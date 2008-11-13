@@ -494,6 +494,7 @@ end
 
 define	OVSC_FMT1	"Overscan section is %s with mean=%g"
 define	OVSC_FMT2	"Overscan section is %s"
+define	OVSC_FMT3	"Overscan section is %s with function=%s" 
 
 procedure merge_overscan (in, out, ampid)
 
@@ -501,11 +502,11 @@ pointer	in		# Input quadrant image
 pointer	out		# Output image
 char	ampid[2]	# Label for readout
 
-pointer	sp, buffer, amplifier, biassec, rootname, fullname
+pointer	sp, buffer, amplifier, biassec, func, rootname, fullname
 real	mean
 int	idx
 
-int	hdmaccf(), stridx()
+int	hdmaccf(), stridx(), nscan()
 
 
 begin
@@ -513,6 +514,7 @@ begin
 	call salloc (buffer,    SZ_LINE,   TY_CHAR)
 	call salloc (amplifier, SZ_LINE,   TY_CHAR)
 	call salloc (biassec,   SZ_LINE,   TY_CHAR)
+	call salloc (func,      SZ_LINE,   TY_CHAR)
 	call salloc (rootname,  SZ_KEYWRD, TY_CHAR)
 	call salloc (fullname,  SZ_KEYWRD, TY_CHAR)
 
@@ -533,9 +535,16 @@ begin
 	    } else {
 		call sscan (Memc[buffer+idx])
 		    call gargr (mean)
-		call sprintf (Memc[buffer], SZ_LINE, OVSC_FMT1)
-		    call pargstr (Memc[biassec])
-		    call pargr (mean)
+	        if (nscan() == 1) {
+		    call sprintf (Memc[buffer], SZ_LINE, OVSC_FMT1)
+			call pargstr (Memc[biassec])
+			call pargr (mean)
+		} else {
+		    call strcpy (Memc[buffer+idx], Memc[func], SZ_LINE)
+		    call sprintf (Memc[buffer], SZ_LINE, OVSC_FMT3)
+			call pargstr (Memc[biassec])
+			call pargstr (Memc[func])
+		}
 	    }
 
 	    # Get overscan keyword name and append AMP_ID

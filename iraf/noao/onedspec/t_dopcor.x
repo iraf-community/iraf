@@ -23,7 +23,7 @@ bool	verbose			# Verbose?
 real	fcval
 bool	wc, fc, aplow[2], aphigh[2]
 int	i, j, ap, beam, nw, dtype
-double	w1, dw, zold, znew
+double	w1, dw, zold, znew, zvel
 pointer	ptr, in, out, mw, sh, inbuf, outbuf
 pointer	sp, input, output, vkey, apstr, key, log, coeff
 
@@ -119,6 +119,7 @@ begin
 		    if (ctod (Memc[vkey], i, z) == 0)
 			z = imgetd (in, Memc[vkey])
 		}
+		zvel = z
 		if (isvel) {
 		    z = z / VLIGHT
 		    if (abs (z) >= 1.)
@@ -223,12 +224,18 @@ begin
 		}
 		if (fcor) {
 		    call sprintf (Memc[log], SZ_LINE, "%8g %g %s")
-			call pargd (z)
+		        if (isvel)
+			    call pargd (zvel)
+			else
+			    call pargd (z)
 			call pargr (ffac)
 			call pargstr (Memc[apstr])
 		} else {
 		    call sprintf (Memc[log], SZ_LINE, "%8g %s")
-			call pargd (z)
+		        if (isvel)
+			    call pargd (zvel)
+			else
+			    call pargd (z)
 			call pargstr (Memc[apstr])
 		}
 		call imastr (out, Memc[key], Memc[log])
@@ -241,6 +248,10 @@ begin
 		    if (SMW_FORMAT(mw) != SMW_ND) {
 			call printf (" apertures=%s,")
 			    call pargstr (Memc[apstr])
+		    }
+		    if (isvel) {
+			call printf (" velocity=%8g,")
+			    call pargd (zvel)
 		    }
 		    call printf (" redshift=%8g, flux factor=%g\n")
 			call pargd (z)

@@ -286,8 +286,8 @@ int	clgeti(), clgwrd(), errget()
 int	imtgetim(), imtrgetim(), imtlen()
 real	clgetr()
 real	mw_c1tranr()
-pointer	imtopen(), immap(), mw_openim(), mw_sctran(), xt_mappm()
-errchk	immap, mw_openim, mw_sctran, xt_mappm
+pointer	imtopen(), immap(), mw_openim(), mw_sctran(), yt_mappm()
+errchk	immap, mw_openim, mw_sctran, yt_mappm
 
 include "../transform/transform.com"
 
@@ -485,7 +485,8 @@ begin
 
 		    # Set masks.
 		    if (mtype > 1) {
-			ptr = xt_mappm ("BPM", in, NO, Memc[minname], SZ_FNAME)
+			ptr = yt_mappm ("BPM", in,"logical", Memc[minname],
+			    SZ_FNAME)
 		        pmin = ptr
 			if (pmin != NULL) {
 			    call sprintf (Memc[moutname], SZ_FNAME, "m%s%d.pl")

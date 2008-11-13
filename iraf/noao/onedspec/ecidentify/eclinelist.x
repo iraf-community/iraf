@@ -156,7 +156,7 @@ pointer	ec			# Echelle pointer
 double	in			# Coordinate to be matched
 double	out			# Matched coordinate
 
-double	match, delta, deltamin
+double	match, alpha, delta, delta1, delta2, out1
 pointer	ll
 
 begin
@@ -166,16 +166,27 @@ begin
 	}
 
 	match = EC_MATCH(ec)
-	deltamin = MAX_REAL
+	alpha = 1.25
+	delta1 = MAX_REAL
 
+	# Find nearest match.
 	for (ll=EC_LL(ec); !IS_INDEFD(Memd[ll]); ll = ll + 1) {
 	    delta = abs (in - Memd[ll])
-	    if (delta < deltamin) {
-		deltamin = delta
-	        if (deltamin <= match)
-		    out = Memd[ll]
+	    if (delta < delta1) {
+	        delta2 = delta1
+		delta1 = delta
+	        if (delta1 <= match)
+		    out1 = Memd[ll]
 	    }
 	}
+
+	# Only return match if no other candidate is also possible.
+	if (delta1 > match)
+	    return
+	if (delta2 < alpha * delta1)
+	    return
+
+	out = out1
 end
 
 # EC_LINELIST -- Add features from a line list.

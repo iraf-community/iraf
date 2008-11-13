@@ -32,7 +32,7 @@ procedure t_setairmass()
 pointer	imlist, im, obs
 pointer	sp, input, observatory, date_key, exp_key, air_key, utm_key, ut_hms
 pointer	ra_key, dec_key, eqn_key, st_key, ut_key, datestr
-int	intype, outtype, year, month, day, fmt
+int	intype, outtype, year, month, day, day1, fmt
 bool	show, update, override, newobs, obshead
 
 double	dec, latitude, exptime, scale, jd
@@ -155,6 +155,7 @@ begin
 		}
 
 		# Adjust for possible change of date in ut_mid.
+		day1 = day
 		jd = ast_date_to_julday (year, month, day, ut_mid)
 		call ast_julday_to_date (jd, year, month, day, ut_mid)
 
@@ -212,9 +213,12 @@ begin
 		# Should probably update a date keyword as well
 		if ((imaccf (im, Memc[utm_key]) == NO || override) &&
 		    (! IS_INDEFD(ut_mid))) {
-		    if (fmt == NO)
-			call imastr (im, Memc[utm_key], Memc[ut_hms])
-		    else if (dtm_encode (Memc[datestr], SZ_FNAME,
+#		    if (fmt == NO && day == day1)
+#			call imastr (im, Memc[utm_key], Memc[ut_hms])
+#		    else if (dtm_encode (Memc[datestr], SZ_FNAME,
+#			year, month, day, utmid, 2, 0) > 0)
+#			call imastr (im, Memc[utm_key], Memc[datestr])
+		    if (dtm_encode (Memc[datestr], SZ_FNAME,
 			year, month, day, utmid, 2, 0) > 0)
 			call imastr (im, Memc[utm_key], Memc[datestr])
 		}
