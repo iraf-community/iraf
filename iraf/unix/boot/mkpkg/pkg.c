@@ -581,10 +581,8 @@ struct context *push_context ( struct context *cx, const char *module,
 	    safe_strcat (ncx->curdir, SZ_PATHNAME+1, newdir);
 	    safe_strcat (ncx->curdir, SZ_PATHNAME+1, "/");
 
-	    if (debug) {
-		printf ("change directory to `%s'\n", newdir);
-		fflush (stdout);
-	    }
+	    printf ("mkpkg: Entering directory `%s'\n", ncx->curdir);
+	    fflush (stdout);
 
 	    if (os_chdir (newdir) == ERR) {
 		warns ("cannot access subdirectory `%s'", newdir);
