@@ -18,16 +18,22 @@ pointer	pm			#I Pixel mask
 int	lvalin			#I Input line interpolation code
 int	cvalin			#I Input column interpolation code
 
-int	i, j, k, l, n, nc, nl, l1, l2, lmin, lmax, ncols, lval, cval, ncompress
+size_t	sz_val
+long	c_1
+long	i, j, k, l, l1, l2, lmin, lmax
+int	ii, jj, lval, cval
+size_t	nc, nl, n, ncols, ncompress
 short	val
 long	v[IM_MAXDIM]
 pointer	fp, ptr, col, pl1, pl2
 pointer	sp, buf, cols
 
 bool	pm_empty()
+long	modl()
 errchk	pmglrs, pmplrs()
 
 begin
+	c_1 = 1
 	# Check for empty mask.
 	if (pm == NULL)
 	    return (NULL)
@@ -35,7 +41,9 @@ begin
 	    return (NULL)
 
 	# Get mask size.
-	call pm_gsize (pm, i, v, j)
+	call pm_gsize (pm, ii, v, jj)
+	i = ii
+	j = jj
 	nc = v[1]
 	nl = v[2]
 
@@ -43,7 +51,8 @@ begin
 	call smark (sp)
 	call salloc (buf, 3*max(nc, nl), TY_SHORT) 
 	call salloc (cols, nc, TY_SHORT)
-	call calloc (fp, FP_LEN, TY_STRUCT)
+	sz_val = FP_LEN
+	call calloc (fp, sz_val, TY_STRUCT)
 
 	# Set the mask codes.  Go through the mask and change any mask codes
 	# that match the input mask code to the output mask code (if they are
@@ -58,17 +67,25 @@ begin
 	    cval = FP_CDEF
 	} else if (IS_INDEFI(lvalin) || lvalin < 1) {
 	    lval = FP_LDEF
-	    cval = mod (cvalin - 1, nc) + 1
+	    l1 = cvalin - 1
+	    l2 = nc
+	    cval = modl(l1,l2) + 1
 	    if (lval == cval)
 		lval = FP_CDEF
 	} else if (IS_INDEFI(cvalin) || cvalin < 1) {
-	    lval = mod (lvalin - 1, nc) + 1
+	    l1 = lvalin - 1
+	    l2 = nc
+	    lval = modl(l1,l2) + 1
 	    cval = FP_CDEF
 	    if (cval == lval)
 		cval = FP_LDEF
 	} else if (lvalin != cvalin) {
-	    lval = mod (lvalin - 1, nc) + 1
-	    cval = mod (cvalin - 1, nc) + 1
+	    l1 = lvalin - 1
+	    l2 = nc
+	    lval = modl(l1,l2) + 1
+	    l1 = cvalin - 1
+	    l2 = nc
+	    cval = modl(l1,l2) + 1
 	} else {
 	    call mfree (fp, TY_STRUCT)
 	    call sfree (sp)
@@ -80,7 +97,8 @@ begin
 	# i.e. are there any mask values different from the line interpolation.
 
 	call aclrs (Mems[cols], nc)
-	call amovkl (long(1), v, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovkl (c_1, v, sz_val)
 	do l = 1, nl {
 	    v[2] = l
 	    call pmglrs (pm, v, Mems[buf], 0, nc, 0)
@@ -110,9 +128,9 @@ begin
 
 	if (n > 0) {
 	    n = n + 10
-	    call malloc (col, n, TY_INT)
-	    call malloc (pl1, n, TY_INT)
-	    call malloc (pl2, n, TY_INT)
+	    call malloc (col, n, TY_LONG)
+	    call malloc (pl1, n, TY_LONG)
+	    call malloc (pl2, n, TY_LONG)
 	    ncols = 0
 	    lmin = nl
 	    lmax = 0
@@ -123,7 +141,8 @@ begin
 		v[1] = i
 		do l = 1, nl {
 		    v[2] = l
-		    call pmglps (pm, v, Mems[buf+l-1], 0, 1, 0)
+		    sz_val = 1
+		    call pmglps (pm, v, Mems[buf+l-1], 0, sz_val, 0)
 		}
 		for (l1=1; l1<=nl && Mems[buf+l1-1]==0; l1=l1+1)
 		    ;
@@ -144,7 +163,8 @@ begin
 			    } else
 				val = lval
 			    v[2] = l
-			    call pmplps (pm, v, val, 0, 1, PIX_SRC)
+			    sz_val = 1
+			    call pmplps (pm, v, val, 0, sz_val, PIX_SRC)
 			    ncompress = ncompress + 1
 			}
 		    }
@@ -155,17 +175,17 @@ begin
 		    if (j > 0) {
 			if (ncols == n) {
 			    n = n + 10
-			    call realloc (col, n, TY_INT)
-			    call realloc (pl1, n, TY_INT)
-			    call realloc (pl2, n, TY_INT)
+			    call realloc (col, n, TY_LONG)
+			    call realloc (pl1, n, TY_LONG)
+			    call realloc (pl2, n, TY_LONG)
 			}
 			j = 1 + l1 - 1
 			k = 1 + l2 - 1
 			lmin = min (lmin, j, k)
 			lmax = max (lmax, j, k)
-			Memi[col+ncols] = i
-			Memi[pl1+ncols] = j
-			Memi[pl2+ncols] = k
+			Meml[col+ncols] = i
+			Meml[pl1+ncols] = j
+			Meml[pl2+ncols] = k
 			ncols = ncols + 1
 		    }
 		    for (l1=l2+1; l1<=nl && Mems[buf+l1-1]==0; l1=l1+1)
@@ -201,7 +221,8 @@ end
 procedure xt_fpsinterp (pm, nc, nl, v, data, lvalin, cvalin, lvalout, cvalout)
 
 pointer	pm		#I Pixel mask
-int	nc, nl		#I Mask size
+size_t	nc		#I Mask size
+size_t	nl		#I Mask size
 long	v[ARB]		#I Coordinate vector
 short	data[ARB]	#I Data buffer
 int	lvalin		#I Input line interpolation code
@@ -209,11 +230,16 @@ int	cvalin		#I Input column interpolation code
 int	lvalout		#I Output line interpolation code
 int	cvalout		#I Output column interpolation code
 
-int	c, l, c1, c2, val
+size_t	sz_val
+long	l_val
+long	c, l, c1, c2
+int	val
 bool	pm_linenotempty()
 
 begin
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	do l = 1, nl {
 	    v[2] = l
 	    if (!pm_linenotempty (pm, v))
@@ -257,9 +283,9 @@ pointer	fp		#U FIXPIX data structure
 begin
 	if (fp == NULL)
 	    return
-	call mfree (FP_PCOL(fp), TY_INT)
-	call mfree (FP_PL1(fp), TY_INT)
-	call mfree (FP_PL2(fp), TY_INT)
+	call mfree (FP_PCOL(fp), TY_LONG)
+	call mfree (FP_PL1(fp), TY_LONG)
+	call mfree (FP_PL2(fp), TY_LONG)
 	if (FP_PV1(fp) != NULL)
 	    call mfree (FP_PV1(fp), FP_PIXTYPE(fp))
 	if (FP_PV2(fp) != NULL)

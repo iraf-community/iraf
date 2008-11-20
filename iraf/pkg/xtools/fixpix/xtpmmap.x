@@ -23,6 +23,7 @@ pointer	refim			#I Reference image pointer
 char	mname[ARB]		#O Expanded mask name
 int	sz_mname		#O Size of expanded mask name
 
+size_t	sz_val
 int	i, flag, nowhite()
 pointer	sp, fname, im, ref, xt_pmmap1()
 bool	streq()
@@ -30,7 +31,8 @@ errchk	xt_pmmap1
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	im = NULL
 	i = nowhite (pmname, Memc[fname], SZ_FNAME)
@@ -82,6 +84,7 @@ int	match			#I Match by physical coordinates?
 char	mname[ARB]		#O Expanded mask name
 int	sz_mname		#O Size of expanded mask name
 
+size_t	sz_val
 int	i, flag, nowhite()
 pointer	sp, fname, im, ref, xt_pmmap1()
 bool	streq()
@@ -89,7 +92,8 @@ errchk	xt_pmmap1
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	im = NULL
 	i = nowhite (pmname, Memc[fname], SZ_FNAME)
@@ -214,23 +218,31 @@ char	pmname[ARB]		#I Image name
 pointer	refim			#I Reference image pointer
 int	flag			#I Mask flag
 
-int	i, ndim, npix, rop, val
+size_t	sz_val
+long	c_1
+long	i
+int	ndim, rop, val
+size_t	npix
 pointer	sp, v1, v2, im_in, im_out, pm, mw, data
 
 pointer	imstatp()
 long	imgnli()
 pointer immap(), pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
+include	<nullptr.inc>
 errchk	immap, mw_openim, im_pmmapo
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
 
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
+	call amovkl (c_1, Meml[v1], sz_val)
+	call amovkl (c_1, Meml[v2], sz_val)
 
-	im_in = immap (pmname, READ_ONLY, 0)
+	im_in = immap (pmname, READ_ONLY, NULLPTR)
 	pm = imstatp (im_in, IM_PMDES)
 	if (pm != NULL)
 	    return (im_in)
@@ -261,7 +273,8 @@ begin
 		}
 	    }
 	    call pmplpi (pm, Meml[v2], Memi[data], 0, npix, rop)
-	    call amovl (Meml[v1], Meml[v2], ndim)
+	    sz_val = ndim
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	im_out = im_pmmapo (pm, im_in)
@@ -287,7 +300,10 @@ char	pmname[ARB]		#I Image name
 pointer	refim			#I Reference image pointer
 int	flag			#I Mask flag
 
-int	fd, nc, nl, c1, c2, l1, l2, nc1, nl1, rop
+long	l_val
+int	fd, rop
+size_t	nc, nl
+long	c1, c2, l1, l2, nc1, nl1
 pointer	pm, im, mw, dummy
 
 int	open(), fscan(), nscan()
@@ -301,14 +317,15 @@ begin
 	nc = IM_LEN(refim,1)
 	nl = IM_LEN(refim,2)
 
+	l_val = 1
 	if (flag == INVERT_MASK)
-	    call pl_box (pm, 1, 1, nc, nl, PIX_SET+PIX_VALUE(1))
+	    call pl_box (pm, l_val, l_val, nc, nl, PIX_SET+PIX_VALUE(1))
 
 	while (fscan (fd) != EOF) {
-	    call gargi (c1)
-	    call gargi (c2)
-	    call gargi (l1)
-	    call gargi (l2)
+	    call gargl (c1)
+	    call gargl (c2)
+	    call gargl (l1)
+	    call gargl (l2)
 	    if (nscan() != 4) {
 		if (nscan() == 2) {
 		    l1 = c2
@@ -359,20 +376,26 @@ char	section[ARB]		#I Image section
 pointer	refim			#I Reference image pointer
 int	flag			#I Mask flag
 
-int	i, j, ip, temp, a[2], b[2], c[2], rop, ctoi()
+size_t	sz_val
+long	c_1
+int	ip, rop, ctol()
+long	i, j, temp, a[2], b[2], c[2]
 pointer	pm, im, mw, dummy, pm_newmask(), im_pmmapo(), imgl1i(), mw_openim()
 errchk	im_pmmapo
 define  error_  99
 
 begin
+	c_1 = 1
+
 	# This is currently only for 1D and 2D images.
 	if (IM_NDIM(refim) > 2)
 	    call error (1, "Image sections only allowed for 1D and 2D images")
 
         # Decode the section string.
-	call amovki (1, a, 2)
-	call amovki (1, b, 2)
-	call amovki (1, c, 2)
+	sz_val = 2
+	call amovkl (c_1, a, sz_val)
+	call amovkl (c_1, b, sz_val)
+	call amovkl (c_1, c, sz_val)
 	do i = 1, IM_NDIM(refim)
 	    b[i] = IM_LEN(refim,i)
 
@@ -389,11 +412,11 @@ begin
 		# Get a:b:c.  Allow notation such as "-*:c"
 		# (or even "-:c") where the step is obviously negative.
 
-		if (ctoi (section, ip, temp) > 0) {                 # a
+		if (ctol (section, ip, temp) > 0) {                 # a
 		    a[i] = temp
 		    if (section[ip] == ':') {
 			ip = ip + 1
-			if (ctoi (section, ip, b[i]) == 0)             # a:b
+			if (ctol (section, ip, b[i]) == 0)             # a:b
 			    goto error_
 		    } else
 			b[i] = a[i]
@@ -408,7 +431,7 @@ begin
 		    ip = ip + 1
 		if (section[ip] == ':') {                           # ..:step
 		    ip = ip + 1
-		    if (ctoi (section, ip, c[i]) == 0)
+		    if (ctol (section, ip, c[i]) == 0)
 			goto error_
 		    else if (c[i] == 0)
 			goto error_
@@ -443,7 +466,7 @@ begin
 
 	if (flag == INVERT_MASK) {
 	    rop = PIX_SET+PIX_VALUE(1)
-	    call pm_box (pm, 1, 1, IM_LEN(refim,1), IM_LEN(refim,2), rop)
+	    call pm_box (pm, c_1, c_1, IM_LEN(refim,1), IM_LEN(refim,2), rop)
 	    rop = PIX_CLR
 	} else
 	    rop = PIX_SET+PIX_VALUE(1)
@@ -479,17 +502,27 @@ procedure xt_pminvert (pm)
 
 pointer	pm		#I Pixel mask to be inverted
 
-int	i, naxes, axlen[IM_MAXDIM], depth, npix, val
+size_t	sz_val
+long	c_1
+long	axlen[IM_MAXDIM]
+long	i
+int	naxes, depth, val
+size_t	npix
 pointer	sp, v, buf, one
 bool	pm_linenotempty()
 
 begin
+	c_1 = 1
+
 	call pm_gsize (pm, naxes, axlen, depth)
 
 	call smark (sp)
-	call salloc (v, IM_MAXDIM, TY_LONG)
-	call salloc (buf, axlen[1], TY_INT)
-	call salloc (one, 6, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
+	sz_val = axlen[1]
+	call salloc (buf, sz_val, TY_INT)
+	sz_val = 6
+	call salloc (one, sz_val, TY_INT)
 
 	npix = axlen[1]
 	RLI_LEN(one) = 2
@@ -498,7 +531,8 @@ begin
 	Memi[one+4] = npix
 	Memi[one+5] = 1
 
-	call amovkl (long(1), Meml[v], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovkl (c_1, Meml[v], sz_val)
 	repeat {
 	    if (pm_linenotempty (pm, Meml[v])) {
 		call pmglpi (pm, Meml[v], Memi[buf], 0, npix, 0)
@@ -540,7 +574,10 @@ pointer	im			#U Pixel mask image pointer
 pointer	refim			#I Reference image pointer
 int	match			#I Match by physical coordinates?
 
-int	i, j, k, l, i1, i2, j1, j2, nc, nl, ncpm, nlpm, nx, val
+size_t	sz_val
+long	i, j, k, l, i1, i2, j1, j2
+int	val, ik, il
+size_t	nc, nl, ncpm, nlpm, nx
 double	x1, x2, y1, y2, lt[6], lt1[6], lt2[6]
 long	vold[IM_MAXDIM], vnew[IM_MAXDIM]
 pointer	pm, pmnew, imnew, mw, ctx, cty, bufref, bufpm
@@ -548,6 +585,9 @@ pointer	pm, pmnew, imnew, mw, ctx, cty, bufref, bufpm
 pointer	imstatp()
 pointer	pm_open(), mw_openim(), im_pmmapo(), imgl1i(), mw_sctran()
 bool	pm_empty(), pm_linenotempty()
+int	nint_di()
+long	nint_dl()
+include	<nullptr.inc>
 errchk	pm_open, mw_openim, im_pmmapo
 
 begin
@@ -577,8 +617,10 @@ begin
 	    mw = mw_openim (refim)
 	    call mw_gltermd (mw, lt2, lt2[5], 2)
 	    call mw_close (mw)
-	} else
-	    call amovd (lt, lt2, 6)
+	} else {
+	    sz_val = 6
+	    call amovd (lt, lt2, sz_val)
+	}
 
 	# Combine lterms.
 	call mw_invertd (lt, lt1, 2)
@@ -586,8 +628,10 @@ begin
 	call mw_vmuld (lt, lt[5], lt[5], 2)
 	lt[5] = lt2[5] - lt[5]
 	lt[6] = lt2[6] - lt[6]
-	do i = 1, 6
-	    lt[i] = nint (1D6 * (lt[i]-int(lt[i]))) / 1D6 + int(lt[i])
+	do i = 1, 6 {
+	    l = lt[i]
+	    lt[i] = nint (1D6 * (lt[i]-l)) / 1D6 + l
+	}
 
 	# Check for a rotation.  For now don't allow any rotation.
 	if (lt[2] != 0. || lt[3] != 0.)
@@ -606,20 +650,20 @@ begin
 
 	# Create a new pixel mask of the required size and offset.
 	# Do dummy image I/O to set the header.
-	pmnew = pm_open (NULL)
+	pmnew = pm_open (NULLPTR)
 	call pm_ssize (pmnew, 2, IM_LEN(refim,1), 27)
-	imnew = im_pmmapo (pmnew, NULL)
+	imnew = im_pmmapo (pmnew, NULLPTR)
 	bufref = imgl1i (imnew)
 
 	# Compute region of mask overlapping the reference image.
 	call mw_ctrand (ctx, 1-0.5D0, x1, 1)
 	call mw_ctrand (ctx, nc+0.5D0, x2, 1)
-	i1 = max (1, nint(min(x1,x2)+1D-5))
-	i2 = min (ncpm, nint(max(x1,x2)-1D-5))
+	i1 = max (1, nint_dl(min(x1,x2)+1D-5))
+	i2 = min (ncpm, nint_dl(max(x1,x2)-1D-5))
 	call mw_ctrand (cty, 1-0.5D0, y1, 1)
 	call mw_ctrand (cty, nl+0.5D0, y2, 1)
-	j1 = max (1, nint(min(y1,y2)+1D-5))
-	j2 = min (nlpm, nint(max(y1,y2)-1D-5))
+	j1 = max (1, nint_dl(min(y1,y2)+1D-5))
+	j2 = min (nlpm, nint_dl(max(y1,y2)-1D-5))
 
 	# Set the new mask values to the maximum of all mask values falling
 	# within each reference pixel in the overlap region.
@@ -632,19 +676,19 @@ begin
 	    # padding.  In this case use range lists for speed.
 	    if (lt[1] == 1D0 && lt[4] == 1D0) {
 		call malloc (bufpm, 3+3*nc, TY_INT)
-		k = nint (lt[5])
-		l = nint (lt[6])
-		do j = max(1-l,j1), min(nl-l,j2) {
+		ik = nint_di (lt[5])
+		il = nint_di (lt[6])
+		do j = max(1-il,j1), min(nl-il,j2) {
 		    vold[2] = j
 		    call pmglri (pm, vold, Memi[bufpm], 0, nc, PIX_SRC)
-		    if (k != 0) {
+		    if (ik != 0) {
 			bufref = bufpm
 			do i = 2, Memi[bufpm] {
 			    bufref = bufref + 3
-			    Memi[bufref] = Memi[bufref] + k
+			    Memi[bufref] = Memi[bufref] + ik
 			}
 		    }
-		    vnew[2] = j + l
+		    vnew[2] = j + il
 		    call pmplri (pmnew, vnew, Memi[bufpm], 0, nc, PIX_SRC)
 		}
 		bufref = NULL
@@ -657,8 +701,8 @@ begin
 		do j = 1, nl {
 		    call mw_ctrand (cty, j-0.5D0, y1, 1)
 		    call mw_ctrand (cty, j+0.5D0, y2, 1)
-		    j1 = max (1, nint(min(y1,y2)+1D-5))
-		    j2 = min (nlpm, nint(max(y1,y2)-1D-5))
+		    j1 = max (1, nint_dl(min(y1,y2)+1D-5))
+		    j2 = min (nlpm, nint_dl(max(y1,y2)-1D-5))
 		    if (j2 < j1)
 			next
 
@@ -672,8 +716,8 @@ begin
 			do i = 1, nc {
 			    call mw_ctrand (ctx, i-0.5D0, x1, 1)
 			    call mw_ctrand (ctx, i+0.5D0, x2, 1)
-			    i1 = max (1, nint(min(x1,x2)+1D-5))
-			    i2 = min (ncpm, nint(max(x1,x2)-1D-5))
+			    i1 = max (1, nint_dl(min(x1,x2)+1D-5))
+			    i2 = min (ncpm, nint_dl(max(x1,x2)-1D-5))
 			    if (i2 < i1)
 				next
 			    val = Memi[bufref+i-1]

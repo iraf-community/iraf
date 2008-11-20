@@ -16,7 +16,8 @@ procedure set_fp (im, fp)
 pointer	im			#I Input mask image pointer
 pointer	fp			#O FIXPIX interpolation pointer
 
-int	i, j, nc, nl
+long	i, j
+size_t	nc, nl
 long	v[2]
 pointer	data1, data2, pm, pmi
 

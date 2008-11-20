@@ -41,13 +41,16 @@ pointer procedure xt_fps$t (fp, im, line, col1, col2, line1, line2, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
+size_t	sz_val
+long	l_val
+long	i, j, c1, c2, l1, l2, l3, l4
+size_t	nc, nl, ncols
 long	v[IM_MAXDIM]
 $if (datatype == silr)
 real	a, b, c, d, val
@@ -58,6 +61,7 @@ PIXEL	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
+long	nint_rl()
 pointer	imgl2$t(), xt_fpval$t()
 
 begin
@@ -70,7 +74,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
@@ -156,8 +162,8 @@ begin
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call parg$t (Mem$t[data+i-1])
 			    $if (datatype == silr)
 			    call pargr (val)
@@ -166,13 +172,13 @@ begin
 			    $endif
 			if (c1 >= col1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c1)
-			    call pargi (line)
+			    call pargl (c1)
+			    call pargl (line)
 			}
 			if (c2 <= col2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c2)
-			    call pargi (line)
+			    call pargl (c2)
+			    call pargl (line)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -200,8 +206,8 @@ begin
 		    }
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call parg$t (Mem$t[data+i-1])
 			    $if (datatype == silr)
 			    call pargr (val)
@@ -210,19 +216,19 @@ begin
 			    $endif
 			if (l1 >= line1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l3)
+			    call pargl (i)
+			    call pargl (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l4)
+			    call pargl (i)
+			    call pargl (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
 		}
 		$if (datatype == sil)
-		Mem$t[data+i-1] = nint (val)
+		Mem$t[data+i-1] = nint_rl(val)
 		$else
 		Mem$t[data+i-1] = val
 		$endif
@@ -243,9 +249,9 @@ pointer procedure xt_fpval$t (fp, im, line)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 
-int	i
+long	i
 pointer	data, imgl2$t()
 
 begin

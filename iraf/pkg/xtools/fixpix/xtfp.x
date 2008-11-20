@@ -41,19 +41,23 @@ pointer procedure xt_fpss (fp, im, line, col1, col2, line1, line2, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
+size_t	sz_val
+long	l_val
+long	i, j, c1, c2, l1, l2, l3, l4
+size_t	nc, nl, ncols
 long	v[IM_MAXDIM]
 real	a, b, c, d, val
 short	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
+long	nint_rl()
 pointer	imgl2s(), xt_fpvals()
 
 begin
@@ -66,7 +70,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
@@ -152,19 +158,19 @@ begin
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call pargs (Mems[data+i-1])
 			    call pargr (val)
 			if (c1 >= col1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c1)
-			    call pargi (line)
+			    call pargl (c1)
+			    call pargl (line)
 			}
 			if (c2 <= col2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c2)
-			    call pargi (line)
+			    call pargl (c2)
+			    call pargl (line)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -192,24 +198,24 @@ begin
 		    }
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call pargs (Mems[data+i-1])
 			    call pargr (val)
 			if (l1 >= line1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l3)
+			    call pargl (i)
+			    call pargl (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l4)
+			    call pargl (i)
+			    call pargl (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
 		}
-		Mems[data+i-1] = nint (val)
+		Mems[data+i-1] = nint_rl(val)
 	    }
 	    for (c1=c2+1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 		;
@@ -227,9 +233,9 @@ pointer procedure xt_fpvals (fp, im, line)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 
-int	i
+long	i
 pointer	data, imgl2s()
 
 begin
@@ -294,19 +300,23 @@ pointer procedure xt_fpsi (fp, im, line, col1, col2, line1, line2, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
+size_t	sz_val
+long	l_val
+long	i, j, c1, c2, l1, l2, l3, l4
+size_t	nc, nl, ncols
 long	v[IM_MAXDIM]
 real	a, b, c, d, val
 int	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
+long	nint_rl()
 pointer	imgl2i(), xt_fpvali()
 
 begin
@@ -319,7 +329,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
@@ -405,19 +417,19 @@ begin
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call pargi (Memi[data+i-1])
 			    call pargr (val)
 			if (c1 >= col1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c1)
-			    call pargi (line)
+			    call pargl (c1)
+			    call pargl (line)
 			}
 			if (c2 <= col2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c2)
-			    call pargi (line)
+			    call pargl (c2)
+			    call pargl (line)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -445,24 +457,24 @@ begin
 		    }
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call pargi (Memi[data+i-1])
 			    call pargr (val)
 			if (l1 >= line1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l3)
+			    call pargl (i)
+			    call pargl (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l4)
+			    call pargl (i)
+			    call pargl (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
 		}
-		Memi[data+i-1] = nint (val)
+		Memi[data+i-1] = nint_rl(val)
 	    }
 	    for (c1=c2+1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 		;
@@ -480,9 +492,9 @@ pointer procedure xt_fpvali (fp, im, line)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 
-int	i
+long	i
 pointer	data, imgl2i()
 
 begin
@@ -547,19 +559,23 @@ pointer procedure xt_fpsl (fp, im, line, col1, col2, line1, line2, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
+size_t	sz_val
+long	l_val
+long	i, j, c1, c2, l1, l2, l3, l4
+size_t	nc, nl, ncols
 long	v[IM_MAXDIM]
 real	a, b, c, d, val
 long	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
+long	nint_rl()
 pointer	imgl2l(), xt_fpvall()
 
 begin
@@ -572,7 +588,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
@@ -658,19 +676,19 @@ begin
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call pargl (Meml[data+i-1])
 			    call pargr (val)
 			if (c1 >= col1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c1)
-			    call pargi (line)
+			    call pargl (c1)
+			    call pargl (line)
 			}
 			if (c2 <= col2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c2)
-			    call pargi (line)
+			    call pargl (c2)
+			    call pargl (line)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -698,24 +716,24 @@ begin
 		    }
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call pargl (Meml[data+i-1])
 			    call pargr (val)
 			if (l1 >= line1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l3)
+			    call pargl (i)
+			    call pargl (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l4)
+			    call pargl (i)
+			    call pargl (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
 		}
-		Meml[data+i-1] = nint (val)
+		Meml[data+i-1] = nint_rl(val)
 	    }
 	    for (c1=c2+1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 		;
@@ -733,9 +751,9 @@ pointer procedure xt_fpvall (fp, im, line)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 
-int	i
+long	i
 pointer	data, imgl2l()
 
 begin
@@ -800,19 +818,23 @@ pointer procedure xt_fpsr (fp, im, line, col1, col2, line1, line2, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
+size_t	sz_val
+long	l_val
+long	i, j, c1, c2, l1, l2, l3, l4
+size_t	nc, nl, ncols
 long	v[IM_MAXDIM]
 real	a, b, c, d, val
 real	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
+long	nint_rl()
 pointer	imgl2r(), xt_fpvalr()
 
 begin
@@ -825,7 +847,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
@@ -911,19 +935,19 @@ begin
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call pargr (Memr[data+i-1])
 			    call pargr (val)
 			if (c1 >= col1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c1)
-			    call pargi (line)
+			    call pargl (c1)
+			    call pargl (line)
 			}
 			if (c2 <= col2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c2)
-			    call pargi (line)
+			    call pargl (c2)
+			    call pargl (line)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -951,19 +975,19 @@ begin
 		    }
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call pargr (Memr[data+i-1])
 			    call pargr (val)
 			if (l1 >= line1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l3)
+			    call pargl (i)
+			    call pargl (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l4)
+			    call pargl (i)
+			    call pargl (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -986,9 +1010,9 @@ pointer procedure xt_fpvalr (fp, im, line)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 
-int	i
+long	i
 pointer	data, imgl2r()
 
 begin
@@ -1053,19 +1077,23 @@ pointer procedure xt_fpsd (fp, im, line, col1, col2, line1, line2, fd)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 int	fd			#I File descriptor for pixel list
 
-int	col1, col2		#I Section of interest
-int	line1, line2		#I Section of interest
+long	col1, col2		#I Section of interest
+long	line1, line2		#I Section of interest
 
-int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
+size_t	sz_val
+long	l_val
+long	i, j, c1, c2, l1, l2, l3, l4
+size_t	nc, nl, ncols
 long	v[IM_MAXDIM]
 double	a, b, c, d, val
 double	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
+long	nint_rl()
 pointer	imgl2d(), xt_fpvald()
 
 begin
@@ -1078,7 +1106,9 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 	ncols = FP_NCOLS(fp)
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	v[2] = line
 
 	# If there might be column interpolation initialize value arrays.
@@ -1164,19 +1194,19 @@ begin
 		    val = a + b * (i - c1)
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call pargd (Memd[data+i-1])
 			    call pargd (val)
 			if (c1 >= col1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c1)
-			    call pargi (line)
+			    call pargl (c1)
+			    call pargl (line)
 			}
 			if (c2 <= col2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (c2)
-			    call pargi (line)
+			    call pargl (c2)
+			    call pargl (line)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -1204,19 +1234,19 @@ begin
 		    }
 		    if (fd != NULL) {
 			call fprintf (fd, "%4d %4d %8g %8g")
-			    call pargi (i)
-			    call pargi (line)
+			    call pargl (i)
+			    call pargl (line)
 			    call pargd (Memd[data+i-1])
 			    call pargd (val)
 			if (l1 >= line1) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l3)
+			    call pargl (i)
+			    call pargl (l3)
 			}
 			if (l2 <= line2) {
 			    call fprintf (fd, " %4d %4d")
-			    call pargi (i)
-			    call pargi (l4)
+			    call pargl (i)
+			    call pargl (l4)
 			}
 			call fprintf (fd, "\n")
 		    }
@@ -1239,9 +1269,9 @@ pointer procedure xt_fpvald (fp, im, line)
 
 pointer	fp			#I FIXPIX pointer
 pointer	im			#I Image pointer
-int	line			#I Line
+long	line			#I Line
 
-int	i
+long	i
 pointer	data, imgl2d()
 
 begin

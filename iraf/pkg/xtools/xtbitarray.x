@@ -5,19 +5,19 @@ include	<mach.h>
 # memory for random I/O.
 
 define	BA_LEN	6				# Length of structure
-define	BA_NC	Memi[$1]			# Number of columns
-define	BA_NL	Memi[$1+1]			# Number of lines 
-define	BA_NBE	Memi[$1+2]			# Number of bits per element
-define	BA_NEW	Memi[$1+3]			# Number of elements per word
-define	BA_MAX	Memi[$1+4]			# Maximum value
-define	BA_DATA	Memi[$1+5]			# Data pointer
+define	BA_NC	Memz[P2Z($1)]			# Number of columns
+define	BA_NL	Memz[P2Z($1+1)]			# Number of lines 
+define	BA_NBE	Memi[P2I($1+2)]			# Number of bits per element
+define	BA_NEW	Memi[P2I($1+3)]			# Number of elements per word
+define	BA_MAX	Memi[P2I($1+4)]			# Maximum value
+define	BA_DATA	Memp[$1+5]			# Data pointer
 
 
 # XT_BAOPEN -- Open the bit array by allocating a structure and memory.
 
 pointer procedure xt_baopen (nc, nl, maxval)
 
-int	nc, nl				#I Size of bit array to open
+size_t	nc, nl				#I Size of bit array to open
 int	maxval				#I Maximum value
 pointer	ba				#R Bitarray structure
 
@@ -57,18 +57,21 @@ end
 procedure xt_baps (ba, c, l, data, n)
 
 pointer	ba				#I Bitarray structure
-int	c, l				#I Starting element
+long	c, l				#I Starting element
 short	data[n]				#I Input data array
-int	n				#I Number of data values
+size_t	n				#I Number of data values
 
-int	i, j, k, m, val
+long	i, j, k, m, bn
+int	val
+long	modl()
 
 begin
 	k = (c - 1) + BA_NC(ba) * (l - 1) - 1
 	do m = 1, n {
 	    k = k + 1
 	    j = k / BA_NEW(ba)
-	    i = BA_NBE(ba) * mod (k, BA_NEW(ba)) + 1
+	    bn = BA_NEW(ba)
+	    i = BA_NBE(ba) * modl(k, bn) + 1
 	    val = min (data[m], BA_MAX(ba))
 	    call bitpak (val, Memi[BA_DATA(ba)+j], i, BA_NBE(ba))
 	}
@@ -80,18 +83,21 @@ end
 procedure xt_bags (ba, c, l, data, n)
 
 pointer	ba				#I Bitarray structure
-int	c, l				#I Starting element
+long	c, l				#I Starting element
 short	data[n]				#I Output data array
-int	n				#I Number of data values
+size_t	n				#I Number of data values
 
-int	i, j, k, m, bitupk()
+long	i, j, k, m, bn
+int	bitupk()
+long	modl()
 
 begin
 	k = (c - 1) + BA_NC(ba) * (l - 1) - 1
 	do m = 1, n {
 	    k = k + 1
 	    j = k / BA_NEW(ba)
-	    i = BA_NBE(ba) * mod (k, BA_NEW(ba)) + 1
+	    bn = BA_NEW(ba)
+	    i = BA_NBE(ba) * modl(k, bn) + 1
 	    data[m] = bitupk (Memi[BA_DATA(ba)+j], i, BA_NBE(ba))
 	}
 end
@@ -102,18 +108,21 @@ end
 procedure xt_bapi (ba, c, l, data, n)
 
 pointer	ba				#I Bitarray structure
-int	c, l				#I Starting element
+long	c, l				#I Starting element
 int	data[n]				#I Input data array
-int	n				#I Number of data values
+size_t	n				#I Number of data values
 
-int	i, j, k, m, val
+long	i, j, k, m, bn
+int	val
+long	modl()
 
 begin
 	k = (c - 1) + BA_NC(ba) * (l - 1) - 1
 	do m = 1, n {
 	    k = k + 1
 	    j = k / BA_NEW(ba)
-	    i = BA_NBE(ba) * mod (k, BA_NEW(ba)) + 1
+	    bn = BA_NEW(ba)
+	    i = BA_NBE(ba) * modl(k, bn) + 1
 	    val = min (data[m], BA_MAX(ba))
 	    call bitpak (val, Memi[BA_DATA(ba)+j], i, BA_NBE(ba))
 	}
@@ -125,18 +134,21 @@ end
 procedure xt_bagi (ba, c, l, data, n)
 
 pointer	ba				#I Bitarray structure
-int	c, l				#I Starting element
+long	c, l				#I Starting element
 int	data[n]				#I Output data array
-int	n				#I Number of data values
+size_t	n				#I Number of data values
 
-int	i, j, k, m, bitupk()
+long	i, j, k, m, bn
+int	bitupk()
+long	modl()
 
 begin
 	k = (c - 1) + BA_NC(ba) * (l - 1) - 1
 	do m = 1, n {
 	    k = k + 1
 	    j = k / BA_NEW(ba)
-	    i = BA_NBE(ba) * mod (k, BA_NEW(ba)) + 1
+	    bn = BA_NEW(ba)
+	    i = BA_NBE(ba) * modl(k, bn) + 1
 	    data[m] = bitupk (Memi[BA_DATA(ba)+j], i, BA_NBE(ba))
 	}
 end
