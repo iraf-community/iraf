@@ -14,10 +14,10 @@ double	ilng[ARB]	#I the input ra/longitude in radians
 double	ilat[ARB]	#I the input dec/latitude in radians
 double	olng[ARB]	#O the output ra/longitude in radians
 double	olat[ARB]	#O the output dec/latitude in radians
-int	npts		#I the number of points to be converted
+size_t	npts		#I the number of points to be converted
 
 double	tilng, tilat, tolng, tolat
-int	i
+long	i
 
 begin
 	do i = 1, npts {
