@@ -8,11 +8,12 @@ include "cq.h"
 # column begins. For blocked text files the foffsets determine where each
 # record begins.
 
-int procedure cq_setrecord (res, recptr)
+long procedure cq_setrecord (res, recptr)
 
 pointer	res			#I the results descriptor
-int	recptr			#U the current record pointer
+long	recptr			#U the current record pointer
 
+size_t	sz_val
 pointer	buf
 
 begin
@@ -20,7 +21,8 @@ begin
 	if (recptr <= 0) {
 	    CQ_RECPTR(res) = 0
 	    CQ_FNFIELDS(res) = 0
-	    call aclri (Memi[CQ_FINDICES(res)], CQ_MAX_NFIELDS + 1)
+	    sz_val = CQ_MAX_NFIELDS + 1
+	    call aclri (Memi[CQ_FINDICES(res)], sz_val)
 	    return (BOF)
 	}
 	if (recptr > CQ_RNRECS(res))
@@ -46,14 +48,15 @@ end
 int procedure cq_gvalc (res, recptr, field, str, maxch)
 
 pointer	res			#I the results descriptor
-int	recptr			#I the current record pointer
+long	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
 char	str[ARB]		#O the output string parameter
 int	maxch			#I the maximum number of characters
 
 pointer	fbuf
 int	fnum, fip, fsize
-int	cq_fnumber(), cq_setrecord()
+int	cq_fnumber()
+long	cq_setrecord()
 
 begin
 	# The record is outside the record data range.
@@ -106,13 +109,15 @@ end
 int procedure cq_gvald (res, recptr, field, dval)
 
 pointer	res			#I the results descriptor
-int	recptr			#I the current record pointer
+long	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
 double	dval			#O the output double value
 
+size_t	sz_val
 pointer	fbuf, sp, line
 int	fnum, fip, fsize, nchars
-int	cq_fnumber(), ctod(), cq_setrecord()
+int	cq_fnumber(), ctod()
+long	cq_setrecord()
 
 begin
 	dval = INDEFD
@@ -133,7 +138,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Extract the requested field as a double precision value. If the data
 	# is in binary internally this may imply a type conversion. If the data
@@ -175,13 +181,15 @@ end
 int procedure cq_gvalr (res, recptr, field, rval)
 
 pointer	res			#I the results descriptor
-int	recptr			#I the current record pointer
+long	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
 real	rval			#O the output real value
 
+size_t	sz_val
 pointer	fbuf, sp, line
 int	fnum, fip, fsize, nchars
-int	cq_fnumber(), ctor(), cq_setrecord()
+int	cq_fnumber(), ctor()
+long	cq_setrecord()
 
 begin
 	rval = INDEFR
@@ -202,7 +210,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Extract the requested field as a double precision value. If the data
 	# is in binary internally this may imply a type conversion. If the data
@@ -244,13 +253,15 @@ end
 int procedure cq_gvall (res, recptr, field, lval)
 
 pointer	res			#I the results descriptor
-int	recptr			#I the current record pointer
+long	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
-long	lval			#I the output long value
+long	lval			#O the output long value
 
+size_t	sz_val
 pointer	fbuf, sp, line
 int	fnum, fip, fsize, nchars
-int	cq_fnumber(), ctol(), cq_setrecord()
+int	cq_fnumber(), ctol()
+long	cq_setrecord()
 
 begin
 	lval = INDEFL
@@ -271,7 +282,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Extract the requested field as a double precision value. If the data
 	# is in binary internally this may imply a type conversion. If the data
@@ -313,13 +325,15 @@ end
 int procedure cq_gvali (res, recptr, field, ival)
 
 pointer	res			#I the results descriptor
-int	recptr			#I the current record pointer
+long	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
-int	ival			#I the output int value
+int	ival			#O the output int value
 
+size_t	sz_val
 pointer	fbuf, sp, line
 int	fnum, fip, fsize, nchars
-int	cq_fnumber(), ctoi(), cq_setrecord()
+int	cq_fnumber(), ctoi()
+long	cq_setrecord()
 
 begin
 	ival = INDEFI
@@ -340,7 +354,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Extract the requested field as a double precision value. If the data
 	# is in binary internally this may imply a type conversion. If the data
@@ -381,13 +396,15 @@ end
 int procedure cq_gvals (res, recptr, field, sval)
 
 pointer	res			#I the results descriptor
-int	recptr			#I the current record pointer
+long	recptr			#I the current record pointer
 char	field[ARB]		#I the record field name.
 short	sval			#O the output short value
 
+size_t	sz_val
 pointer	fbuf, sp, line
 int	fnum, fip, fsize, nchars, ival
-int	cq_fnumber(), ctoi(), cq_setrecord()
+int	cq_fnumber(), ctoi()
+long	cq_setrecord()
 
 begin
 	sval = INDEFS
@@ -408,7 +425,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Extract the requested field as a double precision value. If the data
 	# is in binary internally this may imply a type conversion. If the data

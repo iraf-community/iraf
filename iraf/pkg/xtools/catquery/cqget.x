@@ -31,6 +31,29 @@ begin
 end
 
 
+# CQ_FGETL -- Fetch a long integer field from the current catalog.
+
+long procedure cq_fgetl (cq, field)
+
+pointer	cq				#I the catalog descriptor
+char	field[ARB]			#I the field name
+
+long	lval
+long	cq_dgetl()
+errchk	cq_dgetl()
+
+begin
+	if (CQ_CAT(cq) == NULL)
+	    call error (0, "The current catalog is undefined")
+	if (CQ_CATNO(cq) < 1 || CQ_CATNO(cq) > CQ_NRECS(cq))
+	    call error (0, "The current catalog is undefined")
+
+	lval = cq_dgetl (cq, CQ_CATNO(cq), field)
+
+	return (lval)
+end
+
+
 # CQ_FGETR -- Fetch a real field from the current catalog.
 
 real procedure cq_fgetr (cq, field)
@@ -95,6 +118,29 @@ begin
 	    call error (0, "The current catalog is undefined")
 
 	call cq_dgai (cq, CQ_CATNO(cq), field, array, max_len, npts)
+
+	return (npts)
+end
+
+
+# CQ_FGAL -- Get an array valued long integer parameter.
+
+int procedure cq_fgal (cq, field, array, max_len)
+
+pointer	cq				#I the catalog descriptor
+char	field[ARB]			#I the field name
+long	array[ARB]			#O the output array
+int	max_len				#I the maximum length of the array
+
+int	npts
+
+begin
+	if (CQ_CAT(cq) == NULL)
+	    call error (0, "The current catalog is undefined")
+	if (CQ_CATNO(cq) < 1 || CQ_CATNO(cq) > CQ_NRECS(cq))
+	    call error (0, "The current catalog is undefined")
+
+	call cq_dgal (cq, CQ_CATNO(cq), field, array, max_len, npts)
 
 	return (npts)
 end

@@ -8,8 +8,8 @@ int procedure cq_gnrecord (res, buf, maxch, recptr)
 
 pointer	res			#I the results descriptor
 char	buf[ARB]		#O the output record buffer
-int	maxch			#I the maximum buffer size 
-int	recptr			#U the current record pointer
+size_t	maxch			#I the maximum buffer size 
+long	recptr			#U the current record pointer
 
 int	nchars
 int	getline()
@@ -49,8 +49,8 @@ int procedure cq_grecord (res, buf, maxch, recptr)
 
 pointer	res			#I the results descriptor
 char	buf[ARB]		#O the output record buffer
-int	maxch			#I the maximum buffer size 
-int	recptr			#I the record to be extracted
+size_t	maxch			#I the maximum buffer size 
+long	recptr			#I the record to be extracted
 
 int	nchars
 int	getline()

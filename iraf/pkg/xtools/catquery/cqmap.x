@@ -8,8 +8,11 @@ pointer procedure cq_map (database, mode)
 char	database[ARB]			#I The database file
 int	mode				#I The database file access mode
 
-int	i, nrec, cq_alloc1, cq_alloc2
-pointer	cq, str
+size_t	sz_val
+int	i
+long	j
+size_t	nrec, cq_alloc1, cq_alloc2
+pointer	cq, str, ip
 
 long	note()
 int	open(), fscan(), strlen()
@@ -23,7 +26,8 @@ begin
 	iferr (i = open (database, mode, TEXT_FILE))
 	    return (NULL)
 
-	call calloc (cq, CQ_LEN, TY_STRUCT)
+	sz_val = CQ_LEN
+	call calloc (cq, sz_val, TY_STRUCT)
 	call strcpy (database, CQ_CATDB(cq), SZ_FNAME)
 	CQ_FD(cq) = i
 
@@ -35,7 +39,8 @@ begin
 	call malloc (CQ_OFFSETS(cq), cq_alloc1, TY_LONG)
 	call malloc (CQ_NAMES(cq), cq_alloc1, TY_INT)
 	call malloc (CQ_MAP(cq), cq_alloc2, TY_CHAR)
-	call malloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call malloc (str, sz_val, TY_CHAR)
 
 	nrec = 1
 	CQ_NRECS(cq) = 0
@@ -46,16 +51,16 @@ begin
 
 	    if (streq (CQ_NAME(cq, nrec), "begin")) {
 	        call gargstr (Memc[str], SZ_LINE)
-		for (i=str; IS_WHITE(Memc[i]); i=i+1)
+		for (ip=str; IS_WHITE(Memc[ip]); ip=ip+1)
 		    ;
-		call strcpy (Memc[i], CQ_NAME(cq,nrec), SZ_LINE)
+		call strcpy (Memc[ip], CQ_NAME(cq,nrec), SZ_LINE)
 
-		for (i = 1; i < nrec; i = i + 1)
-		    if (streq (CQ_NAME(cq, i), CQ_NAME(cq, nrec)))
+		for (j = 1; j < nrec; j = j + 1)
+		    if (streq (CQ_NAME(cq, j), CQ_NAME(cq, nrec)))
 			break
 
-		if (i < nrec)
-		    CQ_OFFSET(cq, i) = note (CQ_FD(cq))
+		if (j < nrec)
+		    CQ_OFFSET(cq, j) = note (CQ_FD(cq))
 		else {
 		    CQ_NRECS(cq) = nrec
 		    CQ_OFFSET(cq, nrec) = note (CQ_FD(cq))
@@ -76,7 +81,8 @@ begin
 	    }
 	}
 
-	call realloc (CQ_MAP(cq), CQ_NAMEI(cq, nrec), TY_CHAR)
+	sz_val = CQ_NAMEI(cq, nrec)
+	call realloc (CQ_MAP(cq), sz_val, TY_CHAR)
 	call realloc (CQ_OFFSETS(cq), CQ_NRECS(cq), TY_LONG)
 	call realloc (CQ_NAMES(cq), CQ_NRECS(cq), TY_INT)
 	call mfree (str, TY_CHAR)

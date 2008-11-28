@@ -12,7 +12,7 @@ include		"cq.h"
 int procedure cq_dgeti (cq, record, field)
 
 pointer	cq				#I The catalog database descriptor
-int	record				#I The catalog record index
+long	record				#I The catalog record index
 char	field[ARB]			#I The record field
 
 int	ival				#O Field value
@@ -45,12 +45,50 @@ begin
 end
 
 
+# CQ_DGETL -- Get a long integer field from the database record.
+
+long procedure cq_dgetl (cq, record, field)
+
+pointer	cq				#I The catalog database descriptor
+long	record				#I The catalog record index
+char	field[ARB]			#I The record field
+
+long	lval				#O Field value
+char	name[SZ_LINE]
+
+int	fscan(), nscan()
+bool	streq()
+
+begin
+	if ((record < 1) || (record > CQ_NRECS(cq)))
+	    call error (0, "The catalog record is out of bounds")
+
+	call seek (CQ_FD(cq), CQ_OFFSET(cq, record))
+
+	while (fscan (CQ_FD(cq)) != EOF) {
+	    call gargwrd (name, SZ_LINE)
+
+	    if (streq (name, "begin"))
+		break
+	    else if (streq (name, field)) {
+		call gargl (lval)
+		if (nscan() == 2)
+		   return (lval)
+		else
+		   call error (0, "Error reading catalog integer field value")
+	    }
+	}
+
+	call error (0, "Catalog record field not found")
+end
+
+
 # CQ_DGETR -- Get a real field from the catalog database record.
 
 real procedure cq_dgetr (cq, record, field)
 
 pointer	cq				#I The catalog database descriptor
-int	record				#I The catalog database record index
+long	record				#I The catalog database record index
 char	field[ARB]			#I The catalog record field
 
 real	rval
@@ -88,7 +126,7 @@ end
 double procedure cq_dgetd (cq, record, field)
 
 pointer cq                              #I The catalog database descriptor
-int     record                          #I The catalog database index
+long    record                          #I The catalog database index
 char    field[ARB]                      #I The catalog database field
 
 double  dval
@@ -126,7 +164,7 @@ end
 procedure cq_dgwrd (cq, record, field, str, maxchar)
 
 pointer	cq				#I The catalog access descriptor
-int	record				#I The catalog record index
+long	record				#I The catalog record index
 char	field[ARB]			#I The field name
 char	str[maxchar]			#O The output string value
 int	maxchar				#I The maximum characters for string
@@ -165,7 +203,7 @@ end
 procedure cq_dgstr (cq, record, field, str, maxchar)
 
 pointer	cq				#I The catalog access descriptor
-int	record				#I The catalog record index
+long	record				#I The catalog record index
 char	field[ARB]			#I The field name
 char	str[maxchar]			#O The output string value
 int	maxchar				#I The maximum characters for string
@@ -204,7 +242,7 @@ end
 procedure cq_dgai (cq, record, field, array, len_array, npts)
 
 pointer	cq				#I The database catalog record
-int	record				#I The database record index
+long	record				#I The database record index
 char	field[ARB]			#I The database field
 int	array[len_array]		#O The output array values
 int	len_array			#I The length of array
@@ -249,12 +287,62 @@ begin
 end
 
 
+# CQ_DGAL -- Get a long integer array field from a record.
+
+procedure cq_dgal (cq, record, field, array, len_array, npts)
+
+pointer	cq				#I The database catalog record
+long	record				#I The database record index
+char	field[ARB]			#I The database field
+long	array[len_array]		#O The output array values
+int	len_array			#I The length of array
+int	npts				#O The number of points in the array
+
+char	name[SZ_LINE]
+int	i
+
+int	fscan(), nscan()
+bool	streq()
+
+begin
+	if ((record < 1) || (record > CQ_NRECS(cq)))
+	    call error (0, "The catalog record is out of bounds")
+
+	call seek (CQ_FD(cq), CQ_OFFSET(cq, record))
+
+	while (fscan (CQ_FD(cq)) != EOF) {
+	    call gargwrd (name, SZ_LINE)
+
+	    if (streq (name, "begin"))
+		break
+	    else if (streq (name, field)) {
+		call gargi (npts)
+		if (nscan() != 2)
+		    call error (0, "Error reading size of integer array")
+
+		npts = min (npts, len_array)
+		for (i = 1; i <= npts; i = i + 1) {
+		    if (fscan (CQ_FD(cq)) == EOF)
+		        call error (0, "The integer array is truncated")
+
+		    call gargl (array[i])
+		    if (nscan() != 1)
+		        call error (0, "Error decoding integer array")
+		}
+		return
+	    }
+	}
+
+	call error (0, "The catalog record field not found")
+end
+
+
 # CQ_DGAR -- Get a real array field from a record.
 
 procedure cq_dgar (cq, record, field, array, len_array, npts)
 
 pointer	cq				#I The database catalog record
-int	record				#I The database record index
+long	record				#I The database record index
 char	field[ARB]			#I The database field
 real	array[len_array]		#O The output array values
 int	len_array			#I The length of array
@@ -304,7 +392,7 @@ end
 procedure cq_dgad (cq, record, field, array, len_array, npts)
 
 pointer	cq				#I The catalog database descriptor
-int	record				#I The catalog record index
+long	record				#I The catalog record index
 char	field[ARB]			#I The database field
 double	array[len_array]		#O The array values
 int	len_array			#I The length of array
@@ -354,7 +442,7 @@ end
 procedure cq_dgatxt (cq, record, field, str, maxchar, nlines)
 
 pointer	cq				#I The catalog access descriptor
-int	record				#I The catalog record index
+long	record				#I The catalog record index
 char	field[ARB]			#I The field name
 char	str[maxchar]			#O The output string value
 int	maxchar				#I The maximum characters for string

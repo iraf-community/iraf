@@ -9,6 +9,20 @@ int procedure cq_stati (cq, param)
 pointer	cq			#I pointer to the catalog query structure.
 int	param			#I the integer parameter to be retrieved
 
+long	cq_statl()
+
+begin
+	return (cq_statl(cq,param))
+end
+
+
+# CQ_STATL -- Get a long integer catalog database parameter.
+
+long procedure cq_statl (cq, param)
+
+pointer	cq			#I pointer to the catalog query structure.
+int	param			#I the integer parameter to be retrieved
+
 begin
 	switch (param) {
 	case CQNRECS:
@@ -21,7 +35,6 @@ begin
 	    call error (0, "Error fetching integer catalog database parameter")
 	}
 end
-
 
 
 # CQ_STATS -- Get a string catalog database parameter.

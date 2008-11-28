@@ -2,12 +2,12 @@ include	"cqdef.h"
 
 # CQ_LOCATE -- Locate a catalog by name. Return 0 if the catalog is not found.
 
-int procedure cq_locate (cq, name)
+long procedure cq_locate (cq, name)
 
 pointer	cq				#I the catalog descriptor
 char	name[ARB]			#I the catalog name
 
-int	i
+long	i
 bool	streq()
 
 begin
@@ -23,10 +23,10 @@ end
 # CQ_LOCATEN -- Locate a catalog by number and retrieve its name. Return 0 if
 # the catalog is not found.
 
-int procedure cq_locaten (cq, catno, name, maxch)
+long procedure cq_locaten (cq, catno, name, maxch)
 
 pointer	cq				#I the catalog descriptor
-int	catno				#I the catalog sequence record number
+long	catno				#I the catalog sequence record number
 char	name[ARB]			#O the output catalog name
 int	maxch				#I the maximum size of the catalog name
 
