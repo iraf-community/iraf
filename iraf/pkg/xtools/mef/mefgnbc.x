@@ -9,7 +9,8 @@ int procedure mef_gnbc (mef)
 
 pointer mef
 
-int	len, hd, ip, nbc, hsize, k, ncards
+int	len, nbc, hsize, k, ncards
+pointer	hd, ip
 int	strlen(), strncmp()
 
 begin

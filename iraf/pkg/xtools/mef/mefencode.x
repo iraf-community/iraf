@@ -158,18 +158,21 @@ procedure mef_encode_date (datestr, szdate)
 char	datestr[ARB]	# string containing the date
 int	szdate		# number of chars in the date string
 
+long	l_val
 long	ctime
 int	time[LEN_TMSTRUCT]
 long	clktime()
+int	modi()
 
 begin
-	ctime = clktime (long (0))
+	l_val = 0
+	ctime = clktime (l_val)
 	call brktime (ctime, time)
 
 	call sprintf (datestr, szdate, "%02s/%02s/%02s")
 	    call pargi (TM_MDAY(time))
 	    call pargi (TM_MONTH(time))
-	    call pargi (mod (TM_YEAR(time), CENTURY))
+	    call pargi (modi(TM_YEAR(time), CENTURY))
 end
 
 
@@ -183,11 +186,14 @@ char	value[ARB]		# Keyword value
 int	len			# Lenght of value
 char	comment[ARB]		# Comment
 pointer	pn			# Pointer to a char area
+
+size_t	sz_val
 char	card[LEN_CARD]
 
 begin
 	call mef_encodec (keyword, value, len, card, comment)
-	call amovc (card, Memc[pn], LEN_CARD)
+	sz_val = LEN_CARD
+	call amovc (card, Memc[pn], sz_val)
 	pn = pn + LEN_CARD
 end
 
@@ -202,14 +208,17 @@ int	value			# I Keyword value (YES, NO)
 char	comment[ARB]		# I Comment
 pointer	pn			# I/O Pointer to a char area
 
+size_t	sz_val
 pointer sp, pc
 
 begin
         call smark(sp)
-        call salloc (pc, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+        call salloc (pc, sz_val, TY_CHAR)
 
 	call mef_encodeb (keyword, value, Memc[pc], comment)
-	call amovc (Memc[pc], Memc[pn], LEN_CARD)
+	sz_val = LEN_CARD
+	call amovc (Memc[pc], Memc[pn], sz_val)
 	pn = pn + LEN_CARD
 
 	call sfree(sp)
@@ -226,14 +235,44 @@ int	value			# I Keyword value
 char	comment[ARB]		# I Comment
 pointer	pn			# I/O Pointer to a char area
 
+size_t	sz_val
 pointer sp, pc
 
 begin
         call smark(sp)
-        call salloc (pc, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+        call salloc (pc, sz_val, TY_CHAR)
 
 	call mef_encodei (keyword, value, Memc[pc], comment)
-	call amovc (Memc[pc], Memc[pn], LEN_CARD)
+	sz_val = LEN_CARD
+	call amovc (Memc[pc], Memc[pn], sz_val)
+	pn = pn + LEN_CARD
+
+	call sfree(sp)
+end
+
+
+# MEF_AKWL -- Encode keyword, value and comment into a FITS card and
+# append it to a buffer pointed by pn.
+ 
+procedure mef_akwl (keyword, value, comment, pn)
+
+char	keyword[SZ_KEYWORD]	# I keyword name
+long	value			# I Keyword value 
+char	comment[ARB]		# I Comment
+pointer	pn			# I/O Pointer to a char area
+
+size_t	sz_val
+pointer sp, pc
+
+begin
+        call smark(sp)
+	sz_val = LEN_CARD
+        call salloc (pc, sz_val, TY_CHAR)
+
+	call mef_encodel (keyword, value, Memc[pc], comment)
+	sz_val = LEN_CARD
+	call amovc (Memc[pc], Memc[pn], sz_val)
 	pn = pn + LEN_CARD
 
 	call sfree(sp)
@@ -251,14 +290,17 @@ char	comment[ARB]		# I Comment
 int	precision
 pointer	pn			# I/O Pointer to a char area
 
+size_t	sz_val
 pointer sp, pc
 
 begin
         call smark(sp)
-        call salloc (pc, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+        call salloc (pc, sz_val, TY_CHAR)
 
 	call mef_encoder (keyword, value, Memc[pc], comment, precision)
-	call amovc (Memc[pc], Memc[pn], LEN_CARD)
+	sz_val = LEN_CARD
+	call amovc (Memc[pc], Memc[pn], sz_val)
 	pn = pn + LEN_CARD
 
 	call sfree(sp)
@@ -276,14 +318,17 @@ char	comment[ARB]		# I Comment
 int	precision
 pointer	pn			# I/O Pointer to a char area
 
+size_t	sz_val
 pointer sp, pc
 
 begin
         call smark(sp)
-        call salloc (pc, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+        call salloc (pc, sz_val, TY_CHAR)
 
 	call mef_encoded (keyword, value, Memc[pc], comment, precision)
-	call amovc (Memc[pc], Memc[pn], LEN_CARD)
+	sz_val = LEN_CARD
+	call amovc (Memc[pc], Memc[pn], sz_val)
 	pn = pn + LEN_CARD
 
 	call sfree(sp)
@@ -317,7 +362,8 @@ int	ranges[3, max_ranges]	# Range array
 int	max_ranges		# Maximum number of ranges
 int	nvalues			# The number of values in the ranges
 
-int	ip, nrange, first, last, step, ctoi()
+int	ip, nrange, first, last, step
+int	ctoi(), absi()
 
 begin
 	ip = 1
@@ -342,7 +388,7 @@ begin
 		    ranges[2, 1] = last
 		    ranges[3, 1] = step
 		    ranges[1, 2] = NULL
-	    	    nvalues = nvalues + abs (last-first) / step + 1
+	    	    nvalues = nvalues + absi(last-first) / step + 1
 		    return (OK)
 		} else {
 		    ranges[1, nrange] = NULL
@@ -407,7 +453,7 @@ begin
 	    ranges[1, nrange] = first
 	    ranges[2, nrange] = last
 	    ranges[3, nrange] = step
-	    nvalues = nvalues + abs (last-first) / step + 1
+	    nvalues = nvalues + absi(last-first) / step + 1
 	}
 
 	return (ERR)					# ran out of space
@@ -426,6 +472,7 @@ int	ranges[ARB]		# Range array
 int	number			# Both input and output parameter
 
 int	ip, first, last, step, next_number, remainder
+int	modi()
 
 begin
 	# If number+1 is anywhere in the list, that is the next number,
@@ -440,7 +487,7 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = modi(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder + step <= last)
@@ -470,6 +517,7 @@ int	ranges[ARB]		# Range array
 int	number			# Both input and output parameter
 
 int	ip, first, last, step, next_number, remainder
+int	modi()
 
 begin
 	# If number-1 is anywhere in the list, that is the previous number,
@@ -484,13 +532,13 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = modi(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder >= first)
 		    next_number = number - remainder
 	    } else if (last < number) {
-		remainder = mod (last - first, step)
+		remainder = modi(last - first, step)
 		if (remainder == 0)
 		    next_number = max (next_number, last)
 		else if (last - remainder >= first)
@@ -515,6 +563,7 @@ int	ranges[ARB]		# Range array
 int	number			# Number to be tested against ranges
 
 int	ip, first, last, step
+int	modi()
 
 begin
 	for (ip=1;  ranges[ip] != NULL;  ip=ip+3) {
@@ -522,7 +571,7 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last)
-		if (mod (number - first, step) == 0)
+		if (modi(number - first, step) == 0)
 		    return (true)
 	}
 

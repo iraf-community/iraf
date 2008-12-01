@@ -8,14 +8,16 @@ procedure mef_dummyhdr (out, hdrfname)
 int	out		#I File descriptor
 char	hdrfname[ARB]	#I Header filename
 
+size_t	sz_val
 char    card[LEN_CARD]
 pointer sp, path, op
-int	n, nlines, i, nchars, FD
+int	n, nlines, i, nchars, fd
 int	strlen(), open(), getline(), strncmp()
 
 begin
 	call smark(sp)
-	call salloc (path, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (path, sz_val, TY_CHAR)
 
 	n = 0
 	call mef_encodeb ("SIMPLE", YES, card, "FITS STANDARD")
@@ -68,14 +70,16 @@ begin
 	}
 
         Memc[path] = ' '
-	call amovkc (Memc[path], card, 80)
+	sz_val = 80
+	call amovkc (Memc[path], card, sz_val)
 	call strcpy ("END", card, 3)
 	card[4] = ' '                           # Clear EOS mark
 	call mef_pakwr (out, card)
 
 	n = n + 1
 
-	call amovkc (" ", card, 80)
+	sz_val = 80
+	call amovkc (" ", card, sz_val)
 	nlines = 36 - n
 	for (i=1; i<= nlines; i=i+1)
 	   call mef_pakwr (out, card)

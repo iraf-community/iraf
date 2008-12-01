@@ -16,7 +16,8 @@ pointer	mefi	#I input mef descriptor
 pointer	mefo	#O output mef descriptor	
 
 char    dname[1]
-int	off, status
+long	off
+int	status
 bool	in_phdu
 int	access(), mef_rdhdr_gn()
 
@@ -43,7 +44,7 @@ begin
 	# Check for dataless unit; if so the data pointer is at the
 	# end of the last header block.
 
-	if (MEF_POFF(mefi) == INDEFI)
+	if (MEF_POFF(mefi) == INDEFL)
 	    off = MEF_HOFF(mefi) + ((MEF_HSIZE(mefi)+2879)/2880)*1440
 	else
 	    off = MEF_POFF(mefi)
@@ -61,9 +62,14 @@ procedure mef_pakwr (out, card)
 int 	out		#I Output file descriptor	
 char 	card[ARB]	#I Input FITS card
 
+size_t	sz_val
+
 begin
-	call achtcb (card, card, 80)
-	call write(out, card, 40)
+	sz_val = 80
+	# arg2 : incompatible pointer
+	call achtcb (card, card, sz_val)
+	sz_val = 40
+	call write(out, card, sz_val)
 end
 
 
@@ -93,17 +99,22 @@ procedure mef_wrblank (out, olines)
 int	out		#I output file descriptor
 int	olines		#I number of blank lines
 
-int	nlines, i, nbk
+size_t	sz_val
+int	nlines, i
 char    card[80]
+int	modi()
 
 begin
-	   nlines = 36 - mod(olines,36) 
+	   nlines = 36 - modi(olines,36) 
 
 	   do i =1, 80
 	      card[i] = ' '
 
-	   call achtcb (card, card, 80)
+	   sz_val = 80
+	   # arg2 : incompatible pointer
+	   call achtcb (card, card, sz_val)
+	   sz_val = 40
 	   for(i=1; i<=nlines; i=i+1) 
-	      call write(out, card, 40)
+	      call write(out, card, sz_val)
 	   return
 end

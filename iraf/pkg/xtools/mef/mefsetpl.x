@@ -30,14 +30,15 @@ int     version		#I PL version number
 char    imhdr[ARB]      #I Mask title
 char    title[ARB]
 int     plsize		#I Mask size of TY_SHORT
-int	ctime
-int	mtime
-int	limtime
+long	ctime
+long	mtime
+long	limtime
 real	minval
 real	maxval
 pointer mef		#I Mef descriptor
 
-int	tlen, i, ch, hdrlen, nchars
+size_t	sz_val
+int	tlen, i, ch, hdrlen, nchars, ii
 pointer	sp, tbuf, ip, op, rp, bp, hd
 int	strncmp(), ctol(), ctor(), strlen()
 errchk	realloc
@@ -48,8 +49,10 @@ begin
 	tlen= strlen(imhdr)
 
 	call smark (sp)
-	call salloc (tbuf, SZ_IMTITLE, TY_CHAR)
-	call salloc (bp, tlen, TY_CHAR)
+	sz_val = SZ_IMTITLE
+	call salloc (tbuf, sz_val, TY_CHAR)
+	sz_val = tlen
+	call salloc (bp, sz_val, TY_CHAR)
 
 	call strcpy (imhdr, Memc[bp], tlen)
 
@@ -88,10 +91,10 @@ begin
 		} else if (strncmp (Memc[ip], KW_CTIME, LEN_KWCTIME) == 0) {
 		    # Decode the create time.
 		    ip = ip + LEN_KWCTIME
-		    rp = 1
-		    if (ctol (Memc[ip], rp, ctime) <= 0)
+		    ii = 1
+		    if (ctol (Memc[ip], ii, ctime) <= 0)
 			ctime = 0
-		    ip = ip + rp - 1
+		    ip = ip + ii - 1
 
 	    	    # Advance to next line.
 	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
@@ -102,10 +105,10 @@ begin
 		} else if (strncmp (Memc[ip], KW_MTIME, LEN_KWMTIME) == 0) {
 		    # Decode the modify time.
 		    ip = ip + LEN_KWMTIME
-		    rp = 1
-		    if (ctol (Memc[ip], rp, mtime) <= 0)
+		    ii = 1
+		    if (ctol (Memc[ip], ii, mtime) <= 0)
 			mtime = 0
-		    ip = ip + rp - 1
+		    ip = ip + ii - 1
 
 	    	    # Advance to next line.
 	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
@@ -116,10 +119,10 @@ begin
 		} else if (strncmp (Memc[ip], KW_LIMTIME, LEN_KWLIMTIME) == 0) {
 		    # Decode the limits time.
 		    ip = ip + LEN_KWLIMTIME
-		    rp = 1
-		    if (ctol (Memc[ip], rp, limtime) <= 0)
+		    ii = 1
+		    if (ctol (Memc[ip], ii, limtime) <= 0)
 			limtime = 0
-		    ip = ip + rp - 1
+		    ip = ip + ii - 1
 
 	    	    # Advance to next line.
 	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
@@ -130,10 +133,10 @@ begin
 		} else if (strncmp(Memc[ip],KW_MINPIXVAL,LEN_KWMINPIXVAL)==0) {
 		    # Decode the minimum pixel value.
 		    ip = ip + LEN_KWMINPIXVAL
-		    rp = 1
-		    if (ctor (Memc[ip], rp, minval) <= 0)
+		    ii = 1
+		    if (ctor (Memc[ip], ii, minval) <= 0)
 			minval = 0.0
-		    ip = ip + rp - 1
+		    ip = ip + ii - 1
 
 	    	    # Advance to next line.
 	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
@@ -144,10 +147,10 @@ begin
 		} else if (strncmp(Memc[ip],KW_MAXPIXVAL,LEN_KWMAXPIXVAL)==0) {
 		    # Decode the maximum pixel value.
 		    ip = ip + LEN_KWMAXPIXVAL
-		    rp = 1
-		    if (ctor (Memc[ip], rp, maxval) <= 0)
+		    ii = 1
+		    if (ctor (Memc[ip], ii, maxval) <= 0)
 			maxval = 0.0
-		    ip = ip + rp - 1
+		    ip = ip + ii - 1
 
 	    	    # Advance to next line.
 	    	    while (Memc[ip] != EOS && Memc[ip] != '\n')
@@ -160,7 +163,8 @@ begin
 	}
 	
 	hdrlen = tlen*2
-	call malloc (hd, hdrlen, TY_CHAR)
+	sz_val = hdrlen
+	call malloc (hd, sz_val, TY_CHAR)
 	op = hd
 
 	while (Memc[ip] != EOS) {
@@ -169,7 +173,8 @@ begin
 	    nchars = rp - hd
 	    if (nchars + IDB_RECLEN + 2 > hdrlen) {
 		hdrlen = hdrlen + INC_HDRMEM
-		call realloc (hd, hdrlen, TY_CHAR)
+		sz_val = hdrlen
+		call realloc (hd, sz_val, TY_CHAR)
 		op = hd + nchars
 	    }
 	    # Copy the saved card, leave IP positioned to past newline.

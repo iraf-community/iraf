@@ -24,6 +24,24 @@ begin
 end
 
 
+# MEF_GVALL -- Return the long integer value of a FITS encoded card.
+
+procedure mef_gvall (card, lval)
+
+char	card[ARB]		#I card to be decoded
+long	lval			#O receives integer value
+
+int	ip, ctol()
+char	sval[MEF_SZVALSTR]
+
+begin
+	call mef_gvalt (card, sval, MEF_SZVALSTR)
+	ip = 1
+	if (ctol (sval, ip, lval) <= 0)
+	    lval = 0
+end
+
+
 # MEF_GVALR -- Return the real value of a FITS encoded card.
 
 procedure mef_gvalr (card, rval)

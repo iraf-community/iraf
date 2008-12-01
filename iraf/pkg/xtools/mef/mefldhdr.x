@@ -13,6 +13,7 @@ pointer mef			#I FITS descriptor
 int	spool			#I spool output file descriptor
 int	group			#I Currrent group
 
+size_t	sz_val
 pointer lbuf, sp, fb
 int	nchars, index, ncards, pcount, in
 int	mef_read_card(), mef_kctype()
@@ -21,8 +22,10 @@ long	note()
 errchk  mef_read_card
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (fb, FITS_BLOCK_BYTES, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = FITS_BLOCK_BYTES
+	call salloc (fb, sz_val, TY_CHAR)
 
 	MEF_EXTNAME(mef) = EOS
 	MEF_EXTVER(mef) = INDEFI
@@ -67,7 +70,7 @@ begin
 	    case NAXIS:
 		call mef_gvali (Memc[lbuf], MEF_NDIM(mef))
 	    case NAXISN:
-		 call mef_gvali (Memc[lbuf], MEF_NAXIS(mef,index))
+		 call mef_gvall (Memc[lbuf], MEF_NAXIS(mef,index))
 	    case OBJECT:
 		call mef_gvalt (Memc[lbuf], MEF_OBJECT(mef), MEF_SZVALSTR)
 	    default:
@@ -95,23 +98,29 @@ char	ibuf[ARB]		#I input buffer
 char    obuf[ARB]		#O Output buffer
 int	ncards			#I ncards read so far
 
-int	ip, nchars_read
+size_t	sz_val
+int	ip
+long	nchars_read
 long	read()
+int	modi()
 errchk	read
 
 begin
 	# We read one FITS block first, read card from it until 36
 	# cards have been processed, where we read again.
 
-	if (mod (ncards, 36) == 0) {
-	    nchars_read = read (fd, ibuf, FITS_BLKSZ_CHAR)
+	if (modi(ncards, 36) == 0) {
+	    sz_val = FITS_BLKSZ_CHAR
+	    nchars_read = read (fd, ibuf, sz_val)
 	    if (nchars_read ==  EOF)
 	        return (EOF)
-	    call miiupk (ibuf, ibuf, FITS_BLOCK_BYTES, MII_BYTE, TY_CHAR)
+	    sz_val = FITS_BLOCK_BYTES
+	    call miiupk (ibuf, ibuf, sz_val, MII_BYTE, TY_CHAR)
 	    ip = 1
 	}
 	
-	call amovc (ibuf[ip], obuf, LEN_CARD)
+	sz_val = LEN_CARD
+	call amovc (ibuf[ip], obuf, sz_val)
 	ip = ip + LEN_CARD
 
 	return (LEN_CARD)

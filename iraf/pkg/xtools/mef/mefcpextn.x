@@ -9,9 +9,12 @@ pointer	mefi	#I input mef descriptor
 pointer	mefo	#I output mef descriptor
 int	gn      #I input group number
 
+size_t	sz_val
 char    ibuf[FITS_BLKSZ_CHAR]
-int	ndim, totpix, i, k, in, out, status
-int	mef_rdhdr_gn(), mef_totpix()
+int	ndim, in, out, status
+long	totpix, i, k
+int	mef_rdhdr_gn()
+long	mef_totpix()
 long	read()
 bool    iphdu
 
@@ -39,9 +42,10 @@ begin
 
 	    # Position the input file to the beginning of the pixel area.
 	    call seek (in, MEF_POFF(mefi))
+	    sz_val = 1440
 	    do i = 1, totpix {
-	        k = read (in, ibuf, 1440)
-	        call write (out, ibuf, 1440)
+	        k = read (in, ibuf, sz_val)
+	        call write (out, ibuf, sz_val)
 	    }
 	}
 end

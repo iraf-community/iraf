@@ -100,10 +100,11 @@ end
 int procedure mef_pixtype (mef)
 pointer mef, hdrp
 bool    bfloat, lscale, lzero
-bool    fxf_fpl_equald()
-int	i, impixtype, ctod(), ip
+int	i, impixtype, ip
 double  bscale, bzero
 char    sval[LEN_CARD]
+int	ctod()
+bool    fxf_fpl_equald()
 
 begin
         hdrp= MEF_HDRP(mef)
@@ -162,8 +163,8 @@ pointer	mef
 char	extname[ARB] 	#I extname value
 int	extver		#I extver value
 
-int	mef_strcmp_lwr()
 bool	bxtn, bxtv, bval, bxtn_eq, bxtv_eq
+int	mef_strcmp_lwr()
 
 begin
 	bxtn = extname[1] != EOS
@@ -198,7 +199,7 @@ pointer	mef	#I Input mef descriptor
 
 int	in, ndim
 long	off
-int	mef_totpix()
+long	mef_totpix()
 long	note()
 errchk  seek
 
@@ -223,11 +224,14 @@ end
 # MEF_TOTPIX -- Returns the number of pixels in the data area in units
 #		of chars.
 
-int procedure mef_totpix (mef)
+long procedure mef_totpix (mef)
 
 pointer	mef		#I Mef descriptor
 
-int	ndim, totpix, i, bitpix
+int	ndim, i, bitpix
+long	totpix
+
+int	absi()
 
 begin
 	ndim = MEF_NDIM (mef)
@@ -241,7 +245,7 @@ begin
 	    do i = 2, ndim
 		  totpix = totpix *  MEF_NAXIS(mef,i)
 	}
-	bitpix = abs(MEF_BITPIX(mef))
+	bitpix = absi(MEF_BITPIX(mef))
 
 	# If PCOUNT is not zero, add it to totpix
 	totpix = MEF_PCOUNT(mef) + totpix
@@ -263,13 +267,16 @@ int procedure mef_strcmp_lwr (s1, s2)
 
 char s1[ARB], s2[ARB]
 
+size_t	sz_val
 pointer sp, l1, l2
-int	strcmp(), istat
+int	istat
+int	strcmp()
 
 begin
 	call smark(sp)
-	call salloc (l1, SZ_FNAME, TY_CHAR)
-	call salloc (l2, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (l1, sz_val, TY_CHAR)
+	call salloc (l2, sz_val, TY_CHAR)
 
 	call strcpy (s1, Memc[l1], SZ_FNAME)
 	call strcpy (s2, Memc[l2], SZ_FNAME)
@@ -373,19 +380,27 @@ procedure mef_cp_spool (spool, mef)
 int	spool 		#I spool file descriptor
 pointer mef		#
 
+size_t	sz_val
+long	l_val
+int	i_val
 pointer	hdr, lbuf, sp
-int	fitslen, fstatl, user
+size_t	fitslen
+int	user
 int	stropen(), getline()
+long	fstatl()
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
-	call seek (spool, BOFL)
+	l_val = BOFL
+	call seek (spool, l_val)
 	fitslen = fstatl (spool, F_FILESIZE)
 	fitslen = max (fitslen, MEF_HSIZE(mef))
 	call malloc (hdr, fitslen, TY_CHAR)
-	user = stropen (Memc[hdr], fitslen, NEW_FILE)
+	i_val = fitslen
+	user = stropen (Memc[hdr], i_val, NEW_FILE)
 
 	# Append the saved FITS cards to saved cache.
 	while (getline (spool, Memc[lbuf]) != EOF)

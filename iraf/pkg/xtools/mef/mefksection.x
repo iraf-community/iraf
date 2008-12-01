@@ -17,11 +17,11 @@ char 	ksection[ARB]	#I String with kernel section
 char	extname[ARB]	#O Extname
 int	extver		#O Extver
 
-int     ctotok(),ip, jp, nident, nexpr
-int	junk, nch, lexnum(), ty, token, ival
+int	ip, jp, nident, nexpr
+int	junk, nch, ty, token, ival, lex_type
 char    outstr[LEN_CARD]
 char 	identif[LEN_CARD]
-int	lex_type, mef_klex(), ctoi()
+int	mef_klex(), ctoi(), ctotok(), lexnum()
  
 begin
 	
@@ -110,8 +110,9 @@ int procedure mef_klex (outstr)
 
 char    outstr[ARB]	#I string
 
-int	len, strlen(), strncmp()
+int	len
 char	tmp[LEN_CARD]
+int	strlen(), strncmp()
 
 begin
 	len = strlen(outstr)
@@ -144,8 +145,8 @@ int	lex_type	#I Type of value
 char    extname[ARB]	#O Extname
 int	extver		#O Extver
 
-int	ty, lexnum(), ip, ival, ctoi(), nch, junk
-int	strcmp()
+int	ty, ip, ival, nch, junk
+int	strcmp(), lexnum(), ctoi()
 
 begin
 	call strlwr(outstr)

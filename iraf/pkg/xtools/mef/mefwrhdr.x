@@ -9,6 +9,7 @@ pointer	mefi		#I input mef descriptor
 pointer	mefo		#I output mef descriptor
 bool	in_phdu		#I true if input header is Primary Header Unit.
 
+size_t	sz_val
 pointer	hb, sp, ln
 int	output_lines, out
 int	i, index, naxis
@@ -22,7 +23,8 @@ define	nextb_ 99
 
 begin
 	call smark (sp)
-	call salloc (ln, LEN_CARDNL, TY_CHAR)
+	sz_val = LEN_CARDNL
+	call salloc (ln, sz_val, TY_CHAR)
 
 	# At this point the input first header has been read
 
@@ -107,7 +109,7 @@ begin
 		 next
 	      }
 	   case NAXISN:
-	      call mef_gvali (Memc[hb], MEF_NAXIS(mefi,index))
+	      call mef_gvall (Memc[hb], MEF_NAXIS(mefi,index))
 	      call mef_pakwr (out, Memc[hb])
 	      if (index == naxis) {
 	          if (in_phdu && !new_outf ) {
@@ -193,13 +195,18 @@ end
 procedure mef_padfile (fd, offset)
 
 int	fd	  # file descriptor
-int	offset    # file position in chars
+long	offset    # file position in chars
 
-int     pad, nlines,i
+size_t	sz_val
+int	pad, nlines, i
+long	l
 char	card[LEN_CARDNL]
 
+long	modl()
+
 begin
-        i = mod(offset, 1440)
+	l = 1440
+        i = modl(offset, l)
 	if (i == 0) return
 
 	pad = 1440 - i
@@ -207,9 +214,12 @@ begin
 
         do i =1, 80
               card[i] = ' '
-        call achtcb (card, card, 80)
+	sz_val = 80
+	# arg2 : incompatible pointer
+        call achtcb (card, card, sz_val)
 
+	sz_val = 40
         for(i=1; i<=nlines; i=i+1)
-           call write(fd, card, 40)
+           call write(fd, card, sz_val)
 
 end
