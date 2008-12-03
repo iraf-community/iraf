@@ -1,6 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
-define	LOGPTR	32			# log2(maxpts) (4e9)
+define	LOGPTR	64			# log2(maxpts) (4e9)
 
 # ASRT -- Vector Quicksort.  The output vector may be the same as the
 # input vector.
