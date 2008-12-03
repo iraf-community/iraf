@@ -31,18 +31,21 @@ int	err			#I Print errors?
 int	imext			#O Image extensions?
 pointer	list			#O Image list
 
+size_t	sz_val
 int	i, j, nphu, nextns, fd
 pointer	sp, temp, patbuf, fname, image, im
 pointer	immap(), imtopen(), xt_extns1()
 int	patmake(), gpatmatch(), imtgetim(), open()
 errchk	xt_extns1, open, immap, delete
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (temp, SZ_FNAME, TY_CHAR)
-	call salloc (patbuf, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (temp, sz_val, TY_CHAR)
+	call salloc (patbuf, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
 
 	# Get the list.
 	list = xt_extns1 (files, exttype, index, extname, extver, lindex,
@@ -56,7 +59,7 @@ begin
 	fd = open (Memc[temp+1], NEW_FILE, TEXT_FILE)
 	while (imtgetim (list, Memc[fname], SZ_FNAME) != EOF) {
 	    if (dataless == NO) {
-		iferr (im = immap (Memc[fname], READ_ONLY, 0))
+		iferr (im = immap (Memc[fname], READ_ONLY, NULLPTR))
 		    im = NULL
 		if (im != NULL) {
 		    if (IM_NDIM(im) == 0 || IM_LEN(im,1) == 0) {
@@ -69,7 +72,7 @@ begin
 	    if (gpatmatch (Memc[fname], Memc[patbuf], i, j) > 0) {
 	        call strcpy (Memc[fname], Memc[image], SZ_FNAME)
 		call strcpy (Memc[image+j], Memc[image+i-1], SZ_FNAME)
-		ifnoerr (im = immap (Memc[image], READ_ONLY, 0)) {
+		ifnoerr (im = immap (Memc[image], READ_ONLY, NULLPTR)) {
 		    call strcpy (Memc[image], Memc[fname], SZ_FNAME)
 		    call imunmap (im)
 		    nphu = nphu + 1
@@ -136,6 +139,7 @@ char	ikparams[ARB]		#I Image kernel parameters
 int	err			#I Print errors?
 pointer	list			#O Image list
 
+size_t	sz_val
 int	i, fd
 pointer	sp, temp, fname, rindex, rextver, ikp, str
 pointer	imtopen()
@@ -145,20 +149,24 @@ errchk	open, xt_extn, delete
 
 begin
 	call smark (sp)
-	call salloc (temp, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (ikp, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (temp, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ikp, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Expand parameters.
 	list = imtopen (files)
-	call salloc (rindex, 3*SZ_RANGE, TY_INT)
+	sz_val = 3*SZ_RANGE
+	call salloc (rindex, sz_val, TY_INT)
 	if (ix_decode_ranges (index, Memi[rindex], SZ_RANGE, i) == ERR)
 	    call error (1, "Bad index range list")
 
 	rextver = NULL
 	if (nowhite (extver, Memc[str], SZ_LINE) > 0) {
-	    call salloc (rextver, 3*SZ_RANGE, TY_INT)
+	    sz_val = 3*SZ_RANGE
+	    call salloc (rextver, sz_val, TY_INT)
 	    if (decode_ranges (Memc[str], Memi[rextver], SZ_RANGE, i)==ERR)
 		call error (1, "Bad extension version range list")
 	}
@@ -200,6 +208,7 @@ int	lver			#I List extension version?
 char	ikparams[ARB]		#I Image kernel parameters
 int	err			#I Print errors?
 
+size_t	sz_val
 int	i, j, n, index, ver, stat
 pointer	sp, clust, ksec, imsec, name, str
 pointer	mef, im
@@ -208,25 +217,28 @@ bool	streq(), is_in_range(), xt_extmatch()
 int	mef_rdhdr_exnv(), mef_rdhdr_gn(), ix_get_next_number()
 pointer	mefopen(), immap()
 errchk	mefopen, mef_rdhdr_exnv, mef_rdhdr_gn, immap
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (clust, SZ_FNAME, TY_CHAR)
-	call salloc (ksec, SZ_FNAME, TY_CHAR)
-	call salloc (imsec, SZ_FNAME, TY_CHAR)
-	call salloc (name, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (clust, sz_val, TY_CHAR)
+	call salloc (ksec, sz_val, TY_CHAR)
+	call salloc (imsec, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (name, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Parse the file name syntax.
 	call imparse (fname, Memc[clust], SZ_FNAME, Memc[ksec],
 	    SZ_FNAME, Memc[imsec], SZ_FNAME, index, ver)
 
 	# Open the file and check the error status.
-	iferr (mef = mefopen (Memc[clust], READ_ONLY, 0)) {
+	iferr (mef = mefopen (Memc[clust], READ_ONLY, NULLPTR)) {
 	    if (exttype[1] == EOS || !streq (exttype, "IMAGE"))
 	        call fprintf (fd, fname)
 	    else if (streq (exttype, "IMAGE")) {
-		ifnoerr (im = immap (fname, READ_ONLY, 0)) {
+		ifnoerr (im = immap (fname, READ_ONLY, NULLPTR)) {
 		    call imunmap (im)
 		    call fprintf (fd, fname)
 		}
@@ -262,7 +274,7 @@ begin
 		if (exttype[1] == EOS || !streq (exttype, "IMAGE"))
 			call fprintf (fd, fname)
 		else if (streq (exttype, "IMAGE")) {
-		    ifnoerr (im = immap (fname, READ_ONLY, 0)) {
+		    ifnoerr (im = immap (fname, READ_ONLY, NULLPTR)) {
 			call imunmap (im)
 			call fprintf (fd, fname)
 		    }
@@ -368,7 +380,8 @@ int	ranges[3, max_ranges]	# Range array
 int	max_ranges		# Maximum number of ranges
 int	nvalues			# The number of values in the ranges
 
-int	ip, nrange, first, last, step, ctoi()
+int	ip, nrange, first, last, step
+int	ctoi(), absi()
 
 begin
 	ip = 1
@@ -460,7 +473,7 @@ begin
 	    ranges[1, nrange] = first
 	    ranges[2, nrange] = last
 	    ranges[3, nrange] = step
-	    nvalues = nvalues + abs (last-first) / step + 1
+	    nvalues = nvalues + absi(last-first) / step + 1
 	}
 
 	return (ERR)					# ran out of space
@@ -479,6 +492,7 @@ int	ranges[ARB]		# Range array
 int	number			# Both input and output parameter
 
 int	ip, first, last, step, next_number, remainder
+int	modi()
 
 begin
 	# If number+1 is anywhere in the list, that is the next number,
@@ -495,7 +509,7 @@ begin
 	    if (step == 0)
 		call error (1, "Step size of zero in range list")
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = modi(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder + step <= last)
@@ -521,8 +535,10 @@ char	extname[ARB]		#I Extension name to match
 char	patterns[ARB]		#I Comma-delimited list of patterns
 bool	stat			#O Match?
 
-int	i, j, k, sz_pat, strlen(), patmake(), patmatch(), nowhite()
+size_t	sz_val
+int	i, j, k, sz_pat
 pointer	sp, patstr, patbuf
+int	strlen(), patmake(), patmatch(), nowhite()
 
 begin
 	if (patterns[1] == EOS)
@@ -536,8 +552,9 @@ begin
 	sz_pat = sz_pat + SZ_LINE
 
 	call smark (sp)
-	call salloc (patstr, sz_pat, TY_CHAR)
-	call salloc (patbuf, sz_pat, TY_CHAR)
+	sz_val = sz_pat
+	call salloc (patstr, sz_val, TY_CHAR)
+	call salloc (patbuf, sz_val, TY_CHAR)
 
 	i = nowhite (patterns, Memc[patstr], sz_pat)
 	if (i == 0)

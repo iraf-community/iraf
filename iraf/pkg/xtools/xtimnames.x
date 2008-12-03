@@ -13,12 +13,15 @@ char	image[ARB]		# Full image name
 char	root[maxchar]		# Root name
 int	maxchar			# Size of root name string
 
-int	i, fnextn(), iki_validextn(), strlen()
+size_t	sz_val
+int	i
 pointer	sp, extn
+int	fnextn(), iki_validextn(), strlen()
 
 begin
 	call smark (sp)
-	call salloc (extn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (extn, sz_val, TY_CHAR)
 
 	call imgimage (image, root, maxchar)
 	i = fnextn (root, Memc[extn], SZ_FNAME)
@@ -41,12 +44,15 @@ char	image[ARB]		# Full image name
 char	ext[maxchar]		# Extension
 int	maxchar			# Size of extension
 
-int	i, fnextn(), iki_validextn()
+size_t	sz_val
+int	i
 pointer	sp, root
+int	fnextn(), iki_validextn()
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
 
 	ext[1] = EOS
 
@@ -73,16 +79,19 @@ bool procedure xt_imnameeq (imname1, imname2)
 char	imname1[ARB]		# First image name
 char	imname2[ARB]		# Second image name
 
-bool	stat, streq()
+size_t	sz_val
+bool	stat
 pointer	sp, str1, str2
+bool	streq()
 
 begin
 	if (streq (imname1, imname2))
 	    return (true)
 
 	call smark (sp)
-	call salloc (str1, SZ_FNAME, TY_CHAR)
-	call salloc (str2, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
 
 	# Check roots
 	call xt_imroot (imname1, Memc[str1], SZ_FNAME)

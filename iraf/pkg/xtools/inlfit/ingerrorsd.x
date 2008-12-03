@@ -26,7 +26,7 @@ double	chisqr, variance, rms
 pointer	sp, fit, wts1, params, errors, rejpts, plist
 pointer	name, pvnames, labels
 
-int	open(), nlstati(), in_geti()
+int	open(), nlstati()
 long	in_getl(), nlstatl(), inlstrwrd()
 pointer	in_getp()
 double	in_rmsd(), nlstatd()

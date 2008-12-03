@@ -61,7 +61,9 @@ PIXEL	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
+$if (datatype == sil)
 long	nint_rl()
+$endif
 pointer	imgl2$t(), xt_fpval$t()
 
 begin

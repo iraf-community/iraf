@@ -9,6 +9,8 @@ include <math/iminterp.h>
 int procedure clginterp (param)
 
 char	param[ARB]		# CL parameter prompt string
+
+size_t	sz_val
 int	index, iicodes[5]
 pointer	sp, word
 int	clgwrd()
@@ -17,7 +19,8 @@ data	iicodes /II_NEAREST, II_LINEAR, II_POLY3, II_POLY5, II_SPLINE3/
 
 begin
 	call smark (sp)
-	call salloc (word, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (word, sz_val, TY_CHAR)
 
 	index = max (1, min (5, clgwrd (param, Memc[word], SZ_FNAME,
 	    "|nearest|linear|poly3|poly5|spline3|")))

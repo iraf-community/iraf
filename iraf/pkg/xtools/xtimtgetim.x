@@ -11,9 +11,9 @@
 int procedure xt_imtgetim (list1, list2, list3, image1, image2, image3,
     sz_image)
 
-int	list1			# First input image list
-int	list2			# Second input image list
-int	list3			# Output image list
+pointer	list1			# First input image list
+pointer	list2			# Second input image list
+pointer	list3			# Output image list
 char	image1[sz_image]	# Returned image from first list
 char	image2[sz_image]	# Returned image from second list
 char	image3[sz_image]	# Returned image from third list

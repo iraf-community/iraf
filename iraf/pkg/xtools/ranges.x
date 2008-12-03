@@ -20,7 +20,8 @@ int	ranges[3, max_ranges]	# Range array
 int	max_ranges		# Maximum number of ranges
 int	nvalues			# The number of values in the ranges
 
-int	ip, nrange, first, last, step, ctoi()
+int	ip, nrange, first, last, step
+int	ctoi(), absi()
 
 begin
 	ip = 1
@@ -112,7 +113,7 @@ begin
 	    ranges[1, nrange] = first
 	    ranges[2, nrange] = last
 	    ranges[3, nrange] = step
-	    nvalues = nvalues + abs (last-first) / step + 1
+	    nvalues = nvalues + absi(last-first) / step + 1
 	}
 
 	return (ERR)					# ran out of space
@@ -131,6 +132,7 @@ int	ranges[ARB]		# Range array
 int	number			# Both input and output parameter
 
 int	ip, first, last, step, next_number, remainder
+int	modi()
 
 begin
 	# If number+1 is anywhere in the list, that is the next number,
@@ -147,7 +149,7 @@ begin
 	    if (step == 0)
 		call error (1, "Step size of zero in range list")
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = modi(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder + step <= last)
@@ -177,6 +179,7 @@ int	ranges[ARB]		# Range array
 int	number			# Both input and output parameter
 
 int	ip, first, last, step, next_number, remainder
+int	modi()
 
 begin
 	# If number-1 is anywhere in the list, that is the previous number,
@@ -193,13 +196,13 @@ begin
 	    if (step == 0)
 		call error (1, "Step size of zero in range list")
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = modi(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder >= first)
 		    next_number = number - remainder
 	    } else if (last < number) {
-		remainder = mod (last - first, step)
+		remainder = modi(last - first, step)
 		if (remainder == 0)
 		    next_number = max (next_number, last)
 		else if (last - remainder >= first)
@@ -225,6 +228,7 @@ int	ranges[ARB]		# Range array
 int	number			# Number to be tested against ranges
 
 int	ip, first, last, step, num
+int	modi()
 
 begin
 	if (IS_INDEFI (number))
@@ -237,7 +241,7 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (num >= first && num <= last)
-		if (mod (num - first, step) == 0)
+		if (modi(num - first, step) == 0)
 		    return (true)
 	}
 

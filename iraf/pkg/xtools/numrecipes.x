@@ -58,7 +58,8 @@ real procedure poidev (xm, seed)
 real	xm		# Poisson mean
 long	seed		# Random number seed
 
-real	oldm, g, em, t, y, ymin, ymax, sq, alxm, gammln(), urand(), gasdev()
+real	oldm, g, em, t, y, ymin, ymax, sq, alxm
+real	gammln(), urand(), gasdev()
 data	oldm /-1./
 
 begin
@@ -105,8 +106,9 @@ real procedure gasdev (seed)
 
 long	seed		# Seed for random numbers
 
-real	v1, v2, r, fac, urand()
+real	v1, v2, r, fac
 int	iset
+real	urand()
 data	iset/0/
 
 begin

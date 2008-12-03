@@ -39,17 +39,21 @@ pointer procedure rng_open (rstr, r1, r2, dr)
 
 char	rstr[ARB]		# Range string
 real	r1, r2, dr		# Default range and range limits
-pointer	rg			# Range pointer
 
-int	i, fd, strlen(), open(), getline()
+size_t	sz_val
+pointer	rg			# Range pointer
+int	i, fd
 real	a, b, c
 pointer	sp, str, ptr
+int	strlen(), open(), getline()
 errchk	open, rng_add
 
 begin
 	call smark (sp)
-	call salloc (str, max (strlen (rstr), SZ_LINE), TY_CHAR)
-	call calloc (rg, LEN_RNG, TY_STRUCT)
+	sz_val = max (strlen (rstr), SZ_LINE)
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = LEN_RNG
+	call calloc (rg, sz_val, TY_STRUCT)
 
 	a = r1
 	b = r2
@@ -145,6 +149,7 @@ real	rval			#O Range value
 
 int	i, j, k
 real	drmin, dx
+int	nint_ri()
 
 begin
 	ival = 1
@@ -154,7 +159,7 @@ begin
 	k = 1
 	do i = 1, RNG_NRNGS(rg) {
 	    dx = x - RNG_X1(rg,i)
-	    j = max (0, min (RNG_NX(rg,i)-1, nint (dx / RNG_DX(rg,i))))
+	    j = max (0, min (RNG_NX(rg,i)-1, nint_ri(dx / RNG_DX(rg,i))))
 	    dx = abs (dx - j * RNG_DX(rg,i))
 	    if (dx < drmin) {
 		drmin = dx
@@ -211,7 +216,8 @@ real	x			#I Value to check
 real	delta			#I Maximum distance from element
 
 int	ival
-real	rval, rng_nearest()
+real	rval
+real	rng_nearest()
 
 begin
 	return (abs (rng_nearest (rg, x, ival, rval)) < delta)
@@ -226,7 +232,8 @@ pointer	rg			#I Range descriptor
 int	x			#I Value to check
 
 int	ival
-real	rval, rng_nearest()
+real	rval
+real	rng_nearest()
 
 begin
 	return (abs (rng_nearest (rg, real(x), ival, rval)) < 0.49)
@@ -241,14 +248,17 @@ pointer	rg			# Range descriptor
 char	rstr[ARB]		# Range string
 real	r1, r2, dr		# Default range and range limits
 
-int	i, j, nrgs, strlen(), ctor()
+size_t	sz_val
+int	i, j, nrgs
 real	x1, x2, dx, nx
 pointer	sp, str, ptr
+int	strlen(), ctor(), modi()
 errchk	rng_error
 
 begin
 	call smark (sp)
-	call salloc (str, strlen (rstr), TY_CHAR)
+	sz_val = strlen (rstr)
+	call salloc (str, sz_val, TY_CHAR)
 
 	i = 1
 	while (rstr[i] != EOS) {
@@ -323,8 +333,10 @@ begin
 		call rng_error (4, rstr, r1, r2, dr, rg)
 
 	    nrgs = RNG_NRNGS(rg)
-	    if (mod (nrgs, RNG_ALLOC) == 0)
-		call realloc (rg, LEN_RNG+4*(nrgs+RNG_ALLOC), TY_STRUCT)
+	    if (modi(nrgs, RNG_ALLOC) == 0) {
+		sz_val = LEN_RNG+4*(nrgs+RNG_ALLOC)
+		call realloc (rg, sz_val, TY_STRUCT)
+	    }
 	    nrgs = nrgs + 1
 	    RNG_NRNGS(rg) = nrgs
 	    RNG_X1(rg, nrgs) = x1
@@ -349,10 +361,12 @@ char	rstr[ARB]		# Range string
 real	r1, r2, dr		# Default range and range limits
 pointer	rg			# Range pointer to be freed.
 
+size_t	sz_val
 pointer	errstr
 
 begin
-	call salloc (errstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errstr, sz_val, TY_CHAR)
 
 	switch (errnum) {
 	case 1:

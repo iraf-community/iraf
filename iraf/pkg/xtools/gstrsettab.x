@@ -6,8 +6,11 @@
 
 procedure gstrsettab (tabs, maxtabs, first_tabstop, tabsize)
 
-int   tabs[ARB], first_tabstop, tabsize
-int   i, maxtabs
+int	tabs[ARB]
+int	maxtabs, first_tabstop, tabsize
+
+int	i
+int	modi()
 
 begin
 	for (i=1; i <= maxtabs; i = i + 1) {
@@ -15,7 +18,7 @@ begin
 		tabs[i] = NO
 	    else if (i == first_tabstop)
 		tabs[i] = YES
-	    else if (mod ((i - first_tabstop), tabsize) == 0)
+	    else if (modi((i - first_tabstop), tabsize) == 0)
 		tabs[i] = YES
 	    else
 		tabs[i] = NO

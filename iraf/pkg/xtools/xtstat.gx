@@ -10,7 +10,7 @@ $for (sird)
 procedure xt_stat$t (sample, nsample, frac, mean, sigma, median, mode)
 
 PIXEL	sample[nsample]			#I Sample
-int	nsample				#I Number of sample pixels
+size_t	nsample				#I Number of sample pixels
 real	frac				#I Fraction of data to use
 $if (datatype == d)
 double	mean, sigma, median, mode	#O Statistics
@@ -18,7 +18,7 @@ $else
 real	mean, sigma, median, mode	#O Statistics
 $endif
 
-int	i, j, k, nmax
+long	i, j, k, nmax
 $if (datatype == d)
 double	z1, z2, zstep, zbin
 bool	fp_equald()

@@ -13,10 +13,11 @@ real	med			#R Return value
 
 int	i, i1, box, outnext, out
 real	clip
+int	modi()
 
 begin
 	box = RMS_BOX(rm)
-	outnext = mod (index-1, box)
+	outnext = modi(index-1, box)
 	out = OUT(rm,outnext)
 
 	if (out == 0) {
@@ -62,7 +63,7 @@ begin
 	OUT(rm,outnext) = i
 
 	i1 = box / 2
-	if (mod (box, 2) == 0)
+	if (modi(box, 2) == 0)
 	    med = (DATA(rm,i1) + DATA(rm,i1-1)) / 2
 	else
 	    med = DATA(rm,i1)
@@ -75,7 +76,7 @@ begin
 	    }
 	    if (i < box) {
 		i1 = i / 2
-		if (mod (i, 2) == 0)
+		if (modi(i, 2) == 0)
 		    med = (DATA(rm,i1) + DATA(rm,i1-1)) / 2
 		else
 		    med = DATA(rm,i1)
@@ -94,10 +95,12 @@ int	box			#I Running median box
 real	data			#I Initial data value
 pointer	rm			#R Method pointer
 
+size_t	sz_val
 int	i
 
 begin
-	call malloc (rm, RMS_LEN(box), TY_STRUCT)
+	sz_val = RMS_LEN(box)
+	call malloc (rm, sz_val, TY_STRUCT)
 	RMS_BOX(rm) = box
 	RMS_DATA(rm) = rm + RMS_OFFSET
 	RMS_IN(rm) = P2S(RMS_DATA(rm) + box)

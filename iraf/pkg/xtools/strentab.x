@@ -7,7 +7,8 @@ procedure strentab (line, outline, maxch, tabsize)
 int   maxch, tabsize
 char  line[ARB], outline[ARB]
 
-int   ip, op, ltab
+int	ip, op, ltab
+int	modi()
 
 begin
 	op = 1
@@ -17,7 +18,7 @@ begin
 	    ltab = ip
 	    while (line[ltab] == ' ' && op <= maxch) {
 		ltab = ltab + 1
-		if (mod(ltab, tabsize) == 1) {
+		if (modi(ltab, tabsize) == 1) {
 		    outline[op] = '\t'
 		    ip = ltab
 		    op = op + 1

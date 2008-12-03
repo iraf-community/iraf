@@ -5,8 +5,11 @@
 
 procedure strdetab (line, outline, maxch, tabsize)
 
-int   ip, op, maxch, tabsize
-char  line[ARB], outline [ARB]
+char	line[ARB], outline [ARB]
+int	maxch, tabsize
+
+int	ip, op
+int	modi()
 
 begin
 	op=1
@@ -17,7 +20,7 @@ begin
 		repeat {
 		    outline[op] = ' '
 		    op = op + 1
-		} until ((mod (op, tabsize) == 1) || (op > maxch)) 
+		} until ((modi(op, tabsize) == 1) || (op > maxch)) 
 	        ip = ip + 1
 	    } else {
 		outline[op] = line[ip]

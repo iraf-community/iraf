@@ -834,7 +834,6 @@ real	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
-long	nint_rl()
 pointer	imgl2r(), xt_fpvalr()
 
 begin
@@ -1093,7 +1092,6 @@ double	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
-long	nint_rl()
 pointer	imgl2d(), xt_fpvald()
 
 begin

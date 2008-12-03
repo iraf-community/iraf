@@ -17,7 +17,8 @@ real	background[npts]	# Background estimate
 int	npts			# Number of input data points
 real	dx			# Precision of peak positions
 
-int	i, j, k, npeaks, nextrema
+size_t	nextrema, npeaks
+long	i, j, k
 pointer	sp, a, b, c
 
 int	extrema()

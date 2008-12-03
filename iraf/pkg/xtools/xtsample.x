@@ -17,21 +17,27 @@ include	<imhdr.h>
 # number of lines.
 
 
-int procedure xt_samples (im, bpm, sample, nsample, nlines)
+long procedure xt_samples (im, bpm, sample, nsample, nlines)
 
 pointer	im			#I Image pointer
 pointer	bpm			#I Bad pixel pointer
 short	sample[nsample]		#I Work array
-int	nsample			#I Maximum number of sample pixels
-int	nlines			#I Minimum number of lines to sample
-int	nreturn			#I Number of pixels returned
+size_t	nsample			#I Maximum number of sample pixels
+size_t	nlines			#I Minimum number of lines to sample
 
+long	nreturn			#O Number of pixels returned
+size_t	sz_val
+long	l_val
+real	r_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
-int	i, ip, n, ndim, npix, nc
+int	i, ndim
+long	ip, n, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
+long	modl()
 
 long	imgnls()
+long	nint_rl()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -42,7 +48,8 @@ begin
 	npix = 1
 	do i = 1, ndim
 	    npix = npix * IM_LEN(im,i)
-	pstep = real(npix) / min (npix, nsample)
+	r_val = npix
+	pstep = r_val / min (npix, nsample)
 
 	# To insure a minimum number of lines and efficient use of
 	# pixels in a line, set the column step.
@@ -53,16 +60,18 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
 	    # Convert pixel number to image vector coordinates.
-	    n = npix; ip = nint(p)
+	    n = npix; ip = nint_rl(p)
 	    do i = ndim, 1, -1 {
 	        n = n / IM_LEN(im,i)
 	        v[i] = 1 + ip / n
-		ip = mod (ip, n)
+		ip = modl(ip, n)
 	    }
 
 	    # Sample the pixels in the line.
@@ -76,20 +85,21 @@ begin
 		if (imgnls (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint (c)
+		    ip = nint_rl(c)
 		    nreturn = nreturn + 1
 		    sample[nreturn] = Mems[buf+ip]
 		    p = p + pstep
 		}
 	    } else {
 		v[1] = 1
-	        call amovl (v, vbuf, IM_MAXDIM)
+		sz_val = IM_MAXDIM
+	        call amovl (v, vbuf, sz_val)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnls (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint (c)
+		    ip = nint_rl(c)
 		    if (Mems[bpmbuf+ip] == 0) {
 			nreturn = nreturn + 1
 			sample[nreturn] = Mems[buf+ip]
@@ -102,22 +112,28 @@ begin
 	return (nreturn)
 end
 
-int procedure xt_samplei (im, bpm, sample, nsample, nlines)
+long procedure xt_samplei (im, bpm, sample, nsample, nlines)
 
 pointer	im			#I Image pointer
 pointer	bpm			#I Bad pixel pointer
 int	sample[nsample]		#I Work array
-int	nsample			#I Maximum number of sample pixels
-int	nlines			#I Minimum number of lines to sample
-int	nreturn			#I Number of pixels returned
+size_t	nsample			#I Maximum number of sample pixels
+size_t	nlines			#I Minimum number of lines to sample
 
+long	nreturn			#O Number of pixels returned
+size_t	sz_val
+long	l_val
+real	r_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
-int	i, ip, n, ndim, npix, nc
+int	i, ndim
+long	ip, n, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
+long	modl()
 
 long	imgnls()
 long	imgnli()
+long	nint_rl()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -128,7 +144,8 @@ begin
 	npix = 1
 	do i = 1, ndim
 	    npix = npix * IM_LEN(im,i)
-	pstep = real(npix) / min (npix, nsample)
+	r_val = npix
+	pstep = r_val / min (npix, nsample)
 
 	# To insure a minimum number of lines and efficient use of
 	# pixels in a line, set the column step.
@@ -139,16 +156,18 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
 	    # Convert pixel number to image vector coordinates.
-	    n = npix; ip = nint(p)
+	    n = npix; ip = nint_rl(p)
 	    do i = ndim, 1, -1 {
 	        n = n / IM_LEN(im,i)
 	        v[i] = 1 + ip / n
-		ip = mod (ip, n)
+		ip = modl(ip, n)
 	    }
 
 	    # Sample the pixels in the line.
@@ -162,20 +181,21 @@ begin
 		if (imgnli (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint (c)
+		    ip = nint_rl(c)
 		    nreturn = nreturn + 1
 		    sample[nreturn] = Memi[buf+ip]
 		    p = p + pstep
 		}
 	    } else {
 		v[1] = 1
-	        call amovl (v, vbuf, IM_MAXDIM)
+		sz_val = IM_MAXDIM
+	        call amovl (v, vbuf, sz_val)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnli (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint (c)
+		    ip = nint_rl(c)
 		    if (Mems[bpmbuf+ip] == 0) {
 			nreturn = nreturn + 1
 			sample[nreturn] = Memi[buf+ip]
@@ -188,22 +208,28 @@ begin
 	return (nreturn)
 end
 
-int procedure xt_sampler (im, bpm, sample, nsample, nlines)
+long procedure xt_sampler (im, bpm, sample, nsample, nlines)
 
 pointer	im			#I Image pointer
 pointer	bpm			#I Bad pixel pointer
 real	sample[nsample]		#I Work array
-int	nsample			#I Maximum number of sample pixels
-int	nlines			#I Minimum number of lines to sample
-int	nreturn			#I Number of pixels returned
+size_t	nsample			#I Maximum number of sample pixels
+size_t	nlines			#I Minimum number of lines to sample
 
+long	nreturn			#O Number of pixels returned
+size_t	sz_val
+long	l_val
+real	r_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
-int	i, ip, n, ndim, npix, nc
+int	i, ndim
+long	ip, n, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
+long	modl()
 
 long	imgnls()
 long	imgnlr()
+long	nint_rl()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -214,7 +240,8 @@ begin
 	npix = 1
 	do i = 1, ndim
 	    npix = npix * IM_LEN(im,i)
-	pstep = real(npix) / min (npix, nsample)
+	r_val = npix
+	pstep = r_val / min (npix, nsample)
 
 	# To insure a minimum number of lines and efficient use of
 	# pixels in a line, set the column step.
@@ -225,16 +252,18 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
 	    # Convert pixel number to image vector coordinates.
-	    n = npix; ip = nint(p)
+	    n = npix; ip = nint_rl(p)
 	    do i = ndim, 1, -1 {
 	        n = n / IM_LEN(im,i)
 	        v[i] = 1 + ip / n
-		ip = mod (ip, n)
+		ip = modl(ip, n)
 	    }
 
 	    # Sample the pixels in the line.
@@ -248,20 +277,21 @@ begin
 		if (imgnlr (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint (c)
+		    ip = nint_rl(c)
 		    nreturn = nreturn + 1
 		    sample[nreturn] = Memr[buf+ip]
 		    p = p + pstep
 		}
 	    } else {
 		v[1] = 1
-	        call amovl (v, vbuf, IM_MAXDIM)
+		sz_val = IM_MAXDIM
+	        call amovl (v, vbuf, sz_val)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnlr (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint (c)
+		    ip = nint_rl(c)
 		    if (Mems[bpmbuf+ip] == 0) {
 			nreturn = nreturn + 1
 			sample[nreturn] = Memr[buf+ip]
@@ -274,22 +304,28 @@ begin
 	return (nreturn)
 end
 
-int procedure xt_sampled (im, bpm, sample, nsample, nlines)
+long procedure xt_sampled (im, bpm, sample, nsample, nlines)
 
 pointer	im			#I Image pointer
 pointer	bpm			#I Bad pixel pointer
 double	sample[nsample]		#I Work array
-int	nsample			#I Maximum number of sample pixels
-int	nlines			#I Minimum number of lines to sample
-int	nreturn			#I Number of pixels returned
+size_t	nsample			#I Maximum number of sample pixels
+size_t	nlines			#I Minimum number of lines to sample
 
+long	nreturn			#O Number of pixels returned
+size_t	sz_val
+long	l_val
+real	r_val
 long	v[IM_MAXDIM], vbuf[IM_MAXDIM]
-int	i, ip, n, ndim, npix, nc
+int	i, ndim
+long	ip, n, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
+long	modl()
 
 long	imgnls()
 long	imgnld()
+long	nint_rl()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -300,7 +336,8 @@ begin
 	npix = 1
 	do i = 1, ndim
 	    npix = npix * IM_LEN(im,i)
-	pstep = real(npix) / min (npix, nsample)
+	r_val = npix
+	pstep = r_val / min (npix, nsample)
 
 	# To insure a minimum number of lines and efficient use of
 	# pixels in a line, set the column step.
@@ -311,16 +348,18 @@ begin
 	    cstep = nc / min (min(npix,nsample)/nlines, nc)
 
 	# Step through the pixels.
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	nreturn = 0
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
 	    # Convert pixel number to image vector coordinates.
-	    n = npix; ip = nint(p)
+	    n = npix; ip = nint_rl(p)
 	    do i = ndim, 1, -1 {
 	        n = n / IM_LEN(im,i)
 	        v[i] = 1 + ip / n
-		ip = mod (ip, n)
+		ip = modl(ip, n)
 	    }
 
 	    # Sample the pixels in the line.
@@ -334,20 +373,21 @@ begin
 		if (imgnld (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint (c)
+		    ip = nint_rl(c)
 		    nreturn = nreturn + 1
 		    sample[nreturn] = Memd[buf+ip]
 		    p = p + pstep
 		}
 	    } else {
 		v[1] = 1
-	        call amovl (v, vbuf, IM_MAXDIM)
+		sz_val = IM_MAXDIM
+	        call amovl (v, vbuf, sz_val)
 		if (imgnls (bpm, bpmbuf, vbuf) == EOF)
 		    break
 		if (imgnld (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint (c)
+		    ip = nint_rl(c)
 		    if (Mems[bpmbuf+ip] == 0) {
 			nreturn = nreturn + 1
 			sample[nreturn] = Memd[buf+ip]

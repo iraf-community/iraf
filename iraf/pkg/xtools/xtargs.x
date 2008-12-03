@@ -36,17 +36,20 @@ pointer procedure xtargs_open (argstr)
 
 char	argstr[ARB]			#I Argument string
 
+size_t	sz_val
 int	i, tok
 pointer	sp, key, val, stp, sym
 
 bool	strne()
-int	nscan(), stpstr()
+int	nscan(), stpstr(), modi()
 pointer	stopen(), stfind(), stenter()
 
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (val, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (val, sz_val, TY_CHAR)
 
 	# Open symbol table.
 	stp = stopen ("xtargs", 10, 100, 1000)
@@ -68,7 +71,7 @@ begin
 	    call gargwrd (Memc[val], SZ_LINE)
 
 	    # Check for error.
-	    if (tok != TOK_IDENTIFIER || mod (nscan(), 3) != 0)
+	    if (tok != TOK_IDENTIFIER || modi(nscan(), 3) != 0)
 	        break
 
 	    # Ignore case.
@@ -78,14 +81,14 @@ begin
 	    sym = stfind (stp, Memc[key])
 	    if (sym == NULL) {
 	        sym = stenter (stp, Memc[key], 1)
-		Memi[sym] = stpstr (stp, Memc[val], 1)
+		Memi[P2I(sym)] = stpstr (stp, Memc[val], 1)
 	    }
 	}
 
 	call sfree (sp)
 
 	# Check for error.
-	if (mod (nscan(), 3) != 1) {
+	if (modi(nscan(), 3) != 1) {
 	   call stclose (stp)
 	   call error (1, "Syntax error")
 	}
@@ -104,14 +107,15 @@ char	key[ARB]			#I Key to find
 char	val[maxchar]			#O String value
 int	maxchar				#I Maximum number of characters
 
-pointer	sym, stfind(), strefsbuf()
+pointer	sym
+pointer	stfind(), strefsbuf()
 
 begin
 	sym = stfind (stp, key)
 	if (sym == NULL)
 	    call error (1, "Key not found")
 
-	call strcpy (Memc[strefsbuf(stp,Memi[sym])], val, maxchar)
+	call strcpy (Memc[strefsbuf(stp,Memi[P2I(sym)])], val, maxchar)
 end
 
 
@@ -124,8 +128,10 @@ pointer	stp				#I Symbol table
 char	key[ARB]			#I Key to find
 double	dval				#R Integer value
 
-int	i, j, ctod(), strlen()
-pointer	sym, stfind(), strefsbuf()
+int	i, j
+pointer	sym
+int	ctod(), strlen()
+pointer	stfind(), strefsbuf()
 
 begin
 	sym = stfind (stp, key)
@@ -133,8 +139,8 @@ begin
 	    call error (1, "Key not found")
 
 	i = 1
-	j = ctod (Memc[strefsbuf(stp,Memi[sym])], i, dval)
-	if (j != strlen(Memc[strefsbuf(stp,Memi[sym])]))
+	j = ctod (Memc[strefsbuf(stp,Memi[P2I(sym)])], i, dval)
+	if (j != strlen(Memc[strefsbuf(stp,Memi[P2I(sym)])]))
 	    call error (2, "Value not a number")
 
 	return (dval)

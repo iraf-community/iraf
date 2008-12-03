@@ -29,7 +29,9 @@ real	threshold			# Minimum range in feature
 
 real	xc				# Center
 
-int	x1, x2, nx
+real	r_val
+int	x1, x2
+size_t	nx
 real	a, b, rad, wid
 pointer	sp, data1
 
@@ -53,7 +55,8 @@ begin
 	# the width and error radius buffer.  Check for a minimum range.
 
 	x1 = max (1., x - wid / 2 - rad - wid)
-	x2 = min (real (npts), x + wid / 2 + rad + wid + 1)
+	r_val = npts
+	x2 = min (r_val, x + wid / 2 + rad + wid + 1)
 	nx = x2 - x1 + 1
 	call alimr (data[x1], nx, a, b)
 	if (b - a < threshold)
@@ -64,7 +67,8 @@ begin
 	# half width.
 
 	x1 = max (1., x - wid / 2 - rad)
-	x2 = min (real (npts), x + wid / 2 + rad + 1)
+	r_val = npts
+	x2 = min (r_val, x + wid / 2 + rad + 1)
 	nx = x2 - x1 + 1
 
 	call smark (sp)
@@ -138,11 +142,12 @@ end
 real procedure c1d_center (x, data, npts, width)
 
 real	x				# Starting guess
-int	npts				# Number of points in data vector
+size_t	npts				# Number of points in data vector
 real	data[npts]			# Data vector
 real	width				# Centering width
 
-int	i, j, iteration, dxcheck
+long	i, j
+int	iteration, dxcheck
 real	xc, wid, hwidth, dx, dxabs, dxlast
 real	a, b, sum1, sum2, intgrl1, intgrl2
 pointer	asi1, asi2, sp, data1

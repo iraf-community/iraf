@@ -188,10 +188,10 @@ pointer procedure dtmap (database, mode)
 char	database[ARB]			# Database file
 int	mode				# FIO mode
 
-int	i, nrec
-int	dt_alloc1, dt_alloc2
+size_t	sz_val
+long	i
+size_t	nrec, dt_alloc1, dt_alloc2
 pointer	dt, str
-
 int	open(), fscan(), strlen()
 bool	streq()
 long	note()
@@ -204,7 +204,8 @@ begin
 
 	i = open (database, mode, TEXT_FILE)
 
-	call calloc (dt, DT_LEN, TY_STRUCT)
+	sz_val = DT_LEN
+	call calloc (dt, sz_val, TY_STRUCT)
 	DT(dt) = i
 
 	if (mode != READ_ONLY)
@@ -215,7 +216,8 @@ begin
 	call malloc (DT_OFFSETS(dt), dt_alloc1, TY_LONG)
 	call malloc (DT_NAMES(dt), dt_alloc1, TY_INT)
 	call malloc (DT_MAP(dt), dt_alloc2, TY_CHAR)
-	call malloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call malloc (str, sz_val, TY_CHAR)
 
 	nrec = 1
 	DT_NRECS(dt) = 0
@@ -256,7 +258,8 @@ begin
 	    }
 	}
 
-	call realloc (DT_MAP(dt), DT_NAMEI(dt, nrec), TY_CHAR)
+	sz_val = DT_NAMEI(dt, nrec)
+	call realloc (DT_MAP(dt), sz_val, TY_CHAR)
 	call realloc (DT_OFFSETS(dt), DT_NRECS(dt), TY_LONG)
 	call realloc (DT_NAMES(dt), DT_NRECS(dt), TY_INT)
 	call mfree (str, TY_CHAR)
@@ -289,8 +292,7 @@ int procedure dtlocate (dt, name)
 pointer	dt				# DTTEXT pointer
 char	name[ARB]			# Record name
 
-int	i
-
+long	i
 bool	streq()
 
 begin
@@ -317,7 +319,8 @@ char	str[maxchar]			# String value
 int	maxchar				# Maximum characters for string
 
 char	name[SZ_LINE]
-int	i, fscan()
+int	i
+int	fscan()
 bool	streq()
 
 begin
@@ -355,7 +358,6 @@ char	field[ARB]			# Database field
 
 int	ival				# Field value
 char	name[SZ_LINE]
-
 int	fscan(), nscan()
 bool	streq()
 
@@ -383,6 +385,43 @@ begin
 end
 
 
+# DTGETL -- Get a long integer field
+
+long procedure dtgetl (dt, record, field)
+
+pointer	dt				# DTTEXT pointer
+int	record				# Database index
+char	field[ARB]			# Database field
+
+long	lval				# Field value
+char	name[SZ_LINE]
+int	fscan(), nscan()
+bool	streq()
+
+begin
+	if ((record < 1) || (record > DT_NRECS(dt)))
+	    call error (0, "Database record request out of bounds")
+
+	call seek (DT(dt), DT_OFFSET(dt, record))
+
+	while (fscan (DT(dt)) != EOF) {
+	    call gargwrd (name, SZ_LINE)
+
+	    if (streq (name, "begin"))
+		break
+	    else if (streq (name, field)) {
+		call gargl (lval)
+		if (nscan() == 2)
+		   return (lval)
+		else
+		   call error (0, "Error in database field value")
+	    }
+	}
+
+	call error (0, "Database field not found")
+end
+
+
 # DTGETR -- Get an real field
 
 real procedure dtgetr (dt, record, field)
@@ -393,7 +432,6 @@ char	field[ARB]			# Database field
 
 real	rval
 char	name[SZ_LINE]
-
 int	fscan(), nscan()
 bool	streq()
 
@@ -426,13 +464,12 @@ end
 double procedure dtgetd (dt, record, field)
 
 pointer dt                              # DTTEXT pointer
-int     record                          # Database index
+int	record                          # Database index
 char    field[ARB]                      # Database field
 
 double  dval
 char    name[SZ_LINE]
-
-int     fscan(), nscan()
+int	fscan(), nscan()
 bool    streq()
 
 begin
@@ -472,7 +509,6 @@ int	npts				# Number of points in the array
 
 char	name[SZ_LINE]
 int	i
-
 int	fscan(), nscan()
 bool	streq()
 
@@ -522,7 +558,6 @@ int	npts				# Number of points in the array
 
 char	name[SZ_LINE]
 int	i
-
 int	fscan(), nscan()
 bool	streq()
 
@@ -566,10 +601,12 @@ procedure dtptime (dt)
 pointer	dt				# DTTEXT pointer
 
 char	timestr[SZ_TIME]
-long	time, clktime()
+long	time, l_val
+long	clktime()
 
 begin
-	time = clktime (0)
+	l_val = 0
+	time = clktime (l_val)
 	call cnvtime (time, timestr, SZ_TIME)
 	call fprintf (DT(dt), "# %s\n")
 	    call pargstr (timestr)
@@ -613,16 +650,16 @@ char	database[ARB]		# Database
 char	key[ARB]		# Key
 int	mode			# Mode
 
+size_t	sz_val
 pointer	sp, dbfile, dt
-
 int	isdirectory(), access(), stridxs()
 pointer	dtmap()
-
-errchk	dtmap()
+errchk	dtmap
 
 begin
 	call smark (sp)
-	call salloc (dbfile, SZ_PATHNAME + SZ_FNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME + SZ_FNAME
+	call salloc (dbfile, sz_val, TY_CHAR)
 
 	# Check if the database does not exist create it as a directory.
 
@@ -665,9 +702,12 @@ char	dname[ARB]		# Directory name
 char	fname[ARB]		# File name
 int	mode			# Mode
 
-int	i, open()
+size_t	sz_val
+int	i
+pointer	ip, dbfile
+int	open()
 bool	strne()
-pointer	dbfile, dtmap1()
+pointer	dtmap1()
 errchk	dtmap1, dtunmap
 
 begin
@@ -676,7 +716,8 @@ begin
 		call dtunmap (dt)
 	    } else if (mode != DT_MODE(dt)) {
 		i = SZ_PATHNAME + SZ_FNAME
-		call malloc (dbfile, i, TY_CHAR)
+		sz_val = i
+		call malloc (dbfile, sz_val, TY_CHAR)
 		call fstats (DT(dt), F_FILENAME, Memc[dbfile], i)
 		call close (DT(dt))
 		iferr (i = open (Memc[dbfile], mode, TEXT_FILE)) {
@@ -692,7 +733,7 @@ begin
 	}
 
 	if (dt == NULL) {
-	    i = dtmap1 (dname, fname, mode)
-	    dt = i
+	    ip = dtmap1 (dname, fname, mode)
+	    dt = ip
 	}
 end

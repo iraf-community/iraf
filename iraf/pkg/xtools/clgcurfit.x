@@ -16,7 +16,8 @@ int	curve_type
 int	order
 
 char	str[SZ_LINE]
-int	i, curtypes[3], clgwrd(), clgeti()
+int	i, curtypes[3]
+int	clgwrd(), clgeti()
 errchk	clgwrd
 
 data	curtypes/LEGENDRE, CHEBYSHEV, SPLINE3/

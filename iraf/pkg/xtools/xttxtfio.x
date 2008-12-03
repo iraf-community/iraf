@@ -17,8 +17,12 @@ int procedure xt_txtopen (fname)
 char	fname[ARB]		#I File name or proc:nnnn reference
 int	fd			#R Null to open and non-null to close
 
-int	ip, procptr, strncmp(), ctoi(), open(), stropen()
+size_t	sz_val
+long	l_val
+int	ip
+pointer	procptr
 pointer	strbuf
+int	strncmp(), ctol(), open(), stropen()
 errchk	zcall1, open, stropen
 
 int	firsttime
@@ -30,15 +34,17 @@ common	/xttxtn_com/ buf
 begin
 	# Make sure array of string buffer pointers is initialized.
 	if (firsttime==YES) {
-	    call aclri (buf, TXT_MAXFD)
+	    sz_val = TXT_MAXFD
+	    call aclrp (buf, sz_val)
 	    firsttime = NO
 	}
 
 	# Determine type of open to use.
 	if (strncmp (fname, "proc:", 5) == 0) {
 	    ip = 1
-	    if (ctoi (fname[6], ip, procptr) == 0)
+	    if (ctol (fname[6], ip, l_val) == 0)
 		call error (1, "xt_txtopen: bad file specification")
+	    procptr = l_val
 	    call zcall1 (procptr, strbuf)
 	    fd = stropen (Memc[strbuf], ARB, READ_ONLY)
 	    if (fd > TXT_MAXFD) {

@@ -14,9 +14,9 @@ include	<mach.h>
 define	RMT_OFFSET	4			# Offset to data
 define	RMT_LEN		(RMT_OFFSET+5*$1+3)	# Structure length
 define	RMT_BOX		Memi[P2I($1)]		# Running box size
-define	RMT_DATA	Memi[P2I($1+1)]		# Sorted data (ptr)
-define	RMT_IN		Memi[P2I($1+2)]		# Mapping to input (ptr)
-define	RMT_OUT		Memi[P2I($1+3)]		# Mapping to output (ptr)
+define	RMT_DATA	Memp[$1+1]		# Sorted data (ptr)
+define	RMT_IN		Memp[$1+2]		# Mapping to input (ptr)
+define	RMT_OUT		Memp[$1+3]		# Mapping to output (ptr)
 
 define	DATA		Memr[RMT_DATA($1)+$2]
 define	IN		Mems[RMT_IN($1)+$2]
@@ -32,12 +32,13 @@ int	index			#I Index of new data
 real	data			#I Input data value
 
 short	nrnew, box, outnext, out, leaf, one
+short	mods()
 data	one/1/
 
 begin
 	nrnew = index - 1
 	box = RMT_BOX(rm)
-	outnext = mod (nrnew, box)
+	outnext = mods(nrnew, box)
 	out = OUT(rm,outnext)
 	DATA(rm,out) = data
 
@@ -74,12 +75,14 @@ int	box			#I Running median box
 real	data			#I Initial data value
 pointer	rm			#R Method pointer
 
+size_t	sz_val
 short	i, halfbox
 #short	i, j, k, halfbox, one
 #data	one/1/
 
 begin
-	call malloc (rm, RMT_LEN(box), TY_STRUCT)
+	sz_val = RMT_LEN(box)
+	call malloc (rm, sz_val, TY_STRUCT)
 
 	RMT_BOX(rm) = box
 	RMT_DATA(rm) = rm + RMT_OFFSET

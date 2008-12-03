@@ -22,15 +22,17 @@ char	section[sz_section]	# Returned image section string
 int	sz_section		# Maximum size of image section string
 
 char	wrd1[SZ_WRD], wrd2[SZ_WRD]
-int	ndim, len1, len2, i, j, k
+int	ndim, i, j, k
+long	len1, len2
 pointer	im
 
-int	strdic(), ctoi()
+int	strdic(), ctol()
 pointer	immap()
 errchk	immap()
+include	<nullptr.inc>
 
 begin
-	im = immap (image, READ_ONLY, 0)
+	im = immap (image, READ_ONLY, NULLPTR)
 	ndim = IM_NDIM(im)
 	len1 = IM_LEN(im, 1)
 	len2 = IM_LEN(im, 2)
@@ -66,31 +68,31 @@ begin
 		    switch (j) {
 		    case 3:
 		        call sprintf (section, sz_section, "[%d,*]")
-		            call pargi ((len1 + 1) / 2)
+		            call pargl ((len1 + 1) / 2)
 		    case 4:
 		        call sprintf (section, sz_section, "[%d,*]")
-		            call pargi (len1)
+		            call pargl (len1)
 		    default:
 			i = 1
-			if (ctoi (wrd2, i, len1) == 0)
+			if (ctol (wrd2, i, len1) == 0)
 			    call error (0, "Bad column number")
 		        call sprintf (section, sz_section, "[%d,*]")
-		            call pargi (len1)
+		            call pargl (len1)
 		    }
 		case 2:
 		    switch (j) {
 		    case 3:
 		        call sprintf (section, sz_section, "[*,%d]")
-		            call pargi ((len2 + 1) / 2)
+		            call pargl ((len2 + 1) / 2)
 		    case 4:
 		        call sprintf (section, sz_section, "[*,%d]")
-		            call pargi (len2)
+		            call pargl (len2)
 		    default:
 			i = 1
-			if (ctoi (wrd2, i, len1) == 0)
+			if (ctol (wrd2, i, len1) == 0)
 			    call error (0, "Bad line number")
 		        call sprintf (section, sz_section, "[*,%d]")
-		            call pargi (len1)
+		            call pargl (len1)
 		    }
 		default:
 		    call error (0,

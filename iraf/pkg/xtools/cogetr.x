@@ -28,14 +28,17 @@ include	"cogetr.h"
 pointer procedure cogetr (co, col, line1, line2)
 
 pointer	co		# COIO pointer
-int	col		# Column
-int	line1		# First image line of column vector
-int	line2		# Last image line of column vector
+long	col		# Column
+long	line1		# First image line of column vector
+long	line2		# Last image line of column vector
 
-int	ncols, nlines, lastc1, lastl1, lastl2
-int	i, imlen1, imlen2, col1, nc
+size_t	ncols, nlines, nc
+long	l_val
+long	lastc1, lastl1, lastl2
+long	i, imlen1, imlen2, col1
 pointer	im, coldata, buffer, buf, data
 
+long	modl()
 pointer	imgl2r()
 
 begin
@@ -89,7 +92,8 @@ begin
 	    lastl1 = max (1, line1 - EXTRA)
 	    lastl2 = min (imlen2, line2 + EXTRA)
 	    do i = lastl1, lastl2 {
-	        buf = buffer + mod (i, nlines) * ncols
+		l_val = nlines
+	        buf = buffer + modl(i, l_val) * ncols
 		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
 	    }
 	    CO_COL1(co) = lastc1
@@ -98,7 +102,8 @@ begin
 
 	} else if (line1 < lastl1) {
 	    do i = max (1, line1 - EXTRA), min (imlen2, lastl1 - 1) {
-	        buf = buffer + mod (i, nlines) * ncols
+		l_val = nlines
+	        buf = buffer + modl(i, l_val) * ncols
 		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
 	    }
 	    lastl1 = max (1, line1 - EXTRA)
@@ -108,7 +113,8 @@ begin
 
 	} else if (line2 > lastl2) {
 	    do i = max (1, lastl2 + 1), min (imlen2, line2 + EXTRA) {
-	        buf = buffer + mod (i, nlines) * ncols
+		l_val = nlines
+	        buf = buffer + modl(i, l_val) * ncols
 		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
 	    }
 	    lastl1 = max (1, line1 - EXTRA)
@@ -121,7 +127,8 @@ begin
 
 	data = coldata
 	do i = line1, line2 {
-	    buf = buffer + mod (i, nlines) * ncols
+	    l_val = nlines
+	    buf = buffer + modl(i, l_val) * ncols
 	    Memr[data] = Memr[buf+col-col1]
 	    data = data + 1
 	}
@@ -135,11 +142,14 @@ end
 pointer procedure comap (im, maxbuf)
 
 pointer	im		# IMIO pointer
-int	maxbuf		# Maximum buffer size
+size_t	maxbuf		# Maximum buffer size
 pointer	co		# Returned pointer
 
+size_t	sz_val
+
 begin
-	call malloc (co, LEN_CO, TY_LONG)
+	sz_val = LEN_CO
+	call malloc (co, sz_val, TY_STRUCT)
 	CO_IM(co) = im
 	CO_MAXBUF(co) = maxbuf
 	CO_DATA(co) = NULL
@@ -158,5 +168,5 @@ pointer	co			# Pointer to buffer structure
 begin
 	call mfree (CO_DATA(co), TY_REAL)
 	call mfree (CO_BUF(co), TY_REAL)
-	call mfree (co, TY_LONG)
+	call mfree (co, TY_STRUCT)
 end

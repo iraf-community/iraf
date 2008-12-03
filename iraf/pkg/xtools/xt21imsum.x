@@ -8,13 +8,14 @@ procedure xt_21imsum (im, axis, col1, col2, line1, line2, x, y, npts)
 
 pointer	im			# IMIO pointer
 int	axis			# Axis of vector
-int	col1, col2		# Range of columns
-int	line1, line2		# Range of lines
+long	col1, col2		# Range of columns
+long	line1, line2		# Range of lines
 pointer	x			# Vector ordinates
 pointer	y			# Vector abscissa
-int	npts			# Number of points in vector
+size_t	npts			# Number of points in vector
 
-int	i, line, ncols, nlines
+long	i, line
+size_t	ncols, nlines
 
 real	asumr()
 pointer	imgs2r()
@@ -64,13 +65,14 @@ procedure xt_21immed (im, axis, col1, col2, line1, line2, x, y, npts)
 
 pointer	im			# IMIO pointer
 int	axis			# Axis of vector
-int	col1, col2		# Range of columns
-int	line1, line2		# Range of lines
+long	col1, col2		# Range of columns
+long	line1, line2		# Range of lines
 pointer	x			# Vector ordinates
 pointer	y			# Vector abscissa
-int	npts			# Number of points in vector
+size_t	npts			# Number of points in vector
 
-int	i, j, k, n, line, ncols, nlines, maxncols
+long	i, j, k, n, line
+size_t	ncols, nlines, maxncols
 pointer	buf1, buf2
 
 real	amedr()
@@ -130,19 +132,23 @@ procedure xt_21imavg (im, axis, col1, col2, line1, line2, x, y, npts)
 
 pointer	im			# IMIO pointer
 int	axis			# Axis of vector
-int	col1, col2		# Range of columns
-int	line1, line2		# Range of lines
+long	col1, col2		# Range of columns
+long	line1, line2		# Range of lines
 pointer	x			# Vector ordinates
 pointer	y			# Vector abscissa
-int	npts			# Number of points in vector
+size_t	npts			# Number of points in vector
+
+real	r_val
 
 begin
 	call xt_21imsum (im, axis, col1, col2, line1, line2, x, y, npts)
 
 	switch (axis) {
 	case 1:
-	    call adivkr (Memr[y], real (line2-line1+1), Memr[y], npts)
+	    r_val = line2-line1+1
+	    call adivkr (Memr[y], r_val, Memr[y], npts)
 	case 2:
-	    call adivkr (Memr[y], real (col2-col1+1), Memr[y], npts)
+	    r_val = col2-col1+1
+	    call adivkr (Memr[y], r_val, Memr[y], npts)
 	}
 end

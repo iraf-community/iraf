@@ -126,15 +126,17 @@ procedure xt_getpars (fname)
 
 char	fname			# pset file
 
+size_t	sz_val
 bool	skip
-int	lineno, fd
+int	lineno, fd, i_off
 pointer	sp, lbuf, err, ip
 int	open(), getlline()
 errchk	open, getlline
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_CMDBUF, TY_CHAR)
+	sz_val = SZ_CMDBUF
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 
@@ -148,11 +150,14 @@ begin
 		;
 	    if (Memc[ip] == '#' || Memc[ip] == '\n')
 		next
-	    iferr (call xt_paramset (Memc, ip, skip)) {
+	    i_off = 1
+	    iferr (call xt_paramset (Memc[ip], i_off, skip)) {
+		ip = ip + i_off - 1
 		for (;  Memc[ip] != EOS && Memc[ip] != '\n';  ip=ip+1)
 		    ;
 		Memc[ip] = EOS
-		call salloc (err, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (err, sz_val, TY_CHAR)
 		call sprintf (Memc[err], SZ_LINE,
 		    "Bad param assignment, line %d: `%s'\n")
 		    call pargi (lineno)
@@ -177,13 +182,17 @@ char	args[ARB]		# argument list
 int	ip			# pointer to first char of argument
 bool	skip			# skip whitespace within "param=value" args
 
-pointer	sp, param, value, op, clc_find()
+size_t	sz_val
+pointer	sp, param, value, op
+pointer	clc_find()
 int	stridx()
 
 begin
 	call smark (sp)
-	call salloc (param, SZ_FNAME, TY_CHAR)
-	call salloc (value, SZ_VALSTR, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (param, sz_val, TY_CHAR)
+	sz_val = SZ_VALSTR
+	call salloc (value, sz_val, TY_CHAR)
 
 	# Extract the param field.
 	op = param

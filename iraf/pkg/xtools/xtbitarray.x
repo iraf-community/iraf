@@ -21,13 +21,15 @@ size_t	nc, nl				#I Size of bit array to open
 int	maxval				#I Maximum value
 pointer	ba				#R Bitarray structure
 
+size_t	sz_val
 int	nbits
 errchk	calloc
 
 begin
 	nbits = SZB_CHAR * SZ_INT * 8
 
-	call calloc (ba, BA_LEN, TY_STRUCT)
+	sz_val = BA_LEN
+	call calloc (ba, sz_val, TY_STRUCT)
 	BA_NC(ba) = nc
 	BA_NL(ba) = nl
 	BA_MAX(ba) = maxval
@@ -61,8 +63,8 @@ long	c, l				#I Starting element
 short	data[n]				#I Input data array
 size_t	n				#I Number of data values
 
-long	i, j, k, m, bn
-int	val
+long	j, k, m, bn
+int	i, val
 long	modl()
 
 begin
@@ -87,7 +89,8 @@ long	c, l				#I Starting element
 short	data[n]				#I Output data array
 size_t	n				#I Number of data values
 
-long	i, j, k, m, bn
+long	j, k, m, bn
+int	i
 int	bitupk()
 long	modl()
 
@@ -112,8 +115,8 @@ long	c, l				#I Starting element
 int	data[n]				#I Input data array
 size_t	n				#I Number of data values
 
-long	i, j, k, m, bn
-int	val
+long	j, k, m, bn
+int	i, val
 long	modl()
 
 begin
@@ -138,7 +141,8 @@ long	c, l				#I Starting element
 int	data[n]				#I Output data array
 size_t	n				#I Number of data values
 
-long	i, j, k, m, bn
+long	j, k, m, bn
+int	i
 int	bitupk()
 long	modl()
 

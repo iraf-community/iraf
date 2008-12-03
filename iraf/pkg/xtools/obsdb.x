@@ -28,7 +28,7 @@ PROCEDURES
 	      obsimopen (obs, im, observatory, verbose, newobs, obshead)
 	      obsclose (obs)
 	      obslog (obs, task, params, fd)
-	val = obsget[ird] (obs, param)
+	val = obsget[ilrd] (obs, param)
 	      obsgstr (obs, param, str, maxchar)
 	      obsinfo (obs, fd)
 .fi
@@ -86,6 +86,7 @@ define	OBSVAL		Memc[P2C($1)]	# Observatory value string
 pointer procedure obsopen (observatory)
 
 char	observatory[ARB]		# Observatory name
+
 pointer	obsvopen()
 errchk	obsvopen
 
@@ -103,10 +104,14 @@ char	observatory[ARB]		# Observatory name
 int	verbose				# Verbose?
 pointer	obs				# Observatory symbol table pointer
 
-int	fd, envfind(), envgets(), open(), fscan(), nscan(), nowhite()
+size_t	sz_val
+long	l_val
+int	fd
 pointer	sp, fname, obsname, key, str, temp, sym
+bool	found
+int	envfind(), envgets(), open(), fscan(), nscan(), nowhite()
 pointer	stopen(), stenter()
-bool	found, streq(), strne()
+bool	streq(), strne()
 errchk	open, stopen, stenter, envfind, envgets, fscan
 
 string	obskey	"observatory"
@@ -114,11 +119,13 @@ define	getobs_	99
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (obsname, SZ_FNAME, TY_CHAR)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (temp, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (obsname, sz_val, TY_CHAR)
+	call salloc (key, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (temp, sz_val, TY_CHAR)
 
 	# Open observatory database.
 	if (envfind ("obsdb", Memc[fname], SZ_FNAME) <= 0) {
@@ -208,7 +215,8 @@ getobs_
 		}
 
 		# List database contents and try again
-		call seek (fd, BOF)
+		l_val = BOF
+		call seek (fd, l_val)
 		while (fscan (fd) != EOF) {
 		    call gargwrd (Memc[key], SZ_FNAME)
 		    call gargwrd (Memc[str], SZ_LINE)
@@ -221,7 +229,8 @@ getobs_
 		    } else if (streq (Memc[key], "name"))
 			call eprintf (Memc[str])
 		}
-		call seek (fd, BOF)
+		l_val = BOF
+		call seek (fd, l_val)
 		call eprintf (
 		   "\n  obspars:  Use parameters from OBSERVATORY task\n\n")
 		call flush (STDERR)
@@ -276,8 +285,10 @@ pointer	obs		# Observatory pointer
 char	param[ARB]	# Parameter
 pointer	sym		# Symbol table pointer
 
+size_t	sz_val
+pointer	sp, str
 bool	streq()
-pointer	sp, str, stfind(), stenter()
+pointer	stfind(), stenter()
 double	clgetd()
 
 begin
@@ -291,7 +302,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call sprintf (Memc[str], SZ_LINE, "observatory.%s")
 	    call pargstr (param)
 
@@ -331,13 +343,16 @@ char	task[ARB]		# Task name, image name, or other string
 char	params[ARB]		# Parameters to log
 int	fd			# File descriptor
 
-int	ip, ctowrd()
-pointer	sym, obspars()
-pointer	sp, param
+size_t	sz_val
+int	ip
+pointer	sp, param, sym
+int	ctowrd()
+pointer	obspars()
 
 begin
 	call smark (sp)
-	call salloc (param, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (param, sz_val, TY_CHAR)
 
 	# Log task string and observatory name
 	sym = obspars (obs, "name")
@@ -373,8 +388,10 @@ int procedure obsgeti (obs, param)
 pointer	obs			# Observatory symbol table pointer
 char	param[ARB]		# Observatory parameter
 
-int	ip, ival, ctoi()
-pointer	sym, obspars()
+int	ip, ival
+pointer	sym
+int	ctoi()
+pointer	obspars()
 errchk	obspars
 
 begin
@@ -388,6 +405,31 @@ begin
 end
 
 
+# OBSGETL -- Get long integer observatory parameter.
+
+long procedure obsgetl (obs, param)
+
+pointer	obs			# Observatory symbol table pointer
+char	param[ARB]		# Observatory parameter
+
+int	ip
+long	lval
+pointer	sym
+int	ctol()
+pointer	obspars()
+errchk	obspars
+
+begin
+	sym = obspars (obs, param)
+	if (sym == NULL)
+	    call error (1, "OBSGETL: Observatory parameter not found")
+	ip = 1
+	if (ctol (OBSVAL(sym), ip, lval) <= 0)
+	    call error (1, "OBSGETL: Observatory parameter not integer")
+	return (lval)
+end
+
+
 # OBSGETR -- Get real observatory parameter.
 
 real procedure obsgetr (obs, param)
@@ -395,9 +437,11 @@ real procedure obsgetr (obs, param)
 pointer	obs			# Observatory symbol table pointer
 char	param[ARB]		# Observatory parameter
 
-int	ip, ctor()
+int	ip
 real	rval
-pointer	sym, obspars()
+pointer	sym
+int	ctor()
+pointer	obspars()
 errchk	obspars
 
 begin
@@ -418,9 +462,11 @@ double procedure obsgetd (obs, param)
 pointer	obs			# Observatory symbol table pointer
 char	param[ARB]		# Observatory parameter
 
-int	ip, ctod()
+int	ip
 double	dval
-pointer	sym, obspars()
+pointer	sym
+int	ctod()
+pointer	obspars()
 errchk	obspars
 
 begin
@@ -443,7 +489,8 @@ char	param[ARB]		# Observatory parameter
 char	str[maxchar]		# Observatory parameter value
 int	maxchar			# Maximum characters for string
 
-pointer	sym, obspars()
+pointer	sym
+pointer	obspars()
 errchk	obspars
 
 begin
@@ -469,13 +516,16 @@ int	verbose			#I Verbose?
 bool	newobs			#O New observatory?
 bool	obshead			#O Observatory found in header?	
 
+size_t	sz_val
+pointer	sp, observat, sym
 bool	strne()
-pointer	sp, observat, sym, obsvopen(), obspars()
+pointer	obsvopen(), obspars()
 errchk	obsvopen
 
 begin
 	call smark (sp)
-	call salloc (observat, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (observat, sz_val, TY_CHAR)
 
 	if (verbose == YES) {
 	    call imstats (im, IM_IMAGENAME, Memc[observat], SZ_FNAME)
@@ -534,7 +584,8 @@ procedure obsinfo (obs, fd)
 pointer	obs			# Observatory symbol table pointer
 int	fd			# Output file descriptor
 
-pointer	sym, name, obspars(), sthead(), stnext(), stname()
+pointer	sym, name
+pointer	obspars(), sthead(), stnext(), stname()
 int	stridxs()
 bool	streq()
 errchk	obspars

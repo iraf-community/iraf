@@ -7,6 +7,7 @@ define	NTYPES		9
 int procedure getdatatype (ch)
 
 char	ch
+
 int	i, type_code[NTYPES]
 int	stridx()
 
@@ -17,7 +18,7 @@ data	type_code /TY_UBYTE, TY_CHAR, TY_USHORT, TY_SHORT, TY_INT, TY_LONG,
 begin
 	i = stridx (ch, types)
 	if (i == 0)
-	   return (ERR)
+	    return (ERR)
 	else
 	    return (type_code[stridx(ch,types)])
 end

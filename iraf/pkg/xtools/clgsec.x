@@ -24,6 +24,8 @@ long	x2[IM_MAXDIM]
 long	step[IM_MAXDIM]
 int	nsubscripts
 
+size_t	sz_val
+long	l_val
 int	i, ip
 
 begin
@@ -32,9 +34,13 @@ begin
 
 	# Set default values.
 	nsubscripts = 0
-	call amovkl (long (FIRST), x1, IM_MAXDIM)
-	call amovkl (long (LAST), x2, IM_MAXDIM)
-	call amovkl (long (STEP), step, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = FIRST
+	call amovkl (l_val, x1, sz_val)
+	l_val = LAST
+	call amovkl (l_val, x2, sz_val)
+	l_val = STEP
+	call amovkl (l_val, step, sz_val)
 
 	# Skip leading whitespace.
 	ip = 1

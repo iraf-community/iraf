@@ -4,8 +4,9 @@
 
 int procedure  gstrentab (line, outline, maxch, tabs)
 
-int   maxch, tabs[ARB]
+
 char  line[ARB], outline[ARB]
+int   maxch, tabs[ARB]
 
 int   ip, op, ltab
 

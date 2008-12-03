@@ -14,15 +14,15 @@ include	<pkg/rmsorted.h>
 
 # Method object structure.
 define	RM_LEN		25		# Structure size
-define	RM_RMS		Memi[$1]	# Pointer to RMEDSRT method
-define	RM_BOX		Memi[$1+1]	# Box size
-define	RM_NDATA	Memi[$1+2]	# Number of datasets
-define	RM_PIXTYPE	Memi[$1+3]	# Internal storage type
-define	RM_GOOD		Memi[$1+4]	# Ptr to good array (box)
-define	RM_MASK		Memi[$1+5]	# Ptr to mask array
-define	RM_PWIN		Memi[$1+6]	# Ptr to packed window data (n*box)
-define	RM_POUT		Memi[$1+7]	# Ptr to packed outlist data (n*box)
-define	RM_PMASK	Memi[$1+8]	# Ptr to mask data (n*(box+15)/16)
+define	RM_RMS		Memp[$1]	# Pointer to RMEDSRT method
+define	RM_BOX		Memi[P2I($1+1)]	# Box size
+define	RM_NDATA	Memi[P2I($1+2)]	# Number of datasets
+define	RM_PIXTYPE	Memi[P2I($1+3)]	# Internal storage type
+define	RM_GOOD		Memp[$1+4]	# Ptr to good array (box)
+define	RM_MASK		Memp[$1+5]	# Ptr to mask array
+define	RM_PWIN		Memp[$1+6]	# Ptr to packed window data (n*box)
+define	RM_POUT		Memp[$1+7]	# Ptr to packed outlist data (n*box)
+define	RM_PMASK	Memp[$1+8]	# Ptr to mask data (n*(box+15)/16)
 define	RM_SETMASK	P2S($1+9)	# Ptr to set mask array (16)
 define	RM_UNSETMASK	P2S($1+17)	# Ptr to unset mask array (16)
 
@@ -52,9 +52,12 @@ short	nused			#O Number of values in calculated result
 real	med			#R Return value
 
 int	i, j, iexclude
-short	s1, s2, ors(), ands()
+short	s1, s2
 pointer	rms
-real	clip, rmsorted()
+real	clip
+short	ors(), ands()
+int	modi()
+real	rmsorted()
 
 begin
 	# Call running median sorted routine.
@@ -62,7 +65,7 @@ begin
 	med = rmsorted (rms, nclip, index, in)
 
 	# Set mask if needed.
-	s2 = mod (index-1, RM_BOX(rm))
+	s2 = modi(index-1, RM_BOX(rm))
 	s1 = MASK(rm,s2)
 	if (mask != 0 || s1 != 0) {
 	    if (mask != 0)
@@ -73,7 +76,7 @@ begin
 	}
 
 	# Recompute value if there are masks or an excluded value.
-	iexclude = mod (exclude-1, RM_BOX(rm))
+	iexclude = modi(exclude-1, RM_BOX(rm))
 	if (s1 == 0 && iexclude < 0) {
 	    do s2 = 0, RM_BOX(rm)-1, 16 {
 		s1 = MASK(rm,s2)
@@ -146,13 +149,15 @@ short	nused			#O Number of values in calculated result
 real	med			#R Return value
 
 int	i, j, iexclude
-short	mask, ands()
+short	mask
 real	clip
 pointer	rms
+short	ands()
+int	modi()
 
 begin
 	rms = RM_RMS(rm)
-	iexclude = mod (exclude-1, RM_BOX(rm))
+	iexclude = modi(exclude-1, RM_BOX(rm))
 
 	# Extract good values to use.
 	nused = 0
@@ -213,10 +218,11 @@ int	index			#I Index of new data (one indexed)
 
 int	i, j
 pointer	rms
+int	modi()
 
 begin
 	rms = RM_RMS(rm)
-	i = mod (index-1, RM_BOX(rm))
+	i = modi(index-1, RM_BOX(rm))
 	do j = 0, RM_BOX(rm)-1 {
 	    if (IN(rms,j) == i)
 	        return (DATA(rms,j))
@@ -236,9 +242,13 @@ int	ndatasets		#I Number of datasets
 int	pixtype			#I Internal storage type
 pointer	rm			#O RM pointer
 
+size_t	sz_val
+short	s_val
 int	i
-short	s, nots(), shifts()
-pointer	rms, rms_open()
+short	s
+pointer	rms
+short	nots(), shifts()
+pointer	rms_open()
 
 begin
 	# Open sorted running median method.
@@ -250,11 +260,16 @@ begin
 	else
 	    i = TY_REAL
 
-	call calloc (rm, RM_LEN, TY_STRUCT)
-	call calloc (RM_GOOD(rm), box, TY_REAL)
-	call calloc (RM_PWIN(rm), box*ndatasets, i)
-	call calloc (RM_POUT(rm), ndatasets*(box+1)/2, TY_SHORT)
-	call calloc (RM_PMASK(rm), ndatasets*(box+15)/16, TY_SHORT)
+	sz_val = RM_LEN
+	call calloc (rm, sz_val, TY_STRUCT)
+	sz_val = box
+	call calloc (RM_GOOD(rm), sz_val, TY_REAL)
+	sz_val = box*ndatasets
+	call calloc (RM_PWIN(rm), sz_val, i)
+	sz_val = ndatasets*(box+1)/2
+	call calloc (RM_POUT(rm), sz_val, TY_SHORT)
+	sz_val = ndatasets*(box+15)/16
+	call calloc (RM_PMASK(rm), sz_val, TY_SHORT)
 	
 	RM_RMS(rm) = rms
 	RM_BOX(rm) = box
@@ -267,7 +282,8 @@ begin
 	do i = 0, 15 {
 	    SETMASK(rm,i) = s
 	    UNSETMASK(rm,i) = nots (s)
-	    s = shifts (s, short(1))
+	    s_val = 1
+	    s = shifts (s, s_val)
 	}
 
 	do i = 1, ndatasets
@@ -301,15 +317,18 @@ procedure rm_pack (rm, dataset)
 pointer	rm			#I RM pointer
 int	dataset			#I Data set
 
+size_t	sz_val
 pointer	rms
 
 begin
 	rms = RM_RMS(rm)
+	sz_val = RM_BOX(rm)
 	if (RM_PIXTYPE(rm) == TY_SHORT)
 	    call anirs (DATA(rms,0), PWINS(rm,dataset), RM_BOX(rm))
 #	else
-#	    call amovr (DATA(rms,0), PWINR(rm,dataset), RM_BOX(rm))
-	call achtsb (OUT(rms,0), POUT(rm,dataset), RM_BOX(rm))
+#	    call amovr (DATA(rms,0), PWINR(rm,dataset), sz_val)
+	# arg2: incompatible pointer
+	call achtsb (OUT(rms,0), POUT(rm,dataset), sz_val)
 end
 
 
@@ -320,6 +339,7 @@ procedure rm_unpack (rm, dataset)
 pointer	rm			#I RM pointer
 int	dataset			#I Data set
 
+size_t	sz_val
 int	i, j, box
 pointer	rms
 
@@ -327,12 +347,14 @@ begin
 	rms = RM_RMS(rm)
 	box = RM_BOX(rm)
 
+	sz_val = box
 	if (RM_PIXTYPE(rm) == TY_SHORT)
-	    call achtsr (PWINS(rm,dataset), DATA(rms,0), box)
+	    call achtsr (PWINS(rm,dataset), DATA(rms,0), sz_val)
 	else
 	    RMS_DATA(rms) = RM_PWIN(rm) + box * (dataset - 1)
-#	    call amovr (PWINR(rm,dataset), DATA(rms,0), box)
-	call achtbs (POUT(rm,dataset), OUT(rms,0), box)
+#	    call amovr (PWINR(rm,dataset), DATA(rms,0), sz_val)
+	# arg1: incompatible pointer
+	call achtbs (POUT(rm,dataset), OUT(rms,0), sz_val)
 	RM_MASK(rm) = RM_PMASK(rm) + (box + 15) / 16 * (dataset - 1)
 
 	do i = 0, box-1 {

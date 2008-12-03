@@ -10,11 +10,11 @@ define	ZBIN	0.1	# Bin size for mode.
 procedure xt_stats (sample, nsample, frac, mean, sigma, median, mode)
 
 short	sample[nsample]			#I Sample
-int	nsample				#I Number of sample pixels
+size_t	nsample				#I Number of sample pixels
 real	frac				#I Fraction of data to use
 real	mean, sigma, median, mode	#O Statistics
 
-int	i, j, k, nmax
+long	i, j, k, nmax
 real	z1, z2, zstep, zbin
 bool	fp_equalr()
 
@@ -93,11 +93,11 @@ end
 procedure xt_stati (sample, nsample, frac, mean, sigma, median, mode)
 
 int	sample[nsample]			#I Sample
-int	nsample				#I Number of sample pixels
+size_t	nsample				#I Number of sample pixels
 real	frac				#I Fraction of data to use
 real	mean, sigma, median, mode	#O Statistics
 
-int	i, j, k, nmax
+long	i, j, k, nmax
 real	z1, z2, zstep, zbin
 bool	fp_equalr()
 
@@ -176,11 +176,11 @@ end
 procedure xt_statr (sample, nsample, frac, mean, sigma, median, mode)
 
 real	sample[nsample]			#I Sample
-int	nsample				#I Number of sample pixels
+size_t	nsample				#I Number of sample pixels
 real	frac				#I Fraction of data to use
 real	mean, sigma, median, mode	#O Statistics
 
-int	i, j, k, nmax
+long	i, j, k, nmax
 real	z1, z2, zstep, zbin
 bool	fp_equalr()
 
@@ -257,11 +257,11 @@ end
 procedure xt_statd (sample, nsample, frac, mean, sigma, median, mode)
 
 double	sample[nsample]			#I Sample
-int	nsample				#I Number of sample pixels
+size_t	nsample				#I Number of sample pixels
 real	frac				#I Fraction of data to use
 double	mean, sigma, median, mode	#O Statistics
 
-int	i, j, k, nmax
+long	i, j, k, nmax
 double	z1, z2, zstep, zbin
 bool	fp_equald()
 
