@@ -95,6 +95,8 @@ libsys.a:
 	psioisxt.x	<ctype.h> <gio.h>
 	psioxfer.x	
 	qsort.x	
+	qsortl.x	
+	qsortp.x	
 	sttyco.x	<ctype.h> <error.h> <ttset.h> <ttyset.h>
 	syserr.x	
 	sysid.x	

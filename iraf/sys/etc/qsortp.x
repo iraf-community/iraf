@@ -2,7 +2,7 @@
 
 define	LOGPTR 	64			# log2(maxpts)  (4e9)
 
-# QSORT -- General quicksort for arbitrary objects.  X is an integer array
+# QSORTP -- General quicksort for arbitrary objects.  X is an integer array
 # indexing the array to be sorted.  The user supplied COMPARE function is used
 # to compare objects indexed by X:
 # 
@@ -17,13 +17,13 @@ define	LOGPTR 	64			# log2(maxpts)  (4e9)
 # QSORT reorders the elements of the X array, which must be of type integer.
 # **NOTE** - See also gqsort.x, a more recent version of this routine.
 
-procedure qsort (x, nelem, compare)
+procedure qsortp (x, nelem, compare)
 
-int	x[ARB]			# array to be sorted
+pointer	x[ARB]			# array to be sorted
 size_t	nelem			# number of elements in array
 extern	compare()		# function to be called to compare elements
 
-int	pivot, temp
+pointer	pivot, temp
 int	p
 long	i, j, k
 long	lv[LOGPTR], uv[LOGPTR]
