@@ -18,8 +18,8 @@ double	ys[ARB], ye[ARB]	#I range list to be merged with X
 size_t	ny			#I number of ranges in Y list
 
 double	o1, o2
-int	nx_out, i
-long	xi, yi
+int	nx_out
+long	xi, yi, i
 double	qp_minvald(), qp_maxvald()
 bool	qp_lessthand()
 errchk	realloc
@@ -32,7 +32,7 @@ begin
 	xi = 1
 	yi = 1
 
-	do i = 1, ARB {
+	do i = 1, MAX_LONG {
 	    # Find a pair of ranges which intersect.
 	    repeat {
 		if (qp_lessthand (xe[xi], ys[yi])) {

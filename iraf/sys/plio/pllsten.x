@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <mach.h>
 include	<plset.h>
 include "pllseg.h"
 include	<plio.h>
@@ -28,9 +29,9 @@ size_t	sz_val
 bool	need_src, rop_enable
 int	op, o_op, pv, o_pv
 int	o_hi, hi, data, dv, v
-long	iz, o_iz, segsize, np, o_np, nz, x1, n
+long	iz, o_iz, segsize, np, o_np, nz, x1, n, i
 int	v_src, v_dst, v_stn, src_value
-int	opcode, i
+int	opcode
 long	d_src[LEN_PLLDES], d_dst[LEN_PLLDES], d_stn[LEN_PLLDES]
 int	modi(), absi()
 define	copyout_ 91
@@ -54,7 +55,7 @@ begin
 	if (need_src) {
 	    x1 = 1
 	    pll_init (ll_src, d_src)
-	    do i = 1, ARB {
+	    do i = 1, MAX_LONG {
 		np = min (pll_nleft(d_src), xs - x1)
 		pll_getseg (ll_src, d_src, np, v_src)
 		x1 = x1 + np
@@ -70,7 +71,7 @@ begin
 	if (need_src) {
 	    x1 = 1
 	    pll_init (ll_stn, d_stn)
-	    do i = 1, ARB {
+	    do i = 1, MAX_LONG {
 		np = min (pll_nleft(d_stn), xs - x1)
 		pll_getseg (ll_stn, d_stn, np, v_stn)
 		x1 = x1 + np
@@ -95,7 +96,7 @@ begin
 	x1 = 1;  iz = 1;  hi = 1
 	pll_init (ll_dst, d_dst)
 
-	do i = 1, ARB {
+	do i = 1, MAX_LONG {
 	    # Set up for the next segment (before, in, and after the region to
 	    # which the ROP applies), when the current segment is exhausted.
 
@@ -108,7 +109,7 @@ begin
 			next
 		} else {
 		    # Begin processing final region.
-		    segsize = ARB
+		    segsize = MAX_LONG
 		    rop_enable = false
 		}
 

@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <mach.h>
 include <plset.h>
 include "pllseg.h"
 include	<plio.h>
@@ -72,7 +73,7 @@ begin
 	# Advance to the indicated position in the source list.
 	x1 = 1
 	pll_init (ll_src, d_src)
-	do i = 1, ARB {
+	do i = 1, MAX_LONG {
 	    np = min (pll_nleft(d_src), xs - x1)
 	    pll_getseg (ll_src, d_src, np, v_src)
 	    x1 = x1 + np

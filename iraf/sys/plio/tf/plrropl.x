@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <mach.h>
 include	<plset.h>
 include	<plio.h>
 include "../plrseg.h"
@@ -50,7 +51,7 @@ begin
 	if (need_src) {
 	    x = 1
 	    plr_init (rl_src, d_src)
-	    do i = 1, ARB {
+	    do i = 1, MAX_LONG {
 		np = min (plr_nleft(d_src), xs - x)
 		plr_getseg (rl_src, d_src, np, v_src)
 		x = x + np
@@ -76,7 +77,7 @@ begin
 	rop_enable = false
 	plr_init (rl_dst, d_dst)
 
-	do i = 1, ARB {
+	do i = 1, MAX_LONG {
 	    # Set up for the next segment (before, in, and after the region to
 	    # which the ROP applies), when the current segment is exhausted.
 
@@ -89,7 +90,7 @@ begin
 			next
 		} else {
 		    # Begin processing final region.
-		    segsize = ARB
+		    segsize = MAX_LONG
 		    rop_enable = false
 		}
 

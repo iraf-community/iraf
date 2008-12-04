@@ -41,9 +41,9 @@ begin
 	    sz_val = nwords
 	    call salloc (buf, sz_val, TY_SHORT)
 
-	    sz_val = ARB
+	    sz_val = hdrlen
 	    call amovs (hdr, Mems[buf], sz_val)
-	    sz_val = ARB
+	    sz_val = datalen
 	    call amovs (data, Mems[buf+hdrlen], sz_val)
 
 	    epa = gk_dd[GKI_ESCAPE]
