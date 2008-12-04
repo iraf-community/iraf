@@ -37,6 +37,7 @@ int	tg_compare()
 int	clgfil()
 int	open(), tg_getlongline(), gstrmatch(), stridxs()
 pointer	clpopni(), tg_putstr()
+extern	tg_compare
 
 size_t	ntags
 pointer	tg_op
