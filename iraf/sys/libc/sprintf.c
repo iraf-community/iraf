@@ -17,12 +17,7 @@
  * XCHAR into the char output string.  This is not as bad as it sounds
  * as the operation is negligible compared to the encoding operation.
  */
-#ifdef USE_STDARG
 int snprintf ( char *str, size_t bufsize, const char *format, ... )
-#else
-int snprintf ( va_alist )
-va_dcl
-#endif
 {
 	int ret;
 	XCHAR *ip;
@@ -31,17 +26,7 @@ va_dcl
 	XINT fd, maxch=SZ_OBUF, mode=NEW_FILE;
 	va_list argp;
 
-#ifdef USE_STDARG
 	va_start (argp, format);
-#else
-	char *str;
-	size_t bufsize;
-	const char *format;
-	va_start (argp);
-	str = va_arg (argp, char *);
-	bufsize = va_arg (argp, size_t);
-	format = va_arg (argp, const char *);
-#endif
 
 	fiobuf = obuf;
 
@@ -66,12 +51,7 @@ va_dcl
 	return (ret);
 }
 
-#ifdef USE_STDARG
 int sprintf ( char *str, const char *format, ... )
-#else
-int sprintf ( va_alist )
-va_dcl
-#endif
 {
 	int ret;
 	XCHAR *ip;
@@ -80,15 +60,7 @@ va_dcl
 	XINT fd, maxch=SZ_OBUF, mode=NEW_FILE;
 	va_list argp;
 
-#ifdef USE_STDARG
 	va_start (argp, format);
-#else
-	char *str;
-	const char *format;
-	va_start (argp);
-	str = va_arg (argp, char *);
-	format = va_arg (argp, const char *);
-#endif
 
 	fiobuf = obuf;
 

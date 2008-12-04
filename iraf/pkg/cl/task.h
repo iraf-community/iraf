@@ -370,13 +370,8 @@ extern void parse_clmodes ( struct param *, struct operand * );
 /* clprintf.c */
 extern void strsort ( char *[], int );
 extern void strtable ( FILE *, char *const [], int, int, int, int, int );
-#ifdef USE_STDARG
 extern void oprintf ( const char *, ... );
 extern void tprintf ( const char *, ... );
-#else
-extern void oprintf ();
-extern void tprintf ();
-#endif
 
 /* scan.c */
 extern void cl_scan ( int, const char * );

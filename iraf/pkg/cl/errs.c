@@ -89,27 +89,14 @@ int	errlog = 0;
  * If we are a background task, print the task ordinal to tell the user
  * which task aborted.
  */
-#ifdef USE_STDARG
 void cl_error ( int errtype, const char *diagstr, ... )
-#else
-void cl_error ( va_alist )
-va_dcl
-#endif
 {
 	va_list	args;
 	register struct task *tp;
 	static	int nfatal = 0;
 	static	int break_locks = 1;
 
-#ifdef USE_STDARG
 	va_start (args, diagstr);
-#else
-	int errtype;
-	const char *diagstr;
-	va_start (args);
-	errtype = va_arg (args, int);
-	diagstr = va_arg (args, const char *);
-#endif
 
 	/* Safety measure, in the event of error recursion.
 	 */

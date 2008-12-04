@@ -24,23 +24,12 @@
 
 /* PRINTF -- Formatted print to the standard output.
  */
-#ifdef USE_STDARG
 int printf ( const char *format, ... )
-#else
-int printf (va_alist)
-va_dcl
-#endif
 {
 	int ret = 0;
         va_list argp;
 
-#ifdef USE_STDARG
 	va_start (argp, format);
-#else
-	const char *format;
-	va_start (argp);
-	format = va_arg (argp, const char *);
-#endif
 	ret = u_doprnt (format, &argp, stdout);
 	va_end (argp);
 
@@ -50,25 +39,12 @@ va_dcl
 
 /* FPRINTF -- Formatted print to a file.
  */
-#ifdef USE_STDARG
 int fprintf ( FILE *fp, const char *format, ... )
-#else
-int fprintf ( va_alist )
-va_dcl
-#endif
 {
 	int ret = 0;
         va_list argp;
 
-#ifdef USE_STDARG
 	va_start (argp, format);
-#else
-	FILE *fp;
-	const char *format;
-	va_start (argp);
-	fp = va_arg (argp, FILE *);
-	format = va_arg (argp, const char *);
-#endif
 	ret = u_doprnt (format, &argp, fp);
 	va_end (argp);
 

@@ -34,19 +34,11 @@ static int comstr ( const char *, memel *, int );
  */
 
 /*VARARGS1*/
-#ifdef USE_STDARG
 int compile ( int opcode, ... )
-#else
-int compile ( va_alist )
-va_dcl
-#endif
 {
 	register struct codeentry *cep;
 	register int status = OK;
         va_list argp;
-#ifndef USE_STDARG
-	int opcode;
-#endif
 	int maxpc = topcs - 20;
 
 	if (pc > maxpc) {
@@ -54,12 +46,7 @@ va_dcl
 	    return (ERR);
 	}
 
-#ifdef USE_STDARG
 	va_start (argp, opcode);
-#else
-	va_start (argp);
-	opcode = va_arg (argp, int);
-#endif
 
 	cep = coderef (pc);
 	cep->c_opcode = opcode;

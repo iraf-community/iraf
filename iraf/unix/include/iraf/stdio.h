@@ -77,11 +77,7 @@ extern int c_flsbuf ( unsigned int, IRAF_FILE * );
 /* printf.c */
 extern int u_doprnt ( const char *, va_list *, IRAF_FILE * );
 
-#ifdef USE_STDARG
 extern int eprintf ( const char *format, ... );
-#else
-extern int eprintf ();
-#endif
 
 /* Symbols defined in the standard libc. 
  */
@@ -176,7 +172,6 @@ extern int setbuffer ( FILE *, char *, size_t );
 extern int setlinebuf ( FILE * );
 extern int ungetc ( int, FILE * );
 
-#ifdef USE_STDARG
 extern int printf ( const char *, ... );
 extern int fprintf ( FILE *, const char *, ... );
 extern int scanf ( const char *, ... );
@@ -184,15 +179,6 @@ extern int fscanf ( FILE *, const char *, ... );
 extern int sscanf ( const char *, const char *, ... );
 extern int snprintf ( char *, size_t, const char *, ... );
 extern int sprintf ( char *, const char *, ... );
-#else
-extern int printf ();
-extern int fprintf ();
-extern int scanf ();
-extern int fscanf ();
-extern int sscanf ();
-extern int snprintf ();
-extern int sprintf ();
-#endif
 
 #endif	/* ! NOLIBCNAMES */
 

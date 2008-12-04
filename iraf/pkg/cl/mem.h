@@ -107,11 +107,7 @@ extern int pc;			/* program counter			*/
 extern memel cl_dictbuf[];	/* static dictionary area */
 extern char *memneed( int );	/* insures enough core, returns start	*/
 /* compile.c */
-#ifdef USE_STDARG
 extern int compile ( int, ... );
-#else
-extern int compile ();
-#endif
 extern char *comdstr( const char * );	/* compile string at topd, return start	*/
 extern void catdstr ( char *, const char * );
 /* gram.c */

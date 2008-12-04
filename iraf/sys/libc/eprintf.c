@@ -9,23 +9,12 @@
 
 /* EPRINTF -- Formatted print to the standard error output.
  */
-#ifdef USE_STDARG
 int eprintf ( const char *format, ... )
-#else
-int eprintf ( va_alist )
-va_dcl				/* pointer to arg list		*/
-#endif
 {
 	int ret = 0;
 	va_list	argp;
 
-#ifdef USE_STDARG
 	va_start (argp, format);
-#else
-	const char *format;
-	va_start (argp);
-	format = va_arg (argp, const char *);
-#endif
 	ret = u_doprnt (format, &argp, stderr);
 	va_end (argp);
 	fflush (stderr);

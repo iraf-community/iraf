@@ -139,11 +139,6 @@
 #undef import_ttset
 #endif
 
-#ifdef import_varargs
-#include <iraf/varargs.h>
-#undef import_varargs
-#endif
-
 #ifdef import_stdarg
 #include <iraf/stdarg.h>
 #undef import_stdarg

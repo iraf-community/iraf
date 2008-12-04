@@ -25,23 +25,12 @@ static int qstrcmp ( const void *, const void * );
  */
 /* conflicting types for `u_eprintf' */
 #if 0
-#ifdef USE_STDARG
 eprintf ( const char *fmt, ... )
-#else
-eprintf ( va_alist )
-va_dcl
-#endif
 {
 	va_list	args;
 	FILE *eout;
 
-#ifdef USE_STDARG
 	va_start (args, fmt);
-#else
-	const char *fmt;
-	va_start (args);
-	fmt = va_arg (args, const char *);
-#endif
 	eout = currentask->t_stderr;
 	u_doprnt (fmt, &args, eout);
 	va_end (args);
@@ -51,23 +40,12 @@ va_dcl
 
 /* OPRINTF -- Printf that always writes to the current pseudo-file t_stdout.
  */
-#ifdef USE_STDARG
 void oprintf ( const char *fmt, ... )
-#else
-void oprintf ( va_alist )
-va_dcl
-#endif
 {
 	va_list	args;
 	FILE *sout;
 
-#ifdef USE_STDARG
 	va_start (args, fmt);
-#else
-	const char *fmt;
-	va_start (args);
-	fmt = va_arg (args, const char *);
-#endif
 	sout = currentask->t_stdout;
 	u_doprnt (fmt, &args, sout);
 	va_end (args);
@@ -79,12 +57,7 @@ va_dcl
  * running task.  Be a bit more careful here in case a pipe is broken or
  * something is going haywire.
  */
-#ifdef USE_STDARG
 void tprintf ( const char *fmt, ... )
-#else
-void tprintf ( va_alist )
-va_dcl
-#endif
 {
 	va_list	args;
 	FILE *out;
@@ -94,13 +67,7 @@ va_dcl
 	    cl_error (E_IERR, "no t_out for currentask `%s'",
 	    currentask->t_ltp->lt_lname);
 	else {
-#ifdef USE_STDARG
 	    va_start (args, fmt);
-#else
-	    const char *fmt;
-	    va_start (args);
-	    fmt = va_arg (args, const char *);
-#endif
 	    u_doprnt (fmt, &args, out);
 	    va_end (args);
 	    fflush (out);

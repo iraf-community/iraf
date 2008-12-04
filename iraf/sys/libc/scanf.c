@@ -65,24 +65,13 @@ static int u_scanstr ( struct _input *in, va_list **argp,
  * pointers.  The number of fields successfully converted is returned as
  * the function value.  EOF is returned for a scan at EOF.
  */
-#ifdef USE_STDARG
 int scanf ( const char *format, ... )
-#else
-int scanf ( va_alist )
-va_dcl
-#endif
 {
 	va_list	argp;
 	struct _input in;
 	int status;
 
-#ifdef USE_STDARG
 	va_start (argp, format);
-#else
-	const char *format;
-	va_start (argp);
-	format = va_arg (argp, const char *);
-#endif
 	in.i_type = SCAN_FILE;
 	in.i_nchars = 0;
 	in.u.fp = stdin;
@@ -95,26 +84,13 @@ va_dcl
 
 /* FSCANF -- Formatted scan from a file.
  */
-#ifdef USE_STDARG
 int fscanf ( FILE *fp, const char *format, ... )
-#else
-int fscanf ( va_alist )
-va_dcl
-#endif
 {
 	va_list	argp;
 	int	status;
 	struct	_input in;
 
-#ifdef USE_STDARG
 	va_start (argp, format);
-#else
-	FILE *fp;
-	const char *format;
-	va_start (argp);
-	fp = va_arg (argp, FILE *);
-	format = va_arg (argp, const char *);
-#endif
 	in.i_type = SCAN_FILE;
 	in.i_nchars = 0;
 	in.u.fp = fp;
@@ -128,26 +104,13 @@ va_dcl
 
 /* SSCANF -- Formatted scan from a string.
  */
-#ifdef USE_STDARG
 int sscanf ( const char *str, const char *format, ... )
-#else
-int sscanf (va_alist)
-va_dcl
-#endif
 {
 	va_list	argp;
 	struct _input in;
 	int status;
 
-#ifdef USE_STDARG
 	va_start (argp, format);
-#else
-	const char *str;
-	const char *format;
-	va_start (argp);
-	str = va_arg (argp, const char *);
-	format = va_arg (argp, const char *);
-#endif
 	in.i_type = SCAN_STRING;
 	in.i_nchars = 0;
 	in.u.ip = str;

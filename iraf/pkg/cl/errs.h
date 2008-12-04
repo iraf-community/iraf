@@ -57,10 +57,6 @@ extern const char *e_lookparm;
 
 extern int errlog;
 
-#ifdef USE_STDARG
 extern void cl_error ( int, const char *, ... );
-#else
-extern void cl_error ();
-#endif
 
 #endif	/* _ERRS_H */
