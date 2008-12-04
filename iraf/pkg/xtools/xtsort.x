@@ -7,8 +7,8 @@ procedure xt_sort2 (a1, a2, npts)
 real	a1[npts], a2[npts]		# Arrays to be sorted
 size_t	npts				# Number of points
 
-long	i, j
-pointer	sp, index, ptr
+long	i
+pointer	sp, index, ptr, j
 
 int	xts_compare()
 extern	xts_compare
@@ -47,8 +47,8 @@ procedure xt_sort3 (a1, a2, a3, npts)
 real	a1[npts], a2[npts], a3[npts]	# Arrays to be sorted
 size_t	npts				# Number of points
 
-long	i, j
-pointer	sp, index, ptr
+long	i
+pointer	sp, index, ptr, j
 
 int	xts_compare()
 extern	xts_compare
@@ -93,8 +93,8 @@ procedure xt_sort4 (a1, a2, a3, a4, npts)
 real	a1[npts], a2[npts], a3[npts], a4[npts]	# Arrays to be sorted
 size_t	npts					# Number of points
 
-long	i, j
-pointer	sp, index, ptr
+long	i
+pointer	sp, index, ptr, j
 
 int	xts_compare()
 extern	xts_compare
@@ -161,8 +161,8 @@ procedure xt_sort3d (a1, a2, a3, npts)
 double	a1[npts], a2[npts], a3[npts]	# Arrays to be sorted
 size_t	npts				# Number of points
 
-long	i, j
-pointer	sp, index, ptr
+long	i
+pointer	sp, index, ptr, j
 
 int	xts_compared()
 extern	xts_compared
