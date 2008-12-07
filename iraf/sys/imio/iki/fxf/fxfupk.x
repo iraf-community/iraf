@@ -49,7 +49,7 @@ begin
 		call bswap4 (cbuf, c_1, cbuf, c_1, nbytes)
 
 	case TY_LONG:
-	    if ( sizeof(TY_LONG) == 2 ) {
+	    if ( SZ_LONG == 2 ) {
 		if (BYTE_SWAP4 == YES) {
 		    call bswap4 (cbuf, c_1, cbuf, c_1, nbytes)
 		}

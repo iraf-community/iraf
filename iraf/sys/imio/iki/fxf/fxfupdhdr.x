@@ -1085,7 +1085,6 @@ pointer	im			#I image descriptor
 pointer fit			#I fit descriptor
 
 int	datatype
-int	sizeof()
 errchk	syserr, syserrs
 
 begin
@@ -1097,7 +1096,7 @@ begin
 	case TY_INT:
 	    FIT_BITPIX(fit) = FITS_LONG
 	case TY_LONG:
-	    if ( sizeof(TY_LONG) == 2 ) {
+	    if ( SZ_LONG == 2 ) {
 		FIT_BITPIX(fit) = FITS_LONG
 	    } else {
 		FIT_BITPIX(fit) = FITS_LONGLONG

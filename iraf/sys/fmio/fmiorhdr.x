@@ -19,7 +19,6 @@ long	offset, npti, p1, p2, d1, d2, b_off1, b_off2, status
 int	i, chan
 long	maxpages, szbpage, lval
 long	clktime()
-int	sizeof()
 errchk	syserrs, calloc, malloc, realloc
 
 begin
@@ -47,7 +46,7 @@ begin
 
 	    # Extract the datafile header struct.
 	    sz_val = LEN_DHSTRUCT
-	    if ( sizeof(TY_POINTER) == 2 ) {
+	    if ( SZ_POINTER == 2 ) {
 		call miiupk32 (Memp[buf], Memp[dh], sz_val, TY_POINTER)
 	    } else {
 		call miiupk64 (Memp[buf], Memp[dh], sz_val, TY_POINTER)
@@ -93,7 +92,7 @@ begin
 
 	ip = buf + FM_FTOFF(fm) - 1
 	sz_val = (FM_NLFILES(fm) + 1) * LEN_FTEX
-	if ( sizeof(TY_POINTER) == 2 ) {
+	if ( SZ_POINTER == 2 ) {
 	    call miiupk32 (Memp[ip], Memp[ip], sz_val, TY_POINTER)
 	} else {
 	    call miiupk64 (Memp[ip], Memp[ip], sz_val, TY_POINTER)
@@ -113,7 +112,7 @@ begin
 
 	ip = buf + FM_PTIOFF(fm) - 1
 	call malloc (pti, FM_PTILEN(fm), TY_LONG)
-	if ( sizeof(TY_LONG) == 2 ) {
+	if ( SZ_LONG == 2 ) {
 	    call miiupk32 (Memp[ip], Meml[pti], FM_PTILEN(fm), TY_LONG)
 	} else {
 	    call miiupk64 (Memp[ip], Meml[pti], FM_PTILEN(fm), TY_LONG)

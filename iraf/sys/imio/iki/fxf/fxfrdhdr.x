@@ -22,7 +22,7 @@ pointer	sp, fit, lbuf, poff
 int	compress, i, impixtype
 bool    bfloat, lscale, lzero
 bool    fxf_fpl_equald()
-int	strncmp(), sizeof()
+int	strncmp()
 
 errchk	fxf_rfitshdr, realloc, syserr, syserrs
 
@@ -107,7 +107,7 @@ begin
 	    else
 		impixtype = TY_INT
 	case 64:
-	    if ( sizeof(TY_LONG) == 2 ) {
+	    if ( SZ_LONG == 2 ) {
 		impixtype = ERR
 	    } else {
 		FIT_PIXTYPE(fit) = TY_LONG

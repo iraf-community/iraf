@@ -48,7 +48,7 @@ begin
 		call amovc (ibuf, obuf, nchars)
 
 	case TY_LONG:
-	    if ( sizeof(TY_LONG) == 2 ) {
+	    if ( SZ_LONG == 2 ) {
 		if (BYTE_SWAP4 == YES) {
 		    call bswap4 (ibuf, c_1, obuf, c_1, nbytes)
 		} else {

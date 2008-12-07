@@ -21,7 +21,6 @@ int	chan, i
 size_t	nbytes, maxpages, szbpage, buflen
 long	fmio_extend()
 long	clktime()
-int	sizeof()
 
 begin
 	if (FM_MODE(fm) == READ_ONLY)
@@ -90,7 +89,7 @@ begin
 	    DH_DATASTART(dh)	 = FM_DATASTART(fm)
 
 	    sz_val = LEN_DHSTRUCT
-	    if ( sizeof(TY_POINTER) == 2 ) {
+	    if ( SZ_POINTER == 2 ) {
 		call miipak32 (Memp[dh], Memp[dhbuf], sz_val, TY_POINTER)
 	    } else {
 		call miipak64 (Memp[dh], Memp[dhbuf], sz_val, TY_POINTER)
@@ -108,7 +107,7 @@ begin
 
 	    op = dhbuf + FM_FTOFF(fm) - 1
 	    sz_val = (FM_NLFILES(fm) + 1) * LEN_FTEX
-	    if ( sizeof(TY_POINTER) == 2 ) {
+	    if ( SZ_POINTER == 2 ) {
 	        call miipak32 (Memp[op], Memp[op], sz_val, TY_POINTER)
 	    } else {
 	        call miipak64 (Memp[op], Memp[op], sz_val, TY_POINTER)
@@ -116,7 +115,7 @@ begin
 
 	    # Output the page table index.
 	    sz_val = FM_PTILEN(fm)
-	    if ( sizeof(TY_POINTER) == 2 ) {
+	    if ( SZ_POINTER == 2 ) {
 	        call miipak32 (Meml[FM_PTINDEX(fm)], Memp[dhbuf+FM_PTIOFF(fm)-1],
 			       sz_val , TY_LONG)
 	    } else {

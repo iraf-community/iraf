@@ -27,7 +27,7 @@ pointer	pp, stf
 
 bool	initparam
 int	ival, ip, junk
-int	ctol(), ctoi(), ctor(), ctod(), imaccf(), sizeof()
+int	ctol(), ctoi(), ctor(), ctod(), imaccf()
 errchk	imadds, imaddl, imaddr, imaddd, imastr
 
 begin
@@ -64,7 +64,7 @@ begin
 		call imaddi (im, P_PTYPE(pp), ival)
 	    }
 	case TY_LONG:
-	    if ( sizeof(TY_LONG) == 2 ) {
+	    if ( SZ_LONG == 2 ) {
 		call strcpy ("INTEGER*4", P_PDTYPE(pp), SZ_PDTYPE)
 	    } else {
 		call strcpy ("INTEGER*8", P_PDTYPE(pp), SZ_PDTYPE)
