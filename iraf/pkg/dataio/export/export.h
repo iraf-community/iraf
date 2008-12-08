@@ -18,36 +18,36 @@ define	EX_VERBOSE	Memi[P2I($1+5)]	    # verbose parameter value
 define	EX_FORMAT	Memi[P2I($1+6)]	    # format parameter code
 define	EX_BLTIN	Memi[P2I($1+7)]	    # buitlin format code
 define	EX_COLOR	Memi[P2I($1+8)]	    # does format support color?
-define	EX_OROWS	Memi[P2I($1+9)]	    # no. rows in output image
-define	EX_OCOLS	Memi[P2I($1+10)]	    # no. cols in output image
+define	EX_OROWS	Meml[P2L($1+9)]	    # no. rows in output image
+define	EX_OCOLS	Meml[P2L($1+10)]	    # no. cols in output image
 
 define	EX_IMDIM	Memi[P2I($1+11)]	    # input image list dimensionality
 define	EX_IMTYPE	Memi[P2I($1+12)]	    # input image list type
 define	EX_NIMAGES	Memi[P2I($1+13)]	    # number of images to convert
-define	EX_NCOLS	Memi[P2I($1+14)]	    # number of columns in image
-define	EX_NLINES	Memi[P2I($1+15)]	    # number of lines in image
+define	EX_NCOLS	Meml[P2L($1+14)]	    # number of columns in image
+define	EX_NLINES	Meml[P2L($1+15)]	    # number of lines in image
 define	EX_NEXPR	Memi[P2I($1+16)]	    # number of outbands expressions
-define	EX_NIMOPS	Memi[P2I($1+17)]	    # image operand array (ptr)
-define	EX_IMOPS	Memi[P2I($1+18)]	    # image operand array (ptr)
+define	EX_NIMOPS	Memi[P2I($1+17)]	    # number of image operand array
+define	EX_IMOPS	Memp[$1+18]	    # image operand array (ptr)
 
 define	EX_OUTFLAGS	Memi[P2I($1+20)]	    # output format flags
-define	EX_BFNPTR	Memi[P2I($1+21)]	    # binary file name (ptr)
-define	EX_HDRPTR	Memi[P2I($1+22)]	    # user-defined head file (ptr)
-define	EX_OTPTR	Memi[P2I($1+23)]	    # output type string (ptr)
-define	EX_OBPTR	Memi[P2I($1+24)]	    # outbands expression string (ptr)
-define	EX_CMPTR	Memi[P2I($1+25)]	    # colormap filename (ptr)
-define	EX_LUTPTR	Memi[P2I($1+26)]	    # LUT filename (ptr)
-define	EX_TIMPTR	Memi[P2I($1+27)]	    # temp image name (ptr)
+define	EX_BFNPTR	Memp[$1+21]	    # binary file name (ptr)
+define	EX_HDRPTR	Memp[$1+22]	    # user-defined head file (ptr)
+define	EX_OTPTR	Memp[$1+23]	    # output type string (ptr)
+define	EX_OBPTR	Memp[$1+24]	    # outbands expression string (ptr)
+define	EX_CMPTR	Memp[$1+25]	    # colormap filename (ptr)
+define	EX_LUTPTR	Memp[$1+26]	    # LUT filename (ptr)
+define	EX_TIMPTR	Memp[$1+27]	    # temp image name (ptr)
 define	EX_PSDPI	Memr[P2R($1+28)]	    # EPS dpi resolution
 define	EX_PSSCALE	Memr[P2R($1+29)]	    # EPS scale
 define	EX_BRIGHTNESS	Memr[P2R($1+30)]	    # display brightness value
 define	EX_CONTRAST	Memr[P2R($1+31)]	    # display contrast value
 
-define 	EX_CMAP		Memi[P2I($1+32)]	    # colormap struct (ptr)
+define 	EX_CMAP		Memp[$1+32]	    # colormap struct (ptr)
 define 	EX_NCOLORS	Memi[P2I($1+33)]	    # no. of colors in colormap
-define 	EX_LUT		Memi[P2I($1+34)]	    # LUT struct (ptr)
+define 	EX_LUT		Memp[$1+34]	    # LUT struct (ptr)
 define 	EX_NLUTEL	Memi[P2I($1+35)]	    # no. of indices in lut
-define 	EX_OBANDS	Memi[P2I($1+36)]  	    # outbands array (ptr)
+define 	EX_OBANDS	Memp[$1+36]  	    # outbands array (ptr)
 
 
 # Handy macros.
@@ -56,15 +56,15 @@ define	LUTFILE		Memc[EX_LUTPTR($1)]
 define	CMAPFILE	Memc[EX_CMPTR($1)]
 define	BFNAME		Memc[EX_BFNPTR($1)]
 define	TIMNAME		Memc[EX_TIMPTR($1)]
-define	OBANDS		Memi[P2I(EX_OBANDS($1))+$2-1]
-define	IMOP		Memi[P2I(EX_IMOPS($1))+$2-1]
+define	OBANDS		Memp[EX_OBANDS($1)+$2-1]
+define	IMOP		Memp[EX_IMOPS($1)+$2-1]
 
 
 # Define the outbands struct.
 define	LEN_OUTBANDS	5
-define	OB_EXPSTR	Memi[P2I($1)]	# expression string (ptr)
-define	OB_WIDTH	Memi[P2I($1+1)]	# expression width
-define	OB_HEIGHT	Memi[P2I($1+2)]	# expression height
+define	OB_EXPSTR	Memp[$1]	# expression string (ptr)
+define	OB_WIDTH	Meml[P2L($1+1)]	# expression width
+define	OB_HEIGHT	Meml[P2L($1+2)]	# expression height
 
 define	O_EXPR		Memc[OB_EXPSTR(OBANDS($1,$2))]
 define	O_WIDTH		OB_WIDTH(OBANDS($1,$2))
@@ -73,15 +73,15 @@ define	O_HEIGHT	OB_HEIGHT(OBANDS($1,$2))
 
 # Operand structure.
 define  LEN_OPERAND     10
-define  IO_IMPTR        Memi[P2I($1)]                # image descriptor
+define  IO_IMPTR        Memp[$1]                # image descriptor
 define  IO_BAND         Memi[P2I($1+1)]              # image band
-define  IO_LINE         Memi[P2I($1+2)]              # image line
+define  IO_LINE         Meml[P2L($1+2)]              # image line
 
-define  IO_TAG          Memi[P2I($1+3)]              # operand tag name
+define  IO_TAG          Memp[$1+3]              # operand tag name
 define  IO_TYPE         Memi[P2I($1+4)]              # operand type
 define  IO_NBYTES       Memi[P2I($1+5)]              # number of bytes
-define  IO_NPIX         Memi[P2I($1+6)]              # number of pixels
-define  IO_DATA         Memi[P2I($1+7)]              # pixel ptr
+define  IO_NPIX         Memz[P2Z($1+6)]              # number of pixels
+define  IO_DATA         Memp[$1+7]              # pixel ptr
 define  IO_ISIM         Memi[P2I($1+8)]              # is data an image ptr?
 
 define  OP_TAG          Memc[IO_TAG($1)]
@@ -102,7 +102,8 @@ define  S_NONE          0000B    	# swap nothing
 define  S_ALL           0001B    	# swap everything
 define  S_I2            0002B    	# swap short ints
 define  S_I4            0004B    	# swap long ints
-define  SWAP_STR        "|no|none|yes|i2|i4|"
+define  S_I8            0010B    	# swap long long ints
+define  SWAP_STR        "|no|none|yes|i2|i4|i8|"
 
 # Pixel storage flags.
 define	PIXEL_STORAGE	0001B		# { {RGB} {RGB} ... {RGB} ... }

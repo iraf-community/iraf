@@ -8,10 +8,14 @@ procedure ex_ppm (ex)
 
 pointer	ex					#i task struct pointer
 
+size_t	sz_val
+long	l_val
 pointer	sp, hdr
-int	len, flags
+size_t	len
+int	flags
 
 int	strlen()
+long	modl()
 
 begin
 	# Check to see that we have the correct number of expressions to
@@ -24,19 +28,22 @@ begin
 
         # Write the header to the file.
         call smark (sp)
-        call salloc (hdr, SZ_LINE, TY_CHAR)
-        call aclrc (Memc[hdr], SZ_LINE)
+	sz_val = SZ_LINE
+        call salloc (hdr, sz_val, TY_CHAR)
+        call aclrc (Memc[hdr], sz_val)
 
 	# If we have an odd number of pixels we can't correctly write the
 	# last column to the file, so truncate the column in the output image.
-        if (mod (EX_NCOLS(ex),2) == 1)
+	l_val = 2
+        if (modl(EX_NCOLS(ex),l_val) == 1)
             EX_OCOLS(ex) = EX_OCOLS(ex) - 1
 
         call sprintf (Memc[hdr], SZ_LINE, "P6\n%-6d  %-6d\n255\n")
-            call pargi (EX_OCOLS(ex))
-            call pargi (EX_OROWS(ex))
+            call pargl (EX_OCOLS(ex))
+            call pargl (EX_OROWS(ex))
 	len = strlen (Memc[hdr])
-        call strpak (Memc[hdr], Memc[hdr], SZ_LINE)
+	sz_val = SZ_LINE
+        call strpak (Memc[hdr], Memc[hdr], sz_val)
         call write (EX_FD(ex), Memc[hdr], len/SZB_CHAR)
         call sfree (sp)
 

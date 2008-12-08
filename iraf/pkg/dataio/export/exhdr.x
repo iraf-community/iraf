@@ -15,22 +15,27 @@ pointer	ex				#i task struct pointer
 char	outfile[ARB]			#i output file name
 
 pointer	sp, tfile, buf, cbuf
-int	file_type, nchars
+int	file_type
+size_t	nchars
 
-int	fd, open(), access(), strlen()
-long	fsize, fstatl()
-
+size_t	sz_val
+int	fd
+long	fsize
+int	open(), access(), strlen()
+long	fstatl()
 errchk	open, access
 
 begin
 	if (EX_HEADER(ex) == HDR_SHORT || EX_HEADER(ex) == HDR_LONG) {
 
 	    call smark (sp)
-	    call salloc (tfile, SZ_PATHNAME, TY_CHAR)
-	    call salloc (buf, SZ_LINE, TY_CHAR)
-	    call salloc (cbuf, SZ_LINE, TY_CHAR)
-	    call aclrc (Memc[buf], SZ_LINE)
-	    call aclrc (Memc[cbuf], SZ_LINE)
+	    sz_val = SZ_PATHNAME
+	    call salloc (tfile, sz_val, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
+	    call salloc (cbuf, sz_val, TY_CHAR)
+	    call aclrc (Memc[buf], sz_val)
+	    call aclrc (Memc[cbuf], sz_val)
 
 	    # Write the generic header.
 	    call mktemp ("tmp$ex", Memc[tfile], SZ_PATHNAME)
@@ -45,7 +50,7 @@ begin
 	    fsize = fstatl (fd, F_FILESIZE) * SZB_CHAR
 	    nchars = fsize + 27 #+ fsize/10
 	    call sprintf (Memc[buf], SZ_LINE, "format = EXPORT\nhdrsize = %d\n")
-	        call pargi (nchars)
+	        call pargz (nchars)
 	    nchars = strlen (Memc[buf])
 	    if (EX_FD(ex) != STDOUT && EX_FORMAT(ex) != FMT_LIST) {
 	        call strpak (Memc[buf], Memc[cbuf], nchars)
@@ -105,12 +110,14 @@ procedure ex_mkheader (ex, fd)
 pointer	ex					#i task struct pointer
 int	fd					#i temp file descriptor
 
-long	clktime()		# seconds since 00:00:00 10-Jan-80
+long	l_val
 int	tm[LEN_TMSTRUCT]	# broken down time structure
+long	clktime()		# seconds since 00:00:00 10-Jan-80
 
 begin
 	# Write the time stamp string.
-	call brktime (clktime(0), tm)
+	l_val = 0
+	call brktime (clktime(l_val), tm)
 	call fprintf (fd, "date = '%d/%d/%d'\n")
 	    call pargi (TM_MDAY(tm))
 	    call pargi (TM_MONTH(tm))
@@ -118,9 +125,9 @@ begin
 
 	# ... and the rest of the header
 	call fprintf (fd, "ncols = %d\n")	# image dimensions
-	    call pargi (EX_OCOLS(ex))
+	    call pargl (EX_OCOLS(ex))
 	call fprintf (fd, "nrows = %d\n")
-	    call pargi (EX_OROWS(ex))
+	    call pargl (EX_OROWS(ex))
 	call fprintf (fd, "nbands = %d\n")
 	    call pargi (EX_NEXPR(ex))
 
@@ -139,6 +146,7 @@ begin
 	    case S_ALL: 	call pargstr ("all")
 	    case S_I2: 		call pargstr ("i2")
 	    case S_I4: 		call pargstr ("i4")
+	    case S_I8: 		call pargstr ("i8")
 	    }
 
 	if (EX_HEADER(ex) == HDR_LONG)
@@ -157,6 +165,7 @@ procedure ex_wimhdr (ex, fd)
 pointer	ex					#i task struct pointer
 int	fd					#i temp file descriptor
 
+size_t	sz_val
 pointer sp, lbuf, ip, im
 int     i, in, ncols, min_lenuserarea 
 int     stropen(), getline(), envgeti()
@@ -166,7 +175,8 @@ define  LMARGIN         4
 
 begin
         call smark (sp)
-        call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+        call salloc (lbuf, sz_val, TY_CHAR)
 
 	do i = 1, EX_NIMAGES(ex) {
 

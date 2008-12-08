@@ -8,11 +8,12 @@ procedure ex_miff (ex)
 
 pointer	ex					#i task struct pointer
 
+size_t	sz_val
 pointer	sp, hdr, cmap
 int	i, j, flags
-char	ncols[6]
+char	ncols[11]
 
-int	strlen()
+int	strlen(), modi()
 
 begin
 	# Check to see that we have the correct number of expressions to
@@ -25,10 +26,11 @@ begin
 
         # Write the header to the file.
         call smark (sp)
-        call salloc (hdr, SZ_COMMAND, TY_CHAR)
-        call aclrc (Memc[hdr], SZ_COMMAND)
+	sz_val = SZ_COMMAND
+        call salloc (hdr, sz_val, TY_CHAR)
+        call aclrc (Memc[hdr], sz_val)
 
-	call sprintf (ncols, 6, "%d")
+	call sprintf (ncols, 11, "%d")
 	    call pargi (EX_NCOLORS(ex))
         call sprintf (Memc[hdr], SZ_COMMAND,
 	     "{\nCreated by IRAF EXPORT Task\n}\nid=ImageMagick\nclass=%s %s%s\ncolumns=%-5d  rows=%-5d\n\f\n:\n")
@@ -47,13 +49,15 @@ begin
 		    call pargstr ("")
 		}
 	    }
-                call pargi (EX_OCOLS(ex))
-                call pargi (EX_OROWS(ex))
+                call pargl (EX_OCOLS(ex))
+                call pargl (EX_OROWS(ex))
 
-	if (mod(strlen(Memc[hdr]),2) == 1)
+	if (modi(strlen(Memc[hdr]),2) == 1)
 	    call strcat ("\n", Memc[hdr], SZ_COMMAND)
-        call strpak (Memc[hdr], Memc[hdr], SZ_COMMAND)
-        call write (EX_FD(ex), Memc[hdr], strlen(Memc[hdr])/SZB_CHAR)
+	sz_val = SZ_COMMAND
+        call strpak (Memc[hdr], Memc[hdr], sz_val)
+	sz_val = strlen(Memc[hdr])/SZB_CHAR
+        call write (EX_FD(ex), Memc[hdr], sz_val)
 
 	# Finally, evaluate the expressions and write the image.
 	call ex_do_outtype (ex, "b1")
@@ -61,7 +65,8 @@ begin
 
 	if (bitset (flags,OF_CMAP)) {
 	    # Write out the colormap.
-            call salloc (cmap, 3*CMAP_SIZE, TY_CHAR)
+	    sz_val = 3*CMAP_SIZE
+            call salloc (cmap, sz_val, TY_CHAR)
 	    j = 1
 	    do i = 0, (3*CMAP_SIZE-1), 3 {
 		Memc[cmap+i+0] = CMAP(EX_CMAP(ex), EX_RED,   j)
@@ -69,8 +74,11 @@ begin
 		Memc[cmap+i+2] = CMAP(EX_CMAP(ex), EX_BLUE,  j)
 		j = j + 1
 	    }
-            call achtcb (Memc[cmap], Memc[cmap], (3 * CMAP_SIZE))
-            call write (EX_FD(ex), Memc[cmap], ((3 * CMAP_SIZE) / SZB_CHAR))
+	    sz_val = (3 * CMAP_SIZE)
+	    # arg2: incompatible pointer
+            call achtcb (Memc[cmap], Memc[cmap], sz_val)
+	    sz_val = ((3 * CMAP_SIZE) / SZB_CHAR)
+            call write (EX_FD(ex), Memc[cmap], sz_val)
 
 	    call ex_no_interleave (ex) 			# write the pixels
 

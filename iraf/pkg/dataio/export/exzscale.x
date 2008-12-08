@@ -47,6 +47,7 @@ procedure ex_patch_zscale (ex, expnum)
 pointer	ex				#i task struct pointer
 int	expnum				#i expression number to fix
 
+size_t	sz_val
 pointer	sp, exp, func
 int	ip, pp
 
@@ -54,10 +55,14 @@ bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (exp, SZ_EXPSTR, TY_CHAR)
-	call salloc (func, SZ_FNAME, TY_CHAR)
-	call aclrc(Memc[exp], SZ_EXPSTR)
-	call aclrc(Memc[func], SZ_FNAME)
+	sz_val = SZ_EXPSTR
+	call salloc (exp, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (func, sz_val, TY_CHAR)
+	sz_val = SZ_EXPSTR
+	call aclrc(Memc[exp], sz_val)
+	sz_val = SZ_FNAME
+	call aclrc(Memc[func], sz_val)
 
         # Copy the final expression string to the output buffer.
         call strcpy (O_EXPR(ex,expnum), Memc[exp], SZ_EXPSTR)
@@ -73,7 +78,8 @@ begin
 
             # Get the function name.
             pp = 0
-            call aclrc (Memc[func], SZ_FNAME)
+	    sz_val = SZ_FNAME
+            call aclrc (Memc[func], sz_val)
             while (Memc[exp+ip] != '(' && Memc[exp+ip] != EOS) {
                 Memc[func+pp] = Memc[exp+ip]
                 ip = ip + 1
@@ -113,6 +119,9 @@ pointer ex                              #i task struct pointer
 char    expstr[ARB]                     #i expression string
 int     pp                              #i position pointer
 
+size_t	sz_val
+size_t	sz_val1
+long	l_val
 pointer sp, arg, arg2, exp, buf
 pointer exptr, exptr2, ep
 char    ch
@@ -123,10 +132,11 @@ pointer	ex_evaluate()
 
 begin
         call smark (sp)
-        call salloc (arg, SZ_EXPSTR, TY_CHAR); call aclrc (Memc[arg], SZ_EXPSTR)
-        call salloc (arg2, SZ_EXPSTR,TY_CHAR); call aclrc (Memc[arg2],SZ_EXPSTR)
-        call salloc (exp, SZ_EXPSTR, TY_CHAR); call aclrc (Memc[exp], SZ_EXPSTR)
-        call salloc (buf, SZ_EXPSTR, TY_CHAR); call aclrc (Memc[buf], SZ_EXPSTR)
+	sz_val = SZ_EXPSTR
+        call salloc (arg, sz_val, TY_CHAR); call aclrc (Memc[arg], sz_val)
+        call salloc (arg2, sz_val,TY_CHAR); call aclrc (Memc[arg2],sz_val)
+        call salloc (exp, sz_val, TY_CHAR); call aclrc (Memc[exp], sz_val)
+        call salloc (buf, sz_val, TY_CHAR); call aclrc (Memc[buf], sz_val)
 
         if (DEBUG) { call eprintf("\t\texp=`%s'\n");call pargstr(expstr)}
 
@@ -186,7 +196,8 @@ begin
             call strcpy (Memc[arg], Memc[OB_EXPSTR(exptr)], SZ_EXPSTR)
 
 	    # Get the size of the expression.
-	    call ex_getpix (ex, 1)
+	    l_val = 1
+	    call ex_getpix (ex, l_val)
 	    ep = ex_evaluate (ex, Memc[OB_EXPSTR(exptr)])
             OB_WIDTH(exptr) = O_LEN(ep)
 	    call evvfree (ep)
@@ -219,8 +230,10 @@ begin
 	    	call flush (STDOUT)
 	    }
 
-            call ex_zscale (ex, exptr, exptr2, z1, z2,
-	        CONTRAST, SAMPLE_SIZE, SAMP_LEN)
+	    sz_val = SAMPLE_SIZE
+	    sz_val1 = SAMP_LEN
+            call ex_zscale (ex, exptr, exptr2, z1, z2, CONTRAST,
+			    sz_val, sz_val1)
             call ex_free_outbands (exptr)
 	    if (exptr2 != NULL)
 		call ex_free_outbands (exptr2)
@@ -249,7 +262,8 @@ begin
         }
 
         # Copy fixed-up expression to input buffer.
-        call aclrc (expstr, SZ_EXPSTR)
+	sz_val = SZ_EXPSTR
+        call aclrc (expstr, sz_val)
         call strcpy (Memc[exp], expstr, SZ_EXPSTR)
 
         if (DEBUG){call eprintf("\t\tnew expr=`%s'\n");call pargstr(expstr)}
@@ -268,16 +282,20 @@ pointer	exptr				# expression struct pointer
 pointer	exptr2				# expression struct pointer (mask)
 real	z1, z2				# output min and max greyscale values
 real	contrast			# adj. to slope of transfer function
-int	optimal_sample_size		# desired number of pixels in sample
-int	len_stdline			# optimal number of pixels per line
+size_t	optimal_sample_size		# desired number of pixels in sample
+size_t	len_stdline			# optimal number of pixels per line
 
-int	npix, minpix, ngoodpix, center_pixel, ngrow
+long	l_val, c_2
+double	d_val
+size_t	npix, ngrow
+long	minpix, ngoodpix, center_pixel
 real	zmin, zmax, median
 real	zstart, zslope
 pointer	sample, left
-int	ex_sample_expr(), ex_fit_line()
+long	ex_sample_expr(), ex_fit_line(), modl(), nint_dl()
 
 begin
+	c_2 = 2
 	# Subsample the expression.
 	npix = ex_sample_expr (ex, exptr, exptr2, sample, optimal_sample_size, 
 	    len_stdline)
@@ -294,7 +312,8 @@ begin
 	# are an even number of pixels in the sample.
 
 	left = sample + center_pixel - 1
-	if (mod (npix, 2) == 1 || center_pixel >= npix)
+	l_val = npix
+	if (modl(l_val, c_2) == 1 || center_pixel >= npix)
 	    median = Memr[left]
 	else
 	    median = (Memr[left] + Memr[left+1]) / 2
@@ -305,8 +324,10 @@ begin
 	# accordingly and compute Z1 and Z2, the y intercepts at indices 1 and
 	# npix.
 
-	minpix = max (MIN_NPIXELS, int (npix * MAX_REJECT))
-	ngrow = max (1, nint (npix * .01))
+	l_val = npix * 1.0D0 * MAX_REJECT
+	minpix = max (MIN_NPIXELS, l_val)
+	d_val = npix * .01D0
+	ngrow = max (1, nint_dl(d_val))
 	ngoodpix = ex_fit_line (Memr[sample], npix, zstart, zslope,
 	    KREJ, ngrow, MAX_ITERATIONS)
 
@@ -327,20 +348,21 @@ end
 # EX_SAMPLE_EXPR -- Extract an evenly gridded subsample of the pixels from
 # a possibly two-dimensional expression into a one-dimensional vector.
 
-int procedure ex_sample_expr (ex, exptr, exptr2, sample, optimal_sample_size, 
+long procedure ex_sample_expr (ex, exptr, exptr2, sample, optimal_sample_size, 
     len_stdline)
 
 pointer	ex				# task struct pointer
 pointer	exptr				# expression struct pointer
 pointer	exptr2				# expression struct pointer (mask)
 pointer	sample				# output vector containing the sample
-int	optimal_sample_size		# desired number of pixels in sample
-int	len_stdline			# optimal number of pixels per line
+size_t	optimal_sample_size		# desired number of pixels in sample
+size_t	len_stdline			# optimal number of pixels per line
 
 pointer	op, ep, out, bpm
-int	ncols, nlines, col_step, line_step, maxpix, line
-int	opt_npix_per_line, npix_per_line, nsubsample
-int	opt_nlines_in_sample, min_nlines_in_sample, max_nlines_in_sample
+size_t	ncols, nlines, maxpix
+long	col_step, line_step, line
+size_t	opt_npix_per_line, npix_per_line, nsubsample
+size_t	opt_nlines_in_sample, min_nlines_in_sample, max_nlines_in_sample
 
 pointer	ex_evaluate()
 
@@ -436,9 +458,12 @@ procedure ex_subsample (a, b, n, npix, step, nsubsample)
 
 real	a[n]
 real	b[npix]
-int	n
-int	npix, step, nsubsample
-int	ip, i
+size_t	n
+size_t	npix
+long	step
+size_t	nsubsample
+
+long	ip, i
 
 begin
 	nsubsample = npix
@@ -466,9 +491,12 @@ procedure ex_subsample1 (a, c, b, n, npix, step, nsubsample)
 real	a[ARB]
 int	c[ARB]
 real	b[npix]
-int	n
-int	npix, step, nsubsample
-int	i, j
+size_t	n
+size_t	npix
+long	step
+size_t	nsubsample
+
+long	i, j
 
 begin
 	nsubsample = 0
@@ -491,7 +519,7 @@ begin
 		    if (nsubsample == npix)
 		        break
 		}
-		if (nsubsample >= 0.75 * npix)
+		if (nsubsample >= 0.75D0 * npix)
 		    break
 	    }
 	}
@@ -505,21 +533,23 @@ end
 # there are no pixels left.  The number of pixels left after pixel rejection
 # is returned as the function value.
 
-int procedure ex_fit_line (data, npix, zstart, zslope, krej, ngrow, maxiter)
+long procedure ex_fit_line (data, npix, zstart, zslope, krej, ngrow, maxiter)
 
 real	data[npix]			#i data to be fitted
-int	npix				#i number of pixels before rejection
+size_t	npix				#i number of pixels before rejection
 real	zstart				#o Z-value of pixel data[1]
 real	zslope				#o dz/pixel
 real	krej				#i k-sigma pixel rejection factor
-int	ngrow				#i number of pixels of growing
+size_t	ngrow				#i number of pixels of growing
 int	maxiter				#i max iterations
 
-int	i, ngoodpix, last_ngoodpix, minpix, niter
+long	l_val
+long	i, ngoodpix, last_ngoodpix, minpix
+int	niter
 real	xscale, z0, dz, x, z, mean, sigma, threshold
 double	sumxsqr, sumxz, sumz, sumx, rowrat
 pointer	sp, flat, badpix, normx
-int	ex_reject_pixels(), ex_compute_sigma()
+long	ex_reject_pixels(), ex_compute_sigma()
 
 begin
 	if (npix <= 0)
@@ -577,7 +607,8 @@ begin
 	# marking the pixel as rejected.
 
 	ngoodpix = npix
-	minpix = max (MIN_NPIXELS, int (npix * MAX_REJECT))
+	l_val = npix * 1.0D0 * MAX_REJECT
+	minpix = max (MIN_NPIXELS, l_val)
 
 	for (niter=1;  niter <= maxiter;  niter=niter+1) {
 	    last_ngoodpix = ngoodpix
@@ -630,9 +661,10 @@ procedure ex_flatten_data (data, flat, x, npix, z0, dz)
 real	data[npix]			# raw data array
 real	flat[npix]			# flattened data  (output)
 real	x[npix]				# x value of each pixel
-int	npix				# number of pixels
+size_t	npix				# number of pixels
 real	z0, dz				# z-intercept, dz/dx of fitted line
-int	i
+
+long	i
 
 begin
 	do i = 1, npix
@@ -643,15 +675,15 @@ end
 # EX_COMPUTE_SIGMA -- Compute the root mean square deviation from the
 # mean of a flattened array.  Ignore rejected pixels.
 
-int procedure ex_compute_sigma (a, badpix, npix, mean, sigma)
+long procedure ex_compute_sigma (a, badpix, npix, mean, sigma)
 
 real	a[npix]				# flattened data array
 short	badpix[npix]			# bad pixel flags (!= 0 if bad pixel)
-int	npix
+size_t	npix
 real	mean, sigma			# (output)
 
 real	pixval
-int	i, ngoodpix
+long	i, ngoodpix
 double	sum, sumsq, temp
 
 begin
@@ -699,19 +731,19 @@ end
 # fact that bad pixels tend to be clumped.  The number of pixels left in the
 # fit is returned as the function value.
 
-int procedure ex_reject_pixels (data, flat, normx, badpix, npix,
+long procedure ex_reject_pixels (data, flat, normx, badpix, npix,
 				 sumxsqr, sumxz, sumx, sumz, threshold, ngrow)
 
 real	data[npix]			# raw data array
 real	flat[npix]			# flattened data array
 real	normx[npix]			# normalized x values of pixels
 short	badpix[npix]			# bad pixel flags (!= 0 if bad pixel)
-int	npix
+size_t	npix
 double	sumxsqr,sumxz,sumx,sumz		# matrix sums
 real	threshold			# threshold for pixel rejection
-int	ngrow				# number of pixels of growing
+size_t	ngrow				# number of pixels of growing
 
-int	ngoodpix, i, j
+long	ngoodpix, i, j
 real	residual, lcut, hcut
 double	x, z
 

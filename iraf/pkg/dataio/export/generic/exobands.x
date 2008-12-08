@@ -45,6 +45,7 @@ pointer	ex				#i task struct pointer
 char	opname[ARB]			#i operand name to retrieve
 pointer	o				#o output operand pointer
 
+size_t	sz_val
 int	i, nops, found, optype, imnum
 pointer	sp, buf
 pointer	op, param, emsg
@@ -52,6 +53,7 @@ pointer	im
 
 #int	ex_ptype()
 int	imgeti(), imgftype(), btoi(), ctoi()
+long	imgetl()
 bool	streq(), imgetb()
 double	imgetd()
 
@@ -59,12 +61,18 @@ define	getpar_		99
 
 begin
         call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
-	call salloc (param, SZ_FNAME, TY_CHAR)
-	call salloc (emsg, SZ_LINE, TY_CHAR)
-	call aclrc (Memc[buf], SZ_LINE)
-	call aclrc (Memc[param], SZ_FNAME)
-	call aclrc (Memc[emsg], SZ_LINE)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (param, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (emsg, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call aclrc (Memc[buf], sz_val)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[param], sz_val)
+	sz_val = SZ_LINE
+	call aclrc (Memc[emsg], sz_val)
 
 	if (VDEBUG) { call eprintf ("getop: opname=%s  ");call pargstr(opname)}
 
@@ -83,11 +91,15 @@ getpar_          O_LEN(o) = 0
                  case TY_CHAR:
                      O_TYPE(o) = TY_CHAR
                      O_LEN(o)  = SZ_LINE
-                     call malloc (O_VALP(o), SZ_LINE, TY_CHAR)
+                     sz_val = SZ_LINE
+                     call malloc (O_VALP(o), sz_val, TY_CHAR)
                      call imgstr (im, Memc[param], O_VALC(o), SZ_LINE)
                  case TY_INT:
                      O_TYPE(o) = TY_INT
                      O_VALI(o) = imgeti (im, Memc[param])
+                 case TY_LONG:
+                     O_TYPE(o) = TY_LONG
+                     O_VALL(o) = imgetl (im, Memc[param])
                  case TY_REAL:
                      O_TYPE(o) = TY_DOUBLE
                      O_VALD(o) = imgetd (im, Memc[param])
@@ -193,25 +205,39 @@ procedure ex_obfcn (ex, fcn, args, nargs, o)
 pointer	ex				#i package pointer
 char    fcn[ARB]                        #i function to be executed
 pointer args[ARB]                       #i argument list
-int     nargs                           #i number of arguments
+int	nargs                           #i number of arguments
 pointer o                               #o operand pointer
+
+size_t	sz_val
+short	s_val
+
+int	i_val0, i_val1, i_val2, i_val3
+
+long	l_val0, l_val1, l_val2, l_val3
+
+real	r_val0, r_val1, r_val2, r_val3
+
+double	d_val0, d_val1, d_val2, d_val3
 
 pointer	sp, buf
 pointer	r, g, b, gray
 pointer	scaled, data
-int	i, len, v_nargs, func, nbins
+int	ii, v_nargs, func, nbins
+long	i
+size_t	len
 short	sz1, sz2, sb1, sb2, zero
 real	gamma, bscale, bzero, scale, pix
 real	z1, z2
 
-int	strdic()
+int	strdic(), absi()
 bool	fp_equalr(), strne()
 
 define	setop_		99
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
 
         # Lookup function in dictionary.
         func = strdic (fcn, Memc[buf], SZ_LINE, OB_FUNCTIONS)
@@ -239,14 +265,14 @@ begin
         if (v_nargs > 0 && nargs != v_nargs)
             call xev_error2 ("function `%s' requires %d arguments",
                 fcn, v_nargs)
-        else if (v_nargs < 0 && nargs < abs(v_nargs))
+        else if (v_nargs < 0 && nargs < absi(v_nargs))
             call xev_error2 ("function `%s' requires at least %d arguments",
-                fcn, abs(v_nargs))
+                fcn, absi(v_nargs))
 
         if (DEBUG) {
             call eprintf ("obfcn: nargs=%d func=%d\n")
 		call pargi (nargs) ; call pargi (func)
-            do i = 1, nargs { call eprintf ("\t") ; call zze_pevop (args[i]) }
+            do ii = 1, nargs { call eprintf ("\t") ; call zze_pevop (args[ii]) }
 	    call flush (STDERR)
         }
 
@@ -261,7 +287,8 @@ begin
 	    len = O_LEN(args[1]) - 1
 	    O_LEN(o) = len + 1
 	    O_TYPE(o) = TY_REAL
-	    call malloc (O_VALP(o), len+1, TY_REAL)
+	    sz_val = len+1
+	    call malloc (O_VALP(o), sz_val, TY_REAL)
 	    gray = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -324,7 +351,8 @@ begin
             len = O_LEN(args[1])
 	    O_LEN(o) = len 
 	    O_TYPE(o) = O_TYPE(args[1])
-	    call malloc (O_VALP(o), len, O_TYPE(args[1]))
+	    sz_val = len
+	    call malloc (O_VALP(o), sz_val, O_TYPE(args[1]))
             scaled = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -332,39 +360,65 @@ begin
 		sz2 = z2
 		sb1 = 0
 		sb2 = nbins - 1
-		if (abs(sz2-sz1) > 1.0e-5)
+		if (abs(sz2-sz1) > 1.0e-5) {
 		    call amaps (Mems[data], Mems[scaled], len, sz1, sz2, 
 			sb1, sb2)
-		else
-		    call amovks (0, Mems[scaled], len)
+		} else {
+		    s_val = 0
+		    call amovks (s_val, Mems[scaled], len)
+		}
 
             case TY_INT:
-		if (abs(z2-z1) > 1.0e-5)
-		    call amapi (Memi[data], Memi[scaled], len, int (z1), 
-		        int(z2), int (0), int (nbins-1))
-		else
-		    call amovki (int (0), Memi[scaled], len)
+		if (abs(z2-z1) > 1.0e-5) {
+		    i_val0 = z1
+		    i_val1 = z2
+		    i_val2 = 0
+		    i_val3 = nbins-1
+		    call amapi (Memi[data], Memi[scaled], len,
+				 i_val0, i_val1, i_val2, i_val3)
+		} else {
+		    i_val0 = 0
+		    call amovki (i_val0, Memi[scaled], len)
+		}
 
             case TY_LONG:
-		if (abs(z2-z1) > 1.0e-5)
-		    call amapl (Meml[data], Meml[scaled], len, long (z1), 
-		        long(z2), long (0), long (nbins-1))
-		else
-		    call amovkl (long (0), Meml[scaled], len)
+		if (abs(z2-z1) > 1.0e-5) {
+		    l_val0 = z1
+		    l_val1 = z2
+		    l_val2 = 0
+		    l_val3 = nbins-1
+		    call amapl (Meml[data], Meml[scaled], len,
+				 l_val0, l_val1, l_val2, l_val3)
+		} else {
+		    l_val0 = 0
+		    call amovkl (l_val0, Meml[scaled], len)
+		}
 
             case TY_REAL:
-		if (abs(z2-z1) > 1.0e-5)
-		    call amapr (Memr[data], Memr[scaled], len, real (z1), 
-		        real(z2), real (0), real (nbins-1))
-		else
-		    call amovkr (real (0), Memr[scaled], len)
+		if (abs(z2-z1) > 1.0e-5) {
+		    r_val0 = z1
+		    r_val1 = z2
+		    r_val2 = 0
+		    r_val3 = nbins-1
+		    call amapr (Memr[data], Memr[scaled], len,
+				 r_val0, r_val1, r_val2, r_val3)
+		} else {
+		    r_val0 = 0
+		    call amovkr (r_val0, Memr[scaled], len)
+		}
 
             case TY_DOUBLE:
-		if (abs(z2-z1) > 1.0e-5)
-		    call amapd (Memd[data], Memd[scaled], len, double (z1), 
-		        double(z2), double (0), double (nbins-1))
-		else
-		    call amovkd (double (0), Memd[scaled], len)
+		if (abs(z2-z1) > 1.0e-5) {
+		    d_val0 = z1
+		    d_val1 = z2
+		    d_val2 = 0
+		    d_val3 = nbins-1
+		    call amapd (Memd[data], Memd[scaled], len,
+				 d_val0, d_val1, d_val2, d_val3)
+		} else {
+		    d_val0 = 0
+		    call amovkd (d_val0, Memd[scaled], len)
+		}
 
             }
 
@@ -375,7 +429,8 @@ begin
             len = O_LEN(args[1]) - 1
 	    O_LEN(o) = len + 1
 	    O_TYPE(o) = TY_REAL
-	    call malloc (O_VALP(o), len+1, TY_REAL)
+	    sz_val = len+1
+	    call malloc (O_VALP(o), sz_val, TY_REAL)
             scaled = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -389,29 +444,37 @@ begin
 		if (!fp_equalr (0.0, bscale)) {
                     do i = 0, len
                         Memr[scaled+i] = (Memi[data+i] - bzero) / bscale
-		} else
-		    call amovki (int(0), Memi[scaled], len)
+		} else {
+		    i_val0 = 0
+		    call amovki (i_val0, Memi[scaled], len)
+		}
 
             case TY_LONG:
 		if (!fp_equalr (0.0, bscale)) {
                     do i = 0, len
                         Memr[scaled+i] = (Meml[data+i] - bzero) / bscale
-		} else
-		    call amovkl (long(0), Meml[scaled], len)
+		} else {
+		    l_val0 = 0
+		    call amovkl (l_val0, Meml[scaled], len)
+		}
 
             case TY_REAL:
 		if (!fp_equalr (0.0, bscale)) {
                     do i = 0, len
                         Memr[scaled+i] = (Memr[data+i] - bzero) / bscale
-		} else
-		    call amovkr (real(0), Memr[scaled], len)
+		} else {
+		    r_val0 = 0
+		    call amovkr (r_val0, Memr[scaled], len)
+		}
 
             case TY_DOUBLE:
 		if (!fp_equalr (0.0, bscale)) {
                     do i = 0, len
                         Memr[scaled+i] = (Memd[data+i] - bzero) / bscale
-		} else
-		    call amovkd (double(0), Memd[scaled], len)
+		} else {
+		    d_val0 = 0
+		    call amovkd (d_val0, Memd[scaled], len)
+		}
 
             }
 
@@ -425,7 +488,8 @@ begin
             len = O_LEN(args[1]) - 1
 	    O_LEN(o) = len + 1
 	    O_TYPE(o) = TY_REAL
-	    call malloc (O_VALP(o), len+1, TY_REAL)
+	    sz_val = len+1
+	    call malloc (O_VALP(o), sz_val, TY_REAL)
             scaled = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:
@@ -464,7 +528,8 @@ begin
             len = O_VALI(args[2])
 	    O_LEN(o) = len
 	    O_TYPE(o) = O_TYPE(args[1])
-	    call malloc (O_VALP(o), len, O_TYPE(args[1]))
+	    sz_val = len
+	    call malloc (O_VALP(o), sz_val, O_TYPE(args[1]))
             scaled = O_VALP(o)
             switch (O_TYPE(args[1])) {
             case TY_UBYTE, TY_USHORT, TY_SHORT:

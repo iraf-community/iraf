@@ -15,10 +15,11 @@ procedure ex_rgb (ex)
 
 pointer	ex				#i task struct pointer
 
+size_t	sz_val
 int	i, fd
 short	imagic, type, dim		# stuff saved on disk
 short	xsize, ysize, zsize, pad
-long	min, max
+int	min, max
 char	name[80]
 
 begin
@@ -40,31 +41,44 @@ begin
 	    dim = 2
 	    zsize = 1
 	}
+	if ( MAX_SHORT < EX_OCOLS(ex) )
+	    call error (0, "Too large OCOLS for SGI RGB.")
+	if ( MAX_SHORT < EX_NLINES(ex) )
+	    call error (0, "Too large NLINES for SGI RGB.")
 	xsize = EX_OCOLS(ex)
 	ysize = EX_NLINES(ex)
 	min = 0
 	max = 255
-	call aclrc (name, 80)
+	sz_val = 80
+	call aclrc (name, sz_val)
 	call strcpy ("no name", name, 80)
-	call achtcb (name, name, 80)
+	# arg2: incompatible pointer
+	call achtcb (name, name, sz_val)
 
 	# Write the header values to the output file.
 	fd = EX_FD(ex)
-	call write (fd, imagic, SZ_SHORT / SZ_CHAR)
-	call write (fd, type, SZ_SHORT / SZ_CHAR)
-	call write (fd, dim, SZ_SHORT / SZ_CHAR)
-	call write (fd, xsize, SZ_SHORT / SZ_CHAR)
-	call write (fd, ysize, SZ_SHORT / SZ_CHAR)
-	call write (fd, zsize, SZ_SHORT / SZ_CHAR)
-	call write (fd, min, SZ_LONG / SZ_CHAR)
-	call write (fd, max, SZ_LONG / SZ_CHAR)
-	call write (fd, 0, SZ_LONG / SZ_CHAR)
-	call write (fd, name, 8 / SZB_CHAR)
+	sz_val = SZ_SHORT / SZ_CHAR
+	call write (fd, imagic, sz_val)
+	call write (fd, type, sz_val)
+	call write (fd, dim, sz_val)
+	call write (fd, xsize, sz_val)
+	call write (fd, ysize, sz_val)
+	call write (fd, zsize, sz_val)
+	sz_val = SZ_INT / SZ_CHAR
+	# arg2: incompatible pointer
+	call write (fd, min, sz_val)
+	# arg2: incompatible pointer
+	call write (fd, max, sz_val)
+	# arg2: incompatible pointer
+	call write (fd, 0, sz_val)
+	sz_val = 8 / SZB_CHAR
+	call write (fd, name, sz_val)
 
 	# Pad to a 512 byte header.
 	pad = 0
+	sz_val = SZ_SHORT / SZ_CHAR
 	do i = 1, 240
-	    call write (fd, pad, SZ_SHORT / SZ_CHAR)
+	    call write (fd, pad, sz_val)
 
 	# Fix the output parameters.
 	call ex_do_outtype (ex, "b1")

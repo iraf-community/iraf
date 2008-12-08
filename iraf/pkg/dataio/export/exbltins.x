@@ -178,7 +178,7 @@ begin
 	    call pargstr ("Least Significant Byte First")
         default:
             if (EX_BSWAP(ex) == 0 && (BYTE_SWAP2==NO || BYTE_SWAP4==NO))
-               call pargstr ("Most Significant Byte First")
+                call pargstr ("Most Significant Byte First")
             else
                 call pargstr ("Least Significant Byte First")
         }
@@ -220,10 +220,12 @@ pointer procedure exb_fmt_ext (ex)
 
 pointer	ex				#i task struct pointer
 
+size_t	sz_val
 pointer	suf
 
 begin
-	call malloc (suf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call malloc (suf, sz_val, TY_CHAR)
 
         switch (EX_BLTIN(ex)) {
         case EPS:    call strcpy (".eps",  Memc[suf], SZ_FNAME)

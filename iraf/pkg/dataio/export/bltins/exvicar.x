@@ -11,6 +11,8 @@ procedure ex_vicar (ex)
 
 pointer	ex					#i task struct pointer
 
+size_t	sz_val
+long	l_val
 pointer	sp, hdr, user, date, arch
 int	i, flags
 char	space
@@ -26,23 +28,33 @@ begin
 	    call error (7, "Invalid number of expressions for VICAR file.")
 	if (bitset(flags, OF_LINE) || bitset (flags, LINE_STORAGE))
 	    call error (7, "Line storage illegal for VICAR file.")
+	if ( EX_OUTTYPE(ex) == TY_LONG ) {
+	    if ( SZ_LONG != 2 ) {
+		call error (0, "VICAR2 format cannot handle 64-bit integer type.")
+	    }
+	}
 
 	# Write the header to the file.
 	call smark (sp)
-	call salloc (hdr, SZ_VICHDR, TY_CHAR)
-	call salloc (user, SZ_FNAME, TY_CHAR)
-	call salloc (date, SZ_FNAME, TY_CHAR)
-	call salloc (arch, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_VICHDR
+	call salloc (hdr, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (user, sz_val, TY_CHAR)
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (arch, sz_val, TY_CHAR)
 
 	space = ' '
-	call amovkc (space, Memc[hdr], SZ_VICHDR)
-	call aclrc (Memc[user], SZ_FNAME)
-	call aclrc (Memc[date], SZ_FNAME)
-	call aclrc (Memc[arch], SZ_FNAME)
+	sz_val = SZ_VICHDR
+	call amovkc (space, Memc[hdr], sz_val)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[user], sz_val)
+	call aclrc (Memc[date], sz_val)
+	call aclrc (Memc[arch], sz_val)
 
 	# Header keywords:
 	call getuid (Memc[user], SZ_FNAME)
-	call cnvtime (clktime(long(0)), Memc[date], SZ_FNAME)
+	l_val = 0
+	call cnvtime (clktime(l_val), Memc[date], SZ_FNAME)
 	call sprintf (Memc[hdr], SZ_VICHDR, 
 	   "LBLSIZE=%d FORMAT='%s' TYPE='IMAGE' BUFSIZ=20480 DIM=3 EOL=0 RECSIZE=%d ORG='%s' NL=%d NS=%d NB=%d N1=%d N2=%d N3=%d N4=0 NBB=0 NLB=0 INTFMT='%s' REALFMT='%s' TASK='EXPORT' USER='%s' DAT_TIM='%s'                    ")
 
@@ -55,16 +67,16 @@ begin
                 case TY_REAL:       call pargstr ("REAL")
                 case TY_DOUBLE:     call pargstr ("DOUB")
 		}
-		call pargi (EX_OCOLS(ex))		# RECSIZE
+		call pargl (EX_OCOLS(ex))		# RECSIZE
 		if (bitset(flags, OF_LINE) || bitset (flags, LINE_STORAGE))
 		    call pargstr ("BIL")		# ORG
 		else
 		    call pargstr ("BSQ")
-		call pargi (EX_OROWS(ex))		# NL
-		call pargi (EX_OCOLS(ex))		# NS
+		call pargl (EX_OROWS(ex))		# NL
+		call pargl (EX_OCOLS(ex))		# NS
 		call pargi (EX_NEXPR(ex))		# NB
-		call pargi (EX_OCOLS(ex))		# N1
-		call pargi (EX_OROWS(ex))		# N2
+		call pargl (EX_OCOLS(ex))		# N1
+		call pargl (EX_OROWS(ex))		# N2
 		call pargi (EX_NEXPR(ex))		# N3
 		if (BYTE_SWAP2 == NO)
 		    call pargstr ("HIGH")		# INTFMT
@@ -90,8 +102,10 @@ begin
 	    i = i - 1
 	Memc[hdr+i-1] = ' '
 
-	call strpak (Memc[hdr], Memc[hdr], SZ_VICHDR)
-	call write (EX_FD(ex), Memc[hdr], strlen(Memc[hdr])/SZB_CHAR)
+	sz_val = SZ_VICHDR
+	call strpak (Memc[hdr], Memc[hdr], sz_val)
+	sz_val = strlen(Memc[hdr])/SZB_CHAR
+	call write (EX_FD(ex), Memc[hdr], sz_val)
 	call sfree (sp)
 
 	# Fix the output pixel type to single bytes.

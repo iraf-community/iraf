@@ -8,9 +8,9 @@ include "../exbltins.h"
 
 define	SZ_EPSSTRUCT	    5
 define	EPS_ITEMSPERLINE    Memi[P2I($1)]	# no. of items per line
-define	EPS_HPTR	    Memi[P2I($1+1)]	# ptr to hex digit string
-define	EPS_BPTR	    Memi[P2I($1+2)]	# ptr to output buffer
-define	EPS_BCNT	    Memi[P2I($1+3)]	# index into output buffer
+define	EPS_HPTR	    Memp[$1+1]	# ptr to hex digit string
+define	EPS_BPTR	    Memp[$1+2]	# ptr to output buffer
+define	EPS_BCNT	    Memz[P2Z($1+3)]	# index into output buffer
 define	HEXSTR		    Memc[EPS_HPTR($1)+$2]
 define	BUF		    Memc[EPS_BPTR($1)+$2-1]
 
@@ -29,14 +29,19 @@ procedure ex_eps (ex)
 
 pointer	ex				#i task struct pointer
 
+size_t	sz_val
+long	l_val, c_2
 pointer	eps
 pointer	bptr
-int	fd, len, flags
+int	fd, flags
+size_t	len
 
 int	strlen()
 bool	streq()
+long	modl()
 
 begin
+	c_2 = 2
         # Check to see that we have the correct number of expressions to
         # write this format.
         flags = EX_OUTFLAGS(ex)
@@ -48,10 +53,13 @@ begin
         EX_OUTFLAGS(ex) = or (EX_OUTFLAGS(ex), OF_FLIPY)
 
 	# Allocate the EPS structure.
-	iferr (call calloc (eps, SZ_EPSSTRUCT, TY_STRUCT))
+	sz_val = SZ_EPSSTRUCT
+	iferr (call calloc (eps, sz_val, TY_STRUCT))
 	    call error (0, "Error allocating eps structure.")
-	call calloc (EPS_HPTR(eps), 17, TY_CHAR)
-	call calloc (EPS_BPTR(eps), SZ_EPSBUF+SZ_TRAILER, TY_CHAR)
+	sz_val = 17
+	call calloc (EPS_HPTR(eps), sz_val, TY_CHAR)
+	sz_val = SZ_EPSBUF+SZ_TRAILER
+	call calloc (EPS_BPTR(eps), sz_val, TY_CHAR)
 	call strcpy (HEXITS, Memc[EPS_HPTR(eps)], 17)
 	EPS_BCNT(eps) = 1
 
@@ -78,14 +86,18 @@ begin
 	}
 
 	# Flush the remaining pixels in the buffer.
-	call calloc (bptr, SZ_EPSBUF, TY_CHAR)
+	sz_val = SZ_EPSBUF
+	call calloc (bptr, sz_val, TY_CHAR)
 
-	if (mod (EPS_BCNT(eps),2) == 0) {
+	l_val = EPS_BCNT(eps)
+	if (modl(l_val,c_2) == 0) {
+	    sz_val = SZ_TRAILER
 	    call amovc ("\ngrestore showpage\n%%Trailer\n\0", 
-		BUF(eps,EPS_BCNT(eps)), SZ_TRAILER)
+			BUF(eps,EPS_BCNT(eps)), sz_val)
 	} else {
+	    sz_val = SZ_TRAILER
 	    call amovc ("\ngrestore  showpage\n%%Trailer\n", 
-		BUF(eps,EPS_BCNT(eps)), SZ_TRAILER)
+			BUF(eps,EPS_BCNT(eps)), sz_val)
 	}
 	len = strlen (BUF(eps,1))
 	call strpak (BUF(eps,1), Memc[bptr], len)
@@ -111,8 +123,9 @@ bool	use_cmap			#i write a false color image?
 bool	is_gray				#i is this a grayscale cmap?
 
 pointer	op, bop, out, cm
-int	i, j, k, line, percent
-int	len, orow, type
+int	i, percent, type
+long	j, k, line, orow
+size_t	len
 
 pointer	ex_evaluate(), ex_chtype()
 
@@ -144,6 +157,7 @@ begin
                 bop = ex_chtype (ex, op, type)
 
                 # Write evaluated pixels.
+		# arg1: incompatible pointer
 		call achtbs (Memc[bop], Mems[out], O_LEN(op))
 		len = O_LEN(op) - 1
 		if (is_gray) {
@@ -188,7 +202,8 @@ pointer	eps				#i postscript struct pointer
 int	fd				#i output file descriptor
 
 pointer	op, bop, out
-int	i, j, k, line, percent, orow, type
+int	i, percent, type
+long	j, k, line, orow
 
 pointer	ex_evaluate(), ex_chtype()
 
@@ -219,6 +234,7 @@ begin
                 bop = ex_chtype (ex, op, type)
 
                 # Write evaluated pixels.
+		# arg1: incompatible pointer
 		call achtbs (Memc[bop], Mems[out], O_LEN(op))
 		do k = 1, O_LEN(op)
 		    call eps_putval (eps, fd, Mems[out+k-1])
@@ -245,11 +261,14 @@ pointer	ex				#i task struct pointer
 pointer	eps				#i EPS struct pointer
 int	color				#i is this a color image?
 
-int	bp, fd, cols, rows, dpi, len
-int	icols, irows, devpix, turnflag
+size_t	sz_val
+int	bp, fd, dpi, len
+size_t	zlen
+long	cols, rows, icols, irows
+int	devpix, turnflag
 real    scale, pixfac, scols, srows, llx, lly
 
-int	strlen(), stropen()
+int	strlen(), stropen(), modi()
 
 begin
 	fd = EX_FD(ex)
@@ -319,18 +338,18 @@ begin
 	    call eps_defcol (bp, icols)
 
 	    call fprintf (bp, "/rpicstr %d string def\n")
-	        call pargi (icols)
+	        call pargl (icols)
 	    call fprintf (bp, "/gpicstr %d string def\n")
-	        call pargi (icols)
+	        call pargl (icols)
 	    call fprintf (bp, "/bpicstr %d string def\n")
-	        call pargi (icols)
+	        call pargl (icols)
 
 	} else if (color == YES && bitset (EX_OUTFLAGS(ex),OF_CMAP)) {
 	    call eps_defcol (bp, icols)
 
 	} else {
 	    call fprintf (bp, "/picstr %d string def\n")
-	        call pargi (icols)
+	        call pargl (icols)
 	}
 
 	call fprintf (bp, "%%%%EndProlog\n")
@@ -349,12 +368,12 @@ begin
 	}
 
 	call fprintf (bp, "%d %d 8\n")
-	    call pargi (icols)
-	    call pargi (irows)
+	    call pargl (icols)
+	    call pargl (irows)
 	call fprintf (bp, "[ %d 0 0 -%d 0 %d ]\n")
-	    call pargi (icols)
-	    call pargi (irows)
-	    call pargi (irows)
+	    call pargl (icols)
+	    call pargl (irows)
+	    call pargl (irows)
 	if (color == YES) {
 	    if (bitset (EX_OUTFLAGS(ex), OF_CMAP)) {
 	        call fprintf (bp, "{currentfile pix readhexstring pop}\n")
@@ -374,7 +393,7 @@ begin
 
 	# See if we need to pad the string to write it out correctly.
 	len = strlen(BUF(eps,1))
-	if (mod(len,2) == 1) {
+	if (modi(len,2) == 1) {
 	    BUF(eps,len+1) = '\n'
 	} else {
 	    BUF(eps,len+1) = ' '
@@ -382,10 +401,11 @@ begin
 	}
 
 	# Now write the contents of the string buffer to the output file.
-	len = strlen(BUF(eps,1))
-	call strpak (BUF(eps,1), BUF(eps,1), len)
-	call write (fd, BUF(eps,1), len / SZB_CHAR)
-	call aclrc (BUF(eps,1), SZ_EPSBUF)
+	zlen = strlen(BUF(eps,1))
+	call strpak (BUF(eps,1), BUF(eps,1), zlen)
+	call write (fd, BUF(eps,1), zlen / SZB_CHAR)
+	sz_val = SZ_EPSBUF
+	call aclrc (BUF(eps,1), sz_val)
 	EPS_ITEMSPERLINE(eps) = 0
 end
 
@@ -398,7 +418,7 @@ end
 procedure eps_defcol (fd, len)
 
 int	fd				#i output file descriptor
-int	len				#i length of a scanline
+long	len				#i length of a scanline
 
 begin
   	call fprintf (fd, "%% build a temporary dictionary\n")
@@ -406,7 +426,7 @@ begin
     	call fprintf (fd, 
 	    "%% define string to hold a scanline's worth of data\n")
     	call fprintf (fd, "/pix %d string def\n\n")
-	    call pargi (len)
+	    call pargl (len)
 
 	call fprintf (fd, "\n")
 	call fprintf (fd, "%% define 'colorimage' if it isn't defined\n")

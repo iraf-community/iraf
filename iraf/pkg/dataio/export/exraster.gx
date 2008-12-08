@@ -13,7 +13,8 @@ procedure ex_no_interleave (ex)
 pointer	ex				#i task struct pointer
 
 pointer	op, out
-int	i, j, k, line, percent, orow
+int	i, k, percent
+long	j, line, orow
 int	fd, outtype
 
 pointer	ex_evaluate(), ex_chtype()
@@ -21,8 +22,8 @@ pointer	ex_evaluate(), ex_chtype()
 begin
 	if (DEBUG) { call eprintf ("ex_no_interleave:\n") 
 	    call eprintf ("NEXPR = %d  OCOLS = %d OROWS = %d\n")
-		call pargi(EX_NEXPR(ex));call pargi(EX_OCOLS(ex))
-		call pargi(EX_OROWS(ex))
+		call pargi(EX_NEXPR(ex));call pargl(EX_OCOLS(ex))
+		call pargl(EX_OROWS(ex))
 	}
 
 	# Loop over the number of image expressions.
@@ -89,7 +90,8 @@ procedure ex_ln_interleave (ex)
 pointer	ex				#i task struct pointer
 
 pointer	op, out
-int	i, j, line, percent, orow
+int	j, percent
+long	i, line, orow
 int	fd, outtype
 
 pointer	ex_evaluate(), ex_chtype()
@@ -97,8 +99,8 @@ pointer	ex_evaluate(), ex_chtype()
 begin
 	if (DEBUG) { call eprintf ("ex_ln_interleave:\n")
 	    call eprintf ("NEXPR = %d  OCOLS = %d OROWS = %d\n")
-		call pargi(EX_NEXPR(ex));call pargi(EX_OCOLS(ex))
-		call pargi(EX_OROWS(ex))
+		call pargi(EX_NEXPR(ex));call pargl(EX_OCOLS(ex))
+		call pargl(EX_OROWS(ex))
 	}
 
 	# Process each line in the image.
@@ -164,23 +166,26 @@ procedure ex_px_interleave (ex)
 
 pointer	ex				#i task struct pointer
 
+size_t	sz_val
 pointer	sp, pp, op
 pointer	o, outptr
-int	i, j, line, npix, outtype
-long	totpix
-int	fd, percent, orow
+int	j, outtype
+long	i, line, orow
+size_t	npix, totpix
+int	fd, percent
 
 pointer	ex_evaluate(), ex_chtype()
 
 begin
 	if (DEBUG) { call eprintf ("ex_px_interleave:\n")
 	    call eprintf ("NEXPR = %d  OCOLS = %d OROWS = %d\n")
-		call pargi(EX_NEXPR(ex));call pargi(EX_OCOLS(ex))
-		call pargi(EX_OROWS(ex))
+		call pargi(EX_NEXPR(ex));call pargl(EX_OCOLS(ex))
+		call pargl(EX_OROWS(ex))
 	}
 
 	call smark (sp)
-	call salloc (pp, EX_NEXPR(ex), TY_POINTER)
+	sz_val = EX_NEXPR(ex)
+	call salloc (pp, sz_val, TY_POINTER)
 
 	# Process each line in the image.
 	fd = EX_FD(ex)
@@ -208,7 +213,7 @@ begin
 
 		# Convert to the output pixel type.
 		o = ex_chtype (ex, op, outtype)
-		Memi[pp+j-1] = o
+		Memp[pp+j-1] = o
 
 		npix = O_LEN(op)
 		#npix = EX_OCOLS(op)
@@ -216,15 +221,17 @@ begin
 	    }
 
 	    # Merge pixels into a single vector.
-	    call ex_merge_pixels (Memi[pp], EX_NEXPR(ex), npix, outtype, 
+	    call ex_merge_pixels (Memp[pp], EX_NEXPR(ex), npix, outtype, 
 		outptr, totpix)
 		
 	    # Write vector of merged pixels.
-	    if (outtype == TY_UBYTE)
+	    if (outtype == TY_UBYTE) {
+		# arg2: incompatible pointer
 		call achtsb (Memc[outptr], Memc[outptr], totpix)
-	    if (EX_FORMAT(ex) != FMT_LIST)
+	    }
+	    if (EX_FORMAT(ex) != FMT_LIST) {
 		call ex_wpixels (fd, outtype, outptr, totpix)
-	    else {
+	    } else {
 		call ex_listpix (fd, outtype, outptr, totpix, 
 		    i, EX_NEXPR(ex), EX_NEXPR(ex), YES)
 	    }
@@ -240,9 +247,9 @@ begin
 	    }
 	    do j = 1, EX_NEXPR(ex) {
 	        if (outtype != TY_CHAR && outtype != TY_UBYTE)
-		    call mfree (Memi[pp+j-1], outtype)
+		    call mfree (Memp[pp+j-1], outtype)
 		else
-		    call mfree (Memi[pp+j-1], TY_CHAR)
+		    call mfree (Memp[pp+j-1], TY_CHAR)
 	    }
 
             # Print percent done if being verbose
@@ -262,10 +269,12 @@ end
 procedure ex_getpix (ex, line)
 
 pointer	ex				#i task struct pointer
-int	line				#i current line number
+long	line				#i current line number
 
+size_t	sz_val
 pointer	im, op, data
-int	nptrs, i, band
+int	nptrs, i
+long	band
 
 pointer	imgl3s(), imgl3i(), imgl3l()
 pointer	imgl3r(), imgl3d()
@@ -279,24 +288,29 @@ begin
 	    band = max (1, IO_BAND(op))
 
 	    if (line > IM_LEN(im,2)) {
-	        call calloc (IO_DATA(op), IM_LEN(im,1), IM_PIXTYPE(im))
+		sz_val = IM_LEN(im,1)
+	        call calloc (IO_DATA(op), sz_val, IM_PIXTYPE(im))
 	        IO_ISIM(op) = NO
 	        IO_NPIX(op) = IM_LEN(im,1)
 		next
-	    } else if (IO_DATA(op) == NULL)
-	        call malloc (IO_DATA(op), IM_LEN(im,1), IM_PIXTYPE(im))
+	    } else if (IO_DATA(op) == NULL) {
+		sz_val = IM_LEN(im,1)
+	        call malloc (IO_DATA(op), sz_val, IM_PIXTYPE(im))
+	    }
 
 	    switch (IM_PIXTYPE(im)) {
             case TY_USHORT:
 		data = imgl3s (im, line, band)
-		call amovs (Mems[data], Mems[IO_DATA(op)], IM_LEN(im,1))
+		sz_val = IM_LEN(im,1)
+		call amovs (Mems[data], Mems[IO_DATA(op)], sz_val)
 	        IO_TYPE(op) = TY_SHORT
 		IO_NBYTES(op) = SZ_SHORT * SZB_CHAR
 	        IO_ISIM(op) = YES
 	    $for (silrd)
             case TY_PIXEL:
 		data = imgl3$t (im, line, band)
-		call amov$t (Mem$t[data], Mem$t[IO_DATA(op)], IM_LEN(im,1))
+		sz_val = IM_LEN(im,1)
+		call amov$t (Mem$t[data], Mem$t[IO_DATA(op)], sz_val)
 	        IO_TYPE(op) = TY_PIXEL
 		IO_NBYTES(op) = SZ_PIXEL * SZB_CHAR
 	        IO_ISIM(op) = YES
@@ -314,7 +328,7 @@ procedure ex_wpixels (fd, otype, pix, npix)
 int	fd				#i output file descriptor
 int	otype				#i output data type
 pointer	pix				#i pointer to pixel data
-int	npix				#i number of pixels to write
+size_t	npix				#i number of pixels to write
 
 begin
 	# Write binary output.
@@ -325,6 +339,7 @@ begin
             call write (fd, Mems[pix], npix * SZ_SHORT/SZ_CHAR)
 	$for (silrd)
         case TY_PIXEL:
+	    # arg2: incompatible pointer (ilrd)
             call write (fd, Mem$t[pix], npix * SZ_PIXEL/SZ_CHAR)
 	$endfor
 	}
@@ -338,29 +353,33 @@ procedure ex_listpix (fd, type, data, npix, line, band, nbands, merged)
 int	fd				#i output file descriptor
 int	type				#i output data type
 pointer	data				#i pointer to pixel data
-int	npix				#i number of pixels to write
-int	line				#i current output line number
+size_t	npix				#i number of pixels to write
+long	line				#i current output line number
 int	band				#i current output band number
 int	nbands				#i no. of output bands
 int	merged				#i are pixels interleaved?
 
-int	i, j, k
-int	val, pix, shifti(), andi()
+long	l_val
+long	i, j, k
+int	ii, val, pix
+int	shifti(), andi()
+long	modl()
 
 begin
 	if (merged == YES && nbands > 1) {
 	    do i = 1, npix {
 		k = 0
-	        do j = 1, nbands {
+	        do ii = 1, nbands {
 		    call fprintf (fd, "%4d %4d %4d  ")
-		        call pargi (i)
-		        call pargi (line)
-		        call pargi (j)
+		        call pargl (i)
+		        call pargl (line)
+		        call pargi (ii)
 
 		    switch (type) {
                     case TY_UBYTE:
                         val = Memc[data+k]
-                        if (mod(i,2) == 1) {
+			l_val = 2
+                        if (modl(i,l_val) == 1) {
                             pix = shifti (val, -8)
                         } else {
                             pix = andi (val, 000FFX)
@@ -371,19 +390,19 @@ begin
                             call pargi (pix)
 		    case TY_CHAR, TY_SHORT, TY_USHORT:
 		        call fprintf (fd, "%d\n")
-		            call pargs (Mems[data+((j-1)*npix+i)-1])
+		            call pargs (Mems[data+((ii-1)*npix+i)-1])
         	    case TY_INT:
 		        call fprintf (fd, "%d\n")
-		            call pargi (Memi[data+((j-1)*npix+i)-1])
+		            call pargi (Memi[data+((ii-1)*npix+i)-1])
         	    case TY_LONG:
 		        call fprintf (fd, "%d\n")
-		            call pargl (Meml[data+((j-1)*npix+i)-1])
+		            call pargl (Meml[data+((ii-1)*npix+i)-1])
         	    case TY_REAL:
 		        call fprintf (fd, "%g\n")
-		            call pargr (Memr[data+((j-1)*npix+i)-1])
+		            call pargr (Memr[data+((ii-1)*npix+i)-1])
         	    case TY_DOUBLE:
 		        call fprintf (fd, "%g\n")
-		            call pargd (Memd[data+((j-1)*npix+i)-1])
+		            call pargd (Memd[data+((ii-1)*npix+i)-1])
 	            }
 		}
 	    }
@@ -392,19 +411,20 @@ begin
 	    do i = 1, npix {
 		if (nbands > 1) {
 		    call fprintf (fd, "%4d %4d %4d  ")
-		        call pargi (i)
-		        call pargi (line)
+		        call pargl (i)
+		        call pargl (line)
 		        call pargi (band)
 		} else {
 		    call fprintf (fd, "%4d %4d  ")
-		        call pargi (i)
-		        call pargi (line)
+		        call pargl (i)
+		        call pargl (line)
 		}
 
 		switch (type) {
 		case TY_UBYTE:
 		    val = Memc[data+j]
-		    if (mod(i,2) == 1) {
+		    l_val = 2
+		    if (modl(i,l_val) == 1) {
 			pix = shifti (val, -8)
 		    } else {
 			pix = andi (val, 000FFX)
@@ -441,13 +461,14 @@ end
 procedure ex_merge_pixels (ptrs, nptrs, npix, dtype, pix, totpix)
 
 pointer ptrs[ARB]                       #i array of pixel ptrs
-int     nptrs                           #i number of ptrs
-int     npix                            #i no. of pixels in each array
-int     dtype                           #i type of pointer to alloc
+int	nptrs                           #i number of ptrs
+size_t	npix                            #i no. of pixels in each array
+int	dtype                           #i type of pointer to alloc
 pointer pix                             #o output pixel array ptr
-int     totpix                          #o total no. of output pixels
+size_t	totpix                          #o total no. of output pixels
 
-int     i, j, ip
+long	i, ip
+int	j
 
 begin
         # Calculate the number of output pixels and allocate the pointer.
@@ -456,8 +477,10 @@ begin
             call realloc (pix, totpix, dtype)
 	else {
             call realloc (pix, totpix, TY_CHAR)
-	    do i = 1, nptrs
-		call achtbs (Mems[ptrs[i]], Mems[ptrs[i]], npix)
+	    do j = 1, nptrs {
+		# arg1: incompatible pointer
+		call achtbs (Mems[ptrs[j]], Mems[ptrs[j]], npix)
+	    }
 	}
 
         # Fill the output array
@@ -492,10 +515,13 @@ pointer	ex				#i task struct pointer
 pointer	op				#i evvexpr operand pointer
 int	type				#i new type of pointer
 
-pointer	out, coerce()
+size_t	c_1
+pointer	out
 int	swap, flags
+pointer	coerce()
 
 begin
+	c_1 = 1
 	# Allocate the pointer and coerce it so the routine works.
 	if (type == TY_UBYTE || type == TY_CHAR)
             call calloc (out, O_LEN(op), TY_CHAR)
@@ -521,21 +547,28 @@ begin
 
 	    # Do any requested byte swapping.
 	    if (bitset (swap, S_I2) || bitset (swap, S_ALL))
-		call bswap4 (Mems[out], 1, Mems[out], 1, O_LEN(op))
+		call bswap4 (Mems[out], c_1, Mems[out], c_1, O_LEN(op))
 
         case TY_INT:
             call achti (Memi[O_VALP(op)], Memc[out], O_LEN(op), type)
 
 	    # Do any requested byte swapping.
 	    if (bitset (swap, S_I4) || bitset (swap, S_ALL))
-		call bswap4 (Memi[out], 1, Memi[out], 1, O_LEN(op))
+		call bswap4 (Memi[out], c_1, Memi[out], c_1, O_LEN(op))
 
         case TY_LONG:
             call achtl (Meml[O_VALP(op)], Memc[out], O_LEN(op), type)
 
 	    # Do any requested byte swapping.
-	    if (bitset (swap, S_I4) || bitset (swap, S_ALL))
-		call bswap4 (Meml[out], 1, Meml[out], 1, O_LEN(op))
+	    if ( SZ_LONG == 2 ) {
+		if (bitset (swap, S_I4) || bitset (swap, S_ALL)) {
+		    call bswap4 (Meml[out], c_1, Meml[out], c_1, O_LEN(op))
+		}
+	    } else {
+		if (bitset (swap, S_I8) || bitset (swap, S_ALL)) {
+		    call bswap8 (Meml[out], c_1, Meml[out], c_1, O_LEN(op))
+		}
+	    }
 
         case TY_REAL:
             call achtr (Memr[O_VALP(op)], Memc[out], O_LEN(op), type)
@@ -568,7 +601,7 @@ procedure ex_pix_to_index (ptr, type, len)
 
 pointer	ptr				#i data ptr
 int	type				#i data type of array
-int	len				#i length of array
+size_t	len				#i length of array
 
 $for (silrd)
 PIXEL	$tindx, $tmin, $tmax
@@ -597,7 +630,7 @@ end
 procedure ex_pstat (ex, row, percent)
 
 pointer	ex				#i task struct pointer
-int	row				#u current row
+long	row				#u current row
 int	percent				#u percent completed
 
 begin

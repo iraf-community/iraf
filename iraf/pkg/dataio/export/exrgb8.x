@@ -24,8 +24,8 @@ define	BLUE		3
 
 # Colorbox structure
 define	CBOX_LEN	9
-define	CBOX_NEXT	Memi[P2I($1)]	# pointer to next colorbox structure
-define	CBOX_PREV	Memi[P2I($1+1)]	# pointer to previous colorbox structure
+define	CBOX_NEXT	Memp[$1]	# pointer to next colorbox structure
+define	CBOX_PREV	Memp[$1+1]	# pointer to previous colorbox structure
 define	CBOX_RMIN	Memi[P2I($1+2)]
 define	CBOX_RMAX	Memi[P2I($1+3)]
 define	CBOX_GMIN	Memi[P2I($1+4)]
@@ -52,6 +52,7 @@ procedure ex_mkcmap (ex)
 
 pointer	ex				#i task struct pointer
 
+size_t	sz_val
 pointer	oim				# Output image
 real	z1[3], dz[3]			# Display ranges
 
@@ -61,6 +62,7 @@ pointer freeboxes, usedboxes, ptr, im
 
 pointer	immap(), cm_largest_box()
 errchk	open, immap
+include	<nullptr.inc>
 
 begin
 	# Since we're creating a colormap we force the output pixel size
@@ -72,12 +74,13 @@ begin
 	# we'll path up the operand and expressions structs to it copies 
 	# this out to the requested format.
 
+	sz_val = SZ_FNAME
 	if (EX_TIMPTR(ex) == NULL)
-	    call calloc (EX_TIMPTR(ex), SZ_FNAME, TY_CHAR)
+	    call calloc (EX_TIMPTR(ex), sz_val, TY_CHAR)
 	else
-	    call aclrc (TIMNAME(ex), SZ_FNAME)
+	    call aclrc (TIMNAME(ex), sz_val)
 	call mktemp ("tmp$ex", TIMNAME(ex), SZ_FNAME)
-	oim = immap (TIMNAME(ex), NEW_IMAGE, 0)
+	oim = immap (TIMNAME(ex), NEW_IMAGE, NULLPTR)
 	IM_PIXTYPE(oim) = TY_SHORT
 	IM_LEN(oim,1) = EX_OCOLS(ex)
 	IM_LEN(oim,2) = EX_OROWS(ex)
@@ -94,10 +97,12 @@ begin
 	# Allocate color map.
 	ncolors = NCOLORS
 	call smark (sp)
-	call salloc (cmap, 3 * ncolors, TY_SHORT)
+	sz_val = 3 * ncolors
+	call salloc (cmap, sz_val, TY_SHORT)
 
 	# Allocate and initialize color boxes.
-	call salloc (box_list, ncolors * CBOX_LEN, TY_STRUCT) 
+	sz_val = ncolors * CBOX_LEN
+	call salloc (box_list, sz_val, TY_STRUCT) 
 
 	freeboxes = box_list
 	usedboxes = NULL
@@ -128,8 +133,9 @@ begin
 	    call printf ("Computing colormap....\n")
 	    call flush (STDOUT)
 	}
-	call salloc (histogram, B_LEN*B_LEN*B_LEN, TY_INT)
-	call aclri (Memi[histogram], B_LEN*B_LEN*B_LEN)
+	sz_val = B_LEN*B_LEN*B_LEN
+	call salloc (histogram, sz_val, TY_INT)
+	call aclri (Memi[histogram], sz_val)
 	call cm_get_histogram(ex, z1, dz, ptr, Memi[histogram])
 	EX_OUTFLAGS(ex) = or (EX_OUTFLAGS(ex), OF_CMAP)
 
@@ -157,10 +163,11 @@ begin
 	# First create cell list as described in Heckbert[2] and then
 	# create mapping from truncated pixel space to color table entries
 
-	call salloc (ColorCells, C_LEN*C_LEN*C_LEN, TY_POINTER)
-	call aclri (Memi[ColorCells], C_LEN*C_LEN*C_LEN)
+	sz_val = C_LEN*C_LEN*C_LEN
+	call salloc (ColorCells, sz_val, TY_POINTER)
+	call aclrp (Memp[ColorCells], sz_val)
 	call cm_map_colortable (Memi[histogram], Mems[cmap], ncolors,
-	    Memi[ColorCells])
+	    Memp[ColorCells])
 
 	# Scan image and match input values to table entries.
 	# Apply Floyd-Steinberg dithering.
@@ -170,7 +177,7 @@ begin
 	    call flush (STDOUT)
 	}
 	call cm_quant_fsdither (ex, z1, dz, Memi[histogram],
-	    Memi[ColorCells], Mems[cmap], ncolors, oim)
+	    Memp[ColorCells], Mems[cmap], ncolors, oim)
 
         # Unmap the current image pointer(s).
         do i = 1, EX_NIMAGES(ex) {
@@ -198,8 +205,8 @@ begin
 	EX_OUTFLAGS(ex) = or (EX_OUTFLAGS(ex), BAND_STORAGE)
 
 	for (i=0; i < C_LEN*C_LEN*C_LEN; i=i+1) {
-	    if (Memi[ColorCells+i] != NULL)
-		call mfree (Memi[ColorCells+i], TY_STRUCT)
+	    if (Memp[ColorCells+i] != NULL)
+		call mfree (Memp[ColorCells+i], TY_STRUCT)
 	}
 
 	call sfree (sp)
@@ -214,12 +221,14 @@ pointer	ex				#i task struct pointer
 short	map[3,ncolors]			#i Color map
 int	ncolors				#i Number of colors
 
+size_t	sz_val
 int	i
 pointer	cmap
 
 begin
         # Allocate the colormap pointer and read the colormap.
-        iferr (call calloc (EX_CMAP(ex), 3*CMAP_SIZE, TY_CHAR))
+	sz_val = 3*CMAP_SIZE
+        iferr (call calloc (EX_CMAP(ex), sz_val, TY_CHAR))
             call error (0, "Error allocating colormap pointer.")
 	cmap = EX_CMAP(ex)
 
@@ -243,10 +252,12 @@ procedure cm_getline (ex, z1, dz, line, data)
 pointer	ex				#I task struct pointer
 real	z1[3]				#I Intensity mapping origins
 real	dz[3]				#I Intensity mapping ranges
-int	line				#I Line to be obtained
+long	line				#I Line to be obtained
 pointer	data				#O Intensity mapped data
 
-int	i, j, nc, lnum
+int	i
+size_t	nc
+long	lnum, j
 pointer	iptr, optr, bptr, op
 
 pointer	ex_evaluate(), ex_chtype()
@@ -266,6 +277,7 @@ begin
 	do i = 1, 3 {
 	    op = ex_evaluate (ex, O_EXPR(ex,i))
 	    bptr = ex_chtype (ex, op, EX_OUTTYPE(ex))
+	    # arg1: incompatible pointer
 	    call achtbs (Memc[bptr], Mems[iptr], nc)
 	    call evvfree (op)
 
@@ -291,7 +303,9 @@ real	dz[3]				#I Intensity mapping ranges
 pointer	box				#O Initial box
 int	histogram[B_LEN,B_LEN,B_LEN]	#O Histogram
 
-int	i, j, nc, nl, r, g, b, rmin, gmin, bmin, rmax, gmax, bmax
+long	i, j
+size_t	nc, nl
+int	r, g, b, rmin, gmin, bmin, rmax, gmax, bmax
 pointer	sp, data, ptr
 
 begin
@@ -374,6 +388,7 @@ pointer	usedboxes				#U Used boxes
 pointer	freeboxes				#U Free boxes
 int	histogram[B_LEN, B_LEN, B_LEN]		#I Histogram
 
+size_t	sz_val
 int	first, last, i, j, rdel, gdel, bdel, sum1, sum2
 pointer	sp, hist, new
 int	ir, ig, ib
@@ -382,7 +397,8 @@ int	which
 
 begin
 	call smark (sp)
-	call salloc (hist, B_LEN, TY_INT)
+	sz_val = B_LEN
+	call salloc (hist, sz_val, TY_INT)
 
 	# see which axis is the largest, do a histogram along that
 	# axis.  Split at median point.  Contract both new boxes to
@@ -693,6 +709,7 @@ int	ra, ga, ba				#I Color to create cell for
 short	cmap[3,ncolor]				#I Color map
 int	ncolor					#I Number of colors
 
+size_t	sz_val
 int	i, n, next_n, ir,ig,ib, r1,g1,b1
 long	dist, mindist, tmp
 pointer	ptr
@@ -706,7 +723,8 @@ begin
 	g1 = ig * AC_SHIFT
 	b1 = ib * AC_SHIFT
 
-	call malloc (ptr, CCELL_LEN, TY_STRUCT)
+	sz_val = CCELL_LEN
+	call malloc (ptr, sz_val, TY_STRUCT)
 	ColorCells[1+ir,1+ig,1+ib] = ptr
 	CCELL_NUM_ENTS(ptr) = 0
 
@@ -823,16 +841,18 @@ short	cmap[3,ncolor]			#I Color map
 int	ncolor				#I Number of colors
 pointer	oim				#O Output IMIO pointer
 
-pointer	thisptr, nextptr, optr, impl2s()
+pointer	thisptr, nextptr, optr
 pointer	sp, thisline, nextline, tmpptr
 int     ir, ig, ib, r1, g1, b1, rcell, bcell, gcell
-int     i, j, nc, nl, oval
+int     oval
+long	i, j
+size_t	nc, nl
 
 int	ci, cj
 long	dist, d2, tmp
 pointer	cell
 
-pointer	cm_create_colorcell()
+pointer	cm_create_colorcell(), impl2s()
 
 begin
 	nc = EX_OCOLS(ex)

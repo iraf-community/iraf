@@ -10,17 +10,19 @@ procedure ex_iraf (ex)
 
 pointer	ex					#i task struct pointer
 
+size_t	sz_val
 pointer	sp, imname
 pointer	im, op, out
-int	i, j, flags
-int	line, percent, orow, type
+int	i, flags
+int	percent, type
+long	j, line, orow
 
 pointer	ex_evaluate(), ex_chtype()
 pointer	immap()
 pointer	impl2s(), impl2i(), impl2l(), impl2r(), impl2d()
 int	fnroot()
-
 errchk	immap
+include	<nullptr.inc>
 
 begin
 	# Check to see that we have the correct number of expressions.
@@ -33,8 +35,9 @@ begin
 	    call ex_do_outtype (ex, "u2")
 
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call aclrc (Memc[imname], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	call aclrc (Memc[imname], sz_val)
 
 	# Since we're writing an image, close the output file descriptor
 	# and instead use an image pointer.
@@ -45,7 +48,7 @@ begin
 	# Generate the image name and map it for processing.
 	if (fnroot (BFNAME(ex), Memc[imname], SZ_FNAME) == 0)
 	    call error (0, "Error making image name.")
-	iferr (im = immap (Memc[imname], NEW_IMAGE, 0))
+	iferr (im = immap (Memc[imname], NEW_IMAGE, NULLPTR))
 	    call error (0, "Error mapping output image.")
 
 	# Set the minimal header values.

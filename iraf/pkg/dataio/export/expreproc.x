@@ -17,6 +17,7 @@ procedure ex_preprocess (ex, expr)
 pointer	ex				#i task struct pointer
 char	expr[ARB]			#i input expression strings
 
+size_t	sz_val
 char	expstr[SZ_EXPSTR]
 int	ip, pp, last_ip, explen
 char	func[SZ_FNAME]
@@ -29,7 +30,8 @@ errchk	ex_cnt_parens, ex_pp_psscale
 
 begin
 	# Strip out any whitespace chars.
-	call aclrc (expstr, SZ_EXPSTR)
+	sz_val = SZ_EXPSTR
+	call aclrc (expstr, sz_val)
 	ip = nowhite (expr, expstr, SZ_EXPSTR)
 
 	# Do a quick syntax check.
@@ -61,7 +63,8 @@ begin
 	repeat {
 	    # Get the function name.
 	    pp = 1
-	    call aclrc (func, SZ_FNAME)
+	    sz_val = SZ_FNAME
+	    call aclrc (func, sz_val)
 	    while (expstr[ip] != '(' && expstr[ip] != EOS) {
 		func[pp] = expstr[ip]
 		ip = ip + 1
@@ -168,6 +171,7 @@ procedure ex_pp_setcmap (ex, expstr)
 pointer	ex				#i task struct pointer
 char	expstr[ARB]			#i expression string
 
+size_t	sz_val
 pointer	sp, cm, cmap
 int	ip, lp				# string pointers
 int	tp, i				# where to trim the string
@@ -178,8 +182,9 @@ include "cmaps.inc"
 
 begin
 	call smark (sp)
-	call salloc (cm, SZ_FNAME, TY_CHAR)
-	call aclrc (Memc[cm], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call salloc (cm, sz_val, TY_CHAR)
+	call aclrc (Memc[cm], sz_val)
 
 	if (DEBUG) { call eprintf("\t\texp=`%s'\n");call pargstr(expstr)}
 
@@ -217,7 +222,8 @@ begin
 	}
 
 	# Allocate the colormap pointer and read the colormap.
-	iferr (call calloc (EX_CMAP(ex), 3*CMAP_SIZE, TY_CHAR))
+	sz_val = 3*CMAP_SIZE
+	iferr (call calloc (EX_CMAP(ex), sz_val, TY_CHAR))
 	    call error (0, "Error allocating colormap pointer.")
 	call ex_read_cmap (ex, CMAPFILE(ex))
 

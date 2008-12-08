@@ -34,6 +34,7 @@ begin
 	    case S_ALL: 	call pargstr ("S_ALL")
 	    case S_I2: 		call pargstr ("S_I2")
 	    case S_I4: 		call pargstr ("S_I4")
+	    case S_I8: 		call pargstr ("S_I8")
 	    default: 		call pargstr ("ERR")
 	    }
 	call eprintf ("\touttype=%s header='%s' verbose=%d\n")
@@ -57,12 +58,12 @@ begin
 	do i = 1, EX_NEXPR(ex)
 	    call zze_proband (ex, i)
 	call eprintf ("\tocols=%d orows=%d:\n")
-	    call pargi (EX_OCOLS(ex)) ; call pargi (EX_OROWS(ex))
+	    call pargl (EX_OCOLS(ex)) ; call pargl (EX_OROWS(ex))
 	call eprintf ("\tnimages=%d nimops=%d ncols=%d nlines=%d:\n")
 	    call pargi (EX_NIMAGES(ex))
 	    call pargi (EX_NIMOPS(ex))
-	    call pargi (EX_NCOLS(ex))
-	    call pargi (EX_NLINES(ex))
+	    call pargl (EX_NCOLS(ex))
+	    call pargl (EX_NLINES(ex))
 	do i = 1, MAX_OPERANDS {
 	    if (IMOP(ex,i) != NULL) {
 	        call eprintf ("\t    ") ; call zze_prop (IMOP(ex,i))
@@ -90,9 +91,9 @@ int	band
 
 begin
 	call eprintf ("\t   ob=%d w=%d h=%d expr='%s'\n")
-	    call pargi (OBANDS(ex,band))
-	    call pargi (OB_WIDTH(OBANDS(ex,band)))
-	    call pargi (OB_HEIGHT(OBANDS(ex,band)))
+	    call pargp (OBANDS(ex,band))
+	    call pargl (OB_WIDTH(OBANDS(ex,band)))
+	    call pargl (OB_HEIGHT(OBANDS(ex,band)))
 	    call pargstr (O_EXPR(ex,band))
 end
 
@@ -109,14 +110,14 @@ begin
 
         call sprintf (buf, 8, " buirnx")
         type = ex_ptype(IO_TYPE(o), IO_NBYTES(o))
-        call eprintf("(o=%d im=%d band=%d tag=%s (t='%c' N=%d=>%s) Np=%d %d)\n")
-            call pargi (o)
-            call pargi (IO_IMPTR(o))
+        call eprintf("(o=%d im=%d band=%d tag=%s (t=%d N=%d=>%s) Np=%d %d)\n")
+            call pargp (o)
+            call pargp (IO_IMPTR(o))
             call pargi (IO_BAND(o))
 	    if (IO_TAG(o) == NULL) call pargstr ("")
 	    else 		   call pargstr (OP_TAG(o))
             #call pargc (buf[IO_TYPE(o)+1])
-            call pargc (IO_TYPE(o))
+            call pargi (IO_TYPE(o))
             call pargi (IO_NBYTES(o))
             switch (type) {
             case TY_UBYTE:    call pargstr ("TY_UBYTE")
@@ -128,8 +129,8 @@ begin
             case TY_DOUBLE:   call pargstr ("TY_DOUBLE")
             default:          call pargstr ("ERR")
             }
-            call pargi (IO_NPIX(o))
-            call pargi (IO_DATA(o))
+            call pargz (IO_NPIX(o))
+            call pargp (IO_DATA(o))
         call flush (STDERR)
 end
 
@@ -140,9 +141,9 @@ pointer	o
 
 begin
 	call eprintf ("o=%d type=%d len=%d flags=%d ")
-	    call pargi (o)
+	    call pargp (o)
 	    call pargi (O_TYPE(o))
-	    call pargi (O_LEN(o))
+	    call pargz (O_LEN(o))
 	    call pargi (O_FLAGS(o))
 	switch (O_TYPE(o)) {
 	case TY_CHAR: 	call eprintf ("val='%s'\n") ; call pargstr (O_VALC(o))
@@ -151,7 +152,7 @@ begin
 	case TY_LONG: 	call eprintf ("val=%d\n") ; call pargl (O_VALL(o))
 	case TY_REAL: 	call eprintf ("val=%g\n") ; call pargr (O_VALR(o))
 	case TY_DOUBLE: call eprintf ("val=%g\n") ; call pargd (O_VALD(o))
-        default: 	call eprintf ("ptr=%d\n") ; call pargi (O_VALP(o))
+        default: 	call eprintf ("ptr=%d\n") ; call pargp (O_VALP(o))
 	}
 	call flush (STDERR)
 end

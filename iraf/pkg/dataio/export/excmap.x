@@ -33,6 +33,8 @@ procedure ex_read_cmap (ex, cmname)
 pointer	ex					#i colormap pointer
 char	cmname[ARB]				#i colormap file name
 
+size_t	sz_val
+long	l_val
 pointer	cmap
 pointer	sp, line
 real	r, g, b, scale
@@ -65,9 +67,11 @@ begin
 	    ncolors = r
 	    goto rdmap_
 	} else if (nscan() == 3) {
-	    call seek (fd, BOF)
+	    l_val = BOF
+	    call seek (fd, l_val)
 rdmap_	    call smark (sp)
-	    call salloc (line, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (line, sz_val, TY_CHAR)
 	    stat = getline (fd, Memc[line])
 	    i = 1
 	    ncolors = 256
@@ -113,6 +117,7 @@ int	ncolors				#i number of colors in map
 real	brightness			#i brightness offset
 real	contrast			#i contrast scale
 
+size_t	sz_val
 pointer	sp, ctmp
 int	i, c1, c2
 short 	r, g, b
@@ -120,8 +125,9 @@ real	x, y, z, frac, slope, offset
 
 begin
 	call smark (sp)
-	call salloc (ctmp, 3*CMAP_SIZE, TY_CHAR)
-	call aclrc (Memc[ctmp], 3*CMAP_SIZE)
+	sz_val = 3*CMAP_SIZE
+	call salloc (ctmp, sz_val, TY_CHAR)
+	call aclrc (Memc[ctmp], sz_val)
 
 	slope = max (-7.0, min (7.0, contrast))
 	offset = max (0.0, min (1.0, brightness))
@@ -156,7 +162,8 @@ begin
 	     CMAP(ctmp,EX_GREEN,i) = g
 	     CMAP(ctmp,EX_BLUE, i) = b
         }
-	call amovc (Memc[ctmp], Memc[cmap], 3*CMAP_SIZE)
+	sz_val = 3*CMAP_SIZE
+	call amovc (Memc[ctmp], Memc[cmap], sz_val)
 
 	call sfree (sp)
 end
@@ -169,8 +176,10 @@ procedure ex_bltin_cmap (ex, cmname)
 pointer	ex				#i task struct pointer
 char	cmname[ARB]			#i colormap name
 
+size_t	sz_val
 pointer	cmap
-int	i, j, strdic()
+int	i, j
+int	strdic()
 
 include "cmaps.inc"
 
@@ -188,7 +197,8 @@ begin
 		j = j + 3
 	    }
 	case BLUE:
-	    call aclrs (Mems[cmap], 3*CMAP_SIZE)
+	    sz_val = 3*CMAP_SIZE
+	    call aclrs (Mems[cmap], sz_val)
 	    do i = 1, 256
                 CMAP(cmap,EX_BLUE,i)   = i - 1
 	case COLOR:
@@ -205,7 +215,8 @@ begin
                 CMAP(cmap,EX_BLUE,i)  = i - 1
 	    }
 	case GREEN:
-	    call aclrs (Mems[cmap], 3*CMAP_SIZE)
+	    sz_val = 3*CMAP_SIZE
+	    call aclrs (Mems[cmap], sz_val)
 	    do i = 1, 256
                 CMAP(cmap,EX_GREEN,i)   = i - 1
 	case HALLEY:
@@ -230,7 +241,8 @@ begin
 		j = j + 3
 	    }
 	case RED:
-	    call aclrs (Mems[cmap], 3*CMAP_SIZE)
+	    sz_val = 3*CMAP_SIZE
+	    call aclrs (Mems[cmap], sz_val)
 	    do i = 1, 256
                 CMAP(cmap,EX_RED,i)   = i - 1
 	case STAIRCASE:

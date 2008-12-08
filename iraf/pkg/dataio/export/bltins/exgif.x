@@ -10,8 +10,8 @@ define	SZ_GIFSTRUCT	30
 define	GIF_INIT_BITS	Memi[P2I($1)]	# initial number of bits
 define	GIF_MAXCODE	Memi[P2I($1+1)]	# max output code
 define	GIF_FREE_ENT	Memi[P2I($1+2)]	# first unused entry
-define	GIF_OFFSET	Memi[P2I($1+3)]	# offset into output buffer
-define	GIF_IN_COUNT	Memi[P2I($1+4)]	# length of input
+define	GIF_OFFSET	Memz[P2Z($1+3)]	# offset into output buffer
+define	GIF_IN_COUNT	Meml[P2L($1+4)]	# length of input
 define	GIF_CUR_BITS	Memi[P2I($1+5)]	# current no. bits in code
 define	GIF_N_BITS	Memi[P2I($1+6)]	# no. of max bits
 define	GIF_CUR_ACCUM	Memi[P2I($1+7)]	# current accumulator
@@ -19,21 +19,21 @@ define	GIF_A_COUNT	Memi[P2I($1+8)]	# no. of chars in 'packet'
 define	GIF_CLEAR_CODE	Memi[P2I($1+9)]	# clear hash table code
 define	GIF_EOF_CODE	Memi[P2I($1+10)]	# EOF code
 define	GIF_CLEAR_FLAG	Memi[P2I($1+11)]	# hash table has been cleared?
-define	GIF_CURX	Memi[P2I($1+12)]	# current 'x' position in image
-define	GIF_CURY	Memi[P2I($1+13)]	# current 'y' position in image
+define	GIF_CURX	Meml[P2L($1+12)]	# current 'x' position in image
+define	GIF_CURY	Meml[P2L($1+13)]	# current 'y' position in image
 define	GIF_PASS	Memi[P2I($1+14)]	# interlacing pass number
-define	GIF_WIDTH	Memi[P2I($1+15)]	# width of output image
-define	GIF_HEIGHT	Memi[P2I($1+16)]	# height of output image
+define	GIF_WIDTH	Meml[P2L($1+15)]	# width of output image
+define	GIF_HEIGHT	Meml[P2L($1+16)]	# height of output image
 define	GIF_EXPNUM	Memi[P2I($1+17)]	# expression we're evaluating
-define	GIF_LNUM	Memi[P2I($1+18)]	# line w/in that expression
-define	GIF_NPIX	Memi[P2I($1+19)]	# no. of pixels to process
+define	GIF_LNUM	Meml[P2L($1+18)]	# line w/in that expression
+define	GIF_NPIX	Meml[P2L($1+19)]	# no. of pixels to process
 define	GIF_PERCENT	Memi[P2I($1+20)]	# percent of file completed
 
-define	GIF_CDPTR	Memi[P2I($1+25)]	# compressed data (ptr)
-define	GIF_HPTR	Memi[P2I($1+26)]	# hash table (ptr)
-define	GIF_APTR	Memi[P2I($1+27)]	# packet accumulator (ptr)
-define	GIF_DPTR	Memi[P2I($1+28)]	# expression data (ptr)
-define	GIF_CPTR	Memi[P2I($1+29)]	# code table (ptr)
+define	GIF_CDPTR	Memp[$1+25]	# compressed data (ptr)
+define	GIF_HPTR	Memp[$1+26]	# hash table (ptr)
+define	GIF_APTR	Memp[$1+27]	# packet accumulator (ptr)
+define	GIF_DPTR	Memp[$1+28]	# expression data (ptr)
+define	GIF_CPTR	Memp[$1+29]	# code table (ptr)
 
 define	ACCUM		Mems[GIF_APTR($1)+$2]
 define	HTAB		Memi[GIF_HPTR($1)+$2]
@@ -62,13 +62,18 @@ procedure ex_gif (ex)
 
 pointer	ex				#i task struct pointer
 
+size_t	sz_val
+long	l_val, c_2
 pointer	gif
-int	nbytes, flags
+size_t	nbytes
+int	flags
 
 char	ch[2]
 int	or()
+long	modl()
 
 begin
+	c_2 = 2
         # Check to see that we have the correct number of expressions to
         # write this format.
         flags = EX_OUTFLAGS(ex)
@@ -83,12 +88,17 @@ begin
 
 	# Allocate the gif structure.
 	iferr {
-	    call calloc (gif, SZ_GIFSTRUCT, TY_STRUCT)
-	    call calloc (GIF_APTR(gif), 257, TY_SHORT)
-	    call calloc (GIF_HPTR(gif), HSIZE, TY_INT)
-	    call calloc (GIF_CPTR(gif), HSIZE, TY_INT)
-	    call calloc (GIF_DPTR(gif), max(256,EX_OCOLS(ex)), TY_SHORT)
-	    call calloc (GIF_CDPTR(gif), (2*EX_OROWS(ex)*EX_OCOLS(ex)),TY_SHORT)
+	    sz_val = SZ_GIFSTRUCT
+	    call calloc (gif, sz_val, TY_STRUCT)
+	    sz_val = 257
+	    call calloc (GIF_APTR(gif), sz_val, TY_SHORT)
+	    sz_val = HSIZE
+	    call calloc (GIF_HPTR(gif), sz_val, TY_INT)
+	    call calloc (GIF_CPTR(gif), sz_val, TY_INT)
+	    sz_val = max(256,EX_OCOLS(ex))
+	    call calloc (GIF_DPTR(gif), sz_val, TY_SHORT)
+	    sz_val = (2*EX_OROWS(ex)*EX_OCOLS(ex))
+	    call calloc (GIF_CDPTR(gif), sz_val,TY_SHORT)
 	} then
 	    call error (0, "Error allocating gif structure.")
 
@@ -108,7 +118,8 @@ begin
 	call gif_compress (ex, gif, EX_FD(ex))
 
 	# Write the GIF file terminator and dump the whole thing to disk.
-	if (mod(GIF_OFFSET(gif),2) == 1) {
+	l_val = GIF_OFFSET(gif)
+	if (modl(l_val,c_2) == 1) {
 	    CDATA(gif,GIF_OFFSET(gif)) = '\0'
  	    GIF_OFFSET(gif) = GIF_OFFSET(gif) + 1
 	    ch[1] = ';'
@@ -119,10 +130,14 @@ begin
 	    ch[2] = ';'
 	    nbytes = GIF_OFFSET(gif) / SZB_CHAR
 	}
+	# arg2: incompatible pointer
 	call achtsb (CDATA(gif,0), CDATA(gif,0), GIF_OFFSET(gif))
 	call write (EX_FD(ex), CDATA(gif,0), nbytes)
-	call achtsb (ch, ch, 2)
-	call write (EX_FD(ex), ch, 1)
+	sz_val = 2
+	# arg2: incompatible pointer
+	call achtsb (ch, ch, sz_val)
+	sz_val = 1
+	call write (EX_FD(ex), ch, sz_val)
 
 	# Clean up the pointers.
 	call mfree (GIF_APTR(gif), TY_SHORT)
@@ -147,6 +162,8 @@ char	sig[7]				# GIF signature
 char	lsd[772]			# Screen and Color Map information
 short	SWidth, SHeight			# Screen width and height
 
+size_t	sz_val
+size_t	c_1
 short	stmp
 int	i, j
 
@@ -155,13 +172,17 @@ int	shifti(), ori()
 define	GIF_SIGNATURE	"GIF87a"
 
 begin
+	c_1 = 1
+
 	fd = EX_FD(ex)
 
 	# Write the GIF signature.  This is technically the "header", following
 	# this are the scene/color/image descriptors.
 	call strcpy (GIF_SIGNATURE, sig, 7)
-	call strpak (sig, sig, 7)
-	call write (fd, sig, 7/SZB_CHAR)
+	sz_val = 7
+	call strpak (sig, sig, sz_val)
+	sz_val = 7/SZB_CHAR
+	call write (fd, sig, sz_val)
 
 	# Logical Screen Descriptor.
 	SWidth = EX_OCOLS(ex)
@@ -198,8 +219,11 @@ begin
 	    }
 	}
 	lsd[772] = ','
-	call achtcb (lsd, lsd, 772)
-	call write (fd, lsd, 772/SZB_CHAR)
+	sz_val = 772
+	# arg2: incompatible pointer
+	call achtcb (lsd, lsd, sz_val)
+	sz_val = 772/SZB_CHAR
+	call write (fd, lsd, sz_val)
 
 	# Write the image header.
 	stmp = 0
@@ -214,9 +238,12 @@ begin
 	    stmp = ori (shifti(INTERLACE,8), 8)
 	else
 	    stmp = 8
-        if (BYTE_SWAP2 == YES)
-            call bswap2 (stmp, 1, stmp, 1, 2)
-	call write (fd, stmp, 1)
+        if (BYTE_SWAP2 == YES) {
+	    sz_val = 2
+            call bswap2 (stmp, c_1, stmp, c_1, sz_val)
+	}
+	sz_val = 1
+	call write (fd, stmp, sz_val)
 end
 
 
@@ -228,7 +255,8 @@ pointer	ex				#i tast struct pointer
 pointer	gif				#i gif struct pointer
 int	fd				#i output file descriptor
 
-long	fcode
+size_t	sz_val
+int	fcode
 int	i, c, ent, disp
 int	hsize_reg, hshift
 
@@ -257,7 +285,8 @@ begin
 	hshift = 8-hshift		# set hash code range bound
 
 	hsize_reg = HSIZE		# clear the hash table
-	call amovki (-1, HTAB(gif,0), HSIZE)
+	sz_val = HSIZE
+	call amovki (-1, HTAB(gif,0), sz_val)
 
 	call gif_output (fd, gif, GIF_CLEAR_CODE(gif))
 
@@ -299,7 +328,8 @@ nomatch_    call gif_output (fd, gif, ent)
 		HTAB(gif,i) = fcode
 	    } else {
 		# Clear out the hash table.
-		call amovki (-1, HTAB(gif,0), HSIZE)
+		sz_val = HSIZE
+		call amovki (-1, HTAB(gif,0), sz_val)
 		GIF_FREE_ENT(gif) = GIF_CLEAR_CODE(gif) + 2
 		GIF_CLEAR_FLAG(gif) = YES
 		call gif_output (fd, gif, GIF_CLEAR_CODE(gif))
@@ -335,6 +365,7 @@ begin
 	    op = ex_evaluate (ex, O_EXPR(ex,GIF_EXPNUM(gif)))
 	    out = ex_chtype (ex, op, TY_UBYTE)
 	    call aclrs (DATA(gif,1), O_LEN(op))
+	    # arg1: incompatible pointer
 	    call achtbu (Memc[out], DATA(gif,1), O_LEN(op))
 	    call mfree (out, TY_CHAR)
 	    call evvfree (op)
@@ -359,7 +390,8 @@ procedure gif_bump_pixel (ex, gif)
 pointer	ex				#i tast struct pointer
 pointer gif                             #i gif struct pointer
 
-int	i, row, sum
+int	i
+long	row, sum
 
 begin
 	GIF_CURX(gif) = GIF_CURX(gif) + 1
@@ -448,7 +480,7 @@ int	fd				#i output file descriptor
 pointer	gif				#i gif struct pointer
 int	code				#i code to output
 
-long	masks[17]
+int	masks[17]
 int	i
 
 int	ori(), andi(), shifti()
@@ -511,8 +543,10 @@ procedure gif_putword (fd, w)
 int	fd
 short	w
 
+size_t	sz_val
 short 	val
-int	tmp, shifti()
+int	tmp
+int	shifti()
 
 begin
 	# If this is a MSB-first machine swap the bytes before output.
@@ -523,7 +557,8 @@ begin
 	} else
 	    val = w
 
-	call write (fd, val, SZ_SHORT/SZ_CHAR)
+	sz_val = SZ_SHORT/SZ_CHAR
+	call write (fd, val, sz_val)
 end
 
 
@@ -545,12 +580,14 @@ procedure flush_char (gif)
 
 pointer	gif				#i gif struct pointer
 
+size_t	sz_val
+
 begin
 	if (GIF_A_COUNT(gif) > 0) {
 	    CDATA(gif,GIF_OFFSET(gif)) = GIF_A_COUNT(gif)
 	    GIF_OFFSET(gif) = GIF_OFFSET(gif) + 1
-	    call amovs (ACCUM(gif,0), CDATA(gif,GIF_OFFSET(gif)),
-		GIF_A_COUNT(gif))
+	    sz_val = GIF_A_COUNT(gif)
+	    call amovs (ACCUM(gif,0), CDATA(gif,GIF_OFFSET(gif)), sz_val)
 	    GIF_OFFSET(gif) = GIF_OFFSET(gif) + GIF_A_COUNT(gif)
 	    GIF_A_COUNT(gif) = 0
 	}

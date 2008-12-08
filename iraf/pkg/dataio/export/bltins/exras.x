@@ -40,11 +40,17 @@ procedure ex_ras (ex)
 
 pointer	ex					#i task struct pointer
 
+size_t	sz_val
+size_t	c_1
+long	l_val
 pointer	sp, cmap
-long	header[SZ_RASHDR]
+int	header[SZ_RASHDR]
 int	i, flags
 
+long	modl()
+
 begin
+	c_1 = 1
 	# Check to see that we have the correct number of expressions to
 	# write this format.
 	flags = EX_OUTFLAGS(ex)
@@ -60,7 +66,8 @@ begin
 	EX_OUTFLAGS(ex) = or (EX_OUTFLAGS(ex), OF_FLIPY)
 
 	# Make sure the output is padded to the nearest 16-bits.
-	if (mod (O_WIDTH(ex,1),2) != 0) {
+	l_val = 2
+	if (modl(O_WIDTH(ex,1),l_val) != 0) {
 	    do i = 1, EX_NEXPR(ex) {
 		call strcat ("//repl(0,1)", O_EXPR(ex,i), SZ_EXPSTR)
 		O_WIDTH(ex,i) = O_WIDTH(ex,i) + 1
@@ -68,43 +75,58 @@ begin
 	    EX_OCOLS(ex) = EX_OCOLS(ex) + 1
 	}
 
+	if ( MAX_INT < EX_OCOLS(ex) )
+	    call error (0, "Too large OCOLS for Sun Rasterfile.")
+	if ( MAX_INT < EX_OROWS(ex) )
+	    call error (0, "Too large OROWS for Sun Rasterfile.")
+
 	# Set the header values.
 	header[RAS_MAGIC] = RAS_MAGIC_NUM
 	header[RAS_WIDTH] = EX_OCOLS(ex)
 	header[RAS_HEIGHT] = EX_OROWS(ex)
 	header[RAS_TYPE] = RT_STANDARD
 	if (EX_NEXPR(ex) == 1 || bitset (flags, OF_BAND)) {
+	    if ( MAX_INT < EX_OCOLS(ex) * EX_OROWS(ex) )
+		call error (0, "Too large data for Sun Rasterfile.")
 	    header[RAS_LENGTH] = header[RAS_WIDTH] * header[RAS_HEIGHT]
-	    header[RAS_DEPTH] = long (8)
+	    header[RAS_DEPTH] = 8
 	} else {
+	    if ( MAX_INT < EX_OCOLS(ex) * EX_OROWS(ex) * 3 )
+		call error (0, "Too large data for Sun Rasterfile.")
 	    header[RAS_LENGTH] = header[RAS_WIDTH] * header[RAS_HEIGHT] * 3
-	    header[RAS_DEPTH] = long (24)
+	    header[RAS_DEPTH] = 24
 	    header[RAS_TYPE] = RT_FORMAT_RGB
 	}
 	if (bitset(flags, OF_CMAP)) {
 	    header[RAS_MAPTYPE] = RMT_EQUAL_RGB
-	    header[RAS_MAPLENGTH] = long (3*CMAP_SIZE)
+	    header[RAS_MAPLENGTH] = 3*CMAP_SIZE
 	} else {
 	    header[RAS_MAPTYPE] = RMT_NONE
-	    header[RAS_MAPLENGTH] = long (0)
+	    header[RAS_MAPLENGTH] = 0
 	}
 
         # Write the header to the file.  First swap it to Sun byte order if
         # needed (although the format doesn't require this), then swap it
         # if requested by the user.
-        if (BYTE_SWAP4 == YES) 
-            call bswap4 (header, 1, header, 1, (SZ_RASHDR * SZ_LONG * SZB_CHAR))
-        if (EX_BSWAP(ex) == S_I4) 
-            call bswap4 (header, 1, header, 1, (SZ_RASHDR * SZ_LONG * SZB_CHAR))
-        call write (EX_FD(ex), header, (SZ_RASHDR * SZ_LONG))
+	sz_val = SZ_RASHDR * SZ_INT * SZB_CHAR
+	if (BYTE_SWAP4 == YES) 
+	    call bswap4 (header, c_1, header, c_1, sz_val)
+	if (EX_BSWAP(ex) == S_I4) 
+	    call bswap4 (header, c_1, header, c_1, sz_val)
+
+	sz_val = SZ_RASHDR * SZ_INT
+	# arg2: incompatible pointer
+        call write (EX_FD(ex), header, sz_val)
 
 	# If we have a colormap write that out now.
 	if (bitset(flags, OF_CMAP)) {
 	    call smark (sp)
-	    call salloc (cmap, 3*CMAP_SIZE, TY_CHAR)
-
-	    call achtcb (Memc[EX_CMAP(ex)], Memc[cmap], (3 * CMAP_SIZE))
-	    call write (EX_FD(ex), Memc[cmap], ((3 * CMAP_SIZE) / SZB_CHAR))
+	    sz_val = 3*CMAP_SIZE
+	    call salloc (cmap, sz_val, TY_CHAR)
+	    # arg2: incompatible pointer
+	    call achtcb (Memc[EX_CMAP(ex)], Memc[cmap], sz_val)
+	    sz_val = (3 * CMAP_SIZE) / SZB_CHAR
+	    call write (EX_FD(ex), Memc[cmap], sz_val)
 
 	    call sfree (sp)
 	}
