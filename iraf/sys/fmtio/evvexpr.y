@@ -4354,20 +4354,35 @@ ident_
 		i_off = 1
 		junk = gctol (Memc[ip], i_off, lval, 8)
 		ip = ip + i_off - 1
-		call xvv_initop (out, c_0, TY_INT)
-		O_VALI(out) = lval
+		if ( MAX_INT < lval ) {
+		    call xvv_initop (out, c_0, TY_LONG)
+		    O_VALL(out) = lval
+		} else {
+		    call xvv_initop (out, c_0, TY_INT)
+		    O_VALI(out) = lval
+		}
 	    case LEX_DECIMAL:
 		i_off = 1
 		junk = gctol (Memc[ip], i_off, lval, 10)
 		ip = ip + i_off - 1
-		call xvv_initop (out, c_0, TY_INT)
-		O_VALI(out) = lval
+		if ( MAX_INT < lval ) {
+		    call xvv_initop (out, c_0, TY_LONG)
+		    O_VALL(out) = lval
+		} else {
+		    call xvv_initop (out, c_0, TY_INT)
+		    O_VALI(out) = lval
+		}
 	    case LEX_HEX:
 		i_off = 1
 		junk = gctol (Memc[ip], i_off, lval, 16)
 		ip = ip + i_off - 1
-		call xvv_initop (out, c_0, TY_INT)
-		O_VALI(out) = lval
+		if ( MAX_INT < lval ) {
+		    call xvv_initop (out, c_0, TY_LONG)
+		    O_VALL(out) = lval
+		} else {
+		    call xvv_initop (out, c_0, TY_INT)
+		    O_VALI(out) = lval
+		}
 
 	    case LEX_REAL:
 		ip_start = ip
