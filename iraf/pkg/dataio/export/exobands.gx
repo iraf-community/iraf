@@ -301,8 +301,13 @@ begin
 	    }
 	    if (nargs < 4)
 	        nbins = 256
-	    else
-	        nbins = O_VALI(args[4])
+	    else {
+		if ( O_TYPE(args[4]) == TY_LONG ) {
+		    nbins = O_VALL(args[4])
+		} else {
+		    nbins = O_VALI(args[4])
+		}
+	    }
             len = O_LEN(args[1])
 	    O_LEN(o) = len 
 	    O_TYPE(o) = O_TYPE(args[1])
@@ -396,7 +401,11 @@ begin
             }
 
         case BLOCK:
-            len = O_VALI(args[2])
+	    if ( O_TYPE(args[2]) == TY_LONG ) {
+		len = O_VALL(args[2])
+	    } else {
+		len = O_VALI(args[2])
+	    }
 	    O_LEN(o) = len
 	    O_TYPE(o) = O_TYPE(args[1])
 	    sz_val = len
