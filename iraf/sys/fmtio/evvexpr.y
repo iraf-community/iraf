@@ -2243,27 +2243,27 @@ pointer	out			#I output operand (function value)
 short	v_s
 short	ahivs(), alovs()
 short	ameds()
-int	aravs()
+long	aravs()
 
 int	v_i
 int	ahivi(), alovi()
 int	amedi()
-int	aravi()
+long	aravi()
 
 long	v_l
 long	ahivl(), alovl()
 long	amedl()
-int	aravl()
+long	aravl()
 
 real	v_r
 real	ahivr(), alovr()
 real	amedr()
-int	aravr()
+long	aravr()
 
 double	v_d
 double	ahivd(), alovd()
 double	amedd()
-int	aravd()
+long	aravd()
 
 
 real	mean_r, sigma_r
@@ -2910,20 +2910,20 @@ begin
 	    switch (optype) {
 
 	    case TY_SHORT:
-		v_i = aravs (Mems[O_VALP(ap)], O_LEN(ap), mean_r,sigma_r,v_r)
+		v_l = aravs (Mems[O_VALP(ap)], O_LEN(ap), mean_r,sigma_r,v_r)
 
 	    case TY_INT:
-		v_i = aravi (Memi[O_VALP(ap)], O_LEN(ap), mean_r,sigma_r,v_r)
+		v_l = aravi (Memi[O_VALP(ap)], O_LEN(ap), mean_r,sigma_r,v_r)
 
 	    case TY_REAL:
-		v_i = aravr (Memr[O_VALP(ap)], O_LEN(ap), mean_r,sigma_r,v_r)
+		v_l = aravr (Memr[O_VALP(ap)], O_LEN(ap), mean_r,sigma_r,v_r)
 
 
 	    case TY_LONG:
-		v_i = aravl (Meml[O_VALP(ap)], O_LEN(ap), mean_d,sigma_d,v_d)
+		v_l = aravl (Meml[O_VALP(ap)], O_LEN(ap), mean_d,sigma_d,v_d)
 
 	    case TY_DOUBLE:
-		v_i = aravd (Memd[O_VALP(ap)], O_LEN(ap), mean_d,sigma_d,v_d)
+		v_l = aravd (Memd[O_VALP(ap)], O_LEN(ap), mean_d,sigma_d,v_d)
 
 	    default:
 		call xvv_error1 (s_badtype, fcn)

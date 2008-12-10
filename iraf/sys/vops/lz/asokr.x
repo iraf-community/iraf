@@ -27,7 +27,7 @@ real	a[ARB]			# input array
 size_t	npix			# number of pixels
 size_t	ksel			# element to be selected
 
-size_t	lo, up, i, j, k, dummy
+long	lo, up, i, j, k, dummy
 real	temp, wtemp
 
 begin
@@ -36,7 +36,7 @@ begin
 	k  = max (lo, min (up, ksel))
 
 	# while (lo < up)
-	do dummy = 1, MAX_INT {
+	do dummy = 1, MAX_LONG {
 	    if (! (lo < up))
 		break
 

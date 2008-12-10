@@ -9,18 +9,18 @@ include	<mach.h>
 # The number of pixels remaining in the sample upon termination is returned
 # as the function value.
 
-int procedure aravi (a, npix, mean, sigma, ksig)
+long procedure aravi (a, npix, mean, sigma, ksig)
 
 int	a[ARB]			# input data array
 size_t	npix
 real	mean, sigma, ksig, deviation, lcut, hcut, lgpx
-size_t	ngpix, old_ngpix
+long	ngpix, old_ngpix
 size_t	awvgi()
 
 begin
 	lcut = -MAX_REAL				# no rejection to start
 	hcut =  MAX_REAL
-	ngpix = MAX_INT
+	ngpix = MAX_LONG
 
 	# Iteratively compute mean, sigma and reject outliers until no
 	# more pixels are rejected, or until there are no more pixels.

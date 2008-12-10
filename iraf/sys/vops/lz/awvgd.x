@@ -6,7 +6,7 @@
 # checking is performed.  The number of pixels in the sample is returned as the
 # function value.
 
-size_t procedure awvgd (a, npix, mean, sigma, lcut, hcut)
+long procedure awvgd (a, npix, mean, sigma, lcut, hcut)
 
 double	a[ARB]
 double	mean, sigma, lcut, hcut

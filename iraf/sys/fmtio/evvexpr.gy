@@ -1303,7 +1303,7 @@ $for (silrd)
 PIXEL	v_$t
 PIXEL	ahiv$t(), alov$t()
 PIXEL	amed$t()
-int	arav$t()
+long	arav$t()
 $endfor
 
 real	mean_r, sigma_r
@@ -1722,11 +1722,11 @@ begin
 	    switch (optype) {
 	    $for (sir)
 	    case TY_PIXEL:
-		v_i = arav$t (Mem$t[O_VALP(ap)], O_LEN(ap), mean_r,sigma_r,v_r)
+		v_l = arav$t (Mem$t[O_VALP(ap)], O_LEN(ap), mean_r,sigma_r,v_r)
 	    $endfor
 	    $for (ld)
 	    case TY_PIXEL:
-		v_i = arav$t (Mem$t[O_VALP(ap)], O_LEN(ap), mean_d,sigma_d,v_d)
+		v_l = arav$t (Mem$t[O_VALP(ap)], O_LEN(ap), mean_d,sigma_d,v_d)
 	    $endfor
 	    default:
 		call xvv_error1 (s_badtype, fcn)
