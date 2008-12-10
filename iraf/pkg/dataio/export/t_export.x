@@ -1058,51 +1058,66 @@ end
 # EX_PTYPE -- For a given outtype parameter return the corresponding IRAF
 # data type.
 
-define  NTYPES          6
-define  NBITPIX         4
+define	NTYPES		7
+define	NBITPIX		4
 
 int procedure ex_ptype (type, nbytes)
 
-int	type                            #i pixel type
-int	nbytes                          #i number of bytes
+int	type					#i pixel type
+int	nbytes					#i number of bytes
 
-int	i, pt, pb, ptype
-int	tindex[NTYPES], bindex[NBITPIX], ttbl[NTYPES*NBITPIX]
+int	i, pt, pb, ptype, off
+int	tindex[NTYPES], bindex[NBITPIX], ttbl[2*NTYPES*NBITPIX]
 
-data    tindex  /PT_BYTE, PT_UINT, PT_INT, PT_IEEE, PT_NATIVE, PT_SKIP/
-data    bindex  /1, 2, 4, 8/
-
-data    (ttbl(i), i= 1, 4)    /TY_UBYTE,  TY_USHORT,  TY_INT,      0/      # B
-data    (ttbl(i), i= 5, 8)    /TY_UBYTE,  TY_USHORT,    0,         0/      # U
-data    (ttbl(i), i= 9,12)    /TY_UBYTE,  TY_SHORT,   TY_INT,      0/      # I
-data    (ttbl(i), i=13,16)    /   0,         0,       TY_REAL, TY_DOUBLE/  # R
-data    (ttbl(i), i=17,20)    /   0,         0,       TY_REAL, TY_DOUBLE/  # N
-data    (ttbl(i), i=21,24)    /TY_UBYTE,  TY_USHORT,  TY_REAL, TY_DOUBLE/  # X
+data	tindex	/PT_BYTE, PT_UINT, PT_INT, PT_LONG, PT_IEEE, PT_NATIVE, PT_SKIP/
+data	bindex	/1, 2, 4, 8/
+# for 32-bit long
+data	(ttbl(i), i= 1, 4)    /TY_UBYTE,  TY_USHORT,  TY_INT,      0/      # B
+data	(ttbl(i), i= 5, 8)    /TY_UBYTE,  TY_USHORT,    0,         0/      # U
+data	(ttbl(i), i= 9,12)    /TY_UBYTE,  TY_SHORT,   TY_INT,      0/      # I
+data	(ttbl(i), i=13,16)    /TY_UBYTE,  TY_SHORT,   TY_LONG,     0/      # L
+data	(ttbl(i), i=17,20)    /   0,         0,       TY_REAL, TY_DOUBLE/  # R
+data	(ttbl(i), i=21,24)    /   0,         0,       TY_REAL, TY_DOUBLE/  # N
+data	(ttbl(i), i=25,28)    /TY_UBYTE,  TY_USHORT,  TY_REAL, TY_DOUBLE/  # X
+# for 64-bit long
+data	(ttbl(i), i=29,32)    /TY_UBYTE,  TY_USHORT,  TY_INT,  TY_LONG/    # B
+data	(ttbl(i), i=33,36)    /TY_UBYTE,  TY_USHORT,    0,         0/      # U
+data	(ttbl(i), i=37,40)    /TY_UBYTE,  TY_SHORT,   TY_INT,  TY_LONG/    # I
+data	(ttbl(i), i=41,44)    /TY_UBYTE,  TY_SHORT,   TY_INT,  TY_LONG/    # L
+data	(ttbl(i), i=45,48)    /   0,         0,       TY_REAL, TY_DOUBLE/  # R
+data	(ttbl(i), i=49,52)    /   0,         0,       TY_REAL, TY_DOUBLE/  # N
+data	(ttbl(i), i=53,56)    /TY_UBYTE,  TY_USHORT,  TY_REAL, TY_DOUBLE/  # X
 
 begin
-        if (type == 0 || nbytes == 0)           # uninitialized values
-            return (0)
+	if (type == 0 || nbytes == 0) 		# uninitialized values
+	    return (0)
 
-        pt = NTYPES
-        do i = 1, NTYPES {
-            if (tindex[i] == type)
-                pt = i
-        }
-        pb = NBITPIX
-        do i = 1, NBITPIX {
-            if (bindex[i] == nbytes)
-                pb = i
-        }
+	pt = NTYPES
+	do i = 1, NTYPES {
+	    if (tindex[i] == type)
+		pt = i
+	}
+	pb = NBITPIX
+	do i = 1, NBITPIX {
+	    if (bindex[i] == nbytes)
+		pb = i
+	}
 
-        ptype = ttbl[(pt-1)*NBITPIX+pb]
+	if ( SZ_LONG == 2 ) {
+	    off = 0	# for 32-bit long
+        } else {
+	    off = 28	# for 64-bit long
+	}
+
+	ptype = ttbl[off + (pt-1)*NBITPIX + pb]
 
 	if (DEBUG) { call eprintf("pt=%d pb=%d -> ptype=%d\n")
 	    call pargi (pt) ; call pargi (pb) ; call pargi (ptype) }
 
-        if (ptype == 0)
-            call error (0, "Invalid outtype specified.")
-        else
-            return (ptype)
+	if (ptype == 0)
+	    call error (0, "Invalid outtype specified.")
+	else
+	    return (ptype)
 end
 
 

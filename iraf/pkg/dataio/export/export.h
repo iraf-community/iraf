@@ -129,9 +129,10 @@ define  HDR_USER        4               # user defined a file
 define  PT_BYTE         1               # byte data (no conversion)
 define  PT_UINT         2               # unsigned integer
 define  PT_INT          3               # signed integer
-define  PT_IEEE         4               # ieee floating point
-define  PT_NATIVE       5               # native floating point
-define  PT_SKIP         6               # skip
+define  PT_LONG         4               # signed integer
+define  PT_IEEE         5               # ieee floating point
+define  PT_NATIVE       6               # native floating point
+define  PT_SKIP         7               # skip
 
 # EPS output params.
 define	EPS_DPI		72		# dpi resolution
