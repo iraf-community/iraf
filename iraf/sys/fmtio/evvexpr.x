@@ -4115,6 +4115,7 @@ char	numbuf[MAX_DIGITS]
 size_t	nchars, c_0
 int	token, junk, dtype, i_len, i_off
 int	stridx(), stridxs(), lexnum(), gctod(), gctol()
+long	absl()
 define	ident_ 91
 
 begin
@@ -4158,7 +4159,7 @@ ident_
 		i_off = 1
 		junk = gctol (Memc[ip], i_off, lval, 8)
 		ip = ip + i_off - 1
-		if ( MAX_INT < lval ) {
+		if ( MAX_INT <= absl(lval) ) {
 		    call xvv_initop (out, c_0, TY_LONG)
 		    O_VALL(out) = lval
 		} else {
@@ -4169,7 +4170,7 @@ ident_
 		i_off = 1
 		junk = gctol (Memc[ip], i_off, lval, 10)
 		ip = ip + i_off - 1
-		if ( MAX_INT < lval ) {
+		if ( MAX_INT <= absl(lval) ) {
 		    call xvv_initop (out, c_0, TY_LONG)
 		    O_VALL(out) = lval
 		} else {
@@ -4180,7 +4181,7 @@ ident_
 		i_off = 1
 		junk = gctol (Memc[ip], i_off, lval, 16)
 		ip = ip + i_off - 1
-		if ( MAX_INT < lval ) {
+		if ( MAX_INT <= absl(lval) ) {
 		    call xvv_initop (out, c_0, TY_LONG)
 		    O_VALL(out) = lval
 		} else {
