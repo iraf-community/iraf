@@ -7,15 +7,15 @@ include "../import.h"
 
 define	SZ_RASHDR	13
 define	RAS_MAGIC	Memi[P2I($1)]	# Magic number
-define	RAS_WIDTH	Memi[P2I($1+1)]	# Image width (pixels per line)
-define	RAS_HEIGHT	Memi[P2I($1+2)]	# Image height (number of lines)
+define	RAS_WIDTH	Meml[P2L($1+1)]	# Image width (pixels per line)
+define	RAS_HEIGHT	Meml[P2L($1+2)]	# Image height (number of lines)
 define	RAS_DEPTH	Memi[P2I($1+3)]	# Image depth (bits per pixel)
-define	RAS_LENGTH	Memi[P2I($1+4)]	# Image length (bytes)
+define	RAS_LENGTH	Meml[P2L($1+4)]	# Image length (bytes)
 define	RAS_TYPE	Memi[P2I($1+5)]	# File type
 define	RAS_MAPTYPE	Memi[P2I($1+6)]	# Colormap type
 define	RAS_MAPLENGTH	Memi[P2I($1+7)]	# Colormap length (bytes)
 
-define	RAS_CMAP	Memi[P2I($1+10)]	# Colormap (ptr)
+define	RAS_CMAP	Memp[$1+10]	# Colormap (ptr)
 define	RAS_COUNT	Memi[P2I($1+11)]	# RLE decoding var
 define	RAS_CH		Memi[P2I($1+12)]	# RLE decoding var
 
@@ -48,9 +48,15 @@ char	fname[ARB]				#i file name
 int	info_only				#i print out image info only?
 int	verbose					#i verbosity flag
 
+size_t	sz_val
+long	l_val
 pointer	ras
-int	fd, w, nchars
+int	fd
+size_t	nchars
+long	w
 pointer	ras_open()
+long	modl()
+include	<nullptr.inc>
 
 long    filepos
 common  /rascom/ filepos
@@ -62,10 +68,12 @@ begin
 
         # Initialize the file position.
         filepos = 1
-        call ip_lseek (fd, BOF)
+	l_val = BOF
+        call ip_lseek (fd, l_val)
 
 	# Read in the rasterfile header, dump it directly to the task struct.
-	call ip_ageti (fd, ras, 8)
+	sz_val = 8
+	call ip_ageti (fd, ras, sz_val)
 	filepos = filepos + SZ_INT*SZB_CHAR*8
 	call ip_lseek (fd, filepos)
 
@@ -89,7 +97,8 @@ begin
 
         # Round up to account for 16 bit line blocking.
 	w = RAS_WIDTH(ras) * (RAS_DEPTH(ras) / 8)
-        nchars = w + mod (w, SZB_CHAR)
+	l_val = SZB_CHAR
+        nchars = w + modl(w, l_val)
 
 
         # Patch up the pixtype param if needed.
@@ -129,7 +138,7 @@ begin
 	        call ras_rle24 (ip, ras, fd, nchars)
 	    } else {
 	        call ip_fix_pixtype (ip)
-	        call ip_prpix (ip, fd, IP_IM(ip), NULL)
+	        call ip_prpix (ip, fd, IP_IM(ip), NULLPTR)
 	    }
 
 	default:
@@ -158,8 +167,8 @@ begin
 #            call printf ("Input file:\n\t")
             call printf ("%s: %20t%d x %d   \t\t%d-bit Sun Rasterfile\n")
                 call pargstr (fname)
-                call pargi (RAS_WIDTH(ras))
-                call pargi (RAS_HEIGHT(ras))
+                call pargl (RAS_WIDTH(ras))
+                call pargl (RAS_HEIGHT(ras))
                 call pargi (RAS_DEPTH(ras))
 
             # Print out the format comment if any.
@@ -207,8 +216,8 @@ begin
                 call pargstr ("Least Significant Byte First")
 
         call printf ("%20tResolution:%38t%d x %d\n")
-            call pargi (RAS_WIDTH(ras))
-            call pargi (RAS_HEIGHT(ras))
+            call pargl (RAS_WIDTH(ras))
+            call pargl (RAS_HEIGHT(ras))
 
         call printf ("%20tType: %38t%d-bit %s %s\n")
 	    call pargi (RAS_DEPTH(ras))
@@ -260,10 +269,12 @@ end
 
 pointer procedure ras_open ()
 
+size_t	sz_val
 pointer	ras
 
 begin
-	iferr (call calloc (ras, SZ_RASHDR, TY_STRUCT))
+	sz_val = SZ_RASHDR
+	iferr (call calloc (ras, sz_val, TY_STRUCT))
 	    call error (0, "Error allocating RAS structure.")
 	RAS_CMAP(ras) = NULL
 
@@ -292,7 +303,7 @@ int	fd					#i file descriptor
 pointer	ras					#i RAS struct pointer
 pointer	cmap					#i colormap array ptr
 
-int	ncolors
+size_t	ncolors
 
 long    filepos
 common  /rascom/ filepos
@@ -328,10 +339,11 @@ procedure ras_rle8 (ip, ras, fd, nchars)
 pointer	ip					#i ip struct pointer
 pointer	ras					#i ras struct pointer
 int	fd					#i input file descriptor
-int	nchars					#i line size
+size_t	nchars					#i line size
 
 pointer	im, data, op
-int	i, percent
+int	percent
+long	i
 
 long    filepos
 common  /rascom/ filepos
@@ -382,10 +394,12 @@ procedure ras_rle24 (ip, ras, fd, nchars)
 pointer	ip					#i ip struct pointer
 pointer	ras					#i ras struct pointer
 int	fd					#i input file descriptor
-int	nchars					#i line size
+size_t	nchars					#i line size
 
 pointer	im, data, op
-int	i, percent, npix
+int	percent
+size_t	npix
+long	i
 
 long    filepos
 common  /rascom/ filepos
@@ -444,10 +458,11 @@ procedure ras_read_rle (ras, fd, data, nchars)
 pointer	ras					#i ras struct pointer
 int	fd					#i file descriptor
 char	data[ARB]				#u output pixels
-int	nchars					#i number of pixels to read
+size_t	nchars					#i number of pixels to read
 
-int	i
-short	pix, ras_rdbyte()
+long	i
+short	pix
+short	ras_rdbyte()
 
 long    filepos
 common  /rascom/ filepos
@@ -485,7 +500,7 @@ end
 
 short procedure ras_rdbyte (fd)
 
-int     fd                                      #i file descriptor
+int	fd                                      #i file descriptor
 
 short   val
 short   ip_getb()

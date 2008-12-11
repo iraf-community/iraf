@@ -8,41 +8,41 @@ define	MAX_OPERANDS	1024
 
 # Input format parameters.
 define	IP_INTERLEAVE 	Memi[P2I($1)]	    # type of data interleaving
-define	IP_HSKIP 	Memi[P2I($1+1)]	    # bytes to skip before data
-define	IP_TSKIP 	Memi[P2I($1+2)]	    # bytes to skip after data
-define	IP_BSKIP 	Memi[P2I($1+3)]	    # bytes between image bands
-define	IP_LSKIP 	Memi[P2I($1+4)]	    # bytes to skip at front of line
-define	IP_LPAD 	Memi[P2I($1+5)]	    # bytes to skip at end of line
+define	IP_HSKIP 	Memz[P2Z($1+1)]	    # bytes to skip before data
+define	IP_TSKIP 	Memz[P2Z($1+2)]	    # bytes to skip after data
+define	IP_BSKIP 	Memz[P2Z($1+3)]	    # bytes between image bands
+define	IP_LSKIP 	Memz[P2Z($1+4)]	    # bytes to skip at front of line
+define	IP_LPAD 	Memz[P2Z($1+5)]	    # bytes to skip at end of line
 define	IP_SWAP 	Memi[P2I($1+6)]	    # type of byte swapping
 define	IP_NPIXT	Memi[P2I($1+7)]	    # number of pixtypes
 define	IP_PIXTYPE	Memp[$1+8]	    # pixtype ptr to operands
 define  IP_NDIM 	Memi[P2I($1+9)]	    # number of input axes
-define  IP_AXLEN 	Memi[P2I(($1+10))+$2-1]  # input axis dimension
+define  IP_AXLEN 	Memz[P2Z(($1+10))+$2-1]  # input axis dimension
 
 # Output parameters.
-define	IP_OUTPUT 	Memi[P2I($1+20)]	    # type of output generated
-define	IP_OUTTYPE 	Memi[P2I($1+21)]	    # output pixel type
-define	IP_NBANDS 	Memi[P2I($1+22)]	    # no. of outbands expr string
-define	IP_OUTBANDS 	Memp[$1+23]		    # outbands expr string (ptr)
-define	IP_IMHEADER 	Memp[$1+24]		    # file w/ header info (ptr)
-define	IP_VERBOSE 	Memi[P2I($1+25)]	    # verbose output flag
+define	IP_OUTPUT 	Memi[P2I($1+20)]	# type of output generated
+define	IP_OUTTYPE 	Memi[P2I($1+21)]	# output pixel type
+define	IP_NBANDS 	Memi[P2I($1+22)]	# no. of outbands expr string
+define	IP_OUTBANDS 	Memp[$1+23]		# outbands expr string (ptr)
+define	IP_IMHEADER 	Memp[$1+24]		# file w/ header info (ptr)
+define	IP_VERBOSE 	Memi[P2I($1+25)]	# verbose output flag
 
-define	IP_FORMAT 	Memi[P2I($1+26)]	    # format param
-define	IP_BLTIN 	Memi[P2I($1+27)]	    # format is a 'builtin'
-define	IP_FCODE	Memi[P2I($1+28)]	    # builtin format code
-define	IP_FSYM 	Memp[$1+29]		    # symtab pointer to db record
-define	IP_IM 		Memp[$1+30]		    # output image pointer
-define	IP_FD 		Memi[P2I($1+31)]	    # binary file descripter
-define	IP_OFFSET	Memi[P2I($1+32)]	    # binary file offset
-define	IP_FLIP		Memi[P2I($1+33)]	    # output image orientation flag
-define	IP_COMPTR	Memp[$1+34]		    # comment block pointer
+define	IP_FORMAT 	Memi[P2I($1+26)]	# format param
+define	IP_BLTIN 	Memi[P2I($1+27)]	# format is a 'builtin'
+define	IP_FCODE	Memi[P2I($1+28)]	# builtin format code
+define	IP_FSYM 	Memp[$1+29]		# symtab pointer to db record
+define	IP_IM 		Memp[$1+30]		# output image pointer
+define	IP_FD 		Memi[P2I($1+31)]	# binary file descripter
+define	IP_OFFSET	Meml[P2L($1+32)]	# binary file offset
+define	IP_FLIP		Memi[P2I($1+33)]	# output image orientation flag
+define	IP_COMPTR	Memp[$1+34]		# comment block pointer
 
-define	IP_BUFPTR	Memp[$1+35]		    # array of image buffers (ptr)
-define	IP_NPTRS	Memi[P2I($1+36)]   	    # number of image buffer
-define	IP_SZBUF	Memi[P2I($1+37)]   	    # size of image buffer (lines)
+define	IP_BUFPTR	Memp[$1+35]		# array of image buffers (ptr)
+define	IP_NPTRS	Memi[P2I($1+36)]   	# number of image buffer
+define	IP_SZBUF	Memz[P2Z($1+37)]   	# size of image buffer (lines)
 
-define	IP_CMAP		Memp[$1+38]		    # image colormap (ptr)
-define	IP_USE_CMAP	Memi[P2I($1+39)]   	    # use the image colormap?
+define	IP_CMAP		Memp[$1+38]		# image colormap (ptr)
+define	IP_USE_CMAP	Memi[P2I($1+39)]   	# use the image colormap?
 
 # Useful Macros
 define	PTYPE		Memp[IP_PIXTYPE($1)+$2-1]
@@ -63,11 +63,13 @@ define	O_OP		OB_OP(OBANDS($1,$2))
 # Operand structure
 define	SZ_TAG		15
 define  LEN_OPERAND     6
+
 define  IO_TAG          Memp[$1]                # operand tag name
-define  IO_TYPE         Memi[P2I($1+1)]              # operand type
-define  IO_NBYTES       Memi[P2I($1+2)]              # number of bytes
-define  IO_NPIX         Memi[P2I($1+3)]              # number of pixels
+define  IO_TYPE         Memi[P2I($1+1)]         # operand type
+define  IO_NBYTES       Memi[P2I($1+2)]         # number of bytes
+define  IO_NPIX         Memz[P2Z($1+3)]         # number of pixels
 define  IO_DATA         Memp[$1+4]              # line of pixels
+
 define	OP_TAG		Memc[IO_TAG($1)]
 
 
@@ -87,7 +89,8 @@ define	S_NONE		000B		# swap nothing
 define	S_ALL		001B		# swap everything
 define	S_I2		002B		# swap short ints
 define	S_I4		004B		# swap long ints
-define  SWAP_STR        "|no|none|yes|i2|i4|"
+define	S_I8		010B		# swap long ints
+define  SWAP_STR        "|no|none|yes|i2|i4|i8|"
 
 # Image flipping flags
 define	FLIP_NONE	000B		# don't flip the image
@@ -98,9 +101,10 @@ define	FLIP_Y		002B		# flip image in Y
 define	PT_BYTE		1		# byte data (no conversion)
 define	PT_UINT		2		# unsigned integer
 define	PT_INT		3		# signed integer
-define	PT_IEEE		4		# ieee floating point
-define	PT_NATIVE	5		# native floating point
-define	PT_SKIP		6		# skip
+define	PT_LONG		4		# signed long integer
+define	PT_IEEE		5		# ieee floating point
+define	PT_NATIVE	6		# native floating point
+define	PT_SKIP		7		# skip
 
 # Default task parameters.
 define	DEF_SWAP 	S_NONE

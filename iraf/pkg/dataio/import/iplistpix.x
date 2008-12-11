@@ -7,14 +7,20 @@ include <mwset.h>
 
 procedure ip_listpix (im)
 
+pointer	im
+
+size_t	sz_val
+long	l_val
 char	wcs[SZ_FNAME]
 double	incoords[IM_MAXDIM], outcoords[IM_MAXDIM]
-int	i, j, npix, ndim, wcsndim, laxis1, fmtstat
+int	i, j, ndim, wcsndim, laxis1, fmtstat
+long	npix, k
 int	paxno[IM_MAXDIM], laxno[IM_MAXDIM]
 long	v[IM_MAXDIM], vcoords[IM_MAXDIM]
-pointer	im, line, mw, ct, fmtptrs[IM_MAXDIM]
+pointer	line, mw, ct, fmtptrs[IM_MAXDIM]
 
-int	imgnlr(), mw_stati()
+long	imgnlr()
+int	mw_stati()
 pointer	mw_openim(), mw_sctran()
 
 begin
@@ -51,8 +57,11 @@ begin
 	}
 
 	# Initialize the v vectors.
-	call amovkl (long (1), v, IM_MAXDIM)
-	call amovkl (long (1), vcoords, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, vcoords, sz_val)
 
 	# Initialize the coordinates.
 	laxis1 = 0
@@ -88,7 +97,8 @@ begin
 	# Set the format strings for the logical axes.
 	fmtstat = EOS
 	do i = 1, ndim {
-	    call malloc (fmtptrs[i], SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call malloc (fmtptrs[i], sz_val, TY_CHAR)
 	    if (fmtstat != EOF)
 	        call gargwrd (Memc[fmtptrs[i]], SZ_FNAME)
 	    else
@@ -106,12 +116,14 @@ begin
 
 	# Print the pixels.
 	while (imgnlr (im, line, v) != EOF) {
-	    do i = 1, npix {
-		incoords[laxis1] = i
-	    	if (ct == NULL)
-	    	    call amovd (incoords, outcoords, wcsndim)
-	    	else
+	    do k = 1, npix {
+		incoords[laxis1] = k
+	    	if (ct == NULL) {
+		    sz_val = wcsndim
+	    	    call amovd (incoords, outcoords, sz_val)
+		} else {
 	    	    call mw_ctrand (ct, incoords, outcoords, wcsndim)
+		}
 	    	do j = 1, ndim {	        # X, Y, Z, etc.
 	    	    call printf (Memc[fmtptrs[j]])
 	    	    if (laxno[j] == 0)
@@ -120,9 +132,10 @@ begin
 	    	        call pargd (outcoords[laxno[j]])
 	    	}
 	    	call printf (" %g\n")	        # pixel value
-	    	    call pargr (Memr[line+i-1])
+	    	    call pargr (Memr[line+k-1])
 	    }
-	    call amovl (v, vcoords, IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (v, vcoords, sz_val)
 	    do i = 1, wcsndim {
 	    	if (paxno[i] == 0)
 	    	    next

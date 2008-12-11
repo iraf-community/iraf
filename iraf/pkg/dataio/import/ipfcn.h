@@ -2,7 +2,7 @@
 
 # Format database functions.
 define	DB_FUNCTIONS	"|ctocc|ctod|ctoi|ctol|ctor|ctowrd|\
-			 |getstr|getb|getu|geti|geti2|geti4|\
+			 |getstr|getb|getu|geti|geti2|geti4|geti8|\
 			 |getr|getr4|getr8|getn|getn4|getn8|\
 			 |locate|line|skip|bswap|parameter|default|\
 			 |lsb_host|msb_host|substr|stridx|"
@@ -20,25 +20,26 @@ define	GETU		10 	# Get an unsigned short int at offset
 define	GETI		11 	# Get a signed int at offset
 define	GETI2		12 	# Get a signed int at offset
 define	GETI4		13 	# Get a long signed int at offset
+define	GETI8		14 	# Get a long long signed int at offset
 # newline
-define	GETR		15 	# Get an IEEE fp number at offset
-define	GETR4		16 	# Get an IEEE fp number at offset
-define	GETR8		17 	# Get an IEEE double precision number at offset
-define	GETN		18 	# Get a native fp number at offset
-define	GETN4		19 	# Get a native fp number at offset
-define	GETN8		20 	# Get a native double precision number at offset
+define	GETR		16 	# Get an IEEE fp number at offset
+define	GETR4		17 	# Get an IEEE fp number at offset
+define	GETR8		18 	# Get an IEEE double precision number at offset
+define	GETN		19 	# Get a native fp number at offset
+define	GETN4		20 	# Get a native fp number at offset
+define	GETN8		21 	# Get a native double precision number at offset
 # newline
-define	LOCATE		22	# Compute an offset
-define	LINE		23	# Offset of line N
-define	SKIP		24	# Move offset N-bytes
-define	BSWAP		25	# Byte swap the argument
-define	PARAMETER	26	# Return current task parameter
-define	DEFAULT		27	# Return default task parameter
+define	LOCATE		23	# Compute an offset
+define	LINE		24	# Offset of line N
+define	SKIP		25	# Move offset N-bytes
+define	BSWAP		26	# Byte swap the argument
+define	PARAMETER	27	# Return current task parameter
+define	DEFAULT		28	# Return default task parameter
 # newline
-define	LSB_HOST	29	# Host is LSB byte ordered machine
-define	MSB_HOST	30	# Host is MSB byte ordered machine
-define	SUBSTR		31	# Return a substring of the argument
-define	STRIDX		32	# Return occurance of a char within a string
+define	LSB_HOST	30	# Host is LSB byte ordered machine
+define	MSB_HOST	31	# Host is MSB byte ordered machine
+define	SUBSTR		32	# Return a substring of the argument
+define	STRIDX		33	# Return occurance of a char within a string
 
 
 # Outbands expression functions.

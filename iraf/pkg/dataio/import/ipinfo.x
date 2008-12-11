@@ -9,13 +9,13 @@ pointer	ip					#i task struct pointer
 char	fname[ARB]				#i binary file name
 int	verbose					#i verbose output?
 
+size_t	sz_val
 pointer	sp, buf
 pointer	fmt
 int	fdb
-pointer	locpr()
-int	fdb_opendb()
 
-pointer	fdb_scan_records()
+int	fdb_opendb()
+pointer	locpr(), fdb_scan_records()
 extern	ip_getop(), ip_dbfcn()
 
 begin
@@ -27,7 +27,8 @@ begin
 
 	} else {
 	    call smark (sp)
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 
 	    if (IP_FSYM(ip) == NULL) {
                 fdb = fdb_opendb ()
@@ -70,7 +71,7 @@ begin
 	        call pargstr (fname)
 	    do i = 1, IP_NDIM(ip) {
 	        call printf ("%d ")
-		    call pargi (IP_AXLEN(ip,i))
+		    call pargz (IP_AXLEN(ip,i))
 	        if (i < IP_NDIM(ip))
 	            call printf ("x ")
 	    }
@@ -107,7 +108,7 @@ begin
 	    call printf ("%20tResolution:%38t")
 	    do i = 1, IP_NDIM(ip) {
 	        call printf ("%d ")
-		    call pargi (IP_AXLEN(ip,i))
+		    call pargz (IP_AXLEN(ip,i))
 	        if (i < IP_NDIM(ip))
 	            call printf ("x ")
 	    }
@@ -123,6 +124,8 @@ begin
 	        call printf ("unsigned integer\n")
 	    case PT_INT:
 	        call printf ("signed integer\n")
+	    case PT_LONG:
+	        call printf ("signed long integer\n")
 	    case PT_IEEE:
 	        call printf ("IEEE floating point\n")
 	    case PT_NATIVE:
@@ -142,7 +145,7 @@ begin
             else
 	        call pargstr ("unknown")
 	call printf ("%20tHeader length: %38t%d bytes\n")
-	    call pargi (IP_HSKIP(ip))
+	    call pargz (IP_HSKIP(ip))
 	call printf ("%20tByte swapped: %38t%b\n")
 	    call pargb (itob(IP_SWAP(ip)))
 end
@@ -199,6 +202,8 @@ procedure ip_list_formats (fd)
 
 int	fd					#i input binary file descriptor
 
+size_t	sz_val
+long	l_val
 pointer	sp, format, idstr, alias
 pointer	fmt, ap[5]
 int	i, nsym
@@ -213,12 +218,15 @@ begin
 	cur_offset = note (fd)
 
 	call smark (sp)
-	call salloc (format, SZ_EXPR, TY_CHAR)
-	call salloc (idstr, SZ_EXPR, TY_CHAR)
-	call salloc (alias, SZ_LINE, TY_CHAR)
+	sz_val = SZ_EXPR
+	call salloc (format, sz_val, TY_CHAR)
+	call salloc (idstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (alias, sz_val, TY_CHAR)
 
         # Loop through the database records.
-	call seek (fd, BOF)
+	l_val = BOF
+	call seek (fd, l_val)
 	fmt = NULL
         call printf ("Format%15tAliases%36tFormat Identification\n")
         call printf ("------%15t-------%36t---------------------\n")			
@@ -231,7 +239,8 @@ begin
             call fdb_strip_quote (Memc[idstr], Memc[idstr], SZ_EXPR)
  
 	    # Generate a list of aliases for the format.
-	    call aclrc (Memc[alias], SZ_LINE)
+	    sz_val = SZ_LINE
+	    call aclrc (Memc[alias], sz_val)
 	    nsym = stfindall (fmt, "alias", ap, 5)
 	    if (nsym >= 1) {
 	        do i = nsym, 1, -1 {

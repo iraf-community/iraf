@@ -17,11 +17,13 @@ pointer	ip					#i task struct pointer
 char	opname[ARB]				#i operand name to retrieve
 pointer	o					#o output operand pointer
 
+size_t	sz_val
 int	i, nops, found, optype
 pointer	sp, buf
 pointer	op
 
-int	fstati(), ip_ptype(), strlen(), strncmp()
+long	fstatl()
+int	ip_ptype(), strlen(), strncmp()
 bool	streq()
 
 begin
@@ -29,11 +31,12 @@ begin
 	if (opname[1] == '$') {
 	    if (strncmp(opname, "$FSIZE", 3) == 0) {
 		O_LEN(o) = 0
-		O_TYPE(o) = TY_INT
-		O_VALI(o) = fstati (IP_FD(ip), F_FILESIZE) * SZB_CHAR
+		O_TYPE(o) = TY_LONG
+		O_VALL(o) = fstatl (IP_FD(ip), F_FILESIZE) * SZB_CHAR
 	    } else if (strncmp(opname, "$FNAME", 3) == 0) {
 	        call smark (sp)
-	        call salloc (buf, SZ_FNAME, TY_CHAR)
+		sz_val = SZ_FNAME
+	        call salloc (buf, sz_val, TY_CHAR)
 
 		call fstats (IP_FD(ip), F_FILENAME, Memc[buf], SZ_FNAME)
 
@@ -103,7 +106,8 @@ begin
 	    
 	} else {
 	    call smark (sp)
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 	    call sprintf (Memc[buf], SZ_LINE, "Unknown outbands operand `%s'\n")
 	    	call pargstr(opname) 
 	    call sfree (sp)
@@ -146,21 +150,25 @@ procedure ip_obfcn (ip, fcn, args, nargs, o)
 pointer ip                                      #i task struct pointer
 char    fcn[ARB]                                #i function to be executed
 pointer args[ARB]                               #i argument list
-int     nargs                                   #i number of arguments
+int	nargs                                   #i number of arguments
 pointer o                                       #o operand pointer
 
+size_t	sz_val
 pointer	sp, buf
 pointer	r, g, b, gray, color, cmap
-int	i, len, v_nargs, func
+int	ii, v_nargs, func
+size_t	len
+long	i
 
-int	or(), strdic()
+int	or(), strdic(), absi()
 bool	strne()
 
 define	setop_		99
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
 
         # Lookup function in dictionary.
         func = strdic (fcn, Memc[buf], SZ_LINE, OB_FUNCTIONS)
@@ -184,14 +192,14 @@ begin
         if (v_nargs > 0 && nargs != v_nargs)
             call xev_error2 ("function `%s' requires %d arguments",
                 fcn, v_nargs)
-        else if (v_nargs < 0 && nargs < abs(v_nargs))
+        else if (v_nargs < 0 && nargs < absi(v_nargs))
             call xev_error2 ("function `%s' requires at least %d arguments",
-                fcn, abs(v_nargs))
+                fcn, absi(v_nargs))
 
         if (DEBUG) {
             call eprintf ("obfcn: nargs=%d func=%d\n")
 		call pargi (nargs) ; call pargi (func)
-            do i = 1, nargs { call eprintf ("\t") ; call zzi_pevop (args[i]) }
+            do ii = 1, nargs { call eprintf("\t") ; call zzi_pevop(args[ii]) }
 	    call flush (STDERR)
         }
 

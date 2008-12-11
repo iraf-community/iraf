@@ -9,10 +9,10 @@ include "../import.h"
 procedure ip_gray_cmap (data, len, cmap)
 
 char	data[ARB]				#i pixel values
-int	len					#i how many of 'em
+size_t	len					#i how many of 'em
 pointer	cmap					#i colormap pointer
 
-int	i
+long	i
 short	val, ip_gcmap_val()
 
 begin

@@ -13,20 +13,20 @@ define	SZ_GIFSTACK		(2*MAX_CODE_ENTRIES+2)
 define	SZ_GIFCTAB		(2*MAX_CODE_ENTRIES+2)
 
 define	GIF_FD			Memi[P2I($1)]	# GIF file descriptor
-define	GIF_WIDTH		Memi[P2I($1+1)]	# Screen width
-define	GIF_HEIGHT		Memi[P2I($1+2)]	# Screen height
-define	GIF_CP			Memi[P2I($1+3)]	# Colormap pointer
+define	GIF_WIDTH		Memz[P2Z($1+1)]	# Screen width
+define	GIF_HEIGHT		Memz[P2Z($1+2)]	# Screen height
+define	GIF_CP			Memp[$1+3]	# Colormap pointer
 define	GIF_BITPIX		Memi[P2I($1+4)]	# Bits per pixel
 define	GIF_COLRES		Memi[P2I($1+5)]	# Color resolution
 define	GIF_BACKGROUND		Memi[P2I($1+6)]	# background color (unused?)
 define	GIF_ASPECT		Memi[P2I($1+7)]	# Aspect ratio
 define	GIF_IMNUM		Memi[P2I($1+8)]	# Image number
-define	GIF_CMAP		Memi[P2I($1+9)]	# Global colormap (ptr)
+define	GIF_CMAP		Memp[$1+9]	# Global colormap (ptr)
 
-define	GIF_EXTBP		Memi[P2I($1+10)]	# Extension buffer (ptr)
-define	GIF_CODEP		Memi[P2I($1+11)]	# Code table buffer (ptr)
-define	GIF_CTABP		Memi[P2I($1+12)]	# Code table (ptr)
-define	GIF_STACKP		Memi[P2I($1+13)]	# Stack (ptr)
+define	GIF_EXTBP		Memp[$1+10]	# Extension buffer (ptr)
+define	GIF_CODEP		Memp[$1+11]	# Code table buffer (ptr)
+define	GIF_CTABP		Memp[$1+12]	# Code table (ptr)
+define	GIF_STACKP		Memp[$1+13]	# Stack (ptr)
 define	GIF_CURBIT		Memi[P2I($1+14)]	# Decoder var
 define	GIF_LASTBIT		Memi[P2I($1+15)]	# Decoder var
 define	GIF_DONE		Memi[P2I($1+16)]	# Decoder var
@@ -80,10 +80,12 @@ char	fname[ARB]				#i file name
 int	info_only				#i print out image info only?
 int	verbose					#i verbosity flag
 
+long	l_val
 pointer	gif
 int	fd
 int	bitpix, use_global_cmap, interlace
-int	width, height, version
+long	width, height
+int	version
 char	ch
 short	sig[7], screen[12]
 
@@ -103,7 +105,8 @@ begin
 	# The GIF signature is verified in the database file but check it
 	# here anyway.
 	filepos = 1
-	call ip_lseek (fd, BOF)
+	l_val = BOF
+	call ip_lseek (fd, l_val)
 	if (gif_getbytes(fd, sig, 6) != OK)
 	    call error (0, "Error reading GIF magic number.")
 	if (strncmp(sig[4],"87a",3) == 0)
@@ -125,7 +128,7 @@ begin
 	GIF_ASPECT(gif)     = screen[7]
 	if (DEBUG) {
 	    call eprintf ("w:%d h:%d bpix:%d ncol:%d bkg:%d asp:%d\n")
-		call pargi(GIF_WIDTH(gif)); call pargi(GIF_HEIGHT(gif))
+		call pargz(GIF_WIDTH(gif)); call pargz(GIF_HEIGHT(gif))
 		call pargi(GIF_BITPIX(gif)); call pargi(GIF_COLRES(gif))
 		call pargi(GIF_BACKGROUND(gif)); call pargi(GIF_ASPECT(gif))
 		call flush (STDERR)
@@ -190,7 +193,7 @@ begin
 		call eprintf ("global_cmap:%d bitpix:%d  ")
 		    call pargi(use_global_cmap); call pargi(bitpix)
 		call eprintf ("interlace:%d w:%d h:%d\n")
-		    call pargi(interlace); call pargi(width); call pargi(height)
+		    call pargi(interlace); call pargl(width); call pargl(height)
 	    }
 
 	    if (info_only == NO) {
@@ -225,7 +228,7 @@ procedure ip_gif_info (ip, fname, version, width, height, colres, global,
 pointer	ip					#i task struct pointer
 char	fname[ARB]				#i file name
 int	version					#i GIF version
-int	width, height				#i image dimensions
+long	width, height				#i image dimensions
 int	colres					#i number of colormap entries
 int	global					#i image has global colormap
 int	interlace				#i image is interlaced
@@ -237,8 +240,8 @@ begin
 #            call printf ("Input file:\n\t")
             call printf ("%s: %20t%d x %d   \t\tCompuServe GIF %da format file\n")
                 call pargstr (fname)
-                call pargi (width)
-                call pargi (height)
+                call pargl (width)
+                call pargl (height)
             	call pargi (version)
 
             # Print out the format comment if any.
@@ -267,8 +270,8 @@ begin
         }
 
         call printf ("%20tResolution:%38t%d x %d\n")
-	    call pargi (width)
-	    call pargi (height)
+	    call pargl (width)
+	    call pargl (height)
 
         call printf ("%20tPixel storage: %38t%s\n")
 	    if (interlace == YES)
@@ -298,20 +301,26 @@ end
 
 pointer procedure gif_open ()
 
+size_t	sz_val
 pointer	gif
 
 begin
-	iferr (call calloc (gif, SZ_GIFSTRUCT, TY_STRUCT))
+	sz_val = SZ_GIFSTRUCT
+	iferr (call calloc (gif, sz_val, TY_STRUCT))
 	    call error (0, "Error allocating GIF structure.")
 
 	# Allocate the extension and code buffers.
-	iferr (call calloc (GIF_CODEP(gif), SZ_GIFCODE, TY_CHAR))
+	sz_val = SZ_GIFCODE
+	iferr (call calloc (GIF_CODEP(gif), sz_val, TY_CHAR))
 	    call error (0, "Error allocating GIF code buffer pointer.")
-	iferr (call calloc (GIF_EXTBP(gif), SZ_GIFEXTN, TY_CHAR))
+	sz_val = SZ_GIFEXTN
+	iferr (call calloc (GIF_EXTBP(gif), sz_val, TY_CHAR))
 	    call error (0, "Error allocating GIF extension pointer.")
-	iferr (call calloc (GIF_CTABP(gif), SZ_GIFCTAB, TY_CHAR))
+	sz_val = SZ_GIFCTAB
+	iferr (call calloc (GIF_CTABP(gif), sz_val, TY_CHAR))
 	    call error (0, "Error allocating code table pointer.")
-	iferr (call calloc (GIF_STACKP(gif), SZ_GIFSTACK, TY_CHAR))
+	sz_val = SZ_GIFSTACK
+	iferr (call calloc (GIF_STACKP(gif), sz_val, TY_CHAR))
 	    call error (0, "Error allocating GIF stack pointer.")
 
 	# Initialize some of the variables to non-zero values.
@@ -349,14 +358,14 @@ procedure gif_read_image (ip, gif, width, height, cmap, interlace)
 
 pointer	ip					#i task struct pointer
 pointer	gif					#i GIF struct pointer
-int	width, height				#i image dimensions
+long	width, height				#i image dimensions
 pointer	cmap					#i colormap pointer
 int	interlace				#i interlace flag
 
 pointer	im, op, out, data
 char	csize, pix, val
-int	i, v, xpos, ypos, pass
-int	nlines, line, percent
+int	i, v, pass, percent
+long	xpos, ypos, nlines, line
 
 pointer	ip_evaluate()
 int	gif_rdbyte(), gif_lzw_rdbyte()
@@ -477,14 +486,17 @@ pointer	gif					#i GIF struct pointer
 int	ncolors					#i number of colors to read
 pointer	cmap					#u local or global colormap ptr
 
+size_t	sz_val
 int	i
 char	rgb[3]
 int	gif_getbytes()
 
 begin
-	if (cmap == NULL)
-	    iferr (call calloc (cmap, 3*CMAP_SIZE, TY_CHAR))
+	if (cmap == NULL) {
+	    sz_val = 3*CMAP_SIZE
+	    iferr (call calloc (cmap, sz_val, TY_CHAR))
 		call error (0, "Error allocating color map.")
+	}
 
 	do i = 1, ncolors {
 	    # Read RGB colors.
@@ -510,13 +522,15 @@ pointer	gif					#i Gif struct pointer
 char	label					#i GIF extension label
 int	verbose					#i print verbose info?
 
+size_t	sz_val
 pointer	sp, buf
 int	val
 int	and(), gif_get_data_block()
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_GIFCODE, TY_CHAR)
+	sz_val = SZ_GIFCODE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	switch (label) {
 	case GE_PLAINTEXT:			# Plain Text Extension
@@ -612,6 +626,7 @@ int procedure gif_lzw_rdbyte (gif)
 
 pointer	gif					#i GIF struct pointer
 
+size_t	sz_val
 pointer	sp, buf
 int     i, count
 int	code, incode
@@ -661,7 +676,8 @@ begin
                     return (ERR)
 
 		call smark (sp)
-		call salloc (buf, 260, TY_CHAR)
+		sz_val = 260
+		call salloc (buf, sz_val, TY_CHAR)
 
 		repeat {
                     count = gif_get_data_block (gif, Memc[buf])
@@ -749,7 +765,7 @@ int	code_size				#i op code size
 
 int	i, j, count, ret
 int	val1, val2
-int	btoi(), and(), shifti(), ori ()
+int	btoi(), and(), shifti(), ori(), modi()
 int	gif_get_data_block()
 
 begin
@@ -782,7 +798,7 @@ begin
 	j = 0
         ret = 0
 	while (j < code_size) {
-	    val1 = btoi ( and (int(CODEBUF(gif,i/8)), shifti(1,mod(i,8))) != 0 )
+	    val1 = btoi ( and (int(CODEBUF(gif,i/8)), shifti(1,modi(i,8))) != 0 )
             val2 = shifti (val1, j)
             ret = ori (ret, val2)
 	    i = i + 1
@@ -865,17 +881,21 @@ int	len					#i no. of bytes to read
 
 pointer	sp, bp
 
+size_t	zlen
+long	l_val
 long    filepos
 common  /gifcom/ filepos
 
 begin
+	zlen = len
 	call smark (sp)
-	call salloc (bp, len+1, TY_CHAR)
-	call aclrc (Memc[bp], len+1)
+	call salloc (bp, zlen+1, TY_CHAR)
+	call aclrc (Memc[bp], zlen+1)
 
-	call ip_agetb (fd, bp, len)		# read the bytes
-	call amovc (Memc[bp], buffer, len)	# copy to output buffer
-	filepos = filepos + len
+	l_val = zlen
+	call ip_agetb (fd, bp, l_val)		# read the bytes
+	call amovc (Memc[bp], buffer, zlen)	# copy to output buffer
+	filepos = filepos + zlen
 	call ip_lseek (fd, filepos)
 
 	call sfree (sp)

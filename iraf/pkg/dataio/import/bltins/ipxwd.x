@@ -13,28 +13,34 @@ char	fname[ARB]				#i file name
 int	info_only				#i print out image info only?
 int	verbose					#i verbosity flag
 
+long	l_val
 int	fd
 pointer im, cmap
 int     nchars
-long	depth, cmap_entries, hdr_size
-long	hskip, lpad, width,height
+int	depth, cmap_entries, hdr_size
+long	hskip, lpad, width, height
 
-long	ip_getl()
+int	ip_geti()
+include	<nullptr.inc>
 
 begin
         # Get the input file descriptor and initialize the file position.
         fd = IP_FD(ip)
         im = IP_IM(ip)
-        call ip_lseek (fd, BOF)
+	l_val = BOF
+        call ip_lseek (fd, l_val)
 
 	# Get some information from the header we'll need for processing.
-	hdr_size = ip_getl (fd, 1)
+	l_val = 1
+	hdr_size = ip_geti (fd, l_val)
 	width = IP_AXLEN(ip,1)
 	height = IP_AXLEN(ip,2)
-	depth = ip_getl (fd, 45)
+	l_val = 45
+	depth = ip_geti (fd, l_val)
 	hskip = IP_HSKIP(ip)
 	lpad = IP_LPAD(ip)
-	cmap_entries = ip_getl (fd, 73)
+	l_val = 73
+	cmap_entries = ip_geti (fd, l_val)
 	nchars = width + lpad
 
 	# See if we really want to convert this thing.
@@ -48,7 +54,7 @@ begin
 	# we have a colormap we need to use.
 
 	if (depth > 8) {
-	    call ip_prpix (ip, fd, im, NULL)
+	    call ip_prpix (ip, fd, im, NULLPTR)
 	} else {
 	    cmap = NULL
 	    if (cmap_entries > 0)
@@ -75,8 +81,8 @@ begin
             #call printf ("Input file:\n\t")
             call printf ("%s: %20t%d x %d   \t%d-bit X11 Window Dump\n")
                 call pargstr (fname)
-                call pargi (IP_AXLEN(ip,1))
-                call pargi (IP_AXLEN(ip,2))
+                call pargz (IP_AXLEN(ip,1))
+                call pargz (IP_AXLEN(ip,2))
                 call pargi (depth)
 
             # Print out the format comment if any.
@@ -110,8 +116,8 @@ begin
                 call pargstr ("Least Significant Byte First")
 
         call printf ("%20tResolution:%38t%d x %d\n")
-            call pargi (IP_AXLEN(ip,1))
-            call pargi (IP_AXLEN(ip,2))
+            call pargz (IP_AXLEN(ip,1))
+            call pargz (IP_AXLEN(ip,2))
 
         call printf ("%20tType: %38t%d-bit %s\n")
 	    call pargi (depth)
@@ -121,7 +127,7 @@ begin
                 call pargstr ("")
 
         call printf ("%20tHeader size:%38t%d bytes\n")
-            call pargi (IP_HSKIP(ip))
+            call pargz (IP_HSKIP(ip))
 
 	if (ncolors > 0) {
            call printf ("%20tColormap:%38t%d entries\n")
@@ -148,29 +154,32 @@ int	hdr_size				#i header size
 int	ncolors					#i number of colormap entries
 pointer	cmap					#i colormap pointer
 
-int	i
-long	filepos, pixel
+size_t	sz_val
+int	i, pixel
+long	filepos
 int	r, g, b
 char	flags, pad
 
 short	ip_getb()
 int	ip_getu()
-long	ip_getl()
+int	ip_geti()
 
 define	SZ_X11_CSTRUCT	12
 
 begin
         # Now read the colormap, allocate the pointer if we need to.
 	cmap = NULL
-        if (ncolors == 0)
+        if (ncolors == 0) {
 	    return
-	else
-            call calloc (cmap, CMAP_SIZE*3, TY_CHAR)
+	} else {
+	    sz_val = CMAP_SIZE*3
+            call calloc (cmap, sz_val, TY_CHAR)
+	}
 
 	filepos = hdr_size + 3
 	call ip_lseek (fd, filepos)
 	do i = 1, ncolors {
-	    pixel = ip_getl (fd, filepos)
+	    pixel = ip_geti (fd, filepos)
 	    r = ip_getu (fd, filepos+4)
 	    g = ip_getu (fd, filepos+6)
 	    b = ip_getu (fd, filepos+8)

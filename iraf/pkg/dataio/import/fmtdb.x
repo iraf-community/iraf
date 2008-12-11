@@ -76,6 +76,7 @@ int	fd, in, out
 int	stat, nfiles
 pointer	sp, fname, buf
 pointer	dbfiles
+size_t	sz_val
 
 int	open()
 int	clplen(), clgfil()
@@ -85,8 +86,9 @@ errchk	open, clpopni
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
 
 	dbfiles = clpopni ("database")
 	nfiles = clplen (dbfiles)
@@ -124,6 +126,7 @@ procedure fdb_closedb (fd)
 
 int	fd					#i file descriptor
 
+size_t	sz_val
 pointer	sp, buf
 int	strncmp()
 
@@ -132,7 +135,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
 
 	# Get the database filename, if it's a temp file then the input
 	# was probably and list and we need to clean up.
@@ -152,28 +156,31 @@ pointer procedure fdb_get_rec (fd, format)
 int	fd					#i database file descriptor
 char	format[ARB]				#i format name
 
+size_t	sz_val
 pointer	fmt					#o format symbol table pointer
 bool    found
 char    colon
 pointer sp, key, expr, sym
 
-int     fscan(), stridx()
+int	fscan(), stridx()
 pointer stopen(), stenter()
 bool    streq()
-
 errchk  stopen, stenter, fscan
+include	<nullptr.inc>
 
 begin
 	# Allocate local storage.
         call smark (sp)
-        call salloc (key, SZ_FNAME, TY_CHAR)
-        call salloc (expr, SZ_EXPR, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (key, sz_val, TY_CHAR)
+        sz_val = SZ_EXPR
+        call salloc (expr, sz_val, TY_CHAR)
 
 	# Find format entry.
 	found = false
 	colon = ':'
 	while (fscan (fd) != EOF) {
-	    call fdb_gfield (fd, NULL, Memc[key], Memc[expr])
+	    call fdb_gfield (fd, NULLPTR, Memc[key], Memc[expr])
             if (stridx (colon, Memc[key]) > 0) {
                 call fdb_strip_colon (Memc[key], Memc[key], SZ_FNAME)
             } else if (Memc[key]=='#')  # skip comment lines
@@ -222,28 +229,31 @@ pointer procedure fdb_next_rec (fd)
 
 int	fd					#i input binary file descriptor
 
+size_t	sz_val
 pointer	fmt					# Format symbol table pointer
 char    colon
 pointer sp, key, expr, sym, tmp
 
-int     fscan(), stridx()
+int	fscan(), stridx()
 pointer stopen(), stenter()
-
 errchk  stopen, stenter, fscan
+include	<nullptr.inc>
 
 begin
         # Allocate local storage.
         call smark (sp)
-        call salloc (key, SZ_FNAME, TY_CHAR)
-        call salloc (tmp, SZ_FNAME, TY_CHAR)
-        call salloc (expr, SZ_FMTVAL, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (key, sz_val, TY_CHAR)
+        call salloc (tmp, sz_val, TY_CHAR)
+        sz_val = SZ_FMTVAL
+        call salloc (expr, sz_val, TY_CHAR)
 
 	# Skip ahead top the beginning of the next record.
         colon = ':'
         while (fscan (fd) != EOF) {
             Memc[key] = EOS
             Memc[expr] = EOS
-            call fdb_gfield (fd, NULL, Memc[key], Memc[expr])
+            call fdb_gfield (fd, NULLPTR, Memc[key], Memc[expr])
             if (stridx (colon, Memc[key]) > 0) {
                 call fdb_strip_colon (Memc[key], Memc[key], SZ_FNAME)
                 break
@@ -297,6 +307,8 @@ pointer	opdata					#i data pointer for getop
 pointer	fcn					#i user functions in evvexpr
 pointer	fcndata					#i data pointer for fcn
 
+size_t	sz_val
+long	l_val
 pointer	sp, expr, fm
 pointer	fmt, o
 
@@ -306,11 +318,14 @@ errchk	evvexpr
 
 begin
 	call smark (sp)
-	call salloc (expr, SZ_EXPR, TY_CHAR)
-	call salloc (fm, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_EXPR
+	call salloc (expr, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fm, sz_val, TY_CHAR)
 
         # Rewind the file descriptor.
-	call seek (fd, BOF)
+	l_val = BOF
+	call seek (fd, l_val)
 
         if (DEBUG) { call eprintf("scan_rec: keyw='%s' ");call pargstr(keyword)}
 
@@ -373,15 +388,18 @@ end
 
 procedure fdbgstr (fmt, param, str, maxchar)
 
-pointer	fmt					#i format symbol table pointer
-char	param[ARB]				#i format parameter
-char	str[ARB]				#o format parameter value
-int	maxchar					#i maximum characters for string
+pointer	fmt				#i format symbol table pointer
+char	param[ARB]			#i format parameter
+char	str[ARB]			#o format parameter value
+int	maxchar				#i maximum characters for string
 
-pointer	sym, stfind()
+size_t	sz_val
+pointer	sym
+pointer	stfind()
 
 begin
-	call aclrc (str, maxchar)
+	sz_val = maxchar
+	call aclrc (str, sz_val)
 	sym = stfind (fmt, param)
 	if (sym == NULL)
 	    call strcpy ("", str, maxchar)
@@ -402,11 +420,13 @@ pointer fmt                                     #i format symtab pointer
 char	keyword[ARB]				#o field keyword
 char	expr[ARB]				#o field expression
 
+size_t	sz_val
 pointer	sp, tmp
 
 begin
 	call smark (sp)
-	call salloc (tmp, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tmp, sz_val, TY_CHAR)
 
 	call gargwrd (keyword, SZ_FNAME)
 	call gargwrd (Memc[tmp], SZ_FNAME)
@@ -440,9 +460,10 @@ pointer fmt                                     #i format symtab pointer
 char	expr[ARB]				#o returned expression
 int	maxchars				#i maxchars
 
-pointer sp, ntok, tok, tokval, next_tok, last_tok
+size_t	sz_val
+pointer sp, ntok, tok
 pointer	sym
-int	level, qlevel
+int	tokval, next_tok, last_tok, level, qlevel
 
 int	fscan()
 pointer	stfind()
@@ -451,12 +472,14 @@ define	dopar_	99
 
 begin
         call smark (sp)
-        call salloc (tok, SZ_FNAME, TY_CHAR)
-        call salloc (ntok, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (tok, sz_val, TY_CHAR)
+        call salloc (ntok, sz_val, TY_CHAR)
  
 	# Gather the expression.  For now we'll just eat everything up until
 	# the closing parenthesis.
-	call aclrc (expr, maxchars)
+	sz_val = maxchars
+	call aclrc (expr, sz_val)
 
 	# An expression is made up of a numeric or symbolic constant, a
 	# quoted literal string, or some boolean or arithmetic operation.

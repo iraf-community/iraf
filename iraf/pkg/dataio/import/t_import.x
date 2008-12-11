@@ -25,6 +25,8 @@ pointer	im					# image pointer
 pointer	sp, bfname, imname			# local storage
 pointer	format, output, fmt, idstr
 
+size_t	sz_val
+long	l_val
 int	clplen(), imtlen()		# function definitions
 int	clgfil(), open()
 int	imtgetim(), fdb_opendb()
@@ -33,17 +35,19 @@ pointer	clpopni(), locpr(), imtopenp(), ip_init(), fdb_scan_records(), immap()
 
 extern	ip_getop(), ip_dbfcn()
 errchk	clpopni, clgfil, imtopenp, open, immap
+include	<nullptr.inc>
 
 define	done_		99
 
 begin
 	call smark (sp)				# local storage
-	call salloc (bfname, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (format, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (fmt, SZ_FNAME, TY_CHAR)
-	call salloc (idstr, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (bfname, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (format, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	call salloc (fmt, sz_val, TY_CHAR)
+	call salloc (idstr, sz_val, TY_CHAR)
 
 	ip = ip_init () 			# allocate task struct pointer
 
@@ -93,13 +97,15 @@ begin
 	    if (IP_FORMAT(ip) == IP_SENSE) {
 		# Scan the database and get symtab pointer to format record.
 		fdb = fdb_opendb ()
-		call ip_lseek (fdb, BOF)
+		l_val = BOF
+		call ip_lseek (fdb, l_val)
 		IP_FSYM(ip) = fdb_scan_records (fdb, "image_id",
 		    locpr(ip_getop), ip, locpr(ip_dbfcn), ip)
 		if (IP_FSYM(ip) == NULL) {
 		    # Try it byte-swapped.
                     IP_SWAP(ip) = S_ALL
-		    call ip_lseek (fdb, BOF)
+		    l_val = BOF
+		    call ip_lseek (fdb, l_val)
 		    IP_FSYM(ip) = fdb_scan_records (fdb, "image_id",
 		        locpr(ip_getop), ip, locpr(ip_dbfcn), ip)
                     IP_SWAP(ip) = NULL
@@ -113,7 +119,8 @@ begin
 		        } else {
 		            call printf (
 			    "Unrecognized format. Known formats include:\n\n")
-			    call ip_lseek (fdb, BOF)
+			    l_val = BOF
+			    call ip_lseek (fdb, l_val)
 		            call ip_list_formats (fdb)
 		            call fdb_closedb (fdb)
 		            break
@@ -155,7 +162,7 @@ begin
 		    }
 
 		    # Open the output image.
-		    iferr (im = immap(Memc[imname], NEW_IMAGE, 0)) {
+		    iferr (im = immap(Memc[imname], NEW_IMAGE, NULLPTR)) {
 			call erract (EA_WARN)
 		  	next
 		    }
@@ -188,13 +195,13 @@ begin
 		    # This is it, process the binary file.
 	            if (BAND_INTERLEAVED(ip))
 	                # Input file is band interleaved.
-		        call ip_prband (ip, IP_FD(ip), IP_IM(ip), NULL)
+		        call ip_prband (ip, IP_FD(ip), IP_IM(ip), NULLPTR)
 	            else if (LINE_INTERLEAVED(ip))
 	                # Input file is line interleaved.
-		        call ip_prline (ip, IP_FD(ip), IP_IM(ip), NULL)
+		        call ip_prline (ip, IP_FD(ip), IP_IM(ip), NULLPTR)
 	            else if (PIXEL_INTERLEAVED(ip))
 	                # Input file is pixel interleaved.
-		        call ip_prpix (ip, IP_FD(ip), IP_IM(ip), NULL)
+		        call ip_prpix (ip, IP_FD(ip), IP_IM(ip), NULLPTR)
 	            else 
 		        call error (0, "Unrecognized pixel storage.")
 
@@ -237,17 +244,20 @@ end
 
 pointer procedure ip_init ()
 
+size_t	sz_val
 pointer	ptr
 
 begin
 	# Allocate task structure pointer.
-	iferr (call calloc (ptr, SZ_IMPSTRUCT, TY_STRUCT))
+	sz_val = SZ_IMPSTRUCT
+	iferr (call calloc (ptr, sz_val, TY_STRUCT))
 	    call error (0, "Error allocating IMPORT task structure.")
 
 	# Allocate the pixtype, outbands, and buffer struct pointers.
-	call calloc (IP_PIXTYPE(ptr), MAX_OPERANDS, TY_POINTER)
-	call calloc (IP_OUTBANDS(ptr), MAX_OPERANDS, TY_POINTER)
-	call calloc (IP_BUFPTR(ptr), MAX_OPERANDS, TY_POINTER)
+	sz_val = MAX_OPERANDS
+	call calloc (IP_PIXTYPE(ptr), sz_val, TY_POINTER)
+	call calloc (IP_OUTBANDS(ptr), sz_val, TY_POINTER)
+	call calloc (IP_BUFPTR(ptr), sz_val, TY_POINTER)
 
 	# Initialize some parameters
 	IP_IM(ptr) = NULL
@@ -293,35 +303,41 @@ procedure ip_gin_pars (ip)
 
 pointer	ip					#i task struct pointer
 
+size_t	sz_val
 pointer	sp, dims, bswap, pixtype
 
 int	clgeti()
+long	clgetl()
 
 begin
 	call smark (sp)
-	call salloc (dims, SZ_FNAME, TY_CHAR)
-	call salloc (bswap, SZ_FNAME, TY_CHAR)
-	call salloc (pixtype, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (dims, sz_val, TY_CHAR)
+	call salloc (bswap, sz_val, TY_CHAR)
+	call salloc (pixtype, sz_val, TY_CHAR)
 
 	# Get the storage parameters.
-        IP_HSKIP(ip) = clgeti ("hskip")
-        IP_TSKIP(ip) = clgeti ("tskip")
-        IP_BSKIP(ip) = clgeti ("bskip")
-        IP_LSKIP(ip) = clgeti ("lskip")
-        IP_LPAD(ip) = clgeti ("lpad")
+        IP_HSKIP(ip) = clgetl ("hskip")
+        IP_TSKIP(ip) = clgetl ("tskip")
+        IP_BSKIP(ip) = clgetl ("bskip")
+        IP_LSKIP(ip) = clgetl ("lskip")
+        IP_LPAD(ip) = clgetl ("lpad")
 
         # Process the dims parameter.
-	call aclrc (Memc[dims], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[dims], sz_val)
         call clgstr ("dims", Memc[dims], SZ_FNAME)
         call ip_do_dims (ip, Memc[dims])
 
         # Process the bswap parameter.
-	call aclrc (Memc[bswap], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[bswap], sz_val)
         call clgstr ("bswap", Memc[bswap], SZ_FNAME)
         call ip_do_bswap (ip, Memc[bswap])
 
         # Process the pixtype parameter.
-	call aclrc (Memc[pixtype], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[pixtype], sz_val)
         call clgstr ("pixtype", Memc[pixtype], SZ_FNAME)
         call ip_do_pixtype (ip, Memc[pixtype])
 
@@ -350,19 +366,23 @@ procedure ip_gout_pars (ip)
 
 pointer	ip					#i task struct pointer
 
+size_t	sz_val
 pointer	sp, out, otype, obands, imhead
-int	btoi(), clgeti()
+int	btoi()
+long	clgetl()
 bool	clgetb(), streq()
 
 begin
 	call smark (sp)
-	call salloc (out, SZ_FNAME, TY_CHAR)
-	call salloc (otype, SZ_FNAME, TY_CHAR)
-	call salloc (obands, SZ_FNAME, TY_CHAR)
-	call salloc (imhead, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (out, sz_val, TY_CHAR)
+	call salloc (otype, sz_val, TY_CHAR)
+	call salloc (obands, sz_val, TY_CHAR)
+	call salloc (imhead, sz_val, TY_CHAR)
 
 	# Get the type of output to do.
-	call aclrc (Memc[out], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[out], sz_val)
 	call clgstr ("output", Memc[out], SZ_FNAME)
 	switch (Memc[out]) {
 	case 'i':
@@ -379,7 +399,8 @@ begin
 	}
 
 	# Get the output image type.
-	call aclrc (Memc[otype], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[otype], sz_val)
 	call clgstr ("outtype", Memc[otype], SZ_FNAME)
 	switch (Memc[otype]) {
 	case 'u':
@@ -403,16 +424,18 @@ begin
 	#call ip_reset_outbands (ip)
 
 	# Get optional image header info file name.
-	call aclrc (Memc[imhead], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[imhead], sz_val)
 	call clgstr ("imheader", Memc[imhead], SZ_FNAME)
 	if (streq (Memc[imhead],"")) {
 	    IP_IMHEADER(ip) = NULL
 	} else {
-	    call calloc (IP_IMHEADER(ip), SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call calloc (IP_IMHEADER(ip), sz_val, TY_CHAR)
 	    call strcpy (Memc[imhead], Memc[IP_IMHEADER(ip)], SZ_FNAME)
 	}
         IP_VERBOSE(ip) = btoi (clgetb("verbose"))
-        IP_SZBUF(ip) = clgeti ("buffer_size")
+        IP_SZBUF(ip) = clgetl ("buffer_size")
 
 	if (DEBUG) { call zzi_prstruct ("init outpars", ip) }
 	call sfree (sp)
@@ -426,6 +449,7 @@ procedure ip_reset_outbands (ip)
 
 pointer	ip					#i task struct pointer
 
+size_t	sz_val
 pointer	sp, obands
 int	i
 
@@ -434,13 +458,15 @@ begin
 	    return 
 
 	call smark (sp)
-	call salloc (obands, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (obands, sz_val, TY_CHAR)
 
 	do i = 1, IP_NBANDS(ip)
 	    call ip_free_outbands (OBANDS(ip,i))
 
 	# Process the outbands parameter.
-	call aclrc (Memc[obands], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[obands], sz_val)
 	call clgstr ("outbands", Memc[obands], SZ_FNAME)
         call ip_do_outbands (ip, Memc[obands])
 
@@ -484,6 +510,8 @@ begin
                 IP_SWAP(ip) = or (IP_SWAP(ip), S_I2)
             case 5:
                 IP_SWAP(ip) = or (IP_SWAP(ip), S_I4)
+            case 6:
+                IP_SWAP(ip) = or (IP_SWAP(ip), S_I8)
             default:
                 break
             }
@@ -499,14 +527,15 @@ pointer	ip					#i task struct pointer
 char	dims[ARB]				#i dimension string
 
 char	ch
-int	sp, ndim, npix 
-int	ctoi()
+int	sp, ndim
+long	npix 
+int	ctol()
 
 begin
 	if (DEBUG) { call eprintf("dims='%s'\n");call pargstr (dims) }
 
         ndim = 0
-        for (sp=1;  ctoi(dims[1],sp,npix) > 0;  ) {
+        for (sp=1;  ctol(dims[1],sp,npix) > 0;  ) {
             ndim = ndim + 1
             IP_AXLEN(ip,ndim) = npix
             for (ch=dims[sp];  IS_WHITE(ch) || ch == ',';  ch=dims[sp])
@@ -596,6 +625,8 @@ begin
 		IO_TYPE(op) = PT_UINT
 	    case 'i': 
 		IO_TYPE(op) = PT_INT
+	    case 'l': 
+		IO_TYPE(op) = PT_LONG
 	    case 'r': 
 		IO_TYPE(op) = PT_IEEE
 	    case 'n': 
@@ -649,6 +680,7 @@ procedure ip_do_outbands (ip, outbands)
 pointer	ip					#i task struct pointer
 char	outbands[ARB]				#i outbands string
 
+size_t	sz_val
 pointer	sp, buf
 int	i, op, nbands, level
 
@@ -666,8 +698,10 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (buf, SZ_EXPR, TY_CHAR)
-	call aclrc (Memc[buf], SZ_EXPR)
+	sz_val = SZ_EXPR
+	call salloc (buf, sz_val, TY_CHAR)
+	sz_val = SZ_EXPR
+	call aclrc (Memc[buf], sz_val)
 
 	if (DEBUG) { call eprintf("outbands='%s'\n");call pargstr(outbands) }
 
@@ -677,7 +711,8 @@ begin
 	    level = 0
 	    nbands = nbands + 1
 	    # Copy expr up to the delimiting comma into a buffer.
-	    call aclrc (Memc[buf], SZ_EXPR)
+	    sz_val = SZ_EXPR
+	    call aclrc (Memc[buf], sz_val)
 	    for (i=0; i < SZ_EXPR; i = i + 1) {
 		if (outbands[op] == '(') {
 		    level = level + 1
@@ -722,11 +757,14 @@ end
 
 procedure ip_alloc_outbands (op)
 
+size_t	sz_val
 pointer	op					#i outbands struct pointer
 
 begin
-	call calloc (op, LEN_OUTBANDS, TY_STRUCT)
-	call calloc (OB_EXPR(op), SZ_EXPR, TY_CHAR)
+	sz_val = LEN_OUTBANDS
+	call calloc (op, sz_val, TY_STRUCT)
+	sz_val = SZ_EXPR
+	call calloc (OB_EXPR(op), sz_val, TY_CHAR)
 	call ip_alloc_operand (OB_OP(op))
 end
 
@@ -748,11 +786,14 @@ end
 
 procedure ip_alloc_operand (op)
 
+size_t	sz_val
 pointer	op					#i operand struct pointer
 
 begin
-	call calloc (op, LEN_OPERAND, TY_STRUCT)
-	call calloc (IO_TAG(op), SZ_FNAME, TY_CHAR)
+	sz_val = LEN_OPERAND
+	call calloc (op, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call calloc (IO_TAG(op), sz_val, TY_CHAR)
 end
 
 

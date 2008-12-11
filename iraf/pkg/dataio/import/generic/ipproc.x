@@ -15,16 +15,18 @@ int	fd					#i inpout file descriptor
 pointer	im					#i output image pointer
 pointer	cmap					#i colormap pointer
 
-int	i, j, nlines, npix
-int	optype, nbytes_pix, percent
-int	cur_offset, band_offset, line_offset
+long	l_val
+size_t	nlines, npix
+int	ii, j, optype, nbytes_pix, percent
+long	i, cur_offset, band_offset, line_offset
 
 int	ip_ptype()
 long	ip_lnote()
 
 begin
 	# Rewind the file and skip header pixels.
-	call ip_lseek (fd, BOF)
+	l_val = BOF
+	call ip_lseek (fd, l_val)
 	call ip_lseek (fd, IP_HSKIP(ip)+1)
 
 	# Compute the offset between the same pixel in different bands.  This
@@ -46,7 +48,7 @@ begin
 
 	if (DEBUG) {
 	    call eprintf ("ip_prband: band_offset=%d curpos=%d\n")
-	        call pargi(band_offset) ; call pargi(ip_lnote(fd))
+	        call pargl(band_offset) ; call pargl(ip_lnote(fd))
 	    call zzi_prstruct ("ip_prband", ip) 
 	}
 
@@ -96,8 +98,8 @@ begin
 	    # Restore file pointer to cur_offset.
 	    call ip_lseek (fd, cur_offset)
 	}
-	do i = 1, IP_NBANDS(ip)
-	    call mfree (BUFFER(ip,i), IM_PIXTYPE(im))
+	do ii = 1, IP_NBANDS(ip)
+	    call mfree (BUFFER(ip,ii), IM_PIXTYPE(im))
 end
 
 
@@ -110,11 +112,15 @@ int	fd					#i inpout file descriptor
 pointer	im					#i output image pointer
 pointer	cmap					#i colormap pointer
 
-int	i, j, nlines, npix, percent
+long	l_val
+long	i
+size_t	nlines, npix
+int	ii, j, percent
 
 begin
 	# Rewind the file and skip header pixels.
-	call ip_lseek (fd, BOF)
+	l_val = BOF
+	call ip_lseek (fd, l_val)
 	call ip_lseek (fd, IP_HSKIP(ip)+1)
 
 	if (DEBUG) { 
@@ -153,8 +159,8 @@ begin
             #if (IP_VERBOSE(ip) == YES)
 		call ip_pstat (ip, i, percent)
 	}
-	do i = 1, IP_NBANDS(ip)
-	    call mfree (BUFFER(ip,i), IM_PIXTYPE(im))
+	do ii = 1, IP_NBANDS(ip)
+	    call mfree (BUFFER(ip,ii), IM_PIXTYPE(im))
 end
 
 
@@ -167,15 +173,20 @@ int	fd					#i inpout file descriptor
 pointer	im					#i output image pointer
 pointer	cmap					#i colormap pointer
 
+size_t	c_1
+long	l_val
+long	i
 pointer	op, data
-int	i, swap, optype, nlines
-int	percent, npix, totpix
+size_t	npix, totpix, nlines
+int	ii, swap, optype, percent
 
 int	and(), ip_ptype()
 
 begin
+	c_1 = 1
 	# Rewind the file and skip header pixels.
-	call ip_lseek (fd, BOF)
+	l_val = BOF
+	call ip_lseek (fd, l_val)
 	call ip_lseek (fd, IP_HSKIP(ip)+1)
 
 	if (DEBUG) { call eprintf ("ip_prpix:  ") }
@@ -206,7 +217,7 @@ begin
 	if (DEBUG) { 
 	    call zzi_prstruct ("ip_prpix", ip)
 	    call eprintf ("nl=%d np=%d tp=%d:\n") 
-		call pargi(nlines) ; call pargi(npix) ; call pargi(totpix)
+		call pargz(nlines) ; call pargz(npix) ; call pargz(totpix)
 	}
         do i = 1, nlines {
 
@@ -227,8 +238,8 @@ begin
 	    case TY_USHORT:
 	        call ip_agetu (fd, data, totpix)
                 if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I2) {
-                    call bswap2 (Mems[data], 1, Mems[data], 1, 
-		        (totpix*(SZ_SHORT*SZB_CHAR)))
+                    call bswap2 (Mems[data], c_1, Mems[data], c_1, 
+				 totpix*(SZ_SHORT*SZB_CHAR))
 	        }
 	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_SHORT)))
 
@@ -236,40 +247,47 @@ begin
 	    case TY_SHORT:
 	        call ip_agets (fd, data, totpix)
                 if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I2) {
-                    call bswap2 (Mems[data], 1, Mems[data], 1, 
-		        (totpix*(SZ_SHORT*SZB_CHAR)))
+                    call bswap2 (Mems[data], c_1, Mems[data], c_1, 
+				 totpix*(SZ_SHORT*SZB_CHAR))
 	        }
 	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_SHORT)))
 
 	    case TY_INT:
 	        call ip_ageti (fd, data, totpix)
-                if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4) {
-                    call bswap4 (Memi[data], 1, Memi[data], 1, 
-		        (totpix*(SZ_INT*SZB_CHAR)))
+                if (and(swap, S_ALL) == S_ALL || and(swap, S_I4) == S_I4) {
+                    call bswap4 (Memi[data], c_1, Memi[data], c_1, 
+				 totpix*(SZ_INT*SZB_CHAR))
 	        }
 	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_INT)))
 
 	    case TY_LONG:
 	        call ip_agetl (fd, data, totpix)
-                if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4) {
-                    call bswap4 (Meml[data], 1, Meml[data], 1, 
-		        (totpix*(SZ_LONG*SZB_CHAR)))
-	        }
+		if ( SZ_LONG == 2 ) {
+                    if (and(swap, S_ALL) == S_ALL || and(swap, S_I4) == S_I4) {
+                        call bswap4 (Meml[data], c_1, Meml[data], c_1, 
+				     totpix*(SZ_LONG*SZB_CHAR))
+		    }
+	        } else {
+                    if (and(swap, S_ALL) == S_ALL || and(swap, S_I8) == S_I8) {
+                        call bswap8 (Meml[data], c_1, Meml[data], c_1, 
+				     totpix*(SZ_LONG*SZB_CHAR))
+		    }
+		}
 	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_LONG)))
 
 	    case TY_REAL:
 	        call ip_agetr (fd, data, totpix)
                 if (and(swap, S_ALL) == S_ALL) {
-                    call bswap4 (Memr[data], 1, Memr[data], 1, 
-		        (totpix*(SZ_REAL*SZB_CHAR)))
+                    call bswap4 (Memr[data], c_1, Memr[data], c_1, 
+				 totpix*(SZ_REAL*SZB_CHAR))
 	        }
 	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_REAL)))
 
 	    case TY_DOUBLE:
 	        call ip_agetd (fd, data, totpix)
                 if (and(swap, S_ALL) == S_ALL) {
-                    call bswap8 (Memd[data], 1, Memd[data], 1, 
-		        (totpix*(SZ_DOUBLE*SZB_CHAR)))
+                    call bswap8 (Memd[data], c_1, Memd[data], c_1, 
+				 totpix*(SZ_DOUBLE*SZB_CHAR))
 	        }
 	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_DOUBLE)))
 
@@ -293,8 +311,8 @@ begin
 	    call mfree (data, TY_SHORT)
 	else
 	    call mfree (data, optype)
-	do i = 1, IP_NBANDS(ip)
-	    call mfree (BUFFER(ip,i), IM_PIXTYPE(im))
+	do ii = 1, IP_NBANDS(ip)
+	    call mfree (BUFFER(ip,ii), IM_PIXTYPE(im))
 end
 
 
@@ -305,11 +323,13 @@ procedure ip_probexpr (ip, im, npix, line)
 
 pointer	ip					#i task struct pointer
 pointer	im					#i output image pointer
-int	npix					#i number of output pixels
-int	line					#i line number
+size_t	npix					#i number of output pixels
+long	line					#i line number
 
 int	i
-pointer	out, ip_evaluate()
+pointer	out
+
+pointer	ip_evaluate()
 
 begin
         # Loop over outbands expressions.
@@ -333,15 +353,17 @@ procedure ip_rdline (ip, fd, pnum, npix, cmap)
 pointer	ip					#i task struct pointer
 int	fd					#i input file descriptor
 int	pnum					#i pixtype number
-int	npix					#i number of pixels to read
+size_t	npix					#i number of pixels to read
 pointer	cmap					#i colormap pointer
 
+size_t	c_1
 pointer	op, data
 int	swap, ptype
 
 int	and(), ip_ptype()
 
 begin
+	c_1 = 1
 	# Read pixels in the line and save as operand.
 	op = PTYPE(ip,pnum)
 	ptype = ip_ptype (IO_TYPE(op), IO_NBYTES(op))
@@ -361,48 +383,55 @@ begin
 	case TY_USHORT:
 	    call ip_agetu (fd, data, npix)
             if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I2) {
-                call bswap2 (Mems[data], 1, Mems[data], 1, 
-		    (npix*(SZ_SHORT*SZB_CHAR)))
+                call bswap2 (Mems[data], c_1, Mems[data], c_1, 
+			     npix*(SZ_SHORT*SZB_CHAR))
 	    }
 	    call ip_lskip (fd, (npix * (SZB_CHAR * SZ_SHORT)))
 
 	case TY_SHORT:
 	    call ip_agets (fd, data, npix)
             if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I2) {
-                call bswap2 (Mems[data], 1, Mems[data], 1, 
-		    (npix*(SZ_SHORT*SZB_CHAR)))
+                call bswap2 (Mems[data], c_1, Mems[data], c_1, 
+			     npix*(SZ_SHORT*SZB_CHAR))
 	    }
 	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_SHORT))
 
 	case TY_INT:
 	    call ip_ageti (fd, data, npix)
-            if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4) {
-                call bswap4 (Memi[data], 1, Memi[data], 1, 
-		    (npix*(SZ_INT*SZB_CHAR)))
+            if (and(swap, S_ALL) == S_ALL || and(swap, S_I4) == S_I4) {
+                call bswap4 (Memi[data], c_1, Memi[data], c_1, 
+			     npix*(SZ_INT*SZB_CHAR))
 	    }
 	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_INT))
 
 	case TY_LONG:
 	    call ip_agetl (fd, data, npix)
-            if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4) {
-                call bswap4 (Meml[data], 1, Meml[data], 1, 
-		    (npix*(SZ_LONG*SZB_CHAR)))
+	    if ( SZ_LONG == 2 ) {
+                if (and(swap, S_ALL) == S_ALL || and(swap, S_I4) == S_I4) {
+                    call bswap4 (Meml[data], c_1, Meml[data], c_1, 
+		                 npix*(SZ_LONG*SZB_CHAR))
+		}
+	    } else {
+                if (and(swap, S_ALL) == S_ALL || and(swap, S_I8) == S_I8) {
+                    call bswap8 (Meml[data], c_1, Meml[data], c_1, 
+		                 npix*(SZ_LONG*SZB_CHAR))
+		}
 	    }
 	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_LONG))
 
 	case TY_REAL:
 	    call ip_agetr (fd, data, npix)
             if (and(swap, S_ALL) == S_ALL) {
-                call bswap4 (Memr[data], 1, Memr[data], 1, 
-		    (npix*(SZ_REAL*SZB_CHAR)))
+                call bswap4 (Memr[data], c_1, Memr[data], c_1, 
+			     npix*(SZ_REAL*SZB_CHAR))
 	    }
 	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_REAL))
 
 	case TY_DOUBLE:
 	    call ip_agetd (fd, data, npix)
             if (and(swap, S_ALL) == S_ALL) {
-                call bswap8 (Memd[data], 1, Memd[data], 1, 
-		    (npix*(SZ_DOUBLE*SZB_CHAR)))
+                call bswap8 (Memd[data], c_1, Memd[data], c_1, 
+			     npix*(SZ_DOUBLE*SZB_CHAR))
 	    }
 	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_DOUBLE))
 
@@ -420,16 +449,20 @@ procedure ip_wrline (ip, im, out, npix, line, band)
 pointer	ip					#i task struct pointer
 pointer	im					#i output image pointer
 pointer	out					#i output operand pointer
-int	npix					#i number of pixels to read
-int	line					#i image line number
+size_t	npix					#i number of pixels to read
+long	line					#i image line number
 int	band					#i image band number
 
-int	i, lnum, type
-int	nldone, blnum
+long	c_1
+long	l_val0, l_val1
+int	type
+long	i, lnum, lband, lnpix
 pointer	sp, dptr, data, optr
 bool	lastline
+long	nldone, blnum
 
 int	and()
+long	modl()
 pointer	imps3s(), imps3i(), imps3l(), imps3r(), imps3d()
 pointer	ip_chtype()
 
@@ -438,6 +471,10 @@ data	nldone 	   /1/
 data	lastline   /false/
 
 begin
+	c_1 = 1
+	lband = band
+	lnpix = npix
+	
 	call smark (sp)
 
 	# The first thing we do is change the datatype of the operand to
@@ -453,8 +490,10 @@ begin
 	# See if we're flipping image in Y, and adjust the line number.
 	if (and(IP_FLIP(ip),FLIP_Y) == FLIP_Y) {
 	    lnum = IP_AXLEN(ip,2) - line + 1
-	    if (band == 1)
-	        blnum = IP_SZBUF(ip) - mod (line-1, IP_SZBUF(ip))
+	    if (band == 1) {
+		l_val0 = IP_SZBUF(ip)
+	        blnum = IP_SZBUF(ip) - modl(line-1, l_val0)
+	    }
 	    lastline = (lnum == 1)
 	} else {
 	    lnum = line
@@ -526,90 +565,76 @@ begin
             case TY_UBYTE, TY_USHORT, TY_SHORT:
                 call amovs (Mems[dptr], Mems[data+((blnum-1)*npix)], npix)
 		if (and(IP_FLIP(ip),FLIP_Y) == FLIP_Y) {
-                    data = imps3s (im, 1, npix, 
-		       max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1),
-		       max(1,lnum+min(nldone,IP_SZBUF(ip))-1),
-		       band, band)
+		    l_val0 = max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1)
+		    l_val1 = max(1,lnum+min(nldone,IP_SZBUF(ip))-1)
+                    data = imps3s (im, c_1, lnpix, l_val0, l_val1, lband, lband)
                     call amovs (Mems[BUFFER(ip,band)+(blnum-1)*npix], 
-		        Mems[data], npix*(IP_SZBUF(ip)-blnum+1))
+			        Mems[data], npix*(IP_SZBUF(ip)-blnum+1))
 		} else {
-                    data = imps3s (im, 1, npix, 
-		       min(IP_AXLEN(ip,2),(lnum-blnum+1)),
-		       min(IP_AXLEN(ip,2),lnum),
-		       band, band)
+		    l_val0 = min(IP_AXLEN(ip,2),(lnum-blnum+1))
+		    l_val1 = min(IP_AXLEN(ip,2),lnum)
+                    data = imps3s (im, c_1, lnpix, l_val0, l_val1, lband, lband)
                     call amovs (Mems[BUFFER(ip,band)], Mems[data], npix*blnum)
 		}
 
             case TY_INT:
                 call amovi (Memi[dptr], Memi[data+((blnum-1)*npix)], npix)
 		if (and(IP_FLIP(ip),FLIP_Y) == FLIP_Y) {
-                    data = imps3i (im, 1, npix, 
-		       max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1),
-		       max(1,lnum+min(nldone,IP_SZBUF(ip))-1),
-		       band, band)
+		    l_val0 = max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1)
+		    l_val1 = max(1,lnum+min(nldone,IP_SZBUF(ip))-1)
+                    data = imps3i (im, c_1, lnpix, l_val0, l_val1, lband, lband)
                     call amovi (Memi[BUFFER(ip,band)+(blnum-1)*npix], 
-		        Memi[data], npix*(IP_SZBUF(ip)-blnum+1))
+			        Memi[data], npix*(IP_SZBUF(ip)-blnum+1))
 		} else {
-                    data = imps3i (im, 1, npix, 
-		       min(IP_AXLEN(ip,2),(lnum-blnum+1)),
-		       min(IP_AXLEN(ip,2),lnum),
-		       band, band)
-                    call amovi (Memi[BUFFER(ip,band)], Memi[data], 
-			npix*blnum)
+		    l_val0 = min(IP_AXLEN(ip,2),(lnum-blnum+1))
+		    l_val1 = min(IP_AXLEN(ip,2),lnum)
+                    data = imps3i (im, c_1, lnpix, l_val0, l_val1, lband, lband)
+                    call amovi (Memi[BUFFER(ip,band)], Memi[data], npix*blnum)
 		}
 
             case TY_LONG:
                 call amovl (Meml[dptr], Meml[data+((blnum-1)*npix)], npix)
 		if (and(IP_FLIP(ip),FLIP_Y) == FLIP_Y) {
-                    data = imps3l (im, 1, npix, 
-		       max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1),
-		       max(1,lnum+min(nldone,IP_SZBUF(ip))-1),
-		       band, band)
+		    l_val0 = max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1)
+		    l_val1 = max(1,lnum+min(nldone,IP_SZBUF(ip))-1)
+                    data = imps3l (im, c_1, lnpix, l_val0, l_val1, lband, lband)
                     call amovl (Meml[BUFFER(ip,band)+(blnum-1)*npix], 
-		        Meml[data], npix*(IP_SZBUF(ip)-blnum+1))
+			        Meml[data], npix*(IP_SZBUF(ip)-blnum+1))
 		} else {
-                    data = imps3l (im, 1, npix, 
-		       min(IP_AXLEN(ip,2),(lnum-blnum+1)),
-		       min(IP_AXLEN(ip,2),lnum),
-		       band, band)
-                    call amovl (Meml[BUFFER(ip,band)], Meml[data], 
-			npix*blnum)
+		    l_val0 = min(IP_AXLEN(ip,2),(lnum-blnum+1))
+		    l_val1 = min(IP_AXLEN(ip,2),lnum)
+                    data = imps3l (im, c_1, lnpix, l_val0, l_val1, lband, lband)
+                    call amovl (Meml[BUFFER(ip,band)], Meml[data], npix*blnum)
 		}
 
             case TY_REAL:
                 call amovr (Memr[dptr], Memr[data+((blnum-1)*npix)], npix)
 		if (and(IP_FLIP(ip),FLIP_Y) == FLIP_Y) {
-                    data = imps3r (im, 1, npix, 
-		       max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1),
-		       max(1,lnum+min(nldone,IP_SZBUF(ip))-1),
-		       band, band)
+		    l_val0 = max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1)
+		    l_val1 = max(1,lnum+min(nldone,IP_SZBUF(ip))-1)
+                    data = imps3r (im, c_1, lnpix, l_val0, l_val1, lband, lband)
                     call amovr (Memr[BUFFER(ip,band)+(blnum-1)*npix], 
-		        Memr[data], npix*(IP_SZBUF(ip)-blnum+1))
+			        Memr[data], npix*(IP_SZBUF(ip)-blnum+1))
 		} else {
-                    data = imps3r (im, 1, npix, 
-		       min(IP_AXLEN(ip,2),(lnum-blnum+1)),
-		       min(IP_AXLEN(ip,2),lnum),
-		       band, band)
-                    call amovr (Memr[BUFFER(ip,band)], Memr[data], 
-			npix*blnum)
+		    l_val0 = min(IP_AXLEN(ip,2),(lnum-blnum+1))
+		    l_val1 = min(IP_AXLEN(ip,2),lnum)
+                    data = imps3r (im, c_1, lnpix, l_val0, l_val1, lband, lband)
+                    call amovr (Memr[BUFFER(ip,band)], Memr[data], npix*blnum)
 		}
 
             case TY_DOUBLE:
                 call amovd (Memd[dptr], Memd[data+((blnum-1)*npix)], npix)
 		if (and(IP_FLIP(ip),FLIP_Y) == FLIP_Y) {
-                    data = imps3d (im, 1, npix, 
-		       max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1),
-		       max(1,lnum+min(nldone,IP_SZBUF(ip))-1),
-		       band, band)
+		    l_val0 = max(1,(lnum-IP_SZBUF(ip)+1)+IP_SZBUF(ip)-1)
+		    l_val1 = max(1,lnum+min(nldone,IP_SZBUF(ip))-1)
+                    data = imps3d (im, c_1, lnpix, l_val0, l_val1, lband, lband)
                     call amovd (Memd[BUFFER(ip,band)+(blnum-1)*npix], 
-		        Memd[data], npix*(IP_SZBUF(ip)-blnum+1))
+			        Memd[data], npix*(IP_SZBUF(ip)-blnum+1))
 		} else {
-                    data = imps3d (im, 1, npix, 
-		       min(IP_AXLEN(ip,2),(lnum-blnum+1)),
-		       min(IP_AXLEN(ip,2),lnum),
-		       band, band)
-                    call amovd (Memd[BUFFER(ip,band)], Memd[data], 
-			npix*blnum)
+		    l_val0 = min(IP_AXLEN(ip,2),(lnum-blnum+1))
+		    l_val1 = min(IP_AXLEN(ip,2),lnum)
+                    data = imps3d (im, c_1, lnpix, l_val0, l_val1, lband, lband)
+                    call amovd (Memd[BUFFER(ip,band)], Memd[data], npix*blnum)
 		}
 
             }
@@ -632,10 +657,11 @@ procedure ip_upkpix (ip, ptr, npix)
 
 pointer	ip					#i task struct pointer
 pointer	ptr					#i pointer to pixels
-int	npix					#i number of pixels in line
+size_t	npix					#i number of pixels in line
 
 pointer	op[IM_MAXDIM]
-int	i, j, np, optype[IM_MAXDIM]
+int	j, np, optype[IM_MAXDIM]
+long	i
 
 int	ip_ptype()
 
@@ -726,15 +752,16 @@ procedure ip_fix_outbands (ip)
 
 pointer ip                                      #i task struct pointer
 
-pointer	sp, buf
-pointer	im
+size_t	sz_val
+pointer	sp, buf, im
 int	i, nbands
 
 define	SZ_OBSTR	2500
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
 
 	if (DEBUG) {
 	    call eprintf ("fix_outbands: npixt=%d ndim=%d inter=%d\n")
@@ -751,10 +778,12 @@ begin
 	# pixtype structure.  This way we preserve any user-defined tags on
 	# output.
 	nbands = IP_NPIXT(ip)
-	call aclrc (Memc[buf], SZ_FNAME)
+	sz_val = SZ_FNAME
+	call aclrc (Memc[buf], sz_val)
 	do i = 1, nbands {
 	    call ip_alloc_outbands (OBANDS(ip,i))
-	    call aclrc (Memc[buf], SZ_FNAME)
+	    sz_val = SZ_FNAME
+	    call aclrc (Memc[buf], sz_val)
 	    call sprintf (Memc[buf], SZ_FNAME, "b%d")
 		call pargi (i)
             call strcpy (Memc[buf], O_EXPR(ip,i), SZ_EXPR)
@@ -787,7 +816,8 @@ pointer procedure ip_chtype (op, type)
 pointer	op				#i evvexpr operand pointer
 int	type				#i new type of pointer
 
-pointer	out, coerce()
+pointer	out
+pointer	coerce()
 
 begin
 	# Allocate the pointer and coerce it so the routine works.
@@ -821,29 +851,38 @@ begin
 end
 
 
-define	NTYPES		6
-define	NBITPIX		4
-
 # IP_PTYPE -- For a given pixtype parameter return the corresponding IRAF
 # data type.
+
+define	NTYPES		7
+define	NBITPIX		4
 
 int procedure ip_ptype (type, nbytes)
 
 int	type					#i pixel type
 int	nbytes					#i number of bytes
 
-int	i, pt, pb, ptype
-int	tindex[NTYPES], bindex[NBITPIX], ttbl[NTYPES*NBITPIX]
+int	i, pt, pb, ptype, off
+int	tindex[NTYPES], bindex[NBITPIX], ttbl[2*NTYPES*NBITPIX]
 
-data	tindex 	/PT_BYTE, PT_UINT, PT_INT, PT_IEEE, PT_NATIVE, PT_SKIP/
-data	bindex 	/1, 2, 4, 8/
-
+data	tindex	/PT_BYTE, PT_UINT, PT_INT, PT_LONG, PT_IEEE, PT_NATIVE, PT_SKIP/
+data	bindex	/1, 2, 4, 8/
+# for 32-bit long
 data	(ttbl(i), i= 1, 4)    /TY_UBYTE,  TY_USHORT,  TY_INT,      0/      # B
 data	(ttbl(i), i= 5, 8)    /TY_UBYTE,  TY_USHORT,    0,         0/      # U
 data	(ttbl(i), i= 9,12)    /TY_UBYTE,  TY_SHORT,   TY_INT,      0/      # I
-data	(ttbl(i), i=13,16)    /   0,  	     0,	      TY_REAL, TY_DOUBLE/  # R
-data	(ttbl(i), i=17,20)    /   0,  	     0,       TY_REAL, TY_DOUBLE/  # N
-data	(ttbl(i), i=21,24)    /TY_UBYTE,  TY_USHORT,  TY_REAL, TY_DOUBLE/  # X
+data	(ttbl(i), i=13,16)    /TY_UBYTE,  TY_SHORT,   TY_LONG,     0/      # L
+data	(ttbl(i), i=17,20)    /   0,         0,       TY_REAL, TY_DOUBLE/  # R
+data	(ttbl(i), i=21,24)    /   0,         0,       TY_REAL, TY_DOUBLE/  # N
+data	(ttbl(i), i=25,28)    /TY_UBYTE,  TY_USHORT,  TY_REAL, TY_DOUBLE/  # X
+# for 64-bit long
+data	(ttbl(i), i=29,32)    /TY_UBYTE,  TY_USHORT,  TY_INT,  TY_LONG/    # B
+data	(ttbl(i), i=33,36)    /TY_UBYTE,  TY_USHORT,    0,         0/      # U
+data	(ttbl(i), i=37,40)    /TY_UBYTE,  TY_SHORT,   TY_INT,  TY_LONG/    # I
+data	(ttbl(i), i=41,44)    /TY_UBYTE,  TY_SHORT,   TY_INT,  TY_LONG/    # L
+data	(ttbl(i), i=45,48)    /   0,         0,       TY_REAL, TY_DOUBLE/  # R
+data	(ttbl(i), i=49,52)    /   0,         0,       TY_REAL, TY_DOUBLE/  # N
+data	(ttbl(i), i=53,56)    /TY_UBYTE,  TY_USHORT,  TY_REAL, TY_DOUBLE/  # X
 
 begin
 	if (type == 0 || nbytes == 0) 		# uninitialized values
@@ -860,7 +899,13 @@ begin
 		pb = i
 	}
 
-	ptype = ttbl[(pt-1)*NBITPIX+pb]
+	if ( SZ_LONG == 2 ) {
+	    off = 0	# for 32-bit long
+        } else {
+	    off = 28	# for 64-bit long
+	}
+
+	ptype = ttbl[off + (pt-1)*NBITPIX + pb]
 	if (ptype == 0)
 	    call error (0, "Invalid pixtype specified.")
 	else
@@ -873,8 +918,8 @@ end
 procedure ip_pstat (ip, row, percent)
 
 pointer ip                              #i task struct pointer
-int     row                             #u current row
-int     percent                         #u percent completed
+long	row                             #u current row
+int	percent                         #u percent completed
 
 begin
         # Print percent done if being verbose

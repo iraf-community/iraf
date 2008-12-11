@@ -15,9 +15,10 @@ procedure ip_mkheader (im, fname)
 pointer	im			# IMIO pointer
 char	fname[ARB]		# Image or data file name
 
-int	i, j
-pointer	ua, fd
-pointer	sp, str
+size_t	sz_val
+pointer	p_val
+int	fd
+pointer	sp, str, ua, pp, i, j
 
 int	open(), getline(), nowhite()
 pointer	immap()
@@ -28,14 +29,16 @@ begin
 	    return
 
 	ua = IM_USERAREA(im)
-	ifnoerr (fd = immap (fname, READ_ONLY, LEN_UA)) {
-	    call strcpy (Memc[IM_USERAREA(fd)], Memc[ua], LEN_UA)
-	    call imunmap (fd)
+	p_val = LEN_UA
+	ifnoerr (pp = immap (fname, READ_ONLY, p_val)) {
+	    call strcpy (Memc[IM_USERAREA(pp)], Memc[ua], LEN_UA)
+	    call imunmap (pp)
 	} else {
 	    fd = open (fname, READ_ONLY, TEXT_FILE)
 
 	    call smark (sp)
-	    call salloc (str, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (str, sz_val, TY_CHAR)
 
 	    Memc[ua] = EOS
 	    while (getline (fd, Memc[str]) != EOF) {

@@ -23,18 +23,19 @@ begin
 	    case S_ALL: 	call pargstr ("S_ALL")
 	    case S_I2: 		call pargstr ("S_I2")
 	    case S_I4: 		call pargstr ("S_I4")
+	    case S_I8: 		call pargstr ("S_I8")
 	    default: 		call pargstr ("ERR")
 	    }
 	call eprintf ("\thskip=%d tskip=%d bskip=%d lskip=%d lpad=%d\n")
-	    call pargi (IP_HSKIP(ip))
-	    call pargi (IP_TSKIP(ip))
-	    call pargi (IP_BSKIP(ip))
-	    call pargi (IP_LSKIP(ip))
-	    call pargi (IP_LPAD(ip))
+	    call pargz (IP_HSKIP(ip))
+	    call pargz (IP_TSKIP(ip))
+	    call pargz (IP_BSKIP(ip))
+	    call pargz (IP_LSKIP(ip))
+	    call pargz (IP_LPAD(ip))
 	call eprintf ("\tndim=%s  dims=(%d,%d,%d,%d,%d,%d,%d)\n")
 	    call pargi (IP_NDIM(ip))
 	    do i = 1, 7
-	        call pargi (IP_AXLEN(ip,i))
+	        call pargz (IP_AXLEN(ip,i))
 
 	call eprintf ("\toutput=%s outtype=%s imheader='%s' verbose=%d\n")
 	    switch(IP_OUTPUT(ip)) {
@@ -78,7 +79,7 @@ int	band
 
 begin
 	call eprintf ("ob=%d expr='%s' op->")
-	    call pargi (OBANDS(ip,band))
+	    call pargp (OBANDS(ip,band))
 	    call pargstr (O_EXPR(ip,band))
 	call zzi_prop (O_OP(ip,band))
 end
@@ -88,13 +89,14 @@ procedure zzi_prop (o)
 
 pointer	o			
 char	buf[8]
-int	type, ip_ptype()
+int	type
+int	ip_ptype()
 
 begin
 	call sprintf (buf, 8, " buirnx")
         type = ip_ptype(IO_TYPE(o), IO_NBYTES(o))
 	call eprintf ("(o=%d expr='%s' tag='%s' (t='%c' N=%d=>%s) Np=%d  %d)\n")
-	    call pargi (o)
+	    call pargp (o)
 	    call pargstr (Memc[OB_EXPR(o)])
 	    call pargstr (OP_TAG(o))
 	    call pargc (buf[IO_TYPE(o)+1])
@@ -109,8 +111,8 @@ begin
             case TY_DOUBLE:   call pargstr ("TY_DOUBLE")
             default:          call pargstr ("ERR")
             }
-	    call pargi (IO_NPIX(o))
-	    call pargi (IO_DATA(o))
+	    call pargz (IO_NPIX(o))
+	    call pargp (IO_DATA(o))
 	call flush (STDERR)
 end
 
@@ -121,9 +123,9 @@ pointer	o
 
 begin
 	call eprintf ("o=%d type=%d len=%d flags=%d ")
-	    call pargi (o)
+	    call pargp (o)
 	    call pargi (O_TYPE(o))
-	    call pargi (O_LEN(o))
+	    call pargz (O_LEN(o))
 	    call pargi (O_FLAGS(o))
 	switch (O_TYPE(o)) {
 	case TY_CHAR:
@@ -139,7 +141,7 @@ begin
 	case TY_DOUBLE:
 	    call eprintf ("val=%g\n") ; call pargd (O_VALD(o))
         default:
-	    call eprintf ("ptr=%d\n") ; call pargi (O_VALP(o))
+	    call eprintf ("ptr=%d\n") ; call pargp (O_VALP(o))
 	}
 	call flush (STDERR)
 end

@@ -15,24 +15,27 @@ procedure ip_eval_dbrec (ip)
 
 pointer	ip					#i task struct pointer
 
+size_t	sz_val
 int	ival
 pointer	sp, dims, pixtype, err
 pointer	np, stp, sym
 
-pointer	stname(), sthead(), stnext
+pointer	stname(), sthead(), stnext()
 int	or(), ip_dbgeti()
+long	ip_dbgetl()
 bool	streq()
 
-errchk	ip_dbgeti()
+errchk	ip_dbgeti, ip_dbgetl
 
 begin
 	call smark (sp)
-	call salloc (dims, SZ_EXPR, TY_CHAR)
-	call salloc (pixtype, SZ_EXPR, TY_CHAR)
-	call salloc (err, SZ_EXPR, TY_CHAR)
-	call aclrc (Memc[dims], SZ_EXPR)
-	call aclrc (Memc[pixtype], SZ_EXPR)
-	call aclrc (Memc[err], SZ_EXPR)
+	sz_val = SZ_EXPR
+	call salloc (dims, sz_val, TY_CHAR)
+	call salloc (pixtype, sz_val, TY_CHAR)
+	call salloc (err, sz_val, TY_CHAR)
+	call aclrc (Memc[dims], sz_val)
+	call aclrc (Memc[pixtype], sz_val)
+	call aclrc (Memc[err], sz_val)
 
 	# Load the defaults.
 	call ip_load_defaults (ip)
@@ -72,15 +75,15 @@ begin
 		streq(Memc[np],"bswap")) {
 		    next
 	    } else if (streq(Memc[np],"hskip")) {
-		IP_HSKIP(ip) = ip_dbgeti (ip, "hskip")
+		IP_HSKIP(ip) = ip_dbgetl (ip, "hskip")
 	    } else if (streq(Memc[np],"tskip")) {
-		IP_TSKIP(ip) = ip_dbgeti (ip, "tskip")
+		IP_TSKIP(ip) = ip_dbgetl (ip, "tskip")
 	    } else if (streq(Memc[np],"bskip")) {
-		IP_BSKIP(ip) = ip_dbgeti (ip, "bskip")
+		IP_BSKIP(ip) = ip_dbgetl (ip, "bskip")
 	    } else if (streq(Memc[np],"lskip")) {
-		IP_LSKIP(ip) = ip_dbgeti (ip, "lskip")
+		IP_LSKIP(ip) = ip_dbgetl (ip, "lskip")
 	    } else if (streq(Memc[np],"lpad")) {
-		IP_LPAD(ip) = ip_dbgeti (ip, "lpad")
+		IP_LPAD(ip) = ip_dbgetl (ip, "lpad")
 	    } else if (streq(Memc[np],"yflip")) {
 		if (ip_dbgeti (ip, "yflip") == YES)
 		    IP_FLIP(ip) = or (IP_FLIP(ip), FLIP_Y)
@@ -132,29 +135,35 @@ pointer	args[ARB]				#i argument list
 int	nargs					#i number of arguments
 pointer	o					#o operand pointer
 
+size_t	sz_val
+size_t	c_1
 pointer	sp, buf, outstr
 int	fd, func, v_nargs
-int	i, len, nchar, ival, cur_offset, swap
+int	i, ival, swap, ilen
+size_t	len, nchar
+long	lval, larg_1, larg_2, cur_offset
 char	ch
 short	sval
 real	rval
 double	dval
 
 short	ip_getb(), ip_gets()
-int	strdic(), ip_line(), ip_locate(), ip_getu()
+int	strdic(), ip_getu()
 int	ctoi(), ctol(), ctor(), ctod(), ctocc(), ctowrd()
-int	and(), strlen(), clgeti()
-long	ip_getl()
+int	and(), absi(), strlen(), clgeti(), ip_geti()
+long	ip_getl(), clgetl(), ip_line(), ip_locate()
 real	ip_getr(), ip_getn()
 double	ip_getd(), ip_getn8()
 bool	strne(), streq()
 
 begin
+	c_1 = 1
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call aclrc (Memc[buf], SZ_LINE)
-	call aclrc (Memc[outstr], SZ_LINE)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (outstr, sz_val, TY_CHAR)
+	call aclrc (Memc[buf], sz_val)
+	call aclrc (Memc[outstr], sz_val)
 
 	# Lookup function in dictionary.
 	func = strdic (fcn, Memc[buf], SZ_LINE, DB_FUNCTIONS)
@@ -174,7 +183,7 @@ begin
 
 	case GETSTR:
 	    v_nargs = -1
-	case GETB, GETU, GETI, GETI2, GETI4, GETR, GETR4, GETR8, 
+	case GETB, GETU, GETI, GETI2, GETI4, GETI8, GETR, GETR4, GETR8, 
 	     GETN, GETN4, GETN8:
 	        v_nargs = 1
 
@@ -197,9 +206,26 @@ begin
         if (v_nargs > 0 && nargs != v_nargs)
             call xev_error2 ("function `%s' requires %d arguments",
                 fcn, v_nargs)
-        else if (v_nargs < 0 && nargs < abs(v_nargs))
+        else if (v_nargs < 0 && nargs < absi(v_nargs))
             call xev_error2 ("function `%s' requires at least %d arguments",
-                fcn, abs(v_nargs))
+                fcn, absi(v_nargs))
+
+	larg_1 = 1
+	if ( 0 < nargs ) {
+	   if ( O_TYPE(args[1]) == TY_LONG ) {
+		larg_1 = O_VALL(args[1])
+	   } else if ( O_TYPE(args[1]) == TY_INT ) {
+		larg_1 = O_VALI(args[1])
+	   }
+	}
+	larg_2 = 1
+	if ( 1 < nargs ) {
+	   if ( O_TYPE(args[2]) == TY_LONG ) {
+		larg_2 = O_VALL(args[2])
+	   } else if ( O_TYPE(args[2]) == TY_INT ) {
+		larg_2 = O_VALI(args[2])
+	   }
+	}
 
 	fd = IP_FD(ip)
 	swap = IP_SWAP(ip)
@@ -207,7 +233,7 @@ begin
 
 	if (DEBUG) { 
 	    call eprintf ("cur_offset=%d nargs=%d func=%s swap=%d\n")
-		call pargi(cur_offset) ; call pargi(nargs)
+		call pargl(cur_offset) ; call pargi(nargs)
 		call pargstr(fcn) ; call pargi (swap)
 	    do i = 1, nargs
 	        call zzi_pevop (args[i])
@@ -218,10 +244,11 @@ begin
 	# Evaluate the function.
 	switch (func) {
         case CTOCC:		# run the fmtio equivalents of the argument
-	    if (nargs == 1)
-	        ch = ip_getb (fd, O_VALI(args[1]))
-	    else
+	    if (nargs == 1) {
+	        ch = ip_getb (fd, larg_1)
+	    } else {
 	        ch = ip_getb (fd, cur_offset)
+	    }
 	    len = ctocc (ch, Memc[outstr],  SZ_FNAME) + 1
 	    call ip_initop (o, len, TY_CHAR)
 	    call aclrc (O_VALC(o), len)
@@ -230,10 +257,11 @@ begin
 	    call ip_lseek (fd, cur_offset)
 
         case CTOWRD:
-	    if (nargs == 1)
-	        call ip_gstr (fd, O_VALI(args[1]), SZ_FNAME, Memc[outstr])
-	    else
+	    if (nargs == 1) {
+	        call ip_gstr (fd, larg_1, SZ_FNAME, Memc[outstr])
+	    } else {
 	        call ip_gstr (fd, cur_offset, SZ_FNAME, Memc[outstr])
+	    }
 	    nchar = ctowrd (Memc[outstr], i, Memc[outstr],  SZ_FNAME) + 1
 	    call ip_initop (o, nchar, TY_CHAR)
 	    call aclrc (O_VALC(o), nchar)
@@ -244,13 +272,14 @@ begin
         case CTOI:
 	    i = 1
 	    if (nargs == 1) {
-	        call ip_gstr (fd, O_VALI(args[i]), SZ_FNAME, Memc[outstr])
+	        call ip_gstr (fd, larg_1, SZ_FNAME, Memc[outstr])
 		nchar = ctoi (Memc[outstr], i, ival)
 	        cur_offset = cur_offset + nchar - 1
 	    } else if (nargs == 2) {
-	        call ip_gstr (fd, O_VALI(args[1]), O_VALI(args[2]),Memc[outstr])
+		ilen = larg_2
+	        call ip_gstr (fd, larg_1, ilen, Memc[outstr])
 		nchar = ctoi (Memc[outstr], i, ival)
-	        cur_offset = O_VALI(args[1]) + nchar - 1
+	        cur_offset = larg_1 + nchar - 1
 	    }
 	    call ip_lseek (fd, cur_offset)
 	    O_TYPE(o) = TY_INT
@@ -258,13 +287,14 @@ begin
         case CTOL:
 	    i = 1
 	    if (nargs == 1) {
-	        call ip_gstr (fd, O_VALI(args[i]), SZ_FNAME, Memc[outstr])
-		nchar = ctol (Memc[outstr], i, ival)
+	        call ip_gstr (fd, larg_1, SZ_FNAME, Memc[outstr])
+		nchar = ctol (Memc[outstr], i, lval)
 	        cur_offset = cur_offset + nchar - 1
 	    } else if (nargs == 2) {
-	        call ip_gstr (fd, O_VALI(args[1]), O_VALI(args[2]),Memc[outstr])
-		nchar = ctol (Memc[outstr], i, ival)
-	        cur_offset = O_VALI(args[1]) + nchar - 1
+		ilen = larg_2
+	        call ip_gstr (fd, larg_1, ilen, Memc[outstr])
+		nchar = ctol (Memc[outstr], i, lval)
+	        cur_offset = larg_1 + nchar - 1
 	    }
 	    call ip_lseek (fd, cur_offset)
 	    O_TYPE(o) = TY_LONG
@@ -272,13 +302,14 @@ begin
         case CTOR:
 	    i = 1
 	    if (nargs == 1) {
-	        call ip_gstr (fd, O_VALI(args[i]), SZ_FNAME, Memc[outstr])
+	        call ip_gstr (fd, larg_1, SZ_FNAME, Memc[outstr])
 		nchar = ctor (Memc[outstr], i, rval)
 	        cur_offset = cur_offset + nchar - 1
 	    } else if (nargs == 2) {
-	        call ip_gstr (fd, O_VALI(args[1]), O_VALI(args[2]),Memc[outstr])
+		ilen = larg_2
+	        call ip_gstr (fd, larg_1, ilen, Memc[outstr])
 		nchar = ctor (Memc[outstr], i, rval)
-	        cur_offset = O_VALI(args[1]) + nchar - 1
+	        cur_offset = larg_1 + nchar - 1
 	    }
 	    call ip_lseek (fd, cur_offset)
 	    O_TYPE(o) = TY_REAL
@@ -286,30 +317,34 @@ begin
         case CTOD:
 	    i = 1
 	    if (nargs == 1) {
-	        call ip_gstr (fd, O_VALI(args[i]), SZ_FNAME, Memc[outstr])
+	        call ip_gstr (fd, larg_1, SZ_FNAME, Memc[outstr])
 		nchar = ctod (Memc[outstr], i, dval)
 	        cur_offset = cur_offset + nchar - 1
 	    } else if (nargs == 2) {
-	        call ip_gstr (fd, O_VALI(args[1]), O_VALI(args[2]),Memc[outstr])
+		ilen = larg_2
+	        call ip_gstr (fd, larg_1, ilen, Memc[outstr])
 		nchar = ctod (Memc[outstr], i, dval)
-	        cur_offset = O_VALI(args[1]) + nchar - 1
+	        cur_offset = larg_1 + nchar - 1
 	    }
 	    call ip_lseek (fd, cur_offset)
 	    O_TYPE(o) = TY_DOUBLE
 
         case GETSTR:
 	    if (nargs == 1) {
-		call ip_gstr (fd, cur_offset, O_VALI(args[1]), Memc[outstr])
-	        cur_offset = cur_offset + O_VALI(args[1])
+		ilen = larg_1
+		call ip_gstr (fd, cur_offset, ilen, Memc[outstr])
+	        cur_offset = cur_offset + larg_1
 	    } else if (nargs == 2) {
-		call ip_gstr (fd, O_VALI(args[1]), O_VALI(args[2]),Memc[outstr])
-	        cur_offset = O_VALI(args[1]) + O_VALI(args[2]) - 1
+		ilen = larg_2
+		call ip_gstr(fd, larg_1, ilen, Memc[outstr])
+	        cur_offset = larg_1 + larg_2 - 1
 	    }
 	    if (strlen(Memc[outstr]) == 0) {
 		len = strlen ("ERR") + 1
 	        call ip_initop (o, len, TY_CHAR)
 		call aclrc (O_VALC(o), len)
-	        call strcpy ("ERR", O_VALC(o), len-1)
+		ilen = len-1
+	        call strcpy ("ERR", O_VALC(o), ilen)
 	    } else {
 		len = strlen (Memc[outstr]) + 1
 	        call ip_initop (o, len, TY_CHAR)
@@ -322,8 +357,8 @@ begin
 		sval = ip_getb (fd, cur_offset)
 	        cur_offset = cur_offset + SZB_CHAR
 	    } else {
-		sval = ip_getb (fd, O_VALI(args[1]))
-	        cur_offset = O_VALI(args[1]) + SZB_CHAR
+		sval = ip_getb (fd, larg_1)
+	        cur_offset = larg_1 + SZB_CHAR
 	    }
 	    ival = sval
 	    O_TYPE(o) = TY_INT
@@ -333,11 +368,13 @@ begin
 		sval = short (ip_getu (fd, cur_offset))
 	        cur_offset = cur_offset + (SZB_CHAR * SZ_SHORT)
 	    } else {
-		sval = short (ip_getu (fd, O_VALI(args[1])))
-	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_SHORT)
+		sval = short (ip_getu (fd, larg_1))
+	        cur_offset = larg_1 + (SZB_CHAR * SZ_SHORT)
 	    }
-	    if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I2)
-	    	call bswap2 (sval, 1, sval, 1, (SZ_SHORT*SZB_CHAR))
+	    if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I2) {
+		sz_val = SZ_SHORT*SZB_CHAR
+	    	call bswap2 (sval, c_1, sval, c_1, sz_val)
+	    }
 	    ival = sval
 	    O_TYPE(o) = TY_INT
 
@@ -346,36 +383,58 @@ begin
 		sval = ip_gets (fd, cur_offset)
 	        cur_offset = cur_offset + (SZB_CHAR * SZ_SHORT)
 	    } else {
-		sval = ip_gets (fd, O_VALI(args[1]))
-	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_SHORT)
+		sval = ip_gets (fd, larg_1)
+	        cur_offset = larg_1 + (SZB_CHAR * SZ_SHORT)
 	    }
-	    if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I2) 
-		call bswap2 (sval, 1, sval, 1, (SZ_SHORT*SZB_CHAR))
+	    if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I2) {
+		sz_val = SZ_SHORT*SZB_CHAR
+		call bswap2 (sval, c_1, sval, c_1, sz_val)
+	    }
 	    ival = sval
 	    O_TYPE(o) = TY_INT
 
         case GETI4:
 	    if (nargs == 0) {
-		ival = ip_getl (fd, cur_offset)
+		ival = ip_geti (fd, cur_offset)
+	        cur_offset = cur_offset + (SZB_CHAR * SZ_INT)
+	    } else {
+		ival = ip_geti (fd, larg_1)
+	        cur_offset = larg_1 + (SZB_CHAR * SZ_INT)
+	    }
+	    if (and(swap, S_ALL) == S_ALL || and(swap, S_I4) == S_I4) {
+		sz_val = SZ_INT*SZB_CHAR
+		call bswap4 (ival, c_1, ival, c_1, sz_val)
+	    }
+	    O_TYPE(o) = TY_INT
+
+        case GETI8:
+	    if ( SZ_LONG == 2 ) {
+		call error (0, "Cannot handle 64-bit integer.")
+	    }
+	    if (nargs == 0) {
+		lval = ip_getl (fd, cur_offset)
 	        cur_offset = cur_offset + (SZB_CHAR * SZ_LONG)
 	    } else {
-		ival = ip_getl (fd, O_VALI(args[1]))
-	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_LONG)
+		lval = ip_getl (fd, larg_1)
+	        cur_offset = larg_1 + (SZB_CHAR * SZ_LONG)
 	    }
-	    if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4)
-		call bswap4 (ival, 1, ival, 1, (SZ_INT*SZB_CHAR))
-	    O_TYPE(o) = TY_INT
+	    if (and(swap, S_ALL) == S_ALL || and(swap, S_I8) == S_I8) {
+		sz_val = SZ_LONG*SZB_CHAR
+		call bswap8 (lval, c_1, lval, c_1, sz_val)
+	    }
+	    O_TYPE(o) = TY_LONG
 
         case GETR, GETR4:
 	    if (nargs == 0) {
 		rval = ip_getr (fd, cur_offset)
 	        cur_offset = cur_offset + (SZB_CHAR * SZ_REAL)
 	    } else {
-		rval = ip_getr (fd, O_VALI(args[1]))
-	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_REAL)
+		rval = ip_getr (fd, larg_1)
+	        cur_offset = larg_1 + (SZB_CHAR * SZ_REAL)
 	    }
 	    if (and(swap, S_ALL) == S_ALL) {	# handle byte-swapping
-		call bswap4 (rval, 1, rval, 1, (SZ_REAL*SZB_CHAR))
+		sz_val = SZ_REAL*SZB_CHAR
+		call bswap4 (rval, c_1, rval, c_1, sz_val)
 	    }
 	    O_TYPE(o) = TY_REAL
 
@@ -384,11 +443,12 @@ begin
 		dval = ip_getd (fd, cur_offset)
 	        cur_offset = cur_offset + (SZB_CHAR * SZ_DOUBLE)
 	    } else {
-		dval = ip_getd (fd, O_VALI(args[1]))
-	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_DOUBLE)
+		dval = ip_getd (fd, larg_1)
+	        cur_offset = larg_1 + (SZB_CHAR * SZ_DOUBLE)
 	    }
 	    if (and(swap, S_ALL) == S_ALL) {	# handle byte-swapping
-		call bswap8 (dval, 1, dval, 1, (SZ_DOUBLE*SZB_CHAR))
+		sz_val = SZ_DOUBLE*SZB_CHAR
+		call bswap8 (dval, c_1, dval, c_1, sz_val)
 	    }
 	    O_TYPE(o) = TY_DOUBLE
 
@@ -397,11 +457,12 @@ begin
 		rval = ip_getn (fd, cur_offset)
 	        cur_offset = cur_offset + (SZB_CHAR * SZ_REAL)
 	    } else {
-		rval = ip_getn (fd, O_VALI(args[1]))
-	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_REAL)
+		rval = ip_getn (fd, larg_1)
+	        cur_offset = larg_1 + (SZB_CHAR * SZ_REAL)
 	    }
 	    if (and(swap, S_ALL) == S_ALL) {	# handle byte-swapping
-		call bswap4 (rval, 1, rval, 1, (SZ_REAL*SZB_CHAR))
+		sz_val = SZ_REAL*SZB_CHAR
+		call bswap4 (rval, c_1, rval, c_1, sz_val)
 	    }
 	    O_TYPE(o) = TY_REAL
 
@@ -410,49 +471,61 @@ begin
 		dval = ip_getn8 (fd, cur_offset)
 	        cur_offset = cur_offset + (SZB_CHAR * SZ_DOUBLE)
 	    } else {
-		dval = ip_getn8 (fd, O_VALI(args[1]))
-	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_DOUBLE)
+		dval = ip_getn8 (fd, larg_1)
+	        cur_offset = larg_1 + (SZB_CHAR * SZ_DOUBLE)
 	    }
 	    if (and(swap, S_ALL) == S_ALL) {	# handle byte-swapping
-		call bswap8 (dval, 1, dval, 1, (SZ_DOUBLE*SZB_CHAR))
+		sz_val = SZ_DOUBLE*SZB_CHAR
+		call bswap8 (dval, c_1, dval, c_1, sz_val)
 	    }
 	    O_TYPE(o) = TY_DOUBLE
 
         case LOCATE: 			# locate the pattern in the file
-	    if (nargs == 1)
-	        ival = ip_locate (fd, cur_offset, O_VALC(args[1]))
-	    else if (nargs == 2)
-	        ival = ip_locate (fd, O_VALI(args[1]), O_VALC(args[2]))
-	    if (ival == ERR)
-		ival = 1
-	    O_TYPE(o) = TY_INT
-	    cur_offset = ival
+	    if (nargs == 1) {
+	        lval = ip_locate (fd, cur_offset, O_VALC(args[1]))
+	    } else if (nargs == 2) {
+	        lval = ip_locate (fd, larg_1, O_VALC(args[2]))
+	    }
+	    if (lval == ERR)
+		lval = 1
+	    O_TYPE(o) = TY_LONG
+	    cur_offset = lval
 
         case LINE: 			# locate the line no. in the file
-	    ival = ip_line (fd, O_VALI(args[1]))
-	    if (ival == ERR)
-		ival = 1
-	    O_TYPE(o) = TY_INT
-	    cur_offset = ival
+	    lval = ip_line (fd, larg_1)
+	    if (lval == ERR)
+		lval = 1
+	    O_TYPE(o) = TY_LONG
+	    cur_offset = lval
 
         case SKIP: 			# skip a certain number of bytes
-	    ival = O_VALI(args[1])
-	    O_TYPE(o) = TY_INT
-	    cur_offset = cur_offset + ival
+	    lval = larg_1
+	    O_TYPE(o) = TY_LONG
+	    cur_offset = cur_offset + lval
 
         case BSWAP: 			# byte-swap argument
 	    O_TYPE(o) = O_TYPE(args[1])
 	    switch (O_TYPE(args[1])) {
 	    case TY_SHORT:
-		call bswap2 (O_VALS(args[1]), 1, sval, 1, (SZ_SHORT*SZB_CHAR))
+		sz_val = SZ_SHORT*SZB_CHAR
+		call bswap2 (O_VALS(args[1]), c_1, sval, c_1, sz_val)
 	    case TY_INT:
-		call bswap4 (O_VALI(args[1]), 1, ival, 1, (SZ_INT*SZB_CHAR))
+		sz_val = SZ_INT*SZB_CHAR
+		call bswap4 (O_VALI(args[1]), c_1, ival, c_1, sz_val)
 	    case TY_LONG:
-		call bswap4 (O_VALL(args[1]), 1, ival, 1, (SZ_LONG*SZB_CHAR))
+		if ( SZ_LONG == 2 ) {
+		    sz_val = SZ_LONG*SZB_CHAR
+		    call bswap4 (O_VALL(args[1]), c_1, lval, c_1, sz_val)
+		} else {
+		    sz_val = SZ_LONG*SZB_CHAR
+		    call bswap8 (O_VALL(args[1]), c_1, lval, c_1, sz_val)
+		}
 	    case TY_REAL:
-		call bswap4 (O_VALR(args[1]), 1, rval, 1, (SZ_REAL*SZB_CHAR))
+		sz_val = SZ_REAL*SZB_CHAR
+		call bswap4 (O_VALR(args[1]), c_1, rval, c_1, sz_val)
 	    case TY_DOUBLE:
-		call bswap8 (O_VALD(args[1]), 1, dval, 1, (SZ_DOUBLE*SZB_CHAR))
+		sz_val = SZ_DOUBLE*SZB_CHAR
+		call bswap8 (O_VALD(args[1]), c_1, dval, c_1, sz_val)
 	    }
 
         case PARAMETER: 		# return current task parameter value
@@ -460,12 +533,14 @@ begin
 		call clgstr ("dims", Memc[outstr], SZ_FNAME)
 		len = strlen (Memc[outstr]) + 1
 	        call ip_initop (o, len, TY_CHAR)
-	        call strcpy (Memc[outstr], O_VALC(o), len)
+		ilen = len
+	        call strcpy (Memc[outstr], O_VALC(o), ilen)
 	    } else if (streq(O_VALC(args[1]),"pixtype")) {
 		call clgstr ("pixtype", Memc[outstr], SZ_FNAME)
 		len = strlen (Memc[outstr]) + 1
 	        call ip_initop (o, len, TY_CHAR)
-	        call strcpy (Memc[outstr], O_VALC(o), len)
+		ilen = len
+	        call strcpy (Memc[outstr], O_VALC(o), ilen)
 	    } else if (streq(O_VALC(args[1]),"interleave")) {
 		ival = clgeti ("interleave")
 		O_TYPE(o) = TY_INT
@@ -477,28 +552,28 @@ begin
 		    ival = NO
 		O_TYPE(o) = TY_BOOL
 	    } else if (streq(O_VALC(args[1]),"hskip")) {
-		ival = clgeti ("hskip")
-		O_TYPE(o) = TY_INT
+		lval = clgetl ("hskip")
+		O_TYPE(o) = TY_LONG
 	    } else if (streq(O_VALC(args[1]),"tskip")) {
-		ival = clgeti ("tskip")
-		O_TYPE(o) = TY_INT
+		lval = clgetl ("tskip")
+		O_TYPE(o) = TY_LONG
 	    } else if (streq(O_VALC(args[1]),"bskip")) {
-		ival = clgeti ("bskip")
-		O_TYPE(o) = TY_INT
+		lval = clgetl ("bskip")
+		O_TYPE(o) = TY_LONG
 	    } else if (streq(O_VALC(args[1]),"lskip")) {
-		ival = clgeti ("lskip")
-		O_TYPE(o) = TY_INT
+		lval = clgetl ("lskip")
+		O_TYPE(o) = TY_LONG
 	    } else if (streq(O_VALC(args[1]),"lpad")) {
-		ival = clgeti ("lpad")
-		O_TYPE(o) = TY_INT
+		lval = clgetl ("lpad")
+		O_TYPE(o) = TY_LONG
 	    }
 
         case DEFAULT: 			# return default task parameter value
 	    if (streq(O_VALC(args[1]),"dims")) {
-	        call ip_initop (o, 1, TY_CHAR)
+	        call ip_initop (o, c_1, TY_CHAR)
 	        call strcpy ("", O_VALC(o), 1)
 	    } else if (streq(O_VALC(args[1]),"pixtype")) {
-	        call ip_initop (o, 1, TY_CHAR)
+	        call ip_initop (o, c_1, TY_CHAR)
 	        call strcpy ("", O_VALC(o), 1)
 	    } else if (streq(O_VALC(args[1]),"interleave")) {
 		ival = DEF_INTERLEAVE
@@ -507,20 +582,20 @@ begin
 		ival = DEF_SWAP
 		O_TYPE(o) = TY_INT
 	    } else if (streq(O_VALC(args[1]),"hskip")) {
-		ival = DEF_HSKIP
-		O_TYPE(o) = TY_INT
+		lval = DEF_HSKIP
+		O_TYPE(o) = TY_LONG
 	    } else if (streq(O_VALC(args[1]),"tskip")) {
-		ival = DEF_TSKIP
-		O_TYPE(o) = TY_INT
+		lval = DEF_TSKIP
+		O_TYPE(o) = TY_LONG
 	    } else if (streq(O_VALC(args[1]),"bskip")) {
-		ival = DEF_BSKIP
-		O_TYPE(o) = TY_INT
+		lval = DEF_BSKIP
+		O_TYPE(o) = TY_LONG
 	    } else if (streq(O_VALC(args[1]),"lskip")) {
-		ival = DEF_LSKIP
-		O_TYPE(o) = TY_INT
+		lval = DEF_LSKIP
+		O_TYPE(o) = TY_LONG
 	    } else if (streq(O_VALC(args[1]),"lpad")) {
-		ival = DEF_LPAD
-		O_TYPE(o) = TY_INT
+		lval = DEF_LPAD
+		O_TYPE(o) = TY_LONG
 	    }
 
         case LSB_HOST: 			# host is an LSB byte ordered machine
@@ -551,7 +626,7 @@ begin
 	case TY_INT, TY_BOOL:
 	    O_VALI(o) = ival
 	case TY_LONG:
-	    O_VALL(o) = ival
+	    O_VALL(o) = lval
 	case TY_REAL:
 	    O_VALR(o) = rval
 	case TY_DOUBLE:
@@ -574,20 +649,23 @@ char	param[ARB]				#i parameter to evaluate
 char	outstr[ARB]				#o result string
 int	maxch					#i max length of string
 
+size_t	sz_val
 pointer sp, expr, o
 
-int     strlen()
+int	strlen()
 pointer locpr(), evvexpr()
 extern  ip_getop(), ip_dbfcn()
 errchk  evvexpr
 
 begin
         call smark (sp)
-        call salloc (expr, SZ_EXPR, TY_CHAR)
-        call aclrc (Memc[expr], SZ_EXPR)
+        sz_val = SZ_EXPR
+        call salloc (expr, sz_val, TY_CHAR)
+        call aclrc (Memc[expr], sz_val)
 
         # Get the requested parameter.
-        call aclrc (outstr, SZ_EXPR)
+	sz_val = SZ_EXPR
+        call aclrc (outstr, sz_val)
         call fdbgstr (IP_FSYM(ip), param, Memc[expr], SZ_EXPR)
         if (Memc[expr] == EOS)
             call error (1, "FDBGET: Format parameter not found")
@@ -601,10 +679,12 @@ begin
         iferr {
             o = evvexpr (Memc[expr], locpr(ip_getop), ip,
                 locpr(ip_dbfcn), ip, EV_RNGCHK)
-            if (O_TYPE(o) != TY_CHAR)
+            if (O_TYPE(o) != TY_CHAR) {
                 call error (0, "ip_dbstr: Expression must be a string valued")
-	    else
-                call amovc (O_VALC(o), outstr, (min(strlen(O_VALC(o)),maxch)))
+	    } else {
+		sz_val = min(strlen(O_VALC(o)),maxch)
+                call amovc (O_VALC(o), outstr, sz_val)
+	    }
          } then
              call erract (EA_WARN)
 
@@ -623,6 +703,7 @@ int procedure ip_dbgeti (ip, param)
 pointer	ip					#i task struct pointer
 char	param[ARB]				#i requested parameter
 
+size_t	sz_val
 int	val
 pointer	sp, expr, o
 
@@ -632,7 +713,8 @@ errchk	evvexpr
 
 begin
 	call smark (sp)
-	call salloc (expr, SZ_EXPR, TY_CHAR)
+	sz_val = SZ_EXPR
+	call salloc (expr, sz_val, TY_CHAR)
 
 	# Get the requested parameter.
         call fdbgstr (IP_FSYM(ip), param, Memc[expr], SZ_EXPR)
@@ -671,6 +753,63 @@ begin
 end
 
 
+# IP_DBGETL -- Get long integer valued format parameter from the database.
+
+long procedure ip_dbgetl (ip, param)
+
+pointer	ip					#i task struct pointer
+char	param[ARB]				#i requested parameter
+
+size_t	sz_val
+long	val
+pointer	sp, expr, o
+
+pointer	locpr(), evvexpr()
+extern	ip_getop(), ip_dbfcn()
+errchk	evvexpr
+
+begin
+	call smark (sp)
+	sz_val = SZ_EXPR
+	call salloc (expr, sz_val, TY_CHAR)
+
+	# Get the requested parameter.
+        call fdbgstr (IP_FSYM(ip), param, Memc[expr], SZ_EXPR)
+        if (Memc[expr] == EOS)
+	    call error (1, "IP_DBGET: Format parameter not found")
+
+	# Evaluate the expression.
+	if (DEBUG) {
+	    call eprintf ("ip_dbget: expr='%s'\n")
+		call pargstr (Memc[expr])
+	    call flush (STDERR)
+	}
+        iferr {
+            o = evvexpr (Memc[expr], locpr(ip_getop), ip, 
+		locpr(ip_dbfcn), ip, EV_RNGCHK)
+            if (O_TYPE(o) == TY_BOOL) {
+		val = O_VALI(o)
+	    } else if (O_TYPE(o) != TY_LONG && O_TYPE(o) != TY_SHORT) {
+                call error (0, "Expression must be an integer")
+	    } else
+		val = O_VALL(o)
+
+	    if (DEBUG) {
+	        call eprintf ("ip_dbget: val=%d type=%d ecpr=:%s:\n")
+		    call pargl (val)
+		    call pargi (O_TYPE(o))
+		    call pargstr (Memc[expr])
+	        call flush (STDERR)
+	    }
+        } then 
+             call erract (EA_WARN)
+
+	call evvfree (o)
+	call sfree (sp)
+	return (val)
+end
+
+
 # IP_DBGETR -- Get real valued format parameter from the database.
 
 real procedure ip_dbgetr (ip, param)
@@ -678,6 +817,7 @@ real procedure ip_dbgetr (ip, param)
 pointer	ip					#i task struct pointer
 char	param[ARB]				#i requested parameter
 
+size_t	sz_val
 real	val
 pointer	sp, expr, o
 
@@ -687,7 +827,8 @@ errchk	evvexpr
 
 begin
 	call smark (sp)
-	call salloc (expr, SZ_EXPR, TY_CHAR)
+	sz_val = SZ_EXPR
+	call salloc (expr, sz_val, TY_CHAR)
 
 	# Get the requested parameter.
         call fdbgstr (IP_FSYM(ip), param, Memc[expr], SZ_EXPR)
@@ -771,19 +912,22 @@ procedure ip_do_comment (ip, comstr)
 pointer	ip					#i task struct pointer
 char	comstr[ARB]				#i comment to add
 
+size_t	sz_val
 pointer	sp, buf
 
 begin
 	# Copy the comment line to the comment block.
+	sz_val = SZ_COMMENT
 	if (IP_COMPTR(ip) == NULL)
-	    call calloc (IP_COMPTR(ip), SZ_COMMENT, TY_CHAR)
+	    call calloc (IP_COMPTR(ip), sz_val, TY_CHAR)
 
 	if (COMMENT(ip) == '\0') {
 	    call strcpy ("\t", COMMENT(ip), SZ_LINE)
 	    call strcat (comstr, COMMENT(ip), SZ_LINE)
 	} else { 
 	    call smark (sp)
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 
 	    Memc[buf] = '\0'
 	    call strcpy ("\t", Memc[buf], SZ_LINE)
@@ -803,7 +947,7 @@ end
 procedure ip_initop (o, len, type)
 
 pointer	o				#u operand pointer
-int	len				#i length of array
+size_t	len				#i length of array
 int	type				#i data type of operand
 
 begin

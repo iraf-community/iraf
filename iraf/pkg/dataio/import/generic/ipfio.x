@@ -9,27 +9,37 @@ define	DEBUG	false
 
 procedure ip_gstr (fd, offset, len, outstr)
 
-int     fd
-int	offset
+int	fd
+long	offset
 int	len
 char    outstr[ARB]
 
-int     nstat
+size_t	sz_val
+long	l_val
+size_t	c_1, c_2
+long	nstat
 pointer sp, buf
 long	read()
+long	modl()
 
 begin
+	c_1 = 1
+	c_2 = 2
         call smark (sp)
-        call salloc (buf, len+2, TY_CHAR)
-	call aclrc (Memc[buf], len+2)
-	call aclrc (outstr, len+2)
+	sz_val = len+2
+        call salloc (buf, sz_val, TY_CHAR)
+	call aclrc (Memc[buf], sz_val)
+	call aclrc (outstr, sz_val)
 
         call ip_lseek (fd, offset)
-        nstat = read (fd, Memc[buf], len)
+	sz_val = len
+        nstat = read (fd, Memc[buf], sz_val)
 
-        if (mod(offset,2) == 0 && offset > 1)
-            call bytmov (Memc[buf], 2, Memc[buf], 1, len)
-        call chrupk (Memc[buf], 1, outstr, 1, len)
+	sz_val = len
+	l_val = 2
+        if (modl(offset,l_val) == 0 && offset > 1)
+            call bytmov (Memc[buf], c_2, Memc[buf], c_1, sz_val)
+        call chrupk (Memc[buf], c_1, outstr, c_1, sz_val)
 
 	if (DEBUG) { call eprintf ("ip_gstr: :%s: len=%d\n"); 
 	    call pargstr(outstr) ; call pargi (len) }
@@ -41,21 +51,27 @@ end
 
 short procedure ip_getb (fd, offset)
 
-int     fd
-int	offset
+int	fd
+long	offset
 
-int     nstat
+long	l_val
+size_t	c_1, c_2
 short	val
+long	nstat
 char    buf[2]
 long	read()
+long	modl()
 
 begin
+	c_1 = 1
+	c_2 = 2
         call ip_lseek (fd, offset)
-        nstat = read (fd, buf, 2)
+        nstat = read (fd, buf, c_2)
 
-        if (mod(offset,2) == 0)
-            call bytmov (buf, 2, buf, 1, 2)
-        call chrupk (buf, 1, buf, 1, 2)
+	l_val = 2
+        if (modl(offset,l_val) == 0)
+            call bytmov (buf, c_2, buf, c_1, c_2)
+        call chrupk (buf, c_1, buf, c_1, c_2)
 
 	if (DEBUG) { call eprintf ("ip_getb: %d\n"); call pargs(buf[1]) }
 	if (buf[1] < 0)
@@ -70,8 +86,8 @@ end
 
 int procedure ip_getu (fd, offset)
 
-int     fd
-int	offset
+int	fd
+long	offset
 
 int	val
 short	ip_gets()
@@ -89,16 +105,18 @@ end
 
 short procedure ip_gets (fd, offset)
 
-int     fd
-int	offset
+int	fd
+long	offset
 
-int     nstat
+size_t	sz_val
+long	nstat
 short   val
 long	read()
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_SHORT * SZB_CHAR)
+	sz_val = SZ_SHORT * SZB_CHAR
+        nstat = read (fd, val, sz_val)
 
 	if (DEBUG) { call eprintf ("ip_get: %g\n"); call pargs(val) }
         return (val)
@@ -107,16 +125,19 @@ end
 
 int procedure ip_geti (fd, offset)
 
-int     fd
-int	offset
+int	fd
+long	offset
 
-int     nstat
+size_t	sz_val
+long	nstat
 int   val
 long	read()
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_INT * SZB_CHAR)
+	sz_val = SZ_INT * SZB_CHAR
+	# arg2: incompatible pointer
+        nstat = read (fd, val, sz_val)
 
 	if (DEBUG) { call eprintf ("ip_get: %g\n"); call pargi(val) }
         return (val)
@@ -125,16 +146,19 @@ end
 
 long procedure ip_getl (fd, offset)
 
-int     fd
-int	offset
+int	fd
+long	offset
 
-int     nstat
+size_t	sz_val
+long	nstat
 long   val
 long	read()
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_LONG * SZB_CHAR)
+	sz_val = SZ_LONG * SZB_CHAR
+	# arg2: incompatible pointer
+        nstat = read (fd, val, sz_val)
 
 	if (DEBUG) { call eprintf ("ip_get: %g\n"); call pargl(val) }
         return (val)
@@ -143,16 +167,19 @@ end
 
 real procedure ip_getr (fd, offset)
 
-int     fd
-int	offset
+int	fd
+long	offset
 
-int     nstat
+size_t	sz_val
+long	nstat
 real   val
 long	read()
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_REAL * SZB_CHAR)
+	sz_val = SZ_REAL * SZB_CHAR
+	# arg2: incompatible pointer
+        nstat = read (fd, val, sz_val)
 	call ieeupkr (val)
 
 	if (DEBUG) { call eprintf ("ip_get: %g\n"); call pargr(val) }
@@ -162,16 +189,19 @@ end
 
 double procedure ip_getd (fd, offset)
 
-int     fd
-int	offset
+int	fd
+long	offset
 
-int     nstat
+size_t	sz_val
+long	nstat
 double   val
 long	read()
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_DOUBLE * SZB_CHAR)
+	sz_val = SZ_DOUBLE * SZB_CHAR
+	# arg2: incompatible pointer
+        nstat = read (fd, val, sz_val)
 	call ieeupkd (val)
 
 	if (DEBUG) { call eprintf ("ip_get: %g\n"); call pargd(val) }
@@ -183,16 +213,19 @@ end
 
 real procedure ip_getn (fd, offset)
 
-int     fd
-int	offset
+int	fd
+long	offset
 
-int     nstat
+size_t	sz_val
+long	nstat
 real	rval
 long	read()
 
 begin
 	call ip_lseek (fd, offset)
-	nstat = read (fd, rval, SZ_REAL)
+	sz_val = SZ_REAL
+	# arg2: incompatible pointer
+	nstat = read (fd, rval, sz_val)
 
 	if (DEBUG) { call eprintf ("ip_getn: %g\n"); call pargr(rval) }
 	return (rval)
@@ -204,16 +237,19 @@ end
 
 double procedure ip_getn8 (fd, offset)
 
-int     fd
-int	offset
+int	fd
+long	offset
 
-int     nstat
+size_t	sz_val
+long	nstat
 double	dval
 long	read()
 
 begin
 	call ip_lseek (fd, offset)
-	nstat = read (fd, dval, SZ_DOUBLE)
+	sz_val = SZ_DOUBLE
+	# arg2: incompatible pointer
+	nstat = read (fd, dval, sz_val)
 
 	if (DEBUG) { call eprintf ("ip_getn8: %g\n"); call pargd(dval) }
 	return (dval)
@@ -225,18 +261,25 @@ end
 
 procedure ip_agetb (fd, ptr, len)
 
-int     fd					#i file descriptor
+int	fd					#i file descriptor
 pointer ptr					#i data pointer
-int     len					#i length of array
+size_t	len					#i length of array
 
+long	l_val
+size_t	c_1, c_2
+size_t	nval
 pointer sp, buf
-int     fp, nval, nstat
-long	read()
+long	fp, nstat
+long	read(), modl()
 long	ip_lnote()
 
 begin
+	c_1 = 1
+	c_2 = 2
+
         fp = ip_lnote(fd)
-        if (mod(fp,2) == 0 && fp != 1)
+	l_val = 2
+        if (modl(fp,l_val) == 0 && fp != 1)
 	    nval = len
 	else
 	    nval = len + 1
@@ -249,8 +292,10 @@ begin
         nstat = read (fd, Memc[buf], nval / SZB_CHAR + 1)
 
         fp = ip_lnote(fd)
-        if (mod(fp,2) == 0 && fp != 1)
-            call bytmov (Memc[buf], 2, Memc[buf], 1, nval)
+	l_val = 2
+        if (modl(fp,l_val) == 0 && fp != 1)
+            call bytmov (Memc[buf], c_2, Memc[buf], c_1, nval)
+	# arg1: incompatible pointer
         call achtbc (Memc[buf], Memc[ptr], len)
 
         call sfree (sp)
@@ -262,9 +307,9 @@ end
 
 procedure ip_agetu (fd, ptr, len)
 
-int     fd					#i file descriptor
+int	fd					#i file descriptor
 pointer ptr					#i data pointer
-int     len					#i length of array
+size_t	len					#i length of array
 
 begin
 	call ip_agets (fd, ptr, len)
@@ -278,11 +323,11 @@ end
 
 procedure ip_agets (fd, ptr, len)
 
-int     fd					#i file descriptor
+int	fd					#i file descriptor
 pointer ptr					#i data pointer
-int     len					#i length of array
+size_t	len					#i length of array
 
-int     nstat
+long	nstat
 long	read()
 
 begin
@@ -294,48 +339,51 @@ end
 
 procedure ip_ageti (fd, ptr, len)
 
-int     fd					#i file descriptor
+int	fd					#i file descriptor
 pointer ptr					#i data pointer
-int     len					#i length of array
+size_t	len					#i length of array
 
-int     nstat
+long	nstat
 long	read()
 
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_INT)
+	# arg2: incompatible pointer
         nstat = read (fd, Memi[ptr], len * SZ_INT)
 end
 
 
 procedure ip_agetl (fd, ptr, len)
 
-int     fd					#i file descriptor
+int	fd					#i file descriptor
 pointer ptr					#i data pointer
-int     len					#i length of array
+size_t	len					#i length of array
 
-int     nstat
+long	nstat
 long	read()
 
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_LONG)
+	# arg2: incompatible pointer
         nstat = read (fd, Meml[ptr], len * SZ_LONG)
 end
 
 
 procedure ip_agetr (fd, ptr, len)
 
-int     fd					#i file descriptor
+int	fd					#i file descriptor
 pointer ptr					#i data pointer
-int     len					#i length of array
+size_t	len					#i length of array
 
-int     nstat
+long	nstat
 long	read()
 
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_REAL)
+	# arg2: incompatible pointer
         nstat = read (fd, Memr[ptr], len * SZ_REAL)
 	call ieevupkr (Memr[ptr], Memr[ptr], len)
 end
@@ -343,16 +391,17 @@ end
 
 procedure ip_agetd (fd, ptr, len)
 
-int     fd					#i file descriptor
+int	fd					#i file descriptor
 pointer ptr					#i data pointer
-int     len					#i length of array
+size_t	len					#i length of array
 
-int     nstat
+long	nstat
 long	read()
 
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_DOUBLE)
+	# arg2: incompatible pointer
         nstat = read (fd, Memd[ptr], len * SZ_DOUBLE)
 	call ieevupkd (Memd[ptr], Memd[ptr], len)
 end
@@ -364,16 +413,17 @@ end
 
 procedure ip_agetn (fd, ptr, len)
 
-int     fd					#i file descriptor
+int	fd					#i file descriptor
 pointer ptr					#i data pointer
-int     len					#i length of array
+size_t	len					#i length of array
 
-int     nstat
+long	nstat
 long	read()
 
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_REAL)
+	# arg2: incompatible pointer
         nstat = read (fd, Memr[ptr], len * SZ_REAL)
 end
 
@@ -383,16 +433,17 @@ end
 
 procedure ip_agetn8 (fd, ptr, len)
 
-int     fd					#i file descriptor
+int	fd					#i file descriptor
 pointer ptr					#i data pointer
-int     len					#i length of array
+size_t	len					#i length of array
 
-int     nstat
+long	nstat
 long	read()
 
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_DOUBLE)
+	# arg2: incompatible pointer
         nstat = read (fd, Memd[ptr], len * SZ_DOUBLE)
 end
 
@@ -406,39 +457,50 @@ define	BLKSIZE		1024
 
 # IP_LINE -- Return the offset of the start of the given line number.
 
-int procedure ip_line (fd, line)
+long procedure ip_line (fd, line)
 
 int	fd					#i input file descriptor
-int	line					#i line number to search
+long	line					#i line number to search
 
+size_t	sz_val
+size_t	c_1, c_2
+long	l_val
+int	i
+size_t	nread
 pointer	sp, cbuf, buf
-int	nl, offset, i, nread, fsize
+long	nl, fsize, offset
 
 long	read()
-int	fstati()
+long	fstatl()
 
 define	done_ 	99
 define	err_ 	98
 
 begin
+	c_1 = 1
+	c_2 = 2
 	if (line == 1) {
 	    return (1)
 	} else {
 	    call smark (sp)
-	    call salloc (buf, BLKSIZE, TY_CHAR)
-	    call salloc (cbuf, BLKSIZE, TY_CHAR)
+	    sz_val = BLKSIZE
+	    call salloc (buf, sz_val, TY_CHAR)
+	    call salloc (cbuf, sz_val, TY_CHAR)
 
 	    # Rewind file descriptor
-	    call ip_lseek (fd, BOF)
+	    l_val = BOF
+	    call ip_lseek (fd, l_val)
 	    nl = 1
 	    offset = 1
 	    
 	    nread = BLKSIZE / SZB_CHAR
-	    fsize = fstati (fd, F_FILESIZE)
+	    fsize = fstatl (fd, F_FILESIZE)
 	    while (read (fd, Memc[buf], nread) != EOF) {
 		# Convert it to spp chars.
-	        call ip_lskip (fd, nread)
-        	call chrupk (Memc[buf], 1, Memc[cbuf], 1, BLKSIZE)
+		l_val = nread
+	        call ip_lskip (fd, l_val)
+		sz_val = BLKSIZE
+        	call chrupk (Memc[buf], c_1, Memc[cbuf], c_1, sz_val)
 		do i = 1, BLKSIZE {
 		    if (Memc[cbuf+i-1] == '\n') {
 		        nl = nl + 1
@@ -452,10 +514,11 @@ begin
 		}
 	    }
 err_	    call sfree (sp)
-	    call ip_lseek (fd, BOF)
+	    l_val = BOF
+	    call ip_lseek (fd, l_val)
 	    return (ERR)
 
-done_	    if (DEBUG) { call eprintf("ip_line: '%s'\n"); call pargi(offset) }
+done_	    if (DEBUG) { call eprintf("ip_line: '%s'\n"); call pargl(offset) }
 	    call sfree (sp)
 	    call ip_lseek (fd, offset)
 	    return (offset)
@@ -465,38 +528,48 @@ end
 
 # IP_LOCATE -- Return the offset of the start of the given pattern.
 
-int procedure ip_locate (fd, offset, pattern)
+long procedure ip_locate (fd, offset, pattern)
 
-int     fd                                      #i input file descriptor
-int	offset					#i offset to begin search
+int	fd                                      #i input file descriptor
+long	offset					#i offset to begin search
 char	pattern[ARB]                            #i pattern to locate
 
+size_t	sz_val
+size_t	c_1
+long	l_val
 pointer	sp, cbuf, buf
-int     fsize, nread, patlen, cur_offset, loc
+size_t	nread
+int	patlen, loc
+long	fsize, cur_offset
 
-int     fstati(), strsearch(), strlen()
+long	fstatl()
+int	strsearch(), strlen()
 long	read()
 
 define	done_	99
 
 begin
+	c_1 = 1
         # Rewind file descriptor
         call ip_lseek (fd, offset)
 	cur_offset = offset
 
 	call smark (sp)
-	call salloc (buf, BLKSIZE, TY_CHAR)
-	call salloc (cbuf, BLKSIZE, TY_CHAR)
+	sz_val = BLKSIZE
+	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (cbuf, sz_val, TY_CHAR)
 
-	if (DEBUG) { call eprintf("ip_loc: offset %d\n"); call pargi(offset)}
+	if (DEBUG) { call eprintf("ip_loc: offset %d\n"); call pargl(offset)}
 
 	nread = BLKSIZE / SZB_CHAR
-	fsize = fstati (fd, F_FILESIZE)
+	fsize = fstatl (fd, F_FILESIZE)
 	patlen = strlen (pattern)
         while (read (fd, Memc[buf], nread) != EOF) {
             # Convert it to spp chars.
-	    call ip_lskip (fd, nread)
-            call chrupk (Memc[buf], 1, Memc[cbuf], 1, BLKSIZE)
+	    l_val = nread
+	    call ip_lskip (fd, l_val)
+	    sz_val = BLKSIZE
+            call chrupk (Memc[buf], c_1, Memc[cbuf], c_1, sz_val)
 	    loc = strsearch (Memc[cbuf], pattern)
 	    if (loc != 0) {
   		cur_offset = cur_offset + loc - 1 - patlen
@@ -510,10 +583,11 @@ begin
             }
         }
 	call sfree (sp)
-	call ip_lseek (fd, BOF)
+	l_val = BOF
+	call ip_lseek (fd, l_val)
         return (ERR)
 
-done_	if (DEBUG) { call eprintf("ip_loc: %d\n"); call pargi(cur_offset)}
+done_	if (DEBUG) { call eprintf("ip_loc: %d\n"); call pargl(cur_offset)}
 	call sfree (sp)
 	call ip_lseek (fd, offset)
 	return (cur_offset)
@@ -524,21 +598,24 @@ end
 
 procedure ip_lseek (fd, offset)
 
-int     fd					#i file descriptor
-int     offset					#i requested offset
+int	fd					#i file descriptor
+long	offset					#i requested offset
 
+long	l_val
 long    cur_offset, where, fsize
-int	fstati()
+long	fstatl(), modl()
 common  /fiocom/ cur_offset
 
 begin
 	if (offset == BOF || offset == ERR) {
             cur_offset = 1
-            call seek (fd, BOF)
+	    l_val = BOF
+            call seek (fd, l_val)
 	} else {
-	    fsize = fstati (fd, F_FILESIZE) * SZB_CHAR
+	    fsize = fstatl (fd, F_FILESIZE) * SZB_CHAR
             cur_offset = min (fsize, offset)
-	    where = min (fsize, (offset/SZB_CHAR+mod(offset,2)))
+	    l_val = 2
+	    where = min (fsize, (offset/SZB_CHAR+modl(offset,l_val)))
             call seek (fd, where)
 	}
 end
@@ -548,7 +625,7 @@ end
 
 long procedure ip_lnote (fd)
 
-int     fd					#i file descriptor (unused)
+int	fd					#i file descriptor (unused)
 
 long    cur_offset
 common  /fiocom/ cur_offset
@@ -562,8 +639,8 @@ end
 
 procedure ip_lskip (fd, skip)
 
-int     fd                                      #i file descriptor
-int     skip
+int	fd                                      #i file descriptor
+long	skip
 
 long    cur_offset
 common  /fiocom/ cur_offset
