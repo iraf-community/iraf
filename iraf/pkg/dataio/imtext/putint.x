@@ -15,18 +15,25 @@ int	tx		# file descriptor of output text file
 int	maxll		# maximum length of output text line
 int	width		# field width of each number (0=free format)
 
+size_t	sz_val
+long	l_val
 char	numbuf[MAX_DIGITS]
-int	npix, ip, j, ndigits
+long	npix, j
+int	ip, ndigits
 pointer	sp, obuf, op, pix
 long	v[IM_MAXDIM]
-int	imgnll(), ltoc()
+long	imgnll()
+int	ltoc()
 errchk	imgnll, putline
 
 begin
 	call smark (sp)
-	call salloc (obuf, maxll+1, TY_CHAR)
+	sz_val = maxll+1
+	call salloc (obuf, sz_val, TY_CHAR)
 
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	npix = IM_LEN(im,1)
 	op = obuf
 
@@ -105,6 +112,7 @@ long	lval			# number to be encoded
 char	out[w]			# output field (NOT EOS DELIMITED)
 int	w			# field width
 
+size_t	sz_val
 bool	neg
 int	op, i
 long	val, quotient
@@ -114,7 +122,8 @@ begin
 	if (IS_INDEFL (lval)) {
 	    if (w < 5)
 		goto overflow_
-	    call amovc ("INDEF", out[w-4], 5)
+	    sz_val = 5
+	    call amovc ("INDEF", out[w-4], sz_val)
 	    op = w - 5
 
 	} else {

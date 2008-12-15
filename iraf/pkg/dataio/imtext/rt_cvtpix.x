@@ -13,12 +13,15 @@ pointer	im		# Pointer to image header
 int	format		# Format of text pixels (integer/floating point)
 int	pixels		# Get pixels from input text file?
 
+size_t	sz_val
+long	l_val
 pointer	bufptr, sp, word1, pattern
-int	stat, nlines, npix, i
-long	v[IM_MAXDIM], start
-int	impnll(), impnld(), impnlx()
+int	ii
+size_t	npix
+long	nlines, i
+long	v[IM_MAXDIM], start, stat
+long	impnll(), impnld(), impnlx(), note()
 int	fscan(), stridxs(), patmatch(), patmake()
-long	note()
 
 errchk	impnll, impnld, impnlx
 errchk	rt_get_lineptr, rt_output_line, fscan, seek, amovkl
@@ -33,8 +36,10 @@ begin
 
 	if (pixels == YES && format == UNSET) {
 	    call smark (sp)
-	    call salloc (word1,   SZ_LINE, TY_CHAR)
-	    call salloc (pattern, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (word1, sz_val, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (pattern, sz_val, TY_CHAR)
 
 	    # Note position so we can return to it
 	    start = note (tf)
@@ -76,9 +81,11 @@ begin
 	}
 
 	nlines = 1
-	do i = 2, IM_NDIM(im)
-	    nlines = nlines * IM_LEN (im, i)
-	call amovkl (long(1), v, IM_MAXDIM)
+	do ii = 2, IM_NDIM(im)
+	    nlines = nlines * IM_LEN (im, ii)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	npix = IM_LEN (im, 1)
 
 	# Initialize text buffer

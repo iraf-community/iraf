@@ -13,7 +13,7 @@ procedure t_rtextimage ()
 
 char	output[SZ_FNAME], text_file[SZ_FNAME], temp[SZ_FNAME]
 char	out_fname[SZ_FNAME]
-pointer	im, input, fd_dim
+pointer	im, inputp, fd_dim
 int	header, pixels, nskip, nfiles, ntext, format, data_type, tf, i
 int	junk, ndim, ip
 
@@ -21,11 +21,12 @@ bool	clgetb()
 #char	clgetc()
 pointer	immap(), clpopni(), clpopnu()
 int	btoi(), clgeti(), clplen(), clgfil(), get_data_type()
-int	open(), rt_skip_lines(), ctoi()
+int	open(), rt_skip_lines(), ctol()
+include	<nullptr.inc>
 
 begin
 	# Determine the input and output file names
-	input = clpopni ("input")
+	inputp = clpopni ("input")
 	call clgstr ("output", output, SZ_FNAME)
 
 	# Get hidden parameters from cl. 
@@ -38,9 +39,9 @@ begin
 	    nskip = clgeti ("nskip")
 
 	# Loop over the input files, generating an output name and processing. 
-	nfiles = clplen (input)
+	nfiles = clplen (inputp)
 	do ntext = 1, nfiles {
-	    if (clgfil (input, text_file, SZ_FNAME) == EOF)
+	    if (clgfil (inputp, text_file, SZ_FNAME) == EOF)
 		return
 	    tf = open (text_file, READ_ONLY, TEXT_FILE)
 	    if (nfiles > 1) {
@@ -50,7 +51,7 @@ begin
 	    } else
 		call strcpy (output, out_fname, SZ_FNAME)
 
-	    im = immap (out_fname, NEW_IMAGE, 0)
+	    im = immap (out_fname, NEW_IMAGE, NULLPTR)
 
 	    # Initialize those values that could be read from the header.
 	    format = UNSET
@@ -88,7 +89,7 @@ begin
 		do i = 1, ndim {
 		    junk = clgfil (fd_dim, temp, SZ_FNAME)
 		    ip = 1
-		    junk = ctoi (temp, ip, IM_LEN (im, i))
+		    junk = ctol (temp, ip, IM_LEN (im, i))
 		}
 		IM_NDIM(im) = ndim
 	        call clpcls (fd_dim)
@@ -105,5 +106,5 @@ begin
 	    call close (tf)
 	}
 
-	call clpcls (input)
+	call clpcls (inputp)
 end

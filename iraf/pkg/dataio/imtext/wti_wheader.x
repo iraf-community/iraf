@@ -20,19 +20,22 @@ char	image[ARB]		# Image filename
 int	tx			# File descriptor of text file
 char	out_format[ARB] 	# Output format for pixel conversion
 
+size_t	sz_val
 int	i, nlines, user, op, max_lenuser
 pointer	sp, root, line, comment
 bool	streq()
-int	strlen(), sizeof(), getline(), stropen(), gstrcpy(), stridx()
+int	strlen(), sizeof(), getline(), stropen(), gstrcpy(), stridx(), modi()
 
 errchk	addcard_b, addcard_i, addcard_r, addcard_st
 errchk	wti_iraf_type, streq, strupr, stropen, strclose, getline
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (line, SZ_LINE,  TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	call addcard_i (tx, "BITPIX", NBITS_ASCII, "8-bit ASCII characters")
 	call addcard_i (tx, "NAXIS", IM_NDIM(im), "Number of Image Dimensions")
@@ -44,7 +47,7 @@ begin
 	    op = gstrcpy ("NAXIS", Memc[root], LEN_KEYWORD)
 	    call sprintf (Memc[root+op], LEN_KEYWORD-op, "%d")
 		call pargi (i)
-	    call addcard_i (tx, Memc[root], IM_LEN(im,i), "Length of axis")
+	    call addcard_l (tx, Memc[root], IM_LEN(im,i), "Length of axis")
 	    nlines = nlines + 1
 	}
 	
@@ -114,7 +117,7 @@ begin
 	# a multiple of 36 lines.
 
 	if (nlines != NCARDS_FITS_BLK) {
-	    do i = 1, NCARDS_FITS_BLK - mod(nlines, NCARDS_FITS_BLK)
+	    do i = 1, NCARDS_FITS_BLK - modi(nlines, NCARDS_FITS_BLK)
 	        call fprintf (tx, "%80w\n")
 	}
 

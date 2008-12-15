@@ -29,6 +29,7 @@ int	maxll, file_num, out, nfiles
 pointer	immap(), imtopen()
 bool	clgetb(), strne()
 int	clgeti(), imtgetim(), open(), fstati(), imtlen()
+include	<nullptr.inc>
 
 begin
 	# Open template of input image filenames.
@@ -61,7 +62,7 @@ begin
 	    file_num = file_num + 1
 
 	    # Open image.
-	    iferr (im = immap (image, READ_ONLY, 0)) {
+	    iferr (im = immap (image, READ_ONLY, NULLPTR)) {
 		call erract (EA_WARN)
 		next
 	    }
@@ -107,6 +108,7 @@ bool	pixels			# convert pixels (y/n)?
 int	maxll			# maximum line length of text file
 char	user_format[ARB] 	# output format for single pixel entered by user
 
+size_t	sz_val
 int	width, decpl, fmtchar
 pointer	sp, out_format, ftn_format, spp_format, ep
 errchk	wti_determine_fmt, wti_write_header
@@ -114,16 +116,20 @@ errchk	wti_putint, wti_putreal, wti_putcomplex
 
 begin
 	call smark (sp)
-	call salloc (out_format, SZ_FORMAT, TY_CHAR)
-	call salloc (spp_format, SZ_FORMAT, TY_CHAR)
-	call salloc (ftn_format, SZ_FORMAT, TY_CHAR)
-	call salloc (ep, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FORMAT
+	call salloc (out_format, sz_val, TY_CHAR)
+	call salloc (spp_format, sz_val, TY_CHAR)
+	call salloc (ftn_format, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ep, sz_val, TY_CHAR)
 
 	# Clear the format variables.
-	call aclrc (Memc[out_format], SZ_FORMAT)
-	call aclrc (Memc[spp_format], SZ_FORMAT)
-	call aclrc (Memc[ftn_format], SZ_FORMAT)
-	call aclrc (Memc[ep], SZ_LINE)
+	sz_val = SZ_FORMAT
+	call aclrc (Memc[out_format], sz_val)
+	call aclrc (Memc[spp_format], sz_val)
+	call aclrc (Memc[ftn_format], sz_val)
+	sz_val = SZ_LINE
+	call aclrc (Memc[ep], sz_val)
 	fmtchar = ' '
 
 	# Determine the output format.

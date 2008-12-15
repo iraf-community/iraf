@@ -13,6 +13,7 @@ int	tf		# File descriptor for input text file
 pointer	im		# Pointer to image header
 int	format		# Format of text file pixels (integer/floating point)
 
+size_t	sz_val
 pointer	sp, wt, card
 bool	streq()
 int	ncard, fd_user, max_lenuser
@@ -21,8 +22,10 @@ errchk	getline, rt_decode_card
 
 begin
 	call smark (sp)
-	call salloc (wt, LEN_WT, TY_STRUCT)
-	call salloc (card, LEN_CARD+1, TY_CHAR)
+	sz_val = LEN_WT
+	call salloc (wt, sz_val, TY_STRUCT)
+	sz_val = LEN_CARD+1
+	call salloc (card, sz_val, TY_CHAR)
 
 	Memc[card+LEN_CARD] = '\n'
 	Memc[card+LEN_CARD+1] = EOS
@@ -92,7 +95,7 @@ char	card[ARB]		# Card image read from FITS header
 
 int	nchar, ival, i, j, k, ndim
 
-int	strmatch(), ctoi()
+int	strmatch(), ctoi(), ctol()
 errchk	rt_get_fits_string, putline, putline
 
 begin
@@ -109,7 +112,7 @@ begin
 	} else if (strmatch (card, "^NAXIS") > 0) {
 	    k = strmatch (card, "^NAXIS")
 	    nchar = ctoi (card, k, j)
-	    nchar = ctoi (card, i, IM_LEN(im,j))
+	    nchar = ctol (card, i, IM_LEN(im,j))
 
  	} else if (strmatch (card, "^NDIM    ") > 0)
 	    nchar = ctoi (card, i, IM_NDIM(im))
@@ -117,7 +120,7 @@ begin
  	else if (strmatch (card, "^LEN") > 0) {
  	    k = strmatch (card, "^LEN")
 	    nchar = ctoi (card, k, j)
-	    nchar = ctoi (card, i, IM_LEN(im,j))
+	    nchar = ctol (card, i, IM_LEN(im,j))
 
 	} else if (strmatch (card, "^BITPIX  ") > 0) {
 	    nchar = ctoi (card, i, ival)

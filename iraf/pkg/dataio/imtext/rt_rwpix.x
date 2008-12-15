@@ -25,7 +25,7 @@ procedure rt_output_linel (tf, format, bufptr, npix)
 int	tf		# File descriptor for input text file
 int	format		# Format of pixels in text file (integer/ floating)
 pointer	bufptr		# Pointer to image line to be filled
-int	npix		# Number of pixels per image line
+size_t	npix		# Number of pixels per image line
 
 pointer	sp, dbl_buf, cplx_buf
 errchk	rt_ripixels, rt_rfpixels, rt_rcpixels
@@ -59,7 +59,7 @@ procedure rt_output_lined (tf, format, bufptr, npix)
 int	tf		# File descriptor for input text file
 int	format		# Format of pixels in text file (integer/ floating)
 pointer	bufptr		# Pointer to image line to be filled
-int	npix		# Number of pixels per image line
+size_t	npix		# Number of pixels per image line
 
 pointer	sp, cplx_buf
 errchk	rt_ripixels, rt_rfpixels, rt_rcpixels
@@ -89,7 +89,7 @@ procedure rt_output_linex (tf, format, bufptr, npix)
 int	tf		# File descriptor for input text file
 int	format		# Format of pixels in text file (integer/ floating)
 pointer	bufptr		# Pointer to image line to be filled
-int	npix		# Number of pixels per image line
+size_t	npix		# Number of pixels per image line
 
 pointer	sp, dbl_buf
 errchk	rt_ripixels, rt_rfpixels, rt_rcpixels
@@ -121,10 +121,12 @@ procedure rt_ripixels (tf, dbl_out, npix)
 
 int	tf		# File descriptor for input text file
 double	dbl_out[ARB]	# Output pixel array
-int	npix		# Number of pixels to output
+size_t	npix		# Number of pixels to output
 
 bool	neg
-int	i, sum, ip_start, ip
+long	i, sum
+int	ip_start
+int	ip
 char	text_buf[SZ_LINE]
 common	/rpix_init/ ip, text_buf
 int	getline()
@@ -174,9 +176,10 @@ procedure rt_rfpixels (tf, dbl_out, npix)
 
 int	tf		# File descriptor for text file
 double	dbl_out[npix]	# Output pixel buffer
-int	npix		# Number of pixels to output
+size_t	npix		# Number of pixels to output
 
-int	i, nchars
+long	i
+int	nchars
 double	dval
 int	gctod(), getline()
 
@@ -212,9 +215,10 @@ procedure rt_rcpixels (tf, cplx_out, npix)
 
 int	tf		# File descriptor for text file
 complex cplx_out[npix]  # Output pixel buffer
-int	npix		# Number of pixels to output
+size_t	npix		# Number of pixels to output
 
-int	i, nchars
+long	i
+int	nchars
 complex	xval
 int	gctox(), getline()
 
@@ -250,13 +254,15 @@ int procedure rt_skip_lines (tf, nskip)
 int	tf		# File descriptor of text file
 int	nskip		# Number of lines to skip
 
+size_t	sz_val
 pointer	sp, buffer
 int	i
 int	fscan()
 
 begin
 	call smark (sp)
-	call salloc (buffer, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buffer, sz_val, TY_CHAR)
 
 	for (i = 1; i <= nskip; i = i + 1) {
 	    if (fscan (tf) == EOF) {
