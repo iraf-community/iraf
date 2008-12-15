@@ -11,6 +11,7 @@ skipn,i,h,0,,,Skip n blocks (tape) or records (disk)
 copyn,i,h,INDEF,,,Copy n blocks (tape) or records (disk)
 byteswap,b,h,no,,,Swap bytes?
 wordswap,b,h,no,,,Swap words?
+longwordswap,b,h,no,,,Swap long words?
 offset,i,h,0,,,Tape file number offset
 verbose,b,h,yes,,,Print messages?
 mode,s,h,"ql",,,

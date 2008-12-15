@@ -13,25 +13,30 @@ char	in_fname[ARB]		# input file name
 char	out_fname[ARB]		# output file name
 int	outparam[ARB]		# output parameters
 
+size_t	sz_val0, sz_val1
+size_t	c_1
+long	l_val
 char	padchar
-int	in, out, sz_charsin, sz_charsout, mov_nbytes, rem_in, rem_out
-int	bytes_read, ip, op, i, first_byte, nchars, rec_count, ntrim
-long	offset
+int	in, out
+size_t	sz_charsin, sz_charsout, mov_nbytes, rem_in, rem_out, bytes_read
+long	ip, op, i, first_byte, nchars, rec_count, ntrim, offset
 pointer	inbuf, outbuf
 
-int	mtopen(), reb_roundup(), reb_skipover(), fstati(), open()
-long	read()
+int	mtopen(), open()
+long	read(), fstatl(), modl(), reb_roundup(), reb_skipover()
 errchk	open, mtopen, read, awriteb, awaitb, close, mfree, malloc, flush
 errchk	reb_write_block, reb_pad_block, reb_pad_record, reb_skipover
 include "reblock.com"
 
 begin
+	c_1 = 1
 	# Open input and output files
-	in = mtopen (in_fname, READ_ONLY, 0)
+	sz_val0 = 0
+	in = mtopen (in_fname, READ_ONLY, sz_val0)
 	out = NULL
 
 	# Allocate space for input buffer.
-	sz_charsin = fstati (in, F_BUFSIZE)
+	sz_charsin = fstatl (in, F_BUFSIZE)
 	call malloc (inbuf, sz_charsin, TY_CHAR)
 	outbuf = NULL
 
@@ -69,24 +74,30 @@ begin
 	    if (nchars == EOF)
 		break
 	    bytes_read = nchars * SZB_CHAR
-	    if (mod (fstati (in, F_SZBBLK), SZB_CHAR) != 0)
-		bytes_read = bytes_read - mod (fstati (in, F_SZBBLK), SZB_CHAR)
+	    l_val = SZB_CHAR
+	    if (modl(fstatl (in, F_SZBBLK), l_val) != 0) {
+		l_val = SZB_CHAR
+		bytes_read = bytes_read - modl(fstatl (in, F_SZBBLK), l_val)
+	    }
 	    BLKS_RD(outparam) = BLKS_RD(outparam) + 1
 
 	    # Align to first byte.
 	    if (rec_count == 0 && first_byte > 1) {
 		bytes_read = bytes_read - first_byte + 1
-		call bytmov (Memc[inbuf],first_byte, Memc[inbuf],1, bytes_read)
+		sz_val0 = first_byte
+		call bytmov (Memc[inbuf],sz_val0, Memc[inbuf],c_1, bytes_read)
 	    }
 
 	    # Open the output file. This has been moved from the beginning 
 	    # of the routine to avoid a magtape problem.
 	    # driver problem.
 	    if (BLKS_RD(outparam) == 1) {
-		if (outtape == NO)
+		if (outtape == NO) {
 	    	    out = open (out_fname, NEW_FILE, BINARY_FILE)
-		else
-	    	    out = mtopen (out_fname, WRITE_ONLY, 0)
+		} else {
+		    sz_val0 = 0
+	    	    out = mtopen (out_fname, WRITE_ONLY, sz_val0)
+		}
 	    }
 
 	    # Binary copy.
@@ -94,7 +105,7 @@ begin
 
 		RECS_RD(outparam) = BLKS_RD(outparam)
 		call reb_write_block  (out, Memc[inbuf], bytes_read, offset,
-		    byteswap, wordswap)
+				       byteswap, wordswap, longwordswap)
 		BLKS_WRT(outparam) = BLKS_WRT(outparam) + 1
 		RECS_WRT(outparam) = BLKS_WRT(outparam)
 
@@ -105,17 +116,17 @@ begin
 		if (BLKS_RD(outparam) == 1) {
 
 	            # Initialize block and record sizes
-	            if (IS_INDEFI(szb_inrecord))
+	            if (IS_INDEFL(szb_inrecord))
 	                szb_inrecord = sz_charsin * SZB_CHAR
-	            if (IS_INDEFI(szb_outblock))
-	                szb_outblock = fstati (out, F_BUFSIZE) * SZB_CHAR
-	            if (IS_INDEFI(szb_outrecord))
+	            if (IS_INDEFL(szb_outblock))
+	                szb_outblock = fstatl (out, F_BUFSIZE) * SZB_CHAR
+	            if (IS_INDEFL(szb_outrecord))
 	                szb_outrecord = szb_outblock
 
 	            # Set pad character.
 	            if (pad_record == YES || pad_block == YES) {
 		        padchar = char (padvalue)
-		        call chrpak (padchar, 1, padchar, 1, 1)
+		        call chrpak (padchar, c_1, padchar, c_1, c_1)
 	            }
 
 	            # Allocate space for the output buffer.
@@ -138,7 +149,10 @@ begin
 		    # Calculate the number of bytes to be moved.
 		    mov_nbytes = min (bytes_read - ip + 1,
 			rem_in, rem_out, szb_outblock - op + 1)
-		    call bytmov (Memc[inbuf], ip, Memc[outbuf], op, mov_nbytes)
+		    sz_val0 = ip
+		    sz_val1 = op
+		    call bytmov (Memc[inbuf], sz_val0, Memc[outbuf], sz_val1,
+				 mov_nbytes)
 
 		    # Update the remainders
 		    rem_in = rem_in - mov_nbytes
@@ -174,7 +188,7 @@ begin
 		    # If the output buffer is exhausted, output block of data.
 		    if (op > szb_outblock) {
 		        call reb_write_block (out, Memc[outbuf], szb_outblock,
-		            offset, byteswap, wordswap)
+				      offset, byteswap, wordswap, longwordswap)
 		        BLKS_WRT(outparam) = BLKS_WRT(outparam) + 1
 		        op = 1
 		    }
@@ -240,7 +254,7 @@ begin
 		        szb_outblock, szb_outrecord, padchar)
 		    if (op > szb_outblock) {
 			call reb_write_block (out, Memc[outbuf], szb_outblock,
-			    offset, byteswap, wordswap)
+				      offset, byteswap, wordswap, longwordswap)
 			BLKS_WRT(outparam) = BLKS_WRT(outparam) + 1
 			op = 1
 		    }
@@ -255,7 +269,7 @@ begin
 	    # Write last block
 	    if (op > 1) {
 		call reb_write_block (out, Memc[outbuf], op - 1, offset,
-		    byteswap, wordswap)
+				      byteswap, wordswap, longwordswap)
 	        op = 1
 	        BLKS_WRT(outparam) = BLKS_WRT(outparam) + 1
 		if (pad_record == YES && rem_out < szb_outrecord)
@@ -280,14 +294,22 @@ end
 procedure reb_pad_record (buffer, op, rem_out, szb_outblock, szb_outrecord,
 	padchar)
 
-char	buffer[ARB], padchar
-int	szb_outblock, szb_outrecord, op, rem_out
-int	i, junk
+char	buffer[ARB]
+long	op
+size_t	rem_out
+long	szb_outblock, szb_outrecord
+char	padchar
+
+size_t	sz_val
+size_t	c_1
+long	i, junk
 
 begin
+	c_1 = 1
 	junk = rem_out
 	for (i = 1; i <= junk && op <= szb_outblock; i = i + 1) {
-	    call bytmov (padchar, 1, buffer, op, 1)
+	    sz_val = op
+	    call bytmov (padchar, c_1, buffer, sz_val, c_1)
 	    op = op + 1
 	    rem_out = rem_out - 1
 	}
@@ -304,19 +326,23 @@ procedure reb_pad_block (buffer, op, rem_out, outparam, szb_outblock,
 	szb_outrecord, padchar)
 
 char	buffer[ARB]	# data to be padded
-int	op		# pointer to first element for padding
-int	rem_out		# number of remaining bytes to be padded in a record
+long	op		# pointer to first element for padding
+size_t	rem_out		# number of remaining bytes to be padded in a record
 int	outparam[ARB]	# output parameters, number of records, blocks written
-int	szb_outblock	# size in bytes of output block
-int	szb_outrecord	# size in bytes of an output record
+long	szb_outblock	# size in bytes of output block
+long	szb_outrecord	# size in bytes of an output record
 char	padchar		# character used for padding
 
-int	i, junk
+size_t	sz_val
+size_t	c_1
+long	i, junk
 
 begin
+	c_1 = 1
 	junk = szb_outblock - op + 1
 	for (i = 1; i <= junk; i = i + 1) {
-	    call bytmov (padchar, 1, buffer, op, 1)
+	    sz_val = op
+	    call bytmov (padchar, c_1, buffer, sz_val, c_1)
 	    op = op + 1
 	    rem_out = rem_out - 1
 	    if (rem_out == 0) {
@@ -330,25 +356,32 @@ end
 # REB_WRITE_BLOCK -- Procedure to write blocks  using the asynchronous read
 # and write functions in file i/o. Writing must occur on block boundaries.
 
-procedure reb_write_block (fd, buffer, nbytes, offset, byteswap, wordswap)
+procedure reb_write_block (fd, buffer, nbytes, offset, byteswap, wordswap, longwordswap)
 
 int	fd		# output file descriptor
 char	buffer[ARB]	# data to be output
-int	nbytes		# number of bytes of data
+long	nbytes		# number of bytes of data
 long	offset		# offset in chars in output file for writing
 int	byteswap	# swap every other byte before output
 int	wordswap	# swap every other word before output
+int	longwordswap	# swap every other long word before output
 
-int	nbread
+size_t	c_1
+size_t	sz
+long	nbread
 long	awaitb()
 errchk	awriteb, awaitb
 
 begin
+	c_1 = 1
+	sz = nbytes
 	if (byteswap == YES)
-	    call bswap2 (buffer, 1, buffer, 1, nbytes)
+	    call bswap2 (buffer, c_1, buffer, c_1, sz)
 	if (wordswap == YES)
-	    call bswap4 (buffer, 1, buffer, 1, nbytes)
-	call awriteb (fd, buffer, nbytes, offset)
+	    call bswap4 (buffer, c_1, buffer, c_1, sz)
+	if (longwordswap == YES)
+	    call bswap8 (buffer, c_1, buffer, c_1, sz)
+	call awriteb (fd, buffer, sz, offset)
 	nbread = awaitb (fd)
 	if (nbread == ERR)
 	    call error (3, "Error writing block data")
@@ -360,20 +393,20 @@ end
 # REB_SKIPOVER -- Procedure to find the first byte containing data given the
 # input block size and the number of input blocks to be skipped.
 
-int procedure reb_skipover (fd, szb_inblock, nskip)
+long procedure reb_skipover (fd, szb_inblock, nskip)
 
 int	fd		# file descriptor
-int	szb_inblock	# size of an input block
-int	nskip		# number of blocks to skip
+long	szb_inblock	# size of an input block
+long	nskip		# number of blocks to skip
 
-int	first_byte
+long	l_val
+long	first_byte
 long	szb_skip, szb_physkip, skip_diff, sz_charoff, loff
-long	fstatl()
-int	reb_roundup()
+long	fstatl(), reb_roundup()
 errchk	fstatl, seek
 
 begin
-        szb_skip = long (szb_inblock) * long (nskip)
+        szb_skip = szb_inblock * nskip
         szb_physkip = reb_roundup (szb_skip, SZB_CHAR)
         skip_diff = szb_physkip - szb_skip
 
@@ -382,13 +415,14 @@ begin
 	    first_byte = 1
 	} else {
 	    sz_charoff = (szb_physkip / SZB_CHAR) - 1
-	    first_byte = int (szb_skip - (SZB_CHAR * sz_charoff) + 1)
+	    first_byte = szb_skip - (SZB_CHAR * sz_charoff) + 1
 	}
 
-	loff = long (sz_charoff)
+	loff = sz_charoff
 
         if (loff > fstatl (fd, F_FILESIZE)) {
-	    call seek (fd, EOF)
+	    l_val = EOF
+	    call seek (fd, l_val)
 	    return (EOF)
 	} else {
             call seek (fd, loff)
@@ -400,15 +434,17 @@ end
 # REB_ROUNDUP -- Procedure to round a number to the next highest number
 # divisible by  base.
 
-int procedure reb_roundup (number, base)
+long procedure reb_roundup (number, base)
 
-int	number		# number to be rounded upwards
+long	number		# number to be rounded upwards
 int	base		# base for rounding
 
-int	value
+long	value, l
+long	modl()
 
 begin
-	if (mod(number, base) == 0)
+	l = base
+	if (modl(number, l) == 0)
 	    return (number)
 	else {
 	    value = (number/base + 1) * base

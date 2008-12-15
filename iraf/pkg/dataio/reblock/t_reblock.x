@@ -20,15 +20,16 @@ char	outfiles[SZ_FNAME]	# list of output files
 char	padchar[SZ_PADCHAR]	# character for padding blocks and records
 bool	verbose			# print messages ?
 
+long	l_val
 char	in_fname[SZ_FNAME], out_fname[SZ_FNAME], cval
-int	len_inlist, len_outlist, file_number, file_cnt
-int	range[2 * MAX_RANGES + 1]
-int	outparam[LEN_OUTPARAM], offset, ip
+int	len_inlist, len_outlist, file_number, file_cnt, offset, ip
+int	range[2 * MAX_RANGES + 1], outparam[LEN_OUTPARAM]
 pointer	inlist, outlist
 
 bool	clgetb()
 int	fstati(), mtfile(), mtneedfileno(), fntlenb(), fntgfnb()
-int	decode_ranges(), btoi(), clgeti(), get_next_number(), cctoc()
+int	decode_ranges(), btoi(), get_next_number(), cctoc(), clgeti()
+long	clgetl()
 pointer	fntopnb()
 include "reblock.com"
 
@@ -71,10 +72,13 @@ begin
 	    len_outlist = len_inlist
 	    outtape = YES
 	    if (mtneedfileno (outfiles) == YES) {
-	        if (! clgetb ("newtape"))
-		    call mtfname (outfiles, EOT, out_fname, SZ_FNAME)
-		else
-		    call mtfname (outfiles, 1, out_fname, SZ_FNAME)
+	        if (! clgetb ("newtape")) {
+		    l_val = EOT
+		    call mtfname (outfiles, l_val, out_fname, SZ_FNAME)
+		} else {
+		    l_val = 1
+		    call mtfname (outfiles, l_val, out_fname, SZ_FNAME)
+		}
 	    } else
 		call strcpy (outfiles, out_fname, SZ_FNAME)
 	} else {
@@ -88,14 +92,14 @@ begin
 	        "The number of input and output files is not equal")
 
 	# Get the block and record sizes.
-        szb_outblock = clgeti ("outblock")
+        szb_outblock = clgetl ("outblock")
 	if (outtape == NO)
-	    szb_outblock = INDEFI
-	szb_inrecord = clgeti ("inrecord")
-	szb_outrecord = clgeti ("outrecord")
-	if (IS_INDEFI(szb_inrecord) && !IS_INDEFI(szb_outrecord))
+	    szb_outblock = INDEFL
+	szb_inrecord = clgetl ("inrecord")
+	szb_outrecord = clgetl ("outrecord")
+	if (IS_INDEFL(szb_inrecord) && !IS_INDEFL(szb_outrecord))
 	    szb_inrecord = szb_outrecord
-	if (IS_INDEFI(szb_outrecord) && !IS_INDEFI(szb_inrecord))
+	if (IS_INDEFL(szb_outrecord) && !IS_INDEFL(szb_inrecord))
 	    szb_outrecord = szb_inrecord
 
 	# Get the pad and trim parameters.
@@ -124,19 +128,20 @@ begin
 	    reblock = YES
 	else if (pad_record == YES || pad_block == YES || trim_record == YES)
 	    reblock = YES
-	else if (!IS_INDEFI(szb_outblock) || !IS_INDEFI(szb_inrecord) ||
-	    !IS_INDEFI(szb_outrecord))
+	else if (!IS_INDEFL(szb_outblock) || !IS_INDEFL(szb_inrecord) ||
+	    !IS_INDEFL(szb_outrecord))
 	    reblock = YES
 	else
 	    reblock = NO
 
 	# Get remaining parameters.
-	nskip = max (0, clgeti ("skipn"))
-	ncopy = clgeti ("copyn")
-	if (IS_INDEFI(ncopy))
-	    ncopy = MAX_INT
+	nskip = max (0, clgetl ("skipn"))
+	ncopy = clgetl ("copyn")
+	if (IS_INDEFL(ncopy))
+	    ncopy = MAX_LONG
 	byteswap = btoi (clgetb ("byteswap"))
 	wordswap = btoi (clgetb ("wordswap"))
+	longwordswap = btoi (clgetb ("longwordswap"))
 	verbose = clgetb ("verbose")
 
 	# Loop through the files
@@ -146,10 +151,12 @@ begin
 
 	    # Construct the input file name.
 	    if (intape == YES) {
-		if (mtneedfileno (infiles) == YES)
-		    call mtfname (infiles, file_number, in_fname, SZ_FNAME)
-		else
+		if (mtneedfileno (infiles) == YES) {
+		    l_val = file_number
+		    call mtfname (infiles, l_val, in_fname, SZ_FNAME)
+		} else {
 	            call strcpy (infiles, in_fname, SZ_FNAME)
+		}
 	    } else if (fntgfnb (inlist, in_fname, SZ_FNAME) != EOF)
 		;
 
@@ -164,8 +171,10 @@ begin
 		        call pargi (file_cnt)
 	        } else if (fntgfnb (outlist, out_fname, SZ_FNAME) != EOF)
 		    ;
-	    } else if (file_cnt == 2)
-		call mtfname (out_fname, EOT, out_fname, SZ_FNAME)
+	    } else if (file_cnt == 2) {
+		l_val = EOT
+		call mtfname (out_fname, l_val, out_fname, SZ_FNAME)
+	    }
 
 	    iferr {
 
@@ -182,7 +191,7 @@ begin
 			call printf ("[skip %d blks] ")
 		    else
 		        call printf ("[skip %d recs] ")
-		    call pargi (nskip)
+		    call pargl (nskip)
 		    call printf ("blks r/w %d/%d ")
 		        call pargi (BLKS_RD(outparam))
 		        call pargi (BLKS_WRT(outparam))
