@@ -298,3 +298,4 @@ begin
 	if (dflag == D_ALL && npairs + nlow + nhigh > 0)
 		dflag = D_MIX
 end
+

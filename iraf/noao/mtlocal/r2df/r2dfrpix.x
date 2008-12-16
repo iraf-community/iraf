@@ -44,8 +44,10 @@ int	i, n, ip, op
 int	swap
 pointer	mii, spp
 
-int	read(), sizeof(), miilen()
-errchk	miilen, mfree, malloc, read, miiup
+long	read()
+int	sizeof()
+size_t	miipksize()
+errchk	miipksize, mfree, malloc, read, miiup
 data	mii/NULL/, spp/NULL/
 include "r2df.com"
 
@@ -56,12 +58,12 @@ begin
 	npix_rec = npix_record
 	nch_rec = npix_rec * sizeof (ty_spp)
 
-	len_mii = miilen (npix_rec, ty_mii)
-	sz_rec = len_mii * SZ_INT
+	len_mii = miipksize (npix_rec, ty_mii)
+	sz_rec = len_mii
 
 	if (mii != NULL)
-	    call mfree (mii, TY_INT)
-	call malloc (mii, len_mii, TY_INT)
+	    call mfree (mii, TY_CHAR)
+	call malloc (mii, len_mii, TY_CHAR)
 
 	if (spp != NULL)
 	    call mfree (spp, TY_CHAR)
@@ -87,7 +89,7 @@ entry	r2dfrpix (fd, buffer, npix)
 		    call fseti (fd, F_CANCEL, YES)
 
 		# Read a data record.
-		i = read (fd, Memi[mii], sz_rec)
+		i = read (fd, Memc[mii], sz_rec)
 		if (i == EOF)
 		    return (EOF)
 	        else if ( i < sz_rec - SZ_INT + 1)
@@ -99,18 +101,18 @@ entry	r2dfrpix (fd, buffer, npix)
 
 		    # 			Modified for 2D-FRUTTI data	#
 		    case MII_BYTE:					#
-			call bswap2 (Memi[mii], 1, Memi[mii], 1,	#
+			call bswap2 (Memc[mii], 1, Memc[mii], 1,	#
 				sz_rec * SZB_CHAR)			#
 
 		    case MII_SHORT:
-			call bswap2 (Memi[mii], 1, Memi[mii], 1,
+			call bswap2 (Memc[mii], 1, Memc[mii], 1,
 				sz_rec * SZB_CHAR)
 		    case MII_LONG:
-			call bswap4 (Memi[mii], 1, Memi[mii], 1,
+			call bswap4 (Memc[mii], 1, Memc[mii], 1,
 				sz_rec * SZB_CHAR)
 		    }
 
-		call miiupk (Memi[mii], Memc[spp], npix_rec, ty_mii, ty_spp)
+		call miiupk (Memc[mii], Memc[spp], npix_rec, ty_mii, ty_spp)
 
 		ip = 0
 	    }

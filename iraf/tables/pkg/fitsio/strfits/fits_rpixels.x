@@ -43,7 +43,9 @@ int	ty_mii, ty_spp, npix_rec, nch_rec, sz_rec, nchars, len_mii, recptr
 int	bufsize, i, n, ip, op, nd
 pointer	mii, spp, bufrd
 
-int	read(), sizeof(), miilen(), nint_rec
+long	read()
+int	sizeof(), nint_rec
+size_t	miipksize()
 errchk	mfree, malloc, read
 data	mii/NULL/, spp/NULL/, bufrd/NULL/
 
@@ -57,16 +59,16 @@ begin
 
 	if (ty_spp == TY_CHAR || ty_spp == TY_LONG) {
 	   ty_mii = bitpix
-	   len_mii = miilen (npix_rec, ty_mii)
-	   sz_rec = len_mii * SZ_INT
+	   len_mii = miipksize (npix_rec, ty_mii)
+	   sz_rec = len_mii
 	   if (mii != NULL)
-	      call mfree (mii, TY_INT)
-	   call malloc (mii, len_mii, TY_INT)
+	      call mfree (mii, TY_CHAR)
+	   call malloc (mii, len_mii, TY_CHAR)
 	   ip = nch_rec
 	} else { # is REAL or DOUBLE
 	   if (bufrd != NULL)
 	      call mfree (bufrd, TY_INT)
-	   nint_rec = npix_rec * sizeof (ty_spp) / 2
+	   nint_rec = npix_rec * sizeof (ty_spp) / SZ_INT
 	   call malloc (bufrd, nint_rec, TY_INT)
 	   ip = npix_rec
 	}
@@ -84,14 +86,14 @@ entry	rft_read_pixels (fd, buffer, npix, recptr, bufsize)
 	repeat {
 	    # If data is exhausted read the next record
 	    if (ip == nch_rec) {
-		iferr (i = read (fd, Memi[mii], sz_rec)) {
+		iferr (i = read (fd, Memc[mii], sz_rec)) {
 		       call fseti (fd, F_VALIDATE, bufsize * sz_rec)
 		       call printf ("Error reading record %d\n")
 		       if (mod (recptr + 1, bufsize) == 0)
 			   call pargi ((recptr + 1) / bufsize)
 		       else
 			   call pargi ((recptr + 1) / bufsize + 1)
-		       i = read (fd, Memi[mii], sz_rec)
+		       i = read (fd, Memc[mii], sz_rec)
 		}
 		if (i == EOF)
 		    return (EOF)
@@ -99,17 +101,17 @@ entry	rft_read_pixels (fd, buffer, npix, recptr, bufsize)
 		if (swap == YES)
 		   switch (ty_mii) {
 		   case MII_SHORT:
-		      call bswap2 (Memi[mii], 1, Memi[mii], 1,
+		      call bswap2 (Memc[mii], 1, Memc[mii], 1,
 				sz_rec * SZB_CHAR)
 		   case MII_LONG:
-		      call bswap4 (Memi[mii], 1, Memi[mii], 1,
+		      call bswap4 (Memc[mii], 1, Memc[mii], 1,
 				sz_rec * SZB_CHAR)
 		   }
 
 		if (byte_input == YES)
-		   call amovc (Memi[mii], Memc[spp], npix_rec)
+		   call amovc (Memc[mii], Memc[spp], npix_rec)
 		else
-		  call miiupk (Memi[mii], Memc[spp], npix_rec, ty_mii, ty_spp)
+		  call miiupk (Memc[mii], Memc[spp], npix_rec, ty_mii, ty_spp)
 
 		ip = 0
 		recptr = recptr + 1

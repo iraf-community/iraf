@@ -39,9 +39,11 @@ int	p_npts_per_rec, p_npts_per_scan, p_nrecs_per_scan, p_scantype
 int	nrec, op, nchars
 pointer	mii
 
-int	miilen(), pds_roundup(), read()
+size_t	miipksize()
+int	pds_roundup()
+long	read()
 
-errchk	miilen, malloc, mfree, miiupk, read
+errchk	miipksize, malloc, mfree, miiupk, read
 
 data	mii/NULL/
 
@@ -59,10 +61,10 @@ begin
 
 	maxbufsize = pds_roundup (SCANSTART + 2*p_npts_per_rec, SZB_CHAR)
 	maxbufsize = pds_roundup (maxbufsize, 2) / 2
-	len_mii = miilen (maxbufsize, MII_SHORT)
+	len_mii = miipksize (maxbufsize, MII_SHORT)
 	if (mii != NULL)
-	    call mfree (mii, TY_INT)
-	call malloc (mii, len_mii, TY_INT)
+	    call mfree (mii, TY_CHAR)
+	call malloc (mii, len_mii, TY_CHAR)
 
 	# Calculate the number of data points, and the number of chars
 	# in a first, full and last record rounding up if the record is
@@ -97,36 +99,36 @@ entry	pds_read_scan (fd, scanbuf)
 	    # Get 1st record, remove the 10 bytes containing the scan start
 	    # parameter, and unpack the data.
 	    if (nrec == 1) {
-		nchars = read (fd, Memi[mii], sz_first)
+		nchars = read (fd, Memc[mii], sz_first)
 		if (nchars == EOF)
 		    return (EOF)
 		else if (nchars < sz_first)
 		    call error (6, "Short record encountered.")
-		call bytmov (Memi[mii], SCANSTART + 1, Memi[mii], 1,
+		call bytmov (Memc[mii], SCANSTART + 1, Memc[mii], 1,
 					npts_first*2)
-		call miiupk (Memi[mii], scanbuf[op], npts_first,
+		call miiupk (Memc[mii], scanbuf[op], npts_first,
 					    MII_SHORT, TY_SHORT)
 		op = op + npts_first
 
 	    # Get last record which may be short
 	    } else if (nrec == p_nrecs_per_scan) {
-		nchars = read (fd, Memi[mii], sz_last)
+		nchars = read (fd, Memc[mii], sz_last)
 		if (nchars == EOF)
 		    return (EOF)
 		else if (nchars < sz_last)
 		    call error (6, "Short record encountered.")
-		call miiupk (Memi[mii], scanbuf[op], npts_last,
+		call miiupk (Memc[mii], scanbuf[op], npts_last,
 					    MII_SHORT, TY_SHORT)
 		op = op + npts_last
 
 	    # Get a full record
 	    } else {
-		nchars = read (fd, Memi[mii], sz_full)
+		nchars = read (fd, Memc[mii], sz_full)
 		if (nchars == EOF)
 		    return (EOF)
 		else if ( nchars < sz_full)
 		    call error (6, "Short record encountered.")
-		call miiupk (Memi[mii], scanbuf[op], npts_full,
+		call miiupk (Memc[mii], scanbuf[op], npts_full,
 					    MII_SHORT, TY_SHORT)
 		op = op + npts_full
 	    }

@@ -25,7 +25,8 @@ char	blank
 int	ty_mii, ty_spp, npix_rec, nch_rec, len_mii, sz_rec, nchars, n, nrec
 pointer	spp, mii, ip, op
 
-int	sizeof(), miilen(), fstati()
+int	sizeof(), fstati()
+size_t	miipksize()
 errchk	malloc, mfree, write, miipak, amovc
 data	mii /NULL/, spp/NULL/
 
@@ -39,8 +40,8 @@ begin
 	nch_rec = npix_rec * sizeof (ty_spp)
 	blank = ' '
 
-	len_mii = miilen (npix_rec, ty_mii)
-	sz_rec = len_mii * SZ_INT
+	len_mii = miipksize (npix_rec, ty_mii)
+	sz_rec = len_mii
 
 	# Allocate space for the buffers
 	if (spp != NULL)
@@ -48,8 +49,8 @@ begin
 	call malloc (spp, nch_rec, TY_CHAR)
 	
 	if (mii != NULL)
-	   call mfree (mii, TY_INT)
-	call malloc (mii, len_mii, TY_INT)
+	   call mfree (mii, TY_CHAR)
+	call malloc (mii, len_mii, TY_CHAR)
 
 	op = 0
 	nrec = 0
@@ -109,8 +110,8 @@ entry	wft_write_pixels (fd, buffer, npix)
 
 	    # Write output record.
 	    if (op == nch_rec) {
-		call miipak (Memc[spp], Memi[mii], npix_rec, ty_spp, ty_mii)
-		iferr (call write (fd, Memi[mii], sz_rec)) {
+		call miipak (Memc[spp], Memc[mii], npix_rec, ty_spp, ty_mii)
+		iferr (call write (fd, Memc[mii], sz_rec)) {
 		   call eprintf (" File incomplete: %d logical data")
 		       call pargi (nrec)
 	           call eprintf (" (%d byte) records written\n")
@@ -169,8 +170,8 @@ entry	wft_write_last_record (fd, nrecords)
 			"WRT_LAST_RECORD: Error writing last data record.")
 	       }
 	    } else {
-	       call miipak (Memc[spp], Memi[mii], npix_rec, ty_spp, ty_mii)
-	       iferr (call write (fd, Memi[mii], sz_rec)) {
+	       call miipak (Memc[spp], Memc[mii], npix_rec, ty_spp, ty_mii)
+	       iferr (call write (fd, Memc[mii], sz_rec)) {
                    call printf (" File incomplete: %d logical data")
 		       call pargi (nrec)
 		   call printf (" (%d byte) records written\n")
