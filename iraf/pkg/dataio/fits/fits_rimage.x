@@ -13,14 +13,18 @@ int	fits_fd		# FITS file descriptor
 pointer	fits		# FITS data structure
 pointer	im		# IRAF image descriptor
 
-int	i, npix, npix_record, blksize, ndummy
-long	v[IM_MAXDIM], nlines, il
+size_t	sz_val
+long	l_val
+int	i
+size_t	npix, npix_record, ndummy
+long	v[IM_MAXDIM], blksize, nlines, il
 pointer	tempbuf, buf
 real	linemax, linemin, lirafmin, lirafmax
 double	dblank
 
-long	clktime()
-int	fstati(), rft_init_read_pixels(), rft_read_pixels()
+int	absi()
+long	clktime(), fstatl(), modl()
+long	rft_init_read_pixels(), rft_read_pixels()
 
 errchk	malloc, mfree, rft_init_read_pixels, rft_read_pixels, rft_lscale_pix
 errchk	rft_lchange_pix, rft_rchange_pix, rfit_dchange_pix, rft_put_image_line
@@ -50,9 +54,10 @@ begin
 	# Compute the number of pixels per record and the number of records
 	# per output block.
 
-	npix_record = len_record * FITS_BYTE / abs (BITPIX(fits))
-	blksize = fstati (fits_fd, F_SZBBLK)
-	if (mod (blksize, FITS_RECORD) == 0)
+	npix_record = len_record * FITS_BYTE / absi(BITPIX(fits))
+	blksize = fstatl (fits_fd, F_SZBBLK)
+	l_val = FITS_RECORD
+	if (modl(blksize, l_val) == 0)
 	    blksize = blksize / FITS_RECORD
 	else
 	    blksize = 1
@@ -60,7 +65,9 @@ begin
 	# FITS data is converted to type  LONG, REAL or DOUBLE. If BITPIX is
 	# not one of the MII types then rft_read_pixels returns an ERROR.
 
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	switch (BITPIX(fits)) {
 	case FITS_REAL:
 
@@ -82,8 +89,10 @@ begin
 
 	    do il = 1, nlines {
 	        call rft_put_image_line (im, buf, v, PIXTYPE(im))
+		sz_val = blksize
+		# arg2: incompatible pointer
 	        if (rft_read_pixels (fits_fd, Memr[tempbuf], npix,
-	            NRECORDS(fits), blksize) != npix)
+	            NRECORDS(fits), sz_val) != npix)
 		    call printf ("Error reading FITS data\n")
 	        if (SCALE(fits) == YES)
 	            call rft_rscale_pix (Memr[tempbuf], buf, npix,
@@ -123,8 +132,10 @@ begin
 
 	    do il = 1, nlines {
 	        call rft_put_image_line (im, buf, v, PIXTYPE(im))
+		sz_val = blksize
+		# arg2: incompatible pointer
 	        if (rft_read_pixels (fits_fd, Memd[tempbuf], npix,
-	            NRECORDS(fits), blksize) != npix)
+	            NRECORDS(fits), sz_val) != npix)
 		    call printf ("Error reading FITS data\n")
 	        if (SCALE(fits) == YES)
 	            call rft_dscale_pix (Memd[tempbuf], buf, npix,
@@ -160,8 +171,10 @@ begin
 	    i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_LONG)
 	    do il = 1, nlines {
 	        call rft_put_image_line (im, buf, v, PIXTYPE(im))
+		sz_val = blksize
+		# arg2: incompatible pointer
 	        if (rft_read_pixels (fits_fd, Meml[tempbuf], npix,
-	            NRECORDS(fits), blksize) != npix)
+	            NRECORDS(fits), sz_val) != npix)
 		    call printf ("Error reading FITS data\n")
 	        if (SCALE(fits) == YES)
 	            call rft_lscale_pix (Meml[tempbuf], buf, npix,
@@ -182,7 +195,8 @@ begin
 
 	IRAFMIN(im) = lirafmin
 	IRAFMAX(im) = lirafmax
-	LIMTIME(im) = clktime (long(0))
+	l_val = 0
+	LIMTIME(im) = clktime (l_val)
 
 	if (short_header == YES || long_header == YES) {
 	    if (NBPIX (im) != 0) {
@@ -216,7 +230,7 @@ pointer	buf			# Pointer to output image line
 long	v[ARB]			# imio pointer
 int	data_type		# output pixel type
 
-int	impnll(), impnlr(), impnld(), impnlx()
+long	impnll(), impnlr(), impnld(), impnlx()
 errchk	impnll, impnlr, impnld, impnlx
 
 begin
@@ -247,7 +261,7 @@ procedure rft_rscale_pix (inbuf, outbuf, npix, bscale, bzero, data_type)
 
 real	inbuf[ARB]		# buffer of FITS integers
 pointer	outbuf			# pointer to output image line
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero
 int	data_type		# IRAF image pixel type
 
@@ -281,7 +295,7 @@ procedure rft_dscale_pix (inbuf, outbuf, npix, bscale, bzero, data_type)
 
 double	inbuf[ARB]		# buffer of FITS integers
 pointer	outbuf			# pointer to output image line
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero
 int	data_type		# IRAF image pixel type
 
@@ -316,7 +330,7 @@ procedure rft_lscale_pix (inbuf, outbuf, npix, bscale, bzero, data_type)
 
 long	inbuf[ARB]		# buffer of FITS integers
 pointer	outbuf			# pointer to output image line
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero
 int	data_type		# IRAF image pixel type
 
@@ -350,7 +364,7 @@ procedure rft_rchange_pix (inbuf, outbuf, npix, data_type)
 
 real	inbuf[ARB]		# array of FITS integers
 pointer	outbuf			# pointer to IRAF image line
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	data_type		# IRAF pixel type
 
 errchk	achtrl, amovr, achtrd, achtrx
@@ -378,7 +392,7 @@ procedure rft_dchange_pix (inbuf, outbuf, npix, data_type)
 
 double  inbuf[ARB]		# array of FITS integers
 pointer	outbuf			# pointer to IRAF image line
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	data_type		# IRAF pixel type
 
 errchk	achtdl, achtdr, amovd, achtdx
@@ -407,7 +421,7 @@ procedure rft_lchange_pix (inbuf, outbuf, npix, data_type)
 
 long	inbuf[ARB]		# array of FITS integers
 pointer	outbuf			# pointer to IRAF image line
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	data_type		# IRAF pixel type
 
 begin
@@ -433,13 +447,13 @@ procedure rft_map_blanks (a, buf, npts, pixtype, blank_value, blank, nbadpix)
 
 long	a[ARB]		# integer input buffer
 pointer	buf		# pointer to output image buffer
-int	npts		# number of points
+size_t	npts		# number of points
 int	pixtype		# image data type
 long	blank_value	# FITS blank value
 real	blank		# user blank value
 long	nbadpix		# number of bad pixels
 
-int	i
+long	i
 
 begin
 	# Do blank mapping here
@@ -483,7 +497,7 @@ end
 procedure rft_pix_limits (buf, npix, pixtype, linemin, linemax)
 
 pointer	buf				# pointer to IRAF image line
-int	npix				# number of pixels
+size_t	npix				# number of pixels
 int	pixtype				# output data type
 real	linemax, linemin		# min and max pixel values
 
@@ -529,10 +543,10 @@ procedure altmlr (a, b, npix, bscale, bzero)
 
 long	a[ARB]		# input array
 real	b[ARB]		# output array
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	bscale, bzero	# scaling parameters
 
-int	i
+long	i
 
 begin
 	do i = 1, npix
@@ -546,10 +560,10 @@ procedure altmdr (a, b, npix, bscale, bzero)
 
 real	a[ARB]		# input array
 real	b[ARB]		# output array
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	bscale, bzero	# scaling parameters
 
-int	i
+long	i
 
 begin
 	do i = 1, npix

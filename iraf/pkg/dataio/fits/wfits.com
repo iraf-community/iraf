@@ -3,13 +3,13 @@
 double	bscale		# FITS scaling factor
 double	bzero		# FITS offset factor
 int	bitpix		# Output bits per pixel
-int	len_record	# Record length in FITS bytes
+size_t	len_record	# Record length in FITS bytes
 int	long_header	# Print long header?
 int	short_header	# Print short header?
 int	make_image	# Make a FITS image?
 int	scale		# Scale the data with bzero and bscale?
 int	autoscale	# Allow program to calculate bscale and bzero?
-int	blkfac		# FITS tape blocking factor
+size_t	blkfac		# FITS tape blocking factor
 int	wextensions	# Write a FITS extensions file
 int	gheader		# Write a global FITS extensions file header
 

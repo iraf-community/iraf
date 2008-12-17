@@ -18,33 +18,39 @@ char	iraffile[ARB]		# root IRAF file name
 pointer	pl			# pointer to the file/extensions list
 int	file_number		# the current file number
 
-bool	strne()
-int	fits_fd, stat, min_lenuserarea, ip, len_elist, oshort_header
-int	olong_header, ext_count, ext_number, max_extensions, naxes
+size_t	sz_val
+pointer	p_val
+int	fits_fd, stat, ip, oshort_header, olong_header, naxes, len_elist
+long	min_lenuserarea, ext_count, ext_number
+size_t	max_extensions
 pointer	im, gim, sp, fits, axes, extensions, imname, gimname, gfname, str
 pointer	himname
-int	rft_read_header(), mtopen(), strlen(), envfind(), ctoi()
+int	rft_read_header(), rft_ext_skip()
+int	mtopen(), strlen(), envfind(), ctol()
+bool	strne()
 pointer	immap()
-int	rft_ext_skip()
-real	asumi()
-errchk	smark, sfree, salloc, rft_read_header, rft_read_image, rft_find_eof()
+real	asumi(), nint_ri()
+errchk	smark, sfree, salloc, rft_read_header, rft_read_image, rft_find_eof
 errchk	rft_scan_file, mtopen, immap, imdelete, close, imunmap
 
 include	"rfits.com"
 
 begin
 	# Open input FITS data.
-	fits_fd = mtopen (fitsfile, READ_ONLY, 0)
+	sz_val = 0
+	fits_fd = mtopen (fitsfile, READ_ONLY, sz_val)
 
 	# Allocate memory for the FITS data structure and initialize the file
 	# dependent  components of that structure.
 	call smark (sp)
-	call salloc (fits, LEN_FITS, TY_STRUCT)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (himname, SZ_FNAME, TY_CHAR)
-	call salloc (gimname, SZ_FNAME, TY_CHAR)
-	call salloc (gfname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = LEN_FITS
+	call salloc (fits, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (himname, sz_val, TY_CHAR)
+	call salloc (gimname, sz_val, TY_CHAR)
+	call salloc (gfname, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Initialize.
 	SIMPLE(fits) = NO
@@ -56,7 +62,7 @@ begin
 	# Determine the length of the user area.
 	if (envfind ("min_lenuserarea", Memc[imname], SZ_FNAME) > 0) {
 	    ip = 1
-	    if (ctoi (Memc[imname], ip, min_lenuserarea) <= 0)
+	    if (ctol (Memc[imname], ip, min_lenuserarea) <= 0)
 		min_lenuserarea = LEN_USERAREA
 	    else
 		min_lenuserarea = max (LEN_USERAREA, min_lenuserarea)
@@ -69,15 +75,16 @@ begin
 
 	# Get the extensions list for a given line and count the number of
 	# extensions files.
-	call salloc (axes, 2, TY_INT)
-	call pl_gsize (pl, naxes, Memi[axes], stat)
-	max_extensions = Memi[axes+1]
+	sz_val = 2
+	call salloc (axes, sz_val, TY_LONG)
+	call pl_gsize (pl, naxes, Meml[axes], stat)
+	max_extensions = Meml[axes+1]
 	call salloc (extensions, max_extensions, TY_INT)
-	Memi[axes] = 1
-	Memi[axes+1] = file_number
-	call pl_glpi (pl, Memi[axes], Memi[extensions], 1, max_extensions,
+	Meml[axes] = 1
+	Meml[axes+1] = file_number
+	call pl_glpi (pl, Meml[axes], Memi[extensions], 1, max_extensions,
 	    PIX_SRC)
-	len_elist = nint (asumi (Memi[extensions], max_extensions))
+	len_elist = nint_ri (asumi (Memi[extensions], max_extensions))
 
 	# Loop over the extensions.
 	ext_count = 1; stat = BOF
@@ -102,10 +109,11 @@ begin
 		} else if (len_elist > 1 && ext_count == ext_number) {
 		    call sprintf (Memc[imname], SZ_FNAME, "%s%04d")
 			call pargstr (iraffile)
-			call pargi (ext_number - 1)
+			call pargl (ext_number - 1)
 		} else
 		    call strcpy (iraffile, Memc[imname], SZ_FNAME) 
-	        im = immap (Memc[imname], NEW_IMAGE, min_lenuserarea)
+		p_val = min_lenuserarea
+	        im = immap (Memc[imname], NEW_IMAGE, p_val)
 		call strcpy (IM_HDRFILE(im), Memc[himname], SZ_FNAME)
 
 	        # Skip any extensions the user does not want. In order to do
@@ -133,7 +141,7 @@ begin
 			    }
 			    if (ext_count > 1) {
 		                call printf ("Extension: %d End of data\n")
-		                    call pargi (ext_count - 1)
+		                    call pargl (ext_count - 1)
 			    } else
 	                        call printf ("    End of data\n")
 			} else if (EXTEND(fits) == NO) {
@@ -174,24 +182,24 @@ begin
 		                    call printf (
 				        "File: %s\nExtension: %d  Image: %s")
 		                        call pargstr (fitsfile)
-		                        call pargi (ext_number - 1)
+		                        call pargl (ext_number - 1)
 					#call pargstr (Memc[imname])
 					call pargstr (Memc[himname])
 				} else {
 		                    call printf ("File: %s  Extension: %d")
 		                        call pargstr (fitsfile)
-		                        call pargi (ext_number - 1)
+		                        call pargl (ext_number - 1)
 				}
 			    } else {
 				if (make_image == YES) {
 		                    call printf ("Extension: %d  Image: %s")
-		                        call pargi (ext_number - 1)
+		                        call pargl (ext_number - 1)
 					#call pargstr (Memc[imname])
 					call pargstr (Memc[himname])
 				} else {
 		                    call printf ("File: %s  Extension: %d")
 					call pargstr (fitsfile)
-		                        call pargi (ext_number - 1)
+		                        call pargl (ext_number - 1)
 				}
 			    }
 			} else {
@@ -202,10 +210,10 @@ begin
 			        ext_number - 1) < 1.0) {
 		                call printf ("File:  %s\nExtension: %d ")
 		                    call pargstr (fitsfile)
-		                    call pargi (ext_number - 1)
+		                    call pargl (ext_number - 1)
 			    } else {
 		                call printf ("Extension: %d ")
-		                    call pargi (ext_number - 1)
+		                    call pargl (ext_number - 1)
 			    }
 			}
 	                if (long_header == YES)
@@ -280,7 +288,7 @@ begin
 	            } then {
 			if (len_elist > 1) {
 			    call sprintf (Memc[str], SZ_FNAME, ".%d")
-			        call pargi (ext_number - 1)
+			        call pargl (ext_number - 1)
 			    call strcat (Memc[str], IRAFNAME(fits), SZ_FNAME)
 	                    iferr (call imrename (Memc[imname],
 			        IRAFNAME(fits))) {
@@ -371,15 +379,15 @@ procedure rft_find_eof (fd)
 
 int	fd			# the FITS file descriptor
 
-int	szbuf
+size_t	szbuf
 pointer	sp, buf
-int	fstati()
+long	fstatl()
 long	read()
 errchk	read
 
 begin
 	# Scan through the file.
-	szbuf = fstati (fd, F_BUFSIZE)
+	szbuf = fstatl (fd, F_BUFSIZE)
 	call smark (sp)
 	call salloc (buf, szbuf, TY_CHAR)
 	while (read (fd, Memc[buf], szbuf) != EOF)
@@ -399,11 +407,12 @@ pointer	fits			# pointer to the FITS descriptor
 pointer	im			# pointer to the output image
 real	fe			# maximum file size in Kb for scan mode
 
-int	i, szbuf
+int	i
+size_t	szbuf
 pointer	sp, buf
 real	file_size
-int	fstati()
-long	read()
+int	absi()
+long	fstatl(), read()
 errchk	read
 
 begin
@@ -414,12 +423,12 @@ begin
 	if (IM_NDIM(im) <= 0)
 	    file_size = 0.0
 	else
-	    file_size = file_size * abs (BITPIX(fits)) / FITS_BYTE / 1.0e3
+	    file_size = file_size * absi(BITPIX(fits)) / FITS_BYTE / 1.0e3
 	if (file_size >= fe)
 	    return
 
 	# Scan through the file.
-	szbuf = fstati (fd, F_BUFSIZE)
+	szbuf = fstatl (fd, F_BUFSIZE)
 	call smark (sp)
 	call salloc (buf, szbuf, TY_CHAR)
 	while (read (fd, Memc[buf], szbuf) != EOF)
@@ -437,9 +446,14 @@ int	fits_fd			# fits file descriptor
 pointer	fits			# pointer to the fits structure
 pointer	im			# pointer to the output image
 
-int	i, nbits, nblocks, sz_rec, blksize, stat
+size_t	sz_val
+long	l_val
+int	i
+size_t	sz_rec
+long	j, blksize, nbits, nblocks, stat
 pointer	buf
-int	fstati(), rft_getbuf()
+int	absi()
+long	modl(), fstatl(), rft_getbuf()
 
 begin
 	# Compute the number of blocks to skip.
@@ -447,21 +461,23 @@ begin
 	do i = 2, NAXIS(im)
 	    nbits = nbits * NAXISN(im,i)
 	nbits = nbits + PCOUNT(fits)
-	nbits = abs (BITPIX(fits)) * GCOUNT(fits) * nbits
-	nblocks = int ((nbits + 23039) / 23040)
+	nbits = absi(BITPIX(fits)) * GCOUNT(fits) * nbits
+	nblocks = (nbits + 23039) / 23040
 
 	sz_rec = FITS_RECORD / SZB_CHAR
 	call malloc (buf, sz_rec, TY_CHAR)
-	blksize = fstati (fits_fd, F_SZBBLK)
-        if (mod (blksize, FITS_RECORD) == 0)
+	blksize = fstatl (fits_fd, F_SZBBLK)
+	l_val = FITS_RECORD
+        if (modl(blksize, l_val) == 0)
             blksize = blksize / FITS_RECORD
         else
             blksize = 1
 
 	# Skip the blocks.
-	do i = 1, nblocks {
-	    stat = rft_getbuf (fits_fd, Memc[buf], sz_rec, blksize,
-	        NRECORDS(fits))
+	do j = 1, nblocks {
+	    sz_val = blksize
+	    stat = rft_getbuf (fits_fd, Memc[buf], sz_rec, sz_val,
+			       NRECORDS(fits))
 	    if (stat == EOF)
 		break
 	}

@@ -18,13 +18,18 @@ char	fits_file[ARB]		# FITS file name
 int	image_number		# the current image number
 int	nimages			# the number of images
 
-int	fits_fd, chars_rec, nchars, ip, min_lenuserarea
+size_t	sz_val
+pointer	p_val
+int	fits_fd, nchars, ip
+long	min_lenuserarea
+size_t	chars_rec
 pointer	im, sp, fits, envstr
 
-int	mtfile(), mtopen(), open(), fnldir(), envfind(), ctoi()
+int	mtfile(), mtopen(), open(), fnldir(), envfind(), ctol()
 pointer	immap()
 errchk	immap, imunmap, open, mtopen, close, smark, salloc, sfree
 errchk	delete, wft_write_header, wft_write_image, wft_data_limits
+include	<nullptr.inc>
 
 include "wfits.com"
 
@@ -46,13 +51,15 @@ begin
 
 	# Allocate memory for program data structure.
 	call smark (sp)
-	call salloc (fits, LEN_FITS, TY_STRUCT)
-	call salloc (envstr, SZ_FNAME, TY_CHAR)
+	sz_val = LEN_FITS
+	call salloc (fits, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (envstr, sz_val, TY_CHAR)
 
 	# Set up the minimum length of the user area.
 	if (envfind ("min_lenuserarea", Memc[envstr], SZ_FNAME) > 0) {
 	    ip = 1
-	    if (ctoi (Memc[envstr], ip, min_lenuserarea) <= 0)
+	    if (ctol (Memc[envstr], ip, min_lenuserarea) <= 0)
 		min_lenuserarea = LEN_USERAREA
 	    else
 		min_lenuserarea = max (LEN_USERAREA, min_lenuserarea)
@@ -65,7 +72,7 @@ begin
 	    XTENSION(fits) = EXT_PRIMARY
 
 	    # Open a dummy image.
-	    im = immap ("dev$null", NEW_IMAGE, 0)
+	    im = immap ("dev$null", NEW_IMAGE, NULLPTR)
 	    NAXIS(im) = 0
 	    PIXTYPE(im) = TY_SHORT
 	    OBJECT(im) = EOS
@@ -136,7 +143,8 @@ begin
 	        XTENSION(fits) = EXT_PRIMARY
 	}
 
-	im = immap (iraf_file, READ_ONLY, min_lenuserarea)
+	p_val = min_lenuserarea
+	im = immap (iraf_file, READ_ONLY, p_val)
 	call imgcluster (iraf_file, IRAFNAME(fits), SZ_FNAME)
 	nchars = fnldir (IRAFNAME(fits), IRAFNAME(fits), SZ_FNAME)
 	call strcpy (iraf_file[nchars+1], IRAFNAME(fits), SZ_FNAME)
@@ -213,11 +221,13 @@ pointer	im		# image pointer
 real	irafmin		# minimum picture value
 real	irafmax		# maximum picture value
 
-int	npix
+size_t	sz_val
+long	l_val
+size_t	npix
 long	v[IM_MAXDIM]
 pointer	buf
 real	maxval, minval
-int	imgnlr()
+long	imgnlr()
 errchk	imgnlr
 
 begin
@@ -230,7 +240,9 @@ begin
 	    irafmin = MAX_REAL
 	    npix = NAXISN(im,1)
 
-	    call amovkl (long(1), v, IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    l_val = 1
+	    call amovkl (l_val, v, sz_val)
 	    while (imgnlr (im, buf, v) != EOF) {
 	        call alimr (Memr[buf], npix, minval, maxval)
 	        irafmin = min (irafmin, minval)

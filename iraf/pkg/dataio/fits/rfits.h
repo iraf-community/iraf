@@ -21,6 +21,7 @@ define	FITS_RECORD	2880	# number of bytes in a standard FITS record
 define	FITS_BYTE	 8	# Bits in a FITS byte
 define	FITS_SHORT	16	# Bits in a FITS short
 define	FITS_LONG	32	# Bits in a FITS long
+define	FITS_LONGLONG	64	# Bits in a FITS longlong
 define	FITS_REAL      -32	# Bits in a FITS real * -1
 define	FITS_DOUBLE    -64	# Bits in a FITS double * -1
 
@@ -62,7 +63,7 @@ define	BLANKS		Memi[P2I($1+5)]	  # YES if blank keyword in header
 define	BITPIX		Memi[P2I($1+6)]	  # Bits per pixel (Must be an MII type)
 define	SCALE		Memi[P2I($1+7)]	  # Scale the data ?
 define	SIMPLE		Memi[P2I($1+8)]	  # Standard FITS format 
-define	NRECORDS	Memi[P2I($1+9)]	  # Number of FITS logical records
+define	NRECORDS	Meml[P2L($1+9)]	  # Number of FITS logical records
 define	EXTEND		Memi[P2I($1+10)]	  # FITS extensions may be present
 define	XTENSION	Memi[P2I($1+11)]	  # FITS extension type
 define	PCOUNT		Memi[P2I($1+12)]	  # Number of random parameters

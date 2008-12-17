@@ -34,6 +34,7 @@ define	EXT_IMAGE	2		# the image extension
 define	FITS_BYTE	  8		# Number of bits in a FITS byte
 define	FITS_SHORT	 16		# Number of bits in a FITS short
 define	FITS_LONG	 32		# Number of bits in a FITS long
+define	FITS_LONGLONG	 64		# Number of bits in a FITS longlong
 define	FITS_REAL	-32		# Number of bits in a FITS real * -1
 define	FITS_DOUBLE	-64		# Number of bits in a FITS double * -1
 
@@ -48,6 +49,7 @@ define	LONG_PREC	10		# Precision of FITS long
 define	BYTE_BLANK	 0.0d0			# Blank value for a FITS byte
 define	SHORT_BLANK	-3.2768d4		# Blank value for a FITS short
 define	LONG_BLANK	-2.147483648d9		# Blank value for a FITS long
+define	LONGLONG_BLANK	-9.223372036854775808d18
 #define	BYTE_BLANK	 0			# Blank value for a FITS byte
 #define	SHORT_BLANK	-32768			# Blank value for a FITS short
 #define	LONG_BLANK	-2147483648		# Blank value for a FITS long
@@ -60,6 +62,8 @@ define	SHORT_MAX	        3.2767d4	# Max value for a FITS short
 define	SHORT_MIN              -3.2767d4	# Min value for a FITS short
 define	LONG_MAX	   2.147483647d9	# Max value for a FITS long
 define	LONG_MIN	  -2.147483647d9	# Min value for a FITS long
+define	LONGLONG_MAX	   9.223372036854774784d18
+define	LONGLONG_MIN	  -9.223372036854774784d18
 define	PREC_RATIO	     .99978637d0	# Tape span reduction factor
 
 # Define the FITS card image parameters
@@ -118,7 +122,7 @@ define	LEN_DATE	19		# Length of the new date string
 define	LEN_OBJECT	63		# Maximum length of string parameter
 define	LEN_ALIGN	18		# Maximum length for aligning parameter
 define	LEN_ORIGIN	9		# Length of origin string
-define	LEN_BLANK	11		# Length of the blank string
+define	LEN_BLANK	20		# Length of the blank string
 define	NDEC_REAL	7		# Precision of real data
 define	NDEC_DOUBLE	11		# Precision of double precision data
 

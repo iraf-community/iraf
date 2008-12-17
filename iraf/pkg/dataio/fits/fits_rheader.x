@@ -21,22 +21,27 @@ pointer	fits			# FITS data structure
 pointer	im			# IRAF image descriptor
 pointer	gim			# IRAF global header image descriptor
 
-int	i, stat, nread, max_lenuser, fd_usr, ndiscard
+size_t	sz_val
+size_t	c_1
+long	i
+int	ii, stat, nread, max_lenuser, fd_usr, ndiscard
 char	card[LEN_CARD+1], type_str[LEN_TYPESTR]
-int	rft_decode_card(), rft_init_read_pixels(), rft_read_pixels(), strmatch()
-int	stropen()
+int	rft_decode_card()
+long	rft_init_read_pixels(), rft_read_pixels()
+int	strmatch(), stropen()
 errchk	rft_decode_card, rft_init_read_pixels, rft_read_pixels
 errchk	stropen, close
 
 include "rfits.com"
 
 begin
+	c_1 = 1
 	# Initialization.
 	XTENSION(fits) = EXT_PRIMARY
 	BITPIX(fits) = INDEFI
 	NAXIS(im) = 0
-	do i = 1, IM_MAXDIM
-	    IM_LEN(im,i) = 0
+	do ii = 1, IM_MAXDIM
+	    IM_LEN(im,ii) = 0
 	PCOUNT(fits) = 0
 	GCOUNT(fits) = 1
 	SCALE(fits) = NO
@@ -64,7 +69,8 @@ begin
 	repeat {
 
 	    # Read the card.
-	    i = rft_read_pixels (fits_fd, card, LEN_CARD, NRECORDS(fits), 1)
+	    sz_val = LEN_CARD
+	    i = rft_read_pixels (fits_fd, card, sz_val, NRECORDS(fits), c_1)
 	    card[LEN_CARD + 1] = '\n'
 	    card[LEN_CARD + 2] = EOS
 
@@ -158,13 +164,13 @@ begin
 	    if (NAXIS(im) == 0)
 		call printf ("0")
 	    else {
-	        do i = 1, NAXIS(im) {
-		    if (i == 1) {
+	        do ii = 1, NAXIS(im) {
+		    if (ii == 1) {
 		        call printf ("%d")
-		            call pargl (NAXISN(im,i))
+		            call pargl (NAXISN(im,ii))
 		    } else {
 		        call printf ("x%d")
-		            call pargl (NAXISN(im,i))
+		            call pargl (NAXISN(im,ii))
 		    }
 	        }
 	    }
@@ -236,6 +242,7 @@ int	fd_usr		# file descriptor of user area
 char	card[ARB]	# FITS card
 int	ndiscard	# Number of cards for which no space available
 
+size_t	sz_val
 char	cval
 double	dval
 int	nchar, i, j, k, len
@@ -249,8 +256,10 @@ include	"rfits.com"
 
 begin
 	call smark (sp)
-	call salloc (str, LEN_CARD, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (comment, sz_val, TY_CHAR)
 
 	i = COL_VALUE
 	if (strmatch (card, "^END     ") != 0) {
@@ -497,7 +506,7 @@ int	maxch			# maximum number of characters
 char	colon, minus
 int	ip, nchar, fst, lst, deg, min
 real	sec
-int	stridx(), strldx(), strlen(), ctoi(), ctor()
+int	stridx(), strldx(), strlen(), ctoi(), ctor(), absi()
 
 begin
 	# Return if not a FITS string parameter.
@@ -560,13 +569,13 @@ begin
 	if (stridx (minus, str) > 0 || deg < 0 || min < 0 || sec < 0.0) {
 	    call sprintf (str, maxch, "%c%d:%02d:%05.2f")
 		call pargc (minus)
-	        call pargi (abs (deg))
-	        call pargi (abs (min))
+	        call pargi (absi(deg))
+	        call pargi (absi(min))
 	        call pargr (abs (sec))
 	} else {
 	    call sprintf (str, maxch, "%2d:%02d:%05.2f")
 	        call pargi (deg)
-	        call pargi (abs (min))
+	        call pargi (absi(min))
 	        call pargr (abs (sec))
 	}
 
@@ -706,7 +715,7 @@ char	incard[ARB]		# input FITS card image
 char	outcard[ARB]		# output FITS card
 int	maxch			# maximum size of card
 
-int	ip
+size_t	ip
 
 begin
 	ip = maxch
@@ -746,6 +755,7 @@ double	bscale		# FITS scaling parameter
 double	bzero		# FITS offset parameter
 
 bool	rft_equald()
+int	absi()
 include "rfits.com"
 
 begin
@@ -753,7 +763,7 @@ begin
 
         if (data_type == ERR) {
             if (BITPIX(fits) < 0) {
-                if (abs (BITPIX(fits)) <= (SZ_REAL * SZB_CHAR * NBITS_BYTE))
+                if (absi(BITPIX(fits)) <= (SZ_REAL * SZB_CHAR * NBITS_BYTE))
                     PIXTYPE(im) = TY_REAL
                 else
                     PIXTYPE(im) = TY_DOUBLE
@@ -769,7 +779,7 @@ begin
                 if (BITPIX(fits) <= (SZ_SHORT * SZB_CHAR * NBITS_BYTE))
                     PIXTYPE(im) = TY_SHORT
                 else
-                    PIXTYPE(im) = TY_LONG
+                    PIXTYPE(im) = TY_INT
             }
 
         } else
@@ -789,7 +799,9 @@ int	len_card	# length of FITS card
 int	ndiscard	# number of cards discarded
 int	long_header	# print the long header
 
-int	ngcards, gim_lenuser, ninherit, count
+int	gim_lenuser, ninherit
+size_t	ngcards
+long	count
 pointer	sp, indices, idb_gim, grp, irp
 bool	streq()
 int	strlen(), idb_nextcard(), idb_find()

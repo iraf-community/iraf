@@ -13,11 +13,16 @@ pointer	im			# IRAF image descriptor
 pointer	fits			# FITS data structure
 int	fits_fd			# FITS file descriptor
 
-int	npix, nlines, npix_record, i, stat, nrecords
+size_t	sz_val
+long	l_val
+size_t	npix, npix_record, nrecords
+long	nlines, i
+long	stat
 long	v[IM_MAXDIM]
 pointer	tempbuf, buf
 
-int	wft_get_image_line()
+long	wft_get_image_line()
+int	absi()
 errchk	malloc, mfree, wft_get_image_line, wft_lscale_line, wft_long_line
 errchk	wft_init_write_pixels, wft_write_pixels, wft_write_last_record
 errchk	wft_rscale_line, wft_dscale_line
@@ -37,9 +42,11 @@ begin
 	nlines = 1
 	do i = 2, NAXIS(im)
 	    nlines = nlines * NAXISN(im, i)
-	npix_record = len_record * FITS_BYTE / abs (FITS_BITPIX(fits))
+	npix_record = len_record * FITS_BYTE / absi(FITS_BITPIX(fits))
 
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	switch (FITS_BITPIX(fits)) {
 	case FITS_REAL:
 
@@ -70,6 +77,7 @@ begin
 		        1. / BSCALE(fits), -BZERO(fits), PIXTYPE(im))
 		else
 		    call wft_real_line (buf, Memr[tempbuf], npix, PIXTYPE(im)) 
+		# arg2: incompatible pointer
 	        call wft_write_pixels (fits_fd, Memr[tempbuf], npix)
 	    }
 
@@ -106,6 +114,7 @@ begin
 		else
 		    call wft_double_line (buf, Memd[tempbuf], npix,
 		        PIXTYPE(im)) 
+		# arg2: incompatible pointer
 	        call wft_write_pixels (fits_fd, Memd[tempbuf], npix)
 	    }
 
@@ -137,6 +146,7 @@ begin
 	        else
 		    call wft_long_line (buf, Meml[tempbuf], npix, PIXTYPE(im)) 
 	        # call map_blanks (im, Meml[tempbuf], blank)
+		# arg2: incompatible pointer
 	        call wft_write_pixels (fits_fd, Meml[tempbuf], npix)
 	    }
 	    # Free space.
@@ -147,22 +157,22 @@ begin
 	call wft_write_last_record (fits_fd, nrecords)
 	if (short_header == YES || long_header == YES) {
 	    call printf ("%d  Data logical (2880 byte) records written\n")
-	        call pargi (nrecords)
+	        call pargz (nrecords)
 	}
 end
 
 
 # WFT_GET_IMAGE_LINE -- Procedure to fetch the next image line.
 
-int procedure wft_get_image_line (im, buf, v, datatype)
+long procedure wft_get_image_line (im, buf, v, datatype)
 
 pointer	im			# IRAF image descriptor
 pointer	buf			# pointer to image line
 long	v[ARB]			# imio dimension descriptor
 int	datatype		# IRAF image data type
 
-int	npix
-int	imgnll(), imgnlr(), imgnld(), imgnlx()
+long	npix
+long	imgnll(), imgnlr(), imgnld(), imgnlx()
 errchk	imgnll, imgnlr, imgnld, imgnlx
 
 begin
@@ -190,7 +200,7 @@ procedure wft_rscale_line (buf, outbuffer, npix, bscale, bzero, datatype)
 
 pointer	buf			# pointer to IRAF image line
 real	outbuffer[ARB]		# FITS integer buffer
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero parameters
 int	datatype		# data type of image
 
@@ -223,7 +233,7 @@ procedure wft_dscale_line (buf, outbuffer, npix, bscale, bzero, datatype)
 
 pointer	buf			# pointer to IRAF image line
 double	outbuffer[ARB]		# FITS integer buffer
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero parameters
 int	datatype		# data type of image
 
@@ -256,7 +266,7 @@ procedure wft_lscale_line (buf, outbuffer, npix, bscale, bzero, datatype)
 
 pointer	buf			# pointer to IRAF image line
 long	outbuffer[ARB]		# FITS integer buffer
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero parameters
 int	datatype		# data type of image
 
@@ -285,7 +295,7 @@ procedure wft_real_line (buf, outbuffer, npix, datatype)
 
 pointer	buf			# pointer to IRAF image line
 real	outbuffer[ARB]		# buffer of FITS integers
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	datatype		# IRAF image datatype
 
 errchk	achtlr, achtdr, amovr, achtxr
@@ -313,7 +323,7 @@ procedure wft_double_line (buf, outbuffer, npix, datatype)
 
 pointer	buf			# pointer to IRAF image line
 double  outbuffer[ARB]		# buffer of FITS integers
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	datatype		# IRAF image datatype
 
 errchk	achtld, achtrd, amovd, achtxd
@@ -341,7 +351,7 @@ procedure wft_long_line (buf, outbuffer, npix, datatype)
 
 pointer	buf			# pointer to IRAF image line
 long	outbuffer[ARB]		# buffer of FITS integers
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	datatype		# IRAF image datatype
 
 errchk	amovl, achtrl, achtdl, achtxl
@@ -369,11 +379,11 @@ procedure altall (a, b, npix, k1, k2)
 
 long	a[ARB]		# input vector
 long	b[ARB]		# output vector
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	k1, k2		# scaling factors
 
 double	dtemp
-int	i
+long	i
 
 begin
 	do i = 1, npix {
@@ -394,10 +404,10 @@ procedure altarl (a, b, npix, k1, k2)
 
 real	a[ARB]		# input vector
 long	b[ARB]		# output vector
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	k1, k2		# scaling factors
 
-int	i
+long	i
 double	dtemp
 
 begin
@@ -419,10 +429,10 @@ procedure altadl (a, b, npix, k1, k2)
 
 double	a[ARB]		# input vector
 long	b[ARB]		# output vector
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	k1, k2		# scaling factors
 
-int	i
+long	i
 double	dtemp
 
 begin
@@ -444,10 +454,10 @@ procedure altaxl (a, b, npix, k1, k2)
 
 complex	a[ARB]		# input vector
 long	b[ARB]		# output vector
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	k1, k2		# scaling factors
 
-int	i
+long	i
 double	dtemp
 
 begin
@@ -468,10 +478,10 @@ procedure altadr (a, b, npix, k1, k2)
 
 real	a[ARB]		# input vector
 real	b[ARB]		# output vector
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	k1, k2		# scaling factors
 
-int	i
+long	i
 
 begin
 	do i = 1, npix
@@ -485,10 +495,10 @@ procedure altadx (a, b, npix, k1, k2)
 
 complex	a[ARB]		# input vector
 complex	b[ARB]		# output vector
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	k1, k2		# scaling factors
 
-int	i
+long	i
 
 begin
 	do i = 1, npix

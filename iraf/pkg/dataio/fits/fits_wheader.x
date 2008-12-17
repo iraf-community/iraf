@@ -17,10 +17,13 @@ pointer	im		# pointer to the IRAF image
 pointer	fits		# pointer to the FITS structure
 int	fits_fd		# the FITS file descriptor
 
+size_t	sz_val
 char	card[LEN_CARD+1], trim_card[LEN_CARD+1]
-int	nrecords, recntr, cardptr, cardcnt, stat, cards_per_rec, i
+size_t	nrecords
+int	recntr, cardptr, cardcnt, stat, cards_per_rec, i
 int	wft_card_encode(), wft_set_bitpix(), sizeof(), strncmp()
-int	wft_init_card_encode(), fstati()
+int	wft_init_card_encode(), modi()
+long	fstatl()
 
 errchk	wft_set_bitpix, wft_get_iraf_typestring, wft_set_scale, wft_set_blank
 errchk	wft_fits_set_scale, wft_init_card_encode, wft_card_encode
@@ -111,9 +114,9 @@ begin
 		call pargstr (TYPE_STRING(fits))
 		call pargi (FITS_BITPIX(fits))
 
-	    if (fstati (fits_fd, F_BLKSIZE) == 0) {
+	    if (fstatl (fits_fd, F_BLKSIZE) == 0) {
 		call printf (" blkfac=%d")
-		    call pargi (blkfac)
+		    call pargz (blkfac)
 	    } else
 		call printf (" blkfac=fixed")
 
@@ -135,8 +138,10 @@ begin
 		next
 
 	    # Write the card to the output file if make_image is yes.
-	    if (make_image == YES)
-	        call wft_write_pixels (fits_fd, card, LEN_CARD)
+	    if (make_image == YES) {
+		sz_val = LEN_CARD
+	        call wft_write_pixels (fits_fd, card, sz_val)
+	    }
 
 	    # Trim the card and write is to the standard output if 
 	    # long_header is yes.
@@ -149,7 +154,7 @@ begin
 		    call pargstr (trim_card)
 	    }
 
-	    if (mod (cardcnt, cards_per_rec) == 0) {
+	    if (modi(cardcnt, cards_per_rec) == 0) {
 	        recntr = recntr + 1
 	        cardptr = 1
 	    } else
@@ -171,7 +176,7 @@ begin
 	    call wft_write_last_record (fits_fd, nrecords)
 	    if (short_header == YES || long_header == YES) {
 	        call printf ("\t%d Header  ")
-		    call pargi (nrecords)
+		    call pargz (nrecords)
 	    }
 	}
 end
@@ -192,15 +197,18 @@ begin
 	if (bitpix == ERR) {
 	    switch (datatype) {
 	    case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
-	        if (data_bitpix <= FITS_BYTE)
+	        if (data_bitpix <= FITS_BYTE) {
 		    return (FITS_BYTE)
-	        else if (data_bitpix <= FITS_SHORT) {
+	        } else if (data_bitpix <= FITS_SHORT) {
 		    #if (datatype == TY_USHORT)
 			#return (FITS_LONG)
 		    #else
 		    return (FITS_SHORT)
-	        } else
+	        } else if (data_bitpix <= FITS_LONG) {
 		    return (FITS_LONG)
+	        } else {
+		    return (FITS_LONGLONG)
+		}
 	    case TY_REAL, TY_COMPLEX:
 		return (FITS_REAL)
 	    case TY_DOUBLE:
@@ -352,6 +360,9 @@ begin
 	case FITS_LONG:
 	    maxtape = LONG_MAX
 	    mintape = LONG_MIN
+	case FITS_LONGLONG:
+	    maxtape = LONGLONG_MAX
+	    mintape = LONGLONG_MIN
 	default:
 	    call error (4, "TAPE_LIMITS: Unknown FITS type.")
 	}
@@ -367,17 +378,27 @@ int	fits_bitpix	# the requested FITS bits per pixel
 long	blank		# the FITS integer value of a blank pixel
 char	blank_str[ARB]	# the encoded FITS integer value of a blank pixel
 
+double	tmp
+
 begin
 	switch (fits_bitpix) {
 	case FITS_BYTE:
-	    blank = long (BYTE_BLANK)
+	    blank = BYTE_BLANK
 	    call strcpy ("0", blank_str, LEN_BLANK)
 	case FITS_SHORT:
-	    blank = long (SHORT_BLANK)
+	    blank = SHORT_BLANK
 	    call strcpy ("-32768", blank_str, LEN_BLANK)
 	case FITS_LONG:
-	    blank = long (LONG_BLANK)
+	    blank = LONG_BLANK
 	    call strcpy ("-2147483648", blank_str, LEN_BLANK)
+	case FITS_LONGLONG:
+	    if ( SZ_LONG == 2 ) {
+		call error (0, "SET_BLANK: cannot handle 64-bit integer.")
+	    } else {
+		tmp = LONGLONG_BLANK
+		blank = tmp
+		call strcpy ("-9223372036854775808", blank_str, LEN_BLANK)
+	    }
 	case FITS_REAL:
 	    blank = INDEFL
 	    call strcpy ("", blank_str, LEN_BLANK)

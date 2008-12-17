@@ -185,12 +185,15 @@ procedure wft_encode_date (datestr, szdate)
 char	datestr[ARB]	# string containing the date
 int	szdate		# number of chars in the date string
 
+long	l_val
 long	ctime
 int	time[LEN_TMSTRUCT]
 long	clktime(), lsttogmt()
+int	modi()
 
 begin
-	ctime = clktime (long (0))
+	l_val = 0
+	ctime = clktime (l_val)
 	ctime = lsttogmt (ctime)
 	call brktime (ctime, time)
 
@@ -206,7 +209,7 @@ begin
 	    call sprintf (datestr, szdate, "%02d-%02d-%02d")
 	        call pargi (TM_MDAY(time))
 	        call pargi (TM_MONTH(time))
-	        call pargi (mod (TM_YEAR(time), CENTURY))
+	        call pargi (modi(TM_YEAR(time), CENTURY))
 	}
 end
 

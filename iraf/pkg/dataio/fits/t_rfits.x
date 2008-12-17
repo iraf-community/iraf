@@ -16,6 +16,8 @@ pointer	inlist, outlist
 pointer	sp, infile, file_list, outfile, ext_list, in_fname, out_fname
 pointer	pl, axes
 
+size_t	sz_val
+long	l_val
 bool	clgetb(), pl_linenotempty()
 #char	clgetc()
 int	rft_get_image_type(), clgeti(), mtfile(), strlen(), btoi(), fntlenb()
@@ -32,13 +34,19 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (infile, SZ_FNAME, TY_CHAR)
-	call salloc (file_list, SZ_LINE, TY_CHAR)
-	call salloc (outfile, SZ_FNAME, TY_CHAR)
-	call salloc (ext_list, SZ_LINE, TY_CHAR)
-	call salloc (in_fname, SZ_FNAME, TY_CHAR)
-	call salloc (out_fname, SZ_FNAME, TY_CHAR)
-	call salloc (axes, 2, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (infile, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (file_list, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (outfile, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ext_list, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (in_fname, sz_val, TY_CHAR)
+	call salloc (out_fname, sz_val, TY_CHAR)
+	sz_val = 2
+	call salloc (axes, sz_val, TY_LONG)
 
 	# Get RFITS parameters.
 	call clgstr ("fits_file", Memc[infile], SZ_FNAME)
@@ -120,9 +128,9 @@ begin
 	do file_number = first_file, last_file {
 
 	    # Get the next file number.
-	    Memi[axes] = 1
-	    Memi[axes+1] = file_number
-	    if (! pl_linenotempty (pl, Memi[axes]))
+	    Meml[axes] = 1
+	    Meml[axes+1] = file_number
+	    if (! pl_linenotempty (pl, Meml[axes]))
 		next
 
 	    # Get the input file name.
@@ -130,11 +138,12 @@ begin
 		if (fntgfnb (inlist, Memc[in_fname], SZ_FNAME) == EOF)
 		    call error (0, "T_RFITS: Error reading input file name")
 	    } else {
-		if (mtneedfileno (Memc[infile]) == YES)
-		    call mtfname (Memc[infile], file_number, Memc[in_fname],
-		        SZ_FNAME)
-		else
+		if (mtneedfileno (Memc[infile]) == YES) {
+		    l_val = file_number
+		    call mtfname (Memc[infile], l_val, Memc[in_fname],SZ_FNAME)
+		} else {
 	            call strcpy (Memc[infile], Memc[in_fname], SZ_FNAME)
+		}
 	    }
 
 	    # Get the output file name.

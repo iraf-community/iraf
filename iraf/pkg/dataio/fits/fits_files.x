@@ -16,8 +16,10 @@ int	first_file		# the first file in the list
 int	last_file		# the last file in the list
 int	nfiles			# the number of files in the list
 
-int	i, j, maxncols, maxnlines, nrfiles, rp, rbegin, rend, rstep
-int	last_ext, ebegin, eend, estep, ep, nefiles
+size_t	sz_val
+int	nrfiles, nefiles, rp, ep, ii
+long	i, j, maxncols, maxnlines, last_ext
+long	rbegin, rend, ebegin, eend, rstep, estep
 pointer	sp, extensions, str, axes, pl
 
 bool	pl_linenotempty()
@@ -27,9 +29,11 @@ pointer	pl_create()
 begin
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (extensions, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (axes, 2, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (extensions, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = 2
+	call salloc (axes, sz_val, TY_LONG)
 
 	# Initialize the file list.
 	pl = NULL
@@ -45,9 +49,9 @@ begin
 	    rp = 1
 
 	    # Open the file list.
-	    Memi[axes] = maxncols
-	    Memi[axes+1] = maxnlines
-	    pl = pl_create (2, Memi[axes], 1)
+	    Meml[axes] = maxncols
+	    Meml[axes+1] = maxnlines
+	    pl = pl_create (2, Meml[axes], 1)
 
 	    # Decode the file list.
 	    nrfiles = rft_gfranges (file_list, rp, YES, maxnlines, rbegin,
@@ -69,7 +73,7 @@ begin
 
 		# Initialize the extensions list decoding.
 		ep = 1
-		last_ext = INDEFI
+		last_ext = INDEFL
 
 		# Decode the associated extensions files. If the extensions
 		# list is empty
@@ -79,7 +83,7 @@ begin
 
 		    # Check the  extensions number limits and quit if they
 		    # are exceeded.
-		    if (IS_INDEFI(last_ext))
+		    if (IS_INDEFL(last_ext))
 		        last_ext = eend
 		    else
 		        last_ext = max (last_ext, eend)
@@ -131,16 +135,16 @@ begin
 		    pl = NULL
 		    maxnlines = maxnlines + DEF_MAXNLINES
 	        } else {
-		    do i = first_file, last_file {
-		        Memi[axes] = 1
-		        Memi[axes+1] = i
-		        if (pl_linenotempty (pl, Memi[axes]))
+		    do ii = first_file, last_file {
+		        Meml[axes] = 1
+		        Meml[axes+1] = ii
+		        if (pl_linenotempty (pl, Meml[axes]))
 			    nfiles = nfiles + 1
 		    }
 		}
 	    }
 
-	    if (!IS_INDEFI(last_ext)) {
+	    if (!IS_INDEFL(last_ext)) {
 		if (last_ext > maxncols) {
 		    if (pl != NULL)
 		        call pl_close (pl)
@@ -182,15 +186,17 @@ int procedure rft_gfranges (range_string, ip, firstr, rmax, rbegin, rend,
 char    range_string[ARB]       # range string to be decoded
 int	ip			# the range string pointer
 int	firstr			# first range to be returned
-int	rmax			# the maximum file number
-int	rbegin			# the begining of the range			
-int	rend			# the end of the range
-int	rstep			# the range step size
+long	rmax			# the maximum file number
+long	rbegin			# the begining of the range			
+long	rend			# the end of the range
+long	rstep			# the range step size
 int	zeroindex		# allow zero indexing ?
 char	extensions[ARB]		# the output extensions string
 
-int	ep, itemp
-int	ctoi()
+int	ep
+long	ltemp
+int	ctol()
+long	absl()
 
 begin
 	# Initialize.
@@ -234,7 +240,7 @@ begin
         } else if (range_string[ip] == 'x') {
             ;
         } else if (IS_DIGIT(range_string[ip])) {              # ,n..
-            if (ctoi (range_string, ip, rbegin) == 0)
+            if (ctol (range_string, ip, rbegin) == 0)
                 return (0)
 	    else if (zeroindex == NO) {
 	        if (rbegin <= 0)
@@ -281,7 +287,7 @@ begin
             if (range_string[ip] == EOS)
                 ;
             else if (IS_DIGIT(range_string[ip])) {
-                if (ctoi (range_string, ip, rend) == 0)
+                if (ctol (range_string, ip, rend) == 0)
                     return (0)
 		else if (zeroindex == NO) {
 		    if (rend <= 0)
@@ -330,7 +336,7 @@ begin
             if (range_string[ip] == EOS)
                 ;
             else if (IS_DIGIT(range_string[ip])) {
-                if (ctoi (range_string, ip, rstep) == 0)
+                if (ctol (range_string, ip, rstep) == 0)
                     ;
 	        else if (rstep <= 0)
 		    return (0)
@@ -360,15 +366,15 @@ begin
 
         # Output the range triple.
 	if (rend < rbegin) {
-	    itemp = rbegin
+	    ltemp = rbegin
 	    rbegin = rend
-	    rend = itemp
+	    rend = ltemp
 	}
 	if (zeroindex == YES) {
 	    rbegin = rbegin + 1
 	    rend = rend + 1
 	}
-        return (abs (rend - rbegin) / rstep + 1 )
+        return (absl(rend - rbegin) / rstep + 1 )
 end
 
 

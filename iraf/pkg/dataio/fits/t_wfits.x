@@ -17,6 +17,7 @@ char	in_fname[SZ_FNAME]	# input file name
 char	out_fname[SZ_FNAME]	# output file name
 char	fextn[SZ_FNAME]		# the fits extension
 
+long	l_val
 char	ch
 pointer	imlist, flist
 int	nimages, nfiles, file_number, addext, index
@@ -85,10 +86,13 @@ begin
 		flist = NULL
 		if (mtneedfileno (fits_files) == YES) {
 	            newtape = clgetb ("newtape")
-		    if (newtape)
-			call mtfname (fits_files, 1, out_fname, SZ_FNAME)
-		    else
-			call mtfname (fits_files, EOT, out_fname, SZ_FNAME)
+		    if (newtape) {
+			l_val = 1
+			call mtfname (fits_files, l_val, out_fname, SZ_FNAME)
+		    } else {
+			l_val = EOT
+			call mtfname (fits_files, l_val, out_fname, SZ_FNAME)
+		    }
 	        } else {
 		    call strcpy (fits_files, out_fname, SZ_FNAME)
 		    newtape = false
@@ -124,8 +128,10 @@ begin
 
 	    if (make_image == YES) {
 	        if (mtfile (fits_files) == YES) {
-		    if (wextensions == NO && file_number == 2)
-			call mtfname (out_fname, EOT, out_fname, SZ_FNAME)
+		    if (wextensions == NO && file_number == 2) {
+			l_val = EOT
+			call mtfname (out_fname, l_val, out_fname, SZ_FNAME)
+		    }
 	        } else if (nfiles > 1) {
 		    if (fntgfnb (flist, out_fname, SZ_FNAME) == EOF)
 			 call error (0, "Error reading output file name")
@@ -195,7 +201,7 @@ int	bitpix
 
 begin
 	switch (bitpix) {
-	case FITS_BYTE, FITS_SHORT, FITS_LONG, FITS_REAL, FITS_DOUBLE:
+	case FITS_BYTE, FITS_SHORT, FITS_LONG, FITS_LONGLONG, FITS_REAL, FITS_DOUBLE:
 	    return (bitpix)
 	default:
 	    return (ERR)
