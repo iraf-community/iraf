@@ -43,6 +43,24 @@ begin
 end
 
 
+# ADDCARD_L -- Format and append a FITS header card with a long integer
+# keyword value to the input string buffer.
+
+procedure addcard_l (fd, keyword, value, comment)
+
+int	fd			# File descriptor of input string buffer
+char	keyword[LEN_KEYWORD]	# FITS keyword
+long	value			# Value of FITS keyword
+char	comment[ARB]		# Comment string
+
+begin
+	call fprintf (fd, "%-8.8s= %20d  /  %-45.45s\n")
+	    call pargstr (keyword)
+	    call pargl (value)
+	    call pargstr (comment)
+end
+
+
 # ADDCARD_TIME -- Format and append a FITS header card to the input
 # file descriptor.  The value is input as a real number; it is output
 # in HH:MM:SS.S format with %h.  The procedure can be used for RA, DEC
