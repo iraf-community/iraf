@@ -28,7 +28,7 @@ begin
 	call salloc (fb, sz_val, TY_CHAR)
 
 	MEF_EXTNAME(mef) = EOS
-	MEF_EXTVER(mef) = INDEFI
+	MEF_EXTVER(mef) = INDEFL
 
 	in = MEF_FD(mef)
 	MEF_HOFF(mef) = note(in)
@@ -61,7 +61,7 @@ begin
 	    case EXTNAME:
 		call mef_gvalt (Memc[lbuf], MEF_EXTNAME(mef), LEN_CARD)
 	    case EXTVER:
-		call mef_gvali (Memc[lbuf], MEF_EXTVER(mef))
+		call mef_gvall (Memc[lbuf], MEF_EXTVER(mef))
 	    case PCOUNT:
 		call mef_gvali (Memc[lbuf], pcount)
 		MEF_PCOUNT(mef) = pcount

@@ -22,14 +22,16 @@ bool	verbose			# print messages ?
 
 long	l_val
 char	in_fname[SZ_FNAME], out_fname[SZ_FNAME], cval
-int	len_inlist, len_outlist, file_number, file_cnt, offset, ip
-int	range[2 * MAX_RANGES + 1], outparam[LEN_OUTPARAM]
+long	len_inlist, file_number
+int	len_outlist, file_cnt, offset, ip
+long	range[2 * MAX_RANGES + 1]
+int	outparam[LEN_OUTPARAM]
 pointer	inlist, outlist
 
 bool	clgetb()
 int	fstati(), mtfile(), mtneedfileno(), fntlenb(), fntgfnb()
-int	decode_ranges(), btoi(), get_next_number(), cctoc(), clgeti()
-long	clgetl()
+int	decode_ranges(), btoi(), cctoc(), clgeti()
+long	clgetl(), get_next_number()
 pointer	fntopnb()
 include "reblock.com"
 
@@ -56,7 +58,7 @@ begin
 	    intape = NO
 	    if (len_inlist > 0) {
 		call sprintf (file_list, SZ_LINE, "1-%d")
-		    call pargi (len_inlist)
+		    call pargl (len_inlist)
 	    } else
 	        call strcpy ("0", file_list, SZ_LINE)
 	}
@@ -152,8 +154,7 @@ begin
 	    # Construct the input file name.
 	    if (intape == YES) {
 		if (mtneedfileno (infiles) == YES) {
-		    l_val = file_number
-		    call mtfname (infiles, l_val, in_fname, SZ_FNAME)
+		    call mtfname (infiles, file_number, in_fname, SZ_FNAME)
 		} else {
 	            call strcpy (infiles, in_fname, SZ_FNAME)
 		}
@@ -166,7 +167,7 @@ begin
 		    call sprintf (out_fname[1], SZ_FNAME, "%s%03d")
 		        call pargstr (outfiles)
 		    if (intape == YES)
-		        call pargi (file_number + offset)
+		        call pargl (file_number + offset)
 		    else
 		        call pargi (file_cnt)
 	        } else if (fntgfnb (outlist, out_fname, SZ_FNAME) != EOF)

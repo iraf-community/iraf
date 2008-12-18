@@ -141,6 +141,7 @@ pointer	list			#O Image list
 
 size_t	sz_val
 int	i, fd
+long	li
 pointer	sp, temp, fname, rindex, rextver, ikp, str
 pointer	imtopen()
 int	imtgetim()
@@ -166,8 +167,8 @@ begin
 	rextver = NULL
 	if (nowhite (extver, Memc[str], SZ_LINE) > 0) {
 	    sz_val = 3*SZ_RANGE
-	    call salloc (rextver, sz_val, TY_INT)
-	    if (decode_ranges (Memc[str], Memi[rextver], SZ_RANGE, i)==ERR)
+	    call salloc (rextver, sz_val, TY_LONG)
+	    if (decode_ranges (Memc[str], Meml[rextver], SZ_RANGE, li)==ERR)
 		call error (1, "Bad extension version range list")
 	}
 	i = nowhite (ikparams, Memc[ikp], SZ_LINE)
@@ -299,9 +300,9 @@ begin
 
 	    # Check the extension version.
 	    if (extver != NULL) {
-	        if (IS_INDEFI(MEF_EXTVER(mef)))
+	        if (IS_INDEFL(MEF_EXTVER(mef)))
 		    next
-		if (!is_in_range (Memi[extver], MEF_EXTVER(mef)))
+		if (!is_in_range (Meml[extver], MEF_EXTVER(mef)))
 		    next
 	    }
 

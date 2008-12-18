@@ -14,7 +14,8 @@ int	number				# Test integer number
 
 int	ranges[3, MAX_RANGES]
 int	nvalues, next_number
-int	decode_ranges(), get_next_number(), get_previous_number()
+int	decode_ranges()
+long	get_next_number(), get_previous_number()
 bool	is_in_range()
 int	clglpi()
 

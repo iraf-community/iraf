@@ -16,7 +16,7 @@ define	MEF_FD           Memi[P2I($1)] 		# File descriptor
 define	MEF_HOFF         Meml[P2L($1+2)] 		# Header offset in chars
 define	MEF_ACMODE       Memi[P2I($1+3)] 		# Access mode
 define	MEF_ENUMBER      Memi[P2I($1+4)]		# Absolute extension number
-define	MEF_EXTVER       Memi[P2I($1+5)]		# Extension version
+define	MEF_EXTVER       Meml[P2L($1+5)]		# Extension version
 define	MEF_CGROUP       Memi[P2I($1+6)]		# Current group read
 define	MEF_HFLAG        Memi[P2I($1+7)] 		# Header update flag
 define	MEF_HSIZE        Memi[P2I($1+8)] 		# Header size

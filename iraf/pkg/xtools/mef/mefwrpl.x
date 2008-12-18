@@ -67,7 +67,7 @@ begin
 	call mef_wcardb ("INHERIT", NO, "No Inherit", fd)
         call mef_wcardc ("ORIGIN", FITS_ORIGIN, "FITS file originator", fd)
 	call mef_wcardc ("EXTNAME", MEF_EXTNAME(mef), "", fd)
-	call mef_wcardi ("EXTVER", MEF_EXTVER(mef), "", fd)
+	call mef_wcardl ("EXTVER", MEF_EXTVER(mef), "", fd)
 	call mef_wcardl ("CTIME", ctime, "", fd)
 	call mef_wcardl ("MTIME", mtime, "", fd)
 	call mef_wcardl ("LIMTIME", limtime, "", fd)
