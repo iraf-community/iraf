@@ -18,23 +18,28 @@ define	NFORMATS	5
 
 procedure t_mtexamine()
 
-int	nfiles, file_number, ndumps, nrecords
-int	file_range[2*MAX_RANGES+1], rec_range[2*MAX_RANGES+1]
+size_t	sz_val
+long	l_val
+long	nfiles, ndumps, nrecords, file_number
+long	file_range[2*MAX_RANGES+1], rec_range[2*MAX_RANGES+1]
 pointer	sp, tape_name, tape_file, file_list, rec_list
 
 bool	clgetb()
 char	clgetc()
-int	fstati(), mtfile(), mtneedfileno(), decode_ranges(), get_next_number()
-int	mt_examine(), mt_get_format(), clgeti(), btoi()
+int	fstati(), mtfile(), mtneedfileno(), decode_ranges()
+long	get_next_number(), mt_examine()
+int	mt_get_format(), clgeti(), btoi()
 include "mtexamine.com"
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (tape_name, SZ_FNAME, TY_CHAR)
-	call salloc (tape_file, SZ_FNAME, TY_CHAR)
-	call salloc (file_list, SZ_LINE, TY_CHAR)
-	call salloc (rec_list,  SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tape_name, sz_val, TY_CHAR)
+	call salloc (tape_file, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (file_list, sz_val, TY_CHAR)
+	call salloc (rec_list, sz_val, TY_CHAR)
 
 	# Flush STDOUT on a newline only if output is not redirected.
 	if (fstati (STDOUT, F_REDIR) == NO)
@@ -74,11 +79,12 @@ begin
         while (get_next_number (file_range, file_number) != EOF) {
 
 	    if (mtfile (Memc[tape_file]) == YES &&
-		mtneedfileno (Memc[tape_file]) == YES)
-		call mtfname (Memc[tape_file], file_number, Memc[tape_name],
-		    SZ_FNAME)
-	    else
+		mtneedfileno (Memc[tape_file]) == YES) {
+		call mtfname (Memc[tape_file], file_number, 
+			      Memc[tape_name], SZ_FNAME)
+	    } else {
 	        call strcpy (Memc[tape_file], Memc[tape_name], SZ_FNAME)
+	    }
 
 	    iferr {
 	        nrecords = mt_examine (Memc[tape_name], rec_range)
@@ -102,27 +108,33 @@ end
 # no mtexamine gives a summary of the record structure of the file,
 # otherwise the specified records are dumped.
 
-int procedure mt_examine (tape_file, dump_range)
+long procedure mt_examine (tape_file, dump_range)
 
 char	tape_file[ARB]		# input file name
-int	dump_range[ARB]		# range of records to be dumped
+long	dump_range[ARB]		# range of records to be dumped
 
+size_t	sz_val
 pointer	sp, inbuf, pchar, junk
-int	in, bufsize, totrecords, nrecords, totbytes, last_recsize, nbadrec
-int	stat, rec_number, next_dump, recsize, nelems, vals_per_line, field_len
+int	in
+long	last_recsize, totrecords, nrecords, totbytes, nbadrec
+size_t	bufsize, recsize, nelems
+long	stat, rec_number, next_dump
+int	vals_per_line, field_len
 long	maxval, max_plusint, twice_max_plusint
 
-int	mtopen(), fstati(), get_next_number(), gltoc()
-long	read()
+int	mtopen(), gltoc()
+long	read(), fstatl(), get_next_number()
 errchk	mtopen, malloc, read, mfree, close
 include "mtexamine.com"
 
 begin
 	call smark (sp)
-	call salloc (junk, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (junk, sz_val, TY_CHAR)
 
-	in = mtopen (tape_file, READ_ONLY, 0)
-	bufsize = fstati (in, F_BUFSIZE)
+	sz_val = 0
+	in = mtopen (tape_file, READ_ONLY, sz_val)
+	bufsize = fstatl (in, F_BUFSIZE)
 	call salloc (pchar, bufsize, TY_CHAR)
 
 	call printf ("File %s:\n")
@@ -152,16 +164,16 @@ begin
 	# Loop through the records.
 	repeat {
 	    iferr (stat = read (in, Memc[pchar], bufsize)) {
-		call fseti (in, F_VALIDATE, last_recsize / SZB_CHAR)
+		call fsetl (in, F_VALIDATE, last_recsize / SZB_CHAR)
 		nbadrec = nbadrec + 1
 	        call printf ("\tRead error on record: %d\n")
-		    call pargi (totrecords + 1)
+		    call pargl (totrecords + 1)
 		stat = read (in, Memc[pchar], bufsize)
 	    }
 	    if (stat == EOF)
 		break
 
-	    recsize = fstati (in, F_SZBBLK)
+	    recsize = fstatl (in, F_SZBBLK)
 	    if (dump_records == NO) {
 	        if (nrecords == 0) {
 		    nrecords = 1
@@ -170,19 +182,19 @@ begin
 		    nrecords = nrecords + 1
 		} else {
 		    call printf ("\t%d %d-byte records\n")
-		        call pargi (nrecords)
-		        call pargi (last_recsize)
+		        call pargl (nrecords)
+		        call pargl (last_recsize)
 		    nrecords = 1
 		    last_recsize = recsize
 		}
 	    } else if (next_dump != EOF && rec_number == totrecords + 1) {
 	        call printf ("    Record %d,")
-		    call pargi (totrecords + 1)
+		    call pargl (totrecords + 1)
 		call printf (" %d bytes,")
-		    call pargi (recsize)
+		    call pargz (recsize)
 		nelems = recsize / byte_chunk
 		call printf (" %d elements")
-		    call pargi (nelems)
+		    call pargz (nelems)
 		call mt_bytupkl (Memc[pchar], Meml[inbuf], recsize, byte_chunk,
 		    byteswap)
 		call mt_dump (Meml[inbuf], nelems, field_len, vals_per_line,
@@ -196,22 +208,22 @@ begin
 
 	if (nrecords > 0 && dump_records == NO) {
 	    call printf ("\t%d %d-byte records\n")
-	        call pargi (nrecords)
-	        call pargi (last_recsize)
+	        call pargl (nrecords)
+	        call pargl (last_recsize)
  	}
 
 	# Print total number of records and bytes
 	if (dump_records == YES) {
 	    call printf ("    Total %d records, %d bytes\n")
-	        call pargi (totrecords)
-	        call pargi (totbytes)
+	        call pargl (totrecords)
+	        call pargl (totbytes)
 	} else { 
 	    call printf ("\tTotal %d records, %d bytes")
-	        call pargi (totrecords)
-	        call pargi (totbytes)
+	        call pargl (totrecords)
+	        call pargl (totbytes)
 	    if (nbadrec > 0) {
 		call printf (" [%d bad records]")
-		    call pargi (nbadrec)
+		    call pargl (nbadrec)
 	    }
 	    call printf ("\n")
 	}
@@ -229,20 +241,30 @@ end
 procedure mt_dump (buffer, nelems, field_len, vals_per_line, max_plusint,
 	twice_max_plusint)
 
-int	nelems, field_len, vals_per_line
-long	buffer[ARB], max_plusint, twice_max_plusint
+long	buffer[ARB]
+size_t	nelems
+int	field_len
+int	vals_per_line
+long	max_plusint
+long	twice_max_plusint
 
-int	i, nchars
+size_t	c_1
+long	l_val
+long	i
+int	nchars
 char	ch, outstr[SZ_FNAME]
 int	ctocc()
+long	modl()
 include "mtexamine.com"
 
 begin
+	c_1 = 1
 	for (i = 1; i <= nelems; i = i + 1) {
-	    if (mod (i, vals_per_line) == 1) {
+	    l_val = vals_per_line
+	    if (modl(i, l_val) == 1) {
 		call printf ("\n%*d:")
 		    call pargi (FIELD_INDEX)
-		    call pargi (i)
+		    call pargl (i)
 	    }
 	    if (output_format == FMT_CHAR) {
 		ch = buffer[i]
@@ -253,7 +275,7 @@ begin
 	    } else {
 		if (output_format == FMT_DECIMAL && byte_chunk > 1
 			        && byte_chunk < (SZ_LONG * SZB_CHAR))
-		    call mt_sign_convert (buffer[i], 1, max_plusint,
+		    call mt_sign_convert (buffer[i], c_1, max_plusint,
 		    		    twice_max_plusint)
 		call printf ("%**")
 		    call pargi (field_len)
@@ -292,23 +314,27 @@ procedure mt_bytupkl (a, b, nbytes, byte_chunk, byteswap)
 
 char	a[ARB]		# input buffer
 long	b[ARB]		# output array
-int	nbytes		# number of bytes
+size_t	nbytes		# number of bytes
 int	byte_chunk	# number of bytes to be formatted, swapped etc.
 int	byteswap	# swap bytes
 
-int	op, i, j, rem
+size_t	sz_val
+long	op, i, j
+size_t	rem
 long	sum
 
 begin
 	op = 1
 
 	# Unpack unsigned bytes into a long integer array
+	# arg1: incompatible pointer
 	call achtbl (a, b, nbytes)
 
 	# Flip bytes if necessary
 	if (byteswap == YES && byte_chunk > 1) {
+	    sz_val = byte_chunk
 	    for (i = 1; i <= nbytes - byte_chunk + 1; i = i + byte_chunk)
-		call mt_aflipl (b[i], byte_chunk)
+		call mt_aflipl (b[i], sz_val)
 	}
 
 	# Convert the bytes into unsigned integers
@@ -341,9 +367,10 @@ end
 procedure mt_aflipl (buf, npix)
 
 long	buf[npix]	# array to be flipped
-int	npix		# number of elements in array
+size_t	npix		# number of elements in array
 
-int	n_total, n_half, i, j
+size_t	n_total, n_half
+long	i, j
 
 begin
 	n_half = npix / 2
@@ -363,11 +390,11 @@ end
 procedure mt_sign_convert (b, nelems, max_plusint, twice_max_plusint)
 
 long	b[nelems]		# array of long integers to be converted
-int	nelems			# number of elements in the array
+size_t	nelems			# number of elements in the array
 long	max_plusint		# 0 <= b[i] <= max_plusint - 1
 long	twice_max_plusint	# twice max_plusint
 
-int	i
+long	i
 
 begin
 	for (i = 1; i <= nelems; i = i + 1) {
