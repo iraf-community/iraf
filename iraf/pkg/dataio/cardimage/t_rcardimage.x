@@ -21,13 +21,15 @@ bool	join				# join long lines ?
 bool	verbose				# verbose output ?
 
 char	in_fname[SZ_FNAME], out_fname[SZ_FNAME]
-int	nlines, file_number, ncards, range[MAX_RANGES*2+1], nfiles
+size_t	nlines, ncards
+long	range[MAX_RANGES*2+1], nfiles, file_number
 int	lenlist, junk
 pointer	list
 
 bool	clgetb()
 int	btoi(), clgeti(), mtfile(), mtneedfileno(), strlen(), decode_ranges()
-int	get_next_number(), fntlenb(), fntgfnb(), fstati()
+int	fntlenb(), fntgfnb(), fstati(), modi()
+long	get_next_number()
 pointer	fntopnb()
 include "rcardimage.com"
 
@@ -59,7 +61,7 @@ begin
 	    
 	# Set up the formatting parameters.
 	card_length = min (SZ_LINE, clgeti ("card_length"))
-	if (mod (card_length, SZB_CHAR) != 0)
+	if (modi(card_length, SZB_CHAR) != 0)
 	    call error (2, "A card must contain an even number of characters")
 	max_line_length = min (SZ_LINE, clgeti ("max_line_length"))
 	join = clgetb ("join")
@@ -98,7 +100,7 @@ begin
 	    call strcpy (outfile, out_fname, SZ_FNAME)
 	    if (nfiles > 1) {
 		call sprintf (out_fname[strlen(out_fname)+1], SZ_FNAME, "%03d")
-		    call pargi (file_number + offset)
+		    call pargl (file_number + offset)
 	    }
 
 	    # Copy the cardimage file to the output text file.  If a read
@@ -118,8 +120,8 @@ begin
 
 		if (verbose) {
 		    call printf ("%d card images -> %d text lines\n")
-			call pargi (ncards)
-			call pargi (nlines)
+			call pargz (ncards)
+			call pargz (nlines)
 		}
 
 	    } then {
@@ -128,7 +130,7 @@ begin
 	    } else if (nlines == 0) {			# EOT reached
 		if (verbose) {
 		    call printf ("EOT encountered at file %s\n")
-			call pargi (file_number + offset)
+			call pargl (file_number + offset)
 		}
 		call delete (out_fname)
 		break
@@ -147,17 +149,21 @@ procedure rc_cardfile_to_textfile (in_fname, out_fname, nlines, ncards)
 
 char	in_fname[ARB]				# the input file name
 char	out_fname[ARB]				# the output file name
-int	nlines					# the number of lines
-int	ncards					# the number of cards
+size_t	nlines					# the number of lines
+size_t	ncards					# the number of cards
 
+size_t	sz_val
 char	lbuf[SZ_LINE], tempbuf[SZ_LINE]
-int	in, out, nchars
-int	mtopen(), open(), rc_fetchcard()
+int	in, out
+long	nchars
+int	mtopen(), open()
+long	rc_fetchcard()
 errchk	mtopen, open, rc_fetchcard, putline, strentab, close
 include "rcardimage.com"
 
 begin
-	in = mtopen (in_fname, READ_ONLY, 0)
+	sz_val = 0
+	in = mtopen (in_fname, READ_ONLY, sz_val)
 	out = open (out_fname, NEW_FILE, TEXT_FILE)
 
 	ncards = 0
@@ -183,16 +189,19 @@ end
 # by an identifying continuation string with the previous image(s).
 # Returns number of characters in line or EOF.
 
-int procedure rc_fetchcard (fd, outline, cp)
+long procedure rc_fetchcard (fd, outline, cp)
 
 int	fd			# the input file descriptor
 char	outline[ARB]		# the output line
-int	cp			# the card counter
+size_t	cp			# the card counter
 
 bool	newfile
 char	instring[SZ_LINE * SZ_SHORT]
-int	ip, op, npacked_chars, strsize
-int	rc_card_to_text(), strlen(), strncmp()
+long	ip, op
+int	strsize
+long	npacked_chars
+int	rc_card_to_text()
+int	strlen(), strncmp()
 errchk	rc_card_to_text
 data	newfile/true/
 include "rcardimage.com"
@@ -248,24 +257,35 @@ int procedure rc_card_to_text (fd, card)
 int	fd				# input file descriptor
 char	card[ARB]			# the packed/unpacked cardimage image
 
-int	npacked_chars, nchars
+size_t	sz_val
+size_t	c_1
+int	npacked_chars
+int	nchars
 long	read()
 errchk	read, ebcdic_to_ascii, ibm_to_ascii 
 include "rcardimage.com"
 
 begin
-	npacked_chars = read (fd, card, card_length/SZB_CHAR)
+	c_1 = 1
+	sz_val = card_length/SZB_CHAR
+	npacked_chars = read (fd, card, sz_val)
 	if (npacked_chars == EOF)
 	    return (EOF)
 	nchars = npacked_chars * SZB_CHAR
 	if (ebcdic == YES) {
-	    call achtbs (card, card, nchars)
+	    sz_val = nchars
+	    # arg1: incompatible pointer
+	    call achtbs (card, card, sz_val)
 	    call ebcdic_to_ascii (card, card, nchars)
 	} else if (ibm == YES) {
-	    call achtbs (card, card, nchars)
+	    sz_val = nchars
+	    # arg1: incompatible pointer
+	    call achtbs (card, card, sz_val)
 	    call ibm_to_ascii (card, card, nchars)
-	} else
-	    call chrupk (card, 1, card, 1, nchars)
+	} else {
+	    sz_val = nchars
+	    call chrupk (card, c_1, card, c_1, sz_val)
+	}
 	card[nchars+1] = EOS
 	return (nchars)
 end

@@ -27,13 +27,14 @@ char	ofroot[SZ_FNAME]		# Root file name, output files.
 
 char	tapename[SZ_FNAME]
 char	dfilename[SZ_FNAME]		# Disk file name.
-int	filerange[2 * MAX_RANGES + 1]
-int	nfiles, filenumber, numrecords
+long	filerange[2 * MAX_RANGES + 1]
+long	nfiles, filenumber, numrecords
 bool	verbose 
 bool	errignore
 
 int	mtfile(), strlen(), decode_ranges(), mtneedfileno()
-int	get_next_number(), tape2disk()
+long	get_next_number()
+long	tape2disk()
 bool	clgetb()
 
 begin
@@ -65,7 +66,7 @@ begin
 	        # Assemble the appropriate disk file name.
 	        call strcpy (ofroot, dfilename, SZ_FNAME)
 	        call sprintf (dfilename[strlen(ofroot) + 1], SZ_FNAME, "%03d")
-		    call pargi (filenumber)
+		    call pargl (filenumber)
 
 	        # Print out the tape file we are trying to read.
 	        if (verbose) {
@@ -125,25 +126,30 @@ end
 
 # TAPE2DISK -- This is the actual tape to disk copy routine.
 
-int procedure tape2disk (infile, outfile, errignore)
+long procedure tape2disk (infile, outfile, errignore)
 
 char	infile[SZ_FNAME]
 char	outfile[SZ_FNAME]
 bool	errignore
 
+size_t	sz_val
+long	c_1
 bool	inblock
-int	blksize, mxbufszo, numblks, cutoff, obufsize, temp, numrecords
-int	inblksize, innumblks, toread, mxbufszi
-long	ooffset
-int	nchars, stat, in, out, lastnchars
-pointer	op, otop, bufa, bufb
+long	blksize, mxbufszo, numblks, numrecords
+size_t	obufsize, cutoff, toread
+long	inblksize, innumblks, mxbufszi, ooffset
+long	nchars, stat, lastnchars
+int	in, out
+pointer	op, otop, bufa, bufb, temp
 
-int	fstati(), mtopen(), open()
-long	await()
+int	mtopen(), open()
+long	await(), fstatl()
 
 begin
+	c_1 = 1
 	# Open the input and output files.
-	in = mtopen (infile, READ_ONLY, 0)
+	sz_val = 0
+	in = mtopen (infile, READ_ONLY, sz_val)
 	out = open (outfile, NEW_FILE, BINARY_FILE)
 
 	# Find out how big the blocks are on the output device. Calculate
@@ -151,9 +157,9 @@ begin
 	# and is long enough to permit many input reads per output write.
 	# Here, I use the maximum output buffer size.
 
-	blksize = fstati (out, F_BLKSIZE)	# Outputfile block size
-	mxbufszo = fstati (out, F_MAXBUFSIZE)	# Maximum output buffer size
-	mxbufszi = fstati (in, F_MAXBUFSIZE)	# Maximum in buffer size
+	blksize = fstatl (out, F_BLKSIZE)	# Outputfile block size
+	mxbufszo = fstatl (out, F_MAXBUFSIZE)	# Maximum output buffer size
+	mxbufszi = fstatl (in, F_MAXBUFSIZE)	# Maximum in buffer size
 	if (mxbufszo <= 0)			# if no max, set a max
 	    mxbufszo = SZ_OBUF
 	if (mxbufszi <= 0)			# if no max, set a max
@@ -162,7 +168,7 @@ begin
 
 	# Find out if the input device is blocked and if it is, the block
 	# size.
-	inblksize = fstati (in, F_BLKSIZE)	# Inputfile block size
+	inblksize = fstatl (in, F_BLKSIZE)	# Inputfile block size
 	inblock = true
 	if (inblksize == 0)
 	    inblock = false
@@ -192,7 +198,7 @@ begin
 		innumblks = (cutoff - (op - bufa)) / inblksize
 		toread = (innumblks+1) * inblksize
 
-		call aread (in, Memc[op], toread, 1)
+		call aread (in, Memc[op], toread, c_1)
 		nchars = await (in)
 		if (nchars <= 0) {
 		    if (nchars == ERR) {
@@ -221,7 +227,8 @@ begin
 	    } else {
 
 		repeat {
-		    call aread (in, Memc[op], mxbufszi, 1)
+		    sz_val = mxbufszi
+		    call aread (in, Memc[op], sz_val, c_1)
 		    nchars = await (in)
 
 		    if (nchars <= 0) {
