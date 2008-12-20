@@ -87,7 +87,7 @@ entry	rft_read_pixels (fd, buffer, npix, recptr, bufsize)
 		if (i == EOF)
 		    return (EOF)
 
-		if (swap == YES)
+		if (swap == YES) {
 		    c_1 = 1
 		    switch (ty_mii) {
 		    case MII_SHORT:
@@ -100,6 +100,7 @@ entry	rft_read_pixels (fd, buffer, npix, recptr, bufsize)
 			call bswap8 (Memc[mii], c_1, Memc[mii], c_1,
 				sz_rec * SZB_CHAR)
 		    }
+		}
 
 		call miiupk (Memc[mii], Memc[spp], npix_rec, ty_mii, ty_spp)
 
