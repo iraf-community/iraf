@@ -776,10 +776,16 @@ begin
 		} else
                     PIXTYPE(im) = TY_REAL
             } else {
-                if (BITPIX(fits) <= (SZ_SHORT * SZB_CHAR * NBITS_BYTE))
-                    PIXTYPE(im) = TY_SHORT
-                else
-                    PIXTYPE(im) = TY_INT
+		if (BITPIX(fits) <= (SZ_SHORT * SZB_CHAR * NBITS_BYTE)) {
+		    PIXTYPE(im) = TY_SHORT
+		} else if (BITPIX(fits) <= (SZ_INT * SZB_CHAR * NBITS_BYTE)) {
+		    PIXTYPE(im) = TY_INT
+		} else {
+		    if ( SZ_LONG == 2 ) {
+			call error (0, "SET_IMAGE_PIXTYPE: cannot handle 64-bit integer.")
+		    }
+                    PIXTYPE(im) = TY_LONG
+		}
             }
 
         } else
