@@ -34,7 +34,7 @@
 	}
 
 #define COMPLEX2MII(x_type) { \
-	    for ( i = 0 ; 0 < *nelems ; i++ ) { \
+	    for ( i = 0 ; i < *nelems ; i++ ) { \
 		buf[0] = (long long)(((x_type *)spp)[i].r); \
 		mii_ptr[i][0] = buf_ptr[i0]; \
 		mii_ptr[i][1] = buf_ptr[i1]; \
