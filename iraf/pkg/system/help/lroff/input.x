@@ -61,7 +61,7 @@ begin
 		    # if "soflag" is YES.
 		    switch (Memc[ip+2]) {
 		    case 'B', 'I':			# bold, italic
-			if (soflag == YES)
+			if (soflag != 0)
 			    standout_mode_enabled = true
 		    case 'R':				# roman
 			if (standout_mode_in_effect) {
@@ -81,9 +81,17 @@ begin
 		len_inputline = len_inputline + 1
 		ocol = ocol + 1
 		if (standout_mode_enabled && !standout_mode_in_effect) {
-		    userbuf[op] = SO_ON
-		    op = op + 1
-		    standout_mode_in_effect = true
+		    if (soflag == 1) {
+			userbuf[op] = SO_ON
+			op = op + 1
+			standout_mode_in_effect = true
+		    } else {
+			# double struck
+			userbuf[op] = ch
+			op = op + 1
+			userbuf[op] = BS
+			op = op + 1
+		    }
 		}
 
 	    } else if (ch == '\t') {

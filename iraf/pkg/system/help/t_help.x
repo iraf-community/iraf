@@ -193,6 +193,7 @@ forms_
 	H_STATE(ctrl) = BOF
 	H_EOF(ctrl) = NO
 	H_QUIT(ctrl) = NO
+	H_NLPP(ctrl) = 0
 
 	# If the standard output is not redirected, i.e., if writing to the
 	# terminal, determine whether or not output is to be paginated (pause
@@ -255,21 +256,25 @@ forms_
 	if (out_device == HF_HTML) {
 	    H_FORMAT(ctrl) = HF_HTML
 	    H_RAWOUT(ctrl) = YES
-	    H_SOFLAG(ctrl) = NO
+	    H_SOFLAG(ctrl) = SO_DISABLED
 	    H_MANPAGE(ctrl) = NO
 	    tty = NULL
 	} else if (out_device == HF_PS || out_device == HF_POSTSCRIPT) {
 	    H_FORMAT(ctrl) = HF_PS
 	    H_RAWOUT(ctrl) = YES
-	    H_SOFLAG(ctrl) = NO
+	    H_SOFLAG(ctrl) = SO_DISABLED
 	    H_MANPAGE(ctrl) = NO
 	    tty = NULL
 	} else if (out_device == HF_TEXT) {
 	    H_FORMAT(ctrl) = HF_TEXT
-	    H_SOFLAG(ctrl) = NO
+	    H_SOFLAG(ctrl) = SO_DISABLED
 	} else {
 	    H_FORMAT(ctrl) = HF_TEXT
-	    H_SOFLAG(ctrl) = YES
+	    if ( output_is_not_redirected ) {
+		H_SOFLAG(ctrl) = SO_ENABLED
+	    } else {
+		H_SOFLAG(ctrl) = SO_DOUBLESTRUCK
+	    }
 	}
 	H_TTY(ctrl) = tty
 

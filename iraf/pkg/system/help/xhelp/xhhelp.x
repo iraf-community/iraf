@@ -254,7 +254,7 @@ forms_
 	H_RAWOUT(ctrl) = YES
 	H_MANPAGE(ctrl) = NO
 	H_PAGINATE(ctrl) = NO
-	H_SOFLAG(ctrl) = NO
+	H_SOFLAG(ctrl) = SO_DISABLED
 	H_FORMAT(ctrl) = format
 
 	# We don't produce output to a screen so shut off the tty.

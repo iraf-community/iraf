@@ -30,8 +30,9 @@ begin
 
 	# Clear screen.
 	if (H_FORMAT(ctrl) == HF_TEXT) {
-	    if (H_SOFLAG(ctrl) == YES)
+	    if (H_NLPP(ctrl) > 0 && H_SOFLAG(ctrl) != SO_DISABLED) {
 	        call houtput (ctrl, "\f")
+	    }
 	} else {
 	    call sfree (sp)
 	    return

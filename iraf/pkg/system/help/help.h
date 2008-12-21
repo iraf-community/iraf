@@ -113,3 +113,8 @@ define	BREAK_PAGE	1		# .bp
 define	TEST_PAGE	2		# .tp n
 define	START_KEEP	3		# .ks
 define	END_KEEP	4		# .ke
+
+# SO flags
+define	SO_DISABLED	0
+define	SO_ENABLED	1
+define	SO_DOUBLESTRUCK	2

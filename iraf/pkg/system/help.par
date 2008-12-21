@@ -13,7 +13,7 @@ section,s,h,"all",,,"section for which help is desired"
 
 # Terminal display parameters.
 page,b,h,yes,,,"paginate output"
-nlpp,i,h,59,1,,"number of lines per page if output redirected"
+nlpp,i,h,0,0,,"number of lines per page if output redirected"
 lmargin,i,h,1,1,,"left margin"
 rmargin,i,h,72,2,,"right margin"
 
