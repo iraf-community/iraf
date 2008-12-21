@@ -309,8 +309,15 @@ begin
 	}
 
 	pixtype = IM_PIXTYPE(im)
-	noconvert = ((pixtype == TY_SHORT && BYTE_SWAP2 == NO) ||
-	    ((pixtype == TY_INT || pixtype == TY_LONG) && BYTE_SWAP4 == NO))
+	if ( SZ_LONG == 2 ) {
+	    noconvert = ((pixtype == TY_SHORT && BYTE_SWAP2 == NO) ||
+			 (pixtype == TY_INT && BYTE_SWAP4 == NO) ||
+			 (pixtype == TY_LONG && BYTE_SWAP4 == NO))
+	} else {
+	    noconvert = ((pixtype == TY_SHORT && BYTE_SWAP2 == NO) ||
+			 (pixtype == TY_INT && BYTE_SWAP4 == NO) ||
+			 (pixtype == TY_LONG && BYTE_SWAP8 == NO))
+	}
 
 	if (noconvert) {
 	    call zawrbf (FIT_IO(fit), ibuf, nbytes, boffset)
