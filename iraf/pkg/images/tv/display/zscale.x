@@ -79,7 +79,7 @@ pointer	sp, section, v, sample, zmask, bp, zim, pmz, pmb, buf
 real	rval
 
 pointer	imstatp()
-int	imgnlr()
+long	imgnlr()
 pointer	zsc_pmsection()
 bool	pm_linenotempty()
 errchk	zsc_pmsection, zsc_zlimits

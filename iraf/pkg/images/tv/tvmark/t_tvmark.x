@@ -193,7 +193,7 @@ pointer	out		# pointe to the output image
 
 int	i, ncols, nlines
 pointer	sp, vin, vout, inbuf, outbuf
-int	imgnls(), impnls()
+long	imgnls(), impnls()
 errchk	imgnls(), impnls()
 
 begin

@@ -200,11 +200,11 @@ end
 
 # IE_GIMAGE1 -- Convert input image section name to a 2D physical image section.
 
-procedure ie_gimage1 (im, input, output, maxchar)
+procedure ie_gimage1 (im, input_name, output_name, maxchar)
 
 pointer	im			#I IMIO pointer
-char	input[ARB]		#I Input image name
-char	output[maxchar]		#O Output image name
+char	input_name[ARB]		#I Input image name
+char	output_name[maxchar]	#O Output image name
 int	maxchar			#I Maximum characters in output name.
 
 int	i, fd
@@ -249,13 +249,13 @@ begin
 	    Memc[section] = EOS
 
 	# Strip existing image section and add new section.
-	call imgimage (input, output, maxchar)
-	call strcat (Memc[section], output, maxchar)
+	call imgimage (input_name, output_name, maxchar)
+	call strcat (Memc[section], output_name, maxchar)
 	
 #	if (Memc[section] == EOS)
-#	    call imgimage (input, output, maxchar)
+#	    call imgimage (input_name, output_name, maxchar)
 #	else
-#	    call strcpy (input, output, maxchar)
+#	    call strcpy (input_name, output_name, maxchar)
 
 	call sfree (sp)
 end

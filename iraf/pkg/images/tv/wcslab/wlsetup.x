@@ -617,12 +617,14 @@ double	x0, y0, x1, y1            # I: random points in space
 double	screen_boundary[N_SIDES]  # I: sides of the window
 double	nx, ny                    # O: the closest point on a window boundary
 
+size_t	c_2
 double	x_val[N_SIDES], y_val[N_SIDES], tx0, ty0, tx1, ty1, w[2]
 int	i
 pointer	cvx, cvy
 double	dcveval()
 
 begin
+	c_2 = 2
 	# Get the line parameters.
 	x_val[1] = x0
 	x_val[2] = x1
@@ -632,7 +634,7 @@ begin
 	iferr (call dcvinit (cvx, CHEBYSHEV, 2, min (x0, x1), max (x0, x1)))
 	    cvx = NULL
 	else {
-	    call dcvfit (cvx, x_val, y_val, w, 2, WTS_UNIFORM, i)
+	    call dcvfit (cvx, x_val, y_val, w, c_2, WTS_UNIFORM, i)
 	    if (i != OK)
 	        call error (i, "wlaxie: Error solving on X")
 	}
@@ -640,7 +642,7 @@ begin
 	iferr (call dcvinit (cvy, CHEBYSHEV, 2, min (y0, y1), max (y0, y1)))
 	    cvy = NULL
 	else {
-	    call dcvfit (cvy, y_val, x_val, w, 2, WTS_UNIFORM, i)
+	    call dcvfit (cvy, y_val, x_val, w, c_2, WTS_UNIFORM, i)
 	    if (i != OK)
 	        call error (i, "wlaxie: Error solving on Y")
 	}

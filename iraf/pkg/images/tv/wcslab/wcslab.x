@@ -206,7 +206,7 @@ real	log_y1, log_y2
 
 size_t	sz_val
 real    cd[2,2], r[2], w[2]
-pointer sp, input, pp
+pointer sp, inputp, pp
 pointer clopset(), mw_open()
 real    clgpsetr()
 include	<nullptr.inc>
@@ -214,7 +214,7 @@ include	<nullptr.inc>
 begin
         call smark (sp)
         sz_val = SZ_LINE
-        call salloc (input, sz_val, TY_CHAR)
+        call salloc (inputp, sz_val, TY_CHAR)
 
 	# Open the pset.
 	pp = clopset ("wcspars")
@@ -223,10 +223,10 @@ begin
         mw = mw_open (NULLPTR, 2)
 
         # Get the types.
-        call clgpset (pp, "ctype1", Memc[input], SZ_LINE)
-        call wl_decode_ctype (mw, Memc[input], 1)
-        call clgpset (pp, "ctype2", Memc[input], SZ_LINE)
-        call wl_decode_ctype (mw, Memc[input], 2)
+        call clgpset (pp, "ctype1", Memc[inputp], SZ_LINE)
+        call wl_decode_ctype (mw, Memc[inputp], 1)
+        call clgpset (pp, "ctype2", Memc[inputp], SZ_LINE)
+        call wl_decode_ctype (mw, Memc[inputp], 2)
 
         # Get the reference coordinates.
         r[1] = clgpsetr (pp, "crpix1")
@@ -266,10 +266,10 @@ end
 #   types are defined in the form "axistype-systemtype".  There may be
 #   any number of '-' in between the values.
 
-procedure wl_decode_ctype (mw, input, axno)
+procedure wl_decode_ctype (mw, sinput, axno)
 
 pointer mw              # I: the MWCS descriptor
-char    input[ARB]      # I: the string input
+char    sinput[ARB]     # I: the string input
 int     axno            # I: the axis being worked on
 
 int     i, input_len, axes[2]
@@ -277,34 +277,34 @@ int     strncmp(), strldx(), strlen()
 string  empty ""
 
 begin
-        input_len = strlen (input)
+        input_len = strlen (sinput)
 
         # Fix some characters.
         do i = 1, input_len {
-          if (input[i] == ' ' || input[i] == '\'')
+          if (sinput[i] == ' ' || sinput[i] == '\'')
             break
-          else if (IS_UPPER(input[i]))
-            input[i] = TO_LOWER(input[i])
-          else if (input[i] == '_')
-            input[i] = '-'
+          else if (IS_UPPER(sinput[i]))
+            sinput[i] = TO_LOWER(sinput[i])
+          else if (sinput[i] == '_')
+            sinput[i] = '-'
         }
 
         # Determine the type of function on this axis.
-        if (strncmp (input, "linear", 6) == 0) {
+        if (strncmp (sinput, "linear", 6) == 0) {
           call mw_swtype (mw, axno, 1, "linear", empty)
 
-        } else if (strncmp (input, "ra--", 4) == 0) {
+        } else if (strncmp (sinput, "ra--", 4) == 0) {
 	  axes[1] = axno
 	  if (axno == 1)
 	    axes[2] = 2
 	  else
 	    axes[2] = 1
-          i = strldx ("-", input) + 1
-          call mw_swtype (mw, axes, 2, input[i],
+          i = strldx ("-", sinput) + 1
+          call mw_swtype (mw, axes, 2, sinput[i],
 	      "axis 1: axtype = ra axis 2: axtype=dec")
 
 	# This is dealt with in the ra case.
-        } else if (strncmp (input, "dec-", 4) == 0) {
+        } else if (strncmp (sinput, "dec-", 4) == 0) {
 	  ;
 
         } else {
@@ -313,7 +313,7 @@ begin
           # something we don't know about, assume a LINEAR axis, using
           # the given value of CTYPEi as the default axis label.
           call mw_swtype (mw, axno, 1, "linear", empty)
-          call mw_swattrs (mw, axno, "label", input)
+          call mw_swattrs (mw, axno, "label", sinput)
         }
         
 end
@@ -747,9 +747,9 @@ end
 
 # WL_LABEL_SIDE -- Decode string into set of booleans  sides.
 
-procedure wl_label_side (input, flag)
+procedure wl_label_side (sinput, flag)
 
-char	input[ARB]     # I: string listing the sides to be labeled
+char	sinput[ARB]     # I: string listing the sides to be labeled
 bool	flag[N_SIDES]  # O: the flags indicating which sides wll be labeled
 
 int	i 
@@ -761,13 +761,13 @@ begin
 	    flag[i] = false
 
 	# Now set each side that is in the list.
-	if (strmatch (input, "right") != 0)
+	if (strmatch (sinput, "right") != 0)
 	    flag[RIGHT] = true
-	if (strmatch (input, "left") != 0)
+	if (strmatch (sinput, "left") != 0)
 	    flag[LEFT] = true
-	if (strmatch (input, "top") != 0)
+	if (strmatch (sinput, "top") != 0)
 	    flag[TOP] = true
-	if (strmatch (input, "bottom") != 0)
+	if (strmatch (sinput, "bottom") != 0)
 	    flag[BOTTOM] = true
 end
 
@@ -786,9 +786,9 @@ end
 #  This returns the single coordinate value converted to a base system 
 #  (degrees).
 
-double procedure wl_string_to_internal (input, axis_type, which_axis)
+double procedure wl_string_to_internal (sinput, axis_type, which_axis)
 
-char	input[ARB]	# I; the string containing the numerical value
+char	sinput[ARB]	# I; the string containing the numerical value
 int	axis_type   	# I: the type of wcs
 int	which_axis	# I: the axis number
 
@@ -797,7 +797,7 @@ int	strlen(), nscan()
 
 begin
 	# It is possible that the value was not defined.
-	if (strlen (input)  <= 0)
+	if (strlen (sinput)  <= 0)
 	    value = INDEFD
 
 	# Decode based on the system.
@@ -812,7 +812,7 @@ begin
 		# H:M:S from D:M:S. If the axis being read is RA, assume that
 		# it was H:M:S.
 
-	        call sscan (input)
+	        call sscan (sinput)
 	            call gargd (value)
 
 		# If the axis is Longitude == RA, then convert the hours to
@@ -827,7 +827,7 @@ begin
 	    # Default- unknown system, just read the string as a double
 	    # precision and return it.
 	    default:
-		call sscan (input)
+		call sscan (sinput)
 		    call gargd (value)
 		if (nscan() < 1)
 		    value = INDEFD
