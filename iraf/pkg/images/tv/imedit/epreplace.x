@@ -14,10 +14,11 @@ include	"epix.h"
 procedure ep_replacei (ep, x, y, key)
 
 pointer	ep			#I EPIX pointer
-int	x, y			#I Reference pixel
+long	x, y			#I Reference pixel
 int	key			#I Key
 
-int	i, j, nc, nl, x1, x2, y1, y2
+long	c_1
+long	i, j, nc, nl, x1, x2, y1, y2
 real	minv, maxv
 int	val, ival, oval
 pointer	im, buf
@@ -27,6 +28,7 @@ pointer	imgs2i(), imps2i()
 errchk	imgs2i, imps2i
 
 begin
+	c_1 = 1
 	im = EP_IM(ep)
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
@@ -55,7 +57,7 @@ begin
 
 	x1 = x+1; x2 = x-1; y1 = y+1; y2 = y-1
 	do j = 1, nl {
-	    buf = imgs2i (im, 1, nc, j, j)
+	    buf = imgs2i (im, c_1, nc, j, j)
 	    switch (key) {
 	    case '=':
 		do i = 1, nc {
@@ -138,10 +140,11 @@ end
 procedure ep_replacer (ep, x, y, key)
 
 pointer	ep			#I EPIX pointer
-int	x, y			#I Reference pixel
+long	x, y			#I Reference pixel
 int	key			#I Key
 
-int	i, j, nc, nl, x1, x2, y1, y2
+long	c_1
+long	i, j, nc, nl, x1, x2, y1, y2
 real	minv, maxv
 real	val, ival, oval
 pointer	im, buf
@@ -150,6 +153,7 @@ pointer	imgs2r(), imps2r()
 errchk	imgs2r, imps2r
 
 begin
+	c_1 = 1
 	im = EP_IM(ep)
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
@@ -178,7 +182,7 @@ begin
 
 	x1 = x+1; x2 = x-1; y1 = y+1; y2 = y-1
 	do j = 1, nl {
-	    buf = imgs2r (im, 1, nc, j, j)
+	    buf = imgs2r (im, c_1, nc, j, j)
 	    switch (key) {
 	    case '=':
 		do i = 1, nc {

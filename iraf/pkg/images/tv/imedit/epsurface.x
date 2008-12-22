@@ -7,10 +7,11 @@ procedure ep_surface(gp, data, ncols, nlines, angh, angv)
  
 pointer	gp			# GIO pointer
 real	data[ncols,nlines]	# Surface data to be plotted
-int	ncols, nlines		# Dimensions of surface
+size_t	ncols, nlines		# Dimensions of surface
 real	angh, angv		# Orientation of surface (degrees)
  
 int	wkid
+int	i_val0, ival1
 pointer	sp, work
  
 int	first
@@ -35,7 +36,10 @@ begin
 	call gopwk (wkid, DUMMY, gp)
 	call gacwk (wkid)
  
-	call ezsrfc (data, ncols, nlines, angh, angv, Memr[work])
+	# sys/gio/ncarutil/srface.f
+	i_val0 = ncols
+	i_val1 = nlines
+	call ezsrfc (data, i_val0, i_val1, angh, angv, Memr[work])
  
 	call gdawk (wkid)
 	# We don't want to close the GIO pointer.

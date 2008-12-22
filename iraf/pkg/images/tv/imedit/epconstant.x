@@ -7,9 +7,9 @@ procedure ep_constant (ep, ap, xa, ya, xb, yb)
  
 pointer	ep			# EPIX pointer
 int	ap			# Aperture type
-int	xa, ya, xb, yb		# Aperture coordinates
+long	xa, ya, xb, yb		# Aperture coordinates
  
-int	i, x1, x2, y1, y2
+long	i, x1, x2, y1, y2
 pointer	mask
  
 begin
@@ -39,10 +39,10 @@ procedure ep_constant1 (data, mask, npts, value)
  
 real	data[npts]		# Data subraster
 int	mask[npts]		# Mask subraster
-int	npts			# Number of points
+size_t	npts			# Number of points
 real	value			# Substitution value
  
-int	i
+long	i
  
 begin
 	do i = 1, npts

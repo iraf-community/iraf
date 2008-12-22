@@ -6,10 +6,10 @@ procedure ep_statistics (ep, ap, xa, ya, xb, yb, box)
 
 pointer ep			# EPIX structure
 int	ap			# Aperture type
-int	xa, ya, xb, yb		# Aperture coordinates
+long	xa, ya, xb, yb		# Aperture coordinates
 int	box			# Print box?
 
-int	i, x1, x2, y1, y2
+long	i, x1, x2, y1, y2
 pointer	mask, x, y, w, gs
 
 begin
@@ -22,9 +22,9 @@ begin
 	call ep_gindata (ep, x1, x2, y1, y2)
 	if (EP_INDATA(ep) != NULL) {
 	    call malloc (mask, EP_NPTS(ep), TY_INT)
-	    call malloc (x, EP_NPTS(ep), TY_INT)
-	    call malloc (y, EP_NPTS(ep), TY_INT)
-	    call malloc (w, EP_NPTS(ep), TY_INT)
+	    call malloc (x, EP_NPTS(ep), TY_REAL)
+	    call malloc (y, EP_NPTS(ep), TY_REAL)
+	    call malloc (w, EP_NPTS(ep), TY_REAL)
 
 	    call ep_search (ep, Memr[EP_INDATA(ep)], EP_NX(ep),
 		EP_NY(ep), ap, xa, ya, xb, yb)
@@ -39,9 +39,9 @@ begin
 		    EP_X1(ep), EP_Y1(ep), xa, ya, xb, yb)
 
 	    call mfree (mask, TY_INT)
-	    call mfree (x, TY_INT)
-	    call mfree (y, TY_INT)
-	    call mfree (w, TY_INT)
+	    call mfree (x, TY_REAL)
+	    call mfree (y, TY_REAL)
+	    call mfree (w, TY_REAL)
 	    call gsfree (gs)
 	}
 end
@@ -53,12 +53,12 @@ procedure ep_statistics1 (data, mask, nx, ny, x1, y1, x, y, gs)
 
 real	data[nx,ny]		# Input data subraster
 int	mask[nx,ny]		# Mask subraster
-int	nx, ny			# Size of subraster
-int	x1, y1			# Origin of subraster
-int	x, y			# Center of object
+size_t	nx, ny			# Size of subraster
+long	x1, y1			# Origin of subraster
+long	x, y			# Center of object
 pointer	gs			# GSURFIT pointer
 
-int	i, j, area, nsky
+long	i, j, area, nsky
 real	flux, sky, sigma, d, gseval()
 
 begin
@@ -86,17 +86,17 @@ begin
 	}
 
 	call printf ("x=%d y=%d z=%d mean=%g area=%d")
-	    call pargi (x)
-	    call pargi (y)
+	    call pargl (x)
+	    call pargl (y)
 	    call pargr (data[x-x1+1,y-y1+1])
 	    call pargr (flux / area)
-	    call pargi (area)
+	    call pargl (area)
 
 	if (nsky > 0) {
 	    call printf (" sky=%g sigma=%g nsky=%d")
 		call pargr (sky / nsky)
 		call pargr (sqrt (sigma / nsky))
-		call pargi (nsky)
+		call pargl (nsky)
 	}
 
 	call printf ("\n")
@@ -108,11 +108,11 @@ end
 procedure ep_box (data, nx, ny, xo, yo, xa, ya, xb, yb)
 
 real	data[nx,ny]		# Input data subraster
-int	nx, ny			# Size of subraster
-int	xo, yo			# Origin of subraster
-int	xa, ya, xb, yb		# Aperture
+size_t	nx, ny			# Size of subraster
+long	xo, yo			# Origin of subraster
+long	xa, ya, xb, yb		# Aperture
 
-int	i, j, x1, x2, y1, y2, x, y
+long	i, j, x1, x2, y1, y2, x, y
 
 begin
 	x1 = min (xa, xb)
@@ -129,13 +129,13 @@ begin
 	call printf ("%4w") 
 	do x = x1, x2 {
 	    call printf (" %4d ")
-		call pargi (x)
+		call pargl (x)
 	}
 	call printf ("\n")
 
 	do y = y2, y1, -1 {
 	    call printf ("%4d")
-		call pargi (y)
+		call pargl (y)
 	    j = y - yo + 1
 	    do x = x1, x2 {
 		i = x - xo + 1

@@ -10,9 +10,9 @@ procedure ep_background (ep, ap, xa, ya, xb, yb)
 
 pointer ep			# EPIX structure
 int	ap			# Aperture type
-int	xa, ya, xb, yb		# Aperture coordinates
+long	xa, ya, xb, yb		# Aperture coordinates
 
-int	i, x1, x2, y1, y2
+long	i, x1, x2, y1, y2
 pointer	mask, x, y, w, gs
 
 begin
@@ -55,10 +55,10 @@ procedure ep_bg (data, mask, x, y, npts, gs)
 real	data[npts]		# Data subraster
 int	mask[npts]		# Mask subraster
 real	x[npts], y[npts]	# Coordinates
-int	npts			# Number of points
+size_t	npts			# Number of points
 pointer	gs			# Surface pointer
 
-int	i
+long	i
 real	gseval()
 
 begin

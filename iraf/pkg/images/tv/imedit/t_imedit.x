@@ -22,7 +22,9 @@ procedure t_imedit ()
 pointer	inlist		# List of input images
 pointer	outlist		# List of output images
  
-int	i, key, ap, xa, ya, xb, yb, x1, x2, y1, y2
+size_t	sz_val
+int	key, ap
+long	i, xa, ya, xb, yb, x1, x2, y1, y2
 int	change, changes, newdisplay, newimage
 bool	erase
 pointer	sp, ep, cmd, temp
@@ -32,16 +34,19 @@ bool	streq()
 pointer	immap(), imgl2r(), impl2r(), imtopenp()
 int	imtlen(), imtgetim(), imaccess(), ep_gcur()
 errchk	immap, imdelete, ep_imcopy, ep_setpars, imgl2r, impl2r
- 
+include	<nullptr.inc>
+
 define	newim_	99
  
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Allocate and initialize imedit descriptor.
-	call salloc (ep, EP_LEN, TY_STRUCT)
-	call aclri (Memi[ep], EP_LEN)
+	sz_val = EP_LEN
+	call salloc (ep, sz_val, TY_STRUCT)
+	call aclrp (Memp[ep], sz_val)
  
 	# Check the input and output image lists have proper format.
 	inlist = imtopenp ("input")
@@ -72,7 +77,7 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 		next
 	    }
 
-	    EP_IM(ep) = immap (EP_WORK(ep), READ_WRITE, 0)
+	    EP_IM(ep) = immap (EP_WORK(ep), READ_WRITE, NULLPTR)
 	    EP_INDATA(ep) = NULL
 	    EP_OUTDATA(ep) = NULL
  
@@ -238,17 +243,17 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 		    switch (key) {
 		    case 'a', 'c', 'd', 'f', 'j', 'l', 'v':
 			call fprintf (EP_LOGFD(ep), "%d %d 1 %c\n")
-			    call pargi (xa)
-			    call pargi (ya)
+			    call pargl (xa)
+			    call pargl (ya)
 			    call pargi (key)
 			call fprintf (EP_LOGFD(ep), "%d %d 1 %c\n")
-			    call pargi (xb)
-			    call pargi (yb)
+			    call pargl (xb)
+			    call pargl (yb)
 			    call pargi (key)
 		    case 'b', 'e', 'k':
 			call fprintf (EP_LOGFD(ep), "%d %d 1 %c\n")
-			    call pargi ((xa+xb)/2)
-			    call pargi ((ya+yb)/2)
+			    call pargl ((xa+xb)/2)
+			    call pargl ((ya+yb)/2)
 			    call pargi (key)
 		    case 'u':
 			if (EP_OUTDATA(ep) != NULL) {
@@ -257,12 +262,12 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 			}
 		    case 'm', 'n':
 			call fprintf (EP_LOGFD(ep), "%d %d 1 %c\n")
-			    call pargi ((xa+xb)/2)
-			    call pargi ((ya+yb)/2)
+			    call pargl ((xa+xb)/2)
+			    call pargl ((ya+yb)/2)
 			    call pargi (key)
 			call fprintf (EP_LOGFD(ep), "%d %d 1 %c\n")
-			    call pargi ((x1+x2)/2)
-			    call pargi ((y1+y2)/2)
+			    call pargl ((x1+x2)/2)
+			    call pargl ((y1+y2)/2)
 			    call pargi (key)
 		    }
 		}
@@ -272,8 +277,8 @@ newim_	    call strcpy (EP_OUTPUT(ep), EP_WORK(ep), EP_SZFNAME)
 	    # Only create the output if the input has been changed.
 	    if (changes > 0) {
 		if (streq (EP_INPUT(ep), EP_OUTPUT(ep))) {
-		    EP_IM(ep) = immap (EP_OUTPUT(ep), READ_WRITE, 0)
-		    im = immap (EP_WORK(ep), READ_ONLY, 0)
+		    EP_IM(ep) = immap (EP_OUTPUT(ep), READ_WRITE, NULLPTR)
+		    im = immap (EP_WORK(ep), READ_ONLY, NULLPTR)
 		    do i = 1, IM_LEN(EP_IM(ep),2)
 		        call amovr (Memr[imgl2r(im,i)],
 			    Memr[impl2r(EP_IM(ep),i)], IM_LEN(im,1))

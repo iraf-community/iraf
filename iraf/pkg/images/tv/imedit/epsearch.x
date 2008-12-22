@@ -10,13 +10,14 @@ procedure ep_search (ep, data, nx, ny, ap, xa, ya, xb, yb)
  
 pointer	ep			# EPIX pointer
 real	data[nx,ny]		# Subraster
-int	nx, ny			# Subraster size
+size_t	nx, ny			# Subraster size
 int	ap			# Aperture type
-int	xa, ya, xb, yb		# Aperture (initial and final)
- 
+long	xa, ya, xb, yb		# Aperture (initial and final)
+
 real	xc, yc, search2, dj2, r2, dmax
-int	i, j, i1, i2, j1, j2, imax, jmax
- 
+long	i, j, i1, i2, j1, j2, imax, jmax
+long	nint_rl()
+
 begin
 	if (EP_SEARCH(ep) == 0.)
 	    return
@@ -28,14 +29,14 @@ begin
 	xc = (xa + xb) / 2.
 	i1 = max (1., xc - search2)
 	i2 = min (real(nx), xc + search2)
-	imax = nint (xc)
+	imax = nint_rl(xc)
  
 	ya = ya - EP_Y1(ep) + 1
 	yb = yb - EP_Y1(ep) + 1
 	yc = (ya + yb) / 2.
 	j1 = max (1., yc - search2)
 	j2 = min (real(ny), yc + search2)
-	jmax = nint (yc)
+	jmax = nint_rl(yc)
 
 	dmax = data[imax,jmax]
 	switch (ap) {

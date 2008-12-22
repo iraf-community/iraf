@@ -7,9 +7,9 @@ include	"epix.h"
 procedure ep_gdata (ep, x1, x2, y1, y2)
  
 pointer	ep			# EPIX pointer
-int	x1, x2, y1, y2		# Subraster limits
+long	x1, x2, y1, y2		# Subraster limits
  
-int	nc, nl
+long	nc, nl
 pointer	im, imgs2r(), imps2r()
  
 begin
@@ -43,9 +43,9 @@ end
 procedure ep_gindata (ep, x1, x2, y1, y2)
  
 pointer	ep			# EPIX pointer
-int	x1, x2, y1, y2		# Subraster limits
+long	x1, x2, y1, y2		# Subraster limits
  
-int	nc, nl
+long	nc, nl
 pointer	im, imgs2r()
  
 begin

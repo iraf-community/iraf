@@ -11,10 +11,13 @@ int	mask[nx,ny]		# Mask subraster
 real	x[nx,ny]		# X positions
 real	y[nx,ny]		# Y positions
 real	w[nx,ny]		# Weights
-int	nx, ny			# Subraster size
+size_t	nx, ny			# Subraster size
 pointer	gs			# Surface pointer (returned)
  
-int	i, j, n, npts, xo, yo
+long	i, j
+int	n
+size_t	npts, nn
+int	xo, yo
 pointer	sp, work
 real	amedr()
  
@@ -26,16 +29,16 @@ begin
 	npts = nx * ny
 
 	if (EP_XORDER(ep) == 0 || EP_YORDER(ep) == 0) {
-	    n = 0
+	    nn = 0
 	    do j = 1, ny {
 		do i = 1, nx {
 		    if (mask[i,j] == 2) {
-			Memr[work+n] = data[i,j]
-			n = n + 1
+			Memr[work+nn] = data[i,j]
+			nn = nn + 1
 		    }
 		}
 	    }
-	    call amovkr (amedr (Memr[work], n), Memr[work], npts)
+	    call amovkr (amedr (Memr[work], nn), Memr[work], npts)
 	    xo = 1
 	    yo = 1
 	} else {

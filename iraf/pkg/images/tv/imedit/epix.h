@@ -34,13 +34,13 @@ define	EP_LOGFD	Memi[P2I($1+368)]		# Log file descriptor
 define	EP_IM		Memp[$1+369]			# IMIO pointer
 define	EP_INDATA	Memp[$1+370]			# Input data pointer
 define	EP_OUTDATA	Memp[$1+371]			# Output data pointer
-define	EP_NX		Memi[P2I($1+372)]		# Number of columns in subraster
-define	EP_NY		Memi[P2I($1+373)]		# Number of lines in subraster
-define	EP_NPTS		Memi[P2I($1+374)]		# Number of pixels in subraster
-define	EP_X1		Memi[P2I($1+375)]		# Starting column of subraster
-define	EP_Y1		Memi[P2I($1+376)]		# Starting line of subraster
-define	EP_X2		Memi[P2I($1+377)]		# Ending column of subraster
-define	EP_Y2		Memi[P2I($1+378)]		# Ending line of subraster
+define	EP_NX		Memz[P2Z($1+372)]		# Number of columns in subraster
+define	EP_NY		Memz[P2Z($1+373)]		# Number of lines in subraster
+define	EP_NPTS		Memz[P2Z($1+374)]		# Number of pixels in subraster
+define	EP_X1		Meml[P2L($1+375)]		# Starting column of subraster
+define	EP_Y1		Meml[P2L($1+376)]		# Starting line of subraster
+define	EP_X2		Meml[P2L($1+377)]		# Ending column of subraster
+define	EP_Y2		Meml[P2L($1+378)]		# Ending line of subraster
  
 define	APTYPES		"|circular|square|"	# Aperture types
 define	APRECTANGLE	0			# Rectangular aperture

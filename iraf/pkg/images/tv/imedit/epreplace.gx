@@ -14,10 +14,11 @@ $for (ir)
 procedure ep_replace$t (ep, x, y, key)
 
 pointer	ep			#I EPIX pointer
-int	x, y			#I Reference pixel
+long	x, y			#I Reference pixel
 int	key			#I Key
 
-int	i, j, nc, nl, x1, x2, y1, y2
+long	c_1
+long	i, j, nc, nl, x1, x2, y1, y2
 real	minv, maxv
 PIXEL	val, ival, oval
 pointer	im, buf
@@ -29,6 +30,7 @@ pointer	imgs2$t(), imps2$t()
 errchk	imgs2$t, imps2$t
 
 begin
+	c_1 = 1
 	im = EP_IM(ep)
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
@@ -61,7 +63,7 @@ begin
 
 	x1 = x+1; x2 = x-1; y1 = y+1; y2 = y-1
 	do j = 1, nl {
-	    buf = imgs2$t (im, 1, nc, j, j)
+	    buf = imgs2$t (im, c_1, nc, j, j)
 	    switch (key) {
 	    case '=':
 		do i = 1, nc {

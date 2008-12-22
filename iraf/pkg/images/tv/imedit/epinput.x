@@ -7,10 +7,12 @@ procedure ep_input (ep, ap, xa, ya, xb, yb)
  
 pointer	ep			# EPIX pointer
 int	ap			# Aperture type
-int	xa, ya, xb, yb		# Aperture coordinates
+long	xa, ya, xb, yb		# Aperture coordinates
  
-int	i, x1, x2, y1, y2
-pointer	mask, indata, im, immap(), imgs2r()
+long	i, x1, x2, y1, y2
+pointer	mask, indata, im
+pointer	immap(), imgs2r()
+include	<nullptr.inc>
  
 begin
 	i = max (5., abs (EP_SEARCH(ep)) + 1)
@@ -26,7 +28,7 @@ begin
 		    EP_NY(ep), ap, xa, ya, xb, yb)
 	    call ep_mask (ep, mask, ap, xa, ya, xb, yb)
  
-	    im = immap (EP_INPUT(ep), READ_ONLY, 0)
+	    im = immap (EP_INPUT(ep), READ_ONLY, NULLPTR)
 	    indata = imgs2r (im, EP_X1(ep), EP_X2(ep), EP_Y1(ep), EP_Y2(ep))
 	    call ep_input1 (Memr[indata], Memi[mask], Memr[EP_OUTDATA(ep)],
 		EP_NPTS(ep))
@@ -44,9 +46,9 @@ procedure ep_input1 (indata, mask, outdata, npts)
 real	indata[npts]		# Data subraster
 int	mask[npts]		# Mask subraster
 real	outdata[npts]		# Input buffer data
-int	npts			# Number of points
+size_t	npts			# Number of points
  
-int	i
+long	i
  
 begin
 	do i = 1, npts

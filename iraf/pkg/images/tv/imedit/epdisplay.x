@@ -15,8 +15,10 @@ pointer	ep		# EPIX structure
 char	image[ARB]	# Image
 bool	erase		# Erase
  
-pointer	temp, immap(), imgs2r(), imps2r()
- 
+pointer	temp
+pointer	immap(), imgs2r(), imps2r()
+include	<nullptr.inc>
+
 begin
 	# If the output has been modified save and restore the original
 	# input subraster for later undoing.
@@ -27,7 +29,7 @@ begin
 	    call imunmap (EP_IM(ep))
 	    call ep_command (ep, image, erase)
 	    erase = false
-	    EP_IM(ep) = immap (image, READ_WRITE, 0)
+	    EP_IM(ep) = immap (image, READ_WRITE, NULLPTR)
 	    EP_OUTDATA(ep) = imps2r (EP_IM(ep), EP_X1(ep),
 		EP_X2(ep), EP_Y1(ep), EP_Y2(ep))
 	    EP_INDATA(ep) = imgs2r (EP_IM(ep), EP_X1(ep),
@@ -40,7 +42,7 @@ begin
 	    call imunmap (EP_IM(ep))
 	    call ep_command (ep, image, erase)
 	    erase = false
-	    EP_IM(ep) = immap (image, READ_WRITE, 0)
+	    EP_IM(ep) = immap (image, READ_WRITE, NULLPTR)
 	}
 end
  
@@ -57,14 +59,17 @@ procedure ep_command (ep, image, erase)
 pointer	ep			# EPIX structure
 char	image[ARB]		# Image name
 bool	erase			# Erase?
- 
-int	i, j, k, nscan(), strdic(), stridxs()
+
+size_t	sz_val
+int	i, j, k
+int	nscan(), strdic(), stridxs()
 pointer	sp, cmd, word
  
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (word, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (word, sz_val, TY_CHAR)
  
 	call sscan (EP_COMMAND(ep))
  
@@ -106,15 +111,16 @@ end
 procedure ep_zoom (ep, xa, ya, xb, yb, key, erase)
  
 pointer	ep		# EPIX structure
-int	xa, ya		# Cursor
-int	xb, yb		# Cursor
+long	xa, ya		# Cursor
+long	xb, yb		# Cursor
 int	key		# Cursor key
 bool	erase		# Erase?
  
 real	zoom
-int	nc, nl, nx, ny, zx, zy, x1, x2, y1, y2
+long	nc, nl, nx, ny, zx, zy, x1, x2, y1, y2
+long	absl()
 data	zoom/1./
- 
+
 begin
 	erase = true
  
@@ -124,8 +130,8 @@ begin
 	case 'E':
 	    nc = IM_LEN(EP_IM(ep),1)
 	    nl = IM_LEN(EP_IM(ep),2)
-	    nx = abs (xa - xb) + 1
-	    ny = abs (ya - yb) + 1
+	    nx = absl(xa - xb) + 1
+	    ny = absl(ya - yb) + 1
 	    zoom = max (1., min (nc / real (nx), nl / real (ny)))
 	    zx = (xa + xb) / 2.
 	    zy = (ya + yb) / 2.
@@ -189,8 +195,8 @@ begin
  
 	# Format the image section.
 	call sprintf (EP_SECTION(ep), EP_SZFNAME, "[%d:%d,%d:%d]")
-	    call pargi (x1)
-	    call pargi (x2)
-	    call pargi (y1)
-	    call pargi (y2)
+	    call pargl (x1)
+	    call pargl (x2)
+	    call pargl (y1)
+	    call pargl (y2)
 end

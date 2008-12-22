@@ -9,11 +9,11 @@ procedure ep_move (ep, ap, xa1, ya1, xb1, yb1, xa2, ya2, xb2, yb2, key)
 
 pointer ep			# EPIX structure
 int	ap			# Aperture type
-int	xa1, ya1, xb1, yb1	# Aperture coordinates
-int	xa2, ya2, xb2, yb2	# Aperture coordinates
+long	xa1, ya1, xb1, yb1	# Aperture coordinates
+long	xa2, ya2, xb2, yb2	# Aperture coordinates
 int	key			# Key
 
-int	i, x1, x2, y1, y2
+long	i, x1, x2, y1, y2
 pointer	bufdata, mask, x, y, w
 
 begin
@@ -75,9 +75,9 @@ real	outdata[nx,ny]		# Output data subraster
 int	mask[nx,ny]		# Mask subraster
 real	x[nx,ny], y[nx,ny]	# Coordinates
 real	w[nx,ny]		# Weights
-int	nx, ny			# Size of subraster
+size_t	nx, ny			# Size of subraster
 
-int	i, j
+long	i, j
 real	gseval()
 pointer	gsin, gsout
 
@@ -110,9 +110,9 @@ real	outdata[nx,ny]		# Output data subraster
 int	mask[nx,ny]		# Mask subraster
 real	x[nx,ny], y[nx,ny]	# Coordinates
 real	w[nx,ny]		# Weights
-int	nx, ny			# Size of subraster
+size_t	nx, ny			# Size of subraster
 
-int	i, j
+long	i, j
 real	gseval()
 pointer	gs
 

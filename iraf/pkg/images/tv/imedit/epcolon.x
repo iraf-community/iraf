@@ -38,6 +38,7 @@ pointer	ep			# EPIX structure
 char	cmdstr[ARB]		# Colon command
 int	newimage		# New image?
  
+size_t	sz_val
 int	ival, ncmd
 real	rval
 bool	bval
@@ -46,10 +47,12 @@ pointer	sp, cmd
 bool	strne()
 int	nscan(), strdic(), btoi(), imaccess()
 pointer	immap()
+include	<nullptr.inc>
  
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
  
 	# Scan the command string and get the first word.
 	call sscan (cmdstr)
@@ -299,7 +302,7 @@ begin
 		    call imdelete (Memc[cmd])
 		call imunmap (EP_IM(ep))
 	        call ep_imcopy (EP_WORK(ep), Memc[cmd])
-		EP_IM(ep) = immap (EP_WORK(ep), READ_WRITE, 0)
+		EP_IM(ep) = immap (EP_WORK(ep), READ_WRITE, NULLPTR)
 	    }
 	case XORDER:
 	    call gargi (ival)

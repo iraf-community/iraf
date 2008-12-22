@@ -11,15 +11,17 @@ int procedure ep_gcur (ep, ap, x1, y1, x2, y2, key, strval, maxch)
 
 pointer	ep			# EPIX structure
 int	ap			# Aperture type
-int	x1, y1, x2, y2		# Corners of aperture
+long	x1, y1, x2, y2		# Corners of aperture
 int	key			# Keystroke value of cursor event
 char	strval[ARB]		# String value, if any
 int	maxch
 
+size_t	sz_val
 real	a, b, c, d, e
-pointer	sp, buf, ip
-int	nitems, wcs
+pointer	sp, buf
+int	nitems, wcs, ip
 int	ctor(), clglstr(), clgcur()
+long	absl(), nint_rl()
 
 begin
 	# FIXPIX format consists of a rectangle with column and line ranges.
@@ -28,7 +30,8 @@ begin
 
 	if (EP_FIXPIX(ep) == YES) {
 	    call smark (sp)
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 
 	    # Read the list structured string.
 	    if (clglstr ("cursor", Memc[buf], SZ_LINE) == EOF) {
@@ -36,15 +39,15 @@ begin
 	        return (EOF)
 	    }
 
-	    ip = buf
+	    ip = 1
 	    nitems = 0
-	    if (ctor (Memc, ip, a) > 0)
+	    if (ctor (Memc[buf], ip, a) > 0)
 	        nitems = nitems + 1
-	    if (ctor (Memc, ip, b) > 0)
+	    if (ctor (Memc[buf], ip, b) > 0)
 	        nitems = nitems + 1
-	    if (ctor (Memc, ip, c) > 0)
+	    if (ctor (Memc[buf], ip, c) > 0)
 	        nitems = nitems + 1
-	    if (ctor (Memc, ip, d) > 0)
+	    if (ctor (Memc[buf], ip, d) > 0)
 	        nitems = nitems + 1
 
 	    e = max (a, b)
@@ -53,10 +56,10 @@ begin
 	    e = max (c, d)
 	    c = min (c, d)
 	    d = e
-	    x1 = nint(a)
-	    y1 = nint(c)
-	    x2 = nint(b)
-	    y2 = nint(d)
+	    x1 = nint_rl(a)
+	    y1 = nint_rl(c)
+	    x2 = nint_rl(b)
+	    y2 = nint_rl(d)
 	    ap = APRECTANGLE
 	    if (x2 - x1 <= y2 - y1)
 		key = 'c'
@@ -80,15 +83,15 @@ begin
 	    nitems = clgcur ("cursor", c, d, wcs, key, strval, SZ_LINE)
 	    call printf ("\n")
 	    if (!IS_INDEF(a))
-	        x1 = nint (a)
+	        x1 = nint_rl(a)
 	    if (!IS_INDEF(b))
-	        y1 = nint (b)
+	        y1 = nint_rl(b)
 	    if (!IS_INDEF(c))
-	        x2 = nint (c)
+	        x2 = nint_rl(c)
 	    if (!IS_INDEF(d))
-	        y2 = nint (d)
+	        y2 = nint_rl(d)
 	    if (key == 'f' || key == 'v') {
-	        if (abs (x2-x1) > abs (y2-y1))
+	        if (absl(x2-x1) > absl(y2-y1))
 	            ap = APLDIAG
 	        else
 	            ap = APCDIAG
@@ -96,12 +99,12 @@ begin
 	        ap = APRECTANGLE
 	case 'b', 'e', 'k', 'm', 'n', 'p', 's', ' ':
 	    if (!IS_INDEF(a)) {
-	        x1 = nint (a - EP_RADIUS(ep))
-	        x2 = nint (a + EP_RADIUS(ep))
+	        x1 = nint_rl(a - EP_RADIUS(ep))
+	        x2 = nint_rl(a + EP_RADIUS(ep))
 	    }
 	    if (!IS_INDEF(b)) {
-	        y1 = nint (b - EP_RADIUS(ep))
-	        y2 = nint (b + EP_RADIUS(ep))
+	        y1 = nint_rl(b - EP_RADIUS(ep))
+	        y2 = nint_rl(b + EP_RADIUS(ep))
 	    }
 	    ap = EP_APERTURE(ep)
 	case 'E':
@@ -109,18 +112,18 @@ begin
 	    nitems = clgcur ("cursor", c, d, wcs, key, strval, SZ_LINE)
 	    call printf ("\n")
 	    if (!IS_INDEF(a))
-	        x1 = nint (a)
+	        x1 = nint_rl(a)
 	    if (!IS_INDEF(b))
-	        y1 = nint (b)
+	        y1 = nint_rl(b)
 	    if (!IS_INDEF(c))
-	        x2 = nint (c)
+	        x2 = nint_rl(c)
 	    if (!IS_INDEF(d))
-	        y2 = nint (d)
+	        y2 = nint_rl(d)
 	default:
 	    if (!IS_INDEF(a))
-	        x1 = nint (a)
+	        x1 = nint_rl(a)
 	    if (!IS_INDEF(b))
-	        y1 = nint (b)
+	        y1 = nint_rl(b)
 	}
 
 	return (nitems)

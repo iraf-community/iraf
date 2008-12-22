@@ -11,10 +11,10 @@ real	sigma			# Noise sigma
 real	data[npts]		# Image data
 int	mask[npts]		# Mask (1=object, 2=background)
 real	x[npts], y[npts]	# Coordinates
-int	npts			# Number of pixels in subraster
+size_t	npts			# Number of pixels in subraster
 pointer	gs			# Background surface
 
-int	i, j, nbg
+long	i, j, nbg
 real	a, b, urand(), gseval(), ep_gauss()
 pointer	bg
 

@@ -10,20 +10,22 @@ procedure ep_mask (ep, mask, ap, xa, ya, xb, yb)
 pointer	ep			# EPIX pointer
 pointer	mask			# Mask pointer
 int	ap			# Aperture type
-int	xa, ya, xb, yb		# Aperture
+long	xa, ya, xb, yb		# Aperture
  
-int	xc, yc, i, j
+long	l_val
+long	xc, yc, i, j
 real	rad, r, a, b, c, d, minv, maxv
-int	x1a, x1b, x1c, x2a, x2b, x2c, y1a, y1b, y1c, y2a, y2b, y2c
+long	x1a, x1b, x1c, x2a, x2b, x2c, y1a, y1b, y1c, y2a, y2b, y2c
 pointer	sp, line, ptr1, ptr2
+long	absl(), nint_rl()
  
 begin
 	rad = max (0.5, EP_RADIUS(ep))
 
 	switch (ap) {
 	case APCIRCULAR:
-	    xc = nint ((xa + xb) / 2.)
-	    yc = nint ((ya + yb) / 2.)
+	    xc = nint_rl((xa + xb) / 2.)
+	    yc = nint_rl((ya + yb) / 2.)
  
 	    a = rad ** 2
 	    b = (rad + EP_BUFFER(ep)) ** 2
@@ -57,7 +59,7 @@ begin
 	    do j = EP_Y1(ep), EP_Y2(ep) {
 		xc = xa + d * (j - ya)
 		do i = EP_X1(ep), EP_X2(ep) {
-		    r = abs (i - xc)
+		    r = absl(i - xc)
 		    if (r <= a)
 			Memi[ptr1] = 1
 		    else if (r >= b && r <= c)
@@ -81,7 +83,7 @@ begin
 	    do j = EP_Y1(ep), EP_Y2(ep) {
 		do i = EP_X1(ep), EP_X2(ep) {
 		    yc = ya + d * (i - xa)
-		    r = abs (j - yc)
+		    r = absl(j - yc)
 		    if (r <= a)
 			Memi[ptr1] = 1
 		    else if (r >= b && r <= c)
@@ -96,18 +98,26 @@ begin
 	    call salloc (line, EP_NX(ep), TY_INT)
  
 	    x1a = max (EP_X1(ep), min (xa, xb))
-	    x1b = max (EP_X1(ep), int (x1a - EP_BUFFER(ep)))
-	    x1c = max (EP_X1(ep), int (x1a - EP_BUFFER(ep) - EP_WIDTH(ep)))
+	    l_val = x1a - EP_BUFFER(ep)
+	    x1b = max (EP_X1(ep), l_val)
+	    l_val = x1a - EP_BUFFER(ep) - EP_WIDTH(ep)
+	    x1c = max (EP_X1(ep), l_val)
 	    x2a = min (EP_X2(ep), max (xa, xb))
-	    x2b = min (EP_X2(ep), int (x2a + EP_BUFFER(ep)))
-	    x2c = min (EP_X2(ep), int (x2a + EP_BUFFER(ep) + EP_WIDTH(ep)))
+	    l_val = x2a + EP_BUFFER(ep)
+	    x2b = min (EP_X2(ep), l_val)
+	    l_val = x2a + EP_BUFFER(ep) + EP_WIDTH(ep)
+	    x2c = min (EP_X2(ep), l_val)
  
 	    y1a = max (EP_Y1(ep), min (ya, yb))
-	    y1b = max (EP_Y1(ep), int (y1a - EP_BUFFER(ep)))
-	    y1c = max (EP_Y1(ep), int (y1a - EP_BUFFER(ep) - EP_WIDTH(ep)))
+	    l_val = y1a - EP_BUFFER(ep)
+	    y1b = max (EP_Y1(ep), l_val)
+	    l_val = y1a - EP_BUFFER(ep) - EP_WIDTH(ep)
+	    y1c = max (EP_Y1(ep), l_val)
 	    y2a = min (EP_Y2(ep), max (ya, yb))
-	    y2b = min (EP_Y2(ep), int (y2a + EP_BUFFER(ep)))
-	    y2c = min (EP_Y2(ep), int (y2a + EP_BUFFER(ep) + EP_WIDTH(ep)))
+	    l_val = y2a + EP_BUFFER(ep)
+	    y2b = min (EP_Y2(ep), l_val)
+	    l_val = y2a + EP_BUFFER(ep) + EP_WIDTH(ep)
+	    y2c = min (EP_Y2(ep), l_val)
  
 	    ptr1 = line - EP_X1(ep)
 	    ptr2 = mask - EP_Y1(ep) * EP_NX(ep)

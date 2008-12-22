@@ -9,9 +9,9 @@ procedure ep_line (ep, ap, xa, ya, xb, yb)
  
 pointer	ep			# EPIX pointer
 int	ap			# Aperture type
-int	xa, ya, xb, yb		# Aperture coordinates
+long	xa, ya, xb, yb		# Aperture coordinates
  
-int	i, x1, x2, y1, y2
+long	i, x1, x2, y1, y2
 pointer	mask, gs
  
 begin
@@ -45,9 +45,9 @@ procedure ep_line1 (data, mask, nx, ny)
  
 real	data[nx,ny]		# Data subraster
 int	mask[nx,ny]		# Mask subraster
-int	nx, ny			# Number of points
+size_t	nx, ny			# Number of points
  
-int	i, j, ya, yb, yc, yd
+long	i, j, ya, yb, yc, yd
 real	a, b
  
 begin
