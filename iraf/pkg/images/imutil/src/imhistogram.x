@@ -30,7 +30,7 @@ pointer gp, im, sp, hgm, hgmr, buf, image, device, str, title, op
 real	clgetr()
 pointer	immap(), gopen()
 int	clgeti(), clgwrd()
-int	imgnlr(), imgnli()
+long	imgnlr(), imgnli()
 bool	clgetb(), fp_equalr()
 
 begin

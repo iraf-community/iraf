@@ -41,7 +41,8 @@ char    sharp
 
 pointer	immap()
 bool    streq()
-int	imtopenp(), imtgetim(), getline()
+pointer	imtopenp()
+int	imtgetim(), getline()
 int	envfind(), ctoi(), open()
 
 begin
@@ -228,8 +229,9 @@ int	show
 int	nfields
 
 pointer sp, field
-int	imgnfn(), imofnlu()
 int	flist
+int	imgnfn()
+pointer	imofnlu()
 
 begin
 
@@ -296,9 +298,9 @@ int	goahead, nl
 pointer	sp, ip, oldval, newval, defval, o, fcomm, ncomm
 
 bool	streq()
-pointer	evexpr()
+pointer	evexpr(), locpr()
 extern	he_getop()
-int	getline(), imaccf(), strldxs(), locpr()
+int	getline(), imaccf(), strldxs()
 errchk	evexpr, getline, imaccf, he_gval
 
 begin
@@ -451,8 +453,8 @@ int	update			# enable updating of the image
 bool	numeric
 int	numlen, ip
 pointer	sp, newval, o
-pointer	evexpr()
-int	imaccf(), locpr(), strlen(), lexnum()
+pointer	evexpr(), locpr()
+int	imaccf(), strlen(), lexnum()
 extern	he_getop()
 errchk	imaccf, evexpr, imakbc, imastrc, imakic, imakrc
 
@@ -556,9 +558,9 @@ int	update			# enable updating of the image
 bool	numeric
 int	numlen, ip
 pointer	sp, newval, o
-pointer	evexpr()
+pointer	evexpr(), locpr()
 bool    streq()
-int	imaccf(), locpr(), strlen(), lexnum()
+int	imaccf(), strlen(), lexnum()
 extern	he_getop()
 errchk	imaccf, evexpr, imakbc, imastrc, imakic, imakrc
 

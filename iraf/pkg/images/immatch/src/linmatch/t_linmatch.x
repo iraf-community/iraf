@@ -526,7 +526,7 @@ real	bzero		#I the bzero value
 
 int	ncols
 pointer	sp, v1, v2, buf1, buf2
-int	imgnlr(), impnlr()
+long	imgnlr(), impnlr()
 
 begin
 	call smark (sp)

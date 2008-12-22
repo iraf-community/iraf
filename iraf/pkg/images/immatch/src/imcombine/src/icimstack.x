@@ -17,8 +17,8 @@ long	line_in[IM_MAXDIM], line_out[IM_MAXDIM], line_outbpm[IM_MAXDIM]
 pointer	sp, input, bpmname, key, in, out, inbpm, outbpm, buf_in, buf_out, ptr
 
 int	imtgetim(), imtlen(), errget()
-int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
-int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
+long	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
+long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 pointer	immap(), pm_newmask()
 errchk	immap
 errchk	imgnls, imgnli, imgnll, imgnlr, imgnld, imgnlx

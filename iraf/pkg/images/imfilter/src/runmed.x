@@ -49,7 +49,8 @@ pointer	iline, imline, oline, omline, hdrs, scales, sample, str, rms
 bool	streq(), strne(), aveqi()
 int	open(), fscan(), nscan(), nowhite(), strdic()
 int	imtlen(), imtrgetim()
-int	xt_sampler(), xt_samples(), imgnlr(), impnlr(), imgnls(), impnls()
+long	xt_sampler(), xt_samples()
+long	imgnlr(), impnlr(), imgnls(), impnls()
 real	imgetr(), rm_med(), rm_gmed(), rm_gdata()
 pointer	immap(), yt_mappm(), rm_open()
 errchk	immap, yt_mappm

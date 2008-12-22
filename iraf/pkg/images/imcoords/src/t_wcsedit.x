@@ -767,7 +767,8 @@ int	axes[ARB]		# the output decode axes
 int	max_naxes		# the maximum number of output axes
 
 int	naxes, axis, ranges[3,MAX_NRANGES+1]
-int	decode_ranges(), get_next_number()
+int	decode_ranges()
+long	get_next_number()
 
 begin
 	# Clear the axes array.

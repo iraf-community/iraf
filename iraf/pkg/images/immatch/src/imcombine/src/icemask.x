@@ -16,9 +16,10 @@ int	n[npts]			#I Number of good pixels
 real	wts[npts]		#I Weights
 int	npts			#I Number of output pixels per line
 
-int	i, j, k, impnli()
+int	i, j, k
 real	exp
 pointer	buf
+long	impnli()
 
 pointer	exps			# Exposure times
 pointer	ev			# IMIO coordinate vector

@@ -141,8 +141,8 @@ int     outtype         # output pixel type
 int     ncols
 long    v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer buf1, buf2
-int     imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
-int     impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
+long    imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
+long    impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 
 errchk	imgnls, imgnli, imgnll, imgnlr, imgnld, imgnlx
 errchk	impnls, impnli, impnll, impnlr, impnld, impnlx

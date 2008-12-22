@@ -110,7 +110,9 @@ int	i, nx, new
 long	inline[IM_MAXDIM], outline[IM_MAXDIM]
 pointer	cv, gp, sp, x, wts, indata, outdata
 
-int	lf_getline(), imgnlr(), impnlr(), strlen()
+int	lf_getline()
+long	imgnlr(), impnlr()
+int	strlen()
 pointer	gopen()
 
 begin
@@ -229,7 +231,8 @@ char	title[ARB]		# Title
 
 int	i
 char	line[SZ_LINE]
-int	getline(), nscan(), imgnlr()
+int	getline(), nscan()
+long	imgnlr()
 
 begin
 	call sprintf (title, SZ_LINE, "%s: Fit line =")

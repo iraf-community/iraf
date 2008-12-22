@@ -26,7 +26,7 @@ int	nimages			# Number of images
 
 int	i
 
-int	impnl$t(), imgnl$t()
+long	impnl$t(), imgnl$t()
 
 begin
 	if (impnl$t (im[1], data[1], v[1,1]) == EOF)

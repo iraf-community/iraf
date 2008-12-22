@@ -224,7 +224,8 @@ int	i
 pointer	sp, iroot, isect, oroot, osect, line, data
 
 bool	streq()
-int	imaccess(), impnlr()
+int	imaccess()
+long	impnlr()
 pointer	immap()
 errchk	immap
 

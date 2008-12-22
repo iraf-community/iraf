@@ -157,7 +157,8 @@ real	median[ARB]		# output median of input image
 
 int	i, j, k, nimrows, nimcols, imcount, next_null
 pointer	sp, imname, im, buf
-int	get_next_number(), imtgetim()
+long	get_next_number()
+int	imtgetim()
 pointer	immap(), imgs2r()
 real	amedr()
 

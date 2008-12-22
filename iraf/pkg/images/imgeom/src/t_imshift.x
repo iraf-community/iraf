@@ -175,7 +175,7 @@ long	v[IM_MAXDIM]
 int	ncols, nlines, nbpix
 int	i, x1col, x2col, yline
 
-int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
+long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 pointer	imgs2s(), imgs2i(), imgs2l(), imgs2r(), imgs2d(), imgs2x()
 errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
 errchk	imgs2s, imgs2i, imgs2l, imgs2r, imgs2d, imgs2x

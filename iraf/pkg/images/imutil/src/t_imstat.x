@@ -18,7 +18,8 @@ size_t	old_size
 
 real	clgetr()
 pointer	immap(), imtopenp()
-int	btoi(), ist_fields(), imtgetim(), imgnlr(), ist_ihist()
+int	btoi(), ist_fields(), imtgetim(), ist_ihist()
+long	imgnlr()
 int	clgeti()
 bool	clgetb()
 errchk	immap()

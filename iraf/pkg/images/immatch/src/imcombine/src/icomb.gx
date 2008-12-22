@@ -201,13 +201,13 @@ real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
 pointer	outdata, buf, nm, pms
 pointer	immap()
-int	impnli()
+long	impnli()
 $if (datatype == sil)
-int	impnlr()
-int	imgnlr()
+long	impnlr()
+long	imgnlr()
 $else
-int	impnl$t()
-int	imgnl$t
+long	impnl$t()
+long	imgnl$t
 $endif
 errchk	immap, ic_scale, imgetr, ic_grow, ic_grow$t, ic_rmasks, ic_gdata$t
 

@@ -288,7 +288,7 @@ real	constant		#I the constant value to insert in the imagw
 
 int	npix
 pointer	sp, v, buf
-int	impnls(), impnll(), impnlr(), impnld(), impnlx()
+long	impnls(), impnll(), impnlr(), impnld(), impnlx()
 
 begin
         # Setup start vector for sequential reads and writes.

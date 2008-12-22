@@ -17,8 +17,8 @@ pointer	list, sp, input, output, in, out, buf_in, buf_out, mwin, mwout
 
 bool	envgetb()
 int	imtgetim(), imtlen()
-int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
-int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
+long	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
+long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 int	mw_stati()
 pointer	imtopenp(), immap(), mw_open(), mw_openim()
 

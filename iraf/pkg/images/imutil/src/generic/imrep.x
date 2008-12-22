@@ -17,7 +17,7 @@ int	npix, junk
 real	ilower
 short	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnls(), impnls()
+long	imgnls(), impnls()
 	    
 bool	fp_equalr()
 
@@ -91,7 +91,7 @@ real	ilower
 short	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
-int	imgnls(), impnls()
+long	imgnls(), impnls()
 bool	fp_equalr()
 
 begin
@@ -261,7 +261,7 @@ int	npix, junk
 real	ilower
 int	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnli(), impnli()
+long	imgnli(), impnli()
 	    
 bool	fp_equalr()
 
@@ -335,7 +335,7 @@ real	ilower
 int	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
-int	imgnli(), impnli()
+long	imgnli(), impnli()
 bool	fp_equalr()
 
 begin
@@ -505,7 +505,7 @@ int	npix, junk
 real	ilower
 long	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnll(), impnll()
+long	imgnll(), impnll()
 	    
 bool	fp_equalr()
 
@@ -579,7 +579,7 @@ real	ilower
 long	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
-int	imgnll(), impnll()
+long	imgnll(), impnll()
 bool	fp_equalr()
 
 begin
@@ -748,7 +748,7 @@ pointer	buf1, buf2
 int	npix, junk
 real	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnlr(), impnlr()
+long	imgnlr(), impnlr()
 	    
 
 begin
@@ -812,7 +812,7 @@ int	i, j, k, l, nc, nl, nradius, nbufs
 real	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
-int	imgnlr(), impnlr()
+long	imgnlr(), impnlr()
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -972,7 +972,7 @@ pointer	buf1, buf2
 int	npix, junk
 double	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnld(), impnld()
+long	imgnld(), impnld()
 	    
 
 begin
@@ -1036,7 +1036,7 @@ int	i, j, k, l, nc, nl, nradius, nbufs
 double	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
-int	imgnld(), impnld()
+long	imgnld(), impnld()
 
 begin
 	# Setup start vector for sequential reads and writes.
@@ -1196,7 +1196,7 @@ pointer	buf1, buf2
 int	npix, junk
 complex	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnlx(), impnlx()
+long	imgnlx(), impnlx()
 	    
 
 begin
@@ -1261,7 +1261,7 @@ complex	floor, ceil, newval, val1, val2
 real	abs_floor, abs_ceil
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
-int	imgnlx(), impnlx()
+long	imgnlx(), impnlx()
 
 begin
 	# Setup start vector for sequential reads and writes.

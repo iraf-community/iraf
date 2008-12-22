@@ -19,7 +19,8 @@ long	v[IM_MAXDIM], vcoords[IM_MAXDIM]
 pointer	im, line, imlist, mw, ct, fmtptrs[IM_MAXDIM]
 
 bool	clgetb()
-int	imgnlr(), imgnld(), imgnlx(), imtgetim(), mw_stati(), clscan(), nscan()
+int	imtgetim(), mw_stati(), clscan(), nscan()
+long	imgnlr(), imgnld(), imgnlx()
 pointer	imtopenp(), immap(), mw_openim(), mw_sctran()
 
 begin

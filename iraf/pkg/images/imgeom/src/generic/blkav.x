@@ -29,7 +29,8 @@ long	vin_s[IM_MAXDIM], vin_e[IM_MAXDIM], vout[IM_MAXDIM]
 real	sum
 pointer	sp, accum_ptr, iline_ptr, oline_ptr
 
-int	blkcomp(), impnll()
+int	blkcomp()
+long	impnll()
 pointer	imggsl()
 errchk	imggsl(), impnll()
 
@@ -147,7 +148,8 @@ long	vin_s[IM_MAXDIM], vin_e[IM_MAXDIM], vout[IM_MAXDIM]
 real	sum
 pointer	sp, accum_ptr, iline_ptr, oline_ptr
 
-int	blkcomp(), impnlr()
+int	blkcomp()
+long	impnlr()
 pointer	imggsr()
 errchk	imggsr(), impnlr()
 
@@ -265,7 +267,8 @@ long	vin_s[IM_MAXDIM], vin_e[IM_MAXDIM], vout[IM_MAXDIM]
 double	sum
 pointer	sp, accum_ptr, iline_ptr, oline_ptr
 
-int	blkcomp(), impnld()
+int	blkcomp()
+long	impnld()
 pointer	imggsd()
 errchk	imggsd(), impnld()
 

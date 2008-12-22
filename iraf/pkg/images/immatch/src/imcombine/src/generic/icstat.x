@@ -30,7 +30,7 @@ real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
 
-int	imgnls()
+long	imgnls()
 real	asums()
 short	ic_modes()
 
@@ -253,7 +253,7 @@ real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
 
-int	imgnli()
+long	imgnli()
 real	asumi()
 int	ic_modei()
 
@@ -476,7 +476,7 @@ real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
 
-int	imgnlr()
+long	imgnlr()
 real	asumr()
 real	ic_moder()
 
@@ -697,7 +697,7 @@ real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
 
-int	imgnld()
+long	imgnld()
 double	asumd()
 double	ic_moded()
 

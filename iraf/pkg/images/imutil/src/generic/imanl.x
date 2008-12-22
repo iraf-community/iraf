@@ -26,7 +26,7 @@ int	nimages			# Number of images
 
 int	i
 
-int	impnls(), imgnls()
+long	impnls(), imgnls()
 
 begin
 	if (impnls (im[1], data[1], v[1,1]) == EOF)
@@ -54,7 +54,7 @@ int	nimages			# Number of images
 
 int	i
 
-int	impnli(), imgnli()
+long	impnli(), imgnli()
 
 begin
 	if (impnli (im[1], data[1], v[1,1]) == EOF)
@@ -82,7 +82,7 @@ int	nimages			# Number of images
 
 int	i
 
-int	impnll(), imgnll()
+long	impnll(), imgnll()
 
 begin
 	if (impnll (im[1], data[1], v[1,1]) == EOF)
@@ -110,7 +110,7 @@ int	nimages			# Number of images
 
 int	i
 
-int	impnlr(), imgnlr()
+long	impnlr(), imgnlr()
 
 begin
 	if (impnlr (im[1], data[1], v[1,1]) == EOF)
@@ -138,7 +138,7 @@ int	nimages			# Number of images
 
 int	i
 
-int	impnld(), imgnld()
+long	impnld(), imgnld()
 
 begin
 	if (impnld (im[1], data[1], v[1,1]) == EOF)

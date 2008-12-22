@@ -18,8 +18,8 @@ pointer	sp, root1, root2, imtemp, section
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 
 bool	strne()
-int	imgnls(), imgnll(), imgnlr(), imgnld(), imgnlx()
-int	impnls(), impnll(), impnlr(), impnld(), impnlx()
+long	imgnls(), imgnll(), imgnlr(), imgnld(), imgnlx()
+long	impnls(), impnll(), impnlr(), impnld(), impnlx()
 pointer	immap()
 
 begin

@@ -19,7 +19,7 @@ long	v[IM_MAXDIM]
 short	minval_s, maxval_s
 long	minval_l, maxval_l
 real	minval_r, maxval_r
-int	imgnls(), imgnll(), imgnlr()
+long	imgnls(), imgnll(), imgnlr()
 
 begin
 	call amovkl (long(1), v, IM_MAXDIM)		# start vector

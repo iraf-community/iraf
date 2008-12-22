@@ -25,7 +25,8 @@ real	sum1, sum2, sum3, scale
 long	line1[IM_MAXDIM], line2[IM_MAXDIM], line3[IM_MAXDIM]
 pointer	im1, im2, im3, data1, data2, data3
 
-int	clgwrd(), imgnlr(), impnlr()
+int	clgwrd()
+long	imgnlr(), impnlr()
 bool	clgetb(), strne()
 real	clgetr(), asumr(), ima_efncr()
 pointer	immap()

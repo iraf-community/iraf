@@ -386,7 +386,8 @@ pointer	buf			#O Data buffer
 long	v[ARB]			#I Line vector
 int	flag			#I Flag (=output line)
 
-int	i, j, nc, nl, open(), imgnls(), sizeof(), imloop()
+int	i, j, nc, nl, open(), imloop()
+long	imgnls()
 pointer	im, xt, xt1, ptr, immap(), imggss()
 errchk	open, immap, imgnls, imggss, imunmap
 
@@ -486,7 +487,7 @@ begin
 			next
 
 		    # Buffer some number of lines.
-		    nl = XT_BUFSIZE(xt1) / sizeof (TY_SHORT) / IM_LEN(im,1)
+		    nl = XT_BUFSIZE(xt1) / SZ_SHORT / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
 			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
@@ -562,7 +563,8 @@ pointer	buf			#O Data buffer
 long	v[ARB]			#I Line vector
 int	flag			#I Flag (=output line)
 
-int	i, j, nc, nl, open(), imgnli(), sizeof(), imloop()
+int	i, j, nc, nl, open(), imloop()
+long	imgnli()
 pointer	im, xt, xt1, ptr, immap(), imggsi()
 errchk	open, immap, imgnli, imggsi, imunmap
 
@@ -662,7 +664,7 @@ begin
 			next
 
 		    # Buffer some number of lines.
-		    nl = XT_BUFSIZE(xt1) / sizeof (TY_INT) / IM_LEN(im,1)
+		    nl = XT_BUFSIZE(xt1) / SZ_INT / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
 			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
@@ -738,7 +740,8 @@ pointer	buf			#O Data buffer
 long	v[ARB]			#I Line vector
 int	flag			#I Flag (=output line)
 
-int	i, j, nc, nl, open(), imgnlr(), sizeof(), imloop()
+int	i, j, nc, nl, open(), imloop()
+long	imgnlr()
 pointer	im, xt, xt1, ptr, immap(), imggsr()
 errchk	open, immap, imgnlr, imggsr, imunmap
 
@@ -838,7 +841,7 @@ begin
 			next
 
 		    # Buffer some number of lines.
-		    nl = XT_BUFSIZE(xt1) / sizeof (TY_REAL) / IM_LEN(im,1)
+		    nl = XT_BUFSIZE(xt1) / SZ_REAL / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
 			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)
@@ -914,7 +917,8 @@ pointer	buf			#O Data buffer
 long	v[ARB]			#I Line vector
 int	flag			#I Flag (=output line)
 
-int	i, j, nc, nl, open(), imgnld(), sizeof(), imloop()
+int	i, j, nc, nl, open(), imloop()
+long	imgnld()
 pointer	im, xt, xt1, ptr, immap(), imggsd()
 errchk	open, immap, imgnld, imggsd, imunmap
 
@@ -1014,7 +1018,7 @@ begin
 			next
 
 		    # Buffer some number of lines.
-		    nl = XT_BUFSIZE(xt1) / sizeof (TY_DOUBLE) / IM_LEN(im,1)
+		    nl = XT_BUFSIZE(xt1) / SZ_DOUBLE / IM_LEN(im,1)
 		    if (nl > 1) {
 			nc = IM_LEN(im,1)
 			call amovl (v, XT_VS(xt1,1), IM_MAXDIM)

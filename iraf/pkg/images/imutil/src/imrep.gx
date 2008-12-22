@@ -19,7 +19,7 @@ real	ilower
 $endif
 PIXEL	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 	    
 $if (datatype == sil)
 bool	fp_equalr()
@@ -117,7 +117,7 @@ real	abs_floor, abs_ceil
 $endif
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 $if (datatype == sil)
 bool	fp_equalr()
 $endif

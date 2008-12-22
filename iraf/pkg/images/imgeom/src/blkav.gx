@@ -33,7 +33,8 @@ real	sum
 $endif
 pointer	sp, accum_ptr, iline_ptr, oline_ptr
 
-int	blkcomp(), impnl$t()
+int	blkcomp()
+long	impnl$t()
 pointer	imggs$t()
 errchk	imggs$t(), impnl$t()
 

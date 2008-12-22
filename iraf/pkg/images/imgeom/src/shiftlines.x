@@ -27,7 +27,8 @@ real	dx, deltax, cx
 pointer	sp, x, asi, junk, buf1, buf2
 
 bool	fp_equalr()
-int	impnlr(), asigeti()
+long	impnlr()
+int	asigeti()
 pointer	imggsr()
 
 begin
@@ -142,7 +143,7 @@ long	v1[IM_MAXDIM], v2[IM_MAXDIM], vout[IM_MAXDIM]
 pointer	buf1, buf2
 
 pointer	imggss(), imggsi(), imggsl(), imggsr(), imggsd(), imggsx()
-int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
+long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 
 begin
 	# Set the boundary extension parameters.

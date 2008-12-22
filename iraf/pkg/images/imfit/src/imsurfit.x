@@ -65,7 +65,7 @@ pointer	sf	# pointer to the surface descriptor
 int	i, lp, ncols, nlines, ier
 long	v[IM_MAXDIM]
 pointer	sp, cols, lines, wgt, lbuf
-int	imgnlr()
+long	imgnlr()
 errchk	smark, salloc, sfree, imgnlr
 errchk isinit, islfit, islrefit, issolve
 
@@ -536,7 +536,7 @@ long	u[IM_MAXDIM], v[IM_MAXDIM]
 real	b1x, b2x, b1y, b2y
 pointer	sp, x, y, inbuf, outbuf, ranges
 
-int	impnlr(), imgnlr()
+long	impnlr(), imgnlr()
 real	ims_divzero()
 extern	ims_divzero
 errchk	malloc, mfree, imgnlr, impnlr

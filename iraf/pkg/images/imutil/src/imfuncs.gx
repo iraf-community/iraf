@@ -17,7 +17,7 @@ long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 PIXEL	if_elog$t()
 extern	if_elog$t()
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -53,7 +53,7 @@ pointer	im2				# pointer to the output image
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -106,7 +106,7 @@ pointer	buf1, buf2
 
 PIXEL	if_eln$t()
 extern	if_eln$t()
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -141,7 +141,7 @@ pointer	im2				# pointer to the output image
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -194,7 +194,7 @@ long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 PIXEL	if_esqr$t()
 extern	if_esqr$t()
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -227,7 +227,7 @@ pointer	im2				# the output image pointer
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -251,7 +251,7 @@ pointer	im2				# pointer to the output image
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -299,7 +299,7 @@ pointer	im2				# pointer to the output image
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -322,7 +322,7 @@ pointer	im2				# pointer to the output image
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -361,7 +361,7 @@ pointer	im2				# pointer to the output image
 int	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -400,7 +400,7 @@ pointer	im2				# pointer to the output image
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -439,7 +439,7 @@ pointer	im2				# pointer to the output image
 int	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -484,7 +484,7 @@ pointer	im2				# pointer to the output image
 int	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -530,7 +530,7 @@ pointer	im2				# pointer to the output image
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -570,7 +570,7 @@ pointer	im2				# pointer to the output image
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -618,7 +618,7 @@ pointer	im2				# pointer to the output image
 int	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -668,7 +668,7 @@ pointer	im2				# pointer to the output image
 int	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -710,7 +710,7 @@ long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 PIXEL	if_erecip$t()
 extern	if_erecip$t()
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -748,7 +748,7 @@ pointer	im2				# pointer to the output image
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)
@@ -771,7 +771,7 @@ pointer	im2				# pointer to the output image
 int	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
-int	imgnl$t(), impnl$t()
+long	imgnl$t(), impnl$t()
 
 begin
 	call amovkl (long(1), v1, IM_MAXDIM)

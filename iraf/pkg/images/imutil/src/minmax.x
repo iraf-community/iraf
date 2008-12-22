@@ -26,7 +26,7 @@ long	minval_l, maxval_l
 pointer	buf
 real	minval_r, maxval_r
 double	minval_d, maxval_d
-int	imgnls(), imgnll(), imgnlr(), imgnld(), imgnlx()
+long	imgnls(), imgnll(), imgnlr(), imgnld(), imgnlx()
 
 begin
 	call amovkl (long(1), v, IM_MAXDIM)		# start vector

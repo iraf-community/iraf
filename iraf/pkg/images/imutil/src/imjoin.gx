@@ -18,8 +18,8 @@ int	outtype			#I Output datatype
 int	i, image, line, nlines, nbands, stat, cum_len
 pointer	sp, vin, vout, in, inbuf, outbuf
 
-int	imgnl$t()
-int	impnl$t()
+long	imgnl$t()
+long	impnl$t()
 
 begin
 	# Allocate working space.

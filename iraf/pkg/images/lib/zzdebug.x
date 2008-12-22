@@ -273,7 +273,7 @@ char	imname[SZ_FNAME]
 real	minval, maxval
 long	v[IM_MAXDIM], clktime()
 pointer	im, buf, immap()
-int	imgnlr()
+long	imgnlr()
 
 begin
 	call clgstr ("imname", imname, SZ_FNAME)
