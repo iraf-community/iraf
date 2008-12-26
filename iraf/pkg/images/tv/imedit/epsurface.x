@@ -1,3 +1,5 @@
+include <mach.h>
+
 define	DUMMY	6
  
 # EP_SURFACE -- Draw a perspective view of a surface.  The altitude
@@ -36,7 +38,13 @@ begin
 	call gopwk (wkid, DUMMY, gp)
 	call gacwk (wkid)
  
-	# sys/gio/ncarutil/srface.f
+	# 32-bit limit (sys/gio/ncarutil/srface.f)
+	if ( ncols > MAX_INT ) {
+	    call error (0, "EP_SURFACE: Too large ncols (32-bit limit)")
+	}
+	if ( nlines > MAX_INT ) {
+	    call error (0, "EP_SURFACE: Too large nlines (32-bit limit)")
+	}
 	i_val0 = ncols
 	i_val1 = nlines
 	call ezsrfc (data, i_val0, i_val1, angh, angv, Memr[work])

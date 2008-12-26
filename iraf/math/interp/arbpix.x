@@ -16,6 +16,8 @@ The process is divided as follows:
 
 .endhelp
 
+include <mach.h>
+
 procedure arbpix(datain,n,dataout,terptype)
 include "interpdef.h"
 include "asidef.h"
@@ -187,6 +189,10 @@ begin
 
 	     # use spline routine from C. de Boor's book
 	     # A Practical Guide to Splines
+	     # 32-bit limit (interp/cubspl.f)
+	     if ( tk > MAX_INT ) {
+		 call error (0, "IIRBINT: Too large tk (32-bit limit)")
+	     }
 	     i_val = tk
 	     call cubspl(tx,cc,i_val,2,2)
 	     h = x - tx[pd]

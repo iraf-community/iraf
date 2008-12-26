@@ -1,5 +1,6 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
+include <mach.h>
 include <math.h>
 include <math/iminterp.h>
 include "im1interpdef.h"
@@ -198,6 +199,10 @@ begin
 	     # Use spline routine from C. de Boor's book "A Practical Guide
 	     # to Splines
 
+	     # 32-bit limit (iminterp/ii_cubspl.f)
+	     if ( npts > MAX_INT ) {
+		 call error (0, "II_NEWPIX: Too large npts (32-bit limit)")
+	     }
 	     i_val = npts
 	     call iicbsp (xarray, cc, i_val, 2, 2)
 	     h = x - xarray[index]
