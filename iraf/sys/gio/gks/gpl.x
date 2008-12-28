@@ -6,7 +6,7 @@ include	"gks.h"
 
 procedure gpl (n, px, py)
 
-int	n	 	# Number of points
+size_t	n	 	# Number of points
 real	px[n], py[n]	# Coordinates of points in world coordinates
 
 size_t	sz_val

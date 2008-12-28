@@ -11,9 +11,12 @@ procedure ie_mwinit (ie)
 
 pointer	ie			# IMEXAM descriptor
 
-int	i, j, wcsdim, mw_stati(), nowhite(), stridxs()
-pointer	im, mw, ctlw, ctwl, mw_openim(), mw_sctran()
+size_t	sz_val
+int	i, j, wcsdim
+pointer	im, mw, ctlw, ctwl
 pointer	sp, axno, axval, str1, str2
+int	mw_stati(), nowhite(), stridxs()
+pointer	mw_openim(), mw_sctran()
 bool	streq()
 errchk	mw_openim, mw_sctran
 
@@ -37,10 +40,12 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (axno, IM_MAXDIM, TY_INT)
-	call salloc (axval, IM_MAXDIM, TY_INT)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (axno, sz_val, TY_INT)
+	call salloc (axval, sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
 
 	mw = mw_openim (im)
 	call mw_seti (mw, MW_USEAXMAP, NO)

@@ -19,29 +19,29 @@ define	IE_PP		Memp[$1+6]		# pset pointer
 define	IE_LIST		Memp[$1+7]		# image list
 define	IE_LISTLEN	Memi[P2I($1+8)]		# number of images in list
 define	IE_USEDISPLAY	Memi[P2I($1+9)]		# use image display?
-define	IE_INDEX	Memi[P2I($1+10)]		# image index
-define	IE_DFRAME	Memi[P2I($1+11)]		# frame used to display images
-define	IE_MAPFRAME	Memi[P2I($1+12)]		# mapped display frame
-define	IE_NEWFRAME	Memi[P2I($1+13)]		# new (current) display frame
-define	IE_NFRAMES	Memi[P2I($1+14)]		# number of image frames
-define	IE_ALLFRAMES	Memi[P2I($1+15)]		# use all frames for display?
-define	IE_LOGFD	Memi[P2I($1+16)]		# log file descriptor
-define	IE_MAGZERO	Memr[P2R($1+17)]		# magnitude zero point
-define	IE_XORIGIN	Memr[P2R($1+18)]		# X origin
-define	IE_YORIGIN	Memr[P2R($1+19)]		# Y origin
-define	IE_GTYPE	Memi[P2I($1+20)]		# current graph type
-define	IE_X1		Memr[P2R($1+21)]		# current graph x1
-define	IE_X2		Memr[P2R($1+22)]		# current graph x2
-define	IE_Y1		Memr[P2R($1+23)]		# current graph y1
-define	IE_Y2		Memr[P2R($1+24)]		# current graph y2
-define	IE_IX1		Memi[P2I($1+25)]		# image section coordinate
-define	IE_IX2		Memi[P2I($1+26)]		# image section coordinate
-define	IE_IY1		Memi[P2I($1+27)]		# image section coordinate
-define	IE_IY2		Memi[P2I($1+28)]		# image section coordinate
-define	IE_P1		Memi[P2I($1+29)]		# Physical axis for logical x
-define	IE_P2		Memi[P2I($1+30)]		# Physical axis for logical y
-define	IE_IN		Memr[P2R($1+31+$2-1)]	# Input coordinate vector
-define	IE_OUT		Memr[P2R($1+38+$2-1)]	# Output coordinate vector
+define	IE_INDEX	Memi[P2I($1+10)]	# image index
+define	IE_DFRAME	Memi[P2I($1+11)]	# frame used to display images
+define	IE_MAPFRAME	Memi[P2I($1+12)]	# mapped display frame
+define	IE_NEWFRAME	Memi[P2I($1+13)]	# new (current) display frame
+define	IE_NFRAMES	Memi[P2I($1+14)]	# number of image frames
+define	IE_ALLFRAMES	Memi[P2I($1+15)]	# use all frames for display?
+define	IE_LOGFD	Memi[P2I($1+16)]	# log file descriptor
+define	IE_MAGZERO	Memr[P2R($1+17)]	# magnitude zero point
+define	IE_XORIGIN	Memr[P2R($1+18)]	# X origin
+define	IE_YORIGIN	Memr[P2R($1+19)]	# Y origin
+define	IE_GTYPE	Memi[P2I($1+20)]	# current graph type
+define	IE_X1		Memr[P2R($1+21)]	# current graph x1
+define	IE_X2		Memr[P2R($1+22)]	# current graph x2
+define	IE_Y1		Memr[P2R($1+23)]	# current graph y1
+define	IE_Y2		Memr[P2R($1+24)]	# current graph y2
+define	IE_IX1		Meml[P2L($1+25)]	# image section coordinate
+define	IE_IX2		Meml[P2L($1+26)]	# image section coordinate
+define	IE_IY1		Meml[P2L($1+27)]	# image section coordinate
+define	IE_IY2		Meml[P2L($1+28)]	# image section coordinate
+define	IE_P1		Memi[P2I($1+29)]	# Physical axis for logical x
+define	IE_P2		Memi[P2I($1+30)]	# Physical axis for logical y
+define	IE_IN		Memr[P2R($1+31)+$2-1]	# Input coordinate vector
+define	IE_OUT		Memr[P2R($1+38)+$2-1]	# Output coordinate vector
 define	IE_WCSDIM	Memi[P2I($1+45)]		# WCS dimension
 define	IE_LASTKEY	Memi[P2I($1+46)]		# last type of keyed output
 	# (available)

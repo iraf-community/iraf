@@ -189,8 +189,7 @@ begin
 
 	     # use spline routine from C. de Boor's book
 	     # A Practical Guide to Splines
-	     # 32-bit limit (interp/cubspl.f)
-	     if ( tk > MAX_INT ) {
+	     if ( tk > MAX_INT ) {	# limit by interp/cubspl.f
 		 call error (0, "IIRBINT: Too large tk (32-bit limit)")
 	     }
 	     i_val = tk

@@ -7,9 +7,9 @@ include	<imhdr.h>
 pointer procedure ie_gdata (im, x1, x2, y1, y2)
  
 pointer	im			# IMIO pointer
-int	x1, x2, y1, y2		# Subraster limits (input and output)
+long	x1, x2, y1, y2		# Subraster limits (input and output)
  
-int	i, nc, nl
+long	i, nc, nl
 pointer	imgs2r()
 errchk	imgs2r
  
@@ -17,13 +17,13 @@ begin
 	nc = IM_LEN(im,1)
 	nl = IM_LEN(im,2)
 
-	if (IS_INDEFI (x1))
+	if (IS_INDEFL (x1))
 	    x1 = 1
-	if (IS_INDEFI (x2))
+	if (IS_INDEFL (x2))
 	    x2 = nc
-	if (IS_INDEFI (y1))
+	if (IS_INDEFL (y1))
 	    y1 = 1
-	if (IS_INDEFI (y2))
+	if (IS_INDEFL (y2))
 	    y2 = nl
  
 	i = max (x1, x2)

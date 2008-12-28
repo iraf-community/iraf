@@ -199,8 +199,7 @@ begin
 	     # Use spline routine from C. de Boor's book "A Practical Guide
 	     # to Splines
 
-	     # 32-bit limit (iminterp/ii_cubspl.f)
-	     if ( npts > MAX_INT ) {
+	     if ( npts > MAX_INT ) {	# limited by iminterp/ii_cubspl.f
 		 call error (0, "II_NEWPIX: Too large npts (32-bit limit)")
 	     }
 	     i_val = npts

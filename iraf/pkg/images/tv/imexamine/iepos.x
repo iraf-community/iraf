@@ -15,7 +15,7 @@ int	key			# Key ('x' positions, 'y' origin)
  
 pointer	im, data
 real	dx, dy, r, t, wx, wy, xo, yo
-int	x1, x2, y1, y2
+long	x1, x2, y1, y2
 pointer	ie_gimage(), ie_gdata()
  
 begin

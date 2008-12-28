@@ -31,8 +31,12 @@ bool	center, background, medsky, fitplot, clgpsetb()
 real	radius, buffer, width, magzero, rplot, beta, clgpsetr()
 int	fittype, xorder, yorder, clgpseti(), strdic()
 
-int	i, j, ns, no, np, nx, ny, npts, x1, x2, y1, y2
-int	plist[3], nplist
+size_t	sz_val
+long	i, j, x1, x2, y1, y2
+int	ii
+size_t	ns, no, np, nx, ny, npts
+long	plist[3]
+size_t	nplist
 real	bkg, xcntr, ycntr, mag, e, pa, zcntr, wxcntr, wycntr
 real	params[3]
 real	fwhm, dfwhm
@@ -50,9 +54,11 @@ string	mlabel "#\
 
 begin
 	call smark (sp)
-	call salloc (fittypes, SZ_FNAME, TY_CHAR)
-	call salloc (title, IE_SZTITLE, TY_CHAR)
-	call salloc (coords, IE_SZTITLE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fittypes, sz_val, TY_CHAR)
+	sz_val = IE_SZTITLE
+	call salloc (title, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
 
 	iferr (im = ie_gimage (ie, NO)) {
 	    call erract (EA_WARN)
@@ -184,8 +190,8 @@ begin
 		    call gsinit (gs, GS_POLYNOMIAL, xorder, yorder, YES,
 			real (x1), real (x2), real (y1), real (y2))
 		    call gsfit (gs, Memr[xs], Memr[ys], Memr[zs], Memr[ws], ns,
-			WTS_UNIFORM, i)
-		    if (i == OK)
+			WTS_UNIFORM, ii)
+		    if (ii == OK)
 			break
 		    xorder = max (1, xorder - 1)
 		    yorder = max (1, yorder - 1)
@@ -296,16 +302,17 @@ begin
 	    nplist = 2
 	    params[2] = dfwhm**2 / (8 * log(2.))
 	    params[1] = zcntr
+	    sz_val = 2
 	    call nlinitr (nl, locpr (ie_gauss), locpr (ie_dgauss), 
-		params, params, 2, plist, nplist, .001, 100)
-	    call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, i)
-	    if (i == SINGULAR || i == NO_DEG_FREEDOM) {
+			  params, params, sz_val, plist, nplist, .001, 100)
+	    call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, ii)
+	    if (ii == SINGULAR || ii == NO_DEG_FREEDOM) {
 		call eprintf ("WARNING: Gaussian fit did not converge\n")
 		call tsleep (5)
 		zcntr = INDEF
 		fwhm = INDEF
 	    } else {
-		call nlpgetr (nl, params, i)
+		call nlpgetr (nl, params, sz_val)
 		if (params[2] < 0.) {
 		    zcntr = INDEF
 		    fwhm = INDEF
@@ -327,17 +334,18 @@ begin
 	    }
 	    params[2] = dfwhm / 2. / sqrt (2.**(-1./params[3]) - 1.)
 	    params[1] = zcntr
+	    sz_val = 3
 	    call nlinitr (nl, locpr (ie_moffat), locpr (ie_dmoffat), 
-		params, params, 3, plist, nplist, .001, 100)
-	    call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, i)
-	    if (i == SINGULAR || i == NO_DEG_FREEDOM) {
+		params, params, sz_val, plist, nplist, .001, 100)
+	    call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, ii)
+	    if (ii == SINGULAR || ii == NO_DEG_FREEDOM) {
 		call eprintf ("WARNING: Moffat fit did not converge\n")
 		call tsleep (5)
 		zcntr = INDEF
 		fwhm = INDEF
 		beta = INDEF
 	    } else {
-		call nlpgetr (nl, params, i)
+		call nlpgetr (nl, params, sz_val)
 		if (params[2] < 0.) {
 		    zcntr = INDEF
 		    fwhm = INDEF
@@ -435,7 +443,7 @@ begin
 	    call pargr (mag)
 	    call pargd (sumo)
 	    call pargd (sums / no)
-	    call pargi (no)
+	    call pargz (no)
 	    call pargr (r)
 	    call pargr (e)
 	    call pargr (pa)
@@ -466,7 +474,7 @@ begin
 	        call pargr (mag)
 	        call pargd (sumo)
 	        call pargd (sums / no)
-	        call pargi (no)
+	        call pargz (no)
 	        call pargr (r)
 	        call pargr (e)
 	        call pargr (pa)

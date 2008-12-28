@@ -20,16 +20,20 @@ int	mode			# Mode
 pointer	ie			# IE pointer
 real	x, y			# Center
 
+size_t	sz_val
+int	i_val0, i_val1
 bool	banner
-int	nset, ncontours, dashpat, nhi
-int	x1, x2, y1, y2, nx, ny, npts, wkid
+int	nset, ncontours, dashpat, nhi, wkid
+long	x1, x2, y1, y2
+size_t	npts, nx, ny
 real	vx1, vx2, vy1, vy2, xs, xe, ys, ye
 real	interval, floor, ceiling, zero, finc, zmin, zmax
 pointer	sp, title, hostid, user, xlabel, ylabel, im, data, data1
 
 pointer	pp, clopset(), ie_gdata(), ie_gimage()
 bool	clgpsetb(), fp_equalr()
-int	clgpseti(), btoi()
+int	clgpseti(), btoi(), absi()
+long	clgpsetl()
 real	clgpsetr()
 
 int	isizel, isizem, isizep, nrep, ncrt, ilab, nulbll, ioffd
@@ -58,8 +62,8 @@ begin
 	if (!IS_INDEF(y))
 	    IE_Y1(ie) = y
 
-	nx = clgpseti (pp, "ncolumns")
-	ny = clgpseti (pp, "nlines")
+	nx = clgpsetl (pp, "ncolumns")
+	ny = clgpsetl (pp, "nlines")
 	x1 = IE_X1(ie) - (nx - 1) / 2 + 0.5
 	x2 = IE_X1(ie) + nx / 2 + 0.5
 	y1 = IE_Y1(ie) - (ny - 1) / 2 + 0.5
@@ -102,11 +106,13 @@ begin
 		    btoi (clgpsetb (pp, "ticklabels")))
 
 		# Labels
-		call salloc (title, IE_SZTITLE, TY_CHAR)
-		call salloc (hostid, SZ_LINE, TY_CHAR)
-		call salloc (user, SZ_LINE, TY_CHAR)
-		call salloc (xlabel, SZ_LINE, TY_CHAR)
-		call salloc (ylabel, SZ_LINE, TY_CHAR)
+		sz_val = IE_SZTITLE
+		call salloc (title, sz_val, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (hostid, sz_val, TY_CHAR)
+		call salloc (user, sz_val, TY_CHAR)
+		call salloc (xlabel, sz_val, TY_CHAR)
+		call salloc (ylabel, sz_val, TY_CHAR)
 
 		banner = clgpsetb (pp, "banner")
 		if (banner) {
@@ -185,7 +191,7 @@ begin
 	    else
 		finc = interval
 	} else
-	    finc = - abs (ncontours)
+	    finc = - absi(ncontours)
 
 	# Open device and make contour plot.
 	call gopks (STDERR)
@@ -199,8 +205,16 @@ begin
 	call gswind (gp, 1., real (nx), 1., real (ny))
 	call ggview (gp, vx1, vx2, vy1, vy2)
 	call set (vx1, vx2, vy1, vy2, 1.0, real (nx), 1.0, real (ny), 1)
-	call conrec (Memr[data1], nx, nx, ny, floor,
-	    ceiling, finc, nset, nhi, -dashpat)
+	if ( nx > MAX_INT ) {	# limited by sys/gio/ncarutil/conrec.f
+	    call error (0, "IE_EIMEXAM: Too large nx (32-bit limit)")
+	}
+	if ( ny > MAX_INT ) {	# limited by sys/gio/ncarutil/conrec.f
+	    call error (0, "IE_EIMEXAM: Too large ny (32-bit limit)")
+	}
+	i_val0 = nx
+	i_val1 = ny
+	call conrec (Memr[data1], i_val0, i_val0, i_val1, floor,
+		     ceiling, finc, nset, nhi, -dashpat)
 
 	call gdawk (wkid)
 	call gclks ()

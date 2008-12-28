@@ -14,12 +14,14 @@ int	mode		# Mode
 pointer	ie		# Structure pointer
 real	x		# Column
 
+size_t	sz_val
 real	xavg, junk
-int	i, x1, x2, y1, y2, nx, ny, npts
+long	i, x1, x2, y1, y2
+size_t	nx, ny, npts
 pointer	sp, title, im, data, ptr, xp, yp
 
 real	asumr()
-int	clgpseti()
+long	clgpsetl()
 pointer	clopset(), ie_gimage(), ie_gdata()
 errchk	clcpset, clopset
 
@@ -36,12 +38,12 @@ begin
 	if (!IS_INDEF(x))
 	    IE_X1(ie) = x
 
-	nx = clgpseti (IE_PP(ie), "naverage")
+	nx = clgpsetl (IE_PP(ie), "naverage")
 	x1 = IE_X1(ie) - (nx - 1) / 2 + 0.5
 	x2 = IE_X1(ie) + nx / 2 + 0.5
 	xavg = (x1 + x2) / 2.
-	y1 = INDEFI
-	y2 = INDEFI
+	y1 = INDEFL
+	y2 = INDEFL
 	iferr (data = ie_gdata (im, x1, x2, y1, y2)) {
 	    call erract (EA_WARN)
 	    return
@@ -51,7 +53,8 @@ begin
 	npts = nx * ny
 
 	call smark (sp)
-	call salloc (title, IE_SZTITLE, TY_CHAR)
+	sz_val = IE_SZTITLE
+	call salloc (title, sz_val, TY_CHAR)
 	call salloc (xp, ny, TY_REAL)
 
 	do i = 1, ny
@@ -70,8 +73,8 @@ begin
 
 	call sprintf (Memc[title], IE_SZTITLE, "%s: Columns %d - %d\n%s")
 	    call pargstr (IE_IMNAME(ie))
-	    call pargi (x1)
-	    call pargi (x2)
+	    call pargl (x1)
+	    call pargl (x2)
 	    call pargstr (IM_TITLE(im))
 
 	call ie_graph (gp, mode, IE_PP(ie), Memc[title], Memr[xp],

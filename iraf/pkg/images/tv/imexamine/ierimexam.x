@@ -31,23 +31,32 @@ bool	center, background, medsky, fitplot, clgpsetb()
 real	radius, buffer, width, magzero, rplot, beta, clgpsetr()
 int	nit, fittype, xorder, yorder, clgpseti(), strdic()
 
-int	i, j, ns, no, np, nx, ny, npts, x1, x2, y1, y2
-int	coordlen, plist[3], nplist, strlen()
+size_t	sz_val
+long	i, j, x1, x2, y1, y2
+size_t	ns, no, np, nx, ny, npts
+int	coordlen, ii
+long	plist[3]
+size_t	nplist
 real	bkg, xcntr, ycntr, mag, e, pa, zcntr, wxcntr, wycntr
 real	params[3]
 real	fwhm, dbkg, dfwhm, gfwhm, efwhm
 pointer	sp, fittypes, title, coords, im, data, pp, ws, xs, ys, zs, gs, ptr, nl
 double	sumo, sums, sumxx, sumyy, sumxy
-real	r, r1, r2, r3, dx, dy, gseval(), amedr()
+real	r, r1, r2, r3, dx, dy
+real	gseval(), amedr()
+int	strlen()
 pointer	clopset(), ie_gimage(), ie_gdata(), locpr()
 extern	ie_gauss(), ie_dgauss(), ie_moffat(), ie_dmoffat()
 errchk	stf_measure, nlinit, nlfit
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (fittypes, SZ_FNAME, TY_CHAR)
-	call salloc (title, IE_SZTITLE, TY_CHAR)
-	call salloc (coords, IE_SZTITLE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fittypes, sz_val, TY_CHAR)
+	sz_val = IE_SZTITLE
+	call salloc (title, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
 
 	iferr (im = ie_gimage (ie, NO)) {
 	    call erract (EA_WARN)
@@ -111,7 +120,7 @@ begin
 	# PSFMEASURE routines.
 
 	call stf_measure (im, xcntr, ycntr, beta, 0.5, radius, nit, buffer,
-	    width, INDEF, NULL, NULL, dbkg, r, dfwhm, gfwhm, efwhm)
+	    width, INDEF, NULLPTR, NULL, dbkg, r, dfwhm, gfwhm, efwhm)
 	if (fittype == FITGAUSS)
 	    efwhm = gfwhm
 
@@ -186,8 +195,8 @@ begin
 		    call gsinit (gs, GS_POLYNOMIAL, xorder, yorder, YES,
 			real (x1), real (x2), real (y1), real (y2))
 		    call gsfit (gs, Memr[xs], Memr[ys], Memr[zs], Memr[ws], ns,
-			WTS_UNIFORM, i)
-		    if (i == OK)
+			WTS_UNIFORM, ii)
+		    if (ii == OK)
 			break
 		    xorder = max (1, xorder - 1)
 		    yorder = max (1, yorder - 1)
@@ -298,16 +307,17 @@ begin
 	    nplist = 2
 	    params[2] = dfwhm**2 / (8 * log(2.))
 	    params[1] = zcntr
+	    sz_val = 2
 	    call nlinitr (nl, locpr (ie_gauss), locpr (ie_dgauss), 
-		params, params, 2, plist, nplist, .001, 100)
-	    call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, i)
-	    if (i == SINGULAR || i == NO_DEG_FREEDOM) {
+			  params, params, sz_val, plist, nplist, .001, 100)
+	    call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, ii)
+	    if (ii == SINGULAR || ii == NO_DEG_FREEDOM) {
 		call eprintf ("WARNING: Gaussian fit did not converge\n")
 		call tsleep (5)
 		zcntr = INDEF
 		fwhm = INDEF
 	    } else {
-		call nlpgetr (nl, params, i)
+		call nlpgetr (nl, params, sz_val)
 		if (params[2] < 0.) {
 		    zcntr = INDEF
 		    fwhm = INDEF
@@ -329,17 +339,18 @@ begin
 	    }
 	    params[2] = dfwhm / 2. / sqrt (2.**(-1./params[3]) - 1.)
 	    params[1] = zcntr
+	    sz_val = 3
 	    call nlinitr (nl, locpr (ie_moffat), locpr (ie_dmoffat), 
-		params, params, 3, plist, nplist, .001, 100)
-	    call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, i)
-	    if (i == SINGULAR || i == NO_DEG_FREEDOM) {
+			  params, params, sz_val, plist, nplist, .001, 100)
+	    call nlfitr (nl, Memr[xs], Memr[ys], Memr[ws], no, 1, WTS_USER, ii)
+	    if (ii == SINGULAR || ii == NO_DEG_FREEDOM) {
 		call eprintf ("WARNING: Moffat fit did not converge\n")
 		call tsleep (5)
 		zcntr = INDEF
 		fwhm = INDEF
 		beta = INDEF
 	    } else {
-		call nlpgetr (nl, params, i)
+		call nlpgetr (nl, params, sz_val)
 		if (params[2] < 0.) {
 		    zcntr = INDEF
 		    fwhm = INDEF
@@ -577,7 +588,10 @@ pointer	im
 real	radius
 real	xcntr, ycntr
 
-int	i, j, k, x1, x2, y1, y2, nx, ny, npts
+long	l0, l1, l2, l3
+int	k
+long	i, j, x1, x2, y1, y2
+size_t	nx, ny, npts
 real	xlast, ylast
 real	mean, sum, sum1, sum2, sum3, asumr()
 pointer	data, ptr, ie_gdata()
@@ -641,7 +655,11 @@ begin
 	    }
 	    ycntr = sum1 / sum2
 
-	    if (int(xcntr) == int(xlast) && int(ycntr) == int(ylast))
+	    l0 = xcntr
+	    l1 = xlast
+	    l2 = ycntr
+	    l3 = ylast
+	    if (l0 == l1 && l2 == l3)
 		break
 	}
 end
@@ -655,7 +673,7 @@ procedure ie_gauss (x, nvars, p, np, z)
 real	x[nvars]		#I Input variables
 int	nvars			#I Number of variables
 real	p[np]			#I Parameter vector
-int	np			#I Number of parameters
+size_t	np			#I Number of parameters
 real	z			#O Function return
 
 real	r2
@@ -678,7 +696,7 @@ real	x[nvars]		#I Input variables
 int	nvars			#I Number of variables
 real	p[np]			#I Parameter vector
 real	dp[np]			#I Dummy array of parameters increments
-int	np			#I Number of parameters
+size_t	np			#I Number of parameters
 real	z			#O Function return
 real	der[np]			#O Derivatives
 
@@ -706,7 +724,7 @@ procedure ie_moffat (x, nvars, p, np, z)
 real	x[nvars]		#I Input variables
 int	nvars			#I Number of variables
 real	p[np]			#I Parameter vector
-int	np			#I Number of parameters
+size_t	np			#I Number of parameters
 real	z			#O Function return
 
 real	y
@@ -730,7 +748,7 @@ real	x[nvars]		#I Input variables
 int	nvars			#I Number of variables
 real	p[np]			#I Parameter vector
 real	dp[np]			#I Dummy array of parameters increments
-int	np			#I Number of parameters
+size_t	np			#I Number of parameters
 real	z			#O Function return
 real	der[np]			#O Derivatives
 

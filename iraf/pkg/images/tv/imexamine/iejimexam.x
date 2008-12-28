@@ -19,13 +19,21 @@ int	mode
 real	x, y
 int	axis
 
-int	navg, order, clgpseti()
+size_t	sz_val
+int	order
+long	navg, clgpsetl()
 bool	center, background, clgpsetb()
 real	sigma, width, rplot, clgpsetr()
 
-int	i, j, k, nx, ny, x1, x2, y1, y2, nfit, flag[5]
-real	xc, yc, bkg, r, dr, fit[5], xfit, yfit, asumr(), amedr()
+long	l_val
+int	nfit, flag[5]
+long	i, j, k
+long	x1, x2, y1, y2
+size_t	nx, ny
+real	xc, yc, bkg, r, dr, fit[5], xfit, yfit
 pointer	sp, title, avstr, im, pp, data, xs, ys, ptr
+real	asumr(), amedr()
+long	nint_rl()
 pointer	clopset(), ie_gimage(), ie_gdata()
 
 errchk	ie_gdata, mr_solve
@@ -44,7 +52,7 @@ begin
 	else
 	    IE_PP(ie) = clopset ("kimexam")
 	pp = IE_PP(ie)
-	navg = clgpseti (pp, "naverage")
+	navg = clgpsetl (pp, "naverage")
 	center = clgpsetb (pp, "center")
 	background = clgpsetb (pp, "background")
 	sigma = clgpsetr (pp, "sigma")
@@ -72,8 +80,8 @@ begin
 	r = max (rplot, 8 * sigma + width)
 	x1 = xc - r
 	x2 = xc + r
-	y1 = nint (yc) - (navg - 1) / 2
-	y2 = nint (yc) + navg / 2
+	y1 = nint_rl(yc) - (navg - 1) / 2
+	y2 = nint_rl(yc) + navg / 2
 	iferr {
 	    if (axis == 1)
 		data = ie_gdata (im, x1, x2, y1, y2)
@@ -92,14 +100,16 @@ begin
 	call smark (sp)
 	call salloc (xs, nx, TY_REAL)
 	call salloc (ys, nx, TY_REAL)
-	call salloc (title, IE_SZTITLE, TY_CHAR)
-	call salloc (avstr, SZ_LINE, TY_CHAR)
+	sz_val = IE_SZTITLE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (avstr, sz_val, TY_CHAR)
 
 	ptr = data
 	if (axis == 1) {
 	    call sprintf (Memc[avstr], SZ_LINE, "Lines %d-%d")
-		call pargi (y1)
-		call pargi (y2)
+		call pargl (y1)
+		call pargl (y2)
 	    call amovr (Memr[ptr], Memr[ys], nx) 
 	    ptr = ptr + nx
 	    do i = 2, ny {
@@ -109,8 +119,8 @@ begin
 	    call adivkr (Memr[ys], real (ny), Memr[ys], nx)
 	} else {
 	    call sprintf (Memc[avstr], SZ_LINE, "Columns %d-%d")
-		call pargi (y1)
-		call pargi (y2)
+		call pargl (y1)
+		call pargl (y2)
 	    do i = 0, nx-1 {
 		Memr[ys+i] = asumr (Memr[ptr], ny) / ny
 		ptr = ptr + ny
@@ -148,7 +158,7 @@ begin
 	}
 
 	# Set initial fit parameters
-	k = max (0, nint (xc - x1))
+	k = max (0, nint_rl(xc - x1))
 	fit[1] = bkg
 	fit[2] = 0.
 	fit[3] = Memr[ys+k] - fit[1]
@@ -191,8 +201,9 @@ begin
 	    call pargstr (Memc[avstr])
 	    call pargstr (IM_TITLE(im))
 
-	j = max (0, int (xc - x1 - rplot))
-	k = min (nx-1, nint (xc - x1 + rplot))
+	l_val = xc - x1 - rplot
+	j = max (0, l_val)
+	k = min (nx-1, nint_rl(xc - x1 + rplot))
 	if (axis == 1)
 	    call ie_graph (gp, mode, pp, Memc[title],
 		Memr[xs+j], Memr[ys+j], k-j+1, IE_XLABEL(ie), IE_XFORMAT(ie))
@@ -249,7 +260,7 @@ end
 procedure ie_gfit (xs, ys, nx, fit, flag, nfit)
 
 real	xs[nx], ys[nx]		# Vector to be fit
-int	nx			# Number of points
+size_t	nx			# Number of points
 real	fit[5]			# Fit parameters
 int	flag[nfit]		# Flag for parameters to be fit
 int	nfit			# Number of parameters to be fit
@@ -326,7 +337,7 @@ procedure mr_solve (x, y, npts, params, flags, np, nfit, mr, chisq)
 
 real	x[npts]			# X data array
 real	y[npts]			# Y data array
-int	npts			# Number of data points
+size_t	npts			# Number of data points
 real	params[np]		# Parameter array
 int	flags[np]		# Flag array indexing parameters to fit
 int	np			# Number of parameters
@@ -334,6 +345,7 @@ int	nfit			# Number of parameters to fit
 real	mr			# MR parameter
 real	chisq			# Chi square of fit
 
+size_t	sz_val
 int	i
 real	chisq1
 pointer	new, a1, a2, delta1, delta2
@@ -349,21 +361,27 @@ begin
 	    call mfree (delta1, TY_REAL)
 	    call mfree (delta2, TY_REAL)
 
-	    call malloc (new, np, TY_REAL)
-	    call malloc (a1, nfit*nfit, TY_REAL)
-	    call malloc (a2, nfit*nfit, TY_REAL)
-	    call malloc (delta1, nfit, TY_REAL)
-	    call malloc (delta2, nfit, TY_REAL)
+	    sz_val = np
+	    call malloc (new, sz_val, TY_REAL)
+	    sz_val = nfit*nfit
+	    call malloc (a1, sz_val, TY_REAL)
+	    call malloc (a2, sz_val, TY_REAL)
+	    sz_val = nfit
+	    call malloc (delta1, sz_val, TY_REAL)
+	    call malloc (delta2, sz_val, TY_REAL)
 
-	    call amovr (params, Memr[new], np)
+	    sz_val = np
+	    call amovr (params, Memr[new], sz_val)
 	    call mr_eval (x, y, npts, Memr[new], flags, np, Memr[a2],
 	        Memr[delta2], nfit, chisq)
 	    mr = 0.001
 	}
 
 	# Restore last good fit and apply the Marquardt parameter.
-	call amovr (Memr[a2], Memr[a1], nfit * nfit)
-	call amovr (Memr[delta2], Memr[delta1], nfit)
+	sz_val = nfit * nfit
+	call amovr (Memr[a2], Memr[a1], sz_val)
+	sz_val = nfit
+	call amovr (Memr[delta2], Memr[delta1], sz_val)
 	do i = 1, nfit
 	    Memr[a1+(i-1)*(nfit+1)] = Memr[a2+(i-1)*(nfit+1)] * (1. + mr)
 
@@ -380,9 +398,12 @@ begin
 	if (chisq1 < chisq) {
 	    mr = max (EPSILONR, 0.1 * mr)
 	    chisq = chisq1
-	    call amovr (Memr[a1], Memr[a2], nfit * nfit)
-	    call amovr (Memr[delta1], Memr[delta2], nfit)
-	    call amovr (Memr[new], params, np)
+	    sz_val = nfit * nfit
+	    call amovr (Memr[a1], Memr[a2], sz_val)
+	    sz_val = nfit
+	    call amovr (Memr[delta1], Memr[delta2], sz_val)
+	    sz_val = np
+	    call amovr (Memr[new], params, sz_val)
 	} else
 	    mr = 10. * mr
 
@@ -402,7 +423,7 @@ procedure mr_eval (x, y, npts, params, flags, np, a, delta, nfit, chisq)
 
 real	x[npts]			# X data array
 real	y[npts]			# Y data array
-int	npts			# Number of data points
+size_t	npts			# Number of data points
 real	params[np]		# Parameter array
 int	flags[np]		# Flag array indexing parameters to fit
 int	np			# Number of parameters
@@ -411,13 +432,16 @@ real	delta[nfit]		# Delta array
 int	nfit			# Number of parameters to fit
 real	chisq			# Chi square of fit
 
-int	i, j, k
+size_t	sz_val
+long	i
+int	j, k
 real	ymod, dy, dydpj, dydpk
 pointer	sp, dydp
 
 begin
 	call smark (sp)
-	call salloc (dydp, np, TY_REAL)
+	sz_val = np
+	call salloc (dydp, sz_val, TY_REAL)
 
 	do j = 1, nfit {
 	   do k = 1, j
@@ -456,15 +480,17 @@ real	a[n,n]		# Input matrix and returned inverse
 real	b[n]		# Input RHS vector and returned solution
 int	n		# Dimension of input matrices
 
+size_t	sz_val
 int	krank
 real	rnorm
 pointer	sp, h, g, ip
 
 begin
 	call smark (sp)
-	call salloc (h, n, TY_REAL)
-	call salloc (g, n, TY_REAL)
-	call salloc (ip, n, TY_INT)
+	sz_val = n
+	call salloc (h, sz_val, TY_REAL)
+	call salloc (g, sz_val, TY_REAL)
+	call salloc (ip, sz_val, TY_INT)
 
 	call hfti (a, n, n, n, b, n, 1, 1E-10, krank, rnorm,
 	    Memr[h], Memr[g], Memi[ip])

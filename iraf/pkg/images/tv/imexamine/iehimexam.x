@@ -18,11 +18,14 @@ int	mode		# Mode
 pointer	ie		# Structure pointer
 real	x, y		# Center coordinate
 
+size_t	sz_val
 real	z1, z2, dz, zmin, zmax
-int	i, j, x1, x2, y1, y2, nx, ny, npts, nbins, nbins1, nlevels, nwide
+long	i, j, nlevels, nwide
+long	x1, x2, y1, y2
+size_t	nx, ny, npts, nbins, nbins1
 pointer	pp, sp, hgm, title, im, data, xp, yp
 
-int	clgpseti()
+long	clgpsetl(), nint_rl()
 real	clgpsetr()
 bool	clgpsetb(), fp_equalr()
 pointer	clopset(), ie_gimage(), ie_gdata()
@@ -55,8 +58,8 @@ begin
 
 	# Get the data.
 	pp = clopset ("himexam")
-	nx = clgpseti (pp, "ncolumns")
-	ny = clgpseti (pp, "nlines")
+	nx = clgpsetl (pp, "ncolumns")
+	ny = clgpsetl (pp, "nlines")
 	x1 = z1 - (nx - 1) / 2 + 0.5
 	x2 = z1 + nx / 2 + 0.5
 	y1 = z2 - (ny - 1) / 2 + 0.5
@@ -70,7 +73,7 @@ begin
 	npts = nx * ny
 
 	# Get default histogram resolution.
-	nbins = clgpseti (pp, "nbins")
+	nbins = clgpsetl (pp, "nbins")
 
 	# Get histogram range.
 	z1 = clgpsetr (pp, "z1")
@@ -96,10 +99,10 @@ begin
 	if (clgpsetb (pp, "autoscale")) {
 	    switch (IM_PIXTYPE(im)) {
 	    case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
-		nlevels = nint (z2) - nint (z1)
-		nwide = max (1, nint (real (nlevels) / real (nbins)))
-		nbins = max (1, nint (real (nlevels) / real (nwide)))
-		z2 = nint (z1) + nbins * nwide
+		nlevels = nint_rl(z2) - nint_rl(z1)
+		nwide = max (1, nint_rl(real (nlevels) / real (nbins)))
+		nbins = max (1, nint_rl(real (nlevels) / real (nwide)))
+		z2 = nint_rl(z1) + nbins * nwide
 	    }
 	}
 
@@ -164,17 +167,18 @@ begin
 		Memr[yp+j+1] = Memr[yp+j]
 	    }
 
-	    call salloc (title, IE_SZTITLE, TY_CHAR)
+	    sz_val = IE_SZTITLE
+	    call salloc (title, sz_val, TY_CHAR)
 	    call sprintf (Memc[title], IE_SZTITLE,
 		"%s[%d:%d,%d:%d]: Histogram from z1=%g to z2=%g, nbins=%d\n%s")
 	        call pargstr (IE_IMNAME(ie))
-		call pargi (x1)
-		call pargi (x2)
-	        call pargi (y1)
-	        call pargi (y2)
+		call pargl (x1)
+		call pargl (x2)
+	        call pargl (y1)
+	        call pargl (y2)
 		call pargr (z1)
 		call pargr (z2)
-		call pargi (nbins)
+		call pargz (nbins)
 	        call pargstr (IM_TITLE(im))
 	    call ie_graph (gp, mode, pp, Memc[title], Memr[xp],
 		Memr[yp], nbins1, "", "")

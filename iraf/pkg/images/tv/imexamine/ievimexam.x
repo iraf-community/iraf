@@ -28,12 +28,16 @@ pointer	ie		# IMEXAM pointer
 real	x, y		# Starting or center coordinate
 int	key		# 'u' centered vector, 'v' two endpoint vector
 
-int	btype, nxvals, nyvals, nzvals, width
+size_t	sz_val
+int	btype
+long	nxvals, nyvals
+size_t	nzvals, width
 pointer	sp, title, boundary, im, x_vec, y_vec, pp
 real	x1, y1, x2, y2, zmin, zmax, bconstant
 
 bool	fp_equalr()
-int	clgpseti(), clgwrd()
+int	clgwrd()
+long	clgpsetl()
 pointer	clopset()
 real	clgpsetr()
 pointer	ie_gimage()
@@ -46,8 +50,10 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (title, IE_SZTITLE, TY_CHAR)
-	call salloc (boundary, SZ_BTYPE, TY_CHAR)
+	sz_val = IE_SZTITLE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_BTYPE
+	call salloc (boundary, sz_val, TY_CHAR)
 
 	# Get boundary extension parameters.
 	if (IE_PP(ie) != NULL)
@@ -69,14 +75,15 @@ begin
 	x2 = IE_X2(ie)
 	y1 = IE_Y1(ie)
 	y2 = IE_Y2(ie)
-	width = clgpseti (pp, "naverage")
+	width = clgpsetl (pp, "naverage")
 
 	# Check the boundary and compute the length of the output vector.
 	x1 = max (1.0, min (x1, real (nxvals)))
 	x2 = min (real(nxvals), max (1.0, x2))
 	y1 = max (1.0, min (y1, real (nyvals)))
 	y2 = min (real(nyvals), max (1.0, y2))
-	nzvals = int (sqrt ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))) + 1
+	nzvals = sqrt ((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+	nzvals = nzvals + 1
 
 	# Check for cases which should be handled by pcols or prows.
 	call malloc (x_vec, nzvals, TY_REAL)
@@ -106,7 +113,7 @@ begin
 	    call pargr (y1)
 	    call pargr (x2)
 	    call pargr (y2)
-	    call pargi (width)
+	    call pargz (width)
 	    call pargstr (IM_TITLE(im))
 
 	call ie_graph (gp, mode, pp, Memc[title], Memr[x_vec], Memr[y_vec],
@@ -131,17 +138,20 @@ real	x1, y1		# starting pixel of vector
 real	x2, y2		# ending pixel of pixel
 real	bconstant	# Boundary extension constant
 int	btype		# Boundary extension type
-int	nvals		# number of samples along the vector
-int	width		# width of strip to average over
+size_t	nvals		# number of samples along the vector
+size_t	width		# width of strip to average over
 real	x_vector[ARB]	# Pixel numbers
 real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
+long	l_val
 double	dx, dy, dpx, dpy, ratio, xoff, yoff, noff, xv, yv
-int	i, j, k, nedge, col1, col2, line1, line2
-int	colb, colc, line, linea, lineb, linec
+long	i, j, k, nedge
+long	col1, col2, line1, line2
+long	colb, colc, line, linea, lineb, linec
 pointer sp, oxs, oys, xs, ys, yvals, msi, buf
 real	sum , lim1, lim2, lim3, lim4
+long	nint_rl()
 pointer	imgs2r()
 errchk	msiinit
 
@@ -176,10 +186,12 @@ begin
 	buf = NULL
 
 	# Set the boundary.
-	col1 = int (min (x1, x2)) - nedge
-	col2 = nint (max (x1, x2)) + nedge
-	line1 = int (min (y1, y2)) - nedge
-	line2 = nint (max (y2, y1)) + nedge
+	col1 = min (x1, x2)
+	col1 = col1 - nedge
+	col2 = nint_rl(max (x1, x2)) + nedge
+	line1 = min (y1, y2)
+	line1 = line1 - nedge
+	line2 = nint_rl(max (y2, y1)) + nedge
 	call ie_setboundary (im, col1, col2, line1, line2, btype, bconstant)
 
 	# Initialize.
@@ -207,8 +219,9 @@ begin
 		lim2 = lim1 + double (width - 1) * dpx
 		lim3 = xv + double (linea - line + 1) * ratio
 		lim4 = lim3 + double (width - 1) * dpx
-		colb = max (col1, int (min (lim1, lim2, lim3, lim4)) - 1)
-		colc = min (col2, nint (max (lim1, lim2, lim3, lim4)) + 1)
+		l_val = min (lim1, lim2, lim3, lim4)
+		colb = max (col1, l_val - 1)
+		colc = min (col2, nint_rl(max (lim1, lim2, lim3, lim4)) + 1)
 		buf = imgs2r (im, colb, colc, lineb, linec)
 		call msifit (msi, Memr[buf], colc - colb + 1, linec - lineb +
 		    1, colc - colb + 1)
@@ -221,8 +234,9 @@ begin
 		lim2 = lim1 + double (width - 1) * dpx
 		lim3 = xv + double (linea - line - 1) * ratio
 		lim4 = lim3 + double (width - 1) * dpx
-		colb = max (col1, int (min (lim1, lim2, lim3, lim4)) - 1)
-		colc = min (col2, nint (max (lim1, lim2, lim3, lim4)) + 1)
+		l_val = min (lim1, lim2, lim3, lim4)
+		colb = max (col1, l_val - 1)
+		colc = min (col2, nint_rl(max (lim1, lim2, lim3, lim4)) + 1)
 		buf = imgs2r (im, colb, colc, lineb, linec)
 		call msifit (msi, Memr[buf], colc - colb + 1, linec - lineb +
 		    1, colc - colb + 1)
@@ -265,8 +279,8 @@ procedure ie_get_col (im, x1, y1, x2, y2, nvals, width, btype,
 pointer im		# pointer to image header
 real	x1, y1		# starting pixel of vector
 real	x2, y2		# ending pixel of pixel
-int	nvals		# number of samples along the vector
-int	width		# width of strip to average over
+size_t	nvals		# number of samples along the vector
+size_t	width		# width of strip to average over
 int	btype		# Boundary extension type
 real	bconstant	# Boundary extension constant
 real	x_vector[ARB]	# Pixel numbers
@@ -274,10 +288,11 @@ real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
 real	sum
-int	line, linea, lineb, linec
+long	line, linea, lineb, linec
 pointer sp, xs, ys, msi, yvals, buf
 double	dx, dy, xoff, noff, xv, yv
-int	i, j, k, nedge, col1, col2, line1, line2
+long	i, j, k, nedge, col1, col2, line1, line2
+long	nint_rl()
 pointer	imgs2r()
 errchk	msiinit
 
@@ -293,10 +308,12 @@ begin
 
 	# Set the boundary.
 	nedge  = max (2, width / 2 + 1)
-	col1 = int (x1) - nedge
-	col2 = nint (x1) + nedge
-	line1  = int (min (y1, y2)) - nedge
-	line2 =  nint (max (y1, y2)) + nedge
+	col1 = x1
+	col1 = col1 - nedge
+	col2 = nint_rl(x1) + nedge
+	line1 = min (y1, y2)
+	line1 = line1 - nedge
+	line2 =  nint_rl(max (y1, y2)) + nedge
 	call ie_setboundary (im, col1, col2, line1, line2, btype, bconstant)
 
 	# Determine sampling perpendicular to vector.
@@ -374,8 +391,8 @@ procedure ie_get_row (im, x1, y1, x2, y2, nvals, width, btype, bconstant,
 pointer im		# pointer to image header
 real	x1, y1		# starting pixel of vector
 real	x2, y2		# ending pixel of pixel
-int	nvals		# number of samples along the vector
-int	width		# width of strip to average over
+size_t	nvals		# number of samples along the vector
+size_t	width		# width of strip to average over
 int	btype		# Boundary extension type
 real	bconstant	# Boundary extension constant
 real	x_vector[ARB]	# Pixel numbers
@@ -383,11 +400,12 @@ real	y_vector[ARB]	# Average pixel values (returned)
 real	zmin, zmax 	# min, max of data vector
 
 double	dx, dy, yoff, noff, xv, yv
-int	i, j, nedge, col1, col2, line1, line2
-int	line, linea, lineb, linec
+long	i, j, nedge, col1, col2, line1, line2
+long	line, linea, lineb, linec
 pointer sp, oys, xs, ys, yvals, msi, buf
-errchk	imgs2r, msifit, msiinit
+long	nint_rl()
 pointer	imgs2r()
+errchk	imgs2r, msifit, msiinit
 
 begin
 	call smark (sp)
@@ -402,10 +420,12 @@ begin
 
 	# Set the boundary.
 	nedge  = max (2, width / 2 + 1)
-	col1 = int (min (x1, x2)) - nedge
-	col2 = nint (max (x1, x2)) + nedge
-	line1 = int (y1) - nedge
-	line2 = nint (y1) + nedge
+	col1 = min (x1, x2)
+	col1 = col1 - nedge
+	col2 = nint_rl(max (x1, x2)) + nedge
+	line1 = y1
+	line1 = line1 - nedge
+	line2 = nint_rl(y1) + nedge
 	call ie_setboundary (im, col1, col2, line1, line2, btype, bconstant)
 
 	# Determine sampling perpendicular to vector.
@@ -490,13 +510,13 @@ end
 procedure ie_setboundary (im, col1, col2, line1, line2, btype, bconstant)
 
 pointer	im			# IMIO pointer
-int	col1, col2		# Range of columns
-int	line1, line2		# Range of lines
+long	col1, col2		# Range of columns
+long	line1, line2		# Range of lines
 int	btype			# Boundary extension type
 real	bconstant		# Constant for constant boundary extension
 
 int	btypes[5]
-int	nbndrypix
+long	nbndrypix
 data	btypes /BT_CONSTANT, BT_NEAREST, BT_REFLECT, BT_WRAP, BT_PROJECT/
 
 begin
@@ -507,7 +527,7 @@ begin
 	nbndrypix = max (nbndrypix, line2 - IM_LEN(im, 2))
 
 	call imseti (im, IM_TYBNDRY, btypes[btype])
-	call imseti (im, IM_NBNDRYPIX, nbndrypix + 1)
+	call imsetl (im, IM_NBNDRYPIX, nbndrypix + 1)
 	if (btypes[btype] == BT_CONSTANT)
 	    call imsetr (im, IM_BNDRYPIXVAL, bconstant)
 end
@@ -520,14 +540,15 @@ end
 procedure ie_bufl2r (im, col1, col2, line1, line2, buf)
 
 pointer	im		# Image pointer
-int	col1		# First image column of buffer
-int	col2		# Last image column of buffer
-int	line1		# First image line of buffer
-int	line2		# Last image line of buffer
+long	col1		# First image column of buffer
+long	col2		# Last image column of buffer
+long	line1		# First image line of buffer
+long	line2		# Last image line of buffer
 pointer	buf		# Buffer
 
 pointer	buf1, buf2
-int	i, ncols, nlines, nclast, llast1, llast2, nllast
+long	i, llast1, llast2
+size_t	ncols, nlines, nclast, nllast
 errchk	malloc, realloc, imgs2r
 pointer	imgs2r()
 

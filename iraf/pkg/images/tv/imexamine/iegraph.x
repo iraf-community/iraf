@@ -21,13 +21,15 @@ pointer	pp		# PSET pointer
 char	param[ARB]	# Parameter string
 real	x[npts]		# X data
 real	y[npts]		# Y data
-int	npts		# Number of points
+size_t	npts		# Number of points
 char	label		# Default x label
 char	format		# Default x format
 
-int	i, marks[10], linepattern, patterns[4], clgpseti(), btoi(), strdic()
+size_t	sz_val
+int	i, marks[10], linepattern, patterns[4]
 pointer	sp, title, xlabel, ylabel
 real	x1, x2, y1, y2, wx1, wx2, wy1, wy2, temp, szmarker
+int	clgpseti(), btoi(), strdic()
 real	clgpsetr(), ie_iformatr()
 bool	clgpsetb(), streq()
 
@@ -37,7 +39,8 @@ data	marks/GM_POINT, GM_BOX, GM_PLUS, GM_CROSS, GM_CIRCLE, GM_HEBAR,
 
 begin
 	call smark (sp)
-	call salloc (xlabel, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (xlabel, sz_val, TY_CHAR)
 
 	# If a new graph setup all the axes and labeling options and then
 	# make the graph.
@@ -98,8 +101,10 @@ begin
 		    btoi (clgpsetb (pp, "ticklabels")))
 
 	        # Fetch labels and  plot title string. 
-		call salloc (title, IE_SZTITLE, TY_CHAR)
-		call salloc (ylabel, SZ_LINE, TY_CHAR)
+		sz_val = IE_SZTITLE
+		call salloc (title, sz_val, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (ylabel, sz_val, TY_CHAR)
 
 		if (clgpsetb (pp, "banner")) {
 		    call sysid (Memc[title], IE_SZTITLE)

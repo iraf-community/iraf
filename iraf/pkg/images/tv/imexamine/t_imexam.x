@@ -14,6 +14,7 @@ define	SZ_IMLIST	512
  
 procedure t_imexamine ()
  
+size_t	sz_val
 real	x, y
 pointer	sp, cmd, imname, imlist, gp, ie, im
 int	curtype, key, redraw, mode, nframes, nargs
@@ -23,16 +24,22 @@ pointer	gopen(), ie_gimage()
 pointer	imtopen()
 int	imd_wcsver(), ie_gcur(), ie_getnframes()
 int	btoi(), clgeti(), imtlen()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (ie, IE_LEN, TY_STRUCT)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (imlist, SZ_IMLIST, TY_CHAR)
+	sz_val = IE_LEN
+	call salloc (ie, sz_val, TY_STRUCT)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	sz_val = SZ_IMLIST
+	call salloc (imlist, sz_val, TY_CHAR)
 
 	# Initialize the imexamine descriptor.
-	call aclri (Memi[ie], IE_LEN)
+	sz_val = IE_LEN
+	call aclrp (Memp[ie], sz_val)
 
 	# Determine if we will be accessing the image display, and if so,
 	# the maximum number of frames to be accessed.
@@ -159,23 +166,23 @@ begin
 		x = INDEF
 		y = INDEF
 	    case 'a':	# Aperture photometry
-		call ie_rimexam (NULL, NULL, ie, x, y)
+		call ie_rimexam (NULLPTR, NULL, ie, x, y)
 	    case ',':	# Aperture photometry
-		call ie_qrimexam (NULL, NULL, ie, x, y)
+		call ie_qrimexam (NULLPTR, NULL, ie, x, y)
 
 	    case 'b':	# Print image region coordinates
 		call printf ("%4d %4d %4d %4d\n")
-		    call pargi (IE_IX1(ie))
-		    call pargi (IE_IX2(ie))
-		    call pargi (IE_IY1(ie))
-		    call pargi (IE_IY2(ie))
+		    call pargl (IE_IX1(ie))
+		    call pargl (IE_IX2(ie))
+		    call pargl (IE_IY1(ie))
+		    call pargl (IE_IY2(ie))
 
 		if (IE_LOGFD(ie) != NULL) {
 		    call fprintf (IE_LOGFD(ie), "%4d %4d %4d %4d\n")
-			call pargi (IE_IX1(ie))
-			call pargi (IE_IX2(ie))
-			call pargi (IE_IY1(ie))
-			call pargi (IE_IY2(ie))
+			call pargl (IE_IX1(ie))
+			call pargl (IE_IX2(ie))
+			call pargl (IE_IY1(ie))
+			call pargl (IE_IY2(ie))
 		}
 
 	    case 'c','e','h','j','k','s','l','r','u','v','.': # Graphs
@@ -322,6 +329,7 @@ pointer	ie			#I imexamine descriptor
 char	image[ARB]		#I image name
 pointer	imlist			#I image list
 
+size_t	sz_val
 int	i
 bool	inlist
 pointer	im, sp, lname
@@ -331,7 +339,8 @@ bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (lname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (lname, sz_val, TY_CHAR)
 
 	# Is image already in list?
 	inlist = false

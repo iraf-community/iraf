@@ -106,6 +106,7 @@ char	cmdstr[ARB]		# Colon command
 pointer	gp			# GIO pointer
 int	redraw			# Redraw graph?
  
+size_t	sz_val
 char	gtype
 bool	bval
 real	rval1
@@ -121,7 +122,8 @@ errchk	clopset, clppsetb, clppsetr, clputb, clputi, clputr
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
  
 	# Scan the command string and get the first word.
 	call sscan (cmdstr)
@@ -438,7 +440,9 @@ pointer	pp			# Pset pointer
 char	gtype			# Graph type
 int	redraw			# Redraw graph?
  
+size_t	sz_val
 int	ival
+long	lval
 real	rval1, rval2
 bool	bval
 pointer	sp, cmd, im
@@ -446,11 +450,13 @@ pointer	sp, cmd, im
 real	clgetr(), clgpsetr()
 pointer	ie_gimage()
 int	nscan(), strdic(), clgeti(), clgpseti()
+long	clgetl(), clgpsetl()
 errchk	ie_gimage, clppseti
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	switch (ncmd) {
 	case MAJRX:
@@ -527,12 +533,12 @@ begin
 	case NAVERAGE:
 	    switch (gtype) {
 	    case 'c', 'u', 'j', 'k', 'l', 'v':
-	        call gargi (ival)
+	        call gargl (lval)
 		if (nscan() == 1) {
 		    call printf ("naverage %d\n")
-			call pargi (clgpseti (pp, "naverage"))
+			call pargl (clgpsetl (pp, "naverage"))
 		} else {
-		    call clppseti (pp, "naverage", ival)
+		    call clppsetl (pp, "naverage", lval)
 		    redraw = YES
 		}
 	    default:
@@ -541,12 +547,12 @@ begin
 	case NCOLUMNS:
 	    switch (gtype) {
 	    case 's', 'e', 'h':
-	        call gargi (ival)
+	        call gargl (lval)
 		if (nscan() == 1) {
 		    call printf ("ncolumns %d\n")
-			call pargi (clgpseti (pp, "ncolumns"))
+			call pargl (clgpsetl (pp, "ncolumns"))
 		} else {
-		    call clppseti (pp, "ncolumns", ival)
+		    call clppsetl (pp, "ncolumns", lval)
 		    redraw = YES
 		}
 	    default:
@@ -563,12 +569,12 @@ begin
 		    redraw = YES
 	    }
 	case NCSTAT:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() == 1) {
 		call printf ("ncstat %g\n")
-		    call pargi (clgeti ("ncstat"))
+		    call pargl (clgetl ("ncstat"))
 	    } else
-		call clputi ("ncstat", ival)
+		call clputl ("ncstat", lval)
 	case NHI:
 	    call gargi (ival)
 	    if (nscan() == 1) {
@@ -582,24 +588,24 @@ begin
 	case NLINES:
 	    switch (gtype) {
 	    case 's', 'e', 'h':
-	        call gargi (ival)
+	        call gargl (lval)
 		if (nscan() == 1) {
 		    call printf ("nlines %d\n")
-			call pargi (clgpseti (pp, "nlines"))
+			call pargl (clgpsetl (pp, "nlines"))
 		} else {
-		    call clppseti (pp, "nlines", ival)
+		    call clppsetl (pp, "nlines", lval)
 		    redraw = YES
 		}
 	    default:
 		call printf ("Parameter does not apply to current graph\007\n")
 	    }
 	case NLSTAT:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() == 1) {
 		call printf ("nlstat %g\n")
-		    call pargi (clgeti ("nlstat"))
+		    call pargl (clgetl ("nlstat"))
 	    } else
-		call clputi ("nlstat", ival)
+		call clputl ("nlstat", lval)
 	case POINTMODE:
 	    switch (gtype) {
 	    case 'c', 'u', 'j', 'k', 'l', 'r', 'v', 'h', '.':
@@ -784,7 +790,9 @@ pointer	pp			# Pset pointer
 char	gtype			# Graph type
 int	redraw			# Redraw graph?
  
+size_t	sz_val
 int	ival
+long	lval
 real	rval1
 bool	bval
 pointer	sp, cmd
@@ -792,10 +800,12 @@ pointer	sp, cmd
 real	clgetr()
 bool	clgetb()
 int	nscan(), clgeti(), btoi(), strdic()
+long	clgetl()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	switch (ncmd) {
 	case YLABEL:
@@ -861,12 +871,12 @@ begin
 		call printf ("Parameter does not apply to current graph\007\n")
 	    }
 	case NBINS:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() == 1) {
 		call printf ("nbins %d\n")
-		    call pargi (clgeti ("himexam.nbins"))
+		    call pargl (clgetl ("himexam.nbins"))
 	    } else {
-		call clputi ("himexam.nbins", ival)
+		call clputl ("himexam.nbins", lval)
 		if (gtype == 'h')
 		    redraw = YES
 	    }
@@ -1016,19 +1026,19 @@ begin
 	    } else
 		call clpstr ("output", Memc[cmd])
 	case NCOUTPUT:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() == 1) {
 		call printf ("ncoutput %g\n")
-		    call pargi (clgeti ("ncoutput"))
+		    call pargl (clgetl ("ncoutput"))
 	    } else
-		call clputi ("ncoutput", ival)
+		call clputl ("ncoutput", lval)
 	case NLOUTPUT:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() == 1) {
 		call printf ("nloutput %g\n")
-		    call pargi (clgeti ("nloutput"))
+		    call pargl (clgetl ("nloutput"))
 	    } else
-		call clputi ("nloutput", ival)
+		call clputl ("nloutput", lval)
 
 	default:
 	    call printf ("Ambiguous or unrecognized command\007\n")

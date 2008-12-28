@@ -19,17 +19,20 @@ int	mode			# Mode
 pointer	ie			# IMEXAM pointer
 real	x, y			# Center
 
+size_t	sz_val
+int	i_val0, i_val1
 real	angh, angv		# Orientation of surface (degrees)
 real	floor, ceiling		# Range limits
  
 int	wkid
-int	x1, x2, y1, y2, nx, ny, npts
-pointer	pp, sp, title, str, sdata, work, im, data, ie_gimage(), ie_gdata()
+long	x1, x2, y1, y2
+size_t	nx, ny, npts
+pointer	pp, sp, title, str, sdata, work, im, data
 
 bool	clgpsetb()
-int	clgpseti()
+long	clgpsetl()
 real	clgpsetr()
-pointer	clopset()
+pointer	clopset(), ie_gimage(), ie_gdata()
  
 int	first
 real	vpx1, vpx2, vpy1, vpy2
@@ -48,8 +51,8 @@ begin
 	pp = clopset ("simexam")
 	IE_PP(ie) = pp
 
-	nx = clgpseti (pp, "ncolumns")
-	ny = clgpseti (pp, "nlines")
+	nx = clgpsetl (pp, "ncolumns")
+	ny = clgpsetl (pp, "nlines")
 	angh = clgpsetr (pp, "angh")
 	angv = clgpsetr (pp, "angv")
 	floor = clgpsetr (pp, "floor")
@@ -98,8 +101,10 @@ begin
 	    # Set the viewport.
 	    call gsview (gp, 0.1, 0.9, 0.1, 0.9)
 
-	    call salloc (title, IE_SZTITLE, TY_CHAR)
-	    call salloc (str, SZ_LINE, TY_CHAR)
+	    sz_val = IE_SZTITLE
+	    call salloc (title, sz_val, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (str, sz_val, TY_CHAR)
 
 	    if (clgpsetb (pp, "banner")) {
 		call sysid (Memc[str], SZ_LINE)
@@ -107,10 +112,10 @@ begin
 		    "%s\n%s: Surface plot of [%d:%d,%d:%d]\n%s")
 		    call pargstr (Memc[str])
 		    call pargstr (IE_IMNAME(ie))
-		    call pargi (x1)
-		    call pargi (x2)
-		    call pargi (y1)
-		    call pargi (y2)
+		    call pargl (x1)
+		    call pargl (x2)
+		    call pargl (y1)
+		    call pargl (y2)
 		    call pargstr (IM_TITLE(im))
 	    } else
 		Memc[title] = EOS
@@ -136,7 +141,15 @@ begin
 	call ggview (gp, vpx1, vpx2, vpy1, vpy2)
 	call set (vpx1, vpx2, vpy1, vpy2, 1.0, 1024., 1.0, 1024., 1)
 	call salloc (work, 2*nx*ny+nx+ny, TY_REAL)
-	call ezsrfc (Memr[sdata], nx, ny, angh, angv, Memr[work])
+	if ( nx > MAX_INT ) {	# limited by sys/gio/ncarutil/srface.f
+	    call error (0, "IE_SIMEXAM: Too large nx (32-bit limit)")
+	}
+	if ( ny > MAX_INT ) {	# limited by sys/gio/ncarutil/srface.f
+	    call error (0, "IE_SIMEXAM: Too large ny (32-bit limit)")
+	}
+	i_val0 = nx
+	i_val1 = ny
+	call ezsrfc (Memr[sdata], i_val0, i_val1, angh, angv, Memr[work])
 
 	if (mode != APPEND) {
 	    if (clgpsetb (pp, "axes")) {
@@ -157,24 +170,28 @@ end
 procedure ie_perimeter (gp, z, ncols, nlines, angh, angv)
 
 pointer	gp			# Graphics pointer
-int	ncols			# Number of image columns
-int	nlines			# Number of image lines
+size_t	ncols			# Number of image columns
+size_t	nlines			# Number of image lines
 real	z[ncols, nlines]	# Array of intensity values
 real	angh			# Angle of horizontal inclination
 real	angv			# Angle of vertical inclination
 
+long	l_val, c_2
 pointer	sp, x_val, y_val, kvec
 char	tlabel[10]
 real	xmin, ymin, delta, fact1, flo, hi, xcen, ycen
 real	x1_perim, x2_perim, y1_perim, y2_perim, z1, z2
 real	wc1, wc2, wl1, wl2, del
-int	i, j, junk
-int	itoc()
+long	i, j
+int	junk
+int	ltoc()
+long	modl()
 data  	fact1 /2.0/
 real	vpx1, vpx2, vpy1, vpy2
 common	/noaovp/ vpx1, vpx2, vpy1, vpy2
 
 begin
+	c_2 = 2
 	call smark (sp)
 	call salloc (x_val,   ncols + 2,  TY_REAL)
 	call salloc (y_val,  nlines + 2, TY_REAL)
@@ -199,8 +216,8 @@ begin
 	# Set up linear endpoints and spacing as used in surface.
 
         delta = (hi-flo) / (max (ncols,nlines) -1.) * fact1
-        xmin = -(real (ncols/2)  * delta + real (mod (ncols+1, 2))  * delta)
-        ymin = -(real (nlines/2) * delta + real (mod (nlines+1, 2)) * delta)
+        xmin = -(real (ncols/2)  * delta + real (modl(ncols+1, c_2))  * delta)
+        ymin = -(real (nlines/2) * delta + real (modl(nlines+1, c_2)) * delta)
 	del = 2.0 * delta
 
 	# The perimeter is separated from the surface plot by the 
@@ -245,9 +262,11 @@ begin
 		call ie_label_axis (xcen, y2_perim+del, flo, "X-AXIS", -1, -2)
 		call ie_draw_ticksx (Memr[x_val+1], y2_perim, y2_perim+delta, 
 		    flo, ncols)
-		junk = itoc (int (wc1), tlabel, 10)
+		l_val = wc1
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (xmin, y2_perim+del, flo, tlabel, -1, -2)
-		junk = itoc (int (wc2), tlabel, 10)
+		l_val = wc2
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (Memr[x_val+ncols], y2_perim+del, flo, 
 		    tlabel, -1, -2)
 
@@ -257,9 +276,11 @@ begin
 		call ie_label_axis (x2_perim+del, ycen, flo, "Y-AXIS", 2, -1)
 		call ie_draw_ticksy (x2_perim, x2_perim+delta, Memr[y_val+1],
 		    flo, nlines)
-		junk = itoc (int (wl1), tlabel, 10)
+		l_val = wl1
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (x2_perim+del, ymin, flo, tlabel, 2, -1)
-		junk = itoc (int (wl2), tlabel, 10)
+		l_val = wl2
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (x2_perim+del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, -1)
 	    } else {
@@ -270,9 +291,11 @@ begin
 		call ie_label_axis (xcen, y1_perim-del, flo, "X-AXIS", -1, 2)
 		call ie_draw_ticksx (Memr[x_val+1], y1_perim, y1_perim-delta, 
 		    flo, ncols)
-		junk = itoc (int (wc1), tlabel, 10)
+		l_val = wc1
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (xmin, y1_perim-del, flo, tlabel, -1, 2)
-		junk = itoc (int (wc2), tlabel, 10)
+		l_val = wc2
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (Memr[x_val+ncols], y1_perim-del, flo, 
 		    tlabel, -1, 2)
 
@@ -282,9 +305,11 @@ begin
 		call ie_label_axis (x1_perim-del, ycen, flo, "Y-AXIS", 2, 1)
 		call ie_draw_ticksy (x1_perim, x1_perim-delta, Memr[y_val+1],
 		    flo, nlines)
-		junk = itoc (int (wl1), tlabel, 10)
+		l_val = wl1
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (x1_perim-del, ymin, flo, tlabel, 2, 1)
-		junk = itoc (int (wl2), tlabel, 10)
+		l_val = wl2
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (x1_perim-del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, 1)
 	    }
@@ -299,9 +324,11 @@ begin
 		call ie_label_axis (xcen, y1_perim-del, flo, "X-AXIS", 1, 2)
 		call ie_draw_ticksx (Memr[x_val+1], y1_perim, y1_perim-delta, 
 		    flo, ncols)
-		junk = itoc (int (wc1), tlabel, 10)
+		l_val = wc1
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (xmin, y1_perim-del, flo, tlabel, 1, 2)
-		junk = itoc (int (wc2), tlabel, 10)
+		l_val = wc2
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (Memr[x_val+ncols], y1_perim-del, flo, 
 		    tlabel, 1, 2)
 
@@ -311,9 +338,11 @@ begin
 		call ie_label_axis (x2_perim+del, ycen, flo, "Y-AXIS", 2, -1)
 		call ie_draw_ticksy (x2_perim, x2_perim+delta, Memr[y_val+1],
 		    flo, nlines)
-		junk = itoc (int (wl1), tlabel, 10)
+		l_val = wl1
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (x2_perim+del, ymin, flo, tlabel, 2, -1)
-		junk = itoc (int (wl2), tlabel, 10)
+		l_val = wl2
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (x2_perim+del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, -1)
 	    } else {
@@ -324,9 +353,11 @@ begin
 		call ie_label_axis (xcen, y2_perim+del, flo, "X-AXIS", 1, -2)
 		call ie_draw_ticksx (Memr[x_val+1], y2_perim, y2_perim+delta,
 		    flo, ncols)
-		junk = itoc (int (wc1), tlabel, 10)
+		l_val = wc1
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (xmin, y2_perim+del, flo, tlabel, 1, -2)
-		junk = itoc (int (wc2), tlabel, 10)
+		l_val = wc2
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (Memr[x_val+ncols], y2_perim+del, flo, 
 		    tlabel, 1, -2)
 
@@ -336,9 +367,11 @@ begin
 		call ie_label_axis (x1_perim-del, ycen, flo, "Y-AXIS", 2, 1)
 		call ie_draw_ticksy (x1_perim, x1_perim-delta, Memr[y_val+1],
 		    flo, nlines)
-		junk = itoc (int (wl1), tlabel, 10)
+		l_val = wl1
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (x1_perim-del, ymin, flo, tlabel, 2, 1)
-		junk = itoc (int (wl2), tlabel, 10)
+		l_val = wl2
+		junk = ltoc (l_val, tlabel, 10)
 		call ie_label_axis (x1_perim-del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, 1)
 	    }
@@ -354,12 +387,13 @@ end
 
 procedure ie_draw_axis (xvals, yvals, zval, nvals)
 
-int	nvals
 real	xvals[nvals]
 real	yvals[nvals]
 real	zval
+size_t	nvals
+
 pointer	sp, xt, yt
-int	i
+long	i
 real	dum
 
 begin
@@ -403,19 +437,21 @@ end
 
 procedure ie_draw_ticksx (x, y1, y2, zval, nvals)
 
-int	nvals
 real	x[nvals]
 real	y1, y2
 real	zval
+size_t	nvals
 
-int	i
+size_t	c_2
+long	i
 real	tkx[2], tky[2], dum
 
 begin
+	c_2 = 2
 	do i = 1, nvals {
 	    call trn32s (x[i], y1, zval, tkx[1], tky[1], dum, 1)
 	    call trn32s (x[i], y2, zval, tkx[2], tky[2], dum, 1)
-	    call gpl (2, tkx[1], tky[1])
+	    call gpl (c_2, tkx[1], tky[1])
 	}
 end
 
@@ -424,19 +460,21 @@ end
 
 procedure ie_draw_ticksy (x1, x2, y, zval, nvals)
 
-int	nvals
 real	x1, x2
 real	y[nvals]
 real	zval
+size_t	nvals
 
-int	i
+size_t	c_2
+long	i
 real	tkx[2], tky[2], dum
 
 begin
+	c_2 = 2
 	do i = 1, nvals {
 	    call trn32s (x1, y[i], zval, tkx[1], tky[1], dum, 1)
 	    call trn32s (x2, y[i], zval, tkx[2], tky[2], dum, 1)
-	    call gpl (2, tkx[1], tky[1])
+	    call gpl (c_2, tkx[1], tky[1])
 	}
 end
 
@@ -447,10 +485,12 @@ end
 procedure ie_surf_limits (ras, m, floor, ceiling)
 
 real	ras[m]
-int	m
-real	floor, ceiling
+size_t	m
+real	floor
+real	ceiling
+
 real	val1_1			# value at ras[1]
-int	k
+long	k
 bool	const_val		# true if data are constant
 bool	bad_floor		# true if no value is above floor
 bool	bad_ceiling		# true if no value is below ceiling

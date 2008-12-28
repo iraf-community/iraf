@@ -13,13 +13,18 @@ procedure ie_timexam (ie, x, y)
 pointer	ie			# IE pointer
 real	x, y			# Center
 
-int	i, x1, x2, y1, y2, nx, ny
+size_t	sz_val
+int	ii
+long	i, x1, x2, y1, y2
+size_t	nx, ny
 pointer	sp, root, extn, output
 pointer	im, out, data, outbuf, mw
 
-int	clgeti(), fnextn(), iki_validextn(), strlen(), imaccess()
+int	fnextn(), iki_validextn(), strlen(), imaccess()
+long	clgetl()
 pointer	ie_gimage(), ie_gdata(), immap(), impl2r(), mw_open()
 errchk	impl2r
+include	<nullptr.inc>
 
 begin
 	iferr (im = ie_gimage (ie, NO)) {
@@ -28,33 +33,34 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (extn, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (extn, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
 
 	# Get parameters.
 	call clgstr ("output", Memc[root], SZ_FNAME)
-	nx = clgeti ("ncoutput")
-	ny = clgeti ("nloutput")
+	nx = clgetl ("ncoutput")
+	ny = clgetl ("nloutput")
 
 	# Strip the extension.
 	call imgimage (Memc[root], Memc[root], SZ_FNAME)
 	if (Memc[root] == EOS)
 	    call strcpy (IE_IMAGE(ie), Memc[root], SZ_FNAME)
-	i = fnextn (Memc[root], Memc[extn+1], SZ_FNAME)
+	ii = fnextn (Memc[root], Memc[extn+1], SZ_FNAME)
 	Memc[extn] = EOS
-	if (i > 0) {
+	if (ii > 0) {
 	    call iki_init()
 	    if (iki_validextn (0, Memc[extn+1]) != 0) {
-		Memc[root+strlen(Memc[root])-i-1] = EOS
+		Memc[root+strlen(Memc[root])-ii-1] = EOS
 		Memc[extn] = '.'
 	    }
 	}
 
-	do i = 1, ARB {
+	do ii = 1, ARB {
 	    call sprintf (Memc[output], SZ_FNAME, "%s.%03d%s")
 		call pargstr (Memc[root])
-		call pargi (i)
+		call pargi (ii)
 		call pargstr (Memc[extn])
 	    if (imaccess (Memc[output], 0) == NO)
 		break
@@ -89,7 +95,7 @@ begin
 		outbuf = impl2r (out, i-y1+1)
 		call amovr (Memr[data], Memr[outbuf], nx)
 	    }
-	    mw = mw_open (NULL, 2)
+	    mw = mw_open (NULLPTR, 2)
 	    call mw_saveim (mw, out)
 	    call imunmap (out)
 	} then {
@@ -103,18 +109,18 @@ begin
 
 	call printf ("%s[%d:%d,%d:%d] -> %s\n")
 	    call pargstr (IE_IMAGE(ie))
-	    call pargi (x1)
-	    call pargi (x2)
-	    call pargi (y1)
-	    call pargi (y2)
+	    call pargl (x1)
+	    call pargl (x2)
+	    call pargl (y1)
+	    call pargl (y2)
 	    call pargstr (Memc[output])
 	if (IE_LOGFD(ie) != NULL) {
 	    call fprintf (IE_LOGFD(ie), "%s[%d:%d,%d:%d] -> %s\n")
 		call pargstr (IE_IMAGE(ie))
-		call pargi (x1)
-		call pargi (x2)
-		call pargi (y1)
-		call pargi (y2)
+		call pargl (x1)
+		call pargl (x2)
+		call pargl (y1)
+		call pargl (y2)
 	}
 
 	call sfree (sp)

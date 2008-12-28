@@ -10,7 +10,8 @@ procedure ie_print (ie, x, y)
 pointer	ie			# IMEXAM structure
 real	x, y			# Center of box
  
-int	i, j, x1, x2, y1, y2, nx
+long	i, j, x1, x2, y1, y2
+size_t	nx
 pointer	im, data, ie_gimage(), ie_gdata()
  
 begin
@@ -32,13 +33,13 @@ begin
 	call printf ("%4w") 
 	do i = x1, x2 {
 	    call printf (" %4d ")
-		call pargi (i)
+		call pargl (i)
 	}
 	call printf ("\n")
  
 	do j = y2, y1, -1 {
 	    call printf ("%4d")
-		call pargi (j)
+		call pargl (j)
 	    do i = x1, x2 {
 		call printf (" %5g")
 		    call pargr (Memr[data+(j-y1)*nx+(i-x1)])
@@ -50,13 +51,13 @@ begin
 	    call fprintf (IE_LOGFD(ie), "%4w") 
 	    do i = x1, x2 {
 	        call fprintf (IE_LOGFD(ie), " %4d ")
-		    call pargi (i)
+		    call pargl (i)
 	    }
 	    call fprintf (IE_LOGFD(ie), "\n")
  
 	    do j = y2, y1, -1 {
 	        call fprintf (IE_LOGFD(ie), "%4d")
-		    call pargi (j)
+		    call pargl (j)
 	        do i = x1, x2 {
 		    call fprintf (IE_LOGFD(ie), " %5g")
 			call pargr (Memr[data+(j-y1)*nx+(i-x1)])

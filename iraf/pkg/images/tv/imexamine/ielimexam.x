@@ -15,11 +15,13 @@ int	mode		# Mode
 pointer	ie		# Structure pointer
 real	y		# Line
 
+size_t	sz_val
 real	yavg, junk
-int	i, x1, x2, y1, y2, nx, ny, npts
+long	i, x1, x2, y1, y2
+size_t	nx, ny, npts
 pointer	sp, title, im, data, ptr, xp, yp
 
-int	clgpseti()
+long	clgpsetl()
 pointer	clopset(), ie_gimage(), ie_gdata()
 
 begin
@@ -35,9 +37,9 @@ begin
 	if (!IS_INDEF(y))
 	    IE_Y1(ie) = y
 
-	ny = clgpseti (IE_PP(ie), "naverage")
-	x1 = INDEFI
-	x2 = INDEFI
+	ny = clgpsetl (IE_PP(ie), "naverage")
+	x1 = INDEFL
+	x2 = INDEFL
 	y1 = IE_Y1(ie) - (ny - 1) / 2 + 0.5
 	y2 = IE_Y1(ie) + ny / 2 + 0.5
 	yavg = (y1 + y2) / 2.
@@ -50,7 +52,8 @@ begin
 	npts = nx * ny
 
 	call smark (sp)
-	call salloc (title, IE_SZTITLE, TY_CHAR)
+	sz_val = IE_SZTITLE
+	call salloc (title, sz_val, TY_CHAR)
 	call salloc (xp, nx, TY_REAL)
 
 	do i = 1, nx
@@ -70,8 +73,8 @@ begin
 
 	call sprintf (Memc[title], IE_SZTITLE, "%s: Lines %d - %d\n%s")
 	    call pargstr (IE_IMNAME(ie))
-	    call pargi (y1)
-	    call pargi (y2)
+	    call pargl (y1)
+	    call pargl (y2)
 	    call pargstr (IM_TITLE(im))
 
 	call ie_graph (gp, mode, IE_PP(ie), Memc[title], Memr[xp],

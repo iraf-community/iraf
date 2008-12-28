@@ -23,7 +23,8 @@ int	maxch			#I max chars out
  
 char	ch
 real	x1, y1, x2, y2, dx, dy, r, cosa, sina
-int	temp, k[2], nitems, wcs, ip, i
+int	k[2], nitems, wcs, ip, i
+long	temp
 
 bool	streq()
 char	clgetc()

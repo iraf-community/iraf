@@ -35,10 +35,14 @@ pointer	sfd			#I Object pointer
 pointer	im			#I Image pointer
 
 long	lseed
-int	i, j, k, x1, x2, y1, y2, nx, ny, npts
+long	i, j, k, x1, x2, y1, y2
+size_t	nx, ny, npts
 real	radius, buffer, width, xc, yc, xlast, ylast, r1, r2
-real	mean, sum, sum1, sum2, sum3, asumr(), urand()
-pointer	data, ptr, imgs2r()
+real	mean, sum, sum1, sum2, sum3
+pointer	data, ptr
+real	asumr(), urand()
+long	nint_rl()
+pointer	imgs2r()
 errchk	imgs2r
 
 begin
@@ -58,11 +62,11 @@ begin
 	    xlast = xc
 	    ylast = yc
 
-	    x1 = max (1-NBNDRYPIX, nint (xc - r2))
-	    x2 = min (IM_LEN(im,1)+NBNDRYPIX, nint (xc + r2))
+	    x1 = max (1-NBNDRYPIX, nint_rl(xc - r2))
+	    x2 = min (IM_LEN(im,1)+NBNDRYPIX, nint_rl(xc + r2))
 	    nx = x2 - x1 + 1
-	    y1 = max (1-NBNDRYPIX, nint (yc - r2))
-	    y2 = min (IM_LEN(im,2)+NBNDRYPIX, nint (yc + r2))
+	    y1 = max (1-NBNDRYPIX, nint_rl(yc - r2))
+	    y2 = min (IM_LEN(im,2)+NBNDRYPIX, nint_rl(yc + r2))
 	    ny = y2 - y1 + 1
 	    npts = nx * ny
 	    data = imgs2r (im, x1, x2, y1, y2)
@@ -119,17 +123,17 @@ begin
 	    if (yc - ylast > 0.2 * ny)
 		yc = ylast + 0.2 * ny
 
-	    if (nint(xc) == nint(xlast) && nint(yc) == nint(ylast))
+	    if (nint_rl(xc) == nint_rl(xlast) && nint_rl(yc) == nint_rl(ylast))
 		break
 	}
 
 	# Get a new centered raster if necessary.
-	if (nint(xc) != nint(xlast) || nint(yc) != nint(ylast) || r2 < r1) {
-	    x1 = max (1-NBNDRYPIX, nint (xc - r1))
-	    x2 = min (IM_LEN(im,1)+NBNDRYPIX, nint (xc + r1))
+	if (nint_rl(xc) != nint_rl(xlast) || nint_rl(yc) != nint_rl(ylast) || r2 < r1) {
+	    x1 = max (1-NBNDRYPIX, nint_rl(xc - r1))
+	    x2 = min (IM_LEN(im,1)+NBNDRYPIX, nint_rl(xc + r1))
 	    nx = x2 - x1 + 1
-	    y1 = max (1-NBNDRYPIX, nint (yc - r1))
-	    y2 = min (IM_LEN(im,2)+NBNDRYPIX, nint (yc + r1))
+	    y1 = max (1-NBNDRYPIX, nint_rl(yc - r1))
+	    y2 = min (IM_LEN(im,2)+NBNDRYPIX, nint_rl(yc + r1))
 	    ny = y2 - y1 + 1
 	    npts = nx * ny
 	    data = imgs2r (im, x1, x2, y1, y2)
@@ -164,7 +168,8 @@ procedure stf_bkgd (sf, sfd)
 pointer	sf			#I Parameter structure
 pointer	sfd			#I Star structure
 
-int	i, j, x1, x2, y1, y2, xc, yc, nx, ny, npts, ns, nsat
+long	i, j, x1, x2, y1, y2, xc, yc
+size_t	nx, ny, npts, ns, nsat
 real	sat, bkgd, miso
 real	r, r1, r2, r3, dx, dy, dz
 pointer	sp, data, bdata, ptr
@@ -251,14 +256,16 @@ procedure stf_profile (sf, sfd)
 pointer	sf			#I Parameter structure
 pointer	sfd			#I Star structure
 
-int	np
+size_t	np
 real	radius, xc, yc
 
-int	i, j, k, l, m, ns, nx, ny, x1, x2, y1, y2
+long	i, j, k, l, m, x1, x2, y1, y2, ns
+size_t	nx, ny
 real	bkgd, miso, sigma, peak
 real	r, r1, r2, r3, dx, dy, dx1, dx2, dy1, dy2, dz, xx, yy, xy, ds, da
 pointer	sp, data, profile, ptr, asi, msi, gs
 int	stf_r2n()
+long	nint_rl()
 real	asieval(), msieval(), gseval(), stf_i2r(), stf_r2i()
 errchk	asiinit, asifit, msiinit, msifit, gsrestore
 
@@ -413,8 +420,8 @@ begin
 	if (sigma < 5.) {
 	    if (sigma <= 2.) {
 		call gsrestore (gs, gsdata)
-		dx = xc - nint (xc)
-		dy = yc - nint (yc)
+		dx = xc - nint_rl(xc)
+		dy = yc - nint_rl(yc)
 		r = sqrt (dx * dx + dy * dy)
 		dx = 1.
 		ds = abs (sigma - gseval (gs, r, dx))
@@ -433,8 +440,8 @@ begin
 	    sigma = sigma * sigma
 
 	    # Compute the peak that gives the correct central pixel value.
-	    i = nint (xc)
-	    j = nint (yc)
+	    i = nint_rl(xc)
+	    j = nint_rl(yc)
 	    dx = i - xc
 	    dy = j - yc
 	    r = sqrt (dx * dx + dy * dy)
@@ -649,10 +656,10 @@ pointer	sfd			#I Star structure
 real	x			#I Radius
 real	y			#I Flux
 
-int	npmax, np
+size_t	npmax, np
 pointer	asi
 
-int	i, j, k
+long	i, j, k
 real	r, r1, r2, dx, dy
 pointer	sp, profile
 real	asieval(), stf_i2r(), stf_r2i()
@@ -903,7 +910,7 @@ procedure stf_dfwhm (sf, sfd)
 pointer	sf			#I Main data structure
 pointer	sfd			#I Star data structure
 
-int	np
+size_t	np
 real	r, rpeak, profile, peak, asieval(), stf_i2r()
 pointer	asi
 
@@ -963,7 +970,7 @@ pointer	sfd			#I Star data structure
 real	level			#I Level to measure
 real	r			#O Radius
 
-int	np
+size_t	np
 pointer	asi
 real	f, fmax, rmax, asieval(), stf_i2r()
 
@@ -996,7 +1003,11 @@ procedure stf_fit (sf, sfd)
 pointer	sf			#I Main data structure
 pointer	sfd			#I Star data structure
 
-int	i, j, n, np, pfit[2]
+size_t	sz_val
+size_t	np
+int	ii
+long	i, j, n
+long	pfit[2]
 real	beta, z, params[3]
 pointer	asi, nl
 pointer	sp, x, y, w
@@ -1036,11 +1047,12 @@ begin
 	np = 1
 	params[2] = Memr[x+j] / sqrt (2. * log (1./min(0.99,Memr[y+j])))
 	params[1] = 1
+	sz_val = 2
 	call nlinitr (nl, locpr (stf_gauss1), locpr (stf_gauss2),
-	    params, params, 2, pfit, np, .001, 100)
-	call nlfitr (nl, Memr[x], Memr[y], Memr[w], n, 1, WTS_USER, i)
-	if (i != SINGULAR && i != NO_DEG_FREEDOM) {
-	    call nlpgetr (nl, params, i)
+	    params, params, sz_val, pfit, np, .001, 100)
+	call nlfitr (nl, Memr[x], Memr[y], Memr[w], n, 1, WTS_USER, ii)
+	if (ii != SINGULAR && ii != NO_DEG_FREEDOM) {
+	    call nlpgetr (nl, params, sz_val)
 	    if (params[2] < 0.)
 		params[2] = Memr[x+j] / sqrt (2. * log (1./min(0.99,Memr[y+j])))
 	}
@@ -1064,11 +1076,12 @@ begin
 	params[3] = 1 - beta
 	params[2] = Memr[x+j] / sqrt (min(0.99,Memr[y+j])**(1./params[3]) - 1.)
 	params[1] = 1
+	sz_val = 3
 	call nlinitr (nl, locpr (stf_moffat1), locpr (stf_moffat2),
-	    params, params, 3, pfit, np, .001, 100)
-	call nlfitr (nl, Memr[x], Memr[y], Memr[w], n, 1, WTS_USER, i)
-	if (i != SINGULAR && i != NO_DEG_FREEDOM) {
-	    call nlpgetr (nl, params, i)
+	    params, params, sz_val, pfit, np, .001, 100)
+	call nlfitr (nl, Memr[x], Memr[y], Memr[w], n, 1, WTS_USER, ii)
+	if (ii != SINGULAR && ii != NO_DEG_FREEDOM) {
+	    call nlpgetr (nl, params, sz_val)
 	    if (params[2] < 0.) {
 		params[3] = 1. - beta
 		params[2] = Memr[x+j] /
@@ -1092,7 +1105,7 @@ procedure stf_gauss1 (x, nvars, p, np, z)
 real	x[nvars]		#I Input variables
 int	nvars			#I Number of variables
 real	p[np]			#I Parameter vector
-int	np			#I Number of parameters
+size_t	np			#I Number of parameters
 real	z			#O Function return
 
 real	r2
@@ -1115,7 +1128,7 @@ real	x[nvars]		#I Input variables
 int	nvars			#I Number of variables
 real	p[np]			#I Parameter vector
 real	dp[np]			#I Dummy array of parameters increments
-int	np			#I Number of parameters
+size_t	np			#I Number of parameters
 real	z			#O Function return
 real	der[np]			#O Derivatives
 
@@ -1143,7 +1156,7 @@ procedure stf_moffat1 (x, nvars, p, np, z)
 real	x[nvars]		#I Input variables
 int	nvars			#I Number of variables
 real	p[np]			#I Parameter vector
-int	np			#I Number of parameters
+size_t	np			#I Number of parameters
 real	z			#O Function return
 
 real	y
@@ -1167,7 +1180,7 @@ real	x[nvars]		#I Input variables
 int	nvars			#I Number of variables
 real	p[np]			#I Parameter vector
 real	dp[np]			#I Dummy array of parameters increments
-int	np			#I Number of parameters
+size_t	np			#I Number of parameters
 real	z			#O Function return
 real	der[np]			#O Derivatives
 
