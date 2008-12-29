@@ -106,9 +106,9 @@ define	LL_BLENHI	$1[7]		# length of LL buffer
 # Handy line list macros.
 define	LL_NREF		(int(LL_NREFS($1)))
 define	LL_BLEN		((int(LL_BLENHI($1)))*32768+(int(LL_BLENLO($1))))
-define	LL_SETBLEN	LL_BLENLO($1)=modi($2,32768); LL_BLENHI($1)=($2)/32768
+define	LL_SETBLEN	LL_BLENLO($1)=imod($2,32768); LL_BLENHI($1)=($2)/32768
 define	LL_LEN		((int(LL_LENHI($1)))*32768+(int(LL_LENLO($1))))
-define	LL_SETLEN	LL_LENLO($1)=modi($2,32768); LL_LENHI($1)=($2)/32768
+define	LL_SETLEN	LL_LENLO($1)=imod($2,32768); LL_LENHI($1)=($2)/32768
 define	LL_FIRST	(LL_HDRLEN($1)+1)
 
 # Line list definitions (accessed as a short integer pointer).
@@ -123,9 +123,9 @@ define	LP_BLENHI	Mems[$1+6]	# length of LL buffer
 # Handy line list pointer macros.
 define	LP_NREF		(int(LP_NREFS($1)))
 define	LP_BLEN		(int(LP_BLENHI($1))*32768+int(LP_BLENLO($1)))
-define	LP_SETBLEN	LP_BLENLO($1)=modi($2,32768); LP_BLENHI($1)=($2)/32768
+define	LP_SETBLEN	LP_BLENLO($1)=imod($2,32768); LP_BLENHI($1)=($2)/32768
 define	LP_LEN		(int(LP_LENHI($1))*32768+int(LP_LENLO($1)))
-define	LP_SETLEN	LP_LENLO($1)=modi($2,32768); LP_LENHI($1)=($2)/32768
+define	LP_SETLEN	LP_LENLO($1)=imod($2,32768); LP_LENHI($1)=($2)/32768
 define	LP_FIRST	(($1)+LP_HDRLEN($1))
 
 
