@@ -50,15 +50,15 @@ long	lval
 pointer	sp, offsets, line
 int	in
 long	linenum, index, noffsets, nlines_in_file
-int	open(), getline(), absi()
-long	note(), modl()
+int	open(), getline()
+long	note(), lmod()
 errchk	open, getline, putline, note
 
 begin
 	if (nlines == 0)
 	    return
 	else
-	    noffsets = absi (nlines) + 1
+	    noffsets = iabs (nlines) + 1
 
 	call smark (sp)
 	sz_val = SZ_LINE
@@ -84,7 +84,7 @@ begin
 	    if (nlines < 0 && linenum > -nlines)
 		break
 	    else if (nlines > 0) {
-		index = modl (linenum - 1, noffsets)
+		index = lmod (linenum - 1, noffsets)
 		Meml[offsets+index] = note (in)
 	    }
 	} until (getline (in, Memc[line]) == EOF)
@@ -97,7 +97,7 @@ begin
 		lval = BOFL
 		call seek (in, lval)
 	    } else {
-		index = modl (nlines_in_file - nlines, noffsets)
+		index = lmod (nlines_in_file - nlines, noffsets)
 		call seek (in, Meml[offsets+index])
 	    }
 

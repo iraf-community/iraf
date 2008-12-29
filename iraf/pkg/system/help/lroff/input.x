@@ -29,7 +29,7 @@ bool	standout_mode_in_effect
 char	ch
 int	len_inputline, ocol
 pointer	sp, lbuf, ip, op
-int	stridx(), in(), modi()
+int	stridx(), in(), imod()
 errchk	salloc, in
 include	"lroff.com"
 
@@ -100,7 +100,7 @@ begin
 		    op = op + 1
 		    ocol = ocol + 1
 		    len_inputline = len_inputline + 1
-		} until (ocol > 1 && modi (ocol, TABSIZE) == 0)
+		} until (ocol > 1 && imod (ocol, TABSIZE) == 0)
 		ip = ip + 1
 		next
 

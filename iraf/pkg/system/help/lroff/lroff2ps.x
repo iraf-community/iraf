@@ -448,7 +448,7 @@ char   line[ARB], outline[ARB]
 int    maxch
 
 int	ip, op
-int	modi()
+int	imod()
 
 begin
         ip = 1
@@ -459,7 +459,7 @@ begin
                 repeat {
                     outline[op] = ' '
                     op = op + 1
-                } until (modi(op,8) == 0 || op > maxch)
+                } until (imod(op,8) == 0 || op > maxch)
                 ip = ip + 1
             } else {
                 outline[op] = line [ip]
