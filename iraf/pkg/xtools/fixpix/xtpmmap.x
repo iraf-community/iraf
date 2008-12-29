@@ -585,8 +585,7 @@ pointer	pm, pmnew, imnew, mw, ctx, cty, bufref, bufpm
 pointer	imstatp()
 pointer	pm_open(), mw_openim(), im_pmmapo(), imgl1i(), mw_sctran()
 bool	pm_empty(), pm_linenotempty()
-int	nint_di()
-long	nint_dl()
+long	ldnint()
 include	<nullptr.inc>
 errchk	pm_open, mw_openim, im_pmmapo
 
@@ -658,12 +657,12 @@ begin
 	# Compute region of mask overlapping the reference image.
 	call mw_ctrand (ctx, 1-0.5D0, x1, 1)
 	call mw_ctrand (ctx, nc+0.5D0, x2, 1)
-	i1 = max (1, nint_dl(min(x1,x2)+1D-5))
-	i2 = min (ncpm, nint_dl(max(x1,x2)-1D-5))
+	i1 = max (1, ldnint(min(x1,x2)+1D-5))
+	i2 = min (ncpm, ldnint(max(x1,x2)-1D-5))
 	call mw_ctrand (cty, 1-0.5D0, y1, 1)
 	call mw_ctrand (cty, nl+0.5D0, y2, 1)
-	j1 = max (1, nint_dl(min(y1,y2)+1D-5))
-	j2 = min (nlpm, nint_dl(max(y1,y2)-1D-5))
+	j1 = max (1, ldnint(min(y1,y2)+1D-5))
+	j2 = min (nlpm, ldnint(max(y1,y2)-1D-5))
 
 	# Set the new mask values to the maximum of all mask values falling
 	# within each reference pixel in the overlap region.
@@ -676,8 +675,8 @@ begin
 	    # padding.  In this case use range lists for speed.
 	    if (lt[1] == 1D0 && lt[4] == 1D0) {
 		call malloc (bufpm, 3+3*nc, TY_INT)
-		ik = nint_di (lt[5])
-		il = nint_di (lt[6])
+		ik = idnint (lt[5])
+		il = idnint (lt[6])
 		do j = max(1-il,j1), min(nl-il,j2) {
 		    vold[2] = j
 		    call pmglri (pm, vold, Memi[bufpm], 0, nc, PIX_SRC)
@@ -701,8 +700,8 @@ begin
 		do j = 1, nl {
 		    call mw_ctrand (cty, j-0.5D0, y1, 1)
 		    call mw_ctrand (cty, j+0.5D0, y2, 1)
-		    j1 = max (1, nint_dl(min(y1,y2)+1D-5))
-		    j2 = min (nlpm, nint_dl(max(y1,y2)-1D-5))
+		    j1 = max (1, ldnint(min(y1,y2)+1D-5))
+		    j2 = min (nlpm, ldnint(max(y1,y2)-1D-5))
 		    if (j2 < j1)
 			next
 
@@ -716,8 +715,8 @@ begin
 			do i = 1, nc {
 			    call mw_ctrand (ctx, i-0.5D0, x1, 1)
 			    call mw_ctrand (ctx, i+0.5D0, x2, 1)
-			    i1 = max (1, nint_dl(min(x1,x2)+1D-5))
-			    i2 = min (ncpm, nint_dl(max(x1,x2)-1D-5))
+			    i1 = max (1, ldnint(min(x1,x2)+1D-5))
+			    i2 = min (ncpm, ldnint(max(x1,x2)-1D-5))
 			    if (i2 < i1)
 				next
 			    val = Memi[bufref+i-1]

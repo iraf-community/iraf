@@ -118,7 +118,7 @@ bool	erase		# Erase?
  
 real	zoom
 long	nc, nl, nx, ny, zx, zy, x1, x2, y1, y2
-long	absl()
+long	labs()
 data	zoom/1./
 
 begin
@@ -130,8 +130,8 @@ begin
 	case 'E':
 	    nc = IM_LEN(EP_IM(ep),1)
 	    nl = IM_LEN(EP_IM(ep),2)
-	    nx = absl(xa - xb) + 1
-	    ny = absl(ya - yb) + 1
+	    nx = labs(xa - xb) + 1
+	    ny = labs(ya - yb) + 1
 	    zoom = max (1., min (nc / real (nx), nl / real (ny)))
 	    zx = (xa + xb) / 2.
 	    zy = (ya + yb) / 2.

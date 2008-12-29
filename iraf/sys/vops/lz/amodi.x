@@ -6,9 +6,9 @@ procedure amodi (a, b, c, npix)
 
 int	a[ARB], b[ARB], c[ARB]
 size_t	npix, i
-int	modi()
+int	imod()
 
 begin
 	do i = 1, npix
-	    c[i] = modi (a[i], b[i])
+	    c[i] = imod (a[i], b[i])
 end

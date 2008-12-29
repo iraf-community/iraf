@@ -21,7 +21,7 @@ real	a, b, c, d, e
 pointer	sp, buf
 int	nitems, wcs, ip
 int	ctor(), clglstr(), clgcur()
-long	absl(), nint_rl()
+long	labs(), lnint()
 
 begin
 	# FIXPIX format consists of a rectangle with column and line ranges.
@@ -56,10 +56,10 @@ begin
 	    e = max (c, d)
 	    c = min (c, d)
 	    d = e
-	    x1 = nint_rl(a)
-	    y1 = nint_rl(c)
-	    x2 = nint_rl(b)
-	    y2 = nint_rl(d)
+	    x1 = lnint(a)
+	    y1 = lnint(c)
+	    x2 = lnint(b)
+	    y2 = lnint(d)
 	    ap = APRECTANGLE
 	    if (x2 - x1 <= y2 - y1)
 		key = 'c'
@@ -83,15 +83,15 @@ begin
 	    nitems = clgcur ("cursor", c, d, wcs, key, strval, SZ_LINE)
 	    call printf ("\n")
 	    if (!IS_INDEF(a))
-	        x1 = nint_rl(a)
+	        x1 = lnint(a)
 	    if (!IS_INDEF(b))
-	        y1 = nint_rl(b)
+	        y1 = lnint(b)
 	    if (!IS_INDEF(c))
-	        x2 = nint_rl(c)
+	        x2 = lnint(c)
 	    if (!IS_INDEF(d))
-	        y2 = nint_rl(d)
+	        y2 = lnint(d)
 	    if (key == 'f' || key == 'v') {
-	        if (absl(x2-x1) > absl(y2-y1))
+	        if (labs(x2-x1) > labs(y2-y1))
 	            ap = APLDIAG
 	        else
 	            ap = APCDIAG
@@ -99,12 +99,12 @@ begin
 	        ap = APRECTANGLE
 	case 'b', 'e', 'k', 'm', 'n', 'p', 's', ' ':
 	    if (!IS_INDEF(a)) {
-	        x1 = nint_rl(a - EP_RADIUS(ep))
-	        x2 = nint_rl(a + EP_RADIUS(ep))
+	        x1 = lnint(a - EP_RADIUS(ep))
+	        x2 = lnint(a + EP_RADIUS(ep))
 	    }
 	    if (!IS_INDEF(b)) {
-	        y1 = nint_rl(b - EP_RADIUS(ep))
-	        y2 = nint_rl(b + EP_RADIUS(ep))
+	        y1 = lnint(b - EP_RADIUS(ep))
+	        y2 = lnint(b + EP_RADIUS(ep))
 	    }
 	    ap = EP_APERTURE(ep)
 	case 'E':
@@ -112,18 +112,18 @@ begin
 	    nitems = clgcur ("cursor", c, d, wcs, key, strval, SZ_LINE)
 	    call printf ("\n")
 	    if (!IS_INDEF(a))
-	        x1 = nint_rl(a)
+	        x1 = lnint(a)
 	    if (!IS_INDEF(b))
-	        y1 = nint_rl(b)
+	        y1 = lnint(b)
 	    if (!IS_INDEF(c))
-	        x2 = nint_rl(c)
+	        x2 = lnint(c)
 	    if (!IS_INDEF(d))
-	        y2 = nint_rl(d)
+	        y2 = lnint(d)
 	default:
 	    if (!IS_INDEF(a))
-	        x1 = nint_rl(a)
+	        x1 = lnint(a)
 	    if (!IS_INDEF(b))
-	        y1 = nint_rl(b)
+	        y1 = lnint(b)
 	}
 
 	return (nitems)

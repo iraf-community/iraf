@@ -22,8 +22,7 @@ pointer	tempbuf, buf
 real	linemax, linemin, lirafmin, lirafmax
 double	dblank
 
-int	absi()
-long	clktime(), fstatl(), modl()
+long	clktime(), fstatl(), lmod()
 long	rft_init_read_pixels(), rft_read_pixels()
 
 errchk	malloc, mfree, rft_init_read_pixels, rft_read_pixels, rft_lscale_pix
@@ -54,10 +53,10 @@ begin
 	# Compute the number of pixels per record and the number of records
 	# per output block.
 
-	npix_record = len_record * FITS_BYTE / absi(BITPIX(fits))
+	npix_record = len_record * FITS_BYTE / iabs(BITPIX(fits))
 	blksize = fstatl (fits_fd, F_SZBBLK)
 	l_val = FITS_RECORD
-	if (modl(blksize, l_val) == 0)
+	if (lmod(blksize, l_val) == 0)
 	    blksize = blksize / FITS_RECORD
 	else
 	    blksize = 1

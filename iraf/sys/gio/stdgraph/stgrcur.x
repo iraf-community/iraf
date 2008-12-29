@@ -235,7 +235,7 @@ pointer	decodecur, delimcur, pattern, patbuf, sp, otop, pp
 int	len_pattern, len_curval, sv_iomode, nchars, ip, op, i1, i2, ch
 
 bool	ttygetb()
-int	getci(), stg_encode(), absi()
+int	getci(), stg_encode()
 int	ttygets(), ttygeti(), gstrcpy(), gpatmatch(), patmake(), fstati()
 include	"stdgraph.com"
 define	quit_ 91
@@ -324,7 +324,7 @@ begin
 		    # the case of a fixed length cursor value), or the entire
 		    # cursor string (which may then be variable length).
 
-		    if (op < absi(len_curval))
+		    if (op < iabs(len_curval))
 			next
 		    else if (gpatmatch (g_mem[1], Memc[patbuf], i1,i2) > 0) {
 			if (len_curval > 0)
@@ -351,7 +351,7 @@ begin
 	    if (op > MAX_LENCUR)
 		op = -1
 
-	} until (op >= absi(len_curval) || len_curval == 0)
+	} until (op >= iabs(len_curval) || len_curval == 0)
 
 	# Decode the cursor value string and return the position and key
 	# as output values.  Return the cursor position in GKI coordinates.

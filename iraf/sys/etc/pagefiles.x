@@ -271,7 +271,7 @@ long	note()
 pointer	lno_open()
 bool	streq(), ttygetb()
 int	pg_getcmd(), ctoi(), strncmp(), patmake(), patmatch(), pg_peekcmd()
-int	open(), finfo(), strlen(), pg_getline(), getci(), modi()
+int	open(), finfo(), strlen(), pg_getline(), getci(), imod()
 int	lno_fetch(), fstati(), ttyctrl()
 data	first_call /true/
 
@@ -455,7 +455,7 @@ begin
 			n = n + 1
 		    else if (ch == '\t') {
 			n = n + 1
-			while (modi (n-1, 8) != 0)
+			while (imod (n-1, 8) != 0)
 			    n = n + 1
 		    }
 

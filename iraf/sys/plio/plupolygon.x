@@ -26,7 +26,7 @@ real	tempr, y, y1, y2, x1, x2, p1, p2, p_y, n_y
 
 int	btoi()
 bool	plr_equali()
-long	nint_rl()
+long	lnint()
 define	done_ 91
 
 begin
@@ -90,8 +90,8 @@ begin
 		    cross = (((p_y - y) * (n_y - y)) < 0)
 		}
 
-		i1 = max(1, min(axlen, nint_rl(p1)))
-		i2 = max(1, min(axlen, nint_rl(p2)))
+		i1 = max(1, min(axlen, lnint(p1)))
+		i2 = max(1, min(axlen, lnint(p2)))
 		if (i1 > i2)
 		    swapl (i1, i2)
 

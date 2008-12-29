@@ -15,7 +15,7 @@ size_t	len
 int	flags
 
 int	strlen()
-long	modl()
+long	lmod()
 
 begin
 	# Check to see that we have the correct number of expressions to
@@ -35,7 +35,7 @@ begin
 	# If we have an odd number of pixels we can't correctly write the
 	# last column to the file, so truncate the column in the output image.
 	l_val = 2
-        if (modl(EX_NCOLS(ex),l_val) == 1)
+        if (lmod(EX_NCOLS(ex),l_val) == 1)
             EX_OCOLS(ex) = EX_OCOLS(ex) - 1
 
         call sprintf (Memc[hdr], SZ_LINE, "P6\n%-6d  %-6d\n255\n")

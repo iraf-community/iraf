@@ -618,7 +618,7 @@ pointer	imstatp()
 int	maskcolor()
 pointer	ds_pmmap(), imps2s(), imps2r()
 pointer	sigm2s(), sigm2i(), sigm2r(), sigm2_setup()
-long	nint_rl()
+long	lnint()
 errchk	ds_pmmap, imps2s, imps2r, sigm2s, sigm2i, sigm2r, sigm2_setup
 errchk	maskexprn
 include	<nullptr.inc>
@@ -633,10 +633,10 @@ begin
 	px2 = nint (W_XE(wipix))
 	py1 = nint (W_YS(wipix))
 	py2 = nint (W_YE(wipix))
-	wx1 = nint_rl (W_XS(wdpix))
-	wx2 = nint_rl (W_XE(wdpix))
-	wy1 = nint_rl (W_YS(wdpix))
-	wy2 = nint_rl (W_YE(wdpix))
+	wx1 = lnint (W_XS(wdpix))
+	wx2 = lnint (W_XE(wdpix))
+	wy1 = lnint (W_YS(wdpix))
+	wy2 = lnint (W_YE(wdpix))
 
 	z1 = W_ZS(wdwin)
 	z2 = W_ZE(wdwin)
@@ -883,7 +883,7 @@ long	dx1,dx2,dy1,dy2		# coords of full display window in device pixels
 long	i
 size_t	nx
 pointer	wdwin, wdpix
-long	nint_rl()
+long	lnint()
 pointer	imps2s()
 errchk	imps2s
 
@@ -892,14 +892,14 @@ begin
 	wdpix = W_WC(wdes,W_DPIX)
 
 	# Set display pixels and display window pixels.
-	wx1 = nint_rl (W_XS(wdpix))
-	wx2 = nint_rl (W_XE(wdpix))
-	wy1 = nint_rl (W_YS(wdpix))
-	wy2 = nint_rl (W_YE(wdpix))
-	dx1 = max (1, nint_rl (W_XS(wdwin)))
-	dx2 = min (IM_LEN(ds,1), nint_rl (W_XE(wdwin) - 0.01))
-	dy1 = max (1, nint_rl (W_YS(wdwin)))
-	dy2 = min (IM_LEN(ds,2), nint_rl (W_YE(wdwin) - 0.01))
+	wx1 = lnint (W_XS(wdpix))
+	wx2 = lnint (W_XE(wdpix))
+	wy1 = lnint (W_YS(wdpix))
+	wy2 = lnint (W_YE(wdpix))
+	dx1 = max (1, lnint (W_XS(wdwin)))
+	dx2 = min (IM_LEN(ds,1), lnint (W_XE(wdwin) - 0.01))
+	dy1 = max (1, lnint (W_YS(wdwin)))
+	dy2 = min (IM_LEN(ds,2), lnint (W_YE(wdwin) - 0.01))
 	nx = dx2 - dx1 + 1
 
 	# Erase lower margin.

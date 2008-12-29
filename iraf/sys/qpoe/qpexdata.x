@@ -322,13 +322,13 @@ pointer	op, top
 long	lp, lval
 pointer	coerce()
 int	sizeof()
-long	modl()
+long	lmod()
 errchk	syserr
 
 begin
 	lp = EX_DBOP(ex)
 	lval = SZ_DOUBLE
-	while (modl (lp-1, lval) != 0)
+	while (lmod (lp-1, lval) != 0)
 	    lp = lp + 1
 	op = lp
 

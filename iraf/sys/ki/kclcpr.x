@@ -14,7 +14,7 @@ int	exit_status		# exit status of the job
 long	lg_val
 int	server, inchan, outchan
 int	ki_sendrcv()
-long	modl()
+long	lmod()
 include	"kichan.com"
 include	"kii.com"
 
@@ -44,7 +44,7 @@ begin
 
 	inchan  = k_status[pid] / MAX_CHANNELS
 	lg_val  = MAX_CHANNELS
-	outchan = modl (k_status[pid], lg_val)
+	outchan = lmod (k_status[pid], lg_val)
 
 	# Free the 3 channel descriptors used by the subprocess.
 	call ki_freechan (pid)

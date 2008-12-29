@@ -28,7 +28,7 @@ pointer	list
 
 bool	clgetb()
 int	btoi(), clgeti(), mtfile(), mtneedfileno(), strlen(), decode_ranges()
-int	fntlenb(), fntgfnb(), fstati(), modi()
+int	fntlenb(), fntgfnb(), fstati(), imod()
 long	get_next_number()
 pointer	fntopnb()
 include "rcardimage.com"
@@ -61,7 +61,7 @@ begin
 	    
 	# Set up the formatting parameters.
 	card_length = min (SZ_LINE, clgeti ("card_length"))
-	if (modi(card_length, SZB_CHAR) != 0)
+	if (imod(card_length, SZB_CHAR) != 0)
 	    call error (2, "A card must contain an even number of characters")
 	max_line_length = min (SZ_LINE, clgeti ("max_line_length"))
 	join = clgetb ("join")

@@ -8,7 +8,7 @@ int   maxch, tabsize
 char  line[ARB], outline[ARB]
 
 int	ip, op, ltab
-int	modi()
+int	imod()
 
 begin
 	op = 1
@@ -18,7 +18,7 @@ begin
 	    ltab = ip
 	    while (line[ltab] == ' ' && op <= maxch) {
 		ltab = ltab + 1
-		if (modi(ltab, tabsize) == 1) {
+		if (imod(ltab, tabsize) == 1) {
 		    outline[op] = '\t'
 		    ip = ltab
 		    op = op + 1

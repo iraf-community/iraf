@@ -337,7 +337,7 @@ real	z1, z2		#O Z transform limits
 long	center_pixel, minpix, lval, c_2
 size_t	ngoodpix, ngrow
 size_t	zsc_fit_line()
-long	modl(), nint_rl()
+long	lmod(), lnint()
 real	zmin, zmax, median
 real	zstart, zslope
 
@@ -364,7 +364,7 @@ begin
 
 	center_pixel = (npix + 1) / 2
 	lval = npix
-	if (modl (lval, c_2) == 1) {
+	if (lmod (lval, c_2) == 1) {
 	    median = sample[center_pixel]
 	} else {
 	    median = (sample[center_pixel] + sample[center_pixel+1]) / 2
@@ -378,7 +378,7 @@ begin
 
 	lval = npix * MAX_REJECT
 	minpix = max (MIN_NPIXELS, lval)
-	ngrow = max (1, nint_rl (npix * .01))
+	ngrow = max (1, lnint (npix * .01))
 	ngoodpix = zsc_fit_line (sample, npix, zstart, zslope,
 	    KREJ, ngrow, MAX_ITERATIONS)
 

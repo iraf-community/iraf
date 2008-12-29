@@ -15,7 +15,7 @@ pointer	pm
 int	i, len_p
 int	x, y, oldx, oldy
 include	"imd.com"
-int	nint_ri()
+int	inint()
 
 begin
 	if (npts <= 0)
@@ -36,7 +36,7 @@ begin
 	    IMD_TYPE(g_kt) = PM_LTYPE(pm)
 	}
 	if (IMD_WIDTH(g_kt) != PM_WIDTH(pm)) {
-	    call idk_linewidth (g_out, nint_ri(GKI_UNPACKREAL(PM_WIDTH(pm))))
+	    call idk_linewidth (g_out, inint(GKI_UNPACKREAL(PM_WIDTH(pm))))
 	    IMD_WIDTH(g_kt) = PM_WIDTH(pm)
 	}
 	if (IMD_COLOR(g_kt) != PM_COLOR(pm)) {

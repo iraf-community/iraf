@@ -18,7 +18,7 @@ int	i, interp_type, nylmin, nylmax, offset
 pointer	xintegrl, ptr
 real	xmin, xmax, ymin, ymax, accum
 real	ii_1dinteg()
-int	modi()
+int	imod()
 
 begin
 	# set up 1D interpolant type to match 2-D interpolant
@@ -62,7 +62,7 @@ begin
 	}
 
 	# find the appropriate range in y in the coeff array
-	offset = modi (MSI_FSTPNT(msi), MSI_NXCOEFF(msi)) 
+	offset = imod (MSI_FSTPNT(msi), MSI_NXCOEFF(msi)) 
 	nylmin = max (1, min (MSI_NYCOEFF(msi), int (ymin + 0.5))) 
 	nylmax = min (MSI_NYCOEFF(msi), max (1, int (ymax + 0.5)))
 	nylmin = nylmin + offset

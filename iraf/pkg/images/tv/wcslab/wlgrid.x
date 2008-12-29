@@ -18,7 +18,7 @@ pointer wd		# I: the WCSLAB descriptor
 size_t	c_1
 double	current, tmp_begin, tmp_end, tmp_minor_interval
 int	old_type, old_n_labels, min_counter
-int	gstati(), modi()
+int	gstati(), imod()
 
 begin
 	c_1 = 1
@@ -52,7 +52,7 @@ begin
 	min_counter = 0
 	repeat {
 
-	    if  (modi (min_counter, WL_MINOR_INTERVAL(wd,AXIS1)) == 0) {
+	    if  (imod (min_counter, WL_MINOR_INTERVAL(wd,AXIS1)) == 0) {
 	        call gseti  (WL_GP(wd), G_PLTYPE, WL_MAJ_LINE_TYPE(wd))
 	        call wl_graph_constant_axis1 (wd, current, tmp_begin, tmp_end, 
 	            WL_MAJ_GRIDON(wd), WL_LABON(wd), WL_MAJ_TICK_SIZE(wd))
@@ -84,7 +84,7 @@ begin
 	min_counter = 0
 	tmp_begin = current 
 	repeat {
-	    if  (modi (min_counter, WL_MINOR_INTERVAL(wd,AXIS2)) == 0) {
+	    if  (imod (min_counter, WL_MINOR_INTERVAL(wd,AXIS2)) == 0) {
 
 	        call gseti  (WL_GP(wd), G_PLTYPE, WL_MAJ_LINE_TYPE(wd))
 	        old_n_labels = WL_N_LABELS(wd)

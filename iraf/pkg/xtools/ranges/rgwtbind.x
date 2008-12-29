@@ -26,7 +26,7 @@ long	i, j, k, l
 size_t	n, npts, ntemp, nsample
 
 double	asumd(), amedd()
-long	absl()
+long	labs()
 
 errchk	rg_packd
 
@@ -39,7 +39,7 @@ begin
 	# If the bin size is exactly one then move the selected input points
 	# to the output array.
 
-	if (absl (nbin) < 2) {
+	if (labs (nbin) < 2) {
 	    call rg_packd (rg, in, out)
 	    call rg_packd (rg, wtin, wtout)
 	    nout = RG_NPTS(rg)
@@ -48,7 +48,7 @@ begin
 
 	# Determine the subranges and take the median or average.
 
-	npts = absl (nbin)
+	npts = labs (nbin)
 	ntemp = 0
 
 	do i = 1, RG_NRGS(rg) {

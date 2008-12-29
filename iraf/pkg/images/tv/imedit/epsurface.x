@@ -38,11 +38,10 @@ begin
 	call gopwk (wkid, DUMMY, gp)
 	call gacwk (wkid)
  
-	# 32-bit limit (sys/gio/ncarutil/srface.f)
-	if ( ncols > MAX_INT ) {
+	if ( ncols > MAX_INT ) {	# limited by sys/gio/ncarutil/srface.f
 	    call error (0, "EP_SURFACE: Too large ncols (32-bit limit)")
 	}
-	if ( nlines > MAX_INT ) {
+	if ( nlines > MAX_INT ) {	# limited by sys/gio/ncarutil/srface.f
 	    call error (0, "EP_SURFACE: Too large nlines (32-bit limit)")
 	}
 	i_val0 = ncols

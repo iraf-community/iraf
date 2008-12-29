@@ -9,7 +9,7 @@ char	key[ARB]		# parameter to be returned
 
 double	dval
 double	imgetd()
-long	nint_dl()
+long	ldnint()
 errchk	imgetd
 
 begin
@@ -17,5 +17,5 @@ begin
 	if (IS_INDEFD(dval))
 	    return (INDEFL)
 	else
-	    return (nint_dl (dval))
+	    return (ldnint (dval))
 end

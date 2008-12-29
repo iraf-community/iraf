@@ -21,7 +21,7 @@ long	imsize, bufoff, blkoff
 long	maxlines, bufsize, szline, nlines
 long	opt_bufsize, max_bufsize, dev_blksize, lval
 int	i
-long	fstatl(), modl()
+long	fstatl(), lmod()
 int	sizeof()
 
 begin
@@ -111,7 +111,7 @@ begin
 	lval = sizeof(IM_PIXTYPE(im))
 	if ((bufsize / szline >= 2 && IM_SECTUSED(im) == NO) &&
 	    (IM_VNBUFS(im) == 1 && IM_VNBNDRYPIX(im) == 0) &&
-	    (modl (IM_PIXOFF(im), lval)) == 1 &&
+	    (lmod (IM_PIXOFF(im), lval)) == 1 &&
 	    IM_SWAP(im) == NO) {
 
 	    IM_FAST(im) = YES

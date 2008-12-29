@@ -7,32 +7,65 @@
 #define import_knames
 #include <iraf.h>
 
-XLONG NINT_RL ( XREAL *v )
+/*
+ * snint(), sdnint(), inint(), lnint() and ldnint()
+ */
+
+XSHORT SNINT ( XREAL *v )
 {
-    return (XLONG)(0 <= *v ? floor(*v + 0.5) : -floor(0.5 - *v));
+    return (XSHORT)(0 <= *v ? (*v + 0.5) : (*v - 0.5));
 }
 
-XLONG NINT_DL ( XDOUBLE *v )
+XSHORT SDNINT ( XDOUBLE *v )
 {
-    return (XLONG)(0 <= *v ? floor(*v + 0.5) : -floor(0.5 - *v));
+    return (XSHORT)(0 <= *v ? (*v + 0.5) : (*v - 0.5));
 }
 
-XINT NINT_RI ( XREAL *v )
+XINT ININT ( XREAL *v )
 {
-    return (XINT)(0 <= *v ? floor(*v + 0.5) : -floor(0.5 - *v));
+    return (XINT)(0 <= *v ? (*v + 0.5) : (*v - 0.5));
 }
 
-XINT NINT_DI ( XDOUBLE *v )
+/* IDNINT() is supported by F77 */
+
+XLONG LNINT ( XREAL *v )
 {
-    return (XINT)(0 <= *v ? floor(*v + 0.5) : -floor(0.5 - *v));
+    return (XLONG)(0 <= *v ? (*v + 0.5) : (*v - 0.5));
 }
 
-XSHORT NINT_RS ( XREAL *v )
+XLONG LDNINT ( XDOUBLE *v )
 {
-    return (XSHORT)(0 <= *v ? floor(*v + 0.5) : -floor(0.5 - *v));
+    return (XLONG)(0 <= *v ? (*v + 0.5) : (*v - 0.5));
 }
 
-XSHORT NINT_DS ( XDOUBLE *v )
+/*
+ * sint(), sdint(), iint(), lint() and ldint()
+ */
+
+XSHORT SINT ( XREAL *v )
 {
-    return (XSHORT)(0 <= *v ? floor(*v + 0.5) : -floor(0.5 - *v));
+    return (XSHORT)(*v);
 }
+
+XSHORT SDINT ( XDOUBLE *v )
+{
+    return (XSHORT)(*v);
+}
+
+XINT IINT ( XREAL *v )
+{
+    return (XINT)(*v);
+}
+
+/* IDINT() is supported by F77 */
+
+XLONG LINT ( XREAL *v )
+{
+    return (XLONG)(*v);
+}
+
+XLONG LDINT ( XDOUBLE *v )
+{
+    return (XLONG)(*v);
+}
+

@@ -29,7 +29,7 @@ int	rft_read_header(), rft_ext_skip()
 int	mtopen(), strlen(), envfind(), ctol()
 bool	strne()
 pointer	immap()
-real	asumi(), nint_ri()
+real	asumi(), inint()
 errchk	smark, sfree, salloc, rft_read_header, rft_read_image, rft_find_eof
 errchk	rft_scan_file, mtopen, immap, imdelete, close, imunmap
 
@@ -84,7 +84,7 @@ begin
 	Meml[axes+1] = file_number
 	call pl_glpi (pl, Meml[axes], Memi[extensions], 1, max_extensions,
 	    PIX_SRC)
-	len_elist = nint_ri (asumi (Memi[extensions], max_extensions))
+	len_elist = inint (asumi (Memi[extensions], max_extensions))
 
 	# Loop over the extensions.
 	ext_count = 1; stat = BOF
@@ -411,7 +411,6 @@ int	i
 size_t	szbuf
 pointer	sp, buf
 real	file_size
-int	absi()
 long	fstatl(), read()
 errchk	read
 
@@ -423,7 +422,7 @@ begin
 	if (IM_NDIM(im) <= 0)
 	    file_size = 0.0
 	else
-	    file_size = file_size * absi(BITPIX(fits)) / FITS_BYTE / 1.0e3
+	    file_size = file_size * iabs(BITPIX(fits)) / FITS_BYTE / 1.0e3
 	if (file_size >= fe)
 	    return
 
@@ -452,8 +451,7 @@ int	i
 size_t	sz_rec
 long	j, blksize, nbits, nblocks, stat
 pointer	buf
-int	absi()
-long	modl(), fstatl(), rft_getbuf()
+long	lmod(), fstatl(), rft_getbuf()
 
 begin
 	# Compute the number of blocks to skip.
@@ -461,14 +459,14 @@ begin
 	do i = 2, NAXIS(im)
 	    nbits = nbits * NAXISN(im,i)
 	nbits = nbits + PCOUNT(fits)
-	nbits = absi(BITPIX(fits)) * GCOUNT(fits) * nbits
+	nbits = iabs(BITPIX(fits)) * GCOUNT(fits) * nbits
 	nblocks = (nbits + 23039) / 23040
 
 	sz_rec = FITS_RECORD / SZB_CHAR
 	call malloc (buf, sz_rec, TY_CHAR)
 	blksize = fstatl (fits_fd, F_SZBBLK)
 	l_val = FITS_RECORD
-        if (modl(blksize, l_val) == 0)
+        if (lmod(blksize, l_val) == 0)
             blksize = blksize / FITS_RECORD
         else
             blksize = 1

@@ -25,7 +25,7 @@ long	x1, x2, y1, y2
 size_t	nx, ny, npts, nbins, nbins1
 pointer	pp, sp, hgm, title, im, data, xp, yp
 
-long	clgpsetl(), nint_rl()
+long	clgpsetl(), lnint()
 real	clgpsetr()
 bool	clgpsetb(), fp_equalr()
 pointer	clopset(), ie_gimage(), ie_gdata()
@@ -99,10 +99,10 @@ begin
 	if (clgpsetb (pp, "autoscale")) {
 	    switch (IM_PIXTYPE(im)) {
 	    case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
-		nlevels = nint_rl(z2) - nint_rl(z1)
-		nwide = max (1, nint_rl(real (nlevels) / real (nbins)))
-		nbins = max (1, nint_rl(real (nlevels) / real (nwide)))
-		z2 = nint_rl(z1) + nbins * nwide
+		nlevels = lnint(z2) - lnint(z1)
+		nwide = max (1, lnint(real (nlevels) / real (nbins)))
+		nbins = max (1, lnint(real (nlevels) / real (nwide)))
+		z2 = lnint(z1) + nbins * nwide
 	    }
 	}
 

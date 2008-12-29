@@ -34,13 +34,13 @@ int	i, ndim
 long	ip, n, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
-long	modl()
+long	lmod()
 
 long	imgnls()
 $if (datatype != s)
 long	imgnl$t()
 $endif
-long	nint_rl()
+long	lnint()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -70,11 +70,11 @@ begin
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
 	    # Convert pixel number to image vector coordinates.
-	    n = npix; ip = nint_rl(p)
+	    n = npix; ip = lnint(p)
 	    do i = ndim, 1, -1 {
 	        n = n / IM_LEN(im,i)
 	        v[i] = 1 + ip / n
-		ip = modl(ip, n)
+		ip = lmod(ip, n)
 	    }
 
 	    # Sample the pixels in the line.
@@ -88,7 +88,7 @@ begin
 		if (imgnl$t (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint_rl(c)
+		    ip = lnint(c)
 		    nreturn = nreturn + 1
 		    sample[nreturn] = Mem$t[buf+ip]
 		    p = p + pstep
@@ -102,7 +102,7 @@ begin
 		if (imgnl$t (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint_rl(c)
+		    ip = lnint(c)
 		    if (Mems[bpmbuf+ip] == 0) {
 			nreturn = nreturn + 1
 			sample[nreturn] = Mem$t[buf+ip]

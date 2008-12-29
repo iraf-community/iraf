@@ -121,7 +121,7 @@ int	szb_pixel, nev
 long	xoff, yoff
 long	ncols, pixel
 int	sizeof(), qpio_readpixs(), qpio_readpixi()
-long	modl()
+long	lmod()
 
 include "qpf.com"
 
@@ -139,11 +139,11 @@ begin
 
 	# Convert boffset, nbytes to vs, ve.
 	pixel = (boffset - 1) / szb_pixel
-	vs[1] = (modl (pixel, ncols)) * xblock + xoff
+	vs[1] = (lmod (pixel, ncols)) * xblock + xoff
 	vs[2] = (pixel / ncols) * yblock + yoff
 
 	pixel = (boffset-1 + nbytes - szb_pixel) / szb_pixel
-	ve[1] = (modl (pixel, ncols)) * xblock + (xblock-1) + xoff
+	ve[1] = (lmod (pixel, ncols)) * xblock + (xblock-1) + xoff
 	ve[2] = (pixel / ncols) * yblock + (yblock-1) + yoff
 
 	# Call readpix to sample image into the output buffer.  Zero the buffer

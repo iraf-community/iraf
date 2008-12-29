@@ -212,14 +212,14 @@ size_t	vector_size                    # I: the number of edge vector points
 
 double	current, interval
 long	i, left_over, offset1, offset2, side_length, lval
-long	modl()
+long	lmod()
 
 begin
 	# Divide the vectors into equal amounts for each side.
 	side_length = vector_size / N_SIDES
 	lval = vector_size
 	i = N_SIDES
-	left_over = modl (lval, i)
+	left_over = lmod (lval, i)
 
 	# Calculate the horizontal components.
 	interval =  (screen_boundary[RIGHT] - screen_boundary[LEFT]) /

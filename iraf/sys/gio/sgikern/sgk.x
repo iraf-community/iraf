@@ -619,7 +619,7 @@ size_t	sz_val
 char	fname[SZ_FNAME]
 int	xshift, yshift, dx, dy
 int	new_x, new_y, x1, y1, x2, y2, n, i
-int	open(), absi()
+int	open()
 errchk	open, close
 include	"sgk.com"
 
@@ -682,7 +682,7 @@ begin
 		xshift = 0
 		yshift = 0
 
-		if (absi(new_x - mf_cx) > absi(new_y - mf_cy)) {
+		if (iabs(new_x - mf_cx) > iabs(new_y - mf_cy)) {
 		    dx = 0
 		    dy = 1
 		} else {
@@ -742,7 +742,6 @@ int	a_x2, a_y2			# end point of line
 real	dydx, dxdy
 long	fbit, wbit, word
 int	wpln, mask, dx, dy, x, y, x1, y1, x2, y2, or()
-int	absi()
 include	"sgk.com"
 
 begin
@@ -752,7 +751,7 @@ begin
 	dx = x2 - x1
 	dy = y2 - y1
 
-	if (absi(dx) > absi(dy)) {
+	if (iabs(dx) > iabs(dy)) {
 	    if (x1 > x2) {
 		x1 = a_x2; x2 = a_x1; dx = -dx
 		y1 = a_y2; y2 = a_y1; dy = -dy

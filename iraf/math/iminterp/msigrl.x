@@ -26,7 +26,7 @@ int	i, interp_type, nylmin, nylmax, offset
 pointer	x1lim, x2lim, xintegrl, ptr
 real	xmin, xmax, ymin, ymax, accum
 real	ii_1dinteg()
-int	modi()
+int	imod()
 
 begin
 	# set up 1D interpolant type
@@ -58,7 +58,7 @@ begin
 	call calloc (xintegrl, sz_val, TY_REAL)
 
 	# offset of first data point from edge of coefficient array
-	offset = modi (MSI_FSTPNT(msi), MSI_NXCOEFF(msi)) 
+	offset = imod (MSI_FSTPNT(msi), MSI_NXCOEFF(msi)) 
 
 	# convert the (x,y) points which describe the polygon into
 	# two arrays of x limits x1lim and x2lim and two y limits ymin and ymax

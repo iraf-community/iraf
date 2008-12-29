@@ -7,13 +7,13 @@ procedure amod$t (a, b, c, npix)
 PIXEL	a[ARB], b[ARB], c[ARB]
 size_t	npix, i
 $if (datatype == sil)
-PIXEL	mod$t()
+PIXEL	$tmod()
 $endif
 
 begin
 $if (datatype == sil)
 	do i = 1, npix
-	    c[i] = mod$t (a[i], b[i])
+	    c[i] = $tmod (a[i], b[i])
 $else
 	do i = 1, npix
 	    c[i] = mod (a[i], b[i])

@@ -411,7 +411,7 @@ long	l_val
 long	i, j, k
 int	ii, val, pix
 int	shifti(), andi()
-long	modl()
+long	lmod()
 
 begin
 	if (merged == YES && nbands > 1) {
@@ -427,7 +427,7 @@ begin
                     case TY_UBYTE:
                         val = Memc[data+k]
 			l_val = 2
-                        if (modl(i,l_val) == 1) {
+                        if (lmod(i,l_val) == 1) {
                             pix = shifti (val, -8)
                         } else {
                             pix = andi (val, 000FFX)
@@ -472,7 +472,7 @@ begin
 		case TY_UBYTE:
 		    val = Memc[data+j]
 		    l_val = 2
-		    if (modl(i,l_val) == 1) {
+		    if (lmod(i,l_val) == 1) {
 			pix = shifti (val, -8)
 		    } else {
 			pix = andi (val, 000FFX)

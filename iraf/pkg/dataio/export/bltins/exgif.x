@@ -70,7 +70,7 @@ int	flags
 
 char	ch[2]
 int	or()
-long	modl()
+long	lmod()
 
 begin
 	c_2 = 2
@@ -119,7 +119,7 @@ begin
 
 	# Write the GIF file terminator and dump the whole thing to disk.
 	l_val = GIF_OFFSET(gif)
-	if (modl(l_val,c_2) == 1) {
+	if (lmod(l_val,c_2) == 1) {
 	    CDATA(gif,GIF_OFFSET(gif)) = '\0'
  	    GIF_OFFSET(gif) = GIF_OFFSET(gif) + 1
 	    ch[1] = ';'

@@ -9,13 +9,13 @@ PIXEL	b
 PIXEL	c[ARB]
 size_t	npix, i
 $if (datatype == sil)
-PIXEL	mod$t()
+PIXEL	$tmod()
 $endif
 
 begin
 $if (datatype == sil)
 	do i = 1, npix
-	    c[i] = mod$t (a[i], b)
+	    c[i] = $tmod (a[i], b)
 $else
 	do i = 1, npix
 	    c[i] = mod (a[i], b)

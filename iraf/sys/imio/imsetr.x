@@ -14,13 +14,13 @@ procedure imsetr (im, param, value)
 pointer	im			#I image descriptor
 int	param			#I parameter to be set
 real	value			#I value of parameter
-int	nint_ri()
+int	inint()
 
 begin
 	switch (param) {
 	case IM_BNDRYPIXVAL:
 	    IM_OOBPIX(im) = value
 	default:
-	    call imseti (im, param, nint_ri(value))
+	    call imseti (im, param, inint(value))
 	}
 end

@@ -24,7 +24,7 @@ PIXEL	fit[ARB]	# array containing fit parameters
 
 size_t	sz_val
 int	curve_type, order
-int	nint_ri(), nint_di()
+int	inint()
 
 errchk malloc
 
@@ -42,9 +42,9 @@ begin
 
 	# set curve_type dependent curve descriptor parameters
 $if (datatype == r)
-	curve_type = nint_ri (CV_SAVETYPE(fit))
+	curve_type = inint (CV_SAVETYPE(fit))
 $else
-	curve_type = nint_di (CV_SAVETYPE(fit))
+	curve_type = idnint (CV_SAVETYPE(fit))
 $endif
 	switch (curve_type) {
 	case CHEBYSHEV, LEGENDRE:

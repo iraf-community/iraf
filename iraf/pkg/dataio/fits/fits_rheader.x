@@ -506,7 +506,7 @@ int	maxch			# maximum number of characters
 char	colon, minus
 int	ip, nchar, fst, lst, deg, min
 real	sec
-int	stridx(), strldx(), strlen(), ctoi(), ctor(), absi()
+int	stridx(), strldx(), strlen(), ctoi(), ctor()
 
 begin
 	# Return if not a FITS string parameter.
@@ -569,13 +569,13 @@ begin
 	if (stridx (minus, str) > 0 || deg < 0 || min < 0 || sec < 0.0) {
 	    call sprintf (str, maxch, "%c%d:%02d:%05.2f")
 		call pargc (minus)
-	        call pargi (absi(deg))
-	        call pargi (absi(min))
+	        call pargi (iabs(deg))
+	        call pargi (iabs(min))
 	        call pargr (abs (sec))
 	} else {
 	    call sprintf (str, maxch, "%2d:%02d:%05.2f")
 	        call pargi (deg)
-	        call pargi (absi(min))
+	        call pargi (iabs(min))
 	        call pargr (abs (sec))
 	}
 
@@ -755,7 +755,6 @@ double	bscale		# FITS scaling parameter
 double	bzero		# FITS offset parameter
 
 bool	rft_equald()
-int	absi()
 include "rfits.com"
 
 begin
@@ -763,7 +762,7 @@ begin
 
         if (data_type == ERR) {
             if (BITPIX(fits) < 0) {
-                if (absi(BITPIX(fits)) <= (SZ_REAL * SZB_CHAR * NBITS_BYTE))
+                if (iabs(BITPIX(fits)) <= (SZ_REAL * SZB_CHAR * NBITS_BYTE))
                     PIXTYPE(im) = TY_REAL
                 else
                     PIXTYPE(im) = TY_DOUBLE

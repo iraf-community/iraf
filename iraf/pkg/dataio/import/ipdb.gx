@@ -150,7 +150,7 @@ double	dval
 short	ip_getb(), ip_gets()
 int	strdic(), ip_getu()
 int	ctoi(), ctol(), ctor(), ctod(), ctocc(), ctowrd()
-int	and(), absi(), strlen(), clgeti(), ip_geti()
+int	and(), strlen(), clgeti(), ip_geti()
 long	ip_getl(), clgetl(), ip_line(), ip_locate()
 real	ip_getr(), ip_getn()
 double	ip_getd(), ip_getn8()
@@ -206,9 +206,9 @@ begin
         if (v_nargs > 0 && nargs != v_nargs)
             call xev_error2 ("function `%s' requires %d arguments",
                 fcn, v_nargs)
-        else if (v_nargs < 0 && nargs < absi(v_nargs))
+        else if (v_nargs < 0 && nargs < iabs(v_nargs))
             call xev_error2 ("function `%s' requires at least %d arguments",
-                fcn, absi(v_nargs))
+                fcn, iabs(v_nargs))
 
 	larg_1 = 1
 	if ( 0 < nargs ) {

@@ -102,10 +102,10 @@ int	olines		#I number of blank lines
 size_t	sz_val
 int	nlines, i
 char    card[80]
-int	modi()
+int	imod()
 
 begin
-	   nlines = 36 - modi(olines,36) 
+	   nlines = 36 - imod(olines,36) 
 
 	   do i =1, 80
 	      card[i] = ' '

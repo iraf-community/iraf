@@ -5,27 +5,26 @@
 #define import_knames
 #include <iraf.h>
 
-XINT ABSI ( XINT *a )
+XSHORT SABS ( XSHORT *a )
 {
     if ( *a < 0 ) return 0 - *a;
     else return *a;
 }
 
-XLONG ABSL ( XLONG *a )
+XLONG LABS ( XLONG *a )
 {
     if ( *a < 0 ) return 0 - *a;
     else return *a;
 }
 
-XSHORT ABSS ( XSHORT *a )
+XPOINTER PABS ( XPOINTER *a )
 {
     if ( *a < 0 ) return 0 - *a;
     else return *a;
 }
 
-XPOINTER ABSP ( XPOINTER *a )
+XREAL AABS ( XREAL *a )
 {
     if ( *a < 0 ) return 0 - *a;
     else return *a;
 }
-

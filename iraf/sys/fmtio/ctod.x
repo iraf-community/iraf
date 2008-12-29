@@ -53,7 +53,7 @@ int	j, e, vexp, ip_start
 long	expon
 double	value, scalar
 int	strncmp(), gctol(), stridx()
-long	absl()
+long	labs()
 
 begin
 	while (IS_WHITE (str[ip]))			# skip whitespace
@@ -138,7 +138,7 @@ begin
 	    }
 	}
 
-	if (absl(vexp+expon) > MAX_EXPONENTD)		# check for overflow
+	if (labs(vexp+expon) > MAX_EXPONENTD)		# check for overflow
 	    return (ip - ip_start)
 
 	dval = dval + value * scalar

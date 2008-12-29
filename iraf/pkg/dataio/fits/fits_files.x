@@ -196,7 +196,7 @@ char	extensions[ARB]		# the output extensions string
 int	ep
 long	ltemp
 int	ctol()
-long	absl()
+long	labs()
 
 begin
 	# Initialize.
@@ -374,7 +374,7 @@ begin
 	    rbegin = rbegin + 1
 	    rend = rend + 1
 	}
-        return (absl(rend - rbegin) / rstep + 1 )
+        return (labs(rend - rbegin) / rstep + 1 )
 end
 
 

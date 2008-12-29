@@ -17,7 +17,7 @@ long	recptr		# last successful FITS record read
 
 long	i, bsz
 size_t	nchars
-long	read(), modl(), fstatl()
+long	read(), lmod(), fstatl()
 errchk	read
 
 begin
@@ -28,7 +28,7 @@ begin
 	        i = read (fd, buf[nchars+1], sz_rec - nchars)
 	    } then {
 	        call printf ("Error reading FITS record %d\n")
-	        if (modl(recptr + 1, bsz) == 0)
+	        if (lmod(recptr + 1, bsz) == 0)
 		    call pargl ((recptr + 1) / bsz)
 	        else
 		    call pargl ((recptr + 1) / bsz + 1)

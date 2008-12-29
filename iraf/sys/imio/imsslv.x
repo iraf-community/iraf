@@ -17,14 +17,14 @@ size_t	npix
 long	step
 
 int	i
-long	absl()
+long	labs()
 
 begin
 	# Determine the direction in which each dimension is to be
 	# traversed.
 
 	do i = 1, IM_NPHYSDIM(im) {
-	    step = absl (IM_VSTEP(im,i))
+	    step = labs (IM_VSTEP(im,i))
 	    if (vs[i] <= ve[i])
 		vinc[i] = step
 	    else

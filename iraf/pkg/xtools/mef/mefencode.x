@@ -162,7 +162,7 @@ long	l_val
 long	ctime
 int	time[LEN_TMSTRUCT]
 long	clktime()
-int	modi()
+int	imod()
 
 begin
 	l_val = 0
@@ -172,7 +172,7 @@ begin
 	call sprintf (datestr, szdate, "%02s/%02s/%02s")
 	    call pargi (TM_MDAY(time))
 	    call pargi (TM_MONTH(time))
-	    call pargi (modi(TM_YEAR(time), CENTURY))
+	    call pargi (imod(TM_YEAR(time), CENTURY))
 end
 
 
@@ -363,7 +363,7 @@ int	max_ranges		# Maximum number of ranges
 int	nvalues			# The number of values in the ranges
 
 int	ip, nrange, first, last, step
-int	ctoi(), absi()
+int	ctoi()
 
 begin
 	ip = 1
@@ -388,7 +388,7 @@ begin
 		    ranges[2, 1] = last
 		    ranges[3, 1] = step
 		    ranges[1, 2] = NULL
-	    	    nvalues = nvalues + absi(last-first) / step + 1
+	    	    nvalues = nvalues + iabs(last-first) / step + 1
 		    return (OK)
 		} else {
 		    ranges[1, nrange] = NULL
@@ -453,7 +453,7 @@ begin
 	    ranges[1, nrange] = first
 	    ranges[2, nrange] = last
 	    ranges[3, nrange] = step
-	    nvalues = nvalues + absi(last-first) / step + 1
+	    nvalues = nvalues + iabs(last-first) / step + 1
 	}
 
 	return (ERR)					# ran out of space
@@ -472,7 +472,7 @@ int	ranges[ARB]		# Range array
 int	number			# Both input and output parameter
 
 int	ip, first, last, step, next_number, remainder
-int	modi()
+int	imod()
 
 begin
 	# If number+1 is anywhere in the list, that is the next number,
@@ -487,7 +487,7 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last) {
-		remainder = modi(number - first, step)
+		remainder = imod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder + step <= last)
@@ -517,7 +517,7 @@ int	ranges[ARB]		# Range array
 int	number			# Both input and output parameter
 
 int	ip, first, last, step, next_number, remainder
-int	modi()
+int	imod()
 
 begin
 	# If number-1 is anywhere in the list, that is the previous number,
@@ -532,13 +532,13 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last) {
-		remainder = modi(number - first, step)
+		remainder = imod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder >= first)
 		    next_number = number - remainder
 	    } else if (last < number) {
-		remainder = modi(last - first, step)
+		remainder = imod(last - first, step)
 		if (remainder == 0)
 		    next_number = max (next_number, last)
 		else if (last - remainder >= first)
@@ -563,7 +563,7 @@ int	ranges[ARB]		# Range array
 int	number			# Number to be tested against ranges
 
 int	ip, first, last, step
-int	modi()
+int	imod()
 
 begin
 	for (ip=1;  ranges[ip] != NULL;  ip=ip+3) {
@@ -571,7 +571,7 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last)
-		if (modi(number - first, step) == 0)
+		if (imod(number - first, step) == 0)
 		    return (true)
 	}
 

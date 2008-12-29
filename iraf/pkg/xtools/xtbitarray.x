@@ -65,7 +65,7 @@ size_t	n				#I Number of data values
 
 long	j, k, m, bn
 int	i, val
-long	modl()
+long	lmod()
 
 begin
 	k = (c - 1) + BA_NC(ba) * (l - 1) - 1
@@ -73,7 +73,7 @@ begin
 	    k = k + 1
 	    j = k / BA_NEW(ba)
 	    bn = BA_NEW(ba)
-	    i = BA_NBE(ba) * modl(k, bn) + 1
+	    i = BA_NBE(ba) * lmod(k, bn) + 1
 	    val = min (data[m], BA_MAX(ba))
 	    call bitpak (val, Memi[BA_DATA(ba)+j], i, BA_NBE(ba))
 	}
@@ -92,7 +92,7 @@ size_t	n				#I Number of data values
 long	j, k, m, bn
 int	i
 int	bitupk()
-long	modl()
+long	lmod()
 
 begin
 	k = (c - 1) + BA_NC(ba) * (l - 1) - 1
@@ -100,7 +100,7 @@ begin
 	    k = k + 1
 	    j = k / BA_NEW(ba)
 	    bn = BA_NEW(ba)
-	    i = BA_NBE(ba) * modl(k, bn) + 1
+	    i = BA_NBE(ba) * lmod(k, bn) + 1
 	    data[m] = bitupk (Memi[BA_DATA(ba)+j], i, BA_NBE(ba))
 	}
 end
@@ -117,7 +117,7 @@ size_t	n				#I Number of data values
 
 long	j, k, m, bn
 int	i, val
-long	modl()
+long	lmod()
 
 begin
 	k = (c - 1) + BA_NC(ba) * (l - 1) - 1
@@ -125,7 +125,7 @@ begin
 	    k = k + 1
 	    j = k / BA_NEW(ba)
 	    bn = BA_NEW(ba)
-	    i = BA_NBE(ba) * modl(k, bn) + 1
+	    i = BA_NBE(ba) * lmod(k, bn) + 1
 	    val = min (data[m], BA_MAX(ba))
 	    call bitpak (val, Memi[BA_DATA(ba)+j], i, BA_NBE(ba))
 	}
@@ -144,7 +144,7 @@ size_t	n				#I Number of data values
 long	j, k, m, bn
 int	i
 int	bitupk()
-long	modl()
+long	lmod()
 
 begin
 	k = (c - 1) + BA_NC(ba) * (l - 1) - 1
@@ -152,7 +152,7 @@ begin
 	    k = k + 1
 	    j = k / BA_NEW(ba)
 	    bn = BA_NEW(ba)
-	    i = BA_NBE(ba) * modl(k, bn) + 1
+	    i = BA_NBE(ba) * lmod(k, bn) + 1
 	    data[m] = bitupk (Memi[BA_DATA(ba)+j], i, BA_NBE(ba))
 	}
 end

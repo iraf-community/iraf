@@ -111,7 +111,7 @@ pointer	mef			# image descriptor
 char	key[ARB]		# parameter to be returned
 
 double	dval, mefgetd()
-long	nint_dl()
+long	ldnint()
 errchk	mefgetd
 
 begin
@@ -119,7 +119,7 @@ begin
 	if (IS_INDEFD(dval))
 	    return (INDEFL)
 	else
-	    return (nint_dl(dval))
+	    return (ldnint(dval))
 end
 
 

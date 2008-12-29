@@ -20,7 +20,7 @@ bool	neg
 double	val
 int	op, round, h, m, s, f, i, i_len
 long	v
-int	dtoc3(), ltoc(), absi(), modi()
+int	dtoc3(), ltoc(), imod()
 
 define	output {outstr[op]=$1;op=op+1;if(op>maxch)goto retry_}
 define	retry_ 91
@@ -102,13 +102,13 @@ retry_
 	# Output the minutes field in HMS format.
 	if (fmt == FMT_HMS) {
 	    output (TO_DIGIT (m / 10))
-	    output (TO_DIGIT (modi (m, 10)))
+	    output (TO_DIGIT (imod (m, 10)))
 	    output (':')
 	}
 
 	# Output the seconds field.
 	output (TO_DIGIT (s / 10))
-	output (TO_DIGIT (modi (s, 10)))
+	output (TO_DIGIT (imod (s, 10)))
 
 	# Output the fraction, if any.
 	if (decpl > 0) {
@@ -116,12 +116,12 @@ retry_
 	    do i = 1, decpl {
 		round = round / 10
 		output (TO_DIGIT (f / round))
-		f = modi (f, round)
+		f = imod (f, round)
 	    }
 	}
 
 	# If the HMS format does not fit, go try a more compact format.
-	if (op-1 > absi(width) || op > maxch) {
+	if (op-1 > iabs(width) || op > maxch) {
 	    fmt = FMT_GENERAL
 	    goto retry_
 	}

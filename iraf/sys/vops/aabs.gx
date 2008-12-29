@@ -6,14 +6,14 @@ procedure aabs$t (a, b, npix)
 
 PIXEL	a[ARB], b[ARB]
 size_t	npix, i
-$if (datatype == sil)
-PIXEL	abs$t()
+$if (datatype == sl)
+PIXEL	$tabs()
 $endif
 
 begin
 $if (datatype == sil)
 	do i = 1, npix
-	    b[i] = abs$t(a[i])
+	    b[i] = $tabs(a[i])
 $else
 	do i = 1, npix
 	    b[i] = abs(a[i])

@@ -32,13 +32,13 @@ int	index			#I Index of new data
 real	data			#I Input data value
 
 short	nrnew, box, outnext, out, leaf, one
-short	mods()
+short	smod()
 data	one/1/
 
 begin
 	nrnew = index - 1
 	box = RMT_BOX(rm)
-	outnext = mods(nrnew, box)
+	outnext = smod(nrnew, box)
 	out = OUT(rm,outnext)
 	DATA(rm,out) = data
 

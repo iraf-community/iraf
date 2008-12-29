@@ -122,11 +122,11 @@ procedure gtr_ctran (mx, my, sx, sy)
 int	mx, my			# raw GKI coordinates
 int	sx, sy			# screen coordinates in GKI units
 include	"gtr.com"
-int	nint_ri()
+int	inint()
 
 begin
-	sx = max(0, min(GKI_MAXNDC, nint_ri ((mx - mx1) * xscale + xorigin)))
-	sy = max(0, min(GKI_MAXNDC, nint_ri ((my - my1) * yscale + yorigin)))
+	sx = max(0, min(GKI_MAXNDC, inint ((mx - mx1) * xscale + xorigin)))
+	sy = max(0, min(GKI_MAXNDC, inint ((my - my1) * yscale + yorigin)))
 end
 
 
@@ -469,7 +469,7 @@ int	npts
 int	i
 long	mx, my
 include	"gtr.com"
-long	nint_rl()
+long	lnint()
 
 begin
 	if (pl_op >= GKI_POLYLINE_P + 2) {
@@ -477,8 +477,8 @@ begin
 
 	    # Apply the workstation transformation.
 	    do i = GKI_POLYLINE_P, pl_op, 2 {
-		mx = nint_rl ((pl[i]   - mx1) * xscale + xorigin)
-		my = nint_rl ((pl[i+1] - my1) * yscale + yorigin)
+		mx = lnint ((pl[i]   - mx1) * xscale + xorigin)
+		my = lnint ((pl[i+1] - my1) * yscale + yorigin)
 		pl[i]   = max(0, min(GKI_MAXNDC, mx))
 		pl[i+1] = max(0, min(GKI_MAXNDC, my))
 	    }

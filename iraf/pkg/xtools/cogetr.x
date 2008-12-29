@@ -38,7 +38,7 @@ long	lastc1, lastl1, lastl2
 long	i, imlen1, imlen2, col1
 pointer	im, coldata, buffer, buf, data
 
-long	modl()
+long	lmod()
 pointer	imgl2r()
 
 begin
@@ -93,7 +93,7 @@ begin
 	    lastl2 = min (imlen2, line2 + EXTRA)
 	    do i = lastl1, lastl2 {
 		l_val = nlines
-	        buf = buffer + modl(i, l_val) * ncols
+	        buf = buffer + lmod(i, l_val) * ncols
 		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
 	    }
 	    CO_COL1(co) = lastc1
@@ -103,7 +103,7 @@ begin
 	} else if (line1 < lastl1) {
 	    do i = max (1, line1 - EXTRA), min (imlen2, lastl1 - 1) {
 		l_val = nlines
-	        buf = buffer + modl(i, l_val) * ncols
+	        buf = buffer + lmod(i, l_val) * ncols
 		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
 	    }
 	    lastl1 = max (1, line1 - EXTRA)
@@ -114,7 +114,7 @@ begin
 	} else if (line2 > lastl2) {
 	    do i = max (1, lastl2 + 1), min (imlen2, line2 + EXTRA) {
 		l_val = nlines
-	        buf = buffer + modl(i, l_val) * ncols
+	        buf = buffer + lmod(i, l_val) * ncols
 		call amovr (Memr[imgl2r(im, i)+col1-1], Memr[buf], nc)
 	    }
 	    lastl1 = max (1, line1 - EXTRA)
@@ -128,7 +128,7 @@ begin
 	data = coldata
 	do i = line1, line2 {
 	    l_val = nlines
-	    buf = buffer + modl(i, l_val) * ncols
+	    buf = buffer + lmod(i, l_val) * ncols
 	    Memr[data] = Memr[buf+col-col1]
 	    data = data + 1
 	}

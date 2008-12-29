@@ -47,7 +47,7 @@ int procedure fprfmt (ival)
 
 int	ival					# argument value (from parg_)
 bool	ival_already_used			# wait for next parg
-int	ctoi(), stridx(), absi()
+int	ctoi(), stridx()
 char	ch, chrlwr()
 include "fmt.com"
 
@@ -96,7 +96,7 @@ begin
 		left_justify = NO
 
 	    fill_char = ' '
-	    width = absi (ival)
+	    width = iabs (ival)
 
 	} else {					# "%-0*.dC"
 	    if (format[ip] == '-') {			# left or right justify
@@ -121,7 +121,7 @@ begin
 		    left_justify = YES
 		else
 		    left_justify = NO
-		width = absi (ival)
+		width = iabs (ival)
 
 	    } else if (ctoi (format, ip, width) <= 0)	# "%N.dC"
 		width = USE_DEFAULT

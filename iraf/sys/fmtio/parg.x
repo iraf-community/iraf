@@ -144,7 +144,7 @@ char	ch
 long	lnum
 complex	xnum
 int	n, precision, i, junk, ival, nchars, nbits, fmt
-int	ctocc(), gltoc(), dtoc(), xtoc(), fprfmt(), absi()
+int	ctocc(), gltoc(), dtoc(), xtoc(), fprfmt()
 errchk	putci, fmtstr, fpradv
 include "fmt.com"
 
@@ -222,7 +222,7 @@ begin
 	    case FMT_UNSIGNED:
 		radix = -DECIMAL			# unsigned decimal
 	    default:
-		radix = 0 - absi(radix)			# unsigned radix
+		radix = 0 - iabs(radix)			# unsigned radix
 	    }
 
 	    if (IS_INDEFD (value)) {
@@ -287,7 +287,7 @@ begin
 	    if (decpl == USE_DEFAULT)			# set defaults
 		decpl = precision
 	    else
-		decpl = absi (decpl)
+		decpl = iabs (decpl)
 
 	    if (IS_INDEFD (value))
 		xnum = INDEFX

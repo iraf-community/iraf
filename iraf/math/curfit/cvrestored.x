@@ -16,7 +16,7 @@ double	fit[ARB]	# array containing fit parameters
 
 size_t	sz_val
 int	curve_type, order
-int	nint_ri(), nint_di()
+int	inint()
 
 errchk malloc
 
@@ -33,7 +33,7 @@ begin
 	    call  error (0, "CVRESTORE: xmax <= xmin.")
 
 	# set curve_type dependent curve descriptor parameters
-	curve_type = nint_di (CV_SAVETYPE(fit))
+	curve_type = idnint (CV_SAVETYPE(fit))
 	switch (curve_type) {
 	case CHEBYSHEV, LEGENDRE:
 	    CV_ORDER(cv) = order

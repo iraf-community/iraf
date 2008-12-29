@@ -22,7 +22,7 @@ int	refit				# Use cvrefit?
 int	ord, ord1
 double	xmin, xmax
 
-long	absl()
+long	labs()
 pointer	rg_xrangesd()
 #extern	hd_power$t()
 errchk	rg_xrangesd
@@ -51,7 +51,7 @@ begin
 	    IC_RG(ic) = rg_xrangesd (Memc[IC_SAMPLE(ic)], x, npts)
 	    call rg_order (IC_RG(ic))
 	    call rg_merge (IC_RG(ic))
-	    call rg_wtbind (IC_RG(ic), max (1, absl(IC_NAVERAGE(ic))), x, wts,
+	    call rg_wtbind (IC_RG(ic), max (1, labs(IC_NAVERAGE(ic))), x, wts,
 		npts, Memd[IC_XFIT(ic)], Memd[IC_WTSFIT(ic)], IC_NFIT(ic))
 
 	    if (IC_NFIT(ic) == 0)

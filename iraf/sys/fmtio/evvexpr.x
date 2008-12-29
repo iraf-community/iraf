@@ -2085,9 +2085,9 @@ pointer	sp, sym, buf, ap, ip, op, in1, in2
 include	"evvexpr.com"
 
 pointer	stfind()
-short	mods()
-int	xvv_newtype(), strlen(), gctod(), btoi(), absi(), modi()
-long	absl(), modl()
+short	smod()
+int	xvv_newtype(), strlen(), gctod(), btoi(), imod()
+long	labs(), lmod()
 errchk	xvv_chtype, xvv_initop, xvv_newtype, xvv_error1, xvv_error2
 errchk	zcall5, malloc
 
@@ -2134,9 +2134,9 @@ begin
 	if (v_nargs > 0 && nargs != v_nargs)
 	    call xvv_error2 ("function `%s' requires %d arguments",
 		fcn, v_nargs)
-	else if (v_nargs < 0 && nargs < absi(v_nargs))
+	else if (v_nargs < 0 && nargs < iabs(v_nargs))
 	    call xvv_error2 ("function `%s' requires at least %d arguments",
-		fcn, absi(v_nargs))
+		fcn, iabs(v_nargs))
 
 	# Some functions require that the input operand be a certain type,
 	# e.g. floating.  Handle the simple cases, converting input operands
@@ -2987,7 +2987,7 @@ begin
 		call xvv_chtype (args[2], args[2], TY_INT)
 	    shift = O_VALI(args[2])
 
-	    if (absl(shift) > nelem) {
+	    if (labs(shift) > nelem) {
 		if (shift > 0)
 		    shift = nelem
 		else
@@ -3152,7 +3152,7 @@ begin
 
 	    case TY_SHORT:
 		if (O_LEN(in1) <= 0) {
-		    O_VALS(out) = mods (O_VALS(in1), O_VALS(in2))
+		    O_VALS(out) = smod (O_VALS(in1), O_VALS(in2))
 		} else if (O_LEN(in2) <= 0) {
 		    call amodks (Mems[O_VALP(in1)], O_VALS(in2),
 			Mems[O_VALP(out)], nelem)
@@ -3163,7 +3163,7 @@ begin
 
 	    case TY_INT:
 		if (O_LEN(in1) <= 0) {
-		    O_VALI(out) = modi (O_VALI(in1), O_VALI(in2))
+		    O_VALI(out) = imod (O_VALI(in1), O_VALI(in2))
 		} else if (O_LEN(in2) <= 0) {
 		    call amodki (Memi[O_VALP(in1)], O_VALI(in2),
 			Memi[O_VALP(out)], nelem)
@@ -3174,7 +3174,7 @@ begin
 
 	    case TY_LONG:
 		if (O_LEN(in1) <= 0) {
-		    O_VALL(out) = modl (O_VALL(in1), O_VALL(in2))
+		    O_VALL(out) = lmod (O_VALL(in1), O_VALL(in2))
 		} else if (O_LEN(in2) <= 0) {
 		    call amodkl (Meml[O_VALP(in1)], O_VALL(in2),
 			Meml[O_VALP(out)], nelem)
@@ -4115,7 +4115,7 @@ char	numbuf[MAX_DIGITS]
 size_t	nchars, c_0
 int	token, junk, dtype, i_len, i_off
 int	stridx(), stridxs(), lexnum(), gctod(), gctol()
-long	absl()
+long	labs()
 define	ident_ 91
 
 begin
@@ -4159,7 +4159,7 @@ ident_
 		i_off = 1
 		junk = gctol (Memc[ip], i_off, lval, 8)
 		ip = ip + i_off - 1
-		if ( MAX_INT <= absl(lval) ) {
+		if ( MAX_INT <= labs(lval) ) {
 		    call xvv_initop (out, c_0, TY_LONG)
 		    O_VALL(out) = lval
 		} else {
@@ -4170,7 +4170,7 @@ ident_
 		i_off = 1
 		junk = gctol (Memc[ip], i_off, lval, 10)
 		ip = ip + i_off - 1
-		if ( MAX_INT <= absl(lval) ) {
+		if ( MAX_INT <= labs(lval) ) {
 		    call xvv_initop (out, c_0, TY_LONG)
 		    O_VALL(out) = lval
 		} else {
@@ -4181,7 +4181,7 @@ ident_
 		i_off = 1
 		junk = gctol (Memc[ip], i_off, lval, 16)
 		ip = ip + i_off - 1
-		if ( MAX_INT <= absl(lval) ) {
+		if ( MAX_INT <= labs(lval) ) {
 		    call xvv_initop (out, c_0, TY_LONG)
 		    O_VALL(out) = lval
 		} else {

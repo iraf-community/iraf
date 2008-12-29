@@ -23,7 +23,7 @@ int	axis, pltype1
 real	xl, xr, yb, yt, dy
 real	x1, x2, y1, y2, y3
 
-int	gstati(), stridxs(), gt_geti(), modi()
+int	gstati(), stridxs(), gt_geti(), imod()
 pointer	rg_xrangesr()
 
 begin
@@ -39,7 +39,7 @@ begin
 	    return
 
 	if (gt_geti (gt, GTTRANSPOSE) == YES)
-	    axis = modi(axis, 2) + 1
+	    axis = imod(axis, 2) + 1
 
 	pltype1 = gstati (gp, G_PLTYPE)
 	call gseti (gp, G_PLTYPE, pltype)
@@ -106,7 +106,7 @@ real	w, diff
 real	xl, xr, yb, yt, dy
 real	x1, x2, y1, y2, y3
 
-int	gstati(), stridxs(), gt_geti(), modi()
+int	gstati(), stridxs(), gt_geti(), imod()
 pointer	rg_xrangesr()
 
 begin
@@ -122,7 +122,7 @@ begin
 	    return
 
 	if (gt_geti (gt, GTTRANSPOSE) == YES)
-	    axis = modi(axis, 2) + 1
+	    axis = imod(axis, 2) + 1
 
 	# Initialize
 	pltype1 = gstati (gp, G_PLTYPE)

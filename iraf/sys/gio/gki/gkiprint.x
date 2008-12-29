@@ -750,7 +750,7 @@ int	gkiunits		# print coords in GKI rather than NDC units
 
 int	i
 real	x, y, xsum, xmin, xmax, ysum, ymin, ymax, scale
-int	modi()
+int	imod()
 
 begin
 	if (gkiunits == YES)
@@ -819,7 +819,7 @@ begin
 
 	call fprintf (fd, "\t")
 	for (i=1;  i <= npts * 2;  i=i+2) {
-	    if (i > 1 && modi (i-1, 10) == 0)
+	    if (i > 1 && imod (i-1, 10) == 0)
 		call fprintf (fd, "\n\t")
 	    if (gkiunits == YES)
 		call fprintf (fd, "%5d %5d  ")
@@ -842,7 +842,7 @@ short	data[ARB]		# metacode data
 int	nwords			# number of words of data
 
 int	i
-int	modi()
+int	imod()
 
 begin
 	if (nwords <= 0)
@@ -851,7 +851,7 @@ begin
 	call fprintf (fd, "\t")
 
 	for (i=1;  i <= nwords;  i=i+1) {
-	    if (i > 1 && modi (i-1, 8) == 0)
+	    if (i > 1 && imod (i-1, 8) == 0)
 		call fprintf (fd, "\n\t")
 	    call fprintf (fd, "%7d")
 		call pargs (data[i])

@@ -287,7 +287,7 @@ pointer sp, tempfile, outname
 int	nchars, junk, out_fd
 long	inoff, size, lval
 int	fnldir(), fnroot(), open()
-long	note(), modl()
+long	note(), lmod()
 errchk	open, note, seek, close, delete, rename
 errchk	fxf_make_adj_copy, fxf_write_blanks
 
@@ -310,7 +310,7 @@ begin
 	# Pad to 2880 bytes block
 	size =  note (out_fd) - 1
 	lval = FITS_BLOCK_CHARS
-	size = modl(size, lval)
+	size = lmod(size, lval)
 	if (size != 0) {
 	    size = FITS_BLOCK_CHARS - size
 	    call fxf_write_blanks (out_fd, size)

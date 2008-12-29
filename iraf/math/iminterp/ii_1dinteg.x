@@ -260,14 +260,14 @@ real	mindx			# interpolation minimum
 size_t	c_1
 int	n
 real	x, y, dx, x1, x2
-int	nint_ri()
+int	inint()
 
 begin
 	c_1 = 1
 
 	x1 = min (a, b)
 	x2 = max (a, b)
-	n = max (1, nint_ri (x2 - x1))
+	n = max (1, inint (x2 - x1))
 	dx = (x2 - x1) / n
 
 	sum = 0.

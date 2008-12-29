@@ -103,7 +103,7 @@ int	sz_atval, naps, ip, i
 pointer	sp, atkey, atval, aps, dtype, crval, cdelt, npts, z, coeff, dptr
 int	strlen(), ctoi(), ctod()
 double	x, dval, wf_msp_eval()
-int	modi()
+int	imod()
 errchk	malloc, realloc
 
 begin
@@ -145,7 +145,7 @@ begin
 		call malloc (npts, sz_val, TY_INT) 
 		call malloc (z, sz_val, TY_DOUBLE) 
 		call malloc (coeff, sz_val, TY_POINTER)
-	    } else if (modi (naps, NALLOC) == 0) {
+	    } else if (imod (naps, NALLOC) == 0) {
 		sz_val = naps+NALLOC
 		call realloc (aps, sz_val, TY_INT) 
 		call realloc (dtype, sz_val, TY_INT) 
@@ -353,7 +353,7 @@ double	dval, temp
 int	ncoeff, type, order, ip, i
 errchk	malloc, realloc
 double	wf_msp_eval()
-int	ctod(), modi()
+int	ctod(), imod()
 
 begin
 	coeff = NULL
@@ -364,7 +364,7 @@ begin
 	    if (coeff == NULL) {
 		sz_val = NALLOC
 		call malloc (coeff, sz_val, TY_DOUBLE)
-	    } else if (modi (ncoeff, NALLOC) == 0) {
+	    } else if (imod (ncoeff, NALLOC) == 0) {
 		sz_val = ncoeff+NALLOC
 		call realloc (coeff, sz_val, TY_DOUBLE)
 	    }

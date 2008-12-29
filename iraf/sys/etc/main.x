@@ -152,7 +152,7 @@ pointer	sp
 bool	streq()
 extern	DUMMY()
 int	sys_getcommand(), sys_runtask(), oscmd()
-int	access(), envscan(), onentry(), stropen(), modi()
+int	access(), envscan(), onentry(), stropen(), imod()
 errchk	xonerror, fio_cleanup
 common	/JUMPCOM/ jumpbuf
 string	nullfile "dev$null"
@@ -304,7 +304,7 @@ begin
 	    # be returned to the shell.
 
 	    i = onentry (prtype, bkgfname, a_cmd)
-	    if (modi(i, 2) == PR_EXIT) {
+	    if (imod(i, 2) == PR_EXIT) {
 		interpret = NO
 		errstat = i / 2
 		goto shutdown_

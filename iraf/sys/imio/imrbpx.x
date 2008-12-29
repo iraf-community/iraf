@@ -27,7 +27,7 @@ size_t	npix, c_1
 int	ndim, sz_pixel, btype, i, k
 long	op, off, step, xstep, j, x1, x2, p, linelen
 long	xs[3], xe[3], v1[IM_MAXDIM], v2[IM_MAXDIM]
-long	absl()
+long	labs()
 errchk	imrdpx
 include	<szdtype.inc>
 
@@ -40,7 +40,7 @@ begin
 	# Cache the left and right endpoints of the line segment and the
 	# image line length.
 
-	xstep = absl (IM_VSTEP(im,1))
+	xstep = labs (IM_VSTEP(im,1))
 	linelen = IM_SVLEN(im,1)
 	x1 = v[1]
 	x2 = x1 + (totpix * xstep) - 1

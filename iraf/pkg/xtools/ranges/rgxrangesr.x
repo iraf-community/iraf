@@ -84,7 +84,7 @@ int	i, jj, strlen(), ctor()
 long	j, k, nrgs, l_val
 real	rval1, rval2, a1, b1, a2, b2
 pointer	sp, str, ptr
-long	modl()
+long	lmod()
 
 begin
 	call smark (sp)
@@ -154,7 +154,7 @@ begin
 		if (k <= j) {
 		    nrgs = RG_NRGS(rg)
 		    l_val = NRGS
-		    if (modl (nrgs, l_val) == 0) {
+		    if (lmod (nrgs, l_val) == 0) {
 			sz_val = LEN_RG+2*(nrgs+NRGS)
 			call realloc (rg, sz_val, TY_STRUCT)
 		    }

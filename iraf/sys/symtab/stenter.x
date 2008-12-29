@@ -17,7 +17,7 @@ long	sum, lval
 pointer	el, tp
 int	symlen, new_symbol, thread, ip
 int	stpstr(), stalloc()
-long	modl()
+long	lmod()
 errchk	stalloc, stpstr
 
 begin
@@ -33,7 +33,7 @@ begin
 	}
 
 	lval = ST_INDEXLEN(stp)
-	thread = modl (sum, lval)
+	thread = lmod (sum, lval)
 	tp = ST_INDEX(stp) + thread
 
 	# Allocate space in STAB.

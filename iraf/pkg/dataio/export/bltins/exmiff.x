@@ -13,7 +13,7 @@ pointer	sp, hdr, cmap
 int	i, j, flags
 char	ncols[11]
 
-int	strlen(), modi()
+int	strlen(), imod()
 
 begin
 	# Check to see that we have the correct number of expressions to
@@ -52,7 +52,7 @@ begin
                 call pargl (EX_OCOLS(ex))
                 call pargl (EX_OROWS(ex))
 
-	if (modi(strlen(Memc[hdr]),2) == 1)
+	if (imod(strlen(Memc[hdr]),2) == 1)
 	    call strcat ("\n", Memc[hdr], SZ_COMMAND)
 	sz_val = SZ_COMMAND
         call strpak (Memc[hdr], Memc[hdr], sz_val)

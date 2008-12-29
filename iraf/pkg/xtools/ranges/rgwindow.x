@@ -12,7 +12,7 @@ long	rmin, rmax			# Window
 pointer	rgout				# Pointer to windowed ranges
 
 long	i, j
-long	absl()
+long	labs()
 
 begin
 	if (rg == NULL)
@@ -38,7 +38,7 @@ begin
 	RG_NPTS(rgout) = 0
 	do i = 1, RG_NRGS(rgout)
 	    RG_NPTS(rgout) = RG_NPTS(rgout) +
-		absl (RG_X1(rgout, i) - RG_X2(rgout, i)) + 1
+		labs (RG_X1(rgout, i) - RG_X2(rgout, i)) + 1
 
 	return (rgout)
 end

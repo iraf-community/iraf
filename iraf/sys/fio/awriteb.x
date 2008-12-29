@@ -19,7 +19,7 @@ long	byte_offset		# one-indexed byte offset in file
 long	file_offset, szb_file
 int	junk
 long	awaitb()
-long	modl()
+long	lmod()
 errchk	filerr, syserr
 include	<fio.com>
 
@@ -49,7 +49,7 @@ begin
 
 	file_offset = byte_offset
 	if (FBLKSIZE(fp) > 0) {
-	    if (modl (byte_offset-1, (FBLKSIZE(fp)*SZB_CHAR)) != 0)
+	    if (lmod (byte_offset-1, (FBLKSIZE(fp)*SZB_CHAR)) != 0)
 		call filerr (FNAME(fp), SYS_FAWRALIGN)
 	} else
 	    file_offset = 0

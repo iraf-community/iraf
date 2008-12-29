@@ -24,7 +24,7 @@ bool	rlio
 int	sz_pixel
 long	offset, ip, step
 size_t	nbytes, nchars, c_1
-long	imnote(), absl()
+long	imnote(), labs()
 errchk	imerr, imwrite
 include	<szdtype.inc>
 
@@ -33,7 +33,7 @@ begin
 
 	pl = IM_PL(im)
 	sz_pixel = ty_size[IM_PIXTYPE(im)]
-	step = absl (xstep)
+	step = labs (xstep)
 	if (v[1] < 1 || ((npix-1) * step) + v[1] > IM_SVLEN(im,1))
 	    call imerr (IM_NAME(im), SYS_IMREFOOB)
 

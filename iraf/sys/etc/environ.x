@@ -77,7 +77,7 @@ long	sum, lval
 pointer	el, ep
 int	head, ip, nchars
 int	envputs(), gstrcpy()
-long	modl()
+long	lmod()
 include	"environ.com"
 
 begin
@@ -92,7 +92,7 @@ begin
 		sum = sum + (sum + key[ip])
 	    }
 	    lval = NTHREADS
-	    head = threads[modl(sum,lval)+1]
+	    head = threads[lmod(sum,lval)+1]
 	}
 
 	# If thread is not empty search down it for the named key and return
@@ -146,7 +146,7 @@ pointer	el, op, ep
 bool	streq()
 pointer	coerce()
 int	gstrcpy(), krealloc()
-long	modl()
+long	lmod()
 include	"environ.com"
 
 begin
@@ -162,7 +162,7 @@ begin
 	}
 
 	lval = NTHREADS
-	thread_index = modl (sum, lval) + 1
+	thread_index = lmod (sum, lval) + 1
 	head = threads[thread_index]
 
 	# If thread is not empty search down it for the named key to see if we

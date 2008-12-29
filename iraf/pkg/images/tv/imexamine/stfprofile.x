@@ -41,7 +41,7 @@ real	radius, buffer, width, xc, yc, xlast, ylast, r1, r2
 real	mean, sum, sum1, sum2, sum3
 pointer	data, ptr
 real	asumr(), urand()
-long	nint_rl()
+long	lnint()
 pointer	imgs2r()
 errchk	imgs2r
 
@@ -62,11 +62,11 @@ begin
 	    xlast = xc
 	    ylast = yc
 
-	    x1 = max (1-NBNDRYPIX, nint_rl(xc - r2))
-	    x2 = min (IM_LEN(im,1)+NBNDRYPIX, nint_rl(xc + r2))
+	    x1 = max (1-NBNDRYPIX, lnint(xc - r2))
+	    x2 = min (IM_LEN(im,1)+NBNDRYPIX, lnint(xc + r2))
 	    nx = x2 - x1 + 1
-	    y1 = max (1-NBNDRYPIX, nint_rl(yc - r2))
-	    y2 = min (IM_LEN(im,2)+NBNDRYPIX, nint_rl(yc + r2))
+	    y1 = max (1-NBNDRYPIX, lnint(yc - r2))
+	    y2 = min (IM_LEN(im,2)+NBNDRYPIX, lnint(yc + r2))
 	    ny = y2 - y1 + 1
 	    npts = nx * ny
 	    data = imgs2r (im, x1, x2, y1, y2)
@@ -123,17 +123,17 @@ begin
 	    if (yc - ylast > 0.2 * ny)
 		yc = ylast + 0.2 * ny
 
-	    if (nint_rl(xc) == nint_rl(xlast) && nint_rl(yc) == nint_rl(ylast))
+	    if (anint(xc) == anint(xlast) && anint(yc) == anint(ylast))
 		break
 	}
 
 	# Get a new centered raster if necessary.
-	if (nint_rl(xc) != nint_rl(xlast) || nint_rl(yc) != nint_rl(ylast) || r2 < r1) {
-	    x1 = max (1-NBNDRYPIX, nint_rl(xc - r1))
-	    x2 = min (IM_LEN(im,1)+NBNDRYPIX, nint_rl(xc + r1))
+	if (anint(xc) != anint(xlast) || anint(yc) != anint(ylast) || r2 < r1) {
+	    x1 = max (1-NBNDRYPIX, lnint(xc - r1))
+	    x2 = min (IM_LEN(im,1)+NBNDRYPIX, lnint(xc + r1))
 	    nx = x2 - x1 + 1
-	    y1 = max (1-NBNDRYPIX, nint_rl(yc - r1))
-	    y2 = min (IM_LEN(im,2)+NBNDRYPIX, nint_rl(yc + r1))
+	    y1 = max (1-NBNDRYPIX, lnint(yc - r1))
+	    y2 = min (IM_LEN(im,2)+NBNDRYPIX, lnint(yc + r1))
 	    ny = y2 - y1 + 1
 	    npts = nx * ny
 	    data = imgs2r (im, x1, x2, y1, y2)
@@ -265,7 +265,7 @@ real	bkgd, miso, sigma, peak
 real	r, r1, r2, r3, dx, dy, dx1, dx2, dy1, dy2, dz, xx, yy, xy, ds, da
 pointer	sp, data, profile, ptr, asi, msi, gs
 int	stf_r2n()
-long	nint_rl()
+long	lnint()
 real	asieval(), msieval(), gseval(), stf_i2r(), stf_r2i()
 errchk	asiinit, asifit, msiinit, msifit, gsrestore
 
@@ -420,8 +420,8 @@ begin
 	if (sigma < 5.) {
 	    if (sigma <= 2.) {
 		call gsrestore (gs, gsdata)
-		dx = xc - nint_rl(xc)
-		dy = yc - nint_rl(yc)
+		dx = xc - anint(xc)
+		dy = yc - anint(yc)
 		r = sqrt (dx * dx + dy * dy)
 		dx = 1.
 		ds = abs (sigma - gseval (gs, r, dx))
@@ -440,8 +440,8 @@ begin
 	    sigma = sigma * sigma
 
 	    # Compute the peak that gives the correct central pixel value.
-	    i = nint_rl(xc)
-	    j = nint_rl(yc)
+	    i = lnint(xc)
+	    j = lnint(yc)
 	    dx = i - xc
 	    dy = j - yc
 	    r = sqrt (dx * dx + dy * dy)

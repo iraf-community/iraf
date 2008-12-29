@@ -47,7 +47,7 @@ pointer	sp, cmap
 int	header[SZ_RASHDR]
 int	i, flags
 
-long	modl()
+long	lmod()
 
 begin
 	c_1 = 1
@@ -67,7 +67,7 @@ begin
 
 	# Make sure the output is padded to the nearest 16-bits.
 	l_val = 2
-	if (modl(O_WIDTH(ex,1),l_val) != 0) {
+	if (lmod(O_WIDTH(ex,1),l_val) != 0) {
 	    do i = 1, EX_NEXPR(ex) {
 		call strcat ("//repl(0,1)", O_EXPR(ex,i), SZ_EXPSTR)
 		O_WIDTH(ex,i) = O_WIDTH(ex,i) + 1

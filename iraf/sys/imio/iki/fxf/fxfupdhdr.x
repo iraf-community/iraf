@@ -40,7 +40,7 @@ char	c_0
 long	fxf_hdr_offset()
 int	strncmp(), strlen(), stridxs()
 int	access(), open(), fnldir()
-long	read(), fstatl(), clktime(), absl(), modl()
+long	read(), fstatl(), clktime(), labs(), lmod()
 bool	fnullfile()
 
 errchk  open, read, write, fxf_header_diff, fxf_write_header, fxf_make_adj_copy
@@ -235,7 +235,7 @@ begin
 	# the 4 seconds.
 	
 	lval = 0
-        if (absl(FIT_MTIME(fit) - clktime(lval)) > 60)
+        if (labs(FIT_MTIME(fit) - clktime(lval)) > 60)
 	    FIT_MTIME(fit) = clktime(lval)
 
 	# We cannot use clktime() directly since the previuos value
@@ -249,14 +249,14 @@ begin
 
  	l_size = fstatl (hdr_fd, F_FILESIZE)
 	lval = FITS_BLOCK_CHARS
-	l_npad = FITS_BLOCK_CHARS - modl (l_size, lval)
+	l_npad = FITS_BLOCK_CHARS - lmod (l_size, lval)
 	npad = l_npad
 
 	# If we are appending a new extension, we need to write padding to
 	# 2880 bytes blocks at the end of the file.
 
 	lval = FITS_BLOCK_CHARS
-	if ( modl (l_npad,lval) > 0 &&
+	if ( lmod (l_npad,lval) > 0 &&
 		(FIT_NEWIMAGE(fit) == YES || append) ) {
 	    c_0 = 0
 	    call amovkc (c_0, Memc[mii], npad)
@@ -398,7 +398,7 @@ long	hdr_size, pixoff
 int	clines, ulines, len, usize, excess, nheader_cards, kmax, kmin, ival
 int	merge, inherit, padlines
 int	strlen(), imaccf(), imgeti(), strcmp(), idb_findrecord()
-int	btoi(), strncmp(), modi()
+int	btoi(), strncmp(), imod()
 bool    imgetb()
 
 errchk  open, fcopyo
@@ -621,7 +621,7 @@ begin
         if (diff < 0 && FIT_EXPAND(fit) == NO) {
 	    # We need to reduce the size of the UA becuase we are not
 	    # going to expand the header.
-	    excess = modi (nheader_cards * 81 + usize, 1458)
+	    excess = imod (nheader_cards * 81 + usize, 1458)
 	    excess = excess + (((-diff-1400)/1440)*1458)
 	    Memc[ua+usize-excess] = EOS
 	    usize = strlen (Memc[ua]) 
@@ -1434,7 +1434,7 @@ pointer sp, hdrfile, cfit, tmp1, tmp2
 int	fd, fdout, i, nch, nc, naxis
 char	line[LEN_CARD], blank, cindx
 bool	streq()
-int	open(), strncmp(), fnroot(), modi()
+int	open(), strncmp(), fnroot(), imod()
 long	read(), note()
 errchk	open, fxf_ren_tmp
 
@@ -1502,7 +1502,7 @@ begin
 	    }
 	}
 
-	if (modi (nc, 36) == 0) {
+	if (imod (nc, 36) == 0) {
 	    # We have to write one END card and 35 blank card.
 	    blank = ' '
 	    call amovkc (blank, line, c_80)

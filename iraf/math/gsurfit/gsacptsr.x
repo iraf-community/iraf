@@ -29,7 +29,7 @@ pointer	sp, vzptr, vindex, mzptr, mindex, bxptr, bbxptr, byptr, bbyptr
 pointer	byw, bw
 
 real	adotr()
-int	modi()
+int	imod()
 
 begin
 	# increment the number of points
@@ -140,7 +140,7 @@ begin
 		        do i = 1, npts
 		            MATRIX(mindex) = MATRIX(mindex) + Memr[bw+i-1] *
 				XBASIS(bbxptr+i-1) * YBASIS(bbyptr+i-1)	
-			if (modi (jj, xxorder) == 0) {
+			if (imod (jj, xxorder) == 0) {
 			    jj = 1
 			    ll = ll + 1
 			    bbxptr = GS_XBASIS(sf)

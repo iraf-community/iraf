@@ -22,7 +22,7 @@ int	maxchars
 
 char	suffix[SZ_SUFFIX]
 int	counter, i, n, op, pid
-int	access(), itoc(), modi()
+int	access(), itoc(), imod()
 data	counter/0/
 
 begin
@@ -30,13 +30,13 @@ begin
 
 	do i = 1, MAX_TRIP {
 	    call strcpy (seed, temp_file, maxchars)
-	    op = itoc (modi(pid,10000), suffix, SZ_SUFFIX)
+	    op = itoc (imod(pid,10000), suffix, SZ_SUFFIX)
 	    call strcat (suffix, temp_file, maxchars)
 
 	    counter = counter + 1
 	    op = 1
 	    for (n=counter;  n > 0;  n = (n-1) / RADIX) {
-		suffix[op] = modi (n-1, RADIX) + 'a'
+		suffix[op] = imod (n-1, RADIX) + 'a'
 		op = op + 1
 	    }
 	    suffix[op] = EOS
@@ -44,8 +44,8 @@ begin
 
 	    if (access (temp_file,0,0) == NO)		# does file exist?
 		return
-	    else if (modi(i,NTRIES) == 0)
-		pid = pid + modi(counter,10)		# not likely to get here
+	    else if (imod(i,NTRIES) == 0)
+		pid = pid + imod(counter,10)		# not likely to get here
 	}
 
 	call filerr (seed, SYS_FMKTEMP)

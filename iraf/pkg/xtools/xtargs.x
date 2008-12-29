@@ -41,7 +41,7 @@ int	i, tok
 pointer	sp, key, val, stp, sym
 
 bool	strne()
-int	nscan(), stpstr(), modi()
+int	nscan(), stpstr(), imod()
 pointer	stopen(), stfind(), stenter()
 
 begin
@@ -71,7 +71,7 @@ begin
 	    call gargwrd (Memc[val], SZ_LINE)
 
 	    # Check for error.
-	    if (tok != TOK_IDENTIFIER || modi(nscan(), 3) != 0)
+	    if (tok != TOK_IDENTIFIER || imod(nscan(), 3) != 0)
 	        break
 
 	    # Ignore case.
@@ -88,7 +88,7 @@ begin
 	call sfree (sp)
 
 	# Check for error.
-	if (modi(nscan(), 3) != 1) {
+	if (imod(nscan(), 3) != 1) {
 	   call stclose (stp)
 	   call error (1, "Syntax error")
 	}

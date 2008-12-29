@@ -15,7 +15,7 @@ size_t	sz_val
 int	ip
 pointer	sp, str
 int	strdic(), strncmp(), ctoi(), ctor()
-int	nint_ri()
+int	inint()
 
 begin
 	call smark (sp)
@@ -60,7 +60,7 @@ begin
 		} else if (shift >= -0.5 && shift < 0.5) {
 		    nincr = 1
 		} else {
-		    nincr = nint_ri (shift)
+		    nincr = inint (shift)
 		    shift = INDEFR
 		}
 	    }

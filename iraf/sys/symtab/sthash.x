@@ -20,7 +20,7 @@ int	modulus			# number of possible output values
 int	i
 long	sum, lval
 int	primes[MAX_HASHCHARS]
-long	modl()
+long	lmod()
 data	(primes(i),i=1,9)	/101,103,107,109,113,127,131,137,139/
 data	(primes(i),i=10,18)	/149,151,157,163,167,173,179,181,191/
 
@@ -35,5 +35,5 @@ begin
 	}
 
 	lval = modulus
-	return (modl (sum, lval) + 1)
+	return (lmod (sum, lval) + 1)
 end

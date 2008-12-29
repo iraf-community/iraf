@@ -14,7 +14,7 @@ real	interpolant[ARB]	# array containing the interpolant
 size_t	sz_val
 int	interp_type, i, nconv
 pointer	cptr
-int	nint_ri()
+int	inint()
 
 begin
 	interp_type = int (ASI_SAVETYPE(interpolant))
@@ -27,12 +27,12 @@ begin
 	sz_val = LEN_ASISTRUCT
 	call malloc (asi, sz_val, TY_STRUCT)
 	ASI_TYPE(asi) = interp_type
-	ASI_NSINC(asi) = nint_ri (ASI_SAVENSINC(interpolant))
-	ASI_NINCR(asi) = nint_ri (ASI_SAVENINCR(interpolant))
+	ASI_NSINC(asi) = inint (ASI_SAVENSINC(interpolant))
+	ASI_NINCR(asi) = inint (ASI_SAVENINCR(interpolant))
 	ASI_SHIFT(asi) = ASI_SAVESHIFT(interpolant)
 	ASI_PIXFRAC(asi) = ASI_SAVEPIXFRAC(interpolant)
-	ASI_NCOEFF(asi) = nint_ri (ASI_SAVENCOEFF(interpolant))
-	ASI_OFFSET(asi) = nint_ri (ASI_SAVEOFFSET(interpolant))
+	ASI_NCOEFF(asi) = inint (ASI_SAVENCOEFF(interpolant))
+	ASI_OFFSET(asi) = inint (ASI_SAVEOFFSET(interpolant))
 	ASI_BADVAL(asi) = ASI_SAVEBADVAL(interpolant)
 
 	# Allocate space for and restore coefficients.

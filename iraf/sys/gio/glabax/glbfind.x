@@ -30,7 +30,7 @@ real	char_height, char_width, wctick, tval
 real	p1, p2, tp1, tp2, wcp1, tick1, step, minor_step, length
 
 bool	fp_equalr()
-int	gt_ndigits(), absi()
+int	gt_ndigits()
 real	ggetr(), elogr(), aelogr(), glb_minorstep()
 
 begin
@@ -161,7 +161,7 @@ begin
 	if (scaling == LINEAR) {
 	    minor_step = step / (nminor + 1)
 	    ival = int ((wctick - wcp1) / minor_step)
-	    AX_INLEFT(ax1) = absi (ival)
+	    AX_INLEFT(ax1) = iabs (ival)
 	} else {
 	    t1 = nint (tick1)
 	    t2 = nint (tick1 + step)

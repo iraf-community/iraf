@@ -20,7 +20,7 @@ size_t	c_1, c_2
 long	nstat
 pointer sp, buf
 long	read()
-long	modl()
+long	lmod()
 
 begin
 	c_1 = 1
@@ -37,7 +37,7 @@ begin
 
 	sz_val = len
 	l_val = 2
-        if (modl(offset,l_val) == 0 && offset > 1)
+        if (lmod(offset,l_val) == 0 && offset > 1)
             call bytmov (Memc[buf], c_2, Memc[buf], c_1, sz_val)
         call chrupk (Memc[buf], c_1, outstr, c_1, sz_val)
 
@@ -60,7 +60,7 @@ short	val
 long	nstat
 char    buf[2]
 long	read()
-long	modl()
+long	lmod()
 
 begin
 	c_1 = 1
@@ -69,7 +69,7 @@ begin
         nstat = read (fd, buf, c_2)
 
 	l_val = 2
-        if (modl(offset,l_val) == 0)
+        if (lmod(offset,l_val) == 0)
             call bytmov (buf, c_2, buf, c_1, c_2)
         call chrupk (buf, c_1, buf, c_1, c_2)
 
@@ -190,7 +190,7 @@ size_t	c_1, c_2
 size_t	nval
 pointer sp, buf
 long	fp, nstat
-long	read(), modl()
+long	read(), lmod()
 long	ip_lnote()
 
 begin
@@ -199,7 +199,7 @@ begin
 
         fp = ip_lnote(fd)
 	l_val = 2
-        if (modl(fp,l_val) == 0 && fp != 1)
+        if (lmod(fp,l_val) == 0 && fp != 1)
 	    nval = len
 	else
 	    nval = len + 1
@@ -213,7 +213,7 @@ begin
 
         fp = ip_lnote(fd)
 	l_val = 2
-        if (modl(fp,l_val) == 0 && fp != 1)
+        if (lmod(fp,l_val) == 0 && fp != 1)
             call bytmov (Memc[buf], c_2, Memc[buf], c_1, nval)
 	# arg1: incompatible pointer
         call achtbc (Memc[buf], Memc[ptr], len)
@@ -459,7 +459,7 @@ long	offset					#i requested offset
 
 long	l_val
 long    cur_offset, where, fsize
-long	fstatl(), modl()
+long	fstatl(), lmod()
 common  /fiocom/ cur_offset
 
 begin
@@ -471,7 +471,7 @@ begin
 	    fsize = fstatl (fd, F_FILESIZE) * SZB_CHAR
             cur_offset = min (fsize, offset)
 	    l_val = 2
-	    where = min (fsize, (offset/SZB_CHAR+modl(offset,l_val)))
+	    where = min (fsize, (offset/SZB_CHAR+lmod(offset,l_val)))
             call seek (fd, where)
 	}
 end

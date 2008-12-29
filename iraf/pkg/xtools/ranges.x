@@ -25,7 +25,7 @@ long	nvalues			# The number of values in the ranges
 int	ip, nrange
 long	first, last, step
 int	ctol()
-long	absl()
+long	labs()
 
 begin
 	ip = 1
@@ -117,7 +117,7 @@ begin
 	    ranges[1, nrange] = first
 	    ranges[2, nrange] = last
 	    ranges[3, nrange] = step
-	    nvalues = nvalues + absl(last-first) / step + 1
+	    nvalues = nvalues + labs(last-first) / step + 1
 	}
 
 	return (ERR)					# ran out of space
@@ -137,7 +137,7 @@ long	number			# Both input and output parameter
 
 int	ip
 long	first, last, step, next_number, remainder
-long	modl()
+long	lmod()
 
 begin
 	# If number+1 is anywhere in the list, that is the next number,
@@ -154,7 +154,7 @@ begin
 	    if (step == 0)
 		call error (1, "Step size of zero in range list")
 	    if (number >= first && number <= last) {
-		remainder = modl(number - first, step)
+		remainder = lmod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder + step <= last)
@@ -185,7 +185,7 @@ long	number			# Both input and output parameter
 
 int	ip
 long	first, last, step, next_number, remainder
-long	modl()
+long	lmod()
 
 begin
 	# If number-1 is anywhere in the list, that is the previous number,
@@ -202,13 +202,13 @@ begin
 	    if (step == 0)
 		call error (1, "Step size of zero in range list")
 	    if (number >= first && number <= last) {
-		remainder = modl(number - first, step)
+		remainder = lmod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder >= first)
 		    next_number = number - remainder
 	    } else if (last < number) {
-		remainder = modl(last - first, step)
+		remainder = lmod(last - first, step)
 		if (remainder == 0)
 		    next_number = max (next_number, last)
 		else if (last - remainder >= first)
@@ -235,7 +235,7 @@ long	number			# Number to be tested against ranges
 
 int	ip
 long	first, last, step, num
-long	modl()
+long	lmod()
 
 begin
 	if (IS_INDEFI (number))
@@ -248,7 +248,7 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (num >= first && num <= last)
-		if (modl(num - first, step) == 0)
+		if (lmod(num - first, step) == 0)
 		    return (true)
 	}
 

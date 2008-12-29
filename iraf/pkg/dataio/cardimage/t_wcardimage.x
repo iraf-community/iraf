@@ -22,7 +22,7 @@ pointer	list
 
 bool	clgetb()
 int	fstati(), clplen(), mtfile(), mtneedfileno()
-int	clgeti(), clgfil(), strlen(), btoi(), modi()
+int	clgeti(), clgfil(), strlen(), btoi(), imod()
 pointer	clpopni()
 include "wcardimage.com"
 
@@ -60,7 +60,7 @@ begin
 	# of characters.
 
 	card_length = min (SZ_LINE, clgeti ("card_length"))
-	if (modi(card_length, SZB_CHAR) !=  0)
+	if (imod(card_length, SZB_CHAR) !=  0)
 	    call error (1, "A card must fit in an integral number of chars.")
 
 	# Get number of cards per physical block and convert to packed chars.

@@ -462,7 +462,7 @@ bool	lastline
 long	nldone, blnum
 
 int	and()
-long	modl()
+long	lmod()
 pointer	imps3s(), imps3i(), imps3l(), imps3r(), imps3d()
 pointer	ip_chtype()
 
@@ -492,7 +492,7 @@ begin
 	    lnum = IP_AXLEN(ip,2) - line + 1
 	    if (band == 1) {
 		l_val0 = IP_SZBUF(ip)
-	        blnum = IP_SZBUF(ip) - modl(line-1, l_val0)
+	        blnum = IP_SZBUF(ip) - lmod(line-1, l_val0)
 	    }
 	    lastline = (lnum == 1)
 	} else {

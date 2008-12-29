@@ -32,7 +32,7 @@ pointer	sp, title, hostid, user, xlabel, ylabel, im, data, data1
 
 pointer	pp, clopset(), ie_gdata(), ie_gimage()
 bool	clgpsetb(), fp_equalr()
-int	clgpseti(), btoi(), absi()
+int	clgpseti(), btoi()
 long	clgpsetl()
 real	clgpsetr()
 
@@ -191,7 +191,7 @@ begin
 	    else
 		finc = interval
 	} else
-	    finc = - absi(ncontours)
+	    finc = - iabs(ncontours)
 
 	# Open device and make contour plot.
 	call gopks (STDERR)

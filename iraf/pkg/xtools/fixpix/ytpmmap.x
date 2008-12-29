@@ -53,7 +53,7 @@ size_t	sz_val
 int	i, j, flag, nowhite()
 pointer	sp, fname, extname, im, ref, yt_pmmap1()
 bool	streq()
-int	modi()
+int	imod()
 errchk	yt_pmmap1
 
 begin
@@ -76,7 +76,7 @@ begin
 	    }
 	}
 	Memc[fname+j] = EOS
-	if (modi(flag, 2) == 0)
+	if (imod(flag, 2) == 0)
 	    flag = 0
 	else
 	    flag = INVERT_MASK
@@ -573,7 +573,7 @@ pointer	imstatp()
 int	strdic(), envfind(), nscan()
 pointer	pm_open(), mw_openim(), im_pmmapo(), imgl1i(), mw_sctran()
 bool	pm_empty(), pm_linenotempty()
-long	nint_dl()
+long	ldnint()
 include	<nullptr.inc>
 errchk	yt_match_world, pm_open, mw_openim, im_pmmapo
 
@@ -697,12 +697,12 @@ begin
 	# Compute region of mask overlapping the reference image.
 	call mw_ctrand (ctx, 1-0.5D0, x1, 1)
 	call mw_ctrand (ctx, nc+0.5D0, x2, 1)
-	i1 = max (1, nint_dl(min(x1,x2)+1D-5))
-	i2 = min (ncpm, nint_dl(max(x1,x2)-1D-5))
+	i1 = max (1, ldnint(min(x1,x2)+1D-5))
+	i2 = min (ncpm, ldnint(max(x1,x2)-1D-5))
 	call mw_ctrand (cty, 1-0.5D0, y1, 1)
 	call mw_ctrand (cty, nl+0.5D0, y2, 1)
-	j1 = max (1, nint_dl(min(y1,y2)+1D-5))
-	j2 = min (nlpm, nint_dl(max(y1,y2)-1D-5))
+	j1 = max (1, ldnint(min(y1,y2)+1D-5))
+	j2 = min (nlpm, ldnint(max(y1,y2)-1D-5))
 
 	# Set the new mask values to the maximum of all mask values falling
 	# within each reference pixel in the overlap region.
@@ -715,8 +715,8 @@ begin
 	    # padding.  In this case use range lists for speed.
 	    if (lt[1] == 1D0 && lt[4] == 1D0) {
 		call malloc (bufpm, 3+3*nc, TY_INT)
-		k = nint_dl(lt[5])
-		l = nint_dl(lt[6])
+		k = ldnint(lt[5])
+		l = ldnint(lt[6])
 		do j = max(1-l,j1), min(nl-l,j2) {
 		    vold[2] = j
 		    call plglri (pm, vold, Memi[bufpm], 0, nc, PIX_SRC)
@@ -740,8 +740,8 @@ begin
 		do j = 1, nl {
 		    call mw_ctrand (cty, j-0.5D0, y1, 1)
 		    call mw_ctrand (cty, j+0.5D0, y2, 1)
-		    j1 = max (1, nint_dl(min(y1,y2)+1D-5))
-		    j2 = min (nlpm, nint_dl(max(y1,y2)-1D-5))
+		    j1 = max (1, ldnint(min(y1,y2)+1D-5))
+		    j2 = min (nlpm, ldnint(max(y1,y2)-1D-5))
 		    if (j2 < j1)
 			next
 
@@ -755,8 +755,8 @@ begin
 			do i = 1, nc {
 			    call mw_ctrand (ctx, i-0.5D0, x1, 1)
 			    call mw_ctrand (ctx, i+0.5D0, x2, 1)
-			    i1 = max (1, nint_dl(min(x1,x2)+1D-5))
-			    i2 = min (ncpm, nint_dl(max(x1,x2)-1D-5))
+			    i1 = max (1, ldnint(min(x1,x2)+1D-5))
+			    i2 = min (ncpm, ldnint(max(x1,x2)-1D-5))
 			    if (i2 < i1)
 				next
 			    val = Memi[bufref+i-1]
@@ -808,7 +808,7 @@ real	msieval()
 pointer	xt_baopen(), pm_open(), im_pmmapo(), imgl1i()
 pointer	mw_openim(), mw_sctran()
 bool	pm_empty()
-long	nint_dl()
+long	ldnint()
 include	<nullptr.inc>
 errchk	xt_baopen, pm_open, mw_openim, im_pmmapo, msiinit, msifit
 
@@ -888,10 +888,10 @@ begin
 		x = max (0D0, min (double(nc+1), pix_ref[1]))
 		y = max (0D0, min (double(nl+1), pix_ref[2]))
 		if (x > 0.5 && x < nc+0.5 && y > 0.5 && y < nl+0.5) {
-		    l = max (1, min (ncpm, nint_dl(pix_im[1])))
+		    l = max (1, min (ncpm, ldnint(pix_im[1])))
 		    xmin = min (xmin, l)
 		    xmax = max (xmax, l)
-		    l = max (1, min (nlpm, nint_dl(pix_im[2])))
+		    l = max (1, min (nlpm, ldnint(pix_im[2])))
 		    ymin = min (ymin, l)
 		    ymax = max (ymax, l)
 		}
@@ -942,14 +942,14 @@ begin
 		    pix_tmp[2] = min (double(nc), pix_ref[1] + 0.45 * d[1])
 		    if (pix_tmp[2] < 1 || pix_tmp[1] > nc)
 		        next
-		    c1_ref = nint_dl(pix_tmp[1])
-		    c2_ref = nint_dl(pix_tmp[2])
+		    c1_ref = ldnint(pix_tmp[1])
+		    c2_ref = ldnint(pix_tmp[2])
 		    pix_tmp[1] = max (1D0, pix_ref[2] - 0.45 * d[2])
 		    pix_tmp[2] = min (double(nl), pix_ref[2] + 0.45 * d[2])
 		    if (pix_tmp[2] < 1 || pix_tmp[1] > nl)
 		        next
-		    l1_ref = nint_dl(pix_tmp[1])
-		    l2_ref = nint_dl(pix_tmp[2])
+		    l1_ref = ldnint(pix_tmp[1])
+		    l2_ref = ldnint(pix_tmp[2])
 		    sz_val = 1
 		    do l_ref = l1_ref, l2_ref {
 			do c_ref = c1_ref, c2_ref {

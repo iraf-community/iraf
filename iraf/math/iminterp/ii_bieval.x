@@ -346,7 +346,7 @@ int	j, k, jj, nconv, nx, ny, index, mink, maxk, minj, maxj, last_point
 pointer	sp, taper, ac, ar, offk, offj
 real	sconst, a2, a4, sdx, dx, dy, dxn, dyn, ax, ay, px, py, sumx, sumy, sum
 real	dx2
-int	nint_ri(), modi()
+int	inint(), imod()
 
 begin
 	# Compute the length of the convolution.
@@ -366,7 +366,7 @@ begin
 
 	# Precompute the taper array. Incorporate the sign change portion
 	# of the sinc interpolator into the taper array.
-	if (modi (nsinc, 2) == 0)
+	if (imod (nsinc, 2) == 0)
 	    sdx = 1.0
 	else
 	    sdx = -1.0
@@ -379,8 +379,8 @@ begin
 	do i = 1, npts {
 
 	    # define the fractional pixel interpolation.
-	    nx = nint_ri (x[i])
-	    ny = nint_ri (y[i])
+	    nx = inint (x[i])
+	    ny = inint (y[i])
 	    if (nx < 1 || nx > len_coeff || ny < 1 || ny > len_array) {
 		zfit[i] = 0.0
 		next
@@ -519,15 +519,15 @@ int	nsinc
 int	j, k, xc, yc, lutx, luty, minj, maxj, offj, mink, maxk, offk
 int	index, last_point
 real	dx, dy, sum
-int	nint_ri()
+int	inint()
 
 begin
 	nsinc = (nconv - 1) / 2
 	do i = 1, npts {
 
 	    # Return zero outside of data.
-	    xc = nint_ri (x[i])
-	    yc = nint_ri (y[i])
+	    xc = inint (x[i])
+	    yc = inint (y[i])
 	    if (xc < 1 || xc > len_coeff || yc < 1 || yc > len_array) {
 		zfit[i] = 0.0
 		next
@@ -544,12 +544,12 @@ begin
 	    if (nxincr == 1)
 		lutx = 1
 	    else 
-		lutx = nint_ri ((-dx + 0.5) * (nxincr - 1)) + 1
+		lutx = inint ((-dx + 0.5) * (nxincr - 1)) + 1
 		#lutx = int ((-dx + 0.5) * (nxincr - 1) + 0.5) + 1
 	    if (nyincr == 1)
 		luty = 1
 	    else
-		luty = nint_ri ((-dy + 0.5) * (nyincr - 1)) + 1
+		luty = inint ((-dy + 0.5) * (nyincr - 1)) + 1
 		#luty = int ((-dy + 0.5) * (nyincr - 1) + 0.5) + 1
 
 	    # Compute the convolution limits.
@@ -638,7 +638,7 @@ int	ii, jj, kk, index, nearax, nearbx, nearay, nearby
 real	px[5], py[5], dx, xmin, xmax, m, c, ymin, ymax, xtop
 real	ovlap, accum, waccum, dxfrac, dyfrac, hxfrac, hyfrac, dhxfrac, dhyfrac
 bool	negdx
-int	nint_ri()
+int	inint()
 
 begin
 	dxfrac = max (0.0, min (1.0, 1.0 - xfrac))
@@ -651,10 +651,10 @@ begin
 	do i = 1, npts {
 
 	    # Compute the limits of the integration in x and y.
-	    nearax = nint_ri (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearbx = nint_ri (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearay = nint_ri (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
-	    nearby = nint_ri (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearax = inint (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearbx = inint (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearay = inint (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearby = inint (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
 
 	    # Initialize.
 	    accum = 0.0
@@ -818,16 +818,16 @@ int	ii, jj, kk, index, nearax, nearbx, nearay, nearby
 real	px[5], py[5], dx, xmin, xmax, m, c, ymin, ymax, xtop
 real	ovlap, accum, waccum
 bool	negdx
-int	nint_ri()
+int	inint()
 
 begin
 	do i = 1, npts {
 
 	    # Compute the limits of the integration in x and y.
-	    nearax = nint_ri (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearbx = nint_ri (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearay = nint_ri (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
-	    nearby = nint_ri (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearax = inint (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearbx = inint (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearay = inint (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearby = inint (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
 
 	    # Initialize.
 	    accum = 0.0
@@ -989,16 +989,16 @@ long	i
 int	jj, ii, kk, nearax, nearbx, nearay, nearby, ninter
 real	accum, waccum, px[5], py[5], lx, ld, u1, u2, u1u2, dx, dy, dd
 real	xi, ovlap, xmin, xmax
-int	nint_ri(), modi()
+int	inint(), imod()
 
 begin
 	do i = 1, npts {
 
 	    # Compute the limits of the integration in x and y.
-	    nearax = nint_ri (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearbx = nint_ri (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
-	    nearay = nint_ri (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
-	    nearby = nint_ri (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearax = inint (min (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearbx = inint (max (x[4*i-3], x[4*i-2], x[4*i-1], x[4*i]))
+	    nearay = inint (min (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
+	    nearby = inint (max (y[4*i-3], y[4*i-2], y[4*i-1], y[4*i]))
 
 	    # Initialize.
 	    accum = 0.0
@@ -1075,7 +1075,7 @@ begin
 			ovlap = 0.25
 		    else if (boundary)
 			ovlap = 0.5
-		    else if (modi (ninter, 2) == 0)
+		    else if (imod (ninter, 2) == 0)
 			ovlap = 0.0
 		    else
 		        ovlap = 1.0

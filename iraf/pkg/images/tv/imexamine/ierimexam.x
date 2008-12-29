@@ -588,7 +588,6 @@ pointer	im
 real	radius
 real	xcntr, ycntr
 
-long	l0, l1, l2, l3
 int	k
 long	i, j, x1, x2, y1, y2
 size_t	nx, ny, npts
@@ -655,11 +654,7 @@ begin
 	    }
 	    ycntr = sum1 / sum2
 
-	    l0 = xcntr
-	    l1 = xlast
-	    l2 = ycntr
-	    l3 = ylast
-	    if (l0 == l1 && l2 == l3)
+	    if (aint(xcntr) == aint(xlast) && aint(ycntr) == aint(ylast))
 		break
 	}
 end

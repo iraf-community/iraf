@@ -23,7 +23,7 @@ long	line_1, line_2
 int	i
 pointer	sp, ufd, xp, yp, oo
 bool	pl_upolygon()
-long	absl()
+long	labs()
 extern	pl_upolygon()
 errchk	plvalid
 
@@ -64,7 +64,7 @@ begin
 	}
 
 	if (npts > 2)
-	    if (absl(x[1]-x[npts]) > TOL || absl(y[1]-y[npts]) > TOL) {
+	    if (labs(x[1]-x[npts]) > TOL || labs(y[1]-y[npts]) > TOL) {
 		Memr[xp+npts] = x[1]
 		Memr[yp+npts] = y[1]
 		P_NS(ufd) = npts

@@ -26,14 +26,14 @@ int	days_per_year		# days per year
 long	lval
 
 int	month			# month counter
-int	modi()
-long	modl()
+int	imod()
+long	lmod()
 int	days_per_month[12]	# days per month
 data	days_per_month/31,0,31,30,31,30,31,31,30,31,30,31/
 
 begin
 	lval = SECONDS_PER_DAY
-        seconds = modl (ltime, lval)
+        seconds = lmod (ltime, lval)
         days = ltime / SECONDS_PER_DAY + 1
 
         # Break hours, minutes, seconds.
@@ -46,7 +46,7 @@ begin
         # Break day of week.
 
 	lval = 7
-        TM_WDAY(tm) = modl (days + MONDAY, lval)
+        TM_WDAY(tm) = lmod (days + MONDAY, lval)
 	if (TM_WDAY(tm) == 0)
 	    TM_WDAY(tm) = 7
 
@@ -58,7 +58,7 @@ begin
 	while (days > temp + days_per_year) {
 	    temp = temp + days_per_year
 	    year = year + 1
-	    if (modi (year, 4) == 0)
+	    if (imod (year, 4) == 0)
 	        days_per_year = 366
 	    else
 	        days_per_year = 365
@@ -69,7 +69,7 @@ begin
         # Break month, day of month.
 
 	nights = TM_YDAY(tm)
-	if (modi (TM_YEAR(tm), 4) == 0)
+	if (imod (TM_YEAR(tm), 4) == 0)
 	    days_per_month[2] = 29
 	else
 	    days_per_month[2] = 28

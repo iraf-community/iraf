@@ -78,7 +78,7 @@ size_t	sz_val
 int	i, jj, strlen()
 long	rval1, rval2, j, nrgs, l_val
 pointer	sp, str, ptr
-long	absl(), modl()
+long	labs(), lmod()
 int	ctol()
 
 begin
@@ -129,7 +129,7 @@ begin
 	    if (rval2 >= rmin && rval1 <= rmax) {
 		nrgs = RG_NRGS(rg)
 		l_val = NRGS
-		if (modl (nrgs, l_val) == 0) {
+		if (lmod (nrgs, l_val) == 0) {
 		    sz_val = LEN_RG+2*(nrgs+NRGS)
 		    call realloc (rg, sz_val, TY_STRUCT)
 		}
@@ -138,7 +138,7 @@ begin
 		RG_X1(rg, nrgs) = max (rmin, rval1)
 		RG_X2(rg, nrgs) = min (rmax, rval2)
 		RG_NPTS(rg) = RG_NPTS(rg) +
-		    absl (RG_X1(rg, nrgs) - RG_X2(rg, nrgs)) + 1
+		    labs (RG_X1(rg, nrgs) - RG_X2(rg, nrgs)) + 1
 	    }
 	}
 

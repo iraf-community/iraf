@@ -581,14 +581,14 @@ int	ixy, index, minj, maxj, offj
 long	i, k
 pointer	sp, taper, ac, ixn, work, pac, pwork, ppwork
 real	sconst, a2, a4, dxy, dxyn, dx2, axy, pxy, sumxy, fdxy
-int	modi(), nint_ri()
+int	imod(), inint()
 
 begin
 	# Compute the limits of the convolution in y.
 	nconv = 2 * nsinc + 1
-	nymin = max (1, nint_ri (y[1]) - nsinc)
+	nymin = max (1, inint (y[1]) - nsinc)
 	#nymin = max (1, int (y[1]) - nsinc)
-	nymax = min (len_array, nint_ri (y[nypts]) + nsinc)
+	nymax = min (len_array, inint (y[nypts]) + nsinc)
 	#nymax = min (len_array, int (y[nypts]) + nsinc)
 	nylines = nymax - nymin + 1
 
@@ -605,7 +605,7 @@ begin
 	sconst = (HALFPI / nsinc) ** 2
 	a2 = -0.49670
 	a4 = 0.03705
-	if (modi (nsinc, 2) == 0)
+	if (imod (nsinc, 2) == 0)
 	    fdxy = 1.0
 	else
 	    fdxy = -1.0
@@ -618,7 +618,7 @@ begin
 	# Compute the x interpolants for each shift in x.
 	pac = ac
 	do i = 1, nxpts {
-	    ixy = nint_ri (x[i])
+	    ixy = inint (x[i])
 	    Memi[ixn+i-1] = ixy
 	    dxy = x[i] - ixy
 	    #dxyn = -1 - nsinc - dxy
@@ -667,7 +667,7 @@ begin
 	# Compute the y interpolants for each shift in y.
 	pac = ac
 	do i = 1, nypts {
-	    ixy = nint_ri (y[i])
+	    ixy = inint (y[i])
 	    dxy = y[i] - ixy
 	    Memi[ixn+i-1] = ixy - nsinc - nymin + 1
 	    #dxyn = -1 - nsinc - dxy

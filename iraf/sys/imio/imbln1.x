@@ -13,11 +13,11 @@ pointer	imdes
 long	nx
 
 pointer	bdes
-long	absl()
+long	labs()
 
 begin
 	# Get pointer to most recently used buffer descriptor.
 	bdes = IM_LASTBDES(imdes)
 
-	nx = absl (BD_VE(bdes,1) - BD_VS(bdes,1)) + 1
+	nx = labs (BD_VE(bdes,1) - BD_VS(bdes,1)) + 1
 end

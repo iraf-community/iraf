@@ -23,7 +23,7 @@ pointer	pl
 int	x, y
 int	len_p, i
 include	"imd.com"
-int	nint_ri()
+int	inint()
 
 begin
 	if (npts < 2)
@@ -39,7 +39,7 @@ begin
 	pl = IMD_PLAP(g_kt)
 
 	if (IMD_WIDTH(g_kt) != PL_WIDTH(pl)) {
-	    call idk_linewidth (g_out, nint_ri(GKI_UNPACKREAL(PL_WIDTH(pl))))
+	    call idk_linewidth (g_out, inint(GKI_UNPACKREAL(PL_WIDTH(pl))))
 	    IMD_WIDTH(g_kt) = PL_WIDTH(pl)
 	}
 	if (IMD_COLOR(g_kt) != PL_COLOR(pl)) {

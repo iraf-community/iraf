@@ -56,7 +56,7 @@ short	s1, s2
 pointer	rms
 real	clip
 short	ors(), ands()
-int	modi()
+int	imod()
 real	rmsorted()
 
 begin
@@ -65,7 +65,7 @@ begin
 	med = rmsorted (rms, nclip, index, in)
 
 	# Set mask if needed.
-	s2 = modi(index-1, RM_BOX(rm))
+	s2 = imod(index-1, RM_BOX(rm))
 	s1 = MASK(rm,s2)
 	if (mask != 0 || s1 != 0) {
 	    if (mask != 0)
@@ -76,7 +76,7 @@ begin
 	}
 
 	# Recompute value if there are masks or an excluded value.
-	iexclude = modi(exclude-1, RM_BOX(rm))
+	iexclude = imod(exclude-1, RM_BOX(rm))
 	if (s1 == 0 && iexclude < 0) {
 	    do s2 = 0, RM_BOX(rm)-1, 16 {
 		s1 = MASK(rm,s2)
@@ -153,11 +153,11 @@ short	mask
 real	clip
 pointer	rms
 short	ands()
-int	modi()
+int	imod()
 
 begin
 	rms = RM_RMS(rm)
-	iexclude = modi(exclude-1, RM_BOX(rm))
+	iexclude = imod(exclude-1, RM_BOX(rm))
 
 	# Extract good values to use.
 	nused = 0
@@ -218,11 +218,11 @@ int	index			#I Index of new data (one indexed)
 
 int	i, j
 pointer	rms
-int	modi()
+int	imod()
 
 begin
 	rms = RM_RMS(rm)
-	i = modi(index-1, RM_BOX(rm))
+	i = imod(index-1, RM_BOX(rm))
 	do j = 0, RM_BOX(rm)-1 {
 	    if (IN(rms,j) == i)
 	        return (DATA(rms,j))

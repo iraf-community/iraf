@@ -6,9 +6,9 @@ procedure amods (a, b, c, npix)
 
 short	a[ARB], b[ARB], c[ARB]
 size_t	npix, i
-short	mods()
+short	smod()
 
 begin
 	do i = 1, npix
-	    c[i] = mods (a[i], b[i])
+	    c[i] = smod (a[i], b[i])
 end

@@ -17,7 +17,7 @@ long	x,y			#I center coords of circle
 long	radius			#I radius of circle
 int	rop			#I rasterop
 
-long	absl()
+long	labs()
 errchk	pl_getplane
 include	"pmio.com"
 
@@ -31,7 +31,7 @@ begin
 	    v3[1] = x + radius;  v3[2] = y
 	    call imaplv (PM_REFIM(pl), v3, v4, PM_MAXDIM)
 
-	    call pl_circle (pl, v2[1], v2[2], absl(v4[1]-v2[1]), rop)
+	    call pl_circle (pl, v2[1], v2[2], labs(v4[1]-v2[1]), rop)
 
 	} else
 	    call pl_circle (pl, x, y, radius, rop)

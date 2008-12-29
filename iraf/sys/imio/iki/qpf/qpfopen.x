@@ -35,7 +35,7 @@ int	initialized
 pointer	qp_open, qpio_open()
 real	qpio_statr(), qp_statr()
 int	qpio_getrange(), qp_geti(), qp_gstr(), qp_lenf()
-long	nint_rl()
+long	lnint()
 define	err_ 91
 
 include "qpf.com"
@@ -109,7 +109,7 @@ begin
 
 	if (n >= max(xblock,yblock)) {
 	    call sprintf (Memc[v+7], SZ_FNAME-7, "[%d]")
-		call pargl (nint_rl((xblock+yblock)/2.0))
+		call pargl (lnint((xblock+yblock)/2.0))
 	    IM_MAX(im) = qp_geti (qp, Memc[v])
 	    Memc[v+5] = 'i';  Memc[v+6] = 'n'
 	    IM_MIN(im) = qp_geti (qp, Memc[v])

@@ -15,7 +15,7 @@ pointer	pl			#I mask descriptor
 size_t	sz_val
 pointer	n_bp, o_lp, n_lp
 int	nwords, r_len, b_len, op, i
-int	modi()
+int	imod()
 errchk	malloc, mfree, syserr
 
 begin
@@ -65,7 +65,7 @@ begin
 		call amovs (Mems[o_lp], Mems[n_lp], sz_val)
 
 		LP_NREFS(o_lp) = op / I_SHIFT
-		LP_SETBLEN(o_lp, modi (op, I_SHIFT))
+		LP_SETBLEN(o_lp, imod (op, I_SHIFT))
 		LP_SETBLEN(n_lp, r_len)
 		op = op + r_len
 	    }

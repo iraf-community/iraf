@@ -18,7 +18,7 @@ long	sum, lval
 char	first_char
 int	head, ip, thread
 pointer	el, cp, stab, sbuf
-long	modl()
+long	lmod()
 
 begin
 	# When a symbol is entered in the table a flag is set in the ST_ASCII
@@ -43,7 +43,7 @@ begin
 	}
 
 	lval = ST_INDEXLEN(stp)
-	thread = modl (sum, lval)
+	thread = lmod (sum, lval)
 	head = Memi[ST_INDEX(stp)+thread]
 
 	# If thread is not empty search down it for the named key and return

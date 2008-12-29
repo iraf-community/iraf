@@ -285,7 +285,7 @@ char	buf[SZ_BUF]
 int	fdi, fdo, n, i, msglen
 int	msgsize[8]
 
-int	ndopen(), reopen(), modi()
+int	ndopen(), reopen(), imod()
 long	read()
 data	msgsize /64, 128, 256, 134, 781, 3, 19, 1544/
 
@@ -300,7 +300,7 @@ begin
 	call flush (STDOUT)
 
 	for (i=1;  i <= 5;  i=i+1) {
-	    msglen = msgsize[modi(i,8)+1)
+	    msglen = msgsize[imod(i,8)+1)
 	    call printf ("send %d chars to server\n")
 		call pargi (msglen)
 
@@ -392,7 +392,7 @@ char	port[SZ_LINE]
 int	fd, nmsg, n, i, msglen
 int	msgsize[8]
 
-int	ndopen(), clgeti(), checksum(), modi()
+int	ndopen(), clgeti(), checksum(), imod()
 long	read()
 data	msgsize /64, 128, 256, 134, 781, 3, 19, 1544/
 
@@ -403,7 +403,7 @@ begin
 	fd = ndopen (port, READ_WRITE)
 
 	for (i=1;  i <= nmsg;  i=i+1) {
-	    msglen = msgsize[modi(i,8)+1)
+	    msglen = msgsize[imod(i,8)+1)
 	    call printf ("send %d chars to server, sum=%x\n")
 		call pargi (msglen)
 		call pargi (checksum (buf, msglen))

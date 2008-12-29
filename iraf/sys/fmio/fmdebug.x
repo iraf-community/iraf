@@ -23,8 +23,8 @@ bool	deleted
 int	nlfiles, nlfdeleted, nlfinuse
 long	szbpage, filesize, freespace, i, c_15
 int	spaceinuse
-int	modi()
-long	clktime(), modl()
+int	imod()
+long	clktime(), lmod()
 errchk	fmio_bind
 
 define	end_header_	91
@@ -69,7 +69,7 @@ begin
 	call fprintf (out,
 	"FMIO V%d.%d: datafile=%s, pagesize=%d, nlfiles=%d\n")
 	    call pargi (FM_DFVERSION(fm) / 100)
-	    call pargi (modi(FM_DFVERSION(fm),100))
+	    call pargi (imod(FM_DFVERSION(fm),100))
 	    call pargstr (FM_DFNAME(fm))
 	    call pargl (szbpage)
 	    call pargi (nlfiles)
@@ -157,10 +157,10 @@ end_ftable_
 	do i = 0, FM_PTINPTI(fm) - 1 {
 	    call fprintf (out, " %4d")
 		call pargl (Meml[FM_PTINDEX(fm)+i])
-	    if (modl (i+1, c_15) == 0)
+	    if (lmod (i+1, c_15) == 0)
 		call fprintf (out, "\n")
 	}
-	if (modl (FM_PTINPTI(fm), c_15) != 0)
+	if (lmod (FM_PTINPTI(fm), c_15) != 0)
 	    call fprintf (out, "\n")
 
 end_ptindex_
@@ -174,10 +174,10 @@ end_ptindex_
 	do i = 0, FM_PTNPTE(fm) - 1 {
 	    call fprintf (out, " %4d")
 		call pargs (Mems[FM_PTABLE(fm)+i])
-	    if (modl (i+1, c_15) == 0)
+	    if (lmod (i+1, c_15) == 0)
 		call fprintf (out, "\n")
 	}
-	if (modl (FM_PTINPTI(fm), c_15) != 0)
+	if (lmod (FM_PTINPTI(fm), c_15) != 0)
 	    call fprintf (out, "\n")
 
 end_ptable_

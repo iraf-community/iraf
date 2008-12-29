@@ -291,7 +291,7 @@ int	precision		#I the precision of the output time field
 int	flags			#I see <time.h>
 
 int	oldfits, field
-int	strlen(), btoi(), modi()
+int	strlen(), btoi(), imod()
 
 begin
 	datestr[1] = EOS
@@ -302,7 +302,7 @@ begin
 	        call sprintf (datestr, maxch, "%02d/%02d/%02d")
 		    call pargi (day)
 		    call pargi (month)
-		    call pargi (modi (year, 1900))
+		    call pargi (imod (year, 1900))
 	    }
 	} else if (IS_INDEFD(time)) {
 	    call sprintf (datestr, maxch, "%04d-%02d-%02d")
@@ -352,7 +352,7 @@ int	precision		#I the precision of the output time field
 int	flags			#I see <time.h>
 
 int	oldfits, field
-int	strlen(), btoi(), modi()
+int	strlen(), btoi(), imod()
 
 begin
 
@@ -364,7 +364,7 @@ begin
 	        call sprintf (datestr, maxch, "%02d/%02d/%02d")
 		    call pargi (day)
 		    call pargi (month)
-		    call pargi (modi (year, 1900))
+		    call pargi (imod (year, 1900))
 	    }
 	} else if (IS_INDEFI(hours) || IS_INDEFI(minutes) ||
 	    IS_INDEFD(seconds)) {

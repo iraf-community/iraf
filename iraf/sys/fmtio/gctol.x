@@ -29,7 +29,6 @@ long	lval			# output variable
 int	digit, base, ip_save, first_char
 char	ch
 bool	neg
-int	absi()
 
 begin
 	while (IS_WHITE (str[ip]))
@@ -41,7 +40,7 @@ begin
 	    ip = ip + 1
 
 	first_char = ip
-	base = absi (radix)
+	base = iabs (radix)
 
 	# The first character (following than the sign character) must be
 	# a digit, regardless of the radix.

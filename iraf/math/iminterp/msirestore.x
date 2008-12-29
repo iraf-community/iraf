@@ -14,10 +14,10 @@ real	interpolant[ARB]	# array containing the interpolant
 size_t	sz_val
 int	interp_type
 size_t	npix
-int	nint_ri()
+int	inint()
 
 begin
-	interp_type = nint_ri (MSI_SAVETYPE(interpolant))
+	interp_type = inint (MSI_SAVETYPE(interpolant))
 	if (interp_type < 1 || interp_type > II_NTYPES)
 	    call error (0, "MSIRESTORE: Unknown interpolant type.")
 
@@ -26,16 +26,16 @@ begin
 	sz_val = LEN_MSISTRUCT
 	call malloc (msi, sz_val, TY_STRUCT)
 	MSI_TYPE(msi) = interp_type
-	MSI_NSINC(msi) = nint_ri (MSI_SAVENSINC(interpolant))
-	MSI_NXINCR(msi) = nint_ri (MSI_SAVENXINCR(interpolant))
-	MSI_NYINCR(msi) = nint_ri (MSI_SAVENYINCR(interpolant))
+	MSI_NSINC(msi) = inint (MSI_SAVENSINC(interpolant))
+	MSI_NXINCR(msi) = inint (MSI_SAVENXINCR(interpolant))
+	MSI_NYINCR(msi) = inint (MSI_SAVENYINCR(interpolant))
 	MSI_XSHIFT(msi) = MSI_SAVEXSHIFT(interpolant)
 	MSI_YSHIFT(msi) = MSI_SAVEYSHIFT(interpolant)
 	MSI_XPIXFRAC(msi) = MSI_SAVEXPIXFRAC(interpolant)
 	MSI_YPIXFRAC(msi) = MSI_SAVEYPIXFRAC(interpolant)
-	MSI_NXCOEFF(msi) = nint_ri (MSI_SAVENXCOEFF(interpolant))
-	MSI_NYCOEFF(msi) = nint_ri (MSI_SAVENYCOEFF(interpolant))
-	MSI_FSTPNT(msi) = nint_ri (MSI_SAVEFSTPNT(interpolant))
+	MSI_NXCOEFF(msi) = inint (MSI_SAVENXCOEFF(interpolant))
+	MSI_NYCOEFF(msi) = inint (MSI_SAVENYCOEFF(interpolant))
+	MSI_FSTPNT(msi) = inint (MSI_SAVEFSTPNT(interpolant))
 	MSI_BADVAL(msi) = MSI_SAVEBADVAL(interpolant)
 
 	# allocate space for and restore coefficients

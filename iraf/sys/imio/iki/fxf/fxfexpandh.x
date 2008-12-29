@@ -34,9 +34,8 @@ size_t	bufsize, nchars, rem
 long	psize, lval, nbk, j
 long	hoffset, poffset
 
-int	fxf_xaddl()
-int	modi()
-long	read(), note(), modl(), fstatl()
+int	fxf_xaddl(), imod()
+long	read(), note(), lmod(), fstatl()
 errchk	malloc, read, write
 
 begin
@@ -107,7 +106,7 @@ begin
 	        sz_val = LEN_CARD
 	        call amovc (line, Memc[ip], sz_val)
 	        ip = ip + LEN_CARD
-		if (modi (k,36) == 0) {
+		if (imod (k,36) == 0) {
 		    # We have more than one block of blanks.
 		    call miipak (Memc[op], Memc[op], nchars, TY_CHAR, MII_BYTE)
 		    sz_val = FITS_BLOCK_CHARS
@@ -133,7 +132,7 @@ begin
 
 	    nbk = psize / bufsize
 	    lval = bufsize
-	    rem = modl (psize,lval)
+	    rem = lmod (psize,lval)
 
             if (group == gn)
 		pixoff = note(out_fd)
@@ -265,7 +264,7 @@ char	card[LEN_CARD]
 long	totpix, nbytes
 int	index, k, i, pcount, bitpix, naxis, ip
 long	len_axis[7]
-int	fxf_ctype(), absi()
+int	fxf_ctype()
 bool	end_card
 errchk	syserr, syserrs
 
@@ -311,7 +310,7 @@ begin
 	    # Compute the size of the data area (pixel matrix plus PCOUNT)
 	    # in bytes.  Be careful not to overflow a 32 bit integer.
 
-	    nbytes = (totpix + pcount) * (absi(bitpix) / NBITS_BYTE)
+	    nbytes = (totpix + pcount) * (iabs(bitpix) / NBITS_BYTE)
 
 	    # Round up to fill the final 2880 byte FITS logical block.
 	    nbytes = ((nbytes + 2880-1) / 2880) * 2880
@@ -340,7 +339,7 @@ int	nlines		#I minimum number of header lines to be added
 size_t	sz_val
 pointer	ip
 int	nbc, k, ncards, nkeyw
-int	strncmp(), modi()
+int	strncmp(), imod()
 
 begin
 	# Go to the end of buffer and get last line pointer
@@ -393,7 +392,7 @@ begin
 	    ncards = nlines - nbc
 
 	    # Adjust to a 36 cards boundary.
-	    ncards = 36 - modi (ncards, 36) + ncards
+	    ncards = 36 - imod (ncards, 36) + ncards
 	} else
 	    ncards = 0
 

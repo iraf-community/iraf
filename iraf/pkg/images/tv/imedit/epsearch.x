@@ -16,7 +16,7 @@ long	xa, ya, xb, yb		# Aperture (initial and final)
 
 real	xc, yc, search2, dj2, r2, dmax
 long	i, j, i1, i2, j1, j2, imax, jmax
-long	nint_rl()
+long	lnint()
 
 begin
 	if (EP_SEARCH(ep) == 0.)
@@ -29,14 +29,14 @@ begin
 	xc = (xa + xb) / 2.
 	i1 = max (1., xc - search2)
 	i2 = min (real(nx), xc + search2)
-	imax = nint_rl(xc)
+	imax = lnint(xc)
  
 	ya = ya - EP_Y1(ep) + 1
 	yb = yb - EP_Y1(ep) + 1
 	yc = (ya + yb) / 2.
 	j1 = max (1., yc - search2)
 	j2 = min (real(ny), yc + search2)
-	jmax = nint_rl(yc)
+	jmax = lnint(yc)
 
 	dmax = data[imax,jmax]
 	switch (ap) {

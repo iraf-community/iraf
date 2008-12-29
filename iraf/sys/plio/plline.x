@@ -21,7 +21,7 @@ int	npts
 long	x[4], y[4]
 real	theta, hwidth, dx, dy, width
 
-long	nint_rl()
+long	lnint()
 
 begin
 	width = a_width
@@ -51,17 +51,17 @@ begin
 	    npts = 2
 
 	} else {
-	    x[1] = x1 + nint_rl (hwidth * cos(theta+HALFPI))
-	    y[1] = y1 + nint_rl (hwidth * sin(theta+HALFPI))
+	    x[1] = x1 + lnint (hwidth * cos(theta+HALFPI))
+	    y[1] = y1 + lnint (hwidth * sin(theta+HALFPI))
 
-	    x[2] = x1 + nint_rl (hwidth * cos(theta-HALFPI))
-	    y[2] = y1 + nint_rl (hwidth * sin(theta-HALFPI))
+	    x[2] = x1 + lnint (hwidth * cos(theta-HALFPI))
+	    y[2] = y1 + lnint (hwidth * sin(theta-HALFPI))
 
-	    x[3] = x2 + nint_rl (hwidth * cos(theta-HALFPI))
-	    y[3] = y2 + nint_rl (hwidth * sin(theta-HALFPI))
+	    x[3] = x2 + lnint (hwidth * cos(theta-HALFPI))
+	    y[3] = y2 + lnint (hwidth * sin(theta-HALFPI))
 
-	    x[4] = x2 + nint_rl (hwidth * cos(theta+HALFPI))
-	    y[4] = y2 + nint_rl (hwidth * sin(theta+HALFPI))
+	    x[4] = x2 + lnint (hwidth * cos(theta+HALFPI))
+	    y[4] = y2 + lnint (hwidth * sin(theta+HALFPI))
 	    npts = 4
 	}
 

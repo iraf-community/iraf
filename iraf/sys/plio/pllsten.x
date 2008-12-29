@@ -33,7 +33,7 @@ long	iz, o_iz, segsize, np, o_np, nz, x1, n, i
 int	v_src, v_dst, v_stn, src_value
 int	opcode
 long	d_src[LEN_PLLDES], d_dst[LEN_PLLDES], d_stn[LEN_PLLDES]
-int	modi(), absi()
+int	imod()
 define	copyout_ 91
 define	done_ 92
 
@@ -238,7 +238,7 @@ copyout_	pv = v_dst
 		if (dv != 0) {
 		    # Output IH or DH instruction?
 		    hi = pv
-		    if (absi(dv) > I_DATAMAX) {
+		    if (iabs(dv) > I_DATAMAX) {
 			ll_out[op] = M_SH + and (pv, I_DATAMAX)
 			op = op + 1
 			ll_out[op] = pv / I_SHIFT

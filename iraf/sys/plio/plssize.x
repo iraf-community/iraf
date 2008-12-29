@@ -18,7 +18,7 @@ long	lval
 size_t	npix
 int	i
 pointer	sp, px, lp
-int	pl_p2ls(), modi()
+int	pl_p2ls(), imod()
 errchk	malloc, calloc, mfree
 
 begin

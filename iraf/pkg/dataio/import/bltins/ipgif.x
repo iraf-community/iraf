@@ -765,7 +765,7 @@ int	code_size				#i op code size
 
 int	i, j, count, ret
 int	val1, val2
-int	btoi(), and(), shifti(), ori(), modi()
+int	btoi(), and(), shifti(), ori(), imod()
 int	gif_get_data_block()
 
 begin
@@ -798,7 +798,7 @@ begin
 	j = 0
         ret = 0
 	while (j < code_size) {
-	    val1 = btoi ( and (int(CODEBUF(gif,i/8)), shifti(1,modi(i,8))) != 0 )
+	    val1 = btoi ( and (int(CODEBUF(gif,i/8)), shifti(1,imod(i,8))) != 0 )
             val2 = shifti (val1, j)
             ret = ori (ret, val2)
 	    i = i + 1

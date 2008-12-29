@@ -193,7 +193,7 @@ char	format[ARB]		#I desired date format for old dates
 int	cutover			#I write new format for years >= cutover
 
 int	tm[LEN_TMSTRUCT], nchars
-int	dtm_encode_hms(), modi()
+int	dtm_encode_hms(), imod()
 long	lsttogmt()
 bool	streq()
 
@@ -225,7 +225,7 @@ begin
 	    call sprintf (datestr, maxch, "%02d/%02d/%02d")
 		call pargi (TM_MDAY(tm))
 		call pargi (TM_MONTH(tm))
-		call pargi (modi(TM_YEAR(tm),100))
+		call pargi (imod(TM_YEAR(tm),100))
 
 	}
 end

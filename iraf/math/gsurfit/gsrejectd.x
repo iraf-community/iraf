@@ -26,7 +26,7 @@ int	ii, j, k, l
 int	maxorder, xorder, xxorder, xindex, yindex, ntimes
 pointer	sp, vzptr, mzptr, xbptr, ybptr
 double	byw, bw
-int	modi()
+int	imod()
 
 begin
 	# increment the number of points
@@ -118,7 +118,7 @@ begin
 		    do j = k + ntimes, GS_NCOEFF(sf) {
 		        MATRIX(mzptr+ii) = MATRIX(mzptr+ii) - bw *
 			    XBASIS(xbptr+xindex) * YBASIS(ybptr+yindex)	
-			if (modi (xindex, xxorder) == 0) {
+			if (imod (xindex, xxorder) == 0) {
 			    xindex = 1
 			    yindex = yindex + 1
 			    switch (GS_XTERMS(sf)) {

@@ -38,7 +38,7 @@ size_t	len
 
 int	strlen()
 bool	streq()
-long	modl()
+long	lmod()
 
 begin
 	c_2 = 2
@@ -90,7 +90,7 @@ begin
 	call calloc (bptr, sz_val, TY_CHAR)
 
 	l_val = EPS_BCNT(eps)
-	if (modl(l_val,c_2) == 0) {
+	if (lmod(l_val,c_2) == 0) {
 	    sz_val = SZ_TRAILER
 	    call amovc ("\ngrestore showpage\n%%Trailer\n\0", 
 			BUF(eps,EPS_BCNT(eps)), sz_val)
@@ -268,7 +268,7 @@ long	cols, rows, icols, irows
 int	devpix, turnflag
 real    scale, pixfac, scols, srows, llx, lly
 
-int	strlen(), stropen(), modi()
+int	strlen(), stropen(), imod()
 
 begin
 	fd = EX_FD(ex)
@@ -393,7 +393,7 @@ begin
 
 	# See if we need to pad the string to write it out correctly.
 	len = strlen(BUF(eps,1))
-	if (modi(len,2) == 1) {
+	if (imod(len,2) == 1) {
 	    BUF(eps,len+1) = '\n'
 	} else {
 	    BUF(eps,len+1) = ' '

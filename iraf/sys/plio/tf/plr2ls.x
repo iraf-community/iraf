@@ -16,8 +16,8 @@ size_t	npix			#I number of pixels to convert
 short	hi, pv
 int	op, nr, i, ival
 long	last, xe, x1, x2, iz, np, nz, dv, v
-int	modi()
-long	absl()
+int	imod()
+long	labs()
 define	done_ 91
 
 begin
@@ -83,7 +83,7 @@ begin
 		if (dv != 0) {
 		    # Output IH or DH instruction?
 		    hi = pv
-		    if (absl(dv) > I_DATAMAX) {
+		    if (labs(dv) > I_DATAMAX) {
 			ival = pv
 			ll_dst[op] = M_SH + and (ival, I_DATAMAX)
 			op = op + 1

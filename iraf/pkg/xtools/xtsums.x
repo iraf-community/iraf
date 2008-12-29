@@ -215,7 +215,7 @@ long	c1, c2, l1, l2, nl
 size_t	ncols, nlines, nc
 pointer	j
 
-long	modl()
+long	lmod()
 pointer	imgs2r()
 
 begin
@@ -260,7 +260,7 @@ begin
 	    l2 = line2
 	    call aclrr (Memr[data], nc)
 	    do i = l1, l2 {
-		j = data + (modl(i, nl) + 1) * nc
+		j = data + (lmod(i, nl) + 1) * nc
 		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], nc)
 		call aaddr (Memr[data], Memr[j], Memr[data], nc)
 	    }
@@ -271,11 +271,11 @@ begin
 
 	} else if (line1 > l1) {
 	    do i = l1, line1 - 1 {
-		j = data + (modl(i, nl) + 1) * nc
+		j = data + (lmod(i, nl) + 1) * nc
 		call asubr (Memr[data], Memr[j], Memr[data], nc)
 	    }
 	    do i = l2 + 1, line2 {
-		j = data + (modl(i, nl) + 1) * nc
+		j = data + (lmod(i, nl) + 1) * nc
 		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], nc)
 		call aaddr (Memr[data], Memr[j], Memr[data], nc)
 	    }
@@ -284,11 +284,11 @@ begin
 
 	} else {
 	    do i = line2 + 1, l2 {
-		j = data + (modl(i, nl) + 1) * nc
+		j = data + (lmod(i, nl) + 1) * nc
 		call asubr (Memr[data], Memr[j], Memr[data], nc)
 	    }
 	    do i = line1, l1 - 1 {
-		j = data + (modl(i, nl) + 1) * nc
+		j = data + (lmod(i, nl) + 1) * nc
 		call amovr (Memr[imgs2r (im, c1, c2, i, i)], Memr[j], nc)
 		call aaddr (Memr[data], Memr[j], Memr[data], nc)
 	    }
@@ -318,7 +318,7 @@ long	c1, c2, l1, l2, nc
 pointer	j
 
 pointer	cogetr()
-long	modl()
+long	lmod()
 
 begin
 	ncols = col2 - col1 + 1
@@ -362,7 +362,7 @@ begin
 	    l2 = line2
 	    call aclrr (Memr[data], nlines)
 	    do i = c1, c2 {
-		j = data + (modl(i, nc) + 1) * nl
+		j = data + (lmod(i, nc) + 1) * nl
 		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], nl)
 		call aaddr (Memr[data], Memr[j], Memr[data], nl)
 	    }
@@ -373,11 +373,11 @@ begin
 
 	} else if (col1 > c1) {
 	    do i = c1, col1 - 1 {
-		j = data + (modl(i, nc) + 1) * nl
+		j = data + (lmod(i, nc) + 1) * nl
 		call asubr (Memr[data], Memr[j], Memr[data], nl)
 	    }
 	    do i = c2 + 1, col2 {
-		j = data + (modl(i, nc) + 1) * nl
+		j = data + (lmod(i, nc) + 1) * nl
 		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], nl)
 		call aaddr (Memr[data], Memr[j], Memr[data], nl)
 	    }
@@ -386,11 +386,11 @@ begin
 
 	} else {
 	    do i = col2 + 1, c2 {
-		j = data + (modl(i, nc) + 1) * nl
+		j = data + (lmod(i, nc) + 1) * nl
 		call asubr (Memr[data], Memr[j], Memr[data], nl)
 	    }
 	    do i = col1, c1 - 1 {
-		j = data + (modl(i, nc) + 1) * nl
+		j = data + (lmod(i, nc) + 1) * nl
 		call amovr (Memr[cogetr (co, i, l1, l2)], Memr[j], nl)
 		call aaddr (Memr[data], Memr[j], Memr[data], nl)
 	    }

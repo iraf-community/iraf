@@ -28,14 +28,14 @@ long	op, step
 size_t	nbytes, nchars, n, c_1
 
 long	read(), imnote()
-long	absl()
+long	labs()
 errchk	imerr, seek, read, pl_glpi, pl_glri
 include	<szdtype.inc>
 
 begin
 	c_1 = 1
 
-	step = absl (xstep)
+	step = labs (xstep)
 	if (v[1] < 1 || ((npix-1) * step) + v[1] > IM_SVLEN(im,1))
 	    call imerr (IM_NAME(im), SYS_IMREFOOB)
 

@@ -34,10 +34,10 @@ int	i, ndim
 long	ip, n, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
-long	modl()
+long	lmod()
 
 long	imgnls()
-long	nint_rl()
+long	lnint()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -67,11 +67,11 @@ begin
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
 	    # Convert pixel number to image vector coordinates.
-	    n = npix; ip = nint_rl(p)
+	    n = npix; ip = lnint(p)
 	    do i = ndim, 1, -1 {
 	        n = n / IM_LEN(im,i)
 	        v[i] = 1 + ip / n
-		ip = modl(ip, n)
+		ip = lmod(ip, n)
 	    }
 
 	    # Sample the pixels in the line.
@@ -85,7 +85,7 @@ begin
 		if (imgnls (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint_rl(c)
+		    ip = lnint(c)
 		    nreturn = nreturn + 1
 		    sample[nreturn] = Mems[buf+ip]
 		    p = p + pstep
@@ -99,7 +99,7 @@ begin
 		if (imgnls (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint_rl(c)
+		    ip = lnint(c)
 		    if (Mems[bpmbuf+ip] == 0) {
 			nreturn = nreturn + 1
 			sample[nreturn] = Mems[buf+ip]
@@ -129,11 +129,11 @@ int	i, ndim
 long	ip, n, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
-long	modl()
+long	lmod()
 
 long	imgnls()
 long	imgnli()
-long	nint_rl()
+long	lnint()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -163,11 +163,11 @@ begin
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
 	    # Convert pixel number to image vector coordinates.
-	    n = npix; ip = nint_rl(p)
+	    n = npix; ip = lnint(p)
 	    do i = ndim, 1, -1 {
 	        n = n / IM_LEN(im,i)
 	        v[i] = 1 + ip / n
-		ip = modl(ip, n)
+		ip = lmod(ip, n)
 	    }
 
 	    # Sample the pixels in the line.
@@ -181,7 +181,7 @@ begin
 		if (imgnli (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint_rl(c)
+		    ip = lnint(c)
 		    nreturn = nreturn + 1
 		    sample[nreturn] = Memi[buf+ip]
 		    p = p + pstep
@@ -195,7 +195,7 @@ begin
 		if (imgnli (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint_rl(c)
+		    ip = lnint(c)
 		    if (Mems[bpmbuf+ip] == 0) {
 			nreturn = nreturn + 1
 			sample[nreturn] = Memi[buf+ip]
@@ -225,11 +225,11 @@ int	i, ndim
 long	ip, n, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
-long	modl()
+long	lmod()
 
 long	imgnls()
 long	imgnlr()
-long	nint_rl()
+long	lnint()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -259,11 +259,11 @@ begin
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
 	    # Convert pixel number to image vector coordinates.
-	    n = npix; ip = nint_rl(p)
+	    n = npix; ip = lnint(p)
 	    do i = ndim, 1, -1 {
 	        n = n / IM_LEN(im,i)
 	        v[i] = 1 + ip / n
-		ip = modl(ip, n)
+		ip = lmod(ip, n)
 	    }
 
 	    # Sample the pixels in the line.
@@ -277,7 +277,7 @@ begin
 		if (imgnlr (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint_rl(c)
+		    ip = lnint(c)
 		    nreturn = nreturn + 1
 		    sample[nreturn] = Memr[buf+ip]
 		    p = p + pstep
@@ -291,7 +291,7 @@ begin
 		if (imgnlr (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint_rl(c)
+		    ip = lnint(c)
 		    if (Mems[bpmbuf+ip] == 0) {
 			nreturn = nreturn + 1
 			sample[nreturn] = Memr[buf+ip]
@@ -321,11 +321,11 @@ int	i, ndim
 long	ip, n, npix, nc
 real	p, c, pstep, cstep
 pointer	buf, bpmbuf
-long	modl()
+long	lmod()
 
 long	imgnls()
 long	imgnld()
-long	nint_rl()
+long	lnint()
 
 begin
 	# Determine the number of pixels in the data, the number
@@ -355,11 +355,11 @@ begin
 	for (p=(pstep-0.01)/2; p<npix && nreturn<nsample;) {
 
 	    # Convert pixel number to image vector coordinates.
-	    n = npix; ip = nint_rl(p)
+	    n = npix; ip = lnint(p)
 	    do i = ndim, 1, -1 {
 	        n = n / IM_LEN(im,i)
 	        v[i] = 1 + ip / n
-		ip = modl(ip, n)
+		ip = lmod(ip, n)
 	    }
 
 	    # Sample the pixels in the line.
@@ -373,7 +373,7 @@ begin
 		if (imgnld (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint_rl(c)
+		    ip = lnint(c)
 		    nreturn = nreturn + 1
 		    sample[nreturn] = Memd[buf+ip]
 		    p = p + pstep
@@ -387,7 +387,7 @@ begin
 		if (imgnld (im, buf, v) == EOF)
 		    break
 		for (; c<nc && nreturn<nsample; c=c+cstep) {
-		    ip = nint_rl(c)
+		    ip = lnint(c)
 		    if (Mems[bpmbuf+ip] == 0) {
 			nreturn = nreturn + 1
 			sample[nreturn] = Memd[buf+ip]

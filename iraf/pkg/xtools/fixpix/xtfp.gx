@@ -62,7 +62,7 @@ pointer	pm, data, bp
 
 bool	pm_linenotempty()
 $if (datatype == sil)
-long	nint_rl()
+long	lnint()
 $endif
 pointer	imgl2$t(), xt_fpval$t()
 
@@ -230,7 +230,7 @@ begin
 		    }
 		}
 		$if (datatype == sil)
-		Mem$t[data+i-1] = nint_rl(val)
+		Mem$t[data+i-1] = lnint(val)
 		$else
 		Mem$t[data+i-1] = val
 		$endif

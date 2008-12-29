@@ -55,7 +55,7 @@ int	fd
 size_t	nchars
 long	w
 pointer	ras_open()
-long	modl()
+long	lmod()
 include	<nullptr.inc>
 
 long    filepos
@@ -98,7 +98,7 @@ begin
         # Round up to account for 16 bit line blocking.
 	w = RAS_WIDTH(ras) * (RAS_DEPTH(ras) / 8)
 	l_val = SZB_CHAR
-        nchars = w + modl(w, l_val)
+        nchars = w + lmod(w, l_val)
 
 
         # Patch up the pixtype param if needed.

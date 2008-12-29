@@ -33,7 +33,7 @@ size_t	nx, ny
 real	xc, yc, bkg, r, dr, fit[5], xfit, yfit
 pointer	sp, title, avstr, im, pp, data, xs, ys, ptr
 real	asumr(), amedr()
-long	nint_rl()
+long	lnint()
 pointer	clopset(), ie_gimage(), ie_gdata()
 
 errchk	ie_gdata, mr_solve
@@ -80,8 +80,8 @@ begin
 	r = max (rplot, 8 * sigma + width)
 	x1 = xc - r
 	x2 = xc + r
-	y1 = nint_rl(yc) - (navg - 1) / 2
-	y2 = nint_rl(yc) + navg / 2
+	y1 = lnint(yc) - (navg - 1) / 2
+	y2 = lnint(yc) + navg / 2
 	iferr {
 	    if (axis == 1)
 		data = ie_gdata (im, x1, x2, y1, y2)
@@ -158,7 +158,7 @@ begin
 	}
 
 	# Set initial fit parameters
-	k = max (0, nint_rl(xc - x1))
+	k = max (0, lnint(xc - x1))
 	fit[1] = bkg
 	fit[2] = 0.
 	fit[3] = Memr[ys+k] - fit[1]
@@ -203,7 +203,7 @@ begin
 
 	l_val = xc - x1 - rplot
 	j = max (0, l_val)
-	k = min (nx-1, nint_rl(xc - x1 + rplot))
+	k = min (nx-1, lnint(xc - x1 + rplot))
 	if (axis == 1)
 	    call ie_graph (gp, mode, pp, Memc[title],
 		Memr[xs+j], Memr[ys+j], k-j+1, IE_XLABEL(ie), IE_XFORMAT(ie))

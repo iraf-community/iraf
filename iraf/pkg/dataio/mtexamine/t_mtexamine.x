@@ -254,14 +254,14 @@ long	i
 int	nchars
 char	ch, outstr[SZ_FNAME]
 int	ctocc()
-long	modl()
+long	lmod()
 include "mtexamine.com"
 
 begin
 	c_1 = 1
 	for (i = 1; i <= nelems; i = i + 1) {
 	    l_val = vals_per_line
-	    if (modl(i, l_val) == 1) {
+	    if (lmod(i, l_val) == 1) {
 		call printf ("\n%*d:")
 		    call pargi (FIELD_INDEX)
 		    call pargl (i)

@@ -8,9 +8,9 @@ short	a[ARB]
 short	b
 short	c[ARB]
 size_t	npix, i
-short	mods()
+short	smod()
 
 begin
 	do i = 1, npix
-	    c[i] = mods (a[i], b)
+	    c[i] = smod (a[i], b)
 end

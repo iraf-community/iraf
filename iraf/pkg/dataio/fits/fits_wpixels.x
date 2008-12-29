@@ -32,7 +32,7 @@ pointer	spp, mii, ip, op
 int	sizeof()
 long	fstatl()
 size_t	miipksize()
-long	note(), modl()
+long	note(), lmod()
 errchk	malloc, mfree, write, miipak, amovc
 data	mii /NULL/, spp/NULL/
 
@@ -146,15 +146,15 @@ entry	wft_write_last_record (fd, nrecords)
 	    # Pad out the record if the blocking is non-standard.
 	    szblk = fstatl (fd, F_BUFSIZE) * SZB_CHAR
 	    l_val = FITS_RECORD
-	    if ((bf > 0) && modl(szblk, l_val) != 0 &&
+	    if ((bf > 0) && lmod(szblk, l_val) != 0 &&
 	        (ty_spp != TY_CHAR)) {
 		szblk = szblk / SZB_CHAR
 		n = note (fd) - 1
 		l_val = n
-		if (modl(l_val, szblk) == 0)
+		if (lmod(l_val, szblk) == 0)
 		    n = 0
 		else
-		    n = szblk - modl(l_val, szblk)
+		    n = szblk - lmod(l_val, szblk)
 		for (op = 1; op <= n; op = op + nch_rec) {
 		    szblk = min (nch_rec, n - op + 1)
 		    call amovkc (zero, Memc[spp], szblk)

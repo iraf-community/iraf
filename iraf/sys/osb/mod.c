@@ -5,22 +5,22 @@
 #define import_knames
 #include <iraf.h>
 
-XINT MODI ( XINT *a, XINT *b )
+XSHORT SMOD ( XSHORT *a, XSHORT *b )
 {
     return (*a) % (*b);
 }
 
-XLONG MODL ( XLONG *a, XLONG *b )
+XINT IMOD ( XINT *a, XINT *b )
 {
     return (*a) % (*b);
 }
 
-XSHORT MODS ( XSHORT *a, XSHORT *b )
+XLONG LMOD ( XLONG *a, XLONG *b )
 {
     return (*a) % (*b);
 }
 
-XPOINTER MODP ( XPOINTER *a, XPOINTER *b )
+XPOINTER PMOD ( XPOINTER *a, XPOINTER *b )
 {
     return (*a) % (*b);
 }

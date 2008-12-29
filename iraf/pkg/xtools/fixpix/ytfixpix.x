@@ -33,7 +33,7 @@ pointer	sp, buf, cols
 
 bool	pm_empty()
 pointer	pm_newcopy()
-long	modl()
+long	lmod()
 errchk	pmglrs, pmplrs
 
 begin
@@ -77,23 +77,23 @@ begin
 	    lval = FP_LDEF
 	    l1 = cvalin - 1
 	    l2 = nc
-	    cval = modl(l1,l2) + 1
+	    cval = lmod(l1,l2) + 1
 	    if (lval == cval)
 		lval = FP_CDEF
 	} else if (IS_INDEFI(cvalin) || cvalin < 1) {
 	    l1 = lvalin - 1
 	    l2 = nc
-	    lval = modl(l1,l2) + 1
+	    lval = lmod(l1,l2) + 1
 	    cval = FP_CDEF
 	    if (cval == lval)
 		cval = FP_LDEF
 	} else if (lvalin != cvalin) {
 	    l1 = lvalin - 1
 	    l2 = nc
-	    lval = modl(l1,l2) + 1
+	    lval = lmod(l1,l2) + 1
 	    l1 = cvalin - 1
 	    l2 = nc
-	    cval = modl(l1,l2) + 1
+	    cval = lmod(l1,l2) + 1
 	} else {
 	    call mfree (fp, TY_STRUCT)
 	    call sfree (sp)

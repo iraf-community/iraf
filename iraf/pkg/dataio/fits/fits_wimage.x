@@ -22,7 +22,6 @@ long	v[IM_MAXDIM]
 pointer	tempbuf, buf
 
 long	wft_get_image_line()
-int	absi()
 errchk	malloc, mfree, wft_get_image_line, wft_lscale_line, wft_long_line
 errchk	wft_init_write_pixels, wft_write_pixels, wft_write_last_record
 errchk	wft_rscale_line, wft_dscale_line
@@ -42,7 +41,7 @@ begin
 	nlines = 1
 	do i = 2, NAXIS(im)
 	    nlines = nlines * NAXISN(im, i)
-	npix_record = len_record * FITS_BYTE / absi(FITS_BITPIX(fits))
+	npix_record = len_record * FITS_BYTE / iabs(FITS_BITPIX(fits))
 
 	l_val = 1
 	sz_val = IM_MAXDIM

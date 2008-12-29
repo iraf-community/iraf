@@ -18,7 +18,7 @@ size_t	sz_val
 long	i, idx
 int	j, fd
 pointer	sp, vnames, name
-int	open(), modi()
+int	open(), imod()
 long	inlstrwrd()
 errchk	open()
 
@@ -46,7 +46,7 @@ begin
 	# Print title.
 	do j = 1, nvars + 1 {
 	    idx = j-1
-	    if (modi(j, NPERLINE) == 1) {
+	    if (imod(j, NPERLINE) == 1) {
 		call fprintf (fd, "\n")
 		call fprintf (fd, "#")
 	    }
@@ -72,7 +72,7 @@ begin
 		    call fprintf (fd, "\n")
 	            call fprintf (fd, "%15.15s")
 			call pargstr (names[(i-1)*len_name+1])
-	        } else if (modi(j, NPERLINE) == 1) {
+	        } else if (imod(j, NPERLINE) == 1) {
 		    call fprintf (fd, "\n")
 	            call fprintf (fd, "*%14.7g")
 		        call pargd (x[(i-1)*nvars+j-1])

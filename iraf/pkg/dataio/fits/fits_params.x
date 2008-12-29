@@ -189,7 +189,7 @@ long	l_val
 long	ctime
 int	time[LEN_TMSTRUCT]
 long	clktime(), lsttogmt()
-int	modi()
+int	imod()
 
 begin
 	l_val = 0
@@ -209,7 +209,7 @@ begin
 	    call sprintf (datestr, szdate, "%02d-%02d-%02d")
 	        call pargi (TM_MDAY(time))
 	        call pargi (TM_MONTH(time))
-	        call pargi (modi(TM_YEAR(time), CENTURY))
+	        call pargi (imod(TM_YEAR(time), CENTURY))
 	}
 end
 

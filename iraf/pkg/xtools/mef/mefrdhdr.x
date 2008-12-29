@@ -231,8 +231,6 @@ pointer	mef		#I Mef descriptor
 int	ndim, i, bitpix
 long	totpix
 
-int	absi()
-
 begin
 	ndim = MEF_NDIM (mef)
 	if (ndim == 0 && MEF_PCOUNT(mef) <= 0)
@@ -245,7 +243,7 @@ begin
 	    do i = 2, ndim
 		  totpix = totpix *  MEF_NAXIS(mef,i)
 	}
-	bitpix = absi(MEF_BITPIX(mef))
+	bitpix = iabs(MEF_BITPIX(mef))
 
 	# If PCOUNT is not zero, add it to totpix
 	totpix = MEF_PCOUNT(mef) + totpix
@@ -399,6 +397,9 @@ begin
 	fitslen = fstatl (spool, F_FILESIZE)
 	fitslen = max (fitslen, MEF_HSIZE(mef))
 	call malloc (hdr, fitslen, TY_CHAR)
+	if ( fitslen > MAX_INT ) {
+	    call error(0, "mef_cp_spool: Too large fitslen")
+	}
 	i_val = fitslen
 	user = stropen (Memc[hdr], i_val, NEW_FILE)
 

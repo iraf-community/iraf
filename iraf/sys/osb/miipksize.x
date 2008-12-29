@@ -12,8 +12,6 @@ size_t procedure miipksize (nelems, mii_type)
 size_t	nelems			#I number of MII elements of type mii_type
 int	mii_type		#I <mii.h> type code (=8,16,32,-32,-64)
 
-int	absi()
-
 begin
-	return ((nelems * absi(mii_type) / NBITS_BYTE + SZB_CHAR-1) / SZB_CHAR)
+	return ((nelems * iabs(mii_type) / NBITS_BYTE + SZB_CHAR-1) / SZB_CHAR)
 end

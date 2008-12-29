@@ -502,7 +502,7 @@ size_t	sz_val
 double  accuracy, fraction
 int	sec, h, m, s
 pointer sp, temp_hms, temp_units 
-int	modi()
+int	imod()
 
 begin
 	# Get some memory.
@@ -533,11 +533,11 @@ begin
 	if (sec < 0)
 	    sec = sec + STPERDAY
 	else if (sec >= STPERDAY)
-	    sec = modi (sec, STPERDAY)
+	    sec = imod (sec, STPERDAY)
 
 	# Separater fields.
-	s = modi (sec, 60)
-	m = modi (sec / 60, 60)
+	s = imod (sec, 60)
+	m = imod (sec / 60, 60)
 	h = sec / 3600
 
 	# Format fields.
@@ -623,7 +623,7 @@ size_t	sz_val
 double  accuracy, fraction 
 int	sec, h, m, s
 pointer sp, temp_dms, temp_units
-int	strlen(), absi(), modi()
+int	strlen(), imod()
 
 begin
 	# Get some memory.
@@ -651,9 +651,9 @@ begin
 	}
 
 	# Separater fields.
-	s = modi (absi(sec), 60)
-	m = modi (absi(sec) / 60, 60)
-	h = absi(sec) / 3600
+	s = imod (iabs(sec), 60)
+	m = imod (iabs(sec) / 60, 60)
+	h = iabs(sec) / 3600
 
 	# Format fields
 	#

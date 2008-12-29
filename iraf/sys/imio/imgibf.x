@@ -18,7 +18,7 @@ int	i
 size_t	nchars
 long	nget, totpix, lval
 pointer	bdes
-long	imcssz(), modl()
+long	imcssz(), lmod()
 errchk	imopsf, calloc, realloc, mfree, malloc
 
 begin
@@ -36,7 +36,7 @@ begin
 
 	nget = IM_NGET(im)
 	lval = IM_VNBUFS(im)
-	bdes = IM_IBDES(im) + modl (nget, lval) * LEN_BDES
+	bdes = IM_IBDES(im) + lmod (nget, lval) * LEN_BDES
 	IM_NGET(im) = nget + 1
 
 	# Compute the size of the buffer needed.  Check buffer

@@ -46,14 +46,14 @@ double	v
 char	digits[MAX_DIGITS]
 bool	neg, small, exp_format, squeeze
 int	i, w, d, e, j, len, no_digits, max_size, e_size, f_size, fmt
-int	itoc(), gstrcpy(), absi()
+int	itoc(), gstrcpy()
 
 begin
 	# Set flags indicating whether the number is greater or less that zero,
 	# and whether its absolute value is greater or less than 1.
 
 	v = abs (val)
-	w = absi (width)
+	w = iabs (width)
 
 	fmt = a_fmt
 	if (IS_UPPER(a_fmt))
@@ -63,7 +63,7 @@ begin
 	small = (v < 0.1)
 
 	if (squeeze)
-	    d = absi (decpl)
+	    d = iabs (decpl)
 	else
 	    d = max (0, decpl)
 
@@ -84,7 +84,7 @@ begin
 
 	# Determine exact format for printing.
 
-	len = absi (e)				# base size of E format
+	len = iabs (e)				# base size of E format
 	e_size = 1
 	for (i=10;  i <= 10000;  i=i*10) {
 	    if (len < i)

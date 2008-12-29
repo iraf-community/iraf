@@ -6,9 +6,9 @@ procedure aabsl (a, b, npix)
 
 long	a[ARB], b[ARB]
 size_t	npix, i
-long	absl()
+long	labs()
 
 begin
 	do i = 1, npix
-	    b[i] = absl(a[i])
+	    b[i] = labs(a[i])
 end

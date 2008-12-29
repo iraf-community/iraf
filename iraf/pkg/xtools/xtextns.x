@@ -382,7 +382,7 @@ int	max_ranges		# Maximum number of ranges
 int	nvalues			# The number of values in the ranges
 
 int	ip, nrange, first, last, step
-int	ctoi(), absi()
+int	ctoi()
 
 begin
 	ip = 1
@@ -474,7 +474,7 @@ begin
 	    ranges[1, nrange] = first
 	    ranges[2, nrange] = last
 	    ranges[3, nrange] = step
-	    nvalues = nvalues + absi(last-first) / step + 1
+	    nvalues = nvalues + iabs(last-first) / step + 1
 	}
 
 	return (ERR)					# ran out of space
@@ -493,7 +493,7 @@ int	ranges[ARB]		# Range array
 int	number			# Both input and output parameter
 
 int	ip, first, last, step, next_number, remainder
-int	modi()
+int	imod()
 
 begin
 	# If number+1 is anywhere in the list, that is the next number,
@@ -510,7 +510,7 @@ begin
 	    if (step == 0)
 		call error (1, "Step size of zero in range list")
 	    if (number >= first && number <= last) {
-		remainder = modi(number - first, step)
+		remainder = imod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder + step <= last)

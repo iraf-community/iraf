@@ -21,7 +21,7 @@ size_t	nclean
 pointer	sp, xclean, yclean, wclean
 
 double	dcveval()
-long	absl()
+long	labs()
 
 begin
 	if ((IC_LOW(ic) == 0.) && (IC_HIGH(ic) == 0.))
@@ -41,7 +41,7 @@ begin
 	# If there has been no sample averaging then the rejpts array already
 	# contains indices into the subsampled array.
 
-	} else if (absl(IC_NAVERAGE(ic)) < 2) {
+	} else if (labs(IC_NAVERAGE(ic)) < 2) {
 	    if (IC_NREJECT(ic) > 0) {
 	        do i = 1, npts {
 		    if (Memi[IC_REJPTS(ic)+i-1] == YES)

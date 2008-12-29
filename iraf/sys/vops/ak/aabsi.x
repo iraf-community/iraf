@@ -6,9 +6,8 @@ procedure aabsi (a, b, npix)
 
 int	a[ARB], b[ARB]
 size_t	npix, i
-int	absi()
 
 begin
 	do i = 1, npix
-	    b[i] = absi(a[i])
+	    b[i] = iabs(a[i])
 end

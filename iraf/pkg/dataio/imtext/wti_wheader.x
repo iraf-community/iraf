@@ -24,7 +24,7 @@ size_t	sz_val
 int	i, nlines, user, op, max_lenuser
 pointer	sp, root, line, comment
 bool	streq()
-int	strlen(), sizeof(), getline(), stropen(), gstrcpy(), stridx(), modi()
+int	strlen(), sizeof(), getline(), stropen(), gstrcpy(), stridx(), imod()
 
 errchk	addcard_b, addcard_i, addcard_r, addcard_st
 errchk	wti_iraf_type, streq, strupr, stropen, strclose, getline
@@ -117,7 +117,7 @@ begin
 	# a multiple of 36 lines.
 
 	if (nlines != NCARDS_FITS_BLK) {
-	    do i = 1, NCARDS_FITS_BLK - modi(nlines, NCARDS_FITS_BLK)
+	    do i = 1, NCARDS_FITS_BLK - imod(nlines, NCARDS_FITS_BLK)
 	        call fprintf (tx, "%80w\n")
 	}
 

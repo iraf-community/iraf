@@ -31,7 +31,7 @@ int	xstart, ystart, newx, newy
 int	totlen, polytext, font, seglen 
 pointer	sp, seg, ip, op, tx, first
 int	stx_segment()
-int	nint_ri()
+int	inint()
 include	"imd.com"
 
 real	g_dx, g_dy		# scale GKI to window coords
@@ -173,7 +173,7 @@ begin
 		y = ystart
 
 		while (seglen > 0 && (polytext == YES || ip == first)) {
-		    call imd_drawchar (Memc[ip], nint_ri(x), nint_ri(y), cw, ch,
+		    call imd_drawchar (Memc[ip], inint(x), inint(y), cw, ch,
 			orien, font)
 		    ip = ip + 1
 		    seglen = seglen - 1
@@ -277,7 +277,6 @@ pointer	tx
 int	up, path
 real	dir, sz, ch, cw, cosv, sinv, space
 real	xsize, ysize, xvlen, yvlen, xu, yu, xv, yv, p, q
-int	absi()
 include	"imd.com"
 
 begin
@@ -431,7 +430,7 @@ begin
 	# Set the polytext flag.  Polytext output is possible only if chars
 	# are to be drawn to the right with no extra spacing between chars.
 
-	if (absi(dy) == 0 && dx == cw)
+	if (iabs(dy) == 0 && dx == cw)
 	    polytext = YES
 	else
 	    polytext = NO

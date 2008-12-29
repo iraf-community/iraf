@@ -17,7 +17,7 @@ real	rval			# new value for parameter
 real	char_height
 int	wcs, axes, field, ax[2], wflags, i
 pointer	w, p, pl, pm, tx, fa
-int	modi()
+int	imod()
 real	ggetr()
 
 begin
@@ -160,7 +160,7 @@ begin
 		call syserr (SYS_GSET)
 
 	    axes = param / 100
-	    field = modi (param, 100) + 300
+	    field = imod (param, 100) + 300
 
 	    ax[1] = 0
 	    ax[2] = 0

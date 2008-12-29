@@ -8,9 +8,9 @@ int	a[ARB]
 int	b
 int	c[ARB]
 size_t	npix, i
-int	modi()
+int	imod()
 
 begin
 	do i = 1, npix
-	    c[i] = modi (a[i], b)
+	    c[i] = imod (a[i], b)
 end

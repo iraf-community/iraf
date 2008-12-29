@@ -229,7 +229,7 @@ short	sz1, sz2, sb1, sb2, zero
 real	gamma, bscale, bzero, scale, pix
 real	z1, z2
 
-int	strdic(), absi()
+int	strdic()
 bool	fp_equalr(), strne()
 
 define	setop_		99
@@ -265,9 +265,9 @@ begin
         if (v_nargs > 0 && nargs != v_nargs)
             call xev_error2 ("function `%s' requires %d arguments",
                 fcn, v_nargs)
-        else if (v_nargs < 0 && nargs < absi(v_nargs))
+        else if (v_nargs < 0 && nargs < iabs(v_nargs))
             call xev_error2 ("function `%s' requires at least %d arguments",
-                fcn, absi(v_nargs))
+                fcn, iabs(v_nargs))
 
         if (DEBUG) {
             call eprintf ("obfcn: nargs=%d func=%d\n")

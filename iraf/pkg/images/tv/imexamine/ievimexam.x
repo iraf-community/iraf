@@ -151,7 +151,7 @@ long	col1, col2, line1, line2
 long	colb, colc, line, linea, lineb, linec
 pointer sp, oxs, oys, xs, ys, yvals, msi, buf
 real	sum , lim1, lim2, lim3, lim4
-long	nint_rl()
+long	lnint()
 pointer	imgs2r()
 errchk	msiinit
 
@@ -188,10 +188,10 @@ begin
 	# Set the boundary.
 	col1 = min (x1, x2)
 	col1 = col1 - nedge
-	col2 = nint_rl(max (x1, x2)) + nedge
+	col2 = lnint(max (x1, x2)) + nedge
 	line1 = min (y1, y2)
 	line1 = line1 - nedge
-	line2 = nint_rl(max (y2, y1)) + nedge
+	line2 = lnint(max (y2, y1)) + nedge
 	call ie_setboundary (im, col1, col2, line1, line2, btype, bconstant)
 
 	# Initialize.
@@ -221,7 +221,7 @@ begin
 		lim4 = lim3 + double (width - 1) * dpx
 		l_val = min (lim1, lim2, lim3, lim4)
 		colb = max (col1, l_val - 1)
-		colc = min (col2, nint_rl(max (lim1, lim2, lim3, lim4)) + 1)
+		colc = min (col2, lnint(max (lim1, lim2, lim3, lim4)) + 1)
 		buf = imgs2r (im, colb, colc, lineb, linec)
 		call msifit (msi, Memr[buf], colc - colb + 1, linec - lineb +
 		    1, colc - colb + 1)
@@ -236,7 +236,7 @@ begin
 		lim4 = lim3 + double (width - 1) * dpx
 		l_val = min (lim1, lim2, lim3, lim4)
 		colb = max (col1, l_val - 1)
-		colc = min (col2, nint_rl(max (lim1, lim2, lim3, lim4)) + 1)
+		colc = min (col2, lnint(max (lim1, lim2, lim3, lim4)) + 1)
 		buf = imgs2r (im, colb, colc, lineb, linec)
 		call msifit (msi, Memr[buf], colc - colb + 1, linec - lineb +
 		    1, colc - colb + 1)
@@ -292,7 +292,7 @@ long	line, linea, lineb, linec
 pointer sp, xs, ys, msi, yvals, buf
 double	dx, dy, xoff, noff, xv, yv
 long	i, j, k, nedge, col1, col2, line1, line2
-long	nint_rl()
+long	lnint()
 pointer	imgs2r()
 errchk	msiinit
 
@@ -310,10 +310,10 @@ begin
 	nedge  = max (2, width / 2 + 1)
 	col1 = x1
 	col1 = col1 - nedge
-	col2 = nint_rl(x1) + nedge
+	col2 = lnint(x1) + nedge
 	line1 = min (y1, y2)
 	line1 = line1 - nedge
-	line2 =  nint_rl(max (y1, y2)) + nedge
+	line2 =  lnint(max (y1, y2)) + nedge
 	call ie_setboundary (im, col1, col2, line1, line2, btype, bconstant)
 
 	# Determine sampling perpendicular to vector.
@@ -403,7 +403,7 @@ double	dx, dy, yoff, noff, xv, yv
 long	i, j, nedge, col1, col2, line1, line2
 long	line, linea, lineb, linec
 pointer sp, oys, xs, ys, yvals, msi, buf
-long	nint_rl()
+long	lnint()
 pointer	imgs2r()
 errchk	imgs2r, msifit, msiinit
 
@@ -422,10 +422,10 @@ begin
 	nedge  = max (2, width / 2 + 1)
 	col1 = min (x1, x2)
 	col1 = col1 - nedge
-	col2 = nint_rl(max (x1, x2)) + nedge
+	col2 = lnint(max (x1, x2)) + nedge
 	line1 = y1
 	line1 = line1 - nedge
-	line2 = nint_rl(y1) + nedge
+	line2 = lnint(y1) + nedge
 	call ie_setboundary (im, col1, col2, line1, line2, btype, bconstant)
 
 	# Determine sampling perpendicular to vector.

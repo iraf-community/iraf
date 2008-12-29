@@ -145,7 +145,7 @@ size_t	sz_val
 pointer	sp, ostrike, op
 bool	so_seen, so_mode_in_effect
 int	ip, so_type, ocol, junk, ch, tabchar
-int	ttyctrl(), modi()
+int	ttyctrl(), imod()
 errchk	tty_break_line, putci, ttyctrl, ttyso
 
 begin
@@ -244,7 +244,7 @@ begin
 			}
 		    }
 		    ocol = ocol + 1
-		} until (modi (ocol+TABSIZE-1, TABSIZE) == 0)
+		} until (imod (ocol+TABSIZE-1, TABSIZE) == 0)
 
 	    } else if (ch == FF) {
 		# Formfeed breaks the output line if not at beginning of a

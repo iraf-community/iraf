@@ -32,7 +32,7 @@ pointer	sp, devname, envname, kfname
 bool	streq()
 extern	gflush()
 pointer	ttygdes()
-int	envgets(), envfind(), open(), access(), ttygets(), modi()
+int	envgets(), envfind(), open(), access(), ttygets(), imod()
 pointer	locpr()
 errchk	syserr, syserrs, ttygdes
 errchk	greset, gki_openws, calloc
@@ -145,7 +145,7 @@ begin
 	    GP_GFLAGS(gp) = GF_CLOSEFD
 
 	# Set the access mode; default to NEW_FILE if not specified.
-	GP_ACMODE(gp) = modi (mode, AW_DEFER)
+	GP_ACMODE(gp) = imod (mode, AW_DEFER)
 	if (GP_ACMODE(gp) == 0)
 	    GP_ACMODE(gp) = NEW_FILE
 

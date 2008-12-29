@@ -33,7 +33,7 @@ long	o_iz, o_np
 int	opcode, data, hi, dv, v, op
 long	nz, iz, x1, np, i, n
 long	d_src[LEN_PLLDES], d_dst[LEN_PLLDES]
-int	modi(), absi()
+int	imod()
 define	done_ 91
 
 begin
@@ -221,7 +221,7 @@ begin
 		if (dv != 0) {
 		    # Output IH or DH instruction?
 		    hi = pv
-		    if (absi(dv) > I_DATAMAX) {
+		    if (iabs(dv) > I_DATAMAX) {
 			ll_out[op] = M_SH + and (pv, I_DATAMAX)
 			op = op + 1
 			ll_out[op] = pv / I_SHIFT

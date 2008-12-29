@@ -13,11 +13,11 @@ real	med			#R Return value
 
 int	i, i1, box, outnext, out
 real	clip
-int	modi()
+int	imod()
 
 begin
 	box = RMS_BOX(rm)
-	outnext = modi(index-1, box)
+	outnext = imod(index-1, box)
 	out = OUT(rm,outnext)
 
 	if (out == 0) {
@@ -63,7 +63,7 @@ begin
 	OUT(rm,outnext) = i
 
 	i1 = box / 2
-	if (modi(box, 2) == 0)
+	if (imod(box, 2) == 0)
 	    med = (DATA(rm,i1) + DATA(rm,i1-1)) / 2
 	else
 	    med = DATA(rm,i1)
@@ -76,7 +76,7 @@ begin
 	    }
 	    if (i < box) {
 		i1 = i / 2
-		if (modi(i, 2) == 0)
+		if (imod(i, 2) == 0)
 		    med = (DATA(rm,i1) + DATA(rm,i1-1)) / 2
 		else
 		    med = DATA(rm,i1)

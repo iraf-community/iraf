@@ -13,7 +13,7 @@ procedure pargx (xval)
 complex	xval			# complex value to be encoded
 double	value
 int	n
-int	xtoc(), absi()
+int	xtoc()
 include "fmt.com"
 
 begin
@@ -26,7 +26,7 @@ begin
 	    if (decpl == USE_DEFAULT || decpl == 0)
 		decpl = NDIGITS_RP
 	    else
-		decpl = absi (decpl)
+		decpl = iabs (decpl)
 
 	    # Encode number in the available field width, decreasing the
 	    # precision until the number fits.

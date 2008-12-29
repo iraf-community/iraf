@@ -22,7 +22,7 @@ int	output_lines, i
 size_t	npad
 int	pcount, fd, nlines
 bool    endk, new_outf
-int	modi()
+int	imod()
 errchk  open, fcopyo
 
 begin
@@ -124,7 +124,7 @@ begin
 	# Pad to 1440 characters block in case we want to append another
 	# extension
 
-	npad = 1440 - modi(MEF_PLSIZE(mef), 1440)
+	npad = 1440 - imod(MEF_PLSIZE(mef), 1440)
 
 	call amovki (0, Memi[mii], npad)
 	# arg2 : incompatible pointer

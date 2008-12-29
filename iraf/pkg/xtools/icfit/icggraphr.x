@@ -23,7 +23,7 @@ size_t	npts				# Number of points
 
 pointer	xout, yout
 real	size
-long	absl()
+long	labs()
 
 begin
 	call malloc (xout, npts, TY_REAL)
@@ -39,7 +39,7 @@ begin
  	       float(npts))
  
 	if (npts != IC_NFIT(ic)) {
-	    if ((absl (IC_NAVERAGE(ic)) > 1) || (IC_NREJECT(ic) > 0)) {
+	    if ((labs (IC_NAVERAGE(ic)) > 1) || (IC_NREJECT(ic) > 0)) {
 	        call realloc (xout, IC_NFIT(ic), TY_REAL)
 		call realloc (yout, IC_NFIT(ic), TY_REAL)
 		call icg_axesr (ic, gt, cv, 1, Memr[IC_XFIT(ic)],
@@ -145,7 +145,7 @@ real	size			# Symbol size
 size_t	sz_val
 long	i
 pointer	sp, xr, yr, gt1
-long	absl()
+long	labs()
 
 begin
 	call smark (sp)
@@ -159,7 +159,7 @@ begin
 
 	# Mark the sample points.
 
-	if (absl (IC_NAVERAGE(ic)) > 1) {
+	if (labs (IC_NAVERAGE(ic)) > 1) {
 	    call gt_sets (gt1, GTMARK, "plus")
  	    call gt_setr (gt1, GTXSIZE, -size)
 	    call gt_setr (gt1, GTYSIZE, 1.)

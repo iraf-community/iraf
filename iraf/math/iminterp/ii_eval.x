@@ -168,7 +168,7 @@ long	i
 int	xc, j, minj, maxj, offj
 pointer	sp, taper
 real	dx, dxn, dx2, w1, sconst, a2, a4, sum, sumw
-int	modi(), nint_ri()
+int	imod(), inint()
 
 begin
 	# Compute the constants for the cosine bell taper. 
@@ -181,7 +181,7 @@ begin
 	call smark (sp)
 	sz_val = 2 * nsinc + 1
 	call salloc (taper, sz_val, TY_REAL)
-	if (modi (nsinc, 2) == 0)
+	if (imod (nsinc, 2) == 0)
 	    w1 = 1.0
 	else
 	    w1 = -1.0
@@ -194,7 +194,7 @@ begin
 	do i = 1, npts {
 
 	    # Return zero outside of data.
-	    xc = nint_ri (x[i])
+	    xc = inint (x[i])
 	    if (xc < 1 || xc > npix) {
 		y[i] = 0.
 		next
@@ -264,14 +264,14 @@ int	nsinc
 long	i
 int	j, xc, lut, minj, maxj, offj
 real	dx, sum
-int	nint_ri()
+int	inint()
 
 begin
 	nsinc = (nconv - 1) / 2
 	do i = 1, npts {
 
 	    # Return zero outside of data.
-	    xc = nint_ri (x[i])
+	    xc = inint (x[i])
 	    if (xc < 1 || xc > npix) {
 		y[i] = 0.
 		next
@@ -288,7 +288,7 @@ begin
 	    if (nincr == 1)
 		lut = 1
 	    else 
-		lut = nint_ri ((-dx + 0.5) * (nincr - 1)) + 1
+		lut = inint ((-dx + 0.5) * (nincr - 1)) + 1
 		#lut = int ((-dx + 0.5) * (nincr - 1) + 0.5) + 1
 
 	    # Compute the convolution limits.

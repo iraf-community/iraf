@@ -22,7 +22,7 @@ char	card[LEN_CARD+1], trim_card[LEN_CARD+1]
 size_t	nrecords
 int	recntr, cardptr, cardcnt, stat, cards_per_rec, i
 int	wft_card_encode(), wft_set_bitpix(), sizeof(), strncmp()
-int	wft_init_card_encode(), modi()
+int	wft_init_card_encode(), imod()
 long	fstatl()
 
 errchk	wft_set_bitpix, wft_get_iraf_typestring, wft_set_scale, wft_set_blank
@@ -154,7 +154,7 @@ begin
 		    call pargstr (trim_card)
 	    }
 
-	    if (modi(cardcnt, cards_per_rec) == 0) {
+	    if (imod(cardcnt, cards_per_rec) == 0) {
 	        recntr = recntr + 1
 	        cardptr = 1
 	    } else

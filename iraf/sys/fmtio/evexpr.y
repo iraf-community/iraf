@@ -669,7 +669,7 @@ pointer	sp, buf, ap
 include	"evexpr.com"
 
 bool	strne()
-int	strdic(), strlen(), absi(), modi()
+int	strdic(), strlen(), imod()
 errchk	zcall4, xev_error1, xev_error2, malloc
 string	keywords KEYWORDS
 define	badtype_ 91
@@ -713,9 +713,9 @@ begin
 	if (v_nargs > 0 && nargs != v_nargs)
 	    call xev_error2 ("function `%s' requires %d arguments",
 		fcn, v_nargs)
-	else if (v_nargs < 0 && nargs < absi(v_nargs))
+	else if (v_nargs < 0 && nargs < iabs(v_nargs))
 	    call xev_error2 ("function `%s' requires at least %d arguments",
-		fcn, absi(v_nargs))
+		fcn, iabs(v_nargs))
 
 	# Verify datatypes.
 	if (opcode != F_STR && opcode != F_BOOL) {
@@ -743,7 +743,7 @@ begin
 	switch (opcode) {
 	case F_ABS:
 	    if (type[1] == TY_INT) {
-		iresult = absi (ival[1])
+		iresult = iabs (ival[1])
 		optype = TY_INT
 	    } else
 		rresult = abs (rval[1])
@@ -777,7 +777,7 @@ begin
 	    if (type[1] == TY_REAL || type[2] == TY_REAL)
 		rresult = mod (rval[1], rval[2])
 	    else {
-		iresult = modi (ival[1], ival[2])
+		iresult = imod (ival[1], ival[2])
 		optype = TY_INT
 	    }
 		

@@ -20,8 +20,8 @@ size_t	npix
 long	i, c_10
 int	ch
 long	v[PL_MAXDIM]
-int	modi()
-long	modl()
+int	imod()
+long	lmod()
 errchk	pl_valid
 
 begin
@@ -42,7 +42,7 @@ begin
 	while (v[2] >= vs[2]) {
 	    call pl_glpi (pl, v, Memi[pv], 0, npix, PIX_SRC)
 	    do i = 1, npix {
-		ch = modi (Memi[pv+i-1], 128)
+		ch = imod (Memi[pv+i-1], 128)
 		if (ch < 32)
 		    ch = ch + 32
 		if (ch <= 32 || ch == 127)
@@ -59,14 +59,14 @@ begin
 	# Label the columns.
 	call fprintf (outfd, "%5t")
 	do i = 1, npix {
-	    ch = modl (i, c_10)
+	    ch = lmod (i, c_10)
 	    call putci (outfd, TO_DIGIT(ch))
 	}
 	call fprintf (outfd, "\n")
 
 	call fprintf (outfd, "%5t")
 	do i = 1, npix {
-	    if (modl (i, c_10) == 0) {
+	    if (lmod (i, c_10) == 0) {
 		ch = i / 10
 		call putci (outfd, TO_DIGIT(ch))
 	    } else {

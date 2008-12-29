@@ -168,14 +168,13 @@ int	height, width
 
 int	i
 real	dx, dy, hw
-int	absi()
 
 begin
 	hw = width / 2.0
 	dy = height / hw * 2.0
 
 	do i = 1, npts {
-	    dx = absi (i - xc)
+	    dx = iabs (i - xc)
 	    if (dx > hw)
 		;
 	    else if (dx > hw / 2.0)

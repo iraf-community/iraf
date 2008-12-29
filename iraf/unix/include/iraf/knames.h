@@ -715,20 +715,25 @@ extern int ZZWTMT ( XINT *, XLONG *, XLONG * );
 #define	XORI		xori_
 #define	XORL		xorl_
 #define	XORS		xors_
-#define	MODI		modi_
-#define	MODL		modl_
-#define	MODS		mods_
-#define	MODP		modp_
-#define	ABSI		absi_
-#define	ABSL		absl_
-#define	ABSS		abss_
-#define	ABSP		absp_
-#define	NINT_RL		nintrl_
-#define	NINT_DL		nintdl_
-#define	NINT_RI		nintri_
-#define	NINT_DI		nintdi_
-#define	NINT_RS		nintrs_
-#define	NINT_DS		nintds_
+
+#define	SMOD		smod_
+#define	IMOD		imod_
+#define	LMOD		lmod_
+#define	PMOD		pmod_
+#define	SABS		sabs_
+#define	LABS		labs_
+#define	PABS		pabs_
+#define	AABS		aabs_
+#define	SNINT		snint_
+#define	SDNINT		sdnint_
+#define	ININT		inint_
+#define	LNINT		lnint_
+#define	LDNINT		ldnint_
+#define	SINT		sint_
+#define	SDINT		sdint_
+#define	IINT		iint_
+#define	LINT		lint_
+#define	LDINT		ldint_
 
 #define	ACLRC		aclrc_
 #define	ACLRD		aclrd_
@@ -1035,20 +1040,23 @@ extern XINT SHIFTI ( XINT *, XINT * );
 extern XSHORT SHIFTS ( XSHORT *, XSHORT * );
 extern XLONG SHIFTL ( XLONG *, XLONG * );
 
-extern XINT MODI ( XINT *, XINT * );
-extern XLONG MODL ( XLONG *, XLONG * );
-extern XSHORT MODS ( XSHORT *, XSHORT * );
-extern XPOINTER MODP ( XPOINTER *, XPOINTER * );
-extern XINT ABSI ( XINT * );
-extern XLONG ABSL ( XLONG * );
-extern XSHORT ABSS ( XSHORT * );
-extern XPOINTER ABSP ( XPOINTER * );
-
-extern XLONG NINT_RL ( XREAL * );
-extern XLONG NINT_DL ( XDOUBLE * );
-extern XINT NINT_RI ( XREAL * );
-extern XINT NINT_DI ( XDOUBLE * );
-extern XSHORT NINT_RS ( XREAL * );
-extern XSHORT NINT_DS ( XDOUBLE * );
+extern XSHORT SMOD ( XSHORT *, XSHORT * );
+extern XINT IMOD ( XINT *, XINT * );
+extern XLONG LMOD ( XLONG *, XLONG * );
+extern XPOINTER PMOD ( XPOINTER *, XPOINTER * );
+extern XSHORT SABS ( XSHORT * );
+extern XLONG LABS ( XLONG * );
+extern XPOINTER PABS ( XPOINTER * );
+extern XREAL AABS ( XREAL * );
+extern XSHORT SNINT ( XREAL * );
+extern XSHORT SDNINT ( XDOUBLE * );
+extern XINT ININT ( XREAL * );
+extern XLONG LNINT ( XREAL * );
+extern XLONG LDNINT ( XDOUBLE * );
+extern XSHORT SINT ( XREAL * );
+extern XSHORT SDINT ( XDOUBLE * );
+extern XINT IINT ( XREAL * );
+extern XLONG LINT ( XREAL * );
+extern XLONG LDINT ( XDOUBLE * );
 
 #endif	/* ! _IRAF_KNAMES_H */

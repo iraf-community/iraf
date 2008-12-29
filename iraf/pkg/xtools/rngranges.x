@@ -149,7 +149,7 @@ real	rval			#O Range value
 
 int	i, j, k
 real	drmin, dx
-int	nint_ri()
+int	inint()
 
 begin
 	ival = 1
@@ -159,7 +159,7 @@ begin
 	k = 1
 	do i = 1, RNG_NRNGS(rg) {
 	    dx = x - RNG_X1(rg,i)
-	    j = max (0, min (RNG_NX(rg,i)-1, nint_ri(dx / RNG_DX(rg,i))))
+	    j = max (0, min (RNG_NX(rg,i)-1, inint(dx / RNG_DX(rg,i))))
 	    dx = abs (dx - j * RNG_DX(rg,i))
 	    if (dx < drmin) {
 		drmin = dx
@@ -252,7 +252,7 @@ size_t	sz_val
 int	i, j, nrgs
 real	x1, x2, dx, nx
 pointer	sp, str, ptr
-int	strlen(), ctor(), modi()
+int	strlen(), ctor(), imod()
 errchk	rng_error
 
 begin
@@ -333,7 +333,7 @@ begin
 		call rng_error (4, rstr, r1, r2, dr, rg)
 
 	    nrgs = RNG_NRNGS(rg)
-	    if (modi(nrgs, RNG_ALLOC) == 0) {
+	    if (imod(nrgs, RNG_ALLOC) == 0) {
 		sz_val = LEN_RNG+4*(nrgs+RNG_ALLOC)
 		call realloc (rg, sz_val, TY_STRUCT)
 	    }

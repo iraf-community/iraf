@@ -199,7 +199,7 @@ pointer	sp, ac, ar, offk, offj
 real	sconst, a2, a4, dx, dy, dxn, dyn, dx2, taper, sdx, ax, ay, ctanx, ctany
 real	zx, zy
 real	px[3], py[3]
-int	modi(), nint_ri()
+int	imod(), inint()
 
 begin
 	c_1 = 1
@@ -215,8 +215,8 @@ begin
 	}
 
 	# Return if the data is outside range.
-	xc = nint_ri (x)
-	yc = nint_ri (y)
+	xc = inint (x)
+	yc = inint (y)
 	if (xc < 1 || xc > nxpix || yc < 1 || yc > nypix)
 	    return
 
@@ -255,7 +255,7 @@ begin
 	index = - 1 - nsinc
 	dxn = -1 - nsinc - dx
 	dyn = -1 - nsinc - dy
-	if (modi (nsinc, 2) == 0)
+	if (imod (nsinc, 2) == 0)
 	    sdx = 1.0
 	else
 	    sdx = -1.0

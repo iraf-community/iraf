@@ -17,7 +17,7 @@ double	mean, median, std
 long	ncstat, nlstat, x1, x2, y1, y2
 size_t	npts
 pointer	sp, imname, im, data, sortdata
-long	clgetl(), modl()
+long	clgetl(), lmod()
 pointer	ie_gimage(), ie_gdata()
 string	label "\
 #            SECTION     NPIX     MEAN   MEDIAN   STDDEV      MIN      MAX\n"
@@ -51,7 +51,7 @@ begin
 	call asrtd (Memd[sortdata], Memd[sortdata], npts)
 	call aavgd (Memd[sortdata], npts, mean, std)
 	l_val = npts
-	if (modl(l_val, c_2) == 0)
+	if (lmod(l_val, c_2) == 0)
 	    median = (Memd[sortdata+npts/2-1] + Memd[sortdata+npts/2]) / 2
 	else
 	    median = Memd[sortdata+npts/2]

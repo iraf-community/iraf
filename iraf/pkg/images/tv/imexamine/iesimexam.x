@@ -185,7 +185,7 @@ real	wc1, wc2, wl1, wl2, del
 long	i, j
 int	junk
 int	ltoc()
-long	modl()
+long	lmod()
 data  	fact1 /2.0/
 real	vpx1, vpx2, vpy1, vpy2
 common	/noaovp/ vpx1, vpx2, vpy1, vpy2
@@ -216,8 +216,8 @@ begin
 	# Set up linear endpoints and spacing as used in surface.
 
         delta = (hi-flo) / (max (ncols,nlines) -1.) * fact1
-        xmin = -(real (ncols/2)  * delta + real (modl(ncols+1, c_2))  * delta)
-        ymin = -(real (nlines/2) * delta + real (modl(nlines+1, c_2)) * delta)
+        xmin = -(real (ncols/2)  * delta + real (lmod(ncols+1, c_2))  * delta)
+        ymin = -(real (nlines/2) * delta + real (lmod(nlines+1, c_2)) * delta)
 	del = 2.0 * delta
 
 	# The perimeter is separated from the surface plot by the 

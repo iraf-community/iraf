@@ -23,7 +23,7 @@ long	ip, op, i, first_byte, nchars, rec_count, ntrim, offset
 pointer	inbuf, outbuf
 
 int	mtopen(), open()
-long	read(), fstatl(), modl(), reb_roundup(), reb_skipover()
+long	read(), fstatl(), lmod(), reb_roundup(), reb_skipover()
 errchk	open, mtopen, read, awriteb, awaitb, close, mfree, malloc, flush
 errchk	reb_write_block, reb_pad_block, reb_pad_record, reb_skipover
 include "reblock.com"
@@ -75,9 +75,9 @@ begin
 		break
 	    bytes_read = nchars * SZB_CHAR
 	    l_val = SZB_CHAR
-	    if (modl(fstatl (in, F_SZBBLK), l_val) != 0) {
+	    if (lmod(fstatl (in, F_SZBBLK), l_val) != 0) {
 		l_val = SZB_CHAR
-		bytes_read = bytes_read - modl(fstatl (in, F_SZBBLK), l_val)
+		bytes_read = bytes_read - lmod(fstatl (in, F_SZBBLK), l_val)
 	    }
 	    BLKS_RD(outparam) = BLKS_RD(outparam) + 1
 
@@ -440,11 +440,11 @@ long	number		# number to be rounded upwards
 int	base		# base for rounding
 
 long	value, l
-long	modl()
+long	lmod()
 
 begin
 	l = base
-	if (modl(number, l) == 0)
+	if (lmod(number, l) == 0)
 	    return (number)
 	else {
 	    value = (number/base + 1) * base

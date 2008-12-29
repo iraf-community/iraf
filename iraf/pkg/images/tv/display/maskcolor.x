@@ -16,7 +16,7 @@ pointer	colors			#O Mask colormap object
 size_t	sz_val
 int	i, j, ip, ncolors, token, lasttoken, maskval1, maskval2, color, offset
 pointer	sp, str, op
-int	strdic(), ctoi(), nowhite(), modi()
+int	strdic(), ctoi(), nowhite(), imod()
 
 int	coltrans[9]
 data	coltrans/202,203,204,205,206,207,208,209,-1/
@@ -125,7 +125,7 @@ begin
 			    break
 		    }
 		    if (i > ncolors) {
-			if (modi (ncolors, 10) == 0) {
+			if (imod (ncolors, 10) == 0) {
 			    sz_val = 4*(ncolors+10)
 			    call realloc (colors, sz_val, TY_POINTER)
 			}
@@ -322,7 +322,7 @@ int	optype, opcode, v_nargs
 double	dresult
 
 bool	strne()
-int	strdic(), btoi(), andi(), absi(), modi()
+int	strdic(), btoi(), andi(), imod()
 errchk	malloc
 
 begin
@@ -345,9 +345,9 @@ begin
 	if (v_nargs > 0 && nargs != v_nargs)
 	    call xvv_error2 ("function `%s' requires %d arguments",
 		func, v_nargs)
-	else if (v_nargs < 0 && nargs < absi(v_nargs))
+	else if (v_nargs < 0 && nargs < iabs(v_nargs))
 	    call xvv_error2 ("function `%s' requires at least %d arguments",
-		func, absi(v_nargs))
+		func, iabs(v_nargs))
 
 	# Group some common operations.
 	switch (opcode) {
@@ -453,7 +453,7 @@ begin
 		if (i == 0)
 		    i = c1
 		else if (i > 0)
-		    i = c2 + modi (i-1, c3)
+		    i = c2 + imod (i-1, c3)
 		iresult = i
 	    } else {
 	        do j = 0, oplen-1 {
@@ -461,7 +461,7 @@ begin
 		    if (i == 0)
 			i = c1
 		    else if (i > 0)
-			i = c2 + modi (i-1, c3)
+			i = c2 + imod (i-1, c3)
 		    Memi[iresult+j] = i
 		}
 	    }

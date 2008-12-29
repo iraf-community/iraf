@@ -162,7 +162,7 @@ size_t	c_1
 int	i, j, xc
 real	dx, w, a, d, z, sconst, a2, a4, dx2, taper
 real	w1, w2, w3, u1, u2, u3, v1, v2, v3
-int	nint_ri()
+int	inint()
 
 begin
 	c_1 = 1
@@ -176,7 +176,7 @@ begin
 	    der[i] = 0.
 
 	# Return if outside data range.
-	xc = nint_ri (x)
+	xc = inint (x)
 	if (xc < 1 || xc > npix)
 	    return
 

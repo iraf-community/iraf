@@ -19,8 +19,8 @@ int	maxch, base		# numeric base (2..16)
 
 long	lval, carry, d, n, radix
 int	op, size, nchars
-int	gstrcpy(), absi()
-long	andl(), orl(), absl(), modl()
+int	gstrcpy()
+long	andl(), orl(), labs(), lmod()
 bool	unsigned
 
 begin
@@ -31,7 +31,7 @@ begin
 	# Digit string is generated backwards, then reversed.  Unsigned
 	# conversion used if radix negative.
 
-	radix = max(2, min(MAX_RADIX, absi(base)))
+	radix = max(2, min(MAX_RADIX, iabs(base)))
 
 	unsigned = (base < 0)			# get raw number
 	if (unsigned) {
@@ -48,7 +48,7 @@ begin
 
 	op = 0
 	repeat {
-	    d = absl (modl (n, radix))		# generate next digit
+	    d = labs (lmod (n, radix))		# generate next digit
 	    if (unsigned) {
 		d = 2 * d + carry		# get actual digit value
 		if (d >= radix) {		# check for generated carry

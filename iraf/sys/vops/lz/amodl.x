@@ -6,9 +6,9 @@ procedure amodl (a, b, c, npix)
 
 long	a[ARB], b[ARB], c[ARB]
 size_t	npix, i
-long	modl()
+long	lmod()
 
 begin
 	do i = 1, npix
-	    c[i] = modl (a[i], b[i])
+	    c[i] = lmod (a[i], b[i])
 end

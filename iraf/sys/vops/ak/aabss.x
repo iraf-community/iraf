@@ -6,9 +6,9 @@ procedure aabss (a, b, npix)
 
 short	a[ARB], b[ARB]
 size_t	npix, i
-short	abss()
+short	sabs()
 
 begin
 	do i = 1, npix
-	    b[i] = abss(a[i])
+	    b[i] = sabs(a[i])
 end

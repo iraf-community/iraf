@@ -201,13 +201,13 @@ real	xcen, ycen, ncolsr, nlinesr, ratio, aspect_ratio
 real	x1, x2, y1, y2, ext, xdis, ydis
 bool	fp_equalr()
 real	ggetr()
-long	nint_rl()
+long	lnint()
 data	ext /0.0625/
 
 begin
-	ncols = nint_rl (c2 - c1) + 1
+	ncols = lnint (c2 - c1) + 1
 	ncolsr = ncols
-	nlines = nint_rl (l2 - l1) + 1
+	nlines = lnint (l2 - l1) + 1
 	nlinesr = nlines
 
 	# Determine the standard window sizes.

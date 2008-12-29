@@ -699,7 +699,7 @@ long	ncols
 pointer lbuf, sp, im, stime, fb, ttp
 long	totpix, nbytes
 int	nchars, index, ncards, simple, i, pcount, junk
-int	fxf_read_card(), fxf_ctype(), ctoi(), strsearch(), absi()
+int	fxf_read_card(), fxf_ctype(), ctoi(), strsearch()
 bool	fxf_fpl_equald()
 errchk	syserr, syserrs
 
@@ -860,7 +860,7 @@ begin
 	    # Compute the size of the data area (pixel matrix plus PCOUNT)
 	    # in bytes.  Be careful not to overflow a 32 bit integer.
 
-	    nbytes = (totpix + pcount) * (absi(FIT_BITPIX(fit)) / NBITS_BYTE)
+	    nbytes = (totpix + pcount) * (iabs(FIT_BITPIX(fit)) / NBITS_BYTE)
 
 	    # Round up to fill the final 2880 byte FITS logical block.
 	    nbytes = ((nbytes + 2880-1) / 2880) * 2880

@@ -15,7 +15,7 @@ int	flags
 size_t	len
 
 int	strlen()
-long	modl()
+long	lmod()
 
 begin
 	# Check to see that we have the correct number of expressions to
@@ -34,7 +34,7 @@ begin
 
 	l_val = 2
 	call sprintf (Memc[hdr], SZ_LINE, "P5\n%-6d  %-6d\n255\n")
-	    call pargl (EX_OCOLS(ex) - modl(EX_OCOLS(ex),l_val))
+	    call pargl (EX_OCOLS(ex) - lmod(EX_OCOLS(ex),l_val))
 	    call pargl (EX_OROWS(ex))
 	len = strlen (Memc[hdr])
 	sz_val = SZ_LINE

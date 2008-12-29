@@ -26,7 +26,7 @@ bool	redirected
 pointer	tr, sp, devname, gki_out
 int	flags, mode, fd, p_fd
 size_t	nwords
-int	prstati(), pr_getredir(), absi()
+int	prstati(), pr_getredir()
 pointer	gtr_init(), coerce()
 errchk	gtr_init, gtr_openws, write, flush, gki_write
 include	"gtr.com"
@@ -41,7 +41,7 @@ begin
 	call amovs (gki, Mems[gki_out], nwords)
 
 	tr = gtr_init (stream)
-	p_fd = absi (pr_getredir (source_pid, stream))
+	p_fd = iabs (pr_getredir (source_pid, stream))
 	redirected = (p_fd >= FIRST_FD && p_fd <= LAST_FD)
 
 	switch (gki[GKI_HDR_OPCODE]) {

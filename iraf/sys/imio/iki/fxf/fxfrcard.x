@@ -14,7 +14,7 @@ int	ncards			#I ncards read so far
 
 size_t	sz_val
 int	ip, nchars_read
-int	modi()
+int	imod()
 long	read()
 errchk	read
 
@@ -22,7 +22,7 @@ begin
 	# We read one FITS block first, read card from it until 36
 	# cards have been processed, where we read again.
 
-	if (modi (ncards, 36) == 0) {
+	if (imod (ncards, 36) == 0) {
 	    sz_val = FITS_BLOCK_CHARS
 	    nchars_read = read (fd, ibuf, sz_val)
 	    if (nchars_read ==  EOF)

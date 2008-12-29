@@ -302,7 +302,6 @@ bool	hard
 int	up, path, hwsz, ch, cw, i
 real	dir, cosv, sinv, space
 real	xsize, ysize, xvlen, yvlen, xu, yu, xv, yv, p, q
-int	absi()
 include	"stdgraph.com"
 
 begin
@@ -475,7 +474,7 @@ begin
 	# Set the polytext flag.  Polytext output is possible only if chars
 	# are to be drawn to the right with no extra spacing between chars.
 
-	if (absi(dy) == 0 && dx == cw)
+	if (iabs(dy) == 0 && dx == cw)
 	    polytext = YES
 	else
 	    polytext = NO

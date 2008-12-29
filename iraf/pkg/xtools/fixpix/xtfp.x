@@ -57,7 +57,7 @@ short	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
-long	nint_rl()
+long	lnint()
 pointer	imgl2s(), xt_fpvals()
 
 begin
@@ -215,7 +215,7 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		}
-		Mems[data+i-1] = nint_rl(val)
+		Mems[data+i-1] = lnint(val)
 	    }
 	    for (c1=c2+1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 		;
@@ -316,7 +316,7 @@ int	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
-long	nint_rl()
+long	lnint()
 pointer	imgl2i(), xt_fpvali()
 
 begin
@@ -474,7 +474,7 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		}
-		Memi[data+i-1] = nint_rl(val)
+		Memi[data+i-1] = lnint(val)
 	    }
 	    for (c1=c2+1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 		;
@@ -575,7 +575,7 @@ long	indef
 pointer	pm, data, bp
 
 bool	pm_linenotempty()
-long	nint_rl()
+long	lnint()
 pointer	imgl2l(), xt_fpvall()
 
 begin
@@ -733,7 +733,7 @@ begin
 			call fprintf (fd, "\n")
 		    }
 		}
-		Meml[data+i-1] = nint_rl(val)
+		Meml[data+i-1] = lnint(val)
 	    }
 	    for (c1=c2+1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
 		;

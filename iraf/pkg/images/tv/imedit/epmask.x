@@ -17,15 +17,15 @@ long	xc, yc, i, j
 real	rad, r, a, b, c, d, minv, maxv
 long	x1a, x1b, x1c, x2a, x2b, x2c, y1a, y1b, y1c, y2a, y2b, y2c
 pointer	sp, line, ptr1, ptr2
-long	absl(), nint_rl()
+long	labs(), lnint()
  
 begin
 	rad = max (0.5, EP_RADIUS(ep))
 
 	switch (ap) {
 	case APCIRCULAR:
-	    xc = nint_rl((xa + xb) / 2.)
-	    yc = nint_rl((ya + yb) / 2.)
+	    xc = lnint((xa + xb) / 2.)
+	    yc = lnint((ya + yb) / 2.)
  
 	    a = rad ** 2
 	    b = (rad + EP_BUFFER(ep)) ** 2
@@ -59,7 +59,7 @@ begin
 	    do j = EP_Y1(ep), EP_Y2(ep) {
 		xc = xa + d * (j - ya)
 		do i = EP_X1(ep), EP_X2(ep) {
-		    r = absl(i - xc)
+		    r = labs(i - xc)
 		    if (r <= a)
 			Memi[ptr1] = 1
 		    else if (r >= b && r <= c)
@@ -83,7 +83,7 @@ begin
 	    do j = EP_Y1(ep), EP_Y2(ep) {
 		do i = EP_X1(ep), EP_X2(ep) {
 		    yc = ya + d * (i - xa)
-		    r = absl(j - yc)
+		    r = labs(j - yc)
 		    if (r <= a)
 			Memi[ptr1] = 1
 		    else if (r >= b && r <= c)

@@ -112,11 +112,11 @@ long	blksize
 
 long	diff
 long	lval
-long	modl()
+long	lmod()
 
 begin
 	lval = max (1, blksize)
-	diff = modl (offset-1, lval)
+	diff = lmod (offset-1, lval)
 	if (diff != 0)
 	    offset = offset + (blksize - diff)
 end

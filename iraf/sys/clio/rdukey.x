@@ -29,7 +29,7 @@ bool	rawmode_set, ucasein_set
 bool	playback_set, pbverify_set
 
 pointer	ttyodes()
-int	fstati(), ttstati(), envgets(), getci(), modi()
+int	fstati(), ttstati(), envgets(), getci(), imod()
 define	again_ 91
 define	done_  92
 errchk	ttyodes, syserrs
@@ -190,7 +190,7 @@ done_
 		keystr[op] = '\\';  op=op+1
 		keystr[op] = '0';  op=op+1
 		keystr[op] = key / 8 + '0';  op=op+1
-		keystr[op] = modi(key,8) + '0';  op=op+1
+		keystr[op] = imod(key,8) + '0';  op=op+1
 	    }
 
 	    if (Memc[buf] != EOS && maxch > 1) {

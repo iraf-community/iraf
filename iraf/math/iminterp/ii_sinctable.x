@@ -12,7 +12,7 @@ real	xshift				#I the shift of the look up table
 
 int	i, j, nsinc
 real	sconst, a2, a4, fsign, xsign, sum, dx, dx2, x, f
-int	modi()
+int	imod()
 
 begin
 	# Set up some constants.
@@ -20,7 +20,7 @@ begin
 	sconst = (HALFPI / nsinc) ** 2
 	a2 = -0.49670
 	a4 = 0.03705
-	if (modi (nsinc, 2) == 0)
+	if (imod (nsinc, 2) == 0)
 	    fsign = 1.0
         else
 	    fsign = -1.0

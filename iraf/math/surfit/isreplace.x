@@ -22,7 +22,7 @@ real	fit[ARB]	# array containing the surface parameters and
 size_t	sz_val
 int	surface_type, xorder, yorder
 size_t	ncols, nlines
-long	nint_rl()
+long	lnint()
 
 begin
 	# allocate space for the surface descriptor
@@ -36,10 +36,10 @@ begin
 	if (yorder < 1)
 	    call error (0, "SFRESTORE: Illegal y order.")
 
-	ncols = nint_rl (SF_SAVENCOLS(fit))
+	ncols = lnint (SF_SAVENCOLS(fit))
 	if (ncols < 1)
 	    call error (0, "SFRESTORE: Illegal x range.")
-	nlines = nint_rl (SF_SAVENLINES(fit))
+	nlines = lnint (SF_SAVENLINES(fit))
 	if (nlines < 1)
 	    call error (0, "SFRESTORE: Illegal y range.")
 

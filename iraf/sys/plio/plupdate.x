@@ -46,7 +46,7 @@ int	i
 int	o_lp, n_lp, o_len, n_len, b_len
 
 bool	pll_equal()
-int	pl_alloc(), modi()
+int	pl_alloc(), imod()
 errchk	pl_alloc
 define	update_ 91
 define	oob_ 92

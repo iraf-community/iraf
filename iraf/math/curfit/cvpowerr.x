@@ -182,13 +182,13 @@ double	matrix[ncoeff, ncoeff]
 int	ncoeff
 
 int	s, n, r
-int	modi()
+int	imod()
 double	rcv_legcoeff()
 
 begin
 	# Calculate matrix elements.
 	do s = 0, ncoeff - 1 {
-	    if (modi (s, 2) == 0) 
+	    if (imod (s, 2) == 0) 
 	        r = s / 2
 	    else 
 	        r = (s - 1) / 2
@@ -283,7 +283,7 @@ double	matrix[ncoeff, ncoeff]		# Work array for matrix elements
 int	ncoeff				# Number of coefficients
 
 int	s, n, m
-int	modi()
+int	imod()
 double	rcv_chebcoeff()
 
 begin
@@ -292,7 +292,7 @@ begin
 
 	# Calculate remaining matrix elements.
 	do s = 1, ncoeff - 1 {
-	    if (modi (s, 2) == 0)
+	    if (imod (s, 2) == 0)
 	        n = s / 2
 	    else 
 	        n = (s - 1) / 2

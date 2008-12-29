@@ -202,11 +202,11 @@ int	pad, nlines, i
 long	l
 char	card[LEN_CARDNL]
 
-long	modl()
+long	lmod()
 
 begin
 	l = 1440
-        i = modl(offset, l)
+        i = lmod(offset, l)
 	if (i == 0) return
 
 	pad = 1440 - i

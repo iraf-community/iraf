@@ -292,7 +292,7 @@ long	minpix, ngoodpix, center_pixel
 real	zmin, zmax, median
 real	zstart, zslope
 pointer	sample, left
-long	ex_sample_expr(), ex_fit_line(), modl(), nint_dl()
+long	ex_sample_expr(), ex_fit_line(), lmod(), ldnint()
 
 begin
 	c_2 = 2
@@ -313,7 +313,7 @@ begin
 
 	left = sample + center_pixel - 1
 	l_val = npix
-	if (modl(l_val, c_2) == 1 || center_pixel >= npix)
+	if (lmod(l_val, c_2) == 1 || center_pixel >= npix)
 	    median = Memr[left]
 	else
 	    median = (Memr[left] + Memr[left+1]) / 2
@@ -327,7 +327,7 @@ begin
 	l_val = npix * 1.0D0 * MAX_REJECT
 	minpix = max (MIN_NPIXELS, l_val)
 	d_val = npix * .01D0
-	ngrow = max (1, nint_dl(d_val))
+	ngrow = max (1, ldnint(d_val))
 	ngoodpix = ex_fit_line (Memr[sample], npix, zstart, zslope,
 	    KREJ, ngrow, MAX_ITERATIONS)
 
