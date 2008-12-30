@@ -22,7 +22,6 @@ double	dval
 bool	numeric
 int	ip, axis
 int	strncmp(), gstrcpy(), idb_kwlookup(), ctod(), strlen()
-int	inint()
 long	ldnint()
 
 begin
@@ -79,12 +78,12 @@ begin
 		IM_MTIME(im) = ldnint(dval)
 	case I_NAXIS:
 	    if (numeric)
-		IM_NDIM(im) = inint(dval)
+		IM_NDIM(im) = idnint(dval)
 	case I_PIXFILE:
 	    return (gstrcpy (strval, IM_PIXFILE(im), SZ_IMPIXFILE))
 	case I_PIXTYPE:
 	    if (numeric)
-		IM_PIXTYPE(im) = inint(dval)
+		IM_PIXTYPE(im) = idnint(dval)
 	case I_TITLE:
 	    return (gstrcpy (strval, IM_TITLE(im), SZ_IMTITLE))
 	default:
