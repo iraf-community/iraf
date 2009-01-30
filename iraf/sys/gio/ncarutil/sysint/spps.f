@@ -376,7 +376,7 @@ C If the mapping defined by the last SET call was non-reversed and
 C linear in both x and y, a single polyline will suffice.
 C
         IF (F5.LT.F6.AND.F7.LT.F8.AND.LL.EQ.1) THEN
-          CALL GPL (NP,PX,PY)
+          CALL GPL32 (NP,PX,PY)
 C
 C Otherwise, piece the line together out of smaller chunks, converting
 C the coordinates for each chunk as directed by the last SET call.
@@ -390,7 +390,7 @@ C
                 QY(IQ)=CUFY(PY(IP+IQ-1))
   101         CONTINUE
               CALL SET (F1,F2,F3,F4,F1,F2,F3,F4,1)
-              CALL GPL (NQ,QX,QY)
+              CALL GPL32 (NQ,QX,QY)
               CALL SET (F1,F2,F3,F4,F5,F6,F7,F8,LL)
             END IF
   102     CONTINUE
@@ -856,9 +856,9 @@ C Dump out a series of polylines, each one defined by a pen-up move and
 C a series of pen-down moves.
 C
       DO 102 I=1,NF-1
-        CALL GPL (IF(I+1)-IF(I),QX(IF(I)),QY(IF(I)))
+        CALL GPL32 (IF(I+1)-IF(I),QX(IF(I)),QY(IF(I)))
   102 CONTINUE
-      IF (IF(NF).NE.NQ) CALL GPL (NQ-IF(NF)+1,QX(IF(I)),QY(IF(I)))
+      IF (IF(NF).NE.NQ) CALL GPL32 (NQ-IF(NF)+1,QX(IF(I)),QY(IF(I)))
 C
 C Put the current transformation back the way it was.
 C
@@ -978,9 +978,9 @@ C Dump out a series of polylines, each one defined by a pen-up move and
 C a series of pen-down moves.
 C
       DO 102 I=1,NF-1
-        CALL GPL (IF(I+1)-IF(I),QX(IF(I)),QY(IF(I)))
+        CALL GPL32 (IF(I+1)-IF(I),QX(IF(I)),QY(IF(I)))
   102 CONTINUE
-      IF (IF(NF).NE.NQ) CALL GPL (NQ-IF(NF)+1,QX(IF(I)),QY(IF(I)))
+      IF (IF(NF).NE.NQ) CALL GPL32 (NQ-IF(NF)+1,QX(IF(I)),QY(IF(I)))
 C
 C Put the current transformation back the way it was.
 C
@@ -1054,15 +1054,15 @@ C
           CALL GQPMI (IE,RIN)
           RMAX=MAX0(-IC,1)
           CALL GSPMI (RMAX)
-          CALL GPM (NP,PX,PY)
+          CALL GPM32 (NP,PX,PY)
           CALL GSPMI (RIN)
         ELSE
           CALL GQMK (IE,IN)
           CALL GSMK (MAX0(-IC,1))
-          CALL GPM (NP,PX,PY)
+          CALL GPM32 (NP,PX,PY)
           CALL GSMK (IN)
         END IF
-        IF (IL.NE.0.AND.NP.GE.2) CALL GPL (NP,PX,PY)
+        IF (IL.NE.0.AND.NP.GE.2) CALL GPL32 (NP,PX,PY)
 C
 C Otherwise, things get complicated.  We have to do batches of nine
 C points at a time.  (Actually, we convert ten coordinates at a time,
@@ -1109,14 +1109,14 @@ C
 C Crank out either a polymarker or a set of characters.
 C
           IF (IC.LE.0) THEN
-            CALL GPM (MQ,QX,QY)
+            CALL GPM32 (MQ,QX,QY)
           ELSE
             DO 103 IQ=1,MQ
               CHRTMP = CHAR(IC)
               CALL GTX (QX(IQ),QY(IQ),CHRTMP)
   103       CONTINUE
           END IF
-          IF (IL.NE.0.AND.NQ.GE.2) CALL GPL (NQ,QX,QY)
+          IF (IL.NE.0.AND.NQ.GE.2) CALL GPL32 (NQ,QX,QY)
 C
 C Put the SET parameters back the way they were.
 C

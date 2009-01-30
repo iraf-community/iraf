@@ -792,21 +792,21 @@ C
       IF (IGPH .EQ. 10) THEN
         IF (XI .NE. WIND(1)) THEN
           PY(2) = TICBIG
-          CALL GPL(2,PX,PY)
+          CALL GPL32(2,PX,PY)
         ENDIF
 C
 C  DRAW X-AXIS FOR IGPH = 10
 C
         PX(2) = WIND(2)
         PY(2) = PY(1)
-        CALL GPL(2,PX,PY)
+        CALL GPL32(2,PX,PY)
         PX(2) = PX(1)
       ELSE
 C
 C  DRAW Y-AXIS FOR ANY OTHER IGPH (FIRST TICK.)
 C
         PY(2) = WIND(4)
-        CALL GPL(2,PX,PY)
+        CALL GPL32(2,PX,PY)
       ENDIF
 C
 C  TICKS OR GRIDS ?
@@ -917,7 +917,7 @@ C
      2 .AND.(IGPH.NE.6.AND.IGPH.NE.10)) THEN
         IF (LOOP .EQ. 1) THEN
           PY(2) = WIND(4)
-          CALL GPL(2,PX,PY)
+          CALL GPL32(2,PX,PY)
           IF (IXLAB .EQ. 1) THEN
             IF (LOGVAL.EQ.1 .OR. LOGVAL.EQ.2) THEN
 C (NOAO)      WRITE(LABEL,XFMT) XPOS
@@ -945,7 +945,7 @@ C
         IF (LGRID) THEN
           CALL GSPLCI(IGRIMN)
         ENDIF
-        CALL GPL(2,PX,PY)
+        CALL GPL32(2,PX,PY)
         IF (LGRID) THEN
           CALL GSPLCI(IGRIMJ)
         ENDIF
@@ -957,7 +957,7 @@ C
         IF (.NOT. LGRID) THEN
           PY(2) = TICBIG
         ENDIF
-        CALL GPL(2,PX,PY)
+        CALL GPL32(2,PX,PY)
 C
 C  LABEL.
 C
@@ -1076,21 +1076,21 @@ C
       IF (IGPH .EQ. 10) THEN
         IF (YI .NE. WIND(3)) THEN
           PX(2) = TICBIG
-          CALL GPL(2,PX,PY)
+          CALL GPL32(2,PX,PY)
         ENDIF
 C
 C  DRAW Y-AXIS FOR IGPH = 10
 C
         PY(2) = WIND(4)
         PX(2) = PX(1)
-        CALL GPL(2,PX,PY)
+        CALL GPL32(2,PX,PY)
         PY(2) = PY(1)
       ELSE
 C
 C  DRAW X-AXIS FOR ANY OTHER IGPH (FIRST TICK.)
 C
         PX(2) = WIND(2)
-        CALL GPL(2,PX,PY)
+        CALL GPL32(2,PX,PY)
       ENDIF
 C
 C  GRIDS OR TICS ?
@@ -1192,7 +1192,7 @@ C
      2 .AND.(IGPH.NE.9.AND.IGPH.NE.10)) THEN
         IF (LOOP .EQ. 1) THEN
           PX(2) = WIND(2)
-          CALL GPL(2,PX,PY)
+          CALL GPL32(2,PX,PY)
           IF (IYLAB .EQ. 1) THEN
             IF (LOGVAL .EQ. 1 .OR. LOGVAL .EQ.3) THEN
 C (NOAO)      WRITE(LABEL,YFMT)YPOS
@@ -1220,7 +1220,7 @@ C
         IF (LGRID) THEN
           CALL GSPLCI(IGRIMN)
         ENDIF
-        CALL GPL(2,PX,PY)
+        CALL GPL32(2,PX,PY)
         IF (LGRID) THEN
           CALL GSPLCI(IGRIMJ)
         ENDIF
@@ -1232,7 +1232,7 @@ C
         IF (.NOT. LGRID) THEN
           PX(2) = TICBIG
         ENDIF
-        CALL GPL(2,PX,PY)
+        CALL GPL32(2,PX,PY)
 C
 C  LABEL.
 C

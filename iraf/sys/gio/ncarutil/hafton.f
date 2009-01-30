@@ -520,11 +520,11 @@ C
             PY(1) = J*NCRTG
             PX(2) = PX(1)+NCRTG-1
             PY(2) = PY(1)+NCRTG-1
-            CALL GPL (2,PX,PY)
+            CALL GPL32 (2,PX,PY)
             PYTMP = PY(1)
             PY(1) = PY(2)
             PY(2) = PYTMP
-            CALL GPL (2,PX,PY)
+            CALL GPL32 (2,PX,PY)
 C
             GO TO 129
   122       INTEN = MXLEV
@@ -748,7 +748,7 @@ C
             IF (Z(IP1,J).EQ.SP .OR. Z(IP1,JP1).EQ.SP) KRIGT = 1
             JUMP = KLEFT*4+KCENT*2+KRIGT+1
             GO TO (102,101,102,102,101,102,102,102,102),JUMP
-  101       CALL GPL (2,PX,PY)
+  101       CALL GPL32 (2,PX,PY)
   102    CONTINUE
   103 CONTINUE
 C
@@ -771,7 +771,7 @@ C
             IF (Z(I,JP1).EQ.SP .OR. Z(IP1,JP1).EQ.SP) KUPER = 1
             JUMP = KLOWR*4+KCENT*2+KUPER+1
             GO TO (105,104,105,105,104,105,105,105,105),JUMP
-  104       CALL GPL (2,PX,PY)
+  104       CALL GPL32 (2,PX,PY)
   105    CONTINUE
   106 CONTINUE
       RETURN
