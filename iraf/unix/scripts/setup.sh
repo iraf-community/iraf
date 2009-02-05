@@ -171,16 +171,16 @@ set_irafenv() {
 
 set_mach () {
 
-  ARG_MACH="`echo $1 | tr 'A-Z' 'a-z'`"
+  ARG_MACH="`echo $1 | tr '[A-Z]' '[a-z]'`"
   
   if [ "$ARG_MACH" = "auto" ]; then
     #
-    UNAME_P="`uname -p | tr 'A-Z' 'a-z'`"
+    UNAME_P="`uname -p | tr '[A-Z]' '[a-z]'`"
     if [ "$UNAME_P" = "unknown" -o "$UNAME_P" = "" ]; then
-      UNAME_P="`uname -m | tr 'A-Z' 'a-z'`"
+      UNAME_P="`uname -m | tr '[A-Z]' '[a-z]'`"
     fi
     ARCHITECTURE="`echo $UNAME_P | sed -e 's/^i[3456]86$/i386/' -e 's/\(^cygwin\)\(_.*\)/\1/'`"
-    OPERATING_SYSTEM="`uname -s | tr 'A-Z' 'a-z'`"
+    OPERATING_SYSTEM="`uname -s | tr '[A-Z]' '[a-z]'`"
     VENDOR="generic"
     #
   else
@@ -295,9 +295,7 @@ OPERATING_SYSTEM=""
 VENDOR=""
 SPP_DATA_MODEL=""
 
-if [ "$USER" = "" ]; then
-    USER=`whoami`
-fi
+USER=`whoami`
 
 ################################
 
@@ -379,7 +377,7 @@ EOF
   output_makefile iraf/unix/config makefile.in "$D"
   #
   # F2C
-  #F="`echo $HSI_CF | tr ' ' '\n' | grep -e '-DSPP' -e '-I' | tr '\n' ' '`"
+  #F="`echo $HSI_CF | tr ' ' '\n' | egrep -e '-DSPP' -e '-I' | tr '\n' ' '`"
   # See also MAX_OUTPUT_SIZE in niceprintf.h
   F="-DDEF_C_LINE_LENGTH=5120"
   #
@@ -539,7 +537,7 @@ EOF
            iraf/base iraf/config iraf/dev \
            iraf/doc iraf/math iraf/sys \
            iraf/pkg iraf/tables iraf/noao ; do
-    L=`find $i -print | grep -v -e '\.[acfhlorxy]$' -e '\.[fhx]\....$' -e '\.inc$' -e '\.inc\.orig$' -e '\.com$' -e '\.bd$' -e '\.gy$' -e '\.gh$' -e '\.gc$' -e '\.gx$' -e '\.gx\.old$' -e '/omkpkg$' -e '/mkpkg$' -e '/mkpkg\.[^e][^/]*$' -e '/[mM]akefile[^/]*$' -e '/configure[^/]*$' -e '/strip\.[^/]*$' -e '/strip$' | grep -v -e '~$' -e '/\.svn'`
+    L=`find $i -print | egrep -v -e '\.[acfhlorxy]$' -e '\.[fhx]\....$' -e '\.inc$' -e '\.inc\.orig$' -e '\.com$' -e '\.bd$' -e '\.gy$' -e '\.gh$' -e '\.gc$' -e '\.gx$' -e '\.gx\.old$' -e '/omkpkg$' -e '/mkpkg$' -e '/mkpkg\.[^e][^/]*$' -e '/[mM]akefile[^/]*$' -e '/configure[^/]*$' -e '/strip\.[^/]*$' -e '/strip$' | egrep -v -e '~$' -e '/\.svn'`
     for j in $L ; do
       install_file $j
     done
@@ -559,7 +557,7 @@ EOF
   if [ ! $S = 0 ]; then
     exit $S
   fi
-  if [ $UID = 0 ]; then
+  if [ "$USER" = "root" ]; then
     ( cd $DESTDIR/dev
       echo "Creating /dev/imtli"
       rm -f imtli ; mknod -m 777 imtli p
@@ -585,7 +583,7 @@ EOF
       sed -e 's|^PREFIX=.*|PREFIX='"$PREFIX"'|' > $DESTDIR/$BINDIR/cl
   chmod 755 $DESTDIR/$BINDIR/mkiraf
   chmod 755 $DESTDIR/$BINDIR/cl
-  if [ $UID = 0 ]; then
+  if [ "$USER" = "root" ]; then
     chown root:root $DESTDIR/$BINDIR/mkiraf
     chown root:root $DESTDIR/$BINDIR/cl
   fi
@@ -596,12 +594,12 @@ EOF
     echo ". $PREFIX/iraf/iraf/unix/scripts/setup.sh set_env auto $PREFIX" >> $F
     echo "exec $PREFIX/iraf/iraf/unix/bin/$i.e \$@" >> $F
     chmod 755 $F
-    if [ $UID = 0 ]; then
+    if [ "$USER" = "root" ]; then
       chown root:root $F
     fi
   done
   #
-  if [ $UID = 0 ]; then
+  if [ "$USER" = "root" ]; then
     chown -R root:root $DESTDIR/$PREFIX/iraf/iraf
     chown root:root $DESTDIR/$PREFIX/iraf/COPYRIGHTS
     chown root:root $DESTDIR/$PREFIX/iraf/imdirs
@@ -626,7 +624,7 @@ EOF
            iraf/base iraf/config iraf/dev \
            iraf/doc iraf/math iraf/sys \
            iraf/pkg iraf/tables iraf/noao ; do
-    L=`find $i -print | grep -e '\.[acfhlorxy]$' -e '\.[fhx]\....$' -e '\.inc$' -e '\.inc\.orig$' -e '\.com$' -e '\.bd$' -e '\.gy$' -e '\.gh$' -e '\.gc$' -e '\.gx$' -e '\.gx\.old$' -e '/omkpkg$' -e '/mkpkg$' -e '/mkpkg\.[^e][^/]*$' -e '/[mM]akefile[^/]*$' -e '/configure[^/]*$' -e '/strip\.[^/]*$' -e '/strip$' | grep -v -e '\.[aoe]$' | grep -v -e 'unix/config/mkpkg.inc$' -e 'unix/config/iraf.h$' -e 'unix/config/mach.h$' -e '~$' -e '/\.svn'`
+    L=`find $i -print | egrep -e '\.[acfhlorxy]$' -e '\.[fhx]\....$' -e '\.inc$' -e '\.inc\.orig$' -e '\.com$' -e '\.bd$' -e '\.gy$' -e '\.gh$' -e '\.gc$' -e '\.gx$' -e '\.gx\.old$' -e '/omkpkg$' -e '/mkpkg$' -e '/mkpkg\.[^e][^/]*$' -e '/[mM]akefile[^/]*$' -e '/configure[^/]*$' -e '/strip\.[^/]*$' -e '/strip$' | egrep -v -e '\.[aoe]$' | egrep -v -e 'unix/config/mkpkg.inc$' -e 'unix/config/iraf.h$' -e 'unix/config/mach.h$' -e '~$' -e '/\.svn'`
     for j in $L ; do
       install_file $j
     done
@@ -636,14 +634,14 @@ EOF
            iraf/unix/gdev iraf/unix/include iraf/unix/mkpkg \
            iraf/unix/mkpkg.sh iraf/unix/os iraf/unix/portkit \
            iraf/unix/scripts iraf/unix/shlib iraf/unix/sun ; do
-    L=`find $i -print | grep -v -e 'unix/scripts/setup.sh$' -e 'unix/include/f2c.h$' -e 'unix/boot/spp/rpp/rppfor/entxkw.f$' -e '\.[aoe]$' | grep -v -e '~$' -e '/\.svn'`
+    L=`find $i -print | egrep -v -e 'unix/scripts/setup.sh$' -e 'unix/include/f2c.h$' -e 'unix/boot/spp/rpp/rppfor/entxkw.f$' -e '\.[aoe]$' | egrep -v -e '~$' -e '/\.svn'`
     for j in $L ; do
       install_file $j
     done
   done
   for i in iraf/unix/bin \
            iraf/unix/lib iraf/lib iraf/noao/lib iraf/tables/lib ; do
-    L=`find $i -print | grep -v -e 'unix/bin/alloc\.e$' -e 'unix/bin/sgi.*$' | grep -v -e '~$' -e '/\.svn'`
+    L=`find $i -print | egrep -v -e 'unix/bin/alloc\.e$' -e 'unix/bin/sgi.*$' | egrep -v -e '~$' -e '/\.svn'`
     for j in $L ; do
       install_file $j
     done
@@ -666,12 +664,12 @@ EOF
     echo ". $PREFIX/iraf/iraf/unix/scripts/setup.sh set_env auto $PREFIX" >> $F
     echo "exec $PREFIX/iraf/iraf/unix/bin/$i.e \$@" >> $F
     chmod 755 $F
-    if [ $UID = 0 ]; then
+    if [ "$USER" = "root" ]; then
       chown root:root $F
     fi
   done
   #
-  if [ $UID = 0 ]; then
+  if [ "$USER" = "root" ]; then
     chown -R root:root $DESTDIR/$PREFIX/iraf/iraf
     chown root:root $DESTDIR/$PREFIX/iraf/COPYRIGHTS
     chown root:root $DESTDIR/$PREFIX/iraf/imdirs

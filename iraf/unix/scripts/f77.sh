@@ -239,7 +239,7 @@ do
 		#
 		# construct prototype declarations
 		#
-		NEW_PROTOS="`cat $b.c | grep -e '^[a-zA-Z0-9_][a-zA-Z0-9_]* [a-zA-Z0-9_][a-zA-Z0-9_]*_(.*)$'`"
+		NEW_PROTOS="`cat $b.c | grep '^[a-zA-Z0-9_][a-zA-Z0-9_]* [a-zA-Z0-9_][a-zA-Z0-9_]*_(.*)$'`"
 		FUNC_GLIST="`echo \"$NEW_PROTOS\" | sed -e 's/^\([a-zA-Z0-9_][a-zA-Z0-9_]* \)\([a-zA-Z0-9_][a-zA-Z0-9_]*\)\((.*\)/\-e \[^a-zA-Z0-9_\]\2(/'`"
 		if [ "$FUNC_GLIST" != "" ]; then
 		  touch f2c_proto.h
@@ -250,7 +250,7 @@ do
 		#
 		# display constant arguments on function
 		#
-		#grep -e 'static integer c__[0-9]' -e 'static integer c_n[0-9]' $b.c
+		#egrep -e 'static integer c__[0-9]' -e 'static integer c_n[0-9]' $b.c
 		#
 		# Compile
 		#

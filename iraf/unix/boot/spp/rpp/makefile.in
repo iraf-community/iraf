@@ -4,21 +4,21 @@
 all:	rpp.e
 
 librpp.a::
-	make -C rppfor
+	(cd rppfor ; make)
 
 libf.a::
-	make -C ratlibf
+	(cd ratlibf ; make)
 
 libc.a::
-	make -C ratlibc
+	(cd ratlibc ; make)
 
 rpp.e:	rpp.o librpp.a libf.a libc.a
 	$(CC) $(HSI_LF) rpp.o librpp.a libf.a libc.a $(HSI_F77LIBS) -o $@
 	cp -p $@ ../../../bin/.
 
 clean::
-	make -C rppfor clean
-	make -C ratlibf clean
-	make -C ratlibc clean
+	(cd rppfor ; make clean)
+	(cd ratlibf ; make clean)
+	(cd ratlibc ; make clean)
 	rm -f *.o rpp.e ../../../bin/rpp.e
 

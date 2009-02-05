@@ -35,25 +35,25 @@ reboot_makefiles::
 	$(SETUP) reboot_makefiles $(MACH) $(PREFIX)
 
 boot_make::
-	make -C iraf/unix/include
-	make -C iraf/unix/config
-	make -C iraf/unix/f2c/src f2c
+	(cd iraf/unix/include ; make)
+	(cd iraf/unix/config ; make)
+	(cd iraf/unix/f2c/src ; make f2c)
 	cp -p iraf/unix/f2c/src/f2c iraf/unix/bin/f2c.e
-	make -C iraf/unix/f2c/libf2c all
+	(cd iraf/unix/f2c/libf2c ; make all)
 	cp -p iraf/unix/f2c/libf2c/libf2c.a iraf/unix/lib/.
-	make -C iraf/unix/os
-	make -C iraf/unix/boot/bootlib
-	make -C iraf/unix/boot/generic
-	make -C iraf/unix/boot/mkpkg
-	make -C iraf/unix/boot/rmbin
-	make -C iraf/unix/boot/rmfiles
-	make -C iraf/unix/boot/rtar
-	make -C iraf/unix/boot/wtar
-	make -C iraf/unix/boot/spp
-	make -C iraf/unix/boot/spp/xpp
-	make -C iraf/unix/boot/spp/rpp
-	make -C iraf/unix/boot/xyacc
-	make -C iraf/unix/gdev/sgidev
+	(cd iraf/unix/os ; make)
+	(cd iraf/unix/boot/bootlib ; make)
+	(cd iraf/unix/boot/generic ; make)
+	(cd iraf/unix/boot/mkpkg ; make)
+	(cd iraf/unix/boot/rmbin ; make)
+	(cd iraf/unix/boot/rmfiles ; make)
+	(cd iraf/unix/boot/rtar ; make)
+	(cd iraf/unix/boot/wtar ; make)
+	(cd iraf/unix/boot/spp ; make)
+	(cd iraf/unix/boot/spp/xpp ; make)
+	(cd iraf/unix/boot/spp/rpp ; make)
+	(cd iraf/unix/boot/xyacc ; make)
+	(cd iraf/unix/gdev/sgidev ; make)
 
 iraf::
 	$(SETUP) make_iraf $(MACH)
@@ -80,28 +80,28 @@ clean_tmp_bin::
 	rm -rf tmp_bin
 
 clean_f2c::
-	make -C iraf/unix/f2c/src clean
+	(cd iraf/unix/f2c/src ; make clean)
 	rm -f iraf/unix/bin/f2c.e
-	make -C iraf/unix/f2c/libf2c clean
+	(cd iraf/unix/f2c/libf2c ; make clean)
 	rm -f iraf/unix/lib/libf2c.a
 	find iraf/unix/f2c -type l -exec rm -f {} \;
 
 clean_unix::
-	make -C iraf/unix/include clean
-	make -C iraf/unix/config clean
-	make -C iraf/unix/os clean
-	make -C iraf/unix/boot/bootlib clean
-	make -C iraf/unix/boot/generic clean
-	make -C iraf/unix/boot/mkpkg clean
-	make -C iraf/unix/boot/rmbin clean
-	make -C iraf/unix/boot/rmfiles clean
-	make -C iraf/unix/boot/rtar clean
-	make -C iraf/unix/boot/wtar clean
-	make -C iraf/unix/boot/spp clean
-	make -C iraf/unix/boot/spp/xpp clean
-	make -C iraf/unix/boot/spp/rpp clean
-	make -C iraf/unix/boot/xyacc clean
-	make -C iraf/unix/gdev/sgidev clean
+	(cd iraf/unix/include ; make clean)
+	(cd iraf/unix/config ; make clean)
+	(cd iraf/unix/os ; make clean)
+	(cd iraf/unix/boot/bootlib ; make clean)
+	(cd iraf/unix/boot/generic ; make clean)
+	(cd iraf/unix/boot/mkpkg ; make clean)
+	(cd iraf/unix/boot/rmbin ; make clean)
+	(cd iraf/unix/boot/rmfiles ; make clean)
+	(cd iraf/unix/boot/rtar ; make clean)
+	(cd iraf/unix/boot/wtar ; make clean)
+	(cd iraf/unix/boot/spp ; make clean)
+	(cd iraf/unix/boot/spp/xpp ; make clean)
+	(cd iraf/unix/boot/spp/rpp ; make clean)
+	(cd iraf/unix/boot/xyacc ; make clean)
+	(cd iraf/unix/gdev/sgidev ; make clean)
 	rm -f iraf/unix/config/mkpkg.inc
 	find iraf/unix/include -type l -exec rm -f {} \;
 	find iraf/unix/config -type l -exec rm -f {} \;
