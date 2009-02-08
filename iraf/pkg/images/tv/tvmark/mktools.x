@@ -6,9 +6,11 @@ include "tvmark.h"
 procedure mk_init (mk)
 
 pointer	mk		# pointer to immark structure
+size_t	sz_val
 
 begin
-	call malloc (mk, LEN_MARKSTRUCT, TY_STRUCT)
+	sz_val = LEN_MARKSTRUCT
+	call malloc (mk, sz_val, TY_STRUCT)
 
 	# Initialize the mark type parameters.
 	MK_MARK(mk) = EOS
@@ -34,10 +36,10 @@ begin
 	MK_SLENGTHS(mk) = NULL
 	MK_RLENGTHS(mk) = NULL
 
-	MK_X1(mk) = INDEFI
-	MK_Y1(mk) = INDEFI
-	MK_X2(mk) = INDEFI
-	MK_Y2(mk) = INDEFI
+	MK_X1(mk) = INDEFL
+	MK_Y1(mk) = INDEFL
+	MK_X2(mk) = INDEFL
+	MK_Y2(mk) = INDEFL
 
 	# Initialize actual drawing parameters.
 	MK_NUMBER(mk) = NO
@@ -69,13 +71,15 @@ end
 procedure mk_rinit (mk)
 
 pointer	mk		# pointer to immark structure
+size_t	sz_val
 
 begin
 	call mk_rfree (mk)
-	call malloc (MK_RADII(mk), MAX_NMARKS, TY_REAL)
-	call malloc (MK_AXES(mk), MAX_NMARKS, TY_REAL)
-	call malloc (MK_SLENGTHS(mk), MAX_NMARKS, TY_REAL)
-	call malloc (MK_RLENGTHS(mk), MAX_NMARKS, TY_REAL)
+	sz_val = MAX_NMARKS
+	call malloc (MK_RADII(mk), sz_val, TY_REAL)
+	call malloc (MK_AXES(mk), sz_val, TY_REAL)
+	call malloc (MK_SLENGTHS(mk), sz_val, TY_REAL)
+	call malloc (MK_RLENGTHS(mk), sz_val, TY_REAL)
 end
 
 
@@ -85,7 +89,7 @@ procedure mk_indefr (mk)
 
 pointer	mk		# pointer to immark
 
-int	ncircles, nsquares, nellipses, nrectangles
+size_t	ncircles, nsquares, nellipses, nrectangles
 int	mk_stati()
 
 begin
@@ -116,34 +120,39 @@ int	nellipses 	# number of ellipses
 int	nsquares	# number of squares
 int	nrectangles	# number of rectangles
 
+size_t	sz_val
 int	nc, ne, ns, nr
 int	mk_stati()
 
 begin
-	if (ncircles > 0)
-	    call realloc (MK_RADII(mk), ncircles, TY_REAL)
-	else {
+	if (ncircles > 0) {
+	    sz_val = ncircles
+	    call realloc (MK_RADII(mk), sz_val, TY_REAL)
+	} else {
 	    call mfree (MK_RADII(mk), TY_REAL)
 	    MK_RADII(mk) = NULL
 	}
 
-	if (nellipses > 0) 
-	    call realloc (MK_AXES(mk), nellipses, TY_REAL)
-	else {
+	if (nellipses > 0) {
+	    sz_val = nellipses
+	    call realloc (MK_AXES(mk), sz_val, TY_REAL)
+	} else {
 	    call mfree (MK_AXES(mk), TY_REAL)
 	    MK_AXES(mk) = NULL
 	}
 
-	if (nsquares > 0)
-	    call realloc (MK_SLENGTHS(mk), nsquares, TY_REAL)
-	else {
+	if (nsquares > 0) {
+	    sz_val = nsquares
+	    call realloc (MK_SLENGTHS(mk), sz_val, TY_REAL)
+	} else {
 	    call mfree (MK_SLENGTHS(mk), TY_REAL)
 	    MK_SLENGTHS(mk) = NULL
 	}
 
-	if (nrectangles > 0)
-	    call realloc (MK_RLENGTHS(mk), nrectangles, TY_REAL)
-	else {
+	if (nrectangles > 0) {
+	    sz_val = nrectangles
+	    call realloc (MK_RLENGTHS(mk), sz_val, TY_REAL)
+	} else {
 	    call mfree (MK_RLENGTHS(mk), TY_REAL)
 	    MK_RLENGTHS(mk) = NULL
 	}
@@ -153,14 +162,22 @@ begin
 	ns = mk_stati (mk, NSQUARES)
 	nr = mk_stati (mk, NRECTANGLES)
 
-	if (ncircles > nc)
-	    call amovkr (INDEFR, Memr[MK_RADII(mk)+nc], ncircles - nc)
-	if (nellipses > ne)
-	    call amovkr (INDEFR, Memr[MK_AXES(mk)+ne], nellipses - ne)
-	if (nsquares > ns)
-	    call amovkr (INDEFR, Memr[MK_SLENGTHS(mk)+ns], nsquares - ns)
-	if (nrectangles > nr)
-	    call amovkr (INDEFR, Memr[MK_RLENGTHS(mk)+nr], nrectangles - nr)
+	if (ncircles > nc) {
+	    sz_val = ncircles - nc
+	    call amovkr (INDEFR, Memr[MK_RADII(mk)+nc], sz_val)
+	}
+	if (nellipses > ne) {
+	    sz_val = nellipses - ne
+	    call amovkr (INDEFR, Memr[MK_AXES(mk)+ne], sz_val)
+	}
+	if (nsquares > ns) {
+	    sz_val = nsquares - ns
+	    call amovkr (INDEFR, Memr[MK_SLENGTHS(mk)+ns], sz_val)
+	}
+	if (nrectangles > nr) {
+	    sz_val = nrectangles - nr
+	    call amovkr (INDEFR, Memr[MK_RLENGTHS(mk)+nr], sz_val)
+	}
 end
 
 
@@ -198,9 +215,9 @@ begin
 end
 
 
-# MK_STATI -- Procedure to fetch the value of an immark integer parameter.
+# MK_STAT[IL] -- Procedure to fetch the value of an immark integer parameter.
 
-int procedure mk_stati (mk, param)
+long procedure mk_statl (mk, param)
 
 pointer	mk		# pointer to immark structure
 int	param		# parameter to be fetched
@@ -244,8 +261,19 @@ begin
 	case NYOFFSET:
 	    return (MK_NYOFFSET(mk))
 	default:
-	    call error (0, "MK_STATI: Unknown integer parameter.")
+	    call error (0, "MK_STATL: Unknown integer parameter.")
 	}
+end
+
+int procedure mk_stati (mk, param)
+
+pointer	mk		# pointer to immark structure
+int	param		# parameter to be fetched
+
+long	mk_statl()
+
+begin
+	return (mk_statl(mk,param))
 end
 
 
@@ -332,13 +360,13 @@ begin
 end
 
 
-# MK_SETI -- Procedure to set the value of an integer parameter.
+# MK_SET[IL] -- Procedure to set the value of an integer parameter.
 
-procedure mk_seti (mk, param, value)
+procedure mk_setl (mk, param, value)
 
 pointer	mk		# pointer to immark structure
 int	param		# parameter to be fetched
-int	value		# value of the integer parameter
+long	value		# value of the integer parameter
 
 begin
 	switch (param) {
@@ -379,8 +407,21 @@ begin
 	case NYOFFSET:
 	    MK_NYOFFSET(mk) = value
 	default:
-	    call error (0, "MK_SETI: Unknown integer parameter.")
+	    call error (0, "MK_SETL: Unknown integer parameter.")
 	}
+end
+
+procedure mk_seti (mk, param, value)
+
+pointer	mk		# pointer to immark structure
+int	param		# parameter to be fetched
+int	value		# value of the integer parameter
+
+long	lval
+
+begin
+	lval = value
+	call mk_setl(mk,param,lval)
 end
 
 
@@ -442,7 +483,9 @@ pointer	mk		# pointer to immark structure
 int	param		# parameter to be fetched
 char	str[ARB]	# output string
 
-int	rp, ntemp
+size_t	sz_val
+int	rp, intemp
+size_t	ntemp
 pointer	sp, rtemp
 int	fnldir(), mk_gmarks()
 
@@ -475,9 +518,11 @@ begin
 
 	case CSTRING:
 	    call smark (sp)
-	    call salloc (rtemp, MAX_NMARKS, TY_REAL)
-	    ntemp = mk_gmarks (str, Memr[rtemp], MAX_NMARKS)
-	    if (ntemp > 0) {
+	    sz_val = MAX_NMARKS
+	    call salloc (rtemp, sz_val, TY_REAL)
+	    intemp = mk_gmarks (str, Memr[rtemp], MAX_NMARKS)
+	    if (intemp > 0) {
+		ntemp = intemp
 	        call strcpy (str, MK_CSTRING(mk), SZ_FNAME)
 		MK_NCIRCLES(mk) = ntemp
 		call realloc (MK_RADII(mk), ntemp, TY_REAL)
@@ -488,9 +533,11 @@ begin
 
 	case RSTRING:
 	    call smark (sp)
-	    call salloc (rtemp, MAX_NMARKS, TY_REAL)
-	    ntemp = mk_gmarks (str, Memr[rtemp], MAX_NMARKS)
-	    if (ntemp > 0) {
+	    sz_val = MAX_NMARKS
+	    call salloc (rtemp, sz_val, TY_REAL)
+	    intemp = mk_gmarks (str, Memr[rtemp], MAX_NMARKS)
+	    if (intemp > 0) {
+		ntemp = intemp
 	        call strcpy (str, MK_RSTRING(mk), SZ_FNAME)
 		MK_NRECTANGLES(mk) = ntemp
 		call realloc (MK_RLENGTHS(mk), ntemp, TY_REAL)

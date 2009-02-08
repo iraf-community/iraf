@@ -13,18 +13,25 @@ int	cl		# coordinate file descriptor
 int	ltid		# current number in the list
 int	fnt		# font file descriptor
 
-int	ncols, nlines, nr, nc, x1, x2, y1, y2
+size_t	sz_val
+long	ncols, nlines, x1, x2, y1, y2
+int	inr, inc
+size_t	nr, nc
 pointer	sp, str, lengths, radii, label
 real	x, y, fx, fy, ofx, ofy, xmag, ymag, lmax, lratio, rmax, ratio
+
 int	fscan(), nscan(), mk_stati(), itoc()
 int	mk_plimits(), mk_llimits(), mk_rlimits(), mk_climits()
 pointer	mk_statp()
 real	mk_statr()
+long	mk_statl(), lnint()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (label, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (label, sz_val, TY_CHAR)
 
 	ncols = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
@@ -34,7 +41,8 @@ begin
 
 	# Define the rectangles in terms of device coordinates.
 	if (mk_stati (mk, MKTYPE) == MK_RECTANGLE) {
-	    nr = mk_stati (mk, NRECTANGLES)
+	    inr = mk_stati (mk, NRECTANGLES)
+	    nr = inr
 	    call salloc (lengths, nr, TY_REAL) 
 	    if (xmag <= 0.0) {
 	        lmax = 0.0
@@ -52,7 +60,8 @@ begin
 
 	# Define the circles in terms of device coordinates.
 	if (mk_stati (mk, MKTYPE) == MK_CIRCLE) {
-	    nc = mk_stati (mk, NCIRCLES)
+	    inc = mk_stati (mk, NCIRCLES)
+	    nc = inc
 	    call salloc (radii, nc, TY_REAL)
 	    if (xmag <= 0) {
 	        rmax = 0.0
@@ -106,25 +115,25 @@ begin
 		if (mk_rlimits (fx, fy, lmax, lratio, ncols, nlines, x1, x2,
 		    y1, y2) == YES) {
 		    call mk_drawbox (im, fx, fy, x1, x2, y1, y2, Memr[lengths],
-		        lratio, nr, mk_stati (mk, GRAYLEVEL))
+		        lratio, inr, mk_stati (mk, GRAYLEVEL))
 		}
 
 	    case MK_CIRCLE:
 		if (mk_climits (fx, fy, rmax, ratio, ncols, nlines, x1, x2,
 		    y1, y2) == YES) {
 		    call mk_drawcircles  (im, fx, fy, x1, x2, y1, y2,
-		        Memr[radii], ratio, nc, mk_stati (mk,
+		        Memr[radii], ratio, inc, mk_stati (mk,
 			GRAYLEVEL))
 	            call imflush (im)
 		}
 
 	    case MK_PLUS:
-		call mk_textim (im, "+", nint (fx), nint (fy), mk_stati (mk,
+		call mk_textim (im, "+", lnint (fx), lnint (fy), mk_stati (mk,
 		    SIZE), mk_stati (mk, SIZE), mk_stati (mk, GRAYLEVEL), YES)
 	        call imflush (im)
 
 	    case MK_CROSS:
-		call mk_textim (im, "x", nint (fx), nint (fy), mk_stati (mk,
+		call mk_textim (im, "x", lnint (fx), lnint (fy), mk_stati (mk,
 		    SIZE), mk_stati (mk, SIZE), mk_stati (mk, GRAYLEVEL), YES)
 	        call imflush (im)
 
@@ -135,16 +144,16 @@ begin
 	    ltid = ltid + 1
 	    if (mk_stati (mk, LABEL) == YES) {
 		if (Memc[label] != EOS) {
-		    call mk_textim (im, Memc[label], nint (fx) +
-		        mk_stati(mk, NXOFFSET), nint (fy) + mk_stati (mk,
+		    call mk_textim (im, Memc[label], lnint (fx) +
+		        mk_statl(mk, NXOFFSET), lnint (fy) + mk_statl (mk,
 			NYOFFSET), mk_stati (mk, SIZE), mk_stati (mk, SIZE),
 			mk_stati (mk, GRAYLEVEL), NO)
 		    call imflush (im)
 		}
 	    } else if (mk_stati (mk, NUMBER) == YES) {
 		if (itoc (ltid, Memc[str], SZ_FNAME) > 0) {
-		    call mk_textim (im, Memc[str], nint (fx) +
-		        mk_stati(mk, NXOFFSET), nint (fy) + mk_stati (mk,
+		    call mk_textim (im, Memc[str], lnint (fx) +
+		        mk_statl(mk, NXOFFSET), lnint (fy) + mk_statl (mk,
 			NYOFFSET), mk_stati (mk, SIZE), mk_stati (mk, SIZE),
 			mk_stati (mk, GRAYLEVEL), NO)
 		    call imflush (im)
@@ -165,11 +174,11 @@ end
 procedure mk_drawpt (im, x1, x2, y1, y2, graylevel)
 
 pointer	im		# pointer to the frame image
-int	x1, x2		# column limits
-int	y1, y2		# line limits
+long	x1, x2		# column limits
+long	y1, y2		# line limits
 int	graylevel	# color of dot to be marked
 
-int	i, npix
+long	i, npix
 pointer	vp
 pointer	imps2s()
 
@@ -187,19 +196,21 @@ int procedure mk_plimits (fx, fy, szdot, ncols, nlines, x1, x2, y1, y2)
 
 real	fx, fy		# frame buffer coordinates of point
 int	szdot		# size of a dot
-int	ncols, nlines	# dimensions of the frame buffer
-int	x1, x2		# column limits
-int	y1, y2		# line limits
+long	ncols, nlines	# dimensions of the frame buffer
+long	x1, x2		# column limits
+long	y1, y2		# line limits
+
+long	lnint()
 
 begin
-	x1 = nint (fx) - szdot
+	x1 = lnint (fx) - szdot
 	x2 = x1 + 2 * szdot
 	if (x1 > ncols || x2 < 1)
 	    return (NO)
 	x1 = max (1, min (ncols, x1))
 	x2 = min (ncols, max (1, x2))
 
-	y1 = nint (fy) - szdot
+	y1 = lnint (fy) - szdot
 	y2 = y1 + 2 * szdot 
 	if (y1 > nlines || y2 < 1)
 	    return (NO)
@@ -217,14 +228,16 @@ procedure mk_drawline (im, ofx, ofy, fx, fy, x1, x2, y1, y2, graylevel)
 pointer	im		# pointer to the frame buffer image
 real	ofx, ofy	# previous coordinates
 real	fx, fy		# current coordinates
-int	x1, x2		# column limits
-int	y1, y2		# line limits
+long	x1, x2		# column limits
+long	y1, y2		# line limits
 int	graylevel	# picture gray level
 
-int	i, j, ix1, ix2, npix, itemp
+long	i, j, ix1, ix2, npix, itemp
 pointer	vp
 real	m, b
+
 pointer	imps2s()
+long	lnint()
 
 begin
 	# Compute the slope and intercept.
@@ -247,14 +260,14 @@ begin
 		#b = y2 - m * x1
 	    do i = y1, y2 {
 		if (i == y1) {
-		    ix1 = nint ((i - b) / m)
-		    ix2 = nint ((i + 0.5 - b) / m)
+		    ix1 = lnint ((i - b) / m)
+		    ix2 = lnint ((i + 0.5 - b) / m)
 		} else if (i == y2) {
-		    ix1 = nint ((i - 0.5 - b) / m)
-		    ix2 = nint ((i - b) / m)
+		    ix1 = lnint ((i - 0.5 - b) / m)
+		    ix2 = lnint ((i - b) / m)
 		} else {
-		    ix1 = nint ((i - 0.5 - b) / m)
-		    ix2 = nint ((i + 0.5 - b) / m)
+		    ix1 = lnint ((i - 0.5 - b) / m)
+		    ix2 = lnint ((i + 0.5 - b) / m)
 		}
 		itemp = min (ix1, ix2)
 		ix2 = max (ix1, ix2)
@@ -276,20 +289,22 @@ int procedure mk_llimits (ofx, ofy, fx, fy, ncols, nlines, x1, x2, y1, y2)
 
 real	ofx, ofy	# previous coordinates
 real	fx, fy		# current coordinates
-int	ncols, nlines	# number of lines
-int	x1, x2		# column limits
-int	y1, y2		# line limits
+long	ncols, nlines	# number of lines
+long	x1, x2		# column limits
+long	y1, y2		# line limits
+
+long	lnint()
 
 begin
-	x1 = nint (min (ofx, fx))
-	x2 = nint (max (ofx, fx))
+	x1 = lnint (min (ofx, fx))
+	x2 = lnint (max (ofx, fx))
 	if (x2 < 1 || x1 > ncols)
 	    return (NO)
 	x1 = max (1, min (ncols, x1))
 	x2 = min (ncols, max (1, x2))
 
-	y1 = nint (min (ofy, fy))
-	y2 = nint (max (ofy, fy))
+	y1 = lnint (min (ofy, fy))
+	y2 = lnint (max (ofy, fy))
 	if (y2 < 1 || y1 > nlines)
 	    return (NO)
 	y1 = max (1, min (nlines, y1))
@@ -306,17 +321,19 @@ procedure mk_drawcircles (im, fx, fy, x1, x2, y1, y2, cradii, ratio, ncircles,
 
 pointer	im			# pointer to frame buffer image
 real	fx, fy			# center of circle
-int	x1, x2			# column limits
-int	y1, y2			# line limits
+long	x1, x2			# column limits
+long	y1, y2			# line limits
 real	cradii[ARB]		# sorted list of radii
 real	ratio			# ratio of the magnifications
 int	ncircles		# number of circles
 int	graylevel		# gray level for marking
 
-int	i, j, k, ix1, ix2, npix
+long	i, k, ix1, ix2, npix
+int	j
 pointer	ovp
 real	dy2, dym, dyp, r2, dx1, dx2
 pointer	imps2s()
+long	lnint()
 
 begin
 	if (ratio <= 0)
@@ -352,8 +369,8 @@ begin
 		else
 		    dx2 = 0.0
 
-		ix1 = nint (fx - dx1)
-		ix2 = nint (fx - dx2)
+		ix1 = lnint (fx - dx1)
+		ix2 = lnint (fx - dx2)
 		if (ix1 <= IM_LEN(im,1) && ix2 >= 1) {
 		    ix1 = max (1, ix1)
 		    ix2 = min (ix2, IM_LEN(im,1))
@@ -362,8 +379,8 @@ begin
 		        Mems[ovp+k-1] = graylevel
 		}
 
-		ix1 = nint (fx + dx1)
-		ix2 = nint (fx + dx2)
+		ix1 = lnint (fx + dx1)
+		ix2 = lnint (fx + dx2)
 		if (ix2 <= IM_LEN(im,1) && ix1 >= 1) {
 		    ix2 = max (1, ix2)
 		    ix1 = min (ix1, IM_LEN(im,1))
@@ -384,20 +401,22 @@ int procedure mk_climits (fx, fy, rmax, ratio, ncols, nlines, x1, x2, y1, y2)
 real	fx, fy			# center of rectangle
 real	rmax			# maximum half length of box
 real	ratio			# ratio of the magnifications
-int	ncols, nlines		# dimension of the image
-int	x1, x2			# column limits
-int	y1, y2			# line limits
+long	ncols, nlines		# dimension of the image
+long	x1, x2			# column limits
+long	y1, y2			# line limits
+
+long	lnint()
 
 begin
-	x1 = nint (fx - rmax)
-	x2 = nint (fx + rmax)
+	x1 = lnint (fx - rmax)
+	x2 = lnint (fx + rmax)
 	if (x1 > ncols || x2 < 1)
 	    return (NO)
 	x1 = max (1, min (ncols, x1))
 	x2 = min (ncols, max (1, x2))
 
-	y1 = nint (fy - rmax * ratio)
-	y2 = nint (fy + rmax * ratio)
+	y1 = lnint (fy - rmax * ratio)
+	y2 = lnint (fy + rmax * ratio)
 	if (y1 > nlines || y2 < 1)
 	    return (NO)
 	y1 = max (1, min (nlines, y1))
@@ -414,17 +433,21 @@ procedure mk_drawbox (im, fx, fy, x1, x2, y1, y2, length, ratio, nbox,
 
 pointer	im			# pointer to frame buffer image
 real	fx, fy			# center of rectangle
-int	x1, x2			# column limits
-int	y1, y2			# line limits
+long	x1, x2			# column limits
+long	y1, y2			# line limits
 real	length[ARB]		# list of rectangle lengths
 real	ratio			# ratio of width/length
 int	nbox			# number of boxes
 int	graylevel		# value of graylevel
 
-int	i, j, k, npix, ydist, bdist, ix1, ix2
+long	i, k, npix, ydist, bdist, ix1, ix2
+int	j
 pointer	ovp
 real	hlength
+
 pointer	imps2s()
+real	aabs()
+long	lnint()
 
 begin
 	if (x1 == x2) {
@@ -440,14 +463,14 @@ begin
 	} else {
 	    npix = x2 - x1 + 1
 	    do i = y1, y2 {
-		ydist = nint (abs (i - fy))
+		ydist = lnint (aabs (i - fy))
 		do j = 1, nbox {
 		    hlength = length[j] / 2.0
-		    bdist = nint (hlength * ratio)
+		    bdist = lnint (hlength * ratio)
 		    if (ydist > bdist)
 			next
-		    ix1 = max (x1, nint (fx - hlength))
-		    ix2 = min (x2, nint (fx + hlength))
+		    ix1 = max (x1, lnint (fx - hlength))
+		    ix2 = min (x2, lnint (fx + hlength))
 		    if (ix1 < 1 || ix1 > IM_LEN(im,1) || ix2 < 1 ||
 		        ix2 > IM_LEN(im,1))
 			next
@@ -474,18 +497,20 @@ int procedure mk_rlimits (fx, fy, lmax, lratio, ncols, nlines, x1, x2, y1, y2)
 real	fx, fy			# center of rectangle
 real	lmax			# maximum half length of box
 real	lratio			# ratio of width to length
-int	ncols, nlines		# dimension of the image
-int	x1, x2			# column limits
-int	y1, y2			# line limits
+long	ncols, nlines		# dimension of the image
+long	x1, x2			# column limits
+long	y1, y2			# line limits
 
 real	hlmax, wmax
+
+long	lnint()
 
 begin
 	hlmax = lmax / 2.0
 	wmax = lmax * lratio
 
-	x1 = nint (fx - hlmax)
-	x2 = nint (fx + hlmax)
+	x1 = lnint (fx - hlmax)
+	x2 = lnint (fx + hlmax)
 	if (x1 > ncols || x2 < 1)
 	    return (NO)
 	x1 = max (1, min (ncols, x1))
@@ -507,11 +532,11 @@ end
 procedure mk_pbox (im, x1, x2, y1, y2, graylevel)
 
 pointer	im			# pointer to the image
-int	x1, x2			# column limits
-int	y1, y2			# line limits
+long	x1, x2			# column limits
+long	y1, y2			# line limits
 int	graylevel		# line value
 
-int	i, j, npix
+long	i, j, npix
 pointer	ovp
 pointer	imps2s()
 
@@ -544,18 +569,20 @@ procedure mk_blimits (ofx, ofy, fx, fy, ncols, nlines, x1, x2, y1, y2)
 
 real	ofx, ofy		# first point
 real	fx, fy			# second point
-int	ncols, nlines		# dimensions of the image
-int	x1, x2			# column limits
-int	y1, y2			# line limits
+long	ncols, nlines		# dimensions of the image
+long	x1, x2			# column limits
+long	y1, y2			# line limits
+
+long	lnint()
 
 begin
-    	x1 = nint (min (ofx, fx))
+    	x1 = lnint (min (ofx, fx))
 	x1 = max (1, min (x1, ncols))
-    	x2 = nint (max (ofx, fx))
+    	x2 = lnint (max (ofx, fx))
 	x2 = min (ncols, max (x2, 1))
 
-    	y1 = nint (min (ofy, fy))
+    	y1 = lnint (min (ofy, fy))
 	y1 = max (1, min (y1, nlines))
-    	y2 = nint (max (ofy, fy))
+    	y2 = lnint (max (ofy, fy))
 	y2 = min (nlines, max (y2, 1))
 end

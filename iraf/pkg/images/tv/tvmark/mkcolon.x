@@ -17,24 +17,29 @@ int	cl		# coords file descriptor
 int	ltid		# coords file sequence number
 int	dl		# deletions file descriptor
 
+size_t	sz_val
 bool	bval
 real	rval
 pointer	sp, cmd, str, outim, deletions, ext
 int	ncmd, mark, font, ival, ip, nchars, wcs_status
+long	lval
 
 real	mk_statr()
 bool	itob(), streq()
 pointer	immap(), imd_mapframe(), iw_open()
-int	open(), strdic(), nscan(), mk_stati(), btoi(), ctowrd()
+int	open(), strdic(), nscan(), mk_stati(), btoi(), ctowrd(), imod()
+long	mk_statl()
 errchk	imd_mapframe(), iw_open(), immap(), imunmap(), open()
 
 begin
 	# Allocate some working memory.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (deletions, SZ_FNAME, TY_CHAR)
-	call salloc (ext, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (deletions, sz_val, TY_CHAR)
+	call salloc (ext, sz_val, TY_CHAR)
 
 	# Get the command.
 	ip = 1
@@ -226,22 +231,22 @@ begin
 		call mk_seti (mk, NUMBER, btoi (bval))
 
 	case MKCMD_NXOFFSET:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan () == 1) {
 		call printf ("%s = %g\n")
 		    call pargstr (KY_NXOFFSET)
-		    call pargi (mk_stati (mk, NXOFFSET))
+		    call pargl (mk_statl (mk, NXOFFSET))
 	    } else
-		call mk_seti (mk, NXOFFSET, ival)
+		call mk_setl (mk, NXOFFSET, lval)
 
 	case MKCMD_NYOFFSET:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan () == 1) {
 		call printf ("%s = %g\n")
 		    call pargstr (KY_NYOFFSET)
-		    call pargi (mk_stati (mk, NYOFFSET))
+		    call pargl (mk_statl (mk, NYOFFSET))
 	    } else
-		call mk_seti (mk, NYOFFSET, ival)
+		call mk_setl (mk, NYOFFSET, lval)
 
 	case MKCMD_GRAYLEVEL:
 	    call gargi (ival)
@@ -259,7 +264,7 @@ begin
 		    call pargstr (KY_SZPOINT)
 		    call pargi (2 * mk_stati (mk, SZPOINT) + 1)
 	    } else {
-		if (mod (ival, 2) == 0)
+		if (imod (ival, 2) == 0)
 		    ival = ival + 1
 		ival = ival / 2
 		call mk_seti (mk, SZPOINT, ival)

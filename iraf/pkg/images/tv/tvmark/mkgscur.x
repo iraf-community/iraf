@@ -6,7 +6,7 @@ include <fset.h>
 
 int procedure mk_gscur (sl, gd, xcur, ycur, label, prev_num, req_num, num)
 
-pointer	sl		# pointer to text file containing cursor coords
+int	sl		# pointer to text file containing cursor coords
 pointer	gd		# pointer to graphics stream
 real	xcur, ycur	# x cur and y cur
 char	label[ARB]	# label string
@@ -14,6 +14,8 @@ int	prev_num	# previous number
 int	req_num		# requested number
 int	num		# list number
 
+size_t	sz_val
+long	l_val
 int	stdin, nskip, ncount
 pointer	sp, fname
 int	fscan(), nscan(), strncmp()
@@ -24,7 +26,8 @@ begin
 	    return (EOF)
 
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Find the number of objects to be skipped.
 	call fstats (sl, F_FILENAME, Memc[fname], SZ_FNAME)
@@ -34,7 +37,8 @@ begin
 	} else {
 	    stdin = NO
 	    if (req_num <= prev_num) {
-		call seek (sl, BOF)
+		l_val = BOF
+		call seek (sl, l_val)
 		nskip = req_num
 	    } else
 		nskip = req_num - prev_num

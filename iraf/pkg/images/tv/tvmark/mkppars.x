@@ -7,15 +7,18 @@ procedure mk_ppars (mk)
 
 pointer	mk		# pointer to the immark structure
 
+size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	mk_stati()
+long	mk_statl()
 real	mk_statr()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Store the mark type.
 	call mk_stats (mk, MARK, Memc[str], SZ_LINE)
@@ -32,8 +35,8 @@ begin
 	call clputi ("txsize", mk_stati (mk, SIZE))
 	call clputi ("pointsize", 2 * mk_stati (mk, SZPOINT) + 1)
 	call clputi ("color", mk_stati (mk, GRAYLEVEL))
-	call clputi ("nxoffset", mk_stati (mk, NXOFFSET))
-	call clputi ("nyoffset", mk_stati (mk, NYOFFSET))
+	call clputl ("nxoffset", mk_statl (mk, NXOFFSET))
+	call clputl ("nyoffset", mk_statl (mk, NYOFFSET))
 	call clputr ("tolerance", mk_statr (mk, TOLERANCE))
 
 	call sfree (sp)

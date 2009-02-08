@@ -9,21 +9,27 @@ int	cl		# coordinate file descriptor
 int	dl		# deletions file descriptor
 int	ndelete		# number of deletions
 
+size_t	sz_val
 int	i, ndel, nobj, obj, tcl, tdl, stat
+long	l_val
 pointer	sp, id, tclname, tdlname, line
 real	xval, yval
 int	fscan(), nscan(), open(), getline()
 
 begin
 	call smark (sp)
-	call salloc (id, ndelete, TY_INT)
-	call salloc (tclname, SZ_FNAME, TY_CHAR)
-	call salloc (tdlname, SZ_FNAME, TY_CHAR)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = ndelete
+	call salloc (id, sz_val, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (tclname, sz_val, TY_CHAR)
+	call salloc (tdlname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Rewind both files to the beginning.
-	call seek (cl, BOF)
-	call seek (dl, BOF)
+	l_val = BOF
+	call seek (cl, l_val)
+	call seek (dl, l_val)
 
 	# Read in the ids of objects to be deleted.
 	ndel = 0
@@ -33,7 +39,8 @@ begin
 	}
 
 	# Sort the id numbers.
-	call asrti (Memi[id], Memi[id], ndelete)
+	sz_val = ndelete
+	call asrti (Memi[id], Memi[id], sz_val)
 
 	# Remove id numbers that are not unique.
 	ndel = 1

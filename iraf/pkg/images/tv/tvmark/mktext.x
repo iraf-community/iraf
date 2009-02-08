@@ -14,13 +14,14 @@ procedure mk_textim (im, s, x, y, xmag, ymag, value, center)
 
 pointer	im				# image to put the text in.
 char	s[ARB]				# text to put in the image.
-int	x, y				# x, y position in the image.
+long	x, y				# x, y position in the image.
 int	xmag, ymag			# x, y magnification values.
 int	value				# value to use in image for text.
 int	center				# center the string
 
-int	numrow, numcol, numchars, fonthigh, fontwide, xinit, yinit
-int	i, l, ch, nchar, line, ip, pixary[SZ_PIXARY]
+long	numrow, numcol, xinit, yinit, line
+int	numchars, fonthigh, fontwide
+int	i, l, ch, nchar, ip, pixary[SZ_PIXARY]
 pointer	lineget, lineput
 
 int	strlen()
@@ -127,12 +128,13 @@ end
 procedure mk_putpix (pixary, array, size, position, value, xmag)
 
 int	pixary[ARB]		# array of pixels in character
-int	size, position		# size of data array
 short	array[size]		# data array in which to put character line
+long	size, position		# size of data array
 int	value			# value to use for character pixels
 int	xmag			# x-magnification of text
 
-int	i, k, x
+int	i, k
+long	x
 
 begin
 	do i = 1, 5 {
@@ -150,11 +152,11 @@ end
 procedure mk_tlimits (str, x, y, xmag, ymag, ncols, nlines, x1, x2, y1, y2)
 
 char	str[ARB]		# string to be written to the image
-int	x, y			# starting position of the string
+long	x, y			# starting position of the string
 int	xmag, ymag		# magnification factor
-int	ncols, nlines		# dimensions of the image
-int	x1, x2			# column limits
-int	y1, y2			# line limits
+long	ncols, nlines		# dimensions of the image
+long	x1, x2			# column limits
+long	y1, y2			# line limits
 
 begin
 	x1 = max (1, min (y, ncols))

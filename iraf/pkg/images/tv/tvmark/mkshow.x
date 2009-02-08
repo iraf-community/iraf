@@ -6,14 +6,17 @@ procedure mk_show (mk)
 
 pointer	mk		# pointer to the immark structure
 
+size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	mk_stati()
+long	mk_statl()
 real	mk_statr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Print a blank line.
 	call printf ("\n")
@@ -84,9 +87,9 @@ begin
 	    call pargb (itob (mk_stati (mk, NUMBER)))
 	call printf ("  %s: %d  %s: %d\n")
 	    call pargstr (KY_NXOFFSET)
-	    call pargi (mk_stati (mk, NXOFFSET))
+	    call pargl (mk_statl (mk, NXOFFSET))
 	    call pargstr (KY_NYOFFSET)
-	    call pargi (mk_stati (mk, NYOFFSET))
+	    call pargl (mk_statl (mk, NYOFFSET))
 
 	# Print a blank line.
 	call printf ("\n")

@@ -15,6 +15,7 @@ int	newlist		# integer new list
 int	newobject
 real	deltaxy
 bool	fp_equalr()
+real	aabs()
 
 begin
 	deltaxy = 1.0
@@ -24,8 +25,8 @@ begin
 		newobject = YES
 	    else
 		newobject = NO
-	} else if ((abs (xlist - wx) <= deltaxy) &&
-	        (abs (ylist - wy) <= deltaxy)) {
+	} else if ((aabs (xlist - wx) <= deltaxy) &&
+	        (aabs (ylist - wy) <= deltaxy)) {
 	    wx = xlist
 	    wy = ylist
 	    newobject = NO

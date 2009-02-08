@@ -18,7 +18,10 @@ int	fnt		# font file descriptor
 int	autolog		# automatic logging enabled
 int	interactive	# interactive mode
 
-int	ncmd, ncols, nlines, nc, nr
+size_t	sz_val
+long	l_val
+int	ncmd, nc, nr
+long	ncols, nlines
 int	wcs, bkey, skey, vkey, ekey, fkey, okey, key
 int	id, ltid, ndelete, req_num, lreq_num, prev_num, newlist
 pointer	sim, sp, scratchim, cmd, str, keepcmd, label
@@ -28,15 +31,19 @@ real	xlist, ylist, oxlist, oylist, rmax
 int	imd_gcur(), mk_stati(), strdic(), mk_gscur(), nscan(), mk_new()
 int	mk_find(), fstati()
 real	mk_statr()
+long	lnint()
+include	<nullptr.inc>
 
 begin
 	# Allocate working memory.
 	call smark (sp)
-	call salloc (scratchim, SZ_FNAME, TY_CHAR)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (keepcmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (label, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (scratchim, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (keepcmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (label, sz_val, TY_CHAR)
 
 	ncols = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
@@ -97,7 +104,8 @@ begin
 	    # Rewind the coordinate list.
 	    case 'o':
 	        if (cl != NULL) {
-		    call seek (cl, BOF)
+		    l_val = BOF
+		    call seek (cl, l_val)
 		    oxlist = INDEFR
 		    oylist = INDEFR
 		    ltid = 0
@@ -112,7 +120,7 @@ begin
 		    if (req_num < 1) {
 			if (interactive == YES)
 			    call printf ("Requested object is less than 1.\n")
-		    } else if (mk_gscur (cl, NULL, xlist, ylist, Memc[label],
+		    } else if (mk_gscur (cl, NULLPTR, xlist, ylist, Memc[label],
 		        prev_num, req_num, ltid) != EOF) {
 			if (interactive == YES)
 			    call printf ("Moved to object: %d  %g  %g\n")
@@ -134,7 +142,7 @@ begin
 		    if (req_num < 1) {
 			if (interactive == YES)
 			    call printf ("Requested object is less than 1.\n")
-		    } else if (mk_gscur (cl, NULL, xlist, ylist, Memc[label],
+		    } else if (mk_gscur (cl, NULLPTR, xlist, ylist, Memc[label],
 		        prev_num, req_num, ltid) != EOF) {
 			call mk_onemark (mk, im, iw, xlist, ylist, oxlist,
 			    oylist, Memc[label], ltid)
@@ -151,7 +159,7 @@ begin
 		if (cl != NULL) {
 		    prev_num = ltid
 		    req_num = ltid + 1
-		    if (mk_gscur (cl, NULL, xlist, ylist, Memc[label],
+		    if (mk_gscur (cl, NULLPTR, xlist, ylist, Memc[label],
 		        prev_num, req_num, ltid) != EOF) {
 			if (interactive == YES)
 			    call printf ("Moved to object: %d  %g  %g\n")
@@ -170,7 +178,7 @@ begin
 		if (cl != NULL) {
 		    prev_num = ltid
 		    req_num = ltid + 1
-		    if (mk_gscur (cl, NULL, xlist, ylist, Memc[label],
+		    if (mk_gscur (cl, NULLPTR, xlist, ylist, Memc[label],
 		        prev_num, req_num, ltid) != EOF) {
 			call mk_onemark (mk, im, iw, xlist, ylist, oxlist,
 			    oylist, Memc[label], ltid)
@@ -184,7 +192,8 @@ begin
 	    # Mark the entire list.
 	    case 'l':
 	        if (cl != NULL) {
-		    call seek (cl, BOF)
+		    l_val = BOF
+		    call seek (cl, l_val)
 		    ltid = 0
 		    call mk_bmark (mk, im, iw, cl, ltid, fnt)
 	        } else if (interactive == YES)
@@ -204,7 +213,7 @@ begin
 		    # Move to the end of the list.
 		    prev_num = ltid
 		    req_num = ltid + 1
-		    while (mk_gscur (cl, NULL, xlist, ylist, Memc[label],
+		    while (mk_gscur (cl, NULLPTR, xlist, ylist, Memc[label],
 		        prev_num, req_num, ltid) != EOF) {
 			prev_num = ltid
 			req_num = ltid + 1
@@ -264,8 +273,8 @@ begin
 	    case 'e':
 		if (sim != NULL) {
 		    if ((key == ekey) && (okey == 'e' || okey == 'k')) {
-			call mk_imsection (mk, sim, im, nint (ofx), nint (fx),
-			    nint (ofy), nint (fy))
+			call mk_imsection (mk, sim, im, lnint (ofx), lnint (fx),
+			    lnint (ofy), lnint (fy))
 			ekey = ' '
 		    } else {
 		        if (interactive == YES)
@@ -280,8 +289,8 @@ begin
 	    # Fill region
 	    case 'f':
 		if ((key == fkey) && (okey == 'f' || okey == 'k')) {
-		    call mk_imsection (mk, NULL, im, nint (ofx), nint (fx),
-			nint (ofy), nint (fy))
+		    call mk_imsection (mk, NULLPTR, im, lnint (ofx), lnint (fx),
+			lnint (ofy), lnint (fy))
 		    fkey = ' '
 		} else {
 		    if (interactive == YES)
@@ -369,7 +378,7 @@ begin
 			    if (interactive == YES)
 				call printf (
 				"Requested object is less than 1.\n")
-		        } else if (mk_gscur (cl, NULL, xlist, ylist,
+		        } else if (mk_gscur (cl, NULLPTR, xlist, ylist,
 			    Memc[label], prev_num, req_num, ltid) != EOF) {
 			    if (interactive == YES)
 			        call printf ("Moved to object: %d  %g  %g\n")
@@ -394,7 +403,7 @@ begin
 			    lreq_num = req_num
 			} else if (nscan () < 3)
 			    lreq_num = req_num
-		        while (mk_gscur (cl, NULL, xlist, ylist, Memc[label],
+		        while (mk_gscur (cl, NULLPTR, xlist, ylist, Memc[label],
 			    prev_num, req_num, ltid) != EOF) {
 			    if (ltid > lreq_num)
 				break

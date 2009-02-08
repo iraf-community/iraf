@@ -7,17 +7,20 @@ procedure mk_gpars (mk)
 
 pointer	mk		# pointer to the immark structure
 
+size_t	sz_val
 int	mark, dotsize, ip
 pointer	sp, str
 real	ratio
 bool	clgetb()
-int	clgwrd(), clgeti(), nscan(), btoi(), mk_stati()
+int	clgwrd(), clgeti(), nscan(), btoi(), mk_stati(), imod()
+long	clgetl()
 real	clgetr()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Initialize the immark structure.
 	call mk_init (mk)
@@ -53,12 +56,12 @@ begin
 	call mk_seti (mk, LABEL, btoi (clgetb ("label")))
 	call mk_seti (mk, SIZE, clgeti ("txsize"))
 	dotsize = clgeti ("pointsize")
-	if (mod (dotsize, 2) == 0)
+	if (imod (dotsize, 2) == 0)
 	    dotsize = dotsize + 1
 	call mk_seti (mk, SZPOINT, dotsize / 2)
 	call mk_seti (mk, GRAYLEVEL, clgeti ("color"))
-	call mk_seti (mk, NXOFFSET, clgeti ("nxoffset"))
-	call mk_seti (mk, NYOFFSET, clgeti ("nyoffset"))
+	call mk_setl (mk, NXOFFSET, clgetl ("nxoffset"))
+	call mk_setl (mk, NYOFFSET, clgetl ("nyoffset"))
 	call mk_setr (mk, TOLERANCE, clgetr ("tolerance"))
 
 	call sfree (sp)

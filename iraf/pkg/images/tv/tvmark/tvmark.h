@@ -16,23 +16,23 @@ define	MK_NSQUARES	Memi[P2I($1+8)]	# Number of squares
 define	MK_NRECTANGLES	Memi[P2I($1+9)]	# Number of rectangles
 define	MK_MKTYPE	Memi[P2I($1+10)]	# Type of mark
 define	MK_SZPOINT	Memi[P2I($1+11)]	# Size of point
-define	MK_NXOFFSET	Memi[P2I($1+12)]	# X offset of number
-define	MK_NYOFFSET	Memi[P2I($1+13)]	# X offset of number
+define	MK_NXOFFSET	Meml[P2L($1+12)]	# X offset of number
+define	MK_NYOFFSET	Meml[P2L($1+13)]	# X offset of number
 
-define	MK_RADII	Memi[P2I($1+14)]	# Pointer to list of radii
-define	MK_AXES		Memi[P2I($1+15)]	# Pointer to list of semi-major axes
-define	MK_SLENGTHS	Memi[P2I($1+16)]	# Pointer to list of square lengths
-define	MK_RLENGTHS	Memi[P2I($1+17)]	# Pointer to list of rectangle lengths
+define	MK_RADII	Memp[$1+14]	# Pointer to list of radii
+define	MK_AXES		Memp[$1+15]	# Pointer to list of semi-major axes
+define	MK_SLENGTHS	Memp[$1+16]	# Pointer to list of square lengths
+define	MK_RLENGTHS	Memp[$1+17]	# Pointer to list of rectangle lengths
 
 define	MK_RATIO	Memr[P2R($1+18)]	# Ratio of width/length rectangles
 define	MK_ELLIPTICITY	Memr[P2R($1+19)]	# Ellipticity of ellipses
 define	MK_RTHETA	Memr[P2R($1+20)]	# Position angle of rectangle
 define	MK_ETHETA	Memr[P2R($1+21)]	# Position angle of ellipse
 
-define	MK_X1		Memi[P2I($1+22)]	# LL corner x coord
-define	MK_Y1		Memi[P2I($1+23)]	# LL corner y coord
-define	MK_X2		Memi[P2I($1+24)]	# UR corner x coord
-define	MK_Y2		Memi[P2I($1+25)]	# UR corner y coord
+define	MK_X1		Meml[P2L($1+22)]	# LL corner x coord
+define	MK_Y1		Meml[P2L($1+23)]	# LL corner y coord
+define	MK_X2		Meml[P2L($1+24)]	# UR corner x coord
+define	MK_Y2		Meml[P2L($1+25)]	# UR corner y coord
 
 define	MK_TOLERANCE	Memr[P2R($1+26)]	# Tolerance for deleting objects
 

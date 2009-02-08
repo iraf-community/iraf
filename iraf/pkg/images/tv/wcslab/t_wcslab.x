@@ -30,6 +30,7 @@ bool	clgetb()
 int	clgeti(), strncmp()
 pointer	gopen(), immap(), mw_openim()
 real	clgetr()
+include	<nullptr.inc>
 
 begin
 	# Get memory.
@@ -46,7 +47,7 @@ begin
 	if (Memc[image] != EOS) {
 
 	    # Open the image.
-	    im = immap (Memc[image], READ_ONLY, 0)
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 
 	    # Quit if the image is not 2-dimensional.
 	    if (IM_NDIM(im) != 2) {

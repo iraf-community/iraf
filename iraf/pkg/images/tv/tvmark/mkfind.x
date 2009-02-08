@@ -13,13 +13,15 @@ int	id		# sequence number of detected object in list
 int	ltid		# current sequence number in the list
 real	tol		# tolerance for detection
 
+long	l_val
 real	x, y, dist2, ldist2, tol2
 int	fscan(), nscan()
 
 begin
 	if (cl == NULL)
 	    return (0)
-	call seek (cl, BOF)
+	l_val = BOF
+	call seek (cl, l_val)
 	ltid = 0
 
 	# Initialize

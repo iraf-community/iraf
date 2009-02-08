@@ -20,11 +20,14 @@ pointer	font			# pointer to the font
 int	autolog			# automatically log commands
 int	interactive		# interactive mode
 
+size_t	sz_val
 pointer	sp, mk, im, iw, outim, cfilename, tmpname
-int	cl, dl, log, ft, frame, ltid, wcs_status, ndelete, bufsize
+int	cl, dl, log, ft, frame, ltid, wcs_status, ndelete
+long	bufsize
 
 bool	clgetb()
-int	access(), btoi(), clgeti(), imstati(), mk_mark()
+int	access(), btoi(), clgeti(), mk_mark()
+long	imstatl()
 int	imd_wcsver(), open()
 pointer	immap(), imd_mapframe(), iw_open()
 
@@ -34,14 +37,15 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (coords, SZ_FNAME, TY_CHAR)
-	call salloc (outimage, SZ_FNAME, TY_CHAR)
-	call salloc (deletions, SZ_FNAME, TY_CHAR)
-	call salloc (logfile, SZ_FNAME, TY_CHAR)
-	call salloc (font, SZ_FNAME, TY_CHAR)
-	call salloc  (cfilename, SZ_FNAME, TY_CHAR)
-	call salloc (tmpname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
+	call salloc (outimage, sz_val, TY_CHAR)
+	call salloc (deletions, sz_val, TY_CHAR)
+	call salloc (logfile, sz_val, TY_CHAR)
+	call salloc (font, sz_val, TY_CHAR)
+	call salloc  (cfilename, sz_val, TY_CHAR)
+	call salloc (tmpname, sz_val, TY_CHAR)
 
         # Query server to get the WCS version, this also tells us whether
         # we can use the all 16 supported frames.
@@ -65,9 +69,9 @@ begin
 	
 	# Open the frame as an image.
 	im = imd_mapframe (frame, READ_WRITE, YES)
-	bufsize = max (imstati (im, IM_BUFSIZE), TV_NLINES *
-	    int (IM_LEN(im,1)) * SZ_SHORT) 
-	call imseti (im, IM_BUFSIZE, bufsize)
+	bufsize = max (imstatl (im, IM_BUFSIZE),
+		       TV_NLINES * IM_LEN(im,1) * SZ_SHORT) 
+	call imsetl (im, IM_BUFSIZE, bufsize)
 	iw = iw_open (im, frame, Memc[image], SZ_FNAME, wcs_status)
 	call mk_sets (mk, IMAGE, Memc[image])
 	call mk_seti (mk, FRAME, frame)
@@ -191,20 +195,26 @@ procedure mk_imcopy (in, out)
 pointer	in		# pointer to the input image
 pointer	out		# pointe to the output image
 
-int	i, ncols, nlines
+size_t	sz_val
+long	l_val
+long	i
+size_t	ncols, nlines
 pointer	sp, vin, vout, inbuf, outbuf
 long	imgnls(), impnls()
 errchk	imgnls(), impnls()
 
 begin
 	call smark (sp)
-	call salloc (vin, IM_MAXDIM, TY_LONG)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (vin, sz_val, TY_LONG)
+	call salloc (vout, sz_val, TY_LONG)
 
 	ncols = IM_LEN(in, 1)
 	nlines = IM_LEN(in, 2)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vin], sz_val)
+	call amovkl (l_val, Meml[vout], sz_val)
 
 	do i = 1, nlines {
 	    if (impnls (out, outbuf, Meml[vout]) == EOF)
@@ -227,11 +237,12 @@ procedure mk_imsection (mk, in, out, x1, x2, y1, y2)
 pointer	mk		# pointer to the mark structure
 pointer	in		# input image
 pointer	out		# output image
-int	x1, x2		# column limits
-int	y1, y2		# line limits
+long	x1, x2		# column limits
+long	y1, y2		# line limits
 
 short	value
-int	i, ix1, ix2, iy1, iy2, ncols, nlines, mk_stati()
+long	i, ix1, ix2, iy1, iy2, ncols, nlines
+int	mk_stati()
 pointer	ibuf, obuf
 pointer	imps2s(), imgs2s()
 

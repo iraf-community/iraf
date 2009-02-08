@@ -14,19 +14,26 @@ real	owx, owy	# coordinates of previous list member
 char	label[ARB]	# current label
 int	ltid		# list sequence number
 
-int	ncols, nlines, nr, nc, x1, x2, y1, y2
+size_t	sz_val
+long	ncols, nlines, x1, x2, y1, y2
+size_t	nr, nc
+int	inr, inc
 pointer	sp, str, lengths, radii
 real	fx, fy, ofx, ofy, xmag, ymag, lmax, lratio, rmax, ratio
 int	mk_stati(), itoc()
+long	mk_statl()
 int	mk_plimits(), mk_llimits(), mk_rlimits(), mk_climits()
 pointer	mk_statp()
 real	mk_statr()
+long	lnint()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (lengths, MAX_NMARKS, TY_REAL)
-	    call salloc (radii, MAX_NMARKS, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = MAX_NMARKS
+	call salloc (lengths, sz_val, TY_REAL)
+	call salloc (radii, sz_val, TY_REAL)
 
 	ncols = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
@@ -60,7 +67,8 @@ begin
 	    }
 
 	case MK_RECTANGLE:
-	    nr = mk_stati (mk, NRECTANGLES)
+	    inr = mk_stati (mk, NRECTANGLES)
+	    nr = inr
 	    if (xmag <= 0.0) {
 		lmax = 0.0
 		call amovkr (0.0, Memr[lengths], nr)
@@ -76,12 +84,13 @@ begin
 	    if (mk_rlimits (fx, fy, lmax, lratio, ncols, nlines, x1, x2,
 		y1, y2) == YES) {
 	        call mk_drawbox (im, fx, fy, x1, x2, y1, y2, Memr[lengths],
-		    lratio, nr, mk_stati (mk, GRAYLEVEL))
+		    lratio, inr, mk_stati (mk, GRAYLEVEL))
 		call imflush (im)
 	    }
 
 	case MK_CIRCLE:
-	    nc = mk_stati (mk, NCIRCLES)
+	    inc = mk_stati (mk, NCIRCLES)
+	    nc = inc
 	    if (xmag <= 0.0) {
 		rmax = 0.0
 		call amovkr (0.0, Memr[radii], nc)
@@ -96,17 +105,17 @@ begin
 	    if (mk_climits (fx, fy, rmax, ratio, ncols, nlines, x1, x2,
 	        y1, y2) == YES) {
 	        call mk_drawcircles  (im, fx, fy, x1, x2, y1, y2,
-		    Memr[radii], ratio, nc, mk_stati (mk, GRAYLEVEL))
+		    Memr[radii], ratio, inc, mk_stati (mk, GRAYLEVEL))
 		call imflush (im)
 	    }
 
 	case MK_PLUS:
-	    call mk_textim (im, "+", nint (fx), nint (fy), mk_stati (mk, SIZE),
+	    call mk_textim (im, "+", lnint (fx), lnint (fy), mk_stati (mk, SIZE),
 	        mk_stati (mk, SIZE), mk_stati (mk, GRAYLEVEL), YES)
 	    call imflush (im)
 
 	case MK_CROSS:
-	    call mk_textim (im, "*", nint (fx), nint (fy), mk_stati (mk, SIZE),
+	    call mk_textim (im, "*", lnint (fx), lnint (fy), mk_stati (mk, SIZE),
 	        mk_stati (mk, SIZE), mk_stati (mk, GRAYLEVEL), YES)
 	    call imflush (im)
 
@@ -117,16 +126,16 @@ begin
 	# Number the text file.
 	if (mk_stati (mk, LABEL) == YES) {
 	    if (label[1] != EOS) {
-		call mk_textim (im, label, nint (fx) + mk_stati (mk,
-		    NXOFFSET), nint (fy) + mk_stati (mk, NYOFFSET),
+		call mk_textim (im, label, lnint (fx) + mk_statl (mk,
+		    NXOFFSET), lnint (fy) + mk_statl (mk, NYOFFSET),
 		    mk_stati (mk, SIZE), mk_stati (mk, SIZE), mk_stati (mk,
 		    GRAYLEVEL), NO)
 		call imflush (im)
 	    }
 	} else if (mk_stati (mk, NUMBER) == YES) {
 	    if (itoc (ltid, Memc[str], SZ_FNAME) > 0) {
-		call mk_textim (im, Memc[str], nint (fx) + mk_stati (mk,
-		    NXOFFSET), nint (fy) + mk_stati (mk, NYOFFSET),
+		call mk_textim (im, Memc[str], lnint (fx) + mk_statl (mk,
+		    NXOFFSET), lnint (fy) + mk_statl (mk, NYOFFSET),
 		    mk_stati (mk, SIZE), mk_stati (mk, SIZE), mk_stati (mk,
 		    GRAYLEVEL), NO)
 		call imflush (im)
@@ -145,7 +154,7 @@ pointer	mk		# pointer to the mark structure
 pointer	im		# pointer to the  frame buffer
 real	fx, fy		# real coordinates
 
-int	ncols, nlines, x1, y1, x2, y2
+long	ncols, nlines, x1, y1, x2, y2
 int	mk_stati(), mk_plimits()
 
 begin
@@ -157,10 +166,10 @@ begin
 	    call imflush (im)
 	}
 
-	#call mk_seti (mk, X1, x1)
-	#call mk_seti (mk, Y1, y1)
-	#call mk_seti (mk, X2, x2)
-	#call mk_seti (mk, Y2, x2)
+	#call mk_setl (mk, X1, x1)
+	#call mk_setl (mk, Y1, y1)
+	#call mk_setl (mk, X2, x2)
+	#call mk_setl (mk, Y2, x2)
 end
 
 
@@ -173,14 +182,17 @@ pointer	im		# pointer to the frame buffer image
 pointer	iw		# pointer to the wcs structure
 real	fx, fy		# center of circle
 
-int	nc, ncols, nlines, x1, x2, y1, y2
+long	ncols, nlines, x1, x2, y1, y2
+size_t	nc
+int	inc
 pointer	sp, radii
 real	xmag, ymag, rmax, ratio
 int	mk_stati(), mk_climits()
 pointer	mk_statp()
 
 begin
-	nc = mk_stati (mk, NCIRCLES)
+	inc = mk_stati (mk, NCIRCLES)
+	nc = inc
 	if (nc <= 0)
 	    return
 
@@ -206,14 +218,14 @@ begin
 	if (mk_climits (fx, fy, rmax, ratio, ncols, nlines, x1, x2,
 	    y1, y2) == YES) {
 	    call mk_drawcircles (im, fx, fy, x1, x2, y1, y2, Memr[radii],
-	        ratio, nc, mk_stati (mk, GRAYLEVEL))
+	        ratio, inc, mk_stati (mk, GRAYLEVEL))
 	    call imflush (im)
 	}
 
-	#call mk_seti (mk, X1, x1)
-	#call mk_seti (mk, Y1, y1)
-	#call mk_seti (mk, X2, x2)
-	#call mk_seti (mk, Y2, y2)
+	#call mk_setl (mk, X1, x1)
+	#call mk_setl (mk, Y1, y1)
+	#call mk_setl (mk, X2, x2)
+	#call mk_setl (mk, Y2, y2)
 
 	call sfree (sp)
 end
@@ -229,7 +241,7 @@ pointer	iw		# pointer to the wcs structure
 real	fx, fy		# center of circle
 real	rmax		# maximum radius
 
-int	ncols, nlines, x1, x2, y1, y2
+long	ncols, nlines, x1, x2, y1, y2
 int	mk_climits(), mk_stati()
 
 begin
@@ -243,10 +255,10 @@ begin
 	    call imflush (im)
 	}
 
-	#call mk_seti (mk, X1, x1)
-	#call mk_seti (mk, Y1, y1)
-	#call mk_seti (mk, X2, x2)
-	#call mk_seti (mk, Y2, y2)
+	#call mk_setl (mk, X1, x1)
+	#call mk_setl (mk, Y1, y1)
+	#call mk_setl (mk, X2, x2)
+	#call mk_setl (mk, Y2, y2)
 end
 
 
@@ -259,7 +271,7 @@ pointer	im		# pointer to the frame buffer
 real	ofx, ofy	# coords of first point
 real	fx, fy		# coords of second point
 
-int	ncols, nlines, x1, y1, x2, y2
+long	ncols, nlines, x1, y1, x2, y2
 int	mk_stati(), mk_llimits()
 
 begin
@@ -273,10 +285,10 @@ begin
 	    call imflush (im)
 	}
 
-	#call mk_seti (mk, X1, x1)
-	#call mk_seti (mk, Y1, y1)
-	#call mk_seti (mk, X2, x2)
-	#call mk_seti (mk, Y2, y2)
+	#call mk_setl (mk, X1, x1)
+	#call mk_setl (mk, Y1, y1)
+	#call mk_setl (mk, X2, x2)
+	#call mk_setl (mk, Y2, y2)
 end
 
 
@@ -290,22 +302,23 @@ char	str[ARB]	# character string to be drawn
 real	fx, fy		# lower left coords of string
 int	center		# center the string
 
-int	ncols, nlines
-#int	x1, x2, y1, y2
+long	ncols, nlines
+#long	x1, x2, y1, y2
 int	mk_stati()
+long	lnint()
 
 begin
 	ncols = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
 
-	call mk_textim (im, str, nint (fx), nint (fy), mk_stati (mk, SIZE),
+	call mk_textim (im, str, lnint (fx), lnint (fy), mk_stati (mk, SIZE),
 	    mk_stati(mk, SIZE), mk_stati (mk, GRAYLEVEL), center)
 	call imflush (im)
 
-	#call mk_seti (mk, X1, x1)
-	#call mk_seti (mk, Y1, y1)
-	#call mk_seti (mk, X2, x1)
-	#call mk_seti (mk, Y2, y2)
+	#call mk_setl (mk, X1, x1)
+	#call mk_setl (mk, Y1, y1)
+	#call mk_setl (mk, X2, x1)
+	#call mk_setl (mk, Y2, y2)
 end
 
 
@@ -318,7 +331,9 @@ pointer	im		# pointer to the frame buffer
 pointer	iw		# pointer to the wcs structure
 real	fx, fy		# x and y center coordinates
 
-int	nr, ncols, nlines, x1, y1, x2, y2
+long	ncols, nlines, x1, y1, x2, y2
+size_t	nr
+int	inr
 pointer	sp, lengths
 real	xmag, ymag, lmax, lratio
 int	mk_stati(), mk_rlimits()
@@ -326,7 +341,8 @@ pointer	mk_statp()
 real	mk_statr()
 
 begin
-	nr = mk_stati (mk, NRECTANGLES)
+	inr = mk_stati (mk, NRECTANGLES)
+	nr = inr
 	if (nr <= 0)
 	    return
 
@@ -352,14 +368,14 @@ begin
 	if (mk_rlimits (fx, fy, lmax, lratio, ncols, nlines, x1, x2,
 		y1, y2) == YES) {
 	    call mk_drawbox (im, fx, fy, x1, x2, y1, y2, Memr[lengths],
-		lratio, nr, mk_stati (mk, GRAYLEVEL))
+		lratio, inr, mk_stati (mk, GRAYLEVEL))
 	    call imflush (im)
 	}
 
-	#call mk_seti (mk, X1, x1)
-	#call mk_seti (mk, Y1, y1)
-	#call mk_seti (mk, X2, x2)
-	#call mk_seti (mk, Y2, y2)
+	#call mk_setl (mk, X1, x1)
+	#call mk_setl (mk, Y1, y1)
+	#call mk_setl (mk, X2, x2)
+	#call mk_setl (mk, Y2, y2)
 
 	call sfree (sp)
 end
@@ -374,7 +390,7 @@ pointer	im		# pointer to the frame buffer image
 real	ofx, ofy	# first corner coordinates
 real	fx, fy		# second corner coordinates
 
-int	ncols, nlines, x1, x2, y1, y2
+long	ncols, nlines, x1, x2, y1, y2
 int	mk_stati()
 
 begin
@@ -385,8 +401,8 @@ begin
 	call mk_pbox (im, x1, x2, y1, y2, mk_stati (mk, GRAYLEVEL))
 	call imflush (im)
 
-	#call mk_seti (mk, X1, x1)
-	#call mk_seti (mk, Y1, y1)
-	#call mk_seti (mk, X2, x2)
-	#call mk_seti (mk, Y2, y2)
+	#call mk_setl (mk, X1, x1)
+	#call mk_setl (mk, Y1, y1)
+	#call mk_setl (mk, X2, x2)
+	#call mk_setl (mk, Y2, y2)
 end
