@@ -433,6 +433,24 @@ EOF
   PATH="`pwd`/tmp_bin:$PATH"
   export PATH
   ( cd iraf ; mkpkg )
+  S=$?
+  if [ ! $S = 0 ]; then
+    exit $S
+  fi
+  #
+  # making helpdb
+  if [ "$F2C_AUTO_INCLUDE" != "true" -a -x iraf/bin/cl.e ]; then
+    iraf="`pwd`/iraf/" host="${iraf}unix/" hconfig="${host}config/" TERM=vt100 `pwd`/iraf/bin/cl.e <<EOF
+
+softools
+mkhelpdb base\$root.hd base\$helpdb.mip
+mkhelpdb tables\$base/root.hd tables\$base/helpdb.mip
+mkhelpdb noao\$base/root.hd noao\$base/helpdb.mip
+logout
+EOF
+    rm -f clhistory.txt uparmsosmkhelb.par
+  fi
+  #
   ;;
 
 "reboot_makefiles")
@@ -510,17 +528,6 @@ EOF
   ;;
 
 "make_install")
-  #
-  # making helpdb
-  iraf="`pwd`/iraf/" host="${iraf}unix/" hconfig="${host}config/" TERM=vt100 `pwd`/iraf/bin/cl.e <<EOF
-
-softools
-mkhelpdb base\$root.hd base\$helpdb.mip
-mkhelpdb tables\$base/root.hd tables\$base/helpdb.mip
-mkhelpdb noao\$base/root.hd noao\$base/helpdb.mip
-logout
-EOF
-  rm -f clhistory.txt uparmsosmkhelb.par
   #
   mkdir -p $DESTDIR/$PREFIX/iraf
   S=$?
