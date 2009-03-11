@@ -26,7 +26,8 @@ if [ "$1" != "" ]; then
 fi
 
 # Determine platform architecture.
-. ${hscripts}setup.sh set_env auto $PREFIX
+ARG_MACH=auto
+. ${hscripts}setup.sh
 
 # Recent linux systems display a problem in how pointer addresses 
 # interact with the stack and can result in a segfault.  Remove the

@@ -20,9 +20,7 @@ if [ "$USER" = "" ]; then
 fi
 
 # Protect against running mkiraf in an iraf system directory.
-pushd $iraf &> /dev/null
-irafdir=`pwd`
-popd &> /dev/null
+irafdir=`cd $iraf ; pwd`
 if [ ! "`pwd | grep $irafdir`" = "" ]; then
     if [ "`pwd | grep iraf/local`" = "" ]; then
 	echo "Error: current directory is not an iraf user login directory"

@@ -283,12 +283,24 @@ install_file() {
 
 LANG=C
 
-COMMAND=$1
-ARG_MACH=$2
-PREFIX=$3
+if [ "$1" != "" ]; then
+  COMMAND=$1
+else
+  COMMAND="set_env"
+fi
+if [ "$2" != "" ]; then
+  ARG_MACH=$2
+fi
+if [ "$3" != "" ]; then
+  PREFIX=$3
+fi
 #
-BINDIR=$4
-DESTDIR=$5
+if [ "$4" != "" ]; then
+  BINDIR=$4
+fi
+if [ "$5" != "" ]; then
+  DESTDIR=$5
+fi
 
 ARCHITECTURE=""
 OPERATING_SYSTEM=""
@@ -598,7 +610,9 @@ EOF
     F=$DESTDIR/$BINDIR/$i
     echo '#!/bin/sh' > $F
     echo '' >> $F
-    echo ". $PREFIX/iraf/iraf/unix/scripts/setup.sh set_env auto $PREFIX" >> $F
+    echo "PREFIX=$PREFIX" >> $F
+    echo "ARG_MACH=auto" >> $F
+    echo ". $PREFIX/iraf/iraf/unix/scripts/setup.sh" >> $F
     echo "exec $PREFIX/iraf/iraf/unix/bin/$i.e \$@" >> $F
     chmod 755 $F
     if [ "$USER" = "root" ]; then
@@ -668,7 +682,9 @@ EOF
     F=$DESTDIR/$BINDIR/$i
     echo '#!/bin/sh' > $F
     echo '' >> $F
-    echo ". $PREFIX/iraf/iraf/unix/scripts/setup.sh set_env auto $PREFIX" >> $F
+    echo "PREFIX=$PREFIX" >> $F
+    echo "ARG_MACH=auto" >> $F
+    echo ". $PREFIX/iraf/iraf/unix/scripts/setup.sh" >> $F
     echo "exec $PREFIX/iraf/iraf/unix/bin/$i.e \$@" >> $F
     chmod 755 $F
     if [ "$USER" = "root" ]; then
