@@ -13,14 +13,18 @@ pointer	sp, imtemplate, insystem, outsystem, image, str
 pointer	im, mwin, cooin, mwout, cooout, ctin, ctout
 pointer	r, w, cd, ltm, ltv, iltm, nr, ncd, jr
 pointer	ix, iy, ox, oy, ilng, ilat, olng, olat, imlist
-int	nxgrid, nygrid, npts, instat, outstat, ndim, fitstat, axbits
+int	instat, outstat, ndim, fitstat, axbits
+size_t	nxgrid, nygrid, npts
 bool	uselp, verbose, update, usecd
 
+size_t	sz_val
 double	rg_rmsdiff()
 pointer	immap(), rg_xytoxy(), mw_newcopy(), imtopen()
 int	fstati(), imtgetim(), sk_decim(), sk_decwcs(), mw_stati()
-int	clgeti(), sk_stati(), rg_cdfit()
+int	sk_stati(), rg_cdfit()
+long	clgetl()
 bool	clgetb(), rg_longpole()
+include	<nullptr.inc>
 
 begin
 	if (fstati (STDOUT, F_REDIR) == NO)
@@ -28,19 +32,21 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (imtemplate, SZ_FNAME, TY_CHAR)
-	call salloc (insystem, SZ_FNAME, TY_CHAR)
-	call salloc (outsystem, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imtemplate, sz_val, TY_CHAR)
+	call salloc (insystem, sz_val, TY_CHAR)
+	call salloc (outsystem, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the list of images and output coordinate system.
 	call clgstr ("image", Memc[imtemplate], SZ_FNAME)
 	call clgstr ("outsystem", Memc[outsystem], SZ_FNAME)
 
 	# Get the remaining parameters.
-	nxgrid = clgeti ("nx")
-	nygrid = clgeti ("ny")
+	nxgrid = clgetl ("nx")
+	nygrid = clgetl ("ny")
 	npts = nxgrid * nygrid
 	uselp = clgetb ("longpole")
 	verbose = clgetb ("verbose")
@@ -53,9 +59,9 @@ begin
 	    # Open the input image after removing any section notation.
 	    call imgimage (Memc[image], Memc[image], SZ_FNAME)
 	    if (update)
-	        im = immap (Memc[image], READ_WRITE, 0)
+	        im = immap (Memc[image], READ_WRITE, NULLPTR)
 	    else
-	        im = immap (Memc[image], READ_ONLY, 0)
+	        im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    if (verbose) {
 		call printf ("INPUT IMAGE: %s\n")
 		    call pargstr (Memc[image])
@@ -102,15 +108,21 @@ begin
 	    ndim = mw_stati (mwin, MW_NPHYSDIM)
 
 	    # Allocate working memory for the vectors and matrices.
-	    call malloc (r, ndim, TY_DOUBLE)
-	    call malloc (w, ndim, TY_DOUBLE)
-	    call malloc (cd, ndim * ndim, TY_DOUBLE)
-	    call malloc (ltm, ndim * ndim, TY_DOUBLE)
-	    call malloc (ltv, ndim, TY_DOUBLE)
-	    call malloc (iltm, ndim * ndim, TY_DOUBLE)
-	    call malloc (nr, ndim, TY_DOUBLE)
-	    call malloc (jr, ndim, TY_DOUBLE)
-	    call malloc (ncd, ndim * ndim, TY_DOUBLE)
+	    sz_val = ndim
+	    call malloc (r, sz_val, TY_DOUBLE)
+	    call malloc (w, sz_val, TY_DOUBLE)
+	    sz_val = ndim * ndim
+	    call malloc (cd, sz_val, TY_DOUBLE)
+	    call malloc (ltm, sz_val, TY_DOUBLE)
+	    sz_val = ndim
+	    call malloc (ltv, sz_val, TY_DOUBLE)
+	    sz_val = ndim * ndim
+	    call malloc (iltm, sz_val, TY_DOUBLE)
+	    sz_val = ndim
+	    call malloc (nr, sz_val, TY_DOUBLE)
+	    call malloc (jr, sz_val, TY_DOUBLE)
+	    sz_val = ndim * ndim
+	    call malloc (ncd, sz_val, TY_DOUBLE)
 
 	    # Allocate working memory for the grid points.
 	    call malloc (ix, npts, TY_DOUBLE)
@@ -126,7 +138,8 @@ begin
             call mw_gltermd (mwin, Memd[ltm], Memd[ltv], ndim)
 	    call mw_gwtermd (mwin, Memd[r], Memd[w], Memd[cd], ndim)
             call mwvmuld (Memd[ltm], Memd[r], Memd[nr], ndim)
-            call aaddd (Memd[nr], Memd[ltv], Memd[nr], ndim)
+	    sz_val = ndim
+            call aaddd (Memd[nr], Memd[ltv], Memd[nr], sz_val)
             call mwinvertd (Memd[ltm], Memd[iltm], ndim)
             call mwmmuld (Memd[cd], Memd[iltm], Memd[ncd], ndim)
 
@@ -169,7 +182,8 @@ begin
 
 	    # Compute the new world coordinates of the reference point and
 	    # update the reference point vector.
-	    call rg_lltransform (cooin, cooout, tilng, tilat, tolng, tolat, 1)
+	    sz_val = 1
+	    call rg_lltransform (cooin, cooout, tilng, tilat, tolng, tolat, sz_val)
 	    if (sk_stati(cooout, S_PLNGAX) < sk_stati(cooout, S_PLATAX)) {
 	        Memd[w+sk_stati(cooout,S_PLNGAX)-1] = tolng
 	        Memd[w+sk_stati(cooout,S_PLATAX)-1] = tolat
@@ -225,7 +239,8 @@ begin
 		        Memd[ncd], Memd[cd], ndim, axbits)
 	            call mwmmuld (Memd[cd], Memd[ltm], Memd[ncd], ndim)
 		    call mwinvertd (Memd[ltm], Memd[iltm], ndim)
-		    call asubd (Memd[nr], Memd[ltv], Memd[r], ndim)
+		    sz_val = ndim
+		    call asubd (Memd[nr], Memd[ltv], Memd[r], sz_val)
 		    call mwvmuld (Memd[iltm], Memd[r], Memd[jr], ndim)
 	            call mw_swtermd (mwout, Memd[jr], Memd[w], Memd[ncd], ndim)
 
@@ -243,7 +258,8 @@ begin
 			#call pargstr (Memc[str])
 		    call mw_swattrs (mwout, sk_stati(cooout, S_PLATAX),
 		        "latpole", Memc[str])
-		    call amovd (Memd[ncd], Memd[cd], ndim * ndim)
+		    sz_val = ndim * ndim
+		    call amovd (Memd[ncd], Memd[cd], sz_val)
 		}
 
 	        # Compute and print the goodness of fit estimate.
@@ -355,14 +371,16 @@ int	ndim			#I the dimension of the wcs
 double	longpole		#I the longpole value assumed
 double	latpole			#I the latpole value assumed
 
-int	i,j
+size_t	sz_val
+int	i, j
 pointer	sp, str
 errchk	mw_gwattrs()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Print the image name and current wcs.
 	call printf ("%s wcs\n")
@@ -433,6 +451,7 @@ double	ilatpole	#O the input system latpole value (deg)
 double	olngpole	#O the output system longpole value (deg)
 double	olatpole	#O the output system latpole value (deg)
 
+size_t	sz_val
 double	tilngpole, tilatpole, thetaa, theta0, tilng, tilat, tilngp, tilatp
 double	ntilng, ntilat
 pointer	sp, str
@@ -443,7 +462,8 @@ errchk	mw_gwattrs()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the projection type
 	projection = sk_stati (incoo, S_WTYPE)
@@ -577,7 +597,8 @@ begin
 	# because the original coordinate system is a sky coordinate
 	# system that the input and output coordinate units are degrees.
 
-	call rg_lltransform (outcoo, incoo, 0.0d0, 90.0d0, ntilng, ntilat, 1)
+	sz_val = 1
+	call rg_lltransform (outcoo, incoo, 0.0d0, 90.0d0, ntilng, ntilat, sz_val)
 	#call eprintf ("%0.5f %0.5f\n")
 	    #call pargd (ntilng)
 	    #call pargd (ntilat)
@@ -636,7 +657,7 @@ begin
 
         } else {
 
-            if (abs (slat0 / z) > 1.0d0)
+            if (dabs (slat0 / z) > 1.0d0)
                 call error (0, "Invalid projection parameters")
 
             u = atan2 (y, x)
@@ -658,13 +679,13 @@ begin
                 maxlat = 999.0d0
             else
                 maxlat = latp
-            if (abs(maxlat - latp1) < abs(maxlat - latp2)) {
-                if (abs(latp1) < (DHALFPI + tol))
+            if (dabs(maxlat - latp1) < dabs(maxlat - latp2)) {
+                if (dabs(latp1) < (DHALFPI + tol))
                     tlatp = latp1
                 else
                     tlatp = latp2
             } else {
-                if (abs(latp2) < (DHALFPI + tol))
+                if (dabs(latp2) < (DHALFPI + tol))
                     tlatp = latp2
                 else
                     tlatp = latp1
@@ -674,8 +695,8 @@ begin
 
         # Determine the celestial longitude of the native pole.
         z = cos (tlatp) * clat0
-        if (abs(z) < tol) {
-            if (abs(clat0) < tol) {
+        if (dabs(z) < tol) {
+            if (dabs(clat0) < tol) {
                 rap = ra
                 decp = DHALFPI - theta0
             } else if (tlatp > 0.0d0) {
@@ -719,7 +740,7 @@ double  x, y, z, dphi
 
 begin
         x = sin (dec) * sin (decp) - cos (dec) * cos (decp) * cos (ra - rap)
-        if (abs(x) < 1.0d-5)
+        if (dabs(x) < 1.0d-5)
             x = -cos (dec + decp) + cos (dec) * cos(decp) * (1.0d0 -
                 cos (ra - rap))
         y = -cos (dec) * sin (ra - rap)
@@ -732,7 +753,7 @@ begin
             phi = phi - DTWOPI
         else if (phi < -DPI)
             phi = phi + DTWOPI
-        if (mod (ra - rap, DPI) == 0.0d0) {
+        if (dmod (ra - rap, DPI) == 0.0d0) {
             theta = dec + cos (ra - rap) * decp
             if (theta > DHALFPI)
                 theta = DPI - theta
@@ -740,7 +761,7 @@ begin
                 theta = -DPI - theta
         } else {
             z = sin (dec) * cos (decp) + cos (dec) * sin(decp) * cos (ra - rap)
-            if (abs(z) > 0.99d0)
+            if (dabs(z) > 0.99d0)
                 theta = sign (acos(sqrt (x*x + y*y)), z)
             else
                 theta = asin (z)
@@ -757,7 +778,7 @@ double	xref[ARB]			#I the input x reference vector
 double	yref[ARB]			#I the input y reference vector
 double	xin[ARB]			#I the input x vector
 double	yin[ARB]			#I the input y vector
-int	npts				#I the number of points
+size_t	npts				#I the number of points
 double	xscale, yscale			#O the x and y scale factors
 double	xrot				#O the rotation angle in degrees
 double	yrot				#O the rotation angle in degrees
@@ -797,7 +818,7 @@ double	yref[ARB]	#I reference image y values
 double	xin[ARB]	#I input image x values
 double	yin[ARB]	#I input image y values
 double	wts[ARB]	#I array of weights
-int	npts		#I number of points
+size_t	npts		#I number of points
 double	xshift, yshift	#O the x and y shifts
 double	xmag, ymag	#O the x and y scale factors
 double	xrot, yrot	#O the rotation angles
@@ -860,6 +881,7 @@ double	ocd[ndim,ARB]		#U the output CD matrix
 int	ndim			#I dimensions of the CD matrix
 int	axbits			#I bitflags defining axes to be rotated
 
+size_t	sz_val
 double	d_thetax, d_thetay, costx, sintx, costy, sinty
 int	axis[IM_MAXDIM], naxes, ax1, ax2, axmap
 int	mw_stati()
@@ -880,7 +902,8 @@ begin
 	sintx = sin (d_thetax)
 	costy = cos (d_thetay)
 	sinty = sin (d_thetay)
-	call amovd (icd, ocd, ndim * ndim)
+	sz_val = ndim * ndim
+	call amovd (icd, ocd, sz_val)
 
 	CDOUT(ax1,ax1) = xmag * costx * CDIN(ax1,ax1) -
 	     xmag * sintx * CDIN(ax2,ax1)
@@ -902,9 +925,9 @@ double procedure rg_rmsdiff (a, b, npts)
 
 double	a[ARB]			#I the first input vector
 double	b[ARB]			#I the second input vector
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 
-int	i
+long	i
 double	sum, rms
 
 begin

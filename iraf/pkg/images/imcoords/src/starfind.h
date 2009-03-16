@@ -14,7 +14,7 @@ define	SF_ROUNDLO	Memr[P2R($1+8)]	# Lower roundness limit
 define	SF_ROUNDHI	Memr[P2R($1+9)]	# Upper roundness limit
 define	SF_MAGLO	Memr[P2R($1+10)]	# Lower magnitude limit
 define	SF_MAGHI	Memr[P2R($1+11)]	# Upper magnitude limit
-define	SF_NPIXMIN	Memi[P2I($1+12)]	# Minimum pixels above  threshold
+define	SF_NPIXMIN	Memz[P2Z($1+12)]	# Minimum pixels above  threshold
 
 
 # default values

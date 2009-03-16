@@ -23,29 +23,34 @@ pointer	slngref, slatref, xformat, yformat, coo, refcoo, im, mw, imlist
 pointer	inlist, outlist
 real	datamin, datamax, back
 
+size_t	sz_val
 bool	clgetb()
 double	clgetd(), imgetd()
 int	clplen(), imtlen(), clgeti(), clgwrd(), strlen()
 int	sk_decwcs(), sk_decim(), open(), clgfil(), imtgetim(), strncmp(), ctod()
-int	cc_listran(), strdic(), cc_rdproj()
+int	cc_listran(), strdic(), cc_rdproj(), imod()
 real	clgetr()
 pointer	clpopnu(), immap(), cc_mkwcs(), imtopenp()
 errchk	imgstr(), imgetd(), open()
+include	<nullptr.inc>
 
 begin
 	# Get some working space.
 	call smark (sp)
-	call salloc (infile, SZ_FNAME, TY_CHAR)
-	call salloc (outfile, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (insystem, SZ_FNAME, TY_CHAR)
-	call salloc (refsystem, SZ_FNAME, TY_CHAR)
-	call salloc (slngref, SZ_FNAME, TY_CHAR)
-	call salloc (slatref, SZ_FNAME, TY_CHAR)
-	call salloc (xformat, SZ_FNAME, TY_CHAR)
-	call salloc (yformat, SZ_FNAME, TY_CHAR)
-	call salloc (projstr, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (infile, sz_val, TY_CHAR)
+	call salloc (outfile, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (insystem, sz_val, TY_CHAR)
+	call salloc (refsystem, sz_val, TY_CHAR)
+	call salloc (slngref, sz_val, TY_CHAR)
+	call salloc (slatref, sz_val, TY_CHAR)
+	call salloc (xformat, sz_val, TY_CHAR)
+	call salloc (yformat, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (projstr, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the input data file list.
 	inlist = clpopnu ("input")
@@ -137,9 +142,9 @@ begin
 	back = clgetr ("background")
 	maxiter = clgeti ("maxiter")
 	tol = clgeti ("tolerance")
-	if (mod (sbox,2) == 0)
+	if (imod (sbox,2) == 0)
 	    sbox = sbox + 1
-	if (mod (cbox,2) == 0)
+	if (imod (cbox,2) == 0)
 	    cbox = cbox + 1
 
 	# Get the output formatting parameters.
@@ -150,7 +155,7 @@ begin
 	verbose = clgetb ("verbose")
 
 	# Open the input coordinate system and determine its units.
-	coostat = sk_decwcs (Memc[insystem], mw, coo, NULL) 
+	coostat = sk_decwcs (Memc[insystem], mw, coo, NULLPTR)
 	if (coostat == ERR || mw != NULL) {
 	    call eprintf ("Error: Cannot decode the input coordinate system\n")
 	    if (mw != NULL)
@@ -181,7 +186,7 @@ begin
 	    out = open (Memc[outfile], NEW_FILE, TEXT_FILE)
 
 	    # Open the input image.
-	     im = immap (Memc[image], READ_ONLY, 0)
+	     im = immap (Memc[image], READ_ONLY, NULLPTR)
 	     if (IM_NDIM(im) != 2) {
 		call printf ("Skipping file: %s Image: %s is not 2D\n")
 		    call pargstr (Memc[infile])
@@ -291,12 +296,12 @@ begin
 		        SZ_FNAME))
 			call strcpy (Memc[refsystem], Memc[str], SZ_FNAME)
 		}
-		refstat = sk_decwcs (Memc[str], mw, refcoo, NULL)
+		refstat = sk_decwcs (Memc[str], mw, refcoo, NULLPTR)
 		if (refstat == ERR || mw != NULL) {
 	    	    if (mw != NULL)
 	                call mw_close (mw)
 		    call sk_close (refcoo)
-		    refstat = sk_decwcs (Memc[insystem], mw, refcoo, NULL)
+		    refstat = sk_decwcs (Memc[insystem], mw, refcoo, NULLPTR)
 		}
 
 		# Force the units of the tangent point.
@@ -317,8 +322,8 @@ begin
 	    # Print out a description of the input coordinate and image
 	    # systems.
 	    if (verbose && out != STDOUT)
-		call sk_iiprint ("Insystem", Memc[insystem], NULL, coo)
-	    call sk_iiwrite (out, "Insystem", Memc[insystem], NULL, coo)
+		call sk_iiprint ("Insystem", Memc[insystem], NULLPTR, coo)
+	    call sk_iiwrite (out, "Insystem", Memc[insystem], NULLPTR, coo)
 	    call sk_stats (refcoo, S_COOSYSTEM, Memc[str], SZ_FNAME)
 	    if (usewcs) {
 	        if (verbose && out != STDOUT) {
@@ -328,14 +333,14 @@ begin
 	        call fprintf (out, "\n")
 	    } else {
 	        if (verbose && out != STDOUT) {
-		    call sk_iiprint ("Refsystem", Memc[str], NULL, refcoo)
+		    call sk_iiprint ("Refsystem", Memc[str], NULLPTR, refcoo)
 		}
-	        call sk_iiwrite (out, "Refsystem", Memc[str], NULL, refcoo)
+	        call sk_iiwrite (out, "Refsystem", Memc[str], NULLPTR, refcoo)
 	        call fprintf (out, "\n")
 	    }
 
 	    # Transform the coordinate lists.
-	    ncenter = cc_listran (in, out, im, NULL, mw, coo, refcoo, lngcolumn,
+	    ncenter = cc_listran (in, out, im, NULLPTR, mw, coo, refcoo, lngcolumn,
 		latcolumn, lngunits, latunits, lngrefunits, latrefunits,
 		center, sbox / 2, cbox / 2, datamin, datamax, back,
 		maxiter, tol, Memc[xformat], Memc[yformat], min_sigdigits)
@@ -397,11 +402,12 @@ char	oxformat[ARB]		#I the output x format
 char	oyformat[ARB]		#I the output y format
 int	min_sigdigits		#I the minimum number of significant digits
 
+size_t	sz_val
 double	ilng, ilat, tlng, tlat, olng, olat
-int	nline, ip, max_fields, nfields, offset, nchars, nsdig_lng, nsdig_lat
+int	nline, max_fields, nfields, offset, nchars, nsdig_lng, nsdig_lat
 int	tilngunits, tilatunits, tolngunits, tolatunits, cier, ncenter
 pointer	sp, inbuf, linebuf, field_pos, outbuf, ctin, ctout
-pointer	toxformat, toyformat
+pointer	toxformat, toyformat, ip
 int	sk_stati(), li_get_numd(), getline(), cc_center()
 pointer	sk_ictran(), sk_octran()
 errchk	sk_ictran(), sk_octran()
@@ -416,12 +422,16 @@ begin
 
 	# Allocate some memory.
 	call smark (sp)
-        call salloc (inbuf, SZ_LINE, TY_CHAR)
-        call salloc (linebuf, SZ_LINE, TY_CHAR)
-        call salloc (field_pos, MAX_FIELDS, TY_INT)
-        call salloc (outbuf, SZ_LINE, TY_CHAR)
-	call salloc (toxformat, SZ_FNAME, TY_CHAR)
-	call salloc (toyformat, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (inbuf, sz_val, TY_CHAR)
+        call salloc (linebuf, sz_val, TY_CHAR)
+        sz_val = MAX_FIELDS
+        call salloc (field_pos, sz_val, TY_INT)
+        sz_val = SZ_LINE
+        call salloc (outbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (toxformat, sz_val, TY_CHAR)
+	call salloc (toyformat, sz_val, TY_CHAR)
 
 	# Set the default input and output units.
 	if (ilngunits <= 0)
@@ -580,11 +590,14 @@ double	xcenter, ycenter	#I the final x and y positions
 
 bool	converged
 double	xold, yold, xnew, ynew
-int	i, fbox, x1, x2, y1, y2, nx, ny
+int	i, fbox
+long	x1, x2, y1, y2
+size_t	nx, ny
 real	lo, hi, sky
 pointer	buf, sp, xbuf, ybuf
 pointer	imgs2r()
 real	cc_ctr1d()
+long	ldnint(), labs()
 errchk	imgs2r(), cc_threshold(), cc_rowsum(), cc_colsum(), cc_ctr1d()
 
 
@@ -599,10 +612,10 @@ begin
 		fbox = sbox
 	    else
 		fbox = cbox
-	    x1 = max (nint (xold) - fbox, 1)
-	    x2 = min (nint (xold) + fbox, IM_LEN(im,1))
-	    y1 = max (nint (yold) - fbox, 1)
-	    y2 = min (nint (yold) + fbox, IM_LEN(im,2))
+	    x1 = max (ldnint (xold) - fbox, 1)
+	    x2 = min (ldnint (xold) + fbox, IM_LEN(im,1))
+	    y1 = max (ldnint (yold) - fbox, 1)
+	    y2 = min (ldnint (yold) + fbox, IM_LEN(im,2))
 	    nx = x2 - x1 + 1
 	    ny = y2 - y1 + 1
 
@@ -627,8 +640,8 @@ begin
 
 	    # Force at least one iteration.
 	    if (i > 1) {
-	        if (abs(nint(xnew) - nint(xold)) <= tolerance &&
-	            abs(nint(ynew) - nint(yold)) <= tolerance) {
+	        if (labs(ldnint(xnew) - ldnint(xold)) <= tolerance &&
+	            labs(ldnint(ynew) - ldnint(yold)) <= tolerance) {
 		    converged = true
 		    break
 		}
@@ -656,7 +669,7 @@ procedure cc_threshold (raster, npix, datamin, datamax, back, ldatamin,
 	ldatamax, lback)
 
 real    raster[ARB]             #I input data
-int     npix                    #I length of input data
+size_t  npix                    #I length of input data
 real	datamin			#I minimum good data value
 real	datamax			#I maximum good data value
 real	back			#I background value
@@ -696,11 +709,11 @@ procedure cc_rowsum (raster, row, nx, ny, lo, hi, back)
 
 real    raster[nx,ny]           #I the input 2-D subraster
 real    row[ARB]                #O the output averaged row vector
-int     nx, ny                  #I dimensions of the subraster
+size_t  nx, ny                  #I dimensions of the subraster
 real	lo, hi			#I minimum and maximum good data values
 real	back			#I the background value
 
-int     i, j
+long    i, j
 real    pix, minpix, maxpix
 
 begin
@@ -728,12 +741,12 @@ procedure cc_colsum (raster, col, nx, ny, lo, hi, back)
 
 real    raster[nx,ny]           #I 2-D subraster
 real    col[ARB]                #O 1-D squashed col vector
-int     nx, ny                  #I dimensions of the subraster
+size_t  nx, ny                  #I dimensions of the subraster
 real	lo, hi			#I minimum and maximum good data values
 real	back			#I the background value
 
 
-int     i, j
+long    i, j
 real    pix, minpix, maxpix
 
 begin
@@ -759,10 +772,10 @@ end
 real procedure cc_ctr1d (a, npix)
 
 real    a[ARB]                  #I marginal vector
-int     npix                    #I size of the vector
+size_t  npix                    #I size of the vector
 
 real    centroid, pix, sumi, sumix
-int     i
+long    i
 
 begin
         sumi = 0.

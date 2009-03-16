@@ -16,8 +16,8 @@ procedure sf_find (im, out, sf, nxblock, nyblock, wcs, wxformat, wyformat,
 pointer	im		#I pointer to the input image
 int	out		#I the output file descriptor
 pointer	sf		#I pointer to the apphot structure
-int	nxblock		#I the x dimension blocking factor
-int	nyblock		#I the y dimension blocking factor
+long	nxblock		#I the x dimension blocking factor
+long	nyblock		#I the y dimension blocking factor
 char	wcs[ARB]	#I the world coordinate system
 char	wxformat[ARB]	#I the x axis world coordinate format
 char	wyformat[ARB]	#I the y axis world coordinate format
@@ -25,8 +25,12 @@ int	boundary	#I type of boundary extension
 real	constant	#I constant for constant boundary extension
 int	verbose		#I verbose switch
 
-int	i, j, fwidth, swidth, norm
-int	l1, l2, c1, c2, ncols, nlines, nxb, nyb, nstars, stid
+size_t	sz_val
+long	l_val
+int	norm
+size_t	ncols, nlines, fwidth, swidth
+int	nstars, stid
+long	i, j, c1, c2, l1, l2, nxb, nyb
 pointer	sp, gker2d, ngker2d, skip, fmtstr, twxformat, twyformat
 pointer	imbuf, denbuf, str, mw, ct
 real	sigma, nsigma, a, b, c, f, gsums[LEN_GAUSS], relerr, dmin, dmax
@@ -36,15 +40,18 @@ bool	streq()
 int	sf_stfind()
 pointer	mw_openim(), mw_sctran()
 real	sf_egkernel()
+long	lint()
 errchk	mw_openim(), mw_sctran(), mw_gattrs()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (twxformat, SZ_FNAME, TY_CHAR)
-	call salloc (twyformat, SZ_FNAME, TY_CHAR)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (twxformat, sz_val, TY_CHAR)
+	call salloc (twyformat, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Compute the parameters of the Gaussian kernel.
 	sigma = HWHM_TO_SIGMA * SF_HWHMPSF(sf)
@@ -52,7 +59,7 @@ begin
 	call sf_egparams (sigma, 1.0, 0.0, nsigma, a, b, c, f, fwidth, fwidth)
 
 	# Compute the separation parameter
-	swidth = max (2, int (SF_SEPMIN(sf) * SF_HWHMPSF(sf) + 0.5))
+	swidth = max (2, lint (SF_SEPMIN(sf) * SF_HWHMPSF(sf) + 0.5))
 
 	# Compute the minimum and maximum pixel values.
 	if (IS_INDEFR(SF_DATAMIN(sf)) && IS_INDEFR(SF_DATAMAX(sf))) {
@@ -153,17 +160,18 @@ begin
 
 	# Set up the image boundary extension characteristics.
         call imseti (im, IM_TYBNDRY, boundary)
-        call imseti (im, IM_NBNDRYPIX, 1 + fwidth / 2 + swidth)
+	l_val = 1 + fwidth / 2 + swidth
+        call imsetl (im, IM_NBNDRYPIX, l_val)
         if (boundary == BT_CONSTANT)
             call imsetr (im, IM_BNDRYPIXVAL, constant)
 
 	# Set up the blocking factor.
 	# Compute the magnitude limits
-	if (IS_INDEFI(nxblock))
+	if (IS_INDEFL(nxblock))
 	    nxb = IM_LEN(im,1)
 	else
 	    nxb = nxblock
-	if (IS_INDEFI(nyblock))
+	if (IS_INDEFL(nyblock))
 	    nyb = IM_LEN(im,2)
 	else
 	    nyb = nyblock
@@ -179,7 +187,7 @@ begin
 	    "    Hwhmpsf: %0.3f (pixels)  Threshold: %g (ADU) Npixmin: %d\n")
 		call pargr (SF_HWHMPSF(sf))
 		call pargr (SF_THRESHOLD(sf))
-		call pargi (SF_NPIXMIN(sf))
+		call pargz (SF_NPIXMIN(sf))
 	    call printf ("    Datamin: %g (ADU)  Datamax: %g (ADU)\n")
 		call pargr (SF_DATAMIN(sf))
 		call pargr (SF_DATAMAX(sf))
@@ -198,7 +206,7 @@ begin
 	    "#     Hwhmpsf: %0.3f (pixels)  Threshold: %g (ADU)  Npixmin: %d\n")
 		call pargr (SF_HWHMPSF(sf))
 		call pargr (SF_THRESHOLD(sf))
-		call pargi (SF_NPIXMIN(sf))
+		call pargz (SF_NPIXMIN(sf))
 	    call fprintf (out, "#     Datamin: %g (ADU)  Datamax: %g (ADU)\n")
 		call pargr (SF_DATAMIN(sf))
 		call pargr (SF_DATAMAX(sf))
@@ -206,7 +214,7 @@ begin
 		call pargr (SF_FRADIUS(sf))
 		call pargr (SF_SEPMIN(sf))
 	    call fprintf (out, "# Selection Parameters\n")
-		call pargi (SF_NPIXMIN(sf))
+		call pargz (SF_NPIXMIN(sf))
 	    call fprintf (out, "#     Maglo: %0.3f  Maghi: %0.3f\n")
 		call pargr (SF_MAGLO(sf))
 		call pargr (SF_MAGHI(sf))
@@ -320,17 +328,17 @@ int procedure sf_stfind (out, imbuf, denbuf, ncols, nlines, c1, c2, l1, l2,
 int	out			#I the output file descriptor
 real	imbuf[ncols,nlines]	#I the input data buffer
 real	denbuf[ncols,nlines]	#I the input density enhancements buffer
-int	ncols, nlines		#I the dimensions of the input buffers
-int	c1, c2			#I the image columns limits
-int	l1, l2			#I the image lines limits
-int	sepmin			#I the minimum object separation
+size_t	ncols, nlines		#I the dimensions of the input buffers
+long	c1, c2			#I the image columns limits
+long	l1, l2			#I the image lines limits
+size_t	sepmin			#I the minimum object separation
 int	skip[nxk,ARB]		#I the pixel fitting array
-int	nxk, nyk		#I the dimensions of the fitting array
+size_t	nxk, nyk		#I the dimensions of the fitting array
 real	hwhmpsf			#I the HWHM of the PSF in pixels
 real	threshold		#I the threshold for object detection
 real	datamin, datamax	#I the minimum and maximum good data values
 pointer	ct			#I the coordinate transformation pointer
-int	nmin			#I the minimum number of good object pixels
+size_t	nmin			#I the minimum number of good object pixels
 real	maglo,maghi		#I the magnitude estimate limits
 real	roundlo,roundhi		#I the ellipticity estimate limits
 real	sharplo, sharphi	#I the sharpness estimate limits
@@ -338,7 +346,8 @@ char	fmtstr[ARB]		#I the format string
 int	stid			#U the object sequence number
 int	verbose			#I verbose mode
 
-int	line1, line2, inline, xmiddle, ymiddle, ntotal, nobjs, nstars
+long	line1, line2, inline, xmiddle, ymiddle
+int	ntotal, nobjs, nstars
 pointer	sp, cols, sharp, x, y, ellip, theta, npix, mag, size
 int	sf_detect(), sf_test()
 
@@ -352,11 +361,11 @@ begin
 	# Set up a cylindrical buffers and some working space for
 	# the detected images.
 	call smark (sp)
-	call salloc (cols, ncols, TY_INT)
+	call salloc (cols, ncols, TY_LONG)
 	call salloc (x, ncols, TY_REAL)
 	call salloc (y, ncols, TY_REAL)
 	call salloc (mag, ncols, TY_REAL)
-	call salloc (npix, ncols, TY_INT)
+	call salloc (npix, ncols, TY_SIZE_T)
 	call salloc (size, ncols, TY_REAL)
 	call salloc (ellip, ncols, TY_REAL)
 	call salloc (theta, ncols, TY_REAL)
@@ -368,20 +377,20 @@ begin
 
 	    # Detect local maximum in the density enhancement buffer.
 	    nobjs = sf_detect (denbuf[1,inline-nyk/2-sepmin], ncols, sepmin,
-	        nxk, nyk, threshold, Memi[cols])
+	        nxk, nyk, threshold, Meml[cols])
 	    if (nobjs <= 0)
 		next
 
 	    # Do not skip the middle pixel in the moments computation.
 	    call sf_moments (imbuf[1,inline-nyk/2], denbuf[1,inline-nyk/2],
-	        ncols, skip, nxk, nyk, Memi[cols], Memr[x], Memr[y],
-		Memi[npix], Memr[mag], Memr[size], Memr[ellip], Memr[theta],
+	        ncols, skip, nxk, nyk, Meml[cols], Memr[x], Memr[y],
+		Memz[npix], Memr[mag], Memr[size], Memr[ellip], Memr[theta],
 		Memr[sharp], nobjs, datamin, datamax, threshold, hwhmpsf,
 		real (-sepmin - nxk / 2 + c1 - 1), real (inline - sepmin -
 		nyk + l1 - 1))
 
 	    # Test the image characeteristics of detected objects.
-	    nstars = sf_test (Memi[cols], Memr[x], Memr[y], Memi[npix],
+	    nstars = sf_test (Meml[cols], Memr[x], Memr[y], Memz[npix],
 	        Memr[mag], Memr[size], Memr[ellip], Memr[theta], Memr[sharp],
 		nobjs, real (c1 - 0.5), real (c2 + 0.5), real (l1 - 0.5),
 		real (l2 + 0.5),  nmin, maglo, maghi, roundlo, roundhi,
@@ -389,14 +398,14 @@ begin
 
 	    # Print results on the standard output.
 	    if (verbose == YES)
-	        call sf_write (STDOUT, Memi[cols], Memr[x], Memr[y],
-		    Memr[mag], Memi[npix], Memr[size], Memr[ellip],
+	        call sf_write (STDOUT, Meml[cols], Memr[x], Memr[y],
+		    Memr[mag], Memz[npix], Memr[size], Memr[ellip],
 		    Memr[theta], Memr[sharp], nstars, ct, fmtstr,
 		    ntotal + stid)
 
 	    # Save the results in the file.
-	    call sf_write (out, Memi[cols], Memr[x], Memr[y], Memr[mag],
-	        Memi[npix], Memr[size], Memr[ellip], Memr[theta],
+	    call sf_write (out, Meml[cols], Memr[x], Memr[y], Memr[mag],
+	        Memz[npix], Memr[size], Memr[ellip], Memr[theta],
 		Memr[sharp], nstars, ct, fmtstr, ntotal + stid)
 
 	    ntotal = ntotal + nstars
@@ -417,13 +426,14 @@ end
 int procedure sf_detect (density, ncols, sepmin, nxk, nyk, threshold, cols)
 
 real	density[ncols, ARB]	#I the input density enhancements array
-int	ncols			#I the x dimension of the input array
-int	sepmin			#I the minimum separation in pixels
-int	nxk, nyk		#I size of the fitting area
+size_t	ncols			#I the x dimension of the input array
+size_t	sepmin			#I the minimum separation in pixels
+size_t	nxk, nyk		#I size of the fitting area
 real	threshold		#I density threshold
-int	cols[ARB]		#O column numbers of detected stars
+long	cols[ARB]		#O column numbers of detected stars
 
-int	i, j, k, ymiddle, nxhalf, nyhalf, ny, b2, nobjs, rj2, r2
+long	i, j, k, ymiddle, nxhalf, nyhalf, ny, b2, rj2, r2
+int	nobjs
 define	nextpix_	11
 
 begin
@@ -478,13 +488,13 @@ procedure sf_moments (data, den, ncols, skip, nxk, nyk, cols, x, y,
 
 real	data[ncols,ARB]		#I the input data array
 real	den[ncols,ARB]		#I the input density enhancements array
-int	ncols			#I the x dimension of the input buffer
+size_t	ncols			#I the x dimension of the input buffer
 int	skip[nxk,ARB]		#I the input fitting array
-int	nxk, nyk		#I the dimensions of the fitting array
-int	cols[ARB]		#I the input initial positions	
+size_t	nxk, nyk		#I the dimensions of the fitting array
+long	cols[ARB]		#I the input initial positions	
 real	x[ARB]			#O the output x coordinates
 real	y[ARB]			#O the output y coordinates
-int	npix[ARB]		#O the output area in number of pixels
+size_t	npix[ARB]		#O the output area in number of pixels
 real	mag[ARB]		#O the output magnitude estimates
 real	size[ARB]		#O the output size estimates
 real	ellip[ARB]		#O the output ellipticity estimates
@@ -496,7 +506,8 @@ real	threshold		#I threshold for moments computation
 real	hwhmpsf			#I the HWHM of the PSF
 real	xoff, yoff		#I the x and y coordinate offsets
 
-int	i, j, k, xmiddle, ymiddle, sumn
+int	i
+long	j, k, xmiddle, ymiddle, sumn
 double	pixval, sumix, sumiy, sumi, sumixx, sumixy, sumiyy, r2, dx, dy, diff
 double	mean
 
@@ -635,10 +646,10 @@ int procedure sf_test (cols, x, y, npix, mag, size, ellip, theta, sharps,
 	nobjs, c1, c2, l1, l2, nmin, maglo, maghi, roundlo, roundhi,
 	sharplo, sharphi)
 
-int	cols[ARB]			#U the column ids of detected object
+long	cols[ARB]			#U the column ids of detected object
 real	x[ARB]				#U the x position estimates
 real	y[ARB]				#U the y positions estimates
-int	npix[ARB]			#U the area estimates
+size_t	npix[ARB]			#U the area estimates
 real	mag[ARB]			#U the magnitude estimates
 real	size[ARB]			#U the size estimates
 real	ellip[ARB]			#U the ellipticity estimates
@@ -647,7 +658,7 @@ real	sharps[ARB]			#U sharpness estimates
 int	nobjs				#I the number of detected objects
 real	c1, c2				#I the image column limits
 real	l1, l2				#I the image line limits
-int	nmin				#I the minimum area
+size_t	nmin				#I the minimum area
 real	maglo, maghi			#I the magnitude limits
 real	roundlo, roundhi		#I the roundness limits
 real	sharplo, sharphi		#I the sharpness limits
@@ -696,11 +707,11 @@ procedure sf_write (fd, cols, x, y, mag, npix, size, ellip, theta, sharp,
 	nstars, ct, fmtstr, stid)
 
 int     fd                              #I the output file descriptor
-int     cols[ARB]                       #I column numbers
+long    cols[ARB]                       #I column numbers
 real    x[ARB]                          #I xcoords
 real    y[ARB]                          #I y coords
 real    mag[ARB]                        #I magnitudes
-int     npix[ARB]                       #I number of pixels
+size_t  npix[ARB]                       #I number of pixels
 real    size[ARB]                       #I object sizes
 real    ellip[ARB]                      #I ellipticities
 real    theta[ARB]                      #I position angles
@@ -729,7 +740,7 @@ begin
 		    call pargd (wy)
 		}
                 call pargr (mag[i])
-		call pargi (npix[i])
+		call pargz (npix[i])
                 call pargr (size[i])
                 call pargr (ellip[i])
                 call pargr (theta[i])

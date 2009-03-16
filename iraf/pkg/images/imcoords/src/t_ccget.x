@@ -14,9 +14,9 @@ define	DC_DLENGTH		10
 define	DC_NCOLUMNS		Memi[P2I($1)]    # the number of columns in record
 define	DC_LNGCOLUMN		Memi[P2I($1+1)]  # the ra / longitude column index
 define	DC_LATCOLUMN		Memi[P2I($1+2)]  # the dec / latitude column index 
-define	DC_COLNAMES		Memi[P2I($1+3)]  # the column names pointer
-define	DC_RECORD		Memi[P2I($1+4)]  # the record pointer
-define	DC_COFFSETS		Memi[P2I($1+5)]  # the column offsets
+define	DC_COLNAMES		Memp[$1+3]  # the column names pointer
+define	DC_RECORD		Memp[$1+4]  # the record pointer
+define	DC_COFFSETS		Memp[$1+5]  # the column offsets
 
 define	MAX_NCOLUMNS		100         # the maximum number of columns
 define	SZ_COLNAME		19          # the column name
@@ -27,11 +27,11 @@ define	TABSIZE			8           # the spacing of the tab stops
 define  EC_ELENGTH		10
 
 define	EC_NEXPR		Memi[P2I($1)]    # the number of expressions
-define	EC_ELIST		Memi[P2I($1+1)]  # the expression list pointer
-define	EC_ERANGES		Memi[P2I($1+2)]  # the expression column ranges
-define	EC_EFORMATS		Memi[P2I($1+3)]  # the expression formats
-define	EC_ELNGFORMAT		Memi[P2I($1+4)]  # the expression formats
-define	EC_ELATFORMAT		Memi[P2I($1+5)]  # the expression formats
+define	EC_ELIST		Memp[$1+1]  # the expression list pointer
+define	EC_ERANGES		Memp[$1+2]  # the expression column ranges
+define	EC_EFORMATS		Memp[$1+3]  # the expression formats
+define	EC_ELNGFORMAT		Memp[$1+4]  # the expression formats
+define	EC_ELATFORMAT		Memp[$1+5]  # the expression formats
 
 define	MAX_NEXPR		20
 define	MAX_NERANGES		100
@@ -45,21 +45,23 @@ procedure t_ccget ()
 
 double	dlngcenter, dlatcenter, dlngwidth, dlatwidth, tlngcenter, tlatcenter
 double	dlng1, dlng2, dlat1, dlat2
-int	ip, ninfiles, outlist, noutfiles, fclngunits, fclatunits
-int	fldstat, catstat, catlngunits, catlatunits, olngunits
-int	olatunits, in, out
-pointer	inlist, outstat
+int	ip, ninfiles, noutfiles, fclngunits, fclatunits
+int	fldstat, catstat, outstat
+int	catlngunits, catlatunits, olngunits, olatunits, in, out
+pointer	inlist, outlist
 pointer	sp, lngcenter, latcenter, fcsystem, catsystem, outsystem, olngformat
 pointer	olatformat, lngcolumn, latcolumn, colnames, exprs, formats
 pointer	infile, outfile, str
 pointer	fldcoo, catcoo, outcoo, mw, dc, ec
 bool	verbose
+size_t	sz_val
 double	clgetd()
 pointer	cc_dinit(), cc_einit(), clpopnu()
 int	clplen(), ctod(), strncmp(), clgwrd(), sk_decwcs()
 int	sk_stati(), clgfil(), open()
 bool	clgetb(), streq()
 errchk	clgwrd()
+include	<nullptr.inc>
 
 begin
 	# Open the list of input catalogs. These catalogs must have the
@@ -91,21 +93,26 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	call salloc (infile, SZ_FNAME, TY_CHAR)
-	call salloc (outfile, SZ_FNAME, TY_CHAR)
-	call salloc (lngcenter, SZ_FNAME, TY_CHAR)
-	call salloc (latcenter, SZ_FNAME, TY_CHAR)
-	call salloc (fcsystem, SZ_FNAME, TY_CHAR)
-	call salloc (catsystem, SZ_FNAME, TY_CHAR)
-	call salloc (lngcolumn, SZ_FNAME, TY_CHAR)
-	call salloc (latcolumn, SZ_FNAME, TY_CHAR)
-	call salloc (colnames, SZ_LINE, TY_CHAR)
-	call salloc (outsystem, SZ_FNAME, TY_CHAR)
-	call salloc (olngformat, SZ_FNAME, TY_CHAR)
-	call salloc (olatformat, SZ_FNAME, TY_CHAR)
-	call salloc (exprs, SZ_LINE, TY_CHAR)
-	call salloc (formats, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (infile, sz_val, TY_CHAR)
+	call salloc (outfile, sz_val, TY_CHAR)
+	call salloc (lngcenter, sz_val, TY_CHAR)
+	call salloc (latcenter, sz_val, TY_CHAR)
+	call salloc (fcsystem, sz_val, TY_CHAR)
+	call salloc (catsystem, sz_val, TY_CHAR)
+	call salloc (lngcolumn, sz_val, TY_CHAR)
+	call salloc (latcolumn, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (colnames, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (outsystem, sz_val, TY_CHAR)
+	call salloc (olngformat, sz_val, TY_CHAR)
+	call salloc (olatformat, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (exprs, sz_val, TY_CHAR)
+	call salloc (formats, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the field center coordinates and make some preliminary checks.
 	call clgstr ("lngcenter", Memc[lngcenter], SZ_FNAME)
@@ -202,7 +209,7 @@ begin
 	    (fclatunits == catlatunits)) {
 	    fldcoo = NULL
 	} else {
-	    fldstat = sk_decwcs (Memc[fcsystem], mw, fldcoo, NULL)
+	    fldstat = sk_decwcs (Memc[fcsystem], mw, fldcoo, NULLPTR)
 	    if (fldstat == ERR || mw != NULL) {
 	        if (mw != NULL)
 	            call mw_close (mw)
@@ -211,7 +218,7 @@ begin
 	}
 
 	# Open the catalog coordinate system.
-	catstat = sk_decwcs (Memc[catsystem], mw, catcoo, NULL) 
+	catstat = sk_decwcs (Memc[catsystem], mw, catcoo, NULLPTR)
 	if (catstat == ERR || mw != NULL) {
 	    call eprintf ("Error: Cannot decode the input coordinate system\n")
 	    if (mw != NULL)
@@ -251,7 +258,7 @@ begin
 	    (olatunits == catlatunits)) {
 	    outcoo = NULL
 	} else {
-	    outstat = sk_decwcs (Memc[outsystem], mw, outcoo, NULL) 
+	    outstat = sk_decwcs (Memc[outsystem], mw, outcoo, NULLPTR)
 	    if (outstat == ERR || mw != NULL) {
 	        call eprintf (
 		    "Warning: Cannot decode the output coordinate system\n")
@@ -306,8 +313,9 @@ begin
 	    tlngcenter = dlngcenter
 	    tlatcenter = dlatcenter
 	} else {
+	    sz_val = 1
 	    call sk_ultran (fldcoo, catcoo, dlngcenter, dlatcenter,
-	        tlngcenter, tlatcenter, 1) 
+			    tlngcenter, tlatcenter, sz_val)
 	}
 
 	# Determine the corners of the field in degrees. At present
@@ -354,43 +362,43 @@ begin
 	    # Print information about the field center coordinate system.
 	    if (fldcoo == NULL) {
 	        if (verbose && out != STDOUT)
-		    call sk_iiprint ("Field System", Memc[catsystem], NULL,
+		    call sk_iiprint ("Field System", Memc[catsystem], NULLPTR,
 		        catcoo)
 		if (out != NULL)
 		    call sk_iiwrite (out, "Field System", Memc[catsystem],
-		        NULL, catcoo)
+		        NULLPTR, catcoo)
 	    } else {
 		if (verbose && out != STDOUT)
-		    call sk_iiprint ("Field System", Memc[fcsystem], NULL,
+		    call sk_iiprint ("Field System", Memc[fcsystem], NULLPTR,
 		        fldcoo)
 		if (out != NULL)
-		    call sk_iiwrite (out, "Field System", Memc[fcsystem], NULL,
+		    call sk_iiwrite (out, "Field System", Memc[fcsystem], NULLPTR,
 		        fldcoo)
 	    }
 
 	    # Print information about the input coordinate system.
 	    if (verbose && out != STDOUT)
 		call sk_iiprint (
-		    "Catalog System", Memc[catsystem], NULL, catcoo)
+		    "Catalog System", Memc[catsystem], NULLPTR, catcoo)
 	    if (out != NULL)
-		call sk_iiwrite (out, "Catalog System", Memc[catsystem], NULL,
+		call sk_iiwrite (out, "Catalog System", Memc[catsystem], NULLPTR,
 		    catcoo)
 
 	    # Print information about the output coordinate system.
 	    if (outcoo == NULL) {
 	        if (verbose && out != STDOUT)
-		    call sk_iiprint ("Output System", Memc[catsystem], NULL,
+		    call sk_iiprint ("Output System", Memc[catsystem], NULLPTR,
 		        catcoo)
 		if (out != NULL)
 		    call sk_iiwrite (out, "Output System", Memc[catsystem],
-		        NULL, catcoo)
+		        NULLPTR, catcoo)
 	    } else {
 		if (verbose && out != STDOUT)
-		    call sk_iiprint ("Output System", Memc[outsystem], NULL,
+		    call sk_iiprint ("Output System", Memc[outsystem], NULLPTR,
 		        outcoo)
 		if (out != NULL)
 		    call sk_iiwrite (out, "Output System", Memc[outsystem],
-		        NULL, outcoo)
+		        NULLPTR, outcoo)
 	    }
 		    
 	    # Print the corners field parameters.
@@ -562,20 +570,23 @@ double	dlng1, dlng2		#I the ra / longitude limits in degrees
 double	dlat1, dlat2		#I the dec / latitude limits in degrees
 bool	verbose			#I verbose mode
 
+size_t	sz_val
 double	dlngcenter, dlatcenter, tlng, tlat, dlng, dlat, dist
 double  tmplng, tlngcenter
-int	ip, op, i, j, nline, lngoffset, latoffset, offset1, offset2, nsig
-pointer	sp, inbuf, outbuf, newval, eptr, rptr, fptr, pexpr
+int	i, j, nline, lngoffset, latoffset, offset1, offset2, nsig, i_len
+pointer	sp, inbuf, outbuf, newval, eptr, rptr, fptr, pexpr, ip, op
 pointer	evvexpr(), locpr()
 int	getline(), li_get_numd(), sk_stati(), gstrcpy(), strlen()
 bool	streq()
 extern	cc_getop()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (inbuf, SZ_LINE, TY_CHAR)
-	call salloc (outbuf, SZ_LINE, TY_CHAR)
-	call salloc (newval, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (inbuf, sz_val, TY_CHAR)
+	call salloc (outbuf, sz_val, TY_CHAR)
+	call salloc (newval, sz_val, TY_CHAR)
 
 	# Convert the field center coordinates to degrees.
         switch (sk_stati(catcoo, S_NLNGUNITS)) {
@@ -665,7 +676,7 @@ begin
 	    # in longitude or latitude strips involving the pole. This is
 	    # an extra test of my own.
 	    if (dlng1 < dlng2) {
-	        dist = abs (dlng - dlngcenter)
+	        dist = dabs (dlng - dlngcenter)
 	    } else {
 		if (dlng > dlng1)
 		    tmplng = dlng - 360.0d0 
@@ -675,9 +686,9 @@ begin
 		    tlngcenter = dlngcenter - 360.0d0
 		else
 		    tlngcenter = dlngcenter
-		dist = abs (tmplng - tlngcenter)
+		dist = dabs (tmplng - tlngcenter)
 	    }
-	    if (abs (2.0d0*dist*cos(DEGTORAD(dlat))) > lngwidth) 
+	    if (dabs (2.0d0*dist*cos(DEGTORAD(dlat))) > lngwidth) 
 	        next
 
 	    # If all the columns are selected and no column expressions have
@@ -709,7 +720,7 @@ begin
 		# The next user output field is an expression.
 		if (IS_INDEFI(Memi[rptr])) {
 
-		    pexpr = evvexpr (Memc[eptr], locpr (cc_getop), dc, 0, dc, 0)
+		    pexpr = evvexpr (Memc[eptr], locpr (cc_getop), dc, NULLPTR, dc, 0)
 		    switch (O_TYPE(pexpr)) {
 		    case TY_BOOL:
 			if (Memc[fptr] == '%')
@@ -729,6 +740,12 @@ begin
 			else
 			    call sprintf (Memc[newval], SZ_LINE, "  %10d")
 			    call pargi (O_VALI(pexpr))
+		    case TY_LONG:
+			if (Memc[fptr] == '%')
+			    call sprintf (Memc[newval], SZ_LINE, Memc[fptr])
+			else
+			    call sprintf (Memc[newval], SZ_LINE, "  %10d")
+			    call pargl (O_VALL(pexpr))
 		    case TY_REAL:
 			if (Memc[fptr] == '%')
 			    call sprintf (Memc[newval], SZ_LINE, Memc[fptr])
@@ -742,16 +759,18 @@ begin
 			    call sprintf (Memc[newval], SZ_LINE, "  %10g")
 			    call pargd (O_VALD(pexpr))
 		    }
-		    op = op + gstrcpy (Memc[newval], Memc[op],
-		        min (SZ_LINE - op + outbuf, strlen (Memc[newval])))
+		    i_len = min (SZ_LINE - op + outbuf, strlen (Memc[newval]))
+		    op = op + gstrcpy (Memc[newval], Memc[op], i_len)
 
 		# The next user fields are columns.
 		} else if (Memi[rptr] >= 1 && Memi[rptr+1] <= MAX_NCOLUMNS) {
 
 		    # Transform the coordinates if necessary.
-		    if (outcoo != NULL)
+		    if (outcoo != NULL) {
+			sz_val = 1
 	    		call sk_ultran (catcoo, outcoo, tlng, tlat, tlng,
-			    tlat, 1) 
+					tlat, sz_val)
+		    }
 
 		    pexpr = NULL
 		    do j = max (1, Memi[rptr]), min (Memi[rptr+1],
@@ -762,20 +781,22 @@ begin
 			    call sprintf (Memc[newval], SZ_LINE,
 			        Memc[EC_ELNGFORMAT(ec)])
 				call pargd (tlng)
-		            op = op + gstrcpy (Memc[newval], Memc[op],
-		                min (SZ_LINE - op + outbuf,
-				strlen (Memc[newval])))
+			    i_len = min (SZ_LINE - op + outbuf,
+					 strlen (Memc[newval]))
+		            op = op + gstrcpy (Memc[newval], Memc[op], i_len)
 			} else if (outcoo != NULL && offset1 == latoffset) {
 			    call sprintf (Memc[newval], SZ_LINE,
 			        Memc[EC_ELATFORMAT(ec)])
 				call pargd (tlat)
-		            op = op + gstrcpy (Memc[newval], Memc[op],
-		                min (SZ_LINE - op + outbuf,
-				strlen (Memc[newval])))
-			} else
+			    i_len = min (SZ_LINE - op + outbuf,
+					 strlen (Memc[newval]))
+		            op = op + gstrcpy (Memc[newval], Memc[op], i_len)
+			} else {
+			    i_len = min (SZ_LINE - op + outbuf,
+					 offset2 - offset1)
 			    op = op + gstrcpy (Memc[DC_RECORD(dc)+offset1-1],
-			        Memc[op], min (SZ_LINE - op + outbuf,
-			        offset2 - offset1))
+					       Memc[op], i_len)
+			}
 		    }
 		}
 
@@ -812,16 +833,19 @@ char	cnames[ARB]		#I optional list of columm names
 char	lngname[ARB]		#I the ra / longitude column name or number
 char	latname[ARB]		#I the dec / latitude column name or number
 
+size_t	sz_val
 int	i, ip, op
 pointer	dc, cptr
 int	cc_cnames(), ctotok(), ctoi()
 bool	streq()
 
 begin
-	call calloc (dc, DC_DLENGTH, TY_STRUCT)
+	sz_val = DC_DLENGTH
+	call calloc (dc, sz_val, TY_STRUCT)
 
 	# Define the column names.
-	call calloc (DC_COLNAMES(dc), MAX_NCOLUMNS * (SZ_COLNAME + 1), TY_CHAR)
+	sz_val = MAX_NCOLUMNS * (SZ_COLNAME + 1)
+	call calloc (DC_COLNAMES(dc), sz_val, TY_CHAR)
 	Memc[DC_COLNAMES(dc)] = EOS
 
 	ip = 1
@@ -871,10 +895,12 @@ begin
 	if (DC_LATCOLUMN(dc) <= 0)
 	    DC_LATCOLUMN(dc) = DC_LNGCOLUMN(dc) + 1
 
-	call calloc (DC_RECORD(dc), SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call calloc (DC_RECORD(dc), sz_val, TY_CHAR)
 	Memc[DC_RECORD(dc)) = EOS 
 
-	call calloc (DC_COFFSETS(dc), MAX_NCOLUMNS + 1, TY_INT)
+	sz_val = MAX_NCOLUMNS + 1
+	call calloc (DC_COFFSETS(dc), sz_val, TY_INT)
 
 	return (dc)
 end
@@ -956,15 +982,18 @@ char	formats[ARB]		#I the input formats list
 char	lngformat[ARB]		#I the input output ra / longitude format
 char	latformat[ARB]		#I the input output dec / latitude format
 
+size_t	sz_val
 int	i, ip, nexpr
 pointer	ec, cptr, fptr
 int	cc_enames()
 
 begin
-	call calloc (ec, EC_ELENGTH, TY_STRUCT)
+	sz_val = EC_ELENGTH
+	call calloc (ec, sz_val, TY_STRUCT)
 
 	# Define the column names.
-	call malloc (EC_ELIST(ec), MAX_NEXPR * (SZ_EXPR + 1), TY_CHAR)
+	sz_val = MAX_NEXPR * (SZ_EXPR + 1)
+	call malloc (EC_ELIST(ec), sz_val, TY_CHAR)
 	Memc[EC_ELIST(ec)] = EOS
 
 	# Create list of expressions.
@@ -983,9 +1012,11 @@ begin
 
 	# Decode the list of expressions into column names, column ranges,
 	# and column expressions.
-	call calloc (EC_ERANGES(ec), 3 * MAX_NERANGES + 1, TY_INT)
+	sz_val = 3 * MAX_NERANGES + 1
+	call calloc (EC_ERANGES(ec), sz_val, TY_INT)
 
-	call calloc (EC_EFORMATS(ec), MAX_NEXPR * (SZ_EFORMATS + 1), TY_CHAR)
+	sz_val = MAX_NEXPR * (SZ_EFORMATS + 1)
+	call calloc (EC_EFORMATS(ec), sz_val, TY_CHAR)
 	Memc[EC_EFORMATS(ec)] = EOS
 	ip  = 1
 	fptr = EC_EFORMATS(ec)
@@ -997,9 +1028,11 @@ begin
 	    cptr = cptr + SZ_EXPR + 1
 	}
 
-	call calloc (EC_ELNGFORMAT(ec), SZ_EFORMATS, TY_CHAR)
+	sz_val = SZ_EFORMATS
+	call calloc (EC_ELNGFORMAT(ec), sz_val, TY_CHAR)
 	call strcpy (lngformat, Memc[EC_ELNGFORMAT(ec)], SZ_EFORMATS)
-	call calloc (EC_ELATFORMAT(ec), SZ_EFORMATS, TY_CHAR)
+	sz_val = SZ_EFORMATS
+	call calloc (EC_ELATFORMAT(ec), sz_val, TY_CHAR)
 	call strcpy (latformat, Memc[EC_ELATFORMAT(ec)], SZ_EFORMATS)
 
 	return (ec)
@@ -1069,6 +1102,7 @@ procedure cc_edecode (dc, ec)
 pointer	dc			#I the pointer to the data structure
 pointer	ec			#I the pointer to the expression structure
 
+size_t	sz_val
 int	i, j, ip1, ip2, c1, c2, lindex, rindex, column
 pointer	sp, ename, eptr, cptr, rptr
 char	lbracket, rbracket
@@ -1077,7 +1111,8 @@ bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (ename, SZ_EXPR, TY_CHAR)
+	sz_val = SZ_EXPR
+	call salloc (ename, sz_val, TY_CHAR)
 
 	# Initialize.
 	lbracket = '['
@@ -1155,7 +1190,8 @@ pointer	dc			#I pointer to the data structure
 char	operand[ARB]		#I name of operand to be returned
 pointer	o			#I pointer to output operand
 
-int	ip, column, offset, csize, type, nchars
+size_t	sz_val
+int	ip, column, offset, type, nchars, csize
 pointer	cptr
 bool	streq()
 int	lexnum(), ctod(), ctoi()
@@ -1188,15 +1224,18 @@ begin
 	# Decode the symbol.
 	switch (type) {
 	case LEX_OCTAL, LEX_DECIMAL, LEX_HEX:
-	    call xvv_initop (o, 0, TY_INT)
+	    sz_val = 0
+	    call xvv_initop (o, sz_val, TY_INT)
 	    ip = 1
 	    nchars = ctoi (Memc[cptr], ip, O_VALI(o))
 	case LEX_REAL:
-	    call xvv_initop (o, 0, TY_DOUBLE)
+	    sz_val = 0
+	    call xvv_initop (o, sz_val, TY_DOUBLE)
 	    ip = 1
 	    nchars = ctod (Memc[cptr], ip, O_VALD(o))
 	case LEX_NONNUM:
-	    call xvv_initop (o, csize, TY_CHAR)
+	    sz_val = csize
+	    call xvv_initop (o, sz_val, TY_CHAR)
 	    call strcpy (Memc[cptr], O_VALC(o), csize)
 	}
 end

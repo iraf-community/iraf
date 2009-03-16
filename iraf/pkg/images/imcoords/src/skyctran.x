@@ -35,6 +35,7 @@ int	olatunits		#I the output dec/latitude units
 char	olngformat[ARB]		#I the output ra/longitude format
 char	olatformat[ARB]		#I the output dec/latitude format
 
+size_t	sz_val
 double	ilng, ilat, pilng, pilat, px, rv, tlng, tlat, olng, olat
 int	newsystem, newformat, newobject, tilngunits, tilatunits, tolngunits
 int	tolatunits, ip, key
@@ -54,12 +55,14 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
-	call salloc (tolngformat, SZ_FNAME, TY_CHAR)
-	call salloc (tolatformat, SZ_FNAME, TY_CHAR)
-	call salloc (str1, SZ_FNAME, TY_CHAR)
-	call salloc (str2, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (fmtstr, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tolngformat, sz_val, TY_CHAR)
+	call salloc (tolatformat, sz_val, TY_CHAR)
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
 
 	# Loop over the input.
 	while (scan() != EOF) {
@@ -270,11 +273,12 @@ char	olatformat[ARB]		#I the output dec/latitude format
 int	min_sigdigits		#I the minimum number of significant digits
 bool	transform		#I transform the input file
 
+size_t	sz_val
 double	ilng, ilat, tlng, tlat, olng, olat, pilng, pilat, px, rv
-int	nline, ip, max_fields, nfields, offset, nchars, nsdig_lng, nsdig_lat
+int	nline, max_fields, nfields, offset, nchars, nsdig_lng, nsdig_lat
 int	tilngunits, tilatunits, tolngunits, tolatunits
 pointer	sp, inbuf, linebuf, field_pos, outbuf, ctin, ctout
-pointer	tolngformat, tolatformat
+pointer	tolngformat, tolatformat, ip
 double	sl_da1p()
 int	sk_stati(), li_get_numd(), getline()
 pointer	sk_ictran(), sk_octran()
@@ -291,12 +295,16 @@ begin
 
 	# Allocate some memory.
 	call smark (sp)
-        call salloc (inbuf, SZ_LINE, TY_CHAR)
-        call salloc (linebuf, SZ_LINE, TY_CHAR)
-        call salloc (field_pos, MAX_FIELDS, TY_INT)
-        call salloc (outbuf, SZ_LINE, TY_CHAR)
-	call salloc (tolngformat, SZ_FNAME, TY_CHAR)
-	call salloc (tolatformat, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (inbuf, sz_val, TY_CHAR)
+        call salloc (linebuf, sz_val, TY_CHAR)
+        sz_val = MAX_FIELDS
+        call salloc (field_pos, sz_val, TY_INT)
+        sz_val = SZ_LINE
+        call salloc (outbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tolngformat, sz_val, TY_CHAR)
+	call salloc (tolatformat, sz_val, TY_CHAR)
 
 	# Set the default input and output units.
 	if (ilngunits <= 0)
@@ -524,18 +532,21 @@ int	lngcolumn		#I the input ra/longitude column
 int	latcolumn		#I the input dec/latitude column
 bool	transform		#I tranform the input file
 
+size_t	sz_val
 double	ilng, ilat
-int	ip, nline, max_fields, nfields, xoffset, yoffset, nchars
+int	nline, max_fields, nfields, xoffset, yoffset, nchars
 int	nsdig_lng, nsdig_lat, xwidth, ywidth
-pointer	sp, inbuf, linebuf, outbuf, field_pos
+pointer	sp, inbuf, linebuf, outbuf, field_pos, ip
 int	getline(), li_get_numd()
 
 begin
 	call smark (sp)
-	call salloc (inbuf, SZ_LINE, TY_CHAR)
-	call salloc (linebuf, SZ_LINE, TY_CHAR)
-	call salloc (outbuf, SZ_LINE, TY_CHAR)
-        call salloc (field_pos, MAX_FIELDS, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (inbuf, sz_val, TY_CHAR)
+	call salloc (linebuf, sz_val, TY_CHAR)
+	call salloc (outbuf, sz_val, TY_CHAR)
+        sz_val = MAX_FIELDS
+        call salloc (field_pos, sz_val, TY_INT)
 
 	if (transform) {
 	    while (getline (infd, Memc[inbuf]) != EOF)
@@ -622,6 +633,7 @@ char	olngformat[ARB]		#I the output ra/longitude format
 char	olatformat[ARB]		#I the output dec/latitude format
 bool	transform		#I transform the input file
 
+size_t	sz_val
 double	ilng, ilat, tlng, tlat, olng, olat
 int	wcs, key, tolngunits, tolatunits, newsystem, newformat, newobject
 int	ijunk
@@ -641,10 +653,12 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
-        call salloc (tolngformat, SZ_FNAME, TY_CHAR)
-        call salloc (tolatformat, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (fmtstr, sz_val, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (tolngformat, sz_val, TY_CHAR)
+        call salloc (tolatformat, sz_val, TY_CHAR)
 
 	while (clgcur ("icommands", wx, wy, wcs, key, Memc[cmd],
 	    SZ_LINE) != EOF) {
@@ -786,17 +800,21 @@ char	cmdlist[ARB]		#I the input command list
 int	newsystem		#U new coordinate system ?
 int	newformat		#U new coordinate format ?
 
+size_t	sz_val
 int	ncmd, stat
 pointer	sp, cmd, str1, str2, str3, str4, tmw, tcoo
 int	sk_stati(), strdic(), sk_decwcs()
+include	<nullptr.inc>
 
 begin
         call smark (sp)
-        call salloc (cmd, SZ_LINE, TY_CHAR)
-        call salloc (str1, SZ_FNAME, TY_CHAR)
-        call salloc (str2, SZ_FNAME, TY_CHAR)
-        call salloc (str3, SZ_FNAME, TY_CHAR)
-        call salloc (str4, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (cmd, sz_val, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (str1, sz_val, TY_CHAR)
+        call salloc (str2, sz_val, TY_CHAR)
+        call salloc (str3, sz_val, TY_CHAR)
+        call salloc (str4, sz_val, TY_CHAR)
 
         # Get the command.
         call sscan (cmdstr)
@@ -885,7 +903,7 @@ begin
 	    }
 
 	case CCMD_ISYSTEM:
-	    stat = sk_decwcs (Memc[cmd], tmw, tcoo, NULL)
+	    stat = sk_decwcs (Memc[cmd], tmw, tcoo, NULLPTR)
 	    if (Memc[cmd] == EOS || stat == ERR || (infd == NULL &&
 	        tmw == NULL)) {
 		if (tmw != NULL)
@@ -920,7 +938,7 @@ begin
 	    }
 
 	case CCMD_OSYSTEM:
-	    stat = sk_decwcs (Memc[cmd], tmw, tcoo, NULL)
+	    stat = sk_decwcs (Memc[cmd], tmw, tcoo, NULLPTR)
 	    if (Memc[cmd] == EOS || stat == ERR) {
 		if (tmw != NULL)
 		    call mw_close (tmw)
@@ -1067,6 +1085,7 @@ char	olngformat[ARB]		#I the output ra/longitude format
 char	olatformat[ARB]		#I the output dec/latitude format
 bool	transform		#I transform the input file
 
+size_t	sz_val
 double	ilng1, ilng2, ilat1, ilat2, ilngstep, ilatstep, ilng, ilat, olng, olat
 double	tlng, tlat
 int	i, j, tilngunits, tilatunits, tolngunits, tolatunits
@@ -1086,11 +1105,13 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
-	call salloc (tilngformat, SZ_FNAME, TY_CHAR)
-	call salloc (tilatformat, SZ_FNAME, TY_CHAR)
-	call salloc (tolngformat, SZ_FNAME, TY_CHAR)
-	call salloc (tolatformat, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tilngformat, sz_val, TY_CHAR)
+	call salloc (tilatformat, sz_val, TY_CHAR)
+	call salloc (tolngformat, sz_val, TY_CHAR)
+	call salloc (tolatformat, sz_val, TY_CHAR)
 
         # Set the input and output units.
         if (ilngunits <= 0)
@@ -1302,6 +1323,7 @@ char	olngformat[ARB]		#I the output x format string
 char	olatformat[ARB]		#I the output y format string
 bool	transform		#I transform the input file
 
+size_t	sz_val
 double	x1, x2, x, y1, y2, y, xstep, ystep
 int	i, j, tilngunits, tilatunits, tolngunits, tolatunits
 pointer	sp, tilngformat, tilatformat, tolngformat, tolatformat, fmtstr
@@ -1309,11 +1331,13 @@ int	sk_stati()
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
-	call salloc (tilngformat, SZ_FNAME, TY_CHAR)
-	call salloc (tilatformat, SZ_FNAME, TY_CHAR)
-	call salloc (tolngformat, SZ_FNAME, TY_CHAR)
-	call salloc (tolatformat, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tilngformat, sz_val, TY_CHAR)
+	call salloc (tilatformat, sz_val, TY_CHAR)
+	call salloc (tolngformat, sz_val, TY_CHAR)
+	call salloc (tolatformat, sz_val, TY_CHAR)
 
 	# Set the input units.
         if (ilngunits <= 0)

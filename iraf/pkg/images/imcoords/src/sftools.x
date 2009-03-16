@@ -7,7 +7,7 @@ procedure sf_gpars (sf)
 
 pointer sf                      #I pointer to the star finding structure
 
-int	clgeti()
+long	clgetl()
 real	clgetr()
 
 begin
@@ -21,7 +21,7 @@ begin
 	SF_DATAMIN(sf) = clgetr ("datamin")
 	SF_DATAMAX(sf) = clgetr ("datamax")
 	SF_SEPMIN(sf) = clgetr ("sepmin")
-	SF_NPIXMIN(sf) = clgeti ("npixmin")
+	SF_NPIXMIN(sf) = clgetl ("npixmin")
 	SF_MAGLO(sf) = clgetr ("maglo")
 	SF_MAGHI(sf) = clgetr ("maghi")
 	SF_ROUNDLO(sf) = clgetr ("roundlo")
@@ -38,8 +38,11 @@ procedure sf_init (sf)
 
 pointer	sf			#U pointer to the star finding structure
 
+size_t	sz_val
+
 begin
-	call calloc (sf, LEN_STARFIND, TY_STRUCT)
+	sz_val = LEN_STARFIND
+	call calloc (sf, sz_val, TY_STRUCT)
 
 	SF_HWHMPSF(sf) = DEF_HWHMPSF
 	SF_FRADIUS(sf) = DEF_FRADIUS

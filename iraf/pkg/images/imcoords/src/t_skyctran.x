@@ -9,6 +9,7 @@ int	ilngunits, ilatunits, olngunits, olatunits, min_sigdigits, optype
 int	instat, outstat, nilng, nilat, plngcolumn, platcolumn, pxcolumn
 int	rvcolumn
 double	ilngmin, ilngmax, ilatmin, ilatmax
+size_t	sz_val
 int	fstati()
 pointer	sp, inname, outname, insystem, outsystem, olngformat, olatformat
 pointer	inlist, outlist
@@ -20,18 +21,20 @@ int	clplen(), clgfil(), open(), sk_decwcs()
 int	clgeti(), clgwrd(), sk_stati()
 pointer	clpopnu()
 errchk	clgwrd()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (inname, SZ_FNAME, TY_CHAR)
-	call salloc (outname, SZ_FNAME, TY_CHAR)
-	call salloc (insystem, SZ_FNAME, TY_CHAR)
-	call salloc (outsystem, SZ_FNAME, TY_CHAR)
-	call salloc (ilngformat, SZ_FNAME, TY_CHAR)
-	call salloc (ilatformat, SZ_FNAME, TY_CHAR)
-	call salloc (olngformat, SZ_FNAME, TY_CHAR)
-	call salloc (olatformat, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (inname, sz_val, TY_CHAR)
+	call salloc (outname, sz_val, TY_CHAR)
+	call salloc (insystem, sz_val, TY_CHAR)
+	call salloc (outsystem, sz_val, TY_CHAR)
+	call salloc (ilngformat, sz_val, TY_CHAR)
+	call salloc (ilatformat, sz_val, TY_CHAR)
+	call salloc (olngformat, sz_val, TY_CHAR)
+	call salloc (olatformat, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Open the input and output file lists.
 	inlist = clpopnu ("input")
@@ -86,10 +89,10 @@ begin
 	        "The number of input and output files are not the same")
 
 	# Determine the input coordinate system.
-	instat = sk_decwcs (Memc[insystem], mwin, cooin, NULL)
+	instat = sk_decwcs (Memc[insystem], mwin, cooin, NULLPTR)
 
 	# Determine the output coordinate system.
-	outstat = sk_decwcs (Memc[outsystem], mwout, cooout, NULL)
+	outstat = sk_decwcs (Memc[outsystem], mwout, cooout, NULLPTR)
 
 	# Loop over the input files.
 	first_file = true

@@ -36,6 +36,8 @@ pointer	inlist, outlist
 pointer	imlist, sp, image, columns, units, iwcs, owcs, fmtstr, fmtptrs
 pointer	str, name, im, mw, ct, tmp
 
+size_t	sz_val
+long	l_val
 bool	clgetb()
 pointer	imtopenp()
 int	imtlen(), imtgetim(), fntlenb(), fntgfnb()
@@ -43,18 +45,24 @@ int	open(), mw_stati(), wt_getlabels(), ctoi(), strdic(), clgeti(), nscan()
 int	errget()
 pointer	fntopnb(), immap(), mw_openim(), mw_sctran()
 errchk	mw_openim(), mw_gwattrs(), mw_sctran()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (columns, IM_MAXDIM, TY_INT)
-	call salloc (units, IM_MAXDIM, TY_INT)
-	call salloc (iwcs, SZ_FNAME, TY_CHAR)
-	call salloc (owcs, SZ_FNAME, TY_CHAR)
-	call salloc (fmtstr, SZ_FNAME, TY_CHAR)
-	call salloc (fmtptrs, IM_MAXDIM, TY_POINTER)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (name, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (columns, sz_val, TY_INT)
+	call salloc (units, sz_val, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (iwcs, sz_val, TY_CHAR)
+	call salloc (owcs, sz_val, TY_CHAR)
+	call salloc (fmtstr, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (fmtptrs, sz_val, TY_POINTER)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (name, sz_val, TY_CHAR)
 
 	# Get the input and output image and file lists.
 	imlist = imtopenp ("image")
@@ -133,16 +141,18 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the input image.
-	    im = immap (Memc[image], READ_ONLY, 0)
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    ndim = IM_NDIM(im)
 
 	    # Open the input coordinate file.
-	    if (linlist <= 0)
+	    if (linlist <= 0) {
 	        icl = NULL
-	    else if (fntgfnb (inlist, Memc[str], SZ_FNAME) != EOF)
+	    } else if (fntgfnb (inlist, Memc[str], SZ_FNAME) != EOF) {
 	        icl = open (Memc[str], READ_ONLY, TEXT_FILE)
-	    else 
-		call seek (icl, BOF)
+	    } else {
+		l_val = BOF
+		call seek (icl, l_val)
+	    }
 
 	    # Open the output coordinate file.
 	    if (fntgfnb (outlist, Memc[str], SZ_FNAME) != EOF) {
@@ -181,15 +191,16 @@ begin
 
 		call sscan (Memc[fmtstr])
 		do i = 1, IM_MAXDIM {
-	    	    call malloc (Memi[fmtptrs+i-1], SZ_FNAME, TY_CHAR)
-		    call gargwrd (Memc[Memi[fmtptrs+i-1]], SZ_FNAME)
-		    if (nscan() != i || Memc[Memi[fmtptrs+i-1]] == EOS) {
+		    sz_val = SZ_FNAME
+	    	    call malloc (Memp[fmtptrs+i-1], sz_val, TY_CHAR)
+		    call gargwrd (Memc[Memp[fmtptrs+i-1]], SZ_FNAME)
+		    if (nscan() != i || Memc[Memp[fmtptrs+i-1]] == EOS) {
 			if (outwcs == WT_WORLD) {
 			    iferr (call mw_gwattrs (mw, i, "format",
-			        Memc[Memi[fmtptrs+i-1]], SZ_FNAME))
-			        Memc[Memi[fmtptrs+i-1]] = EOS
+			        Memc[Memp[fmtptrs+i-1]], SZ_FNAME))
+			        Memc[Memp[fmtptrs+i-1]] = EOS
 			} else
-			    Memc[Memi[fmtptrs+i-1]] = EOS
+			    Memc[Memp[fmtptrs+i-1]] = EOS
 		    }
 		}
 
@@ -249,14 +260,14 @@ begin
 
 		# Transform the coordinate file.
 		call wt_transform (im, icl, ocl, Memi[columns], Memi[units],
-		    ndim, inwcs, outwcs, mw, ct, Memi[fmtptrs], wcsndim,
+		    ndim, inwcs, outwcs, mw, ct, Memp[fmtptrs], wcsndim,
 		    min_sigdigits)
 
 	    }
 
 	    # Free the format pointers.
 	    do i = 1, IM_MAXDIM
-	        call mfree (Memi[fmtptrs+i-1], TY_CHAR)
+	        call mfree (Memp[fmtptrs+i-1], TY_CHAR)
 
 	    # Close the input image.
 	    if (mw != NULL)
@@ -307,27 +318,32 @@ pointer	fmtptrs[ARB]		#I the array of format pointers
 int	wcsndim			#I the dimensions of the wcs
 int	min_sigdigits		#I the minimum number of significant digits
 
-int	nline, ip, nread, nwrite, max_fields, nfields, offset
+size_t	sz_val
+int	nline, nread, nwrite, max_fields, nfields, offset, ip
 pointer	sp, inbuf, linebuf, field_pos, outbuf, voff, vstep, paxno, laxno, incoo
-pointer	lincoo, outcoo, nsig
+pointer	lincoo, outcoo, nsig, pp
 int	getline(), li_get_numd()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (inbuf, SZ_LINE, TY_CHAR)
-	call salloc (linebuf, SZ_LINE, TY_CHAR)
-	call salloc (field_pos, MAX_FIELDS, TY_INT)
-	call salloc (outbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (inbuf, sz_val, TY_CHAR)
+	call salloc (linebuf, sz_val, TY_CHAR)
+	sz_val = MAX_FIELDS
+	call salloc (field_pos, sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (outbuf, sz_val, TY_CHAR)
 
-	call salloc (voff, wcsndim, TY_DOUBLE)
-	call salloc (vstep, wcsndim, TY_DOUBLE)
-	call salloc (paxno, wcsndim, TY_INT)
-	call salloc (laxno, wcsndim, TY_INT)
-	call salloc (incoo, wcsndim, TY_DOUBLE)
-	call salloc (lincoo, wcsndim, TY_DOUBLE)
-	call salloc (outcoo, wcsndim, TY_DOUBLE)
-	call salloc (nsig, wcsndim, TY_INT)
+	sz_val = wcsndim
+	call salloc (voff, sz_val, TY_DOUBLE)
+	call salloc (vstep, sz_val, TY_DOUBLE)
+	call salloc (paxno, sz_val, TY_INT)
+	call salloc (laxno, sz_val, TY_INT)
+	call salloc (incoo, sz_val, TY_DOUBLE)
+	call salloc (lincoo, sz_val, TY_DOUBLE)
+	call salloc (outcoo, sz_val, TY_DOUBLE)
+	call salloc (nsig, sz_val, TY_INT)
 
 	call mw_gaxmap (mw, Memi[paxno], Memi[laxno], wcsndim)
 	call wt_laxmap (outwcs, Memi[paxno], wcsndim, Memi[laxno], ndim)
@@ -342,21 +358,22 @@ begin
 	    nwrite = ndim
 	else
 	    nwrite = wcsndim
-	call amovkd (INDEFD, Memd[outcoo], wcsndim)
+	sz_val = wcsndim
+	call amovkd (INDEFD, Memd[outcoo], sz_val)
 
 	max_fields = MAX_FIELDS
 	for (nline = 1; getline (icl, Memc[inbuf]) != EOF; nline = nline + 1) {
 
 	    # Skip over leading white space.
-	    for (ip = inbuf; IS_WHITE(Memc[ip]); ip = ip + 1)
+	    for (pp = inbuf; IS_WHITE(Memc[pp]); pp = pp + 1)
 		;
 
 	    # Pass on comment and blank lines unchanged.
-	    if (Memc[ip] == '#') {
+	    if (Memc[pp] == '#') {
                 # Pass comment lines on to the output unchanged.
                 call putline (ocl, Memc[inbuf])
                 next
-            } else if (Memc[ip] == '\n' || Memc[ip] == EOS) {
+            } else if (Memc[pp] == '\n' || Memc[pp] == EOS) {
                 # Blank lines too.
                 call putline (ocl, Memc[inbuf])
                 next
@@ -368,7 +385,8 @@ begin
                 nfields)
 
 	    # Decode the coordinates checking for valid input.
-	    call aclri (Memi[nsig], wcsndim)
+	    sz_val = wcsndim
+	    call aclri (Memi[nsig], sz_val)
 	    do ip = 1, nread {
 
 		if (columns[ip] > nfields) {
@@ -555,6 +573,7 @@ double	outcoo[ARB]		#O array of output coordinates
 int	wcsndim			#I the dimension of the wcs
 int	nread			#I the number of input coordinates.
 
+size_t	sz_val
 int	i
 
 begin
@@ -565,16 +584,20 @@ begin
 		else
 		    lincoo[i] = incoo[paxno[i]]
 	    }
-	    if (ct == NULL)
-		call amovd (lincoo, outcoo, wcsndim)
-	    else
+	    if (ct == NULL) {
+		sz_val = wcsndim
+		call amovd (lincoo, outcoo, sz_val)
+	    } else {
 		call mw_ctrand (ct, lincoo, outcoo, wcsndim)
+	    }
 
 	} else {
-	    if (ct == NULL)
-		call amovd (incoo, outcoo, wcsndim)
-	    else
+	    if (ct == NULL) {
+		sz_val = wcsndim
+		call amovd (incoo, outcoo, sz_val)
+	    } else {
 		call mw_ctrand (ct, incoo, outcoo, wcsndim)
+	    }
 	}
 
 end

@@ -15,18 +15,21 @@ int	ndim
 pointer	sp, imnamelist, image, wcs, system
 pointer	r, w, cd, ncd, nr, ltv, iltm, ltm
 pointer	imlist, im, mwim, mw
+size_t	sz_val
 bool    clgetb(), streq()
 int	imtgetim(), mw_stati()
 pointer	imtopen(), immap(), mw_openim(), mw_open()
 errchk	mw_openim()
+include	<nullptr.inc>
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (imnamelist, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (wcs, SZ_FNAME, TY_CHAR)
-	call salloc (system, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imnamelist, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (wcs, sz_val, TY_CHAR)
+	call salloc (system, sz_val, TY_CHAR)
 
 	# Get the parameters.
 	call clgstr ("image", Memc[imnamelist], SZ_FNAME)
@@ -41,7 +44,7 @@ begin
 	    call imgimage (Memc[image], Memc[image], SZ_FNAME)
 
 	    # Open the image.
-	    im = immap (Memc[image], READ_WRITE, 0)
+	    im = immap (Memc[image], READ_WRITE, NULLPTR)
 	    iferr {
 	        if (verbose) {
 	            call printf ("Initializing wcs %s for image %s\n")
@@ -60,19 +63,23 @@ begin
 
 	        # Allocate space for the transforms.
 	        ndim = mw_stati (mwim, MW_NPHYSDIM)
-	        call malloc (r, ndim * ndim, TY_DOUBLE)
-	        call malloc (w, ndim * ndim, TY_DOUBLE)
-	        call malloc (cd, ndim * ndim, TY_DOUBLE)
-	        call malloc (ltm, ndim * ndim, TY_DOUBLE)
-	        call malloc (ltv, ndim, TY_DOUBLE)
-	        call malloc (iltm, ndim * ndim, TY_DOUBLE)
-	        call malloc (nr, ndim * ndim, TY_DOUBLE)
-	        call malloc (ncd, ndim * ndim, TY_DOUBLE)
+	        sz_val = ndim * ndim
+	        call malloc (r, sz_val, TY_DOUBLE)
+	        call malloc (w, sz_val, TY_DOUBLE)
+	        call malloc (cd, sz_val, TY_DOUBLE)
+	        call malloc (ltm, sz_val, TY_DOUBLE)
+	        sz_val = ndim
+	        call malloc (ltv, sz_val, TY_DOUBLE)
+	        sz_val = ndim * ndim
+	        call malloc (iltm, sz_val, TY_DOUBLE)
+	        call malloc (nr, sz_val, TY_DOUBLE)
+	        call malloc (ncd, sz_val, TY_DOUBLE)
 
 		call mw_gwtermd (mwim, Memd[r], Memd[w], Memd[cd], ndim)
 		call mw_gltermd (mwim, Memd[ltm], Memd[ltv], ndim)
 		call mwvmuld (Memd[ltm], Memd[r], Memd[nr], ndim)
-		call aaddd (Memd[nr], Memd[ltv], Memd[nr], ndim)
+		sz_val = ndim
+		call aaddd (Memd[nr], Memd[ltv], Memd[nr], sz_val)
 		call mwinvertd (Memd[ltm], Memd[iltm], ndim)
 		call mwmmuld (Memd[cd], Memd[iltm], Memd[ncd], ndim)
 		call mw_swtermd (mwim, Memd[nr], Memd[w], Memd[ncd], ndim)
@@ -101,7 +108,7 @@ begin
 	        Memc[system])) {
 
 	        ndim = IM_NDIM(im)
-		mw = mw_open (NULL, ndim)
+		mw = mw_open (NULLPTR, ndim)
 	        call mw_saveim (mw, im)
 		call mw_close (mw)
 
@@ -132,11 +139,14 @@ double	ltm[ndim,ndim]		# the rotation matrix
 double	ltv[ndim]		# the shift vector
 int	ndim			# the number of dimensions
 
+size_t	sz_val
 int	i
 
 begin
-	call aclrd (ltm, ndim * ndim)
+	sz_val = ndim * ndim
+	call aclrd (ltm, sz_val)
 	do i = 1, ndim
 	    ltm[i,i] = 1.0d0
-	call aclrd (ltv, ndim)
+	sz_val = ndim
+	call aclrd (ltv, sz_val)
 end

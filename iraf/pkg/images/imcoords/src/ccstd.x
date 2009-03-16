@@ -19,6 +19,7 @@ pointer	sx2, sy2		#O pointers to the x and y distortion surfaces
 pointer	mw			#O pointer to the mwcs structure
 pointer	coo			#O pointer to the coordinate structure
 
+size_t	sz_val
 double	lngref, latref
 int	recstat, proj
 pointer	sp, projstr, projpars
@@ -27,8 +28,10 @@ pointer	cc_celwcs()
 
 begin
 	call smark (sp)
-	call salloc (projstr, SZ_FNAME, TY_CHAR)
-	call salloc (projpars, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (projstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (projpars, sz_val, TY_CHAR)
 
 	if (dt == NULL) {
 
@@ -98,6 +101,7 @@ pointer	sy1		#O pointer to the linear y coordinate surface
 pointer	mw		#O pointer to the mwcs structure
 pointer	coo		#O pointer to the celestial coordinate structure
 
+size_t	sz_val
 double	xref, yref, xscale, yscale, xrot, yrot, lngref, latref
 int	coostat, proj, tlngunits, tlatunits, pfd
 pointer	sp, projstr
@@ -106,11 +110,13 @@ double	dgseval()
 int	sk_decwcs(), sk_stati(), strdic(), open(), cc_rdproj()
 pointer	cc_celwcs()
 errchk	open()
+include	<nullptr.inc>
 
 begin
 	# Allocate some workin space.
 	call smark (sp)
-	call salloc (projstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (projstr, sz_val, TY_CHAR)
 
 	# Get the reference point pixel coordinates.
 	xref = clgetd ("xref")
@@ -154,7 +160,7 @@ begin
 	if (IS_INDEFD(latref))
 	    latref = 0.0d0
 
-        coostat = sk_decwcs ("j2000", mw, coo, NULL)
+        coostat = sk_decwcs ("j2000", mw, coo, NULLPTR)
         if (coostat == ERR || mw != NULL) {
             if (mw != NULL)
                 call mw_close (mw)
@@ -200,6 +206,7 @@ pointer sx1, sy1                #I pointer to linear surfaces
 pointer sx2, sy2                #I pointer to distortion surfaces
 bool    forward                 #I forward transform
 
+size_t	sz_val
 double  f, fx, fy, g, gx, gy, denom, dx, dy
 int     niter
 pointer newsx, newsy
@@ -227,19 +234,21 @@ begin
             repeat {
 
                 f = dgseval (newsx, xt, yt) - x
-                call dgsder (newsx, xt, yt, fx, 1, 1, 0)
-                call dgsder (newsx, xt, yt, fy, 1, 0, 1)
+		sz_val = 1
+                call dgsder (newsx, xt, yt, fx, sz_val, 1, 0)
+                call dgsder (newsx, xt, yt, fy, sz_val, 0, 1)
 
                 g = dgseval (newsy, xt, yt) - y
-                call dgsder (newsy, xt, yt, gx, 1, 1, 0)
-                call dgsder (newsy, xt, yt, gy, 1, 0, 1)
+		sz_val = 1
+                call dgsder (newsy, xt, yt, gx, sz_val, 1, 0)
+                call dgsder (newsy, xt, yt, gy, sz_val, 0, 1)
 
                 denom = fx * gy - fy * gx
                 dx = (-f * gy + g * fy) / denom
                 dy = (-g * fx + f * gx) / denom
                 xt = xt + dx
                 yt = yt + dy
-                if (max (abs (dx), abs (dy), abs(f), abs(g)) < 1.0e-5)
+                if (max (dabs(dx), dabs(dy), dabs(f), dabs(g)) < 1.0e-5)
                     break
 
                 niter = niter + 1

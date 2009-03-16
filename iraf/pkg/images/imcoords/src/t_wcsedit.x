@@ -29,11 +29,13 @@ int	wcsdim, parno, naxes1, naxes2, ndim
 pointer	sp, imtemplate, image, parameter, ax1list, ax2list, axes1, axes2
 pointer	value, wcs, system
 pointer	imlist, im, mwim, r, w, cd, ltm, ltv, iltm, nr, ncd
+size_t	sz_val
 bool	clgetb(), streq(), wcs_iedit()
 int	clgeti(), fstati(), wcs_decode_parno(), wcs_decode_axlist(), imtgetim()
 int	mw_stati()
 pointer	imtopen(), immap(), mw_openim(), mw_open()
 errchk	mw_newsystem()
+include	<nullptr.inc>
 
 begin
 	if (fstati (STDOUT, F_REDIR) == NO)
@@ -41,16 +43,19 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (imtemplate, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (parameter, SZ_FNAME, TY_CHAR)
-	call salloc (value, SZ_FNAME, TY_CHAR)
-	call salloc (ax1list, SZ_FNAME, TY_CHAR)
-	call salloc (ax2list, SZ_FNAME, TY_CHAR)
-	call salloc (axes1, IM_MAXDIM, TY_INT)
-	call salloc (axes2, IM_MAXDIM, TY_INT)
-	call salloc (wcs, SZ_FNAME, TY_CHAR)
-	call salloc (system, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imtemplate, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (parameter, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
+	call salloc (ax1list, sz_val, TY_CHAR)
+	call salloc (ax2list, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (axes1, sz_val, TY_INT)
+	call salloc (axes2, sz_val, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (wcs, sz_val, TY_CHAR)
+	call salloc (system, sz_val, TY_CHAR)
 
 	# Get the list of images, parameter to be edited, axes lists,
 	# and new parameter value.
@@ -114,18 +119,18 @@ begin
 	    call imgimage (Memc[image], Memc[image], SZ_FNAME)
 
 	    # Open the image and the wcs.
-	    iferr (im = immap (Memc[image], READ_WRITE, 0)) {
-	        im = immap (Memc[image], NEW_IMAGE, 0)
+	    iferr (im = immap (Memc[image], READ_WRITE, NULLPTR)) {
+	        im = immap (Memc[image], NEW_IMAGE, NULLPTR)
 		IM_NDIM(im) = 0
 		ndim = wcsdim
-		mwim = mw_open (NULL, ndim)
+		mwim = mw_open (NULLPTR, ndim)
 		call mw_newsystem (mwim, Memc[wcs], ndim)
 	    } else {
 		mwim = mw_openim (im)
 		iferr (call mw_ssystem (mwim, Memc[wcs])) {
 		    call mw_close (mwim)
 		    ndim = IM_NDIM(im)
-		    mwim = mw_open (NULL, ndim)
+		    mwim = mw_open (NULLPTR, ndim)
 		    call mw_newsystem (mwim, Memc[wcs], ndim)
 		} else
 		    ndim = mw_stati (mwim, MW_NPHYSDIM)
@@ -133,20 +138,24 @@ begin
 	    call mw_gsystem (mwim, Memc[system], SZ_FNAME)
 
 	    # Allocate working memory.
-	    call malloc (r, ndim * ndim, TY_DOUBLE)
-	    call malloc (w, ndim * ndim, TY_DOUBLE)
-	    call malloc (cd, ndim * ndim, TY_DOUBLE)
-	    call malloc (ltm, ndim * ndim, TY_DOUBLE)
-	    call malloc (ltv, ndim, TY_DOUBLE)
-	    call malloc (iltm, ndim * ndim, TY_DOUBLE)
-	    call malloc (nr, ndim * ndim, TY_DOUBLE)
-	    call malloc (ncd, ndim * ndim, TY_DOUBLE)
+	    sz_val = ndim * ndim
+	    call malloc (r, sz_val, TY_DOUBLE)
+	    call malloc (w, sz_val, TY_DOUBLE)
+	    call malloc (cd, sz_val, TY_DOUBLE)
+	    call malloc (ltm, sz_val, TY_DOUBLE)
+	    sz_val = ndim
+	    call malloc (ltv, sz_val, TY_DOUBLE)
+	    sz_val = ndim * ndim
+	    call malloc (iltm, sz_val, TY_DOUBLE)
+	    call malloc (nr, sz_val, TY_DOUBLE)
+	    call malloc (ncd, sz_val, TY_DOUBLE)
 
 	    # Compute the original world to logical transformation.
 	    call mw_gwtermd (mwim, Memd[r], Memd[w], Memd[cd], ndim)
             call mw_gltermd (mwim, Memd[ltm], Memd[ltv], ndim)
             call mwvmuld (Memd[ltm], Memd[r], Memd[nr], ndim)
-            call aaddd (Memd[nr], Memd[ltv], Memd[nr], ndim)
+	    sz_val = ndim
+            call aaddd (Memd[nr], Memd[ltv], Memd[nr], sz_val)
             call mwinvertd (Memd[ltm], Memd[iltm], ndim)
             call mwmmuld (Memd[cd], Memd[iltm], Memd[ncd], ndim)
 
@@ -197,7 +206,8 @@ begin
 		call mw_sltermd (mwim, Memd[ltm], Memd[ltv], ndim)
 		call mwmmuld (Memd[ncd], Memd[ltm], Memd[cd], ndim)
 		call mwinvertd (Memd[ltm], Memd[iltm], ndim)
-		call asubd (Memd[nr], Memd[ltv], Memd[r], ndim)
+		sz_val = ndim
+		call asubd (Memd[nr], Memd[ltv], Memd[r], sz_val)
 		call mwvmuld (Memd[iltm], Memd[r], Memd[nr], ndim)
 		call mw_swtermd (mwim, Memd[nr], Memd[w], Memd[cd], ndim)
 		call mw_saveim (mwim, im)
@@ -238,6 +248,7 @@ double	cd[ndim,ARB]		# the fits rotation matrix
 int	ndim			# the dimension of the wcs
 bool	verbose			# verbose mode
 
+size_t	sz_val
 bool	update
 int	cmd, parno, naxes1, naxes2
 pointer	sp, parameter, value, ax1list, ax2list, axes1, axes2
@@ -246,12 +257,14 @@ int	clscan(), strdic(), nscan(), wcs_decode_parno(), wcs_decode_axlist()
 begin
 	# Allocate working memory.
 	call smark (sp)
-	call salloc (parameter, SZ_FNAME, TY_CHAR)
-	call salloc (value, SZ_FNAME, TY_CHAR)
-	call salloc (ax1list, SZ_FNAME, TY_CHAR)
-	call salloc (ax2list, SZ_FNAME, TY_CHAR)
-	call salloc (axes1, ndim, TY_INT)
-	call salloc (axes2, ndim, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (parameter, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
+	call salloc (ax1list, sz_val, TY_CHAR)
+	call salloc (ax2list, sz_val, TY_CHAR)
+	sz_val = ndim
+	call salloc (axes1, sz_val, TY_INT)
+	call salloc (axes2, sz_val, TY_INT)
 
 	# Print the starting wcs.
 	if (verbose)
@@ -418,14 +431,16 @@ double	r[ARB]			# the fits crpix parameters
 double	cd[ndim,ARB]		# the fits rotation matrix
 int	ndim			# the dimension of the wcs
 
-int	i,j
+size_t	sz_val
+int	i, j
 pointer	sp, str
 errchk	mw_gwattrs()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Print the image name and current wcs.
 	call printf ("\nIMAGE: %s  CURRENT WCS: %s\n")
@@ -557,14 +572,16 @@ double	r[ARB]			# the fits crpix parameters
 double	cd[ndim,ARB]		# the fits rotation matrix
 int	ndim			# the dimension of the wcs
 
-int	i,j
+size_t	sz_val
+int	i, j
 pointer	sp, str
 errchk	mw_gwattrs()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Print the image name and current wcs.
 	call printf ("\nIMAGE: %s  CURRENT WCS: %s\n")
@@ -729,6 +746,7 @@ int	naxes1			# number of principal axes to be edited
 int	axes2[ARB]		# list of secondary axes to be edited
 int	naxes2			# number of secondary axes to be edited
 
+size_t	sz_val
 int	wcs_getaxes()
 
 begin
@@ -749,7 +767,8 @@ begin
 	        return (ERR)
 	} else {
 	    naxes2 = naxes1
-	    call amovi (axes1, axes2, naxes1)
+	    sz_val = naxes1
+	    call amovi (axes1, axes2, sz_val)
 	}
 
 	return (OK)
@@ -766,13 +785,16 @@ char	axlist[ARB]		# the axis list to be decoded
 int	axes[ARB]		# the output decode axes
 int	max_naxes		# the maximum number of output axes
 
-int	naxes, axis, ranges[3,MAX_NRANGES+1]
+size_t	sz_val
+long	axis, naxes
+long	ranges[3,MAX_NRANGES+1]
 int	decode_ranges()
 long	get_next_number()
 
 begin
 	# Clear the axes array.
-	call aclri (axes, max_naxes)
+	sz_val = max_naxes
+	call aclri (axes, sz_val)
 
 	# Check for a blank string.
 	if (axlist[1] == EOS)

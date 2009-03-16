@@ -42,6 +42,7 @@ int	geometry, function, xxorder, xyorder, xxterms, yxorder, yyorder, yxterms
 int	nrecords, pixsys, maxiter
 bool	verbose, update, interactive
 
+size_t	sz_val
 double	clgetd()
 pointer	dtmap(), immap(), gopen(), cc_utan(), cc_imtan(), imtopenp(), imtopen()
 pointer	clpopnu()
@@ -50,20 +51,24 @@ int	sk_decwcs(), sk_stati(), imtgetim(), clgfil(), open(), ctod()
 int	errget(), strncmp(), cc_rdproj(), strdic()
 bool	clgetb()
 errchk	open(), cc_map()
+include	<nullptr.inc>
 
 begin
 	# Get some working space.
 	call smark (sp)
-	call salloc (infile, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (database, SZ_FNAME, TY_CHAR)
-	call salloc (insystem, SZ_FNAME, TY_CHAR)
-	call salloc (lngref, SZ_FNAME, TY_CHAR)
-	call salloc (latref, SZ_FNAME, TY_CHAR)
-	call salloc (refsystem, SZ_FNAME, TY_CHAR)
-	call salloc (graphics, SZ_FNAME, TY_CHAR)
-	call salloc (projstr, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (infile, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (database, sz_val, TY_CHAR)
+	call salloc (insystem, sz_val, TY_CHAR)
+	call salloc (lngref, sz_val, TY_CHAR)
+	call salloc (latref, sz_val, TY_CHAR)
+	call salloc (refsystem, sz_val, TY_CHAR)
+	call salloc (graphics, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (projstr, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the input data file list.
 	inlist = clpopnu ("input")
@@ -199,7 +204,7 @@ begin
 	verbose = clgetb ("verbose")
 
 	# Open the input coordinate system.
-	coostat = sk_decwcs (Memc[insystem], mw, coo, NULL) 
+	coostat = sk_decwcs (Memc[insystem], mw, coo, NULLPTR)
 	if (coostat == ERR || mw != NULL) {
 	    call eprintf ("Error: Cannot decode the input coordinate system\n")
 	    if (mw != NULL)
@@ -236,7 +241,7 @@ begin
 	    dlatref = INDEFD
 
 	# Open the reference coordinate system if possible.
-	refstat = sk_decwcs (Memc[refsystem], mw, refcoo, NULL)
+	refstat = sk_decwcs (Memc[refsystem], mw, refcoo, NULLPTR)
 	if (refstat == ERR || mw != NULL) {
 	    if (mw != NULL)
 	        call mw_close (mw)
@@ -278,9 +283,9 @@ begin
 		if (imtgetim (imlist, Memc[image], SZ_FNAME) == EOF) {
 		    im = NULL
 		} else if (update) {
-		    im = immap (Memc[image], READ_WRITE, 0)
+		    im = immap (Memc[image], READ_WRITE, NULLPTR)
 		} else {
-		    im = immap (Memc[image], READ_ONLY, 0)
+		    im = immap (Memc[image], READ_ONLY, NULLPTR)
 		}
 		if (im != NULL) {
 		    if (IM_NDIM(im) != 2) {
@@ -344,9 +349,9 @@ begin
 		tdlngref = INDEFD
 		tdlatref = INDEFD
 	        if (verbose && res != STDOUT)
-		    call sk_iiprint ("Refsystem", Memc[insystem], NULL, coo)
+		    call sk_iiprint ("Refsystem", Memc[insystem], NULLPTR, coo)
 		if (res != NULL)
-		    call sk_iiwrite (res, "Refsystem", Memc[insystem], NULL,
+		    call sk_iiwrite (res, "Refsystem", Memc[insystem], NULLPTR,
 		    coo)
 
 	    # The tangent point was set by the user and a tangent point
@@ -357,9 +362,9 @@ begin
 		    tdlatref, lngrefunits, latrefunits)
 		call sk_stats (tcoo, S_COOSYSTEM, Memc[str], SZ_FNAME) 
 		if (verbose && res != STDOUT)
-		    call sk_iiprint ("Refsystem", Memc[str], NULL, tcoo)
+		    call sk_iiprint ("Refsystem", Memc[str], NULLPTR, tcoo)
 		if (res != NULL)
-		    call sk_iiwrite (res, "Refsystem", Memc[str], NULL, tcoo)
+		    call sk_iiwrite (res, "Refsystem", Memc[str], NULLPTR, tcoo)
 		#call mfree (tcoo, TY_STRUCT)
 		call sk_close (tcoo)
 
@@ -370,9 +375,9 @@ begin
 		    lngrefunits, latrefunits)
 		call sk_stats (tcoo, S_COOSYSTEM, Memc[str], SZ_FNAME) 
 		if (verbose && res != STDOUT)
-		    call sk_iiprint ("Refsystem", Memc[str], NULL, tcoo)
+		    call sk_iiprint ("Refsystem", Memc[str], NULLPTR, tcoo)
 		if (res != NULL)
-		    call sk_iiwrite (res, "Refsystem", Memc[str], NULL, tcoo)
+		    call sk_iiwrite (res, "Refsystem", Memc[str], NULLPTR, tcoo)
 		#call mfree (tcoo, TY_STRUCT)
 		call sk_close (tcoo)
 
@@ -383,18 +388,18 @@ begin
 		tdlngref = INDEFD
 		tdlatref = INDEFD
 	        if (verbose && res != STDOUT)
-		    call sk_iiprint ("Refsystem", Memc[insystem], NULL, coo)
+		    call sk_iiprint ("Refsystem", Memc[insystem], NULLPTR, coo)
 		if (res != NULL)
-		    call sk_iiwrite (res, "Refsystem", Memc[insystem], NULL,
+		    call sk_iiwrite (res, "Refsystem", Memc[insystem], NULLPTR,
 		        coo)
 
 	    }
 
 	    # Print information about the input coordinate system.
 	    if (verbose && res != STDOUT)
-		call sk_iiprint ("Insystem", Memc[insystem], NULL, coo)
+		call sk_iiprint ("Insystem", Memc[insystem], NULLPTR, coo)
 	    if (res != NULL)
-		call sk_iiwrite (res, "Insystem", Memc[insystem], NULL, coo)
+		call sk_iiwrite (res, "Insystem", Memc[insystem], NULLPTR, coo)
 
 	    iferr { 
 		if (interactive)
@@ -470,6 +475,7 @@ double	odlatref		#O the output reference point dec / latitude
 int	lngrefunits		#I the input reference ra / longitude units
 int	latrefunits		#I the input reference dec / latitude units
 
+size_t	sz_val
 pointer	trefcoo
 pointer	sk_copy()
 
@@ -481,8 +487,9 @@ begin
 	    call sk_seti (trefcoo, S_NLNGUNITS, lngrefunits)
 	    call sk_seti (trefcoo, S_NLATUNITS, latrefunits)
 	}
+	sz_val = 1
 	call sk_ultran (trefcoo, coo, idlngref, idlatref, odlngref, odlatref,
-	    1) 
+			sz_val)
 
 	return (trefcoo)
 end
@@ -506,15 +513,18 @@ double	odlatref		#O the output reference point dec / latitude
 int	lngrefunits		#I the input reference ra / longitude units
 int	latrefunits		#I the input reference dec / latitude units
 
+size_t	sz_val
 double	idlngref, idlatref, idepoch
 pointer	sp, str, tcoo, mw
 double	imgetd()
 pointer	sk_copy()
 int	sk_decwcs()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	iferr (idlngref = imgetd (im, lngref))
 	    idlngref = INDEFD
@@ -531,8 +541,9 @@ begin
 	    tcoo = sk_copy (coo)
 	} else if (refcoo != NULL) {
 	    tcoo = sk_copy (refcoo)
+	    sz_val = 1
 	    call sk_ultran (tcoo, coo, idlngref, idlatref, odlngref,
-	        odlatref, 1) 
+			    odlatref, sz_val)
 	} else {
 	    iferr (idepoch = imgetd (im, refsystem))
 		idepoch = INDEFD
@@ -541,7 +552,7 @@ begin
 	    else {
 		call sprintf (Memc[str], SZ_FNAME, "fk4 b%g")
 		    call pargd (idepoch)
-		if (sk_decwcs (Memc[str], mw, tcoo, NULL) == ERR) {
+		if (sk_decwcs (Memc[str], mw, tcoo, NULLPTR) == ERR) {
 		    #call mfree (tcoo, TY_STRUCT)
 		    call sk_close (tcoo)
 		    tcoo = sk_copy (coo)
@@ -549,8 +560,9 @@ begin
 	    }
 	    call sk_seti (tcoo, S_NLNGUNITS, lngrefunits)
 	    call sk_seti (tcoo, S_NLATUNITS, latrefunits)
+	    sz_val = 1
 	    call sk_ultran (tcoo, coo, idlngref, idlatref, odlngref,
-		odlatref, 1) 
+			    odlatref, sz_val)
 	}
 
 	call sfree (sp)
@@ -579,24 +591,29 @@ double	ymin, ymax		#I max and min yref values
 bool	update			#I update the image wcs
 bool	verbose			#I verbose mode
 
+size_t	sz_val
 double	mintemp, maxtemp, lngrms, latrms, lngmean, latmean
 pointer	sp, str, projstr
 pointer	xref, yref, lngref, latref, xi, eta, xifit, etafit, lngfit, latfit, wts
 pointer	sx1, sy1, sx2, sy2, xerrmsg, yerrmsg
-int	npts
+size_t	npts
 double	asumd()
-int	cc_rdxyrd(), sk_stati(), rg_wrdstr()
+int	sk_stati(), rg_wrdstr()
+long	cc_rdxyrd()
 bool	streq()
+include	<nullptr.inc>
 
 errchk	geo_fitd, geo_mgfitd()
 
 begin
 	# Get working space.
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (projstr, SZ_LINE, TY_CHAR)
-	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
-	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (projstr, sz_val, TY_CHAR)
+	call salloc (xerrmsg, sz_val, TY_CHAR)
+	call salloc (yerrmsg, sz_val, TY_CHAR)
 
 	# Initialize the pointers.
 	xref = NULL
@@ -804,7 +821,7 @@ begin
 	# Compute the wcs mapping rms.
 	if (! streq (GM_PROJSTR(fit), "tnx") && ! streq (GM_PROJSTR(fit),
 	    "zpx")) {
-	    call cc_eval (sx1, sy1, NULL, NULL, Memd[xref], Memd[yref],
+	    call cc_eval (sx1, sy1, NULLPTR, NULLPTR, Memd[xref], Memd[yref],
 	        Memd[xifit], Memd[etafit], npts)
 	    call cc_rms (fit, Memd[xi], Memd[eta], Memd[xifit],
 	        Memd[etafit], Memd[wts], npts, lngrms, latrms)
@@ -878,7 +895,7 @@ end
 # CC_RDXYRD -- Read in the x, y, ra, and dec values from the input
 # file.
 
-int procedure cc_rdxyrd (in, xcolumn, ycolumn, lngcolumn, latcolumn, xref,
+long procedure cc_rdxyrd (in, xcolumn, ycolumn, lngcolumn, latcolumn, xref,
 	yref, lngref, latref, xmin, xmax, ymin, ymax)
 
 int	in			#I the input file file descriptor
@@ -889,15 +906,19 @@ pointer	lngref, latref		#I pointers to the lng / lat value arrays
 double	xmin, xmax		#I the min and max x values
 double	ymin, ymax		#I the min and max y values
 
-int	nline, ip, npts, bufsize, nfields, max_fields, nsig, offset
-pointer	sp, inbuf, linebuf, field_pos
+size_t	sz_val
+int	nline, nfields, max_fields, nsig, offset
+size_t	npts, bufsize
+pointer	sp, inbuf, linebuf, field_pos, ip
 int	getline(), li_get_numd()
 
 begin
 	call smark (sp)
-	call salloc (inbuf, SZ_LINE, TY_CHAR)
-	call salloc (linebuf, SZ_LINE, TY_CHAR)
-	call salloc (field_pos, MAX_FIELDS, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (inbuf, sz_val, TY_CHAR)
+	call salloc (linebuf, sz_val, TY_CHAR)
+	sz_val = MAX_FIELDS
+	call salloc (field_pos, sz_val, TY_INT)
 
 	bufsize = CC_DEFBUFSIZE
 	call malloc (xref, bufsize, TY_DOUBLE)
@@ -994,12 +1015,12 @@ procedure cc_refpt (coo, lngref, latref, npts, lngmean, latmean)
 pointer	coo			#I the input coordinate system descriptor
 double	lngref[ARB]		#I the input longitude coordinates
 double	latref[ARB]		#I the input latitude coordinates
-int	npts			#I the number of input coordinates
+size_t	npts			#I the number of input coordinates
 double	lngmean			#O the output mean longitude
 double	latmean			#O the output mean latitude
 
 double	sumx, sumy, sumz, tlng, tlat, tr, tpa
-int	i
+long	i
 int	sk_stati()
 
 begin
@@ -1046,7 +1067,7 @@ begin
         if (tpa >= DTWOPI)
             tpa = tpa - DTWOPI
 	tr = sumz 
-	if (abs(tr) > 0.99d0) {
+	if (dabs(tr) > 0.99d0) {
 	    if (tr < 0.0d0)
 	        tr = DPI - asin (sqrt (sumx * sumx + sumy * sumy))
 	    else
@@ -1064,7 +1085,7 @@ begin
         if (lngmean >= DTWOPI)
             lngmean = lngmean - DTWOPI
 	latmean = sumx
-	if (abs (latmean) > 0.99d0) {
+	if (dabs (latmean) > 0.99d0) {
 	    if (latmean < 0.0d0)
 		latmean = -acos (sqrt(sumy ** 2 + sumz ** 2))
 	    else
@@ -1102,7 +1123,7 @@ double	xref[ARB]		#I the x reference coordinates
 double	yref[ARB]		#I the y reference coordinates
 double	xi[ARB]			#O the fitted xi coordinates
 double	eta[ARB]		#O the fitted eta coordinates
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 
 pointer	sp, temp
 
@@ -1135,11 +1156,11 @@ double	eta[ARB]		#I the input eta coordinates
 double	xifit[ARB]		#I the fitted chi coordinates
 double	etafit[ARB]		#I the fitted eta coordinates
 double	wts[ARB]		#I the input weights array
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 double	xirms			#O the output xi rms
 double	etarms			#O the output eta rms
 
-int	i, index, ngood
+long	i, index, ngood
 pointer	sp, twts
 
 begin
@@ -1150,7 +1171,7 @@ begin
 	# Compute the weights.
 	call amovd (wts, Memd[twts], npts)
 	do i = 1, GM_NREJECT(fit) {
-	    index = Memi[GM_REJ(fit)+i-1]
+	    index = Meml[GM_REJ(fit)+i-1]
 	    if (wts[index] > 0.0d0) 
 		Memd[twts+index-1] = 0.0d0
 	}
@@ -1191,6 +1212,7 @@ double	lngref, latref		#I the coordinates of the reference point
 pointer	sx1, sy1		#I pointer to linear surfaces
 int	comment			#I comment the output ?
 
+size_t	sz_val
 double	xshift, yshift, a, b, c, d, denom
 double	xpix, ypix, xscale, yscale, xrot, yrot
 pointer sp, str, keyword, value
@@ -1200,9 +1222,11 @@ int	sk_stati()
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (keyword, SZ_FNAME, TY_CHAR)
-	call salloc (value, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyword, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
 
 	# Compute the geometric parameters.
 	call geo_gcoeffd (sx1, sy1, xshift, yshift, a, b, c, d)
@@ -1365,14 +1389,16 @@ procedure cc_out (fit, coo, out, sx1, sy1, sx2, sy2, lxrms, lyrms)
 
 pointer	fit		#I pointer to fitting structure
 pointer	coo		#I pointer to the coordinate system structure
-int	out		#I pointer to database file
+pointer	out		#I pointer to database file
 pointer	sx1, sy1	#I pointer to linear surfaces
 pointer	sx2, sy2	#I pointer to distortion surfaces
 double	lxrms, lyrms	#I the input wcs x and y rms
 
+size_t	sz_val
 double	xshift, yshift, a, b, c, d, denom, xrms, yrms
 double	xpixref, ypixref, xscale, yscale, xrot, yrot
-int	i, npts, ncoeff
+int	i, ncoeff
+size_t	npts
 pointer	sp, str, xcoeff, ycoeff, keyword, value
 bool	fp_equald()
 int	dgsgeti(), rg_wrdstr(), sk_stati()
@@ -1380,9 +1406,10 @@ int	dgsgeti(), rg_wrdstr(), sk_stati()
 begin
 	# Allocate some working memory.
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (keyword, SZ_FNAME, TY_CHAR)
-	call salloc (value, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (keyword, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
 
 	# Compute the rms.
 	#npts = max (0, GM_NPTS(fit) - GM_NREJECT(fit) - GM_NWTS0(fit))
@@ -1523,8 +1550,9 @@ begin
 
 	# Allocate memory for linear coefficients.
 	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
-	call calloc (xcoeff, ncoeff, TY_DOUBLE)
-	call calloc (ycoeff, ncoeff, TY_DOUBLE)
+	sz_val = ncoeff
+	call calloc (xcoeff, sz_val, TY_DOUBLE)
+	call calloc (ycoeff, sz_val, TY_DOUBLE)
 
 	# Encode the linear coefficients.
 	call dgssave (sx1, Memd[xcoeff])
@@ -1552,8 +1580,9 @@ begin
 	    ncoeff = max (0, ncoeff)
 	else
 	    ncoeff = max (dgsgeti (sy2, GSNSAVE), ncoeff)
-	call calloc (xcoeff, ncoeff, TY_DOUBLE)
-	call calloc (ycoeff, ncoeff, TY_DOUBLE)
+	sz_val = ncoeff
+	call calloc (xcoeff, sz_val, TY_DOUBLE)
+	call calloc (ycoeff, sz_val, TY_DOUBLE)
 
 	# Encode the coefficients.
 	call dgssave (sx2, Memd[xcoeff])
@@ -1590,20 +1619,24 @@ double  latref[ARB]             #I the input dec / latitude coordinates
 double  lngfit[ARB]             #I the fitted ra / longitude coordinates
 double  latfit[ARB]             #I the fitted dec / latitude coordinates
 double  wts[ARB]                #I the weights array
-int     npts                    #I the number of data points
+size_t  npts                    #I the number of data points
 
+size_t	sz_val
 double  diflng, diflat
-int     i, index
+long    i, index
 pointer sp, fmtstr, lngunits, latunits, twts
 int     sk_stati()
 
 begin
         # Allocate working space.
         call smark (sp)
-        call salloc (fmtstr, SZ_LINE, TY_CHAR)
-        call salloc (lngunits, SZ_FNAME, TY_CHAR)
-        call salloc (latunits, SZ_FNAME, TY_CHAR)
-        call salloc (twts, npts, TY_DOUBLE)
+        sz_val = SZ_LINE
+        call salloc (fmtstr, sz_val, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (lngunits, sz_val, TY_CHAR)
+        call salloc (latunits, sz_val, TY_CHAR)
+        sz_val = npts
+        call salloc (twts, sz_val, TY_DOUBLE)
 
         # Get the unit strings.
         switch (sk_stati (coo, S_NLNGUNITS)) {
@@ -1626,7 +1659,7 @@ begin
         # Compute the weights.
         call amovd (wts, Memd[twts], npts)
         do i = 1, GM_NREJECT(fit) {
-            index = Memi[GM_REJ(fit)+i-1]
+            index = Meml[GM_REJ(fit)+i-1]
             if (wts[index] > 0.0d0)
                 Memd[twts+index-1] = 0.0d0
         }

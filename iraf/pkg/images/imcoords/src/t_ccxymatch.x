@@ -29,6 +29,7 @@ pointer	xtrans, ytrans, listindex, xlist, ylist, ilineno, intri, intrirat
 real	tolerance, ptolerance, xin, yin, xmag, ymag, xrot, yrot
 real	pseparation, separation, ratio
 
+size_t	sz_val
 bool	clgetb()
 double	clgetd()
 int	fstati(), clplen(), clgeti(), clgwrd(), open(), clgfil()
@@ -45,21 +46,26 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (inname, SZ_FNAME, TY_CHAR)
-	call salloc (refname, SZ_FNAME, TY_CHAR)
-	call salloc (outname, SZ_FNAME, TY_CHAR)
-	call salloc (refpoints, SZ_FNAME, TY_CHAR)
-	call salloc (xreftie, MAX_NTIE, TY_REAL)
-	call salloc (yreftie, MAX_NTIE, TY_REAL)
-	call salloc (xintie, MAX_NTIE, TY_REAL)
-	call salloc (yintie, MAX_NTIE, TY_REAL)
-	call salloc (coeff, MAX_NCOEFF, TY_REAL)
-	call salloc (projection, SZ_LINE, TY_CHAR)
-	call salloc (xformat, SZ_FNAME, TY_CHAR)
-	call salloc (yformat, SZ_FNAME, TY_CHAR)
-	call salloc (lngformat, SZ_FNAME, TY_CHAR)
-	call salloc (latformat, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (inname, sz_val, TY_CHAR)
+	call salloc (refname, sz_val, TY_CHAR)
+	call salloc (outname, sz_val, TY_CHAR)
+	call salloc (refpoints, sz_val, TY_CHAR)
+	sz_val = MAX_NTIE
+	call salloc (xreftie, sz_val, TY_REAL)
+	call salloc (yreftie, sz_val, TY_REAL)
+	call salloc (xintie, sz_val, TY_REAL)
+	call salloc (yintie, sz_val, TY_REAL)
+	sz_val = MAX_NCOEFF
+	call salloc (coeff, sz_val, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (projection, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (xformat, sz_val, TY_CHAR)
+	call salloc (yformat, sz_val, TY_CHAR)
+	call salloc (lngformat, sz_val, TY_CHAR)
+	call salloc (latformat, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the input, output, and reference lists.
 	ilist = clpopnu ("input")
@@ -218,7 +224,8 @@ begin
 		# triangles used for matching and sort them in order of
 		# increasing ratio.
 
-		call malloc (rsindex, ntrefstars, TY_INT)
+		sz_val = ntrefstars
+		call malloc (rsindex, sz_val, TY_INT)
 	    	nrefstars = rg_sort (Memr[xref], Memr[yref], Memi[rsindex],
 	            ntrefstars, separation, YES, YES)
 		if (match != RG_TRIANGLES) {
@@ -227,8 +234,10 @@ begin
 		    nreftri = nrefstars
 		} else if (nrefstars > 2) {
 	    	    nrmaxtri = rg_factorial (min (nrefstars, maxntriangles), 3)
-	    	    call calloc (reftri, SZ_TRIINDEX * nrmaxtri, TY_INT)
-	    	    call calloc (reftrirat, SZ_TRIPAR * nrmaxtri, TY_REAL)
+		    sz_val = SZ_TRIINDEX * nrmaxtri
+	    	    call calloc (reftri, sz_val, TY_INT)
+		    sz_val = SZ_TRIPAR * nrmaxtri
+	    	    call calloc (reftrirat, sz_val, TY_REAL)
 	    	    nreftri = rg_triangle (Memr[xref], Memr[yref],
 		        Memi[rsindex], nrefstars, Memi[reftri],
 			Memr[reftrirat], nrmaxtri, maxntriangles,
@@ -313,9 +322,10 @@ begin
 		    call printf (
 		        "    No valid reference triangles can be defined\n")
 	    } else {
-	        call malloc (xtrans, ntliststars, TY_REAL)
-	        call malloc (ytrans, ntliststars, TY_REAL)
-	        call malloc (listindex, ntliststars, TY_INT)
+		sz_val = ntliststars
+	        call malloc (xtrans, sz_val, TY_REAL)
+	        call malloc (ytrans, sz_val, TY_REAL)
+	        call malloc (listindex, sz_val, TY_INT)
 	        call rg_compute (Memr[xlist], Memr[ylist], Memr[xtrans],
 	            Memr[ytrans], ntliststars, Memr[coeff], MAX_NCOEFF)
 	        nliststars = rg_sort (Memr[xtrans], Memr[ytrans],
@@ -334,8 +344,10 @@ begin
 	        } else if (nliststars > 2) {
 	    	    ninmaxtri = rg_factorial (min (max(nliststars,nrefstars),
 		        maxntriangles), 3)
-	    	    call calloc (intri, SZ_TRIINDEX * ninmaxtri, TY_INT)
-	    	    call calloc (intrirat, SZ_TRIPAR * ninmaxtri, TY_REAL)
+		    sz_val = SZ_TRIINDEX * ninmaxtri
+	    	    call calloc (intri, sz_val, TY_INT)
+		    sz_val = SZ_TRIPAR * ninmaxtri
+	    	    call calloc (intrirat, sz_val, TY_REAL)
 	    	    nintri = rg_triangle (Memr[xtrans], Memr[ytrans],
 		        Memi[listindex], nliststars, Memi[intri],
 			Memr[intrirat], ninmaxtri, maxntriangles,
@@ -474,7 +486,9 @@ double	latref			#I the input reference dec / latitude
 int	lngunits		#I the ra / longitude units
 int	latunits		#I the dec / latitude units
 
-int	i, ip, bufsize, npts, lnpts, maxcols
+size_t	sz_val
+int	i, ip, lnpts, maxcols
+size_t	bufsize, npts
 double	xval, yval
 pointer	sp, str, tx, ty
 int	fscan(), nscan(), ctod()
@@ -482,7 +496,8 @@ double	asumd()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	bufsize = DEF_BUFSIZE
 	call malloc (lng, bufsize, TY_DOUBLE)

@@ -13,10 +13,12 @@ real	ratio			#I ratio of half-width in y to x
 real	theta			#I position angle of Gaussian
 real	nsigma			#I limit of convolution
 real	a, b, c, f		#O ellipse parameters
-int	nx, ny			#O dimensions of the kernel
+size_t	nx, ny			#O dimensions of the kernel
 
 real	sx2, sy2, cost, sint, discrim
 bool	fp_equalr ()
+long	lint()
+real	aabs()
 
 begin
 	# Define some temporary variables.
@@ -38,16 +40,16 @@ begin
 	    } else
 		call error (0, "SF_EGPARAMS: Cannot make 1D Gaussian.")
 	    f = nsigma ** 2 / 2.
-	    nx = 2 * int (max (sigma * nsigma * abs (cost), RMIN)) + 1
-	    ny = 2 * int (max (sigma * nsigma * abs (sint), RMIN)) + 1
+	    nx = 2 * lint (max (sigma * nsigma * aabs (cost), RMIN)) + 1
+	    ny = 2 * lint (max (sigma * nsigma * aabs (sint), RMIN)) + 1
 	} else {
 	    a = cost ** 2 / sx2 + sint ** 2 / sy2
 	    b = 2. * (1.0 / sx2 - 1.0 / sy2) * cost * sint
 	    c = sint ** 2 / sx2 + cost ** 2 / sy2
 	    discrim = b ** 2 - 4. * a * c
 	    f = nsigma ** 2 / 2.
-	    nx = 2 * int (max (sqrt (-8. * c * f / discrim), RMIN)) + 1
-	    ny = 2 * int (max (sqrt (-8. * a * f / discrim), RMIN)) + 1
+	    nx = 2 * lint (max (sqrt (-8. * c * f / discrim), RMIN)) + 1
+	    ny = 2 * lint (max (sqrt (-8. * a * f / discrim), RMIN)) + 1
 	}
 end
 
@@ -60,11 +62,11 @@ real procedure sf_egkernel (gkernel, ngkernel, skip, nx, ny, gsums, a, b, c, f)
 real	gkernel[nx,ny]		#O output Gaussian amplitude kernel
 real	ngkernel[nx,ny]		#O output normalized Gaussian amplitude kernel
 int	skip[nx,ny]		#O output skip subraster
-int	nx, ny			#I input dimensions of the kernel
+size_t	nx, ny			#I input dimensions of the kernel
 real	gsums[ARB]		#O output array of gsums
 real	a, b, c, f		#I ellipse parameters
 
-int	i, j, x0, y0, x, y
+long	i, j, x0, y0, x, y
 real	rjsq, rsq, relerr, ef
 
 begin
@@ -126,17 +128,20 @@ procedure sf_fconvolve (im, c1, c2, l1, l2, bwidth, imbuf, denbuf, ncols,
 	nlines, kernel, skip, nxk, nyk)
 
 pointer	im			#I pointer to the input image
-int	c1, c2			#I column limits in the input image
-int	l1, l2			#I line limits in the input image
-int	bwidth			#I width of pixel buffer
+long	c1, c2			#I column limits in the input image
+long	l1, l2			#I line limits in the input image
+size_t	bwidth			#I width of pixel buffer
 real	imbuf[ncols,nlines]	#O the output data buffer
 real	denbuf[ncols,nlines]	#O the output density enhancement buffer
-int	ncols, nlines		#I dimensions of the output buffers
+size_t	ncols, nlines		#I dimensions of the output buffers
 real	kernel[nxk,nyk]		#I the convolution kernel
 int	skip[nxk,nyk]		#I the skip array
-int	nxk, nyk		#I dimensions of the kernel
+size_t	nxk, nyk		#I dimensions of the kernel
 
-int	i, col1, col2, inline, index, outline
+size_t	sz_val
+long	l_val
+long	i, index, outline
+long	col1, col2, inline
 pointer	sp, lineptrs
 pointer	imgs2r()
 errchk	imgs2r
@@ -147,7 +152,8 @@ begin
 	call salloc (lineptrs, nyk, TY_POINTER)
 
 	# Set the number of image buffers.
-	call imseti (im, IM_NBUFS, nyk)
+	l_val = nyk
+	call imsetl (im, IM_NBUFS, l_val)
 
 	# Set input image column limits.
 	col1 = c1 - nxk / 2 - bwidth
@@ -207,19 +213,24 @@ procedure sf_gconvolve (im, c1, c2, l1, l2, bwidth, imbuf, denbuf, ncols,
 	nlines, kernel, skip, nxk, nyk, gsums, datamin, datamax)
 
 pointer	im			# pointer to the input image
-int	c1, c2			#I column limits in the input image
-int	l1, l2			#I line limits in the input image
-int	bwidth			#I width of pixel buffer
+long	c1, c2			#I column limits in the input image
+long	l1, l2			#I line limits in the input image
+size_t	bwidth			#I width of pixel buffer
 real	imbuf[ncols,nlines]	#O the output data buffer
 real	denbuf[ncols,nlines]	#O the output density enhancement buffer
-int	ncols, nlines		#I dimensions of the output buffers
+size_t	ncols, nlines		#I dimensions of the output buffers
 real	kernel[nxk,nyk]		#I the first convolution kernel
 int	skip[nxk,nyk]		#I the sky array
-int	nxk, nyk		#I dimensions of the kernel
+size_t	nxk, nyk		#I dimensions of the kernel
 real	gsums[ARB]		#U array of kernel sums
 real	datamin, datamax	#I the good data minimum and maximum
 
-int	i, nc, col1, col2, inline, index, outline
+size_t	sz_val
+long	l_val
+long	i
+size_t	nc
+long	index, outline
+long	col1, col2, inline
 pointer	sp, lineptrs, sd, sgsq, sg, p
 pointer	imgs2r()
 errchk	imgs2r()
@@ -230,14 +241,16 @@ begin
 	call salloc (lineptrs, nyk, TY_POINTER)
 
 	# Set the number of image buffers.
-	call imseti (im, IM_NBUFS, nyk)
+	l_val = nyk
+	call imsetl (im, IM_NBUFS, l_val)
 
 	# Allocate some working space.
 	nc = c2 - c1 + 2 * bwidth + 1
-	call salloc (sd, nc, TY_REAL)
-	call salloc (sgsq, nc, TY_REAL)
-	call salloc (sg, nc, TY_REAL)
-	call salloc (p, nc, TY_REAL)
+	sz_val = nc
+	call salloc (sd, sz_val, TY_REAL)
+	call salloc (sgsq, sz_val, TY_REAL)
+	call salloc (sg, sz_val, TY_REAL)
+	call salloc (p, sz_val, TY_REAL)
 
 	# Set input image column limits.
 	col1 = c1 - nxk / 2 - bwidth
@@ -304,12 +317,12 @@ procedure sf_skcnvr (in, out, npix, kernel, skip, nk)
 
 real	in[npix+nk-1]		#I the input vector
 real	out[npix]		#O the output vector
-int	npix			#I the size of the vector
+size_t	npix			#I the size of the vector
 real	kernel[ARB]		#I the convolution kernel
 int	skip[ARB]		#I the skip array
-int	nk			#I the size of the convolution kernel
+size_t	nk			#I the size of the convolution kernel
 
-int	i, j
+long	i, j
 real	sum
 
 begin
@@ -336,13 +349,13 @@ real	sd[ARB]			#U the computed input/output sum vector
 real	sg[ARB]			#U the input/ouput first normalization factor
 real	sgsq[ARB]		#U the input/ouput second normalization factor
 real	p[ARB]			#U the number of points vector
-int	npix			#I the size of the vector
+size_t	npix			#I the size of the vector
 real	kernel[ARB]		#I the convolution kernel
 int	skip[ARB]		#I the skip array
-int	nk			#I the size of the convolution kernel
+size_t	nk			#I the size of the convolution kernel
 real	datamin, datamax	#I the good data limits.
 
-int	i, j
+long	i, j
 real	data
 
 begin
@@ -373,12 +386,12 @@ real	sd[ARB]			#I the computed input/output sum vector
 real	sg[ARB]			#I the input/ouput first normalization factor
 real	sgsq[ARB]		#U the input/ouput second normalization factor
 real	p[ARB]			#I the number of points vector
-int	npix			#I the size of the vector
+size_t	npix			#I the size of the vector
 real	pixels			#I number of pixels
 real	denom			#I kernel normalization factor
 real	sgop			#I kernel normalization factor
 
-int	i
+long	i
 
 begin
 	do i = 1, npix {
