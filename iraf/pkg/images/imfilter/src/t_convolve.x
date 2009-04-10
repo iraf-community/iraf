@@ -22,8 +22,9 @@ int	bilinear				# Bilinear kernel
 int	radsym					# Radially symmetric kernel?
 int	delim					# record delimiter for files
 
+size_t	sz_val
 char	str[SZ_LINE], imtemp[SZ_FNAME]
-int	kxdim, kydim, dummy
+size_t	kxdim, kydim, dummy
 pointer	list1, list2
 pointer	sp, im1, im2, kername, xkername, ykername, kernel, xkernel, ykernel
 
@@ -33,13 +34,15 @@ int	imtgetim(), imtlen(), clgwrd(), btoi()
 pointer	imtopen(), immap()
 real	clgetr()
 errchk	cnv_convolve
+include	<nullptr.inc>
 
 begin
 	# Allocate temporary working space.
 	call smark (sp)
-	call salloc (kername, SZ_LINE, TY_CHAR)
-	call salloc (xkername, SZ_LINE, TY_CHAR)
-	call salloc (ykername, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (kername, sz_val, TY_CHAR)
+	call salloc (xkername, sz_val, TY_CHAR)
+	call salloc (ykername, sz_val, TY_CHAR)
 
 	# Get the input and output image parameters.
 	call clgstr ("input", imtlist1, SZ_FNAME)
@@ -103,7 +106,7 @@ begin
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
 	    # Open the input and output images.
-	    im1 = immap (image1, READ_ONLY, 0)
+	    im1 = immap (image1, READ_ONLY, NULLPTR)
 	    im2 = immap (image2, NEW_COPY, im1)
 
 	    # Convolve each image with the kernel.
@@ -166,7 +169,7 @@ char	kername[maxch]		# kernal
 int	maxch			# maximum length of kername
 int	delim		# delimiter for kernel rows
 pointer	kernel			# Gaussian kernel
-int	nx, ny			# dimensions of the kernel
+size_t	nx, ny			# dimensions of the kernel
 
 int	fd
 int	access(), stropen(), open()
@@ -190,9 +193,9 @@ end
 procedure cnv_rowflip (a, nx, ny)
 
 real	a[nx,ny]	# matrix to be flipped
-int	nx, ny		# dimensions of a
+size_t	nx, ny		# dimensions of a
 
-int	i, j, nhalf, ntotal
+long	i, j, nhalf, ntotal
 real	temp
 
 begin
@@ -215,24 +218,28 @@ procedure cnv_decode_kernel (fd, kernel, nx, ny, delim)
 
 int	fd		# file descriptor
 pointer	kernel		# pointer to kernel
-int	nx, ny		# kernel dimensions
+size_t	nx, ny		# kernel dimensions
 int	delim		# kernel row delimiter
 
+size_t	sz_val
 pointer	sp, line
-int	sz_kernel, kp, lp, minnx, maxnx, nchars
+size_t	sz_kernel, kp
+long	minnx, maxnx
+int	lp, nchars
 int	getline(), ctor()
 
 begin
 	# Allocate space for the line buffer.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Initialize row and column counters and the kernel element counter.
 	kp = 0
 	nx = 0
 	ny = 0
-	minnx = MAX_INT
-	maxnx = -MAX_INT
+	minnx = MAX_LONG
+	maxnx = -MAX_LONG
 	kernel = NULL
 
 	# Decode the kernel.

@@ -14,7 +14,10 @@ pointer	im2		#I pointer to the output image
 int	boundary	#I boundary extension type
 real	constant	#I constant for constant boundary extension
 
-int	col1, col2, ncols, line, line1, line2
+size_t	sz_val
+long	l_val
+long	col1, col2, line, line1, line2
+size_t	ncols
 pointer	filter, left, right, inbuf, outbuf
 pointer	impl2r()
 errchk	impl2r, med_buf, mde_medboxset, med_xefilter, mde_yefilter
@@ -27,13 +30,13 @@ begin
 
 	# Set the mode filtering buffers.
 	call calloc (filter, MOD_XBOX(mde) * MOD_YBOX(mde) + 1, TY_REAL)
-	call calloc (left, MOD_XBOX(mde) * MOD_YBOX(mde), TY_INT)
-	call calloc (right, MOD_XBOX(mde) * MOD_YBOX(mde), TY_INT)
+	call calloc (left, MOD_XBOX(mde) * MOD_YBOX(mde), TY_LONG)
+	call calloc (right, MOD_XBOX(mde) * MOD_YBOX(mde), TY_LONG)
 
 	# Set the input image boundary extension parameters.
 	call imseti (im1, IM_TYBNDRY, boundary)
-	call imseti (im1, IM_NBNDRYPIX, max (MOD_XBOX(mde) / 2,
-	    MOD_YBOX(mde) / 2))
+	l_val = max (MOD_XBOX(mde) / 2, MOD_YBOX(mde) / 2)
+	call imsetl (im1, IM_NBNDRYPIX, l_val)
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
 	# Set the line buffer parameters.
@@ -54,7 +57,7 @@ begin
 
 	    # Set up modal filter array for each image line.
 	    call mde_modboxset (mde, Memr[inbuf], ncols, MOD_YBOX(mde),
-	        Memr[filter], Memi[left], Memi[right], line)
+	        Memr[filter], Meml[left], Meml[right], line)
 
 	    # Get the output image line.
 	    outbuf = impl2r (im2, line)
@@ -62,24 +65,28 @@ begin
 		call error (0, "Error writing output image.")
 
 	    # Modal filter the image line.
-	    if (MOD_XBOX(mde) == 1)
+	    if (MOD_XBOX(mde) == 1) {
+		sz_val = IM_LEN(im2,1)
 		call mde_yofilter (mde, Memr[inbuf], ncols, MOD_YBOX(mde),
-		    Memr[filter], Memr[outbuf], int (IM_LEN(im2,1)))
-	    else if (MOD_YBOX(mde) == 1)
+		    Memr[filter], Memr[outbuf], sz_val)
+	    } else if (MOD_YBOX(mde) == 1) {
+		sz_val = IM_LEN(im2,1)
 		call mde_xofilter (mde, Memr[inbuf], ncols, MOD_YBOX(mde),
-		    Memr[outbuf], int (IM_LEN(im2,1)), Memr[filter],
-		    Memi[left], Memi[right])
-	    else
+		    Memr[outbuf], sz_val, Memr[filter],
+		    Meml[left], Meml[right])
+	    } else {
+		sz_val = IM_LEN(im2, 1)
 	        call mde_modboxfilter (mde, Memr[inbuf], ncols, MOD_YBOX(mde),
-		    Memr[outbuf], int (IM_LEN(im2, 1)), Memr[filter],
-		    Memi[left], Memi[right], line)
+		    Memr[outbuf], sz_val, Memr[filter],
+		    Meml[left], Meml[right], line)
+	    }
 	}
 
 	# Free the image and filter buffers.
 	call mfree (inbuf, TY_REAL)
 	call mfree (filter, TY_REAL)
-	call mfree (left, TY_INT)
-	call mfree (right, TY_INT)
+	call mfree (left, TY_LONG)
+	call mfree (right, TY_LONG)
 end
 
 
@@ -93,18 +100,22 @@ procedure mde_modboxset (mde, data, nx, ny, filter, left, right, line)
 
 pointer	mde			#I pointer to the mode structure
 real	data[nx, ny]		#I image data buffer
-int	nx			#I number of columns in image buffer
-int	ny			#I number of lines in the image buffer
+size_t	nx			#I number of columns in image buffer
+size_t	ny			#I number of lines in the image buffer
 real	filter[ARB]		#U array of elements to be sorted
-int	left[ARB]		#U array of back pointers
-int	right[ARB]		#U array of forward pointers
-int	line			#I line number
+long	left[ARB]		#U array of back pointers
+long	right[ARB]		#U array of forward pointers
+long	line			#I line number
 
-int	i, j, k, l, xbox, ybox, nlo, nhi, npts, nptsp1, start, finish, mp
+long	c_2
+size_t	xbox, ybox, npts, nptsp1, nlo, nhi
+long	i, j, k, l, start, finish, mp
 pointer	sp, insert, index
 real	sum, zlo, zhi
+long	lmod()
 
 begin
+	c_2 = 2
 	# Get algorithm parameters.
 	xbox = MOD_XBOX(mde)
 	ybox = MOD_YBOX(mde)
@@ -146,7 +157,7 @@ begin
 	    nptsp1 = npts + 1
 	    mp = 1
 
-	    call salloc (index, npts, TY_INT)
+	    call salloc (index, npts, TY_LONG)
 
 	    # Load the filter kernel.
 	    nlo = 0
@@ -162,25 +173,25 @@ begin
 		    else
 			sum = sum + data[i,j]
 		    filter[k] = data[i,j]
-		    Memi[index+k-1] = k
+		    Meml[index+k-1] = k
 		    k = k + 1
 		}
 	    }
 
 	    # Sort the initial filter kernel index array.
-	    call med_gshsrt (filter, Memi[index], npts)
+	    call med_gshsrt (filter, Meml[index], npts)
 
 	    # Set up the sorted linked list parameters.
-	    start = Memi[index]
-	    finish = Memi[index+npts-1]
+	    start = Meml[index]
+	    finish = Meml[index+npts-1]
 	    left[start] = 0
 	    do i = 2, npts
-		left[Memi[index+i-1]] = Memi[index+i-2]
+		left[Meml[index+i-1]] = Meml[index+i-2]
 	    do i = 1, npts - 1
-		right[Memi[index+i-1]] = Memi[index+i]
+		right[Meml[index+i-1]] = Meml[index+i]
 	    right[finish] = npts + 1
 
-	} else if (mod (line, 2) == 1) {
+	} else if (lmod (line, c_2) == 1) {
 
 	    npts = MOD_NPTS(mde)
 	    nptsp1 = MOD_NPTSP1(mde)
@@ -191,7 +202,7 @@ begin
 	    nhi = MOD_NHIGH(mde)
 	    sum = MOD_SUM(mde)
 
-	    call salloc (index, xbox, TY_INT)
+	    call salloc (index, xbox, TY_LONG)
 	    call salloc (insert, xbox, TY_REAL)
 
 	    # Xbox elements are deleted when lines are changed.
@@ -225,11 +236,11 @@ begin
 		else
 		    sum = sum + data[i,ny]
 		Memr[insert+i-1] = data[i,ny]
-		Memi[index+i-1] = i
+		Meml[index+i-1] = i
 	    }
 
 	    # Sort the new points.
-	    call med_gshsrt (Memr[insert], Memi[index], xbox)
+	    call med_gshsrt (Memr[insert], Meml[index], xbox)
 
 	    # Adjust the mode pointer.
 	    mp = mp + ybox
@@ -240,8 +251,8 @@ begin
 	    do i = 1, xbox {
 
 		# Insert the new point into the filter kernel.
-		l = Memi[index+i-1]
-		k = mod (mp + (l - 1) * ybox, npts)
+		l = Meml[index+i-1]
+		k = lmod (mp + (l - 1) * ybox, npts)
 		filter[k] = Memr[insert+l-1]
 
 		# Find the element to the right of the inserted point.
@@ -278,7 +289,7 @@ begin
 	    nhi = MOD_NHIGH(mde)
 	    sum = MOD_SUM(mde)
 
-	    call salloc (index, xbox, TY_INT)
+	    call salloc (index, xbox, TY_LONG)
 	    call salloc (insert, xbox, TY_REAL)
 
 	    # Xbox elements are deleted when lines are changed.
@@ -313,20 +324,20 @@ begin
 		else
 		    sum = sum + data[j,ny]
 		Memr[insert+i-1] = data[j,ny]
-		Memi[index+i-1] = i
+		Meml[index+i-1] = i
 		j = j + 1
 	    }
 
 	    # Sort the new points.
-	    call med_gshsrt (Memr[insert], Memi[index], xbox)
+	    call med_gshsrt (Memr[insert], Meml[index], xbox)
 
 	    # Do a merge sort of the old and new points.
 	    j = start
 	    do i = 1, xbox {
 
 		# Insert the new point into the filter kernel
-		l = Memi[index+i-1]
-		k = mod (mp + (l - 1) * ybox, npts)
+		l = Meml[index+i-1]
+		k = lmod (mp + (l - 1) * ybox, npts)
 		filter[k] = Memr[insert+l-1]
 
 		# Find the element to the right of the inserted point
@@ -378,16 +389,20 @@ procedure mde_modboxfilter (mde, data, nx, ny, mode, ncols, filter, left,
 
 pointer	mde		#I pointer to the mode structure
 real	data[nx, ny]	#I image data
-int	nx, ny		#I dimensions of data
+size_t	nx, ny		#I dimensions of data
 real	mode[ncols]	#O mode array
-int	ncols		#I number of output image columns
+size_t	ncols		#I number of output image columns
 real	filter[ARB]	#U the mode array of points to be filtered
-int	left[ARB]	#U the array of back pointers
-int	right[ARB]	#U the array of forward pointers
-int	line		#I current line number
+long	left[ARB]	#U the array of back pointers
+long	right[ARB]	#U the array of forward pointers
+long	line		#I current line number
+
+long	c_2
+long	lmod()
 
 begin
-	if (mod (line, 2) == 0)
+	c_2 = 2
+	if (lmod (line, c_2) == 0)
 	    call mde_oreverse_boxfilter (mde, data, nx, ny, mode, ncols,
 		filter, left, right)
 	else
@@ -403,15 +418,15 @@ procedure mde_oforward_boxfilter (mde, data, nx, ny, mode, ncols,
 
 pointer	mde		#I pointer to the mode filtering structure
 real	data[nx, ny]	#I image data
-int	nx, ny		#I dimensions of data
+size_t	nx, ny		#I dimensions of data
 real	mode[ncols]	#O mode array
-int	ncols		#I number of output image columns
+size_t	ncols		#I number of output image columns
 real	filter[ARB]	#U the array of points to be filtered
-int	left[ARB]	#U the array of back pointers
-int	right[ARB]	#U the array of forward pointers
+long	left[ARB]	#U the array of back pointers
+long	right[ARB]	#U the array of forward pointers
 
-int	i, j, k, l, col, nzero, nhalf, xbox, ybox, npts, nptsp1
-int	nlo, nhi, start, finish, mp
+size_t	xbox, ybox, nzero, nhalf, npts, nptsp1, nlo, nhi
+long	start, finish, mp, col, i, j, k, l
 real	sum, zlo, zhi
 pointer	sp, index
 
@@ -431,7 +446,7 @@ begin
 	sum = MOD_SUM(mde)
 
 	call smark (sp)
-	call salloc (index, ybox, TY_INT)
+	call salloc (index, ybox, TY_LONG)
 
 	col = 1 + xbox
 	do i = 1, ncols - 1 {
@@ -481,18 +496,18 @@ begin
 		else
 		    sum = sum + data[col,j]
 		filter[mp+j-1] = data[col,j]
-		Memi[index+j-1] = j
+		Meml[index+j-1] = j
 	    }
 
 	    # Sort array to be inserted.
-	    call med_gshsrt (filter[mp], Memi[index], ybox)
+	    call med_gshsrt (filter[mp], Meml[index], ybox)
 
 	    # Merge the sorted lists.
 	    k = start
 	    do j = 1, ybox {
 
 		# Position in filter kernel of new point
-		l = Memi[index+j-1] + mp - 1
+		l = Meml[index+j-1] + mp - 1
 
 		# Find the element to the right of the point to be inserted
 		while (filter[l] > filter[k] && k != right[finish])
@@ -557,15 +572,15 @@ procedure mde_oreverse_boxfilter (mde, data, nx, ny, mode, ncols,
 
 pointer	mde		#I pointer to the mode fitting structure
 real	data[nx, ny]	#I image data
-int	nx, ny		#I dimensions of data
+size_t	nx, ny		#I dimensions of data
 real	mode[ncols]	#O mode array
-int	ncols		#I number of output image columns
+size_t	ncols		#I number of output image columns
 real	filter[ARB]	#U the array of data to be filtered
-int	left[ARB]	#U the array of back pointers
-int	right[ARB]	#U the array of forward pointers
+long	left[ARB]	#U the array of back pointers
+long	right[ARB]	#U the array of forward pointers
 
-int	i, j, k, l, col, nhalf, xbox, ybox, npts, start, finish, nlo, nhi, mp
-int	nptsp1, nzero
+size_t	xbox, ybox, nzero, nhalf, npts, nptsp1, nlo, nhi
+long	start, finish, mp, col, i, j, k, l
 pointer	sp, index
 real	sum, zlo, zhi
 
@@ -585,7 +600,7 @@ begin
 	sum = MOD_SUM(mde)
 
 	call smark (sp)
-	call salloc (index, ybox, TY_INT)
+	call salloc (index, ybox, TY_LONG)
 
 	col = nx - xbox
 	do i = ncols, 2, - 1 {
@@ -634,18 +649,18 @@ begin
 		else
 		    sum = sum + data[col,j]
 		filter[mp+j-1] = data[col,j]
-		Memi[index+j-1] = j
+		Meml[index+j-1] = j
 	    }
 
 	    # Sort array to be inserted.
-	    call med_gshsrt (filter[mp], Memi[index], ybox)
+	    call med_gshsrt (filter[mp], Meml[index], ybox)
 
 	    # Merge the sorted lists.
 	    k = start
 	    do j = 1, ybox {
 
 		# Find position in filter kernel of new point.
-		l = Memi[index+j-1] + mp - 1
+		l = Meml[index+j-1] + mp - 1
 
 		# Find the element to the right of the point to be inserted.
 		while (filter[l] > filter[k] && k != right[finish])
@@ -710,14 +725,15 @@ procedure mde_xofilter (mde, data, nx, ny, mode, ncols, filter, left, right)
 
 pointer	mde		#I pointer to the mode structure
 real	data[nx, ny]	#I image data
-int	nx, ny		#I dimensions of data
+size_t	nx, ny		#I dimensions of data
 real	mode[ncols]	#O mode array
-int	ncols		#I number of output image columns
+size_t	ncols		#I number of output image columns
 real	filter[ARB]	#U the array of points to be modal filtered
-int	left[ARB]	#U the array of back pointers
-int	right[ARB]	#U the array of forward pointers
+long	left[ARB]	#U the array of back pointers
+long	right[ARB]	#U the array of forward pointers
 
-int	i, j, k, start, finish, mp, xbox, npts, nptsp1, nhalf, nlo, nhi, nzero
+size_t	xbox, npts, nptsp1, nhalf, nlo, nhi, nzero
+long	i, j, k, start, finish, mp
 real	sum, zlo, zhi
 
 begin
@@ -836,12 +852,13 @@ procedure mde_yofilter (mde, data, nx, ny, filter, mode, ncols)
 
 pointer	mde		#I pointer to the mode structure
 real	data[nx,ny]	#I image data
-int	nx, ny		#I dimensions of data
+size_t	nx, ny		#I dimensions of data
 real	filter[ARB]	#U array containing the points to be modal filtered
 real	mode[ncols]	#O the mode array
-int	ncols		#I number of output image columns
+size_t	ncols		#I number of output image columns
 
-int	i, j, npts, nlo, nhi
+long	i, j
+size_t	npts, nlo, nhi
 real	sum, zlo, zhi
 
 begin

@@ -17,14 +17,15 @@ int	boundary				# Type of boundary extension
 real	constant				# Constant boundary extension
 
 char	str[SZ_LINE], imtemp[SZ_FNAME]
-int	kxdim, kydim
+size_t	kxdim, kydim
 pointer	list1, list2, im1, im2
 
-int	imtgetim(), imtlen(), clgeti(), clgwrd()
+int	imtgetim(), imtlen(), clgwrd()
+long	clgetl()
 pointer	imtopen(), immap()
 real	clgetr()
-
 errchk	cnv_boxcar
+include	<nullptr.inc>
 
 begin
 	# Get task parameters
@@ -32,8 +33,8 @@ begin
 	call clgstr ("output", imtlist2, SZ_FNAME)
 
 	# Get filter parameters
-	kxdim = clgeti ("xwindow")
-	kydim = clgeti ("ywindow")
+	kxdim = clgetl ("xwindow")
+	kydim = clgetl ("ywindow")
 
 	# Get boundary extension parameters
 	boundary = clgwrd ("boundary", str, SZ_LINE,
@@ -57,7 +58,7 @@ begin
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
 	    # Open images
-	    im1 = immap (image1, READ_ONLY, 0)
+	    im1 = immap (image1, READ_ONLY, NULLPTR)
 	    im2 = immap (image2, NEW_COPY, im1)
 
 	    # Boxcar smooth an image

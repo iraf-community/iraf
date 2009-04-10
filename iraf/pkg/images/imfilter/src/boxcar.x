@@ -11,11 +11,13 @@ procedure cnv_boxcar (im1, im2, nxk, nyk, boundary, constant)
 
 pointer	im1		# pointer to the input image
 pointer	im2		# pointer to the output image
-int	nxk, nyk	# dimensions of the kernel
+size_t	nxk, nyk	# dimensions of the kernel
 int	boundary	# type of boundary extnsion
 real	constant	# constant for constant boundary extension
 
-int	i, ncols, nlines, col1, col2, inline, outline
+long	l_val
+long	i, col1, col2, inline, outline
+size_t	ncols, nlines
 pointer	sp, lineptrs, accum, outbuf
 
 pointer	imgs2r(), impl2r()
@@ -40,9 +42,11 @@ begin
 	call salloc (accum, ncols + nxk - 1, TY_REAL)
 
 	# Set boundary conditions on input image
-	call imseti (im1, IM_NBUFS, nyk)
+	l_val = nyk
+	call imsetl (im1, IM_NBUFS, l_val)
 	call imseti (im1, IM_TYBNDRY, boundary)
-	call imseti (im1, IM_NBNDRYPIX, max (nxk / 2 + 1, nyk / 2 + 1))
+	l_val = max (nxk / 2 + 1, nyk / 2 + 1)
+	call imsetl (im1, IM_NBNDRYPIX, l_val)
 	if (boundary == BT_CONSTANT)
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
 

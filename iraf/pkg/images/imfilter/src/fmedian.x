@@ -14,7 +14,10 @@ pointer	im2		#I pointer to the output image
 int	boundary	#I boundary extension type
 real	constant	#I constant for constant boundary extension
 
-int	col1, col2, ncols, line, line1, line2, nlines
+size_t	sz_val, sz_val1
+long	l_val
+long	col1, col2, line, line1, line2
+size_t	ncols, nlines
 pointer	inbuf, outbuf, hst
 real	rval
 bool	fp_equalr()
@@ -24,12 +27,13 @@ errchk	impl2r, fmd_buf, fmd_medboxset, fmd_medboxfilter
 begin
 	# Set the image boundary extension parameters.
 	call imseti (im1, IM_TYBNDRY, boundary)
-	call imseti (im1, IM_NBNDRYPIX, max (FMED_XBOX(fmd) / 2,
-	    FMED_YBOX(fmd)/ 2))
+	l_val = max (FMED_XBOX(fmd) / 2, FMED_YBOX(fmd)/ 2)
+	call imsetl (im1, IM_NBNDRYPIX, l_val)
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
 	# Allocate space for the histogram and zero.
-	call calloc (hst, FMED_HMAX(fmd) - FMED_HMIN(fmd) + 1, TY_INT)
+	sz_val = FMED_HMAX(fmd) - FMED_HMIN(fmd) + 1
+	call calloc (hst, sz_val, TY_LONG)
 
 	# Check for 1D images.
 	if (IM_NDIM(im1) == 1)
@@ -48,14 +52,16 @@ begin
 	if (IS_INDEFR(FMED_ZLOW(fmd))) {
 	    FMED_HLOW(fmd) = FMED_HMIN(fmd)
 	} else {
-	    call amapr (FMED_ZLOW(fmd), rval, 1, FMED_ZMIN(fmd),
+	    sz_val = 1
+	    call amapr (FMED_ZLOW(fmd), rval, sz_val, FMED_ZMIN(fmd),
 	        FMED_ZMAX(fmd), real(FMED_HMIN(fmd)), real(FMED_HMAX(fmd)))
 	    FMED_HLOW(fmd) = rval
 	}
 	if (IS_INDEFR(FMED_ZHIGH(fmd))) {
 	    FMED_HHIGH(fmd) = FMED_HMAX(fmd)
 	} else {
-	    call amapr (FMED_ZHIGH(fmd), rval, 1, FMED_ZMIN(fmd),
+	    sz_val = 1
+	    call amapr (FMED_ZHIGH(fmd), rval, sz_val, FMED_ZMIN(fmd),
 	        FMED_ZMAX(fmd), real(FMED_HMIN(fmd)), real(FMED_HMAX(fmd)))
 	    FMED_HHIGH(fmd) = rval
 	}
@@ -80,8 +86,9 @@ begin
 		real (FMED_HMAX(fmd)))
 
 	    # Set up median filter array for each line scanned.
-	    call fmd_medboxset (fmd, Memi[inbuf], ncols, nlines, Memi[hst],
-		FMED_HMAX(fmd) - FMED_HMIN(fmd) + 1, line)
+	    sz_val = FMED_HMAX(fmd) - FMED_HMIN(fmd) + 1
+	    call fmd_medboxset (fmd, Memi[inbuf], ncols, nlines, Meml[hst],
+				sz_val, line)
 
 	    # Get output image line.
 	    outbuf = impl2r (im2, line)
@@ -89,19 +96,22 @@ begin
 		call error (0, "Error writing output image.")
 
 	    # Median filter the image line.
+	    sz_val = IM_LEN(im2, 1)
+	    sz_val1 = FMED_HMAX(fmd) - FMED_HMIN(fmd) + 1
 	    call fmd_medboxfilter (fmd, Memi[inbuf], ncols, nlines,
-	        Memr[outbuf], int (IM_LEN(im2, 1)), Memi[hst],
-		FMED_HMAX(fmd) - FMED_HMIN(fmd) + 1, line)
+				Memr[outbuf], sz_val, Meml[hst], sz_val1, line)
 
 	    # Recover original data range.
-	    if (FMED_UNMAP(fmd) == YES && FMED_MAP(fmd) == YES)
-		call amapr (Memr[outbuf], Memr[outbuf], int (IM_LEN(im2,1)),
+	    if (FMED_UNMAP(fmd) == YES && FMED_MAP(fmd) == YES) {
+		sz_val = IM_LEN(im2,1)
+		call amapr (Memr[outbuf], Memr[outbuf], sz_val,
 		    real (FMED_HMIN(fmd)), real (FMED_HMAX(fmd)),
 		    FMED_ZMIN(fmd), FMED_ZMAX(fmd))
+	    }
 	}
 
 	# Free space.
-	call mfree (hst, TY_INT)
+	call mfree (hst, TY_LONG)
 	call mfree (inbuf, TY_INT)
 end
 
@@ -112,15 +122,20 @@ procedure fmd_medboxset (fmd, data, nx, ny, hist, nbins, line)
 
 pointer fmd				#I pointer to the fmedian structure
 int	data[nx, ny]			#I image data buffer
-int	nx				#I number of columns in image buffer
-int	ny				#I number of lines in the image buffer
-int	hist[nbins]			#U histogram
-int	nbins				#I number of histogram bins
-int	line				#I line number
+size_t	nx				#I number of columns in image buffer
+size_t	ny				#I number of lines in the image buffer
+long	hist[nbins]			#U histogram
+size_t	nbins				#I number of histogram bins
+long	line				#I line number
 
-int	i, j, xbox, ybox, hmin, hmax, hlo, hhi, nhlo, nhhi, index
-int	median, nmedian, nltmedian, nzero
+long	l_val
+long	i, j
+int	hmin, hmax, hlo, hhi, nhlo, nhhi
+size_t	xbox, ybox, index
+int	median
+long	nmedian, nltmedian, nzero
 pointer	sp, filter
+long	lmod()
 int	amedi()
 
 begin
@@ -191,7 +206,8 @@ begin
 	    nhhi = FMED_NHHIGH(fmd)
 
 	    # Add new points.
-	    if (mod (line, 2) == 0) {
+	    l_val = 2
+	    if (lmod (line, l_val) == 0) {
 	        do i = nx - xbox + 1, nx {
 		    if (data[i,ny] < hlo) {
 			nhlo = nhlo + 1
@@ -263,15 +279,19 @@ procedure fmd_medboxfilter (fmd, data, nx, ny, medline, ncols, hist,
 
 pointer	fmd		#I pointer to the fmedian structure
 int	data[nx, ny]	#I image data
-int	nx, ny		#I dimensions of data
+size_t	nx, ny		#I dimensions of data
 real	medline[ncols]	#O median array
-int	ncols		#I number of output image columns
-int	hist[nbins]	#U histogram
-int	nbins		#I length of histogram
-int	line		#I current line number
+size_t	ncols		#I number of output image columns
+long	hist[nbins]	#U histogram
+size_t	nbins		#I length of histogram
+long	line		#I current line number
+
+long	l_val
+long	lmod()
 
 begin
-	if (mod (line, 2) != 0)
+	l_val = 2
+	if (lmod (line, l_val) != 0)
 	    call fmd_eforward_filter (fmd, data, nx, ny, medline, ncols,
 	        hist, nbins)
 	else
@@ -286,14 +306,17 @@ procedure fmd_eforward_filter (fmd, data, nx, ny, medline, ncols, hist, nbins)
 
 pointer	fmd			#I pointer to the fmedian structure
 int	data[nx,ny]		#I buffer of image data
-int	nx, ny			#I dimensions of image buffer
+size_t	nx, ny			#I dimensions of image buffer
 real	medline[ncols]		#O medians
-int	ncols			#I length of output image line
-int	hist[nbins]		#U histogram
-int	nbins			#I size of histogram
+size_t	ncols			#I length of output image line
+long	hist[nbins]		#U histogram
+size_t	nbins			#I size of histogram
 
-int	i, j, xbox, ybox, dindex, hmin, hmax, hindex, hlo, hhi, nhlo, nhhi
-int	median, nmedian, nltmedian, nzero
+long	i, j, dindex, hindex
+int	hmin, hmax, hlo, hhi, nhlo, nhhi
+size_t	xbox, ybox
+int	median
+long	nmedian, nltmedian, nzero
 
 begin
 	xbox = FMED_XBOX(fmd)
@@ -424,14 +447,17 @@ procedure fmd_erev_filter (fmd, data, nx, ny, medline, ncols, hist, nbins)
 
 pointer	fmd			#I pointer to the fmedian structure
 int	data[nx,ny]		#I buffer of image data
-int	nx, ny			#I dimensions of image buffer
+size_t	nx, ny			#I dimensions of image buffer
 real	medline[ncols]		#O medians
-int	ncols			#I length of output image line
-int	hist[nbins]		#U histogram
-int	nbins			#I size of histogram
+size_t	ncols			#I length of output image line
+long	hist[nbins]		#U histogram
+size_t	nbins			#I size of histogram
 
-int	i, j, xbox, ybox, dindex, hmin, hmax, hindex, hlo, hhi, nhlo, nhhi
-int	median, nmedian, nltmedian, nzero
+long	i, j, dindex, hindex
+int	hmin, hmax, hlo, hhi, nhlo, nhhi
+size_t	xbox, ybox
+int	median
+long	nmedian, nltmedian, nzero
 
 begin
 	xbox = FMED_XBOX(fmd)

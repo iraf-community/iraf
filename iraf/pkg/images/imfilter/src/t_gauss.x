@@ -26,7 +26,8 @@ int	boundary				# Type of boundary extension
 real	constant				# Constant boundary extension
 
 char	str[SZ_LINE], imtemp[SZ_FNAME]
-int	kbilinear, nxk1, nyk1, nxk2, nyk2, radsym
+int	kbilinear, radsym
+size_t	nxk1, nyk1, nxk2, nyk2
 pointer	list1, list2, sp, im1, im2, kernel1, kernel2
 real	a1, b1, c1, f1, a2, b2, c2, f2
 
@@ -34,7 +35,7 @@ bool	clgetb(), fp_equalr()
 int	imtgetim(), imtlen(), clgwrd(), btoi()
 pointer	imtopen(), immap()
 real	clgetr()
-
+include	<nullptr.inc>
 errchk	cnv_ell_gauss, cnv_gauss_kernel, cnv_convolve
 
 begin
@@ -85,7 +86,7 @@ begin
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
 	    # Open the input and output images.
-	    im1 = immap (image1, READ_ONLY, 0)
+	    im1 = immap (image1, READ_ONLY, NULLPTR)
 	    im2 = immap (image2, NEW_COPY, im1)
 
 	    kernel1 = NULL
@@ -209,12 +210,16 @@ real	ratio			# Ratio of half-width in y to x
 real	theta			# Position angle of Gaussian
 real	nsigma			# Limit of convolution
 real	a, b, c, f		# Ellipse parameters
-int	nx, ny			# Dimensions of the kernel
+size_t	nx, ny			# Dimensions of the kernel
 
+long	c_2, l_val
 real	sx2, sy2, cost, sint, discrim
 bool	fp_equalr ()
+long	lmod()
+real	aabs()
 
 begin
+	c_2 = 2
 	# Define some constants.
 	sx2 = sigma ** 2
 	sy2 = (ratio * sigma) ** 2
@@ -236,8 +241,8 @@ begin
 		call error (0, "CNV_GAUSS_KERNEL: Cannot make 1D Gaussian.")
 
 	    f = nsigma ** 2 / 2.
-	    nx = 2. * sigma * nsigma * abs (cost) + 1.
-	    ny = 2. * sigma * nsigma * abs (sint) + 1.
+	    nx = 2. * sigma * nsigma * aabs (cost) + 1.
+	    ny = 2. * sigma * nsigma * aabs (sint) + 1.
 
 	} else {
 
@@ -251,9 +256,11 @@ begin
 	}
 
 	# Force the kernel to the next nearest odd integer.
-	if (mod (nx, 2) == 0)
+	l_val = nx
+	if (lmod (l_val, c_2) == 0)
 	    nx = nx + 1
-	if (mod (ny, 2) == 0)
+	l_val = ny
+	if (lmod (l_val, c_2) == 0)
 	    ny = ny + 1
 end
 
@@ -264,10 +271,10 @@ end
 procedure cnv_gauss_kernel (kernel, nx, ny, a, b, c, f)
 
 real	kernel[nx,ny]		# Gaussian kernel
-int	nx, ny			# Dimensions of the kernel
+size_t	nx, ny			# Dimensions of the kernel
 real	a, b, c, f		# Ellipse parameters
 
-int	i, j, x0, y0, x, y
+long	i, j, x0, y0, x, y
 real	norm
 bool 	fp_equalr()
 

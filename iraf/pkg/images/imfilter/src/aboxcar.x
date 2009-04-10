@@ -6,9 +6,9 @@ procedure cnv_aboxr (in, out, npix, knpix)
 
 real	in[npix+knpix-1]
 real	out[npix]
-int	npix, knpix
+size_t	npix, knpix
 
-int	i
+long	i
 real	sum
 
 begin

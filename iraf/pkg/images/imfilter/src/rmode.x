@@ -14,10 +14,12 @@ pointer	im2		#I pointer to the output image
 int	boundary	#I boundary extension type
 real	constant	#I constant for constant boundary extension
 short	kernel[nxk,ARB]	#I the ring filter kernel 
-int	nxk, nyk	#I dimensions of the kernel
+size_t	nxk, nyk	#I dimensions of the kernel
 
-
-int	col1, col2, ncols, line, line1, line2, nlines
+size_t	sz_val
+long	l_val
+long	col1, col2, line, line1, line2
+size_t	ncols, nlines
 pointer	inbuf, outbuf, filter
 pointer	impl2r()
 errchk	impl2r, med_buf, med_remedfilter
@@ -25,11 +27,13 @@ errchk	impl2r, med_buf, med_remedfilter
 begin
 	# Set the image boundary extension parameters.
 	call imseti (im1, IM_TYBNDRY, boundary)
-	call imseti (im1, IM_NBNDRYPIX, max (nxk / 2, nyk / 2))
+	l_val = max (nxk / 2, nyk / 2)
+	call imsetl (im1, IM_NBNDRYPIX, l_val)
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
 	# Allocate space for the points to be medianed.
-	call malloc (filter, RMOD_NRING(med), TY_REAL)
+	sz_val = RMOD_NRING(med)
+	call malloc (filter, sz_val, TY_REAL)
 
 	# Check for 1D images.
 	if (IM_NDIM(im1) == 1)
@@ -58,8 +62,9 @@ begin
 		call error (0, "Error writing output image.")
 
 	    # Median filter the image line.
+	    sz_val = IM_LEN(im2, 1)
 	    call med_romodfilter (med, Memr[inbuf], ncols, nlines, Memr[outbuf],
-		int (IM_LEN(im2, 1)), Memr[filter], kernel, nxk, nyk)
+				  sz_val, Memr[filter], kernel, nxk, nyk)
 
 	}
 
@@ -76,14 +81,16 @@ procedure med_romodfilter (med, data, nx, ny, medline, ncols, filter,
 
 pointer	med			#I pointer to the fmedian structure
 real	data[nx,ny]		#I buffer of image data
-int	nx, ny			#I dimensions of image buffer
+size_t	nx, ny			#I dimensions of image buffer
 real	medline[ncols]		#O the output array of medians
-int	ncols			#I length of output image line
+size_t	ncols			#I length of output image line
 real	filter[ARB]		#U the medianing filter
 short	kernel[xbox,ARB]	#U the ring filter kernel
-int	xbox, ybox		#U the dimensions of the kernel
+size_t	xbox, ybox		#U the dimensions of the kernel
 
-int	i, j, k, nring, npts, nlo, nhi
+long	i, j, k
+int	nring
+size_t	npts, nlo, nhi
 real	sum, zlo, zhi
 real	asokr()
 

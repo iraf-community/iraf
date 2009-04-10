@@ -12,14 +12,17 @@ procedure cnv_radcnvr (in, out, npix, kernel, knpix)
 
 real	in[npix+knpix-1]	# input vector, including boundary pixels
 real	out[ARB]		# output vector
-int	npix			# length of output vector
+size_t	npix			# length of output vector
 real	kernel[knpix]		# convolution kernel
-int	knpix			# size of convolution kernel
+size_t	knpix			# size of convolution kernel
 
-int	i, j, midpoint, hknpix
+long	c_2, l_val 
+long	i, j, midpoint, hknpix
 real	sum, k1, k2, k3
+long	lmod()
 
 begin
+	c_2 = 2
 	switch (knpix) {
 	case 1:
 	    k1 = kernel[1]
@@ -57,7 +60,8 @@ begin
 	default:
 	    hknpix = knpix / 2
 	    midpoint = hknpix + 1
-	    if (mod (knpix, 2) == 1) {
+	    l_val = knpix
+	    if (lmod (l_val, c_2) == 1) {
 	        do i = 1, npix {
 	            sum = out[i]
 	            do j = 1, hknpix
@@ -84,10 +88,10 @@ procedure cnv_awsum1 (a, b, c, npts, k)
 real	a[ARB]		# the first input vector
 real	b[ARB]		# the second input vector
 real	c[ARB]		# the output vector
-int	npts		# the number of points
+size_t	npts		# the number of points
 real	k		# the real constant
 
-int	i
+long	i
 
 begin
 	do i = 1, npts

@@ -38,26 +38,35 @@ real	blank			#I Blank values
 char	storetype[ARB]		#I Storage type
 bool	verbose			#I Verbose?
 
-int	i, j, nims, nc, nl, iindex, oindex, eindex, stat, halfwin, ot, stype
-int	fd, len[IM_MAXDIM]
+size_t	sz_val, sz_val1
+long	l_val, c_1
+long	i, j
+int	nims, iindex, oindex, eindex, stat, halfwin, ot, stype, ii
+size_t	nc, nl
+int	fd
+long	len[IM_MAXDIM]
 short	nused
 real	iscl, iscl1, oscl, val, mean, sigma, median, mode
 pointer	in, im, out, om, idata, imdata, imdata1, odata, omdata, omdata1, hdr, rm
 pointer	sp, inname, outname, imtemp, imname, omname
 pointer	iline, imline, oline, omline, hdrs, scales, sample, str, rms
 
-bool	streq(), strne(), aveqi()
+bool	streq(), strne(), aveql()
 int	open(), fscan(), nscan(), nowhite(), strdic()
 int	imtlen(), imtrgetim()
+int	imod()
 long	xt_sampler(), xt_samples()
 long	imgnlr(), impnlr(), imgnls(), impnls()
 real	imgetr(), rm_med(), rm_gmed(), rm_gdata()
 pointer	immap(), yt_mappm(), rm_open()
 errchk	immap, yt_mappm
+include	<nullptr.inc>
 
 begin
+	c_1 = 1
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Check input data for errors.
 	nims = imtlen (input)
@@ -94,38 +103,46 @@ begin
 	# Open and check scale file if one is specified.
 	if (scale[1] == '@') {
 	    fd = open (scale[2], READ_ONLY, TEXT_FILE)
-	    i = 0
+	    ii = 0
 	    while (fscan (fd) != EOF) {
-		i = i + 1
+		ii = ii + 1
 	        call gargr (val)
-		if (nscan() != 1 || i > nims) {
+		if (nscan() != 1 || ii > nims) {
 		    call close (fd)
 		    call error (13, "Scale file error")
 		}
 	    }
-	    call seek (fd, BOF)
+	    l_val = BOF
+	    call seek (fd, l_val)
 	} else
 	    fd = NULL
 
 	# Allocate memory.
-	call salloc (inname, SZ_FNAME, TY_CHAR)
-	call salloc (outname, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (omname, SZ_FNAME, TY_CHAR)
-	call salloc (iline, IM_MAXDIM, TY_LONG)
-	call salloc (imline, IM_MAXDIM, TY_LONG)
-	call salloc (oline, IM_MAXDIM, TY_LONG)
-	call salloc (omline, IM_MAXDIM, TY_LONG)
-	call salloc (hdrs, window, TY_POINTER)
-	call salloc (scales, window, TY_REAL)
-	if (streq (scale, "mode"))
-	    call salloc (sample, NSAMPLE, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (inname, sz_val, TY_CHAR)
+	call salloc (outname, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (omname, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (iline, sz_val, TY_LONG)
+	call salloc (imline, sz_val, TY_LONG)
+	call salloc (oline, sz_val, TY_LONG)
+	call salloc (omline, sz_val, TY_LONG)
+	sz_val = window
+	call salloc (hdrs, sz_val, TY_POINTER)
+	call salloc (scales, sz_val, TY_REAL)
+	if (streq (scale, "mode")) {
+	    sz_val = NSAMPLE
+	    call salloc (sample, sz_val, TY_STRUCT)
+	}
 
 	# Initialize
 	halfwin = window / 2
-	call aclri (Memi[hdrs], window)
-	call amovkr (1., Memr[scales], window)
+	sz_val = window
+	call aclrp (Memp[hdrs], sz_val)
+	sz_val = window
+	call amovkr (1., Memr[scales], sz_val)
 	imdata1 = NULL
 	omdata1 = NULL
 	oindex = 0
@@ -141,38 +158,46 @@ begin
 		call printf ("  Reading %s ...\n")
 		    call pargstr (Memc[inname])
 	    }
-	    in = immap (Memc[inname], READ_ONLY, 0)
+	    in = immap (Memc[inname], READ_ONLY, NULLPTR)
 	    im = NULL
 	    if (nowhite (inmaskkey, Memc[str], SZ_LINE) > 0) {
 	        ifnoerr (call imgstr (in, Memc[str], Memc[imname], SZ_FNAME)) {
 		    call printf ("  Reading mask %s ...\n")
 			call pargstr (Memc[imname])
-		    #im = immap (Memc[imname], READ_ONLY, 0)
+		    #im = immap (Memc[imname], READ_ONLY, NULLPTR)
 		    im = yt_mappm (Memc[imname], in, "logical",
 			Memc[imname], SZ_FNAME)
 		}
 	    }
 	    
-	    j = mod (iindex, window)
-	    hdr = Memi[hdrs+j]
+	    j = imod(iindex, window)
+	    hdr = Memp[hdrs+j]
 	    call mfree (hdr, TY_STRUCT)
-	    call malloc (hdr, LEN_IMDES+IM_HDRLEN(in)+1, TY_STRUCT)
-	    call amovi (Memi[in], Memi[hdr], LEN_IMDES)
-	    call amovi (IM_MAGIC(in), IM_MAGIC(hdr), IM_HDRLEN(in)+1)
+	    sz_val = LEN_IMDES+IM_HDRLEN(in)+1
+	    call malloc (hdr, sz_val, TY_STRUCT)
+	    sz_val = LEN_IMDES
+	    call amovp (Memp[in], Memp[hdr], sz_val)
+	    sz_val = (IM_HDRLEN(in)+1) * SZ_POINTER
+	    call amovc (IM_MAGIC(in), IM_MAGIC(hdr), sz_val)
 	    call strcpy (Memc[inname], IM_NAME(hdr), SZ_IMNAME)
-	    Memi[hdrs+j] = hdr
+	    Memp[hdrs+j] = hdr
 
 	    # Check image size.
-	    if (iindex == 1)
-		call amovi (IM_LEN(in,1), len, IM_MAXDIM)
-	    else if (!aveqi (IM_LEN(in,1), len, IM_MAXDIM))
+	    sz_val = IM_MAXDIM
+	    if (iindex == 1) {
+		call amovl (IM_LEN(in,1), len, sz_val)
+	    } else if (!aveql (IM_LEN(in,1), len, sz_val)) {
 	        call error (21, "Image sizes are not the same")
+	    }
 	    if (im != NULL) {
-	        if (!aveqi (IM_LEN(im,1), len, IM_MAXDIM))
+		sz_val = IM_MAXDIM
+	        if (!aveql (IM_LEN(im,1), len, sz_val)) {
 		    call error (21, "Mask size not the same")
+		}
 	    } else if (imdata1 == NULL) {
-	        call salloc (imdata1, IM_LEN(in,1), TY_SHORT)
-		call aclrs (Mems[imdata1], IM_LEN(in,1))
+	        sz_val = IM_LEN(in,1)
+	        call salloc (imdata1, sz_val, TY_SHORT)
+		call aclrs (Mems[imdata1], sz_val)
 	    }
 
 	    # Initialize.
@@ -186,7 +211,7 @@ begin
 		call salloc (rms, nl, TY_POINTER)
 		do j = 1, nl {
 		    rm = rm_open (window, nc, stype)
-		    Memi[rms+j-1] = rm
+		    Memp[rms+j-1] = rm
 		}
 	    }
 
@@ -204,17 +229,21 @@ begin
 		    iscl = 1.
 	    } else if (streq (scale, "mode")) {
 		if (IM_PIXTYPE(in) == TY_SHORT) {
-		    i = xt_samples (in, im, Mems[P2S(sample)], NSAMPLE, NLINES) 
+		    sz_val = NSAMPLE
+		    sz_val1 = NLINES
+		    i = xt_samples (in, im, Mems[P2S(sample)], sz_val, sz_val1)
 		    call xt_stats (Mems[P2S(sample)], i, FRAC,
 			mean, sigma, median, mode)
 		} else {
-		    i = xt_sampler (in, im, Memr[sample], NSAMPLE, NLINES) 
+		    sz_val = NSAMPLE
+		    sz_val1 = NLINES
+		    i = xt_sampler (in, im, Memr[sample], sz_val, sz_val1)
 		    call xt_statr (Memr[sample], i, FRAC,
 			mean, sigma, median, mode)
 		}
 		if (verbose) {
 		    call printf("    nsample=%d, mean=%g, median=%g, mode=%g\n")
-			call pargi (i)
+			call pargl (i)
 			call pargr (mean)
 			call pargr (median)
 			call pargr (mode)
@@ -234,14 +263,15 @@ begin
 		call printf ("    scale = %g\n")
 		    call pargr (iscl)
 	    }
-	    Memr[scales+mod(iindex,window)] = iscl
+	    Memr[scales+imod(iindex,window)] = iscl
 
 	    # Do initial accumulation.
 	    if (iindex < window) {
-		call amovkl (long(1), Meml[iline], IM_MAXDIM)
-		call amovkl (long(1), Meml[imline], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovkl (c_1, Meml[iline], sz_val)
+		call amovkl (c_1, Meml[imline], sz_val)
 		do j = 1, nl {
-		    rm = Memi[rms+j-1]
+		    rm = Memp[rms+j-1]
 		    if (im != NULL)
 			stat = imgnls (im, imdata, Meml[imline])  
 		    else
@@ -281,7 +311,7 @@ begin
 		call printf ("  Writing %s ...\n")
 		    call pargstr (Memc[outname])
 	    }
-	    hdr = Memi[hdrs+mod(oindex,window)]
+	    hdr = Memp[hdrs+imod(oindex,window)]
 	    call xt_mkimtemp (IM_NAME(hdr), Memc[outname], Memc[imtemp],
 	        SZ_FNAME)
 	    out = immap (Memc[outname], NEW_COPY, hdr)
@@ -301,19 +331,22 @@ begin
 		    call imastr (out, Memc[str], Memc[omname])
 	    } else
 	        om = NULL
-	    if (omdata1 == NULL)
-	        call salloc (omdata1, IM_LEN(in,1), TY_SHORT)
+	    if (omdata1 == NULL) {
+	        sz_val = IM_LEN(in,1)
+	        call salloc (omdata1, sz_val, TY_SHORT)
+	    }
 
 	    if (outscale)
 	        oscl = 1
 	    else
-		oscl = 1 / Memr[scales+mod(oindex,window)]
+		oscl = 1 / Memr[scales+imod(oindex,window)]
 
 	    # Add input data and create output data.
-	    call amovkl (long(1), Meml[iline], IM_MAXDIM)
-	    call amovkl (long(1), Meml[imline], IM_MAXDIM)
-	    call amovkl (long(1), Meml[oline], IM_MAXDIM)
-	    call amovkl (long(1), Meml[omline], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovkl (c_1, Meml[iline], sz_val)
+	    call amovkl (c_1, Meml[imline], sz_val)
+	    call amovkl (c_1, Meml[oline], sz_val)
+	    call amovkl (c_1, Meml[omline], sz_val)
 	    do j = 1, nl {
 		stat = impnlr (out, odata, Meml[oline])
 		if (im != NULL)
@@ -325,7 +358,7 @@ begin
 		else
 		    omdata = omdata1
 
-		rm = Memi[rms+j-1]
+		rm = Memp[rms+j-1]
 		if (IM_PIXTYPE(in) == TY_SHORT) {
 		    stat = imgnls (in, idata, Meml[iline])  
 		    switch (ot) {
@@ -417,7 +450,7 @@ begin
 		    call printf ("  Writing %s ...\n")
 			call pargstr (Memc[outname])
 		}
-		hdr = Memi[hdrs+mod(oindex,window)]
+		hdr = Memp[hdrs+imod(oindex,window)]
 		call xt_mkimtemp (IM_NAME(hdr), Memc[outname], Memc[imtemp],
 		    SZ_FNAME)
 		out = immap (Memc[outname], NEW_COPY, hdr)
@@ -436,16 +469,19 @@ begin
 			call imastr (out, Memc[str], Memc[omname])
 		} else
 		    om = NULL
-		if (omdata1 == NULL)
-		    call salloc (omdata1, IM_LEN(in,1), TY_SHORT)
+		if (omdata1 == NULL) {
+		    sz_val = IM_LEN(in,1)
+		    call salloc (omdata1, sz_val, TY_SHORT)
+		}
 
 		if (outscale)
 		    oscl = 1
 		else
-		    oscl = 1 / Memr[scales+mod(oindex,window)]
+		    oscl = 1 / Memr[scales+imod(oindex,window)]
 
-		call amovkl (long(1), Meml[oline], IM_MAXDIM)
-		call amovkl (long(1), Meml[omline], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovkl (c_1, Meml[oline], sz_val)
+		call amovkl (c_1, Meml[omline], sz_val)
 		do j = 1, nl {
 		    stat = impnlr (out, odata, Meml[oline])
 		    if (om != NULL)
@@ -453,7 +489,7 @@ begin
 		    else
 			omdata = omdata1
 
-		    rm = Memi[rms+j-1]
+		    rm = Memp[rms+j-1]
 		    switch (ot) {
 		    case OT_FILTER:
 			do i = 1, nc {
@@ -496,11 +532,11 @@ begin
 	if (fd != NULL)
 	    call close (fd)
 	do j = 1, nl {
-	    rm = Memi[rms+j-1]
+	    rm = Memp[rms+j-1]
 	    call rm_close (rm)
 	}
-	do i = 1, window {
-	    hdr = Memi[hdrs+mod(i,window)]
+	do ii = 1, window {
+	    hdr = Memp[hdrs+imod(ii,window)]
 	    call mfree (hdr, TY_STRUCT)
 	}
 	call sfree (sp)

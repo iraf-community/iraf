@@ -13,26 +13,31 @@ procedure cnv_xyconvolve (im1, im2, xkernel, nxk, ykernel, nyk, boundary,
 pointer	im1		# pointer to the input image
 pointer	im2		# pointer to the output image
 real	xkernel[ARB]	# the convolution kernel in x
-int	nxk		# dimensions of the kernel in x
+size_t	nxk		# dimensions of the kernel in x
 real	ykernel[ARB]	# the convolution kernel in x
-int	nyk		# dimensions of the kernel in y
+size_t	nyk		# dimensions of the kernel in y
 int	boundary	# type of boundary extension
 real	constant	# constant for constant boundary extension
 int	radsym		# does the kernel have radial symmetry
 
-int	i, ncols, nlines, col1, col2, nincols, inline, outline, tempi
+long	l_val, c_2
+long	col1, col2, nincols, inline, outline, tempi, i
+size_t	ncols, nlines
 pointer	sp, lineptrs, imbuf, inbuf, linebuf, outbuf, bufptr, bufptr1, bufptr2
+long	lmod()
 pointer	imgs2r(), impl2r()
 errchk	imgs2r, impl2r
 
 begin
+	c_2 = 2
 	# Allocate working space.
 	call smark (sp)
-	call salloc (lineptrs, nyk, TY_INT)
+	call salloc (lineptrs, nyk, TY_LONG)
 
 	# Set the input image boundary conditions.
 	call imseti (im1, IM_TYBNDRY, boundary)
-	call imseti (im1, IM_NBNDRYPIX, max (nxk / 2 + 1, nyk / 2 + 1))
+	l_val = max (nxk / 2 + 1, nyk / 2 + 1)
+	call imsetl (im1, IM_NBNDRYPIX, l_val)
 	if (boundary == BT_CONSTANT)
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
@@ -54,7 +59,7 @@ begin
 	# Initialise the line buffers.
 	inline = 1 - nyk / 2
 	do i = 1 , nyk {
-	    Memi[lineptrs+i-1] = i
+	    Meml[lineptrs+i-1] = i
 	    imbuf = imgs2r (im1, col1, col2, inline, inline)
 	    if (radsym == YES)
 	        call cnv_radcnvr (Memr[imbuf], Memr[inbuf+(i-1)*ncols], ncols,
@@ -77,36 +82,37 @@ begin
 	    call aclrr (Memr[outbuf], ncols)
 	    if (radsym == YES) {
 		do i = 1, nyk /2 {
-	            bufptr1 = inbuf + (Memi[lineptrs+i-1] - 1) * ncols
-	            bufptr2 = inbuf + (Memi[lineptrs+nyk-i] - 1) * ncols
+	            bufptr1 = inbuf + (Meml[lineptrs+i-1] - 1) * ncols
+	            bufptr2 = inbuf + (Meml[lineptrs+nyk-i] - 1) * ncols
 		    call aaddr (Memr[bufptr1], Memr[bufptr2], Memr[linebuf],
 		       ncols )
 		    call cnv_awsum1 (Memr[outbuf], Memr[linebuf], Memr[outbuf],
 		        ncols, ykernel[i])
 		}
-	        bufptr = inbuf + (Memi[lineptrs+nyk/2] - 1) * ncols
-		if (mod (nyk, 2) == 1)
+	        bufptr = inbuf + (Meml[lineptrs+nyk/2] - 1) * ncols
+		l_val = nyk
+		if (lmod (l_val, c_2) == 1)
 		    call cnv_awsum1 (Memr[outbuf], Memr[bufptr], Memr[outbuf],
 		        ncols, ykernel[nyk/2+1])
 	    } else {
 	        do i = 1, nyk {
-	            bufptr = inbuf + (Memi[lineptrs+i-1] - 1) * ncols
+	            bufptr = inbuf + (Meml[lineptrs+i-1] - 1) * ncols
 		    call cnv_awsum1 (Memr[outbuf], Memr[bufptr], Memr[outbuf],
 		        ncols, ykernel[i])
 	        }
 	    }
 
 	    # Scroll the input buffer indices.
-	    tempi = Memi[lineptrs]
+	    tempi = Meml[lineptrs]
 	    do i = 1, nyk - 1
-		Memi[lineptrs+i-1] = Memi[lineptrs+i]
-	    Memi[lineptrs+nyk-1] = tempi
+		Meml[lineptrs+i-1] = Meml[lineptrs+i]
+	    Meml[lineptrs+nyk-1] = tempi
 
 	    # Read in the new input image line.
 	    imbuf = imgs2r (im1, col1, col2, inline, inline)
 
 	    # Do the 1D convolution and add the vector into the input buffer.
-	    bufptr = inbuf + (Memi[lineptrs+nyk-1] - 1) * ncols
+	    bufptr = inbuf + (Meml[lineptrs+nyk-1] - 1) * ncols
 	    call aclrr (Memr[bufptr], ncols)
 	    if (radsym == YES)
 	        call cnv_radcnvr (Memr[imbuf], Memr[bufptr], ncols, xkernel,

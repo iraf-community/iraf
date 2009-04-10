@@ -14,10 +14,13 @@ pointer	im2		#I pointer to the output image
 int	boundary	#I boundary extension type
 real	constant	#I constant for constant boundary extension
 short	kernel[nxk,ARB]	#I the ring filter kernel 
-int	nxk, nyk	#I dimensions of the kernel
+size_t	nxk, nyk	#I dimensions of the kernel
 
-
-int	col1, col2, ncols, line, line1, line2, nlines
+size_t	sz_val, sz_val1
+long	l_val
+long	col1, col2
+long	line, line1, line2
+size_t	ncols, nlines
 pointer	inbuf, outbuf, hst
 real	rval
 bool	fp_equalr()
@@ -27,11 +30,13 @@ errchk	impl2r, fmd_buf, fmd_remedfilter
 begin
 	# Set the image boundary extension parameters.
 	call imseti (im1, IM_TYBNDRY, boundary)
-	call imseti (im1, IM_NBNDRYPIX, max (nxk / 2, nyk / 2))
+	l_val = max (nxk / 2, nyk / 2)
+	call imsetl (im1, IM_NBNDRYPIX, l_val)
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
 	# Allocate space for the histogram and zero.
-	call calloc (hst, FRMED_HMAX(fmd) - FRMED_HMIN(fmd) + 1, TY_INT)
+	sz_val = FRMED_HMAX(fmd) - FRMED_HMIN(fmd) + 1
+	call calloc (hst, sz_val, TY_LONG)
 
 	# Check for 1D images.
 	if (IM_NDIM(im1) == 1)
@@ -50,14 +55,16 @@ begin
 	if (IS_INDEFR(FRMED_ZLOW(fmd))) {
 	    FRMED_HLOW(fmd) = FRMED_HMIN(fmd)
 	} else {
-	    call amapr (FRMED_ZLOW(fmd), rval, 1, FRMED_ZMIN(fmd),
+	    sz_val = 1
+	    call amapr (FRMED_ZLOW(fmd), rval, sz_val, FRMED_ZMIN(fmd),
 	        FRMED_ZMAX(fmd), real(FRMED_HMIN(fmd)), real(FRMED_HMAX(fmd)))
 	    FRMED_HLOW(fmd) = rval
 	}
 	if (IS_INDEFR(FRMED_ZHIGH(fmd))) {
 	    FRMED_HHIGH(fmd) = FRMED_HMAX(fmd)
 	} else {
-	    call amapr (FRMED_ZHIGH(fmd), rval, 1, FRMED_ZMIN(fmd),
+	    sz_val = 1
+	    call amapr (FRMED_ZHIGH(fmd), rval, sz_val, FRMED_ZMIN(fmd),
 	        FRMED_ZMAX(fmd), real(FRMED_HMIN(fmd)), real(FRMED_HMAX(fmd)))
 	    FRMED_HHIGH(fmd) = rval
 	}
@@ -87,19 +94,21 @@ begin
 		call error (0, "Error writing output image.")
 
 	    # Median filter the image line.
+	    sz_val = IM_LEN(im2, 1)
+	    sz_val1 = FRMED_HMAX(fmd) - FRMED_HMIN(fmd) + 1
 	    call fmd_remedfilter (fmd, Memi[inbuf], ncols, nlines, Memr[outbuf],
-		int (IM_LEN(im2, 1)), Memi[hst], FRMED_HMAX(fmd) -
-		FRMED_HMIN(fmd) + 1, kernel, nxk, nyk)
+		sz_val, Meml[hst], sz_val1, kernel, nxk, nyk)
 
 	    # Recover original data range.
+	    sz_val = IM_LEN(im2,1)
 	    if (FRMED_UNMAP(fmd) == YES && FRMED_MAP(fmd) == YES)
-		call amapr (Memr[outbuf], Memr[outbuf], int (IM_LEN(im2,1)),
+		call amapr (Memr[outbuf], Memr[outbuf], sz_val,
 		    real (FRMED_HMIN(fmd)), real (FRMED_HMAX(fmd)),
 		    FRMED_ZMIN(fmd), FRMED_ZMAX(fmd))
 	}
 
 	# Free space.
-	call mfree (hst, TY_INT)
+	call mfree (hst, TY_LONG)
 	call mfree (inbuf, TY_INT)
 end
 
@@ -111,16 +120,19 @@ procedure fmd_remedfilter (fmd, data, nx, ny, medline, ncols, hist, nbins,
 
 pointer	fmd			#I pointer to the frmedian structure
 int	data[nx,ny]		#I buffer of image data
-int	nx, ny			#I dimensions of image buffer
+size_t	nx, ny			#I dimensions of image buffer
 real	medline[ncols]		#O medians
-int	ncols			#I length of output image line
-int	hist[nbins]		#U histogram
-int	nbins			#I size of histogram
+size_t	ncols			#I length of output image line
+long	hist[nbins]		#U histogram
+size_t	nbins			#I size of histogram
 short	kernel[xbox,ARB]	#I the ring filter kernel
-int	xbox, ybox		#I the dimensions of the kernel
+size_t	xbox, ybox		#I the dimensions of the kernel
 
-int	i, j, k, hmin, hmax, hindex, hlo, hhi, nhlo, nhhi
-int	ohmin, ohmax, nring, nmedian, nzero, hsum
+size_t	sz_val
+long	i, j, k
+int	hmin, hmax, hindex, hlo, hhi, nhlo, nhhi
+int	ohmin, ohmax, nring
+long	nmedian, nzero, hsum
 
 begin
 	nring = FRMED_NRING(fmd)
@@ -170,7 +182,8 @@ begin
 		    hsum = hsum + hist[j]
 		}
 		medline[i] = j + hmin - 1
-	        call aclri (hist[ohmin-hmin+1], ohmax - ohmin + 1)
+		sz_val = ohmax - ohmin + 1
+	        call aclrl (hist[ohmin-hmin+1], sz_val)
 
 	    } else if (nhlo < nhhi)
 	        medline[i] = hhi

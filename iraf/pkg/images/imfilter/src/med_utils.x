@@ -10,12 +10,16 @@ real	sigma			#I sigma of Gaussian in x
 real	ratio			#I ratio of half-width in y to x
 real	theta			#I position angle of Gaussian
 real	a, b, c, f		#O ellipse parameters
-int	nx, ny			#O dimensions of the kernel
+size_t	nx, ny			#O dimensions of the kernel
 
+long	l_val, c_2
 real	sx2, sy2, cost, sint, discrim
+real	aabs()
+long	lmod()
 bool	fp_equalr ()
 
 begin
+	c_2 = 2
 	# Define some constants.
 	sx2 = sigma ** 2
 	sy2 = (ratio * sigma) ** 2
@@ -44,8 +48,8 @@ begin
 		call error (0, "MED_GAUSS_KERNEL: Cannot make 1D Gaussian.")
 
 	    f = 0.5
-	    nx = 2. * sigma * abs (cost) + 1.
-	    ny = 2. * sigma * abs (sint) + 1.
+	    nx = 2. * sigma * aabs (cost) + 1.
+	    ny = 2. * sigma * aabs (sint) + 1.
 
 	} else {
 
@@ -59,9 +63,11 @@ begin
 	}
 
 	# Force the kernel to the next nearest odd integer.
-	if (mod (nx, 2) == 0)
+	l_val = nx
+	if (lmod (l_val, c_2) == 0)
 	    nx = nx + 1
-	if (mod (ny, 2) == 0)
+	l_val = ny
+	if (lmod (l_val, c_2) == 0)
 	    ny = ny + 1
 end
 
@@ -72,11 +78,12 @@ end
 int procedure med_mkring (kernel, nx, ny, a1, b1, c1, f1, a2, b2, c2, f2)
 
 short	kernel[nx,ny]		#O Gaussian kernel
-int	nx, ny			#I dimensions of the kernel
+size_t	nx, ny			#I dimensions of the kernel
 real	a1, b1, c1, f1		#I inner ellipse parameters
 real	a2, b2, c2, f2		#I outer ellipse parameters
 
-int	i, j, x0, y0, x, y, nring
+long	i, j, x0, y0, x, y
+int	nring
 real	k1, k2
 
 begin

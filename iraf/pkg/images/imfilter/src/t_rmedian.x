@@ -10,10 +10,12 @@ include "rmedian.h"
 procedure t_rmedian()
 
 bool	verbose
-int	boundary, nxk, nyk
+int	boundary
+size_t	nxk, nyk
 pointer	list1, list2, sp, imtlist1, imtlist2, image1, image2, imtemp, str
 pointer	med, im1, im2, kernel
 real	rinner, router, ratio, theta, constant, a1, b1, c1, f1, a2, b2, c2, f2
+size_t	sz_val
 
 bool	clgetb(), fp_equalr()
 int	imtgetim(), imtlen(), clgwrd()
@@ -21,19 +23,24 @@ int	med_mkring()
 pointer	imtopen(), immap()
 real	clgetr()
 errchk	med_ell_gauss, med_mkring, med_medring
+include	<nullptr.inc>
 
 begin
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (imtlist1, SZ_LINE, TY_CHAR)
-	call salloc (imtlist2, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (imtlist1, sz_val, TY_CHAR)
+	call salloc (imtlist2, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Allcoate space for the rmedian structure.
-	call calloc (med, LEN_RMEDIAN_STRUCT, TY_STRUCT)
+	sz_val = LEN_RMEDIAN_STRUCT
+	call calloc (med, sz_val, TY_STRUCT)
 
 	# Get the task parameters.
 	call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -90,7 +97,7 @@ begin
 	    call xt_mkimtemp (Memc[image1], Memc[image2], Memc[imtemp],
 	        SZ_FNAME)
 
-	    im1 = immap (Memc[image1], READ_ONLY, 0)
+	    im1 = immap (Memc[image1], READ_ONLY, NULLPTR)
 	    im2 = immap (Memc[image2], NEW_COPY, im1)
 
 	    if (verbose) {

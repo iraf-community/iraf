@@ -12,11 +12,11 @@ procedure fmd_maxmin (im, xbox, ybox, boundary, constant, minimum, maximum)
 pointer	im		#I pointer to image
 int	boundary	#I type of boundary extension
 real	constant	#I constant for boundary extension
-int	xbox, ybox	#I median filter size
+size_t	xbox, ybox	#I median filter size
 real	minimum		#O image minimum
 real	maximum		#O image maximum
 
-int	i, col1, col2, line1, line2
+long	i, col1, col2, line1, line2
 pointer	buf
 real	minval, maxval
 
@@ -27,7 +27,7 @@ begin
 
 	    # Set image boundary extension parameters.
 	    call imseti (im, IM_TYBNDRY, boundary)
-	    call imseti (im, IM_NBNDRYPIX, max (xbox / 2, ybox / 2))
+	    call imsetl (im, IM_NBNDRYPIX, max (xbox / 2, ybox / 2))
 	    call imsetr (im, IM_BNDRYPIXVAL, constant)
 
 	    # Set the column and line boundaries.

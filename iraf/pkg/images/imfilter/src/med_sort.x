@@ -5,10 +5,10 @@
 procedure med_ashsrt (a, npts)
 
 real	a[ARB]			#U array to be sorted
-int	npts			#I number of points
+size_t	npts			#I number of points
 
 real	temp
-int	j, k, d
+long	j, k, d
 define	swap {temp=$1;$1=$2;$2=temp}
 
 begin
@@ -89,11 +89,11 @@ end
 procedure med_gshsrt (a, index, npts)
 
 real	a[ARB]			#I array to be sorted
-int	index[ARB]		#O array of indices
-int	npts			#I number of points in the array
+long	index[ARB]		#O array of indices
+size_t	npts			#I number of points in the array
 
-int	j, k
-int	d, temp
+long	j, k
+long	d, temp
 define	swap {temp=$1;$1=$2;$2=temp}
 
 begin

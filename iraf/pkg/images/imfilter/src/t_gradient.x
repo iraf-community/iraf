@@ -29,13 +29,13 @@ int	boundary				# Type of boundary extension
 real	constant				# Constant boundary extension
 
 char	str[SZ_LINE], imtemp[SZ_FNAME]
-int	nxk, nyk
+size_t	nxk, nyk
 pointer	list1, list2, sp, im1, im2, kernel
 
 int	imtgetim(), imtlen(), clgwrd()
 pointer	imtopen(), immap()
 real	clgetr()
-
+include	<nullptr.inc>
 errchk	cnv_convolve
 
 begin
@@ -68,7 +68,7 @@ begin
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
 	    # Open images.
-	    im1 = immap (image1, READ_ONLY, 0)
+	    im1 = immap (image1, READ_ONLY, NULLPTR)
 	    im2 = immap (image2, NEW_COPY, im1)
 
 	    kernel = NULL
@@ -125,7 +125,7 @@ end
 procedure cnv_gradient_kernel (kernel, nx, ny, filter)
 
 real	kernel[nx,ny]		# Gaussian kernel
-int	nx, ny			# dimensions of the kernel
+size_t	nx, ny			# dimensions of the kernel
 int	filter			# which filter
 
 real	norm

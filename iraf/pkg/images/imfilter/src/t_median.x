@@ -9,36 +9,47 @@ include "median.h"
 procedure t_median()
 
 bool	verbose
-int	xwindow, ywindow, boundary
+long	xwindow, ywindow
+int	boundary
 pointer	list1, list2
 pointer	sp, imtlist1, imtlist2, image1, image2, imtemp, str, im1, im2, mde
 real	constant
+long	c_2
+size_t	sz_val
+
 bool	clgetb()
-int	clgeti(), imtgetim(), imtlen(), clgwrd()
+int	imtgetim(), imtlen(), clgwrd()
+long	clgetl(), lmod()
 pointer	imtopen(), immap()
 real	clgetr()
+include	<nullptr.inc>
 errchk	mde_medbox
 
 begin
+	c_2 = 2
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (imtlist1, SZ_LINE, TY_CHAR)
-	call salloc (imtlist2, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (imtlist1, sz_val, TY_CHAR)
+	call salloc (imtlist2, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Allocate the median fitting structure
-	call calloc (mde, LEN_MEDIAN_STRUCT, TY_STRUCT)
+	sz_val = LEN_MEDIAN_STRUCT
+	call calloc (mde, sz_val, TY_STRUCT)
 
 	# Get task parameters
 	call clgstr ("input", Memc[imtlist1], SZ_LINE)
 	call clgstr ("output", Memc[imtlist2], SZ_LINE)
 
 	# Get algorithm parameters.
-	xwindow = clgeti ("xwindow")
-	ywindow = clgeti ("ywindow")
+	xwindow = clgetl ("xwindow")
+	ywindow = clgetl ("ywindow")
 	MED_ZLOW(mde) = clgetr ("zloreject")
 	if (IS_INDEFR(MED_ZLOW(mde)))
 	    MED_ZLOW(mde) = -MAX_REAL
@@ -67,22 +78,22 @@ begin
 	    call xt_mkimtemp (Memc[image1], Memc[image2], Memc[imtemp],
 	        SZ_FNAME)
 
-	    im1 = immap (Memc[image1], READ_ONLY, 0)
+	    im1 = immap (Memc[image1], READ_ONLY, NULLPTR)
 	    im2 = immap (Memc[image2], NEW_COPY, im1)
 
-	    if (mod (xwindow, 2) == 0)
+	    if (lmod (xwindow, c_2) == 0)
 	        MED_XBOX(mde) = xwindow + 1
 	    else
 	        MED_XBOX(mde) = xwindow
-	    if (mod (ywindow, 2) == 0)
+	    if (lmod (ywindow, c_2) == 0)
 	        MED_YBOX(mde) = ywindow + 1
 	    else
 	        MED_YBOX(mde) = ywindow
 
 	    if (verbose) {
                 call printf ("%dx%d Box median filter %s to %s\n")
-                    call pargi (MED_XBOX(mde))
-                    call pargi (MED_YBOX(mde))
+                    call pargz (MED_XBOX(mde))
+                    call pargz (MED_YBOX(mde))
                     call pargstr (Memc[image1])
                     call pargstr (Memc[imtemp])
                 if (MED_ZLOW(mde) > -MAX_REAL || MED_ZHIGH(mde) < MAX_REAL)  {

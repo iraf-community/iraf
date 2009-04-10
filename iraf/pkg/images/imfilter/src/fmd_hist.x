@@ -6,13 +6,14 @@
 procedure fmd_ashgmi (data, npix, hgm, nbins, z1, z2)
 
 int 	data[ARB]		#I data vector
-int	npix			#I number of pixels
-int	hgm[ARB]		#U output histogram
-int	nbins			#I number of bins in histogram
+size_t	npix			#I number of pixels
+long	hgm[ARB]		#U output histogram
+size_t	nbins			#I number of bins in histogram
 int	z1, z2			#I greyscale values of first and last bins
 
 real	dz
-int	bin, i
+long	bin, i
+long	lint()
 
 begin
 	if (nbins < 2)
@@ -20,7 +21,7 @@ begin
 	dz = real (nbins - 1) / real (z2 - z1)
 
 	do i = 1, npix {
-	    bin = int ((data[i] - z1) * dz) + 1
+	    bin = lint ((data[i] - z1) * dz) + 1
 	    if (bin <= 0 || bin > nbins)
 		next
 	    hgm[bin] = hgm[bin] + 1

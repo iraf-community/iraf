@@ -7,12 +7,13 @@
 procedure med_buf (im, col1, col2, line1, line2, buf)
 
 pointer	im		#I pointer to image
-int	col1, col2	#I column limits in the image
-int	line1, line2	#I line limits in the image
+long	col1, col2	#I column limits in the image
+long	line1, line2	#I line limits in the image
 pointer	buf		#U buffer pointer
 
-int	i
-int	ncols, nlines, llast1, llast2, nllast, nclast
+long	i
+long	llast1, llast2, nllast, nclast
+size_t	ncols, nlines
 pointer	buf1, buf2
 pointer	imgs2r()
 errchk	imgs2r

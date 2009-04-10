@@ -9,18 +9,20 @@ include <imhdr.h>
 procedure fmd_buf (im, col1, col2, line1, line2, buf, map, a1, a2, b1, b2)
 
 pointer	im		#I pointer to image
-int	col1, col2	#I column limits in the image
-int	line1, line2	#I line limits in the image
+long	col1, col2	#I column limits in the image
+long	line1, line2	#I line limits in the image
 pointer	buf		#U buffer pointer
 int	map		#I perform mapping on image lines
 real	a1, a2		#I limits of input image line
 real	b1, b2		#I limits of output image line
 
 
-int	i
-int	ncols, nlines, llast1, llast2, nllast, nclast
+long	i
+long	llast1, llast2, nllast, nclast
+size_t	ncols, nlines
 pointer	bufr, bufi, buf1, buf2
 bool	fp_equalr()
+int	inint()
 pointer	imgs2r(), imgs2i()
 errchk	imgs2r, imgs2i
 
@@ -63,9 +65,9 @@ begin
 			switch (IM_PIXTYPE(im)) {
 			case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
 			    bufi = imgs2i (im, col1, col2, i, i)
-			    call amaxki (Memi[bufi], nint(a1), Memi[buf2],
+			    call amaxki (Memi[bufi], inint(a1), Memi[buf2],
 			        ncols)
-			    call aminki (Memi[buf2], nint(a2), Memi[buf2],
+			    call aminki (Memi[buf2], inint(a2), Memi[buf2],
 			        ncols)
 			default:
 		            bufr = imgs2r (im, col1, col2, i, i)
@@ -98,9 +100,9 @@ begin
 			switch (IM_PIXTYPE(im)) {
 			case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
 			    bufi = imgs2i (im, col1, col2, i, i)
-			    call amaxki (Memi[bufi], nint(a1), Memi[buf2],
+			    call amaxki (Memi[bufi], inint(a1), Memi[buf2],
 			        ncols)
-			    call aminki (Memi[buf2], nint(a2), Memi[buf2],
+			    call aminki (Memi[buf2], inint(a2), Memi[buf2],
 			        ncols)
 			default:
 		            bufr = imgs2r (im, col1, col2, i, i)

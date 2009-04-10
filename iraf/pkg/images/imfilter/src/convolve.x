@@ -12,13 +12,17 @@ procedure cnv_convolve (im1, im2, kernel, nxk, nyk, boundary, constant, radsym)
 pointer	im1		# pointer to the input image
 pointer	im2		# pointer to the output image
 real	kernel[nxk,nyk]	# the convolution kernel
-int	nxk, nyk	# dimensions of the kernel
+size_t	nxk, nyk	# dimensions of the kernel
 int	boundary	# type of boundary extension
 real	constant	# constant for constant boundary extension
 int	radsym		# does the kernel have radial symmetry ?
 
-int	i, ncols, nlines, col1, col2, nincols, inline, outline
+size_t	sz_val
+long	l_val
+long	i, col1, col2, nincols, inline, outline
+size_t	ncols, nlines
 pointer	sp, lineptrs, linebuf, outbuf
+long	lmod()
 pointer	imgs2r(), impl2r()
 errchk	imgs2r, impl2r
 
@@ -28,11 +32,13 @@ begin
 	call salloc (lineptrs, nyk, TY_POINTER)
 
 	# Set the number of image buffers.
-	call imseti (im1, IM_NBUFS, nyk)
+	l_val = nyk
+	call imsetl (im1, IM_NBUFS, l_val)
 
 	# Set the input image boundary conditions.
 	call imseti (im1, IM_TYBNDRY, boundary)
-	call imseti (im1, IM_NBNDRYPIX, max (nxk / 2 + 1, nyk / 2 + 1))
+	l_val = max (nxk / 2 + 1, nyk / 2 + 1)
+	call imsetl (im1, IM_NBNDRYPIX, l_val)
 	if (boundary == BT_CONSTANT)
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
@@ -56,7 +62,8 @@ begin
 	}
 
 	# Generate the output image line by line
-	call salloc (linebuf, nincols, TY_REAL)
+	sz_val = nincols
+	call salloc (linebuf, sz_val, TY_REAL)
 	do outline = 1, nlines {
 
 	    # Scroll the input buffers
@@ -81,7 +88,9 @@ begin
 	            call cnv_radcnvr (Memr[linebuf], Memr[outbuf], ncols,
 		        kernel[1,i], nxk)
 		}
-		if (mod (nyk, 2) == 1)
+		l_val = nyk
+		i = 2
+		if (lmod (l_val, i) == 1)
 	            call cnv_radcnvr (Memr[Memp[lineptrs+nyk/2]], Memr[outbuf],
 		        ncols, kernel[1,nyk/2+1], nxk)
 	    } else {
