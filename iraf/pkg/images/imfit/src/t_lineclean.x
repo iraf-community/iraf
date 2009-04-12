@@ -105,12 +105,16 @@ pointer	gt				# GTIO pointer
 char	title[ARB]			# Title
 bool	interactive			# Interactive?
 
+size_t	sz_val
+long	l_val
 char	graphics[SZ_FNAME]
-int	i, nx, new
+long	i
+size_t	nx
+int	new
 long	inline[IM_MAXDIM], outline[IM_MAXDIM]
 pointer	cv, gp, sp, x, wts, indata, outdata
 
-int	lf_getline()
+long	lf_getline()
 long	imgnlr(), impnlr()
 int	strlen()
 pointer	gopen()
@@ -153,8 +157,10 @@ begin
 	# Loop through each input image line and create an output image line.
 
 	new = YES
-	call amovkl (long(1), inline, IM_MAXDIM)
-	call amovkl (long(1), outline, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, inline, sz_val)
+	call amovkl (l_val, outline, sz_val)
 
 	while (imgnlr (in, indata, inline) != EOF) {
 	    if (impnlr (out, outdata, outline) == EOF)
@@ -183,16 +189,19 @@ char	output[ARB]		# Output image
 pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 
+size_t	sz_val
 pointer	sp, root, sect
 int	imaccess()
 pointer	immap()
+include	<nullptr.inc>
 
 begin
 	# Get the root name and section of the input image.
 
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (sect, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (sect, sz_val, TY_CHAR)
 
 	call get_root (input, Memc[root], SZ_FNAME)
 	call get_section (input, Memc[sect], SZ_FNAME)
@@ -205,12 +214,12 @@ begin
 
 	# Map the input and output images.
 
-	in = immap (input, READ_ONLY, 0)
+	in = immap (input, READ_ONLY, NULLPTR)
 
 	call sprintf (Memc[root], SZ_FNAME, "%s%s")
 	    call pargstr (output)
 	    call pargstr (Memc[sect])
-	out = immap (Memc[root], READ_WRITE, 0)
+	out = immap (Memc[root], READ_WRITE, NULLPTR)
 
 	call sfree (sp)
 end
@@ -220,7 +229,7 @@ end
 # when the user enters EOF or CR.  Default line is the first line and
 # the out of bounds lines are silently limited to the nearest in bounds line.
 
-int procedure lf_getline (ic, gt, im, data, v, title)
+long procedure lf_getline (ic, gt, im, data, v, title)
 
 pointer	ic			# ICFIT pointer
 pointer	gt			# GTOOLS pointer
@@ -229,6 +238,8 @@ pointer	data			# Image data
 long	v[ARB]			# Image line vector
 char	title[ARB]		# Title
 
+size_t	sz_val
+long	l_val
 int	i
 char	line[SZ_LINE]
 int	getline(), nscan()
@@ -246,7 +257,9 @@ begin
 	    return (EOF)
 	call sscan (line)
 
-	call amovkl (long (1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	do i = 2, max (2, IM_NDIM(im)) {
 	    call gargl (v[i])
 	    if (nscan() == 0)

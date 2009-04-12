@@ -82,13 +82,13 @@ prl_free	(pl)
 procedure prl_add_ranges (pl, linemin, linemax, ranges)
 
 pointer	pl		# pointer to the list descriptor
-int	linemin		# minimum line number
-int	linemax		# maximum line number
-int	ranges[ARB]	# ranges
+long	linemin		# minimum line number
+long	linemax		# maximum line number
+long	ranges[ARB]	# ranges
 
-int	i, j, lc
-int	olp, lp, lnull, lold
-int	nr, nnewr, noldr
+long	i, j, lc
+long	olp, lp, lnull, lold
+size_t	nr, nnewr, noldr
 
 begin
 	# check conditions
@@ -106,7 +106,7 @@ begin
 	do i = linemin, linemax {
 
 	    # get offset for line i
-	    lp = Memi[PRL_LINES(pl)+i-1]
+	    lp = Meml[PRL_LINES(pl)+i-1]
 
 	    # if line pointer is undefined
 	    if (lp == NULL) {
@@ -114,37 +114,37 @@ begin
 		if (lc == 1) {
 
 		    # set line pointer and store
-	    	    Memi[PRL_LINES(pl)+i-1] = PRL_LP(pl)
+	    	    Meml[PRL_LINES(pl)+i-1] = PRL_LP(pl)
 		    lnull = PRL_LP(pl)
 
 		    # check the size of the list
 		    if (PRL_SZLIST(pl) < (nr + PRL_LP(pl))) {
 	    		PRL_SZLIST(pl) = PRL_SZLIST(pl) + nr + 1 
-	    		call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_INT)
+	    		call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_LONG)
 		    }
 
 		    # move ranges and reset pointers
-		    call amovi (ranges, Memi[PRL_LIST(pl)+PRL_LP(pl)-1], nr)
+		    call amovl (ranges, Meml[PRL_LIST(pl)+PRL_LP(pl)-1], nr)
 		    PRL_LP(pl) = PRL_LP(pl) + nr + 1
-		    Memi[PRL_LIST(pl)+PRL_LP(pl)-2] = NULL
+		    Meml[PRL_LIST(pl)+PRL_LP(pl)-2] = NULL
 		    lc = lc + 1
 
 		} else
 
 		    # set line pointer
-		    Memi[PRL_LINES(pl)+i-1] = lnull
+		    Meml[PRL_LINES(pl)+i-1] = lnull
 
 	    } else {
 
 		if (lp != olp) {
 
 		    # set line pointer and store
-	    	    Memi[PRL_LINES(pl)+i-1] = PRL_LP(pl)
+	    	    Meml[PRL_LINES(pl)+i-1] = PRL_LP(pl)
 		    lold = PRL_LP(pl)
 
 		    # find length of previously defined range and calculate
 		    # length of new ranges
-		    for (j = lp; Memi[PRL_LIST(pl)+j-1] != NULL; j = j + 1)
+		    for (j = lp; Meml[PRL_LIST(pl)+j-1] != NULL; j = j + 1)
 		        ;
 		    noldr = j - lp
 		    nnewr = noldr + nr
@@ -152,21 +152,21 @@ begin
 		    # check size of list
 	            if (PRL_SZLIST(pl) < (nnewr + PRL_LP(pl))) {
 		        PRL_SZLIST(pl) = PRL_SZLIST(pl) + nnewr + 1
-	                call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_INT)
+	                call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_LONG)
 		    }
 
 		    # add ranges to list and update pointers
-		    call amovi (Memi[PRL_LIST(pl)+lp-1],
-		        Memi[PRL_LIST(pl)+PRL_LP(pl)-1], noldr)
+		    call amovl (Meml[PRL_LIST(pl)+lp-1],
+		        Meml[PRL_LIST(pl)+PRL_LP(pl)-1], noldr)
 		    PRL_LP(pl) = PRL_LP(pl) + noldr
-		    call amovi (ranges, Memi[PRL_LIST(pl)+PRL_LP(pl)-1], nr)
+		    call amovl (ranges, Meml[PRL_LIST(pl)+PRL_LP(pl)-1], nr)
 		    PRL_LP(pl) = PRL_LP(pl) + nr + 1
-		    Memi[PRL_LIST(pl)+PRL_LP(pl)-2] = NULL
+		    Meml[PRL_LIST(pl)+PRL_LP(pl)-2] = NULL
 
 		} else
 
 		    # set line pointers
-		    Memi[PRL_LINES(pl)+i-1] = lold
+		    Meml[PRL_LINES(pl)+i-1] = lold
 
 		olp = lp
 	    }
@@ -180,11 +180,11 @@ end
 int procedure prl_eqlines (pl, line1, line2)
 
 pointer	pl	# pointer to the list
-int	line1	# line numbers
-int	line2
+long	line1	# line numbers
+long	line2
 
 begin
-	if (Memi[PRL_LINES(pl)+line1-1] == Memi[PRL_LINES(pl)+line2-1])
+	if (Meml[PRL_LINES(pl)+line1-1] == Meml[PRL_LINES(pl)+line2-1])
 	    return (YES)
 	else
 	    return (NO)
@@ -196,31 +196,32 @@ end
 # numbers are used to define a range a minimum, maximum and a step size.
 # The ranges are delimited by a NULL.
 
-int procedure prl_get_ranges (pl, lineno, ranges, max_nranges)
+long procedure prl_get_ranges (pl, lineno, ranges, max_nranges)
 
 pointer	pl		# pointer to the pixel list descriptor
-int	lineno		# line number
-int	ranges[ARB]	# array of ranges
-int	max_nranges	# the maximum number of ranges
+long	lineno		# line number
+long	ranges[ARB]	# array of ranges
+size_t	max_nranges	# the maximum number of ranges
 
-int	lp, ip
-int	nranges
+pointer	lp
+long	ip
+size_t	nranges
 
 begin
 	# check for existence of ranges
-	if (Memi[PRL_LINES(pl)+lineno-1] == NULL) {
+	if (Meml[PRL_LINES(pl)+lineno-1] == NULL) {
 	    ranges[1] = NULL
 	    return (0)
 	}
 
 	# set pointer to the first element in list for line lineno
-	lp = PRL_LIST(pl) + Memi[PRL_LINES(pl)+lineno-1] - 1
+	lp = PRL_LIST(pl) + Meml[PRL_LINES(pl)+lineno-1] - 1
 
 	# get ranges
 	nranges = 0
 	ip = 1
-	while (Memi[lp+ip-1] != NULL && nranges <= 3 * max_nranges) {
-	    ranges[ip] = Memi[lp+ip-1]
+	while (Meml[lp+ip-1] != NULL && nranges <= 3 * max_nranges) {
+	    ranges[ip] = Meml[lp+ip-1]
 	    ip = ip + 1
 	    nranges = nranges + 1
 	}
@@ -237,17 +238,17 @@ end
 # defined ranges given the current line number. Note that the current
 # line number is updated.
 
-int procedure prl_nextlineno (pl, current_lineno)
+long procedure prl_nextlineno (pl, current_lineno)
 
 pointer	pl			# pointer to the pixel list descriptor
-int	current_lineno		# current line number
+long	current_lineno		# current line number
 
-int findex, lp
+long	findex, lp
 
 begin
 	findex = max (1, current_lineno + 1)
 	do lp = findex, PRL_NLINES(pl) {
-	    if (Memi[PRL_LINES(pl)+lp-1] != NULL) {
+	    if (Meml[PRL_LINES(pl)+lp-1] != NULL) {
 		current_lineno = lp
 		return (lp)
 	    }
@@ -260,17 +261,17 @@ end
 # with a set of defined ranges given the current line number.
 # Note that the current line number is updated.
 
-int procedure prl_prevlineno (pl, current_lineno)
+long procedure prl_prevlineno (pl, current_lineno)
 
 pointer	pl		# pointer to the pixel list descriptor
-int	current_lineno	# current line number
+long	current_lineno	# current line number
 
-int	findex, lp
+long	findex, lp
 
 begin
 	findex = min (current_lineno - 1, PRL_NLINES(pl))
 	do lp = findex, 1, -1 {
-	    if (Memi[PRL_LINES(pl)+lp-1] != NULL) {
+	    if (Meml[PRL_LINES(pl)+lp-1] != NULL) {
 		current_lineno = lp
 		return (lp)
 	    }
@@ -286,12 +287,12 @@ end
 procedure prl_put_ranges (pl, linemin, linemax, ranges)
 
 pointer	pl		# pointer to the list
-int	linemin		# minimum line
-int	linemax		# maximum line
-int	ranges[ARB]	# list of ranges
+long	linemin		# minimum line
+long	linemax		# maximum line
+long	ranges[ARB]	# list of ranges
 
-int	i
-int	len_range
+long	i
+size_t	len_range
 
 begin
 	# check boundary conditions
@@ -306,17 +307,17 @@ begin
 	# check space allocation
 	if (PRL_SZLIST(pl) < (len_range + PRL_LP(pl))) {
 	    PRL_SZLIST(pl) = PRL_SZLIST(pl) + len_range + 1
-	    call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_INT)
+	    call realloc (PRL_LIST(pl), PRL_SZLIST(pl), TY_LONG)
 	}
 
 	# set the line pointers
 	do i = linemin, linemax
-	    Memi[PRL_LINES(pl)+i-1] = PRL_LP(pl)
+	    Meml[PRL_LINES(pl)+i-1] = PRL_LP(pl)
 
 	# add ranges
-	call amovi (ranges, Memi[PRL_LIST(pl)+PRL_LP(pl)-1], len_range)
+	call amovl (ranges, Meml[PRL_LIST(pl)+PRL_LP(pl)-1], len_range)
 	PRL_LP(pl) = PRL_LP(pl) + len_range + 1
-	Memi[PRL_LIST(pl)+PRL_LP(pl)-2] = NULL
+	Meml[PRL_LIST(pl)+PRL_LP(pl)-2] = NULL
 end
 
 
@@ -331,9 +332,9 @@ begin
 	    return
 
 	if (PRL_LIST(pl) != NULL)
-	    call mfree (PRL_LIST(pl), TY_INT)
+	    call mfree (PRL_LIST(pl), TY_LONG)
 	if (PRL_LINES(pl) != NULL)
-	    call mfree (PRL_LINES(pl), TY_INT)
+	    call mfree (PRL_LINES(pl), TY_LONG)
 
 	call mfree (pl, TY_STRUCT)
 end
@@ -345,25 +346,30 @@ end
 procedure prl_init (pl, ncols, nlines)
 
 pointer	pl		# pixel list descriptor
-int	ncols		# number of image columns 
-int	nlines		# number of image lines
+size_t	ncols		# number of image columns 
+size_t	nlines		# number of image lines
+
+size_t	sz_val
+long	l_val
 
 begin
 	# allocate space for a pixel list descriptor
-	call malloc (pl, LEN_PLSTRUCT, TY_STRUCT)
+	sz_val = LEN_PLSTRUCT
+	call malloc (pl, sz_val, TY_STRUCT)
 
 	# initialize
 	PRL_NCOLS(pl) = ncols
 	PRL_NLINES(pl) = nlines
 
 	# allocate space for the line pointers
-	call malloc (PRL_LINES(pl), PRL_NLINES(pl), TY_INT) 
-	call amovki (NULL, Memi[PRL_LINES(pl)], PRL_NLINES(pl))
+	call malloc (PRL_LINES(pl), PRL_NLINES(pl), TY_LONG) 
+	l_val = NULL
+	call amovkl (l_val, Meml[PRL_LINES(pl)], PRL_NLINES(pl))
 
 	# set pointer to next free element
 	PRL_LP(pl) = 1
 
 	# allocate space for the actual list
-	call malloc (PRL_LIST(pl), PRL_NLINES(pl), TY_INT)
+	call malloc (PRL_LIST(pl), PRL_NLINES(pl), TY_LONG)
 	PRL_SZLIST(pl) = PRL_NLINES(pl)
 end

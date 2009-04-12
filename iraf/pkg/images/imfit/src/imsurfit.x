@@ -62,7 +62,11 @@ pointer	im	# pointer to the input image
 pointer	imfit	# pointer to the imsurfit structure
 pointer	sf	# pointer to the surface descriptor
 
-int	i, lp, ncols, nlines, ier
+long	l_val
+size_t	sz_val
+long	i
+int	ier
+size_t	ncols, nlines, lp
 long	v[IM_MAXDIM]
 pointer	sp, cols, lines, wgt, lbuf
 long	imgnlr()
@@ -79,18 +83,20 @@ begin
 
 	# Allocate working space for fitting.
 	call smark (sp)
-	call salloc (cols, ncols, TY_INT)
-	call salloc (lines, nlines, TY_INT)
+	call salloc (cols, ncols, TY_LONG)
+	call salloc (lines, nlines, TY_LONG)
 	call salloc (wgt, ncols, TY_REAL)
 
 	# Initialize the x and weight buffers.
 	do i = 1, ncols
-	    Memi[cols - 1 + i] = i
+	    Meml[cols - 1 + i] = i
 	 call amovkr (1.0, Memr[wgt], ncols)
 
 	# Loop over image lines.
 	lp = 0
-	call amovkl (long (1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	do i = 1, nlines {
 
 	    # Read in the image line.
@@ -99,30 +105,30 @@ begin
 
 	    # Fit each image line.
 	    if (i == 1)
-	        call islfit (sf, Memi[cols], i, Memr[lbuf], Memr[wgt],
+	        call islfit (sf, Meml[cols], i, Memr[lbuf], Memr[wgt],
 		ncols, SF_USER, ier)
 	    else
-		call islrefit (sf, Memi[cols], i, Memr[lbuf], Memr[wgt])
+		call islrefit (sf, Meml[cols], i, Memr[lbuf], Memr[wgt])
 
 	    # Handle fitting errors.
 	    switch (ier) {
 	    case NO_DEG_FREEDOM:
 		call eprintf ("Warning: Too few columns to fit line: %d\n")
-		    call pargi (i)
+		    call pargl (i)
 	    case SINGULAR:
 		call eprintf ("Warning: Solution singular for line: %d\n")
-		    call pargi (i)
-		Memi[lines + lp] = i
+		    call pargl (i)
+		Meml[lines + lp] = i
 		lp = lp + 1
 	    default:
-		Memi[lines + lp] = i
+		Meml[lines + lp] = i
 		lp = lp + 1
 	    }
 
 	}
 
 	# Solve the surface.
-	call issolve (sf, Memi[lines], lp, ier)
+	call issolve (sf, Meml[lines], lp, ier)
 
 	# Handle fitting errors.
 	switch (ier) {
@@ -149,11 +155,14 @@ pointer	imfit	# pointer to imsurfit header structure
 pointer	gl	# pointer to good region list
 pointer	sf	# pointer to the surface descriptor
 
-int	lp, lineno, prevlineno, ncols, nlines, npts, nranges, ier, ijunk
-int	max_nranges
+long	l_val
+size_t	lp, ncols, nlines, npts, nranges, max_nranges
+long	lineno, prevlineno, ijunk
+int	ier
 pointer	sp, colsfit, lines, buf, fbuf, wgt, ranges
-int	prl_nextlineno(), prl_eqlines(), prl_get_ranges(), is_expand_ranges()
-int	is_choose_rangesr()
+long	prl_nextlineno(), prl_get_ranges(), is_expand_ranges()
+long	is_choose_rangesr()
+int	prl_eqlines()
 pointer	imgl2r()
 
 errchk	smark, salloc, sfree, imgl2r
@@ -172,11 +181,11 @@ begin
 
 	# Allocate temporary space for fitting.
 	call smark (sp)
-	call salloc (colsfit, ncols, TY_INT)
-	call salloc (lines, nlines, TY_INT)
+	call salloc (colsfit, ncols, TY_LONG)
+	call salloc (lines, nlines, TY_LONG)
 	call salloc (fbuf, ncols, TY_REAL)
 	call salloc (wgt, ncols, TY_REAL)
-	call salloc (ranges, 3 * max_nranges + 1, TY_INT)
+	call salloc (ranges, 3 * max_nranges + 1, TY_LONG)
 	call amovkr (1., Memr[wgt], ncols)
 
 	# Intialize counters and pointers.
@@ -193,35 +202,37 @@ begin
 		call error (0, "GOOD_PIXELS: Error reading image.")
 
 	    # Get the ranges for that image line.
-	    nranges = prl_get_ranges (gl, lineno, Memi[ranges], max_nranges)
+	    nranges = prl_get_ranges (gl, lineno, Meml[ranges], max_nranges)
 	    if (nranges == 0)
 		next
 
 	    # If ranges are not equal to previous line fit else refit.
 	    if (lp == 0 || prl_eqlines (gl, lineno, prevlineno) == NO) {
-		npts = is_expand_ranges (Memi[ranges], Memi[colsfit], ncols)
-		ijunk = is_choose_rangesr (Memi[colsfit], Memr[buf], Memr[fbuf],
-		    npts, 1, ncols)
-		call islfit (sf, Memi[colsfit], lineno, Memr[fbuf], Memr[wgt],
+		npts = is_expand_ranges (Meml[ranges], Meml[colsfit], ncols)
+		l_val = 1
+		ijunk = is_choose_rangesr (Meml[colsfit], Memr[buf], Memr[fbuf],
+		    npts, l_val, ncols)
+		call islfit (sf, Meml[colsfit], lineno, Memr[fbuf], Memr[wgt],
 		    npts, SF_USER, ier)
 	    } else {
-		ijunk = is_choose_rangesr (Memi[colsfit], Memr[buf], Memr[fbuf],
-		    npts, 1, ncols)
-		call islrefit (sf, Memi[colsfit], lineno, Memr[fbuf], Memr[wgt])
+		l_val = 1
+		ijunk = is_choose_rangesr (Meml[colsfit], Memr[buf], Memr[fbuf],
+		    npts, l_val, ncols)
+		call islrefit (sf, Meml[colsfit], lineno, Memr[fbuf], Memr[wgt])
 	    }
 
 	    # Handle fitting errors.
 	    switch (ier) {
 	    case NO_DEG_FREEDOM:
 		call eprintf ("Warning: Too few columns to fit line: %d\n")
-		    call pargi (lineno)
+		    call pargl (lineno)
 	    case SINGULAR:
 		call eprintf ("Warning: Solution singular for line: %d\n")
-		    call pargi (lineno)
-		Memi[lines+lp] = lineno
+		    call pargl (lineno)
+		Meml[lines+lp] = lineno
 		lp = lp + 1
 	    default:
-		Memi[lines+lp] = lineno
+		Meml[lines+lp] = lineno
 		lp = lp + 1
 	    }
 
@@ -229,7 +240,7 @@ begin
 	}
 
 	# Solve the surface.
-	call issolve (sf, Memi[lines], lp, ier)
+	call issolve (sf, Meml[lines], lp, ier)
 
 	# Handle fitting errors.
 	switch (ier) {
@@ -255,12 +266,15 @@ pointer	im	# input image
 pointer	imfit	# pointer to the imsurfit header structure
 pointer	sf	# pointer to the surface descriptor
 
-int	i, lp, cp, op, lineno, x1, x2, y1, y2, ier
-int	nimcols, nimlines, ncols, nlines, npts
+long	l_val
+int	ier
+long	i, cp, lineno, x1, x2, y1, y2
+size_t	op, lp, nimcols, nimlines, ncols, nlines, npts
 pointer	sp, cols, lines, wgt, z, med, sbuf, lbuf, buf
 
 pointer	imgs2r()
 real	asokr()
+long	lmod()
 errchk	salloc, sfree, smark
 errchk	isinit, islfit, islrefit, issolve
 
@@ -268,12 +282,12 @@ begin
 	# Determine the number of lines and columns for a median processed
 	# image.
 	nimcols = IM_LEN(im,1)
-	if (mod (int (IM_LEN(im,1)), XMEDIAN(imfit)) != 0)
+	if (lmod (IM_LEN(im,1), XMEDIAN(imfit)) != 0)
 	    ncols = IM_LEN(im,1) / XMEDIAN(imfit) + 1
 	else
 	    ncols = IM_LEN(im,1) / XMEDIAN(imfit)
 	nimlines = IM_LEN(im,2)
-	if (mod (int (IM_LEN(im,2)), YMEDIAN(imfit)) != 0)
+	if (lmod (IM_LEN(im,2), YMEDIAN(imfit)) != 0)
 	    nlines = IM_LEN(im,2) / YMEDIAN(imfit) + 1
 	else
 	    nlines = IM_LEN(im,2) / YMEDIAN(imfit)
@@ -284,15 +298,15 @@ begin
 
 	# Allocate workin memory.
 	call smark (sp)
-	call salloc (cols, ncols, TY_INT)
+	call salloc (cols, ncols, TY_LONG)
 	call salloc (wgt, ncols, TY_REAL)
-	call salloc (lines, nlines, TY_INT)
+	call salloc (lines, nlines, TY_LONG)
 	call salloc (z, ncols, TY_REAL)
 	call salloc (med, XMEDIAN(imfit) * YMEDIAN(imfit), TY_REAL)
 
 	# Intialize the x and weight arrays.
 	do i = 1, ncols
-	    Memi[cols - 1 + i] = i
+	    Meml[cols - 1 + i] = i
 	call amovkr (1.0, Memr[wgt], ncols)
 
 	# Loop over image sections.
@@ -302,7 +316,8 @@ begin
 
 	    # Get image section.
 	    y2 = min (y1 + YMEDIAN(imfit) - 1, nimlines)
-	    sbuf = imgs2r (im, 1, nimcols, y1, y2)
+	    l_val = 1
+	    sbuf = imgs2r (im, l_val, nimcols, y1, y2)
 	    if (sbuf == EOF)
 		call error (0, "Error reading image section.")
 
@@ -331,23 +346,23 @@ begin
 
 	    # Fit each image "line".
 	    if (y1 == 1)
-		call islfit (sf, Memi[cols], lineno, Memr[z], Memr[wgt],
+		call islfit (sf, Meml[cols], lineno, Memr[z], Memr[wgt],
 		     ncols, SF_USER, ier)
 	    else
-		call islrefit (sf, Memi[cols], lineno, Memr[z], Memr[wgt])
+		call islrefit (sf, Meml[cols], lineno, Memr[z], Memr[wgt])
 
 	    # Handle fitting errors.
 	    switch (ier) {
 	    case NO_DEG_FREEDOM:
 		call eprintf ("Warning: Too few columns to fit line: %d\n")
-		    call pargi (lineno)
+		    call pargl (lineno)
 	    case SINGULAR:
 		call eprintf ("Warning: Solution singular for line: %d\n")
-		    call pargi (lineno)
-		Memi[lines + lp] = lineno
+		    call pargl (lineno)
+		Meml[lines + lp] = lineno
 		lp = lp + 1
 	    default:
-		Memi[lines + lp] = lineno
+		Meml[lines + lp] = lineno
 		lp = lp + 1
 	    }
 
@@ -355,7 +370,7 @@ begin
 	}
 
 	# Solve th surface.
-	call issolve (sf, Memi[lines], lp, ier)
+	call issolve (sf, Meml[lines], lp, ier)
 
 	# Handle fitting errors.
 	switch (ier) {
@@ -382,15 +397,19 @@ pointer	imfit	# pointer to surface descriptor structure
 pointer	gl	# pointer to good regions list
 pointer	sf	# pointer the surface descriptor
 
-int	i, cp, lp, x1, x2, y1, y2, ier, ntemp
-int	nimcols, nimlines, ncols, nlines, nranges, nbox, nxpts
-int	lineno, current_line, lines_per_box, max_nranges
+size_t	sz_val0, sz_val1
+long	i, cp, x1, x2, y1, y2, ntemp
+size_t	lp
+int	ier
+size_t	nimcols, nimlines, ncols, nlines, nranges, nbox, nxpts, max_nranges
+long	lineno, current_line, lines_per_box
 pointer	sp, colsfit, cols, lines, wgt, npts, lbuf, med, mbuf, z, ranges
 
-int	prl_get_ranges(), prl_nextlineno(), is_expand_ranges()
-int	is_choose_rangesr()
+long	prl_nextlineno(), prl_get_ranges(), is_expand_ranges()
+long	is_choose_rangesr()
 pointer	imgl2r()
 real	asokr()
+long	lmod()
 errchk	smark, salloc, sfree, imgl2r
 errchk	isinit, islfit, issolve
 errchk	prl_get_ranges, prl_nextlineno, is_choose_rangesr()
@@ -399,12 +418,12 @@ begin
 	# Determine the number of lines and columns for a median processed
 	# image.
 	nimcols = IM_LEN(im,1)
-	if (mod (int (IM_LEN(im,1)), XMEDIAN(imfit)) != 0)
+	if (lmod (IM_LEN(im,1), XMEDIAN(imfit)) != 0)
 	    ncols = IM_LEN(im,1) / XMEDIAN(imfit) + 1
 	else
 	    ncols = IM_LEN(im,1) / XMEDIAN(imfit)
 	nimlines = IM_LEN(im,2)
-	if (mod (int (IM_LEN(im,2)), YMEDIAN(imfit)) != 0)
+	if (lmod (IM_LEN(im,2), YMEDIAN(imfit)) != 0)
 	    nlines = IM_LEN(im,2) / YMEDIAN(imfit) + 1
 	else
 	    nlines = IM_LEN(im,2) / YMEDIAN(imfit)
@@ -417,14 +436,14 @@ begin
 
 	# Allocate working memory.
 	call smark (sp)
-	call salloc (colsfit, nimcols, TY_INT)
-	call salloc (cols, ncols, TY_INT)
-	call salloc (npts, ncols, TY_INT)
-	call salloc (lines, nlines, TY_INT)
+	call salloc (colsfit, nimcols, TY_LONG)
+	call salloc (cols, ncols, TY_LONG)
+	call salloc (npts, ncols, TY_LONG)
+	call salloc (lines, nlines, TY_LONG)
 	call salloc (wgt, ncols, TY_REAL)
 	call salloc (med, nbox * ncols, TY_REAL)
 	call salloc (z, ncols, TY_REAL)
-	call salloc (ranges, 3 * max_nranges + 1, TY_INT)
+	call salloc (ranges, 3 * max_nranges + 1, TY_LONG)
 	call amovkr (1., Memr[wgt], ncols)
 
 	# Loop over median boxes in y.
@@ -447,24 +466,24 @@ begin
 		next
 
 	    # Loop over the image lines.
-	    call aclri (Memi[npts], ncols)
+	    call aclrl (Meml[npts], ncols)
 	    do i = y1, y2 {
 
 		# Get image line, and check the good regions list.
 		lbuf = imgl2r (im, i)
-		nranges = prl_get_ranges (gl, i, Memi[ranges], max_nranges)
+		nranges = prl_get_ranges (gl, i, Meml[ranges], max_nranges)
 		if (nranges == 0)
 		    next
-		nxpts = is_expand_ranges (Memi[ranges], Memi[colsfit], nimcols)
+		nxpts = is_expand_ranges (Meml[ranges], Meml[colsfit], nimcols)
 
 		# Loop over the median boxes in x.
 		cp= 0
 		mbuf = med
 		for (x1 = 1; x1 <= nimcols; x1 = x1 + XMEDIAN(imfit)) {
 		    x2 = min (x1 + XMEDIAN(imfit) - 1, nimcols)
-		    ntemp = is_choose_rangesr (Memi[colsfit], Memr[lbuf],
-		        Memr[mbuf+Memi[npts+cp]], nxpts, x1, x2)
-		    Memi[npts+cp] = Memi[npts+cp] + ntemp
+		    ntemp = is_choose_rangesr (Meml[colsfit], Memr[lbuf],
+		        Memr[mbuf+Meml[npts+cp]], nxpts, x1, x2)
+		    Meml[npts+cp] = Meml[npts+cp] + ntemp
 		    mbuf = mbuf + nbox
 		    cp = cp + 1
 		}
@@ -474,37 +493,38 @@ begin
 	    nxpts = 0
 	    mbuf = med
 	    do i = 1, ncols {
-		if (Memi[npts+i-1] > ((MEDIAN_PERCENT(imfit) / 100.) * nbox)) {
-		    Memr[z+nxpts] = asokr (Memr[mbuf], Memi[npts+i-1],
-			(Memi[npts+i-1] + 1) / 2)
-		    Memi[cols+nxpts] = i
+		if (Meml[npts+i-1] > ((MEDIAN_PERCENT(imfit) / 100.) * nbox)) {
+		    sz_val0 = Meml[npts+i-1]
+		    sz_val1 = (Meml[npts+i-1] + 1) / 2
+		    Memr[z+nxpts] = asokr (Memr[mbuf], sz_val0, sz_val1)
+		    Meml[cols+nxpts] = i
 		    nxpts = nxpts + 1
 		}
 		mbuf = mbuf + nbox
 	    }
 
 	    # Fit the line.
-	    call islfit (sf, Memi[cols], lineno, Memr[z], Memr[wgt], nxpts,
+	    call islfit (sf, Meml[cols], lineno, Memr[z], Memr[wgt], nxpts,
 		SF_USER, ier)
 
 	    # Handle fitting errors.
 	    switch (ier) {
 	    case NO_DEG_FREEDOM:
 		call eprintf ("Warning: Too few columns to fit line: %d\n")
-		    call pargi (lineno)
+		    call pargl (lineno)
 	    case SINGULAR:
 		call eprintf ("Warning: Solution singular for line: %d\n")
-		    call pargi (lineno)
-		Memi[lines+lp] = lineno
+		    call pargl (lineno)
+		Meml[lines+lp] = lineno
 		lp = lp + 1
 	    default:
-		Memi[lines+lp] = lineno
+		Meml[lines+lp] = lineno
 		lp = lp + 1
 	    }
 	}
 
 	# Solve the surface.
-	call issolve (sf, Memi[lines], lp, ier)
+	call issolve (sf, Meml[lines], lp, ier)
 
 	# Handle fitting errors.
 	switch (ier) {
@@ -531,7 +551,10 @@ pointer	imfit	# pointer to the imsurfut header structure
 pointer	sf	# pointer to the surface descriptor
 pointer	rl	# pointer to the rejected pixel list regions list
 
-int	i, k, ncols, nlines, max_nranges
+long	l_val
+size_t	sz_val
+long	i, k
+size_t	nlines, max_nranges, ncols
 long	u[IM_MAXDIM], v[IM_MAXDIM]
 real	b1x, b2x, b1y, b2y
 pointer	sp, x, y, inbuf, outbuf, ranges
@@ -560,7 +583,7 @@ begin
 	call smark (sp)
 	call salloc (x, ncols, TY_REAL)
 	call salloc (y, ncols, TY_REAL)
-	call salloc (ranges, 3 * max_nranges + 1, TY_INT)
+	call salloc (ranges, 3 * max_nranges + 1, TY_LONG)
 
 	# Intialize the x array.
 	do i = 1, ncols
@@ -569,8 +592,10 @@ begin
 	    call amapr (Memr[x], Memr[x], ncols, 1., real (ncols), b1x, b2x)
 
 	# loop over the images lines
-	call amovkl (long (1), v, IM_MAXDIM)
-	call amovkl (long (1), u, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
+	call amovkl (l_val, u, sz_val)
 	do i = 1, nlines {
 
 	    # Get input and output image buffers.
@@ -585,7 +610,8 @@ begin
 	    # transform to median coordinates.
 	    if (MEDIAN(imfit) == YES) {
 	        Memr[y] = real (i)
-		call amapr (Memr[y], Memr[y], 1, 1., real (nlines),
+		sz_val = 1
+		call amapr (Memr[y], Memr[y], sz_val, 1., real (nlines),
 			    b1y, b2y)
 		call amovkr (Memr[y], Memr[y+1], (ncols-1))
 	    } else
@@ -635,34 +661,34 @@ procedure clean_line (x, y, z, ncols, nlines, rl, sf, line, ngrow)
 real	x[ARB]		# array of weights set to 1
 real	y		# y value of line
 real	z[ARB]		# line of data
-int	ncols		# number of image columns
-int	nlines		# number of image lines
+size_t	ncols		# number of image columns
+size_t	nlines		# number of image lines
 pointer	rl		# pointer to reject pixel list
 pointer	sf		# surface fitting
-int	line		# line number
+long	line		# line number
 int	ngrow		# radius for region growing
 
-int	cp, j, k, nranges, dist, yreg_min, yreg_max, xreg_min, xreg_max
+long	cp, j, k, nranges, dist, yreg_min, yreg_max, xreg_min, xreg_max
 pointer	sp, branges
 real	r2
-int	prl_get_ranges(), is_next_number()
+long	prl_get_ranges(), is_next_number()
 real	iseval()
 
 begin
 	call smark (sp)
-	call salloc (branges, 3 * ncols + 1, TY_INT)
+	call salloc (branges, 3 * ncols + 1, TY_LONG)
 
 	r2 = ngrow ** 2
 	yreg_min = max (1, line - ngrow)
 	yreg_max = min (nlines, line + ngrow)
 
 	do j = yreg_min, yreg_max {
-	    nranges = prl_get_ranges (rl, j, Memi[branges], ncols)
+	    nranges = prl_get_ranges (rl, j, Meml[branges], ncols)
 	    if (nranges == 0)
 		next
-	    dist = int (sqrt (r2 - (j - line) ** 2))
+	    dist = sqrt (r2 - (j - line) ** 2)
 	    cp = 0
-	    while (is_next_number (Memi[branges], cp) != EOF) {
+	    while (is_next_number (Meml[branges], cp) != EOF) {
 		xreg_min = max (1, cp - dist)
 		xreg_max = min (ncols, cp + dist)
 		do k = xreg_min, xreg_max
@@ -685,6 +711,7 @@ pointer		gl	# pointer to good regions list
 pointer		sf	# pointer to surface descriptor
 pointer		rl	# pointer to rejected pixel list
 
+size_t	sz_val0, sz_val1
 int	niter, nrejects
 real	sigma
 int	detect_rejects()
@@ -693,7 +720,9 @@ errchk  prl_init, detect_rejects, get_sigma, refit_surface
 
 begin
 	# Initialize rejected pixel list.
-	call prl_init (rl, int(IM_LEN(im,1)), int(IM_LEN(im,2)))
+	sz_val0 = IM_LEN(im,1)
+	sz_val1 = IM_LEN(im,2)
+	call prl_init (rl, sz_val0, sz_val1)
 
 	# Do an iterative rejection cycle on the image.
 	niter = 0
@@ -726,12 +755,15 @@ pointer		gl	# pointer to good regions list
 pointer		sf	# pointer to surface descriptor
 pointer		rl	# pointer to rejected pixels list
 
-int	i, ijunk, lp, ier, max_nranges
-int	ncols, nlines, npts, nfree, nrejects, nranges, ncoeff
+size_t	lp, max_nranges
+long	i, ijunk
+int	ier
+size_t	ncols, nlines, npts, nfree, nrejects, nranges, ncoeff
 pointer	sp, cols, colsfit, lines, buf, fbuf, wgt, granges
 
-int	prl_get_ranges(), grow_regions(), is_expand_ranges()
-int	is_choose_rangesr()
+long	l_val
+long	prl_get_ranges(), is_expand_ranges(), is_choose_rangesr()
+int	grow_regions()
 pointer	imgl2r()
 errchk	smark, salloc, sfree, imgl2r
 errchk	iscoeff, islfit, issolve
@@ -745,17 +777,17 @@ begin
 
 	# Allocate up temporary storage.
 	call smark (sp)
-	call salloc (cols, ncols, TY_INT)
-	call salloc (colsfit, ncols, TY_INT)
-	call salloc (lines, nlines, TY_INT)
-	call salloc (fbuf, ncols, TY_INT)
+	call salloc (cols, ncols, TY_LONG)
+	call salloc (colsfit, ncols, TY_LONG)
+	call salloc (lines, nlines, TY_LONG)
+	call salloc (fbuf, ncols, TY_REAL)
 	call salloc (wgt, ncols, TY_REAL)
-	call salloc (granges, 3 * max_nranges + 1, TY_INT)
+	call salloc (granges, 3 * max_nranges + 1, TY_LONG)
 
 	# Initialize columns.
 	do i = 1, ncols
-	    Memi[cols+i-1] = i
-	call amovi (Memi[cols], Memi[colsfit], ncols)
+	    Meml[cols+i-1] = i
+	call amovl (Meml[cols], Meml[colsfit], ncols)
 
 	# Get number of coefficients.
 	switch (SURFACE_TYPE(imfit)) {
@@ -773,7 +805,7 @@ begin
 
 	    # Determine whether image line is good.
 	    if (gl != NULL) {
-		nranges = prl_get_ranges (gl, i, Memi[granges], max_nranges)
+		nranges = prl_get_ranges (gl, i, Meml[granges], max_nranges)
 		if (nranges == 0)
 		    next
 	    }
@@ -787,13 +819,13 @@ begin
 	    if (gl == NULL)
 		npts = ncols
 	    else
-		npts = is_expand_ranges (Memi[granges], Memi[colsfit], ncols)
+		npts = is_expand_ranges (Meml[granges], Meml[colsfit], ncols)
 	    nfree = npts - nrejects
 
 	    # If no rejected pixels skip to next line.
 	    if (nrejects == 0) {
 		if (nfree >= ncoeff ) {
-		    Memi[lines+lp] = i
+		    Meml[lines+lp] = i
 		    lp = lp + 1
 		}
 		next
@@ -808,17 +840,19 @@ begin
 	    if (gl == NULL) {
 		npts = ncols
 	        if (nfree >= ncoeff)
-	            call islfit (sf, Memi[colsfit], i, Memr[buf], Memr[wgt],
+	            call islfit (sf, Meml[colsfit], i, Memr[buf], Memr[wgt],
 		        npts, SF_USER, ier)
 	        else
 		    ier = NO_DEG_FREEDOM
 	    } else {
-		ijunk = is_choose_rangesr (Memi[colsfit], Memr[buf],
-		    Memr[fbuf], npts, 1, ncols)
-		ijunk = is_choose_rangesr (Memi[colsfit], Memr[wgt], Memr[wgt],
-		    npts, 1, ncols)
+		l_val = 1
+		ijunk = is_choose_rangesr (Meml[colsfit], Memr[buf],
+		    Memr[fbuf], npts, l_val, ncols)
+		l_val = 1
+		ijunk = is_choose_rangesr (Meml[colsfit], Memr[wgt], Memr[wgt],
+		    npts, l_val, ncols)
 	        if (nfree >= ncoeff)
-	            call islfit (sf, Memi[colsfit], i, Memr[fbuf], Memr[wgt],
+	            call islfit (sf, Meml[colsfit], i, Memr[fbuf], Memr[wgt],
 		        npts, SF_USER, ier)
 	        else
 		    ier = NO_DEG_FREEDOM
@@ -828,20 +862,20 @@ begin
 	    switch (ier) {
 	    case NO_DEG_FREEDOM:
 		call eprintf ("REFIT_SURFACE: Too few points to fit line: %d\n")
-		    call pargi (i)
+		    call pargl (i)
 	    case SINGULAR:
 		call eprintf ("REFIT_SURFACE: Solution singular for line: %d\n")
-		    call pargi (i)
-		Memi[lines+lp] = i
+		    call pargl (i)
+		Meml[lines+lp] = i
 		lp = lp + 1
 	    default:
-		Memi[lines+lp] = i
+		Meml[lines+lp] = i
 		lp = lp + 1
 	    }
 	}
 
 	# Resolve surface.
-	call issolve (sf, Memi[lines], lp, ier)
+	call issolve (sf, Meml[lines], lp, ier)
 
 	# Evaluate fitting errors for surface.
 	switch (ier) {
@@ -863,17 +897,18 @@ end
 int procedure grow_regions (wgt, ncols, nlines, rl, line, ngrow)
 
 real	wgt[ARB]	# array of weights set to 1
-int	ncols		# number of image columnspoints
-int	nlines		# number of images lines
+size_t	ncols		# number of image columnspoints
+size_t	nlines		# number of images lines
 pointer	rl		# pointer to reject pixel list
-int	line		# line number
+long	line		# line number
 int	ngrow		# radius for region growing
 
-int	cp, j, k, nrejects, nranges, max_nranges
-int	dist, yreg_min, yreg_max, xreg_min, xreg_max
+long	cp, j, k
+size_t	nrejects, nranges, max_nranges
+long	dist, yreg_min, yreg_max, xreg_min, xreg_max
 pointer	sp, branges
 real	r2
-int	prl_get_ranges(), is_next_number()
+long	prl_get_ranges(), is_next_number()
 errchk	smark, salloc, sfree
 errchk	prl_get_ranges, is_next_number 
 
@@ -881,7 +916,7 @@ begin
 	max_nranges = ncols
 
 	call smark (sp)
-	call salloc (branges, 3 * max_nranges + 1, TY_INT)
+	call salloc (branges, 3 * max_nranges + 1, TY_LONG)
 
 	r2 = ngrow ** 2
 	nrejects = 0
@@ -889,12 +924,12 @@ begin
 	yreg_max = min (nlines, line + ngrow)
 
 	do j = yreg_min, yreg_max {
-	    nranges = prl_get_ranges (rl, j, Memi[branges], max_nranges)
+	    nranges = prl_get_ranges (rl, j, Meml[branges], max_nranges)
 	    if (nranges == 0)
 		next
-	    dist = int (sqrt (r2 - (j - line) ** 2))
+	    dist = sqrt (r2 - (j - line) ** 2)
 	    cp = 0
-	    while (is_next_number (Memi[branges], cp) != EOF) {
+	    while (is_next_number (Meml[branges], cp) != EOF) {
 		xreg_min = max (1, cp - dist)
 		xreg_max = min (ncols, cp + dist)
 		do k = xreg_min, xreg_max {
@@ -921,11 +956,13 @@ pointer		gl	# pointer to good pixel list
 pointer		sf	# pointer to surface deascriptor
 pointer		rl	# pointer to rejected pixel list
 
-int	i, ijunk, cp, nranges, npts, ntpts, ncols, nlines, max_nranges
+long	l_val
+long	i, ijunk, cp, nranges
+size_t	npts, ntpts, ncols, nlines, max_nranges
 pointer	sp, colsfit, x, xfit, y, zfit, buf, fbuf, wgt, granges, branges
 real	sum, sigma
-int	prl_get_ranges(), is_next_number(), is_expand_ranges()
-int	is_choose_rangesr()
+long	prl_get_ranges(), is_expand_ranges(), is_next_number()
+long	is_choose_rangesr()
 pointer	imgl2r()
 real	asumr(), awssqr()
 errchk	smark, salloc, sfree, imgl2r
@@ -937,15 +974,15 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (colsfit, ncols, TY_REAL)
+	call salloc (colsfit, ncols, TY_LONG)
 	call salloc (x, ncols, TY_REAL)
 	call salloc (xfit, ncols, TY_REAL)
 	call salloc (y, ncols, TY_REAL)
 	call salloc (fbuf, ncols, TY_REAL)
 	call salloc (zfit, ncols, TY_REAL)
 	call salloc (wgt, ncols, TY_REAL)
-	call salloc (granges, 3 * max_nranges + 1, TY_INT)
-	call salloc (branges, 3 * max_nranges + 1, TY_INT)
+	call salloc (granges, 3 * max_nranges + 1, TY_LONG)
+	call salloc (branges, 3 * max_nranges + 1, TY_LONG)
 
 	# Intialize the x array.
 	do i = 1, ncols
@@ -961,10 +998,10 @@ begin
 
 	    # Check that line is in range.
 	    if (gl != NULL) {
-		nranges = prl_get_ranges (gl, i, Memi[granges], max_nranges)
+		nranges = prl_get_ranges (gl, i, Meml[granges], max_nranges)
 		if (nranges == 0)
 		    next
-		npts = is_expand_ranges (Memi[granges], Memi[colsfit], ncols)
+		npts = is_expand_ranges (Meml[granges], Meml[colsfit], ncols)
 	    }
 	    
 	    # Read in image.
@@ -979,24 +1016,27 @@ begin
 	        call isvector (sf, Memr[xfit], Memr[y], Memr[zfit], npts)
 	        call asubr (Memr[buf], Memr[zfit], Memr[zfit], npts)
 	    } else {
-		ijunk = is_choose_rangesr (Memi[colsfit], Memr[x], Memr[xfit],
-		    npts, 1, ncols)
-		ijunk = is_choose_rangesr (Memi[colsfit], Memr[buf], Memr[fbuf],
-		    npts, 1, ncols)
+		l_val = 1
+		ijunk = is_choose_rangesr (Meml[colsfit], Memr[x], Memr[xfit],
+		    npts, l_val, ncols)
+		ijunk = is_choose_rangesr (Meml[colsfit], Memr[buf], Memr[fbuf],
+		    npts, l_val, ncols)
 	        call isvector (sf, Memr[xfit], Memr[y], Memr[zfit], npts)
 	        call asubr (Memr[fbuf], Memr[zfit], Memr[zfit], npts)
 	    }
 
 	    # Get ranges of rejected pixels for the line and set weights.
 	    call amovkr (1., Memr[wgt], ncols)
-	    nranges = prl_get_ranges (rl, i, Memi[branges], max_nranges)
+	    nranges = prl_get_ranges (rl, i, Meml[branges], max_nranges)
 	    if (nranges > 0) {
 		cp = 0
-		while (is_next_number (Memi[branges], cp) != EOF)
+		while (is_next_number (Meml[branges], cp) != EOF)
 		    Memr[wgt+cp-1] = 0.
-		if (gl != NULL)
-		    ijunk = is_choose_rangesr (Memi[colsfit], Memr[wgt],
-		        Memr[wgt], npts, 1, ncols)
+		if (gl != NULL) {
+		    l_val = 1
+		    ijunk = is_choose_rangesr (Meml[colsfit], Memr[wgt],
+		        Memr[wgt], npts, l_val, ncols)
+		}
 	    }
 
 	    # Calculate sigma.
@@ -1021,14 +1061,16 @@ pointer		sf	# pointer to surface descriptor
 pointer		rl	# pointer to rejected pixel list
 real		sigma	# standard deviation of fit
 
-int	i, j, ijunk, cp, ncols, nlines, npts, nranges, nlrejects, ntrejects
-int	norejects, max_nranges
+long	l_val
+long	i, j, ijunk, cp
+size_t	ncols, nlines, npts, nranges, nlrejects, ntrejects
+size_t	norejects, max_nranges
 pointer	sp, granges, branges, x, xfit, cols, colsfit, y, zfit, buf, fbuf
 pointer	wgt, list
 real	upper, lower
 
-int	prl_get_ranges(), is_next_number(), is_make_ranges(), is_expand_ranges()
-int	is_choose_rangesr()
+long	prl_get_ranges(), is_expand_ranges(), is_next_number()
+long	is_choose_rangesr(), is_make_ranges()
 pointer	imgl2r()
 
 begin
@@ -1040,23 +1082,23 @@ begin
 	call smark (sp)
 	call salloc (x, ncols, TY_REAL)
 	call salloc (xfit, ncols, TY_REAL)
-	call salloc (cols, ncols, TY_INT)
-	call salloc (colsfit, ncols, TY_INT)
+	call salloc (cols, ncols, TY_LONG)
+	call salloc (colsfit, ncols, TY_LONG)
 	call salloc (y, ncols, TY_REAL)
 	call salloc (fbuf, ncols, TY_REAL)
 	call salloc (zfit, ncols, TY_REAL)
 	call salloc (wgt, ncols, TY_REAL)
-	call salloc (granges, 3 * max_nranges + 1, TY_INT)
-	call salloc (branges, 3 * max_nranges + 1, TY_INT)
-	call salloc (list, ncols, TY_INT)
+	call salloc (granges, 3 * max_nranges + 1, TY_LONG)
+	call salloc (branges, 3 * max_nranges + 1, TY_LONG)
+	call salloc (list, ncols, TY_LONG)
 
 	# Intialize x and column values.
 	do i = 1, ncols {
-	    Memi[cols+i-1] = i
+	    Meml[cols+i-1] = i
 	    Memr[x+i-1] = i
 	}
 	call amovr (Memr[x], Memr[xfit], ncols)
-	call amovi (Memi[cols], Memi[colsfit], ncols)
+	call amovl (Meml[cols], Meml[colsfit], ncols)
 
 	ntrejects = 0
 	if (LOWER(imfit) <= 0.0)
@@ -1073,10 +1115,10 @@ begin
 
 	    # Get ranges if appropriate.
 	    if (gl != NULL) {
-		nranges = prl_get_ranges (gl, i, Memi[granges], max_nranges)
+		nranges = prl_get_ranges (gl, i, Meml[granges], max_nranges)
 		if (nranges == 0)
 		    next
-		npts = is_expand_ranges (Memi[granges], Memi[colsfit], ncols) 
+		npts = is_expand_ranges (Meml[granges], Meml[colsfit], ncols) 
 	    }
 
 	    # Read in image.
@@ -1091,28 +1133,31 @@ begin
 	        call isvector (sf, Memr[xfit], Memr[y], Memr[zfit], npts)
 	        call asubr (Memr[buf], Memr[zfit], Memr[zfit], npts)
 	    } else {
-		ijunk = is_choose_rangesr (Memi[colsfit], Memr[x], Memr[xfit],
-		    npts, 1, ncols)
-		ijunk = is_choose_rangesr (Memi[colsfit], Memr[buf], Memr[fbuf],
-		    npts, 1, ncols)
+		l_val = 1
+		ijunk = is_choose_rangesr (Meml[colsfit], Memr[x], Memr[xfit],
+		    npts, l_val, ncols)
+		ijunk = is_choose_rangesr (Meml[colsfit], Memr[buf], Memr[fbuf],
+		    npts, l_val, ncols)
 	        call isvector (sf, Memr[xfit], Memr[y], Memr[zfit], npts)
 	        call asubr (Memr[fbuf], Memr[zfit], Memr[zfit], npts)
 	    }
 
 	    # Get ranges of rejected pixels for the line and set weights.
 	    call amovkr (1., Memr[wgt], ncols)
-	    nranges = prl_get_ranges (rl, i, Memi[branges], max_nranges)
+	    nranges = prl_get_ranges (rl, i, Meml[branges], max_nranges)
 	    norejects = 0
 	    if (nranges > 0) {
 		cp = 0
-		while (is_next_number (Memi[branges], cp) != EOF) {
-		    Memi[list+norejects] = cp
+		while (is_next_number (Meml[branges], cp) != EOF) {
+		    Meml[list+norejects] = cp
 		    norejects = norejects + 1
 		    Memr[wgt+cp-1] = 0.
 		}
-		if (gl != NULL)
-		    ijunk = is_choose_rangesr (Memi[colsfit], Memr[wgt],
-		        Memr[wgt], npts, 1, ncols)
+		if (gl != NULL) {
+		    l_val = 1
+		    ijunk = is_choose_rangesr (Meml[colsfit], Memr[wgt],
+		        Memr[wgt], npts, l_val, ncols)
+		}
 	    }
 
 	    # Detect deviant pixels.
@@ -1120,17 +1165,17 @@ begin
 	    do j = 1, npts {
 		if ((Memr[zfit+j-1] < lower || Memr[zfit+j-1] > upper) &&
 		    Memr[wgt+j-1] != 0.) {
-		    Memi[list+norejects+nlrejects] = Memi[colsfit+j-1]
+		    Meml[list+norejects+nlrejects] = Meml[colsfit+j-1]
 		    nlrejects = nlrejects + 1
 		}
 	    }
 
 	    # Add to rejected pixel list.
 	    if (nlrejects > 0) {
-		call asrti (Memi[list], Memi[list], norejects + nlrejects)
-		nranges = is_make_ranges (Memi[list], norejects + nlrejects,
-		    Memi[granges], max_nranges)
-		call prl_put_ranges (rl, i, i, Memi[granges])
+		call asrtl (Meml[list], Meml[list], norejects + nlrejects)
+		nranges = is_make_ranges (Meml[list], norejects + nlrejects,
+		    Meml[granges], max_nranges)
+		call prl_put_ranges (rl, i, i, Meml[granges])
 	    }
 
 	    ntrejects = ntrejects + nlrejects
@@ -1147,9 +1192,9 @@ real procedure awssqr (a, w, npts)
 
 real	a[npts]		# array of data
 real	w[npts]		# array of points
-int	npts		# number of data points
+size_t	npts		# number of data points
 
-int	i
+long	i
 real	sum
 
 begin

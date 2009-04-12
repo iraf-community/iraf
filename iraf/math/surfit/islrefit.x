@@ -15,7 +15,7 @@ include "surfitdef.h"
 procedure islrefit (sf, cols, lineno, z, w)
 
 pointer	sf		# pointer to surface descriptor
-int	cols[ARB]	# columns to be fit 
+long	cols[ARB]	# columns to be fit 
 long	lineno		# line number
 real	z[ARB]		# surface values
 real	w[ARB]		# weight values

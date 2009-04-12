@@ -18,7 +18,7 @@ include "surfitdef.h"
 procedure islfit (sf, cols, lineno, z, w, ncols, wtflag, ier)
 
 pointer	sf		# pointer to the surface descriptor
-int	cols[ncols]	# array of columns
+long	cols[ncols]	# array of columns
 long	lineno    	# lineno
 real	z[ncols]	# the surface values
 real	w[ncols]	# array of weights

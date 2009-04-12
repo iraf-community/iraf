@@ -125,12 +125,16 @@ int procedure is_decode_ranges (range_string, ranges, max_ranges, minimum,
     maximum, nvalues)
 
 char	range_string[ARB]	# Range string to be decoded
-int	ranges[3, max_ranges]	# Range array
-int	max_ranges		# Maximum number of ranges
-int	minimum, maximum	# Minimum and maximum range values allowed
-int	nvalues			# The number of values in the ranges
+long	ranges[3, max_ranges]	# Range array
+size_t	max_ranges		# Maximum number of ranges
+long	minimum, maximum	# Minimum and maximum range values allowed
+size_t	nvalues			# The number of values in the ranges
 
-int	ip, nrange, out_of_range, a, b, first, last, step, ctoi()
+int	ip
+long	out_of_range, a, b, first, last, step
+int	ctol()
+long	lmod()
+size_t	nrange
 
 begin
 	ip = 1
@@ -175,7 +179,7 @@ begin
 	    else if (range_string[ip] == 'x')
 		;
 	    else if (IS_DIGIT(range_string[ip])) {		# ,n..
-		if (ctoi (range_string, ip, a) == 0)
+		if (ctol (range_string, ip, a) == 0)
 		    return (ERR)
 	    } else
 		return (ERR)
@@ -195,7 +199,7 @@ begin
 		if (range_string[ip] == EOS)
 		    ;
 		else if (IS_DIGIT(range_string[ip])) {
-		    if (ctoi (range_string, ip, b) == 0)
+		    if (ctol (range_string, ip, b) == 0)
 		        return (ERR)
 		} else if (range_string[ip] == 'x')
 		    ;
@@ -217,7 +221,7 @@ begin
 		if (range_string[ip] == EOS)
 		    ;
 		else if (IS_DIGIT(range_string[ip])) {
-		    if (ctoi (range_string, ip, step) == 0)
+		    if (ctol (range_string, ip, step) == 0)
 		        ;
 		} else if (range_string[ip] == '-')
 		    ;
@@ -231,9 +235,9 @@ begin
 	    first = min (a, b)
 	    last = max (a, b)
 	    if (first < minimum)
-		first = minimum + mod (step - mod (minimum - first, step), step)
+		first = minimum + lmod(step - lmod(minimum - first, step), step)
 	    if (last > maximum)
-		last = maximum - mod (last - maximum, step)
+		last = maximum - lmod(last - maximum, step)
 	    if (first <= last) {
 	        ranges[1, nrange] = first
 	        ranges[2, nrange] = last
@@ -254,12 +258,13 @@ end
 # regardless of the order in which the ranges are given.  Duplicate entries
 # are ignored.  EOF is returned at the end of the list.
 
-int procedure is_next_number (ranges, number)
+long procedure is_next_number (ranges, number)
 
-int	ranges[ARB]		# Range array
-int	number			# Both input and output parameter
+long	ranges[ARB]		# Range array
+long	number			# Both input and output parameter
 
-int	ip, first, last, step, next_number, remainder
+long	ip, first, last, step, next_number, remainder
+long	lmod()
 
 begin
 	# If number+1 is anywhere in the list, that is the next number,
@@ -267,14 +272,14 @@ begin
 	# is greater than number+1.
 
 	number = number + 1
-	next_number = MAX_INT
+	next_number = MAX_LONG
 
 	for (ip=1;  ranges[ip] != NULL;  ip=ip+3) {
 	    first = ranges[ip]
 	    last = ranges[ip+1]
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = lmod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder + step <= last)
@@ -283,7 +288,7 @@ begin
 		next_number = min (next_number, first)
 	}
 
-	if (next_number == MAX_INT)
+	if (next_number == MAX_LONG)
 	    return (EOF)
 	else {
 	    number = next_number
@@ -298,12 +303,13 @@ end
 # regardless of the order in which the ranges are given.  Duplicate entries
 # are ignored.  EOF is returned at the end of the list.
 
-int procedure is_previous_number (ranges, number)
+long procedure is_previous_number (ranges, number)
 
-int	ranges[ARB]		# Range array
-int	number			# Both input and output parameter
+long	ranges[ARB]		# Range array
+long	number			# Both input and output parameter
 
-int	ip, first, last, step, next_number, remainder
+long	ip, first, last, step, next_number, remainder
+long	lmod()
 
 begin
 	# If number-1 is anywhere in the list, that is the previous number,
@@ -318,13 +324,13 @@ begin
 	    last = ranges[ip+1]
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = lmod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder >= first)
 		    next_number = number - remainder
 	    } else if (last < number) {
-		remainder = mod (last - first, step)
+		remainder = lmod(last - first, step)
 		if (remainder == 0)
 		    next_number = max (next_number, last)
 		else if (last - remainder >= first)
@@ -345,10 +351,11 @@ end
 
 bool procedure is_in_rangelist (ranges, number)
 
-int	ranges[ARB]		# Range array
-int	number			# Number to be tested against ranges
+long	ranges[ARB]		# Range array
+long	number			# Number to be tested against ranges
 
-int	ip, first, last, step
+long	ip, first, last, step
+long	lmod()
 
 begin
 	for (ip=1;  ranges[ip] != NULL;  ip=ip+3) {
@@ -356,7 +363,7 @@ begin
 	    last = ranges[ip+1]
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last)
-		if (mod (number - first, step) == 0)
+		if (lmod(number - first, step) == 0)
 		    return (TRUE)
 	}
 
@@ -366,15 +373,15 @@ end
 
 # IS_EXPAND_RANGES -- Expand a range string into a array of values.
 
-int procedure is_expand_ranges (ranges, array, max_nvalues)
+long procedure is_expand_ranges (ranges, array, max_nvalues)
 
-int	ranges[ARB]			# Range array
-int	array[max_nvalues]		# Array of values
-int	max_nvalues			# Maximum number of values
+long	ranges[ARB]			# Range array
+long	array[max_nvalues]		# Array of values
+size_t	max_nvalues			# Maximum number of values
 
-int	n, value
+long	n, value
 
-int	is_next_number()
+long	is_next_number()
 
 begin
 	n = 0
@@ -395,9 +402,10 @@ procedure is_select_ranges (a, b, ranges)
 
 real	a[ARB]				# Input array
 real	b[ARB]				# Output array
-int	ranges[3, ARB]			# Ranges
+long	ranges[3, ARB]			# Ranges
 
-int	i, j, npts, nmove
+long	i, j
+size_t	npts, nmove
 
 begin
 	npts = 0
@@ -418,16 +426,16 @@ end
 
 # IS_CHOOSE_RANGESI -- Copy the selected values from array a to b.
 
-int procedure is_choose_rangesi (indices, a, b, npts, ifirst, ilast)
+long procedure is_choose_rangesi (indices, a, b, npts, ifirst, ilast)
 
-int	indices[ARB]		# array of indices
+long	indices[ARB]		# array of indices
 int	a[ARB]			# input array
 int	b[ARB]			# output array
-int	npts			# number of points
-int	ifirst			# first index
-int	ilast			# last index
+size_t	npts			# number of points
+long	ifirst			# first index
+long	ilast			# last index
 
-int	i, element
+long	i, element
 
 begin
 	element = 1
@@ -443,16 +451,16 @@ end
 
 # IS_CHOOSE_RANGESR -- Copy the selected values from array a to b.
 
-int procedure is_choose_rangesr (indices, a, b, npts, ifirst, ilast)
+long procedure is_choose_rangesr (indices, a, b, npts, ifirst, ilast)
 
-int	indices[ARB]		# array of indices
+long	indices[ARB]		# array of indices
 real	a[ARB]			# input array
 real	b[ARB]			# output array
-int	npts			# number of points
-int	ifirst			# first element to be extracted
-int	ilast			# last element to be extracted
+size_t	npts			# number of points
+long	ifirst			# first element to be extracted
+long	ilast			# last element to be extracted
 
-int	i, element
+long	i, element
 
 begin
 	element = 1
@@ -469,15 +477,15 @@ end
 # IS_MAKE_RANGES -- Procedure to make a set of ranges from an ordered list
 # of column numbers. Only a step size of 1 is checked for.
 
-int procedure is_make_ranges (list, npts, ranges, max_nranges)
+long procedure is_make_ranges (list, npts, ranges, max_nranges)
 
-int	list[ARB]	# list of column numbers in increasing order
-int	npts		# number of list elements
-int	ranges[ARB]	# output ranges
-int	max_nranges	# the maximum number of ranges
+long	list[ARB]	# list of column numbers in increasing order
+size_t	npts		# number of list elements
+long	ranges[ARB]	# output ranges
+size_t	max_nranges	# the maximum number of ranges
 
 bool	next_range
-int	ip, op, nranges
+long	ip, op, nranges
 
 begin
 	# If zero list elements return

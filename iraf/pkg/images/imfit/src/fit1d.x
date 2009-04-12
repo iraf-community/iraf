@@ -126,12 +126,14 @@ int	ntype				# Type of output
 bool	interactive			# Interactive?
 
 char	graphics[SZ_FNAME]		# Graphics device
-int	i, nx, new
+long	i
+int	new
+size_t	nx
 real	div
 pointer	cv, gp, sp, x, wts, indata, outdata
 
 int	f1d_getline(), f1d_getdata(), strlen()
-real	cveval()
+real	cveval(), aabs()
 pointer	gopen()
 
 begin
@@ -197,7 +199,7 @@ begin
 	    case 3:
 		do i = 0, nx-1 {
 		    div = cveval (cv, Memr[x+i])
-		    if (abs (div) < 1E-20)
+		    if (aabs (div) < 1E-20)
 			div = 1
 		    Memr[outdata+i] = Memr[indata+i] / div
 		}
@@ -220,6 +222,8 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 bool	same			# Same image?
 
+size_t	sz_val
+long	l_val
 int	i
 pointer	sp, iroot, isect, oroot, osect, line, data
 
@@ -228,15 +232,17 @@ int	imaccess()
 long	impnlr()
 pointer	immap()
 errchk	immap
+include	<nullptr.inc>
 
 begin
 	# Get the root name and section of the input image.
 
 	call smark (sp)
-	call salloc (iroot, SZ_FNAME, TY_CHAR)
-	call salloc (isect, SZ_FNAME, TY_CHAR)
-	call salloc (oroot, SZ_FNAME, TY_CHAR)
-	call salloc (osect, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (iroot, sz_val, TY_CHAR)
+	call salloc (isect, sz_val, TY_CHAR)
+	call salloc (oroot, sz_val, TY_CHAR)
+	call salloc (osect, sz_val, TY_CHAR)
 
 	call imgimage (input, Memc[iroot], SZ_FNAME)
 	call imgsection (input, Memc[isect], SZ_FNAME)
@@ -248,20 +254,27 @@ begin
 	# of the full input image and initialize according to ntype.
 
 	if (imaccess (output, READ_WRITE) == NO) {
-	    in = immap (Memc[iroot], READ_ONLY, 0)
+	    in = immap (Memc[iroot], READ_ONLY, NULLPTR)
 	    out = immap (Memc[oroot], NEW_COPY, in)
 	    IM_PIXTYPE(out) = TY_REAL
 
-	    call salloc (line, IM_MAXDIM, TY_LONG)
-	    call amovkl (long (1), Meml[line], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call salloc (line, sz_val, TY_LONG)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[line], sz_val)
 
 	    switch (ntype) {
 	    case 1, 2:
-	        while (impnlr (out, data, Meml[line]) != EOF)
-	            call aclrr (Memr[data], IM_LEN(out, 1))
+	        while (impnlr (out, data, Meml[line]) != EOF) {
+		    sz_val = IM_LEN(out, 1)
+	            call aclrr (Memr[data], sz_val)
+		}
 	    case 3:
-	        while (impnlr (out, data, Meml[line]) != EOF)
-	            call amovkr (1., Memr[data], IM_LEN(out, 1))
+	        while (impnlr (out, data, Meml[line]) != EOF) {
+		    sz_val = IM_LEN(out, 1)
+	            call amovkr (1., Memr[data], sz_val)
+		}
 	    }
 
 	    call imunmap (in)
@@ -273,7 +286,7 @@ begin
 	# does not then add the image section to the output image.  Finally
 	# check the input and output images have the same size.
 
-	in = immap (input, READ_ONLY, 0)
+	in = immap (input, READ_ONLY, NULLPTR)
 
 	if (Memc[isect] != EOS && Memc[osect] == EOS) {
 	    call sprintf (Memc[osect], SZ_FNAME, "%s%s")
@@ -284,10 +297,10 @@ begin
 
 	if (streq (input, Memc[osect])) {
 	    call imunmap (in)
-	    in = immap (input, READ_WRITE, 0)
+	    in = immap (input, READ_WRITE, NULLPTR)
 	    out = in
 	} else
-	    out = immap (Memc[osect], READ_WRITE, 0)
+	    out = immap (Memc[osect], READ_WRITE, NULLPTR)
 
 	do i = 1, IM_NDIM(in)
 	    if (IM_LEN(in, i) != IM_LEN(out, i)) {
@@ -313,7 +326,9 @@ int	maxbuf			# Maximum buffer size for column axis
 pointer	indata			# Input data pointer
 pointer	outdata			# Output data pointer
 
-int	i, index, last_index, col1, col2, nc, ncols, nlines, ncols_block
+long	l_val
+long	i, index, last_index, col1, col2, nc, ncols, ncols_block
+size_t	nlines
 pointer	inbuf, outbuf, ptr
 pointer	imgl1r(), impl1r(), imgl2r(), impl2r(), imgs2r(), imps2r()
 data	index/0/
@@ -386,8 +401,9 @@ begin
 	    if (index > col2) {
 		col1 = col2 + 1
 		col2 = min (ncols, col1 + ncols_block - 1)
-		inbuf = imgs2r (in, col1, col2, 1, nlines)
-		outbuf = imps2r (out, col1, col2, 1, nlines)
+		l_val = 1
+		inbuf = imgs2r (in, col1, col2, l_val, nlines)
+		outbuf = imps2r (out, col1, col2, l_val, nlines)
 		nc = col2 - col1 + 1
 	    }
 
@@ -415,9 +431,13 @@ int	axis			# Image axis
 char	title[ARB]		# Title
 pointer	data			# Image data
 
+size_t	sz_val
+long	l_val
 pointer	x
 char	line[SZ_LINE]
-int	i, j, stat, imlen
+long	i, j
+int	stat
+size_t	imlen
 int	getline(), nscan()
 pointer	imgl1r()
 data	stat/EOF/
@@ -432,8 +452,10 @@ begin
 	    	    call pargstr (IM_TITLE(im))
 		call gt_sets (gt, GTTITLE, title)
 		call mfree (data, TY_REAL)
-		call malloc (data, IM_LEN(im, 1), TY_REAL)
-		call amovr (Memr[imgl1r(im)], Memr[data], IM_LEN(im, 1))
+		sz_val = IM_LEN(im, 1)
+		call malloc (data, sz_val, TY_REAL)
+		sz_val = IM_LEN(im, 1)
+		call amovr (Memr[imgl1r(im)], Memr[data], sz_val)
 		stat = OK
 	    } else
 		stat = EOF
@@ -462,8 +484,8 @@ begin
 	    return (EOF)
 
 	call sscan (line)
-	call gargi (i)
-	call gargi (j)
+	call gargl (i)
+	call gargl (j)
 
 	switch (nscan()) {
 	case 0:
@@ -479,8 +501,8 @@ begin
 
 	call sprintf (title, SZ_LINE, "%s %d - %d\n%s")
 	    call pargstr (title)
-	    call pargi (i)
-	    call pargi (j)
+	    call pargl (i)
+	    call pargl (j)
 	    call pargstr (IM_TITLE(im))
 
 	call gt_sets (gt, GTTITLE, title)
@@ -488,10 +510,12 @@ begin
 	switch (axis) {
 	case 1:
 	    call ic_pstr (ic, "xlabel", "Column")
-	    call xt_21imavg (im, axis, 1, IM_LEN(im, 1), i, j, x, data, imlen)
+	    l_val = 1
+	    call xt_21imavg (im, axis, l_val, IM_LEN(im, 1), i, j, x, data, imlen)
 	case 2:
 	    call ic_pstr (ic, "xlabel", "Line")
-	    call xt_21imavg (im, axis, i, j, 1, IM_LEN(im, 2), x, data, imlen)
+	    l_val = 1
+	    call xt_21imavg (im, axis, i, j, l_val, IM_LEN(im, 2), x, data, imlen)
 	}
 	call mfree (x, TY_REAL)
 

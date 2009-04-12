@@ -25,19 +25,23 @@ char	imtlist2[SZ_LINE]			# Output image list
 char	image1[SZ_FNAME]			# Input image
 char	image2[SZ_FNAME]			# Output image
 
+size_t	sz_val
 char	str[SZ_LINE], region_str[SZ_LINE]
 int	region_type
 pointer	list1, list2, im1, im2, imfit, gl, sp
 
 bool	clgetb()
 int	imtgetim(), imtlen(), btoi(), clgeti(), clgwrd()
+long	clgetl()
 pointer	imtopen(), immap()
 real	clgetr()
+include	<nullptr.inc>
 
 begin
 	# Allocate space for imfit structure.
 	call smark (sp)
-	call salloc (imfit, LEN_IMSFSTRUCT, TY_STRUCT)
+	sz_val = LEN_IMSFSTRUCT
+	call salloc (imfit, sz_val, TY_STRUCT)
 
 	# Get task parameters.
 	call clgstr ("input", imtlist1, SZ_FNAME)
@@ -54,8 +58,8 @@ begin
 	CROSS_TERMS(imfit) = btoi (clgetb ("cross_terms"))
 
 	# Get median processing parameters.
-	XMEDIAN(imfit) = clgeti ("xmedian")
-	YMEDIAN(imfit) = clgeti ("ymedian")
+	XMEDIAN(imfit) = clgetl ("xmedian")
+	YMEDIAN(imfit) = clgetl ("ymedian")
 	MEDIAN_PERCENT(imfit) = clgetr ("median_percent")
 	if (XMEDIAN(imfit) > 1 || YMEDIAN(imfit) > 1)
 	    MEDIAN(imfit) = YES
@@ -120,7 +124,7 @@ begin
 	while ((imtgetim (list1, image1, SZ_FNAME) != EOF) &&
 	      (imtgetim (list2, image2, SZ_FNAME) != EOF)) {
 	    
-	    im1 = immap (image1, READ_ONLY, 0)
+	    im1 = immap (image1, READ_ONLY, NULLPTR)
 	    im2 = immap (image2, NEW_COPY, im1)
 
 	    iferr {
@@ -155,13 +159,17 @@ pointer	gl			# good pixel list descriptor
 int	region_type		# type of good region
 char	region_string[ARB]	# region parameters
 
-int	i, ip, zero, nvals, range_min, r2, xdist, max_nranges
-int	x1, x2, y1, y2, temp, border, xcenter, ycenter, radius
-int	columns[7]
-pointer	sp, ranges, list
+long	l_val
+int	ip, r2, radius, list
+long	i, zero, range_min, xdist
+size_t	max_nranges, nvals
+long	x1, x2, y1, y2, temp, border, xcenter, ycenter
+long	columns[7]
+pointer	sp, ranges
 
 bool	is_in_rangelist()
-int	is_next_number(), is_decode_ranges(), open(), fscan(), nscan(), ctoi()
+long	is_next_number()
+int	is_decode_ranges(), open(), fscan(), nscan(), ctoi(), ctol()
 errchk	open, close
 
 begin
@@ -170,15 +178,16 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (ranges, 3 * max_nranges + 1, TY_INT)
+	call salloc (ranges, 3 * max_nranges + 1, TY_LONG)
 
 	# Compute the good pixel list.
 	switch (region_type) {
 	case ROWS:
 
 	    # Decode the row ranges.
-	    if (is_decode_ranges (region_string, Memi[ranges], max_nranges, 1,
-	        int (IM_LEN(im,2)), nvals) == ERR)
+	    l_val = 1
+	    if (is_decode_ranges (region_string, Meml[ranges], max_nranges, l_val,
+	        IM_LEN(im,2), nvals) == ERR)
 		call error (0, "MAKE_GOOD_LIST: Error decoding row string.")
 	    if (nvals == 0) 
 		call error (0, "MAKE_GOOD_LIST: no good rows.") 
@@ -188,7 +197,7 @@ begin
 	    }
 
 	    # Intialize the good pixel list.
-	    call prl_init (gl, int (IM_LEN(im,1)), int (IM_LEN(im,2)))
+	    call prl_init (gl, IM_LEN(im,1), IM_LEN(im,2))
 
 	    # Set column limits using the ranges format.
 	    columns[1] = 1
@@ -198,23 +207,24 @@ begin
 
 	    # Set column limits for the specied lines.
 	    zero = 0
-	    range_min = is_next_number (Memi[ranges], zero)
+	    range_min = is_next_number (Meml[ranges], zero)
 	    while (range_min != EOF) {
 	        for (i = range_min; i <= IM_LEN(im,2) + 1; i = i + 1) {
-		    if (!is_in_rangelist (Memi[ranges], i) ||
+		    if (!is_in_rangelist (Meml[ranges], i) ||
 		        i == IM_LEN(im,2)+1) {
 		        call prl_put_ranges (gl, range_min, i-1, columns)
 		        break
 		    }
 		}
-		range_min = is_next_number (Memi[ranges], i)
+		range_min = is_next_number (Meml[ranges], i)
 	    }
 
 	case COLUMNS:
 
 	    # Set the specified columns.
-	    if (is_decode_ranges (region_string, Memi[ranges], max_nranges, 1,
-	        int (IM_LEN(im,1)), nvals) == ERR)
+	    l_val = 1
+	    if (is_decode_ranges (region_string, Meml[ranges], max_nranges, l_val,
+	        IM_LEN(im,1), nvals) == ERR)
 		call error (0, "MAKE_GOOD_LIST: Error decoding column string.")
 	    if (nvals == 0)
 		call error (0, "MAKE_GOOD_LIST: No good columns.")
@@ -224,31 +234,32 @@ begin
 	    }
 
 	    # Make the good pixel list.
-	    call prl_init (gl, int (IM_LEN(im,1)), int (IM_LEN(im,2)))
-	    call prl_add_ranges (gl, 1, int (IM_LEN(im,2)), Memi[ranges])
+	    call prl_init (gl, IM_LEN(im,1), IM_LEN(im,2))
+	    l_val = 1
+	    call prl_add_ranges (gl, l_val, IM_LEN(im,2), Meml[ranges])
 
 	case CIRCLE, INVCIRCLE:
 	    
 	    # Get the parameters of the circle.
 	    ip = 1
-	    if (ctoi (region_string, ip, xcenter) <= 0)
+	    if (ctol (region_string, ip, xcenter) <= 0)
 		call error (0, "MAKE_GOOD_LIST: Error decoding xcenter.")
-	    if (ctoi (region_string, ip, ycenter) <= 0)
+	    if (ctol (region_string, ip, ycenter) <= 0)
 		call error (0, "MAKE_GOOD_LIST: Error decoding ycenter.")
 	    if (ctoi (region_string, ip, radius) <= 0)
 		call error (0, "MAKE_GOOD_LIST: Error decoding radius.")
 
 	    y1 = max (1, ycenter - radius)
-	    y2 = min (int (IM_LEN(im,2)), ycenter + radius)
+	    y2 = min (IM_LEN(im,2), ycenter + radius)
 	    x1 = max (1, xcenter - radius)
-	    x2 = min (int (IM_LEN(im,1)), xcenter + radius)
+	    x2 = min (IM_LEN(im,1), xcenter + radius)
 	    if (region_type == CIRCLE) {
 	        if (y1 > IM_LEN(im,2) || y2 < 1 || x1 > IM_LEN(im,1) || x2 < 1)
 		    call error (0, "MAKE_GOOD_LIST: No good regions.")
 	    }
 
 	    # Create the good pixel list.
-	    call prl_init (gl, int (IM_LEN(im,1)), int (IM_LEN(im,2)))
+	    call prl_init (gl, IM_LEN(im,1), IM_LEN(im,2))
 
 	    r2 = radius ** 2
 	    if (region_type == CIRCLE) {
@@ -308,16 +319,16 @@ begin
 
 	    # Open file of sections.
 	    list = open (region_string, READ_ONLY, TEXT_FILE)
-	    call prl_init (gl, int (IM_LEN(im,1)), int (IM_LEN(im,2)))
+	    call prl_init (gl, IM_LEN(im,1), IM_LEN(im,2))
 
 	    # Scan the list.
 	    while (fscan (list) != EOF) {
 		
 		# Fetch parameters from list.
-		call gargi (x1)
-		call gargi (x2)
-		call gargi (y1)
-		call gargi (y2)
+		call gargl (x1)
+		call gargl (x2)
+		call gargl (y1)
+		call gargl (y2)
 		if (nscan() != 4)
 		    next
 		
@@ -361,7 +372,7 @@ begin
 
 	    # Decode border parameter.
 	    ip = 1
-	    if (ctoi (region_string, ip, border) == ERR)
+	    if (ctol (region_string, ip, border) == ERR)
 		call error (0, "MAKE_GOOD_LIST: Error decoding border string.")
 	    if (border < 1)
 		call error (0, "MAKE_GOOD_LIST: No border.")
@@ -371,7 +382,7 @@ begin
 	    }
 
 	    # Intialize list.
-	    call prl_init (gl, int (IM_LEN(im,1)), int (IM_LEN(im,2)))
+	    call prl_init (gl, IM_LEN(im,1), IM_LEN(im,2))
 	    y1 = 1 + border - 1
 	    y2 = IM_LEN(im,2) - border + 1
 	    columns[1] = 1
@@ -380,8 +391,9 @@ begin
 	    columns[4] = NULL
 
 	    # Set ranges for top and bottom edges of image.
-	    call prl_put_ranges (gl, 1, y1, columns)
-	    call prl_put_ranges (gl, y2, int (IM_LEN(im,2)), columns)
+	    l_val = 1
+	    call prl_put_ranges (gl, l_val, y1, columns)
+	    call prl_put_ranges (gl, y2, IM_LEN(im,2), columns)
 
 	    columns[1] = 1
 	    columns[2] = y1
