@@ -16,7 +16,7 @@ include	<pkg/rmsorted.h>
 define	RM_LEN		25		# Structure size
 define	RM_RMS		Memp[$1]	# Pointer to RMEDSRT method
 define	RM_BOX		Memi[P2I($1+1)]	# Box size
-define	RM_NDATA	Memi[P2I($1+2)]	# Number of datasets
+define	RM_NDATA	Memz[P2Z($1+2)]	# Number of datasets
 define	RM_PIXTYPE	Memi[P2I($1+3)]	# Internal storage type
 define	RM_GOOD		Memp[$1+4]	# Ptr to good array (box)
 define	RM_MASK		Memp[$1+5]	# Ptr to mask array
@@ -238,13 +238,14 @@ end
 pointer procedure rm_open (box, ndatasets, pixtype)
 
 int	box			#I Median box size (<= 128)
-int	ndatasets		#I Number of datasets
+size_t	ndatasets		#I Number of datasets
 int	pixtype			#I Internal storage type
 pointer	rm			#O RM pointer
 
 size_t	sz_val
 short	s_val
 int	i
+long	j
 short	s
 pointer	rms
 short	nots(), shifts()
@@ -286,8 +287,8 @@ begin
 	    s = shifts (s, s_val)
 	}
 
-	do i = 1, ndatasets
-	    call rm_pack (rm, i)
+	do j = 1, ndatasets
+	    call rm_pack (rm, j)
 
 	return (rm)
 end
@@ -315,7 +316,7 @@ end
 procedure rm_pack (rm, dataset)
 
 pointer	rm			#I RM pointer
-int	dataset			#I Data set
+long	dataset			#I Data set
 
 size_t	sz_val
 pointer	rms
@@ -337,7 +338,7 @@ end
 procedure rm_unpack (rm, dataset)
 
 pointer	rm			#I RM pointer
-int	dataset			#I Data set
+long	dataset			#I Data set
 
 size_t	sz_val
 int	i, j, box
