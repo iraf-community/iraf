@@ -21,15 +21,22 @@ int	boundary			# Boundary extension type
 real	constant			# Constant boundary extension
 char	interpstr[ARB]			# Interpolation type
 
-int	i, nsinc, nincr, ncols, nimcols, nlines, nbpix, nmargin, interpolation
+size_t	sz_val
+long	l_val
+size_t	ncols, nimcols
+int	j
+long	i, nlines, nbpix
+int	nsinc, nincr, nmargin, interpolation
 long	v1[IM_MAXDIM], v2[IM_MAXDIM], vout[IM_MAXDIM]
 real	dx, deltax, cx
 pointer	sp, x, asi, junk, buf1, buf2
 
 bool	fp_equalr()
-long	impnlr()
+long	impnlr(), lint()
 int	asigeti()
 pointer	imggsr()
+real	aabs()
+long	lint()
 
 begin
 	# Check for out of bounds shifts.
@@ -38,7 +45,7 @@ begin
 	    call error (0, "SHIFTLINES: Shift out of bounds")
 
 	# Compute the shift.
-	dx = abs (shift - int (shift))
+	dx = aabs(shift - aint(shift))
 	if (fp_equalr (dx, 0.0))
 	    deltax = 0.0
 	else if (shift > 0.0)
@@ -49,7 +56,7 @@ begin
 	# Initialize the interpolation.
 	call asitype (interpstr, interpolation, nsinc, nincr, cx)
 	if (interpolation == II_LSINC || interpolation == II_SINC)
-	    call asisinit (asi, II_LSINC, nsinc, 1, deltax - nint (deltax),
+	    call asisinit (asi, II_LSINC, nsinc, 1, deltax - anint(deltax),
 	        0.0)
 	else
 	    call asisinit (asi, interpolation, nsinc, 1, cx, 0.0)
@@ -59,9 +66,9 @@ begin
 	    nmargin = asigeti (asi, II_ASINSINC)
 	else
 	    nmargin = NMARGIN
-	nbpix = int (abs (shift) + 1.0) + nmargin
+	nbpix = lint(aabs(shift) + 1.0) + nmargin
 	call imseti (im1, IM_TYBNDRY, boundary)
-	call imseti (im1, IM_NBNDRYPIX, nbpix)
+	call imsetl (im1, IM_NBNDRYPIX, nbpix)
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
 	# Allocate space for and set up the interpolation coordinates.
@@ -81,23 +88,25 @@ begin
 	# Initialize the input v vectors.
 	cx = 1. - nmargin - shift
 	if ((cx <= 0.0) && (! fp_equalr (dx, 0.0)))
-	    v1[1] = long (cx) - 1
+	    v1[1] = lint(cx) - 1
 	else
-	    v1[1] = long (cx)
+	    v1[1] = lint(cx)
 	v2[1] = ncols - shift + nmargin + 1
 	nimcols = v2[1] - v1[1] + 1
-	do i = 2, IM_NDIM(im1) {
-	    v1[i] = long (1)
-	    v2[i] = long (1)
+	do j = 2, IM_NDIM(im1) {
+	    v1[j] = 1
+	    v2[j] = 1
 	}
 
 	# Compute the number of output lines.
 	nlines = 1
-	do i = 2, IM_NDIM(im1)
-	    nlines = nlines * IM_LEN(im1, i)
+	do j = 2, IM_NDIM(im1)
+	    nlines = nlines * IM_LEN(im1, j)
 
 	# Initialize the output v vector.
-	call amovkl (long(1), vout, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, vout, sz_val)
 
 	# Shift the images.
 	do i = 1, nlines {
@@ -134,20 +143,25 @@ procedure sh_linesi (im1, im2, shift, boundary, constant)
 
 pointer	im1				# Input image descriptor
 pointer	im2				# Output image descriptor
-int	shift				# Integer shift
+long	shift				# Integer shift
 int	boundary			# Boundary extension type
 real	constant			# Constant for boundary extension
 
-int	i, ncols, nlines, junk
+size_t	sz_val
+long	l_val
+int	j
+long	i, junk
+size_t	ncols, nlines
 long	v1[IM_MAXDIM], v2[IM_MAXDIM], vout[IM_MAXDIM]
 pointer	buf1, buf2
 
 pointer	imggss(), imggsi(), imggsl(), imggsr(), imggsd(), imggsx()
 long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
+long	labs()
 
 begin
 	# Set the boundary extension parameters.
-	call imseti (im1, IM_NBNDRYPIX, abs (shift))
+	call imsetl (im1, IM_NBNDRYPIX, labs(shift))
 	call imseti (im1, IM_TYBNDRY, boundary)
 	call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
@@ -159,16 +173,18 @@ begin
 	# Setup start vector for sequential reads and writes.
 	v1[1] = max (-ncols + 1, -shift + 1)
 	v2[1] = min (2 * ncols, ncols - shift)
-	do i = 2, IM_NDIM(im1) {
-	    v1[i] = long (1)
-	    v2[i] = long (1)
+	do j = 2, IM_NDIM(im1) {
+	    v1[j] = 1
+	    v2[j] = 1
 	}
-	call amovkl (long(1), vout, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, vout, sz_val)
 
 	# Setup line counter.
 	nlines = 1
-	do i = 2, IM_NDIM(im1)
-	    nlines = nlines * IM_LEN(im1, i)
+	do j = 2, IM_NDIM(im1)
+	    nlines = nlines * IM_LEN(im1, j)
 
 
 	# Shift the image using appropriate datatype operators.

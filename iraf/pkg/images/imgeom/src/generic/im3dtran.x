@@ -6,7 +6,8 @@
 procedure txyz3s (a, b, nx, ny, nz)
 
 short	a[nx, ny, nz], b[nx, ny, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -22,7 +23,8 @@ end
 procedure txzy3s (a, b, nx, ny, nz)
 
 short	a[nx, ny, nz], b[nx, nz, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -38,7 +40,8 @@ end
 procedure tyxz3s (a, b, nx, ny, nz)
 
 short	a[nx, ny, nz], b[ny, nx, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -54,7 +57,8 @@ end
 procedure tyzx3s (a, b, nx, ny, nz)
 
 short	a[nx, ny, nz], b[ny, nz, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -70,7 +74,8 @@ end
 procedure tzxy3s (a, b, nx, ny, nz)
 
 short	a[nx, ny, nz], b[nz, nx, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -86,7 +91,8 @@ end
 procedure tzyx3s (a, b, nx, ny, nz)
 
 short	a[nx, ny, nz], b[nz, ny, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -103,7 +109,8 @@ end
 procedure txyz3i (a, b, nx, ny, nz)
 
 int	a[nx, ny, nz], b[nx, ny, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -119,7 +126,8 @@ end
 procedure txzy3i (a, b, nx, ny, nz)
 
 int	a[nx, ny, nz], b[nx, nz, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -135,7 +143,8 @@ end
 procedure tyxz3i (a, b, nx, ny, nz)
 
 int	a[nx, ny, nz], b[ny, nx, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -151,7 +160,8 @@ end
 procedure tyzx3i (a, b, nx, ny, nz)
 
 int	a[nx, ny, nz], b[ny, nz, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -167,7 +177,8 @@ end
 procedure tzxy3i (a, b, nx, ny, nz)
 
 int	a[nx, ny, nz], b[nz, nx, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -183,7 +194,8 @@ end
 procedure tzyx3i (a, b, nx, ny, nz)
 
 int	a[nx, ny, nz], b[nz, ny, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -200,7 +212,8 @@ end
 procedure txyz3l (a, b, nx, ny, nz)
 
 long	a[nx, ny, nz], b[nx, ny, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -216,7 +229,8 @@ end
 procedure txzy3l (a, b, nx, ny, nz)
 
 long	a[nx, ny, nz], b[nx, nz, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -232,7 +246,8 @@ end
 procedure tyxz3l (a, b, nx, ny, nz)
 
 long	a[nx, ny, nz], b[ny, nx, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -248,7 +263,8 @@ end
 procedure tyzx3l (a, b, nx, ny, nz)
 
 long	a[nx, ny, nz], b[ny, nz, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -264,7 +280,8 @@ end
 procedure tzxy3l (a, b, nx, ny, nz)
 
 long	a[nx, ny, nz], b[nz, nx, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -280,7 +297,8 @@ end
 procedure tzyx3l (a, b, nx, ny, nz)
 
 long	a[nx, ny, nz], b[nz, ny, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -297,7 +315,8 @@ end
 procedure txyz3r (a, b, nx, ny, nz)
 
 real	a[nx, ny, nz], b[nx, ny, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -313,7 +332,8 @@ end
 procedure txzy3r (a, b, nx, ny, nz)
 
 real	a[nx, ny, nz], b[nx, nz, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -329,7 +349,8 @@ end
 procedure tyxz3r (a, b, nx, ny, nz)
 
 real	a[nx, ny, nz], b[ny, nx, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -345,7 +366,8 @@ end
 procedure tyzx3r (a, b, nx, ny, nz)
 
 real	a[nx, ny, nz], b[ny, nz, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -361,7 +383,8 @@ end
 procedure tzxy3r (a, b, nx, ny, nz)
 
 real	a[nx, ny, nz], b[nz, nx, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -377,7 +400,8 @@ end
 procedure tzyx3r (a, b, nx, ny, nz)
 
 real	a[nx, ny, nz], b[nz, ny, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -394,7 +418,8 @@ end
 procedure txyz3d (a, b, nx, ny, nz)
 
 double	a[nx, ny, nz], b[nx, ny, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -410,7 +435,8 @@ end
 procedure txzy3d (a, b, nx, ny, nz)
 
 double	a[nx, ny, nz], b[nx, nz, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -426,7 +452,8 @@ end
 procedure tyxz3d (a, b, nx, ny, nz)
 
 double	a[nx, ny, nz], b[ny, nx, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -442,7 +469,8 @@ end
 procedure tyzx3d (a, b, nx, ny, nz)
 
 double	a[nx, ny, nz], b[ny, nz, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -458,7 +486,8 @@ end
 procedure tzxy3d (a, b, nx, ny, nz)
 
 double	a[nx, ny, nz], b[nz, nx, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -474,7 +503,8 @@ end
 procedure tzyx3d (a, b, nx, ny, nz)
 
 double	a[nx, ny, nz], b[nz, ny, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -491,7 +521,8 @@ end
 procedure txyz3x (a, b, nx, ny, nz)
 
 complex	a[nx, ny, nz], b[nx, ny, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -507,7 +538,8 @@ end
 procedure txzy3x (a, b, nx, ny, nz)
 
 complex	a[nx, ny, nz], b[nx, nz, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -523,7 +555,8 @@ end
 procedure tyxz3x (a, b, nx, ny, nz)
 
 complex	a[nx, ny, nz], b[ny, nx, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -539,7 +572,8 @@ end
 procedure tyzx3x (a, b, nx, ny, nz)
 
 complex	a[nx, ny, nz], b[ny, nz, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -555,7 +589,8 @@ end
 procedure tzxy3x (a, b, nx, ny, nz)
 
 complex	a[nx, ny, nz], b[nz, nx, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -571,7 +606,8 @@ end
 procedure tzyx3x (a, b, nx, ny, nz)
 
 complex	a[nx, ny, nz], b[nz, ny, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx

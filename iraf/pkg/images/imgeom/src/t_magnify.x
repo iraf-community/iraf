@@ -32,6 +32,7 @@ real	x1, y1				# Starting coordinates
 real	x2, y2				# Ending coordinates
 int	flux				# Flux conserve
 
+size_t	sz_val
 int	btype, logfd
 pointer	list1, list2, sp, in, out, image1, image2, image3, mw, errmsg
 real	a, b, c, d, shifts[2], scale[2]
@@ -41,17 +42,22 @@ int	clgwrd(), imtgetim(), imtlen(), open(), btoi(), errget()
 pointer	imtopen(), mw_openim(), immap()
 real	clgetr()
 errchk	open(), mg_magnify1(), mg_magnify2()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_LINE, TY_CHAR)
-	call salloc (output, SZ_LINE, TY_CHAR)
-	call salloc (interp, SZ_FNAME, TY_CHAR)
-	call salloc (boundary, SZ_BTYPE, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (image3, SZ_FNAME, TY_CHAR)
-	call salloc (errmsg, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (input, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (interp, sz_val, TY_CHAR)
+	sz_val = SZ_BTYPE
+	call salloc (boundary, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (image3, sz_val, TY_CHAR)
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	# Get task parameters.
 	call clgstr ("input", Memc[input], SZ_LINE)
@@ -121,7 +127,7 @@ begin
 	    # Map the input and output images.
 	    call xt_mkimtemp (Memc[image1], Memc[image2], Memc[image3],
 	        SZ_FNAME)
-	    in = immap (Memc[image1], READ_ONLY, 0)
+	    in = immap (Memc[image1], READ_ONLY, NULLPTR)
 	    out = immap (Memc[image2], NEW_COPY, in)
 
 	    # Set the limits of the output image.
@@ -258,11 +264,15 @@ real	x1, x2			# Starting and ending points of output image
 real	dx			# Pixel interval
 int	flux			# Conserve flux?
 
-int	i, nxin, nxout, nxymargin, itype, nsinc, nincr, col1, col2
+size_t	sz_val
+int	itype, nsinc, nincr
+long	i, col1, col2
+size_t	nxin, nxout, nxymargin
 pointer	sp, x, z, buf, asi
 real	xshift
 pointer	imgs1r(), impl1r()
 int	asigeti()
+long	lnint()
 
 begin
 	# Set the default values for the output image limits if they are INDEF
@@ -289,13 +299,13 @@ begin
 	# limits and the set boundary.
 
 	col1 = x1
-	col2 = nint (x2)
+	col2 = lnint(x2)
 	if (itype == II_SPLINE3)
 	    nxymargin = NMARGIN_SPLINE3
 	else if (itype == II_SINC || itype == II_LSINC)
 	    nxymargin = asigeti (asi, II_ASINSINC)
 	else if (itype == II_DRIZZLE)
-	    nxymargin = max (nint (dx), NMARGIN)
+	    nxymargin = max (lnint(dx), NMARGIN)
 	else
 	    nxymargin = NMARGIN
 	call mg_setboundary1 (in, col1, col2, btype, bconst, nxymargin)
@@ -308,7 +318,8 @@ begin
 	# Also initialize the image data buffer.
 
 	call smark (sp)
-	call salloc (x, 2 * nxout, TY_REAL)
+	sz_val = 2 * nxout
+	call salloc (x, sz_val, TY_REAL)
 
 	# Set the x interpolation coordinates.  The coordinates are relative
 	# to the boundary extended input image.
@@ -356,15 +367,19 @@ real	x2, y2			# Ending point of output image
 real	dx, dy			# Pixel interval
 int	flux			# Conserve flux?
 
-int	i, nxin, nxout, nyout, nxymargin, itype, nsinc, nincr
-int	l1out, l2out, nlout, l1in, l2in, nlin, fstline, lstline
-int	col1, col2, line1, line2
+size_t	sz_val
+long	l_val
+int	itype, nsinc, nincr
+size_t	nxin, nxout, nyout, nxymargin, nlin
+long	i, l1out, l2out, nlout, l1in, l2in
+long	fstline, lstline, col1, col2, line1, line2
 real	shift
 pointer	msi
 pointer	sp, x, y, z, buf
 
 pointer	imps2r()
 int	msigeti()
+long	lnint()
 
 begin
 	# Set the default values for the output image limits if they are INDEF
@@ -402,7 +417,7 @@ begin
 	else if (itype == II_BISINC || itype == II_BILSINC)
 	    nxymargin = msigeti (msi, II_MSINSINC)
 	else if (itype == II_BIDRIZZLE)
-	    nxymargin = max (nint (dx), nint(dy), NMARGIN)
+	    nxymargin = max (lnint(dx), lnint(dy), NMARGIN)
 	else
 	    nxymargin = NMARGIN
 
@@ -410,9 +425,9 @@ begin
 	# limits and the set boundary.
 
 	col1 = x1
-	col2 = nint (x2)
+	col2 = lnint(x2)
 	line1 = y1
-	line2 = nint (y2)
+	line2 = lnint(y2)
 	call mg_setboundary2 (in, col1, col2, line1, line2, btype, bconst,
 	    nxymargin)
 
@@ -427,8 +442,10 @@ begin
 	# Also initialize the image data buffer.
 
 	call smark (sp)
-	call salloc (x, 2 * nxout, TY_REAL)
-	call salloc (y, 2 * NYOUT2, TY_REAL)
+	sz_val = 2 * nxout
+	call salloc (x, sz_val, TY_REAL)
+	sz_val = 2 * NYOUT2
+	call salloc (y, sz_val, TY_REAL)
 	buf = NULL
 	fstline = 0
 	lstline = 0
@@ -470,7 +487,8 @@ begin
 	    }
 
 	    # Output the section.
-	    z = imps2r (out, 1, nxout, l1out, l2out)
+	    l_val = 1
+	    z = imps2r (out, l_val, nxout, l1out, l2out)
 
 	    # Compute the y values.
 	    if (itype == II_BIDRIZZLE) {
@@ -503,13 +521,14 @@ end
 procedure mg_bufl2r (im, col1, col2, line1, line2, buf)
 
 pointer	im		# Image pointer
-int	col1		# First image column of buffer
-int	col2		# Last image column of buffer
-int	line1		# First image line of buffer
-int	line2		# Last image line of buffer
+long	col1		# First image column of buffer
+long	col2		# Last image column of buffer
+long	line1		# First image line of buffer
+long	line2		# Last image line of buffer
 pointer	buf		# Buffer
 
-int	i, ncols, nlines, nclast, llast1, llast2, nllast
+size_t	ncols, nlines, nclast, nllast
+long	i, llast1, llast2
 pointer	buf1, buf2
 
 pointer	imgs2r()
@@ -571,13 +590,14 @@ end
 procedure mg_setboundary1 (im, col1, col2, btype, bconst, nxymargin)
 
 pointer	im			# IMIO pointer
-int	col1, col2		# Range of columns
+long	col1, col2		# Range of columns
 int	btype			# Boundary extension type
 real	bconst			# Constant for constant boundary extension
-int	nxymargin		# Number of margin pixels
+size_t	nxymargin		# Number of margin pixels
 
 int	btypes[5]
-int	nbndrypix
+size_t	nbndrypix
+long	l_val
 
 data	btypes /BT_CONSTANT, BT_NEAREST, BT_REFLECT, BT_WRAP, BT_PROJECT/
 
@@ -587,7 +607,8 @@ begin
 	nbndrypix = max (nbndrypix, col2 - IM_LEN(im, 1))
 
 	call imseti (im, IM_TYBNDRY, btypes[btype])
-	call imseti (im, IM_NBNDRYPIX, nbndrypix + nxymargin + 1)
+	l_val = nbndrypix + nxymargin + 1
+	call imsetl (im, IM_NBNDRYPIX, l_val)
 	if (btypes[btype] == BT_CONSTANT)
 	    call imsetr (im, IM_BNDRYPIXVAL, bconst)
 end
@@ -599,14 +620,15 @@ procedure mg_setboundary2 (im, col1, col2, line1, line2, btype, bconst,
 	nxymargin)
 
 pointer	im			# IMIO pointer
-int	col1, col2		# Range of columns
-int	line1, line2		# Range of lines
+long	col1, col2		# Range of columns
+long	line1, line2		# Range of lines
 int	btype			# Boundary extension type
 real	bconst			# Constant for constant boundary extension
-int	nxymargin		# Number of margin pixels to allow
+size_t	nxymargin		# Number of margin pixels to allow
 
 int	btypes[5]
-int	nbndrypix
+size_t	nbndrypix
+long	l_val
 
 data	btypes /BT_CONSTANT, BT_NEAREST, BT_REFLECT, BT_WRAP, BT_PROJECT/
 
@@ -618,7 +640,8 @@ begin
 	nbndrypix = max (nbndrypix, line2 - IM_LEN(im, 2))
 
 	call imseti (im, IM_TYBNDRY, btypes[btype])
-	call imseti (im, IM_NBNDRYPIX, nbndrypix + nxymargin + 1)
+	l_val = nbndrypix + nxymargin + 1
+	call imsetl (im, IM_NBNDRYPIX, l_val)
 	if (btypes[btype] == BT_CONSTANT)
 	    call imsetr (im, IM_BNDRYPIXVAL, bconst)
 end

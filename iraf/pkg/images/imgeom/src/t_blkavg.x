@@ -27,6 +27,7 @@ char	image1[SZ_FNAME]			# Input image name
 char	image2[SZ_FNAME]			# Output image name
 char	imtemp[SZ_FNAME]			# Temporary file
 
+size_t	sz_val
 int	i
 pointer	list1, list2, im1, im2, mw
 real	shifts[IM_MAXDIM], mags[IM_MAXDIM]
@@ -34,6 +35,7 @@ real	shifts[IM_MAXDIM], mags[IM_MAXDIM]
 bool	envgetb()
 int	imtgetim(), imtlen(), clgeti(), clgwrd()
 pointer	imtopen(), immap(), mw_openim()
+include	<nullptr.inc>
 
 string	blk_param	"bX"
 
@@ -43,7 +45,8 @@ begin
 	call clgstr ("input", imtlist1, SZ_LINE)
 	call clgstr ("output", imtlist2, SZ_LINE)
 	option = clgwrd ("option", image1, SZ_FNAME, OPTIONS)
-	call amovki (INDEFI, blkfac, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovki (INDEFI, blkfac, sz_val)
 
 	# Expand the input and output image lists.
 
@@ -63,7 +66,7 @@ begin
 
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
-	    im1 = immap (image1, READ_ONLY, 0)
+	    im1 = immap (image1, READ_ONLY, NULLPTR)
 	    im2 = immap (image2, NEW_COPY, im1)
 
 	    do i = 1, IM_NDIM(im1) {

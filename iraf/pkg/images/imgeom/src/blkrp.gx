@@ -2,7 +2,7 @@
 
 include <imhdr.h>
 
-$for (dlrs)
+$for (dlirs)
 
 # BLKRP -- Block replicate an image.
 
@@ -12,7 +12,11 @@ pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
 int	blkfac[ARB]		# Block replication factors
 
-int	i, j, ndim, nin, nout
+size_t	sz_val
+long	l_val
+int	i, j, ndim
+long	k
+size_t	nin, nout
 pointer	sp, buf, buf1, buf2, buf3, v1, v2, v3, ptrin, ptrout
 pointer	imgl1$t(), impl1$t()
 long	imgnl$t(), impnl$t()
@@ -32,7 +36,7 @@ begin
 	    buf2 = impl1$t (out)
 	    ptrin = buf1
 	    ptrout = buf2
-	    do i = 1, nin {
+	    do k = 1, nin {
 		do j = 1, blkfac[1] {
 		    Mem$t[ptrout] = Mem$t[ptrin]
 		    ptrout = ptrout + 1
@@ -48,14 +52,17 @@ begin
 
 	    # Allocate memory.
 	    call salloc (buf, nout, TY_PIXEL)
-	    call salloc (v1, IM_MAXDIM, TY_LONG)
-	    call salloc (v2, IM_MAXDIM, TY_LONG)
-	    call salloc (v3, IM_MAXDIM, TY_LONG)
+	    sz_val = IM_MAXDIM
+	    call salloc (v1, sz_val, TY_LONG)
+	    call salloc (v2, sz_val, TY_LONG)
+	    call salloc (v3, sz_val, TY_LONG)
 
 	    # Initialize the input line vector and the output section vectors.
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[v1], sz_val)
+	    call amovkl (l_val, Meml[v2], sz_val)
+	    call amovkl (l_val, Meml[v3], sz_val)
 
 	    # For each output line compute a block replicated line from the
 	    # input image.  If the line replication factor is greater than
@@ -76,7 +83,7 @@ begin
 		else {
 	            ptrin = buf1
 	            ptrout = buf
-	            do i = 1, nin {
+	            do k = 1, nin {
 		        do j = 1, blkfac[1] {
 		            Mem$t[ptrout] = Mem$t[ptrin]
 		            ptrout = ptrout + 1
@@ -91,11 +98,12 @@ begin
 
 		# Repeat for each repetition of the input line.
 		for (i=2;  i <= blkfac[2];  i=i+1) {
-	            j = impnl$t (out, buf2, Meml[v2])
+	            k = impnl$t (out, buf2, Meml[v2])
 		    call amov$t (Mem$t[buf3], Mem$t[buf2], nout)
 		}
 
-		call amovl (Meml[v2], Meml[v3], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v2], Meml[v3], sz_val)
 	    }
 	}
 

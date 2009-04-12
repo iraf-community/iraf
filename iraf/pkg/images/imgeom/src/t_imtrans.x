@@ -16,7 +16,7 @@ procedure t_imtranspose ()
 
 char	imtlist1[SZ_LINE]			# Input image list
 char	imtlist2[SZ_LINE]			# Output image list
-int	len_blk					# 1D length of transpose block
+long	len_blk					# 1D length of transpose block
 
 char	image1[SZ_FNAME]			# Input image name
 char	image2[SZ_FNAME]			# Output image name
@@ -26,8 +26,10 @@ pointer	list1, list2
 pointer	im1, im2, mw
 
 bool	envgetb()
-int	clgeti(), imtgetim(), imtlen()
+int	imtgetim(), imtlen()
+long	clgetl()
 pointer	imtopen(), immap(), mw_openim()
+include	<nullptr.inc>
 
 begin
 	# Get input and output image template lists and the size of
@@ -35,7 +37,7 @@ begin
 
 	call clgstr ("input", imtlist1, SZ_LINE)
 	call clgstr ("output", imtlist2, SZ_LINE)
-	len_blk = clgeti ("len_blk")
+	len_blk = clgetl ("len_blk")
 
 	# Expand the input and output image lists.
 
@@ -54,7 +56,7 @@ begin
 
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
-	    im1 = immap (image1, READ_ONLY, 0)
+	    im1 = immap (image1, READ_ONLY, NULLPTR)
 	    im2 = immap (image2, NEW_COPY, im1)
 
 	    # Do the transpose.
@@ -89,10 +91,11 @@ procedure imtranspose (im_in, im_out, len_blk)
 
 pointer	im_in				# Input image descriptor
 pointer	im_out				# Output image descriptor
-int	len_blk				# 1D length of transpose block
+long	len_blk				# 1D length of transpose block
 
-int	x1, x2, nx
-int	y1, y2, ny
+long	x1, x2
+long	y1, y2
+size_t	nx, ny
 pointer	buf_in, buf_out
 
 pointer	imgs2s(), imps2s(), imgs2i(), imps2i(), imgs2l(), imps2l()
@@ -163,14 +166,17 @@ procedure imtrmw (mw)
 
 pointer	mw			# pointer to the mwcs structure
 
+size_t	sz_val
 int	i, axes[IM_MAXDIM], axval[IM_MAXDIM]
-int	naxes, pdim, nelem, axmap, ax1, ax2, szatstr
+int	naxes, axmap, ax1, ax2, szatstr, pdim
+size_t	nelem
 pointer	sp, ltr, ltm, ltv, cd, r, w, ncd, nr
 pointer	attribute1, attribute2, atstr1, atstr2, mwtmp
 double	temp
 int	mw_stati(), itoc(), strlen()
 pointer	mw_open()
 errchk	mw_gwattrs(), mw_newsystem()
+include	<nullptr.inc>
 
 begin
 	# Convert axis bitflags to the axis lists.
@@ -189,21 +195,26 @@ begin
 	call smark (sp)
 	call salloc (ltr, nelem, TY_DOUBLE)
 	call salloc (cd, nelem, TY_DOUBLE)
-	call salloc (r, pdim, TY_DOUBLE)
-	call salloc (w, pdim, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (r, sz_val, TY_DOUBLE)
+	call salloc (w, sz_val, TY_DOUBLE)
 	call salloc (ltm, nelem, TY_DOUBLE) 
-	call salloc (ltv, pdim, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (ltv, sz_val, TY_DOUBLE)
 	call salloc (ncd, nelem, TY_DOUBLE)
-	call salloc (nr, pdim, TY_DOUBLE)
-	call salloc (attribute1, SZ_FNAME, TY_CHAR)
-	call salloc (attribute2, SZ_FNAME, TY_CHAR)
+	sz_val = pdim
+	call salloc (nr, sz_val, TY_DOUBLE)
+	sz_val = SZ_FNAME
+	call salloc (attribute1, sz_val, TY_CHAR)
+	call salloc (attribute2, sz_val, TY_CHAR)
 
 	# Get the wterm which corresponds to the original logical to
 	# world transformation.
 	call mw_gwtermd (mw, Memd[r], Memd[w], Memd[cd], pdim) 
 	call mw_gltermd (mw, Memd[ltm], Memd[ltv], pdim) 
 	call mwvmuld (Memd[ltm], Memd[r], Memd[nr], pdim)
-	call aaddd (Memd[nr], Memd[ltv], Memd[nr], pdim)
+	sz_val = pdim
+	call aaddd (Memd[nr], Memd[ltv], Memd[nr], sz_val)
 	call mwinvertd (Memd[ltm], Memd[ltr], pdim)
 	call mwmmuld (Memd[cd], Memd[ltr], Memd[ncd], pdim)
 
@@ -222,20 +233,22 @@ begin
 	LTM(ax1,ax2) = 1.0d0
 	LTM(ax2,ax1) = 1.0d0
 	LTM(ax2,ax2) = 0.0d0
-	call aclrd (Memd[ltv], pdim)
-	call aclrd (Memd[r], pdim)
+	sz_val = pdim
+	call aclrd (Memd[ltv], sz_val)
+	call aclrd (Memd[r], sz_val)
 	call mw_translated (mw, Memd[ltv], Memd[ltr], Memd[r], pdim)
 
 	# Get the new lterm, recompute the wterm, and store it.
 	call mw_gltermd (mw, Memd[ltm], Memd[ltv], pdim) 
 	call mwmmuld (Memd[ncd], Memd[ltm], Memd[cd], pdim)
 	call mwinvertd (Memd[ltm], Memd[ltr], pdim)
-	call asubd (Memd[nr], Memd[ltv], Memd[r], pdim)
+	sz_val = pdim
+	call asubd (Memd[nr], Memd[ltv], Memd[r], sz_val)
 	call mwvmuld (Memd[ltr], Memd[r], Memd[nr], pdim)
 	call mw_swtermd (mw, Memd[nr], Memd[w], Memd[cd], pdim)
 
 	# Make a new temporary wcs and set the system name.
-	mwtmp = mw_open (NULL, pdim)
+	mwtmp = mw_open (NULLPTR, pdim)
 	call mw_gsystem (mw, Memc[attribute1], SZ_FNAME)
 	iferr (call mw_newsystem (mwtmp, Memc[attribute1], pdim))
 	    call mw_ssystem (mwtmp, Memc[attribute1])
@@ -257,8 +270,9 @@ begin
 	call mw_swtype (mwtmp, ax2, 1, Memc[attribute1], "")
 
 	# Copy the axis attributes.
-	call malloc (atstr1, szatstr, TY_CHAR)
-	call malloc (atstr2, szatstr, TY_CHAR)
+	sz_val = szatstr
+	call malloc (atstr1, sz_val, TY_CHAR)
+	call malloc (atstr2, sz_val, TY_CHAR)
 	for (i =  1; ; i = i + 1) {
 
 	    if (itoc (i, Memc[attribute1], SZ_FNAME) <= 0)
@@ -277,8 +291,9 @@ begin
 		    (strlen (Memc[atstr2]) < szatstr))
 		    break
 		szatstr = szatstr + SZ_LINE
-		call realloc (atstr1, szatstr, TY_CHAR)
-		call realloc (atstr2, szatstr, TY_CHAR)
+		sz_val = szatstr
+		call realloc (atstr1, sz_val, TY_CHAR)
+		call realloc (atstr2, sz_val, TY_CHAR)
 	    }
 	    if ((Memc[atstr1] == EOS) && (Memc[atstr2] == EOS))
 	        break

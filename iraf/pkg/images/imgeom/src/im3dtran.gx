@@ -6,7 +6,8 @@ $for (silrdx)
 procedure txyz3$t (a, b, nx, ny, nz)
 
 PIXEL	a[nx, ny, nz], b[nx, ny, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -22,7 +23,8 @@ end
 procedure txzy3$t (a, b, nx, ny, nz)
 
 PIXEL	a[nx, ny, nz], b[nx, nz, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -38,7 +40,8 @@ end
 procedure tyxz3$t (a, b, nx, ny, nz)
 
 PIXEL	a[nx, ny, nz], b[ny, nx, nz]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -54,7 +57,8 @@ end
 procedure tyzx3$t (a, b, nx, ny, nz)
 
 PIXEL	a[nx, ny, nz], b[ny, nz, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -70,7 +74,8 @@ end
 procedure tzxy3$t (a, b, nx, ny, nz)
 
 PIXEL	a[nx, ny, nz], b[nz, nx, ny]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx
@@ -86,7 +91,8 @@ end
 procedure tzyx3$t (a, b, nx, ny, nz)
 
 PIXEL	a[nx, ny, nz], b[nz, ny, nx]
-int	nx, ny, nz, x, y, z
+size_t	nx, ny, nz
+long	x, y, z
 
 begin
 	do x = 1, nx

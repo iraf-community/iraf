@@ -24,7 +24,7 @@ char	image2[SZ_FNAME]		# Output image name
 char	imtemp[SZ_FNAME]		# Temporary file
 
 char	str[SZ_LINE], interpstr[SZ_FNAME]
-int	ishift
+long	ishift
 pointer	list1, list2, im1, im2, mw
 
 bool	fp_equalr(), envgetb()
@@ -32,6 +32,7 @@ int	clgwrd(), imtgetim(), imtlen()
 pointer	imtopen(), immap(), mw_openim()
 real	clgetr()
 errchk	sh_lines, sh_linesi, mw_openim, mw_shift, mw_saveim, mw_close
+include	<nullptr.inc>
 
 begin
 	# Get input and output image template lists.
@@ -62,7 +63,7 @@ begin
 
 	    call xt_mkimtemp (image1, image2, imtemp, SZ_FNAME)
 
-	    im1 = immap (image1, READ_ONLY, 0)
+	    im1 = immap (image1, READ_ONLY, NULLPTR)
 	    im2 = immap (image2, NEW_COPY, im1)
 
 	    # Shift the image.

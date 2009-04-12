@@ -24,8 +24,11 @@ pointer imtemp			# Temporary file
 pointer	sfile			# Text file containing list of shifts
 pointer	interpstr		# Interpolant string
 
-int	boundary_type, ixshift, iyshift, nshifts, interp_type
-pointer	list1, list2, sp, str, xs, ys, im1, im2, sf, mw
+size_t	sz_val
+int	boundary_type, nshifts, interp_type
+long	ixshift, iyshift
+int	sf
+pointer	list1, list2, sp, str, xs, ys, im1, im2, mw
 real	constant, shifts[2]
 double	txshift, tyshift, xshift, yshift
 
@@ -34,18 +37,23 @@ int	imtgetim(), imtlen(), clgwrd(), strdic(), open(), ish_rshifts()
 pointer	immap(), imtopen(), mw_openim()
 real	clgetr()
 double	clgetd()
+long	ldnint(), ldint()
 errchk	ish_ishiftxy, ish_gshiftxy, mw_openim, mw_saveim, mw_shift
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (imtlist1, SZ_LINE, TY_CHAR)
-	call salloc (imtlist2, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_LINE, TY_CHAR)
-	call salloc (image2, SZ_LINE, TY_CHAR)
-	call salloc (imtemp, SZ_LINE, TY_CHAR)
-	call salloc (sfile, SZ_FNAME, TY_CHAR)
-	call salloc (interpstr, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (imtlist1, sz_val, TY_CHAR)
+	call salloc (imtlist2, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (sfile, sz_val, TY_CHAR)
+	call salloc (interpstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get task parameters.
 	call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -73,8 +81,10 @@ begin
 	# Determine the source of the shifts.
 	if (Memc[sfile] != EOS) {
 	    sf = open (Memc[sfile], READ_ONLY, TEXT_FILE)
-	    call salloc (xs, imtlen (list1), TY_DOUBLE)
-	    call salloc (ys, imtlen (list1), TY_DOUBLE)
+	    sz_val = imtlen (list1)
+	    call salloc (xs, sz_val, TY_DOUBLE)
+	    sz_val = imtlen (list1)
+	    call salloc (ys, sz_val, TY_DOUBLE)
 	    nshifts = ish_rshifts (sf, Memd[xs], Memd[ys], imtlen (list1))
 	    if (nshifts != imtlen (list1))
 		call error (2,
@@ -94,7 +104,7 @@ begin
 	    call xt_mkimtemp (Memc[image1], Memc[image2], Memc[imtemp],
 	        SZ_FNAME)
 
-	    im1 = immap (Memc[image1], READ_ONLY, 0)
+	    im1 = immap (Memc[image1], READ_ONLY, NULLPTR)
 	    im2 = immap (Memc[image2], NEW_COPY, im1)
 
 	    if (sf != NULL) {
@@ -105,13 +115,13 @@ begin
 		yshift = tyshift
 	    }
 
-	    ixshift = int (xshift)
-	    iyshift = int (yshift)
+	    ixshift = ldint(xshift)
+	    iyshift = ldint(yshift)
 
 	    iferr {
 		# Perform the shift.
 		if (interp_type == II_BINEAREST) {
-		    call ish_ishiftxy (im1, im2, nint(xshift), nint(yshift),
+		    call ish_ishiftxy (im1, im2, ldnint(xshift), ldnint(yshift),
 		        boundary_type, constant)
 		} else if (fp_equald (xshift, double(ixshift)) &&
 		    fp_equald (yshift, double(iyshift))) {
@@ -165,18 +175,22 @@ procedure ish_ishiftxy (im1, im2, ixshift, iyshift, boundary_type,
 
 pointer	im1		#I pointer to the input image
 pointer	im2		#I pointer to the output image
-int	ixshift		#I shift in x and y
-int	iyshift		#I
+long	ixshift		#I shift in x and y
+long	iyshift		#I
 int	boundary_type	#I type of boundary extension
 real	constant	#I constant for boundary extension
 
+long	l_val
+size_t	sz_val
 pointer	buf1, buf2
 long	v[IM_MAXDIM]
-int	ncols, nlines, nbpix
-int	i, x1col, x2col, yline
+size_t	ncols, nlines
+long	nbpix
+long	i, x1col, x2col, yline
 
 long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 pointer	imgs2s(), imgs2i(), imgs2l(), imgs2r(), imgs2d(), imgs2x()
+long	labs(), lmod()
 errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
 errchk	imgs2s, imgs2i, imgs2l, imgs2r, imgs2d, imgs2x
 string	wrerr "ISHIFTXY: Error writing in image."
@@ -197,13 +211,13 @@ begin
 	    ixshift = min (ncols, max (-ncols, ixshift))
 	    iyshift = min (nlines, max (-nlines, iyshift))
 	case BT_WRAP:
-	    ixshift = mod (ixshift, ncols)
-	    iyshift = mod (iyshift, nlines)
+	    ixshift = lmod(ixshift, ncols)
+	    iyshift = lmod(iyshift, nlines)
 	}
 
 	# Set the boundary extension values.
-	nbpix = max (abs (ixshift), abs (iyshift))
-	call imseti (im1, IM_NBNDRYPIX, nbpix)
+	nbpix = max (labs(ixshift), labs(iyshift))
+	call imsetl (im1, IM_NBNDRYPIX, nbpix)
 	call imseti (im1, IM_TYBNDRY, boundary_type)
 	if (boundary_type == BT_CONSTANT)
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
@@ -212,7 +226,9 @@ begin
 	x1col = max (-ncols + 1, - ixshift + 1) 
 	x2col = min (2 * ncols,  ncols - ixshift)
 
-	call amovkl (long (1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	# Shift the image using the appropriate data type operators.
 	switch (IM_PIXTYPE(im1)) {
@@ -298,15 +314,20 @@ char	interpstr[ARB]	#I type of interpolant
 int	boundary_type	#I type of boundary extension
 real	constant	#I value of constant for boundary extension
 
-int	lout1, lout2, nyout, nxymargin, interp_type, nsinc, nincr
-int	cin1, cin2, nxin, lin1, lin2, nyin, i
-int	ncols, nlines, nbpix, fstline, lstline
-double	xshft, yshft, deltax, deltay, dx, dy, cx, ly
+long	l_val
+long	lout1, lout2
+int	nxymargin, interp_type, nsinc, nincr
+long	cin1, cin2, lin1, lin2, i
+long	nbpix, fstline, lstline
+size_t	ncols, nlines, nyout, nxin, nyin
+double	xshft, yshft, deltax, deltay, dx, dy, ly, cx
+real	r_val0, r_val1
 pointer	sp, x, y, msi, sinbuf, soutbuf
 
 pointer	imps2r()
 int	msigeti()
 bool	fp_equald()
+long	ldint()
 errchk	msisinit(), msifree(), msifit(), msigrid()
 errchk	imgs2r(), imps2r()
 
@@ -322,8 +343,8 @@ begin
 
 	# Get the real shift.
 	if (boundary_type == BT_WRAP) {
-	    xshft = mod (xshift, real (ncols))
-	    yshft = mod (yshift, real (nlines))
+	    xshft = dmod(xshift, double (ncols))
+	    yshft = dmod(yshift, double (nlines))
 	} else {
 	    xshft = xshift
 	    yshft = yshift
@@ -336,14 +357,14 @@ begin
 	sinbuf = NULL
 
 	# Define the x and y shifts for the interpolation.
-	dx = abs (xshft - int (xshft))
+	dx = dabs(xshft - dint(xshft))
 	if (fp_equald (dx, 0D0))
 	    deltax = 0.0
 	else if (xshft > 0.)
 	    deltax = 1. - dx
 	else
 	    deltax = dx
-	dy = abs (yshft - int (yshft))
+	dy = dabs(yshft - dint(yshft))
 	if (fp_equald (dy, 0D0))
 	    deltay = 0.0
 	else if (yshft > 0.)
@@ -352,12 +373,16 @@ begin
 	    deltay = dy
 
 	# Initialize the 2-D interpolation routines.
-	call msitype (interpstr, interp_type, nsinc, nincr, cx)
-	if (interp_type == II_BILSINC || interp_type == II_BISINC )
-	    call msisinit (msi, II_BILSINC, nsinc, 1, 1,
-	        deltax - nint (deltax), deltay - nint (deltay), 0.0)
-	else
-	    call msisinit (msi, interp_type, nsinc, nincr, nincr, cx, cx, 0.0)
+	call msitype (interpstr, interp_type, nsinc, nincr, r_val0)
+	cx = r_val0
+	if (interp_type == II_BILSINC || interp_type == II_BISINC ) {
+	    r_val0 = deltax - dnint(deltax)
+	    r_val1 = deltay - dnint(deltay)
+	    call msisinit (msi, II_BILSINC, nsinc, 1, 1, r_val0, r_val1, 0.0)
+	} else {
+	    call msisinit (msi, interp_type, nsinc, nincr, nincr,
+			   r_val0, r_val0, 0.0)
+	}
 
 	# Set boundary extension parameters.
 	if (interp_type == II_BISPLINE3)
@@ -366,8 +391,8 @@ begin
 	    nxymargin = msigeti (msi, II_MSINSINC) 
 	else
 	    nxymargin = NMARGIN
-	nbpix = max (int (abs(xshft)+1.0), int (abs(yshft)+1.0)) + nxymargin
-	call imseti (im1, IM_NBNDRYPIX, nbpix)
+	nbpix = max (ldint(dabs(xshft)+1.0), ldint(dabs(yshft)+1.0)) + nxymargin
+	call imsetl (im1, IM_NBNDRYPIX, nbpix)
 	call imseti (im1, IM_TYBNDRY, boundary_type)
 	if (boundary_type == BT_CONSTANT)
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
@@ -399,9 +424,9 @@ begin
 	# Define column ranges in the input image.
 	cx = 1. - nxymargin - xshft
 	if ((cx <= 0.) &&  (! fp_equald (dx, 0D0)))
-	    cin1 = int (cx) - 1
+	    cin1 = ldint(cx) - 1
 	else
-	    cin1 = int (cx)
+	    cin1 = ldint(cx)
 	cin2 = ncols - xshft + nxymargin + 1
 	nxin = cin2 - cin1 + 1
 
@@ -415,9 +440,9 @@ begin
 	    # Define correspoding range of input lines.
 	    ly = lout1 - nxymargin - yshft
 	    if ((ly <= 0.0) && (! fp_equald (dy, 0D0)))
-	        lin1 = int (ly) - 1
+	        lin1 = ldint(ly) - 1
 	    else
-		lin1 = int (ly)
+		lin1 = ldint(ly)
 	    lin2 = lout2 - yshft + nxymargin + 1
 	    nyin = lin2 - lin1 + 1
 
@@ -430,7 +455,8 @@ begin
 	    }
 
 	    # Output the section.
-	    soutbuf = imps2r (im2, 1, ncols, lout1, lout2)
+	    l_val = 1
+	    soutbuf = imps2r (im2, l_val, ncols, lout1, lout2)
 	    if (soutbuf == EOF)
 		call error (9, "GSHIFTXY: Error writing output image.")
 
@@ -452,12 +478,13 @@ end
 procedure ish_buf (im, col1, col2, line1, line2, buf)
 
 pointer	im		#I pointer to input image
-int	col1, col2	#I column range of input buffer
-int	line1, line2	#I line range of input buffer
+long	col1, col2	#I column range of input buffer
+long	line1, line2	#I line range of input buffer
 pointer	buf		#U buffer
 
 pointer	buf1, buf2
-int	i, ncols, nlines, nclast, llast1, llast2, nllast
+long	i, llast1, llast2
+size_t	ncols, nlines, nclast, nllast
 errchk	malloc, realloc
 pointer	imgs2r()
 

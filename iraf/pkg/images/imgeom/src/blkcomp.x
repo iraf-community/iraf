@@ -6,7 +6,7 @@ include	<imhdr.h>
 # dimension.  Initialize input-line vectors to block vectors.  Return total
 # number of input lines mapping to current output line.
 
-int procedure blkcomp (im1, blkfac, vout, blkin_s, blkin_e,
+long procedure blkcomp (im1, blkfac, vout, blkin_s, blkin_e,
 		vin_s, vin_e)
 
 pointer	im1			# pointer to input image descriptor
@@ -17,7 +17,8 @@ long	blkin_e[IM_MAXDIM]	# index of ending block for each dimension
 long	vin_s[IM_MAXDIM]	# initial starting input vector
 long	vin_e[IM_MAXDIM]	# initial ending input vector
 
-int	num_ilines, dim
+long	num_ilines
+int	dim
 
 begin
 	num_ilines = 1
@@ -26,8 +27,8 @@ begin
 	# dimension mapping to current output line.
 
 	do dim = 2, IM_NDIM(im1) {
-	    blkin_s[dim] = long(1 + (vout[dim] - 1) * blkfac[dim])
-	    blkin_e[dim] = long(min (IM_LEN(im1,dim), vout[dim] * blkfac[dim]))
+	    blkin_s[dim] = 1 + (vout[dim] - 1) * blkfac[dim]
+	    blkin_e[dim] = min (IM_LEN(im1,dim), vout[dim] * blkfac[dim])
 	    vin_s[dim]   = blkin_s[dim]
 	    vin_e[dim]   = blkin_s[dim]
 	    num_ilines = num_ilines * (blkin_e[dim] - blkin_s[dim] + 1)
