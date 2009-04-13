@@ -116,15 +116,18 @@ define	TY_UBYTE	12		; (special) for image i/o
 define	INDEFS		(-32767)
 define	INDEFI		(-2147483647)
 define	INDEFL		(-9223372036854775807)
+define	INDEFZ		INDEFL
 #else	/* ILP64 */
 define	INDEFS		(-32767)
 define	INDEFL		(-9223372036854775807)
 define	INDEFI		INDEFL
+define	INDEFZ		INDEFL
 #endif
 #else	/* ILP32 */
 define	INDEFS		(-32767)
 define	INDEFL		(-2147483647)
 define	INDEFI		INDEFL
+define	INDEFZ		INDEFL
 #endif
 
 define	INDEFR		1.6e38
@@ -138,6 +141,7 @@ define	IS_INDEFI	(($1)==INDEFI)
 define	IS_INDEFR	(($1)==INDEFR)
 define	IS_INDEFD	(($1)==INDEFD)
 define	IS_INDEFX	(real($1)==INDEFR)
+define	IS_INDEFZ	(($1)==INDEFZ)
 define	IS_INDEF	(($1)==INDEFR)
 
 ; Useful macros for pointer conversions in data structures.
