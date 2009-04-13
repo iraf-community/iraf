@@ -19,6 +19,8 @@ int	min_sigdigits, infd, outfd
 pointer	inlist, outlist
 pointer	reclist, sp, in_fname, out_fname, record, xformat, yformat, str, dt
 pointer	sx1, sy1, sx2, sy2
+size_t	sz_val
+
 int	clgwrd(), clgeti(), open()
 bool	streq()
 int	fntlenb(), fntgfnb(), imtlen(), imtgetim()
@@ -27,12 +29,14 @@ pointer	fntopnb(), imtopenp(), dtmap()
 begin
 	# Allocate memory for transformation parameters structure
 	call smark (sp)
-	call salloc (in_fname, SZ_FNAME, TY_CHAR)
-	call salloc (out_fname, SZ_FNAME, TY_CHAR)
-	call salloc (record, SZ_FNAME, TY_CHAR)
-	call salloc (xformat, SZ_FNAME, TY_CHAR)
-	call salloc (yformat, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (in_fname, sz_val, TY_CHAR)
+	call salloc (out_fname, sz_val, TY_CHAR)
+	call salloc (record, sz_val, TY_CHAR)
+	call salloc (xformat, sz_val, TY_CHAR)
+	call salloc (yformat, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Open the input and output file lists.
 	call clgstr ("input", Memc[str], SZ_FNAME)
@@ -222,6 +226,7 @@ int	min_sigdigits		#I the minimum number of digits to be output
 pointer	sx1, sy1		#I pointers to the linear x and y surfaces
 pointer	sx2, sy2		#I pointers to the x and y distortion surfaces
 
+size_t	sz_val
 double	xd, yd, xtd, ytd
 int	max_fields, nline, nfields, nchars, nsdig_x, nsdig_y, offset
 real	xr, yr, xtr, ytr
@@ -237,10 +242,13 @@ double	dgsgetd()
 
 begin
 	call smark (sp)
-	call salloc (inbuf, SZ_LINE, TY_CHAR)
-	call salloc (linebuf, SZ_LINE, TY_CHAR)
-	call salloc (field_pos, MAX_FIELDS, TY_INT)
-	call salloc (outbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (inbuf, sz_val, TY_CHAR)
+	call salloc (linebuf, sz_val, TY_CHAR)
+	sz_val = MAX_FIELDS
+	call salloc (field_pos, sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (outbuf, sz_val, TY_CHAR)
 
 	max_fields = MAX_FIELDS
 
@@ -256,7 +264,7 @@ begin
 	    xmax = dgsgetd (sx1, GSXMAX)
 	    ymin = dgsgetd (sx1, GSYMIN)
 	    ymax = dgsgetd (sx1, GSYMAX)
-	    tol = abs (xmax - xmin) / 1E10
+	    tol = dabs (xmax - xmin) / 1E10
 	    xd = (xmin + xmax) / 2
 	    yd = (ymin + ymax) / 2
 	    call tr_init (sx, nsx, sy, nsy, xd, yd, der)

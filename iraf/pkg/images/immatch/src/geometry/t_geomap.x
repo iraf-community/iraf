@@ -28,6 +28,7 @@ int	xxorder, xyorder, xxterms, yxorder, yyorder, yxterms, maxiter
 int	nresfiles, res
 pointer	list, reslist, reclist, sp, in_name, str, out, fit, gd, graphics
 real	rxmin, rxmax, rymin, rymax
+size_t	sz_val
 
 bool	clgetb()
 double	clgetd()
@@ -40,9 +41,11 @@ errchk	geo_mapr(), geo_mapd()
 begin
 	# Get working space.
 	call smark (sp)
-	call salloc (in_name, SZ_FNAME, TY_CHAR)
-	call salloc (graphics, SZ_FNAME, TY_CHAR)
-	call salloc (str, max(SZ_LINE, SZ_FNAME), TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (in_name, sz_val, TY_CHAR)
+	call salloc (graphics, sz_val, TY_CHAR)
+	sz_val = max(SZ_LINE, SZ_FNAME)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get input data file(s).
 	list = clpopnu ("input")
@@ -239,21 +242,24 @@ real	xmin, xmax		#I max and min xref values
 real	ymin, ymax		#I max and min yref values
 bool	verbose			#I verbose mode
 
-int	npts, ngood
+size_t	sz_val
+size_t	npts, ngood
 pointer	sp, str, xref, yref, xin, yin, wts, xfit, yfit, xerrmsg, yerrmsg
 pointer	sx1, sy1, sx2, sy2
 real	mintemp, maxtemp
 
 real	asumr()
-int	geo_rdxyr()
+long	geo_rdxyr()
 errchk	geo_fitr, geo_mgfitr()
 
 begin
 	# Get working space.
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
-	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (xerrmsg, sz_val, TY_CHAR)
+	call salloc (yerrmsg, sz_val, TY_CHAR)
 
 	# Initialize pointers.
 	xref = NULL
@@ -397,8 +403,8 @@ begin
 	if (res != NULL) {
 	    call fprintf (res, "#     Xin and Yin fit rms: %0.7g  %0.7g\n")
 	    if (ngood <= 1) {
-		call pargd (0.0)
-		call pargd (0.0)
+		call pargd (0.0d0)
+		call pargd (0.0d0)
 	    } else {
 		call pargd (sqrt (GM_XRMS(fit) / (ngood - 1)))
 		call pargd (sqrt (GM_YRMS(fit) / (ngood - 1)))
@@ -443,7 +449,7 @@ define	GEO_DEFBUFSIZE	1000	# default data buffer sizes
 
 # GEO_RDXY -- Read in the data points.
 
-int procedure geo_rdxyr (fd, xref, yref, xin, yin, xmin, xmax, ymin, ymax)
+long procedure geo_rdxyr (fd, xref, yref, xin, yin, xmin, xmax, ymin, ymax)
 
 int	fd			# the input file descriptor
 pointer	xref			# the x reference coordinates
@@ -453,7 +459,7 @@ pointer	yin			# the y coordinates
 real	xmin, xmax		# the range of the x coordinates
 real	ymin, ymax		# the range of the y coordinates
 
-int	npts, bufsize
+size_t	npts, bufsize
 int	fscan(), nscan()
 
 begin
@@ -532,13 +538,15 @@ real   xref[ARB]               #I the x reference coordinates
 real   yref[ARB]               #I the y reference coordinates
 real   xi[ARB]                 #O the fitted xi coordinates
 real   eta[ARB]                #O the fitted eta coordinates
-int     npts                    #I the number of points
+size_t	npts                    #I the number of points
 
+size_t	sz_val
 pointer sp, temp
 
 begin
         call smark (sp)
-        call salloc (temp, npts, TY_REAL)
+        sz_val = npts
+        call salloc (temp, sz_val, TY_REAL)
 
         call gsvector (sx1, xref, yref, xi, npts)
         if (sx2 != NULL) {
@@ -561,11 +569,13 @@ end
 procedure geo_moutr (fit, out, sx1, sy1, sx2, sy2)
 
 pointer	fit		#I pointer to fitting structure
-int	out		#I pointer to database file
+pointer	out		#I pointer to database file
 pointer	sx1, sy1	#I pointer to linear surfaces
 pointer	sx2, sy2	#I pointer to distortion surfaces
 
-int	i, npts, ncoeff
+size_t	sz_val
+int	i, ncoeff
+size_t	npts
 pointer	sp, str, xcoeff, ycoeff
 real	xrms, yrms, xshift, yshift, xscale, yscale, xrot, yrot
 int	gsgeti()
@@ -573,7 +583,8 @@ int	rg_wrdstr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Compute the x and y fit rms.
 	#npts = max (0, GM_NPTS(fit) - GM_NREJECT(fit) - GM_NWTS0(fit))
@@ -636,8 +647,9 @@ begin
 
 	# Allocate memory for linear coefficients.
 	ncoeff = max (gsgeti (sx1, GSNSAVE), gsgeti (sy1, GSNSAVE))
-	call calloc (xcoeff, ncoeff, TY_REAL)
-	call calloc (ycoeff, ncoeff, TY_REAL)
+	sz_val = ncoeff
+	call calloc (xcoeff, sz_val, TY_REAL)
+	call calloc (ycoeff, sz_val, TY_REAL)
 
 	# Output the linear coefficients.
 	call gssave (sx1, Memr[xcoeff])
@@ -662,8 +674,9 @@ begin
 	    ncoeff = max (0, ncoeff)
 	else
 	    ncoeff = max (gsgeti (sy2, GSNSAVE), ncoeff)
-	call calloc (xcoeff, ncoeff, TY_REAL)
-	call calloc (ycoeff, ncoeff, TY_REAL)
+	sz_val = ncoeff
+	call calloc (xcoeff, sz_val, TY_REAL)
+	call calloc (ycoeff, sz_val, TY_REAL)
 
 	# Save the coefficients.
 	call gssave (sx2, Memr[xcoeff])
@@ -698,21 +711,24 @@ real   yin[ARB]                #I the input dec / latitude coordinates
 real   xfit[ARB]               #I the fitted ra / longitude coordinates
 real   yfit[ARB]               #I the fitted dec / latitude coordinates
 real   wts[ARB]                #I the weights array
-int     npts                    #I the number of data points
+size_t	npts                    #I the number of data points
 
-int     i, index
+size_t	sz_val
+long	i, index
 pointer sp, fmtstr, twts
 
 begin
         # Allocate working space.
         call smark (sp)
-        call salloc (fmtstr, SZ_LINE, TY_CHAR)
-        call salloc (twts, npts, TY_REAL)
+        sz_val = SZ_LINE
+        call salloc (fmtstr, sz_val, TY_CHAR)
+        sz_val = npts
+        call salloc (twts, sz_val, TY_REAL)
 
         # Compute the weights.
         call amovr (wts, Memr[twts], npts)
         do i = 1, GM_NREJECT(fit) {
-            index = Memi[GM_REJ(fit)+i-1]
+            index = Meml[GM_REJ(fit)+i-1]
             if (wts[index] > real(0.0))
                 Memr[twts+index-1] = real(0.0)
         }
@@ -775,6 +791,7 @@ pointer	fit			#I pointer to the fit structure
 pointer sx1, sy1                #I pointer to linear surfaces
 int     comment                 #I comment the output ?
 
+size_t	sz_val
 real   xshift, yshift, a, b, c, d
 real   xscale, yscale, xrot, yrot
 pointer sp, str
@@ -783,7 +800,8 @@ bool    fp_equalr()
 begin
         # Allocate temporary space.
         call smark (sp)
-        call salloc (str, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (str, sz_val, TY_CHAR)
 
         # Compute the geometric parameters.
         call geo_gcoeffr (sx1, sy1, xshift, yshift, a, b, c, d)
@@ -880,21 +898,24 @@ double	xmin, xmax		#I max and min xref values
 double	ymin, ymax		#I max and min yref values
 bool	verbose			#I verbose mode
 
-int	npts, ngood
+size_t	sz_val
+size_t	npts, ngood
 pointer	sp, str, xref, yref, xin, yin, wts, xfit, yfit, xerrmsg, yerrmsg
 pointer	sx1, sy1, sx2, sy2
 double	mintemp, maxtemp
 
 double	asumd()
-int	geo_rdxyd()
+long	geo_rdxyd()
 errchk	geo_fitd, geo_mgfitd()
 
 begin
 	# Get working space.
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (xerrmsg, SZ_LINE, TY_CHAR)
-	call salloc (yerrmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (xerrmsg, sz_val, TY_CHAR)
+	call salloc (yerrmsg, sz_val, TY_CHAR)
 
 	# Initialize pointers.
 	xref = NULL
@@ -1038,8 +1059,8 @@ begin
 	if (res != NULL) {
 	    call fprintf (res, "#     Xin and Yin fit rms: %0.7g  %0.7g\n")
 	    if (ngood <= 1) {
-		call pargd (0.0)
-		call pargd (0.0)
+		call pargd (0.0d0)
+		call pargd (0.0d0)
 	    } else {
 		call pargd (sqrt (GM_XRMS(fit) / (ngood - 1)))
 		call pargd (sqrt (GM_YRMS(fit) / (ngood - 1)))
@@ -1084,7 +1105,7 @@ define	GEO_DEFBUFSIZE	1000	# default data buffer sizes
 
 # GEO_RDXY -- Read in the data points.
 
-int procedure geo_rdxyd (fd, xref, yref, xin, yin, xmin, xmax, ymin, ymax)
+long procedure geo_rdxyd (fd, xref, yref, xin, yin, xmin, xmax, ymin, ymax)
 
 int	fd			# the input file descriptor
 pointer	xref			# the x reference coordinates
@@ -1094,7 +1115,7 @@ pointer	yin			# the y coordinates
 double	xmin, xmax		# the range of the x coordinates
 double	ymin, ymax		# the range of the y coordinates
 
-int	npts, bufsize
+size_t	npts, bufsize
 int	fscan(), nscan()
 
 begin
@@ -1173,13 +1194,15 @@ double   xref[ARB]               #I the x reference coordinates
 double   yref[ARB]               #I the y reference coordinates
 double   xi[ARB]                 #O the fitted xi coordinates
 double   eta[ARB]                #O the fitted eta coordinates
-int     npts                    #I the number of points
+size_t	npts                    #I the number of points
 
+size_t	sz_val
 pointer sp, temp
 
 begin
         call smark (sp)
-        call salloc (temp, npts, TY_DOUBLE)
+        sz_val = npts
+        call salloc (temp, sz_val, TY_DOUBLE)
 
         call dgsvector (sx1, xref, yref, xi, npts)
         if (sx2 != NULL) {
@@ -1202,11 +1225,13 @@ end
 procedure geo_moutd (fit, out, sx1, sy1, sx2, sy2)
 
 pointer	fit		#I pointer to fitting structure
-int	out		#I pointer to database file
+pointer	out		#I pointer to database file
 pointer	sx1, sy1	#I pointer to linear surfaces
 pointer	sx2, sy2	#I pointer to distortion surfaces
 
-int	i, npts, ncoeff
+size_t	sz_val
+int	i, ncoeff
+size_t	npts
 pointer	sp, str, xcoeff, ycoeff
 double	xrms, yrms, xshift, yshift, xscale, yscale, xrot, yrot
 int	dgsgeti()
@@ -1214,7 +1239,8 @@ int	rg_wrdstr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Compute the x and y fit rms.
 	#npts = max (0, GM_NPTS(fit) - GM_NREJECT(fit) - GM_NWTS0(fit))
@@ -1277,8 +1303,9 @@ begin
 
 	# Allocate memory for linear coefficients.
 	ncoeff = max (dgsgeti (sx1, GSNSAVE), dgsgeti (sy1, GSNSAVE))
-	call calloc (xcoeff, ncoeff, TY_DOUBLE)
-	call calloc (ycoeff, ncoeff, TY_DOUBLE)
+	sz_val = ncoeff
+	call calloc (xcoeff, sz_val, TY_DOUBLE)
+	call calloc (ycoeff, sz_val, TY_DOUBLE)
 
 	# Output the linear coefficients.
 	call dgssave (sx1, Memd[xcoeff])
@@ -1303,8 +1330,9 @@ begin
 	    ncoeff = max (0, ncoeff)
 	else
 	    ncoeff = max (dgsgeti (sy2, GSNSAVE), ncoeff)
-	call calloc (xcoeff, ncoeff, TY_DOUBLE)
-	call calloc (ycoeff, ncoeff, TY_DOUBLE)
+	sz_val = ncoeff
+	call calloc (xcoeff, sz_val, TY_DOUBLE)
+	call calloc (ycoeff, sz_val, TY_DOUBLE)
 
 	# Save the coefficients.
 	call dgssave (sx2, Memd[xcoeff])
@@ -1339,21 +1367,24 @@ double   yin[ARB]                #I the input dec / latitude coordinates
 double   xfit[ARB]               #I the fitted ra / longitude coordinates
 double   yfit[ARB]               #I the fitted dec / latitude coordinates
 double   wts[ARB]                #I the weights array
-int     npts                    #I the number of data points
+size_t	npts                    #I the number of data points
 
-int     i, index
+size_t	sz_val
+long	i, index
 pointer sp, fmtstr, twts
 
 begin
         # Allocate working space.
         call smark (sp)
-        call salloc (fmtstr, SZ_LINE, TY_CHAR)
-        call salloc (twts, npts, TY_DOUBLE)
+        sz_val = SZ_LINE
+        call salloc (fmtstr, sz_val, TY_CHAR)
+        sz_val = npts
+        call salloc (twts, sz_val, TY_DOUBLE)
 
         # Compute the weights.
         call amovd (wts, Memd[twts], npts)
         do i = 1, GM_NREJECT(fit) {
-            index = Memi[GM_REJ(fit)+i-1]
+            index = Meml[GM_REJ(fit)+i-1]
             if (wts[index] > double(0.0))
                 Memd[twts+index-1] = double(0.0)
         }
@@ -1416,6 +1447,7 @@ pointer	fit			#I pointer to the fit structure
 pointer sx1, sy1                #I pointer to linear surfaces
 int     comment                 #I comment the output ?
 
+size_t	sz_val
 double   xshift, yshift, a, b, c, d
 double   xscale, yscale, xrot, yrot
 pointer sp, str
@@ -1424,7 +1456,8 @@ bool    fp_equald()
 begin
         # Allocate temporary space.
         call smark (sp)
-        call salloc (str, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (str, sz_val, TY_CHAR)
 
         # Compute the geometric parameters.
         call geo_gcoeffd (sx1, sy1, xshift, yshift, a, b, c, d)

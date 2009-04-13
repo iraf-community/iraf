@@ -4,8 +4,8 @@ define	LEN_GEOSTRUCT	(30 + SZ_FNAME)
 
 # output picture formatting parameters
 
-define	GT_NCOLS		Memi[P2I($1)]	# number of output columns
-define	GT_NLINES		Memi[P2I($1+1)]	# number of output lines
+define	GT_NCOLS		Memz[P2Z($1)]	# number of output columns
+define	GT_NLINES		Memz[P2Z($1+1)]	# number of output lines
 define	GT_XMIN			Memr[P2R($1+2)]	# x minimum
 define	GT_XMAX			Memr[P2R($1+3)]	# x maximum
 define	GT_YMIN			Memr[P2R($1+4)]	# y minimun	

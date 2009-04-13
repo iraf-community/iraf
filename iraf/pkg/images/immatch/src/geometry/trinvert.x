@@ -34,10 +34,13 @@ double	der[8]			# Last result as input, new result as output
 double	xmin, xmax, ymin, ymax	# Limits of coordinate surfaces.
 double	tol			# Tolerance
 
+size_t	c_1
 int	i, j, nedge
 double	fudge, du, dv, dx, dy, tmp[3]
 
 begin
+	c_1 = 1
+
 	# Use the last result as the starting point for the next position.
 	# If this is near the desired value then the interation will converge
 	# quickly.  Allow a iteration to go off the surface twice.
@@ -55,23 +58,23 @@ begin
 	    y = der[2] + fudge * dy
 	    der[1] = max (xmin, min (xmax, x))
 	    der[2] = max (ymin, min (ymax, y))
-	    if ((abs (dx) < tol) && (abs (dy) < tol))
+	    if ((dabs (dx) < tol) && (dabs (dy) < tol))
 	        break
 
 	    if (nusf == 0)
 		der[3] = der[1]
 	    else if (nusf == 1) {
-	        call dgsder (usf[1], der[1], der[2], der[3], 1, 0, 0)
-	        call dgsder (usf[1], der[1], der[2], der[4], 1, 1, 0)
-	        call dgsder (usf[1], der[1], der[2], der[5], 1, 0, 1)
+	        call dgsder (usf[1], der[1], der[2], der[3], c_1, 0, 0)
+	        call dgsder (usf[1], der[1], der[2], der[4], c_1, 1, 0)
+	        call dgsder (usf[1], der[1], der[2], der[5], c_1, 0, 1)
 	    } else {
-	        call dgsder (usf[1], der[1], der[2], der[3], 1, 0, 0)
-	        call dgsder (usf[1], der[1], der[2], der[4], 1, 1, 0)
-	        call dgsder (usf[1], der[1], der[2], der[5], 1, 0, 1)
+	        call dgsder (usf[1], der[1], der[2], der[3], c_1, 0, 0)
+	        call dgsder (usf[1], der[1], der[2], der[4], c_1, 1, 0)
+	        call dgsder (usf[1], der[1], der[2], der[5], c_1, 0, 1)
 		do j = 2, nusf {
-	            call dgsder (usf[j], der[1], der[2], tmp[1], 1, 0, 0)
-	            call dgsder (usf[j], der[1], der[2], tmp[2], 1, 1, 0)
-	            call dgsder (usf[j], der[1], der[2], tmp[3], 1, 0, 1)
+	            call dgsder (usf[j], der[1], der[2], tmp[1], c_1, 0, 0)
+	            call dgsder (usf[j], der[1], der[2], tmp[2], c_1, 1, 0)
+	            call dgsder (usf[j], der[1], der[2], tmp[3], c_1, 0, 1)
 		    der[3] = der[3] + tmp[1]
 		    der[4] = der[4] + tmp[2]
 		    der[5] = der[5] + tmp[3]
@@ -81,17 +84,17 @@ begin
 	    if (nvsf == 0)
 		der[6] = der[2]
 	    else if (nvsf == 1) {
-	        call dgsder (vsf[1], der[1], der[2], der[6], 1, 0, 0)
-	        call dgsder (vsf[1], der[1], der[2], der[7], 1, 1, 0)
-	        call dgsder (vsf[1], der[1], der[2], der[8], 1, 0, 1)
+	        call dgsder (vsf[1], der[1], der[2], der[6], c_1, 0, 0)
+	        call dgsder (vsf[1], der[1], der[2], der[7], c_1, 1, 0)
+	        call dgsder (vsf[1], der[1], der[2], der[8], c_1, 0, 1)
 	    } else {
-	        call dgsder (vsf[1], der[1], der[2], der[6], 1, 0, 0)
-	        call dgsder (vsf[1], der[1], der[2], der[7], 1, 1, 0)
-	        call dgsder (vsf[1], der[1], der[2], der[8], 1, 0, 1)
+	        call dgsder (vsf[1], der[1], der[2], der[6], c_1, 0, 0)
+	        call dgsder (vsf[1], der[1], der[2], der[7], c_1, 1, 0)
+	        call dgsder (vsf[1], der[1], der[2], der[8], c_1, 0, 1)
 		do j = 2, nvsf {
-	            call dgsder (vsf[j], der[1], der[2], tmp[1], 1, 0, 0)
-	            call dgsder (vsf[j], der[1], der[2], tmp[2], 1, 1, 0)
-	            call dgsder (vsf[j], der[1], der[2], tmp[3], 1, 0, 1)
+	            call dgsder (vsf[j], der[1], der[2], tmp[1], c_1, 0, 0)
+	            call dgsder (vsf[j], der[1], der[2], tmp[2], c_1, 1, 0)
+	            call dgsder (vsf[j], der[1], der[2], tmp[3], c_1, 0, 1)
 		    der[6] = der[6] + tmp[1]
 		    der[7] = der[7] + tmp[2]
 		    der[8] = der[8] + tmp[3]
@@ -111,10 +114,13 @@ int	nusf, nvsf		# Number of surfaces for each coordinate
 double	x, y			# Starting X and Y
 double	der[8]			# Inversion data
 
+size_t	c_1
 int	j
 double	tmp[3]
 
 begin
+	c_1 = 1
+
 	der[1] = x
 	der[2] = y
 	if (nusf == 0) {
@@ -122,17 +128,17 @@ begin
 	    der[4] = 1.
 	    der[5] = 0.
 	} else if (nusf == 1) {
-	    call dgsder (usf[1], der[1], der[2], der[3], 1, 0, 0)
-	    call dgsder (usf[1], der[1], der[2], der[4], 1, 1, 0)
-	    call dgsder (usf[1], der[1], der[2], der[5], 1, 0, 1)
+	    call dgsder (usf[1], der[1], der[2], der[3], c_1, 0, 0)
+	    call dgsder (usf[1], der[1], der[2], der[4], c_1, 1, 0)
+	    call dgsder (usf[1], der[1], der[2], der[5], c_1, 0, 1)
 	} else {
-	    call dgsder (usf[1], der[1], der[2], der[3], 1, 0, 0)
-	    call dgsder (usf[1], der[1], der[2], der[4], 1, 1, 0)
-	    call dgsder (usf[1], der[1], der[2], der[5], 1, 0, 1)
+	    call dgsder (usf[1], der[1], der[2], der[3], c_1, 0, 0)
+	    call dgsder (usf[1], der[1], der[2], der[4], c_1, 1, 0)
+	    call dgsder (usf[1], der[1], der[2], der[5], c_1, 0, 1)
 	    do j = 2, nusf {
-	        call dgsder (usf[j], der[1], der[2], tmp[1], 1, 0, 0)
-	        call dgsder (usf[j], der[1], der[2], tmp[2], 1, 1, 0)
-	        call dgsder (usf[j], der[1], der[2], tmp[3], 1, 0, 1)
+	        call dgsder (usf[j], der[1], der[2], tmp[1], c_1, 0, 0)
+	        call dgsder (usf[j], der[1], der[2], tmp[2], c_1, 1, 0)
+	        call dgsder (usf[j], der[1], der[2], tmp[3], c_1, 0, 1)
 		der[3] = der[3] + tmp[1]
 		der[4] = der[4] + tmp[2]
 		der[5] = der[5] + tmp[3]
@@ -144,17 +150,17 @@ begin
 	    der[7] = 0.
 	    der[8] = 1.
 	} else if (nvsf == 1) {
-	    call dgsder (vsf[1], der[1], der[2], der[6], 1, 0, 0)
-	    call dgsder (vsf[1], der[1], der[2], der[7], 1, 1, 0)
-	    call dgsder (vsf[1], der[1], der[2], der[8], 1, 0, 1)
+	    call dgsder (vsf[1], der[1], der[2], der[6], c_1, 0, 0)
+	    call dgsder (vsf[1], der[1], der[2], der[7], c_1, 1, 0)
+	    call dgsder (vsf[1], der[1], der[2], der[8], c_1, 0, 1)
 	} else {
-	    call dgsder (vsf[1], der[1], der[2], der[6], 1, 0, 0)
-	    call dgsder (vsf[1], der[1], der[2], der[7], 1, 1, 0)
-	    call dgsder (vsf[1], der[1], der[2], der[8], 1, 0, 1)
+	    call dgsder (vsf[1], der[1], der[2], der[6], c_1, 0, 0)
+	    call dgsder (vsf[1], der[1], der[2], der[7], c_1, 1, 0)
+	    call dgsder (vsf[1], der[1], der[2], der[8], c_1, 0, 1)
 	    do j = 2, nvsf {
-	        call dgsder (vsf[j], der[1], der[2], tmp[1], 1, 0, 0)
-	        call dgsder (vsf[j], der[1], der[2], tmp[2], 1, 1, 0)
-	        call dgsder (vsf[j], der[1], der[2], tmp[3], 1, 0, 1)
+	        call dgsder (vsf[j], der[1], der[2], tmp[1], c_1, 0, 0)
+	        call dgsder (vsf[j], der[1], der[2], tmp[2], c_1, 1, 0)
+	        call dgsder (vsf[j], der[1], der[2], tmp[3], c_1, 0, 1)
 		der[6] = der[6] + tmp[1]
 		der[7] = der[7] + tmp[2]
 		der[8] = der[8] + tmp[3]

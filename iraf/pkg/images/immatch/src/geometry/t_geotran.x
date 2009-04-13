@@ -11,7 +11,7 @@ include "geotran.h"
 
 procedure t_geotran ()
 
-int	ncols, nlines			# output picture size
+size_t	ncols, nlines			# output picture size
 real	xmin, xmax, ymin, ymax		# minimum and maximum ref values
 real	xscale, yscale			# output picture scale
 real	xin, yin			# input picture origin
@@ -19,10 +19,12 @@ real	xshift, yshift			# x and y shifts
 real	xout, yout			# output picture origin
 real	xmag, ymag			# input picture scale
 real	xrotation, yrotation		# rotation angle
-int	nxblock, nyblock		# block size of image to be used
+size_t	nxblock, nyblock		# block size of image to be used
 
+size_t	sz_val
 bool	verbose
-int	ndim, nc, nl, mode
+int	ndim, mode
+size_t	nc, nl
 pointer	list1, list2, tflist
 pointer	sp, imtlist1, imtlist2, database, transform, record
 pointer	image1, image2, imtemp, imroot, section, str
@@ -31,26 +33,32 @@ real	xs, ys, txshift, tyshift, txmag, tymag, txrot, tyrot
 double	oltv[2], nltv[2], oltm[2,2], nltm[2,2]
 
 bool	clgetb(), envgetb(), streq()
-int	imtlen(), clgeti(), imtgetim(), clgwrd(), btoi()
+int	imtlen(), imtgetim(), clgwrd(), btoi()
+long	clgetl()
 pointer	imtopen(), immap(), mw_openim()
 real	clgetr()
 errchk	immap()
+include	<nullptr.inc>
 
 begin
 	# Set up  the geotran structure.
 	call smark (sp)
-	call salloc (imtlist1, SZ_LINE, TY_CHAR)
-	call salloc (imtlist2, SZ_LINE, TY_CHAR)
-	call salloc (database, SZ_FNAME, TY_CHAR)
-	call salloc (transform, SZ_FNAME, TY_CHAR)
-	call salloc (record, SZ_FNAME, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (imroot, SZ_FNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (geo, LEN_GEOSTRUCT, TY_STRUCT)
+	sz_val = SZ_LINE
+	call salloc (imtlist1, sz_val, TY_CHAR)
+	call salloc (imtlist2, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (database, sz_val, TY_CHAR)
+	call salloc (transform, sz_val, TY_CHAR)
+	call salloc (record, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	call salloc (imroot, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = LEN_GEOSTRUCT
+	call salloc (geo, sz_val, TY_STRUCT)
 
 	# Get the input and output lists and database file.
 	call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -73,8 +81,8 @@ begin
 	ymax = clgetr ("ymax")
 	xscale = clgetr ("xscale")
 	yscale = clgetr ("yscale")
-	ncols= clgeti ("ncols")
-	nlines = clgeti ("nlines")
+	ncols= clgetl ("ncols")
+	nlines = clgetl ("nlines")
 
 	# Get the geometric transformation parameters.
 	xin = clgetr ("xin")
@@ -99,8 +107,8 @@ begin
 	GT_YSAMPLE(geo) = clgetr ("ysample")
 	GT_FLUXCONSERVE(geo) = btoi (clgetb("fluxconserve"))
 
-	nxblock = clgeti ("nxblock")
-	nyblock = clgeti ("nyblock")
+	nxblock = clgetl ("nxblock")
+	nyblock = clgetl ("nyblock")
 	verbose = clgetb ("verbose")
 
 	# Open the lists of images and check the scale lengths.
@@ -140,7 +148,7 @@ begin
 	    }
 
 	    # Open the images.
-	    in = immap (Memc[image1], READ_ONLY, 0)
+	    in = immap (Memc[image1], READ_ONLY, NULLPTR)
 	    call imgimage (Memc[image1], Memc[str], SZ_FNAME)
 	    call imgimage (Memc[image2], Memc[imroot], SZ_FNAME)
 	    call imgsection (Memc[image2], Memc[section], SZ_FNAME)
@@ -149,7 +157,7 @@ begin
 		call mktemp ("tmp", Memc[image2], SZ_FNAME)
 	    } else
 		call strcpy (Memc[image2], Memc[imtemp], SZ_FNAME)
-	    ifnoerr (out = immap (Memc[image2], READ_WRITE, 0)) {
+	    ifnoerr (out = immap (Memc[image2], READ_WRITE, NULLPTR)) {
 		mode = READ_WRITE
 		nc = IM_LEN(out,1)
 		nl = IM_LEN(out,2)
@@ -157,20 +165,20 @@ begin
 		ys = INDEF
 	    } else if (Memc[section] != EOS) {
 		mode = NEW_IMAGE
-	        out = immap (Memc[imroot], NEW_IMAGE, 0)
+	        out = immap (Memc[imroot], NEW_IMAGE, NULLPTR)
 		IM_NDIM(out) = IM_NDIM(in)
-		if (IS_INDEFI(ncols))
+		if (IS_INDEFZ(ncols))
 		    IM_LEN(out,1) = IM_LEN(in,1)
 		else
 		    IM_LEN(out,1) = ncols
-		if (IS_INDEFI(nlines))
+		if (IS_INDEFZ(nlines))
 		    IM_LEN(out,2) = IM_LEN(in,2)
 		else
 		    IM_LEN(out,2) = nlines
 		IM_PIXTYPE(out) = IM_PIXTYPE(in)
 		call geo_imzero (out, GT_CONSTANT(geo))
 		call imunmap (out)
-		out = immap (Memc[image2], READ_WRITE, 0)
+		out = immap (Memc[image2], READ_WRITE, NULLPTR)
 		nc = IM_LEN(out,1)
 		nl = IM_LEN(out,2)
 		xs = INDEF
@@ -227,19 +235,23 @@ begin
 	            call geo_imtran (in, out, geo, sx1, sy1, sx2, sy2)
 	    } else {
 	        if (GT_XSAMPLE(geo) > 1.0 || GT_YSAMPLE(geo) > 1.0) {
-		    if (IM_NDIM(out) == 1)
+		    if (IM_NDIM(out) == 1) {
+			sz_val = 1
 		        call geo_stran (in, out, geo, sx1, sy1, sx2, sy2,
-			    nxblock, 1)
-		    else
+			    nxblock, sz_val)
+		    } else {
 		        call geo_stran (in, out, geo, sx1, sy1, sx2, sy2,
 			    nxblock, nyblock)
+		    }
 	        } else {
-		    if (IM_NDIM(out) == 1)
+		    if (IM_NDIM(out) == 1) {
+			sz_val = 1
 	                call geo_tran (in, out, geo, sx1, sy1, sx2, sy2,
-			    nxblock, 1)
-		    else
+			    nxblock, sz_val)
+		    } else {
 	                call geo_tran (in, out, geo, sx1, sy1, sx2, sy2,
 			    nxblock, nyblock)
+		    }
 		}
 	    }
 
@@ -250,7 +262,8 @@ begin
 		call geo_gwcs (geo, sx1, sy1, oltm, oltv)
 		call mw_invertd (oltm, nltm, ndim)
 		call mw_vmuld (nltm, oltv, nltv, ndim)
-		call anegd (nltv, nltv, ndim)
+		sz_val = ndim
+		call anegd (nltv, nltv, sz_val)
 		call geo_swcs (mw, nltm, nltv, ndim) 
 		call mw_saveim (mw, out)
 		call mw_close (mw)
@@ -286,25 +299,36 @@ procedure geo_imzero (im, constant)
 pointer	im			#I pointer to the input image
 real	constant		#I the constant value to insert in the imagw
 
-int	npix
+size_t	sz_val
+long	l_val
+size_t	npix
 pointer	sp, v, buf
-long	impnls(), impnll(), impnlr(), impnld(), impnlx()
+long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
+short	sint()
+int	iint()
+long	lint()
 
 begin
         # Setup start vector for sequential reads and writes.
 	call smark (sp)
-	call salloc (v, IM_MAXDIM, TY_LONG)
-        call amovkl (long(1), Meml[v], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
+	l_val = 1
+	sz_val = IM_MAXDIM
+        call amovkl (l_val, Meml[v], sz_val)
 
         # Initialize the image.
         npix = IM_LEN(im, 1)
         switch (IM_PIXTYPE(im)) {
         case TY_SHORT:
             while (impnls (im, buf, Meml[v]) != EOF)
-                call amovks (short (constant), Mems[buf], npix)
-        case TY_USHORT, TY_INT, TY_LONG:
+                call amovks (sint(constant), Mems[buf], npix)
+        case TY_INT:
+            while (impnli (im, buf, Meml[v]) != EOF)
+                call amovki (iint(constant), Memi[buf], npix)
+        case TY_USHORT, TY_LONG:
             while (impnll (im, buf, Meml[v]) != EOF)
-                call amovkl (long (constant), Meml[buf], npix)
+                call amovkl (lint(constant), Meml[buf], npix)
         case TY_REAL:
             while (impnlr (im, buf, Meml[v]) != EOF)
                 call amovkr (constant, Memr[buf], npix)
@@ -332,7 +356,7 @@ pointer	geo			#I pointer to geotran structure
 real	xmin, xmax		#I minimum and maximum reference values
 real	ymin, ymax		#I minimum and maximum reference values
 real	xscale, yscale		#I output picture scale
-int	ncols, nlines		#I output picture size
+size_t	ncols, nlines		#I output picture size
 real	xin, yin		#I input picture pixel coordinates
 real	xshift, yshift		#I shift of origin
 real	xout, yout		#I corresponding output picture coords
@@ -375,6 +399,7 @@ pointer sx1, sy1	#O pointer to linear surfaces
 pointer	sx2, sy2	#O pointer to distortion surfaces
 
 real	xmax, ymax
+real	aabs()
 
 begin
 	# Get the scale transformation parameters.
@@ -403,11 +428,11 @@ begin
 	if (GT_XMAX(geo) <= 0.0 || GT_YMAX(geo) <= 0.0) {
 
 	    # Compute the size of the output image.
-	    xmax = abs (cos(GT_XROTATION(geo)) * IM_LEN(in,1) /
-	        GT_XMAG(geo)) + abs(sin(GT_YROTATION(geo)) * IM_LEN(in,2) /
+	    xmax = aabs (cos(GT_XROTATION(geo)) * IM_LEN(in,1) /
+	        GT_XMAG(geo)) + aabs(sin(GT_YROTATION(geo)) * IM_LEN(in,2) /
 		GT_YMAG(geo))
-	    ymax = abs (sin(GT_XROTATION(geo)) * IM_LEN(in, 1) /
-	        GT_XMAG(geo)) + abs (cos(GT_YROTATION(geo)) * IM_LEN(in,2) /
+	    ymax = aabs (sin(GT_XROTATION(geo)) * IM_LEN(in, 1) /
+	        GT_XMAG(geo)) + aabs(cos(GT_YROTATION(geo)) * IM_LEN(in,2) /
 		GT_YMAG(geo))
 	}
 
@@ -419,7 +444,7 @@ begin
 	if (IS_INDEF(GT_XMAX(geo)))
 	    GT_XMAX(geo) = IM_LEN(in,1)
 	else if (GT_XMAX(geo) <= 0.0)
-	    #GT_XMAX(geo) = int (xmax + 1.0)
+	    #GT_XMAX(geo) = aint (xmax + 1.0)
 	    GT_XMAX(geo) = xmax
 
 	# Set up the y reference coordinate limits.
@@ -430,15 +455,15 @@ begin
 	if (IS_INDEF(GT_YMAX(geo)))
 	    GT_YMAX(geo) = IM_LEN(in, 2)
 	else if (GT_YMAX(geo) <= 0.0)
-	    #GT_YMAX(geo) = int (ymax + 1.0) 
+	    #GT_YMAX(geo) = aint (ymax + 1.0) 
 	    GT_YMAX(geo) = ymax
 
 	# Set the number of columns and rows.
-	if (IS_INDEFI(GT_NCOLS(geo)))
+	if (IS_INDEFZ(GT_NCOLS(geo)))
 	    GT_NCOLS(geo) = IM_LEN(in, 1)
 	if (IM_NDIM(in) == 1)
 	    GT_NLINES(geo) = 1
-	else if (IS_INDEFI(GT_NLINES(geo)))
+	else if (IS_INDEFZ(GT_NLINES(geo)))
 	    GT_NLINES(geo) = IM_LEN(in, 2)
 
 	# Set scale, overiding number of columns and rows if necessary. 
@@ -491,6 +516,7 @@ char	transform[ARB]		#I name of transform
 pointer	sx1, sy1		#O pointer to linear part of surface fit
 pointer	sx2, sy2		#O pointer to higher order surface
 
+size_t	sz_val
 int	i, rec, ncoeff, junk
 pointer	dt, xcoeff, ycoeff, newsx1, newsy1
 int	dtlocate(), dtgeti(), dtscan()
@@ -504,8 +530,9 @@ begin
 
 	# Get the linear part of the fit.
 	ncoeff = dtgeti (dt, rec, "surface1")
-	call malloc (xcoeff, ncoeff, TY_REAL)
-	call malloc (ycoeff, ncoeff, TY_REAL)
+	sz_val = ncoeff
+	call malloc (xcoeff, sz_val, TY_REAL)
+	call malloc (ycoeff, sz_val, TY_REAL)
 	do i = 1, ncoeff {
 	    junk = dtscan (dt)
 	    call gargr (Memr[xcoeff+i-1])
@@ -533,8 +560,9 @@ begin
 	    GT_DISTORT)) {
 
 	    # Get the distortion coefficients.
-	    call realloc (xcoeff, ncoeff, TY_REAL)
-	    call realloc (ycoeff, ncoeff, TY_REAL)
+	    sz_val = ncoeff
+	    call realloc (xcoeff, sz_val, TY_REAL)
+	    call realloc (ycoeff, sz_val, TY_REAL)
 	    do i = 1, ncoeff {
 	        junk = dtscan(dt)
 	        call gargr (Memr[xcoeff+i-1])
@@ -584,6 +612,7 @@ pointer	geo		#I pointer to geotran sturcture
 pointer	sx1, sy1	#I pointers to linear surface descriptors
 
 real	gsgetr ()
+real	aabs()
 
 begin
 	# Set the reference coordinate limits.
@@ -597,18 +626,18 @@ begin
 	    GT_YMAX(geo) = gsgetr (sy1, GSYMAX)
 
 	# Set the number of lines and columns.
-	if (IS_INDEFI(GT_NCOLS(geo)))
+	if (IS_INDEFZ(GT_NCOLS(geo)))
 	    GT_NCOLS(geo) = IM_LEN(in, 1)
 	if (IM_NDIM(in) == 1)
 	    GT_NLINES(geo) = 1
-	else if (IS_INDEFI(GT_NLINES(geo)))
+	else if (IS_INDEFZ(GT_NLINES(geo)))
 	    GT_NLINES(geo) = IM_LEN(in, 2)
 
 	# Set scale, overiding the number of columns and rows if necessary. 
 	if (IS_INDEFR(GT_XSCALE(geo)))
 	    GT_XSCALE(geo) = (GT_XMAX(geo) - GT_XMIN(geo)) / (GT_NCOLS(geo) - 1)
 	else
-	    GT_NCOLS(geo) = abs ((GT_XMAX(geo) - GT_XMIN(geo)) /
+	    GT_NCOLS(geo) = aabs ((GT_XMAX(geo) - GT_XMIN(geo)) /
 	        GT_XSCALE(geo)) + 1
 	if (IM_NDIM(in) == 1)
 	    GT_YSCALE(geo) = 1.0
@@ -616,7 +645,7 @@ begin
 	    GT_YSCALE(geo) = (GT_YMAX(geo) - GT_YMIN(geo)) /
 	        (GT_NLINES(geo) - 1)
 	else
-	    GT_NLINES(geo) = abs ((GT_YMAX(geo) - GT_YMIN(geo)) /
+	    GT_NLINES(geo) = aabs ((GT_YMAX(geo) - GT_YMIN(geo)) /
 	        GT_YSCALE(geo)) + 1
 
 	# Set the output image size.
@@ -748,6 +777,7 @@ pointer	sy1		# pointer to the linear y coordinate surface
 double	ltm[2,2]	# rotation matrix
 double	ltv[2]		# shift vector
 
+size_t	sz_val
 double	xscale, yscale, xmin, ymin
 int	ncoeff
 pointer	sp, xcoeff, ycoeff
@@ -759,8 +789,9 @@ begin
 	# Allocate space for the coefficients.
 	call smark (sp)
 	ncoeff = max (gsgeti (sx1, GSNSAVE), gsgeti (sy1, GSNSAVE))
-	call salloc (xcoeff, ncoeff, TY_REAL)
-	call salloc (ycoeff, ncoeff, TY_REAL)
+	sz_val = ncoeff
+	call salloc (xcoeff, sz_val, TY_REAL)
+	call salloc (ycoeff, sz_val, TY_REAL)
 
 	# Fetch the coefficients.
 	call gssave (sx1, Memr[xcoeff])
@@ -829,6 +860,7 @@ double	gltm[ldim,ldim]		# the input cd matrix from geotran
 double	gltv[ldim]		# the input shift vector from geotran
 int	ldim			# number of logical dimensions
 
+size_t	sz_val
 int	axes[IM_MAXDIM], naxes, pdim, nelem, axmap, ax1, ax2
 pointer	sp, ltm, ltv_1, ltv_2
 int	mw_stati()
@@ -853,14 +885,17 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (ltm, nelem, TY_DOUBLE)
-	call salloc (ltv_1, pdim, TY_DOUBLE)
-	call salloc (ltv_2, pdim, TY_DOUBLE)
+	sz_val = nelem
+	call salloc (ltm, sz_val, TY_DOUBLE)
+	sz_val = pdim
+	call salloc (ltv_1, sz_val, TY_DOUBLE)
+	call salloc (ltv_2, sz_val, TY_DOUBLE)
 
 	# Initialize the vectors and matrices.
 	call mw_mkidmd (Memd[ltm], pdim)
-	call aclrd (Memd[ltv_1], pdim)
-	call aclrd (Memd[ltv_2], pdim)
+	sz_val = pdim
+	call aclrd (Memd[ltv_1], sz_val)
+	call aclrd (Memd[ltv_2], sz_val)
 
 	# Enter the linear operation.
 	ax1 = axes[1]

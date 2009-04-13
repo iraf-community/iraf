@@ -18,6 +18,7 @@ pointer	geo			#I pointer to geotran structure
 pointer	sx1, sy1		#I pointers to linear surface descriptors
 pointer	sx2, sy2		#I pointer to higher order surface descriptors
 
+size_t	sz_val
 int	nincr
 pointer	sp, xref, yref, msi
 real	shift
@@ -47,8 +48,9 @@ begin
 	call salloc (yref, GT_NLINES(geo), TY_REAL)
 
 	# Calculate the reference coordinates of the input image pixels.
-	call geo_ref (geo, Memr[xref], 1, GT_NCOLS(geo), GT_NCOLS(geo),
-	    Memr[yref], 1, GT_NLINES(geo), GT_NLINES(geo), gsgetr (sx1,
+	sz_val = 1
+	call geo_ref (geo, Memr[xref], sz_val, GT_NCOLS(geo), GT_NCOLS(geo),
+	    Memr[yref], sz_val, GT_NLINES(geo), GT_NLINES(geo), gsgetr (sx1,
 	    GSXMIN), gsgetr (sx1, GSXMAX), gsgetr (sx1, GSYMIN), gsgetr (sx1,
 	    GSYMAX), GT_ONE)
 
@@ -57,8 +59,9 @@ begin
 	    GT_NCOLS(geo), Memr[yref], GT_NLINES(geo))
 
 	# Interpolate.
-	call geo_gsvector (input, output, geo, msi, Memr[xref], 1,
-	    GT_NCOLS(geo), Memr[yref], 1, GT_NLINES(geo), sx1, sy1, sx2, sy2)
+	sz_val = 1
+	call geo_gsvector (input, output, geo, msi, Memr[xref], sz_val,
+	    GT_NCOLS(geo), Memr[yref], sz_val, GT_NLINES(geo), sx1, sy1, sx2, sy2)
 
 	# Clean up.
 	if (IM_NDIM(input) == 1)
@@ -81,11 +84,15 @@ pointer	geo			#I pointer to geotran structure
 pointer	sx1, sy1		#I pointer to linear surface descriptors
 pointer	sx2, sy2		#I pointer to higher order surface descriptors
 
-int	nxsample, nysample, nincr
+size_t	sz_val
+long	l_val
+size_t	nxsample, nysample
+int	nincr
 pointer	sp, xsample, ysample, xinterp, yinterp
 pointer	xmsi, ymsi, jmsi, msi, xbuf, ybuf, jbuf
 real	shift
 real	gsgetr()
+include	<nullptr.inc>
 
 begin
 	# Allocate working space and intialize the interpolant.
@@ -130,8 +137,9 @@ begin
             GT_INTERPOLANT(geo), GT_NSINC(geo),  GT_NXYMARGIN(geo))
 
         # Setup input image boundary extension parameters.
-        call geo_ref (geo, Memr[xsample], 1, GT_NCOLS(geo), GT_NCOLS(geo),
-            Memr[ysample], 1, GT_NLINES(geo), GT_NLINES(geo), gsgetr (sx1,
+	sz_val = 1
+        call geo_ref (geo, Memr[xsample], sz_val, GT_NCOLS(geo), GT_NCOLS(geo),
+            Memr[ysample], sz_val, GT_NLINES(geo), GT_NLINES(geo), gsgetr (sx1,
             GSXMIN), gsgetr (sx1, GSXMAX), gsgetr (sx1, GSYMIN), gsgetr (sx1,
             GSYMAX), GT_ONE)
         call geo_imset (input, geo, sx1, sy1, sx2, sy2, Memr[xsample],
@@ -139,11 +147,13 @@ begin
 
 	# Calculate the sampled reference coordinates and the interpolated
 	# reference coordinates.
-	call geo_ref (geo, Memr[xsample], 1, nxsample, nxsample, Memr[ysample],
-	    1, nysample, nysample, gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
+	sz_val = 1
+	call geo_ref (geo, Memr[xsample], sz_val, nxsample, nxsample, Memr[ysample],
+	    sz_val, nysample, nysample, gsgetr (sx1, GSXMIN), gsgetr (sx1, GSXMAX),
 	    gsgetr (sx1, GSYMIN), gsgetr (sx1, GSYMAX), GT_ONE)
-	call geo_sample (geo, Memr[xinterp], 1, GT_NCOLS(geo), nxsample,
-	    Memr[yinterp], 1, GT_NLINES(geo), nysample, GT_ONE)
+	sz_val = 1
+	call geo_sample (geo, Memr[xinterp], sz_val, GT_NCOLS(geo), nxsample,
+	    Memr[yinterp], sz_val, GT_NLINES(geo), nysample, GT_ONE)
 
 	# Initialize the buffers
 	xbuf = NULL
@@ -151,23 +161,29 @@ begin
 	jbuf = NULL
 
 	# Set up interpolants
-	call geo_xbuffer (sx1, sx2, xmsi, Memr[xsample], Memr[ysample], 1,
-	    nxsample, 1, nysample, xbuf)
-	call geo_ybuffer (sy1, sy2, ymsi, Memr[xsample], Memr[ysample], 1,
-	    nxsample, 1, nysample, ybuf)
+	sz_val = 1
+	call geo_xbuffer (sx1, sx2, xmsi, Memr[xsample], Memr[ysample], sz_val,
+	    nxsample, sz_val, nysample, xbuf)
+	call geo_ybuffer (sy1, sy2, ymsi, Memr[xsample], Memr[ysample], sz_val,
+	    nxsample, sz_val, nysample, ybuf)
 	if (GT_FLUXCONSERVE(geo) == YES && (sx2 != NULL || sy2 != NULL)) {
-	    if (IM_NDIM(input) == 1)
-	        call geo_jbuffer (sx1, NULL, sx2, NULL, jmsi, Memr[xsample],
-	            Memr[ysample], 1, nxsample, 1, nysample, jbuf)
-	    else
+	    if (IM_NDIM(input) == 1) {
+		sz_val = 1
+	        call geo_jbuffer (sx1, NULLPTR, sx2, NULLPTR, jmsi, Memr[xsample],
+	            Memr[ysample], sz_val, nxsample, sz_val, nysample, jbuf)
+	    } else {
+		sz_val = 1
 	        call geo_jbuffer (sx1, sy1, sx2, sy2, jmsi, Memr[xsample],
-	            Memr[ysample], 1, nxsample, 1, nysample, jbuf)
+	            Memr[ysample], sz_val, nxsample, sz_val, nysample, jbuf)
+	    }
 	}
 
 	# Transform the image.
+	sz_val = 1
+	l_val = 1
 	call geo_msivector (input, output, geo, xmsi, ymsi, jmsi, msi, 
-	    sx1, sy1, sx2, sy2, Memr[xinterp], 1, GT_NCOLS(geo), nxsample,
-	    Memr[yinterp], 1, GT_NLINES(geo), nysample, 1, 1)
+	    sx1, sy1, sx2, sy2, Memr[xinterp], sz_val, GT_NCOLS(geo), nxsample,
+	    Memr[yinterp], sz_val, GT_NLINES(geo), nysample, l_val, l_val)
 
 	# Free space.
 	if (IM_NDIM(input) == 1) {
