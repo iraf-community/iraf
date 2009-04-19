@@ -20,8 +20,11 @@ int	nimages			#I Number of images
 
 int	type			#O Type of value
 
-int	fd, i, nowhite(), open(), fscan(), nscan(), strdic()
-real	rval, imgetr()
+size_t	sz_val
+int	fd, i
+real	rval
+int	nowhite(), open(), fscan(), nscan(), strdic()
+real	imgetr()
 pointer	errstr
 errchk	open, imgetr
 
@@ -56,12 +59,13 @@ begin
 		}
 		call close (fd)
 		if (i < nimages) {
-		    call salloc (errstr, SZ_LINE, TY_CHAR)
-		    call sprintf (errstr, SZ_FNAME,
+		    sz_val = SZ_LINE
+		    call salloc (errstr, sz_val, TY_CHAR)
+		    call sprintf (Memc[errstr], SZ_FNAME,
 			"Insufficient %s values in %s")
 			call pargstr (param)
 			call pargstr (name[2])
-		    call error (1, errstr)
+		    call error (1, Memc[errstr])
 		}
 	    }
 	} else if (name[1] == '!') {
@@ -70,7 +74,8 @@ begin
 		if (IS_INDEFR(values[i]))
 		    values[i] = imgetr (in[i], name[2])
 		if (project) {
-		    call amovkr (values, values, nimages)
+		    sz_val = nimages
+		    call amovkr (values, values, sz_val)
 		    break
 		}
 	    }

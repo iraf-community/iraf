@@ -33,17 +33,25 @@ pointer	out[ARB]		# Output images
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 real	wts[nimages]		# Weights
-int	offsets[nimages,ARB]	# Input image offsets
+long	offsets[nimages,ARB]	# Input image offsets
 int	nimages			# Number of input images
-int	bufsize			# IMIO buffer size
+size_t	bufsize			# IMIO buffer size
 
+size_t	sz_val
+long	l_val
 char	str[1]
-int	i, j, k, npts, fd, stropen(), xt_imgnls()
+long	j, k
+int	i, fd
+size_t	npts
 pointer	sp, d, id, n, m, lflag, v, dbuf
-pointer	im, buf, xt_opix(), impl1i()
+pointer	im, buf
+int	stropen()
+long	xt_imgnls()
+pointer	xt_opix(), impl1i()
 errchk	stropen, xt_cpix, xt_opix, xt_imgnls, impl1i, ic_combines
 pointer	impl1r()
 errchk	impl1r
+include	<nullptr.inc>
 
 include	"../icombine.com"
 
@@ -52,39 +60,48 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (dbuf, nimages, TY_POINTER)
-	call salloc (d, nimages, TY_POINTER)
-	call salloc (id, nimages, TY_POINTER)
+	sz_val = nimages
+	call salloc (dbuf, sz_val, TY_POINTER)
+	call salloc (d, sz_val, TY_POINTER)
+	call salloc (id, sz_val, TY_POINTER)
 	call salloc (n, npts, TY_INT)
-	call salloc (m, nimages, TY_POINTER)
-	call salloc (lflag, nimages, TY_INT)
-	call salloc (v, IM_MAXDIM, TY_LONG)
-	call amovki (D_ALL, Memi[lflag], nimages)
-	call amovkl (1, Meml[v], IM_MAXDIM)
+	sz_val = nimages
+	call salloc (m, sz_val, TY_POINTER)
+	call salloc (lflag, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[v], sz_val)
 
 	# If not aligned or growing create data buffers of output length
 	# otherwise use the IMIO buffers.
 
 	if (!aligned || grow >= 1.) {
 	    do i = 1, nimages
-		call salloc (Memi[dbuf+i-1], npts, TY_SHORT)
+		call salloc (Memp[dbuf+i-1], npts, TY_SHORT)
 	} else {
 	    do i = 1, nimages {
 		im = xt_opix (in[i], i, 1)
 		if (im != in[i])
-		    call salloc (Memi[dbuf+i-1], npts, TY_SHORT)
+		    call salloc (Memp[dbuf+i-1], npts, TY_SHORT)
 	    }
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovkp (NULLPTR, Memp[dbuf], sz_val)
 	}
 
 	if (project) {
 	    call imseti (in[1], IM_NBUFS, nimages)
 	    call imseti (in[1], IM_BUFFRAC, 0)
-	    call imseti (in[1], IM_BUFSIZE, bufsize)
+	    l_val = bufsize
+	    call imsetl (in[1], IM_BUFSIZE, l_val)
 	    do i = 1, 6 {
 		if (out[i] != NULL) {
 		    call imseti (out[i], IM_BUFFRAC, 0)
-		    call imseti (out[i], IM_BUFSIZE, bufsize)
+		    l_val = bufsize
+		    call imsetl (out[i], IM_BUFSIZE, l_val)
 		}
 	    }
 	} else {
@@ -95,7 +112,8 @@ begin
 	    do i = 1, 6 {
 		if (out[i] != NULL) {
 		    call imseti (out[i], IM_BUFFRAC, 0)
-		    call imseti (out[i], IM_BUFSIZE, bufsize)
+		    l_val = bufsize
+		    call imsetl (out[i], IM_BUFSIZE, l_val)
 		}
 	    }
 	    buf = impl1r (out[1])
@@ -124,7 +142,8 @@ begin
 	    # Do I/O for first input image line.
 	    if (!project) {
 		do i = 1, nimages {
-		    call xt_imseti (i, "bufsize", bufsize)
+		    l_val = bufsize
+		    call xt_imsetl (i, "bufsize", l_val)
 		    j = max (0, offsets[i,1])
 		    k = min (npts, IM_LEN(in[i],1) + offsets[i,1])
 		    if (k - j < 1)
@@ -144,7 +163,8 @@ begin
 			next
 		    iferr {
 			Meml[v+1] = j
-			j = xt_imgnls (in[i], i, buf, Meml[v], 1)
+			l_val = 1
+			j = xt_imgnls (in[i], i, buf, Meml[v], l_val)
 		    } then {
 			call imseti (im, IM_PIXFD, NULL)
 			call sfree (sp)
@@ -157,8 +177,8 @@ begin
 	    call strclose (fd)
 	}
 
-	call ic_combines (in, out, Memi[dbuf], Memi[d], Memi[id], Memi[n],
-	    Memi[m], Memi[lflag], offsets, scales, zeros, wts, nimages, npts)
+	call ic_combines (in, out, Memp[dbuf], Memp[d], Memp[id], Memi[n],
+	    Memp[m], Memi[lflag], offsets, scales, zeros, wts, nimages, npts)
 end
 
 
@@ -175,36 +195,45 @@ pointer	id[nimages]		# Image index ID pointers
 int	n[npts]			# Number of good pixels
 pointer	m[nimages]		# Mask pointers
 int	lflag[nimages]		# Line flags
-int	offsets[nimages,ARB]	# Input image offsets
+long	offsets[nimages,ARB]	# Input image offsets
 real	scales[nimages]		# Scale factors
 real	zeros[nimages]		# Zero offset factors
 real	wts[nimages]		# Combining weights
 int	nimages			# Number of input images
-int	npts			# Number of points per output line
+size_t	npts			# Number of points per output line
 
-int	i, ext, ctor(), errcode()
-real	r, imgetr()
+size_t	sz_val
+long	l_val
+long	j
+int	i, ext
+real	r
 pointer	sp, fname, imname, v1, v2, v3, work
 pointer	outdata, buf, nm, pms
+int	ctor(), errcode()
+real	imgetr()
 pointer	immap()
 long	impnli()
 long	impnlr()
 long	imgnlr()
 errchk	immap, ic_scale, imgetr, ic_grow, ic_grows, ic_rmasks, ic_gdatas
+include	<nullptr.inc>
 
 include	"../icombine.com"
 data	ext/0/
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (v3, IM_MAXDIM, TY_LONG)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	call salloc (v3, sz_val, TY_LONG)
+	l_val = 1
+	call amovkl (l_val, Meml[v1], sz_val)
+	call amovkl (l_val, Meml[v2], sz_val)
+	call amovkl (l_val, Meml[v3], sz_val)
 
 	call ic_scale (in, out, offsets, scales, zeros, wts, nimages)
 
@@ -224,7 +253,8 @@ begin
 	# Set rejection algorithm specific parameters
 	switch (reject) {
 	case CCDCLIP, CRREJECT:
-	    call salloc (nm, 3*nimages, TY_REAL)
+	    sz_val = 3*nimages
+	    call salloc (nm, sz_val, TY_REAL)
 	    i = 1
 	    if (ctor (Memc[rdnoise], i, r) > 0) {
 		do i = 1, nimages
@@ -357,12 +387,13 @@ begin
 
 	    if (pms == NULL) {
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    do i = 1, npts {
-			if (n[i] > 0)
+		    do j = 1, npts {
+			if (n[j] > 0)
 			    Memi[buf] = 0
-			else if (n[i] == 0)
+			else if (n[j] == 0)
 			    Memi[buf] = 1
 			else
 			    Memi[buf] = 1
@@ -370,7 +401,8 @@ begin
 		}
 
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmas (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -380,7 +412,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
 		if (out[5] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
@@ -390,14 +423,15 @@ begin
 		    call ic_emask (out[6], Meml[v2], id, nimages, n, wts, npts)
 	    }
 
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	if (pms != NULL) {
 	    if (nkeep > 0) {
 		call imstats (out[1], IM_IMAGENAME, Memc[fname], SZ_FNAME)
 		call imunmap (out[1])
-		iferr (buf = immap (Memc[fname], READ_WRITE, 0)) {
+		iferr (buf = immap (Memc[fname], READ_WRITE, NULLPTR)) {
 		    switch (errcode()) {
 		    case SYS_FXFOPNOEXTNV:
 			call imgcluster (Memc[fname], Memc[fname], SZ_FNAME)
@@ -405,7 +439,7 @@ begin
 			call sprintf (Memc[imname], SZ_FNAME, "%s[%d]")
 			    call pargstr (Memc[fname])
 			    call pargi (ext)
-			iferr (buf = immap (Memc[imname], READ_WRITE, 0)) {
+			iferr (buf = immap (Memc[imname], READ_WRITE, NULLPTR)) {
 			    buf = NULL
 			    ext = 0
 			}
@@ -413,7 +447,7 @@ begin
 			    call sprintf (Memc[imname], SZ_FNAME, "%s[%d]")
 				call pargstr (Memc[fname])
 				call pargi (ext+1)
-			    iferr (outdata = immap (Memc[imname],READ_WRITE,0)) 
+			    iferr (outdata = immap (Memc[imname],READ_WRITE,NULLPTR)) 
 				break
 			    if (buf != NULL)
 				call imunmap (buf)
@@ -427,9 +461,11 @@ begin
 		out[1] = buf
 	    }
 
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[v1], sz_val)
+	    call amovkl (l_val, Meml[v2], sz_val)
+	    call amovkl (l_val, Meml[v3], sz_val)
 	    while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 		call ic_gdatas (in, out, dbuf, d, id, n, m, lflag, offsets,
 		    scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -438,8 +474,8 @@ begin
 		    pms)
 
 		if (nkeep > 0) {
-		    do i = 1, npts {
-			if (n[i] < nkeep) {
+		    do j = 1, npts {
+			if (n[j] < nkeep) {
 			    Meml[v1+1] = Meml[v1+1] - 1
 			    if (imgnlr (out[1], buf, Meml[v1]) == EOF)
 				;
@@ -461,12 +497,13 @@ begin
 		}
 
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    do i = 1, npts {
-			if (n[i] > 0)
+		    do j = 1, npts {
+			if (n[j] > 0)
 			    Memi[buf] = 0
-			else if (n[i] == 0)
+			else if (n[j] == 0)
 			    Memi[buf] = 1
 			else
 			    Memi[buf] = 2
@@ -475,7 +512,8 @@ begin
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmas (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -485,7 +523,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
 		if (out[5] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
@@ -494,11 +533,12 @@ begin
 		if (out[6] != NULL)
 		    call ic_emask (out[6], Meml[v2], id, nimages, n, wts, npts)
 
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 	    }
 
 	    do i = 1, nimages
-		call pm_close (Memi[pms+i-1])
+		call pm_close (Memp[pms+i-1])
 	    call mfree (pms, TY_POINTER)
 	}
 
@@ -512,17 +552,25 @@ pointer	out[ARB]		# Output images
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 real	wts[nimages]		# Weights
-int	offsets[nimages,ARB]	# Input image offsets
+long	offsets[nimages,ARB]	# Input image offsets
 int	nimages			# Number of input images
-int	bufsize			# IMIO buffer size
+size_t	bufsize			# IMIO buffer size
 
+size_t	sz_val
+long	l_val
 char	str[1]
-int	i, j, k, npts, fd, stropen(), xt_imgnli()
+long	j, k
+int	i, fd
+size_t	npts
 pointer	sp, d, id, n, m, lflag, v, dbuf
-pointer	im, buf, xt_opix(), impl1i()
+pointer	im, buf
+int	stropen()
+long	xt_imgnli()
+pointer	xt_opix(), impl1i()
 errchk	stropen, xt_cpix, xt_opix, xt_imgnli, impl1i, ic_combinei
 pointer	impl1r()
 errchk	impl1r
+include	<nullptr.inc>
 
 include	"../icombine.com"
 
@@ -531,39 +579,48 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (dbuf, nimages, TY_POINTER)
-	call salloc (d, nimages, TY_POINTER)
-	call salloc (id, nimages, TY_POINTER)
+	sz_val = nimages
+	call salloc (dbuf, sz_val, TY_POINTER)
+	call salloc (d, sz_val, TY_POINTER)
+	call salloc (id, sz_val, TY_POINTER)
 	call salloc (n, npts, TY_INT)
-	call salloc (m, nimages, TY_POINTER)
-	call salloc (lflag, nimages, TY_INT)
-	call salloc (v, IM_MAXDIM, TY_LONG)
-	call amovki (D_ALL, Memi[lflag], nimages)
-	call amovkl (1, Meml[v], IM_MAXDIM)
+	sz_val = nimages
+	call salloc (m, sz_val, TY_POINTER)
+	call salloc (lflag, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[v], sz_val)
 
 	# If not aligned or growing create data buffers of output length
 	# otherwise use the IMIO buffers.
 
 	if (!aligned || grow >= 1.) {
 	    do i = 1, nimages
-		call salloc (Memi[dbuf+i-1], npts, TY_INT)
+		call salloc (Memp[dbuf+i-1], npts, TY_INT)
 	} else {
 	    do i = 1, nimages {
 		im = xt_opix (in[i], i, 1)
 		if (im != in[i])
-		    call salloc (Memi[dbuf+i-1], npts, TY_INT)
+		    call salloc (Memp[dbuf+i-1], npts, TY_INT)
 	    }
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovkp (NULLPTR, Memp[dbuf], sz_val)
 	}
 
 	if (project) {
 	    call imseti (in[1], IM_NBUFS, nimages)
 	    call imseti (in[1], IM_BUFFRAC, 0)
-	    call imseti (in[1], IM_BUFSIZE, bufsize)
+	    l_val = bufsize
+	    call imsetl (in[1], IM_BUFSIZE, l_val)
 	    do i = 1, 6 {
 		if (out[i] != NULL) {
 		    call imseti (out[i], IM_BUFFRAC, 0)
-		    call imseti (out[i], IM_BUFSIZE, bufsize)
+		    l_val = bufsize
+		    call imsetl (out[i], IM_BUFSIZE, l_val)
 		}
 	    }
 	} else {
@@ -574,7 +631,8 @@ begin
 	    do i = 1, 6 {
 		if (out[i] != NULL) {
 		    call imseti (out[i], IM_BUFFRAC, 0)
-		    call imseti (out[i], IM_BUFSIZE, bufsize)
+		    l_val = bufsize
+		    call imsetl (out[i], IM_BUFSIZE, l_val)
 		}
 	    }
 	    buf = impl1r (out[1])
@@ -603,7 +661,8 @@ begin
 	    # Do I/O for first input image line.
 	    if (!project) {
 		do i = 1, nimages {
-		    call xt_imseti (i, "bufsize", bufsize)
+		    l_val = bufsize
+		    call xt_imsetl (i, "bufsize", l_val)
 		    j = max (0, offsets[i,1])
 		    k = min (npts, IM_LEN(in[i],1) + offsets[i,1])
 		    if (k - j < 1)
@@ -623,7 +682,8 @@ begin
 			next
 		    iferr {
 			Meml[v+1] = j
-			j = xt_imgnli (in[i], i, buf, Meml[v], 1)
+			l_val = 1
+			j = xt_imgnli (in[i], i, buf, Meml[v], l_val)
 		    } then {
 			call imseti (im, IM_PIXFD, NULL)
 			call sfree (sp)
@@ -636,8 +696,8 @@ begin
 	    call strclose (fd)
 	}
 
-	call ic_combinei (in, out, Memi[dbuf], Memi[d], Memi[id], Memi[n],
-	    Memi[m], Memi[lflag], offsets, scales, zeros, wts, nimages, npts)
+	call ic_combinei (in, out, Memp[dbuf], Memp[d], Memp[id], Memi[n],
+	    Memp[m], Memi[lflag], offsets, scales, zeros, wts, nimages, npts)
 end
 
 
@@ -654,36 +714,45 @@ pointer	id[nimages]		# Image index ID pointers
 int	n[npts]			# Number of good pixels
 pointer	m[nimages]		# Mask pointers
 int	lflag[nimages]		# Line flags
-int	offsets[nimages,ARB]	# Input image offsets
+long	offsets[nimages,ARB]	# Input image offsets
 real	scales[nimages]		# Scale factors
 real	zeros[nimages]		# Zero offset factors
 real	wts[nimages]		# Combining weights
 int	nimages			# Number of input images
-int	npts			# Number of points per output line
+size_t	npts			# Number of points per output line
 
-int	i, ext, ctor(), errcode()
-real	r, imgetr()
+size_t	sz_val
+long	l_val
+long	j
+int	i, ext
+real	r
 pointer	sp, fname, imname, v1, v2, v3, work
 pointer	outdata, buf, nm, pms
+int	ctor(), errcode()
+real	imgetr()
 pointer	immap()
 long	impnli()
 long	impnlr()
 long	imgnlr()
 errchk	immap, ic_scale, imgetr, ic_grow, ic_growi, ic_rmasks, ic_gdatai
+include	<nullptr.inc>
 
 include	"../icombine.com"
 data	ext/0/
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (v3, IM_MAXDIM, TY_LONG)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	call salloc (v3, sz_val, TY_LONG)
+	l_val = 1
+	call amovkl (l_val, Meml[v1], sz_val)
+	call amovkl (l_val, Meml[v2], sz_val)
+	call amovkl (l_val, Meml[v3], sz_val)
 
 	call ic_scale (in, out, offsets, scales, zeros, wts, nimages)
 
@@ -703,7 +772,8 @@ begin
 	# Set rejection algorithm specific parameters
 	switch (reject) {
 	case CCDCLIP, CRREJECT:
-	    call salloc (nm, 3*nimages, TY_REAL)
+	    sz_val = 3*nimages
+	    call salloc (nm, sz_val, TY_REAL)
 	    i = 1
 	    if (ctor (Memc[rdnoise], i, r) > 0) {
 		do i = 1, nimages
@@ -836,12 +906,13 @@ begin
 
 	    if (pms == NULL) {
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    do i = 1, npts {
-			if (n[i] > 0)
+		    do j = 1, npts {
+			if (n[j] > 0)
 			    Memi[buf] = 0
-			else if (n[i] == 0)
+			else if (n[j] == 0)
 			    Memi[buf] = 1
 			else
 			    Memi[buf] = 1
@@ -849,7 +920,8 @@ begin
 		}
 
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmai (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -859,7 +931,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
 		if (out[5] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
@@ -869,14 +942,15 @@ begin
 		    call ic_emask (out[6], Meml[v2], id, nimages, n, wts, npts)
 	    }
 
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	if (pms != NULL) {
 	    if (nkeep > 0) {
 		call imstats (out[1], IM_IMAGENAME, Memc[fname], SZ_FNAME)
 		call imunmap (out[1])
-		iferr (buf = immap (Memc[fname], READ_WRITE, 0)) {
+		iferr (buf = immap (Memc[fname], READ_WRITE, NULLPTR)) {
 		    switch (errcode()) {
 		    case SYS_FXFOPNOEXTNV:
 			call imgcluster (Memc[fname], Memc[fname], SZ_FNAME)
@@ -884,7 +958,7 @@ begin
 			call sprintf (Memc[imname], SZ_FNAME, "%s[%d]")
 			    call pargstr (Memc[fname])
 			    call pargi (ext)
-			iferr (buf = immap (Memc[imname], READ_WRITE, 0)) {
+			iferr (buf = immap (Memc[imname], READ_WRITE, NULLPTR)) {
 			    buf = NULL
 			    ext = 0
 			}
@@ -892,7 +966,7 @@ begin
 			    call sprintf (Memc[imname], SZ_FNAME, "%s[%d]")
 				call pargstr (Memc[fname])
 				call pargi (ext+1)
-			    iferr (outdata = immap (Memc[imname],READ_WRITE,0)) 
+			    iferr (outdata = immap (Memc[imname],READ_WRITE,NULLPTR)) 
 				break
 			    if (buf != NULL)
 				call imunmap (buf)
@@ -906,9 +980,11 @@ begin
 		out[1] = buf
 	    }
 
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[v1], sz_val)
+	    call amovkl (l_val, Meml[v2], sz_val)
+	    call amovkl (l_val, Meml[v3], sz_val)
 	    while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 		call ic_gdatai (in, out, dbuf, d, id, n, m, lflag, offsets,
 		    scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -917,8 +993,8 @@ begin
 		    pms)
 
 		if (nkeep > 0) {
-		    do i = 1, npts {
-			if (n[i] < nkeep) {
+		    do j = 1, npts {
+			if (n[j] < nkeep) {
 			    Meml[v1+1] = Meml[v1+1] - 1
 			    if (imgnlr (out[1], buf, Meml[v1]) == EOF)
 				;
@@ -940,12 +1016,13 @@ begin
 		}
 
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    do i = 1, npts {
-			if (n[i] > 0)
+		    do j = 1, npts {
+			if (n[j] > 0)
 			    Memi[buf] = 0
-			else if (n[i] == 0)
+			else if (n[j] == 0)
 			    Memi[buf] = 1
 			else
 			    Memi[buf] = 2
@@ -954,7 +1031,8 @@ begin
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmai (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -964,7 +1042,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
 		if (out[5] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
@@ -973,35 +1052,44 @@ begin
 		if (out[6] != NULL)
 		    call ic_emask (out[6], Meml[v2], id, nimages, n, wts, npts)
 
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 	    }
 
 	    do i = 1, nimages
-		call pm_close (Memi[pms+i-1])
+		call pm_close (Memp[pms+i-1])
 	    call mfree (pms, TY_POINTER)
 	}
 
 	call sfree (sp)
 end
 
-procedure icombiner (in, out, scales, zeros, wts, offsets, nimages, bufsize)
+procedure icombinel (in, out, scales, zeros, wts, offsets, nimages, bufsize)
 
 pointer	in[nimages]		# Input images
 pointer	out[ARB]		# Output images
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 real	wts[nimages]		# Weights
-int	offsets[nimages,ARB]	# Input image offsets
+long	offsets[nimages,ARB]	# Input image offsets
 int	nimages			# Number of input images
-int	bufsize			# IMIO buffer size
+size_t	bufsize			# IMIO buffer size
 
+size_t	sz_val
+long	l_val
 char	str[1]
-int	i, j, k, npts, fd, stropen(), xt_imgnlr()
+long	j, k
+int	i, fd
+size_t	npts
 pointer	sp, d, id, n, m, lflag, v, dbuf
-pointer	im, buf, xt_opix(), impl1i()
-errchk	stropen, xt_cpix, xt_opix, xt_imgnlr, impl1i, ic_combiner
+pointer	im, buf
+int	stropen()
+long	xt_imgnll()
+pointer	xt_opix(), impl1i()
+errchk	stropen, xt_cpix, xt_opix, xt_imgnll, impl1i, ic_combinel
 pointer	impl1r()
 errchk	impl1r
+include	<nullptr.inc>
 
 include	"../icombine.com"
 
@@ -1010,39 +1098,48 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (dbuf, nimages, TY_POINTER)
-	call salloc (d, nimages, TY_POINTER)
-	call salloc (id, nimages, TY_POINTER)
+	sz_val = nimages
+	call salloc (dbuf, sz_val, TY_POINTER)
+	call salloc (d, sz_val, TY_POINTER)
+	call salloc (id, sz_val, TY_POINTER)
 	call salloc (n, npts, TY_INT)
-	call salloc (m, nimages, TY_POINTER)
-	call salloc (lflag, nimages, TY_INT)
-	call salloc (v, IM_MAXDIM, TY_LONG)
-	call amovki (D_ALL, Memi[lflag], nimages)
-	call amovkl (1, Meml[v], IM_MAXDIM)
+	sz_val = nimages
+	call salloc (m, sz_val, TY_POINTER)
+	call salloc (lflag, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[v], sz_val)
 
 	# If not aligned or growing create data buffers of output length
 	# otherwise use the IMIO buffers.
 
 	if (!aligned || grow >= 1.) {
 	    do i = 1, nimages
-		call salloc (Memi[dbuf+i-1], npts, TY_REAL)
+		call salloc (Memp[dbuf+i-1], npts, TY_LONG)
 	} else {
 	    do i = 1, nimages {
 		im = xt_opix (in[i], i, 1)
 		if (im != in[i])
-		    call salloc (Memi[dbuf+i-1], npts, TY_REAL)
+		    call salloc (Memp[dbuf+i-1], npts, TY_LONG)
 	    }
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovkp (NULLPTR, Memp[dbuf], sz_val)
 	}
 
 	if (project) {
 	    call imseti (in[1], IM_NBUFS, nimages)
 	    call imseti (in[1], IM_BUFFRAC, 0)
-	    call imseti (in[1], IM_BUFSIZE, bufsize)
+	    l_val = bufsize
+	    call imsetl (in[1], IM_BUFSIZE, l_val)
 	    do i = 1, 6 {
 		if (out[i] != NULL) {
 		    call imseti (out[i], IM_BUFFRAC, 0)
-		    call imseti (out[i], IM_BUFSIZE, bufsize)
+		    l_val = bufsize
+		    call imsetl (out[i], IM_BUFSIZE, l_val)
 		}
 	    }
 	} else {
@@ -1053,7 +1150,8 @@ begin
 	    do i = 1, 6 {
 		if (out[i] != NULL) {
 		    call imseti (out[i], IM_BUFFRAC, 0)
-		    call imseti (out[i], IM_BUFSIZE, bufsize)
+		    l_val = bufsize
+		    call imsetl (out[i], IM_BUFSIZE, l_val)
 		}
 	    }
 	    buf = impl1r (out[1])
@@ -1082,7 +1180,8 @@ begin
 	    # Do I/O for first input image line.
 	    if (!project) {
 		do i = 1, nimages {
-		    call xt_imseti (i, "bufsize", bufsize)
+		    l_val = bufsize
+		    call xt_imsetl (i, "bufsize", l_val)
 		    j = max (0, offsets[i,1])
 		    k = min (npts, IM_LEN(in[i],1) + offsets[i,1])
 		    if (k - j < 1)
@@ -1102,7 +1201,8 @@ begin
 			next
 		    iferr {
 			Meml[v+1] = j
-			j = xt_imgnlr (in[i], i, buf, Meml[v], 1)
+			l_val = 1
+			j = xt_imgnll (in[i], i, buf, Meml[v], l_val)
 		    } then {
 			call imseti (im, IM_PIXFD, NULL)
 			call sfree (sp)
@@ -1115,14 +1215,14 @@ begin
 	    call strclose (fd)
 	}
 
-	call ic_combiner (in, out, Memi[dbuf], Memi[d], Memi[id], Memi[n],
-	    Memi[m], Memi[lflag], offsets, scales, zeros, wts, nimages, npts)
+	call ic_combinel (in, out, Memp[dbuf], Memp[d], Memp[id], Memi[n],
+	    Memp[m], Memi[lflag], offsets, scales, zeros, wts, nimages, npts)
 end
 
 
 # IC_COMBINE -- Combine images.
 
-procedure ic_combiner (in, out, dbuf, d, id, n, m, lflag, offsets,
+procedure ic_combinel (in, out, dbuf, d, id, n, m, lflag, offsets,
 	scales, zeros, wts, nimages, npts)
 
 pointer	in[nimages]		# Input images
@@ -1133,36 +1233,45 @@ pointer	id[nimages]		# Image index ID pointers
 int	n[npts]			# Number of good pixels
 pointer	m[nimages]		# Mask pointers
 int	lflag[nimages]		# Line flags
-int	offsets[nimages,ARB]	# Input image offsets
+long	offsets[nimages,ARB]	# Input image offsets
 real	scales[nimages]		# Scale factors
 real	zeros[nimages]		# Zero offset factors
 real	wts[nimages]		# Combining weights
 int	nimages			# Number of input images
-int	npts			# Number of points per output line
+size_t	npts			# Number of points per output line
 
-int	i, ext, ctor(), errcode()
-real	r, imgetr()
+size_t	sz_val
+long	l_val
+long	j
+int	i, ext
+real	r
 pointer	sp, fname, imname, v1, v2, v3, work
 pointer	outdata, buf, nm, pms
+int	ctor(), errcode()
+real	imgetr()
 pointer	immap()
 long	impnli()
 long	impnlr()
-long	imgnlr
-errchk	immap, ic_scale, imgetr, ic_grow, ic_growr, ic_rmasks, ic_gdatar
+long	imgnlr()
+errchk	immap, ic_scale, imgetr, ic_grow, ic_growl, ic_rmasks, ic_gdatal
+include	<nullptr.inc>
 
 include	"../icombine.com"
 data	ext/0/
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (v3, IM_MAXDIM, TY_LONG)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	call salloc (v3, sz_val, TY_LONG)
+	l_val = 1
+	call amovkl (l_val, Meml[v1], sz_val)
+	call amovkl (l_val, Meml[v2], sz_val)
+	call amovkl (l_val, Meml[v3], sz_val)
 
 	call ic_scale (in, out, offsets, scales, zeros, wts, nimages)
 
@@ -1182,7 +1291,527 @@ begin
 	# Set rejection algorithm specific parameters
 	switch (reject) {
 	case CCDCLIP, CRREJECT:
-	    call salloc (nm, 3*nimages, TY_REAL)
+	    sz_val = 3*nimages
+	    call salloc (nm, sz_val, TY_REAL)
+	    i = 1
+	    if (ctor (Memc[rdnoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nm+3*(i-1)] = r
+	    } else {
+		do i = 1, nimages
+		    Memr[nm+3*(i-1)] = imgetr (in[i], Memc[rdnoise])
+	    }
+	    i = 1
+	    if (ctor (Memc[gain], i, r) > 0) {
+		do i = 1, nimages {
+		    Memr[nm+3*(i-1)+1] = r
+		    Memr[nm+3*(i-1)] =
+			max ((Memr[nm+3*(i-1)] / r) ** 2, 1e4 / MAX_REAL)
+		}
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[gain])
+		    Memr[nm+3*(i-1)+1] = r
+		    Memr[nm+3*(i-1)] =
+			max ((Memr[nm+3*(i-1)] / r) ** 2, 1e4 / MAX_REAL)
+		}
+	    }
+	    i = 1
+	    if (ctor (Memc[snoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nm+3*(i-1)+2] = r
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[snoise])
+		    Memr[nm+3*(i-1)+2] = r
+		}
+	    }
+	    if (!keepids) {
+		if (doscale1)
+		    keepids = true
+		else {
+		    do i = 2, nimages {
+			if (Memr[nm+3*(i-1)] != Memr[nm] ||
+			    Memr[nm+3*(i-1)+1] != Memr[nm+1] ||
+			    Memr[nm+3*(i-1)+2] != Memr[nm+2]) {
+			    keepids = true
+			    break
+			}
+		    }
+		}
+	    }
+	    if (reject == CRREJECT)
+		lsigma = MAX_REAL
+	case MINMAX:
+	    mclip = false
+	case PCLIP:
+	    mclip = true
+	case AVSIGCLIP, SIGCLIP:
+	    if (doscale1)
+		keepids = true
+	case NONE:
+	    mclip = false
+	}
+
+	if (out[4] != NULL)
+	    keepids = true
+
+	if (out[6] != NULL) {
+	    keepids = true
+	    call ic_einit (in, nimages, Memc[expkeyword], 1., 2**27-1)
+	}
+
+	if (grow >= 1.) {
+	    keepids = true
+	    call salloc (work, npts * nimages, TY_INT)
+	}
+	pms = NULL
+
+	if (keepids) {
+	    do i = 1, nimages
+		call salloc (id[i], npts, TY_INT)
+	}
+
+	while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
+	    call ic_gdatal (in, out, dbuf, d, id, n, m, lflag, offsets,
+		scales, zeros, nimages, npts, Meml[v2], Meml[v3])
+
+	    switch (reject) {
+	    case CCDCLIP, CRREJECT:
+		if (mclip)
+		    call ic_mccdclipl (d, id, n, scales, zeros, Memr[nm],
+			nimages, npts, Memr[outdata])
+		else
+		    call ic_accdclipl (d, id, n, scales, zeros, Memr[nm],
+			nimages, npts, Memr[outdata])
+	    case MINMAX:
+		call ic_mml (d, id, n, npts)
+	    case PCLIP:
+		call ic_pclipl (d, id, n, nimages, npts, Memr[outdata])
+	    case SIGCLIP:
+		if (mclip)
+		    call ic_msigclipl (d, id, n, scales, zeros, nimages, npts,
+			Memr[outdata])
+		else
+		    call ic_asigclipl (d, id, n, scales, zeros, nimages, npts,
+			Memr[outdata])
+	    case AVSIGCLIP:
+		if (mclip)
+		    call ic_mavsigclipl (d, id, n, scales, zeros, nimages,
+			npts, Memr[outdata])
+		else
+		    call ic_aavsigclipl (d, id, n, scales, zeros, nimages,
+			npts, Memr[outdata])
+	    }
+
+	    if (pms == NULL || nkeep > 0) {
+		if (docombine) {
+		    switch (combine) {
+		    case AVERAGE:
+			call ic_averagel (d, id, n, wts, nimages, npts,
+			    YES, YES, Memr[outdata])
+		    case MEDIAN:
+			call ic_medianl (d, n, npts, YES, Memr[outdata])
+		    case SUM:
+			call ic_averagel (d, id, n, wts, nimages, npts,
+			    YES, NO, Memr[outdata])
+		    }
+		}
+	    }
+
+	    if (grow >= 1.)
+		call ic_grow (out, Meml[v2], id, n, Memi[work], nimages, npts,
+		    pms)
+
+	    if (pms == NULL) {
+		if (out[2] != NULL) {
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    i = impnli (out[2], buf, Meml[v1])
+		    do j = 1, npts {
+			if (n[j] > 0)
+			    Memi[buf] = 0
+			else if (n[j] == 0)
+			    Memi[buf] = 1
+			else
+			    Memi[buf] = 1
+		    }
+		}
+
+		if (out[3] != NULL) {
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    i = impnlr (out[3], buf, Meml[v1])
+		    call ic_sigmal (d, id, n, wts, npts, Memr[outdata],
+			Memr[buf])
+		}
+
+		if (out[4] != NULL)
+		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
+
+		if (out[5] != NULL) {
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    i = impnli (out[5], buf, Meml[v1])
+		    call amovki (nimages, Memi[buf], npts)
+		    call asubi (Memi[buf], n, Memi[buf], npts)
+		}
+
+		if (out[6] != NULL)
+		    call ic_emask (out[6], Meml[v2], id, nimages, n, wts, npts)
+	    }
+
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
+	}
+
+	if (pms != NULL) {
+	    if (nkeep > 0) {
+		call imstats (out[1], IM_IMAGENAME, Memc[fname], SZ_FNAME)
+		call imunmap (out[1])
+		iferr (buf = immap (Memc[fname], READ_WRITE, NULLPTR)) {
+		    switch (errcode()) {
+		    case SYS_FXFOPNOEXTNV:
+			call imgcluster (Memc[fname], Memc[fname], SZ_FNAME)
+			ext = ext + 1
+			call sprintf (Memc[imname], SZ_FNAME, "%s[%d]")
+			    call pargstr (Memc[fname])
+			    call pargi (ext)
+			iferr (buf = immap (Memc[imname], READ_WRITE, NULLPTR)) {
+			    buf = NULL
+			    ext = 0
+			}
+			repeat {
+			    call sprintf (Memc[imname], SZ_FNAME, "%s[%d]")
+				call pargstr (Memc[fname])
+				call pargi (ext+1)
+			    iferr (outdata = immap (Memc[imname],READ_WRITE,NULLPTR)) 
+				break
+			    if (buf != NULL)
+				call imunmap (buf)
+			    buf = outdata
+			    ext = ext + 1
+			}
+		    default:
+			call erract (EA_ERROR)
+		    }
+		}
+		out[1] = buf
+	    }
+
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[v1], sz_val)
+	    call amovkl (l_val, Meml[v2], sz_val)
+	    call amovkl (l_val, Meml[v3], sz_val)
+	    while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
+		call ic_gdatal (in, out, dbuf, d, id, n, m, lflag, offsets,
+		    scales, zeros, nimages, npts, Meml[v2], Meml[v3])
+
+		call ic_growl (Meml[v2], d, id, n, Memi[work], nimages, npts,
+		    pms)
+
+		if (nkeep > 0) {
+		    do j = 1, npts {
+			if (n[j] < nkeep) {
+			    Meml[v1+1] = Meml[v1+1] - 1
+			    if (imgnlr (out[1], buf, Meml[v1]) == EOF)
+				;
+			    call amovr (Memr[buf], Memr[outdata], npts)
+			    break
+			}
+		    }
+		}
+
+		switch (combine) {
+		case AVERAGE:
+		    call ic_averagel (d, id, n, wts, nimages, npts,
+		        NO, YES, Memr[outdata])
+		case MEDIAN:
+		    call ic_medianl (d, n, npts, NO, Memr[outdata])
+		case SUM:
+		    call ic_averagel (d, id, n, wts, nimages, npts,
+		        NO, NO, Memr[outdata])
+		}
+
+		if (out[2] != NULL) {
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    i = impnli (out[2], buf, Meml[v1])
+		    do j = 1, npts {
+			if (n[j] > 0)
+			    Memi[buf] = 0
+			else if (n[j] == 0)
+			    Memi[buf] = 1
+			else
+			    Memi[buf] = 2
+			buf = buf + 1
+		    }
+		}
+			
+		if (out[3] != NULL) {
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    i = impnlr (out[3], buf, Meml[v1])
+		    call ic_sigmal (d, id, n, wts, npts, Memr[outdata],
+			Memr[buf])
+		}
+
+		if (out[4] != NULL)
+		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
+
+		if (out[5] != NULL) {
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
+		    i = impnli (out[5], buf, Meml[v1])
+		    call amovki (nimages, Memi[buf], npts)
+		    call asubi (Memi[buf], n, Memi[buf], npts)
+		}
+
+		if (out[6] != NULL)
+		    call ic_emask (out[6], Meml[v2], id, nimages, n, wts, npts)
+
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
+	    }
+
+	    do i = 1, nimages
+		call pm_close (Memp[pms+i-1])
+	    call mfree (pms, TY_POINTER)
+	}
+
+	call sfree (sp)
+end
+
+procedure icombiner (in, out, scales, zeros, wts, offsets, nimages, bufsize)
+
+pointer	in[nimages]		# Input images
+pointer	out[ARB]		# Output images
+real	scales[nimages]		# Scales
+real	zeros[nimages]		# Zeros
+real	wts[nimages]		# Weights
+long	offsets[nimages,ARB]	# Input image offsets
+int	nimages			# Number of input images
+size_t	bufsize			# IMIO buffer size
+
+size_t	sz_val
+long	l_val
+char	str[1]
+long	j, k
+int	i, fd
+size_t	npts
+pointer	sp, d, id, n, m, lflag, v, dbuf
+pointer	im, buf
+int	stropen()
+long	xt_imgnlr()
+pointer	xt_opix(), impl1i()
+errchk	stropen, xt_cpix, xt_opix, xt_imgnlr, impl1i, ic_combiner
+pointer	impl1r()
+errchk	impl1r
+include	<nullptr.inc>
+
+include	"../icombine.com"
+
+begin
+	npts = IM_LEN(out[1],1)
+
+	# Allocate memory.
+	call smark (sp)
+	sz_val = nimages
+	call salloc (dbuf, sz_val, TY_POINTER)
+	call salloc (d, sz_val, TY_POINTER)
+	call salloc (id, sz_val, TY_POINTER)
+	call salloc (n, npts, TY_INT)
+	sz_val = nimages
+	call salloc (m, sz_val, TY_POINTER)
+	call salloc (lflag, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[v], sz_val)
+
+	# If not aligned or growing create data buffers of output length
+	# otherwise use the IMIO buffers.
+
+	if (!aligned || grow >= 1.) {
+	    do i = 1, nimages
+		call salloc (Memp[dbuf+i-1], npts, TY_REAL)
+	} else {
+	    do i = 1, nimages {
+		im = xt_opix (in[i], i, 1)
+		if (im != in[i])
+		    call salloc (Memp[dbuf+i-1], npts, TY_REAL)
+	    }
+	    sz_val = nimages
+	    call amovkp (NULLPTR, Memp[dbuf], sz_val)
+	}
+
+	if (project) {
+	    call imseti (in[1], IM_NBUFS, nimages)
+	    call imseti (in[1], IM_BUFFRAC, 0)
+	    l_val = bufsize
+	    call imsetl (in[1], IM_BUFSIZE, l_val)
+	    do i = 1, 6 {
+		if (out[i] != NULL) {
+		    call imseti (out[i], IM_BUFFRAC, 0)
+		    l_val = bufsize
+		    call imsetl (out[i], IM_BUFSIZE, l_val)
+		}
+	    }
+	} else {
+	    # Reserve FD for string operations.
+	    fd = stropen (str, 1, NEW_FILE)
+
+	    # Do I/O to the images.
+	    do i = 1, 6 {
+		if (out[i] != NULL) {
+		    call imseti (out[i], IM_BUFFRAC, 0)
+		    l_val = bufsize
+		    call imsetl (out[i], IM_BUFSIZE, l_val)
+		}
+	    }
+	    buf = impl1r (out[1])
+	    call aclrr (Memr[buf], npts)
+	    if (out[3] != NULL) {
+		buf = impl1r (out[3])
+		call aclrr (Memr[buf], npts)
+	    }
+	    if (out[2] != NULL) {
+		buf = impl1i (out[2])
+		call aclri (Memi[buf], npts)
+	    }
+	    if (out[4] != NULL) {
+		buf = impl1i (out[4])
+		call aclri (Memi[buf], npts)
+	    }
+	    if (out[5] != NULL) {
+		buf = impl1i (out[5])
+		call aclri (Memi[buf], npts)
+	    }
+	    if (out[6] != NULL) {
+		buf = impl1i (out[6])
+		call aclri (Memi[buf], npts)
+	    }
+
+	    # Do I/O for first input image line.
+	    if (!project) {
+		do i = 1, nimages {
+		    l_val = bufsize
+		    call xt_imsetl (i, "bufsize", l_val)
+		    j = max (0, offsets[i,1])
+		    k = min (npts, IM_LEN(in[i],1) + offsets[i,1])
+		    if (k - j < 1)
+			call xt_cpix (i)
+		    j = 1 - offsets[i,2]
+		    if (j < 1 || j > IM_LEN(in[i],2))
+			call xt_cpix (i)
+		}
+
+		do i = 1, nimages {
+		    j = max (0, offsets[i,1])
+		    k = min (npts, IM_LEN(in[i],1) + offsets[i,1])
+		    if (k - j < 1)
+			next
+		    j = 1 - offsets[i,2]
+		    if (j < 1 || j > IM_LEN(in[i],2))
+			next
+		    iferr {
+			Meml[v+1] = j
+			l_val = 1
+			j = xt_imgnlr (in[i], i, buf, Meml[v], l_val)
+		    } then {
+			call imseti (im, IM_PIXFD, NULL)
+			call sfree (sp)
+			call strclose (fd)
+			call erract (EA_ERROR)
+		    }
+		}
+	    }
+
+	    call strclose (fd)
+	}
+
+	call ic_combiner (in, out, Memp[dbuf], Memp[d], Memp[id], Memi[n],
+	    Memp[m], Memi[lflag], offsets, scales, zeros, wts, nimages, npts)
+end
+
+
+# IC_COMBINE -- Combine images.
+
+procedure ic_combiner (in, out, dbuf, d, id, n, m, lflag, offsets,
+	scales, zeros, wts, nimages, npts)
+
+pointer	in[nimages]		# Input images
+pointer	out[ARB]		# Output image
+pointer	dbuf[nimages]		# Data buffers for nonaligned images
+pointer	d[nimages]		# Data pointers
+pointer	id[nimages]		# Image index ID pointers
+int	n[npts]			# Number of good pixels
+pointer	m[nimages]		# Mask pointers
+int	lflag[nimages]		# Line flags
+long	offsets[nimages,ARB]	# Input image offsets
+real	scales[nimages]		# Scale factors
+real	zeros[nimages]		# Zero offset factors
+real	wts[nimages]		# Combining weights
+int	nimages			# Number of input images
+size_t	npts			# Number of points per output line
+
+size_t	sz_val
+long	l_val
+long	j
+int	i, ext
+real	r
+pointer	sp, fname, imname, v1, v2, v3, work
+pointer	outdata, buf, nm, pms
+int	ctor(), errcode()
+real	imgetr()
+pointer	immap()
+long	impnli()
+long	impnlr()
+long	imgnlr
+errchk	immap, ic_scale, imgetr, ic_grow, ic_growr, ic_rmasks, ic_gdatar
+include	<nullptr.inc>
+
+include	"../icombine.com"
+data	ext/0/
+
+begin
+	call smark (sp)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	call salloc (v3, sz_val, TY_LONG)
+	l_val = 1
+	call amovkl (l_val, Meml[v1], sz_val)
+	call amovkl (l_val, Meml[v2], sz_val)
+	call amovkl (l_val, Meml[v3], sz_val)
+
+	call ic_scale (in, out, offsets, scales, zeros, wts, nimages)
+
+	# Set combine parameters
+	switch (combine) {
+	case AVERAGE, SUM:
+	    if (dowts)
+		keepids = true
+	    else
+		keepids = false
+	case MEDIAN:
+	    dowts = false
+	    keepids = false
+	}
+	docombine = true
+
+	# Set rejection algorithm specific parameters
+	switch (reject) {
+	case CCDCLIP, CRREJECT:
+	    sz_val = 3*nimages
+	    call salloc (nm, sz_val, TY_REAL)
 	    i = 1
 	    if (ctor (Memc[rdnoise], i, r) > 0) {
 		do i = 1, nimages
@@ -1315,12 +1944,13 @@ begin
 
 	    if (pms == NULL) {
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    do i = 1, npts {
-			if (n[i] > 0)
+		    do j = 1, npts {
+			if (n[j] > 0)
 			    Memi[buf] = 0
-			else if (n[i] == 0)
+			else if (n[j] == 0)
 			    Memi[buf] = 1
 			else
 			    Memi[buf] = 2
@@ -1329,7 +1959,8 @@ begin
 		}
 
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmar (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -1339,7 +1970,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
 		if (out[5] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
@@ -1349,14 +1981,15 @@ begin
 		    call ic_emask (out[6], Meml[v2], id, nimages, n, wts, npts)
 	    }
 
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	if (pms != NULL) {
 	    if (nkeep > 0) {
 		call imstats (out[1], IM_IMAGENAME, Memc[fname], SZ_FNAME)
 		call imunmap (out[1])
-		iferr (buf = immap (Memc[fname], READ_WRITE, 0)) {
+		iferr (buf = immap (Memc[fname], READ_WRITE, NULLPTR)) {
 		    switch (errcode()) {
 		    case SYS_FXFOPNOEXTNV:
 			call imgcluster (Memc[fname], Memc[fname], SZ_FNAME)
@@ -1364,7 +1997,7 @@ begin
 			call sprintf (Memc[imname], SZ_FNAME, "%s[%d]")
 			    call pargstr (Memc[fname])
 			    call pargi (ext)
-			iferr (buf = immap (Memc[imname], READ_WRITE, 0)) {
+			iferr (buf = immap (Memc[imname], READ_WRITE, NULLPTR)) {
 			    buf = NULL
 			    ext = 0
 			}
@@ -1372,7 +2005,7 @@ begin
 			    call sprintf (Memc[imname], SZ_FNAME, "%s[%d]")
 				call pargstr (Memc[fname])
 				call pargi (ext+1)
-			    iferr (outdata = immap (Memc[imname],READ_WRITE,0)) 
+			    iferr (outdata = immap (Memc[imname],READ_WRITE,NULLPTR)) 
 				break
 			    if (buf != NULL)
 				call imunmap (buf)
@@ -1386,9 +2019,11 @@ begin
 		out[1] = buf
 	    }
 
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[v1], sz_val)
+	    call amovkl (l_val, Meml[v2], sz_val)
+	    call amovkl (l_val, Meml[v3], sz_val)
 	    while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 		call ic_gdatar (in, out, dbuf, d, id, n, m, lflag, offsets,
 		    scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -1397,8 +2032,8 @@ begin
 		    pms)
 
 		if (nkeep > 0) {
-		    do i = 1, npts {
-			if (n[i] < nkeep) {
+		    do j = 1, npts {
+			if (n[j] < nkeep) {
 			    Meml[v1+1] = Meml[v1+1] - 1
 			    if (imgnlr (out[1], buf, Meml[v1]) == EOF)
 				;
@@ -1420,12 +2055,13 @@ begin
 		}
 
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    do i = 1, npts {
-			if (n[i] > 0)
+		    do j = 1, npts {
+			if (n[j] > 0)
 			    Memi[buf] = 0
-			else if (n[i] == 0)
+			else if (n[j] == 0)
 			    Memi[buf] = 1
 			else
 			    Memi[buf] = 2
@@ -1434,7 +2070,8 @@ begin
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnlr (out[3], buf, Meml[v1])
 		    call ic_sigmar (d, id, n, wts, npts, Memr[outdata],
 			Memr[buf])
@@ -1444,7 +2081,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
 		if (out[5] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
@@ -1453,11 +2091,12 @@ begin
 		if (out[6] != NULL)
 		    call ic_emask (out[6], Meml[v2], id, nimages, n, wts, npts)
 
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 	    }
 
 	    do i = 1, nimages
-		call pm_close (Memi[pms+i-1])
+		call pm_close (Memp[pms+i-1])
 	    call mfree (pms, TY_POINTER)
 	}
 
@@ -1471,17 +2110,25 @@ pointer	out[ARB]		# Output images
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 real	wts[nimages]		# Weights
-int	offsets[nimages,ARB]	# Input image offsets
+long	offsets[nimages,ARB]	# Input image offsets
 int	nimages			# Number of input images
-int	bufsize			# IMIO buffer size
+size_t	bufsize			# IMIO buffer size
 
+size_t	sz_val
+long	l_val
 char	str[1]
-int	i, j, k, npts, fd, stropen(), xt_imgnld()
+long	j, k
+int	i, fd
+size_t	npts
 pointer	sp, d, id, n, m, lflag, v, dbuf
-pointer	im, buf, xt_opix(), impl1i()
+pointer	im, buf
+int	stropen()
+long	xt_imgnld()
+pointer	xt_opix(), impl1i()
 errchk	stropen, xt_cpix, xt_opix, xt_imgnld, impl1i, ic_combined
 pointer	impl1d()
 errchk	impl1d
+include	<nullptr.inc>
 
 include	"../icombine.com"
 
@@ -1490,39 +2137,48 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (dbuf, nimages, TY_POINTER)
-	call salloc (d, nimages, TY_POINTER)
-	call salloc (id, nimages, TY_POINTER)
+	sz_val = nimages
+	call salloc (dbuf, sz_val, TY_POINTER)
+	call salloc (d, sz_val, TY_POINTER)
+	call salloc (id, sz_val, TY_POINTER)
 	call salloc (n, npts, TY_INT)
-	call salloc (m, nimages, TY_POINTER)
-	call salloc (lflag, nimages, TY_INT)
-	call salloc (v, IM_MAXDIM, TY_LONG)
-	call amovki (D_ALL, Memi[lflag], nimages)
-	call amovkl (1, Meml[v], IM_MAXDIM)
+	sz_val = nimages
+	call salloc (m, sz_val, TY_POINTER)
+	call salloc (lflag, sz_val, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
+	sz_val = nimages
+	call amovki (D_ALL, Memi[lflag], sz_val)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[v], sz_val)
 
 	# If not aligned or growing create data buffers of output length
 	# otherwise use the IMIO buffers.
 
 	if (!aligned || grow >= 1.) {
 	    do i = 1, nimages
-		call salloc (Memi[dbuf+i-1], npts, TY_DOUBLE)
+		call salloc (Memp[dbuf+i-1], npts, TY_DOUBLE)
 	} else {
 	    do i = 1, nimages {
 		im = xt_opix (in[i], i, 1)
 		if (im != in[i])
-		    call salloc (Memi[dbuf+i-1], npts, TY_DOUBLE)
+		    call salloc (Memp[dbuf+i-1], npts, TY_DOUBLE)
 	    }
-	    call amovki (NULL, Memi[dbuf], nimages)
+	    sz_val = nimages
+	    call amovkp (NULLPTR, Memp[dbuf], sz_val)
 	}
 
 	if (project) {
 	    call imseti (in[1], IM_NBUFS, nimages)
 	    call imseti (in[1], IM_BUFFRAC, 0)
-	    call imseti (in[1], IM_BUFSIZE, bufsize)
+	    l_val = bufsize
+	    call imsetl (in[1], IM_BUFSIZE, l_val)
 	    do i = 1, 6 {
 		if (out[i] != NULL) {
 		    call imseti (out[i], IM_BUFFRAC, 0)
-		    call imseti (out[i], IM_BUFSIZE, bufsize)
+		    l_val = bufsize
+		    call imsetl (out[i], IM_BUFSIZE, l_val)
 		}
 	    }
 	} else {
@@ -1533,7 +2189,8 @@ begin
 	    do i = 1, 6 {
 		if (out[i] != NULL) {
 		    call imseti (out[i], IM_BUFFRAC, 0)
-		    call imseti (out[i], IM_BUFSIZE, bufsize)
+		    l_val = bufsize
+		    call imsetl (out[i], IM_BUFSIZE, l_val)
 		}
 	    }
 	    buf = impl1d (out[1])
@@ -1562,7 +2219,8 @@ begin
 	    # Do I/O for first input image line.
 	    if (!project) {
 		do i = 1, nimages {
-		    call xt_imseti (i, "bufsize", bufsize)
+		    l_val = bufsize
+		    call xt_imsetl (i, "bufsize", l_val)
 		    j = max (0, offsets[i,1])
 		    k = min (npts, IM_LEN(in[i],1) + offsets[i,1])
 		    if (k - j < 1)
@@ -1582,7 +2240,8 @@ begin
 			next
 		    iferr {
 			Meml[v+1] = j
-			j = xt_imgnld (in[i], i, buf, Meml[v], 1)
+			l_val = 1
+			j = xt_imgnld (in[i], i, buf, Meml[v], l_val)
 		    } then {
 			call imseti (im, IM_PIXFD, NULL)
 			call sfree (sp)
@@ -1595,8 +2254,8 @@ begin
 	    call strclose (fd)
 	}
 
-	call ic_combined (in, out, Memi[dbuf], Memi[d], Memi[id], Memi[n],
-	    Memi[m], Memi[lflag], offsets, scales, zeros, wts, nimages, npts)
+	call ic_combined (in, out, Memp[dbuf], Memp[d], Memp[id], Memi[n],
+	    Memp[m], Memi[lflag], offsets, scales, zeros, wts, nimages, npts)
 end
 
 
@@ -1613,36 +2272,45 @@ pointer	id[nimages]		# Image index ID pointers
 int	n[npts]			# Number of good pixels
 pointer	m[nimages]		# Mask pointers
 int	lflag[nimages]		# Line flags
-int	offsets[nimages,ARB]	# Input image offsets
+long	offsets[nimages,ARB]	# Input image offsets
 real	scales[nimages]		# Scale factors
 real	zeros[nimages]		# Zero offset factors
 real	wts[nimages]		# Combining weights
 int	nimages			# Number of input images
-int	npts			# Number of points per output line
+size_t	npts			# Number of points per output line
 
-int	i, ext, ctor(), errcode()
-real	r, imgetr()
+size_t	sz_val
+long	l_val
+long	j
+int	i, ext
+real	r
 pointer	sp, fname, imname, v1, v2, v3, work
 pointer	outdata, buf, nm, pms
+int	ctor(), errcode()
+real	imgetr()
 pointer	immap()
 long	impnli()
 long	impnld()
 long	imgnld
 errchk	immap, ic_scale, imgetr, ic_grow, ic_growd, ic_rmasks, ic_gdatad
+include	<nullptr.inc>
 
 include	"../icombine.com"
 data	ext/0/
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (v3, IM_MAXDIM, TY_LONG)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	call salloc (v3, sz_val, TY_LONG)
+	l_val = 1
+	call amovkl (l_val, Meml[v1], sz_val)
+	call amovkl (l_val, Meml[v2], sz_val)
+	call amovkl (l_val, Meml[v3], sz_val)
 
 	call ic_scale (in, out, offsets, scales, zeros, wts, nimages)
 
@@ -1662,7 +2330,8 @@ begin
 	# Set rejection algorithm specific parameters
 	switch (reject) {
 	case CCDCLIP, CRREJECT:
-	    call salloc (nm, 3*nimages, TY_REAL)
+	    sz_val = 3*nimages
+	    call salloc (nm, sz_val, TY_REAL)
 	    i = 1
 	    if (ctor (Memc[rdnoise], i, r) > 0) {
 		do i = 1, nimages
@@ -1795,12 +2464,13 @@ begin
 
 	    if (pms == NULL) {
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    do i = 1, npts {
-			if (n[i] > 0)
+		    do j = 1, npts {
+			if (n[j] > 0)
 			    Memi[buf] = 0
-			else if (n[i] == 0)
+			else if (n[j] == 0)
 			    Memi[buf] = 1
 			else
 			    Memi[buf] = 2
@@ -1809,7 +2479,8 @@ begin
 		}
 
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnld (out[3], buf, Meml[v1])
 		    call ic_sigmad (d, id, n, wts, npts, Memd[outdata],
 			Memd[buf])
@@ -1819,7 +2490,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
 		if (out[5] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
@@ -1829,14 +2501,15 @@ begin
 		    call ic_emask (out[6], Meml[v2], id, nimages, n, wts, npts)
 	    }
 
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 	}
 
 	if (pms != NULL) {
 	    if (nkeep > 0) {
 		call imstats (out[1], IM_IMAGENAME, Memc[fname], SZ_FNAME)
 		call imunmap (out[1])
-		iferr (buf = immap (Memc[fname], READ_WRITE, 0)) {
+		iferr (buf = immap (Memc[fname], READ_WRITE, NULLPTR)) {
 		    switch (errcode()) {
 		    case SYS_FXFOPNOEXTNV:
 			call imgcluster (Memc[fname], Memc[fname], SZ_FNAME)
@@ -1844,7 +2517,7 @@ begin
 			call sprintf (Memc[imname], SZ_FNAME, "%s[%d]")
 			    call pargstr (Memc[fname])
 			    call pargi (ext)
-			iferr (buf = immap (Memc[imname], READ_WRITE, 0)) {
+			iferr (buf = immap (Memc[imname], READ_WRITE, NULLPTR)) {
 			    buf = NULL
 			    ext = 0
 			}
@@ -1852,7 +2525,7 @@ begin
 			    call sprintf (Memc[imname], SZ_FNAME, "%s[%d]")
 				call pargstr (Memc[fname])
 				call pargi (ext+1)
-			    iferr (outdata = immap (Memc[imname],READ_WRITE,0)) 
+			    iferr (outdata = immap (Memc[imname],READ_WRITE,NULLPTR)) 
 				break
 			    if (buf != NULL)
 				call imunmap (buf)
@@ -1866,9 +2539,11 @@ begin
 		out[1] = buf
 	    }
 
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v2], IM_MAXDIM)
-	    call amovkl (long(1), Meml[v3], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[v1], sz_val)
+	    call amovkl (l_val, Meml[v2], sz_val)
+	    call amovkl (l_val, Meml[v3], sz_val)
 	    while (impnld (out[1], outdata, Meml[v1]) != EOF) {
 		call ic_gdatad (in, out, dbuf, d, id, n, m, lflag, offsets,
 		    scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -1877,8 +2552,8 @@ begin
 		    pms)
 
 		if (nkeep > 0) {
-		    do i = 1, npts {
-			if (n[i] < nkeep) {
+		    do j = 1, npts {
+			if (n[j] < nkeep) {
 			    Meml[v1+1] = Meml[v1+1] - 1
 			    if (imgnld (out[1], buf, Meml[v1]) == EOF)
 				;
@@ -1900,12 +2575,13 @@ begin
 		}
 
 		if (out[2] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[2], buf, Meml[v1])
-		    do i = 1, npts {
-			if (n[i] > 0)
+		    do j = 1, npts {
+			if (n[j] > 0)
 			    Memi[buf] = 0
-			else if (n[i] == 0)
+			else if (n[j] == 0)
 			    Memi[buf] = 1
 			else
 			    Memi[buf] = 2
@@ -1914,7 +2590,8 @@ begin
 		}
 			
 		if (out[3] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnld (out[3], buf, Meml[v1])
 		    call ic_sigmad (d, id, n, wts, npts, Memd[outdata],
 			Memd[buf])
@@ -1924,7 +2601,8 @@ begin
 		    call ic_rmasks (out[4], Meml[v2], id, nimages, n, npts)
 
 		if (out[5] != NULL) {
-		    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v2], Meml[v1], sz_val)
 		    i = impnli (out[5], buf, Meml[v1])
 		    call amovki (nimages, Memi[buf], npts)
 		    call asubi (Memi[buf], n, Memi[buf], npts)
@@ -1933,11 +2611,12 @@ begin
 		if (out[6] != NULL)
 		    call ic_emask (out[6], Meml[v2], id, nimages, n, wts, npts)
 
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 	    }
 
 	    do i = 1, nimages
-		call pm_close (Memi[pms+i-1])
+		call pm_close (Memp[pms+i-1])
 	    call mfree (pms, TY_POINTER)
 	}
 

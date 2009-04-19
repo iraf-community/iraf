@@ -4,7 +4,7 @@ include	"../icombine.h"
 
 define	MINCLIP		2	# Mininum number of images for algorithm
 
-$for (sird)
+$for (silrd)
 # IC_ACCDCLIP -- Reject pixels using CCD noise parameters about the average
 
 procedure ic_accdclip$t (d, m, n, scales, zeros, nm, nimages, npts, average)
@@ -16,14 +16,16 @@ real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 real	nm[3,nimages]		# Noise model parameters
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 $if (datatype == sil)
 real	average[npts]		# Average
 $else
 PIXEL	average[npts]		# Average
 $endif
 
-int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
+size_t	sz_val
+long	i, k
+int	j, l, jj, n1, n2, nin, nk, maxkeep
 $if (datatype == sil)
 real	d1, low, high, sum, a, s, r, zero
 data	zero /0.0/
@@ -53,7 +55,8 @@ begin
 	    docombine = false
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# There must be at least two pixels for rejection.  The initial
 	# average is the low/high rejected average except in the case of
@@ -275,14 +278,16 @@ real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 real	nm[3,nimages]		# Noise model
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 $if (datatype == sil)
 real	median[npts]		# Median
 $else
 PIXEL	median[npts]		# Median
 $endif
 
-int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
+size_t	sz_val
+long	i, k
+int	j, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
 pointer	sp, resid, mp1, mp2
 $if (datatype == sil)
@@ -292,6 +297,7 @@ $else
 PIXEL	med, zero
 data	zero /0$f/
 $endif
+int	imod()
 
 include	"../icombine.com"
 
@@ -307,7 +313,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]
@@ -327,7 +334,7 @@ begin
 
 		if (n1 == 0)
 		    med = blank
-		else if (mod (n1, 2) == 0) {
+		else if (imod (n1, 2) == 0) {
 		    med = Mem$t[d[n3-1]+k]
 		    med = (med + Mem$t[d[n3]+k]) / 2.
 		} else

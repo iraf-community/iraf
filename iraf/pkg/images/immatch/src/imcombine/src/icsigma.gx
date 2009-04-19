@@ -3,7 +3,7 @@
 include	<imhdr.h>
 include	"../icombine.h"
 
-$for (sird)
+$for (silrd)
 # IC_SIGMA -- Compute the sigma image line.
 # The estimated sigma includes a correction for the finite population.
 # Weights are used if desired.
@@ -14,7 +14,7 @@ pointer	d[ARB]			# Data pointers
 pointer	m[ARB]			# Image ID pointers
 int	n[npts]			# Number of points
 real	wts[ARB]		# Weights
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 $if (datatype == sil)
 real	average[npts]		# Average
 real	sigma[npts]		# Sigma line (returned)
@@ -23,7 +23,8 @@ PIXEL	average[npts]		# Average
 PIXEL	sigma[npts]		# Sigma line (returned)
 $endif
 
-int	i, j, k, n1
+long	i, k
+int	j, n1
 real	wt, sigcor, sumwt
 $if (datatype == sil)
 real	a, sum

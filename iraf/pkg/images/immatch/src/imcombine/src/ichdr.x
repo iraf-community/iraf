@@ -9,15 +9,19 @@ pointer	in[nimages]		#I Input images
 pointer	out[ARB]		#I Output images
 int	nimages			#I Number of images
 
-int	i, j, imgnfn(), fnroot(), nowhite()
-pointer	sp, inkey, key, str, list, imofnlu()
+size_t	sz_val
+int	i, j
+int	imgnfn(), fnroot(), nowhite()
+pointer	sp, inkey, key, str, list
+pointer	imofnlu()
 bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (inkey, SZ_FNAME, TY_CHAR)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (inkey, sz_val, TY_CHAR)
+	call salloc (key, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	call clgstr ("imcmb", Memc[inkey], SZ_FNAME)
 	i = nowhite (Memc[inkey], Memc[inkey], SZ_FNAME)

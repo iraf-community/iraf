@@ -20,7 +20,7 @@ procedure ic_mopen (in, out, nimages, offsets)
 pointer	in[nimages]		#I Input images
 pointer	out[ARB]		#I Output images
 int	nimages			#I Number of images
-int	offsets[nimages,ARB]	#I Offsets to  output image
+long	offsets[nimages,ARB]	#I Offsets to  output image
 
 int	mtype			# Mask type
 int	mvalue			# Mask value
@@ -28,11 +28,18 @@ pointer	bufs			# Pointer to data line buffers
 pointer	pms			# Pointer to array of PMIO pointers
 pointer	names			# Pointer to array of string pointers
 
-int	i, j, k, nin, nout, npix, npms, nscan(), strdic(), ctor()
+size_t	sz_val
+int	i, npms
+long	j, k
+size_t	nin, nout, npix
+bool	invert
 real	rval
-pointer	sp, str, key, fname, title, image, pm, pm_open()
-bool	invert, pm_empty()
+pointer	sp, str, key, fname, title, image, pm
+int	nscan(), strdic(), ctor()
+bool	pm_empty()
+pointer	pm_open()
 errchk	calloc, pm_open, ic_pmload
+include	<nullptr.inc>
 
 include "icombine.com"
 
@@ -42,11 +49,13 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (title, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (title, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
 
 	# Determine the mask parameters and allocate memory.
 	# The mask buffers are initialize to all excluded so that
@@ -78,12 +87,13 @@ begin
 	    }
 	}
 	npix = IM_LEN(out[1],1)
-	call calloc (pms, nimages, TY_POINTER)
-	call calloc (bufs, nimages, TY_POINTER)
-	call calloc (names, nimages, TY_POINTER)
+	sz_val = nimages
+	call calloc (pms, sz_val, TY_POINTER)
+	call calloc (bufs, sz_val, TY_POINTER)
+	call calloc (names, sz_val, TY_POINTER)
 	do i = 1, nimages {
-	    call malloc (Memi[bufs+i-1], npix, TY_INT)
-	    call amovki (1, Memi[Memi[bufs+i-1]], npix)
+	    call malloc (Memp[bufs+i-1], npix, TY_INT)
+	    call amovki (1, Memi[Memp[bufs+i-1]], npix)
 	}
 
 	# Check for special cases.  The BOOLEAN type is used when only
@@ -132,8 +142,9 @@ begin
 	npms = 0
 	do i = 1, nimages {
 	    if (mtype != M_NONE) {
-		call malloc (Memi[names+i-1], SZ_FNAME, TY_CHAR)
-		fname = Memi[names+i-1]
+		sz_val = SZ_FNAME
+		call malloc (Memp[names+i-1], sz_val, TY_CHAR)
+		fname = Memp[names+i-1]
 		ifnoerr (call imgstr (in[i],Memc[key],Memc[fname],SZ_FNAME)) {
 		    nin = IM_LEN(in[i],1)
 		    j = max (0, offsets[i,1])
@@ -142,7 +153,7 @@ begin
 		    if (npix < 1)
 			Memc[fname] = EOS
 		    else {
-			pm = pm_open (NULL)
+			pm = pm_open (NULLPTR)
 			call ic_pmload (in[i], pm, Memc[fname], SZ_FNAME)
 			call pm_setp (pm, P_REFIM, in[i])
 			if (pm_empty (pm) && !invert)
@@ -171,7 +182,8 @@ begin
 	}
 
 	# Set up mask structure.
-	call calloc (icm, ICM_LEN, TY_STRUCT)
+	sz_val = ICM_LEN
+	call calloc (icm, sz_val, TY_STRUCT)
 	ICM_TYPE(icm) = mtype
 	ICM_VALUE(icm) = mvalue
 	ICM_BUFS(icm) = bufs
@@ -194,13 +206,17 @@ pointer	pm			#O Mask pointer to be returned
 char	fname[ARB]		#U Mask name
 int	maxchar			#I Max size of mask name
 
+size_t	sz_val
 bool	match
-pointer	sp, str, imname, yt_pmload()
-int	i, fnldir(), stridxs(), envfind()
+int	i
+pointer	sp, str, imname
+int	fnldir(), stridxs(), envfind()
+pointer	yt_pmload()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# First check if the specified file can be loaded.
 	match = (envfind ("pmatch", Memc[str], SZ_PATHNAME) > 0)
@@ -231,7 +247,8 @@ begin
 	}
 
 	# Check if the image has a path.  If not return an error.
-	call salloc (imname, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (imname, sz_val, TY_CHAR)
 	call imstats (im, IM_IMAGENAME, Memc[imname], SZ_PATHNAME)
 	if (fnldir (Memc[imname], Memc[str], SZ_PATHNAME) == 0) {
 	    call sprintf (Memc[str], SZ_PATHNAME,
@@ -284,12 +301,12 @@ begin
 	    return
 
 	do i = 1, nimages {
-	    call mfree (Memi[ICM_NAMES(icm)+i-1], TY_CHAR)
-	    call mfree (Memi[ICM_BUFS(icm)+i-1], TY_INT)
+	    call mfree (Memp[ICM_NAMES(icm)+i-1], TY_CHAR)
+	    call mfree (Memp[ICM_BUFS(icm)+i-1], TY_INT)
 	}
 	do i = 1, nimages {
-	    if (Memi[ICM_PMS(icm)+i-1] != NULL)
-		call pm_close (Memi[ICM_PMS(icm)+i-1])
+	    if (Memp[ICM_PMS(icm)+i-1] != NULL)
+		call pm_close (Memp[ICM_PMS(icm)+i-1])
 	    if (project)
 		break
 	}
@@ -308,7 +325,7 @@ procedure ic_mget (in, out, offsets, v1, v2, m, lflag, nimages, mtype)
 
 pointer	in[nimages]		# Input image pointers
 pointer	out[ARB]		# Output image pointer
-int	offsets[nimages,ARB]	# Offsets to  output image
+long	offsets[nimages,ARB]	# Offsets to  output image
 long	v1[IM_MAXDIM]		# Data vector desired in output image
 long	v2[IM_MAXDIM]		# Data vector in input image
 pointer	m[nimages]		# Pointer to mask pointers
@@ -321,10 +338,16 @@ pointer	bufs			# Pointer to data line buffers
 pointer	pms			# Pointer to array of PMIO pointers
 
 char	title[1]
-int	i, j, k, l, ndim, nin, nout, npix, envfind()
-pointer	buf, pm, names, fname, pm_open(), yt_pmload()
-bool	match, pm_linenotempty()
+int	i, l, ndim
+long	j, k
+size_t	nin, nout, npix
+bool	match
+pointer	buf, pm, names, fname
+int	envfind()
+bool	pm_linenotempty()
+pointer	pm_open(), yt_pmload()
 errchk	pm_glpi, pm_open, pm_loadf, pm_loadim, yt_pmload
+include	<nullptr.inc>
 
 include	"icombine.com"
 
@@ -357,14 +380,14 @@ begin
 	    k = min (nout, nin + offsets[i,1])
 	    npix = k - j
 
-	    m[i] = Memi[bufs+i-1]
-	    buf = Memi[bufs+i-1] + j
+	    m[i] = Memp[bufs+i-1]
+	    buf = Memp[bufs+i-1] + j
 	    if (project) {
-		pm =  Memi[pms]
-		fname = Memi[names]
+		pm =  Memp[pms]
+		fname = Memp[names]
 	    } else {
-		pm =  Memi[pms+i-1]
-		fname = Memi[names+i-1]
+		pm =  Memp[pms+i-1]
+		fname = Memp[names+i-1]
 	    }
 
 	    if (npix < 1)
@@ -390,7 +413,7 @@ begin
 	    if (lflag[i] == D_NONE) {
 		if (pm != NULL && !project) {
 		    call pm_close (pm)
-		    Memi[pms+i-1] = NULL
+		    Memp[pms+i-1] = NULL
 		}
 		call amovki (1, Memi[m[i]], nout)
 		next
@@ -417,15 +440,15 @@ begin
 		   pm = yt_pmload (Memc[fname], in[i], "logical",
 		       Memc[fname], SZ_FNAME)
 		} else {
-		    pm = pm_open (NULL)
+		    pm = pm_open (NULLPTR)
 		    iferr (call pm_loadf (pm, Memc[fname], title, 1))
 			call pm_loadim (pm, Memc[fname], title, 1)
 		    call pm_setp (pm, P_REFIM, in[i])
 		}
 		if (project)
-		    Memi[pms] = pm
+		    Memp[pms] = pm
 		else
-		    Memi[pms+i-1] = pm
+		    Memp[pms+i-1] = pm
 	    }
 
 	    if (pm_linenotempty (pm, v2)) {
@@ -499,7 +522,7 @@ procedure ic_mget1 (in, image, nimages, offset, v, m)
 pointer	in			# Input image pointer
 int	image			# Image index
 int	nimages			# Number of images
-int	offset			# Column offset
+long	offset			# Column offset
 long	v[IM_MAXDIM]		# Data vector desired
 pointer	m			# Pointer to mask
 
@@ -509,10 +532,14 @@ pointer	bufs			# Pointer to data line buffers
 pointer	pms			# Pointer to array of PMIO pointers
 
 char	title[1]
-int	i, npix, envfind()
-pointer	buf, pm, names, fname, pm_open(), yt_pmload()
+long	i
+size_t	npix
+pointer	buf, pm, names, fname
 bool	pm_linenotempty()
+int	envfind()
+pointer	pm_open(), yt_pmload()
 errchk	pm_glpi, pm_open, pm_loadf, pm_loadim, yt_pmload
+include	<nullptr.inc>
 
 include	"icombine.com"
 
@@ -530,13 +557,13 @@ begin
 	names = ICM_NAMES(icm)
 
 	npix = IM_LEN(in,1)
-	m = Memi[bufs+image-1] + offset
+	m = Memp[bufs+image-1] + offset
 	if (project) {
-	    pm =  Memi[pms]
-	    fname = Memi[names]
+	    pm =  Memp[pms]
+	    fname = Memp[names]
 	} else {
-	    pm =  Memi[pms+image-1]
-	    fname = Memi[names+image-1]
+	    pm =  Memp[pms+image-1]
+	    fname = Memp[names+image-1]
 	}
 
 	if (fname == NULL)
@@ -549,15 +576,15 @@ begin
 	        pm = yt_pmload (Memc[fname], in, "logical", Memc[fname],
 		    SZ_FNAME)
 	    } else {
-		pm = pm_open (NULL)
+		pm = pm_open (NULLPTR)
 		iferr (call pm_loadf (pm, Memc[fname], title, 1))
 		    call pm_loadim (pm, Memc[fname], title, 1)
 		call pm_setp (pm, P_REFIM, in)
 	    }
 	    if (project)
-		Memi[pms] = pm
+		Memp[pms] = pm
 	    else
-		Memi[pms+image-1] = pm
+		Memp[pms+image-1] = pm
 	}
 
 	# Do mask I/O and convert to appropriate values in order of
@@ -631,11 +658,11 @@ begin
 	names = ICM_NAMES(icm)
 
 	if (project) {
-	    pm =  Memi[pms]
-	    fname = Memi[names]
+	    pm =  Memp[pms]
+	    fname = Memp[names]
 	} else {
-	    pm =  Memi[pms+image-1]
-	    fname = Memi[names+image-1]
+	    pm =  Memp[pms+image-1]
+	    fname = Memp[names+image-1]
 	}
 
 	if (fname == NULL || pm == NULL)
@@ -645,9 +672,9 @@ begin
 
 	call pm_close (pm)
 	if (project)
-	    Memi[pms] = NULL
+	    Memp[pms] = NULL
 	else
-	    Memi[pms+image-1] = NULL
+	    Memp[pms+image-1] = NULL
 end
 
 
@@ -659,18 +686,20 @@ char    pmname[ARB]             #I Pixel mask name
 pointer refim                   #I Reference image pointer
 char    match[ARB]              #I Match by physical coordinates?
 char    mname[ARB]              #O Expanded mask name
-int     sz_mname                #O Size of expanded mask name
+int	sz_mname                #O Size of expanded mask name
 pointer	pm			#R Pixel mask pointer
 
-int	imstati()
-pointer	im, yt_mappm()
+pointer	im
+pointer	imstatp()
+pointer	yt_mappm()
 errchk	yt_mappm
+include	<nullptr.inc>
 
 begin
 	im = yt_mappm (pmname, refim, match, mname, sz_mname)
 	if (im != NULL) {
-	    pm = imstati (im, IM_PMDES)
-	    call imseti (im, IM_PMDES, NULL)
+	    pm = imstatp (im, IM_PMDES)
+	    call imsetp (im, IM_PMDES, NULLPTR)
 	    call imunmap (im)
 	} else
 	    pm = NULL

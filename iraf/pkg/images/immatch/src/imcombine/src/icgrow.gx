@@ -15,12 +15,16 @@ pointer	m[ARB]			# Image id pointers
 int	n[ARB]			# Number of good pixels
 int	buf[npts,nimages]	# Working buffer
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 pointer	pms			# Pointer to array of pixel masks
 
-int	i, j, k, l, line, nl, rop, igrow, nset, ncompress, or()
+size_t	sz_val
+size_t	nl
+int	i, k, l, rop, igrow, ncompress
+long	j, nset, line
 real	grow2, i2
 pointer	mp, pm, pm_newmask()
+int	or()
 errchk	pm_newmask()
 
 include	"../icombine.com"
@@ -59,7 +63,8 @@ begin
 		return
 
 	    if (pms == NULL) {
-		call malloc (pms, nimages, TY_POINTER)
+		sz_val = nimages
+		call malloc (pms, sz_val, TY_POINTER)
 		do i = 1, nimages
 		    Memp[pms+i-1] = pm_newmask (out, 1)
 		ncompress = 0
@@ -89,7 +94,7 @@ begin
 end
 
 
-$for (sird)
+$for (silrd)
 # IC_GROW$T --  Reject pixels.
 
 procedure ic_grow$t (v, d, m, n, buf, nimages, npts, pms)
@@ -100,10 +105,11 @@ pointer	m[ARB]			# Image id pointers
 int	n[ARB]			# Number of good pixels
 int	buf[ARB]		# Buffer of npts
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 pointer	pms			# Pointer to array of pixel masks
 
-int	i, j, k
+long	i
+int	j, k
 pointer	pm
 bool	pl_linenotempty()
 

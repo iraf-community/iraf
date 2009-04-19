@@ -16,16 +16,20 @@ procedure ic_setout (in, out, offsets, nimages)
 
 pointer	in[nimages]		# Input images
 pointer	out[ARB]		# Output images
-int	offsets[nimages,ARB]	# Offsets
+long	offsets[nimages,ARB]	# Offsets
 int	nimages			# Number of images
 
-int	i, j, indim, outdim, mwdim, a, b, amin, bmax, fd, offtype
+size_t	sz_val
+pointer	p_val
+int	i, j, indim, outdim, mwdim, fd, offtype
+long	a, b, amin, bmax
 real	val
 bool	proj, reloff, flip, streq(), fp_equald()
 pointer	sp, str, fname
 pointer	ltv, lref, wref, cd, ltm, coord, shift, axno, axval, section
 pointer	mw, ct, mw_openim(), mw_sctran(), xt_immap()
 int	open(), fscan(), nscan(), mw_stati(), strlen(), strdic()
+long	lmod(), lnint(), ldnint()
 errchk	mw_openim, mw_gwtermd, mw_gltermd, mw_gaxmap
 errchk	mw_sctran, mw_ctrand, open, xt_immap
 
@@ -34,17 +38,23 @@ define	newscan_ 10
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (ltv, IM_MAXDIM, TY_DOUBLE)
-	call salloc (ltm, IM_MAXDIM*IM_MAXDIM, TY_DOUBLE)
-	call salloc (lref, IM_MAXDIM, TY_DOUBLE)
-	call salloc (wref, IM_MAXDIM, TY_DOUBLE)
-	call salloc (cd, IM_MAXDIM*IM_MAXDIM, TY_DOUBLE)
-	call salloc (coord, IM_MAXDIM, TY_DOUBLE)
-	call salloc (shift, IM_MAXDIM, TY_REAL)
-	call salloc (axno, IM_MAXDIM, TY_INT)
-	call salloc (axval, IM_MAXDIM, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (ltv, sz_val, TY_DOUBLE)
+	sz_val = IM_MAXDIM*IM_MAXDIM
+	call salloc (ltm, sz_val, TY_DOUBLE)
+	sz_val = IM_MAXDIM
+	call salloc (lref, sz_val, TY_DOUBLE)
+	call salloc (wref, sz_val, TY_DOUBLE)
+	sz_val = IM_MAXDIM*IM_MAXDIM
+	call salloc (cd, sz_val, TY_DOUBLE)
+	sz_val = IM_MAXDIM
+	call salloc (coord, sz_val, TY_DOUBLE)
+	call salloc (shift, sz_val, TY_REAL)
+	call salloc (axno, sz_val, TY_INT)
+	call salloc (axval, sz_val, TY_INT)
 
 	# Check and set the image dimensionality.
 	indim = IM_NDIM(in[1])
@@ -90,7 +100,8 @@ begin
 
 	switch (offtype) {
 	case NONE:
-	    call aclri (offsets, outdim*nimages)
+	    sz_val = outdim*nimages
+	    call aclrl (offsets, sz_val)
 	    reloff = true
 	case WORLD, WCS:
 	    do j = 1, outdim
@@ -101,7 +112,7 @@ begin
 		    Memd[wref+outdim] = i
 		    call mw_ctrand (ct, Memd[wref], Memd[coord], indim)
 		    do j = 1, outdim
-			offsets[i,j] = nint (Memd[lref+j-1] - Memd[coord+j-1])
+			offsets[i,j] = ldnint(Memd[lref+j-1] - Memd[coord+j-1])
 		}
 		call mw_ctfree (ct)
 		call mw_close (mw)
@@ -114,13 +125,14 @@ begin
 		    ct = mw_sctran (mw, "world", "logical", 0)
 		    call mw_ctrand (ct, Memd[wref], Memd[coord], indim)
 		    do j = 1, outdim
-			offsets[i,j] = nint (Memd[lref+j-1] - Memd[coord+j-1])
+			offsets[i,j] = ldnint(Memd[lref+j-1] - Memd[coord+j-1])
 		    call mw_ctfree (ct)
 		}
 	    }
 	    reloff = true
 	case PHYSICAL:
-	    call salloc (section, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (section, sz_val, TY_CHAR)
 
 	    call mw_gltermd (mw, Memd[ltm], Memd[coord], indim)
 	    do i = 2, nimages {
@@ -142,7 +154,8 @@ begin
 		    call imstats (in[i], IM_IMAGENAME, Memc[fname], SZ_FNAME)
 		    call strcat (Memc[section], Memc[fname], SZ_FNAME)
 		    call xt_imunmap (in[i], i)
-		    in[i] = xt_immap (Memc[fname], READ_ONLY, TY_CHAR, i) 
+		    p_val = TY_CHAR
+		    in[i] = xt_immap (Memc[fname], READ_ONLY, p_val, i) 
 		    call mw_close (mw)
 		    mw = mw_openim (in[i])
 		    call mw_gltermd (mw, Memd[cd], Memd[coord], indim)
@@ -166,7 +179,7 @@ begin
 		    Memd[ltv+outdim] = i
 		    call mw_ctrand (ct, Memd[ltv], Memd[coord], indim)
 		    do j = 1, outdim
-			offsets[i,j] = nint (Memd[lref+j-1] - Memd[coord+j-1])
+			offsets[i,j] = ldnint(Memd[lref+j-1] - Memd[coord+j-1])
 		}
 		call mw_ctfree (ct)
 		call mw_close (mw)
@@ -177,7 +190,7 @@ begin
 		    ct = mw_sctran (mw, "physical", "logical", 0)
 		    call mw_ctrand (ct, Memd[ltv], Memd[coord], indim)
 		    do j = 1, outdim
-			offsets[i,j] = nint (Memd[lref+j-1] - Memd[coord+j-1])
+			offsets[i,j] = ldnint(Memd[lref+j-1] - Memd[coord+j-1])
 		    call mw_ctfree (ct)
 		}
 	    }
@@ -185,14 +198,14 @@ begin
 	case GRID:
 	    amin = 1
 	    do j = 1, outdim {
-		call gargi (a)
-		call gargi (b)
+		call gargl (a)
+		call gargl (b)
 		if (nscan() < 1+2*j) {
 		    a = 1
 		    b = 0
 		}
 		do i = 1, nimages
-		    offsets[i,j] = mod ((i-1)/amin, a) * b 
+		    offsets[i,j] = lmod((i-1)/amin, a) * b 
 		amin = amin * a
 	    }
 	    reloff = true
@@ -215,7 +228,7 @@ newscan_	if (fscan (fd) == EOF)
 		call reset_scan ()
 		do j = 1, outdim {
 		    call gargr (val)
-		    offsets[i,j] = nint (val)
+		    offsets[i,j] = lnint(val)
 		}
 		if (nscan() < outdim)
 		    call error (1, "IMCOMBINE: Error in offset list")
@@ -250,11 +263,11 @@ newscan_	if (fscan (fd) == EOF)
 	call clgstr ("outlimits", Memc[fname], SZ_FNAME)
 	call sscan (Memc[fname])
 	do j = 1, outdim {
-	    call gargi (a)
-	    call gargi (b)
+	    call gargl (a)
+	    call gargl (b)
 	    if (nscan() < 2*j)
 		break
-	    if (!IS_INDEFI(a)) {
+	    if (!IS_INDEFL(a)) {
 		do i = 1, nimages {
 		    offsets[i,j] = offsets[i,j] - a + 1
 		    if (offsets[i,j] != 0)
@@ -262,7 +275,7 @@ newscan_	if (fscan (fd) == EOF)
 		}
 		IM_LEN(out[1],j) = IM_LEN(out[1],j) - a + 1
 	    }
-	    if (!IS_INDEFI(a) && !IS_INDEFI(b))
+	    if (!IS_INDEFL(a) && !IS_INDEFL(b))
 		IM_LEN(out[1],j) = min (IM_LEN(out[1],j), b - a + 1)
 	}
 
@@ -304,12 +317,15 @@ newscan_	if (fscan (fd) == EOF)
 		call mw_gltermd (mw, Memd[ltm], Memd[ltv], mwdim)
 		call mw_gwtermd (mw, Memd[lref], Memd[wref], Memd[cd], mwdim)
 		call mwvmuld (Memd[ltm], Memd[lref], Memd[lref], mwdim)
-		call aaddd (Memd[lref], Memd[ltv], Memd[lref], mwdim)
+		sz_val = mwdim
+		call aaddd (Memd[lref], Memd[ltv], Memd[lref], sz_val)
 		call mwinvertd (Memd[ltm], Memd[ltm], mwdim)
 		call mwmmuld (Memd[cd], Memd[ltm], Memd[cd], mwdim)
 		call mw_swtermd (mw, Memd[lref], Memd[wref], Memd[cd], mwdim)
-		call aclrd (Memd[ltv], mwdim)
-		call aclrd (Memd[ltm], mwdim*mwdim)
+		sz_val = mwdim
+		call aclrd (Memd[ltv], sz_val)
+		sz_val = mwdim*mwdim
+		call aclrd (Memd[ltm], sz_val)
 		do i = 1, mwdim
 		    Memd[ltm+(i-1)*(mwdim+1)] = 1.
 		call mw_sltermd (mw, Memd[ltm], Memd[ltv], mwdim)

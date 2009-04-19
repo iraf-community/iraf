@@ -2,14 +2,14 @@
 
 include	"../icombine.h"
 
-$for (sird)
+$for (silrd)
 # IC_MEDIAN -- Median of lines
 
 procedure ic_median$t (d, n, npts, doblank, median)
 
 pointer	d[ARB]			# Input data line pointers
 int	n[npts]			# Number of good pixels
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 int	doblank			# Set blank values?
 $if (datatype == sil)
 real	median[npts]		# Median
@@ -17,7 +17,8 @@ $else
 PIXEL	median[npts]		# Median
 $endif
 
-int	i, j, k, j1, j2, n1, lo, up, lo1, up1
+long	i, k
+int	j, j1, j2, n1, lo, up, lo1, up1
 bool	even
 $if (datatype == silx)
 real	val1, val2, val3
@@ -28,6 +29,7 @@ PIXEL	temp, wtemp
 $if (datatype == x)
 real	abs_temp
 $endif
+int	imod()
 
 include	"../icombine.com"
 
@@ -45,7 +47,7 @@ begin
 	if (mclip) {
 	    if (dflag == D_ALL) {
 		n1 = n[1]
-		even = (mod (n1, 2) == 0)
+		even = (imod(n1, 2) == 0)
 		j1 = n1 / 2 + 1
 		j2 = n1 / 2
 		do i = 1, npts {
@@ -74,7 +76,7 @@ begin
 			n1 = n[i]
 			if (n1 > 0) {
 			    j1 = n1 / 2 + 1
-			    if (mod (n1, 2) == 0) {
+			    if (imod(n1, 2) == 0) {
 				j2 = n1 / 2
 				val1 = Mem$t[d[j1]+k]
 				val2 = Mem$t[d[j2]+k]
@@ -92,7 +94,7 @@ begin
 	# Compute the median.
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = abs(n[i])
+	    n1 = iabs(n[i])
 
 	    # If there are more than 3 points use Wirth algorithm.  This
 	    # is the same as vops$amed.gx except for an even number of
@@ -140,7 +142,7 @@ begin
 
 		median[i] = Mem$t[d[j]+k]
 
-		if (mod (n1,2) == 0) {
+		if (imod(n1, 2) == 0) {
 		    lo = 1
 		    up = n1
 		    j  = max (lo, min (up, (up+1)/2)+1)

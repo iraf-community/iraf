@@ -12,9 +12,11 @@ long	v[ARB]			#I Output vector (input)
 pointer	id[nimages]		#I Image id pointers
 int	nimages			#I Number of images
 int	n[npts]			#I Number of good pixels
-int	npts			#I Number of output points per line
+size_t	npts			#I Number of output points per line
 
-int	i, j, k, ndim
+size_t	sz_val
+long	i, j
+int	k, ndim
 long	impnls()
 long	v1[IM_MAXDIM]
 pointer	buf
@@ -22,7 +24,8 @@ pointer	buf
 begin
 	ndim = IM_NDIM(pm)
 	do k = 1, nimages {
-	    call amovl (v, v1, ndim-1)
+	    sz_val = ndim-1
+	    call amovl (v, v1, sz_val)
 	    v1[ndim] = k
 	    i = impnls (pm, buf, v1)
 	    do j = 1, npts {

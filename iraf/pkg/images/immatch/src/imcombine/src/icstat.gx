@@ -5,7 +5,7 @@ include	"../icombine.h"
 
 define	NMAX	100000	# Maximum number of pixels to sample
 
-$for (sird)
+$for (silrd)
 # IC_STAT -- Compute image statistics within specified section.
 # The image section is relative to a reference image which may be
 # different than the input image and may have an offset.  Only a
@@ -19,13 +19,17 @@ procedure ic_stat$t (im, imref, section, offsets, image, nimages,
 pointer	im			 # Data image
 pointer	imref			 # Reference image for image section
 char	section[ARB]		 # Image section
-int	offsets[nimages,ARB]	 # Image section offset from data to reference
+long	offsets[nimages,ARB]	 # Image section offset from data to reference
 int	image			 # Image index (for mask I/O)
 int	nimages			 # Number of images in  offsets.
 bool	domode, domedian, domean # Statistics to compute
 real	mode, median, mean	 # Statistics
 
-int	i, j, ndim, n, nv
+size_t	sz_val
+long	l_val
+int	i, j, ndim
+size_t	n
+long	nv, k
 real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
@@ -44,11 +48,12 @@ include	"../icombine.com"
 
 begin
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (dv, IM_MAXDIM, TY_LONG)
-	call salloc (va, IM_MAXDIM, TY_LONG)
-	call salloc (vb, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	call salloc (dv, sz_val, TY_LONG)
+	call salloc (va, sz_val, TY_LONG)
+	call salloc (vb, sz_val, TY_LONG)
 
 	# Determine the image section parameters.  This must be in terms of
 	# the data image pixel coordinates though the section may be specified
@@ -58,66 +63,71 @@ begin
 	ndim = IM_NDIM(im)
 	if (project)
 	    ndim = ndim - 1
-	call amovki (1, Memi[v1], IM_MAXDIM)
-	call amovki (1, Memi[va], IM_MAXDIM)
-	call amovki (1, Memi[dv], IM_MAXDIM)
-	call amovi (IM_LEN(imref,1), Memi[vb], ndim)
-	call ic_section (section, Memi[va], Memi[vb], Memi[dv], ndim)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, Meml[v1], sz_val)
+	call amovkl (l_val, Meml[va], sz_val)
+	call amovkl (l_val, Meml[dv], sz_val)
+	sz_val = ndim
+	call amovl (IM_LEN(imref,1), Meml[vb], sz_val)
+	call ic_section (section, Meml[va], Meml[vb], Meml[dv], ndim)
 	if (im != imref)
 	    do i = 1, ndim {
-		Memi[va+i-1] = Memi[va+i-1] - offsets[image,i]
-		Memi[vb+i-1] = Memi[vb+i-1] - offsets[image,i]
+		Meml[va+i-1] = Meml[va+i-1] - offsets[image,i]
+		Meml[vb+i-1] = Meml[vb+i-1] - offsets[image,i]
 	    }
 
 	do j = 1, 10 {
 	    n = 1
 	    do i = 0, ndim-1 {
-		Memi[v1+i] = max (1, min (Memi[va+i], Memi[vb+i]))
-		Memi[v2+i] = min (IM_LEN(im,i+1), max (Memi[va+i], Memi[vb+i]))
-		Memi[dv+i] = j
-		nv = max (1, (Memi[v2+i] - Memi[v1+i]) / Memi[dv+i] + 1)
-		Memi[v2+i] = Memi[v1+i] + (nv - 1) * Memi[dv+i]
+		Meml[v1+i] = max (1, min (Meml[va+i], Meml[vb+i]))
+		Meml[v2+i] = min (IM_LEN(im,i+1), max (Meml[va+i], Meml[vb+i]))
+		Meml[dv+i] = j
+		nv = max (1, (Meml[v2+i] - Meml[v1+i]) / Meml[dv+i] + 1)
+		Meml[v2+i] = Meml[v1+i] + (nv - 1) * Meml[dv+i]
 		n = n * nv
 	    }
 	    if (n < NMAX)
 		break
 	}
 
-	call amovl (Memi[v1], Memi[va], IM_MAXDIM)
-	Memi[va] = 1
+	sz_val = IM_MAXDIM
+	call amovl (Meml[v1], Meml[va], sz_val)
+	Meml[va] = 1
 	if (project)
-	   Memi[va+ndim] = image
-	call amovl (Memi[va], Memi[vb], IM_MAXDIM)
+	   Meml[va+ndim] = image
+	sz_val = IM_MAXDIM
+	call amovl (Meml[va], Meml[vb], sz_val)
 
 	# Accumulate the pixel values within the section.  Masked pixels and
 	# thresholded pixels are ignored.
 
 	call salloc (data, n, TY_PIXEL)
 	dp = data
-	while (imgnl$t (im, lp, Memi[vb]) != EOF) {
-	    call ic_mget1 (im, image, nimages, offsets[image,1], Memi[va], mask)
-	    lp = lp + Memi[v1] - 1
+	while (imgnl$t (im, lp, Meml[vb]) != EOF) {
+	    call ic_mget1 (im, image, nimages, offsets[image,1], Meml[va], mask)
+	    lp = lp + Meml[v1] - 1
 	    if (dflag == D_ALL) {
 		if (dothresh) {
-		    do i = Memi[v1], Memi[v2], Memi[dv] {
+		    do k = Meml[v1], Meml[v2], Meml[dv] {
 			a = Mem$t[lp]
 			if (a >= lthresh && a <= hthresh) {
 			    Mem$t[dp] = a
 			    dp = dp + 1
 			}
-			lp = lp + Memi[dv]
+			lp = lp + Meml[dv]
 		    }
 		} else {
-		    do i = Memi[v1], Memi[v2], Memi[dv] {
+		    do k = Meml[v1], Meml[v2], Meml[dv] {
 			Mem$t[dp] = Mem$t[lp]
 			dp = dp + 1
-			lp = lp + Memi[dv]
+			lp = lp + Meml[dv]
 		    }
 		}
 	    } else if (dflag == D_MIX) {
-		mp = mask + Memi[v1] - 1
+		mp = mask + Meml[v1] - 1
 		if (dothresh) {
-		    do i = Memi[v1], Memi[v2], Memi[dv] {
+		    do k = Meml[v1], Meml[v2], Meml[dv] {
 			if (Memi[mp] == 0) {
 			    a = Mem$t[lp]
 			    if (a >= lthresh && a <= hthresh) {
@@ -125,29 +135,30 @@ begin
 				dp = dp + 1
 			    }
 			}
-			mp = mp + Memi[dv]
-			lp = lp + Memi[dv]
+			mp = mp + Meml[dv]
+			lp = lp + Meml[dv]
 		    }
 		} else {
-		    do i = Memi[v1], Memi[v2], Memi[dv] {
+		    do k = Meml[v1], Meml[v2], Meml[dv] {
 			if (Memi[mp] == 0) {
 			    Mem$t[dp] = Mem$t[lp]
 			    dp = dp + 1
 			}
-			mp = mp + Memi[dv]
-			lp = lp + Memi[dv]
+			mp = mp + Meml[dv]
+			lp = lp + Meml[dv]
 		    }
 		}
 	    }
 	    for (i=2; i<=ndim; i=i+1) {
-		Memi[va+i-1] = Memi[va+i-1] + Memi[dv+i-1]
-		if (Memi[va+i-1] <= Memi[v2+i-1])
+		Meml[va+i-1] = Meml[va+i-1] + Meml[dv+i-1]
+		if (Meml[va+i-1] <= Meml[v2+i-1])
 		    break
-		Memi[va+i-1] = Memi[v1+i-1]
+		Meml[va+i-1] = Meml[v1+i-1]
 	    }
 	    if (i > ndim)
 		break
-	    call amovl (Memi[va], Memi[vb], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[va], Meml[vb], sz_val)
 	}
 
 	# Close mask until it is needed again.
@@ -186,9 +197,9 @@ define	ZBIN	0.1	# Bin size for mode.
 PIXEL procedure ic_mode$t (a, n)
 
 PIXEL	a[n]			# Data array
-int	n			# Number of points
+size_t	n			# Number of points
 
-int	i, j, k, nmax
+long	i, j, k, nmax
 real	z1, z2, zstep, zbin
 PIXEL	mode
 bool	fp_equalr()

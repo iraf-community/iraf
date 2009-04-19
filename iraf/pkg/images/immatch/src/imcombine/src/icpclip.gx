@@ -4,7 +4,7 @@ include	"../icombine.h"
 
 define	MINCLIP		3	# Minimum number for clipping
 
-$for (sird)
+$for (silrd)
 # IC_PCLIP -- Percentile clip
 #
 # 1) Find the median
@@ -18,15 +18,17 @@ pointer	d[ARB]			# Data pointers
 pointer	m[ARB]			# Image id pointers
 int	n[npts]			# Number of good pixels
 int	nimages			# Number of input images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 $if (datatype == sil)
 real	median[npts]		# Median
 $else
 PIXEL	median[npts]		# Median
 $endif
 
-int	i, j, k, l, id, n1, n2, n3, n4, n5, nl, nh, nin, maxkeep
-bool	even, fp_equalr()
+size_t	sz_val
+long	i, j
+int	k, l, n1, n2, n3, n4, n5, id, nl, nh, nin, maxkeep
+bool	even
 real	sigma, r, s, t
 pointer	sp, resid, mp1, mp2
 $if (datatype == sil)
@@ -34,6 +36,8 @@ real	med
 $else
 PIXEL	med
 $endif
+bool	fp_equalr()
+int	inint(), imod()
 
 include	"../icombine.com"
 
@@ -49,7 +53,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
 
 	# Set sign of pclip parameter
 	if (pclip < 0)
@@ -65,14 +70,14 @@ begin
 	    else
 		maxkeep = min (n1, nkeep)
 	    n2 = 1 + n1 / 2
-	    even = (mod (n1, 2) == 0)
+	    even = (imod(n1, 2) == 0)
 	    if (pclip < 0.) {
 		if (even)
-		    n3 = max (1, nint (n2 - 1 + pclip))
+		    n3 = max (1, inint(n2 - 1 + pclip))
 		else
-		    n3 = max (1, nint (n2 + pclip))
+		    n3 = max (1, inint(n2 + pclip))
 	    } else
-		n3 = min (n1, nint (n2 + pclip))
+		n3 = min (n1, inint(n2 + pclip))
 	    nin = n1
 	}
 
@@ -91,14 +96,14 @@ begin
 		    next
 		}
 		n2 = 1 + n1 / 2
-		even = (mod (n1, 2) == 0)
+		even = (imod(n1, 2) == 0)
 		if (pclip < 0) {
 		    if (even)
-			n3 = max (1, nint (n2 - 1 + pclip))
+			n3 = max (1, inint(n2 - 1 + pclip))
 		    else
-			n3 = max (1, nint (n2 + pclip))
+			n3 = max (1, inint(n2 + pclip))
 		} else
-		    n3 = min (n1, nint (n2 + pclip))
+		    n3 = min (n1, inint(n2 + pclip))
 	    }
 
 	    j = i - 1 
@@ -177,7 +182,7 @@ begin
 	    # If any pixels are rejected recompute the median.
 	    if (nl > 1 || nh < n1) {
 		n5 = nl + n4 / 2
-		if (mod (n4, 2) == 0) {
+		if (imod(n4, 2) == 0) {
 		    med = Mem$t[d[n5-1]+j]
 		    med = (med + Mem$t[d[n5]+j]) / 2.
 		} else

@@ -4,7 +4,7 @@ include	<imhdr.h>
 include	<mach.h>
 include	"../icombine.h"
 
-$for (sird)
+$for (silrd)
 # IC_GDATA -- Get line of image and mask data and apply threshold and scaling.
 # Entirely empty lines are excluded.  The data are compacted within the
 # input data buffers.  If it is required, the connection to the original
@@ -21,17 +21,21 @@ pointer	id[nimages]		# ID pointers
 int	n[npts]			# Number of good pixels
 pointer	m[nimages]		# Mask pointers
 int	lflag[nimages]		# Empty mask flags
-int	offsets[nimages,ARB]	# Image offsets
+long	offsets[nimages,ARB]	# Image offsets
 real	scales[nimages]		# Scale factors
 real	zeros[nimages]		# Zero offset factors
 int	nimages			# Number of input images
-int	npts			# NUmber of output points per line
+size_t	npts			# NUmber of output points per line
 long	v1[ARB], v2[ARB]	# Line vectors
 
+size_t	sz_val
 PIXEL	temp
-int	i, j, k, l, n1, n2, npix, nin, nout, ndim, nused, mtype, xt_imgnl$t()
+int	i, l, ndim, nused, mtype
+long	j, k, n1, n2
+size_t	npix, nin, nout
 real	a, b
 pointer	buf, dp, ip, mp
+long	xt_imgnl$t()
 errchk	xt_cpix, xt_imgnl$t
 
 PIXEL	max_pixel
@@ -39,11 +43,13 @@ $if (datatype == s)
 data	max_pixel/MAX_SHORT/
 $else $if (datatype == i)
 data	max_pixel/MAX_INT/
+$else $if (datatype == l)
+data	max_pixel/MAX_LONG/
 $else $if (datatype == r)
 data	max_pixel/MAX_REAL/
 $else
 data	max_pixel/MAX_DOUBLE/
-$endif $endif $endif
+$endif $endif $endif $endif
 
 include	"../icombine.com"
 
@@ -79,7 +85,8 @@ begin
 	    if (lflag[i] == D_NONE)
 		next
 	    if (dbuf[i] == NULL) {
-		call amovl (v1, v2, IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (v1, v2, sz_val)
 		if (project)
 		    v2[ndim+1] = i
 		j = xt_imgnl$t (in[i], i, d[i], v2, v1[2])
@@ -343,9 +350,11 @@ begin
 
 	# Sort the pixels and IDs if needed
 	if (mclip) {
-	    call malloc (dp, nused, TY_PIXEL)
+	    sz_val = nused
+	    call malloc (dp, sz_val, TY_PIXEL)
 	    if (keepids) {
-		call malloc (ip, nused, TY_INT)
+		sz_val = nused
+		call malloc (ip, sz_val, TY_INT)
 		call ic_2sort$t (d, Mem$t[dp], id, Memi[ip], n, npts)
 		call mfree (ip, TY_INT)
 	    } else

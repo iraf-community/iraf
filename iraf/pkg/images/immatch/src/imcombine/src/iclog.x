@@ -25,17 +25,21 @@ real	mean[nimages]		# Means
 real	scales[nimages]		# Scale factors
 real	zeros[nimages]		# Zero or sky levels
 real	wts[nimages]		# Weights
-int	offsets[nimages,ARB]	# Image offsets
+long	offsets[nimages,ARB]	# Image offsets
 int	nimages			# Number of images
 bool	dozero			# Zero flag
 int	nout			# Number of images combined in output
 
-int	i, j, stack, ctor()
-real	rval, imgetr()
-long	clktime()
+size_t	sz_val
+long	l_val
+int	i, j, stack
+real	rval
 bool	prncombine, prexptime, prmode, prmedian, prmean, prmask
 bool	prrdn, prgain, prsn
 pointer	sp, fname, bpname, key
+int	ctor()
+real	imgetr()
+long	clktime(), lnint()
 errchk	imgetr
 
 include	"icombine.com"
@@ -45,20 +49,24 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (fname, SZ_LINE, TY_CHAR)
-	call salloc (bpname, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (bpname, sz_val, TY_CHAR)
 
 	stack = NO
 	if (project) {
 	    ifnoerr (call imgstr (in[1], "stck0001", Memc[fname], SZ_LINE))
 	        stack = YES
 	}
-	if (stack == YES)
-	    call salloc (key, SZ_FNAME, TY_CHAR)
+	if (stack == YES) {
+	    sz_val = SZ_FNAME
+	    call salloc (key, sz_val, TY_CHAR)
+	}
 
 	# Time stamp the log and print parameter information.
 
-	call cnvdate (clktime(0), Memc[fname], SZ_LINE)
+	l_val = 0
+	call cnvdate (clktime(l_val), Memc[fname], SZ_LINE)
 	call fprintf (logfd, "\n%s: IMCOMBINE\n")
 	    call pargstr (Memc[fname])
 	switch (combine) {
@@ -77,8 +85,8 @@ begin
 	switch (reject) {
 	case MINMAX:
 	    call fprintf (logfd, "  reject = minmax, nlow = %d, nhigh = %d\n")
-		call pargi (nint (flow * nimages))
-		call pargi (nint (fhigh * nimages))
+		call pargl (lnint(flow * nimages))
+		call pargl (lnint(fhigh * nimages))
 	case CCDCLIP:
 	    call fprintf (logfd, "  reject = ccdclip, mclip = %b, nkeep = %d\n")
 		call pargb (mclip)
@@ -348,11 +356,11 @@ begin
 	    if (!aligned) {
 		if (IM_NDIM(out[1]) == 1) {
 		    call fprintf (logfd, " %9d")
-			call pargi (offsets[i,1])
+			call pargl (offsets[i,1])
 		} else {
 		    do  j = 1, IM_NDIM(out[1]) {
 			call fprintf (logfd, " %4d")
-			    call pargi (offsets[i,j])
+			    call pargl (offsets[i,j])
 		    }
 		}
 	    }

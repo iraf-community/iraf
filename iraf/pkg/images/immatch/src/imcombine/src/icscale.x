@@ -17,21 +17,23 @@ procedure ic_scale (in, out, offsets, scales, zeros, wts, nimages)
 
 pointer	in[nimages]		# Input images
 pointer	out[ARB]		# Output images
-int	offsets[nimages,ARB]	# Image offsets
+long	offsets[nimages,ARB]	# Image offsets
 real	scales[nimages]		# Scale factors
 real	zeros[nimages]		# Zero or sky levels
 real	wts[nimages]		# Weights
 int	nimages			# Number of images
 
+size_t	sz_val
 int	stype, ztype, wtype
-int	i, j, k, l, nout
+int	i, j, nout
+long	k, l
 real	mode, median, mean, sumwts
 pointer	sp, ncombine, exptime, modes, medians, means
 pointer	section, str, sname, zname, wname, im, imref
 bool	domode, domedian, domean, dozero, dos, doz, dow, snorm, znorm, wflag
 
 int	imgeti(), strdic(), ic_gscale()
-real	imgetr(), asumr(), asumi()
+real	imgetr(), asumr(), asumi(), aabs()
 pointer	xt_opix()
 errchk	ic_gscale, xt_opix, ic_statr
 
@@ -39,16 +41,19 @@ include	"icombine.com"
 
 begin
 	call smark (sp)
-	call salloc (ncombine, nimages, TY_INT)
-	call salloc (exptime, nimages, TY_REAL)
-	call salloc (modes, nimages, TY_REAL)
-	call salloc (medians, nimages, TY_REAL)
-	call salloc (means, nimages, TY_REAL)
-	call salloc (section, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (sname, SZ_FNAME, TY_CHAR)
-	call salloc (zname, SZ_FNAME, TY_CHAR)
-	call salloc (wname, SZ_FNAME, TY_CHAR)
+	sz_val = nimages
+	call salloc (ncombine, sz_val, TY_INT)
+	call salloc (exptime, sz_val, TY_REAL)
+	call salloc (modes, sz_val, TY_REAL)
+	call salloc (medians, sz_val, TY_REAL)
+	call salloc (means, sz_val, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (section, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (sname, sz_val, TY_CHAR)
+	call salloc (zname, sz_val, TY_CHAR)
+	call salloc (wname, sz_val, TY_CHAR)
 
 	# Get the number of images previously combined and the exposure times.
 	# The default combine number is 1 and the default exposure is 0.
@@ -62,8 +67,9 @@ begin
 	    } else
 		Memr[exptime+i-1] = 0.
 	    if (project) {
-		call amovki (Memi[ncombine], Memi[ncombine], nimages)
-		call amovkr (Memr[exptime], Memr[exptime], nimages)
+		sz_val = nimages
+		call amovki (Memi[ncombine], Memi[ncombine], sz_val)
+		call amovkr (Memr[exptime], Memr[exptime], sz_val)
 		break
 	    }
 	}
@@ -137,8 +143,8 @@ begin
 			call sprintf (Memc[str], SZ_LINE, "%d:%d,")
 		    else
 			call sprintf (Memc[str], SZ_LINE, "%d:%d]")
-			    call pargi (k)
-			    call pargi (l)
+			    call pargl (k)
+			    call pargl (l)
 		    call strcat (Memc[str], Memc[section], SZ_FNAME)
 		}
 		imref = out[1]
@@ -184,27 +190,28 @@ begin
 	}
 
 	# Save the image statistics if computed.
-	call amovkr (INDEFR, Memr[modes], nimages)
-	call amovkr (INDEFR, Memr[medians], nimages)
-	call amovkr (INDEFR, Memr[means], nimages)
+	sz_val = nimages
+	call amovkr (INDEFR, Memr[modes], sz_val)
+	call amovkr (INDEFR, Memr[medians], sz_val)
+	call amovkr (INDEFR, Memr[means], sz_val)
 	if (stype == S_MODE)
-	    call amovr (scales, Memr[modes], nimages)
+	    call amovr (scales, Memr[modes], sz_val)
 	if (stype == S_MEDIAN)
-	    call amovr (scales, Memr[medians], nimages)
+	    call amovr (scales, Memr[medians], sz_val)
 	if (stype == S_MEAN)
-	    call amovr (scales, Memr[means], nimages)
+	    call amovr (scales, Memr[means], sz_val)
 	if (ztype == S_MODE)
-	    call amovr (zeros, Memr[modes], nimages)
+	    call amovr (zeros, Memr[modes], sz_val)
 	if (ztype == S_MEDIAN)
-	    call amovr (zeros, Memr[medians], nimages)
+	    call amovr (zeros, Memr[medians], sz_val)
 	if (ztype == S_MEAN)
-	    call amovr (zeros, Memr[means], nimages)
+	    call amovr (zeros, Memr[means], sz_val)
 	if (wtype == S_MODE)
-	    call amovr (wts, Memr[modes], nimages)
+	    call amovr (wts, Memr[modes], sz_val)
 	if (wtype == S_MEDIAN)
-	    call amovr (wts, Memr[medians], nimages)
+	    call amovr (wts, Memr[medians], sz_val)
 	if (wtype == S_MEAN)
-	    call amovr (wts, Memr[means], nimages)
+	    call amovr (wts, Memr[means], sz_val)
 
 	# If nothing else has set the scaling factors set them to defaults.
 	do i = 1, nimages {
@@ -220,7 +227,8 @@ begin
 	    if (scales[i] <= 0.) {
 		call eprintf ("WARNING: Negative scale factors")
 		call eprintf (" -- ignoring scaling\n")
-		call amovkr (1., scales, nimages)
+		sz_val = nimages
+		call amovkr (1., scales, sz_val)
 		break
 	    }
 
@@ -228,11 +236,14 @@ begin
 	snorm = (stype == S_FILE || stype == S_KEYWORD)
 	znorm = (ztype == S_FILE || ztype == S_KEYWORD)
 	wflag = (wtype == S_FILE || wtype == S_KEYWORD)
-	if (snorm)
-	    call arcpr (1., scales, scales, nimages)
+	if (snorm) {
+	    sz_val = nimages
+	    call arcpr (1., scales, scales, sz_val)
+	}
 	mean = scales[1]
-	call adivkr (scales, mean, scales, nimages)
-	call adivr (zeros, scales, zeros, nimages)
+	sz_val = nimages
+	call adivkr (scales, mean, scales, sz_val)
+	call adivr (zeros, scales, zeros, sz_val)
 
 	if (wtype != S_NONE) {
 	    do i = 1, nimages {
@@ -258,26 +269,33 @@ begin
 	    }
 	}
 
-	if (znorm)
-	    call anegr (zeros, zeros, nimages)
-	else {
+	if (znorm) {
+	    sz_val = nimages
+	    call anegr (zeros, zeros, sz_val)
+	} else {
 	    # Because of finite arithmetic it is possible for the zero offsets
 	    # to be nonzero even when they are all equal.  Just for the sake of
 	    # a nice log set the zero offsets in this case.
 
 	    mean = zeros[1]
-	    call asubkr (zeros, mean, zeros, nimages)
+	    sz_val = nimages
+	    call asubkr (zeros, mean, zeros, sz_val)
 	    for (i=2; (i<=nimages)&&(zeros[i]==zeros[1]); i=i+1)
 		;
-	    if (i > nimages)
-		call aclrr (zeros, nimages)
+	    if (i > nimages) {
+		sz_val = nimages
+		call aclrr (zeros, sz_val)
+	    }
 	}
-	mean = asumr (wts, nimages)
-	if (mean > 0.)
-	    call adivkr (wts, mean, wts, nimages)
-	else {
+	sz_val = nimages
+	mean = asumr (wts, sz_val)
+	if (mean > 0.) {
+	    sz_val = nimages
+	    call adivkr (wts, mean, wts, sz_val)
+	} else {
 	    call eprintf ("WARNING: Mean weight is zero -- using no weights\n")
-	    call amovkr (1., wts, nimages)
+	    sz_val = nimages
+	    call amovkr (1., wts, sz_val)
 	    mean = 1.
 	}
 
@@ -299,7 +317,7 @@ begin
 	}
 	if (doscale && sigscale != 0.) {
 	    do i = 1, nimages {
-		if (abs (scales[i] - 1) > sigscale) {
+		if (aabs(scales[i] - 1) > sigscale) {
 		    doscale1 = true
 		    break
 		}
@@ -307,7 +325,8 @@ begin
 	}
 		    
 	# Set the output header parameters.
-	nout = asumi (Memi[ncombine], nimages)
+	sz_val = nimages
+	nout = asumi (Memi[ncombine], sz_val)
 	call imaddi (out[1], "ncombine", nout)
 	mean = 0.
 	sumwts = 0.

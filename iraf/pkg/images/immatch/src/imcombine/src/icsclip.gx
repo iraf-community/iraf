@@ -4,7 +4,7 @@ include	"../icombine.h"
 
 define	MINCLIP		3	# Mininum number of images for algorithm
 
-$for (sird)
+$for (silrd)
 # IC_ASIGCLIP -- Reject pixels using sigma clipping about the average
 # The initial average rejects the high and low pixels.  A correction for
 # different scalings of the images may be made.  Weights are not used.
@@ -17,14 +17,16 @@ int	n[npts]			# Number of good pixels
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 $if (datatype == sil)
 real	average[npts]		# Average
 $else
 PIXEL	average[npts]		# Average
 $endif
 
-int	i, j, k, l, jj, n1, n2, nin, nk, maxkeep
+size_t	sz_val
+long	i, k
+int	j, l, jj, n1, n2, nin, nk, maxkeep
 $if (datatype == sil)
 real	d1, low, high, sum, a, s, r, one
 data	one /1.0/
@@ -55,9 +57,12 @@ begin
 
 	# Save the residuals and the sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Do sigma clipping.
 	nin = n[1]
@@ -140,7 +145,7 @@ begin
 			    d1 = Mem$t[dp1]
 			    r = (d1 - a) / (s * Memr[wp])
 			    if (r < -lsigma || r > hsigma) {
-				Memr[resid+n1] = abs (r)
+				Memr[resid+n1] = abs(r)
 				if (j < n1) {
 				    dp2 = d[n1] + k
 				    Mem$t[dp1] = Mem$t[dp2]
@@ -171,7 +176,7 @@ begin
 			    d1 = Mem$t[dp1]
 			    r = (d1 - a) / s
 			    if (r < -lsigma || r > hsigma) {
-				Memr[resid+n1] = abs (r)
+				Memr[resid+n1] = abs(r)
 				if (j < n1) {
 				    dp2 = d[n1] + k
 				    Mem$t[dp1] = Mem$t[dp2]
@@ -304,14 +309,16 @@ int	n[npts]			# Number of good pixels
 real	scales[nimages]		# Scales
 real	zeros[nimages]		# Zeros
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 $if (datatype == sil)
 real	median[npts]		# Median
 $else
 PIXEL	median[npts]		# Median
 $endif
 
-int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
+size_t	sz_val
+long	i, k
+int	j, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 real	r, s
 pointer	sp, resid, w, mp1, mp2
 $if (datatype == sil)
@@ -321,6 +328,7 @@ $else
 PIXEL	med, one
 data	one /1$f/
 $endif
+int	imod()
 
 include	"../icombine.com"
 
@@ -337,9 +345,12 @@ begin
 
 	# Save the residuals and sigma scaling corrections if needed.
 	call smark (sp)
-	call salloc (resid, nimages+1, TY_REAL)
-	if (doscale1)
-	    call salloc (w, nimages, TY_REAL)
+	sz_val = nimages+1
+	call salloc (resid, sz_val, TY_REAL)
+	if (doscale1) {
+	    sz_val = nimages
+	    call salloc (w, sz_val, TY_REAL)
+	}
 
 	# Compute median and sigma and iteratively clip.
 	nin = n[1]
@@ -359,7 +370,7 @@ begin
 
 		if (n1 == 0)
 		    med = blank
-		else if (mod (n1, 2) == 0)
+		else if (imod (n1, 2) == 0)
 		    med = (Mem$t[d[n3-1]+k] + Mem$t[d[n3]+k]) / 2.
 		else
 		    med = Mem$t[d[n3]+k]

@@ -2,7 +2,7 @@
 
 define	LOGPTR	32			# log2(maxpts) (4e9)
 
-$for (sird)
+$for (silrd)
 # IC_SORT -- Quicksort.  This is based on the VOPS asrt except that
 # the input is an array of pointers to image lines and the sort is done
 # across the image lines at each point along the lines.  The number of
@@ -14,10 +14,11 @@ procedure ic_sort$t (a, b, nvecs, npts)
 pointer	a[ARB]			# pointer to input vectors
 PIXEL	b[ARB]			# work array
 int	nvecs[npts]		# number of vectors
-int	npts			# number of points in vectors
+size_t	npts			# number of points in vectors
 
 PIXEL	pivot, temp, temp3
-int	i, j, k, l, p, npix, lv[LOGPTR], uv[LOGPTR]
+long	l
+int	i, j, k, p, npix, lv[LOGPTR], uv[LOGPTR]
 define	swap {temp=$1;$1=$2;$2=temp}
 define	copy_	10
 
@@ -192,10 +193,11 @@ PIXEL	b[ARB]			# work array
 pointer	c[ARB]			# pointer to associated integer vectors
 int	d[ARB]			# work array
 int	nvecs[npts]		# number of vectors
-int	npts			# number of points in vectors
+size_t	npts			# number of points in vectors
 
 PIXEL	pivot, temp, temp3
-int	i, j, k, l, p, npix, lv[LOGPTR], uv[LOGPTR], itemp
+long	l
+int	i, j, k, p, npix, lv[LOGPTR], uv[LOGPTR], itemp
 define	swap {temp=$1;$1=$2;$2=temp}
 define	iswap {itemp=$1;$1=$2;$2=itemp}
 define	copy_	10

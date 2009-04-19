@@ -14,11 +14,14 @@ pointer	id[nimages]		#I Image id pointers
 int	nimages			#I Number of images
 int	n[npts]			#I Number of good pixels
 real	wts[npts]		#I Weights
-int	npts			#I Number of output pixels per line
+size_t	npts			#I Number of output pixels per line
 
-int	i, j, k
+size_t	sz_val
+long	i
+int	j, k
 real	exp
 pointer	buf
+int	inint()
 long	impnli()
 
 pointer	exps			# Exposure times
@@ -38,7 +41,8 @@ begin
 	    einit = YES
 	}
 
-	call amovl (v, Meml[ev], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (v, Meml[ev], sz_val)
 	i = impnli (pm, buf, Meml[ev])
 	call aclri (Memi[buf], npts)
 	do i = 1, npts {
@@ -48,7 +52,7 @@ begin
 		if (wts[k] > 0.)
 		    exp = exp + Memr[exps+k-1]
 	    }
-	    Memi[buf] = nint((exp-ezero)/escale)
+	    Memi[buf] = inint((exp-ezero)/escale)
 	    buf = buf + 1
 	}
 end
@@ -58,14 +62,16 @@ end
 
 procedure ic_einit (in, nimages, key, default, maxval)
 
-int	in[nimages]		#I Image pointers
+pointer	in[nimages]		#I Image pointers
 int	nimages			#I Number of images
 char	key[ARB]		#I Exposure time keyword
 real	default			#I Default exposure time
 int	maxval			#I Maximum mask value
 
+size_t	sz_val
 int	i
-real	exp, emin, emax, efrac, imgetr()
+real	exp, emin, emax, efrac
+real	imgetr(), aabs()
 
 pointer	exps			# Exposure times
 pointer	ev			# IMIO coordinate vector
@@ -75,8 +81,10 @@ int	einit			# Initialization flag
 common	/emask/ exps, ev, ezero, escale, einit
 
 begin
-	call malloc (ev, IM_MAXDIM, TY_LONG)
-	call malloc (exps, nimages, TY_REAL)
+	sz_val = IM_MAXDIM
+	call malloc (ev, sz_val, TY_LONG)
+	sz_val = nimages
+	call malloc (exps, sz_val, TY_REAL)
 
 	emax = 0.
 	emin = MAX_REAL
@@ -88,7 +96,7 @@ begin
 	    emax = emax + exp
 	    if (exp > 0.)
 		emin = min (exp, emin)
-	    efrac = max (abs(exp-nint(exp)), efrac)
+	    efrac = max (aabs(exp-anint(exp)), efrac)
 	    Memr[exps+i-1] = exp
 	}
 

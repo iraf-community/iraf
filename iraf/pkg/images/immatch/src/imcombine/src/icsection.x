@@ -14,12 +14,13 @@ include	<ctype.h>
 procedure ic_section (section, x1, x2, xs, ndim)
 
 char	section[ARB]		# Image section
-int	x1[ndim]		# Starting pixel
-int	x2[ndim]		# Ending pixel
-int	xs[ndim]		# Step
+long	x1[ndim]		# Starting pixel
+long	x2[ndim]		# Ending pixel
+long	xs[ndim]		# Step
 int	ndim			# Number of dimensions
 
-int	i, ip, a, b, c, temp, ctoi()
+int	i, ip, ctol()
+long	a, b, c, temp
 define	error_	99
 
 begin
@@ -48,11 +49,11 @@ begin
 	    # Get a:b:c.  Allow notation such as "-*:c"
 	    # (or even "-:c") where the step is obviously negative.
 
-	    if (ctoi (section, ip, temp) > 0) {			# a
+	    if (ctol (section, ip, temp) > 0) {			# a
 		a = temp
 	        if (section[ip] == ':') {	
 		    ip = ip + 1
-		    if (ctoi (section, ip, b) == 0)		# a:b
+		    if (ctol (section, ip, b) == 0)		# a:b
 		        goto error_
 	        } else
 		    b = a
@@ -67,7 +68,7 @@ begin
 	        ip = ip + 1
 	    if (section[ip] == ':') {				# ..:step
 	        ip = ip + 1
-	        if (ctoi (section, ip, c) == 0)
+	        if (ctol (section, ip, c) == 0)
 		    goto error_
 	        else if (c == 0)
 		    goto error_

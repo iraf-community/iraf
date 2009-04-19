@@ -15,7 +15,7 @@ include	"icombine.h"
 procedure icombine (list, output, headers, bmask, rmask, nrmask, emask,
 	sigma, logfile, scales, zeros, wts, stack, delete, listonly)
 
-int	list				#I List of input images
+pointer	list				#I List of input images
 char	output[ARB]			#I Output image
 char	headers[ARB]			#I Output header rootname
 char	bmask[ARB]			#I Bad pixel mask
@@ -31,19 +31,23 @@ int	stack				#I Stack input images?
 int	delete				#I Delete input images?
 int	listonly			#I List images to combine?
 
+size_t	sz_val
 bool	proj
 char	input[SZ_FNAME], errstr[SZ_LINE]
-int	i, j, nimages, intype, stack1, err, bufsize_i
+int	i, j, nimages, intype, stack1, err
+size_t	bufsize_i
 pointer	sp, im, in1, in, out[6], offsets, key, tmp, bpmstack 
 size_t	bufsize, oldsize, maxsize, maxmemory, memory, sz_0
 
 char	clgetc()
 int	clgwrd(), imtlen(), imtgetim(), imtrgetim(), getdatatype()
 long	envgetl()
-int	errget(), open(), ty_max(), sizeof(), strmatch()
+int	errget(), open(), ty_max(), sizeof(), strmatch(), iint()
 pointer	immap(), xt_immap(), ic_pmmap()
 size_t	begmem()
+real	aabs()
 errchk	ic_imstack, immap, imunmap, xt_immap, ic_pmmap, ic_setout
+include	<nullptr.inc>
 
 include	"icombine.com"
 
@@ -95,10 +99,11 @@ begin
 retry_
 	iferr {
 	    call smark (sp)
-	    call salloc (in, 1, TY_POINTER)
+	    sz_val = 1
+	    call salloc (in, sz_val, TY_POINTER)
 
 	    nimages = 0
-	    in1 = NULL; Memi[in] = NULL; logfd = NULL
+	    in1 = NULL; Memp[in] = NULL; logfd = NULL
 	    out[1] = NULL; out[2] = NULL; out[3] = NULL
 	    out[4] = NULL; out[5] = NULL; out[6] = NULL
 
@@ -106,7 +111,8 @@ retry_
 	    if (stack1 == YES) {
 		proj = project
 		project = true
-		call salloc (bpmstack, SZ_FNAME, TY_CHAR)
+		sz_val = SZ_FNAME
+		call salloc (bpmstack, sz_val, TY_CHAR)
 		i = clgwrd ("masktype", Memc[bpmstack], SZ_FNAME, MASKTYPES)
 		if (i == M_NONE)
 		    Memc[bpmstack] = EOS
@@ -121,28 +127,31 @@ retry_
 
 	    # Open the input image(s).
 	    if (project) {
-		tmp = immap (input, READ_ONLY, 0); out[1] = tmp
+		tmp = immap (input, READ_ONLY, NULLPTR); out[1] = tmp
 		if (IM_NDIM(out[1]) == 1)
 		    call error (1, "Can't project one dimensional images")
 		nimages = IM_LEN(out[1],IM_NDIM(out[1]))
-		call salloc (in, nimages, TY_POINTER)
-		call amovki (out[1], Memi[in], nimages)
+		sz_val = nimages
+		call salloc (in, sz_val, TY_POINTER)
+		call amovkp (out[1], Memp[in], sz_val)
 	    } else {
-		call salloc (in, imtlen(list), TY_POINTER)
-		call amovki (NULL, Memi[in], imtlen(list))
+		sz_val = imtlen(list)
+		call salloc (in, sz_val, TY_POINTER)
+		sz_val = imtlen(list)
+		call amovkp (NULLPTR, Memp[in], sz_val)
 		call imtrew (list)
 		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
 		    nimages = nimages + 1
-		    tmp = xt_immap (input, READ_ONLY, 0, nimages)
-		    Memi[in+nimages-1] = tmp
+		    tmp = xt_immap (input, READ_ONLY, NULLPTR, nimages)
+		    Memp[in+nimages-1] = tmp
 		}
 
 		# Check sizes and set I/O option.
 		intype = 0
-		tmp = Memi[in]
+		tmp = Memp[in]
 		do i = 2, nimages {
 		    do j = 1, IM_NDIM(tmp) {
-			if (IM_LEN(tmp,j) != IM_LEN(Memi[in+i-1],j))
+			if (IM_LEN(tmp,j) != IM_LEN(Memp[in+i-1],j))
 			    intype = 1
 		    }
 		    if (intype == 1)
@@ -163,12 +172,12 @@ retry_
 
 	    if (reject == PCLIP) {
 		i = nimages / 2.
-		if (abs (pclip) < 1.)
+		if (aabs (pclip) < 1.)
 		    pclip = pclip * i
 		if (pclip < 0.)
-		    pclip = min (-1, max (-i, int (pclip)))
+		    pclip = min (-1, max (-i, iint(pclip)))
 		else
-		    pclip = max (1, min (i, int (pclip)))
+		    pclip = max (1, min (i, iint(pclip)))
 	    }
 
 	    if (reject == MINMAX) {
@@ -188,9 +197,10 @@ retry_
 	    if (stack1 == YES) {
 		call imtrew (list)
 		i = imtgetim (list, errstr, SZ_LINE)
-		in1 = immap (errstr, READ_ONLY, 0)
+		in1 = immap (errstr, READ_ONLY, NULLPTR)
 		tmp = immap (output, NEW_COPY, in1); out[1] = tmp
-		call salloc (key, SZ_FNAME, TY_CHAR)
+		sz_val = SZ_FNAME
+		call salloc (key, sz_val, TY_CHAR)
 		do i = 1, nimages {
 		    call sprintf (Memc[key], SZ_FNAME, "stck%04d")
 			call pargi (i)
@@ -204,25 +214,26 @@ retry_
 		    }
 		}
 	    } else {
-		tmp = immap (output, NEW_COPY, Memi[in]); out[1] = tmp
+		tmp = immap (output, NEW_COPY, Memp[in]); out[1] = tmp
 		if (project) {
 		    IM_LEN(out[1],IM_NDIM(out[1])) = 1
 		    IM_NDIM(out[1]) = IM_NDIM(out[1]) - 1
 		}
 	    }
-	    call salloc (offsets, nimages*IM_NDIM(out[1]), TY_INT)
-	    iferr (call ic_setout (Memi[in], out, Memi[offsets], nimages)) {
+	    sz_val = nimages*IM_NDIM(out[1])
+	    call salloc (offsets, sz_val, TY_LONG)
+	    iferr (call ic_setout (Memp[in], out, Meml[offsets], nimages)) {
 		call erract (EA_WARN)
 		call error (1, "Can't set output geometry")
 	    }
-	    call ic_hdr (Memi[in], out, nimages)
+	    call ic_hdr (Memp[in], out, nimages)
 	    iferr (call imdelf (out, "BPM"))
 		;
 
 	    # Determine the highest precedence datatype and set output datatype.
-	    intype = IM_PIXTYPE(Memi[in])
+	    intype = IM_PIXTYPE(Memp[in])
 	    do i = 2, nimages
-		intype = ty_max (intype, IM_PIXTYPE(Memi[in+i-1]))
+		intype = ty_max (intype, IM_PIXTYPE(Memp[in+i-1]))
 	    IM_PIXTYPE(out[1]) = getdatatype (clgetc ("outtype"))
 	    if (IM_PIXTYPE(out[1]) == ERR)
 		IM_PIXTYPE(out[1]) = intype
@@ -233,8 +244,10 @@ retry_
 		IM_NDIM(out[4]) = IM_NDIM(out[4]) + 1
 		IM_LEN(out[4],IM_NDIM(out[4])) = nimages
 		if (!project) {
-		    if (key == NULL)
-			call salloc (key, SZ_FNAME, TY_CHAR)
+		    if (key == NULL) {
+			sz_val = SZ_FNAME
+			call salloc (key, sz_val, TY_CHAR)
+		    }
 		    do i = 100, nimages {
 			j = imtrgetim (list, i, input, SZ_FNAME)
 			if (i < 999)
@@ -279,7 +292,7 @@ retry_
 		out[3] = NULL
 
 	    # Open masks.
-	    call ic_mopen (Memi[in], out, nimages, Memi[offsets])
+	    call ic_mopen (Memp[in], out, nimages, Meml[offsets])
 
 	    # Open the log file.
 	    logfd = NULL
@@ -313,19 +326,22 @@ retry_
 	    bufsize_i = bufsize
 	    switch (ty_max (intype, IM_PIXTYPE(out[1]))) {
 	    case TY_SHORT:
-		call icombines (Memi[in], out, scales, zeros,
-		    wts, Memi[offsets], nimages, bufsize_i)
-	    case TY_USHORT, TY_INT, TY_LONG:
-		call icombinei (Memi[in], out, scales, zeros,
-		    wts, Memi[offsets], nimages, bufsize_i)
+		call icombines (Memp[in], out, scales, zeros,
+		    wts, Meml[offsets], nimages, bufsize_i)
+	    case TY_USHORT, TY_INT:
+		call icombinei (Memp[in], out, scales, zeros,
+		    wts, Meml[offsets], nimages, bufsize_i)
+	    case TY_LONG:
+		call icombinel (Memp[in], out, scales, zeros,
+		    wts, Meml[offsets], nimages, bufsize_i)
 	    case TY_DOUBLE:
-		call icombined (Memi[in], out, scales, zeros,
-		    wts, Memi[offsets], nimages, bufsize_i)
+		call icombined (Memp[in], out, scales, zeros,
+		    wts, Meml[offsets], nimages, bufsize_i)
 	    case TY_COMPLEX:
 		call error (1, "Complex images not allowed")
 	    default:
-		call icombiner (Memi[in], out, scales, zeros,
-		    wts, Memi[offsets], nimages, bufsize_i)
+		call icombiner (Memp[in], out, scales, zeros,
+		    wts, Meml[offsets], nimages, bufsize_i)
 	    }
 	} then {
 	    err = errget (errstr, SZ_LINE)
@@ -334,8 +350,8 @@ retry_
 	    call ic_mclose (nimages)
 	    if (!project) {
 		do j = 2, nimages {
-		    if (Memi[in+j-1] != NULL)
-			call xt_imunmap (Memi[in+j-1], j)
+		    if (Memp[in+j-1] != NULL)
+			call xt_imunmap (Memp[in+j-1], j)
 		}
 	    }
 	    if (out[2] != NULL) {
@@ -368,8 +384,8 @@ retry_
 		iferr (call imdelete (output))
 		    ;
 	    }
-	    if (Memi[in] != NULL)
-		call xt_imunmap (Memi[in], 1)
+	    if (Memp[in] != NULL)
+		call xt_imunmap (Memp[in], 1)
 	    if (in1 != NULL)
 		call imunmap (in1)
 	    if (logfd != NULL)
@@ -427,7 +443,7 @@ err_
 	    # axis reduced WCS.
 	    iferr {
 		call imunmap (out[4])
-		out[4] = immap (rmask, READ_WRITE, 0)
+		out[4] = immap (rmask, READ_WRITE, NULLPTR)
 		i = IM_NDIM(out[4])
 		call imaddi (out[4], "WCSDIM", i)
 		call sprintf (errstr, SZ_LINE, "LTM%d_%d")
@@ -455,7 +471,7 @@ err_
 		# This might be the same as the output image.
 		iferr {
 		    do i = 1, nimages {
-			im = Memi[in+i-1]
+			im = Memp[in+i-1]
 			call imstats (im, IM_IMAGENAME, input, SZ_FNAME)
 			if (strmatch (headers, ".fits$") == 0) {
 			    call sprintf (errstr, SZ_LINE, "%s.fits[append]")
@@ -469,7 +485,7 @@ err_
 			do j = 1, IM_NDIM(im) {
 			    call sprintf (errstr, SZ_LINE, "AXLEN%d")
 				call pargi (j)
-			    call imaddi (tmp, errstr, IM_LEN(im,j))
+			    call imaddl (tmp, errstr, IM_LEN(im,j))
 			}
 			call imastr (tmp, "INIMAGE", input)
 			call imastr (tmp, "OUTIMAGE", output)
@@ -486,12 +502,12 @@ err_
 	}
 	if (!project) {
 	    do i = 2, nimages {
-		if (Memi[in+i-1] != NULL)
-		    call xt_imunmap (Memi[in+i-1], i)
+		if (Memp[in+i-1] != NULL)
+		    call xt_imunmap (Memp[in+i-1], i)
 	    }
 	}
-	if (Memi[in] != NULL)
-	    call xt_imunmap (Memi[in], 1)
+	if (Memp[in] != NULL)
+	    call xt_imunmap (Memp[in], 1)
 	if (in1 != NULL)
 	    call imunmap (in1)
 	if (stack1 == YES) {

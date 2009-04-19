@@ -16,31 +16,34 @@ pointer	sp, fname, output, headers, bmask, rmask, sigma, nrmask, emask, logfile
 pointer	scales, zeros, wts, im
 int	n
 pointer	input, ilist, olist, hlist, blist, rlist, slist, nrlist, elist
+size_t	sz_val
 
 bool	clgetb()
 real	clgetr()
 int	clgwrd(), clgeti(), imtgetim(), imtlen()
 pointer	imtopenp(), imtopen(), immap()
 errchk	immap, icombine
+include	<nullptr.inc>
 
 include	"src/icombine.com"
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (headers, SZ_FNAME, TY_CHAR)
-	call salloc (bmask, SZ_FNAME, TY_CHAR)
-	call salloc (rmask, SZ_FNAME, TY_CHAR)
-	call salloc (nrmask, SZ_FNAME, TY_CHAR)
-	call salloc (emask, SZ_FNAME, TY_CHAR)
-	call salloc (sigma, SZ_FNAME, TY_CHAR)
-	call salloc (expkeyword, SZ_FNAME, TY_CHAR)
-	call salloc (statsec, SZ_FNAME, TY_CHAR)
-	call salloc (gain, SZ_FNAME, TY_CHAR)
-	call salloc (rdnoise, SZ_FNAME, TY_CHAR)
-	call salloc (snoise, SZ_FNAME, TY_CHAR)
-	call salloc (logfile, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	call salloc (headers, sz_val, TY_CHAR)
+	call salloc (bmask, sz_val, TY_CHAR)
+	call salloc (rmask, sz_val, TY_CHAR)
+	call salloc (nrmask, sz_val, TY_CHAR)
+	call salloc (emask, sz_val, TY_CHAR)
+	call salloc (sigma, sz_val, TY_CHAR)
+	call salloc (expkeyword, sz_val, TY_CHAR)
+	call salloc (statsec, sz_val, TY_CHAR)
+	call salloc (gain, sz_val, TY_CHAR)
+	call salloc (rdnoise, sz_val, TY_CHAR)
+	call salloc (snoise, sz_val, TY_CHAR)
+	call salloc (logfile, sz_val, TY_CHAR)
 
 	# Get task parameters.  Some additional parameters are obtained later.
 	ilist = imtopenp ("input")
@@ -171,7 +174,7 @@ begin
 
 		# Set the input list and initialize the scaling factors.
 		if (project) {
-		    im = immap (Memc[fname], READ_ONLY, 0)
+		    im = immap (Memc[fname], READ_ONLY, NULLPTR)
 		    if (IM_NDIM(im) == 1)
 			n = 0
 		    else
@@ -191,10 +194,12 @@ begin
 		}
 
 		# Allocate and initialize scaling factors.
-		call malloc (scales, 3*n, TY_REAL)
+		sz_val = 3*n
+		call malloc (scales, sz_val, TY_REAL)
 		zeros = scales + n
 		wts = scales + 2 * n
-		call amovkr (INDEFR, Memr[scales], 3*n)
+		sz_val = 3*n
+		call amovkr (INDEFR, Memr[scales], sz_val)
 
 		call icombine (input, Memc[output], Memc[headers], Memc[bmask],
 		    Memc[rmask], Memc[nrmask], Memc[emask], Memc[sigma],

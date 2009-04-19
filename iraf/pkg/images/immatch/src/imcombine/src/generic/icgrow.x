@@ -15,12 +15,16 @@ pointer	m[ARB]			# Image id pointers
 int	n[ARB]			# Number of good pixels
 int	buf[npts,nimages]	# Working buffer
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 pointer	pms			# Pointer to array of pixel masks
 
-int	i, j, k, l, line, nl, rop, igrow, nset, ncompress, or()
+size_t	sz_val
+size_t	nl
+int	i, k, l, rop, igrow, ncompress
+long	j, nset, line
 real	grow2, i2
 pointer	mp, pm, pm_newmask()
+int	or()
 errchk	pm_newmask()
 
 include	"../icombine.com"
@@ -59,7 +63,8 @@ begin
 		return
 
 	    if (pms == NULL) {
-		call malloc (pms, nimages, TY_POINTER)
+		sz_val = nimages
+		call malloc (pms, sz_val, TY_POINTER)
 		do i = 1, nimages
 		    Memp[pms+i-1] = pm_newmask (out, 1)
 		ncompress = 0
@@ -100,10 +105,11 @@ pointer	m[ARB]			# Image id pointers
 int	n[ARB]			# Number of good pixels
 int	buf[ARB]		# Buffer of npts
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 pointer	pms			# Pointer to array of pixel masks
 
-int	i, j, k
+long	i
+int	j, k
 pointer	pm
 bool	pl_linenotempty()
 
@@ -143,10 +149,11 @@ pointer	m[ARB]			# Image id pointers
 int	n[ARB]			# Number of good pixels
 int	buf[ARB]		# Buffer of npts
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 pointer	pms			# Pointer to array of pixel masks
 
-int	i, j, k
+long	i
+int	j, k
 pointer	pm
 bool	pl_linenotempty()
 
@@ -178,6 +185,50 @@ end
 
 # IC_GROW$T --  Reject pixels.
 
+procedure ic_growl (v, d, m, n, buf, nimages, npts, pms)
+
+long	v[ARB]			# Output vector
+pointer	d[ARB]			# Data pointers
+pointer	m[ARB]			# Image id pointers
+int	n[ARB]			# Number of good pixels
+int	buf[ARB]		# Buffer of npts
+int	nimages			# Number of images
+size_t	npts			# Number of output points per line
+pointer	pms			# Pointer to array of pixel masks
+
+long	i
+int	j, k
+pointer	pm
+bool	pl_linenotempty()
+
+include	"../icombine.com"
+
+begin
+	do k = 1, nimages {
+	    pm = Memp[pms+k-1]
+	    if (!pl_linenotempty (pm, v))
+		next
+	    call pmglpi (pm, v, buf, 1, npts, PIX_SRC)
+	    do i = 1, npts {
+		if (buf[i] == 0)
+		    next
+		for (j = 1; j <= n[i]; j = j + 1) {
+		    if (Memi[m[j]+i-1] == k) {
+			if (j < n[i]) {
+			    Meml[d[j]+i-1] = Meml[d[n[i]]+i-1]
+			    Memi[m[j]+i-1] = Memi[m[n[i]]+i-1]
+			}
+			n[i] = n[i] - 1
+			dflag = D_MIX
+			break
+		    }
+		}
+	    }
+	}
+end
+
+# IC_GROW$T --  Reject pixels.
+
 procedure ic_growr (v, d, m, n, buf, nimages, npts, pms)
 
 long	v[ARB]			# Output vector
@@ -186,10 +237,11 @@ pointer	m[ARB]			# Image id pointers
 int	n[ARB]			# Number of good pixels
 int	buf[ARB]		# Buffer of npts
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 pointer	pms			# Pointer to array of pixel masks
 
-int	i, j, k
+long	i
+int	j, k
 pointer	pm
 bool	pl_linenotempty()
 
@@ -229,10 +281,11 @@ pointer	m[ARB]			# Image id pointers
 int	n[ARB]			# Number of good pixels
 int	buf[ARB]		# Buffer of npts
 int	nimages			# Number of images
-int	npts			# Number of output points per line
+size_t	npts			# Number of output points per line
 pointer	pms			# Pointer to array of pixel masks
 
-int	i, j, k
+long	i
+int	j, k
 pointer	pm
 bool	pl_linenotempty()
 

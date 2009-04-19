@@ -8,11 +8,14 @@ include	<imhdr.h>
 
 procedure ic_imstack (list, output, mask)
 
-int	list		#I List of images
+pointer	list		#I List of images
 char	output[ARB]	#I Name of output image
 char	mask[ARB]	#I Name of output mask
 
-int	i, j, npix
+size_t	sz_val
+long	c_1
+int	i, j
+size_t	npix
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM], line_outbpm[IM_MAXDIM]
 pointer	sp, input, bpmname, key, in, out, inbpm, outbpm, buf_in, buf_out, ptr
 
@@ -23,12 +26,16 @@ pointer	immap(), pm_newmask()
 errchk	immap
 errchk	imgnls, imgnli, imgnll, imgnlr, imgnld, imgnlx
 errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
+include	<nullptr.inc>
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (bpmname, SZ_FNAME, TY_CHAR)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	call salloc (bpmname, sz_val, TY_CHAR)
+	call salloc (key, sz_val, TY_CHAR)
 
 	iferr {
 	    # Add each input image to the output image.
@@ -38,7 +45,7 @@ begin
 
 		i = i + 1
 		in = NULL; inbpm = NULL
-		ptr = immap (Memc[input], READ_ONLY, 0)
+		ptr = immap (Memc[input], READ_ONLY, NULLPTR)
 		in = ptr
 
 		# For the first input image map the output image as a copy
@@ -50,14 +57,16 @@ begin
 		    IM_NDIM(out) = IM_NDIM(out) + 1
 		    IM_LEN(out, IM_NDIM(out)) = imtlen (list)
 		    npix = IM_LEN(out, 1)
-		    call amovkl (long(1), line_out, IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovkl (c_1, line_out, sz_val)
 
 		    if (mask[1] != EOS) {
 			ptr = immap (mask, NEW_COPY, in)
 			outbpm = ptr
 			IM_NDIM(outbpm) = IM_NDIM(outbpm) + 1
 			IM_LEN(outbpm, IM_NDIM(outbpm)) = imtlen (list)
-			call amovkl (long(1), line_outbpm, IM_MAXDIM)
+			sz_val = IM_MAXDIM
+			call amovkl (c_1, line_outbpm, sz_val)
 		    }
 		}
 
@@ -77,7 +86,8 @@ begin
 		# the output image.  Switch on the output data type to optimize
 		# IMIO.
 
-		call amovkl (long(1), line_in, IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovkl (c_1, line_in, sz_val)
 		switch (IM_PIXTYPE (out)) {
 		case TY_SHORT:
 		    while (imgnls (in, buf_in, line_in) != EOF) {
@@ -85,13 +95,13 @@ begin
 			    call error (0, "Error writing output image")
 			call amovs (Mems[buf_in], Mems[buf_out], npix)
 		    }
-		case TY_INT:
+		case TY_USHORT, TY_INT:
 		    while (imgnli (in, buf_in, line_in) != EOF) {
 			if (impnli (out, buf_out, line_out) == EOF)
 			    call error (0, "Error writing output image")
 			call amovi (Memi[buf_in], Memi[buf_out], npix)
 		    }
-		case TY_USHORT, TY_LONG:
+		case TY_LONG:
 		    while (imgnll (in, buf_in, line_in) != EOF) {
 			if (impnll (out, buf_out, line_out) == EOF)
 			    call error (0, "Error writing output image")
@@ -129,7 +139,7 @@ begin
 			Memc[bpmname] = EOS
 			ptr = pm_newmask (in, 27)
 		    } else
-			ptr = immap (Memc[bpmname], READ_ONLY, 0)
+			ptr = immap (Memc[bpmname], READ_ONLY, NULLPTR)
 		    inbpm = ptr
 
 		    if (IM_NDIM(inbpm) != IM_NDIM(outbpm) - 1)
@@ -139,7 +149,8 @@ begin
 			    call error (0, "Masks not consistent")
 		    }
 
-		    call amovkl (long(1), line_in, IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovkl (c_1, line_in, sz_val)
 		    while (imgnli (inbpm, buf_in, line_in) != EOF) {
 			if (impnli (outbpm, buf_out, line_outbpm) == EOF)
 			    call error (0, "Error writing output mask")

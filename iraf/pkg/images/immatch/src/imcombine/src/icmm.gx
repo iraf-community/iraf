@@ -2,18 +2,19 @@
 
 include	"../icombine.h"
 
-$for (sird)
+$for (silrd)
 # IC_MM --  Reject a specified number of high and low pixels
 
 procedure ic_mm$t (d, m, n, npts)
 
 pointer	d[ARB]		# Data pointers
 pointer	m[ARB]		# Image ID pointers
-int	n[npts]			# Number of good pixels
-int	npts			# Number of output points per line
+int	n[npts]		# Number of good pixels
+size_t	npts		# Number of output points per line
 
 int	n1, ncombine, npairs, nlow, nhigh, np
-int	i, i1, j, jmax, jmin
+int	j, jmax, jmin, id
+long	i, i1
 pointer	k, kmax, kmin
 PIXEL	d1, d2, dmin, dmax
 
@@ -73,27 +74,27 @@ begin
 		    if (jmax < j) {
 			if (jmin != j) {
 			    Mem$t[kmax] = d2
-			    k = Memi[m[jmax]+i1]
+			    id = Memi[m[jmax]+i1]
 			    Memi[m[jmax]+i1] = Memi[m[j]+i1]
-			    Memi[m[j]+i1] = k
+			    Memi[m[j]+i1] = id
 			} else {
 			    Mem$t[kmax] = d1
-			    k = Memi[m[jmax]+i1]
+			    id = Memi[m[jmax]+i1]
 			    Memi[m[jmax]+i1] = Memi[m[n1]+i1]
-			    Memi[m[n1]+i1] = k
+			    Memi[m[n1]+i1] = id
 			}
 		    }
 		    if (jmin < j) {
 			if (jmax != n1) {
 			    Mem$t[kmin] = d1
-			    k = Memi[m[jmin]+i1]
+			    id = Memi[m[jmin]+i1]
 			    Memi[m[jmin]+i1] = Memi[m[n1]+i1]
-			    Memi[m[n1]+i1] = k
+			    Memi[m[n1]+i1] = id
 			} else {
 			    Mem$t[kmin] = d2
-			    k = Memi[m[jmin]+i1]
+			    id = Memi[m[jmin]+i1]
 			    Memi[m[jmin]+i1] = Memi[m[j]+i1]
-			    Memi[m[j]+i1] = k
+			    Memi[m[j]+i1] = id
 			}
 		    }
 		} else {
@@ -136,9 +137,9 @@ begin
 		if (keepids) {
 		    if (jmin < n1) {
 			Mem$t[kmin] = d1
-			k = Memi[m[jmin]+i1]
+			id = Memi[m[jmin]+i1]
 			Memi[m[jmin]+i1] = Memi[m[n1]+i1]
-			Memi[m[n1]+i1] = k
+			Memi[m[n1]+i1] = id
 		    }
 		} else {
 		    if (jmin < n1)
@@ -170,9 +171,9 @@ begin
 		if (keepids) {
 		    if (jmax < n1) {
 			Mem$t[kmax] = d1
-			k = Memi[m[jmax]+i1]
+			id = Memi[m[jmax]+i1]
 			Memi[m[jmax]+i1] = Memi[m[n1]+i1]
-			Memi[m[n1]+i1] = k
+			Memi[m[n1]+i1] = id
 		    }
 		} else {
 		    if (jmax < n1)
