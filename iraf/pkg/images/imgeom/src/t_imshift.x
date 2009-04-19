@@ -242,7 +242,7 @@ begin
 		    call error (5, wrerr)
 		call amovs (Mems[buf1], Mems[buf2], ncols)
 	    }
-	case TY_INT:
+	case TY_USHORT, TY_INT:
 	    do i = 1, nlines {
 	        if (impnli (im2, buf2, v) == EOF)
 		    call error (5, wrerr)
@@ -252,7 +252,7 @@ begin
 		    call error (5, wrerr)
 		call amovi (Memi[buf1], Memi[buf2], ncols)
 	    }
-	case TY_USHORT, TY_LONG:
+	case TY_LONG:
 	    do i = 1, nlines {
 	        if (impnll (im2, buf2, v) == EOF)
 		    call error (5, wrerr)

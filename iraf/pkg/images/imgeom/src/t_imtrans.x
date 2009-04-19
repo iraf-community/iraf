@@ -128,11 +128,11 @@ begin
 		    buf_in = imgs2s (im_in, x1, x2, y1, y2)
 		    buf_out = imps2s (im_out, y1, y2, x1, x2)
 		    call imtr2s (Mems[buf_in], Mems[buf_out], nx, ny)
-		case TY_INT:
+		case TY_USHORT, TY_INT:
 		    buf_in = imgs2i (im_in, x1, x2, y1, y2)
 		    buf_out = imps2i (im_out, y1, y2, x1, x2)
 		    call imtr2i (Memi[buf_in], Memi[buf_out], nx, ny)
-		case TY_USHORT, TY_LONG:
+		case TY_LONG:
 		    buf_in = imgs2l (im_in, x1, x2, y1, y2)
 		    buf_out = imps2l (im_out, y1, y2, x1, x2)
 		    call imtr2l (Meml[buf_in], Meml[buf_out], nx, ny)

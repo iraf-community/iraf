@@ -323,10 +323,10 @@ begin
         case TY_SHORT:
             while (impnls (im, buf, Meml[v]) != EOF)
                 call amovks (sint(constant), Mems[buf], npix)
-        case TY_INT:
+        case TY_USHORT, TY_INT:
             while (impnli (im, buf, Meml[v]) != EOF)
                 call amovki (iint(constant), Memi[buf], npix)
-        case TY_USHORT, TY_LONG:
+        case TY_LONG:
             while (impnll (im, buf, Meml[v]) != EOF)
                 call amovkl (lint(constant), Meml[buf], npix)
         case TY_REAL:

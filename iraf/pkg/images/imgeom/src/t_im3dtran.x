@@ -208,7 +208,7 @@ begin
 			    call tzyx3s (Mems[buf_in], Mems[buf_out], nx,ny,nz)
 			}
 
-		    case TY_INT:
+		    case TY_USHORT, TY_INT:
 			buf_in = imgs3i (im_in, x1, x2, y1, y2, z1, z2)
 			switch (which3d) {
 			case XYZ:
@@ -231,7 +231,7 @@ begin
 			    call tzyx3i (Memi[buf_in], Memi[buf_out], nx,ny,nz)
 			}
 
-		    case TY_LONG, TY_USHORT:
+		    case TY_LONG:
 			buf_in = imgs3l (im_in, x1, x2, y1, y2, z1, z2)
 			switch (which3d) {
 			case XYZ:
