@@ -12,14 +12,15 @@ real	y[ARB]				#I the reference vector
 real	xerr[ARB]			#I the input vector errors squared
 real	yerr[ARB]			#I the reference vector errors squared
 real	weight[ARB]			#I the input weight array
-int	npts				#I the number of points
+size_t	npts				#I the number of points
 int	maxiter				#I the number of iterations
 real	answers[ARB]			#I/O the answers array
 int	nreject				#I the max number of rejection cycles
 real	locut				#I the low side rejection parameter
 real	hicut				#I the high side rejection parameter
 
-int	i, niter, nrej
+int	niter
+long	i, nrej
 real	loval, hival, resid
 
 begin
@@ -70,13 +71,15 @@ real	y[ARB]				#I the reference vector
 real	xerr[ARB]			#I the input vector errors squared
 real	yerr[ARB]			#I the reference vector errors squared
 real	weight[ARB]			#I the input weight array
-int	npts				#I the number of points
+size_t	npts				#I the number of points
 int	niter				#I the number of iterations
 real	answers[ARB]			#I/O the answers array
 
-int	i, j
+int	i
+long	j
 pointer	bufr, bufx, bufw
 real	slope, yintrcpt, me1, msq, wt, dm, db
+real	aabs()
 
 begin
 	# Peform the initial fit.
@@ -117,7 +120,7 @@ begin
 	    call ll_0lsqf1 (Memr[bufx], Memr[bufr], Memr[bufw], npts, answers)
 	    if (IS_INDEFR(CHI[answers]))
 	        break
-	    if (abs ((me1 - CHI[answers]) / CHI[answers]) < 1.0e-5)
+	    if (aabs ((me1 - CHI[answers]) / CHI[answers]) < 1.0e-5)
 		break
 	    dm = SLOPE[answers]
 	    db = YINCPT[answers]
@@ -144,10 +147,10 @@ procedure ll_0lsqf1 (x, y, w, npts, answers)
 real	x[ARB]				#I the input vector
 real	y[ARB]				#I the reference vector
 real	w[ARB]				#I the weight vector
-int	npts				#I the number of points
+size_t	npts				#I the number of points
 real	answers[ARB]			#I the answers
 
-int	i, ngood
+long	i, ngood
 double	sumyy, sumxx, sumxy, sumx, sumy, sumw
 double	a, b, det
 real	wressq, ressq
@@ -193,8 +196,8 @@ begin
 		RMS[answers] = 0.0
 	    } else if (wressq >= 0.0) {
 		CHI[answers] = sqrt (wressq / (ngood - 2))
-		ESLOPE[answers] = CHI[answers] * sqrt (real (sumw / abs(det)))
-		EYINCPT[answers] = CHI[answers] * sqrt (real (sumxx / abs(det)))
+		ESLOPE[answers] = CHI[answers] * sqrt (real (sumw / dabs(det)))
+		EYINCPT[answers] = CHI[answers] * sqrt (real (sumxx / dabs(det)))
 		RMS[answers] = sqrt (ressq / (ngood - 2))
 	    } else {
 		CHI[answers] = 0.0
@@ -384,10 +387,10 @@ end
 double	procedure ll_dsum1 (a, n)
 
 real	a[ARB]			#I the input vector
-int	n			#I the number of points
+size_t	n			#I the number of points
 
 double	sum
-int	i
+long	i
 
 begin
 	sum = 0.0d0
@@ -404,10 +407,10 @@ double	procedure ll_dsum2 (a, b, n)
 
 real	a[n]		#I the input vector 
 real	b[n]		#I the weight vector
-int	n		#I the number of points
+size_t	n		#I the number of points
 
 double	sum
-int	i
+long	i
 
 begin
 	sum = 0.0d0
@@ -428,10 +431,10 @@ double	procedure ll_dsum3 (a, b, c, n)
 real	a[n]			#I first input vector
 real	b[n]			#I second input vector
 real	c[n]			#I input weight vector
-int	n			#I the number of points
+size_t	n			#I the number of points
 
 double	sum
-int	i
+long	i
 
 begin
 	sum = 0.0d0

@@ -8,13 +8,16 @@ pointer	db			#I pointer to the database file
 int	dformat			#I is the scaling file in database format
 pointer	ls			#I pointer to the linmatch structure
 
+size_t	sz_val
+int	i_val
 pointer	sp, image
 real	rg_lstatr()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
 
 	if (dformat == YES) {
 	    call rg_ldbparams (db, ls)
@@ -22,7 +25,8 @@ begin
 	    call rg_ldbtscale (db, ls)
 	} else {
 	    call rg_lstats (ls, IMAGE, Memc[image], SZ_FNAME)
-	    call fprintf (db, "%s  %g %g  %g %g")
+	    i_val = db
+	    call fprintf (i_val, "%s  %g %g  %g %g")
 		call pargstr (Memc[image])
 		call pargr (rg_lstatr(ls, TBSCALE))
 		call pargr (rg_lstatr(ls, TBZERO))
@@ -41,9 +45,12 @@ procedure rg_lwreg (db, ls)
 pointer	db		#I pointer to the database file
 pointer	ls		#I pointer to the intensity matching structure
 
-int	i, nregions, rc1, rc2, rl1, rl2, c1, c2, l1, l2, del
+long	i
+size_t	nregions
+int	del
+long	rc1, rc2, rl1, rl2, c1, c2, l1, l2
 real	xshift, yshift, bscale, bzero, bserr, bzerr
-int	rg_lstati()
+long	rg_lstatl()
 pointer	rg_lstatp()
 real	rg_lstatr()
 
@@ -51,27 +58,27 @@ begin
 	xshift = rg_lstatr (ls, SXSHIFT)
 	yshift = rg_lstatr (ls, SYSHIFT)
 
-	nregions = rg_lstati (ls, NREGIONS)
+	nregions = rg_lstatl (ls, NREGIONS)
 	do i = 1, nregions  {
 
-	    rc1 = Memi[rg_lstatp (ls, RC1)+i-1]
-	    rc2 = Memi[rg_lstatp (ls, RC2)+i-1]
-	    rl1 = Memi[rg_lstatp (ls, RL1)+i-1]
-	    rl2 = Memi[rg_lstatp (ls, RL2)+i-1]
-	    if (IS_INDEFI(rc1))
-		c1 = INDEFI
+	    rc1 = Meml[rg_lstatp (ls, RC1)+i-1]
+	    rc2 = Meml[rg_lstatp (ls, RC2)+i-1]
+	    rl1 = Meml[rg_lstatp (ls, RL1)+i-1]
+	    rl2 = Meml[rg_lstatp (ls, RL2)+i-1]
+	    if (IS_INDEFL(rc1))
+		c1 = INDEFL
 	    else
 	        c1 = rc1 + xshift
-	    if (IS_INDEFI(rc2))
-		c2 = INDEFI
+	    if (IS_INDEFL(rc2))
+		c2 = INDEFL
 	    else
 	        c2 = rc2 + xshift
-	    if (IS_INDEFI(rl1))
-		l1 = INDEFI
+	    if (IS_INDEFL(rl1))
+		l1 = INDEFL
 	    else
 	        l1 = rl1 + yshift
-	    if (IS_INDEFI(rl2))
-		l2 = INDEFI
+	    if (IS_INDEFL(rl2))
+		l2 = INDEFL
 	    else
 	        l2 = rl2 + yshift
 
@@ -94,12 +101,14 @@ procedure rg_ldbparams (db, ls)
 pointer	db		#I pointer to the database file
 pointer	ls		#I pointer to the intensity matching structure
 
+size_t	sz_val
 pointer	sp, str
-int	rg_lstati()
+long	rg_lstatl()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Write out the time record was written.
 	call dtput (db, "\n")
@@ -122,7 +131,7 @@ begin
 
 	call dtput (db, "\t%s\t%d\n")
 	    call pargstr (KY_NREGIONS)
-	    call pargi (rg_lstati(ls, NREGIONS))
+	    call pargl (rg_lstatl(ls, NREGIONS))
 
 	call sfree (sp)
 end
@@ -134,10 +143,10 @@ procedure rg_ldbscaler (db, rc1, rc2, rl1, rl2, c1, c2, l1, l2, bscale,
 	bzero, bserr, bzerr, del)
 
 pointer	db		# pointer to the database file
-int	rc1, rc2	# reference image region column limits
-int	rl1, rl2	# reference image region line limits
-int	c1, c2		# image region column limits
-int	l1, l2		# image region line limits
+long	rc1, rc2	# reference image region column limits
+long	rl1, rl2	# reference image region line limits
+long	c1, c2		# image region column limits
+long	l1, l2		# image region line limits
 real	bscale 		# the scaling parameter
 real	bzero 		# the offset parameter
 real	bserr		# the error in the scaling parameter
@@ -145,18 +154,18 @@ real	bzerr		# the error in the offset parameter
 int	del		# the deletions index
 
 begin
-	if (IS_INDEFI(rc1) || IS_INDEFI(c1)) {
+	if (IS_INDEFL(rc1) || IS_INDEFL(c1)) {
 	    call dtput (db,"\t[INDEF] [INDEF]  %g %g  %g %g  %s\n")
 	} else {
 	    call dtput (db,"\t[%d:%d,%d:%d] [%d:%d,%d:%d]  %g %g  %g %g  %s\n")
-	        call pargi (rc1)
-	        call pargi (rc2)
-	        call pargi (rl1)
-	        call pargi (rl2)
-	        call pargi (c1)
-	        call pargi (c2)
-	        call pargi (l1)
-	        call pargi (l2)
+	        call pargl (rc1)
+	        call pargl (rc2)
+	        call pargl (rl1)
+	        call pargl (rl2)
+	        call pargl (c1)
+	        call pargl (c2)
+	        call pargl (l1)
+	        call pargl (l2)
 	}
 
 	    call pargr (bscale)
@@ -196,7 +205,7 @@ end
 procedure rg_lpwrec (ls, i)
 
 pointer	ls		#I pointer to the linmatch structure
-int	i		#I the current region
+long	i		#I the current region
 
 pointer rg_lstatp()
 real	rg_lstatr()
@@ -212,11 +221,11 @@ begin
 	} else {
 	    call printf (
 	    "Region %d: [%d:%d,%d:%d] bscale = %g +/- %g bzero = %g +/- %g\n")
-	        call pargi (i)
-		call pargi (Memi[rg_lstatp(ls,RC1)+i-1])
-		call pargi (Memi[rg_lstatp(ls,RC2)+i-1])
-		call pargi (Memi[rg_lstatp(ls,RL1)+i-1])
-		call pargi (Memi[rg_lstatp(ls,RL2)+i-1])
+	        call pargl (i)
+		call pargl (Meml[rg_lstatp(ls,RC1)+i-1])
+		call pargl (Meml[rg_lstatp(ls,RC2)+i-1])
+		call pargl (Meml[rg_lstatp(ls,RL1)+i-1])
+		call pargl (Meml[rg_lstatp(ls,RL2)+i-1])
 		call pargr (Memr[rg_lstatp(ls,RBSCALE)+i-1])
 		call pargr (Memr[rg_lstatp(ls,RBSCALEERR)+i-1])
 		call pargr (Memr[rg_lstatp(ls,RBZERO)+i-1])

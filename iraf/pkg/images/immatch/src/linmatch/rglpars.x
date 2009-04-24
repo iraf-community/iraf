@@ -9,19 +9,22 @@ procedure rg_glpars (ls)
 
 pointer ls              #I pointer to iscale structure
 
+size_t	sz_val
 int	ip, nchars
 pointer sp, str1, str2
-int     clgeti(), nscan(), lexnum()
+int	clgeti(), nscan(), lexnum()
+long	clgetl()
 real    clgetr()
 
 begin
         # Allocate working space.
         call smark (sp)
-        call salloc (str1, SZ_LINE, TY_CHAR)
-        call salloc (str2, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (str1, sz_val, TY_CHAR)
+        call salloc (str2, sz_val, TY_CHAR)
 
         # Initialize the linscale structure.
-        call rg_linit (ls, clgeti ("maxnregions"))
+        call rg_linit (ls, clgetl ("maxnregions"))
 
 	# Get the x and y shifts.
 	call rg_lsetr (ls, XSHIFT, clgetr("xshift"))
@@ -41,8 +44,8 @@ begin
 	else
             call rg_lsets (ls, BZSTRING, "0.0")
 
-        call rg_lseti (ls, DNX, clgeti ("dnx"))
-        call rg_lseti (ls, DNY, clgeti ("dny"))
+        call rg_lsetl (ls, DNX, clgetl ("dnx"))
+        call rg_lsetl (ls, DNY, clgetl ("dny"))
         call rg_lseti (ls, MAXITER, clgeti ("maxiter"))
         call rg_lsetr (ls, DATAMIN, clgetr ("datamin"))
         call rg_lsetr (ls, DATAMAX, clgetr ("datamax"))
@@ -65,16 +68,19 @@ procedure rg_plpars (ls)
 
 pointer	ls		# pointer to the linscale structure
 
+size_t	sz_val
 pointer	sp, str1, str2, str
 int	rg_lstati()
+long	rg_lstatl()
 real	rg_lstatr()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Set the x and y shifts parameters.
 	call clputr ("xshift", rg_lstatr (ls, XSHIFT))
@@ -87,8 +93,8 @@ begin
 	    call pargstr (Memc[str1])
 	    call pargstr (Memc[str2])
 	call clpstr ("scaling", Memc[str])
-	call clputi ("dnx", rg_lstati (ls, DNX))
-	call clputi ("dny", rg_lstati (ls, DNY))
+	call clputl ("dnx", rg_lstatl (ls, DNX))
+	call clputl ("dny", rg_lstatl (ls, DNY))
 	call clputi ("maxiter", rg_lstati (ls, MAXITER))
 	call clputr ("datamin", rg_lstatr (ls, DATAMIN))
 	call clputr ("datamax", rg_lstatr (ls, DATAMAX))

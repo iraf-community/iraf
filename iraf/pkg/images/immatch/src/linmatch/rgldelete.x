@@ -5,7 +5,7 @@ include "linmatch.h"
 # RG_LFIND -- Find the point nearest the cursor regardless of whether it
 # has been deleted or not.
 
-int procedure rg_lfind (gd, ls, wcs, wx, wy, bscale, bzero, plot_type)
+long procedure rg_lfind (gd, ls, wcs, wx, wy, bscale, bzero, plot_type)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -16,9 +16,9 @@ real	bscale			#I the computed bscale value
 real	bzero			#I the computed bzero value
 int	plot_type		#I the current plot type
 
-int	region
-int	rg_mmffind(), rg_mmrfind(), rg_bzffind(), rg_bzrfind()
-int	rg_msffind(), rg_msrfind()
+long	region
+long	rg_mmffind(), rg_mmrfind(), rg_bzffind()
+long	rg_msffind(), rg_msrfind(), rg_bzrfind()
 
 begin
 	switch (plot_type) {
@@ -44,7 +44,7 @@ end
 
 # RG_LDELETE -- Delete or undelete regions from the data.
 
-int procedure rg_ldelete (gd, ls, udelete, wcs, wx, wy, bscale, bzero,
+long procedure rg_ldelete (gd, ls, udelete, wcs, wx, wy, bscale, bzero,
 	plot_type, delete) 
 
 pointer	gd			#I pointer to the graphics stream
@@ -58,9 +58,9 @@ real	bzero			#I the computed bzero value
 int	plot_type		#I the current plot type
 int	delete			#I delete the point
 
-int	region
-int	rg_rdelete(), rg_mmfdelete(), rg_mmrdelete(), rg_bzfdelete()
-int	rg_bzrdelete(), rg_msfdelete(), rg_msrdelete()
+long	region
+long	rg_rdelete(), rg_mmfdelete(), rg_mmrdelete(), rg_bzfdelete()
+long	rg_bzrdelete(), rg_msfdelete(), rg_msrdelete()
 
 begin
 	switch (plot_type) {
@@ -96,21 +96,21 @@ end
 # RG_RDELETE -- Delete or undelete a particular region from the data using
 # a histogram or fit plot.
 
-int procedure rg_rdelete (gd, ls, udelete, delete)
+long procedure rg_rdelete (gd, ls, udelete, delete)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
 int	udelete[ARB]		#I/O the user deletions array
 int	delete			#I delete the point
 
-int	region
-int	rg_lstati()
+long	region
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
 	# Get the current region.
-	region = rg_lstati (ls, CNREGION)
-	if (region < 1 || region > rg_lstati (ls, NREGIONS))
+	region = rg_lstatl (ls, CNREGION)
+	if (region < 1 || region > rg_lstatl (ls, NREGIONS))
 	    return (0)
 
 	# Delete or undelete the region.
@@ -133,7 +133,7 @@ end
 # RG_MMFDELETE -- Delete or undelete a point computed from the mean, median,
 # or mode.
 
-int procedure rg_mmfdelete (gd, ls, udelete, wx, wy, delete)
+long procedure rg_mmfdelete (gd, ls, udelete, wx, wy, delete)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -142,15 +142,20 @@ real	wx			#I the input x coordinate
 real	wy			#I the input y coordinate
 int	delete			#I delete the input object
 
-int	nregions, region, mtype
+long	l_val
+size_t	nregions
+long	region
+int	mtype
 pointer	sp, xdata, ydata
-int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
+int	rg_lstati()
+long	rg_lstatl(), rg_lpundelete(), rg_lpdelete()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	# Determine the type of data to plot.
 	mtype = 0
@@ -210,7 +215,7 @@ end
 # RG_MMRDELETE -- Delete or undelete a point computed from the mean, median,
 # or mode residuals plots.
 
-int procedure rg_mmrdelete (gd, ls, udelete, wx, wy, bscale, bzero, delete)
+long procedure rg_mmrdelete (gd, ls, udelete, wx, wy, bscale, bzero, delete)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -221,15 +226,20 @@ real	bscale			#I the computed bscale factor
 real	bzero			#I the computed bzero factor
 int	delete			#I delete the input object
 
-int	nregions, region, mtype
+long	l_val
+size_t	nregions
+long	region
+int	mtype
 pointer	sp, xdata, ydata
-int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
+int	rg_lstati()
+long	rg_lstatl(), rg_lpundelete(), rg_lpdelete()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	# Determine the type of data to plot.
 	mtype = 0
@@ -297,7 +307,7 @@ end
 # RG_BZFDELETE -- Delete or undelete a point computed from the  average
 # of the fitted bscale or bzeros.
 
-int procedure rg_bzfdelete (gd, ls, udelete, wcs, wx, wy, delete)
+long procedure rg_bzfdelete (gd, ls, udelete, wcs, wx, wy, delete)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -307,15 +317,19 @@ real	wx			#I the input x coordinate
 real	wy			#I the input y coordinate
 int	delete			#I delete the input object
 
-int	i, nregions, region
+long	l_val
+long	i
+size_t	nregions
+long	region
 pointer	sp, xreg
-int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
+long	rg_lstatl(), rg_lpundelete(), rg_lpdelete()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	call smark (sp)
 	call salloc (xreg, nregions, TY_REAL)
@@ -356,7 +370,7 @@ end
 # RG_BZRDELETE -- Delete or undelete a point computed from the  average
 # of the fitted bscale or bzero residuals.
 
-int procedure rg_bzrdelete (gd, ls, udelete, wcs, wx, wy, bscale, bzero,
+long procedure rg_bzrdelete (gd, ls, udelete, wcs, wx, wy, bscale, bzero,
 	delete)
 
 pointer	gd			#I pointer to the graphics stream
@@ -369,15 +383,18 @@ real	bscale			#I the input bscale value
 real	bzero			#I the input bzero value
 int	delete			#I delete the input object
 
-int	i, nregions, region
+long	l_val
+long	i, region
+size_t	nregions
 pointer	sp, xreg, yreg
-int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
+long	rg_lstatl(), rg_lpundelete(), rg_lpdelete()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	call smark (sp)
 	call salloc (xreg, nregions, TY_REAL)
@@ -423,7 +440,7 @@ end
 # RG_MSFDELETE -- Delete or undelete a point computed from the  average
 # of the fitted bscale or bzeros.
 
-int procedure rg_msfdelete (gd, ls, udelete, wcs, wx, wy, delete)
+long procedure rg_msfdelete (gd, ls, udelete, wcs, wx, wy, delete)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -433,14 +450,17 @@ real	wx			#I the input x coordinate
 real	wy			#I the input y coordinate
 int	delete			#I delete the input object
 
-int	nregions, region
-int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
+long	l_val
+size_t	nregions
+long	region
+long	rg_lstatl(), rg_lpundelete(), rg_lpdelete()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	# Delete or undelete the point.
 	if (delete == YES) {
@@ -474,7 +494,7 @@ end
 # RG_MSRDELETE -- Delete or undelete a point computed from the  average
 # of the fitted bscale or bzeros.
 
-int procedure rg_msrdelete (gd, ls, udelete, wcs, wx, wy, bscale, bzero, delete)
+long procedure rg_msrdelete (gd, ls, udelete, wcs, wx, wy, bscale, bzero, delete)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -486,15 +506,18 @@ real	bscale			#I the input bscale value
 real	bzero			#I the input bzero value
 int	delete			#I delete the input object
 
-int	nregions, region
+long	l_val
+size_t	nregions
+long	region
 pointer	sp, resid
-int	rg_lstati(), rg_lpdelete(), rg_lpundelete()
+long	rg_lstatl(), rg_lpundelete(), rg_lpdelete()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	call smark (sp)
 	call salloc (resid, nregions, TY_REAL)
@@ -505,9 +528,10 @@ begin
 		    Memr[resid], nregions)
 	        call asubr (Memr[rg_lstatp(ls,RMAG)], Memr[resid],
 		    Memr[resid], nregions)
-	    } else
+	    } else {
 	        call asubr (Memr[rg_lstatp(ls,RMAG)], Memr[rg_lstatp(ls,
 		    IMAG)], Memr[resid], nregions)
+	    }
 	} else {
 	    call altmr (Memr[rg_lstatp(ls,ISKY)], Memr[resid], nregions,
 	        bscale, bzero)
@@ -547,22 +571,27 @@ end
 
 # RG_MMFFIND -- Find a point computed from the mean, median, or mode.
 
-int procedure rg_mmffind (gd, ls, wx, wy)
+long procedure rg_mmffind (gd, ls, wx, wy)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
 real	wx			#I the input x coordinate
 real	wy			#I the input y coordinate
 
-int	nregions, mtype, region
+long	l_val
+size_t	nregions
+long	region
+int	mtype
 pointer	sp, xdata, ydata
-int	rg_lstati(), rg_lpfind()
+int	rg_lstati()
+long	rg_lstatl(), rg_lpfind()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	# Determine the type of data to plot.
 	mtype = 0
@@ -615,7 +644,7 @@ end
 
 # RG_MMRFIND -- Find a point computed from the mean, median, or mode.
 
-int procedure rg_mmrfind (gd, ls, wx, wy, bscale, bzero)
+long procedure rg_mmrfind (gd, ls, wx, wy, bscale, bzero)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -624,15 +653,20 @@ real	wy			#I the input y coordinate
 real	bscale			#I the input bscale factor
 real	bzero			#I the input bzero factor
 
-int	nregions, mtype, region
+long	l_val
+size_t	nregions
+long	region
+int	mtype
 pointer	sp, xdata, ydata
-int	rg_lstati(), rg_lpfind()
+int	rg_lstati()
+long	rg_lstatl(), rg_lpfind()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	# Determine the type of data to plot.
 	mtype = 0
@@ -694,7 +728,7 @@ end
 # RG_BZFFIND -- Find a point computed from the bscale and bzero fits
 # to all the regions.
 
-int procedure rg_bzffind (gd, ls, wcs, wx, wy)
+long procedure rg_bzffind (gd, ls, wcs, wx, wy)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -702,15 +736,19 @@ int	wcs			#I the input wcs
 real	wx			#I the input x coordinate
 real	wy			#I the input y coordinate
 
-int	i, nregions, region
+long	l_val
+size_t	nregions
+long	i, region
 pointer	sp, xreg
-int	rg_lstati(), rg_lpfind()
+long	rg_lpfind()
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	call smark (sp)
 	call salloc (xreg, nregions, TY_REAL)
@@ -735,7 +773,7 @@ end
 # RG_BZRFIND -- Find a point computed from the bscale and bzero fit
 # residuals to all the regions.
 
-int procedure rg_bzrfind (gd, ls, wcs, wx, wy, bscale, bzero)
+long procedure rg_bzrfind (gd, ls, wcs, wx, wy, bscale, bzero)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -745,15 +783,19 @@ real	wy			#I the input y coordinate
 real	bscale			#I the input bscale value
 real	bzero			#I the input bscale value
 
-int	i, nregions, region
+long	l_val
+size_t	nregions
+long	i, region
 pointer	sp, xreg, yreg
-int	rg_lstati(), rg_lpfind()
+long	rg_lpfind()
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	call smark (sp)
 	call salloc (xreg, nregions, TY_REAL)
@@ -784,7 +826,7 @@ end
 # RG_MSFFIND -- Find a point computed from the bscale and bzero fits
 # to all the regions.
 
-int procedure rg_msffind (gd, ls, wcs, wx, wy)
+long procedure rg_msffind (gd, ls, wcs, wx, wy)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -792,14 +834,18 @@ int	wcs			#I the input wcs
 real	wx			#I the input x coordinate
 real	wy			#I the input y coordinate
 
-int	nregions, region
-int	rg_lstati(), rg_lpfind()
+long	l_val
+size_t	nregions
+long	region
+long	rg_lpfind()
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	if (wcs == 1)
 	    region = rg_lpfind (gd, 1, wx, wy, Memr[rg_lstatp(ls,IMAG)],
@@ -817,7 +863,7 @@ end
 # RG_MSRFIND -- Find a point computed from the bscale and bzero fits
 # to all the regions.
 
-int procedure rg_msrfind (gd, ls, wcs, wx, wy, bscale, bzero)
+long procedure rg_msrfind (gd, ls, wcs, wx, wy, bscale, bzero)
 
 pointer	gd			#I pointer to the graphics stream
 pointer	ls			#I pointer to the linmatch structure
@@ -827,15 +873,19 @@ real	wy			#I the input y coordinate
 real	bscale			#I the input bscale value
 real	bzero			#I the input bzero value
 
-int	nregions, region
+long	l_val
+size_t	nregions
+long	region
 pointer	sp, resid
-int	rg_lstati(), rg_lpfind()
+long	rg_lpfind()
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (0)
+	nregions = l_val
 
 	call smark (sp)
 	call salloc (resid, nregions, TY_REAL)
@@ -846,9 +896,10 @@ begin
 		    Memr[resid], nregions)
 		call asubr (Memr[rg_lstatp(ls,RMAG)], Memr[resid], Memr[resid],
 		    nregions)
-	    } else
+	    } else {
 		call asubr (Memr[rg_lstatp(ls,RMAG)], Memr[rg_lstatp(ls,IMAG)],
 		    Memr[resid], nregions)
+	    }
 	    region = rg_lpfind (gd, 1, wx, wy, Memr[rg_lstatp(ls,IMAG)],
 	        Memr[resid], nregions)
 	} else if (wcs == 2) {
@@ -869,7 +920,7 @@ end
 
 # RG_LPDELETE -- Delete a point from the plot.
 
-int procedure rg_lpdelete (gd, wcs, wx, wy, xdata, ydata, delete, udelete, npts)
+long procedure rg_lpdelete (gd, wcs, wx, wy, xdata, ydata, delete, udelete, npts)
 
 pointer	gd			#I the graphics stream descriptor
 int	wcs			#I the input wcs
@@ -878,9 +929,9 @@ real	xdata[ARB]		#I the input x data array
 real	ydata[ARB]		#I the input y data array
 int	delete[ARB]		#I the deletions array
 int	udelete[ARB]		#I/O the user deletions array
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 
-int	i, region
+long	i, region
 real	wx0, wy0, r2min, r2, x0, y0
 
 begin
@@ -913,7 +964,7 @@ end
 
 # RG_LPUNDELETE -- Undelete a point from the plot.
 
-int procedure rg_lpundelete (gd, wcs, wx, wy, xdata, ydata, delete,
+long procedure rg_lpundelete (gd, wcs, wx, wy, xdata, ydata, delete,
 	udelete, npts)
 
 pointer	gd			#I the graphics stream descriptor
@@ -923,9 +974,9 @@ real	xdata[ARB]		#I the input x data array
 real	ydata[ARB]		#I the input y data array
 int	delete[ARB]		#I the deletions array
 int	udelete[ARB]		#I/O the user deletions array
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 
-int	i, region
+long	i, region
 real	wx0, wy0, r2min, r2, x0, y0
 
 begin
@@ -961,16 +1012,16 @@ end
 
 # RG_LPFIND -- Find a point in the plot.
 
-int procedure rg_lpfind (gd, wcs, wx, wy, xdata, ydata, npts)
+long procedure rg_lpfind (gd, wcs, wx, wy, xdata, ydata, npts)
 
 pointer	gd			#I the graphics stream descriptor
 int	wcs			#I the input wcs
 real	wx, wy			#I the point to be deleted.
 real	xdata[ARB]		#I the input x data array
 real	ydata[ARB]		#I the input y data array
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 
-int	i, region
+long	i, region
 real	wx0, wy0, r2min, x0, y0, r2
 
 begin

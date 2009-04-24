@@ -15,7 +15,7 @@ pointer	imr			#I pointer to the reference image
 pointer	im1			#I pointer to the input image
 pointer	ls			#I pointer to the linmatch structure
 int	udelete[ARB]		#I the user deletions array
-int	region			#I the current region if applicable
+long	region			#I the current region if applicable
 real	bscale			#I the computed bscale value
 real	bzero			#I the computed bzero value
 int	plot_type		#I the current plot type
@@ -63,19 +63,21 @@ pointer	imr			#I pointer to the reference image
 pointer	im1			#I pointer to the input image
 pointer	ls			#I pointer to the linmatch structure
 int	udelete[ARB]		#I the user deleteions array
-int	region			#I the current region if applicable
+long	region			#I the current region if applicable
 
-int	nbinsr, nbins1
+size_t	sz_val
+size_t	nbinsr, nbins1
 pointer	rbuf, ibuf, sp, hgmi, hgmr, image, title, str
 real	rsigma, hminr, hmaxr, dhr, isigma, hmin1, hmax1, dh1, ymin, ymax
-int	rg_lstati(), rg_limget()
+int	rg_limget()
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
 	# Get the data.
 	if (imr == NULL || im1 == NULL) {
 	    return (ERR)
-	} else if (region == rg_lstati (ls,CNREGION) &&
+	} else if (region == rg_lstatl (ls,CNREGION) &&
 	    rg_lstatp (ls,RBUF) != NULL && rg_lstatp(ls, IBUF) != NULL) {
 	    rbuf = rg_lstatp (ls, RBUF) 
 	    ibuf = rg_lstatp (ls, IBUF) 
@@ -87,7 +89,7 @@ begin
 	}
 
 	# Get the reference image binning parameters.
-	rsigma = sqrt (real(Memi[rg_lstatp(ls,RNPTS)+region-1])) *
+	rsigma = sqrt (real(Meml[rg_lstatp(ls,RNPTS)+region-1])) *
 	    Memr[rg_lstatp(ls,RSIGMA)+region-1]
 	hminr = Memr[rg_lstatp(ls,RMEDIAN)+region-1] - LMODE_HWIDTH * rsigma
 	hmaxr = Memr[rg_lstatp(ls,RMEDIAN)+region-1] + LMODE_HWIDTH * rsigma
@@ -99,7 +101,7 @@ begin
 	    return (ERR)
 
 	# Get the input image binning parameters.
-	isigma = sqrt (real(Memi[rg_lstatp(ls,INPTS)+region-1])) *
+	isigma = sqrt (real(Meml[rg_lstatp(ls,INPTS)+region-1])) *
 	    Memr[rg_lstatp(ls,ISIGMA)+region-1]
 	hmin1 = Memr[rg_lstatp(ls,IMEDIAN)+region-1] - LMODE_HWIDTH * isigma
 	hmax1 = Memr[rg_lstatp(ls,IMEDIAN)+region-1] + LMODE_HWIDTH * isigma
@@ -112,17 +114,21 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (hgmi, max (nbinsr, nbins1), TY_INT)
-	call salloc (hgmr, max (nbinsr, nbins1), TY_REAL)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (title, 2 * SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = max (nbinsr, nbins1)
+	call salloc (hgmi, sz_val, TY_INT)
+	call salloc (hgmr, sz_val, TY_REAL)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = 2 * SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	call gclear (gd)
 
 	# Create the reference histogram.
 	call aclri (Memi[hgmi], nbinsr)
-	call ahgmr (Memr[rbuf], Memi[rg_lstatp(ls,RNPTS)+region-1],
+	call ahgmr (Memr[rbuf], Meml[rg_lstatp(ls,RNPTS)+region-1],
 	    Memi[hgmi], nbinsr, hminr, hmaxr)
 	call achtir (Memi[hgmi], Memr[hgmr], nbinsr)
 	call alimr (Memr[hgmr], nbinsr, ymin, ymax)
@@ -144,14 +150,14 @@ begin
 	call sprintf (Memc[title], 2 * SZ_LINE,
         "Ref Image: %s  Region: %d%s\nNbins = %d Hmin = %g Hmax = %g Dh = %g\n%s\n")
 	    call pargstr (Memc[image])
-	    call pargi (region)
+	    call pargl (region)
 	    if (udelete[region] == YES)
 		call pargstr (" [deleted]")
 	    else if (Memi[rg_lstatp(ls,RDELETE)+region-1] != LS_NO)
 		call pargstr (" [rejected]")
 	    else
 		call pargstr ("")
-	    call pargi (nbinsr)
+	    call pargz (nbinsr)
 	    call pargr (hminr)
 	    call pargr (hmaxr)
 	    call pargr (dhr)
@@ -165,7 +171,7 @@ begin
 
 	# Create the input histogram.
 	call aclri (Memi[hgmi], nbins1)
-	call ahgmr (Memr[ibuf], Memi[rg_lstatp(ls,INPTS)+region-1],
+	call ahgmr (Memr[ibuf], Meml[rg_lstatp(ls,INPTS)+region-1],
 	    Memi[hgmi], nbins1, hmin1, hmax1)
 	call achtir (Memi[hgmi], Memr[hgmr], nbins1)
 	call alimr (Memr[hgmr], nbins1, ymin, ymax)
@@ -187,14 +193,14 @@ begin
 	call sprintf (Memc[title], 2 * SZ_LINE,
 	"Input Image: %s  Region: %d%s\nNbins = %d Hmin = %g Hmax = %g Dh = %g\n%s\n")
 	    call pargstr (Memc[image])
-	    call pargi (region)
+	    call pargl (region)
 	    if (udelete[region] == YES)
 		call pargstr (" [deleted]")
 	    else if (Memi[rg_lstatp(ls,RDELETE)+region-1] != NO)
 		call pargstr (" [rejected]")
 	    else
 		call pargstr ("")
-	    call pargi (nbins1)
+	    call pargz (nbins1)
 	    call pargr (hmin1)
 	    call pargr (hmax1)
 	    call pargr (dh1)
@@ -222,17 +228,23 @@ int	udelete[ARB]		#I the user deletions array
 real	bscale			#I the fitted bscale value
 real	bzero			#I the fitted bzero value
 
+size_t	sz_val
+long	l_val
 bool	start, finish
-int	nregions, mtype
+size_t	nregions
+int	mtype
 pointer	sp, title, str, imager, image1
 real	xmin, xmax, ymin, ymax, diff, dxmin, dxmax, dymin, dymax, x, y
+real	aabs()
 int	rg_lstati()
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (ERR)
+	nregions = l_val
 
 	# Determine the type of data to plot.
 	mtype = 0
@@ -259,10 +271,12 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (title, 2 * SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (imager, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_LINE, TY_CHAR)
+	sz_val = 2 * SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (imager, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
 
 	# Clear the plot space.
 	call gclear (gd)
@@ -294,14 +308,14 @@ begin
 	if (diff <= 0)
 	    diff = MINFRACTION
 	else
-	    diff = max (diff, MINFRACTION * abs (xmax + xmin) / 2.0)
+	    diff = max (diff, MINFRACTION * aabs (xmax + xmin) / 2.0)
 	xmin = xmin - diff * FRACTION
 	xmax = xmax + diff * FRACTION
 	diff = ymax - ymin
 	if (diff <= 0.0)
 	    diff = MINFRACTION
 	else
-	    diff = max (diff, MINFRACTION * abs (ymax + ymin) / 2.0)
+	    diff = max (diff, MINFRACTION * aabs (ymax + ymin) / 2.0)
 	ymin = ymin - diff * FRACTION
 	ymax = ymax + diff * FRACTION
 	call gswind (gd, xmin, xmax, ymin, ymax)
@@ -311,7 +325,7 @@ begin
 	call rg_lstats (ls, IMAGE, Memc[image1], SZ_FNAME)
 	call sprintf (Memc[str], SZ_LINE,
 	    "Nregions = %d Ref Image = %g * Input Image + %g")
-	    call pargi (nregions)
+	    call pargz (nregions)
 	    call pargr (bscale)
 	    call pargr (bzero)
 	call sprintf (Memc[title], 2 * SZ_LINE,
@@ -396,16 +410,22 @@ int	udelete[ARB]		#I the user deletions array
 real	bscale			#I the fitted bscale value
 real	bzero			#I the fitted bzero value
 
-int	nregions, mtype
+size_t	sz_val
+long	l_val
+size_t	nregions
+int	mtype
 pointer	sp, resid, title, imager, image1, str
 real	xmin, xmax, ymin, ymax, diff
 int	rg_lstati()
+long	rg_lstatl()
 pointer	rg_lstatp()
+real	aabs()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (ERR)
+	nregions = l_val
 
 	# Determine the type of data to plot.
 	mtype = 0
@@ -472,27 +492,30 @@ begin
 	if (diff <= 0.0)
 	    diff = MINFRACTION
 	else
-	    diff = max (diff, MINFRACTION * abs (xmax + xmin) / 2.0)
+	    diff = max (diff, MINFRACTION * aabs (xmax + xmin) / 2.0)
 	xmin = xmin - diff * FRACTION
 	xmax = xmax + diff * FRACTION
 	diff = ymax - ymin
 	if (diff <= 0.0)
 	    diff = MINFRACTION
 	else
-	    diff = max (diff, MINFRACTION * abs (ymax + ymin) / 2.0)
+	    diff = max (diff, MINFRACTION * aabs (ymax + ymin) / 2.0)
 	ymin = ymin - diff * FRACTION
 	ymax = ymax + diff * FRACTION
 	call gswind (gd, xmin, xmax, ymin, ymax)
 
-	call salloc (title, 2 * SZ_LINE, TY_CHAR)
-	call salloc (imager, SZ_FNAME, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = 2 * SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imager, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call rg_lstats (ls, REFIMAGE, Memc[imager], SZ_FNAME)
 	call rg_lstats (ls, IMAGE, Memc[image1], SZ_FNAME)
 	call sprintf (Memc[str], SZ_LINE,
 	    "Nregions = %d Ref Image = %g * Input Image + %g")
-	    call pargi (nregions)
+	    call pargz (nregions)
 	    call pargr (bscale)
 	    call pargr (bzero)
 	call sprintf (Memc[title], 2 * SZ_LINE,
@@ -538,22 +561,24 @@ pointer	imr			#I pointer to the reference image
 pointer	im1			#I pointer to the input image
 pointer	ls			#I pointer to the linmatch structure
 int	udelete[ARB]		#I pointer to the user deletions array
-int	region			#I the current region
+long	region			#I the current region
 
+size_t	sz_val
 bool	start, finish
-int	npts
+size_t	npts
 pointer	rbuf, ibuf, sp, title, str, imager, image1, resid
 real	xmin, xmax, ymin, ymax, diff, bscale, bzero, datamin, datamax
 real	loreject, hireject, chi, dxmin, dxmax, dymin, dymax, x, y
-int	rg_lstati(), rg_limget()
+long	rg_lstatl()
+int	rg_limget(), rg_lstati()
 pointer	rg_lstatp()
-real	rg_lstatr()
+real	rg_lstatr(), aabs()
 
 begin
 	# Get the data.
 	if (imr == NULL || im1 == NULL) {
 	    return (ERR)
-	} else if (region == rg_lstati (ls,CNREGION) &&
+	} else if (region == rg_lstatl (ls,CNREGION) &&
 	    rg_lstatp (ls,RBUF) != NULL && rg_lstatp(ls, IBUF) != NULL) {
 	    rbuf = rg_lstatp (ls, RBUF) 
 	    ibuf = rg_lstatp (ls, IBUF) 
@@ -568,7 +593,7 @@ begin
 	call gclear (gd)
 
 	# Get some constants
-	npts = Memi[rg_lstatp(ls,RNPTS)+region-1]
+	npts = Meml[rg_lstatp(ls,RNPTS)+region-1]
 	bscale = Memr[rg_lstatp(ls,RBSCALE)+region-1]
 	bzero = Memr[rg_lstatp(ls,RBZERO)+region-1]
 	chi = Memr[rg_lstatp(ls,RCHI)+region-1]
@@ -603,14 +628,14 @@ begin
 	if (diff <= 0.0)
 	    diff = MINFRACTION
 	else
-	    diff = max (diff, MINFRACTION * abs (xmax + xmin) / 2.0)
+	    diff = max (diff, MINFRACTION * aabs (xmax + xmin) / 2.0)
 	xmin = xmin - diff * FRACTION
 	xmax = xmax + diff * FRACTION
 	diff = ymax - ymin
 	if (diff <= 0.0)
 	    diff = MINFRACTION
 	else
-	    diff = max (diff, MINFRACTION * abs (ymax + ymin) / 2.0)
+	    diff = max (diff, MINFRACTION * aabs (ymax + ymin) / 2.0)
 	ymin = ymin - diff * FRACTION
 	ymax = ymax + diff * FRACTION
 	call gswind (gd, xmin, xmax, ymin, ymax)
@@ -619,15 +644,18 @@ begin
 	call smark (sp)
 
 	# Create the plot title.
-	call salloc (title, 2 * SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (imager, SZ_FNAME, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
+	sz_val = 2 * SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imager, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
 	call rg_lstats (ls, REFIMAGE, Memc[imager], SZ_FNAME)
 	call rg_lstats (ls, IMAGE, Memc[image1], SZ_FNAME)
 	call sprintf (Memc[str], SZ_LINE,
 	    "Region %d%s: Ref Image = %g * Input Image + %g")
-	    call pargi (region)
+	    call pargl (region)
 	    if (udelete[region] == YES)
 		call pargstr (" [deleted]")
 	    else if (Memi[rg_lstatp(ls,RDELETE)+region-1] != LS_NO)
@@ -645,7 +673,8 @@ begin
 	    "Ref image Counts")
 
 	# Compute the residuals.
-	call salloc (resid, npts, TY_REAL)
+	sz_val = npts
+	call salloc (resid, sz_val, TY_REAL)
 	if (IS_INDEFR(bscale) || IS_INDEFR(bzero))
 	    call amovkr (0.0, Memr[resid], npts)
 	else {
@@ -713,21 +742,23 @@ pointer	imr			#I pointer to the reference image
 pointer	im1			#I pointer to the input image
 pointer	ls			#I pointer to the linmatch structure
 int	udelete[ARB]		#I pointer to the user deletions array
-int	region			#I the current region
+long	region			#I the current region
 
-int	npts
+size_t	sz_val
+size_t	npts
 pointer	rbuf, ibuf, sp, title, str, imager, image1, resid
 real	xmin, xmax, ymin, ymax, diff, bscale, bzero, datamin, datamax
 real	loreject, hireject, chi
 int	rg_lstati(), rg_limget()
+long	rg_lstatl()
 pointer	rg_lstatp()
-real	rg_lstatr()
+real	rg_lstatr(), aabs()
 
 begin
 	# Get the data.
 	if (imr == NULL || im1 == NULL) {
 	    return (ERR)
-	} else if (region == rg_lstati (ls,CNREGION) &&
+	} else if (region == rg_lstatl (ls,CNREGION) &&
 	    rg_lstatp (ls,RBUF) != NULL && rg_lstatp(ls, IBUF) != NULL) {
 	    rbuf = rg_lstatp (ls, RBUF) 
 	    ibuf = rg_lstatp (ls, IBUF) 
@@ -742,7 +773,7 @@ begin
 	call gclear (gd)
 
 	# Get some constants
-	npts = Memi[rg_lstatp(ls,RNPTS)+region-1]
+	npts = Meml[rg_lstatp(ls,RNPTS)+region-1]
 	bscale = Memr[rg_lstatp(ls,RBSCALE)+region-1]
 	bzero = Memr[rg_lstatp(ls,RBZERO)+region-1]
 	chi = Memr[rg_lstatp(ls,RCHI)+region-1]
@@ -769,7 +800,8 @@ begin
 	call smark (sp)
 
 	# Compute the residuals.
-	call salloc (resid, npts, TY_REAL)
+	sz_val = npts
+	call salloc (resid, sz_val, TY_REAL)
 	if (IS_INDEFR(bscale) || IS_INDEFR(bzero))
 	    call amovkr (INDEFR, Memr[resid], npts)
 	else {
@@ -784,30 +816,33 @@ begin
 	if (diff <= 0.0)
 	    diff = MINFRACTION
 	else
-	    diff = max (diff, MINFRACTION * abs (xmin + xmax) / 2.0)
+	    diff = max (diff, MINFRACTION * aabs (xmin + xmax) / 2.0)
 	xmin = xmin - diff * FRACTION
 	xmax = xmax + diff * FRACTION
 	diff = ymax - ymin
 	if (diff <= 0.0)
 	    diff = MINFRACTION
 	else
-	    diff = max (diff, MINFRACTION * abs (ymin + ymax) / 2.0)
+	    diff = max (diff, MINFRACTION * aabs (ymin + ymax) / 2.0)
 	ymin = ymin - diff * FRACTION
 	ymax = ymax + diff * FRACTION
 	call gswind (gd, xmin, xmax, ymin, ymax)
 
 	# Create the plot title.
-	call salloc (title, 2 * SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (imager, SZ_FNAME, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
+	sz_val = 2 * SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imager, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
 
 	# Create the plot title.
 	call rg_lstats (ls, REFIMAGE, Memc[imager], SZ_FNAME)
 	call rg_lstats (ls, IMAGE, Memc[image1], SZ_FNAME)
 	call sprintf (Memc[str], SZ_LINE,
 	    "Region %d%s: Ref Image = %g * Input Image + %g")
-	    call pargi (region)
+	    call pargl (region)
 	    if (udelete[region] == YES)
 		call pargstr (" [deleted]")
 	    else if (Memi[rg_lstatp(ls,RDELETE)+region-1] != LS_NO)
@@ -851,25 +886,34 @@ int	udelete[ARB]		#I the user deletions array
 real	bscale			#I the fitted bscale value
 real	bzero			#I the fitted bzero value
 
-int	i, nregions
+size_t	sz_val
+long	l_val
+size_t	nregions
+long	i
 pointer	sp, xreg, title, str, imager, image1
 real	xmin, xmax, ymin, ymax, diff
 int	rg_lstati()
+long	rg_lstatl()
 pointer	rg_lstatp()
+real	aabs()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (ERR)
+	nregions = l_val
 
 	# Allocate working space.
 	call smark (sp)
 
 	# Set up space and info the plot title.
-	call salloc (title, 2 * SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (imager, SZ_FNAME, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
+	sz_val = 2 * SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imager, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
 	call rg_lstats (ls, REFIMAGE, Memc[imager], SZ_FNAME)
 	if (rg_lstati(ls,BSALGORITHM) == LS_PHOTOMETRY ||
 	    rg_lstati(ls,BZALGORITHM) == LS_PHOTOMETRY)
@@ -925,7 +969,7 @@ begin
 	if (diff <= 0.0)
 	    diff = MINFRACTION
 	else
-	    diff = max (diff, MINFRACTION * abs (ymin + ymax) / 2.0)
+	    diff = max (diff, MINFRACTION * aabs (ymin + ymax) / 2.0)
 	ymin = ymin - FRACTION * diff
 	ymax = ymax + FRACTION * diff
 	call gseti (gd, G_WCS, 2)
@@ -968,16 +1012,21 @@ int	udelete[ARB]		#I the user deletions array
 real	bscale			#I the fitted bscale value
 real	bzero			#I the fitted bzero value
 
-int	i, nregions
+size_t	sz_val
+long	l_val
+size_t	nregions
+long	i
 pointer	sp, xreg, yreg, title, str, imager, image1
 real	xmin, xmax, ymin, ymax, diff
 int	rg_lstati()
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 1)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 1)
 	    return (ERR)
+	nregions = l_val
 
 	# Allocate working space.
 	call smark (sp)
@@ -985,10 +1034,13 @@ begin
 	call salloc (yreg, nregions, TY_REAL)
 
 	# Set up space and info the plot title.
-	call salloc (title, 2 * SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (imager, SZ_FNAME, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
+	sz_val = 2 * SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imager, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
 	call rg_lstats (ls, REFIMAGE, Memc[imager], SZ_FNAME)
 	if (rg_lstati(ls,BSALGORITHM) == LS_PHOTOMETRY ||
 	    rg_lstati(ls,BZALGORITHM) == LS_PHOTOMETRY)
@@ -1088,24 +1140,30 @@ int	udelete[ARB]		#I the user deletions array
 real	bscale			#I the fitted bscale value
 real	bzero			#I the fitted bzero value
 
+size_t	sz_val
+long	l_val
 bool	start, finish
-int	nregions
+size_t	nregions
 pointer	sp, title, str, imager, image1
 real	xmin, xmax, ymin, ymax, diff, dxmin, dxmax, dymin, dymax, x, y
-int	rg_lstati()
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 0)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 0)
 	    return (ERR)
+	nregions = l_val
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (title, 2 * SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (imager, SZ_FNAME, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
+	sz_val = 2 * SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imager, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
 	call rg_lstats (ls, REFIMAGE, Memc[imager], SZ_FNAME)
 	call rg_lstats (ls, PHOTFILE, Memc[image1], SZ_FNAME)
 
@@ -1259,24 +1317,30 @@ int	udelete[ARB]		#I the user deletions array
 real	bscale			#I the fitted bscale value
 real	bzero			#I the fitted bzero value
 
-int	nregions
+size_t	sz_val
+long	l_val
+size_t	nregions
 pointer	sp, yreg, title, str, imager, image1
 real	xmin, xmax, ymin, ymax, diff, dmin, dmax
-int	rg_lstati()
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
-	if (nregions <= 0)
+	l_val = rg_lstatl (ls, NREGIONS)
+	if (l_val <= 0)
 	    return (ERR)
+	nregions = l_val
 
 	# Allocate working space.
 	call smark (sp)
 	call salloc (yreg, nregions, TY_REAL)
-	call salloc (title, 2 * SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (imager, SZ_FNAME, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
+	sz_val = 2 * SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imager, sz_val, TY_CHAR)
+	call salloc (image1, sz_val, TY_CHAR)
 	call rg_lstats (ls, REFIMAGE, Memc[imager], SZ_FNAME)
 	call rg_lstats (ls, PHOTFILE, Memc[image1], SZ_FNAME)
 
@@ -1401,10 +1465,10 @@ procedure rg_lhbox (gp, ydata, npts, x1, x2)
 
 pointer gp              #I the graphics descriptor
 real    ydata[ARB]      #I the y coordinates of the line endpoints
-int     npts            #I the number of line endpoints
+size_t	npts            #I the number of line endpoints
 real    x1, x2          #I starting and ending x coordinates
 
-int     pixel
+long	pixel
 real    left, right, top, bottom, x, y, dx
 
 begin
@@ -1438,9 +1502,10 @@ procedure rg_pfill (gd, xmin, xmax, ymin, ymax, fstyle, fcolor)
 pointer gd                      #I pointer to the graphics stream
 real    xmin, xmax              #I the x coordinate limits
 real    ymin, ymax              #I the y coordinate limits
-int     fstyle                  #I the fill style
-int     fcolor                  #I the fill color
+int	fstyle                  #I the fill style
+int	fcolor                  #I the fill color
 
+size_t	sz_val
 real    x[4], y[4]
 
 begin
@@ -1449,7 +1514,8 @@ begin
         x[2] = xmax; y[2] = ymin
         x[3] = xmax; y[3] = ymax
         x[4] = xmin; y[4] = ymax
-        call gfill (gd, x, y, 4, fstyle)
+	sz_val = 4
+        call gfill (gd, x, y, sz_val, fstyle)
 end
 
 
@@ -1462,11 +1528,11 @@ real    x[ARB]          # the x coordinates
 real    y[ARB]          # the y coordinates
 int	del[ARB]	# the deletions array
 int	udel[ARB]	# the user deletions array
-int     npts            # the number of points to be marked
-int     gmarker         # the good point marker type
-int     dmarker         # the deleted point marker type
+size_t	npts            # the number of points to be marked
+int	gmarker         # the good point marker type
+int	dmarker         # the deleted point marker type
 
-int     i
+long	i
 
 begin
         # Plot the points.
@@ -1492,15 +1558,15 @@ pointer gd              #I pointer to the graphics stream
 real    x[ARB]          #I the x coordinates
 real    y[ARB]          #I the y coordinates
 real	resid[ARB]	#I the residuals array
-int     npts            #I the number of points to be marked
+size_t	npts            #I the number of points to be marked
 real	datamin		#I the good data minimum
 real	datamax		#I the good data maximum
 real	loreject	#I the low side rejection limit
 real	hireject	#I the high side rejection limit
-int     gmarker         #I the good point marker type
-int     dmarker         #I the deleted point marker type
+int	gmarker         #I the good point marker type
+int	dmarker         #I the deleted point marker type
 
-int	i
+long	i
 
 begin
 	do i = 1, npts {
@@ -1526,15 +1592,15 @@ pointer gd              #I pointer to the graphics stream
 real    x[ARB]          #I the x coordinates
 real    y[ARB]          #I the y coordinates
 real	resid[ARB]	#I the residuals array
-int     npts            #I the number of points to be marked
+size_t	npts            #I the number of points to be marked
 real	datamin		#I the good data minimum
 real	datamax		#I the good data maximum
 real	loreject	#I the low side rejection limit
 real	hireject	#I the high side rejection limit
-int     gmarker         #I the good point marker type
-int     dmarker         #I the deleted point marker type
+int	gmarker         #I the good point marker type
+int	dmarker         #I the deleted point marker type
 
-int	i
+long	i
 
 begin
 	do i = 1, npts {
@@ -1558,10 +1624,10 @@ procedure rg_galimr (a, index, npts, amin, amax)
 
 real	a[ARB]			#I the input array
 int	index[ARB]		#I the index array
-int	npts			#I the size of the array
+size_t	npts			#I the size of the array
 real	amin, amax		#O the output min and max values
 
-int	i
+long	i
 real	dmin, dmax, gmin, gmax
 
 begin

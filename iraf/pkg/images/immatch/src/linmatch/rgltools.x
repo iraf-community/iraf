@@ -5,11 +5,14 @@ include "linmatch.h"
 procedure rg_linit (ls, max_nregions)
 
 pointer	ls		#I/O pointer to the intensity scaling structure
-int	max_nregions	#I the maximum number of regions
+long	max_nregions	#I the maximum number of regions
+
+size_t	sz_val
 
 begin
 	# Allocate the temporary space.
-	call malloc (ls, LEN_LSSTRUCT, TY_STRUCT)
+	sz_val = LEN_LSSTRUCT
+	call malloc (ls, sz_val, TY_STRUCT)
 
 	# Set up the regions parameters.
 	LS_NREGIONS(ls) = 0
@@ -108,17 +111,19 @@ procedure rg_lrinit (ls)
 
 pointer	ls		#I pointer to the intensity scaling structure
 
+long	lval_indef
+
 begin
 	# Free up previously defined region pointers.
 	call rg_lrfree (ls)
 
 	# Allocate region definition pointers.
-	call malloc (LS_RC1(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RC2(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RL1(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RL2(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RXSTEP(ls), LS_MAXNREGIONS(ls), TY_INT)
-	call malloc (LS_RYSTEP(ls), LS_MAXNREGIONS(ls), TY_INT)
+	call malloc (LS_RC1(ls), LS_MAXNREGIONS(ls), TY_LONG)
+	call malloc (LS_RC2(ls), LS_MAXNREGIONS(ls), TY_LONG)
+	call malloc (LS_RL1(ls), LS_MAXNREGIONS(ls), TY_LONG)
+	call malloc (LS_RL2(ls), LS_MAXNREGIONS(ls), TY_LONG)
+	call malloc (LS_RXSTEP(ls), LS_MAXNREGIONS(ls), TY_LONG)
+	call malloc (LS_RYSTEP(ls), LS_MAXNREGIONS(ls), TY_LONG)
 
 	# Allocate region statistics pointers.
 	call malloc (LS_RMEAN(ls), LS_MAXNREGIONS(ls), TY_REAL)
@@ -129,7 +134,7 @@ begin
 	call malloc (LS_RSKYERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
 	call malloc (LS_RMAG(ls), LS_MAXNREGIONS(ls), TY_REAL)
 	call malloc (LS_RMAGERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_RNPTS(ls), LS_MAXNREGIONS(ls), TY_INT)
+	call malloc (LS_RNPTS(ls), LS_MAXNREGIONS(ls), TY_LONG)
 
 	call malloc (LS_IMEAN(ls), LS_MAXNREGIONS(ls), TY_REAL)
 	call malloc (LS_IMEDIAN(ls), LS_MAXNREGIONS(ls), TY_REAL)
@@ -139,7 +144,7 @@ begin
 	call malloc (LS_ISKYERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
 	call malloc (LS_IMAG(ls), LS_MAXNREGIONS(ls), TY_REAL)
 	call malloc (LS_IMAGERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
-	call malloc (LS_INPTS(ls), LS_MAXNREGIONS(ls), TY_INT)
+	call malloc (LS_INPTS(ls), LS_MAXNREGIONS(ls), TY_LONG)
 
 	call malloc (LS_RBSCALE(ls), LS_MAXNREGIONS(ls), TY_REAL)
 	call malloc (LS_RBSCALEERR(ls), LS_MAXNREGIONS(ls), TY_REAL)
@@ -148,41 +153,42 @@ begin
 	call malloc (LS_RDELETE(ls), LS_MAXNREGIONS(ls), TY_INT)
 	call malloc (LS_RCHI(ls), LS_MAXNREGIONS(ls), TY_REAL)
 
+	lval_indef = INDEFL
 	# Initialize region definitions.
-	call amovi (INDEFI, Memi[LS_RC1(ls)], LS_MAXNREGIONS(ls))
-	call amovi (INDEFI, Memi[LS_RC2(ls)], LS_MAXNREGIONS(ls))
-	call amovi (INDEFI, Memi[LS_RL1(ls)], LS_MAXNREGIONS(ls))
-	call amovi (INDEFI, Memi[LS_RL2(ls)], LS_MAXNREGIONS(ls))
-	call amovi (INDEFI, Memi[LS_RXSTEP(ls)], LS_MAXNREGIONS(ls))
-	call amovi (INDEFI, Memi[LS_RYSTEP(ls)], LS_MAXNREGIONS(ls))
+	call amovkl (lval_indef, Meml[LS_RC1(ls)], LS_MAXNREGIONS(ls))
+	call amovkl (lval_indef, Meml[LS_RC2(ls)], LS_MAXNREGIONS(ls))
+	call amovkl (lval_indef, Meml[LS_RL1(ls)], LS_MAXNREGIONS(ls))
+	call amovkl (lval_indef, Meml[LS_RL2(ls)], LS_MAXNREGIONS(ls))
+	call amovkl (lval_indef, Meml[LS_RXSTEP(ls)], LS_MAXNREGIONS(ls))
+	call amovkl (lval_indef, Meml[LS_RYSTEP(ls)], LS_MAXNREGIONS(ls))
 
 	# Initilaize the statistics.
-	call amovr (INDEFR, Memr[LS_RMEAN(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RMEDIAN(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RMODE(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RSIGMA(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RSKY(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RSKYERR(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RMAG(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RMAGERR(ls)], LS_MAXNREGIONS(ls))
-	call amovi (INDEFI, Memr[LS_RNPTS(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_IMEAN(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_IMEDIAN(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_IMODE(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_ISIGMA(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_ISKY(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_ISKYERR(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_IMAG(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_IMAGERR(ls)], LS_MAXNREGIONS(ls))
-	call amovi (INDEFI, Memr[LS_INPTS(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RMEAN(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RMEDIAN(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RMODE(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RSIGMA(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RSKY(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RSKYERR(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RMAG(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RMAGERR(ls)], LS_MAXNREGIONS(ls))
+	call amovkl (lval_indef, Meml[LS_RNPTS(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_IMEAN(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_IMEDIAN(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_IMODE(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_ISIGMA(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_ISKY(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_ISKYERR(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_IMAG(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_IMAGERR(ls)], LS_MAXNREGIONS(ls))
+	call amovkl (lval_indef, Meml[LS_INPTS(ls)], LS_MAXNREGIONS(ls))
 
 	# Initialize the answers.
-	call amovr (INDEFR, Memr[LS_RBSCALE(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RBSCALEERR(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RBZERO(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RBZEROERR(ls)], LS_MAXNREGIONS(ls))
-	call amovi (LS_NO, Memi[LS_RDELETE(ls)], LS_MAXNREGIONS(ls))
-	call amovr (INDEFR, Memr[LS_RCHI(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RBSCALE(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RBSCALEERR(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RBZERO(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RBZEROERR(ls)], LS_MAXNREGIONS(ls))
+	call amovki (LS_NO, Memi[LS_RDELETE(ls)], LS_MAXNREGIONS(ls))
+	call amovkr (INDEFR, Memr[LS_RCHI(ls)], LS_MAXNREGIONS(ls))
 end
 
 
@@ -192,49 +198,52 @@ procedure rg_lindefr (ls)
 
 pointer	ls		#I pointer to the intensity scaling structure
 
-int	nregions
-int	rg_lstati()
+size_t	nregions
+long	lval_indef
+
+long	rg_lstatl()
 
 begin
-	nregions = rg_lstati (ls, NREGIONS)
+	nregions = rg_lstatl (ls, NREGIONS)
 	if (nregions > 0) {
 
+	    lval_indef = INDEFL
 	    # Reinitialize the region definition pointers.
-	    call amovi (INDEFI, Memi[LS_RC1(ls)], nregions)
-	    call amovi (INDEFI, Memi[LS_RC2(ls)], nregions)
-	    call amovi (INDEFI, Memi[LS_RL1(ls)], nregions)
-	    call amovi (INDEFI, Memi[LS_RL2(ls)], nregions)
-	    call amovi (INDEFI, Memi[LS_RXSTEP(ls)], nregions)
-	    call amovi (INDEFI, Memi[LS_RYSTEP(ls)], nregions)
+	    call amovkl (lval_indef, Meml[LS_RC1(ls)], nregions)
+	    call amovkl (lval_indef, Meml[LS_RC2(ls)], nregions)
+	    call amovkl (lval_indef, Meml[LS_RL1(ls)], nregions)
+	    call amovkl (lval_indef, Meml[LS_RL2(ls)], nregions)
+	    call amovkl (lval_indef, Meml[LS_RXSTEP(ls)], nregions)
+	    call amovkl (lval_indef, Meml[LS_RYSTEP(ls)], nregions)
 
 	    # Reinitialize the statistics pointers.
-	    call amovr (INDEFR, Memr[LS_RMEAN(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RMEDIAN(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RMODE(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RSIGMA(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RSKY(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RSKYERR(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RMAG(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RMAGERR(ls)], nregions)
-	    call amovi (INDEFI, Memi[LS_RNPTS(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RMEAN(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RMEDIAN(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RMODE(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RSIGMA(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RSKY(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RSKYERR(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RMAG(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RMAGERR(ls)], nregions)
+	    call amovkl (lval_indef, Meml[LS_RNPTS(ls)], nregions)
 
-	    call amovr (INDEFR, Memr[LS_IMEAN(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_IMEDIAN(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_IMODE(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_ISIGMA(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_ISKY(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_ISKYERR(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_IMAG(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_IMAGERR(ls)], nregions)
-	    call amovi (INDEFI, Memi[LS_INPTS(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_IMEAN(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_IMEDIAN(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_IMODE(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_ISIGMA(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_ISKY(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_ISKYERR(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_IMAG(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_IMAGERR(ls)], nregions)
+	    call amovkl (lval_indef, Meml[LS_INPTS(ls)], nregions)
 
 	    # Reinitialize the answers pointers.
-	    call amovr (INDEFR, Memr[LS_RBSCALE(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RBSCALEERR(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RBZERO(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RBZEROERR(ls)], nregions)
-	    call amovi (LS_NO, Memi[LS_RDELETE(ls)], nregions)
-	    call amovr (INDEFR, Memr[LS_RCHI(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RBSCALE(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RBSCALEERR(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RBZERO(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RBZEROERR(ls)], nregions)
+	    call amovki (LS_NO, Memi[LS_RDELETE(ls)], nregions)
+	    call amovkr (INDEFR, Memr[LS_RCHI(ls)], nregions)
 
 	}
 end
@@ -245,21 +254,22 @@ end
 procedure rg_lrealloc (ls, nregions)
 
 pointer	ls		#I pointer to the intensity scaling structure
-int	nregions	#I the number of regions
+size_t	nregions	#I the number of regions
 
-int	nr
-int	rg_lstati()
+size_t	nr
+long	lval_indef
+long	rg_lstatl()
 
 begin
-	nr = rg_lstati (ls, NREGIONS)
+	nr = rg_lstatl (ls, NREGIONS)
 
 	# Resize the region definition buffers.
-	call realloc (LS_RC1(ls), nregions, TY_INT)
-	call realloc (LS_RC2(ls), nregions, TY_INT)
-	call realloc (LS_RL1(ls), nregions, TY_INT)
-	call realloc (LS_RL2(ls), nregions, TY_INT)
-	call realloc (LS_RXSTEP(ls), nregions, TY_INT)
-	call realloc (LS_RYSTEP(ls), nregions, TY_INT)
+	call realloc (LS_RC1(ls), nregions, TY_LONG)
+	call realloc (LS_RC2(ls), nregions, TY_LONG)
+	call realloc (LS_RL1(ls), nregions, TY_LONG)
+	call realloc (LS_RL2(ls), nregions, TY_LONG)
+	call realloc (LS_RXSTEP(ls), nregions, TY_LONG)
+	call realloc (LS_RYSTEP(ls), nregions, TY_LONG)
 
 	# Resize the statistics buffers.
 	call realloc (LS_RMEAN(ls), nregions, TY_REAL)
@@ -270,7 +280,7 @@ begin
 	call realloc (LS_RSKYERR(ls), nregions, TY_REAL)
 	call realloc (LS_RMAG(ls), nregions, TY_REAL)
 	call realloc (LS_RMAGERR(ls), nregions, TY_REAL)
-	call realloc (LS_RNPTS(ls), nregions, TY_INT)
+	call realloc (LS_RNPTS(ls), nregions, TY_LONG)
 
 	call realloc (LS_IMEAN(ls), nregions, TY_REAL)
 	call realloc (LS_IMEDIAN(ls), nregions, TY_REAL)
@@ -280,7 +290,7 @@ begin
 	call realloc (LS_ISKYERR(ls), nregions, TY_REAL)
 	call realloc (LS_IMAG(ls), nregions, TY_REAL)
 	call realloc (LS_IMAGERR(ls), nregions, TY_REAL)
-	call realloc (LS_INPTS(ls), nregions, TY_INT)
+	call realloc (LS_INPTS(ls), nregions, TY_LONG)
 
 	# Resize the answers buffers.
 	call realloc (LS_RBSCALE(ls), nregions, TY_REAL)
@@ -290,42 +300,44 @@ begin
 	call realloc (LS_RDELETE(ls), nregions, TY_INT)
 	call realloc (LS_RCHI(ls), nregions, TY_REAL)
 
+	lval_indef = INDEFL
+
 	# Reinitialize the region defintions.
-	call amovi (INDEFI, Memi[LS_RC1(ls)+nr], nregions - nr)
-	call amovi (INDEFI, Memi[LS_RC2(ls)+nr], nregions - nr)
-	call amovi (INDEFI, Memi[LS_RL1(ls)+nr], nregions - nr)
-	call amovi (INDEFI, Memi[LS_RL2(ls)+nr], nregions - nr)
-	call amovi (INDEFI, Memi[LS_RXSTEP(ls)+nr], nregions - nr)
-	call amovi (INDEFI, Memi[LS_RYSTEP(ls)+nr], nregions - nr)
+	call amovkl (lval_indef, Meml[LS_RC1(ls)+nr], nregions - nr)
+	call amovkl (lval_indef, Meml[LS_RC2(ls)+nr], nregions - nr)
+	call amovkl (lval_indef, Meml[LS_RL1(ls)+nr], nregions - nr)
+	call amovkl (lval_indef, Meml[LS_RL2(ls)+nr], nregions - nr)
+	call amovkl (lval_indef, Meml[LS_RXSTEP(ls)+nr], nregions - nr)
+	call amovkl (lval_indef, Meml[LS_RYSTEP(ls)+nr], nregions - nr)
 
 	# Reinitialize the statistics buffers.
-	call amovr (INDEFR, Memr[LS_RMEAN(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RMEDIAN(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RMODE(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RSIGMA(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RSKY(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RSKYERR(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RMAG(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RMAGERR(ls)+nr], nregions - nr)
-	call amovi (INDEFI, Memi[LS_RNPTS(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RMEAN(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RMEDIAN(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RMODE(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RSIGMA(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RSKY(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RSKYERR(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RMAG(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RMAGERR(ls)+nr], nregions - nr)
+	call amovkl (lval_indef, Meml[LS_RNPTS(ls)+nr], nregions - nr)
 
-	call amovr (INDEFR, Memr[LS_IMEAN(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_IMEDIAN(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_IMODE(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_ISIGMA(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_ISKY(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_ISKYERR(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_IMAG(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_IMAGERR(ls)+nr], nregions - nr)
-	call amovi (INDEFI, Memi[LS_INPTS(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_IMEAN(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_IMEDIAN(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_IMODE(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_ISIGMA(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_ISKY(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_ISKYERR(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_IMAG(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_IMAGERR(ls)+nr], nregions - nr)
+	call amovkl (lval_indef, Meml[LS_INPTS(ls)+nr], nregions - nr)
 
 	# Reinitialize the answers buffers.
-	call amovr (INDEFR, Memr[LS_RBSCALE(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RBSCALEERR(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RBZERO(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RBZEROERR(ls)+nr], nregions - nr)
-	call amovi (LS_NO, Memi[LS_RDELETE(ls)+nr], nregions - nr)
-	call amovr (INDEFR, Memr[LS_RCHI(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RBSCALE(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RBSCALEERR(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RBZERO(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RBZEROERR(ls)+nr], nregions - nr)
+	call amovki (LS_NO, Memi[LS_RDELETE(ls)+nr], nregions - nr)
+	call amovkr (INDEFR, Memr[LS_RCHI(ls)+nr], nregions - nr)
 end
 
 
@@ -340,22 +352,22 @@ begin
 
 	# Free the regions definitions buffers.
 	if (LS_RC1(ls) != NULL)
-	    call mfree (LS_RC1(ls), TY_INT)
+	    call mfree (LS_RC1(ls), TY_LONG)
 	LS_RC1(ls) = NULL
 	if (LS_RC2(ls) != NULL)
-	    call mfree (LS_RC2(ls), TY_INT)
+	    call mfree (LS_RC2(ls), TY_LONG)
 	LS_RC2(ls) = NULL
 	if (LS_RL1(ls) != NULL)
-	    call mfree (LS_RL1(ls), TY_INT)
+	    call mfree (LS_RL1(ls), TY_LONG)
 	LS_RL1(ls) = NULL
 	if (LS_RL2(ls) != NULL)
-	    call mfree (LS_RL2(ls), TY_INT)
+	    call mfree (LS_RL2(ls), TY_LONG)
 	LS_RL2(ls) = NULL
 	if (LS_RXSTEP(ls) != NULL)
-	    call mfree (LS_RXSTEP(ls), TY_INT)
+	    call mfree (LS_RXSTEP(ls), TY_LONG)
 	LS_RXSTEP(ls) = NULL
 	if (LS_RYSTEP(ls) != NULL)
-	    call mfree (LS_RYSTEP(ls), TY_INT)
+	    call mfree (LS_RYSTEP(ls), TY_LONG)
 	LS_RYSTEP(ls) = NULL
 
 	# Free the statistics buffers.
@@ -386,7 +398,7 @@ begin
 	    call mfree (LS_RMAGERR(ls), TY_REAL)
 	LS_RMAGERR(ls) = NULL
 	if (LS_RNPTS(ls) != NULL)
-	    call mfree (LS_RNPTS(ls), TY_INT)
+	    call mfree (LS_RNPTS(ls), TY_LONG)
 	LS_RNPTS(ls) = NULL
 
 	if (LS_IBUF(ls) != NULL)
@@ -416,7 +428,7 @@ begin
 	    call mfree (LS_IMAGERR(ls), TY_REAL)
 	LS_IMAGERR(ls) = NULL
 	if (LS_INPTS(ls) != NULL)
-	    call mfree (LS_INPTS(ls), TY_INT)
+	    call mfree (LS_INPTS(ls), TY_LONG)
 	LS_INPTS(ls) = NULL
 
 	# Free the answers buffers.
@@ -482,6 +494,31 @@ begin
 	    return (LS_MAXITER(ls))
 	case NREJECT:
 	    return (LS_NREJECT(ls))
+	default:
+	    call error (0, "RG_LSTATI: Unknown integer parameter.")
+	}
+end
+
+
+# RG_LSTATL -- Fetch the value of a long parameter.
+
+long procedure rg_lstatl (ls, param)
+
+pointer	ls		#I pointer to the intensity scaling structure
+int	param		#I parameter to be fetched
+
+begin
+	switch (param) {
+	case CNREGION:
+	    return (LS_CNREGION(ls))
+	case NREGIONS:
+	    return (LS_NREGIONS(ls))
+	case MAXNREGIONS:
+	    return (LS_MAXNREGIONS(ls))
+	case DNX:
+	    return (LS_DNX(ls))
+	case DNY:
+	    return (LS_DNY(ls))
 	default:
 	    call error (0, "RG_LSTATI: Unknown integer parameter.")
 	}
@@ -755,6 +792,35 @@ begin
 end
 
 
+# RG_LSETL -- Set the value of a long parameter.
+
+procedure rg_lsetl (ls, param, value)
+
+pointer	ls		# pointer to the intensity scaling structure
+int	param		# parameter to be fetched
+long	value		# value of the integer parameter
+
+begin
+	switch (param) {
+
+	case NREGIONS:
+	    LS_NREGIONS(ls) = value
+	case CNREGION:
+	    LS_CNREGION(ls) = value
+	case MAXNREGIONS:
+	    LS_MAXNREGIONS(ls) = value
+
+	case DNX:
+	    LS_DNX(ls) = value
+	case DNY:
+	    LS_DNY(ls) = value
+
+	default:
+	    call error (0, "RG_LSETI: Unknown integer parameter.")
+	}
+end
+
+
 # RG_LSETP -- Set the value of a pointer parameter.
 
 procedure rg_lsetp (ls, param, value)
@@ -904,6 +970,7 @@ pointer	ls		# pointer to the intensity scaling structure
 int	param		# parameter to be fetched
 char	str[ARB]	# output string
 
+size_t	sz_val
 int	index, ip
 pointer	sp, temp
 real	rval
@@ -911,7 +978,8 @@ int	fnldir(), strdic(), ctor(), rg_lstati()
 
 begin
 	call smark (sp)
-	call salloc (temp, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (temp, sz_val, TY_CHAR)
 
 	switch (param) {
 

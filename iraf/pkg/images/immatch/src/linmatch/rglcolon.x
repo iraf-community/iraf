@@ -24,20 +24,31 @@ int	newimage		#I/O new input image
 int	newfit			#I/O new fit
 int	newavg			#I/O new averages
 
-int	ncmd, nref, nim, ival, fd
+size_t	sz_val
+long	c_1, c_2
+long	lval
+int	ncmd, ival, fd
+long	nref, nim
 pointer	sp, cmd, str
 real	rval
 bool	streq()
-int	strdic(), rg_lstati(), rg_lregions(), open(), nscan()
-int	rg_lrphot(), access(), rg_lmkxy(), rg_lmkregions()
+int	strdic(), open(), nscan(), access()
+long	lmod()
+long	rg_lregions(), rg_lrphot(), rg_lmkxy(), rg_lmkregions(), rg_lstatl()
+int	rg_lstati()
 pointer	fntopnb(), immap(), dtmap()
 real	rg_lstatr()
 errchk	immap(), open(), fntopnb()
+include	<nullptr.inc>
 
 begin
+	c_1 = 1
+	c_2 = 2
+
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)
@@ -70,30 +81,33 @@ begin
 		} then {
 		    call erract (EA_WARN)
 		    rpfd = open (Memc[str], READ_ONLY, TEXT_FILE)
-		    if (rg_lrphot (rpfd, ls, 1, rg_lstati(ls, MAXNREGIONS),
+		    if (rg_lrphot (rpfd, ls, c_1, rg_lstatl(ls, MAXNREGIONS),
 		        YES) <= 0)
 			;
-		    call seek (ipfd, BOF)
-		    if (rg_lrphot (ipfd, ls, 1, rg_lstati(ls, NREGIONS),
+		    lval = BOF
+		    call seek (ipfd, lval)
+		    if (rg_lrphot (ipfd, ls, c_1, rg_lstatl(ls, NREGIONS),
 		        NO) <= 0)
 			;
 		} else {
-		    nref = rg_lrphot (rpfd, ls, 1, rg_lstati(ls, MAXNREGIONS),
+		    nref = rg_lrphot (rpfd, ls, c_1, rg_lstatl(ls, MAXNREGIONS),
 		        YES)
 		    if (nref > 0) {
-		        call seek (ipfd, BOF)
-		        nim = rg_lrphot (ipfd, ls, 1, rg_lstati(ls, NREGIONS),
+			lval = BOF
+		        call seek (ipfd, lval)
+		        nim = rg_lrphot (ipfd, ls, c_1, rg_lstatl(ls, NREGIONS),
 			    NO)
 			if (nim < nref)
 			    call printf ("There are too few input points\n")
 		    } else {
 			call close (rpfd)
 		        rpfd = open (Memc[str], READ_ONLY, TEXT_FILE)
-		        if (rg_lrphot (rpfd, ls, 1, rg_lstati(ls, MAXNREGIONS),
+		        if (rg_lrphot (rpfd, ls, c_1, rg_lstatl(ls, MAXNREGIONS),
 		            YES) <= 0)
 			    ;
-		        call seek (ipfd, BOF)
-		        if (rg_lrphot (ipfd, ls, 1, rg_lstati(ls, NREGIONS),
+			lval = BOF
+		        call seek (ipfd, lval)
+		        if (rg_lrphot (ipfd, ls, c_1, rg_lstatl(ls, NREGIONS),
 		            NO) <= 0)
 			    ;
 			call printf (
@@ -108,15 +122,15 @@ begin
 		    imr = NULL
 		}
 		iferr {
-		    imr = immap (Memc[cmd], READ_ONLY, 0)
+		    imr = immap (Memc[cmd], READ_ONLY, NULLPTR)
 		} then {
 		    call erract (EA_WARN)
-		    imr = immap (Memc[str], READ_ONLY, 0)
+		    imr = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else if (IM_NDIM(imr) > 2 || IM_NDIM(imr) != IM_NDIM(im1)) {
 		    call printf (
                     "Reference image has the wrong number of dimensions\n")
                     call imunmap (imr)
-                    imr = immap (Memc[str], READ_ONLY, 0)
+                    imr = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else {
 		    call rg_lgain (imr, ls)
 		    if (!IS_INDEFR(rg_lstatr(ls,GAIN)))
@@ -143,15 +157,15 @@ begin
                     im1 = NULL
                 }
                 iferr {
-                    im1 = immap (Memc[cmd], READ_ONLY, 0)
+                    im1 = immap (Memc[cmd], READ_ONLY, NULLPTR)
                 } then {
                     call erract (EA_WARN)
-                    im1 = immap (Memc[str], READ_ONLY, 0)
+                    im1 = immap (Memc[str], READ_ONLY, NULLPTR)
                 } else if (IM_NDIM(im1) > 2 || IM_NDIM(im1) != IM_NDIM(imr)) {
 		    call printf (
                     "Reference image has the wrong number of dimensions\n")
                     call imunmap (im1)
-                    im1 = immap (Memc[str], READ_ONLY, 0)
+                    im1 = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else {
 		    call rg_lgain (im1, ls)
 		    if (!IS_INDEFR(rg_lstatr(ls,GAIN)))
@@ -180,7 +194,7 @@ begin
 		} then {
 		    reglist = fntopnb (Memc[str], NO)
 		} else {
-		    if (rg_lregions (reglist, imr, ls, 1, NO) > 0)
+		    if (rg_lregions (reglist, imr, ls, c_1, NO) > 0)
 			;
 		    call rg_lsets (ls, REGIONS, Memc[cmd])
 		    newimage = YES; newref = YES; newfit = YES; newavg = YES
@@ -206,7 +220,7 @@ begin
 		    call erract (EA_WARN)
 		    ipfd = open (Memc[str], READ_ONLY, TEXT_FILE)
 		} else {
-		    nim = rg_lrphot (ipfd, ls, 1, rg_lstati(ls, NREGIONS),
+		    nim = rg_lrphot (ipfd, ls, c_1, rg_lstatl(ls, NREGIONS),
 		        NO)
 		    if (nim > 0) {
 		        call rg_lsets (ls, PHOTFILE, Memc[cmd])
@@ -215,7 +229,7 @@ begin
 		    } else {
 			call close (ipfd)
 		        ipfd = open (Memc[str], READ_ONLY, TEXT_FILE)
-		        nim = rg_lrphot (ipfd, ls, 1, rg_lstati(ls, NREGIONS),
+		        nim = rg_lrphot (ipfd, ls, c_1, rg_lstatl(ls, NREGIONS),
 		            NO)
 		    }
 		}
@@ -277,10 +291,12 @@ begin
                     call pargstr (Memc[str])
             } else {
                 if (db != NULL) {
-                    if (dformat == YES)
+                    if (dformat == YES) {
                         call dtunmap (db)
-                    else
-                        call close (db)
+                    } else {
+			ival = db
+                        call close (ival)
+		    }
                     db = NULL
                 }
                 iferr {
@@ -340,37 +356,37 @@ begin
 	    }
 
 	case LSCMD_DNX:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_DNX)
-		    call pargi (rg_lstati (ls, DNX))
+		    call pargl (rg_lstatl (ls, DNX))
 	    } else {
-		if (mod (ival, 2) == 0)
-		    ival = ival + 1
-		call rg_lseti (ls, DNX, ival)
+		if (lmod(lval, c_2) == 0)
+		    lval = lval + 1
+		call rg_lsetl (ls, DNX, lval)
 		newref = YES; newimage = YES; newfit = YES; newavg = YES
 	    }
 
 	case LSCMD_DNY:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_DNY)
-		    call pargi (rg_lstati (ls, DNY))
+		    call pargl (rg_lstatl (ls, DNY))
 	    } else {
-		if (mod (ival, 2) == 0)
-		    ival = ival + 1
-		call rg_lseti (ls, DNY, ival)
+		if (lmod(lval, c_2) == 0)
+		    lval = lval + 1
+		call rg_lsetl (ls, DNY, lval)
 		newref = YES; newimage = YES; newfit = YES; newavg = YES
 	    }
 
 	case LSCMD_MAXNREGIONS:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_MAXNREGIONS)
-		    call pargi (rg_lstati (ls, MAXNREGIONS))
+		    call pargl (rg_lstatl (ls, MAXNREGIONS))
 	    }
 
 	case LSCMD_DATAMIN:
@@ -530,17 +546,17 @@ begin
 		    reglist = NULL
 		}
 	        if (ncmd == LSCMD_MARKCOORDS) {
-	            nref = rg_lmkxy (fd, imr, ls, 1, rg_lstati (ls,
+	            nref = rg_lmkxy (fd, imr, ls, c_1, rg_lstatl (ls,
 	                MAXNREGIONS))
 	        } else {
-	            nref = rg_lmkregions (fd, imr, ls, 1, rg_lstati (ls,
+	            nref = rg_lmkregions (fd, imr, ls, c_1, rg_lstatl (ls,
 	                MAXNREGIONS), Memc[str], SZ_LINE)
 		}
 		if (nref <= 0) {
 		    call rg_lstats (ls, REGIONS, Memc[str], SZ_LINE)
                     iferr (reglist = fntopnb (Memc[str], NO))
                         reglist = NULL
-                    if (rg_lregions (reglist, imr, ls, 1, 1) > 0)
+                    if (rg_lregions (reglist, imr, ls, c_1, 1) > 0)
                     	;
                     call rg_lsets (ls, REGIONS, Memc[str])
                     call rg_lseti (ls, CNREGION, 1)

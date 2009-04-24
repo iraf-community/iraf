@@ -24,21 +24,29 @@ pointer	ls		#I pointer to the linmatch structure
 pointer	gd		#I the graphics stream pointer
 pointer	id		#I display stream pointer
 
-int	i, newref, newimage, newfit, newavg, newplot, plottype, wcs, key, reg
+size_t	sz_val
+long	c_0, c_1
+long	i, reg
+int	newref, newimage, newfit, newavg, newplot, plottype, wcs, key
 int	hplot, lplot, lplot_type
 pointer	sp, cmd, udelete, stat
 real	bscale, bzero, bserr, bzerr, wx, wy
 int	rg_lstati(), rg_lplot(), clgcur(), rg_lgqverify(), rg_lgtverify()
-int	rg_ldelete(), rg_lfind(), rg_mmhplot(), rg_rifplot(), rg_rirplot()
-int	rg_lregions()
+long	rg_ldelete(), rg_lstatl(), rg_lregions(), rg_lfind()
+int	rg_mmhplot(), rg_rifplot(), rg_rirplot()
 pointer	rg_lstatp()
 
 begin
+	c_0 = 0
+	c_1 = 1
+
 	call gdeactivate (gd, 0)
 
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (udelete, rg_lstati(ls, MAXNREGIONS), TY_INT)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = rg_lstatl(ls, MAXNREGIONS)
+	call salloc (udelete, sz_val, TY_INT)
 
 	# Initialize the fitting.
 	newref = YES
@@ -49,12 +57,12 @@ begin
 	# Initialize the plotting.
 	switch (rg_lstati(ls, BZALGORITHM)) {
 	case LS_MEAN, LS_MEDIAN, LS_MODE:
-	    if (rg_lstati (ls, NREGIONS) > 1)
+	    if (rg_lstatl (ls, NREGIONS) > 1)
 	        plottype = LS_MMFIT
 	    else
 	        plottype = LS_MMHIST
 	case LS_FIT:
-	    if (rg_lstati (ls, NREGIONS) > 1)
+	    if (rg_lstatl (ls, NREGIONS) > 1)
 	        plottype = LS_BSZFIT
 	    else
 	        plottype = LS_RIFIT
@@ -64,12 +72,12 @@ begin
 	}
 	switch (rg_lstati(ls, BSALGORITHM)) {
 	case LS_MEAN, LS_MEDIAN, LS_MODE:
-	    if (rg_lstati (ls, NREGIONS) > 1)
+	    if (rg_lstatl (ls, NREGIONS) > 1)
 	        plottype = LS_MMFIT
 	    else
 	        plottype = LS_MMHIST
 	case LS_FIT:
-	    if (rg_lstati (ls, NREGIONS) > 1)
+	    if (rg_lstatl (ls, NREGIONS) > 1)
 	        plottype = LS_BSZFIT
 	    else
 	        plottype = LS_RIFIT
@@ -79,24 +87,25 @@ begin
 	}
 
 	# Do the initial fit.
-	if (rg_lstati (ls, NREGIONS) <= 0) {
+	if (rg_lstatl (ls, NREGIONS) <= 0) {
 	    call gclear (gd)
 	    call gflush (gd)
 	    bscale = 1.0; bzero = 0.0
 	    bserr = INDEFR; bzerr = INDEFR
 	    call printf ("The regions/photometry list is empty\n")
 	} else {
-	    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)], rg_lstati(ls,
-	        NREGIONS))
+	    sz_val = rg_lstatl(ls, NREGIONS)
+	    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)], sz_val)
 	    call rg_scale (imr, im1, ls, bscale, bzero, bserr, bzerr, YES)
-	    call amovki (NO, Memi[udelete], rg_lstati(ls,NREGIONS))
-	    if (rg_lplot (gd, imr, im1, ls, Memi[udelete], 1, bscale, bzero,
+	    sz_val = rg_lstatl(ls,NREGIONS)
+	    call amovki (NO, Memi[udelete], sz_val)
+	    if (rg_lplot (gd, imr, im1, ls, Memi[udelete], c_1, bscale, bzero,
 	    	plottype) == OK) {
 	        newref = NO
 	        newimage = NO
 	        newfit = NO
 		newavg = NO
-		call rg_lpwrec (ls, 0)
+		call rg_lpwrec (ls, c_0)
 	    } else {
 	        call gclear (gd)
 	        call gflush (gd)
@@ -132,17 +141,18 @@ begin
 			if (rg_lstati(ls, BSALGORITHM) != LS_PHOTOMETRY &&
 			    rg_lstati(ls, BZALGORITHM) != LS_PHOTOMETRY) {
 			    if (newref == YES) {
-				if (rg_lregions (reglist, imr, ls, 1, YES) > 0)
+				if (rg_lregions (reglist, imr, ls, c_1, YES) > 0)
 				    ;
 			    } else if (newimage == YES) {
 				call rg_lindefr (ls)
 			    }
 			}
-			if (newfit == YES)
+			if (newfit == YES) {
+			    sz_val = rg_lstatl(ls,NREGIONS)
 	    		    call amovki (LS_NO, Memi[rg_lstatp(ls,RDELETE)],
-			        rg_lstati(ls,NREGIONS))
-			else if (newavg == YES) {
-			    do i = 1, rg_lstati(ls,NREGIONS) {
+					 sz_val)
+			} else if (newavg == YES) {
+			    do i = 1, rg_lstatl(ls,NREGIONS) {
 				if (Memi[rg_lstatp(ls,RDELETE)+i-1] ==
 				    LS_DELETED || Memi[rg_lstatp(ls,
 				    RDELETE)+i-1] == LS_BADSIGMA)
@@ -150,7 +160,7 @@ begin
 			    }
 			    
 			}
-			do i = 1, rg_lstati(ls,NREGIONS) {
+			do i = 1, rg_lstatl(ls,NREGIONS) {
 			    if (Memi[udelete+i-1] == YES)
 				Memi[rg_lstatp(ls,RDELETE)+i-1] = LS_DELETED
 			}
@@ -171,7 +181,7 @@ begin
 		case 'g':
 		    switch (rg_lstati(ls, BZALGORITHM)) {
 		    case LS_MEAN, LS_MEDIAN, LS_MODE:
-	    		if (rg_lstati (ls, NREGIONS) > 1) {
+	    		if (rg_lstatl (ls, NREGIONS) > 1) {
 			    if (plottype != LS_MMFIT)
 				newplot = YES
 	        	    plottype = LS_MMFIT
@@ -181,7 +191,7 @@ begin
 	        	    plottype = LS_MMHIST
 			}
 		    case LS_FIT:
-	    		if (rg_lstati (ls, NREGIONS) > 1) {
+	    		if (rg_lstatl (ls, NREGIONS) > 1) {
 			    if (plottype != LS_BSZFIT)
 				newplot = YES
 	        	    plottype = LS_BSZFIT
@@ -198,7 +208,7 @@ begin
 		    }
 		    switch (rg_lstati(ls, BSALGORITHM)) {
 		    case LS_MEAN, LS_MEDIAN, LS_MODE:
-	    		if (rg_lstati (ls, NREGIONS) > 1) {
+	    		if (rg_lstatl (ls, NREGIONS) > 1) {
 			    if (plottype != LS_MMFIT)
 				newplot = YES
 	        	    plottype = LS_MMFIT
@@ -208,7 +218,7 @@ begin
 	        	    plottype = LS_MMHIST
 			}
 		    case LS_FIT:
-	    		if (rg_lstati (ls, NREGIONS) > 1) {
+	    		if (rg_lstatl (ls, NREGIONS) > 1) {
 			    if (plottype != LS_BSZFIT)
 	        	        plottype = LS_BSZFIT
 	    		} else {
@@ -226,7 +236,7 @@ begin
 		case 'i':
 		    switch (rg_lstati(ls, BZALGORITHM)) {
 		    case LS_MEAN, LS_MEDIAN, LS_MODE:
-	    		if (rg_lstati (ls, NREGIONS) > 1) {
+	    		if (rg_lstatl (ls, NREGIONS) > 1) {
 			    if (plottype != LS_MMRESID)
 				newplot = YES
 	        	    plottype = LS_MMRESID
@@ -235,7 +245,7 @@ begin
 			    "There are too few regions for a residuals plot\n")
 			}
 		    case LS_FIT:
-	    		if (rg_lstati (ls, NREGIONS) > 1) {
+	    		if (rg_lstatl (ls, NREGIONS) > 1) {
 			    if (plottype != LS_BSZRESID)
 				newplot = YES
 	        	     plottype = LS_BSZRESID
@@ -256,7 +266,7 @@ begin
 		    }
 		    switch (rg_lstati(ls, BSALGORITHM)) {
 		    case LS_MEAN, LS_MEDIAN, LS_MODE:
-	    		if (rg_lstati (ls, NREGIONS) > 1) {
+	    		if (rg_lstatl (ls, NREGIONS) > 1) {
 			    if (plottype != LS_MMRESID)
 				newplot = YES
 	        	    plottype = LS_MMRESID
@@ -265,7 +275,7 @@ begin
 			    "There are too few regions for a residuals plot\n")
 			}
 		    case LS_FIT:
-	    		if (rg_lstati (ls, NREGIONS) > 1) {
+	    		if (rg_lstatl (ls, NREGIONS) > 1) {
 			    if (plottype != LS_BSZRESID)
 				newplot = YES
 	        	    plottype = LS_BSZRESID
@@ -298,7 +308,7 @@ begin
 			    } else {
 	        	        call printf (
 			            "Unable to plot statistics for region %d\n")
-				    call pargi (reg)
+				    call pargl (reg)
 			    }
 		        } else
 	        	    call printf ("Unable to plot region statistics\n")
@@ -327,7 +337,7 @@ begin
 			    else {
 	        	        call printf (
 			            "Unable to plot statistics for region %d\n")
-				    call pargi (reg)
+				    call pargl (reg)
 			    }
 		        } else
 	        	    call printf (
@@ -360,7 +370,7 @@ begin
 				call printf ("\n")
 				break
 			    case ' ':
-				if (reg < rg_lstati (ls, NREGIONS)) {
+				if (reg < rg_lstatl (ls, NREGIONS)) {
 				    reg = reg + 1
 				    hplot = YES
 				}
@@ -422,7 +432,7 @@ begin
 				call printf ("\n")
 				break
 			    case ' ':
-				if (reg < rg_lstati (ls, NREGIONS)) {
+				if (reg < rg_lstatl (ls, NREGIONS)) {
 				    reg = reg + 1
 				    lplot = YES
 				}
@@ -499,7 +509,7 @@ begin
 	    }
 
 	    if (newplot == YES) {
-		if (rg_lstati(ls,NREGIONS) <= 0) {
+		if (rg_lstatl(ls,NREGIONS) <= 0) {
 	    	    call gclear (gd)
 	    	    call gflush (gd)
 	    	    bscale = 1.0; bzero = 0.0
@@ -507,12 +517,12 @@ begin
 	    	    call printf ("The regions/photometry list is empty\n")
 		} else if (newref == YES || newimage == YES) {
 		    call printf ("Bscale and bzero must be recomputed\n")
-		} else if (rg_lplot (gd, imr, im1, ls, Memi[udelete], 1,
+		} else if (rg_lplot (gd, imr, im1, ls, Memi[udelete], c_1,
 		    bscale, bzero, plottype) == OK) {
 		    if (newfit == YES || newavg == YES)
 		        call printf ("Bscale and bzero should be recomputed\n")
 		    else
-		        call rg_lpwrec (ls, 0)
+		        call rg_lpwrec (ls, c_0)
 		    newplot = NO
 		} else
 	            call printf ("Unable to plot image data for region 1\n")
@@ -532,19 +542,21 @@ int procedure rg_lgqverify (task, db, dformat, rg, ch)
 
 char    task[ARB]       #I the calling task name
 pointer db              #I pointer to the shifts database file
-int     dformat         #I is the shifts file in database format
+int	dformat         #I is the shifts file in database format
 pointer rg              #I pointer to the task structure
-int     ch              #I the input keystroke command
+int	ch              #I the input keystroke command
 
-int     wcs, stat
+size_t	sz_val
+int	wcs, stat
 pointer sp, cmd
 real    wx, wy
 bool    streq()
-int     clgcur()
+int	clgcur()
 
 begin
         call smark (sp)
-        call salloc (cmd, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (cmd, sz_val, TY_CHAR)
 
         # Print the status line query in reverse video and get the keystroke.
         call printf (QUERY)
@@ -578,7 +590,7 @@ end
 
 int procedure rg_lgtverify (ch)
 
-int     ch              #I the input keystroke command
+int	ch              #I the input keystroke command
 
 begin
         if (ch == 'q') {

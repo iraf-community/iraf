@@ -4,55 +4,55 @@ define	LEN_LSSTRUCT (70 + 12 * SZ_FNAME + 12)
 
 # Quantities that define the current region and the number of regions
 
-define	LS_CNREGION	Memi[P2I($1)]      # the current region
-define	LS_NREGIONS	Memi[P2I($1+1)]    # the number of regions
-define	LS_MAXNREGIONS	Memi[P2I($1+2)]    # the maximum number of regions
+define	LS_CNREGION	Meml[P2L($1)]      # the current region
+define	LS_NREGIONS	Memz[P2Z($1+1)]    # the number of regions
+define	LS_MAXNREGIONS	Memz[P2Z($1+2)]    # the maximum number of regions
 
 # Quantities that are dependent on the number of regions
 
-define	LS_RC1		Memi[P2I($1+3)]    # pointers to first columns of regions
-define	LS_RC2		Memi[P2I($1+4)]    # pointers to last columns of regions
-define	LS_RL1		Memi[P2I($1+5)]    # pointer to first lines of regions
-define	LS_RL2		Memi[P2I($1+6)]    # pointers to last lines of regions
-define	LS_RXSTEP	Memi[P2I($1+7)]    # pointers to the x step sizes
-define	LS_RYSTEP	Memi[P2I($1+8)]    # pointers to the y step sizes
+define	LS_RC1		Memp[$1+3]    # pointers to first columns of regions
+define	LS_RC2		Memp[$1+4]    # pointers to last columns of regions
+define	LS_RL1		Memp[$1+5]    # pointer to first lines of regions
+define	LS_RL2		Memp[$1+6]    # pointers to last lines of regions
+define	LS_RXSTEP	Memp[$1+7]    # pointers to the x step sizes
+define	LS_RYSTEP	Memp[$1+8]    # pointers to the y step sizes
 define	LS_XSHIFT	Memr[P2R($1+9)]   # the x shift from image to reference
 define	LS_YSHIFT	Memr[P2R($1+10)]   # the y shift from image to reference
 define	LS_SXSHIFT	Memr[P2R($1+11)]   # the x shift from image to reference
 define	LS_SYSHIFT	Memr[P2R($1+12)]   # the y shift from image to reference
 
-define	LS_RBUF		Memi[P2I($1+14)]   # pointer to the reference image data
+define	LS_RBUF		Memp[$1+14]   # pointer to the reference image data
 define	LS_RGAIN	Memr[P2R($1+15)]   # the reference image gain
 define	LS_RREADNOISE	Memr[P2R($1+16)]   # the reference image readout noise
-define	LS_RMEAN	Memi[P2I($1+17)]   # pointers to means of ref regions
-define	LS_RMEDIAN	Memi[P2I($1+18)]   # pointers to medians of ref regions
-define	LS_RMODE	Memi[P2I($1+19)]   # pointers to modes of ref regions
-define	LS_RSIGMA	Memi[P2I($1+20)]   # pointers to stdevs of ref regions
-define	LS_RSKY		Memi[P2I($1+21)]   # pointers to sky values of ref regions
-define	LS_RSKYERR	Memi[P2I($1+22)]   # pointers to sky errors of ref regions
-define	LS_RMAG		Memi[P2I($1+23)]   # pointers to magnitudes of ref regions
-define	LS_RMAGERR	Memi[P2I($1+24)]   # pointers to mag errors of ref regions
-define	LS_RNPTS	Memi[P2I($1+25)]   # pointers to npts of ref regions
+define	LS_RMEAN	Memp[$1+17]   # pointers to means of ref regions
+define	LS_RMEDIAN	Memp[$1+18]   # pointers to medians of ref regions
+define	LS_RMODE	Memp[$1+19]   # pointers to modes of ref regions
+define	LS_RSIGMA	Memp[$1+20]   # pointers to stdevs of ref regions
+define	LS_RSKY		Memp[$1+21]   # pointers to sky values of ref regions
+define	LS_RSKYERR	Memp[$1+22]   # pointers to sky errors of ref regions
+define	LS_RMAG		Memp[$1+23]   # pointers to magnitudes of ref regions
+define	LS_RMAGERR	Memp[$1+24]   # pointers to mag errors of ref regions
+define	LS_RNPTS	Memp[$1+25]   # pointers to npts of ref regions
 
-define	LS_IBUF		Memi[P2I($1+27)]   # pointer to the input image data
+define	LS_IBUF		Memp[$1+27]   # pointer to the input image data
 define	LS_IGAIN	Memr[P2R($1+28)]   # the input image gain
 define	LS_IREADNOISE	Memr[P2R($1+29)]   # the input image readout noise
-define	LS_IMEAN	Memi[P2I($1+30)]   # pointers to means of image regions
-define	LS_IMEDIAN	Memi[P2I($1+31)]   # pointers to medians of image regions
-define	LS_IMODE	Memi[P2I($1+32)]   # pointers to modes of image regions
-define	LS_ISIGMA	Memi[P2I($1+33)]   # pointers to stdevs of image regions
-define	LS_ISKY		Memi[P2I($1+34)]   # pointers to sky values of image regions
-define	LS_ISKYERR	Memi[P2I($1+35)]   # pointers to sky errors of image regions
-define	LS_IMAG		Memi[P2I($1+36)]   # pointers to magnitudes of image regions
-define	LS_IMAGERR	Memi[P2I($1+37)]   # pointers to mag errors of image regions
-define	LS_INPTS	Memi[P2I($1+38)]   # pointers to npts of image regions
+define	LS_IMEAN	Memp[$1+30]   # pointers to means of image regions
+define	LS_IMEDIAN	Memp[$1+31]   # pointers to medians of image regions
+define	LS_IMODE	Memp[$1+32]   # pointers to modes of image regions
+define	LS_ISIGMA	Memp[$1+33]   # pointers to stdevs of image regions
+define	LS_ISKY		Memp[$1+34]   # pointers to sky values of image regions
+define	LS_ISKYERR	Memp[$1+35]   # pointers to sky errors of image regions
+define	LS_IMAG		Memp[$1+36]   # pointers to magnitudes of image regions
+define	LS_IMAGERR	Memp[$1+37]   # pointers to mag errors of image regions
+define	LS_INPTS	Memp[$1+38]   # pointers to npts of image regions
 
-define	LS_RBSCALE	Memi[P2I($1+39)]   # pointers to bscales of regions
-define	LS_RBSCALEERR	Memi[P2I($1+40)]   # pointers to bscale errors of regions
-define	LS_RBZERO	Memi[P2I($1+41)]   # pointers to bzero errors of regions
-define	LS_RBZEROERR	Memi[P2I($1+42)]   # pointers to bzero errors of regions
-define	LS_RDELETE	Memi[P2I($1+43)]   # pointer to the delete array
-define	LS_RCHI		Memi[P2I($1+44)]   # pointer to the resid array
+define	LS_RBSCALE	Memp[$1+39]   # pointers to bscales of regions
+define	LS_RBSCALEERR	Memp[$1+40]   # pointers to bscale errors of regions
+define	LS_RBZERO	Memp[$1+41]   # pointers to bzero errors of regions
+define	LS_RBZEROERR	Memp[$1+42]   # pointers to bzero errors of regions
+define	LS_RDELETE	Memp[$1+43]   # pointer to the delete array
+define	LS_RCHI		Memp[$1+44]   # pointer to the resid array
 
 # Quantities that affect the fitting algorithms
 
@@ -60,10 +60,10 @@ define	LS_BSALGORITHM	Memi[P2I($1+45)]	# bscale fitting algorithm
 define	LS_BZALGORITHM	Memi[P2I($1+46)]	# bzero fitting algorithm
 define	LS_CBZERO	Memr[P2R($1+47)]	# constant bzero
 define	LS_CBSCALE	Memr[P2R($1+48)]	# constant bscale
-define	LS_DNX		Memi[P2I($1+49)]	# x width of data region to extract
-define	LS_DNY		Memi[P2I($1+50)]	# y width of data region to extract
-#define	LS_PNX		Memi[P2I($1+51)]	# x width of photometry region
-#define	LS_PNY		Memi[P2I($1+52)]	# y widht of photometry region
+define	LS_DNX		Meml[P2L($1+49)]	# x width of data region to extract
+define	LS_DNY		Meml[P2L($1+50)]	# y width of data region to extract
+#define	LS_PNX		Meml[P2L($1+51)]	# x width of photometry region
+#define	LS_PNY		Meml[P2L($1+52)]	# y widht of photometry region
 define	LS_DATAMIN	Memr[P2R($1+51)]	# the minimum good data value
 define	LS_DATAMAX	Memr[P2R($1+52)]	# the maximum good data value
 define	LS_MAXITER	Memi[P2I($1+53)]	# maximum number of iterations

@@ -16,35 +16,47 @@ int	dformat			#I write the output file in database format
 int	interactive		#I interactive mode ?
 int	verbose			#I verbose mode
 
-int	stat, nregions
+size_t	sz_val
+int	i_val
+long	c_1
+int	stat
+long	nregions
 int	rpfd, ipfd, sfd
 pointer	reglist, reclist, shiftslist, list1, listr, list2
 pointer	sp, reference, imager, image1, imtemp, image2, str, str1, shifts
 pointer	ls, db, gd, id, imr, im1, im2
 bool	clgetb()
 int	imtlen(), fntlenb(), access(), btoi(), open()
-int	rg_lstati(), imtgetim(), fntgfnb(), rg_lregions(), rg_lscale()
-int	rg_lrphot(), rg_liscale()
+int	rg_lstati(), imtgetim(), fntgfnb(), rg_lscale()
+long	rg_lregions(), rg_lrphot(), rg_lstatl()
+int	rg_liscale()
 pointer	fntopnb(), imtopen(), dtmap(), gopen(), immap()
 real	rg_lstatr()
 errchk	gopen()
+include	<nullptr.inc>
 
 begin
+	c_1 = 1
+
 	call fseti (STDOUT, F_FLUSHNL, YES)
 
 	# Allocate temporary space.
 	call smark (sp)
 
-	call salloc (reference, SZ_FNAME, TY_CHAR)
-	call salloc (freglist, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (imager, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (database, SZ_FNAME, TY_CHAR)
-	call salloc (shifts, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (str1, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (reference, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (freglist, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (imager, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	call salloc (database, sz_val, TY_CHAR)
+	call salloc (shifts, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str1, sz_val, TY_CHAR)
 
 	# Open the input and output image lists.
 	call clgstr ("input", Memc[str], SZ_LINE)
@@ -199,7 +211,7 @@ begin
 		    call rg_lsets (ls, REFIMAGE, Memc[str])
 		    call rg_lsetr (ls, RGAIN, rg_lstatr (ls,GAIN))
 		    call rg_lsetr (ls, RREADNOISE, rg_lstatr (ls,READNOISE))
-		    nregions = rg_lrphot (rpfd, ls, 1, rg_lstati(ls,
+		    nregions = rg_lrphot (rpfd, ls, c_1, rg_lstatl(ls,
 		        MAXNREGIONS), YES) 
 		    if (nregions <= 0 && interactive == NO)
 		        call error (0,
@@ -213,7 +225,7 @@ begin
 		if (imtgetim(listr, Memc[str], SZ_FNAME) != EOF) {
 		    if (imr != NULL)
 		        call imunmap (imr)
-		    imr = immap (Memc[str], READ_ONLY, 0)
+		    imr = immap (Memc[str], READ_ONLY, NULLPTR)
 		    if (IM_NDIM(imr) > 2)
 			call error (0, "Referenc image must be 1D or 2D")
 		    call rg_lgain (imr, ls)
@@ -223,7 +235,7 @@ begin
 		    if (!IS_INDEFR(rg_lstatr(ls,READNOISE)))
 		        call rg_lsetr (ls, RREADNOISE, rg_lstatr (ls,READNOISE))
 		    call rg_lsets (ls, REFIMAGE, Memc[str])
-		    nregions = rg_lregions (reglist, imr, ls, 1, NO)
+		    nregions = rg_lregions (reglist, imr, ls, c_1, NO)
 		    if (nregions <= 0 && interactive == NO)
 			call error (0, "The regions list is empty.")
 		    if (shiftslist != NULL) {
@@ -244,7 +256,7 @@ begin
 	    if (list2 == NULL && imr == NULL) 
 		im1 = NULL
 	    else {
-	        im1 = immap (Memc[image1], READ_ONLY, 0)
+	        im1 = immap (Memc[image1], READ_ONLY, NULLPTR)
 	        if (IM_NDIM(im1) > 2) {
                      call error (0, "Input images must be 1D or 2D")
                 } else if (imr != NULL) {
@@ -269,12 +281,12 @@ begin
 		    ipfd = open (Memc[str], READ_ONLY, TEXT_FILE)
 		    call rg_lsets (ls, PHOTFILE, Memc[str])
 		}
-	   	 nregions = rg_lrphot (ipfd, ls, 1, rg_lstati (ls,
-		    NREGIONS), NO) 
+	   	 nregions = rg_lrphot (ipfd, ls, c_1, rg_lstatl (ls, NREGIONS),
+		    NO) 
 		 if (nregions <= 0 && interactive == NO)
 		    call error (0,
 			"The input photometry file is empty.")
-		 if (nregions < rg_lstati (ls, NREGIONS) && interactive == NO) {
+		 if (nregions < rg_lstatl (ls, NREGIONS) && interactive == NO) {
 		    call eprintf ("The input photometry file has fewer")
 		    call eprintf (" objects than the reference photoemtry")
 		    call eprintf (" file.\n")
@@ -389,10 +401,12 @@ begin
 	    call fntclsb (reglist)
 	if (reclist != NULL)
 	    call fntclsb (reclist)
-	if (dformat == YES)
+	if (dformat == YES) {
 	    call dtunmap (db)
-	else
-	    call close (db)
+	} else {
+	    i_val = db
+	    call close (i_val)
+	}
 
 	# Close up the graphics and image display devices.
 	if (gd != NULL)
@@ -414,6 +428,7 @@ procedure rg_lgain (im, ls)
 pointer	im		#I pointer to the input image
 pointer	ls		#I pointer to the intensity matching structure
 
+size_t	sz_val
 int	ip
 pointer	sp, key
 real	epadu
@@ -423,7 +438,8 @@ errchk	imgetr()
 
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
 
 	call rg_lstats (ls, CCDGAIN, Memc[key], SZ_FNAME)
 	ip = 1
@@ -454,6 +470,7 @@ procedure rg_lrdnoise (im, ls)
 pointer	im		#I pointer to the input image
 pointer	ls		#I pointer to the intensity matching structure
 
+size_t	sz_val
 int	ip
 pointer	sp, key
 real	rdnoise
@@ -463,7 +480,8 @@ errchk	imgetr()
 
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
 
 	call rg_lstats (ls, CCDREAD, Memc[key], SZ_FNAME)
 	ip = 1
@@ -524,18 +542,23 @@ pointer	im2		#I pointer to the output image
 real	bscale		#I the bscale value
 real	bzero		#I the bzero value
 
-int	ncols
+size_t	sz_val
+long	l_val
+size_t	ncols
 pointer	sp, v1, v2, buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
 
 	ncols = IM_LEN(im1,1)
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovkl (long(1), Meml[v2], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[v1], sz_val)
+	call amovkl (l_val, Meml[v2], sz_val)
 	while (imgnlr (im1, buf1, Meml[v1]) != EOF) {
 	    if (impnlr (im2, buf2, Meml[v2]) != EOF)
 		call altmr (Memr[buf1], Memr[buf2], ncols, bscale, bzero)

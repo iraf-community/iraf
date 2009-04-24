@@ -8,37 +8,42 @@ include "linmatch.h"
 # notation, grid notation, coordinate notation or are read
 # from a file.
 
-int procedure rg_lregions (list, im, ls, rp, reread)
+long procedure rg_lregions (list, im, ls, rp, reread)
 
-int	list			#I pointer to the regions file list
+pointer	list			#I pointer to the regions file list
 pointer	im			#I pointer to the reference image
 pointer	ls			#I pointer to the linscale structure
-int	rp			#I region pointer
+long	rp			#I region pointer
 int	reread			#I reread the current file
 
+size_t	sz_val
+long	l_val
 char	fname[SZ_FNAME]
-int	max_nregions, nregions, fd
+size_t	max_nregions, nregions
+int	fd
 pointer	sp, regions
-int	rg_lstati(), rg_lgrid(), rg_lgregions(), rg_lsregions()
-int	rg_lrsections(), rg_lrcoords(), fntgfnb(), open()
+long	rg_lgrid(), rg_lgregions(), rg_lsregions(), rg_lrcoords(), rg_lstatl()
+long	rg_lrsections()
+int	fntgfnb(), open()
 data	fname[1] /EOS/
 errchk	fntgfnb(), seek(),  open(), close()
 
 begin
 	call smark (sp)
-	call salloc (regions, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (regions, sz_val, TY_CHAR)
 
 	call rg_lstats (ls, REGIONS, Memc[regions], SZ_LINE)
-	max_nregions = rg_lstati (ls, MAXNREGIONS)
+	max_nregions = rg_lstatl (ls, MAXNREGIONS)
 
 	if (rp < 1 || rp > max_nregions || Memc[regions] == EOS) {
 	    nregions = 0
 	} else if (rg_lgrid (im, ls, rp, max_nregions) > 0) {
-	    nregions = rg_lstati (ls, NREGIONS)
+	    nregions = rg_lstatl (ls, NREGIONS)
 	} else if (rg_lgregions (im, ls, rp, max_nregions) > 0) {
-	    nregions = rg_lstati (ls, NREGIONS)
+	    nregions = rg_lstatl (ls, NREGIONS)
 	} else if (rg_lsregions (im, ls, rp, max_nregions) > 0) {
-	    nregions = rg_lstati (ls, NREGIONS)
+	    nregions = rg_lstatl (ls, NREGIONS)
 	} else if (list != NULL) {
 	    if (reread == NO) {
 	        iferr {
@@ -46,7 +51,8 @@ begin
 	                fd = open (fname, READ_ONLY, TEXT_FILE)
 	                nregions= rg_lrsections (fd, im, ls, rp, max_nregions)
 		        if (nregions <= 0) {
-			    call seek (fd, BOF)
+			    l_val = BOF
+			    call seek (fd, l_val)
 	                    nregions= rg_lrcoords (fd, im, ls, rp, max_nregions)
 		        }
 	                call close (fd)
@@ -59,7 +65,8 @@ begin
 	            fd = open (fname, READ_ONLY, TEXT_FILE)
 	            nregions= rg_lrsections (fd, im, ls, rp, max_nregions)
 		    if (nregions <= 0) {
-			call seek (fd, BOF)
+			l_val = BOF
+			call seek (fd, l_val)
 	                nregions= rg_lrcoords (fd, im, ls, rp, max_nregions)
 		    }
 	            call close (fd)
@@ -77,24 +84,28 @@ end
 
 # RG_LGRID - Decode the regions from a grid specification.
 
-int procedure rg_lgrid (im, ls, rp, max_nregions)
+long procedure rg_lgrid (im, ls, rp, max_nregions)
 
 pointer im                      #I pointer to the reference image
 pointer ls                      #I pointer to the linscale structure
-int     rp                      #I index of the current region
-int     max_nregions            #I the maximum number of regions
+long	rp                      #I index of the current region
+size_t	max_nregions            #I the maximum number of regions
 
-int     i, istart, iend, j, jstart, jend, ncols, nlines, nxsample, nysample
-int     nxcols, nylines, nregions
+size_t	sz_val
+long	i, istart, iend, j, jstart, jend
+long	ncols, nlines, nxsample, nysample
+long	nxcols, nylines, nregions
 pointer sp, region, section
-int     rg_lstati(), nscan(), strcmp()
+int	nscan(), strcmp()
+long	rg_lstatl(), lnint()
 pointer rg_lstatp()
 
 begin
         # Allocate working space.
         call smark (sp)
-        call salloc (region, SZ_LINE, TY_CHAR)
-        call salloc (section, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (region, sz_val, TY_CHAR)
+        call salloc (section, sz_val, TY_CHAR)
 
         # Allocate the arrays to hold the regions information,
         call rg_lrealloc (ls, max_nregions)
@@ -103,13 +114,13 @@ begin
         call rg_lstats (ls, REGIONS, Memc[region], SZ_LINE)
         ncols = IM_LEN(im,1)
         nlines = IM_LEN(im,2)
-        nregions = min (rp - 1, rg_lstati (ls, NREGIONS))
+        nregions = min (rp - 1, rg_lstatl (ls, NREGIONS))
 
         # Decode the grid specification.
         call sscan (Memc[region])
             call gargwrd (Memc[section], SZ_LINE)
-            call gargi (nxsample)
-            call gargi (nysample)
+            call gargl (nxsample)
+            call gargl (nysample)
         if ((nscan() != 3) || (strcmp (Memc[section], "grid") != 0)) {
             call sfree (sp)
             return (nregions)
@@ -117,7 +128,7 @@ begin
 
         # Decode the regions.
         if ((nxsample * nysample) > max_nregions) {
-            nxsample = nint (sqrt (real (max_nregions) * real (ncols) /
+            nxsample = lnint(sqrt (real (max_nregions) * real (ncols) /
                 real (nlines)))
             nysample = real (max_nregions) / real (nxsample)
         }
@@ -129,12 +140,12 @@ begin
             istart = 1 + (ncols - nxsample * nxcols) / 2
             iend = istart + (nxsample - 1) * nxcols
             do i = istart, iend, nxcols {
-                Memi[rg_lstatp(ls,RC1)+nregions] = i
-                Memi[rg_lstatp(ls,RC2)+nregions] = i + nxcols - 1
-                Memi[rg_lstatp(ls,RL1)+nregions] = j
-                Memi[rg_lstatp(ls,RL2)+nregions] = j + nylines - 1
-                Memi[rg_lstatp(ls,RXSTEP)+nregions] = 1
-                Memi[rg_lstatp(ls,RYSTEP)+nregions] = 1
+                Meml[rg_lstatp(ls,RC1)+nregions] = i
+                Meml[rg_lstatp(ls,RC2)+nregions] = i + nxcols - 1
+                Meml[rg_lstatp(ls,RL1)+nregions] = j
+                Meml[rg_lstatp(ls,RL2)+nregions] = j + nylines - 1
+                Meml[rg_lstatp(ls,RXSTEP)+nregions] = 1
+                Meml[rg_lstatp(ls,RYSTEP)+nregions] = 1
 		Memr[rg_lstatp(ls,RMEAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMEDIAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMODE)+nregions] = INDEFR
@@ -143,7 +154,7 @@ begin
 		Memr[rg_lstatp(ls,RSKYERR)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMAG)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMAGERR)+nregions] = INDEFR
-		Memi[rg_lstatp(ls,RNPTS)+nregions] = INDEFI
+		Meml[rg_lstatp(ls,RNPTS)+nregions] = INDEFL
 		Memr[rg_lstatp(ls,IMEAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMEDIAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMODE)+nregions] = INDEFR
@@ -152,7 +163,7 @@ begin
 		Memr[rg_lstatp(ls,ISKYERR)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMAG)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMAGERR)+nregions] = INDEFR
-		Memi[rg_lstatp(ls,INPTS)+nregions] = INDEFI
+		Meml[rg_lstatp(ls,INPTS)+nregions] = INDEFL
 		Memr[rg_lstatp(ls,RBSCALE)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RBSCALEERR)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RBZERO)+nregions] = INDEFR
@@ -163,7 +174,7 @@ begin
             }
         }
 
-        call rg_lseti (ls, NREGIONS, nregions)
+        call rg_lsetl (ls, NREGIONS, nregions)
         if (nregions > 0)
             call rg_lrealloc (ls, nregions)
         else
@@ -177,25 +188,29 @@ end
 # RG_LGREGIONS -- Compute the column and line limits givenan x and y
 # coordinate and a default size.
 
-int procedure rg_lgregions (im, ls, rp, max_nregions)
+long procedure rg_lgregions (im, ls, rp, max_nregions)
 
 pointer im                      #I pointer to the image
 pointer ls                      #I pointer to the linscale structure
-int     rp                      #I pointer to the current region
-int     max_nregions            #I maximum number of regions
+long	rp                      #I pointer to the current region
+size_t	max_nregions            #I maximum number of regions
 
+size_t	sz_val
 char	comma
-int     ncols, nlines, nregions, onscan()
-int     x1, x2, y1, y2
+size_t	nregions
+long	ncols, nlines, x1, x2, y1, y2
 pointer sp, region
 real    x, y, xc, yc
-int     rg_lstati(), nscan()
+int	nscan(), onscan()
+#int	rg_lstati()
+long	rg_lstatl()
 pointer rg_lstatp()
 
 begin
         # Allocate working space.
         call smark (sp)
-        call salloc (region, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (region, sz_val, TY_CHAR)
 
         # Allocate the arrays to hold the regions information.
         call rg_lrealloc (ls, max_nregions)
@@ -206,7 +221,7 @@ begin
 
         # Decode the center.
         call rg_lstats (ls, REGIONS, Memc[region], SZ_LINE)
-        nregions = min (rp - 1, rg_lstati (ls, NREGIONS))
+        nregions = min (rp - 1, rg_lstatl (ls, NREGIONS))
 	onscan = 0
         call sscan (Memc[region])
             call gargr (x)
@@ -229,25 +244,25 @@ begin
             #}
 
             # Compute the data section.
-            x1 = xc - rg_lstati (ls, DNX) / 2
-            x2 = x1 + rg_lstati (ls, DNX) - 1
+            x1 = xc - rg_lstatl (ls, DNX) / 2
+            x2 = x1 + rg_lstatl (ls, DNX) - 1
             if (IM_NDIM(im) == 1) {
                 y1 = 1
                 y2 = 1
             } else {
-                y1 = yc - rg_lstati (ls, DNY) / 2
-                y2 = y1 + rg_lstati (ls, DNY) - 1
+                y1 = yc - rg_lstatl (ls, DNY) / 2
+                y2 = y1 + rg_lstatl (ls, DNY) - 1
             }
 
             # Make sure that the region is on the image.
             if (x1 >= 1 && x2 <= IM_LEN(im,1) && y1 >= 1 &&
                 y2 <= IM_LEN(im,2)) {
-                Memi[rg_lstatp(ls,RC1)+nregions] = x1
-                Memi[rg_lstatp(ls,RC2)+nregions] = x2
-                Memi[rg_lstatp(ls,RL1)+nregions] = y1
-                Memi[rg_lstatp(ls,RL2)+nregions] = y2
-                Memi[rg_lstatp(ls,RXSTEP)+nregions] = 1
-                Memi[rg_lstatp(ls,RYSTEP)+nregions] = 1
+                Meml[rg_lstatp(ls,RC1)+nregions] = x1
+                Meml[rg_lstatp(ls,RC2)+nregions] = x2
+                Meml[rg_lstatp(ls,RL1)+nregions] = y1
+                Meml[rg_lstatp(ls,RL2)+nregions] = y2
+                Meml[rg_lstatp(ls,RXSTEP)+nregions] = 1
+                Meml[rg_lstatp(ls,RYSTEP)+nregions] = 1
 		Memr[rg_lstatp(ls,RMEAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMEDIAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMODE)+nregions] = INDEFR
@@ -256,7 +271,7 @@ begin
 		Memr[rg_lstatp(ls,RSKYERR)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMAG)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMAGERR)+nregions] = INDEFR
-		Memi[rg_lstatp(ls,RNPTS)+nregions] = INDEFI
+		Meml[rg_lstatp(ls,RNPTS)+nregions] = INDEFL
 		Memr[rg_lstatp(ls,IMEAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMEDIAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMODE)+nregions] = INDEFR
@@ -265,7 +280,7 @@ begin
 		Memr[rg_lstatp(ls,ISKYERR)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMAG)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMAGERR)+nregions] = INDEFR
-		Memi[rg_lstatp(ls,INPTS)+nregions] = INDEFI
+		Meml[rg_lstatp(ls,INPTS)+nregions] = INDEFL
 		Memr[rg_lstatp(ls,RBSCALE)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RBSCALEERR)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RBZERO)+nregions] = INDEFR
@@ -282,7 +297,7 @@ begin
         }
 
         # Reallocate the correct amount of space.
-        call rg_lseti (ls, NREGIONS, nregions)
+        call rg_lsetl (ls, NREGIONS, nregions)
         if (nregions > 0)
             call rg_lrealloc (ls, nregions)
         else
@@ -298,39 +313,43 @@ end
 # Sections are marked by pointing the image display cursor to the
 # lower left and upper rights corners of the desired sections respectively.
 
-int procedure rg_lmkregions (fd, im, ls, rp, max_nregions, regions, maxch)
+long procedure rg_lmkregions (fd, im, ls, rp, max_nregions, regions, maxch)
 
 int	fd			#I pointer to the output text file
 pointer	im			#I pointer to the image
 pointer	ls			#I pointer to the intensity scaling structure
-int	rp			#I pointer to current region
-int	max_nregions		#I maximum number of regions
+long	rp			#I pointer to current region
+size_t	max_nregions		#I maximum number of regions
 char	regions[ARB]		#O the output regions string
 int	maxch			#I the maximum size of the output string
 
-int	nregions, op, wcs, key
+size_t	sz_val
+long	nregions
+int	op, wcs, key
 pointer	sp, cmd
 real	xll, yll, xur, yur
-int	rg_lstati(), clgcur(), gstrcpy()
+int	clgcur(), gstrcpy()
+long	rg_lstatl(), lnint()
 pointer	rg_lstatp()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_lrealloc (ls, max_nregions)
 
 	# Initialize.
-	nregions = min (rp-1, rg_lstati (ls, NREGIONS))
+	nregions = min (rp-1, rg_lstatl (ls, NREGIONS))
 	op = 1
 	regions[1] = EOS
 
 	while (nregions < max_nregions) {
 
 	    call printf ("Mark lower left corner of region %d [q to quit].\n")
-		call pargi (nregions + 1)
+		call pargl (nregions + 1)
 	    if (clgcur ("icommands", xll, yll, wcs, key, Memc[cmd],
 	        SZ_LINE) == EOF)
 		break
@@ -338,7 +357,7 @@ begin
 		break
 
 	    call printf ("Mark upper right corner of region %d [q to quit].\n")
-		call pargi (nregions + 1)
+		call pargl (nregions + 1)
 	    if (clgcur ("icommands", xur, yur, wcs, key, Memc[cmd],
 	        SZ_LINE) == EOF)
 		break
@@ -350,12 +369,12 @@ begin
 		IM_LEN(im,2))
 		next
 
-	    Memi[rg_lstatp(ls,RC1)+nregions] = nint(xll)
-	    Memi[rg_lstatp(ls,RC2)+nregions] = nint(xur)
-	    Memi[rg_lstatp(ls,RXSTEP)+nregions] = 1
-	    Memi[rg_lstatp(ls,RL1)+nregions] = nint(yll)
-	    Memi[rg_lstatp(ls,RL2)+nregions] = nint(yur)
-	    Memi[rg_lstatp(ls,RYSTEP)+nregions] = 1
+	    Meml[rg_lstatp(ls,RC1)+nregions] = lnint(xll)
+	    Meml[rg_lstatp(ls,RC2)+nregions] = lnint(xur)
+	    Meml[rg_lstatp(ls,RXSTEP)+nregions] = 1
+	    Meml[rg_lstatp(ls,RL1)+nregions] = lnint(yll)
+	    Meml[rg_lstatp(ls,RL2)+nregions] = lnint(yur)
+	    Meml[rg_lstatp(ls,RYSTEP)+nregions] = 1
 
 	    Memr[rg_lstatp(ls,RMEAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMEDIAN)+nregions] = INDEFR
@@ -365,7 +384,7 @@ begin
 	    Memr[rg_lstatp(ls,RSKYERR)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMAG)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMAGERR)+nregions] = INDEFR
-	    Memi[rg_lstatp(ls,RNPTS)+nregions] = INDEFI
+	    Meml[rg_lstatp(ls,RNPTS)+nregions] = INDEFL
 
 	    Memr[rg_lstatp(ls,IMEAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMEDIAN)+nregions] = INDEFR
@@ -375,7 +394,7 @@ begin
 	    Memr[rg_lstatp(ls,ISKYERR)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMAG)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMAGERR)+nregions] = INDEFR
-	    Memi[rg_lstatp(ls,INPTS)+nregions] = INDEFI
+	    Meml[rg_lstatp(ls,INPTS)+nregions] = INDEFL
 
 	    Memr[rg_lstatp(ls,RBSCALE)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RBSCALEERR)+nregions] = INDEFR
@@ -387,31 +406,33 @@ begin
 
 	    # Write the regions string.
 	    call sprintf (Memc[cmd], SZ_LINE, "[%d:%d,%d:%d] ")
-		call pargi (nint(xll))
-		call pargi (nint(xur))
-		call pargi (nint(yll))
-		call pargi (nint(yur))
+		call pargl (lnint(xll))
+		call pargl (lnint(xur))
+		call pargl (lnint(yll))
+		call pargl (lnint(yur))
 	    op = op + gstrcpy (Memc[cmd], regions[op], maxch - op + 1)
 
 	    # Write the output record.
 	    if (fd != NULL) {
 		call fprintf (fd, "[%d:%d,%d:%d]\n")
-		    call pargi (nint(xll)) 
-		    call pargi (nint(xur)) 
-		    call pargi (nint(yll)) 
-		    call pargi (nint(yur)) 
+		    call pargl (lnint(xll)) 
+		    call pargl (lnint(xur)) 
+		    call pargl (lnint(yll)) 
+		    call pargl (lnint(yur)) 
 	    }
 	}
 	call printf ("\n")
 
 	# Reallocate the correct amount of space.
 	call rg_lsets (ls, REGIONS, regions)
-	call rg_lseti (ls, NREGIONS, nregions)
+	call rg_lsetl (ls, NREGIONS, nregions)
 
-	if (nregions > 0)
-	    call rg_lrealloc (ls, nregions)
-	else 
+	if (nregions > 0) {
+	    sz_val = nregions
+	    call rg_lrealloc (ls, sz_val)
+	} else {
 	    call rg_lrfree (ls)
+	}
 
 	call sfree (sp)
 
@@ -422,35 +443,41 @@ end
 # RG_LMKXY -- Create a list of objects by selecting objects with
 # the image display cursor.
 
-int procedure rg_lmkxy (fd, im, ls, rp, max_nregions)
+long procedure rg_lmkxy (fd, im, ls, rp, max_nregions)
 
-int     fd                      #I the output coordinates file descriptor
+int	fd                      #I the output coordinates file descriptor
 pointer im                      #I pointer to the image
 pointer	ls                      #I pointer to the psf matching structure
-int     rp                      #I pointer to current region
-int     max_nregions            #I maximum number of regions
+long	rp                      #I pointer to current region
+size_t	max_nregions            #I maximum number of regions
 
-int     nregions, wcs, key, x1, x2, y1, y2
+size_t	sz_val
+long	nregions
+int	wcs, key
+long	x1, x2, y1, y2
 pointer sp, region, cmd
 real    xc, yc
-int     clgcur(), rg_lstati()
+int	clgcur()
+long	rg_lstatl()
 pointer rg_lstatp()
 
 begin
         # Allocate working space.
         call smark (sp)
-        call salloc (region, SZ_FNAME, TY_CHAR)
-        call salloc (cmd, SZ_LINE, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (region, sz_val, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (cmd, sz_val, TY_CHAR)
 
         # Allocate the arrays to hold the regions information,
         call rg_lrealloc (ls, max_nregions)
 
-        nregions = min (rp-1, rg_lstati (ls, NREGIONS))
+        nregions = min (rp-1, rg_lstatl (ls, NREGIONS))
         while (nregions < max_nregions) {
 
             # Identify the object.
             call printf ("Mark object %d [any key=mark,q=quit]:\n")
-                call pargi (nregions + 1)
+                call pargl (nregions + 1)
             if (clgcur ("icommands", xc, yc, wcs, key, Memc[cmd],
 		SZ_LINE) == EOF)
                 break
@@ -458,10 +485,10 @@ begin
                 break
 
             # Compute the data section.
-            x1 = xc - rg_lstati (ls, DNX) / 2
-            x2 = x1 + rg_lstati (ls, DNX) - 1
-            y1 = yc - rg_lstati (ls, DNY) / 2
-            y2 = y1 + rg_lstati (ls, DNY) - 1
+            x1 = xc - rg_lstatl (ls, DNX) / 2
+            x2 = x1 + rg_lstatl (ls, DNX) - 1
+            y1 = yc - rg_lstatl (ls, DNY) / 2
+            y2 = y1 + rg_lstatl (ls, DNY) - 1
 
             # Make sure that the region is on the image.
             if (x1 < 1 || x2 > IM_LEN(im,1) || y1 < 1 || y2 >
@@ -474,12 +501,12 @@ begin
                     call pargr (yc)
             }
 
-	    Memi[rg_lstatp(ls,RC1)+nregions] = x1
-	    Memi[rg_lstatp(ls,RC2)+nregions] = x2
-	    Memi[rg_lstatp(ls,RXSTEP)+nregions] = 1
-	    Memi[rg_lstatp(ls,RL1)+nregions] = y1
-	    Memi[rg_lstatp(ls,RL2)+nregions] = y2
-	    Memi[rg_lstatp(ls,RYSTEP)+nregions] = 1
+	    Meml[rg_lstatp(ls,RC1)+nregions] = x1
+	    Meml[rg_lstatp(ls,RC2)+nregions] = x2
+	    Meml[rg_lstatp(ls,RXSTEP)+nregions] = 1
+	    Meml[rg_lstatp(ls,RL1)+nregions] = y1
+	    Meml[rg_lstatp(ls,RL2)+nregions] = y2
+	    Meml[rg_lstatp(ls,RYSTEP)+nregions] = 1
 
 	    Memr[rg_lstatp(ls,RMEAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMEDIAN)+nregions] = INDEFR
@@ -489,7 +516,7 @@ begin
 	    Memr[rg_lstatp(ls,RSKYERR)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMAG)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMAGERR)+nregions] = INDEFR
-	    Memi[rg_lstatp(ls,RNPTS)+nregions] = INDEFI
+	    Meml[rg_lstatp(ls,RNPTS)+nregions] = INDEFL
 
 	    Memr[rg_lstatp(ls,IMEAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMEDIAN)+nregions] = INDEFR
@@ -499,7 +526,7 @@ begin
 	    Memr[rg_lstatp(ls,ISKYERR)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMAG)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMAGERR)+nregions] = INDEFR
-	    Memi[rg_lstatp(ls,INPTS)+nregions] = INDEFI
+	    Meml[rg_lstatp(ls,INPTS)+nregions] = INDEFL
 
 	    Memr[rg_lstatp(ls,RBSCALE)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RBSCALEERR)+nregions] = INDEFR
@@ -513,9 +540,10 @@ begin
         }
 
 	# Reallocate the correct amount of space.
-        call rg_lseti (ls, NREGIONS, nregions)
+        call rg_lsetl (ls, NREGIONS, nregions)
         if (nregions > 0) {
-            call rg_lrealloc (ls, nregions)
+	    sz_val = nregions
+            call rg_lrealloc (ls, sz_val)
             if (fd != NULL) {
                 call fstats (fd, F_FILENAME, Memc[region], SZ_FNAME)
                 call rg_lsets (ls, REGIONS, Memc[region])
@@ -533,24 +561,31 @@ end
 
 # RG_LRSECTIONS -- Read the sections from a file.
 
-int procedure rg_lrsections (fd, im, ls, rp, max_nregions)
+long procedure rg_lrsections (fd, im, ls, rp, max_nregions)
 
 int	fd			#I the regions file descriptor
 pointer	im			#I pointer to the image
 pointer	ls			#I pointer to the linscale structure
-int	rp			#I pointer to current region
-int	max_nregions		#I the  maximum number of regions
+long	rp			#I pointer to current region
+size_t	max_nregions		#I the  maximum number of regions
 
-int	stat, nregions, ncols, nlines, x1, y1, x2, y2, xstep, ystep
+size_t	sz_val
+long	c_2
+int	stat
+size_t	nregions
+long	ncols, nlines, x1, y1, x2, y2, xstep, ystep
 pointer	sp, section, line
-int	rg_lstati(), getline(), rg_lgsections()
+int	getline(), rg_lgsections()
+long	rg_lstatl(), lmod()
 pointer	rg_lstatp()
 
 begin
+	c_2 = 2
 	# Allocate working space.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
-	call salloc (section, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_lrealloc (ls, max_nregions)
@@ -560,7 +595,7 @@ begin
 	nlines = IM_LEN(im,2)
 
 	# Decode the regions string.
-	nregions = min (rp - 1, rg_lstati (ls, NREGIONS))
+	nregions = min (rp - 1, rg_lstatl (ls, NREGIONS))
 	while (getline (fd, Memc[line]) != EOF &&  nregions < max_nregions) {
 
 	    call sscan (Memc[line])
@@ -572,14 +607,14 @@ begin
 
 		# Check for even dimensioned regions.
 		if (stat == OK) {
-		    if (mod (x2 - x1 + 1, 2) == 2) {
+		    if (lmod(x2 - x1 + 1, c_2) == 2) {
 			x2 = x2 + 1
 			if (x2 > ncols)
 			    x2 = x2 - 2
 			if (x2 < 1)
 			    stat = ERR
 		    }
-		    if (mod (y2 - y1 + 1, 2) == 2) {
+		    if (lmod(y2 - y1 + 1, c_2) == 2) {
 			y2 = y2 + 1
 			if (y2 > nlines)
 			    y2 = y2 - 2
@@ -591,12 +626,12 @@ begin
 
 		# Add the new region to the list.
 		if (stat == OK) {
-		    Memi[rg_lstatp(ls,RC1)+nregions] = x1
-		    Memi[rg_lstatp(ls,RC2)+nregions] = x2
-		    Memi[rg_lstatp(ls,RL1)+nregions] = y1
-		    Memi[rg_lstatp(ls,RL2)+nregions] = y2
-		    Memi[rg_lstatp(ls,RXSTEP)+nregions] = xstep
-		    Memi[rg_lstatp(ls,RYSTEP)+nregions] = ystep
+		    Meml[rg_lstatp(ls,RC1)+nregions] = x1
+		    Meml[rg_lstatp(ls,RC2)+nregions] = x2
+		    Meml[rg_lstatp(ls,RL1)+nregions] = y1
+		    Meml[rg_lstatp(ls,RL2)+nregions] = y2
+		    Meml[rg_lstatp(ls,RXSTEP)+nregions] = xstep
+		    Meml[rg_lstatp(ls,RYSTEP)+nregions] = ystep
 		    Memr[rg_lstatp(ls,RMEAN)+nregions] = INDEFR
 		    Memr[rg_lstatp(ls,RMEDIAN)+nregions] = INDEFR
 		    Memr[rg_lstatp(ls,RMODE)+nregions] = INDEFR
@@ -605,7 +640,7 @@ begin
 		    Memr[rg_lstatp(ls,RSKYERR)+nregions] = INDEFR
 		    Memr[rg_lstatp(ls,RMAG)+nregions] = INDEFR
 		    Memr[rg_lstatp(ls,RMAGERR)+nregions] = INDEFR
-		    Memi[rg_lstatp(ls,RNPTS)+nregions] = INDEFI
+		    Meml[rg_lstatp(ls,RNPTS)+nregions] = INDEFL
 		    Memr[rg_lstatp(ls,IMEAN)+nregions] = INDEFR
 		    Memr[rg_lstatp(ls,IMEDIAN)+nregions] = INDEFR
 		    Memr[rg_lstatp(ls,IMODE)+nregions] = INDEFR
@@ -614,7 +649,7 @@ begin
 		    Memr[rg_lstatp(ls,ISKYERR)+nregions] = INDEFR
 		    Memr[rg_lstatp(ls,IMAG)+nregions] = INDEFR
 		    Memr[rg_lstatp(ls,IMAGERR)+nregions] = INDEFR
-		    Memi[rg_lstatp(ls,INPTS)+nregions] = INDEFI
+		    Meml[rg_lstatp(ls,INPTS)+nregions] = INDEFL
 		    Memr[rg_lstatp(ls,RBSCALE)+nregions] = INDEFR
 		    Memr[rg_lstatp(ls,RBSCALEERR)+nregions] = INDEFR
 		    Memr[rg_lstatp(ls,RBZERO)+nregions] = INDEFR
@@ -628,7 +663,7 @@ begin
 	    }
 	}
 
-	call rg_lseti (ls, NREGIONS, nregions)
+	call rg_lsetl (ls, NREGIONS, nregions)
 	if (nregions > 0)
 	    call rg_lrealloc (ls, nregions)
 	else
@@ -641,24 +676,29 @@ end
 
 # RG_LRCOORDS -- Read the coordinates from a file.
 
-int procedure rg_lrcoords (fd, im, ls, rp, max_nregions)
+long procedure rg_lrcoords (fd, im, ls, rp, max_nregions)
 
 int	fd			#I the regions file descriptor
 pointer	im			#I pointer to the image
 pointer	ls			#I pointer to the linscale structure
-int	rp			#I pointer to current region
-int	max_nregions		#I the  maximum number of regions
+long	rp			#I pointer to current region
+size_t	max_nregions		#I the  maximum number of regions
 
-int	ncols, nlines, nregions, x1, x2, y1, y2
+size_t	sz_val
+size_t	nregions
+long	ncols, nlines, x1, x2, y1, y2
 pointer	sp, line
 real	x, y, xc, yc
-int	rg_lstati(), getline(), nscan()
+int	getline(), nscan()
+#int	rg_lstati()
+long	rg_lstatl()
 pointer	rg_lstatp()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_lrealloc (ls, max_nregions)
@@ -668,7 +708,7 @@ begin
 	nlines = IM_LEN(im,2)
 
 	# Decode the regions string.
-	nregions = min (rp - 1, rg_lstati (ls, NREGIONS))
+	nregions = min (rp - 1, rg_lstatl (ls, NREGIONS))
 	while (getline (fd, Memc[line]) != EOF &&  nregions < max_nregions) {
 
 	    call sscan (Memc[line])
@@ -686,25 +726,25 @@ begin
             #}
 
             # Compute the data section.
-            x1 = xc - rg_lstati (ls, DNX) / 2
-            x2 = x1 + rg_lstati (ls, DNX) - 1
+            x1 = xc - rg_lstatl (ls, DNX) / 2
+            x2 = x1 + rg_lstatl (ls, DNX) - 1
             if (IM_NDIM(im) == 1) {
                 y1 = 1
                 y2 = 1
             } else {
-                y1 = yc - rg_lstati (ls, DNY) / 2
-                y2 = y1 + rg_lstati (ls, DNY) - 1
+                y1 = yc - rg_lstatl (ls, DNY) / 2
+                y2 = y1 + rg_lstatl (ls, DNY) - 1
             }
 
             # Make sure that the region is on the image.
             if (x1 >= 1 && x2 <= IM_LEN(im,1) && y1 >= 1 && y2 <=
 	        IM_LEN(im,2)) {
-                Memi[rg_lstatp(ls,RC1)+nregions] = x1
-                Memi[rg_lstatp(ls,RC2)+nregions] = x2
-                Memi[rg_lstatp(ls,RL1)+nregions] = y1
-                Memi[rg_lstatp(ls,RL2)+nregions] = y2
-                Memi[rg_lstatp(ls,RXSTEP)+nregions] = 1
-                Memi[rg_lstatp(ls,RYSTEP)+nregions] = 1
+                Meml[rg_lstatp(ls,RC1)+nregions] = x1
+                Meml[rg_lstatp(ls,RC2)+nregions] = x2
+                Meml[rg_lstatp(ls,RL1)+nregions] = y1
+                Meml[rg_lstatp(ls,RL2)+nregions] = y2
+                Meml[rg_lstatp(ls,RXSTEP)+nregions] = 1
+                Meml[rg_lstatp(ls,RYSTEP)+nregions] = 1
 		Memr[rg_lstatp(ls,RMEAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMEDIAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMODE)+nregions] = INDEFR
@@ -713,7 +753,7 @@ begin
 		Memr[rg_lstatp(ls,RSKYERR)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMAG)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RMAGERR)+nregions] = INDEFR
-		Memi[rg_lstatp(ls,RNPTS)+nregions] = INDEFI
+		Meml[rg_lstatp(ls,RNPTS)+nregions] = INDEFL
 		Memr[rg_lstatp(ls,IMEAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMEDIAN)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMODE)+nregions] = INDEFR
@@ -722,7 +762,7 @@ begin
 		Memr[rg_lstatp(ls,ISKYERR)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMAG)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,IMAGERR)+nregions] = INDEFR
-		Memi[rg_lstatp(ls,INPTS)+nregions] = INDEFI
+		Meml[rg_lstatp(ls,INPTS)+nregions] = INDEFL
 		Memr[rg_lstatp(ls,RBSCALE)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RBSCALEERR)+nregions] = INDEFR
 		Memr[rg_lstatp(ls,RBZERO)+nregions] = INDEFR
@@ -733,7 +773,7 @@ begin
             }
 	}
 
-	call rg_lseti (ls, NREGIONS, nregions)
+	call rg_lsetl (ls, NREGIONS, nregions)
 	if (nregions > 0)
 	    call rg_lrealloc (ls, nregions)
 	else
@@ -746,33 +786,36 @@ end
 
 # RG_LRPHOT -- Read the photometry from a file.
 
-int procedure rg_lrphot (fd, ls, rp, max_nregions, refimage)
+long procedure rg_lrphot (fd, ls, rp, max_nregions, refimage)
 
 int	fd			#I the regions file descriptor
 pointer	ls			#I pointer to the linscale structure
-int	rp			#I pointer to current region
-int	max_nregions		#I the  maximum number of regions
+long	rp			#I pointer to current region
+size_t	max_nregions		#I the  maximum number of regions
 int	refimage		#I is the photometry for the reference image
 
-int	nregions, maxnr
+size_t	sz_val
+size_t	nregions, maxnr
 pointer	sp, line
 real	sky, skyerr, mag, magerr
-int	rg_lstati(), getline(), nscan()
+long	rg_lstatl()
+int	getline(), nscan()
 pointer	rg_lstatp()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Allocate the space to hold the arrays.
 	if (refimage == YES) {
 	    call rg_lrealloc (ls, max_nregions)
-	    nregions = min (rp - 1, rg_lstati (ls, NREGIONS))
+	    nregions = min (rp - 1, rg_lstatl (ls, NREGIONS))
 	    maxnr = max_nregions
 	} else {
 	    nregions = 0
-	    maxnr = rg_lstati(ls, NREGIONS)
+	    maxnr = rg_lstatl (ls, NREGIONS)
 	}
 
 	while (getline (fd, Memc[line]) != EOF &&  nregions < maxnr) {
@@ -785,18 +828,18 @@ begin
 	    if (nscan() != 4)
 		next
 
-            Memi[rg_lstatp(ls,RC1)+nregions] = INDEFI
-            Memi[rg_lstatp(ls,RC2)+nregions] = INDEFI
-            Memi[rg_lstatp(ls,RL1)+nregions] = INDEFI
-            Memi[rg_lstatp(ls,RL2)+nregions] = INDEFI
-            Memi[rg_lstatp(ls,RXSTEP)+nregions] = INDEFI
-            Memi[rg_lstatp(ls,RYSTEP)+nregions] = INDEFI
+            Meml[rg_lstatp(ls,RC1)+nregions] = INDEFL
+            Meml[rg_lstatp(ls,RC2)+nregions] = INDEFL
+            Meml[rg_lstatp(ls,RL1)+nregions] = INDEFL
+            Meml[rg_lstatp(ls,RL2)+nregions] = INDEFL
+            Meml[rg_lstatp(ls,RXSTEP)+nregions] = INDEFL
+            Meml[rg_lstatp(ls,RYSTEP)+nregions] = INDEFL
 
 	    Memr[rg_lstatp(ls,RMEAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMEDIAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMODE)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RSIGMA)+nregions] = INDEFR
-	    Memi[rg_lstatp(ls,RNPTS)+nregions] = INDEFI
+	    Meml[rg_lstatp(ls,RNPTS)+nregions] = INDEFL
 	    if (refimage == YES) {
 	        Memr[rg_lstatp(ls,RSKY)+nregions] = sky
 	        Memr[rg_lstatp(ls,RSKYERR)+nregions] = skyerr
@@ -812,7 +855,7 @@ begin
 	    Memr[rg_lstatp(ls,IMEDIAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMODE)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,ISIGMA)+nregions] = INDEFR
-	    Memi[rg_lstatp(ls,INPTS)+nregions] = INDEFI
+	    Meml[rg_lstatp(ls,INPTS)+nregions] = INDEFL
 	    if (refimage == NO) {
 	        Memr[rg_lstatp(ls,ISKY)+nregions] = sky
 	        Memr[rg_lstatp(ls,ISKYERR)+nregions] = skyerr
@@ -830,13 +873,13 @@ begin
 	}
 
 	if (refimage == YES) {
-	    call rg_lseti (ls, NREGIONS, nregions)
+	    call rg_lsetl (ls, NREGIONS, nregions)
 	    if (nregions > 0)
 	        call rg_lrealloc (ls, nregions)
 	    else
 	        call rg_lrfree (ls)
-	} else if (nregions < rg_lstati (ls,NREGIONS)) {
-	    call rg_lseti (ls, NREGIONS, nregions)
+	} else if (nregions < rg_lstatl (ls,NREGIONS)) {
+	    call rg_lsetl (ls, NREGIONS, nregions)
 	}
 
 	call sfree (sp)
@@ -848,24 +891,28 @@ end
 # an image section. If the section is the null string then the region list
 # is empty.
 
-int procedure rg_lsregions (im, ls, rp, max_nregions)
+long procedure rg_lsregions (im, ls, rp, max_nregions)
 
 pointer	im			#I pointer to the image
 pointer	ls			#I pointer to the linscale structure
-int	rp			#I pointer to the current region
-int	max_nregions		#I maximum number of regions
+long	rp			#I pointer to the current region
+size_t	max_nregions		#I maximum number of regions
 
-int	ncols, nlines, nregions
-int	x1, x2, y1, y2, xstep, ystep
+size_t	sz_val
+size_t	nregions
+long	ncols, nlines
+long	x1, x2, y1, y2, xstep, ystep
 pointer	sp, section, region
-int	rg_lstati(), rg_lgsections()
+long	rg_lstatl()
+int	rg_lgsections()
 pointer	rg_lstatp()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (region, SZ_LINE, TY_CHAR)
-	call salloc (section, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (region, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
 	call rg_lstats (ls, REGIONS, Memc[region], SZ_LINE)
 
 	# Allocate the arrays to hold the regions information.
@@ -880,18 +927,18 @@ begin
 	    call sscan (Memc[region])
 	        call gargwrd (Memc[section], SZ_LINE)
 
-	    nregions = min (rp - 1, rg_lstati (ls, NREGIONS))
+	    nregions = min (rp - 1, rg_lstatl (ls, NREGIONS))
 	    while (Memc[section] != EOS && nregions < max_nregions) {
 
 		# Check for even dimensioned regions.
 		if (rg_lgsections (Memc[section], x1, x2, xstep, y1, y2, ystep,
 		    ncols, nlines) == OK) {
-		    Memi[rg_lstatp(ls,RC1)+nregions] = x1
-		    Memi[rg_lstatp(ls,RC2)+nregions] = x2
-		    Memi[rg_lstatp(ls,RL1)+nregions] = y1
-		    Memi[rg_lstatp(ls,RL2)+nregions] = y2
-		    Memi[rg_lstatp(ls,RXSTEP)+nregions] = xstep
-		    Memi[rg_lstatp(ls,RYSTEP)+nregions] = ystep
+		    Meml[rg_lstatp(ls,RC1)+nregions] = x1
+		    Meml[rg_lstatp(ls,RC2)+nregions] = x2
+		    Meml[rg_lstatp(ls,RL1)+nregions] = y1
+		    Meml[rg_lstatp(ls,RL2)+nregions] = y2
+		    Meml[rg_lstatp(ls,RXSTEP)+nregions] = xstep
+		    Meml[rg_lstatp(ls,RYSTEP)+nregions] = ystep
 	    	    Memr[rg_lstatp(ls,RMEAN)+nregions] = INDEFR
 	    	    Memr[rg_lstatp(ls,RMEDIAN)+nregions] = INDEFR
 	    	    Memr[rg_lstatp(ls,RMODE)+nregions] = INDEFR
@@ -900,7 +947,7 @@ begin
 	    	    Memr[rg_lstatp(ls,RSKYERR)+nregions] = INDEFR
 	    	    Memr[rg_lstatp(ls,RMAG)+nregions] = INDEFR
 	    	    Memr[rg_lstatp(ls,RMAGERR)+nregions] = INDEFR
-	    	    Memi[rg_lstatp(ls,RNPTS)+nregions] = INDEFI
+	    	    Meml[rg_lstatp(ls,RNPTS)+nregions] = INDEFL
 	    	    Memr[rg_lstatp(ls,IMEAN)+nregions] = INDEFR
 	    	    Memr[rg_lstatp(ls,IMEDIAN)+nregions] = INDEFR
 	    	    Memr[rg_lstatp(ls,IMODE)+nregions] = INDEFR
@@ -909,7 +956,7 @@ begin
 	    	    Memr[rg_lstatp(ls,ISKYERR)+nregions] = INDEFR
 	    	    Memr[rg_lstatp(ls,IMAG)+nregions] = INDEFR
 	    	    Memr[rg_lstatp(ls,IMAGERR)+nregions] = INDEFR
-	    	    Memi[rg_lstatp(ls,INPTS)+nregions] = INDEFI
+	    	    Meml[rg_lstatp(ls,INPTS)+nregions] = INDEFL
 	    	    Memr[rg_lstatp(ls,RBSCALE)+nregions] = INDEFR
 	    	    Memr[rg_lstatp(ls,RBSCALEERR)+nregions] = INDEFR
 	    	    Memr[rg_lstatp(ls,RBZERO)+nregions] = INDEFR
@@ -922,12 +969,12 @@ begin
 	    }
 
 	} else {
-	    Memi[rg_lstatp(ls,RC1)+nregions] = 1
-	    Memi[rg_lstatp(ls,RC2)+nregions] = ncols
-	    Memi[rg_lstatp(ls,RL1)+nregions] = 1
-	    Memi[rg_lstatp(ls,RL2)+nregions] = nlines
-	    Memi[rg_lstatp(ls,RXSTEP)+nregions] = 1
-	    Memi[rg_lstatp(ls,RYSTEP)+nregions] = 1
+	    Meml[rg_lstatp(ls,RC1)+nregions] = 1
+	    Meml[rg_lstatp(ls,RC2)+nregions] = ncols
+	    Meml[rg_lstatp(ls,RL1)+nregions] = 1
+	    Meml[rg_lstatp(ls,RL2)+nregions] = nlines
+	    Meml[rg_lstatp(ls,RXSTEP)+nregions] = 1
+	    Meml[rg_lstatp(ls,RYSTEP)+nregions] = 1
 	    Memr[rg_lstatp(ls,RMEAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMEDIAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMODE)+nregions] = INDEFR
@@ -936,7 +983,7 @@ begin
 	    Memr[rg_lstatp(ls,RSKYERR)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMAG)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RMAGERR)+nregions] = INDEFR
-	    Memi[rg_lstatp(ls,RNPTS)+nregions] = INDEFI
+	    Meml[rg_lstatp(ls,RNPTS)+nregions] = INDEFL
 	    Memr[rg_lstatp(ls,IMEAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMEDIAN)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMODE)+nregions] = INDEFR
@@ -945,7 +992,7 @@ begin
 	    Memr[rg_lstatp(ls,ISKYERR)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMAG)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,IMAGERR)+nregions] = INDEFR
-	    Memi[rg_lstatp(ls,INPTS)+nregions] = INDEFI
+	    Meml[rg_lstatp(ls,INPTS)+nregions] = INDEFL
 	    Memr[rg_lstatp(ls,RBSCALE)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RBSCALEERR)+nregions] = INDEFR
 	    Memr[rg_lstatp(ls,RBZERO)+nregions] = INDEFR
@@ -957,7 +1004,7 @@ begin
 
 
 	# Reallocate the correct amount of space.
-	call rg_lseti (ls, NREGIONS, nregions)
+	call rg_lsetl (ls, NREGIONS, nregions)
 	if (nregions > 0)
 	    call rg_lrealloc (ls, nregions)
 	else
@@ -976,14 +1023,14 @@ int procedure rg_lgsections (section, x1, x2, xstep, y1, y2, ystep, ncols,
         nlines)
 
 char    section[ARB]            #I the input section string
-int     x1, x2                  #O the output column section limits
-int     xstep                   #O the output column step size
-int     y1, y2                  #O the output line section limits
-int     ystep                   #O the output line step size
-int     ncols, nlines           #I the maximum number of lines and columns
+long	x1, x2                  #O the output column section limits
+long	xstep                   #O the output column step size
+long	y1, y2                  #O the output line section limits
+long	ystep                   #O the output line step size
+long	ncols, nlines           #I the maximum number of lines and columns
 
-int     ip
-int     rg_lgdim()
+int	ip
+int	rg_lgdim()
 
 begin
         ip = 1
@@ -1005,14 +1052,14 @@ end
 int procedure rg_lgdim (section, ip, x1, x2, step, limit)
 
 char    section[ARB]            #I the input image section
-int     ip                      #I/O pointer to the position in section string
-int     x1                      #O first limit of dimension
-int     x2                      #O second limit of dimension
-int     step                    #O step size of dimension
-int     limit                   #I maximum size of dimension
+int	ip                      #I/O pointer to the position in section string
+long	x1                      #O first limit of dimension
+long	x2                      #O second limit of dimension
+long	step                    #O step size of dimension
+long	limit                   #I maximum size of dimension
 
-int     temp
-int     ctoi()
+long	temp
+int	ctol()
 
 begin
         x1 = 1
@@ -1030,15 +1077,16 @@ begin
 
 
  	# Get X1, X2.
-        if (ctoi (section, ip, temp) > 0) {                     # [x1
+        if (ctol (section, ip, temp) > 0) {                     # [x1
             x1 = max (1, min (temp, limit))
             if (section[ip] == ':') {
                 ip = ip + 1
-                if (ctoi (section, ip, temp) == 0)              # [x1:x2
+                if (ctol (section, ip, temp) == 0)              # [x1:x2
                     return (ERR)
                 x2 = max (1, min (temp, limit))
-            } else
+            } else {
                 x2 = x1
+	    }
 
         } else if (section[ip] == '-') {
             x1 = limit
@@ -1056,7 +1104,7 @@ begin
         # Get sample step size, if give.
         if (section[ip] == ':') {                               # ..:step
             ip = ip + 1
-            if (ctoi (section, ip, step) == 0)
+            if (ctol (section, ip, step) == 0)
                 return (ERR)
             else if (step == 0)
                 return (ERR)

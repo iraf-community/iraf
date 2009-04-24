@@ -14,20 +14,24 @@ pointer	db		#I pointer to the database file
 int	dformat		#I write the output file in database format
 pointer	ls		#I pointer to the linscale structure
 
+size_t	sz_val
+int	i_val
 pointer	sp, image, imname
 real	bscale, bzero, bserr, bzerr
 bool	streq()
 int	rg_lstati(), fscan(), nscan()
 
-#int	i, nregions
-#int	rg_isfit ()
+#long	i
+#size_t	nregions
+#int	rg_isfit()
 #pointer	rg_istatp()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
 	call rg_lstats (ls, IMAGE, Memc[image], SZ_FNAME)
 
 	# Initialize.
@@ -46,7 +50,8 @@ begin
 	    if (dformat ==  YES) {
 		call rg_lfile (db, ls, bscale, bzero, bserr, bzerr)
 	    } else {
-		if (fscan(db) != EOF) {
+		i_val = db
+		if (fscan(i_val) != EOF) {
 		    call gargwrd (Memc[imname], SZ_FNAME)
 		    call gargr (bscale)
 		    call gargr (bzero)
@@ -91,7 +96,8 @@ begin
 	    if (dformat == YES)
 		call rg_ldbtscale (db, ls) 
 	    else {
-		call fprintf (db, "%s  %g %g  %g %g\n")
+		i_val = db
+		call fprintf (i_val, "%s  %g %g  %g %g\n")
 		    call pargstr (Memc[image])
 		    call pargr (bscale)
 		    call pargr (bzero)
@@ -119,16 +125,18 @@ real	tbserr		#O the average error in the scaling parameter
 real	tbzerr		#O the average error in the offset parameter
 int	refit		#I recompute entire fit, otherwise recompute averages
 
-int	i, nregions, ngood
+long	i
+size_t	nregions, ngood
 double	sumbscale, sumbzero, sumwbscale, sumbserr, sumbzerr, sumwbzero, dw
 real	bscale, bzero, bserr, bzerr, avbscale, avbzero, avbserr, avbzerr
 int	rg_lstati(), rg_limget(), rg_lbszfit()
+long	rg_lstatl()
 pointer	rg_lstatp()
 real	rg_lstatr()
 
 begin
 	# Determine the number of regions.
-	nregions = rg_lstati (ls, NREGIONS)
+	nregions = rg_lstatl (ls, NREGIONS)
 
 	# Initialize the statistics
 	sumbscale = 0.0d0
@@ -145,7 +153,7 @@ begin
 	    if (refit == YES) {
 
 	        # Set the current region.
-	        call rg_lseti (ls, CNREGION, i)
+	        call rg_lsetl (ls, CNREGION, i)
 
 	        # Fetch the data for the given region and estimate the mean,
 	        # median, mode, standard deviation, and number of points in
@@ -234,17 +242,20 @@ int procedure rg_limget (ls, imr, im1, i)
 pointer	ls		#I pointer to the intensity scaling structure
 pointer	imr		#I pointer to reference image
 pointer	im1		#I pointer to image
-int	i		#I the region id
+long	i		#I the region id
 
-int	stat, nrimcols, nrimlines, nimcols, nimlines, nrcols, nrlines, ncols 
-int	nlines, rc1, rc2, rl1, rl2, c1, c2, l1, l2, xstep, ystep, npts
+size_t	sz_val
+int	stat
+long	nrimcols, nrimlines, nimcols, nimlines, nrcols, nrlines, ncols
+long	nlines, rc1, rc2, rl1, rl2, c1, c2, l1, l2, xstep, ystep, npts
 pointer	sp, str, ibuf, rbuf, prc1, prc2, prxstep, prl1, prl2, prystep
-int	rg_lstati(), rg_simget()
+long	rg_simget(), rg_lstatl()
 pointer	rg_lstatp()
 real	rg_lstatr()
+include	<nullptr.inc>
 
-#int	c1, c2, l1, l2
-#int	ncols, nlines, npts
+#long	c1, c2, l1, l2
+#size_t	ncols, nlines, npts
 
 define	nextregion_	11
 
@@ -253,7 +264,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Delete the data of the previous region if any.
 	rbuf = rg_lstatp (ls, RBUF)
@@ -266,7 +278,7 @@ begin
 	ibuf = NULL
 
 	# Check for number of regions.
-	if (i < 1 || i > rg_lstati (ls, NREGIONS)) {
+	if (i < 1 || i > rg_lstatl (ls, NREGIONS)) {
 	    stat = ERR
 	    goto nextregion_
 	}
@@ -292,12 +304,12 @@ begin
 	prystep = rg_lstatp (ls, RYSTEP) 
 
 	# Get the reference subraster regions.
-	rc1 = Memi[prc1+i-1]
-	rc2 = Memi[prc2+i-1]
-	rl1 = Memi[prl1+i-1]
-	rl2 = Memi[prl2+i-1]
-	xstep = Memi[prxstep+i-1]
-	ystep = Memi[prystep+i-1]
+	rc1 = Meml[prc1+i-1]
+	rc2 = Meml[prc2+i-1]
+	rl1 = Meml[prl1+i-1]
+	rl2 = Meml[prl2+i-1]
+	xstep = Meml[prxstep+i-1]
+	ystep = Meml[prystep+i-1]
 	nrcols = (rc2 - rc1) / xstep + 1
 	nrlines = (rl2 - rl1) / ystep + 1
 
@@ -307,14 +319,14 @@ begin
             call rg_lstats (ls, REFIMAGE, Memc[str], SZ_LINE)
             call eprintf (
                 "Reference region %d: %s[%d:%d:%d,%d:%d:%d] is off image.\n")
-		call pargi (i)
+		call pargl (i)
                 call pargstr (Memc[str])
-                call pargi (rc1)
-                call pargi (rc2)
-		call pargi (xstep)
-                call pargi (rl1)
-                call pargi (rl2)
-		call pargi (ystep)
+                call pargl (rc1)
+                call pargl (rc2)
+		call pargl (xstep)
+                call pargl (rl1)
+                call pargl (rl2)
+		call pargl (ystep)
             stat = ERR
             goto nextregion_
         }
@@ -324,14 +336,14 @@ begin
             call rg_lstats (ls, REFIMAGE, Memc[str], SZ_LINE)
             call eprintf (
             "Reference region %d: %s[%d:%d:%d,%d:%d:%d] has too few points.\n")
-		call pargi (i)
+		call pargl (i)
                 call pargstr (Memc[str])
-                call pargi (rc1)
-                call pargi (rc2)
-		call pargi (xstep)
-                call pargi (rl1)
-                call pargi (rl2)
-		call pargi (ystep)
+                call pargl (rc1)
+                call pargl (rc2)
+		call pargl (xstep)
+                call pargl (rl1)
+                call pargl (rl2)
+		call pargl (ystep)
             stat = ERR
             goto nextregion_
         }
@@ -343,7 +355,7 @@ begin
 	    go to nextregion_
 	}
 	call rg_lsetp (ls, RBUF, rbuf)
-	Memi[rg_lstatp(ls,RNPTS)+i-1] = npts
+	Meml[rg_lstatp(ls,RNPTS)+i-1] = npts
 
 	# Get the input image subraster regions.
 	c1 = rc1 + rg_lstatr (ls, SXSHIFT)
@@ -363,14 +375,14 @@ begin
             call rg_lstats (ls, IMAGE, Memc[str], SZ_LINE)
             call eprintf (
                 "Input region %d: %s[%d:%d:%d,%d:%d:%d] is off image.\n")
-		call pargi (i)
+		call pargl (i)
                 call pargstr (Memc[str])
-                call pargi (c1)
-                call pargi (c2)
-		call pargi (xstep)
-                call pargi (l1)
-                call pargi (l2)
-		call pargi (ystep)
+                call pargl (c1)
+                call pargl (c2)
+		call pargl (xstep)
+                call pargl (l1)
+                call pargl (l2)
+		call pargl (ystep)
             stat = ERR
             goto nextregion_
         }
@@ -380,14 +392,14 @@ begin
             call rg_lstats (ls, IMAGE, Memc[str], SZ_LINE)
             call eprintf (
             "Input regions %d: %s[%d:%d:%d,%d:%d:%d] has too few points.\n")
-		call pargi (i)
+		call pargl (i)
                 call pargstr (Memc[str])
-                call pargi (c1)
-                call pargi (c2)
-		call pargi (xstep)
-                call pargi (l1)
-                call pargi (l2)
-		call pargi (ystep)
+                call pargl (c1)
+                call pargl (c2)
+		call pargl (xstep)
+                call pargl (l1)
+                call pargl (l2)
+		call pargl (ystep)
             stat = ERR
             goto nextregion_
         }
@@ -399,7 +411,7 @@ begin
 	    go to nextregion_
         }
 	call rg_lsetp (ls, IBUF, ibuf)
-	Memi[rg_lstatp(ls,INPTS)+i-1] = npts
+	Meml[rg_lstatp(ls,INPTS)+i-1] = npts
 
 
 nextregion_
@@ -408,14 +420,14 @@ nextregion_
 	    call rg_lsetp (ls, RBUF, rbuf) 
 	    if (ibuf != NULL)
 		call mfree (ibuf, TY_REAL)
-	    call rg_lsetp (ls, IBUF, NULL) 
-	    call rg_lseti (ls, CNREGION, i)
+	    call rg_lsetp (ls, IBUF, NULLPTR)
+	    call rg_lsetl (ls, CNREGION, i)
 	    Memi[rg_lstatp(ls,RDELETE)+i-1] = LS_BADREGION
 	    return (ERR)
 	} else {
 	    call rg_lsetp (ls, RBUF, rbuf) 
 	    call rg_lsetp (ls, IBUF, ibuf) 
-	    call rg_lseti (ls, CNREGION, i)
+	    call rg_lsetl (ls, CNREGION, i)
 	    Memi[rg_lstatp(ls,RDELETE)+i-1] = LS_NO
 	    return (OK)
 	}
@@ -427,20 +439,24 @@ end
 procedure rg_lgmmm (ls, i)
 
 pointer	ls		#I pointer to the intensity scaling structure
-int	i		#I the current region
+long	i		#I the current region
 
-int	npts
+size_t	sz_val
+long	l_val, c_2
+size_t	npts
 pointer	rbuf, ibuf, buf
 real	sigma, dmin, dmax
 int	rg_lstati()
 pointer	rg_lstatp()
 real	rg_lmode(), rg_lstatr()
+long	lmod()
 
 begin
+	c_2 = 2
 	# Test that the data buffers exist and contain data.
 	rbuf = rg_lstatp (ls, RBUF)
 	ibuf = rg_lstatp (ls, IBUF)
-	npts = Memi[rg_lstatp (ls, RNPTS)+i-1]
+	npts = Meml[rg_lstatp (ls, RNPTS)+i-1]
 	if (rbuf == NULL || npts <= 0) {
 	    Memr[rg_lstatp(ls,RMEAN)+i-1] = 0.0
 	    Memr[rg_lstatp(ls,RMEDIAN)+i-1] = 0.0
@@ -466,7 +482,7 @@ begin
 		    Memi[rg_lstatp(ls,RDELETE)+i-1] = LS_BADREGION
 		    call eprintf (
 		        "Reference region %d contains data < datamin\n")
-			call pargi (i)
+			call pargl (i)
 		}
 	    }
 	    if (!IS_INDEFR(rg_lstatr(ls,DATAMAX))) {
@@ -474,20 +490,22 @@ begin
 		    Memi[rg_lstatp(ls,RDELETE)+i-1] = LS_BADREGION
 		    call eprintf (
 		        "Reference region %d contains data > datamax\n")
-			call pargi (i)
+			call pargl (i)
 		}
 	    }
 	}
 	call aavgr (Memr[rbuf], npts, Memr[rg_lstatp(ls,RMEAN)+i-1], sigma)
 	Memr[rg_lstatp(ls,RSIGMA)+i-1] = sigma / sqrt (real(npts))
 	call asrtr (Memr[rbuf], Memr[buf], npts)
-	if (mod (npts,2) == 1)
+	l_val = npts
+	if (lmod(l_val,c_2) == 1)
 	    Memr[rg_lstatp(ls,RMEDIAN)+i-1] = Memr[buf+npts/2]
 	else
 	    Memr[rg_lstatp(ls,RMEDIAN)+i-1] = (Memr[buf+npts/2-1] +
 	            Memr[buf+npts/2]) / 2.0
-	Memr[rg_lstatp(ls,RMODE)+i-1] = rg_lmode (Memr[buf], npts,
-	    LMODE_NMIN, LMODE_ZRANGE, LMODE_ZBIN, LMODE_ZSTEP)
+	sz_val = LMODE_NMIN
+	Memr[rg_lstatp(ls,RMODE)+i-1] = rg_lmode (Memr[buf], npts, sz_val,
+	    LMODE_ZRANGE, LMODE_ZBIN, LMODE_ZSTEP)
 	sigma = sqrt ((max (Memr[rg_lstatp(ls,RMEAN)+i-1], 0.0) /
 	    rg_lstatr(ls,RGAIN) + (rg_lstatr(ls,RREADNOISE) /
 	    rg_lstatr (ls,RGAIN)) ** 2) / npts)
@@ -513,26 +531,28 @@ begin
 		if (dmin < rg_lstatr(ls,DATAMIN)) {
 		    Memi[rg_lstatp(ls,RDELETE)+i-1] = LS_BADREGION
 		    call eprintf ("Input region %d contains data < datamin\n")
-			call pargi (i)
+			call pargl (i)
 		}
 	    }
 	    if (!IS_INDEFR(rg_lstatr(ls,DATAMAX))) {
 		if (dmax > rg_lstatr(ls,DATAMAX)) {
 		    Memi[rg_lstatp(ls,RDELETE)+i-1] = LS_BADREGION
 		    call eprintf ("Input region %d contains data > datamax\n")
-			call pargi (i)
+			call pargl (i)
 		}
 	    }
 	}
 	call aavgr (Memr[ibuf], npts, Memr[rg_lstatp(ls,IMEAN)+i-1], sigma)
 	Memr[rg_lstatp(ls,ISIGMA)+i-1] = sigma / sqrt (real(npts))
 	call asrtr (Memr[ibuf], Memr[buf], npts)
-	if (mod (npts,2) == 1)
+	l_val = npts
+	if (lmod(l_val,c_2) == 1)
 	    Memr[rg_lstatp(ls,IMEDIAN)+i-1] = Memr[buf+npts/2]
 	else
 	    Memr[rg_lstatp(ls,IMEDIAN)+i-1] = (Memr[buf+npts/2-1] +
 	        Memr[buf+npts/2]) / 2.0
-	Memr[rg_lstatp(ls,IMODE)+i-1] = rg_lmode (Memr[buf], npts, LMODE_NMIN,
+	sz_val = LMODE_NMIN
+	Memr[rg_lstatp(ls,IMODE)+i-1] = rg_lmode (Memr[buf], npts, sz_val,
 	    LMODE_ZRANGE, LMODE_ZBIN, LMODE_ZSTEP)
 	sigma = sqrt ((max (Memr[rg_lstatp(ls,IMEAN)+i-1], 0.0) /
 	    rg_lstatr(ls,IGAIN) + (rg_lstatr(ls,IREADNOISE) /
@@ -550,7 +570,7 @@ end
 int procedure rg_lbszfit (ls, i, bscale, bzero, bserr, bzerr)
 
 pointer	ls		#I pointer to the intensity scaling strucuture
-int	i		#I the number of the current region
+long	i		#I the number of the current region
 real	bscale		#O the computed bscale factor
 real	bzero		#O the computed bzero factor
 real	bserr		#O the computed error in bscale
@@ -561,7 +581,7 @@ real	bjunk, chi
 bool	fp_equalr()
 int	rg_lstati()
 pointer	rg_lstatp()
-real	rg_lstatr()
+real	rg_lstatr(), aabs()
 
 begin
 	stat = OK
@@ -582,7 +602,7 @@ begin
 	        if (fp_equalr (0.0, Memr[rg_lstatp(ls,RMEAN)+i-1]))
 	            bserr = 0.0
 		else
-	            bserr = abs (bscale) * sqrt ((Memr[rg_lstatp(ls,
+	            bserr = aabs(bscale) * sqrt ((Memr[rg_lstatp(ls,
 		        RSIGMA)+i-1] / Memr[rg_lstatp(ls,RMEAN)+i-1]) ** 2 +
 		        (Memr[rg_lstatp(ls, ISIGMA)+i-1] /
 		        Memr[rg_lstatp(ls,IMEAN)+i-1]) ** 2)
@@ -598,7 +618,7 @@ begin
 	        if (fp_equalr (0.0, Memr[rg_lstatp(ls,RMEDIAN)+i-1])) 
 	            bserr = 0.0
 		else
-	            bserr = abs (bscale) * sqrt ((Memr[rg_lstatp(ls,
+	            bserr = aabs(bscale) * sqrt ((Memr[rg_lstatp(ls,
 		        RSIGMA)+i-1] / Memr[rg_lstatp(ls,RMEDIAN)+i-1]) ** 2 +
 		        (Memr[rg_lstatp(ls, ISIGMA)+i-1] / Memr[rg_lstatp(ls,
 		        IMEDIAN)+i-1]) ** 2)
@@ -614,7 +634,7 @@ begin
 	        if (fp_equalr (0.0, Memr[rg_lstatp (ls,RMODE)+i-1]))
 	            bserr = 0.0
 		else
-	            bserr = abs (bscale) * sqrt ((Memr[rg_lstatp(ls,
+	            bserr = aabs(bscale) * sqrt ((Memr[rg_lstatp(ls,
 		        RSIGMA)+i-1] / Memr[rg_lstatp(ls,RMODE)+i-1]) ** 2 +
 			(Memr[rg_lstatp(ls, ISIGMA)+i-1] / Memr[rg_lstatp(ls,
 			IMODE)+i-1]) ** 2)
@@ -737,17 +757,20 @@ real	tbzero		#O the computed bzero factor
 real	tbserr		#O the computed error in bscale
 real	tbzerr		#O the computed error in bzero
 
-int	i, bsalg, bzalg, nregions
+long	i
+size_t	nregions
+int	bsalg, bzalg
 pointer	sp, weight
 real	answers[MAX_NFITPARS]
 int	rg_lstati()
+long	rg_lstatl()
 pointer	rg_lstatp()
 real	rg_lstatr()
 
 begin
 	bsalg = rg_lstati (ls, BSALGORITHM)
 	bzalg = rg_lstati (ls, BZALGORITHM)
-	nregions = rg_lstati (ls, NREGIONS)
+	nregions = rg_lstatl (ls, NREGIONS)
 
 	call smark (sp)
 	call salloc (weight, nregions, TY_REAL)
@@ -920,6 +943,7 @@ real	bzero		#O the average offset parameter
 real	bserr		#O the error in bscale
 real	bzerr		#O the error in bzero
 
+size_t	sz_val
 int	rec
 pointer	sp, record
 int	dtlocate()
@@ -927,7 +951,8 @@ real	dtgetr()
 
 begin
 	call smark (sp)
-	call salloc (record, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (record, sz_val, TY_CHAR)
 
 	call rg_lstats (ls, RECORD, Memc[record], SZ_FNAME)
 	iferr {
@@ -950,16 +975,17 @@ end
 # RG_SIMGET -- Fill a buffer from a specified region of the image including a
 # step size in x and y.
 
-int procedure rg_simget (im, c1, c2, cstep, l1, l2, lstep, ptr)
+long procedure rg_simget (im, c1, c2, cstep, l1, l2, lstep, ptr)
 
 pointer im              #I the pointer to the iraf image
-int     c1, c2          #I the column limits
-int     cstep           #I the column step size
-int     l1, l2          #I the line limits
-int     lstep           #I the line step size
+long	c1, c2          #I the column limits
+long	cstep           #I the column step size
+long	l1, l2          #I the line limits
+long	lstep           #I the line step size
 pointer ptr             #I the pointer to the output buffer
 
-int	i, j, ncols, nlines, npts
+long	i, j
+size_t	ncols, nlines, npts
 pointer	iptr, buf
 pointer imgs2r()
 
@@ -992,20 +1018,25 @@ end
 real procedure rg_lmode (a, npts, nmin, zrange, fzbin, fzstep)
 
 real	a[npts]			#I the sorted input data array
-int	npts			#I the number of points
-int	nmin			#I the minimum number of points
+size_t	npts			#I the number of points
+size_t	nmin			#I the minimum number of points
 real	zrange			#I fraction of pixels around median to use
 real	fzbin			#I the bin size for the mode search
 real	fzstep			#I the step size for the mode search
 
-int	x1, x2, x3, nmax
+long	l_val, c_2
+long	x1, x2, x3
+size_t	nmax
 real	zstep, zbin, y1, y2, mode
 bool	fp_equalr()
+long	lint(), lmod()
 
 begin
+	c_2 = 2
 	# If there are too few points return the median.
 	if (npts < nmin) {
-	    if (mod (npts,2) == 1)
+	    l_val = npts
+	    if (lmod(l_val,c_2) == 1)
 	        return (a[1+npts/2])
 	    else
 	        return ((a[npts/2] + a[1+npts/2]) / 2.0)
@@ -1013,8 +1044,8 @@ begin
 
 	# Compute the data range that will be used to do the mode search.
 	# If the data has no range then the constant value will be returned.
-	x1 = max (1, int (1.0 + npts * (1.0 - zrange) / 2.0))
-	x3 = min (npts, int (1.0 + npts * (1.0 + zrange) / 2.0))
+	x1 = max (1, lint(1.0 + npts * (1.0 - zrange) / 2.0))
+	x3 = min (npts, lint(1.0 + npts * (1.0 + zrange) / 2.0))
 	if (fp_equalr (a[x1], a[x3]))
 	    return (a[x1])
 
@@ -1035,7 +1066,7 @@ begin
                 ;
             if (x2 - x1 > nmax) {
                 nmax = x2 - x1
-		if (mod (x2+x1,2) == 0)
+		if (lmod(x2+x1,c_2) == 0)
                     mode = a[(x2+x1)/2]
 		else
                     mode = (a[(x2+x1)/2] + a[(x2+x1)/2+1]) / 2.0
@@ -1053,14 +1084,15 @@ end
 procedure rg_llsqfit (ls, i, bscale, bzero, bserr, bzerr, chi)
 
 pointer	ls			#I pointer to the intensity scaling structure
-int	i			#I the current region
+long	i			#I the current region
 real	bscale			#O the computed bscale factor
 real	bzero			#O the computed bzero factor
 real	bserr			#O the estimated error in bscale
 real	bzerr			#O the estimated error in bzero
 real	chi			#O the output chi at unit weight
 
-int	j, npts
+long	j
+size_t	npts
 pointer	rbuf, ibuf, rerr, ierr, weight
 real	rgain, igain, rrnoise, irnoise, answers[MAX_NFITPARS]
 real	datamin, datamax
@@ -1074,7 +1106,7 @@ begin
 	ibuf = rg_lstatp (ls, IBUF)
 
 	# Allocate space for the error and weight arrays.
-	npts = Memi[rg_lstatp(ls,RNPTS)+i-1]
+	npts = Meml[rg_lstatp(ls,RNPTS)+i-1]
 	call malloc (rerr, npts, TY_REAL)
 	call malloc (ierr, npts, TY_REAL)
 	call malloc (weight, npts, TY_REAL)
@@ -1154,18 +1186,21 @@ real	avbscale			#I/O the average bscale factor
 real	avbzero				#I/O the average bzero factor
 real	avbserr				#O the average bscale error factor
 real	avbzerr				#O the average bzero error factor
-int	ngood				#I/O the number of good data values
+size_t	ngood				#I/O the number of good data values
 
-int	i, nregions, nrej, nbad
+long	i, nbad
+size_t	nregions
+int	nrej
 real	sigbscale, sigbzero, lobscale, hibscale, lobzero, hibzero
 real	bscale, bzero, bsresid, bzresid
 double	dw
 int	rg_lstati()
+long	rg_lstatl()
 pointer	rg_lstatp()
 real	rg_lsigma(), rg_lstatr()
 
 begin
-	nregions = rg_lstati (ls,NREGIONS)
+	nregions = rg_lstatl (ls,NREGIONS)
 
 	nrej = 0
 	repeat {
@@ -1266,7 +1301,7 @@ real	avbscale			#O the average bscale factor
 real	avbzero				#O the average bzero factor
 real	avbserr				#O the average bscale error factor
 real	avbzerr				#O the average bzero error factor
-int	ngood				#I the number of good data values
+size_t	ngood				#I the number of good data values
 
 begin
 	# Compute the average scaling factors.
@@ -1309,10 +1344,11 @@ real procedure rg_lsigma (a, del, npts, mean)
 
 real	a[ARB]			#I the input array
 int	del[ARB]		#I the deletions array
-int	npts			#I the number of points in the array
+size_t	npts			#I the number of points in the array
 real	mean			#I the mean of the array
 
-int	i, ngood
+long	i
+size_t	ngood
 double	sumsq
 
 begin
