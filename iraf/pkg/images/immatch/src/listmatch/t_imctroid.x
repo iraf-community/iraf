@@ -14,11 +14,11 @@ define	BACKGROUND	Memr[P2R(($1)+4)]
 define	LO_THRESH	Memr[P2R(($1)+5)]
 define	HI_THRESH	Memr[P2R(($1)+6)]
 define	MAX_TRIES	Memi[P2I(($1)+7)]
-define	TOL		Memi[P2I(($1)+8)]
+define	TOL		Meml[P2L(($1)+8)]
 define	MAX_SHIFT	Memr[P2R(($1)+9)]
 
 # other scalars
-define	IM		Memi[P2I(($1)+10)]
+define	IM		Memp[($1)+10]
 define	BOXSIZE		Memi[P2I(($1)+11)]
 define	BACK_LOCAL	Memr[P2R(($1)+12)]
 define	LO_LOCAL	Memr[P2R(($1)+13)]
@@ -31,32 +31,32 @@ define	OFF1D		(($1)-1)
 define	OFF2D		((($2)-1)*NCOORDS($1)+(($3)-1))
 
 # vectors and matrices
-define	XINIT_PT	Memi[P2I(($1)+20)]	# need space for NCOORDS of these
-define	YINIT_PT	Memi[P2I(($1)+21)]
+define	XINIT_PT	Memp[($1)+20]	# need space for NCOORDS of these
+define	YINIT_PT	Memp[($1)+21]
 define	XINIT		Memr[XINIT_PT($1)+OFF1D($2)]
 define	YINIT		Memr[YINIT_PT($1)+OFF1D($2)]
 
-define	XSHIFT_PT	Memi[P2I(($1)+22)]	# space for NIMAGES of these
-define	YSHIFT_PT	Memi[P2I(($1)+23)]
+define	XSHIFT_PT	Memp[($1)+22]	# space for NIMAGES of these
+define	YSHIFT_PT	Memp[($1)+23]
 define	XSHIFT		Memr[XSHIFT_PT($1)+OFF1D($2)]
 define	YSHIFT		Memr[YSHIFT_PT($1)+OFF1D($2)]
 
-define	XSIZE_PT	Memi[P2I(($1)+24)]	# space for NIMAGES+1
-define	YSIZE_PT	Memi[P2I(($1)+25)]
+define	XSIZE_PT	Memp[($1)+24]	# space for NIMAGES+1
+define	YSIZE_PT	Memp[($1)+25]
 define	XSIZE		Memr[XSIZE_PT($1)+OFF1D($2)]
 define	YSIZE		Memr[YSIZE_PT($1)+OFF1D($2)]
 
-define	XCENTER_PT	Memi[P2I(($1)+26)]	# space for (NIMAGES+1)*NCOORDS
-define	YCENTER_PT	Memi[P2I(($1)+27)]
+define	XCENTER_PT	Memp[($1)+26]	# space for (NIMAGES+1)*NCOORDS
+define	YCENTER_PT	Memp[($1)+27]
 define	XCENTER		Memr[XCENTER_PT($1)+OFF2D($1,$2,$3)]
 define	YCENTER		Memr[YCENTER_PT($1)+OFF2D($1,$2,$3)]
 
-define	XSIGMA_PT	Memi[P2I(($1)+28)]
-define	YSIGMA_PT	Memi[P2I(($1)+29)]
+define	XSIGMA_PT	Memp[($1)+28]
+define	YSIGMA_PT	Memp[($1)+29]
 define	XSIGMA		Memr[XSIGMA_PT($1)+OFF2D($1,$2,$3)]
 define	YSIGMA		Memr[YSIGMA_PT($1)+OFF2D($1,$2,$3)]
 
-define	REJECTED_PT	Memi[P2I(($1)+30)]
+define	REJECTED_PT	Memp[($1)+30]
 define	REJECTED	Memi[REJECTED_PT($1)+OFF2D($1,$2,$3)]
 
 
@@ -76,17 +76,22 @@ pointer	img, ref, refer, cp, im, sp
 int	nimages, ncoords, nshifts, ncentered, i, j
 real	x, y, junk
 bool	error_seen, firsttime
+size_t	sz_val
 
 pointer	imtopenp(), immap(), ia_openp2r(), ia_init()
 int	imtlen(), imtgetim(), ia_len(), ia_center(), strmatch()
+real	aabs()
 
 errchk	imtopenp, immap, imunmap
 errchk	ia_init, ia_openp2r, ia_len, ia_close, ia_center
 
+include	<nullptr.inc>
+
 begin
 	call smark (sp)
-	call salloc (img, SZ_FNAME, TY_CHAR)
-	call salloc (refer, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (img, sz_val, TY_CHAR)
+	call salloc (refer, sz_val, TY_CHAR)
 
 	error_seen = false
 	imlist = NULL
@@ -109,7 +114,7 @@ begin
 	    # Get the reference image and check name for whitespace.
 	    call clgstr ("reference", Memc[refer], SZ_FNAME)
 	    if (Memc[refer] != EOS && strmatch (Memc[refer], "^#$") == 0)
-		iferr (ref = immap (Memc[refer], READ_ONLY, 0)) {
+		iferr (ref = immap (Memc[refer], READ_ONLY, NULLPTR)) {
 		    ref = NULL
 		    call error (1, "Reference not found")
 		}
@@ -143,7 +148,7 @@ begin
 	    # Loop over all the images
 	    ncentered = 0
 	    for (i=1; imtgetim (imlist, Memc[img], SZ_FNAME) != EOF; i=i+1) {
-		im = immap (Memc[img], READ_ONLY, 0)
+		im = immap (Memc[img], READ_ONLY, NULLPTR)
 		IM(cp) = im
 
 		if (IM_NDIM(im) != 2) {
@@ -181,11 +186,11 @@ begin
 			next
 		    }
 
-		    if (abs (XCENTER(cp,i,j) - x) > MAX_SHIFT(cp)) {
+		    if ( aabs(XCENTER(cp,i,j) - x) > MAX_SHIFT(cp) ) {
 			REJECTED(cp,i,j) = YES
 			next
 		    }
-		    if (abs (YCENTER(cp,i,j) - y) > MAX_SHIFT(cp)) {
+		    if ( aabs(YCENTER(cp,i,j) - y) > MAX_SHIFT(cp) ) {
 			REJECTED(cp,i,j) = YES
 			next
 		    }
@@ -252,11 +257,11 @@ begin
 			next
 		    }
 
-		    if (abs (XCENTER(cp,nimages+1,j) - x) > MAX_SHIFT(cp)) {
+		    if ( aabs(XCENTER(cp,nimages+1,j) - x) > MAX_SHIFT(cp) ) {
 			REJECTED(cp,nimages+1,j) = YES
 			next
 		    }
-		    if (abs (YCENTER(cp,nimages+1,j) - y ) > MAX_SHIFT(cp)) {
+		    if ( aabs(YCENTER(cp,nimages+1,j) - y ) > MAX_SHIFT(cp) ) {
 			REJECTED(cp,nimages+1,j) = YES
 			next
 		    }
@@ -330,21 +335,24 @@ int	nshifts			#I number of shifts in list (or # images)
 pointer	coordlist		#I coordinate "template" pointer
 int	ncoords			#I number of coordinates in list
 
+size_t	sz_val
 pointer	cp
 int	boxsize, i
 real	x, y
 
-int	clgeti(), btoi(), ia_get2r()
-real	clgetr()
+int	clgeti(), btoi(), ia_get2r(), imod()
+long	clgetl(), labs()
+real	clgetr(), aabs()
 bool	clgetb()
 
 errchk	ia_get2r
 
 begin
-	call calloc (cp, LEN_CP, TY_STRUCT)
+	sz_val = LEN_CP
+	call calloc (cp, sz_val, TY_STRUCT)
 
 	boxsize = clgeti ("boxsize")
-	if (mod (boxsize, 2) == 0) {
+	if ( imod(boxsize, 2) == 0 ) {
 	    boxsize = boxsize + 1
 	    call eprintf ("Warning: boxsize must be odd, using %d\n")
 		call pargi (boxsize)
@@ -353,7 +361,7 @@ begin
 
 	if (shiftlist == NULL) {
 	    boxsize = clgeti ("bigbox")
-	    if (mod (boxsize, 2) == 0) {
+	    if ( imod(boxsize, 2) == 0 ) {
 		boxsize = boxsize + 1
 		call eprintf ("Warning: bigbox must be odd, using %d\n")
 		    call pargi (boxsize)
@@ -376,12 +384,12 @@ begin
 	}
 
 	MAX_TRIES(cp)	= max (clgeti ("niterate"), 2)
-	TOL(cp)		= abs (clgeti ("tolerance"))
+	TOL(cp)		= labs (clgetl ("tolerance"))
 	MAX_SHIFT(cp)   = clgetr ("maxshift")
 	if (IS_INDEFR(MAX_SHIFT(cp)))
 	    MAX_SHIFT(cp) = MAX_REAL
 	else
-	    MAX_SHIFT(cp) = abs (MAX_SHIFT(cp))
+	    MAX_SHIFT(cp) = aabs (MAX_SHIFT(cp))
 	VERBOSE(cp)	= btoi (clgetb ("verbose"))
 
 	IM(cp)		= NULL
@@ -389,17 +397,22 @@ begin
 	NIMAGES(cp)	= nshifts
 	NCOORDS(cp)	= ncoords
 
-	call malloc (XINIT_PT(cp), ncoords, TY_REAL)
-	call malloc (YINIT_PT(cp), ncoords, TY_REAL)
-	call malloc (XSHIFT_PT(cp), nshifts, TY_REAL)
-	call malloc (YSHIFT_PT(cp), nshifts, TY_REAL)
-	call malloc (XSIZE_PT(cp), nshifts+1, TY_REAL)
-	call malloc (YSIZE_PT(cp), nshifts+1, TY_REAL)
-	call malloc (XCENTER_PT(cp), (nshifts+1)*ncoords, TY_REAL)
-	call malloc (YCENTER_PT(cp), (nshifts+1)*ncoords, TY_REAL)
-	call malloc (XSIGMA_PT(cp), (nshifts+1)*ncoords, TY_REAL)
-	call malloc (YSIGMA_PT(cp), (nshifts+1)*ncoords, TY_REAL)
-	call calloc (REJECTED_PT(cp), (nshifts+1)*ncoords, TY_INT)
+	sz_val = ncoords
+	call malloc (XINIT_PT(cp), sz_val, TY_REAL)
+	call malloc (YINIT_PT(cp), sz_val, TY_REAL)
+	sz_val = nshifts
+	call malloc (XSHIFT_PT(cp), sz_val, TY_REAL)
+	call malloc (YSHIFT_PT(cp), sz_val, TY_REAL)
+	sz_val = nshifts+1
+	call malloc (XSIZE_PT(cp), sz_val, TY_REAL)
+	call malloc (YSIZE_PT(cp), sz_val, TY_REAL)
+	sz_val = (nshifts+1)*ncoords
+	call malloc (XCENTER_PT(cp), sz_val, TY_REAL)
+	call malloc (YCENTER_PT(cp), sz_val, TY_REAL)
+	call malloc (XSIGMA_PT(cp), sz_val, TY_REAL)
+	call malloc (YSIGMA_PT(cp), sz_val, TY_REAL)
+	sz_val = (nshifts+1)*ncoords
+	call calloc (REJECTED_PT(cp), sz_val, TY_INT)
 
 	for (i=1; ia_get2r (coordlist, x, y) != EOF; i=i+1) {
 	    if (i > ncoords)
@@ -466,13 +479,16 @@ real	xinit, yinit		#I initial x and y coordinates
 real	xcenter, ycenter	#O centered x and y coordinates
 real	xsigma, ysigma		#O centering errors
 
-int	x1, x2, y1, y2, nx, ny, try
+size_t	nx, ny
+long	x1, x2, y1, y2
+int	try
 pointer	im, buf, xbuf, ybuf, sp
 real	xold, yold, xnew, ynew
 bool	converged
 
 pointer	imgs2r()
 real	ia_ctr1d()
+long	lnint(), labs()
 
 errchk	imgs2r, ia_threshold, ia_rowsum, ia_colsum, ia_ctr1d
 
@@ -483,10 +499,10 @@ begin
 	converged = false
 
 	do try = 1, MAX_TRIES(cp) {
-	    x1 = max (nint(xold) - BOXSIZE(cp), 1)
-	    x2 = min (nint(xold) + BOXSIZE(cp), IM_LEN(im,1))
-	    y1 = max (nint(yold) - BOXSIZE(cp), 1)
-	    y2 = min (nint(yold) + BOXSIZE(cp), IM_LEN(im,2))
+	    x1 = max (lnint(xold) - BOXSIZE(cp), 1)
+	    x2 = min (lnint(xold) + BOXSIZE(cp), IM_LEN(im,1))
+	    y1 = max (lnint(yold) - BOXSIZE(cp), 1)
+	    y2 = min (lnint(yold) + BOXSIZE(cp), IM_LEN(im,2))
 
 	    nx = x2 - x1 + 1
 	    ny = y2 - y1 + 1
@@ -513,8 +529,8 @@ begin
 
 	    call sfree (sp)
 
-	    if (abs (nint(xnew) - nint(xold)) <= TOL(cp) &&
-		abs (nint(ynew) - nint(yold)) <= TOL(cp)) {
+	    if ( labs(lnint(xnew) - lnint(xold)) <= TOL(cp) &&
+		 labs(lnint(ynew) - lnint(yold)) <= TOL(cp) ) {
 
 		converged = true
 		break
@@ -530,8 +546,8 @@ begin
 	    return (OK)
 	} else {
 	    call eprintf ("Warning: failed to converge near (%d,%d)\n")
-		call pargi (nint (xinit))
-		call pargi (nint (yinit))
+		call pargl (lnint(xinit))
+		call pargl (lnint(yinit))
 	    call flush (STDERR)
 	    return (ERR)
 	}
@@ -544,7 +560,7 @@ procedure ia_threshold (cp, raster, npix)
 
 pointer	cp			#I center structure pointer
 real	raster[ARB]		#I 2-D subraster
-int	npix			#I size of the (apparently) 1-D subraster
+size_t	npix			#I size of the (apparently) 1-D subraster
 
 real	lo, hi, junk
 
@@ -585,9 +601,9 @@ procedure ia_rowsum (cp, raster, row, nx, ny)
 pointer	cp			#I center structure pointer
 real	raster[nx,ny]		#I 2-D subraster
 real	row[ARB]		#O 1-D squashed row vector
-int	nx, ny			#I dimensions of the subraster
+size_t	nx, ny			#I dimensions of the subraster
 
-int	i, j
+long	i, j
 real	lo, hi, back, pix
 
 begin
@@ -624,9 +640,9 @@ procedure ia_colsum (cp, raster, col, nx, ny)
 pointer	cp			#I center structure pointer
 real	raster[nx,ny]		#I 2-D subraster
 real	col[ARB]		#O 1-D squashed col vector
-int	nx, ny			#I dimensions of the subraster
+size_t	nx, ny			#I dimensions of the subraster
 
-int	i, j
+long	i, j
 real	lo, hi, back, pix
 
 begin
@@ -660,11 +676,11 @@ end
 real procedure ia_ctr1d (a, npix, err)
 
 real	a[ARB]			#I marginal vector
-int	npix			#I size of the vector
+size_t	npix			#I size of the vector
 real	err			#O error in the centroid
 
 real	centroid, pix, sumi, sumix, sumix2
-int	i
+long	i
 
 bool	fp_equalr()
 
@@ -703,6 +719,8 @@ pointer procedure ia_openp2r (param)
 
 char	param[ARB]	#I parameter name
 
+size_t	sz_val
+long	l_val
 int	fd, length
 pointer	lp, fname, sp
 real	x1, x2
@@ -713,7 +731,8 @@ errchk	open
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	call clgstr (param, Memc[fname], SZ_FNAME)
 
@@ -739,7 +758,8 @@ begin
 		    # read another line
 		}
 	    }
-	    call seek (fd, BOF)
+	    l_val = BOF
+	    call seek (fd, l_val)
 	} else {
 	    fd = NULL
 	    length = 0
@@ -747,7 +767,8 @@ begin
 
 	call sfree (sp)
 
-	call malloc (lp, LEN_LP, TY_STRUCT)
+	sz_val = LEN_LP
+	call malloc (lp, sz_val, TY_STRUCT)
 	LP_FD(lp) = fd
 	LP_LEN(lp) = length
 
@@ -832,6 +853,7 @@ procedure ia_stats (cp, imlist)
 pointer	cp			#I center structure pointer
 pointer	imlist			#I image template (for labeling)
 
+size_t	sz_val
 real	xshift, yshift, xsum, ysum
 real	xsum2, ysum2, xsig2, ysig2
 real	xvar, yvar, xerr, yerr, xprop, yprop
@@ -843,7 +865,8 @@ int	imtgetim()
 
 begin
 	call smark (sp)
-	call salloc (img, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (img, sz_val, TY_CHAR)
 
 	nim = NIMAGES(cp)
 	ncoo = NCOORDS(cp)
@@ -929,10 +952,13 @@ procedure ia_trim (cp)
 
 pointer	cp			#I center structure pointer
 
+int	i
 real	xlo, xhi, ylo, yhi, xmin, ymin
-int	ixlo, ixhi, iylo, iyhi, ixlonew, ixhinew, iylonew, iyhinew, i
-int	vxlo, vxhi, vylo, vyhi		# vignetted versions
+long	ixlo, ixhi, iylo, iyhi, ixlonew, ixhinew, iylonew, iyhinew
+long	vxlo, vxhi, vylo, vyhi		# vignetted versions
 bool	firsttime
+
+long	lint()
 
 begin
 	firsttime = true
@@ -947,19 +973,19 @@ begin
 	    xhi = XSIZE(cp,i) + XSHIFT(cp,i)
 	    yhi = YSIZE(cp,i) + YSHIFT(cp,i)
 
-	    ixlonew = int (xlo)
+	    ixlonew = lint(xlo)
 	    if (xlo > ixlonew)			# round up
 		ixlonew = ixlonew + 1
 
-	    ixhinew = int (xhi)
+	    ixhinew = lint(xhi)
 	    if (xhi < ixhinew)			# round down
 		ixhinew = ixhinew - 1
 
-	    iylonew = int (ylo)			# round up
+	    iylonew = lint(ylo)			# round up
 	    if (ylo > iylonew)
 		iylonew = iylonew + 1
 
-	    iyhinew = int (yhi)			# round down
+	    iyhinew = lint(yhi)			# round down
 	    if (yhi < iyhinew)
 		iyhinew = iyhinew - 1
 
@@ -993,24 +1019,24 @@ begin
 	# Vignetting is possible downstream since imshift and other tasks
 	# preserve the size of the input image.
 
-	vxlo = max (1, min (ixlo, int(xmin)))
-	vxhi = max (1, min (ixhi, int(xmin)))
-	vylo = max (1, min (iylo, int(ymin)))
-	vyhi = max (1, min (iyhi, int(ymin)))
+	vxlo = max (1, min (ixlo, lint(xmin)))
+	vxhi = max (1, min (ixhi, lint(xmin)))
+	vylo = max (1, min (iylo, lint(ymin)))
+	vyhi = max (1, min (iyhi, lint(ymin)))
 	if (vxlo != ixlo || vxhi != ixhi || vylo != iylo || vyhi != iyhi) {
 	    call eprintf ("#Vignette_Section = [%d:%d,%d:%d]\n")
-		call pargi (vxlo)
-		call pargi (vxhi)
-		call pargi (vylo)
-		call pargi (vyhi)
+		call pargl (vxlo)
+		call pargl (vxhi)
+		call pargl (vylo)
+		call pargl (vyhi)
 	}
 
 	# Output the trim section.
 	call printf ("#Trim_Section = [%d:%d,%d:%d]\n")
-	    call pargi (ixlo)
-	    call pargi (ixhi)
-	    call pargi (iylo)
-	    call pargi (iyhi)
+	    call pargl (ixlo)
+	    call pargl (ixhi)
+	    call pargl (iylo)
+	    call pargl (iyhi)
 
 	call flush (STDOUT)
 end
