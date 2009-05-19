@@ -11,6 +11,8 @@ pointer	ilist, rlist
 pointer	sp, image, refimage, value, str, imr, mwr, im
 real	rval
 double	dval
+size_t	sz_val
+
 bool	clgetb()
 int	imtlen(), imtgetim()
 #int	mw_stati(), rg_samesize()
@@ -18,14 +20,17 @@ pointer	imtopen(), immap(), mw_openim()
 real	imgetr()
 double	imgetd()
 errchk	mw_openim(), imgstr(), imgetr(), imgetd(), imdelf()
+include	<nullptr.inc>
 
 begin
 	# Get some temporary working space.
 	call smark (sp)
-	call salloc (refimage, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (value, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (refimage, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the input image and reference image lists.
 	call clgstr ("images", Memc[str], SZ_FNAME)
@@ -57,7 +62,7 @@ begin
 		        call mw_close (mwr)
 		    call imunmap (imr)
 		}
-		imr = immap (Memc[refimage], READ_ONLY, 0)
+		imr = immap (Memc[refimage], READ_ONLY, NULLPTR)
 
 		# Open the reference image wcs.
 		iferr (mwr = mw_openim (imr))
@@ -81,8 +86,8 @@ begin
 
 	    # Remove any image section and open the input image.
 	    call imgimage (Memc[image], Memc[image], SZ_FNAME)
-	    iferr (im = immap (Memc[image], READ_WRITE, 0)) {
-	        im = immap (Memc[image], NEW_IMAGE, 0)
+	    iferr (im = immap (Memc[image], READ_WRITE, NULLPTR)) {
+	        im = immap (Memc[image], NEW_IMAGE, NULLPTR)
 		IM_NDIM(im) = 0
 	    }
 

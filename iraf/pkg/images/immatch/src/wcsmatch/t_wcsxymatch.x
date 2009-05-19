@@ -11,37 +11,47 @@ procedure t_wcsxymatch()
 bool	verbose, transpose
 double	xmin, xmax, ymin, ymax, x1, x2, y1, y2
 int	cfd, ofd
-int	nx, ny, npts, wcs, xcolumn, ycolumn
+size_t	nx, ny, npts
+int	wcs, xcolumn, ycolumn
 int	xunits, yunits, min_sigdigits, axstat, projstat
 pointer	olist, clist, ilist, rlist
 pointer	sp, refimage, image, xformat, yformat, rxformat, ryformat
 pointer	wxformat, wyformat, str, paxno, rlaxno, laxno
 pointer	im, imr, mw, mwr, rxl, ryl, rxw, ryw, ixl, iyl, ctr, ct
+size_t	sz_val
+size_t	c_1
 
 bool	clgetb(), streq()
 double	clgetd()
 int	imtlen(), fntlenb(), imtgetim(), open(), clgeti()
-int	clgwrd(), rg_rdxy(), fntgfnb(), rg_axstat(), rg_projstat(), mw_stati()
+int	clgwrd(), fntgfnb(), rg_axstat(), rg_projstat(), mw_stati()
+long	clgetl(), rg_rdxy()
 int	strdic()
 pointer	fntopnb(), imtopen(), immap(), mw_openim(), rg_xytoxy()
 errchk	mw_openim(), mw_gwattrs()
+include	<nullptr.inc>
 
 begin
+	c_1 = 1
+
 	# Get some temporary working space.
 	call smark (sp)
-	call salloc (refimage, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (xformat, SZ_FNAME, TY_CHAR)
-	call salloc (yformat, SZ_FNAME, TY_CHAR)
-	call salloc (wxformat, SZ_FNAME, TY_CHAR)
-	call salloc (wyformat, SZ_FNAME, TY_CHAR)
-	call salloc (rxformat, SZ_FNAME, TY_CHAR)
-	call salloc (ryformat, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (refimage, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (xformat, sz_val, TY_CHAR)
+	call salloc (yformat, sz_val, TY_CHAR)
+	call salloc (wxformat, sz_val, TY_CHAR)
+	call salloc (wyformat, sz_val, TY_CHAR)
+	call salloc (rxformat, sz_val, TY_CHAR)
+	call salloc (ryformat, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
-	call salloc (paxno, IM_MAXDIM, TY_INT)
-	call salloc (rlaxno, IM_MAXDIM, TY_INT)
-	call salloc (laxno, IM_MAXDIM, TY_INT)
+	sz_val = IM_MAXDIM
+	call salloc (paxno, sz_val, TY_INT)
+	call salloc (rlaxno, sz_val, TY_INT)
+	call salloc (laxno, sz_val, TY_INT)
 
 	# Get the input image and output file lists.
 	call clgstr ("input", Memc[str], SZ_FNAME)
@@ -61,8 +71,8 @@ begin
 	    xmax = clgetd ("xmax")
 	    ymin = clgetd ("ymin")
 	    ymax = clgetd ("ymax")
-	    nx = clgeti ("nx")
-	    ny = clgeti ("ny")
+	    nx = clgetl ("nx")
+	    ny = clgetl ("ny")
 	    wcs = clgwrd ("wcs", Memc[str], SZ_FNAME, RG_WCSLIST)
 	} else {
 	    clist = fntopnb (Memc[str], NO) 
@@ -70,8 +80,8 @@ begin
 	    xmax = INDEFD
 	    ymin = INDEFD
 	    ymax = INDEFD
-	    nx = clgeti ("nx")
-	    ny = clgeti ("ny")
+	    nx = clgetl ("nx")
+	    ny = clgetl ("ny")
 	    wcs = clgwrd ("wcs", Memc[str], SZ_FNAME, RG_WCSLIST)
 	    xcolumn = clgeti ("xcolumn")
 	    ycolumn = clgeti ("ycolumn")
@@ -160,7 +170,7 @@ begin
 		        call mw_close (mwr)
 		    call imunmap (imr)
 		}
-		imr = immap (Memc[refimage], READ_ONLY, 0)
+		imr = immap (Memc[refimage], READ_ONLY, NULLPTR)
 		if (IM_NDIM(imr) > 2)
 		    call error (0, "The reference image must be 1D or 2D")
 
@@ -249,7 +259,7 @@ begin
 		    call malloc (ixl, npts, TY_DOUBLE)
 		    call malloc (iyl, npts, TY_DOUBLE)
 		    if (IM_NDIM(imr) == 1)
-		        call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, x1, x2,
+		        call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, x1, x2,
 			    y1, y2)
 		    else
 		        call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, x1, x2,
@@ -265,7 +275,7 @@ begin
 	    }
 
 	    # Open the input image.
-	    im = immap (Memc[image], READ_ONLY, 0)
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    if (IM_NDIM(im) > 2)
 		call error (0, "The input image must be 1D or 2D")
 	    if (IM_NDIM(im) != IM_NDIM(imr))
@@ -362,7 +372,7 @@ begin
 		    call printf (
 		        "\tWarning: reference image wcs is undefined\n")
 		if (IM_NDIM(imr) == 1)
-		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, 1.0d0,
+		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, 1.0d0,
 		        double(IM_LEN(im,1)), 1.0d0, 1.0d0)
 		else
 		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, 1.0d0,
@@ -382,7 +392,7 @@ logical <-> world transform\n")
 logical <-> world transform\n")
 		}
 		if (IM_NDIM(imr) == 1)
-		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, 1.0d0,
+		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, 1.0d0,
 		        double(IM_LEN(im,1)), 1.0d0, 1.0d0)
 		else
 		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, 1.0d0,
@@ -419,7 +429,7 @@ logical transform\n")
 -> logical transform\n")
 			}
 			if (IM_NDIM(imr) == 1)
-		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, 1.0d0,
+		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, 1.0d0,
 		        	double(IM_LEN(im,1)), 1.0d0, 1.0d0)
 			else
 		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, 1.0d0,
@@ -451,7 +461,7 @@ logical transform\n")
 logical transform\n")
 			}
 			if (IM_NDIM(imr) == 1)
-		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, 1.0d0,
+		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, 1.0d0,
 		        	double(IM_LEN(im,1)), 1.0d0, 1.0d0)
 			else
 		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, 1.0d0,
@@ -469,7 +479,7 @@ attributes are different\n")
 attributes are different\n")
 			}
 			if (IM_NDIM(imr) == 1)
-		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, 1.0d0,
+		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, 1.0d0,
 		        	double(IM_LEN(im,1)), 1.0d0, 1.0d0)
 			else
 		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, 1.0d0,
@@ -548,12 +558,14 @@ int	min_sigdigits		#I the minimum number of significant digits
 char	wformat[ARB]		#O the output world coordinate format
 int	maxch			#I the maximum size of the format string
 
+size_t	sz_val
 pointer	sp, str
 bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	if (mwr == NULL || mw == NULL) {
 	    call sprintf (wformat, maxch, "%%%d.%dg")
@@ -610,6 +622,7 @@ pointer	mw2			#I pointer to the second wcs
 int	ax21, ax22		#I the logical input axes
 bool	transpose		#I transpose the world coordinates
 
+size_t	sz_val
 int	stat
 pointer	sp, xax1, yax1, xax2, yax2
 bool	streq()
@@ -617,10 +630,11 @@ errchk	mw_gwattrs()
 
 begin
 	call smark (sp)
-	call salloc (xax1, SZ_FNAME, TY_CHAR)
-	call salloc (yax1, SZ_FNAME, TY_CHAR)
-	call salloc (xax2, SZ_FNAME, TY_CHAR)
-	call salloc (yax2, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (xax1, sz_val, TY_CHAR)
+	call salloc (yax1, sz_val, TY_CHAR)
+	call salloc (xax2, sz_val, TY_CHAR)
+	call salloc (yax2, sz_val, TY_CHAR)
 
 	iferr (call mw_gwattrs (mw1, ax11, "axtype", Memc[xax1], SZ_FNAME))
 	    Memc[xax1] = EOS
@@ -657,6 +671,7 @@ int	ax11, ax12		#I the logical reference axes
 pointer	mw2			#I pointer to the second wcs
 int	ax21, ax22		#I the logical reference axes
 
+size_t	sz_val
 int	stat
 pointer	sp, xproj1, yproj1, xproj2, yproj2
 bool	streq()
@@ -664,10 +679,11 @@ errchk	mw_gwattrs()
 
 begin
 	call smark (sp)
-	call salloc (xproj1, SZ_FNAME, TY_CHAR)
-	call salloc (yproj1, SZ_FNAME, TY_CHAR)
-	call salloc (xproj2, SZ_FNAME, TY_CHAR)
-	call salloc (yproj2, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (xproj1, sz_val, TY_CHAR)
+	call salloc (yproj1, sz_val, TY_CHAR)
+	call salloc (xproj2, sz_val, TY_CHAR)
+	call salloc (yproj2, sz_val, TY_CHAR)
 
 	iferr (call mw_gwattrs (mw1, ax11, "wtype", Memc[xproj1], SZ_FNAME))
 	    Memc[xproj1] = EOS
@@ -706,18 +722,20 @@ double	xin[ARB]		#I the input logical x coordinates
 double	yin[ARB]		#I the input logical y coordinates
 double	wxref[ARB]		#I the input reference world x coordinates
 double	wyref[ARB]		#I the input reference world y coordinates
-int	npts			#I the number of input points
+size_t	npts			#I the number of input points
 char	xformat[ARB]		#I the logical x coordinates format
 char	yformat[ARB]		#I the logical y coordinates format
 char	wxformat[ARB]		#I the world x coordinates format
 char	wyformat[ARB]		#I the world y coordinates format
 
-int	i
+size_t	sz_val
+long	i
 pointer	sp, fmtstr
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
 
 	# Write the column descriptions.
 	call fprintf (ofd,
@@ -761,12 +779,12 @@ end
 
 procedure rg_laxmap (paxno, wcsndim, laxno, ndim)
 
-int     paxno[ARB]              #I the physical axis map
-int     wcsndim                 #I the number of physical axis dimensions
-int     laxno[ARB]              #O the physical axis map
-int     ndim                    #I the number of logical axis dimensions
+int	paxno[ARB]              #I the physical axis map
+int	wcsndim                 #I the number of physical axis dimensions
+int	laxno[ARB]              #O the physical axis map
+int	ndim                    #I the number of logical axis dimensions
 
-int     i, j
+int	i, j
 
 begin
         if (ndim < wcsndim) {

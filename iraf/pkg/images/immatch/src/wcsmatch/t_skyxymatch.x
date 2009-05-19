@@ -14,38 +14,47 @@ procedure t_skyxymatch()
 bool	verbose
 double	xmin, xmax, ymin, ymax, x1, x2, y1, y2
 int	cfd, ofd
-int	nx, ny, wcs, min_sigdigits, xcolumn, ycolumn, xunits, yunits
-int	rstat, stat, npts
+int	wcs, min_sigdigits, xcolumn, ycolumn, xunits, yunits
+int	rstat, stat
+size_t	nx, ny, npts
 pointer	olist, clist, ilist, rlist
 pointer	sp, refimage, image, xformat, yformat, rxformat, ryformat
 pointer	rwxformat, rwyformat, txformat, tyformat, twxformat, twyformat, str
 pointer	imr, im, mwr, mw, coor, coo, ctr, ct
 pointer	rxl, ryl, rxw, ryw, trxw, tryw, ixl, iyl
+size_t	sz_val
+size_t	c_1
 
 bool	clgetb(), streq()
 double	clgetd()
 int	clgeti(), clgwrd(), strdic(), imtlen()
 int	fntlenb(), imtgetim(), fntgfnb(), open(), mw_stati(), sk_decim()
-int	rg_rdxy(), sk_stati()
+int	sk_stati()
+long	clgetl(), rg_rdxy()
 pointer	fntopnb(), imtopen(), immap(), rg_xytoxy()
 errchk	mw_gwattrs()
+include	<nullptr.inc>
 
 begin
+	c_1 = 1
+
 	# Get some temporary working space.
 	call smark (sp)
-	call salloc (refimage, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (xformat, SZ_FNAME, TY_CHAR)
-	call salloc (yformat, SZ_FNAME, TY_CHAR)
-	call salloc (rwxformat, SZ_FNAME, TY_CHAR)
-	call salloc (rwyformat, SZ_FNAME, TY_CHAR)
-	call salloc (rxformat, SZ_FNAME, TY_CHAR)
-	call salloc (ryformat, SZ_FNAME, TY_CHAR)
-	call salloc (twxformat, SZ_FNAME, TY_CHAR)
-	call salloc (twyformat, SZ_FNAME, TY_CHAR)
-	call salloc (txformat, SZ_FNAME, TY_CHAR)
-	call salloc (tyformat, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (refimage, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (xformat, sz_val, TY_CHAR)
+	call salloc (yformat, sz_val, TY_CHAR)
+	call salloc (rwxformat, sz_val, TY_CHAR)
+	call salloc (rwyformat, sz_val, TY_CHAR)
+	call salloc (rxformat, sz_val, TY_CHAR)
+	call salloc (ryformat, sz_val, TY_CHAR)
+	call salloc (twxformat, sz_val, TY_CHAR)
+	call salloc (twyformat, sz_val, TY_CHAR)
+	call salloc (txformat, sz_val, TY_CHAR)
+	call salloc (tyformat, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the input image and output file lists.
 	call clgstr ("input", Memc[str], SZ_FNAME)
@@ -65,8 +74,8 @@ begin
 	    xmax = clgetd ("xmax")
 	    ymin = clgetd ("ymin")
 	    ymax = clgetd ("ymax")
-	    nx = clgeti ("nx")
-	    ny = clgeti ("ny")
+	    nx = clgetl ("nx")
+	    ny = clgetl ("ny")
 	    wcs = clgwrd ("wcs", Memc[str], SZ_FNAME, RG_WCSLIST)
 	} else {
 	    clist = fntopnb (Memc[str], NO) 
@@ -74,8 +83,8 @@ begin
 	    xmax = INDEFD
 	    ymin = INDEFD
 	    ymax = INDEFD
-	    nx = clgeti ("nx")
-	    ny = clgeti ("ny")
+	    nx = clgetl ("nx")
+	    ny = clgetl ("ny")
 	    wcs = clgwrd ("wcs", Memc[str], SZ_FNAME, RG_WCSLIST)
 	    xcolumn = clgeti ("xcolumn")
 	    ycolumn = clgeti ("ycolumn")
@@ -160,7 +169,7 @@ begin
 			call sk_close (coor)
 		    call imunmap (imr)
 		}
-		imr = immap (Memc[refimage], READ_ONLY, 0)
+		imr = immap (Memc[refimage], READ_ONLY, NULLPTR)
 		if (IM_NDIM(imr) > 2)
 		    call error (0, "The reference image must be 1D or 2D")
 
@@ -241,7 +250,7 @@ begin
 		    call malloc (ixl, npts, TY_DOUBLE)
 		    call malloc (iyl, npts, TY_DOUBLE)
 		    if (IM_NDIM(imr) == 1)
-		        call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, x1, x2,
+		        call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, x1, x2,
 			    y1, y2)
 		    else
 		        call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, x1, x2,
@@ -257,7 +266,7 @@ begin
 	    }
 
 	    # Open the input image.
-	    im = immap (Memc[image], READ_ONLY, 0)
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    if (IM_NDIM(im) > 2)
 		call error (0, "The input image must be 1D or 2D")
 	    if (IM_NDIM(im) != IM_NDIM(imr))
@@ -384,7 +393,7 @@ begin
 		    call printf (
 		        "\tWarning: error decoding reference image wcs\n")
 		if (IM_NDIM(imr) == 1)
-		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, 1.0d0,
+		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, 1.0d0,
 		        double(IM_LEN(im,1)), 1.0d0, 1.0d0)
 		else
 		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, 1.0d0,
@@ -405,7 +414,7 @@ logical <-> world transform\n")
 		    call printf ("\tWarning: Unable to compute reference \
 logical <-> world transform\n")
 		if (IM_NDIM(imr) == 1)
-		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, 1.0d0,
+		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, 1.0d0,
 		        double(IM_LEN(im,1)), 1.0d0, 1.0d0)
 		else
 		    call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, 1.0d0,
@@ -445,7 +454,7 @@ logical transform\n")
 		                "\tWarning: Unable to compute image physical \
 -> logical transform\n")
 			if (IM_NDIM(imr) == 1)
-		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, 1.0d0,
+		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, 1.0d0,
 		        	double(IM_LEN(im,1)), 1.0d0, 1.0d0)
 			else
 		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, 1.0d0,
@@ -479,7 +488,7 @@ logical transform\n")
 		                "\tWarning: Unable to compute image world -> \
 logical transform\n")
 			if (IM_NDIM(imr) == 1)
-		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, 1, 1.0d0,
+		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, c_1, 1.0d0,
 		        	double(IM_LEN(im,1)), 1.0d0, 1.0d0)
 			else
 		    	    call rg_rxyl (Memd[rxl], Memd[ryl], nx, ny, 1.0d0,
@@ -569,12 +578,14 @@ int	min_sigdigits		#I the minmum number of significant digits
 char	wformat[ARB]		#O the output format string
 int	maxch			#I the maximum size of the output format string
 
+size_t	sz_val
 pointer	sp, str
 bool	streq()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	if (mw == NULL) {
 	    call sprintf (wformat, maxch, "%%%d.%dg")
@@ -629,7 +640,7 @@ double	wxref[ARB]		#I the reference world x coordinates
 double	wyref[ARB]		#I the reference world y coordinates
 double	twxref[ARB]		#I the input world x coordinates
 double	twyref[ARB]		#I the input world y coordinates
-int	npts			#I the number of input points
+size_t	npts			#I the number of input points
 char	xformat[ARB]		#I the logical x coordinates format
 char	yformat[ARB]		#I the logical y coordinates format
 char	wxformat[ARB]		#I the reference world x coordinates format
@@ -637,12 +648,14 @@ char	wyformat[ARB]		#I the reference world y coordinates format
 char	twxformat[ARB]		#I the input world x coordinates format
 char	twyformat[ARB]		#I the input world y coordinates format
 
-int	i
+size_t	sz_val
+long	i
 pointer	sp, fmtstr
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
 
 	# Write the column descriptions.
 	call fprintf (ofd,
