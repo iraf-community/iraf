@@ -10,11 +10,13 @@ procedure rg_pconvolve (im1, im2, kernel, nxk, nyk, boundary, constant)
 pointer	im1		# pointer to the input image
 pointer	im2		# pointer to the output image
 real	kernel[nxk,nyk]	# the convolution kernel
-int	nxk, nyk	# dimensions of the kernel
+long	nxk, nyk	# dimensions of the kernel
 int	boundary	# type of boundary extension
 real	constant	# constant for constant boundary extension
 
-int	i, ncols, nlines, col1, col2, nincols, inline, outline
+size_t	sz_val
+long	i, col1, col2, inline, outline
+size_t	ncols, nlines, nincols
 pointer	sp, lineptrs, linebuf, outbuf, nkern
 pointer	imgs2r(), impl2r()
 errchk	imgs2r, impl2r
@@ -22,15 +24,17 @@ errchk	imgs2r, impl2r
 begin
 	# Set up an array of line pointers.
 	call smark (sp)
-	call salloc (lineptrs, nyk, TY_POINTER)
-	call salloc (nkern, nxk * nyk, TY_REAL)
+	sz_val = nyk
+	call salloc (lineptrs, sz_val, TY_POINTER)
+	sz_val = nxk * nyk
+	call salloc (nkern, sz_val, TY_REAL)
 
 	# Set the number of image buffers.
-	call imseti (im1, IM_NBUFS, nyk)
+	call imsetl (im1, IM_NBUFS, nyk)
 
 	# Set the input image boundary conditions.
 	call imseti (im1, IM_TYBNDRY, boundary)
-	call imseti (im1, IM_NBNDRYPIX, max (nxk / 2 + 1, nyk / 2 + 1))
+	call imsetl (im1, IM_NBNDRYPIX, max (nxk / 2 + 1, nyk / 2 + 1))
 	if (boundary == BT_CONSTANT)
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
 
@@ -93,9 +97,9 @@ procedure rg_pflip (inkern, outkern, nxk, nyk)
 
 real	inkern[nxk,nyk]		# the input kernel
 real	outkern[nxk,nyk]	# the output kernel
-int	nxk, nyk		# the kernel dimensions 
+long	nxk, nyk		# the kernel dimensions 
 
-int	i, j
+long	i, j
 
 begin
 	do j = 1, nyk {

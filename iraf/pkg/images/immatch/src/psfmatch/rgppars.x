@@ -6,38 +6,43 @@ procedure rg_pgpars (pm)
 
 pointer	pm		#I pointer to psfmatch structure
 
-int	ival
+size_t	sz_val
+long	lval, c_2
 pointer	sp, str
 bool	clgetb()
-int	clgwrd(), clgeti(), btoi()
+int	clgwrd(), btoi()
+long	clgetl(), lmod()
 real	clgetr()
 
 begin
+	c_2 = 2
+
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Initialize the psf matching structure.
 	call rg_pinit (pm, clgwrd ("convolution", Memc[str], SZ_LINE,
 	    PM_CTYPES))
 
 	# Define the data and kernel sizes.
-	ival = clgeti ("dnx")
-	if (mod (ival, 2) == 0)
-	    ival = ival + 1
-	call rg_pseti (pm, DNX, ival)
-	ival = clgeti ("dny")
-	if (mod (ival, 2) == 0)
-	    ival = ival + 1
-	call rg_pseti (pm, DNY, ival)
-	ival = clgeti ("pnx")
-	if (mod (ival, 2) == 0)
-	    ival = ival + 1
-	call rg_pseti (pm, PNX, ival)
-	ival = clgeti ("pny")
-	if (mod (ival, 2) == 0)
-	    ival = ival + 1
-	call rg_pseti (pm, PNY, ival)
+	lval = clgetl ("dnx")
+	if (lmod (lval, c_2) == 0)
+	    lval = lval + 1
+	call rg_psetl (pm, DNX, lval)
+	lval = clgetl ("dny")
+	if (lmod (lval, c_2) == 0)
+	    lval = lval + 1
+	call rg_psetl (pm, DNY, lval)
+	lval = clgetl ("pnx")
+	if (lmod (lval, c_2) == 0)
+	    lval = lval + 1
+	call rg_psetl (pm, PNX, lval)
+	lval = clgetl ("pny")
+	if (lmod (lval, c_2) == 0)
+	    lval = lval + 1
+	call rg_psetl (pm, PNY, lval)
 
 	# Centering parameters.
 	call rg_pseti (pm, CENTER, btoi (clgetb ("center")))
@@ -76,25 +81,28 @@ procedure rg_pppars (pm)
 
 pointer	pm		#I pointer to the psf matching structure
 
+size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	rg_pstati()
+long	rg_pstatl()
 real	rg_pstatr()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Store the psf data string.
 	call rg_pstats (pm, PSFDATA, Memc[str], SZ_LINE)
 	call clpstr ("psf", Memc[str])
 
 	# Store the size parameters.
-	call clputi ("dnx", rg_pstati (pm, DNX))
-	call clputi ("dny", rg_pstati (pm, DNY))
-	call clputi ("pnx", rg_pstati (pm, PNX))
-	call clputi ("pny", rg_pstati (pm, PNY))
+	call clputl ("dnx", rg_pstatl (pm, DNX))
+	call clputl ("dny", rg_pstatl (pm, DNY))
+	call clputl ("pnx", rg_pstatl (pm, PNX))
+	call clputl ("pny", rg_pstatl (pm, PNY))
 
 	# Store the centering parameters.
 	call clputb ("center", itob (rg_pstati (pm, CENTER)))

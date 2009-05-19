@@ -4,10 +4,10 @@
 real procedure rg_pg10f (fft, nxfft, nyfft)
 
 real	fft[nxfft,nyfft]	#I array containing 2 real ffts
-int	nxfft			#I x dimension of complex array
-int	nyfft			#I y dimension of complex array
+long	nxfft			#I x dimension of complex array
+long	nyfft			#I y dimension of complex array
 
-int	xcen, ycen
+long	xcen, ycen
 
 begin
 	xcen = nxfft / 2 + 1 
@@ -27,10 +27,10 @@ end
 real procedure rg_pg1norm (fft, nxfft, nyfft)
 
 real	fft[nxfft,nyfft]	#I array containing 2 real ffts
-int	nxfft			#I x dimension of complex array
-int	nyfft			#I y dimension of complex array
+long	nxfft			#I x dimension of complex array
+long	nyfft			#I y dimension of complex array
 
-int	xcen, ycen
+long	xcen, ycen
 real	ln1, ln2, cx, cy
 
 begin
@@ -65,10 +65,10 @@ end
 real procedure rg_pg20f (fft, nxfft, nyfft)
 
 real	fft[nxfft,nyfft]	#I array containing 2 real ffts
-int	nxfft			#I x dimension of complex array
-int	nyfft			#I y dimension of complex array
+long	nxfft			#I x dimension of complex array
+long	nyfft			#I y dimension of complex array
 
-int	xcen, ycen
+long	xcen, ycen
 
 begin
 	xcen = nxfft / 2 + 1 
@@ -88,10 +88,10 @@ end
 real procedure rg_pg2norm (fft, nxfft, nyfft)
 
 real	fft[nxfft,nyfft]	#I array containing 2 real ffts
-int	nxfft			#I x dimension of complex array
-int	nyfft			#I y dimension of complex array
+long	nxfft			#I x dimension of complex array
+long	nyfft			#I y dimension of complex array
 
-int	xcen, ycen
+long	xcen, ycen
 real	fftr, ffti, ln1r, ln2r, ln1i, ln2i, cxr, cyr, cxi, cyi, ampr, ampi
 
 begin
@@ -183,9 +183,9 @@ real    fft1[nxfft,nyfft]       # array containing 2 ffts of 2 real functions
 real    fftnum[nxfft,nyfft]     # the numerator fft
 real    fftdenom[nxfft,nyfft]   # the denominator fft
 real    fft2[nxfft,nyfft]       # fft of psf matching function
-int     nxfft, nyfft            # dimensions of fft
+long    nxfft, nyfft            # dimensions of fft
 
-int	i, j, xcen, ycen, nxp2, nxp3, nyp2
+long	i, j, xcen, ycen, nxp2, nxp3, nyp2
 real    c1, c2, h1r, h1i, h2r, h2i, denom
 
 begin
@@ -430,11 +430,11 @@ end
 procedure rg_pnorm (fft, nxfft, nyfft, norm)
 
 real    fft[ARB]        #I the input fft
-int     nxfft           #I the x dimension of fft (complex storage)
-int     nyfft           #I the y dimension of the fft
+long    nxfft           #I the x dimension of fft (complex storage)
+long    nyfft           #I the y dimension of the fft
 real    norm            #I the flux ratio
 
-int     index
+long     index
 
 begin
         index = nxfft + 1 + 2 * (nyfft / 2) * nxfft

@@ -15,7 +15,9 @@ int	newref		#I new reference image ?
 
 int	stat
 int	rg_pstati(), rg_pfget(), rg_psfget(), rg_kget()
+long	rg_pstatl()
 pointer	rg_pstatp()
+include	<nullptr.inc>
 
 begin
 	# Compute the convolution kernel.
@@ -25,11 +27,11 @@ begin
 	    if (rg_pstati (pm,CONVOLUTION) ==  PM_CONIMAGE) {
 
 		# Set the kernel size to the user specified kernel size.
-		call rg_pseti (pm, KNX, rg_pstati (pm, PNX))
+		call rg_psetl (pm, KNX, rg_pstatl (pm, PNX))
 		if (IM_NDIM(imr) == 1)
 		    call rg_pseti (pm, KNY, 1)
 		else
-		    call rg_pseti (pm, KNY, rg_pstati (pm, PNY))
+		    call rg_psetl (pm, KNY, rg_pstatl (pm, PNY))
 
 		# Compute the FFTS of the input and reference image.
 		stat = rg_pfget (pm, imr, im1, newref)
@@ -37,11 +39,11 @@ begin
 	    } else {
 
 		# Set the kernel size to the psf image size
-		call rg_pseti (pm, KNX, IM_LEN (impsf,1))
+		call rg_psetl (pm, KNX, IM_LEN (impsf,1))
 		if (IM_NDIM(imr) == 1)
 		    call rg_pseti (pm, KNY, 1)
 		else
-		    call rg_pseti (pm, KNY, IM_LEN(impsf,2))
+		    call rg_psetl (pm, KNY, IM_LEN(impsf,2))
 
 		# Compute the FFTS of the input and reference psf images.
 		stat = rg_psfget (pm, imr, impsf, newref)
@@ -51,19 +53,19 @@ begin
 	    if (stat == ERR) {
 	        if (rg_pstatp (pm, REFFFT) != NULL)
 		    call mfree (rg_pstatp (pm, REFFFT), TY_REAL)
-	        call rg_psetp (pm, REFFFT, NULL)
+	        call rg_psetp (pm, REFFFT, NULLPTR)
 	        if (rg_pstatp (pm, IMFFT) != NULL)
 		    call mfree (rg_pstatp (pm, IMFFT), TY_REAL)
-	        call rg_psetp (pm, IMFFT, NULL)
+	        call rg_psetp (pm, IMFFT, NULLPTR)
 	        if (rg_pstatp (pm, FFT) != NULL)
 		    call mfree (rg_pstatp (pm, FFT), TY_REAL)
-	        call rg_psetp (pm, FFT, NULL)
+	        call rg_psetp (pm, FFT, NULLPTR)
 	        if (rg_pstatp (pm, CONV) != NULL)
 		    call mfree (rg_pstatp (pm, CONV), TY_REAL)
-	        call rg_psetp (pm, CONV, NULL)
+	        call rg_psetp (pm, CONV, NULLPTR)
 	        if (rg_pstatp (pm, ASFFT) != NULL)
 		    call mfree (rg_pstatp (pm, ASFFT), TY_REAL)
-	        call rg_psetp (pm, ASFFT, NULL)
+	        call rg_psetp (pm, ASFFT, NULLPTR)
 	    }
 
 	    # Do the filtering in frequency space.
@@ -73,11 +75,11 @@ begin
 	} else {
 
 	    # Set the kernel size.
-	    call rg_pseti (pm, KNX, IM_LEN(imk,1))
+	    call rg_psetl (pm, KNX, IM_LEN(imk,1))
 	    if (IM_NDIM(im1) == 1)
 		call rg_pseti (pm, KNY, 1)
 	    else
-		call rg_pseti (pm, KNY, IM_LEN(imk,2))
+		call rg_psetl (pm, KNY, IM_LEN(imk,2))
 
 	    # Read in the convolution kernel.
 	    stat = rg_kget (pm, imk)
@@ -86,19 +88,19 @@ begin
 	    if (stat == ERR) {
 	        if (rg_pstatp (pm, REFFFT) != NULL)
 		    call mfree (rg_pstatp (pm, REFFFT), TY_REAL)
-	        call rg_psetp (pm, REFFFT, NULL)
+	        call rg_psetp (pm, REFFFT, NULLPTR)
 	        if (rg_pstatp (pm, IMFFT) != NULL)
 		    call mfree (rg_pstatp (pm, IMFFT), TY_REAL)
-	        call rg_psetp (pm, IMFFT, NULL)
+	        call rg_psetp (pm, IMFFT, NULLPTR)
 	        if (rg_pstatp (pm, FFT) != NULL)
 		    call mfree (rg_pstatp (pm, FFT), TY_REAL)
-	        call rg_psetp (pm, FFT, NULL)
+	        call rg_psetp (pm, FFT, NULLPTR)
 	        if (rg_pstatp (pm, CONV) != NULL)
 		    call mfree (rg_pstatp (pm, CONV), TY_REAL)
-	        call rg_psetp (pm, CONV, NULL)
+	        call rg_psetp (pm, CONV, NULLPTR)
 	        if (rg_pstatp (pm, ASFFT) != NULL)
 		    call mfree (rg_pstatp (pm, ASFFT), TY_REAL)
-	        call rg_psetp (pm, ASFFT, NULL)
+	        call rg_psetp (pm, ASFFT, NULLPTR)
 	    }
 	}
 
@@ -115,13 +117,18 @@ pointer	imr		#I pointer to reference image
 pointer	im1		#I pointer to input image
 int	newref		#I new reference image ?
 
-int	i, nregions, nrimcols, nrimlines, nrcols, nrlines, nrpcols, nrplines
-int	nborder, stat, rc1, rc2, rl1, rl2, nxfft, nyfft
+size_t	sz_val
+int	i, nregions
+size_t	nrcols, nrlines, nrpcols, nrplines, nborder
+long	nrimcols, nrimlines, rc1, rc2, rl1, rl2
+int	stat
+long	nxfft, nyfft
 pointer	sp, str, coeff, dim, rbuf, ibuf, rsum, isum, border
 pointer	prc1, prc2, prl1, prl2, przero, prxslope, pryslope, reffft, imfft, fft
 real	rwtsum, iwtsum, rscale, iscale, rnscale, inscale
 bool	fp_equalr()
-int	rg_pstati(), rg_border(), rg_szfft()
+int	rg_pstati(), rg_szfft()
+long	rg_border(), rg_pstatl()
 pointer	rg_pstatp(), rg_pgdata()
 real	rg_pstatr(), rg_pnsum(), rg_pg1norm(), rg_pg2norm()
 real	rg_pg10f(), rg_pg20f()
@@ -135,9 +142,12 @@ begin
 	    return (ERR)
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (coeff, max (GS_SAVECOEFF+6, 9), TY_REAL)
-	call salloc (dim, 2, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = max (GS_SAVECOEFF+6, 9)
+	call salloc (coeff, sz_val, TY_REAL)
+	sz_val = 2
+	call salloc (dim, sz_val, TY_LONG)
 
 	# Get the reference region pointers.
 	prc1 = rg_pstatp (pm, RC1)
@@ -150,13 +160,13 @@ begin
 
 	# Check to see if the reference / input images are 1D.
 	nrimcols = IM_LEN(imr,1)
-	nrpcols = rg_pstati (pm, PNX)
+	nrpcols = rg_pstatl (pm, PNX)
 	if (IM_NDIM(imr) == 1) {
 	    nrimlines = 1
 	    nrplines = 1
 	} else {
 	    nrimlines = IM_LEN(imr,2)
-	    nrplines = rg_pstati (pm, PNY)
+	    nrplines = rg_pstatl (pm, PNY)
 	}
 
 	# Initialize
@@ -167,34 +177,35 @@ begin
 	rbuf = NULL
 	ibuf = NULL
 	stat = OK
-	if (newref == YES)
-	    call calloc  (rsum, rg_pstati (pm, DNX) * rg_pstati (pm, DNY),
-	        TY_REAL)
-	call calloc  (isum, rg_pstati (pm, DNX) * rg_pstati (pm, DNY),
-	    TY_REAL)
+	if (newref == YES) {
+	    sz_val = rg_pstatl (pm, DNX) * rg_pstatl (pm, DNY)
+	    call calloc  (rsum, sz_val, TY_REAL)
+	}
+	sz_val = rg_pstatl (pm, DNX) * rg_pstatl (pm, DNY)
+	call calloc  (isum, sz_val, TY_REAL)
 
 	do i = 1, nregions {
 
 	    # Get the reference subraster regions.
-	    rc1 = max (1, min (nrimcols, Memi[prc1+i-1]))
-	    rc2 = min (nrimcols, max (1, Memi[prc2+i-1]))
-	    rl1 = max (1, min (nrimlines, Memi[prl1+i-1]))
-	    rl2 = min (nrimlines, max (1, Memi[prl2+i-1]))
+	    rc1 = max (1, min (nrimcols, Meml[prc1+i-1]))
+	    rc2 = min (nrimcols, max (1, Meml[prc2+i-1]))
+	    rl1 = max (1, min (nrimlines, Meml[prl1+i-1]))
+	    rl2 = min (nrimlines, max (1, Meml[prl2+i-1]))
 	    nrcols = rc2 - rc1 + 1
 	    nrlines = rl2 - rl1 + 1
 
 	    # Go to next object if reference region is off the image.
-	    if (nrcols < rg_pstati (pm, DNX) || (IM_NDIM(imr) == 2 &&
-	        nrlines < rg_pstati(pm, DNY))) {
+	    if (nrcols < rg_pstatl (pm, DNX) || (IM_NDIM(imr) == 2 &&
+	        nrlines < rg_pstatl (pm, DNY))) {
 	        call rg_pstats (pm, REFIMAGE, Memc[str], SZ_LINE)
 	        call eprintf (
 		    "Reference object %d: %s[%d:%d,%d:%d] is off image.\n")
 		    call pargi (i)
 		    call pargstr (Memc[str])
-		    call pargi (rc1)
-		    call pargi (rc2)
-		    call pargi (rl1)
-		    call pargi (rl2)
+		    call pargl (rc1)
+		    call pargl (rc2)
+		    call pargl (rl1)
+		    call pargl (rl2)
 		next
 	    }
 
@@ -312,20 +323,22 @@ begin
 	    nyfft = 1
 	else
 	    nyfft = rg_szfft (nrlines, 0)
-	call rg_pseti (pm, NXFFT, nxfft)
-	call rg_pseti (pm, NYFFT, nyfft)
+	call rg_psetl (pm, NXFFT, nxfft)
+	call rg_psetl (pm, NYFFT, nyfft)
 
 	imfft = rg_pstatp (pm, IMFFT)
 	if (imfft != NULL)
 	    call mfree (imfft, TY_REAL)
-	call calloc (imfft, 2 * nxfft * nyfft, TY_REAL)
+	sz_val = 2 * nxfft * nyfft
+	call calloc (imfft, sz_val, TY_REAL)
 	call rg_psetp (pm, IMFFT, imfft)
 
 	# Allocate space for the fft.
 	fft = rg_pstatp (pm, FFT)
 	if (fft != NULL)
 	    call mfree (fft, TY_REAL)
-	call calloc (fft, 2 * nxfft * nyfft, TY_REAL)
+	sz_val = 2 * nxfft * nyfft
+	call calloc (fft, sz_val, TY_REAL)
 	call rg_psetp (pm, FFT, fft)
 
 	# Allocate space for the reference and input image ffts
@@ -334,7 +347,8 @@ begin
 	    reffft = rg_pstatp (pm, REFFFT)
 	    if (reffft != NULL)
 	        call mfree (reffft, TY_REAL)
-	    call calloc (reffft, 2 * nxfft * nyfft, TY_REAL)
+	    sz_val = 2 * nxfft * nyfft
+	    call calloc (reffft, sz_val, TY_REAL)
 	    call rg_psetp (pm, REFFFT, reffft)
 
 	    # Load the reference image FFT.
@@ -354,12 +368,12 @@ begin
 
 	    # Compute the Fourier Transform of the reference and input image
 	    # data.
-	    Memi[dim] = nxfft
-	    Memi[dim+1] = nyfft
-	    if (Memi[dim+1] == 1)
-	        call rg_fourn (Memr[fft], Memi[dim], 1, 1)
+	    Meml[dim] = nxfft
+	    Meml[dim+1] = nyfft
+	    if (Meml[dim+1] == 1)
+	        call rg_fourn (Memr[fft], Meml[dim], 1, 1)
 	    else
-	        call rg_fourn (Memr[fft], Memi[dim], 2, 1)
+	        call rg_fourn (Memr[fft], Meml[dim], 2, 1)
 
 	    # Compute the flux ratio between the two data sets.
 	    if (IS_INDEFR(rg_pstatr(pm, UFLUXRATIO))) {
@@ -392,12 +406,12 @@ begin
 	    call rg_fshift (Memr[imfft], Memr[imfft], 2 * nxfft, nyfft)
 
 	    # Compute the Fourier Transform of the input image data.
-	    Memi[dim] = nxfft
-	    Memi[dim+1] = nyfft
-	    if (Memi[dim+1] == 1)
-	        call rg_fourn (Memr[imfft], Memi[dim], 1, 1)
+	    Meml[dim] = nxfft
+	    Meml[dim+1] = nyfft
+	    if (Meml[dim+1] == 1)
+	        call rg_fourn (Memr[imfft], Meml[dim], 1, 1)
 	    else
-	        call rg_fourn (Memr[imfft], Memi[dim], 2, 1)
+	        call rg_fourn (Memr[imfft], Meml[dim], 2, 1)
 
 	    # Compute the flux ratio between the two data sets.
 	    if (IS_INDEFR(rg_pstatr(pm, UFLUXRATIO))) {
@@ -413,6 +427,7 @@ begin
 		call rg_psetr (pm, FLUXRATIO, rg_pstatr (pm, UFLUXRATIO))
 
 	    # Divide the two functions.
+	    # arg 1,2,3 : incompatible pointer
 	    call adivx (Memr[reffft], Memr[imfft], Memr[fft], nxfft * nyfft)
 	}
 
@@ -443,15 +458,20 @@ pointer	imr		#I pointer to the reference psf
 pointer	impsf		#I pointer to the input image psf
 int	newref		#I new reference image
 
-int	nrcols, nrlines, nxfft, nyfft
+size_t	sz_val
+long	c_1
+long	nrcols, nrlines, nxfft, nyfft
 pointer	sp, dim, rbuf, ibuf, imfft, fft, reffft
 int	rg_szfft()
 pointer	rg_pgdata(), rg_pstatp()
 real	rg_pstatr(), rg_pg2norm(), rg_pg1norm()
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (dim, 2, TY_INT)
+	sz_val = 2
+	call salloc (dim, sz_val, TY_LONG)
 
 	nrcols = IM_LEN(imr,1)
 	if (IM_NDIM(imr) == 1)
@@ -464,10 +484,10 @@ begin
 	ibuf = NULL
 	if (newref == YES) {
 	    call calloc (rbuf, nrcols * nrlines, TY_REAL)
-	    rbuf = rg_pgdata (imr, 1, nrcols, 1, nrlines)
+	    rbuf = rg_pgdata (imr, c_1, nrcols, c_1, nrlines)
 	}
 	call calloc (ibuf, nrcols * nrlines, TY_REAL)
-	ibuf = rg_pgdata (impsf, 1, nrcols, 1, nrlines)
+	ibuf = rg_pgdata (impsf, c_1, nrcols, c_1, nrlines)
 
 	# Compute the size for the FFT buffers.
  	nxfft = rg_szfft (nrcols, 0)
@@ -475,8 +495,8 @@ begin
             nyfft = 1
         else
             nyfft = rg_szfft (nrlines, 0)
-        call rg_pseti (pm, NXFFT, nxfft)
-        call rg_pseti (pm, NYFFT, nyfft)
+        call rg_psetl (pm, NXFFT, nxfft)
+        call rg_psetl (pm, NYFFT, nyfft)
 
 	imfft = rg_pstatp (pm, IMFFT)
         if (imfft != NULL)
@@ -512,12 +532,12 @@ begin
 
             # Compute the Fourier Transform of the reference and input image
             # data.
-            Memi[dim] = nxfft
-            Memi[dim+1] = nyfft
-            if (Memi[dim+1] == 1)
-                call rg_fourn (Memr[fft], Memi[dim], 1, 1)
+            Meml[dim] = nxfft
+            Meml[dim+1] = nyfft
+            if (Meml[dim+1] == 1)
+                call rg_fourn (Memr[fft], Meml[dim], 1, 1)
             else
-                call rg_fourn (Memr[fft], Memi[dim], 2, 1)
+                call rg_fourn (Memr[fft], Meml[dim], 2, 1)
 
             # Compute the flux ratio between the two data sets.
 	    if (IS_INDEFR(rg_pstatr(pm, UFLUXRATIO)))
@@ -543,12 +563,12 @@ begin
             call rg_fshift (Memr[imfft], Memr[imfft], 2 * nxfft, nyfft)
 
             # Compute the Fourier Transform of the input image data.
-            Memi[dim] = nxfft
-            Memi[dim+1] = nyfft
-            if (Memi[dim+1] == 1)
-                call rg_fourn (Memr[imfft], Memi[dim], 1, 1)
+            Meml[dim] = nxfft
+            Meml[dim+1] = nyfft
+            if (Meml[dim+1] == 1)
+                call rg_fourn (Memr[imfft], Meml[dim], 1, 1)
             else
-                call rg_fourn (Memr[imfft], Memi[dim], 2, 1)
+                call rg_fourn (Memr[imfft], Meml[dim], 2, 1)
 
             # Compute the flux ratio between the two data sets.
 	    if (IS_INDEFR(rg_pstatr(pm, UFLUXRATIO)))
@@ -559,6 +579,7 @@ begin
                 call rg_psetr (pm, FLUXRATIO, rg_pstatr(pm, UFLUXRATIO))
 
             # Divide the two functions.
+	    # arg 1,2,3 : incompatible pointer
             call adivx (Memr[reffft], Memr[imfft], Memr[fft], nxfft * nyfft)
 
 	}
@@ -585,11 +606,14 @@ int procedure rg_kget (pm, imk)
 pointer	pm			#I pointer to the psfmatch structure
 pointer	imk			#I pointer to the kernel image
 
-int	nrlines
+long	c_1
+long	nrlines
 pointer	conv
 pointer	rg_pstatp(), rg_pgdata()
 
 begin
+	c_1 = 1
+
 	if (IM_NDIM(imk) == 1)
 	    nrlines = 1
 	else
@@ -597,7 +621,7 @@ begin
 	conv = rg_pstatp (pm, CONV)
 	if (conv != NULL)
 	    call mfree (conv, TY_REAL)
-	conv = rg_pgdata (imk, 1, int(IM_LEN(imk,1)), 1, nrlines)
+	conv = rg_pgdata (imk, c_1, IM_LEN(imk,1), c_1, nrlines)
 	call rg_psetp (pm, CONV, conv)
 
 	return (OK)
@@ -610,93 +634,96 @@ procedure rg_pfilter (pm)
 
 pointer	pm		#I pointer to the psf matching structure
 
+size_t	sz_val
 pointer	sp, dim, psfft, conv
 real	nfactor
 int	rg_pstati()
+long	rg_pstatl()
 pointer	rg_pstatp()
 real	rg_pstatr(), asumr()
 
 begin
 	call smark (sp)
-	call salloc (dim, 2, TY_INT)
+	sz_val = 2
+	call salloc (dim, sz_val, TY_LONG)
 
 	# Allocate space for the fourier spectrum.
 	if (rg_pstatp (pm, ASFFT) != NULL)
 	    call mfree (rg_pstatp (pm, ASFFT), TY_REAL)
-	call calloc (psfft, rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT),
+	call calloc (psfft, rg_pstatl (pm, NXFFT) * rg_pstatl (pm, NYFFT),
 	    TY_REAL)
 	call rg_psetp (pm, ASFFT, psfft)
 
 	# Allocate space for the convolution kernel.
 	if (rg_pstatp (pm, CONV) != NULL)
 	    call mfree (rg_pstatp (pm, CONV), TY_REAL)
-	call malloc (conv, 2 * rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT),
+	call malloc (conv, 2 * rg_pstatl (pm, NXFFT) * rg_pstatl (pm, NYFFT),
 	    TY_REAL)
 	call rg_psetp (pm, CONV, conv)
 	call amovr (Memr[rg_pstatp(pm,FFT)], Memr[rg_pstatp(pm,CONV)],
-	    2 * rg_pstati (pm, NXFFT) * rg_pstati (pm, NYFFT))
+	    2 * rg_pstatl (pm, NXFFT) * rg_pstatl (pm, NYFFT))
 
 #	# Compute the zextend parameter.
 #	call rg_psetr (pm, THRESHOLD, rg_pstatr (pm, PRATIO) *
-#	    rg_gnorm (Memr[rg_pstatp(pm,IMFFT)], rg_pstati(pm,NXFFT),
-#	    rg_pstati(pm,NYFFT)))
+#	    rg_gnorm (Memr[rg_pstatp(pm,IMFFT)], rg_pstatl(pm,NXFFT),
+#	    rg_pstatl(pm,NYFFT)))
 
 	# Filter the frequency spectrum.
 	switch (rg_pstati(pm,FILTER)) {
 	case PM_FCOSBELL:
-	    call rg_pcosbell (Memr[rg_pstatp(pm,CONV)], rg_pstati (pm, NXFFT),
-	        rg_pstati (pm, NYFFT), rg_pstatr (pm, SXINNER), rg_pstatr (pm,
+	    call rg_pcosbell (Memr[rg_pstatp(pm,CONV)], rg_pstatl (pm, NXFFT),
+	        rg_pstatl (pm, NYFFT), rg_pstatr (pm, SXINNER), rg_pstatr (pm,
 		SXOUTER), rg_pstatr (pm, SYINNER), rg_pstatr (pm, SYOUTER),
 		rg_pstati (pm, RADSYM))
 	case PM_FREPLACE:
 	    call rg_preplace (Memr[rg_pstatp(pm,CONV)], Memr[rg_pstatp(pm,
-	        IMFFT)], rg_pstati (pm, NXFFT), rg_pstati (pm, NYFFT),
+	        IMFFT)], rg_pstatl (pm, NXFFT), rg_pstatl (pm, NYFFT),
 		rg_pstatr (pm,THRESHOLD), rg_pstatr (pm,FLUXRATIO))
 	case PM_FMODEL:
 	    call rg_pgmodel (Memr[rg_pstatp(pm,CONV)], Memr[rg_pstatp(pm,
-	        IMFFT)], rg_pstati (pm, NXFFT), rg_pstati (pm, NYFFT),
+	        IMFFT)], rg_pstatl (pm, NXFFT), rg_pstatl (pm, NYFFT),
 		rg_pstatr (pm, THRESHOLD), rg_pstatr (pm, FLUXRATIO))
 	default:
 	    ;
 	}
 
 	# Filter out any values greater than the normalization. 
-	call rg_pnormfilt (Memr[rg_pstatp(pm,CONV)], rg_pstati(pm,NXFFT),
-	    rg_pstati(pm,NYFFT), rg_pstatr (pm, FLUXRATIO))
+	call rg_pnormfilt (Memr[rg_pstatp(pm,CONV)], rg_pstatl(pm,NXFFT),
+	    rg_pstatl(pm,NYFFT), rg_pstatr (pm, FLUXRATIO))
 
 	# Compute the fourier spectrum.
 	call rg_pfourier (Memr[rg_pstatp(pm,CONV)], Memr[rg_pstatp(pm,ASFFT)],
-	    rg_pstati(pm,NXFFT), rg_pstati(pm,NYFFT))
+	    rg_pstatl(pm,NXFFT), rg_pstatl(pm,NYFFT))
 
-	Memi[dim] = rg_pstati (pm, NXFFT)
-	Memi[dim+1] = rg_pstati (pm, NYFFT)
+	Meml[dim] = rg_pstatl (pm, NXFFT)
+	Meml[dim+1] = rg_pstatl (pm, NYFFT)
 	call rg_fshift (Memr[rg_pstatp(pm,CONV)], Memr[rg_pstatp(pm,CONV)],
-	    2 * rg_pstati(pm, NXFFT), rg_pstati(pm, NYFFT))
-	call rg_fourn (Memr[rg_pstatp(pm,CONV)], Memi[dim], 2, -1)
+	    2 * rg_pstatl(pm, NXFFT), rg_pstatl(pm, NYFFT))
+	call rg_fourn (Memr[rg_pstatp(pm,CONV)], Meml[dim], 2, -1)
 	call rg_fshift (Memr[rg_pstatp(pm,CONV)], Memr[rg_pstatp(pm,CONV)],
-	    2 * rg_pstati(pm, NXFFT), rg_pstati(pm, NYFFT))
-	call adivkr (Memr[rg_pstatp(pm,CONV)], real (rg_pstati(pm,NXFFT) *
-	    rg_pstati(pm,NYFFT)), Memr[rg_pstatp(pm,CONV)], 2 * rg_pstati(pm,
-	    NXFFT) * rg_pstati(pm,NYFFT))
+	    2 * rg_pstatl(pm, NXFFT), rg_pstatl(pm, NYFFT))
+	call adivkr (Memr[rg_pstatp(pm,CONV)], real (rg_pstatl(pm,NXFFT) *
+	    rg_pstatl(pm,NYFFT)), Memr[rg_pstatp(pm,CONV)], 2 * rg_pstatl(pm,
+	    NXFFT) * rg_pstatl(pm,NYFFT))
 
 	# Unpack the convolution kernel.
-	call rg_movexr (Memr[rg_pstatp(pm,CONV)], rg_pstati(pm,NXFFT),
-	    rg_pstati(pm,NYFFT), Memr[rg_pstatp(pm,CONV)], rg_pstati(pm,KNX),
-	    rg_pstati(pm,KNY))
+	call rg_movexr (Memr[rg_pstatp(pm,CONV)], rg_pstatl(pm,NXFFT),
+	    rg_pstatl(pm,NYFFT), Memr[rg_pstatp(pm,CONV)], rg_pstatl(pm,KNX),
+	    rg_pstatl(pm,KNY))
 
 	# Normalize the kernel.
 	if (! IS_INDEFR(rg_pstatr (pm, NORMFACTOR))) {
 	    nfactor = rg_pstatr (pm, NORMFACTOR) / asumr (Memr[rg_pstatp(pm,
-		CONV)], rg_pstati (pm, KNX) * rg_pstati(pm,KNY))
+		CONV)], rg_pstatl (pm, KNX) * rg_pstatl(pm,KNY))
 	    call amulkr (Memr[rg_pstatp (pm,CONV)], nfactor,
-	        Memr[rg_pstatp(pm, CONV)], rg_pstati (pm, KNX) *
-		rg_pstati (pm, KNY))
+	        Memr[rg_pstatp(pm, CONV)], rg_pstatl (pm, KNX) *
+		rg_pstatl (pm, KNY))
 	}
 
 	# Reallocate the convolution kernel array
 	#conv = rg_pstatp (pm, CONV)
 	#if (conv != NULL) {
-	    #call realloc (conv, rg_pstati(pm, KNX) * rg_pstati(pm, KNY),
+	    #call realloc (conv, rg_pstatl(pm, KNX) * rg_pstatl(pm, KNY),
 	        #TY_REAL)
 	    #call rg_psetp (pm, CONV, conv) 
 	#}
@@ -710,10 +737,11 @@ end
 pointer procedure rg_pgdata (im, c1, c2, l1, l2)
 
 pointer im              #I pointer to the iraf image
-int     c1, c2          #I column limits in the input image
-int     l1, l2          #I line limits in the input image
+long	c1, c2          #I column limits in the input image
+long	l1, l2          #I line limits in the input image
 
-int     i, ncols, nlines, npts
+long	i
+size_t	ncols, nlines, npts
 pointer ptr, index, buf
 pointer imgs1r(), imgs2r()
 
@@ -742,10 +770,10 @@ end
 real procedure rg_pnsum (data, ncols, nlines, nxdata, nydata)
 
 real	data[ncols,nlines]		#I the input data subraster
-int	ncols, nlines			#I the size of the input subraster
-int	nxdata, nydata			#I the size of the data region
+size_t	ncols, nlines			#I the size of the input subraster
+size_t	nxdata, nydata			#I the size of the data region
 
-int	j, wxborder, wyborder, npts
+long	j, wxborder, wyborder, npts
 real	sum
 bool	fp_equalr()
 real	asumr()
@@ -776,21 +804,23 @@ pointer	pm			#I pointer to psf matching structure
 pointer	imk			#I pointer to kernel image
 pointer imf			#I pointer to fourier spectrum image
 
-int	nx, ny
+long	c_1
+long	nx, ny
 pointer	buf
-int	rg_pstati()
+long	rg_pstatl()
 pointer	rg_pstatp(), imps2r()
 
 begin
+	c_1 = 1
 	# Write out the kernel image.
 	if (imk != NULL && rg_pstatp(pm, CONV) != NULL) {
-	    nx = rg_pstati (pm, KNX)
-	    ny = rg_pstati (pm, KNY)
+	    nx = rg_pstatl (pm, KNX)
+	    ny = rg_pstatl (pm, KNY)
 	    IM_NDIM(imk) = 2
 	    IM_LEN(imk,1) = nx
 	    IM_LEN(imk,2) = ny
 	    IM_PIXTYPE(imk) = TY_REAL
-	    buf = imps2r (imk, 1, nx, 1, ny)
+	    buf = imps2r (imk, c_1, nx, c_1, ny)
 	    if (rg_pstatp (pm, CONV) != NULL)
 	        call amovr (Memr[rg_pstatp(pm,CONV)], Memr[buf], nx * ny)
 	    else
@@ -799,13 +829,13 @@ begin
 
 	# Write out the fourier spectrum.
 	if (imf != NULL && rg_pstatp(pm,ASFFT) != NULL) {
-	    nx = rg_pstati (pm, NXFFT)
-	    ny = rg_pstati (pm, NYFFT)
+	    nx = rg_pstatl (pm, NXFFT)
+	    ny = rg_pstatl (pm, NYFFT)
 	    IM_NDIM(imf) = 2
 	    IM_LEN(imf,1) = nx
 	    IM_LEN(imf,2) = ny
 	    IM_PIXTYPE(imf) = TY_REAL
-	    buf = imps2r (imf, 1, nx, 1, ny)
+	    buf = imps2r (imf, c_1, nx, c_1, ny)
 	    if (rg_pstatp (pm, CONV) != NULL)
 	        call amovr (Memr[rg_pstatp(pm,ASFFT)], Memr[buf], nx * ny)
 	    else

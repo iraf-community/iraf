@@ -18,29 +18,36 @@ int	verbose			# verbose mode ?
 int	boundary		# boundary extension type
 real	constant		# constant for boundary extension
 
+size_t	sz_val
 int	nregions, newref, stat
 pointer	list1, listr, psflist, listk, list2
 pointer	sp, imtemp, str, pm, gd, id, imr, im1, impsf, imk, im2
 bool	clgetb()
 int	imtlen(), imtgetim(), fntlenb(), clgwrd(), btoi()
 int	rg_pstati(), rg_ptmpimage(), rg_pregions(), rg_psfm(), rg_pisfm()
+long	rg_pstatl()
 pointer	fntopnb(), imtopen(), gopen(), immap(), rg_pstatp()
 real	clgetr()
 errchk	fntopnb(), fntclsb()
+include	<nullptr.inc>
 
 begin
 	call fseti (STDOUT, F_FLUSHNL, YES)
 
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (imager, SZ_FNAME, TY_CHAR)
-	call salloc (fpsflist, SZ_LINE, TY_CHAR)
-	call salloc (kernel, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (pspectra, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (imager, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fpsflist, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (kernel, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (pspectra, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get task parameters.
 	call clgstr ("input", Memc[str], SZ_LINE)
@@ -134,7 +141,7 @@ begin
 	        if (imtgetim (listr, Memc[imager], SZ_FNAME) != EOF) {
 		    if (imr != NULL)
 		        call imunmap (imr)
-		    imr = immap (Memc[imager], READ_ONLY, 0)
+		    imr = immap (Memc[imager], READ_ONLY, NULLPTR)
 		    if (IM_NDIM(imr) > 2)
 			call error (0, "Reference psf/image must be 1D or 2D")
 		    call rg_psets (pm, REFIMAGE, Memc[imager])
@@ -148,7 +155,7 @@ begin
 	        }
 		if (rg_pstati (pm, CONVOLUTION) == PM_CONPSF) {
 		    if (imtgetim (psflist, Memc[str], SZ_FNAME) != EOF) {
-			impsf = immap (Memc[str], READ_ONLY, 0)
+			impsf = immap (Memc[str], READ_ONLY, NULLPTR)
 			if (IM_NDIM(impsf) != IM_NDIM(imr))
 			    call error (0,
 			"Image and reference psf must have same dimensionality")
@@ -173,7 +180,7 @@ begin
 	    }
 
 	    # Open the input image.
-	    im1 = immap (Memc[image1], READ_ONLY, 0)
+	    im1 = immap (Memc[image1], READ_ONLY, NULLPTR)
 	    if (IM_NDIM(im1) > 2) {
 		call error (0, "Input image must be 1D or 2D")
 	    } else if (imr != NULL) {
@@ -193,9 +200,9 @@ begin
 		    ;
 	    }
 	    if (rg_pstati (pm, CONVOLUTION) != PM_CONKERNEL)
-	        imk = immap (Memc[kernel], NEW_IMAGE, 0)
+	        imk = immap (Memc[kernel], NEW_IMAGE, NULLPTR)
 	    else
-	        imk = immap (Memc[kernel], READ_ONLY, 0)
+	        imk = immap (Memc[kernel], READ_ONLY, NULLPTR)
 	    call rg_psets (pm, KERNEL, Memc[kernel])
 
 
@@ -215,8 +222,8 @@ begin
 
 	    # Compute the the psf matching kernel.
 	    if (interactive == YES) {
-		stat = rg_pisfm (pm, imr, psflist, impsf, im1, imk, NULL, im2,
-		    gd, id)
+		stat = rg_pisfm (pm, imr, psflist, impsf, im1, imk, NULLPTR,
+				 im2, gd, id)
 	    } else {
 	        if (rg_psfm (pm, imr, im1, impsf, imk, newref) == OK) {
 		    if (verbose == YES) {
@@ -225,7 +232,7 @@ begin
 			    call pargstr (Memc[kernel])
 			    call pargstr (Memc[image1])
 		        if (rg_pstati(pm, CONVOLUTION) != PM_CONKERNEL)
-		            call rg_pwrite (pm, imk, NULL)
+		            call rg_pwrite (pm, imk, NULLPTR)
 		    }
 		} else {
 		    if (verbose == YES) {
@@ -252,7 +259,7 @@ begin
 		}
 		if (rg_pstatp(pm, CONV) != NULL)
 		    call rg_pconvolve (im1, im2, Memr[rg_pstatp(pm,CONV)],
-		        rg_pstati(pm,KNX), rg_pstati(pm,KNY), boundary,
+		        rg_pstatl(pm,KNX), rg_pstatl(pm,KNY), boundary,
 			constant)
 	    }
 
@@ -319,10 +326,10 @@ char    image[ARB]              #I image name
 char    prefix[ARB]             #I user supplied prefix
 char    tmp[ARB]                #I user supplied temporary root
 char    name[ARB]               #O output name
-int     maxch                   #I max number of chars
+int	maxch                   #I max number of chars
 
-int     npref, ndir
-int     fnldir(), rg_pimroot(), strlen()
+int	npref, ndir
+int	fnldir(), rg_pimroot(), strlen()
 
 begin
         npref = strlen (prefix)
@@ -346,15 +353,17 @@ int procedure rg_pimroot (image, root, maxch)
 
 char    image[ARB]              #I image specification
 char    root[ARB]               #O rootname
-int     maxch                   #I maximum number of characters
+int	maxch                   #I maximum number of characters
 
-int     nchars
+size_t	sz_val
+int	nchars
 pointer sp, str
-int     fnldir(), strlen()
+int	fnldir(), strlen()
 
 begin
         call smark (sp)
-        call salloc (str, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (str, sz_val, TY_CHAR)
 
         call imgimage (image, root, maxch)
         nchars = fnldir (root, Memc[str], maxch)

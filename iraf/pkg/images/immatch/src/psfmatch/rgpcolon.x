@@ -23,22 +23,30 @@ int	newdata			#I/O new input image
 int	newfourier		#I/O new FFT
 int	newfilter		#I/O new filter
 
+size_t	sz_val
+long	c_2
 bool	bval
-int	ncmd, ival, stat, fd, ip
+int	ncmd, stat, fd, ip
+long	lval
 pointer	sp, cmd, str
 real	rval
 bool	itob()
 bool	streq()
 int	strdic(), nscan(), rg_pstati(), btoi(), rg_pregions()
+long	rg_pstatl(), lmod()
 int	access(), rg_pmkregions(), open(), ctor()
 pointer	fntopnb(), immap()
 real	rg_pstatr()
 errchk	immap(), fntopnb()
+include	<nullptr.inc>
 
 begin
+	c_2 = 2
+
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)
@@ -65,15 +73,15 @@ begin
 		    imr = NULL
 		}
 		iferr {
-		    imr = immap (Memc[cmd], READ_ONLY, 0)
+		    imr = immap (Memc[cmd], READ_ONLY, NULLPTR)
 		} then {
 		    call erract (EA_WARN)
-		    imr = immap (Memc[str], READ_ONLY, 0)
+		    imr = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else if (IM_NDIM(imr) > 2 || IM_NDIM(imr) != IM_NDIM(im1)) {
 		    call printf (
                     "Reference image has the wrong number of dimensions\n")
                     call imunmap (imr)
-                    imr = immap (Memc[str], READ_ONLY, 0)
+                    imr = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else {
 		    call rg_psets (pm, REFIMAGE, Memc[cmd])
 		    newref = YES; newdata = YES
@@ -95,32 +103,32 @@ begin
                     im1 = NULL
                 }
                 iferr {
-                    im1 = immap (Memc[cmd], READ_ONLY, 0)
+                    im1 = immap (Memc[cmd], READ_ONLY, NULLPTR)
                     call imseti (im1, IM_TYBNDRY, BT_NEAREST)
                     if (IM_NDIM(im1) == 1)
-                        call imseti (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
+                        call imsetl (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
                     else
-                        call imseti (im1, IM_NBNDRYPIX,
+                        call imsetl (im1, IM_NBNDRYPIX,
                             max (IM_LEN(im1,1), IM_LEN(im1,2)))
                 } then {
                     call erract (EA_WARN)
-                    im1 = immap (Memc[str], READ_ONLY, 0)
+                    im1 = immap (Memc[str], READ_ONLY, NULLPTR)
                     call imseti (im1, IM_TYBNDRY, BT_NEAREST)
                     if (IM_NDIM(im1) == 1)
-                        call imseti (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
+                        call imsetl (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
                     else
-                        call imseti (im1, IM_NBNDRYPIX,
+                        call imsetl (im1, IM_NBNDRYPIX,
                             max (IM_LEN(im1,1), IM_LEN(im1,2)))
                 } else if (IM_NDIM(im1) > 2 || IM_NDIM(im1) != IM_NDIM(imr)) {
 		    call printf (
                     "Reference image has the wrong number of dimensions\n")
                     call imunmap (im1)
-                    im1 = immap (Memc[str], READ_ONLY, 0)
+                    im1 = immap (Memc[str], READ_ONLY, NULLPTR)
                     call imseti (im1, IM_TYBNDRY, BT_NEAREST)
                     if (IM_NDIM(im1) == 1)
-                        call imseti (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
+                        call imsetl (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
                     else
-                        call imseti (im1, IM_NBNDRYPIX,
+                        call imsetl (im1, IM_NBNDRYPIX,
                             max (IM_LEN(im1,1), IM_LEN(im1,2)))
 		} else {
                     call rg_psets (pm, IMAGE, Memc[cmd])
@@ -167,16 +175,16 @@ begin
 		    impsf = NULL
 		}
 		iferr {
-		    impsf = immap (Memc[cmd], READ_ONLY, 0)
+		    impsf = immap (Memc[cmd], READ_ONLY, NULLPTR)
 		} then {
 		    call erract (EA_WARN)
-		    impsf = immap (Memc[str], READ_ONLY, 0)
+		    impsf = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else if (IM_NDIM(impsf) > 2 || IM_NDIM(impsf) !=
 		    IM_NDIM(imr)) {
 		    call printf (
                     "PSF image has the wrong number of dimensions\n")
                     call imunmap (impsf)
-                    impsf = immap (Memc[str], READ_ONLY, 0)
+                    impsf = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else {
 		    call rg_psets (pm, PSFIMAGE, Memc[cmd])
 		    newref = YES; newdata = YES
@@ -198,7 +206,7 @@ begin
 		    imk = NULL
 		}
 		iferr {
-		    imk = immap (Memc[cmd], NEW_IMAGE, 0)
+		    imk = immap (Memc[cmd], NEW_IMAGE, NULLPTR)
 		} then {
 		    call erract (EA_WARN)
 		    imk = NULL
@@ -232,54 +240,54 @@ begin
 	    }
 
 	case PMCMD_DNX:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %g\n")
 		    call pargstr (KY_DNX)
-		    call pargi (rg_pstati (pm, DNX))
+		    call pargl (rg_pstatl (pm, DNX))
 	    } else {
-		if (mod (ival, 2) == 0)
-		    ival = ival + 1
-		call rg_pseti (pm, DNX, ival)
+		if (lmod(lval, c_2) == 0)
+		    lval = lval + 1
+		call rg_psetl (pm, DNX, lval)
 		newref = YES; newdata = YES; newfourier = YES; newfilter = YES
 	    }
 
 	case PMCMD_DNY:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %g\n")
 		    call pargstr (KY_DNY)
-		    call pargi (rg_pstati (pm, DNY))
+		    call pargl (rg_pstatl (pm, DNY))
 	    } else {
-		if (mod (ival, 2) == 0)
-		    ival = ival + 1
-		call rg_pseti (pm, DNY, ival)
+		if (lmod (lval, c_2) == 0)
+		    lval = lval + 1
+		call rg_psetl (pm, DNY, lval)
 		newref = YES; newdata = YES; newfourier = YES; newfilter = YES
 	    }
 
 	case PMCMD_PNX:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %g\n")
 		    call pargstr (KY_PNX)
-		    call pargi (rg_pstati (pm, PNX))
+		    call pargl (rg_pstatl (pm, PNX))
 	    } else {
-		if (mod (ival, 2) == 0)
-		    ival = ival + 1
-		call rg_pseti (pm, PNX, min (ival, rg_pstati (pm, DNX)))
+		if (lmod (lval, c_2) == 0)
+		    lval = lval + 1
+		call rg_psetl (pm, PNX, min (lval, rg_pstatl (pm, DNX)))
 		newref = YES; newdata = YES; newfourier = YES; newfilter = YES
 	    }
 
 	case PMCMD_PNY:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %g\n")
 		    call pargstr (KY_PNY)
-		    call pargi (rg_pstati (pm, PNY))
+		    call pargl (rg_pstatl (pm, PNY))
 	    } else {
-		if (mod (ival, 2) == 0)
-		    ival = ival + 1
-		call rg_pseti (pm, PNY, min (ival, rg_pstati(pm, DNY)))
+		if (lmod (lval, c_2) == 0)
+		    lval = lval + 1
+		call rg_psetl (pm, PNY, min (lval, rg_pstatl (pm, DNY)))
 		newref = YES; newdata = YES; newfourier = YES; newfilter = YES
 	    }
 
@@ -308,11 +316,11 @@ begin
 		    call rg_pseti (pm, BACKGRD, stat)
 		    call rg_psets (pm, BSTRING, Memc[cmd])
 		    newfourier = YES; newfilter = YES
-		} else if (ctor (str, ip, rval) > 0) {
+		} else if (ctor (Memc[str], ip, rval) > 0) {
                     call rg_psetr (pm, BVALUE, rval)
-                    if (ctor (str, ip, rval) > 0) {
+                    if (ctor (Memc[str], ip, rval) > 0) {
                         call rg_psetr (pm, BVALUER, rval)
-                        call strcpy (str, PM_BSTRING(pm), SZ_FNAME)
+                        call strcpy (Memc[str], PM_BSTRING(pm), SZ_FNAME)
                         call rg_pseti (pm, BACKGRD, PM_NUMBER)
                     } else {
                         call rg_psetr (pm, BVALUE, 0.0)

@@ -9,7 +9,7 @@ include "psfmatch.h"
 
 int procedure rg_pregions (list, im, pm, rp, reread)
 
-int	list			#I pointer to regions file list
+pointer	list			#I pointer to regions file list
 pointer	im			#I pointer to the image
 pointer	pm			#I pointer to the psfmatch structure
 int	rp			#I region pointer
@@ -63,17 +63,22 @@ pointer	pm			#I pointer to the psf matching structure
 int	rp			#I pointer to current region
 int	max_nregions		#I maximum number of regions
 
-int	nregions, wcs, key, x1, x2, y1, y2
+size_t	sz_val
+int	nregions, wcs, key
+long	x1, x2, y1, y2
 pointer	sp, region, cmd
 real	x, y, xc, yc
 int	clgcur(), rg_pstati()
+long	rg_pstatl()
 pointer	rg_pstatp()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (region, SZ_FNAME, TY_CHAR)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (region, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_prealloc (pm, max_nregions)
@@ -91,18 +96,18 @@ begin
 
 	    # Center the object.
 	    if (rg_pstati (pm, CENTER) == YES) {
-	        call rg_pcntr (im, x, y, max (rg_pstati(pm, PNX),
-	            rg_pstati(pm, PNY)), xc, yc)
+	        call rg_pcntr (im, x, y, max (rg_pstatl(pm, PNX),
+	            rg_pstatl(pm, PNY)), xc, yc)
 	    } else {
 		xc = x
 		yc = y
 	    }
 
 	    # Compute the data section.
-	    x1 = xc - rg_pstati (pm, DNX) / 2
-	    x2 = x1 + rg_pstati (pm, DNX) - 1
-	    y1 = yc - rg_pstati (pm, DNY) / 2
-	    y2 = y1 + rg_pstati (pm, DNY) - 1
+	    x1 = xc - rg_pstatl (pm, DNX) / 2
+	    x2 = x1 + rg_pstatl (pm, DNX) - 1
+	    y1 = yc - rg_pstatl (pm, DNY) / 2
+	    y2 = y1 + rg_pstatl (pm, DNY) - 1
 
 	    # Make sure that the region is on the image.
 	    if (x1 < 1 || x2 > IM_LEN(im,1) || y1 < 1 || y2 >
@@ -115,10 +120,10 @@ begin
 		    call pargr (yc)
 	    }
 
-	    Memi[rg_pstatp(pm,RC1)+nregions] = x1
-	    Memi[rg_pstatp(pm,RC2)+nregions] = x2
-	    Memi[rg_pstatp(pm,RL1)+nregions] = y1
-	    Memi[rg_pstatp(pm,RL2)+nregions] = y2
+	    Meml[rg_pstatp(pm,RC1)+nregions] = x1
+	    Meml[rg_pstatp(pm,RC2)+nregions] = x2
+	    Meml[rg_pstatp(pm,RL1)+nregions] = y1
+	    Meml[rg_pstatp(pm,RL2)+nregions] = y2
 	    Memr[rg_pstatp(pm,RZERO)+nregions] = INDEFR
 	    Memr[rg_pstatp(pm,RXSLOPE)+nregions] = INDEFR
 	    Memr[rg_pstatp(pm,RYSLOPE)+nregions] = INDEFR
@@ -155,16 +160,20 @@ pointer	pm			#I pointer to psf matching structure
 int	rp			#I pointer to current region
 int	max_nregions		#I maximum number of regions
 
-int	nregions, x1, y1, x2, y2
+size_t	sz_val
+int	nregions
+long	x1, y1, x2, y2
 pointer	sp, line
 real	x, y, xc, yc
 int	rg_pstati(), getline()
+long	rg_pstatl()
 pointer	rg_pstatp()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_prealloc (pm, max_nregions)
@@ -180,22 +189,22 @@ begin
 		call gargr (x)
 		call gargr (y)
 	    if (rg_pstati (pm, CENTER) == YES) {
-		call rg_pcntr (im, x, y, max (rg_pstati(pm, PNX),
-		    rg_pstati(pm, PNY)), xc, yc)
+		call rg_pcntr (im, x, y, max (rg_pstatl(pm, PNX),
+		    rg_pstatl(pm, PNY)), xc, yc)
 	    } else {
 		xc = x
 		yc = y
 	    }
 
 	    # Compute the data section.
-	    x1 = xc - rg_pstati (pm, DNX) / 2
-	    x2 = x1 + rg_pstati (pm, DNX) - 1
+	    x1 = xc - rg_pstatl (pm, DNX) / 2
+	    x2 = x1 + rg_pstatl (pm, DNX) - 1
 	    if (IM_NDIM(im) == 1) {
 		y1 = 1
 		y2 = 1
 	    } else {
-	        y1 = yc - rg_pstati (pm, DNY) / 2
-	        y2 = y1 + rg_pstati (pm, DNY) - 1
+	        y1 = yc - rg_pstatl (pm, DNY) / 2
+	        y2 = y1 + rg_pstatl (pm, DNY) - 1
 	    }
 
 	    # Make sure that the region is on the image.
@@ -204,10 +213,10 @@ begin
 		next
 
 	    # Add the new region to the list.
-	    Memi[rg_pstatp(pm,RC1)+nregions] = x1
-	    Memi[rg_pstatp(pm,RC2)+nregions] = x2
-	    Memi[rg_pstatp(pm,RL1)+nregions] = y1
-	    Memi[rg_pstatp(pm,RL2)+nregions] = y2
+	    Meml[rg_pstatp(pm,RC1)+nregions] = x1
+	    Meml[rg_pstatp(pm,RC2)+nregions] = x2
+	    Meml[rg_pstatp(pm,RL1)+nregions] = y1
+	    Meml[rg_pstatp(pm,RL2)+nregions] = y2
 	    Memr[rg_pstatp(pm,RZERO)+nregions] = INDEFR
 	    Memr[rg_pstatp(pm,RXSLOPE)+nregions] = INDEFR
 	    Memr[rg_pstatp(pm,RYSLOPE)+nregions] = INDEFR
@@ -235,17 +244,20 @@ pointer	pm			#I pointer to psf matching structure
 int	rp			#I pointer to the current region
 int	max_nregions		#I maximum number of regions
 
-int	ncols, nlines, nregions
-int	x1, x2, y1, y2
+size_t	sz_val
+int	nregions
+long	ncols, nlines, x1, x2, y1, y2
 pointer	sp, region
 real	x, y, xc, yc
 int	rg_pstati(), nscan()
+long	rg_pstatl()
 pointer	rg_pstatp()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (region, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (region, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information.
 	call rg_prealloc (pm, max_nregions)
@@ -266,31 +278,31 @@ begin
 
 	    # Compute a more accurate center.
 	    if (rg_pstati (pm, CENTER) == YES) {
-	        call rg_pcntr (im, x, y, max (rg_pstati(pm, PNX),
-	            rg_pstati(pm, PNY)), xc, yc)
+	        call rg_pcntr (im, x, y, max (rg_pstatl(pm, PNX),
+	            rg_pstatl(pm, PNY)), xc, yc)
 	    } else {
 		xc = x
 		yc = y
 	    }
 
 	    # Compute the data section.
-	    x1 = xc - rg_pstati (pm, DNX) / 2
-	    x2 = x1 + rg_pstati (pm, DNX) - 1
+	    x1 = xc - rg_pstatl (pm, DNX) / 2
+	    x2 = x1 + rg_pstatl (pm, DNX) - 1
 	    if (IM_NDIM(im) == 1) {
 		y1 = 1
 		y2 = 1
 	    } else {
-	        y1 = yc - rg_pstati (pm, DNY) / 2
-	        y2 = y1 + rg_pstati (pm, DNY) - 1
+	        y1 = yc - rg_pstatl (pm, DNY) / 2
+	        y2 = y1 + rg_pstatl (pm, DNY) - 1
 	    }
 
 	    # Make sure that the region is on the image.
 	    if (x1 >= 1 && x2 <= IM_LEN(im,1) && y1 >= 1 &&
 	        y2 <= IM_LEN(im,2)) {
-	        Memi[rg_pstatp(pm,RC1)+nregions] = x1
-	        Memi[rg_pstatp(pm,RC2)+nregions] = x2
-	        Memi[rg_pstatp(pm,RL1)+nregions] = y1
-	        Memi[rg_pstatp(pm,RL2)+nregions] = y2
+	        Meml[rg_pstatp(pm,RC1)+nregions] = x1
+	        Meml[rg_pstatp(pm,RC2)+nregions] = x2
+	        Meml[rg_pstatp(pm,RL1)+nregions] = y1
+	        Meml[rg_pstatp(pm,RL2)+nregions] = y2
 	        Memr[rg_pstatp(pm,RZERO)+nregions] = INDEFR
 	        Memr[rg_pstatp(pm,RXSLOPE)+nregions] = INDEFR
 	        Memr[rg_pstatp(pm,RYSLOPE)+nregions] = INDEFR
@@ -318,14 +330,17 @@ procedure rg_pcntr (im, xstart, ystart, boxsize, xcntr, ycntr)
 
 pointer im				#I pointer to the input image
 real    xstart, ystart			#I initial position
-int     boxsize				#I width of the centering box
+long	boxsize				#I width of the centering box
 real    xcntr, ycntr			#O computed center
 
-int     x1, x2, y1, y2, half_box
-int     ncols, nrows, nx, ny, try
+size_t	sz_val
+long    x1, x2, y1, y2, ncols, nrows, half_box
+int	try
+size_t	nx, ny
 real    xinit, yinit
 pointer bufptr, sp, x_vect, y_vect
 pointer imgs2r()
+real	aabs()
 
 begin
 	# Inialize.
@@ -388,7 +403,7 @@ begin
 
             try = try + 1
             if (try == 1) {
-                if ((abs(xcntr-xinit) > 1.0) || (abs(ycntr-yinit) > 1.0)) {
+                if ((aabs(xcntr-xinit) > 1.0) || (aabs(ycntr-yinit) > 1.0)) {
                     xinit = xcntr
                     yinit = ycntr
                 }
@@ -404,9 +419,9 @@ procedure rg_prowsum (v, row, nx, ny)
 
 real    v[nx,ny]			#I the input subraster
 real    row[ARB]			#O the output row sum
-int     nx, ny				#I the dimensions of the subraster
+size_t	nx, ny				#I the dimensions of the subraster
 
-int     i, j
+long	i, j
 
 begin
         do i = 1, ny
@@ -421,9 +436,9 @@ procedure rg_pcolsum (v, col, nx, ny)
 
 real    v[nx,ny]			#I the input subraster
 real    col[ARB]			#O the output column sum
-int     nx, ny				#I the dimensions of the subraster
+size_t	nx, ny				#I the dimensions of the subraster
 
-int     i, j
+long	i, j
 
 begin
         do i = 1, ny
@@ -437,10 +452,10 @@ end
 procedure rg_pcenter (v, nv, vc)
 
 real    v[ARB]				#I the input vector
-int     nv				#I the length of the vector
+size_t	nv				#I the length of the vector
 real    vc				#O the output center
 
-int     i
+long	i
 real    sum1, sum2, sigma, cont
 
 begin

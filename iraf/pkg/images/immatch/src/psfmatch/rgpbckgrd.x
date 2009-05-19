@@ -8,9 +8,9 @@ procedure rg_pscale (pm, data, npts, nx, ny, pnx, pny, offset, coeff)
 
 pointer	pm		#I pointer to the psfmatch structure
 real	data[ARB]	#I the input data
-int	npts		#I the number of points
-int	nx, ny		#I the dimensions of the original subraster
-int	pnx, pny	#I the dimensions of the data region
+size_t	npts		#I the number of points
+size_t	nx, ny		#I the dimensions of the original subraster
+size_t	pnx, pny	#I the dimensions of the data region
 real	offset		#I the input offset
 real	coeff[ARB]	#O the output coefficients
 

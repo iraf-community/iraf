@@ -4,17 +4,17 @@ define	LEN_PSFSTRUCT (45 + 12 * SZ_FNAME + 12)
 
 # Define the psf fitting structure
 
-define	PM_RC1		Memi[P2I($1)]	# pointer to first column of region
-define	PM_RC2		Memi[P2I($1+1)]	# pointer to last column of region
-define	PM_RL1		Memi[P2I($1+2)]	# pointer to first line of region
-define	PM_RL2		Memi[P2I($1+3)]	# pointer to last line of region
-define	PM_RZERO	Memi[P2I($1+4)]	# pointer to zero point of ref regions
-define	PM_RXSLOPE	Memi[P2I($1+5)]	# pointer to x slopes of ref regions
-define	PM_RYSLOPE	Memi[P2I($1+6)]	# pointer to y slopes of ref regions
+define	PM_RC1		Memp[$1]	# pointer to first column of region
+define	PM_RC2		Memp[$1+1]	# pointer to last column of region
+define	PM_RL1		Memp[$1+2]	# pointer to first line of region
+define	PM_RL2		Memp[$1+3]	# pointer to last line of region
+define	PM_RZERO	Memp[$1+4]	# pointer to zero point of ref regions
+define	PM_RXSLOPE	Memp[$1+5]	# pointer to x slopes of ref regions
+define	PM_RYSLOPE	Memp[$1+6]	# pointer to y slopes of ref regions
 define	PM_NREGIONS	Memi[P2I($1+7)]	# total number of regions
 define	PM_CNREGION	Memi[P2I($1+8)]	# the current region
 
-define	PM_CENTER	Memi[P2I($1+9)]	# the the psf objects
+define	PM_CENTER	Memi[P2I($1+9)]	# the psf objects
 define	PM_BACKGRD	Memi[P2I($1+10)]	# type of background subtraction
 define	PM_BVALUER	Memr[P2R($1+11)]	# reference background value
 define	PM_BVALUE	Memr[P2R($1+12)]	# image background value
@@ -23,12 +23,12 @@ define	PM_HIREJECT	Memr[P2R($1+14)]	# high side rejection
 define	PM_APODIZE	Memr[P2R($1+15)]	# fraction of region to be apodized
 
 define	PM_CONVOLUTION	Memi[P2I($1+16)]	# the convolution type
-define	PM_DNX		Memi[P2I($1+17)]	# x dimension of kernel
-define	PM_DNY		Memi[P2I($1+18)]	# y dimension of kernel
-define	PM_PNX		Memi[P2I($1+19)]	# x dimension of user kernel
-define	PM_PNY		Memi[P2I($1+20)]	# y dimension of user kernel
-define	PM_KNX		Memi[P2I($1+21)]	# x size of kernel
-define	PM_KNY		Memi[P2I($1+22)]	# x size of kernel
+define	PM_DNX		Meml[P2L($1+17)]	# x dimension of kernel
+define	PM_DNY		Meml[P2L($1+18)]	# y dimension of kernel
+define	PM_PNX		Meml[P2L($1+19)]	# x dimension of user kernel
+define	PM_PNY		Meml[P2L($1+20)]	# y dimension of user kernel
+define	PM_KNX		Meml[P2L($1+21)]	# x size of kernel
+define	PM_KNY		Meml[P2L($1+22)]	# x size of kernel
 
 define	PM_POWER	Memi[P2I($1+23)]	# save power spectrum of kernel ?
 
@@ -45,16 +45,16 @@ define	PM_THRESHOLD	Memr[P2R($1+32)]	# threshold in divisor for model
 define	PM_NORMFACTOR	Memr[P2R($1+34)]	# the normalization factor
 
 #define	PM_PRATIO	Memr[P2R($1+24)]	# power ration threshold
-#define	PM_XSHIFTS	Memi[P2I($1+26)]	# pointer to x shifts
-#define	PM_YSHIFTS	Memi[P2I($1+27)]	# pointer to y shifts
+#define	PM_XSHIFTS	Memp[$1+26]	# pointer to x shifts
+#define	PM_YSHIFTS	Memp[$1+27]	# pointer to y shifts
 
-define	PM_REFFFT	Memi[P2I($1+35)]	# pointer to reference fft
-define  PM_IMFFT	Memi[P2I($1+36)]	# pointer to image fft
-define  PM_FFT		Memi[P2I($1+37)]	# pointer to unfiltered fft
-define  PM_CONV		Memi[P2I($1+38)]	# pointer to kernel
-define	PM_ASFFT	Memi[P2I($1+39)]	# pointer to power spectrum
-define  PM_NXFFT	Memi[P2I($1+40)]	# x dimension of FFT
-define  PM_NYFFT	Memi[P2I($1+41)]	# y dimension of FFT
+define	PM_REFFFT	Memp[$1+35]	# pointer to reference fft
+define  PM_IMFFT	Memp[$1+36]	# pointer to image fft
+define  PM_FFT		Memp[$1+37]	# pointer to unfiltered fft
+define  PM_CONV		Memp[$1+38]	# pointer to kernel
+define	PM_ASFFT	Memp[$1+39]	# pointer to power spectrum
+define  PM_NXFFT	Meml[P2L($1+40)]	# x dimension of FFT
+define  PM_NYFFT	Meml[P2L($1+41)]	# y dimension of FFT
 
 define	PM_BSTRING	Memc[P2C($1+42)]              # background string
 define	PM_CSTRING	Memc[P2C($1+42+SZ_FNAME+1)]   # convolution string

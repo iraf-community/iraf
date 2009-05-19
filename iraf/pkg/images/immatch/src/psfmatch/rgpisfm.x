@@ -31,24 +31,29 @@ pointer	im2		#I/O pointer to the output image
 pointer	gd		#I graphics stream pointer
 pointer	id		#I display stream pointer
 
+size_t	sz_val
 int	newref, newimage, newfourier, newfilter, plotfunc, plottype, wcs, key
-int	newplot, ncolr, nliner, ip
+int	newplot, ip
+long	ncolr, nliner
 pointer	sp, cmd
 real	wx, wy
 int	rg_pstati(), rg_psfm(), clgcur(), rg_pgqverify(), rg_pgtverify()
-int	ctoi(), rg_pregions()
+long	rg_pstatl(), lnint()
+int	ctol(), rg_pregions()
 pointer	rg_pstatp()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	newref = YES
 	newimage = YES
 	newfourier = YES
 	newfilter = YES
-	ncolr = INDEFI
-	nliner = INDEFI
+	ncolr = INDEFL
+	nliner = INDEFL
 	plotfunc = PM_PKERNEL
 	plottype = PM_PCONTOUR
 
@@ -101,18 +106,18 @@ begin
                 case 'x':
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
     		        call rg_pcolon (gd, pm, imr, reglist, impsf, im1, imk,
-			    NULL, im2, Memc[cmd], newref, newimage,
+			    NULLPTR, im2, Memc[cmd], newref, newimage,
 			    newfourier, newfilter)
                     } else {
                         ip = ip + 1
-                        if (ctoi (Memc[cmd], ip, ncolr) <= 0) {
+                        if (ctol (Memc[cmd], ip, ncolr) <= 0) {
 			    switch (plotfunc) {
 			    case PM_PPOWER:
-                                ncolr = rg_pstati (pm, NXFFT) / 2 + 1
+                                ncolr = rg_pstatl (pm, NXFFT) / 2 + 1
 			    case PM_PKERNEL:
-                                ncolr = rg_pstati (pm, KNX) / 2 + 1
+                                ncolr = rg_pstatl (pm, KNX) / 2 + 1
 			    default:
-                                ncolr = rg_pstati (pm, KNX) / 2 + 1
+                                ncolr = rg_pstatl (pm, KNX) / 2 + 1
 			    }
 			}
                         plottype = PM_PCOL
@@ -122,18 +127,18 @@ begin
 		case 'y':
 		    if (Memc[cmd+ip] != EOS && Memc[cmd+ip] != ' ') {
     		        call rg_pcolon (gd, pm, imr, reglist, impsf, im1, imk,
-			    NULL, im2, Memc[cmd], newref, newimage,
+			    NULLPTR, im2, Memc[cmd], newref, newimage,
 			    newfourier, newfilter)
                     } else {
 			ip = ip + 1
-                        if (ctoi (Memc[cmd], ip, nliner) <= 0) {
+                        if (ctol (Memc[cmd], ip, nliner) <= 0) {
 			    switch (plotfunc) {
 			    case PM_PPOWER:
-                                nliner = rg_pstati (pm, NYFFT) / 2 + 1
+                                nliner = rg_pstatl (pm, NYFFT) / 2 + 1
 			    case PM_PKERNEL:
-                                nliner = rg_pstati (pm, KNY) / 2 + 1
+                                nliner = rg_pstatl (pm, KNY) / 2 + 1
 			    default:
-                                nliner = rg_pstati (pm, KNY) / 2 + 1
+                                nliner = rg_pstatl (pm, KNY) / 2 + 1
 			    }
 			}
                         plottype = PM_PLINE
@@ -142,7 +147,7 @@ begin
 
 
 		default:
-    		    call rg_pcolon (gd, pm, imr, reglist, impsf, im1, imk, NULL,
+    		    call rg_pcolon (gd, pm, imr, reglist, impsf, im1, imk, NULLPTR,
 		        im2, Memc[cmd], newref, newimage, newfourier,
 			newfilter)
 		}
@@ -170,8 +175,8 @@ begin
 			        "\nRecomputing convolution kernel ...\n")
 			    if (rg_psfm (pm, imr, im1, impsf, imk,
 			        newref) == OK) {
-			        ncolr = INDEFI
-			        nliner = INDEFI
+			        ncolr = INDEFL
+			        nliner = INDEFL
 	    		        call rg_pplot (gd, pm, ncolr, nliner, plotfunc,
 			            plottype)
 			        newref = NO
@@ -187,8 +192,8 @@ begin
 		        if (newfilter == YES) {
 		            if (Memr[rg_pstatp(pm,FFT)] != NULL) {
 			        call rg_pfilter (pm)
-			        ncolr = INDEFI
-			        nliner = INDEFI
+			        ncolr = INDEFL
+			        nliner = INDEFL
 	    		        call rg_pplot (gd, pm, ncolr, nliner, plotfunc,
 			            plottype)
 				newfilter = NO
@@ -209,8 +214,8 @@ begin
 		    newplot = YES
 		plotfunc = PM_PKERNEL
 		plottype = PM_PCONTOUR
-		ncolr = (1 + rg_pstati (pm, KNX)) / 2
-		nliner = (1 + rg_pstati (pm, KNY)) / 2 
+		ncolr = (1 + rg_pstatl (pm, KNX)) / 2
+		nliner = (1 + rg_pstatl (pm, KNY)) / 2 
 
 	    # Draw a contour plot of the fourier spectrum.
 	    case 'p':
@@ -220,18 +225,18 @@ begin
 		    newplot = YES
 		plotfunc = PM_PPOWER
 		plottype = PM_PCONTOUR
-		ncolr = (1 + rg_pstati (pm, NXFFT)) / 2
-		nliner = (1 + rg_pstati (pm, NYFFT)) / 2 
+		ncolr = (1 + rg_pstatl (pm, NXFFT)) / 2
+		nliner = (1 + rg_pstatl (pm, NYFFT)) / 2 
 
 	    # Plot a line of the current plot.
 	    case 'x':
 	        if (plottype != PM_PCOL)
                     newplot = YES
                 if (plottype == PM_PCONTOUR) {
-                    ncolr = nint (wx)
-                    nliner = nint (wy)
+                    ncolr = lnint(wx)
+                    nliner = lnint(wy)
                 } else if (plottype == PM_PLINE) {
-                    ncolr = nint (wx)
+                    ncolr = lnint(wx)
                 }
                 plottype = PM_PCOL
 
@@ -240,10 +245,10 @@ begin
 		if (plottype != PM_PLINE)
                     newplot = YES
                 if (plottype == PM_PCONTOUR) {
-                    ncolr = nint (wx)
-                    nliner = nint (wy)
+                    ncolr = lnint(wx)
+                    nliner = lnint(wy)
                 } else if (plottype == PM_PCOL) {
-                    ncolr = nint (wx)
+                    ncolr = lnint(wx)
                 }
                 plottype = PM_PLINE
 
@@ -292,15 +297,18 @@ pointer	pm		# pointer to psfmatch structure
 pointer	imk		# pointer to kernel image
 int	ch		# character keystroke command
 
+size_t	sz_val
 int	wcs, stat 
 pointer	sp, cmd
 real	wx, wy
 bool	streq()
 int	clgcur(), rg_pstati()
+include	<nullptr.inc>
 
 begin
  	call smark (sp)
-        call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+        call salloc (cmd, sz_val, TY_CHAR)
 
         # Print the status line query in reverse video and get the keystroke.
         call printf (QUERY)
@@ -310,17 +318,17 @@ begin
 	# Process the command.
         if (ch == 'q') {
 	    if (rg_pstati (pm, CONVOLUTION) != PM_CONKERNEL)
-                call rg_pwrite (pm, imk, NULL)
+                call rg_pwrite (pm, imk, NULLPTR)
             stat = YES
         } else if (ch == 'w') {
 	    if (rg_pstati (pm, CONVOLUTION) != PM_CONKERNEL)
-                call rg_pwrite (pm, imk, NULL)
+                call rg_pwrite (pm, imk, NULLPTR)
             if (streq ("psfmatch", task))
                 call rg_pppars (pm)
             stat = YES
         } else if (ch == 'n') {
 	    if (rg_pstati (pm, CONVOLUTION) != PM_CONKERNEL)
-                call rg_pwrite (pm, imk, NULL)
+                call rg_pwrite (pm, imk, NULLPTR)
             stat = YES
         } else {
             stat = NO
@@ -337,7 +345,7 @@ end
 
 int procedure rg_pgtverify (ch)
 
-int     ch              #I the input keystroke command
+int	ch              #I the input keystroke command
 
 begin
         if (ch == 'q') {
@@ -359,24 +367,30 @@ procedure rg_pplot (gd, pm, col, line, plotfunc, plottype)
 
 pointer gd              #I pointer to the graphics stream
 pointer pm              #I pointer to the psfmatch structure
-int     col             #I column of cross-correlation function to plot
-int     line            #I line of cross-correlation function to plot
+long    col             #I column of cross-correlation function to plot
+long    line            #I line of cross-correlation function to plot
 int	plotfunc	#I the default plot function type
-int     plottype        #I the default plot type
+int	plottype        #I the default plot type
 
-int	nx, ny
+size_t	sz_val
+long	c_1
+size_t	nx, ny
 pointer	sp, title, str, data
-int	rg_pstati(), strlen()
+int	strlen()
+long	rg_pstatl()
 pointer	rg_pstatp()
 
 begin
+	c_1 = 1
+
         if (gd == NULL)
             return
 
         # Allocate working space.
         call smark (sp)
-        call salloc (title, SZ_LINE, TY_CHAR)
-        call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+        call salloc (title, sz_val, TY_CHAR)
+        call salloc (str, sz_val, TY_CHAR)
 
         # Initialize the plot title and data.
 	switch (plotfunc) {
@@ -388,8 +402,8 @@ begin
                 call rg_pstats (pm, IMAGE, Memc[str], SZ_FNAME)
                 call pargstr (Memc[str])
 	    data = rg_pstatp (pm, ASFFT)
-	    nx = rg_pstati (pm, NXFFT)
-	    ny = rg_pstati (pm, NYFFT)
+	    nx = rg_pstatl (pm, NXFFT)
+	    ny = rg_pstatl (pm, NYFFT)
 	case PM_PKERNEL:
             call sprintf (Memc[title], SZ_LINE,
                 "Convolution Kernel for Reference: %s  Image: %s")
@@ -398,8 +412,8 @@ begin
                 call rg_pstats (pm, IMAGE, Memc[str], SZ_FNAME)
                 call pargstr (Memc[str])
 	    data = rg_pstatp (pm, CONV)
-	    nx = rg_pstati (pm, KNX)
-	    ny = rg_pstati (pm, KNY)
+	    nx = rg_pstatl (pm, KNX)
+	    ny = rg_pstatl (pm, KNY)
 	default:
             call sprintf (Memc[title], SZ_LINE,
                 "Convolution Kernel for Reference: %s  Image: %s")
@@ -408,12 +422,12 @@ begin
                 call rg_pstats (pm, IMAGE, Memc[str], SZ_FNAME)
                 call pargstr (Memc[str])
 	    data = rg_pstatp (pm, CONV)
-	    nx = rg_pstati (pm, KNX)
-	    nx = rg_pstati (pm, KNY)
+	    nx = rg_pstatl (pm, KNX)
+	    nx = rg_pstatl (pm, KNY)
 	}
-	if (IS_INDEFI(col))
+	if (IS_INDEFL(col))
 	    col = 1 + nx / 2
-	if (IS_INDEFI(line))
+	if (IS_INDEFL(line))
 	    line = 1 + ny / 2
 
 	# Draw the plot.
@@ -424,19 +438,19 @@ begin
                     "\nLine %d")
                     call pargi (1)
                 call rg_pcpline (gd, Memc[title], Memr[rg_pstatp(pm,ASFFT)],
-                    nx, ny, 1)
+                    nx, ny, c_1)
 	    case PM_PKERNEL:
                 call sprintf (Memc[title+strlen(Memc[title])], SZ_LINE,
                     "\nLine %d")
                     call pargi (1)
                 call rg_pcpline (gd, Memc[title], Memr[rg_pstatp(pm,CONV)],
-                    nx, ny, 1)
+                    nx, ny, c_1)
 	    default:
                 call sprintf (Memc[title+strlen(Memc[title])], SZ_LINE,
                     "\nLine %d")
                     call pargi (1)
                 call rg_pcpline (gd, Memc[title], Memr[rg_pstatp(pm,CONV)],
-                    nx, ny, 1)
+                    nx, ny, c_1)
             }
         } else {
             switch (plottype) {
@@ -445,12 +459,12 @@ begin
             case PM_PLINE:
                 call sprintf (Memc[title+strlen(Memc[title])], SZ_LINE,
                     "\nLine %d")
-                    call pargi (line)
+                    call pargl (line)
                 call rg_pcpline (gd, Memc[title], Memr[data], nx, ny, line)
             case PM_PCOL:
                 call sprintf (Memc[title+strlen(Memc[title])], SZ_LINE,
                     "\nColumn %d")
-                    call pargi (col)
+                    call pargl (col)
                 call rg_pcpcol (gd, Memc[title], Memr[data], nx, ny, col)
             default:
                 call rg_contour (gd, Memc[title], "", Memr[data], nx, ny)
@@ -468,10 +482,11 @@ procedure rg_pcpline (gd, title, data, nx, ny, nline)
 pointer gd              #I pointer to the graphics stream
 char    title[ARB]      #I title for the plot
 real    data[nx,ARB]    #I the input data array
-int     nx, ny          #I dimensions of the input data array
-int     nline           #I the line number
+size_t  nx, ny          #I dimensions of the input data array
+long    nline           #I the line number
 
-int     i
+size_t	sz_val
+long	i
 pointer sp, str, x
 real    ymin, ymax
 
@@ -486,7 +501,8 @@ begin
 
         # Allocate some working space.
         call smark (sp)
-        call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+        call salloc (str, sz_val, TY_CHAR)
         call salloc (x, nx, TY_REAL)
 
         # Initialize the data.
@@ -515,10 +531,10 @@ procedure rg_pcpcol (gd, title, data, nx, ny, ncol)
 pointer gd              #I pointer to the graphics stream
 char    title[ARB]      #I title of the column plot
 real    data[nx,ARB]    #I the input data array
-int     nx, ny          #I the dimensions of the input data array
-int     ncol            #I line number
+size_t	nx, ny          #I the dimensions of the input data array
+long    ncol            #I line number
 
-int     i
+long	i
 pointer sp, x, y
 real    ymin, ymax
 

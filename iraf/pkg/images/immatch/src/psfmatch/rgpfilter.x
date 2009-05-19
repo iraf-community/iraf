@@ -5,16 +5,17 @@ include <math.h>
 procedure rg_pcosbell (fft, nxfft, nyfft, sx1, sx2, sy1, sy2, radsym)
 
 real	fft[ARB]		#I/O the ifft to be filtered
-int	nxfft			#I the x dimension of the fft
-int	nyfft			#I the y dimension of the fft
+long	nxfft			#I the x dimension of the fft
+long	nyfft			#I the y dimension of the fft
 real	sx1			#I inner x radius of the cosine bell filter
 real	sx2			#I outer x radius of the cosine bell filter
 real	sy1			#I inner y radius of the cosine bell filter
 real	sy2			#I outer y radius of the cosine bell filter
 int	radsym			#I radial symmetry ?
 
-int	i, j, index, xcen, ycen
+long	i, j, index, xcen, ycen
 real	factorx, factory, r1, r2, r, rj, cos2
+long	labs()
 
 begin
 	# Compute the center of the fft.
@@ -35,7 +36,7 @@ begin
 	    factory = HALFPI / (r2 - r1)
 	    index = 1
 	    do j = 1, nyfft {
-		r = abs (ycen - j)
+		r = labs (ycen - j)
 		if (r >= r2)
 		    cos2 = 0.0
 		else if (r <= r1)
@@ -58,7 +59,7 @@ begin
 	    factorx = HALFPI / (r2 - r1)
 
 	    do i = 1, nxfft {
-		r = abs (xcen - i)
+		r = labs (xcen - i)
 		if (r >= r2)
 		    cos2 = 0.0
 		else if (r <= r1)
@@ -119,18 +120,20 @@ procedure rg_preplace (fft, fftdiv, nxfft, nyfft, pthreshold, norm)
 
 real	fft[ARB]		#I/O the fft of the kernel
 real	fftdiv[ARB]		#I the divisor fft
-int	nxfft			#I x dimension of the fft (complex storage)
-int	nyfft			#I y dimension of the fft
+long	nxfft			#I x dimension of the fft (complex storage)
+long	nyfft			#I y dimension of the fft
 real	pthreshold		#I the minimum percent amplitude in the divisor
 real	norm			#I the normalization  value
 
+size_t	sz_val
 pointer	sp, params
-int	xcen, ycen, i, j, ri, rj, index
+long	xcen, ycen, i, j, ri, rj, index
 real	divpeak, a1, a2, a3, u, v, divisor, absv, phi
 
 begin
 	call smark (sp)
-	call salloc (params, 5, TY_REAL)
+	sz_val = 5
+	call salloc (params, sz_val, TY_REAL)
 
 	# Compute the central amplitude peak.
 	xcen = nxfft / 2 + 1
@@ -191,18 +194,20 @@ procedure rg_pgmodel (fft, fftdiv, nxfft, nyfft, pthreshold, norm)
 
 real	fft[ARB]		#I/O the fft of the kernel
 real	fftdiv[ARB]		#I the divisor fft
-int	nxfft			#I the x dimension of the fft
-int	nyfft			#I the y dimension of the fft
+long	nxfft			#I the x dimension of the fft
+long	nyfft			#I the y dimension of the fft
 real	pthreshold		#I the minimum percent amplitude in the divisor
 real	norm			#I the normalization factor
 
+size_t	sz_val
 pointer	sp, params
-int	xcen, ycen, i, j, index
+long	xcen, ycen, i, j, index
 real	divpeak, a1, a2, a3, u, v, absv, phi, ri, rj
 
 begin
 	call smark (sp)
-	call salloc (params, 5, TY_REAL)
+	sz_val = 5
+	call salloc (params, sz_val, TY_REAL)
 
 	# Compute the central amplitude peak.
 	xcen = nxfft / 2 + 1
@@ -258,13 +263,14 @@ procedure rg_pgaussfit (fft, fftdiv, nxfft, nyfft, divpeak, norm, param)
 
 real	fft[ARB]		#I the fft of the kernel
 real	fftdiv[ARB]		#I the divisor fft
-int	nxfft			#I the x dimension of the fft
-int	nyfft			#I the y dimension of the fft
+long	nxfft			#I the x dimension of the fft
+long	nyfft			#I the y dimension of the fft
 real	divpeak			#I the minimum value in the divisor
 real	norm			#I the normalization value norm value
 real	param[ARB]		#O the output fitted parameters
 
-int	i, j, yj, xcen, ycen
+size_t	sz_val
+long	i, j, yj, xcen, ycen
 double	x, y, x2, xy, y2, z, wt, x2w, y2w, xyw, zw, xzw, yzw
 double	sxxxx, sxxxy, sxxyy, sxyyy, syyyy, sxxz, sxyz, syyz, sxx, sxy
 double	syy, sxz, syz
@@ -274,7 +280,8 @@ real	divisor
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (mat, 12, TY_DOUBLE)
+	sz_val = 12
+	call salloc (mat, sz_val, TY_DOUBLE)
 
 	# Define the center of the fft.
 	xcen = nxfft / 2 + 1
@@ -386,9 +393,9 @@ end
 procedure rg_pgelim (a, n)
 
 double  a[n+1,n]                        #I/O matrix to be solved
-int     n                               #I number of variables
+int	n                               #I number of variables
 
-int     i, j, k
+int	i, j, k
 double	den, hold
 
 begin
@@ -429,11 +436,11 @@ end
 procedure rg_pnormfilt (fft, nxfft, nyfft, norm)
 
 real	fft[ARB]		#I/O the input fft
-int	nxfft			#I the x length of the fft
-int	nyfft			#I the y length of the fft
+long	nxfft			#I the x length of the fft
+long	nyfft			#I the y length of the fft
 real	norm			#I the normalization factor
 
-int	j, i_index
+long	j, i_index
 
 begin
 	do j = 1, nyfft {
@@ -449,10 +456,10 @@ procedure rg_pfourier (fft, psfft, nxfft, nyfft)
 
 real	fft[ARB]		# the input fft
 real	psfft[ARB]		# fourier spectrum of the fft
-int	nxfft			# the x dimension of the fft
-int	nyfft			# the y dimension of the fft
+long	nxfft			# the x dimension of the fft
+long	nyfft			# the y dimension of the fft
 
-int	j, i_index, o_index
+long	j, i_index, o_index
 
 begin
 	do j = 1, nyfft {
@@ -469,9 +476,9 @@ procedure rg_pvfourier (a, b, nxfft)
 
 real	a[ARB]		# input vector in complex storage order
 real	b[ARB]		# output vector in real storage order
-int	nxfft		# length of vector
+long	nxfft		# length of vector
 
-int	i
+long	i
 
 begin
 	do i = 1, nxfft
@@ -485,10 +492,10 @@ end
 procedure rg_pnreplace (a, nxfft, norm)
 
 real	a[ARB]		#I/O ithe nput vector in complex storage order
-int	nxfft		#I the length of the vector
+long	nxfft		#I the length of the vector
 real	norm		#I the flux ratio
 
-int	i
+long	i
 real	val
 
 begin
