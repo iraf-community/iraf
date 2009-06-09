@@ -12,8 +12,11 @@ real	lower, upper			# Range to be replaced
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf1, buf2
-int	npix, junk
+size_t	npix
+long	junk
 $if (datatype == sil)
 real	ilower
 $endif
@@ -23,12 +26,15 @@ long	imgnl$t(), impnl$t()
 	    
 $if (datatype == sil)
 bool	fp_equalr()
+long	lint()
 $endif
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im, 1)
 	$if (datatype == x)
@@ -45,7 +51,7 @@ begin
 	# If lower is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (lower)) {
 	    $if (datatype == sil)
-	    ceil = int (upper)
+	    ceil = lint(upper)
 	    $else
 	    ceil = double (upper)
 	    $endif
@@ -58,11 +64,11 @@ begin
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
 	    $if (datatype == sil)
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
+	        floor = lint(lower+1.0)
 	    $else
 	    floor = double (lower)
 	    $endif
@@ -75,12 +81,12 @@ begin
 	# Replace pixels between lower and upper by value.
 	} else {
 	    $if (datatype == sil)
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
-	    ceil = int (upper)
+	        floor = lint(lower+1.0)
+	    ceil = lint(upper)
 	    $else
 	    floor = double (lower)
 	    ceil = double (upper)
@@ -106,8 +112,11 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf, buf1, buf2, ptr
-int	i, j, k, l, nc, nl, nradius, nbufs
+size_t	nc, nl
+long	i, j, k, l, nradius, nbufs
 $if (datatype == sil)
 real	ilower
 $endif
@@ -118,14 +127,17 @@ $endif
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 long	imgnl$t(), impnl$t()
+long	lint(), lmod()
 $if (datatype == sil)
 bool	fp_equalr()
 $endif
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	nc = IM_LEN(im, 1)
 	if (IM_NDIM(im) > 1)
@@ -148,7 +160,7 @@ begin
 	} else if (IS_INDEFR (lower)) {
 	    $if (datatype == sil)
 	    floor = -MAX_PIXEL
-	    ceil = int (upper)
+	    ceil = lint(upper)
 	    $else $if (datatype == x)
 	    floor = 0
 	    ceil = real (upper)
@@ -162,11 +174,11 @@ begin
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
 	    $if (datatype == sil)
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
+	        floor = lint(lower+1.0)
 	    ceil = MAX_PIXEL
 	    $else $if (datatype == x)
 	    floor = real (lower)
@@ -181,12 +193,12 @@ begin
 	# Replace pixels between lower and upper by value.
 	} else {
 	    $if (datatype == sil)
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
-	    ceil = int (upper)
+	        floor = lint(lower+1.0)
+	    ceil = lint(upper)
 	    $else $if (datatype == x)
 	    floor = real (lower)
 	    ceil = real (upper)
@@ -200,13 +212,14 @@ begin
 
 	# Initialize buffering.
 	radius2 = radius * radius
-	nradius = int (radius)
+	nradius = lint(radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_PIXEL)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_PIXEL)
 
 	while (imgnl$t (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
-	    buf2 = buf + mod (j, nbufs) * nc
+	    buf2 = buf + lmod(j, nbufs) * nc
 	    do i = 1, nc {
 		val1 = Mem$t[buf1]
 		val2 = Mem$t[buf2]
@@ -216,7 +229,7 @@ begin
 		if ((val1 >= floor) && (val1 <= ceil)) {
 		$endif
 		    do k = max(1,j-nradius), min (nl,j+nradius) {
-			ptr = buf + mod (k, nbufs) * nc - 1
+			ptr = buf + lmod(k, nbufs) * nc - 1
 			y2 = (k - j) ** 2
 			do l = max(1,i-nradius), min (nc,i+nradius) {
 			    if ((l-i)**2 + y2 > radius2)
@@ -235,7 +248,7 @@ begin
 	    if (j > nradius) {
 		while (impnl$t (im, buf2, v2) != EOF) {
 		    k = v2[2] - 1
-		    buf1 = buf + mod (k, nbufs) * nc
+		    buf1 = buf + lmod(k, nbufs) * nc
 		    do i = 1, nc {
 			val1 = Mem$t[buf1]
 			if (IS_INDEF(Mem$t[buf1]))
@@ -261,11 +274,11 @@ end
 procedure arep$t (a, npts, floor, ceil, newval)
 
 PIXEL	a[npts]				# Input arrays
-int	npts				# Number of points
+size_t	npts				# Number of points
 PIXEL	floor, ceil			# Replacement limits
 PIXEL	newval				# Replacement value
 
-int	i
+long	i
 $if (datatype == x)
 real	abs_floor
 real	abs_ceil
@@ -293,10 +306,10 @@ end
 procedure arle$t (a, npts, floor, newval)
 
 PIXEL	a[npts]
-int	npts
+size_t	npts
 PIXEL	floor, newval
 
-int	i
+long	i
 $if (datatype == x)
 real	abs_floor
 $endif
@@ -321,10 +334,10 @@ end
 procedure arge$t (a, npts, ceil, newval)
 
 PIXEL	a[npts]
-int	npts
+size_t	npts
 PIXEL	ceil, newval
 
-int	i
+long	i
 $if (datatype == x)
 real	abs_ceil
 $endif

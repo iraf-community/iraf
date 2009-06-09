@@ -10,7 +10,9 @@ procedure ima_subs (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 short	a, b
 
-int	len
+size_t	sz_val
+long	l_val
+size_t	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
 
@@ -20,7 +22,9 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	l_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	# If imagea is constant then read imageb.  Do a vector/scalar
 	# subtraction and then negate the result.
@@ -59,7 +63,9 @@ procedure ima_subi (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 int	a, b
 
-int	len
+size_t	sz_val
+long	l_val
+size_t	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
 
@@ -69,7 +75,9 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	l_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	# If imagea is constant then read imageb.  Do a vector/scalar
 	# subtraction and then negate the result.
@@ -108,7 +116,9 @@ procedure ima_subl (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 long	a, b
 
-int	len
+size_t	sz_val
+long	l_val
+size_t	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
 
@@ -118,7 +128,9 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	l_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	# If imagea is constant then read imageb.  Do a vector/scalar
 	# subtraction and then negate the result.
@@ -157,7 +169,9 @@ procedure ima_subr (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 real	a, b
 
-int	len
+size_t	sz_val
+long	l_val
+size_t	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
 
@@ -167,7 +181,9 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	l_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	# If imagea is constant then read imageb.  Do a vector/scalar
 	# subtraction and then negate the result.
@@ -206,7 +222,9 @@ procedure ima_subd (im_a, im_b, im_c, a, b)
 pointer	im_a, im_b, im_c
 double	a, b
 
-int	len
+size_t	sz_val
+long	l_val
+size_t	len
 pointer	im[3], buf[3]
 long	v[IM_MAXDIM, 3]
 
@@ -216,7 +234,9 @@ begin
 	# Loop through all of the image lines.
 	im[1] = im_c
 	len = IM_LEN (im[1], 1)
-	call amovkl (long(1), v, 3 * IM_MAXDIM)
+	l_val = 1
+	sz_val = 3 * IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	# If imagea is constant then read imageb.  Do a vector/scalar
 	# subtraction and then negate the result.

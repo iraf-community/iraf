@@ -12,7 +12,9 @@ procedure if_log10r (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 real	if_elogr()
@@ -20,8 +22,10 @@ extern	if_elogr()
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -50,14 +54,18 @@ procedure if_alog10r (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -72,9 +80,9 @@ procedure if_va10r (a, b, n)
 
 real	a[n]				# the input vector
 real	b[n]				# the output vector
-int	n				# the number of points
+size_t	n				# the number of points
 
-int	i
+long	i
 real	maxexp, maxval
 
 begin
@@ -100,7 +108,9 @@ procedure if_lnr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 
@@ -109,8 +119,10 @@ extern	if_elnr()
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -138,14 +150,18 @@ procedure if_alnr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -160,9 +176,9 @@ procedure if_valnr (a, b, n)
 
 real	a[n]			# the input vector
 real	b[n]			# the output vector
-int	n			# the number of pixels
+size_t	n			# the number of pixels
 
-int	i
+long	i
 real	maxexp, maxval, eval
 
 begin
@@ -189,7 +205,9 @@ procedure if_sqrr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 real	if_esqrr()
@@ -197,8 +215,10 @@ extern	if_esqrr()
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -224,14 +244,18 @@ procedure if_squarer (im1, im2)
 pointer	im1				# the input image pointer
 pointer	im2				# the output image pointer
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -248,14 +272,18 @@ procedure if_cbrtr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -270,9 +298,9 @@ procedure if_vcbrtr (a, b, n)
 
 real	a[n]			# the input vector
 real	b[n]			# the output vector
-int	n			# the number of pixels
+size_t	n			# the number of pixels
 
-int	i
+long	i
 real	onethird
 
 begin
@@ -296,14 +324,18 @@ procedure if_cuber (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -319,14 +351,18 @@ procedure if_cosr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -341,9 +377,9 @@ procedure if_vcosr (a, b, n)
 
 real	a[n]				# the input vector
 real	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 
 begin
 	do i = 1, n
@@ -358,14 +394,18 @@ procedure if_sinr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -380,9 +420,9 @@ procedure if_vsinr (a, b, n)
 
 real	a[n]				# the input vector
 real	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 
 begin
 	do i = 1, n
@@ -397,14 +437,18 @@ procedure if_tanr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -419,9 +463,9 @@ procedure if_vtanr (a, b, n)
 
 real	a[n]				# the input vector
 real	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 
 begin
 	do i = 1, n 
@@ -436,14 +480,18 @@ procedure if_acosr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -458,9 +506,9 @@ procedure if_vacosr (a, b, n)
 
 real	a[n]				# the input vector
 real	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 
 begin
 	do i = 1, n {
@@ -481,14 +529,18 @@ procedure if_asinr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -503,9 +555,9 @@ procedure if_vasinr (a, b, n)
 
 real	a[n]
 real	b[n]
-int	n
+size_t	n
 
-int	i
+long	i
 
 begin
 	do i = 1, n {
@@ -527,14 +579,18 @@ procedure if_atanr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -549,9 +605,9 @@ procedure if_vatanr (a, b, n)
 
 real	a[n]
 real	b[n]
-int	n
+size_t	n
 
-int	i
+long	i
 
 begin
 	do i = 1, n
@@ -567,14 +623,18 @@ procedure if_hcosr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -589,9 +649,9 @@ procedure if_vhcosr (a, b, n)
 
 real	a[n]				# the input vector
 real	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 real	maxexp, maxval
 
 begin
@@ -615,14 +675,18 @@ procedure if_hsinr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -637,9 +701,9 @@ procedure if_vhsinr (a, b, n)
 
 real	a[n]				# the input vector
 real	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 real	maxexp, maxval
 
 begin
@@ -665,14 +729,18 @@ procedure if_htanr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -687,9 +755,9 @@ procedure if_vhtanr (a, b, n)
 
 real	a[n]				# the input vector
 real	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 
 begin
 	do i = 1, n
@@ -705,7 +773,10 @@ procedure if_recipr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
+real	r_1
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 real	if_erecipr()
@@ -713,13 +784,16 @@ extern	if_erecipr()
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
+	r_1 = 1.0
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
 	    (impnlr (im2, buf2, v2) != EOF))
-	    call arczr (1.0, Memr[buf1], Memr[buf2], npix, if_erecipr)
+	    call arczr (r_1, Memr[buf1], Memr[buf2], npix, if_erecipr)
 end
 
 
@@ -743,7 +817,9 @@ procedure if_log10d (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 double	if_elogd()
@@ -751,8 +827,10 @@ extern	if_elogd()
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -781,14 +859,18 @@ procedure if_alog10d (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -803,9 +885,9 @@ procedure if_va10d (a, b, n)
 
 double	a[n]				# the input vector
 double	b[n]				# the output vector
-int	n				# the number of points
+size_t	n				# the number of points
 
-int	i
+long	i
 double	maxexp, maxval
 
 begin
@@ -831,7 +913,9 @@ procedure if_lnd (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 
@@ -840,8 +924,10 @@ extern	if_elnd()
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -869,14 +955,18 @@ procedure if_alnd (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -891,9 +981,9 @@ procedure if_valnd (a, b, n)
 
 double	a[n]			# the input vector
 double	b[n]			# the output vector
-int	n			# the number of pixels
+size_t	n			# the number of pixels
 
-int	i
+long	i
 double	maxexp, maxval, eval
 
 begin
@@ -920,7 +1010,9 @@ procedure if_sqrd (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 double	if_esqrd()
@@ -928,8 +1020,10 @@ extern	if_esqrd()
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -955,14 +1049,18 @@ procedure if_squared (im1, im2)
 pointer	im1				# the input image pointer
 pointer	im2				# the output image pointer
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -979,14 +1077,18 @@ procedure if_cbrtd (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1001,9 +1103,9 @@ procedure if_vcbrtd (a, b, n)
 
 double	a[n]			# the input vector
 double	b[n]			# the output vector
-int	n			# the number of pixels
+size_t	n			# the number of pixels
 
-int	i
+long	i
 double	onethird
 
 begin
@@ -1027,14 +1129,18 @@ procedure if_cubed (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1050,14 +1156,18 @@ procedure if_cosd (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1072,9 +1182,9 @@ procedure if_vcosd (a, b, n)
 
 double	a[n]				# the input vector
 double	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 
 begin
 	do i = 1, n
@@ -1089,14 +1199,18 @@ procedure if_sind (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1111,9 +1225,9 @@ procedure if_vsind (a, b, n)
 
 double	a[n]				# the input vector
 double	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 
 begin
 	do i = 1, n
@@ -1128,14 +1242,18 @@ procedure if_tand (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1150,9 +1268,9 @@ procedure if_vtand (a, b, n)
 
 double	a[n]				# the input vector
 double	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 
 begin
 	do i = 1, n 
@@ -1167,14 +1285,18 @@ procedure if_acosd (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1189,9 +1311,9 @@ procedure if_vacosd (a, b, n)
 
 double	a[n]				# the input vector
 double	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 
 begin
 	do i = 1, n {
@@ -1212,14 +1334,18 @@ procedure if_asind (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1234,9 +1360,9 @@ procedure if_vasind (a, b, n)
 
 double	a[n]
 double	b[n]
-int	n
+size_t	n
 
-int	i
+long	i
 
 begin
 	do i = 1, n {
@@ -1258,14 +1384,18 @@ procedure if_atand (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1280,9 +1410,9 @@ procedure if_vatand (a, b, n)
 
 double	a[n]
 double	b[n]
-int	n
+size_t	n
 
-int	i
+long	i
 
 begin
 	do i = 1, n
@@ -1298,14 +1428,18 @@ procedure if_hcosd (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1320,9 +1454,9 @@ procedure if_vhcosd (a, b, n)
 
 double	a[n]				# the input vector
 double	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 double	maxexp, maxval
 
 begin
@@ -1346,14 +1480,18 @@ procedure if_hsind (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1368,9 +1506,9 @@ procedure if_vhsind (a, b, n)
 
 double	a[n]				# the input vector
 double	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 double	maxexp, maxval
 
 begin
@@ -1396,14 +1534,18 @@ procedure if_htand (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 pointer	buf1, buf2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1418,9 +1560,9 @@ procedure if_vhtand (a, b, n)
 
 double	a[n]				# the input vector
 double	b[n]				# the output vector
-int	n				# the number of pixels
+size_t	n				# the number of pixels
 
-int	i
+long	i
 
 begin
 	do i = 1, n
@@ -1436,7 +1578,10 @@ procedure if_recipd (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
+double	r_1
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 double	if_erecipd()
@@ -1444,13 +1589,16 @@ extern	if_erecipd()
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
+	r_1 = 1.0
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
 	    (impnld (im2, buf2, v2) != EOF))
-	    call arczd (1.0, Memd[buf1], Memd[buf2], npix, if_erecipd)
+	    call arczd (r_1, Memd[buf1], Memd[buf2], npix, if_erecipd)
 end
 
 
@@ -1476,14 +1624,18 @@ procedure if_absl (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnll(), impnll()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnll (im1, buf1, v1) != EOF) &&
@@ -1499,14 +1651,18 @@ procedure if_negl (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnll(), impnll()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnll (im1, buf1, v1) != EOF) &&
@@ -1524,14 +1680,18 @@ procedure if_absr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -1547,14 +1707,18 @@ procedure if_negr (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnlr(), impnlr()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnlr (im1, buf1, v1) != EOF) &&
@@ -1572,14 +1736,18 @@ procedure if_absd (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&
@@ -1595,14 +1763,18 @@ procedure if_negd (im1, im2)
 pointer	im1				# pointer to the input image
 pointer	im2				# pointer to the output image
 
-int	npix
+long	l_val
+size_t	sz_val
+size_t	npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer	buf1, buf2
 long	imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	l_val = 1
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im1, 1)
 	while ((imgnld (im1, buf1, v1) != EOF) &&

@@ -12,19 +12,25 @@ real	lower, upper			# Range to be replaced
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf1, buf2
-int	npix, junk
+size_t	npix
+long	junk
 real	ilower
 short	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnls(), impnls()
 	    
 bool	fp_equalr()
+long	lint()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im, 1)
 	newval = double (value)
@@ -36,7 +42,7 @@ begin
 
 	# If lower is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (lower)) {
-	    ceil = int (upper)
+	    ceil = lint(upper)
 	    while (imgnls (im, buf1, v1) != EOF) {
 		junk = impnls (im, buf2, v2)
 		call amovs (Mems[buf1], Mems[buf2], npix)
@@ -45,11 +51,11 @@ begin
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
+	        floor = lint(lower+1.0)
 	    while (imgnls (im, buf1, v1) != EOF) {
 		junk = impnls (im, buf2, v2)
 		call amovs (Mems[buf1], Mems[buf2], npix)
@@ -58,12 +64,12 @@ begin
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
-	    ceil = int (upper)
+	        floor = lint(lower+1.0)
+	    ceil = lint(upper)
 	    while (imgnls (im, buf1, v1) != EOF) {
 		junk = impnls (im, buf2, v2)
 		call amovs (Mems[buf1], Mems[buf2], npix)
@@ -85,19 +91,25 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf, buf1, buf2, ptr
-int	i, j, k, l, nc, nl, nradius, nbufs
+size_t	nc, nl
+long	i, j, k, l, nradius, nbufs
 real	ilower
 short	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 long	imgnls(), impnls()
+long	lint(), lmod()
 bool	fp_equalr()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	nc = IM_LEN(im, 1)
 	if (IM_NDIM(im) > 1)
@@ -115,42 +127,43 @@ begin
 	# If lower is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (lower)) {
 	    floor = -MAX_SHORT
-	    ceil = int (upper)
+	    ceil = lint(upper)
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
+	        floor = lint(lower+1.0)
 	    ceil = MAX_SHORT
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
-	    ceil = int (upper)
+	        floor = lint(lower+1.0)
+	    ceil = lint(upper)
 	}
 
 	# Initialize buffering.
 	radius2 = radius * radius
-	nradius = int (radius)
+	nradius = lint(radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_SHORT)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_SHORT)
 
 	while (imgnls (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
-	    buf2 = buf + mod (j, nbufs) * nc
+	    buf2 = buf + lmod(j, nbufs) * nc
 	    do i = 1, nc {
 		val1 = Mems[buf1]
 		val2 = Mems[buf2]
 		if ((val1 >= floor) && (val1 <= ceil)) {
 		    do k = max(1,j-nradius), min (nl,j+nradius) {
-			ptr = buf + mod (k, nbufs) * nc - 1
+			ptr = buf + lmod(k, nbufs) * nc - 1
 			y2 = (k - j) ** 2
 			do l = max(1,i-nradius), min (nc,i+nradius) {
 			    if ((l-i)**2 + y2 > radius2)
@@ -169,7 +182,7 @@ begin
 	    if (j > nradius) {
 		while (impnls (im, buf2, v2) != EOF) {
 		    k = v2[2] - 1
-		    buf1 = buf + mod (k, nbufs) * nc
+		    buf1 = buf + lmod(k, nbufs) * nc
 		    do i = 1, nc {
 			val1 = Mems[buf1]
 			if (IS_INDEFS(Mems[buf1]))
@@ -195,11 +208,11 @@ end
 procedure areps (a, npts, floor, ceil, newval)
 
 short	a[npts]				# Input arrays
-int	npts				# Number of points
+size_t	npts				# Number of points
 short	floor, ceil			# Replacement limits
 short	newval				# Replacement value
 
-int	i
+long	i
 
 begin
 
@@ -215,10 +228,10 @@ end
 procedure arles (a, npts, floor, newval)
 
 short	a[npts]
-int	npts
+size_t	npts
 short	floor, newval
 
-int	i
+long	i
 
 begin
 
@@ -233,10 +246,10 @@ end
 procedure arges (a, npts, ceil, newval)
 
 short	a[npts]
-int	npts
+size_t	npts
 short	ceil, newval
 
-int	i
+long	i
 
 begin
 
@@ -256,19 +269,25 @@ real	lower, upper			# Range to be replaced
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf1, buf2
-int	npix, junk
+size_t	npix
+long	junk
 real	ilower
 int	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnli(), impnli()
 	    
 bool	fp_equalr()
+long	lint()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im, 1)
 	newval = double (value)
@@ -280,7 +299,7 @@ begin
 
 	# If lower is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (lower)) {
-	    ceil = int (upper)
+	    ceil = lint(upper)
 	    while (imgnli (im, buf1, v1) != EOF) {
 		junk = impnli (im, buf2, v2)
 		call amovi (Memi[buf1], Memi[buf2], npix)
@@ -289,11 +308,11 @@ begin
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
+	        floor = lint(lower+1.0)
 	    while (imgnli (im, buf1, v1) != EOF) {
 		junk = impnli (im, buf2, v2)
 		call amovi (Memi[buf1], Memi[buf2], npix)
@@ -302,12 +321,12 @@ begin
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
-	    ceil = int (upper)
+	        floor = lint(lower+1.0)
+	    ceil = lint(upper)
 	    while (imgnli (im, buf1, v1) != EOF) {
 		junk = impnli (im, buf2, v2)
 		call amovi (Memi[buf1], Memi[buf2], npix)
@@ -329,19 +348,25 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf, buf1, buf2, ptr
-int	i, j, k, l, nc, nl, nradius, nbufs
+size_t	nc, nl
+long	i, j, k, l, nradius, nbufs
 real	ilower
 int	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 long	imgnli(), impnli()
+long	lint(), lmod()
 bool	fp_equalr()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	nc = IM_LEN(im, 1)
 	if (IM_NDIM(im) > 1)
@@ -359,42 +384,43 @@ begin
 	# If lower is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (lower)) {
 	    floor = -MAX_INT
-	    ceil = int (upper)
+	    ceil = lint(upper)
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
+	        floor = lint(lower+1.0)
 	    ceil = MAX_INT
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
-	    ceil = int (upper)
+	        floor = lint(lower+1.0)
+	    ceil = lint(upper)
 	}
 
 	# Initialize buffering.
 	radius2 = radius * radius
-	nradius = int (radius)
+	nradius = lint(radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_INT)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_INT)
 
 	while (imgnli (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
-	    buf2 = buf + mod (j, nbufs) * nc
+	    buf2 = buf + lmod(j, nbufs) * nc
 	    do i = 1, nc {
 		val1 = Memi[buf1]
 		val2 = Memi[buf2]
 		if ((val1 >= floor) && (val1 <= ceil)) {
 		    do k = max(1,j-nradius), min (nl,j+nradius) {
-			ptr = buf + mod (k, nbufs) * nc - 1
+			ptr = buf + lmod(k, nbufs) * nc - 1
 			y2 = (k - j) ** 2
 			do l = max(1,i-nradius), min (nc,i+nradius) {
 			    if ((l-i)**2 + y2 > radius2)
@@ -413,7 +439,7 @@ begin
 	    if (j > nradius) {
 		while (impnli (im, buf2, v2) != EOF) {
 		    k = v2[2] - 1
-		    buf1 = buf + mod (k, nbufs) * nc
+		    buf1 = buf + lmod(k, nbufs) * nc
 		    do i = 1, nc {
 			val1 = Memi[buf1]
 			if (IS_INDEFI(Memi[buf1]))
@@ -439,11 +465,11 @@ end
 procedure arepi (a, npts, floor, ceil, newval)
 
 int	a[npts]				# Input arrays
-int	npts				# Number of points
+size_t	npts				# Number of points
 int	floor, ceil			# Replacement limits
 int	newval				# Replacement value
 
-int	i
+long	i
 
 begin
 
@@ -459,10 +485,10 @@ end
 procedure arlei (a, npts, floor, newval)
 
 int	a[npts]
-int	npts
+size_t	npts
 int	floor, newval
 
-int	i
+long	i
 
 begin
 
@@ -477,10 +503,10 @@ end
 procedure argei (a, npts, ceil, newval)
 
 int	a[npts]
-int	npts
+size_t	npts
 int	ceil, newval
 
-int	i
+long	i
 
 begin
 
@@ -500,19 +526,25 @@ real	lower, upper			# Range to be replaced
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf1, buf2
-int	npix, junk
+size_t	npix
+long	junk
 real	ilower
 long	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnll(), impnll()
 	    
 bool	fp_equalr()
+long	lint()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im, 1)
 	newval = double (value)
@@ -524,7 +556,7 @@ begin
 
 	# If lower is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (lower)) {
-	    ceil = int (upper)
+	    ceil = lint(upper)
 	    while (imgnll (im, buf1, v1) != EOF) {
 		junk = impnll (im, buf2, v2)
 		call amovl (Meml[buf1], Meml[buf2], npix)
@@ -533,11 +565,11 @@ begin
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
+	        floor = lint(lower+1.0)
 	    while (imgnll (im, buf1, v1) != EOF) {
 		junk = impnll (im, buf2, v2)
 		call amovl (Meml[buf1], Meml[buf2], npix)
@@ -546,12 +578,12 @@ begin
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
-	    ceil = int (upper)
+	        floor = lint(lower+1.0)
+	    ceil = lint(upper)
 	    while (imgnll (im, buf1, v1) != EOF) {
 		junk = impnll (im, buf2, v2)
 		call amovl (Meml[buf1], Meml[buf2], npix)
@@ -573,19 +605,25 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf, buf1, buf2, ptr
-int	i, j, k, l, nc, nl, nradius, nbufs
+size_t	nc, nl
+long	i, j, k, l, nradius, nbufs
 real	ilower
 long	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 long	imgnll(), impnll()
+long	lint(), lmod()
 bool	fp_equalr()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	nc = IM_LEN(im, 1)
 	if (IM_NDIM(im) > 1)
@@ -603,42 +641,43 @@ begin
 	# If lower is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (lower)) {
 	    floor = -MAX_LONG
-	    ceil = int (upper)
+	    ceil = lint(upper)
 
 	# If upper is INDEF then all pixels below upper are replaced by value.
 	} else if (IS_INDEFR (upper)) {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
+	        floor = lint(lower+1.0)
 	    ceil = MAX_LONG
 
 	# Replace pixels between lower and upper by value.
 	} else {
-	    ilower = int (lower)
+	    ilower = lint(lower)
 	    if (fp_equalr(lower,ilower))
-	        floor = int (lower)
+	        floor = lint(lower)
 	    else
-	        floor = int (lower+1.0)
-	    ceil = int (upper)
+	        floor = lint(lower+1.0)
+	    ceil = lint(upper)
 	}
 
 	# Initialize buffering.
 	radius2 = radius * radius
-	nradius = int (radius)
+	nradius = lint(radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_LONG)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_LONG)
 
 	while (imgnll (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
-	    buf2 = buf + mod (j, nbufs) * nc
+	    buf2 = buf + lmod(j, nbufs) * nc
 	    do i = 1, nc {
 		val1 = Meml[buf1]
 		val2 = Meml[buf2]
 		if ((val1 >= floor) && (val1 <= ceil)) {
 		    do k = max(1,j-nradius), min (nl,j+nradius) {
-			ptr = buf + mod (k, nbufs) * nc - 1
+			ptr = buf + lmod(k, nbufs) * nc - 1
 			y2 = (k - j) ** 2
 			do l = max(1,i-nradius), min (nc,i+nradius) {
 			    if ((l-i)**2 + y2 > radius2)
@@ -657,7 +696,7 @@ begin
 	    if (j > nradius) {
 		while (impnll (im, buf2, v2) != EOF) {
 		    k = v2[2] - 1
-		    buf1 = buf + mod (k, nbufs) * nc
+		    buf1 = buf + lmod(k, nbufs) * nc
 		    do i = 1, nc {
 			val1 = Meml[buf1]
 			if (IS_INDEFL(Meml[buf1]))
@@ -683,11 +722,11 @@ end
 procedure arepl (a, npts, floor, ceil, newval)
 
 long	a[npts]				# Input arrays
-int	npts				# Number of points
+size_t	npts				# Number of points
 long	floor, ceil			# Replacement limits
 long	newval				# Replacement value
 
-int	i
+long	i
 
 begin
 
@@ -703,10 +742,10 @@ end
 procedure arlel (a, npts, floor, newval)
 
 long	a[npts]
-int	npts
+size_t	npts
 long	floor, newval
 
-int	i
+long	i
 
 begin
 
@@ -721,10 +760,10 @@ end
 procedure argel (a, npts, ceil, newval)
 
 long	a[npts]
-int	npts
+size_t	npts
 long	ceil, newval
 
-int	i
+long	i
 
 begin
 
@@ -744,8 +783,11 @@ real	lower, upper			# Range to be replaced
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf1, buf2
-int	npix, junk
+size_t	npix
+long	junk
 real	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnlr(), impnlr()
@@ -753,8 +795,10 @@ long	imgnlr(), impnlr()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im, 1)
 	newval = double (value)
@@ -807,17 +851,23 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf, buf1, buf2, ptr
-int	i, j, k, l, nc, nl, nradius, nbufs
+size_t	nc, nl
+long	i, j, k, l, nradius, nbufs
 real	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 long	imgnlr(), impnlr()
+long	lint(), lmod()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	nc = IM_LEN(im, 1)
 	if (IM_NDIM(im) > 1)
@@ -850,19 +900,20 @@ begin
 
 	# Initialize buffering.
 	radius2 = radius * radius
-	nradius = int (radius)
+	nradius = lint(radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_REAL)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_REAL)
 
 	while (imgnlr (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
-	    buf2 = buf + mod (j, nbufs) * nc
+	    buf2 = buf + lmod(j, nbufs) * nc
 	    do i = 1, nc {
 		val1 = Memr[buf1]
 		val2 = Memr[buf2]
 		if ((val1 >= floor) && (val1 <= ceil)) {
 		    do k = max(1,j-nradius), min (nl,j+nradius) {
-			ptr = buf + mod (k, nbufs) * nc - 1
+			ptr = buf + lmod(k, nbufs) * nc - 1
 			y2 = (k - j) ** 2
 			do l = max(1,i-nradius), min (nc,i+nradius) {
 			    if ((l-i)**2 + y2 > radius2)
@@ -881,7 +932,7 @@ begin
 	    if (j > nradius) {
 		while (impnlr (im, buf2, v2) != EOF) {
 		    k = v2[2] - 1
-		    buf1 = buf + mod (k, nbufs) * nc
+		    buf1 = buf + lmod(k, nbufs) * nc
 		    do i = 1, nc {
 			val1 = Memr[buf1]
 			if (IS_INDEFR(Memr[buf1]))
@@ -907,11 +958,11 @@ end
 procedure arepr (a, npts, floor, ceil, newval)
 
 real	a[npts]				# Input arrays
-int	npts				# Number of points
+size_t	npts				# Number of points
 real	floor, ceil			# Replacement limits
 real	newval				# Replacement value
 
-int	i
+long	i
 
 begin
 
@@ -927,10 +978,10 @@ end
 procedure arler (a, npts, floor, newval)
 
 real	a[npts]
-int	npts
+size_t	npts
 real	floor, newval
 
-int	i
+long	i
 
 begin
 
@@ -945,10 +996,10 @@ end
 procedure arger (a, npts, ceil, newval)
 
 real	a[npts]
-int	npts
+size_t	npts
 real	ceil, newval
 
-int	i
+long	i
 
 begin
 
@@ -968,8 +1019,11 @@ real	lower, upper			# Range to be replaced
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf1, buf2
-int	npix, junk
+size_t	npix
+long	junk
 double	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnld(), impnld()
@@ -977,8 +1031,10 @@ long	imgnld(), impnld()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im, 1)
 	newval = double (value)
@@ -1031,17 +1087,23 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf, buf1, buf2, ptr
-int	i, j, k, l, nc, nl, nradius, nbufs
+size_t	nc, nl
+long	i, j, k, l, nradius, nbufs
 double	floor, ceil, newval, val1, val2
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 long	imgnld(), impnld()
+long	lint(), lmod()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	nc = IM_LEN(im, 1)
 	if (IM_NDIM(im) > 1)
@@ -1074,19 +1136,20 @@ begin
 
 	# Initialize buffering.
 	radius2 = radius * radius
-	nradius = int (radius)
+	nradius = lint(radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_DOUBLE)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_DOUBLE)
 
 	while (imgnld (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
-	    buf2 = buf + mod (j, nbufs) * nc
+	    buf2 = buf + lmod(j, nbufs) * nc
 	    do i = 1, nc {
 		val1 = Memd[buf1]
 		val2 = Memd[buf2]
 		if ((val1 >= floor) && (val1 <= ceil)) {
 		    do k = max(1,j-nradius), min (nl,j+nradius) {
-			ptr = buf + mod (k, nbufs) * nc - 1
+			ptr = buf + lmod(k, nbufs) * nc - 1
 			y2 = (k - j) ** 2
 			do l = max(1,i-nradius), min (nc,i+nradius) {
 			    if ((l-i)**2 + y2 > radius2)
@@ -1105,7 +1168,7 @@ begin
 	    if (j > nradius) {
 		while (impnld (im, buf2, v2) != EOF) {
 		    k = v2[2] - 1
-		    buf1 = buf + mod (k, nbufs) * nc
+		    buf1 = buf + lmod(k, nbufs) * nc
 		    do i = 1, nc {
 			val1 = Memd[buf1]
 			if (IS_INDEFD(Memd[buf1]))
@@ -1131,11 +1194,11 @@ end
 procedure arepd (a, npts, floor, ceil, newval)
 
 double	a[npts]				# Input arrays
-int	npts				# Number of points
+size_t	npts				# Number of points
 double	floor, ceil			# Replacement limits
 double	newval				# Replacement value
 
-int	i
+long	i
 
 begin
 
@@ -1151,10 +1214,10 @@ end
 procedure arled (a, npts, floor, newval)
 
 double	a[npts]
-int	npts
+size_t	npts
 double	floor, newval
 
-int	i
+long	i
 
 begin
 
@@ -1169,10 +1232,10 @@ end
 procedure arged (a, npts, ceil, newval)
 
 double	a[npts]
-int	npts
+size_t	npts
 double	ceil, newval
 
-int	i
+long	i
 
 begin
 
@@ -1192,8 +1255,11 @@ real	lower, upper			# Range to be replaced
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf1, buf2
-int	npix, junk
+size_t	npix
+long	junk
 complex	floor, ceil, newval
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 long	imgnlx(), impnlx()
@@ -1201,8 +1267,10 @@ long	imgnlx(), impnlx()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	npix = IM_LEN(im, 1)
 	newval = complex (value, img)
@@ -1255,18 +1323,24 @@ real	radius				# Radius
 real	value				# Replacement value
 real	img				# Imaginary value for complex
 
+size_t	sz_val
+long	l_val
 pointer	buf, buf1, buf2, ptr
-int	i, j, k, l, nc, nl, nradius, nbufs
+size_t	nc, nl
+long	i, j, k, l, nradius, nbufs
 complex	floor, ceil, newval, val1, val2
 real	abs_floor, abs_ceil
 real	radius2, y2
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]	# IMIO vectors
 long	imgnlx(), impnlx()
+long	lint(), lmod()
 
 begin
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	nc = IM_LEN(im, 1)
 	if (IM_NDIM(im) > 1)
@@ -1305,19 +1379,20 @@ begin
 
 	# Initialize buffering.
 	radius2 = radius * radius
-	nradius = int (radius)
+	nradius = lint(radius)
 	nbufs = min (1 + 2 * nradius, nl)
-	call calloc (buf, nc*nbufs, TY_COMPLEX)
+	sz_val = nc*nbufs
+	call calloc (buf, sz_val, TY_COMPLEX)
 
 	while (imgnlx (im, buf1, v1) != EOF) {
 	    j = v1[2] - 1
-	    buf2 = buf + mod (j, nbufs) * nc
+	    buf2 = buf + lmod(j, nbufs) * nc
 	    do i = 1, nc {
 		val1 = Memx[buf1]
 		val2 = Memx[buf2]
 		if ((abs (val1) >= abs_floor) && (abs (val1) <= abs_ceil)) {
 		    do k = max(1,j-nradius), min (nl,j+nradius) {
-			ptr = buf + mod (k, nbufs) * nc - 1
+			ptr = buf + lmod(k, nbufs) * nc - 1
 			y2 = (k - j) ** 2
 			do l = max(1,i-nradius), min (nc,i+nradius) {
 			    if ((l-i)**2 + y2 > radius2)
@@ -1336,7 +1411,7 @@ begin
 	    if (j > nradius) {
 		while (impnlx (im, buf2, v2) != EOF) {
 		    k = v2[2] - 1
-		    buf1 = buf + mod (k, nbufs) * nc
+		    buf1 = buf + lmod(k, nbufs) * nc
 		    do i = 1, nc {
 			val1 = Memx[buf1]
 			if (IS_INDEFX(Memx[buf1]))
@@ -1362,11 +1437,11 @@ end
 procedure arepx (a, npts, floor, ceil, newval)
 
 complex	a[npts]				# Input arrays
-int	npts				# Number of points
+size_t	npts				# Number of points
 complex	floor, ceil			# Replacement limits
 complex	newval				# Replacement value
 
-int	i
+long	i
 real	abs_floor
 real	abs_ceil
 
@@ -1386,10 +1461,10 @@ end
 procedure arlex (a, npts, floor, newval)
 
 complex	a[npts]
-int	npts
+size_t	npts
 complex	floor, newval
 
-int	i
+long	i
 real	abs_floor
 
 begin
@@ -1406,10 +1481,10 @@ end
 procedure argex (a, npts, ceil, newval)
 
 complex	a[npts]
-int	npts
+size_t	npts
 complex	ceil, newval
 
-int	i
+long	i
 real	abs_ceil
 
 begin
