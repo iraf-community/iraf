@@ -7,8 +7,8 @@ procedure rg_xscale (xc, data, npts, nx, ny, offset, coeff)
 
 pointer	xc		#I pointer to the cross-correlation function
 real	data[ARB]	#I the input data
-int	npts		#I the number of points
-int	nx, ny		#I the dimensions of the original subraster
+size_t	npts		#I the number of points
+size_t	nx, ny		#I the dimensions of the original subraster
 real	offset		#I the input offset
 real	coeff[ARB]	#O the output coefficients
 

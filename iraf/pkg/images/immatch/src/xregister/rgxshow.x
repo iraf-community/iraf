@@ -23,12 +23,14 @@ procedure rg_xnshow (xc)
 
 pointer	xc	#I pointer to the main xregister structure
 
+size_t	sz_val
 pointer	sp, str
-int	rg_xstati()
+long	rg_xstatl()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Set the object characteristics.
 	call printf ("\nInput/output data\n")
@@ -46,14 +48,14 @@ begin
 	    call pargstr (Memc[str])
 	call printf ("    %s = %d    %s = %d\n")
 	    call pargstr (KY_XLAG)
-	    call pargi (rg_xstati (xc, XLAG))
+	    call pargl (rg_xstatl (xc, XLAG))
 	    call pargstr (KY_YLAG)
-	    call pargi (rg_xstati (xc, YLAG))
+	    call pargl (rg_xstatl (xc, YLAG))
 	call printf ("    %s = %d    %s = %d\n")
 	    call pargstr (KY_DXLAG)
-	    call pargi (rg_xstati (xc, DXLAG))
+	    call pargl (rg_xstatl (xc, DXLAG))
 	    call pargstr (KY_DYLAG)
-	    call pargi (rg_xstati (xc, DYLAG))
+	    call pargl (rg_xstatl (xc, DYLAG))
 	call rg_xstats (xc, DATABASE, Memc[str], SZ_FNAME)
 	call printf ("    %s: %s\n")
 	    call pargstr (KY_DATABASE)
@@ -81,6 +83,7 @@ procedure rg_xbshow (xc)
 
 pointer	xc		#I pointer to the main xregister structure
 
+size_t	sz_val
 int	back
 pointer	sp, str
 int	rg_xstati()
@@ -88,7 +91,8 @@ real	rg_xstatr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	back = rg_xstati (xc, BACKGRD)
 	call printf ("Background fitting parameters:\n")
@@ -122,12 +126,14 @@ procedure rg_xxshow (xc)
 
 pointer	xc		#I pointer to the main xregister structure
 
+size_t	sz_val
 pointer	sp, str
-int	rg_xstati()
+long	rg_xstatl()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	call printf ("Cross correlation function:\n")
 	call rg_xstats (xc, CSTRING, Memc[str], SZ_LINE)
@@ -136,9 +142,9 @@ begin
 	    call pargstr (Memc[str])
 	call printf ("    %s = %d    %s = %d\n")
 	    call pargstr (KY_XWINDOW)
-	    call pargi (rg_xstati (xc, XWINDOW))
+	    call pargl (rg_xstatl (xc, XWINDOW))
 	    call pargstr (KY_YWINDOW)
-	    call pargi (rg_xstati (xc, YWINDOW))
+	    call pargl (rg_xstatl (xc, YWINDOW))
 
 	call sfree (sp)
 end
@@ -150,12 +156,14 @@ procedure rg_xpshow (xc)
 
 pointer	xc		#I pointer to the main xregister structure
 
+size_t	sz_val
 pointer	sp, str
-int	rg_xstati()
+long	rg_xstatl()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	call printf ("Peak centering parameters:\n")
 	call rg_xstats (xc, PSTRING, Memc[str], SZ_LINE)
@@ -164,9 +172,9 @@ begin
 	    call pargstr (Memc[str])
 	call printf ("    %s = %d    %s = %d\n")
 	    call pargstr (KY_XCBOX)
-	    call pargi (rg_xstati (xc, XCBOX))
+	    call pargl (rg_xstatl (xc, XCBOX))
 	    call pargstr (KY_YCBOX)
-	    call pargi (rg_xstati (xc, YCBOX))
+	    call pargl (rg_xstatl (xc, YCBOX))
 
 	call sfree (sp)
 end

@@ -11,11 +11,12 @@ include "xregister.h"
 
 int procedure rg_xregions (list, im, xc, rp)
 
-int	list			#I pointer to the regions list
+pointer	list			#I pointer to the regions list
 pointer	im			#I pointer to the reference image
 pointer	xc			#I pointer to the cross-correlation structure
 int	rp			#I index of the current region
 
+size_t	sz_val
 int	fd, nregions
 pointer	sp, fname, regions
 int	rg_xgrid(), rg_xgregions(), rg_xrregions(), rg_xstati(), fntgfnb()
@@ -24,8 +25,10 @@ errchk	fntgfnb(), open(), close()
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (regions, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (regions, sz_val, TY_CHAR)
 
 	call rg_xstats (xc, REGIONS, Memc[regions], SZ_LINE)
 	if (rp < 1 || rp > MAX_NREGIONS || Memc[regions] == EOS) {
@@ -64,18 +67,21 @@ int	max_nregions		#I the maximum number of regions
 char	regions[ARB]		#O the output regions string
 int	maxch			#I maximum size of the output regions string
 
+size_t	sz_val
 int	op, nregions, wcs, key
 pointer	sp, region, section, cmd
 real	xll, yll, xur, yur
+long	lnint()
 int	rg_xstati(), clgcur(), gstrcpy()
 pointer	rg_xstatp()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (region, SZ_LINE, TY_CHAR)
-	call salloc (section, SZ_LINE, TY_CHAR)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (region, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_xrealloc (xc, max_nregions)
@@ -107,10 +113,10 @@ begin
 		IM_LEN(im,2))
 		break
 
-	    Memi[rg_xstatp(xc,RC1)+nregions] = nint (xll)
-	    Memi[rg_xstatp(xc,RC2)+nregions] = nint (xur)
-	    Memi[rg_xstatp(xc,RL1)+nregions] = nint (yll)
-	    Memi[rg_xstatp(xc,RL2)+nregions] = nint (yur)
+	    Meml[rg_xstatp(xc,RC1)+nregions] = lnint(xll)
+	    Meml[rg_xstatp(xc,RC2)+nregions] = lnint(xur)
+	    Meml[rg_xstatp(xc,RL1)+nregions] = lnint(yll)
+	    Meml[rg_xstatp(xc,RL2)+nregions] = lnint(yur)
 	    Memr[rg_xstatp(xc,RZERO)+nregions] = INDEFR
 	    Memr[rg_xstatp(xc,RXSLOPE)+nregions] = INDEFR
 	    Memr[rg_xstatp(xc,RYSLOPE)+nregions] = INDEFR
@@ -120,10 +126,10 @@ begin
 
 	    # Write the first 9 regions into the regions string.
 	    call sprintf (Memc[cmd], SZ_LINE, "[%d:%d,%d:%d] ")
-		call pargi (nint (xll))
-		call pargi (nint (xur))
-		call pargi (nint (yll))
-		call pargi (nint (yur))
+		call pargl (lnint(xll))
+		call pargl (lnint(xur))
+		call pargl (lnint(yll))
+		call pargl (lnint(yur))
 	    op = op + gstrcpy (Memc[cmd], regions[op], maxch - op + 1)
 	}
 	call printf ("\n")
@@ -150,17 +156,21 @@ pointer	xc			#I pointer to the cross-correlation structure
 int	rp			#I index of the current region
 int	max_nregions		#I the maximum number of regions
 
-int	i, istart, iend, j, jstart, jend, ncols, nlines, nxsample, nysample
-int	nxcols, nylines, nregions
+size_t	sz_val
+int	nregions
+long	i, istart, iend, j, jstart, jend, ncols, nlines, nxsample, nysample
+long	nxcols, nylines
 pointer	sp, region, section
+long	lnint()
 int	rg_xstati(), nscan(), strcmp()
 pointer	rg_xstatp()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (region, SZ_LINE, TY_CHAR)
-	call salloc (section, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (region, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_xrealloc (xc, max_nregions)
@@ -174,8 +184,8 @@ begin
 	# Decode the grid specification.
 	call sscan (Memc[region])
 	    call gargwrd (Memc[section], SZ_LINE)
-	    call gargi (nxsample)
-	    call gargi (nysample) 
+	    call gargl (nxsample)
+	    call gargl (nysample) 
 	if ((nscan() != 3) || (strcmp (Memc[section], "grid") != 0)) {
 	    call sfree (sp)
 	    return (nregions)
@@ -183,7 +193,7 @@ begin
 
 	# Decode the regions.
 	if ((nxsample * nysample) > max_nregions) {
-	    nxsample = nint (sqrt (real (max_nregions) * real (ncols) /
+	    nxsample = lnint (sqrt (real (max_nregions) * real (ncols) /
 	        real (nlines)))
 	    nysample = real (max_nregions) / real (nxsample)
 	}
@@ -195,10 +205,10 @@ begin
 	    istart = 1 + (ncols - nxsample * nxcols) / 2
 	    iend = istart + (nxsample - 1) * nxcols
 	    do i = istart, iend, nxcols {
-		Memi[rg_xstatp(xc,RC1)+nregions] = i 
-		Memi[rg_xstatp(xc,RC2)+nregions] = i + nxcols - 1
-		Memi[rg_xstatp(xc,RL1)+nregions] = j
-		Memi[rg_xstatp(xc,RL2)+nregions] = j + nylines - 1
+		Meml[rg_xstatp(xc,RC1)+nregions] = i 
+		Meml[rg_xstatp(xc,RC2)+nregions] = i + nxcols - 1
+		Meml[rg_xstatp(xc,RL1)+nregions] = j
+		Meml[rg_xstatp(xc,RL2)+nregions] = j + nylines - 1
 		Memr[rg_xstatp(xc,RZERO)+nregions] = INDEFR
 		Memr[rg_xstatp(xc,RXSLOPE)+nregions] = INDEFR
 		Memr[rg_xstatp(xc,RYSLOPE)+nregions] = INDEFR
@@ -229,7 +239,9 @@ pointer	xc			#I pointer to the cross-correlation structure
 int	rp			#I index of the current region
 int	max_nregions		#I the maximum number of regions
 
-int	ncols, nlines, nregions, x1, y1, x2, y2, step
+size_t	sz_val
+int	nregions
+long	ncols, nlines, x1, y1, x2, y2, step
 pointer	sp, line, section
 int	rg_xstati(), getline(), rg_xgsections()
 pointer	rg_xstatp()
@@ -237,8 +249,9 @@ pointer	rg_xstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
-	call salloc (section, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information,
 	call rg_xrealloc (xc, max_nregions)
@@ -255,10 +268,10 @@ begin
 	    while ((Memc[section] != EOS) && (nregions < max_nregions)) {
 		if (rg_xgsections (Memc[section], x1, x2, step, y1, y2, step,
 		    ncols, nlines) == OK) {
-		    Memi[rg_xstatp(xc,RC1)+nregions] = x1
-		    Memi[rg_xstatp(xc,RC2)+nregions] = x2
-		    Memi[rg_xstatp(xc,RL1)+nregions] = y1
-		    Memi[rg_xstatp(xc,RL2)+nregions] = y2
+		    Meml[rg_xstatp(xc,RC1)+nregions] = x1
+		    Meml[rg_xstatp(xc,RC2)+nregions] = x2
+		    Meml[rg_xstatp(xc,RL1)+nregions] = y1
+		    Meml[rg_xstatp(xc,RL2)+nregions] = y2
 		    Memr[rg_xstatp(xc,RZERO)+nregions] = INDEFR
 		    Memr[rg_xstatp(xc,RXSLOPE)+nregions] = INDEFR
 		    Memr[rg_xstatp(xc,RYSLOPE)+nregions] = INDEFR
@@ -293,7 +306,9 @@ pointer	xc			#I pointer to cross-correlation structure
 int	rp			#I the index of the current region
 int	max_nregions		#I the maximum number of regions
 
-int	ncols, nlines, nregions, x1, x2, y1, y2, step
+size_t	sz_val
+int	nregions
+long	ncols, nlines, x1, x2, y1, y2, step
 pointer	sp, section, region
 int	rg_xstati(), rg_xgsections()
 pointer	rg_xstatp()
@@ -301,8 +316,9 @@ pointer	rg_xstatp()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (region, SZ_LINE, TY_CHAR)
-	call salloc (section, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (region, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
 
 	# Allocate the arrays to hold the regions information.
 	call rg_xrealloc (xc, max_nregions)
@@ -319,10 +335,10 @@ begin
 	while ((Memc[section] != EOS) && (nregions < max_nregions)) {
 	    if (rg_xgsections (Memc[section], x1, x2, step, y1, y2, step,
 		ncols, nlines) == OK) {
-		Memi[rg_xstatp(xc,RC1)+nregions] = x1
-		Memi[rg_xstatp(xc,RC2)+nregions] = x2
-		Memi[rg_xstatp(xc,RL1)+nregions] = y1
-		Memi[rg_xstatp(xc,RL2)+nregions] = y2
+		Meml[rg_xstatp(xc,RC1)+nregions] = x1
+		Meml[rg_xstatp(xc,RC2)+nregions] = x2
+		Meml[rg_xstatp(xc,RL1)+nregions] = y1
+		Meml[rg_xstatp(xc,RL2)+nregions] = y2
 		Memr[rg_xstatp(xc,RZERO)+nregions] = INDEFR
 		Memr[rg_xstatp(xc,RXSLOPE)+nregions] = INDEFR
 		Memr[rg_xstatp(xc,RYSLOPE)+nregions] = INDEFR
@@ -355,11 +371,11 @@ int procedure rg_xgsections (section, x1, x2, xstep, y1, y2, ystep, ncols,
 	nlines)
 
 char	section[ARB]		#I the input section string
-int	x1, x2			#O the output column section limits
-int	xstep			#O the output column step size
-int	y1, y2			#O the output line section limits
-int	ystep			#O the output line step size
-int	ncols, nlines		#I the maximum number of lines and columns
+long	x1, x2			#O the output column section limits
+long	xstep			#O the output column step size
+long	y1, y2			#O the output line section limits
+long	ystep			#O the output line step size
+long	ncols, nlines		#I the maximum number of lines and columns
 
 int	ip
 int	rg_xgdim()
@@ -385,13 +401,13 @@ int procedure rg_xgdim (section, ip, x1, x2, step, limit)
 
 char	section[ARB]		#I the input image section
 int	ip			#I/O pointer to the position in section string
-int	x1			#O first limit of dimension
-int	x2			#O second limit of dimension
-int	step			#O step size of dimension
-int	limit			#I maximum size of dimension
+long	x1			#O first limit of dimension
+long	x2			#O second limit of dimension
+long	step			#O step size of dimension
+long	limit			#I maximum size of dimension
 
-int	temp
-int	ctoi()
+long	temp
+int	ctol()
 
 begin
 	x1 = 1
@@ -408,11 +424,11 @@ begin
 	    ip = ip + 1
 
 	# Get X1, X2.
-	if (ctoi (section, ip, temp) > 0) {			# [x1
+	if (ctol (section, ip, temp) > 0) {			# [x1
 	    x1 = max (1, min (temp, limit))
 	    if (section[ip] == ':') {	
 		ip = ip + 1
-		if (ctoi (section, ip, temp) == 0)		# [x1:x2
+		if (ctol (section, ip, temp) == 0)		# [x1:x2
 		    return (ERR)
 		x2 = max (1, min (temp, limit))
 	    } else
@@ -434,7 +450,7 @@ begin
 	# Get sample step size, if give.
 	if (section[ip] == ':') {				# ..:step
 	    ip = ip + 1
-	    if (ctoi (section, ip, step) == 0)
+	    if (ctol (section, ip, step) == 0)
 		return (ERR)
 	    else if (step == 0)
 		return (ERR)

@@ -4,28 +4,28 @@
 
 define	LEN_XCSTRUCT	(50 + 12 * SZ_FNAME + 12)
 
-define	XC_RC1		Memi[P2I($1)]	# pointers to 1st column of ref regions
-define	XC_RC2		Memi[P2I($1+1)]	# pointers to 2nd column of ref regions
-define	XC_RL1		Memi[P2I($1+2)]	# pointers to 1st line of ref regions
-define	XC_RL2		Memi[P2I($1+3)]	# pointers to 2nd line of ref regions
-define	XC_RZERO	Memi[P2I($1+4)]	# pointers to zero points of ref regions
-define	XC_RXSLOPE	Memi[P2I($1+5)]	# pointers to x slopes of ref regions
-define	XC_RYSLOPE	Memi[P2I($1+6)]	# pointers to y slopes of ref regions
-define	XC_XSHIFTS	Memi[P2I($1+7)]	# pointers to x shifts of ref regions
-define	XC_YSHIFTS	Memi[P2I($1+8)]	# pointers to y shifts of ref regions
+define	XC_RC1		Memp[$1]	# pointers to 1st column of ref regions
+define	XC_RC2		Memp[$1+1]	# pointers to 2nd column of ref regions
+define	XC_RL1		Memp[$1+2]	# pointers to 1st line of ref regions
+define	XC_RL2		Memp[$1+3]	# pointers to 2nd line of ref regions
+define	XC_RZERO	Memp[$1+4]	# pointers to zero points of ref regions
+define	XC_RXSLOPE	Memp[$1+5]	# pointers to x slopes of ref regions
+define	XC_RYSLOPE	Memp[$1+6]	# pointers to y slopes of ref regions
+define	XC_XSHIFTS	Memp[$1+7]	# pointers to x shifts of ref regions
+define	XC_YSHIFTS	Memp[$1+8]	# pointers to y shifts of ref regions
 define	XC_NREGIONS	Memi[P2I($1+9)]	# total number of regions
 define	XC_CREGION	Memi[P2I($1+10)]	# the current region
 
 define	XC_NREFPTS	Memi[P2I($1+11)]	# number of reference points
-define	XC_XREF		Memi[P2I($1+12)]	# pointer to x reference points
-define	XC_YREF		Memi[P2I($1+13)]	# pointer to y reference points
-define	XC_TRANSFORM	Memi[P2I($1+14)]	# pointer to the transform
-define	XC_IXLAG	Memi[P2I($1+15)]	# initial shift in x
-define	XC_IYLAG	Memi[P2I($1+16)]	# initial shift in y
-define	XC_XLAG		Memi[P2I($1+17)]	# current shift in x
-define	XC_YLAG		Memi[P2I($1+18)]	# current shift in y
-define	XC_DXLAG	Memi[P2I($1+19)]	# incremental shift in x
-define	XC_DYLAG	Memi[P2I($1+20)]	# incremental shift in y
+define	XC_XREF		Memp[$1+12]		# pointer to x reference points
+define	XC_YREF		Memp[$1+13]		# pointer to y reference points
+define	XC_TRANSFORM	Memp[$1+14]		# pointer to the transform
+define	XC_IXLAG	Meml[P2L($1+15)]	# initial shift in x
+define	XC_IYLAG	Meml[P2L($1+16)]	# initial shift in y
+define	XC_XLAG		Meml[P2L($1+17)]	# current shift in x
+define	XC_YLAG		Meml[P2L($1+18)]	# current shift in y
+define	XC_DXLAG	Meml[P2L($1+19)]	# incremental shift in x
+define	XC_DYLAG	Meml[P2L($1+20)]	# incremental shift in y
 
 define	XC_BACKGRD	Memi[P2I($1+21)]	# type of background subtraction
 define	XC_BORDER	Memi[P2I($1+22)]	# width of background border
@@ -37,13 +37,13 @@ define	XC_APODIZE	Memr[P2R($1+27)]	# fraction of apodized region
 define	XC_FILTER	Memi[P2I($1+28)]	# filter type
 
 define	XC_CFUNC	Memi[P2I($1+30)]	# crosscor function
-define	XC_XWINDOW	Memi[P2I($1+31)]	# width of correlation window in x
-define	XC_YWINDOW	Memi[P2I($1+32)]	# width of correlation window in y
-define	XC_XCOR		Memi[P2I($1+33)]	# pointer to cross-correlation function
+define	XC_XWINDOW	Meml[P2L($1+31)]	# width of correlation window in x
+define	XC_YWINDOW	Meml[P2L($1+32)]	# width of correlation window in y
+define	XC_XCOR		Memp[$1+33]		# pointer to cross-correlation function
 
 define	XC_PFUNC	Memi[P2I($1+34)]	# correlation peak fitting function
-define	XC_XCBOX	Memi[P2I($1+35)]	# x width of cor fitting box
-define	XC_YCBOX	Memi[P2I($1+36)]	# y width of cor fitting box
+define	XC_XCBOX	Meml[P2L($1+35)]	# x width of cor fitting box
+define	XC_YCBOX	Meml[P2L($1+36)]	# y width of cor fitting box
 
 define	XC_TXSHIFT	Memr[P2R($1+37)]	# total x shift
 define	XC_TYSHIFT	Memr[P2R($1+38)]	# total y shift

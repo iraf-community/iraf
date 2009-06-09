@@ -21,22 +21,25 @@ char		interpstr[ARB]	#I type of interpolant
 int		boundary_type	#I type of boundary extension
 real		constant	#I value of constant for boundary extension
 
+size_t	sz_val
 int	interp_type
 pointer	sp, str
 bool	fp_equalr()
 int	strdic()
+long	lnint(), lint()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 	interp_type = strdic (interpstr, Memc[str], SZ_FNAME, II_BFUNCTIONS)
 
 	if (interp_type == II_NEAREST)
-	    call rg_xishiftim (im1, im2, nint (xshift), nint (yshift),
+	    call rg_xishiftim (im1, im2, lnint(xshift), lnint(yshift),
 	        interp_type, boundary_type, constant)
-	else if (fp_equalr (xshift, real (int (xshift))) && fp_equalr (yshift,
-	    real (int (xshift))))
-	    call rg_xishiftim (im1, im2, int (xshift), int (yshift),
+	else if (fp_equalr (xshift, aint(xshift)) &&
+		 fp_equalr (yshift, aint(xshift)))
+	    call rg_xishiftim (im1, im2, lint(xshift), lint(yshift),
 	        interp_type, boundary_type, constant)
 	else
 	    call rg_xfshiftim (im1, im2, xshift, yshift, interpstr,
@@ -52,18 +55,21 @@ procedure rg_xishiftim (im1, im2, nxshift, nyshift, interp_type, boundary_type,
 
 pointer	im1			#I pointer to the input image
 pointer	im2			#I pointer to the output image
-int	nxshift, nyshift	#I shift in x and y
+long	nxshift, nyshift	#I shift in x and y
 int	interp_type		#I type of interpolant
 int	boundary_type		#I type of boundary extension
 real	constant		#I constant for boundary extension
 
-int	ixshift, iyshift
+size_t	sz_val
+long	l_val
+long	ixshift, iyshift
 pointer	buf1, buf2
 long	v[IM_MAXDIM]
-int	ncols, nlines, nbpix
-int	i, x1col, x2col, yline
+size_t	ncols, nlines
+long	i, x1col, x2col, yline, nbpix
 
 long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
+long	labs(), lmod()
 pointer	imgs2s(), imgs2i(), imgs2l(), imgs2r(), imgs2d(), imgs2x()
 errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
 errchk	imgs2s, imgs2i, imgs2l, imgs2r, imgs2d, imgs2x
@@ -88,13 +94,13 @@ begin
 	    ixshift = min (ncols, max (-ncols, ixshift))
 	    iyshift = min (nlines, max (-nlines, iyshift))
 	case BT_WRAP:
-	    ixshift = mod (ixshift, ncols)
-	    iyshift = mod (iyshift, nlines)
+	    ixshift = lmod(ixshift, ncols)
+	    iyshift = lmod(iyshift, nlines)
 	}
 
 	# Set the boundary extension values.
-	nbpix = max (abs (ixshift), abs (iyshift))
-	call imseti (im1, IM_NBNDRYPIX, nbpix)
+	nbpix = max (labs(ixshift), labs(iyshift))
+	call imsetl (im1, IM_NBNDRYPIX, nbpix)
 	call imseti (im1, IM_TYBNDRY, boundary_type)
 	if (boundary_type == BT_CONSTANT)
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
@@ -103,7 +109,9 @@ begin
 	x1col = max (-ncols + 1, - ixshift + 1) 
 	x2col = min (2 * ncols,  ncols - ixshift)
 
-	call amovkl (long (1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	# Shift the image using the appropriate data type operators.
 	switch (IM_PIXTYPE(im1)) {
@@ -117,7 +125,7 @@ begin
 		    call error (5, wrerr)
 		call amovs (Mems[buf1], Mems[buf2], ncols)
 	    }
-	case TY_INT:
+	case TY_USHORT, TY_INT:
 	    do i = 1, nlines {
 	        if (impnli (im2, buf2, v) == EOF)
 		    call error (5, wrerr)
@@ -127,7 +135,7 @@ begin
 		    call error (5, wrerr)
 		call amovi (Memi[buf1], Memi[buf2], ncols)
 	    }
-	case TY_USHORT, TY_LONG:
+	case TY_LONG:
 	    do i = 1, nlines {
 	        if (impnll (im2, buf2, v) == EOF)
 		    call error (5, wrerr)
@@ -188,15 +196,20 @@ char		interpstr[ARB]	#I type of interpolant
 int		boundary_type	#I type of boundary extension
 real		constant	#I value of constant for boundary extension
 
-int	i, interp_type, nsinc, nincr
-int	ncols, nlines, nbpix, fstline, lstline, nxymargin
-int	cin1, cin2, nxin, lin1, lin2, nyin
-int	lout1, lout2, nyout
+long	l_val
+int	interp_type, nsinc, nincr
+long	i
+size_t	ncols, nlines
+long	nbpix, fstline, lstline, nxymargin
+long	cin1, cin2, nxin, lin1, lin2, nyin
+long	lout1, lout2, nyout
 real	xshft, yshft, deltax, deltay, dx, dy, cx, ly
 pointer	sp, x, y, msi, sinbuf, soutbuf
 bool	fp_equalr()
 int	msigeti()
+long	lint()
 pointer	imps2r()
+real	aabs()
 
 errchk	imgs2r, imps2r
 errchk	msiinit, msifree, msifit, msigrid
@@ -214,8 +227,8 @@ begin
 
 	# Get the real shift.
 	if (boundary_type == BT_WRAP) {
-	    xshft = mod (xshift, real (ncols))
-	    yshft = mod (yshift, real (nlines))
+	    xshft = amod(xshift, real(ncols))
+	    yshft = amod(yshift, real(nlines))
 	} else {
 	    xshft = xshift
 	    yshft = yshift
@@ -228,14 +241,14 @@ begin
 	sinbuf = NULL
 
 	# Define the x and y interpolation coordinates.
-	dx = abs (xshft - int (xshft))
+	dx = aabs(xshft - aint(xshft))
 	if (fp_equalr (dx, 0.0))
 	    deltax = 0.0
 	else if (xshft > 0.)
 	    deltax = 1. - dx
 	else
 	    deltax = dx
-	dy = abs (yshft - int (yshft))
+	dy = aabs(yshft - aint(yshft))
 	if (fp_equalr (dy, 0.0))
 	    deltay = 0.0
 	else if (yshft > 0.)
@@ -247,7 +260,7 @@ begin
 	call msitype (interpstr, interp_type, nsinc, nincr, cx)
 	if (interp_type == II_BILSINC || interp_type == II_BISINC)
 	    call msisinit (msi, interp_type, nsinc, 1, 1,
-	        deltax - nint (deltax), deltay - nint (deltay), 0.0)
+	        deltax - anint(deltax), deltay - anint(deltay), 0.0)
 	else
 	    call msisinit (msi, interp_type, nsinc, 1, 1, cx, cx, 0.0)
 
@@ -258,8 +271,8 @@ begin
 	    nxymargin = msigeti (msi, II_MSINSINC)
 	else
 	    nxymargin = NMARGIN
-	nbpix = max (int (abs(xshft)+1.0), int (abs(yshft)+1.0)) + nxymargin
-	call imseti (im1, IM_NBNDRYPIX, nbpix)
+	nbpix = max (lint(aabs(xshft)+1.0), lint(aabs(yshft)+1.0)) + nxymargin
+	call imsetl (im1, IM_NBNDRYPIX, nbpix)
 	call imseti (im1, IM_TYBNDRY, boundary_type)
 	if (boundary_type == BT_CONSTANT)
 	    call imsetr (im1, IM_BNDRYPIXVAL, constant)
@@ -291,9 +304,9 @@ begin
 	# Define column range in the input image.
 	cx = 1. - nxymargin - xshft
 	if ((cx <= 0.) &&  (! fp_equalr (dx, 0.0)))
-	    cin1 = int (cx) - 1
+	    cin1 = lint(cx) - 1
 	else
-	    cin1 = int (cx)
+	    cin1 = lint(cx)
 	cin2 = ncols - xshft + nxymargin + 1
 	nxin = cin2 - cin1 + 1
 
@@ -307,9 +320,9 @@ begin
 	    # Define correspoding range of input lines.
 	    ly = lout1 - nxymargin - yshft
 	    if ((ly <= 0) && (! fp_equalr (dy, 0.0)))
-	        lin1 = int (ly) - 1
+	        lin1 = lint(ly) - 1
 	    else
-		lin1 = int (ly)
+		lin1 = lint(ly)
 	    lin2 = lout2 - yshft + nxymargin + 1
 	    nyin = lin2 - lin1 + 1
 
@@ -322,7 +335,8 @@ begin
 	    }
 
 	    # Output the image section.
-	    soutbuf = imps2r (im2, 1, ncols, lout1, lout2)
+	    l_val = 1
+	    soutbuf = imps2r (im2, l_val, ncols, lout1, lout2)
 	    if (soutbuf == EOF)
 		call error (0, "GSHIFTXY: Error writing output image.")
 
@@ -341,11 +355,12 @@ end
 procedure rg_buf (im, col1, col2, line1, line2, buf)
 
 pointer	im		#I pointer to input image
-int	col1, col2	#I column range of input buffer
-int	line1, line2	#I line range of input buffer
+long	col1, col2	#I column range of input buffer
+long	line1, line2	#I line range of input buffer
 pointer	buf		#I buffer
 
-int	i, ncols, nlines, nclast, llast1, llast2, nllast
+long	i, nclast, llast1, llast2, nllast
+size_t	ncols, nlines
 pointer	buf1, buf2
 
 pointer	imgs2r()

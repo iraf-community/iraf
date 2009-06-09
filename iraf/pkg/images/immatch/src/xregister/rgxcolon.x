@@ -23,20 +23,27 @@ int	newdata			#I/O new input data
 int	newcross		#I/O new cross-correlation function flag
 int	newcenter		#I/O new cross-correlation peak flag
 
-bool	streq()
+size_t	sz_val
 int	ncmd, creg, nreg, ival, stat
+long	lval, c_2
 pointer	sp, cmd, str
 real	rval
+bool	streq()
 int	strdic(), open(), nscan(), rg_xstati()
 int	rg_xregions(), rg_xmkregions(), strlen()
 pointer	fntopnb(), immap(), dtmap(), rg_xstatp()
 real	rg_xstatr()
+long	rg_xstatl(), lmod()
 errchk	immap(), dtmap(), open(), fntopnb()
+include	<nullptr.inc>
 
 begin
+	c_2 = 2
+
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)
@@ -62,15 +69,15 @@ begin
 		    imr = NULL
 		}
 		iferr {
-		    imr = immap (Memc[cmd], READ_ONLY, 0)
+		    imr = immap (Memc[cmd], READ_ONLY, NULLPTR)
 		} then {
 		    call erract (EA_WARN)
-		    imr = immap (Memc[str], READ_ONLY, 0)
+		    imr = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else if (IM_NDIM(imr) > 2 || IM_NDIM(imr) != IM_NDIM(im1)) {
 		    call printf (
 		    "Image has the wrong number of dimensions\n")
 		    call imunmap (imr)
-		    imr = immap (Memc[str], READ_ONLY, 0)
+		    imr = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else {
 		    call rg_xsets (xc, REFIMAGE, Memc[cmd])
 		    newdata = YES; newcross = YES; newcenter = YES
@@ -90,32 +97,32 @@ begin
 		    im1 = NULL
 		}
 		iferr {
-		    im1 = immap (Memc[cmd], READ_ONLY, 0)
+		    im1 = immap (Memc[cmd], READ_ONLY, NULLPTR)
 		    call imseti (im1, IM_TYBNDRY, BT_NEAREST)
 		    if (IM_NDIM(im1) == 1)
-			call imseti (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
+			call imsetl (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
 		    else
-		        call imseti (im1, IM_NBNDRYPIX,
+		        call imsetl (im1, IM_NBNDRYPIX,
 			    max (IM_LEN(im1,1), IM_LEN(im1,2)))
 		} then {
 		    call erract (EA_WARN)
-		    im1 = immap (Memc[str], READ_ONLY, 0)
+		    im1 = immap (Memc[str], READ_ONLY, NULLPTR)
 		    call imseti (im1, IM_TYBNDRY, BT_NEAREST)
 		    if (IM_NDIM(im1) == 1)
-			call imseti (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
+			call imsetl (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
 		    else
-		        call imseti (im1, IM_NBNDRYPIX,
+		        call imsetl (im1, IM_NBNDRYPIX,
 			    max (IM_LEN(im1,1), IM_LEN(im1,2)))
 		} else if (IM_NDIM(im1) > 2 || IM_NDIM(im1) != IM_NDIM(imr)) {
 		    call printf (
 		        "Image has the wrong number of dimensions\n")
 		    call imunmap (im1)
-		    im1 = immap (Memc[str], READ_ONLY, 0)
+		    im1 = immap (Memc[str], READ_ONLY, NULLPTR)
 		    call imseti (im1, IM_TYBNDRY, BT_NEAREST)
 		    if (IM_NDIM(im1) == 1)
-			call imseti (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
+			call imsetl (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
 		    else
-		        call imseti (im1, IM_NBNDRYPIX,
+		        call imsetl (im1, IM_NBNDRYPIX,
 			    max (IM_LEN(im1,1), IM_LEN(im1,2)))
 		} else {
 		    call rg_xsets (xc, IMAGE, Memc[cmd])
@@ -155,10 +162,12 @@ begin
 		    call pargstr (Memc[str])
 	    } else {
 		if (db != NULL) {
-		    if (dformat == YES)
+		    if (dformat == YES) {
 		        call dtunmap (db)
-		    else
-			call close (db)
+		    } else {
+			ival = db
+			call close (ival)
+		    }
 		    db = NULL
 		}
 		iferr {
@@ -198,10 +207,10 @@ begin
 		    call pargi (creg)
 		    call pargi (rg_xstati (xc, NREGIONS))
 		call printf ("  [%d:%d,%d:%d]\n")
-		    call pargi (Memi[rg_xstatp (xc,RC1)+creg-1])
-		    call pargi (Memi[rg_xstatp (xc,RC2)+creg-1])
-		    call pargi (Memi[rg_xstatp (xc,RL1)+creg-1])
-		    call pargi (Memi[rg_xstatp (xc,RL2)+creg-1])
+		    call pargl (Meml[rg_xstatp (xc,RC1)+creg-1])
+		    call pargl (Meml[rg_xstatp (xc,RC2)+creg-1])
+		    call pargl (Meml[rg_xstatp (xc,RL1)+creg-1])
+		    call pargl (Meml[rg_xstatp (xc,RL2)+creg-1])
 
 	    } else {
 		if (nreg < 1 || nreg > rg_xstati (xc,NREGIONS)) {
@@ -211,10 +220,10 @@ begin
 		    call printf (
 		        "Setting current region to %d: [%d:%d,%d:%d]\n")
 			call pargi (nreg)
-			call pargi (Memi[rg_xstatp (xc,RC1)+nreg-1])
-			call pargi (Memi[rg_xstatp (xc,RC2)+nreg-1])
-			call pargi (Memi[rg_xstatp (xc,RL1)+nreg-1])
-			call pargi (Memi[rg_xstatp (xc,RL2)+nreg-1])
+			call pargl (Meml[rg_xstatp (xc,RC1)+nreg-1])
+			call pargl (Meml[rg_xstatp (xc,RC2)+nreg-1])
+			call pargl (Meml[rg_xstatp (xc,RL1)+nreg-1])
+			call pargl (Meml[rg_xstatp (xc,RL2)+nreg-1])
 		    call rg_xseti (xc, CREGION, nreg)
 		    newdata = YES; newcross = YES; newcenter = YES
 		}
@@ -281,45 +290,45 @@ begin
 	    }
 
 	case XCMD_XLAG:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan () ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_XLAG)
-		    call pargi (rg_xstati (xc, XLAG))
+		    call pargl (rg_xstatl (xc, XLAG))
 	    } else {
-		call rg_xseti (xc, XLAG, ival)
+		call rg_xsetl (xc, XLAG, lval)
 		newdata = YES; newcross = YES; newcenter = YES
 	    }
 
 	case XCMD_YLAG:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_YLAG)
-		    call pargi (rg_xstati (xc, YLAG))
+		    call pargl (rg_xstatl (xc, YLAG))
 	    } else {
-		call rg_xseti (xc, YLAG, ival)
+		call rg_xsetl (xc, YLAG, lval)
 		newdata = YES; newcross = YES; newcenter = YES
 	    }
 
 	case XCMD_DXLAG:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_DXLAG)
-		    call pargi (rg_xstati (xc, DXLAG))
+		    call pargl (rg_xstatl (xc, DXLAG))
 	    } else {
-		call rg_xseti (xc, DXLAG, ival)
+		call rg_xsetl (xc, DXLAG, lval)
 	    }
 
 	case XCMD_DYLAG:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_DYLAG)
-		    call pargi (rg_xstati (xc, DYLAG))
+		    call pargl (rg_xstatl (xc, DYLAG))
 	    } else {
-		call rg_xseti (xc, DYLAG, ival)
+		call rg_xsetl (xc, DYLAG, lval)
 	    }
 
 	case XCMD_BACKGROUND:
@@ -398,24 +407,24 @@ begin
 	    }
 
 	case XCMD_XWINDOW:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_XWINDOW)
-		    call pargi (rg_xstati (xc, XWINDOW))
+		    call pargl (rg_xstatl (xc, XWINDOW))
 	    } else {
-		call rg_xseti (xc, XWINDOW, ival)
+		call rg_xsetl (xc, XWINDOW, lval)
 		newdata = YES; newcross = YES; newcenter = YES
 	    }
 
 	case XCMD_YWINDOW:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_YWINDOW)
-		    call pargi (rg_xstati (xc, YWINDOW))
+		    call pargl (rg_xstatl (xc, YWINDOW))
 	    } else {
-		call rg_xseti (xc, YWINDOW, ival)
+		call rg_xsetl (xc, YWINDOW, lval)
 		newdata = YES; newcross = YES; newcenter = YES
 	    }
 
@@ -436,28 +445,28 @@ begin
 	    }
 
 	case XCMD_XCBOX:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_XCBOX)
-		    call pargi (rg_xstati (xc, XCBOX))
+		    call pargl (rg_xstatl (xc, XCBOX))
 	    } else {
-		if (mod (ival, 2) == 0)
-		    ival = ival + 1
-		call rg_xseti (xc, XCBOX, ival)
+		if (lmod (lval, c_2) == 0)
+		    lval = lval + 1
+		call rg_xsetl (xc, XCBOX, lval)
 		newcenter = YES
 	    }
 
 	case XCMD_YCBOX:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %g\n")
 		    call pargstr (KY_YCBOX)
-		    call pargi (rg_xstati (xc, YCBOX))
+		    call pargl (rg_xstatl (xc, YCBOX))
 	    } else {
-		if (mod (ival, 2) == 0)
-		    ival = ival + 1
-		call rg_xseti (xc, YCBOX, ival)
+		if (lmod (lval, c_2) == 0)
+		    lval = lval + 1
+		call rg_xsetl (xc, YCBOX, lval)
 		newcenter = YES
 	    }
 

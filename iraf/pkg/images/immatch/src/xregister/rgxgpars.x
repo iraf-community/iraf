@@ -6,29 +6,35 @@ procedure rg_xgpars (xc)
 
 pointer	xc		#I pointer to the main structure
 
-int	xlag, ylag, xwindow, ywindow, xcbox, ycbox
+size_t	sz_val
+long	c_2
+long	xlag, ylag, xwindow, ywindow, xcbox, ycbox
 pointer	sp, str
 int	clgwrd(), clgeti()
+long	clgetl(), lmod()
 real	clgetr()
 
 begin
+	c_2 = 2
+
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Initialize the correlation structure.
 	call rg_xinit (xc, clgwrd ("correlation", Memc[str], SZ_LINE,
 	    XC_CTYPES))
 
 	# Fetch the initial shift information.
-	xlag = clgeti ("xlag")
-	ylag = clgeti ("ylag")
-	call rg_xseti (xc, IXLAG, xlag)
-	call rg_xseti (xc, IYLAG, ylag)
-	call rg_xseti (xc, XLAG, xlag)
-	call rg_xseti (xc, YLAG, ylag)
-	call rg_xseti (xc, DXLAG, clgeti ("dxlag"))
-	call rg_xseti (xc, DYLAG, clgeti ("dylag"))
+	xlag = clgetl ("xlag")
+	ylag = clgetl ("ylag")
+	call rg_xsetl (xc, IXLAG, xlag)
+	call rg_xsetl (xc, IYLAG, ylag)
+	call rg_xsetl (xc, XLAG, xlag)
+	call rg_xsetl (xc, YLAG, ylag)
+	call rg_xsetl (xc, DXLAG, clgetl ("dxlag"))
+	call rg_xsetl (xc, DYLAG, clgetl ("dylag"))
 
 	# Get the background value computation parameters.
 	call rg_xseti (xc, BACKGRD, clgwrd ("background", Memc[str], SZ_LINE,
@@ -43,26 +49,26 @@ begin
 	call rg_xsets (xc, FSTRING, Memc[str])
 
 	# Get the window parameters and force the window size to be odd.
-	xwindow = clgeti ("xwindow")
-	if (mod (xwindow,2) == 0)
+	xwindow = clgetl ("xwindow")
+	if (lmod(xwindow,c_2) == 0)
 	    xwindow = xwindow + 1
-	call rg_xseti (xc, XWINDOW, xwindow)
-	ywindow = clgeti ("ywindow")
-	if (mod (ywindow,2) == 0)
+	call rg_xsetl (xc, XWINDOW, xwindow)
+	ywindow = clgetl ("ywindow")
+	if (lmod(ywindow,c_2) == 0)
 	    ywindow = ywindow + 1
-	call rg_xseti (xc, YWINDOW, ywindow)
+	call rg_xsetl (xc, YWINDOW, ywindow)
 
 	# Get the peak fitting parameters.
 	call rg_xseti (xc, PFUNC, clgwrd ("function", Memc[str], SZ_LINE,
 	    XC_PTYPES))
-	xcbox = clgeti ("xcbox")
-	if (mod (xcbox,2) == 0)
+	xcbox = clgetl ("xcbox")
+	if (lmod(xcbox,c_2) == 0)
 	    xcbox = xcbox + 1
-	call rg_xseti (xc, XCBOX, xcbox)
-	ycbox = clgeti ("ycbox")
-	if (mod (ycbox,2) == 0)
+	call rg_xsetl (xc, XCBOX, xcbox)
+	ycbox = clgetl ("ycbox")
+	if (lmod(ycbox,c_2) == 0)
 	    ycbox = ycbox + 1
-	call rg_xseti (xc, YCBOX, ycbox)
+	call rg_xsetl (xc, YCBOX, ycbox)
 
 	call sfree (sp)
 end

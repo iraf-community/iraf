@@ -6,22 +6,25 @@ procedure rg_pxpars (xc)
 
 pointer	xc		#I pointer to the cross-correlation structure
 
+size_t	sz_val
 pointer	sp, str
 int	rg_xstati()
+long	rg_xstatl()
 real	rg_xstatr()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Define the regions.
 	call rg_xstats (xc, REGIONS, Memc[str], SZ_LINE)
 	call clpstr ("regions", Memc[str])
-	call clputi ("xlag", rg_xstati (xc, XLAG))
-	call clputi ("ylag", rg_xstati (xc, YLAG))
-	call clputi ("dxlag", rg_xstati (xc, DXLAG))
-	call clputi ("dylag", rg_xstati (xc, DYLAG))
+	call clputl ("xlag", rg_xstatl (xc, XLAG))
+	call clputl ("ylag", rg_xstatl (xc, YLAG))
+	call clputl ("dxlag", rg_xstatl (xc, DXLAG))
+	call clputl ("dylag", rg_xstatl (xc, DYLAG))
 
 	# Store the background fitting parameters.
 	call rg_xstats (xc, BSTRING, Memc[str], SZ_LINE)
@@ -36,14 +39,14 @@ begin
 	# Store the cross-correlation parameters.
 	call rg_xstats (xc, CSTRING, Memc[str], SZ_LINE)
 	call clpstr ("correlation", Memc[str])
-	call clputi ("xwindow", rg_xstati (xc, XWINDOW))
-	call clputi ("ywindow", rg_xstati (xc, YWINDOW))
+	call clputl ("xwindow", rg_xstatl (xc, XWINDOW))
+	call clputl ("ywindow", rg_xstatl (xc, YWINDOW))
 
 	# Store the peak centering parameters.
 	call rg_xstats (xc, PSTRING, Memc[str], SZ_LINE)
 	call clpstr ("function", Memc[str])
-	call clputi ("xcbox", rg_xstati (xc, XCBOX))
-	call clputi ("ycbox", rg_xstati (xc, YCBOX))
+	call clputl ("xcbox", rg_xstatl (xc, XCBOX))
+	call clputl ("ycbox", rg_xstatl (xc, YCBOX))
 
 	call sfree (sp)
 end

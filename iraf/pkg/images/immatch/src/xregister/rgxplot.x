@@ -8,11 +8,13 @@ procedure rg_xpline (gd, imr, im, nliner, xshift, yshift)
 pointer	gd		#I pointer to the graphics stream
 pointer	imr		#I pointer to the reference image
 pointer	im		#I pointer to the image
-int	nliner		#I the reference line
-int	xshift		#I x shift
-int	yshift		#I y shift
+long	nliner		#I the reference line
+long	xshift		#I x shift
+long	yshift		#I y shift
 
-int	i, rncols, rnlines, incols, inlines
+size_t	sz_val
+long	i
+size_t	rncols, rnlines, incols, inlines
 pointer	sp, title, xr, xi, ptrr, ptri
 real	ymin, ymax, tymin, tymax
 int	strlen()
@@ -41,7 +43,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (title, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
 	call salloc (xr, rncols, TY_REAL)
 	call salloc (xi, rncols, TY_REAL)
 
@@ -72,10 +75,10 @@ begin
 	    call pargstr (IM_HDRFILE(im))
 	call sprintf (Memc[title+strlen(Memc[title])], SZ_LINE,
 	    "Refline (solid): %d  Inline (dashed): %d  Xlag: %d  Ylag: %d")
-	    call pargi (nliner)
-	    call pargi (nliner + yshift)
-	    call pargi (xshift)
-	    call pargi (yshift)
+	    call pargl (nliner)
+	    call pargl (nliner + yshift)
+	    call pargl (xshift)
+	    call pargl (yshift)
 
 	# Set up the axes labels and window.
 	call gclear (gd)
@@ -100,17 +103,22 @@ procedure rg_xpcol (gd, imr, im, ncolr, xshift, yshift)
 pointer	gd		#I pointer to the graphics stream
 pointer	imr		#I pointer to the reference image
 pointer	im		#I pointer to the image
-int	ncolr		#I the line number
-int	xshift		#I xshift to be applied
-int	yshift		#I yshift to be applied
+long	ncolr		#I the line number
+long	xshift		#I xshift to be applied
+long	yshift		#I yshift to be applied
 
-int	i, rncols, rnlines, incols, inlines
+size_t	sz_val
+long	c_1
+long	i
+size_t	rncols, rnlines, incols, inlines
 pointer	sp, title, xr, xi, ptrr, ptri
 real	ymin, ymax, tymin, tymax
 int	strlen()
 pointer	imgs1r(), imgs2r()
 
 begin
+	c_1 = 1
+
 	# Return if no graphics stream.
 	if (gd == NULL)
 	    return
@@ -133,7 +141,8 @@ begin
 
 	# Allocate valid working space.
 	call smark (sp)
-	call salloc (title, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
 	call salloc (xr, rnlines, TY_REAL)
 	call salloc (xi, inlines, TY_REAL)
 
@@ -145,11 +154,11 @@ begin
 	if (IM_NDIM(imr) == 1)
 	    ptrr = imgs1r (imr, ncolr, ncolr)
 	else
-	    ptrr = imgs2r (imr, ncolr, ncolr, 1, rnlines)
+	    ptrr = imgs2r (imr, ncolr, ncolr, c_1, rnlines)
 	if (IM_NDIM(im) == 1)
 	    ptri = imgs1r (im, ncolr + xshift, ncolr + xshift)
 	else
-	    ptri = imgs2r (im, ncolr + xshift, ncolr + xshift, 1, inlines)
+	    ptri = imgs2r (im, ncolr + xshift, ncolr + xshift, c_1, inlines)
 	call alimr (Memr[ptrr], rnlines, ymin, ymax)
 	call alimr (Memr[ptri], inlines, tymin, tymax)
 	ymin = min (ymin, tymin)
@@ -161,10 +170,10 @@ begin
 	    call pargstr (IM_HDRFILE(im))
 	call sprintf (Memc[title+strlen(Memc[title])], SZ_LINE,
 	    "Refcol (solid): %d  Imcol (dashed): %d  Xlag: %d Ylag: %d")
-	    call pargi (ncolr)
-	    call pargi (ncolr + xshift)
-	    call pargi (xshift)
-	    call pargi (yshift)
+	    call pargl (ncolr)
+	    call pargl (ncolr + xshift)
+	    call pargl (xshift)
+	    call pargl (yshift)
 
 	# Set up the labels and the axes.
 	call gclear (gd)
@@ -189,10 +198,11 @@ procedure rg_xcpline (gd, title, data, nx, ny, nline)
 pointer	gd		#I pointer to the graphics stream
 char	title[ARB]	#I title for the plot
 real	data[nx,ARB]	#I the input data array	
-int	nx, ny		#I dimensions of the input data array
-int	nline		#I the line number
+size_t	nx, ny		#I dimensions of the input data array
+long	nline		#I the line number
 
-int	i
+size_t	sz_val
+long	i
 pointer	sp, str, x
 real	ymin, ymax
 
@@ -207,7 +217,8 @@ begin
 
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call salloc (x, nx, TY_REAL)
 
 	# Initialize the data.
@@ -236,10 +247,10 @@ procedure rg_xcpcol (gd, title, data, nx, ny, ncol)
 pointer	gd		#I pointer to the graphics stream
 char	title[ARB]	#I title of the column plot
 real	data[nx,ARB]	#I the input data array
-int	nx, ny		#I the dimensions of the input data array
-int	ncol		#I line number
+size_t	nx, ny		#I the dimensions of the input data array
+long	ncol		#I line number
 
-int	i
+long	i
 pointer	sp, x, y
 real	ymin, ymax
 
@@ -284,11 +295,12 @@ end
 procedure rg_xmkpeak (gd, xwindow, ywindow, xshift, yshift)
 
 pointer	gd		#I pointer to the graphics stream
-int	xwindow		#I x dimension of correlation function
-int	ywindow		#I y dimension of correlation function
+long	xwindow		#I x dimension of correlation function
+long	ywindow		#I y dimension of correlation function
 real	xshift		#O x shift
 real	yshift		#O y shift
 
+size_t	sz_val
 int	wcs, key
 pointer	sp, cmd
 real	wx, wy
@@ -299,7 +311,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call printf ("Mark peak of the cross correlation function\n")
 	if (clgcur ("gcommands", wx, wy, wcs, key, Memc[cmd], SZ_LINE) == EOF)

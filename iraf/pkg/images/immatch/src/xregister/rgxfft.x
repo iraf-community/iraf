@@ -6,21 +6,23 @@
 procedure rg_fftcor (fft, nxfft nyfft)
 
 real	fft[ARB]	#I/O array to be  fft'd
-int	nxfft, nyfft	#I dimensions of the fft
+long	nxfft, nyfft	#I dimensions of the fft
 
+size_t	sz_val
 pointer	sp, dim
 
 begin
 	call smark (sp)
-	call salloc (dim, 2, TY_INT)
+	sz_val = 2
+	call salloc (dim, sz_val, TY_LONG)
 
 	# Fourier transform the two arrays.
-	Memi[dim] = nxfft
-	Memi[dim+1] = nyfft
-	if (Memi[dim+1] == 1)
-	    call rg_fourn (fft, Memi[dim], 1, 1)
+	Meml[dim] = nxfft
+	Meml[dim+1] = nyfft
+	if (Meml[dim+1] == 1)
+	    call rg_fourn (fft, Meml[dim], 1, 1)
 	else
-	    call rg_fourn (fft, Memi[dim], 2, 1)
+	    call rg_fourn (fft, Meml[dim], 2, 1)
 
 	# Compute the product of the two transforms.
 	call rg_mulfft (fft, fft, 2 * nxfft, nyfft)
@@ -32,10 +34,10 @@ begin
 	call adivkr (fft, real (nxfft * nyfft), fft, 2 * nxfft * nyfft)
 
 	# Compute the inverse transform.
-	if (Memi[dim+1] == 1)
-	    call rg_fourn (fft, Memi[dim], 1, -1)
+	if (Meml[dim+1] == 1)
+	    call rg_fourn (fft, Meml[dim], 1, -1)
 	else
-	    call rg_fourn (fft, Memi[dim], 2, -1)
+	    call rg_fourn (fft, Meml[dim], 2, -1)
 
 	call sfree (sp)
 end
@@ -47,9 +49,9 @@ procedure rg_mulfft (fft1, fft2, nxfft, nyfft)
 
 real	fft1[nxfft,nyfft]	#I array containing 2 ffts of 2 real functions
 real	fft2[nxfft,nyfft]	#O fft of correlation function
-int	nxfft, nyfft		#I dimensions of fft
+long	nxfft, nyfft		#I dimensions of fft
 
-int	i,j, nxd2p2, nxp2, nxp3, nyd2p1, nyp2
+long	i, j, nxd2p2, nxp2, nxp3, nyd2p1, nyp2
 real	c1, c2, h1r, h1i, h2r, h2i
 
 begin
@@ -132,10 +134,10 @@ end
 procedure rg_fnorm (array, ncols, nlines, nxfft, nyfft)
 
 real	array[ARB]			#I/O the input/output data array
-int	ncols, nlines			#I dimensions of the input data array
-int	nxfft, nyfft			#I dimensions of the fft
+size_t	ncols, nlines			#I dimensions of the input data array
+long	nxfft, nyfft			#I dimensions of the fft
 
-int	i, j, index
+long	i, j, index
 real	sumr, sumi, meanr, meani
 
 begin

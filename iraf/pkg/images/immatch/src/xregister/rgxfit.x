@@ -16,25 +16,26 @@ int	nreg		    #I the current region
 pointer	gd		    #I the pointer to the graphics stream
 real	xshift, yshift	    #O the computed shifts
 
-int	nrlines, xwindow, ywindow, xcbox, ycbox, xlag, ylag
+long	nrlines, xwindow, ywindow, xcbox, ycbox, xlag, ylag
 real	xin, yin, xout, yout
 int	rg_xstati()
+long	rg_xstatl()
 pointer	rg_xstatp()
 
 begin
 	# Check the window and centering box sizes.
-	nrlines = Memi[rg_xstatp(xc,RL2)+nreg-1] -
-	    Memi[rg_xstatp(xc,RL1)+nreg-1] + 1
-	xwindow = rg_xstati (xc, XWINDOW)
+	nrlines = Meml[rg_xstatp(xc,RL2)+nreg-1] -
+	    Meml[rg_xstatp(xc,RL1)+nreg-1] + 1
+	xwindow = rg_xstatl (xc, XWINDOW)
 	if (nrlines == 1)
 	    ywindow = 1
 	else
-	    ywindow = rg_xstati (xc, YWINDOW)
-	xcbox = rg_xstati (xc, XCBOX)
+	    ywindow = rg_xstatl (xc, YWINDOW)
+	xcbox = rg_xstatl (xc, XCBOX)
 	if (nrlines == 1)
 	    ycbox = 1
 	else
-	    ycbox = rg_xstati (xc, YCBOX)
+	    ycbox = rg_xstatl (xc, YCBOX)
 
 	# Do the centering.
 	switch (rg_xstati (xc, PFUNC)) {
@@ -63,16 +64,16 @@ begin
 
 	# Store the shifts.
 	if (rg_xstati (xc, NREFPTS) > 0) {
-	    xin  = (Memi[rg_xstatp(xc,RC1)+nreg-1] +
-	        Memi[rg_xstatp(xc,RC2)+nreg-1]) / 2.0
-	    yin  = (Memi[rg_xstatp(xc,RL1)+nreg-1] +
-	        Memi[rg_xstatp(xc,RL2)+nreg-1]) / 2.0
+	    xin  = (Meml[rg_xstatp(xc,RC1)+nreg-1] +
+	        Meml[rg_xstatp(xc,RC2)+nreg-1]) / 2.0
+	    yin  = (Meml[rg_xstatp(xc,RL1)+nreg-1] +
+	        Meml[rg_xstatp(xc,RL2)+nreg-1]) / 2.0
 	    call rg_etransform (xc, xin, yin, xout, yout)
 	    xlag = xout - xin
 	    ylag = yout - yin
 	} else {
-	    xlag = rg_xstati (xc, XLAG)
-	    ylag = rg_xstati (xc, YLAG)
+	    xlag = rg_xstatl (xc, XLAG)
+	    ylag = rg_xstatl (xc, YLAG)
 	}
 	xshift = - (xshift + xlag)
 	yshift = - (yshift + ylag)
@@ -87,10 +88,10 @@ end
 procedure rg_maxmin (xcor, xwindow, ywindow, xshift, yshift)
 
 real	xcor[xwindow,ywindow]	#I the cross-correlation function
-int	xwindow, ywindow	#I dimensions of cross-correlation function
+long	xwindow, ywindow	#I dimensions of cross-correlation function
 real	xshift, yshift		#O x and shift of the peak
 
-int	xindex, yindex
+long	xindex, yindex
 
 begin
 	# Locate the maximum point.
@@ -106,17 +107,21 @@ end
 procedure rg_imean (xcor, xwindow, ywindow, xcbox, ycbox, xshift, yshift)
 
 real	xcor[xwindow,ARB]	#I the cross-correlation function
-int	xwindow, ywindow	#I dimensions of the cross-correlation function
-int	xcbox, ycbox		#I dimensions of the centering box
+long	xwindow, ywindow	#I dimensions of the cross-correlation function
+long	xcbox, ycbox		#I dimensions of the centering box
 real	xshift, yshift		#O x and y shift of cross-correlation function
 
-int	xindex, yindex, xlo, xhi, ylo, yhi, nx, ny
+size_t	sz_val
+long	xindex, yindex, xlo, xhi, ylo, yhi
+size_t	nx, ny
 pointer	sp, xmarg, ymarg
 
 begin
 	call smark (sp)
-	call salloc (xmarg, xcbox, TY_REAL)
-	call salloc (ymarg, ycbox, TY_REAL)
+	sz_val = xcbox
+	call salloc (xmarg, sz_val, TY_REAL)
+	sz_val = ycbox
+	call salloc (ymarg, sz_val, TY_REAL)
 
 	# Locate the maximum point and normalize.
 	call rg_alim2r (xcor, xwindow, ywindow, xindex, yindex)
@@ -149,21 +154,23 @@ end
 procedure rg_iparabolic (xcor, xwindow, ywindow, xcbox, ycbox, xshift, yshift)
 
 real	xcor[xwindow,ARB]	#I the cross-correlation function
-int	xwindow, ywindow	#I dimensions of the cross-correlation fucntion
-int	xcbox, ycbox		#I the dimensions of the centering box
+long	xwindow, ywindow	#I dimensions of the cross-correlation fucntion
+long	xcbox, ycbox		#I the dimensions of the centering box
 real	xshift, yshift		#O the x and y shift of the peak
 
-int	i, j, xindex, yindex, xlo, xhi, nx, ylo, yhi, ny
+size_t	sz_val
+long	i, j, xindex, yindex, xlo, xhi, nx, ylo, yhi, ny
 pointer	sp, x, y, c, xfit, yfit
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (x, 3, TY_REAL)
-	call salloc (y, 3, TY_REAL)
-	call salloc (c, 3, TY_REAL)
-	call salloc (xfit, 3, TY_REAL)
-	call salloc (yfit, 3, TY_REAL)
+	sz_val = 3
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (c, sz_val, TY_REAL)
+	call salloc (xfit, sz_val, TY_REAL)
+	call salloc (yfit, sz_val, TY_REAL)
 
 	# Locate the maximum point.
 	call rg_alim2r (xcor, xwindow, ywindow, xindex, yindex)
@@ -225,24 +232,29 @@ define	NPARS_PARABOLA	3
 procedure rg_parabolic (xcor, xwindow, ywindow, xcbox, ycbox, xshift, yshift)
 
 real	xcor[xwindow,ARB]	#I the cross-correlation function
-int	xwindow, ywindow	#I dimensions of the cross-correlation fucntion
-int	xcbox, ycbox		#I the dimensions of the centering box
+long	xwindow, ywindow	#I dimensions of the cross-correlation fucntion
+long	xcbox, ycbox		#I the dimensions of the centering box
 real	xshift, yshift		#O the x and y shift of the peak
 
+size_t	sz_val
 extern	rg_polyfit, rg_dpolyfit
-int	i,  xindex, yindex, xlo, xhi, ylo, yhi, nx, ny, npar, ier
+long	i, xindex, yindex, xlo, xhi, ylo, yhi
+size_t	nx, ny, npar
+int	ier
 pointer	sp, x, w, xmarg, ymarg, params, eparams, list, nl
 pointer	locpr()
 
 begin
 	call smark (sp)
-	call salloc (x, max (xwindow, ywindow), TY_REAL)
-	call salloc (w, max (xwindow, ywindow), TY_REAL)
-	call salloc (xmarg, max (xwindow, ywindow), TY_REAL)
-	call salloc (ymarg, max (xwindow, ywindow), TY_REAL)
-	call salloc (params, NPARS_PARABOLA, TY_REAL)
-	call salloc (eparams, NPARS_PARABOLA, TY_REAL)
-	call salloc (list, NPARS_PARABOLA, TY_INT)
+	sz_val = max (xwindow, ywindow)
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (w, sz_val, TY_REAL)
+	call salloc (xmarg, sz_val, TY_REAL)
+	call salloc (ymarg, sz_val, TY_REAL)
+	sz_val = NPARS_PARABOLA
+	call salloc (params, sz_val, TY_REAL)
+	call salloc (eparams, sz_val, TY_REAL)
+	call salloc (list, sz_val, TY_LONG)
 
 	# Locate the maximum point.
 	call rg_alim2r (xcor, xwindow, ywindow, xindex, yindex)
@@ -269,12 +281,14 @@ begin
 		    xshift = - Memr[params+1] / (2.0 * Memr[params+2]) 
 		    call eprintf ("\txshift=%g\n")
 			call pargr (xshift)
-	    call aclrr (Memr[eparams], NPARS_PARABOLA)
+	    sz_val = NPARS_PARABOLA
+	    call aclrr (Memr[eparams], sz_val)
 	    do i = 1, NPARS_PARABOLA
-		Memi[list+i-1] = i
+		Meml[list+i-1] = i
+	    sz_val = NPARS_PARABOLA
 	    call nlinitr (nl, locpr (rg_polyfit), locpr (rg_dpolyfit),
-	        Memr[params], Memr[eparams], NPARS_PARABOLA, Memi[list],
-		    NPARS_PARABOLA, .0001, NL_MAXITER)
+			  Memr[params], Memr[eparams], sz_val, Meml[list],
+			  sz_val, .0001, NL_MAXITER)
 	    call nlfitr (nl, Memr[x], Memr[xmarg], Memr[w], nx, 1, WTS_USER,
 		ier)
 	    call nlvectorr (nl, Memr[x], Memr[w], nx, 1)
@@ -307,12 +321,14 @@ begin
 		    yshift = - Memr[params+1] / (2.0 * Memr[params+2]) 
 		    call eprintf ("\tyshift=%g\n")
 			call pargr (yshift)
-	    call aclrr (Memr[eparams], NPARS_PARABOLA)
+	    sz_val = NPARS_PARABOLA
+	    call aclrr (Memr[eparams], sz_val)
 	    do i = 1, NPARS_PARABOLA
-		Memi[list+i-1] = i
+		Meml[list+i-1] = i
+	    sz_val = NPARS_PARABOLA
 	    call nlinitr (nl, locpr (rg_polyfit), locpr (rg_dpolyfit),
-	        Memr[params], Memr[eparams], NPARS_PARABOLA, Memi[list],
-		    NPARS_PARABOLA, 0.0001, NL_MAXITER)
+			  Memr[params], Memr[eparams], sz_val, Meml[list],
+			  sz_val, 0.0001, NL_MAXITER)
 	    call nlfitr (nl, Memr[x], Memr[ymarg], Memr[w], ny, 1, WTS_USER,
 		ier)
 	    call nlvectorr (nl, Memr[x], Memr[w], ny, 1)
@@ -349,20 +365,23 @@ define	ABSORPTION	2		# emission features
 procedure rg_sawtooth (xcor, xwindow, ywindow, xcbox, ycbox, xshift, yshift)
 
 real	xcor[xwindow,ARB]	#I the cross-correlation function
-int	xwindow, ywindow	#I the dimensions of the cross-correlation
-int	xcbox, ycbox		#I the dimensions of the centering box
+long	xwindow, ywindow	#I the dimensions of the cross-correlation
+long	xcbox, ycbox		#I the dimensions of the centering box
 real	xshift, yshift		#O the x and y shifts
 
-int	i, j, xindex, yindex, xlo, xhi, ylo, yhi, nx, ny
+size_t	sz_val
+long	i, j, xindex, yindex, xlo, xhi, ylo, yhi
+size_t	nx, ny
 pointer	sp, data, xfit, yfit, yclean
 real	ic
 
 begin
 	call smark (sp)
-	call salloc (data, max (xwindow, ywindow), TY_REAL)
-	call salloc (xfit, max (xwindow, ywindow), TY_REAL)
-	call salloc (yfit, max (xwindow, ywindow), TY_REAL)
-	call salloc (yclean, max (xwindow, ywindow), TY_REAL)
+	sz_val = max (xwindow, ywindow)
+	call salloc (data, sz_val, TY_REAL)
+	call salloc (xfit, sz_val, TY_REAL)
+	call salloc (yfit, sz_val, TY_REAL)
+	call salloc (yclean, sz_val, TY_REAL)
 
 	# Locate the maximum point and normalize.
 	call rg_alim2r (xcor, xwindow, ywindow, xindex, yindex)
@@ -426,10 +445,10 @@ end
 procedure rg_alim2r (data, nx, ny, i, j)
 
 real	data[nx,ARB]		#I the input data
-int	nx, ny			#I the dimensions of the input array
-int	i, j			#O the indices of the maximum pixel
+long	nx, ny			#I the dimensions of the input array
+long	i, j			#O the indices of the maximum pixel
 
-int	ii, jj
+long	ii, jj
 real	datamax
 
 begin
@@ -452,13 +471,14 @@ procedure rg_xmkmarg (xcor, xwindow, ywindow, xlo, xhi, ylo, yhi, xmarg,
 	ymarg)
 
 real	xcor[xwindow,ARB]	#I the cross-correlation function
-int	xwindow, ywindow	#I dimensions of cross-correlation function
-int	xlo, xhi		#I the x limits for centering
-int	ylo, yhi		#I the y limits for centering
+long	xwindow, ywindow	#I dimensions of cross-correlation function
+long	xlo, xhi		#I the x limits for centering
+long	ylo, yhi		#I the y limits for centering
 real	xmarg[ARB]		#O the output x marginal array
 real	ymarg[ARB]		#O the output y marginal array
 
-int	i, j, index, nx, ny
+long	i, j, index
+size_t	nx, ny
 
 begin
 	nx = xhi - xlo + 1
@@ -493,10 +513,10 @@ end
 procedure rg_centroid (a, npts, shift)
 
 real	a[ARB]		#I the input array
-int	npts		#I the number of points
+size_t	npts		#I the number of points
 real	shift		#O the position of the maximum
 
-int	i
+long	i
 real	mean, dif, sumi, sumix
 bool	fp_equalr()
 real	asumr()
@@ -539,7 +559,7 @@ procedure rg_x1dcenter (x, data, npts, xc, ic, width, type, radius, threshold)
 
 real	x				#I initial guess
 real	data[npts]			#I data points
-int	npts				#I number of data points
+size_t	npts				#I number of data points
 real	xc				#O computed center
 real	ic				#O intensity at computed center
 real	width				#I feature width
@@ -547,9 +567,12 @@ int	type				#I feature type
 real	radius				#I centering radius
 real	threshold			#I minimum range in feature
 
-int	x1, x2, nx
+size_t	sz_val
+long	x1, x2
+size_t	nx
 real	a, b, rad, wid
 pointer	sp, data1
+real	aabs()
 
 begin
 	# Check starting value.
@@ -588,7 +611,8 @@ begin
 	nx = x2 - x1 + 1
 
 	call smark (sp)
-	call salloc (data1, nx, TY_REAL)
+	sz_val = nx
+	call salloc (data1, sz_val, TY_REAL)
 	call amovr (data[x1], Memr[data1], nx)
 
 	# Make the centering data positive, subtract the continuum, and
@@ -613,7 +637,7 @@ begin
 	# Check user centering error radius.
 	if (!IS_INDEF(xc)) {
 	    xc = xc + x1 - 1
-	    if (abs (x - xc) > radius) {
+	    if (aabs(x - xc) > radius) {
 		xc = INDEF
 		ic = INDEF
 	    }
@@ -629,18 +653,20 @@ end
 procedure rg_xcenter (x, data, npts, xc, ic, width)
 
 real	x				#I starting guess
-int	npts				#I number of points in data vector
 real	data[npts]			#I data vector
+size_t	npts				#I number of points in data vector
 real	xc				#O computed xc
 real	ic				#O computed intensity at xc
 real	width				#I centering width
 
-int	i, j, iteration, dxcheck
+size_t	sz_val
+long	i, j
+int	iteration, dxcheck
 real	hwidth, dx, dxabs, dxlast
 real	a, b, sum1, sum2, intgrl1, intgrl2
 pointer	asi1, asi2, sp, data1
 
-real	asigrl(), asieval()
+real	asigrl(), asieval(), aabs()
 
 define	done_	99
 
@@ -676,7 +702,8 @@ begin
 
 	# Allocate, compute, and interpolate the x*y values.
 	call smark (sp)
-	call salloc (data1, npts, TY_REAL)
+	sz_val = npts
+	call salloc (data1, sz_val, TY_REAL)
 	do i = 1, npts
 	    Memr[data1+i-1] = data[i] * i
 	call asifit (asi2, Memr[data1], npts)
@@ -716,8 +743,8 @@ begin
 		break
 
 	    # Limit dx change in one iteration to 1 pixel.
-	    dx = max (-1., min (1., sum1 / abs (sum2)))
-	    dxabs = abs (dx)
+	    dx = max (-1., min (1., sum1 / aabs(sum2)))
+	    dxabs = aabs(dx)
 	    xc = xc + dx
 	    ic = asieval (asi1, xc)
 
@@ -775,10 +802,10 @@ procedure rg_polyfit (x, nvars, p, np, z)
 real	x		#I position coordinate
 int	nvars		#I number of variables
 real	p[ARB]		#I coefficients of polynomial
-int	np		#I number of parameters 
+size_t	np		#I number of parameters 
 real	z		#O function return
 
-int	i
+long	i
 real	r
 
 begin
@@ -797,11 +824,11 @@ real	x		#I position coordinate
 int	nvars		#I number of variables
 real	p[ARB]		#I coefficients of polynomial
 real	dp[ARB]		#I parameter derivative increments
-int	np		#I number of parameters
+size_t	np		#I number of parameters
 real	z		#O function value
 real	der[ARB]	#O derivatives
 
-int	i
+long	i
 
 begin
 	der[1] = 1.0

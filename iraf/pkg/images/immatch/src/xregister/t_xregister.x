@@ -17,8 +17,10 @@ pointer	interpstr		# interpolant type
 int	boundary		# boundary extension type
 real	constant		# constant for boundary extension
 
+size_t	sz_val
+int	i_val
 int	tfd, stat, nregions
-int	c1, c2, l1, l2, ncols, nlines
+long	c1, c2, l1, l2, ncols, nlines
 pointer	reglist, reflist, reclist, list1, listr, list2
 pointer	sp, image1, image2, imtemp, str, coords
 pointer	gd, id, imr, im1, im2, sdb, xc, mw
@@ -30,6 +32,7 @@ int	rg_xcorr(), rg_xicorr(), fntgfnb(), access(), open()
 pointer	fntopnb(), imtopen(), gopen(), immap(), dtmap(), mw_openim()
 real	clgetr(), rg_xstatr()
 errchk	fntopnb(), gopen()
+include	<nullptr.inc>
 
 begin
 	# Set STDOUT to flush on a newline character
@@ -38,14 +41,17 @@ begin
 	# Allocate temporary working space.
 	call smark (sp)
 
-	call salloc (freglist, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (database, SZ_FNAME, TY_CHAR)
-	call salloc (coords, SZ_FNAME, TY_CHAR)
-	call salloc (interpstr, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (freglist, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	call salloc (database, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
+	call salloc (interpstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get task parameters and open lists.
 	call clgstr ("input", Memc[str], SZ_LINE)
@@ -176,12 +182,12 @@ begin
 	tfd = NULL
 
 	# Initialize the overlap section.
-	c1 = INDEFI
-	c2 = INDEFI
-	l1 = INDEFI
-	l2 = INDEFI
-	ncols = INDEFI
-	nlines = INDEFI
+	c1 = INDEFL
+	c2 = INDEFL
+	l1 = INDEFL
+	l2 = INDEFL
+	ncols = INDEFL
+	nlines = INDEFL
 
 	# Do each set of input, reference,  and output images.
 	while ((imtgetim (list1, Memc[image1], SZ_FNAME) != EOF)) {
@@ -193,7 +199,7 @@ begin
 	        if (imtgetim (listr, Memc[str], SZ_FNAME) != EOF) {
 		    if (imr != NULL)
 		        call imunmap (imr)
-		    imr = immap (Memc[str], READ_ONLY, 0)
+		    imr = immap (Memc[str], READ_ONLY, NULLPTR)
 		    if (IM_NDIM(imr) > 2)
 		        call error (0, "Reference images must be 1D or 2D")
 		    call rg_xsets (xc, REFIMAGE, Memc[str])
@@ -211,7 +217,7 @@ begin
 		call rg_xsets (xc, REFIMAGE, "reference")
 
 	    # Open the input image.
-	    im1 = immap (Memc[image1], READ_ONLY, 0)
+	    im1 = immap (Memc[image1], READ_ONLY, NULLPTR)
 	    if (IM_NDIM(im1) > 2) {
 	         call error (0, "Input images must be 1D or 2D")
 	    } else if (imr != NULL) {
@@ -221,9 +227,9 @@ begin
 	    }
 	    call imseti (im1, IM_TYBNDRY, BT_NEAREST)
 	    if (IM_NDIM(im1) == 1)
-	        call imseti (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
+	        call imsetl (im1, IM_NBNDRYPIX, IM_LEN(im1,1))
 	    else
-	        call imseti (im1, IM_NBNDRYPIX,
+	        call imsetl (im1, IM_NBNDRYPIX,
 		    max (IM_LEN(im1,1), IM_LEN(im1,2)))
 	    call rg_xsets (xc, IMAGE, Memc[image1])
 
@@ -329,10 +335,12 @@ begin
 	    call fntclsb (reflist)
 	if (reclist != NULL)
 	    call fntclsb (reclist)
-	if (dformat == YES)
+	if (dformat == YES) {
 	    call dtunmap (sdb)
-	else
-	    call close (sdb)
+	} else {
+	    i_val = sdb
+	    call close (i_val)
+	}
 
 	# Close up the graphics and display devices.
 	if (gd != NULL)
@@ -351,12 +359,14 @@ procedure rg_overlap (im1, xshift, yshift, x1, x2, y1, y2, ncols, nlines)
 pointer	im1			# pointer to the input image
 real	xshift			# the computed x shift of the input image
 real	yshift			# the computed y shift of the input image
-int	x1, x2			# the input/output column limits
-int	y1, y2			# the input/output line limits
-int	ncols, nlines		# the input/output size limits
+long	x1, x2			# the input/output column limits
+long	y1, y2			# the input/output line limits
+long	ncols, nlines		# the input/output size limits
 
-int	ixlo, ixhi, iylo, iyhi
+long	ixlo, ixhi, iylo, iyhi
 real	xlo, xhi, ylo, yhi
+
+long	lint()
 
 begin
 	if (IS_INDEFR(xshift) || IS_INDEFR(yshift))
@@ -369,41 +379,41 @@ begin
 	yhi = IM_LEN(im1,2) + yshift
 
 	# Round up or down as appropriate.
-	ixlo = int (xlo)
+	ixlo = lint(xlo)
 	if (xlo > ixlo)
 	    ixlo = ixlo + 1
-	ixhi = int (xhi)
+	ixhi = lint(xhi)
 	if (xhi < ixhi)
 	    ixhi = ixhi - 1
-	iylo = int (ylo)
+	iylo = lint(ylo)
 	if (ylo > iylo)
 	    iylo = iylo + 1
-	iyhi = int (yhi)
+	iyhi = lint(yhi)
 	if (yhi < iyhi)
 	    iyhi = iyhi - 1
 
 	# Determine the new limits.
-	if (IS_INDEFI(x1))
+	if (IS_INDEFL(x1))
 	    x1 = ixlo
 	else
 	    x1 = max (ixlo, x1)
-	if (IS_INDEFI(x2))
+	if (IS_INDEFL(x2))
 	    x2 = ixhi
 	else
 	    x2 = min (ixhi, x2)
-	if (IS_INDEFI(y1))
+	if (IS_INDEFL(y1))
 	    y1 = iylo
 	else
 	    y1 = max (iylo, y1)
-	if (IS_INDEFI(y2))
+	if (IS_INDEFL(y2))
 	    y2 = iyhi
 	else
 	    y2 = min (iyhi, y2)
-	if (IS_INDEFI(ncols))
+	if (IS_INDEFL(ncols))
 	    ncols = IM_LEN(im1,1)
 	else
 	    ncols = min (ncols, IM_LEN(im1,1))
-	if (IS_INDEFI(nlines))
+	if (IS_INDEFL(nlines))
 	    nlines = IM_LEN(im1,2)
 	else
 	    nlines = min (nlines, IM_LEN(im1,2))
@@ -414,11 +424,11 @@ end
 
 procedure rg_poverlap (x1, x2, y1, y2, ncols, nlines)
 
-int	x1, x2			# the input column limits
-int	y1, y2			# the input line limits
-int	ncols, nlines		# the number of lines and columns
+long	x1, x2			# the input column limits
+long	y1, y2			# the input line limits
+long	ncols, nlines		# the number of lines and columns
 
-int	vx1, vx2, vy1, vy2
+long	vx1, vx2, vy1, vy2
 
 begin
 	vx1 = max (1, min (x1, ncols))
@@ -427,15 +437,15 @@ begin
 	vy2 = max (1, min (y2, nlines))
 
 	call printf ("Overlap region: [%d:%d,%d:%d]\n")
-	    call pargi (x1)
-	    call pargi (x2)
-	    call pargi (y1)
-	    call pargi (y2)
+	    call pargl (x1)
+	    call pargl (x2)
+	    call pargl (y1)
+	    call pargl (y2)
 	if (vx1 != x1 || vx2 != x2 || vy1 != y1 || vy2 != y2) {
 	    call printf ("Vignetted overlap region: [%d:%d,%d:%d]\n")
-	        call pargi (vx1)
-	        call pargi (vx2)
-	        call pargi (vy1)
-	        call pargi (vy2)
+	        call pargl (vx1)
+	        call pargl (vx2)
+	        call pargl (vy1)
+	        call pargl (vy2)
 	}
 end

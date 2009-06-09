@@ -14,17 +14,22 @@ pointer	db		#I pointer to the shifts database
 int	dformat		#I write shifts file in database format ?
 pointer	xc		#I pointer to the cross-correlation structure
 
+size_t	sz_val
+int	i_val
 pointer	sp, image, imname
 real	xshift, yshift
 bool	streq()
 int	rg_xstati(), fscan(), nscan()
+long	lnint(), rg_xstatl()
 errchk	rg_cross(), rg_xfile()
+include	<nullptr.inc>
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
 	call rg_xstats (xc, IMAGE, Memc[image], SZ_FNAME)
 
 	# Initialize.
@@ -40,7 +45,7 @@ begin
 	        call rg_xdbparams (db, xc)
 
 	    # Compute the cross-correlation function.
-	    call rg_cross (imr, im1, xc, NULL, xshift, yshift)
+	    call rg_cross (imr, im1, xc, NULLPTR, xshift, yshift)
 	    call rg_xsetr (xc, TXSHIFT, xshift)
 	    call rg_xsetr (xc, TYSHIFT, yshift)
 
@@ -52,7 +57,8 @@ begin
 	    if (dformat == YES)
 	        call rg_xdbshift (db, xc)
 	    else {
-		call fprintf (db, "%s  %g  %g\n")
+		i_val = db
+		call fprintf (i_val, "%s  %g  %g\n")
 		    call pargstr (Memc[image])
 		    call pargr (xshift)
 		    call pargr (yshift)
@@ -62,14 +68,14 @@ begin
 	    if (rg_xstati (xc, NREFPTS) > 0) {
 	        call rg_xseti (xc, XLAG, 0)
 	        call rg_xseti (xc, YLAG, 0)
-	    } else if (IS_INDEFI (rg_xstati (xc, DXLAG)) ||
-	        IS_INDEFI (rg_xstati (xc, DYLAG))) {
-	        call rg_xseti (xc, XLAG, nint (-xshift))
-	        call rg_xseti (xc, YLAG, nint (-yshift))
+	    } else if (IS_INDEFL (rg_xstatl (xc, DXLAG)) ||
+	        IS_INDEFL (rg_xstatl (xc, DYLAG))) {
+	        call rg_xsetl (xc, XLAG, lnint(-xshift))
+	        call rg_xsetl (xc, YLAG, lnint(-yshift))
 	    } else {
-	        call rg_xseti (xc, XLAG, rg_xstati (xc, XLAG) + rg_xstati (xc,
+	        call rg_xsetl (xc, XLAG, rg_xstatl (xc, XLAG) + rg_xstatl (xc,
 	            DXLAG))
-	        call rg_xseti (xc, YLAG, rg_xstati (xc, YLAG) + rg_xstati (xc,
+	        call rg_xsetl (xc, YLAG, rg_xstatl (xc, YLAG) + rg_xstatl (xc,
 	            DYLAG))
 	    }
 
@@ -77,7 +83,8 @@ begin
 	    if (dformat == YES)
 	        call rg_xfile (db, xc, xshift, yshift)
 	    else {
-		if (fscan (db) != EOF) {
+		i_val = db
+		if (fscan (i_val) != EOF) {
 		    call gargwrd (Memc[imname], SZ_FNAME)
 		    call gargr (xshift)
 		    call gargr (yshift)
@@ -121,6 +128,7 @@ pointer	pxshift, pyshift
 real	xshift, yshift
 int	rg_xstati(), rg_xcget(), rg_xfget()
 pointer	rg_xstatp()
+include	<nullptr.inc>
 
 begin
 	# Get the pointers.
@@ -142,7 +150,7 @@ begin
 		    Memr[pyshift+i-1] = INDEFR
 		    if (rg_xstatp (xc, XCOR) != NULL)
 		        call mfree (rg_xstatp (xc, XCOR), TY_REAL)
-		    call rg_xsetp (xc, XCOR, NULL)
+		    call rg_xsetp (xc, XCOR, NULLPTR)
 		    next
 	        }
 	    case XC_FOURIER:
@@ -151,7 +159,7 @@ begin
 		    Memr[pyshift+i-1] = INDEFR
 		    if (rg_xstatp (xc, XCOR) != NULL)
 		        call mfree (rg_xstatp (xc, XCOR), TY_REAL)
-		    call rg_xsetp (xc, XCOR, NULL)
+		    call rg_xsetp (xc, XCOR, NULLPTR)
 		    next
 	        }
 	    default:
@@ -184,6 +192,7 @@ pointer	xc		#I pointer to the cross correlation structure
 real	xshift		#O shift in x
 real	yshift		#O shift in y
 
+size_t	sz_val
 int	rec
 pointer	sp, str
 int	dtlocate()
@@ -192,7 +201,8 @@ errchk	dtlocate(), dtgetr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	call rg_xstats (xc, RECORD, Memc[str], SZ_LINE)
 	iferr {
@@ -221,6 +231,7 @@ int	stat
 pointer	pxshift, pyshift
 int	rg_xstati(), rg_xcget(), rg_xfget()
 pointer	rg_xstatp()
+include	<nullptr.inc>
 
 begin
 	pxshift = rg_xstatp (xc, XSHIFTS)
@@ -234,7 +245,7 @@ begin
 		Memr[pyshift+nreg-1] = INDEFR
 		if (rg_xstatp (xc, XCOR) != NULL)
 		    call mfree (rg_xstatp (xc, XCOR), TY_REAL)
-		call rg_xsetp (xc, XCOR, NULL)
+		call rg_xsetp (xc, XCOR, NULLPTR)
 	    }
 	case XC_FOURIER:
 	    stat = rg_xfget (xc, imr, im1, nreg)
@@ -243,7 +254,7 @@ begin
 		Memr[pyshift+nreg-1] = INDEFR
 		if (rg_xstatp (xc, XCOR) != NULL)
 		    call mfree (rg_xstatp (xc, XCOR), TY_REAL)
-		call rg_xsetp (xc, XCOR, NULL)
+		call rg_xsetp (xc, XCOR, NULLPTR)
 	    }
 	case XC_FILE:
 	    stat = OK
@@ -263,13 +274,16 @@ pointer	imr		#I pointer to the reference image
 pointer	im1		#I pointer to input image image
 int	i		#I index of region
 
-int	stat, xwindow, ywindow, nrimcols, nrimlines, nimcols, nimlines
-int	nrcols, nrlines, ncols, nlines
-int	xlag, ylag, nborder, rc1, rc2, rl1, rl2, c1, c2, l1, l2
+size_t	sz_val
+int	stat
+long	nrimcols, nrimlines, nimcols, nimlines
+size_t	nrcols, nrlines, ncols, nlines, xwindow, ywindow, nborder
+long	xlag, ylag, rc1, rc2, rl1, rl2, c1, c2, l1, l2
 pointer	sp, str, coeff, rbuf, ibuf, xcor
 pointer	prc1, prc2, prl1, prl2, przero, prxslope, pryslope, border
 real	rxlag, rylag
-int	rg_xstati(), rg_border()
+int	rg_xstati()
+long	rg_xstatl(), rg_border(), lint()
 pointer	rg_xstatp(), rg_ximget()
 real	rg_xstatr()
 
@@ -277,8 +291,10 @@ define	nextregion_	10
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (coeff, max (GS_SAVECOEFF + 6, 9), TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = max (GS_SAVECOEFF + 6, 9)
+	call salloc (coeff, sz_val, TY_REAL)
 	rbuf = NULL
 	ibuf = NULL
 
@@ -310,10 +326,10 @@ begin
 	pryslope = rg_xstatp (xc, RYSLOPE)
 
 	# Compute the reference region limits.
-	rc1 = max (1, min (int (nrimcols), Memi[prc1+i-1]))
-	rc2 = min (int (nrimcols), max (1, Memi[prc2+i-1]))
-	rl1 = max (1, min (int (nrimlines), Memi[prl1+i-1]))
-	rl2 = min (int (nrimlines), max (1, Memi[prl2+i-1]))
+	rc1 = max (1, min (nrimcols, Meml[prc1+i-1]))
+	rc2 = min (nrimcols, max (1, Meml[prc2+i-1]))
+	rl1 = max (1, min (nrimlines, Meml[prl1+i-1]))
+	rl2 = min (nrimlines, max (1, Meml[prl2+i-1]))
 	nrcols = rc2 - rc1 + 1
 	nrlines = rl2 - rl1 + 1
 
@@ -323,20 +339,20 @@ begin
 	    call eprintf (
 		"Reference section: %s[%d:%d,%d:%d] is off image.\n")
 		call pargstr (Memc[str])
-		call pargi (rc1)
-		call pargi (rc2)
-		call pargi (rl1)
-		call pargi (rl2)
+		call pargl (rc1)
+		call pargl (rc2)
+		call pargl (rl1)
+		call pargl (rl2)
 	    stat = ERR
 	    goto nextregion_
 	}
 
 	# Check the window sizes.
-	xwindow = rg_xstati (xc, XWINDOW)
+	xwindow = rg_xstatl (xc, XWINDOW)
 	if (nrlines == 1)
 	    ywindow = 1
 	else
-	    ywindow = rg_xstati (xc, YWINDOW)
+	    ywindow = rg_xstatl (xc, YWINDOW)
 
 	# Move to next ref regions if current region is too small.
 	if (nrcols < xwindow || (IM_NDIM(imr) == 2 && nrlines < ywindow)) {
@@ -344,10 +360,10 @@ begin
 	    call eprintf (
 	    "Reference section: %s[%d:%d,%d:%d] has too few points.\n")
 		call pargstr (Memc[str])
-		call pargi (rc1)
-		call pargi (rc2)
-		call pargi (rl1)
-		call pargi (rl2)
+		call pargl (rc1)
+		call pargl (rc2)
+		call pargl (rl1)
+		call pargl (rl2)
 	    stat = ERR
 	    goto nextregion_
 	}
@@ -362,11 +378,11 @@ begin
 	    else
 	        ylag = rylag - (rl1 + rl2) / 2.0
 	} else {
-	    xlag = rg_xstati (xc, XLAG)
+	    xlag = rg_xstatl (xc, XLAG)
 	    if (ywindow == 1)
 	        ylag = 0
 	    else
-	        ylag = rg_xstati (xc, YLAG)
+	        ylag = rg_xstatl (xc, YLAG)
 	}
 
 	# Get the input image limits.
@@ -383,10 +399,10 @@ begin
 	    call eprintf (
 		"Image section: %s[%d:%d,%d:%d] is off image.\n")
 		call pargstr (Memc[str])
-		call pargi (c1)
-		call pargi (c2)
-		call pargi (l1)
-		call pargi (l2)
+		call pargl (c1)
+		call pargl (c2)
+		call pargl (l1)
+		call pargl (l2)
 	    stat = ERR
 	    goto nextregion_
 	}
@@ -397,10 +413,10 @@ begin
 	    call eprintf (
 		"Image section: %s[%d:%d,%d:%d] has too few points.\n")
 		call pargstr (Memc[str])
-		call pargi (c1)
-		call pargi (c2)
-		call pargi (l1)
-		call pargi (l2)
+		call pargl (c1)
+		call pargl (c2)
+		call pargl (l1)
+		call pargl (l2)
 	    stat = ERR
 	    goto nextregion_
 	}
@@ -531,13 +547,17 @@ pointer	imr		#I pointer to the reference image
 pointer	im1		#I pointer to the input image
 int	i		#I index of the current region
 
-int	rc1, rc2, rl1, rl2, nrcols, nrlines, c1, c2, l1, l2, ncols, nlines
-int	nrimcols, nrimlines, nimcols, nimlines
-int	xwindow, ywindow, xlag, nxfft, nyfft, ylag, stat, nborder
+size_t	sz_val
+int	stat
+size_t	ncols, nlines, nrcols, nrlines, xwindow, ywindow, nborder
+long	rc1, rc2, rl1, rl2, c1, c2, l1, l2
+long	nrimcols, nrimlines, nimcols, nimlines
+long	xlag, nxfft, nyfft, ylag
 pointer	sp, str, coeff, xcor, rbuf, ibuf, fft, border
 pointer	prc1, prc2, prl1, prl2, przero, prxslope, pryslope
 real	rxlag, rylag
-int	rg_xstati(), rg_border(), rg_szfft()
+int	rg_xstati(), rg_szfft()
+long	rg_xstatl(), rg_border(), lint()
 pointer	rg_xstatp(), rg_ximget()
 real	rg_xstatr()
 
@@ -545,8 +565,10 @@ define	nextregion_	11
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (coeff, max (GS_SAVECOEFF+6, 9), TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = max (GS_SAVECOEFF+6, 9)
+	call salloc (coeff, sz_val, TY_REAL)
 
 	# Check for number of regions.
 	if (i > rg_xstati (xc, NREGIONS)) {
@@ -576,10 +598,10 @@ begin
 	pryslope = rg_xstatp (xc, RYSLOPE)
 
 	# Get the reference subraster region.
-	rc1 = max (1, min (int (nrimcols), Memi[prc1+i-1]))
-	rc2 = min (int (nrimcols), max (1, Memi[prc2+i-1]))
-	rl1 = max (1, min (int (nrimlines), Memi[prl1+i-1]))
-	rl2 = min (int (nrimlines), max (1, Memi[prl2+i-1]))
+	rc1 = max (1, min (nrimcols, Meml[prc1+i-1]))
+	rc2 = min (nrimcols, max (1, Meml[prc2+i-1]))
+	rl1 = max (1, min (nrimlines, Meml[prl1+i-1]))
+	rl2 = min (nrimlines, max (1, Meml[prl2+i-1]))
 	nrcols = rc2 - rc1 + 1
 	nrlines = rl2 - rl1 + 1
 
@@ -589,20 +611,20 @@ begin
 	    call eprintf (
 		"Reference section: %s[%d:%d,%d:%d] is off image.\n")
 		call pargstr (Memc[str])
-		call pargi (rc1)
-		call pargi (rc2)
-		call pargi (rl1)
-		call pargi (rl2)
+		call pargl (rc1)
+		call pargl (rc2)
+		call pargl (rl1)
+		call pargl (rl2)
 	    stat = ERR
 	    goto nextregion_
 	}
 
 	# Check the window sizes.
-	xwindow = rg_xstati (xc, XWINDOW)
+	xwindow = rg_xstatl (xc, XWINDOW)
 	if (nrlines == 1)
 	    ywindow = 1
 	else
-	    ywindow = rg_xstati (xc, YWINDOW)
+	    ywindow = rg_xstatl (xc, YWINDOW)
 
 	# Go to the next region if the reference region has too few points.
 	if ((nrcols < xwindow) || (IM_NDIM(im1) == 2 && nrlines < ywindow)) {
@@ -610,10 +632,10 @@ begin
 	    call eprintf (
 		"Reference section: %s[%d:%d,%d:%d] has too few points.\n")
 		call pargstr (Memc[str])
-		call pargi (rc1)
-		call pargi (rc2)
-		call pargi (rl1)
-		call pargi (rl2)
+		call pargl (rc1)
+		call pargl (rc2)
+		call pargl (rl1)
+		call pargl (rl2)
 	    stat = ERR
 	    goto nextregion_
 	}
@@ -628,11 +650,11 @@ begin
 	    else
 	        ylag = rylag - (rl1 + rl2) / 2.0
 	} else {
-	    xlag = rg_xstati (xc, XLAG)
+	    xlag = rg_xstatl (xc, XLAG)
 	    if (ywindow == 1)
 		ylag = 0
 	    else
-	        ylag = rg_xstati (xc, YLAG)
+	        ylag = rg_xstatl (xc, YLAG)
 	}
 
 	# Get the input image subraster regions.
@@ -649,10 +671,10 @@ begin
 	    call eprintf (
 		"Image section: %s[%d:%d,%d:%d] is off image.\n")
 		call pargstr (Memc[str])
-		call pargi (c1)
-		call pargi (c2)
-		call pargi (l1)
-		call pargi (l2)
+		call pargl (c1)
+		call pargl (c2)
+		call pargl (l1)
+		call pargl (l2)
 	    stat = ERR
 	    goto nextregion_
 	}
@@ -663,10 +685,10 @@ begin
 	    call eprintf (
 		"Image section: %s[%d:%d,%d:%d] has too few points.\n")
 		call pargstr (Memc[str])
-		call pargi (c1)
-		call pargi (c2)
-		call pargi (l1)
-		call pargi (l2)
+		call pargl (c1)
+		call pargl (c2)
+		call pargl (l1)
+		call pargl (l2)
 	    stat = ERR
 	    goto nextregion_
 	}
@@ -819,10 +841,11 @@ end
 pointer procedure rg_ximget (im, c1, c2, l1, l2)
 
 pointer	im		#I pointer to the iraf image
-int	c1, c2		#I column limits in the input image
-int	l1, l2		#I line limits in the input image
+long	c1, c2		#I column limits in the input image
+long	l1, l2		#I line limits in the input image
 
-int	i, ncols, nlines, npts
+long	i
+size_t	ncols, nlines, npts
 pointer	ptr, index, buf
 pointer	imgs1r(), imgs2r()
 
@@ -851,10 +874,11 @@ end
 procedure rg_xlaplace (data, nx, ny, rho)
 
 real	data[nx,ARB]		#I the input array
-int	nx, ny			#I the size of the input/output data array
+size_t	nx, ny			#I the size of the input/output data array
 real	rho			#I the pixel to pixel correlation factor
 
-int	i, inline, outline, nxk, nyk, nxc
+long	i, inline, outline
+size_t	nxk, nyk, nxc
 pointer	sp, lineptrs, ptr
 real	rhosq, kernel[3,3]
 data	nxk /3/, nyk /3/
@@ -878,19 +902,20 @@ begin
 
 	# Allocate working space.
 	nxc = nx + 2 * (nxk / 2)
-	do i = 1, nyk
-	    call salloc (Memi[lineptrs+i-1], nxc, TY_REAL) 
+	do i = 1, nyk {
+	    call salloc (Memp[lineptrs+i-1], nxc, TY_REAL) 
+	}
 
 	inline = 1 - nyk / 2
 	do i = 1, nyk - 1 {
 	    if (inline < 1) {
-	        call amovr (data[1,1], Memr[Memi[lineptrs+i]+nxk/2], nx)
-	        Memr[Memi[lineptrs+i]] = data[1,1]
-	        Memr[Memi[lineptrs+i]+nxc-1] = data[nx,1]
+	        call amovr (data[1,1], Memr[Memp[lineptrs+i]+nxk/2], nx)
+	        Memr[Memp[lineptrs+i]] = data[1,1]
+	        Memr[Memp[lineptrs+i]+nxc-1] = data[nx,1]
 	    } else {
-	        call amovr (data[1,i-1], Memr[Memi[lineptrs+i]+nxk/2], nx)
-	        Memr[Memi[lineptrs+i]] = data[1,i-1]
-	        Memr[Memi[lineptrs+i]+nxc-1] = data[nx,i-1]
+	        call amovr (data[1,i-1], Memr[Memp[lineptrs+i]+nxk/2], nx)
+	        Memr[Memp[lineptrs+i]] = data[1,i-1]
+	        Memr[Memp[lineptrs+i]+nxc-1] = data[nx,i-1]
 	    }
 	    inline = inline + 1
 	}
@@ -899,28 +924,28 @@ begin
 	do outline = 1, ny {
 
 	    # Scroll the input buffers
-	    ptr = Memi[lineptrs] 
+	    ptr = Memp[lineptrs] 
 	    do i = 1, nyk - 1
-		Memi[lineptrs+i-1] = Memi[lineptrs+i]
-	    Memi[lineptrs+nyk-1] = ptr 
+		Memp[lineptrs+i-1] = Memp[lineptrs+i]
+	    Memp[lineptrs+nyk-1] = ptr 
 
 	    # Read in new image line
 	    if (inline > ny) {
-		call amovr (data[1,ny], Memr[Memi[lineptrs+nyk-1]+nxk/2],
+		call amovr (data[1,ny], Memr[Memp[lineptrs+nyk-1]+nxk/2],
 		    nx)
-	        Memr[Memi[lineptrs+nyk-1]] = data[1,ny]
-	        Memr[Memi[lineptrs+nyk-1]+nxc-1] = data[nx,ny]
+	        Memr[Memp[lineptrs+nyk-1]] = data[1,ny]
+	        Memr[Memp[lineptrs+nyk-1]+nxc-1] = data[nx,ny]
 	    } else {
-		call amovr (data[1,inline], Memr[Memi[lineptrs+nyk-1]+nxk/2],
+		call amovr (data[1,inline], Memr[Memp[lineptrs+nyk-1]+nxk/2],
 		    nx)
-	        Memr[Memi[lineptrs+nyk-1]] = data[1,inline]
-	        Memr[Memi[lineptrs+nyk-1]+nxc-1] = data[nx,inline]
+	        Memr[Memp[lineptrs+nyk-1]] = data[1,inline]
+	        Memr[Memp[lineptrs+nyk-1]+nxc-1] = data[nx,inline]
 	    }
 
 	    # Generate output image line
 	    call aclrr (data[1,outline], nx)
 	    do i = 1, nyk
-		call acnvr (Memr[Memi[lineptrs+i-1]], data[1,outline], nx,
+		call acnvr (Memr[Memp[lineptrs+i-1]], data[1,outline], nx,
 		    kernel[1,i], nxk)
 
 	    inline = inline + 1
@@ -938,13 +963,13 @@ procedure rg_xconv (ref, nrcols, nrlines, image, ncols, nlines, xcor, xwindow,
 	ywindow)
 
 real	ref[nrcols,nrlines]	#I the input reference subraster
-int	nrcols, nrlines		#I size of the reference subraster
+size_t	nrcols, nrlines		#I size of the reference subraster
 real	image[ncols,nlines]	#I the input image subraster
-int	ncols, nlines		#I size of the image subraster
+size_t	ncols, nlines		#I size of the image subraster
 real	xcor[xwindow,ywindow]	#O the output cross-correlation function
-int	xwindow, ywindow	#I size of the cross-correlation function
+size_t	xwindow, ywindow	#I size of the cross-correlation function
 
-int	lagx, lagy, i, j
+long	lagx, lagy, i, j
 real	meanr, facr, meani, faci, sum
 real	asumr()
 #real	cxmin, cxmax
@@ -994,13 +1019,13 @@ procedure rg_xdiff (ref, nrcols, nrlines, image, ncols, nlines, xcor, xwindow,
 	ywindow)
 
 real	ref[nrcols,nrlines]	#I reference subraste
-int	nrcols, nrlines		#I size of the reference subraster
+size_t	nrcols, nrlines		#I size of the reference subraster
 real	image[ncols,nlines]	#I image subraster
-int	ncols, nlines		#I size of image subraster
+size_t	ncols, nlines		#I size of image subraster
 real	xcor[xwindow,ywindow]	#O crosscorrelation function
-int	xwindow, ywindow	#I size of correlation function
+size_t	xwindow, ywindow	#I size of correlation function
 
-int	lagx, lagy, i, j
+long	lagx, lagy, i, j
 real	meanr, meani, sum, cormin, cormax
 real	asumr()
 
