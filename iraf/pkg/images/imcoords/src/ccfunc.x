@@ -497,7 +497,6 @@ char    etaname[ARB]    #I the wcs eta correction attribute name
 int     xiaxis          #I the xi axis number
 int     etaaxis         #I the eta axis number
 
-size_t	sz_val
 int     function, xxorder, xyorder, xxterms, yxorder, yyorder, yxterms
 int     ier
 size_t	nx, ny, npix

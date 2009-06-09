@@ -118,6 +118,7 @@ pointer	im1		#I pointer to input image
 int	newref		#I new reference image ?
 
 size_t	sz_val
+long	c_0
 int	i, nregions
 size_t	nrcols, nrlines, nrpcols, nrplines, nborder
 long	nrimcols, nrimlines, rc1, rc2, rl1, rl2
@@ -136,6 +137,8 @@ real	rg_pg10f(), rg_pg20f()
 define	nextimage_	11
 
 begin
+	c_0 = 0
+
 	# Assemble the PSF data by looping over the regions list.
 	nregions = rg_pstati (pm, NREGIONS)
 	if (nregions <= 0)
@@ -318,11 +321,11 @@ begin
 	# the size of the reference subraster, the window size and
 	# the fact that the FFT must be a power of 2.
 
-	nxfft = rg_szfft (nrcols, 0)
+	nxfft = rg_szfft (nrcols, c_0)
 	if (nrlines == 1)
 	    nyfft = 1
 	else
-	    nyfft = rg_szfft (nrlines, 0)
+	    nyfft = rg_szfft (nrlines, c_0)
 	call rg_psetl (pm, NXFFT, nxfft)
 	call rg_psetl (pm, NYFFT, nyfft)
 
@@ -459,7 +462,7 @@ pointer	impsf		#I pointer to the input image psf
 int	newref		#I new reference image
 
 size_t	sz_val
-long	c_1
+long	c_1, c_0
 long	nrcols, nrlines, nxfft, nyfft
 pointer	sp, dim, rbuf, ibuf, imfft, fft, reffft
 int	rg_szfft()
@@ -467,6 +470,7 @@ pointer	rg_pgdata(), rg_pstatp()
 real	rg_pstatr(), rg_pg2norm(), rg_pg1norm()
 
 begin
+	c_0 = 0
 	c_1 = 1
 
 	call smark (sp)
@@ -490,11 +494,11 @@ begin
 	ibuf = rg_pgdata (impsf, c_1, nrcols, c_1, nrlines)
 
 	# Compute the size for the FFT buffers.
- 	nxfft = rg_szfft (nrcols, 0)
+ 	nxfft = rg_szfft (nrcols, c_0)
         if (nrlines == 1)
             nyfft = 1
         else
-            nyfft = rg_szfft (nrlines, 0)
+            nyfft = rg_szfft (nrlines, c_0)
         call rg_psetl (pm, NXFFT, nxfft)
         call rg_psetl (pm, NYFFT, nyfft)
 

@@ -333,7 +333,6 @@ real    xstart, ystart			#I initial position
 long	boxsize				#I width of the centering box
 real    xcntr, ycntr			#O computed center
 
-size_t	sz_val
 long    x1, x2, y1, y2, ncols, nrows, half_box
 int	try
 size_t	nx, ny

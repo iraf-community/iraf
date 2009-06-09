@@ -138,7 +138,6 @@ real	kernel[nxk,nyk]		#I the convolution kernel
 int	skip[nxk,nyk]		#I the skip array
 size_t	nxk, nyk		#I dimensions of the kernel
 
-size_t	sz_val
 long	l_val
 long	i, index, outline
 long	col1, col2, inline
