@@ -179,6 +179,28 @@ int MXUMSK ( void );
 #define	ZFUNC8		zfunc8_
 #define	ZFUNC9		zfunc9_
 #define	ZFUNCA		zfunca_
+#define	ZFNCL0		zfncl0_
+#define	ZFNCL1		zfncl1_
+#define	ZFNCL2		zfncl2_
+#define	ZFNCL3		zfncl3_
+#define	ZFNCL4		zfncl4_
+#define	ZFNCL5		zfncl5_
+#define	ZFNCL6		zfncl6_
+#define	ZFNCL7		zfncl7_
+#define	ZFNCL8		zfncl8_
+#define	ZFNCL9		zfncl9_
+#define	ZFNCLA		zfncla_
+#define	ZFNCP0		zfncp0_
+#define	ZFNCP1		zfncp1_
+#define	ZFNCP2		zfncp2_
+#define	ZFNCP3		zfncp3_
+#define	ZFNCP4		zfncp4_
+#define	ZFNCP5		zfncp5_
+#define	ZFNCP6		zfncp6_
+#define	ZFNCP7		zfncp7_
+#define	ZFNCP8		zfncp8_
+#define	ZFNCP9		zfncp9_
+#define	ZFNCPA		zfncpa_
 #define	ZFUTIM		zfutim_
 #define	ZFXDIR		zfxdir_
 #define	ZGCMDL		zgcmdl_
@@ -419,6 +441,28 @@ extern XINT ZFUNC7 ( XPOINTER *, void *, void *, void *, void *, void *, void *,
 extern XINT ZFUNC8 ( XPOINTER *, void *, void *, void *, void *, void *, void *, void *, void * );
 extern XINT ZFUNC9 ( XPOINTER *, void *, void *, void *, void *, void *, void *, void *, void *, void * );
 extern XINT ZFUNCA ( XPOINTER *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void * );
+extern XLONG ZFNCL0 ( XPOINTER * );
+extern XLONG ZFNCL1 ( XPOINTER *, void * );
+extern XLONG ZFNCL2 ( XPOINTER *, void *, void * );
+extern XLONG ZFNCL3 ( XPOINTER *, void *, void *, void * );
+extern XLONG ZFNCL4 ( XPOINTER *, void *, void *, void *, void * );
+extern XLONG ZFNCL5 ( XPOINTER *, void *, void *, void *, void *, void * );
+extern XLONG ZFNCL6 ( XPOINTER *, void *, void *, void *, void *, void *, void * );
+extern XLONG ZFNCL7 ( XPOINTER *, void *, void *, void *, void *, void *, void *, void * );
+extern XLONG ZFNCL8 ( XPOINTER *, void *, void *, void *, void *, void *, void *, void *, void * );
+extern XLONG ZFNCL9 ( XPOINTER *, void *, void *, void *, void *, void *, void *, void *, void *, void * );
+extern XLONG ZFNCLA ( XPOINTER *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void * );
+extern XPOINTER ZFNCP0 ( XPOINTER * );
+extern XPOINTER ZFNCP1 ( XPOINTER *, void * );
+extern XPOINTER ZFNCP2 ( XPOINTER *, void *, void * );
+extern XPOINTER ZFNCP3 ( XPOINTER *, void *, void *, void * );
+extern XPOINTER ZFNCP4 ( XPOINTER *, void *, void *, void *, void * );
+extern XPOINTER ZFNCP5 ( XPOINTER *, void *, void *, void *, void *, void * );
+extern XPOINTER ZFNCP6 ( XPOINTER *, void *, void *, void *, void *, void *, void * );
+extern XPOINTER ZFNCP7 ( XPOINTER *, void *, void *, void *, void *, void *, void *, void * );
+extern XPOINTER ZFNCP8 ( XPOINTER *, void *, void *, void *, void *, void *, void *, void *, void * );
+extern XPOINTER ZFNCP9 ( XPOINTER *, void *, void *, void *, void *, void *, void *, void *, void *, void * );
+extern XPOINTER ZFNCPA ( XPOINTER *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void * );
 extern int ZFUTIM ( PKCHAR *, XLONG *, XLONG *, XINT * );
 extern int ZFXDIR ( XCHAR *, XCHAR *, XINT *, XINT *);
 extern int ZGCMDL ( PKCHAR *, XINT *, XINT * );

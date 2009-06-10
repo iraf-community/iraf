@@ -49,9 +49,11 @@ struct cplx {
 	float	i;
 };
 
-typedef	void  (*PFV)();
-typedef	int   (*PFU)();
-typedef	XINT  (*PFI)();
+typedef	void     (*PFV)();
+typedef	int      (*PFU)();
+typedef	XINT     (*PFI)();
+typedef	XLONG    (*PFL)();
+typedef	XPOINTER (*PFP)();
 
 /* Signal handler in IRAF SPP */
 typedef	void (*XSIGFUNC)(XINT *,void (**)());
@@ -68,12 +70,16 @@ typedef	void (*XSIGFUNC)(XINT *,void (**)());
 #define	XLONG		longint
 #define	XPOINTER	longint
 #define	XSIZE_T		longint
+#define	PFL		Q_fp
+#define	PFP		Q_fp
 #else	/* ILP64 */
 #define	XINT		integer
 #define	XBOOL		logical
 #define	XLONG		integer
 #define	XPOINTER	integer
 #define	XSIZE_T		integer
+#define	PFL		I_fp
+#define	PFP		I_fp
 #endif
 
 #else	/* ILP32 */
@@ -83,6 +89,8 @@ typedef	void (*XSIGFUNC)(XINT *,void (**)());
 #define	XLONG		integer
 #define	XPOINTER	integer
 #define	XSIZE_T		integer
+#define	PFL		I_fp
+#define	PFP		I_fp
 
 #endif
 
