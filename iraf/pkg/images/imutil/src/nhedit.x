@@ -533,11 +533,6 @@ begin
 	            call imakici (im, field, O_VALI(o), comment, pkey, baf)
 	        else
 	            call imakic (im, field, O_VALI(o), comment)
-	    case TY_LONG:
-	        if (pkey[1] != EOS && baf != 0)
-	            call imaklci (im, field, O_VALL(o), comment, pkey, baf)
-	        else
-	            call imaklc (im, field, O_VALL(o), comment)
 	    case TY_REAL:
 	        if (pkey[1] != EOS && baf != 0)
 	            call imakrci (im, field, O_VALR(o), comment, pkey, baf)
@@ -657,11 +652,6 @@ begin
 	            call imakici (im, field, O_VALI(o), comment, pkey, baf)
 	        else
 	            call imakic (im, field, O_VALI(o), comment)
-	    case TY_LONG:
-	        if (pkey[1] != EOS && baf != 0)
-	            call imaklci (im, field, O_VALL(o), comment, pkey, baf)
-	        else
-	            call imaklc (im, field, O_VALL(o), comment)
 	    case TY_REAL:
 	        if (pkey[1] != EOS && baf != 0)
 	            call imakrci (im, field, O_VALR(o), comment, pkey, baf)

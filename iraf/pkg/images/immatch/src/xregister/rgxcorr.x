@@ -283,7 +283,7 @@ pointer	sp, str, coeff, rbuf, ibuf, xcor
 pointer	prc1, prc2, prl1, prl2, przero, prxslope, pryslope, border
 real	rxlag, rylag
 int	rg_xstati()
-long	rg_xstatl(), rg_border(), lint()
+long	rg_xstatl(), rg_border()
 pointer	rg_xstatp(), rg_ximget()
 real	rg_xstatr()
 
@@ -557,7 +557,7 @@ pointer	sp, str, coeff, xcor, rbuf, ibuf, fft, border
 pointer	prc1, prc2, prl1, prl2, przero, prxslope, pryslope
 real	rxlag, rylag
 int	rg_xstati(), rg_szfft()
-long	rg_xstatl(), rg_border(), lint()
+long	rg_xstatl(), rg_border()
 pointer	rg_xstatp(), rg_ximget()
 real	rg_xstatr()
 
