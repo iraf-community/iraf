@@ -33,22 +33,26 @@ pointer	output			# output images
 int	func			# function
 int	verbose			# verbose mode
 
+size_t	sz_val
 pointer	list1, list2
 pointer	sp, image1, image2, image3, function, im1, im2
 bool	clgetb()
 int	clgwrd(), imtgetim(), imtlen(), btoi()
 pointer	imtopen(), immap()
+include	<nullptr.inc>
 
 begin
 	# Allocate working space.
 
 	call smark (sp)
-	call salloc (input, SZ_LINE, TY_CHAR)
-	call salloc (output, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (image3, SZ_FNAME, TY_CHAR)
-	call salloc (function, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (input, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (image3, sz_val, TY_CHAR)
+	call salloc (function, sz_val, TY_CHAR)
 
 	# Get image template list.
 
@@ -72,7 +76,7 @@ begin
 
 	    call xt_mkimtemp (Memc[image1], Memc[image2], Memc[image3],
 	        SZ_FNAME)
-	    im1 = immap (Memc[image1], READ_ONLY, 0)
+	    im1 = immap (Memc[image1], READ_ONLY, NULLPTR)
 	    if (IM_PIXTYPE(im1) == TY_COMPLEX) {
 		call printf ("%s is datatype complex: skipping\n")
 		call imunmap (im1)

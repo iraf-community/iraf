@@ -60,19 +60,21 @@ int	update
 int	verify
 int	show
 
+size_t	sz_val
 pointer hc
 char    outstr[LEN_CARD]
 char 	identif[LEN_CARD], dot
-int     ip, nexpr, token, add, addonly, delete, nch
+int	ip, nexpr, token, add, addonly, delete, nch, lex_type
 bool    streq()
-int	lex_type, ctotok(), he_ks_lex(), ctowrd()
+int	ctotok(), he_ks_lex(), ctowrd()
 errchk	syserr, syserrs
 
 begin
        # The default values should have been already initialized 
        # with a call fxf_ksinit().
 
-       call calloc(hc, HSZ, TY_STRUCT)
+       sz_val = HSZ
+       call calloc(hc, sz_val, TY_STRUCT)
        call  he_ksinit (hc)
 
        ip = 1
@@ -197,7 +199,8 @@ int procedure he_ks_lex (outstr)
 
 char    outstr[ARB]
 
-int	len, strlen(), strncmp()
+int	len
+int	strlen(), strncmp()
 errchk	syserr, syserrs
 
 begin
@@ -246,8 +249,9 @@ char	cmd[ARB]		#I Ksection
 int	ip			#I Current parsing pointer in ksection
 pointer	hc			#U Update the values in the FKS structure
 
+size_t	sz_val
 pointer sp, ln
-int     jp, token
+int	jp, token
 int	ctotok()
 errchk	syserr, syserrs
 
@@ -255,7 +259,8 @@ begin
 	jp = ip
 
 	call smark (sp)
-	call salloc (ln, LEN_CARD, TY_CHAR)
+	sz_val = LEN_CARD
+	call salloc (ln, sz_val, TY_CHAR)
 
 	# See if the parameter value is given as par=<value> or '+/-'
 	if (ctotok (cmd, jp, Memc[ln], LEN_CARD) == TOK_OPERATOR) {
@@ -286,7 +291,7 @@ char	outstr[ARB] 		#I Input string with value
 int	param			#I Parameter code
 pointer hc			#U Fits kernel descriptor
 
-int     ival
+int	ival
 int	strcmp()
 errchk	syserr, syserrs
 

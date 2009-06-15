@@ -10,10 +10,13 @@ define	NTYPES	7
 
 procedure t_imstack ()
 
-int	i, j, npix, pdim, lmax, lindex
+int	i, j, pdim, lmax, lindex
+size_t	npix
 int	axno[IM_MAXDIM], axval[IM_MAXDIM]
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM]
 pointer	list, sp, input, output, in, out, buf_in, buf_out, mwin, mwout
+size_t	sz_val
+long	l_val
 
 bool	envgetb()
 int	imtgetim(), imtlen()
@@ -21,11 +24,13 @@ long	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
 long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 int	mw_stati()
 pointer	imtopenp(), immap(), mw_open(), mw_openim()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (input, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
 
 	# Get the input images and the output image.
 	list = imtopenp ("images")
@@ -37,7 +42,7 @@ begin
 	while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
 
 	    i = i + 1
-	    in = immap (Memc[input], READ_ONLY, 0)
+	    in = immap (Memc[input], READ_ONLY, NULLPTR)
 
 	    # For the first input image map the output image as a copy
 	    # and increment the dimension.  Set the output line counter.
@@ -48,7 +53,9 @@ begin
 		IM_NDIM(out) = IM_NDIM(out) + 1
 		IM_LEN(out, IM_NDIM(out)) = imtlen (list)
 		npix = IM_LEN(out, 1)
-	        call amovkl (long(1), line_out, IM_MAXDIM)
+		l_val = 1
+		sz_val = IM_MAXDIM
+	        call amovkl (l_val, line_out, sz_val)
 	    }
 
 	    # Check next input image for consistency with the output image.
@@ -63,7 +70,9 @@ begin
 	    # the output image.  Switch on the output data type to optimize
 	    # IMIO.
 
-	    call amovkl (long(1), line_in, IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, line_in, sz_val)
 	    switch (IM_PIXTYPE (out)) {
 	    case TY_SHORT:
 	        while (imgnls (in, buf_in, line_in) != EOF) {
@@ -71,13 +80,13 @@ begin
 		        call error (0, "Error writing output image")
 		    call amovs (Mems[buf_in], Mems[buf_out], npix)
 		}
-	    case TY_INT:
+	    case TY_USHORT, TY_INT:
 	        while (imgnli (in, buf_in, line_in) != EOF) {
 		    if (impnli (out, buf_out, line_out) == EOF)
 		        call error (0, "Error writing output image")
 		    call amovi (Memi[buf_in], Memi[buf_out], npix)
 		}
-	    case TY_USHORT, TY_LONG:
+	    case TY_LONG:
 	        while (imgnll (in, buf_in, line_in) != EOF) {
 		    if (impnll (out, buf_out, line_out) == EOF)
 		        call error (0, "Error writing output image")
@@ -132,7 +141,7 @@ begin
 		    call mw_saxmap (mwin, axno, axval, pdim)
 		    call mw_saveim (mwin, out)
 		} else {
-		    mwout = mw_open (NULL, pdim + 1)
+		    mwout = mw_open (NULLPTR, pdim + 1)
 		    call isk_wcs (mwin, mwout, IM_NDIM(out))
 		    call mw_saveim (mwout, out)
 		    call mw_close (mwout)
@@ -159,6 +168,7 @@ procedure isk_new_image (im)
 
 pointer	im				# image descriptor
 
+size_t	sz_val
 pointer	sp, lbuf
 int	i, type_codes[NTYPES]
 bool	strne()
@@ -170,7 +180,8 @@ data	type_codes /TY_SHORT,TY_USHORT,TY_INT,TY_LONG,TY_REAL,TY_DOUBLE,
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	call clgstr ("title", Memc[lbuf], SZ_LINE)
 	if (strne (Memc[lbuf], "default") && strne (Memc[lbuf], "*"))
@@ -195,6 +206,7 @@ pointer	mwin			# input wcs descriptor
 pointer	mwout			# output wcs descriptor
 int	ndim			# the dimension of the output image
 
+size_t	sz_val
 int	i, j, nin, nout, szatstr, axno[IM_MAXDIM], axval[IM_MAXDIM]
 pointer	sp, wcs, attribute, matin, matout, rin, rout, win, wout, atstr
 int	mw_stati(), itoc(), strlen()
@@ -208,15 +220,24 @@ begin
 
 	# Allocate space for the matrices and vectors.
 	call smark (sp)
-	call salloc (wcs, SZ_FNAME, TY_CHAR)
-	call salloc (matin, nin * nin, TY_DOUBLE)
-	call salloc (matout, nout * nout, TY_DOUBLE)
-	call salloc (rin, nin, TY_DOUBLE)
-	call salloc (rout, nout, TY_DOUBLE)
-	call salloc (win, nin, TY_DOUBLE)
-	call salloc (wout, nout, TY_DOUBLE)
-	call salloc (attribute, SZ_FNAME, TY_CHAR)
-	call malloc (atstr, szatstr, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (wcs, sz_val, TY_CHAR)
+	sz_val = nin * nin
+	call salloc (matin, sz_val, TY_DOUBLE)
+	sz_val = nout * nout
+	call salloc (matout, sz_val, TY_DOUBLE)
+	sz_val = nin
+	call salloc (rin, sz_val, TY_DOUBLE)
+	sz_val = nout
+	call salloc (rout, sz_val, TY_DOUBLE)
+	sz_val = nin
+	call salloc (win, sz_val, TY_DOUBLE)
+	sz_val = nout
+	call salloc (wout, sz_val, TY_DOUBLE)
+	sz_val = SZ_FNAME
+	call salloc (attribute, sz_val, TY_CHAR)
+	sz_val = szatstr
+	call malloc (atstr, sz_val, TY_CHAR)
 
 	# Set the system name.
 	call mw_gsystem (mwin, Memc[wcs], SZ_FNAME)
@@ -225,18 +246,24 @@ begin
 
 	# Set the lterm.
 	call mw_gltermd (mwin, Memd[matin], Memd[rin], nin)
-	call aclrd (Memd[rout], nout)
-	call amovd (Memd[rin], Memd[rout], nin)
+	sz_val = nout
+	call aclrd (Memd[rout], sz_val)
+	sz_val = nin
+	call amovd (Memd[rin], Memd[rout], sz_val)
 	call mw_mkidmd [Memd[matout], nout)
 	call isk_mcopy (Memd[matin], nin, Memd[matout], nout)
 	call mw_sltermd (mwout, Memd[matout], Memd[rout], nout)
 
 	# Set the wterm.
 	call mw_gwtermd (mwin, Memd[rin], Memd[win], Memd[matin], nin)
-	call aclrd (Memd[rout], nout)
-	call amovd (Memd[rin], Memd[rout], nin)
-	call aclrd (Memd[wout], nout)
-	call amovd (Memd[win], Memd[wout], nin)
+	sz_val = nout
+	call aclrd (Memd[rout], sz_val)
+	sz_val = nin
+	call amovd (Memd[rin], Memd[rout], sz_val)
+	sz_val = nout
+	call aclrd (Memd[wout], sz_val)
+	sz_val = nin
+	call amovd (Memd[win], Memd[wout], sz_val)
 	call mw_mkidmd [Memd[matout], nout)
 	call isk_mcopy (Memd[matin], nin, Memd[matout], nout)
 	call mw_swtermd (mwout, Memd[rout], Memd[wout], Memd[matout], nout)
@@ -264,7 +291,8 @@ begin
 		    if (strlen (Memc[atstr]) < szatstr)
 			break
 		    szatstr = szatstr + SZ_LINE
-		    call realloc (atstr, szatstr, TY_CHAR)
+		    sz_val = szatstr
+		    call realloc (atstr, sz_val, TY_CHAR)
 		}
 		if (Memc[atstr] == EOS)
 		    break

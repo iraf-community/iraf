@@ -31,27 +31,30 @@ pointer image1                  # Input image
 pointer image2                  # Output image
 pointer imtemp                  # Temporary file
 
-int     intype, outtype, verbose
+size_t	sz_val
+int	intype, outtype, verbose
 pointer list1, list2, im1, im2, sp, instr, outstr, imstr
 bool    clgetb()
-int     imtgetim(), imtlen(), clgwrd(), chp_gettype(), btoi()
+int	imtgetim(), imtlen(), clgwrd(), chp_gettype(), btoi()
 pointer imtopen(), immap()
-
 errchk	xt_mkimtemp, immap, imunmap, xt_delimtemp, chp_pixtype
+include	<nullptr.inc>
 
 begin
         call fseti (STDOUT, F_FLUSHNL, YES)
 
         # Allocate temporary space.
         call smark (sp)
-        call salloc (imtlist1, SZ_FNAME, TY_CHAR)
-        call salloc (imtlist2, SZ_FNAME, TY_CHAR)
-        call salloc (image1, SZ_FNAME, TY_CHAR)
-        call salloc (image2, SZ_FNAME, TY_CHAR)
-        call salloc (imtemp, SZ_FNAME, TY_CHAR)
-        call salloc (instr, SZ_LINE, TY_CHAR)
-        call salloc (outstr, SZ_LINE, TY_CHAR)
-        call salloc (imstr, SZ_LINE, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (imtlist1, sz_val, TY_CHAR)
+        call salloc (imtlist2, sz_val, TY_CHAR)
+        call salloc (image1, sz_val, TY_CHAR)
+        call salloc (image2, sz_val, TY_CHAR)
+        call salloc (imtemp, sz_val, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (instr, sz_val, TY_CHAR)
+        call salloc (outstr, sz_val, TY_CHAR)
+        call salloc (imstr, sz_val, TY_CHAR)
 
         # Get task parameters.
         call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -79,7 +82,7 @@ begin
                 # Open the input and output images.
                 call xt_mkimtemp (Memc[image1], Memc[image2], Memc[imtemp],
                     SZ_FNAME)
-                im1 = immap (Memc[image1], READ_ONLY, 0)
+                im1 = immap (Memc[image1], READ_ONLY, NULLPTR)
                 if (intype == CHP_ALL || IM_PIXTYPE(im1) == chp_gettype(intype))
                     im2 = immap (Memc[image2], NEW_COPY, im1)
                 else
@@ -136,9 +139,11 @@ procedure chp_pixtype (im1, im2, outtype)
 
 pointer im1             # pointer to the input image
 pointer im2             # pointer to the output image
-int     outtype         # output pixel type
+int	outtype         # output pixel type
 
-int     ncols
+long	l_val
+size_t	sz_val
+size_t	ncols
 long    v1[IM_MAXDIM], v2[IM_MAXDIM]
 pointer buf1, buf2
 long    imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
@@ -150,13 +155,15 @@ errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
 begin
         ncols = IM_LEN(im1, 1)
         IM_PIXTYPE(im2) = outtype
-        call amovkl (long(1), v1, IM_MAXDIM)
-        call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+        call amovkl (l_val, v1, sz_val)
+        call amovkl (l_val, v2, sz_val)
 
         switch (outtype) {
         case TY_USHORT:
-            while (impnll(im2,buf2,v2) != EOF && imgnll(im1,buf1,v1) != EOF)
-                call amovl (Meml[buf1], Meml[buf2], ncols)
+            while (impnli(im2,buf2,v2) != EOF && imgnli(im1,buf1,v1) != EOF)
+                call amovi (Memi[buf1], Memi[buf2], ncols)
         case TY_SHORT:
             while (impnls(im2,buf2,v2) != EOF && imgnls(im1,buf1,v1) != EOF)
                 call amovs (Mems[buf1], Mems[buf2], ncols)
@@ -183,7 +190,7 @@ end
 
 int procedure chp_gettype (intype)
 
-int     intype          # input pixel type
+int	intype          # input pixel type
 
 begin
         switch (intype) {
@@ -211,9 +218,9 @@ end
 
 procedure chp_enctype (pixtype, str, maxch)
 
-int     pixtype         # pixel type
+int	pixtype         # pixel type
 char    str[ARB]        # string for encoding pixel type
-int     maxch           # maximum characters
+int	maxch           # maximum characters
 
 begin
         switch (pixtype) {

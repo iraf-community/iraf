@@ -19,8 +19,12 @@ int	rescale					# Option for rescaling
 real	constant				# Replacement for zero divide
 bool	verbose					# Verbose output?
 
+size_t	sz_val
+long	l_val
 char	str[SZ_LINE]
-int	i, npix, ntotal
+int	i
+long	j, ntotal
+size_t	npix
 real	sum1, sum2, sum3, scale
 long	line1[IM_MAXDIM], line2[IM_MAXDIM], line3[IM_MAXDIM]
 pointer	im1, im2, im3, data1, data2, data3
@@ -31,15 +35,16 @@ bool	clgetb(), strne()
 real	clgetr(), asumr(), ima_efncr()
 pointer	immap()
 extern	ima_efncr
+include	<nullptr.inc>
 
 common	/imadcomr/ constant
 
 begin
 	# Access images and set parameters.
 	call clgstr ("numerator", image1, SZ_FNAME)
-	im1 = immap (image1, READ_ONLY, 0)
+	im1 = immap (image1, READ_ONLY, NULLPTR)
 	call clgstr ("denominator", image2, SZ_FNAME)
-	im2 = immap (image2, READ_ONLY, 0)
+	im2 = immap (image2, READ_ONLY, NULLPTR)
 	call clgstr ("resultant", image3, SZ_FNAME)
 	im3 = immap (image3, NEW_COPY, im1)
 
@@ -63,15 +68,17 @@ begin
 	sum1 = 0.
 	sum2 = 0.
 	sum3 = 0.
-	call amovkl (long(1), line1, IM_MAXDIM)
-	call amovkl (long(1), line2, IM_MAXDIM)
-	call amovkl (long(1), line3, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, line1, sz_val)
+	call amovkl (l_val, line2, sz_val)
+	call amovkl (l_val, line3, sz_val)
 
 	# Loop through the images doing the division.
 	# Accumulate the sums for mean values.
 	while (impnlr (im3, data3, line3) != EOF) {
-	    i = imgnlr (im1, data1, line1)
-	    i = imgnlr (im2, data2, line2)
+	    j = imgnlr (im1, data1, line1)
+	    j = imgnlr (im2, data2, line2)
 	    call advzr (Memr[data1], Memr[data2], Memr[data3], npix, ima_efncr)
 	    sum1 = sum1 + asumr (Memr[data1], npix)
 	    sum2 = sum2 + asumr (Memr[data2], npix)
@@ -119,13 +126,15 @@ begin
 	}
 
 	# Open image read_write and initialize line counters.
-	im1 = immap (image3, READ_WRITE, 0)
-	call amovkl (long(1), line1, IM_MAXDIM)
-	call amovkl (long(1), line2, IM_MAXDIM)
+	im1 = immap (image3, READ_WRITE, NULLPTR)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, line1, sz_val)
+	call amovkl (l_val, line2, sz_val)
 
 	# Loop through the image rescaling the image lines.
 	while (imgnlr (im1, data1, line1) != EOF) {
-	    i = impnlr (im1, data2, line2)
+	    j = impnlr (im1, data2, line2)
 	    call amulkr (Memr[data1], scale, Memr[data2], npix)
 	}
 

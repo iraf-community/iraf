@@ -20,15 +20,18 @@ procedure t_imheader()
 int	nimages, errcode
 bool	long_format, user_fields
 pointer	list, sp, template, image, errmsg
+size_t	sz_val
 int	imtgetim(), imtlen(), clgeti(), errget()
 pointer	imtopen()
 bool	clgetb()
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
-	call salloc (template, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
+	call salloc (template, sz_val, TY_CHAR)
 
 	if (clgeti ("$nargs") == 0)
 	    call clgstr ("imlist", Memc[template], SZ_LINE)
@@ -73,6 +76,7 @@ char	image[ARB]
 bool	long_format
 bool	user_fields
 
+size_t	sz_val
 int	hi, i
 bool	pixfile_ok
 pointer	im, sp, ctime, mtime, ldim, pdim, title, lbuf, ip
@@ -80,18 +84,22 @@ int	gstrcpy(), stropen(), getline(), strlen(), stridxs(), imstati()
 errchk	im_fmt_dimensions, immap, access, stropen, getline
 define	done_ 91
 pointer	immap()
+include	<nullptr.inc>
 
 begin
 	# Allocate automatic buffers.
 	call smark (sp)
-	call salloc (ctime, SZ_TIME,   TY_CHAR)
-	call salloc (mtime, SZ_TIME,   TY_CHAR)
-	call salloc (ldim,  SZ_DIMSTR, TY_CHAR)
-	call salloc (pdim,  SZ_DIMSTR, TY_CHAR)
-	call salloc (title, SZ_LINE,   TY_CHAR)
-	call salloc (lbuf,  SZ_LINE,   TY_CHAR)
+	sz_val = SZ_TIME
+	call salloc (ctime, sz_val,   TY_CHAR)
+	call salloc (mtime, sz_val,   TY_CHAR)
+	sz_val = SZ_DIMSTR
+	call salloc (ldim, sz_val, TY_CHAR)
+	call salloc (pdim, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val,   TY_CHAR)
+	call salloc (lbuf, sz_val,   TY_CHAR)
 
-	im = immap (image, READ_ONLY, 0)
+	im = immap (image, READ_ONLY, NULLPTR)
 
 	# Format subscript strings, date strings, mininum and maximum
 	# pixel values.
@@ -196,8 +204,9 @@ procedure im_fmt_dimensions (im, outstr, maxch, len_axes)
 
 pointer	im
 char	outstr[ARB]
-int	maxch, i, fd, stropen()
+int	maxch, i, fd
 long	len_axes[ARB]
+int	stropen()
 errchk	stropen, fprintf, pargl
 
 begin
@@ -267,6 +276,7 @@ procedure imh_print_user_area (out, im)
 int	out			# output file
 pointer	im			# image descriptor
 
+size_t	sz_val
 pointer	sp, lbuf, ip
 int	in, ncols, min_lenuserarea, i
 int	stropen(), getline(), envgeti()
@@ -274,7 +284,8 @@ errchk	stropen, envgeti, getline, putci, putline
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Open user area in header.
 	min_lenuserarea = (LEN_IMDES + IM_LENHDRMEM(im) - IMU) * SZ_STRUCT - 1

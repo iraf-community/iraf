@@ -16,8 +16,8 @@ define	IST_MODE	Memr[P2R($1+14)]
 define	IST_STDDEV	Memr[P2R($1+15)]
 define	IST_SKEW	Memr[P2R($1+16)]
 define	IST_KURTOSIS	Memr[P2R($1+17)]
-define	IST_NPIX	Memi[P2I($1+18)]
-define	IST_SW		Memi[P2I($1+19)]
+define	IST_NPIX	Memz[P2Z($1+18)]
+define	IST_SW		Memp[$1+19]
 
 define	LEN_NSWITCHES	8
 

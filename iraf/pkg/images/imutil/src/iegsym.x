@@ -11,8 +11,8 @@ include	"gettok.h"
 
 # Expression database symbol.
 define	LEN_SYM		2
-define	SYM_TEXT	Memi[$1]
-define	SYM_NARGS	Memi[$1+1]
+define	SYM_TEXT	Memi[P2I($1)]
+define	SYM_NARGS	Memi[P2I($1+1)]
 
 
 

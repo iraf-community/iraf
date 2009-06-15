@@ -4,16 +4,16 @@
 
 define	LEN_IRSTRUCT	35
 
-define 	IT_NCOLS	Memi[P2I($1)]	# x length of single subraster
-define	IT_NROWS	Memi[P2I($1+1)]	# y length of a single subrasters
-define	IT_NXOVERLAP	Memi[P2I($1+2)]	# x overlap between subrasters
-define	IT_NYOVERLAP	Memi[P2I($1+3)]	# y overlap between subrasters
-define	IT_NXSUB	Memi[P2I($1+4)]	# number of subrasters in x dimension
-define	IT_NYSUB	Memi[P2I($1+5)]	# number of subrasters in y dimension
-define	IT_NXRSUB	Memi[P2I($1+6)]	# x index of reference subraster
-define	IT_NYRSUB	Memi[P2I($1+7)]	# y index of reference subraster
-define	IT_XREF		Memi[P2I($1+8)]	# x offset of reference subraster
-define	IT_YREF		Memi[P2I($1+9)]	# y offset of reference subraster
+define 	IT_NCOLS	Memz[P2Z($1)]	# x length of single subraster
+define	IT_NROWS	Memz[P2Z($1+1)]	# y length of a single subrasters
+define	IT_NXOVERLAP	Meml[P2L($1+2)]	# x overlap between subrasters
+define	IT_NYOVERLAP	Meml[P2L($1+3)]	# y overlap between subrasters
+define	IT_NXSUB	Memz[P2Z($1+4)]	# number of subrasters in x dimension
+define	IT_NYSUB	Memz[P2Z($1+5)]	# number of subrasters in y dimension
+define	IT_NXRSUB	Meml[P2L($1+6)]	# x index of reference subraster
+define	IT_NYRSUB	Meml[P2L($1+7)]	# y index of reference subraster
+define	IT_XREF		Meml[P2L($1+8)]	# x offset of reference subraster
+define	IT_YREF		Meml[P2L($1+9)]	# y offset of reference subraster
 define	IT_CORNER	Memi[P2I($1+10)]	# starting corner for insertion
 define	IT_ORDER	Memi[P2I($1+11)]	# row or column insertion
 define	IT_RASTER	Memi[P2I($1+12)]	# raster order

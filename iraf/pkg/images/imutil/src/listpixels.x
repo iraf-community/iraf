@@ -13,15 +13,19 @@ procedure t_listpixels()
 bool	verbose
 char	image[SZ_FNAME], wcs[SZ_FNAME]
 double	incoords[IM_MAXDIM], outcoords[IM_MAXDIM]
-int	i, j, npix, ndim, wcsndim, laxis1, fmtstat
+long	k, npix
+int	i, j, ndim, wcsndim, laxis1, fmtstat
 int	paxno[IM_MAXDIM], laxno[IM_MAXDIM]
 long	v[IM_MAXDIM], vcoords[IM_MAXDIM]
 pointer	im, line, imlist, mw, ct, fmtptrs[IM_MAXDIM]
+size_t	sz_val
+long	l_val
 
 bool	clgetb()
 int	imtgetim(), mw_stati(), clscan(), nscan()
 long	imgnlr(), imgnld(), imgnlx()
 pointer	imtopenp(), immap(), mw_openim(), mw_sctran()
+include	<nullptr.inc>
 
 begin
 	# Get the image list and the wcs.
@@ -40,7 +44,7 @@ begin
 	    }
 
 	    # Open the input image.
-	    im = immap (image, READ_ONLY, 0)
+	    im = immap (image, READ_ONLY, NULLPTR)
 	    ndim = IM_NDIM(im)
 	    npix = IM_LEN(im,1)
 
@@ -72,8 +76,10 @@ begin
 	    }
 
 	    # Initialize the v vectors.
-	    call amovkl (long (1), v, IM_MAXDIM)
-	    call amovkl (long (1), vcoords, IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, v, sz_val)
+	    call amovkl (l_val, vcoords, sz_val)
 
 	    # Initialize the coordinates.
 	    laxis1 = 0
@@ -109,7 +115,8 @@ begin
 	    # Set the format strings for the logical axes.
 	    fmtstat = clscan ("formats")
 	    do i = 1, ndim {
-		call malloc (fmtptrs[i], SZ_FNAME, TY_CHAR)
+		sz_val = SZ_FNAME
+		call malloc (fmtptrs[i], sz_val, TY_CHAR)
 		if (fmtstat != EOF)
 		    call gargwrd (Memc[fmtptrs[i]], SZ_FNAME)
 		else
@@ -131,12 +138,14 @@ begin
 	    switch (IM_PIXTYPE(im)) {
 	    case TY_COMPLEX:
 		while (imgnlx (im, line, v) != EOF) {
-		    do i = 1, npix {
-			incoords[laxis1] = i
-			if (ct == NULL)
-			    call amovd (incoords, outcoords, wcsndim)
-			else
+		    do k = 1, npix {
+			incoords[laxis1] = k
+			if (ct == NULL) {
+			    sz_val = wcsndim
+			    call amovd (incoords, outcoords, sz_val)
+			} else {
 			    call mw_ctrand (ct, incoords, outcoords, wcsndim)
+			}
 			do j = 1, ndim {		    # X, Y, Z, etc.
 			    call printf (Memc[fmtptrs[j]])
 			    if (laxno[j] == 0)
@@ -145,9 +154,10 @@ begin
 				call pargd (outcoords[laxno[j]])
 			}
 			call printf (" %z\n")		    # pixel value
-			    call pargx (Memx[line+i-1])
+			    call pargx (Memx[line+k-1])
 		    }
-		    call amovl (v, vcoords, IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (v, vcoords, sz_val)
 		    do i = 1, wcsndim {
 			if (paxno[i] == 0)
 			    next
@@ -156,12 +166,14 @@ begin
 		}
 	    case TY_DOUBLE:
 		while (imgnld (im, line, v) != EOF) {
-		    do i = 1, npix {
-			incoords[laxis1] = i
-			if (ct == NULL)
-			    call amovd (incoords, outcoords, wcsndim)
-			else
+		    do k = 1, npix {
+			incoords[laxis1] = k
+			if (ct == NULL) {
+			    sz_val = wcsndim
+			    call amovd (incoords, outcoords, sz_val)
+			} else {
 			    call mw_ctrand (ct, incoords, outcoords, wcsndim)
+			}
 			do j = 1, ndim {		    # X, Y, Z, etc.
 			    call printf (Memc[fmtptrs[j]])
 			    if (laxno[j] == 0)
@@ -170,9 +182,10 @@ begin
 				call pargd (outcoords[laxno[j]])
 			}
 			call printf (" %g\n")		    # pixel value
-			    call pargd (Memd[line+i-1])
+			    call pargd (Memd[line+k-1])
 		    }
-		    call amovl (v, vcoords, IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (v, vcoords, sz_val)
 		    do i = 1, wcsndim {
 			if (paxno[i] == 0)
 			    next
@@ -181,12 +194,14 @@ begin
 		}
 	    default:
 		while (imgnlr (im, line, v) != EOF) {
-		    do i = 1, npix {
-			incoords[laxis1] = i
-			if (ct == NULL)
-			    call amovd (incoords, outcoords, wcsndim)
-			else
+		    do k = 1, npix {
+			incoords[laxis1] = k
+			if (ct == NULL) {
+			    sz_val = wcsndim
+			    call amovd (incoords, outcoords, sz_val)
+			} else {
 			    call mw_ctrand (ct, incoords, outcoords, wcsndim)
+			}
 			do j = 1, ndim {		    # X, Y, Z, etc.
 			    call printf (Memc[fmtptrs[j]])
 			    if (laxno[j] == 0)
@@ -195,9 +210,10 @@ begin
 				call pargd (outcoords[laxno[j]])
 			}
 			call printf (" %g\n")		    # pixel value
-			    call pargr (Memr[line+i-1])
+			    call pargr (Memr[line+k-1])
 		    }
-		    call amovl (v, vcoords, IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (v, vcoords, sz_val)
 		    do i = 1, wcsndim {
 			if (paxno[i] == 0)
 			    next

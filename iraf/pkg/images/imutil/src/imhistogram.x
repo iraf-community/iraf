@@ -24,23 +24,30 @@ procedure t_imhistogram()
 
 long	v[IM_MAXDIM]
 real	z1, z2, dz, z1temp, z2temp, zstart
-int	npix, nbins, nbins1, nlevels, nwide, z1i, z2i, i, maxch, histtype
+size_t	npix, nbins, nbins1, nlevels, nwide
+int	z1i, z2i, maxch, histtype
+long	i
 pointer gp, im, sp, hgm, hgmr, buf, image, device, str, title, op
+size_t	sz_val
+long	l_val
 
 real	clgetr()
 pointer	immap(), gopen()
-int	clgeti(), clgwrd()
-long	imgnlr(), imgnli()
+int	clgwrd(), inint()
+long	imgnlr(), imgnli(), clgetl(), lnint()
 bool	clgetb(), fp_equalr()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_CHOICE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_CHOICE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the image name.
 	call clgstr ("image", Memc[image], SZ_LINE)
-	im = immap (Memc[image], READ_ONLY, 0)
+	im = immap (Memc[image], READ_ONLY, NULLPTR)
 	npix = IM_LEN(im,1)
 
 	# Get histogram range.
@@ -69,17 +76,17 @@ begin
 	# Get default histogram resolution.
 	dz = clgetr ("binwidth")
 	if (IS_INDEFR(dz))
-	    nbins = clgeti ("nbins")
+	    nbins = clgetl ("nbins")
 	else {
-	    nbins = nint ((z2 - z1) / dz)
+	    nbins = lnint((z2 - z1) / dz)
 	    z2 = z1 + nbins * dz
 	}
 
 	# Set the limits for integer images.
 	switch (IM_PIXTYPE(im)) {
 	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
-	    z1i = nint (z1)
-	    z2i = nint (z2)
+	    z1i = inint(z1)
+	    z2i = inint(z2)
 	    z1 = real (z1i)
 	    z2 = real (z2i)
 	}
@@ -92,8 +99,8 @@ begin
 	    switch (IM_PIXTYPE(im)) {
 	    case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
 		nlevels = z2i - z1i
-		nwide = max (1, nint (real (nlevels) / real (nbins)))
-		nbins = max (1, nint (real (nlevels) / real (nwide)))
+		nwide = max (1, lnint (real (nlevels) / real (nbins)))
+		nbins = max (1, lnint (real (nlevels) / real (nwide)))
 		z2i = z1i + nbins * nwide
 		z2 = real (z2i)
 	    }
@@ -106,9 +113,11 @@ begin
 	nbins1 = nbins + 1
 
 	# Initialize the histogram buffer and image line vector.
-	call salloc (hgm,  nbins1, TY_INT)
+	call salloc (hgm, nbins1, TY_INT)
 	call aclri  (Memi[hgm], nbins1)
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	# Read successive lines of the image and accumulate the histogram.
 
@@ -182,8 +191,10 @@ begin
 		zstart = zstart + dz
 	    }
 	} else {
-	    call salloc (device, SZ_FNAME, TY_CHAR)
-	    call salloc (title, SZ_TITLE, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (device, sz_val, TY_CHAR)
+	    sz_val = SZ_TITLE
+	    call salloc (title, sz_val, TY_CHAR)
 	    call salloc (hgmr, nbins, TY_REAL)
 	    call achtir (Memi[hgm], Memr[hgmr], nbins)
 
@@ -221,7 +232,7 @@ begin
 		call pargstr (IM_TITLE(im))
 		call pargr (z1)
 		call pargr (z2)
-		call pargi (nbins)
+		call pargz (nbins)
 		call pargr (dz)
 
 	    # Draw the plot.  Center the bins for plot_type=line.
@@ -250,10 +261,10 @@ procedure hgline (gp, ydata, npts, x1, x2)
 
 pointer	gp		# Graphics descriptor
 real	ydata[ARB]	# Y coordinates of the line endpoints
-int	npts		# Number of line endpoints
+size_t	npts		# Number of line endpoints
 real	x1, x2
 
-int	pixel
+long	pixel
 real	x, y, dx
 
 begin
@@ -289,7 +300,9 @@ end
 procedure ih_acumi (a, b, npix)
 
 int	a[ARB], b[ARB]
-int	npix, i
+size_t	npix
+
+long	i
 
 # int	npix, i, a_first, b_first
 
@@ -314,7 +327,9 @@ end
 procedure ih_amrgi (a, b, npix)
 
 int	a[ARB], b[ARB]
-int	npix, i
+size_t	npix
+
+long	i
 
 # int	npix, i, a_first, b_first
 

@@ -1,6 +1,6 @@
 include <imhdr.h>
 
-define	VPTR		Memp[$1+$2-1]	# Array of axis vector pointers
+define	VPTR		Memp[$1+($2)-1]	# Array of axis vector pointers
 
 $for (silrdx)
 

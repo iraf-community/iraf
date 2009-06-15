@@ -10,6 +10,7 @@ char	image[SZ_FNAME]
 char	str[SZ_LINE]
 int	option
 pointer	list
+
 int	clgwrd(), imtgetim(), imtlen()
 pointer	imtopen()
 

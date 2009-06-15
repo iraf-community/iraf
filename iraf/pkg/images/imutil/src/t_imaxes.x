@@ -16,10 +16,11 @@ char	param[SZ_PARAM]
 int	i
 pointer	im
 pointer	immap()
+include	<nullptr.inc>
 
 begin
 	call clgstr ("image", imname, SZ_FNAME)
-	im = immap (imname, READ_ONLY, 0)
+	im = immap (imname, READ_ONLY, NULLPTR)
 
 	call clputi ("ndim", IM_NDIM(im))
 

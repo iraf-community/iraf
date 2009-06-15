@@ -18,16 +18,22 @@ procedure t_hselect()
 
 pointer	sp, im, image, fields, expr, missing, section, imlist
 int	ip, min_lenuserarea
+pointer	p_val
+size_t	sz_val
+
 int	imtgetim(), envfind(), ctoi()
 pointer	imtopenp(), immap()
 
 begin
 	call smark (sp)
-	call salloc (image,   SZ_FNAME, TY_CHAR)
-	call salloc (fields,  SZ_LINE,  TY_CHAR)
-	call salloc (expr,    SZ_LINE,  TY_CHAR)
-	call salloc (missing, SZ_LINE,  TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fields, sz_val,  TY_CHAR)
+	call salloc (expr, sz_val,  TY_CHAR)
+	call salloc (missing, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (section, sz_val, TY_CHAR)
 
 	# Get the primary operands.
 	imlist = imtopenp ("images")
@@ -51,7 +57,8 @@ begin
 		min_lenuserarea = LEN_USERAREA
 
 	    # Open the image.
-	    iferr (im = immap (Memc[image], READ_ONLY, min_lenuserarea)) {
+	    p_val = min_lenuserarea
+	    iferr (im = immap (Memc[image], READ_ONLY, p_val)) {
 		call erract (EA_WARN)
 		next
 	    }
@@ -81,20 +88,24 @@ char	fields[ARB]		# fields to be passed if record is selected
 char	expr[ARB]		# exression to be evaluated
 char	missing[ARB]		# missing output value
 
+size_t	sz_val
 int	fieldno
 pointer	o, sp, field, value, flist
 pointer	evexpr(), imofnlu(), locpr()
 int	imgnfn()
 extern	he_getop()
 errchk	evexpr, imofnlu, imgnfn
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (field, SZ_FNAME, TY_CHAR)
-	call salloc (value, SZ_LINE,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (field, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (value, sz_val,  TY_CHAR)
 
 	# Evaluate selection criteria.
-	o = evexpr (expr, locpr(he_getop), 0)
+	o = evexpr (expr, locpr(he_getop), NULLPTR)
 	if (O_TYPE(o) != TY_BOOL)
 	    call error (1, "expression must be boolean")
 

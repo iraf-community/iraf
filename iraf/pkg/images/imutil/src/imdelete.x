@@ -11,14 +11,17 @@ procedure t_imdelete()
 bool	verify
 int	nchars
 pointer	list, sp, tty, imname, im
+size_t	sz_val
 
 pointer	ttyodes(), immap(), imtopenp()
 int	imtgetim(), imaccess(), strlen()
 bool	clgetb()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	list = imtopenp ("images")
 	verify = clgetb ("verify")
@@ -50,7 +53,7 @@ begin
 		call ttyso (STDOUT, tty, NO)
 
 		# Include portion of image title in prompt.
-		ifnoerr (im = immap (Memc[imname], READ_ONLY, 0)) {
+		ifnoerr (im = immap (Memc[imname], READ_ONLY, NULLPTR)) {
 		    nchars = strlen (IM_TITLE(im))
 		    if (nchars > 0) {
 			call printf (" - %0.28s")

@@ -13,9 +13,11 @@ procedure t_imstatistics ()
 real	lower, upper, binwidth, lsigma, usigma, low, up, hwidth, hmin, hmax
 pointer	sp, fieldstr, fields, image, ist, v
 pointer	im, buf, hgm, list
-int	i, nclip, format, nfields, nbins, npix, cache
-size_t	old_size
+int	i, nclip, format, nfields, cache
+size_t	old_size, nbins, npix
 
+size_t	sz_val
+long	l_val
 real	clgetr()
 pointer	immap(), imtopenp()
 int	btoi(), ist_fields(), imtgetim(), ist_ihist()
@@ -23,13 +25,18 @@ long	imgnlr()
 int	clgeti()
 bool	clgetb()
 errchk	immap()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (fieldstr, SZ_LINE, TY_CHAR)
-	call salloc (fields, IST_NFIELDS, TY_INT)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = SZ_LINE
+	call salloc (fieldstr, sz_val, TY_CHAR)
+	sz_val = IST_NFIELDS
+	call salloc (fields, sz_val, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
 
 	# Open the list of input images, the fields and the data value limits.
 	list = imtopenp ("images")
@@ -65,7 +72,7 @@ begin
 	while (imtgetim (list, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the image.
-	    iferr (im = immap (Memc[image], READ_ONLY, 0)) {
+	    iferr (im = immap (Memc[image], READ_ONLY, NULLPTR)) {
 		call printf ("Error reading image %s ...\n")
 		    call pargstr (Memc[image])
 		next
@@ -80,39 +87,36 @@ begin
 	    do i = 0, nclip {
 
 	        call ist_initialize (ist, low, up)
-	        call amovkl (long(1), Meml[v], IM_MAXDIM)
+		l_val = 1
+		sz_val = IM_MAXDIM
+	        call amovkl (l_val, Meml[v], sz_val)
 
 	        if (IST_SKURTOSIS(IST_SW(ist)) == YES) {
 	    	    while (imgnlr (im, buf, Meml[v]) != EOF)
-		        call ist_accumulate4 (ist, Memr[buf],
-			    int (IM_LEN(im, 1)), low, up,
-			    IST_SMINMAX(IST_SW(ist)))
+		        call ist_accumulate4 (ist, Memr[buf], IM_LEN(im, 1), 
+			    low, up, IST_SMINMAX(IST_SW(ist)))
 	    	} else if (IST_SSKEW(IST_SW(ist)) == YES) {
 	    	    while (imgnlr (im, buf, Meml[v]) != EOF)
-		        call ist_accumulate3 (ist, Memr[buf],
-			    int (IM_LEN (im, 1)), low, up,
-			    IST_SMINMAX(IST_SW(ist)))
+		        call ist_accumulate3 (ist, Memr[buf], IM_LEN (im, 1),
+			    low, up, IST_SMINMAX(IST_SW(ist)))
 	        } else if (IST_SSTDDEV(IST_SW(ist)) == YES ||
 		    IST_SMEDIAN(IST_SW(ist)) == YES ||
 		    IST_SMODE(IST_SW(ist)) == YES) {
 	    	    while (imgnlr (im, buf, Meml[v]) != EOF)
-		        call ist_accumulate2 (ist, Memr[buf],
-			    int (IM_LEN(im,1)), low, up,
-			    IST_SMINMAX(IST_SW(ist)))
+		        call ist_accumulate2 (ist, Memr[buf], IM_LEN(im,1),
+			     low, up, IST_SMINMAX(IST_SW(ist)))
 	        } else if (IST_SMEAN(IST_SW(ist)) == YES) {
 	    	    while (imgnlr (im, buf, Meml[v]) != EOF)
-		        call ist_accumulate1 (ist, Memr[buf],
-			    int (IM_LEN(im,1)), low, up,
-			    IST_SMINMAX(IST_SW(ist)))
+		        call ist_accumulate1 (ist, Memr[buf], IM_LEN(im,1),
+			    low, up, IST_SMINMAX(IST_SW(ist)))
 	        } else if (IST_SNPIX(IST_SW(ist)) == YES) {
 	    	    while (imgnlr (im, buf, Meml[v]) != EOF)
-		        call ist_accumulate0 (ist, Memr[buf],
-			    int (IM_LEN(im,1)), low, up,
-			    IST_SMINMAX(IST_SW(ist)))
+		        call ist_accumulate0 (ist, Memr[buf], IM_LEN(im,1),
+			    low, up, IST_SMINMAX(IST_SW(ist)))
 	        } else if (IST_SMINMAX(IST_SW(ist)) == YES) {
 	    	    while (imgnlr (im, buf, Meml[v]) != EOF)
-		        call ist_accumulate0 (ist, Memr[buf],
-			    int (IM_LEN(im,1)), low, up, YES)
+		        call ist_accumulate0 (ist, Memr[buf], IM_LEN(im,1),
+			    low, up, YES)
 	        }
 
 	        # Compute the central moment statistics.
@@ -153,9 +157,12 @@ begin
 	        YES) && ist_ihist (ist, binwidth, hgm, nbins, hwidth, hmin,
 		hmax) == YES) {
 		call aclri (Memi[hgm], nbins)
-		call amovkl (long(1), Meml[v], IM_MAXDIM)
+		l_val = 1
+		sz_val = IM_MAXDIM
+		call amovkl (l_val, Meml[v], sz_val)
+		sz_val = IM_LEN(im,1)
 		while (imgnlr (im, buf, Meml[v]) != EOF)
-		    call ahgmr (Memr[buf], int(IM_LEN(im,1)), Memi[hgm], nbins,
+		    call ahgmr (Memr[buf], sz_val, Memi[hgm], nbins,
 		        hmin, hmax)
 		if (IST_SMEDIAN(IST_SW(ist)) == YES)
 		    call ist_hmedian (ist, Memi[hgm], nbins, hwidth, hmin,
@@ -189,9 +196,13 @@ procedure ist_allocate (ist)
 
 pointer	ist		#O the statistics descriptor
 
+size_t	sz_val
+
 begin
-    	call calloc (ist, LEN_IMSTAT, TY_STRUCT)
-	call malloc (IST_SW(ist), LEN_NSWITCHES, TY_INT)
+	sz_val = LEN_IMSTAT
+    	call calloc (ist, sz_val, TY_STRUCT)
+	sz_val = LEN_NSWITCHES
+	call malloc (IST_SW(ist), sz_val, TY_INT)
 end
 
 
@@ -213,18 +224,21 @@ end
 int procedure ist_fields (fieldstr, fields, max_nfields)
 
 char    fieldstr[ARB]           #I string containing the list of fields
-int     fields[ARB]             #O fields array
-int     max_nfields             #I maximum number of fields
+int	fields[ARB]             #O fields array
+int	max_nfields             #I maximum number of fields
 
-int     nfields, flist, field
-pointer sp, fname
-int     fntopenb(), fntgfnb(), strdic()
+size_t	sz_val
+int	nfields, field
+pointer sp, fname, flist
+pointer	fntopenb()
+int	fntgfnb(), strdic()
 
 begin
         nfields = 0
 
         call smark (sp)
-        call salloc (fname, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (fname, sz_val, TY_CHAR)
 
         flist = fntopenb (fieldstr, NO)
         while (fntgfnb (flist, Memc[fname], SZ_FNAME) != EOF &&
@@ -248,17 +262,19 @@ end
 procedure ist_switches (ist, fields, nfields, nclip)
 
 pointer	ist			#I the statistics pointer
-int     fields[ARB]             #I fields array
-int     nfields                 #I maximum number of fields
+int	fields[ARB]             #I fields array
+int	nfields                 #I maximum number of fields
 int	nclip			#I the number of clipping iterations
 
+size_t	sz_val
 pointer	sw
 int	ist_isfield()
 
 begin
 	# Initialize.
 	sw = IST_SW(ist)
-	call amovki (NO, Memi[sw], LEN_NSWITCHES)
+	sz_val = LEN_NSWITCHES
+	call amovki (NO, Memi[sw], sz_val)
 
         # Set the computation switches.
         IST_SNPIX(sw) = ist_isfield (IST_FNPIX, fields, nfields)
@@ -288,10 +304,10 @@ end
 
 procedure ist_pheader (fields, nfields)
 
-int     fields[ARB]             # fields to be printed
-int     nfields                 # number of fields
+int	fields[ARB]             # fields to be printed
+int	nfields                 # number of fields
 
-int     i
+int	i
 
 begin
         call printf ("#")
@@ -340,11 +356,11 @@ end
 
 int procedure ist_isfield (field, fields, nfields)
 
-int     field           #I field to be tested
-int     fields[ARB]     #I array of selected fields
-int     nfields         #I number of fields
+int	field           #I field to be tested
+int	fields[ARB]     #I array of selected fields
+int	nfields         #I number of fields
 
-int     i, isfield
+int	i, isfield
 
 begin
         isfield = NO
@@ -401,14 +417,14 @@ procedure ist_accumulate4 (ist, x, npts, lower, upper, minmax)
 
 pointer ist             #I pointer to the statistics structure
 real    x[ARB]          #I the data array
-int     npts            #I the number of data points
+long	npts            #I the number of data points
 real    lower           #I lower data boundary
 real    upper           #I upper data boundary
-int     minmax          #I compute the minimum and maximum ?
+int	minmax          #I compute the minimum and maximum ?
 
 double  xx, xx2, sumx, sumx2, sumx3, sumx4
 real    lo, hi, xmin, xmax
-int     i, npix
+long	i, npix
 
 begin
         lo = IST_LO(ist)
@@ -495,14 +511,14 @@ procedure ist_accumulate3 (ist, x, npts, lower, upper, minmax)
 
 pointer ist             #I pointer to the statistics structure
 real    x[ARB]          #I the data array
-int     npts            #I the number of data points
+long	npts            #I the number of data points
 real    lower           #I lower data boundary
 real    upper           #I upper data boundary
-int     minmax          #I compute the minimum and maximum ?
+int	minmax          #I compute the minimum and maximum ?
 
 double  xx, xx2, sumx, sumx2, sumx3
 real    lo, hi, xmin, xmax
-int     i, npix
+long	i, npix
 
 begin
         lo = IST_LO(ist)
@@ -583,14 +599,14 @@ procedure ist_accumulate2 (ist, x, npts, lower, upper, minmax)
 
 pointer ist             #I pointer to the statistics structure
 real    x[ARB]          #I the data array
-int     npts            #I the number of data points
+long	npts            #I the number of data points
 real    lower           #I lower data boundary
 real    upper           #I upper data boundary
-int     minmax          #I compute the minimum and maximum ?
+int	minmax          #I compute the minimum and maximum ?
 
 double  xx, sumx, sumx2
 real    lo, hi, xmin, xmax
-int     i, npix
+long	i, npix
 
 begin
         lo = IST_LO(ist)
@@ -661,14 +677,14 @@ procedure ist_accumulate1 (ist, x, npts, lower, upper, minmax)
 
 pointer ist             #I pointer to the statistics structure
 real    x[ARB]          #I the data array
-int     npts            #I the number of data points
+long	npts            #I the number of data points
 real    lower           #I lower data boundary
 real    upper           #I upper data boundary
-int     minmax          #I compute the minimum and maximum ?
+int	minmax          #I compute the minimum and maximum ?
 
 double  sumx
 real    lo, hi, xx, xmin, xmax
-int     i, npix
+long	i, npix
 
 begin
         lo = IST_LO(ist)
@@ -731,12 +747,12 @@ procedure ist_accumulate0 (ist, x, npts, lower, upper, minmax)
 
 pointer ist             #I pointer to the statistics structure
 real    x[ARB]          #I the data array
-int     npts            #I the number of data points
+long	npts            #I the number of data points
 real    lower           #I lower data boundary
 real    upper           #I upper data boundary
-int     minmax          #I compute the minimum and maximum ?
+int	minmax          #I compute the minimum and maximum ?
 
-int     i, npix
+long	i, npix
 real    lo, hi, xx, xmin, xmax
 
 begin
@@ -846,7 +862,7 @@ int procedure ist_ihist (ist, binwidth, hgm, nbins, hwidth, hmin, hmax)
 pointer ist             #I pointer to the statistics structure
 real    binwidth        #I histogram bin width in sigma
 pointer hgm             #O pointer to the histogram
-int     nbins           #O number of bins
+size_t	nbins           #O number of bins
 real    hwidth          #O histogram resolution
 real    hmin            #O minimum histogram value
 real    hmax            #O maximum histogram value
@@ -878,21 +894,23 @@ end
 procedure ist_hmedian (ist, hgm, nbins, hwidth, hmin, hmax)
 
 pointer ist             #I pointer to the statistics structure
-int     hgm[ARB]        #I histogram of the pixels
-int     nbins           #I number of bins in the histogram
+int	hgm[ARB]        #I histogram of the pixels
+size_t	nbins           #I number of bins in the histogram
 real    hwidth          #I resolution of the histogram
 real    hmin            #I minimum histogram value
 real    hmax            #I maximum histogram value
 
+size_t	sz_val
 real    h1, hdiff, hnorm
 pointer sp, ihgm
-int     i, lo, hi
+long	i, lo, hi
 
 bool    fp_equalr()
 
 begin
         call smark (sp)
-        call salloc (ihgm, nbins, TY_REAL)
+        sz_val = nbins
+        call salloc (ihgm, sz_val, TY_REAL)
 
         # Integrate the histogram and normalize.
         Memr[ihgm] = hgm[1]
@@ -935,13 +953,13 @@ end
 procedure ist_hmode (ist, hgm, nbins, hwidth, hmin, hmax)
 
 pointer ist             #I pointer to the statistics strucuture
-int     hgm[ARB]        #I histogram of the pixels
-int     nbins           #I number of bins in the histogram
+int	hgm[ARB]        #I histogram of the pixels
+size_t	nbins           #I number of bins in the histogram
 real    hwidth          #I resolution of the histogram
 real    hmin            #I minimum histogram value
 real    hmax            #I maximum histogram value
 
-int     i, bpeak
+long	i, bpeak
 real    hpeak, dh1, dh2, denom
 bool    fp_equalr()
 
@@ -1013,10 +1031,10 @@ procedure ist_print (image, mask, ist, fields, nfields)
 char    image[ARB]              #I image name
 char    mask[ARB]               #I mask name
 pointer ist                     #I pointer to the statistics structure
-int     fields[ARB]             #I fields to be printed
-int     nfields                 #I number of fields
+int	fields[ARB]             #I fields to be printed
+int	nfields                 #I number of fields
 
-int     i
+int	i
 
 begin
         call printf (" ")
@@ -1027,7 +1045,7 @@ begin
                     call pargstr (image)
             case IST_FNPIX:
                 call printf (IST_FINTEGER)
-                    call pargi (IST_NPIX(ist))
+                    call pargz (IST_NPIX(ist))
             case IST_FMIN:
                 call printf (IST_FREAL)
                     call pargr (IST_MIN(ist))
@@ -1067,10 +1085,10 @@ procedure ist_fprint (image, mask, ist, fields, nfields)
 char    image[ARB]              #I image name
 char    mask[ARB]               #I mask name
 pointer ist                     #I pointer to the statistics structure
-int     fields[ARB]             #I fields to be printed
-int     nfields                 #I number of fields
+int	fields[ARB]             #I fields to be printed
+int	nfields                 #I number of fields
 
-int     i
+int	i
 
 begin
         do i = 1, nfields {
@@ -1080,7 +1098,7 @@ begin
                     call pargstr (image)
             case IST_FNPIX:
                 call printf ("%d")
-                    call pargi (IST_NPIX(ist))
+                    call pargz (IST_NPIX(ist))
             case IST_FMIN:
                 call printf ("%g")
                     call pargr (IST_MIN(ist))
@@ -1125,7 +1143,8 @@ int	cache			#I cache the image pixels in the imio buffer
 pointer	im			#I the image descriptor
 size_t	old_size		#O the old working set size
 
-int	i, buf_size
+int	i
+long	buf_size, l_val
 size_t	req_size
 int	sizeof(), ist_memstat()
 
@@ -1133,8 +1152,10 @@ begin
 	req_size = MEMFUDGE * IM_LEN(im,1) * sizeof (IM_PIXTYPE(im))
 	do i = 2, IM_NDIM(im)
 	    req_size = req_size * IM_LEN(im,i)
-	if (ist_memstat (cache, req_size, old_size) == YES) 
-	    call ist_pcache (im, INDEFI, buf_size)
+	if (ist_memstat (cache, req_size, old_size) == YES) {
+	    l_val = INDEFL
+	    call ist_pcache (im, l_val, buf_size)
+	}
 end
 
 
@@ -1183,18 +1204,20 @@ end
 procedure ist_pcache (im, req_size, buf_size)
 
 pointer im                      #I the input image point
-int     req_size                #I the requested working set size in chars
-int	buf_size		#O the new image buffer size
+long	req_size                #I the requested working set size in chars
+long	buf_size		#O the new image buffer size
 
-int     i, def_size, new_imbufsize
-int     sizeof(), imstati()
+int	i
+long	def_size, new_imbufsize, l_val
+int	sizeof()
+long	imstatl()
 
 begin
 	# Find the default buffer size.
-	def_size = imstati (im, IM_BUFSIZE)
+	def_size = imstatl (im, IM_BUFSIZE)
 
         # Compute the new required image i/o buffer size in chars.
-        if (IS_INDEFI(req_size)) {
+        if (IS_INDEFL(req_size)) {
             new_imbufsize = IM_LEN(im,1) * sizeof (IM_PIXTYPE(im))
 	    do i = 2, IM_NDIM(im)
 		new_imbufsize = new_imbufsize * IM_LEN(im,i)
@@ -1210,8 +1233,9 @@ begin
 	}
 
         # Reset the image i/o buffer.
-        call imseti (im, IM_BUFSIZE, new_imbufsize)
-        call imseti (im, IM_BUFFRAC, 0)
+        call imsetl (im, IM_BUFSIZE, new_imbufsize)
+	l_val = 0
+        call imsetl (im, IM_BUFFRAC, l_val)
 	buf_size = new_imbufsize
 end
 

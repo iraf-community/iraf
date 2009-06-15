@@ -31,12 +31,16 @@ procedure t_nhedit()
 pointer	fields			# template listing fields to be processed
 pointer	valexpr			# the value expression (if op=edit|add)
 
+size_t	sz_val
+long	l_val
+pointer	p_val
 bool	noupdate, quit
-int	imlist, nfields, up, min_lenuserarea
+pointer	imlist
+int	nfields, up, min_lenuserarea
 pointer	sp, field, sections, s_fields, im, ip, image, buf
 pointer s_comm, cmd, pkey
 int	operation, verify, show, update, comfile, fd, baf
-int     def_pars, dp_oper, dp_update, dp_verify, dp_show	
+int	def_pars, dp_oper, dp_update, dp_verify, dp_show
 char    sharp
 
 pointer	immap()
@@ -47,16 +51,20 @@ int	envfind(), ctoi(), open()
 
 begin
 	call smark (sp)
-	call salloc (buf,       SZ_FNAME, TY_CHAR)
-	call salloc (image,     SZ_FNAME, TY_CHAR)
-	call salloc (field,     SZ_FNAME, TY_CHAR)
-	call salloc (fields,    SZ_FNAME, TY_CHAR)
-	call salloc (pkey,      SZ_FNAME, TY_CHAR)
-	call salloc (s_fields,  SZ_LINE,  TY_CHAR)
-	call salloc (valexpr,   SZ_LINE,  TY_CHAR)
-	call salloc (s_comm,    SZ_LINE,  TY_CHAR)
-	call salloc (sections,  SZ_FNAME, TY_CHAR)
-	call salloc (cmd,       SZ_LINE,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (field, sz_val, TY_CHAR)
+	call salloc (fields, sz_val, TY_CHAR)
+	call salloc (pkey, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (s_fields, sz_val,  TY_CHAR)
+	call salloc (valexpr, sz_val,  TY_CHAR)
+	call salloc (s_comm, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (sections, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val,  TY_CHAR)
 
 	# Get the primary operands.
 	imlist = imtopenp ("images")
@@ -67,7 +75,8 @@ begin
 	# Do we have a command file instead of a command line?
 	comfile=NO
 	fd = 0
-	call aclrc (Memc[s_fields], SZ_LINE)
+	sz_val = SZ_LINE
+	call aclrc (Memc[s_fields], sz_val)
         call clgstr ("comfile", Memc[s_fields], SZ_LINE)
         if (streq(Memc[s_fields], "")) {
 	    call he_getpars (operation, fields, valexpr, Memc[s_comm], 
@@ -101,10 +110,11 @@ begin
 
 	    # Open the image.
 	    iferr {
+		p_val = min_lenuserarea
 		if (update == YES)
-		    im = immap (Memc[image], READ_WRITE, min_lenuserarea)
+		    im = immap (Memc[image], READ_WRITE, p_val)
 		else
-		    im = immap (Memc[image], READ_ONLY,  min_lenuserarea)
+		    im = immap (Memc[image], READ_ONLY,  p_val)
 	    } then {
 		call erract (EA_WARN)
 		next
@@ -115,7 +125,8 @@ begin
 	        # Open the command file and start processing each line. 
                 #rewind file before  proceeding
 
-	        call seek(fd, BOF)
+		l_val = BOF
+	        call seek(fd, l_val)
                 while (getline(fd, Memc[cmd]) != EOF) {
 		    for (ip=cmd;  IS_WHITE(Memc[ip]);  ip=ip+1)
 			    ;
@@ -228,15 +239,17 @@ int	verify
 int	show
 int	nfields
 
+size_t	sz_val
 pointer sp, field
-int	flist
+pointer	flist
 int	imgnfn()
 pointer	imofnlu()
 
 begin
 
 	call smark(sp)
-	call salloc (field, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (field, sz_val, TY_CHAR)
 	   
 	if (operation == OP_INIT || operation == OP_ADD) {
 	    # Add a field to the image header.  This cannot be done within
@@ -294,6 +307,7 @@ int	verify			# verify new value interactively
 int	show			# print record of edit
 int	update			# enable updating of the image
 
+size_t	sz_val
 int	goahead, nl
 pointer	sp, ip, oldval, newval, defval, o, fcomm, ncomm
 
@@ -302,14 +316,17 @@ pointer	evexpr(), locpr()
 extern	he_getop()
 int	getline(), imaccf(), strldxs()
 errchk	evexpr, getline, imaccf, he_gval
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (oldval, SZ_LINE, TY_CHAR)
-	call salloc (newval, SZ_LINE, TY_CHAR)
-	call salloc (defval, SZ_LINE, TY_CHAR)
-	call salloc (fcomm, HRECLEN, TY_CHAR)
-	call salloc (ncomm, HRECLEN, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (oldval, sz_val, TY_CHAR)
+	call salloc (newval, sz_val, TY_CHAR)
+	call salloc (defval, sz_val, TY_CHAR)
+	sz_val = HRECLEN
+	call salloc (fcomm, sz_val, TY_CHAR)
+	call salloc (ncomm, sz_val, TY_CHAR)
 
 	call strcpy (comment, Memc[ncomm], HRECLEN)
 
@@ -331,7 +348,7 @@ begin
 	# a string literal.
 
 	if (valexpr[1] == '(') {
-	    o = evexpr (valexpr, locpr (he_getop), 0)
+	    o = evexpr (valexpr, locpr (he_getop), NULLPTR)
 	    call he_encodeop (o, Memc[newval], SZ_LINE)
 	    call xev_freeop (o)
 	    call mfree (o, TY_STRUCT)
@@ -450,6 +467,7 @@ int	verify			# verify new value interactively
 int	show			# print record of edit
 int	update			# enable updating of the image
 
+size_t	sz_val
 bool	numeric
 int	numlen, ip
 pointer	sp, newval, o
@@ -457,10 +475,12 @@ pointer	evexpr(), locpr()
 int	imaccf(), strlen(), lexnum()
 extern	he_getop()
 errchk	imaccf, evexpr, imakbc, imastrc, imakic, imakrc
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (newval, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (newval, sz_val, TY_CHAR)
 
 	# If the named field already exists, this is really an edit operation
 	# rather than an add.  Call editfield so that the usual verification
@@ -484,9 +504,10 @@ begin
 	    numeric = (numlen == strlen (valexpr))
 
 	if (numeric || valexpr[1] == '(')
-	    o = evexpr (valexpr, locpr(he_getop), 0)
+	    o = evexpr (valexpr, locpr(he_getop), NULLPTR)
 	else {
-	    call malloc (o, LEN_OPERAND, TY_STRUCT)
+	    sz_val = LEN_OPERAND
+	    call malloc (o, sz_val, TY_STRUCT)
 	    call xev_initop (o, strlen(valexpr), TY_CHAR)
 	    call strcpy (valexpr, O_VALC(o), ARB)
 	}
@@ -512,6 +533,11 @@ begin
 	            call imakici (im, field, O_VALI(o), comment, pkey, baf)
 	        else
 	            call imakic (im, field, O_VALI(o), comment)
+	    case TY_LONG:
+	        if (pkey[1] != EOS && baf != 0)
+	            call imaklci (im, field, O_VALL(o), comment, pkey, baf)
+	        else
+	            call imaklc (im, field, O_VALL(o), comment)
 	    case TY_REAL:
 	        if (pkey[1] != EOS && baf != 0)
 	            call imakrci (im, field, O_VALR(o), comment, pkey, baf)
@@ -555,6 +581,7 @@ int	verify			# verify new value interactively
 int	show			# print record of edit
 int	update			# enable updating of the image
 
+size_t	sz_val
 bool	numeric
 int	numlen, ip
 pointer	sp, newval, o
@@ -563,10 +590,12 @@ bool    streq()
 int	imaccf(), strlen(), lexnum()
 extern	he_getop()
 errchk	imaccf, evexpr, imakbc, imastrc, imakic, imakrc
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (newval, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (newval, sz_val, TY_CHAR)
 
 	# If the named field already exists, this is really an edit operation
 	# rather than an add.  Call editfield so that the usual verification
@@ -590,9 +619,10 @@ begin
 	    numeric = (numlen == strlen (valexpr))
 
 	if (numeric || valexpr[1] == '(')
-	    o = evexpr (valexpr, locpr(he_getop), 0)
+	    o = evexpr (valexpr, locpr(he_getop), NULLPTR)
 	else {
-	    call malloc (o, LEN_OPERAND, TY_STRUCT)
+	    sz_val = LEN_OPERAND
+	    call malloc (o, sz_val, TY_STRUCT)
 	    call xev_initop (o, max(1,strlen(valexpr)), TY_CHAR)
 	    call strcpy (valexpr, O_VALC(o), SZ_LINE)
 	}
@@ -627,6 +657,11 @@ begin
 	            call imakici (im, field, O_VALI(o), comment, pkey, baf)
 	        else
 	            call imakic (im, field, O_VALI(o), comment)
+	    case TY_LONG:
+	        if (pkey[1] != EOS && baf != 0)
+	            call imaklci (im, field, O_VALL(o), comment, pkey, baf)
+	        else
+	            call imaklc (im, field, O_VALL(o), comment)
 	    case TY_REAL:
 	        if (pkey[1] != EOS && baf != 0)
 	            call imakrci (im, field, O_VALR(o), comment, pkey, baf)
@@ -665,12 +700,14 @@ int	verify			# verify deletion interactively
 int	show			# print record of edit
 int	update			# enable updating of the image
 
+size_t	sz_val
 pointer	sp, ip, newval
 int	getline(), imaccf()
 
 begin
 	call smark (sp)
-	call salloc (newval, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (newval, sz_val, TY_CHAR)
 
 	if (imaccf (im, field) == NO) {
 	    call eprintf ("nonexistent field %s,%s\n")
@@ -762,14 +799,16 @@ procedure nh_cpstr (str, outbuf)
 char    str[ARB]                	# string to be printed
 char    outbuf[ARB]            		# comment string to be printed
                                                                                 
-int     ip
+size_t	sz_val
+int	ip
 bool    quoteit
 pointer sp, op, buf
                                                                                 
 begin
                                                                                 
         call smark (sp)
-        call salloc (buf, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (buf, sz_val, TY_CHAR)
                                                                                 
         op = buf
         Memc[op] = '"'
@@ -815,12 +854,14 @@ end
 char	str[ARB]		# string to be printed
 char	comment[ARB]		# comment string to be printed
 
+size_t	sz_val
 pointer	sp, buf
 
 begin
 
 	call smark (sp)
-        call salloc (buf, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (buf, sz_val, TY_CHAR)
                                                                                 
         call nh_cpstr (str, Memc[buf])
 
@@ -849,6 +890,8 @@ int	baf
 int	update
 int	verify
 int	show
+
+size_t	sz_val
 bool	clgetb(), streq()
 
 pointer sp, ip, s_fields, s_valexpr
@@ -856,8 +899,9 @@ int	btoi()
 
 begin
         call smark(sp)
-	call salloc (s_fields,  SZ_LINE,  TY_CHAR)
-	call salloc (s_valexpr,  SZ_LINE,  TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (s_fields, sz_val,  TY_CHAR)
+	call salloc (s_valexpr, sz_val,  TY_CHAR)
 
 	operation = OP_EDIT
 	if (clgetb ("add"))
@@ -926,14 +970,14 @@ end
 
 procedure nh_setpar (operation, dp_oper, dp_update, dp_verify, dp_show, 
                         update, verify, show)
-int     operation
-int     dp_oper
-int     dp_update
-int     dp_verify
-int     dp_show
-int     update
-int     verify
-int     show
+int	operation
+int	dp_oper
+int	dp_update
+int	dp_verify
+int	dp_show
+int	update
+int	verify
+int	show
 
 begin
         # If the value is positive then the parameter has been set

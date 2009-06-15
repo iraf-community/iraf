@@ -17,6 +17,9 @@ bool	force			# force recomputation of values
 bool	update			# update values in image header
 bool	verbose			# print values as they are computed
 
+size_t	sz_val
+long	l_val
+real	r_val0, r_val1
 bool	section
 int	pixtype
 long	vmin[IM_MAXDIM], vmax[IM_MAXDIM]
@@ -27,15 +30,18 @@ bool	clgetb()
 long	clktime()
 int	imtgetim()
 pointer	imtopen(), immap()
+include	<nullptr.inc>
 define	tryagain_ 91
 
 begin
 	call smark (sp)
-	call salloc (images, SZ_LINE, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (imsect, SZ_FNAME, TY_CHAR)
-	call salloc (pixmin, SZ_FNAME, TY_CHAR)
-	call salloc (pixmax, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (images, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (imsect, sz_val, TY_CHAR)
+	call salloc (pixmin, sz_val, TY_CHAR)
+	call salloc (pixmax, sz_val, TY_CHAR)
 
 	# Get list of input images.
 
@@ -59,7 +65,7 @@ begin
 
 	    if (update) {
 
-		iferr (im = immap (Memc[imname], READ_WRITE, 0))
+		iferr (im = immap (Memc[imname], READ_WRITE, NULLPTR))
 		    goto tryagain_
 
 		pixtype = IM_PIXTYPE(im)
@@ -86,7 +92,8 @@ begin
 			    IM_MAX(im) = INDEFR
 			else
 			    IM_MAX(im) = maxval
-			IM_LIMTIME(im) = clktime (long(0))
+			l_val = 0
+			IM_LIMTIME(im) = clktime (l_val)
 			call imseti (im, IM_WHEADER, YES)
 		    }
 		} else {
@@ -97,7 +104,7 @@ begin
 		call imunmap (im)
 
 	    } else {
-tryagain_	iferr (im = immap (Memc[imname], READ_ONLY, 0)) {
+tryagain_	iferr (im = immap (Memc[imname], READ_ONLY, NULLPTR)) {
 		    call erract (EA_WARN)
 		    next
 		} else {
@@ -131,9 +138,13 @@ tryagain_	iferr (im = immap (Memc[imname], READ_ONLY, 0)) {
 		    call printf ("    %s %s %z %s %z\n")
 		        call pargstr (Memc[imname])
 		        call pargstr (Memc[pixmin])
-		        call pargx (complex (minval, iminval))
+			r_val0 = minval
+			r_val1 = iminval
+		        call pargx (complex (r_val0, r_val1))
 		        call pargstr (Memc[pixmax])
-		        call pargx (complex (maxval, imaxval))
+			r_val0 = maxval
+			r_val1 = imaxval
+		        call pargx (complex (r_val0, r_val1))
 		    call flush (STDOUT)
 		} else {
 		    call printf ("    %s %s %g %s %g\n")

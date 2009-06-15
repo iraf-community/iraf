@@ -18,6 +18,7 @@ pointer	imtopen()
 int	imtgetim()
 real	clgetr()
 pointer	immap()
+include	<nullptr.inc>
 
 begin
 	# Get image template list.
@@ -37,15 +38,15 @@ begin
 
 	while (imtgetim (list, image, SZ_FNAME) != EOF) {
 
-	    im = immap (image, READ_WRITE, 0)
+	    im = immap (image, READ_WRITE, NULLPTR)
 
 	    if (radius < 1.) {
 		switch (IM_PIXTYPE (im)) {
 		case TY_SHORT:
 		    call imreps (im, lower, upper, value, img)
-		case TY_INT:
+		case TY_USHORT, TY_INT:
 		    call imrepi (im, lower, upper, value, img)
-		case TY_USHORT, TY_LONG:
+		case TY_LONG:
 		    call imrepl (im, lower, upper, value, img)
 		case TY_REAL:
 		    call imrepr (im, lower, upper, value, img)
@@ -61,9 +62,9 @@ begin
 		switch (IM_PIXTYPE (im)) {
 		case TY_SHORT:
 		    call imrreps (im, lower, upper, radius, value, img)
-		case TY_INT:
+		case TY_USHORT, TY_INT:
 		    call imrrepi (im, lower, upper, radius, value, img)
-		case TY_USHORT, TY_LONG:
+		case TY_LONG:
 		    call imrrepl (im, lower, upper, radius, value, img)
 		case TY_REAL:
 		    call imrrepr (im, lower, upper, radius, value, img)

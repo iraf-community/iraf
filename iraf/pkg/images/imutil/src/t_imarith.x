@@ -37,6 +37,7 @@ double	divzero				# Zero divide replacement
 int	pixtype				# Output pixel datatype
 int	calctype			# Datatype for calculations
 
+size_t	sz_val
 int	i, j, pixtype1, pixtype2
 short	sc1, sc2, sdz
 pointer	hlist
@@ -51,21 +52,26 @@ double	clgetd(), imgetd()
 bool	clgetb(), streq()
 int	clgwrd()
 int	gctod(), lexnum()
+long	ldint()
 pointer	immap()
 errchk	immap, imgetd, imputd
+include	<nullptr.inc>
 
 begin
 	# Allocate memory for strings.
 	call smark (sp)
-	call salloc (operand1, SZ_FNAME, TY_CHAR)
-	call salloc (operand2, SZ_FNAME, TY_CHAR)
-	call salloc (result, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (opstr, SZ_FNAME, TY_CHAR)
-	call salloc (dtstr, SZ_FNAME, TY_CHAR)
-	call salloc (field, SZ_FNAME, TY_CHAR)
-	call salloc (title, SZ_IMTITLE, TY_CHAR)
-	call salloc (hparams, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (operand1, sz_val, TY_CHAR)
+	call salloc (operand2, sz_val, TY_CHAR)
+	call salloc (result, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	call salloc (opstr, sz_val, TY_CHAR)
+	call salloc (dtstr, sz_val, TY_CHAR)
+	call salloc (field, sz_val, TY_CHAR)
+	sz_val = SZ_IMTITLE
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (hparams, sz_val, TY_CHAR)
 
 	# Get the operands and the operator.
 	list1 = imtopenp ("operand1")
@@ -109,7 +115,7 @@ begin
 	    # is a file.  If it is not then attempt to interpret the operand
 	    # as a numerical constant.  Otherwise it is an error.
 	    iferr {
-		im1 = immap (Memc[operand1], READ_ONLY, 0)
+		im1 = immap (Memc[operand1], READ_ONLY, NULLPTR)
 		pixtype1 = IM_PIXTYPE(im1)
 	    } then {
 		i = 1
@@ -132,7 +138,7 @@ begin
 	    }
 
 	    iferr {
-		im2 = immap (Memc[operand2], READ_ONLY, 0)
+		im2 = immap (Memc[operand2], READ_ONLY, NULLPTR)
 		pixtype2 = IM_PIXTYPE(im2)
 	    } then {
 		i = 1
@@ -253,34 +259,34 @@ begin
 	        case TY_INT:
 	            switch (op) {
 	            case ADD:
-	                call ima_addi (im1, im2, im3, int (c1), int (c2))
+	                call ima_addi (im1, im2, im3, idint(c1), idint(c2))
 	            case SUB:
-	                call ima_subi (im1, im2, im3, int (c1), int (c2))
+	                call ima_subi (im1, im2, im3, idint(c1), idint(c2))
 	            case MUL:
-	                call ima_muli (im1, im2, im3, int (c1), int (c2))
+	                call ima_muli (im1, im2, im3, idint(c1), idint(c2))
 	            case DIV:
-	                call ima_divi (im1, im2, im3, int (c1), int (c2),
-			    int (divzero))
+	                call ima_divi (im1, im2, im3, idint(c1), idint(c2),
+			    idint(divzero))
 	            case MIN:
-	                call ima_mini (im1, im2, im3, int (c1), int (c2))
+	                call ima_mini (im1, im2, im3, idint(c1), idint(c2))
 	            case MAX:
-	                call ima_maxi (im1, im2, im3, int (c1), int (c2))
+	                call ima_maxi (im1, im2, im3, idint(c1), idint(c2))
 	            }
 	        case TY_LONG:
 	            switch (op) {
 	            case ADD:
-	                call ima_addl (im1, im2, im3, long (c1), long (c2))
+	                call ima_addl (im1, im2, im3, ldint(c1), ldint(c2))
 	            case SUB:
-	                call ima_subl (im1, im2, im3, long (c1), long (c2))
+	                call ima_subl (im1, im2, im3, ldint(c1), ldint(c2))
 	            case MUL:
-	                call ima_mull (im1, im2, im3, long (c1), long (c2))
+	                call ima_mull (im1, im2, im3, ldint(c1), ldint(c2))
 	            case DIV:
-	                call ima_divl (im1, im2, im3, long (c1), long (c2),
-			    long (divzero))
+	                call ima_divl (im1, im2, im3, ldint(c1), ldint(c2),
+			    ldint(divzero))
 	            case MIN:
-	                call ima_minl (im1, im2, im3, long (c1), long (c2))
+	                call ima_minl (im1, im2, im3, ldint(c1), ldint(c2))
 	            case MAX:
-	                call ima_maxl (im1, im2, im3, long (c1), long (c2))
+	                call ima_maxl (im1, im2, im3, ldint(c1), ldint(c2))
 	            }
 	        case TY_REAL:
 	            switch (op) {
@@ -398,14 +404,14 @@ begin
 	    if (op == DIV)
 		max_type = TY_REAL
 	    else if (pixtype2 == TY_USHORT)
-		max_type = TY_LONG
+		max_type = TY_INT
 	    else
 	        max_type = pixtype2
 	case TY_USHORT:
 	    if (op == DIV)
 		max_type = TY_REAL
 	    else if ((pixtype2 == TY_SHORT) || (pixtype2 == TY_USHORT))
-		max_type = TY_LONG
+		max_type = TY_INT
 	    else
 		max_type = pixtype2
 	case TY_INT:
@@ -437,12 +443,12 @@ begin
 	switch (line[1]) {
 	case '1':
 	    if (pixtype1 == TY_USHORT)
-		calctype = TY_LONG
+		calctype = TY_INT
 	    else
 	        calctype = pixtype1
 	case '2':
 	    if (pixtype2 == TY_USHORT)
-		calctype = TY_LONG
+		calctype = TY_INT
 	    else
 	        calctype = pixtype2
 	case EOS:
@@ -450,7 +456,7 @@ begin
 	case 's':
 	    calctype = TY_SHORT
 	case 'u':
-	    calctype = TY_LONG
+	    calctype = TY_INT
 	case 'i':
 	    calctype = TY_INT
 	case 'l':

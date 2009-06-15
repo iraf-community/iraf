@@ -19,20 +19,22 @@ pointer image2                  # Output image
 int	sdim			# Dimension to be sliced
 int	verbose			# Verbose mode
 
+size_t	sz_val
 pointer sp
 pointer	list1, list2
 
 bool    clgetb()
-int     imtgetim(), imtlen(), btoi(), clgeti()
+int	imtgetim(), imtlen(), btoi(), clgeti()
 pointer	imtopen()
 errchk	sl_slice
 
 begin
         call smark (sp)
-        call salloc (imtlist1, SZ_FNAME, TY_CHAR)
-        call salloc (imtlist2, SZ_FNAME, TY_CHAR)
-        call salloc (image1, SZ_FNAME, TY_CHAR)
-        call salloc (image2, SZ_FNAME, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (imtlist1, sz_val, TY_CHAR)
+        call salloc (imtlist2, sz_val, TY_CHAR)
+        call salloc (image1, sz_val, TY_CHAR)
+        call salloc (image2, sz_val, TY_CHAR)
 
         # Get task parameters.
         call clgstr ("input", Memc[imtlist1], SZ_FNAME)
@@ -72,7 +74,11 @@ char	image2[ARB]		# output image
 int	sdim			# slice dimension
 int	verbose			# verbose mode
 
-int	i, j, ndim, fdim, ncols, nlout, nimout, pdim
+size_t	sz_val
+long	l_val
+long	i, j, nlout, nimout
+size_t	ncols
+int	ndim, fdim, pdim
 int	axno[IM_MAXDIM], axval[IM_MAXDIM]
 pointer	sp, inname, outname, outsect, im1, im2, buf1, buf2, vim1, vim2
 pointer	mw, vs, ve
@@ -89,8 +95,10 @@ errchk	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
 errchk	imggss(), imggsi(), imggsl(), imggsr(), imggsd(), imggsx()
 errchk	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 
+include	<nullptr.inc>
+
 begin
-	iferr (im1 = immap (image1, READ_ONLY, 0)) {
+	iferr (im1 = immap (image1, READ_ONLY, NULLPTR)) {
 	    call erract (EA_WARN)
 	    return
 	}
@@ -124,14 +132,18 @@ begin
 	#}
 
 	call smark (sp)
-	call salloc (inname, SZ_LINE, TY_CHAR)
-	call salloc (outname, SZ_FNAME, TY_CHAR)
-	call salloc (outsect, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (inname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (outname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outsect, sz_val, TY_CHAR)
 
-	call salloc (vs, IM_MAXDIM, TY_LONG)
-	call salloc (ve, IM_MAXDIM, TY_LONG)
-	call salloc (vim1, IM_MAXDIM, TY_LONG)
-	call salloc (vim2, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (vs, sz_val, TY_LONG)
+	call salloc (ve, sz_val, TY_LONG)
+	call salloc (vim1, sz_val, TY_LONG)
+	call salloc (vim2, sz_val, TY_LONG)
 
 	# Compute the number of output images. and the number of columns
 	nimout = IM_LEN(im1, sdim)
@@ -151,13 +163,15 @@ begin
 	    nlout = nlout * IM_LEN(im1,i)
 	nlout = nlout / ncols 
 
-	call amovkl (long(1), Meml[vim1], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vim1], sz_val)
 	do i = 1, nimout {
 
 	    # Construct the output image name.
 	    call sprintf (Memc[outname], SZ_FNAME, "%s%03d")
 		call pargstr (image2)
-		call pargi (i)
+		call pargl (i)
 
 	    # Open the output image.
 	    iferr (im2 = immap (Memc[outname], NEW_COPY, im1)) {
@@ -202,7 +216,9 @@ begin
 	    }
 
 	    # Loop over the appropriate range of lines.
-	    call amovkl (long(1), Meml[vim2], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[vim2], sz_val)
 	    switch (IM_PIXTYPE(im1)) {
 	    case TY_SHORT:
 		if (sdim == ndim) {
@@ -337,7 +353,8 @@ begin
 
 		# Open and shift the wcs.
 	        mw = mw_openim (im1)
-	        call aclrr (shifts, ndim)
+		sz_val = ndim
+	        call aclrr (shifts, sz_val)
 		shifts[sdim] = -(i - 1)
 	        call mw_shift (mw, shifts, (2 ** ndim - 1))
 
@@ -407,11 +424,12 @@ end
 procedure  sl_einsection (im, el, sdim, section, maxch)
 
 pointer	im		# pointer to the image
-int	el		# element of last dimension
+long	el		# element of last dimension
 int	sdim		# slice dimension
 char	section[ARB]	# output section
 int	maxch		# maximum number of characters in output section
 
+long	l_val
 int	i, op
 int	ltoc(), gstrcat()
 
@@ -422,7 +440,8 @@ begin
 
 	# Encode dimensions up to the slice dimension.
 	for (i = 1; i <= sdim - 1 && op <= maxch; i = i + 1) {
-	    op = op + ltoc (long(1), section[op], maxch)
+	    l_val = 1
+	    op = op + ltoc (l_val, section[op], maxch)
 	    op = op + gstrcat (":", section[op], maxch)
 	    op = op + ltoc (IM_LEN(im,i), section[op], maxch)
 	    op = op + gstrcat (",", section[op], maxch)
@@ -434,7 +453,8 @@ begin
 
 	# Encode dimensions above the slice dimension.
 	for (i = sdim + 1; i <= IM_NDIM(im); i = i + 1) {
-	    op = op + ltoc (long(1), section[op], maxch)
+	    l_val = 1
+	    op = op + ltoc (l_val, section[op], maxch)
 	    op = op + gstrcat (":", section[op], maxch)
 	    op = op + ltoc (IM_LEN(im,i), section[op], maxch)
 	    op = op + gstrcat (",", section[op], maxch)
@@ -453,6 +473,7 @@ pointer	im		# pointer to the image
 char	section[ARB]	# output section
 int	maxch		# maximum number of characters in output section
 
+long	l_val
 int	i, op
 int	ltoc(), gstrcat()
 
@@ -462,7 +483,8 @@ begin
 	op = op + 1
 
 	for (i = 1; i <= IM_NDIM(im); i = i + 1) {
-	    op = op + ltoc (long(1), section[op], maxch)
+	    l_val = 1
+	    op = op + ltoc (l_val, section[op], maxch)
 	    op = op + gstrcat (":", section[op], maxch)
 	    op = op + ltoc (IM_LEN(im,i), section[op], maxch)
 	    op = op + gstrcat (",", section[op], maxch)
