@@ -438,14 +438,14 @@ begin
 	# Compute the zero point, x slope and y slope of ref image.
 	if (IS_INDEFR(Memr[przero+i-1]) || IS_INDEFR(Memr[prxslope+i- 1]) ||
 	    IS_INDEFR(Memr[pryslope+i-1])) {
-	    if (IS_INDEFI(rg_xstati (xc, BORDER))) {
+	    if (IS_INDEFL(rg_xstatl (xc, BORDER))) {
 		call rg_xscale (xc, Memr[rbuf], nrcols * nrlines, nrcols,
 		    nrlines, rg_xstatr (xc, BVALUER), Memr[coeff])
 	    } else {
 		    border = NULL
 		    nborder = rg_border (Memr[rbuf], nrcols, nrlines,
-		        max (0, nrcols - 2 * rg_xstati (xc, BORDER)),
-		        max (0, nrlines - 2 * rg_xstati (xc, BORDER)),
+		        max (0, nrcols - 2 * rg_xstatl (xc, BORDER)),
+		        max (0, nrlines - 2 * rg_xstatl (xc, BORDER)),
 			border)
 		    call rg_xscale (xc, Memr[border], nborder, nrcols,
 			nrlines, rg_xstatr (xc, BVALUER), Memr[coeff])
@@ -463,14 +463,14 @@ begin
 	    Memr[prxslope+i-1], Memr[pryslope+i-1])
 
 	# Compute the zero point, and the x and y slopes of input image.
-	if (IS_INDEFI(rg_xstati (xc, BORDER))) {
+	if (IS_INDEFL(rg_xstatl (xc, BORDER))) {
 	    call rg_xscale (xc, Memr[ibuf], ncols * nlines, ncols,
 		nlines, rg_xstatr (xc, BVALUE), Memr[coeff])
 	} else {
 	    border = NULL
 	    nborder = rg_border (Memr[ibuf], ncols, nlines,
-	        max (0, ncols - 2 * rg_xstati (xc, BORDER)),
-	        max (0, nlines - 2 * rg_xstati (xc, BORDER)),
+	        max (0, ncols - 2 * rg_xstatl (xc, BORDER)),
+	        max (0, nlines - 2 * rg_xstatl (xc, BORDER)),
 		border)
 	    call rg_xscale (xc, Memr[border], nborder, ncols, nlines,
 		rg_xstatr (xc, BVALUE), Memr[coeff])
@@ -717,14 +717,14 @@ begin
 	# Compute the zero point, x slope and y slope of ref image.
 	if (IS_INDEFR(Memr[przero+i-1]) || IS_INDEFR(Memr[prxslope+i- 1]) ||
 	    IS_INDEFR(Memr[pryslope+i-1])) {
-	    if (IS_INDEFI(rg_xstati (xc, BORDER))) {
+	    if (IS_INDEFL(rg_xstatl (xc, BORDER))) {
 		call rg_xscale (xc, Memr[rbuf], nrcols * nrlines, nrcols,
 		    nrlines, rg_xstatr (xc, BVALUER), Memr[coeff])
 	    } else {
 		    border = NULL
 		    nborder = rg_border (Memr[rbuf], nrcols, nrlines,
-		        max (0, nrcols - 2 * rg_xstati (xc, BORDER)),
-		        max (0, nrlines - 2 * rg_xstati (xc, BORDER)),
+		        max (0, nrcols - 2 * rg_xstatl (xc, BORDER)),
+		        max (0, nrlines - 2 * rg_xstatl (xc, BORDER)),
 			border)
 		    call rg_xscale (xc, Memr[border], nborder, nrcols,
 			nrlines, rg_xstatr (xc, BVALUER), Memr[coeff])
@@ -766,14 +766,14 @@ begin
 	}
 
 	# Compute the zero point, and the x and y slopes of input image.
-	if (IS_INDEFI(rg_xstati (xc, BORDER))) {
+	if (IS_INDEFL(rg_xstatl (xc, BORDER))) {
 	    call rg_xscale (xc, Memr[ibuf], ncols * nlines, ncols,
 		nlines, rg_xstatr (xc, BVALUE), Memr[coeff])
 	} else {
 	    border = NULL
 	    nborder = rg_border (Memr[ibuf], ncols, nlines,
-	        max (0, ncols - 2 * rg_xstati (xc, BORDER)),
-	        max (0, nlines - 2 * rg_xstati (xc, BORDER)),
+	        max (0, ncols - 2 * rg_xstatl (xc, BORDER)),
+	        max (0, nlines - 2 * rg_xstatl (xc, BORDER)),
 		border)
 	    call rg_xscale (xc, Memr[border], nborder, ncols, nlines,
 		rg_xstatr (xc, BVALUE), Memr[coeff])

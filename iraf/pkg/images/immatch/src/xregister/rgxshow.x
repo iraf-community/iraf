@@ -87,6 +87,7 @@ size_t	sz_val
 int	back
 pointer	sp, str
 int	rg_xstati()
+long	rg_xstatl()
 real	rg_xstatr()
 
 begin
@@ -102,7 +103,7 @@ begin
 	    call pargstr (Memc[str])
 	call printf ("    %s = %d\n")
 	    call pargstr (KY_BORDER)
-	    call pargi (rg_xstati (xc, BORDER))
+	    call pargl (rg_xstatl (xc, BORDER))
 	call printf ("    %s = %g   %s = %g\n")
 	    call pargstr (KY_LOREJECT)
 	    call pargr (rg_xstatr (xc, LOREJECT))

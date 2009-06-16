@@ -12,16 +12,17 @@ size_t	nx, ny		#I the dimensions of the original subraster
 real	offset		#I the input offset
 real	coeff[ARB]	#O the output coefficients
 
-int	wborder
+size_t	wborder
 pointer	gs
 real	loreject, hireject, zero
-int	rg_xstati(), rg_znsum(), rg_znmedian(), rg_slope()
+int	rg_xstati(), rg_slope()
+long	rg_xstatl(), rg_znmedian(), rg_znsum()
 real	rg_xstatr()
 
 begin
 	loreject = rg_xstatr (xc, LOREJECT)
 	hireject = rg_xstatr (xc, HIREJECT)
-	wborder = rg_xstati (xc, BORDER)
+	wborder = rg_xstatl (xc, BORDER)
 
 	switch (rg_xstati (xc, BACKGRD)) {
 	case XC_BNONE:

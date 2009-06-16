@@ -25,10 +25,10 @@ define	GM_YXORDER	Memi[P2I($1+32)]		# Y fit X order
 define	GM_YYORDER	Memi[P2I($1+33)]		# Y fit Y order
 define	GM_YXTERMS	Memi[P2I($1+34)]		# Y fit cross-terms
 define	GM_MAXITER	Memi[P2I($1+35)]		# maximum number of iterations
-define	GM_NPTS		Memi[P2I($1+36)]		# Number of data points
-define	GM_NREJECT	Memi[P2I($1+37)]		# Number of rejected pixels
-define	GM_NWTS0	Memi[P2I($1+38)]		# Number of pts with wts <= 0
-define	GM_REJ		Memi[P2I($1+39)]		# Pointer to rejected pixels
+define	GM_NPTS		Memz[P2Z($1+36)]		# Number of data points
+define	GM_NREJECT	Memz[P2Z($1+37)]		# Number of rejected pixels
+define	GM_NWTS0	Memz[P2Z($1+38)]		# Number of pts with wts <= 0
+define	GM_REJ		Memp[$1+39]		# Pointer to rejected pixels
 define	GM_RECORD	Memc[P2C($1+40)]	# Record name
 define	GM_PROJSTR	Memc[P2C($1+40+SZ_FNAME+1)]	# Projection parameters
 

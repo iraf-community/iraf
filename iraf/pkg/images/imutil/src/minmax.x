@@ -24,11 +24,12 @@ long	colmin, colmax
 complex	xmin_value, xmax_value, minval_x, maxval_x
 long	v[IM_MAXDIM], ovmin[IM_MAXDIM], ovmax[IM_MAXDIM]
 short	minval_s, maxval_s
+int	minval_i, maxval_i
 long	minval_l, maxval_l
 pointer	buf
 real	minval_r, maxval_r
 double	minval_d, maxval_d
-long	imgnls(), imgnll(), imgnlr(), imgnld(), imgnlx()
+long	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
 
 begin
 	l_val = 1
@@ -75,7 +76,36 @@ begin
 		call amovl (v[2], ovmax[2], sz_val)
 	    }
 
-	case TY_USHORT, TY_INT, TY_LONG:
+	case TY_USHORT, TY_INT:
+	    while (imgnli (im, buf, v) != EOF) {
+		call valimi (Memi[buf], IM_LEN(im,1), minval_i, maxval_i,
+		    colmin, colmax)
+		if (first_line) {
+		    min_value = minval_i
+		    max_value = maxval_i
+		    vmin[1] = colmin
+		    vmax[1] = colmax
+		    first_line = false
+		} else {
+		    if (minval_i < min_value) {
+			min_value = minval_i
+			vmin[1] = colmin
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmin[2], vmin[2], sz_val)
+		    }
+		    if (maxval_i > max_value) {
+			max_value = maxval_i
+			vmax[1] = colmax
+			sz_val = IM_NDIM(im) - 1
+			call amovl (ovmax[2], vmax[2], sz_val)
+		    }
+		}
+		sz_val = IM_NDIM(im) - 1
+		call amovl (v[2], ovmin[2], sz_val)
+		call amovl (v[2], ovmax[2], sz_val)
+	    }
+
+	case TY_LONG:
 	    while (imgnll (im, buf, v) != EOF) {
 		call valiml (Meml[buf], IM_LEN(im,1), minval_l, maxval_l,
 		    colmin, colmax)
@@ -222,6 +252,32 @@ begin
 		colmin = i
 	    } else if (value > maxval_s) {
 		maxval_s = value
+		colmax = i
+	    }
+	}
+end
+
+
+# ALIM -- Compute the limits (minimum and maximum values) of a vector.
+
+procedure valimi (a, npix, minval_i, maxval_i, colmin, colmax)
+
+int	a[ARB], minval_i, maxval_i, value
+long	colmin, colmax, npix, i
+
+begin
+	minval_i = a[1]
+	maxval_i = a[1]
+	colmin = 1
+	colmax = 1
+
+	do i = 1, npix {
+	    value = a[i]
+	    if (value < minval_i) {
+		minval_i = value
+		colmin = i
+	    } else if (value > maxval_i) {
+		maxval_i = value
 		colmax = i
 	    }
 	}

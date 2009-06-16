@@ -8,7 +8,6 @@ pointer	xc		#I pointer to the cross-correlation structure
 
 size_t	sz_val
 pointer	sp, str
-int	rg_xstati()
 long	rg_xstatl()
 real	rg_xstatr()
 
@@ -29,7 +28,7 @@ begin
 	# Store the background fitting parameters.
 	call rg_xstats (xc, BSTRING, Memc[str], SZ_LINE)
 	call clpstr ("background", Memc[str])
-	call clputi ("border", rg_xstati (xc, BORDER))
+	call clputl ("border", rg_xstatl (xc, BORDER))
 	call clputr ("loreject", rg_xstatr (xc, LOREJECT))
 	call clputr ("hireject", rg_xstatr (xc, HIREJECT))
 	call clputr ("apodize", rg_xstatr (xc, APODIZE))

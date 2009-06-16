@@ -14,6 +14,7 @@ int	ntie			#I the number of tie points
 int	file_type		#I the input file type
 bool	interactive		#I the 
 
+size_t	sz_val
 int	nref, wcs, key
 pointer	sp, str
 int	clgcur(), fscan(), nscan()
@@ -21,7 +22,8 @@ int	clgcur(), fscan(), nscan()
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Print the prompt string.
 	if (interactive) {
@@ -119,16 +121,19 @@ int	lngunits		#I the ra / longitude units
 int	latunits		#I the dec / latitude units
 int	file_type		#I the input file type
 
-int	nref
+size_t	sz_val
+size_t	nref
 pointer	sp, dxref, dyref, str
 int	fscan(), nscan()
 
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (dxref, ntie, TY_DOUBLE)
-	call salloc (dyref, ntie, TY_DOUBLE)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = ntie
+	call salloc (dxref, sz_val, TY_DOUBLE)
+	call salloc (dyref, sz_val, TY_DOUBLE)
 
 	# Issue prompt.
 	if (fd == STDIN) {
@@ -396,6 +401,7 @@ int	ntie			#I number of tie points
 real	coeff[ARB]		#O the output coefficient array
 int	ncoeff			#I the number of coefficients
 
+size_t	sz_val
 int	ier, xier, yier, nfcoeff
 pointer	sp, wts, fcoeff, sx, sy
 real	xmin, xmax, ymin, ymax
@@ -414,18 +420,21 @@ begin
 	        coeff, ncoeff)
 	default:
 	    call smark (sp)
-	    call salloc (fcoeff, 3, TY_REAL)
-	    call salloc (wts, ntie, TY_REAL)
-	    call alimr (xlist, ntie, xmin, xmax)
-	    call alimr (ylist, ntie, ymin, ymax)
+	    sz_val = 3
+	    call salloc (fcoeff, sz_val, TY_REAL)
+	    sz_val = ntie
+	    call salloc (wts, sz_val, TY_REAL)
+	    call alimr (xlist, sz_val, xmin, xmax)
+	    call alimr (ylist, sz_val, ymin, ymax)
 	    call gsinit (sx, GS_POLYNOMIAL, 2, 2, GS_XNONE, xmin, xmax,
 	        ymin, ymax)
 	    call gsinit (sy, GS_POLYNOMIAL, 2, 2, GS_XNONE, xmin, xmax,
 	        ymin, ymax)
-	    call amovkr (1.0, Memr[wts], ntie)
-	    call gsfit (sx, xlist, ylist, xref, Memr[wts], ntie, WTS_UNIFORM,
+	    sz_val = ntie
+	    call amovkr (1.0, Memr[wts], sz_val)
+	    call gsfit (sx, xlist, ylist, xref, Memr[wts], sz_val, WTS_UNIFORM,
 		xier)
-	    call gsfit (sy, xlist, ylist, yref, Memr[wts], ntie, WTS_UNIFORM,
+	    call gsfit (sy, xlist, ylist, yref, Memr[wts], sz_val, WTS_UNIFORM,
 		yier)
 	    if (xier == OK && xier == OK) {
 	        call gscoeff (sx, Memr[fcoeff], nfcoeff)
@@ -474,7 +483,7 @@ begin
 end
 
 
-# RG_INTERSECT -- Compute the intersection of two sorted lists given a
+# RG_INTERSECTION -- Compute the intersection of two sorted lists given a
 # matching tolerance.
 
 int procedure rg_intersection (ofd, xref, yref, refindex, rlineno, nrefstars,
@@ -484,27 +493,30 @@ int procedure rg_intersection (ofd, xref, yref, refindex, rlineno, nrefstars,
 int	ofd			#I the output file descriptor
 real	xref[ARB]		#I the input x reference coordinates
 real	yref[ARB]		#I the input y reference coordinates
-int	refindex[ARB]		#I the input reference coordinates sort index
+long	refindex[ARB]		#I the input reference coordinates sort index
 int	rlineno[ARB]		#I the input reference coordinate line numbers
 int	nrefstars		#I the number of reference stars
 real	xlist[ARB]		#I the input x list coordinates
 real	ylist[ARB]		#I the input y list coordinates
 real	xtrans[ARB]		#I the input x transformed list coordinates
 real	ytrans[ARB]		#I the input y transformed list coordinates
-int	listindex[ARB]		#I the input list sort index
+long	listindex[ARB]		#I the input list sort index
 int	ilineno[ARB]		#I the input input line numbers
 int	nliststars		#I the number of input stars
 real	tolerance		#I the matching tolerance
 char	xformat[ARB]		#I the output x coordinate format
 char	yformat[ARB]		#I the output y coordinate format
 
-int	blp, rp, rindex, lp, lindex, rmatch, lmatch, ninter
+size_t	sz_val
+int	blp, rp, lp, ninter
+long	rindex, lindex, rmatch, lmatch
 pointer	sp, fmtstr
 real	dx, dy, tol2, rmax2, r2
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
 
 	# Construct the fromat string
 	call sprintf (Memc[fmtstr], SZ_LINE, "%s %s  %s %s  %%5d %%5d\n")
@@ -606,14 +618,14 @@ double	lngref[ARB]		#I the input ra/longitude reference coordinates
 double	latref[ARB]		#I the input dec/latitude reference coordinates
 real	xref[ARB]		#I the input x reference coordinates
 real	yref[ARB]		#I the input y reference coordinates
-int	refindex[ARB]		#I the input reference coordinates sort index
+long	refindex[ARB]		#I the input reference coordinates sort index
 int	rlineno[ARB]		#I the input reference coordinate line numbers
 int	nrefstars		#I the number of reference stars
 real	xlist[ARB]		#I the input x list coordinates
 real	ylist[ARB]		#I the input y list coordinates
 real	xtrans[ARB]		#I the input x transformed list coordinates
 real	ytrans[ARB]		#I the input y transformed list coordinates
-int	listindex[ARB]		#I the input list sort index
+long	listindex[ARB]		#I the input list sort index
 int	ilineno[ARB]		#I the input input line numbers
 int	nliststars		#I the number of input stars
 real	tolerance		#I the matching tolerance
@@ -622,13 +634,16 @@ char	latformat[ARB]		#I the output dec / latitude coordinate format
 char	xformat[ARB]		#I the output x coordinate format
 char	yformat[ARB]		#I the output y coordinate format
 
-int	blp, rp, rindex, lp, lindex, rmatch, lmatch, ninter
+size_t	sz_val
+int	blp, rp, lp, ninter
+long	rindex, lindex, rmatch, lmatch
 pointer	sp, fmtstr
 real	dx, dy, tol2, rmax2, r2
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
 
 	# Construct the fromat string
 	call sprintf (Memc[fmtstr], SZ_LINE, "%s %s  %s %s  %%5d %%5d\n")

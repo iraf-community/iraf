@@ -25,9 +25,12 @@ int	yxterms		#I include cross-terms in y fit
 int	maxiter		#I the maximum number of rejection interations
 double	reject		#I rejection threshold in sigma
 
+size_t	sz_val
+
 begin
 	# Allocate the space.
-	call malloc (fit, LEN_GEOMAP, TY_STRUCT)
+	sz_val = LEN_GEOMAP
+	call malloc (fit, sz_val, TY_STRUCT)
 
 	# Set function and order.
 	GM_PROJECTION(fit) = projection
@@ -59,7 +62,7 @@ pointer	fit		#I pointer to the fitting structure
 
 begin
 	if (GM_REJ(fit) != NULL)
-	    call mfree (GM_REJ(fit), TY_INT)
+	    call mfree (GM_REJ(fit), TY_LONG)
 	call mfree (fit, TY_STRUCT)
 end
 
@@ -81,7 +84,7 @@ real	yref[ARB]	#I y reference array
 real	xin[ARB]	#I x array
 real	yin[ARB]	#I y array
 real	wts[ARB]	#I weight array
-int	npts		#I the number of data points
+size_t	npts		#I the number of data points
 char	xerrmsg[ARB]	#O the x fit error message
 char	yerrmsg[ARB]	#O the y fit error message
 int	maxch		#I maximum size of the error message
@@ -147,13 +150,14 @@ real	yin[npts]	#I input image y values
 real	wts[npts]	#I array of weights
 real	xresid[npts]	#O x fit residuals
 real	yresid[npts]	#O y fit residuals
-int	npts		#I number of points
+size_t	npts		#I number of points
 char	xerrmsg[ARB]	#O returned x fit error message
 int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-int	i
+size_t	sz_val
+long	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, num, denom, theta, det 
 double	ctheta, stheta, cthetax, sthetax, cthetay, sthetay
@@ -164,7 +168,8 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	call salloc (savefit, GS_SAVECOEFF + 3, TY_REAL)
+	sz_val = GS_SAVECOEFF + 3
+	call salloc (savefit, sz_val, TY_REAL)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -370,13 +375,14 @@ real	yin[npts]	#I input image y values
 real	wts[npts]	#I array of weights
 real	xresid[npts]	#O x fit residuals
 real	yresid[npts]	#O y fit residuals
-int	npts		#I number of points
+size_t	npts		#I number of points
 char	xerrmsg[ARB]	#O returned x fit error message
 int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-int	i
+size_t	sz_val
+long	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, sxrxr, syryr, num, denom, det, theta
 double	mag, ctheta, stheta, cthetax, sthetax, cthetay, sthetay
@@ -387,7 +393,8 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	call salloc (savefit, GS_SAVECOEFF + 3, TY_REAL)
+	sz_val = GS_SAVECOEFF + 3
+	call salloc (savefit, sz_val, TY_REAL)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -618,13 +625,14 @@ real	yin[npts]	#I input image y values
 real	wts[npts]	#I array of weights
 real	xresid[npts]	#O x fit residuals
 real	yresid[npts]	#O y fit residuals
-int	npts		#I number of points
+size_t	npts		#I number of points
 char	xerrmsg[ARB]	#O returned x fit error message
 int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-int	i
+size_t	sz_val
+long	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, sxrxr, syryr, num, denom, theta
 double	xmag, ymag, ctheta, stheta, cthetax, sthetax, cthetay, sthetay
@@ -635,7 +643,8 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	call salloc (savefit, GS_SAVECOEFF + 3, TY_REAL)
+	sz_val = GS_SAVECOEFF + 3
+	call salloc (savefit, sz_val, TY_REAL)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -869,12 +878,14 @@ real	y[npts]		#I reference image y values
 real	z[npts]	        #I z values 
 real	wts[npts]	#I array of weights
 real	resid[npts]	#O fitted residuals
-int	npts		#I number of points
+size_t	npts		#I number of points
 int	xfit		#I X fit ?
 char	errmsg[ARB]	#O returned error message
 int	maxch		#I maximum number of characters in error message
 
-int	i, ier, ncoeff
+size_t	sz_val
+long	i
+int	ier, ncoeff
 pointer	sp, zfit, savefit, coeff
 real	xmin, xmax, ymin, ymax
 bool	fp_equald()
@@ -883,8 +894,10 @@ begin
 	# Allocate working space.
 	call smark (sp)
 	call salloc (zfit, npts, TY_REAL)
-	call salloc (savefit, GS_SAVECOEFF + 3, TY_REAL)
-	call salloc (coeff, 3, TY_REAL)
+	sz_val = GS_SAVECOEFF + 3
+	call salloc (savefit, sz_val, TY_REAL)
+	sz_val = 3
+	call salloc (coeff, sz_val, TY_REAL)
 
 	# Determine the minimum and maximum values
 	if (fp_equald (GM_XMIN(fit), GM_XMAX(fit))) {
@@ -1153,14 +1166,14 @@ real	yin[npts]	#I yvalues
 real	wts[npts]	#I weights
 real	xresid[npts]	#I residuals
 real	yresid[npts]	#I yresiduals
-int	npts		#I number of data points
+size_t	npts		#I number of data points
 char	xerrmsg[ARB]	#O the output x error message
 int	xmaxch		#I maximum number of characters in the x error message
 char	yerrmsg[ARB]	#O the output y error message
 int	ymaxch		#I maximum number of characters in the y error message
 
-int	i
-int	nreject, niter
+long	i, nreject
+int	niter
 pointer	sp, twts
 real	cutx, cuty
 errchk	geo_fxyr(), geo_fthetar(), geo_fmagnifyr(), geo_flinearr()
@@ -1172,8 +1185,8 @@ begin
 
 	# Allocate space for the residuals.
 	if (GM_REJ(fit) != NULL)
-	    call mfree (GM_REJ(fit), TY_INT)
-	call malloc (GM_REJ(fit), npts, TY_INT)
+	    call mfree (GM_REJ(fit), TY_LONG)
+	call malloc (GM_REJ(fit), npts, TY_LONG)
 	GM_NREJECT(fit) = 0
 
 	# Initialize the temporary weights array and the number of rejected
@@ -1201,7 +1214,7 @@ begin
 		    (abs (yresid[i]) > cuty))) {
 		    Memr[twts+i-1] = real(0.0)
 		    nreject = nreject + 1
-		    Memi[GM_REJ(fit)+nreject-1] = i
+		    Meml[GM_REJ(fit)+nreject-1] = i
 	        }
 	    }
 	    if ((nreject - GM_NREJECT(fit)) <= 0)
@@ -1295,7 +1308,7 @@ double	yref[ARB]	#I y reference array
 double	xin[ARB]	#I x array
 double	yin[ARB]	#I y array
 double	wts[ARB]	#I weight array
-int	npts		#I the number of data points
+size_t	npts		#I the number of data points
 char	xerrmsg[ARB]	#O the x fit error message
 char	yerrmsg[ARB]	#O the y fit error message
 int	maxch		#I maximum size of the error message
@@ -1361,13 +1374,14 @@ double	yin[npts]	#I input image y values
 double	wts[npts]	#I array of weights
 double	xresid[npts]	#O x fit residuals
 double	yresid[npts]	#O y fit residuals
-int	npts		#I number of points
+size_t	npts		#I number of points
 char	xerrmsg[ARB]	#O returned x fit error message
 int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-int	i
+size_t	sz_val
+long	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, num, denom, theta, det 
 double	ctheta, stheta, cthetax, sthetax, cthetay, sthetay
@@ -1378,7 +1392,8 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	call salloc (savefit, GS_SAVECOEFF + 3, TY_DOUBLE)
+	sz_val = GS_SAVECOEFF + 3
+	call salloc (savefit, sz_val, TY_DOUBLE)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -1584,13 +1599,14 @@ double	yin[npts]	#I input image y values
 double	wts[npts]	#I array of weights
 double	xresid[npts]	#O x fit residuals
 double	yresid[npts]	#O y fit residuals
-int	npts		#I number of points
+size_t	npts		#I number of points
 char	xerrmsg[ARB]	#O returned x fit error message
 int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-int	i
+size_t	sz_val
+long	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, sxrxr, syryr, num, denom, det, theta
 double	mag, ctheta, stheta, cthetax, sthetax, cthetay, sthetay
@@ -1601,7 +1617,8 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	call salloc (savefit, GS_SAVECOEFF + 3, TY_DOUBLE)
+	sz_val = GS_SAVECOEFF + 3
+	call salloc (savefit, sz_val, TY_DOUBLE)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -1832,13 +1849,14 @@ double	yin[npts]	#I input image y values
 double	wts[npts]	#I array of weights
 double	xresid[npts]	#O x fit residuals
 double	yresid[npts]	#O y fit residuals
-int	npts		#I number of points
+size_t	npts		#I number of points
 char	xerrmsg[ARB]	#O returned x fit error message
 int	xmaxch		#I maximum number of characters in x fit error message
 char	yerrmsg[ARB]	#O returned y fit error message
 int	ymaxch		#I maximum number of characters in y fit error message
 
-int	i
+size_t	sz_val
+long	i
 double	sw, sxr, syr, sxi, syi, xr0, yr0, xi0, yi0
 double	syrxi, sxryi, sxrxi, syryi, sxrxr, syryr, num, denom, theta
 double	xmag, ymag, ctheta, stheta, cthetax, sthetax, cthetay, sthetay
@@ -1849,7 +1867,8 @@ bool	fp_equald()
 begin
 	# Allocate some working space
 	call smark (sp)
-	call salloc (savefit, GS_SAVECOEFF + 3, TY_DOUBLE)
+	sz_val = GS_SAVECOEFF + 3
+	call salloc (savefit, sz_val, TY_DOUBLE)
 
 	# Initialize the fit.
         if (sx1 != NULL)
@@ -2083,12 +2102,14 @@ double	y[npts]		#I reference image y values
 double	z[npts]	        #I z values 
 double	wts[npts]	#I array of weights
 double	resid[npts]	#O fitted residuals
-int	npts		#I number of points
+size_t	npts		#I number of points
 int	xfit		#I X fit ?
 char	errmsg[ARB]	#O returned error message
 int	maxch		#I maximum number of characters in error message
 
-int	i, ier, ncoeff
+size_t	sz_val
+long	i
+int	ier, ncoeff
 pointer	sp, zfit, savefit, coeff
 double	xmin, xmax, ymin, ymax
 bool	fp_equald()
@@ -2097,8 +2118,10 @@ begin
 	# Allocate working space.
 	call smark (sp)
 	call salloc (zfit, npts, TY_DOUBLE)
-	call salloc (savefit, GS_SAVECOEFF + 3, TY_DOUBLE)
-	call salloc (coeff, 3, TY_DOUBLE)
+	sz_val = GS_SAVECOEFF + 3
+	call salloc (savefit, sz_val, TY_DOUBLE)
+	sz_val = 3
+	call salloc (coeff, sz_val, TY_DOUBLE)
 
 	# Determine the minimum and maximum values
 	if (fp_equald (GM_XMIN(fit), GM_XMAX(fit))) {
@@ -2365,14 +2388,14 @@ double	yin[npts]	#I yvalues
 double	wts[npts]	#I weights
 double	xresid[npts]	#I residuals
 double	yresid[npts]	#I yresiduals
-int	npts		#I number of data points
+size_t	npts		#I number of data points
 char	xerrmsg[ARB]	#O the output x error message
 int	xmaxch		#I maximum number of characters in the x error message
 char	yerrmsg[ARB]	#O the output y error message
 int	ymaxch		#I maximum number of characters in the y error message
 
-int	i
-int	nreject, niter
+long	i, nreject
+int	niter
 pointer	sp, twts
 double	cutx, cuty
 errchk	geo_fxyd(), geo_fthetad(), geo_fmagnifyd(), geo_flineard()
@@ -2384,8 +2407,8 @@ begin
 
 	# Allocate space for the residuals.
 	if (GM_REJ(fit) != NULL)
-	    call mfree (GM_REJ(fit), TY_INT)
-	call malloc (GM_REJ(fit), npts, TY_INT)
+	    call mfree (GM_REJ(fit), TY_LONG)
+	call malloc (GM_REJ(fit), npts, TY_LONG)
 	GM_NREJECT(fit) = 0
 
 	# Initialize the temporary weights array and the number of rejected
@@ -2413,7 +2436,7 @@ begin
 		    (abs (yresid[i]) > cuty))) {
 		    Memd[twts+i-1] = double(0.0)
 		    nreject = nreject + 1
-		    Memi[GM_REJ(fit)+nreject-1] = i
+		    Meml[GM_REJ(fit)+nreject-1] = i
 	        }
 	    }
 	    if ((nreject - GM_NREJECT(fit)) <= 0)

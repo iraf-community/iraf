@@ -14,10 +14,11 @@ size_t	pnx, pny	#I the dimensions of the data region
 real	offset		#I the input offset
 real	coeff[ARB]	#O the output coefficients
 
-int	wxborder, wyborder
+size_t	wxborder, wyborder
 pointer	gs
 real	loreject, hireject, zero
-int	rg_pstati(), rg_znsum(), rg_znmedian(), rg_slope()
+int	rg_pstati(), rg_slope()
+long	rg_znmedian(), rg_znsum()
 real	rg_pstatr()
 
 begin

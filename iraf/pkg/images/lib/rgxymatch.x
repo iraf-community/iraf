@@ -6,15 +6,16 @@ procedure rg_rxyl (xl, yl, nx, ny, x1, x2, y1, y2)
 
 double	xl[ARB]			#O array of output x coordinates
 double	yl[ARB]			#O array of output y coordinates
-int	nx			#I the size of the grid in x
-int	ny			#I the size of the grid in y
+size_t	nx			#I the size of the grid in x
+size_t	ny			#I the size of the grid in y
 double	x1			#I the lower limit of the grid in x
 double	x2			#I the upper limit of the grid in x
 double	y1			#I the lower limit of the grid in y
 double	y2			#I the upper limit of the grid in y
 
 double	xstep, ystep, x, y
-int	i, j, npts
+long	i, j
+size_t	npts
 
 begin
 	if (nx == 1)
@@ -51,13 +52,14 @@ double	xl[ARB]			#I the input logical x coordinate
 double	yl[ARB]			#I the input logical y coordinate
 double	xw[ARB]			#O the output world x coordinate
 double	yw[ARB]			#O the output world y coordinate
-int	npts			#I the number of coordinates.
+size_t	npts			#I the number of coordinates.
 char	inwcs[ARB]		#I the input wcs
 char	outwcs[ARB]		#I the output wcs
 int	ax1			#I the logical x axis
 int	ax2			#I the logical y axis
 
-int	i, axbits
+long	i
+int	axbits
 pointer	ct
 double	mw_c1trand()
 int	mw_stati()

@@ -4,10 +4,10 @@
 
 int procedure rg_szfft (npts, window)
 
-int	npts			#I the number of points in the data
-int	window			#I the width of the valid cross correlation
+size_t	npts			#I the number of points in the data
+long	window			#I the width of the valid cross correlation
 
-int	nfft, pow2
+long	nfft, pow2
 
 begin
 	nfft = npts + window / 2
@@ -26,11 +26,11 @@ end
 procedure rg_rload (buf, ncols, nlines, fft, nxfft, nyfft)
 
 real    buf[ARB]        	#I the input data buffer
-int     ncols, nlines   	#I the size of the input buffer
+size_t	ncols, nlines   	#I the size of the input buffer
 real    fft[ARB]        	#O the out array to be fft'd
-int     nxfft, nyfft    	#I the dimensions of the fft
+long	nxfft, nyfft    	#I the dimensions of the fft
 
-int     i, dindex, findex
+long	i, dindex, findex
 
 begin
         # Load the reference and image data.
@@ -50,11 +50,11 @@ end
 procedure rg_iload (buf, ncols, nlines, fft, nxfft, nyfft)
 
 real    buf[ARB]        	#I the input data buffer
-int     ncols, nlines   	#I the size of the input buffer
+size_t	ncols, nlines   	#I the size of the input buffer
 real    fft[ARB]        	#O the output array to be fft'd
-int     nxfft, nyfft    	#I the dimensions of the fft
+long	nxfft, nyfft    	#I the dimensions of the fft
 
-int     i, dindex, findex
+long	i, dindex, findex
 
 begin
         # Load the reference and image data.
@@ -75,9 +75,9 @@ procedure rg_rweave (a, b, npts)
 
 real    a[ARB]          	#I input array
 real    b[ARB]          	#O output array
-int     npts            	#I the number of data points
+size_t	npts            	#I the number of data points
 
-int     i
+long	i
 
 begin
         do i = 1, npts
@@ -92,9 +92,9 @@ procedure rg_iweave (a, b, npts)
 
 real    a[ARB]          	#I the input array
 real    b[ARB]          	#O the output array
-int     npts            	#I the number of data points
+size_t	npts            	#I the number of data points
 
-int     i
+long	i
 
 begin
         do i = 1, npts
@@ -113,12 +113,13 @@ end
 procedure rg_fourn (data, nn, ndim, isign)
 
 real    data[ARB]               #I/O input data and output fft
-int     nn[ndim]                #I array of dimension lengths
-int     ndim                    #I number of dimensions
-int     isign                   #I forward or inverse transform
+long	nn[ndim]                #I array of dimension lengths
+int	ndim                    #I number of dimensions
+int	isign                   #I forward or inverse transform
 
-int     idim, i1, i2, i3, ip1, ip2, ip3, ifp1, ifp2, i2rev, i3rev, k1, k2
-int     ntot, nprev, n, nrem, pibit
+int	idim
+long	i1, i2, i3, ip1, ip2, ip3, ifp1, ifp2, i2rev, i3rev, k1, k2, pibit
+long	ntot, n, nrem, nprev
 double  wr, wi, wpr, wpi, wtemp, theta
 real    tempr, tempi
 
@@ -205,9 +206,9 @@ procedure rg_fshift (fft1, fft2, nx, ny)
 
 real    fft1[nx,ARB]            #I input fft array
 real    fft2[nx,ARB]            #O output fft array
-int     nx, ny                  #I fft array dimensions
+long	nx, ny                  #I fft array dimensions
 
-int     i, j
+long	i, j
 real    fac
 
 begin
@@ -230,11 +231,11 @@ end
 procedure rg_movexr (fft, nxfft, nyfft, xcor, xwindow, ywindow)
 
 real    fft[ARB]                #I the input fft
-int     nxfft, nyfft            #I the dimensions of the input fft
+long	nxfft, nyfft            #I the dimensions of the input fft
 real    xcor[ARB]   	        #O the output cross-correlation function
-int     xwindow, ywindow        #I the cross-correlation function window
+long	xwindow, ywindow        #I the cross-correlation function window
 
-int     j, ix, iy, findex, xindex
+long	j, ix, iy, findex, xindex
 
 begin
         # Compute the starting index of the extraction array.
@@ -259,9 +260,9 @@ procedure rg_extract (a, b, npts)
 
 real    a[ARB]          #I the input array
 real    b[ARB]          #O the output array
-int     npts            #I the number of data points
+size_t	npts            #I the number of data points
 
-int     i
+long	i
 
 begin
         do i = 1, npts

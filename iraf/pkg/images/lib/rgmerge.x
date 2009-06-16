@@ -20,12 +20,12 @@ int	nref			#I the number of reference coordinates
 real	xin[ARB]		#I the input x coordinates
 real	yin[ARB]		#I the input y coordinates
 int	nin			#I the number of input coordinates
-int	reftri[nrmaxtri,ARB]	#U list of reference triangles
+long	reftri[nrmaxtri,ARB]	#U list of reference triangles
 real	reftrirat[nrmaxtri,ARB]	#U list of reference triangle parameters
 int	nreftri			#U number of reference triangles
 int	nrmaxtri		#I maximum number of reference triangles
 int	nrefstars		#I the number of reference stars
-int	intri[ninmaxtri,ARB]	#U list of input triangles
+long	intri[ninmaxtri,ARB]	#U list of input triangles
 real	intrirat[ninmaxtri,ARB]	#U list of input triangle parameters
 int	nintri			#U number of input triangles
 int	ninmaxtri		#I maximum number of input triangles
@@ -35,6 +35,7 @@ real	ptolerance		#I the input triangles matching tolerance
 real	ratio			#I the maximum ratio of triangle sides
 int	nreject			#I maximum number of rejection iterations
 
+size_t	sz_val
 int	i, nmerge, nkeep, nmatch, ncheck
 pointer	sp, rindex, lindex
 int	rg_tmerge(), rg_treject(), rg_tvote(), rg_triangle
@@ -72,17 +73,18 @@ begin
 
 	    # Find the indices of the matched points.
 	    call smark (sp)
-	    call salloc (rindex, nmatch, TY_INT)
-	    call salloc (lindex, nmatch, TY_INT)
+	    sz_val = nmatch
+	    call salloc (rindex, sz_val, TY_LONG)
+	    call salloc (lindex, sz_val, TY_LONG)
 	    do i = 1, nmatch {
-		Memi[rindex+i-1] = reftri[i,RG_MATCH]
-		Memi[lindex+i-1] = intri[i,RG_MATCH]
+		Meml[rindex+i-1] = reftri[i,RG_MATCH]
+		Meml[lindex+i-1] = intri[i,RG_MATCH]
 	    }
 
 	    # Recompute the triangles.
-	    nreftri = rg_triangle (xref, yref, Memi[rindex], nmatch, reftri,
+	    nreftri = rg_triangle (xref, yref, Meml[rindex], nmatch, reftri,
 		reftrirat, nrmaxtri, nrefstars, tolerance, ratio)
-	    nintri = rg_triangle (xin, yin, Memi[lindex], nmatch, intri,
+	    nintri = rg_triangle (xin, yin, Meml[lindex], nmatch, intri,
 		intrirat, ninmaxtri, nliststars, ptolerance, ratio)
 
 	    # Rematch the triangles.
@@ -134,16 +136,17 @@ int procedure rg_triangle (xref, yref, refindex, nrefstars, reftri, tripar,
 
 real	xref[ARB]		#I x reference coordinates
 real	yref[ARB]		#I y reference coordinates
-int	refindex[ARB]		#I the reference list sort index
+long	refindex[ARB]		#I the reference list sort index
 int	nrefstars		#I number of reference stars
-int	reftri[nmaxtri,ARB]	#O reference triangles
+long	reftri[nmaxtri,ARB]	#O reference triangles
 real	tripar[nmaxtri,ARB]	#O triangle parameters
 int	nmaxtri			#I maximum number of triangles
 int	maxnpts			#I the maximum number of points
 real	tolerance		#I matching tolerance
 real	maxratio		#I maximum ratio of triangle sides
 
-int	i, j, k, nsample, npts, ntri
+int	i, j, k, nsample, npts
+size_t	ntri
 real	rij, rjk, rki, dx1, dy1, dx2, dy2, dx3, dy3, r1, r2sq, r2, r3sq, r3
 real	ratio, cosc, cosc2, sinc2, tol2, tol
 
@@ -275,22 +278,25 @@ end
 int procedure rg_tmerge (reftri, rtripar, nrtri, nmrtri, listri, ltripar,
 	nltri, nmltri)
 
-int	reftri[nmrtri,ARB]	#U list of reference triangles
+long	reftri[nmrtri,ARB]	#U list of reference triangles
 real	rtripar[nmrtri,ARB]	#I reference triangle parameters
 int	nrtri			#I number of reference triangles
 int	nmrtri			#I maximum number of reference triangles
-int	listri[nmltri,ARB]	#U list of reference triangles
+long	listri[nmltri,ARB]	#U list of reference triangles
 real	ltripar[nmltri,ARB]	#I reference triangle parameters
 int	nltri			#I number of reference triangles
 int	nmltri			#I maximum number of reference triangles
 
-int	rp, blp, lp, ninter, rindex, lindex, mindex
+size_t	sz_val
+int	rp, blp, lp, ninter
+long	rindex, lindex, mindex
 real	rmaxtol, lmaxtol, maxtol, dr, dr2, mdr2, dcos2, mdcos2, dtolr, dtolc 
 
 begin
 	# Find the maximum tolerance for each list.
-	call alimr (rtripar[1,RG_TOLR], nrtri, maxtol, rmaxtol)
-	call alimr (ltripar[1,RG_TOLR], nltri, maxtol, lmaxtol)
+	sz_val = nrtri
+	call alimr (rtripar[1,RG_TOLR], sz_val, maxtol, rmaxtol)
+	call alimr (ltripar[1,RG_TOLR], sz_val, maxtol, lmaxtol)
 	maxtol = sqrt (rmaxtol + lmaxtol)
 
 	# Define the beginning of the search range for each triangle.
@@ -372,27 +378,29 @@ end
 int procedure rg_treject (reftri, rtripar, nrtri, nmrtri, listri, ltripar,
 	nltri, nmltri, nmatch, maxiter)
 
-int	reftri[nmrtri,ARB]	#U list of reference triangles
+long	reftri[nmrtri,ARB]	#U list of reference triangles
 real	rtripar[nmrtri,ARB]	#I reference triangle parameters
 int	nrtri			#I number of reference triangles
 int	nmrtri			#I maximum number of reference triangles
-int	listri[nmltri,ARB]	#U list of reference triangles
+long	listri[nmltri,ARB]	#U list of reference triangles
 real	ltripar[nmltri,ARB]	#I reference triangle parameters
 int	nltri			#I number of reference triangles
 int	nmltri			#I maximum number of reference triangles
 int	nmatch			#I initial number of matches
 int	maxiter			#I maximum number of rejection iterations
 
+size_t	sz_val
 double	dif, mode, sum, sumsq
-int	i, nrej, nplus, nminus, ntrue, nfalse, npts, ncount, niter, rindex
-int	lindex
+int	i, nrej, nplus, nminus, ntrue, nfalse, npts, ncount, niter
+long	rindex, lindex
 pointer	sp, adif
 real	sigma, factor, locut, hicut
 double	rg_moded()
 
 begin
 	call smark (sp)
-	call salloc (adif, nmatch, TY_DOUBLE)
+	sz_val = nmatch
+	call salloc (adif, sz_val, TY_DOUBLE)
 
 	# Accumulate the number of same sense and number of opposite sense
 	# matches as well as the log perimeter statistics.
@@ -412,7 +420,7 @@ begin
 	nminus = nmatch - nplus
 
 	# Compute the mean, mode, and sigma of the logP distribution,
-	ntrue = abs (nplus - nminus)
+	ntrue = iabs(nplus - nminus)
 	nfalse = nplus + nminus - ntrue
 	#mean = sum / nmatch
 	if (nmatch <= 1)
@@ -424,7 +432,8 @@ begin
 	    return (nmatch)
 	} else
 	    sigma = sqrt (sigma)
-	call asrtd (Memd[adif], Memd[adif], nmatch)
+	sz_val = nmatch
+	call asrtd (Memd[adif], Memd[adif], sz_val)
         #if (mod (nmatch,2) == 1)
             #median = Memd[adif+nmatch/2]
         #else
@@ -492,7 +501,8 @@ begin
 	    if (sigma <= 0.0)
 		break
 	    sigma = sqrt (sigma)
-	    call asrtd (Memd[adif], Memd[adif], npts)
+	    sz_val = npts
+	    call asrtd (Memd[adif], Memd[adif], sz_val)
             #if (mod (npts,2) == 1)
                 #median = Memd[adif+npts/2]
             #else
@@ -502,7 +512,7 @@ begin
 
 	    # Recompute the ksigma rejection criterion based on the number of
 	    # same and opposite sense matches.
-	    ntrue = abs (nplus - nminus)
+	    ntrue = iabs(nplus - nminus)
 	    nfalse = nplus + nminus - ntrue
 	    if (nfalse > ntrue)
 	        factor = 1.0
@@ -556,16 +566,18 @@ end
 int procedure rg_tvote (reftri, nmrtri, nrefstars, listri, nmltri, nliststars,
 	nmatch)
 
-int	reftri[nmrtri,ARB]		#U reference triangles
+long	reftri[nmrtri,ARB]		#U reference triangles
 int	nmrtri				#I maximum number of reference triangles
 int	nrefstars			#I number of reference stars
-int	listri[nmltri,ARB]		#U input list triangles
+long	listri[nmltri,ARB]		#U input list triangles
 int	nmltri				#I maximum number of list triangles
 int	nliststars			#I number of list stars
 int	nmatch				#I number of match triangles
 
-int	i, j, rp, lp, vp, pixval, tminvote, tmaxvote, minvote, maxvote, hmaxvote
-int	ninter, axes[2], laxes[2], pvp
+size_t	sz_val
+int	pixval, tminvote, tmaxvote, minvote, maxvote, hmaxvote, ninter
+long	i, j, rp, lp, vp, pvp
+long	axes[2], laxes[2]
 pointer	sp, vote, vindex, pl, lmatch, rmatch
 bool	pl_linenotempty()
 pointer	pl_create()
@@ -585,7 +597,8 @@ begin
 	    if (! pl_linenotempty (pl, laxes))
 	        call pl_point (pl, laxes[1], laxes[2], PIX_SET + PIX_VALUE(1))
 	    else {
-		call pl_glpi (pl, laxes, pixval, 16, 1, PIX_SRC)
+		sz_val = 1
+		call pl_glpi (pl, laxes, pixval, 16, sz_val, PIX_SRC)
 		pixval = pixval + 1
 	        call pl_point (pl, laxes[1], laxes[2], PIX_SET +
 		    PIX_VALUE(pixval))
@@ -595,7 +608,8 @@ begin
 	    if (! pl_linenotempty (pl, laxes))
 	        call pl_point (pl, laxes[1], laxes[2], PIX_SET + PIX_VALUE(1))
 	    else {
-		call pl_glpi (pl, laxes, pixval, 16, 1, PIX_SRC)
+		sz_val = 1
+		call pl_glpi (pl, laxes, pixval, 16, sz_val, PIX_SRC)
 		pixval = pixval + 1
 	        call pl_point (pl, laxes[1], laxes[2], PIX_SET +
 		    PIX_VALUE(pixval))
@@ -605,7 +619,8 @@ begin
 	    if (! pl_linenotempty (pl, laxes))
 	        call pl_point (pl, laxes[1], laxes[2], PIX_SET + PIX_VALUE(1))
 	    else {
-		call pl_glpi (pl, laxes, pixval, 16, 1, PIX_SRC)
+		sz_val = 1
+		call pl_glpi (pl, laxes, pixval, 16, sz_val, PIX_SRC)
 		pixval = pixval + 1
 	        call pl_point (pl, laxes[1], laxes[2], PIX_SET +
 		    PIX_VALUE(pixval))
@@ -615,7 +630,7 @@ begin
 	# Allocate temporary working space.
 	call smark (sp)
 	call salloc (vote, axes[1], TY_INT)
-	call salloc (vindex, axes[1], TY_INT)
+	call salloc (vindex, axes[1], TY_LONG)
 	call salloc (lmatch, axes[1], TY_INT)
 	call salloc (rmatch, axes[2], TY_INT)
 	call amovki (NO, Memi[lmatch], axes[1])
@@ -647,11 +662,11 @@ begin
 
 	        # Sort the vote array.
 	        do i = 1, axes[1]
-		    Memi[vindex+i-1] = i
+		    Meml[vindex+i-1] = i
 	        laxes[1] = 1
 	        laxes[2] = j
 	        call pl_glpi (pl, laxes, Memi[vote], 16, axes[1], PIX_SRC)
-	        call rg_qsorti (Memi[vote], Memi[vindex], Memi[vindex],
+	        call rg_qsorti (Memi[vote], Meml[vindex], Meml[vindex],
 		    axes[1])
 
 	        # Reject points which have no votes, which have only a
@@ -660,8 +675,8 @@ begin
 		# the same number of votes as the next largest index,
 		# or which have already been matched.
 
-		vp = Memi[vindex+axes[1]-1]
-		pvp = Memi[vindex+axes[1]-2]
+		vp = Meml[vindex+axes[1]-1]
+		pvp = Meml[vindex+axes[1]-2]
 	        if (Memi[vote+vp-1] <= 0)
 		    next
 		if (Memi[vote+vp-1] == Memi[vote+pvp-1])
@@ -699,15 +714,17 @@ real	xref[ARB]		#I the x reference coordinates
 real	yref[ARB]		#I the y reference coordinates
 real	xlist[ARB]		#I the x list coordinates
 real	ylist[ARB]		#I the y list coordinates
-int	reftri[nmrtri,ARB]	#I list of reference triangles
+long	reftri[nmrtri,ARB]	#I list of reference triangles
 int	nmrtri			#I maximum number of reference triangles
-int	listri[nmltri,ARB]	#I list of reference triangles
+long	listri[nmltri,ARB]	#I list of reference triangles
 int	nmltri			#I maximum number of list triangles
 int	nmatch			#I number of matches
 real	coeff[ARB]		#O the new computed coefficients
 int	ncoeff			#I the number of coefficients
 
-int	i, rindex, lindex, stat
+size_t	sz_val
+int	i, stat
+long	rindex, lindex
 pointer	sp, xr, yr, xin, yin
 int	rg_lincoeff()
 
@@ -716,10 +733,11 @@ begin
 	    return (ERR)
 
 	call smark (sp)
-	call salloc (xr, nmatch, TY_REAL)
-	call salloc (yr, nmatch, TY_REAL)
-	call salloc (xin, nmatch, TY_REAL)
-	call salloc (yin, nmatch, TY_REAL)
+	sz_val = nmatch
+	call salloc (xr, sz_val, TY_REAL)
+	call salloc (yr, sz_val, TY_REAL)
+	call salloc (xin, sz_val, TY_REAL)
+	call salloc (yin, sz_val, TY_REAL)
 
 	# Load the points to be fit.
 	do i = 1, nmatch {
@@ -754,20 +772,23 @@ int	rlineno[ARB]		#I the reference coordinate line numbers
 real	xlist[ARB]		#I the x list coordinates
 real	ylist[ARB]		#I the y list coordinates
 int	ilineno[ARB]		#I the input list line numbers
-int	reftri[nmrtri,ARB]	#I list of reference triangles
+long	reftri[nmrtri,ARB]	#I list of reference triangles
 int	nmrtri			#I maximum number of reference triangles
-int	listri[nmltri,ARB]	#I list of reference triangles
+long	listri[nmltri,ARB]	#I list of reference triangles
 int	nmltri			#I maximum number of list triangles
 int	nmatch			#I number of matches
 char	xformat[ARB]		#I the output x column format
 char	yformat[ARB]		#I the output y column format
 
-int	i, lindex, rindex
+size_t	sz_val
+int	i
+long	lindex, rindex
 pointer	sp, fmtstr
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
 
 	# Construct the format string.
 	call sprintf (Memc[fmtstr], SZ_LINE, "%s %s  %s %s  %%5d %%5d\n")
@@ -818,9 +839,9 @@ int	rlineno[ARB]		#I the reference coordinate line numbers
 real	xlist[ARB]		#I the x list coordinates
 real	ylist[ARB]		#I the y list coordinates
 int	ilineno[ARB]		#I the input list line numbers
-int	reftri[nmrtri,ARB]	#I list of reference triangles
+long	reftri[nmrtri,ARB]	#I list of reference triangles
 int	nmrtri			#I maximum number of reference triangles
-int	listri[nmltri,ARB]	#I list of reference triangles
+long	listri[nmltri,ARB]	#I list of reference triangles
 int	nmltri			#I maximum number of list triangles
 int	nmatch			#I number of matches
 char	lngformat[ARB]		#I the output longitude column format
@@ -828,12 +849,15 @@ char	latformat[ARB]		#I the output latitude column format
 char	xformat[ARB]		#I the output x column format
 char	yformat[ARB]		#I the output y column format
 
-int	i, lindex, rindex
+size_t	sz_val
+int	i
+long	lindex, rindex
 pointer	sp, fmtstr
 
 begin
 	call smark (sp)
-	call salloc (fmtstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fmtstr, sz_val, TY_CHAR)
 
 	# Construct the format string.
 	call sprintf (Memc[fmtstr], SZ_LINE, "%s %s  %s %s  %%5d %%5d\n")
@@ -905,20 +929,21 @@ end
 double procedure rg_moded (a, npts, nmin, zrange, fzbin, fzstep)
 
 double  a[npts]                 #I the sorted input data array
-int     npts                    #I the number of points
-int     nmin                    #I the minimum number of points
+int	npts                    #I the number of points
+int	nmin                    #I the minimum number of points
 double  zrange                  #I fraction of pixels around median to use
 double  fzbin                   #I the bin size for the mode search
 double  fzstep                  #I the step size for the mode search
 
-int     x1, x2, x3, nmax
+int	x1, x2, x3, nmax
 double  zstep, zbin, y1, y2, mode
 bool    fp_equald()
+int	imod()
 
 begin
         # If there are too few points return the median.
         if (npts < nmin) {
-            if (mod (npts,2) == 1)
+            if ( imod(npts,2) == 1 )
                 return (a[1+npts/2])
             else
                 return ((a[npts/2] + a[1+npts/2]) / 2.0d0)
@@ -926,8 +951,8 @@ begin
 
         # Compute the data range that will be used to do the mode search.
         # If the data has no range then the constant value will be returned.
-        x1 = max (1, int (1.0d0 + npts * (1.0d0 - zrange) / 2.0d0))
-        x3 = min (npts, int (1.0d0 + npts * (1.0d0 + zrange) / 2.0d0))
+        x1 = max (1, idint(1.0d0 + npts * (1.0d0 - zrange) / 2.0d0))
+        x3 = min (npts, idint(1.0d0 + npts * (1.0d0 + zrange) / 2.0d0))
         if (fp_equald (a[x1], a[x3]))
             return (a[x1])
 
@@ -949,7 +974,7 @@ begin
                 ;
             if (x2 - x1 > nmax) {
                 nmax = x2 - x1
-                if (mod (x2+x1,2) == 0)
+                if ( imod(x2+x1,2) == 0 )
                     mode = a[(x2+x1)/2]
                 else
                     mode = (a[(x2+x1)/2] + a[(x2+x1)/2+1]) / 2.0d0

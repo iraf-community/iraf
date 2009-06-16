@@ -28,7 +28,7 @@ define	XC_DXLAG	Meml[P2L($1+19)]	# incremental shift in x
 define	XC_DYLAG	Meml[P2L($1+20)]	# incremental shift in y
 
 define	XC_BACKGRD	Memi[P2I($1+21)]	# type of background subtraction
-define	XC_BORDER	Memi[P2I($1+22)]	# width of background border
+define	XC_BORDER	Meml[P2L($1+22)]	# width of background border
 define	XC_BVALUER	Memr[P2R($1+23)]	# reference background value
 define	XC_BVALUE	Memr[P2R($1+24)]	# image bacground value
 define	XC_LOREJECT	Memr[P2R($1+25)]	# low side rejection
@@ -130,7 +130,7 @@ define	DEF_XWINDOW	5
 define	DEF_YWINDOW	5
 
 define	DEF_BACKGRD	XC_BNONE
-define	DEF_BORDER	INDEFI
+define	DEF_BORDER	INDEFL
 define  DEF_LOREJECT	INDEFR
 define	DEF_HIREJECT	INDEFR
 

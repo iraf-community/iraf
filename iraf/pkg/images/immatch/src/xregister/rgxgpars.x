@@ -10,7 +10,7 @@ size_t	sz_val
 long	c_2
 long	xlag, ylag, xwindow, ywindow, xcbox, ycbox
 pointer	sp, str
-int	clgwrd(), clgeti()
+int	clgwrd()
 long	clgetl(), lmod()
 real	clgetr()
 
@@ -40,7 +40,7 @@ begin
 	call rg_xseti (xc, BACKGRD, clgwrd ("background", Memc[str], SZ_LINE,
 	    XC_BTYPES))
 	call rg_xsets (xc, BSTRING, Memc[str])
-	call rg_xseti (xc, BORDER, clgeti ("border"))
+	call rg_xsetl (xc, BORDER, clgetl ("border"))
 	call rg_xsetr (xc, LOREJECT, clgetr ("loreject"))
 	call rg_xsetr (xc, HIREJECT, clgetr ("hireject"))
 	call rg_xsetr (xc, APODIZE, clgetr ("apodize"))

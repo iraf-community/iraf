@@ -12,22 +12,28 @@ char	image1[ARB]			# Input image
 char	image2[ARB]			# Output image
 bool	verbose				# Print the operation
 
-int	npix, junk
+size_t	sz_val
+long	l_val
+size_t	npix
+long	junk
 pointer	buf1, buf2, im1, im2
 pointer	sp, root1, root2, imtemp, section
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 
 bool	strne()
-long	imgnls(), imgnll(), imgnlr(), imgnld(), imgnlx()
-long	impnls(), impnll(), impnlr(), impnld(), impnlx()
+long	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
+long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 pointer	immap()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (root1, SZ_PATHNAME, TY_CHAR)
-	call salloc (root2, SZ_PATHNAME, TY_CHAR)
-	call salloc (imtemp, SZ_PATHNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (root1, sz_val, TY_CHAR)
+	call salloc (root2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (section, sz_val, TY_CHAR)
 
 	# If verbose print the operation.
 	if (verbose) {
@@ -43,7 +49,7 @@ begin
 	call imgsection (image2, Memc[section], SZ_FNAME)
 
 	# Map the input image.
-	im1 = immap (image1, READ_ONLY, 0)
+	im1 = immap (image1, READ_ONLY, NULLPTR)
 
 	# If the output has a section appended we are writing to a
 	# section of an existing image.  Otherwise get a temporary
@@ -53,7 +59,7 @@ begin
 
 	if (strne (Memc[root1], Memc[root2]) && Memc[section] != EOS) {
 	    call strcpy (image2, Memc[imtemp], SZ_PATHNAME)
-	    im2 = immap (image2, READ_WRITE, 0)
+	    im2 = immap (image2, READ_WRITE, NULLPTR)
 	} else {
 	    call xt_mkimtemp (image1, image2, Memc[imtemp], SZ_PATHNAME)
 	    im2 = immap (image2, NEW_COPY, im1)
@@ -61,8 +67,10 @@ begin
 
 	# Setup start vector for sequential reads and writes.
 
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	# Copy the image.
 
@@ -73,7 +81,12 @@ begin
 		junk = impnls (im2, buf2, v2)
 		call amovs (Mems[buf1], Mems[buf2], npix)
 	    }
-	case TY_USHORT, TY_INT, TY_LONG:
+	case TY_USHORT, TY_INT:
+	    while (imgnli(im1, buf1, v1) != EOF) {
+		junk = impnli (im2, buf2, v2)
+		call amovi (Memi[buf1], Memi[buf2], npix)
+	    }
+	case TY_LONG:
 	    while (imgnll (im1, buf1, v1) != EOF) {
 		junk = impnll (im2, buf2, v2)
 		call amovl (Meml[buf1], Meml[buf2], npix)

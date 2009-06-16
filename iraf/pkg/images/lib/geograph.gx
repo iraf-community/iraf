@@ -22,16 +22,19 @@ int	plot_type	#I type of plot
 pointer	gt		#I gtools descriptor
 pointer	fit		#I geomap fit parameters
 
-int	npts
+size_t	sz_val
+size_t	npts
 pointer	sp, params, xtermlab, ytermlab
 real	xrms, yrms, rej
 int	strlen(), rg_wrdstr()
 
 begin
 	call smark (sp)
-	call salloc (params, MAX_PARAMS, TY_CHAR)
-	call salloc (xtermlab, SZ_FNAME, TY_CHAR)
-	call salloc (ytermlab, SZ_FNAME, TY_CHAR)
+	sz_val = MAX_PARAMS
+	call salloc (params, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (xtermlab, sz_val, TY_CHAR)
+	call salloc (ytermlab, sz_val, TY_CHAR)
 
 	npts = max (0, GM_NPTS(fit) - GM_NWTS0(fit))
 	xrms = max (0.0d0, GM_XRMS(fit))
@@ -66,9 +69,9 @@ begin
 	    case GS_POLYNOMIAL:
 		call pargstr ("polynomial")
 	    }
-	    call pargi (GM_NPTS(fit))
+	    call pargz (GM_NPTS(fit))
 	    call pargr (rej)
-	    call pargi (GM_NWTS0(fit))
+	    call pargz (GM_NWTS0(fit))
 
 	# Print fit parameters.
 	switch (plot_type) {
@@ -255,6 +258,7 @@ pointer	gfit		#I pointer to the gfit structure
 char	cmdstr[ARB]	#I command string
 int	newgraph	#I plot new graph
 
+size_t	sz_val
 int	ncmd, ival
 pointer	sp, str, cmd
 real	rval
@@ -262,8 +266,10 @@ int	nscan(), strdic(), rg_wrdstr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)
@@ -515,11 +521,12 @@ PIXEL	xin[ARB]	#I x array
 PIXEL	yin[ARB]	#I y array
 PIXEL	wts[ARB]	#I array of weights
 PIXEL	userwts[ARB]	#I array of user weights
-int	npts		#I number of points
+size_t	npts		#I number of points
 real	wx, wy		#I world coordinates
 int	delete		#I delete points ?
 
-int	i, j, pmltype
+long	i, j
+int	pmltype
 real	r2min, r2, x0, y0
 int	gstati()
 
@@ -608,12 +615,13 @@ PIXEL	x[ARB]		#I reference x values
 PIXEL	resid[ARB]	#I residuals
 PIXEL	wts[ARB]	#I weight array
 PIXEL	userwts[ARB]	#I user weight array
-int	npts		#I number of points
+size_t	npts		#I number of points
 real	wx		#I world x coordinate
 real	wy		#I world y coordinate
 int	delete		#I delete point
 
-int	i, j, pmltype
+long	i, j
+int	pmltype
 real	r2, r2min, x0, y0
 int	gstati()
 
@@ -711,9 +719,9 @@ PIXEL	yref[ARB]	#I y reference values
 PIXEL	xin[ARB]	#I x values
 PIXEL	yin[ARB]	#I y values
 PIXEL	wts[ARB]	#I array of weights
-int	npts		#I number of points
+size_t	npts		#I number of points
 
-int	i, j
+long	i, j
 $if (datatype == d)
 pointer	sp, rxin, ryin
 $endif
@@ -766,7 +774,7 @@ $endif
 
 	# Mark the rejected points.
 	do i = 1, GM_NREJECT(fit) {
-	    j = Memi[GM_REJ(fit)+i-1]
+	    j = Meml[GM_REJ(fit)+i-1]
 $if (datatype == r)
 	    call gmark (gd, xin[j], yin[j], GM_CIRCLE, 2., 2.)
 $else
@@ -792,9 +800,9 @@ pointer	gfit		#I pointer to the plot structure
 PIXEL	x[ARB]		#I x reference values
 PIXEL	resid[ARB]	#I residual
 PIXEL	wts[ARB]	#I array of weights
-int	npts		#I number of points
+size_t	npts		#I number of points
 
-int	i, j
+long	i, j
 pointer	sp, zero
 $if (datatype == d)
 pointer	rxin, ryin
@@ -858,7 +866,7 @@ $endif
 	# plot rejected points
 	if (GM_NREJECT(fit) > 0) {
 	    do i = 1, GM_NREJECT(fit) {
-		j = Memi[GM_REJ(fit)+i-1]
+		j = Meml[GM_REJ(fit)+i-1]
 $if (datatype == r)
 		call gmark (gd, x[j], resid[j], GM_CIRCLE, 2., 2.)
 $else
@@ -885,6 +893,7 @@ pointer	fit		#I fit descriptor
 pointer	sx1, sy1	#I pointer to the linear x and y surface fits
 pointer sx2, sy2	#I pointer to the linear x and y surface fits
 
+size_t	sz_ngraph
 int	i
 pointer	sp, xtemp, ytemp, xfit1, yfit1, xfit2, yfit2
 $if (datatype == d)
@@ -893,17 +902,19 @@ $endif
 PIXEL	xint, yint, dx, dy
 
 begin
+	sz_ngraph = NGRAPH
+
 	# allocate temporary space
 	call smark (sp)
-	call salloc (xtemp, NGRAPH, TY_PIXEL)
-	call salloc (ytemp, NGRAPH, TY_PIXEL)
-	call salloc (xfit1, NGRAPH, TY_PIXEL)
-	call salloc (yfit1, NGRAPH, TY_PIXEL)
-	call salloc (xfit2, NGRAPH, TY_PIXEL)
-	call salloc (yfit2, NGRAPH, TY_PIXEL)
+	call salloc (xtemp, sz_ngraph, TY_PIXEL)
+	call salloc (ytemp, sz_ngraph, TY_PIXEL)
+	call salloc (xfit1, sz_ngraph, TY_PIXEL)
+	call salloc (yfit1, sz_ngraph, TY_PIXEL)
+	call salloc (xfit2, sz_ngraph, TY_PIXEL)
+	call salloc (yfit2, sz_ngraph, TY_PIXEL)
 $if (datatype == d)
-	call salloc (xbuf, NGRAPH, TY_REAL)
-	call salloc (ybuf, NGRAPH, TY_REAL)
+	call salloc (xbuf, sz_ngraph, TY_REAL)
+	call salloc (ybuf, sz_ngraph, TY_REAL)
 $endif
 
 	# Calculate intervals in x and y.
@@ -920,53 +931,55 @@ $endif
 	for (i = 1; i <= NINTERVALS + 1; i = i + 1) {
 
 	    # Set the x value.
-	    call amovk$t (xint, Mem$t[xtemp], NGRAPH)
+	    call amovk$t (xint, Mem$t[xtemp], sz_ngraph)
 
 	    # X fit.
 $if (datatype == r)
 	    call gsvector (sx1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit1],
-	        NGRAPH)
+			   sz_ngraph)
 $else
 	    call dgsvector (sx1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit1],
-	        NGRAPH)
+			    sz_ngraph )
 $endif
 	    if (sx2 != NULL) {
 $if (datatype == r)
 	        call gsvector (sx2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit2],
-		    NGRAPH)
+			       sz_ngraph)
 $else
 	        call dgsvector (sx2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit2],
-		    NGRAPH)
+				sz_ngraph)
 $endif
-	        call aadd$t (Mem$t[xfit1], Mem$t[xfit2], Mem$t[xfit1], NGRAPH)
+	        call aadd$t (Mem$t[xfit1], Mem$t[xfit2], Mem$t[xfit1],
+			     sz_ngraph)
 	    }
 
 	    # Y fit.
 $if (datatype == r)
 	    call gsvector (sy1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit1],
-	        NGRAPH)
+	        sz_ngraph)
 $else
 	    call dgsvector (sy1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit1],
-	        NGRAPH)
+	        sz_ngraph)
 $endif
 	    if (sy2 != NULL) {
 $if (datatype == r)
 	        call gsvector (sy2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit2],
-		    NGRAPH)
+		    sz_ngraph)
 $else
 	        call dgsvector (sy2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit2],
-		    NGRAPH)
+		    sz_ngraph)
 $endif
-	        call aadd$t (Mem$t[yfit1], Mem$t[yfit2], Mem$t[yfit1], NGRAPH)
+	        call aadd$t (Mem$t[yfit1], Mem$t[yfit2], Mem$t[yfit1],
+			     sz_ngraph)
 	    }
 
 	    # Plot line of constant x.
 $if (datatype == r)
-	    call gpline (gd, Memr[xfit1], Memr[yfit1], NGRAPH)
+	    call gpline (gd, Memr[xfit1], Memr[yfit1], sz_ngraph)
 $else
-	    call achtdr (Memd[xfit1], Memr[xbuf], NGRAPH)
-	    call achtdr (Memd[yfit1], Memr[ybuf], NGRAPH)
-	    call gpline (gd, Memr[xbuf], Memr[ybuf], NGRAPH)
+	    call achtdr (Memd[xfit1], Memr[xbuf], sz_ngraph)
+	    call achtdr (Memd[yfit1], Memr[ybuf], sz_ngraph)
+	    call gpline (gd, Memr[xbuf], Memr[ybuf], sz_ngraph)
 $endif
 
 	    # Update the x value.
@@ -989,54 +1002,56 @@ $endif
 	for (i = 1; i <= NINTERVALS + 1; i = i + 1) {
 
 	    # set the y value
-	    call amovk$t (yint, Mem$t[ytemp], NGRAPH)
+	    call amovk$t (yint, Mem$t[ytemp], sz_ngraph)
 
 	    # X fit.
 $if (datatype == r)
 	    call gsvector (sx1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit1],
-	        NGRAPH)
+			   sz_ngraph)
 $else
 	    call dgsvector (sx1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit1],
-	        NGRAPH)
+			    sz_ngraph)
 $endif
 	    if (sx2 != NULL) {
 $if (datatype == r)
 	        call gsvector (sx2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit2],
-		    NGRAPH)
+			       sz_ngraph)
 $else
 	        call dgsvector (sx2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit2],
-		    NGRAPH)
+				sz_ngraph)
 $endif
-	        call aadd$t (Mem$t[xfit1], Mem$t[xfit2], Mem$t[xfit1], NGRAPH)
+	        call aadd$t (Mem$t[xfit1], Mem$t[xfit2], Mem$t[xfit1],
+			     sz_ngraph)
 	    }
 
 
 	    # Y fit.
 $if (datatype == r)
 	    call gsvector (sy1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit1],
-	        NGRAPH)
+			   sz_ngraph)
 $else
 	    call dgsvector (sy1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit1],
-	        NGRAPH)
+			    sz_ngraph)
 $endif
 	    if (sy2 != NULL) {
 $if (datatype == r)
 	        call gsvector (sy2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit2],
-		    NGRAPH)
+			       sz_ngraph)
 $else
 	        call dgsvector (sy2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit2],
-		    NGRAPH)
+				sz_ngraph)
 $endif
-	        call aadd$t (Mem$t[yfit1], Mem$t[yfit2], Mem$t[yfit1], NGRAPH)
+	        call aadd$t (Mem$t[yfit1], Mem$t[yfit2], Mem$t[yfit1],
+			     sz_ngraph)
 	    }
 
 	    # Plot line of constant y.
 $if (datatype == r)
-	    call gpline (gd, Memr[xfit1], Memr[yfit1], NGRAPH)
+	    call gpline (gd, Memr[xfit1], Memr[yfit1], sz_ngraph)
 $else
-	    call achtdr (Memd[xfit1], Memr[xbuf], NGRAPH)
-	    call achtdr (Memd[yfit1], Memr[ybuf], NGRAPH)
-	    call gpline (gd, Memr[xbuf], Memr[ybuf], NGRAPH)
+	    call achtdr (Memd[xfit1], Memr[xbuf], sz_ngraph)
+	    call achtdr (Memd[yfit1], Memr[ybuf], sz_ngraph)
+	    call gpline (gd, Memr[xbuf], Memr[ybuf], sz_ngraph)
 $endif
 
 	    # Update the y value.
@@ -1064,10 +1079,11 @@ PIXEL	xref[ARB]	#I x reference values
 PIXEL	yref[ARB]	#I y reference values
 PIXEL	xin[ARB]	#I x input values
 PIXEL	yin[ARB]	#I y input values
-int	npts		#I number of data points
+size_t	npts		#I number of data points
 real	wx, wy		#I x and y world coordinates
 
-int	i, j
+size_t	sz_ngraph
+long	i, j
 pointer	sp, xtemp, ytemp, xfit1, yfit1, xfit2, yfit2
 $if (datatype == d)
 pointer	xbuf, ybuf
@@ -1081,6 +1097,8 @@ double	dgseval()
 $endif
 
 begin
+	sz_ngraph = NGRAPH
+
 	# Transform world coordinates.
 	call gctran (gd, wx, wy, wx, wy, 1, 0)
 	r2min = MAX_REAL
@@ -1105,15 +1123,15 @@ $endif
 
 	    # Allocate temporary space.
 	    call smark (sp)
-	    call salloc (xtemp, NGRAPH, TY_PIXEL)
-	    call salloc (ytemp, NGRAPH, TY_PIXEL)
-	    call salloc (xfit1, NGRAPH, TY_PIXEL)
-	    call salloc (yfit1, NGRAPH, TY_PIXEL)
-	    call salloc (xfit2, NGRAPH, TY_PIXEL)
-	    call salloc (yfit2, NGRAPH, TY_PIXEL)
+	    call salloc (xtemp, sz_ngraph, TY_PIXEL)
+	    call salloc (ytemp, sz_ngraph, TY_PIXEL)
+	    call salloc (xfit1, sz_ngraph, TY_PIXEL)
+	    call salloc (yfit1, sz_ngraph, TY_PIXEL)
+	    call salloc (xfit2, sz_ngraph, TY_PIXEL)
+	    call salloc (yfit2, sz_ngraph, TY_PIXEL)
 $if (datatype == d)
-	    call salloc (xbuf, NGRAPH, TY_REAL)
-	    call salloc (ybuf, NGRAPH, TY_REAL)
+	    call salloc (xbuf, sz_ngraph, TY_REAL)
+	    call salloc (ybuf, sz_ngraph, TY_REAL)
 $endif
 
 	    # Compute the deltas.
@@ -1134,7 +1152,7 @@ $else
 $endif
 
 	    # Set up line of constant x.
-	    call amovk$t (xref[j], Mem$t[xtemp], NGRAPH)
+	    call amovk$t (xref[j], Mem$t[xtemp], sz_ngraph)
 	    delta = (GM_YMAX(fit) - GM_YMIN(fit)) / (NGRAPH - 1)
 	    Mem$t[ytemp] = GM_YMIN(fit)
 	    do i = 2, NGRAPH
@@ -1143,55 +1161,57 @@ $endif
 	    # X solution.
 $if (datatype == r)
 	    call gsvector (sx1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit1],
-	        NGRAPH)
+			   sz_ngraph)
 $else
 	    call dgsvector (sx1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit1],
-	        NGRAPH)
+			    sz_ngraph)
 $endif
 	    if (sx2 != NULL) {
 $if (datatype == r)
 	        call gsvector (sx2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit2],
-		    NGRAPH)
+			       sz_ngraph)
 $else
 	        call dgsvector (sx2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit2],
-		    NGRAPH)
+				sz_ngraph)
 $endif
-	        call aadd$t (Mem$t[xfit1], Mem$t[xfit2], Mem$t[xfit1], NGRAPH)
+	        call aadd$t (Mem$t[xfit1], Mem$t[xfit2], Mem$t[xfit1],
+			     sz_ngraph)
 	    }
-	    call aaddk$t (Mem$t[xfit1], deltax, Mem$t[xfit1], NGRAPH)
+	    call aaddk$t (Mem$t[xfit1], deltax, Mem$t[xfit1], sz_ngraph)
 
 	    # Y solution.
 $if (datatype == r)
 	    call gsvector (sy1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit1],
-	        NGRAPH)
+			   sz_ngraph)
 $else
 	    call dgsvector (sy1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit1],
-	        NGRAPH)
+			    sz_ngraph)
 $endif
 	    if (sy2 != NULL) {
 $if (datatype == r)
 	        call gsvector (sy2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit2],
-		    NGRAPH)
+			       sz_ngraph)
 $else
 	        call dgsvector (sy2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit2],
-		    NGRAPH)
+				sz_ngraph)
 $endif
-	        call aadd$t (Mem$t[yfit1], Mem$t[yfit2], Mem$t[yfit1], NGRAPH)
+	        call aadd$t (Mem$t[yfit1], Mem$t[yfit2], Mem$t[yfit1],
+			     sz_ngraph)
 	    }
-	    call aaddk$t (Mem$t[yfit1], deltay, Mem$t[yfit1], NGRAPH)
+	    call aaddk$t (Mem$t[yfit1], deltay, Mem$t[yfit1], sz_ngraph)
 
 	    # Plot line of constant x.
 $if (datatype == r)
-	    call gpline (gd, Memr[xfit1], Memr[yfit1], NGRAPH)
+	    call gpline (gd, Memr[xfit1], Memr[yfit1], sz_ngraph)
 $else
-	    call achtdr (Memd[xfit1], Memr[xbuf], NGRAPH)
-	    call achtdr (Memd[yfit1], Memr[ybuf], NGRAPH)
-	    call gpline (gd, Memr[xbuf], Memr[ybuf], NGRAPH)
+	    call achtdr (Memd[xfit1], Memr[xbuf], sz_ngraph)
+	    call achtdr (Memd[yfit1], Memr[ybuf], sz_ngraph)
+	    call gpline (gd, Memr[xbuf], Memr[ybuf], sz_ngraph)
 $endif
 	    call gflush (gd)
 
 	    # Set up line of constant y.
-	    call amovk$t (yref[j], Mem$t[ytemp], NGRAPH)
+	    call amovk$t (yref[j], Mem$t[ytemp], sz_ngraph)
 	    delta = (GM_XMAX(fit) - GM_XMIN(fit)) / (NGRAPH - 1)
 	    Mem$t[xtemp] = GM_XMIN(fit)
 	    do i = 2, NGRAPH
@@ -1200,50 +1220,52 @@ $endif
 	    # X fit.
 $if (datatype == r)
 	    call gsvector (sx1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit1],
-	        NGRAPH)
+			   sz_ngraph)
 $else
 	    call dgsvector (sx1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit1],
-	        NGRAPH)
+			    sz_ngraph)
 $endif
 	    if (sx2 != NULL) {
 $if (datatype == r)
 	        call gsvector (sx2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit2],
-		    NGRAPH)
+			       sz_ngraph)
 $else
 	        call dgsvector (sx2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[xfit2],
-		    NGRAPH)
+				sz_ngraph)
 $endif
-	        call aadd$t (Mem$t[xfit1], Mem$t[xfit2], Mem$t[xfit1], NGRAPH)
+	        call aadd$t (Mem$t[xfit1], Mem$t[xfit2], Mem$t[xfit1],
+			     sz_ngraph)
 	    }
-	    call aaddk$t (Mem$t[xfit1], deltax, Mem$t[xfit1], NGRAPH)
+	    call aaddk$t (Mem$t[xfit1], deltax, Mem$t[xfit1], sz_ngraph)
 
 	    # Y fit.
 $if (datatype == r)
 	    call gsvector (sy1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit1],
-	        NGRAPH)
+			   sz_ngraph)
 $else
 	    call dgsvector (sy1, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit1],
-	        NGRAPH)
+			    sz_ngraph)
 $endif
 	    if (sy2 != NULL) {
 $if (datatype == r)
 	        call gsvector (sy2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit2],
-		    NGRAPH)
+			       sz_ngraph)
 $else
 	        call dgsvector (sy2, Mem$t[xtemp], Mem$t[ytemp], Mem$t[yfit2],
-		    NGRAPH)
+				sz_ngraph)
 $endif
-	        call aadd$t (Mem$t[yfit1], Mem$t[yfit2], Mem$t[yfit1], NGRAPH)
+	        call aadd$t (Mem$t[yfit1], Mem$t[yfit2], Mem$t[yfit1],
+			     sz_ngraph)
 	    }
-	    call aaddk$t (Mem$t[yfit1], deltay, Mem$t[yfit1], NGRAPH)
+	    call aaddk$t (Mem$t[yfit1], deltay, Mem$t[yfit1], sz_ngraph)
 
 	    # Plot line of constant y.
 $if (datatype == r)
-	    call gpline (gd, Memr[xfit1], Memr[yfit1], NGRAPH)
+	    call gpline (gd, Memr[xfit1], Memr[yfit1], sz_ngraph)
 $else
-	    call achtdr (Memd[xfit1], Memr[xbuf], NGRAPH)
-	    call achtdr (Memd[yfit1], Memr[ybuf], NGRAPH)
-	    call gpline (gd, Memr[xbuf], Memr[ybuf], NGRAPH)
+	    call achtdr (Memd[xfit1], Memr[xbuf], sz_ngraph)
+	    call achtdr (Memd[yfit1], Memr[ybuf], sz_ngraph)
+	    call gpline (gd, Memr[xbuf], Memr[ybuf], sz_ngraph)
 $endif
 	    call gflush (gd)
 
@@ -1267,6 +1289,7 @@ PIXEL	b		#O output y coefficient of x fit
 PIXEL	c		#O output x coefficient of y fit
 PIXEL	d		#O output y coefficient of y fit
 
+size_t	sz_val
 int	nxxcoeff, nxycoeff, nyxcoeff, nyycoeff
 pointer	sp, xcoeff, ycoeff
 PIXEL	xxrange, xyrange, xxmaxmin, xymaxmin
@@ -1284,11 +1307,15 @@ begin
 	# Allocate working space.
 	call smark (sp)
 $if (datatype == r)
-	call salloc (xcoeff, gsgeti (sx, GSNCOEFF), TY_PIXEL)
-	call salloc (ycoeff, gsgeti (sy, GSNCOEFF), TY_PIXEL)
+	sz_val = gsgeti (sx, GSNCOEFF)
+	call salloc (xcoeff, sz_val, TY_PIXEL)
+	sz_val = gsgeti (sy, GSNCOEFF)
+	call salloc (ycoeff, sz_val, TY_PIXEL)
 $else
-	call salloc (xcoeff, dgsgeti (sx, GSNCOEFF), TY_PIXEL)
-	call salloc (ycoeff, dgsgeti (sy, GSNCOEFF), TY_PIXEL)
+	sz_val = dgsgeti (sx, GSNCOEFF)
+	call salloc (xcoeff, sz_val, TY_PIXEL)
+	sz_val = dgsgeti (sy, GSNCOEFF)
+	call salloc (ycoeff, sz_val, TY_PIXEL)
 $endif
 
 	# Get coefficients and numbers of coefficients.

@@ -19,9 +19,10 @@ pointer	buf
 bool	first_line
 long	v[IM_MAXDIM]
 short	minval_s, maxval_s
+int	minval_i, maxval_i
 long	minval_l, maxval_l
 real	minval_r, maxval_r
-long	imgnls(), imgnll(), imgnlr()
+long	imgnls(), imgnli(), imgnll(), imgnlr()
 
 begin
 	l_val = 1
@@ -46,7 +47,21 @@ begin
 			max_value = maxval_s
 		}
 	    }
-	case TY_USHORT, TY_INT, TY_LONG:
+	case TY_USHORT, TY_INT:
+	    while (imgnli (im, buf, v) != EOF) {
+		call alimi (Memi[buf], IM_LEN(im,1), minval_i, maxval_i)
+		if (first_line) {
+		    min_value = minval_i
+		    max_value = maxval_i
+		    first_line = false
+		} else {
+		    if (minval_i < min_value)
+			min_value = minval_i
+		    if (maxval_i > max_value)
+			max_value = maxval_i
+		}
+	    }
+	case TY_LONG:
 	    while (imgnll (im, buf, v) != EOF) {
 		call aliml (Meml[buf], IM_LEN(im,1), minval_l, maxval_l)
 		if (first_line) {

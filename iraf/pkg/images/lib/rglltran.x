@@ -12,9 +12,9 @@ double	rxlng[ARB]	#I the x refererence image world coordinates (degrees)
 double	rylat[ARB]	#I the y refererence image world coordinates (degrees)
 double	ixlng[ARB]	#O the x refererence image world coordinates (degrees)
 double	iylat[ARB]	#O the y refererence image world coordinates (degrees)
-int	npts		#I the number of coordinates
+size_t	npts		#I the number of coordinates
 
-int	i
+long	i
 double	ilng, ilat, olng, olat
 int	sk_stati()
 

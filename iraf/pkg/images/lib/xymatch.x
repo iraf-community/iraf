@@ -12,14 +12,17 @@ pointer	lineno			#U pointer to the line numbers
 int	xcolumn			#I column containing the x coordinate
 int	ycolumn			#I column containing the y coordinate
 
-int	i, ip, bufsize, npts, lnpts, maxcols
+size_t	sz_val
+int	i, ip, lnpts, maxcols
+size_t	bufsize, npts
 pointer	sp, str
 real	xval, yval
 int	fscan(), nscan(), ctor()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	bufsize = DEF_BUFSIZE
 	call malloc (x, bufsize, TY_REAL)
@@ -76,12 +79,13 @@ int procedure rg_sort (xcoord, ycoord, rsindex, npts, tolerance, sort, coincid)
 
 real	xcoord[ARB]		#I pointer to the x coordinates
 real	ycoord[ARB]		#I pointer to the y coordinates
-int	rsindex[ARB]		#I pointer to sort index
+long	rsindex[ARB]		#I pointer to sort index
 int	npts			#I the number of objects
 real	tolerance		#I coincidence tolerance in pixels
 int	sort			#I sort the pixels ?
 int	coincid			#I remove coincident points
 
+size_t	sz_val
 int	i, ndif
 int	rg_xycoincide()
 
@@ -92,8 +96,9 @@ begin
 
 	# Sort the pixels in y and then x if the arrays are unsorted.
 	if (sort == YES) {
-	    call rg_qsortr (ycoord, rsindex, rsindex, npts)
-	    call rg_sqsort (xcoord, ycoord, rsindex, rsindex, npts)
+	    sz_val = npts
+	    call rg_qsortr (ycoord, rsindex, rsindex, sz_val)
+	    call rg_sqsort (xcoord, ycoord, rsindex, rsindex, sz_val)
 	}
 
 	# Remove objects that are closer together than tolerance.
@@ -115,8 +120,8 @@ int procedure rg_xycoincide (xcoord, ycoord, a, b, npts, tolerance)
 
 real	xcoord[ARB]		#I the input x coordinate values
 real	ycoord[ARB]		#I the input y coordinate values
-int	a[ARB]			#I the input sort index
-int	b[ARB]			#O the output sort index
+long	a[ARB]			#I the input sort index
+long	b[ARB]			#O the output sort index
 int	npts			#I the  number of points
 real	tolerance		#I the coincidence tolerace
 

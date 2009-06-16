@@ -16,15 +16,15 @@ double  lngref[ARB]             #I the input ra / longitude coordinates
 double  latref[ARB]             #I the input dec / latitude coordinates
 double  xi[ARB]                 #O the output ra / longitude std coordinates
 double  eta[ARB]                #O the output dec / latitude std coordinates
-int     npts                    #I the number of data points
+size_t  npts                    #I the number of data points
 double  reflng                  #I the ra / longitude reference point
 double  reflat                  #I the dec / latitude reference point
-int     lngunits                #I the ra / longitude units
-int     latunits                #I the dec / latitude units
+int	lngunits                #I the ra / longitude units
+int	latunits                #I the dec / latitude units
 
 
 double  tlngref, tlatref
-int     i
+long	i
 pointer mw, ct
 pointer rg_projwcs(),  mw_sctran()
 errchk  mw_sctran()
@@ -81,14 +81,14 @@ double  xi[ARB]                 #I the output ra / longitude std coordinates
 double  eta[ARB]                #I the output dec / latitude std coordinates
 double  lngfit[ARB]             #O the input ra / longitude coordinates
 double  latfit[ARB]             #O the input dec / latitude coordinates
-int     npts                    #I the number of data points
+size_t  npts                    #I the number of data points
 double  reflng                  #I the ra / longitude reference point
 double  reflat                  #I the dec / latitude reference point
-int     lngunits                #I the ra / longitude units
-int     latunits                #I the dec / latitude units
+int	lngunits                #I the ra / longitude units
+int	latunits                #I the dec / latitude units
 
 double  tlngref, tlatref
-int     i
+long	i
 pointer mw, ct
 pointer rg_projwcs(), mw_sctran()
 errchk  mw_sctran()
@@ -141,30 +141,39 @@ pointer procedure rg_projwcs (projection, reflng, reflat, lngunits, latunits)
 char    projection[ARB]         #I the projection type
 double  reflng                  #I the ra / longitude reference point
 double  reflat                  #I the dec / latitude reference point
-int     lngunits                #I the ra / longitude units
-int     latunits                #I the dec / latitude units
+int	lngunits                #I the ra / longitude units
+int	latunits                #I the dec / latitude units
 
-int     ndim
+size_t	sz_val
+int	ndim
 pointer sp, projstr, projpars, wpars, ltm, ltv, cd, r, w, mw, axes
 pointer mw_open()
+include	<nullptr.inc>
 
 begin
         ndim = 2
 
         # Allocate working space.
         call smark (sp)
-        call salloc (projstr, SZ_FNAME, TY_CHAR)
-        call salloc (projpars, SZ_LINE, TY_CHAR)
-        call salloc (wpars, SZ_LINE, TY_CHAR)
-        call salloc (ltm, ndim * ndim, TY_DOUBLE)
-        call salloc (ltv, ndim, TY_DOUBLE)
-        call salloc (cd, ndim * ndim, TY_DOUBLE)
-        call salloc (r, ndim, TY_DOUBLE)
-        call salloc (w, ndim, TY_DOUBLE)
-        call salloc (axes, IM_MAXDIM, TY_INT)
+        sz_val = SZ_FNAME
+        call salloc (projstr, sz_val, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (projpars, sz_val, TY_CHAR)
+        call salloc (wpars, sz_val, TY_CHAR)
+        sz_val = ndim * ndim
+        call salloc (ltm, sz_val, TY_DOUBLE)
+        sz_val = ndim
+        call salloc (ltv, sz_val, TY_DOUBLE)
+        sz_val = ndim * ndim
+        call salloc (cd, sz_val, TY_DOUBLE)
+        sz_val = ndim
+        call salloc (r, sz_val, TY_DOUBLE)
+        call salloc (w, sz_val, TY_DOUBLE)
+        sz_val = IM_MAXDIM
+        call salloc (axes, sz_val, TY_INT)
 
         # Open the wcs.
-        mw = mw_open (NULL, ndim)
+        mw = mw_open (NULLPTR, ndim)
 
         # Set the axes and projection type.
         Memi[axes] = 1
@@ -185,12 +194,14 @@ begin
 
         # Set the lterm.
         call mw_mkidmd (Memd[ltm], ndim)
-        call aclrd (Memd[ltv], ndim)
+	sz_val = ndim
+        call aclrd (Memd[ltv], sz_val)
         call mw_sltermd (mw, Memd[ltm], Memd[ltv], ndim)
 
         # Set the wterm.
         call mw_mkidmd (Memd[cd], ndim)
-        call aclrd (Memd[r], ndim)
+	sz_val = ndim
+        call aclrd (Memd[r], sz_val)
         switch (lngunits) {
         case SKY_DEGREES:
             Memd[w] = reflng

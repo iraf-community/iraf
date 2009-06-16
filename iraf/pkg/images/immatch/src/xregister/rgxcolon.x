@@ -347,13 +347,13 @@ begin
 	    }
 
 	case XCMD_BORDER:
-	    call gargi (ival)
+	    call gargl (lval)
 	    if (nscan() ==  1) {
 		call printf ("%s = %d\n")
 		    call pargstr (KY_BORDER)
-		    call pargi (rg_xstati (xc, BORDER))
+		    call pargl (rg_xstatl (xc, BORDER))
 	    } else {
-		call rg_xseti (xc, BORDER, ival)
+		call rg_xsetl (xc, BORDER, lval)
 		newdata = YES; newcross = YES; newcenter = YES
 	    }
 

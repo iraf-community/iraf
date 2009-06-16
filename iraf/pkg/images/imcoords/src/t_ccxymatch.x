@@ -210,9 +210,9 @@ begin
 		if (yref != NULL)
 		    call mfree (yref, TY_REAL)
 		if (rlineno != NULL)
-		    call mfree (rlineno, TY_INT)
+		    call mfree (rlineno, TY_LONG)
 		if (rsindex != NULL)
-		    call mfree (rsindex, TY_INT)
+		    call mfree (rsindex, TY_LONG)
 		ntrefstars = rg_rdlli (rfd, lngref, latref, xref, yref, rlineno,
 		    tlngin, tlatin, lngcol, latcol, Memc[projection], lngin,
 		    latin, lngunits, latunits)
@@ -225,8 +225,8 @@ begin
 		# increasing ratio.
 
 		sz_val = ntrefstars
-		call malloc (rsindex, sz_val, TY_INT)
-	    	nrefstars = rg_sort (Memr[xref], Memr[yref], Memi[rsindex],
+		call malloc (rsindex, sz_val, TY_LONG)
+	    	nrefstars = rg_sort (Memr[xref], Memr[yref], Meml[rsindex],
 	            ntrefstars, separation, YES, YES)
 		if (match != RG_TRIANGLES) {
 	    	    reftri = NULL
@@ -235,11 +235,11 @@ begin
 		} else if (nrefstars > 2) {
 	    	    nrmaxtri = rg_factorial (min (nrefstars, maxntriangles), 3)
 		    sz_val = SZ_TRIINDEX * nrmaxtri
-	    	    call calloc (reftri, sz_val, TY_INT)
+	    	    call calloc (reftri, sz_val, TY_LONG)
 		    sz_val = SZ_TRIPAR * nrmaxtri
 	    	    call calloc (reftrirat, sz_val, TY_REAL)
 	    	    nreftri = rg_triangle (Memr[xref], Memr[yref],
-		        Memi[rsindex], nrefstars, Memi[reftri],
+		        Meml[rsindex], nrefstars, Meml[reftri],
 			Memr[reftrirat], nrmaxtri, maxntriangles,
 			tolerance, ratio)
 		} else {
@@ -325,31 +325,31 @@ begin
 		sz_val = ntliststars
 	        call malloc (xtrans, sz_val, TY_REAL)
 	        call malloc (ytrans, sz_val, TY_REAL)
-	        call malloc (listindex, sz_val, TY_INT)
+	        call malloc (listindex, sz_val, TY_LONG)
 	        call rg_compute (Memr[xlist], Memr[ylist], Memr[xtrans],
 	            Memr[ytrans], ntliststars, Memr[coeff], MAX_NCOEFF)
 	        nliststars = rg_sort (Memr[xtrans], Memr[ytrans],
-		    Memi[listindex], ntliststars, separation, YES, YES)
+		    Meml[listindex], ntliststars, separation, YES, YES)
 	        if (match != RG_TRIANGLES) {
 	    	    intri = NULL
 	    	    intrirat = NULL
 		    nintri = nliststars
 		    call rg_pllcolumns (ofd)
 		    ninter = rg_llintersect (ofd, Memd[lngref], Memd[latref],
-		        Memr[xref], Memr[yref], Memi[rsindex], Memi[rlineno],
+		        Memr[xref], Memr[yref], Meml[rsindex], Memi[rlineno],
 			nrefstars, Memr[xlist], Memr[ylist], Memr[xtrans],
-			Memr[ytrans], Memi[listindex], Memi[ilineno],
+			Memr[ytrans], Meml[listindex], Memi[ilineno],
 			nliststars, tolerance, Memc[lngformat],
 			Memc[latformat],Memc[xformat], Memc[yformat])
 	        } else if (nliststars > 2) {
 	    	    ninmaxtri = rg_factorial (min (max(nliststars,nrefstars),
 		        maxntriangles), 3)
 		    sz_val = SZ_TRIINDEX * ninmaxtri
-	    	    call calloc (intri, sz_val, TY_INT)
+	    	    call calloc (intri, sz_val, TY_LONG)
 		    sz_val = SZ_TRIPAR * ninmaxtri
 	    	    call calloc (intrirat, sz_val, TY_REAL)
 	    	    nintri = rg_triangle (Memr[xtrans], Memr[ytrans],
-		        Memi[listindex], nliststars, Memi[intri],
+		        Meml[listindex], nliststars, Meml[intri],
 			Memr[intrirat], ninmaxtri, maxntriangles,
 			ptolerance, ratio)
 	    	    if (nintri <= 0) {
@@ -359,8 +359,8 @@ begin
 		    } else {
 		        ninter = rg_match (Memr[xref], Memr[yref], nrefstars,
 			    Memr[xtrans], Memr[ytrans], nliststars,
-			    Memi[reftri], Memr[reftrirat], nreftri, nrmaxtri,
-			    ntrefstars, Memi[intri], Memr[intrirat], nintri,
+			    Meml[reftri], Memr[reftrirat], nreftri, nrmaxtri,
+			    ntrefstars, Meml[intri], Memr[intrirat], nintri,
 			    ninmaxtri, ntliststars, tolerance, ptolerance,
 			    ratio, nreject)
 		    }
@@ -369,13 +369,13 @@ begin
 		        call rg_pllcolumns (ofd)
 			call rg_lmwrite (ofd, Memd[lngref], Memd[latref],
 			    Memi[rlineno], Memr[xlist], Memr[ylist],
-			    Memi[ilineno], Memi[reftri], nrmaxtri,
-			    Memi[intri], ninmaxtri, ninter, Memc[lngformat],
+			    Memi[ilineno], Meml[reftri], nrmaxtri,
+			    Meml[intri], ninmaxtri, ninter, Memc[lngformat],
 			    Memc[latformat], Memc[xformat], Memc[yformat])
 		    } else {
 			if (rg_mlincoeff (Memr[xref], Memr[yref], Memr[xlist],
-			    Memr[ylist], Memi[reftri], nrmaxtri,
-			    Memi[intri], ninmaxtri, ninter, Memr[coeff],
+			    Memr[ylist], Meml[reftri], nrmaxtri,
+			    Meml[intri], ninmaxtri, ninter, Memr[coeff],
 			    MAX_NCOEFF) == ERR)
 			    call rg_lmkcoeff (xin, yin, xmag, ymag, xrot, yrot,
 			        0.0, 0.0, Memr[coeff], MAX_NCOEFF)
@@ -383,7 +383,7 @@ begin
 			    Memr[xtrans], Memr[ytrans], ntliststars,
 			    Memr[coeff], MAX_NCOEFF)
 	        	nliststars = rg_sort (Memr[xtrans], Memr[ytrans],
-		    	    Memi[listindex], ntliststars, separation,
+		    	    Meml[listindex], ntliststars, separation,
 			    YES, YES)
 	    		if (verbose)
 			    call rg_pmlincoeff ("  xi", " eta", Memr[coeff],
@@ -392,9 +392,9 @@ begin
 			    MAX_NCOEFF)
 		        call rg_pllcolumns (ofd)
 		        ninter = rg_llintersect (ofd, Memd[lngref],
-			    Memd[latref], Memr[xref], Memr[yref], Memi[rsindex],
+			    Memd[latref], Memr[xref], Memr[yref], Meml[rsindex],
 			    Memi[rlineno], nrefstars, Memr[xlist], Memr[ylist],
-			    Memr[xtrans], Memr[ytrans], Memi[listindex],
+			    Memr[xtrans], Memr[ytrans], Meml[listindex],
 			    Memi[ilineno], nliststars, tolerance,
 			    Memc[lngformat], Memc[latformat], Memc[xformat],
 			    Memc[yformat])
@@ -420,13 +420,13 @@ begin
 	    call mfree (xlist, TY_REAL)
 	    call mfree (ylist, TY_REAL)
 	    call mfree (ilineno, TY_INT)
-	    call mfree (listindex, TY_INT)
+	    call mfree (listindex, TY_LONG)
 	    if (xtrans != NULL)
 	        call mfree (xtrans, TY_REAL)
 	    if (ytrans != NULL)
 	        call mfree (ytrans, TY_REAL)
 	    if (intri != NULL)
-	        call mfree (intri, TY_INT)
+	        call mfree (intri, TY_LONG)
 	    if (intrirat != NULL)
 	        call mfree (intrirat, TY_REAL)
 
@@ -441,9 +441,9 @@ begin
 	call mfree (xref, TY_REAL)
 	call mfree (yref, TY_REAL)
 	call mfree (rlineno, TY_INT)
-	call mfree (rsindex, TY_INT)
+	call mfree (rsindex, TY_LONG)
 	if (reftri != NULL)
-	    call mfree (reftri, TY_INT)
+	    call mfree (reftri, TY_LONG)
 	if (reftrirat != NULL)
 	    call mfree (reftrirat, TY_REAL)
 

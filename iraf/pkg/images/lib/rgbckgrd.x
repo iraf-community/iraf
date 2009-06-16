@@ -5,14 +5,16 @@ include <math/gsurfit.h>
 
 # RG_BORDER -- Fetch the border pixels from a 2D subraster.
 
-int procedure rg_border (buf, nx, ny, pnx, pny, ptr)
+long procedure rg_border (buf, nx, ny, pnx, pny, ptr)
 
 real	buf[nx,ARB]	#I the input data subraster
-int	nx, ny		#I the dimensions of the input subraster
-int	pnx, pny	#I the size of the data region
+size_t	nx, ny		#I the dimensions of the input subraster
+size_t	pnx, pny	#I the size of the data region
 pointer	ptr		#I the pointer to the output buffer
 	
-int	j, nborder, wxborder, wyborder, index
+size_t	nborder, wxborder, wyborder
+long	j
+pointer	index
 
 begin
 	# Compute the size of the array
@@ -55,12 +57,12 @@ end
 procedure rg_subtract (data, nx, ny, zero, xslope, yslope)
 
 real	data[nx,ARB]		#I/O the input/output data array
-int	nx, ny			#I the dimensions of the input data array
+size_t	nx, ny			#I the dimensions of the input data array
 real	zero			#I the input zero point
 real	xslope			#I the input x slope
 real	yslope			#I the input y slope
 
-int	i, j
+long	i, j
 real	ydelta
 
 begin
@@ -78,11 +80,11 @@ end
 procedure rg_apodize (data, nx, ny, apodize, forward)
 
 real    data[nx,ARB]            #I the input data array
-int     nx, ny                  #I the size of the input array
+size_t	nx, ny                  #I the size of the input array
 real    apodize                 #I the percentage of the end to apodize
-int     forward                 #I YES for forward, NO for reverse
+int	forward                 #I YES for forward, NO for reverse
 
-int     i, j, nxpercent, nypercent, iindex, jindex
+long	i, j, nxpercent, nypercent, iindex, jindex
 real    f
 
 begin
@@ -134,14 +136,14 @@ end
 # RG_ZNSUM -- Compute the mean and number of good points in the array with
 # one optional level of rejections.
 
-int procedure rg_znsum (data, npts, mean, lcut, hcut)
+long procedure rg_znsum (data, npts, mean, lcut, hcut)
 
 real	data[ARB]	#I the input data array
-int	npts		#I the number of data points
+size_t	npts		#I the number of data points
 real	mean		#O the mean of the data
 real	lcut, hcut	#I the good data limits
 
-int	i, ngpts
+long	i, ngpts
 real	dif, sigma, sum, sumsq, lo, hi
 real	asumr(), assqr()
 
@@ -210,19 +212,23 @@ end
 # RG_ZNMEDIAN -- Compute the median and number of good points in the array
 # with one level of rejection.
 
-int procedure rg_znmedian (data, npts, median, lcut, hcut)
+long procedure rg_znmedian (data, npts, median, lcut, hcut)
 
 real	data[ARB]	#I the input data array
-int	npts		#I the number of data points
+size_t	npts		#I the number of data points
 real	median		#O the median of the data
 real	lcut, hcut	#I the good data limits
 
-int	i, ngpts, lindex, hindex
+long	l_val, c_2
+long	i, ngpts, lindex, hindex
 pointer	sp, sdata
 real	mean, sigma, dif, lo, hi
 real	amedr()
+long	lmod()
 
 begin
+	c_2 = 2
+
 	if (IS_INDEFR (lcut) && IS_INDEFR(hcut))  {
 	    median = amedr (data, npts)
 	    return (npts)
@@ -232,7 +238,8 @@ begin
 	call smark (sp)
 	call salloc (sdata, npts, TY_REAL)
 	call asrtr (data, Memr[sdata], npts)
-	if (mod (npts, 2) == 0)
+	l_val = npts
+	if (lmod(l_val, c_2) == 0)
 	    median = (Memr[sdata+(1+npts)/2-1] + Memr[sdata+(1+npts)/2]) / 2.0
 	else
 	    median = Memr[sdata+(1+npts)/2-1]
@@ -271,7 +278,7 @@ begin
 	ngpts = hindex - lindex + 1
 	if (ngpts <= 0)
 	    median = INDEFR
-	else if (mod (ngpts, 2) == 0)
+	else if (lmod (ngpts, c_2) == 0)
 	    median = (Memr[sdata+lindex-1+(ngpts+1)/2-1] + Memr[sdata+lindex-1+
 	        (ngpts+1)/2]) / 2.0
 	else
@@ -290,12 +297,13 @@ int procedure rg_slope (gs, data, npts, nx, ny, wxborder, wyborder, loreject,
 
 pointer	gs			#I the pointer to surfit structure
 real	data[ARB]		#I/O the input/output data
-int	npts			#I the number of points
-int	nx, ny			#I dimensions of the original data
-int	wxborder, wyborder	#I the x and y width of the border
+size_t	npts			#I the number of points
+size_t	nx, ny			#I dimensions of the original data
+size_t	wxborder, wyborder	#I the x and y width of the border
 real	loreject, hireject	#I the rejection criteria
 
-int	i, stat, ier
+long	i
+int	stat, ier
 pointer	sp, x, y, w, zfit
 real	lcut, hcut, sigma
 int	rg_reject(), rg_breject()
@@ -370,9 +378,9 @@ real	x[ARB]		#I the input x array
 real	y[ARB]		#I the input y array
 real	w[ARB]		#I the input weight array
 real	data[ARB]	#I the input data array
-int	nx, ny		#I the size of the input data array
+size_t	nx, ny		#I the size of the input data array
 
-int	i, index
+long	i, index
 
 begin
 	index = 1
@@ -394,10 +402,10 @@ real	x[ARB]			#I the input x array
 real	y[ARB]			#I the input y array
 real	w[ARB]			#I the input weight array
 real	data[ARB]		#I the input data array
-int	nx, ny			#I the dimensions of the input data
-int	wxborder, wyborder	#I the width of the border
+size_t	nx, ny			#I the dimensions of the input data
+size_t	wxborder, wyborder	#I the width of the border
 
-int	i, index, nborder
+long	i, index, nborder
 
 begin
 	nborder = nx * ny - (nx - wxborder) * (ny - wyborder)
@@ -440,9 +448,9 @@ real	y[ARB]		#I the input y array
 real	w[ARB]		#I the input w array
 real	zfit[ARB]	#O the output fitted data
 real	data[ARB]	#I/O the input/output data array
-int	nx, ny		#I the dimensions of the output data
+size_t	nx, ny		#I the dimensions of the output data
 
-int	i, j, index, npts
+long	i, j, index, npts
 real	sum
 
 begin
@@ -478,10 +486,10 @@ real	y[ARB]			#I the output y array
 real	w[ARB]			#I the output weight array
 real	zfit[ARB]		#O the fitted z array
 real	data[ARB]		#I/O the input/output data array
-int	nx, ny			#I the dimensions of original subraster
-int	wxborder, wyborder	#I the width of the border
+size_t	nx, ny			#I the dimensions of original subraster
+size_t	wxborder, wyborder	#I the width of the border
 
-int	i, j, npts, nborder, index
+long	i, j, npts, nborder, index
 real	sum
 
 begin
@@ -556,10 +564,11 @@ real	y[ARB]		#I the input y array
 real	w[ARB]		#I the input w array
 real	zfit[ARB]	#O the fitted data
 real	data[ARB]	#I/O the input/output data array
-int	nx, ny		#I the dimensions of the data
+size_t	nx, ny		#I the dimensions of the data
 real	lcut, hcut	#I the lo and high side rejection criteria
 
-int	i, j, index, ier
+long	i, j, index
+int	ier
 
 begin
 	index = 1
@@ -595,11 +604,12 @@ real	y[ARB]			#I the input y array
 real	w[ARB]			#I the input weight array
 real	zfit[ARB]		#O the fitted z array
 real	data[ARB]		#I/O the input/output data array
-int	nx, ny			#I the dimensions of the original subraster
-int	wxborder, wyborder	#I the width of the border
+size_t	nx, ny			#I the dimensions of the original subraster
+size_t	wxborder, wyborder	#I the width of the border
 real	lcut, hcut		#I the low and high rejection criteria
 
-int	i, j, nborder, index, ier
+long	i, j, nborder, index
+int	ier
 
 begin
 	nborder = nx * ny - (nx - wxborder) * (ny - wyborder)

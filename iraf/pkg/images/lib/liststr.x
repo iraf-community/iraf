@@ -154,13 +154,15 @@ int	nsdig_x			#I the number of significant digits in x
 int	nsdig_y			#I the number of significant digits in y
 int	min_sigdigits		#I the minimum number of significant digits
 
+size_t	sz_val
 int	num_field, width, op
 pointer	sp, field
 int	gstrcpy()
 
 begin
 	call smark (sp)
-	call salloc (field, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (field, sz_val, TY_CHAR)
 
 	# Initialize output pointer.
 	op = 1
@@ -213,6 +215,7 @@ int	nsdig_x			#I the number of significant digits in x
 int	nsdig_y			#I the number of significant digits in y
 int	min_sigdigits		#I the minimum number of significant digits
 
+size_t	sz_val
 int	ip, op
 pointer	sp, field
 int	gstrcpy()
@@ -220,7 +223,8 @@ int	gstrcpy()
 begin
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (field, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (field, sz_val, TY_CHAR)
 
 	# Copy the input buffer into the output buffer minus the newline.
 	op = 1
@@ -296,25 +300,27 @@ procedure li_npack_liner (inbuf, outbuf, maxch, field_pos, nfields,
 
 char    inbuf[ARB]              #I the input string buffer
 char    outbuf[maxch]           #O the output string buffer
-int     maxch                   #I the maximum size of the output buffer
-int     field_pos[ARB]          #I starting positions for the fields
-int     nfields                 #I the number of fields
-int     vfields[ARB]            #I the fields to be formatted
+int	maxch                   #I the maximum size of the output buffer
+int	field_pos[ARB]          #I starting positions for the fields
+int	nfields                 #I the number of fields
+int	vfields[ARB]            #I the fields to be formatted
 real   values[ARB]             #I the field values to be formatted
-int     nsdigits[ARB]           #I the number of field significant digits
-int     nvalues                 #I the number of fields to be formatted
+int	nsdigits[ARB]           #I the number of field significant digits
+int	nvalues                 #I the number of fields to be formatted
 char    vformats[sz_fmt,ARB]    #I the field formats
-int     sz_fmt                  #I the size of the format string
-int     min_sigdigits           #I the minimum number of significant digits
+int	sz_fmt                  #I the size of the format string
+int	min_sigdigits           #I the minimum number of significant digits
 
+size_t	sz_val
 bool    found
-int     op, num_field, num_var, width
+int	op, num_field, num_var, width
 pointer sp, field
-int     gstrcpy()
+int	gstrcpy()
 
 begin
         call smark (sp)
-        call salloc (field, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (field, sz_val, TY_CHAR)
 
         # Initialize output pointer.
         op = 1
@@ -364,29 +370,33 @@ procedure li_nappend_liner (inbuf, outbuf, maxch, field_pos, nfields,
 
 char    inbuf[ARB]              #I the input string buffer
 char    outbuf[maxch]           #O the output string buffer
-int     maxch                   #I the maximum size of the output buffer
-int     field_pos[ARB]          #I starting positions for the fields
-int     nfields                 #I the number of fields
-int     vfields[ARB]            #I the fields to be formatted
+int	maxch                   #I the maximum size of the output buffer
+int	field_pos[ARB]          #I starting positions for the fields
+int	nfields                 #I the number of fields
+int	vfields[ARB]            #I the fields to be formatted
 real   values[ARB]             #I the field values to be formatted
-int     nsdigits[ARB]           #I the number of field significant digits
-int     nvalues                 #I the number of fields to be formatted
+int	nsdigits[ARB]           #I the number of field significant digits
+int	nvalues                 #I the number of fields to be formatted
 char    vformats[sz_fmt,ARB]    #I the field formats
-int     sz_fmt                  #I the size of the format string
-int     min_sigdigits           #I the minimum number of significant digits
+int	sz_fmt                  #I the size of the format string
+int	min_sigdigits           #I the minimum number of significant digits
 
-int     num_var, ip, op, index
+size_t	sz_val
+int	num_var, ip, op, index
 pointer sp, field, nvfields
-int     gstrcpy()
+int	gstrcpy()
 
 begin
         # Allocate some working space.
         call smark (sp)
-        call salloc (field, SZ_LINE, TY_CHAR)
-        call salloc (nvfields, nvalues, TY_INT)
+        sz_val = SZ_LINE
+        call salloc (field, sz_val, TY_CHAR)
+        sz_val = nvalues
+        call salloc (nvfields, sz_val, TY_LONG)
         do num_var = 1, nvalues
-            Memi[nvfields+num_var-1] = num_var
-        call rg_qsorti (vfields, Memi[nvfields], Memi[nvfields], nvalues)
+            Meml[nvfields+num_var-1] = num_var
+	sz_val = nvalues
+        call rg_qsorti (vfields, Meml[nvfields], Meml[nvfields], sz_val)
 
         # Copy the input buffer into the output buffer minus the newline.
         op = 1
@@ -401,7 +411,7 @@ begin
         op = op + gstrcpy ("  ", outbuf[op], maxch - op + 1)
 
         do num_var = 1, nvalues {
-            index = Memi[nvfields+num_var-1]
+            index = Meml[nvfields+num_var-1]
             call li_format_fieldr (values[index], Memc[field], SZ_LINE,
                 vformats[sz_fmt,index], nsdigits[index], 0, min_sigdigits)
             op = op + gstrcpy (Memc[field], outbuf[op], maxch - op + 1)
@@ -493,13 +503,15 @@ int	nsdig_x			#I the number of significant digits in x
 int	nsdig_y			#I the number of significant digits in y
 int	min_sigdigits		#I the minimum number of significant digits
 
+size_t	sz_val
 int	num_field, width, op
 pointer	sp, field
 int	gstrcpy()
 
 begin
 	call smark (sp)
-	call salloc (field, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (field, sz_val, TY_CHAR)
 
 	# Initialize output pointer.
 	op = 1
@@ -552,6 +564,7 @@ int	nsdig_x			#I the number of significant digits in x
 int	nsdig_y			#I the number of significant digits in y
 int	min_sigdigits		#I the minimum number of significant digits
 
+size_t	sz_val
 int	ip, op
 pointer	sp, field
 int	gstrcpy()
@@ -559,7 +572,8 @@ int	gstrcpy()
 begin
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (field, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (field, sz_val, TY_CHAR)
 
 	# Copy the input buffer into the output buffer minus the newline.
 	op = 1
@@ -635,25 +649,27 @@ procedure li_npack_lined (inbuf, outbuf, maxch, field_pos, nfields,
 
 char    inbuf[ARB]              #I the input string buffer
 char    outbuf[maxch]           #O the output string buffer
-int     maxch                   #I the maximum size of the output buffer
-int     field_pos[ARB]          #I starting positions for the fields
-int     nfields                 #I the number of fields
-int     vfields[ARB]            #I the fields to be formatted
+int	maxch                   #I the maximum size of the output buffer
+int	field_pos[ARB]          #I starting positions for the fields
+int	nfields                 #I the number of fields
+int	vfields[ARB]            #I the fields to be formatted
 double   values[ARB]             #I the field values to be formatted
-int     nsdigits[ARB]           #I the number of field significant digits
-int     nvalues                 #I the number of fields to be formatted
+int	nsdigits[ARB]           #I the number of field significant digits
+int	nvalues                 #I the number of fields to be formatted
 char    vformats[sz_fmt,ARB]    #I the field formats
-int     sz_fmt                  #I the size of the format string
-int     min_sigdigits           #I the minimum number of significant digits
+int	sz_fmt                  #I the size of the format string
+int	min_sigdigits           #I the minimum number of significant digits
 
+size_t	sz_val
 bool    found
-int     op, num_field, num_var, width
+int	op, num_field, num_var, width
 pointer sp, field
-int     gstrcpy()
+int	gstrcpy()
 
 begin
         call smark (sp)
-        call salloc (field, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (field, sz_val, TY_CHAR)
 
         # Initialize output pointer.
         op = 1
@@ -703,29 +719,33 @@ procedure li_nappend_lined (inbuf, outbuf, maxch, field_pos, nfields,
 
 char    inbuf[ARB]              #I the input string buffer
 char    outbuf[maxch]           #O the output string buffer
-int     maxch                   #I the maximum size of the output buffer
-int     field_pos[ARB]          #I starting positions for the fields
-int     nfields                 #I the number of fields
-int     vfields[ARB]            #I the fields to be formatted
+int	maxch                   #I the maximum size of the output buffer
+int	field_pos[ARB]          #I starting positions for the fields
+int	nfields                 #I the number of fields
+int	vfields[ARB]            #I the fields to be formatted
 double   values[ARB]             #I the field values to be formatted
-int     nsdigits[ARB]           #I the number of field significant digits
-int     nvalues                 #I the number of fields to be formatted
+int	nsdigits[ARB]           #I the number of field significant digits
+int	nvalues                 #I the number of fields to be formatted
 char    vformats[sz_fmt,ARB]    #I the field formats
-int     sz_fmt                  #I the size of the format string
-int     min_sigdigits           #I the minimum number of significant digits
+int	sz_fmt                  #I the size of the format string
+int	min_sigdigits           #I the minimum number of significant digits
 
-int     num_var, ip, op, index
+size_t	sz_val
+int	num_var, ip, op, index
 pointer sp, field, nvfields
-int     gstrcpy()
+int	gstrcpy()
 
 begin
         # Allocate some working space.
         call smark (sp)
-        call salloc (field, SZ_LINE, TY_CHAR)
-        call salloc (nvfields, nvalues, TY_INT)
+        sz_val = SZ_LINE
+        call salloc (field, sz_val, TY_CHAR)
+        sz_val = nvalues
+        call salloc (nvfields, sz_val, TY_LONG)
         do num_var = 1, nvalues
-            Memi[nvfields+num_var-1] = num_var
-        call rg_qsorti (vfields, Memi[nvfields], Memi[nvfields], nvalues)
+            Meml[nvfields+num_var-1] = num_var
+	sz_val = nvalues
+        call rg_qsorti (vfields, Meml[nvfields], Meml[nvfields], sz_val)
 
         # Copy the input buffer into the output buffer minus the newline.
         op = 1
@@ -740,7 +760,7 @@ begin
         op = op + gstrcpy ("  ", outbuf[op], maxch - op + 1)
 
         do num_var = 1, nvalues {
-            index = Memi[nvfields+num_var-1]
+            index = Meml[nvfields+num_var-1]
             call li_format_fieldd (values[index], Memc[field], SZ_LINE,
                 vformats[sz_fmt,index], nsdigits[index], 0, min_sigdigits)
             op = op + gstrcpy (Memc[field], outbuf[op], maxch - op + 1)

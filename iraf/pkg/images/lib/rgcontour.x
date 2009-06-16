@@ -23,8 +23,10 @@ pointer	gp			#I pointer to graphics stream
 char	htitle[ARB]		#I the plot header title
 char	btitle[ARB]		#I the plot trailer title
 real	data[ncols,ARB]		#I input data
-int	ncols, nlines		#I dimensions of data
+size_t	ncols, nlines		#I dimensions of data
 
+size_t	sz_val
+int	i_val0, i_val1
 bool	perimeter
 pointer	tcojmp[LEN_JUMPBUF]
 int	status, wkid
@@ -37,6 +39,7 @@ real	interval, floor, ceiling, dmin, dmax, zero, finc, ybot
 real	vx1, vx2, vy1, vy2, wx1, wx2, wy1, wy2
 real	first_col, last_col, first_row, last_row
 real	xlt, ybt, side, ext, hold[5]
+real	aabs()
 
 extern	rg_onint()
 
@@ -52,10 +55,19 @@ begin
 	    return
 	call greactivate (gp, 0)
 
+	if ( ncols > MAX_INT ) {	# limited by sys/gio/ncarutil/conrec.f
+	    call error (0, "RG_CONTOUR: Too large ncols (32-bit limit)")
+	}
+	if ( nlines > MAX_INT ) {	# limited by sys/gio/ncarutil/conrec.f
+	    call error (0, "RG_CONTOUR: Too large nlines (32-bit limit)")
+	}
+
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (label, SZ_LINE, TY_CHAR)
-	call salloc (temp, ncols * nlines, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (label, sz_val, TY_CHAR)
+	sz_val = ncols * nlines
+	call salloc (temp, sz_val, TY_REAL)
 
 	# First of all, intialize conrec's block data before altering any
 	# parameters in common.
@@ -85,7 +97,7 @@ begin
 	    else
 		finc = interval
 	} else
-	    finc = - abs (ncontours)
+	    finc = - iabs (ncontours)
 
 	# Define the data limits.
 
@@ -111,7 +123,7 @@ begin
 	call amovr (data,  Memr[temp], nlines * ncols)
 
 	# Apply the zero point shift.
-	if (abs (zero) > EPSILON)
+	if (aabs (zero) > EPSILON)
 	    call asubkr (Memr[temp], zero, Memr[temp], ncols * nlines)
 
 	# Open device and make contour plot.
@@ -147,7 +159,9 @@ begin
 	# with an error status.
 	call zsvjmp (tcojmp, status)
 	if (status == OK) {
-	    call conrec (Memr[temp], ncols, ncols, nlines, floor, ceiling,
+	    i_val0 = ncols
+	    i_val1 = nlines
+	    call conrec (Memr[temp], i_val0, i_val0, i_val1, floor, ceiling,
 	        finc, nset, nhi, -dashpat)
 	} else {
 	    call gcancel (gp)
@@ -220,26 +234,33 @@ procedure rg_perimeter (gp)
 
 pointer	gp			#I graphics descriptor
 
+size_t	sz_val
 real	xs, xe, ys, ye
-int	i, first_col, last_col, first_tick, last_tick, bias
-int	nchar, dummy, first_row, last_row, cnt_step, cnt_label
+int	ii
+long	i, first_col, last_col, first_tick, last_tick, bias
+long	first_row, last_row, cnt_step, cnt_label
+int	nchar, dummy
 pointer	sp, label, fmt1, fmt2, fmt3, fmt4
 real	dist, kk, col, row, dx, dy, sz_char, cw, xsz, label_pos
 real	xdist, ydist, xspace, yspace, k[3]
 data 	k/1.0,2.0,3.0/
 
 bool	ggetb()
-int	itoc()
+int	ltoc(), iint()
+long	lmod()
 real 	ggetr()
-errchk	ggwind, gseti, gctran, gline, gtext, itoc
+long	lint()
+errchk	ggwind, gseti, gctran, gline, gtext, ltoc
 
 begin
 	call smark (sp)
-	call salloc (label, SZ_LABEL, TY_CHAR)
-	call salloc (fmt1, SZ_FMT, TY_CHAR)
-	call salloc (fmt2, SZ_FMT, TY_CHAR)
-	call salloc (fmt3, SZ_FMT, TY_CHAR)
-	call salloc (fmt4, SZ_FMT, TY_CHAR)
+	sz_val = SZ_LABEL
+	call salloc (label, sz_val, TY_CHAR)
+	sz_val = SZ_FMT
+	call salloc (fmt1, sz_val, TY_CHAR)
+	call salloc (fmt2, sz_val, TY_CHAR)
+	call salloc (fmt3, sz_val, TY_CHAR)
+	call salloc (fmt4, sz_val, TY_CHAR)
 
 	# First, get window coordinates and turn off clipping
 	call ggwind (gp, xs, xe, ys, ye)
@@ -281,7 +302,7 @@ begin
 
 	# Draw inner and outer perimeter
 	kk = k[1]
-	do i = 1, 2 {
+	do ii = 1, 2 {
 	    xspace = kk * xdist
 	    yspace = kk * ydist
 	    call gline (gp, xs - xspace, ys - yspace, xe + xspace, ys - yspace)
@@ -294,8 +315,8 @@ begin
 	# Now draw x axis tick marks, along both the bottom and top of
 	# the picture.  First find the endpoint integer pixels.
 
-	first_col = int (xs)
-	last_col = int (xe)
+	first_col = iint(xs)
+	last_col = iint(xe)
 
 	# Determine increments of ticks and tick labels for x axis
 	cnt_step  = 1
@@ -309,7 +330,7 @@ begin
 	}
 
 	first_tick = first_col
-	bias = mod (first_tick, cnt_step)
+	bias = lmod(first_tick, cnt_step)
 	last_tick = last_col + bias
 
 	do i = first_tick, last_tick, cnt_step {
@@ -317,15 +338,15 @@ begin
 	    call gline (gp, col, ys - k[1] * ydist, col, ys - k[2] * ydist)
 	    call gline (gp, col, ye + k[1] * ydist, col, ye + k[2] * ydist)
 
-	    if (mod ((i - bias), cnt_label)  == 0) {
+	    if ( lmod((i - bias), cnt_label) == 0 ) {
 		# Label tick mark; calculate number of characters needed
 		nchar = 3
-		if (int (col) == 0)
+		if (iint(col) == 0)
 		    nchar = 1
-		if (int (col) >= 1000)
+		if (iint(col) >= 1000)
 		    nchar = 4
 
-		dummy = itoc (int(col), Memc[label], nchar)
+		dummy = ltoc (lint(col), Memc[label], nchar)
 
 		# Position label slightly below outer perimeter.  Seperation
 		# is twenty percent of a character width, in WCS.
@@ -341,8 +362,8 @@ begin
 	# Label the y axis tick marks along the left and right sides of the
 	# picture.  First find the integer pixel endpoints.
 	
-	first_row = int (ys)
-	last_row = int (ye)
+	first_row = iint(ys)
+	last_row = iint(ye)
 
 	# Determine increments of ticks and tick labels for y axis
 	cnt_step  = 1
@@ -356,7 +377,7 @@ begin
 	}
 
 	first_tick = first_row 
-	bias = mod (first_tick, cnt_step)
+	bias = lmod(first_tick, cnt_step)
 	last_tick = last_row + bias
 
 	do i = first_tick, last_tick, cnt_step {
@@ -364,15 +385,15 @@ begin
 	    call gline (gp, xs - k[1] * xdist, row, xs - k[2] * xdist, row)
 	    call gline (gp, xe + k[1] * xdist, row, xe + k[2] * xdist, row)
 
-	    if (mod ((i - bias), cnt_label) == 0) {
+	    if ( lmod((i - bias), cnt_label) == 0 ) {
 		# Label tick mark; calculate number of characters needed
 		nchar = 3
-		if (int (row) == 0)
+		if (iint(row) == 0)
 		    nchar = 1
-		else if (int (row) >= 1000)
+		else if (iint(row) >= 1000)
 		    nchar = 4
 		
-	        dummy = itoc (int(row), Memc[label], nchar)
+	        dummy = ltoc (lint(row), Memc[label], nchar)
 
 		# Position label slightly to the left of outer perimeter.
 		# Separation twenty percent of a character width, in WCS.
@@ -396,8 +417,8 @@ procedure rg_map_viewport (gp, ncols, nlines, ux1, ux2, uy1, uy2, fill,
 	perimeter)
 
 pointer	gp			#I graphics stream descriptor
-int	ncols			#I number of image cols
-int	nlines			#I number of image lines
+size_t	ncols			#I number of image cols
+size_t	nlines			#I number of image lines
 real	ux1, ux2, uy1, uy2	#I/O NDC coordinates of requested viewort
 bool	fill			#I fill viewport
 bool	perimeter		#I draw the perimeter
