@@ -153,8 +153,13 @@ v2start_
 		switch (IM_PIXTYPE(im)) {
 		case TY_SHORT, TY_USHORT:
 		    IM_SWAPPED(im) = BYTE_SWAP2
-		case TY_INT, TY_LONG:
+		case TY_INT:
 		    IM_SWAPPED(im) = BYTE_SWAP4
+		case TY_LONG:
+		    if ( SZ_LONG == 2 )
+			IM_SWAPPED(im) = BYTE_SWAP4
+		    else
+			IM_SWAPPED(im) = BYTE_SWAP8
 		case TY_REAL:
 		    if (IEEE_USED == YES)
 			IM_SWAPPED(im) = IEEE_SWAP4

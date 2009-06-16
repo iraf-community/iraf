@@ -108,10 +108,15 @@ begin
 	    switch (P_PDTYPE(pp)) {
 	    # changed case for int to short and long--dlb 11/3/87
 	    case 'I':
-		if (sz_param == SZ_SHORT)
+		if (sz_param == SZ_SHORT) {
 		    P_SPPTYPE(pp) = TY_SHORT
-		else
+		} else if (sz_param == SZ_INT) {
 		    P_SPPTYPE(pp) = TY_INT
+		} else if (sz_param == SZ_LONG) {
+		    P_SPPTYPE(pp) = TY_LONG
+		} else {
+		    call error (1, badtype)
+		}
 		P_LEN(pp) = 1
 	    case 'R':
 		if (sz_param == SZ_REAL)

@@ -77,10 +77,19 @@ begin
 	    else
 		ival = TY_INT
 	case 64:
-	    if (ch == 'R')
+	    if (ch == 'R') {
 		ival = TY_DOUBLE
-	    else
+	    } else if (ch == 'I') {
+		if (SZ_LONG == 2) {
+		    call error (1,"STF_RDHEADER: Cannot handle 64-bit integer")
+		}
+		else {
+		    ival = TY_LONG
+		}
+	    }
+	    else {
 		ival = TY_COMPLEX
+	    }
 	default:
 	    ival = ERR
 	}
