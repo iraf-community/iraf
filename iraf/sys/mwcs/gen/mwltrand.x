@@ -13,11 +13,13 @@ double	ltm[ndim,ndim]			#I linear transformation matrix
 double	ltv[ndim]			#I linear translation vector
 int	ndim				#I dimension of system
 
+size_t	sz_val
 int	i, j
 double	p3[MAX_DIM]
 
 begin
-	call amovd (p1, p3, ndim)
+	sz_val = ndim
+	call amovd (p1, p3, sz_val)
 	do j = 1, ndim {
 	    p2[j] = ltv[j]
 	    do i = 1, ndim
