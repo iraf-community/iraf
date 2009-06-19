@@ -21,14 +21,14 @@ define	IST_SW		Memp[$1+19]
 
 define	LEN_NSWITCHES	8
 
-define	IST_SKURTOSIS	Memi[P2I($1)]
-define	IST_SSKEW	Memi[P2I($1+1)]
-define	IST_SSTDDEV	Memi[P2I($1+2)]
-define	IST_SMODE	Memi[P2I($1+3)]
-define	IST_SMEDIAN	Memi[P2I($1+4)]
-define	IST_SMEAN	Memi[P2I($1+5)]
-define	IST_SMINMAX	Memi[P2I($1+6)]
-define	IST_SNPIX	Memi[P2I($1+7)]
+define	IST_SKURTOSIS	Memi[$1]
+define	IST_SSKEW	Memi[$1+1]
+define	IST_SSTDDEV	Memi[$1+2]
+define	IST_SMODE	Memi[$1+3]
+define	IST_SMEDIAN	Memi[$1+4]
+define	IST_SMEAN	Memi[$1+5]
+define	IST_SMINMAX	Memi[$1+6]
+define	IST_SNPIX	Memi[$1+7]
 
 define  IST_FIELDS  "|image|npix|min|max|mean|midpt|mode|stddev|skew|kurtosis|"
 
