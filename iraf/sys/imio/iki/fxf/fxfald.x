@@ -20,7 +20,7 @@ begin
 	### of left to right.
 
 	if ( fit_pixtype == TY_LONG ) {
-	    do i = npix, 1, -1 {
+	    do i = 1, npix {
 		b[i] = a_l[i] * bscale + bzero
 	    }
 	} else {
