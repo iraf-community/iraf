@@ -18,11 +18,12 @@ define	IOFF		1
 
 # FITUPK -- Unpack cbuf in place from FITS binary format to local machine type.
 
-procedure fxf_unpack_data (cbuf, npix, pixtype, bscale, bzero)
+procedure fxf_unpack_data (cbuf, npix, pixtype, fit_pixtype, bscale, bzero)
 
 char	cbuf[ARB]		#U buffer with input,output data
 size_t	npix			#I number of pixels in buffer
 int	pixtype			#I input pixtype
+int	fit_pixtype		#I input pixtype of FITS
 double	bscale			#I scale factor to applied to input data
 double	bzero			#I offset to applied to input data
 
@@ -78,10 +79,19 @@ begin
 	case TY_DOUBLE:
 	    ### Same as above.
 	    if (!fp_equald(bscale,1.0d0) || !fp_equald(bzero,0.0d0)) {
-		if (BYTE_SWAP4 == YES)
-		    call bswap4 (cbuf, c_1, cbuf, c_1, nbytes)
-		# arg1,2: incompatible pointer
-		call fxf_altmd (cbuf, cbuf, npix, bscale, bzero)
+		if ( fit_pixtype == TY_LONG ) {
+		    if (BYTE_SWAP8 == YES) {
+			call bswap8 (cbuf, c_1, cbuf, c_1, nbytes)
+		    }
+		}
+		else {
+		    if (BYTE_SWAP4 == YES) {
+			call bswap4 (cbuf, c_1, cbuf, c_1, nbytes)
+		    }
+		}
+		# arg1,2,3: incompatible pointer
+		call fxf_altmd (cbuf, cbuf, cbuf, npix,
+				fit_pixtype, bscale, bzero)
 	    } else {
 		# arg1: incompatible pointer
 		call ieevupkd (cbuf, cbuf, npix)

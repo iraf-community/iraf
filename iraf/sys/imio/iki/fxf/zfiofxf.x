@@ -224,8 +224,8 @@ begin
 		call fxf_zaltrd(obuf[ip], npix, FIT_BSCALE(fit), FIT_BZERO(fit))
             }	    
         } else {
-	   call fxf_unpack_data (obuf[ip],
-	       npix, pixtype, FIT_BSCALE(fit), FIT_BZERO(fit)) 
+	   call fxf_unpack_data (obuf[ip], npix, pixtype, FIT_PIXTYPE(fit),
+				 FIT_BSCALE(fit), FIT_BZERO(fit)) 
         }
 end
 
