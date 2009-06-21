@@ -334,9 +334,9 @@ size_t	npix		#I Number of pixels
 real	contrast	#I Contrast algorithm parameter
 real	z1, z2		#O Z transform limits
 
-long	center_pixel, minpix, lval, c_2
-size_t	ngoodpix, ngrow
-size_t	zsc_fit_line()
+long	center_pixel, minpix, ngoodpix, lval, c_2
+size_t	ngrow
+long	zsc_fit_line()
 long	lmod(), lnint()
 real	zmin, zmax, median
 real	zstart, zslope
@@ -401,7 +401,7 @@ end
 # there are no pixels left.  The number of pixels left after pixel rejection
 # is returned as the function value.
 
-size_t procedure zsc_fit_line (data, npix, zstart, zslope, krej, ngrow, maxiter)
+long procedure zsc_fit_line (data, npix, zstart, zslope, krej, ngrow, maxiter)
 
 real	data[npix]		# data to be fitted
 size_t	npix			# number of pixels before rejection
@@ -412,12 +412,12 @@ size_t	ngrow			# number of pixels of growing
 int	maxiter			# max iterations
 
 long	i, minpix, lval
-size_t	ngoodpix, last_ngoodpix
+long	ngoodpix, last_ngoodpix
 int	niter
 real	xscale, z0, dz, x, z, mean, sigma, threshold
 double	sumxsqr, sumxz, sumz, sumx, rowrat
 pointer	sp, flat, badpix, normx
-size_t	zsc_reject_pixels(), zsc_compute_sigma()
+long	zsc_reject_pixels(), zsc_compute_sigma()
 
 begin
 	call smark (sp)
@@ -544,7 +544,7 @@ end
 # ZSC_COMPUTE_SIGMA -- Compute the root mean square deviation from the
 # mean of a flattened array.  Ignore rejected pixels.
 
-size_t procedure zsc_compute_sigma (a, badpix, npix, mean, sigma)
+long procedure zsc_compute_sigma (a, badpix, npix, mean, sigma)
 
 real	a[npix]			# flattened data array
 short	badpix[npix]		# bad pixel flags (!= 0 if bad pixel)
@@ -552,8 +552,7 @@ size_t	npix
 real	mean, sigma		# (output)
 
 real	pixval
-long	i
-size_t	ngoodpix
+long	i, ngoodpix
 double	sum, sumsq, temp
 
 begin
@@ -601,8 +600,8 @@ end
 # fact that bad pixels tend to be clumped.  The number of pixels left in the
 # fit is returned as the function value.
 
-size_t procedure zsc_reject_pixels (data, flat, normx, badpix, npix,
-				    sumxsqr, sumxz, sumx, sumz, threshold, ngrow)
+long procedure zsc_reject_pixels (data, flat, normx, badpix, npix,
+				  sumxsqr, sumxz, sumx, sumz, threshold, ngrow)
 
 real	data[npix]		# raw data array
 real	flat[npix]		# flattened data array
@@ -613,7 +612,7 @@ double	sumxsqr,sumxz,sumx,sumz	# matrix sums
 real	threshold		# threshold for pixel rejection
 size_t	ngrow			# number of pixels of growing
 
-size_t	ngoodpix
+long	ngoodpix
 long	i, j
 real	residual, lcut, hcut
 double	x, z
