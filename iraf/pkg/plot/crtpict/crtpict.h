@@ -22,8 +22,8 @@ define	CRT_YE			0.950
 define	LEN_CLPAR 		(15 + 40 + 40 + 20)
 define	FILL			Memi[P2I($1)]
 define	REPLICATE		Memi[P2I($1+1)]
-define	NSAMPLE_LINES		Memi[P2I($1+2)]
-define	LUT			Memi[P2I($1+3)]
+define	NSAMPLE_LINES		Meml[P2L($1+2)]
+define	LUT			Memp[$1+3]
 define	PERIM			Memi[P2I($1+4)]
 define	XMAG			Memr[P2R($1+5)]
 define	YMAG			Memr[P2R($1+6)]

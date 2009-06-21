@@ -9,24 +9,29 @@
 
 procedure crt_tweak_ndc (nvalues, ndc_start, ndc_end, device_res)
 
-int	nvalues			# Number of image values to output
+size_t	nvalues			# Number of image values to output
 real	ndc_start, ndc_end	# NDC endpoints - changed on output
 int	device_res		# Full device resolution
 
-int	ndevice_elements, first_device_element, last_device_element, int_extra
-int	dev_pixel_1, dev_pixel_2, desired_dev_elements, desired_inverse
+long	l_val
+long	ndevice_elements, first_device_element, last_device_element
+long	desired_dev_elements, desired_inverse, int_extra
+int	dev_pixel_1, dev_pixel_2
 real	ndc_extra, extra, real_extra
 double	gki_tweak
+int	iint()
+long	lmod()
 
 begin
 	gki_tweak = double (32767) / double (32768)
-	if (int (ndc_end) == 1)
+	if ( iint(ndc_end) == 1 )
 	    ndc_end = gki_tweak
 	first_device_element = ndc_start * device_res 
 	last_device_element  = ndc_end * device_res
 	ndevice_elements = (last_device_element - first_device_element) + 1
 
-	if (mod (ndevice_elements, nvalues) != 0) {
+	l_val = nvalues
+	if ( lmod(ndevice_elements, l_val) != 0 ) {
 	    # Calculate amount to be altered
 	    real_extra = real (ndevice_elements) / real (nvalues)
 	    if (real_extra > 1.0) {
@@ -39,7 +44,7 @@ begin
 	    } else {
 		# Tweak to get an integer decimation factor
 		real_extra = real (nvalues) / real (ndevice_elements)
-		desired_inverse = int (real_extra) + 1
+		desired_inverse = iint(real_extra) + 1
 		desired_dev_elements = nvalues / desired_inverse
 		extra = desired_dev_elements - ndevice_elements
 		ndc_extra = real (extra) / real (device_res)

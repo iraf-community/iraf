@@ -23,18 +23,21 @@ pointer	im				# input image
 pointer	gp				# graphics descriptor
 real	px1,px2,py1,py2			# input section
 real	ndc_xs,ndc_xe,ndc_ys,ndc_ye	# NDC of output section
-int	nx_output, ny_output		# Number of output pixels.  Image pixels
+size_t	nx_output, ny_output		# Number of output pixels.  Image pixels
 					# are scaled to these dimensions.
 real	z1,z2				# range of intensities to be mapped.
 int	zt				# specified greyscale transform type
 pointer	cl				# Pointer to crtpict structure
 
+size_t	sz_val
+int	i_val
 bool	unitary_greyscale_transformation
 pointer	in, si, sline, rline, llut, sp
 short	sz1, sz2, sdz1, sdz2, lut1, lut2
 real	dz1, dz2, y1, y2, delta_y
-int	ndev_cols, ndev_rows, nline, ny_device
-int	xblk, yblk
+int	ndev_cols, ndev_rows, ny_device
+long	nline
+long	xblk, yblk
 bool	ggetb(), fp_equalr()
 int	ggeti()
 real	ggetr()
@@ -54,8 +57,8 @@ begin
 	ny_device  = ((ndc_ye * ndev_rows) - (ndc_ys * ndev_rows)) + 1
 
 	# This sets up for the scaled image input 
-	xblk = INDEFI
-	yblk = INDEFI
+	xblk = INDEFL
+	yblk = INDEFL
 	si = sigl2_setup (im, px1,px2,nx_output,xblk, py1,py2,ny_output,yblk)
 
 	# If user has supplied look up table, it has to be dealt with at
@@ -66,7 +69,8 @@ begin
 	    iferr (call crt_ulut (UFILE(cl), z1, z2, llut))
 		call erract (EA_FATAL)
 	    LUT(cl) = llut
-	    call alims (Mems[llut], SZ_BUF, lut1, lut2)
+	    sz_val = SZ_BUF
+	    call alims (Mems[llut], sz_val, lut1, lut2)
 	}
 
 	# If device can't output greyscale information, return at this point.
@@ -135,8 +139,11 @@ begin
 		y1 = ndc_ys + (nline - 1) * delta_y
 		y2 = ndc_ys + (nline * delta_y)
 
-		call gpcell (gp, Mems[sline], nx_output, 1, ndc_xs, y1, ndc_xe,
-		    y2)
+		if ( nx_output > MAX_INT ) {	# limited by sys/gio/gpcell.x
+		    call error (0, "CRT_MAP_IMAGE: Too large nx_output (32-bit limit)")
+		}
+		i_val = nx_output
+		call gpcell (gp, Mems[sline], i_val, 1, ndc_xs, y1, ndc_xe, y2)
 	    }
 	} else {
 	    # Pixels are treated as TY_REAL; intensities are converted to
@@ -161,8 +168,11 @@ begin
 		y1 = ndc_ys + (nline - 1) * delta_y
 		y2 = ndc_ys + (nline * delta_y)
 
-		call gpcell (gp, Mems[sline], nx_output, 1, ndc_xs, y1, 
-		    ndc_xe, y2)
+		if ( nx_output > MAX_INT ) {	# limited by sys/gio/gpcell.x
+		    call error (0, "CRT_MAP_IMAGE: Too large nx_output (32-bit limit)")
+		}
+		i_val = nx_output
+		call gpcell (gp, Mems[sline], i_val, 1, ndc_xs, y1, ndc_xe, y2)
 	    }
 	}
 

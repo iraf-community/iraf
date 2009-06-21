@@ -17,6 +17,7 @@ pointer im
 pointer	wdes
 real	xs, xe, ys, ye, z1, z2
 
+size_t	sz_nbins, sz_val
 pointer	w1, inten_hgram, greys_hgram, sp, text, syv, greys, hgram
 pointer real_greys, xval, yval
 int	nsig_bits, i, zrange, mask
@@ -33,16 +34,19 @@ errchk	ggetb, ggeti, ggetr, crt_calc_hgrams, ggwind, gswind, gsview, gploto
 errchk	gsetr, gseti, glabax, amapr, gpline, gvline, achtir, gtext
 
 begin
+	sz_nbins = NBINS
+
 	call smark (sp)
-	call salloc (inten_hgram, NBINS, TY_INT)
-	call salloc (greys_hgram, NBINS, TY_INT)
-	call salloc (text, SZ_LINE, TY_CHAR)
-	call salloc (syv, NBINS, TY_SHORT)
-	call salloc (greys, NBINS, TY_INT)
-	call salloc (hgram, NBINS, TY_REAL)
-	call salloc (real_greys, NBINS, TY_REAL)
-	call salloc (xval, NBINS, TY_REAL)
-	call salloc (yval, NBINS, TY_REAL)
+	call salloc (inten_hgram, sz_nbins, TY_INT)
+	call salloc (greys_hgram, sz_nbins, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (text, sz_val, TY_CHAR)
+	call salloc (syv, sz_nbins, TY_SHORT)
+	call salloc (greys, sz_nbins, TY_INT)
+	call salloc (hgram, sz_nbins, TY_REAL)
+	call salloc (real_greys, sz_nbins, TY_REAL)
+	call salloc (xval, sz_nbins, TY_REAL)
+	call salloc (yval, sz_nbins, TY_REAL)
 
 	# First, get pointer to WCS 1 and some device parameters.
 	w1 = W_WC(wdes, 1)
@@ -109,8 +113,8 @@ begin
 	call gsetr (gp, G_MINORLENGTH, minor_length)
 	call gseti (gp, G_LABELAXIS, NO)
 	call gsetr (gp, G_TICKLABELSIZE, 0.25)
-	call achtir (Memi[inten_hgram], Memr[hgram], NBINS)
-	call gploto (gp, Memr[hgram], NBINS, IM_MIN(im), IM_MAX(im), "")
+	call achtir (Memi[inten_hgram], Memr[hgram], sz_nbins)
+	call gploto (gp, Memr[hgram], sz_nbins, IM_MIN(im), IM_MAX(im), "")
 
 	# Now to label the plot:
 	call ggwind (gp, ux1, ux2, uy1, uy2)
@@ -124,12 +128,12 @@ begin
 	# transformed. 
 
 	call gsview (gp, plot3_xs, plot3_xe, plot_ys, plot_ye)
-	call achtir (Memi[greys_hgram], Memr[hgram], NBINS)
+	call achtir (Memi[greys_hgram], Memr[hgram], sz_nbins)
 
 	if (z2 > z1)
-	    call gploto (gp, Memr[hgram], NBINS, dz1, dz2, "")
+	    call gploto (gp, Memr[hgram], sz_nbins, dz1, dz2, "")
 	else
-	    call gploto (gp, Memr[hgram], NBINS, dz2, dz1, "")
+	    call gploto (gp, Memr[hgram], sz_nbins, dz2, dz1, "")
 
 	# Now to label the plot:
 	call ggwind (gp, ux1, ux2, uy1, uy2)
@@ -156,21 +160,21 @@ begin
 		    "USER DEFINED FUNCTION: FROM %g TO %g")
 		call pargr (z1)
 		call pargr (z2)
-		call amapr (Memr[xval], Memr[yval], NBINS, z1, z2, STARTPT, 
+		call amapr (Memr[xval], Memr[yval], sz_nbins, z1, z2, STARTPT, 
 		    ENDPT)
-		call achtrs (Memr[yval], Mems[syv], NBINS)
-		call aluts (Mems[syv], Mems[syv], NBINS, Mems[LUT[cl]])
-		call achtsr (Mems[syv], Memr[yval], NBINS)
+		call achtrs (Memr[yval], Mems[syv], sz_nbins)
+		call aluts (Mems[syv], Mems[syv], sz_nbins, Mems[LUT[cl]])
+		call achtsr (Mems[syv], Memr[yval], sz_nbins)
 	    } else {
 	        call sprintf (Memc[text], SZ_LINE, 
 		    "TRANSFER FUNCTION: LINEAR FROM %g TO %g")
 		call pargr (z1)
 		call pargr (z2)
-	        call amapr (Memr[xval], Memr[yval], NBINS, z1, z2, real (dz1), 
+	        call amapr (Memr[xval], Memr[yval], sz_nbins, z1, z2, real (dz1), 
 		    real (dz2))
 	    }
 
-	    call gpline (gp, Memr[xval], Memr[yval], NBINS)
+	    call gpline (gp, Memr[xval], Memr[yval], sz_nbins)
 	    call ggwind (gp, wx1, wx2, wy1, wy2)
 	    x = (wx2 + wx1) / 2.0
 	    y = wy1 - (wy2 - wy1) * 0.20
@@ -195,8 +199,8 @@ begin
 		Memi[greys+i-1] = and (int (inten), mask)
 	    }
 
-	    call achtir (Memi[greys], Memr[real_greys], NBINS)
-	    call gvline (gp, Memr[real_greys], NBINS, IM_MIN(im), IM_MAX(im))
+	    call achtir (Memi[greys], Memr[real_greys], sz_nbins)
+	    call gvline (gp, Memr[real_greys], sz_nbins, IM_MIN(im), IM_MAX(im))
 	    call ggwind (gp, wx1, wx2, wy1, wy2)
 	    x = (wx2 + wx1) / 2.0
 	    y = wy1 - (wy2 - wy1) * 0.20

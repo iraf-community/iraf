@@ -18,17 +18,22 @@ int	ztrans			# Type of transfer function - linear or unitary
 int	inten_hgram[NBINS]	# Output array of intensity hgram values
 int	greys_hgram[NBINS]	# Output array of greyscale hgram values
 
+size_t	sz_val, sz_nbins
+long	l_val
 pointer buf
-int	npix, nsig_bits, zrange, mask, min_val, max_val
+int	nsig_bits, zrange, mask, min_val, max_val
+size_t	npix
 long	v[IM_MAXDIM]
 int	dz1, dz2, high_zi, low_zi
 real	high_z, low_z
 bool	ggetb()
-int	imgnlr(), imgnli()
-int	ggeti()
+long	imgnlr(), imgnli()
+int	ggeti(), iint()
 errchk 	im_minmax, ggeti, imgnli, imgnlr
 
 begin
+	sz_nbins = NBINS
+
 	# If z1 and z2 not in graphcap, set to some reasonable numbers for
 	# plots to be generated.
 	if (ggetb (gp, "z1") && ggetb (gp, "z2")) {
@@ -48,39 +53,41 @@ begin
 	}
 	mask = (2 ** (nsig_bits)) - 1
 
-	call aclri (inten_hgram, NBINS)
-	call aclri (greys_hgram, NBINS)
-	call amovkl (long(1), v, IM_MAXDIM)
+	call aclri (inten_hgram, sz_nbins)
+	call aclri (greys_hgram, sz_nbins)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	# Read lines into buffer and accumulate histograms.
 	npix = IM_LEN(im,1)
 
 	if (ztrans == W_UNITARY) {
-	    min_val = int (IM_MIN(im))
-	    max_val = int (IM_MAX(im))
+	    min_val = iint(IM_MIN(im))
+	    max_val = iint(IM_MAX(im))
 	    while (imgnli (im, buf, v) != EOF) {
-		call ahgmi (Memi[buf], npix, inten_hgram, NBINS, min_val,
-		    max_val)
-		call aandki  (Memi[buf], mask, Memi[buf], npix)
-		call ahgmi  (Memi[buf], npix, greys_hgram, NBINS, dz1, dz2)
+		call ahgmi (Memi[buf], npix, inten_hgram, sz_nbins, min_val,
+			    max_val)
+		call aandki (Memi[buf], mask, Memi[buf], npix)
+		call ahgmi  (Memi[buf], npix, greys_hgram, sz_nbins, dz1, dz2)
 	    }
 	} else if (IM_PIXTYPE(im) == TY_SHORT) {
-	    min_val = int (IM_MIN(im))
-	    max_val = int (IM_MAX(im))
+	    min_val = iint(IM_MIN(im))
+	    max_val = iint(IM_MAX(im))
 	    if (z2 > z1) {
 		# Positive contrast
-		high_zi = int (z2)
-		low_zi  = int (z1)
+		high_zi = iint(z2)
+		low_zi  = iint(z1)
 	    } else {
 		# Negative contrast
-		high_zi = int (z1)
-		low_zi  = int (z2)
+		high_zi = iint(z1)
+		low_zi  = iint(z2)
 	    }
 	    while (imgnli (im, buf, v) != EOF) {
-		call ahgmi (Memi[buf], npix, inten_hgram, NBINS, min_val, 
-		    max_val)
-		call ahgmi (Memi[buf], npix, greys_hgram, NBINS, low_zi,
-		    high_zi)
+		call ahgmi (Memi[buf], npix, inten_hgram, sz_nbins, min_val, 
+			    max_val)
+		call ahgmi (Memi[buf], npix, greys_hgram, sz_nbins, low_zi,
+			    high_zi)
 	    }
 	} else {
 	    if (z2 > z1) {
@@ -93,9 +100,10 @@ begin
 		low_z  = z2
 	    }
 	    while (imgnlr (im, buf, v) != EOF) {
-	        call ahgmr (Memr[buf], npix, inten_hgram, NBINS, IM_MIN(im),
-		    IM_MAX(im))
-	        call ahgmr (Memr[buf], npix, greys_hgram, NBINS, low_z, high_z)
+	        call ahgmr (Memr[buf], npix, inten_hgram, sz_nbins, IM_MIN(im),
+			    IM_MAX(im))
+	        call ahgmr (Memr[buf], npix, greys_hgram, sz_nbins, low_z,
+			    high_z)
 	    }
 	} 
 end
@@ -116,22 +124,29 @@ short	lut[ARB]		# Look up table previously calculated
 int	inten_hgram[NBINS]	# Output array of intensity hgram values
 int	greys_hgram[NBINS]	# Output array of greyscale hgram values
 
+size_t	sz_val, sz_nbins
+long	l_val
 pointer buf, ibuf, sp, rlut
 short	min_val, max_val, short_min, short_max, dz1, dz2
-int	npix
+size_t	npix
 long	v[IM_MAXDIM]
 short	high_zi, low_zi
 real	high_z, low_z
-int	imgnlr(), imgnls()
+long	imgnlr(), imgnls()
 errchk 	im_minmax, imgnls, imgnlr
 
 begin
-	# Get max and min in look up table
-	call alims (lut, SZ_BUF, dz1, dz2)
+	sz_nbins = NBINS
 
-	call aclri (inten_hgram, NBINS)
-	call aclri (greys_hgram, NBINS)
-	call amovkl (long(1), v, IM_MAXDIM)
+	# Get max and min in look up table
+	sz_val = SZ_BUF
+	call alims (lut, sz_val, dz1, dz2)
+
+	call aclri (inten_hgram, sz_nbins)
+	call aclri (greys_hgram, sz_nbins)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	# Read lines into buffer and accumulate histograms.
 	npix = IM_LEN(im,1)
@@ -153,12 +168,12 @@ begin
 	    }
 
 	    while (imgnls (im, buf, v) != EOF) {
-		call ahgms (Mems[buf], npix, inten_hgram, NBINS, min_val, 
-		    max_val)
+		call ahgms (Mems[buf], npix, inten_hgram, sz_nbins, min_val, 
+			    max_val)
 		call amaps  (Mems[buf], Mems[buf], npix, low_zi, high_zi, 
-		    short_min, short_max)
+			     short_min, short_max)
 		call aluts  (Mems[buf], Mems[buf], npix, lut)
-		call ahgms (Mems[buf], npix, greys_hgram, NBINS, dz1, dz2)
+		call ahgms (Mems[buf], npix, greys_hgram, sz_nbins, dz1, dz2)
 	    }
 	} else {
 	    if (z2 > z1) {
@@ -173,18 +188,19 @@ begin
 
 	    call smark (sp)
 	    call salloc (ibuf, npix, TY_INT)
-	    call salloc (rlut, SZ_BUF, TY_REAL)
-	    call achtsr (lut, Memr[rlut], SZ_BUF)
+	    sz_val = SZ_BUF
+	    call salloc (rlut, sz_val, TY_REAL)
+	    call achtsr (lut, Memr[rlut], sz_val)
 
 	    while (imgnlr (im, buf, v) != EOF) {
-	        call ahgmr (Memr[buf], npix, inten_hgram, NBINS, IM_MIN(im),
-		    IM_MAX(im))
+	        call ahgmr (Memr[buf], npix, inten_hgram, sz_nbins, IM_MIN(im),
+			    IM_MAX(im))
 
 		call amapr (Memr[buf], Memr[buf], npix, z1, z2, STARTPT, ENDPT)
-		call achtri (Memr[buf], Memr[ibuf], npix)
+		call achtri (Memr[buf], Memi[ibuf], npix)
 		call alutr (Memi[ibuf], Memr[buf], npix, Memr[rlut])
-	        call ahgmr (Memr[buf], npix, greys_hgram, NBINS, real (dz1),
-		    real (dz2))
+	        call ahgmr (Memr[buf], npix, greys_hgram, sz_nbins, real (dz1),
+			    real (dz2))
 	    }
 
 	    call sfree (sp)

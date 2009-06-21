@@ -18,15 +18,20 @@ real	z1			# Intensity mapped to minimum gs value
 real	z2			# Intensity mapped to maximum gs value
 pointer	lut			# Look up table - pointer is returned
 
+size_t	sz_val
 pointer	sp, x, y
-int	nvalues, i, j, x1, x2, y1
+int	j, x1, x2, y1
+long	i
+size_t	nvalues
 real	delta_gs, delta_xv, slope
+int	iint()
 errchk	crt_rlut, crt_sort, malloc
 
 begin
 	call smark (sp)
-	call salloc (x, SZ_BUF, TY_REAL)
-	call salloc (y, SZ_BUF, TY_REAL)
+	sz_val = SZ_BUF
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
 
 	# Read intensities and greyscales from the user's input file.  The
 	# intensity range is then mapped into a standard range and the 
@@ -38,14 +43,15 @@ begin
 	call crt_sort (Memr[x], Memr[y], nvalues)
 
 	# Fill lut in straight line segments - piecewise linear
-	call malloc (lut, SZ_BUF, TY_SHORT)
+	sz_val = SZ_BUF
+	call malloc (lut, sz_val, TY_SHORT)
 	do i = 1, nvalues-1 {
 	    delta_gs = Memr[y+i] - Memr[y+i-1]
 	    delta_xv = Memr[x+i] - Memr[x+i-1]
 	    slope = delta_gs / delta_xv
-	    x1 = int (Memr[x+i-1]) 
-	    x2 = int (Memr[x+i])
-	    y1 = int (Memr[y+i-1])
+	    x1 = iint(Memr[x+i-1]) 
+	    x2 = iint(Memr[x+i])
+	    y1 = iint(Memr[y+i-1])
 	    do j = x1, x2-1
 		Mems[lut+j-1] = y1 + slope * (j-x1)
 	}
@@ -61,8 +67,9 @@ procedure crt_rlut (utab, x, y, nvalues)
 char	utab[SZ_FNAME]		# Name of list file
 real	x[SZ_BUF]		# Array of x values, filled on return
 real	y[SZ_BUF]		# Array of y values, filled on return
-int	nvalues			# Number of values in x, y vectors - returned
+size_t	nvalues			# Number of values in x, y vectors - returned
 
+size_t	sz_val
 int	n, fd
 pointer	sp, lbuf, ip
 real	xval, yval
@@ -71,7 +78,8 @@ errchk	open, sscan, getline, malloc
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	iferr (fd = open (utab, READ_ONLY, TEXT_FILE))
 	    call error (0, "Error opening user table")
@@ -113,9 +121,9 @@ procedure crt_sort (xvals, yvals, nvals)
 
 real	xvals[nvals]		# Array of x values
 real	yvals[nvals]		# Array of y values
-int	nvals			# Number of values in each array
+size_t	nvals			# Number of values in each array
 
-int	i, j
+long	i, j
 real	temp
 define	swap	{temp=$1;$1=$2;$2=temp}
 

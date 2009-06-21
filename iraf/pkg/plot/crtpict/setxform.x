@@ -16,11 +16,13 @@ pointer im
 pointer	cl
 pointer	wdes
 
-int	w1, len_stdline
+size_t	len_stdline, sz_val
+pointer	w1
 real	z1, z2
 
 bool	fp_equalr()
 int	strncmp()
+real	aabs()
 errchk	crt_xy_scale, strcmp, im_minmax, zscale
 
 begin
@@ -54,18 +56,18 @@ begin
 	    } else {
 		# Use image min and max unless the user has set the contrast
 		# parameter to alter the slope of the transfer function.
-		if (abs (CONTRAST(cl) - 1.0) > EPSILON) {
+		if ( aabs(CONTRAST(cl) - 1.0) > EPSILON ) {
 		    # CONTRAST = 1.0
 		    z1 = IM_MIN(im)
 		    z2 = IM_MAX(im)
-		} else if (abs (CONTRAST(cl) + 1.0) > EPSILON) {
+		} else if ( aabs(CONTRAST(cl) + 1.0) > EPSILON ) {
 		    # CONTRAST = -1.0
 		    z1 = IM_MAX(im)
 		    z2 = IM_MIN(im)
 		} else {
 		    len_stdline = SAMPLE_SIZE / NSAMPLE_LINES(cl)
-		    call zscale (im, z1, z2, CONTRAST(cl), SAMPLE_SIZE, 
-			len_stdline)
+		    sz_val = SAMPLE_SIZE
+		    call zscale (im, z1, z2, CONTRAST(cl), sz_val, len_stdline)
 		}
 	    }
 	}
@@ -74,7 +76,8 @@ begin
 	    W_ZT(w1) = W_LINEAR
 	    # Calculate optimum z1 and z2 from image mode
 	    len_stdline = SAMPLE_SIZE / NSAMPLE_LINES(cl)
-	    call zscale (im, z1, z2, CONTRAST(cl), SAMPLE_SIZE, len_stdline)
+	    sz_val = SAMPLE_SIZE
+	    call zscale (im, z1, z2, CONTRAST(cl), sz_val, len_stdline)
 	    if (IM_PIXTYPE(im) == TY_SHORT) {
 	        if (short (z1) == short (z2))
 		    call error (0, 

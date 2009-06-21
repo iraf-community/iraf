@@ -30,21 +30,22 @@ define	SI_LEN		15
 define	SI_MAXDIM	2		# images of 2 dimensions supported
 define	SI_NBUFS	3		# nbuffers used by SIGL2
 
-define	SI_IM		Memi[P2I($1)]	# pointer to input image header
-define	SI_GRID		Memi[P2I($1+1)+$2-1]	# pointer to array of X coords
-define	SI_NPIX		Memi[P2I($1+3)+$2-1]	# number of X coords
-define	SI_BAVG		Memi[P2I($1+5)+$2-1]	# X block averaging factor
+define	SI_IM		Memp[$1]		# pointer to input image header
+define	SI_GRID		Memp[$1+1+$2-1]		# pointer to array of X coords
+define	SI_NPIX		Memz[P2Z($1+3)+$2-1]	# number of X coords
+define	SI_BAVG		Meml[P2L($1+5)+$2-1]	# X block averaging factor
 define	SI_INTERP	Memi[P2I($1+7)+$2-1]	# interpolate X axis
-define	SI_BUF		Memi[P2I($1+9)+$2-1]	# line buffers
+define	SI_BUF		Memp[$1+9+$2-1]		# line buffers
 define	SI_TYBUF	Memi[P2I($1+12)]	# buffer type
-define	SI_XOFF		Memi[P2I($1+13)]	# offset in input image to first X
+define	SI_XOFF		Meml[P2L($1+13)]	# offset in input image to first X
 define	SI_INIT		Memi[P2I($1+14)]	# YES until first i/o is done
 
 define	OUTBUF		SI_BUF($1,3)
 
 define	SI_TOL		(1E-5)		# close to a pixel
-define	INTVAL		(abs ($1 - nint($1)) < SI_TOL)
+define	INTVAL		(abs ($1 - anint($1)) < SI_TOL)
 define	SWAPI		{tempi=$2;$2=$1;$1=tempi}
+define	SWAPL		{templ=$2;$2=$1;$1=templ}
 define	SWAPP		{tempp=$2;$2=$1;$1=tempp}
 define	NOTSET		(-9999)
 
@@ -60,23 +61,28 @@ pointer procedure sigl2_setup (im, px1, px2, nx, xblk, py1, py2, ny, yblk)
 
 pointer	im			# the input image
 real	px1, px2		# range in X to be sampled on an even grid
-int	nx			# number of output pixels in X
-int	xblk			# blocking factor in x
+size_t	nx			# number of output pixels in X
+long	xblk			# blocking factor in x
 real	py1, py2		# range in Y to be sampled on an even grid
-int	ny			# number of output pixels in Y
-int	yblk			# blocking factor in y
+size_t	ny			# number of output pixels in Y
+long	yblk			# blocking factor in y
 
-int	npix, noldpix, nbavpix, i, j
-int	npts[SI_MAXDIM]		# number of output points for axis
-int	blksize[SI_MAXDIM]	# block averaging factor (npix per block)
+size_t	sz_val
+size_t	npix, noldpix, nbavpix
+int	i
+long	j
+size_t	npts[SI_MAXDIM]		# number of output points for axis
+long	blksize[SI_MAXDIM]	# block averaging factor (npix per block)
 real	tau[SI_MAXDIM]		# tau = p(i+1) - p(i) in fractional pixels
 real	p1[SI_MAXDIM]		# starting pixel coords in each axis
 real	p2[SI_MAXDIM]		# ending pixel coords in each axis
 real	scalar, start
 pointer	si, gp
+long	lint()
 
 begin
-	iferr (call calloc (si, SI_LEN, TY_STRUCT))
+	sz_val = SI_LEN
+	iferr (call calloc (si, sz_val, TY_STRUCT))
 	    call erract (EA_FATAL)
 
 	SI_IM(si) = im
@@ -99,7 +105,7 @@ begin
 	# between the first and last point.
 
 	do i = 1, SI_MAXDIM {
-	    if ((blksize[i] >= 1) && !IS_INDEFI(blksize[i])) {
+	    if ((blksize[i] >= 1) && !IS_INDEFL(blksize[i])) {
 	        if (npts[i] == 1)
 		    tau[i] = 0.
 	        else
@@ -107,7 +113,7 @@ begin
 	    } else {
 		if (npts[i] == 1) {
 		    tau[i] = 0.
-		    blksize[i] = int (p2[i] - p1[i] + 1)
+		    blksize[i] = lint(p2[i] - p1[i] + 1)
 	        } else {
 	            tau[i] = (p2[i] - p1[i]) / (npts[i] - 1)
 	    	    if (tau[i] >= 2.0) {
@@ -118,7 +124,7 @@ begin
 			# block averaged pixels will be replicated as necessary
 			# to fill the last block out to this size.  
 
-			blksize[i] = int (tau[i])
+			blksize[i] = lint(tau[i])
 			npix = p2[i] - p1[i] + 1
 			noldpix = (npix+blksize[i]-1) / blksize[i] * blksize[i]
 			nbavpix = noldpix / blksize[i]
@@ -135,9 +141,9 @@ begin
 	SI_BAVG(si,1) = blksize[1]
 	SI_BAVG(si,2) = blksize[2]
 
-	if (IS_INDEFI (xblk))
+	if (IS_INDEFL (xblk))
 	    xblk = blksize[1]
-	if (IS_INDEFI (yblk))
+	if (IS_INDEFL (yblk))
 	    yblk = blksize[2]
 
 	# Allocate and initialize the grid arrays, specifying the X and Y
@@ -154,8 +160,8 @@ begin
 	    # given by XOFF.
 
 	    if (i == 1) {
-		SI_XOFF(si) = int (p1[i])
-		start = p1[1] - int (p1[i]) + 1.0
+		SI_XOFF(si) = lint(p1[i])
+		start = p1[1] - SI_XOFF(si) + 1.0
 	    } else
 		start = p1[i]
 
@@ -208,12 +214,15 @@ end
 pointer procedure sigl2s (si, lineno)
 
 pointer	si		# pointer to SI descriptor
-int	lineno
+long	lineno
 
 pointer	rawline, tempp, gp
-int	i, buf_y[2], new_y[2], tempi, curbuf, altbuf
-int	npix, nblks_y, ybavg, x1, x2
+long	buf_y[2], new_y[2], templ
+int	i, tempi, curbuf, altbuf
+size_t	npix, nblks_y
+long	ybavg, x1, x2
 real	x, y, weight_1, weight_2
+long	lint()
 pointer	si_blkavgs()
 errchk	si_blkavgs
 
@@ -226,7 +235,7 @@ begin
 	gp = SI_GRID(si,1)
 	x1 = SI_XOFF(si)
 	x = Memr[gp+npix-1]
-	x2 = x1 + int(x)
+	x2 = x1 + lint(x)
 	if (INTVAL(x))
 	    x2 = x2 - 1
 	x2 = max (x1 + 1, x2)
@@ -239,7 +248,7 @@ begin
 	# permitted.
 
 	if (SI_INTERP(si,1) == NO && SI_INTERP(si,2) == NO)
-	    return (si_blkavgs (SI_IM(si), x1, x2, int(y),
+	    return (si_blkavgs (SI_IM(si), x1, x2, lint(y),
 		SI_BAVG(si,1), SI_BAVG(si,2)))
 
 	# If we are interpolating in Y two buffers are required, one for each
@@ -268,8 +277,8 @@ begin
 	# the X grid.  The X and Y values herein are in the coordinate system
 	# of the (possibly block averaged) input image.
 
-	new_y[1] = int(y)
-	new_y[2] = int(y) + 1
+	new_y[1] = lint(y)
+	new_y[2] = lint(y) + 1
 
 	# Get the pair of lines whose integral Y values form an interval
 	# containing the fractional Y value of the output line.  Sometimes the
@@ -286,7 +295,7 @@ begin
 		;
 	    } else if (new_y[i] == buf_y[altbuf]) {
 		SWAPP (SI_BUF(si,1), SI_BUF(si,2))
-		SWAPI (buf_y[1], buf_y[2])
+		SWAPL (buf_y[1], buf_y[2])
 
 	    } else {
 		# Get line and interpolate onto output grid.  If interpolation
@@ -352,13 +361,14 @@ end
 pointer procedure si_blkavgs (im, x1, x2, y, xbavg, ybavg)
 
 pointer	im			# input image
-int	x1, x2			# range of x blocks to be read
-int	y			# y block to be read
-int	xbavg, ybavg		# X and Y block averaging factors
+long	x1, x2			# range of x blocks to be read
+long	y			# y block to be read
+long	xbavg, ybavg		# X and Y block averaging factors
 
 short	snlines
-int	nblks_x, nblks_y, ncols, nlines, xoff, i, j
-int	first_line, nlines_in_sum, npix, nfull_blks, count
+size_t	nblks_x, nblks_y, ncols, nlines
+long	xoff, i, j, first_line, count
+size_t	nlines_in_sum, npix, nfull_blks
 real	sum
 pointer	sp, a, b
 pointer	imgs2s()
@@ -448,12 +458,15 @@ end
 pointer procedure sigl2r (si, lineno)
 
 pointer	si		# pointer to SI descriptor
-int	lineno
+long	lineno
 
 pointer	rawline, tempp, gp
-int	i, buf_y[2], new_y[2], tempi, curbuf, altbuf
-int	npix, nblks_y, ybavg, x1, x2
+long	buf_y[2], new_y[2], templ
+int	i, tempi, curbuf, altbuf
+size_t	npix, nblks_y
+long	ybavg, x1, x2
 real	x, y, weight_1, weight_2
+long	lint()
 pointer	si_blkavgr()
 errchk	si_blkavgr
 
@@ -466,7 +479,7 @@ begin
 	gp = SI_GRID(si,1)
 	x1 = SI_XOFF(si)
 	x = Memr[gp+npix-1]
-	x2 = x1 + int(x)
+	x2 = x1 + lint(x)
 	if (INTVAL(x))
 	    x2 = x2 - 1
 	x2 = max (x1 + 1, x2)
@@ -479,7 +492,7 @@ begin
 	# permitted.
 
 	if (SI_INTERP(si,1) == NO && SI_INTERP(si,2) == NO)
-	    return (si_blkavgr (SI_IM(si), x1, x2, int(y),
+	    return (si_blkavgr (SI_IM(si), x1, x2, lint(y),
 		SI_BAVG(si,1), SI_BAVG(si,2)))
 
 	# If we are interpolating in Y two buffers are required, one for each
@@ -508,8 +521,8 @@ begin
 	# the X grid.  The X and Y values herein are in the coordinate system
 	# of the (possibly block averaged) input image.
 
-	new_y[1] = int(y)
-	new_y[2] = int(y) + 1
+	new_y[1] = lint(y)
+	new_y[2] = lint(y) + 1
 
 	# Get the pair of lines whose integral Y values form an interval
 	# containing the fractional Y value of the output line.  Sometimes the
@@ -526,7 +539,7 @@ begin
 		;
 	    } else if (new_y[i] == buf_y[altbuf]) {
 		SWAPP (SI_BUF(si,1), SI_BUF(si,2))
-		SWAPI (buf_y[1], buf_y[2])
+		SWAPL (buf_y[1], buf_y[2])
 
 	    } else {
 		# Get line and interpolate onto output grid.  If interpolation
@@ -592,12 +605,13 @@ end
 pointer procedure si_blkavgr (im, x1, x2, y, xbavg, ybavg)
 
 pointer	im			# input image
-int	x1, x2			# range of x blocks to be read
-int	y			# y block to be read
-int	xbavg, ybavg		# X and Y block averaging factors
+long	x1, x2			# range of x blocks to be read
+long	y			# y block to be read
+long	xbavg, ybavg		# X and Y block averaging factors
 
-int	nblks_x, nblks_y, ncols, nlines, xoff, i, j
-int	first_line, nlines_in_sum, npix, nfull_blks, count
+size_t	nblks_x, nblks_y, ncols, nlines
+long	xoff, i, j, first_line, count
+size_t	nlines_in_sum, npix, nfull_blks
 real	sum
 pointer	sp, a, b
 pointer	imgs2r()

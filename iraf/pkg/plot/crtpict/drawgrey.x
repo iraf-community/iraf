@@ -15,7 +15,7 @@ pointer	cl
 
 short 	grey[NSTEPS]
 char	label[SZ_LABEL]
-int	ndev_rows, i, dummy
+int	ndev_rows, i, dummy, i_val
 real	ndc_xs, ndc_xe, ndc_ys, ndc_ye, yres, del_y
 real	delta_grey, delta_x, x_start, x, dz1, dz2
 
@@ -53,7 +53,8 @@ begin
 	x_start = ndc_xs + (delta_x / 2.0)
 	do i = 1, NSTEPS {
 	    grey[i] = short (dz1 + (i-1) * delta_grey + 0.5)
-	    dummy = itoc (int(grey[i]), label, SZ_LABEL)
+	    i_val = grey[i]
+	    dummy = itoc (i_val, label, SZ_LABEL)
 	    x = x_start + (i - 1) * delta_x
 	    call gtext (gp, x, ndc_ys, label, "h=c;s=0.25;v=t")
 	}

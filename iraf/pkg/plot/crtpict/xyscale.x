@@ -17,7 +17,8 @@ pointer	cl
 pointer	im
 pointer	wdes
 
-int	w1, w0, ndev_rows, ndev_cols
+pointer	w1, w0
+int	ndev_rows, ndev_cols
 real	xcenter, ycenter, xsize, ysize, pxsize, pysize, xscale, yscale
 real	ystart, yend
 int	ggeti()

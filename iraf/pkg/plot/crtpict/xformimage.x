@@ -27,8 +27,10 @@ real	pxsize, pysize		# size of image section in fractional pixels
 real	wxcenter, wycenter	# center of device window in frac device pixels
 real	xmag, ymag		# x,y magnification ratios
 pointer	w0, w1			# world coord systems 0 (NDC) and 1 (pixel)
-int	ndev_cols, ndev_rows, nx_output, ny_output
+int	ndev_cols, ndev_rows
+size_t	nx_output, ny_output
 int	ggeti()
+long	lint()
 errchk	ggeti, gseti, gsview, gswind, draw_perimeter
 errchk	crt_map_image, crt_replicate_image
 
@@ -54,10 +56,10 @@ begin
 	# This is not necessarily the same as WCS 1 since the WCS coords
 	# need not be inbounds, but they are integral pixels.
 
-	px1 = max (1.0,		        real (int (W_XS(w1) + 0.5)))
-	px2 = min (real (IM_LEN(im,1)), real (int (W_XE(w1) + 0.5)))
-	py1 = max (1.0,		        real (int (W_YS(w1) + 0.5)))
-	py2 = min (real (IM_LEN(im,2)), real (int (W_YE(w1) + 0.5)))
+	px1 = max (1.0,		        aint(W_XS(w1) + 0.5))
+	px2 = min (real (IM_LEN(im,1)), aint(W_XE(w1) + 0.5))
+	py1 = max (1.0,		        aint(W_YS(w1) + 0.5))
+	py2 = min (real (IM_LEN(im,2)), aint(W_YE(w1) + 0.5))
 
 	# The extent of the output image in NDC coords
 	pxsize = ((px2 - px1) + 1.0) / ndev_cols
@@ -77,18 +79,18 @@ begin
 	# To avoid possible truncation errors down the line, make sure
 	# the ndc coordinates passed to the output procedures represent
 	# integer pixels.
-	ndc_xs = real (int (ndc_xs * ndev_cols)) / ndev_cols
-	ndc_xe = real (int (ndc_xe * ndev_cols)) / ndev_cols
-	ndc_ys = real (int (ndc_ys * ndev_rows)) / ndev_rows
-	ndc_ye = real (int (ndc_ye * ndev_rows)) / ndev_rows
+	ndc_xs = aint(ndc_xs * ndev_cols) / ndev_cols
+	ndc_xe = aint(ndc_xe * ndev_cols) / ndev_cols
+	ndc_ys = aint(ndc_ys * ndev_rows) / ndev_rows
+	ndc_ye = aint(ndc_ye * ndev_rows) / ndev_rows
 
 	# Output the image data in WCS 0.  The number of image pixels that
 	# will be put out across the device is calculated first.  
 
 	call gseti (gp, G_WCS, 0)
 	if (REPLICATE(cl) == YES) {
-	    nx_output = (int(px2) - int(px1)) + 1
-	    ny_output = (int(py2) - int(py1)) + 1
+	    nx_output = (lint(px2) - lint(px1)) + 1
+	    ny_output = (lint(py2) - lint(py1)) + 1
 	} else {
 	    # Image pixels will be scaled to number of device pixels 
 	    nx_output = ((ndc_xe * ndev_cols) - (ndc_xs * ndev_cols)) + 1

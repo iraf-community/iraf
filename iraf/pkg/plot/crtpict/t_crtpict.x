@@ -18,23 +18,31 @@ procedure t_crtpict ()
 bool	redir
 pointer	sp, cl, gp, im, command, image, word, title, output, ofile, dev, list
 int	cmd, stat, fd
+size_t	sz_val
 
 pointer	immap(), gopen(), imtopenp()
 bool	clgetb(), streq()
-int	strncmp(), clgeti(), btoi(), fstati(), open(), getline()
+int	strncmp(), btoi(), fstati(), open(), getline()
+long	clgetl()
 int	imtgetim()
-real	clgetr()
+real	clgetr(), aabs()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (cl, LEN_CLPAR, TY_STRUCT)
-	call salloc (command, SZ_LINE, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (word, SZ_LINE, TY_CHAR)
-	call salloc (title, SZ_LINE, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (ofile, SZ_FNAME, TY_CHAR)
-	call salloc (dev, SZ_FNAME, TY_CHAR)
+	sz_val = LEN_CLPAR
+	call salloc (cl, sz_val, TY_STRUCT)
+	sz_val = SZ_LINE
+	call salloc (command, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (word, sz_val, TY_CHAR)
+	call salloc (title, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (output, sz_val, TY_CHAR)
+	call salloc (ofile, sz_val, TY_CHAR)
+	call salloc (dev, sz_val, TY_CHAR)
 
 	# If the input has been redirected, input is read from the named
 	# command file.  If not, each image name in the input template is
@@ -44,9 +52,10 @@ begin
 	if (fstati (STDIN, F_REDIR) == YES) {
 	    call printf ("Input has been redirected\n")
 	    redir = true
-	    cmd = open (STDIN, READ_ONLY, TEXT_FILE)
-	} else 
+	    cmd = open ("STDIN", READ_ONLY, TEXT_FILE)
+	} else {
 	    list = imtopenp ("input")
+	}
 
 	# The user can "trap" the output metacode and intercept the
 	# spooling process if an output file is specified.
@@ -61,14 +70,14 @@ begin
 	call clgstr ("ztrans", ZTRANS(cl), SZ_LINE)
 	if (strncmp (ZTRANS(cl), "auto", 1) == 0) {
 	    CONTRAST(cl) = clgetr ("contrast")
-	    NSAMPLE_LINES(cl) = clgeti ("nsample_lines")
+	    NSAMPLE_LINES(cl) = clgetl ("nsample_lines")
 	} else if (strncmp (ZTRANS(cl), "min_max", 1) == 0) {
 	    Z1(cl) = clgetr ("z1")
 	    Z2(cl) = clgetr ("z2")
-	    if (abs (Z1(cl) - Z2(cl)) < EPSILON) {
+	    if ( aabs(Z1(cl) - Z2(cl)) < EPSILON ) {
 		CONTRAST(cl) = clgetr ("contrast")
-		if (abs (CONTRAST(cl)) - 1.0 > EPSILON)
-		    NSAMPLE_LINES(cl) = clgeti ("nsample_lines")
+		if ( aabs(CONTRAST(cl)) - 1.0 > EPSILON )
+		    NSAMPLE_LINES(cl) = clgetl ("nsample_lines")
 	    }
 	} else if (strncmp (ZTRANS(cl), "user", 1) == 0)
 	    call clgstr ("lutfile", UFILE(cl), SZ_FNAME)
@@ -79,9 +88,9 @@ begin
 	    XMAG(cl) = clgetr ("xmag")
 	    YMAG(cl) = clgetr ("ymag")
 	    if (XMAG(cl) < 0)
-		XMAG(cl) = 1 / abs (XMAG(cl))
+		XMAG(cl) = 1 / aabs(XMAG(cl))
 	    if (YMAG(cl) < 0)
-		YMAG(cl) = 1 / abs (YMAG(cl))
+		YMAG(cl) = 1 / aabs(YMAG(cl))
 	}
 
 	if (FILL(cl) == YES || XMAG(cl) - 1.0 > EPSILON || 
@@ -127,7 +136,7 @@ begin
 	    }
 
 	    # Open the input image; if an error occurs, go to next image in list
-	    iferr (im = immap (Memc[image], READ_ONLY, 0)) {
+	    iferr (im = immap (Memc[image], READ_ONLY, NULLPTR)) {
 		call erract (EA_WARN)
 		next
 	    }

@@ -39,16 +39,21 @@ procedure zscale (im, z1, z2, contrast, optimal_sample_size, len_stdline)
 pointer	im			# image to be sampled
 real	z1, z2			# output min and max greyscale values
 real	contrast		# adj. to slope of transfer function
-int	optimal_sample_size	# desired number of pixels in sample
-int	len_stdline		# optimal number of pixels per line
+size_t	optimal_sample_size	# desired number of pixels in sample
+size_t	len_stdline		# optimal number of pixels per line
 
-int	npix, minpix, ngoodpix, center_pixel, ngrow
+long	l_val, c_2
+long	minpix, ngoodpix, center_pixel
+size_t	npix, ngrow
 real	zmin, zmax, median, temp
 real	zstart, zslope
 pointer	sample, left
-int	zsc_sample_image(), zsc_fit_line()
+real	aabs()
+long	zsc_sample_image(), zsc_fit_line(), ldint(), ldnint(), lmod()
 
 begin
+	c_2 = 2
+
 	# Subsample the image.
 	npix = zsc_sample_image (im, sample, optimal_sample_size, len_stdline)
 	center_pixel = max (1, (npix + 1) / 2)
@@ -64,7 +69,8 @@ begin
 	# are an even number of pixels in the sample.
 
 	left = sample + center_pixel - 1
-	if (mod (npix, 2) == 1 || center_pixel >= npix)
+	l_val = npix
+	if (lmod (l_val, c_2) == 1 || center_pixel >= npix)
 	    median = Memr[left]
 	else
 	    median = (Memr[left] + Memr[left+1]) / 2
@@ -75,8 +81,8 @@ begin
 	# accordingly and compute Z1 and Z2, the y intercepts at indices 1 and
 	# npix.
 
-	minpix = max (MIN_NPIXELS, int (npix * MAX_REJECT))
-	ngrow = max (1, nint (npix * .01))
+	minpix = max (MIN_NPIXELS, ldint(npix * 1.0d0 * MAX_REJECT))
+	ngrow = max (1, ldnint(npix * 0.01d0))
 	ngoodpix = zsc_fit_line (Memr[sample], npix, zstart, zslope,
 	    KREJ, ngrow, MAX_ITERATIONS)
 
@@ -84,7 +90,7 @@ begin
 	    z1 = zmin
 	    z2 = zmax
 	} else {
-	    zslope = zslope / abs (contrast)
+	    zslope = zslope / aabs(contrast)
 	    z1 = max (zmin, median - (center_pixel - 1) * zslope)
 	    z2 = min (zmax, median + (npix - center_pixel) * zslope)
 	    if (contrast < 0) {
@@ -102,16 +108,17 @@ end
 # ZSC_SAMPLE_IMAGE -- Extract an evenly gridded subsample of the pixels from
 # a two-dimensional image into a one-dimensional vector.
 
-int procedure zsc_sample_image (im, sample, optimal_sample_size, len_stdline)
+long procedure zsc_sample_image (im, sample, optimal_sample_size, len_stdline)
 
 pointer	im			# image to be sampled
 pointer	sample			# output vector containing the sample
-int	optimal_sample_size	# desired number of pixels in sample
-int	len_stdline		# optimal number of pixels per line
+size_t	optimal_sample_size	# desired number of pixels in sample
+size_t	len_stdline		# optimal number of pixels per line
 
-int	ncols, nlines, col_step, line_step, maxpix, line
-int	opt_npix_per_line, npix_per_line
-int	opt_nlines_in_sample, min_nlines_in_sample, max_nlines_in_sample
+long	ncols, nlines, col_step, line_step, line
+size_t	maxpix
+size_t	opt_npix_per_line, npix_per_line
+size_t	opt_nlines_in_sample, min_nlines_in_sample, max_nlines_in_sample
 pointer	op
 pointer	imgl2r()
 
@@ -168,8 +175,9 @@ procedure zsc_subsample (a, b, npix, step)
 
 real	a[ARB]
 real	b[npix]
-int	npix, step
-int	ip, i
+size_t	npix
+long	step
+long	ip, i
 
 begin
 	if (step <= 1)
@@ -191,21 +199,22 @@ end
 # there are no pixels left.  The number of pixels left after pixel rejection
 # is returned as the function value.
 
-int procedure zsc_fit_line (data, npix, zstart, zslope, krej, ngrow, maxiter)
+long procedure zsc_fit_line (data, npix, zstart, zslope, krej, ngrow, maxiter)
 
 real	data[npix]		# data to be fitted
-int	npix			# number of pixels before rejection
+size_t	npix			# number of pixels before rejection
 real	zstart			# Z-value of pixel data[1]	(output)
 real	zslope			# dz/pixel			(output)
 real	krej			# k-sigma pixel rejection factor
-int	ngrow			# number of pixels of growing
+size_t	ngrow			# number of pixels of growing
 int	maxiter			# max iterations
 
-int	i, ngoodpix, last_ngoodpix, minpix, niter
+long	i, minpix, ngoodpix, last_ngoodpix
+int	niter
 real	xscale, z0, dz, x, z, mean, sigma, threshold
 double	sumxsqr, sumxz, sumz, sumx, rowrat
 pointer	sp, flat, badpix, normx
-int	zsc_reject_pixels(), zsc_compute_sigma()
+long	zsc_reject_pixels(), zsc_compute_sigma(), ldint()
 
 begin
 	call smark (sp)
@@ -263,7 +272,7 @@ begin
 	# marking the pixel as rejected.
 
 	ngoodpix = npix
-	minpix = max (MIN_NPIXELS, int (npix * MAX_REJECT))
+	minpix = max (MIN_NPIXELS, ldint(npix * 1.0d0 * MAX_REJECT))
 
 	for (niter=1;  niter <= maxiter;  niter=niter+1) {
 	    last_ngoodpix = ngoodpix
@@ -316,9 +325,10 @@ procedure zsc_flatten_data (data, flat, x, npix, z0, dz)
 real	data[npix]		# raw data array
 real	flat[npix]		# flattened data  (output)
 real	x[npix]			# x value of each pixel
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 real	z0, dz			# z-intercept, dz/dx of fitted line
-int	i
+
+long	i
 
 begin
 	do i = 1, npix
@@ -329,15 +339,15 @@ end
 # ZSC_COMPUTE_SIGMA -- Compute the root mean square deviation from the
 # mean of a flattened array.  Ignore rejected pixels.
 
-int procedure zsc_compute_sigma (a, badpix, npix, mean, sigma)
+long procedure zsc_compute_sigma (a, badpix, npix, mean, sigma)
 
 real	a[npix]			# flattened data array
 short	badpix[npix]		# bad pixel flags (!= 0 if bad pixel)
-int	npix
+size_t	npix
 real	mean, sigma		# (output)
 
 real	pixval
-int	i, ngoodpix
+long	i, ngoodpix
 double	sum, sumsq, temp
 
 begin
@@ -385,19 +395,19 @@ end
 # fact that bad pixels tend to be clumped.  The number of pixels left in the
 # fit is returned as the function value.
 
-int procedure zsc_reject_pixels (data, flat, normx, badpix, npix,
+long procedure zsc_reject_pixels (data, flat, normx, badpix, npix,
 				 sumxsqr, sumxz, sumx, sumz, threshold, ngrow)
 
 real	data[npix]		# raw data array
 real	flat[npix]		# flattened data array
 real	normx[npix]		# normalized x values of pixels
 short	badpix[npix]		# bad pixel flags (!= 0 if bad pixel)
-int	npix
+size_t	npix
 double	sumxsqr,sumxz,sumx,sumz	# matrix sums
 real	threshold		# threshold for pixel rejection
-int	ngrow			# number of pixels of growing
+size_t	ngrow			# number of pixels of growing
 
-int	ngoodpix, i, j
+long	ngoodpix, i, j
 real	residual, lcut, hcut
 double	x, z
 

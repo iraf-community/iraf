@@ -26,6 +26,7 @@ real	tx1_xc, tx1_ly, tx2_xs, tx2_ly, tx3_xs, tx3_ly, tx4_xs, tx4_ly
 real	px1, px2, py1, py2, pxcenter, pycenter, yres
 real	vx1, vx2, vy1, vy2, tx_start, xrf, yrf
 
+size_t	sz_val
 int	junk
 pointer	sp, buf
 int	envfind(), envputs()
@@ -106,8 +107,8 @@ begin
 
 	call sprintf (text, SZ_LINE,
 	    "ncols=%d nrows=%d zmin=%g zmax=%g xc=%0.2f yc=%0.2f")  
-	        call pargi (IM_LEN(im,1))
-	        call pargi (IM_LEN(im,2))
+	        call pargl (IM_LEN(im,1))
+	        call pargl (IM_LEN(im,2))
 	        call pargr (IM_MIN(im))
 	        call pargr (IM_MAX(im))
 	        call pargr (pxcenter)
@@ -123,8 +124,8 @@ begin
 
 	# Also output transformation information to STDOUT
 	call printf ("ncols=%d nrows=%d zmin=%g zmax=%g xc=%.2f yc=%.2f")
-	    call pargi (IM_LEN(im,1))
-	    call pargi (IM_LEN(im,2))
+	    call pargl (IM_LEN(im,1))
+	    call pargl (IM_LEN(im,2))
 	    call pargr (IM_MIN(im))
 	    call pargr (IM_MAX(im))
 	    call pargr (pxcenter)
@@ -141,7 +142,8 @@ begin
 	# addition to the sequence number written by the 11/23 program.
 
 	call smark (sp)
-	call salloc (buf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buf, sz_val, TY_CHAR)
 
 	if (envfind ("userid", Memc[buf], SZ_LINE) <= 0) {
 	    call getuid (Memc[buf], SZ_LINE)
