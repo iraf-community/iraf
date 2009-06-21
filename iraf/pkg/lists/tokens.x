@@ -34,15 +34,18 @@ char	begin_comment[SZ_COMDELIMSTR], end_comment[SZ_COMDELIMSTR]
 int	fd, token, last_token, last_nscan
 pointer	sp, fname, tokbuf, outstr, ip, op, list
 
+size_t	sz_val
 bool	streq(), clgetb()
 int	clgfil(), fscan(), nscan(), open(), ctocc()
 pointer	clpopni()
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (tokbuf, SZ_LINE, TY_CHAR)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (tokbuf, sz_val, TY_CHAR)
+	call salloc (outstr, sz_val, TY_CHAR)
 
 	# If comments are to be ignored, get comment delimiters.
 	ignore_comments = clgetb ("ignore_comments")

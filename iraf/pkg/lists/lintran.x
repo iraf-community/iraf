@@ -30,13 +30,15 @@ pointer	list
 pointer	sp, tr
 int	xfield, yfield, min_sigdigits
 
-int 	clgeti(), clgfil()
+size_t	sz_val
+int	clgeti(), clgfil()
 pointer	clpopni()
 
 begin
 	# Allocate memory for transformation parameters structure
 	call smark (sp)
-	call salloc (tr, LEN_TR, TY_STRUCT)
+	sz_val = LEN_TR
+	call salloc (tr, sz_val, TY_STRUCT)
 
 	# Call procedure to get parameters and fill structure
 	call lt_initialize_transform (tr)
@@ -102,6 +104,7 @@ char	in_fname[ARB]
 int	xfield, yfield
 pointer	tr
 
+size_t	sz_val
 char	outbuf[SZ_LINE]
 int	nfields, nchars, max_fields, in, nline
 int	nsdig_x, nsdig_y, offset, min_sigdigits
@@ -111,9 +114,11 @@ int	getline(), lt_get_num(), open()
 
 begin
 	call smark (sp)
-	call salloc (inbuf, SZ_LINE, TY_CHAR)
-	call salloc (linebuf, SZ_LINE, TY_CHAR)
-	call salloc (field_pos, MAX_FIELDS, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (inbuf, sz_val, TY_CHAR)
+	call salloc (linebuf, sz_val, TY_CHAR)
+	sz_val = MAX_FIELDS
+	call salloc (field_pos, sz_val, TY_INT)
 
 	max_fields = MAX_FIELDS
 
@@ -186,7 +191,7 @@ end
 procedure lt_find_fields (linebuf, field_pos, max_fields, nfields)
 
 char	linebuf[SZ_LINE]
-int	field_pos[max_fields],max_fields, nfields
+int	field_pos[max_fields], max_fields, nfields
 bool	in_field
 int	ip, field_num
 
@@ -221,7 +226,7 @@ char	linebuf[SZ_LINE]
 int	nsdig
 double	dval
 char	ch
-int 	nchar, ip
+int	nchar, ip
 
 int	gctod()
 
