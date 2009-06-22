@@ -22,9 +22,11 @@ char	u_imsect[SZ_FNAME], v_imsect[SZ_FNAME]
 char	device[SZ_FNAME], title[SZ_LINE]
 pointer	u_im, v_im, u_subras, v_subras
 pointer	tcojmp[LEN_JUMPBUF]
-int	u_ncols, v_ncols, u_nlines, v_nlines, status, wkid
-int	mode
+long	u_ncols, v_ncols, u_nlines, v_nlines
+int	mode, status, wkid
 pointer	epa, old_onint
+long	c_1
+int	i_val0, i_val1
 
 pointer	gp, gopen()
 
@@ -33,15 +35,19 @@ extern	vl_tco_onint()
 pointer	immap(), imgs2r()
 common	/tcocom/ tcojmp
 
+include	<nullptr.inc>
+
 begin
+	c_1 = 1
+
 	# Get image section strings and output device.
 	call clgstr ("u_image", u_imsect, SZ_FNAME)
 	call clgstr ("v_image", v_imsect, SZ_FNAME)
 	call clgstr ("device", device, SZ_FNAME)
 
 	# Map image.
-	u_im = immap (u_imsect, READ_ONLY, 0)
-	v_im = immap (v_imsect, READ_ONLY, 0)
+	u_im = immap (u_imsect, READ_ONLY, NULLPTR)
+	v_im = immap (v_imsect, READ_ONLY, NULLPTR)
 
 	call clgstr ("title", title, SZ_LINE)
 	if (streq (title, "imtitle")) {
@@ -66,8 +72,8 @@ begin
 	if ((u_ncols != v_ncols) || (u_nlines != v_nlines))
 	    call error (0, "U and V subrasters must be same size")
 
-	u_subras = imgs2r (u_im, 1, u_ncols, 1, u_nlines)
-	v_subras = imgs2r (v_im, 1, v_ncols, 1, v_nlines)
+	u_subras = imgs2r (u_im, c_1, u_ncols, c_1, u_nlines)
+	v_subras = imgs2r (v_im, c_1, v_ncols, c_1, v_nlines)
 
 	if (u_ncols * u_nlines > 128 ** 2 || v_ncols * v_nlines > 128 ** 2 && 
 	    clgetb ("verbose")) {
@@ -93,7 +99,15 @@ begin
 
 	call zsvjmp (tcojmp, status)
 	if (status == OK) {
-	    call ezvec (Memr[u_subras], Memr[v_subras], u_ncols, u_nlines)
+	    if ( u_ncols > MAX_INT ) {	# limited by sys/gio/ncarutil/velvct.f
+		call error (0, "T_VELVECT: Too large u_ncols (32-bit limit)")
+	    }
+	    if ( u_nlines > MAX_INT ) {	# limited by sys/gio/ncarutil/velvct.f
+		call error (0, "T_VELVECT: Too large u_nlines (32-bit limit)")
+	    }
+	    i_val0 = u_ncols
+	    i_val1 = u_nlines
+	    call ezvec (Memr[u_subras], Memr[v_subras], i_val0, i_val1)
 	} else {
 	    call gcancel (gp)
 	    call fseti (STDOUT, F_CANCEL, OK)

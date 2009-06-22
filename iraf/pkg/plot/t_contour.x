@@ -21,21 +21,25 @@ char	imsect[SZ_FNAME], label[SZ_LINE]
 char	device[SZ_FNAME], title[SZ_LINE], system_id[SZ_LINE]
 
 pointer	im, subras
-int	xres, yres, nx, ny
-pointer	tcojmp[LEN_JUMPBUF]
-int	ncols, nlines, status, wkid
+int	i_val0, i_val1
+int	xres, yres
+size_t	nx, ny
+long	ncols, nlines
+int	status, wkid
 int	nset, ncontours, dashpat, mode, nhi
 pointer	epa, old_onint
 real	interval, floor, ceiling, zero, finc, ybot
 real	vx1, vx2, vy1, vy2, wx1, wx2, wy1, wy2
 real	xs, xe, ys, ye, dmin, dmax
 
-real	clgetr()
+real	clgetr(), aabs()
 pointer	gp, gopen()
 extern	tco_onint()
 int	clgeti(), btoi()
 bool	clgetb(), streq(), fp_equalr()
 pointer	immap(), plt_getdata()
+
+pointer	tcojmp[LEN_JUMPBUF]
 common	/tcocom/ tcojmp
 
 int	ioffm, isolid, nla, nlm
@@ -47,6 +51,8 @@ common  /conre4/ isizel, isizem , isizep, nrep, ncrt, ilab, nulbll,
 int	first
 common  /conflg/ first
 common  /noaolb/ hold
+
+include	<nullptr.inc>
 
 begin
 	# First of all, intialize conrec's block data before altering any
@@ -83,7 +89,7 @@ begin
 	    else
 		finc = interval
 	} else
-	    finc = - abs (ncontours)
+	    finc = - iabs(ncontours)
 
 	mode = NEW_FILE
 	if (clgetb ("append"))
@@ -95,7 +101,7 @@ begin
 	pre = clgetb ("preserve")
 
 	# Map image.  Retrieve values from header that will be needed.
-	im = immap (imsect, READ_ONLY, 0)
+	im = immap (imsect, READ_ONLY, NULLPTR)
 	ncols = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
 	if (streq (title, "imtitle")) {
@@ -136,7 +142,7 @@ begin
 	ceiling = ceiling - zero
 
 	# Apply the zero point shift.
-	if (abs (zero) > EPSILON)
+	if ( aabs(zero) > EPSILON )
 	    call asubkr (Memr[subras], zero, Memr[subras], nx * ny)
 
 	# Open device and make contour plot.
@@ -185,8 +191,16 @@ begin
 
 	call zsvjmp (tcojmp, status)
 	if (status == OK) {
-	    call conrec (Memr[subras], nx, nx, ny, floor, ceiling, finc, nset,
-	        nhi, -dashpat)
+	    if ( nx > MAX_INT ) {   # limited by sys/gio/ncarutil/conrec.f
+		call error (0, "T_CONTOUR: Too large nx (32-bit limit)")
+	    }
+	    if ( ny > MAX_INT ) {   # limited by sys/gio/ncarutil/conrec.f
+		call error (0, "T_CONTOUR: Too large ny (32-bit limit)")
+	    }
+	    i_val0 = nx
+	    i_val1 = ny
+	    call conrec (Memr[subras], i_val0, i_val0, i_val1,
+			 floor, ceiling, finc, nset, nhi, -dashpat)
 	} else {
 	    call gcancel (gp)
 	    call fseti (STDOUT, F_CANCEL, OK)

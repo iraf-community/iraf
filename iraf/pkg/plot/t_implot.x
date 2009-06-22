@@ -67,18 +67,21 @@ char	device[SZ_FNAME]
 
 int	xnticks, ynticks
 bool	overplot, lineplot, logscale, erase, rescale[2], p_rescale[2]
-int	key, wcs, ip, i1, i2, n, linetype, color, nltypes, linestep, navg
-int	npix, nlines, ncols, line, col, shift, step, p_navg, sline, nim, index
+int	key, wcs, ip, linetype, color, nltypes, linestep, sline, nim, index
+size_t	npix, navg, nlines, ncols, n
+long	col, line, shift, step, p_navg, i1, i2
 real	x, y, px, py, qx, qy, x1, x2, y1, y2
 real	median, mean, sigma, sum
 pointer	im, mw, ct, gp, xold, yold, xnew, ynew, sl, ptr
 
-real	asumr(), amedr(), plt_iformatr()
-int	clgeti(), clgcur(), ctoi(), ctor(), ggeti(), imtlen(), imaccess()
-int	imtrgetim()
+real	asumr(), amedr(), plt_iformatr(), aabs()
+int	clgeti(), clgcur(), ggeti(), imtlen(), imaccess()
+int	ctoi(), ctor(), ctol(), imtrgetim()
+long	clgetl(), lnint(), labs()
 pointer	gopen(), immap(), mw_openim(), mw_sctran(), sl_getstr()
 pointer	imtopenp()
 errchk	mw_sctran
+include	<nullptr.inc>
 
 define	line_ 91
 define	col_ 92
@@ -96,9 +99,9 @@ begin
 	call clgstr ("wcs", wcstype, SZ_FNAME)
 
 	if (clgeti ("$nargs") > 1)
-	    line = clgeti ("line")
+	    line = clgetl ("line")
 	else
-	    line = INDEFI
+	    line = INDEFL
 
 	p_rescale[1] = true
 	rescale[1]   = true
@@ -119,7 +122,7 @@ begin
 	nltypes   = ggeti (gp, "lt")
 	p_navg	  = 1
 	navg	  = 1
-	step	  = clgeti ("step")
+	step	  = clgetl ("step")
 
 	# Loop through the images.  Currently this loop is not actually
 	# used and instead the 'm' and 'n' keys explicitly change the
@@ -133,7 +136,7 @@ begin
 		im = NULL; mw = NULL; sl = NULL
 
 		if (imaccess (image, READ_ONLY) == YES) {
-		    ptr = immap (image, READ_ONLY, 0); 
+		    ptr = immap (image, READ_ONLY, NULLPTR); 
 		    im = ptr
 	   
 		} else {
@@ -155,10 +158,10 @@ begin
 		else
 		    nlines = 1
 
-		if (IS_INDEFI(line))
+		if (IS_INDEFL(line))
 		    line = max(1, min(nlines, (nlines + 1) / 2))
 
-		if (IS_INDEFI(step) || step < 1)
+		if (IS_INDEFL(step) || step < 1)
 		    step = max (1, nlines / 10)
 
 		npix = max (ncols, nlines)
@@ -205,15 +208,15 @@ quit_			break
 			    SZ_FNAME) == EOF)
 			    next
 
-			if (abs(x2-x1) > abs(y2-y1)) {
+			if (aabs(x2-x1) > aabs(y2-y1)) {
 			    # Range is in X.
 
-			    navg = abs (x2 - x1) + 1
+			    navg = aabs(x2 - x1) + 1
 			    if (lineplot) {
-				col = nint (min (x1, x2))
+				col = lnint(min (x1, x2))
 				goto col_
 			    } else {
-				line = nint (min (x1, x2))
+				line = lnint(min (x1, x2))
 				goto line_
 			    }
 
@@ -225,16 +228,16 @@ quit_			break
 				    ncols, nlines)
 				call imp_tran (gp, x2, y2, x2, y2, Memr[xnew],
 				    ncols, nlines)
-				navg = abs (y2 - y1) + 1
-				line = nint (min (y1, y2))
+				navg = aabs(y2 - y1) + 1
+				line = lnint(min (y1, y2))
 				goto line_
 			    } else {
 				call imp_tran (gp, x1, y1, x1, y1, Memr[xnew],
 				    nlines, ncols)
 				call imp_tran (gp, x2, y2, x2, y2, Memr[xnew],
 				    nlines, ncols)
-				navg = abs (y2 - y1) + 1
-				col = nint (min (y1, y2))
+				navg = aabs(y2 - y1) + 1
+				col = lnint(min (y1, y2))
 				goto col_
 			    }
 			}
@@ -267,11 +270,11 @@ quit_			break
 			if (lineplot) {
 			    call imp_tran (gp, x, y, px, py, Memr[xnew], ncols,
 				nlines)
-			    line = max(1, min(nlines, nint(py)))
+			    line = max(1, min(nlines, lnint(py)))
 			} else {
 			    call imp_tran (gp, x, y, px, py, Memr[xnew], nlines,
 				ncols)
-			    line = max(1, min(nlines, nint(px)))
+			    line = max(1, min(nlines, lnint(px)))
 			}
 			navg = p_navg
 			line = line - (navg - 1) / 2
@@ -351,9 +354,9 @@ nextim_		    	if (index < nim)
 			call mw_close (mw)
 			call imunmap (im)
 
-			iferr (im = immap (command, READ_ONLY, 0)) {
+			iferr (im = immap (command, READ_ONLY, NULLPTR)) {
 			    call erract (EA_WARN)
-			    im = immap (image, READ_ONLY, 0)
+			    im = immap (image, READ_ONLY, NULLPTR)
 			    mw = mw_openim (im)
 			    call mw_seti (mw, MW_USEAXMAP, NO)
 			    ct = mw_sctran (mw, "logical", wcstype, 0)
@@ -362,7 +365,7 @@ nextim_		    	if (index < nim)
 
 			if (IM_NDIM(im) <= 0) {
 			    call eprintf ("image has no pixels\n")
-			    im = immap (image, READ_ONLY, 0)
+			    im = immap (image, READ_ONLY, NULLPTR)
 			    mw = mw_openim (im)
 			    call mw_seti (mw, MW_USEAXMAP, NO)
 			    ct = mw_sctran (mw, "logical", wcstype, 0)
@@ -399,11 +402,11 @@ nextim_		    	if (index < nim)
 			if (lineplot) {
 			    call imp_tran (gp, x, y, px, py, Memr[xnew], ncols,
 				nlines)
-			    col = max(1, min(ncols, nint(px)))
+			    col = max(1, min(ncols, lnint(px)))
 			} else {
 			    call imp_tran (gp, x, y, px, py, Memr[xnew], nlines,
 				ncols)
-			    col = max(1, min(ncols, nint(py)))
+			    col = max(1, min(ncols, lnint(py)))
 			}
 			navg = p_navg
 			col = col - (navg - 1) / 2
@@ -487,7 +490,7 @@ replotcol_
 			call gctran (gp, x1, y1, px, py, wcs, 0)
 			call gctran (gp, x2, y2, qx, qy, wcs, 0)
 
-			if (abs (py - qy) < .01) {
+			if ( aabs(py - qy) < .01 ) {
 			    y1 = INDEF;  y2 = INDEF
 			    rescale[2] = true
 			}
@@ -528,8 +531,8 @@ replotcol_
 			    SZ_FNAME) == EOF)
 			    next
 
-			i1 = max(1, min(npix, nint(x1)))
-			i2 = max(1, min(npix, nint(x2)))
+			i1 = max(1, min(npix, lnint(x1)))
+			i2 = max(1, min(npix, lnint(x2)))
 			if (i1 > i2) {
 			    n = i1
 			    i1 = i2
@@ -549,7 +552,7 @@ replotcol_
 			    call pargr (mean)
 			    call pargr (sigma)
 			    call pargr (sum)
-			    call pargi (n)
+			    call pargz (n)
 			sline = 1
 			call printf (Memc[sl_getstr(sl,sline)])
 
@@ -591,7 +594,7 @@ replotcol_
 			case 'a':
 			    # Set number of lines or columns to average.
 			    ip = ip + 1
-			    if (ctoi (command, ip, p_navg) <= 0) {
+			    if (ctol (command, ip, p_navg) <= 0) {
 				call printf (bell)
 				p_navg = 1
 			    }
@@ -604,16 +607,16 @@ replotcol_
 			    while (IS_WHITE (command[ip]))
 				ip = ip + 1
 
-			    iferr (im = immap (command[ip], READ_ONLY, 0)) {
+			    iferr (im = immap (command[ip], READ_ONLY, NULLPTR)) {
 				call erract (EA_WARN)
-				im = immap (image, READ_ONLY, 0)
+				im = immap (image, READ_ONLY, NULLPTR)
 				mw = mw_openim (im)
 				call mw_seti (mw, MW_USEAXMAP, NO)
 				ct = mw_sctran (mw, "logical", wcstype, 0)
 
 			    } else if (IM_NDIM(im) <= 0) {
 				call eprintf ("image has no pixels\n")
-				im = immap (image, READ_ONLY, 0)
+				im = immap (image, READ_ONLY, NULLPTR)
 				mw = mw_openim (im)
 				call mw_seti (mw, MW_USEAXMAP, NO)
 				ct = mw_sctran (mw, "logical", wcstype, 0)
@@ -683,10 +686,10 @@ replotcol_
 			    if (command[ip+1] != 'o') {
 				# Plot a line.
 				ip = ip + 1
-				if (ctoi (command, ip, i1) <= 0) {
+				if (ctol (command, ip, i1) <= 0) {
 				    call printf (bell)
 				    next
-				} else if (ctoi (command, ip, i2) <= 0) {
+				} else if (ctol (command, ip, i2) <= 0) {
 				    line = max(1, min(nlines, i1))
 				    navg = p_navg
 				    line = line - (navg - 1) / 2
@@ -695,7 +698,7 @@ replotcol_
 				    i1 = max(1, min(nlines, i1))
 				    i2 = max(1, min(nlines, i2))
 				    line = min (i1, i2)
-				    navg = max (1, abs (i2 - i1) + 1)
+				    navg = max (1, labs(i2 - i1) + 1)
 				    goto line_
 				}
 			    } else {
@@ -708,10 +711,10 @@ replotcol_
 			case 'c':
 			    # Plot a column.
 			    ip = ip + 1
-			    if (ctoi (command, ip, i1) <= 0) {
+			    if (ctol (command, ip, i1) <= 0) {
 				call printf (bell)
 				next
-			    } else if (ctoi (command, ip, i2) <= 0) {
+			    } else if (ctol (command, ip, i2) <= 0) {
 				col = max(1, min(ncols, i1))
 				navg = p_navg
 				col = col - (navg - 1) / 2
@@ -720,7 +723,7 @@ replotcol_
 				i1 = max(1, min(ncols, i1))
 				i2 = max(1, min(ncols, i2))
 				col  = min (i1, i2)
-				navg = max (1, abs (i2 - i1) + 1)
+				navg = max (1, labs(i2 - i1) + 1)
 				goto col_
 			    }
 
@@ -734,7 +737,7 @@ replotcol_
 				# Set step size.
 				while (IS_ALPHA (command[ip]))
 				    ip = ip + 1
-				if (ctoi (command, ip, step) <= 0) {
+				if (ctol (command, ip, step) <= 0) {
 				    call printf (bell)
 				    step = 1
 				}
@@ -852,21 +855,24 @@ char	wcstype[ARB]		# WCS type
 pointer	x, y			# output vector
 char	xlabel[SZ_FNAME]	# WCS label
 char	format[SZ_FNAME]	# WCS format
-int	linecol			# line or column number
-int	navg			# number of lines or columns to be averaged
+long	linecol			# line or column number
+size_t	navg			# number of lines or columns to be averaged
 bool	lineplot		# true if line is to be extracted
 
+size_t	sz_val
 real	norm
 pointer	sp, axvals, buf, off
-int	x1, x2, y1, y2
-int	nx, ny, width, i, ndim
+long	x1, x2, y1, y2, width, i
+size_t	nx, ny
+int	ndim
 real	asumr()
 pointer	imgl2r(), imgs2r(), imgl1r(), imgs1r()
 errchk	imgl2r, imgs2r, imgl1r, imgs1r, plt_wcs
 
 begin
 	call smark (sp)
-	call salloc (axvals, IM_NDIM(im), TY_REAL)
+	sz_val = IM_NDIM(im)
+	call salloc (axvals, sz_val, TY_REAL)
 
 	call strcpy (wcstype, xlabel, SZ_FNAME)
 
@@ -876,7 +882,8 @@ begin
 	    ny = IM_LEN(im,2)
 	else
 	    ny = 1
-	call amovkr (1., Memr[axvals], ndim)
+	sz_val = ndim
+	call amovkr (1., Memr[axvals], sz_val)
 
 	if (lineplot) {
 	    # Extract a line vector.
@@ -954,26 +961,32 @@ pointer	gp			# graphics descriptor
 pointer	im			# image descriptor
 real	xv[ARB]			# coordinate vector
 real	yv[ARB]			# data  vector
-int	nx			# number of pixels in vector
-int	ny			# number of pixels on plot-Y axis
+size_t	nx			# number of pixels in vector
+size_t	ny			# number of pixels on plot-Y axis
 real	y			# position on plot Y-axis
-int	navg			# number of lines or columns averaged
+size_t	navg			# number of lines or columns averaged
 bool	lineplot		# are we plotting a line or a column
 bool	rescale[2]		# rescale plot
 char	image[ARB]		# image name
 char	xlabel[ARB]		# X label
 
+size_t	sz_val
 real	junkr
-int	i, i1, i2, npix, maxch
+size_t	npix
+long	i, i1, i2
+int	maxch
 pointer	sp, ip, plot_title, op
 bool	fp_equalr()
+long	lnint()
+real	aabs()
 
 real	x1, x2, y1, y2
 common	/comimp/ x1, x2, y1, y2
 
 begin
 	call smark (sp)
-	call salloc (plot_title, SZ_PLOTTITLE, TY_CHAR)
+	sz_val = SZ_PLOTTITLE
+	call salloc (plot_title, sz_val, TY_CHAR)
 
 	# Format the plot title, starting with the system banner.
 	call sysid (Memc[plot_title], SZ_PLOTTITLE)
@@ -998,10 +1011,10 @@ begin
 		    npix = IM_LEN(im,1)
 		}
 
-		i1 = max (1, min (npix, nint (y)))
-		i2 = max (1, min (npix, nint (y) + navg - 1))
-		call pargi (i1)
-		call pargi (i2)
+		i1 = max (1, min (npix, lnint(y)))
+		i2 = max (1, min (npix, lnint(y) + navg - 1))
+		call pargl (i1)
+		call pargl (i2)
 		call pargstr (image)
 		call pargstr (IM_TITLE(im))
 
@@ -1011,7 +1024,7 @@ begin
 		    call pargstr ("Line")
 		else
 		    call pargstr ("Column")
-		call pargi (nint(y))
+		call pargl (lnint(y))
 		call pargstr (image)
 		call pargstr (IM_TITLE(im))
 	}
@@ -1082,8 +1095,8 @@ begin
 	    call gswind (gp, x1, x2, y1, y2)
 
 	    # Mark position on Y axis.
-	    if (abs(y) > .001)
-		call imp_markpos (gp, nint(y), ny)
+	    if ( aabs(y) > .001 )
+		call imp_markpos (gp, lnint(y), ny)
 	} else {
 	    call glabax (gp, Memc[plot_title], xlabel, "")
 	    call ggwind (gp, x1, x2, y1, y2)
@@ -1126,9 +1139,9 @@ procedure imp_redraw (gp, xold, yold, xnew, ynew, npix)
 pointer	gp			# graphics descriptor
 real	xold[ARB], yold[ARB]	# old data vector
 real	xnew[ARB], ynew[ARB]	# new data vector
-int	npix			# length of the data vectors
+size_t	npix			# length of the data vectors
 
-int	i, n
+long	i, n
 
 begin
 	# Erase the old vector and redraw the new in its place, in segments
@@ -1155,8 +1168,8 @@ end
 procedure imp_markpos (gp, line, nlines)
 
 pointer	gp			# graphics descriptor
-int	line			# line or column
-int	nlines			# number of lines or columns
+long	line			# line or column
+size_t	nlines			# number of lines or columns
 real	y, x1, x2, y1, y2
 
 begin
@@ -1177,23 +1190,24 @@ pointer	gp			# graphics descriptor
 real	x, y			# cursor coordinate
 real	px, py			# image coordinate
 real	xvec[nx]		# x vector
-int	nx, ny			# number of columns and lines
+size_t	nx, ny			# number of columns and lines
 
-int	i
+long	i
 real	x1, x2, y1, y2, diff, diffmin
+real	aabs()
 bool	fp_equalr()
 
 begin
 	call ggwind (gp, x1, x2, y1, y2)
 	if (fp_equalr (y1, y2))
-	    py = nint (ny / 2.)
+	    py = anint(ny / 2.)
 	else
-	    py = nint ((ny - 1) / (y2 - y1) * (y - y1) + 1)
+	    py = anint((ny - 1) / (y2 - y1) * (y - y1) + 1)
 
 	px = 1
-	diffmin = abs (x - xvec[1])
+	diffmin = aabs(x - xvec[1])
 	do i = 2, nx {
-	    diff = abs (x - xvec[i])
+	    diff = aabs(x - xvec[i])
 	    if (diff < diffmin) {
 		px = i
 		diffmin = diff

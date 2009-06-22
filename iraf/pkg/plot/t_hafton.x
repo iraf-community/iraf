@@ -23,18 +23,24 @@ pointer	im, subras, gp
 pointer	tcojmp[LEN_JUMPBUF]
 char	imsect[SZ_FNAME], mapping_function[SZ_FNAME]
 char	device[SZ_FNAME], title[SZ_LINE], system_id[SZ_LINE]
-int	ncols, nlines, status, wkid, mode
+int	status, wkid, mode
+size_t	ncols, nlines
 pointer	epa, old_onint
-int	nlevels, nprm, nopt, xres, yres, nfunction, nx, ny
+int	nlevels, nprm, nopt, xres, yres, nfunction
+size_t	nx, ny
 real	z1, z2, wx1, wx2, wy1, wy2, contrast
 real	xs, xe, ys, ye, vx1, vx2, vy1, vy2
+size_t	sz_val0, sz_val1
+int	i_val0, i_val1
 
-real	clgetr()
+real	clgetr(), aabs()
 extern	hf_tco_onint()
 int	clgeti(),  strncmp()
 pointer	gopen(), plt_getdata(), immap()
 bool	clgetb(), fp_equalr(), streq()
 common	/tcocom/ tcojmp
+
+include	<nullptr.inc>
 
 begin
 	# Get image section string and output device.
@@ -42,7 +48,7 @@ begin
 	call clgstr ("device", device, SZ_FNAME)
 
 	# Map image.
-	im = immap (imsect, READ_ONLY, 0)
+	im = immap (imsect, READ_ONLY, NULLPTR)
 
 	z1 = clgetr ("z1")
 	z2 = clgetr ("z2")
@@ -126,7 +132,9 @@ begin
 	    # Get z1, z2 as if positive contrast.  Set nopt later to negative
 	    # if necessary.
 
-	    call zscale (im, z1, z2, abs(contrast), SAMPLE_SIZE, LEN_STDLINE)
+	    sz_val0 = SAMPLE_SIZE
+	    sz_val1 = LEN_STDLINE
+	    call zscale (im, z1, z2, aabs(contrast), sz_val0, sz_val1)
 	}
 
 	call eprintf ("Intensities from z1=%.2f to z2=%.2f mapped with a")
@@ -180,8 +188,16 @@ begin
 
 	call zsvjmp (tcojmp, status)
 	if (status == OK) {
-	    call hafton (Memr[subras], nx, nx, ny, z1, z2,
-	        nlevels, nopt, nprm, 0, 0.)
+	    if ( nx > MAX_INT ) {	# limited by sys/gio/ncarutil/hafton.f
+		call error (0, "T_HAFTON: Too large nx (32-bit limit)")
+	    }
+	    if ( ny > MAX_INT ) {	# limited by sys/gio/ncarutil/hafton.f
+		call error (0, "T_HAFTON: Too large ny (32-bit limit)")
+	    }
+	    i_val0 = nx
+	    i_val1 = ny
+	    call hafton (Memr[subras], i_val0, i_val0, i_val1, z1, z2,
+			 nlevels, nopt, nprm, 0, 0.)
 	} else {
 	    call gcancel (gp)
 	    call fseti (STDOUT, F_CANCEL, OK)
@@ -191,8 +207,17 @@ begin
 	if (clgetb ("perimeter")) {
 	    call gswind (gp, xs, xe, ys, ye)
 	    call draw_perimeter (gp)
-	} else
-	    call perim (1, ncols - 1, nlines - 1, 1)
+	} else {
+	    if ( ncols-1 > MAX_INT ) {	# limited by sys/gio/ncarutil/gridal.f
+		call error (0, "T_HAFTON: Too large ncols (32-bit limit)")
+	    }
+	    if ( nlines-1 > MAX_INT ) {	# limited by sys/gio/ncarutil/gridal.f
+		call error (0, "T_HAFTON: Too large nlines (32-bit limit)")
+	    }
+	    i_val0 = ncols - 1
+	    i_val1 = nlines - 1
+	    call perim (1, i_val0, i_val1, 1)
+	}
 
 	# Now find window and output text string title.  The window is
 	# set to the full image coordinates for labelling.
@@ -244,17 +269,22 @@ pointer	im				# image descriptor
 real	min_value			# minimum pixel value in image (out)
 real	max_value			# maximum pixel value in image (out)
 
+long	l_val
+size_t	sz_val
 pointer	buf
 bool	first_line
 long	v[IM_MAXDIM]
 short	minval_s, maxval_s
+int	minval_i, maxval_i
 long	minval_l, maxval_l
 real	minval_r, maxval_r
-int	imgnls(), imgnll(), imgnlr()
+long	imgnls(), imgnli(), imgnll(), imgnlr()
 errchk	amovkl, imgnls, imgnll, imgnlr, alims, aliml, alimr
 
 begin
-	call amovkl (long(1), v, IM_MAXDIM)		# start vector
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)		# start vector
 	first_line = true
 	min_value = INDEF
 	max_value = INDEF
@@ -262,7 +292,8 @@ begin
 	switch (IM_PIXTYPE(im)) {
 	case TY_SHORT:
 	    while (imgnls (im, buf, v) != EOF) {
-		call alims (Mems[buf], IM_LEN(im,1), minval_s, maxval_s)
+		sz_val = IM_LEN(im,1)
+		call alims (Mems[buf], sz_val, minval_s, maxval_s)
 		if (first_line) {
 		    min_value = minval_s
 		    max_value = maxval_s
@@ -274,12 +305,28 @@ begin
 			max_value = maxval_s
 		}
 	    }
-	case TY_USHORT, TY_INT, TY_LONG:
-	    while (imgnll (im, buf, v) != EOF) {
-		call aliml (Meml[buf], IM_LEN(im,1), minval_l, maxval_l)
+	case TY_USHORT, TY_INT:
+	    while (imgnli (im, buf, v) != EOF) {
+		sz_val = IM_LEN(im,1)
+		call alimi (Memi[buf], sz_val, minval_i, maxval_i)
 		if (first_line) {
-		    min_value = minval_s
-		    max_value = maxval_s
+		    min_value = minval_i
+		    max_value = maxval_i
+		    first_line = false
+		} else {
+		    if (minval_i < min_value)
+			min_value = minval_i
+		    if (maxval_i > max_value)
+			max_value = maxval_i
+		}
+	    }
+	case TY_LONG:
+	    while (imgnll (im, buf, v) != EOF) {
+		sz_val = IM_LEN(im,1)
+		call aliml (Meml[buf], sz_val, minval_l, maxval_l)
+		if (first_line) {
+		    min_value = minval_l
+		    max_value = maxval_l
 		    first_line = false
 		} else {
 		    if (minval_l < min_value)
@@ -290,7 +337,8 @@ begin
 	    }
 	default:
 	    while (imgnlr (im, buf, v) != EOF) {
-		call alimr (Memr[buf], IM_LEN(im,1), minval_r, maxval_r)
+		sz_val = IM_LEN(im,1)
+		call alimr (Memr[buf], sz_val, minval_r, maxval_r)
 		if (first_line) {
 		    min_value = minval_r
 		    max_value = maxval_r

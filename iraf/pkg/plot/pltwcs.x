@@ -23,25 +23,30 @@ real	axvals[ARB]		# axis values for nonselected logical axes
 real	x1			# starting logical pixel coordinate
 real	x2			# ending logical pixel coordinate
 real	x[ARB]			# output vector
-int	npts			# number of points
+size_t	npts			# number of points
 char	label[ARB]		# input system label, output coordinate label
 char	format[ARB]		# output coordinate format
 int	maxchar			# maximum characters in label and format
 
-int	i, j, wcsdim, paxis, mw_stati()
+size_t	sz_val
+int	i, j, wcsdim, paxis
+long	k
 real	dx
 pointer	sp, axno, axval, xin, xout, str1, str2
+int	mw_stati()
 bool	streq()
 errchk	mw_gwattrs
 
 begin
 	call smark (sp)
-	call salloc (axno, IM_MAXDIM, TY_INT)
-	call salloc (axval, IM_MAXDIM, TY_INT)
-	call salloc (xin, IM_MAXDIM, TY_REAL)
-	call salloc (xout, IM_MAXDIM, TY_REAL)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (axno, sz_val, TY_INT)
+	call salloc (axval, sz_val, TY_INT)
+	call salloc (xin, sz_val, TY_REAL)
+	call salloc (xout, sz_val, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
 
 	call mw_seti (mw, MW_USEAXMAP, NO)
 	wcsdim = mw_stati (mw, MW_NDIM)
@@ -73,10 +78,10 @@ begin
 	if (npts > 1)
 	    dx = (x2 - x1) / (npts - 1)
 
-	do i = 1, npts {
-	    Memr[xin+paxis-1] = x1 + (i - 1) * dx
+	do k = 1, npts {
+	    Memr[xin+paxis-1] = x1 + (k - 1) * dx
 	    call mw_ctranr (ct, Memr[xin], Memr[xout], wcsdim)
-	    x[i] = Memr[xout+paxis-1]
+	    x[k] = Memr[xout+paxis-1]
 	}
 
 	# Set coordinate label
@@ -126,35 +131,41 @@ pointer	mw			# mwcs descriptor
 pointer	ct			# coordinate descriptor
 char	wcs[ARB]		# WCS type
 char	format[ARB]		# default format
-int	col			# logical column
-int	line			# logical line
+long	col			# logical column
+long	line			# logical line
 real	value			# pixel value
 char	str[maxchar]		# coordinate string
 int	maxchar			# maximum length of coordinate string
 
-int	i, j, k, wcsdim, mw_stati()
+size_t	sz_val
+int	i, j, k, wcsdim
 pointer	sp, axno, axval, axis, xin, xout, fmt, temp
 bool	streq()
+int	mw_stati(), imod()
+long	lnint()
 errchk	mw_gwattrs
 
 begin
 	if (streq (wcs, "logical")) {
 	    call sprintf (str, maxchar, "pixel=[%d,%d] value=%g\n")
-		call pargi (col)
-		call pargi (line)
+		call pargl (col)
+		call pargl (line)
 		call pargr (value)
 	    return
 	}
 
 	call smark (sp)
-	call salloc (axno, IM_MAXDIM, TY_INT)
-	call salloc (axval, IM_MAXDIM, TY_INT)
-	call salloc (axis, IM_MAXDIM, TY_INT)
-	call salloc (xin, IM_MAXDIM, TY_REAL)
-	call salloc (xout, IM_MAXDIM, TY_REAL)
-	call salloc (fmt, SZ_FNAME, TY_CHAR)
-	call salloc (temp, SZ_FNAME, TY_CHAR)
-	call aclri (Memi[axis], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call salloc (axno, sz_val, TY_INT)
+	call salloc (axval, sz_val, TY_INT)
+	call salloc (axis, sz_val, TY_INT)
+	call salloc (xin, sz_val, TY_REAL)
+	call salloc (xout, sz_val, TY_REAL)
+	sz_val = SZ_FNAME
+	call salloc (fmt, sz_val, TY_CHAR)
+	call salloc (temp, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call aclri (Memi[axis], sz_val)
 
 	# Map the logical to physical coordinates
 	call mw_seti (mw, MW_USEAXMAP, NO)
@@ -199,21 +210,21 @@ begin
 	j = Memi[axis]
 	k = Memi[axis+1]
 	if (k == 0)
-	    k = mod (j, 2) + 1
+	    k = imod(j, 2) + 1
 	i = min (j, k)
 	j = max (j, k)
 	if (streq (wcs, "physical")) {
 	    call sprintf (str, maxchar,
 		"pixel=[%d,%d], physical=[%d,%d], value=%g\n")
-		call pargi (col)
-		call pargi (line)
-		call pargi (nint (Memr[xout+i-1]))
-		call pargi (nint (Memr[xout+j-1]))
+		call pargl (col)
+		call pargl (line)
+		call pargl (lnint(Memr[xout+i-1]))
+		call pargl (lnint(Memr[xout+j-1]))
 		call pargr (value)
 	} else {
 	    call sprintf (str, maxchar, "pixel=[%d,%d], world=[")
-		call pargi (col)
-		call pargi (line)
+		call pargl (col)
+		call pargl (line)
 
 	    call strcpy (format, Memc[fmt], SZ_FNAME)
 	    if (Memc[fmt] == EOS)

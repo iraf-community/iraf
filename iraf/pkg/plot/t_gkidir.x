@@ -12,12 +12,15 @@ procedure t_gkidir ()
 
 pointer	sp, mc_fname, list
 int	mfd
+size_t	sz_val
+
 int	open(), clgfil()
 pointer	clpopni()
 
 begin
 	call smark (sp)
-	call salloc (mc_fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (mc_fname, sz_val, TY_CHAR)
 
 	list = clpopni ("input")
 	while (clgfil (list, Memc[mc_fname], SZ_FNAME) != EOF) {
@@ -40,10 +43,11 @@ procedure gkd_read_metacode (mf)
 
 int	mf	# Metacode file descriptor
 
+size_t	sz_val
 bool	new_frame
 char	tx_string[SZ_TEXT+1]
 pointer	gki
-int	nframe, length, mc_length, seek_text
+int	i_val, nframe, length, mc_length, seek_text
 int	nchars, nchars_max, op_code
 int	gki_fetch_next_instruction()
 
@@ -89,8 +93,10 @@ begin
 	    if (op_code == GKI_MFTITLE) {
 		# No need to look at gtext commands any more - found a title.
 		seek_text = NO
-		nchars_max = min (int(Mems[gki+GKI_MFTITLE_N-1]), SZ_TEXT)
-		call achtsc (Mems[gki+GKI_MFTITLE_T-1], tx_string, nchars_max)
+		i_val = Mems[gki+GKI_MFTITLE_N-1]
+		nchars_max = min (i_val, SZ_TEXT)
+		sz_val = nchars_max
+		call achtsc (Mems[gki+GKI_MFTITLE_T-1], tx_string, sz_val)
 		tx_string[nchars_max+1] = EOS
 	    }
 
@@ -99,7 +105,8 @@ begin
 		nchars = Mems[gki + GKI_TEXT_N - 1]
 		if (nchars > nchars_max) {
 		    nchars_max = min (nchars, SZ_TEXT)
-		    call achtsc (Mems[gki+GKI_TEXT_T-1], tx_string, nchars_max)
+		    sz_val = nchars_max
+		    call achtsc (Mems[gki+GKI_TEXT_T-1], tx_string, sz_val)
 		    tx_string[nchars_max+1] = EOS
 		}
 	    }

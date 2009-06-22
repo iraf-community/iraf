@@ -16,7 +16,7 @@ define	EDGE2	0.93
 procedure pl_map_viewport (gp, ncols, nlines, ux1, ux2, uy1, uy2, fill, perim)
 
 pointer	gp			#I pointer to graphics descriptor
-int	ncols, nlines		#I size of image area, after block reduction
+size_t	ncols, nlines		#I size of image area, after block reduction
 real	ux1, ux2, uy1, uy2	#I NDC coordinates of requested viewort
 bool	fill			#I fill viewport (vs preserve aspect ratio)
 bool	perim			#I draw perimeter

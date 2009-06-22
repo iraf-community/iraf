@@ -15,19 +15,23 @@ bool	center			# center the object before computing profile
 int	cboxsize		# the centering box width
 bool	list			# list output instead of plot output
 
-int	rboxsize, npts
+size_t	sz_val
+int	rboxsize
+size_t	npts
 pointer	sp, imname, im, radius, azimuth, intensity
 real	xcntr, ycntr
 
 bool	clgetb()
-int	imtgetim(), clgeti(), rp_radius()
+int	imtgetim(), clgeti(), rp_radius(), inint(), imod()
 pointer	imtopenp(), immap()
 real	clgetr()
+include	<nullptr.inc>
 
 begin
 	# Allocate stack space.
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	# Get the radial profiling parameters. The width of the extraction
 	# box mut be odd.
@@ -37,13 +41,13 @@ begin
 	pradius = clgetr ("radius")
 	paz1 = clgetr ("az1")
 	paz2 = clgetr ("az2")
-	rboxsize = 2 * (nint (pradius + 1.0)) + 1
+	rboxsize = 2 * (inint(pradius + 1.0)) + 1
 
 	# Get the centering parameters. The centering box must be odd.
 	center = clgetb ("center")
 	if (center) {
 	   cboxsize = clgeti ("cboxsize")
-	   if (mod (cboxsize, 2) == 0)
+	   if ( imod(cboxsize, 2) == 0 )
 	        cboxsize = cboxsize + 1
 	}
 
@@ -51,15 +55,16 @@ begin
  	list = clgetb ("list")
 
 	# Allocate memory for vectors. 
-	call malloc (radius, rboxsize * rboxsize, TY_REAL)
-	call malloc (azimuth, rboxsize * rboxsize, TY_REAL)
-	call malloc (intensity, rboxsize * rboxsize, TY_REAL)
+	sz_val = rboxsize * rboxsize
+	call malloc (radius, sz_val, TY_REAL)
+	call malloc (azimuth, sz_val, TY_REAL)
+	call malloc (intensity, sz_val, TY_REAL)
 
 	# Loop over all images
 	while (imtgetim (images, Memc[imname], SZ_FNAME) != EOF) {
 
 	    # Open the image.
-	    iferr (im = immap (Memc[imname], READ_ONLY, 0)) {
+	    iferr (im = immap (Memc[imname], READ_ONLY, NULLPTR)) {
 		call eprintf ("Image %s not found\n")
 		call pargstr (Memc[imname])
 		next
@@ -105,10 +110,13 @@ real	xstart, ystart		# starting coordinates
 int	boxsize			# width of the centering box
 real	xcntr, ycntr		# centered coordinates
 
-int	half_box, x1, x2, y1, y2
-int	ncols, nrows, nx, ny, try
+size_t	sz_val
+int	half_box, try
+long	x1, x2, y1, y2
+size_t	ncols, nrows, nx, ny
 pointer	bufptr, sp, x_vect, y_vect
 real	xinit, yinit
+real	aabs()
 pointer	imgs2r()
 
 begin
@@ -134,8 +142,10 @@ begin
 	    bufptr = imgs2r (im, x1, x2, y1, y2)
 
 	    call smark (sp)
-	    call salloc (x_vect, nx, TY_REAL)
-	    call salloc (y_vect, ny, TY_REAL)
+	    sz_val = nx
+	    call salloc (x_vect, sz_val, TY_REAL)
+	    sz_val = ny
+	    call salloc (y_vect, sz_val, TY_REAL)
 
 	    # Compute the marginals.
 	    call aclrr (Memr[x_vect], nx)
@@ -156,7 +166,7 @@ begin
 	    # If the shifts are greater than a pixel to 1 more iteration.
 	    try = try + 1
 	    if (try == 1) {
-		if ((abs (xcntr-xinit) > 1.0) || (abs (ycntr-yinit) > 1.0)) {
+		if ((aabs(xcntr-xinit) > 1.0) || (aabs(ycntr-yinit) > 1.0)) {
 		    xinit = xcntr
 		    yinit = ycntr
 		}
@@ -180,10 +190,12 @@ real	radius[ARB]		# the output radius vector
 real	azimuth[ARB]		# the output azimuth vector
 real	intensity[ARB]		# the output intensity vector
 
-int	half_box, ncols, nrows, x1, x2, y1, y2, nx, ny, npts
-pointer	bufptr	
+int	half_box
+long	x1, x2, y1, y2, npts
+size_t	ncols, nrows, nx, ny
+pointer	bufptr
 real	xinit, yinit
-int	rp_vectors()
+long	rp_vectors()
 pointer	imgs2r()
 
 begin
@@ -223,9 +235,9 @@ real	paz1, paz2		# the azimuth limits
 real	radius[npts]		# the radius vector
 real	azimuth[npts]		# the azimuth vector
 real	intensity[npts]		# the intensity vector
-int	npts			# the number of points
+size_t	npts			# the number of points
 
-int	i
+long	i
 
 begin
 	call printf ("# [%s]   xcntr:%7.2f   ycntr:%7.2f\n")
@@ -250,7 +262,7 @@ procedure rp_rplot (imname, xcntr, ycntr, az1, az2,
 	radius, azimuth, intensity, npts)
 
 char	imname[ARB]
-int	npts
+size_t	npts
 real	xcntr, ycntr, az1, az2
 real	radius[npts], azimuth[npts], intensity[npts]
 
@@ -278,12 +290,12 @@ end
 
 # RP_VECTORS -- Compute the radius and intensity vectors.
 
-int procedure rp_vectors (a, nx, ny, x1, y1, xcntr, ycntr, pradius, paz1, paz2,
-	radius, azimuth, intensity)
+long procedure rp_vectors (a, nx, ny, x1, y1, xcntr, ycntr, pradius,
+			   paz1, paz2, radius, azimuth, intensity)
 								
 real	a[nx,ny]		# the input data array
-int	nx, ny			# dimensions of the input array
-int	x1, y1			# lower left corner of input array
+size_t	nx, ny			# dimensions of the input array
+long	x1, y1			# lower left corner of input array
 real	xcntr, ycntr		# coordinates of center pixel
 real	pradius			# the plotting radius
 real	paz1, paz2		# the azimuth limits
@@ -291,7 +303,7 @@ real	radius[ARB]		# the output radius vector
 real	azimuth[ARB]		# the output azimuth vector
 real	intensity[ARB]		# the output intensity vector
 
-int	i, j, npts
+long	i, j, npts
 real	dx, dy, az, pr2, az1, az2, r2, dy2
 
 begin
@@ -338,9 +350,9 @@ procedure rp_rowsum (v, row, nx, ny)
 
 real	v[nx,ny]		# the input subraster
 real	row[ARB]		# the output summed row
-int	nx, ny			# the dimensions of the input subraster
+size_t	nx, ny			# the dimensions of the input subraster
 
-int	i, j
+long	i, j
 
 begin
 	do i = 1, ny
@@ -355,9 +367,9 @@ procedure rp_colsum (v, col, nx, ny)
 
 real	v[nx,ny]		# the input subraster
 real	col[ARB]		# the output summed column
-int	nx, ny			# the dimensions of the input subraster
+size_t	nx, ny			# the dimensions of the input subraster
 
-int	i, j
+long	i, j
 
 begin
 	do i = 1, ny
@@ -371,10 +383,10 @@ end
 procedure rp_getcenter (v, nv, vc)
 
 real	v[ARB]			# the input array
-int	nv			# length of the input array
+size_t	nv			# length of the input array
 real	vc			# the output centroid
 
-int	i
+long	i
 real	sum1, sum2, sigma, cont
 
 begin
@@ -409,9 +421,11 @@ real	az1, az2	# azimuth limits
 int	mode		# Mode
 real	x[npts]		# X data
 real	y[npts]		# Y data
-int	npts		# Number of points
+size_t	npts		# Number of points
 
-int	i, marks[10], linepattern, patterns[4], clgeti(), btoi(), strdic()
+size_t	sz_val
+int	i, linepattern, marks[10], patterns[4]
+int	clgeti(), btoi(), strdic()
 pointer	sp, marker, title, xlabel, ylabel
 real	x1, x2, y1, y2, wx1, wx2, wy1, wy2, vx1, vx2, vy1,vy2, temp, 
 	szmarker, clgetr()
@@ -423,7 +437,8 @@ data	marks/GM_POINT, GM_BOX, GM_PLUS, GM_CROSS, GM_CIRCLE, GM_HEBAR,
 
 begin
 	call smark (sp)
-	call salloc (marker, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (marker, sz_val, TY_CHAR)
 
 	# If a new graph setup all the axes and labeling options and then
 	# make the graph.
@@ -497,9 +512,11 @@ begin
 		    btoi (clgetb ("ticklabels")))
 
 	        # Fetch labels and plot title string. 
-		call salloc (title, RP_SZTITLE, TY_CHAR)
-		call salloc (xlabel, SZ_LINE, TY_CHAR)
-		call salloc (ylabel, SZ_LINE, TY_CHAR)
+		sz_val = RP_SZTITLE
+		call salloc (title, sz_val, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (xlabel, sz_val, TY_CHAR)
+		call salloc (ylabel, sz_val, TY_CHAR)
 
 		# Build system info string
 		call sysid (Memc[title], SZ_LINE)

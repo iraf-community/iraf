@@ -10,14 +10,16 @@ procedure im_projection (im, pv, npix, axis)
 
 pointer	im
 real	pv[npix]		# receives the projection vector
-int	npix			# length of projection vector
+size_t	npix			# length of projection vector
 int	axis			# the axis to be projected to (x=1)
 
-int	i, lastv
+size_t	sz_val
+long	j, lastv, l_val
+int	i
 long	v[IM_MAXDIM], nsum, totpix
 pointer	pix
 real	asumr()
-int	imgnlr()
+long	imgnlr()
 errchk	imgnlr
 
 begin
@@ -27,7 +29,9 @@ begin
 	    call error (2, "Attempt to take projection over nonexistent axis")
 
 	call aclrr (pv, npix)
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	switch (axis) {
 	case 1:
@@ -49,9 +53,9 @@ begin
 	    # this output element.
 
 	    for (lastv=v[axis];  imgnlr (im, pix, v) != EOF;  lastv=v[axis]) {
-		i = lastv
-		if (i <= npix)
-		    pv[i] = pv[i] + asumr (Memr[pix], IM_LEN(im,1))
+		j = lastv
+		if (j <= npix)
+		    pv[j] = pv[j] + asumr (Memr[pix], IM_LEN(im,1))
 	    }
 	}
 

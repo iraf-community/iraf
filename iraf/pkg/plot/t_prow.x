@@ -11,20 +11,25 @@ procedure t_prow ()
 
 pointer	image, wcslab, fmt
 pointer	im, mw, ct, sp, x_vec, y_vec
-int	row, ncols, nlines
+long	row
+size_t	ncols, nlines
 real	zmin, zmax
-int	clgeti()
+size_t	sz_val
+long	clgetl()
 pointer	immap(), mw_openim(), mw_sctran()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (wcslab, SZ_LINE, TY_CHAR)
-	call salloc (fmt, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (wcslab, sz_val, TY_CHAR)
+	call salloc (fmt, sz_val, TY_CHAR)
 
 	# Open image
 	call clgstr ("image", Memc[image], SZ_FNAME)
-	im = immap (Memc[image], READ_ONLY, 0)
+	im = immap (Memc[image], READ_ONLY, NULLPTR)
 	call clgstr ("wcs", Memc[wcslab], SZ_LINE)
 	mw = mw_openim (im)
 	call mw_seti (mw, MW_USEAXMAP, NO)
@@ -33,7 +38,7 @@ begin
 	ncols  = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
 
-	row = clgeti ("row")
+	row = clgetl ("row")
 	if (row < 1 || row > nlines) {
 	    call imunmap (im)
 	    call error (2, "line index references outside image")

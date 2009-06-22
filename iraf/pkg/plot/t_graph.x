@@ -23,9 +23,10 @@ define	IMAGE_OP	2
 
 procedure t_graph()
 
-char	input[SZ_LINE]
+char	l_input[SZ_LINE]
 pointer	x[MAX_CURVES], y[MAX_CURVES], size[MAX_CURVES]
-int	npix[MAX_CURVES], ncurves
+size_t	npix[MAX_CURVES]
+int	ncurves
 
 bool	append, overplot
 char	device[SZ_FNAME]
@@ -48,9 +49,9 @@ begin
 	}
 
 	if (fstati (STDIN, F_REDIR) == YES)
-	    call strcpy ("STDIN", input, SZ_FNAME)
+	    call strcpy ("STDIN", l_input, SZ_FNAME)
 	else
-	    call clgstr ("input", input, SZ_LINE)
+	    call clgstr ("input", l_input, SZ_LINE)
 
 	# Fetch plotting parameters.
 
@@ -65,7 +66,7 @@ begin
 	call zsvjmp (tgrjmp, status)
 	if (status == OK) {
 	    # Fetch remaining params and draw the plot.
-	    iferr (call ggplot (device, overplot, append, input, x, y,
+	    iferr (call ggplot (device, overplot, append, l_input, x, y,
 		size, npix, ncurves))
 		status = ERR
 	}
@@ -107,40 +108,43 @@ end
 # devics has been opened.  Fetch remaining parameters, read in the data,
 # and make the plot.
 
-procedure ggplot (device, overplot, append, input, x, y, size, npix, ncurves)
+procedure ggplot (device, overplot, append, l_input, x, y, size, npix, ncurves)
 
 char	device[SZ_FNAME]	# Graphics device
 bool	overplot		# Overplot graph
 bool	append			# Append graph
-char	input[ARB]		# List of operands to be plotted
+char	l_input[ARB]		# List of operands to be plotted
 pointer	x[MAX_CURVES]		# X values
 pointer y[MAX_CURVES]		# Y values
 pointer size[MAX_CURVES]	# Size of markers to plot
-int	npix[MAX_CURVES]	# Number of points per curve
+size_t	npix[MAX_CURVES]	# Number of points per curve
 int	ncurves			# Number of curves to overplot
 
+size_t	sz_val
 pointer	gd
 char	xlabel[SZ_LINE], ylabel[SZ_LINE], title[SZ_LINE]
 char	marker[SZ_FNAME], wcs[SZ_FNAME], xformat[SZ_FNAME], yformat[SZ_FNAME]
 bool	pointmode, lintran, xautoscale, yautoscale
 bool	drawbox, transpose, rdmarks
 int	ltype, color, ip1, ip2
-int	xtran, ytran, axis, ticklabels, i, marker_type, j
+int	xtran, ytran, axis, ticklabels, marker_type, i, k
+long	j
 real	p1, p2, q1, q2, wx1, wx2, wy1, wy2, szmarker, vx1, vx2, vy1, vy2
 real	xx, yy, sz, szx, szy
-pointer	sp, ltypes, colors, ptemp
+pointer	sp, ltypes, colors, ptemp, pp1, pp2
 
 pointer	gopen()
 bool	clgetb(), streq(), fp_equalr()
-int	clgeti(), gg_rdcurves(), ctoi(), ggeti()
+int	clgeti(), gg_rdcurves(), ctoi(), gstati(), imod()
 real	clgetr(), plt_iformatr()
 errchk	clgetb, clgeti, clgstr, clgetr, glabax, gpmark
 errchk	gswind, gseti, gg_rdcurves, gascale, grscale
 
 begin
 	call smark (sp)
-	call salloc (ltypes, SZ_LINE, TY_CHAR)
-	call salloc (colors, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ltypes, sz_val, TY_CHAR)
+	call salloc (colors, sz_val, TY_CHAR)
 
 	# If computing projection along an axis (collapsing a multidimensional
 	# section to a vector), fetch axis number.  Get wcs string.
@@ -150,10 +154,10 @@ begin
 	# Set the line type and color lists.
 	i = 0
 	call clgstr ("ltypes", Memc[ltypes], SZ_LINE)
-	for (ip1=ltypes; Memc[ip1]!=EOS; ip1=ip1+1) {
-	    if (Memc[ip1] == ',')
-		Memc[ip1] = ' '
-	    if (IS_DIGIT(Memc[ip1]))
+	for (pp1=ltypes; Memc[pp1]!=EOS; pp1=pp1+1) {
+	    if (Memc[pp1] == ',')
+		Memc[pp1] = ' '
+	    if (IS_DIGIT(Memc[pp1]))
 		i = i + 1
 	}
 	if (i == 0)
@@ -163,10 +167,10 @@ begin
 
 	i = 0
 	call clgstr ("colors", Memc[colors], SZ_LINE)
-	for (ip2=colors; Memc[ip2]!=EOS; ip2=ip2+1) {
-	    if (Memc[ip2] == ',')
-		Memc[ip2] = ' '
-	    if (IS_DIGIT(Memc[ip2]))
+	for (pp2=colors; Memc[pp2]!=EOS; pp2=pp2+1) {
+	    if (Memc[pp2] == ',')
+		Memc[pp2] = ' '
+	    if (IS_DIGIT(Memc[pp2]))
 		i = i + 1
 	}
 	if (i == 0)
@@ -200,7 +204,7 @@ begin
 	ylabel[1] = EOS
 	xformat[1] = EOS
 	yformat[1] = EOS
-	ncurves = gg_rdcurves (input, title, xlabel, ylabel, xformat,
+	ncurves = gg_rdcurves (l_input, title, xlabel, ylabel, xformat,
 	    x, y, size, npix, axis, wcs, rdmarks)
 
 	if (overplot || append)
@@ -294,8 +298,8 @@ begin
 	# autoscaling will reset it later.
 
 	if (append) {
-	    xtran = ggeti (gd, G_XTRAN)
-	    ytran = ggeti (gd, G_YTRAN)
+	    xtran = gstati (gd, G_XTRAN)
+	    ytran = gstati (gd, G_YTRAN)
 	    call ggwind (gd, wx1, wx2, wy1, wy2)
 	} else {
 	    xtran = GW_LINEAR
@@ -359,15 +363,15 @@ begin
 	do i = 1, ncurves {
 	    if (Memc[ltypes] == EOS)
 		ltype = ltype + 1
-	    else if (ctoi (Memc[ltypes], ip1, j) > 0)
-		ltype = j
-	    ltype = mod (ltype - 1, 4) + 1
+	    else if (ctoi (Memc[ltypes], ip1, k) > 0)
+		ltype = k
+	    ltype = imod(ltype - 1, 4) + 1
 	    call gseti (gd, G_PLTYPE, ltype)
 	    if (Memc[colors] == EOS)
 		color = color + 1
-	    else if (ctoi (Memc[colors], ip2, j) > 0)
-		color = j
-	    color = mod (color - 1, 9) + 1
+	    else if (ctoi (Memc[colors], ip2, k) > 0)
+		color = k
+	    color = imod(color - 1, 9) + 1
 	    call gseti (gd, G_PLCOLOR, color)
 	    if (pointmode) {
 		if (!rdmarks) {
@@ -414,7 +418,7 @@ char	xformat[ARB]		# WCS coordinate format
 pointer	x[ARB]			# Pointer to x vector
 pointer	y[ARB]			# Pointer to y vector
 pointer	size[ARB]		# Pointer to vector of marker sizes
-int	npix[ARB]		# Number of values per vector
+size_t	npix[ARB]		# Number of values per vector
 int	axis			# Axis for projection
 char	wcs[ARB]		# WCS type
 bool	rdmarks			# Read marks from list?
@@ -472,7 +476,8 @@ int	axis			# Axis of image projection
 char	wcs[ARB]		# WCS type
 bool	rdmarks			# Read marks from list?
 
-int	gg_rdlist2(), gg_rdimage2(), gg_optype()
+long	gg_rdimage2(), gg_rdlist2()
+int	gg_optype()
 errchk	gg_rdlist2, gg_rdimage2, gg_optype
 
 begin
@@ -521,7 +526,7 @@ end
 # one dimension, producing x and y vectors as output.  Set the title
 # and coordinate label if not previously defined.
 
-int procedure gg_rdimage2 (imsect, title, xlabel, ylabel, xformat, x, y, size,
+long procedure gg_rdimage2 (imsect, title, xlabel, ylabel, xformat, x, y, size,
 	axis, wcs)
 
 char	imsect[ARB]		# Image section to be plotted
@@ -533,17 +538,23 @@ pointer	x, y, size		# Pointer to x, y and size vector
 int	axis			# Axis about which the projection is to be taken
 char	wcs[ARB]		# WCS type
 
-int	npix, i, stridxs()
+size_t	sz_val
+size_t	npix
+int	i
 pointer	sp, im, mw, ct, axvals, str
+int	stridxs()
 pointer	immap(), mw_openim(), mw_sctran()
 errchk	immap, im_projection, malloc, mw_openim, mw_sctran, plt_wcs
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (axvals, IM_MAXDIM, TY_REAL)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (axvals, sz_val, TY_REAL)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
-	im = immap (imsect, READ_ONLY, 0)
+	im = immap (imsect, READ_ONLY, NULLPTR)
 
 	if (axis < 1 || axis > IM_NDIM(im))
 	    call error (2, "Attempt to take projection over nonexistent axis")
@@ -594,13 +605,15 @@ end
 # a third array of mark sizes is returned.  Mark sizes can only be given
 # in two column (x,y) mode, with the mark size given as a third column.
 
-int procedure gg_rdlist2 (fname, x, y, size, rdmarks)
+long procedure gg_rdlist2 (fname, x, y, size, rdmarks)
 
 char	fname[ARB]		# Name of list file
 pointer	x, y, size		# Pointers to x, y and size vectors
 bool	rdmarks			# Read markers from file?
 
-int	buflen, n, fd, ncols, lineno
+size_t	sz_val
+size_t	buflen, n
+int	fd, ncols, lineno
 pointer	sp, lbuf, ip
 real	xval, yval, szmark
 int	getline(), nscan(), open()
@@ -608,7 +621,8 @@ errchk	open, sscan, getline, malloc
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 
@@ -707,7 +721,7 @@ end
 procedure gg_lintran (x, npix, p1in, p2in, q1, q2)
 
 real	x[npix]			# Vector to transform
-int	npix			# Number of pixels in vector
+size_t	npix			# Number of pixels in vector
 real	p1in, p2in		# Range of input values to map
 real	q1, q2			# Range for output values
 real	p1, p2

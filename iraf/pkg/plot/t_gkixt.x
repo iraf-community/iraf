@@ -19,19 +19,24 @@ define	WS_MODE		Mems[$1+GKI_OPENWS_M - 1]
 procedure t_gkiextract ()
 
 char	mc_fname[SZ_FNAME], frames_list[SZ_LINE]
-int	mfd, verify, nframes, junk
-int	this_frame, frames[3,MAX_RANGES]
+int	mfd, verify
+long	this_frame, nframes, junk
+long	frames[3,MAX_RANGES]
 pointer	list, index, sp
+size_t	sz_val
+long	l_val
 
 bool	clgetb()
-int	clgfil(), open(), get_next_number()
+int	clgfil(), open()
+long	get_next_number()
 int	decode_ranges(), btoi(), gke_user_go_ahead()
 pointer	clpopni()
 
 begin
 	# Allocate space for the index array.
 	call smark (sp)
-	call salloc (index, 4 * MAX_FRAMES, TY_INT)
+	sz_val = 4 * MAX_FRAMES
+	call salloc (index, sz_val, TY_LONG)
 
 	list = clpopni ("input")
 	call clgstr ("frames", frames_list, SZ_LINE)
@@ -42,25 +47,26 @@ begin
 	# Loop through the list of metacode frames.
 	while (clgfil (list, mc_fname, SZ_FNAME) != EOF) {
 	    mfd = open (mc_fname, READ_ONLY, BINARY_FILE)
-	    call gke_make_index (mfd, Memi[index], nframes)
+	    call gke_make_index (mfd, Meml[index], nframes)
 
 	    # Position to beginning of metacode file.
-	    call seek (mfd, BOF)
+	    l_val = BOF
+	    call seek (mfd, l_val)
 
 	    this_frame = 0
 	    while (get_next_number (frames, this_frame) != EOF) {
 		if (this_frame > nframes) {
 		    call eprintf ("Metacode file '%s' contains %d frames\n")
 			call pargstr (mc_fname)
-			call pargi (nframes)
+			call pargl (nframes)
 		    break
 		}
 
 	        if (verify == YES) {
-		    if (gke_user_go_ahead (this_frame, Memi[index]) == YES)
-		        call gke_extract_plot (mfd, Memi[index], this_frame)
+		    if (gke_user_go_ahead (this_frame, Meml[index]) == YES)
+		        call gke_extract_plot (mfd, Meml[index], this_frame)
 	        } else
-	            call gke_extract_plot (mfd, Memi[index], this_frame)
+	            call gke_extract_plot (mfd, Meml[index], this_frame)
 	    }
 	    call close (mfd)
 	}
@@ -74,8 +80,8 @@ end
 
 int procedure gke_user_go_ahead (this_frame, index)
 
-int	this_frame		# Current frame number
-int	index[4, ARB]		# Metacode index
+long	this_frame		# Current frame number
+long	index[4, ARB]		# Metacode index
 
 pointer	tty
 pointer	ttyodes()
@@ -84,8 +90,8 @@ bool	clgetb()
 begin
 	# Print directory information for this_frame from index.
 	call eprintf ("   [%d] (%d words) %26t%s")
-	    call pargi (this_frame)
-	    call pargi (index[3, this_frame])
+	    call pargl (this_frame)
+	    call pargl (index[3, this_frame])
 	    call pargstr (Memc[index[4, this_frame]])
 
 	# Now get user response from terminal.
@@ -109,10 +115,11 @@ end
 procedure gke_extract_plot (mf, index, this_frame)
 
 int	mf			# Metacode file descriptor
-int	index[4,ARB]		# Index of metacode frames
-int	this_frame		# Current frame number
+long	index[4,ARB]		# Index of metacode frames
+long	this_frame		# Current frame number
 
-int	mc_begin, nchars
+long	mc_begin
+size_t	nchars
 pointer	metacode, sp
 long	read()
 errchk	seek, salloc, read, write, mfree
@@ -148,14 +155,15 @@ end
 procedure gke_make_index (mf, index, nframes)
 
 int	mf			# Metacode file descriptor
-int	index[4,ARB]		# Index of metacode frames
-int	nframes			# Number of frames in index (output)
+long	index[4,ARB]		# Index of metacode frames
+long	nframes			# Number of frames in index (output)
 
+size_t	sz_val
 bool	new_frame
 char	tx_string[SZ_TEXT+1]
 pointer	gki, ptr
-int	nframe, length, mc_length, seek_text, nchars_read
-int	nchars, nchars_max, op_code, file_pos
+long	nframe, mc_length, nchars_read, file_pos
+int	length, seek_text, nchars, nchars_max, op_code
 int	gke_read_next_instruction()
 errchk	gke_read_next_instruction
 
@@ -189,7 +197,8 @@ begin
 		    index[1,nframe] = nframe
 		    index[2,nframe + 1] = file_pos - length
 		    index[3,nframe] = mc_length
-		    call malloc (ptr, nchars_max + 1, TY_CHAR)
+		    sz_val = nchars_max + 1
+		    call malloc (ptr, sz_val, TY_CHAR)
 		    call strcpy (tx_string, Memc[ptr], nchars_max)
 		    index[4,nframe] = ptr
 		} else 
@@ -215,7 +224,8 @@ begin
 		seek_text = NO
 		nchars_max = Mems[gki + GKI_MFTITLE_N - 1]
 		nchars_max = min (SZ_TEXT, nchars_max)
-		call achtsc (Mems[gki+GKI_MFTITLE_T-1], tx_string, nchars_max)
+		sz_val = nchars_max
+		call achtsc (Mems[gki+GKI_MFTITLE_T-1], tx_string, sz_val)
 		tx_string[nchars_max+1] = EOS
 	    }
 
@@ -224,7 +234,8 @@ begin
 		nchars = Mems[gki + GKI_TEXT_N - 1]
 		if (nchars > nchars_max) {
 		    nchars_max = min (SZ_TEXT, nchars)
-		    call achtsc (Mems[gki+GKI_TEXT_T-1], tx_string, nchars_max)
+		    sz_val = nchars_max
+		    call achtsc (Mems[gki+GKI_TEXT_T-1], tx_string, sz_val)
 		    tx_string[nchars_max+1] = EOS
 		}
 	    }
@@ -236,7 +247,8 @@ begin
 	if (mc_length > GKI_CLEAR_LEN) {
             index[1,nframe] = nframe
             index[3,nframe] = mc_length
-            call malloc (ptr, nchars_max + 1, TY_CHAR)
+	    sz_val = nchars_max + 1
+            call malloc (ptr, sz_val, TY_CHAR)
             call strcpy (tx_string, Memc[ptr], nchars_max)
             index[4,nframe] = ptr
 	    nframes = nframe
@@ -256,9 +268,12 @@ int procedure gke_read_next_instruction (fd, instruction, nchars_total)
 
 int	fd			# input file containing metacode
 pointer	instruction		# pointer to instruction (output)
-int	nchars_total		# number of chars read from input stream
+long	nchars_total		# number of chars read from input stream
 
-int	len_ibuf, nchars, nchars_read
+size_t	sz_val
+size_t	nchars
+int	len_ibuf
+long	nchars_read
 pointer	ibuf
 long	read()
 errchk	read
@@ -269,7 +284,8 @@ begin
 	# a larger buffer later if necessary.
 
 	if (ibuf == NULL) {
-	    call malloc (ibuf, LEN_DEFIBUF, TY_SHORT)
+	    sz_val = LEN_DEFIBUF
+	    call malloc (ibuf, sz_val, TY_SHORT)
 	    len_ibuf = LEN_DEFIBUF
 	}
 
@@ -284,14 +300,16 @@ begin
 	nchars_total = 0
 	repeat {
 	    repeat {
-		nchars_read = read (fd, I_BOI(ibuf), ONEWORD)
+		sz_val = ONEWORD
+		nchars_read = read (fd, I_BOI(ibuf), sz_val)
 		if (nchars_read == EOF)
 		    return (EOF)
 		else 
 		    nchars_total = nchars_total + nchars_read
 	    } until (I_BOI(ibuf) == BOI)
 
-	    nchars_read = read (fd, I_OPCODE(ibuf), TWOWORDS)
+	    sz_val = TWOWORDS
+	    nchars_read = read (fd, I_OPCODE(ibuf), sz_val)
 	    if (nchars_read == EOF)
 		return (EOF)
 	    else
@@ -302,7 +320,8 @@ begin
 
 	    if (I_LENGTH(ibuf) > len_ibuf) {
 		len_ibuf = I_LENGTH(ibuf)
-		call realloc (ibuf, len_ibuf, TY_SHORT)
+		sz_val = len_ibuf
+		call realloc (ibuf, sz_val, TY_SHORT)
 	    }
 
 	    nchars = (I_LENGTH(ibuf) - LEN_GKIHDR) * SZ_SHORT

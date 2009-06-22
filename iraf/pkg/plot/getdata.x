@@ -10,9 +10,9 @@ pointer	im			# Pointer to image header
 bool	sub			# Subsample versus block average (yes/no)?
 bool	pre			# Preserve aspect ratio (yes/no)?
 int	xres, yres		# desired resolution
-int	nx, ny			# dimensions of output array
+size_t	nx, ny			# dimensions of output array
 
-int	nxin, nyin
+long	nxin, nyin, l_val
 pointer subras, data
 pointer plt_blkaverage(), plt_subsample(), imgs2r()
 errchk	plt_blkaverage, plt_subsample, calloc
@@ -39,7 +39,8 @@ begin
 	    nx = nxin
 	    ny = nyin
 	    call calloc (data, nx * ny, TY_REAL)
-	    subras = imgs2r (im, 1, nxin, 1, nyin)
+	    l_val = 1
+	    subras = imgs2r (im, l_val, nxin, l_val, nyin)
 	    call amovr (Memr[subras], Memr[data], nx * ny)
 	    return (data)
 	}
@@ -54,13 +55,14 @@ pointer procedure plt_subsample (im, xres, yres, pre, nxout, nyout)
 pointer	im			# input image
 int	xres, yres		# desired output resolution
 bool	pre			# preserve aspect ratio?
-int	nxout, nyout		# dimensions of output array (returned)
+size_t	nxout, nyout		# dimensions of output array (returned)
 
-pointer	sp, xvec, data
-int	x_factor, y_factor, xrf, yrf
-int	nxin, nyin, yin, ii, jj, index, nop
+pointer	sp, xvec, data, index
+long	x_factor, y_factor, xrf, yrf, yin, ii, jj, nop
+size_t	nxin, nyin
 errchk	imgl2r, calloc
 pointer	imgl2r()
+long	lmod()
 
 begin
 	call smark (sp)
@@ -88,8 +90,8 @@ begin
 	nyout = nyin / yrf
 
 	call eprintf ("Image will be subsampled by %d in x and %d in y\n")
-	    call pargi (xrf)
-	    call pargi (yrf)
+	    call pargl (xrf)
+	    call pargl (yrf)
 
 	call salloc (xvec, nxin, TY_REAL)
 	call calloc (data, nxout * nyout, TY_REAL)
@@ -100,7 +102,7 @@ begin
 	    nop = 1
 	    do ii = 1, nxin {
 		index = data + ((jj-1) * nxout) + nop - 1
-		if (mod (ii-1, xrf) == 0) {
+		if ( lmod(ii-1, xrf) == 0 ) {
 		    Memr[index] = Memr[xvec+ii-1]
 		    nop = nop + 1
 		}
@@ -121,12 +123,12 @@ pointer procedure plt_blkaverage (im, xres, yres, pre, nx, ny)
 pointer	im			# input image
 int	xres, yres		# blocking factors
 bool	pre			# preserve aspect ratio?
-int	nx, ny			# dimensions of output array (returned)
+size_t	nx, ny			# dimensions of output array (returned)
 
 real	sum
-pointer	sp, xvec, data
-int	nxin, nyin, nxout, nyout, nxout_full, nyout_full
-int	jj, ii, index, nxcols, yin, nxrows, bfx, bfy, x_factor, y_factor
+pointer	sp, xvec, data, index
+size_t	nxin, nyin, nxout, nyout, nxout_full, nyout_full, x_factor, y_factor
+long	jj, ii, nxcols, yin, nxrows, bfx, bfy
 errchk 	abavr, aclrr, aaddr, salloc, calloc, imgl2r
 pointer	imgl2r()
 
@@ -153,8 +155,8 @@ begin
 	}
 
 	call eprintf ("Image will be block averaged by %d in x and %d in y\n")
-	    call pargi (x_factor)
-	    call pargi (y_factor)
+	    call pargz (x_factor)
+	    call pargz (y_factor)
 
 	nxout = (nxin + x_factor - 1) / x_factor
 	nyout = (nyin + y_factor - 1) / y_factor

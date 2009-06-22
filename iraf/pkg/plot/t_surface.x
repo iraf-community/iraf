@@ -21,11 +21,13 @@ char	imsect[SZ_FNAME]
 char	device[SZ_FNAME], title[SZ_LINE]
 bool	label, sub, pre
 pointer	im, subras, work
-int	ncols, nlines, mode, wkid, nx, ny, npix
+int	mode, wkid
+size_t	nx, ny, npix, ncols, nlines
 pointer	epa, old_onint, tsujmp[LEN_JUMPBUF]
 int	xres, yres, first, status
 real	angh, angv, imcols, imlines
 real	floor, ceiling, vpx1, vpx2, vpy1, vpy2
+int	i_val0, i_val1
 
 pointer gp, gopen()
 bool	clgetb(), streq()
@@ -36,6 +38,8 @@ pointer	immap(), plt_getdata()
 common	/tsucom/ tsujmp
 common  /noaovp/ vpx1, vpx2, vpy1, vpy2
 common  /frstfg/ first
+
+include	<nullptr.inc>
 
 define	exit_ 91
 begin
@@ -48,7 +52,7 @@ begin
 	call clgstr ("device", device, SZ_FNAME)
 
 	# Map image and open graphics device.
-	im = immap (imsect, READ_ONLY, 0)
+	im = immap (imsect, READ_ONLY, NULLPTR)
 
 	angh = clgetr ("angh")
 	angv = clgetr ("angv")
@@ -119,9 +123,17 @@ begin
 	call xwhen (X_INT, epa, old_onint)
 
 	call zsvjmp (tsujmp, status)
-	if (status == OK)
-	    call ezsrfc (Memr[subras], nx, ny, angh, angv, Memr[work])
-	else {
+	if (status == OK) {
+	    if ( nx > MAX_INT ) {	# limited by sys/gio/ncarutil/srface.f
+		call error (0, "T_SURFACE: Too large nx (32-bit limit)")
+	    }
+	    if ( ny > MAX_INT ) {	# limited by sys/gio/ncarutil/srface.f
+		call error (0, "T_SURFACE: Too large ny (32-bit limit)")
+	    }
+	    i_val0 = nx
+	    i_val1 = ny
+	    call ezsrfc (Memr[subras], i_val0, i_val1, angh, angv, Memr[work])
+	} else {
 	    call gcancel (gp)
 	    call fseti (STDOUT, F_CANCEL, OK)
 	}
@@ -166,9 +178,11 @@ end
 int procedure surf_limits (ras, npix, floor, ceiling)
 
 real	ras[npix]		# Input array of pixels
-int	npix			# npixels in array
+size_t	npix			# npixels in array
 real	floor, ceiling		# user specified parameters
-int	apply, i
+
+int	apply
+long	i
 real	tfloor, tceiling, delta, dmin, dmax
 bool	fp_equalr()
 
@@ -232,27 +246,32 @@ end
 procedure srf_perimeter (gp, z, ncols, nlines, angh, angv)
 
 pointer	gp			# Graphics pointer
-int	ncols			# Number of image columns
-int	nlines			# Number of image lines
+size_t	ncols			# Number of image columns
+size_t	nlines			# Number of image lines
 real	z[ncols, nlines]	# Array of intensity values
 real	angh			# Angle of horizontal inclination
 real	angv			# Angle of vertical inclination
 
+long	l_val, c_2
 pointer	sp, x_val, y_val, kvec
 char	tlabel[SZ_TLABEL]
 real	xmin, ymin, delta, fact1, flo, hi, xcen, ycen
 real	x1_perim, x2_perim, y1_perim, y2_perim, z1, z2
 real	wc1, wc2, wl1, wl2, del
-int	i, j, junk
-int	itoc()
+long	i, j
+int	junk
+int	ltoc()
+long	lint(), lmod()
 data  	fact1 /2.0/
 real	vpx1, vpx2, vpy1, vpy2
 common	/noaovp/ vpx1, vpx2, vpy1, vpy2
 
 begin
+	c_2 = 2
+
 	call smark (sp)
-	call salloc (x_val,   ncols + 2,  TY_REAL)
-	call salloc (y_val,  nlines + 2, TY_REAL)
+	call salloc (x_val, ncols + 2,  TY_REAL)
+	call salloc (y_val, nlines + 2, TY_REAL)
 	call salloc (kvec, max (ncols, nlines) + 2, TY_REAL)
 
 	# Get window coordinates set up in calling procedure.
@@ -274,8 +293,10 @@ begin
 	# Set up linear endpoints and spacing as used in surface.
 
         delta = (hi-flo) / (max (ncols,nlines) -1.) * fact1
-        xmin = -(real (ncols/2)  * delta + real (mod (ncols+1, 2))  * delta)
-        ymin = -(real (nlines/2) * delta + real (mod (nlines+1, 2)) * delta)
+	l_val = ncols+1
+        xmin = -(real (ncols/2)  * delta + real (lmod(l_val, c_2)) * delta)
+	l_val = nlines+1
+        ymin = -(real (nlines/2) * delta + real (lmod(l_val, c_2)) * delta)
 	del = 2.0 * delta
 
 	# The perimeter is separated from the surface plot by the 
@@ -321,7 +342,7 @@ begin
 		call srf_draw_ticksx (Memr[x_val+1], y2_perim, y2_perim+delta, 
 		    flo, ncols)
 		call srf_label_axis (xmin, y2_perim+del, flo, "1", -1, -2)
-		junk = itoc (int (wc2), tlabel, SZ_TLABEL)
+		junk = ltoc (lint(wc2), tlabel, SZ_TLABEL)
 		call srf_label_axis (Memr[x_val+ncols], y2_perim+del, flo, 
 		    tlabel, -1, -2)
 
@@ -332,7 +353,7 @@ begin
 		call srf_draw_ticksy (x2_perim, x2_perim+delta, Memr[y_val+1],
 		    flo, nlines)
 		call srf_label_axis (x2_perim+del, ymin, flo, "1", 2, -1)
-		junk = itoc (int (wl2), tlabel, SZ_TLABEL)
+		junk = ltoc (lint(wl2), tlabel, SZ_TLABEL)
 		call srf_label_axis (x2_perim+del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, -1)
 	    } else {
@@ -344,7 +365,7 @@ begin
 		call srf_draw_ticksx (Memr[x_val+1], y1_perim, y1_perim-delta, 
 		    flo, ncols)
 		call srf_label_axis (xmin, y1_perim-del, flo, "1", -1, 2)
-		junk = itoc (int (wc2), tlabel, SZ_TLABEL)
+		junk = ltoc (lint(wc2), tlabel, SZ_TLABEL)
 		call srf_label_axis (Memr[x_val+ncols], y1_perim-del, flo, 
 		    tlabel, -1, 2)
 
@@ -355,7 +376,7 @@ begin
 		call srf_draw_ticksy (x1_perim, x1_perim-delta, Memr[y_val+1],
 		    flo, nlines)
 		call srf_label_axis (x1_perim-del, ymin, flo, "1", 2, 1)
-		junk = itoc (int (wl2), tlabel, SZ_TLABEL)
+		junk = ltoc (lint(wl2), tlabel, SZ_TLABEL)
 		call srf_label_axis (x1_perim-del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, 1)
 	    }
@@ -371,7 +392,7 @@ begin
 		call srf_draw_ticksx (Memr[x_val+1], y1_perim, y1_perim-delta, 
 		    flo, ncols)
 		call srf_label_axis (xmin, y1_perim-del, flo, "1", 1, 2)
-		junk = itoc (int (wc2), tlabel, SZ_TLABEL)
+		junk = ltoc (lint(wc2), tlabel, SZ_TLABEL)
 		call srf_label_axis (Memr[x_val+ncols], y1_perim-del, flo, 
 		    tlabel, 1, 2)
 
@@ -382,7 +403,7 @@ begin
 		call srf_draw_ticksy (x2_perim, x2_perim+delta, Memr[y_val+1],
 		    flo, nlines)
 		call srf_label_axis (x2_perim+del, ymin, flo, "1", 2, -1)
-		junk = itoc (int (wl2), tlabel, SZ_TLABEL)
+		junk = ltoc (lint(wl2), tlabel, SZ_TLABEL)
 		call srf_label_axis (x2_perim+del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, -1)
 	    } else {
@@ -394,7 +415,7 @@ begin
 		call srf_draw_ticksx (Memr[x_val+1], y2_perim, y2_perim+delta,
 		    flo, ncols)
 		call srf_label_axis (xmin, y2_perim+del, flo, "1", 1, -2)
-		junk = itoc (int (wc2), tlabel, SZ_TLABEL)
+		junk = ltoc (lint(wc2), tlabel, SZ_TLABEL)
 		call srf_label_axis (Memr[x_val+ncols], y2_perim+del, flo, 
 		    tlabel, 1, -2)
 
@@ -405,7 +426,7 @@ begin
 		call srf_draw_ticksy (x1_perim, x1_perim-delta, Memr[y_val+1],
 		    flo, nlines)
 		call srf_label_axis (x1_perim-del, ymin, flo, "1", 2, 1)
-		junk = itoc (int (wl2), tlabel, SZ_TLABEL)
+		junk = ltoc (lint(wl2), tlabel, SZ_TLABEL)
 		call srf_label_axis (x1_perim-del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, 1)
 	    }
@@ -419,12 +440,12 @@ end
 
 procedure srf_draw_axis (xvals, yvals, zval, nvals)
 
-int	nvals
+size_t	nvals
 real	xvals[nvals]
 real	yvals[nvals]
 real	zval
 pointer	sp, xt, yt
-int	i
+long	i
 real	dum
 
 begin
@@ -464,37 +485,41 @@ end
 
 procedure srf_draw_ticksx (x, y1, y2, zval, nvals)
 
-int	nvals
+size_t	nvals
 real	x[nvals]
 real	y1, y2
 real	zval
 
-int	i
+size_t	c_2
+long	i
 real	tkx[2], tky[2], dum
 
 begin
+	c_2 = 2
 	do i = 1, nvals {
 	    call trn32s (x[i], y1, zval, tkx[1], tky[1], dum, 1)
 	    call trn32s (x[i], y2, zval, tkx[2], tky[2], dum, 1)
-	    call gpl (2, tkx[1], tky[1])
+	    call gpl (c_2, tkx[1], tky[1])
 	}
 end
 
 
 procedure srf_draw_ticksy (x1, x2, y, zval, nvals)
 
-int	nvals
+size_t	nvals
 real	x1, x2
 real	y[nvals]
 real	zval
 
-int	i
+size_t	c_2
+long	i
 real	tkx[2], tky[2], dum
 
 begin
+	c_2 = 2
 	do i = 1, nvals {
 	    call trn32s (x1, y[i], zval, tkx[1], tky[1], dum, 1)
 	    call trn32s (x2, y[i], zval, tkx[2], tky[2], dum, 1)
-	    call gpl (2, tkx[1], tky[1])
+	    call gpl (c_2, tkx[1], tky[1])
 	}
 end

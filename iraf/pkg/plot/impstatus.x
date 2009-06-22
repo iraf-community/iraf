@@ -8,7 +8,7 @@ procedure sl_init (sl, nlines)
 pointer	sl			# Pointer to status lines
 int	nlines			# Number of lines
 
-int	i
+size_t	i
 
 begin
 	i = nlines * (SZ_LINE + 1)
@@ -40,9 +40,11 @@ pointer procedure sl_getstr (sl, line)
 pointer	sl			# Pointer to status lines
 int	line			# Line to enter
 
-int	i
+int	i, i_val
+int	imod()
 
 begin
-	i = mod (line-1, int(Memc[sl]))
+	i_val = Memc[sl]
+	i = imod(line-1, i_val)
 	return (sl + i * (SZ_LINE+1) + 1)
 end

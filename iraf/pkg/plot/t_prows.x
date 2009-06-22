@@ -11,20 +11,25 @@ procedure t_prows()
 
 pointer	image, wcslab, fmt
 pointer	im, mw, ct, sp, x_vec, y_vec
-int	row1, row2, ncols, nlines
+long	row1, row2
+size_t	ncols, nlines
 real	zmin, zmax
-int	clgeti()
+size_t	sz_val
+long	clgetl()
 pointer	immap(), mw_openim(), mw_sctran()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (wcslab, SZ_LINE, TY_CHAR)
-	call salloc (fmt, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (wcslab, sz_val, TY_CHAR)
+	call salloc (fmt, sz_val, TY_CHAR)
 
 	# Open image
 	call clgstr ("image", Memc[image], SZ_FNAME)
-	im = immap (Memc[image], READ_ONLY, 0)
+	im = immap (Memc[image], READ_ONLY, NULLPTR)
 	call clgstr ("wcs", Memc[wcslab], SZ_LINE)
 	mw = mw_openim (im)
 	call mw_seti (mw, MW_USEAXMAP, NO)
@@ -33,8 +38,8 @@ begin
 	ncols  = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
 
-	row1 = clgeti ("row1")
-	row2 = clgeti ("row2")
+	row1 = clgetl ("row1")
+	row2 = clgetl ("row2")
 	if (min(row1,row2) < 1 || max(row1,row2) > nlines) {
 	    call imunmap (im)
 	    call error (2, "line index references outside image")
@@ -69,8 +74,8 @@ procedure plt_grows (im, mw, ct, row1, row2, x_vector, y_vector, zmin, zmax,
 pointer im              # Pointer to image section header
 pointer	mw		# MWCS pointer
 pointer	ct		# CT pointer
-int     row1            # The first row to be extracted
-int     row2            # The last row to be extracted
+long	row1            # The first row to be extracted
+long	row2            # The last row to be extracted
 real    x_vector[ARB]   # Data values in x direction (returned)
 real    y_vector[ARB]   # Data values in y direction (returned)
 real    zmin, zmax      # Minimum and maximum values in y_vector (returned)
@@ -78,12 +83,15 @@ char	wcslab[sz_wcslab]	# WCS label if present
 char	format[sz_wcslab]	# WCS format if present
 int	sz_wcslab	# String length
  
-int     i, ncols, nrows
+size_t	sz_val
+long	i
+size_t	ncols, nrows
 pointer sp, axvals, imgl2r()
  
 begin
 	call smark (sp)
-	call salloc (axvals, IM_MAXDIM, TY_REAL)
+	sz_val = IM_MAXDIM
+	call salloc (axvals, sz_val, TY_REAL)
 
         # Fill x and y arrays.
         ncols = IM_LEN(im,1)
@@ -113,13 +121,14 @@ procedure pr_draw_vector (image,
 
 char	image[SZ_FNAME]				#I image name
 real	xvec[ncols], yvec[ncols]		#I vectors to be plot
-int	ncols					#I number of columns
+size_t	ncols					#I number of columns
 real	zmin, zmax				#I vector min max
-int	row1, row2				#I selected rows
+long	row1, row2				#I selected rows
 char	wcslab[ARB]				#I WCS label
 char	format[ARB]				#I WCS format
 bool	prows					#I is task PROWS (y/n)
 
+size_t	sz_val
 pointer	sp, gp
 pointer	device, marker, xlabel, ylabel, title, suffix
 real	wx1, wx2, wy1, wy2, vx1, vx2, vy1, vy2, szm, tol
@@ -133,12 +142,15 @@ int	btoi(), clgeti()
 
 begin
 	call smark (sp)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (marker, SZ_FNAME, TY_CHAR)
-	call salloc (xlabel, SZ_LINE,  TY_CHAR)
-	call salloc (ylabel, SZ_LINE,  TY_CHAR)
-	call salloc (title,  SZ_LINE,  TY_CHAR)
-	call salloc (suffix, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (device, sz_val, TY_CHAR)
+	call salloc (marker, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (xlabel, sz_val,  TY_CHAR)
+	call salloc (ylabel, sz_val,  TY_CHAR)
+	call salloc (title, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (suffix, sz_val, TY_CHAR)
 
 	call clgstr ("device", Memc[device], SZ_FNAME)
 	mode = NEW_FILE
@@ -162,11 +174,11 @@ begin
                 call strcpy (image, Memc[title], SZ_LINE)
                 if (prows) {
 		    call sprintf (Memc[suffix], SZ_FNAME, ": rows %d to %d")
-                        call pargi (row1)
-                        call pargi (row2)
+                        call pargl (row1)
+                        call pargl (row2)
 		} else {
 		    call sprintf (Memc[suffix], SZ_FNAME, ": row %d")
-                        call pargi (row1)
+                        call pargl (row1)
 		}
                 call strcat (Memc[suffix], Memc[title], SZ_LINE)
             }

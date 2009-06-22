@@ -29,39 +29,49 @@ define	SZ_TITLE	512		# plot title buffer
 
 procedure t_phistogram()
 
-int	isimage, npix, nbins, nbins1, nlevels, nwide, z1i, z2i, i, hist_type
-pointer im, tx, sp, hgm, hgmr, buf, input, str, v
+int	isimage, hist_type, tx
+long	nlevels, nwide, z1i, z2i, i, l_val
+size_t	npix, nbins, nbins1
+pointer im, sp, hgm, hgmr, buf, p_input, str, v
 real	z1, z2, dz, z1temp, z2temp, zstart
+size_t	sz_val
 
 bool	streq(), clgetb(), fp_equalr()
-int	clgeti(), clgwrd(), open(), ph_gdata(), imgnlr(), imgnli()
+int	clgwrd(), open(), ph_gdata()
+long	imgnlr(), imgnll(), clgetl(), lnint()
 pointer	immap()
 real	clgetr()
 errchk	immap()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_CHOICE, TY_CHAR)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = SZ_LINE
+	call salloc (p_input, sz_val, TY_CHAR)
+	sz_val = SZ_CHOICE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
 
 	# Get the image name.
-	call clgstr ("input", Memc[input], SZ_LINE)
-	if (streq (Memc[input], "STDIN")) {
+	call clgstr ("input", Memc[p_input], SZ_LINE)
+	if (streq (Memc[p_input], "STDIN")) {
 	    isimage = NO
-	    tx = open (Memc[input], READ_ONLY, TEXT_FILE)
+	    tx = open (Memc[p_input], READ_ONLY, TEXT_FILE)
 	    npix = ph_gdata (tx, buf, SZ_HISTBUF)
 	} else {
 	    iferr {
-	        im = immap (Memc[input], READ_ONLY, 0)
+	        im = immap (Memc[p_input], READ_ONLY, NULLPTR)
 	    } then {
 	        isimage = NO
-	        tx = open (Memc[input], READ_ONLY, TEXT_FILE)
+	        tx = open (Memc[p_input], READ_ONLY, TEXT_FILE)
 	        npix = ph_gdata (tx, buf, SZ_HISTBUF)
 	    } else {
 	        isimage = YES
 	        npix = IM_LEN(im,1)
-	        call amovkl (long(1), Meml[v], IM_MAXDIM)
+		l_val = 1
+		sz_val = IM_MAXDIM
+	        call amovkl (l_val, Meml[v], sz_val)
 	    }
 	}
 
@@ -91,9 +101,9 @@ begin
 	# Get the default histogram resolution.
 	dz = clgetr ("binwidth")
 	if (IS_INDEFR(dz)) {
-	    nbins = clgeti ("nbins")
+	    nbins = clgetl ("nbins")
 	} else {
-	    nbins = nint ((z2 - z1) / dz)
+	    nbins = lnint((z2 - z1) / dz)
 	    if ((z1 + nbins * dz) < z2)
 		nbins = nbins + 1
 	    z2 = z1 + nbins * dz
@@ -103,8 +113,8 @@ begin
 	if (isimage == YES) {
 	    switch (IM_PIXTYPE(im)) {
 	    case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
-	        z1i = nint (z1)
-	        z2i = nint (z2)
+	        z1i = lnint(z1)
+	        z2i = lnint(z2)
 	        z1 = real (z1i)
 	        z2 = real (z2i)
 	    }
@@ -119,8 +129,8 @@ begin
 	    switch (IM_PIXTYPE(im)) {
 	    case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
 		nlevels = z2i - z1i
-		nwide = max (1, nint (real (nlevels) / real (nbins)))
-		nbins = max (1, nint (real (nlevels) / real (nwide)))
+		nwide = max (1, lnint(real (nlevels) / real (nbins)))
+		nbins = max (1, lnint(real (nlevels) / real (nwide)))
 		z2i = z1i + nbins * nwide
 		z2 = real (z2i)
 	    }
@@ -133,7 +143,7 @@ begin
 	nbins1 = nbins + 1
 
 	# Initialize the histogram buffer and image line vector.
-	call salloc (hgm,  nbins1, TY_INT)
+	call salloc (hgm, nbins1, TY_INT)
 	call aclri  (Memi[hgm], nbins1)
 
 	# Read successive lines of the image and accumulate the histogram.
@@ -143,7 +153,7 @@ begin
 	    # Test for NULL data range.
 	    if (fp_equalr (z1, z2)) {
 	        call eprintf ("Warning: File `%s' has no data range.\n")
-		    call pargstr (Memc[input])
+		    call pargstr (Memc[p_input])
 		call mfree (buf, TY_REAL)
 	        call sfree (sp)
 	        call close (tx)
@@ -159,21 +169,21 @@ begin
 	        # Test for constant valued image.
 	        if (z1i == z2i) {
 	            call eprintf ("Warning: Image `%s' has no data range.\n")
-		        call pargstr (Memc[input])
+		        call pargstr (Memc[p_input])
 	            call sfree (sp)
 	            call imunmap (im)
 	            return
 	        }
 
-	        while (imgnli (im, buf, Meml[v]) != EOF) 
-		    call ahgmi (Memi[buf], npix, Memi[hgm], nbins1, z1i, z2i)
+	        while (imgnll (im, buf, Meml[v]) != EOF) 
+		    call ahgml (Meml[buf], npix, Memi[hgm], nbins1, z1i, z2i)
 
 	    default:
 
 	        # Test for constant valued image.
 	        if (fp_equalr (z1, z2)) {
 	            call eprintf ("Warning: Image `%s' has no data range.\n")
-		        call pargstr (Memc[input])
+		        call pargstr (Memc[p_input])
 	            call sfree (sp)
 	            call imunmap (im)
 	            return
@@ -234,10 +244,10 @@ begin
 	    call achtir (Memi[hgm], Memr[hgmr], nbins)
 	    if (isimage == YES)
 	        call ph_plot (Memr[hgmr], nbins, z1, z2, dz, hist_type,
-		    Memc[input], IM_TITLE(im))
+		    Memc[p_input], IM_TITLE(im))
 	    else
 	        call ph_plot (Memr[hgmr], nbins, z1, z2, dz, hist_type,
-		    Memc[input], "")
+		    Memc[p_input], "")
 	}
 
 	if (isimage == YES) {
@@ -258,12 +268,14 @@ int	fd		# input text file descriptor
 pointer	data		# pointer to the ouput data array
 int	sz_bufincr	# increment for data buffer size
 
-int	szbuf, ndata
+size_t	sz_val
+size_t	szbuf, ndata
 int	fscan(), nscan()
 
 begin
 	# Get some buffer space.
-	call malloc (data, sz_bufincr, TY_REAL)
+	sz_val = sz_bufincr
+	call malloc (data, sz_val, TY_REAL)
 	szbuf = sz_bufincr
 
 	# Read the data.
@@ -292,7 +304,7 @@ end
 procedure ph_plot (hgmr, nbins, z1, z2, dz, hist_type, hsource, hid)
 
 real	hgmr[ARB]		# the histogram values
-int	nbins			# the number of bins in the histogram
+size_t	nbins			# the number of bins in the histogram
 real	z1			# the lower limit of the histogram
 real	z2			# the upper limit of the histogram
 real	dz			# the bin width of the histogram
@@ -300,6 +312,7 @@ int	hist_type		# the histogram type
 char	hsource[ARB]		# source of the histogram data
 char	hid[ARB]		# the id of the histogram
 
+size_t	sz_val
 pointer	sp, title, xlabel, ylabel, device, str, gp
 real	hmin, hmax, wx1, wx2, wy1, wy2, vx1, vx2, vy1, vy2
 bool	clgetb(), streq()
@@ -310,8 +323,10 @@ real	clgetr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (str, max (SZ_CHOICE, SZ_TITLE), TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (device, sz_val, TY_CHAR)
+	sz_val = max (SZ_CHOICE, SZ_TITLE)
+	call salloc (str, sz_val, TY_CHAR)
 
 	call clgstr ("device", Memc[device], SZ_FNAME)
 	if (! clgetb ("append")) {
@@ -371,9 +386,11 @@ begin
 		call gseti (gp, G_YNMINOR, clgeti ("minry"))
 
 	        # Allocate space for the labels and title.
-	        call salloc (title, SZ_TITLE, TY_CHAR)
-	        call salloc (xlabel, SZ_FNAME, TY_CHAR)
-	        call salloc (ylabel, SZ_FNAME, TY_CHAR)
+	        sz_val = SZ_TITLE
+	        call salloc (title, sz_val, TY_CHAR)
+	        sz_val = SZ_FNAME
+	        call salloc (xlabel, sz_val, TY_CHAR)
+	        call salloc (ylabel, sz_val, TY_CHAR)
 
 	        # Format the x and y axis labels.
 	        call clgstr ("xlabel", Memc[xlabel], SZ_FNAME)
@@ -402,7 +419,7 @@ begin
 	            call pargstr (hid)
 	            call pargr (z1)
 	            call pargr (z2)
-	            call pargi (nbins)
+	            call pargz (nbins)
 	            call pargr (dz)
 	        }
 
@@ -448,10 +465,10 @@ procedure ph_hgline (gp, ydata, npts, x1, x2)
 
 pointer	gp		# Graphics descriptor
 real	ydata[ARB]	# Y coordinates of the line endpoints
-int	npts		# Number of line endpoints
+size_t	npts		# Number of line endpoints
 real	x1, x2
 
-int	pixel
+long	pixel
 real	left, right, top, bottom, x, y, dx
 
 begin
@@ -485,10 +502,10 @@ procedure ph_fhgline (gp, ydata, npts, x1, x2)
 
 pointer	gp		# Graphics descriptor
 real	ydata[ARB]	# Y coordinates of the line endpoints
-int	npts		# Number of line endpoints
+size_t	npts		# Number of line endpoints
 real	x1, x2
 
-int	pixel
+long	pixel
 real	left, right, top, bottom, x, y, dx
 
 begin
@@ -530,7 +547,9 @@ end
 procedure ph_acumi (a, b, npix)
 
 int	a[ARB], b[ARB]
-int	npix, i
+size_t	npix
+
+long	i
 
 # int	npix, i, a_first, b_first
 
@@ -555,7 +574,9 @@ end
 procedure ph_amrgi (a, b, npix)
 
 int	a[ARB], b[ARB]
-int	npix, i
+size_t	npix
+
+long	i
 
 # int	npix, i, a_first, b_first
 

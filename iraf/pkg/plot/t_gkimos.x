@@ -37,24 +37,29 @@ define	PROMPT		"Gkimosaic Options"
 
 procedure t_gkimosaic ()
 
-pointer	sp, device, output, input, vp, ip, wcs, inlist
+pointer	sp, device, output, p_input, vp, ip, wcs, inlist
 bool	fill, rotate, clear_screen
-int	in, nx, ny, out, interactive, nwcs, buflen
-int	nplots_page, index, lastp, nplot, nfiles, nf, pcounter
-long	fpos, length_mc
-bool	clgetb(), streq()
-int	open(), clgeti(), clgfil(), btoi(), fstati(), gm_interact()
-int	clplen()
-long	gm_rwframe()
-pointer	clpopni()
+int	in, out, interactive, nwcs
+size_t	nx, ny, buflen
+int	nfiles, nf, pcounter
+long	fpos, length_mc, lastp, index, nplot, nplots_page
+size_t	sz_val
 
+bool	clgetb(), streq()
+int	open(), clgfil(), btoi(), fstati(), gm_interact()
+long	clgetl()
+int	clplen()
+long	gm_rwframe(), lmod()
+pointer	clpopni()
 
 begin
 	call smark  (sp)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (input,  SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (wcs, LEN_WCSARRAY, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call salloc (device, sz_val, TY_CHAR)
+	call salloc (p_input, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	sz_val = LEN_WCSARRAY
+	call salloc (wcs, sz_val, TY_STRUCT)
 
 	call gm_initwcs (wcs)
 
@@ -79,8 +84,8 @@ begin
 	call gki_openws (out, Memc[device], NEW_FILE)
 
 	# Get remaining cl parameters
-	nx = max (1, clgeti ("nx"))
-	ny = max (1, clgeti ("ny"))
+	nx = max (1, clgetl ("nx"))
+	ny = max (1, clgetl ("ny"))
 	nplots_page = nx * ny
 	fill = clgetb ("fill")
 	rotate = clgetb ("rotate")
@@ -98,11 +103,11 @@ begin
 	pcounter = 0
 
 	# Main processing loop begins here
-	while (clgfil (inlist, Memc[input], SZ_FNAME) != EOF) {
+	while (clgfil (inlist, Memc[p_input], SZ_FNAME) != EOF) {
 	    iferr {
 		fpos = 1
 		nf = nf + 1
-		in = open (Memc[input], READ_ONLY, BINARY_FILE)
+		in = open (Memc[p_input], READ_ONLY, BINARY_FILE)
 	    } then {
 		call erract (EA_WARN)
 		next
@@ -111,7 +116,7 @@ begin
 	    # Initialize memory and plot counters for maintaining index
 	    buflen = MAX_FRAMES
 	    call calloc (ip, buflen, TY_LONG)
-	    Meml[ip] = long (fpos)
+	    Meml[ip] = fpos
 	    lastp = 0
 
 	    repeat {
@@ -161,7 +166,7 @@ cursor_loop_	    call gki_setwcs (out, Memp[wcs], LEN_WCSARRAY)
 		nplot = nplot + 1
 		pcounter = pcounter + 1
 
-		if (nplots_page == 1 || mod (nplot, nplots_page) == 1)
+		if (nplots_page == 1 || lmod(nplot, nplots_page) == 1)
 		    clear_screen = true
 		else
 		    clear_screen = false
@@ -209,20 +214,24 @@ int	in		# File descriptor for input metacode file
 int	out		# File descriptor for output graphics stream
 pointer	ip		# Pointer to index
 pointer	vp		# Pointre to viewport array
-int	fpos
-int	lastp
-int	nx, ny		# The number of plots in x and y
+long	fpos
+long	lastp
+size_t	nx, ny		# The number of plots in x and y
 bool	rotate		# Rotate plots (y/n)?
 
+size_t	sz_val
 pointer	sp, bp
 bool	fill
-int	nskip, new_vport, junk, key, cval, nxold, nyold
+int	new_vport, junk, key, cval
+size_t	nxold, nyold
+long	nskip
 real	wx, wy
 int	clgcur()
 
 begin
 	call smark (sp)
-	call salloc (bp, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (bp, sz_val, TY_CHAR)
 	nskip = 0
 	new_vport = NO
 
@@ -284,8 +293,8 @@ pointer	frame_wcs	# Pointer to accumulated SETWCS instruction
 int	nwcs		# Counter for number of SETWCS instructions encountered
 
 pointer	gki
-int	n_instructions, nchars_read, stat
-long	length_mc
+int	n_instructions, stat
+long	length_mc, nchars_read
 int	gm_read_next_instruction(), gm_writemc()
 errchk	gm_read_next_instruction, gm_writemc
 
@@ -319,15 +328,17 @@ end
 procedure gm_colon (cmdstr, nx, ny, fill, new_vport, rotate, nskip)
 
 char	cmdstr[ARB]
-int	nx, ny
+size_t	nx, ny
 bool	fill
 int	new_vport
 bool	rotate
-int	nskip
+long	nskip
 
+size_t	sz_val
 pointer	sp, bp, mp
 bool	tempb, plus_sign
-int	ncmd, tempi
+int	ncmd
+long	tempi
 int	strdic(), nscan(), stridxs()
 errchk	strdic, nscan, stridxs
 
@@ -335,8 +346,10 @@ string	cmds "|nx|ny|fill|rotate|skip|"
 
 begin
 	call smark (sp)
-	call salloc (bp, SZ_COMMAND, TY_CHAR)
-	call salloc (mp, SZ_MATCH, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (bp, sz_val, TY_CHAR)
+	sz_val = SZ_MATCH
+	call salloc (mp, sz_val, TY_CHAR)
 
 	# Parse the command string with fmtio.  First look for a minus sign,
 	# then find the string in the string index, matching only the
@@ -357,7 +370,7 @@ begin
 	switch (ncmd) {
 	case 1:
 	    # nx
-	    call gargi (tempi)
+	    call gargl (tempi)
 	    if (nscan() >= 2) {
 	        new_vport = YES
 		nx = tempi
@@ -365,7 +378,7 @@ begin
 
 	case 2:
 	    # ny
-	    call gargi (tempi)
+	    call gargl (tempi)
 	    if (nscan() >= 2) {
 		new_vport = YES
 		ny = tempi
@@ -394,7 +407,7 @@ begin
 
 	case 5:
 	    # skip
-	    call gargi (tempi)
+	    call gargl (tempi)
 	    if (nscan() >= 2)
 		nskip = tempi
 	    else
@@ -417,13 +430,14 @@ procedure gm_posmc (in, file_pos, pcounter, mc_index, nskip)
 
 int	in			# File descriptor of input file
 long	file_pos		# Current position in file
-int	pcounter		# Plot number just plotted upon entering
+long	pcounter		# Plot number just plotted upon entering
 long	mc_index[ARB]		# Accumulated index of mc plots
-int	nskip			# Requested nplots to skip 
+long	nskip			# Requested nplots to skip 
 
-int	desired_plot, i, nchars_read, pcounter_in, fpos_in
-long	desired_position
-int	gm_findnextplot()
+long	l_val
+long	nchars_read, desired_plot, i, pcounter_in, fpos_in, desired_position
+long	labs()
+long	gm_findnextplot()
 errchk	seek, gm_findnextplot
 
 begin
@@ -438,9 +452,10 @@ begin
 		return
 	    }
 
-	    if (abs (nskip) > pcounter) {
+	    if ( labs(nskip) > pcounter ) {
 	        call eprintf ("At beginning of file\n")
-	        call seek (in, BOFL)
+		l_val = BOFL
+	        call seek (in, l_val)
 		file_pos = 1
 		pcounter = 0
 		return
@@ -450,7 +465,7 @@ begin
 	    # calling program will redetermine the starting position as 
 	    # before.
 
-	    desired_plot = pcounter - abs (nskip) + 1
+	    desired_plot = pcounter - labs (nskip) + 1
 	    desired_position = mc_index[desired_plot]
 	    call seek (in, desired_position)
 	    pcounter = desired_plot - 1
@@ -465,7 +480,7 @@ begin
 		nchars_read = gm_findnextplot (in)
 		if (nchars_read == EOF) {
 		    call eprintf ("Only %d plots left - position unchanged\n")
-			call pargi (i - 1)
+			call pargl (i - 1)
 		    pcounter = pcounter_in
 		    file_pos = fpos_in
 		    call seek (in, fpos_in)
@@ -487,11 +502,13 @@ end
 # GM_FINDNEXTPLOT  -- read until the start of the next plot in the metacode
 # file, returning the number of chars read to get there.
 
-int procedure gm_findnextplot (in)
+long procedure gm_findnextplot (in)
 
 int	in
+
 pointer	gki
-int	nchars_read, opcode, plot_length
+long	nchars_read, plot_length
+int	opcode
 int	gm_read_next_instruction()
 
 begin
@@ -523,9 +540,11 @@ int procedure gm_read_next_instruction (fd, instruction, nchars_total)
 
 int	fd			# input file containing metacode
 pointer	instruction		# pointer to instruction (output)
-int	nchars_total		# number of chars read from input stream
+long	nchars_total		# number of chars read from input stream
 
-int	len_ibuf, nchars, nchars_read
+size_t	sz_val
+long	nchars_read
+size_t	len_ibuf, nchars
 pointer	ibuf
 long	read()
 errchk	read
@@ -536,7 +555,8 @@ begin
 	# a larger buffer later if necessary.
 
 	if (ibuf == NULL) {
-	    call malloc (ibuf, LEN_DEFIBUF, TY_SHORT)
+	    sz_val = LEN_DEFIBUF
+	    call malloc (ibuf, sz_val, TY_SHORT)
 	    len_ibuf = LEN_DEFIBUF
 	}
 
@@ -551,14 +571,16 @@ begin
 	nchars_total = 0
 	repeat {
 	    repeat {
-		nchars_read = read (fd, I_BOI(ibuf), ONEWORD)
+		sz_val = ONEWORD
+		nchars_read = read (fd, I_BOI(ibuf), sz_val)
 		if (nchars_read == EOF)
 		    return (EOF)
 		else 
 		    nchars_total = nchars_total + nchars_read
 	    } until (I_BOI(ibuf) == BOI)
 
-	    nchars_read = read (fd, I_OPCODE(ibuf), TWOWORDS)
+	    sz_val = TWOWORDS
+	    nchars_read = read (fd, I_OPCODE(ibuf), sz_val)
 	    if (nchars_read == EOF)
 		return (EOF)
 	    else
@@ -624,7 +646,8 @@ errchk	amovi, gm_vtransr
 
 begin
 	call smark (sp)
-	call salloc (wcs_temp, LEN_WCSARRAY, TY_STRUCT)
+	sz_val = LEN_WCSARRAY
+	call salloc (wcs_temp, sz_val, TY_STRUCT)
 
 	nwcs_in = nwcs_cnt
 	nwords = gki[GKI_SETWCS_N]
@@ -632,8 +655,7 @@ begin
 
 	if (nwcs > 1) {
 	    sz_val = (nwcs * LEN_WCS) * (SZ_POINTER / SZ_SHORT)
-	    # arg2 : incompatible pointer
-	    call amovs (gki[GKI_SETWCS_WCS], Memp[wcs_temp], sz_val)
+	    call amovs (gki[GKI_SETWCS_WCS], Mems[P2S(wcs_temp)], sz_val)
 
 	    do i = 1, nwcs {
 		w = ((i - 1) * LEN_WCS) + wcs_temp
@@ -839,11 +861,11 @@ end
 procedure gm_getvp (vp, nx, ny, fill)
 
 pointer	vp		# Pointer to array of viewport coordinates
-int	nx		# Number of plots in x direction
-int	ny		# Number of plots in y direction
+size_t	nx		# Number of plots in x direction
+size_t	ny		# Number of plots in y direction
 bool	fill		# Fill viewport or preserve aspect ratio
 
-int	i, j, plotnumber
+long	i, j, plotnumber
 real	x_sep, y_sep, x_ext, y_ext, x_center, y_center
 
 begin
@@ -986,6 +1008,8 @@ real	x1, y1, xcen, ycen, xscale, yscale, cos_angle, sin_angle
 common	/gm_tform/ x1, y1, xcen, ycen, xscale, yscale, cos_angle, sin_angle,
          rotate
 
+long	lint()
+
 begin
 	do i = 1, 2 * npairs, 2 {
 	    xtemp = real (xy_pairs[i]) * xscale + x1
@@ -999,9 +1023,9 @@ begin
 	        # Rotate about center, making sure transformed coordinates
 	        # are in NDC bounds.
 
-	        xt = max (0, min (int(((ytemp - ycen) * xscale/yscale) + xcen), 
+	        xt = max (0, min (lint(((ytemp - ycen) * xscale/yscale) + xcen), 
 		    GKI_MAXNDC))
-	        yt = max (0, min (int(((xcen - xtemp) * yscale/xscale) + ycen), 
+	        yt = max (0, min (lint(((xcen - xtemp) * yscale/xscale) + ycen), 
 		    GKI_MAXNDC))
 	    }
 

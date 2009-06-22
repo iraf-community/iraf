@@ -12,10 +12,10 @@ procedure hgpline (gp, x, y, n, type)
 pointer	gp			#I GIO pointer
 real	x[ARB]			#I X coordinates
 real	y[ARB]			#I Y coordinates
-int	n			#I Number of coordinates
+size_t	n			#I Number of coordinates
 char	type[ARB]		#I Plot type
 
-int	i
+long	i
 real	x1, x2, bottom
 char	line[5]
 

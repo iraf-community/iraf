@@ -17,17 +17,19 @@ procedure draw_perimeter (gp)
 pointer	gp			# Graphics descriptor
 real	xs, xe, ys, ye		# WCS coordinates of pixel window
 
-int	i, first_col, last_col, first_tick, last_tick, bias
-int	nchar, dummy, first_row, last_row, cnt_step, cnt_label
+long	i, first_col, last_col, first_tick, last_tick, bias
+long	first_row, last_row, cnt_step, cnt_label
+int	ii, nchar, dummy
 char	label[SZ_LABEL], fmt1[SZ_FMT], fmt2[SZ_FMT], fmt3[SZ_FMT], fmt4[SZ_FMT]
 real	dist, kk, col, row, dx, dy, sz_char, cw, xsz, label_pos
 real	xdist, ydist, xspace, yspace
 bool	ggetb()
-int	itoc()
+int	ltoc()
+long	lint(), lmod()
 real 	ggetr()
 real	k[3]
 data 	k/1.0,2.0,3.0/
-errchk	ggwind, gseti, gctran, gline, gtext, itoc
+errchk	ggwind, gseti, gctran, gline, gtext, ltoc
 
 begin
 	# First, get window coordinates and turn off clipping
@@ -70,7 +72,7 @@ begin
 
 	# Draw inner and outer perimeter
 	kk = k[1]
-	do i = 1, 2 {
+	do ii = 1, 2 {
 	    xspace = kk * xdist
 	    yspace = kk * ydist
 	    call gline (gp, xs - xspace, ys - yspace, xe + xspace, ys - yspace)
@@ -83,8 +85,8 @@ begin
 	# Now draw x axis tick marks, along both the bottom and top of
 	# the picture.  First find the endpoint integer pixels.
 
-	first_col = int (xs)
-	last_col = int (xe)
+	first_col = lint(xs)
+	last_col = lint(xe)
 
 	# Determine increments of ticks and tick labels for x axis
 	cnt_step  = 1
@@ -98,7 +100,7 @@ begin
 	}
 
 	first_tick = first_col
-	bias = mod (first_tick, cnt_step)
+	bias = lmod (first_tick, cnt_step)
 	last_tick = last_col + bias
 
 	do i = first_tick, last_tick, cnt_step {
@@ -106,15 +108,15 @@ begin
 	    call gline (gp, col, ys - k[1] * ydist, col, ys - k[2] * ydist)
 	    call gline (gp, col, ye + k[1] * ydist, col, ye + k[2] * ydist)
 
-	    if (mod ((i - bias), cnt_label)  == 0) {
+	    if ( lmod((i - bias), cnt_label) == 0 ) {
 		# Label tick mark; calculate number of characters needed
 		nchar = 3
-		if (int (col) == 0)
+		if ( lint(col) == 0 )
 		    nchar = 1
-		if (int (col) >= 1000)
+		if ( lint(col) >= 1000 )
 		    nchar = 4
 
-		dummy = itoc (int(col), label, nchar)
+		dummy = ltoc (lint(col), label, nchar)
 
 		# Position label slightly below outer perimeter.  Seperation
 		# is twenty percent of a character width, in WCS.
@@ -130,8 +132,8 @@ begin
 	# Label the y axis tick marks along the left and right sides of the
 	# picture.  First find the integer pixel endpoints.
 	
-	first_row = int (ys)
-	last_row = int (ye)
+	first_row = lint(ys)
+	last_row = lint(ye)
 
 	# Determine increments of ticks and tick labels for y axis
 	cnt_step  = 1
@@ -145,7 +147,7 @@ begin
 	}
 
 	first_tick = first_row 
-	bias = mod (first_tick, cnt_step)
+	bias = lmod (first_tick, cnt_step)
 	last_tick = last_row + bias
 
 	do i = first_tick, last_tick, cnt_step {
@@ -153,15 +155,15 @@ begin
 	    call gline (gp, xs - k[1] * xdist, row, xs - k[2] * xdist, row)
 	    call gline (gp, xe + k[1] * xdist, row, xe + k[2] * xdist, row)
 
-	    if (mod ((i - bias), cnt_label) == 0) {
+	    if ( lmod((i - bias), cnt_label) == 0 ) {
 		# Label tick mark; calculate number of characters needed
 		nchar = 3
-		if (int (row) == 0)
+		if ( lint(row) == 0 )
 		    nchar = 1
-		else if (int (row) >= 1000)
+		else if ( lint(row) >= 1000 )
 		    nchar = 4
 		
-	        dummy = itoc (int(row), label, nchar)
+	        dummy = ltoc (lint(row), label, nchar)
 
 		# Position label slightly to the left of outer perimeter.
 		# Separation twenty percent of a character width, in WCS.

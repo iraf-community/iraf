@@ -11,20 +11,26 @@ procedure t_pcols ()
 
 pointer	image, wcslab, fmt
 pointer	im, mw, ct, sp, x_vec, y_vec
-int	col1, col2, ncols, nlines
+long	col1, col2
+size_t	ncols, nlines
 real	zmin, zmax
-int	clgeti()
+size_t	sz_val
+
+long	clgetl()
 pointer	immap(), mw_openim(), mw_sctran()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (wcslab, SZ_LINE, TY_CHAR)
-	call salloc (fmt, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (wcslab, sz_val, TY_CHAR)
+	call salloc (fmt, sz_val, TY_CHAR)
 
 	# Open image
 	call clgstr ("image", Memc[image], SZ_FNAME)
-	im = immap (Memc[image], READ_ONLY, 0)
+	im = immap (Memc[image], READ_ONLY, NULLPTR)
 	call clgstr ("wcs", Memc[wcslab], SZ_LINE)
 	mw = mw_openim (im)
 	call mw_seti (mw, MW_USEAXMAP, NO)
@@ -33,8 +39,8 @@ begin
 	ncols  = IM_LEN(im,1)
 	nlines = IM_LEN(im,2)
 
-	col1 = clgeti ("col1")
-	col2 = clgeti ("col2")
+	col1 = clgetl("col1")
+	col2 = clgetl("col2")
 	if (min(col1,col2) < 1 || max(col1,col2) > ncols) {
 	    call imunmap (im)
 	    call error (2, "column index references outside image")
@@ -69,8 +75,8 @@ procedure plt_gcols (im, mw, ct, col1, col2, x_vector, y_vector, zmin, zmax,
 pointer im              # Pointer to image header
 pointer	mw		# MWCS  pointer
 pointer	ct		# CT pointer
-int     col1            # First column to extract
-int     col2            # Last column to extract
+long	col1            # First column to extract
+long	col2            # Last column to extract
 real    x_vector[ARB]   # The row ordinal values (returned)
 real    y_vector[ARB]   # The column data values (returned)
 real    zmin, zmax      # Minimum and maximum data values (returned)
@@ -78,13 +84,16 @@ char	wcslab[sz_wcslab]	# WCS label if present
 char	format[sz_wcslab]	# WCS format if present
 int	sz_wcslab	# String length
  
-int     i, nrows, ncols
+size_t	sz_val
+long	i
+size_t	nrows, ncols
 pointer	sp, axvals, off, imgl2r()
 real    asumr()
  
 begin
 	call smark (sp)
-	call salloc (axvals, IM_MAXDIM, TY_REAL)
+	sz_val = IM_MAXDIM
+	call salloc (axvals, sz_val, TY_REAL)
 
         # Fill x and y arrays.
         nrows = IM_LEN(im,2)
@@ -113,13 +122,14 @@ procedure pc_draw_vector (image,
 
 char	image[SZ_FNAME]				#I Image name
 real	xvec[nlines], yvec[nlines]		#I Vectors to be plot
-int	nlines					#I Npts in vector
+size_t	nlines					#I Npts in vector
 real	zmin, zmax				#I Vector min max
-int	col1, col2				#I Selected columns
+long	col1, col2				#I Selected columns
 char	wcslab[ARB]				#I WCS label
 char	format[ARB]				#I WCS format
 bool	pcols					#I Is task PCOLS? (y/n)
 
+size_t	sz_val
 pointer	sp, gp
 pointer	device, marker, xlabel, ylabel, title, suffix
 real	wx1, wx2, wy1, wy2, vx1, vx2, vy1, vy2, szm, tol
@@ -133,12 +143,15 @@ int	btoi(), clgeti()
 
 begin
 	call smark (sp)
-	call salloc (device, SZ_FNAME, TY_CHAR)
-	call salloc (marker, SZ_FNAME, TY_CHAR)
-	call salloc (xlabel, SZ_LINE,  TY_CHAR)
-	call salloc (ylabel, SZ_LINE,  TY_CHAR)
-	call salloc (title,  SZ_LINE,  TY_CHAR)
-	call salloc (suffix, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (device, sz_val, TY_CHAR)
+	call salloc (marker, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (xlabel, sz_val,  TY_CHAR)
+	call salloc (ylabel, sz_val,  TY_CHAR)
+	call salloc (title, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (suffix, sz_val, TY_CHAR)
 
 	call clgstr ("device", Memc[device], SZ_FNAME)
 	mode = NEW_FILE
@@ -162,11 +175,11 @@ begin
 	        call strcpy (image, Memc[title], SZ_LINE)
 		if (pcols) {
 		    call sprintf (Memc[suffix], SZ_FNAME, ": columns %d to %d")
-		        call pargi (col1)
-		        call pargi (col2)
+		        call pargl (col1)
+		        call pargl (col2)
 		} else {
 		    call sprintf (Memc[suffix], SZ_FNAME, ": column %d")
-		        call pargi (col1)
+		        call pargl (col1)
 		}
 	        call strcat (Memc[suffix], Memc[title], SZ_LINE)
 	    }

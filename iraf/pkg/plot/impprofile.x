@@ -14,7 +14,7 @@ procedure imp_profile (gp, x, y, n, x1, y1, x2, y2, sl, sline)
 pointer	gp		#I gio pointer
 real	x[n]		#I x coordinates
 real	y[n]		#I y coordinates
-int	n		#I number of points
+size_t	n		#I number of points
 real	x1, y1		#I first endpoint
 real	x2, y2		#I second endpoint
 pointer	sl		#U status line pointer
@@ -25,7 +25,7 @@ real	p, p1, p2, pc, pl, pr, step
 real	a, b, c, y0, dy, xc, xl, xr, der[2]
 double	sumb, sum0, sum1, sum2, sum3
 pointer	xasi, yasi, sl_getstr
-real	asieval()
+real	asieval(), aabs()
 bool	fp_equalr()
 
 begin
@@ -44,7 +44,7 @@ begin
 		b = der[2]
 	    a = x1 - der[1]
 	    p1 = max (1., min (real(n), p1 + a / der[2]))
-	    if (abs (a) < DX)
+	    if ( aabs(a) < DX )
 		break
 	}
 	p2 = p1
@@ -54,7 +54,7 @@ begin
 		b = der[2]
 	    a = x2 - der[1]
 	    p2 = max (1., min (real(n), p2 + a / der[2]))
-	    if (abs (a) < DX)
+	    if ( aabs(a) < DX )
 		break
 	}
 
@@ -66,14 +66,14 @@ begin
 	} else if (p1 < p2) {
 	    y0 = y1
 	    dy = (y2 - y0) / (p2 - p1)
-	    step = (p2 - p1) / (nint(p2) - nint(p1) + 1) * STEP
+	    step = (p2 - p1) / (anint(p2) - anint(p1) + 1) * STEP
 	} else {
 	    pc = p1
 	    p1 = p2
 	    p2 = pc
 	    y0 = y2
 	    dy = (y1 - y0) / (p2 - p1)
-	    step = (p2 - p1) / (nint(p2) - nint(p1) + 1) * STEP
+	    step = (p2 - p1) / (anint(p2) - anint(p1) + 1) * STEP
 	}
 
 	# Compute the first 2 moments using trapezoidal integration.
@@ -127,7 +127,7 @@ begin
 	pc= p1
 	c = 0.
 	for (p=p1; p<=p2; p=p+step) {
-	    a = abs (asieval (yasi, p) - y0 - (p - p1) * dy)
+	    a = aabs (asieval (yasi, p) - y0 - (p - p1) * dy)
 	    if (a > c) {
 		pc = p
 		c = a
@@ -140,7 +140,7 @@ begin
 	pl = INDEF
 	xl = INDEF
 	for (p=pc; p>=p1; p=p-step) {
-	    a = abs (asieval (yasi, p) - y0 - (p - p1) * dy)
+	    a = aabs (asieval (yasi, p) - y0 - (p - p1) * dy)
 	    if (a < c) {
 		pl = p + (c - a) / (b - a) * step
 		xl = asieval (xasi, pl)
@@ -152,7 +152,7 @@ begin
 	pr = INDEF
 	xr = INDEF
 	for (p=pc; p<p2; p=p+step) {
-	    a = abs (asieval (yasi, p) - y0 - (p - p1) * dy)
+	    a = aabs (asieval (yasi, p) - y0 - (p - p1) * dy)
 	    if (a < c) {
 		pr = p - (c - a) / (b - a) * step
 		xr = asieval (xasi, pr)
