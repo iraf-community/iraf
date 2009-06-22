@@ -25,7 +25,8 @@ procedure t_imhistogram()
 long	v[IM_MAXDIM]
 real	z1, z2, dz, z1temp, z2temp, zstart
 size_t	npix, nbins, nbins1, nlevels, nwide
-int	z1i, z2i, maxch, histtype
+long	z1i, z2i
+int	maxch, histtype
 long	i
 pointer gp, im, sp, hgm, hgmr, buf, image, device, str, title, op
 size_t	sz_val
@@ -33,8 +34,8 @@ long	l_val
 
 real	clgetr()
 pointer	immap(), gopen()
-int	clgwrd(), inint()
-long	imgnlr(), imgnli(), clgetl(), lnint()
+int	clgwrd()
+long	imgnlr(), imgnll(), clgetl(), lnint()
 bool	clgetb(), fp_equalr()
 include	<nullptr.inc>
 
@@ -85,8 +86,8 @@ begin
 	# Set the limits for integer images.
 	switch (IM_PIXTYPE(im)) {
 	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
-	    z1i = inint(z1)
-	    z2i = inint(z2)
+	    z1i = lnint(z1)
+	    z2i = lnint(z2)
 	    z1 = real (z1i)
 	    z2 = real (z2i)
 	}
@@ -132,8 +133,8 @@ begin
 	        return
 	    }
 
-	    while (imgnli (im, buf, v) != EOF) 
-		call ahgmi (Memi[buf], npix, Memi[hgm], nbins1, z1i, z2i)
+	    while (imgnll (im, buf, v) != EOF) 
+		call ahgml (Meml[buf], npix, Memi[hgm], nbins1, z1i, z2i)
 
 	default:
 	    # Test for constant valued image, which causes zero divide in ahgm.
