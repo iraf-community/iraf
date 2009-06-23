@@ -311,7 +311,7 @@ C -NOAO
 C
       SAVE
       CHARACTER*1     IGAP       ,ISOL       ,RCHAR
-      CHARACTER       ENCSCR*22  ,IWORK*126
+      CHARACTER       ENCSCR*32  ,IWORK*126
 C +NOAO - Character variable added for improved label processing.
       character*25    string(5)
 C -NOAO
