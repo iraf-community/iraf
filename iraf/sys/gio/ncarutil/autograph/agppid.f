@@ -25,7 +25,7 @@ C
       CHARACTER*124 TEMP
 C
 C +NOAO
-      integer*2 itemp(124)
+      integer*2 itemp(125)
 C -NOAO
 C
 C Set up the print line.
@@ -50,7 +50,7 @@ C
 C +NOAO - replace FTN write and format statement.
 C 102 WRITE (I1MACH(4),1001) TEMP
   102 CONTINUE
-      call f77upk (temp, itemp, 125)
+      call f77upk (temp, itemp, 124)
       call pstr (itemp)
 C
 C Done.

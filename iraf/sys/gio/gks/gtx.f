@@ -4,7 +4,7 @@ c
 c
 	real		px, py
 	character*(*) 	f77chars
-	integer*2     	sppchars(161)
+	integer*2     	sppchars(162)
 c
 c
 c	Unpack characters from packed input array
