@@ -57,7 +57,7 @@ c 102 WRITE (IFMT,'(A2,I2,A1,I1,A1)') '(F',NS,'.',ND,')'
       ifmt(3:3) = char (ns + ichar ('0'))
       ifmt(5:5) = char (nd + ichar ('0'))
 c     WRITE (IOUT,IFMT) V
-      call encode (ns, ifmt, iout, v)
+      call encode (ns, ifmt, iout, v, 0)
       NC = NS
 c + NOAO
 c The following statement was making 5 digit labels (+4800) come out
@@ -84,11 +84,11 @@ C1001 FORMAT('(F',I2,'.',I1,',1H',A1,')')
 C
       END
 C
-      SUBROUTINE ENCODE (NCHARS, FTNFMT, FTNOUT, RVAL)
+      SUBROUTINE ENCODE (NCHARS, FTNFMT, FTNOUT, RVAL, IVAL)
 
       INTEGER SZFMT, SZBUF
       PARAMETER (SZFMT=11)
-      PARAMETER (SZBUF=15)
+      PARAMETER (SZBUF=32)
 
       CHARACTER*(*) FTNFMT
       CHARACTER*(*) FTNOUT
@@ -98,7 +98,7 @@ C UNPACK THE FORTRAN CHARACTER STRING, CALL FENCD TO ACTUALLY ENCODE THE
 C OUTPUT STRING, THEN PACK THE OUTPUT STRING INTO A FORTRAN STRING FOR RETURN
 C
       CALL F77UPK (FTNFMT, SPPFMT, SZFMT)
-      CALL FENCD (NCHARS, SPPFMT, SPPOUT, RVAL)
+      CALL FENCD (NCHARS, SPPFMT, SPPOUT, RVAL, IVAL)
       CALL F77PAK (SPPOUT, FTNOUT, NCHARS)
 
       END

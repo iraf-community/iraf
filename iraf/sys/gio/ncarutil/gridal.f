@@ -867,12 +867,12 @@ C
         IF (LOGVAL .EQ. 1 .OR. LOGVAL .EQ. 2) THEN
 C +NOAO
 C         WRITE(LABEL,XFMT)XPOS
-          call encode (10, xfmt, label, xpos)
+          call encode (10, xfmt, label, xpos, 0)
 C -NOAO
         ELSE
 C +NOAO
 C         WRITE(LABEL,XFMT)XCUR
-          call encode (10, yfmt, label, xcur)
+          call encode (10, yfmt, label, xcur, 0)
 C -NOAO
         ENDIF
         CALL CHSTR(LABEL,FIRST,LAST)
@@ -921,13 +921,13 @@ C
           IF (IXLAB .EQ. 1) THEN
             IF (LOGVAL.EQ.1 .OR. LOGVAL.EQ.2) THEN
 C (NOAO)      WRITE(LABEL,XFMT) XPOS
-              call encode (10, xfmt, label, xpos)
+              call encode (10, xfmt, label, xpos, 0)
             ELSE
               IF (XCUR .GT. EXCUR+.1*XINT) THEN
                 GOTO 101
               ELSE
 C (NOAO)        WRITE(LABEL,XFMT) XCUR
-                call encode (10, xfmt, label, xcur)
+                call encode (10, xfmt, label, xcur, 0)
               ENDIF
             ENDIF
             CALL CHSTR(LABEL,FIRST,LAST)
@@ -964,10 +964,10 @@ C
         IF (IXLAB .EQ. 1 .AND. LOOP .EQ. 1) THEN
           IF (LOGVAL .EQ. 1 .OR. LOGVAL .EQ. 2) THEN
 C (NOAO)    WRITE(LABEL,XFMT)XPOS
-            call encode (10, xfmt, label, xpos)
+            call encode (10, xfmt, label, xpos, 0)
           ELSE
 C (NOAO)    WRITE(LABEL,XFMT)XCUR
-            call encode (10, xfmt, label, xcur)
+            call encode (10, xfmt, label, xcur, 0)
           ENDIF
           CALL CHSTR(LABEL,FIRST,LAST)
           CALL GTX (XPOS,XLAB,LABEL(FIRST:LAST))
@@ -1145,10 +1145,10 @@ C
         ENDIF
         IF (LOGVAL .EQ. 1 .OR. LOGVAL .EQ.3) THEN
 C (NOAO)  WRITE(LABEL,YFMT)YPOS
-          call encode (10, yfmt, label, ypos)
+          call encode (10, yfmt, label, ypos, 0)
         ELSE
 C (NOAO)  WRITE(LABEL,YFMT)YCUR
-          call encode (10, yfmt, label, ycur)
+          call encode (10, yfmt, label, ycur, 0)
         ENDIF
         CALL CHSTR(LABEL,FIRST,LAST)
         CALL GTX (YLAB,YPOS,LABEL(FIRST:LAST))
@@ -1196,13 +1196,13 @@ C
           IF (IYLAB .EQ. 1) THEN
             IF (LOGVAL .EQ. 1 .OR. LOGVAL .EQ.3) THEN
 C (NOAO)      WRITE(LABEL,YFMT)YPOS
-              call encode (10, yfmt, label, ypos)
+              call encode (10, yfmt, label, ypos, 0)
             ELSE
               IF (YCUR .GT. EYCUR+.1*YINT) THEN
                 GOTO 201
               ELSE
 C (NOAO)        WRITE(LABEL,YFMT)YCUR
-                call encode (10, yfmt, label, ycur)
+                call encode (10, yfmt, label, ycur, 0)
               ENDIF
             ENDIF
             CALL CHSTR(LABEL,FIRST,LAST)
@@ -1239,10 +1239,10 @@ C
         IF (IYLAB .EQ. 1 .AND. LOOP .EQ.1) THEN
           IF (LOGVAL .EQ. 1 .OR. LOGVAL .EQ.3) THEN
 C (NOAO)   WRITE(LABEL,YFMT)YPOS
-           call encode (10, yfmt, label, ypos)
+           call encode (10, yfmt, label, ypos, 0)
           ELSE
 C (NOAO)    WRITE(LABEL,YFMT)YCUR
-            call encode (10, yfmt, label, ycur)
+            call encode (10, yfmt, label, ycur, 0)
           ENDIF
           CALL CHSTR(LABEL,FIRST,LAST)
           CALL GTX(YLAB,YPOS,LABEL(FIRST:LAST))

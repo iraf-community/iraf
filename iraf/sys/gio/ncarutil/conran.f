@@ -1564,8 +1564,8 @@ C
 C +NOAO - FTN internal writes rewritten as calls to encode.
 C       WRITE(ENCSCR,'(G13.5)')XRG
 C       WRITE(ENSCRY,'(G13.5)')YRG
-        call encode (13, '(f13.5)', encscr, xrg)
-	call encode (13, '(f13.5)', enscry, yrg)
+        call encode (13, '(f13.5)', encscr, xrg, 0)
+	call encode (13, '(f13.5)', enscry, yrg, 0)
 C -NOAO
         IWORK(12:24) = ENCSCR
         IWORK(37:49) = ENSCRY
@@ -1574,7 +1574,7 @@ C -NOAO
             IWORK(IMSZ:IMSZ+10) = ' SCALED BY '
 C +NOAO
 C           WRITE(ENCSCR,'(G13.5)')SCALE
-            call encode (13, '(f13.5)', encscr, scale)
+            call encode (13, '(f13.5)', encscr, scale, 0)
 C -NOAO
             IWORK(IMSZ+11:IMSZ+23) = ENCSCR
             IMSZ = 73
@@ -1608,13 +1608,13 @@ C
 C
 C +NOAO
 C       WRITE(ENCSCR,'(G13.5)')HOLD(1)
-        call encode (13, '(f13.5)', encscr, hold(1))
+        call encode (13, '(f13.5)', encscr, hold(1), 0)
         IWORK(13:25) = ENCSCR
 C       WRITE(ENCSCR,'(G13.5)')HOLD(2)
-        call encode (13, '(f13.5)', encscr, hold(2))
+        call encode (13, '(f13.5)', encscr, hold(2), 0)
         IWORK(29:41) = ENCSCR
 C       WRITE(ENCSCR,'(G13.5)')HOLD(3)
-        call encode (13, '(f13.5)', encscr, hold(3))
+        call encode (13, '(f13.5)', encscr, hold(3), 0)
         IWORK(62:74) = ENCSCR
 C -NOAO
 C

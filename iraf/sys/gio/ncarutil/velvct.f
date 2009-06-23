@@ -584,7 +584,7 @@ C
       IF (IOFFM .NE. 0) GO TO 200
 C +NOAO - FTN internal write replaced with call to encode
 C     WRITE(LABEL,'(E10.3)')HA
-      call encode (10, '(e10.3)', label, ha)
+      call encode (10, '(e10.3)', label, ha, 0)
 C -NOAO
 C
 C     TURN OFF CLIPPING SO ARROW CAN BE DRAWN

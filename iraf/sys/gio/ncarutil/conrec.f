@@ -379,11 +379,9 @@ C
 C +NOAO
 C
 C     WRITE (IWORK(56:62),'(I6)') M
-      rval = m
-      call encode (6, '(i6)', iwork(56:62), rval)
+      call encode (6, '(i6)', iwork(56:62), 0.0, m)
 C     WRITE (IWORK(73:79),'(I6)') N
-      rval = n
-      call encode (6, '(i6)', iwork(73:79), rval)
+      call encode (6, '(i6)', iwork(73:79), 0.0, n)
 C -NOAO
 C
       CALL SETER( IWORK, 1, 1 )
@@ -618,7 +616,7 @@ C
          IWORK = 'CONSTANT FIELD'
 C +NOAO 
 C     WRITE( ENCSCR, '(G22.14)' ) GL
-      call encode (22, '(g22.14)', encscr, gl)
+      call encode (22, '(g22.14)', encscr, gl, 0)
 C -NOAO
       DO 126 I=1,22
          IWORK(I+14:I+14) = ENCSCR(I:I)

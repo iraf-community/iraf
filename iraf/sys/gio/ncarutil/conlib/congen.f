@@ -326,7 +326,7 @@ C
 C +NOAO - FTN internal write rewritten as encode for IRAF.
 C
 C     WRITE(IVOUT,'(G13.5)')CONV
-      call encode (13, '(g13.5)', ivout, conv)
+      call encode (13, '(g13.5)', ivout, conv, 0)
 C
 C -NOAO
         IHOLD(40:62) = IVOUT

@@ -414,7 +414,7 @@ C -NOAO
   111 CONTINUE
 C +NOAO - FTN internal write rewritten as call to encode.
 C       WRITE(IDUMMY,'(G11.4)') ZLEV(LEV)
-	call encode (11, '(g11.4)', idummy, zlev(lev))
+	call encode (11, '(g11.4)', idummy, zlev(lev), 0)
 C -NOAO
       TKX = KX
       TKY = KY+38

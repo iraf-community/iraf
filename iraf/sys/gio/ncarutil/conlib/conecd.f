@@ -144,7 +144,7 @@ C
 C       WRITE(CHTMP,IFMT1)V
 C       IOUT = CHTMP
 C
-        call encode (ns, ifmt1, iout, v)
+        call encode (ns, ifmt1, iout, v, 0)
 
       NUSED = NS
       RETURN
@@ -154,7 +154,7 @@ C
 C 60  WRITE(CHTMP,'(E8.3)')V
 C     IOUT = CHTMP
 C
-  60  call encode (8, '(E8.3)', iout, v)
+  60  call encode (8, '(E8.3)', iout, v, 0)
 C
 C -NOAO
       NUSED = 8

@@ -97,7 +97,7 @@ C
 C + NOAO - FTN internal write rewritten as call to encode for IRAF
 C
 C      WRITE(ISTR,FORM)ZD(K)
-       call encode (len, form, istr, zd(k))
+       call encode (len, form, istr, zd(k), 0)
 C
 C - NOAO
 C

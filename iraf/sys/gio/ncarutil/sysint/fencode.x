@@ -13,16 +13,18 @@ define	SZ_FORMAT	11
 # where c is one of [EFGI], and where W and D are the field width and
 # number of decimal places or precision, respectively.
 
-procedure fencd (nchars, f_format, spp_outstr, rval)
+procedure fencd (nchars, f_format, spp_outstr, rval, ival)
 
 int	nchars			# desired number of output chars
-char	f_format[SZ_FORMAT] 	# SPP string containing format
+char	f_format[ARB]		# SPP string containing format
 char	spp_outstr[nchars+1]    # SPP string containing encoded number
 real	rval			# value to be encoded
+int	ival
 
 char	fmtchar, outstr[MAX_DIGITS], spp_format[SZ_FORMAT+1]
 int	ip, op, stridxs()
 real	x
+int	ix
 
 begin
 	# Encode format string for SPRINTF, format "%w.d".  Start copying
@@ -55,16 +57,27 @@ begin
 	}
 	op = op + 1
 	spp_format[op] = EOS
-	x = rval
-	if (rval > 0)
-	    x = -x
+	if ( fmtchar == 'i' ) {
+	    ix = ival
+	    if (ival > 0)
+		ix = -ix
+	} else {
+	    x = rval
+	    if (rval > 0)
+		x = -x
+	}
 
 	# Now encode the user supplied variable and return it as a spp
 	# string.
 
 	iferr {
-	    call sprintf (outstr, MAX_DIGITS, spp_format)
+	    if ( fmtchar == 'i' ) {
+		call sprintf (outstr, MAX_DIGITS, spp_format)
+		call pargi (ix)
+	    } else {
+		call sprintf (outstr, MAX_DIGITS, spp_format)
 		call pargr (x)
+	    }
 	} then
 	    call erract (EA_FATAL)
 
@@ -73,8 +86,13 @@ begin
 	# a blank.
 
 	op = stridxs ("-", outstr)
-	if (rval > 0 && op > 0) 
-	    outstr[op] = ' '
+	if ( fmtchar == 'i' ) {
+	    if (ival > 0 && op > 0) 
+		outstr[op] = ' '
+	} else {
+	    if (rval > 0 && op > 0) 
+		outstr[op] = ' '
+	}
 
-	call strcpy (outstr, spp_outstr, SZ_LINE)
+	call strcpy (outstr, spp_outstr, nchars)
 end

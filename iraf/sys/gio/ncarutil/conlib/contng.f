@@ -90,10 +90,8 @@ C + NOAO - FTN internal writes rewritten as calls to encode for IRAF
 C
 C         WRITE(IP1C,'(I4)')IP1
 C         WRITE(IP2C,'(I4)')IP2
-          rval = ip1
-          call encode (4, '(I4)', ip1c, rval)
-          rval = ip2
-	  call encode (4, '(I4)', ip2c, rval)
+          call encode (4, '(I4)', ip1c, 0.0, ip1)
+	  call encode (4, '(I4)', ip2c, 0.0, ip2)
 C - NOAO
 C
             CALL SETER (ITEMP,1,1)
