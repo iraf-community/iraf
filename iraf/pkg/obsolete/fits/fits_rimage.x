@@ -20,7 +20,8 @@ real	linemax, linemin, lirafmin, lirafmax
 double	dblank
 
 long	clktime()
-int	fstati(), rft_init_read_pixels(), rft_read_pixels()
+int	fstati(), rft_read_pixels()
+long	rft_init_read_pixels()
 
 errchk	malloc, mfree, rft_init_read_pixels, rft_read_pixels, rft_lscale_pix
 errchk	rft_lchange_pix, rft_rchange_pix, rfit_dchange_pix, rft_put_image_line
@@ -262,7 +263,7 @@ pointer	buf			# Pointer to output image line
 long	v[ARB]			# imio pointer
 int	data_type		# output pixel type
 
-int	impnll(), impnlr(), impnld(), impnlx()
+long	impnll(), impnlr(), impnld(), impnlx()
 errchk	impnll, impnlr, impnld, impnlx
 
 begin

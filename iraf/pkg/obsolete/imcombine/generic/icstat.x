@@ -29,7 +29,7 @@ int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
-int	imgnls()
+long	imgnls()
 short	ic_modes()
 real	asums()
 
@@ -248,7 +248,7 @@ int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
-int	imgnli()
+long	imgnli()
 int	ic_modei()
 real	asumi()
 
@@ -467,7 +467,7 @@ int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
-int	imgnlr()
+long	imgnlr()
 real	ic_moder()
 real	asumr()
 
@@ -684,7 +684,7 @@ int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp
-int	imgnld()
+long	imgnld()
 double	ic_moded()
 double	asumd()
 

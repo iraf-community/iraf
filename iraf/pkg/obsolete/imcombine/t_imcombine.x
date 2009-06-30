@@ -14,7 +14,7 @@ include	"icombine.h"
 
 procedure t_imcombine ()
 
-pointer	sp, input, output, rmask, sigma, plfile, logfile
+pointer	sp, p_input, output, rmask, sigma, plfile, logfile
 pointer	ilist, olist, rlist, slist, plist
 int	n
 
@@ -27,7 +27,7 @@ include	"icombine.com"
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (p_input, SZ_FNAME, TY_CHAR)
 	call salloc (output, SZ_FNAME, TY_CHAR)
 	call salloc (rmask, SZ_FNAME, TY_CHAR)
 	call salloc (plfile, SZ_FNAME, TY_CHAR)
@@ -46,8 +46,8 @@ begin
 	call clgstr ("logfile", Memc[logfile], SZ_FNAME)
 
 	project = clgetb ("project")
-	combine = clgwrd ("combine", Memc[input], SZ_FNAME, COMBINE)
-	reject = clgwrd ("reject", Memc[input], SZ_FNAME, REJECT)
+	combine = clgwrd ("combine", Memc[p_input], SZ_FNAME, COMBINE)
+	reject = clgwrd ("reject", Memc[p_input], SZ_FNAME, REJECT)
 	blank = clgetr ("blank")
 	call clgstr ("gain", Memc[gain], SZ_FNAME)
 	call clgstr ("rdnoise", Memc[rdnoise], SZ_FNAME)
@@ -121,15 +121,15 @@ begin
 	# Loop through image lists.  Note that if not projecting then
 	# the input and rejmask lists will be exhausted by IMCOMBINE.
 
-	while (imtgetim (ilist, Memc[input], SZ_FNAME) != EOF) {
+	while (imtgetim (ilist, Memc[p_input], SZ_FNAME) != EOF) {
 	    if (imtgetim (olist, Memc[output], SZ_FNAME) == EOF) {
 		if (project) {
 		    call eprintf ("IMCOMBINE: No output image for %s\n")
-			call pargstr (Memc[input])
+			call pargstr (Memc[p_input])
 		    next
 		} else {
 		    call eprintf ("IMCOMBINE: No output image\n")
-			call pargstr (Memc[input])
+			call pargstr (Memc[p_input])
 		    break
 		}
 	    }
@@ -140,7 +140,7 @@ begin
 	    if (imtgetim (slist, Memc[sigma], SZ_FNAME) == EOF)
 		Memc[sigma] = EOS
 
-	    iferr (call icombine (ilist, Memc[input], Memc[output],
+	    iferr (call icombine (ilist, Memc[p_input], Memc[output],
 		Memc[rmask], Memc[plfile], Memc[sigma], Memc[logfile], NO))
 		call erract (EA_WARN)
 	}
@@ -159,11 +159,11 @@ end
 # opens the logfile, and sets IMIO parameters.  It attempts to adjust
 # buffer sizes and memory requirements for maximum efficiency.
 
-procedure icombine (list, input, output, rmask, plfile, sigma,
+procedure icombine (list, input_im, output, rmask, plfile, sigma,
 	logfile, stack)
 
 int	list			# List of input images
-char	input[ARB]		# Input image
+char	input_im[ARB]		# Input image
 char	output[ARB]		# Output image
 char	rmask[ARB]		# Rejection mask
 char	plfile[ARB]		# Output pixel list file
@@ -206,16 +206,16 @@ retry_
 
 	    # Stack the input images.
 	    if (stack1 == YES) {
-		call mktemp ("tmp", input, SZ_FNAME)
+		call mktemp ("tmp", input_im, SZ_FNAME)
 		call imtrew (list)
-		call ic_imstack (list, input)
+		call ic_imstack (list, input_im)
 		project = true
 	    }
 
 	    # Open the input image(s).
 	    nimages = 0
 	    if (project) {
-		tmp = immap (input, READ_ONLY, 0); out[1] = tmp
+		tmp = immap (input_im, READ_ONLY, 0); out[1] = tmp
 		if (IM_NDIM(out[1]) == 1)
 		    call error (1, "Can't project one dimensional images")
 		nimages = IM_LEN(out[1],IM_NDIM(out[1]))
@@ -225,8 +225,8 @@ retry_
 		call salloc (in, imtlen(list), TY_POINTER)
 		call amovki (NULL, Memi[in], imtlen(list))
 		call imtrew (list)
-		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
-		    tmp = immap (input, READ_ONLY, 0)
+		while (imtgetim (list, input_im, SZ_FNAME)!=EOF) {
+		    tmp = immap (input_im, READ_ONLY, 0)
 		    Memi[in+nimages] = tmp
 		    nimages = nimages + 1
 		}
@@ -294,10 +294,10 @@ retry_
 		    if (key == NULL)
 			call salloc (key, SZ_FNAME, TY_CHAR)
 		    do i = 1, nimages {
-			j = imtrgetim (list, i, input, SZ_FNAME)
+			j = imtrgetim (list, i, input_im, SZ_FNAME)
 			call sprintf (Memc[key], SZ_FNAME, "mask%04d")
 			    call pargi (i)
-			call imastr (out[4], Memc[key], input)
+			call imastr (out[4], Memc[key], input_im)
 		    }
 		}
 	    } else
@@ -407,13 +407,13 @@ retry_
 		    goto retry_
 		}
 		if (stack1 == YES)
-		    call imdelete (input)
+		    call imdelete (input_im)
 		call fixmem (oldsize)
 		call sfree (sp)
 		call error (err, errstr)
 	    default:
 		if (stack1 == YES)
-		    call imdelete (input)
+		    call imdelete (input_im)
 		call fixmem (oldsize)
 		call sfree (sp)
 		call error (err, errstr)
@@ -442,7 +442,7 @@ retry_
 	if (Memi[in] != NULL)
 	    call imunmap (Memi[in])
 	if (stack1 == YES)
-	    call imdelete (input)
+	    call imdelete (input_im)
 	if (logfd != NULL)
 	    call close (logfd)
 	if (icm != NULL)

@@ -22,7 +22,8 @@ pointer	im, list, ist, buf, hgm
 real	hwidth, hmin, hmax
 
 bool	clgetb()
-int	ist_fields(), ist_isfield, imtgetim(), ist_ihist(), btoi(), imgnlr()
+int	ist_fields(), ist_isfield, imtgetim(), ist_ihist(), btoi()
+long	imgnlr()
 real	clgetr()
 pointer	imtopenp(), immap()
 
@@ -151,7 +152,8 @@ int	max_nfields		# maximum number of fields
 
 int	nfields, flist, field
 pointer	sp, fname
-int	fntopenb(), fntgfnb(), strdic()
+pointer	fntopenb()
+int	fntgfnb(), strdic()
 
 begin
 	nfields = 0

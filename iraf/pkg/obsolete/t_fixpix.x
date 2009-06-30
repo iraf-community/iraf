@@ -121,9 +121,9 @@ begin
 	switch (IM_PIXTYPE (image)) {
 	case TY_SHORT:
 	    call fixlines (image, x1, x2, y1, y2)
-	case TY_INT:
+	case TY_USHORT, TY_INT:
 	    call fixlinei (image, x1, x2, y1, y2)
-	case TY_USHORT, TY_LONG:
+	case TY_LONG:
 	    call fixlinel (image, x1, x2, y1, y2)
 	case TY_REAL:
 	    call fixliner (image, x1, x2, y1, y2)
@@ -157,9 +157,9 @@ begin
 	switch (IM_PIXTYPE (image)) {
 	case TY_SHORT:
 	    call fixcols (image, x1, x2, y1, y2)
-	case TY_INT:
+	case TY_USHORT, TY_INT:
 	    call fixcoli (image, x1, x2, y1, y2)
-	case TY_USHORT, TY_LONG:
+	case TY_LONG:
 	    call fixcoll (image, x1, x2, y1, y2)
 	case TY_REAL:
 	    call fixcolr (image, x1, x2, y1, y2)

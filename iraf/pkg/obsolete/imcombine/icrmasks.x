@@ -14,7 +14,8 @@ int	nimages			#I Number of images
 int	n[npts]			#I Number of good pixels
 int	npts			#I Number of output points per line
 
-int	i, j, k, ndim, impnls()
+int	i, j, k, ndim
+long	impnls()
 long	v1[IM_MAXDIM]
 pointer	buf
 

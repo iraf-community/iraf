@@ -124,7 +124,7 @@ end
 # regardless of the order in which the ranges are given.  Duplicate entries
 # are ignored.  EOF is returned at the end of the list.
 
-int procedure get_next_number (ranges, number)
+long procedure get_next_number (ranges, number)
 
 int	ranges[ARB]		# Range array
 int	number			# Both input and output parameter

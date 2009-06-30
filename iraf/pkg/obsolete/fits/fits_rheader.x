@@ -22,7 +22,8 @@ pointer	im			# IRAF image descriptor
 
 int	i, stat, nread, max_lenuser, fd_usr, ndiscard
 char	card[LEN_CARD+1]
-int	rft_decode_card(), rft_init_read_pixels(), rft_read_pixels(), strmatch()
+int	rft_decode_card(), rft_read_pixels(), strmatch()
+long	rft_init_read_pixels()
 int	stropen()
 errchk	rft_decode_card, rft_init_read_pixels, rft_read_pixels
 errchk	stropen, close

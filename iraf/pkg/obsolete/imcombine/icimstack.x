@@ -13,28 +13,28 @@ char	output		#I Name of output image
 
 int	i, j, npix
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM]
-pointer	sp, input, key, in, out, buf_in, buf_out, ptr
+pointer	sp, p_input, key, in, out, buf_in, buf_out, ptr
 
 int	imtgetim(), imtlen()
-int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
-int	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
+long	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld(), imgnlx()
+long	impnls(), impnli(), impnll(), impnlr(), impnld(), impnlx()
 pointer	immap()
 errchk	immap
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
+	call salloc (p_input, SZ_FNAME, TY_CHAR)
 	call salloc (key, SZ_FNAME, TY_CHAR)
 
 	iferr {
 	    # Add each input image to the output image.
 	    out = NULL
 	    i = 0
-	    while (imtgetim (list, Memc[input], SZ_FNAME) != EOF) {
+	    while (imtgetim (list, Memc[p_input], SZ_FNAME) != EOF) {
 
 		i = i + 1
 		in = NULL
-		ptr = immap (Memc[input], READ_ONLY, 0)
+		ptr = immap (Memc[p_input], READ_ONLY, 0)
 		in = ptr
 
 		# For the first input image map the output image as a copy
@@ -59,7 +59,7 @@ begin
 
 		call sprintf (Memc[key], SZ_FNAME, "stck%04d")
 		    call pargi (i)
-		call imastr (out, Memc[key], Memc[input])
+		call imastr (out, Memc[key], Memc[p_input])
 
 		# Copy the input lines from the image to the next lines of
 		# the output image.  Switch on the output data type to optimize
@@ -73,13 +73,13 @@ begin
 			    call error (0, "Error writing output image")
 			call amovs (Mems[buf_in], Mems[buf_out], npix)
 		    }
-		case TY_INT:
+		case TY_USHORT, TY_INT:
 		    while (imgnli (in, buf_in, line_in) != EOF) {
 			if (impnli (out, buf_out, line_out) == EOF)
 			    call error (0, "Error writing output image")
 			call amovi (Memi[buf_in], Memi[buf_out], npix)
 		    }
-		case TY_USHORT, TY_LONG:
+		case TY_LONG:
 		    while (imgnll (in, buf_in, line_in) != EOF) {
 			if (impnll (out, buf_out, line_out) == EOF)
 			    call error (0, "Error writing output image")

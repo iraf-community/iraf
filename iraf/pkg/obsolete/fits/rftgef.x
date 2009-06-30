@@ -7,7 +7,7 @@ include <mach.h>
 
 # RFT_GETBUF -- Procedure to get the buffer.
 
-int procedure rft_getbuf (fd, buf, sz_rec, bufsize, recptr)
+long procedure rft_getbuf (fd, buf, sz_rec, bufsize, recptr)
 
 int	fd		# file descriptor
 char	buf[ARB]	# buffer to be filled

@@ -13,7 +13,7 @@ update:
 	$call dataio
 	$call images
 	$call lists
-	$call obsolete
+#	$call obsolete
 	$call plot
 	$call proto
 	$call utilities

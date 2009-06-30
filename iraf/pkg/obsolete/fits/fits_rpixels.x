@@ -24,7 +24,7 @@ include <mach.h>
 # In this case the bytes are first swapped into most significant byte first
 # before the MII unpack routine is called.
 
-int procedure rft_init_read_pixels (npix_record, bitpix, lsbf, spp_type)
+long procedure rft_init_read_pixels (npix_record, bitpix, lsbf, spp_type)
 
 int	npix_record	# number of pixels per input record
 int	bitpix		# bits per pixel (must correspond to an MII type)
@@ -33,7 +33,7 @@ int	spp_type	# SPP data type to be returned
 
 # entry rft_read_pixels (fd, buffer, npix)
 
-int	rft_read_pixels
+long	rft_read_pixels
 int	fd		# input file descriptor
 char	buffer[1]	# output buffer
 int	npix		# number of pixels to read
@@ -43,9 +43,10 @@ int	ty_mii, ty_spp, npix_rec, nch_rec, sz_rec, nchars, len_mii, recptr
 int	bufsize, i, n, ip, op
 pointer	mii, spp
 
-int	rft_getbuf(), sizeof()
-size_t	miilen()
-errchk	miilen, mfree, malloc, rft_getbuf, miiupk
+long	rft_getbuf()
+int	sizeof()
+size_t	miipksize()
+errchk	miipksize, mfree, malloc, rft_getbuf, miiupk
 data	mii/NULL/, spp/NULL/
 
 begin
@@ -55,12 +56,12 @@ begin
 	npix_rec = npix_record
 	nch_rec = npix_rec * sizeof (ty_spp)
 
-	len_mii = miilen (npix_rec, ty_mii)
-	sz_rec = len_mii * SZ_INT
+	len_mii = miipksize (npix_rec, ty_mii)
+	sz_rec = len_mii
 
 	if (mii != NULL)
-	    call mfree (mii, TY_INT)
-	call malloc (mii, len_mii, TY_INT)
+	    call mfree (mii, TY_CHAR)
+	call malloc (mii, len_mii, TY_CHAR)
 
 	if (spp != NULL)
 	    call mfree (spp, TY_CHAR)
@@ -79,21 +80,21 @@ entry	rft_read_pixels (fd, buffer, npix, recptr, bufsize)
 	    # If data is exhausted read the next record
 	    if (ip == nch_rec) {
 
-		i = rft_getbuf (fd, Memi[mii], sz_rec, bufsize, recptr)
+		i = rft_getbuf (fd, Memc[mii], sz_rec, bufsize, recptr)
 		if (i == EOF)
 		    return (EOF)
 
 		if (swap == YES)
 		    switch (ty_mii) {
 		    case MII_SHORT:
-			call bswap2 (Memi[mii], 1, Memi[mii], 1,
+			call bswap2 (Memc[mii], 1, Memc[mii], 1,
 				sz_rec * SZB_CHAR)
 		    case MII_LONG:
-			call bswap4 (Memi[mii], 1, Memi[mii], 1,
+			call bswap4 (Memc[mii], 1, Memc[mii], 1,
 				sz_rec * SZB_CHAR)
 		    }
 
-		call miiupk (Memi[mii], Memc[spp], npix_rec, ty_mii, ty_spp)
+		call miiupk (Memc[mii], Memc[spp], npix_rec, ty_mii, ty_spp)
 
 		ip = 0
 		#recptr = recptr + 1

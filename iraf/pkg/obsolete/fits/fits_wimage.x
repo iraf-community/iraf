@@ -17,7 +17,7 @@ int	npix, nlines, npix_record, i, stat, nrecords
 long	v[IM_MAXDIM]
 pointer	tempbuf, buf
 
-int	wft_get_image_line()
+long	wft_get_image_line()
 errchk	malloc, mfree, wft_get_image_line, wft_lscale_line, wft_long_line
 errchk	wft_init_write_pixels, wft_write_pixels, wft_write_last_record
 errchk	wft_rscale_line, wft_dscale_line
@@ -150,7 +150,7 @@ end
 
 # WFT_GET_IMAGE_LINE -- Procedure to fetch the next image line.
 
-int procedure wft_get_image_line (im, buf, v, datatype)
+long procedure wft_get_image_line (im, buf, v, datatype)
 
 pointer	im			# IRAF image descriptor
 pointer	buf			# pointer to image line
@@ -158,7 +158,7 @@ long	v[ARB]			# imio dimension descriptor
 int	datatype		# IRAF image data type
 
 int	npix
-int	imgnll(), imgnlr(), imgnld(), imgnlx()
+long	imgnll(), imgnlr(), imgnld(), imgnlx()
 errchk	imgnll, imgnlr, imgnld, imgnlx
 
 begin

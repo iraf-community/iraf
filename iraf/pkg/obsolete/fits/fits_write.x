@@ -127,7 +127,7 @@ int	npix
 long	v[IM_MAXDIM]
 pointer	buf
 real	maxval, minval
-int	imgnlr()
+long	imgnlr()
 errchk	imgnlr
 
 begin
