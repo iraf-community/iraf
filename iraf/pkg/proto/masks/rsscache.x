@@ -13,7 +13,8 @@ int	nimages			#I the number of images
 pointer	im			#I the current image descriptor
 size_t	old_size		#O the old working set size
 
-int	i, buf_size
+int	i
+long	buf_size, l_val
 size_t	req_size
 int	sizeof(), rs_memstat()
 
@@ -22,8 +23,10 @@ begin
 	do i = 2, IM_NDIM(im)
 	    req_size = req_size * IM_LEN(im,i)
 	req_size = nimages * req_size
-	if (rs_memstat (cache, req_size, old_size) == YES) 
-	    call rs_pcache (im, INDEFI, buf_size)
+	if (rs_memstat (cache, req_size, old_size) == YES) {
+	    l_val = INDEFL
+	    call rs_pcache (im, l_val, buf_size)
+	}
 end
 
 
@@ -35,7 +38,8 @@ int	cache			#I cache the image pixels in the imio buffer
 pointer	im			#I the image descriptor
 size_t	old_size		#O the old working set size
 
-int	i, buf_size
+int	i
+long	buf_size, l_val
 size_t	req_size
 int	sizeof(), rs_memstat()
 
@@ -43,8 +47,10 @@ begin
 	req_size = MEMFUDGE * IM_LEN(im,1) * sizeof (IM_PIXTYPE(im))
 	do i = 2, IM_NDIM(im)
 	    req_size = req_size * IM_LEN(im,i)
-	if (rs_memstat (cache, req_size, old_size) == YES) 
-	    call rs_pcache (im, INDEFI, buf_size)
+	if (rs_memstat (cache, req_size, old_size) == YES) {
+	    l_val = INDEFL
+	    call rs_pcache (im, l_val, buf_size)
+	}
 end
 
 
@@ -92,18 +98,20 @@ end
 procedure rs_pcache (im, req_size, buf_size)
 
 pointer im                      #I the input image point
-int     req_size                #I the requested working set size in chars
-int	buf_size		#O the new image buffer size
+long	req_size                #I the requested working set size in chars
+long	buf_size		#O the new image buffer size
 
-int     i, def_size, new_imbufsize
-int     sizeof(), imstati()
+int	i
+long	def_size, new_imbufsize, l_val
+int	sizeof()
+long	imstatl()
 
 begin
 	# Find the default buffer size.
-	def_size = imstati (im, IM_BUFSIZE)
+	def_size = imstatl (im, IM_BUFSIZE)
 
         # Compute the new required image i/o buffer size in chars.
-        if (IS_INDEFI(req_size)) {
+        if (IS_INDEFL(req_size)) {
             new_imbufsize = IM_LEN(im,1) * sizeof (IM_PIXTYPE(im))
 	    do i = 2, IM_NDIM(im)
 		new_imbufsize = new_imbufsize * IM_LEN(im,i)
@@ -119,8 +127,9 @@ begin
 	}
 
         # Reset the image i/o buffer.
-        call imseti (im, IM_BUFSIZE, new_imbufsize)
-        call imseti (im, IM_BUFFRAC, 0)
+        call imsetl (im, IM_BUFSIZE, new_imbufsize)
+	l_val = 0
+        call imsetl (im, IM_BUFFRAC, l_val)
 	buf_size = new_imbufsize
 end
 

@@ -16,19 +16,19 @@ define	MIS_MODE	Memr[P2R($1+14)]
 define	MIS_STDDEV	Memr[P2R($1+15)]
 define	MIS_SKEW	Memr[P2R($1+16)]
 define	MIS_KURTOSIS	Memr[P2R($1+17)]
-define	MIS_NPIX	Memi[P2I($1+18)]
-define	MIS_SW		Memi[P2I($1+19)]
+define	MIS_NPIX	Memz[P2Z($1+18)]
+define	MIS_SW		Memp[$1+19]
 
 define	LEN_NSWITCHES	8
 
-define	MIS_SKURTOSIS	Memi[P2I($1)]
-define	MIS_SSKEW	Memi[P2I($1+1)]
-define	MIS_SSTDDEV	Memi[P2I($1+2)]
-define	MIS_SMODE	Memi[P2I($1+3)]
-define	MIS_SMEDIAN	Memi[P2I($1+4)]
-define	MIS_SMEAN	Memi[P2I($1+5)]
-define	MIS_SMINMAX	Memi[P2I($1+6)]
-define	MIS_SNPIX	Memi[P2I($1+7)]
+define	MIS_SKURTOSIS	Memi[$1]
+define	MIS_SSKEW	Memi[$1+1]
+define	MIS_SSTDDEV	Memi[$1+2]
+define	MIS_SMODE	Memi[$1+3]
+define	MIS_SMEDIAN	Memi[$1+4]
+define	MIS_SMEAN	Memi[$1+5]
+define	MIS_SMINMAX	Memi[$1+6]
+define	MIS_SNPIX	Memi[$1+7]
 
 define  MIS_FIELDS  "|image|npix|min|max|mean|midpt|mode|stddev|skew|kurtosis|mask|"
 define	MIS_NFIELDS	11

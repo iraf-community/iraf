@@ -11,15 +11,16 @@ include "rskysub.h"
 procedure rs_stats (inlist, imsklist, omsklist, sclist, rs, msk_invert,
 	cache, verbose)
 
-int	inlist			#I the input image list
-int	imsklist		#I the input mask list
-int	omsklist		#I the output mask list
-int	sclist			#I the input scale factors list
+pointer	inlist			#I the input image list
+pointer	imsklist		#I the input mask list
+pointer	omsklist		#I the output mask list
+pointer	sclist			#I the input scale factors list
 pointer	rs			#I the sky subtraction descriptor
 bool	msk_invert		#I invert the pixel masks ?
 bool	cache			#I cache the image i/o buffers ?
 bool	verbose			#I print image statistics ?
 
+size_t	sz_val
 real	fscale
 pointer	sp, image, imaskname, omaskname, masktemp, str
 pointer	im, ims, pmim, pmout
@@ -31,14 +32,16 @@ int	imtgetim(), imtlen(), imtrgetim(), ctor(), ctowrd(), btoi()
 int	fntgfnb(), imaccess()
 bool	strne(), streq()
 errchk	immap()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (imaskname, SZ_FNAME, TY_CHAR)
-	call salloc (omaskname, SZ_FNAME, TY_CHAR)
-	call salloc (masktemp, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (imaskname, sz_val, TY_CHAR)
+	call salloc (omaskname, sz_val, TY_CHAR)
+	call salloc (masktemp, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Loop over the input images and compute the scale factors.
 	# At some point we might combine this with the later running
@@ -49,7 +52,7 @@ begin
 
 	    # Open the input image. This image is opened READ_WRITE
 	    # so some header information can be added ...
-	    iferr (im = immap (Memc[image], READ_WRITE, 0)) {
+	    iferr (im = immap (Memc[image], READ_WRITE, NULLPTR)) {
 		call printf ("Error opening image %s ...\n")
 		    call pargstr (Memc[image])
 		next
@@ -63,7 +66,7 @@ begin
 	    if (streq (RS_ISCALES(rs), "median") && RS_STATSEC(rs) != EOS) {
 	        call imgimage (Memc[image], Memc[str], SZ_FNAME)
 		call strcat (RS_STATSEC(rs), Memc[str], SZ_FNAME)
-	        iferr (ims = immap (Memc[str], READ_ONLY, 0)) {
+	        iferr (ims = immap (Memc[str], READ_ONLY, NULLPTR)) {
 		    call imunmap (im)
 		    call printf ("Error opening image %s ...\n")
 		        call pargstr (Memc[image])
@@ -119,7 +122,7 @@ begin
 		        else
                             call xt_mkimtemp (Memc[imaskname], Memc[omaskname],
 			        Memc[masktemp], SZ_FNAME)
-                        pmout = im_pmmap (Memc[omaskname], NEW_IMAGE, 0)
+                        pmout = im_pmmap (Memc[omaskname], NEW_IMAGE, NULLPTR)
 			call mp_mpcopy (im, pmim, pmout)
                     }
                 } else {
@@ -254,17 +257,23 @@ pointer	pmout			#I the output mask image descriptor
 pointer	rs			#I the sky subtraction pointer
 real	fscale			#O the scaling factor
 
+size_t	sz_val
+long	l_val
 real	low, up, hmin, hmax, hwidth
 pointer	sp, vs, ve, mst, pm, mp, buf, hgm, smsk
-int	i, mval, npts, npix, nbins, nbad
+int	i, mval
+size_t	npts, npix, nbins
+long	nbad
 
 pointer	mp_miopen(), imstatp()
-int	mio_glsegr(), mst_ihist(), rs_umask()
+int	mst_ihist()
+long	mio_glsegr(), rs_umask()
 
 begin
 	call smark (sp)
-	call salloc (vs, IM_MAXDIM, TY_LONG)
-	call salloc (ve, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (vs, sz_val, TY_LONG)
+	call salloc (ve, sz_val, TY_LONG)
 
 	# Allocate space for statistics structure.
 	call mst_allocate (mst)
@@ -284,8 +293,11 @@ begin
 	do i = 0 , RS_MAXITER(rs) {
 
 	    # Set up the mask i/o boundaries.
-            call amovkl (long(1), Meml[vs], IM_NDIM(ims))
-            call amovl (IM_LEN(ims,1), Meml[ve], IM_NDIM(ims))
+            l_val = 1
+            sz_val = IM_NDIM(ims)
+            call amovkl (l_val, Meml[vs], sz_val)
+            sz_val = IM_NDIM(ims)
+            call amovl (IM_LEN(ims,1), Meml[ve], sz_val)
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(ims))
 
 	    # Initialize the statistics computation.
@@ -328,8 +340,11 @@ begin
         if (mst_ihist (mst, RS_BINWIDTH(rs), hgm, nbins, hwidth, hmin,
 	    hmax) == YES) {
             call aclri (Memi[hgm], nbins)
-            call amovkl (long(1), Meml[vs], IM_NDIM(ims))
-            call amovl (IM_LEN(ims,1), Meml[ve], IM_NDIM(ims))
+            l_val = 1
+            sz_val = IM_NDIM(ims)
+            call amovkl (l_val, Meml[vs], sz_val)
+            sz_val = IM_NDIM(ims)
+            call amovl (IM_LEN(ims,1), Meml[ve], sz_val)
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(ims))
             while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF)
                 call ahgmr (Memr[buf], npts, Memi[hgm], nbins, hmin, hmax)
@@ -342,9 +357,13 @@ begin
 	fscale = MIS_MEDIAN(mst)
 
 	if (pmout != NULL) {
-            call malloc (smsk, IM_LEN(im,1), TY_SHORT)
-            call amovkl (long(1), Meml[vs], IM_NDIM(im))
-            call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
+	    sz_val = IM_LEN(im,1)
+            call malloc (smsk, sz_val, TY_SHORT)
+            l_val = 1
+            sz_val = IM_NDIM(im)
+            call amovkl (l_val, Meml[vs], sz_val)
+            sz_val = IM_NDIM(im)
+            call amovl (IM_LEN(im,1), Meml[ve], sz_val)
             call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
             pm = imstatp (pmout, IM_PMDES)
             while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF) {
@@ -374,15 +393,19 @@ pointer	im			#I the input image descriptor
 pointer rs			#I the sky subtraction descriptor
 real	fscale			#I the computed scaling factor
 
-
+size_t	sz_val
+long	l_val
 real	low, up, hmin, hmax, hwidth
 pointer	sp, v, mst, buf, hgm
-int	i, npts, npix, nbins
-int	imgnlr(), mst_ihist()
+int	i
+size_t	npts, npix, nbins
+long	imgnlr()
+int	mst_ihist()
 
 begin
 	call smark (sp)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
 
 	# Allocate space for statistics structure.
 	call mst_allocate (mst)
@@ -403,7 +426,9 @@ begin
 
 	    # Accumulate the statistics.
 	    npts = IM_LEN(im,1)
-            call amovkl (long(1), Meml[v], IM_NDIM(im))
+            l_val = 1
+            sz_val = IM_NDIM(im)
+            call amovkl (l_val, Meml[v], sz_val)
             while (imgnlr (im, buf, Meml[v]) != EOF)
                 call mst_accumulate2 (mst, Memr[buf], npts, low, up, YES)
 
@@ -438,7 +463,9 @@ begin
         if (mst_ihist (mst, RS_BINWIDTH(rs), hgm, nbins, hwidth, hmin,
 	    hmax) == YES) {
             call aclri (Memi[hgm], nbins)
-            call amovkl (long(1), Meml[v], IM_NDIM(im))
+            l_val = 1
+            sz_val = IM_NDIM(im)
+            call amovkl (l_val, Meml[v], sz_val)
             while (imgnlr (im, buf, Meml[v]) != EOF)
                 call ahgmr (Memr[buf], npts, Memi[hgm], nbins, hmin, hmax)
             call mst_hmedian (mst, Memi[hgm], nbins, hwidth, hmin, hmax)
@@ -456,16 +483,16 @@ end
 
 # RS_UMASK -- Update the mask.
 
-int procedure rs_umask (pix, msk, npts, lower, upper)
+long procedure rs_umask (pix, msk, npts, lower, upper)
 
 real    pix[ARB]                #I array of image pixels
 short   msk[ARB]                #O array of mask pixels, set to 1 and 0
-int     npts                    #I the number of pixels
+size_t	npts                    #I the number of pixels
 real    lower                   #I the lower good data limit
 real    upper                   #I the upper good data limit
 
 real    lo, up
-int     i, nbad
+long	i, nbad
 
 begin
         if (IS_INDEFR(lower) && IS_INDEFR(upper))

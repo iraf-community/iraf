@@ -8,9 +8,13 @@ procedure mst_allocate (mst)
 
 pointer	mst		#O the statistics descriptor
 
+size_t	sz_val
+
 begin
-    	call calloc (mst, LEN_MIMSTAT, TY_STRUCT)
-	call malloc (MIS_SW(mst), LEN_NSWITCHES, TY_INT)
+	sz_val = LEN_MIMSTAT
+    	call calloc (mst, sz_val, TY_STRUCT)
+	sz_val = LEN_NSWITCHES
+	call malloc (MIS_SW(mst), sz_val, TY_INT)
 end
 
 
@@ -32,18 +36,21 @@ end
 int procedure mst_fields (fieldstr, fields, max_nfields)
 
 char    fieldstr[ARB]           #I string containing the list of fields
-int     fields[ARB]             #O fields array
-int     max_nfields             #I maximum number of fields
+int	fields[ARB]             #O fields array
+int	max_nfields             #I maximum number of fields
 
-int     nfields, flist, field
-pointer sp, fname
-int     fntopenb(), fntgfnb(), strdic()
+size_t	sz_val
+int	nfields, field
+pointer sp, fname, flist
+pointer	fntopenb()
+int	fntgfnb(), strdic()
 
 begin
         nfields = 0
 
         call smark (sp)
-        call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+        call salloc (fname, sz_val, TY_CHAR)
 
         flist = fntopenb (fieldstr, NO)
         while (fntgfnb (flist, Memc[fname], SZ_FNAME) != EOF &&
@@ -67,17 +74,19 @@ end
 procedure mst_switches (mst, fields, nfields, nclip)
 
 pointer	mst			#I the statistics pointer
-int     fields[ARB]             #I fields array
-int     nfields                 #I maximum number of fields
+int	fields[ARB]             #I fields array
+int	nfields                 #I maximum number of fields
 int	nclip			#I the number of clipping iterations
 
+size_t	sz_val
 pointer	sw
 int	mst_isfield()
 
 begin
 	# Initialize.
 	sw = MIS_SW(mst)
-	call amovki (NO, Memi[sw], LEN_NSWITCHES)
+	sz_val = LEN_NSWITCHES
+	call amovki (NO, Memi[sw], sz_val)
 
         # Set the computation switches.
         MIS_SNPIX(sw) = mst_isfield (MIS_FNPIX, fields, nfields)
@@ -107,10 +116,10 @@ end
 
 procedure mst_pheader (fields, nfields)
 
-int     fields[ARB]             # fields to be printed
-int     nfields                 # number of fields
+int	fields[ARB]             # fields to be printed
+int	nfields                 # number of fields
 
-int     i
+int	i
 
 begin
         call printf ("#")
@@ -162,11 +171,11 @@ end
 
 int procedure mst_isfield (field, fields, nfields)
 
-int     field           #I field to be tested
-int     fields[ARB]     #I array of selected fields
-int     nfields         #I number of fields
+int	field           #I field to be tested
+int	fields[ARB]     #I array of selected fields
+int	nfields         #I number of fields
 
-int     i, isfield
+int	i, isfield
 
 begin
         isfield = NO
@@ -223,14 +232,14 @@ procedure mst_accumulate4 (mst, x, npts, lower, upper, minmax)
 
 pointer mst             #I pointer to the statistics structure
 real    x[ARB]          #I the data array
-int     npts            #I the number of data points
+size_t	npts            #I the number of data points
 real    lower           #I lower data boundary
 real    upper           #I upper data boundary
-int     minmax          #I compute the minimum and maximum ?
+int	minmax          #I compute the minimum and maximum ?
 
 double  xx, xx2, sumx, sumx2, sumx3, sumx4
 real    lo, hi, xmin, xmax
-int     i, npix
+long	i, npix
 
 begin
         lo = MIS_LO(mst)
@@ -317,14 +326,14 @@ procedure mst_accumulate3 (mst, x, npts, lower, upper, minmax)
 
 pointer mst             #I pointer to the statistics structure
 real    x[ARB]          #I the data array
-int     npts            #I the number of data points
+size_t	npts            #I the number of data points
 real    lower           #I lower data boundary
 real    upper           #I upper data boundary
-int     minmax          #I compute the minimum and maximum ?
+int	minmax          #I compute the minimum and maximum ?
 
 double  xx, xx2, sumx, sumx2, sumx3
 real    lo, hi, xmin, xmax
-int     i, npix
+long	i, npix
 
 begin
         lo = MIS_LO(mst)
@@ -405,14 +414,14 @@ procedure mst_accumulate2 (mst, x, npts, lower, upper, minmax)
 
 pointer mst             #I pointer to the statistics structure
 real    x[ARB]          #I the data array
-int     npts            #I the number of data points
+size_t	npts            #I the number of data points
 real    lower           #I lower data boundary
 real    upper           #I upper data boundary
-int     minmax          #I compute the minimum and maximum ?
+int	minmax          #I compute the minimum and maximum ?
 
 double  xx, sumx, sumx2
 real    lo, hi, xmin, xmax
-int     i, npix
+long	i, npix
 
 begin
         lo = MIS_LO(mst)
@@ -483,14 +492,14 @@ procedure mst_accumulate1 (mst, x, npts, lower, upper, minmax)
 
 pointer mst             #I pointer to the statistics structure
 real    x[ARB]          #I the data array
-int     npts            #I the number of data points
+size_t	npts            #I the number of data points
 real    lower           #I lower data boundary
 real    upper           #I upper data boundary
-int     minmax          #I compute the minimum and maximum ?
+int	minmax          #I compute the minimum and maximum ?
 
 double  sumx
 real    lo, hi, xx, xmin, xmax
-int     i, npix
+long	i, npix
 
 begin
         lo = MIS_LO(mst)
@@ -553,12 +562,12 @@ procedure mst_accumulate0 (mst, x, npts, lower, upper, minmax)
 
 pointer mst             #I pointer to the statistics structure
 real    x[ARB]          #I the data array
-int     npts            #I the number of data points
+size_t	npts            #I the number of data points
 real    lower           #I lower data boundary
 real    upper           #I upper data boundary
-int     minmax          #I compute the minimum and maximum ?
+int	minmax          #I compute the minimum and maximum ?
 
-int     i, npix
+long	i, npix
 real    lo, hi, xx, xmin, xmax
 
 begin
@@ -668,7 +677,7 @@ int procedure mst_ihist (mst, binwidth, hgm, nbins, hwidth, hmin, hmax)
 pointer mst             #I pointer to the statistics structure
 real    binwidth        #I histogram bin width in sigma
 pointer hgm             #O pointer to the histogram
-int     nbins           #O number of bins
+size_t	nbins           #O number of bins
 real    hwidth          #O histogram resolution
 real    hmin            #O minimum histogram value
 real    hmax            #O maximum histogram value
@@ -700,15 +709,15 @@ end
 procedure mst_hmedian (mst, hgm, nbins, hwidth, hmin, hmax)
 
 pointer mst             #I pointer to the statistics structure
-int     hgm[ARB]        #I histogram of the pixels
-int     nbins           #I number of bins in the histogram
+int	hgm[ARB]        #I histogram of the pixels
+size_t	nbins           #I number of bins in the histogram
 real    hwidth          #I resolution of the histogram
 real    hmin            #I minimum histogram value
 real    hmax            #I maximum histogram value
 
 real    h1, hdiff, hnorm
 pointer sp, ihgm
-int     i, lo, hi
+long	i, lo, hi
 
 bool    fp_equalr()
 
@@ -757,13 +766,13 @@ end
 procedure mst_hmode (mst, hgm, nbins, hwidth, hmin, hmax)
 
 pointer mst             #I pointer to the statistics strucuture
-int     hgm[ARB]        #I histogram of the pixels
-int     nbins           #I number of bins in the histogram
+int	hgm[ARB]        #I histogram of the pixels
+size_t	nbins           #I number of bins in the histogram
 real    hwidth          #I resolution of the histogram
 real    hmin            #I minimum histogram value
 real    hmax            #I maximum histogram value
 
-int     i, bpeak
+long	i, bpeak
 real    hpeak, dh1, dh2, denom
 bool    fp_equalr()
 
@@ -835,10 +844,10 @@ procedure mst_print (image, mask, mst, fields, nfields)
 char    image[ARB]              #I image name
 char    mask[ARB]               #I mask name
 pointer mst                     #I pointer to the statistics structure
-int     fields[ARB]             #I fields to be printed
-int     nfields                 #I number of fields
+int	fields[ARB]             #I fields to be printed
+int	nfields                 #I number of fields
 
-int     i
+int	i
 
 begin
         call printf (" ")
@@ -852,7 +861,7 @@ begin
                     call pargstr (mask)
             case MIS_FNPIX:
                 call printf (MIS_FINTEGER)
-                    call pargi (MIS_NPIX(mst))
+                    call pargz (MIS_NPIX(mst))
             case MIS_FMIN:
                 call printf (MIS_FREAL)
                     call pargr (MIS_MIN(mst))
@@ -892,10 +901,10 @@ procedure mst_fprint (image, mask, mst, fields, nfields)
 char    image[ARB]              #I image name
 char    mask[ARB]               #I mask name
 pointer mst                     #I pointer to the statistics structure
-int     fields[ARB]             #I fields to be printed
-int     nfields                 #I number of fields
+int	fields[ARB]             #I fields to be printed
+int	nfields                 #I number of fields
 
-int     i
+int	i
 
 begin
         do i = 1, nfields {
@@ -908,7 +917,7 @@ begin
                     call pargstr (mask)
             case MIS_FNPIX:
                 call printf ("%d")
-                    call pargi (MIS_NPIX(mst))
+                    call pargz (MIS_NPIX(mst))
             case MIS_FMIN:
                 call printf ("%g")
                     call pargr (MIS_MIN(mst))

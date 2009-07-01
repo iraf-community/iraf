@@ -6,12 +6,13 @@ include "rskysub.h"
 
 procedure rs_msub (inlist, outlist, rs, cache, verbose)
 
-int	inlist			#I the input image list
-int	outlist			#I the output image list
+pointer	inlist			#I the input image list
+pointer	outlist			#I the output image list
 pointer	rs			#I the sky subtraction descriptor
 bool	cache			#I cache temp image buffer in memory ?
 bool	verbose			#I print task statistics
 
+size_t	sz_val
 real	fscale
 pointer	sp, image, outimage, tmpimage, str
 pointer	im, outim, tmpim
@@ -21,13 +22,15 @@ size_t	oldsize, bufsize
 pointer	immap()
 int	imtlen(), imtrgetim(), btoi(), imaccess()
 errchk	immap()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (outimage, SZ_FNAME, TY_CHAR)
-	call salloc (tmpimage, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (outimage, sz_val, TY_CHAR)
+	call salloc (tmpimage, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Check image status. If resubtract is yes then delete the output
 	# images if they already exist. Otherwise determine whether the
@@ -48,7 +51,7 @@ begin
 		    } else
 			last = i
 		} else {
-		    outim = immap (Memc[outimage], READ_ONLY, 0)
+		    outim = immap (Memc[outimage], READ_ONLY, NULLPTR)
 		    iferr (call imgstr (outim, RS_KYSKYSUB(rs), Memc[str],
 		        SZ_FNAME)) {
 			if (first == 0) {
@@ -83,7 +86,7 @@ begin
 
 	# Create the temporary image.
 	call mktemp ("_rsum", Memc[tmpimage], SZ_FNAME)
-	tmpim = immap (Memc[tmpimage], NEW_IMAGE, 0)
+	tmpim = immap (Memc[tmpimage], NEW_IMAGE, NULLPTR)
 
 	# Compute the sliding mean parameters.
 	nlo = RS_NCOMBINE(rs) / 2
@@ -135,7 +138,7 @@ begin
 	        call eprintf ("Error reading input image list\n")
 		break
 	    }
-	    iferr (im = immap (Memc[image], READ_ONLY, 0)) {
+	    iferr (im = immap (Memc[image], READ_ONLY, NULLPTR)) {
 	        call eprintf ("Error opening input image %s\n")
 		    call pargstr (Memc[image])
 		break
@@ -168,7 +171,8 @@ begin
 
 	    if (imno == first) {
 		IM_NDIM(tmpim) = IM_NDIM(im)
-		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), sz_val)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), 1, tmpim, oldsize)
 		call rs_minit (inlist, tmpim, start, finish, RS_KYFSCALE(rs))
@@ -216,12 +220,13 @@ end
 
 procedure rs_rrmsub (inlist, outlist, rs, cache, verbose)
 
-int	inlist			#I the input image list
-int	outlist			#I the output image list
+pointer	inlist			#I the input image list
+pointer	outlist			#I the output image list
 pointer	rs			#I the sky subtraction descriptor
 bool	cache			#I cache temp image buffer in memory ?
 bool	verbose			#I print task statistics
 
+size_t	sz_val
 real	fscale
 pointer	sp, image, outimage, tmpimage, imptrs, imids, str
 pointer	im, tmpim, outim
@@ -231,15 +236,19 @@ size_t	oldsize, bufsize
 pointer	immap()
 int	imtlen(), imtrgetim(), btoi(), imaccess()
 errchk	immap(), imgstr()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (outimage, SZ_FNAME, TY_CHAR)
-	call salloc (tmpimage, SZ_FNAME, TY_CHAR)
-	call salloc (imptrs, RS_NCOMBINE(rs) + 1, TY_POINTER)
-	call salloc (imids, RS_NCOMBINE(rs) + 1, TY_INT)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (outimage, sz_val, TY_CHAR)
+	call salloc (tmpimage, sz_val, TY_CHAR)
+	sz_val = RS_NCOMBINE(rs) + 1
+	call salloc (imptrs, sz_val, TY_POINTER)
+	call salloc (imids, sz_val, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Check image status. If resubtract is yes then delete the output
 	# images if they already exist. Otherwise determine whether the
@@ -260,7 +269,7 @@ begin
 		    } else
 			last = i
 		} else {
-		    outim = immap (Memc[outimage], READ_ONLY, 0)
+		    outim = immap (Memc[outimage], READ_ONLY, NULLPTR)
 		    iferr (call imgstr (outim, RS_KYSKYSUB(rs), Memc[str],
 		        SZ_FNAME)) {
 			if (first == 0) {
@@ -295,7 +304,7 @@ begin
 
 	# Create the temporary image.
 	call mktemp ("_rsum", Memc[tmpimage], SZ_FNAME)
-	tmpim = immap (Memc[tmpimage], NEW_IMAGE, 0)
+	tmpim = immap (Memc[tmpimage], NEW_IMAGE, NULLPTR)
 
 	# Compute the sliding mean parameters.
 	nlo = RS_NCOMBINE(rs) / 2
@@ -367,7 +376,8 @@ begin
 		call rs_iptrs (inlist, Memp[imptrs], Memi[imids], start,
 		    finish, cache, oldsize)
 		IM_NDIM(tmpim) = IM_NDIM(Memp[imptrs])
-		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpim,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(Memp[imptrs],1), IM_LEN(tmpim,1), sz_val)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), finish - start + 2, tmpim,
 		    bufsize)
@@ -440,12 +450,13 @@ end
 
 procedure rs_rmsub (inlist, outlist, rs, cache, verbose)
 
-int	inlist			#I the input image list
-int	outlist			#I the output image list
+pointer	inlist			#I the input image list
+pointer	outlist			#I the output image list
 pointer	rs			#I the sky subtraction descriptor
 bool	cache			#I cache temp image buffer in memory ?
 bool	verbose			#I print task statistics
 
+size_t	sz_val
 real	fscale
 pointer	sp, image, outimage, tmpimage, str
 pointer	im, outim, tmpim
@@ -455,13 +466,15 @@ size_t	oldsize, newsize
 pointer	immap()
 int	imtlen(), imtrgetim(), btoi(), imaccess()
 errchk	immap()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (outimage, SZ_FNAME, TY_CHAR)
-	call salloc (tmpimage, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (outimage, sz_val, TY_CHAR)
+	call salloc (tmpimage, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Check image status. If resubtract is yes then delete the output
 	# images if they already exist. Otherwise determine whether the
@@ -482,7 +495,7 @@ begin
 		    } else
 			last = i
 		} else {
-		    outim = immap (Memc[outimage], READ_ONLY, 0)
+		    outim = immap (Memc[outimage], READ_ONLY, NULLPTR)
 		    iferr (call imgstr (outim, RS_KYSKYSUB(rs), Memc[str],
 		        SZ_FNAME)) {
 			if (first == 0) {
@@ -517,7 +530,7 @@ begin
 
 	# Create the temporary image.
 	call mktemp ("_rsum", Memc[tmpimage], SZ_FNAME)
-	tmpim = immap (Memc[tmpimage], NEW_IMAGE, 0)
+	tmpim = immap (Memc[tmpimage], NEW_IMAGE, NULLPTR)
 
 	# Compute the sliding mean parameters.
 	nlo = RS_NCOMBINE(rs) / 2
@@ -569,7 +582,7 @@ begin
 	        call eprintf ("Error reading input image list\n")
 		break
 	    }
-	    iferr (im = immap (Memc[image], READ_ONLY, 0)) {
+	    iferr (im = immap (Memc[image], READ_ONLY, NULLPTR)) {
 	        call eprintf ("Error opening input image %s\n")
 		    call pargstr (Memc[image])
 		break
@@ -599,7 +612,8 @@ begin
 	    # Set the size of the temporary image. 
 	    if (imno == first) {
 		IM_NDIM(tmpim) = IM_NDIM(im)
-		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (IM_LEN(im,1), IM_LEN(tmpim,1), sz_val)
 		IM_PIXTYPE(tmpim) = TY_REAL
 		call rs_cachen (btoi(cache), 1, tmpim, oldsize)
 	    }
@@ -645,28 +659,37 @@ end
 
 procedure rs_minit (inlist, tmpim, start, finish, skyscale)
 
-int	inlist			#I the input image list
+pointer	inlist			#I the input image list
 pointer	tmpim			#I the output storage image
 int	start			#I the starting image in the list
 int	finish			#I the ending image in the list
 #real	normsum			#U the normalization accumulator 
+long	l_val
+size_t	sz_val
 char	skyscale[ARB]		#I the scaling factor keyword 
 
 pointer	sp, image, imptrs, imnorm, vin, vout, obuf, ibuf
-int	i, j, nin, npix
+int	i, j, nin
+size_t	npix
 real	imgetr()
 pointer	immap()
-int	imtrgetim(), impnlr(), imgnlr()
+int	imtrgetim()
+long	impnlr(), imgnlr()
 errchk	imgetr()
+include	<nullptr.inc>
 
 begin
 	nin = finish - start + 1
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR) 
-	call salloc (imptrs, nin, TY_POINTER) 
-	call salloc (imnorm, nin, TY_REAL) 
-	call salloc (vout, IM_MAXDIM, TY_LONG) 
-	call salloc (vin, nin * IM_MAXDIM, TY_LONG) 
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR) 
+	sz_val = nin
+	call salloc (imptrs, sz_val, TY_POINTER) 
+	call salloc (imnorm, sz_val, TY_REAL) 
+	sz_val = IM_MAXDIM
+	call salloc (vout, sz_val, TY_LONG) 
+	sz_val = nin * IM_MAXDIM
+	call salloc (vin, sz_val, TY_LONG) 
 
 	# Open the input images
 	j = 1
@@ -674,7 +697,7 @@ begin
 	do i = start, finish {
 	    if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) == EOF)
 		;
-	    Memp[imptrs+j-1] = immap (Memc[image], READ_ONLY, 0)
+	    Memp[imptrs+j-1] = immap (Memc[image], READ_ONLY, NULLPTR)
 	    iferr (Memr[imnorm+j-1] = imgetr (Memp[imptrs+j-1], skyscale))
 		Memr[imnorm+j-1] = 1.0
 		#normsum = normsum + 1.0
@@ -683,8 +706,11 @@ begin
 	    j = j + 1
 	}
 
-	call amovkl (long(1), Meml[vin], IM_MAXDIM * nin)
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM * nin
+	call amovkl (l_val, Meml[vin], sz_val)
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vout], sz_val)
 	npix = IM_LEN(tmpim,1)
 	while (impnlr (tmpim, obuf, Meml[vout]) != EOF) {
 	    call amovkr (0.0, Memr[obuf], npix)
@@ -717,23 +743,28 @@ int	nin			#I the number of images
 real	fscale			#I the scaling factor
 
 
+long	l_val
+size_t	sz_val
 real	norm1, normf, rmin, rmax
 pointer	sp, vin, vout, vtmp, obuf, ibuf, tbuf
-int	i, npix	
+long	i, npix	
 real	imgetr()
-int	impnlr(), imgnlr()
+long	impnlr(), imgnlr()
 errchk	imgetr()
 
 begin
 
 	call smark (sp)
-	call salloc (vin, IM_MAXDIM, TY_LONG)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
-	call salloc (vtmp, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (vin, sz_val, TY_LONG)
+	call salloc (vout, sz_val, TY_LONG)
+	call salloc (vtmp, sz_val, TY_LONG)
 
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vout], sz_val)
+	call amovkl (l_val, Meml[vin], sz_val)
+	call amovkl (l_val, Meml[vtmp], sz_val)
 
 	iferr (norm1 = imgetr (im, RS_KYFSCALE(rs)))
 	    norm1 = 1.0
@@ -780,19 +811,23 @@ real	fscale			#I the normalization factor
 char	skyscale[ARB]		#I the sky scaling keyword
 char	skysub[ARB]		#I the sky subtraction keyword
 
+long	l_val
+size_t	sz_val
 real	norm1, normf
 pointer	sp, vin, vout, vtmp, str, obuf, ibuf, tbuf
-int	i, npix
+long	i, npix
 real	imgetr()
-int	impnlr(), imgnlr()
+long	impnlr(), imgnlr()
 errchk	imgetr()
 
 begin
 	call smark (sp)
-	call salloc (vin, IM_MAXDIM, TY_LONG)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
-	call salloc (vtmp, IM_MAXDIM, TY_LONG)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (vin, sz_val, TY_LONG)
+	call salloc (vout, sz_val, TY_LONG)
+	call salloc (vtmp, sz_val, TY_LONG)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Write a sky subtraction flag to the output image.
 	call sprintf (Memc[str], SZ_FNAME,
@@ -806,9 +841,11 @@ begin
 	normf = fscale / (nin - 1)
 	norm1 = 1.0 + normf * norm1
 
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vout], sz_val)
+	call amovkl (l_val, Meml[vin], sz_val)
+	call amovkl (l_val, Meml[vtmp], sz_val)
 	npix = IM_LEN(im,1)
 	while (impnlr (outim, obuf, Meml[vout]) != EOF && imgnlr (im, ibuf,
 	    Meml[vin]) != EOF && imgnlr (tmpim, tbuf, Meml[vtmp]) != EOF) {
@@ -825,22 +862,27 @@ end
 
 procedure rs_maddsub (inlist, tmpim, start, finish, ostart, ofinish, skyscale)
 
-int	inlist			#I the input image list
+pointer	inlist			#I the input image list
 pointer	tmpim			#I the storage image descriptor
 int	start			#I the current starting image
 int	finish			#I the current ending image
 int	ostart			#I the previous starting image
 int	ofinish			#I the previous ending image
 #real	normsum			#I the norm factor accumulator
+long	l_val
+size_t	sz_val
 char	skyscale		#I the sky scaling keyword
 
 pointer	sp, image, vin, vsub, vadd, vout, imsub, imadd, norma, norms
 pointer	ibuf, obuf, sbuf, abuf
-int	i, j, nsub, nadd, npix, doadd, dosub
+int	i, j, nsub, nadd, doadd, dosub
+size_t	npix
 real	imgetr()
 pointer	immap()
-int	imtrgetim(), impnlr(), imgnlr()
+int	imtrgetim()
+long	impnlr(), imgnlr()
 errchk	imgetr()
+include	<nullptr.inc>
 
 begin
 	if (start == ostart && finish == ofinish)
@@ -849,15 +891,22 @@ begin
 	nadd = finish - ofinish
 
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (vin, IM_MAXDIM, TY_LONG)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
-	call salloc (imsub, nsub, TY_POINTER)
-	call salloc (norms, nsub, TY_REAL)
-	call salloc (vsub, nsub * IM_MAXDIM, TY_LONG)
-	call salloc (imadd, nadd, TY_POINTER)
-	call salloc (vadd, nadd * IM_MAXDIM, TY_LONG)
-	call salloc (norma, nadd, TY_REAL)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (vin, sz_val, TY_LONG)
+	call salloc (vout, sz_val, TY_LONG)
+	sz_val = nsub
+	call salloc (imsub, sz_val, TY_POINTER)
+	call salloc (norms, sz_val, TY_REAL)
+	sz_val = nsub * IM_MAXDIM
+	call salloc (vsub, sz_val, TY_LONG)
+	sz_val = nadd
+	call salloc (imadd, sz_val, TY_POINTER)
+	sz_val = nadd * IM_MAXDIM
+	call salloc (vadd, sz_val, TY_LONG)
+	sz_val = nadd
+	call salloc (norma, sz_val, TY_REAL)
 
 	# Open the images to be subtracted. In most cases there will be
 	# one such image.
@@ -866,7 +915,7 @@ begin
 	    j = 1
 	    do i = ostart, start - 1 {
 	        if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) != EOF) {
-	    	    Memp[imsub+j-1] = immap (Memc[image], READ_ONLY, 0)
+	    	    Memp[imsub+j-1] = immap (Memc[image], READ_ONLY, NULLPTR)
 	    	    iferr (Memr[norms+j-1] = imgetr (Memp[imsub+j-1], skyscale))
 			Memr[norms+j-1] = 1.0
 	    	    #normsum = normsum - Memr[norms+j-1]
@@ -883,7 +932,7 @@ begin
 	    j = 1
 	    do i = ofinish + 1, finish {
 	        if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) != EOF) {
-	            Memp[imadd+j-1] = immap (Memc[image], READ_ONLY, 0)
+	            Memp[imadd+j-1] = immap (Memc[image], READ_ONLY, NULLPTR)
 	            iferr (Memr[norma+j-1] = imgetr (Memp[imadd+j-1], skyscale))
 			Memr[norma+j-1] = 1.0
 	            #normsum = normsum + Memr[norma+j-1]
@@ -894,10 +943,15 @@ begin
 	    doadd = NO
 
 	# Make the vector operators in-line code later if necessary.
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
-	call amovkl (long(1), Meml[vsub], nsub * IM_MAXDIM)
-	call amovkl (long(1), Meml[vadd], nadd * IM_MAXDIM)
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vin], sz_val)
+	sz_val = nsub * IM_MAXDIM
+	call amovkl (l_val, Meml[vsub], sz_val)
+	sz_val = nadd * IM_MAXDIM
+	call amovkl (l_val, Meml[vadd], sz_val)
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vout], sz_val)
 	npix = IM_LEN(tmpim,1)
 	while (impnlr (tmpim, obuf, Meml[vout]) != EOF &&
 	    imgnlr (tmpim, ibuf, Meml[vin]) != EOF) {
@@ -970,7 +1024,7 @@ end
 
 procedure rs_iptrs (inlist, imptrs, imids, start, finish, cache, oldsize)
 
-int	inlist				#I the input image list
+pointer	inlist				#I the input image list
 pointer	imptrs[ARB]			#O the input image pointers
 int	imids[ARB]			#O the input image ids
 int	start				#I the starting image in the series
@@ -978,21 +1032,24 @@ int	finish				#I the ending image in the serious
 bool	cache				#I cache the image in memory ?
 size_t	oldsize				#O the original working set size
 
+size_t	sz_val
 pointer	sp, image
 int	n, i
 size_t	bufsize
 pointer	immap()
 int	imtrgetim(), btoi()
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
 
 	n = 1
 	do i = start, finish {
 	    if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) != EOF) {
 		imids[n] = i
-		imptrs[n] = immap (Memc[image], READ_ONLY, 0)
+		imptrs[n] = immap (Memc[image], READ_ONLY, NULLPTR)
 		call rs_cachen (btoi(cache), n, imptrs[n], bufsize)
 		if (n == 1)
 		    oldsize = bufsize
@@ -1010,7 +1067,7 @@ end
 procedure rs_asptrs (inlist, imptrs, imids, start, finish, ostart, ofinish,
 	cache)
 
-int	inlist				#I the input image list
+pointer	inlist				#I the input image list
 pointer	imptrs[ARB]			#U the input image pointers
 int	imids[ARB]			#U the input image ids
 int	start				#I the starting image in the series
@@ -1019,11 +1076,13 @@ int	ostart				#I the old starting image in the series
 int	ofinish				#I the old ending image in the serious
 bool	cache				#I cache image buffers ?
 
+size_t	sz_val
 pointer	sp, image
 int	i, n, nold, nsub, nadd
 size_t	bufsize
 pointer	immap()
 int	imtrgetim(), btoi()
+include	<nullptr.inc>
 
 begin
 	# No new images are added or deleted.
@@ -1031,7 +1090,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
 
 	nold = ofinish - start + 1
 
@@ -1057,7 +1117,7 @@ begin
 	    n = nold + 1
 	    do i = ofinish + 1, finish {
 		if (imtrgetim (inlist, i, Memc[image], SZ_FNAME) != EOF) {
-		    imptrs[n] = immap (Memc[image], READ_ONLY, 0)
+		    imptrs[n] = immap (Memc[image], READ_ONLY, NULLPTR)
 		    imids[n] = i
 		    if ((finish - start) > (ofinish - ostart))
 		        call rs_cachen (btoi(cache), n+1, imptrs[n], bufsize)
@@ -1080,20 +1140,25 @@ pointer	tmpim			#I the storage image descriptor
 pointer	outim			#I the output image descriptor
 real	fscale			#O the scaling factor
 
+long	l_val
+size_t	sz_val
 real	rmin, rmax
 pointer	sp, vout, vin, vtmp, obuf, tmpbuf, ibuf
-int	i, npix
-int	impnlr(), imgnlr()
+long	i, npix
+long	impnlr(), imgnlr()
 
 begin
 	call smark (sp)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
-	call salloc (vin, IM_MAXDIM, TY_LONG)
-	call salloc (vtmp, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (vout, sz_val, TY_LONG)
+	call salloc (vin, sz_val, TY_LONG)
+	call salloc (vtmp, sz_val, TY_LONG)
 
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vout], sz_val)
+	call amovkl (l_val, Meml[vtmp], sz_val)
+	call amovkl (l_val, Meml[vin], sz_val)
 
 	# Compute the normalized input image.
 	npix = IM_LEN(im,1)
@@ -1132,20 +1197,26 @@ pointer	outim			#I the output image descriptor
 real	fscale			#I the scaling factor
 char	skysub[ARB]		#I the skyscale keyword
 
+long	l_val
+size_t	sz_val
 pointer	sp, vout, vtmp, vin, str, obuf, tmpbuf, ibuf
-int	npix
-int	imgnlr(), impnlr()
+size_t	npix
+long	imgnlr(), impnlr()
 
 begin
 	call smark (sp)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
-	call salloc (vin, IM_MAXDIM, TY_LONG)
-	call salloc (vtmp, IM_MAXDIM, TY_LONG)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (vout, sz_val, TY_LONG)
+	call salloc (vin, sz_val, TY_LONG)
+	call salloc (vtmp, sz_val, TY_LONG)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vtmp], IM_MAXDIM)
-	call amovkl (long(1), Meml[vin], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vout], sz_val)
+	call amovkl (l_val, Meml[vtmp], sz_val)
+	call amovkl (l_val, Meml[vin], sz_val)
 
 	# Add keyword to image header.
 	call sprintf (Memc[str], SZ_FNAME,

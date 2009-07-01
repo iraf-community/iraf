@@ -12,34 +12,41 @@ real	lower, upper, lsigma, usigma, binwidth, low, up, hwidth, hmin, hmax
 pointer	sp, inmasks, fieldstr, fields, image, imask, omask, masktemp, str, str2
 pointer	mst, vs, ve, im, pmim, pmout, opm, mp, buf, hgm, smsk
 pointer	imlist, inlist, outlist
-int	i, nclip, nfields, format, mval, npts, npix
-int	nbins, in_invert, nbad, cache
-size_t	old_size
+int	i, nclip, nfields, format, mval, in_invert, cache
+long	nbad
+size_t	npts, npix, nbins, old_size
+size_t	sz_val
+long	l_val
 
 real	clgetr()
-pointer	yt_mappm(), mp_miopen()
-int	imtlen(), imtgetim(), clgeti()
-pointer	imtopenp(), imtopen(), immap(), imstatp()
-int	mst_fields(), btoi(), mio_glsegr(), mst_ihist()
-int	mst_umask(), strmatch()
+pointer	yt_mappm(), mp_miopen(), imtopenp(), imtopen(), immap(), imstatp()
+long	mio_glsegr(), mst_umask()
+int	imtlen(), imtgetim(), clgeti(), mst_fields(), btoi(), mst_ihist()
+int	strmatch()
 bool	clgetb()
 errchk	immap(), yt_mappm(), yt_pminvert()
+include	<nullptr.inc>
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (inmasks, SZ_FNAME, TY_CHAR)
-	call salloc (fieldstr, SZ_LINE, TY_CHAR)
-	call salloc (fields, MIS_NFIELDS, TY_INT)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (imask, SZ_FNAME, TY_CHAR)
-	call salloc (omask, SZ_FNAME, TY_CHAR)
-	call salloc (masktemp, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (str2, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (inmasks, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fieldstr, sz_val, TY_CHAR)
+	sz_val = MIS_NFIELDS
+	call salloc (fields, sz_val, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (imask, sz_val, TY_CHAR)
+	call salloc (omask, sz_val, TY_CHAR)
+	call salloc (masktemp, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
 
-	call salloc (vs, IM_MAXDIM, TY_LONG)
-	call salloc (ve, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (vs, sz_val, TY_LONG)
+	call salloc (ve, sz_val, TY_LONG)
 
 	# Open the input image list.
 	imlist = imtopenp ("images")
@@ -117,7 +124,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the input image.
-	    iferr (im = immap (Memc[image], READ_ONLY, 0)) {
+	    iferr (im = immap (Memc[image], READ_ONLY, NULLPTR)) {
 		call printf ("Error reading image %s ...\n")
 		    call pargstr (Memc[image])
 		next
@@ -187,8 +194,11 @@ begin
 	    do i = 0 , nclip {
 
 		# Set up the mask i/o boundaries.
-                call amovkl (long(1), Meml[vs], IM_NDIM(im))
-                call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
+                l_val = 1
+                sz_val = IM_NDIM(im)
+                call amovkl (l_val, Meml[vs], sz_val)
+                sz_val = IM_NDIM(im)
+                call amovl (IM_LEN(im,1), Meml[ve], sz_val)
                 call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
 
 		# Initialize the statistics computation.
@@ -261,8 +271,11 @@ begin
 	        MIS_SMODE(MIS_SW(mst)) == YES) && mst_ihist (mst, binwidth,
 		hgm, nbins, hwidth, hmin, hmax) == YES) {
                 call aclri (Memi[hgm], nbins)
-                call amovkl (long(1), Meml[vs], IM_NDIM(im))
-                call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
+                l_val = 1
+                sz_val = IM_NDIM(im)
+                call amovkl (l_val, Meml[vs], sz_val)
+                sz_val = IM_NDIM(im)
+                call amovl (IM_LEN(im,1), Meml[ve], sz_val)
                 call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
                 while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF)
                     call ahgmr (Memr[buf], npts, Memi[hgm], nbins, hmin, hmax)
@@ -286,10 +299,15 @@ begin
 	    # Save the new mask to an output image.
 	    if (pmout != NULL) {
 	        call malloc (smsk, IM_LEN(im,1), TY_SHORT)
-                call amovkl (long(1), Meml[vs], IM_NDIM(im))
-                call amovl (IM_LEN(im,1), Meml[ve], IM_NDIM(im))
+                l_val = 1
+                sz_val = IM_NDIM(im)
+                call amovkl (l_val, Meml[vs], sz_val)
+                sz_val = IM_NDIM(im)
+                call amovl (IM_LEN(im,1), Meml[ve], sz_val)
                 call mio_setrange (mp, Meml[vs], Meml[ve], IM_NDIM(im))
-                call amovkl (long(1), Meml[vs], IM_NDIM(im))
+                l_val = 1
+                sz_val = IM_NDIM(im)
+                call amovkl (l_val, Meml[vs], sz_val)
 		opm = imstatp (pmout, IM_PMDES)
                 while (mio_glsegr (mp, buf, mval, Meml[vs], npts) != EOF) { 
 		    nbad = mst_umask (Memr[buf], Mems[smsk], npts, low, up)
@@ -327,16 +345,16 @@ end
 
 # MST_UMASK -- Update the mask.
 
-int procedure mst_umask (pix, msk, npts, lower, upper)
+long procedure mst_umask (pix, msk, npts, lower, upper)
 
 real	pix[ARB]		#I array of image pixels
 short	msk[ARB]		#O array of mask pixels, set to 1 and 0
-int	npts			#I the number of pixels
+size_t	npts			#I the number of pixels
 real	lower			#I the lower good data limit
 real	upper			#I the upper good data limit
 
 real	lo, up
-int	i, nbad
+long	i, nbad
 
 begin
 	if (IS_INDEFR(lower) && IS_INDEFR(upper))

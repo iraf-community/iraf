@@ -28,13 +28,17 @@ real	flow				#I Number of low pixels to reject
 real	fhigh				#I Number of high pixels to reject
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
+long	l_val
+size_t	sz_val
 pointer	sp, im, mpim, norm, vout, mvout, vs, ve, vin
 pointer	buf_out, buf_msk, buf_in, pbuf
-int	i, n, nimages, npix, npts, mval
+int	n, nimages, mval
+long	i
+size_t	npix, npts
 
 real	imgetr()
 pointer	mio_openo(), imstatp()
-int	impnlr(), impnli(), mio_glsegr()
+long	impnlr(), impnli(), mio_glsegr()
 errchk	imgetr()
 
 begin
@@ -44,14 +48,16 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (im, nimages, TY_POINTER)
-	call salloc (mpim, nimages, TY_POINTER)
-	call salloc (norm, nimages, TY_REAL)
-	call salloc (vs, IM_MAXDIM, TY_LONG)
-	call salloc (ve, IM_MAXDIM, TY_LONG)
-	call salloc (vin, IM_MAXDIM, TY_LONG)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
-	call salloc (mvout, IM_MAXDIM, TY_LONG)
+	sz_val = nimages
+	call salloc (im, sz_val, TY_POINTER)
+	call salloc (mpim, sz_val, TY_POINTER)
+	call salloc (norm, sz_val, TY_REAL)
+	sz_val = IM_MAXDIM
+	call salloc (vs, sz_val, TY_LONG)
+	call salloc (ve, sz_val, TY_LONG)
+	call salloc (vin, sz_val, TY_LONG)
+	call salloc (vout, sz_val, TY_LONG)
+	call salloc (mvout, sz_val, TY_LONG)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels.
 	# This case will not actually be used in the rskysub task because it
@@ -74,10 +80,12 @@ begin
 	    }
 
 	    # Initialize i/o.
-	    call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	    call amovkl (long(1), Meml[mvout], IM_MAXDIM)
-	    call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	    call amovkl (long(1), Meml[ve], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[vout], sz_val)
+	    call amovkl (l_val, Meml[mvout], sz_val)
+	    call amovkl (l_val, Meml[vs], sz_val)
+	    call amovkl (l_val, Meml[ve], sz_val)
 	    Meml[ve] = npix
 
 	    # For each input line compute an output line.
@@ -92,7 +100,8 @@ begin
 	    	do i = 1, n {
 		    call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
 			IM_NDIM(Memp[im+i-1]))
-		    call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[vs], Meml[vin], sz_val)
 		    while (mio_glsegr (Memp[mpim+i-1], buf_in, mval,
 		        Meml[vin], npts) != EOF) {
 		        call awsur (Memr[buf_in], Memr[buf_out+Meml[vin]-1],
@@ -111,8 +120,9 @@ begin
 		}
 
 		# Set the i/o parameters.
-		call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
-		call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[vout], Meml[vs], sz_val)
+		call amovl (Meml[vout], Meml[ve], sz_val)
 		Meml[vs] = 1
 		Meml[ve] = npix
 	    }
@@ -141,13 +151,16 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	call salloc (pbuf, nimages * npix, TY_REAL)
+	sz_val = nimages * npix
+	call salloc (pbuf, sz_val, TY_REAL)
 
 	# Initialize the i/o.
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[mvout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	call amovkl (long(1), Meml[ve], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vout], sz_val)
+	call amovkl (l_val, Meml[mvout], sz_val)
+	call amovkl (l_val, Meml[vs], sz_val)
+	call amovkl (l_val, Meml[ve], sz_val)
 	Meml[ve] = npix
 
 	# Compute output lines for each input line.
@@ -161,7 +174,8 @@ begin
 	    for (i = 1; i <= n; i = i + 1) {
 		call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
 		    IM_NDIM(Memp[im+i-1]))
-		call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[vs], Meml[vin], sz_val)
 		while (mio_glsegr (Memp[mpim+i-1], buf_in, mval, Meml[vin],
 		    npts) != EOF) {
 		    call rs_accumr (Memr[buf_in], npts, Meml[vin] - 1,
@@ -180,8 +194,9 @@ begin
 	    }
 
 	    # Set the i/o parameters.
-	    call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
-	    call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[vout], Meml[vs], sz_val)
+	    call amovl (Meml[vout], Meml[ve], sz_val)
 	    Meml[vs] = 1
 	    Meml[ve] = npix
 	}
@@ -204,8 +219,8 @@ end
 procedure rs_psumr (list, msklist, im_out, msk_out, start, finish, current,
 	flow, fhigh, msk_invert, skyscale)
 
-int	list				#I List of input images
-int	msklist				#I List of input masks
+pointer	list				#I List of input images
+pointer	msklist				#I List of input masks
 pointer	im_out				#I Output image descriptor
 pointer	msk_out				#I Output "mask" descriptor
 int	start				#I The starting image for the sum
@@ -216,14 +231,20 @@ real	fhigh				#I Number of high pixels to reject
 bool	msk_invert			#I inver the input mask ?
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
-pointer	sp, input, str, im, mkim, mpim, norm, vout, mvout, vs, ve, vin
+long	l_val
+size_t	sz_val
+pointer	sp, p_input, str, im, mkim, mpim, norm, vout, mvout, vs, ve, vin
 pointer	buf_out, buf_msk, buf_in, pbuf
-int	i, n, nimages, npix, npts, mval
+int	i, n, nimages, mval
+long	j
+size_t	npix, npts
 
 real	imgetr()
 pointer	immap(), mp_open(), mio_openo(), imstatp()
-int	imtrgetim(), impnlr(), impnli(), mio_glsegr()
+int	imtrgetim()
+long	impnlr(), impnli(), mio_glsegr()
 errchk	imgetr()
+include	<nullptr.inc>
 
 begin
 	# Initialize.
@@ -232,17 +253,20 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (im, nimages, TY_POINTER)
-	call salloc (mkim, nimages, TY_POINTER)
-	call salloc (mpim, nimages, TY_POINTER)
-	call salloc (norm, nimages, TY_REAL)
-	call salloc (vs, IM_MAXDIM, TY_LONG)
-	call salloc (ve, IM_MAXDIM, TY_LONG)
-	call salloc (vin, IM_MAXDIM, TY_LONG)
-	call salloc (vout, IM_MAXDIM, TY_LONG)
-	call salloc (mvout, IM_MAXDIM, TY_LONG)
+	sz_val = SZ_FNAME
+	call salloc (p_input, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = nimages
+	call salloc (im, sz_val, TY_POINTER)
+	call salloc (mkim, sz_val, TY_POINTER)
+	call salloc (mpim, sz_val, TY_POINTER)
+	call salloc (norm, sz_val, TY_REAL)
+	sz_val = IM_MAXDIM
+	call salloc (vs, sz_val, TY_LONG)
+	call salloc (ve, sz_val, TY_LONG)
+	call salloc (vin, sz_val, TY_LONG)
+	call salloc (vout, sz_val, TY_LONG)
+	call salloc (mvout, sz_val, TY_LONG)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels.
 	# This case will not actually be used in the rskysub task because it
@@ -256,24 +280,24 @@ begin
 	    do i = start, finish {
 		if (i == current)
 		    next
-	        if (imtrgetim (list, i, Memc[input], SZ_FNAME) != EOF) {
-	            Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
+	        if (imtrgetim (list, i, Memc[p_input], SZ_FNAME) != EOF) {
+	            Memp[im+n] = immap (Memc[p_input], READ_ONLY, NULLPTR)
 		    iferr (Memr[norm+n] = imgetr (Memp[im+n], skyscale))
 			Memr[norm+n] = 1.0
                     if (imtrgetim (msklist, i, Memc[str+1], SZ_FNAME) != EOF) {
                         if (msk_invert) {
                             Memc[str] = '^'
                             Memp[mkim+n] = mp_open (Memc[str], Memp[im+n],
-			        Memc[input], SZ_FNAME)
+			        Memc[p_input], SZ_FNAME)
                         } else
                             Memp[mkim+n] = mp_open (Memc[str+1], Memp[im+n],
-				Memc[input], SZ_FNAME)
+				Memc[p_input], SZ_FNAME)
                     } else if (imtrgetim (msklist, 1, Memc[str],
 			SZ_FNAME) != EOF) {
                         Memp[mkim+n] = mp_open (Memc[str], Memp[im+n],
-			    Memc[input], SZ_FNAME)
+			    Memc[p_input], SZ_FNAME)
                     } else {
-                        Memp[mkim+n] = mp_open ("", Memp[im+n], Memc[input],
+                        Memp[mkim+n] = mp_open ("", Memp[im+n], Memc[p_input],
 			    SZ_FNAME)
                     }
 		    Memp[mpim+n] = mio_openo (imstatp(Memp[mkim+n], IM_PLDES),
@@ -283,10 +307,12 @@ begin
 	    }
 
 	    # Initialize i/o.
-	    call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	    call amovkl (long(1), Meml[mvout], IM_MAXDIM)
-	    call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	    call amovkl (long(1), Meml[ve], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[vout], sz_val)
+	    call amovkl (l_val, Meml[mvout], sz_val)
+	    call amovkl (l_val, Meml[vs], sz_val)
+	    call amovkl (l_val, Meml[ve], sz_val)
 	    Meml[ve] = npix
 
 	    # For each input line compute an output line.
@@ -301,7 +327,8 @@ begin
 	    	do i = 1, n {
 		    call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
 			IM_NDIM(Memp[im+i-1]))
-		    call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[vs], Meml[vin], sz_val)
 		    while (mio_glsegr (Memp[mpim+i-1], buf_in, mval,
 		        Meml[vin], npts) != EOF) {
 		        call awsur (Memr[buf_in], Memr[buf_out+Meml[vin]-1],
@@ -313,15 +340,16 @@ begin
 		}
 
 		# Compute the average.
-		do i = 1, npix {
-		    if (Memi[buf_msk+i-1] > 1)
-			Memr[buf_out+i-1] = Memr[buf_out+i-1] /
-			    Memi[buf_msk+i-1]
+		do j = 1, npix {
+		    if (Memi[buf_msk+j-1] > 1)
+			Memr[buf_out+j-1] = Memr[buf_out+j-1] /
+			    Memi[buf_msk+j-1]
 		}
 
 		# Set the i/o parameters.
-		call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
-		call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[vout], Meml[vs], sz_val)
+		call amovl (Meml[vout], Meml[ve], sz_val)
 		Meml[vs] = 1
 		Meml[ve] = npix
 	    }
@@ -345,23 +373,23 @@ begin
 	do i = start, finish {
 	    if (i == current)
 		next
-	    if (imtrgetim (list, i, Memc[input], SZ_FNAME) != EOF) {
-	        Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
+	    if (imtrgetim (list, i, Memc[p_input], SZ_FNAME) != EOF) {
+	        Memp[im+n] = immap (Memc[p_input], READ_ONLY, NULLPTR)
 		iferr (Memr[norm+n] = imgetr (Memp[im+n], skyscale))
 		    Memr[norm+n] = 1.0
                 if (imtrgetim (msklist, i, Memc[str+1], SZ_FNAME) != EOF) {
                     if (msk_invert) {
                         Memc[str] = '^'
                         Memp[mkim+n] = mp_open (Memc[str], Memp[im+n],
-		            Memc[input], SZ_FNAME)
+		            Memc[p_input], SZ_FNAME)
                     } else
                         Memp[mkim+n] = mp_open (Memc[str+1], Memp[im+n],
-			    Memc[input], SZ_FNAME)
+			    Memc[p_input], SZ_FNAME)
                 } else if (imtrgetim (msklist, 1, Memc[str], SZ_FNAME) != EOF) {
                     Memp[mkim+n] = mp_open (Memc[str], Memp[im+n],
-		        Memc[input], SZ_FNAME)
+		        Memc[p_input], SZ_FNAME)
                 } else {
-                    Memp[mkim+n] = mp_open ("", Memp[im+n], Memc[input],
+                    Memp[mkim+n] = mp_open ("", Memp[im+n], Memc[p_input],
 		        SZ_FNAME)
                 }
 		Memp[mpim+n] = mio_openo (imstatp(Memp[mkim+n], IM_PLDES),
@@ -371,13 +399,16 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	call salloc (pbuf, nimages * npix, TY_REAL)
+	sz_val = nimages * npix
+	call salloc (pbuf, sz_val, TY_REAL)
 
 	# Initialize the i/o.
-	call amovkl (long(1), Meml[vout], IM_MAXDIM)
-	call amovkl (long(1), Meml[mvout], IM_MAXDIM)
-	call amovkl (long(1), Meml[vs], IM_MAXDIM)
-	call amovkl (long(1), Meml[ve], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vout], sz_val)
+	call amovkl (l_val, Meml[mvout], sz_val)
+	call amovkl (l_val, Meml[vs], sz_val)
+	call amovkl (l_val, Meml[ve], sz_val)
 	Meml[ve] = npix
 
 	# Compute output lines for each input line.
@@ -391,7 +422,8 @@ begin
 	    for (i = 1; i <= n; i = i + 1) {
 		call mio_setrange (Memp[mpim+i-1], Meml[vs], Meml[ve],
 		    IM_NDIM(Memp[im+i-1]))
-		call amovl (Meml[vs], Meml[vin], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[vs], Meml[vin], sz_val)
 		while (mio_glsegr (Memp[mpim+i-1], buf_in, mval, Meml[vin],
 		    npts) != EOF) {
 		    call rs_accumr (Memr[buf_in], npts, Meml[vin] - 1,
@@ -404,14 +436,15 @@ begin
 	        flow, fhigh)
 
 	    # If averaging divide the sum by the number of images averaged.
-	    do i = 1, npix {
-		if (Memi[buf_msk+i-1] > 1)
-		    Memr[buf_out+i-1] = Memr[buf_out+i-1] / Memi[buf_msk+i-1]
+	    do j = 1, npix {
+		if (Memi[buf_msk+j-1] > 1)
+		    Memr[buf_out+j-1] = Memr[buf_out+j-1] / Memi[buf_msk+j-1]
 	    }
 
 	    # Set the i/o parameters.
-	    call amovl (Meml[vout], Meml[vs], IM_MAXDIM)
-	    call amovl (Meml[vout], Meml[ve], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[vout], Meml[vs], sz_val)
+	    call amovl (Meml[vout], Meml[ve], sz_val)
 	    Meml[vs] = 1
 	    Meml[ve] = npix
 	}
@@ -447,18 +480,22 @@ int	nlow				#I Number of low pixels to reject
 int	nhigh				#I Number of high pixels to reject
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
+long	l_val
+size_t	sz_val
 real	const
 pointer	sp, v1, v2, im, norm, buf_out, buf_in, pbuf, rbuf
-int	i, n, nl, nh, nimages, naccept, npix
+int	i, n, nl, nh, nimages, naccept
+size_t	npix
+int	imod()
 real	imgetr()
-int	impnlr(), imgnlr()
+long	impnlr(), imgnlr()
 errchk	imgetr()
 
 begin
 	# Initialize.
 	nimages = finish - start
 	if (IS_INDEFI(nlow) || IS_INDEFI(nhigh)) {
-	    if (mod (nimages,2) == 0) {
+	    if ( imod(nimages,2) == 0 ) {
 		nl = nimages / 2 - 1
 		nh = nimages / 2 - 1
 	    } else {
@@ -475,10 +512,12 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_POINTER)
-	call salloc (norm, nimages, TY_REAL)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	sz_val = nimages
+	call salloc (im, sz_val, TY_POINTER)
+	call salloc (norm, sz_val, TY_REAL)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels.
 	# This case will not actually be used in the rskysub task because it
@@ -499,8 +538,11 @@ begin
 	    }
 
 	    # Initialize i/o.
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[v1], sz_val)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 
 	    # For each input line compute an output line.
 	    while (impnlr (im_out, buf_out, Meml[v2]) != EOF) {
@@ -510,7 +552,8 @@ begin
 
 		# Accumulate lines from each input image.
 	    	do i = 1, n {
-		    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v1], Meml[v2], sz_val)
 		    if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	call error (0, "Error reading input image")
 		    call awsur (Memr[buf_in], Memr[buf_out], Memr[buf_out],
@@ -525,7 +568,8 @@ begin
 		call adivkr (Memr[buf_out], const, Memr[buf_out], npix)
 
 		# Set the i/o parameters.
-		call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v2], Meml[v1], sz_val)
 	    }
 
 	    # Finish up.
@@ -546,12 +590,17 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	call salloc (pbuf, nimages, TY_POINTER)
-	call salloc (rbuf, nimages * npix, TY_REAL)
+	sz_val = nimages
+	call salloc (pbuf, sz_val, TY_POINTER)
+	sz_val = nimages * npix
+	call salloc (rbuf, sz_val, TY_REAL)
 
 	# Initialize the i/o.
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[v1], sz_val)
+	sz_val = IM_MAXDIM
+	call amovl (Meml[v1], Meml[v2], sz_val)
 
 	# Compute output lines for each input line.
 	while (impnlr (im_out, buf_out, Meml[v2]) != EOF) {
@@ -559,7 +608,8 @@ begin
 	    # Read lines from the input images.
 	    for (i = 1; i <= n; i = i + 1) {
 		Memp[pbuf+i-1] = rbuf + (i - 1) * npix
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 		if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 		call amulkr (Memr[buf_in], Memr[norm+i-1], Memr[Memp[pbuf+i-1]],
@@ -575,7 +625,8 @@ begin
 		call adivkr (Memr[buf_out], const, Memr[buf_out], npix)
 	    }
 
-	    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v2], Meml[v1], sz_val)
 	}
 
 	# Finish up.
@@ -593,7 +644,7 @@ end
 
 procedure rs_sumr (list, im_out, start, finish, current, nlow, nhigh, skyscale)
 
-int	list				#I List of input images
+pointer	list				#I List of input images
 pointer	im_out				#I Output image descriptor
 int	start				#I The starting image for the sum
 int	finish				#I The ending image for the sum
@@ -602,19 +653,24 @@ int	nlow				#I Number of low pixels to reject
 int	nhigh				#I Number of high pixels to reject
 char	skyscale[ARB]			#I Keyword containing scaling factor
 
+long	l_val
+size_t	sz_val
 real	const
-pointer	sp, input, v1, v2, im, norm, buf_out, buf_in, buf
-int	i, n, nimages, naccept, npix, nl, nh
+pointer	sp, p_input, v1, v2, im, norm, buf_out, buf_in, buf
+int	i, n, nimages, naccept, nl, nh
+size_t	npix
 real	imgetr()
 pointer	immap()
-int	imtrgetim(), impnlr(), imgnlr()
+int	imtrgetim(), imod()
+long	impnlr(), imgnlr()
 errchk	imgetr()
+include	<nullptr.inc>
 
 begin
 	# Initialize.
 	nimages = finish - start
 	if (IS_INDEFI(nlow) || IS_INDEFI(nhigh)) {
-	    if (mod (nimages,2) == 0) {
+	    if ( imod(nimages,2) == 0 ) {
 		nl = nimages / 2 - 1
 		nh = nimages / 2 - 1
 	    } else {
@@ -631,11 +687,14 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (v2, IM_MAXDIM, TY_LONG)
-	call salloc (im, nimages, TY_POINTER)
-	call salloc (norm, nimages, TY_REAL)
+	sz_val = SZ_FNAME
+	call salloc (p_input, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (v2, sz_val, TY_LONG)
+	sz_val = nimages
+	call salloc (im, sz_val, TY_POINTER)
+	call salloc (norm, sz_val, TY_REAL)
 
 	# If there are no pixels to be rejected avoid calls to reject pixels.
 	# This case will not actually be used in the rskysub task because it
@@ -649,8 +708,8 @@ begin
 	    do i = start, finish {
 		if (i == current)
 		    next
-	        if (imtrgetim (list, i, Memc[input], SZ_FNAME) != EOF) {
-	            Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
+	        if (imtrgetim (list, i, Memc[p_input], SZ_FNAME) != EOF) {
+	            Memp[im+n] = immap (Memc[p_input], READ_ONLY, NULLPTR)
 		    iferr (Memr[norm+n] = imgetr (Memp[im+n], skyscale))
 			Memr[norm+n] = 1.0
 		    n = n + 1
@@ -658,8 +717,11 @@ begin
 	    }
 
 	    # Initialize i/o.
-	    call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[v1], sz_val)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v1], Meml[v2], sz_val)
 
 	    # For each input line compute an output line.
 	    while (impnlr (im_out, buf_out, Meml[v2]) != EOF) {
@@ -669,7 +731,8 @@ begin
 
 		# Accumulate lines from each input image.
 	    	do i = 1, n {
-		    call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		    sz_val = IM_MAXDIM
+		    call amovl (Meml[v1], Meml[v2], sz_val)
 		    if (imgnlr (Memp[im+i-1], buf_in, Meml[v2]) == EOF)
 		    	call error (0, "Error reading input image")
 		    call amulkr (Memr[buf_in], Memr[norm+i-1], Memr[buf_in],
@@ -682,7 +745,8 @@ begin
 		call adivkr (Memr[buf_out], const, Memr[buf_out], npix)
 
 		# Set the i/o parameters.
-		call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v2], Meml[v1], sz_val)
 	    }
 
 	    # Unmap the images.
@@ -700,8 +764,8 @@ begin
 	do i = start, finish {
 	    if (i == current)
 		next
-	    if (imtrgetim (list, i, Memc[input], SZ_FNAME) != EOF) {
-	        Memp[im+n] = immap (Memc[input], READ_ONLY, 0)
+	    if (imtrgetim (list, i, Memc[p_input], SZ_FNAME) != EOF) {
+	        Memp[im+n] = immap (Memc[p_input], READ_ONLY, NULLPTR)
 		iferr (Memr[norm+n] = imgetr (Memp[im+n], skyscale))
 		    Memr[norm+n] = 1.0
 	        n = n + 1
@@ -709,18 +773,23 @@ begin
 	}
 
 	# Allocate additional buffer space.
-	call salloc (buf, nimages, TY_POINTER)
+	sz_val = nimages
+	call salloc (buf, sz_val, TY_POINTER)
 
 	# Initialize the i/o.
-	call amovkl (long(1), Meml[v1], IM_MAXDIM)
-	call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[v1], sz_val)
+	sz_val = IM_MAXDIM
+	call amovl (Meml[v1], Meml[v2], sz_val)
 
 	# Compute output lines for each input line.
 	while (impnlr (im_out, buf_out, Meml[v2]) != EOF) {
 
 	    # Read lines from the input images.
 	    for (i = 1; i <= n; i = i + 1) {
-		call amovl (Meml[v1], Meml[v2], IM_MAXDIM)
+		sz_val = IM_MAXDIM
+		call amovl (Meml[v1], Meml[v2], sz_val)
 		if (imgnlr (Memp[im+i-1], Memp[buf+i-1], Meml[v2]) == EOF)
 		    call error (0, "Error reading input image")
 		call amulkr (Memr[Memp[buf+i-1]], Memr[norm+i-1],
@@ -736,7 +805,8 @@ begin
 		call adivkr (Memr[buf_out], const, Memr[buf_out], npix)
 	    }
 
-	    call amovl (Meml[v2], Meml[v1], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v2], Meml[v1], sz_val)
 	}
 
 	# Finish up.
@@ -751,14 +821,14 @@ end
 procedure rs_accumr (indata, npts, offset, norm, outdata, ndata, npix)
 
 real	indata[npts]			#I the input data 
-int	npts				#I the number of input data points
-int	offset				#I the offset of the first data point
+size_t	npts				#I the number of input data points
+long	offset				#I the offset of the first data point
 real	norm				#I the normalization factor
 real	outdata[npix,ARB]		#U the output array
 int	ndata[npix]			#U the number of good data points
-int	npix				#I number of points in a line
+size_t	npix				#I number of points in a line
 
-int	i
+long	i
 
 begin
 	do i = 1, npts {
@@ -778,15 +848,16 @@ procedure rs_mmrejr (indata, n, out, npts, flo, fhi)
 real	indata[npts,ARB]	#U the data buffer of good pixels
 int	n[npts]			#U The number of good pixels
 real	out[npts]		#O the output sum
-int	npts			#I The number of output points per line
+size_t	npts			#I The number of output points per line
 real	flo			#I Fraction of low points to reject
 real	fhi			#I Fraction of high points to reject
 
 
 real	d1, d2, dmin, dmax, sum
-int	n1, npairs, nlow, nhigh, naccept, np, nlo, nhi, medflag
-int	i, j, jmax, jmin
-
+int	medflag
+int	n1, npairs, nlow, nhigh, naccept, np, nlo, nhi, j, jmax, jmin
+long	i
+int	imod()
 
 begin
 	if (IS_INDEFR(flo) || IS_INDEFR(fhi))
@@ -798,7 +869,7 @@ begin
 
 	    n1 = n[i]
 	    if (medflag == YES) {
-		if (mod (n1, 2) == 0) {
+		if ( imod(n1, 2) == 0 ) {
 		    nlo = n1 / 2 - 1
 		    nhi = n1 / 2 - 1
 		} else {
@@ -1016,7 +1087,7 @@ procedure rs_rejr (a, nvecs, b, npts, nlow, nhigh)
 pointer	a[nvecs]		# Pointers to set of vectors
 int	nvecs			# Number of vectors
 real	b[npts]			# Output vector
-int	npts			# Number of points in the vectors
+size_t	npts			# Number of points in the vectors
 int	nlow			# Number of low points to be rejected
 int	nhigh			# Number of high points to be rejected
 
@@ -1125,9 +1196,9 @@ procedure rs_minswr (a, nvecs, npts)
 
 pointer	a[nvecs]			# Array of vector pointers
 int	nvecs				# Number of vectors
-int	npts				# Number of points in the vectors
+size_t	npts				# Number of points in the vectors
 
-int	i, j, k, kmin
+long	i, j, k, kmin
 real	temp
 
 begin
@@ -1154,9 +1225,9 @@ procedure rs_maxswr (a, nvecs, npts)
 
 pointer	a[nvecs]			# Array of vector pointers
 int	nvecs				# Number of vectors
-int	npts				# Number of points in the vectors
+size_t	npts				# Number of points in the vectors
 
-int	i, j, k, kmax
+long	i, j, k, kmax
 real	temp
 
 begin
@@ -1185,9 +1256,9 @@ procedure rs_mxmnswr (a, nvecs, npts)
 
 pointer	a[nvecs]			# Array of vector pointers
 int	nvecs				# Number of vectors
-int	npts				# Number of points in the vectors
+size_t	npts				# Number of points in the vectors
 
-int	i, j, k, kmax, kmin
+long	i, j, k, kmax, kmin
 real	temp
 
 begin
