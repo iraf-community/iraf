@@ -12,7 +12,7 @@ bool procedure pl_ucircle (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
 long	y			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
+long	rl_reg[3,ARB]		#O output range list for line Y
 long	xs			#O first pixel to be edited
 size_t	npix			#O number of pixels affected
 

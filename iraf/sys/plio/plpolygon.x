@@ -40,7 +40,7 @@ begin
 	sz_val = LEN_PGONDES
 	call salloc (ufd, sz_val, TY_STRUCT)
 	sz_val = RL_FIRST + (npts+1)*3
-	call salloc (oo, sz_val, TY_INT)
+	call salloc (oo, sz_val, TY_LONG)
 	sz_val = npts + 1
 	call salloc (xp, sz_val, TY_REAL)
 	call salloc (yp, sz_val, TY_REAL)

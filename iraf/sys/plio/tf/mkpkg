@@ -13,28 +13,28 @@ libex.a:
 #	plglrl.x	<plio.h> <plset.h>
 	plglrs.x	<plio.h> <plset.h>
 	pll2pi.x	<plio.h>
-#	pll2pl.x	<plio.h>
+	pll2pl.x	<plio.h>
 	pll2ps.x	<plio.h>
 	pll2ri.x	<plio.h> <plset.h>
-#	pll2rl.x	<plio.h> <plset.h>
+	pll2rl.x	<plio.h> <plset.h>
 	pll2rs.x	<plio.h> <plset.h>
 	plp2li.x	<plio.h>
-#	plp2ll.x	<plio.h>
+	plp2ll.x	<plio.h>
 	plp2ls.x	<plio.h>
 	plp2ri.x	<plio.h> <plset.h>
-#	plp2rl.x	<plio.h> <plset.h>
+	plp2rl.x	<plio.h> <plset.h>
 	plp2rs.x	<plio.h> <plset.h>
 	plplpi.x	<plio.h>
-#	plplpl.x	<plio.h>
+	plplpl.x	<plio.h>
 	plplps.x	<plio.h>
 	plplri.x	<plio.h>
-#	plplrl.x	<plio.h>
+	plplrl.x	<plio.h>
 	plplrs.x	<plio.h>
 	plr2li.x	<plio.h> <plset.h>
-#	plr2ll.x	<plio.h> <plset.h>
+	plr2ll.x	<plio.h> <plset.h>
 	plr2ls.x	<plio.h> <plset.h>
 	plr2pi.x	<plio.h> <plset.h>
-#	plr2pl.x	<plio.h> <plset.h>
+	plr2pl.x	<plio.h> <plset.h>
 	plr2ps.x	<plio.h> <plset.h>
 	plreqi.x	<plset.h>
 	plreql.x	<plset.h>

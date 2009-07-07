@@ -11,7 +11,7 @@ bool procedure pl_ubox (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
 long	y			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
+long	rl_reg[3,ARB]		#O output range list for line Y
 long	xs			#O start of edit region in dst mask
 size_t	npix			#O number of pixels affected
 

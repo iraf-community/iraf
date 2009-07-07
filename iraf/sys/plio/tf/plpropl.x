@@ -9,10 +9,10 @@ procedure pl_pixropl (px_src,xs,src_maxval, px_dst,ds,dst_maxval, npix, rop)
 
 long	px_src[ARB]		#I source pixel array
 long	xs			#I starting pixel index in src
-int	src_maxval		#I max pixel value in src mask
+long	src_maxval		#I max pixel value in src mask
 long	px_dst[ARB]		#O destination pixel array
 long	ds			#I starting pixel index in dst
-int	dst_maxval		#I max pixel value in dst mask
+long	dst_maxval		#I max pixel value in dst mask
 size_t	npix			#I number of pixels to convert
 int	rop			#I rasterop
 
@@ -20,7 +20,6 @@ pointer	sp, src
 int	opcode
 long	i
 long	data, ceil, src_value
-int	and(), or(), xor(), not()
 define	out_ 91
 
 begin

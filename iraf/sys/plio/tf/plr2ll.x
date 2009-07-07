@@ -6,14 +6,14 @@ include	<plio.h>
 # PL_R2L -- Convert a range list to a line list.  The length of the output
 # line list is returned as the function value.
 
-int procedure pl_r2ls (rl_src, xs, ll_dst, npix)
+int procedure pl_r2ll (rl_src, xs, ll_dst, npix)
 
-short	rl_src[3,ARB]		#I input range list
+long	rl_src[3,ARB]		#I input range list
 long	xs			#I starting pixel index in range list
 short	ll_dst[ARB]		#O destination line list
 size_t	npix			#I number of pixels to convert
 
-short	hi, pv
+long	hi, pv
 int	op, nr, i
 long	last, xe, x1, x2, iz, np, nz, dv, v, lval0, lval1
 int	imod()

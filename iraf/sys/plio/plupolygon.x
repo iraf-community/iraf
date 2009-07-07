@@ -12,7 +12,7 @@ bool procedure pl_upolygon (ufd, line, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
 long	line			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
+long	rl_reg[3,ARB]		#O output range list for line Y
 long	xs			#O start of edit region in dst mask
 size_t	npix			#O number of pixels affected
 
@@ -25,7 +25,7 @@ int	tempi, rl_len, p_prev, p_next
 real	tempr, y, y1, y2, x1, x2, p1, p2, p_y, n_y
 
 int	btoi()
-bool	plr_equali()
+bool	plr_equall()
 long	lnint()
 define	done_ 91
 
@@ -130,9 +130,9 @@ begin
 	    
 	    # Interchange the initial segment and the low segment.
 	    if (low != j) {
-		swapi (RL_X(rl_reg,j), RL_X(rl_reg,low))
-		swapi (RL_N(rl_reg,j), RL_N(rl_reg,low))
-		swapi (RL_V(rl_reg,j), RL_V(rl_reg,low))
+		swapl (RL_X(rl_reg,j), RL_X(rl_reg,low))
+		swapl (RL_N(rl_reg,j), RL_N(rl_reg,low))
+		swapl (RL_V(rl_reg,j), RL_V(rl_reg,low))
 	    }
 	}
 
@@ -218,9 +218,9 @@ done_
 
 	rl_new = true
 	if (P_OY(ufd) == line - 1)
-	    rl_new = !plr_equali (rl_reg, Memi[P_OO(ufd)])
+	    rl_new = !plr_equall (rl_reg, Meml[P_OO(ufd)])
 	sz_val = rn - 1
-	call amovi (rl_reg, Memi[P_OO(ufd)], sz_val)
+	call amovl (rl_reg, Meml[P_OO(ufd)], sz_val)
 	P_OY(ufd) = line
 
 	return (rl_new)

@@ -14,8 +14,8 @@ short	ll_dst[ARB]		#O destination line list
 size_t	npix			#I number of pixels to convert
 
 int	hi, pv
-int	op, nr, i, ival
-long	last, xe, x1, x2, iz, np, nz, dv, v
+int	op, nr, i
+long	last, xe, x1, x2, iz, np, nz, dv, v, lval0, lval1
 int	imod()
 long	labs()
 define	done_ 91
@@ -84,8 +84,9 @@ begin
 		    # Output IH or DH instruction?
 		    hi = pv
 		    if (labs(dv) > I_DATAMAX) {
-			ival = pv
-			ll_dst[op] = M_SH + and (ival, I_DATAMAX)
+			lval0 = pv
+			lval1 = I_DATAMAX
+			ll_dst[op] = M_SH + and (lval0, lval1)
 			op = op + 1
 			ll_dst[op] = pv / I_SHIFT
 			op = op + 1
@@ -99,7 +100,8 @@ begin
 			# Convert to IS or DS if range is a single pixel.
 			if (np == 1 && nz == 0) {
 			    v = ll_dst[op-1]
-			    ll_dst[op-1] = or (v, M_MOVE)
+			    lval1 = M_MOVE
+			    ll_dst[op-1] = or (v, lval1)
 			    goto done_
 			}
 		    }

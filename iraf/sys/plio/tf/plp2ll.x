@@ -1,29 +1,27 @@
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
-include	<plset.h>
 include	<plio.h>
 
-# PL_R2L -- Convert a range list to a line list.  The length of the output
-# line list is returned as the function value.
+# PL_P2L -- Convert a pixel array to a line list.  The length of the list is
+# returned as the function value.
 
-int procedure pl_r2ls (rl_src, xs, ll_dst, npix)
+int procedure pl_p2ll (px_src, xs, ll_dst, npix)
 
-short	rl_src[3,ARB]		#I input range list
-long	xs			#I starting pixel index in range list
+long	px_src[ARB]		#I input pixel array
+long	xs			#I starting index in pixbuf
 short	ll_dst[ARB]		#O destination line list
 size_t	npix			#I number of pixels to convert
 
-short	hi, pv
-int	op, nr, i
-long	last, xe, x1, x2, iz, np, nz, dv, v, lval0, lval1
+long	hi, pv, nv, zero
+long	xe, x1, iz, ip, np, nz, dv, v, lval0, lval1
+int	op
 int	imod()
 long	labs()
 define	done_ 91
 
 begin
 	# No input pixels?
-	nr = RL_LEN(rl_src)
-	if (npix <= 0 || nr <= 0)
+	if (npix <= 0)
 	    return (0)
 
 	# Initialize the linelist header.
@@ -34,48 +32,42 @@ begin
 
 	xe = xs + npix - 1
 	op = LL_CURHDRLEN + 1
-	iz = xs
-	hi = 1
 
-	# Process the array of range lists.
-	do i = RL_FIRST, nr + 1 {
-	    if (i <= nr) {
-		# Load next range.
-		x1 = rl_src[1,i]
-		np = rl_src[2,i]
-		pv = rl_src[3,i]
-		x2 = x1 + np - 1
-		last = x2
+	# Pack the pixel array into a line list.  This is done by scanning
+	# the pixel list for successive ranges of pixels of constant nonzero
+	# value, where each range is described as follows:
 
-		# Get an inbounds range.
-		if (x1 > xe)
-		    break
-		else if (xs > x2)
-		    next
-		else if (x1 < xs)
-		    x1 = xs
-		else if (x2 > xe)
-		    x2 = xe
+	zero = 0
+	pv = max (zero, px_src[xs])	# pixel value of current range
+	x1 = xs			# start index of current range
+	iz = xs			# start index of range of zeros
+	hi = 1			# current high value
 
-		# Go again if nothing inbounds.
-		nz = x1 - iz
-		np = x2 - x1 + 1
-		if (np <= 0)
+	# Process the data array.
+	do ip = xs, xe {
+	    if (ip < xe) {
+		# Get the next pixel value, loop again if same as previous one.
+		nv = max (zero, px_src[ip+1])
+		if (nv == pv)
 		    next
 
-	    } else if (iz < xe) {
-		# At end of input range list, but need to output a ZN.
-		nz = xe - iz + 1
-		np = 0
-		pv = 0
-	    } else
-		break
+		# If current range is zero, loop again to get nonzero range.
+		if (pv == 0) {
+		    pv = nv
+		    x1 = ip + 1
+		    next
+		}
+	    } else if (pv == 0)
+		x1 = xe + 1
 
 	    # Encode an instruction to regenerate the current range I0-IP
 	    # of N data values of nonzero level PV.  In the most complex case
 	    # we must update the high value and output a range of zeros,
 	    # followed by a range of NP high values.  If NP is 1, we can
 	    # probably use a PN or [ID]S instruction to save space.
+
+	    np = ip - x1 + 1
+	    nz = x1 - iz
 
 	    # Change the high value?
 	    if (pv > 0) {
@@ -109,6 +101,8 @@ begin
 	    }
 
 	    # Output range of zeros to catch up to current range?
+	    # The I_DATAMAX-1 limit is to allow adding M_PN+1 without
+	    # overflowing the range of the data segment.
 	    if (nz > 0) {
 		# Output the ZN instruction.
 		for (;  nz > 0;  nz = nz - (I_DATAMAX-1)) {
@@ -116,7 +110,7 @@ begin
 		    op = op + 1
 		}
 		# Convert to PN if range is a single pixel.
-		if (np == 1 && pv > 0 && x2 == last) {
+		if (np == 1 && pv > 0) {
 		    ll_dst[op-1] = ll_dst[op-1] + M_PN + 1
 		    goto done_
 		}
@@ -128,7 +122,9 @@ begin
 		op = op + 1
 	    }
 done_
-	    iz = x2 + 1
+	    x1 = ip + 1
+	    iz = x1
+	    pv = nv
 	}
 
 	LL_SETLEN(ll_dst, op - 1)

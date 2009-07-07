@@ -9,10 +9,18 @@ procedure pl_pixrop$t (px_src,xs,src_maxval, px_dst,ds,dst_maxval, npix, rop)
 
 PIXEL	px_src[ARB]		#I source pixel array
 long	xs			#I starting pixel index in src
+$if (datatype == l)
+long	src_maxval		#I max pixel value in src mask
+$else
 int	src_maxval		#I max pixel value in src mask
+$endif
 PIXEL	px_dst[ARB]		#O destination pixel array
 long	ds			#I starting pixel index in dst
+$if (datatype == l)
+long	dst_maxval		#I max pixel value in dst mask
+$else
 int	dst_maxval		#I max pixel value in dst mask
+$endif
 size_t	npix			#I number of pixels to convert
 int	rop			#I rasterop
 
@@ -20,7 +28,6 @@ pointer	sp, src
 int	opcode
 long	i
 PIXEL	data, ceil, src_value
-int	and(), or(), xor(), not()
 define	out_ 91
 
 begin

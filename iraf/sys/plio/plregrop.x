@@ -38,7 +38,7 @@ long	xs, lval
 size_t	npix
 pointer	sp, ll_out, ll_reg, ll_dst, ol_dst, rl_out
 pointer	pl_access()
-int	pl_r2li()
+int	pl_r2ll()
 bool	ufcn()
 errchk	plvalid
 
@@ -48,7 +48,7 @@ begin
 	call smark (sp)
 	call salloc (ll_out, LL_MAXLEN(pl), TY_SHORT)
 	call salloc (ll_reg, LL_MAXLEN(pl), TY_SHORT)
-	call salloc (rl_out, RL_MAXLEN(pl), TY_INT)
+	call salloc (rl_out, RL_MAXLEN(pl), TY_LONG)
 
 	sz_val = PL_MAXDIM
 	call amovl (PL_PLANE(pl,1), v, sz_val)
@@ -56,10 +56,10 @@ begin
 
 	for (v[2]=y1;  v[2] <= y2;  v[2]=v[2]+1) {
 	    ll_dst = pl_access (pl, v)
-	    rl_new = ufcn (ufd, v[2], Memi[rl_out], xs, npix)
+	    rl_new = ufcn (ufd, v[2], Meml[rl_out], xs, npix)
 	    if (rl_new) {
 		lval = 1
-		ll_len = pl_r2li (Memi[rl_out], lval, Mems[ll_reg], npix)
+		ll_len = pl_r2ll (Meml[rl_out], lval, Mems[ll_reg], npix)
 	    }
 
 	    if (ll_dst != ol_dst || rl_new) {

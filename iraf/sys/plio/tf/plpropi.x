@@ -20,7 +20,6 @@ pointer	sp, src
 int	opcode
 long	i
 int	data, ceil, src_value
-int	and(), or(), xor(), not()
 define	out_ 91
 
 begin

@@ -27,8 +27,8 @@ int	rop			#I rasterop
 size_t	sz_val
 bool	need_src, need_dst, rop_enable
 int	data, src_value, v_src, v_dst, pv
-int	opcode, rn_o, p, ival
-long	segsize, x, i, np
+int	opcode, rn_o, p
+long	segsize, x, i, np, lval0, lval1
 int	d_src[LEN_PLRDES], d_dst[LEN_PLRDES]
 
 begin
@@ -122,8 +122,9 @@ begin
 		    if (R_NOTSRC(rop)) {
 			v_src = not (v_src)
 			if (src_maxval != 0) {
-			    ival = v_src
-			    v_src = and (ival, src_maxval)
+			    lval0 = v_src
+			    lval1 = src_maxval
+			    v_src = and (lval0, lval1)
 			}
 		    }
 
@@ -136,8 +137,9 @@ begin
 		    if (R_NOTDST(rop)) {
 			v_dst = not (v_dst)
 			if (dst_maxval != 0) {
-			    ival = v_dst
-			    v_dst = and (ival, dst_maxval)
+			    lval0 = v_dst
+			    lval1 = dst_maxval
+			    v_dst = and (lval0, lval1)
 			}
 		    }
 		}
@@ -172,8 +174,9 @@ begin
 		if (dst_maxval == 1 && pv != 0) {
 		    pv = 1
 		} else if (dst_maxval > 1) {
-		    ival = pv
-		    pv = and (ival, dst_maxval)
+		    lval0 = pv
+		    lval1 = dst_maxval
+		    pv = and (lval0, lval1)
 		}
 
 	    } else
