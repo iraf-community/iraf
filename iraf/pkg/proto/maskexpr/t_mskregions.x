@@ -32,21 +32,23 @@ procedure t_mskregions()
 
 pointer	sp, exprdb, dims, regnumber, uaxlen, mskname, imname, regfname
 pointer	st, refim, pmim, expr, xexpr, msklist, imlist, reglist
-int	undim, regval, depth, regfd, pregval
-int	ip, npix, ch, regno, pregno
+int	undim, regval, depth, regfd, pregval, ip, ch, regno, pregno
+long	npix, l_val
 char	lbrackett
 bool	verbose, append
 
+size_t	sz_val
 pointer	pl
 
 pointer	me_getexprdb(), immap(), me_expandtext(), pl_create(), imtopenp()
 pointer	clpopnu(), imstatp()
-int	clplen(), imtlen(), clgeti(), ctoi(), clgfil()
+int	clplen(), imtlen(), clgeti(), ctol(), clgfil()
 int	imtgetim(), imaccess(), strmatch(), fscan(), open()
 int	strdic(), stridx()
 bool	clgetb(), strne()
 data	lbrackett /'('/
 errchk	immap()
+include	<nullptr.inc>
 
 begin
 	# Get the regions file list.
@@ -85,13 +87,16 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	call salloc (exprdb, SZ_FNAME, TY_CHAR)
-	call salloc (dims, SZ_FNAME, TY_CHAR)
-	call salloc (regnumber, SZ_FNAME, TY_CHAR)
-	call salloc (uaxlen, IM_MAXDIM, TY_LONG)
-	call salloc (mskname, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (regfname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (exprdb, sz_val, TY_CHAR)
+	call salloc (dims, sz_val, TY_CHAR)
+	call salloc (regnumber, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (uaxlen, sz_val, TY_LONG)
+	sz_val = SZ_FNAME
+	call salloc (mskname, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (regfname, sz_val, TY_CHAR)
 
 	# Get remaining parameters,
 	call clgstr ("dims", Memc[dims], SZ_FNAME)
@@ -116,8 +121,9 @@ begin
 	# default dimensions are used.
 
 	undim = 0
-	call aclrl (Meml[uaxlen], IM_MAXDIM)
-	for (ip = 1;  ctoi (Memc[dims], ip, npix) > 0;  ) {
+	sz_val = IM_MAXDIM
+	call aclrl (Meml[uaxlen], sz_val)
+	for (ip = 1;  ctol (Memc[dims], ip, npix) > 0;  ) {
 	    Meml[uaxlen+undim] = npix
 	    undim = undim + 1
 	    for (ch = Memc[dims+ip-1];  IS_WHITE(ch) || ch == ',';
@@ -147,7 +153,7 @@ begin
 	    # Open the reference image.
 	    if (imtlen (imlist) > 0) {
 		if (imtgetim (imlist, Memc[imname], SZ_FNAME) != EOF) {
-		    iferr (refim = immap (Memc[imname], READ_ONLY, 0)) {
+		    iferr (refim = immap (Memc[imname], READ_ONLY, NULLPTR)) {
 			refim = NULL
 		        call printf (
 			    "Cannot open reference image %s for mask %s\n")
@@ -166,14 +172,15 @@ begin
 
 	    # Open the output mask.
 	    if (imaccess (Memc[mskname], 0) == YES) {
-		pmim = immap (Memc[mskname], READ_WRITE, 0) 
+		pmim = immap (Memc[mskname], READ_WRITE, NULLPTR) 
 	    } else {
 	        if (refim != NULL) {
 		    pmim = immap (Memc[mskname], NEW_COPY, refim) 
 	        } else {
-		    pmim = immap (Memc[mskname], NEW_IMAGE, 0) 
+		    pmim = immap (Memc[mskname], NEW_IMAGE, NULLPTR) 
 		    IM_NDIM(pmim) = undim
-		    call amovl (Meml[uaxlen], IM_LEN(pmim,1), undim)
+		    sz_val = undim
+		    call amovl (Meml[uaxlen], IM_LEN(pmim,1), sz_val)
 	        }
 		IM_PIXTYPE(pmim) = TY_INT
 		pl = imstatp (pmim, IM_PLDES)
@@ -182,7 +189,7 @@ begin
 		pl = pl_create (IM_NDIM(pmim), IM_LEN(pmim,1), depth)
 		call imsetp (pmim, IM_PLDES, pl)
 		call imunmap (pmim)
-		pmim = immap (Memc[mskname], READ_WRITE, 0) 
+		pmim = immap (Memc[mskname], READ_WRITE, NULLPTR) 
 	    }
 
 	    # Open the regions list.
@@ -190,8 +197,10 @@ begin
 		if (regfd != NULL)
 		    call close (regfd)
 		regfd = open (Memc[regfname], READ_ONLY, TEXT_FILE)
-	    } else if (regfd != NULL)
-	        call seek (regfd, BOF)
+	    } else if (regfd != NULL) {
+		l_val = BOF
+	        call seek (regfd, l_val)
+	    }
 
 	    # Print a header banner.
 	    if (verbose) {
@@ -213,7 +222,8 @@ begin
 	    while (fscan (regfd) != EOF) {
 
 		# Get the expression.
-	        call malloc (expr, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+	        call malloc (expr, sz_val, TY_CHAR)
 		call gargstr (Memc[expr], SZ_LINE)
 
 		# Determine whether or not the region specificationis an

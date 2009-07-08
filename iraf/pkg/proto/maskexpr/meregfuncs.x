@@ -7,17 +7,18 @@ include <math.h>
 
 procedure me_point (ix, iy, stat, npts, x1, y1)
 
-int	ix[ARB]			#I the integer x coordinates
-int	iy[ARB]			#I the integer y coordinates
+long	ix[ARB]			#I the integer x coordinates
+long	iy[ARB]			#I the integer y coordinates
 int	stat[ARB]		#O the integer status array containing YES or NO
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 real	x1, y1			#I the coordinates of the point
 
-int	i
+long	i
+long	lnint()
 
 begin
 	do i = 1, npts {
-	    if (ix[i] == nint(x1) && iy[i] == nint(y1))
+	    if (ix[i] == lnint(x1) && iy[i] == lnint(y1))
 		stat[i] = YES
 	    else
 		stat[i] = NO
@@ -29,15 +30,15 @@ end
 
 procedure me_circle (ix, iy, stat, npts, xc, yc, r)
 
-int	ix[ARB]			#I the integer x coordinates
-int	iy[ARB]			#I the integer y coordinates
+long	ix[ARB]			#I the integer x coordinates
+long	iy[ARB]			#I the integer y coordinates
 int	stat[ARB]		#O the integer status array containing YES or NO
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 real	xc, yc			#I the center of the circle
 real	r			#I the radius of the circle
 
 real	r2, rdist
-int	i
+long	i
 
 begin
 	r2 = r * r
@@ -56,15 +57,15 @@ end
 
 procedure me_cannulus (ix, iy, stat, npts, xc, yc, r1, r2)
 
-int	ix[ARB]			#I the integer x coordinates
-int	iy[ARB]			#I the integer y coordinates
+long	ix[ARB]			#I the integer x coordinates
+long	iy[ARB]			#I the integer y coordinates
 int	stat[ARB]		#O the integer status array containing YES or NO
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 real	xc, yc			#I the center of the circle
 real	r1, r2			#I the radius of the circular annulus
 
 real	r12, r22, rdist
-int	i
+long	i
 
 begin
 	r12 = r1 * r1
@@ -83,10 +84,10 @@ end
 
 procedure me_ellipse (ix, iy, stat, npts, xc, yc, a, ratio, theta)
 
-int	ix[ARB]			#I the integer x coordinates
-int	iy[ARB]			#I the integer y coordinates
+long	ix[ARB]			#I the integer x coordinates
+long	iy[ARB]			#I the integer y coordinates
 int	stat[ARB]		#O the integer status array (YES/NO)
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 real	xc, yc			#I the center of the ellipse
 real	a			#I the semi-major axis of the ellipse
 real	ratio			#I the semi-minor / semi-minor axis
@@ -94,7 +95,7 @@ real	theta			#I the position angle of the ellipse
 
 real	asq, bsq, cost, sint, costsq, sintsq, rdist
 real	dx, dy, aa, bb, cc, rr
-int	i
+long	i
 
 begin
 	asq = a * a
@@ -125,10 +126,10 @@ end
 
 procedure me_eannulus (ix, iy, stat, npts, xc, yc, a1, a2, ratio, theta)
 
-int	ix[ARB]			#I the integer x coordinates
-int	iy[ARB]			#I the integer y coordinates
+long	ix[ARB]			#I the integer x coordinates
+long	iy[ARB]			#I the integer y coordinates
 int	stat[ARB]		#O the integer status array (YES/NO)
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 real	xc, yc			#I the center of the ellipse
 real	a1, a2			#I the semi-major axis of the i/o ellipse
 real	ratio			#I the semi-minor / semi-major axis of ellipse
@@ -137,7 +138,7 @@ real	theta			#I the position angle of the ellipse
 real	a1sq, b1sq, aa1, bb1, cc1, rr1, rdist1
 real	a2sq, b2sq, aa2, bb2, cc2, rr2, rdist2
 real	dx, dy, cost, sint, costsq, sintsq
-int	i
+long	i
 
 begin
 	# First ellipse.
@@ -178,10 +179,10 @@ end
 
 procedure me_rectangle (ix, iy, stat, npts, xc, yc, a, ratio, theta)
 
-int	ix[ARB]			#I the integer x coordinates
-int	iy[ARB]			#I the integer y coordinates
+long	ix[ARB]			#I the integer x coordinates
+long	iy[ARB]			#I the integer y coordinates
 int	stat[ARB]		#O the integer status array (YES/NO)
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 real	xc, yc			#I the center of the rectangle
 real	a			#I the semi-major axis width of the rectangle
 real	ratio			#I the semi-minor axis / semi-major axis
@@ -220,10 +221,10 @@ end
 
 procedure me_rannulus (ix, iy, stat, npts, xc, yc, r1, r2, ratio, theta)
 
-int	ix[ARB]			#I the integer x coordinates
-int	iy[ARB]			#I the integer y coordinates
+long	ix[ARB]			#I the integer x coordinates
+long	iy[ARB]			#I the integer y coordinates
 int	stat[ARB]		#O the integer status array (YES/NO)
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 real	xc, yc			#I the center of the rectangle
 real	r1, r2			#I the semi-major axis width of the rectangle
 real	ratio			#I the semi-minor / semi-major axis ratio
@@ -283,15 +284,15 @@ end
 
 procedure me_box (ix, iy, stat, npts, x1, y1, x2, y2)
 
-int	ix[ARB]			#I the integer x coordinates
-int	iy[ARB]			#I the integer y coordinates
+long	ix[ARB]			#I the integer x coordinates
+long	iy[ARB]			#I the integer y coordinates
 int	stat[ARB]		#O the integer status array (YES/NO)
-int	npts			#I the number of points
+size_t	npts			#I the number of points
 real	x1, y1			#I first box corner
 real	x2, y2			#I first box corner
 
 real	xmin, xmax, ymin, ymax
-int	i
+long	i
 
 begin
 	xmin = min (x1, x2)
@@ -313,35 +314,39 @@ end
 
 procedure me_polygon (ix, iy, stat, npts, xver, yver, nver)
 
-int	ix[ARB]			#I the x image pixel coordinates
-int	iy[ARB]			#I the y image pixel coordinates
+long	ix[ARB]			#I the x image pixel coordinates
+long	iy[ARB]			#I the y image pixel coordinates
 int	stat[ARB]		#O the output status array
-int	npts			#I the number of image pixel coordinates
+size_t	npts			#I the number of image pixel coordinates
 real	xver[ARB]		#I the x polygon vertices coordinates
 real	yver[ARB]		#I the y polygon vertices coordinates
 int	nver			#I the number of polygon coordinates
 
+size_t	sz_val
 real	lx, ld
 pointer	sp, txver, tyver, work1, work2, xintr
-int	i, j, ixmin, ixmax, nintr
+long	i, ixmin, ixmax
+int	j, nintr
 int	me_pyclip()
 
 begin
 	call smark (sp)
-	call salloc (txver, nver + 1, TY_REAL)
-	call salloc (tyver, nver + 1, TY_REAL)
-	call salloc (work1, nver + 1, TY_REAL)
-	call salloc (work2, nver + 1, TY_REAL)
-	call salloc (xintr, nver + 1, TY_REAL)
+	sz_val = nver + 1
+	call salloc (txver, sz_val, TY_REAL)
+	call salloc (tyver, sz_val, TY_REAL)
+	call salloc (work1, sz_val, TY_REAL)
+	call salloc (work2, sz_val, TY_REAL)
+	call salloc (xintr, sz_val, TY_REAL)
 
 	# Close the polygon.
-	call amovr (xver, Memr[txver], nver)
-	call amovr (yver, Memr[tyver], nver)
+	sz_val = nver
+	call amovr (xver, Memr[txver], sz_val)
+	call amovr (yver, Memr[tyver], sz_val)
 	Memr[txver+nver] = xver[1] 
 	Memr[tyver+nver] = yver[1] 
 
 	# Loop over the points.
-	call alimi (ix, npts, ixmin, ixmax)
+	call aliml (ix, npts, ixmin, ixmax)
 	lx = ixmax - ixmin + 1
 	do i = 1, npts {
 
@@ -351,11 +356,13 @@ begin
 	    if (i == 1)  {
 		nintr = me_pyclip (Memr[txver], Memr[tyver], Memr[work1],
 		    Memr[work2], Memr[xintr], nver + 1, lx, ld)
-		call asrtr (Memr[xintr], Memr[xintr], nintr)
+		sz_val = nintr
+		call asrtr (Memr[xintr], Memr[xintr], sz_val)
 	    } else if (iy[i] != iy[i-1]) {
 		nintr = me_pyclip (Memr[txver], Memr[tyver], Memr[work1],
 		    Memr[work2], Memr[xintr], nver + 1, lx, ld)
-		call asrtr (Memr[xintr], Memr[xintr], nintr)
+		sz_val = nintr
+		call asrtr (Memr[xintr], Memr[xintr], sz_val)
 	    }
 
 	    # Are the intersection points in range ?
@@ -380,44 +387,49 @@ end
 
 procedure me_apolygon (ix, iy, stat, npts, ixver, iyver, oxver, oyver, nver)
 
-int	ix[ARB]			#I the x image pixel coordinates
-int	iy[ARB]			#I the y image pixel coordinates
+long	ix[ARB]			#I the x image pixel coordinates
+long	iy[ARB]			#I the y image pixel coordinates
 int	stat[ARB]		#O the output status array
-int	npts			#I the number of image pixel coordinates
+size_t	npts			#I the number of image pixel coordinates
 real	ixver[ARB]		#I the x polygon vertices coordinates
 real	iyver[ARB]		#I the y polygon vertices coordinates
 real	oxver[ARB]		#I the x polygon vertices coordinates
 real	oyver[ARB]		#I the y polygon vertices coordinates
 int	nver			#I the number of polygon coordinates
 
+size_t	sz_val
 real	lx, ld
 pointer	sp, tixver, tiyver, toxver, toyver, work1, work2, ixintr, oxintr
-int	i, j, jj, ixmin, ixmax, inintr, onintr, ibegin, iend
+long	i, ixmin, ixmax
+int	j, jj, inintr, onintr, ibegin, iend
 int	me_pyclip()
 
 begin
 	call smark (sp)
-	call salloc (tixver, nver + 1, TY_REAL)
-	call salloc (tiyver, nver + 1, TY_REAL)
-	call salloc (toxver, nver + 1, TY_REAL)
-	call salloc (toyver, nver + 1, TY_REAL)
-	call salloc (work1, nver + 1, TY_REAL)
-	call salloc (work2, nver + 1, TY_REAL)
-	call salloc (ixintr, nver + 1, TY_REAL)
-	call salloc (oxintr, nver + 1, TY_REAL)
+	sz_val = nver + 1
+	call salloc (tixver, sz_val, TY_REAL)
+	call salloc (tiyver, sz_val, TY_REAL)
+	call salloc (toxver, sz_val, TY_REAL)
+	call salloc (toyver, sz_val, TY_REAL)
+	call salloc (work1, sz_val, TY_REAL)
+	call salloc (work2, sz_val, TY_REAL)
+	call salloc (ixintr, sz_val, TY_REAL)
+	call salloc (oxintr, sz_val, TY_REAL)
 
 	# Close the polygons.
-	call amovr (ixver, Memr[tixver], nver)
-	call amovr (iyver, Memr[tiyver], nver)
+	sz_val = nver
+	call amovr (ixver, Memr[tixver], sz_val)
+	call amovr (iyver, Memr[tiyver], sz_val)
 	Memr[tixver+nver] = ixver[1] 
 	Memr[tiyver+nver] = iyver[1] 
-	call amovr (oxver, Memr[toxver], nver)
-	call amovr (oyver, Memr[toyver], nver)
+	sz_val = nver
+	call amovr (oxver, Memr[toxver], sz_val)
+	call amovr (oyver, Memr[toyver], sz_val)
 	Memr[toxver+nver] = oxver[1] 
 	Memr[toyver+nver] = oyver[1] 
 
 	# Loop over the points.
-	call alimi (ix, npts, ixmin, ixmax)
+	call aliml (ix, npts, ixmin, ixmax)
 	lx = ixmax - ixmin + 1
 	do i = 1, npts {
 
@@ -429,11 +441,13 @@ begin
 	    if (i == 1)  {
 		onintr = me_pyclip (Memr[toxver], Memr[toyver], Memr[work1],
 		    Memr[work2], Memr[oxintr], nver + 1, lx, ld)
-		call asrtr (Memr[oxintr], Memr[oxintr], onintr)
+		sz_val = onintr
+		call asrtr (Memr[oxintr], Memr[oxintr], sz_val)
 	    } else if (iy[i] != iy[i-1]) {
 		onintr = me_pyclip (Memr[toxver], Memr[toyver], Memr[work1],
 		    Memr[work2], Memr[oxintr], nver + 1, lx, ld)
-		call asrtr (Memr[oxintr], Memr[oxintr], onintr)
+		sz_val = onintr
+		call asrtr (Memr[oxintr], Memr[oxintr], sz_val)
 	    }
 	    if (onintr <= 0)
 		next
@@ -443,11 +457,13 @@ begin
 	    if (i == 1)  {
 		inintr = me_pyclip (Memr[tixver], Memr[tiyver], Memr[work1],
 		    Memr[work2], Memr[ixintr], nver + 1, lx, ld)
-		call asrtr (Memr[ixintr], Memr[ixintr], inintr)
+		sz_val = inintr
+		call asrtr (Memr[ixintr], Memr[ixintr], sz_val)
 	    } else if (iy[i] != iy[i-1]) {
 		inintr = me_pyclip (Memr[tixver], Memr[tiyver], Memr[work1],
 		    Memr[work2], Memr[ixintr], nver + 1, lx, ld)
-		call asrtr (Memr[ixintr], Memr[ixintr], inintr)
+		sz_val = inintr
+		call asrtr (Memr[ixintr], Memr[ixintr], sz_val)
 	    }
 
 	    # Are the intersection points in range ?
@@ -505,32 +521,35 @@ define	MAX_NRANGES	100
 
 procedure me_cols (ix, stat, npts, rangstr)
 
-int	ix[ARB]			#I the x image pixel coordinates
+long	ix[ARB]			#I the x image pixel coordinates
 int	stat[ARB]		#O the output status array
-int	npts			#I the number of image pixel coordinates
+size_t	npts			#I the number of image pixel coordinates
 char	rangstr[ARB]		#I the input range specification string
 
+size_t	sz_val
 pointer	sp, ranges
-int	index, nvals
-int	me_decode_ranges(), me_next_number()
+long	index, nvals
+int	me_decode_ranges()
+long	me_next_number()
 
 begin
 	# Allocate space for storing the ranges.
 	call smark (sp)
-	call salloc (ranges, 3 * MAX_NRANGES + 1, TY_INT)
+	sz_val = 3 * MAX_NRANGES + 1
+	call salloc (ranges, sz_val, TY_LONG)
 
 	# Decode the ranges string. If there was an error set up the ranges
 	# so as to include everything.
-	if (me_decode_ranges (rangstr, Memi[ranges], MAX_NRANGES,
+	if (me_decode_ranges (rangstr, Meml[ranges], MAX_NRANGES,
 	    nvals) == ERR) {
-	    if (me_decode_ranges ("-", Memi[ranges], MAX_NRANGES, nvals) != ERR)
+	    if (me_decode_ranges ("-", Meml[ranges], MAX_NRANGES, nvals) != ERR)
 		;
 	}
 
 	# Set the status array.
 	call amovki (NO, stat, npts)
 	index = 0
-	while (me_next_number (Memi[ranges], index) != EOF)
+	while (me_next_number (Meml[ranges], index) != EOF)
 	    stat[index] = YES
 
 	call sfree (sp)
@@ -541,26 +560,28 @@ end
 
 procedure me_lines (ix, stat, npts, rangstr)
 
-int	ix[ARB]			#I the x image pixel coordinates
+long	ix[ARB]			#I the x image pixel coordinates
 int	stat[ARB]		#O the output status array
-int	npts			#I the number of image pixel coordinates
+size_t	npts			#I the number of image pixel coordinates
 char	rangstr[ARB]		#I the input range specification string
 
+size_t	sz_val
 pointer	sp, ranges
-int	i, lastix, nvals
+long	i, lastix, nvals
 int	me_decode_ranges()
 bool	me_is_in_range()
 
 begin
 	# Allocate space for storing the ranges.
 	call smark (sp)
-	call salloc (ranges, 3 * MAX_NRANGES + 1, TY_INT)
+	sz_val = 3 * MAX_NRANGES + 1
+	call salloc (ranges, sz_val, TY_LONG)
 
 	# Decode the ranges string. If there was an error set up the ranges
 	# so as to include everything.
-	if (me_decode_ranges (rangstr, Memi[ranges], MAX_NRANGES,
+	if (me_decode_ranges (rangstr, Meml[ranges], MAX_NRANGES,
 	    nvals) == ERR) {
-	    if (me_decode_ranges ("-", Memi[ranges], MAX_NRANGES, nvals) != ERR)
+	    if (me_decode_ranges ("-", Meml[ranges], MAX_NRANGES, nvals) != ERR)
 		;
 	}
 
@@ -570,7 +591,7 @@ begin
 	do i = 1, npts {
 	    if (ix[i] == lastix) {
 		stat[i] = YES
-	    } else if (me_is_in_range (Memi[ranges], ix[i])) {
+	    } else if (me_is_in_range (Meml[ranges], ix[i])) {
 		lastix = ix[i]
 		stat[i] = YES
 	    }
@@ -584,10 +605,10 @@ end
 
 procedure me_vector (ix, iy, stat, npts, x1, y1, x2, y2, width)
 
-int	ix[ARB]			#I the x image pixel coordinates
-int	iy[ARB]			#I the y image pixel coordinates
+long	ix[ARB]			#I the x image pixel coordinates
+long	iy[ARB]			#I the y image pixel coordinates
 int	stat[ARB]		#O the output status array
-int	npts			#I the number of image pixel coordinates
+size_t	npts			#I the number of image pixel coordinates
 real	x1, y1			#I coordinates of the first point
 real	x2, y2			#I coordinates of the first point
 real	width			#I the vector width
@@ -631,17 +652,18 @@ define	SMALL_NUMBER	1.0e-24
 
 procedure me_pie (ix, iy, stat, npts, xc, yc, angle1, angle2, width, height)
 
-int	ix[ARB]			#I the x pixel coordinates
-int	iy[ARB]			#I the y pixel coordinates
+long	ix[ARB]			#I the x pixel coordinates
+long	iy[ARB]			#I the y pixel coordinates
 int	stat[ARB]		#O the output status array 
-int	npts			#I the number of data points
+size_t	npts			#I the number of data points
 real	xc, yc			#I the center of the wedge
 real	angle1, angle2		#I the wedge angles
-int	width, height		#I the image mask width and height
+long	width, height		#I the image mask width and height
 
 real	sweep, x2, y2, vx[7], vy[7]
 int	count, intrcpt1, intrcpt2
 int	me_pie_intercept(), me_corner_vertex()
+real	aabs()
 
 begin
 	# Set the first vertex
@@ -650,7 +672,7 @@ begin
 	sweep = angle2 - angle1
 
 	# If the sweep is too small to be noticed don't bother.
-	if (abs (sweep) < SMALL_NUMBER) {
+	if ( aabs(sweep) < SMALL_NUMBER ) {
 	    call amovki (NO, stat, npts) 
 	    return
 	}
@@ -690,12 +712,13 @@ end
 
 int procedure me_pie_intercept (width, height, xcen, ycen, angle, xcept, ycept)
 
-int	width, height		#I the dimensions of the image field
+long	width, height		#I the dimensions of the image field
 real	xcen, ycen		#I the base pivot point of the ray
 real	angle			#I the angle of ray
 real	xcept, ycept		#I coordinates of intercept with edge of image
 
 real	angl, slope
+real	aabs()
 
 begin
 	# Put angles in normal range.
@@ -706,14 +729,14 @@ begin
 	    angl = angl - 360.0
 
 	# Check for a horizontal angle.
-	if (abs (angl) < SMALL_NUMBER) {
+	if ( aabs(angl) < SMALL_NUMBER ) {
 	    #xcept = 0
 	    xcept = width + 1
 	    ycept = ycen
 	    #return (2)
 	    return (4)
 	}
-	if (abs (angl - 180.0) < SMALL_NUMBER) {
+	if ( aabs(angl - 180.0) < SMALL_NUMBER ) {
 	    #xcept = width + 1
 	    xcept = 0
 	    ycept = ycen
@@ -730,14 +753,14 @@ begin
 	if (angl < 180.0) {
 	    ycept = height + 1
 	    # rule out vertical line
-	    if (abs(angl - 90.0) < SMALL_NUMBER) {
+	    if ( aabs(angl - 90.0) < SMALL_NUMBER ) {
 		x_cept = xcen
 		return (1)
 	    }
 	} else {
 	    ycept = 0.0
 	    # rule out vertical line
-	    if (abs(angl - 270.0) < SMALL_NUMBER) {
+	    if ( aabs(angl - 270.0) < SMALL_NUMBER ) {
 		xcept = xcen
 		return (3)
 	    }
@@ -775,7 +798,7 @@ end
 int procedure me_corner_vertex (index, width, height, x, y)
 
 int	index			#I  code of side before corner
-int	width, height		#I  dimensions of image field
+long	width, height		#I  dimensions of image field
 real	x, y			#O  coords of corner
 
 begin
@@ -815,17 +838,19 @@ real    xin[ARB]                #I the x coordinates of the input vertices
 real    yin[ARB]                #I the y coordinates of the input vertices
 real    xout[ARB]               #O the x coordinates of the output vertices
 real    yout[ARB]               #O the y coordinates of the output vertices
-int     nver                    #I the number of vertices
+int	nver                    #I the number of vertices
 real    width                   #I the width of the expansion region
 
+size_t	sz_val
 real    xcen, ycen, m1, b1, m2, b2, xp1, yp1, xp2, yp2
-int     i
+int	i
 real    asumr()
 
 begin
         # Find the center of gravity of the polygon.
-        xcen = asumr (xin, nver) / nver
-        ycen = asumr (yin, nver) / nver
+	sz_val = nver
+        xcen = asumr (xin, sz_val) / nver
+        ycen = asumr (yin, sz_val) / nver
 
         do i = 1, nver {
 
@@ -941,11 +966,12 @@ real    yver[ARB]               #I the y vertex coords
 real    xintr[ARB]              #O the array of x intersection points
 real    slope[ARB]              #O the array of y slopes at intersection points
 real    xranges[ARB]            #O the x line segments
-int     nver                    #I the number of vertices
+int	nver                    #I the number of vertices
 real    lx, ld                  #I the equation of the image line
 
+size_t	sz_val
 real    u1, u2, u1u2, dx, dy, dd, xa, wa
-int     i, j, nintr, nplus, nzero, nneg, imin, imax, nadd
+int	i, j, nintr, nplus, nzero, nneg, imin, imax, nadd
 bool    collinear
 
 begin
@@ -1127,23 +1153,27 @@ begin
 
         # Reorder the x ranges and slopes if necessary.
         if ((imax < imin) && ! (imin == nintr && imax == 1)) {
-            call amovr (xranges, xintr, nintr)
+	    sz_val = nintr
+            call amovr (xranges, xintr, sz_val)
             do i = 1, imax
                 xranges[nintr-imax+i] = xintr[i]
             do i = imin, nintr
                 xranges[i-imax] = xintr[i]
-            call amovr (slope, xintr, nintr)
+	    sz_val = nintr
+            call amovr (slope, xintr, sz_val)
             do i = 1, imax
                 slope[nintr-imax+i] = xintr[i]
             do i = imin, nintr
                 slope[i-imax] = xintr[i]
         } else if ((imin < imax) && ! (imin == 1 && imax == nintr)) {
-            call amovr (xranges, xintr, nintr)
+	    sz_val = nintr
+            call amovr (xranges, xintr, sz_val)
             do i = 1, imin
                 xranges[nintr-imin+i] = xintr[i]
             do i = imax, nintr
                 xranges[i-imin] = xintr[i]
-            call amovr (slope, xintr, nintr)
+	    sz_val = nintr
+            call amovr (slope, xintr, sz_val)
             do i = 1, imin
                 slope[nintr-imin+i] = xintr[i]
             do i = imax, nintr
@@ -1180,11 +1210,11 @@ end
 procedure me_alimr (data, npts, mindat, maxdat, imin, imax)
 
 real    data[npts]      #I the input data array
-int     npts            #I the number of points
+int	npts            #I the number of points
 real    mindat, maxdat  #O the minimum and maximum data values
-int     imin, imax      #O the indices of the minimum and maximum data values
+int	imin, imax      #O the indices of the minimum and maximum data values
 
-int     i
+int	i
 
 begin
         imin = 1
@@ -1206,7 +1236,7 @@ end
 
 
 define	FIRST	1		# Default starting range
-define	LAST	MAX_INT		# Default ending range
+define	LAST	MAX_LONG	# Default ending range
 define	STEP	1		# Default step
 define	EOLIST	0		# End of list
 
@@ -1220,11 +1250,14 @@ define	EOLIST	0		# End of list
 int procedure me_decode_ranges (range_string, ranges, max_ranges, nvalues)
 
 char	range_string[ARB]	#I range string to be decoded
-int	ranges[3, max_ranges]	#O output range array
+long	ranges[3, max_ranges]	#O output range array
 int	max_ranges		#I maximum number of ranges
-int	nvalues			#O the number of values in the ranges
+long	nvalues			#O the number of values in the ranges
 
-int	ip, nrange, first, last, step, ctoi()
+int	ip, nrange
+long	first, last, step
+int	ctol()
+long	labs()
 
 begin
 	ip = 1
@@ -1249,7 +1282,7 @@ begin
 		    ranges[2, 1] = last
 		    ranges[3, 1] = step
 		    ranges[1, 2] = EOLIST
-	    	    nvalues = MAX_INT
+	    	    nvalues = MAX_LONG
 		    return (OK)
 		} else {
 		    ranges[1, nrange] = EOLIST
@@ -1260,7 +1293,7 @@ begin
 	    else if (range_string[ip] == 'x')
 		;
 	    else if (IS_DIGIT(range_string[ip])) {		# ,n..
-		if (ctoi (range_string, ip, first) == 0)
+		if (ctol (range_string, ip, first) == 0)
 		    return (ERR)
 	    } else
 		return (ERR)
@@ -1280,7 +1313,7 @@ begin
 		if (range_string[ip] == EOS)
 		    ;
 		else if (IS_DIGIT(range_string[ip])) {
-		    if (ctoi (range_string, ip, last) == 0)
+		    if (ctol (range_string, ip, last) == 0)
 		        return (ERR)
 		} else if (range_string[ip] == 'x')
 		    ;
@@ -1302,7 +1335,7 @@ begin
 		if (range_string[ip] == EOS)
 		    ;
 		else if (IS_DIGIT(range_string[ip])) {
-		    if (ctoi (range_string, ip, step) == 0)
+		    if (ctol (range_string, ip, step) == 0)
 		        ;
 		    if (step == 0)
 			return (ERR)
@@ -1316,7 +1349,7 @@ begin
 	    ranges[1, nrange] = first
 	    ranges[2, nrange] = last
 	    ranges[3, nrange] = step
-	    nvalues = nvalues + abs (last-first) / step + 1
+	    nvalues = nvalues + labs (last-first) / step + 1
 	}
 
 	return (ERR)					# ran out of space
@@ -1329,12 +1362,14 @@ end
 # regardless of the order in which the ranges are given.  Duplicate entries
 # are ignored.  EOF is returned at the end of the list.
 
-int procedure me_next_number (ranges, number)
+long procedure me_next_number (ranges, number)
 
-int	ranges[ARB]		#I the range array
-int	number			#U both input and output parameter
+long	ranges[ARB]		#I the range array
+long	number			#U both input and output parameter
 
-int	ip, first, last, step, next_number, remainder
+int	ip
+long	first, last, step, next_number, remainder
+long	lmod()
 
 begin
 	# If number+1 is anywhere in the list, that is the next number,
@@ -1342,7 +1377,7 @@ begin
 	# is greater than number+1.
 
 	number = number + 1
-	next_number = MAX_INT
+	next_number = MAX_LONG
 
 	for (ip=1;  ranges[ip] != EOLIST;  ip=ip+3) {
 	    first = min (ranges[ip], ranges[ip+1])
@@ -1351,7 +1386,7 @@ begin
 	    if (step == 0)
 		call error (1, "Step size of zero in range list")
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = lmod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder + step <= last)
@@ -1360,7 +1395,7 @@ begin
 		next_number = min (next_number, first)
 	}
 
-	if (next_number == MAX_INT)
+	if (next_number == MAX_LONG)
 	    return (EOF)
 	else {
 	    number = next_number
@@ -1375,12 +1410,14 @@ end
 # regardless of the order in which the ranges are given.  Duplicate entries
 # are ignored.  EOF is returned at the end of the list.
 
-int procedure me_previous_number (ranges, number)
+long procedure me_previous_number (ranges, number)
 
-int	ranges[ARB]		# Range array
-int	number			# Both input and output parameter
+long	ranges[ARB]		# Range array
+long	number			# Both input and output parameter
 
-int	ip, first, last, step, next_number, remainder
+int	ip
+long	first, last, step, next_number, remainder
+long	lmod()
 
 begin
 	# If number-1 is anywhere in the list, that is the previous number,
@@ -1397,13 +1434,13 @@ begin
 	    if (step == 0)
 		call error (1, "Step size of zero in range list")
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = lmod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder >= first)
 		    next_number = number - remainder
 	    } else if (last < number) {
-		remainder = mod (last - first, step)
+		remainder = lmod(last - first, step)
 		if (remainder == 0)
 		    next_number = max (next_number, last)
 		else if (last - remainder >= first)
@@ -1421,18 +1458,20 @@ end
 
 
 # ME_IS_IN_RANGE -- Test number to see if it is in range. If the number is
-# INDEFI then it is mapped to the maximum integer.
+# INDEFL then it is mapped to the maximum integer.
 
 bool procedure me_is_in_range (ranges, number)
 
-int	ranges[ARB]		# range array
-int	number			# number to be tested against ranges
+long	ranges[ARB]		# range array
+long	number			# number to be tested against ranges
 
-int	ip, first, last, step, num
+int	ip
+long	num, first, last, step
+long	lmod()
 
 begin
-	if (IS_INDEFI (number))
-	    num = MAX_INT
+	if (IS_INDEFL (number))
+	    num = MAX_LONG
 	else
 	    num = number
 
@@ -1441,7 +1480,7 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (num >= first && num <= last)
-		if (mod (num - first, step) == 0)
+		if ( lmod(num - first, step) == 0 )
 		    return (true)
 	}
 

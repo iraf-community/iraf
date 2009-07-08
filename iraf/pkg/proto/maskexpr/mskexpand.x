@@ -31,8 +31,9 @@ pointer procedure me_getexprdb (fname)
 
 char	fname[ARB]		#I file to be read
 
+size_t	sz_val
 pointer	sym, sp, lbuf, st, a_st, ip, symname, tokbuf, text
-int	tok, fd, line, nargs, op, token, buflen, offset, stpos, n
+int	tok, fd, line, nargs, op, token, buflen, offset, stpos, n, i_val, i_off
 pointer	stopen(), stenter()
 int	open(), getlline(), ctotok(), stpstr()
 errchk	open, getlline, stopen, stenter, me_puttok
@@ -41,10 +42,12 @@ define	skip_ 91
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_COMMAND, TY_CHAR)
-	call salloc (text, SZ_COMMAND, TY_CHAR)
-	call salloc (tokbuf, SZ_COMMAND, TY_CHAR)
-	call salloc (symname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call salloc (lbuf, sz_val, TY_CHAR)
+	call salloc (text, sz_val, TY_CHAR)
+	call salloc (tokbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (symname, sz_val, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 	st = stopen ("imexpr", DEF_LENINDEX, DEF_LENSTAB, DEF_LENSBUF)
@@ -62,7 +65,10 @@ begin
 		next
 	
 	    # Get symbol name.
-	    if (ctotok (Memc,ip,Memc[symname],SZ_FNAME) != TOK_IDENTIFIER) {
+	    i_off = 1
+	    i_val = ctotok (Memc[ip],i_off,Memc[symname],SZ_FNAME)
+	    ip = ip + i_off - 1
+	    if ( i_val != TOK_IDENTIFIER ) {
 		call eprintf ("exprdb: expected identifier at line %d\n")
 		    call pargi (line)
 skip_		while (getlline (fd, Memc[lbuf], SZ_COMMAND) != EOF) {
@@ -86,7 +92,9 @@ skip_		while (getlline (fd, Memc[lbuf], SZ_COMMAND) != EOF) {
 		ip = ip + 1
 		n = 0
 		repeat {
-		    tok = ctotok (Memc, ip, Memc[tokbuf], SZ_FNAME)
+		    i_off = 1
+		    tok = ctotok (Memc[ip], i_off, Memc[tokbuf], SZ_FNAME)
+		    ip = ip + i_off - 1
 		    if (tok == TOK_IDENTIFIER) {
 			sym = stenter (a_st, Memc[tokbuf], LEN_ARGSYM)
 			n = n + 1
@@ -114,7 +122,9 @@ skip_		while (getlline (fd, Memc[lbuf], SZ_COMMAND) != EOF) {
 	    
 	    repeat {
 		repeat {
-		    token = ctotok (Memc, ip, Memc[tokbuf], SZ_COMMAND)
+		    i_off = 1
+		    token = ctotok (Memc[ip], i_off, Memc[tokbuf], SZ_COMMAND)
+		    ip = ip + i_off - 1
 		    if (Memc[tokbuf] == '#')
 			break
 		    else if (token != TOK_EOS && token != TOK_NEWLINE)
@@ -170,6 +180,7 @@ int	op			#U output pointer
 int	buflen			#U buffer length, chars
 char	token[ARB]		#I token string
 
+size_t	sz_val
 pointer	sym
 int	ip, ch1, ch2
 pointer	stfind()
@@ -190,7 +201,8 @@ begin
 	for (ip=1;  token[ip] != EOS;  ip=ip+1) {
 	    if (op + 1 > buflen) {
 		buflen = buflen + SZ_COMMAND
-		call realloc (text, buflen, TY_CHAR)
+		sz_val = buflen
+		call realloc (text, sz_val, TY_CHAR)
 	    }
 
 	    # The following is necessary because ctotok parses tokens such as
@@ -243,18 +255,21 @@ pointer procedure me_expandtext (st, expr)
 pointer	st			#I symbol table (macros)
 char	expr[ARB]		#I input expression
 
+size_t	sz_val
+long	l_val
 pointer	buf, gt
 int	buflen, nchars
 int	gt_expand()
 pointer	locpr(), gt_opentext()
-pointer	me_gsym()
 extern	me_gsym()
 
 begin
 	buflen = SZ_COMMAND
-	call malloc (buf, buflen, TY_CHAR)
+	sz_val = buflen
+	call malloc (buf, sz_val, TY_CHAR)
 
-	gt = gt_opentext (expr, locpr(me_gsym), st, 0, GT_NOFILE)
+	l_val = 0
+	gt = gt_opentext (expr, locpr(me_gsym), st, l_val, GT_NOFILE)
 	nchars = gt_expand (gt, buf, buflen)
 	call gt_close (gt)
 

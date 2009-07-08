@@ -10,14 +10,17 @@ include "peregfuncs.h"
 bool procedure pe_ucircle (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	y			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O first pixel to be edited
-int	npix			#O number of pixels affected
+long	y			#I mask line number
+long	rl_reg[3,ARB]		#O output range list for line Y
+long	xs			#O first pixel to be edited
+size_t	npix			#O number of pixels affected
 
 real	radius, dx, dy
 pointer	pl
-int	rn, axlen, x1, x1_clipped, x2, x2_clipped
+int	rn
+long	x1, x1_clipped, x2, x2_clipped, axlen
+long	lint()
+real	aabs()
 
 begin
 	pl = C_PL(ufd)
@@ -25,15 +28,15 @@ begin
 	axlen = PL_AXLEN(pl,1)
 	radius = C_RADIUS(ufd)
 
-	dy = abs (C_YCEN(ufd) - y)
+	dy = aabs(C_YCEN(ufd) - y)
 	if (dy < radius) {
 	    dx = radius * radius - dy * dy
 	    if (dx > 0.0)
 		dx = sqrt (dx)
 	    else
 		dx = 0.0
-	    x1 = int(C_XCEN(ufd) - dx)
-	    x2 = int(C_XCEN(ufd) + dx)
+	    x1 = lint(C_XCEN(ufd) - dx)
+	    x2 = lint(C_XCEN(ufd) + dx)
 	    x1_clipped = max(1, min (axlen, x1))
 	    x2_clipped = max(x1, min (axlen, x2))
 	    xs = x1_clipped
@@ -60,14 +63,17 @@ end
 bool procedure pe_uellipse (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	y			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O first pixel to be edited
-int	npix			#O number of pixels affected
+long	y			#I mask line number
+long	rl_reg[3,ARB]		#O output range list for line Y
+long	xs			#O first pixel to be edited
+size_t	npix			#O number of pixels affected
 
 real	dy, dy2, ady, bb, cc, discr, dx1, dx2
 pointer	pl
-int	rn, axlen, x1, x1_clipped, x2, x2_clipped
+int	rn
+long	x1, x1_clipped, x2, x2_clipped, axlen
+long	lint()
+real	aabs()
 
 begin
 	pl = E_PL(ufd)
@@ -76,7 +82,7 @@ begin
 
 	dy = y - E_YCEN(ufd)
 	dy2 = dy * dy
-	ady = abs (dy)
+	ady = aabs(dy)
 	bb = E_BB(ufd) * dy
 	cc = E_CC(ufd) * dy2
 	if (ady < E_DYMAX(ufd)) {
@@ -87,8 +93,8 @@ begin
 		discr = 0.0
 	    dx1 = (-bb - discr) / 2.0 / E_AA(ufd)
 	    dx2 = (-bb + discr) / 2.0 / E_AA(ufd)
-	    x1 = int(E_XCEN(ufd) + min (dx1, dx2))
-	    x2 = int(E_XCEN(ufd) + max (dx1, dx2))
+	    x1 = lint(E_XCEN(ufd) + min (dx1, dx2))
+	    x2 = lint(E_XCEN(ufd) + max (dx1, dx2))
 	    x1_clipped = max(1, min (axlen, x1))
 	    x2_clipped = max(x1, min (axlen, x2))
 	    xs = x1_clipped
@@ -115,10 +121,10 @@ end
 bool procedure pe_ubox (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	y			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O first pixel to be edited
-int	npix			#O number of pixels affected
+long	y			#I mask line number
+long	rl_reg[3,ARB]		#O output range list for line Y
+long	xs			#O first pixel to be edited
+size_t	npix			#O number of pixels affected
 
 int	rn 
 bool	rl_new
@@ -155,19 +161,21 @@ end
 bool procedure pe_upolygon (ufd, line, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	line			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O start of edit region in dst mask
-int	npix			#O number of pixels affected
+long	line			#I mask line number
+long	rl_reg[3,ARB]		#O output range list for line Y
+long	xs			#O start of edit region in dst mask
+size_t	npix			#O number of pixels affected
 
+size_t	sz_val
 pointer	xp, yp, pl
 bool	rl_new, cross
-int	nseg, np, low, rn, i1, i2, ii, i, j
-int	tempi, axlen, rl_len, p_prev, p_next
+int	tempi, nseg, i, j, ii, p_prev, p_next, rl_len, rn
+long	templ, axlen, np, low, i1, i2, ll
 real	tempr, y, y1, y2, x1, x2, p1, p2, p_y, n_y
 
+long	lnint()
 int	btoi()
-bool	plr_equali()
+bool	plr_equall()
 define	done_ 91
 
 begin
@@ -231,10 +239,10 @@ begin
 		    cross = (((p_y - y) * (n_y - y)) < 0)
 		}
 
-		i1 = max(1, min(axlen, nint(p1)))
-		i2 = max(1, min(axlen, nint(p2)))
+		i1 = max(1, min(axlen, lnint(p1)))
+		i2 = max(1, min(axlen, lnint(p2)))
 		if (i1 > i2)
-		    swapi (i1, i2)
+		    swapl (i1, i2)
 
 		np = i2 - i1 + 1
 		if (np > 0) {
@@ -271,9 +279,9 @@ begin
 	    
 	    # Interchange the initial segment and the low segment.
 	    if (low != j) {
-		swapi (RL_X(rl_reg,j), RL_X(rl_reg,low))
-		swapi (RL_N(rl_reg,j), RL_N(rl_reg,low))
-		swapi (RL_V(rl_reg,j), RL_V(rl_reg,low))
+		swapl (RL_X(rl_reg,j), RL_X(rl_reg,low))
+		swapl (RL_N(rl_reg,j), RL_N(rl_reg,low))
+		swapl (RL_V(rl_reg,j), RL_V(rl_reg,low))
 	    }
 	}
 
@@ -282,9 +290,9 @@ begin
 	do i = RL_FIRST + 1, rl_len {
 	    i1 = RL_X(rl_reg,rn)
 	    i2 = RL_N(rl_reg,rn) + i1 - 1
-	    ii = RL_X(rl_reg,i)
-	    if (ii >= i1 && ii <= i2) {
-		i2 = ii + RL_N(rl_reg,i) - 1
+	    ll = RL_X(rl_reg,i)
+	    if (ll >= i1 && ll <= i2) {
+		i2 = ll + RL_N(rl_reg,i) - 1
 		RL_N(rl_reg,rn) = max (RL_N(rl_reg,rn), i2 - i1 + 1)
 		RL_V(rl_reg,rn) = max (RL_V(rl_reg,rn), RL_V(rl_reg,i))
 	    } else {
@@ -359,8 +367,9 @@ done_
 
 	rl_new = true
 	if (P_OY(ufd) == line - 1)
-	    rl_new = !plr_equali (rl_reg, Memi[P_OO(ufd)])
-	call amovi (rl_reg, Memi[P_OO(ufd)], rn - 1)
+	    rl_new = !plr_equall (rl_reg, Meml[P_OO(ufd)])
+	sz_val = rn - 1
+	call amovl (rl_reg, Meml[P_OO(ufd)], sz_val)
 	P_OY(ufd) = line
 
 	return (rl_new)
@@ -373,15 +382,18 @@ end
 bool procedure pe_ucannulus (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	y			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O first pixel to be edited
-int	npix			#O number of pixels affected
+long	y			#I mask line number
+long	rl_reg[3,ARB]		#O output range list for line Y
+long	xs			#O first pixel to be edited
+size_t	npix			#O number of pixels affected
 
 real	radius1, radius2, dx, dy
 pointer	pl
-int	rn, axlen, x1o, x1o_clipped, x2o, x2o_clipped, x1i, x1i_clipped
-int	x2i, x2i_clipped
+int	rn
+long	axlen, x1o, x1o_clipped, x2o, x2o_clipped, x1i, x1i_clipped
+long	x2i, x2i_clipped
+real	aabs()
+long	lint()
 
 begin
 	pl = CA_PL(ufd)
@@ -390,15 +402,15 @@ begin
 	radius1 = CA_RADIUS1(ufd)
 	radius2 = CA_RADIUS2(ufd)
 
-	dy = abs (CA_YCEN(ufd) - y)
+	dy = aabs(CA_YCEN(ufd) - y)
 	if (dy < radius2) {
 	    dx = radius2 * radius2 - dy * dy
 	    if (dx > 0.0)
 		dx = sqrt (dx)
 	    else
 		dx = 0.0
-	    x1o = int (CA_XCEN(ufd) - dx)
-	    x2o = int (CA_XCEN(ufd) + dx)
+	    x1o = lint(CA_XCEN(ufd) - dx)
+	    x2o = lint(CA_XCEN(ufd) + dx)
 	    x1o_clipped = max(1, min(axlen, x1o))
 	    x2o_clipped = max(1, min(axlen, x2o))
 	    xs = x1o_clipped
@@ -408,8 +420,8 @@ begin
 		    dx = sqrt (dx)
 		else
 		    dx = 0.0
-	        x1i = int (CA_XCEN(ufd) - dx)
-	        x2i = int (CA_XCEN(ufd) + dx)
+	        x1i = lint(CA_XCEN(ufd) - dx)
+	        x2i = lint(CA_XCEN(ufd) + dx)
 	        x1i_clipped = max(1, min (axlen, x1i))
 	        x2i_clipped = max(1, min (axlen, x2i))
 	        RL_X(rl_reg,rn) = 1
@@ -446,15 +458,17 @@ end
 bool procedure pe_ueannulus (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	y			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O first pixel to be edited
-int	npix			#O number of pixels affected
+long	y			#I mask line number
+long	rl_reg[3,ARB]		#O output range list for line Y
+long	xs			#O first pixel to be edited
+size_t	npix			#O number of pixels affected
 
 real	dy, dy2, ady, bb2, cc2, bb1, cc1, discr, dx1, dx2
 pointer	pl
-int	rn, axlen, x1o, x1o_clipped, x2o, x2o_clipped, x1i, x1i_clipped
-int	x2i, x2i_clipped
+int	rn
+long	axlen, x1o, x1o_clipped, x2o, x2o_clipped, x1i, x1i_clipped
+long	x2i, x2i_clipped
+real	aabs()
 
 begin
 	pl = EA_PL(ufd)
@@ -463,7 +477,7 @@ begin
 
 	dy = y - EA_YCEN(ufd)
 	dy2 = dy * dy
-	ady = abs (dy)
+	ady = aabs(dy)
 	bb2 = EA_BB2(ufd) * dy
 	cc2 = EA_CC2(ufd) * dy2
 	bb1 = EA_BB1(ufd) * dy
@@ -528,23 +542,27 @@ end
 bool procedure pe_uarect (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I the region descriptor structure
-int	y			#I the current line
-int	rl_reg[3,ARB]		#O the output regions list
-int	xs			#O the starting x value
-int	npix			#O the number of pixels affected
+long	y			#I the current line
+long	rl_reg[3,ARB]		#O the output regions list
+long	xs			#O the starting x value
+size_t	npix			#O the number of pixels affected
 
+size_t	sz_val
 real	lx, ld
 pointer	sp, work1, work2, oxintr, ixintr, pl
-int	j, jj, rn, onintr, inintr, ix1, ix2, ox1, ox2, ibegin, iend, jx1, jx2
+int	j, jj, rn, onintr, inintr, ibegin, iend
+long	ix1, ix2, ox1, ox2, jx1, jx2
 int	me_pyclip()
+long	lint()
 
 begin
 	# Allocate working memory.
 	call smark (sp)
-	call salloc (work1, RA_NVER(ufd) + 1, TY_REAL)
-	call salloc (work2, RA_NVER(ufd) + 1, TY_REAL)
-	call salloc (oxintr, RA_NVER(ufd) + 1, TY_REAL)
-	call salloc (ixintr, RA_NVER(ufd) + 1, TY_REAL)
+	sz_val = RA_NVER(ufd) + 1
+	call salloc (work1, sz_val, TY_REAL)
+	call salloc (work2, sz_val, TY_REAL)
+	call salloc (oxintr, sz_val, TY_REAL)
+	call salloc (ixintr, sz_val, TY_REAL)
 
 	# Initialize.
 	pl = RA_PL(ufd)
@@ -555,7 +573,8 @@ begin
 	# Find the intersection of the outer polygon with the image line.
 	onintr = me_pyclip (Memr[RA_OXP(ufd)], Memr[RA_OYP(ufd)], Memr[work1],
 	    Memr[work2], Memr[oxintr], RA_NVER(ufd) + 1, lx, ld)
-	call asrtr (Memr[oxintr], Memr[oxintr], onintr)
+	sz_val = onintr
+	call asrtr (Memr[oxintr], Memr[oxintr], sz_val)
 
 	if (onintr > 0) {
 
@@ -563,14 +582,15 @@ begin
 	    inintr = me_pyclip (Memr[RA_IXP(ufd)], Memr[RA_IYP(ufd)],
 	        Memr[work1], Memr[work2], Memr[ixintr], RA_NVER(ufd) + 1,
 		lx, ld)
-	    call asrtr (Memr[ixintr], Memr[ixintr], inintr)
+	    sz_val = inintr
+	    call asrtr (Memr[ixintr], Memr[ixintr], sz_val)
 
 	    # Create the region list.
-	    xs = max (1, min (int(Memr[oxintr]), PL_AXLEN(pl,1)))
+	    xs = max (1, min (lint(Memr[oxintr]), PL_AXLEN(pl,1)))
 	    if (inintr <= 0) {
 		do j = 1, onintr, 2 {
-		    ox1 = max (1, min (int(Memr[oxintr+j-1]), PL_AXLEN(pl,1)))
-		    ox2 = max (ox1, min (int(Memr[oxintr+j]), PL_AXLEN(pl,1)))
+		    ox1 = max (1, min (lint(Memr[oxintr+j-1]), PL_AXLEN(pl,1)))
+		    ox2 = max (ox1, min (lint(Memr[oxintr+j]), PL_AXLEN(pl,1)))
 		    RL_X(rl_reg,rn) = ox1 - xs + 1
 		    RL_N(rl_reg,rn) = ox2 - ox1 + 1
 		    RL_V(rl_reg,rn) = RA_PV(ufd)
@@ -579,10 +599,10 @@ begin
 		npix = RL_X(rl_reg, rn-1) + RL_N(rl_reg,rn-1) - 1
 	    } else {
 		do j = 1, onintr, 2 {
-		    ox1 = max (1, min (int(Memr[oxintr+j-1]), PL_AXLEN(pl,1)))
-		    ox2 = max (ox1, min (int(Memr[oxintr+j]), PL_AXLEN(pl,1)))
+		    ox1 = max (1, min (lint(Memr[oxintr+j-1]), PL_AXLEN(pl,1)))
+		    ox2 = max (ox1, min (lint(Memr[oxintr+j]), PL_AXLEN(pl,1)))
 		    do jj = 1, inintr, 2 {
-			ix1 = max (1, min (int(Memr[ixintr+jj-1]),
+			ix1 = max (1, min (lint(Memr[ixintr+jj-1]),
 			    PL_AXLEN(pl,1)))
 			if (ix1 > ox1 && ix1 < ox2) {
 			    ibegin = jj
@@ -591,7 +611,7 @@ begin
 			
 		    }
 		    do jj = inintr, 1, -2 {
-			ix2 = max (1, min (int(Memr[ixintr+jj-1]),
+			ix2 = max (1, min (lint(Memr[ixintr+jj-1]),
 			    PL_AXLEN(pl,1)))
 			if (ix2 > ox1 && ix2 < ox2) {
 			    iend = jj
@@ -603,9 +623,9 @@ begin
 		    RL_V(rl_reg,rn) = RA_PV(ufd)
 		    rn = rn + 1
 		    do jj = ibegin + 1, iend - 1, 2 {
-			jx1 = max (1, min (int(Memr[ixintr+jj-1]),
+			jx1 = max (1, min (lint(Memr[ixintr+jj-1]),
 			    PL_AXLEN(pl,1)))
-			jx2 = max (jx1, min (int(Memr[ixintr+jj]),
+			jx2 = max (jx1, min (lint(Memr[ixintr+jj]),
 			    PL_AXLEN(pl,1)))
 		        RL_X(rl_reg,rn) = jx1 - xs + 1
 		        RL_N(rl_reg,rn) = jx2 - jx1 + 1
@@ -641,23 +661,27 @@ end
 bool procedure pe_uapolygon (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I the region descriptor structure
-int	y			#I the current line
-int	rl_reg[3,ARB]		#O the output regions list
-int	xs			#O the starting x value
-int	npix			#O the number of pixels affected
+long	y			#I the current line
+long	rl_reg[3,ARB]		#O the output regions list
+long	xs			#O the starting x value
+size_t	npix			#O the number of pixels affected
 
+size_t	sz_val
 real	lx, ld
 pointer	sp, work1, work2, oxintr, ixintr, pl
-int	j, jj, rn, onintr, inintr, ix1, ix2, ox1, ox2, ibegin, iend, jx1, jx2
+int	j, jj, rn, onintr, inintr, ibegin, iend
+long	ix1, ix2, ox1, ox2, jx1, jx2
 int	me_pyclip()
+long	lint()
 
 begin
 	# Allocate working memory.
 	call smark (sp)
-	call salloc (work1, PA_NVER(ufd) + 1, TY_REAL)
-	call salloc (work2, PA_NVER(ufd) + 1, TY_REAL)
-	call salloc (oxintr, PA_NVER(ufd) + 1, TY_REAL)
-	call salloc (ixintr, PA_NVER(ufd) + 1, TY_REAL)
+	sz_val = PA_NVER(ufd) + 1
+	call salloc (work1, sz_val, TY_REAL)
+	call salloc (work2, sz_val, TY_REAL)
+	call salloc (oxintr, sz_val, TY_REAL)
+	call salloc (ixintr, sz_val, TY_REAL)
 
 	# Initialize.
 	pl = PA_PL(ufd)
@@ -668,7 +692,8 @@ begin
 	# Find the intersection of the outer polygon with the image line.
 	onintr = me_pyclip (Memr[PA_OXP(ufd)], Memr[PA_OYP(ufd)], Memr[work1],
 	    Memr[work2], Memr[oxintr], PA_NVER(ufd) + 1, lx, ld)
-	call asrtr (Memr[oxintr], Memr[oxintr], onintr)
+	sz_val = onintr
+	call asrtr (Memr[oxintr], Memr[oxintr], sz_val)
 
 	if (onintr > 0) {
 
@@ -676,14 +701,15 @@ begin
 	    inintr = me_pyclip (Memr[PA_IXP(ufd)], Memr[PA_IYP(ufd)],
 	        Memr[work1], Memr[work2], Memr[ixintr], PA_NVER(ufd) + 1,
 		lx, ld)
-	    call asrtr (Memr[ixintr], Memr[ixintr], inintr)
+	    sz_val = inintr
+	    call asrtr (Memr[ixintr], Memr[ixintr], sz_val)
 
 	    # Create the region list.
-	    xs = max (1, min (int(Memr[oxintr]), PL_AXLEN(pl,1)))
+	    xs = max (1, min (lint(Memr[oxintr]), PL_AXLEN(pl,1)))
 	    if (inintr <= 0) {
 		do j = 1, onintr, 2 {
-		    ox1 = max (1, min (int(Memr[oxintr+j-1]), PL_AXLEN(pl,1)))
-		    ox2 = max (ox1, min (int(Memr[oxintr+j]), PL_AXLEN(pl,1)))
+		    ox1 = max (1, min (lint(Memr[oxintr+j-1]), PL_AXLEN(pl,1)))
+		    ox2 = max (ox1, min (lint(Memr[oxintr+j]), PL_AXLEN(pl,1)))
 		    RL_X(rl_reg,rn) = ox1 - xs + 1
 		    RL_N(rl_reg,rn) = ox2 - ox1 + 1
 		    RL_V(rl_reg,rn) = PA_PV(ufd)
@@ -692,10 +718,10 @@ begin
 		npix = RL_X(rl_reg, rn-1) + RL_N(rl_reg,rn-1) - 1
 	    } else {
 		do j = 1, onintr, 2 {
-		    ox1 = max (1, min (int(Memr[oxintr+j-1]), PL_AXLEN(pl,1)))
-		    ox2 = max (ox1, min (int(Memr[oxintr+j]), PL_AXLEN(pl,1)))
+		    ox1 = max (1, min (lint(Memr[oxintr+j-1]), PL_AXLEN(pl,1)))
+		    ox2 = max (ox1, min (lint(Memr[oxintr+j]), PL_AXLEN(pl,1)))
 		    do jj = 1, inintr, 2 {
-			ix1 = max (1, min (int(Memr[ixintr+jj-1]),
+			ix1 = max (1, min (lint(Memr[ixintr+jj-1]),
 			    PL_AXLEN(pl,1)))
 			if (ix1 > ox1 && ix1 < ox2) {
 			    ibegin = jj
@@ -704,7 +730,7 @@ begin
 			
 		    }
 		    do jj = inintr, 1, -2 {
-			ix2 = max (1, min (int(Memr[ixintr+jj-1]),
+			ix2 = max (1, min (lint(Memr[ixintr+jj-1]),
 			    PL_AXLEN(pl,1)))
 			if (ix2 > ox1 && ix2 < ox2) {
 			    iend = jj
@@ -716,9 +742,9 @@ begin
 		    RL_V(rl_reg,rn) = PA_PV(ufd)
 		    rn = rn + 1
 		    do jj = ibegin + 1, iend - 1, 2 {
-			jx1 = max (1, min (int(Memr[ixintr+jj-1]),
+			jx1 = max (1, min (lint(Memr[ixintr+jj-1]),
 			    PL_AXLEN(pl,1)))
-			jx2 = max (jx1, min (int(Memr[ixintr+jj]),
+			jx2 = max (jx1, min (lint(Memr[ixintr+jj]),
 			    PL_AXLEN(pl,1)))
 		        RL_X(rl_reg,rn) = jx1 - xs + 1
 		        RL_N(rl_reg,rn) = jx2 - jx1 + 1
@@ -754,14 +780,17 @@ end
 bool procedure pe_ucols (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	y			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O first pixel to be edited
-int	npix			#O number of pixels affected
+long	y			#I mask line number
+long	rl_reg[3,ARB]		#O output range list for line Y
+long	xs			#O first pixel to be edited
+size_t	npix			#O number of pixels affected
+
+size_t	sz_val
 
 begin
 	# Copy the ranges.
-	call amovi (Memi[L_RANGES(ufd)], rl_reg, L_NRANGES(ufd) * 3)
+	sz_val = L_NRANGES(ufd) * 3
+	call amovl (Meml[L_RANGES(ufd)], rl_reg, sz_val)
 	xs = L_XS(ufd)
 	npix = L_NPIX(ufd)
 
@@ -775,13 +804,14 @@ end
 bool procedure pe_ulines (ufd, y, rl_reg, xs, npix)
 
 pointer	ufd			#I user function descriptor
-int	y			#I mask line number
-int	rl_reg[3,ARB]		#O output range list for line Y
-int	xs			#O first pixel to be edited
-int	npix			#O number of pixels affected
+long	y			#I mask line number
+long	rl_reg[3,ARB]		#O output range list for line Y
+long	xs			#O first pixel to be edited
+size_t	npix			#O number of pixels affected
 
 pointer	pl
-int	rn, axlen
+int	rn
+long	axlen
 bool	me_is_in_range()
 
 begin
@@ -789,7 +819,7 @@ begin
 	rn = RL_FIRST
 	axlen = PL_AXLEN(pl,1)
 
-	if (me_is_in_range (Memi[L_RANGES(ufd)], y))  {
+	if (me_is_in_range (Meml[L_RANGES(ufd)], y))  {
 	    xs = 1
 	    npix = axlen
 	    RL_X(rl_reg,rn) = 1

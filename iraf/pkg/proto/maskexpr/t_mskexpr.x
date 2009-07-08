@@ -23,21 +23,25 @@ procedure t_mskexpr()
 
 pointer	expr, st, xexpr, refim, pmim, refmsk
 pointer	sp, exprdb, dims, uaxlen, mskname, imname, refname
-pointer	msklist, imlist, rmsklist
-int	i, ip, op, len_exprbuf, fd, nchars, ch
-int	undim, npix, depth
+pointer	msklist, imlist, rmsklist, op
+size_t	len_exprbuf, nchars
+long	npix
+int	i, ip, fd, ch, undim, depth
 bool	verbose
+size_t	sz_val
 
 pointer	me_getexprdb(), me_expandtext(), immap(), yt_mappm(), me_mkmask(), imtopenp()
 long	fstatl()
-int	imtlen(), open(), getci(), imtgetim(), ctoi()
+int	imtlen(), open(), getci(), imtgetim(), ctol()
 int	clgeti(), strmatch(), imaccess()
 bool	clgetb(), strne()
 errchk	immap(), yt_pmmap()
+include	<nullptr.inc>
 
 begin
 	# Get the expression parameter.
-	call malloc (expr, SZ_COMMAND, TY_CHAR)
+	sz_val = SZ_COMMAND
+	call malloc (expr, sz_val, TY_CHAR)
 	call clgstr ("expr", Memc[expr], SZ_COMMAND)
 
 	# Get the output mask list.
@@ -74,12 +78,15 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	call salloc (exprdb, SZ_FNAME, TY_CHAR)
-	call salloc (dims, SZ_FNAME, TY_CHAR)
-	call salloc (uaxlen, IM_MAXDIM, TY_LONG)
-	call salloc (mskname, SZ_FNAME, TY_CHAR)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (refname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (exprdb, sz_val, TY_CHAR)
+	call salloc (dims, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (uaxlen, sz_val, TY_LONG)
+	sz_val = SZ_FNAME
+	call salloc (mskname, sz_val, TY_CHAR)
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (refname, sz_val, TY_CHAR)
 
 	# Get remaining parameters,
 	call clgstr ("exprdb", Memc[exprdb], SZ_PATHNAME)
@@ -129,8 +136,9 @@ begin
 	# default dimensions are used.
 
 	undim = 0
-	call aclrl (Meml[uaxlen], IM_MAXDIM)
-	for (ip = 1;  ctoi (Memc[dims], ip, npix) > 0;  ) {
+	sz_val = IM_MAXDIM
+	call aclrl (Meml[uaxlen], sz_val)
+	for (ip = 1;  ctol (Memc[dims], ip, npix) > 0;  ) {
 	    Meml[uaxlen+undim] = npix
 	    undim = undim + 1
 	    for (ch = Memc[dims+ip-1];  IS_WHITE(ch) || ch == ',';
@@ -157,7 +165,7 @@ begin
 	    # Open the reference image.
 	    if (imtlen (imlist) > 0) {
 		if (imtgetim (imlist, Memc[imname], SZ_FNAME) != EOF) {
-		    iferr (refim = immap (Memc[imname], READ_ONLY, 0)) {
+		    iferr (refim = immap (Memc[imname], READ_ONLY, NULLPTR)) {
 			refim = NULL
 		        call printf (
 			    "Cannot open reference image %s for mask %s\n")
@@ -182,7 +190,7 @@ begin
 			    "logical", Memc[refname], SZ_FNAME))
 			    refmsk = NULL
 		    } else {
-			iferr (refmsk = immap (Memc[refname], READ_ONLY, 0))
+			iferr (refmsk = immap (Memc[refname], READ_ONLY, NULLPTR))
 			    refmsk = NULL
 		    }
 		    if (refmsk == NULL) {

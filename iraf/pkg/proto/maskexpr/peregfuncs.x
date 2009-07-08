@@ -13,8 +13,10 @@ pointer	pl			#I mask descriptor
 real	x,y			#I center coords of circle
 int	rop			#I rasterop
 
+long	lnint()
+
 begin
-	call pl_point (pl, nint(x), nint(y), rop)
+	call pl_point (pl, lnint(x), lnint(y), rop)
 end
 
 
@@ -35,9 +37,11 @@ real	x,y			#I center coords of circle
 real	radius			#I radius of circle
 int	rop			#I rasterop
 
+size_t	sz_val
 real	y1r, y2r, x1r, x2r
-int	y1, y2
+long	y1, y2
 pointer	sp, ufd
+long	lint()
 bool	pe_ucircle()
 extern	pe_ucircle()
 
@@ -56,10 +60,11 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (ufd, LEN_CIRCLEDES, TY_STRUCT)
+	sz_val = LEN_CIRCLEDES
+	call salloc (ufd, sz_val, TY_STRUCT)
 
-	y1 = max ( 1, min (PL_AXLEN(pl,2), int(y1r)))
-	y2 = max (y1, min (PL_AXLEN(pl,2), int(y2r)))
+	y1 = max ( 1, min (PL_AXLEN(pl,2), lint(y1r)))
+	y2 = max (y1, min (PL_AXLEN(pl,2), lint(y2r)))
 
 	C_PL(ufd) = pl
 	C_XCEN(ufd) = x
@@ -92,10 +97,12 @@ real	ratio			#I the ratio semi-minor / semi-major axes
 real	theta			#I position angle in degrees
 int	rop			#I rasterop
 
+size_t	sz_val
 real	aa, bb, cc, ff, dx, dy
 real	y1r, y2r, x1r, x2r, r2
-int	y1, y2
+long	y1, y2
 pointer	sp, ufd
+long	lint()
 bool	pe_uellipse()
 extern	pe_uellipse()
 
@@ -128,9 +135,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (ufd, LEN_ELLDES, TY_STRUCT)
-	y1 = max ( 1, min (PL_AXLEN(pl,2), int(y1r)))
-	y2 = max (y1, min (PL_AXLEN(pl,2), int(y2r)))
+	sz_val = LEN_ELLDES
+	call salloc (ufd, sz_val, TY_STRUCT)
+	y1 = max ( 1, min (PL_AXLEN(pl,2), lint(y1r)))
+	y2 = max (y1, min (PL_AXLEN(pl,2), lint(y2r)))
 
 	E_PL(ufd) = pl
 	E_XCEN(ufd) = x
@@ -166,7 +174,9 @@ real	x1, y1			#I lower left corner of box
 real	x2, y2			#I upper right corner of box
 int	rop			#I rasterop
 
+size_t	sz_val
 pointer	sp, ufd
+long	lint(), lnint()
 bool	pe_ubox()
 extern	pe_ubox()
 
@@ -181,16 +191,17 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (ufd, LEN_BOXDES, TY_STRUCT)
+	sz_val = LEN_BOXDES
+	call salloc (ufd, sz_val, TY_STRUCT)
 
 	B_PL(ufd) = pl
-	B_X1(ufd) = max (1, min (PL_AXLEN(pl,1), nint(x1)))
-	B_Y1(ufd) = max (1, min (PL_AXLEN(pl,2), nint(y1)))
-	B_X2(ufd) = max (1, min (PL_AXLEN(pl,1), nint(x2)))
-	B_Y2(ufd) = max (1, min (PL_AXLEN(pl,2), nint(y2)))
+	B_X1(ufd) = max (1, min (PL_AXLEN(pl,1), lnint(x1)))
+	B_Y1(ufd) = max (1, min (PL_AXLEN(pl,2), lnint(y1)))
+	B_X2(ufd) = max (1, min (PL_AXLEN(pl,1), lnint(x2)))
+	B_Y2(ufd) = max (1, min (PL_AXLEN(pl,2), lnint(y2)))
 	B_PV(ufd) = 1
 
-	call pl_regionrop (pl, pe_ubox, ufd, int(B_Y1(ufd)), int(B_Y2(ufd)),
+	call pl_regionrop (pl, pe_ubox, ufd, lint(B_Y1(ufd)), lint(B_Y2(ufd)),
 	    rop)
 
 	call sfree (sp)
@@ -293,9 +304,12 @@ real	y[npts]			#I polygon y-vertices
 int	npts			#I number of points in polygon
 int	rop			#I rasterop defining operation
 
+size_t	sz_val
 real	line_1r, line_2r
 pointer	sp, ufd, xp, yp, oo
-int	line_1, line_2, i
+long	line_1, line_2, i
+long	lint()
+real	aabs()
 bool	pe_upolygon()
 extern	pe_upolygon()
 errchk	plvalid
@@ -307,10 +321,13 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (ufd, LEN_PGONDES, TY_STRUCT)
-	call salloc (oo, RL_FIRST + (npts+1)*3, TY_INT)
-	call salloc (xp, npts + 1, TY_REAL)
-	call salloc (yp, npts + 1, TY_REAL)
+	sz_val = LEN_PGONDES
+	call salloc (ufd, sz_val, TY_STRUCT)
+	sz_val = RL_FIRST + (npts+1)*3
+	call salloc (oo, sz_val, TY_LONG)
+	sz_val = npts + 1
+	call salloc (xp, sz_val, TY_REAL)
+	call salloc (yp, sz_val, TY_REAL)
 
 	# Initialize the region descriptor.
 	P_PL(ufd) = pl
@@ -330,16 +347,17 @@ begin
 	    Memr[yp+i-1] = y[i]
 	}
 
-	if (abs(x[1]-x[npts]) > TOL || abs(y[1]-y[npts]) > TOL) {
+	if (aabs(x[1]-x[npts]) > TOL || aabs(y[1]-y[npts]) > TOL) {
 	    Memr[xp+npts] = x[1]
 	    Memr[yp+npts] = y[1]
 	    P_NS(ufd) = npts
 	}
 
 	# Compute the range in Y in which the polygon should be drawn.
-	call alimr (y, npts, line_1r, line_2r)
-	line_1 = max (1, min (PL_AXLEN(pl,2), int (line_1r)))
-	line_2 = max (line_1, min (PL_AXLEN(pl,2), int (line_2r)))
+	sz_val = npts
+	call alimr (y, sz_val, line_1r, line_2r)
+	line_1 = max (1, min (PL_AXLEN(pl,2), lint(line_1r)))
+	line_2 = max (line_1, min (PL_AXLEN(pl,2), lint(line_2r)))
 
 	call pl_regionrop (pl, pe_upolygon, ufd, line_1, line_2, rop)
 
@@ -365,9 +383,11 @@ real	radius1			#I inner radius of circular annulus
 real	radius2			#I outer radius of circular annulus
 int	rop			#I rasterop
 
+size_t	sz_val
 real	y1r, y2r, x1r, x2r
-int	y1, y2
+long	y1, y2
 pointer	sp, ufd
+long	lint()
 bool	pe_ucannulus()
 extern	pe_ucannulus()
 
@@ -390,10 +410,11 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (ufd, LEN_CANNDES, TY_STRUCT)
+	sz_val = LEN_CANNDES
+	call salloc (ufd, sz_val, TY_STRUCT)
 
-	y1 = max ( 1, min (PL_AXLEN(pl,2), int(y1r)))
-	y2 = max (y1, min (PL_AXLEN(pl,2), int(y2r)))
+	y1 = max ( 1, min (PL_AXLEN(pl,2), lint(y1r)))
+	y2 = max (y1, min (PL_AXLEN(pl,2), lint(y2r)))
 
 	CA_PL(ufd) = pl
 	CA_XCEN(ufd) = x
@@ -428,10 +449,12 @@ real	ratio			#I the semi-minor / semi-major axis ratio
 real	theta			#I the position angle in degrees
 int	rop			#I rasterop
 
+size_t	sz_val
 real	aa, bb, cc, ff, r2, dx, dy
 real	y1r, y2r, x1r, x2r
-int	y1, y2
+long	y1, y2
 pointer	sp, ufd
+long	lint()
 bool	pe_ueannulus()
 extern	pe_ueannulus()
 
@@ -468,7 +491,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (ufd, LEN_EANNDES, TY_STRUCT)
+	sz_val = LEN_EANNDES
+	call salloc (ufd, sz_val, TY_STRUCT)
 
 	EA_PL(ufd) = pl
 	EA_XCEN(ufd) = x
@@ -502,8 +526,8 @@ begin
 	EA_DXMAX1(ufd) = dx
 	EA_DYMAX1(ufd) = dy
 
-	y1 = max ( 1, min (PL_AXLEN(pl,2), int(y1r)))
-	y2 = max (y1, min (PL_AXLEN(pl,2), int(y2r)))
+	y1 = max ( 1, min (PL_AXLEN(pl,2), lint(y1r)))
+	y2 = max (y1, min (PL_AXLEN(pl,2), lint(y2r)))
 	call pl_regionrop (pl, pe_ueannulus, ufd, y1, y2, rop)
 
 	call sfree (sp)
@@ -524,9 +548,12 @@ real	ratio			#I ratio of the semi-minor / semi-major axes
 real	theta			#I position angle
 int	rop			#I rasterop defining operation
 
+size_t	sz_val
 real	line_1r, line_2r
 pointer	sp, ufd, ixp, iyp, oxp, oyp
-int	line_1, line_2, i
+int	i
+long	line_1, line_2
+long	lint()
 bool	pe_uarect()
 extern	pe_uarect()
 errchk	plvalid
@@ -537,11 +564,13 @@ begin
 
 	# Initialize the
 	call smark (sp)
-	call salloc (ufd, LEN_RANNDES, TY_STRUCT)
-	call salloc (ixp, 5, TY_REAL)
-	call salloc (iyp, 5, TY_REAL)
-	call salloc (oxp, 5, TY_REAL)
-	call salloc (oyp, 5, TY_REAL)
+	sz_val = LEN_RANNDES
+	call salloc (ufd, sz_val, TY_STRUCT)
+	sz_val = 5
+	call salloc (ixp, sz_val, TY_REAL)
+	call salloc (iyp, sz_val, TY_REAL)
+	call salloc (oxp, sz_val, TY_REAL)
+	call salloc (oyp, sz_val, TY_REAL)
 
 	# Copy and close the inner polygon.
 	call me_rectgeom (radius1, ratio, theta, Memr[ixp], Memr[iyp])
@@ -563,9 +592,10 @@ begin
 
 	# Compute the range in X in which the polygon should be drawn
 	# and reject polygons that are off the image.
-	call alimr (Memr[oxp], 4, line_1r, line_2r)
-	line_1 = max (1, min (PL_AXLEN(pl,1), int (line_1r)))
-	line_2 = max (line_1, min (PL_AXLEN(pl,1), int (line_2r)))
+	sz_val = 4
+	call alimr (Memr[oxp], sz_val, line_1r, line_2r)
+	line_1 = max (1, min (PL_AXLEN(pl,1), lint(line_1r)))
+	line_2 = max (line_1, min (PL_AXLEN(pl,1), lint(line_2r)))
 	if (line_2 < 1 || line_1 > PL_AXLEN(pl,1)) {
 	    call sfree (sp)
 	    return
@@ -573,9 +603,10 @@ begin
 
 	# Compute the range in Y in which the polygon should be drawn
 	# and reject polygons that are off the image.
-	call alimr (Memr[oyp], 4, line_1r, line_2r)
-	line_1 = max (1, min (PL_AXLEN(pl,2), int (line_1r)))
-	line_2 = max (line_1, min (PL_AXLEN(pl,2), int (line_2r)))
+	sz_val = 4
+	call alimr (Memr[oyp], sz_val, line_1r, line_2r)
+	line_1 = max (1, min (PL_AXLEN(pl,2), lint(line_1r)))
+	line_2 = max (line_1, min (PL_AXLEN(pl,2), lint(line_2r)))
 	if (line_2 < 1 || line_1 > PL_AXLEN(pl,2)) {
 	    call sfree (sp)
 	    return
@@ -610,9 +641,12 @@ real	y[npts]			#I outer polygon y-vertices
 int	npts			#I number of points in polygon
 int	rop			#I rasterop defining operation
 
+size_t	sz_val
 real	line_1r, line_2r
 pointer	sp, ufd, ixp, iyp, oxp, oyp
-int	line_1, line_2, i
+int	i
+long	line_1, line_2
+long	lint()
 bool	pe_uapolygon()
 extern	pe_uapolygon()
 errchk	plvalid
@@ -625,11 +659,13 @@ begin
 
 	# Initialize the
 	call smark (sp)
-	call salloc (ufd, LEN_PAGONDES, TY_STRUCT)
-	call salloc (ixp, npts + 1, TY_REAL)
-	call salloc (iyp, npts + 1, TY_REAL)
-	call salloc (oxp, npts + 1, TY_REAL)
-	call salloc (oyp, npts + 1, TY_REAL)
+	sz_val = LEN_PAGONDES
+	call salloc (ufd, sz_val, TY_STRUCT)
+	sz_val = npts + 1
+	call salloc (ixp, sz_val, TY_REAL)
+	call salloc (iyp, sz_val, TY_REAL)
+	call salloc (oxp, sz_val, TY_REAL)
+	call salloc (oyp, sz_val, TY_REAL)
 
 	# Copy and close the inner polygon.
 	do i = 1, npts {
@@ -647,9 +683,10 @@ begin
 
 	# Compute the range in X in which the polygon should be drawn
 	# and reject polygons that are off the image.
-	call alimr (Memr[oxp], npts, line_1r, line_2r)
-	line_1 = max (1, min (PL_AXLEN(pl,1), int (line_1r)))
-	line_2 = max (line_1, min (PL_AXLEN(pl,1), int (line_2r)))
+	sz_val = npts
+	call alimr (Memr[oxp], sz_val, line_1r, line_2r)
+	line_1 = max (1, min (PL_AXLEN(pl,1), lint(line_1r)))
+	line_2 = max (line_1, min (PL_AXLEN(pl,1), lint(line_2r)))
 	if (line_2 < 1 || line_1 > PL_AXLEN(pl,1)) {
 	    call sfree (sp)
 	    return
@@ -657,9 +694,10 @@ begin
 
 	# Compute the range in Y in which the polygon should be drawn
 	# and reject polygons that are off the image.
-	call alimr (Memr[oyp], npts, line_1r, line_2r)
-	line_1 = max (1, min (PL_AXLEN(pl,2), int (line_1r)))
-	line_2 = max (line_1, min (PL_AXLEN(pl,2), int (line_2r)))
+	sz_val = npts
+	call alimr (Memr[oyp], sz_val, line_1r, line_2r)
+	line_1 = max (1, min (PL_AXLEN(pl,2), lint(line_1r)))
+	line_2 = max (line_1, min (PL_AXLEN(pl,2), lint(line_2r)))
 	if (line_2 < 1 || line_1 > PL_AXLEN(pl,2)) {
 	    call sfree (sp)
 	    return
@@ -696,9 +734,14 @@ pointer	pl			#I mask descriptor
 char	rangestr[ARB]		#I the input ranges string
 int	rop			#I rasterop
 
-int	npts, nvalues, colno, x1, x2, nregions
+size_t	sz_val
+long	l_val, x1, x2, colno
+size_t	npts
+int	nregions
+long	nvalues
 pointer	sp, ufd, rgptr, lineptr
-int	me_decode_ranges(), me_next_number(), me_previous_number(), pl_p2ri()
+int	me_decode_ranges(), pl_p2rl()
+long	me_previous_number(), me_next_number()
 bool	pe_ucols()
 extern	pe_ucols()
 
@@ -708,42 +751,46 @@ begin
 	npts = PL_AXLEN(pl,1)
 
 	call smark (sp)
-	call salloc (ufd, LEN_COLSDES, TY_STRUCT)
-	call salloc (rgptr, 3 * MAX_NRANGES + 1, TY_INT)
-	call salloc (lineptr, npts, TY_INT)
+	sz_val = LEN_COLSDES
+	call salloc (ufd, sz_val, TY_STRUCT)
+	sz_val = 3 * MAX_NRANGES + 1
+	call salloc (rgptr, sz_val, TY_LONG)
+	sz_val = npts
+	call salloc (lineptr, sz_val, TY_LONG)
 
 	# Decode the ranges string
-	if (me_decode_ranges (rangestr, Memi[rgptr], MAX_NRANGES,
+	if (me_decode_ranges (rangestr, Meml[rgptr], MAX_NRANGES,
 	    nvalues) == ERR) {
 	    call sfree (sp)
 	    return
 	}
 
 	# Get the column limits.
-	x1 = INDEFI
-	x2 = INDEFI
+	x1 = INDEFL
+	x2 = INDEFL
 	colno = 0
-	if (me_next_number (Memi[rgptr], colno) != EOF)
+	if (me_next_number (Meml[rgptr], colno) != EOF)
 	    x1 = colno 
 	colno = npts + 1
-	if (me_previous_number (Memi[rgptr], colno) != EOF)
+	if (me_previous_number (Meml[rgptr], colno) != EOF)
 	    x2 = colno 
-	if (IS_INDEFI(x1) || IS_INDEFI(x2)) {
+	if (IS_INDEFL(x1) || IS_INDEFL(x2)) {
 	    call sfree (sp)
 	    return
 	}
 
 	# Set the pixel values.
-	call aclri (Memi[lineptr], npts)
+	call aclrl (Meml[lineptr], npts)
 	colno = 0
-	while (me_next_number (Memi[rgptr], colno) != EOF) {
+	while (me_next_number (Meml[rgptr], colno) != EOF) {
 	    if (colno < 1 || colno > npts)
 		next
-	    Memi[lineptr+colno-1] = 1
+	    Meml[lineptr+colno-1] = 1
 	}
 
 	# Convert the pixel list to a ranges list.
-	nregions = pl_p2ri (Memi[lineptr], 1, Memi[rgptr], npts)
+	l_val = 1
+	nregions = pl_p2rl (Meml[lineptr], l_val, Meml[rgptr], npts)
 
 	L_PL(ufd) = pl
 	L_RANGES(ufd) = rgptr
@@ -753,7 +800,8 @@ begin
 	L_PV(ufd) = 1
 
 	# Call the regions operator.
-	call pl_regionrop (pl, pe_ucols, ufd, 1, PL_AXLEN(pl,2), rop)
+	l_val = 1
+	call pl_regionrop (pl, pe_ucols, ufd, l_val, PL_AXLEN(pl,2), rop)
 
 	call sfree (sp)
 end
@@ -775,7 +823,8 @@ pointer	pl			#I mask descriptor
 char	rangestr[ARB]		#I the input ranges string
 int	rop			#I rasterop
 
-int	i, y1, y2, nvalues
+size_t	sz_val
+long	i, y1, y2, nvalues
 pointer	sp, rgptr, ufd
 int	me_decode_ranges()
 bool	me_is_in_range()
@@ -787,36 +836,38 @@ begin
 	#call plvalid (pl)
 
 	call smark (sp)
-	call salloc (ufd, LEN_LINESDES, TY_STRUCT)
-	call salloc (rgptr, 3 * MAX_NRANGES + 1, TY_INT)
+	sz_val = LEN_LINESDES
+	call salloc (ufd, sz_val, TY_STRUCT)
+	sz_val = 3 * MAX_NRANGES + 1
+	call salloc (rgptr, sz_val, TY_LONG)
 
 	# Decode the ranges string
-	if (me_decode_ranges (rangestr, Memi[rgptr], MAX_NRANGES,
+	if (me_decode_ranges (rangestr, Meml[rgptr], MAX_NRANGES,
 	    nvalues) == ERR) {
 	    call sfree (sp)
 	    return
 	}
 
 	# Find the line limits.
-	y1 = INDEFI
-	y2 = INDEFI
+	y1 = INDEFL
+	y2 = INDEFL
 	do i = 1, PL_AXLEN(pl,2) {
-	    if (me_is_in_range (Memi[rgptr], i)) {
+	    if (me_is_in_range (Meml[rgptr], i)) {
 		y1 = i
 		break
 	    }
 	}
-	if (IS_INDEFI(y1)) {
+	if (IS_INDEFL(y1)) {
 	    call sfree (sp)
 	    return
 	}
 	do i = PL_AXLEN(pl,2), 1, -1 {
-	    if (me_is_in_range (Memi[rgptr], i)) {
+	    if (me_is_in_range (Meml[rgptr], i)) {
 		y2 = i
 		break
 	    }
 	}
-	if (IS_INDEFI(y2)) {
+	if (IS_INDEFL(y2)) {
 	    call sfree (sp)
 	    return
 	}
@@ -843,6 +894,7 @@ int	rop			#I the mask raster op
 
 real	sweep, x2, y2, vx[7], vy[7]
 int	count, intrcpt1, intrcpt2
+real	aabs()
 int	me_pie_intercept(), me_corner_vertex()
 
 begin
@@ -852,7 +904,7 @@ begin
 	sweep = angle2 - angle1
 
 	# If the sweep is too small to be noticed don't bother.
-	if (abs (sweep) < SMALL_NUMBER) {
+	if ( aabs(sweep) < SMALL_NUMBER ) {
 	    return
 	}
 	if (sweep < 0.0)

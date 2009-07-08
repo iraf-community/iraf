@@ -98,15 +98,15 @@ define	LEN_GTDES	50
 define	GT_FD		Memi[P2I($1)]	# current input stream
 define	GT_UFD		Memi[P2I($1+1)]	# user (client) input file
 define	GT_FLAGS	Memi[P2I($1+2)]	# option flags
-define	GT_PBBLEN	Memi[P2I($1+3)]	# pushback buffer length
+define	GT_PBBLEN	Meml[P2L($1+3)]	# pushback buffer length
 define	GT_DEBUG	Memi[P2I($1+4)]	# for debug messages
-define	GT_GSYM		Memi[P2I($1+5)]	# get symbol routine
-define	GT_GSYMDATA	Memi[P2I($1+6)]	# client data for above
+define	GT_GSYM		Memp[$1+5]	# get symbol routine
+define	GT_GSYMDATA	Memp[$1+6]	# client data for above
 define	GT_NEXTCH	Memi[P2I($1+7)]	# lookahead character
 define	GT_FTEMP	Memi[P2I($1+8)]	# file on stream is a temp file
 define	GT_LEVEL	Memi[P2I($1+9)]	# current nesting level
-define	GT_SVFD		Memi[P2I($1+10)+$2-1]# stacked file descriptors
-define	GT_SVFTEMP	Memi[P2I($1+30)+$2-1]# stacked ftemp flags
+define	GT_SVFD		Memi[P2I($1+10)+($2)-1]# stacked file descriptors
+define	GT_SVFTEMP	Memi[P2I($1+30)+($2)-1]# stacked ftemp flags
 
 # Set to YES to enable debug messages.
 define	DEBUG		NO
@@ -121,9 +121,10 @@ int procedure gt_expandtext (text, obuf, len_obuf, gsym, gsym_data)
 char	text[ARB]		#I input text to be expanded
 pointer	obuf			#U output buffer
 int	len_obuf		#U size of output buffer
-int	gsym			#I epa of client get-symbol routine
-int	gsym_data		#I client data for above
+pointer	gsym			#I epa of client get-symbol routine
+pointer	gsym_data		#I client data for above
 
+long	l_val
 pointer	gt
 int	nchars
 int	gt_expand()
@@ -131,7 +132,8 @@ pointer	gt_opentext()
 errchk	gt_opentext
 
 begin
-	gt = gt_opentext (text, gsym, gsym_data, 0, 0)
+	l_val = 0
+	gt = gt_opentext (text, gsym, gsym_data, l_val, 0)
 	nchars = gt_expand (gt, obuf, len_obuf)
 	call gt_close (gt)
 
@@ -149,6 +151,8 @@ pointer	gt			#I gettok descriptor
 pointer	obuf			#U output buffer
 int	len_obuf		#U size of output buffer
 
+size_t	sz_val
+int	i_val
 int	token, nchars
 pointer	sp, tokbuf, op, otop
 int	gt_gettok(), strlen(), gstrcpy()
@@ -156,7 +160,8 @@ errchk	realloc
 
 begin
 	call smark (sp)
-	call salloc (tokbuf, SZ_TOKBUF, TY_CHAR)
+	sz_val = SZ_TOKBUF
+	call salloc (tokbuf, sz_val, TY_CHAR)
 
 	# Open input text for macro expanded token input.
 	otop = obuf + len_obuf
@@ -169,7 +174,8 @@ begin
 		if (op + strlen(Memc[tokbuf]) + 3 > otop) {
 		    nchars = op - obuf
 		    len_obuf = len_obuf + INC_TOKBUF
-		    call realloc (obuf, len_obuf, TY_CHAR)
+		    sz_val = len_obuf
+		    call realloc (obuf, sz_val, TY_CHAR)
 		    otop = obuf + len_obuf
 		    op = obuf + nchars
 		}
@@ -178,7 +184,8 @@ begin
 		    Memc[op] = '"'  
 		    op = op + 1
 		}
-		op = op + gstrcpy (Memc[tokbuf], Memc[op], otop-op)
+		i_val = otop-op
+		op = op + gstrcpy (Memc[tokbuf], Memc[op], i_val)
 		if (token == GT_STRING) {
 		    Memc[op] = '"'  
 		    op = op + 1
@@ -203,17 +210,19 @@ end
 pointer procedure gt_open (fd, gsym, gsym_data, pbblen, flags)
 
 int	fd			#I input file
-int	gsym			#I epa of client get-symbol routine
-int	gsym_data		#I client data for above
-int	pbblen			#I pushback buffer length
+pointer	gsym			#I epa of client get-symbol routine
+pointer	gsym_data		#I client data for above
+long	pbblen			#I pushback buffer length
 int	flags			#I option flags
 
+size_t	sz_val
 pointer	gt
-int	sz_pbbuf
+long	sz_pbbuf
 errchk	calloc
 
 begin
-	call calloc (gt, LEN_GTDES, TY_STRUCT)
+	sz_val = LEN_GTDES
+	call calloc (gt, sz_val, TY_STRUCT)
 
 	GT_GSYM(gt) = gsym
 	GT_GSYMDATA(gt) = gsym_data
@@ -227,7 +236,7 @@ begin
 	    sz_pbbuf = DEF_MAXPUSHBACK
 	else
 	    sz_pbbuf = pbblen
-	call fseti (GT_FD(gt), F_PBBSIZE, sz_pbbuf)
+	call fsetl (GT_FD(gt), F_PBBSIZE, sz_pbbuf)
 	GT_PBBLEN(gt) = sz_pbbuf
 
 	return (gt)
@@ -242,18 +251,20 @@ end
 pointer procedure gt_opentext (text, gsym, gsym_data, pbblen, flags)
 
 char	text[ARB]		#I input text to be scanned
-int	gsym			#I epa of client get-symbol routine
-int	gsym_data		#I client data for above
-int	pbblen			#I pushback buffer length
+pointer	gsym			#I epa of client get-symbol routine
+pointer	gsym_data		#I client data for above
+long	pbblen			#I pushback buffer length
 int	flags			#I option flags
 
+size_t	sz_val
 pointer	gt
-int	sz_pbbuf
+long	sz_pbbuf
 int	stropen(), strlen()
 errchk	stropen, calloc
 
 begin
-	call calloc (gt, LEN_GTDES, TY_STRUCT)
+	sz_val = LEN_GTDES
+	call calloc (gt, sz_val, TY_STRUCT)
 
 	GT_GSYM(gt) = gsym
 	GT_GSYMDATA(gt) = gsym_data
@@ -267,7 +278,7 @@ begin
 	    sz_pbbuf = DEF_MAXPUSHBACK
 	else
 	    sz_pbbuf = pbblen
-	call fseti (GT_FD(gt), F_PBBSIZE, sz_pbbuf)
+	call fsetl (GT_FD(gt), F_PBBSIZE, sz_pbbuf)
 	GT_PBBLEN(gt) = sz_pbbuf
 
 	return (gt)
@@ -287,12 +298,14 @@ char	tokbuf[maxch]		#O receives the text of the token
 int	maxch			#I max chars out
 
 pointer	sp, bp, cmd, ibuf, obuf, argbuf, fname, textp
-int	fd, token, level, margs, nargs, nchars, i_fd, o_fd, ftemp
+int	fd, token, level, margs, nargs, i_fd, o_fd, ftemp
+size_t	nchars
 
 int	strmac(), open(), stropen()
-int	gt_rawtok(), gt_nexttok(), gt_arglist(), zfunc3()
+int	gt_rawtok(), gt_nexttok(), gt_arglist()
+pointer	zfncp3()
 errchk	gt_rawtok, close, ungetci, ungetline, gt_arglist, 
-errchk	clcmdw, stropen, syserr, zfunc3
+errchk	clcmdw, stropen, syserr, zfncp3
 define	pushfile_ 91
 
 
@@ -348,7 +361,7 @@ begin
 		# Lookup the identifier in the symbol table.
 		textp = NULL
 		if (GT_GSYM(gt) != NULL)
-		    textp = zfunc3 (GT_GSYM(gt), GT_GSYMDATA(gt), tokbuf, margs)
+		    textp = zfncp3 (GT_GSYM(gt), GT_GSYMDATA(gt), tokbuf, margs)
 
 		# Process a defined macro.
 		if (textp != NULL) {
@@ -436,7 +449,7 @@ pushfile_
 		    next
 		}
 
-		call fseti (i_fd, F_PBBSIZE, GT_PBBLEN(gt))
+		call fsetl (i_fd, F_PBBSIZE, GT_PBBLEN(gt))
 
 		# Cancel lookahead.
 		if (GT_NEXTCH(gt) > 0) {
@@ -820,12 +833,14 @@ procedure gt_close (gt)
 
 pointer	gt			#I gettok descriptor
 
+size_t	sz_val
 int	level, fd
 pointer	sp, fname
 
 begin
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	for (level=GT_LEVEL(gt);  level >= 0;  level=level-1) {
 	    fd = GT_FD(gt)
