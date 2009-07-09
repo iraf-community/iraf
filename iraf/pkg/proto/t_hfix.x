@@ -13,27 +13,34 @@ define	IS_FITS		(IS_DIGIT($1)||IS_UPPER($1)||($1=='-')||($1=='_'))
 
 procedure t_hfix ()
 
-int	images			# List of images to be fixed
+pointer	images			# List of images to be fixed
 pointer	cmd			# Fix command
 bool	update			# Update image header
 
-int	mode, reclen
+size_t	sz_val
+int	mode, reclen, fd, hd
 pointer	sp, image, efile, ecmd, eline
-pointer	im, ua, fd, hd, ip, jp, kp
+pointer	im, ua, ip, jp, kp
 
-int	imtopnp(), imtgetim(), stridxs(), open(), stropen()
+pointer	imtopnp()
+int	imtgetim(), stridxs(), open(), stropen()
 int	getline(), gstrcpy()
 bool	clgetb()
 pointer	immap()
 errchk	open, clcmdw
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (cmd,SZ_LINE, TY_CHAR)
-	call salloc (efile, SZ_FNAME, TY_CHAR)
-	call salloc (ecmd, SZ_LINE, TY_CHAR)
-	call salloc (eline, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (efile, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (ecmd, sz_val, TY_CHAR)
+	call salloc (eline, sz_val, TY_CHAR)
 
 	# Get task parameters and set update mode
 	images = imtopnp ("images")
@@ -46,7 +53,7 @@ begin
 
 	# Fix the image headers.
 	while (imtgetim (images, Memc[image], SZ_FNAME) != EOF) {
-	    iferr (im = immap (Memc[image], mode, NULL)) {
+	    iferr (im = immap (Memc[image], mode, NULLPTR)) {
 		call erract (EA_WARN)
 		next
 	    }

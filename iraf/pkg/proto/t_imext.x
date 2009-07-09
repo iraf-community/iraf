@@ -15,7 +15,7 @@ define	SZ_LISTOUT	255		# Size of output list
 
 procedure t_imextensions()
 
-pointer	input			# List of ME file names
+pointer	p_input			# List of ME file names
 int	output			# Output list (none|list|file)
 pointer	index			# Range list of extension indexes
 pointer	extname			# Pattern for extension names
@@ -25,6 +25,7 @@ int	lname			# List extension name?
 int	lver			# List extension version?
 pointer	ikparams		# Image kernel parameters
 
+size_t	sz_val
 pointer	sp, image, listout, list
 int	nimages, fd
 int	clgwrd(), btoi(), imtgetim(), imtlen(), stropen()
@@ -34,15 +35,17 @@ errchk	stropen, fprintf, strclose
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_LINE, TY_CHAR)
-	call salloc (index, SZ_LINE, TY_CHAR)
-	call salloc (extname, SZ_LINE, TY_CHAR)
-	call salloc (extver, SZ_LINE, TY_CHAR)
-	call salloc (ikparams, SZ_LINE, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (p_input, sz_val, TY_CHAR)
+	call salloc (index, sz_val, TY_CHAR)
+	call salloc (extname, sz_val, TY_CHAR)
+	call salloc (extver, sz_val, TY_CHAR)
+	call salloc (ikparams, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
 
 	# Task parameters
-	call clgstr ("input", Memc[input], SZ_LINE)
+	call clgstr ("input", Memc[p_input], SZ_LINE)
 	output = clgwrd ("output", Memc[image], SZ_FNAME, OUTPUTS)
 	call clgstr ("index", Memc[index], SZ_LINE)
 	call clgstr ("extname", Memc[extname], SZ_LINE)
@@ -53,13 +56,14 @@ begin
 	call clgstr ("ikparams", Memc[ikparams], SZ_LINE)
 
 	# Get the list.
-	list = xt_imextns (Memc[input], Memc[index], Memc[extname],
+	list = xt_imextns (Memc[p_input], Memc[index], Memc[extname],
 	    Memc[extver], lindex, lname, lver, Memc[ikparams], YES)
 
 	# Format the output and set the number of images.
 	switch (output) {
 	case LIST:
-	    call salloc (listout, SZ_LISTOUT, TY_CHAR)
+	    sz_val = SZ_LISTOUT
+	    call salloc (listout, sz_val, TY_CHAR)
 	    iferr {
 		fd = stropen (Memc[listout], SZ_LISTOUT, WRITE_ONLY)
 		nimages = 0

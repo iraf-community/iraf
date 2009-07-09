@@ -25,27 +25,33 @@ real	bscale		# scale factor
 real    lower           # lower limit for mean, median, or mode computation
 real    upper           # upper limit for mean, median, or mode computation
 pointer	section		# image section for statistics
-int	step		# default sample step
+long	step		# default sample step
 int	verbose		# verbose mode
 
+size_t	sz_val
 double	temp
 int	i, bz, bs 
 real	mean, median, mode, sigma, tlower, tupper 
 pointer	sp, str, image1, image2, imtemp, inim, outim
 
 bool	clgetb()
-int	btoi(), strdic(), gctod(), clgeti(), imtgetim(), imtlen()
+int	btoi(), strdic(), gctod(), imtgetim(), imtlen()
+long	clgetl()
 pointer	imtopenp(), immap()
 real	clgetr()
+
+include	<nullptr.inc>
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (image1, SZ_FNAME, TY_CHAR)
-	call salloc (image2, SZ_FNAME, TY_CHAR)
-	call salloc (imtemp, SZ_FNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image1, sz_val, TY_CHAR)
+	call salloc (image2, sz_val, TY_CHAR)
+	call salloc (imtemp, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
 
 	# Open the input and output image lists.
 	inlist = imtopenp ("input")
@@ -79,7 +85,7 @@ begin
 
 	# Get the section to be used for statistics computation.
 	call clgstr ("section", Memc[section], SZ_FNAME)
-	step = max (1, clgeti ("step"))
+	step = max (1, clgetl ("step"))
 
 	# Get the upper and lower good data limits.
 	lower = clgetr ("lower")
@@ -102,7 +108,7 @@ begin
 	    # Open the input and output images.
             call xt_mkimtemp (Memc[image1], Memc[image2], Memc[imtemp],
                 SZ_FNAME)
-	    iferr (inim = immap (Memc[image1], READ_ONLY, 0)) {
+	    iferr (inim = immap (Memc[image1], READ_ONLY, NULLPTR)) {
 		call erract (EA_WARN)
 		next
 	    }
@@ -170,16 +176,20 @@ pointer	outim		# pointer to the output image
 real	bzero		# zero point
 real	bscale		# scale
 
-int	nc
+size_t	sz_val
+long	l_val
+size_t	nc
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
 real	bz, bs
 
 pointer	in, out
-int	imgnlr(), impnlr(), imgnlx(), impnlx(), imgnld(), impnld()
+long	imgnlr(), impnlr(), imgnlx(), impnlx(), imgnld(), impnld()
 
 begin
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 
 	bz = -bzero
 	bs = 1. / bscale
@@ -194,7 +204,7 @@ begin
 	case TY_COMPLEX:
 	  while ((imgnlx (inim, in, v1) != EOF) && (impnlx (outim,
               out, v2) != EOF))
-	  call altax (Memx[in], Memx[out], nc, complex(bz), complex(bs))
+	  call altax (Memx[in], Memx[out], nc, bz, bs)
 
 	default:
 	  while ((imgnlr (inim, in, v1) != EOF) && (impnlr (outim,
@@ -246,7 +256,7 @@ procedure bs_imstats (im, section, step, binwidth, binsep, mean, median, mode,
 
 pointer	im			# input image
 char	section[ARB]		# sample section
-int	step			# default sample step
+long	step			# default sample step
 real	binwidth		# bin width
 real	binsep			# separation between bins
 real	mean			# mean
@@ -255,58 +265,64 @@ real	mode			# mode
 real	sigma			# sigma
 real    upper			# upper limit for statistics 
 real	lower			# lower limit for statistics 
-
-int	i, n, nx, ndim
+	
+size_t	sz_val
+int	i, ndim
+long	j, nx
+size_t	n
 pointer	sp, x1, x2, xs, v, v1, dv, data, ptr1, ptr2
-int	imgnlr()
+long	imgnlr()
 
 begin
 	call smark (sp)
-	call salloc (x1, IM_MAXDIM, TY_INT)
-	call salloc (x2, IM_MAXDIM, TY_INT)
-	call salloc (xs, IM_MAXDIM, TY_INT)
-	call salloc (v, IM_MAXDIM, TY_LONG)
-	call salloc (v1, IM_MAXDIM, TY_LONG)
-	call salloc (dv, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (x1, sz_val, TY_LONG)
+	call salloc (x2, sz_val, TY_LONG)
+	call salloc (xs, sz_val, TY_LONG)
+	call salloc (v, sz_val, TY_LONG)
+	call salloc (v1, sz_val, TY_LONG)
+	call salloc (dv, sz_val, TY_LONG)
 
 	# Initialize the section.
 	ndim = IM_NDIM(im)
 	do i = 1, ndim {
-	    Memi[x1+i-1] = 1
-	    Memi[x2+i-1] = IM_LEN(im,i)
-	    Memi[xs+i-1] = 0
+	    Meml[x1+i-1] = 1
+	    Meml[x2+i-1] = IM_LEN(im,i)
+	    Meml[xs+i-1] = 0
 	}
 
 	# Parse the sample section.
-	call bs_section (section, Memi[x1], Memi[x2], Memi[xs], ndim)
+	call bs_section (section, Meml[x1], Meml[x2], Meml[xs], ndim)
 
 	# Check the step sizes.
 	do i = 1, ndim {
-	    if (Memi[xs+i-1] == 0)
-		Memi[xs+i-1] = step
+	    if (Meml[xs+i-1] == 0)
+		Meml[xs+i-1] = step
 	}
 
 	# Define the region of the image to be extracted.
 	n = 1
 	do i = 1, ndim {
-	    nx = (Memi[x2+i-1] - Memi[x1+i-1]) / Memi[xs+i-1] + 1
-	    Meml[v+i-1] = Memi[x1+i-1]
+	    nx = (Meml[x2+i-1] - Meml[x1+i-1]) / Meml[xs+i-1] + 1
+	    Meml[v+i-1] = Meml[x1+i-1]
 	    if (nx == 1)
 		Meml[dv+i-1] = 1
 	    else
-	        Meml[dv+i-1] = (Memi[x2+i-1] - Memi[x1+i-1]) / (nx - 1)
+	        Meml[dv+i-1] = (Meml[x2+i-1] - Meml[x1+i-1]) / (nx - 1)
 	    n = n * nx
 	}
 
 	# Accumulate the pixel values within the section.
-	call salloc (data, n, TY_REAL)
+	sz_val = n
+	call salloc (data, sz_val, TY_REAL)
 	Meml[v] = 1
 	ptr1 = data
-	call amovl (Meml[v], Meml[v1], IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovl (Meml[v], Meml[v1], sz_val)
 	while (imgnlr (im, ptr2, Meml[v1]) != EOF) {
 
-	    ptr2 = ptr2 + Memi[x1] - 1
-	    do i = Memi[x1], Memi[x2], Meml[dv] {
+	    ptr2 = ptr2 + Meml[x1] - 1
+	    do j = Meml[x1], Meml[x2], Meml[dv] {
 		Memr[ptr1] = Memr[ptr2]
 		ptr1 = ptr1 + 1
 		ptr2 = ptr2 + Meml[dv]
@@ -314,15 +330,16 @@ begin
 
 	    for (i=2; i<=ndim; i=i+1) {
 		Meml[v+i-1] = Meml[v+i-1] + Meml[dv+i-1]
-		if (Meml[v+i-1] <= Memi[x2+i-1])
+		if (Meml[v+i-1] <= Meml[x2+i-1])
 		    break
-		Meml[v+i-1] = Memi[x1+i-1]
+		Meml[v+i-1] = Meml[x1+i-1]
 	    }
 
 	    if (i > ndim)
 		break
 
-	    call amovl (Meml[v], Meml[v1], IM_MAXDIM)
+	    sz_val = IM_MAXDIM
+	    call amovl (Meml[v], Meml[v1], sz_val)
 	}
 
 	# Compute the statistics.
@@ -347,7 +364,7 @@ procedure bs_stats (data, npts, binwidth, binsep, mean, median, mode, sigma,
 	upper, lower)
 
 real	data[npts]		# sata array which will be sorted.
-int	npts			# number of data points
+size_t	npts			# number of data points
 real	binwidth		# bin width
 real	binsep			# separation between bins
 real	mean			# mean
@@ -357,9 +374,10 @@ real	sigma			# sigma
 real	upper			# upper limit for mean
 real	lower			# lower limit for mean
 
-int	x1, x2, x3, n, nmax
+long	x1, x2, x3, nmax
+size_t	n
 real	width, sep, y1, y2
-int	bs_awvgr()
+long	bs_awvgr()
 
 begin
 	# Initialize.
@@ -423,15 +441,15 @@ end
 # no limit checking is performed.  The number of pixels in the sample is
 # returned as the function value.
 
-int procedure bs_awvgr (a, npix, mean, sigma, lcut, hcut)
+long procedure bs_awvgr (a, npix, mean, sigma, lcut, hcut)
 
 real	a[ARB]		# input array of data
-int	npix		# the number of data points
+size_t	npix		# the number of data points
 real	mean		# the computed mean
 real	sigma		# the computed standard deviation
 real	lcut, hcut	# lower and upper cutoff for statistics calculation
 
-int	i, ngpix
+long	i, ngpix
 real	value, sum, sumsq, temp
 
 begin
@@ -495,12 +513,14 @@ end
 procedure bs_section (section, x1, x2, xs, ndim)
 
 char	section[ARB]		# Image section
-int	x1[ndim]		# Starting pixel
-int	x2[ndim]		# Ending pixel
-int	xs[ndim]		# Step size in pixels
+long	x1[ndim]		# Starting pixel
+long	x2[ndim]		# Ending pixel
+long	xs[ndim]		# Step size in pixels
 int	ndim			# Number of dimensions
 
-int	i, ip, a, b, c, temp, ctoi()
+long	a, b, c, temp
+int	i, ip
+int	ctol()
 define	error_	99
 
 begin
@@ -529,11 +549,11 @@ begin
 	    # Get a:b:c.  Allow notation such as "-*:c"
 	    # (or even "-:c") where the step is obviously negative.
 
-	    if (ctoi (section, ip, temp) > 0) {			# a
+	    if (ctol (section, ip, temp) > 0) {			# a
 		a = temp
 	        if (section[ip] == ':') {	
 		    ip = ip + 1
-		    if (ctoi (section, ip, b) == 0)		# a:b
+		    if (ctol (section, ip, b) == 0)		# a:b
 		        goto error_
 	        } else
 		    b = a
@@ -553,7 +573,7 @@ begin
 
 	    if (section[ip] == ':') {				# :step
 	        ip = ip + 1
-	        if (ctoi (section, ip, c) == 0)
+	        if (ctol (section, ip, c) == 0)
 		    goto error_
 	        else if (c == 0)
 		    goto error_

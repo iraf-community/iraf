@@ -15,9 +15,12 @@ int	cinterp			# Mask code for column interpolation
 bool	verbose			# Verbose output?
 int	fd			# List pixels?
 
-int	i, nc, nl
-long	v[IM_MAXDIM]
+int	j
+size_t	nc, nl
+long	i, v[IM_MAXDIM]
 pointer	sp, imname, pmname, str1, str2, im, pmim, pm, fp, buf, tmp
+long	l_val
+size_t	sz_val
 
 bool	clgetb(), pm_linenotempty()
 int	imtgetim(), imtlen(), clgeti(), imaccf()
@@ -26,13 +29,16 @@ pointer	imtopenp(), immap(), yt_pmmap(), xt_fpinit(), imstatp()
 pointer	xt_fps(), xt_fpi(), xt_fpl(), xt_fpr(), xt_fpd()
 pointer	impl2s(), impl2i(), impl2l(), impl2r(), impl2d()
 errchk	immap, yt_pmmap, xt_fpinit
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (pmname, SZ_FNAME, TY_CHAR)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (pmname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
 
 	# Get task parameters
 	ilist = imtopenp ("images")
@@ -52,7 +58,7 @@ begin
 	    call sfree (sp)
 	    call error (1, "Image and mask lists are incompatible")
 	}
-	if (!IS_INDEFI(linterp) && !IS_INDEF(cinterp) &&
+	if (!IS_INDEFI(linterp) && !IS_INDEFI(cinterp) &&
 	    linterp>0 && linterp==cinterp) {
 	    call imtclose (ilist)
 	    call imtclose (mlist)
@@ -71,7 +77,7 @@ begin
 		im = NULL
 		pmim = NULL
 		fp = NULL
-	        tmp = immap (Memc[imname], READ_WRITE, 0)
+	        tmp = immap (Memc[imname], READ_WRITE, NULLPTR)
 		im = tmp
 		tmp = yt_pmmap (Memc[pmname], im, Memc[pmname], SZ_FNAME);
 		pmim = tmp
@@ -89,7 +95,9 @@ begin
 		    call flush (STDOUT)
 		}
 
-		call amovkl (long(1), v, IM_MAXDIM)
+		l_val = 1
+		sz_val = IM_MAXDIM
+		call amovkl (l_val, v, sz_val)
 		if (fp != NULL) {
 		    do i = 1, nl {
 			v[2] = i
@@ -100,11 +108,11 @@ begin
 			    tmp = xt_fps (fp, im, i, fd)
 			    buf = impl2s (im, i)
 			    call amovs (Mems[tmp], Mems[buf], nc)
-			case TY_INT:
+			case TY_USHORT, TY_INT:
 			    tmp = xt_fpi (fp, im, i, fd)
 			    buf = impl2i (im, i)
 			    call amovi (Memi[tmp], Memi[buf], nc)
-			case TY_USHORT, TY_LONG:
+			case TY_LONG:
 			    tmp = xt_fpl (fp, im, i, fd)
 			    buf = impl2l (im, i)
 			    call amovl (Meml[tmp], Meml[buf], nc)
@@ -121,16 +129,17 @@ begin
 		}
 
 		# Add log to header.
-		call cnvdate (clktime(0), Memc[str2], SZ_LINE)
+		l_val = 0
+		call cnvdate (clktime(l_val), Memc[str2], SZ_LINE)
 		call sprintf (Memc[str1], SZ_LINE, "%s Bad pixel file is %s")
 			call pargstr (Memc[str2])
 			call pargstr (Memc[pmname])
 		if (imaccf (im, "FIXPIX") == NO)
 		    call imastr (im, "FIXPIX", Memc[str1])
 		else {
-		    do i = 2, 99 {
+		    do j = 2, 99 {
 			call sprintf (Memc[str2], SZ_LINE, "FIXPIX%02d")
-			    call pargi (i)
+			    call pargi (j)
 			if (imaccf (im, Memc[str2]) == NO) {
 			    call imastr (im, Memc[str2], Memc[str1])
 			    break

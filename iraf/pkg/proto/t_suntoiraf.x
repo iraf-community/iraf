@@ -55,23 +55,31 @@ define	BADVALUE	0	# row value for bad read
 
 procedure t_suntoiraf ()
 
-int	fd, fdtmp, i, krow, nlut, nchars, junk, nread
+int	fd, fdtmp, i, nlut, junk
+size_t	nchars
+long	nread, krow
 pointer	infile, fname, image, buf, im, imtmp, pix, sp, sp1, hdr, lut
 bool	apply_lut, delete_file, verbose, listonly, yflip
+short	s_val
+size_t	sz_val
 
-int	clgfil(), open(), strcmp(), fnroot(), fnextn()
+int	clgfil(), open(), strcmp(), fnroot(), fnextn(), imod()
 long	read()
 pointer	clpopni(), immap(), impl2s()
 bool	clgetb()
-
 errchk	open, read, immap
+
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (hdr, RAS_HEADER_LEN, TY_INT)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_LINE, TY_CHAR)
+	sz_val = RAS_HEADER_LEN
+	call salloc (hdr, sz_val, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (buf, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (image, sz_val, TY_CHAR)
 
 	infile = clpopni ("names")	# Get the raster/image names.
 	apply_lut = clgetb ("apply_lut")# Apply the raster lut?
@@ -87,7 +95,9 @@ begin
 	while (clgfil (infile, Memc[fname], SZ_FNAME) != EOF) {
 	    iferr {
 		fdtmp = open (Memc[fname], READ_ONLY, BINARY_FILE); fd = fdtmp
-		nread = read (fd, Memi[hdr], RAS_HEADER_LEN * SZ_INT)
+		sz_val = RAS_HEADER_LEN * SZ_INT
+		# arg2: incompatible pointer
+		nread = read (fd, Memi[hdr], sz_val)
 
 		if (RAS_MAGIC_NUM(hdr) != RAS_MAGIC)
 		    call error (0, "not a rasterfile")
@@ -162,7 +172,7 @@ begin
 			    call pargstr (Memc[buf])
 		    }
 
-		    imtmp = immap (Memc[image], NEW_IMAGE, 0); im = imtmp
+		    imtmp = immap (Memc[image], NEW_IMAGE, NULLPTR); im = imtmp
 
 		    IM_NDIM (im) = 2
 		    IM_LEN (im, 1) = RAS_WIDTH(hdr)
@@ -197,30 +207,39 @@ begin
 	    }
 
 	    call smark (sp1)
-	    call salloc (pix, RAS_WIDTH(hdr), TY_SHORT)
+	    sz_val = RAS_WIDTH(hdr)
+	    call salloc (pix, sz_val, TY_SHORT)
 
 	    # Extract the Sun raster LUT
 	    if (RAS_MAPLENGTH(hdr) > 0) {
-		call salloc (lut, RAS_MAPLENGTH(hdr), TY_SHORT)
+		sz_val = RAS_MAPLENGTH(hdr)
+		call salloc (lut, sz_val, TY_SHORT)
 
 		# assumes that MAPLENGTH is even (for SZB_CHAR=2)
-		nread = read (fd, Mems[lut], RAS_MAPLENGTH(hdr) / SZB_CHAR)
-		call achtbs (Mems[lut], Mems[lut], RAS_MAPLENGTH(hdr))
+		sz_val = RAS_MAPLENGTH(hdr) / SZB_CHAR
+		nread = read (fd, Mems[lut], sz_val)
+		sz_val = RAS_MAPLENGTH(hdr)
+		# arg1: incompatible pointer
+		call achtbs (Mems[lut], Mems[lut], sz_val)
 
 		nlut = RAS_MAPLENGTH(hdr) / 3
 	    }
 
 	    # round up to account for 16 bit line blocking
-	    nchars = RAS_WIDTH(hdr) / SZB_CHAR + mod (RAS_WIDTH(hdr), SZB_CHAR)
+	    nchars = RAS_WIDTH(hdr) / SZB_CHAR + imod(RAS_WIDTH(hdr), SZB_CHAR)
 
 	    # Access pixels and write them out for each row
 	    do i = 1, RAS_HEIGHT(hdr) {
 	        ifnoerr (nread = read (fd, Mems[pix], nchars)) {
-		    call achtbs (Mems[pix], Mems[pix], RAS_WIDTH(hdr))
+		    sz_val = RAS_WIDTH(hdr)
+		    # arg1: incompatible pointer
+		    call achtbs (Mems[pix], Mems[pix], sz_val)
 		    if (apply_lut && RAS_MAPLENGTH(hdr) > 0)
 		        call si_lut (Mems[pix], RAS_WIDTH(hdr), Mems[lut], nlut)
 		} else {
-		    call amovks (BADVALUE, Mems[pix], RAS_WIDTH(hdr))
+		    s_val = BADVALUE
+		    sz_val = RAS_WIDTH(hdr)
+		    call amovks (s_val, Mems[pix], sz_val)
 		    call eprintf ("Problem reading row %d in %s.\n")
 			call pargi (i)
 			call pargstr (Memc[fname])
@@ -232,7 +251,8 @@ begin
 		else
 		    krow = i
 
-		call amovs (Mems[pix], Mems[impl2s (im, krow)], RAS_WIDTH(hdr))
+		sz_val = RAS_WIDTH(hdr)
+		call amovs (Mems[pix], Mems[impl2s (im, krow)], sz_val)
 	    }
 
 	    call imunmap (im)

@@ -8,7 +8,7 @@ include "fi.h"
 procedure fi_precord (in_fname, linebuf, fields, nfields, quit, name)
 
 char	in_fname[SZ_FNAME]		# Name of input file
-int	linebuf[SZ_LINE]		# Line containing fields
+char	linebuf[SZ_LINE]		# Line containing fields
 int	fields[MAX_FIELDS]		# List of fields to extract
 int	nfields				# Number of fields to extract
 bool	quit				# Quit if missing field (y/n)?

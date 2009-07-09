@@ -12,13 +12,14 @@ pointer	infile
 int	nfiles
 
 real	xinit, yinit, xcntr, ycntr
-int	cboxsize
+long	cboxsize
 pointer	im
 
 int	imtlen(), imtgetim()
-int	clgeti()
+long	clgetl()
 real	clgetr()
 pointer	immap(), imtopenp()
+include	<nullptr.inc>
 
 begin
 	# Get file names
@@ -30,11 +31,11 @@ begin
 	yinit = clgetr ("y_init")
 
 	# Get box size to use
-	cboxsize = clgeti ("cboxsize")
+	cboxsize = clgetl ("cboxsize")
 
 	# Loop over all images
 	while (imtgetim (infile, ifile, SZ_FNAME) != EOF) {
-	    iferr (im = immap (ifile, READ_ONLY, 0)) {
+	    iferr (im = immap (ifile, READ_ONLY, NULLPTR)) {
 		call eprintf ("[%s] not found\n")
 		call pargstr (ifile)
 		next
@@ -60,14 +61,16 @@ procedure mpc_cntr (im, xstart, ystart, boxsize, xcntr, ycntr)
 
 pointer	im
 real	xstart, ystart
-int	boxsize
+long	boxsize
 real	xcntr, ycntr
 
-int	x1, x2, y1, y2, half_box
-int	ncols, nrows, nx, ny, try
+int	try
+long	ncols, nrows, x1, x2, y1, y2, half_box
+size_t	nx, ny
 real	xinit, yinit
 pointer	bufptr, sp, x_vect, y_vect
 pointer	imgs2r()
+real	aabs()
 
 begin
 	half_box = (boxsize - 1) / 2
@@ -122,7 +125,7 @@ begin
 
 	    try = try + 1
 	    if (try == 1) {
-		if ((abs(xcntr-xinit) > 1.0) || (abs(ycntr-yinit) > 1.0)) {
+		if ((aabs(xcntr-xinit) > 1.0) || (aabs(ycntr-yinit) > 1.0)) {
 		    xinit = xcntr
 		    yinit = ycntr
 		}
@@ -136,11 +139,11 @@ end
 
 procedure mpc_rowsum (v, row, nx, ny)
 
-int	nx, ny
+size_t	nx, ny
 real	v[nx,ny]
 real	row[ARB]
 
-int	i, j
+long	i, j
 
 begin
 	do i = 1, ny
@@ -153,11 +156,11 @@ end
 
 procedure mpc_colsum (v, col, nx, ny)
 
-int	nx, ny
+size_t	nx, ny
 real	v[nx,ny]
 real	col[ARB]
 
-int	i, j
+long	i, j
 
 begin
 	do i = 1, ny
@@ -171,10 +174,10 @@ end
 procedure mpc_getcenter (v, nv, vc)
 
 real	v[ARB]
-int	nv
+size_t	nv
 real	vc
 
-int	i
+long	i
 real	sum1, sum2, sigma, cont
 
 begin

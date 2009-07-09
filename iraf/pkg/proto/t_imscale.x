@@ -15,20 +15,23 @@ real	lower					# Lower limit for mean
 real	upper					# Upper limit for mean
 bool	verbose					# Verbose output?
 
-int	i
+size_t	sz_val
+long	l_val
+long	i
 long	line_in[IM_MAXDIM], line_out[IM_MAXDIM]
 real	mean_in, scale
 pointer	in, out, data_in, data_out
 
-int	imgnlr(), impnlr()
+long	imgnlr(), impnlr()
 real	clgetr(), image_mean()
 bool	clgetb()
 pointer	immap()
+include	<nullptr.inc>
 
 begin
 	# Access images and set parameters.
 	call clgstr ("input", input, SZ_FNAME)
-	in = immap (input, READ_WRITE, 0)
+	in = immap (input, READ_WRITE, NULLPTR)
 	call clgstr ("output", output, SZ_FNAME)
 	out = immap (output, NEW_COPY, in)
 	mean = clgetr ("mean")
@@ -48,8 +51,10 @@ begin
 	scale = mean / mean_in
 
 	# Create the output image.
-	call amovkl (long(1), line_in, IM_MAXDIM)
-	call amovkl (long(1), line_out, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, line_in, sz_val)
+	call amovkl (l_val, line_out, sz_val)
 
 	# Loop through the image lines and rescale.
 	while (impnlr (out, data_out, line_out) != EOF) {
@@ -90,17 +95,21 @@ pointer	im				# IMIO descriptor
 real	lower				# Low cutoff
 real	upper				# High cutoff
 
-int	i, npix
+size_t	sz_val
+long	l_val
+long	npix
 long	line[IM_MAXDIM]
 real	sum
-pointer	data, data_end
+pointer	i, data, data_end
 
-int	imgnls(), imgnli(), imgnll(), imgnlr()
+long	imgnls(), imgnli(), imgnll(), imgnlr()
 
 begin
 	sum = 0.
 	npix = 0
-	call amovkl (long(1), line, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, line, sz_val)
 
 	# Loop through the image lines to compute the mean.
 	# Optimize IMIO for the image datatype.

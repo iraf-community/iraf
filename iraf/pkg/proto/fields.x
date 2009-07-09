@@ -10,9 +10,11 @@ procedure t_fields ()
 
 pointer	sp, f_str, l_str, fin, list
 bool	quit, name
-int	fields[MAX_FIELDS], lines[3, MAX_LINES], nfields, nlines
+long	lines[3, MAX_LINES], nlines
+int	fields[MAX_FIELDS], nfields
 int	ranges[3,MAX_RANGES], nranges
 
+size_t	sz_val
 bool	clgetb()
 int	decode_ranges(), fi_decode_ranges(), clgfil()
 pointer	clpopni()
@@ -20,9 +22,10 @@ pointer	clpopni()
 begin
 	# Allocate space on stack for char buffers
 	call smark (sp)
-	call salloc (f_str,  SZ_LINE, TY_CHAR)
-	call salloc (l_str,  SZ_LINE, TY_CHAR)
-	call salloc (fin,    SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (f_str, sz_val, TY_CHAR)
+	call salloc (l_str, sz_val, TY_CHAR)
+	call salloc (fin, sz_val, TY_CHAR)
 
 	# Open template of input files
 	list = clpopni ("files")
@@ -108,7 +111,8 @@ int	max_ranges		# Maximum number of ranges
 int	minimum, maximum	# Minimum and maximum range values allowed
 int	nvalues			# The number of values in the ranges
 
-int	ip, nrange, a, b, first, last, step, ctoi()
+int	ip, nrange, a, b, first, last, step
+int	ctoi()
 
 begin
 	ip = 1
@@ -201,7 +205,7 @@ begin
 	    ranges[1, nrange] = first
 	    ranges[2, nrange] = last
 	    ranges[3, nrange] = step
-	    nvalues = nvalues + abs (last - first) / step + 1
+	    nvalues = nvalues + iabs(last - first) / step + 1
 	    nrange = nrange + 1
 	}
 
@@ -216,14 +220,16 @@ end
 procedure fi_xtract (in_fname, lines, fields, nfields, quit, name)
 
 char	in_fname[SZ_FNAME]		# Input file name
-int	lines[3,MAX_LINES]		# Ranges of lines to be extracted
+long	lines[3,MAX_LINES]		# Ranges of lines to be extracted
 int	fields[MAX_FIELDS]		# Fields to be extracted
 int	nfields				# Number of fields to extract
 bool	quit				# Quit if missing field (y/n)?
 bool	name				# Print file name in each line (y/n)?
 
+size_t	sz_val
 pointer	sp, lbuf
-int	in, in_line
+int	in, st, i_val
+long	in_line
 
 bool	is_in_range()
 int	open(), getlongline()
@@ -232,7 +238,8 @@ errchk	salloc, open, getlongline, fi_precord
 begin
 	# Allocate space for line buffer
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Open input file
 	in = open (in_fname, READ_ONLY, TEXT_FILE)
@@ -241,7 +248,10 @@ begin
 	in_line = 0
 	repeat {
 	    repeat {
-	        if (getlongline (in, Memc[lbuf], SZ_LINE, in_line) == EOF) {
+		i_val = in_line
+		st = getlongline (in, Memc[lbuf], SZ_LINE, i_val)
+		in_line = i_val
+	        if ( st == EOF) {
 		    call close (in)
 		    call sfree (sp)
 	            return
