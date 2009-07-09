@@ -22,7 +22,7 @@ int	mode, reclen, fd, hd
 pointer	sp, image, efile, ecmd, eline
 pointer	im, ua, ip, jp, kp
 
-pointer	imtopnp()
+pointer	imtopenp()
 int	imtgetim(), stridxs(), open(), stropen()
 int	getline(), gstrcpy()
 bool	clgetb()
@@ -43,7 +43,7 @@ begin
 	call salloc (eline, sz_val, TY_CHAR)
 
 	# Get task parameters and set update mode
-	images = imtopnp ("images")
+	images = imtopenp ("images")
 	call clgstr ("command", Memc[cmd], SZ_LINE)
 	update = clgetb ("update")
 	if (update)

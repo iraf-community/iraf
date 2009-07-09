@@ -42,7 +42,7 @@ int	max_nfields             #I maximum number of fields
 size_t	sz_val
 int	nfields, field
 pointer sp, fname, flist
-pointer	fntopenb()
+pointer	fntopnb()
 int	fntgfnb(), strdic()
 
 begin
@@ -52,7 +52,7 @@ begin
 	sz_val = SZ_FNAME
         call salloc (fname, sz_val, TY_CHAR)
 
-        flist = fntopenb (fieldstr, NO)
+        flist = fntopnb (fieldstr, NO)
         while (fntgfnb (flist, Memc[fname], SZ_FNAME) != EOF &&
             (nfields < max_nfields)) {
             field = strdic (Memc[fname], Memc[fname], SZ_FNAME, MIS_FIELDS)
