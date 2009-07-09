@@ -63,7 +63,7 @@ long	filbuf(), read()
 int	strncmp()
 long	fstatl()
 int	pr_findproc(), psio_isxmit(), zfunc3(), imod()
-pointer	zfncp2()
+pointer	zpfnc2()
 errchk	epa_writep, epa_giotr, epa_writetty, epa_readtty, epa_gflush
 errchk	pr_findproc, psio_xfer, filbuf, read, write, flush, syserr
 include	<fio.com>
@@ -212,7 +212,7 @@ begin
 			# to process the metacode.
 
 			ival = nchars
-			op = zfncp2 (epa_writep, destfd, ival)
+			op = zpfnc2 (epa_writep, destfd, ival)
 			if (read (in, Memc[op], nchars) < nchars)
 			    call syserr (SYS_PRIPCSYNTAX)
 # call eprintf ("___giotr, %d chars\n")

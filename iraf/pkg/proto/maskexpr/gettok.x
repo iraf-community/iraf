@@ -303,9 +303,9 @@ size_t	nchars
 
 int	strmac(), open(), stropen()
 int	gt_rawtok(), gt_nexttok(), gt_arglist()
-pointer	zfncp3()
+pointer	zpfnc3()
 errchk	gt_rawtok, close, ungetci, ungetline, gt_arglist, 
-errchk	clcmdw, stropen, syserr, zfncp3
+errchk	clcmdw, stropen, syserr, zpfnc3
 define	pushfile_ 91
 
 
@@ -361,7 +361,7 @@ begin
 		# Lookup the identifier in the symbol table.
 		textp = NULL
 		if (GT_GSYM(gt) != NULL)
-		    textp = zfncp3 (GT_GSYM(gt), GT_GSYMDATA(gt), tokbuf, margs)
+		    textp = zpfnc3 (GT_GSYM(gt), GT_GSYMDATA(gt), tokbuf, margs)
 
 		# Process a defined macro.
 		if (textp != NULL) {

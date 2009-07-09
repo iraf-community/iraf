@@ -2,7 +2,7 @@
 
 # GSTRENTAB -- Procedure to replace blanks with tabs and blanks.
 
-int procedure  gstrentab (line, outline, maxch, tabs)
+int procedure gstrentab (line, outline, maxch, tabs)
 
 
 char  line[ARB], outline[ARB]
