@@ -9,47 +9,51 @@ include	<mach.h>
 
 procedure t_split()
 
-long	offset
 bool	verbose
-pointer	sp, input, output, fname, buf
-int	maxfiles, nchars, nlines, nbytes
-int	file_type, nrecords, fileno, in, out, n
+pointer	sp, p_input, output, fname, buf
+int	maxfiles, nbytes, file_type, fileno, in, out
+long	offset, n, nlines, nrecords
+size_t	nchars
+size_t	sz_val
 
 bool	clgetb()
 int	open(), getline(), access(), clgeti()
-long	read()
+long	read(), clgetl()
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (p_input, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Get the input file name and the root name for the output files.
-	call clgstr ("input", Memc[input], SZ_FNAME)
+	call clgstr ("input", Memc[p_input], SZ_FNAME)
 	call clgstr ("output", Memc[output], SZ_FNAME)
 
 	# Determine the file type of the input file.
-	if (access (Memc[input], READ_ONLY, TEXT_FILE) == YES)
+	if (access (Memc[p_input], READ_ONLY, TEXT_FILE) == YES)
 	    file_type = TEXT_FILE
 	else
 	    file_type = BINARY_FILE
 
 	# Determine the segment size and allocate the data buffer.
 	if (file_type == TEXT_FILE) {
-	    nlines = clgeti ("nlines")
-	    call salloc (buf, SZ_LINE, TY_CHAR)
+	    nlines = clgetl ("nlines")
+	    sz_val = SZ_LINE
+	    call salloc (buf, sz_val, TY_CHAR)
 	} else {
 	    nbytes = clgeti ("nbytes")
 	    nchars = (nbytes + SZB_CHAR-1) / SZB_CHAR
-	    call salloc (buf, nchars, TY_CHAR)
+	    sz_val = nchars
+	    call salloc (buf, sz_val, TY_CHAR)
 	}
 
 	maxfiles = clgeti ("maxfiles")
 	verbose  = clgetb ("verbose")
 
 	# Split the input file.
-	in = open (Memc[input], READ_ONLY, file_type)
+	in = open (Memc[p_input], READ_ONLY, file_type)
 	offset = 1
 
 	for (fileno=1;  fileno <= maxfiles;  fileno=fileno+1) {
@@ -70,7 +74,8 @@ begin
 	    if (file_type == BINARY_FILE) {
 		n = read (in, Memc[buf], nchars)
 		if (n != EOF) {
-		    call write (out, Memc[buf], n)
+		    sz_val = n
+		    call write (out, Memc[buf], sz_val)
 		    nrecords = n
 		} else
 		    nrecords = 0
@@ -92,13 +97,13 @@ begin
 	    } else if (verbose) {
 		call printf ("%d %s @ %d\n")
 		    if (file_type == TEXT_FILE) {
-			call pargi (nrecords)
+			call pargl (nrecords)
 			call pargstr ("lines")
 		    } else {
-			call pargi (nrecords * SZB_CHAR)
+			call pargl (nrecords * SZB_CHAR)
 			call pargstr ("bytes")
 		    }
-		    call pargi (offset)
+		    call pargl (offset)
 	    }
 
 	    offset = offset + nrecords

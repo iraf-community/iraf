@@ -83,7 +83,7 @@ end
 
 # DECODE_TABSTOP -- Procedure to decode tabstops
 
-int procedure  decode_tabstop (tab_list, ip, tabs, maxtabs, tabstop)
+int procedure decode_tabstop (tab_list, ip, tabs, maxtabs, tabstop)
 
 char	tab_list[ARB]
 int	maxtabs

@@ -29,22 +29,28 @@ procedure t_curfit ()
 
 pointer	x, y, w, gt, fcn, fname, flist, dev, str, sp, ic, fd
 bool	listdata, verbose, power, redir
-int	ofmt, interactive, datatype
-int	axis, nvalues, nmax, weighting
+int	ofmt, interactive, datatype, axis, weighting
+size_t	nvalues, nmax
+size_t	sz_val
+
 pointer	gt_init(), imtopen()
 bool	clgetb()
-int	clgeti(), cf_operand(), cf_rimage(), cf_rlist()
+int	clgeti(), cf_operand()
+long	cf_rimage(), cf_rlist()
 int	imtgetim(), clgwrd()
 int	fstati()
 
 begin
 	# Allocate space for string buffers
 	call smark (sp)
-	call salloc (fcn,   SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (flist, SZ_LINE,  TY_CHAR)
-	call salloc (dev,   SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fcn, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (flist, sz_val,  TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (dev, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# First get cl parameters.  Check to see if input has been redirected.
 	redir = false
@@ -203,7 +209,7 @@ define	SZ_BUF		1000
 # datatype arrays in memory.  Return pointers to the arrays and a count of the
 # number of pixels.  
 
-int procedure cf_rlist (fname, x, y, w, weighting, datatype)
+long procedure cf_rlist (fname, x, y, w, weighting, datatype)
 
 char	fname[ARB]		# Name of list file
 pointer	x			# Pointer to x data values (returned)
@@ -212,7 +218,9 @@ pointer	w			# Pointer to weight values (returned)
 int	weighting		# Type of weighting
 int	datatype		# Datatype of x and Y values
 
-int	buflen, n, fd, ncols, lineno
+size_t	sz_val
+size_t	buflen, n
+int	fd, ncols, lineno
 pointer	sp, lbuf, ip
 
 double	cf_divzd()
@@ -223,7 +231,8 @@ errchk	open, sscan, getline, malloc
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	fd = open (fname, READ_ONLY, TEXT_FILE)
 
@@ -337,18 +346,18 @@ begin
 	case CF_STATISTICAL:
 	    if (datatype == TY_REAL) {
 		call aabsr (Memr[y], Memr[w], n)
-		call arczr (1.0, Memr[w], Memr[w], n, cf_divzr (1.0))
+		call arczr (1.0, Memr[w], Memr[w], n, cf_divzr)
 	    } else {
 		call aabsd (Memd[y], Memd[w], n)
-		call arczd (1.0d0, Memd[w], Memd[w], n, cf_divzd (1.0d0))
+		call arczd (1.0d0, Memd[w], Memd[w], n, cf_divzd)
 	    }
 	case CF_INSTRUMENTAL:
 	    if (datatype == TY_REAL) {
 		call apowkr (Memr[w], 2, Memr[w], n)
-		call arczr (1.0, Memr[w], Memr[w], n, cf_divzr (0.0))
+		call arczr (1.0, Memr[w], Memr[w], n, cf_divzr)
 	    } else {
 		call apowkd (Memd[w], 2, Memd[w], n)
-		call arczd (1.0d0, Memd[w], Memd[w], n, cf_divzd (0.0d0))
+		call arczd (1.0d0, Memd[w], Memd[w], n, cf_divzd)
 	    }
 	}
 
@@ -360,7 +369,7 @@ end
 # CF_RIMAGE -- Read an image section and compute the projection about
 # one dimension, producing x and y vectors as output.
 
-int procedure cf_rimage (imsect, axis, x, y, w, weighting, datatype)
+long procedure cf_rimage (imsect, axis, x, y, w, weighting, datatype)
 
 char	imsect[ARB]		# Name of image section
 pointer	x			# Pointer to x data values
@@ -370,13 +379,14 @@ int	weighting		# Type of weighting
 int	axis			# Axis about which projection is taken
 int	datatype		# Datatype of data values
 
-int	npix
+size_t	npix
 pointer	im
 pointer	immap()
 errchk	immap, im_projectionr, im_projectiond, malloc
+include	<nullptr.inc>
 
 begin
-	im = immap (imsect, READ_ONLY, 0)
+	im = immap (imsect, READ_ONLY, NULLPTR)
 
 	if (axis < 1 || axis > IM_NDIM(im))
 	    call error (2, "Attempt to take projection over nonexistent axis")

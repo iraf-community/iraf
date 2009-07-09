@@ -12,7 +12,7 @@ include	<math/gsurfit.h>
 
 procedure t_surfit ()
 
-pointer	input			# Input file
+pointer	p_input			# Input file
 pointer	func			# Function type
 pointer	wttype			# Weight type
 pointer	image			# Surface image
@@ -24,30 +24,37 @@ int	xterms			# Cross-terms?
 double	xmin, xmax		# Surface range
 double	ymin, ymax		# Surface range
 double	zmin, zmax		# Data limits
-int	ncols			# Number of image columns
-int	nlines			# Number of image lines
+size_t	ncols			# Number of image columns
+size_t	nlines			# Number of image lines
 
-int	i, j, k, fd, n, ncoeff, maxorder, xincr
+size_t	sz_val
+long	l_val
+int	ii, jj, kk, fd, ncoeff, maxorder, xincr
+long	i, j, k
+size_t	n
 double	r[8], dx, dy, chisqr
 pointer	sf, im, mw
 pointer sp, x, y, z, w, c, e, f, xvec, yvec, ptr, xtype
 
 int	clgeti(), clgwrd()
+long	clgetl(), lmod()
 int	open(), fscan(), nscan(), nowhite(), dgsgeti()
 double	clgetd(), dgseval()
 pointer	immap(), impl2d(), mw_open()
 errchk	open, malloc, realloc, immap, impl2d, mw_open
 errchk	dgsinit, dgsfit, dgscoeff, dgserrors
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (input, SZ_FNAME, TY_CHAR)
-	call salloc (func, SZ_FNAME, TY_CHAR)
-	call salloc (wttype, SZ_FNAME, TY_CHAR)
-	call salloc (coords, SZ_FNAME, TY_CHAR)
-	call salloc (fit, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (xtype, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (p_input, sz_val, TY_CHAR)
+	call salloc (func, sz_val, TY_CHAR)
+	call salloc (wttype, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
+	call salloc (fit, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (xtype, sz_val, TY_CHAR)
 
 	x = NULL
 	y = NULL
@@ -60,8 +67,8 @@ begin
 
 	iferr {
 	    # Read points to be fit.
-	    call clgstr ("input", Memc[input], SZ_FNAME)
-	    ptr = open (Memc[input], READ_ONLY, TEXT_FILE); fd = ptr
+	    call clgstr ("input", Memc[p_input], SZ_FNAME)
+	    ptr = open (Memc[p_input], READ_ONLY, TEXT_FILE); fd = ptr
 
 	    n = 0
 	    while (fscan (fd) != EOF) {
@@ -73,12 +80,14 @@ begin
 		    next
 		if (nscan() < 4)
 		    r[4] = 1.
+		l_val = 100
 		if (n == 0) {
-		    call malloc (x, 100, TY_DOUBLE)
-		    call malloc (y, 100, TY_DOUBLE)
-		    call malloc (z, 100, TY_DOUBLE)
-		    call malloc (w, 100, TY_DOUBLE)
-		} else if (mod (n, 100) == 0) {
+		    sz_val = 100
+		    call malloc (x, sz_val, TY_DOUBLE)
+		    call malloc (y, sz_val, TY_DOUBLE)
+		    call malloc (z, sz_val, TY_DOUBLE)
+		    call malloc (w, sz_val, TY_DOUBLE)
+		} else if ( lmod(n, l_val) == 0 ) {
 		    call realloc (x, n+100, TY_DOUBLE)
 		    call realloc (y, n+100, TY_DOUBLE)
 		    call realloc (z, n+100, TY_DOUBLE)
@@ -135,15 +144,15 @@ begin
 		call error (2, "No data values")
 
 	    # Fit surface.
-	    i = clgwrd ("function", Memc[func], SZ_FNAME, GS_FUNCTIONS)
+	    ii = clgwrd ("function", Memc[func], SZ_FNAME, GS_FUNCTIONS)
 	    xorder = clgeti ("xorder")
 	    yorder = clgeti ("yorder")
 	    xterms = clgwrd ("xterms", Memc[xtype], SZ_FNAME, GS_XTYPES) - 1
 
 	    # Set the weights.
-	    j = clgwrd ("weighting", Memc[wttype], SZ_FNAME,
+	    jj = clgwrd ("weighting", Memc[wttype], SZ_FNAME,
 		"|uniform|user|statistical|instrumental|")
-	    switch (j) {
+	    switch (jj) {
 	    case 1:
 		do k = 0, n-1
 		    Memd[w+k] = 1
@@ -151,21 +160,22 @@ begin
 		;
 	    case 3:
 		do k = 0, n-1
-		    Memd[w+k] = 1 / max (1.0d-20, abs (Memd[z+k]))
+		    Memd[w+k] = 1 / max (1.0d-20, dabs(Memd[z+k]))
 	    case 4:
 		do k = 0, n-1
 		    Memd[w+k] = 1 / max (1.0d-20, Memd[z+k]**2)
 	    }
 
-	    call dgsinit (sf, i, xorder, yorder, xterms, xmin, xmax, ymin, ymax)
-	    call dgsfit (sf, Memd[x], Memd[y], Memd[z], Memd[w], n, WTS_USER, i)
-	    if (i != OK)
+	    call dgsinit (sf, ii, xorder, yorder, xterms, xmin, xmax, ymin, ymax)
+	    call dgsfit (sf, Memd[x], Memd[y], Memd[z], Memd[w], n, WTS_USER, ii)
+	    if (ii != OK)
 		call error (2, "Fitting error")
 
 	    # Output parameters, coefficients, errors, and fit results.
 	    ncoeff = dgsgeti (sf, GSNCOEFF)
-	    call salloc (c, ncoeff, TY_DOUBLE)
-	    call salloc (e, ncoeff, TY_DOUBLE)
+	    sz_val = ncoeff
+	    call salloc (c, sz_val, TY_DOUBLE)
+	    call salloc (e, sz_val, TY_DOUBLE)
 	    call salloc (f, n, TY_DOUBLE)
 	    call dgscoeff (sf, Memd[c], ncoeff)
 	    call dgsvector (sf, Memd[x], Memd[y], Memd[f], n)
@@ -194,11 +204,11 @@ begin
 	    call printf ("   x  y    coeff    error\n")
 	    i = 0
 	    if (xterms == GS_XFULL) {
-		do k = 1, yorder {
-		    do j = 1, xorder {
+		do kk = 1, yorder {
+		    do jj = 1, xorder {
 			call printf ("  %2d %2d %8.6g %8.6g\n")
-			    call pargi (j-1)
-			    call pargi (k-1)
+			    call pargi (jj-1)
+			    call pargi (kk-1)
 			    call pargd (Memd[c+i])
 			    call pargd (Memd[e+i])
 			i = i + 1
@@ -207,31 +217,31 @@ begin
 	    } else if (xterms == GS_XHALF) {
 		maxorder = max (xorder+1, yorder+1)
 		xincr = xorder
-		do k = 1, yorder {
-		    do j = 1, xincr {
+		do kk = 1, yorder {
+		    do jj = 1, xincr {
 			call printf ("  %2d %2d %8.6g %8.6g\n")
-			    call pargi (j-1)
-			    call pargi (k-1)
+			    call pargi (jj-1)
+			    call pargi (kk-1)
 			    call pargd (Memd[c+i])
 			    call pargd (Memd[e+i])
 			i = i + 1
 		    }
-		    if ((k + xorder + 1) > maxorder)
+		    if ((kk + xorder + 1) > maxorder)
 			xincr = xincr - 1
 		}
 	    } else {
-		do j = 1, xorder {
+		do jj = 1, xorder {
 		    call printf ("  %2d %2d %8.6g %8.6g\n")
-			call pargi (j-1)
+			call pargi (jj-1)
 			call pargi (0)
 			call pargd (Memd[c+i])
 			call pargd (Memd[e+i])
 		    i = i + 1
 		}
-		do k = 2, yorder {
+		do kk = 2, yorder {
 		    call printf ("  %2d %2d %8.6g %8.6g\n")
 			call pargi (0)
-			call pargi (k-1)
+			call pargi (kk-1)
 			call pargd (Memd[c+i])
 			call pargd (Memd[e+i])
 		    i = i + 1
@@ -265,7 +275,7 @@ begin
 
 		call clgstr ("fit", Memc[fit], SZ_FNAME)
 		if (nowhite (Memc[fit], Memc[fit], SZ_FNAME) != 0) {
-		    i = open (Memc[fit], APPEND, TEXT_FILE)
+		    ii = open (Memc[fit], APPEND, TEXT_FILE)
 		    while (fscan (fd) != EOF) {
 			call gargd (r[1])
 			call gargd (r[2])
@@ -274,12 +284,12 @@ begin
 			if (r[1]<xmin || r[1]>xmax || r[2]<ymin || r[2]>ymax)
 			    next
 			r[3] = dgseval (sf, r[1], r[2])
-			call fprintf (i, "%8.6g %8.6g %8.6g\n")
+			call fprintf (ii, "%8.6g %8.6g %8.6g\n")
 			    call pargd (r[1])
 			    call pargd (r[2])
 			    call pargd (r[3])
 		    }
-		    call close (i)
+		    call close (ii)
 		}
 		call close (fd)
 	    }
@@ -287,10 +297,10 @@ begin
 	    # Create an image if desired.
 	    call clgstr ("image", Memc[image], SZ_FNAME)
 	    if (nowhite (Memc[image], Memc[image], SZ_FNAME) != 0) {
-		ncols = clgeti ("ncols")
-		nlines = clgeti ("nlines")
+		ncols = clgetl ("ncols")
+		nlines = clgetl ("nlines")
 
-		ptr = immap (Memc[image], NEW_IMAGE, 0); im = ptr
+		ptr = immap (Memc[image], NEW_IMAGE, NULLPTR); im = ptr
 		IM_PIXTYPE(im) = TY_REAL
 		IM_LEN(im,1) = ncols
 		IM_LEN(im,2) = nlines
@@ -316,7 +326,7 @@ begin
 		r[6] = 0.
 		r[7] = 0.
 		r[8] = dy
-		mw = mw_open (NULL, 2)
+		mw = mw_open (NULLPTR, 2)
 		call mw_newsystem (mw, "world", 2)
 		call mw_swtermd (mw, r[1], r[3], r[5], 2)
 		call mw_saveim (mw, im)

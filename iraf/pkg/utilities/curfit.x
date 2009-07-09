@@ -26,13 +26,14 @@ pointer	gt			# Graphics tools pointer
 real	x[nmax]			# X data values
 real	y[nmax]			# Y data values
 real	wts[nmax]		# Weights
-int	nvalues			# Number of data points
-int	nmax			# Maximum number of data points
+size_t	nvalues			# Number of data points
+size_t	nmax			# Maximum number of data points
 char	device[SZ_FNAME]	# Output graphics device
 int	interactive		# Fit curve interactively?
 int	ofmt			# Type of output listing
 bool	power			# Convert coeff to power series?
 
+size_t	sz_val
 int	ncoeff, i
 real	xmin, xmax
 pointer	sp, gp, cv, coeff, tty
@@ -77,7 +78,8 @@ begin
  	    # Calculate and print coefficients
 	    ncoeff = rcvstati (cv, CVNCOEFF)
 	    call smark (sp)
-	    call salloc (coeff, ncoeff, TY_REAL)
+	    sz_val = ncoeff
+	    call salloc (coeff, sz_val, TY_REAL)
 	    call rcvpower (cv, Memr[coeff], ncoeff)
 	    call printf ("# Power series coefficients would be:\n")
 	    call printf ("# \t\tcoefficient\n")
@@ -99,12 +101,12 @@ end
 procedure cf_listxyr (cv, xvals, yvals, wts, nvalues)
 
 pointer	cv			# Pointer to curfit structure
-int	nvalues			# Number of data values
+size_t	nvalues			# Number of data values
 real	xvals[nvalues]		# Array of x data values
 real	yvals[nvalues]		# Array of y data values
 real	wts[nvalues]		# Array of weights
 
-int	i
+long	i
 real	rcveval()
 
 begin
@@ -128,14 +130,16 @@ real	x[npix]			# Index of projection vector
 real	y[npix]			# Receives the projection vector
 real	w[npix]			# Receives the weight vector
 int	weighting		# Weighting of the individual points
-int	npix			# Length of projection vector
+size_t	npix			# Length of projection vector
 int	axis			# The axis to be projected to (x=1)
 
-int	i, lastv
+long	l_val
+size_t	sz_val
+long	i, lastv
 long	v[IM_MAXDIM], nsum, totpix
 pointer	pix
 real	asumr()
-int	imgnlr()
+long	imgnlr()
 errchk	imgnlr
 
 begin
@@ -147,7 +151,9 @@ begin
 
 	# Set the y projection vector
 	call aclrr (y, npix)
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	switch (axis) {
 	case 1:
@@ -218,13 +224,14 @@ pointer	gt			# Graphics tools pointer
 double	x[nmax]			# X data values
 double	y[nmax]			# Y data values
 double	wts[nmax]		# Weights
-int	nvalues			# Number of data points
-int	nmax			# Maximum number of data points
+size_t	nvalues			# Number of data points
+size_t	nmax			# Maximum number of data points
 char	device[SZ_FNAME]	# Output graphics device
 int	interactive		# Fit curve interactively?
 int	ofmt			# Type of output listing
 bool	power			# Convert coeff to power series?
 
+size_t	sz_val
 int	ncoeff, i
 double	xmin, xmax
 pointer	sp, gp, cv, coeff, tty
@@ -269,7 +276,8 @@ begin
  	    # Calculate and print coefficients
 	    ncoeff = dcvstati (cv, CVNCOEFF)
 	    call smark (sp)
-	    call salloc (coeff, ncoeff, TY_DOUBLE)
+	    sz_val = ncoeff
+	    call salloc (coeff, sz_val, TY_DOUBLE)
 	    call dcvpower (cv, Memd[coeff], ncoeff)
 	    call printf ("# Power series coefficients would be:\n")
 	    call printf ("# \t\tcoefficient\n")
@@ -291,12 +299,12 @@ end
 procedure cf_listxyd (cv, xvals, yvals, wts, nvalues)
 
 pointer	cv			# Pointer to curfit structure
-int	nvalues			# Number of data values
+size_t	nvalues			# Number of data values
 double	xvals[nvalues]		# Array of x data values
 double	yvals[nvalues]		# Array of y data values
 double	wts[nvalues]		# Array of weights
 
-int	i
+long	i
 double	dcveval()
 
 begin
@@ -320,14 +328,16 @@ double	x[npix]			# Index of projection vector
 double	y[npix]			# Receives the projection vector
 double	w[npix]			# Receives the weight vector
 int	weighting		# Weighting of the individual points
-int	npix			# Length of projection vector
+size_t	npix			# Length of projection vector
 int	axis			# The axis to be projected to (x=1)
 
-int	i, lastv
+long	l_val
+size_t	sz_val
+long	i, lastv
 long	v[IM_MAXDIM], nsum, totpix
 pointer	pix
 double	asumd()
-int	imgnld()
+long	imgnld()
 errchk	imgnld
 
 begin
@@ -339,7 +349,9 @@ begin
 
 	# Set the y projection vector
 	call aclrd (y, npix)
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 
 	switch (axis) {
 	case 1:

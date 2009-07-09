@@ -70,7 +70,8 @@ int	order					# polynomial order
 int	weighting				# mode of weighting fit
 bool	verbose, listdata			# printout options
 
-int	i, in, item, m[50], mode, nterms, line_number
+int	i, in, item, m[50], mode, nterms
+long	line_number
 real	x[MAX_ITEMS], y[MAX_ITEMS], yfit[MAX_ITEMS], sigy[MAX_ITEMS]
 real	a0, a[50], siga0, siga[50], r[50], rmul, chisqr, ftest
 real	stdev
@@ -105,7 +106,7 @@ begin
 	    # There must be two items per entry for the x,y pair.
 	    if (nscan() < 2) {
 		call eprintf ("Bad entry in list on line:%d - item ignored\n")
-		    call pargi (line_number)
+		    call pargl (line_number)
 		next
 	    }
 
@@ -114,11 +115,11 @@ begin
 	        call gargr (sigy[item])
 	        if (nscan() < 3) {
 		    call eprintf ("Undefined sigmay on line:%d - item ignored\n")
-			call pargi (line_number)
+			call pargl (line_number)
 		    next
 		} else if (fp_equalr (sigy[item], 0.0)) {
 		    call eprintf ("Zero-valued sigmay on line:%d - item ignored\n")
-			call pargi (line_number)
+			call pargl (line_number)
 		    next
 		}
 		    

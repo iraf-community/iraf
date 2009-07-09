@@ -21,6 +21,7 @@ char	line[SZ_LINE], lastchar
 int	del[NCHARS], collap[NCHARS]
 int	delete, allbut, lastfrom, lastto, collapse, in, i, op, nchars
 pointer	list
+size_t	sz_val
 
 bool	clgetb()
 int	makeset(), strlen(), clgfil(), open(), getline()
@@ -81,8 +82,9 @@ begin
 
 	# Initialize lookup table, delete and collapse vectors
 	call makelut (lut, NCHARS)
-	call amovki (OFF, del, NCHARS)
-	call amovki (OFF, collap, NCHARS)
+	sz_val = NCHARS
+	call amovki (OFF, del, sz_val)
+	call amovki (OFF, collap, sz_val)
 	
 	# Delete array
 	if (delete == YES) {
@@ -96,9 +98,11 @@ begin
 
 	# Allbut?
 	if (allbut == YES) {
-	    if (delete == YES)
-	        call axorki (del, ON,  del, NCHARS)
-	    call axorki (collap, ON, collap, NCHARS)
+	    sz_val = NCHARS
+	    if (delete == YES) {
+	        call axorki (del, ON,  del, sz_val)
+	    }
+	    call axorki (collap, ON, collap, sz_val)
 	}
 
 	# Set up the transformation

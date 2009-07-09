@@ -6,22 +6,22 @@
 
 procedure t_urand()
 
-int	nlines			# number of lines of output
-int	ncols			# number of random numbers per line
+long	nlines			# number of lines of output
+long	ncols			# number of random numbers per line
 int	ndigits			# number of digits of precision
 long	seed			# seed for the random number generator
 real	scale_factor		# scale output numbers by this factor
 
-int	n, i
-long	seed1
+long	n, i
+long	seed1, l_val
 int	clgeti()
 long	clgetl(), clktime()
 real	clgetr(), urand()
 
 begin
 	# Get parameters from the CL.
-	nlines		= clgeti ("nlines")
-	ncols		= clgeti ("ncols")
+	nlines		= clgetl ("nlines")
+	ncols		= clgetl ("ncols")
 	ndigits		= clgeti ("ndigits")
 	seed		= clgetl ("seed")
 	scale_factor	= clgetr ("scale_factor")
@@ -30,10 +30,12 @@ begin
 	# a list, "ncols" numbers per output line.  The output format
 	# is dependent on the ndigits of precision, set by the user.
 
-	if (IS_INDEFL(seed))
-	    seed1 = seed1 + clktime (long(0))
-	else
+	if (IS_INDEFL(seed)) {
+	    l_val = 0
+	    seed1 = seed1 + clktime (l_val)
+	} else {
 	    seed1 = seed
+	}
 
 	for (n=1;  n <= nlines;  n=n+1) {
 	    do i = 1, ncols {
