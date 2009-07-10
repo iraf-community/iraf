@@ -1,7 +1,7 @@
 # include <stdlib.h>
 # include <fitsio.h>		/* CFITSIO include file */
 # include "fitsio_spp.h"	/* sizes of SPP strings and Fortran FITSIO */
-# include "underscore.h"	/* appends underscore, if needed */
+# include "tbfxff.h"
 
 #define import_spp
 #include <iraf.h>
