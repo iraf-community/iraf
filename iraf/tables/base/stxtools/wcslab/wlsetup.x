@@ -200,7 +200,7 @@ procedure wl_construct_edge_vectors (screen_boundary, x, y, vector_size)
 
 double	screen_boundary[N_SIDES]       # I: the side values
 double	x[vector_size], y[vector_size] # O: the edge vector points
-int	vector_size                    # I: the number of edge vector points
+size_t	vector_size                    # I: the number of edge vector points
 
 double	current, interval
 int	i, left_over, offset1, offset2, side_length
@@ -260,7 +260,7 @@ procedure wl_sky_extrema (wd, ax1_array, n_points, pole_position, north,
 
 pointer	wd                         # I: the WCSLAB descriptor
 double  ax1_array[n_points]        # I: the axis 1 edge vector
-int     n_points                   # I: the length of the edge vector
+size_t	n_points                   # I: the length of the edge vector
 double  pole_position[N_DIM]       # I: the pole position
 bool    north                      # I: is the pole in the north ?
 double  ax1min, ax1max, ax1ran     # I/O: the minimum, maximum, range in axis 1
@@ -743,7 +743,7 @@ end
 procedure wl_ra_range (ra, n_values, min, max, diff)
 
 double	ra[ARB]		# I:   the possible RA values
-int	n_values	# I:   the number of possible RA values
+size_t	n_values	# I:   the number of possible RA values
 double	min		# I/O: the minimum RA
 double	max		# I/O: the maximum RA
 double	diff		# I/O: the difference between minimum and maximum

@@ -273,7 +273,7 @@ pointer wlct                # I: the MWCS coordinate transformation descriptor
 int	flip                # I: true if the axes are transposed
 double  wx[npts], wy[npts]  # I: the world coordinates
 double  lx[npts], ly[npts]  # O: the logical coordinates
-int     npts                # I: the number of points to translate
+size_t	npts                # I: the number of points to translate
 
 begin
 	if (flip == YES)
@@ -291,7 +291,7 @@ pointer lwct                # I: the MWCS coordinate transformation descriptor
 int	flip                # I: true if the axes are transposed
 double  lx[npts], ly[npts]  # I: the logical coordinates
 double  wx[npts], wy[npts]  # O: the world coordinates
-int     npts                # I: the number of points to translate
+size_t	npts                # I: the number of points to translate
 
 begin
 	if (flip == YES)
@@ -306,10 +306,10 @@ end
 # Description
 #  This function returns the index of the maximum value of the input array.
 
-int procedure wl_max_element_array (array, npts)
+long procedure wl_max_element_array (array, npts)
 
 double	array[ARB] 	 # I: the array to look through for the maximum
-int	npts             # I: the number of points in the array
+size_t	npts             # I: the number of points in the array
 
 int	i, maximum
 
@@ -366,7 +366,7 @@ define ONER Memr[$1+$2-1]
 procedure wl_rotate (x, y, npts, angle, nx, ny)
 
 real	x[npts], y[npts]    # I: the vectors to rotate
-int	npts                # I: the number of points in the vectors
+size_t	npts                # I: the number of points in the vectors
 real	angle               # I: the angle to rotate (radians)
 real	nx[npts], ny[npts]  # O: the transformed vectors
 
