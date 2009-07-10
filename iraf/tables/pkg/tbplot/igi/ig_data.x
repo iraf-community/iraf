@@ -54,7 +54,7 @@ begin
 
 	call lcmdcat (igs, NO)
 	call cmdcat  (igs, NO)
-	call getroot (LOP_VALC(tokvals), root)
+	call ig_getroot (LOP_VALC(tokvals), root)
 
 #	if (access (LOP_VALC(tokvals), 0, TEXT_FILE) == YES) {
 	if (access (root, 0, TEXT_FILE) == YES) {
@@ -94,7 +94,7 @@ begin
 end
 
 
-procedure getroot(file, root)
+procedure ig_getroot(file, root)
 
 char	file[ARB]
 char	root[ARB]

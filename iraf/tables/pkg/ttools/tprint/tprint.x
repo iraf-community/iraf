@@ -202,7 +202,7 @@ begin
 
 	# Get file name from table name.
 	junk = tbparse (tablename, Memc[filename],
-			Memc[cdfname], SZ_FNAME, ttype, hdu)
+			Memc[cdfname], SZ_FNAME, hdu)
 
 	percent = '%'
 

@@ -11,7 +11,7 @@ define	HELPFILE	"tables$pkg/ttools/gtedit/gtedit.key" # (BPS 05.31.94)
 define	GT_QUIT		0
 define	GT_EXIT		1
 
-procedure gtplot (device, input, tp, tpr, deleted, xcolumn, ycolumn, x, y,
+procedure gteplot (device, input, tp, tpr, deleted, xcolumn, ycolumn, x, y,
 	  size, null, npix, table_name, status)
 
 char	device[SZ_FNAME]	# Graphics device
@@ -57,7 +57,7 @@ define	next_		92
 pointer	gopen()
 bool	clgetb()
 int	strncmp()
-int	clgeti() 
+int	clgeti(), gstati()
 int	clgcur()
 real	clgetr()
 pointer	tbtopn()
@@ -168,8 +168,8 @@ replot_
 	# autoscaling will reset it later.
 
 	if (mode == APPEND) {
-	    call ggeti (gd, G_XTRAN, xtran)
-	    call ggeti (gd, G_YTRAN, ytran)
+	    xtran = gstati(gd, G_XTRAN)
+	    ytran = gstati(gd, G_YTRAN)
 	    call ggwind (gd, wx1, wx2, wy1, wy2)
 	} else {
 	    xtran = GW_LINEAR

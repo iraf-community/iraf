@@ -80,7 +80,7 @@ int	tbpsta()
 
 begin
 	# Open table
-	tp = tbtopn (root, READ_ONLY)
+	tp = tbtopn (root, READ_ONLY, 0)
 
 	# Get its total number of columns.
 	numcol = tbpsta (tp, TBL_NCOLS)
@@ -90,7 +90,7 @@ begin
 	call malloc (cp, numcol, TY_INT)
 	call tcs_open (tp, cs, Memi[cp], ncp, numcol)
 	call tbtclo (tp)
-	call mfree (cp)
+	call mfree (cp, TY_INT)
 
 	# Decide mode.
 	if (type == OUTPUT_TYPE) {

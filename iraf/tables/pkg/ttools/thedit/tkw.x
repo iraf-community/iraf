@@ -315,7 +315,7 @@ begin
 
 	    call tbtnam (tp, Memc[tablename], SZ_FNAME)
 	    junk = tbparse (Memc[tablename], Memc[filename],
-			Memc[hduname], SZ_FNAME, ttype, hdu)
+			Memc[hduname], SZ_FNAME, hdu)
 	    call strcpy (Memc[filename], value, maxch)
 
 	} else if (streq (keyword, "i_ctime")) {
@@ -328,7 +328,7 @@ begin
 	    # Get file name.
 	    call tbtnam (tp, Memc[tablename], SZ_FNAME)
 	    junk = tbparse (Memc[tablename], Memc[filename],
-			Memc[hduname], SZ_FNAME, ttype, hdu)
+			Memc[hduname], SZ_FNAME, hdu)
 
 	    if (finfo (Memc[filename], ostruct) == ERR)
 		call error (1, "Can't get info about file")

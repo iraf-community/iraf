@@ -71,7 +71,7 @@ begin
 	    if (gf_find_db_p (oldim, PARAM_DB) == NULL) {
 		# Only copies of geis templates have extensions
 
-		code = gf_filetype (IM_HDRFILE(oldim))
+		code = gf_filetype (IM_HDRFILE(oldim), acmode)
 		extend = btoi (code == GEIS_FMT)
 		inherit = extend
 

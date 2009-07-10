@@ -68,7 +68,7 @@ string	crvdict	"|straight|pseudohist|fullhist|"
 
 pointer	gopen()
 bool	clgetb(), fp_equalr(), streq()
-int	clgeti(), gg_rdcurves(), gg_relindef(), clgwrd(), getpat()
+int	clgeti(), gg_rdcurves(), gg_relindef(), clgwrd(), getpat(), gstati()
 real	clgetr()
 
 errchk	clgetb, clgeti, clgstr, clgetr, gpmark
@@ -255,8 +255,8 @@ begin
 
 	if (mode == APPEND) {
 	    # Append to existing plot;  use that WCS
-	    call ggeti (gd, G_XTRAN, xtran)
-	    call ggeti (gd, G_YTRAN, ytran)
+	    xtran = gstati(gd, G_XTRAN)
+	    ytran = gstati(gd, G_YTRAN)
 	    call ggwind (gd, wx1, wx2, wy1, wy2)
 
 	} else {

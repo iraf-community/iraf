@@ -138,7 +138,7 @@ begin
 	    call salloc (deleted, npix, TY_INT)
 	    call aclri (Memi[deleted], npix)
 
-	    call gtplot (Memc[device], Memc[input], tp, tpr, deleted, 
+	    call gteplot (Memc[device], Memc[input], tp, tpr, deleted, 
 		   Memc[xcolumn], Memc[ycolumn], x, y, size, null, npix, 
 		   Memc[input], status)
 	}
