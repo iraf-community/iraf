@@ -5,6 +5,6 @@
 #include <f2c/tables/gilib.h>
 #include <f2c/tables/stxtools.h>
 #include <f2c/tables/tbtables.h>
-#include "../strfits/f2c_include.h"
+#include "../strfits/f2c_proto.h"
 #include "f2c_proto.h"
 
