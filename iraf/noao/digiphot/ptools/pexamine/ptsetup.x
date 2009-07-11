@@ -290,7 +290,7 @@ int	ncols			# the number of stored columns
 
 int	ip1, ip2, i
 pointer	sp, name1, name2
-pointer	pt_getnames()
+int	pt_getnames()
 
 begin
 	call smark (sp)

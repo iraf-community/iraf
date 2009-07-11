@@ -13,7 +13,7 @@ int	index[ARB]		#O the output sort index
 int     nlines                  #I the number of strings
 
 int     i, j, k, temp, lv[LOGPTR], p, pivlin, uv[LOGPTR]
-int     strcmp()
+int     strncmp()
 
 begin
         lv[1] = 1
@@ -40,11 +40,11 @@ begin
                     swap (index[j], index[k])
                     pivlin = linptr[j]
                     while (i < j) {
-                        for (i=i+1; strcmp (linbuf, linptr[i], pivlin) < 0;
+                        for (i=i+1; strncmp (linbuf, linptr[i], pivlin) < 0;
                             i=i+1)
                             ;
                         for (j=j-1;  j > i;  j=j-1)
-                            if (strcmp (linbuf, linptr[j], pivlin) <= 0)
+                            if (strncmp (linbuf, linptr[j], pivlin) <= 0)
                                 break
                         if (i < j) {              # out of order pair
                             swap (linptr[i], linptr[j])

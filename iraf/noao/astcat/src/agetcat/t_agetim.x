@@ -150,8 +150,8 @@ begin
 		    }
 		    if (addext == YES) {
 			call strcpy (Memc[str1], Memc[str2], SZ_FNAME)
-			call strcat (".", Memc[str2])
-			call strcat (Memc[extn], Memc[str2])
+			call strcat (".", Memc[str2], SZ_FNAME)
+			call strcat (Memc[extn], Memc[str2], SZ_FNAME)
 			call strcpy (Memc[str2], Memc[str1], SZ_FNAME)
 		    }
 		} else {
