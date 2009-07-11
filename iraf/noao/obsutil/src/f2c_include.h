@@ -1,0 +1,10 @@
+#include <f2c/sys/sys.h>
+#include <f2c/sys/vops.h>
+#include <f2c/sys/ex.h>
+#include <f2c/pkg/xtools.h>
+#include "ccdtime/f2c_proto.h"
+#include "sptime/f2c_proto.h"
+#include "pairmass/f2c_proto.h"
+#include "starfocus/f2c_proto.h"
+#include "specfocus/f2c_proto.h"
+#include "f2c_proto.h"
