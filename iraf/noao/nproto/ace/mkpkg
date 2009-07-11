@@ -55,6 +55,6 @@ libpkg.a:
 	t_mscext.x	<error.h> <imhdr.h> <imset.h>
 	x_ace.x	
 	xtmaskname.x	
-	xtpmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>\
-			<mwset.h> <pmset.h>
+#	xtpmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>\
+#			<mwset.h> <pmset.h>
 	;
