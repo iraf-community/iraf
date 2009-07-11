@@ -1,0 +1,9 @@
+#include <f2c/sys/sys.h>
+#include "mkobsfile/f2c_proto.h"
+#include "mkcatalog/f2c_proto.h"
+#include "mkconfig/f2c_proto.h"
+#include "mkimsets/f2c_proto.h"
+#include "parser/f2c_proto.h"
+#include "fitparams/f2c_proto.h"
+#include "evaluate/f2c_proto.h"
+#include "f2c_proto.h"

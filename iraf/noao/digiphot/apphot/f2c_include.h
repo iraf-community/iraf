@@ -1,0 +1,10 @@
+#include <f2c/sys/sys.h>
+#include "center/f2c_proto.h"
+#include "daofind/f2c_proto.h"
+#include "fitpsf/f2c_proto.h"
+#include "fitsky/f2c_proto.h"
+#include "wphot/f2c_proto.h"
+#include "phot/f2c_proto.h"
+#include "polyphot/f2c_proto.h"
+#include "radprof/f2c_proto.h"
+#include "f2c_proto.h"

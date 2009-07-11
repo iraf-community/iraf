@@ -1,0 +1,13 @@
+#include <f2c/sys/sys.h>
+#include <f2c/sys/vops.h>
+#include "addstar/f2c_proto.h"
+#include "allstar/f2c_proto.h"
+#include "daoedit/f2c_proto.h"
+#include "group/f2c_proto.h"
+#include "select/f2c_proto.h"
+#include "nstar/f2c_proto.h"
+#include "peak/f2c_proto.h"
+#include "psf/f2c_proto.h"
+#include "seepsf/f2c_proto.h"
+#include "substar/f2c_proto.h"
+#include "f2c_proto.h"

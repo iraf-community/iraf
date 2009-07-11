@@ -1,0 +1,12 @@
+#include <f2c/sys/sys.h>
+#include <f2c/sys/vops.h>
+#include <f2c/sys/ex.h>
+#include <f2c/pkg/xtools.h>
+#include "../polyphot/f2c_proto.h"
+#include "../fitpsf/f2c_proto.h"
+#include "../fitsky/f2c_proto.h"
+#include "../center/f2c_proto.h"
+#include "../aputil/f2c_proto.h"
+#include "../aplib/f2c_proto.h"
+#include "../wphot/f2c_proto.h"
+#include "f2c_proto.h"
