@@ -1,8 +1,10 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
 include	<mach.h>
 include	<ctype.h>
 
 define	FIRST	0		# Default starting range
-define	LAST	MAX_INT		# Default ending range
+define	LAST	MAX_LONG	# Default ending range
 define	STEP	1		# Default step
 define	EOLIST	-1		# End of list
 
@@ -16,11 +18,14 @@ define	EOLIST	-1		# End of list
 int procedure decode_ranges (range_string, ranges, max_ranges, nvalues)
 
 char	range_string[ARB]	# Range string to be decoded
-int	ranges[3, max_ranges]	# Range array
+long	ranges[3, max_ranges]	# Range array
 int	max_ranges		# Maximum number of ranges
-int	nvalues			# The number of values in the ranges
+long	nvalues			# The number of values in the ranges
 
-int	ip, nrange, first, last, step, ctoi()
+int	ip, nrange
+long	first, last, step
+int	ctol()
+long	labs()
 
 begin
 	ip = 1
@@ -45,7 +50,7 @@ begin
 		    ranges[2, 1] = last
 		    ranges[3, 1] = step
 		    ranges[1, 2] = EOLIST
-	    	    nvalues = MAX_INT
+	    	    nvalues = MAX_LONG
 		    return (OK)
 		} else {
 		    ranges[1, nrange] = EOLIST
@@ -56,7 +61,7 @@ begin
 	    else if (range_string[ip] == 'x')
 		;
 	    else if (IS_DIGIT(range_string[ip])) {		# ,n..
-		if (ctoi (range_string, ip, first) == 0)
+		if (ctol (range_string, ip, first) == 0)
 		    return (ERR)
 	    } else
 		return (ERR)
@@ -76,7 +81,7 @@ begin
 		if (range_string[ip] == EOS)
 		    ;
 		else if (IS_DIGIT(range_string[ip])) {
-		    if (ctoi (range_string, ip, last) == 0)
+		    if (ctol (range_string, ip, last) == 0)
 		        return (ERR)
 		} else if (range_string[ip] == 'x')
 		    ;
@@ -98,7 +103,7 @@ begin
 		if (range_string[ip] == EOS)
 		    ;
 		else if (IS_DIGIT(range_string[ip])) {
-		    if (ctoi (range_string, ip, step) == 0)
+		    if (ctol (range_string, ip, step) == 0)
 		        ;
 		} else if (range_string[ip] == '-')
 		    ;
@@ -110,7 +115,7 @@ begin
 	    ranges[1, nrange] = first
 	    ranges[2, nrange] = last
 	    ranges[3, nrange] = step
-	    nvalues = nvalues + abs (last-first) / step + 1
+	    nvalues = nvalues + labs(last-first) / step + 1
 	}
 
 	return (ERR)					# ran out of space
@@ -123,12 +128,14 @@ end
 # regardless of the order in which the ranges are given.  Duplicate entries
 # are ignored.  EOF is returned at the end of the list.
 
-int procedure get_next_number (ranges, number)
+long procedure get_next_number (ranges, number)
 
-int	ranges[ARB]		# Range array
-int	number			# Both input and output parameter
+long	ranges[ARB]		# Range array
+long	number			# Both input and output parameter
 
-int	ip, first, last, step, next_number, remainder
+int	ip
+long	first, last, step, next_number, remainder
+long	lmod()
 
 begin
 	# If number+1 is anywhere in the list, that is the next number,
@@ -136,14 +143,14 @@ begin
 	# is greater than number+1.
 
 	number = number + 1
-	next_number = MAX_INT
+	next_number = MAX_LONG
 
 	for (ip=1;  ranges[ip] != EOLIST;  ip=ip+3) {
 	    first = min (ranges[ip], ranges[ip+1])
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = lmod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder + step <= last)
@@ -152,7 +159,7 @@ begin
 		next_number = min (next_number, first)
 	}
 
-	if (next_number == MAX_INT)
+	if (next_number == MAX_LONG)
 	    return (EOF)
 	else {
 	    number = next_number
@@ -167,12 +174,14 @@ end
 # regardless of the order in which the ranges are given.  Duplicate entries
 # are ignored.  EOF is returned at the end of the list.
 
-int procedure get_previous_number (ranges, number)
+long procedure get_previous_number (ranges, number)
 
-int	ranges[ARB]		# Range array
-int	number			# Both input and output parameter
+long	ranges[ARB]		# Range array
+long	number			# Both input and output parameter
 
-int	ip, first, last, step, next_number, remainder
+int	ip
+long	first, last, step, next_number, remainder
+long	lmod()
 
 begin
 	# If number-1 is anywhere in the list, that is the previous number,
@@ -187,13 +196,13 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (number >= first && number <= last) {
-		remainder = mod (number - first, step)
+		remainder = lmod(number - first, step)
 		if (remainder == 0)
 		    return (number)
 		if (number - remainder >= first)
 		    next_number = number - remainder
 	    } else if (last < number) {
-		remainder = mod (last - first, step)
+		remainder = lmod(last - first, step)
 		if (remainder == 0)
 		    next_number = max (next_number, last)
 		else if (last - remainder >= first)
@@ -215,14 +224,16 @@ end
 
 bool procedure is_in_range (ranges, number)
 
-int	ranges[ARB]		# Range array
-int	number			# Number to be tested against ranges
+long	ranges[ARB]		# Range array
+long	number			# Number to be tested against ranges
 
-int	ip, first, last, step, num
+int	ip
+long	first, last, step, num
+long	lmod()
 
 begin
 	if (IS_INDEFI (number))
-	    num = MAX_INT
+	    num = MAX_LONG
 	else
 	    num = number
 
@@ -231,7 +242,7 @@ begin
 	    last = max (ranges[ip], ranges[ip+1])
 	    step = ranges[ip+2]
 	    if (num >= first && num <= last)
-		if (mod (num - first, step) == 0)
+		if (lmod(num - first, step) == 0)
 		    return (true)
 	}
 

@@ -1,0 +1,15 @@
+#include <f2c/sys/sys.h>
+#include <f2c/sys/vops.h>
+#include <f2c/sys/ex.h>
+#include <f2c/math/curfit.h>
+#include <f2c/math/iminterp.h>
+#include <f2c/pkg/xtools.h>
+#include <f2c/noao/smw.h>
+#include "splot/f2c_proto.h"
+#include "irsiids/f2c_proto.h"
+#include "identify/f2c_proto.h"
+#include "dispcor/f2c_proto.h"
+#include "sensfunc/f2c_proto.h"
+#include "odcombine/f2c_proto.h"
+#include "ecidentify/f2c_proto.h"
+#include "f2c_proto.h"
