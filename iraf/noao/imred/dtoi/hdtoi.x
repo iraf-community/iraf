@@ -17,7 +17,7 @@ procedure t_hdtoi ()
 pointer	sp, cv, fog, db, im_in, lut, im_out, imageout, imagein, option
 pointer	in_list, out_list, fog_list
 bool	verbose
-int	minval, maxval, rec, ip, ngpix
+int	minval, maxval, rec, ip, ngpix, nfpix
 int	datatype, nluv, updatedb
 real	sigma, floor, scale, fog_val, sdev
 
@@ -68,7 +68,7 @@ begin
 		call salloc (option, SZ_FNAME, TY_CHAR)
 		call clgstr ("option", Memc[option], SZ_FNAME)
 	        call hd_fogcalc (fog_list, fog_val, sdev, ngpix, scale, sigma,
-		    Memc[option])
+		    Memc[option], nfpix)
 
 		call eprintf ("Fog density = %f, sdev = %f, ngpix = %d\n")
 		    call pargr (fog_val)
