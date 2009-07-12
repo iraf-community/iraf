@@ -11,7 +11,7 @@ libtbtables.a:
 	fsadef.x
 	fsarch.x
 	fsasfm.x
-	fsbdef.x
+	fsbdef.c
 	fsbnfm.x
 	fsclos.x
 	fscmps.x
@@ -30,12 +30,12 @@ libtbtables.a:
 	fsdtyp.x
 	fsesum.x
 	fsfiou.x
-	fsg2db.x
+	fsg2db.c
 	fsg2dd.x
 	fsg2de.x
 	fsg2di.x
 	fsg2dj.x
-	fsg3db.x
+	fsg3db.c
 	fsg3dd.x
 	fsg3de.x
 	fsg3di.x
@@ -43,7 +43,7 @@ libtbtables.a:
 	fsgabc.x
 	fsgacl.x
 	fsgbcl.x
-	fsgcfb.x
+	fsgcfb.c
 	fsgcfc.x
 	fsgcfd.x
 	fsgcfe.x
@@ -57,7 +57,7 @@ libtbtables.a:
 	fsgcnn.x
 	fsgcno.x
 	fsgcrd.x
-	fsgcvb.x
+	fsgcvb.c
 	fsgcvc.x
 	fsgcvd.x
 	fsgcve.x
@@ -71,7 +71,7 @@ libtbtables.a:
 	fsgcxj.x
 	fsgdes.x
 	fsgerr.x
-	fsggpb.x
+	fsggpb.c
 	fsggpd.x
 	fsggpe.x
 	fsggpi.x
@@ -99,12 +99,12 @@ libtbtables.a:
 	fsgkys.x
 	fsgkyt.x
 	fsgmsg.x
-	fsgpfb.x
+	fsgpfb.c
 	fsgpfd.x
 	fsgpfe.x
 	fsgpfi.x
 	fsgpfj.x
-	fsgpvb.x
+	fsgpvb.c
 	fsgpvd.x
 	fsgpve.x
 	fsgpvi.x
@@ -112,12 +112,12 @@ libtbtables.a:
 	fsgrec.x
 	fsgrsz.x
 	fsgsdt.x
-	fsgsfb.x
+	fsgsfb.c
 	fsgsfd.x
 	fsgsfe.x
 	fsgsfi.x
 	fsgsfj.x
-	fsgsvb.x
+	fsgsvb.c
 	fsgsvd.x
 	fsgsve.x
 	fsgsvi.x
@@ -159,18 +159,18 @@ libtbtables.a:
 	fsmrhd.x
 	fsnkey.x
 	fsopen.x
-	fsp2db.x
+	fsp2db.c
 	fsp2dd.x
 	fsp2de.x
 	fsp2di.x
 	fsp2dj.x
-	fsp3db.x
+	fsp3db.c
 	fsp3dd.x
 	fsp3de.x
 	fsp3di.x
 	fsp3dj.x
 	fspcks.x
-	fspclb.x
+	fspclb.c
 	fspclc.x
 	fspcld.x
 	fspcle.x
@@ -181,7 +181,7 @@ libtbtables.a:
 	fspcls.x
 	fspclu.x
 	fspclx.x
-	fspcnb.x
+	fspcnb.c
 	fspcnd.x
 	fspcne.x
 	fspcni.x
@@ -190,7 +190,7 @@ libtbtables.a:
 	fspdat.x
 	fspdef.x
 	fspdes.x
-	fspgpb.x
+	fspgpb.c
 	fspgpd.x
 	fspgpe.x
 	fspgpi.x
@@ -218,12 +218,12 @@ libtbtables.a:
 	fsplsw.x
 	fspmsg.x
 	fspnul.x
-	fsppnb.x
+	fsppnb.c
 	fsppnd.x
 	fsppne.x
 	fsppni.x
 	fsppnj.x
-	fspprb.x
+	fspprb.c
 	fspprd.x
 	fsppre.x
 	fsppri.x
@@ -231,7 +231,7 @@ libtbtables.a:
 	fsppru.x
 	fsprec.x
 	fspscl.x
-	fspssb.x
+	fspssb.c
 	fspssd.x
 	fspsse.x
 	fspssi.x
