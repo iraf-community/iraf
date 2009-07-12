@@ -28,7 +28,7 @@ begin
 anynul=false
 elem=felem
 do i=1,nelem    {
-  call ftgcvs(iunit,colnum,frow,elem,1,farray,flgval(i),null,status)
+  call ftgcfs(iunit,colnum,frow,elem,1,farray,flgval(i),null,status)
   if (null)
      anynul=true
 

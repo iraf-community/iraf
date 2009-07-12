@@ -19,5 +19,5 @@ begin
 do i=1,nfield
   call f77pak(tform(1,i) ,ftform(i),SZ_FTFORM)
 
-call ftbdef(ounit,nfield,tform,pcount,nrows,status)
+call ftbdef(ounit,nfield,ftform,pcount,nrows,status)
 end

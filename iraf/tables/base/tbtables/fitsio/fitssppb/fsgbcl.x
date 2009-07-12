@@ -10,22 +10,23 @@ int     iunit           # i input file pointer
 int     colnum          # i column number
 char    ttype[SZ_FTTYPE]           # o column name
 char    tunit[SZ_FTUNIT]           # o physical units of the column
-int     dtype           # o datatype code
+char    dtype[SZ_FTFORM]           # o datatype code
 int     rcount          # o repeat count for vector column
 double  tscal           # o scaling factor
 double  tzero           # o scaling zero point
 int     tnull           # o integer used to represent null values
 char    tdisp[SZ_FTFORM]      # o Fortran display format
 int     status          # o error status
-%       character fttype*24, ftunit*24,ftdisp*16
+%       character fttype*24, ftunit*24, ftdisp*16, fdtype*16
 
 begin
 
-call ftgbcl(iunit,colnum,fttype,ftunit,dtype,rcount,
+call ftgbcl(iunit,colnum,fttype,ftunit,fdtype,rcount,
         tscal,tzero,tnull,ftdisp,status)
 
 call f77upk(fttype,ttype,SZ_FTTYPE)
 call f77upk(ftunit,tunit,SZ_FTUNIT)
 call f77upk(ftdisp,tdisp,SZ_FTFORM)
+call f77upk(fdtype,dtype,SZ_FTFORM)
 
 end

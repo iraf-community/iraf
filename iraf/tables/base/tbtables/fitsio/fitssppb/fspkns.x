@@ -27,7 +27,7 @@ call f77pak(comm  ,fcomm ,SZ_FCOMMENT)
 n1=nstart
 do i=1,nkey   {
  call f77pak(strval(1,i),fstrva,SZ_FSTRVAL)
- call ftpkys(ounit,fkeywr,n1,1,fstrva,fcomm,status)
+ call ftpkns(ounit,fkeywr,n1,1,fstrva,fcomm,status)
  n1=n1+1
   }
 
