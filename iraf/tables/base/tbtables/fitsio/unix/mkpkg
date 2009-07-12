@@ -6,6 +6,6 @@ $checkin  libtbtables.a ../
 $exit
 
 libtbtables.a:
-	ftpcbf.x
-	ftgcbf.x
+	ftpcbf.c
+	ftgcbf.c
 	;
