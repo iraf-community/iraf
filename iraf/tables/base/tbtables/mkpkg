@@ -234,12 +234,16 @@ libtbtables.a:
 	    $echo "NOTE:  SPP FITSIO will be used for FITS tables."
 	    tbfhp_f.x	<tbset.h> tbtables.h tblfits.h
 	    !rm -f fitssppb
-	    !ln -s fitsio/fitssppb 
+	    !ln -s fitsio/fitssppb fitssppb
+	    !rm -f sppfitsio.h
+	    !ln -s fitssppb.h sppfitsio.h
 	    @fitsio
 	    @fitssppb
 	$else
 	    $echo "NOTE:  CFITSIO will be used for FITS tables."
 	    $echo "NOTE:  CFITSIO does not support IRAF networking."
+	    !rm -f sppfitsio.h
+	    !ln -s tbfxff.h sppfitsio.h
 	    tbfhp.x	<tbset.h> tbtables.h tblfits.h
 	    tbfxff.c	<fitsio.h> fitsio_spp.h underscore.h
 	    @cfitsio
