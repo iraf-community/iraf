@@ -16,11 +16,23 @@
 #define	LEN_JUMPBUF	1024		/* C "jmp_buf" len + 1 (or larger) */
 #define	EPSILON		(1.192e-7)	/* smallest real E s.t. (1.0+E > 1.0) */
 #define EPSILOND	(2.220d-16)	/* double precision epsilon */
+
 #if (defined(SPP_LP64) || defined(SPP_ILP64))
+
 #define	MAX_LONG	9223372036854775807L
+#if defined(SPP_LP64)
+#define	MAX_INT		2147483647
 #else
-#define	MAX_LONG	2147483647
+#define	MAX_INT		9223372036854775807L
 #endif
+
+#else	/* ILP32 */
+
+#define	MAX_LONG	2147483647
+#define	MAX_INT		2147483647
+
+#endif
+
 #define	FNNODE_CHAR	'!'		/* node name delimiter character */
 
 /* Indefinite valued numbers. (potentially MACHDEP)
