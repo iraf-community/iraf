@@ -515,7 +515,7 @@ EOF
   export PATH
   extlibs="${iraf}tables/lib/"
   export extlibs
-  ( cd iraf/tables ; tables="${iraf}tables/" mkpkg -p tables )
+  ( cd iraf/tables ; tables="${iraf}tables/" mkpkg -p tables SPPFITSIO=yes )
   #( cd iraf/tables/base ; for i in `ls|grep '\.a$'`; do mv $i ../lib/.; done )
   ;;
 
