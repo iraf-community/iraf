@@ -11,7 +11,7 @@ mach.h::
 
 mkpkg.inc::
 	rm -f mkpkg.inc
-	cat mkpkg.inc.in | sed -e "s|@LFLAGS@|$(MKPKG_XC_LFLAGS)|" > mkpkg.inc
+	cat mkpkg.inc.in | sed -e "s|@LFLAGS@|$(XC_LFLAGS)|" -e "s|@HOSTID@|$(HOSTID)|" -e "s|@SITEID@|$(SITEID)|" > mkpkg.inc
 
 clean::
 	rm -f iraf.h mach.h mkpkg.inc

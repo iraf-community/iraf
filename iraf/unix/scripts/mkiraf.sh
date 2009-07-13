@@ -3,11 +3,12 @@
 # directory from which the user will thereafter type "cl" to start a session.
 
 PREFIX=
+HOSTID=
 
 iraf="$PREFIX/iraf/iraf/"
 imdir="$PREFIX/iraf/imdirs/"
 
-host="${iraf}unix/"
+host="${iraf}${HOSTID}/"
 hconfig="${host}config/"
 
 ttymsg="Terminal types: xgterm,xterm,gterm,vt640,vt100,etc."

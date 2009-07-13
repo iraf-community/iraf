@@ -6,14 +6,15 @@
 set_irafenv() {
   #
   IRAFARCH="$MACH"
+  export IRAFARCH
   #
   if [ "$iraf" = "" ]; then
     iraf="${PREFIX}/iraf/iraf/"
   fi
-  export iraf MACH IRAFARCH
+  export iraf
   #
-  HOSTID="unix"
-  host="${iraf}unix/"
+  host="${iraf}${HOSTID}/"
+  export host
   #
   hconfig="${host}config/"
   hlib="${host}lib/"
@@ -21,7 +22,7 @@ set_irafenv() {
   hscripts="${host}scripts/"
   hinclude="${host}include/"
   tmp="/tmp/"
-  export HOSTID host hconfig hlib hbin hscripts hinclude tmp
+  export hconfig hlib hbin hscripts hinclude tmp
   #
   CC="gcc"
   F77="${hscripts}f77.sh"
@@ -39,17 +40,12 @@ set_irafenv() {
   HSI_LFLAGS=""
   HSI_OSLIBS=""
   #
-  mkzflags="'lflags=-Nxz -/Wl,-Bstatic'"
-  #
   XC_CFLAGS="-Wall"
   XC_FFLAGS="-Wall"
-  XC_LFLAGS=""
-  #XC_LFLAGS="-Wl,-Bstatic"
-  #XC_LFLAGS="-Wl,-Bdynamic"
   #XC_FFLAGS="-Ns1602 -Nx512"
   XC_LIBS="-lf2c"
   #
-  MKPKG_XC_LFLAGS=""
+  XC_LFLAGS=""
   #
   # Architecture-dependent settings
   #
@@ -60,7 +56,7 @@ set_irafenv() {
     ;;
   x86_64)
     F="$F -DX86_64"
-    #MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -/mcmodel=medium"
+    #XC_LFLAGS="$XC_LFLAGS -/mcmodel=medium"
     ;;
   powerpc)
     F="$F -DPOWERPC"
@@ -93,7 +89,7 @@ set_irafenv() {
     HSI_CF="$HSI_CF -O $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS -O"
-    MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
+    XC_LFLAGS="$XC_LFLAGS -Nz"
     XC_LIBS="$XC_LIBS -lm"
     ;;
   freebsd)
@@ -101,7 +97,7 @@ set_irafenv() {
     HSI_CF="$HSI_CF -O $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS -O"
-    MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -z -/static"
+    XC_LFLAGS="$XC_LFLAGS -z -/static"
     XC_LIBS="$XC_LIBS -lm -lcompat"
     ;;
   darwin)
@@ -110,7 +106,7 @@ set_irafenv() {
     HSI_CF="$HSI_CF $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS"
-    MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
+    XC_LFLAGS="$XC_LFLAGS -Nz"
     XC_LIBS="$XC_LIBS -lm"
     ;;
   sunos)
@@ -118,7 +114,7 @@ set_irafenv() {
     HSI_CF="$HSI_CF -O $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS -O"
-    MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
+    XC_LFLAGS="$XC_LFLAGS -Nz"
     XC_LIBS="$XC_LIBS -lm -lsocket -lnsl -lintl -ldl -lelf"
     ;;
   cygwin)
@@ -126,7 +122,7 @@ set_irafenv() {
     HSI_CF="$HSI_CF -O $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS -O"
-    MKPKG_XC_LFLAGS="$MKPKG_XC_LFLAGS -Nz"
+    XC_LFLAGS="$XC_LFLAGS -Nz"
     XC_LIBS="$XC_LIBS -lm"
     ;;
   *)
@@ -144,8 +140,8 @@ set_irafenv() {
     HSI_LIBS="${hlib}libboot.a ${iraf}lib/libsys.a ${iraf}lib/libvops.a ${hlib}libos.a"
   fi
   export HSI_CF HSI_XF HSI_FF HSI_LF HSI_F77LIBS HSI_LFLAGS HSI_OSLIBS
-  export mkzflags HSI_LIBS
-  export XC_CFLAGS XC_FFLAGS XC_LFLAGS XC_LIBS
+  export HSI_LIBS
+  export XC_CFLAGS XC_FFLAGS XC_LIBS
 
   # see tables/lib/zzsetenv.def
   #tables=${iraf}tables/
@@ -243,7 +239,8 @@ output_makefile () {
   echo Making $ARG_DIR/Makefile.
   cat <<EOF > $ARG_DIR/Makefile
 
-MACH        = $MACH
+HOSTID      = $HOSTID
+SITEID      = $SITEID
 CC          = $CC
 F77         = $F77
 F2C         = $F2C
@@ -253,7 +250,7 @@ HSI_LF      = $HSI_LF
 HSI_F77LIBS = $HSI_F77LIBS
 RANLIB      = $RANLIB
 HSI_LIBS    = $HSI_LIBS
-MKPKG_XC_LFLAGS   = $MKPKG_XC_LFLAGS
+XC_LFLAGS   = $XC_LFLAGS
 $ARG_ADDITIONAL_DEFS
 
 EOF
@@ -279,9 +276,13 @@ install_file() {
 }
 
 ########################################################################
+#  M A I N
 ########################################################################
 
 LANG=C
+
+HOSTID="unix"
+SITEID="noao"
 
 if [ "$1" != "" ]; then
   COMMAND=$1
@@ -311,7 +312,11 @@ USER=`whoami`
 
 ################################
 
-set_mach "$ARG_MACH"
+if [ "$ARG_MACH" = "" ]; then
+  set_mach "$MACH"
+else
+  set_mach "$ARG_MACH"
+fi
 
 export ARCHITECTURE OPERATING_SYSTEM VENDOR SPP_DATA_MODEL
 
@@ -597,9 +602,9 @@ EOF
   fi
   #
   cat iraf/unix/scripts/mkiraf.sh | \
-      sed -e 's|^PREFIX=.*|PREFIX='"$PREFIX"'|' > $DESTDIR/$BINDIR/mkiraf
+      sed -e 's|^HOSTID=.*|HOSTID='"$HOSTID"'|' -e 's|^PREFIX=.*|PREFIX='"$PREFIX"'|' > $DESTDIR/$BINDIR/mkiraf
   cat iraf/unix/scripts/cl.sh | \
-      sed -e 's|^PREFIX=.*|PREFIX='"$PREFIX"'|' > $DESTDIR/$BINDIR/cl
+      sed -e 's|^HOSTID=.*|HOSTID='"$HOSTID"'|' -e 's|^PREFIX=.*|PREFIX='"$PREFIX"'|' -e 's|^MACH=.*|MACH='"$MACH"'|' > $DESTDIR/$BINDIR/cl
   chmod 755 $DESTDIR/$BINDIR/mkiraf
   chmod 755 $DESTDIR/$BINDIR/cl
   if [ "$USER" = "root" ]; then
@@ -611,7 +616,7 @@ EOF
     echo '#!/bin/sh' > $F
     echo '' >> $F
     echo "PREFIX=$PREFIX" >> $F
-    echo "ARG_MACH=auto" >> $F
+    echo "MACH=$MACH" >> $F
     echo ". $PREFIX/iraf/iraf/unix/scripts/setup.sh" >> $F
     echo "exec $PREFIX/iraf/iraf/unix/bin/$i.e \$@" >> $F
     chmod 755 $F
@@ -683,7 +688,7 @@ EOF
     echo '#!/bin/sh' > $F
     echo '' >> $F
     echo "PREFIX=$PREFIX" >> $F
-    echo "ARG_MACH=auto" >> $F
+    echo "MACH=$MACH" >> $F
     echo ". $PREFIX/iraf/iraf/unix/scripts/setup.sh" >> $F
     echo "exec $PREFIX/iraf/iraf/unix/bin/$i.e \$@" >> $F
     chmod 755 $F

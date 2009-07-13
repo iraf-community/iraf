@@ -4,11 +4,13 @@
 # machine.
 
 PREFIX=
+HOSTID=
+MACH=
 
 iraf="$PREFIX/iraf/iraf/"
 export iraf
 
-host="${iraf}unix/"
+host="${iraf}${HOSTID}/"
 hconfig="${host}config/"
 hscripts="${host}scripts/"
 
@@ -25,8 +27,7 @@ if [ "$1" != "" ]; then
     fi
 fi
 
-# Determine platform architecture.
-ARG_MACH=auto
+# Setup various environment variables
 . ${hscripts}setup.sh
 
 # Recent linux systems display a problem in how pointer addresses 
