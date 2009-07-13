@@ -223,10 +223,10 @@ size_t	buflen, n
 int	fd, ncols, lineno
 pointer	sp, lbuf, ip
 
-double	cf_divzd()
+double	cf_divzd(), cfz_divzd()
 int	getline(), nscan(), open()
-real	cf_divzr()
-extern	cf_divzr(), cf_divzd()
+real	cf_divzr(), cfz_divzr()
+extern	cf_divzr(), cf_divzd(), cfz_divzr(), cfz_divzd()
 errchk	open, sscan, getline, malloc
 
 begin
@@ -354,10 +354,10 @@ begin
 	case CF_INSTRUMENTAL:
 	    if (datatype == TY_REAL) {
 		call apowkr (Memr[w], 2, Memr[w], n)
-		call arczr (1.0, Memr[w], Memr[w], n, cf_divzr)
+		call arczr (1.0, Memr[w], Memr[w], n, cfz_divzr)
 	    } else {
 		call apowkd (Memd[w], 2, Memd[w], n)
-		call arczd (1.0d0, Memd[w], Memd[w], n, cf_divzd)
+		call arczd (1.0d0, Memd[w], Memd[w], n, cfz_divzd)
 	    }
 	}
 
@@ -429,4 +429,26 @@ double	a	# double precision number number
 
 begin
 	return (a)
+end
+
+
+# CFZ_DIVZR -- Procedure to return a real number in case of a divide by zero.
+
+real procedure cfz_divzr (a)
+
+real	a	# real number
+
+begin
+	return (0.0)
+end
+
+
+# CFZ_DIVZD -- Procedure to return a double number in case of a divide by zero.
+
+double procedure cfz_divzd (a)
+
+double	a	# double precision number number
+
+begin
+	return (0.0d0)
 end
