@@ -367,6 +367,5 @@ libtbtables.a:
 	ftxiou.f
 	ftxmsg.f
 	ftxypx.f
-	@$(FITSIO_HOST_DEP)
 	fitsspp.x	fitsspp.com
 	;
