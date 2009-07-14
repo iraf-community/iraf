@@ -756,6 +756,7 @@ extern int ZZWTMT ( XINT *, XLONG *, XLONG * );
 #define	SHIFTL		shiftl_
 #define	STRPAK		strpak_
 #define	STRUPK		strupk_
+#define	F77PAK		f77pak_
 #define	XORI		xori_
 #define	XORL		xorl_
 #define	XORS		xors_
