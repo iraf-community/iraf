@@ -20,6 +20,7 @@
 #include "opcodes.h"
 #include "operand.h"
 #include "param.h"
+#include "eparam.h"
 #include "clmodes.h"
 #include "task.h"
 #include "errs.h"
@@ -382,6 +383,11 @@ static void login ( const char *cmd )
 	curpack->pk_pfp = NULL;
 	curpack->pk_npk = NULL;
 	curpack->pk_flags = 0;
+
+#ifndef NOREADLINE
+	/* Initialize the input buffer for ":g" command */
+	epar_cmdbuf[0] = '\0';
+#endif
 
 	/* Make first ltask.
 	 */

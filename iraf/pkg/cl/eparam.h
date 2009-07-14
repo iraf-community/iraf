@@ -143,6 +143,9 @@ extern char *e_tonextword ( const char * );
 extern char *e_toprevword ( const char *, const char * );
 extern void e_puterr ( const char * );
 extern int e_psetok ( const char * );
+#ifndef NOREADLINE
+extern char epar_cmdbuf[];
+#endif
 
 
 /* gquery.c */

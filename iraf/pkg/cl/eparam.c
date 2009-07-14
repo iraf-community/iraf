@@ -89,6 +89,9 @@ int	eh_standout = YES;		/* ehist default for standout         */
 int	eh_bol      = NO;		/* start ehist at beginning of line   */
 int	eh_verify   = NO;		/* use ehist with history meta-chars  */
 
+#ifndef NOREADLINE
+char	epar_cmdbuf[SZ_LINE+1];
+#endif
 
 /* EPSET -- Edit a parameter set.  Once in the parameter set editor, editor
  * colon commands may be used to edit any other parameter set, to save psets
@@ -164,7 +167,11 @@ int epset ( const char *pset )
 		break;
 	    case EP_RUN:			/* run the task */
 		snprintf (runcmd, SZ_LINE+1, "%s (mode='h')\n", newpset);
+#ifdef NOREADLINE
 		c_ungetline (fileno (prevtask->t_in), runcmd);
+#else
+		strcpy (epar_cmdbuf, runcmd);
+#endif
 		return (OK);
 	    default:
 		eprintf ("eparam: unrecognized command\n");

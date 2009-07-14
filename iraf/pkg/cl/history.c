@@ -249,7 +249,11 @@ input_:
 	    if (fgets (raw_cmd, SZ_LINE+1, fp) == NULL)
 		return (EOF);
 #else
-	    {
+	    if ( epar_cmdbuf[0] != '\0' ) {
+		snprintf (raw_cmd, SZ_LINE+1, "%s", epar_cmdbuf);
+		epar_cmdbuf[0] = '\0';
+	    }
+	    else {
 		char *rl_buf;
 		char prompt[SZ_LINE];
 		if (cmdblk_line == 0) {
