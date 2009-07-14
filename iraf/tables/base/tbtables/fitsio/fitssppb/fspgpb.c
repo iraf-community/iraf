@@ -7,10 +7,10 @@
   as the array being written).
 */
 
-int fspgpb_(XINT *ounit, XINT *group, XINT *fparm, XINT *nparm, XINT *array,
-	    XINT *status)
+int FSPGPB_U(XINT *ounit, XINT *group, XINT *fparm, XINT *nparm, XINT *array,
+	     XINT *status)
 {
-    ftpgpb_(ounit, group, fparm, nparm, array, status, MAX_INT);
-    zzepro_();
+    FTPGPB_U(ounit, group, fparm, nparm, array, status, MAX_INT);
+    ZZEPRO();
     return 0;
 }

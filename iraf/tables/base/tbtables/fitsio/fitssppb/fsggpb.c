@@ -7,10 +7,10 @@
   as the array being read).
 */
 
-int fsggpb_(XINT *iunit, XINT *group, XINT *fparm, XINT *nparm, XINT *array,
-	    XINT *status)
+int FSGGPB_U(XINT *iunit, XINT *group, XINT *fparm, XINT *nparm, XINT *array,
+	     XINT *status)
 {
-    ftggpb_(iunit, group, fparm, nparm, array, status, MAX_INT);
-    zzepro_();
+    FTGGPB_U(iunit, group, fparm, nparm, array, status, MAX_INT);
+    ZZEPRO();
     return 0;
 }

@@ -7,11 +7,11 @@
   will be made.
 */
 
-int fsgcvb_(XINT *iunit, XINT *colnum, XINT *frow, XINT *felem, XINT *nelem,
-	    XINT *nulval, XINT *array, XBOOL *anynul, XINT *status)
+int FSGCVB_U(XINT *iunit, XINT *colnum, XINT *frow, XINT *felem, XINT *nelem,
+	     XINT *nulval, XINT *array, XBOOL *anynul, XINT *status)
 {
-    ftgcvb_(iunit, colnum, frow, felem, nelem, nulval, array, anynul, status,
-	    MAX_INT, MAX_INT);
-    zzepro_();
+    FTGCVB_U(iunit, colnum, frow, felem, nelem, nulval, array, anynul, status,
+	     MAX_INT, MAX_INT);
+    ZZEPRO();
     return 0;
 }

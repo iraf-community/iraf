@@ -9,11 +9,11 @@
   as the array being read).
 */
 
-int fspssb_(XINT *iunit, XINT *group, XINT *naxis, XINT *naxes, XINT *fpixel,
-	    XINT *lpixel, XINT *array, XINT *status)
+int FSPSSB_U(XINT *iunit, XINT *group, XINT *naxis, XINT *naxes, XINT *fpixel,
+	     XINT *lpixel, XINT *array, XINT *status)
 {
-    ftpssb_(iunit, group, naxis, naxes, fpixel, lpixel, array, status,
-	    MAX_INT);
-    zzepro_();
+    FTPSSB_U(iunit, group, naxis, naxes, fpixel, lpixel, array, status,
+	     MAX_INT);
+    ZZEPRO();
     return 0;
 }

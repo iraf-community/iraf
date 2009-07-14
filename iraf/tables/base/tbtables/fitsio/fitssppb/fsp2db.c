@@ -7,10 +7,10 @@
   as the array being written).
 */
 
-int fsp2db_(XINT *ounit, XINT *group, XINT *dim1, XINT *nx, XINT *ny,
-	    XINT *array, XINT *status)
+int FSP2DB_U(XINT *ounit, XINT *group, XINT *dim1, XINT *nx, XINT *ny,
+	     XINT *array, XINT *status)
 {
-    ftp2db_(ounit, group, dim1, nx, ny, array, status, MAX_INT);
-    zzepro_();
+    FTP2DB_U(ounit, group, dim1, nx, ny, array, status, MAX_INT);
+    ZZEPRO();
     return 0;
 }

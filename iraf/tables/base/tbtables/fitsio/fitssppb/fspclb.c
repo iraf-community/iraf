@@ -5,10 +5,10 @@
   specified column of the table.
 */
 
-int fspclb_(XINT *ounit, XINT *colnum, XINT *frow, XINT *felem, XINT *nelem,
-	    XINT *array, XINT *status)
+int FSPCLB_U(XINT *ounit, XINT *colnum, XINT *frow, XINT *felem, XINT *nelem,
+	     XINT *array, XINT *status)
 {
-    ftpclb_(ounit, colnum, frow, felem, nelem, array, status, MAX_INT);
-    zzepro_();
+    FTPCLB_U(ounit, colnum, frow, felem, nelem, array, status, MAX_INT);
+    ZZEPRO();
     return 0;
 }

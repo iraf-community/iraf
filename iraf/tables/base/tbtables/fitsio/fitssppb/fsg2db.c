@@ -7,11 +7,11 @@
   as the array being read).
 */
 
-int fsg2db_(XINT *ounit, XINT *group, XINT *nulval, XINT *dim1, XINT *nx,
-	    XINT *ny, XINT *array, XBOOL *anyflg, XINT *status)
+int FSG2DB_U(XINT *ounit, XINT *group, XINT *nulval, XINT *dim1, XINT *nx,
+	     XINT *ny, XINT *array, XBOOL *anyflg, XINT *status)
 {
-    ftg2db_(ounit, group, nulval, dim1, nx, ny, array, anyflg, status,
-	    MAX_INT, MAX_INT);
-    zzepro_();
+    FTG2DB_U(ounit, group, nulval, dim1, nx, ny, array, anyflg, status,
+	     MAX_INT, MAX_INT);
+    ZZEPRO();
     return 0;
 }

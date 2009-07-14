@@ -7,11 +7,11 @@
   any pixels are undefined.
 */
 
-int fsgcfb_(XINT *iunit, XINT *colnum, XINT *frow, XINT *felem, XINT *nelem,
-	    XINT *array, XBOOL *flgval, XBOOL *anynul, XINT *status)
+int FSGCFB_U(XINT *iunit, XINT *colnum, XINT *frow, XINT *felem, XINT *nelem,
+	     XINT *array, XBOOL *flgval, XBOOL *anynul, XINT *status)
 {
-    ftgcfb_(iunit, colnum, frow, felem, nelem, array, flgval, anynul, status,
-	    MAX_INT);
-    zzepro_();
+    FTGCFB_U(iunit, colnum, frow, felem, nelem, array, flgval, anynul, status,
+	     MAX_INT);
+    ZZEPRO();
     return 0;
 }

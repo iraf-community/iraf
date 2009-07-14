@@ -7,10 +7,10 @@
   as the array being written).
 */
 
-int fsp3db_(XINT *ounit, XINT *group, XINT *dim1, XINT *dim2, XINT *nx,
-	    XINT *ny, XINT *nz, XINT *array, XINT *status)
+int FSP3DB_U(XINT *ounit, XINT *group, XINT *dim1, XINT *dim2, XINT *nx,
+	     XINT *ny, XINT *nz, XINT *array, XINT *status)
 {
-    ftp3db_(ounit, group, dim1, dim2, nx, ny, nz, array, status, MAX_INT);
-    zzepro_();
+    FTP3DB_U(ounit, group, dim1, dim2, nx, ny, nz, array, status, MAX_INT);
+    ZZEPRO();
     return 0;
 }

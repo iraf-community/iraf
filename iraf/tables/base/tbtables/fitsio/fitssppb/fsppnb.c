@@ -7,11 +7,11 @@
   as the array being written).
 */
 
-int fsppnb_(XINT *ounit, XINT *group, XINT *felem, XINT *nelem, XINT *array,
-	    XINT *nulval, XINT *status)
+int FSPPNB_U(XINT *ounit, XINT *group, XINT *felem, XINT *nelem, XINT *array,
+	     XINT *nulval, XINT *status)
 {
-    ftppnb_(ounit, group, felem, nelem, array, nulval, status,
-	    MAX_INT, MAX_INT);
-    zzepro_();
+    FTPPNB_U(ounit, group, felem, nelem, array, nulval, status,
+	     MAX_INT, MAX_INT);
+    ZZEPRO();
     return 0;
 }

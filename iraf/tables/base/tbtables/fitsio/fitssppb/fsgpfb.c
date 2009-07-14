@@ -10,11 +10,11 @@
   ANYNUL is return with a value of .true. if any pixels were undefined.
 */
 
-int fsgpfb_(XINT *iunit, XINT *group, XINT *felem, XINT *nelem, XINT *array,
-	    XBOOL *flgval, XBOOL *anynul, XINT *status)
+int FSGPFB_U(XINT *iunit, XINT *group, XINT *felem, XINT *nelem, XINT *array,
+	     XBOOL *flgval, XBOOL *anynul, XINT *status)
 {
-    ftgpfb_(iunit, group, felem, nelem, array, flgval, anynul, status,
-	    MAX_INT);
-    zzepro_();
+    FTGPFB_U(iunit, group, felem, nelem, array, flgval, anynul, status,
+	     MAX_INT);
+    ZZEPRO();
     return 0;
 }

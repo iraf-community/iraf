@@ -5,11 +5,11 @@
   specified column of the table.
 */
 
-int fspcnb_(XINT *ounit, XINT *colnum, XINT *frow, XINT *felem, XINT *nelem,
-	    XINT *array, XINT *nulval, XINT *status)
+int FSPCNB_U(XINT *ounit, XINT *colnum, XINT *frow, XINT *felem, XINT *nelem,
+	     XINT *array, XINT *nulval, XINT *status)
 {
-    ftpcnb_(ounit, colnum, frow, felem, nelem, array, nulval, status,
-	    MAX_INT, MAX_INT);
-    zzepro_();
+    FTPCNB_U(ounit, colnum, frow, felem, nelem, array, nulval, status,
+	     MAX_INT, MAX_INT);
+    ZZEPRO();
     return 0;
 }
