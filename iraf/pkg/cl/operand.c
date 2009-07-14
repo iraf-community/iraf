@@ -396,7 +396,7 @@ struct operand makeop ( const char *str, int type )
 		    ip++;
 		if (*--ip == c) {
 		    new_s = comdstr(s+1);	/* skip leading quote	*/
-		    new_s[ip-s] = '\0';		/* remove trailing quote */
+		    new_s[ip-(s+1)] = '\0';	/* remove trailing quote */
 		}
 	    }
 	    if ( new_s == NULL ) new_s = comdstr(s);
