@@ -1,12 +1,9 @@
 
 PREFIX=/opt/local
-BINDIR=/opt/local/bin
-
 #PREFIX=/usr/local
-#BINDIR=/usr/local/bin
-
 #PREFIX=/opt
-#BINDIR=/opt/bin
+
+BINDIR=$(PREFIX)/bin
 
 DESTDIR=
 #DESTDIR=root
