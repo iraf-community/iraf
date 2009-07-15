@@ -1,4 +1,11 @@
 
+[PREPARATION]
+
+Install readline-devel.
+
+$ yum install readline-devel
+
+
 [HOW TO BUILD]
 
 Edit the Makefile and set PREFIX and BINDIR, and type make xxx as follows:
@@ -8,6 +15,7 @@ $ make iraf
 $ make reboot
 $ make tables
 $ make noao
+
 
 [HOW TO INSTALL]
 
@@ -19,4 +27,15 @@ You can use DESTDIR=... to make your IRAF packages:
 
 # make install DESTDIR=rootdir
 # make install_devel DESTDIR=rootdir
+
+
+[HOW TO RUN CL]
+
+You do NOT have to set any environment variables except PATH.
+
+$ PATH=/opt/local/bin:$PATH
+$ mkiraf
+$ cl
+
+rehash is required when using csh or zsh.
 
