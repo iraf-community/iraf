@@ -62,7 +62,7 @@ libds.a:
 	zawrim.x	zdisplay.h
 	zawtim.x	zdisplay.h
 	zblkim.x	zdisplay.h
-	zclrim.x	zdisplay.h
+#	zclrim.x	zdisplay.h
 	zclsim.x	zdisplay.h
 	zersim.x	zdisplay.h
 	zfrmim.x	zdisplay.h

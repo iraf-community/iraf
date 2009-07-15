@@ -8,15 +8,15 @@ $exit
 libbev.a:
 	agauss.f
 	area.f
-	chifit.f
-	curfit.f
+#	chifit.f
+#	curfit.f
 	determ.f
 	factor.f
 	fchisq.f
-	fderiv.f
+#	fderiv.f
 	gamma.f
-	gradls.f
-	gridls.f
+#	gradls.f
+#	gridls.f
 	integ.f
 	interp.f
 	legfit.f
@@ -29,7 +29,7 @@ libbev.a:
 	ploren.f
 	polfit.f
 	ppoiss.f
-	regres.f
+#	regres.f
 	smooth.f
 	xfit.f
 	;
