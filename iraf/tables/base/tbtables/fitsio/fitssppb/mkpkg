@@ -123,7 +123,7 @@ libtbtables.a:
 	fsgsvi.x
 	fsgsvj.x
 	fsgtbb.x
-	fsgtbs.x
+#	fsgtbs.x
 	fsgtcl.x
 	fsgtcs.x
 	fsgtdm.x
