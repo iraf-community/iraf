@@ -14,6 +14,10 @@
 
 #include <iraf/spptypes.h>
 
+#define	EXIT		exit_
+
+extern void EXIT ( XINT * );
+
 #define	c_main		cmain_
 #define	IRAF_MAIN	irafmn_
 #define	USHLIB		ushlib_
@@ -27,6 +31,7 @@
 
 extern XINT IRAF_MAIN ( XCHAR *, XINT *, XINT *, XINT *, XPOINTER *, XINT *, XINT *, XCHAR *, XINT *, PFI, PFI );
 extern XINT c_main ( XINT *, PKCHAR *, PKCHAR * );
+
 /* zshlib.c */
 #ifndef F2C_INCLUDE		/* for native C code */
 extern unsigned XINT VSHLIB[];	/* shared library descriptor */
