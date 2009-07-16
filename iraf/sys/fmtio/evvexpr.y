@@ -2428,36 +2428,41 @@ begin
 		if (O_LEN(ap) > 0) {
 		    call aabss (Mems[O_VALP(ap)], Mems[O_VALP(out)],
 			O_LEN(ap))
-		} else
-		    O_VALS(out) = -(O_VALS(ap))
+		} else {
+		    O_VALS(out) = abs(O_VALS(ap))
+		}
 
 	    case TY_INT:
 		if (O_LEN(ap) > 0) {
 		    call aabsi (Memi[O_VALP(ap)], Memi[O_VALP(out)],
 			O_LEN(ap))
-		} else
-		    O_VALI(out) = -(O_VALI(ap))
+		} else {
+		    O_VALI(out) = abs(O_VALI(ap))
+		}
 
 	    case TY_LONG:
 		if (O_LEN(ap) > 0) {
 		    call aabsl (Meml[O_VALP(ap)], Meml[O_VALP(out)],
 			O_LEN(ap))
-		} else
-		    O_VALL(out) = -(O_VALL(ap))
+		} else {
+		    O_VALL(out) = labs(O_VALL(ap))
+		}
 
 	    case TY_REAL:
 		if (O_LEN(ap) > 0) {
 		    call aabsr (Memr[O_VALP(ap)], Memr[O_VALP(out)],
 			O_LEN(ap))
-		} else
-		    O_VALR(out) = -(O_VALR(ap))
+		} else {
+		    O_VALR(out) = abs(O_VALR(ap))
+		}
 
 	    case TY_DOUBLE:
 		if (O_LEN(ap) > 0) {
 		    call aabsd (Memd[O_VALP(ap)], Memd[O_VALP(out)],
 			O_LEN(ap))
-		} else
-		    O_VALD(out) = -(O_VALD(ap))
+		} else {
+		    O_VALD(out) = abs(O_VALD(ap))
+		}
 
 	    default:
 		call xvv_error1 (s_badtype, fcn)

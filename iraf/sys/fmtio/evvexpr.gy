@@ -1468,8 +1468,13 @@ begin
 		if (O_LEN(ap) > 0) {
 		    call aabs$t (Mem$t[O_VALP(ap)], Mem$t[O_VALP(out)],
 			O_LEN(ap))
-		} else
-		    O_VAL$T(out) = -(O_VAL$T(ap))
+		} else {
+		    $if (datatype == l)
+		    O_VAL$T(out) = labs(O_VAL$T(ap))
+		    $else
+		    O_VAL$T(out) = abs(O_VAL$T(ap))
+		    $endif
+		}
 	    $endfor
 	    default:
 		call xvv_error1 (s_badtype, fcn)
