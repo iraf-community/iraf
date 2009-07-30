@@ -53,6 +53,7 @@ pointer	descrip[ARB]	# o: list of column array selectors
 int	ndescrip	# o: number of column array selectors
 int	maxdescrip	# i: length of descrip array
 #--
+size_t	sz_val
 bool	negate, file
 int	ncols, top, fd_stack[MAX_STACK]
 pointer	sp, token, pattern, section, errmsg
@@ -68,10 +69,12 @@ begin
 	# Allocate memory for temporary strings
 
 	call smark (sp)
-	call salloc (token, SZ_FNAME, TY_CHAR)
-	call salloc (pattern, SZ_FNAME, TY_CHAR)
-	call salloc (section, SZ_FNAME, TY_CHAR)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (token, sz_val, TY_CHAR)
+	call salloc (pattern, sz_val, TY_CHAR)
+	call salloc (section, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	# Keep track of the number of column patterns and the negation
 	# pattern. At the end of the procedure, if no patterns were read,
@@ -349,6 +352,7 @@ bool procedure tcs_hasmeta (pattern, maxch)
 char	pattern[ARB]	# u: character string
 int	maxch		# i: declared length of pattern
 #--
+size_t	sz_val
 bool	meta
 int	ic, jc
 pointer	sp, buffer
@@ -371,7 +375,8 @@ begin
 	# Copy the pattern to a temporary buffer
 
 	call smark (sp)
-	call salloc (buffer, maxch, TY_CHAR)
+	sz_val = maxch
+	call salloc (buffer, sz_val, TY_CHAR)
 
 	jc = 0
 	meta = false
@@ -447,6 +452,7 @@ pointer	descrip[ARB]	# u: list of column array selectors
 int	ndescrip	# u: number of column array selectors
 int	maxdescrip	# i: length of descrip array
 #--
+size_t	sz_val
 int	icol, ncols, id
 pointer	sp, buffer, colname, errmsg, cp
 
@@ -461,9 +467,12 @@ begin
 	# Allocate temporary strings
 
 	call smark (sp)
-	call salloc (buffer, SZ_LINE, TY_CHAR)
-	call salloc (colname, SZ_COLNAME, TY_CHAR)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (buffer, sz_val, TY_CHAR)
+	sz_val = SZ_COLNAME
+	call salloc (colname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	# Compile the pattern
 
@@ -556,7 +565,10 @@ pointer	cp		# i: column descriptor
 char	section[ARB]	# i: column array section
 pointer	descrip		# i: column array selector
 #--
-int	ic, idim, ndim, first, last, inc, axlen[MAXDIM]
+size_t	sz_val
+int	ic, idim, ndim
+long	first, last, inc
+long	axlen[MAXDIM]
 
 string	baddimen  "Dimension of section does not match column"
 
@@ -570,7 +582,8 @@ begin
 
 	# Allocate column selector descriptor
 
-	call malloc (descrip, TCS_LENGTH(ndim), TY_INT)
+	sz_val = TCS_LENGTH(ndim)
+	call malloc (descrip, sz_val, TY_STRUCT)
 
 	if (section[1] == EOS) {
 	    # If there is no section, copy the array dimensions
@@ -591,7 +604,7 @@ begin
 		if (tcs_getsect (section, ic, first, last, inc) <= 0){
 		    # Not enough dimensions in section
 
-		    call mfree (descrip, TY_INT)
+		    call mfree (descrip, TY_STRUCT)
 		    call error (1, baddimen)
 		}
 
@@ -601,7 +614,7 @@ begin
 		# Indef indicates an asterisk in the section, for which
 		# we substitute the actual array dimension
 
-		if (IS_INDEFI (last)) {
+		if (IS_INDEFL (last)) {
 		    TCS_LAST(descrip,idim) = axlen[idim]
 		} else {
 		    TCS_LAST(descrip,idim) = last
@@ -611,7 +624,7 @@ begin
 	    # It is an error if the section has more dimensions than the array
 
 	    if (section[ic] != EOS) {
-		call mfree (descrip, TY_INT)
+		call mfree (descrip, TY_STRUCT)
 		call error (1, baddimen)
 	    }
 	}
@@ -638,16 +651,18 @@ int procedure tcs_getsect (section, ic, first, last, inc)
 
 char	section[ARB]	# i: section string
 int	ic		# u: starting character in string
-int	first		# o: first element in array
-int	last		# o: last element in array
-int	inc		# o: array increment
+long	first		# o: first element in array
+long	last		# o: last element in array
+long	inc		# o: array increment
 #--
+size_t	sz_val
 bool	done
-int	jc, nc, ival, old_ic, value
+int	jc, nc, ival, old_ic
+long	value
 pointer	sp, number
 
 bool	streq()
-int	stridx(), ctoi()
+int	stridx(), ctol()
 
 string	badsect  "Syntax error in array section"
 
@@ -655,7 +670,8 @@ begin
 	# Temporary string to hold numeric token
 
 	call smark (sp)
-	call salloc (number, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (number, sz_val, TY_CHAR)
 
 	# Set defaults for outputs
 
@@ -683,13 +699,13 @@ begin
 		Memc[number+jc] = EOS
 
 		if (streq (Memc[number], "*")) {
-		    last = INDEFI
+		    last = INDEFL
 
 		} else {
 		    # Convert string to number
 
 		    jc = 1
-		    nc = ctoi (Memc[number], jc, value)
+		    nc = ctol (Memc[number], jc, value)
 
 		    # Check for trailing non-numeric chars
 
@@ -773,6 +789,7 @@ pointer	descrip[ARB]	# o: list of column array selectors
 int	ndescrip	# o: number of column array selectors
 int	maxdescrip	# i: length of descrip array
 #--
+size_t	sz_val
 int	id, icol, jcol, ncols
 pointer	cp, sp, clist
 
@@ -785,7 +802,8 @@ begin
 	ncols = tbpsta (tp, TBL_NCOLS)
 
 	call smark (sp)
-	call salloc (clist, ncols, TY_INT)
+	sz_val = ncols
+	call salloc (clist, sz_val, TY_POINTER)
 
 	# Get each column pointer and search column selectors for a match
 	# If none is, found, copy the pointer to the column list
@@ -799,7 +817,7 @@ begin
 	    }
 
 	    if (id > ndescrip) {
-		Memi[clist+jcol] = cp
+		Memp[clist+jcol] = cp
 		jcol = jcol + 1
 	    }
 	}
@@ -812,7 +830,7 @@ begin
 
 	ndescrip = min (jcol, maxdescrip)
 	do id = 1, ndescrip
-	    call tcs_fillstruct (tp, Memi[clist+id-1], "", descrip[id])
+	    call tcs_fillstruct (tp, Memp[clist+id-1], "", descrip[id])
 
 	call sfree (sp)
 end

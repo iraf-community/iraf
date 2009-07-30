@@ -14,11 +14,12 @@ define	yyparse		trsparse
 %L
 include "trsopen.com"
 
-int	cptr
+pointer	cptr
 bool	trscname(), trscnum()
 pointer	trsaddnode()
 errchk	trslex, trsaddnode
 string	badcol  "column not found"
+include	<nullptr.inc>
 
 %}
 
@@ -33,8 +34,8 @@ string	badcol  "column not found"
 
 expr :		filter YEOF {
 		    # Normal exit. Code a stop instruction.
-		    Memi[$$] = trsaddnode (YDONE, Memi[$1], NULL)
-		    return (Memi[$$])
+		    Memp[$$] = trsaddnode (YDONE, Memp[$1], NULLPTR)
+		    return (Memp[$$])
 		}
 	|	error {
 		    # Parser error
@@ -43,89 +44,89 @@ expr :		filter YEOF {
 	;
 filter :	{
 			# Empty filter 
-			Memi[$$] = NULL
+			Memp[$$] = NULL
 		}
 	|	YLPAR filter YRPAR {
 			# Parentheses for grouping
-			Memi[$$] = Memi[$2]
+			Memp[$$] = Memp[$2]
 		}
 	|	filter YCOMMA filter {
 			# And instruction
-			Memi[$$] = trsaddnode (YAND, Memi[$1], Memi[$3])
+			Memp[$$] = trsaddnode (YAND, Memp[$1], Memp[$3])
 		}
 	|	filter YSEMI filter {
 			# And instruction
-			Memi[$$] = trsaddnode (YAND, Memi[$1], Memi[$3])
+			Memp[$$] = trsaddnode (YAND, Memp[$1], Memp[$3])
 		}
 	|	YBANG filter {
 			# Not instruction
-			Memi[$$] = trsaddnode (YNOT, Memi[$2], NULL)
+			Memp[$$] = trsaddnode (YNOT, Memp[$2], NULLPTR)
 		}
 	| 	YNUM YEQUAL range {
 			# Filter with singleton range
-			if (! trscnum (Memi[$1], cptr)) {
+			if (! trscnum (Memp[$1], cptr)) {
 				call strcpy (badcol, Memc[errbuf], SZ_LINE)
 				return (NULL)
 			}
 
-			Memi[$$] = trsaddnode (YRANGE, Memi[$3], -cptr)
+			Memp[$$] = trsaddnode (YRANGE, Memp[$3], -cptr)
 		}
 	|	YSTR YEQUAL range {
 			# Filter with singleton range
-			if (! trscname (Memi[$1], cptr)) {
+			if (! trscname (Memp[$1], cptr)) {
 				call strcpy (badcol, Memc[errbuf], SZ_LINE)
 				return (NULL)
 			}
-			Memi[$$] = trsaddnode (YRANGE, Memi[$3], -cptr)
+			Memp[$$] = trsaddnode (YRANGE, Memp[$3], -cptr)
 		}
 	;
 range :		YLPAR range YRPAR {
 			# Parentheses for grouping
-			Memi[$$] = Memi[$2]
+			Memp[$$] = Memp[$2]
 		}
 	|	range YCOMMA range {
 			# Or instruction
-			Memi[$$] = trsaddnode (YOR, Memi[$1], Memi[$3])
+			Memp[$$] = trsaddnode (YOR, Memp[$1], Memp[$3])
 		}
 	|	YBANG range {
 			# Not instruction
-			Memi[$$] = trsaddnode (YNOT, Memi[$2], NULL)
+			Memp[$$] = trsaddnode (YNOT, Memp[$2], NULLPTR)
 		}
 	|	YNUM {
 			# Numeric equality instruction
-			Memi[$$] = trsaddnode (YEQN, -Memi[$1], NULL)
+			Memp[$$] = trsaddnode (YEQN, -Memp[$1], NULLPTR)
 		}
 	|	YSTR {
 			# String equality instruction
-			Memi[$$] = trsaddnode (YEQS, -Memi[$1], NULL)
+			Memp[$$] = trsaddnode (YEQS, -Memp[$1], NULLPTR)
 		}
 	|	YCOLON YNUM {
 			# Numeric less than or equal instruction
-			Memi[$$] = trsaddnode (YLEN, -Memi[$2], NULL)
+			Memp[$$] = trsaddnode (YLEN, -Memp[$2], NULLPTR)
 		}
 	|	YCOLON YSTR {
 			# String less than or equal instruction
-			Memi[$$] = trsaddnode (YLES, -Memi[$2], NULL)
+			Memp[$$] = trsaddnode (YLES, -Memp[$2], NULLPTR)
 		}
 	|	YNUM YCOLON YNUM {
 			# Numeric inside instruction
-			Memi[$$] = trsaddnode (YINN, -Memi[$1], -Memi[$3])
+			Memp[$$] = trsaddnode (YINN, -Memp[$1], -Memp[$3])
 		}
 	|	YSTR YCOLON YSTR {
 			# String inside instruction
-			Memi[$$] = trsaddnode (YINS, -Memi[$1], -Memi[$3])
+			Memp[$$] = trsaddnode (YINS, -Memp[$1], -Memp[$3])
 		}
 	|	YNUM YCOLON {
 			# Numeric greater than or equal instruction
-			Memi[$$] = trsaddnode (YGEN, -Memi[$1], NULL)
+			Memp[$$] = trsaddnode (YGEN, -Memp[$1], NULLPTR)
 		}
 	|	YSTR YCOLON {
 			# Numeric greater than or equal instruction
-			Memi[$$] = trsaddnode (YGES, -Memi[$1], NULL)
+			Memp[$$] = trsaddnode (YGES, -Memp[$1], NULLPTR)
 		}
 	|	YPER YNUM {
 			# Bit mask instruction
-			Memi[$$] = trsaddnode (YMSK, -Memi[$2], NULL)
+			Memp[$$] = trsaddnode (YMSK, -Memp[$2], NULLPTR)
 		}
 	;
 %%
@@ -140,9 +141,11 @@ char	expr[ARB]	# i: expression to be parsed
 include	"trsopen.com"
 
 char	nil
-int	fd, jtop
+pointer	fd
+int	jtop, i_fd
 bool	debug
 pointer	sp, root
+size_t	sz_val
 
 data	nil     / EOS /
 data	debug	/ false /
@@ -162,11 +165,15 @@ begin
 	tabptr = tp
 
 	call smark (sp)
-	call salloc (tokbuf, SZ_TOKEN, TY_CHAR)
-	call salloc (errbuf, SZ_LINE, TY_CHAR)
-	call salloc (treebuf, SZ_BUFFER, TY_INT)
+	sz_val = SZ_TOKEN
+	call salloc (tokbuf, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errbuf, sz_val, TY_CHAR)
+	sz_val = SZ_BUFFER
+	call salloc (treebuf, sz_val, TY_POINTER)
 
-	call amovkc (nil, Memc[tokbuf], SZ_TOKEN)
+	sz_val = SZ_TOKEN
+	call amovkc (nil, Memc[tokbuf], sz_val)
 	call strcpy (syntax, Memc[errbuf], SZ_LINE)
 
 	itree = 0
@@ -188,14 +195,16 @@ begin
 
 	    do jtop = 1, itop
 		call close (stack[jtop])
-	    call close (fd)
+	    i_fd = fd
+	    call close (i_fd)
 
 	    call trserr
 	}
 
 	# Free memory and close files
 
-	call close (fd)
+	i_fd = fd
+	call close (i_fd)
 	call sfree (sp)
 	return (pcode)
 end
@@ -288,6 +297,8 @@ include "trsopen.com"
 
 int	nc
 pointer	sp, token, errmsg
+size_t	sz_val
+int	imod()
 
 string	errfmt  "Error in table row selector, %s. Last read: %s"
 
@@ -295,8 +306,10 @@ begin
 	# Allocate memory to hold token
 
 	call smark (sp)
-	call salloc (token, SZ_TOKEN, TY_CHAR)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_TOKEN
+	call salloc (token, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	# Copy token from token buffer. Since token buffer is maintained 
 	# as a queue, the copy is in two parts, after and before the
@@ -305,11 +318,13 @@ begin
 	nc = 0
 	if (Memc[tokbuf+itok] != EOS) {
 	    nc = SZ_TOKEN - itok
-	    call amovc (Memc[tokbuf+itok], Memc[token], nc)
+	    sz_val = nc
+	    call amovc (Memc[tokbuf+itok], Memc[token], sz_val)
 	}
 
-	itok = mod (itok - 1, SZ_TOKEN)
-	call amovc (Memc[tokbuf], Memc[token+nc], itok)
+	itok = imod (itok - 1, SZ_TOKEN)
+	sz_val = itok
+	call amovc (Memc[tokbuf], Memc[token+nc], sz_val)
 
 	nc = nc + itok
 	Memc[token+nc] = EOS
@@ -330,15 +345,18 @@ pointer procedure trsinit ()
 
 #--
 pointer	buf
+size_t	sz_val
 
 begin
-	call malloc (buf, LEN_TRSBUF, TY_INT)
+	sz_val = LEN_TRSBUF
+	call malloc (buf, sz_val, TY_POINTER)
 
 	TRS_IDENT(buf) = TRS_MAGIC
 	TRS_ROWS(buf) = NULL
 
-	call malloc (TRS_CODE(buf), SZ_BUFFER, TY_INT)
-	call malloc (TRS_VALUE(buf), SZ_BUFFER, TY_DOUBLE)
+	sz_val = SZ_BUFFER
+	call malloc (TRS_CODE(buf), sz_val, TY_STRUCT)
+	call malloc (TRS_VALUE(buf), sz_val, TY_DOUBLE)
 
 	return (buf)
 end
@@ -347,12 +365,15 @@ end
 
 int procedure trslex (fd, value)
 
-int	fd		# u: file descriptor of currently open file
+pointer	fd		# u: file descriptor of currently open file
 pointer	value		# i: Pointer to current token value
 #--
 include	"trsopen.com"
 
+int	i_fd
 int	type
+size_t	sz_val
+char	c_eos
 
 string	badfile  "bad file name"
 string	maxfile  "files nested too deep"
@@ -373,10 +394,13 @@ begin
 		# if no deferred file, return end of file token
 
 		if (itop != 0) {
-		    call amovkc (EOS, Memc[tokbuf], SZ_TOKEN)
+		    c_eos = EOS
+		    sz_val = SZ_TOKEN
+		    call amovkc (c_eos, Memc[tokbuf], sz_val)
 		    itok = 0
 
-		    call close (fd)
+		    i_fd = fd
+		    call close (i_fd)
 		    fd = stack[itop]
 		    itop = itop - 1
 		    type = YNIL
@@ -402,9 +426,11 @@ begin
 		    stack[itop] = fd
 
 		    ifnoerr {
-			fd = open (Memc[Memi[value]], READ_ONLY, TEXT_FILE)
+			fd = open (Memc[Memp[value]], READ_ONLY, TEXT_FILE)
 		    } then {
-			call amovkc (EOS, Memc[tokbuf], SZ_TOKEN)
+			c_eos = EOS
+			sz_val = SZ_TOKEN
+			call amovkc (c_eos, Memc[tokbuf], sz_val)
 			itok = 0
 			type = YNIL
 
@@ -426,16 +452,19 @@ end
 
 int procedure trsnextch (fd, ch)
 
-int	fd		# i: input file descriptor
+pointer	fd		# i: input file descriptor
 char	ch		# o: character read from input
 #--
+int	i_fd
 include	"trsopen.com"
 
 char	getc()
+int	imod()
 
 begin
-	Memc[tokbuf+itok] = getc (fd, ch)
-	itok = mod (itok+1, SZ_TOKEN)
+	i_fd = fd
+	Memc[tokbuf+itok] = getc (i_fd, ch)
+	itok = imod (itok+1, SZ_TOKEN)
 
 	return (ch)
 end
@@ -444,7 +473,7 @@ end
 
 procedure trstok (fd, value, type)
 
-int	fd		# u: file descriptor of currently open file
+pointer	fd		# u: file descriptor of currently open file
 pointer	value		# i: Pointer to current token value
 int	type		# i: Token type
 #--
@@ -454,8 +483,10 @@ char	ch, stop
 double	dval
 int	stoptype[10]
 int	nc, ic, index, delta, size
+int	i_fd
 
 pointer	sp, token, ptr, valbuf
+size_t	sz_val
 
 string	notnum   "not a number"
 string	noroom   "expression too complex"
@@ -466,14 +497,14 @@ string	stopset  " ,;:%=!()@"
 data	stoptype / YNIL, YCOMMA, YSEMI, YCOLON, YPER, 
 		   YEQUAL, YBANG, YLPAR, YRPAR, YINC /
 
-int	trsnextch(),trstrim(), stridx(), ctod()
+int	trsnextch(), trstrim(), stridx(), ctod(), imod()
 
 begin
 	# Eat leading whitespace, watch for end of file
 
 	while (trsnextch (fd, ch) <= ' ') {
 	    if (ch == EOF) {
-		Memi[value] = NULL
+		Memp[value] = NULL
 		type = YEOF
 		return
 	    }
@@ -485,7 +516,7 @@ begin
 
 	index = stridx (ch, stopset)
 	if (index > 0) {
-	    Memi[value] = NULL
+	    Memp[value] = NULL
 	    type = stoptype[index] 
 	    return
 	}
@@ -494,7 +525,8 @@ begin
 	# First, gather all characters in token
 
 	call smark (sp)
-	call salloc (token, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (token, sz_val, TY_CHAR)
 
 	if (ch == '\'' || ch == '"') {
 	    # First case: token is a quoted string
@@ -515,7 +547,7 @@ begin
 
 	    if (ch == EOF) {
 		call strcpy (nostop, Memc[errbuf], SZ_LINE)
-		Memi[value] = NULL
+		Memp[value] = NULL
 		type = YERR
 
 		call sfree (sp)
@@ -539,7 +571,8 @@ begin
 		    if (itok < 0)
 			itok = SZ_TOKEN - 1
 
-		    call ungetc (fd, ch)
+		    i_fd = fd
+		    call ungetc (i_fd, ch)
 		    break
 		}
 
@@ -560,7 +593,7 @@ begin
 
 	    if (ival + 1 >= SZ_BUFFER) {
 		call strcpy (noroom, Memc[errbuf], SZ_LINE)
-		Memi[value] = NULL
+		Memp[value] = NULL
 		type = YERR
 
 	    } else {
@@ -568,7 +601,7 @@ begin
 		ival = ival + 1
 
 		Memd[ptr] = dval
-		Memi[value] = ptr
+		Memp[value] = ptr
 		type = YNUM
 	    }
 
@@ -577,14 +610,14 @@ begin
 	    # and store in the value buffer
 
 	    size = nc + 1
-	    delta = mod (size, SZ_DOUBLE)
+	    delta = imod (size, SZ_DOUBLE)
 	    if (delta != 0)
 		size = size + (SZ_DOUBLE - delta)
 	    size = size / SZ_DOUBLE
 
 	    if (ival + size >= SZ_BUFFER) {
 		call strcpy (noroom, Memc[errbuf], SZ_LINE)
-		Memi[value] = NULL
+		Memp[value] = NULL
 		type = YERR
 
 	    } else {
@@ -592,7 +625,7 @@ begin
 		ival = ival + size
 
 		call strcpy (Memc[token], Memc[ptr], size*SZ_DOUBLE-1)
-		Memi[value] = ptr
+		Memp[value] = ptr
 		type = YSTR
 	    }
 	}

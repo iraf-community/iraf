@@ -16,7 +16,7 @@ frees the memory held by the pseudocode arrays. Here is an typical
 example of the use of these three routines:
 
 	tp = tbtopn (table, READ_ONLY, NULL)
-	numrow = tbpsta (tp, TBL_NROWS)
+	numrow = tbpstl (tp, TBL_NROWS)
 	pcode = trsopen (tp, filter)
 	do irow = 1, numrow {
 	    if (trseval (tp, irow, pcode)) {
@@ -78,7 +78,7 @@ and include files can contain other files, up to seven levels deep.
 bool procedure trseval (tp, irow, pcode)
 
 pointer	tp		# i: table descriptor
-int	irow		# i: table row number
+long	irow		# i: table row number
 pointer	pcode		# i: pseudocode
 #--
 string	notcode "trseval: not pointer to code"
@@ -107,13 +107,14 @@ end
 bool procedure trscalc (tp, irow, codebuf)
 
 pointer	tp		# i: table descriptor
-int	irow		# i: table row number
+long	irow		# i: table row number
 pointer	codebuf		# i: pseudocode
 
 #--
+size_t	sz_val
 bool	jump, stack[MAXSTACK]
 double	val
-int	itop, icode,junk, mask1, mask2
+int	itop, icode, junk, mask1, mask2
 pointer	sp, str
 
 string	ovflow  "trscalc: stack overflow"
@@ -125,7 +126,8 @@ int	trstrim()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	itop = 0
 	icode = 0
@@ -255,7 +257,7 @@ procedure trsgetd (tp, cp, irow, val)
 
 pointer	tp		# i: table descriptor
 pointer	cp		# i: column descriptor
-int	irow		# i: column number
+long	irow		# i: column number
 double	val		# o: value read from table
 #--
 errchk	tbegtd
@@ -274,18 +276,18 @@ procedure trsgett (tp, cp, irow, str, maxch)
 
 pointer	tp		# i: table descriptor
 pointer	cp		# i: column descriptor
-int	irow		# i: column number
+long	irow		# i: column number
 char	str[ARB]	# o: value read from table
 int	maxch		# i: maximum string length
 #--
 int	junk
 
-errchk	itoc, tbgett
-int	itoc()
+errchk	ltoc, tbgett
+int	ltoc()
 
 begin
 	if (cp == NULL) {
-	    junk = itoc (irow, str, maxch)
+	    junk = ltoc (irow, str, maxch)
 	} else {
 	    call tbegtt (tp, cp, irow, str, maxch)
 	}

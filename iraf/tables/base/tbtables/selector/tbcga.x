@@ -13,23 +13,26 @@ include <tbset.h>
 # Phil Hodge,  5-Mar-1998  Function created.
 # Phil Hodge, 18-Jun-1998  Error check the subroutines.
 
-int procedure tbcgad (tp, cp, buffer, nelem)
+long procedure tbcgad (tp, cp, buffer, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 double	buffer[ARB]	# o: values read from table
-int	nelem		# i: maximum number of elements to read
+long	nelem		# i: maximum number of elements to read
 #--
 pointer descrip		# column selector descriptor
-int	nrows		# number of selected rows
-int	row		# loop index for selected row number
-int	nvals		# number of elements in one cell
-int	nret		# number returned, should be the same as nvals
-int	i
-int	tbagtd()
+long	nrows		# number of selected rows
+long	row		# loop index for selected row number
+long	nvals		# number of elements in one cell
+long	nret		# number returned, should be the same as nvals
+long	i
+long	c_1
+long	tbagtd()
 errchk	tbagtd(), tbegtd(), tcs_rdaryd()
 
 begin
+	c_1 = 1
+
 	# Get descrip, nvals, and nrows.
 	call tbcnel1 (tp, cp, descrip, nvals, nrows)
 
@@ -47,7 +50,7 @@ begin
 		if (nvals == 1)
 		    call tbegtd (tp, cp, row, buffer[i])
 		else
-		    nret = tbagtd (tp, cp, row, buffer[i], 1, nvals)
+		    nret = tbagtd (tp, cp, row, buffer[i], c_1, nvals)
 	    } else {
 		call tcs_rdaryd (tp, descrip, row, nelem-i+1, nret, buffer[i])
 	    }
@@ -61,23 +64,26 @@ begin
 	return (i - 1)
 end
 
-int procedure tbcgar (tp, cp, buffer, nelem)
+long procedure tbcgar (tp, cp, buffer, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 real	buffer[ARB]	# o: values read from table
-int	nelem		# i: maximum number of elements to read
+long	nelem		# i: maximum number of elements to read
 #--
 pointer descrip		# column selector descriptor
-int	nrows		# number of selected rows
-int	row		# loop index for selected row number
-int	nvals		# number of elements in one cell
-int	nret		# number returned, should be the same as nvals
-int	i
-int	tbagtr()
+long	nrows		# number of selected rows
+long	row		# loop index for selected row number
+long	nvals		# number of elements in one cell
+long	nret		# number returned, should be the same as nvals
+long	i
+long	c_1
+long	tbagtr()
 errchk	tbagtr(), tbegtr(), tcs_rdaryr()
 
 begin
+	c_1 = 1
+
 	# Get descrip, nvals, and nrows.
 	call tbcnel1 (tp, cp, descrip, nvals, nrows)
 
@@ -95,7 +101,7 @@ begin
 		if (nvals == 1)
 		    call tbegtr (tp, cp, row, buffer[i])
 		else
-		    nret = tbagtr (tp, cp, row, buffer[i], 1, nvals)
+		    nret = tbagtr (tp, cp, row, buffer[i], c_1, nvals)
 	    } else {
 		call tcs_rdaryr (tp, descrip, row, nelem-i+1, nret, buffer[i])
 	    }

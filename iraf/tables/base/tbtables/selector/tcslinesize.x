@@ -2,24 +2,27 @@ include "tcs.h"
 
 # TCS_LINESIZE -- Size of a single line in a column array
 
-int procedure tcs_linesize (descrip)
+long procedure tcs_linesize (descrip)
 
 pointer	descrip		# i: column selector
 #--
-int	size, ndim
+size_t	sz_val
+long	size
+int	ndim
 pointer sp, length
 
 begin
 	call smark (sp)
-	call salloc (length, MAXDIM, TY_INT)
+	sz_val = MAXDIM
+	call salloc (length, sz_val, TY_LONG)
 
 	# Get length of each axis
 
-	call tcs_shape (descrip, Memi[length], ndim, MAXDIM)
+	call tcs_shape (descrip, Meml[length], ndim, MAXDIM)
 
 	# Return length of first
 
-	size = Memi[length]
+	size = Meml[length]
 	call sfree (sp)
 
 	return (size)

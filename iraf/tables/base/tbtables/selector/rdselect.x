@@ -10,6 +10,7 @@ char	rowselect[ARB]	# o: row selector
 char	colselect[ARB]	# o: column selector
 int	maxch		# i: max length of output strings
 #--
+size_t	sz_val
 char	colon
 int	ic, nc, isect, nsect, idtype
 pointer	sp, ident, extend, errmsg, bracket[MAXSECT]
@@ -25,9 +26,11 @@ errchk	nextbrak
 
 begin
 	call smark (sp)
-	call salloc (ident, SZ_FNAME, TY_CHAR)
-	call salloc (extend, SZ_FNAME, TY_CHAR)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ident, sz_val, TY_CHAR)
+	call salloc (extend, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	# Search for the first unescaped bracket
 	# Copy all chars prior to bracket into root
@@ -47,7 +50,8 @@ begin
 
 	for (isect = 1; isect <= MAXSECT; isect = isect + 1) {
 
-	    call salloc (bracket[isect], SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (bracket[isect], sz_val, TY_CHAR)
 	    if (! nextbrak (file, ic, Memc[bracket[isect]], maxch))
 		break
 	}
@@ -106,6 +110,7 @@ int	ic		# u: index to char within name
 char	section[ARB]	# o: section extracted from name
 int	maxch		# i: maximum length of section
 #--
+size_t	sz_val
 int	jc, level
 pointer	sp, errmsg
 
@@ -121,7 +126,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	jc = 1
 	while (level > 0 && file[ic] != EOS) {

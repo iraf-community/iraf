@@ -29,7 +29,7 @@ define	yyerrok		yyerrflag = 0
 define	YYMOVE		call yy_move (Memp[$1], Memp[$2], YYOPLEN)
 define	YYERRCODE	256
 
-# line 131 "trsopen.y"
+# line 132 "trsopen.y"
 
 
 # TRSOPEN -- Compile a table row selection expression 
@@ -42,9 +42,11 @@ char	expr[ARB]	# i: expression to be parsed
 include	"trsopen.com"
 
 char	nil
-int	fd, jtop
+pointer	fd
+int	jtop, i_fd
 bool	debug
 pointer	sp, root
+size_t	sz_val
 
 data	nil     / EOS /
 data	debug	/ false /
@@ -64,11 +66,15 @@ begin
 	tabptr = tp
 
 	call smark (sp)
-	call salloc (tokbuf, SZ_TOKEN, TY_CHAR)
-	call salloc (errbuf, SZ_LINE, TY_CHAR)
-	call salloc (treebuf, SZ_BUFFER, TY_INT)
+	sz_val = SZ_TOKEN
+	call salloc (tokbuf, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errbuf, sz_val, TY_CHAR)
+	sz_val = SZ_BUFFER
+	call salloc (treebuf, sz_val, TY_POINTER)
 
-	call amovkc (nil, Memc[tokbuf], SZ_TOKEN)
+	sz_val = SZ_TOKEN
+	call amovkc (nil, Memc[tokbuf], sz_val)
 	call strcpy (syntax, Memc[errbuf], SZ_LINE)
 
 	itree = 0
@@ -90,14 +96,16 @@ begin
 
 	    do jtop = 1, itop
 		call close (stack[jtop])
-	    call close (fd)
+	    i_fd = fd
+	    call close (i_fd)
 
 	    call trserr
 	}
 
 	# Free memory and close files
 
-	call close (fd)
+	i_fd = fd
+	call close (i_fd)
 	call sfree (sp)
 	return (pcode)
 end
@@ -190,6 +198,8 @@ include "trsopen.com"
 
 int	nc
 pointer	sp, token, errmsg
+size_t	sz_val
+int	imod()
 
 string	errfmt  "Error in table row selector, %s. Last read: %s"
 
@@ -197,8 +207,10 @@ begin
 	# Allocate memory to hold token
 
 	call smark (sp)
-	call salloc (token, SZ_TOKEN, TY_CHAR)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_TOKEN
+	call salloc (token, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	# Copy token from token buffer. Since token buffer is maintained 
 	# as a queue, the copy is in two parts, after and before the
@@ -207,11 +219,13 @@ begin
 	nc = 0
 	if (Memc[tokbuf+itok] != EOS) {
 	    nc = SZ_TOKEN - itok
-	    call amovc (Memc[tokbuf+itok], Memc[token], nc)
+	    sz_val = nc
+	    call amovc (Memc[tokbuf+itok], Memc[token], sz_val)
 	}
 
-	itok = mod (itok - 1, SZ_TOKEN)
-	call amovc (Memc[tokbuf], Memc[token+nc], itok)
+	itok = imod (itok - 1, SZ_TOKEN)
+	sz_val = itok
+	call amovc (Memc[tokbuf], Memc[token+nc], sz_val)
 
 	nc = nc + itok
 	Memc[token+nc] = EOS
@@ -232,15 +246,18 @@ pointer procedure trsinit ()
 
 #--
 pointer	buf
+size_t	sz_val
 
 begin
-	call malloc (buf, LEN_TRSBUF, TY_INT)
+	sz_val = LEN_TRSBUF
+	call malloc (buf, sz_val, TY_POINTER)
 
 	TRS_IDENT(buf) = TRS_MAGIC
 	TRS_ROWS(buf) = NULL
 
-	call malloc (TRS_CODE(buf), SZ_BUFFER, TY_INT)
-	call malloc (TRS_VALUE(buf), SZ_BUFFER, TY_DOUBLE)
+	sz_val = SZ_BUFFER
+	call malloc (TRS_CODE(buf), sz_val, TY_STRUCT)
+	call malloc (TRS_VALUE(buf), sz_val, TY_DOUBLE)
 
 	return (buf)
 end
@@ -249,12 +266,15 @@ end
 
 int procedure trslex (fd, value)
 
-int	fd		# u: file descriptor of currently open file
+pointer	fd		# u: file descriptor of currently open file
 pointer	value		# i: Pointer to current token value
 #--
 include	"trsopen.com"
 
+int	i_fd
 int	type
+size_t	sz_val
+char	c_eos
 
 string	badfile  "bad file name"
 string	maxfile  "files nested too deep"
@@ -275,10 +295,13 @@ begin
 		# if no deferred file, return end of file token
 
 		if (itop != 0) {
-		    call amovkc (EOS, Memc[tokbuf], SZ_TOKEN)
+		    c_eos = EOS
+		    sz_val = SZ_TOKEN
+		    call amovkc (c_eos, Memc[tokbuf], sz_val)
 		    itok = 0
 
-		    call close (fd)
+		    i_fd = fd
+		    call close (i_fd)
 		    fd = stack[itop]
 		    itop = itop - 1
 		    type = YNIL
@@ -304,9 +327,11 @@ begin
 		    stack[itop] = fd
 
 		    ifnoerr {
-			fd = open (Memc[Memi[value]], READ_ONLY, TEXT_FILE)
+			fd = open (Memc[Memp[value]], READ_ONLY, TEXT_FILE)
 		    } then {
-			call amovkc (EOS, Memc[tokbuf], SZ_TOKEN)
+			c_eos = EOS
+			sz_val = SZ_TOKEN
+			call amovkc (c_eos, Memc[tokbuf], sz_val)
 			itok = 0
 			type = YNIL
 
@@ -328,16 +353,19 @@ end
 
 int procedure trsnextch (fd, ch)
 
-int	fd		# i: input file descriptor
+pointer	fd		# i: input file descriptor
 char	ch		# o: character read from input
 #--
+int	i_fd
 include	"trsopen.com"
 
 char	getc()
+int	imod()
 
 begin
-	Memc[tokbuf+itok] = getc (fd, ch)
-	itok = mod (itok+1, SZ_TOKEN)
+	i_fd = fd
+	Memc[tokbuf+itok] = getc (i_fd, ch)
+	itok = imod (itok+1, SZ_TOKEN)
 
 	return (ch)
 end
@@ -346,7 +374,7 @@ end
 
 procedure trstok (fd, value, type)
 
-int	fd		# u: file descriptor of currently open file
+pointer	fd		# u: file descriptor of currently open file
 pointer	value		# i: Pointer to current token value
 int	type		# i: Token type
 #--
@@ -356,8 +384,10 @@ char	ch, stop
 double	dval
 int	stoptype[10]
 int	nc, ic, index, delta, size
+int	i_fd
 
 pointer	sp, token, ptr, valbuf
+size_t	sz_val
 
 string	notnum   "not a number"
 string	noroom   "expression too complex"
@@ -368,14 +398,14 @@ string	stopset  " ,;:%=!()@"
 data	stoptype / YNIL, YCOMMA, YSEMI, YCOLON, YPER, 
 		   YEQUAL, YBANG, YLPAR, YRPAR, YINC /
 
-int	trsnextch(),trstrim(), stridx(), ctod()
+int	trsnextch(), trstrim(), stridx(), ctod(), imod()
 
 begin
 	# Eat leading whitespace, watch for end of file
 
 	while (trsnextch (fd, ch) <= ' ') {
 	    if (ch == EOF) {
-		Memi[value] = NULL
+		Memp[value] = NULL
 		type = YEOF
 		return
 	    }
@@ -387,7 +417,7 @@ begin
 
 	index = stridx (ch, stopset)
 	if (index > 0) {
-	    Memi[value] = NULL
+	    Memp[value] = NULL
 	    type = stoptype[index] 
 	    return
 	}
@@ -396,7 +426,8 @@ begin
 	# First, gather all characters in token
 
 	call smark (sp)
-	call salloc (token, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (token, sz_val, TY_CHAR)
 
 	if (ch == '\'' || ch == '"') {
 	    # First case: token is a quoted string
@@ -417,7 +448,7 @@ begin
 
 	    if (ch == EOF) {
 		call strcpy (nostop, Memc[errbuf], SZ_LINE)
-		Memi[value] = NULL
+		Memp[value] = NULL
 		type = YERR
 
 		call sfree (sp)
@@ -441,7 +472,8 @@ begin
 		    if (itok < 0)
 			itok = SZ_TOKEN - 1
 
-		    call ungetc (fd, ch)
+		    i_fd = fd
+		    call ungetc (i_fd, ch)
 		    break
 		}
 
@@ -462,7 +494,7 @@ begin
 
 	    if (ival + 1 >= SZ_BUFFER) {
 		call strcpy (noroom, Memc[errbuf], SZ_LINE)
-		Memi[value] = NULL
+		Memp[value] = NULL
 		type = YERR
 
 	    } else {
@@ -470,7 +502,7 @@ begin
 		ival = ival + 1
 
 		Memd[ptr] = dval
-		Memi[value] = ptr
+		Memp[value] = ptr
 		type = YNUM
 	    }
 
@@ -479,14 +511,14 @@ begin
 	    # and store in the value buffer
 
 	    size = nc + 1
-	    delta = mod (size, SZ_DOUBLE)
+	    delta = imod (size, SZ_DOUBLE)
 	    if (delta != 0)
 		size = size + (SZ_DOUBLE - delta)
 	    size = size / SZ_DOUBLE
 
 	    if (ival + size >= SZ_BUFFER) {
 		call strcpy (noroom, Memc[errbuf], SZ_LINE)
-		Memi[value] = NULL
+		Memp[value] = NULL
 		type = YERR
 
 	    } else {
@@ -494,7 +526,7 @@ begin
 		ival = ival + size
 
 		call strcpy (Memc[token], Memc[ptr], size*SZ_DOUBLE-1)
-		Memi[value] = ptr
+		Memp[value] = ptr
 		type = YSTR
 	    }
 	}
@@ -562,11 +594,12 @@ errchk	salloc, yylex
 
 include "trsopen.com"
 
-int	cptr
+pointer	cptr
 bool	trscname(), trscnum()
 pointer	trsaddnode()
 errchk	trslex, trsaddnode
 string	badcol  "column not found"
+include	<nullptr.inc>
 
 short	yyexca[6]
 data	(yyexca(i),i=  1,  6)	/  -1,   1,   0,  -1,  -2,   0/
@@ -787,140 +820,140 @@ yyabort_
 	switch (yym) {
 	    
 case 1:
-# line 34 "trsopen.y"
+# line 35 "trsopen.y"
 {
 		    # Normal exit. Code a stop instruction.
-		    Memi[yyval] = trsaddnode (YDONE, Memi[yypvt-YYOPLEN], NULL)
-		    return (Memi[yyval])
+		    Memp[yyval] = trsaddnode (YDONE, Memp[yypvt-YYOPLEN], NULLPTR)
+		    return (Memp[yyval])
 		}
 case 2:
-# line 39 "trsopen.y"
+# line 40 "trsopen.y"
 {
 		    # Parser error
 		    return (NULL)
 		}
 case 3:
-# line 44 "trsopen.y"
+# line 45 "trsopen.y"
 {
 			# Empty filter 
-			Memi[yyval] = NULL
+			Memp[yyval] = NULL
 		}
 case 4:
-# line 48 "trsopen.y"
+# line 49 "trsopen.y"
 {
 			# Parentheses for grouping
-			Memi[yyval] = Memi[yypvt-YYOPLEN]
+			Memp[yyval] = Memp[yypvt-YYOPLEN]
 		}
 case 5:
-# line 52 "trsopen.y"
+# line 53 "trsopen.y"
 {
 			# And instruction
-			Memi[yyval] = trsaddnode (YAND, Memi[yypvt-2*YYOPLEN], Memi[yypvt])
+			Memp[yyval] = trsaddnode (YAND, Memp[yypvt-2*YYOPLEN], Memp[yypvt])
 		}
 case 6:
-# line 56 "trsopen.y"
+# line 57 "trsopen.y"
 {
 			# And instruction
-			Memi[yyval] = trsaddnode (YAND, Memi[yypvt-2*YYOPLEN], Memi[yypvt])
+			Memp[yyval] = trsaddnode (YAND, Memp[yypvt-2*YYOPLEN], Memp[yypvt])
 		}
 case 7:
-# line 60 "trsopen.y"
+# line 61 "trsopen.y"
 {
 			# Not instruction
-			Memi[yyval] = trsaddnode (YNOT, Memi[yypvt], NULL)
+			Memp[yyval] = trsaddnode (YNOT, Memp[yypvt], NULLPTR)
 		}
 case 8:
-# line 64 "trsopen.y"
+# line 65 "trsopen.y"
 {
 			# Filter with singleton range
-			if (! trscnum (Memi[yypvt-2*YYOPLEN], cptr)) {
+			if (! trscnum (Memp[yypvt-2*YYOPLEN], cptr)) {
 				call strcpy (badcol, Memc[errbuf], SZ_LINE)
 				return (NULL)
 			}
 
-			Memi[yyval] = trsaddnode (YRANGE, Memi[yypvt], -cptr)
+			Memp[yyval] = trsaddnode (YRANGE, Memp[yypvt], -cptr)
 		}
 case 9:
-# line 73 "trsopen.y"
+# line 74 "trsopen.y"
 {
 			# Filter with singleton range
-			if (! trscname (Memi[yypvt-2*YYOPLEN], cptr)) {
+			if (! trscname (Memp[yypvt-2*YYOPLEN], cptr)) {
 				call strcpy (badcol, Memc[errbuf], SZ_LINE)
 				return (NULL)
 			}
-			Memi[yyval] = trsaddnode (YRANGE, Memi[yypvt], -cptr)
+			Memp[yyval] = trsaddnode (YRANGE, Memp[yypvt], -cptr)
 		}
 case 10:
-# line 82 "trsopen.y"
+# line 83 "trsopen.y"
 {
 			# Parentheses for grouping
-			Memi[yyval] = Memi[yypvt-YYOPLEN]
+			Memp[yyval] = Memp[yypvt-YYOPLEN]
 		}
 case 11:
-# line 86 "trsopen.y"
+# line 87 "trsopen.y"
 {
 			# Or instruction
-			Memi[yyval] = trsaddnode (YOR, Memi[yypvt-2*YYOPLEN], Memi[yypvt])
+			Memp[yyval] = trsaddnode (YOR, Memp[yypvt-2*YYOPLEN], Memp[yypvt])
 		}
 case 12:
-# line 90 "trsopen.y"
+# line 91 "trsopen.y"
 {
 			# Not instruction
-			Memi[yyval] = trsaddnode (YNOT, Memi[yypvt], NULL)
+			Memp[yyval] = trsaddnode (YNOT, Memp[yypvt], NULLPTR)
 		}
 case 13:
-# line 94 "trsopen.y"
+# line 95 "trsopen.y"
 {
 			# Numeric equality instruction
-			Memi[yyval] = trsaddnode (YEQN, -Memi[yypvt], NULL)
+			Memp[yyval] = trsaddnode (YEQN, -Memp[yypvt], NULLPTR)
 		}
 case 14:
-# line 98 "trsopen.y"
+# line 99 "trsopen.y"
 {
 			# String equality instruction
-			Memi[yyval] = trsaddnode (YEQS, -Memi[yypvt], NULL)
+			Memp[yyval] = trsaddnode (YEQS, -Memp[yypvt], NULLPTR)
 		}
 case 15:
-# line 102 "trsopen.y"
+# line 103 "trsopen.y"
 {
 			# Numeric less than or equal instruction
-			Memi[yyval] = trsaddnode (YLEN, -Memi[yypvt], NULL)
+			Memp[yyval] = trsaddnode (YLEN, -Memp[yypvt], NULLPTR)
 		}
 case 16:
-# line 106 "trsopen.y"
+# line 107 "trsopen.y"
 {
 			# String less than or equal instruction
-			Memi[yyval] = trsaddnode (YLES, -Memi[yypvt], NULL)
+			Memp[yyval] = trsaddnode (YLES, -Memp[yypvt], NULLPTR)
 		}
 case 17:
-# line 110 "trsopen.y"
+# line 111 "trsopen.y"
 {
 			# Numeric inside instruction
-			Memi[yyval] = trsaddnode (YINN, -Memi[yypvt-2*YYOPLEN], -Memi[yypvt])
+			Memp[yyval] = trsaddnode (YINN, -Memp[yypvt-2*YYOPLEN], -Memp[yypvt])
 		}
 case 18:
-# line 114 "trsopen.y"
+# line 115 "trsopen.y"
 {
 			# String inside instruction
-			Memi[yyval] = trsaddnode (YINS, -Memi[yypvt-2*YYOPLEN], -Memi[yypvt])
+			Memp[yyval] = trsaddnode (YINS, -Memp[yypvt-2*YYOPLEN], -Memp[yypvt])
 		}
 case 19:
-# line 118 "trsopen.y"
+# line 119 "trsopen.y"
 {
 			# Numeric greater than or equal instruction
-			Memi[yyval] = trsaddnode (YGEN, -Memi[yypvt-YYOPLEN], NULL)
+			Memp[yyval] = trsaddnode (YGEN, -Memp[yypvt-YYOPLEN], NULLPTR)
 		}
 case 20:
-# line 122 "trsopen.y"
+# line 123 "trsopen.y"
 {
 			# Numeric greater than or equal instruction
-			Memi[yyval] = trsaddnode (YGES, -Memi[yypvt-YYOPLEN], NULL)
+			Memp[yyval] = trsaddnode (YGES, -Memp[yypvt-YYOPLEN], NULLPTR)
 		}
 case 21:
-# line 126 "trsopen.y"
+# line 127 "trsopen.y"
 {
 			# Bit mask instruction
-			Memi[yyval] = trsaddnode (YMSK, -Memi[yypvt], NULL)
+			Memp[yyval] = trsaddnode (YMSK, -Memp[yypvt], NULLPTR)
 		}	}
 
 	goto yystack_				# stack new state and value

@@ -9,24 +9,26 @@ include	"trs.h"
 procedure trsgencode (tp, root, pcode)
 
 pointer	tp		# i: table descriptor
-int	root		# i: root node of binary tree
+pointer	root		# i: root node of binary tree
 pointer	pcode		# u: pseudocode structure
 #--
-int	nrow
+long	nrow
+long	l_val
 
 bool	trshasrow()
-int	tbpsta()
+long	tbpstl()
 pointer	trsoptimize(), rst_create()
 errchk	trshasrow, trsputcode, trsoptimze
 
 begin
-	nrow = tbpsta (tp, TBL_NROWS)
+	nrow = tbpstl (tp, TBL_NROWS)
 
 	if (trshasrow (root)) {
 	    TRS_ROWS(pcode) = trsoptimize (root, nrow)
 
 	} else {
-	    TRS_ROWS(pcode) = rst_create (1, nrow)
+	    l_val = 1
+	    TRS_ROWS(pcode) = rst_create (l_val, nrow)
 	}
 
 	call trsputcode (root, pcode)
@@ -95,20 +97,23 @@ end
 pointer procedure trsoptimize (root, nrow)
 
 pointer	root		# i: root of binary tree
-int	nrow		# i: number of rows in table
+long	nrow		# i: number of rows in table
 #--
 int	top, istack, nstack
 pointer	sp, eval, node, prev, set
+size_t	sz_val
 
 bool	trs_under_tree()
 pointer	trs_first_tree(), trs_next_tree()
 errchk	trsroweval, trs_snip_tree
+include	<nullptr.inc>
 
 begin
 	# Allocate arrays used in traversing binary tree
 
 	call smark (sp)
-	call salloc (eval, MAXDEPTH, TY_INT)
+	sz_val = MAXDEPTH
+	call salloc (eval, sz_val, TY_POINTER)
 
 	# Traverse the binary tree, looking for row expressions
 	# when one is found, evaluate it and remove it from the tree
@@ -121,7 +126,7 @@ begin
 
 	    if (trs_under_tree (node))
 		call trsroweval (TREE_OPER(node), -TREE_LEFT(node), 
-				 -TREE_RIGHT(node), nrow, Memi[eval], 
+				 -TREE_RIGHT(node), nrow, Memp[eval], 
 				 top)
 
 	    prev = node
@@ -148,11 +153,11 @@ begin
 
 	nstack = top - 1
 	do istack = 1, nstack
-	    call trsroweval (YAND, NULL, NULL, nrow, Memi[eval], top)
+	    call trsroweval (YAND, NULLPTR, NULLPTR, nrow, Memp[eval], top)
 
 	# Return the row set evaluated 
 
-	set = Memi[eval]
+	set = Memp[eval]
 
 	call sfree (sp)
 	return (set)
@@ -214,12 +219,12 @@ begin
 
 		# Add instruction to code buffer
 
-		Memi[codebuf+icode+OCODE] = oper
-		Memi[codebuf+icode+OCOLUMN] = col
-		Memi[codebuf+icode+OTJUMP] = NULL
-		Memi[codebuf+icode+OFJUMP] = NULL
-		Memi[codebuf+icode+OLOVAL] = loval
-		Memi[codebuf+icode+OHIVAL] = hival
+		CODE(codebuf+icode) = oper
+		COLUMN(codebuf+icode) = col
+		TJUMP(codebuf+icode) = NULL
+		FJUMP(codebuf+icode) = NULL
+		LOVAL(codebuf+icode) = loval
+		HIVAL(codebuf+icode) = hival
 
 		# Increment code buffer index
 
@@ -257,10 +262,10 @@ begin
 		    icode = TREE_INST(child)
 
 		    if (inst == YOR) 
-			Memi[codebuf+icode+OTJUMP] = jump
+			TJUMP(codebuf+icode) = jump
 
 		    if (inst == YAND)
-			Memi[codebuf+icode+OFJUMP] = jump
+			FJUMP(codebuf+icode) = jump
 		}
 	    }
 
@@ -276,16 +281,19 @@ procedure trsroweval (code, loval, hival, nrow, eval, top)
 int	code		# i: pseudocode instruction
 pointer	loval		# i: low end of range
 pointer	hival		# i: high end of range
-int	nrow		# i: number of rows in table
+long	nrow		# i: number of rows in table
 pointer	eval[MAXDEPTH]	# u: stack of pending results
 int	top		# u: index to top of stack
 #--
-int	narg, iarg, lo, hi
+int	narg, iarg
+long	lo, hi
+long	l_val
 
 string	ovflow  "trs_roweval: stack overflow"
 string	badcode "trs_roweval: bad instruction"
 
 pointer	rst_create(), rst_and(), rst_or(), rst_not()
+long	ldint()
 
 begin
 	if (top == MAXDEPTH)
@@ -314,15 +322,16 @@ begin
 	    narg = 0
 	    top = top + 1
 
-	    lo = max (1, int(Memd[loval]))
+	    lo = max (1, ldint(Memd[loval]))
 	    eval[top] = rst_create (lo, lo)
 
 	case YLEN:	# numeric less than or equal check
 	    narg = 0
 	    top = top + 1
 
-	    lo = max (1, int(Memd[loval]))
-	    eval[top] = rst_create (1, lo)
+	    lo = max (1, ldint(Memd[loval]))
+	    l_val = 1
+	    eval[top] = rst_create (l_val, lo)
 
 	case YINN: 	# numeric inclusion check
 	    narg = 0
@@ -340,7 +349,7 @@ begin
 	    narg = 0
 	    top = top + 1
 
-	    hi = min (nrow, int(Memd[loval]))
+	    hi = min (nrow, ldint(Memd[loval]))
 	    eval[top] = rst_create (hi, nrow)
 
 	default:

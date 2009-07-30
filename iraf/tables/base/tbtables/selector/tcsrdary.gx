@@ -10,25 +10,27 @@ $endif
 
 pointer	tp			# i: table descriptor
 pointer	descrip			# i: column selector
-int	irow			# i: table row number
+long	irow			# i: table row number
 $if (datatype == c)
 int	maxch			# i: max length of string
 $endif
-int	maxbuf			# i: declared length of buffer
-int	nbuf			# o: length of output array
+long	maxbuf			# i: declared length of buffer
+long	nbuf			# o: length of output array
 $if (datatype == c)
 char	buffer[maxch,ARB]	# o: array of values
 $else
 PIXEL	buffer[ARB]		# o: array of values
 $endif
 #--
-int	idim, ndim, pdim, plen, psize, off
-int	axsize, axlen[MAXDIM], axpos[MAXDIM]
+int	idim, ndim, pdim
+long	plen, psize, off, axsize
+long	axpos[MAXDIM]
+long	axlen[MAXDIM]
 
 $if (datatype == c)
-int	tbagtt()
+long	tbagtt()
 $else
-int	tbagt$t()
+long	tbagt$t()
 $endif
 
 begin

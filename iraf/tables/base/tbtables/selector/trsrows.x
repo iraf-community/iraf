@@ -53,11 +53,12 @@ pointer procedure trsrows (tp, expr)
 pointer	tp		# i: table descriptor
 char	expr[ARB]	# i: expression to be evaluated
 #--
-int	iset, irow
+long	iset, irow
 pointer	pcode, code, set
+long	l_val
 
 bool	trscalc()
-int	rst_rownum()
+long	rst_rownum()
 pointer	trsopen(), rst_copy(), rst_create()
 errchk	trsopen, trscalc, trsclose
 
@@ -70,14 +71,15 @@ begin
 	# calculate the result for each element in the set
 
 	code = TRS_CODE (pcode)
-	if (Memi[code] == YDONE) {
+	if (CODE(code) == YDONE) {
 	    set = rst_copy (TRS_ROWS(pcode))
 
 	} else {
 	    # Start with an empty set. Calculate the result for each
 	    # element in the row set and if true, add it to the output set
 
-	    set = rst_create (0, 0)
+	    l_val = 0
+	    set = rst_create (l_val, l_val)
 
 	    iset = 1
 	    repeat {

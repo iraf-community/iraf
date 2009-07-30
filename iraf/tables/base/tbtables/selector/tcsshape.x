@@ -5,7 +5,7 @@ include "tcs.h"
 procedure tcs_shape (descrip, length, ndim, maxdimen)
 
 pointer	descrip		# i: column selector
-int	length[ARB]	# o: dimension lengths
+long	length[ARB]	# o: dimension lengths
 int	ndim		# o: number of dimensions
 int	maxdimen	# i: max number of dimensions 
 #--

@@ -18,8 +18,8 @@ begin
 	call rst_free (TRS_ROWS(trs))
 
 	call mfree (TRS_VALUE(trs), TY_DOUBLE)
-	call mfree (TRS_CODE(trs), TY_INT)
-	call mfree (trs, TY_INT)
+	call mfree (TRS_CODE(trs), TY_STRUCT)
+	call mfree (trs, TY_STRUCT)
 end
 
 

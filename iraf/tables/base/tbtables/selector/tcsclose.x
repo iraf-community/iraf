@@ -9,6 +9,6 @@ int	id
 
 begin
 	do id = 1, ndescrip
-	    call mfree (descrip[id], TY_INT)
+	    call mfree (descrip[id], TY_STRUCT)
 
 end

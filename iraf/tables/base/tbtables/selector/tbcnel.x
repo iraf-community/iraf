@@ -13,14 +13,14 @@ include <tbset.h>
 #
 # Phil Hodge,  5-Mar-1998  Function created.
 
-int procedure tbcnel (tp, cp)
+long procedure tbcnel (tp, cp)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 #--
 pointer descrip		# column selector descriptor (ignored)
-int	nrows		# number of selected rows
-int	nelem		# number of elements in one cell
+long	nrows		# number of selected rows
+long	nelem		# number of elements in one cell
 
 begin
 	call tbcnel1 (tp, cp, descrip, nelem, nrows)
@@ -33,12 +33,13 @@ procedure tbcnel1 (tp, cp, descrip, nelem, nrows)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 pointer descrip		# o: column selector descriptor
-int	nelem		# o: number of elements in one cell
-int	nrows		# o: number of selected rows
+long	nelem		# o: number of elements in one cell
+long	nrows		# o: number of selected rows
 #--
 pointer tbcdes()
-int	tcs_totsize()
-int	tbpsta(), tbalen()
+long	tcs_totsize()
+long	tbpstl()
+long	tbalen()
 
 begin
 	descrip = tbcdes (tp, cp)
@@ -48,5 +49,5 @@ begin
 	else
 	    nelem = tcs_totsize (descrip)
 
-	nrows = tbpsta (tp, TBL_NROWS)		# number of selected rows
+	nrows = tbpstl (tp, TBL_NROWS)		# number of selected rows
 end

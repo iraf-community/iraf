@@ -9,10 +9,11 @@ procedure omniread (file, dtype, data, nelem, ncol, maxcol)
 char	file[ARB]	# i: file name, including sections or selectors
 int	dtype		# i: data type of data to be read
 pointer	data[ARB]	# o: pointers to columns of output data
-int	nelem		# o: length of output columns
+long	nelem		# o: length of output columns
 int	ncol		# o: number of output columns
 int	maxcol		# i: maximum number of columns
 #--
+size_t	sz_val
 pointer	sp, project
 
 errchk	omniproject
@@ -22,8 +23,9 @@ begin
 	# indicating projection should not be done
 
 	call smark (sp)
-	call salloc (project, maxcol, TY_INT)
-	call aclri (Memi[project], maxcol)
+	sz_val = maxcol
+	call salloc (project, sz_val, TY_INT)
+	call aclri (Memi[project], sz_val)
 
 	call omniproject (file, dtype, Memi[project], 
 			  data, nelem, ncol, maxcol)
@@ -39,7 +41,7 @@ char	file[ARB]	# i: file name, including sections or selectors
 int	dtype		# i: data type of data to be read
 int	project		# i: axis to project multi-dimensional data on
 pointer	data[ARB]	# o: pointers to columns of output data
-int	nelem		# o: length of output columns
+long	nelem		# o: length of output columns
 int	ncol		# o: number of output columns
 int	maxcol		# i: maximum number of columns
 #--
@@ -79,11 +81,13 @@ procedure om_error (file, message)
 char	file[ARB]	# i: file name
 char	message[ARB]	# i: error message
 #--
+size_t	sz_val
 pointer	sp, text
 
 begin
 	call smark (sp)
-	call salloc (text, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (text, sz_val, TY_CHAR)
 
 	call sprintf (Memc[text], SZ_LINE, "%s (%s)\n")
 	call pargstr (message)
@@ -102,16 +106,20 @@ pointer	im		# i: image descriptor
 int	dtype		# i: data type of data to be read
 int	project		# i: axis to project multi-dimensional data on
 pointer	data		# o: pointers to columns of output data
-int	nelem		# o: length of output columns
+long	nelem		# o: length of output columns
 #--
-int	axis, nline
+size_t	sz_val
+size_t	sz_nelem
+long	axis
+long	nline
 pointer	sp, sum, vec, buf
+long	l_val
 
 string	badaxis  "Cannot project data on axis"
 string	badtype  "Unrecognized input datatype"
 
 double	asumd()
-int	imgnld()
+long	imgnld()
 errchk	om_error
 
 begin
@@ -126,13 +134,17 @@ begin
 	# converted to the output type
 
 	nelem = IM_LEN(im,project)
+	sz_nelem = nelem
 
 	call smark (sp)
-	call salloc (sum, nelem, TY_DOUBLE)
-	call salloc (vec, IM_MAXDIM, TY_LONG)
+	call salloc (sum, sz_nelem, TY_DOUBLE)
+	sz_val = IM_MAXDIM
+	call salloc (vec, sz_val, TY_LONG)
 
-	call aclrd (Memd[sum], nelem)
-	call amovkl (long(1), Meml[vec], IM_MAXDIM)
+	call aclrd (Memd[sum], sz_nelem)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[vec], sz_val)
 
 	# Sum the data. In the general case, we read each line, 
 	# get the index of the projected axis, compute the sum of 
@@ -142,7 +154,7 @@ begin
 
 	if (project == 1) {
 	    while (imgnld (im, buf, Meml[vec]) != EOF)
-		call aaddd (Memd[buf], Memd[sum], Memd[sum], nelem)
+		call aaddd (Memd[buf], Memd[sum], Memd[sum], sz_nelem)
 
 	} else {
 	    axis = Meml[vec+project-1]
@@ -162,23 +174,23 @@ begin
 		nline  = nline * IM_LEN(im,axis)
 	}
 
-	call adivkd (Memd[sum], double(nline), Memd[sum], nelem)
+	call adivkd (Memd[sum], double(nline), Memd[sum], sz_nelem)
 
 	# Copy the result to an array of the proper data type
 
-	call malloc (data, nelem, dtype)
+	call malloc (data, sz_nelem, dtype)
 
 	switch (dtype) {
 	case TY_SHORT:
-	    call achtds (Memd[sum], Mems[data], nelem)
+	    call achtds (Memd[sum], Mems[data], sz_nelem)
 	case TY_INT:
-	    call achtdi (Memd[sum], Memi[data], nelem)
+	    call achtdi (Memd[sum], Memi[data], sz_nelem)
 	case TY_LONG:
-	    call achtdl (Memd[sum], Meml[data], nelem)
+	    call achtdl (Memd[sum], Meml[data], sz_nelem)
 	case TY_REAL:
-	    call achtdr (Memd[sum], Memr[data], nelem)
+	    call achtdr (Memd[sum], Memr[data], sz_nelem)
 	case TY_DOUBLE:
-	    call amovd (Memd[sum], Memd[data], nelem)
+	    call amovd (Memd[sum], Memd[data], sz_nelem)
 	default:
 	    call om_error (IM_NAME(im), badtype)
 	}
@@ -192,13 +204,15 @@ end
 procedure om_projtab (array, length, ndim, project, dtype, line)
 					 
 double	array[ARB]	# i: input array
-int	length[ARB]	# i: array shape
+long	length[ARB]	# i: array shape
 int	ndim		# i: number of array dimensions
 int	project		# i: axis to project onto
 int	dtype		# i: datatype of output line
 pointer	line		# o: output line
 #--
-int	linelen, elem, axis, idim
+size_t	sz_val
+int	idim
+long	axis, linelen, elem, l_val
 pointer	sp, sum, nsum, vec
 
 string	badtype  "om_projtab: illegal datatype"
@@ -209,22 +223,27 @@ begin
 	linelen = length[project]
 
 	call smark (sp)
-	call salloc (sum, linelen, TY_DOUBLE)
-	call salloc (nsum, linelen, TY_INT)
-	call salloc (vec, ndim, TY_INT)
+	sz_val = linelen
+	call salloc (sum, sz_val, TY_DOUBLE)
+	call salloc (nsum, sz_val, TY_INT)
+	sz_val = ndim
+	call salloc (vec, sz_val, TY_LONG)
 
 	# Initialize arrays
 
-	call amovkd (double(0.0), Memd[sum], linelen)
-	call amovki (0, Memi[nsum], linelen)
-	call amovki (1, Memi[vec], ndim)
+	sz_val = linelen
+	call amovkd (double(0.0), Memd[sum], sz_val)
+	call amovki (0, Memi[nsum], sz_val)
+	l_val = 1
+	sz_val = ndim
+	call amovkl (l_val, Meml[vec], sz_val)
 
 	elem = 1
 	repeat {
 	    # Determine which line element the array element is projected
 	    # onto and add it to the sum
 
-	    axis = Memi[vec+project-1]
+	    axis = Meml[vec+project-1]
 	    Memd[sum+axis-1] = Memd[sum+axis-1] + array[elem]
 	    Memi[nsum+axis-1] = Memi[nsum+axis-1] + 1
 
@@ -232,9 +251,9 @@ begin
 
 	    elem = elem + 1
 	    for (idim = 1; idim <= ndim; idim = idim +1) {
-		Memi[vec+idim-1] = Memi[vec+idim-1] + 1
-		if (Memi[vec+idim-1] > length[idim]) {
-		    Memi[vec+idim-1] = 1
+		Meml[vec+idim-1] = Meml[vec+idim-1] + 1
+		if (Meml[vec+idim-1] > length[idim]) {
+		    Meml[vec+idim-1] = 1
 		} else {
 		    break
 		}
@@ -279,11 +298,13 @@ pointer	rcode		# i: row selector
 int	dtype		# i: data type of output columns
 int	project		# i: axis to project multi-dimensional data on
 pointer	data[ARB]	# o: pointers to output columns
-int	nelem		# o: length of each output column
+long	nelem		# o: length of each output column
 int	ncol		# i: number of columns
 #--
+size_t	sz_val
 bool	done
-int	irow, nrow, icol, coltype, osize, size, ndim
+long	irow, nrow, osize, size
+int	icol, coltype, ndim
 pointer	sp, length, file, olddata
 
 string	ambiguous  "More than one row matches in file"
@@ -291,15 +312,17 @@ string	badtype    "Unrecognized input datatype"
 string	badsize    "All arrays are not the same length"
 
 bool	trseval()
-int	tbpsta(), tcs_totsize()
+long	tbpstl(), tcs_totsize()
 errchk	trseval, om_error, tcs_rdarys, tcs_rdaryi, tcs_rdaryr, tcsrdaryd
 
 begin
 	# Allocate temporary arrays
 
 	call smark (sp)
-	call salloc (length, IM_MAXDIM, TY_INT)
-	call salloc (file, SZ_PATHNAME, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (length, sz_val, TY_LONG)
+	sz_val = SZ_PATHNAME
+	call salloc (file, sz_val, TY_CHAR)
 
 	# Get table name for error messages
 
@@ -309,7 +332,7 @@ begin
 	# It is an error to have more than one row match
 
 	done = false
-	nrow = tbpsta (tp, TBL_NROWS)
+	nrow = tbpstl (tp, TBL_NROWS)
 	do irow = 1, nrow {
 	    if (trseval (tp, irow, rcode)) {
 		if (done)
@@ -330,13 +353,14 @@ begin
 		    # Read the array from the table
 
 		    osize = tcs_totsize (col[icol])
-		    call malloc (data[icol], osize, coltype)
+		    sz_val = osize
+		    call malloc (data[icol], sz_val, coltype)
 
 		    switch (coltype) {
 		    case TY_SHORT:
 			call tcs_rdarys (tp, col[icol], irow, osize, 
 					 size, Mems[data[icol]])
-		    case TY_INT, TY_LONG:
+		    case TY_INT:
 			call tcs_rdaryi (tp, col[icol], irow, osize, 
 					 size, Memi[data[icol]])
 		    case TY_REAL:
@@ -354,15 +378,16 @@ begin
 			# Project a multi-dimensional array onto
 			# a single dimension
 
-			call tcs_shape (col[icol], Memi[length], 
+			call tcs_shape (col[icol], Meml[length], 
 					ndim, IM_MAXDIM)
 
-			size = Memi[length+project-1]
+			size = Meml[length+project-1]
 
 			olddata = data[icol]
-			call malloc (data[icol], size, dtype)
+			sz_val = size
+			call malloc (data[icol], sz_val, dtype)
 
-			call om_projtab (Memd[olddata], Memi[length], ndim,
+			call om_projtab (Memd[olddata], Meml[length], ndim,
 					 project, dtype, data[icol])
 
 			call mfree (olddata, TY_DOUBLE)
@@ -371,8 +396,9 @@ begin
 			# Copy integer data to a long array
 
 			olddata = data[icol]
-			call malloc (data[icol], size, dtype)
-			call achtil (Memi[olddata], Meml[data[icol]], size)
+			sz_val = size
+			call malloc (data[icol], sz_val, TY_LONG)
+			call achtil (Memi[olddata], Meml[data[icol]], sz_val)
 			call mfree (olddata, TY_INT)
 		    }
 
@@ -398,8 +424,9 @@ char	file[ARB]	# i: file name, including sections or selectors
 int	dtype		# i: data type of data to be read
 int	project		# i: axis to project multi-dimensional data on
 pointer	data		# o: pointers to columns of output data
-int	nelem		# o: length of output columns
+long	nelem		# o: length of output columns
 #--
+size_t	sz_nelem
 pointer	im, buf
 
 string	notline  "Cannot read multi-dimensional data"
@@ -410,11 +437,13 @@ pointer	immap(), imgl1s(), imgl1i(), imgl1l(), imgl1r(), imgl1d()
 
 errchk	immap, om_error, om_projim
 
+include	<nullptr.inc>
+
 begin
 	data = NULL
 	nelem = 0
 
-	im = immap (file, READ_ONLY, NULL)
+	im = immap (file, READ_ONLY, NULLPTR)
 
 	if (project == 0 || IM_NDIM(im) == 1) {
 	    # No projection, so check to see if the image is really 
@@ -428,24 +457,25 @@ begin
 		call om_error (file, badaxis)
 
 	    nelem = IM_LEN(im,1)
-	    call malloc (data, nelem, dtype)
+	    sz_nelem = nelem
+	    call malloc (data, sz_nelem, dtype)
 
 	    switch (dtype) {
 	    case TY_SHORT:
 		buf = imgl1s (im)
-		call amovs (Mems[buf], Mems[data], nelem)
+		call amovs (Mems[buf], Mems[data], sz_nelem)
 	    case TY_INT:
 		buf = imgl1i (im)
-		call amovi (Memi[buf], Memi[data], nelem)
+		call amovi (Memi[buf], Memi[data], sz_nelem)
 	    case TY_LONG:
 		buf = imgl1l (im)
-		call amovl (Meml[buf], Meml[data], nelem)
+		call amovl (Meml[buf], Meml[data], sz_nelem)
 	    case TY_REAL:
 		buf = imgl1r (im)
-		call amovr (Memr[buf], Memr[data], nelem)
+		call amovr (Memr[buf], Memr[data], sz_nelem)
 	    case TY_DOUBLE:
 		buf = imgl1d (im)
-		call amovd (Memd[buf], Memd[data], nelem)
+		call amovd (Memd[buf], Memd[data], sz_nelem)
 	    default:
 		call om_error (file, badtype)
 	    }
@@ -466,14 +496,16 @@ pointer	col[ARB]	# i: column selectors
 pointer	rcode		# i: row selector
 int	dtype		# i: data type of output columns
 pointer	data[ARB]	# o: pointers to output columns
-int	nelem		# o: length of each output column
+long	nelem		# o: length of each output column
 int	ncol		# i: number of columns
 #--
-int	irow, nrow, icol, ival
+size_t	sz_val
+long	irow, nrow
+int	icol, ival
 pointer	sp, cp
 
 bool	trseval()
-int	tbpsta()
+long	tbpstl()
 pointer	tcs_column()
 errchk	trseval, tbegts, tbegti, tbegtr, tbegtd
 
@@ -481,13 +513,14 @@ begin
 	# Allocate arrays to read data and 
 	# get column pointers from selectors
 
-	nrow = tbpsta (tp, TBL_NROWS)
+	nrow = tbpstl (tp, TBL_NROWS)
 
 	call smark (sp)
-	call salloc (cp, ncol, TY_INT)
+	sz_val = ncol
+	call salloc (cp, sz_val, TY_POINTER)
 
 	do icol = 1, ncol {
-	    Memi[cp+icol-1] = tcs_column (col[icol])
+	    Memp[cp+icol-1] = tcs_column (col[icol])
 	    call malloc (data[icol], nrow, dtype)
 	}
 
@@ -501,24 +534,24 @@ begin
 		switch (dtype) {
 		case TY_SHORT:
 		    do icol = 1, ncol
-			call tbegts (tp, Memi[cp+icol-1], irow, 
+			call tbegts (tp, Memp[cp+icol-1], irow, 
 				     Mems[data[icol]+nelem])
 		case TY_INT:
 		    do icol = 1, ncol
-			call tbegti (tp, Memi[cp+icol-1], irow, 
+			call tbegti (tp, Memp[cp+icol-1], irow, 
 				     Memi[data[icol]+nelem])
 		case TY_LONG:
 		    do icol = 1, ncol {
-			call tbegti (tp, Memi[cp+icol-1], irow, ival)
-			Memi[data[icol]+nelem] = ival
+			call tbegti (tp, Memp[cp+icol-1], irow, ival)
+			Meml[data[icol]+nelem] = ival
 		    }
 		case TY_REAL:
 		    do icol = 1, ncol
-			call tbegtr (tp, Memi[cp+icol-1], irow, 
+			call tbegtr (tp, Memp[cp+icol-1], irow, 
 				     Memr[data[icol]+nelem])
 		case TY_DOUBLE:
 		    do icol = 1, ncol
-			call tbegtd (tp, Memi[cp+icol-1], irow, 
+			call tbegtd (tp, Memp[cp+icol-1], irow, 
 				     Memd[data[icol]+nelem])
 		}
 
@@ -548,11 +581,13 @@ char	file[ARB]	# i: file name, including sections or selectors
 int	dtype		# i: data type of data to be read
 int	project		# i: axis to project multi-dimensional data on
 pointer	data[ARB]	# o: pointers to columns of output data
-int	nelem		# o: length of output columns
+long	nelem		# o: length of output columns
 int	ncol		# o: number of output columns
 int	maxcol		# i: maximum number of columns
 #--
-int	nscalar, icol, length, ndim
+size_t	sz_val
+int	nscalar, icol, ndim
+long	length
 pointer	tp, sp, col, root, rowselect, colselect, rcode
 
 string	nodata   "Could not read data from file"
@@ -564,33 +599,37 @@ pointer	tbtopn(), trsopen()
 
 errchk	rdselect, tbtopn, tcs_open, trsopen, om_error
 
+include	<nullptr.inc>
+
 begin
 	# Break the table name into its various parts
 
 	call smark (sp)
-	call salloc (col, maxcol, TY_INT)
-	call salloc (root, SZ_PATHNAME, TY_CHAR)
-	call salloc (rowselect, SZ_PATHNAME, TY_CHAR)
-	call salloc (colselect, SZ_PATHNAME, TY_CHAR)
+	sz_val = maxcol
+	call salloc (col, sz_val, TY_POINTER)
+	sz_val = SZ_PATHNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (rowselect, sz_val, TY_CHAR)
+	call salloc (colselect, sz_val, TY_CHAR)
 
 	call rdselect (file, Memc[root], Memc[rowselect], 
 		       Memc[colselect], SZ_PATHNAME)
 
 	# Open then table
 
-	tp = tbtopn (Memc[root], READ_ONLY, NULL)
+	tp = tbtopn (Memc[root], READ_ONLY, NULLPTR)
 
 	# Check to see if we are dealing with scalar or array columns
 	# It is an error to mix scalar and array columns in one call.
 
-	call tcs_open (tp, Memc[colselect], Memi[col], ncol, maxcol)
+	call tcs_open (tp, Memc[colselect], Memp[col], ncol, maxcol)
 
 	if (ncol == 0)
 	    call om_error (file, nodata)
 
 	nscalar = 0
 	do icol = 1, ncol {
-	    call tcs_shape (Memi[col+icol-1], length, ndim, 1)
+	    call tcs_shape (Memp[col+icol-1], length, ndim, 1)
 	    if (ndim == 0)
 		nscalar = nscalar + 1
 	}
@@ -606,13 +645,13 @@ begin
 		    call om_error (file, badaxis)
 	    }
 
-	    call om_rdscalar (tp, Memi[col], rcode, dtype, 
+	    call om_rdscalar (tp, Memp[col], rcode, dtype, 
 			      data, nelem, ncol)
 	    if (nelem == 0)
 		call om_error (file, norows)
 
 	} else if (nscalar == 0) {
-	    call om_rdarray (tp, Memi[col], rcode, dtype, 
+	    call om_rdarray (tp, Memp[col], rcode, dtype, 
 			     project, data, nelem, ncol)
 
 	} else {
@@ -620,6 +659,6 @@ begin
 	}
 
 	call trsclose (rcode)
-	call tcs_close (Memi[col], ncol)
+	call tcs_close (Memp[col], ncol)
 	call tbtclo (tp)
 end

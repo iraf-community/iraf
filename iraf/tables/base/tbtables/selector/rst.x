@@ -57,16 +57,16 @@ these functions. Or ask Bernie Simon (bsimon@stsci.edu).
 define	LEN_RST		6		# length of row set structure
 define	LEN_TAIL	5		# length of tail structure
 
-define	RST_LAST	Memi[$1]	# last element in row set
-define	RST_MAX		Memi[$1+1]	# max elements in row set
-define	RST_CURRENT	Memi[$1+2]	# current element in row set	
-define	RST_LOARY	Memi[$1+3]	# array of low range ends
-define	RST_HIARY	Memi[$1+4]	# array of high range ends
-define	RST_NUMARY	Memi[$1+5]	# array of cumulative number of rows
+define	RST_LAST	Memi[P2I($1)]	# last element in row set
+define	RST_MAX		Memi[P2I($1+1)]	# max elements in row set
+define	RST_CURRENT	Memi[P2I($1+2)]	# current element in row set	
+define	RST_LOARY	Memp[$1+3]	# array of low range ends
+define	RST_HIARY	Memp[$1+4]	# array of high range ends
+define	RST_NUMARY	Memp[$1+5]	# array of cumulative number of rows
 
-define	RST_LOVAL	Memi[RST_LOARY($1)+($2)-1]
-define	RST_HIVAL	Memi[RST_HIARY($1)+($2)-1]
-define	RST_NROW	Memi[RST_NUMARY($1)+($2)-1]
+define	RST_LOVAL	Meml[RST_LOARY($1)+($2)-1]
+define	RST_HIVAL	Meml[RST_HIARY($1)+($2)-1]
+define	RST_NROW	Meml[RST_NUMARY($1)+($2)-1]
 
 # RST_ADDTAB -- Update set to reflect inserted rows in underlying table
 #
@@ -77,10 +77,11 @@ define	RST_NROW	Memi[RST_NUMARY($1)+($2)-1]
 procedure rst_addtab (set, loval, nval)
 
 pointer	set		# i: row set
-int	loval		# i: rows are inserted after this row
-int	nval		# i: number of rows inserted
+long	loval		# i: rows are inserted after this row
+long	nval		# i: number of rows inserted
 #--
-int	idx, ndx, hival, range[2]
+int	idx, ndx
+long	hival, range[2]
 pointer	tail
 
 int	rst_findloc()
@@ -137,10 +138,11 @@ end
 procedure rst_addval (set, value)
 
 pointer	set		# i: row set
-int	value		# i:value to add
+long	value		# i:value to add
 #--
 int	idx
 pointer	tail
+long	l_val
 
 int	rst_findloc()
 pointer	rst_tail()
@@ -173,7 +175,8 @@ begin
 
 	# Restore the tail to the set
 
-	call rst_concat (set, tail, 0)
+	l_val = 0
+	call rst_concat (set, tail, l_val)
 	call rst_notail (tail)
 
 end
@@ -187,15 +190,18 @@ pointer procedure rst_and (set1, set2)
 pointer	set1		# i: first row set
 pointer	set2		# i: second row set
 #--
-int	idx1, idx2, loval3, loval4, hival3, hival4
+int	idx1, idx2
+long	loval3, loval4, hival3, hival4
 pointer	set3
+long	l_val
 
 pointer	rst_create()
 
 begin
 	# Create output row set
 
-	set3 = rst_create (0, 0)
+	l_val = 0
+	set3 = rst_create (l_val, l_val)
 
 	# Main loop: intersection of two sets
 
@@ -306,26 +312,30 @@ pointer procedure rst_copy (set1)
 
 pointer	set1		# i: row set
 #--
+size_t	sz_val
 int	last, max
 pointer	set2
 
 begin
-	call malloc (set2, LEN_RST, TY_INT)
+	sz_val = LEN_RST
+	call malloc (set2, sz_val, TY_STRUCT)
 
 	last = RST_LAST(set1)
 	max = RST_MAX(set1)
 
-	call malloc (RST_LOARY(set2), max, TY_INT)
-	call malloc (RST_HIARY(set2), max, TY_INT)
-	call malloc (RST_NUMARY(set2), max, TY_INT)
+	sz_val = max
+	call malloc (RST_LOARY(set2), sz_val, TY_LONG)
+	call malloc (RST_HIARY(set2), sz_val, TY_LONG)
+	call malloc (RST_NUMARY(set2), sz_val, TY_LONG)
 
 	RST_LAST(set2) = last
 	RST_MAX(set2) = max
 	RST_CURRENT(set2) = 0
 
-	call amovi (RST_LOVAL(set1,1), RST_LOVAL(set2,1), last)
-	call amovi (RST_HIVAL(set1,1), RST_HIVAL(set2,1), last)
-	call amovi (RST_NROW(set1,1), RST_NROW(set2,1), last)
+	sz_val = last
+	call amovl (RST_LOVAL(set1,1), RST_LOVAL(set2,1), sz_val)
+	call amovl (RST_HIVAL(set1,1), RST_HIVAL(set2,1), sz_val)
+	call amovl (RST_NROW(set1,1), RST_NROW(set2,1), sz_val)
 
 	return (set2)
 end
@@ -338,18 +348,21 @@ end
 
 pointer procedure rst_create (loval, hival)
 
-int	loval		# i: low end of range
-int	hival		# i: high end of range
+long	loval		# i: low end of range
+long	hival		# i: high end of range
 #--
-int	temp	
+size_t	sz_val
+long	temp
 pointer	set
 
 begin
-	call malloc (set, LEN_RST, TY_INT)
+	sz_val = LEN_RST
+	call malloc (set, sz_val, TY_STRUCT)
 
-	call malloc (RST_LOARY(set), 1, TY_INT)
-	call malloc (RST_HIARY(set), 1, TY_INT)
-	call malloc (RST_NUMARY(set), 1, TY_INT)
+	sz_val = 1
+	call malloc (RST_LOARY(set), sz_val, TY_LONG)
+	call malloc (RST_HIARY(set), sz_val, TY_LONG)
+	call malloc (RST_NUMARY(set), sz_val, TY_LONG)
 
 	RST_MAX(set) = 1
 	RST_CURRENT(set) = 0
@@ -382,10 +395,12 @@ end
 procedure rst_deltab (set, loval, nval)
 
 pointer set		# u: row set
-int	loval		# i: first row deleted in underlying table
-int	nval		# i: number of rows deleted in underlying table
+long	loval		# i: first row deleted in underlying table
+long	nval		# i: number of rows deleted in underlying table
 #--
-int	idx, jdx, ndx, hival, range[2,2]
+int	idx, jdx, ndx
+long	hival
+long	range[2,2]
 pointer	tail
 
 int	rst_findloc()
@@ -453,10 +468,12 @@ end
 procedure rst_delval (set, value)
 
 pointer	set		# u: row set
-int	value		# i:value to add
+long	value		# i:value to add
 #--
-int	idx, jdx, ndx, range[2,2]
+int	idx, jdx, ndx
+long	range[2,2]
 pointer	tail
+long	l_val
 
 int	rst_findloc()
 pointer	rst_tail()
@@ -511,7 +528,8 @@ begin
 
 	# Restore the tail to the set
 
-	call rst_concat (set, tail, 0)
+	l_val = 0
+	call rst_concat (set, tail, l_val)
 	call rst_notail (tail)
 
 end
@@ -526,11 +544,11 @@ pointer	set		# i: row set
 #--
 
 begin
-	call mfree (RST_NUMARY(set), TY_INT)
-	call mfree (RST_HIARY(set), TY_INT)
-	call mfree (RST_LOARY(set), TY_INT)
+	call mfree (RST_NUMARY(set), TY_LONG)
+	call mfree (RST_HIARY(set), TY_LONG)
+	call mfree (RST_LOARY(set), TY_LONG)
 
-	call mfree (set, TY_INT)
+	call mfree (set, TY_STRUCT)
 end
 
 # RST_INSET -- Return true if value is in set
@@ -538,7 +556,7 @@ end
 bool procedure rst_inset (set, value)
 
 pointer	set		# i: row set
-int	value		# i: value to be checked
+long	value		# i: value to be checked
 #--
 bool	result
 int	idx
@@ -559,11 +577,11 @@ end
 
 # RST_NELEM -- Number of elements in a set
 
-int procedure rst_nelem (set)
+long procedure rst_nelem (set)
 
 pointer	set		# i: row set
 #--
-int	nelem
+long	nelem
 
 begin
 	if (RST_LAST(set) == 0) {
@@ -584,16 +602,19 @@ end
 
 pointer procedure rst_not (nrow, set1)
 
-int	nrow 		# i: largest possible value in set
+long	nrow 		# i: largest possible value in set
 pointer	set1		# i: set to be negated
 #--
-int	idx1, loval2, hival2
+int	idx1
+long	loval2, hival2
 pointer	set2
+long	l_val
 
 pointer	rst_create()
 
 begin
-	set2 = rst_create (0,0)
+	l_val = 0
+	set2 = rst_create (l_val, l_val)
 
 	loval2 = 1
 	do idx1 = 1, RST_LAST(set1) {
@@ -622,15 +643,18 @@ pointer procedure rst_or (set1, set2)
 pointer	set1		# i: first row set
 pointer	set2		# i: second row set
 #--
-int	idx1, idx2, loval3, hival3
+int	idx1, idx2
+long	loval3, hival3
 pointer	set3
+long	l_val
 
 pointer	rst_create()
 
 begin
 	# Create output row set
 
-	set3 = rst_create (0, 0)
+	l_val = 0
+	set3 = rst_create (l_val, l_val)
 
 	# Main loop: union of two sets
 
@@ -735,12 +759,13 @@ end
 # a compromise between sequential and binary search. The procedure uses 
 # the current row pointer as hint on where to locate the new row.
 
-int procedure rst_rownum (set, index)
+long procedure rst_rownum (set, index)
 
 pointer	set		# i: row set
-int	index		# i: index into the set
+long	index		# i: index into the set
 #--
-int	inc, hi, lo, mid, irow
+int	inc, hi, lo, mid
+long	irow
 
 begin
 	# Search for a bracket containing the element 
@@ -835,18 +860,18 @@ char	str[ARB]	# o: string representation of set
 int	maxch		# i: maximum length of string
 #--
 int	ic, idx
-int	itoc()
+int	ltoc()
 
 begin
 	ic = 1
 	do idx = 1, RST_LAST(set) {
-	    ic = ic + itoc (RST_LOVAL(set,idx), str[ic], maxch-ic)
+	    ic = ic + ltoc (RST_LOVAL(set,idx), str[ic], maxch-ic)
 
 	    if (RST_LOVAL(set,idx) != RST_HIVAL(set,idx)) {
 		str[ic] = ':'
 		ic = ic + 1
 
-		ic = ic + itoc (RST_HIVAL(set,idx), str[ic], maxch-ic)
+		ic = ic + ltoc (RST_HIVAL(set,idx), str[ic], maxch-ic)
 	    }
 
 	    str[ic] = ','
@@ -869,10 +894,12 @@ end
 procedure rst_addrange (set, loval, hival) 
 
 pointer	set		# u: row set
-int	loval		# i: low end of range
-int	hival		# i: high end of range
+long	loval		# i: low end of range
+long	hival		# i: high end of range
 #--
-int	last, nrow
+size_t	sz_val
+int	last
+long	nrow
 
 begin
 
@@ -904,9 +931,10 @@ begin
 	if (last > RST_MAX(set)) {
 	    RST_MAX(set) = 2 * RST_MAX(set)
 
-	    call realloc (RST_LOARY(set), RST_MAX(set), TY_INT)
-	    call realloc (RST_HIARY(set), RST_MAX(set), TY_INT)
-	    call realloc (RST_NUMARY(set), RST_MAX(set), TY_INT)
+	    sz_val = RST_MAX(set)
+	    call realloc (RST_LOARY(set), sz_val, TY_LONG)
+	    call realloc (RST_HIARY(set), sz_val, TY_LONG)
+	    call realloc (RST_NUMARY(set), sz_val, TY_LONG)
 	}
 
 	# Set array values
@@ -922,7 +950,7 @@ procedure rst_concat (set, tail, shift)
 
 pointer	set	# u: row set
 pointer	tail	# i: tail structure
-int	shift	# i: Amount to shift each value by
+long	shift	# i: Amount to shift each value by
 #--
 int	idx
 
@@ -938,7 +966,7 @@ end
 int procedure rst_findloc (set, value)
 
 pointer	set		# i: row set
-int	value		# i: value whose location is sought
+long	value		# i: value whose location is sought
 #--
 int	inc, hi, lo, mid
 
@@ -1018,12 +1046,12 @@ pointer	tail		# u: tail structure
 
 begin
 	if (RST_HIARY(tail) != NULL)
-	    call mfree (RST_HIARY(tail), TY_INT)
+	    call mfree (RST_HIARY(tail), TY_LONG)
 
 	if (RST_LOARY(tail) != NULL)
-	    call mfree (RST_LOARY(tail), TY_INT)
+	    call mfree (RST_LOARY(tail), TY_LONG)
 
-	call mfree (tail, TY_INT)
+	call mfree (tail, TY_STRUCT)
 end
 
 # RST_TAIL -- Copy the tail of a row set into another structure (low level)
@@ -1033,12 +1061,14 @@ pointer procedure rst_tail (set, idx)
 pointer	set		# i: row set
 int	idx		# i: index of where copy starts
 #--
+size_t	sz_val
 pointer	tail
 
 begin
 	# Allocate and initialize structure
 
-	call malloc (tail, LEN_TAIL, TY_INT)
+	sz_val = LEN_TAIL
+	call malloc (tail, sz_val, TY_STRUCT)
 
 	RST_LAST(tail) = max (RST_LAST(set) - idx + 1, 0)
 	RST_MAX(tail) = RST_LAST(tail)
@@ -1053,13 +1083,15 @@ begin
 	} else {
 	    # Allocate memory for data arrays
 
-	    call malloc (RST_LOARY(tail), RST_LAST(tail), TY_INT)
-	    call malloc (RST_HIARY(tail), RST_LAST(tail), TY_INT)
+	    sz_val = RST_LAST(tail)
+	    call malloc (RST_LOARY(tail), sz_val, TY_LONG)
+	    call malloc (RST_HIARY(tail), sz_val, TY_LONG)
 
 	    # Copy data from old structure to data arrays
 
-	    call amovi (RST_LOVAL(set,idx), RST_LOVAL(tail,1), RST_LAST(tail))
-	    call amovi (RST_HIVAL(set,idx), RST_HIVAL(tail,1), RST_LAST(tail))
+	    sz_val = RST_LAST(tail)
+	    call amovl (RST_LOVAL(set,idx), RST_LOVAL(tail,1), sz_val)
+	    call amovl (RST_HIVAL(set,idx), RST_HIVAL(tail,1), sz_val)
 	}
 
 	# Return 

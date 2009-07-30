@@ -4,15 +4,15 @@
 
 # SELROWS -- Count how many rows are selected by an expression
 
-int procedure selrows (tp, expr)
+long procedure selrows (tp, expr)
 
 pointer	tp		# i: table descriptor
 char	expr[ARB]	# i: expression to be evaluated
 #--
-int	nrow
+long	nrow
 pointer	set
 
-int	rst_nelem()
+long	rst_nelem()
 pointer	trsrows()
 errchk	trsrows
 
