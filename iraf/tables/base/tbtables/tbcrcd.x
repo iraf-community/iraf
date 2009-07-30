@@ -25,13 +25,13 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 int	colnum			# i: column number
 #--
+size_t	sz_val
 pointer sp
 pointer coldef			# column descriptor read from table
 pointer pformat			# scratch for print format
 long	offset			# location of column descriptor in table file
 int	stat			# status from read operation
-int	read()
-int	tbalen()
+long	read(), tbalen()
 
 errchk	seek, read
 
@@ -40,14 +40,17 @@ begin
 	    call error (1, "tbcrcd:  internal error")
 
 	call smark (sp)
-	call salloc (coldef, LEN_COLDEF, TY_STRUCT)
-	call salloc (pformat, SZ_COLFMT, TY_CHAR)
+	sz_val = LEN_COLDEF
+	call salloc (coldef, sz_val, TY_STRUCT)
+	sz_val = SZ_COLFMT
+	call salloc (pformat, sz_val, TY_CHAR)
 
 	offset = SZ_SIZINFO +
 		TB_MAXPAR(tp) * SZ_PACKED_REC +
 		(colnum-1) * SZ_COLDEF + 1
 	call seek (TB_FILE(tp), offset)
-	stat = read (TB_FILE(tp), Memi[coldef], SZ_COLDEF)
+	sz_val = SZ_COLDEF
+	stat = read (TB_FILE(tp), Memc[P2C(coldef)], sz_val)
 	if (stat == EOF)
 	    call error (ER_TBCINFMISSING,
 			"tbcrcd:  EOF while reading column info for table")
@@ -70,17 +73,20 @@ begin
 
 	call tbbncp1 (CD_COL_NAME(coldef), COL_NAME(cp),
 		SZ_CD_COLNAME / SZB_CHAR)
-	call strupk (COL_NAME(cp), COL_NAME(cp), SZ_COLNAME)
+	sz_val = SZ_COLNAME
+	call strupk (COL_NAME(cp), COL_NAME(cp), sz_val)
 
 	call tbbncp1 (CD_COL_UNITS(coldef), COL_UNITS(cp),
 		SZ_CD_COLUNITS / SZB_CHAR)
-	call strupk (COL_UNITS(cp), COL_UNITS(cp), SZ_COLUNITS)
+	sz_val = SZ_COLUNITS
+	call strupk (COL_UNITS(cp), COL_UNITS(cp), sz_val)
 
 	# include a leading '%' in the print format
 	Memc[pformat] = '%'
 	call tbbncp1 (CD_COL_FMT(coldef), Memc[pformat+1],
 		SZ_CD_COLFMT / SZB_CHAR)
-	call strupk (Memc[pformat+1], Memc[pformat+1], SZ_COLFMT-1)
+	sz_val = SZ_COLFMT-1
+	call strupk (Memc[pformat+1], Memc[pformat+1], sz_val)
 	call strcpy (Memc[pformat], COL_FMT(cp), SZ_COLFMT)
 
 	call sfree (sp)
@@ -113,13 +119,13 @@ end
 # tbalen -- number of elements in array
 # This routine returns the number of elements in a table entry.
 
-int procedure tbalen (cptr)
+long procedure tbalen (cptr)
 
 pointer cptr		# i: pointer to column descriptor
 #--
-int	clen		# length in char of entire entry
-int	value		# this will be returned
-int	tbeszt()	# size in char of one element of type text
+long	clen		# length in char of entire entry
+long	value		# this will be returned
+long	tbeszt()	# size in char of one element of type text
 
 begin
 	clen = COL_LEN(cptr)

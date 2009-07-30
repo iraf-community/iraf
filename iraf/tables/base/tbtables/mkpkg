@@ -54,6 +54,7 @@ libtbtables.a:
 	tbcgt.x		<tbset.h> tbtables.h tblerr.h
 	tbciga.x	<tbset.h> tbtables.h
 	tbcigi.x	<mach.h> <tbset.h> tbtables.h tblerr.h
+	tbcigl.x	<mach.h> <tbset.h> tbtables.h tblerr.h
 	tbcigt.x	<tbset.h> tbtables.h tblerr.h
 	tbcinf.x	<mach.h> <tbset.h> tbtables.h
 	tbcnam.x	<tbset.h> tbtables.h

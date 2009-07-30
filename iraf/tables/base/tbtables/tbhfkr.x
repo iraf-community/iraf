@@ -23,6 +23,7 @@ int	dtype			# o: data type (TY_CHAR, etc)
 char	str[SZ_PARREC]		# o: the string containing the value
 int	parnum			# o: parameter number or zero if not found
 #--
+size_t	sz_val
 pointer sp
 pointer par			# buffer for parameter record
 char	uckey[SZ_KEYWORD]	# keyword converted to upper case
@@ -34,7 +35,8 @@ errchk	tbhgnp
 
 begin
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 
 	call strcpy (keyword, uckey, SZ_KEYWORD)
 	call strupr (uckey)

@@ -37,7 +37,7 @@ procedure tbzrds (tp, buf, line, line_type)
 
 pointer tp		# i: pointer to table descriptor
 char	buf[ARB]	# io: buffer for input line
-int	line		# io: line number in input file
+long	line		# io: line number in input file
 int	line_type	# io: type of line read by tbzlin
 #--
 pointer sp
@@ -49,7 +49,7 @@ char	pform[SZ_COLFMT]	# print format
 int	fd		# fd for the file
 int	width		# width of field for printing
 int	precision	# for print format
-int	row		# row number (can be from more than one line)
+long	row		# row number (can be from more than one line)
 int	colnum		# column number
 bool	first		# is current line the first non-comment line?
 bool	done

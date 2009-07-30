@@ -20,11 +20,12 @@ pointer sp
 pointer pbuf			# buffer for user parameters
 pointer blank			# buffer for extra (blank) user param records
 long	oldoff, newoff		# offsets from start of old & new files
-int	pbufsiz			# size of buffer pointed to by pbuf
+size_t	pbufsiz			# size of buffer pointed to by pbuf
 int	k			# loop index
 int	n_copy			# number of user-parameter records to copy
-int	stat
-int	read()
+long	stat
+size_t	sz_val
+long	read()
 errchk	seek, read, write
 
 begin
@@ -41,20 +42,25 @@ begin
 	do k = 1, n_copy {
 	    call seek (oldfd, oldoff)
 	    call seek (newfd, newoff)
-	    stat = read (oldfd, Memc[pbuf], SZ_PACKED_REC)
-	    call write (newfd, Memc[pbuf], SZ_PACKED_REC)
+	    sz_val = SZ_PACKED_REC
+	    stat = read (oldfd, Memc[pbuf], sz_val)
+	    sz_val = SZ_PACKED_REC
+	    call write (newfd, Memc[pbuf], sz_val)
 	    oldoff = oldoff + SZ_PACKED_REC
 	    newoff = newoff + SZ_PACKED_REC
 	}
 	# Fill out the rest of the space (if any) for user parameters.
 	if (TB_MAXPAR(tp) > n_copy) {
-	    call salloc (blank, SZ_PARREC, TY_CHAR)
+	    sz_val = SZ_PARREC
+	    call salloc (blank, sz_val, TY_CHAR)
 	    do k = 1, SZ_PARREC
 		Memc[blank+k-1] = ' '
-	    call strpak (Memc[blank], Memc[pbuf], SZ_PARREC)
+	    sz_val = SZ_PARREC
+	    call strpak (Memc[blank], Memc[pbuf], sz_val)
 	    do k = n_copy+1, TB_MAXPAR(tp) {
 		call seek (newfd, newoff)
-		call write (newfd, Memc[pbuf], SZ_PACKED_REC)
+		sz_val = SZ_PACKED_REC
+		call write (newfd, Memc[pbuf], sz_val)
 		newoff = newoff + SZ_PACKED_REC
 	    }
 	}

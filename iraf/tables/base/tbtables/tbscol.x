@@ -16,6 +16,7 @@ procedure tbscol (tp, cp)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 #--
+size_t	sz_val
 errchk	tcs_addcol
 
 begin
@@ -23,7 +24,8 @@ begin
 
 	    if (TB_NSEL_COLS(tp) + 1 > TB_MAX_SELCOLS(tp)) {
 		TB_MAX_SELCOLS(tp) = TB_NSEL_COLS(tp) + INCR_MAX_SELCOLS
-		call realloc (TB_SELCOL_PTR(tp), TB_MAX_SELCOLS(tp), TY_POINTER)
+		sz_val = TB_MAX_SELCOLS(tp)
+		call realloc (TB_SELCOL_PTR(tp), sz_val, TY_POINTER)
 	    }
 
 	    call tcs_addcol (tp, cp,

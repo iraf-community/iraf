@@ -22,8 +22,8 @@ include "tblerr.h"
 procedure tbrsft (tp, first, shift)
 
 pointer tp		# i: pointer to table descriptor
-int	first		# i: first row to be moved
-int	shift		# i: shift by this many rows
+long	first		# i: first row to be moved
+long	shift		# i: shift by this many rows
 #--
 errchk	tbxsft, tbysft, tbzsft, tbfsft
 

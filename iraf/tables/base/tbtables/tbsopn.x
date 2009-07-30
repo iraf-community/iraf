@@ -18,8 +18,9 @@ pointer tp		# i: pointer to table descriptor
 char	rowselect[ARB]	# i: row selector string
 char	colselect[ARB]	# i: column selector string
 #--
+size_t	sz_val
 pointer trsrows()
-int	rst_nelem()
+long	rst_nelem()
 errchk	trsrows, tcs_open
 
 begin
@@ -43,7 +44,8 @@ begin
 
 	    # Allocate enough space to select all columns.
 	    TB_MAX_SELCOLS(tp) = TB_NCOLS(tp)
-	    call malloc (TB_SELCOL_PTR(tp), TB_MAX_SELCOLS(tp), TY_POINTER)
+	    sz_val = TB_MAX_SELCOLS(tp)
+	    call malloc (TB_SELCOL_PTR(tp), sz_val, TY_POINTER)
 
 	    call tcs_open (tp, colselect,
 			TB_SELCOL(tp,1), TB_NSEL_COLS(tp), TB_MAX_SELCOLS(tp))

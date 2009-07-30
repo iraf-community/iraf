@@ -27,6 +27,7 @@ procedure tbhcal (itp, otp)
 pointer itp			# i: pointer to descriptor of input table
 pointer otp			# i: pointer to descriptor of output table
 #--
+size_t	sz_val
 pointer sp
 pointer par			# buffer for header record for parameter
 pointer comment			# scratch for comment string
@@ -40,7 +41,8 @@ int	k			# loop index for par number in output table
 int	numout			# initial number of par in output table
 int	allout			# total number of parameters for output table
 int	num_noncomment		# number of non-comment parameters
-int	key_offset		# an offset for keyword names in scratch array
+pointer	key_offset		# an offset for keyword names in scratch array
+long	l_val
 int	strncmp()
 bool	tbhisc()
 errchk	tbtchs, tbbcmt, tbfcal, tbhgnp, tbhpnp, tbhanp, tbhrpr, tbhwpr
@@ -66,22 +68,27 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
-	call salloc (comment, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	# This will be zero if it's a new table.
 	numout = TB_NPAR(otp)
 
 	# Do we need more space for header parameters in the output table?
 	allout = numout + TB_NPAR(itp)
-	if (allout > TB_MAXPAR(otp))
-	    call tbtchs (otp, allout+DEFMAXPAR, -1, -1, -1)
+	if (allout > TB_MAXPAR(otp)) {
+	    l_val = -1
+	    call tbtchs (otp, allout+DEFMAXPAR, -1, l_val, l_val)
+	}
 
 	# Are there already some parameters in the output table?
 	if (numout > 0) {
 
-	    call salloc (key, numout*SZ_KEYWORD, TY_CHAR)
-	    call salloc (pnum, numout, TY_INT)
+	    sz_val = numout*SZ_KEYWORD
+	    call salloc (key, sz_val, TY_CHAR)
+	    sz_val = numout
+	    call salloc (pnum, sz_val, TY_INT)
 
 	    # Make a list of all non-comment keywords in output table.
 	    num_noncomment = 0			# initial values

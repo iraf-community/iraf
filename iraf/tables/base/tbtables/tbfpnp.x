@@ -18,6 +18,7 @@ char	keyword[SZ_KEYWORD]	# i: keyword for the parameter
 int	dtype			# i: data type (TY_CHAR, etc)
 char	str[ARB]		# i: string containing the value of the param.
 #--
+size_t	sz_val
 pointer sp
 pointer rec			# scratch for header record to be written
 pointer strval			# copy of str, without leading & trailing blanks
@@ -39,9 +40,10 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (rec, SZ_LINE, TY_CHAR)
-	call salloc (strval, SZ_LINE, TY_CHAR)
-	call salloc (oldrec, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (rec, sz_val, TY_CHAR)
+	call salloc (strval, sz_val, TY_CHAR)
+	call salloc (oldrec, sz_val, TY_CHAR)
 
 	# Copy the keyword to scratch and convert to upper case.
 	call strcpy (keyword, ukkey, SZ_KEYWORD)
@@ -125,7 +127,8 @@ begin
 	if (!iscomm) {
 	    # Read the current value to see if the keywords are the same,
 	    # and if so, to get the comment.
-	    call salloc (cmt, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (cmt, sz_val, TY_CHAR)
 	    call tbfgnp (tp, parnum, oldkey, odtype,
 			Memc[oldrec], Memc[cmt], SZ_LINE)
 	    if (streq (ukkey, oldkey)) {

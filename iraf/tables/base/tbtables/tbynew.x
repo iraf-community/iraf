@@ -28,14 +28,18 @@ int	k		# loop index
 int	parnum		# parameter number (dummy values for "header")
 int	colnum		# column number
 int	fd		# fd for table file
+size_t	sz_val
+pointer	p_val
 int	open()
 errchk	tbtwsi, tbhwpr, tbyncn, tbcwcd, open
 
 begin
 	call smark (sp)
 	# Allocate space for dummy parameter & column descriptor records.
-	call salloc (pstr, SZ_PARREC, TY_CHAR)
-	call salloc (colinfo, LEN_COLSTRUCT, TY_INT)
+	sz_val = SZ_PARREC
+	call salloc (pstr, sz_val, TY_CHAR)
+	sz_val = LEN_COLSTRUCT
+	call salloc (colinfo, sz_val, TY_STRUCT)
 
 	if (TB_ALLROWS(tp) <= 0)
 	    TB_ALLROWS(tp) = DEFNUMROWS
@@ -64,7 +68,9 @@ begin
 	    call tbcwcd (tp, colptr)
 	}
 	# Write dummy records for column descriptors to fill out allocated space
-	call amovki (0, Memi[colinfo], LEN_COLSTRUCT)	# Zero buffer
+	p_val = 0
+	sz_val = LEN_COLSTRUCT
+	call amovkp (p_val, Memp[colinfo], sz_val)	# Zero buffer
 	do colnum = TB_NCOLS(tp)+1, TB_MAXCOLS(tp) {
 	    COL_NUMBER(colinfo) = colnum
 	    call tbcwcd (tp, colinfo)		# write dummy descriptor

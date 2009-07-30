@@ -36,6 +36,7 @@ procedure tbzwrt (tp)
 
 pointer tp			# i: pointer to table descriptor
 #--
+size_t	sz_val
 pointer sp
 pointer temp			# scratch for name of temporary table
 pointer cbuf			# buffer for output string
@@ -43,11 +44,11 @@ pointer colname			# for comparing column name with "c<n>"
 pointer cp			# pointer to column descriptor
 int	fd			# fd for temporary table
 int	key			# loop index for keyword number
-int	row_1			# row number minus one
+long	row_1			# row number minus one
 int	ncols			# number of columns
 int	colnum			# column number
 int	lenstr			# length of a string table element
-int	ip			# offset for extracting a string in Memc
+long	ip			# offset for extracting a string in Memc
 int	i			# loop index
 int	istart, iend		# limits on i when looking for embedded blanks
 bool	to_stdout		# is output file STDOUT?
@@ -64,8 +65,10 @@ begin
 	blank = ' '
 
 	call smark (sp)
-	call salloc (temp, SZ_FNAME, TY_CHAR)
-	call salloc (cbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (temp, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cbuf, sz_val, TY_CHAR)
 
 	ncols = TB_NCOLS(tp)
 
@@ -89,7 +92,8 @@ begin
 	# current column number), or if units have been specified for any
 	# column, the table subtype will be reset to explicit column def.
 	if (TB_SUBTYPE(tp) != TBL_SUBTYPE_EXPLICIT) {
-	    call salloc (colname, SZ_COLNAME, TY_CHAR)
+	    sz_val = SZ_COLNAME
+	    call salloc (colname, sz_val, TY_CHAR)
 	    do colnum = 1, TB_NCOLS(tp) {
 		cp = TB_COLINFO(tp,colnum)
 		if (COL_UNITS(cp) != EOS) {

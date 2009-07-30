@@ -10,6 +10,7 @@ char	sppfmt[ARB]	# i: print format in SPP style
 char	ftnfmt[ARB]	# o: print format in Fortran style
 int	maxch		# i: max size of ftnfmt
 #--
+size_t	sz_val
 pointer sp
 pointer fmt		# scratch for Fortran format
 pointer numpart		# copy of numerical portion of print format
@@ -27,8 +28,9 @@ int	strlen(), stridx()
 
 begin
 	call smark (sp)
-	call salloc (fmt, SZ_FNAME, TY_CHAR)
-	call salloc (numpart, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fmt, sz_val, TY_CHAR)
+	call salloc (numpart, sz_val, TY_CHAR)
 
 	fmtlen = strlen (sppfmt)
 

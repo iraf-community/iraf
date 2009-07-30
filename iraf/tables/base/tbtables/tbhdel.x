@@ -20,6 +20,7 @@ procedure tbhdel (tp, parnum)
 pointer tp			# i: pointer to table descriptor
 int	parnum			# i: number of the parameter to be deleted
 #--
+size_t	sz_val
 pointer sp
 pointer str			# scratch for a parameter record
 int	k			# loop index for copying keyword
@@ -56,7 +57,8 @@ begin
 	} else if (parnum >= 1 && parnum < TB_NPAR(tp)) {
 
 	    call smark (sp)
-	    call salloc (str, SZ_PARREC, TY_CHAR)
+	    sz_val = SZ_PARREC
+	    call salloc (str, sz_val, TY_CHAR)
 
 	    do k = parnum, TB_NPAR(tp)-1 {
 		# Read next parameter record, and overwrite current one.

@@ -20,9 +20,11 @@ procedure tbdsav (tp, tp_save)
 pointer tp		# i: pointer to table descriptor
 pointer tp_save		# o: pointer to space for saving size info
 #--
+size_t	sz_val
 
 begin
-	call malloc (tp_save, LEN_TBLSTRUCT, TY_STRUCT)
+	sz_val = LEN_TBLSTRUCT
+	call malloc (tp_save, sz_val, TY_STRUCT)
 
 	TB_TYPE(tp_save)    = TB_TYPE(tp)
 	TB_NPAR(tp_save)    = TB_NPAR(tp)

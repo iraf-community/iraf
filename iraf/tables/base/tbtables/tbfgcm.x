@@ -12,6 +12,7 @@ char	keyword[SZ_KEYWORD]	# i: keyword to be found
 char	comment[ARB]		# o: comment string for keyword
 int	maxch			# i: max size of comment
 #--
+size_t	sz_val
 pointer sp
 pointer value			# scratch for value (ignored)
 pointer cmt			# scratch for comment; also for error message
@@ -21,8 +22,9 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (value, SZ_LINE, TY_CHAR)
-	call salloc (cmt, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (value, sz_val, TY_CHAR)
+	call salloc (cmt, sz_val, TY_CHAR)
 
 	# Check for history or comment.
 	call strcpy (keyword, Memc[value], SZ_LINE)	# temp

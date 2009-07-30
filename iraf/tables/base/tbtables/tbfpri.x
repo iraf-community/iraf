@@ -26,6 +26,7 @@ char	intable[ARB]	# i: name of FITS file to be copied
 char	outtable[ARB]	# i: name of new FITS file
 int	copied		# o: YES if input header was copied to output
 #--
+size_t	sz_val
 pointer sp
 pointer ifname, ofname	# input & output file names
 pointer os_infile, os_outfile	# host operating system file names
@@ -51,11 +52,12 @@ errchk	tbferr, tbparse, tbttyp, vfn_expand_ldir
 
 begin
 	call smark (sp)
-	call salloc (ifname, SZ_FNAME, TY_CHAR)
-	call salloc (ofname, SZ_FNAME, TY_CHAR)
-	call salloc (dummy, SZ_FNAME, TY_CHAR)
-	call salloc (os_infile, SZ_FNAME, TY_CHAR)
-	call salloc (os_outfile, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ifname, sz_val, TY_CHAR)
+	call salloc (ofname, sz_val, TY_CHAR)
+	call salloc (dummy, sz_val, TY_CHAR)
+	call salloc (os_infile, sz_val, TY_CHAR)
+	call salloc (os_outfile, sz_val, TY_CHAR)
 
 	# Get name of output file; i.e. strip off any extension name or
 	# number, row & column selectors.
@@ -121,8 +123,9 @@ begin
 		call tbferr (status)
 
 	    # Extract root and extension (discarding directory).
-	    call salloc (fname, SZ_FNAME, TY_CHAR)
-	    call salloc (extn, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (fname, sz_val, TY_CHAR)
+	    call salloc (extn, sz_val, TY_CHAR)
 	    nchar = fnroot (Memc[os_outfile], Memc[fname], SZ_FNAME)
 	    nchar = fnextn (Memc[os_outfile], Memc[extn], SZ_FNAME)
 	    call strcat (".", Memc[fname], SZ_FNAME)

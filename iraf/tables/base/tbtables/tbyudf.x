@@ -18,14 +18,15 @@ procedure tbyudf (tp, colptr, numcols, rownum)
 pointer tp			# i: pointer to table descriptor
 pointer colptr[numcols]		# i: array of pointers to column descriptors
 int	numcols			# i: number of columns
-int	rownum			# i: row number
+long	rownum			# i: row number
 #--
 pointer sp
 pointer charbuf			# Scratch for character string column
 long	offset			# Location (chars) for writing in table
-int	j, k			# Loop indexes
+long	j			# Loop indexes
+int	k			# Loop indexes
 int	datatype		# Data type of a column
-int	dlen			# Number of char in an element of the table
+size_t	dlen			# Number of char in an element of the table
 short	sbuf			# buffer for short datatype
 bool	boolbuf			# Buffer for writing Boolean values
 long	tbyoff()

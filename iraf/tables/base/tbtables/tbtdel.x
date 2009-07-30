@@ -29,6 +29,7 @@ procedure tbtdel (table)
 
 char	table[ARB]	# i: name of table to be deleted
 #--
+size_t	sz_val
 pointer sp
 pointer tname		# for table name (and possible error message)
 pointer fname		# file name
@@ -44,15 +45,17 @@ int	ttype, exists	# returned by tbttyp; exists is ignored
 pointer tbtopn()
 int	tbnparse(), tbttyp()
 errchk	qp_deletef, tbtopn, tbfdel, tbnparse, tbttyp
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (tname, SZ_FNAME, TY_CHAR)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (extname, SZ_FNAME, TY_CHAR)
-	call salloc (brackets, SZ_FNAME, TY_CHAR)
-	call salloc (rowsel, SZ_FNAME, TY_CHAR)
-	call salloc (colsel, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tname, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (extname, sz_val, TY_CHAR)
+	call salloc (brackets, sz_val, TY_CHAR)
+	call salloc (rowsel, sz_val, TY_CHAR)
+	call salloc (colsel, sz_val, TY_CHAR)
 
 	# Check whether we have been asked to delete a FITS file without
 	# any specification of which extension is the table.
@@ -72,7 +75,7 @@ begin
 	}
 
 	# Open the table that is to be deleted.
-	tp = tbtopn (table, READ_WRITE, NULL)
+	tp = tbtopn (table, READ_WRITE, NULLPTR)
 
 	# Get the full name of the file, including filename extension.
 	call strcpy (TB_NAME(tp), Memc[tname], SZ_FNAME)

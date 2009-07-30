@@ -37,11 +37,11 @@ pointer	tp		# i: Table descriptor
 int	numcols		# i: Number of columns to sort on
 pointer	colptr[ARB]	# i: Array of column descriptors
 bool	fold		# i: Fold upper and lower case when sorting
-int	row1		# i: Index to first row to compare
-int	row2		# i: Index to second row to compare
+long	row1		# i: Index to first row to compare
+long	row2		# i: Index to second row to compare
 #--
 int	datatype	# data type of column
-int	nelem		# number of elements in array (or one if scalar)
+long	nelem		# number of elements in array (or one if scalar)
 double	dval1, dval2
 int	ival1, ival2
 short	sval1, sval2
@@ -50,19 +50,26 @@ real	rval1, rval2
 
 pointer sp2		# stack pointer for ptr1 & ptr2
 pointer ptr1, ptr2	# pointers to arrays of values
-int	i		# loop index
+long	i		# loop index
 
 int	icol, order
 pointer	sp, cp
 
+size_t	sz_val
+long	c_1
+
 int	tbcigi(), strcmp()
+long	tbcigl()
 
 begin
+	c_1 = 1
+
 	# Allocate dynamic memory for strings
 
 	call smark (sp)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
 
 	# Loop over each column until the two rows don't match
 
@@ -71,13 +78,13 @@ begin
 	    cp = colptr[icol]
 
 	    datatype = tbcigi (cp, TBL_COL_DATATYPE)
-	    nelem = tbcigi (cp, TBL_COL_LENDATA)
+	    nelem = tbcigl (cp, TBL_COL_LENDATA)
 
 	    if (nelem == 1) {
 
 		switch (datatype) {
 
-		case TY_INT,TY_LONG:
+		case TY_INT:
 		    call tbegti (tp, cp, row1, ival1)
 		    call tbegti (tp, cp, row2, ival2)
 
@@ -166,12 +173,13 @@ begin
 
 		switch (datatype) {
 
-		case TY_INT,TY_LONG:
-		    call salloc (ptr1, nelem, TY_INT)
-		    call salloc (ptr2, nelem, TY_INT)
+		case TY_INT:
+		    sz_val = nelem
+		    call salloc (ptr1, sz_val, TY_INT)
+		    call salloc (ptr2, sz_val, TY_INT)
 
-		    call tbagti (tp, cp, row1, Memi[ptr1], 1, nelem)
-		    call tbagti (tp, cp, row2, Memi[ptr2], 1, nelem)
+		    call tbagti (tp, cp, row1, Memi[ptr1], c_1, nelem)
+		    call tbagti (tp, cp, row2, Memi[ptr2], c_1, nelem)
 
 		    do i = 0, nelem-1 {
 			if (Memi[ptr1+i] == Memi[ptr2+i])
@@ -189,11 +197,12 @@ begin
 		    }
 
 		case TY_SHORT,TY_BOOL:
-		    call salloc (ptr1, nelem, TY_SHORT)
-		    call salloc (ptr2, nelem, TY_SHORT)
+		    sz_val = nelem
+		    call salloc (ptr1, sz_val, TY_SHORT)
+		    call salloc (ptr2, sz_val, TY_SHORT)
 
-		    call tbagts (tp, cp, row1, Mems[ptr1], 1, nelem)
-		    call tbagts (tp, cp, row2, Mems[ptr2], 1, nelem)
+		    call tbagts (tp, cp, row1, Mems[ptr1], c_1, nelem)
+		    call tbagts (tp, cp, row2, Mems[ptr2], c_1, nelem)
 
 		    do i = 0, nelem-1 {
 			if (Mems[ptr1+i] == Mems[ptr2+i])
@@ -211,11 +220,12 @@ begin
 		    }
 
 		case TY_REAL:
-		    call salloc (ptr1, nelem, TY_REAL)
-		    call salloc (ptr2, nelem, TY_REAL)
+		    sz_val = nelem
+		    call salloc (ptr1, sz_val, TY_REAL)
+		    call salloc (ptr2, sz_val, TY_REAL)
 
-		    call tbagtr (tp, cp, row1, Memr[ptr1], 1, nelem)
-		    call tbagtr (tp, cp, row2, Memr[ptr2], 1, nelem)
+		    call tbagtr (tp, cp, row1, Memr[ptr1], c_1, nelem)
+		    call tbagtr (tp, cp, row2, Memr[ptr2], c_1, nelem)
 
 		    do i = 0, nelem-1 {
 			if (Memr[ptr1+i] == Memr[ptr2+i])
@@ -233,11 +243,12 @@ begin
 		    }
 
 		case TY_DOUBLE:
-		    call salloc (ptr1, nelem, TY_DOUBLE)
-		    call salloc (ptr2, nelem, TY_DOUBLE)
+		    sz_val = nelem
+		    call salloc (ptr1, sz_val, TY_DOUBLE)
+		    call salloc (ptr2, sz_val, TY_DOUBLE)
 
-		    call tbagtd (tp, cp, row1, Memd[ptr1], 1, nelem)
-		    call tbagtd (tp, cp, row2, Memd[ptr2], 1, nelem)
+		    call tbagtd (tp, cp, row1, Memd[ptr1], c_1, nelem)
+		    call tbagtd (tp, cp, row2, Memd[ptr2], c_1, nelem)
 
 		    do i = 0, nelem-1 {
 			if (Memd[ptr1+i] == Memd[ptr2+i])

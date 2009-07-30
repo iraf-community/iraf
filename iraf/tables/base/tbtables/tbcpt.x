@@ -23,11 +23,11 @@ procedure tbcptd (tp, cp, buffer, sel_firstrow, sel_lastrow)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to descriptor of the column
 double	buffer[ARB]	# i: array of values to be put into column
-int	sel_firstrow	# i: first row into which to put values
-int	sel_lastrow	# i: last row into which to put values
+long	sel_firstrow	# i: first row into which to put values
+long	sel_lastrow	# i: last row into which to put values
 #--
-int	firstrow, lastrow	# range of actual row numbers
-int	row, i
+long	firstrow, lastrow	# range of actual row numbers
+long	row, i, l_val
 errchk	tbswer, tbxcpd, tbycpd, tbzcpd, tbfapd
 
 begin
@@ -49,9 +49,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcpd (tp, cp, buffer, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		call tbfapd (tp, cp, row, buffer[i], 1, 1)
+		call tbfapd (tp, cp, row, buffer[i], l_val, l_val)
 		i = i + 1
 	    }
 	} else {
@@ -70,11 +71,11 @@ procedure tbcptr (tp, cp, buffer, sel_firstrow, sel_lastrow)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to descriptor of the column
 real	buffer[ARB]	# i: array of values to be put into column
-int	sel_firstrow	# i: first row into which to put values
-int	sel_lastrow	# i: last row into which to put values
+long	sel_firstrow	# i: first row into which to put values
+long	sel_lastrow	# i: last row into which to put values
 #--
-int	firstrow, lastrow	# range of actual row numbers
-int	row, i
+long	firstrow, lastrow	# range of actual row numbers
+long	row, i, l_val
 errchk	tbswer, tbxcpr, tbycpr, tbzcpr, tbfapr
 
 begin
@@ -96,9 +97,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcpr (tp, cp, buffer, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		call tbfapr (tp, cp, row, buffer[i], 1, 1)
+		call tbfapr (tp, cp, row, buffer[i], l_val, l_val)
 		i = i + 1
 	    }
 	} else {
@@ -118,11 +120,11 @@ procedure tbcpti (tp, cp, buffer, sel_firstrow, sel_lastrow)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to descriptor of the column
 int	buffer[ARB]	# i: array of values to be put into column
-int	sel_firstrow	# i: first row into which to put values
-int	sel_lastrow	# i: last row into which to put values
+long	sel_firstrow	# i: first row into which to put values
+long	sel_lastrow	# i: last row into which to put values
 #--
-int	firstrow, lastrow	# range of actual row numbers
-int	row, i
+long	firstrow, lastrow	# range of actual row numbers
+long	row, i, l_val
 errchk	tbswer, tbxcpi, tbycpi, tbzcpi, tbfapi
 
 begin
@@ -144,9 +146,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcpi (tp, cp, buffer, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		call tbfapi (tp, cp, row, buffer[i], 1, 1)
+		call tbfapi (tp, cp, row, buffer[i], l_val, l_val)
 		i = i + 1
 	    }
 	} else {
@@ -166,11 +169,11 @@ procedure tbcpts (tp, cp, buffer, sel_firstrow, sel_lastrow)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to descriptor of the column
 short	buffer[ARB]	# i: array of values to be put into column
-int	sel_firstrow	# i: first row into which to put values
-int	sel_lastrow	# i: last row into which to put values
+long	sel_firstrow	# i: first row into which to put values
+long	sel_lastrow	# i: last row into which to put values
 #--
-int	firstrow, lastrow	# range of actual row numbers
-int	row, i
+long	firstrow, lastrow	# range of actual row numbers
+long	row, i, l_val
 errchk	tbswer, tbxcps, tbycps, tbzcps, tbfaps
 
 begin
@@ -192,9 +195,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcps (tp, cp, buffer, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		call tbfaps (tp, cp, row, buffer[i], 1, 1)
+		call tbfaps (tp, cp, row, buffer[i], l_val, l_val)
 		i = i + 1
 	    }
 	} else {
@@ -213,11 +217,11 @@ procedure tbcptb (tp, cp, buffer, sel_firstrow, sel_lastrow)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to descriptor of the column
 bool	buffer[ARB]	# i: array of values to be put into column
-int	sel_firstrow	# i: first row into which to put values
-int	sel_lastrow	# i: last row into which to put values
+long	sel_firstrow	# i: first row into which to put values
+long	sel_lastrow	# i: last row into which to put values
 #--
-int	firstrow, lastrow	# range of actual row numbers
-int	row, i
+long	firstrow, lastrow	# range of actual row numbers
+long	row, i, l_val
 errchk	tbswer, tbxcpb, tbycpb, tbzcpb, tbfapb
 
 begin
@@ -239,9 +243,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcpb (tp, cp, buffer, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		call tbfapb (tp, cp, row, buffer[i], 1, 1)
+		call tbfapb (tp, cp, row, buffer[i], l_val, l_val)
 		i = i + 1
 	    }
 	} else {
@@ -262,11 +267,11 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to descriptor of the column
 char	buffer[lenstr,ARB]	# i: array of values to be put into column
 int	lenstr			# i: number of char in each element of buffer
-int	sel_firstrow	# i: first row into which to put values
-int	sel_lastrow	# i: last row into which to put values
+long	sel_firstrow	# i: first row into which to put values
+long	sel_lastrow	# i: last row into which to put values
 #--
-int	firstrow, lastrow	# range of actual row numbers
-int	row, i
+long	firstrow, lastrow	# range of actual row numbers
+long	row, i, l_val
 errchk	tbswer, tbxcpt, tbycpt, tbzcpt, tbfapt
 
 begin
@@ -288,9 +293,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcpt (tp, cp, buffer, lenstr, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		call tbfapt (tp, cp, row, buffer[1,i], lenstr, 1, 1)
+		call tbfapt (tp, cp, row, buffer[1,i], lenstr, l_val, l_val)
 		i = i + 1
 	    }
 	} else {

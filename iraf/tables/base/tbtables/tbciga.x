@@ -22,7 +22,7 @@ procedure tbciga (tp, cp, ndim, axlen, maxdim)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 int	ndim		# o: dimension of array
-int	axlen[maxdim]	# o: length of each axis
+long	axlen[maxdim]	# o: length of each axis
 int	maxdim		# i: size of axlen array
 #--
 errchk	tbfiga
@@ -43,13 +43,14 @@ procedure tbcisa (tp, cp, ndim, axlen)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 int	ndim		# i: dimension of array
-int	axlen[ARB]	# i: length of each axis
+long	axlen[ARB]	# i: length of each axis
 #--
+size_t	sz_val
 pointer sp
 pointer errmess		# scratch for possible error message
 pointer colname		# scratch for column name
-int	nelem		# actual total number of elements in array
-int	nvals		# total number specified as input
+long	nelem		# actual total number of elements in array
+long	nvals		# total number specified as input
 int	i
 errchk	tbfisa
 
@@ -63,22 +64,26 @@ begin
 
 	if (nelem != nvals) {
 	    call smark (sp)
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
-	    call salloc (colname, SZ_COLNAME, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
+	    sz_val = SZ_COLNAME
+	    call salloc (colname, sz_val, TY_CHAR)
 	    call tbcigt (cp, TBL_COL_NAME, Memc[colname], SZ_COLNAME)
 	    call sprintf (Memc[errmess], SZ_LINE,
 		"tbcisa:  column `%s', actual array size=%d, specified size=%d")
 		call pargstr (Memc[colname])
-		call pargi (nelem)
-		call pargi (nvals)
+		call pargl (nelem)
+		call pargl (nvals)
 	    call error (1, Memc[errmess])
 	}
 
 	# Check whether dimension is too large.
 	if (ndim > TBL_MAXDIM) {
 	    call smark (sp)
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
-	    call salloc (colname, SZ_COLNAME, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
+	    sz_val = SZ_COLNAME
+	    call salloc (colname, sz_val, TY_CHAR)
 	    call tbcigt (cp, TBL_COL_NAME, Memc[colname], SZ_COLNAME)
 	    call sprintf (Memc[errmess], SZ_LINE,
 		"tbcisa:  column `%s', dimension %d is too large")

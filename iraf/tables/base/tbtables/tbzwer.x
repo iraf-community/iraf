@@ -17,9 +17,9 @@ define	NUM_EXTRA	1000	# number of extra "rows" to add for text file
 procedure tbzwer (tp, rownum)
 
 pointer tp		# i: pointer to table descriptor
-int	rownum		# i: (actual) row number in table
+long	rownum		# i: (actual) row number in table
 #--
-int	old_allrows	# current allocated number of rows
+long	old_allrows	# current allocated number of rows
 errchk	tbzsiz
 
 begin

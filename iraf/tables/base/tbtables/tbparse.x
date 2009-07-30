@@ -37,6 +37,7 @@ char	extname[ARB]	# o: CDF name, or null if none
 int	maxch		# i: size of fname and extname strings
 int	hdu		# o: HDU number for FITS file, or -1 if none
 #--
+size_t	sz_val
 pointer sp
 pointer brackets	# scratch for expression in brackets
 pointer rowselect, colselect	# ignored (selector strings)
@@ -50,10 +51,12 @@ begin
 	localmax = max (SZ_FNAME, maxch)
 
 	call smark (sp)
-	call salloc (brackets, localmax, TY_CHAR)
-	call salloc (scratch, localmax, TY_CHAR)
-	call salloc (rowselect, SZ_FNAME, TY_CHAR)
-	call salloc (colselect, SZ_FNAME, TY_CHAR)
+	sz_val = localmax
+	call salloc (brackets, sz_val, TY_CHAR)
+	call salloc (scratch, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (rowselect, sz_val, TY_CHAR)
+	call salloc (colselect, sz_val, TY_CHAR)
 
 	nchar = tbnparse (tablename, fname, Memc[scratch], Memc[brackets],
 		localmax, extver, hdu, overwrite,

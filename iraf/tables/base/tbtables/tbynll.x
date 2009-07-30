@@ -13,12 +13,13 @@ include "tbtables.h"
 procedure tbynll (tp, firstrow, lastrow)
 
 pointer tp			# i: pointer to table descriptor
-int	firstrow		# i: first row to be set to INDEF
-int	lastrow			# i: last row to be set to INDEF
+long	firstrow		# i: first row to be set to INDEF
+long	lastrow			# i: last row to be set to INDEF
 #--
+size_t	sz_val
 pointer sp
 pointer colptr			# scratch for array of column pointers
-int	row1, row2		# firstrow, lastrow truncated to 1, nrows
+long	row1, row2		# firstrow, lastrow truncated to 1, nrows
 int	k			# loop index for column number
 pointer tbcnum()
 errchk	tbyscn
@@ -31,9 +32,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (colptr, TB_NCOLS(tp), TY_INT)
+	sz_val = TB_NCOLS(tp)
+	call salloc (colptr, sz_val, TY_POINTER)
 	do k = 1, TB_NCOLS(tp)
-	    Memi[colptr+k-1] = tbcnum (tp, k)
-	call tbyscn (tp, TB_FILE(tp), Memi[colptr], TB_NCOLS(tp), row1, row2)
+	    Memp[colptr+k-1] = tbcnum (tp, k)
+	call tbyscn (tp, TB_FILE(tp), Memp[colptr], TB_NCOLS(tp), row1, row2)
 	call sfree (sp)
 end

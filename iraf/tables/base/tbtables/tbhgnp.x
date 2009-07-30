@@ -25,6 +25,7 @@ char	keyword[SZ_KEYWORD]	# o: keyword for the parameter
 int	dtype			# o: data type (TY_CHAR, etc)
 char	str[SZ_PARREC]		# o: string containing the value of the param.
 #--
+size_t	sz_val
 pointer sp
 pointer par			# buffer for parameter record
 pointer cmt			# scratch for comment from FITS record
@@ -39,7 +40,8 @@ errchk	tbhrpr
 begin
 	if (TB_TYPE(tp) == TBL_TYPE_FITS) {
 	    call smark (sp)
-	    call salloc (cmt, SZ_PARREC, TY_CHAR)	# thrown away
+	    sz_val = SZ_PARREC
+	    call salloc (cmt, sz_val, TY_CHAR)	# thrown away
 	    call tbfgnp (tp, parnum, keyword, dtype, str, Memc[cmt], SZ_PARREC)
 	    call sfree (sp)
 	    return
@@ -53,7 +55,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 
 	call tbhrpr (tp, parnum, Memc[par])	# read parameter record
 

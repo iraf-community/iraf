@@ -14,15 +14,16 @@ pointer tp			# i: pointer to table descriptor
 pointer colptr[numcols]		# i: array of pointers to descr of new columns
 int	fd			# i: identifies the data file for a table
 int	numcols			# i: the number of new columns
-int	firstrow		# i: the first row to be set to indef
-int	lastrow			# i: the last row to be set to indef
+long	firstrow		# i: the first row to be set to indef
+long	lastrow			# i: the last row to be set to indef
 
 pointer sp
 pointer charbuf			# Scratch for character string column
 long	offset			# Location (chars) for writing in table
-int	j, k			# Loop indexes
+long	j
+int	k			# Loop indexes
 int	datatype		# Data type of a column
-int	dlen			# Number of char in an element of the table
+size_t	dlen			# Number of char in an element of the table
 short	sbuf
 bool	boolbuf			# Buffer for writing Boolean values
 long	tbyoff()

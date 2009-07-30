@@ -19,6 +19,7 @@ char	oldkey[ARB]		# i: current keyword name
 int	parnum			# i: number of current keyword
 char	newkey[ARB]		# i: new keyword name
 #--
+size_t	sz_val
 pointer sp
 pointer par			# buffer for parameter record
 char	uc_oldkey[SZ_KEYWORD]	# old keyword converted to upper case
@@ -43,7 +44,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 
 	call strcpy (oldkey, uc_oldkey, SZ_KEYWORD)
 	call strcpy (newkey, uc_newkey, SZ_KEYWORD)

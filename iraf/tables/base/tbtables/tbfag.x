@@ -12,29 +12,32 @@ include "tbtables.h"
 
 # tbfagd -- get double-precision elements
 
-int procedure tbfagd (tp, cp, rownum, buffer, first, nelem)
+long procedure tbfagd (tp, cp, rownum, buffer, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 double	buffer[ARB]	# o: buffer for values to be gotten
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
 pointer sp
 pointer cbuf		# for getting string
 bool	bbuf		# for getting boolean
 bool	flagvals	# set to true if the value is undefined
-int	i, j		# loop indexes
+long	i, j		# loop indexes
 int	status		# zero is OK
 double	nulval		# INDEFD
 bool	anyf		# set to true if any value is undefined
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+long	c_1
 int	nscan()
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	ntotal = COL_NELEM(cp)
@@ -43,11 +46,12 @@ begin
 	if (COL_DTYPE(cp) < 0) {		# text string
 
 	    call smark (sp)
-	    call salloc (cbuf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (cbuf, sz_val, TY_CHAR)
 	    j = first
 	    do i = 1, nret {
 		call fsgcvs (TB_FILE(tp), COL_NUMBER(cp), rownum,
-			    j, 1, "", Memc[cbuf], SZ_LINE, anyf, status)
+			    j, c_1, "", Memc[cbuf], SZ_LINE, anyf, status)
 		call sscan (Memc[cbuf])
 		    call gargd (buffer[i])
 		if (nscan() < 1)
@@ -60,7 +64,7 @@ begin
 
 	    j = first
 	    do i = 1, nret {
-		call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 			bbuf, flagvals, anyf, status)
 		if (flagvals)
 		    buffer[i] = INDEFD
@@ -87,29 +91,32 @@ end
 
 # tbfagr -- get single-precision elements
 
-int procedure tbfagr (tp, cp, rownum, buffer, first, nelem)
+long procedure tbfagr (tp, cp, rownum, buffer, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 real	buffer[ARB]	# o: buffer for values to be gotten
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
 pointer sp
 pointer cbuf		# for getting string
 bool	bbuf		# for getting boolean
 bool	flagvals	# set to true if the value is undefined
-int	i, j		# loop indexes
+long	i, j		# loop indexes
 int	status		# zero is OK
 real	nulval		# INDEFR
 bool	anyf		# set to true if any value is undefined
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+long	c_1
 int	nscan()
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	ntotal = COL_NELEM(cp)
@@ -118,11 +125,12 @@ begin
 	if (COL_DTYPE(cp) < 0) {		# text string
 
 	    call smark (sp)
-	    call salloc (cbuf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (cbuf, sz_val, TY_CHAR)
 	    j = first
 	    do i = 1, nret {
 		call fsgcvs (TB_FILE(tp), COL_NUMBER(cp), rownum,
-			    j, 1, "", Memc[cbuf], SZ_LINE, anyf, status)
+			    j, c_1, "", Memc[cbuf], SZ_LINE, anyf, status)
 		call sscan (Memc[cbuf])
 		    call gargr (buffer[i])
 		if (nscan() < 1)
@@ -135,7 +143,7 @@ begin
 
 	    j = first
 	    do i = 1, nret {
-		call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 			bbuf, flagvals, anyf, status)
 		if (flagvals)
 		    buffer[i] = INDEFR
@@ -161,29 +169,32 @@ end
 
 # tbfagi -- get an integer element
 
-int procedure tbfagi (tp, cp, rownum, buffer, first, nelem)
+long procedure tbfagi (tp, cp, rownum, buffer, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 int	buffer[ARB]	# o: buffer for values to be gotten
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
 pointer sp
 pointer cbuf		# for getting string
 bool	bbuf		# for getting boolean
 bool	flagvals	# set to true if the value is undefined
-int	i, j		# loop indexes
+long	i, j		# loop indexes
 int	status		# zero is OK
 int	nulval		# INDEFI
 bool	anyf		# set to true if any value is undefined
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+long	c_1
 int	nscan()
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	ntotal = COL_NELEM(cp)
@@ -192,11 +203,12 @@ begin
 	if (COL_DTYPE(cp) < 0) {		# text string
 
 	    call smark (sp)
-	    call salloc (cbuf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (cbuf, sz_val, TY_CHAR)
 	    j = first
 	    do i = 1, nret {
 		call fsgcvs (TB_FILE(tp), COL_NUMBER(cp), rownum,
-			    j, 1, "", Memc[cbuf], SZ_LINE, anyf, status)
+			    j, c_1, "", Memc[cbuf], SZ_LINE, anyf, status)
 		call sscan (Memc[cbuf])
 		    call gargi (buffer[i])
 		if (nscan() < 1)
@@ -209,7 +221,7 @@ begin
 
 	    j = first
 	    do i = 1, nret {
-		call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 			bbuf, flagvals, anyf, status)
 		if (flagvals)
 		    buffer[i] = INDEFI
@@ -235,29 +247,32 @@ end
 
 # tbfags -- get short integer elements
 
-int procedure tbfags (tp, cp, rownum, buffer, first, nelem)
+long procedure tbfags (tp, cp, rownum, buffer, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 short	buffer[ARB]	# o: buffer for values to be gotten
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
 pointer sp
 pointer cbuf		# for getting string
 bool	bbuf		# for getting boolean
 bool	flagvals	# set to true if the value is undefined
-int	i, j		# loop indexes
+long	i, j		# loop indexes
 int	status		# zero is OK
 short	nulval		# INDEFS
 bool	anyf		# set to true if any value is undefined
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+long	c_1
 int	nscan()
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	ntotal = COL_NELEM(cp)
@@ -266,11 +281,12 @@ begin
 	if (COL_DTYPE(cp) < 0) {		# text string
 
 	    call smark (sp)
-	    call salloc (cbuf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (cbuf, sz_val, TY_CHAR)
 	    j = first
 	    do i = 1, nret {
 		call fsgcvs (TB_FILE(tp), COL_NUMBER(cp), rownum,
-			    j, 1, "", Memc[cbuf], SZ_LINE, anyf, status)
+			    j, c_1, "", Memc[cbuf], SZ_LINE, anyf, status)
 		call sscan (Memc[cbuf])
 		    call gargs (buffer[i])
 		if (nscan() < 1)
@@ -283,7 +299,7 @@ begin
 
 	    j = first
 	    do i = 1, nret {
-		call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 			bbuf, flagvals, anyf, status)
 		if (flagvals)
 		    buffer[i] = INDEFS
@@ -309,29 +325,32 @@ end
 
 # tbfagb -- get boolean elements
 
-int procedure tbfagb (tp, cp, rownum, buffer, first, nelem)
+long procedure tbfagb (tp, cp, rownum, buffer, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 bool	buffer[ARB]	# o: buffer for values to be gotten
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
 pointer sp
 pointer cbuf		# for getting string
 pointer flags		# scratch for array of null flags
 double	dbuf
 double	nulval		# INDEFD
-int	i, j		# loop indexes
+long	i, j		# loop indexes
 int	status		# zero is OK
 bool	anyf		# set to true if any value is undefined
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+long	c_1
 bool	streq()
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	ntotal = COL_NELEM(cp)
@@ -340,11 +359,12 @@ begin
 	if (COL_DTYPE(cp) < 0) {		# text string
 
 	    call smark (sp)
-	    call salloc (cbuf, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (cbuf, sz_val, TY_CHAR)
 	    j = first
 	    do i = 1, nret {
 		call fsgcvs (TB_FILE(tp), COL_NUMBER(cp), rownum,
-			j, 1, "", Memc[cbuf], SZ_LINE, anyf, status)
+			j, c_1, "", Memc[cbuf], SZ_LINE, anyf, status)
 		call strlwr (Memc[cbuf])
 		if (streq (Memc[cbuf], "yes") || streq (Memc[cbuf], "y") ||
 		    streq (Memc[cbuf], "true") || streq (Memc[cbuf], "t"))
@@ -358,12 +378,13 @@ begin
 	} else if (COL_DTYPE(cp) == TBL_TY_BOOL) {
 
 	    call smark (sp)
-	    call salloc (flags, nret, TY_CHAR)
+	    sz_val = nret
+	    call salloc (flags, sz_val, TY_BOOL)
 	    do i = 1, nret
 		buffer[i] = false
 	    call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, first, nret,
-			buffer, Memc[flags], anyf, status)
-	    # We can't actually use Memc[flags] because bool has no INDEF.
+			buffer, Memb[flags], anyf, status)
+	    # We can't actually use Memb[flags] because bool has no INDEF.
 	    call sfree (sp)
 
 	} else {
@@ -372,7 +393,7 @@ begin
 	    j = first
 	    do i = 1, nret {
 		call fsgcvd (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, nulval, dbuf, anyf, status)
+				j, c_1, nulval, dbuf, anyf, status)
 		if (anyf)
 		    buffer[i] = false
 		else
@@ -389,21 +410,21 @@ end
 
 # tbfagt -- get text-string elements
 
-int procedure tbfagt (tp, cp, rownum, cbuf, maxch, first, nelem)
+long procedure tbfagt (tp, cp, rownum, cbuf, maxch, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 char	cbuf[maxch,ARB]	# o: buffer for values to be gotten
 int	maxch		# i: max number of char in output string
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
 int	status		# zero is OK
-int	i, j		# loop indexes
+long	i, j		# loop indexes
 bool	anyf		# set to true if any value is undefined
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
 # The following are for getting non-text type values and converting to text
 double	dbuf
 double	dnulval		# INDEFD
@@ -415,9 +436,11 @@ short	sbuf
 short	snulval		# INDEFS
 bool	bbuf
 bool	flagvals	# set to true if the value is undefined
+long	c_1
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	ntotal = COL_NELEM(cp)
@@ -439,7 +462,7 @@ begin
 		dnulval = INDEFD
 		do i = 1, nret {
 		    call fsgcvd (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, dnulval, dbuf, anyf, status)
+				j, c_1, dnulval, dbuf, anyf, status)
 		    call sprintf (cbuf[1,i], maxch, COL_FMT(cp))
 			call pargd (dbuf)
 		    j = j + 1
@@ -448,7 +471,7 @@ begin
 		rnulval = INDEFR
 		do i = 1, nret {
 		    call fsgcve (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, rnulval, rbuf, anyf, status)
+				j, c_1, rnulval, rbuf, anyf, status)
 		    call sprintf (cbuf[1,i], maxch, COL_FMT(cp))
 			call pargr (rbuf)
 		    j = j + 1
@@ -457,7 +480,7 @@ begin
 		inulval = INDEFI
 		do i = 1, nret {
 		    call fsgcvj (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, inulval, ibuf, anyf, status)
+				j, c_1, inulval, ibuf, anyf, status)
 		    call sprintf (cbuf[1,i], maxch, COL_FMT(cp))
 			call pargi (ibuf)
 		    j = j + 1
@@ -466,14 +489,14 @@ begin
 		snulval = INDEFS
 		do i = 1, nret {
 		    call fsgcvi (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, snulval, sbuf, anyf, status)
+				j, c_1, snulval, sbuf, anyf, status)
 		    call sprintf (cbuf[1,i], maxch, COL_FMT(cp))
 			call pargs (sbuf)
 		    j = j + 1
 		}
 	    case TBL_TY_BOOL:
 		do i = 1, nret {
-		    call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		    call fsgcfl (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 				bbuf, flagvals, anyf, status)
 		    if (flagvals) {
 			call strcpy ("INDEF", cbuf[1,i], maxch)

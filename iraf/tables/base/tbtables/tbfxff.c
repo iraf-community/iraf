@@ -16,8 +16,15 @@ static char c_value[FLEN_VALUE+1];
 static char c_comment[FLEN_COMMENT+1];
 static char c_message[FLEN_ERRMSG+1];
 
+static void **Ptrs = NULL;		/* address table for CFITSIO ptrs */
+static int N_ptrs = 0;
+
 static void strpak (const XCHAR *, char *, long);
 static void strupk (const char *, XCHAR *, long);
+
+static int register_ptr(void *ptr);
+static int unregister_ptr(void *ptr);
+static void *get_ptr(int idx);
 
 /* This file tbfxff.c contains the interface between the SPP FITSIO calls
    and the CFITSIO functions.
@@ -38,105 +45,105 @@ static void strupk (const char *, XCHAR *, long);
    Phil Hodge, 12-Sep-2000  Add fsgtbb and fsptbb.
 */
 
-void FTDREC_U (XPOINTER *x_fptr, XINT *keypos, XINT *x_status)
+void FTDREC_U (XINT *funit, XINT *keypos, XINT *x_status)
 {
-
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
-	ffdrec (*fptr, *keypos, &status);
+	ffdrec (fptr, *keypos, &status);
 	*x_status = status;
 }
 
 void FTCMSG_U()
 {
-
 	ffcmsg();
 }
 
-void FSGIOU_U (XPOINTER *x_fptr, XINT *x_status)
+void FSGIOU_U (XINT *funit, XINT *x_status)
 {
 	;
 }
 
-void FSFIOU_U (XPOINTER *x_fptr, XINT *x_status)
+void FSFIOU_U (XINT *funit, XINT *x_status)
 {
 	;
 }
 
-void FSCLOS_U (XPOINTER *x_fptr, XINT *x_status)
+void FSCLOS_U (XINT *funit, XINT *x_status)
 {
-
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
-	ffclos (*fptr, &status);
+	ffclos (fptr, &status);
+	if ( status == 0 ) {
+	    unregister_ptr(fptr);
+	}
 	*x_status = status;
 }
 
-void FSCOPY_U (XPOINTER *x_infptr, XPOINTER *x_outfptr, XINT *morekeys,
+void FSCOPY_U (XINT *in_funit, XINT *out_funit, XINT *morekeys,
 	       XINT *x_status)
 {
-	fitsfile **infptr = (fitsfile **)x_infptr;
-	fitsfile **outfptr = (fitsfile **)x_outfptr;
+	fitsfile *infptr = (fitsfile *)get_ptr(*in_funit);
+	fitsfile *outfptr = (fitsfile *)get_ptr(*out_funit);
 	int status = *x_status;
-	ffcopy (*infptr, *outfptr, *morekeys, &status);
+	ffcopy (infptr, outfptr, *morekeys, &status);
 	*x_status = status;
 }
 
-void FSCRHD_U (XPOINTER *x_fptr, XINT *x_status)
+void FSCRHD_U (XINT *funit, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
-	ffcrhd (*fptr, &status);
+	ffcrhd (fptr, &status);
 	*x_status = status;
 }
 
-void FSDHDU_U (XPOINTER *x_fptr, XINT *x_hdutyp, XINT *x_status)
+void FSDHDU_U (XINT *funit, XINT *x_hdutyp, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	int hdutyp = *x_hdutyp;
-	ffdhdu (*fptr, &hdutyp, &status);
+	ffdhdu (fptr, &hdutyp, &status);
 	*x_hdutyp = hdutyp;
 	*x_status = status;
 }
 
-void FSDROW_U (XPOINTER *x_fptr, XINT *frow, XINT *nrows, XINT *x_status)
+void FSDROW_U (XINT *funit, XLONG *frow, XLONG *nrows, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
-	ffdrow (*fptr, (long)*frow, (long)*nrows, &status);
+	ffdrow (fptr, (long)*frow, (long)*nrows, &status);
 	*x_status = status;
 }
 
 /* read bytes */
-void FSGTBB_U (XPOINTER *x_fptr, XINT *frow, XINT *felem, XINT *nbytes,
+void FSGTBB_U (XINT *funit, XLONG *frow, XLONG *felem, XLONG *nbytes,
 	       XCHAR array[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
-	ffgtbb (*fptr, (long)*frow, (long)*felem, (long)*nbytes,
+	ffgtbb (fptr, (long)*frow, (long)*felem, (long)*nbytes,
 		(unsigned char *)array, &status);
 	*x_status = status;
 }
 
 /* write bytes */
-void FSPTBB_U (XPOINTER *x_fptr, XINT *frow, XINT *felem, XINT *nbytes,
+void FSPTBB_U (XINT *funit, XLONG *frow, XLONG *felem, XLONG *nbytes,
 	       XCHAR array[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
-	ffptbb (*fptr, (long)*frow, (long)*felem, (long)*nbytes,
+	ffptbb (fptr, (long)*frow, (long)*felem, (long)*nbytes,
 		(unsigned char *)array, &status);
 	*x_status = status;
 }
 
 /* NOTE:  This is deprecated; use fsgcfl instead.  See next function.  ### */
 
-void FSGCL_U (XPOINTER *x_fptr, XINT *colnum,
-	      XINT *frow, XINT *felem, XINT *nelem,
-	      XINT lray[], XINT *x_status)
+void FSGCL_U (XINT *funit, XINT *colnum,
+	      XLONG *frow, XLONG *felem, XLONG *nelem,
+	      XBOOL lray[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	char nulval = 0;
 	int anynul;
@@ -145,8 +152,7 @@ void FSGCL_U (XPOINTER *x_fptr, XINT *colnum,
 
 	larray = calloc (*nelem, sizeof(char));
 
-	ffgcvl (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffgcvl (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		nulval, larray, &anynul, &status);
 
 	for (i = 0;  i < *nelem;  i++)
@@ -156,11 +162,11 @@ void FSGCL_U (XPOINTER *x_fptr, XINT *colnum,
 	*x_status = status;
 }
 
-void FSGCFL_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
-	       XINT lray[], XINT flgval[], XINT *x_anynul, XINT *x_status)
+void FSGCFL_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
+	       XBOOL lray[], XBOOL flgval[], XBOOL *x_anynul, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	int anynul = *x_anynul;
 	long i;
@@ -171,8 +177,7 @@ void FSGCFL_U (XPOINTER *x_fptr, XINT *colnum,
 	larray = calloc (*nelem, sizeof(char));
 	nularray = calloc (*nelem, sizeof(char));
 
-	ffgcfl (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffgcfl (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		larray, nularray, &anynul, &status);
 
 	for (i = 0;  i < *nelem;  i++) {
@@ -186,53 +191,50 @@ void FSGCFL_U (XPOINTER *x_fptr, XINT *colnum,
 	*x_status = status;
 }
 
-void FSGCVD_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
-	       XDOUBLE *nulval, XDOUBLE array[], XINT *x_anynul, XINT *x_status)
+void FSGCVD_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
+	       XDOUBLE *nulval, XDOUBLE array[], XBOOL *x_anynul, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	int anynul = *x_anynul;
-	ffgcvd (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffgcvd (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		*nulval, array, &anynul, &status);
 	*x_anynul = anynul;
 	*x_status = status;
 }
 
-void FSGCVE_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
-	       XREAL *nulval, XREAL array[], XINT *x_anynul, XINT *x_status)
+void FSGCVE_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
+	       XREAL *nulval, XREAL array[], XBOOL *x_anynul, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	int anynul = *x_anynul;
-	ffgcve (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffgcve (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		*nulval, array, &anynul, &status);
 	*x_anynul = anynul;
 	*x_status = status;
 }
 
-void FSGCVI_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
-	       XSHORT *nulval, XSHORT array[], XINT *x_anynul, XINT *x_status)
+void FSGCVI_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
+	       XSHORT *nulval, XSHORT array[], XBOOL *x_anynul, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	int anynul = *x_anynul;
-	ffgcvi (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffgcvi (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		*nulval, array, &anynul, &status);
 	*x_anynul = anynul;
 	*x_status = status;
 }
 
-void FSGCVJ_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
-	       XINT *nulval, XINT array[], XINT *x_anynul, XINT *x_status)
+void FSGCVJ_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
+	       XINT *nulval, XINT array[], XBOOL *x_anynul, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	int anynul = *x_anynul;
 	long *larray;
@@ -240,8 +242,7 @@ void FSGCVJ_U (XPOINTER *x_fptr, XINT *colnum,
 
 	larray = calloc (*nelem, sizeof(long));
 
-	ffgcvj (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffgcvj (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		(long)*nulval, larray, &anynul, &status);
 
 	for (i = 0;  i < *nelem;  i++)
@@ -252,12 +253,12 @@ void FSGCVJ_U (XPOINTER *x_fptr, XINT *colnum,
 	*x_status = status;
 }
 
-void FSGCVS_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
+void FSGCVS_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
 	       XCHAR nulval[], XCHAR array[], XINT *dim1,
-	       XINT *x_anynul, XINT *x_status)
+	       XBOOL *x_anynul, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	int anynul = *x_anynul;
 	char **larray;
@@ -273,8 +274,7 @@ void FSGCVS_U (XPOINTER *x_fptr, XINT *colnum,
 
 	strpak (nulval, lnulval, *dim1);
 
-	ffgcvs (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffgcvs (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		lnulval, larray, &anynul, &status);
 
 	j = 0;
@@ -290,27 +290,27 @@ void FSGCVS_U (XPOINTER *x_fptr, XINT *colnum,
 	*x_status = status;
 }
 
-void FSGHSP_U (XPOINTER *x_fptr, XINT *x_nexist, XINT *x_nmore, XINT *x_status)
+void FSGHSP_U (XINT *funit, XINT *x_nexist, XINT *x_nmore, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	int nexist = *x_nexist;
 	int nmore = *x_nmore;
-	ffghsp (*fptr, &nexist, &nmore, &status);
+	ffghsp (fptr, &nexist, &nmore, &status);
 	*x_nmore = nmore;
 	*x_nexist = nexist;
 	*x_status = status;
 }
 
-void FSGKEY_U (XPOINTER *x_fptr, XCHAR sppkey[],
+void FSGKEY_U (XINT *funit, XCHAR sppkey[],
 	       XCHAR sppvalue[], XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 
-	ffgkey (*fptr, c_keyword, c_value, c_comment, &status);
+	ffgkey (fptr, c_keyword, c_value, c_comment, &status);
 
 	if (status == 0) {
 	    strupk (c_value, sppvalue, FLEN_VALUE);
@@ -319,31 +319,31 @@ void FSGKEY_U (XPOINTER *x_fptr, XCHAR sppkey[],
 	*x_status = status;
 }
 
-void FSGKYD_U (XPOINTER *x_fptr, XCHAR sppkey[], XDOUBLE *value,
+void FSGKYD_U (XINT *funit, XCHAR sppkey[], XDOUBLE *value,
 	       XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 
-	ffgkyd (*fptr, c_keyword, value, c_comment, &status);
+	ffgkyd (fptr, c_keyword, value, c_comment, &status);
 
 	if (status == 0)
 	    strupk (c_comment, sppcomm, FLEN_COMMENT);
 	*x_status = status;
 }
 
-void FSGKYJ_U (XPOINTER *x_fptr, XCHAR sppkey[], XINT *value,
+void FSGKYJ_U (XINT *funit, XCHAR sppkey[], XINT *value,
 	       XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	long lvalue;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 
-	ffgkyj (*fptr, c_keyword, &lvalue, c_comment, &status);
+	ffgkyj (fptr, c_keyword, &lvalue, c_comment, &status);
 	*value = lvalue;
 
 	if (status == 0)
@@ -351,15 +351,32 @@ void FSGKYJ_U (XPOINTER *x_fptr, XCHAR sppkey[], XINT *value,
 	*x_status = status;
 }
 
-void FSGKYS_U (XPOINTER *x_fptr, XCHAR sppkey[], XCHAR sppvalue[],
+void FSGKYK_U (XINT *funit, XCHAR sppkey[], XLONG *value,
 	       XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
+	int status = *x_status;
+	long lvalue;
+
+	strpak (sppkey, c_keyword, FLEN_KEYWORD);
+
+	ffgkyj (fptr, c_keyword, &lvalue, c_comment, &status);
+	*value = lvalue;
+
+	if (status == 0)
+	    strupk (c_comment, sppcomm, FLEN_COMMENT);
+	*x_status = status;
+}
+
+void FSGKYS_U (XINT *funit, XCHAR sppkey[], XCHAR sppvalue[],
+	       XCHAR sppcomm[], XINT *x_status)
+{
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 
-	ffgkys (*fptr, c_keyword, c_value, c_comment, &status);
+	ffgkys (fptr, c_keyword, c_value, c_comment, &status);
 
 	if (status == 0) {
 	    strupk (c_value, sppvalue, FLEN_VALUE);
@@ -379,33 +396,33 @@ void FSGMSG_U (XCHAR sppmsg[])
 	    sppmsg[0] = 0;
 }
 
-void FSGREC_U (XPOINTER *x_fptr, XINT *nrec, XCHAR spprecord[], XINT *x_status)
+void FSGREC_U (XINT *funit, XINT *nrec, XCHAR spprecord[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
-	ffgrec (*fptr, *nrec, c_card, &status);
+	ffgrec (fptr, *nrec, c_card, &status);
 
 	if (status == 0)
 	    strupk (c_card, spprecord, FLEN_CARD);
 	*x_status = status;
 }
 
-void FSGRSZ_U (XPOINTER *x_fptr, XINT *maxrows, XINT *x_status)
+void FSGRSZ_U (XINT *funit, XLONG *maxrows, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	long ndata;
 
-	ffgrsz (*fptr, &ndata, &status);
+	ffgrsz (fptr, &ndata, &status);
 	*maxrows = ndata;
 	*x_status = status;
 }
 
-void FSGTDM_U (XPOINTER *x_fptr, XINT *colnum, XINT *maxdim,
-	       XINT *x_naxis, XINT naxes[], XINT *x_status)
+void FSGTDM_U (XINT *funit, XINT *colnum, XINT *maxdim,
+	       XINT *x_naxis, XLONG naxes[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	int naxis = *x_naxis;
 	long *axlen;
@@ -413,7 +430,7 @@ void FSGTDM_U (XPOINTER *x_fptr, XINT *colnum, XINT *maxdim,
 
 	axlen = calloc (*maxdim, sizeof(long));
 
-	ffgtdm (*fptr, *colnum, *maxdim, &naxis, axlen, &status);
+	ffgtdm (fptr, *colnum, *maxdim, &naxis, axlen, &status);
 
 	if (status == 0) {
 	    for (i = 0;  i < naxis;  i++)
@@ -425,11 +442,11 @@ void FSGTDM_U (XPOINTER *x_fptr, XINT *colnum, XINT *maxdim,
 	*x_status = status;
 }
 
-void FSIBIN_U (XPOINTER *x_fptr, XINT *nrows, XINT *nfields,
+void FSIBIN_U (XINT *funit, XLONG *nrows, XINT *nfields,
 	       XCHAR sppttype[], XCHAR spptform[], XCHAR spptunit[],
-	       XCHAR sppextnam[], XINT *pcount, XINT *x_status)
+	       XCHAR sppextnam[], XLONG *pcount, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	char **ttype, **tform, **tunit;
 	char *extnam;
@@ -458,8 +475,7 @@ void FSIBIN_U (XPOINTER *x_fptr, XINT *nrows, XINT *nfields,
 	    j3 += SZ_FTUNIT+1;
 	}
 
-	ffibin (*fptr, (long)*nrows, *nfields,
-		ttype, tform, tunit,
+	ffibin (fptr, (long)*nrows, *nfields, ttype, tform, tunit,
 		extnam, (long)*pcount, &status);
 
 	free (extnam);
@@ -474,10 +490,10 @@ void FSIBIN_U (XPOINTER *x_fptr, XINT *nrows, XINT *nfields,
 	*x_status = status;
 }
 
-void FSICOL_U (XPOINTER *x_fptr, XINT *colnum,
+void FSICOL_U (XINT *funit, XINT *colnum,
 	       XCHAR sppttype[], XCHAR spptform[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	char *ttype, *tform;
 
@@ -486,186 +502,216 @@ void FSICOL_U (XPOINTER *x_fptr, XINT *colnum,
 	strpak (sppttype, ttype, SZ_FTTYPE);
 	strpak (spptform, tform, SZ_FTFORM);
 
-	fficol (*fptr, *colnum, ttype, tform, &status);
+	fficol (fptr, *colnum, ttype, tform, &status);
 
 	free (ttype);
 	free (tform);
 	*x_status = status;
 }
 
-void FSINIT_U (XPOINTER *x_fptr, XCHAR sppname[],
+void FSINIT_U (XINT *funit, XCHAR sppname[],
 	       XINT *blocksize, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = NULL;
 	int status = *x_status;
+
 	strpak (sppname, c_filename, FLEN_FILENAME);
-	ffinit (fptr, c_filename, &status);
+
+	ffinit (&fptr, c_filename, &status);
+	if ( status == 0 ) {
+	    int idx;
+	    idx = register_ptr(fptr);
+	    if ( idx < 0 ) {
+		ffclos (fptr, &status);
+		status = MEMORY_ALLOCATION;
+	    }
+	    *funit = idx;
+	}
 	*x_status = status;
 }
 
-void FSIROW_U (XPOINTER *x_fptr, XINT *frow, XINT *nrows, XINT *x_status)
+void FSIROW_U (XINT *funit, XLONG *frow, XLONG *nrows, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
-	ffirow (*fptr, (long)*frow, (long)*nrows, &status);
+	ffirow (fptr, (long)*frow, (long)*nrows, &status);
 	*x_status = status;
 }
 
-void FSMAHD_U (XPOINTER *x_fptr, XINT *hdunum, XINT *x_exttype, XINT *x_status)
+void FSMAHD_U (XINT *funit, XINT *hdunum, XINT *x_exttype, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	int exttype = *x_exttype;
-	ffmahd (*fptr, *hdunum, &exttype, &status);
+	ffmahd (fptr, *hdunum, &exttype, &status);
 	*x_exttype = exttype;
 	*x_status = status;
 }
 
-void FSMCOM_U (XPOINTER *x_fptr, XCHAR sppkey[], XCHAR sppcomm[], XINT *x_status)
+void FSMCOM_U (XINT *funit, XCHAR sppkey[], XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffmcom (*fptr, c_keyword, c_comment, &status);
+	ffmcom (fptr, c_keyword, c_comment, &status);
 	*x_status = status;
 }
 
-void FSMKYD_U (XPOINTER *x_fptr, XCHAR sppkey[], XDOUBLE *dval,
+void FSMKYD_U (XINT *funit, XCHAR sppkey[], XDOUBLE *dval,
 	       XINT *decim, XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffmkyd (*fptr, c_keyword, *dval, *decim, c_comment, &status);
+	ffmkyd (fptr, c_keyword, *dval, *decim, c_comment, &status);
 	*x_status = status;
 }
 
-void FSMKYE_U (XPOINTER *x_fptr, XCHAR sppkey[], XREAL *rval,
+void FSMKYE_U (XINT *funit, XCHAR sppkey[], XREAL *rval,
 	       XINT *decim, XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffmkye (*fptr, c_keyword, *rval, *decim, c_comment, &status);
+	ffmkye (fptr, c_keyword, *rval, *decim, c_comment, &status);
 	*x_status = status;
 }
 
-void FSMKYJ_U (XPOINTER *x_fptr, XCHAR sppkey[], XINT *intval,
+void FSMKYJ_U (XINT *funit, XCHAR sppkey[], XINT *intval,
 	       XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffmkyj (*fptr, c_keyword, (long)*intval, c_comment, &status);
+	ffmkyj (fptr, c_keyword, (long)*intval, c_comment, &status);
 	*x_status = status;
 }
 
-void FSMKYL_U (XPOINTER *x_fptr, XCHAR sppkey[], XINT *logval,
+void FSMKYK_U (XINT *funit, XCHAR sppkey[], XLONG *intval,
 	       XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffmkyl (*fptr, c_keyword, *logval, c_comment, &status);
+	ffmkyj (fptr, c_keyword, (long)*intval, c_comment, &status);
 	*x_status = status;
 }
 
-void FSMKYS_U (XPOINTER *x_fptr, XCHAR sppkey[], XCHAR sppvalue[],
+void FSMKYL_U (XINT *funit, XCHAR sppkey[], XBOOL *logval,
 	       XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
+	int status = *x_status;
+
+	strpak (sppkey, c_keyword, FLEN_KEYWORD);
+	strpak (sppcomm, c_comment, FLEN_COMMENT);
+
+	ffmkyl (fptr, c_keyword, *logval, c_comment, &status);
+	*x_status = status;
+}
+
+void FSMKYS_U (XINT *funit, XCHAR sppkey[], XCHAR sppvalue[],
+	       XCHAR sppcomm[], XINT *x_status)
+{
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppvalue, c_value, FLEN_VALUE);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffmkys (*fptr, c_keyword, c_value, c_comment, &status);
+	ffmkys (fptr, c_keyword, c_value, c_comment, &status);
 	*x_status = status;
 }
 
-void FSMREC_U (XPOINTER *x_fptr, XINT *nkey, XCHAR sppcard[], XINT *x_status)
+void FSMREC_U (XINT *funit, XINT *nkey, XCHAR sppcard[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppcard, c_card, FLEN_CARD);
 
-	ffmrec (*fptr, *nkey, c_card, &status);
+	ffmrec (fptr, *nkey, c_card, &status);
 	*x_status = status;
 }
 
-void FSOPEN_U (XPOINTER *x_fptr, XCHAR sppname[], XINT *iomode,
+void FSOPEN_U (XINT *funit, XCHAR sppname[], XINT *iomode,
 	       XINT *blocksize, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = NULL;
 	int status = *x_status;
 
 	strpak (sppname, c_filename, FLEN_FILENAME);
 
-	ffopen (fptr, c_filename, *iomode, &status);
+	ffopen (&fptr, c_filename, *iomode, &status);
+	if ( status == 0 ) {
+	    int idx;
+	    idx = register_ptr(fptr);
+	    if ( idx < 0 ) {
+		ffclos (fptr, &status);
+		status = MEMORY_ALLOCATION;
+	    }
+	    *funit = idx;
+	}
 	*x_status = status;
 }
 
-void FSPCLD_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
+void FSPCLD_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
 	       XDOUBLE array[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
-	ffpcld (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffpcld (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		array, &status);
 	*x_status = status;
 }
 
-void FSPCLE_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
+void FSPCLE_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
 	       XREAL array[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
-	ffpcle (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffpcle (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		array, &status);
 	*x_status = status;
 }
 
-void FSPCLI_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
+void FSPCLI_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
 	       XSHORT array[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
-	ffpcli (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffpcli (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		array, &status);
 	*x_status = status;
 }
 
-void FSPCLJ_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
+void FSPCLJ_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
 	       XINT array[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	long *larray;
 	long i;
@@ -675,19 +721,18 @@ void FSPCLJ_U (XPOINTER *x_fptr, XINT *colnum,
 	for (i = 0;  i < *nelem;  i++)
 	    larray[i] = array[i];
 
-	ffpclj (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffpclj (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		larray, &status);
 
 	free (larray);
 	*x_status = status;
 }
 
-void FSPCLL_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
-	       XINT array[], XINT *x_status)
+void FSPCLL_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
+	       XBOOL array[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	char *larray;
 	long i;
@@ -697,19 +742,18 @@ void FSPCLL_U (XPOINTER *x_fptr, XINT *colnum,
 	for (i = 0;  i < *nelem;  i++)
 	    larray[i] = array[i];
 
-	ffpcll (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffpcll (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		larray, &status);
 
 	free (larray);
 	*x_status = status;
 }
 
-void FSPCLS_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
+void FSPCLS_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
 	       XCHAR array[], XINT *dim1, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	char **larray;
 	long i, j;		/* j is the index for array */
@@ -723,8 +767,7 @@ void FSPCLS_U (XPOINTER *x_fptr, XINT *colnum,
 	    j += (*dim1 + 1);		/* array is 2-D */
 	}
 
-	ffpcls (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem,
+	ffpcls (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
 		larray, &status);
 
 	for (i = 0;  i < *nelem;  i++)
@@ -734,33 +777,33 @@ void FSPCLS_U (XPOINTER *x_fptr, XINT *colnum,
 	*x_status = status;
 }
 
-void FSPCLU_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *frow, XINT *felem, XINT *nelem,
+void FSPCLU_U (XINT *funit, XINT *colnum,
+	       XLONG *frow, XLONG *felem, XLONG *nelem,
 	       XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
-	ffpclu (*fptr, *colnum,
-		(long)*frow, (long)*felem, (long)*nelem, &status);
+	ffpclu (fptr, *colnum, (long)*frow, (long)*felem, (long)*nelem,
+		&status);
 	*x_status = status;
 }
 
-void FSPCOM_U (XPOINTER *x_fptr, XCHAR sppcomm[], XINT *x_status)
+void FSPCOM_U (XINT *funit, XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffpcom (*fptr, c_comment, &status);
+	ffpcom (fptr, c_comment, &status);
 	*x_status = status;
 }
 
-void FSPHBN_U (XPOINTER *x_fptr, XINT *nrows, XINT *nfields,
+void FSPHBN_U (XINT *funit, XLONG *nrows, XINT *nfields,
 	       XCHAR sppttype[], XCHAR spptform[], XCHAR spptunit[],
-	       XCHAR sppextnam[], XINT *pcount, XINT *x_status)
+	       XCHAR sppextnam[], XLONG *pcount, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	char **ttype, **tform, **tunit;
 	char *extnam;
@@ -789,8 +832,7 @@ void FSPHBN_U (XPOINTER *x_fptr, XINT *nrows, XINT *nfields,
 	    j3 += SZ_FTUNIT+1;
 	}
 
-	ffphbn (*fptr, (long)*nrows, *nfields,
-		ttype, tform, tunit,
+	ffphbn (fptr, (long)*nrows, *nfields, ttype, tform, tunit,
 		extnam, (long)*pcount, &status);
 
 	free (extnam);
@@ -805,22 +847,22 @@ void FSPHBN_U (XPOINTER *x_fptr, XINT *nrows, XINT *nfields,
 	*x_status = status;
 }
 
-void FSPHIS_U (XPOINTER *x_fptr, XCHAR sppcomm[], XINT *x_status)
+void FSPHIS_U (XINT *funit, XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffphis (*fptr, c_comment, &status);
+	ffphis (fptr, c_comment, &status);
 	*x_status = status;
 }
 
-void FSPHPR_U (XPOINTER *x_fptr, XINT *simple, XINT *bitpix,
+void FSPHPR_U (XINT *funit, XBOOL *simple, XINT *bitpix,
 	       XINT *naxis, XLONG naxes[], XLONG *pcount, XLONG *gcount,
-	       XINT *extend, XINT *x_status)
+	       XBOOL *extend, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	long *axlen;
 	long i;
@@ -830,87 +872,87 @@ void FSPHPR_U (XPOINTER *x_fptr, XINT *simple, XINT *bitpix,
 	for (i = 0;  i < *naxis;  i++)
 	    axlen[i] = naxes[i];
 
-	ffphpr (*fptr, *simple, *bitpix, *naxis, axlen,
+	ffphpr (fptr, *simple, *bitpix, *naxis, axlen,
 		(long)*pcount, (long)*gcount, *extend, &status);
 
 	free (axlen);
 	*x_status = status;
 }
 
-void FSPKYD_U (XPOINTER *x_fptr, XCHAR sppkey[],
+void FSPKYD_U (XINT *funit, XCHAR sppkey[],
 	       XDOUBLE *dval, XINT *decim, XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffpkyd (*fptr, c_keyword, *dval, *decim, c_comment, &status);
+	ffpkyd (fptr, c_keyword, *dval, *decim, c_comment, &status);
 	*x_status = status;
 }
 
-void FSPKYE_U (XPOINTER *x_fptr, XCHAR sppkey[],
+void FSPKYE_U (XINT *funit, XCHAR sppkey[],
 	       XREAL *rval, XINT *decim, XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffpkye (*fptr, c_keyword, *rval, *decim, c_comment, &status);
+	ffpkye (fptr, c_keyword, *rval, *decim, c_comment, &status);
 	*x_status = status;
 }
 
-void FSPKYJ_U (XPOINTER *x_fptr, XCHAR sppkey[], XINT *value,
+void FSPKYJ_U (XINT *funit, XCHAR sppkey[], XINT *value,
 	       XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffpkyj (*fptr, c_keyword, (long)*value, c_comment, &status);
+	ffpkyj (fptr, c_keyword, (long)*value, c_comment, &status);
 	*x_status = status;
 }
 
-void FSPKYL_U (XPOINTER *x_fptr, XCHAR sppkey[],
-	       XINT *logval, XCHAR sppcomm[], XINT *x_status)
+void FSPKYL_U (XINT *funit, XCHAR sppkey[],
+	       XBOOL *logval, XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffpkyl (*fptr, c_keyword, *logval, c_comment, &status);
+	ffpkyl (fptr, c_keyword, *logval, c_comment, &status);
 	*x_status = status;
 }
 
-void FSPKYS_U (XPOINTER *x_fptr, XCHAR sppkey[], XCHAR sppvalue[],
+void FSPKYS_U (XINT *funit, XCHAR sppkey[], XCHAR sppvalue[],
 	       XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppvalue, c_value, FLEN_VALUE);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffpkys (*fptr, c_keyword, c_value, c_comment, &status);
+	ffpkys (fptr, c_keyword, c_value, c_comment, &status);
 	*x_status = status;
 }
 
-void FSPREC_U (XPOINTER *x_fptr, XCHAR sppcard[], XINT *x_status)
+void FSPREC_U (XINT *funit, XCHAR sppcard[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppcard, c_card, FLEN_CARD);
 
-	ffprec (*fptr, c_card, &status);
+	ffprec (fptr, c_card, &status);
 	*x_status = status;
 }
 
@@ -930,10 +972,10 @@ void FSPSVC_U (XCHAR sppcard[],
 	*x_status = status;
 }
 
-void FSPTDM_U (XPOINTER *x_fptr, XINT *colnum,
-	       XINT *naxis, XINT naxes[], XINT *x_status)
+void FSPTDM_U (XINT *funit, XINT *colnum,
+	       XINT *naxis, XLONG naxes[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 	long *axlen;
 	long i;
@@ -943,70 +985,70 @@ void FSPTDM_U (XPOINTER *x_fptr, XINT *colnum,
 	for (i = 0;  i < *naxis;  i++)
 	    axlen[i] = naxes[i];
 
-	ffptdm (*fptr, *colnum, *naxis, axlen, &status);
+	ffptdm (fptr, *colnum, *naxis, axlen, &status);
 
 	free (axlen);
 	*x_status = status;
 }
 
-void FSRDEF_U (XPOINTER *x_fptr, XINT *x_status)
+void FSRDEF_U (XINT *funit, XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
-	ffrdef (*fptr, &status);
+	ffrdef (fptr, &status);
 	*x_status = status;
 }
 
-void FSUKYD_U (XPOINTER *x_fptr, XCHAR sppkey[],
+void FSUKYD_U (XINT *funit, XCHAR sppkey[],
 	       XDOUBLE *dval, XINT *decim, XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffukyd (*fptr, c_keyword, *dval, *decim, c_comment, &status);
+	ffukyd (fptr, c_keyword, *dval, *decim, c_comment, &status);
 	*x_status = status;
 }
 
-void FSUKYJ_U (XPOINTER *x_fptr, XCHAR sppkey[], XINT *value,
+void FSUKYJ_U (XINT *funit, XCHAR sppkey[], XINT *value,
 	       XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffukyj (*fptr, c_keyword, (long)*value, c_comment, &status);
+	ffukyj (fptr, c_keyword, (long)*value, c_comment, &status);
 	*x_status = status;
 }
 
-void FSUKYL_U (XPOINTER *x_fptr, XCHAR sppkey[], XINT *x_logval,
+void FSUKYL_U (XINT *funit, XCHAR sppkey[], XBOOL *x_logval,
 	       XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffukyl (*fptr, c_keyword, *x_logval, c_comment, &status);
+	ffukyl (fptr, c_keyword, *x_logval, c_comment, &status);
 	*x_status = status;
 }
 
-void FSUKYS_U (XPOINTER *x_fptr, XCHAR sppkey[],
+void FSUKYS_U (XINT *funit, XCHAR sppkey[],
 	       XCHAR sppvalue[], XCHAR sppcomm[], XINT *x_status)
 {
-	fitsfile **fptr = (fitsfile **)x_fptr;
+	fitsfile *fptr = (fitsfile *)get_ptr(*funit);
 	int status = *x_status;
 
 	strpak (sppkey, c_keyword, FLEN_KEYWORD);
 	strpak (sppvalue, c_value, FLEN_VALUE);
 	strpak (sppcomm, c_comment, FLEN_COMMENT);
 
-	ffukys (*fptr, c_keyword, c_value, c_comment, &status);
+	ffukys (fptr, c_keyword, c_value, c_comment, &status);
 	*x_status = status;
 }
 
@@ -1030,4 +1072,58 @@ static void strupk (const char *in, XCHAR *out, long maxch)
 	    i++;
 	}
 	out[i] = 0;
+}
+
+#define IDX_OFFSET 50				/* see fitsio/ftxiou.f */
+
+static int register_ptr(void *ptr)
+{
+    int i;
+    if ( ptr == NULL ) return -1;			/* error */
+    for ( i=0 ; i < N_ptrs ; i++ ) {
+	if ( Ptrs[i] == NULL ) break;
+    }
+    if ( i == N_ptrs ) {
+	void **tmp_ptr;
+	tmp_ptr = (void **)realloc(Ptrs, sizeof(void *) * (i+1));
+	if ( tmp_ptr == NULL ) return -1;		/* error */
+	Ptrs = tmp_ptr;
+	N_ptrs = i+1;
+    }
+    Ptrs[i] = ptr;
+    return (IDX_OFFSET + i);
+}
+
+static int unregister_ptr(void *ptr)
+{
+    int i, new_n;
+    if ( ptr == NULL ) return -1;			/* error */
+    if ( Ptrs == NULL ) return -1;			/* error */
+    for ( i=0 ; i < N_ptrs ; i++ ) {
+	if ( Ptrs[i] == ptr ) {
+	    Ptrs[i] = NULL;
+	    break;
+	}
+    }
+    if ( i == N_ptrs ) return -1;			/* error */
+    new_n = 0;
+    for ( i=0 ; i < N_ptrs ; i++ ) {
+	if ( Ptrs[i] != NULL ) new_n = i+1;
+    }
+    if ( new_n < N_ptrs ) {
+	void **tmp_ptr;
+	tmp_ptr = (void **)realloc(Ptrs, sizeof(void *) * new_n);
+	if ( 0 < new_n && tmp_ptr == NULL ) return -1;	/* error */
+	Ptrs = tmp_ptr;
+	N_ptrs = new_n;
+    }
+    return 0;
+}
+
+static void *get_ptr(int idx)
+{
+    if ( IDX_OFFSET <= idx && idx < IDX_OFFSET + N_ptrs ) {
+	return Ptrs[idx - IDX_OFFSET];
+    }
+    else return NULL;					/* error */
 }

@@ -23,12 +23,15 @@ procedure tbtrsi (tp)
 
 pointer tp			# Pointer to table descriptor
 #--
-int	sizinfo[LEN_SIZINFO]	# Size information record
-long	tbtbod()
-int	read()
+long	sizinfo[LEN_SIZINFO]	# Size information record
+long	l_val
+size_t	sz_val, c_1
+long	tbtbod(), read()
 errchk	seek, read, tbfrsi
 
 begin
+	c_1 = 1
+
 	if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    TB_BOD(tp) = 0
 	    return
@@ -40,15 +43,23 @@ begin
 	    return
 	}
 
-	call seek (TB_FILE(tp), BOF)
-	if (read (TB_FILE(tp), sizinfo, SZ_SIZINFO) == EOF)
+	l_val = BOF
+	call seek (TB_FILE(tp), l_val)
+	sz_val = SZ_SIZINFO
+	# arg2: incompatible pointer
+	if (read (TB_FILE(tp), sizinfo, sz_val) == EOF)
 	    call error (ER_TBFILEMPTY, "table data file is empty")
 
 	TB_TYPE(tp) = S_TYPE(sizinfo)
 	if ((TB_TYPE(tp) != TBL_TYPE_S_ROW) &&
 	    (TB_TYPE(tp) != TBL_TYPE_S_COL)) {
 	    # Check whether sizinfo is just byte swapped.
-	    call bswap4 (sizinfo, 1, sizinfo, 1, SZ_SIZINFO*SZB_CHAR)
+	    sz_val = SZ_SIZINFO*SZB_CHAR
+	    if ( SZ_LONG == 2 ) {
+		call bswap4 (sizinfo, c_1, sizinfo, c_1, sz_val)
+	    } else {
+		call bswap8 (sizinfo, c_1, sizinfo, c_1, sz_val)
+	    }
 	    if ((S_TYPE(sizinfo) == TBL_TYPE_S_ROW) ||
 		(S_TYPE(sizinfo) == TBL_TYPE_S_COL)) {
 		call error (ER_BYTESWAPPED,

@@ -14,10 +14,10 @@ procedure tbxudf (tp, colptr, numcols, rownum)
 pointer tp			# i: pointer to table descriptor
 pointer colptr[numcols]		# i: array of pointers to column descriptors
 int	numcols			# i: number of columns
-int	rownum			# i: row number
+long	rownum			# i: row number
 #--
 int	k			# loop index
-int	coloffset		# offset of column within row
+pointer	coloffset		# offset of column within row
 long	roffset			# offset to beginning of row
 long	offset			# for writing INDEF values in table data file
 long	tbxoff()

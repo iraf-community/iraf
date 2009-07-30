@@ -10,6 +10,7 @@ procedure tbfscal (tp, cp)
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
 #--
+size_t	sz_val
 pointer sp
 pointer keyword		# for keyword name
 int	i		# column number
@@ -17,7 +18,8 @@ int	status
 
 begin
 	call smark (sp)
-	call salloc (keyword, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyword, sz_val, TY_CHAR)
 
 	i = COL_NUMBER(cp)
 	status = 0			# initial value

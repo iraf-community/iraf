@@ -9,15 +9,18 @@ include "tblerr.h"
 
 procedure tbrchg (tp, allrows)
 
-pointer tp			# Pointer to table descriptor
-int	allrows			# The new value for the allocated number of rows
+pointer tp		# Pointer to table descriptor
+long	allrows		# The new value for the allocated number of rows
+
+long	l_val
 
 errchk	tbtchs
 
 begin
 	if (TB_TYPE(tp) == TBL_TYPE_S_COL) {
 	    if (TB_IS_OPEN(tp)) {
-		call tbtchs (tp, -1, -1, -1, allrows)
+		l_val = -1
+		call tbtchs (tp, -1, -1, l_val, allrows)
 	    } else {
 		TB_ALLROWS(tp) = allrows
 	    }

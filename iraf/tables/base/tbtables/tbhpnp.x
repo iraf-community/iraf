@@ -35,6 +35,7 @@ char	keyword[SZ_KEYWORD]	# i: keyword for the parameter
 int	dtype			# i: data type (TY_CHAR, etc)
 char	str[ARB]		# i: string containing the value of the param.
 #--
+size_t	sz_val
 pointer sp
 pointer str2			# copy of str, without leading & trailing blanks
 pointer par			# buffer for parameter record
@@ -59,9 +60,10 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (str2, SZ_PARREC, TY_CHAR)
-	call salloc (par, SZ_PARREC, TY_CHAR)
-	call salloc (oldpar, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (str2, sz_val, TY_CHAR)
+	call salloc (par, sz_val, TY_CHAR)
+	call salloc (oldpar, sz_val, TY_CHAR)
 
 	# We must have an upper case keyword.
 	call strcpy (keyword, uckey, SZ_KEYWORD)

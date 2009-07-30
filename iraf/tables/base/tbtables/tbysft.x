@@ -19,29 +19,34 @@ include "tblerr.h"
 procedure tbysft (tp, first, shift)
 
 pointer tp			# i: pointer to table descriptor
-int	first			# i: first row to be affected by the shift
-int	shift			# i: shift by this many rows
+long	first			# i: first row to be affected by the shift
+long	shift			# i: shift by this many rows
 #--
 pointer cptr			# pointer to a column descriptor
 pointer v			# pointer to array of values
 pointer vj			# pointer which is incremented in loop
-int	abs_shift		# absolute value of shift
-int	row1, row2		# range of rows to be copied
-int	nrows			# number of rows written to table
-int	nvals			# number of values in scratch array
+long	abs_shift		# absolute value of shift
+long	row1, row2		# range of rows to be copied
+long	nrows			# number of rows written to table
+size_t	nvals			# number of values in scratch array
 int	dtype			# data type of a column
-int	col_width		# space in char for an element in table
+long	col_width		# space in char for an element in table
 int	col			# loop index for column number
-int	k			# loop index
+long	k			# loop index
 long	i_offset		# offset in char to a table element
 long	o_offset		# offset in char to a table element
+long	c_1
+size_t	sz_val
 long	tbeoff()
 pointer tbcnum()
+long	labs()
 errchk	tbegpb, tbegpd, tbegpi, tbegps, tbegpr, tbegpt,
 	tbeppb, tbeppd, tbeppi, tbepps, tbeppr, tbeppt,
 	tbywer
 
 begin
+	c_1 = 1
+
 	nrows = TB_NROWS(tp)
 
 	# Make sure there are enough rows allocated in the table.
@@ -64,7 +69,7 @@ begin
 	if (shift > 0)
 	    TB_NROWS(tp) = TB_NROWS(tp) + shift
 
-	abs_shift = abs (shift)
+	abs_shift = labs (shift)
 
 	# Rows row1:row2 will be copied to row1+shift:row2+shift.
 	if (shift < 0) {
@@ -86,14 +91,14 @@ begin
 	    case TY_REAL:
 		call malloc (v, nvals, TY_REAL)
 		vj = v					# incremented in loop
-		i_offset = tbeoff (tp, cptr, row1, 1)
+		i_offset = tbeoff (tp, cptr, row1, c_1)
 		do k = row1, row2 {
 		    call tbegpr (tp, cptr, i_offset, k, Memr[vj])	# get
 		    vj = vj + 1
 		    i_offset = i_offset + col_width
 		}
 		vj = v					# incremented in loop
-		o_offset = tbeoff (tp, cptr, row1+shift, 1)
+		o_offset = tbeoff (tp, cptr, row1+shift, c_1)
 		do k = row1+shift, row2+shift {
 		    call tbeppr (tp, cptr, o_offset, k, Memr[vj])	# put
 		    vj = vj + 1
@@ -104,14 +109,14 @@ begin
 	    case TY_DOUBLE:
 		call malloc (v, nvals, TY_DOUBLE)
 		vj = v
-		i_offset = tbeoff (tp, cptr, row1, 1)
+		i_offset = tbeoff (tp, cptr, row1, c_1)
 		do k = row1, row2 {
 		    call tbegpd (tp, cptr, i_offset, k, Memd[vj])
 		    vj = vj + 1
 		    i_offset = i_offset + col_width
 		}
 		vj = v
-		o_offset = tbeoff (tp, cptr, row1+shift, 1)
+		o_offset = tbeoff (tp, cptr, row1+shift, c_1)
 		do k = row1+shift, row2+shift {
 		    call tbeppd (tp, cptr, o_offset, k, Memd[vj])
 		    vj = vj + 1
@@ -122,14 +127,14 @@ begin
 	    case TY_INT:
 		call malloc (v, nvals, TY_INT)
 		vj = v
-		i_offset = tbeoff (tp, cptr, row1, 1)
+		i_offset = tbeoff (tp, cptr, row1, c_1)
 		do k = row1, row2 {
 		    call tbegpi (tp, cptr, i_offset, k, Memi[vj])
 		    vj = vj + 1
 		    i_offset = i_offset + col_width
 		}
 		vj = v
-		o_offset = tbeoff (tp, cptr, row1+shift, 1)
+		o_offset = tbeoff (tp, cptr, row1+shift, c_1)
 		do k = row1+shift, row2+shift {
 		    call tbeppi (tp, cptr, o_offset, k, Memi[vj])
 		    vj = vj + 1
@@ -140,14 +145,14 @@ begin
 	    case TY_SHORT:
 		call malloc (v, nvals, TY_SHORT)
 		vj = v
-		i_offset = tbeoff (tp, cptr, row1, 1)
+		i_offset = tbeoff (tp, cptr, row1, c_1)
 		do k = row1, row2 {
 		    call tbegps (tp, cptr, i_offset, k, Mems[vj])
 		    vj = vj + 1
 		    i_offset = i_offset + col_width
 		}
 		vj = v
-		o_offset = tbeoff (tp, cptr, row1+shift, 1)
+		o_offset = tbeoff (tp, cptr, row1+shift, c_1)
 		do k = row1+shift, row2+shift {
 		    call tbepps (tp, cptr, o_offset, k, Mems[vj])
 		    vj = vj + 1
@@ -158,14 +163,14 @@ begin
 	    case TY_BOOL:
 		call malloc (v, nvals, TY_BOOL)
 		vj = v
-		i_offset = tbeoff (tp, cptr, row1, 1)
+		i_offset = tbeoff (tp, cptr, row1, c_1)
 		do k = row1, row2 {
 		    call tbegpb (tp, cptr, i_offset, k, Memb[vj])
 		    vj = vj + 1
 		    i_offset = i_offset + col_width
 		}
 		vj = v
-		o_offset = tbeoff (tp, cptr, row1+shift, 1)
+		o_offset = tbeoff (tp, cptr, row1+shift, c_1)
 		do k = row1+shift, row2+shift {
 		    call tbeppb (tp, cptr, o_offset, k, Memb[vj])
 		    vj = vj + 1
@@ -177,10 +182,11 @@ begin
 		if (dtype >= 0 && dtype != TY_CHAR)
 		    call error (ER_TBCOLBADTYP,
 				"tbysft:  table or memory corrupted?")
-		call malloc (v, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call malloc (v, sz_val, TY_CHAR)
 		if (shift < 0) {
-		    i_offset = tbeoff (tp, cptr, row1, 1)
-		    o_offset = tbeoff (tp, cptr, row1-abs_shift, 1)
+		    i_offset = tbeoff (tp, cptr, row1, c_1)
+		    o_offset = tbeoff (tp, cptr, row1-abs_shift, c_1)
 		    do k = row1, row2 {
 			call tbegpt (tp, cptr, i_offset, k, Memc[v], SZ_LINE)
 			call tbeppt (tp, cptr, o_offset, k, Memc[v])
@@ -188,8 +194,8 @@ begin
 			o_offset = o_offset + col_width
 		    }
 		} else {
-		    i_offset = tbeoff (tp, cptr, row2, 1)
-		    o_offset = tbeoff (tp, cptr, row2+shift, 1)
+		    i_offset = tbeoff (tp, cptr, row2, c_1)
+		    o_offset = tbeoff (tp, cptr, row2+shift, c_1)
 		    # (actually, it's the offsets that count; k is ignored)
 		    do k = row2+shift, row1+shift, -1 {
 			call tbegpt (tp, cptr, i_offset, k, Memc[v], SZ_LINE)

@@ -34,25 +34,25 @@ procedure tbrcpy (itp, otp, iselrow, oselrow)
 
 pointer itp			# i: pointer to descriptor of input table
 pointer otp			# i: pointer to descriptor of output table
-int	iselrow			# i: row number (selected row) in input table
-int	oselrow			# i: row number (selected row) in output table
+long	iselrow			# i: row number (selected row) in input table
+long	oselrow			# i: row number (selected row) in output table
 #--
 pointer sp
 pointer rowbuf			# scratch for copying entire row
 pointer icp, ocp		# pointers to arrays of column descriptors
 long	ioffset			# offset in char to element in input table
 long	ooffset			# offset in char to element in output table
-int	ilen			# if row-ordered, length of input row
-int	olen			# if row-ordered, length of output row
-int	buflen			# length of buffer if both are row-ordered
-int	irownum			# actual row number in input table
-int	orownum			# actual row number in output table
+long	ilen			# if row-ordered, length of input row
+long	olen			# if row-ordered, length of output row
+size_t	buflen			# length of buffer if both are row-ordered
+long	irownum			# actual row number in input table
+long	orownum			# actual row number in output table
 int	colnum			# loop index for column number
 int	ncols			# number of columns to copy
-int	i
+long	i
+size_t	sz_val
 pointer tbcnum()
-long	tbxoff()
-int	read()
+long	tbxoff(), read()
 int	tbpsta()
 errchk	tbrcsc, tbsirow, tbswer1, seek, read, write
 
@@ -105,19 +105,20 @@ begin
 	    # Note that if a column selector is in effect, we're only
 	    # copying the selected columns.
 	    ncols = tbpsta (itp, TBL_NCOLS)	# can be less than TB_NCOLS
-	    call salloc (icp, ncols, TY_POINTER)
-	    call salloc (ocp, ncols, TY_POINTER)
+	    sz_val = ncols
+	    call salloc (icp, sz_val, TY_POINTER)
+	    call salloc (ocp, sz_val, TY_POINTER)
 
 	    # This is where we assume that the columns are in the same
 	    # order in both tables.
 	    do colnum = 1, ncols {
-		Memi[icp+colnum-1] = tbcnum (itp, colnum)
-		Memi[ocp+colnum-1] = tbcnum (otp, colnum)
+		Memp[icp+colnum-1] = tbcnum (itp, colnum)
+		Memp[ocp+colnum-1] = tbcnum (otp, colnum)
 	    }
 
 	    # Copy this row.  Some columns may contain arrays.
-	    call tbrcsc (itp, otp, Memi[icp], Memi[ocp],
-			iselrow, oselrow, ncols)
+	    call tbrcsc (itp, otp, Memp[icp], Memp[ocp],
+			 iselrow, oselrow, ncols)
 	}
 	TB_MODIFIED(otp) = true
 

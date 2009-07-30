@@ -31,7 +31,7 @@ char	colname[SZ_COLNAME,numcols]	# i: Names of columns
 char	colunits[SZ_COLUNITS,numcols]	# i: Units for columns
 char	colfmt[SZ_COLFMT,numcols]	# i: Print formats for columns
 int	datatype[numcols]		# i: Data types (-n for string)
-int	lenarray[numcols]		# i: number of elements for each col
+long	lenarray[numcols]		# i: number of elements for each col
 int	numcols				# i: Number of columns to be defined
 pointer colptr[ARB]			# o: Pointers to the new columns
 #--
@@ -39,10 +39,12 @@ pointer cp			# pointer to column descriptor
 pointer prevcol			# pointer to descriptor for previous column
 char	pformat[SZ_COLFMT]	# local copy of format for printing a column
 int	dtype			# SPP data type of column
-int	dlen			# number of char used by a column in table
+long	dlen			# number of char used by a column in table
 int	k			# loop index
 int	ncols			# current number of columns
 int	new_maxcols		# new maximum number of columns
+size_t	sz_val
+int	i_val
 errchk	tbbaln, calloc
 
 begin
@@ -50,7 +52,8 @@ begin
 	ncols = TB_NCOLS(tp) + numcols		# total
 	if (ncols > TB_MAXCOLS(tp)) {
 	    new_maxcols = ncols + DEFMAXCOLS
-	    call realloc (TB_COLPTR(tp), new_maxcols, TY_POINTER)
+	    sz_val = new_maxcols
+	    call realloc (TB_COLPTR(tp), sz_val, TY_POINTER)
 	    TB_MAXCOLS(tp) = new_maxcols
 	}
 
@@ -58,13 +61,15 @@ begin
 
 	    # Assign value for SPP data type and for data length (of one
 	    # element) in table.
-	    call tbbaln (datatype[k], dtype, dlen)
+	    call tbbaln (datatype[k], dtype, i_val)
+	    dlen = i_val
 
 	    # Assign default print format if none given; pformat is output.
 	    call tbbadf (colfmt[1,k], datatype[k], dlen, pformat, SZ_COLFMT)
 
 	    # Allocate space for column descriptor
-	    call calloc (cp, LEN_COLSTRUCT, TY_STRUCT)
+	    sz_val = LEN_COLSTRUCT
+	    call calloc (cp, sz_val, TY_STRUCT)
 	    ncols = TB_NCOLS(tp) + 1
 	    TB_NCOLS(tp) = ncols
 	    TB_COLINFO(tp,ncols) = cp		# save pointer to col descr

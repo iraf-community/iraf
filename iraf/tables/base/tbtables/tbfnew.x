@@ -64,6 +64,7 @@ procedure tbfnew (tp)
 
 pointer tp		# i: pointer to table descriptor
 #--
+size_t	sz_val
 pointer sp
 pointer errmess
 pointer ttype, tform, tunit	# for arrays to be passed to fsibin
@@ -74,7 +75,8 @@ pointer filename	# name without directory prefix
 pointer comment		# returned by fsgkyj and ignored
 pointer cp		# pointer to a column descriptor
 int	blocksize
-int	bitpix, naxis, naxes[2]
+int	bitpix, naxis
+long	naxes[2]
 bool	simple, extend
 int	status		# zero is OK
 int	hdu		# HDU number (zero is primary header)
@@ -84,24 +86,28 @@ equivalence (fd, dfd)	# to force alignment of fd
 int	hdutype		# type of current HDU
 int	extver		# value of EXTVER from existing header, or -1
 int	ncols		# number of columns, but min of 1 (for allocating space)
-int	nrows		# dummy number of rows
+long	nrows		# dummy number of rows
 int	nfields		# number of columns to define
-int	vsize		# size of area for variable-length data (zero)
+long	vsize		# size of area for variable-length data (zero)
 int	i
 int	ival		# undefined value for int, short, bool
 int	ttype0, tform0, tunit0	# offsets into 2-D char arrays
 int	tdtype		# "true" data type, i.e. not scaled by tscal, tzero
 char	dtype_c		# data type char:  'D', 'E', 'J', 'I', 'L', 'A'
-int	nelem		# array length
+long	nelem		# array length
 bool	append		# append new hdu at end of file?
 bool	done
+long	c_0, c_1
 pointer tbcnum()
 int	access()
-int	tbpsta(), tbcigi()
+int	tbpsta()
+long	tbcigl()
 int	tbffnd()
 errchk	tbffnd, tbfptf, tbferr
 
 begin
+	c_0 = 0
+	c_1 = 1
 	status = 0
 
 	append = true			# reset if overwrite = yes
@@ -109,12 +115,17 @@ begin
 	ncols = max (nfields, 1)
 
 	call smark (sp)
-	call salloc (ttype, (SZ_FTTYPE+1) * ncols, TY_CHAR)
-	call salloc (tform, (SZ_FTFORM+1) * ncols, TY_CHAR)
-	call salloc (tunit, (SZ_FTUNIT+1) * ncols, TY_CHAR)
-	call salloc (extname, SZ_LINE, TY_CHAR)
-	call salloc (keyword, SZ_FNAME, TY_CHAR)
-	call salloc (tdisp, SZ_FNAME, TY_CHAR)
+	sz_val = (SZ_FTTYPE+1) * ncols
+	call salloc (ttype, sz_val, TY_CHAR)
+	sz_val = (SZ_FTFORM+1) * ncols
+	call salloc (tform, sz_val, TY_CHAR)
+	sz_val = (SZ_FTUNIT+1) * ncols
+	call salloc (tunit, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (extname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyword, sz_val, TY_CHAR)
+	call salloc (tdisp, sz_val, TY_CHAR)
 
 	# Get a unit number.
 	# This call does nothing if linked with CFITSIO.  In that case,
@@ -143,7 +154,8 @@ begin
 
 		hdu = tbffnd (tp, Memc[extname], SZ_LINE, extver, hdutype)
 		if (hdu == EOF) {
-		    call salloc (errmess, SZ_LINE, TY_CHAR)
+		    sz_val = SZ_LINE
+		    call salloc (errmess, sz_val, TY_CHAR)
 		    call sprintf (Memc[errmess], SZ_LINE, 
 			"table not found in FITS file `%s'")
 			call pargstr (TB_NAME(tp))
@@ -186,7 +198,8 @@ begin
 		# value it should be after we add a new extension.
 		call fsmahd (fd, 1, hdutype, status)
 		# check that the primary header is _just_ a header
-		call malloc (comment, SZ_FNAME, TY_CHAR)
+		sz_val = SZ_FNAME
+		call malloc (comment, sz_val, TY_CHAR)
 		call fsgkyj (fd, "NAXIS", naxis, Memc[comment], status)
 		call mfree (comment, TY_CHAR)
 		if (naxis == 0) {
@@ -214,7 +227,8 @@ begin
 	    # If an HDU number was specified, it ought to agree with
 	    # what we've found.
 	    if (TB_HDU(tp) != hdu) {
-		call salloc (errmess, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (errmess, sz_val, TY_CHAR)
 		call sprintf (Memc[errmess], SZ_LINE,
 	"extension %d was specified, but %s currently has %d extensions")
 		    call pargi (TB_HDU(tp))
@@ -231,7 +245,8 @@ begin
 	    if (TB_HDU(tp) <= 1) {
 		TB_HDU(tp) = 1			# user interface numbering
 	    } else {
-		call salloc (errmess, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (errmess, sz_val, TY_CHAR)
 		call sprintf (Memc[errmess], SZ_LINE,
 	"extension number in new FITS file (%s) can't be greater than one")
 		    call pargstr (TB_NAME(tp))
@@ -252,7 +267,7 @@ begin
 	    naxes[1] = 0
 	    extend = true
 	    call fsphpr (fd, simple, bitpix, naxis, naxes,
-			0, 1, extend, status)
+			c_0, c_1, extend, status)
 	    if (status != 0)
 		call tbferr (status)
 
@@ -262,7 +277,8 @@ begin
 		call tbferr (status)
 
 	    # Add the FILENAME keyword to the primary header.
-	    call salloc (filename, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (filename, sz_val, TY_CHAR)
 	    call tbfroot (TB_NAME(tp), Memc[filename], SZ_FNAME)
 	    call fspkys (fd, "FILENAME", Memc[filename], "name of file", status)
 	    if (status != 0)
@@ -295,7 +311,7 @@ begin
 	do i = 1, nfields {
 	    cp = tbcnum (tp, i)
 	    tdtype = COL_TDTYPE(cp)		# "true" data type
-	    nelem = tbcigi (cp, TBL_COL_LENDATA)
+	    nelem = tbcigl (cp, TBL_COL_LENDATA)
 	    switch (tdtype) {			# get TFORM code
 	    case TY_DOUBLE:
 		dtype_c = 'D'
@@ -314,11 +330,11 @@ begin
 	    call tbcigt (cp, TBL_COL_UNITS, Memc[tunit+tunit0], SZ_FTUNIT)
 	    if (tdtype > 0) {
 		call sprintf (Memc[tform+tform0], SZ_FTFORM, "%d%c")
-		    call pargi (nelem)
+		    call pargl (nelem)
 		    call pargc (dtype_c)
 	    } else if (nelem > 1) {		# array of char strings
 		call sprintf (Memc[tform+tform0], SZ_FTFORM, "%d%c%d")
-		    call pargi (-tdtype * nelem) # FITSIO special convention
+		    call pargl (-tdtype * nelem) # FITSIO special convention
 		    call pargc (dtype_c)
 		    call pargi (-tdtype)
 	    } else {				# character string
@@ -415,6 +431,7 @@ char	fullname[ARB]	# i: full file name, possibly including directory
 char	fname[maxch]	# o: root+extension, no directory prefix
 int	maxch		# i: allocated size of fname
 #--
+size_t	sz_val
 pointer sp
 pointer extn		# scratch
 int	nchar, fnroot(), fnextn()
@@ -422,7 +439,8 @@ errchk	fnroot, fnextn
 
 begin
 	call smark (sp)
-	call salloc (extn, maxch, TY_CHAR)
+	sz_val = maxch
+	call salloc (extn, sz_val, TY_CHAR)
 
 	nchar = fnroot (fullname, fname, maxch)		# extract root
 	nchar = fnextn (fullname, Memc[extn], maxch)	# extract extension

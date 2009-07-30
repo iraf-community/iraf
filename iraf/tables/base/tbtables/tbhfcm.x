@@ -18,6 +18,7 @@ procedure tbhfcm (par, index)
 char	par[ARB]	# i: string containing header parameter
 int	index		# o: index of beginning of comment, or zero
 #--
+size_t	sz_val
 pointer sp
 pointer word		# scratch for the parameter value
 int	ip, nchar, ctowrd()
@@ -37,7 +38,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (word, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (word, sz_val, TY_CHAR)
 
 	# Skip over the value.
 	ip = START_OF_VALUE

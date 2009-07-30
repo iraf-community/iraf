@@ -14,13 +14,15 @@ procedure tbfwcd (tp, cp)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 #--
+size_t	sz_val
 pointer sp
 pointer value		# for new value of name, units, format
 errchk	tbfnam, tbfnit, tbffmt, tbfscal
 
 begin
 	call smark (sp)
-	call salloc (value, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (value, sz_val, TY_CHAR)
 
 	call tbcigt (cp, TBL_COL_NAME, Memc[value], SZ_FNAME)
 	call tbfnam (tp, cp, Memc[value])

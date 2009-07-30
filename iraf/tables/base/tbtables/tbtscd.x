@@ -21,11 +21,12 @@ int	old_ncols		# i: previous number of columns
 pointer sp
 pointer cbuf			# column-descriptor buffer
 long	oldoff, newoff		# offsets from start of old & new files
-int	cbufsiz			# size of buffer pointed to by cbuf
+size_t	cbufsiz			# size of buffer pointed to by cbuf
 int	k			# loop index
-int	stat
+long	stat
 char	zero
-int	read()
+size_t	sz_val
+long	read()
 errchk	seek, read, write
 
 begin
@@ -40,17 +41,20 @@ begin
 	do k = 1, old_ncols {
 	    call seek (oldfd, oldoff)
 	    call seek (newfd, newoff)
-	    stat = read (oldfd, Memc[cbuf], SZ_COLDEF)
-	    call write (newfd, Memc[cbuf], SZ_COLDEF)
+	    sz_val = SZ_COLDEF
+	    stat = read (oldfd, Memc[cbuf], sz_val)
+	    call write (newfd, Memc[cbuf], sz_val)
 	    oldoff = oldoff + SZ_COLDEF
 	    newoff = newoff + SZ_COLDEF
 	}
 	# Fill out the rest of the space for column descriptors.
 	zero = 0
-	call amovkc (zero, Memc[cbuf], SZ_COLDEF)
+	sz_val = SZ_COLDEF
+	call amovkc (zero, Memc[cbuf], sz_val)
 	do k = old_ncols+1, TB_MAXCOLS(tp) {
 	    call seek (newfd, newoff)
-	    call write (newfd, Memc[cbuf], SZ_COLDEF)
+	    sz_val = SZ_COLDEF
+	    call write (newfd, Memc[cbuf], sz_val)
 	    newoff = newoff + SZ_COLDEF
 	}
 

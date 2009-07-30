@@ -13,26 +13,30 @@ procedure tbzsiz (tp, old_maxpar, old_allrows)
 
 pointer tp			# i: pointer to table descriptor
 int	old_maxpar		# i: previous value of max number of parameters
-int	old_allrows		# i: previous value of allocated number of rows
+long	old_allrows		# i: previous value of allocated number of rows
 #--
 pointer cp			# pointer to column descriptor
 int	dtype			# column data type
-int	new_allrows		# new value of allocated number of rows
-int	oldsize, newsize	# old & new lengths of char buffer
+size_t	new_allrows		# new value of allocated number of rows
+size_t	oldsize, newsize	# old & new lengths of char buffer
 int	lenstr			# length of each string in string column
-int	row_1			# row number minus one
+long	row_1			# row number minus one
 int	colnum			# loop index for column number
-int	k			# loop index
+long	k			# loop index
+int	j
+size_t	sz_val
 errchk	realloc
 
 begin
 	# Allocate or reallocate the array of pointers to keywords.
 	if (TB_KEYLIST_PTR(tp) == NULL) {
-	    call calloc (TB_KEYLIST_PTR(tp), TB_MAXPAR(tp), TY_POINTER)
+	    sz_val = TB_MAXPAR(tp)
+	    call calloc (TB_KEYLIST_PTR(tp), sz_val, TY_POINTER)
 	} else if (TB_MAXPAR(tp) > old_maxpar) {
-	    call realloc (TB_KEYLIST_PTR(tp), TB_MAXPAR(tp), TY_POINTER)
-	    do k = old_maxpar + 1, TB_MAXPAR(tp)
-		TB_KEYWORD(tp,k) = NULL
+	    sz_val = TB_MAXPAR(tp)
+	    call realloc (TB_KEYLIST_PTR(tp), sz_val, TY_POINTER)
+	    do j = old_maxpar + 1, TB_MAXPAR(tp)
+		TB_KEYWORD(tp,j) = NULL
 	}
 
 	# Check whether we need to do anything further.

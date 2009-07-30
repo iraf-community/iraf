@@ -14,16 +14,16 @@ include "tblerr.h"
 procedure tbznll (tp, firstrow, lastrow)
 
 pointer tp			# i: pointer to table descriptor
-int	firstrow		# i: first row to be set to INDEF
-int	lastrow			# i: last row to be set to INDEF
+long	firstrow		# i: first row to be set to INDEF
+long	lastrow			# i: last row to be set to INDEF
 #--
 pointer cp			# pointer to a column descriptor
-int	row1, row2		# firstrow, lastrow truncated to 1, nrows
-int	row			# loop index for row number
+long	row1, row2		# firstrow, lastrow truncated to 1, nrows
+long	row			# loop index for row number
 int	col			# loop index for column number
 int	datatype		# data type of a column
 int	lenstr			# length of a string table element
-int	ip			# offset to a string in Memc
+long	ip			# offset to a string in Memc
 pointer tbcnum()
 
 begin

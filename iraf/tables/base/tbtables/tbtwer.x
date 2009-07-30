@@ -29,9 +29,9 @@ include "tbtables.h"
 procedure tbtwer (tp, selrow)
 
 pointer tp		# i: pointer to table descriptor
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 #--
-int	rownum		# actual row number (ignored)
+long	rownum		# actual row number (ignored)
 errchk	tbswer
 
 begin

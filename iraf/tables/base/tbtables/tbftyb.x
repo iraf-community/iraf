@@ -18,19 +18,22 @@ int	tdtype		# o: true data type in FITS table (e.g. integer)
 int	dtype		# o: data type to use for table interface
 char	pformat[maxch]	# o: spp print format
 int	maxch		# i: size of print format string
-int	nelem		# o: number of elements in array
-int	len		# o: nelem * size of one element
+long	nelem		# o: number of elements in array
+long	len		# o: nelem * size of one element
 #--
+size_t	sz_val
 pointer sp
 pointer tform_lc	# tform in lower case
 pointer errmess		# scratch for error message
-int	rpt		# repeat count
-int	lenstring	# size of string
-int	ip, ctoi()
+long	rpt		# repeat count
+long	lenstring	# size of string
+int	ip
+int	ctol()
 
 begin
 	call smark (sp)
-	call salloc (tform_lc, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tform_lc, sz_val, TY_CHAR)
 
 	call strcpy (tform, Memc[tform_lc], SZ_FNAME)
 	call strlwr (Memc[tform_lc])
@@ -40,7 +43,7 @@ begin
 
 	# Read repeat count.
 	ip = 1
-	if (ctoi (Memc[tform_lc], ip, rpt) < 1)
+	if (ctol (Memc[tform_lc], ip, rpt) < 1)
 	    rpt = 1
 
 	nelem = rpt
@@ -48,7 +51,7 @@ begin
 	if (Memc[tform_lc+ip-1] == 'a') {		# character
 	    # Single element has tform wA, but FITSIO supports rAw as well.
 	    ip = ip + 1			# skip past 'a' and check for a number
-	    if (ctoi (Memc[tform_lc], ip, lenstring) < 1)
+	    if (ctol (Memc[tform_lc], ip, lenstring) < 1)
 		lenstring = rpt
 	    dtype = -lenstring
 	    nelem = rpt / lenstring
@@ -83,7 +86,8 @@ begin
 	    dtype = TBL_TY_SHORT
 	    len = nelem * SZ_SHORT
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 			"unrecognized TFORM:  `%s'")
 		call pargstr (tform)

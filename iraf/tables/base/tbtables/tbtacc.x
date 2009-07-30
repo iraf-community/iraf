@@ -24,10 +24,11 @@ char	tablename[ARB]		# i: the table name
 pointer tp
 pointer tbtopn()
 int	subtype, tbpsta()
+include	<nullptr.inc>
 
 begin
 	iferr {
-	    tp = tbtopn (tablename, READ_ONLY, NULL)
+	    tp = tbtopn (tablename, READ_ONLY, NULLPTR)
 	} then {
 	    return (NO)
 	}

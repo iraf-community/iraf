@@ -33,9 +33,10 @@ int procedure tbzlin (fd, buf, maxch, line, line_type)
 int	fd		# i: fd for the file
 char	buf[ARB]	# o: buffer for the line that was read
 int	maxch		# i: size of line buffer
-int	line		# io: incremented each time a line is read from file
+long	line		# io: incremented each time a line is read from file
 int	line_type	# o: type of line returned in buf
 #--
+size_t	sz_val
 pointer sp
 pointer scratch
 char	ch		# a character from the string which was read
@@ -99,7 +100,8 @@ begin
 	    if (buf[ip] != NEWLINE) {
 		# The last line of the file need not have a newline.
 		call smark (sp)
-		call salloc (scratch, 2*SZ_LINE, TY_CHAR)
+		sz_val = 2*SZ_LINE
+		call salloc (scratch, sz_val, TY_CHAR)
 		nchar = getlline (fd, Memc[scratch], 2*SZ_LINE)
 		if (nchar != EOF) {
 		    call error (1,

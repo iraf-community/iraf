@@ -12,6 +12,7 @@ pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 char	colname[ARB]	# i: new column name
 #--
+size_t	sz_val
 pointer sp
 pointer keyword		# scratch for keyword name
 pointer dummy		# for current value, if keyword already exists
@@ -21,9 +22,10 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (keyword, SZ_FNAME, TY_CHAR)
-	call salloc (dummy, SZ_FNAME, TY_CHAR)
-	call salloc (comment, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyword, sz_val, TY_CHAR)
+	call salloc (dummy, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	call sprintf (Memc[keyword], SZ_FNAME, "TTYPE%d")
 	    call pargi (COL_NUMBER(cp))

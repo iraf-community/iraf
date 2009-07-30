@@ -21,6 +21,7 @@ procedure tbcwcd (tp, cp)
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 #--
+size_t	sz_val
 pointer sp
 pointer coldef			# column descriptor read from table
 pointer temp			# scratch for strings
@@ -39,10 +40,12 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (coldef, LEN_COLDEF, TY_STRUCT)
+	sz_val = LEN_COLDEF
+	call salloc (coldef, sz_val, TY_STRUCT)
 
 	# This assumes SZ_COLUNITS & SZ_COLFMT are no longer than SZ_COLNAME.
-	call salloc (temp, SZ_COLNAME, TY_CHAR)
+	sz_val = SZ_COLNAME
+	call salloc (temp, sz_val, TY_CHAR)
 
 	# Copy the column descriptor from memory into the buffer that
 	# we'll write to the file.
@@ -51,15 +54,18 @@ begin
 	CD_COL_LEN(coldef) = COL_LEN(cp)
 	CD_COL_DTYPE(coldef) = COL_DTYPE(cp)
 
-	call strpak (COL_NAME(cp), Memc[temp], SZ_COLNAME)
+	sz_val = SZ_COLNAME
+	call strpak (COL_NAME(cp), Memc[temp], sz_val)
 	call tbbncp0 (Memc[temp], CD_COL_NAME(coldef), SZ_CD_COLNAME/SZB_CHAR)
 
-	call strpak (COL_UNITS(cp), Memc[temp], SZ_COLNAME)
+	sz_val = SZ_COLNAME
+	call strpak (COL_UNITS(cp), Memc[temp], sz_val)
 	call tbbncp0 (Memc[temp], CD_COL_UNITS(coldef), SZ_CD_COLUNITS/SZB_CHAR)
 
 	call strcpy (COL_FMT(cp), Memc[temp], SZ_COLNAME)
 	# skip over the leading '%' in the print format
-	call strpak  (Memc[temp+1], Memc[temp+1], SZ_COLNAME-1)
+	sz_val = SZ_COLNAME-1
+	call strpak  (Memc[temp+1], Memc[temp+1], sz_val)
 	call tbbncp0 (Memc[temp+1], CD_COL_FMT(coldef), SZ_CD_COLFMT/SZB_CHAR)
 
 	colnum = COL_NUMBER(cp)
@@ -67,7 +73,8 @@ begin
 		TB_MAXPAR(tp) * SZ_PACKED_REC +
 		(colnum-1) * SZ_COLDEF + 1
 	call seek (TB_FILE(tp), offset)
-	call write (TB_FILE(tp), Memi[coldef], SZ_COLDEF)
+	sz_val = SZ_COLDEF
+	call write (TB_FILE(tp), Memc[P2C(coldef)], sz_val)
 
 	call sfree (sp)
 end

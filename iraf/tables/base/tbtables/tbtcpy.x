@@ -47,8 +47,8 @@ pointer icp, ocp		# pointers to arrays of column descriptors
 int	itype, otype		# table types based on extension
 int	ihdu, ohdu		# HDU number, if any (ignored)
 int	ncols			# number of columns
-int	nrows			# number of rows in input table
-int	row			# loop index for row number
+long	nrows			# number of rows in input table
+long	row			# loop index for row number
 int	junk
 int	dotloc			# location of last '.' in file name
 int	root_len		# number of char in input directory name
@@ -56,21 +56,26 @@ int	exists			# returned by tbttyp and ignored
 int	i
 bool	from_stdin		# is intable STDIN?
 bool	cat_extname		# should we append input name to use as EXTNAME?
+size_t	sz_val
+long	l_val
 pointer tbtopn(), tbcnum()
 int	strlen()
 int	fnldir()
 int	tbparse(), tbttyp()
 int	tbpsta()
+long	tbpstl()
 bool	streq()
 errchk	fcopy, fcopyo, tbtopn, tbtcre, tbhcal, tbrcsc, tbparse, tbttyp, tbtwer
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (in, SZ_FNAME, TY_CHAR)
-	call salloc (out, SZ_FNAME, TY_CHAR)
-	call salloc (iextn, SZ_FNAME, TY_CHAR)
-	call salloc (oextn, SZ_FNAME, TY_CHAR)
-	call salloc (scratch, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (in, sz_val, TY_CHAR)
+	call salloc (out, sz_val, TY_CHAR)
+	call salloc (iextn, sz_val, TY_CHAR)
+	call salloc (oextn, sz_val, TY_CHAR)
+	call salloc (scratch, sz_val, TY_CHAR)
 
 	# Get the file names and EXTNAMEs or numbers for the tables.
 	junk = tbparse (intable, Memc[in], Memc[iextn], SZ_FNAME, ihdu)
@@ -93,7 +98,7 @@ begin
 
 	# Open the input table (but if it's STDIN we'll open it later).
 	if (!from_stdin) {
-	    itp = tbtopn (intable, READ_ONLY, NULL)
+	    itp = tbtopn (intable, READ_ONLY, NULLPTR)
 	    itype = TB_TYPE(itp)		# actual table type
 	}
 
@@ -137,7 +142,7 @@ begin
 	# The reason we didn't open it before is that we weren't sure of
 	# the output table type; for text output we already used fcopy above.
 	if (from_stdin)
-	    itp = tbtopn (intable, READ_ONLY, NULL)
+	    itp = tbtopn (intable, READ_ONLY, NULLPTR)
 
 	# If the output is a FITS file, and no EXTNAME was given in the
 	# file name, append the input table name (without directory)
@@ -180,14 +185,15 @@ begin
 	    Memc[iextn] != EOS) {
 
 	    ncols = tbpsta (itp, TBL_NCOLS)
-	    nrows = tbpsta (itp, TBL_NROWS)
+	    nrows = tbpstl (itp, TBL_NROWS)
 
-	    call salloc (icp, ncols, TY_POINTER)
-	    call salloc (ocp, ncols, TY_POINTER)
+	    sz_val = ncols
+	    call salloc (icp, sz_val, TY_POINTER)
+	    call salloc (ocp, sz_val, TY_POINTER)
 
 	    do i = 1, ncols {
-		Memi[icp+i-1] = tbcnum (itp, i)
-		Memi[ocp+i-1] = tbcnum (otp, i)
+		Memp[icp+i-1] = tbcnum (itp, i)
+		Memp[ocp+i-1] = tbcnum (otp, i)
 	    }
 
 	    call tbhcal (itp, otp)		# copy all header parameters
@@ -196,13 +202,14 @@ begin
 		call tbtwer (otp, nrows)
 
 	    do row = 1, nrows		# copy all rows
-		call tbrcsc (itp, otp, Memi[icp], Memi[ocp], row, row, ncols)
+		call tbrcsc (itp, otp, Memp[icp], Memp[ocp], row, row, ncols)
 
 	} else {			# same type, and neither is FITS
 
 	    # Copy the whole file.
-	    call seek (TB_FILE(itp), BOF)
-	    call seek (TB_FILE(otp), BOF)
+	    l_val = BOF
+	    call seek (TB_FILE(itp), l_val)
+	    call seek (TB_FILE(otp), l_val)
 	    call fcopyo (TB_FILE(itp), TB_FILE(otp))
 	    call flush (TB_FILE(otp))
 

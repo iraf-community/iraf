@@ -25,10 +25,10 @@ procedure tbeptd (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 double	buffer			# i: value to be put
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for writing
 int	dtype			# data type of column
 # buffers for copying elements of various data types
@@ -38,10 +38,14 @@ real	rbuf
 int	ibuf
 short	sbuf
 bool	bbuf
+long	c_1
 long	tbeoff()
+short	sdnint()
 errchk	tbswer, tbeppb, tbeppd, tbeppi, tbepps, tbeppr, tbeppt, tbfapd, tbzptd
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -54,16 +58,16 @@ begin
 	    call tbzptd (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    call tbfapd (tp, cptr, rownum, buffer, 1, 1)
+	    call tbfapd (tp, cptr, rownum, buffer, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {
 	case TBL_TY_REAL:
-	    if (IS_INDEFD (buffer) || abs (buffer) > MAX_REAL)
+	    if (IS_INDEFD (buffer) || dabs (buffer) > MAX_REAL)
 		rbuf = INDEFR
 	    else
 		rbuf = buffer
@@ -75,21 +79,21 @@ begin
 		dbuf = buffer
 	    call tbeppd (tp, cptr, offset, rownum, dbuf)
 	case TBL_TY_INT:
-	    if (IS_INDEFD (buffer) || abs (buffer) > MAX_INT)
+	    if (IS_INDEFD (buffer) || dabs (buffer) > MAX_INT)
 		ibuf = INDEFI
 	    else
-		ibuf = nint (buffer)
+		ibuf = idnint (buffer)
 	    call tbeppi (tp, cptr, offset, rownum, ibuf)
 	case TBL_TY_SHORT:
-	    if (IS_INDEFD (buffer) || abs (buffer) > MAX_SHORT)
+	    if (IS_INDEFD (buffer) || dabs (buffer) > MAX_SHORT)
 		sbuf = INDEFS
 	    else
-		sbuf = nint (buffer)
+		sbuf = sdnint (buffer)
 	    call tbepps (tp, cptr, offset, rownum, sbuf)
 	case TBL_TY_BOOL:
-	    if (IS_INDEFD (buffer) || abs (buffer) > MAX_INT)
+	    if (IS_INDEFD (buffer) || dabs (buffer) > MAX_INT)
 		bbuf = false
-	    else if (nint (buffer) == NO)
+	    else if (idnint (buffer) == NO)
 		bbuf = false
 	    else
 		bbuf = true
@@ -110,10 +114,10 @@ procedure tbeptr (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 real	buffer			# i: value to be put
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for writing
 int	dtype			# data type of column
 # buffers for copying elements of various data types
@@ -122,10 +126,16 @@ double	dbuf
 int	ibuf
 short	sbuf
 bool	bbuf
+long	c_1
 long	tbeoff()
+real	aabs()
+int	inint()
+short	snint()
 errchk	tbswer, tbeppb, tbeppd, tbeppi, tbepps, tbeppr, tbeppt, tbfapr, tbzptr
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -138,11 +148,11 @@ begin
 	    call tbzptr (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    call tbfapr (tp, cptr, rownum, buffer, 1, 1)
+	    call tbfapr (tp, cptr, rownum, buffer, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {
@@ -155,21 +165,21 @@ begin
 		dbuf = buffer
 	    call tbeppd (tp, cptr, offset, rownum, dbuf)
 	case TBL_TY_INT:
-	    if (IS_INDEF (buffer) || abs (buffer) > MAX_INT)
+	    if (IS_INDEF (buffer) || aabs (buffer) > MAX_INT)
 		ibuf = INDEFI
 	    else
-		ibuf = nint (buffer)
+		ibuf = inint (buffer)
 	    call tbeppi (tp, cptr, offset, rownum, ibuf)
 	case TBL_TY_SHORT:
-	    if (IS_INDEF (buffer) || abs (buffer) > MAX_SHORT)
+	    if (IS_INDEF (buffer) || aabs (buffer) > MAX_SHORT)
 		sbuf = INDEFS
 	    else
-		sbuf = nint (buffer)
+		sbuf = snint (buffer)
 	    call tbepps (tp, cptr, offset, rownum, sbuf)
 	case TBL_TY_BOOL:
-	    if (IS_INDEF (buffer) || abs (buffer) > MAX_INT)
+	    if (IS_INDEF (buffer) || aabs (buffer) > MAX_INT)
 		bbuf = false
-	    else if (nint (buffer) == NO)
+	    else if (inint (buffer) == NO)
 		bbuf = false
 	    else
 		bbuf = true
@@ -190,10 +200,10 @@ procedure tbepti (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 int	buffer			# i: value to be put
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for writing
 int	dtype			# data type of column
 # buffers for copying elements of various data types
@@ -202,10 +212,13 @@ double	dbuf
 real	rbuf
 short	sbuf
 bool	bbuf
+long	c_1
 long	tbeoff()
 errchk	tbswer, tbeppb, tbeppd, tbeppi, tbepps, tbeppr, tbeppt, tbfapi, tbzpti
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -218,11 +231,11 @@ begin
 	    call tbzpti (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    call tbfapi (tp, cptr, rownum, buffer, 1, 1)
+	    call tbfapi (tp, cptr, rownum, buffer, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {
@@ -241,7 +254,7 @@ begin
 	case TBL_TY_INT:
 	    call tbeppi (tp, cptr, offset, rownum, buffer)
 	case TBL_TY_SHORT:
-	    if (IS_INDEFI (buffer) || abs (buffer) > MAX_SHORT)
+	    if (IS_INDEFI (buffer) || iabs (buffer) > MAX_SHORT)
 		sbuf = INDEFS
 	    else
 		sbuf = buffer
@@ -268,10 +281,10 @@ procedure tbepts (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 short	buffer			# i: value to be put
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for writing
 int	dtype			# data type of column
 # buffers for copying elements of various data types
@@ -280,10 +293,13 @@ double	dbuf
 real	rbuf
 int	ibuf
 bool	bbuf
+long	c_1
 long	tbeoff()
 errchk	tbswer, tbeppb, tbeppd, tbeppi, tbepps, tbeppr, tbeppt, tbfaps, tbzpts
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -296,11 +312,11 @@ begin
 	    call tbzpts (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    call tbfaps (tp, cptr, rownum, buffer, 1, 1)
+	    call tbfaps (tp, cptr, rownum, buffer, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {
@@ -346,10 +362,10 @@ procedure tbeptb (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 bool	buffer			# i: value to be put
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for writing
 int	dtype			# data type of column
 # buffers for copying elements of various data types
@@ -358,10 +374,13 @@ double	dbuf
 real	rbuf
 int	ibuf
 short	sbuf
+long	c_1
 long	tbeoff()
 errchk	tbswer, tbeppb, tbeppd, tbeppi, tbepps, tbeppr, tbeppt, tbfapb, tbzptb
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -374,11 +393,11 @@ begin
 	    call tbzptb (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    call tbfapb (tp, cptr, rownum, buffer, 1, 1)
+	    call tbfapb (tp, cptr, rownum, buffer, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {
@@ -424,10 +443,10 @@ procedure tbeptt (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 char	buffer[ARB]		# i: value to be put
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for writing
 int	dtype			# data type of column
 # buffers for copying elements of various data types
@@ -436,11 +455,14 @@ real	rbuf
 int	ibuf
 short	sbuf
 bool	bbuf
+long	c_1
 long	tbeoff()
 int	nscan(), strlen()
 errchk	tbswer, tbeppb, tbeppd, tbeppi, tbepps, tbeppr, tbeppt, tbfapt, tbzptt
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -453,11 +475,11 @@ begin
 	    call tbzptt (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    call tbfapt (tp, cptr, rownum, buffer, strlen(buffer), 1, 1)
+	    call tbfapt (tp, cptr, rownum, buffer, strlen(buffer), c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {

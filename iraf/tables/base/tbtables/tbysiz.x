@@ -24,18 +24,20 @@ pointer tp			# i: pointer to table descriptor
 int	old_maxpar		# i: previous value for max number of parmeters
 int	old_maxcols		# i: previous value for max number of columns
 int	old_ncols		# i: previous number of columns
-int	old_allrows		# i: previous value of allocated number of rows
+long	old_allrows		# i: previous value of allocated number of rows
 
 pointer sp
 pointer colptr			# scratch for array of column pointers
 int	k
-int	new_allrows		# = TB_ALLROWS(tp)
+long	new_allrows		# = TB_ALLROWS(tp)
 int	iomode			# I/O mode for reopening the table
 int	oldfd, newfd		# Channel numbers for old & new table files
-int	bufsize			# save and restore FIO buffer size
+long	bufsize			# save and restore FIO buffer size
 char	temp_file[SZ_FNAME]	# Name of temporary file for table data
+size_t	sz_val
 pointer tbcnum()
-int	open(), fstati()
+int	open()
+long	fstatl()
 errchk	tbtwsi, tbyscp, mktemp, open, close, delete, rename, tbyscn, flush
 
 begin
@@ -47,7 +49,7 @@ begin
 	oldfd = TB_FILE(tp)
 	if (oldfd == NULL)
 	    return
-	bufsize = fstati (oldfd, F_BUFSIZE)
+	bufsize = fstatl (oldfd, F_BUFSIZE)
 
 	new_allrows = TB_ALLROWS(tp)
 
@@ -61,10 +63,11 @@ begin
 	# For each existing column, set all new rows to indef.
 	if ((new_allrows > old_allrows) && (old_ncols > 0)) {
 	    call smark (sp)
-	    call salloc (colptr, old_ncols, TY_INT)
+	    sz_val = old_ncols
+	    call salloc (colptr, sz_val, TY_POINTER)
 	    do k = 1, old_ncols
-		Memi[colptr+k-1] = tbcnum (tp, k)
-	    call tbyscn (tp, newfd, Memi[colptr], old_ncols,
+		Memp[colptr+k-1] = tbcnum (tp, k)
+	    call tbyscn (tp, newfd, Memp[colptr], old_ncols,
 			old_allrows+1, new_allrows)
 	    call sfree (sp)
 	}
@@ -85,7 +88,7 @@ begin
 	TB_FILE(tp) = open (TB_NAME(tp), iomode, BINARY_FILE)
 
 	# Restore whatever buffer size the old table had.
-	call fseti (TB_FILE(tp), F_BUFSIZE, bufsize)
+	call fsetl (TB_FILE(tp), F_BUFSIZE, bufsize)
 
 	# Update the size information record in the new table.
 	call tbtwsi (tp)			# write size information

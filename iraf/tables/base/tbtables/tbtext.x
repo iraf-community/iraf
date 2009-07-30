@@ -28,6 +28,7 @@ char	inname[ARB]		# i: table name, possibly without extension
 char	outname[ARB]		# o: table name, including extension
 int	maxch			# i: max number of char in inname or outname
 #--
+size_t	sz_val
 pointer sp
 pointer name			# pointer to scratch for name
 pointer brackets		# bracketed expression at end of inname
@@ -38,7 +39,8 @@ int	k			# loop index
 bool	no_change		# true if table name is OK as is
 string	defext ".tab"		# the default extension for a table
 int	tbttyp()
-int	strlen(), locva()
+int	strlen()
+pointer	locva()
 int	tbparse()
 errchk	tbparse
 
@@ -47,8 +49,10 @@ begin
 	    call error (ER_TBNAMTOOLONG, "table name is too long")
 
 	call smark (sp)
-	call salloc (name, maxch, TY_CHAR)
-	call salloc (brackets, SZ_FNAME, TY_CHAR)
+	sz_val = maxch
+	call salloc (name, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (brackets, sz_val, TY_CHAR)
 
 	# Extract file name from inname in case inname includes a bracketed
 	# expression.
@@ -84,6 +88,7 @@ begin
 	if (no_change) {
 
 	    # Return the unmodified input name.
+	    # arg1: incompatible pointer
 	    if (locva (inname) != locva (outname))
 		call strcpy (inname, outname, maxch)
 

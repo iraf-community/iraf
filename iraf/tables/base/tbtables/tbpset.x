@@ -23,11 +23,30 @@ pointer tp			# i: pointer to table descriptor
 int	setwhat			# i: specifies what parameter is to be set
 int	value			# i: the value that is to be assigned
 #--
+long	lvalue
+
+begin
+	lvalue = value
+	call tbpsetl(tp, setwhat, lvalue)
+end
+
+
+procedure tbpsetl (tp, setwhat, value)
+
+pointer tp			# i: pointer to table descriptor
+int	setwhat			# i: specifies what parameter is to be set
+long	value			# i: the value that is to be assigned
+#--
+size_t	sz_val
+long	l_val
+int	ivalue
 pointer sp, errmess		# for possible error message
 bool	streq()
 errchk	tbcchg, tbrchg, tbtchs, tbtfst
 
 begin
+	ivalue = value
+
 	switch (setwhat) {
 
 	case (TBL_ROWLEN):		# Specify what row length to allocate
@@ -47,13 +66,14 @@ begin
 
 	case (TBL_WHTYPE):		# Specify table type
 
-	    if (value != TBL_TYPE_S_ROW && value != TBL_TYPE_S_COL && 
-		value != TBL_TYPE_TEXT && value != TBL_TYPE_FITS) {
+	    if (ivalue != TBL_TYPE_S_ROW && ivalue != TBL_TYPE_S_COL && 
+		ivalue != TBL_TYPE_TEXT && ivalue != TBL_TYPE_FITS) {
 		call smark (sp)
-		call salloc (errmess, SZ_FNAME, TY_CHAR)
+		sz_val = SZ_FNAME
+		call salloc (errmess, sz_val, TY_CHAR)
 		call sprintf (Memc[errmess], SZ_FNAME,
 			"tbpset:  %d is not a valid table type")
-		    call pargi (value)
+		    call pargi (ivalue)
 		call error (1, Memc[errmess])
 	    }
 
@@ -62,46 +82,49 @@ begin
 			"can't specify table type after opening table")
 
 	    # Can't set type of table for FITS file or CDF file.
-	    if (TB_TYPE(tp) == TBL_TYPE_FITS || value == TBL_TYPE_FITS)
+	    if (TB_TYPE(tp) == TBL_TYPE_FITS || ivalue == TBL_TYPE_FITS)
 		return
-	    if (TB_TYPE(tp) == TBL_TYPE_CDF || value == TBL_TYPE_CDF)
+	    if (TB_TYPE(tp) == TBL_TYPE_CDF || ivalue == TBL_TYPE_CDF)
 		return
 
 	    # Can't change the type of STDOUT or STDERR.
 	    if (streq (TB_NAME(tp), "STDOUT") || streq (TB_NAME(tp), "STDERR"))
 		return
 	    
-	    TB_TYPE(tp) = value
+	    TB_TYPE(tp) = ivalue
 
 	case (TBL_SUBTYPE):		# Specify table subtype
 
 	    # Can only set subtype for text tables.
 	    if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
-		if (value == TBL_SUBTYPE_SIMPLE) {
+		if (ivalue == TBL_SUBTYPE_SIMPLE) {
 		    TB_SUBTYPE(tp) = TBL_SUBTYPE_SIMPLE
-		} else if (value == TBL_SUBTYPE_EXPLICIT) {
+		} else if (ivalue == TBL_SUBTYPE_EXPLICIT) {
 		    TB_SUBTYPE(tp) = TBL_SUBTYPE_EXPLICIT
 		} else {
 		    call smark (sp)
-		    call salloc (errmess, SZ_FNAME, TY_CHAR)
+		    sz_val = SZ_FNAME
+		    call salloc (errmess, sz_val, TY_CHAR)
 		    call sprintf (Memc[errmess], SZ_FNAME,
 			"tbpset:  %d is not a valid text table subtype")
-			call pargi (value)
+			call pargi (ivalue)
 		    call error (1, Memc[errmess])
 		}
 	    }
 
 	case (TBL_MAXPAR):		# "Maximum" number of header parameters
-	    call tbtchs (tp, value, -1, -1, -1)
+	    l_val = -1
+	    call tbtchs (tp, ivalue, -1, l_val, l_val)
 
 	case (TBL_MAXCOLS):		# "Maximum" number of columns
-	    call tbtchs (tp, -1, value, -1, -1)
+	    l_val = -1
+	    call tbtchs (tp, -1, ivalue, l_val, l_val)
 
 	case (TBL_ADVICE):		# suggest random or sequential access
 	    if ( ! TB_IS_OPEN(tp) )
 		call error (ER_TBNOTOPEN,
 			"table must be open to set I/O advice")
-	    call tbtfst (tp, F_ADVICE, value)
+	    call tbtfst (tp, F_ADVICE, ivalue)
 
 	default:
 	    call error (ER_TBBADOPTION, "invalid option for tbpset")

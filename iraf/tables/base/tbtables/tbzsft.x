@@ -16,17 +16,19 @@ include "tblerr.h"
 procedure tbzsft (tp, first, shift)
 
 pointer tp			# i: pointer to table descriptor
-int	first			# i: first row to be affected by the shift
-int	shift			# i: shift by this many rows
+long	first			# i: first row to be affected by the shift
+long	shift			# i: shift by this many rows
 #--
 pointer cptr			# pointer to a column descriptor
 pointer v			# pointer to array of values
-int	abs_shift		# absolute value of shift
-int	row1, row2		# range of rows to be copied
-int	nrows			# number of rows written to table
+long	abs_shift		# absolute value of shift
+long	row1, row2		# range of rows to be copied
+long	nrows			# number of rows written to table
 int	dtype			# data type of a column
 int	col			# loop index for column number
-int	ip, op			# loop indexes
+long	ip, op			# loop indexes
+long	l_val
+size_t	sz_val
 pointer tbcnum()
 
 begin
@@ -37,14 +39,16 @@ begin
 	    if (shift > 0) {
 		row2 = shift + first - 1
 		if (row2 > TB_ALLROWS(tp)) {
-		    call tbtchs (tp, -1, -1, -1, row2)
+		    l_val = -1
+		    call tbtchs (tp, -1, -1, l_val, row2)
 		}
 	    }
 	    return					# nothing else to do
 	} else {
 	    row2 = shift + nrows
 	    if (row2 > TB_ALLROWS(tp)) {
-		call tbtchs (tp, -1, -1, -1, row2)
+		l_val = -1
+		call tbtchs (tp, -1, -1, l_val, row2)
 	    }
 	}
 
@@ -112,7 +116,8 @@ begin
 
 	    } else if (dtype < 0 || dtype == TBL_TY_CHAR) {
 
-		call malloc (v, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call malloc (v, sz_val, TY_CHAR)
 		if (shift < 0) {
 		    op = first
 		    do ip = row1, row2 {

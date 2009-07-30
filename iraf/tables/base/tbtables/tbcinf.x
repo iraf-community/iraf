@@ -20,10 +20,11 @@ char	colname[ARB]		# o: Column name
 char	colunits[ARB]		# o: Units for column
 char	colfmt[ARB]		# o: Print format for display of column
 int	datatype		# o: Data type of column (SPP type or -n)
-int	lendata			# o: Number of elements (=1)
+long	lendata			# o: Number of elements (=1)
 int	lenfmt			# o: Bytes for print format
 #--
 int	tbcigi()
+long	tbcigl()
 
 begin
 	colnum   = tbcigi (colptr, TBL_COL_NUMBER)
@@ -31,6 +32,6 @@ begin
 	call tbcigt (colptr, TBL_COL_UNITS, colunits, SZ_COLUNITS)
 	call tbcigt (colptr, TBL_COL_FMT,   colfmt,   SZ_COLFMT)
 	datatype = tbcigi (colptr, TBL_COL_DATATYPE)
-	lendata  = tbcigi (colptr, TBL_COL_LENDATA)
+	lendata  = tbcigl (colptr, TBL_COL_LENDATA)
 	lenfmt   = tbcigi (colptr, TBL_COL_FMTLEN)
 end

@@ -18,28 +18,37 @@ procedure tbfdef (tp, cp)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to descriptor for new column
 #--
+size_t	sz_val
 pointer sp
 pointer keyword		# for keyword name (TDISPn)
 pointer tdisp		# for print format
 pointer ttype, tform, tunit	# for values of header keywords
-int	dtype, nelem	# data type and array length
+int	dtype		# data type
+long	nelem		# array length
 int	colnum		# column number
-int	row		# loop index for row number
+long	row		# loop index for row number
 int	ival		# undefined value for int, short, bool
 char	dtype_c		# data type:  'D', 'E', 'J', 'I', 'L, 'A'
 int	lenfmt		# width needed for printing value
 int	status		# zero is OK
+long	c_1
 errchk	tbferr, tbfptf, tbftfo
 
 begin
+	c_1 = 1
 	status = 0
 
 	call smark (sp)
-	call salloc (keyword, SZ_FNAME, TY_CHAR)
-	call salloc (tdisp, SZ_COLFMT, TY_CHAR)
-	call salloc (ttype, SZ_FTTYPE, TY_CHAR)
-	call salloc (tform, SZ_FTFORM, TY_CHAR)
-	call salloc (tunit, SZ_FTUNIT, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyword, sz_val, TY_CHAR)
+	sz_val = SZ_COLFMT
+	call salloc (tdisp, sz_val, TY_CHAR)
+	sz_val = SZ_FTTYPE
+	call salloc (ttype, sz_val, TY_CHAR)
+	sz_val = SZ_FTFORM
+	call salloc (tform, sz_val, TY_CHAR)
+	sz_val = SZ_FTUNIT
+	call salloc (tunit, sz_val, TY_CHAR)
 
 	# Get column information.
 	call tbcinf (cp,
@@ -70,11 +79,11 @@ begin
 	    }
 	    if (dtype > 0) {
 		call sprintf (Memc[tform], SZ_FNAME, "%d%c")
-		    call pargi (nelem)
+		    call pargl (nelem)
 		    call pargc (dtype_c)
 	    } else if (nelem > 1) {		# array of char strings
 		call sprintf (Memc[tform], SZ_FNAME, "%d%c%d")
-		    call pargi (-dtype * nelem)	# FITSIO special convention
+		    call pargl (-dtype * nelem)	# FITSIO special convention
 		    call pargc (dtype_c)
 		    call pargi (-dtype)
 	    } else {				# character string
@@ -141,7 +150,7 @@ begin
 
 	# Fill the new column with INDEF.
 	do row = 1, TB_NROWS(tp) {
-	    call fspclu (TB_FILE(tp), colnum, row, 1, nelem, status)
+	    call fspclu (TB_FILE(tp), colnum, row, c_1, nelem, status)
 	    if (status != 0)
 		call tbferr (status)
 	}

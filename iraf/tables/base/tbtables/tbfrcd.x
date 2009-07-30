@@ -25,6 +25,7 @@ pointer tp		# i: pointer to table descriptor
 pointer cp[ARB]		# i: pointers to column descriptors
 int	ncols		# i: number of columns in cp array
 #--
+size_t	sz_val
 pointer sp
 pointer ttype		# scratch for column name
 pointer tform		# scratch for column format
@@ -38,12 +39,17 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (ttype, (SZ_FTTYPE+1)*ncols, TY_CHAR)
-	call salloc (tform, (SZ_FTFORM+1)*ncols, TY_CHAR)
-	call salloc (tunit, (SZ_FTUNIT+1)*ncols, TY_CHAR)
-	call salloc (tdisp, (SZ_FTTYPE+1)*ncols, TY_CHAR)
-	call salloc (tscal, ncols, TY_DOUBLE)
-	call salloc (tzero, ncols, TY_DOUBLE)
+	sz_val = (SZ_FTTYPE+1)*ncols
+	call salloc (ttype, sz_val, TY_CHAR)
+	sz_val = (SZ_FTFORM+1)*ncols
+	call salloc (tform, sz_val, TY_CHAR)
+	sz_val = (SZ_FTUNIT+1)*ncols
+	call salloc (tunit, sz_val, TY_CHAR)
+	sz_val = (SZ_FTTYPE+1)*ncols
+	call salloc (tdisp, sz_val, TY_CHAR)
+	sz_val = ncols
+	call salloc (tscal, sz_val, TY_DOUBLE)
+	call salloc (tzero, sz_val, TY_DOUBLE)
 
 	# Initialize these arrays to null or indef.
 	call tbfcd1 (Memc[ttype], Memc[tform], Memc[tunit], Memc[tdisp],
@@ -107,6 +113,7 @@ double	tscal[ncols]		# o: will be assigned if keyword found
 double	tzero[ncols]		# o: will be assigned if keyword found
 int	ncols			# i: size of arrays
 #--
+size_t	sz_val
 pointer sp
 pointer buf			# scratch for header record
 pointer value			# scratch for keyword value
@@ -123,9 +130,10 @@ begin
 	status = 0
 
 	call smark (sp)
-	call salloc (buf, SZ_FNAME, TY_CHAR)
-	call salloc (value, SZ_FNAME, TY_CHAR)
-	call salloc (comment, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (buf, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	# Read each keyword in the header.
 	do parnum = 1, TB_NPAR(tp) {

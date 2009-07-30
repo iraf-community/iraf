@@ -19,14 +19,15 @@ procedure tbycpb (tp, colptr, buffer, firstrow, lastrow)
 pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 bool	buffer[ARB]		# Buffer for values
-int	firstrow		# Number of first row into which to put values
-int	lastrow			# Number of last row into which to put values
+long	firstrow		# Number of first row into which to put values
+long	lastrow			# Number of last row into which to put values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in output array buffer
-int	nrows			# Number of rows to write
+long	k			# Index in output array buffer
+size_t	nrows			# Number of rows to write
 int	datatype		# Data type of element in table
-int	dlen			# Number of char for one element in table
+size_t	dlen			# Number of char for one element in table
 # buffers for copying elements of various types
 double	dblbuf
 real	realbuf
@@ -50,7 +51,8 @@ begin
 		else
 		    realbuf = real(NO)
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), realbuf, SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), realbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_DOUBLE:
@@ -60,7 +62,8 @@ begin
 		else
 		    dblbuf = double(NO)
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_INT:
@@ -70,7 +73,8 @@ begin
 		else
 		    intbuf = NO
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), intbuf, SZ_INT)
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), intbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_SHORT:
@@ -80,7 +84,8 @@ begin
 		else
 		    shortbuf = NO
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), shortbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_BOOL:
@@ -91,7 +96,8 @@ begin
 		do k = 1, lastrow-firstrow+1 {
 		    call sprintf (charbuf, SZ_LINE, "%-3b")
 			call pargb (buffer[k])
-		    call strpak (charbuf, charbuf, SZ_LINE)
+		    sz_val = SZ_LINE
+		    call strpak (charbuf, charbuf, sz_val)
 		    call seek (TB_FILE(tp), offset)
 		    call write (TB_FILE(tp), charbuf, dlen)
 		    offset = offset + dlen
@@ -112,13 +118,14 @@ procedure tbycpd (tp, colptr, buffer, firstrow, lastrow)
 pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 double	buffer[ARB]		# Buffer for values
-int	firstrow		# Number of first row into which to put values
-int	lastrow			# Number of last row into which to put values
+long	firstrow		# Number of first row into which to put values
+long	lastrow			# Number of last row into which to put values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in output array buffer
+long	k			# Index in output array buffer
 int	datatype		# Data type of element in table
-int	dlen			# Number of char for one element in table
+size_t	dlen			# Number of char for one element in table
 # buffers for copying elements of various types
 double	dblbuf
 real	realbuf
@@ -127,6 +134,7 @@ short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]
 long	tbyoff()
+short	sdnint()
 errchk	seek, write, sprintf
 
 begin
@@ -142,7 +150,8 @@ begin
 		else
 		    realbuf = buffer[k]
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), realbuf, SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), realbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_DOUBLE:
@@ -152,37 +161,41 @@ begin
 		else
 		    dblbuf = buffer[k]
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_INT:
 	    do k = 1, lastrow-firstrow+1 {
-		if (IS_INDEFD (buffer[k]) || (abs (buffer[k]) > MAX_INT))
+		if (IS_INDEFD (buffer[k]) || (dabs (buffer[k]) > MAX_INT))
 		    intbuf = INDEFI
 		else
-		    intbuf = nint (buffer[k])
+		    intbuf = idnint (buffer[k])
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), intbuf, SZ_INT)
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), intbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_SHORT:
 	    do k = 1, lastrow-firstrow+1 {
-		if (IS_INDEFD (buffer[k]) || (abs (buffer[k]) > MAX_SHORT))
+		if (IS_INDEFD (buffer[k]) || (dabs (buffer[k]) > MAX_SHORT))
 		    shortbuf = INDEFS
 		else
-		    shortbuf = nint (buffer[k])
+		    shortbuf = sdnint (buffer[k])
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), shortbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_BOOL:
 	    do k = 1, lastrow-firstrow+1 {
-		if (IS_INDEFD (buffer[k]) || (nint (buffer[k]) == NO))
+		if (IS_INDEFD (buffer[k]) || (idnint (buffer[k]) == NO))
 		    boolbuf = false
 		else
 		    boolbuf = true
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), boolbuf, sz_val)
 		offset = offset + dlen
 	    }
 	default:
@@ -190,7 +203,8 @@ begin
 		do k = 1, lastrow-firstrow+1 {
 		    call sprintf (charbuf, SZ_LINE, "%-25.17g")
 			call pargd (buffer[k])
-		    call strpak (charbuf, charbuf, SZ_LINE)
+		    sz_val = SZ_LINE
+		    call strpak (charbuf, charbuf, sz_val)
 		    call seek (TB_FILE(tp), offset)
 		    call write (TB_FILE(tp), charbuf, dlen)
 		    offset = offset + dlen
@@ -211,14 +225,15 @@ procedure tbycpr (tp, colptr, buffer, firstrow, lastrow)
 pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 real	buffer[ARB]		# Buffer for values
-int	firstrow		# Number of first row into which to put values
-int	lastrow			# Number of last row into which to put values
+long	firstrow		# Number of first row into which to put values
+long	lastrow			# Number of last row into which to put values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in output array buffer
-int	nrows			# Number of rows to write
+long	k			# Index in output array buffer
+size_t	nrows			# Number of rows to write
 int	datatype		# Data type of element in table
-int	dlen			# Number of char for one element in table
+size_t	dlen			# Number of char for one element in table
 # buffers for copying elements of various types
 double	dblbuf
 int	intbuf
@@ -226,6 +241,9 @@ short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]
 long	tbyoff()
+real	aabs()
+int	inint()
+short	snint()
 errchk	seek, write, sprintf
 
 begin
@@ -245,37 +263,41 @@ begin
 		else
 		    dblbuf = buffer[k]
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_INT:
 	    do k = 1, lastrow-firstrow+1 {
-		if (IS_INDEFR (buffer[k]) || (abs (buffer[k]) > MAX_INT))
+		if (IS_INDEFR (buffer[k]) || (aabs (buffer[k]) > MAX_INT))
 		    intbuf = INDEFI
 		else
-		    intbuf = nint (buffer[k])
+		    intbuf = inint (buffer[k])
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), intbuf, SZ_INT)
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), intbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_SHORT:
 	    do k = 1, lastrow-firstrow+1 {
-		if (IS_INDEFR (buffer[k]) || (abs (buffer[k]) > MAX_SHORT))
+		if (IS_INDEFR (buffer[k]) || (aabs (buffer[k]) > MAX_SHORT))
 		    shortbuf = INDEFS
 		else
-		    shortbuf = nint (buffer[k])
+		    shortbuf = snint (buffer[k])
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), shortbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_BOOL:
 	    do k = 1, lastrow-firstrow+1 {
-		if (IS_INDEFR (buffer[k]) || (nint (buffer[k]) == NO))
+		if (IS_INDEFR (buffer[k]) || (inint (buffer[k]) == NO))
 		    boolbuf = false
 		else
 		    boolbuf = true
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), boolbuf, sz_val)
 		offset = offset + dlen
 	    }
 	default:
@@ -283,7 +305,8 @@ begin
 		do k = 1, lastrow-firstrow+1 {
 		    call sprintf (charbuf, SZ_LINE, "%-15.7g")
 			call pargr (buffer[k])
-		    call strpak (charbuf, charbuf, SZ_LINE)
+		    sz_val = SZ_LINE
+		    call strpak (charbuf, charbuf, sz_val)
 		    call seek (TB_FILE(tp), offset)
 		    call write (TB_FILE(tp), charbuf, dlen)
 		    offset = offset + dlen
@@ -304,14 +327,15 @@ procedure tbycpi (tp, colptr, buffer, firstrow, lastrow)
 pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 int	buffer[ARB]		# Buffer for values
-int	firstrow		# Number of first row into which to put values
-int	lastrow			# Number of last row into which to put values
+long	firstrow		# Number of first row into which to put values
+long	lastrow			# Number of last row into which to put values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in output array buffer
-int	nrows			# Number of rows to write
+long	k			# Index in output array buffer
+size_t	nrows			# Number of rows to write
 int	datatype		# Data type of element in table
-int	dlen			# Number of char for one element in table
+size_t	dlen			# Number of char for one element in table
 # buffers for copying elements of various types
 double	dblbuf
 real	realbuf
@@ -335,7 +359,8 @@ begin
 		else
 		    realbuf = buffer[k]
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), realbuf, SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), realbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_DOUBLE:
@@ -345,7 +370,8 @@ begin
 		else
 		    dblbuf = buffer[k]
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_INT:
@@ -353,12 +379,13 @@ begin
 	    call write (TB_FILE(tp), buffer, nrows*SZ_INT)
 	case TY_SHORT:
 	    do k = 1, lastrow-firstrow+1 {
-		if (IS_INDEFI (buffer[k]) || (abs (buffer[k]) > MAX_SHORT))
+		if (IS_INDEFI (buffer[k]) || (iabs (buffer[k]) > MAX_SHORT))
 		    shortbuf = INDEFS
 		else
 		    shortbuf = buffer[k]
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), shortbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_BOOL:
@@ -368,7 +395,8 @@ begin
 		else
 		    boolbuf = true
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), boolbuf, sz_val)
 		offset = offset + dlen
 	    }
 	default:
@@ -376,7 +404,8 @@ begin
 		do k = 1, lastrow-firstrow+1 {
 		    call sprintf (charbuf, SZ_LINE, "%-11d")
 			call pargi (buffer[k])
-		    call strpak (charbuf, charbuf, SZ_LINE)
+		    sz_val = SZ_LINE
+		    call strpak (charbuf, charbuf, sz_val)
 		    call seek (TB_FILE(tp), offset)
 		    call write (TB_FILE(tp), charbuf, dlen)
 		    offset = offset + dlen
@@ -397,14 +426,15 @@ procedure tbycps (tp, colptr, buffer, firstrow, lastrow)
 pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 short	buffer[ARB]		# Buffer for values
-int	firstrow		# Number of first row into which to put values
-int	lastrow			# Number of last row into which to put values
+long	firstrow		# Number of first row into which to put values
+long	lastrow			# Number of last row into which to put values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in output array buffer
-int	nrows			# Number of rows to write
+long	k			# Index in output array buffer
+size_t	nrows			# Number of rows to write
 int	datatype		# Data type of element in table
-int	dlen			# Number of char for one element in table
+size_t	dlen			# Number of char for one element in table
 # buffers for copying elements of various types
 double	dblbuf
 real	realbuf
@@ -428,7 +458,8 @@ begin
 		else
 		    realbuf = buffer[k]
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), realbuf, SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), realbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_DOUBLE:
@@ -438,7 +469,8 @@ begin
 		else
 		    dblbuf = buffer[k]
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_INT:
@@ -448,7 +480,8 @@ begin
 		else
 		    intbuf = buffer[k]
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), intbuf, SZ_INT)
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), intbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_SHORT:
@@ -461,7 +494,8 @@ begin
 		else
 		    boolbuf = true
 		call seek (TB_FILE(tp), offset)
-		call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), boolbuf, sz_val)
 		offset = offset + dlen
 	    }
 	default:
@@ -469,7 +503,8 @@ begin
 		do k = 1, lastrow-firstrow+1 {
 		    call sprintf (charbuf, SZ_LINE, "%-11d")
 			call pargs (buffer[k])
-		    call strpak (charbuf, charbuf, SZ_LINE)
+		    sz_val = SZ_LINE
+		    call strpak (charbuf, charbuf, sz_val)
 		    call seek (TB_FILE(tp), offset)
 		    call write (TB_FILE(tp), charbuf, dlen)
 		    offset = offset + dlen
@@ -491,13 +526,14 @@ pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 char	buffer[lenstring,ARB]	# Buffer for values
 int	lenstring		# The number of char in each element of buffer
-int	firstrow		# Number of first row into which to put values
-int	lastrow			# Number of last row into which to put values
+long	firstrow		# Number of first row into which to put values
+long	lastrow			# Number of last row into which to put values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in output array buffer
+long	k			# Index in output array buffer
 int	datatype		# Data type of element in table
-int	dlen			# Number of char for one element in table
+size_t	dlen			# Number of char for one element in table
 # buffers for copying elements of various types
 double	dblbuf
 real	realbuf
@@ -522,7 +558,8 @@ begin
 		    call gargr (realbuf)
 		    if (nscan() < 1)
 			realbuf = INDEFR
-		call write (TB_FILE(tp), realbuf, SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), realbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_DOUBLE:
@@ -534,7 +571,8 @@ begin
 			dblbuf = TBL_INDEFD
 		    else if (IS_INDEFD (dblbuf))
 			dblbuf = TBL_INDEFD
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_INT:
@@ -544,7 +582,8 @@ begin
 		    call gargi (intbuf)
 		    if (nscan() < 1)
 			intbuf = INDEFI
-		call write (TB_FILE(tp), intbuf, SZ_INT)
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), intbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_SHORT:
@@ -554,7 +593,8 @@ begin
 		    call gargs (shortbuf)
 		    if (nscan() < 1)
 			shortbuf = INDEFS
-		call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), shortbuf, sz_val)
 		offset = offset + dlen
 	    }
 	case TY_BOOL:
@@ -564,14 +604,16 @@ begin
 		    call gargb (boolbuf)
 		    if (nscan() < 1)
 			boolbuf = false
-		call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), boolbuf, sz_val)
 		offset = offset + dlen
 	    }
 	default:
 	    if (datatype < 0 || datatype == TY_CHAR) {
 		do k = 1, lastrow-firstrow+1 {
 		    call seek (TB_FILE(tp), offset)
-		    call strpak (buffer[1,k], charbuf, lenstring)
+		    sz_val = lenstring
+		    call strpak (buffer[1,k], charbuf, sz_val)
 		    call write (TB_FILE(tp), charbuf, dlen)
 		    offset = offset + dlen
 		}

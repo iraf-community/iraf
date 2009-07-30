@@ -61,20 +61,25 @@ int procedure tbttyp (tablename, exists)
 char	tablename[ARB]	# i: name of the file containing the table
 int	exists		# o: YES if the file can be opened
 #--
+size_t	sz_val
+size_t	c_1
 pointer sp
 pointer buf		# for reading from the file
 int	ttype		# table type
 int	i		# loop index
+long	j
 int	fd
-int	nread, nelem	# chars to read, number actually read
-int	open(), read()
+size_t	nread, nelem	# chars to read, number actually read
+int	open()
+long	read()
 int	len, strlen(), strncmp()
 int	ofd, fstdfile()	# to check for STDIN, STDOUT, etc.; ofd is ignored
 bool	streq()
 
 pointer fname		# file name without trailing brackets
 pointer fullname	# input file name with ".tab" appended
-int	extname, hdu, dummy	# returned by tbparse and ignored
+pointer	extname
+int	hdu, dummy	# returned by tbparse and ignored
 int	tbparse()
 
 # These are used for checking for a FITS file.
@@ -86,14 +91,16 @@ string	naxis    "NAXIS   =                "
 #                 123456789012345678901234567890
 
 # These are used for checking for an STSDAS binary table.
-int	i_sizinfo[LEN_SIZINFO]	# size information record
+long	i_sizinfo[LEN_SIZINFO]	# size information record
 char	c_sizinfo[SZ_SIZINFO]
 equivalence (i_sizinfo[1], c_sizinfo[1])
-int	b_sizinfo[LEN_SIZINFO]	# byte-swapped size information record
+long	b_sizinfo[LEN_SIZINFO]	# byte-swapped size information record
 
 errchk	open, read, tbparse
 
 begin
+	c_1 = 1
+
 	# initial values
 	exists = YES
 	# zero is a flag to indicate we don't know the type yet
@@ -103,8 +110,9 @@ begin
 	    return (TBL_TYPE_TEXT)
 
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
-	call salloc (extname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	call salloc (extname, sz_val, TY_CHAR)
 
 	# Brackets on end of tablename?  Remove them.
 	len = strlen (tablename)
@@ -129,7 +137,8 @@ begin
 
 	if (exists == NO) {
 	    # Append default extension and try again.
-	    call salloc (fullname, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (fullname, sz_val, TY_CHAR)
 	    call strcpy (Memc[fname], Memc[fullname], SZ_FNAME)
 	    call strcat (".tab", Memc[fullname], SZ_FNAME)
 	    iferr {
@@ -145,7 +154,8 @@ begin
 
 	    # Read the beginning of the file to decide what type it is.
 
-	    call salloc (buf, SZ_FITS_BLOCK, TY_CHAR)
+	    sz_val = SZ_FITS_BLOCK
+	    call salloc (buf, sz_val, TY_CHAR)
 
 	    nread = SZ_FITS_BLOCK / SZB_CHAR
 	    nelem = read (fd, Memc[buf], nread)
@@ -163,7 +173,8 @@ begin
 
 	    if (nelem == nread) {		# did we read entire block?
 
-		call strupk (Memc[buf], Memc[buf], SZ_FITS_BLOCK)
+		sz_val = SZ_FITS_BLOCK
+		call strupk (Memc[buf], Memc[buf], sz_val)
 
 		# It could be FITS; check the first three "cards."
 
@@ -178,8 +189,8 @@ begin
 		}
 
 		# But if there are any newlines, it's not a FITS file.
-		do i = 0, nelem-1 {
-		    if (Memc[buf+i] == NEWLINE) {
+		do j = 0, nelem-1 {
+		    if (Memc[buf+j] == NEWLINE) {
 			ttype = 0
 			break
 		    }
@@ -202,8 +213,12 @@ begin
 		    # Check whether i_sizinfo is byte swapped.  If so, set
 		    # the table type if it matches row or column.  Note that
 		    # this is not considered an error (at this point).
-		    call bswap4 (i_sizinfo, 1, b_sizinfo, 1,
-					SZ_SIZINFO*SZB_CHAR)
+		    sz_val = SZ_SIZINFO*SZB_CHAR
+		    if ( SZ_LONG == 2 ) {
+			call bswap4 (i_sizinfo, c_1, b_sizinfo, c_1, sz_val)
+		    } else {
+			call bswap8 (i_sizinfo, c_1, b_sizinfo, c_1, sz_val)
+		    }
 		    if (S_TYPE(b_sizinfo) == TBL_TYPE_S_ROW)
 			ttype = TBL_TYPE_S_ROW
 		    if (S_TYPE(b_sizinfo) == TBL_TYPE_S_COL)

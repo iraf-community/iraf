@@ -17,35 +17,39 @@ procedure tbfapd (tp, cp, rownum, buffer, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 double	buffer[ARB]	# i: buffer for values to be written
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
 pointer sp
 pointer cbuf		# for writing to a string
 bool	bbuf
 bool	anyf		# true if any input value is INDEF
 int	status		# zero is OK
-int	i, j
+long	i, j
+long	c_1
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	if (COL_DTYPE(cp) < 0) {		# text string
 
 	    call smark (sp)
-	    call salloc (cbuf, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (cbuf, sz_val, TY_CHAR)
 	    j = first
 	    do i = 1, nelem {
 		if (IS_INDEFD(buffer[i])) {
 		    call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		} else {
 		    call sprintf (Memc[cbuf], SZ_FNAME, "%-25.16g")
 			call pargd (buffer[i])
-		    call fspcls (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		    call fspcls (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 				Memc[cbuf], SZ_FNAME, status)
 		}
 		j = j + 1
@@ -58,11 +62,11 @@ begin
 	    do i = 1, nelem {
 		if (IS_INDEFD(buffer[i])) {
 		    call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		} else {
 		    bbuf = (buffer[i] != 0.d0)
 		    call fspcll (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, bbuf, status)
+				j, c_1, bbuf, status)
 		}
 		j = j + 1
 	    }
@@ -86,10 +90,10 @@ begin
 		do i = 1, nelem {
 		    if (IS_INDEFD(buffer[i])) {
 			call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		    } else {
 			call fspcld (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, buffer[i], status)
+				j, c_1, buffer[i], status)
 		    }
 		    j = j + 1
 		}
@@ -112,35 +116,39 @@ procedure tbfapr (tp, cp, rownum, buffer, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 real	buffer[ARB]	# i: buffer for values to be written
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
 pointer sp
 pointer cbuf		# for writing to a string
 bool	bbuf
 bool	anyf		# true if any input value is INDEF
 int	status		# zero is OK
-int	i, j
+long	i, j
+long	c_1
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	if (COL_DTYPE(cp) < 0) {		# text string
 
 	    call smark (sp)
-	    call salloc (cbuf, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (cbuf, sz_val, TY_CHAR)
 	    j = first
 	    do i = 1, nelem {
 		if (IS_INDEFR(buffer[i])) {
 		    call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		} else {
 		    call sprintf (Memc[cbuf], SZ_FNAME, "%-15.7g")
 			call pargr (buffer[i])
-		    call fspcls (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		    call fspcls (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 				Memc[cbuf], SZ_FNAME, status)
 		}
 		j = j + 1
@@ -153,11 +161,11 @@ begin
 	    do i = 1, nelem {
 		if (IS_INDEFR(buffer[i])) {
 		    call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		} else {
 		    bbuf = (buffer[i] != 0.)
 		    call fspcll (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, bbuf, status)
+				j, c_1, bbuf, status)
 		}
 		j = j + 1
 	    }
@@ -178,10 +186,10 @@ begin
 		do i = 1, nelem {
 		    if (IS_INDEFR(buffer[i])) {
 			call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		    } else {
 			call fspcle (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, buffer[i], status)
+				j, c_1, buffer[i], status)
 		    }
 		    j = j + 1
 		}
@@ -203,35 +211,39 @@ procedure tbfapi (tp, cp, rownum, buffer, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 int	buffer[ARB]	# i: buffer for values to be written
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
 pointer sp
 pointer cbuf		# for writing to a string
 bool	bbuf
 bool	anyf		# true if any input value is INDEF
 int	status		# zero is OK
-int	i, j
+long	i, j
+long	c_1
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	if (COL_DTYPE(cp) < 0) {		# text string
 
 	    call smark (sp)
-	    call salloc (cbuf, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (cbuf, sz_val, TY_CHAR)
 	    j = first
 	    do i = 1, nelem {
 		if (IS_INDEFI(buffer[i])) {
 		    call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		} else {
 		    call sprintf (Memc[cbuf], SZ_FNAME, "%-10d")
 			call pargi (buffer[i])
-		    call fspcls (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		    call fspcls (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 				Memc[cbuf], SZ_FNAME, status)
 		}
 		j = j + 1
@@ -244,11 +256,11 @@ begin
 	    do i = 1, nelem {
 		if (IS_INDEFI(buffer[i])) {
 		    call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		} else {
 		    bbuf = (buffer[i] != 0)
 		    call fspcll (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, bbuf, status)
+				j, c_1, bbuf, status)
 		}
 		j = j + 1
 	    }
@@ -269,10 +281,10 @@ begin
 		do i = 1, nelem {
 		    if (IS_INDEFI(buffer[i])) {
 			call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		    } else {
 			call fspclj (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, buffer[i], status)
+				j, c_1, buffer[i], status)
 		    }
 		    j = j + 1
 		}
@@ -294,35 +306,39 @@ procedure tbfaps (tp, cp, rownum, buffer, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 short	buffer[ARB]	# i: buffer for values to be written
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
 pointer sp
 pointer cbuf		# for writing to a string
 bool	bbuf
 bool	anyf		# true if any input value is INDEF
 int	status		# zero is OK
-int	i, j
+long	i, j
+long	c_1
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	if (COL_DTYPE(cp) < 0) {		# text string
 
 	    call smark (sp)
-	    call salloc (cbuf, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (cbuf, sz_val, TY_CHAR)
 	    j = first
 	    do i = 1, nelem {
 		if (IS_INDEFS(buffer[i])) {
 		    call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		} else {
 		    call sprintf (Memc[cbuf], SZ_FNAME, "%-10d")
 			call pargs (buffer[i])
-		    call fspcls (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		    call fspcls (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 				Memc[cbuf], SZ_FNAME, status)
 		}
 		j = j + 1
@@ -335,11 +351,11 @@ begin
 	    do i = 1, nelem {
 		if (IS_INDEFS(buffer[i])) {
 		    call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		} else {
 		    bbuf = (buffer[i] != 0)
 		    call fspcll (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, bbuf, status)
+				j, c_1, bbuf, status)
 		}
 		j = j + 1
 	    }
@@ -360,10 +376,10 @@ begin
 		do i = 1, nelem {
 		    if (IS_INDEFS(buffer[i])) {
 			call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		    } else {
 			call fspcli (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, buffer[i], status)
+				j, c_1, buffer[i], status)
 		    }
 		    j = j + 1
 		}
@@ -385,32 +401,36 @@ procedure tbfapb (tp, cp, rownum, buffer, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 bool	buffer[ARB]	# i: buffer for values to be written
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
 pointer sp
 pointer cbuf		# for writing to a string
 double	dbuf
 int	status		# zero is OK
-int	i, j
+long	i, j
+long	c_1
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	if (COL_DTYPE(cp) < 0) {		# text string
 
 	    call smark (sp)
-	    call salloc (cbuf, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (cbuf, sz_val, TY_CHAR)
 	    j = first
 	    do i = 1, nelem {
 		if (buffer[i])
 		    call strcpy ("yes", Memc[cbuf], SZ_FNAME)
 		else
 		    call strcpy ("no", Memc[cbuf], SZ_FNAME)
-		call fspcls (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		call fspcls (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 				Memc[cbuf], SZ_FNAME, status)
 		j = j + 1
 	    }
@@ -430,7 +450,7 @@ begin
 		    dbuf = 1.d0
 		else
 		    dbuf = 0.d0
-		call fspcld (TB_FILE(tp), COL_NUMBER(cp), rownum, j, 1,
+		call fspcld (TB_FILE(tp), COL_NUMBER(cp), rownum, j, c_1,
 			dbuf, status)
 		j = j + 1
 	    }
@@ -448,14 +468,14 @@ procedure tbfapt (tp, cp, rownum, cbuf, maxch, first, nelem)
 
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
-int	rownum		# i: row number
+long	rownum		# i: row number
 char	cbuf[maxch,ARB]	# i: buffer for values to be written
 int	maxch		# i: max number of char in input string
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
 int	status		# zero is OK
-int	i, j		# loop indexes
+long	i, j		# loop indexes
 int	nscan()
 
 # The following are for putting non-text type values
@@ -464,10 +484,11 @@ real	rbuf
 int	ibuf
 short	sbuf
 bool	bbuf
-
+long	c_1
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	if (COL_DTYPE(cp) < 0) {
@@ -486,10 +507,10 @@ begin
 			call gargr (rbuf)
 		    if (nscan() < 1 || IS_INDEF(rbuf)) {
 			call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		    } else {
 			call fspcle (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, rbuf, status)
+				j, c_1, rbuf, status)
 		    }
 		    j = j + 1
 		}
@@ -499,10 +520,10 @@ begin
 			call gargd (dbuf)
 		    if (nscan() < 1 || IS_INDEFD(dbuf)) {
 			call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		    } else {
 			call fspcld (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, dbuf, status)
+				j, c_1, dbuf, status)
 		    }
 		    j = j + 1
 		}
@@ -512,10 +533,10 @@ begin
 			call gargi (ibuf)
 		    if (nscan() < 1 || IS_INDEFI(ibuf)) {
 			call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		    } else {
 			call fspclj (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, ibuf, status)
+				j, c_1, ibuf, status)
 		    }
 		    j = j + 1
 		}
@@ -525,10 +546,10 @@ begin
 			call gargs (sbuf)
 		    if (nscan() < 1 || IS_INDEFS(sbuf)) {
 			call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		    } else {
 			call fspcli (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, sbuf, status)
+				j, c_1, sbuf, status)
 		    }
 		    j = j + 1
 		}
@@ -538,10 +559,10 @@ begin
 			call gargb (bbuf)
 		    if (nscan() < 1) {
 			call fspclu (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, status)
+				j, c_1, status)
 		    } else {
 			call fspcll (TB_FILE(tp), COL_NUMBER(cp), rownum,
-				j, 1, bbuf, status)
+				j, c_1, bbuf, status)
 		    }
 		    j = j + 1
 		}

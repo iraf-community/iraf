@@ -14,7 +14,7 @@ procedure tbxwnc (tp, colptr, numcols, old_colused)
 pointer tp			# i: pointer to table descriptor
 pointer colptr[numcols]		# i: pointers to descriptors for new columns
 int	numcols			# i: number of new columns
-int	old_colused		# i: previous value of TB_COLUSED
+long	old_colused		# i: previous value of TB_COLUSED
 #--
 pointer cp			# Pointer to a specific column
 int	k			# Loop index

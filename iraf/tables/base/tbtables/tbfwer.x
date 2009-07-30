@@ -16,32 +16,39 @@ include "tblfits.h"		# defines FITS_TNULL_NOT_SET
 procedure tbfwer (tp, nrows, new_nrows)
 
 pointer tp		# i: pointer to table descriptor
-int	nrows		# i: number of rows on entry to this routine
-int	new_nrows	# i: number of rows after calling this routine
+long	nrows		# i: number of rows on entry to this routine
+long	new_nrows	# i: number of rows after calling this routine
 #--
+size_t	sz_val
 pointer sp
 pointer keyword		# for TNULL keyword
 pointer cp		# pointer to one column descriptor
-int	row, col	# row and column numbers
-int	nelem		# number of elements, if column is array type
+int	col		# column numbers
+long	row		# row numbers
+long	nelem		# number of elements, if column is array type
 int	dtype		# data type of column (needed to set TNULL)
 int	ival		# undefined value
 int	status		# zero is OK
 #
 pointer comment		# for getting NAXIS1
-int	nbytes		# value of NAXIS1 (length of a row, in bytes)
-int	nchar		# number of char elements in nbytes
+long	nbytes		# value of NAXIS1 (length of a row, in bytes)
+size_t	nchar		# number of char elements in nbytes
+long	c_1
 #
 pointer tbcnum()
 int	tbcigi()
+long	tbcigl()
 errchk	tbferr
 
 begin
+	c_1 = 1
+
 	if (new_nrows <= nrows)
 	    return			# nothing to do
 
 	call smark (sp)
-	call salloc (keyword, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyword, sz_val, TY_CHAR)
 
 	status = 0
 
@@ -49,7 +56,7 @@ begin
 
 	    # Write the INDEF record to all the new rows.
 	    do row = nrows+1, new_nrows {
-		call fsptbb (TB_FILE(tp), row, 1, TB_ROWLEN(tp),
+		call fsptbb (TB_FILE(tp), row, c_1, TB_ROWLEN(tp),
 			Memc[TB_INDEF(tp)], status)
 		if (status != 0)
 		    call tbferr (status)
@@ -64,9 +71,9 @@ begin
 	    do col = 1, TB_NCOLS(tp) {		# loop over columns
 
 		cp = tbcnum (tp, col)
-		nelem = tbcigi (cp, TBL_COL_LENDATA)
+		nelem = tbcigl (cp, TBL_COL_LENDATA)
 
-		call fspclu (TB_FILE(tp), col, row, 1, nelem, status)
+		call fspclu (TB_FILE(tp), col, row, c_1, nelem, status)
 
 		if (status == FITS_TNULL_NOT_SET) {
 
@@ -98,7 +105,7 @@ begin
 		    }
 		    # try again
 		    call fsrdef (TB_FILE(tp), status)
-		    call fspclu (TB_FILE(tp), col, row, 1, nelem, status)
+		    call fspclu (TB_FILE(tp), col, row, c_1, nelem, status)
 		}
 		if (status != 0)
 		    call tbferr (status)
@@ -107,9 +114,10 @@ begin
 	    # Allocate memory for TB_INDEF, and read the record that we just
 	    # wrote, reading into TB_INDEF.
 
-	    call salloc (comment, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (comment, sz_val, TY_CHAR)
 	    call fsrdef (TB_FILE(tp), status)
-	    call fsgkyj (TB_FILE(tp), "NAXIS1", nbytes, Memc[comment], status)
+	    call fsgkyk (TB_FILE(tp), "NAXIS1", nbytes, Memc[comment], status)
 	    if (status != 0)
 		call tbferr (status)
 
@@ -118,7 +126,7 @@ begin
 	    # round up
 	    nchar = (nbytes + SZB_CHAR-1) / (SZB_CHAR)
 	    call realloc (TB_INDEF(tp), nchar, TY_CHAR)
-	    call fsgtbb (TB_FILE(tp), row, 1, TB_ROWLEN(tp),
+	    call fsgtbb (TB_FILE(tp), row, c_1, TB_ROWLEN(tp),
 			Memc[TB_INDEF(tp)), status)
 	    if (status != 0)
 		call tbferr (status)
@@ -128,7 +136,7 @@ begin
 	    # Now that we have the INDEF record in TB_INDEF, write it to
 	    # all the other new rows.
 	    do row = nrows+2, new_nrows {
-		call fsptbb (TB_FILE(tp), row, 1, TB_ROWLEN(tp),
+		call fsptbb (TB_FILE(tp), row, c_1, TB_ROWLEN(tp),
 			Memc[TB_INDEF(tp)], status)
 		if (status != 0)
 		    call tbferr (status)

@@ -10,10 +10,10 @@ include "tblerr.h"
 procedure tbsirow (tp, selrow, rownum)
 
 pointer tp		# i: pointer to table descriptor
-int	selrow		# i: row number (or selected row number)
-int	rownum		# o: actual row number
+long	selrow		# i: row number (or selected row number)
+long	rownum		# o: actual row number
 #--
-int	rst_rownum()
+long	rst_rownum()
 
 begin
 	if (selrow < 1)

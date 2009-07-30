@@ -15,15 +15,18 @@ procedure tbegpb (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 bool	buffer			# o: buffer to receive value
 #--
-int	read()
+size_t	sz_val
+long	read()
 errchk	seek, read
 
 begin
 	call seek (TB_FILE(tp), offset)
-	if (read (TB_FILE(tp), buffer, SZ_BOOL) < SZ_BOOL)
+	sz_val = SZ_BOOL
+	# arg2: incompatible pointer
+	if (read (TB_FILE(tp), buffer, sz_val) < SZ_BOOL)
 		call error (1, "tbegpb:  unexpected end of file")
 end
 
@@ -32,15 +35,18 @@ procedure tbegpd (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 double	buffer			# o: buffer to receive value
 #--
-int	read()
+size_t	sz_val
+long	read()
 errchk	seek, read
 
 begin
 	call seek (TB_FILE(tp), offset)
-	if (read (TB_FILE(tp), buffer, SZ_DOUBLE) < SZ_DOUBLE)
+	sz_val = SZ_DOUBLE
+	# arg2: incompatible pointer
+	if (read (TB_FILE(tp), buffer, sz_val) < SZ_DOUBLE)
 		call error (1, "tbegpd:  unexpected end of file")
 end
 
@@ -49,15 +55,18 @@ procedure tbegpr (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 real	buffer			# o: buffer to receive value
 #--
-int	read()
+size_t	sz_val
+long	read()
 errchk	seek, read
 
 begin
 	call seek (TB_FILE(tp), offset)
-	if (read (TB_FILE(tp), buffer, SZ_REAL) < SZ_REAL)
+	sz_val = SZ_REAL
+	# arg2: incompatible pointer
+	if (read (TB_FILE(tp), buffer, sz_val) < SZ_REAL)
 		call error (1, "tbegpr:  unexpected end of file")
 end
 
@@ -66,15 +75,18 @@ procedure tbegpi (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 int	buffer			# o: buffer to receive value
 #--
-int	read()
+size_t	sz_val
+long	read()
 errchk	seek, read
 
 begin
 	call seek (TB_FILE(tp), offset)
-	if (read (TB_FILE(tp), buffer, SZ_INT) < SZ_INT)
+	sz_val = SZ_INT
+	# arg2: incompatible pointer
+	if (read (TB_FILE(tp), buffer, sz_val) < SZ_INT)
 		call error (1, "tbegpi:  unexpected end of file")
 end
 
@@ -83,15 +95,17 @@ procedure tbegps (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 short	buffer			# o: buffer to receive value
 #--
-int	read()
+size_t	sz_val
+long	read()
 errchk	seek, read
 
 begin
 	call seek (TB_FILE(tp), offset)
-	if (read (TB_FILE(tp), buffer, SZ_SHORT) < SZ_SHORT)
+	sz_val = SZ_SHORT
+	if (read (TB_FILE(tp), buffer, sz_val) < SZ_SHORT)
 		call error (1, "tbegps:  unexpected end of file")
 end
 
@@ -100,14 +114,14 @@ procedure tbegpt (tp, cptr, offset, rownum, buffer, maxch)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 char	buffer[ARB]		# o: buffer to receive value
 int	maxch			# i: max number of char to read
 #--
+size_t	sz_val
 char	cbuf[SZ_LINE]		# buffer for reading from table
-int	nchar			# number of char to read
-int	read()
-int	tbeszt()
+size_t	nchar			# number of char to read
+long	read(), tbeszt()
 errchk	seek, read
 
 begin
@@ -117,5 +131,6 @@ begin
 	    call error (1, "tbegpt:  unexpected end of file")
 	# It may be that no EOS was read from the entry in the table.
 	cbuf[nchar+1] = EOS
-	call strupk (cbuf, buffer, maxch)
+	sz_val = maxch
+	call strupk (cbuf, buffer, sz_val)
 end

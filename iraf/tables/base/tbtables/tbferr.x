@@ -6,6 +6,7 @@ procedure tbferr (status)
 
 int	status		# i: FITSIO error number; zero is OK
 #--
+size_t	sz_val
 pointer sp
 pointer errmess		# for error message
 pointer mess2		# for additional error messages
@@ -16,8 +17,9 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (errmess, SZ_LINE, TY_CHAR)
-	call salloc (mess2, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmess, sz_val, TY_CHAR)
+	call salloc (mess2, sz_val, TY_CHAR)
 
 	# Get the oldest error message.
 	call fsgmsg (Memc[errmess])

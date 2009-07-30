@@ -15,10 +15,10 @@ pointer tp		# i: pointer to table descriptor
 pointer colptr		# i: pointer to column descriptor
 #--
 pointer locn		# Location in INDEF record (unit = SZ_CHAR)
-int	nchar		# number of char in entry for current column
+long	nchar		# number of char in entry for current column
 short	sbuf
 bool	bbuf
-int	k
+pointer	k
 
 begin
 	locn = TB_INDEF(tp) + COL_OFFSET(colptr)
@@ -61,9 +61,9 @@ end
 # The purpose of this is to assign the input value of type double to
 # a character output buffer.
 
-procedure tbbeqd (input, output)
+procedure tbbeqd (d_input, output)
 
-double	input			# i: input double-precision value
+double	d_input			# i: input double-precision value
 char	output[ARB]		# o: same as input, bit for bit
 #--
 double	buf			# local copy of input
@@ -72,7 +72,7 @@ int	i
 equivalence (buf, cbuf)
 
 begin
-	buf = input
+	buf = d_input
 	do i = 1, SZ_DOUBLE
 	    output[i] = cbuf[i]
 end
@@ -81,9 +81,9 @@ end
 # The purpose of this is to assign the input value of type real to
 # a character output buffer.
 
-procedure tbbeqr (input, output)
+procedure tbbeqr (r_input, output)
 
-real	input			# i: input single-precision value
+real	r_input			# i: input single-precision value
 char	output[ARB]		# o: same as input, bit for bit
 #--
 real	buf			# local copy of input
@@ -92,7 +92,7 @@ int	i
 equivalence (buf, cbuf)
 
 begin
-	buf = input
+	buf = r_input
 	do i = 1, SZ_REAL
 	    output[i] = cbuf[i]
 end
@@ -101,9 +101,9 @@ end
 # The purpose of this is to assign the input value of type integer to
 # a character output buffer.
 
-procedure tbbeqi (input, output)
+procedure tbbeqi (i_input, output)
 
-int	input			# i: input integer value
+int	i_input			# i: input integer value
 char	output[ARB]		# o: same as input, bit for bit
 #--
 int	buf			# local copy of input
@@ -112,7 +112,7 @@ int	i
 equivalence (buf, cbuf)
 
 begin
-	buf = input
+	buf = i_input
 	do i = 1, SZ_INT
 	    output[i] = cbuf[i]
 end
@@ -121,9 +121,9 @@ end
 # The purpose of this is to assign the input value of type short integer to
 # a character output buffer.
 
-procedure tbbeqs (input, output)
+procedure tbbeqs (s_input, output)
 
-short	input			# i: input integer value
+short	s_input			# i: input integer value
 char	output[ARB]		# o: same as input, bit for bit
 #--
 short	buf			# local copy of input
@@ -133,9 +133,9 @@ equivalence (buf, cbuf)
 
 begin
 	if (SZ_SHORT == SZ_CHAR) {
-	    output[1] = input
+	    output[1] = s_input
 	} else {
-	    buf = input
+	    buf = s_input
 	    do i = 1, SZ_SHORT
 		output[i] = cbuf[i]
 	}
@@ -145,9 +145,9 @@ end
 # The purpose of this is to assign the input value of type boolean to
 # a character output buffer.
 
-procedure tbbeqb (input, output)
+procedure tbbeqb (b_input, output)
 
-bool	input			# i: input integer value
+bool	b_input			# i: input integer value
 char	output[ARB]		# o: same as input, bit for bit
 #--
 bool	buf			# local copy of input
@@ -156,7 +156,7 @@ int	i
 equivalence (buf, cbuf)
 
 begin
-	buf = input
+	buf = b_input
 	do i = 1, SZ_BOOL
 	    output[i] = cbuf[i]
 end

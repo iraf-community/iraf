@@ -45,19 +45,20 @@ char	colname[SZ_COLNAME,numcols]	# i: names of columns
 char	colunits[SZ_COLUNITS,numcols]	# i: units for columns
 char	colfmt[SZ_COLFMT,numcols]	# i: print formats for columns
 int	datatype[numcols]		# i: data types of columns
-int	lenarray[numcols]		# i: number of elements for each column
+long	lenarray[numcols]		# i: number of elements for each column
 int	numcols				# i: number of columns to be defined
 #--
 int	ntotal			# number of columns including new ones
 int	old_ncols   		# TB_NCOLS before adding new columns
-int	old_colused		# TB_COLUSED before increasing size
+long	old_colused		# TB_COLUSED before increasing size
 int	new_maxcols		# new maximum number of columns
-int	new_colused		# new value for row length used
-int	new_rowlen		# new value for row length allocated
+long	new_colused		# new value for row length used
+long	new_rowlen		# new value for row length allocated
 int	dtype			# SPP data type of column
 int	dlen			# number of char used by a column in table
-int	larray			# max (lenarray, 1)
+long	larray			# max (lenarray, 1)
 int	k			# Loop index
+long	l_val
 errchk	tbbaln, tbcadd, tbfdef, tbtchs, tbtflu
 
 begin
@@ -105,7 +106,8 @@ begin
 
 	# Update the values in the table struct and, if the table is open,
 	# update the table size.
-	call tbtchs (tp, -1, new_maxcols, new_rowlen, -1)
+	l_val = -1
+	call tbtchs (tp, -1, new_maxcols, new_rowlen, l_val)
 
 	# Create descriptors for the new columns.
 	# For a text table, allocate memory for the column values.

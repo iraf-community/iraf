@@ -14,7 +14,7 @@ pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 #--
 pointer new		# pointer to new memory for column data
-int	row		# row number
+long	row		# row number
 errchk	malloc
 
 begin

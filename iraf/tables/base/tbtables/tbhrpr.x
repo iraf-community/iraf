@@ -21,6 +21,7 @@ pointer tp			# i: pointer to table descriptor
 int	parnum			# i: number of the parameter to be gotten
 char	str[SZ_PARREC]		# o: string containing the keyword and value
 #--
+size_t	sz_val
 pointer sp
 pointer par			# scratch for reading the keyword
 pointer word			# value extracted from str
@@ -30,10 +31,11 @@ bool	done
 int	datatype		# data type of parameter
 int	width, prec, fcode	# returned by tbbwrd and ignored
 int	tbbwrd()
-int	stat
+long	stat
 long	locn			# location for reading in file
 int	ch			# a character in the string
-int	read(), strlen()
+long	read()
+int	strlen()
 bool	streq()
 errchk	seek, read
 
@@ -47,7 +49,8 @@ begin
 
 	    maxch = max (strlen (Memc[TB_KEYWORD(tp,parnum)]), SZ_PARREC)
 	    call smark (sp)
-	    call salloc (par, maxch, TY_CHAR)
+	    sz_val = maxch
+	    call salloc (par, sz_val, TY_CHAR)
 
 	    call strcpy (Memc[TB_KEYWORD(tp,parnum)], Memc[par], maxch)
 
@@ -106,7 +109,8 @@ begin
 
 	    # Now ip (zero indexed) is the beginning of the value.
 	    # Determine the data type.
-	    call salloc (word, maxch, TY_CHAR)
+	    sz_val = maxch
+	    call salloc (word, sz_val, TY_CHAR)
 	    i = ip + 1				# one indexed
 	    if (streq (str, "HISTORY ") || streq (str, "COMMENT ")) {
 		datatype = TY_CHAR
@@ -134,7 +138,9 @@ begin
 	    locn = SZ_PACKED_REC * (parnum - 1) + SZ_SIZINFO + 1
 
 	    call seek (TB_FILE(tp), locn)
-	    stat = read (TB_FILE(tp), str, SZ_PACKED_REC)
-	    call strupk (str, str, SZ_PARREC)
+	    sz_val = SZ_PACKED_REC
+	    stat = read (TB_FILE(tp), str, sz_val)
+	    sz_val = SZ_PARREC
+	    call strupk (str, str, sz_val)
 	}
 end

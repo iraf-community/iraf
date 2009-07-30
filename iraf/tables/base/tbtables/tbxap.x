@@ -19,20 +19,22 @@ procedure tbxapd (tp, cp, row, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 double	buffer[ARB]	# i: values to write to table
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 long	eoffset		# offset from BOF to element to put
 long	roffset		# offset from BOF
 long	offset		# offset of element from beginning of row
-int	rowlen		# length of a row in char
+long	rowlen		# length of a row in char
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nchar		# number of char to write (= nelem * SZ_DOUBLE)
-int	i
+long	ntotal		# total number of elements in array
+size_t	nchar		# number of char to write (= nelem * SZ_DOUBLE)
+long	i
 bool	some_indef	# true if there are any INDEF elements in buffer
 pointer cbuf		# scratch for character buffer
 double	dbuf
@@ -41,6 +43,7 @@ int	ibuf
 short	sbuf
 bool	bbuf
 long	tbeoff(), tbxoff()
+short	sdnint()
 errchk	seek, write, tbxppt, tbxwer
 
 begin
@@ -59,8 +62,10 @@ begin
 	    offset = COL_OFFSET(cp)		# from beginning of row
 
 	    call seek (TB_FILE(tp), roffset)
-	    if (offset > 0)
-		call write (TB_FILE(tp), Memc[TB_INDEF(tp)], offset)
+	    if (offset > 0) {
+		sz_val = offset
+		call write (TB_FILE(tp), Memc[TB_INDEF(tp)], sz_val)
+	    }
 
 	    # Search for INDEF values in buffer, first checking the last
 	    # element because INDEF is more likely to be found at the end.
@@ -81,7 +86,8 @@ begin
 			dbuf = TBL_INDEFD
 		    else
 			dbuf = buffer[i]
-		    call write (TB_FILE(tp), dbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dbuf, sz_val)
 		}
 	    } else {
 		call write (TB_FILE(tp), buffer, nchar)
@@ -89,8 +95,8 @@ begin
 
 	    call seek (TB_FILE(tp), roffset+offset+nchar)
 	    if (offset+nchar < rowlen) {
-		call write (TB_FILE(tp), Memc[TB_INDEF(tp)+offset+nchar],
-		    rowlen-(offset+nchar))
+		sz_val = rowlen-(offset+nchar)
+		call write (TB_FILE(tp), Memc[TB_INDEF(tp)+offset+nchar], sz_val)
 	    }
 
 	    TB_NROWS(tp) = row
@@ -111,11 +117,12 @@ begin
 	    switch (dtype) {
 	    case TBL_TY_REAL:
 		do i = 1, nelem {		# put each element individually
-		    if (IS_INDEFD (buffer[i]) || abs (buffer[i]) > MAX_REAL)
+		    if (IS_INDEFD (buffer[i]) || dabs (buffer[i]) > MAX_REAL)
 			rbuf = INDEFR
 		    else
 			rbuf = buffer[i]
-		    call write (TB_FILE(tp), rbuf, SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), rbuf, sz_val)
 		}
 	    case TBL_TY_DOUBLE:
 		some_indef = false			# initial value
@@ -135,26 +142,29 @@ begin
 			    dbuf = TBL_INDEFD
 			else
 			    dbuf = buffer[i]
-			call write (TB_FILE(tp), dbuf, SZ_DOUBLE)
+			sz_val = SZ_DOUBLE
+			call write (TB_FILE(tp), dbuf, sz_val)
 		    }
 		} else {
 		    call write (TB_FILE(tp), buffer, nchar)
 		}
 	    case TBL_TY_INT:
 		do i = 1, nelem {
-		    if (IS_INDEFD (buffer[i]) || abs (buffer[i]) > MAX_INT)
+		    if (IS_INDEFD (buffer[i]) || dabs (buffer[i]) > MAX_INT)
 			ibuf = INDEFI
 		    else
-			ibuf = nint (buffer[i])
-		    call write (TB_FILE(tp), ibuf, SZ_INT)
+			ibuf = idnint (buffer[i])
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), ibuf, sz_val)
 		}
 	    case TBL_TY_SHORT:
 		do i = 1, nelem {
-		    if (IS_INDEFD (buffer[i]) || abs (buffer[i]) > MAX_SHORT)
+		    if (IS_INDEFD (buffer[i]) || dabs (buffer[i]) > MAX_SHORT)
 			sbuf = INDEFS
 		    else
-			sbuf = nint (buffer[i])
-		    call write (TB_FILE(tp), sbuf, SZ_SHORT)
+			sbuf = sdnint (buffer[i])
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), sbuf, sz_val)
 		}
 	    case TBL_TY_BOOL:
 		do i = 1, nelem {
@@ -162,17 +172,20 @@ begin
 			bbuf = false
 		    else
 			bbuf = (buffer[i] != double(NO))
-		    call write (TB_FILE(tp), bbuf, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), bbuf, sz_val)
 		}
 	    default:
 		if (dtype < 0 || dtype == TY_CHAR) {
 		    call smark (sp)
-		    call salloc (cbuf, SZ_FNAME, TY_CHAR)
+		    sz_val = SZ_FNAME
+		    call salloc (cbuf, sz_val, TY_CHAR)
 		    do i = 1, nelem {
 			eoffset = tbeoff (tp, cp, row, first+i-1)
 			call sprintf (Memc[cbuf], SZ_FNAME, "%.16g")
 			    call pargd (buffer[i])
-			call tbxppt (tp, cp, eoffset, Memc[cbuf], SZ_FNAME, 1)
+			l_val = 1
+			call tbxppt (tp, cp, eoffset, Memc[cbuf], SZ_FNAME, l_val)
 		    }
 		    call sfree (sp)
 		} else {
@@ -187,26 +200,31 @@ procedure tbxapr (tp, cp, row, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 real	buffer[ARB]	# i: values to write to table
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 long	eoffset		# offset from BOF to element to put
 long	roffset		# offset from BOF
 long	offset		# offset of element from beginning of row
-int	rowlen		# length of a row in char
+long	rowlen		# length of a row in char
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nchar		# number of char to write (= nelem * SZ_REAL)
-int	i
+long	ntotal		# total number of elements in array
+size_t	nchar		# number of char to write (= nelem * SZ_REAL)
+long	i
 pointer cbuf		# scratch for character buffer
 double	dbuf		# buffer for writing double precision elements
 int	ibuf
 short	sbuf
 bool	bbuf
 long	tbeoff(), tbxoff()
+int	inint()
+short	snint()
+real	aabs()
 errchk	seek, write, tbxppt, tbxwer
 
 begin
@@ -225,13 +243,15 @@ begin
 	    offset = COL_OFFSET(cp)		# from beginning of row
 
 	    call seek (TB_FILE(tp), roffset)
-	    if (offset > 0)
-		call write (TB_FILE(tp), Memc[TB_INDEF(tp)], offset)
+	    if (offset > 0) {
+		sz_val = offset
+		call write (TB_FILE(tp), Memc[TB_INDEF(tp)], sz_val)
+	    }
 	    call write (TB_FILE(tp), buffer, nchar)
 	    call seek (TB_FILE(tp), roffset+offset+nchar)
 	    if (offset+nchar < rowlen) {
-		call write (TB_FILE(tp), Memc[TB_INDEF(tp)+offset+nchar],
-		    rowlen-(offset+nchar))
+		sz_val = rowlen-(offset+nchar)
+		call write (TB_FILE(tp), Memc[TB_INDEF(tp)+offset+nchar], sz_val)
 	    }
 
 	    TB_NROWS(tp) = row
@@ -251,30 +271,34 @@ begin
 	    dtype = COL_DTYPE(cp)
 	    switch (dtype) {
 	    case TBL_TY_REAL:
-		call write (TB_FILE(tp), buffer, nelem * SZ_REAL)
+		sz_val = nelem * SZ_REAL
+		call write (TB_FILE(tp), buffer, sz_val)
 	    case TBL_TY_DOUBLE:
 		do i = 1, nelem {		# put each element individually
 		    if (IS_INDEFR (buffer[i]))
 			dbuf = TBL_INDEFD
 		    else
 			dbuf = buffer[i]
-		    call write (TB_FILE(tp), dbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dbuf, sz_val)
 		}
 	    case TBL_TY_INT:
 		do i = 1, nelem {
-		    if (IS_INDEFR (buffer[i]) || abs (buffer[i]) > MAX_INT)
+		    if (IS_INDEFR (buffer[i]) || aabs (buffer[i]) > MAX_INT)
 			ibuf = INDEFI
 		    else
-			ibuf = nint (buffer[i])
-		    call write (TB_FILE(tp), ibuf, SZ_INT)
+			ibuf = inint (buffer[i])
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), ibuf, sz_val)
 		}
 	    case TBL_TY_SHORT:
 		do i = 1, nelem {
-		    if (IS_INDEFR (buffer[i]) || abs (buffer[i]) > MAX_SHORT)
+		    if (IS_INDEFR (buffer[i]) || aabs (buffer[i]) > MAX_SHORT)
 			sbuf = INDEFS
 		    else
-			sbuf = nint (buffer[i])
-		    call write (TB_FILE(tp), sbuf, SZ_SHORT)
+			sbuf = snint (buffer[i])
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), sbuf, sz_val)
 		}
 	    case TBL_TY_BOOL:
 		do i = 1, nelem {
@@ -282,17 +306,20 @@ begin
 			bbuf = false
 		    else
 			bbuf = (buffer[i] != real(NO))
-		    call write (TB_FILE(tp), bbuf, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), bbuf, sz_val)
 		}
 	    default:
 		if (dtype < 0 || dtype == TY_CHAR) {
 		    call smark (sp)
-		    call salloc (cbuf, SZ_FNAME, TY_CHAR)
+		    sz_val = SZ_FNAME
+		    call salloc (cbuf, sz_val, TY_CHAR)
 		    do i = 1, nelem {
 			eoffset = tbeoff (tp, cp, row, first+i-1)
 			call sprintf (Memc[cbuf], SZ_FNAME, "%.7g")
 			    call pargr (buffer[i])
-			call tbxppt (tp, cp, eoffset, Memc[cbuf], SZ_FNAME, 1)
+			l_val = 1
+			call tbxppt (tp, cp, eoffset, Memc[cbuf], SZ_FNAME, l_val)
 		    }
 		    call sfree (sp)
 		} else {
@@ -307,20 +334,22 @@ procedure tbxapi (tp, cp, row, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 int	buffer[ARB]	# i: values to write to table
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 long	eoffset		# offset from BOF to element to put
 long	roffset		# offset from BOF
 long	offset		# offset of element from beginning of row
-int	rowlen		# length of a row in char
+long	rowlen		# length of a row in char
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nchar		# number of char to write (= nelem * SZ_INT)
-int	i
+long	ntotal		# total number of elements in array
+size_t	nchar		# number of char to write (= nelem * SZ_INT)
+long	i
 pointer cbuf		# scratch for character buffer
 double	dbuf		# buffer for writing double precision elements
 real	rbuf
@@ -345,13 +374,15 @@ begin
 	    offset = COL_OFFSET(cp)		# from beginning of row
 
 	    call seek (TB_FILE(tp), roffset)
-	    if (offset > 0)
-		call write (TB_FILE(tp), Memc[TB_INDEF(tp)], offset)
+	    if (offset > 0) {
+		sz_val = offset
+		call write (TB_FILE(tp), Memc[TB_INDEF(tp)], sz_val)
+	    }
 	    call write (TB_FILE(tp), buffer, nchar)
 	    call seek (TB_FILE(tp), roffset+offset+nchar)
 	    if (offset+nchar < rowlen) {
-		call write (TB_FILE(tp), Memc[TB_INDEF(tp)+offset+nchar],
-		    rowlen-(offset+nchar))
+		sz_val = rowlen-(offset+nchar)
+		call write (TB_FILE(tp), Memc[TB_INDEF(tp)+offset+nchar], sz_val)
 	    }
 
 	    TB_NROWS(tp) = row
@@ -376,7 +407,8 @@ begin
 			rbuf = INDEFR
 		    else
 			rbuf = buffer[i]
-		    call write (TB_FILE(tp), rbuf, SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), rbuf, sz_val)
 		}
 	    case TBL_TY_DOUBLE:
 		do i = 1, nelem {		# put each element individually
@@ -384,17 +416,20 @@ begin
 			dbuf = TBL_INDEFD
 		    else
 			dbuf = buffer[i]
-		    call write (TB_FILE(tp), dbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dbuf, sz_val)
 		}
 	    case TBL_TY_INT:
-		call write (TB_FILE(tp), buffer, nelem * SZ_INT)
+		sz_val = nelem * SZ_INT
+		call write (TB_FILE(tp), buffer, sz_val)
 	    case TBL_TY_SHORT:
 		do i = 1, nelem {
-		    if (IS_INDEFI (buffer[i]) || abs (buffer[i]) > MAX_SHORT)
+		    if (IS_INDEFI (buffer[i]) || iabs (buffer[i]) > MAX_SHORT)
 			sbuf = INDEFS
 		    else
 			sbuf = buffer[i]
-		    call write (TB_FILE(tp), sbuf, SZ_SHORT)
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), sbuf, sz_val)
 		}
 	    case TBL_TY_BOOL:
 		do i = 1, nelem {
@@ -402,17 +437,20 @@ begin
 			bbuf = false
 		    else
 			bbuf = (buffer[i] != NO)
-		    call write (TB_FILE(tp), bbuf, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), bbuf, sz_val)
 		}
 	    default:
 		if (dtype < 0 || dtype == TY_CHAR) {
 		    call smark (sp)
-		    call salloc (cbuf, SZ_FNAME, TY_CHAR)
+		    sz_val = SZ_FNAME
+		    call salloc (cbuf, sz_val, TY_CHAR)
 		    do i = 1, nelem {
 			eoffset = tbeoff (tp, cp, row, first+i-1)
 			call sprintf (Memc[cbuf], SZ_FNAME, "%d")
 			    call pargi (buffer[i])
-			call tbxppt (tp, cp, eoffset, Memc[cbuf], SZ_FNAME, 1)
+			l_val = 1
+			call tbxppt (tp, cp, eoffset, Memc[cbuf], SZ_FNAME, l_val)
 		    }
 		    call sfree (sp)
 		} else {
@@ -427,20 +465,22 @@ procedure tbxaps (tp, cp, row, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 short	buffer[ARB]	# i: values to write to table
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 long	eoffset		# offset from BOF to element to put
 long	roffset		# offset from BOF
 long	offset		# offset of element from beginning of row
-int	rowlen		# length of a row in char
+long	rowlen		# length of a row in char
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nchar		# number of char to write (= nelem * SZ_SHORT)
-int	i
+long	ntotal		# total number of elements in array
+size_t	nchar		# number of char to write (= nelem * SZ_SHORT)
+long	i
 pointer cbuf		# scratch for character buffer
 double	dbuf		# buffer for writing double precision elements
 real	rbuf
@@ -465,13 +505,15 @@ begin
 	    offset = COL_OFFSET(cp)		# from beginning of row
 
 	    call seek (TB_FILE(tp), roffset)
-	    if (offset > 0)
-		call write (TB_FILE(tp), Memc[TB_INDEF(tp)], offset)
+	    if (offset > 0) {
+		sz_val = offset
+		call write (TB_FILE(tp), Memc[TB_INDEF(tp)], sz_val)
+	    }
 	    call write (TB_FILE(tp), buffer, nchar)
 	    call seek (TB_FILE(tp), roffset+offset+nchar)
 	    if (offset+nchar < rowlen) {
-		call write (TB_FILE(tp), Memc[TB_INDEF(tp)+offset+nchar],
-		    rowlen-(offset+nchar))
+		sz_val = rowlen-(offset+nchar)
+		call write (TB_FILE(tp), Memc[TB_INDEF(tp)+offset+nchar], sz_val)
 	    }
 
 	    TB_NROWS(tp) = row
@@ -496,7 +538,8 @@ begin
 			rbuf = INDEFR
 		    else
 			rbuf = buffer[i]
-		    call write (TB_FILE(tp), rbuf, SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), rbuf, sz_val)
 		}
 	    case TBL_TY_DOUBLE:
 		do i = 1, nelem {		# put each element individually
@@ -504,7 +547,8 @@ begin
 			dbuf = TBL_INDEFD
 		    else
 			dbuf = buffer[i]
-		    call write (TB_FILE(tp), dbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dbuf, sz_val)
 		}
 	    case TBL_TY_INT:
 		do i = 1, nelem {
@@ -512,27 +556,32 @@ begin
 			ibuf = INDEFI
 		    else
 			ibuf = buffer[i]
-		    call write (TB_FILE(tp), ibuf, SZ_INT)
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), ibuf, sz_val)
 		}
 	    case TBL_TY_SHORT:
-		call write (TB_FILE(tp), buffer, nelem * SZ_SHORT)
+		sz_val = nelem * SZ_SHORT
+		call write (TB_FILE(tp), buffer, sz_val)
 	    case TBL_TY_BOOL:
 		do i = 1, nelem {
 		    if (IS_INDEFS (buffer[i]))
 			bbuf = false
 		    else
 			bbuf = (buffer[i] != NO)
-		    call write (TB_FILE(tp), bbuf, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), bbuf, sz_val)
 		}
 	    default:
 		if (dtype < 0 || dtype == TY_CHAR) {
 		    call smark (sp)
-		    call salloc (cbuf, SZ_FNAME, TY_CHAR)
+		    sz_val = SZ_FNAME
+		    call salloc (cbuf, sz_val, TY_CHAR)
 		    do i = 1, nelem {
 			eoffset = tbeoff (tp, cp, row, first+i-1)
 			call sprintf (Memc[cbuf], SZ_FNAME, "%d")
 			    call pargs (buffer[i])
-			call tbxppt (tp, cp, eoffset, Memc[cbuf], SZ_FNAME, 1)
+			l_val = 1
+			call tbxppt (tp, cp, eoffset, Memc[cbuf], SZ_FNAME, l_val)
 		    }
 		    call sfree (sp)
 		} else {
@@ -547,20 +596,22 @@ procedure tbxapb (tp, cp, row, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 bool	buffer[ARB]	# i: values to write to table
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 long	eoffset		# offset from BOF to element to put
 long	roffset		# offset from BOF
 long	offset		# offset of element from beginning of row
-int	rowlen		# length of a row in char
+long	rowlen		# length of a row in char
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nchar		# number of char to write (= nelem * SZ_BOOL)
-int	i
+long	ntotal		# total number of elements in array
+size_t	nchar		# number of char to write (= nelem * SZ_BOOL)
+long	i
 pointer cbuf		# scratch for character buffer
 double	dbuf		# buffer for writing double precision elements
 real	rbuf
@@ -585,13 +636,15 @@ begin
 	    offset = COL_OFFSET(cp)		# from beginning of row
 
 	    call seek (TB_FILE(tp), roffset)
-	    if (offset > 0)
-		call write (TB_FILE(tp), Memc[TB_INDEF(tp)], offset)
+	    if (offset > 0) {
+		sz_val = offset
+		call write (TB_FILE(tp), Memc[TB_INDEF(tp)], sz_val)
+	    }
 	    call write (TB_FILE(tp), buffer, nchar)
 	    call seek (TB_FILE(tp), roffset+offset+nchar)
 	    if (offset+nchar < rowlen) {
-		call write (TB_FILE(tp), Memc[TB_INDEF(tp)+offset+nchar],
-		    rowlen-(offset+nchar))
+		sz_val = rowlen-(offset+nchar)
+		call write (TB_FILE(tp), Memc[TB_INDEF(tp)+offset+nchar], sz_val)
 	    }
 
 	    TB_NROWS(tp) = row
@@ -616,7 +669,8 @@ begin
 			rbuf = real(YES)
 		    else
 			rbuf = real(NO)
-		    call write (TB_FILE(tp), rbuf, SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), rbuf, sz_val)
 		}
 	    case TBL_TY_DOUBLE:
 		do i = 1, nelem {		# put each element individually
@@ -624,7 +678,8 @@ begin
 			dbuf = double(YES)
 		    else
 			dbuf = double(NO)
-		    call write (TB_FILE(tp), dbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dbuf, sz_val)
 		}
 	    case TBL_TY_INT:
 		do i = 1, nelem {
@@ -632,7 +687,8 @@ begin
 			ibuf = YES
 		    else
 			ibuf = NO
-		    call write (TB_FILE(tp), ibuf, SZ_INT)
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), ibuf, sz_val)
 		}
 	    case TBL_TY_SHORT:
 		do i = 1, nelem {
@@ -640,19 +696,23 @@ begin
 			sbuf = YES
 		    else
 			sbuf = NO
-		    call write (TB_FILE(tp), sbuf, SZ_SHORT)
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), sbuf, sz_val)
 		}
 	    case TBL_TY_BOOL:
-		call write (TB_FILE(tp), buffer, nelem * SZ_BOOL)
+		sz_val = nelem * SZ_BOOL
+		call write (TB_FILE(tp), buffer, sz_val)
 	    default:
 		if (dtype < 0 || dtype == TY_CHAR) {
 		    call smark (sp)
-		    call salloc (cbuf, SZ_FNAME, TY_CHAR)
+		    sz_val = SZ_FNAME
+		    call salloc (cbuf, sz_val, TY_CHAR)
 		    do i = 1, nelem {
 			eoffset = tbeoff (tp, cp, row, first+i-1)
 			call sprintf (Memc[cbuf], SZ_FNAME, "%-3b")
 			    call pargb (buffer[i])
-			call tbxppt (tp, cp, eoffset, Memc[cbuf], SZ_FNAME, 1)
+			l_val = 1
+			call tbxppt (tp, cp, eoffset, Memc[cbuf], SZ_FNAME, l_val)
 		    }
 		    call sfree (sp)
 		} else {
@@ -667,16 +727,17 @@ procedure tbxapt (tp, cp, row, cbuf, maxch, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 char	cbuf[maxch,ARB]	# i: values to write to table
 int	maxch		# i: size of first dimension of cbuf
-int	first		# i: number of first array element to write
-int	nelem		# i: maximum number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: maximum number of elements to write
 #--
+size_t	sz_val
 long	offset		# offset of first element in entry
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	i
+long	ntotal		# total number of elements in array
+long	i
 double	dbuf		# buffer for writing double precision elements
 real	rbuf
 int	ibuf
@@ -684,6 +745,7 @@ short	sbuf
 bool	bbuf
 int	nscan()
 long	tbeoff()
+short	sdnint()
 errchk	tbxppt, tbxwer
 
 begin
@@ -715,11 +777,12 @@ begin
 			call gargd (dbuf)
 		    if (nscan() < 1)
 			rbuf = TBL_INDEFD
-		    else if (IS_INDEFD (dbuf) || abs (dbuf) > MAX_REAL)
+		    else if (IS_INDEFD (dbuf) || dabs (dbuf) > MAX_REAL)
 			rbuf = INDEFR
 		    else
 			rbuf = dbuf
-		    call write (TB_FILE(tp), rbuf, SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), rbuf, sz_val)
 		}
 	    case TBL_TY_DOUBLE:
 		do i = 1, nelem {
@@ -729,27 +792,30 @@ begin
 			dbuf = TBL_INDEFD
 		    else if (IS_INDEFD (dbuf))
 			dbuf = TBL_INDEFD
-		    call write (TB_FILE(tp), dbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dbuf, sz_val)
 		}
 	    case TBL_TY_INT:
 		do i = 1, nelem {
 		    call sscan (cbuf[1,i])
 			call gargd (dbuf)
-		    if (nscan() < 1 || abs (dbuf) > MAX_INT)
+		    if (nscan() < 1 || dabs (dbuf) > MAX_INT)
 			ibuf = INDEFI
 		    else
-			ibuf = nint (dbuf)
-		    call write (TB_FILE(tp), ibuf, SZ_INT)
+			ibuf = idnint (dbuf)
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), ibuf, sz_val)
 		}
 	    case TBL_TY_SHORT:
 		do i = 1, nelem {
 		    call sscan (cbuf[1,i])
 			call gargd (dbuf)
-		    if (nscan() < 1 || abs (dbuf) > MAX_SHORT)
+		    if (nscan() < 1 || dabs (dbuf) > MAX_SHORT)
 			sbuf = INDEFS
 		    else
-			sbuf = nint (dbuf)
-		    call write (TB_FILE(tp), sbuf, SZ_SHORT)
+			sbuf = sdnint (dbuf)
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), sbuf, sz_val)
 		}
 	    case TBL_TY_BOOL:
 		do i = 1, nelem {
@@ -757,7 +823,8 @@ begin
 			call gargb (bbuf)
 		    if (nscan() < 1)
 			bbuf = false
-		    call write (TB_FILE(tp), bbuf, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), bbuf, sz_val)
 		}
 	    }
 	}
@@ -772,13 +839,14 @@ pointer cp			# i: pointer to column descriptor
 long	offset			# i: offset in char to first location
 char	cbuf[maxch,nelem]	# i: buffer containing values
 int	maxch			# i: size of each element of array
-int	nelem			# i: number of elements to put
+long	nelem			# i: number of elements to put
 #--
 char	buffer[SZ_LINE]		# buffer for packed string
 long	eoffset			# location in char for writing
-int	nchar			# number of char to write
-int	i
-int	tbeszt()
+size_t	nchar			# number of char to write
+size_t	sz_val
+long	i
+long	tbeszt()
 errchk	seek, write
 
 begin
@@ -787,7 +855,8 @@ begin
 
 	do i = 1, nelem {			# do for each element
 
-	    call strpak (cbuf[1,i], buffer, SZ_LINE)	# pack the string
+	    sz_val = SZ_LINE
+	    call strpak (cbuf[1,i], buffer, sz_val)	# pack the string
 
 	    call seek (TB_FILE(tp), eoffset)
 	    call write (TB_FILE(tp), buffer, nchar)

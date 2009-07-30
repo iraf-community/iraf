@@ -25,7 +25,7 @@ procedure tbzrdx (tp, buf, line, line_type)
 
 pointer tp		# i: pointer to table descriptor
 char	buf[ARB]	# io: buffer for input line
-int	line		# io: line number in input file
+long	line		# io: line number in input file
 int	line_type	# io: type of line read by tbzlin
 #--
 pointer cp		# pointer to column descriptor
@@ -34,10 +34,11 @@ int	datatype		# data type code for a column
 char	colfmt[SZ_COLFMT]	# print format for a column
 char	colunits[SZ_COLUNITS]	# units for a column
 int	fd		# fd for the file
-int	row		# row number (can be from more than one line)
+long	row		# row number (can be from more than one line)
 bool	data_read	# has a line of data been read?
 bool	done
 int	nchar, tbzlin()	# reads a line from the file
+long	l_val
 errchk	tbzlin, tbzmex, tbbecd, tbcadd, tbzkey
 
 begin
@@ -73,7 +74,8 @@ begin
 
 		# Interpret column definition, and create a new column.
 		call tbbecd (buf, colname, datatype, colfmt, colunits)
-		call tbcadd (tp, cp, colname, colunits, colfmt, datatype, 1, 1)
+		l_val = 1
+		call tbcadd (tp, cp, colname, colunits, colfmt, datatype, l_val, 1)
 
 	    } else if (line_type == DATA_LINE) {
 

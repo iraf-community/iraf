@@ -13,12 +13,13 @@ pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 int	width		# i: the new max width for this column
 #--
+size_t	sz_val
 pointer sp
 pointer message		# scratch for possible error message
 pointer new		# pointer to new memory for column data
 int	oldwidth	# previous value of column width
-int	row		# row number
-int	ip, op		# offsets in char array
+long	row		# row number
+long	ip, op		# offsets in char array
 errchk	calloc
 
 begin
@@ -29,7 +30,8 @@ begin
 
 	if (width > SZ_LINE-1) {
 	    call smark (sp)
-	    call salloc (message, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (message, sz_val, TY_CHAR)
 	    call sprintf (Memc[message], SZ_LINE,
 		"string is too long for a table; the maximum is %s")
 		call pargi (SZ_LINE-1)

@@ -14,18 +14,19 @@ include "tblerr.h"
 procedure tbrswp (tp, selrow1, selrow2)
 
 pointer tp		# i: pointer to table descriptor
-int	selrow1		# i: first row number (selected row)
-int	selrow2		# i: second row number (selected row)
+long	selrow1		# i: first row number (selected row)
+long	selrow2		# i: second row number (selected row)
 #--
+size_t	sz_val
 pointer sp
 pointer rowbuf1, rowbuf2	# scratch for interchanging entire rows
 pointer cptr			# pointer to descriptor for column
 long	offset1			# offset in char to first element
 long	offset2			# offset in char to second element
-int	row1, row2		# actual row numbers corresponding to selrow1,2
+long	row1, row2		# actual row numbers corresponding to selrow1,2
 int	colnum			# loop index for column number
 int	dtype			# data type of column
-int	rowlen			# length of row
+long	rowlen			# length of row
 # buffers for copying single elements
 pointer cbuf1, cbuf2		# scratch for character strings
 double	dbuf1, dbuf2
@@ -34,8 +35,7 @@ int	ibuf1, ibuf2
 short	sbuf1, sbuf2
 bool	bbuf1, bbuf2
 pointer tbcnum()
-long	tbxoff()
-int	read()
+long	tbxoff(), read()
 errchk	tbegtb, tbegtd, tbegti, tbegts, tbegtr, tbegtt,
 	tbeptb, tbeptd, tbepti, tbepts, tbeptr, tbeptt,
 	tbswer, seek, read, write
@@ -62,8 +62,9 @@ begin
 
 	    # Read both rows into scratch space, and then write them out again.
 	    rowlen = TB_ROWLEN(tp)		# length in char
-	    call salloc (rowbuf1, rowlen, TY_CHAR)
-	    call salloc (rowbuf2, rowlen, TY_CHAR)
+	    sz_val = rowlen
+	    call salloc (rowbuf1, sz_val, TY_CHAR)
+	    call salloc (rowbuf2, sz_val, TY_CHAR)
 
 	    # These are the offsets to the beginnings of the rows.
 	    offset1 = tbxoff (tp, row1)
@@ -71,22 +72,27 @@ begin
 
 	    # Read both rows.
 	    call seek (TB_FILE(tp), offset1)
-	    if (read (TB_FILE(tp), Memc[rowbuf1], rowlen) < rowlen)
+	    sz_val = rowlen
+	    if (read (TB_FILE(tp), Memc[rowbuf1], sz_val) < rowlen)
 		call error (1, "tbrswp:  could not read row")
 	    call seek (TB_FILE(tp), offset2)
-	    if (read (TB_FILE(tp), Memc[rowbuf2], rowlen) < rowlen)
+	    sz_val = rowlen
+	    if (read (TB_FILE(tp), Memc[rowbuf2], sz_val) < rowlen)
 		call error (1, "tbrswp:  could not read row")
 
 	    # Write both rows.
 	    call seek (TB_FILE(tp), offset2)
-	    call write (TB_FILE(tp), Memc[rowbuf1], rowlen)
+	    sz_val = rowlen
+	    call write (TB_FILE(tp), Memc[rowbuf1], sz_val)
 	    call seek (TB_FILE(tp), offset1)
-	    call write (TB_FILE(tp), Memc[rowbuf2], rowlen)
+	    sz_val = rowlen
+	    call write (TB_FILE(tp), Memc[rowbuf2], sz_val)
 
 	} else {
 
-	    call salloc (cbuf1, SZ_LINE, TY_CHAR)
-	    call salloc (cbuf2, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (cbuf1, sz_val, TY_CHAR)
+	    call salloc (cbuf2, sz_val, TY_CHAR)
 
 	    # Copy each element (i.e. each column in the row) one at a time.
 	    do colnum = 1, TB_NCOLS(tp) {

@@ -15,29 +15,31 @@ procedure tbfrsi (tp)
 
 pointer tp		# i: pointer to table descriptor
 #--
+size_t	sz_val
 pointer sp
 pointer comment		# comment from FITS file
 int	status		# used for fitsio
 int	keysexist	# number of header keywords
 int	keysadd		# space available for new header keywords
-int	naxis1		# row length in bytes
+long	naxis1		# row length in bytes
 errchk	tbferr
 
 begin
 	status = 0
 
 	call smark (sp)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (comment, sz_val, TY_CHAR)
 
 	if (TB_SUBTYPE(tp) == TBL_SUBTYPE_BINTABLE ||
 	    TB_SUBTYPE(tp) == TBL_SUBTYPE_ASCII) {
 
-	    call fsgkyj (TB_FILE(tp), "NAXIS1",
+	    call fsgkyk (TB_FILE(tp), "NAXIS1",
 		    naxis1, Memc[comment], status)
 	    if (status != 0)
 		call tbferr (status)
 
-	    call fsgkyj (TB_FILE(tp), "NAXIS2",
+	    call fsgkyk (TB_FILE(tp), "NAXIS2",
 		    TB_NROWS(tp), Memc[comment], status)
 	    if (status != 0)
 		call tbferr (status)

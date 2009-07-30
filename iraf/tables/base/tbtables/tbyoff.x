@@ -9,7 +9,7 @@ long procedure tbyoff (tp, cp, rownum)
 
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
-int	rownum			# i: the row number
+long	rownum			# i: the row number
 
 long	offset
 

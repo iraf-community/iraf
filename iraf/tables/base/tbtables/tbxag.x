@@ -9,15 +9,17 @@ include "tbtables.h"
 # Phil Hodge,  2-Jun-1997  Replace IS_INDEFD with TBL_IS_INDEFD.
 # Phil Hodge,  5-Aug-1999  Use COL_NELEM instead of tbalen to get array length.
 
-int procedure tbxagd (tp, cp, row, buffer, first, nelem)
+long procedure tbxagd (tp, cp, row, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 double	buffer[ARB]	# o: values read from table
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 pointer buf		# scratch for local string buffer
 real	rbuf
@@ -26,12 +28,12 @@ short	sbuf
 bool	bbuf
 long	offset		# offset of first element in entry
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
-int	nchar		# number of char to read
-int	i		# loop index
-int	read(), nscan()
-long	tbeoff()
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+size_t	nchar		# number of char to read
+long	i		# loop index
+int	nscan()
+long	tbeoff(), read()
 string	CANNOTREAD	"tbagtd:  unexpected end of file"
 errchk	seek, read, tbxgpt
 
@@ -56,8 +58,9 @@ begin
 
 	    switch (dtype) {
 	    case TBL_TY_REAL:
+		nchar = SZ_REAL
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), rbuf, SZ_REAL) < SZ_REAL)
+		    if (read (TB_FILE(tp), rbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (IS_INDEFR(rbuf))
 			buffer[i] = INDEFD
@@ -65,8 +68,9 @@ begin
 			buffer[i] = rbuf
 		}
 	    case TBL_TY_INT:
+		nchar = SZ_INT
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), ibuf, SZ_INT) < SZ_INT)
+		    if (read (TB_FILE(tp), ibuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (IS_INDEFI(ibuf))
 			buffer[i] = INDEFD
@@ -74,8 +78,9 @@ begin
 			buffer[i] = ibuf
 		}
 	    case TBL_TY_SHORT:
+		nchar = SZ_SHORT
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), sbuf, SZ_SHORT) < SZ_SHORT)
+		    if (read (TB_FILE(tp), sbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (IS_INDEFS(sbuf))
 			buffer[i] = INDEFD
@@ -83,8 +88,9 @@ begin
 			buffer[i] = sbuf
 		}
 	    case TBL_TY_BOOL:
+		nchar = SZ_BOOL
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), bbuf, SZ_BOOL) < SZ_BOOL)
+		    if (read (TB_FILE(tp), bbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (bbuf)
 			buffer[i] = double(YES)
@@ -95,10 +101,12 @@ begin
 		if (dtype > 0 && dtype != TBL_TY_CHAR)
 		    call error (1, "tbagtd:  bad data type")
 		call smark (sp)
-		call salloc (buf, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (buf, sz_val, TY_CHAR)
 		do i = 1, nret {
 		    offset = tbeoff (tp, cp, row, first+i-1)
-		    call tbxgpt (tp, cp, offset, Memc[buf], SZ_LINE, 1)
+		    l_val = 1
+		    call tbxgpt (tp, cp, offset, Memc[buf], SZ_LINE, l_val)
 		    call sscan (Memc[buf])
 			call gargd (buffer[i])
 		    if (nscan() < 1)
@@ -111,15 +119,17 @@ begin
 	return (nret)
 end
 
-int procedure tbxagr (tp, cp, row, buffer, first, nelem)
+long procedure tbxagr (tp, cp, row, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 real	buffer[ARB]	# o: values read from table
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 pointer buf		# scratch for local string buffer
 double	dbuf
@@ -128,12 +138,12 @@ short	sbuf
 bool	bbuf
 long	offset		# offset of first element in entry
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
-int	nchar		# number of char to read
-int	i		# loop index
-int	read(), nscan()
-long	tbeoff()
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+size_t	nchar		# number of char to read
+long	i		# loop index
+int	nscan()
+long	tbeoff(), read()
 string	CANNOTREAD	"tbagtr:  unexpected end of file"
 errchk	seek, read, tbxgpt
 
@@ -154,8 +164,9 @@ begin
 
 	    switch (dtype) {
 	    case TBL_TY_DOUBLE:
+		nchar = SZ_DOUBLE
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), dbuf, SZ_DOUBLE) < SZ_DOUBLE)
+		    if (read (TB_FILE(tp), dbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (TBL_IS_INDEFD (dbuf))
 			buffer[i] = INDEFR
@@ -163,8 +174,9 @@ begin
 			buffer[i] = dbuf
 		}
 	    case TBL_TY_INT:
+		nchar = SZ_INT
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), ibuf, SZ_INT) < SZ_INT)
+		    if (read (TB_FILE(tp), ibuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (IS_INDEFI(ibuf))
 			buffer[i] = INDEFR
@@ -172,8 +184,9 @@ begin
 			buffer[i] = ibuf
 		}
 	    case TBL_TY_SHORT:
+		nchar = SZ_SHORT
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), sbuf, SZ_SHORT) < SZ_SHORT)
+		    if (read (TB_FILE(tp), sbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (IS_INDEFS(sbuf))
 			buffer[i] = INDEFR
@@ -181,8 +194,9 @@ begin
 			buffer[i] = sbuf
 		}
 	    case TBL_TY_BOOL:
+		nchar = SZ_BOOL
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), bbuf, SZ_BOOL) < SZ_BOOL)
+		    if (read (TB_FILE(tp), bbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (bbuf)
 			buffer[i] = real(YES)
@@ -193,15 +207,17 @@ begin
 		if (dtype > 0 && dtype != TBL_TY_CHAR)
 		    call error (1, "tbagtr:  bad data type")
 		call smark (sp)
-		call salloc (buf, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (buf, sz_val, TY_CHAR)
 		do i = 1, nret {
 		    offset = tbeoff (tp, cp, row, first+i-1)
-		    call tbxgpt (tp, cp, offset, Memc[buf], SZ_LINE, 1)
+		    l_val = 1
+		    call tbxgpt (tp, cp, offset, Memc[buf], SZ_LINE, l_val)
 		    call sscan (Memc[buf])
 			call gargd (dbuf)
 		    if (nscan() < 1)
 			buffer[i] = INDEFR
-		    else if (abs (dbuf) > MAX_REAL)
+		    else if (dabs (dbuf) > MAX_REAL)
 			buffer[i] = INDEFR
 		    else
 			buffer[i] = dbuf
@@ -213,15 +229,17 @@ begin
 	return (nret)
 end
 
-int procedure tbxagi (tp, cp, row, buffer, first, nelem)
+long procedure tbxagi (tp, cp, row, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 int	buffer[ARB]	# o: values read from table
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 pointer buf		# scratch for local string buffer
 double	dbuf
@@ -230,12 +248,13 @@ short	sbuf
 bool	bbuf
 long	offset		# offset of first element in entry
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
-int	nchar		# number of char to read
-int	i		# loop index
-int	read(), nscan()
-long	tbeoff()
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+size_t	nchar		# number of char to read
+long	i		# loop index
+int	nscan(), inint()
+long	tbeoff(), read()
+real	aabs()
 string	CANNOTREAD	"tbagti:  unexpected end of file"
 errchk	seek, read, tbxgpt
 
@@ -256,26 +275,29 @@ begin
 
 	    switch (dtype) {
 	    case TBL_TY_DOUBLE:
+		nchar = SZ_DOUBLE
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), dbuf, SZ_DOUBLE) < SZ_DOUBLE)
+		    if (read (TB_FILE(tp), dbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
-		    if (TBL_IS_INDEFD (dbuf) || abs (dbuf) > MAX_INT)
+		    if (TBL_IS_INDEFD (dbuf) || dabs (dbuf) > MAX_INT)
 			buffer[i] = INDEFI
 		    else
-			buffer[i] = nint (dbuf)
+			buffer[i] = idnint (dbuf)
 		}
 	    case TBL_TY_REAL:
+		nchar = SZ_REAL
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), rbuf, SZ_REAL) < SZ_REAL)
+		    if (read (TB_FILE(tp), rbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
-		    if (IS_INDEFR(rbuf) || abs (rbuf) > MAX_INT)
+		    if (IS_INDEFR(rbuf) || aabs (rbuf) > MAX_INT)
 			buffer[i] = INDEFI
 		    else
-			buffer[i] = nint (rbuf)
+			buffer[i] = inint (rbuf)
 		}
 	    case TBL_TY_SHORT:
+		nchar = SZ_SHORT
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), sbuf, SZ_SHORT) < SZ_SHORT)
+		    if (read (TB_FILE(tp), sbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (IS_INDEFS(sbuf))
 			buffer[i] = INDEFI
@@ -283,8 +305,9 @@ begin
 			buffer[i] = sbuf
 		}
 	    case TBL_TY_BOOL:
+		nchar = SZ_BOOL
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), bbuf, SZ_BOOL) < SZ_BOOL)
+		    if (read (TB_FILE(tp), bbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (bbuf)
 			buffer[i] = YES
@@ -295,16 +318,18 @@ begin
 		if (dtype > 0 && dtype != TBL_TY_CHAR)
 		    call error (1, "tbagti:  bad data type")
 		call smark (sp)
-		call salloc (buf, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (buf, sz_val, TY_CHAR)
 		do i = 1, nret {
 		    offset = tbeoff (tp, cp, row, first+i-1)
-		    call tbxgpt (tp, cp, offset, Memc[buf], SZ_LINE, 1)
+		    l_val = 1
+		    call tbxgpt (tp, cp, offset, Memc[buf], SZ_LINE, l_val)
 		    call sscan (Memc[buf])
 			call gargd (dbuf)
-		    if (nscan() < 1 || abs (dbuf) > MAX_INT)
+		    if (nscan() < 1 || dabs (dbuf) > MAX_INT)
 			buffer[i] = INDEFI
 		    else
-			buffer[i] = nint (dbuf)
+			buffer[i] = idnint (dbuf)
 		}
 		call sfree (sp)
 	    }
@@ -313,15 +338,17 @@ begin
 	return (nret)
 end
 
-int procedure tbxags (tp, cp, row, buffer, first, nelem)
+long procedure tbxags (tp, cp, row, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 short	buffer[ARB]	# o: values read from table
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 pointer buf		# scratch for local string buffer
 double	dbuf
@@ -330,12 +357,14 @@ int	ibuf
 bool	bbuf
 long	offset		# offset of first element in entry
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
-int	nchar		# number of char to read
-int	i		# loop index
-int	read(), nscan()
-long	tbeoff()
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+size_t	nchar		# number of char to read
+long	i		# loop index
+int	nscan()
+long	tbeoff(), read()
+short	snint(), sdnint()
+real	aabs()
 string	CANNOTREAD	"tbagts:  unexpected end of file"
 errchk	seek, read, tbxgpt
 
@@ -356,35 +385,39 @@ begin
 
 	    switch (dtype) {
 	    case TBL_TY_DOUBLE:
+		nchar = SZ_DOUBLE
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), dbuf, SZ_DOUBLE) < SZ_DOUBLE)
+		    if (read (TB_FILE(tp), dbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
-		    if (TBL_IS_INDEFD (dbuf) || abs (dbuf) > MAX_SHORT)
+		    if (TBL_IS_INDEFD (dbuf) || dabs (dbuf) > MAX_SHORT)
 			buffer[i] = INDEFS
 		    else
-			buffer[i] = nint (dbuf)
+			buffer[i] = sdnint (dbuf)
 		}
 	    case TBL_TY_REAL:
+		nchar = SZ_REAL
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), rbuf, SZ_REAL) < SZ_REAL)
+		    if (read (TB_FILE(tp), rbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
-		    if (IS_INDEFR(rbuf) || abs (rbuf) > MAX_SHORT)
+		    if (IS_INDEFR(rbuf) || aabs (rbuf) > MAX_SHORT)
 			buffer[i] = INDEFS
 		    else
-			buffer[i] = nint (rbuf)
+			buffer[i] = snint (rbuf)
 		}
 	    case TBL_TY_INT:
+		nchar = SZ_INT
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), ibuf, SZ_INT) < SZ_INT)
+		    if (read (TB_FILE(tp), ibuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
-		    if (IS_INDEFI(ibuf) || abs (ibuf) > MAX_SHORT)
+		    if (IS_INDEFI(ibuf) || iabs (ibuf) > MAX_SHORT)
 			buffer[i] = INDEFS
 		    else
 			buffer[i] = ibuf
 		}
 	    case TBL_TY_BOOL:
+		nchar = SZ_BOOL
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), bbuf, SZ_BOOL) < SZ_BOOL)
+		    if (read (TB_FILE(tp), bbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (bbuf)
 			buffer[i] = YES
@@ -395,16 +428,18 @@ begin
 		if (dtype > 0 && dtype != TBL_TY_CHAR)
 		    call error (1, "tbagts:  bad data type")
 		call smark (sp)
-		call salloc (buf, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (buf, sz_val, TY_CHAR)
 		do i = 1, nret {
 		    offset = tbeoff (tp, cp, row, first+i-1)
-		    call tbxgpt (tp, cp, offset, Memc[buf], SZ_LINE, 1)
+		    l_val = 1
+		    call tbxgpt (tp, cp, offset, Memc[buf], SZ_LINE, l_val)
 		    call sscan (Memc[buf])
 			call gargd (dbuf)
-		    if (nscan() < 1 || abs (dbuf) > MAX_SHORT)
+		    if (nscan() < 1 || dabs (dbuf) > MAX_SHORT)
 			buffer[i] = INDEFS
 		    else
-			buffer[i] = nint (dbuf)
+			buffer[i] = sdnint (dbuf)
 		}
 		call sfree (sp)
 	    }
@@ -413,15 +448,17 @@ begin
 	return (nret)
 end
 
-int procedure tbxagb (tp, cp, row, buffer, first, nelem)
+long procedure tbxagb (tp, cp, row, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 bool	buffer[ARB]	# o: values read from table
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 pointer buf		# scratch for local string buffer
 double	dbuf
@@ -430,12 +467,12 @@ int	ibuf
 short	sbuf
 long	offset		# offset of first element in entry
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
-int	nchar		# number of char to read
-int	i		# loop index
-int	read(), nscan()
-long	tbeoff()
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+size_t	nchar		# number of char to read
+long	i		# loop index
+int	nscan()
+long	tbeoff(), read()
 string	CANNOTREAD	"tbagtb:  unexpected end of file"
 errchk	seek, read, tbxgpt
 
@@ -456,8 +493,9 @@ begin
 
 	    switch (dtype) {
 	    case TBL_TY_DOUBLE:
+		nchar = SZ_DOUBLE
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), dbuf, SZ_DOUBLE) < SZ_DOUBLE)
+		    if (read (TB_FILE(tp), dbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (TBL_IS_INDEFD (dbuf))
 			buffer[i] = false
@@ -465,8 +503,9 @@ begin
 			buffer[i] = (dbuf != double(NO))
 		}
 	    case TBL_TY_REAL:
+		nchar = SZ_REAL
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), rbuf, SZ_REAL) < SZ_REAL)
+		    if (read (TB_FILE(tp), rbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (IS_INDEFR(rbuf))
 			buffer[i] = false
@@ -474,8 +513,9 @@ begin
 			buffer[i] = (rbuf != real(NO))
 		}
 	    case TBL_TY_INT:
+		nchar = SZ_INT
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), ibuf, SZ_INT) < SZ_INT)
+		    if (read (TB_FILE(tp), ibuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (IS_INDEFI(ibuf))
 			buffer[i] = false
@@ -483,8 +523,9 @@ begin
 			buffer[i] = (ibuf != NO)
 		}
 	    case TBL_TY_SHORT:
+		nchar = SZ_SHORT
 		do i = 1, nret {
-		    if (read (TB_FILE(tp), sbuf, SZ_SHORT) < SZ_SHORT)
+		    if (read (TB_FILE(tp), sbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (IS_INDEFS(sbuf))
 			buffer[i] = false
@@ -495,10 +536,12 @@ begin
 		if (dtype > 0 && dtype != TBL_TY_CHAR)
 		    call error (1, "tbagtb:  bad data type")
 		call smark (sp)
-		call salloc (buf, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (buf, sz_val, TY_CHAR)
 		do i = 1, nret {
 		    offset = tbeoff (tp, cp, row, first+i-1)
-		    call tbxgpt (tp, cp, offset, Memc[buf], SZ_LINE, 1)
+		    l_val = 1
+		    call tbxgpt (tp, cp, offset, Memc[buf], SZ_LINE, l_val)
 		    call sscan (Memc[buf])
 			call gargb (buffer[i])
 		    if (nscan() < 1)
@@ -511,16 +554,17 @@ begin
 	return (nret)
 end
 
-int procedure tbxagt (tp, cp, row, cbuf, maxch, first, nelem)
+long procedure tbxagt (tp, cp, row, cbuf, maxch, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	row		# i: row number
+long	row		# i: row number
 char	cbuf[maxch,ARB]	# o: values read from table
 int	maxch		# i: size of first dimension of cbuf
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
+size_t	sz_val
 pointer sp
 pointer buf		# scratch for local string buffer
 double	dbuf
@@ -531,11 +575,11 @@ bool	bbuf
 char	pformat[SZ_COLFMT]	# print format for column
 long	offset		# offset of first element in entry
 int	dtype		# data type of column
-int	ntotal		# total number of elements in array
-int	nret		# actual number of elements to read
-int	i		# loop index
-int	read()
-long	tbeoff()
+long	ntotal		# total number of elements in array
+long	nret		# actual number of elements to read
+long	i		# loop index
+size_t	nchar
+long	tbeoff(), read()
 string	CANNOTREAD	"tbagtt:  unexpected end of file"
 errchk	seek, read, tbxgpt
 
@@ -552,7 +596,8 @@ begin
 	} else {
 
 	    call smark (sp)
-	    call salloc (buf, SZ_LINE+maxch, TY_CHAR)
+	    sz_val = SZ_LINE+maxch
+	    call salloc (buf, sz_val, TY_CHAR)
 	    call tbcigt (cp, TBL_COL_FMT, pformat, SZ_COLFMT)
 
 	    call seek (TB_FILE(tp), offset)
@@ -561,12 +606,14 @@ begin
 
 		switch (dtype) {
 		case TBL_TY_REAL:
-		    if (read (TB_FILE(tp), rbuf, SZ_REAL) < SZ_REAL)
+		    nchar = SZ_REAL
+		    if (read (TB_FILE(tp), rbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    call sprintf (Memc[buf], SZ_LINE+maxch, pformat)
 			call pargr (rbuf)
 		case TBL_TY_DOUBLE:
-		    if (read (TB_FILE(tp), dbuf, SZ_DOUBLE) < SZ_DOUBLE)
+		    nchar = SZ_DOUBLE
+		    if (read (TB_FILE(tp), dbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    if (TBL_IS_INDEFD (dbuf)) {
 			call strcpy ("INDEF", Memc[buf], SZ_LINE)
@@ -575,17 +622,20 @@ begin
 			    call pargd (dbuf)
 		    }
 		case TBL_TY_INT:
-		    if (read (TB_FILE(tp), ibuf, SZ_INT) < SZ_INT)
+		    nchar = SZ_INT
+		    if (read (TB_FILE(tp), ibuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    call sprintf (Memc[buf], SZ_LINE+maxch, pformat)
 			call pargi (ibuf)
 		case TBL_TY_SHORT:
-		    if (read (TB_FILE(tp), sbuf, SZ_SHORT) < SZ_SHORT)
+		    nchar = SZ_SHORT
+		    if (read (TB_FILE(tp), sbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    call sprintf (Memc[buf], SZ_LINE+maxch, pformat)
 			call pargs (sbuf)
 		case TBL_TY_BOOL:
-		    if (read (TB_FILE(tp), bbuf, SZ_BOOL) < SZ_BOOL)
+		    nchar = SZ_BOOL
+		    if (read (TB_FILE(tp), bbuf, nchar) < nchar)
 			call error (1, CANNOTREAD)
 		    call sprintf (Memc[buf], SZ_LINE+maxch, pformat)
 			call pargb (bbuf)
@@ -611,13 +661,14 @@ pointer cp			# i: pointer to column descriptor
 long	offset			# i: offset in char to first location
 char	cbuf[maxch,nelem]	# o: buffer to receive values
 int	maxch			# i: size of each element of array
-int	nelem			# i: number of elements to get
+long	nelem			# i: number of elements to get
 #--
 char	buffer[SZ_LINE]		# buffer for reading from table
 long	eoffset			# offset to location for reading
-int	nchar			# size of each element in table
-int	i
-int	read(), tbeszt()
+size_t	nchar			# size of each element in table
+long	i
+size_t	sz_val
+long	read(), tbeszt()
 errchk	seek, read
 
 begin
@@ -632,7 +683,8 @@ begin
 
 	    # It may be that no EOS was read from the element in the table.
 	    buffer[nchar+1] = EOS
-	    call strupk (buffer, cbuf[1,i], maxch)
+	    sz_val = maxch
+	    call strupk (buffer, cbuf[1,i], sz_val)
 
 	    eoffset = eoffset + nchar
 	}

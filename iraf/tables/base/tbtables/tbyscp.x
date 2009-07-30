@@ -16,7 +16,7 @@ int	oldfd, newfd		# Channel numbers for input & output tables
 int	old_maxpar		# Previous maximum number of user parameters
 int	old_maxcols		# Previous value for maximum number of columns
 int	old_ncols		# Previous number of columns
-int	old_allrows		# Previous number of allocated rows
+long	old_allrows		# Previous number of allocated rows
 
 pointer cp			# pointer to a column descriptor
 pointer sp
@@ -24,16 +24,18 @@ pointer sbuf			# size info buffer
 pointer dbuf			# buffer for copying table (data buffer)
 pointer extrabuf		# buffer for filling out rest of column
 long	oldoff, newoff		# offsets from start of old & new files
-int	new_allrows		# = TB_ALLROWS(tp)
-int	sbufsiz			# size of buffer pointed to by sbuf
-int	dbufsiz			# size of buffer pointed to by dbuf
-int	extrasiz		# size of buffer pointer to by extrabuf
-int	j, k			# loop indexes
-int	dlen			# number of char in an element
-int	stat
+long	new_allrows		# = TB_ALLROWS(tp)
+size_t	sbufsiz			# size of buffer pointed to by sbuf
+size_t	dbufsiz			# size of buffer pointed to by dbuf
+size_t	extrasiz		# size of buffer pointer to by extrabuf
+long	j			# loop indexes
+int	k
+long	dlen			# number of char in an element
+long	stat
+long	l_val
+size_t	sz_val
 pointer tbcnum()
-long	tbtbod()
-int	read()
+long	tbtbod(), read()
 errchk	seek, read, write
 
 begin
@@ -44,16 +46,20 @@ begin
 	sbufsiz = LEN_SIZINFO				# unit = SZ_INT
 	dbufsiz = min (new_allrows, old_allrows)	# unit = SZ_CHAR
 	extrasiz = new_allrows - old_allrows
-	call salloc (sbuf, sbufsiz, TY_INT)
+	call salloc (sbuf, sbufsiz, TY_LONG)
 	call salloc (dbuf, dbufsiz, TY_CHAR)
 	if (new_allrows > old_allrows)
 	    call salloc (extrabuf, extrasiz, TY_CHAR)
 
 	# Write dummy size info record.
-	call amovki (0, Memi[sbuf], LEN_SIZINFO)
+	l_val = 0
+	sz_val = LEN_SIZINFO
+	call amovkl (l_val, Meml[sbuf], sz_val)
 	newoff = 1
 	call seek (newfd, newoff)
-	call write (newfd, Memi[sbuf], SZ_SIZINFO)
+	sz_val = SZ_SIZINFO
+	# arg2: incompatible pointer
+	call write (newfd, Meml[sbuf], sz_val)
 
 	# Copy each user parameter to the temporary file.
 	call tbtscu (tp, oldfd, newfd, old_maxpar)

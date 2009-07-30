@@ -23,15 +23,18 @@ pointer cp[ARB]			# i: array of pointers to column descriptors
 double	buffer[ARB]		# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
 int	numcols			# i: number of columns from which to get values
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# index into buffer & nullflag
-int	nret			# for fits tables
-int	tbfagd()
+long	nret			# for fits tables
+long	c_1
+long	tbfagd()
 errchk	tbsirow, tbxrgd, tbyrgd, tbzgtd, tbfagd
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_S_ROW) {
@@ -45,7 +48,7 @@ begin
 	    }
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
 	    do k = 1, numcols {
-		nret = tbfagd (tp, cp[k], rownum, buffer[k], 1, 1)
+		nret = tbfagd (tp, cp[k], rownum, buffer[k], c_1, c_1)
 		nullflag[k] = (IS_INDEFD (buffer[k]))
 	    }
 	} else {
@@ -63,15 +66,18 @@ pointer cp[ARB]			# i: array of pointers to column descriptors
 real	buffer[ARB]		# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
 int	numcols			# i: number of columns from which to get values
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# index into buffer & nullflag
-int	nret			# for fits tables
-int	tbfagr()
+long	nret			# for fits tables
+long	c_1
+long	tbfagr()
 errchk	tbsirow, tbxrgr, tbyrgr, tbzgtr, tbfagr
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_S_ROW) {
@@ -85,7 +91,7 @@ begin
 	    }
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
 	    do k = 1, numcols {
-		nret = tbfagr (tp, cp[k], rownum, buffer[k], 1, 1)
+		nret = tbfagr (tp, cp[k], rownum, buffer[k], c_1, c_1)
 		nullflag[k] = (IS_INDEFR (buffer[k]))
 	    }
 	} else {
@@ -103,15 +109,18 @@ pointer cp[ARB]			# i: array of pointers to column descriptors
 int	buffer[ARB]		# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
 int	numcols			# i: number of columns from which to get values
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# index into buffer & nullflag
-int	nret			# for fits tables
-int	tbfagi()
+long	nret			# for fits tables
+long	c_1
+long	tbfagi()
 errchk	tbsirow, tbxrgi, tbyrgi, tbzgti, tbfagi
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_S_ROW) {
@@ -125,7 +134,7 @@ begin
 	    }
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
 	    do k = 1, numcols {
-		nret = tbfagi (tp, cp[k], rownum, buffer[k], 1, 1)
+		nret = tbfagi (tp, cp[k], rownum, buffer[k], c_1, c_1)
 		nullflag[k] = (IS_INDEFI (buffer[k]))
 	    }
 	} else {
@@ -143,15 +152,18 @@ pointer cp[ARB]			# i: array of pointers to column descriptors
 short	buffer[ARB]		# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
 int	numcols			# i: number of columns from which to get values
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# index into buffer & nullflag
-int	nret			# for fits tables
-int	tbfags()
+long	nret			# for fits tables
+long	c_1
+long	tbfags()
 errchk	tbsirow, tbxrgs, tbyrgs, tbzgts, tbfags
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_S_ROW) {
@@ -165,7 +177,7 @@ begin
 	    }
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
 	    do k = 1, numcols {
-		nret = tbfags (tp, cp[k], rownum, buffer[k], 1, 1)
+		nret = tbfags (tp, cp[k], rownum, buffer[k], c_1, c_1)
 		nullflag[k] = (IS_INDEFS (buffer[k]))
 	    }
 	} else {
@@ -183,16 +195,19 @@ pointer cp[ARB]			# i: array of pointers to column descriptors
 bool	buffer[ARB]		# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
 int	numcols			# i: number of columns from which to get values
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# index into buffer & nullflag
-int	nret			# for fits tables
+long	nret			# for fits tables
 int	ival			# for getting from a fits table
-int	tbfagi()
+long	c_1
+long	tbfagi()
 errchk	tbsirow, tbxrgb, tbyrgb, tbzgtb, tbfagi
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_S_ROW) {
@@ -206,7 +221,7 @@ begin
 	    }
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
 	    do k = 1, numcols {
-		nret = tbfagi (tp, cp[k], rownum, ival, 1, 1)
+		nret = tbfagi (tp, cp[k], rownum, ival, c_1, c_1)
 		if (IS_INDEFI(ival)) {
 		    buffer[k] = false
 		    nullflag[k] = true
@@ -231,16 +246,19 @@ char	buffer[lenstr,ARB]	# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
 int	lenstr			# i: length of each string in array buffer
 int	numcols			# i: number of columns from which to get values
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# index into buffer & nullflag
-int	nret			# for fits tables
-int	tbfagt()
+long	nret			# for fits tables
+long	c_1
+long	tbfagt()
 int	strsearch()
 errchk	tbxrgt, tbyrgt, tbzgtt, tbfagt
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_S_ROW) {
@@ -257,7 +275,7 @@ begin
 	    }
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
 	    do k = 1, numcols {
-		nret = tbfagt (tp, cp[k], rownum, buffer[1,k], lenstr, 1, 1)
+		nret = tbfagt (tp, cp[k], rownum, buffer[1,k], lenstr, c_1, c_1)
 		nullflag[k] = (buffer[1,k] == EOS ||
 			(strsearch (buffer[1,k], "INDEF") > 0))
 	    }

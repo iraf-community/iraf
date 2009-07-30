@@ -8,19 +8,22 @@ include "tbtables.h"
 procedure tbfnll (tp, firstrow, lastrow)
 
 pointer tp		# i: pointer to table descriptor
-int	firstrow	# i: first row to be set to INDEF
-int	lastrow		# i: last row to be set to INDEF
+long	firstrow	# i: first row to be set to INDEF
+long	lastrow		# i: last row to be set to INDEF
 #--
 pointer cp		# pointer to column descriptor
-int	row1, row2	# firstrow, lastrow truncated to 1, nrows
-int	row, col	# loop indexes for row and column numbers
-int	nelem		# number of elements for a column
+long	row1, row2	# firstrow, lastrow truncated to 1, nrows
+long	row		# loop indexes for row and column numbers
+int	col
+long	nelem		# number of elements for a column
 int	status		# zero is OK
+long	c_1
 pointer tbcnum()
-int	tbcigi()
+long	tbcigl()
 errchk	tbferr
 
 begin
+	c_1 = 1
 	status = 0
 
 	row1 = max (1, firstrow)
@@ -32,9 +35,9 @@ begin
 
 		cp = tbcnum (tp, col)
 
-		nelem = tbcigi (cp, TBL_COL_LENDATA)
+		nelem = tbcigl (cp, TBL_COL_LENDATA)
 
-		call fspclu (TB_FILE(tp), col, row, 1, nelem, status)
+		call fspclu (TB_FILE(tp), col, row, c_1, nelem, status)
 		if (status != 0)
 		    call tbferr (status)
 	    }

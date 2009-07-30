@@ -13,7 +13,7 @@ procedure tbfiga (tp, cp, ndim, axlen, maxdim)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 int	ndim		# o: dimension of array
-int	axlen[maxdim]	# o: length of each axis
+long	axlen[maxdim]	# o: length of each axis
 int	maxdim		# i: size of axlen array
 #--
 int	status		# zero is OK
@@ -40,7 +40,7 @@ procedure tbfisa (tp, cp, ndim, axlen)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 int	ndim		# i: dimension of array
-int	axlen[ARB]	# i: length of each axis
+long	axlen[ARB]	# i: length of each axis
 #--
 int	status		# zero is OK
 errchk	tbferr

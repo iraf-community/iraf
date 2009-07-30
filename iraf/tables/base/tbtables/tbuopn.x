@@ -32,6 +32,7 @@ procedure tbuopn (tp)
 
 pointer tp		# i: pointer to table descriptor
 #--
+size_t	sz_val
 pointer colptr		# pointer to column descriptor
 int	colnum		# column number (a loop index)
 int	fd		# fd for table file
@@ -66,12 +67,14 @@ begin
 	call tbtrsi (tp)
 
 	# Allocate space for the array of pointers to column descriptors.
-	call malloc (TB_COLPTR(tp), TB_MAXCOLS(tp), TY_POINTER)
+	sz_val = TB_MAXCOLS(tp)
+	call malloc (TB_COLPTR(tp), sz_val, TY_POINTER)
 
 	# Create column descriptors.
 	# (For a text table, TB_NCOLS will still be zero.)
 	do colnum = 1, TB_NCOLS(tp) {
-	    call malloc (colptr, LEN_COLSTRUCT, TY_STRUCT)
+	    sz_val = LEN_COLSTRUCT
+	    call malloc (colptr, sz_val, TY_STRUCT)
 	    TB_COLINFO(tp,colnum) = colptr
 	}
 

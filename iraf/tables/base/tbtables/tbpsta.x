@@ -26,9 +26,23 @@ int procedure tbpsta (tp, param)
 pointer tp			# i: pointer to table descriptor
 int	param			# i: the parameter to be determined.
 #--
-int	value
-int	fstati(), tbfsiz(), tbrlen(), tbtszd()
-errchk	fstati, tbfsiz
+long	value
+long	tbpstl()
+
+begin
+	value = tbpstl(tp, param)
+	return (value)
+end
+
+
+long procedure tbpstl (tp, param)
+
+pointer tp			# i: pointer to table descriptor
+int	param			# i: the parameter to be determined.
+#--
+long	value
+long	fstatl(), tbrlen(), tbtszd(), tbfsiz()
+errchk	fstatl, tbfsiz
 
 begin
 	switch (param) {
@@ -92,7 +106,7 @@ begin
 	    if (TB_TYPE(tp) == TBL_TYPE_FITS)
 		return (tbfsiz (tp))
 	    else
-		return (fstati (TB_FILE(tp), F_BUFSIZE))
+		return (fstatl (TB_FILE(tp), F_BUFSIZE))
 
 	case TBL_DATA_SIZE:		# size of data portion of table in chars
 	    if (TB_IS_OPEN(tp))
@@ -112,13 +126,13 @@ end
 # The size returned is the space used, not allocated.  If row and/or column
 # selectors are used, the size will be appropriately reduced.
 
-int procedure tbtszd (tp)
+long procedure tbtszd (tp)
 
 pointer tp		# i: pointer to table descriptor
 #--
-int	nrows		# number of selected rows
-int	rowlen		# row length (selected columns) in chars
-int	tbrlen()
+long	nrows		# number of selected rows
+long	rowlen		# row length (selected columns) in chars
+long	tbrlen()
 
 begin
 	if (TB_ROW_SELECT(tp) == YES)
@@ -141,13 +155,13 @@ end
 # (Values are returned in units of SZ_CHAR regardless of the _CHAR
 # suffix in this routine.)
 
-int procedure tbrlen (tp, param)
+long procedure tbrlen (tp, param)
 
 pointer tp		# i: pointer to table descriptor
 int	param		# i: either TBL_ROWLEN or TBL_ROWLEN_USED
 #--
 pointer cp
-int	value
+long	value
 int	colnum
 pointer	tcs_column()
 

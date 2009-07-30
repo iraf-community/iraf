@@ -18,10 +18,10 @@ procedure tbrudf (tp, colptr, numcols, selrow)
 pointer tp			# i: pointer to table descriptor
 pointer colptr[ARB]		# i: array of pointers to column descriptors
 int	numcols			# i: number of columns
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
-int	rst_rownum()
+long	rownum			# actual row number
+long	rst_rownum()
 errchk	rst_rownum, tbswer, tbfudf, tbxudf, tbyudf, tbzudf
 
 begin

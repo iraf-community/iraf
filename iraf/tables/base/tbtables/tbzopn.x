@@ -20,30 +20,34 @@ procedure tbzopn (tp)
 
 pointer tp		# i: pointer to table descriptor
 #--
+size_t	sz_val
 pointer sp
 pointer buf		# buffer for input line
-int	line		# counter for line number in input file
+long	line		# counter for line number in input file
 int	line_type	# type of line read by tbzlin
 int	subtype		# text table subtype
 int	col
-int	rowlen
+long	rowlen
 pointer cp		# pointer to column descriptor
 pointer tbcnum()
 errchk	tbzsub, tbzrds, tbzrdx
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_TEXTBUF, TY_CHAR)
+	sz_val = SZ_TEXTBUF
+	call salloc (buf, sz_val, TY_CHAR)
 
 	line = 0	# incremented later
 
 	# Allocate space for the list of keywords.
 	if (TB_MAXPAR(tp) <= 0)
 	    TB_MAXPAR(tp) = INCR_N_KEYWORDS
-	call calloc (TB_KEYLIST_PTR(tp), TB_MAXPAR(tp), TY_POINTER)
+	sz_val = TB_MAXPAR(tp)
+	call calloc (TB_KEYLIST_PTR(tp), sz_val, TY_POINTER)
 
 	# Allocate space for the comment buffer.
-	call malloc (TB_COMMENT(tp), SZ_TEXTBUF, TY_CHAR)
+	sz_val = SZ_TEXTBUF
+	call malloc (TB_COMMENT(tp), sz_val, TY_CHAR)
 	TB_SZ_COMMENT(tp) = SZ_TEXTBUF
 	Memc[TB_COMMENT(tp)] = EOS
 

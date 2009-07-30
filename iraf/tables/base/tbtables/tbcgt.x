@@ -24,13 +24,14 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to descriptor of the column
 double	buffer[ARB]		# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
-int	sel_firstrow		# i: first row from which to get values
-int	sel_lastrow		# i: last row from which to get values
+long	sel_firstrow		# i: first row from which to get values
+long	sel_lastrow		# i: last row from which to get values
 #--
-int	firstrow, lastrow	# actual range of row numbers
-int	i, row			# loop indexes
-int	nret			# for fits tables
-int	tbfagd()
+long	firstrow, lastrow	# actual range of row numbers
+long	i, row			# loop indexes
+long	nret			# for fits tables
+long	tbfagd()
+long	l_val
 errchk	tbsirow, tbxcgd, tbycgd, tbzcgd, tbfagd
 
 begin
@@ -44,9 +45,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcgd (tp, cp, buffer, nullflag, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		nret = tbfagd (tp, cp, row, buffer[i], 1, 1)
+		nret = tbfagd (tp, cp, row, buffer[i], l_val, l_val)
 		nullflag[i] = (IS_INDEFD (buffer[i]))
 		i = i + 1
 	    }
@@ -64,13 +66,14 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to descriptor of the column
 real	buffer[ARB]		# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
-int	sel_firstrow		# i: first row from which to get values
-int	sel_lastrow		# i: last row from which to get values
+long	sel_firstrow		# i: first row from which to get values
+long	sel_lastrow		# i: last row from which to get values
 #--
-int	firstrow, lastrow	# actual range of row numbers
-int	i, row			# loop indexes
-int	nret			# for fits tables
-int	tbfagr()
+long	firstrow, lastrow	# actual range of row numbers
+long	i, row			# loop indexes
+long	nret			# for fits tables
+long	l_val
+long	tbfagr()
 errchk	tbsirow, tbxcgr, tbycgr, tbzcgr, tbfagr
 
 begin
@@ -84,9 +87,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcgr (tp, cp, buffer, nullflag, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		nret = tbfagr (tp, cp, row, buffer[i], 1, 1)
+		nret = tbfagr (tp, cp, row, buffer[i], l_val, l_val)
 		nullflag[i] = (IS_INDEFR (buffer[i]))
 		i = i + 1
 	    }
@@ -105,13 +109,14 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to descriptor of the column
 int	buffer[ARB]		# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
-int	sel_firstrow		# i: first row from which to get values
-int	sel_lastrow		# i: last row from which to get values
+long	sel_firstrow		# i: first row from which to get values
+long	sel_lastrow		# i: last row from which to get values
 #--
-int	firstrow, lastrow	# actual range of row numbers
-int	i, row			# loop indexes
-int	nret			# for fits tables
-int	tbfagi()
+long	firstrow, lastrow	# actual range of row numbers
+long	i, row			# loop indexes
+long	nret			# for fits tables
+long	l_val
+long	tbfagi()
 errchk	tbsirow, tbxcgi, tbycgi, tbzcgi, tbfagi
 
 begin
@@ -125,9 +130,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcgi (tp, cp, buffer, nullflag, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		nret = tbfagi (tp, cp, row, buffer[i], 1, 1)
+		nret = tbfagi (tp, cp, row, buffer[i], l_val, l_val)
 		nullflag[i] = (IS_INDEFI (buffer[i]))
 		i = i + 1
 	    }
@@ -146,13 +152,14 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to descriptor of the column
 short	buffer[ARB]		# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
-int	sel_firstrow		# i: first row from which to get values
-int	sel_lastrow		# i: last row from which to get values
+long	sel_firstrow		# i: first row from which to get values
+long	sel_lastrow		# i: last row from which to get values
 #--
-int	firstrow, lastrow	# actual range of row numbers
-int	i, row			# loop indexes
-int	nret			# for fits tables
-int	tbfags()
+long	firstrow, lastrow	# actual range of row numbers
+long	i, row			# loop indexes
+long	nret			# for fits tables
+long	l_val
+long	tbfags()
 errchk	tbsirow, tbxcgs, tbycgs, tbzcgs, tbfags
 
 begin
@@ -166,9 +173,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcgs (tp, cp, buffer, nullflag, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		nret = tbfags (tp, cp, row, buffer[i], 1, 1)
+		nret = tbfags (tp, cp, row, buffer[i], l_val, l_val)
 		nullflag[i] = (IS_INDEFS (buffer[i]))
 		i = i + 1
 	    }
@@ -186,14 +194,15 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to descriptor of the column
 bool	buffer[ARB]		# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
-int	sel_firstrow		# i: first row from which to get values
-int	sel_lastrow		# i: last row from which to get values
+long	sel_firstrow		# i: first row from which to get values
+long	sel_lastrow		# i: last row from which to get values
 #--
-int	firstrow, lastrow	# actual range of row numbers
-int	i, row			# loop indexes
-int	nret			# for fits tables
+long	firstrow, lastrow	# actual range of row numbers
+long	i, row			# loop indexes
+long	nret			# for fits tables
 int	ival			# for getting from a fits table
-int	tbfagi()
+long	l_val
+long	tbfagi()
 errchk	tbsirow, tbxcgb, tbycgb, tbzcgb, tbfagi
 
 begin
@@ -207,9 +216,10 @@ begin
 	} else if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzcgb (tp, cp, buffer, nullflag, firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		nret = tbfagi (tp, cp, row, ival, 1, 1)
+		nret = tbfagi (tp, cp, row, ival, l_val, l_val)
 		if (IS_INDEFI(ival)) {
 		    buffer[i] = false
 		    nullflag[i] = true
@@ -235,13 +245,14 @@ pointer cp			# i: pointer to descriptor of the column
 char	buffer[lenstr,ARB]	# o: buffer for values
 bool	nullflag[ARB]		# o: true if element is undefined in table
 int	lenstr			# i: length of each element of buffer
-int	sel_firstrow		# i: first row from which to get values
-int	sel_lastrow		# i: last row from which to get values
+long	sel_firstrow		# i: first row from which to get values
+long	sel_lastrow		# i: last row from which to get values
 #--
-int	firstrow, lastrow	# actual range of row numbers
-int	i, row			# loop indexes
-int	nret			# for fits tables
-int	tbfagt()
+long	firstrow, lastrow	# actual range of row numbers
+long	i, row			# loop indexes
+long	nret			# for fits tables
+long	l_val
+long	tbfagt()
 int	strsearch()
 errchk	tbsirow, tbxcgt, tbycgt, tbzcgt, tbfagt
 
@@ -259,9 +270,10 @@ begin
 	    call tbzcgt (tp, cp, buffer, nullflag, lenstr,
 			firstrow, lastrow)
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
+	    l_val = 1
 	    i = 1
 	    do row = firstrow, lastrow {
-		nret = tbfagt (tp, cp, row, buffer[1,i], lenstr, 1, 1)
+		nret = tbfagt (tp, cp, row, buffer[1,i], lenstr, l_val, l_val)
 		nullflag[i] = (buffer[1,i] == EOS ||
 			(strsearch (buffer[1,i], "INDEF") > 0))
 		i = i + 1

@@ -16,8 +16,8 @@ pointer cp		# i: pointer to column descriptor
 int	width		# i: the maximum width for this column
 #--
 pointer new		# pointer to new memory for column data
-int	row		# row number
-int	op		# offset in new char array
+long	row		# row number
+long	op		# offset in new char array
 errchk	calloc
 
 begin

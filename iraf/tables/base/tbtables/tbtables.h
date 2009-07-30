@@ -27,8 +27,8 @@ define	DEFMAXPAR		5
 define	DEFMAXCOLS		5
 
 # This section describes the size information record.
-define	LEN_SIZINFO		12		# unit = SZ_INT
-define	SZ_SIZINFO		(LEN_SIZINFO * SZ_INT)
+define	LEN_SIZINFO		12		# unit = SZ_LONG
+define	SZ_SIZINFO		(LEN_SIZINFO * SZ_LONG)
 define	S_NPAR			$1[1]		# Number of header parameters
 define	S_MAXPAR		$1[2]		# Max number of header pars
 define	S_NROWS			$1[3]		# Number of rows
@@ -49,12 +49,12 @@ define	TB_FILE			Memi[P2I($1)]
 define	TB_FILE2		Memi[P2I($1+1)]	# second half of pointer
 
 # Table file name; this can be an IRAF virtual file name.
-define	TB_NAME_PTR		Memi[P2I($1+2)]	# pointer to table name string
+define	TB_NAME_PTR		Memp[$1+2]	# pointer to table name string
 define	TB_NAME			Memc[TB_NAME_PTR($1)]
 
 # Table file name converted to a host operating system file name.
 # This name is needed for CFITSIO, since that uses host OS I/O.
-define	TB_OS_FILENAME_PTR	Memi[P2I($1+3)]	# pointer to OS file name string
+define	TB_OS_FILENAME_PTR	Memp[$1+3]	# pointer to OS file name string
 define	TB_OS_FILENAME		Memc[TB_OS_FILENAME_PTR($1)]
 
 # General descriptive information.  (R) means relevant only for row-ordered
@@ -65,12 +65,12 @@ define	TB_TYPE			Memi[P2I($1+4)]	# what type of table
 define	TB_SUBTYPE		Memi[P2I($1+5)]	# subtype of text or FITS table
 define	TB_NPAR			Memi[P2I($1+6)]	# number of header paramters
 define	TB_MAXPAR		Memi[P2I($1+7)]	# max number of header paramters
-define	TB_NROWS		Memi[P2I($1+8)]	# number of rows
-define	TB_ALLROWS		Memi[P2I($1+9)]	# (C) allocated number of rows
+define	TB_NROWS		Meml[P2L($1+8)]	# number of rows
+define	TB_ALLROWS		Meml[P2L($1+9)]	# (C) allocated number of rows
 define	TB_NCOLS		Memi[P2I($1+10)]	# number of columns
 define	TB_MAXCOLS		Memi[P2I($1+11)]	# current max number of columns
-define	TB_COLUSED		Memi[P2I($1+12)]	# (R) chars used by columns
-define	TB_ROWLEN		Memi[P2I($1+13)]	# (R,F) row length
+define	TB_COLUSED		Meml[P2L($1+12)]	# (R) chars used by columns
+define	TB_ROWLEN		Meml[P2L($1+13)]	# (R,F) row length
 define	TB_VERSION		Memi[P2I($1+14)]	# Software version number
 define	TB_BOD			Meml[P2L($1+15)]	# L beg of data (in SZ_CHAR)
 define	TB_IOMODE		Memi[P2I($1+16)]	# I/O mode
@@ -82,15 +82,15 @@ define	TB_MODIFIED		Memb[P2B($1+19)]	# Has table been changed?
 define	TB_INDEF_IS_CURRENT	Memb[P2B($1+20)]	# (F) TB_INDEF is up-to-date?
 
 # Pointers.  TB_INDEF is used for row-ordered tables and FITS tables.
-define	TB_INDEF		Memi[P2I($1+21)]	# Pointer to indef record buffer
-define	TB_COLPTR		Memi[P2I($1+22)]	# Ptr to array of column ptrs
+define	TB_INDEF		Memp[$1+21]	# Pointer to indef record buffer
+define	TB_COLPTR		Memp[$1+22]	# Ptr to array of column ptrs
 
 # These are for tables in FITS files.
 define	TB_HDU			Memi[P2I($1+23)]	# number of HDU in FITS file
 define	TB_EXTVER		Memi[P2I($1+24)]	# version number
 define	TB_OVERWRITE		Memi[P2I($1+25)]	# +1 --> yes, 0 --> no
-define	TB_CD			Memi[P2I($1+26)]	# returned by cd_open()
-define	TB_EXTNAME_PTR		Memi[P2I($1+27)]	# pointer to EXTNAME
+define	TB_CD			Memp[$1+26]		# returned by cd_open()
+define	TB_EXTNAME_PTR		Memp[$1+27]		# pointer to EXTNAME
 define	TB_EXTNAME		Memc[TB_EXTNAME_PTR($1)]
 
 # These are for row and column selectors.
@@ -103,25 +103,25 @@ define	TB_EXTNAME		Memc[TB_EXTNAME_PTR($1)]
 # descriptor of Mth selected column (note:  not the same as column descriptor)
 
 define	TB_ROW_SELECT		Memi[P2I($1+28)]	# row selection turned on?
-define	TB_NSEL_ROWS		Memi[P2I($1+29)]	# number of selected rows
-define	TB_ROWSET		Memi[P2I($1+30)]	# pointer to row set
+define	TB_NSEL_ROWS		Meml[P2L($1+29)]	# number of selected rows
+define	TB_ROWSET		Memp[$1+30]		# pointer to row set
 
 define	TB_COLUMN_SELECT	Memi[P2I($1+31)]	# column selection turned on?
 define	TB_NSEL_COLS		Memi[P2I($1+32)]	# number of selected columns
 define	TB_MAX_SELCOLS		Memi[P2I($1+33)]	# size of TB_SELCOL_PTR array
-define	TB_SELCOL_PTR		Memi[P2I($1+34)]
-define	TB_SELCOL		Memi[TB_SELCOL_PTR($1)+$2-1]
+define	TB_SELCOL_PTR		Memp[$1+34]
+define	TB_SELCOL		Memp[TB_SELCOL_PTR($1)+$2-1]
 
 # These are for text tables.
-define	TB_COMMENT		Memi[P2I($1+35)]	# pointer to comment string
+define	TB_COMMENT		Memp[$1+35]	# pointer to comment string
 define	TB_SZ_COMMENT		Memi[P2I($1+36)]	# size of comment string
-define	TB_KEYLIST_PTR		Memi[P2I($1+37)]	# pointer to list of keywords
-define	TB_KEYWORD		Memi[TB_KEYLIST_PTR($1)+$2-1]  # ptr to keyword
+define	TB_KEYLIST_PTR		Memp[$1+37]	# pointer to list of keywords
+define	TB_KEYWORD		Memp[TB_KEYLIST_PTR($1)+$2-1]  # ptr to keyword
 
 
 # Array of pointers to column information.  This array can be reallocated
 # to allow more columns; the current size at any time is TB_MAXCOLS.
-define	TB_COLINFO		Memi[TB_COLPTR($1)+$2-1]
+define	TB_COLINFO		Memp[TB_COLPTR($1)+$2-1]
 
 
 
@@ -150,11 +150,11 @@ define	FULL_SZ_COLNAME		(SZ_COLNAME+SZ_CHAR)
 define	LEN_COLSTRUCT	(10 + 3*(FULL_SZ_COLNAME)/SZ_STRUCT)
 
 define	COL_NUMBER		Memi[P2I($1)]	# Column number
-define	COL_OFFSET		Memi[P2I($1+1)]	# Offset from start of row
-define	COL_LEN			Memi[P2I($1+2)]	# Chars for one cell
+define	COL_OFFSET		Memp[$1+1]	# Offset from start of row
+define	COL_LEN			Meml[P2L($1+2)]	# Chars for one cell
 define	COL_DTYPE		Memi[P2I($1+3)]	# Data type
 define	COL_TDTYPE		Memi[P2I($1+4)]	# True data type, in FITS table
-define	COL_NELEM		Memi[P2I($1+5)]	# Length of array
+define	COL_NELEM		Meml[P2L($1+5)]	# Length of array
 define	COL_TSCAL		Memd[P2D($1+6)]	# TSCAL, if FITS table
 define	COL_TZERO		Memd[P2D($1+8)]	# TZERO, if FITS table
 define	COL_NAME	Memc[P2C($1+10)]
@@ -175,8 +175,8 @@ define	SZ_CD_COLUNITS		20	# Size of string for units
 define	SZ_CD_COLFMT		8	# Size for print format
 
 define	CD_COL_NUMBER		Memi[P2I($1)]	# Column number
-define	CD_COL_OFFSET		Memi[P2I($1+1)]	# Offset from start of row
-define	CD_COL_LEN		Memi[P2I($1+2)]	# Chars for one cell
+define	CD_COL_OFFSET		Memp[$1+1]	# Offset from start of row
+define	CD_COL_LEN		Meml[P2L($1+2)]	# Chars for one cell
 define	CD_COL_DTYPE		Memi[P2I($1+3)]	# Data type
 define	CD_COL_NAME		Memc[P2C($1+4)]		# Column name	20
 define	CD_COL_UNITS		Memc[P2C($1+9)]		# Units		20

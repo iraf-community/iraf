@@ -14,11 +14,11 @@ procedure tbzcpb (tp, cp, buffer, firstrow, lastrow)
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 bool	buffer[ARB]		# i: buffer containing values to be put
-int	firstrow		# i: number of first row to put
-int	lastrow			# i: number of last row to put
+long	firstrow		# i: number of first row to put
+long	lastrow			# i: number of last row to put
 #--
-int	row			# loop index for row number
-int	k			# index into buffer
+long	row			# loop index for row number
+long	k			# index into buffer
 errchk	tbzptb
 
 begin
@@ -34,11 +34,11 @@ procedure tbzcpd (tp, cp, buffer, firstrow, lastrow)
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 double	buffer[ARB]		# i: buffer containing values to be put
-int	firstrow		# i: number of first row to put
-int	lastrow			# i: number of last row to put
+long	firstrow		# i: number of first row to put
+long	lastrow			# i: number of last row to put
 #--
-int	row			# loop index for row number
-int	k			# index into buffer
+long	row			# loop index for row number
+long	k			# index into buffer
 errchk	tbzptd
 
 begin
@@ -63,11 +63,11 @@ procedure tbzcpr (tp, cp, buffer, firstrow, lastrow)
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 real	buffer[ARB]		# i: buffer containing values to be put
-int	firstrow		# i: number of first row to put
-int	lastrow			# i: number of last row to put
+long	firstrow		# i: number of first row to put
+long	lastrow			# i: number of last row to put
 #--
-int	row			# loop index for row number
-int	k			# index into buffer
+long	row			# loop index for row number
+long	k			# index into buffer
 errchk	tbzptr
 
 begin
@@ -83,11 +83,11 @@ procedure tbzcpi (tp, cp, buffer, firstrow, lastrow)
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 int	buffer[ARB]		# i: buffer containing values to be put
-int	firstrow		# i: number of first row to put
-int	lastrow			# i: number of last row to put
+long	firstrow		# i: number of first row to put
+long	lastrow			# i: number of last row to put
 #--
-int	row			# loop index for row number
-int	k			# index into buffer
+long	row			# loop index for row number
+long	k			# index into buffer
 errchk	tbzpti
 
 begin
@@ -112,11 +112,11 @@ procedure tbzcps (tp, cp, buffer, firstrow, lastrow)
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 short	buffer[ARB]		# i: buffer containing values to be put
-int	firstrow		# i: number of first row to put
-int	lastrow			# i: number of last row to put
+long	firstrow		# i: number of first row to put
+long	lastrow			# i: number of last row to put
 #--
-int	row			# loop index for row number
-int	k			# index into buffer
+long	row			# loop index for row number
+long	k			# index into buffer
 errchk	tbzpts
 
 begin
@@ -133,11 +133,11 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 char	buffer[lenstr,ARB]	# i: buffer containing values to be put
 int	lenstr			# i: size of each element
-int	firstrow		# i: number of first row to put
-int	lastrow			# i: number of last row to put
+long	firstrow		# i: number of first row to put
+long	lastrow			# i: number of last row to put
 #--
-int	row			# loop index for row number
-int	k			# index into buffer
+long	row			# loop index for row number
+long	k			# index into buffer
 errchk	tbzptt
 
 begin

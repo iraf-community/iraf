@@ -23,23 +23,25 @@ pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 bool	buffer[ARB]		# Buffer for values
 bool	nullflag[ARB]		# True if element is undefined in table
-int	firstrow		# Number of first row from which to get values
-int	lastrow			# Number of last row from which to get values
+long	firstrow		# Number of first row from which to get values
+long	lastrow			# Number of last row from which to get values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in arrays buffer & nullflag
-int	nrows			# Number of rows to read
+long	k			# Index in arrays buffer & nullflag
+size_t	nrows			# Number of rows to read
 int	datatype		# Data type of element in table
-int	dlen			# Number of char in one data element
-int	stat			# OK or an error reading row
+size_t	dlen			# Number of char in one data element
+long	stat			# OK or an error reading row
 # buffers for copying elements of various types
 double	dblbuf
 real	realbuf
 int	intbuf
 short	shortbuf
+size_t	nchar
 char	charbuf[SZ_LINE]
-long	tbyoff()
-int	read(), nscan()
+long	tbyoff(), read()
+int	nscan(), inint()
 errchk	seek, read
 
 begin
@@ -50,35 +52,38 @@ begin
 
 	switch (datatype) {
 	case TY_REAL:
+	    nchar = SZ_REAL
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), realbuf, SZ_REAL)
+		stat = read (TB_FILE(tp), realbuf, nchar)
  		if (IS_INDEFR (realbuf)) {
 		    buffer[k] = false
 		    nullflag[k] = true
 		} else {
-		    buffer[k] = (nint(realbuf) != NO)
+		    buffer[k] = (inint(realbuf) != NO)
 		    nullflag[k] = false
 		}
 		offset = offset + dlen
 	    }
 	case TY_DOUBLE:
+	    nchar = SZ_DOUBLE
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		stat = read (TB_FILE(tp), dblbuf, nchar)
  		if (TBL_IS_INDEFD (dblbuf)) {
 		    buffer[k] = false
 		    nullflag[k] = true
 		} else {
-		    buffer[k] = (nint(dblbuf) != NO)
+		    buffer[k] = (idnint(dblbuf) != NO)
 		    nullflag[k] = false
 		}
 		offset = offset + dlen
 	    }
 	case TY_INT:
+	    nchar = SZ_INT
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+		stat = read (TB_FILE(tp), intbuf, nchar)
  		if (IS_INDEFI (intbuf)) {
 		    buffer[k] = false
 		    nullflag[k] = true
@@ -89,9 +94,10 @@ begin
 		offset = offset + dlen
 	    }
 	case TY_SHORT:
+	    nchar = SZ_SHORT
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), shortbuf, SZ_SHORT)
+		stat = read (TB_FILE(tp), shortbuf, nchar)
  		if (IS_INDEFS (shortbuf)) {
 		    buffer[k] = false
 		    nullflag[k] = true
@@ -111,7 +117,8 @@ begin
 		do k = 1, lastrow-firstrow+1 {
 		    call seek (TB_FILE(tp), offset)
 		    stat = read (TB_FILE(tp), charbuf, dlen)
-		    call strupk (charbuf, charbuf, SZ_LINE)
+		    sz_val = SZ_LINE
+		    call strupk (charbuf, charbuf, sz_val)
 		    if (charbuf[1] != EOS) {
 			call sscan (charbuf)
 			    call gargb (buffer[k])
@@ -144,23 +151,25 @@ pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 double	buffer[ARB]		# Buffer for values
 bool	nullflag[ARB]		# True if element is undefined in table
-int	firstrow		# Number of first row from which to get values
-int	lastrow			# Number of last row from which to get values
+long	firstrow		# Number of first row from which to get values
+long	lastrow			# Number of last row from which to get values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in arrays buffer & nullflag
-int	nrows			# Number of rows to read
+long	k			# Index in arrays buffer & nullflag
+size_t	nrows			# Number of rows to read
 int	datatype		# Data type of element in table
-int	dlen			# Number of char in one data element
-int	stat			# OK or an error reading row
+size_t	dlen			# Number of char in one data element
+long	stat			# OK or an error reading row
 # buffers for copying elements of various types
 real	realbuf
 int	intbuf
 short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]
-long	tbyoff()
-int	read(), nscan()
+size_t	nchar
+long	tbyoff(), read()
+int	nscan()
 errchk	seek, read
 
 begin
@@ -171,9 +180,10 @@ begin
 
 	switch (datatype) {
 	case TY_REAL:
+	    nchar = SZ_REAL
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), realbuf, SZ_REAL)
+		stat = read (TB_FILE(tp), realbuf, nchar)
  		if (IS_INDEFR (realbuf)) {
 		    buffer[k] = INDEFD
 		    nullflag[k] = true
@@ -195,9 +205,10 @@ begin
 		}
 	    }
 	case TY_INT:
+	    nchar = SZ_INT
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+		stat = read (TB_FILE(tp), intbuf, nchar)
  		if (IS_INDEFI (intbuf)) {
 		    buffer[k] = INDEFD
 		    nullflag[k] = true
@@ -208,9 +219,10 @@ begin
 		offset = offset + dlen
 	    }
 	case TY_SHORT:
+	    nchar = SZ_SHORT
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), shortbuf, SZ_SHORT)
+		stat = read (TB_FILE(tp), shortbuf, nchar)
  		if (IS_INDEFS (shortbuf)) {
 		    buffer[k] = INDEFD
 		    nullflag[k] = true
@@ -221,9 +233,10 @@ begin
 		offset = offset + dlen
 	    }
 	case TY_BOOL:
+	    nchar = SZ_BOOL
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), boolbuf, SZ_BOOL)
+		stat = read (TB_FILE(tp), boolbuf, nchar)
 		if (boolbuf)
 		    buffer[k] = real(YES)
 		else
@@ -236,7 +249,8 @@ begin
 		do k = 1, lastrow-firstrow+1 {
 		    call seek (TB_FILE(tp), offset)
 		    stat = read (TB_FILE(tp), charbuf, dlen)
-		    call strupk (charbuf, charbuf, SZ_LINE)
+		    sz_val = SZ_LINE
+		    call strupk (charbuf, charbuf, sz_val)
 		    call sscan (charbuf)
 			call gargd (buffer[k])
 		    if (nscan() < 1) {
@@ -264,23 +278,25 @@ pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 real	buffer[ARB]		# Buffer for values
 bool	nullflag[ARB]		# True if element is undefined in table
-int	firstrow		# Number of first row from which to get values
-int	lastrow			# Number of last row from which to get values
+long	firstrow		# Number of first row from which to get values
+long	lastrow			# Number of last row from which to get values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in arrays buffer & nullflag
-int	nrows			# Number of rows to read
+long	k			# Index in arrays buffer & nullflag
+size_t	nrows			# Number of rows to read
 int	datatype		# Data type of element in table
-int	dlen			# Number of char in one data element
-int	stat			# OK or an error reading row
+size_t	dlen			# Number of char in one data element
+long	stat			# OK or an error reading row
 # buffers for copying elements of various types
 double	dblbuf
 int	intbuf
 short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]
-long	tbyoff()
-int	read(), nscan()
+size_t	nchar
+long	tbyoff(), read()
+int	nscan()
 errchk	seek, read
 
 begin
@@ -297,9 +313,10 @@ begin
  		nullflag[k] = IS_INDEFR (buffer[k])
 
 	case TY_DOUBLE:
+	    nchar = SZ_DOUBLE
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		stat = read (TB_FILE(tp), dblbuf, nchar)
  		if (TBL_IS_INDEFD (dblbuf)) {
 		    buffer[k] = INDEFR
 		    nullflag[k] = true
@@ -310,9 +327,10 @@ begin
 		offset = offset + dlen
 	    }
 	case TY_INT:
+	    nchar = SZ_INT
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+		stat = read (TB_FILE(tp), intbuf, nchar)
  		if (IS_INDEFI (intbuf)) {
 		    buffer[k] = INDEFR
 		    nullflag[k] = true
@@ -323,9 +341,10 @@ begin
 		offset = offset + dlen
 	    }
 	case TY_SHORT:
+	    nchar = SZ_SHORT
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), shortbuf, SZ_SHORT)
+		stat = read (TB_FILE(tp), shortbuf, nchar)
  		if (IS_INDEFS (shortbuf)) {
 		    buffer[k] = INDEFR
 		    nullflag[k] = true
@@ -336,9 +355,10 @@ begin
 		offset = offset + dlen
 	    }
 	case TY_BOOL:
+	    nchar = SZ_BOOL
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), boolbuf, SZ_BOOL)
+		stat = read (TB_FILE(tp), boolbuf, nchar)
 		if (boolbuf)
 		    buffer[k] = real(YES)
 		else
@@ -351,7 +371,8 @@ begin
 		do k = 1, lastrow-firstrow+1 {
 		    call seek (TB_FILE(tp), offset)
 		    stat = read (TB_FILE(tp), charbuf, dlen)
-		    call strupk (charbuf, charbuf, SZ_LINE)
+		    sz_val = SZ_LINE
+		    call strupk (charbuf, charbuf, sz_val)
 		    call sscan (charbuf)
 			call gargr (buffer[k])
 		    if (nscan() < 1) {
@@ -379,23 +400,26 @@ pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 int	buffer[ARB]		# Buffer for values
 bool	nullflag[ARB]		# True if element is undefined in table
-int	firstrow		# Number of first row from which to get values
-int	lastrow			# Number of last row from which to get values
+long	firstrow		# Number of first row from which to get values
+long	lastrow			# Number of last row from which to get values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in arrays buffer & nullflag
-int	nrows			# Number of rows to read
+long	k			# Index in arrays buffer & nullflag
+size_t	nrows			# Number of rows to read
 int	datatype		# Data type of element in table
-int	dlen			# Number of char in one data element
-int	stat			# OK or an error reading row
+size_t	dlen			# Number of char in one data element
+long	stat			# OK or an error reading row
 # buffers for copying elements of various types
 double	dblbuf
 real	realbuf
 short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]
-long	tbyoff()
-int	read(), nscan()
+size_t	nchar
+long	tbyoff(), read()
+int	nscan(), inint()
+real	aabs()
 errchk	seek, read
 
 begin
@@ -406,27 +430,29 @@ begin
 
 	switch (datatype) {
 	case TY_REAL:
+	    nchar = SZ_REAL
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), realbuf, SZ_REAL)
- 		if (IS_INDEFR (realbuf) || abs (realbuf) > MAX_INT) {
+		stat = read (TB_FILE(tp), realbuf, nchar)
+ 		if (IS_INDEFR (realbuf) || aabs (realbuf) > MAX_INT) {
 		    buffer[k] = INDEFI
 		    nullflag[k] = true
 		} else {
-		    buffer[k] = nint (realbuf)
+		    buffer[k] = inint (realbuf)
 		    nullflag[k] = IS_INDEFI (buffer[k])
 		}
 		offset = offset + dlen
 	    }
 	case TY_DOUBLE:
+	    nchar = SZ_DOUBLE
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), dblbuf, SZ_DOUBLE)
- 		if (TBL_IS_INDEFD (dblbuf) || abs (dblbuf) > MAX_INT) {
+		stat = read (TB_FILE(tp), dblbuf, nchar)
+ 		if (TBL_IS_INDEFD (dblbuf) || dabs (dblbuf) > MAX_INT) {
 		    buffer[k] = INDEFI
 		    nullflag[k] = true
 		} else {
-		    buffer[k] = nint (dblbuf)
+		    buffer[k] = idnint (dblbuf)
 		    nullflag[k] = false
 		}
 		offset = offset + dlen
@@ -438,9 +464,10 @@ begin
  		nullflag[k] = IS_INDEFI (buffer[k])
 
 	case TY_SHORT:
+	    nchar = SZ_SHORT
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), shortbuf, SZ_SHORT)
+		stat = read (TB_FILE(tp), shortbuf, nchar)
  		if (IS_INDEFS (shortbuf)) {
 		    buffer[k] = INDEFI
 		    nullflag[k] = true
@@ -451,9 +478,10 @@ begin
 		offset = offset + dlen
 	    }
 	case TY_BOOL:
+	    nchar = SZ_BOOL
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), boolbuf, SZ_BOOL)
+		stat = read (TB_FILE(tp), boolbuf, nchar)
 		if (boolbuf)
 		    buffer[k] = YES
 		else
@@ -466,15 +494,16 @@ begin
 		do k = 1, lastrow-firstrow+1 {
 		    call seek (TB_FILE(tp), offset)
 		    stat = read (TB_FILE(tp), charbuf, dlen)
-		    call strupk (charbuf, charbuf, SZ_LINE)
+		    sz_val = SZ_LINE
+		    call strupk (charbuf, charbuf, sz_val)
 		    call sscan (charbuf)
 			call gargd (dblbuf)
 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
-				abs (dblbuf) > MAX_INT) {
+				dabs (dblbuf) > MAX_INT) {
 			buffer[k] = INDEFI
 			nullflag[k] = true
 		    } else {
-			buffer[k] = nint (dblbuf)
+			buffer[k] = idnint (dblbuf)
 			nullflag[k] = IS_INDEFI (buffer[k])
 		    }
 		    offset = offset + dlen
@@ -496,23 +525,27 @@ pointer tp			# Pointer to table descriptor
 pointer colptr			# Pointer to descriptor of the column
 short	buffer[ARB]		# Buffer for values
 bool	nullflag[ARB]		# True if element is undefined in table
-int	firstrow		# Number of first row from which to get values
-int	lastrow			# Number of last row from which to get values
+long	firstrow		# Number of first row from which to get values
+long	lastrow			# Number of last row from which to get values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in arrays buffer & nullflag
-int	nrows			# Number of rows to read
+long	k			# Index in arrays buffer & nullflag
+size_t	nrows			# Number of rows to read
 int	datatype		# Data type of element in table
-int	dlen			# Number of char in one data element
-int	stat			# OK or an error reading row
+size_t	dlen			# Number of char in one data element
+long	stat			# OK or an error reading row
 # buffers for copying elements of various types
 double	dblbuf
 real	realbuf
 int	intbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]
-long	tbyoff()
-int	read(), nscan()
+size_t	nchar
+long	tbyoff(), read()
+int	nscan()
+real	aabs()
+short	snint(), sdnint()
 errchk	seek, read
 
 begin
@@ -523,36 +556,39 @@ begin
 
 	switch (datatype) {
 	case TY_REAL:
+	    nchar = SZ_REAL
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), realbuf, SZ_REAL)
- 		if (IS_INDEFR (realbuf) || abs (realbuf) > MAX_SHORT) {
+		stat = read (TB_FILE(tp), realbuf, nchar)
+ 		if (IS_INDEFR (realbuf) || aabs (realbuf) > MAX_SHORT) {
 		    buffer[k] = INDEFS
 		    nullflag[k] = true
 		} else {
-		    buffer[k] = nint (realbuf)
+		    buffer[k] = snint (realbuf)
 		    nullflag[k] = false
 		}
 		offset = offset + dlen
 	    }
 	case TY_DOUBLE:
+	    nchar = SZ_DOUBLE
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), dblbuf, SZ_DOUBLE)
- 		if (TBL_IS_INDEFD (dblbuf) || abs (dblbuf) > MAX_SHORT) {
+		stat = read (TB_FILE(tp), dblbuf, nchar)
+ 		if (TBL_IS_INDEFD (dblbuf) || dabs (dblbuf) > MAX_SHORT) {
 		    buffer[k] = INDEFS
 		    nullflag[k] = true
 		} else {
-		    buffer[k] = nint (dblbuf)
+		    buffer[k] = sdnint (dblbuf)
 		    nullflag[k] = false
 		}
 		offset = offset + dlen
 	    }
 	case TY_INT:
+	    nchar = SZ_INT
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), intbuf, SZ_INT)
- 		if (IS_INDEFI (intbuf) || abs (intbuf) > MAX_SHORT) {
+		stat = read (TB_FILE(tp), intbuf, nchar)
+ 		if (IS_INDEFI (intbuf) || iabs (intbuf) > MAX_SHORT) {
 		    buffer[k] = INDEFS
 		    nullflag[k] = true
 		} else {
@@ -569,9 +605,10 @@ begin
  		nullflag[k] = IS_INDEFS (buffer[k])
 
 	case TY_BOOL:
+	    nchar = SZ_BOOL
 	    do k = 1, lastrow-firstrow+1 {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), boolbuf, SZ_BOOL)
+		stat = read (TB_FILE(tp), boolbuf, nchar)
 		if (boolbuf)
 		    buffer[k] = YES
 		else
@@ -584,15 +621,16 @@ begin
 		do k = 1, lastrow-firstrow+1 {
 		    call seek (TB_FILE(tp), offset)
 		    stat = read (TB_FILE(tp), charbuf, dlen)
-		    call strupk (charbuf, charbuf, SZ_LINE)
+		    sz_val = SZ_LINE
+		    call strupk (charbuf, charbuf, sz_val)
 		    call sscan (charbuf)
 			call gargd (dblbuf)
 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
-				abs (dblbuf) > MAX_SHORT) {
+				dabs (dblbuf) > MAX_SHORT) {
 			buffer[k] = INDEFS
 			nullflag[k] = true
 		    } else {
-			buffer[k] = nint (dblbuf)
+			buffer[k] = sdnint (dblbuf)
 			nullflag[k] = IS_INDEFS (buffer[k])
 		    }
 		    offset = offset + dlen
@@ -615,26 +653,27 @@ pointer colptr			# Pointer to descriptor of the column
 char	buffer[lenstring,ARB]	# Buffer for values
 bool	nullflag[ARB]		# True if element is undefined in table
 int	lenstring		# The number of char in each element of buffer
-int	firstrow		# Number of first row from which to get values
-int	lastrow			# Number of last row from which to get values
+long	firstrow		# Number of first row from which to get values
+long	lastrow			# Number of last row from which to get values
 #--
+size_t	sz_val
 long	offset			# Location (chars) for reading in table
-int	k			# Index in arrays buffer & nullflag
-int	row			# Row number (loop index)
-int	numchar			# Number of characters to copy string to string
-int	nrows			# Number of rows to read
+long	k			# Index in arrays buffer & nullflag
+long	row			# Row number (loop index)
+size_t	numchar			# Number of characters to copy string to string
+size_t	nrows			# Number of rows to read
 int	datatype		# Data type of element in table
-int	dlen			# Number of char in one data element
-int	stat			# OK or an error reading row
+size_t	dlen			# Number of char in one data element
+long	stat			# OK or an error reading row
 # buffers for copying elements of various types
 double	dblbuf
 real	realbuf
 int	intbuf
 short	shortbuf
 bool	boolbuf
+size_t	nchar
 char	charbuf[SZ_LINE]
-long	tbyoff()
-int	read()
+long	tbyoff(), read()
 errchk	seek, read, sprintf
 
 begin
@@ -645,10 +684,11 @@ begin
 
 	switch (datatype) {
 	case TY_REAL:
+	    nchar = SZ_REAL
 	    k = 1
 	    do row = firstrow, lastrow {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), realbuf, SZ_REAL)
+		stat = read (TB_FILE(tp), realbuf, nchar)
 		call sprintf (buffer[1,k], lenstring, COL_FMT(colptr))
 		    call pargr (realbuf)
  		nullflag[k] = IS_INDEFR (realbuf)
@@ -656,10 +696,11 @@ begin
 		k = k + 1
 	    }
 	case TY_DOUBLE:
+	    nchar = SZ_DOUBLE
 	    k = 1
 	    do row = firstrow, lastrow {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		stat = read (TB_FILE(tp), dblbuf, nchar)
 		if (TBL_IS_INDEFD (dblbuf)) {
 		    call strcpy ("INDEF", buffer[1,k], lenstring)
 		    nullflag[k] = true
@@ -672,10 +713,11 @@ begin
 		k = k + 1
 	    }
 	case TY_INT:
+	    nchar = SZ_INT
 	    k = 1
 	    do row = firstrow, lastrow {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+		stat = read (TB_FILE(tp), intbuf, nchar)
 		call sprintf (buffer[1,k], lenstring, COL_FMT(colptr))
 		    call pargi (intbuf)
  		nullflag[k] = IS_INDEFI (intbuf)
@@ -683,10 +725,11 @@ begin
 		k = k + 1
 	    }
 	case TY_SHORT:
+	    nchar = SZ_SHORT
 	    k = 1
 	    do row = firstrow, lastrow {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), shortbuf, SZ_SHORT)
+		stat = read (TB_FILE(tp), shortbuf, nchar)
 		call sprintf (buffer[1,k], lenstring, COL_FMT(colptr))
 		    call pargs (shortbuf)
  		nullflag[k] = IS_INDEFS (shortbuf)
@@ -694,10 +737,11 @@ begin
 		k = k + 1
 	    }
 	case TY_BOOL:
+	    nchar = SZ_BOOL
 	    k = 1
 	    do row = firstrow, lastrow {
 		call seek (TB_FILE(tp), offset)
-		stat = read (TB_FILE(tp), boolbuf, SZ_BOOL)
+		stat = read (TB_FILE(tp), boolbuf, nchar)
 		call sprintf (buffer[1,k], lenstring, COL_FMT(colptr))
 		    call pargb (boolbuf)
 		nullflag[k] = false
@@ -711,7 +755,8 @@ begin
 		    call seek (TB_FILE(tp), offset)
 		    stat = read (TB_FILE(tp), charbuf, dlen)
 		    numchar = min (lenstring, SZB_CHAR*dlen)
-		    call strupk (charbuf, buffer[1,k], numchar)
+		    sz_val = numchar
+		    call strupk (charbuf, buffer[1,k], sz_val)
 		    nullflag[k] = (buffer[1,k] == EOS)
 		    offset = offset + dlen
 		    k = k + 1

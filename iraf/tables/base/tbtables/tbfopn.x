@@ -44,6 +44,7 @@ procedure tbfopn (tp)
 
 pointer tp		# i: pointer to table descriptor
 #--
+size_t	sz_val
 pointer sp
 pointer extname		# for value of EXTNAME from table header
 pointer errmess		# scratch for error message
@@ -61,7 +62,8 @@ errchk	tbffnd, tbferr
 
 begin
 	call smark (sp)
-	call salloc (extname, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (extname, sz_val, TY_CHAR)
 
 	status = 0
 
@@ -95,7 +97,8 @@ begin
 	# Find the specified extension in the file.
 	hdu = tbffnd (tp, Memc[extname], SZ_LINE, extver, hdutype)
 	if (hdu == EOF) {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE, 
 		"table not found in FITS file `%s'")
 		call pargstr (TB_NAME(tp))

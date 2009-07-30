@@ -25,6 +25,7 @@ pointer wid			# o: pointer to array of values of width
 pointer prec			# o: pointer to array of (width - precision)
 pointer fmt_code		# o: pointer to array of format codes
 #--
+size_t	sz_val
 pointer sp
 pointer word			# scratch for a word from the line
 pointer cp			# pointer to column descriptor
@@ -41,6 +42,7 @@ int	precision		# precision for printing
 int	datatype		# data type of current word (from tbbwrd)
 int	fcode			# format code returned by tbbwrd
 bool	done			# loop-termination flag
+long	l_val
 int	tbbwrd(), strncmp()
 errchk	realloc, tbcadd
 
@@ -50,13 +52,15 @@ begin
 	    call error (1, "file is an image header, not a table")
 
 	call smark (sp)
-	call salloc (word, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (word, sz_val, TY_CHAR)
 
 	# Allocate buffers for column widths, precision, and format codes.
 	maxcols = TB_MAXCOLS(tp)
-	call malloc (wid, maxcols, TY_INT)
-	call malloc (prec, maxcols, TY_INT)
-	call malloc (fmt_code, maxcols, TY_CHAR)
+	sz_val = maxcols
+	call malloc (wid, sz_val, TY_INT)
+	call malloc (prec, sz_val, TY_INT)
+	call malloc (fmt_code, sz_val, TY_CHAR)
 
 	colnum = 0				# initial values
 	ip = 1
@@ -98,14 +102,16 @@ begin
 
 		# Allocate a descriptor for the column, update TB_MAXCOLS(tp),
 		# and allocate & initialize a buffer for storing values.
-		call tbcadd (tp, cp, cname, units, pform, datatype, 1, 1)
+		l_val = 1
+		call tbcadd (tp, cp, cname, units, pform, datatype, l_val, 1)
 
 		# Reallocate space for column widths and precision.
 		if (colnum > maxcols) {
 		    maxcols = TB_MAXCOLS(tp)
-		    call realloc (wid, maxcols, TY_INT)
-		    call realloc (prec, maxcols, TY_INT)
-		    call realloc (fmt_code, maxcols, TY_CHAR)
+		    sz_val = maxcols
+		    call realloc (wid, sz_val, TY_INT)
+		    call realloc (prec, sz_val, TY_INT)
+		    call realloc (fmt_code, sz_val, TY_CHAR)
 		}
 
 		# Save values of width, precision and format code.  The latter

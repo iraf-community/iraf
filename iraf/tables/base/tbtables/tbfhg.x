@@ -16,6 +16,7 @@ pointer tp		# i: pointer to table descriptor
 char	keyword[ARB]	# i: name of parameter to get
 double	value		# o: value of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer sval		# for getting the value as a string
 pointer comment		# for getting the comment
@@ -25,8 +26,9 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (sval, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	status = 0
 
@@ -57,6 +59,7 @@ pointer tp		# i: pointer to table descriptor
 char	keyword[ARB]	# i: name of parameter to get
 real	value		# o: value of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer sval		# for getting the value as a string
 pointer comment		# for getting the comment
@@ -66,8 +69,9 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (sval, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	status = 0
 
@@ -98,6 +102,7 @@ pointer tp		# i: pointer to table descriptor
 char	keyword[ARB]	# i: name of parameter to get
 int	value		# o: value of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer sval		# for getting the value as a string
 pointer comment		# for getting the comment
@@ -108,8 +113,9 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (sval, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	status = 0
 
@@ -131,7 +137,7 @@ begin
 	if (IS_INDEFD(dval))
 	    value = INDEFI
 	else
-	    value = nint (dval)
+	    value = idnint (dval)
 
 	call sfree (sp)
 end
@@ -146,6 +152,7 @@ pointer tp		# i: pointer to table descriptor
 char	keyword[ARB]	# i: name of parameter to get
 bool	value		# o: value of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer sval		# for getting the value as a string
 pointer comment		# for getting the comment
@@ -156,8 +163,9 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (sval, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	status = 0
 
@@ -186,7 +194,7 @@ begin
 	junk = ctod (Memc[sval], ip, dval)
 	if (IS_INDEFD(dval))
 	    value = false
-	else if (nint (dval) == 0)
+	else if (idnint (dval) == 0)
 	    value = false
 	else
 	    value = true
@@ -203,6 +211,7 @@ char	keyword[ARB]	# i: name of parameter to get
 char	text[ARB]	# o: value of parameter
 int	maxch		# i: maximum number of characters to get
 #--
+size_t	sz_val
 pointer sp
 pointer temp		# for getting the value
 pointer comment		# for getting the comment
@@ -214,8 +223,10 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (temp, max (maxch, SZ_FNAME), TY_CHAR)
-	call salloc (comment, SZ_FNAME, TY_CHAR)
+	sz_val = max (maxch, SZ_FNAME)
+	call salloc (temp, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (comment, sz_val, TY_CHAR)
 
 	status = 0
 

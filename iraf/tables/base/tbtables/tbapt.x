@@ -12,12 +12,12 @@ procedure tbaptd (tp, cp, selrow, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 double	buffer[ARB]	# i: values to write to table
-int	first		# i: number of first array element to write
-int	nelem		# i: number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: number of elements to write
 #--
-int	row		# actual row number
+long	row		# actual row number
 errchk	tbeptd, tbfapd, tbswer1, tbxapd, tbwapd
 
 begin
@@ -46,12 +46,12 @@ procedure tbaptr (tp, cp, selrow, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 real	buffer[ARB]	# i: values to write to table
-int	first		# i: number of first array element to write
-int	nelem		# i: number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: number of elements to write
 #--
-int	row		# actual row number
+long	row		# actual row number
 errchk	tbeptr, tbfapr, tbswer1, tbxapr, tbwapr
 
 begin
@@ -80,12 +80,12 @@ procedure tbapti (tp, cp, selrow, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 int	buffer[ARB]	# i: values to write to table
-int	first		# i: number of first array element to write
-int	nelem		# i: number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: number of elements to write
 #--
-int	row		# actual row number
+long	row		# actual row number
 errchk	tbepti, tbfapi, tbswer1, tbxapi, tbwapi
 
 begin
@@ -114,12 +114,12 @@ procedure tbapts (tp, cp, selrow, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 short	buffer[ARB]	# i: values to write to table
-int	first		# i: number of first array element to write
-int	nelem		# i: number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: number of elements to write
 #--
-int	row		# actual row number
+long	row		# actual row number
 errchk	tbepts, tbfaps, tbswer1, tbxaps, tbwaps
 
 begin
@@ -148,12 +148,12 @@ procedure tbaptb (tp, cp, selrow, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 bool	buffer[ARB]	# i: values to write to table
-int	first		# i: number of first array element to write
-int	nelem		# i: number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: number of elements to write
 #--
-int	row		# actual row number
+long	row		# actual row number
 errchk	tbeptb, tbfapb, tbswer1, tbxapb, tbwapb
 
 begin
@@ -182,13 +182,13 @@ procedure tbaptt (tp, cp, selrow, cbuf, maxch, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 char	cbuf[maxch,ARB]	# i: values to write to table
 int	maxch		# i: size of first dimension of cbuf
-int	first		# i: number of first array element to write
-int	nelem		# i: number of elements to write
+long	first		# i: number of first array element to write
+long	nelem		# i: number of elements to write
 #--
-int	row		# actual row number
+long	row		# actual row number
 errchk	tbeptt, tbfapt, tbswer1, tbxapt, tbwapt
 
 begin

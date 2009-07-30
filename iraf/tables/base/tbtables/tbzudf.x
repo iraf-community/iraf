@@ -14,12 +14,12 @@ procedure tbzudf (tp, cp, numcols, rownum)
 pointer tp			# i: pointer to table descriptor
 pointer cp[numcols]		# i: array of pointers to column descriptors
 int	numcols			# i: number of columns
-int	rownum			# i: row number
+long	rownum			# i: row number
 #--
 int	k			# Loop index
 int	datatype		# Data type of a column
 int	lenstr			# length of a string table element
-int	ip			# offset to a string in Memc
+long	ip			# offset to a string in Memc
 
 begin
 	do k = 1, numcols {

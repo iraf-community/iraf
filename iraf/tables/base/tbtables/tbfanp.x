@@ -17,6 +17,7 @@ int	dtype			# i: data type
 char	str[ARB]		# i: string containing the value of the param.
 int	parnum			# o: number of the parameter in the table
 #--
+size_t	sz_val
 pointer sp
 pointer fitsrec			# scratch for FITS output record
 pointer value			# scratch for first "word" in input str
@@ -54,7 +55,8 @@ begin
 	} else if (ukey[1] == EOS) {		# blank keyword
 
 	    call smark (sp)
-	    call salloc (fitsrec, SZ_FITS_REC, TY_CHAR)
+	    sz_val = SZ_FITS_REC
+	    call salloc (fitsrec, sz_val, TY_CHAR)
 	    call sprintf (Memc[fitsrec], SZ_FITS_REC, "          %s")
 		call pargstr (str)
 	    call fsprec (TB_FILE(tp), Memc[fitsrec], status)
@@ -63,8 +65,9 @@ begin
 	} else {
 
 	    call smark (sp)
-	    call salloc (fitsrec, SZ_FITS_REC, TY_CHAR)
-	    call salloc (value, SZ_FITS_REC, TY_CHAR)
+	    sz_val = SZ_FITS_REC
+	    call salloc (fitsrec, sz_val, TY_CHAR)
+	    call salloc (value, sz_val, TY_CHAR)
 
 	    # Extract one "word".
 	    ip = 1
@@ -126,7 +129,8 @@ begin
 		vlen = strlen (Memc[value])
 		if (vlen < 21) {
 		    # Right justify at column 30.
-		    call salloc (blanks, 21-vlen, TY_CHAR)
+		    sz_val = 21-vlen
+		    call salloc (blanks, sz_val, TY_CHAR)
 		    do i = 1, 21-vlen
 			Memc[blanks+i-1] = ' '
 		    Memc[blanks+21-vlen] = EOS

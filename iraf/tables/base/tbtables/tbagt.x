@@ -8,18 +8,18 @@ include "tbtables.h"
 # Phil Hodge,  9-Jun-1995  Modify for FITS tables.
 # Phil Hodge,  2-Mar-1998  Map selected row number to actual row number.
 
-int procedure tbagtd (tp, cp, selrow, buffer, first, nelem)
+long procedure tbagtd (tp, cp, selrow, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 double	buffer[ARB]	# o: values read from table
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
-int	row		# actual row number
-int	nret		# actual number of elements read
-int	tbxagd(), tbfagd()
+long	row		# actual row number
+long	nret		# actual number of elements read
+long	tbxagd(), tbfagd()
 errchk	tbsirow, tbegtd, tbfagd, tbxagd
 
 begin
@@ -46,18 +46,18 @@ begin
 	return (nret)
 end
 
-int procedure tbagtr (tp, cp, selrow, buffer, first, nelem)
+long procedure tbagtr (tp, cp, selrow, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 real	buffer[ARB]	# o: values read from table
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
-int	row		# actual row number
-int	nret		# actual number of elements read
-int	tbxagr(), tbfagr()
+long	row		# actual row number
+long	nret		# actual number of elements read
+long	tbxagr(), tbfagr()
 errchk	tbsirow, tbegtr, tbfagr, tbxagr, tbxagr
 
 begin
@@ -84,18 +84,18 @@ begin
 	return (nret)
 end
 
-int procedure tbagti (tp, cp, selrow, buffer, first, nelem)
+long procedure tbagti (tp, cp, selrow, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 int	buffer[ARB]	# o: values read from table
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
-int	row		# actual row number
-int	nret		# actual number of elements read
-int	tbxagi(), tbfagi()
+long	row		# actual row number
+long	nret		# actual number of elements read
+long	tbxagi(), tbfagi()
 errchk	tbsirow, tbegti, tbfagi, tbxagi
 
 begin
@@ -122,18 +122,18 @@ begin
 	return (nret)
 end
 
-int procedure tbagts (tp, cp, selrow, buffer, first, nelem)
+long procedure tbagts (tp, cp, selrow, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 short	buffer[ARB]	# o: values read from table
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
-int	row		# actual row number
-int	nret		# actual number of elements read
-int	tbxags(), tbfags()
+long	row		# actual row number
+long	nret		# actual number of elements read
+long	tbxags(), tbfags()
 errchk	tbsirow, tbegts, tbfags, tbxags
 
 begin
@@ -160,18 +160,18 @@ begin
 	return (nret)
 end
 
-int procedure tbagtb (tp, cp, selrow, buffer, first, nelem)
+long procedure tbagtb (tp, cp, selrow, buffer, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 bool	buffer[ARB]	# o: values read from table
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
-int	row		# actual row number
-int	nret		# actual number of elements read
-int	tbxagb(), tbfagb()
+long	row		# actual row number
+long	nret		# actual number of elements read
+long	tbxagb(), tbfagb()
 errchk	tbsirow, tbegtb, tbfagb, tbxagb
 
 begin
@@ -198,19 +198,19 @@ begin
 	return (nret)
 end
 
-int procedure tbagtt (tp, cp, selrow, cbuf, maxch, first, nelem)
+long procedure tbagtt (tp, cp, selrow, cbuf, maxch, first, nelem)
 
 pointer tp		# i: pointer to table struct
 pointer cp		# i: pointer to column struct
-int	selrow		# i: row number (or selected row number)
+long	selrow		# i: row number (or selected row number)
 char	cbuf[maxch,ARB]	# o: values read from table
 int	maxch		# i: size of first dimension of cbuf
-int	first		# i: number of first array element to read
-int	nelem		# i: maximum number of elements to read
+long	first		# i: number of first array element to read
+long	nelem		# i: maximum number of elements to read
 #--
-int	row		# actual row number
-int	nret		# actual number of elements read
-int	tbxagt(), tbfagt()
+long	row		# actual row number
+long	nret		# actual number of elements read
+long	tbxagt(), tbfagt()
 errchk	tbsirow, tbegtt, tbfagt, tbxagt
 
 begin

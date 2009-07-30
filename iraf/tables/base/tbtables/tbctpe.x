@@ -39,8 +39,9 @@ pointer template		# i: pointer to descriptor of template table
 pointer icp, ocp		# pointers to column descriptors
 int	k			# loop index
 int	colnum			# column number, a loop index
-int	offset			# for recomputing COL_OFFSET
-long	tbtbod()
+long	offset			# for recomputing COL_OFFSET
+size_t	sz_val
+long	tbtbod(), tbpstl()
 int	tbpsta()
 pointer	tbcnum()
 errchk	calloc
@@ -59,8 +60,8 @@ begin
 	TB_NCOLS(tp) = tbpsta (template, TBL_NCOLS)
 	TB_MAXPAR(tp) = TB_MAXPAR(template)
 	TB_ALLROWS(tp) = TB_ALLROWS(template)
-	TB_COLUSED(tp) = tbpsta (template, TBL_ROWLEN_CHAR_USED)
-	TB_ROWLEN(tp) = tbpsta (template, TBL_ROWLEN_CHAR)
+	TB_COLUSED(tp) = tbpstl (template, TBL_ROWLEN_CHAR_USED)
+	TB_ROWLEN(tp) = tbpstl (template, TBL_ROWLEN_CHAR)
 
 	TB_BOD(tp) = tbtbod (TB_MAXPAR(tp), TB_MAXCOLS(tp))
 
@@ -70,12 +71,13 @@ begin
 	offset = 0			# only needed if column selector used
 	do colnum = 1, tbpsta (template, TBL_NCOLS) {
 	    icp = tbcnum (template, colnum)
-	    call calloc (ocp, LEN_COLSTRUCT, TY_STRUCT)
+	    sz_val = LEN_COLSTRUCT
+	    call calloc (ocp, sz_val, TY_STRUCT)
 	    TB_COLINFO(tp,colnum) = ocp
 
 	    # Copy the contents of the column descriptor.
 	    do k = 1, LEN_COLSTRUCT
-		Memi[ocp+k-1] = Memi[icp+k-1]
+		Memp[ocp+k-1] = Memp[icp+k-1]
 
 	    # Update column number and offset if a column selector was used.
 	    if (TB_COLUMN_SELECT(template) == YES) {

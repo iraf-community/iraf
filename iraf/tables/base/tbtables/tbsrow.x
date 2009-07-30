@@ -25,11 +25,11 @@ include "tbtables.h"
 procedure tbsrow (tp, selrow, rownum)
 
 pointer tp		# i: pointer to table descriptor
-int	selrow		# i: row number (or selected row number)
-int	rownum		# o: actual row number
+long	selrow		# i: row number (or selected row number)
+long	rownum		# o: actual row number
 #--
-int	num_new_rows		# number of new rows to add
-int	rst_rownum(), rst_nelem()
+long	num_new_rows		# number of new rows to add
+long	rst_rownum(), rst_nelem()
 errchk	rst_rownum, rst_addtab
 
 begin

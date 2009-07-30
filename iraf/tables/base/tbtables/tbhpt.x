@@ -21,6 +21,7 @@ pointer tp			# i: Pointer to table descriptor
 double	value			# i: Value of parameter
 char	keyword[ARB]		# i: Name of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 pointer errmess			# scratch for possible error message
@@ -43,7 +44,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 
 	call tbhfkw (tp, keyword, parnum)			# find keyword
 	if (parnum > 0) {
@@ -52,7 +54,8 @@ begin
 		call pargd (value)
 	    call tbhpnp (tp, parnum, keyword, dtype, Memc[par])	# put Nth param.
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 		"tbhptd:  `%s' not found; use tbhadd to add new parameter")
 		call pargstr (keyword)
@@ -72,6 +75,7 @@ pointer tp			# i: Pointer to table descriptor
 real	value			# i: Value of parameter
 char	keyword[ARB]		# i: Name of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 pointer errmess			# scratch for possible error message
@@ -94,7 +98,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 
 	call tbhfkw (tp, keyword, parnum)			# find keyword
 	if (parnum > 0) {
@@ -103,7 +108,8 @@ begin
 		call pargr (value)
 	    call tbhpnp (tp, parnum, keyword, dtype, Memc[par])	# put Nth param.
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 		"tbhptr:  `%s' not found; use tbhadr to add new parameter")
 		call pargstr (keyword)
@@ -123,6 +129,7 @@ pointer tp			# i: Pointer to table descriptor
 int	value			# i: Value of parameter
 char	keyword[ARB]		# i: Name of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 pointer errmess			# scratch for possible error message
@@ -145,7 +152,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 
 	call tbhfkw (tp, keyword, parnum)			# find keyword
 	if (parnum > 0) {
@@ -154,7 +162,8 @@ begin
 		call pargi (value)
 	    call tbhpnp (tp, parnum, keyword, dtype, Memc[par])	# put Nth param.
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 		"tbhpti:  `%s' not found; use tbhadi to add new parameter")
 		call pargstr (keyword)
@@ -172,6 +181,7 @@ pointer tp			# i: Pointer to table descriptor
 bool	value			# i: Value of parameter
 char	keyword[ARB]		# i: Name of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 pointer errmess			# scratch for possible error message
@@ -195,7 +205,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 
 	call tbhfkw (tp, keyword, parnum)			# find keyword
 	if (parnum > 0) {
@@ -208,7 +219,8 @@ begin
 	    call pargi (intval)
 	    call tbhpnp (tp, parnum, keyword, dtype, Memc[par])	# put Nth param.
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 		"tbhptb:  `%s' not found; use tbhadb to add new parameter")
 		call pargstr (keyword)
@@ -228,6 +240,7 @@ pointer tp			# i: Pointer to table descriptor
 char	keyword[ARB]		# i: Name of parameter
 char	text[ARB]		# i: Value of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer errmess			# scratch for possible error message
 int	dtype			# data type
@@ -256,7 +269,8 @@ begin
 		call tbhpnp (tp, parnum, keyword, dtype, text)	# put Nth param.
 	    } else {
 		call smark (sp)
-		call salloc (errmess, SZ_LINE, TY_CHAR)
+		sz_val = SZ_LINE
+		call salloc (errmess, sz_val, TY_CHAR)
 		call sprintf (Memc[errmess], SZ_LINE,
 		"tbhptt:  `%s' not found; use tbhadt to add new parameter")
 		    call pargstr (keyword)

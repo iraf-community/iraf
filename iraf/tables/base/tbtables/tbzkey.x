@@ -29,6 +29,8 @@ int	parnum		# i: parameter number, or zero to append a new one
 #--
 int	keynum		# = parnum or TB_NPAR + 1
 int	in_len		# length of input string
+long	l_val
+size_t	sz_val
 int	strlen()
 errchk	tbtchs
 
@@ -45,8 +47,10 @@ begin
 	}
 
 	# Allocate or reallocate the array of keywords, if necessary.
-	if (TB_KEYLIST_PTR(tp) == NULL || keynum > TB_MAXPAR(tp))
-	    call tbtchs (tp, TB_NPAR(tp) + INCR_N_KEYWORDS, -1, -1, -1)
+	if (TB_KEYLIST_PTR(tp) == NULL || keynum > TB_MAXPAR(tp)) {
+	    l_val = -1
+	    call tbtchs (tp, TB_NPAR(tp) + INCR_N_KEYWORDS, -1, l_val, l_val)
+	}
 
 	# If we're replacing an existing keyword, free the previous memory.
 	if (keynum <= TB_NPAR(tp)) {
@@ -56,7 +60,8 @@ begin
 
 	# Allocate space for a new entry, and copy the input string.
 	in_len = strlen (str)
-	call malloc (TB_KEYWORD(tp,keynum), in_len, TY_CHAR)
+	sz_val = in_len
+	call malloc (TB_KEYWORD(tp,keynum), sz_val, TY_CHAR)
 	call strcpy (str, Memc[TB_KEYWORD(tp,keynum)], in_len)
 
 	# chop off newline, if present

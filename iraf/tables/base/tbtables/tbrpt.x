@@ -21,13 +21,16 @@ pointer tp			# i: pointer to table descriptor
 pointer cp[ARB]			# i: array of pointers to column descriptors
 double	buffer[ARB]		# i: array of values to be put into table
 int	numcols			# i: number of columns
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# loop index for column number
+long	c_1
 errchk	tbswer1, tbxrpd, tbyrpd, tbzptd, tbfapd
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -44,7 +47,7 @@ begin
 		call tbzptd (tp, cp[k], rownum, buffer[k])
 	else if (TB_TYPE(tp) == TBL_TYPE_FITS)
 	    do k = 1, numcols
-		call tbfapd (tp, cp[k], rownum, buffer[k], 1, 1)
+		call tbfapd (tp, cp[k], rownum, buffer[k], c_1, c_1)
 	else
 	    call error (ER_TBCORRUPTED, "tbrptd:  table type is messed up")
 
@@ -61,13 +64,16 @@ pointer tp			# i: pointer to table descriptor
 pointer cp[ARB]			# i: array of pointers to column descriptors
 real	buffer[ARB]		# i: array of values to be put into table
 int	numcols			# i: number of columns
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# loop index for column number
+long	c_1
 errchk	tbswer1, tbxrpr, tbyrpr, tbzptr, tbfapr
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -83,7 +89,7 @@ begin
 		call tbzptr (tp, cp[k], rownum, buffer[k])
 	else if (TB_TYPE(tp) == TBL_TYPE_FITS)
 	    do k = 1, numcols
-		call tbfapr (tp, cp[k], rownum, buffer[k], 1, 1)
+		call tbfapr (tp, cp[k], rownum, buffer[k], c_1, c_1)
 	else
 	    call error (ER_TBCORRUPTED, "tbrptr:  table type is messed up")
 
@@ -100,13 +106,16 @@ pointer tp			# i: pointer to table descriptor
 pointer cp[ARB]			# i: array of pointers to column descriptors
 int	buffer[ARB]		# i: array of values to be put into table
 int	numcols			# i: number of columns
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# loop index for column number
+long	c_1
 errchk	tbswer1, tbxrpi, tbyrpi, tbzpti, tbfapi
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -122,7 +131,7 @@ begin
 		call tbzpti (tp, cp[k], rownum, buffer[k])
 	else if (TB_TYPE(tp) == TBL_TYPE_FITS)
 	    do k = 1, numcols
-		call tbfapi (tp, cp[k], rownum, buffer[k], 1, 1)
+		call tbfapi (tp, cp[k], rownum, buffer[k], c_1, c_1)
 	else
 	    call error (ER_TBCORRUPTED, "tbrpti:  table type is messed up")
 
@@ -139,13 +148,16 @@ pointer tp			# i: pointer to table descriptor
 pointer cp[ARB]			# i: array of pointers to column descriptors
 short	buffer[ARB]		# i: array of values to be put into table
 int	numcols			# i: number of columns
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# loop index for column number
+long	c_1
 errchk	tbswer1, tbxrps, tbyrps, tbzpts, tbfaps
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -161,7 +173,7 @@ begin
 		call tbzpts (tp, cp[k], rownum, buffer[k])
 	else if (TB_TYPE(tp) == TBL_TYPE_FITS)
 	    do k = 1, numcols
-		call tbfaps (tp, cp[k], rownum, buffer[k], 1, 1)
+		call tbfaps (tp, cp[k], rownum, buffer[k], c_1, c_1)
 	else
 	    call error (ER_TBCORRUPTED, "tbrpts:  table type is messed up")
 
@@ -178,13 +190,16 @@ pointer tp			# i: pointer to table descriptor
 pointer cp[ARB]			# i: array of pointers to column descriptors
 bool	buffer[ARB]		# i: array of values to be put into table
 int	numcols			# i: number of columns
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# loop index for column number
+long	c_1
 errchk	tbswer1, tbxrpb, tbyrpb, tbzptb, tbfapb
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -200,7 +215,7 @@ begin
 		call tbzptb (tp, cp[k], rownum, buffer[k])
 	else if (TB_TYPE(tp) == TBL_TYPE_FITS)
 	    do k = 1, numcols
-		call tbfapb (tp, cp[k], rownum, buffer[k], 1, 1)
+		call tbfapb (tp, cp[k], rownum, buffer[k], c_1, c_1)
 	else
 	    call error (ER_TBCORRUPTED, "tbrptb:  table type is messed up")
 
@@ -218,13 +233,16 @@ pointer cp[ARB]			# i: array of pointers to column descriptors
 char	buffer[lenstr,ARB]	# i: array of values to be put into table
 int	lenstr			# i: length of each string in array buffer
 int	numcols			# i: number of columns
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 int	k			# loop index for column number
+long	c_1
 errchk	tbswer1, tbxrpt, tbyrpt, tbzptt, tbfapt
 
 begin
+	c_1 = 1
+
 	if (TB_READONLY(tp))
 	    call error (ER_TBREADONLY, "can't write to table; it's readonly")
 
@@ -240,7 +258,7 @@ begin
 		call tbzptt (tp, cp[k], rownum, buffer[1,k])
 	else if (TB_TYPE(tp) == TBL_TYPE_FITS)
 	    do k = 1, numcols
-		call tbfapt (tp, cp[k], rownum, buffer[1,k], lenstr, 1, 1)
+		call tbfapt (tp, cp[k], rownum, buffer[1,k], lenstr, c_1, c_1)
 	else
 	    call error (ER_TBCORRUPTED, "tbrptt:  table type is messed up")
 

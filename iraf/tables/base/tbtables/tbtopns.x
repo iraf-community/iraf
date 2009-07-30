@@ -48,12 +48,13 @@ int	fd			# o: fd number for table file
 #--
 pointer tbtopn(), tbtopn2()
 errchk	tbtopn, tbtopn2
+include	<nullptr.inc>
 
 begin
 	if (byte_swap == YES)
 	    tp = tbtopn2 (tablename)
 	else
-	    tp = tbtopn (tablename, READ_ONLY, NULL)
+	    tp = tbtopn (tablename, READ_ONLY, NULLPTR)
 
 	fd = TB_FILE(tp)
 end
@@ -67,6 +68,7 @@ pointer procedure tbtopn2 (tablename)
 
 char	tablename[ARB]		# i: the name of the table
 #--
+size_t	sz_val
 pointer tp			# pointer to table descriptor
 pointer sp
 pointer name			# scratch for table name including extension
@@ -76,21 +78,25 @@ errchk	tbtext, malloc, tbuopn2
 
 begin
 	call smark (sp)
-	call salloc (name, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (name, sz_val, TY_CHAR)
 	call tbtext (tablename, Memc[name], SZ_FNAME)
 
 	if (access (Memc[name], 0, TEXT_FILE) == YES) {
 	    call smark (sp)
-	    call salloc (message, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (message, sz_val, TY_CHAR)
 	    call sprintf (Memc[message], SZ_FNAME, "`%s' is not a binary table")
 		call pargstr (Memc[name])
 	    call error (1, Memc[message])
 	}
 
 	# Allocate space for the table descriptor and the table name.
-	call calloc (tp, LEN_TBLSTRUCT, TY_STRUCT)
-	call malloc (TB_NAME_PTR(tp), SZ_FNAME, TY_CHAR)
-	call malloc (TB_OS_FILENAME_PTR(tp), SZ_FNAME, TY_CHAR)
+	sz_val = LEN_TBLSTRUCT
+	call calloc (tp, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call malloc (TB_NAME_PTR(tp), sz_val, TY_CHAR)
+	call malloc (TB_OS_FILENAME_PTR(tp), sz_val, TY_CHAR)
 	TB_OS_FILENAME(tp) = EOS	# not used (only used for CFITSIO)
 	TB_EXTNAME_PTR(tp) = NULL
 
@@ -156,6 +162,7 @@ procedure tbuopn2 (tp)
 
 pointer tp		# i: pointer to table descriptor
 #--
+size_t	sz_val
 pointer colptr		# pointer to column descriptor
 int	colnum		# column number (a loop index)
 int	open()
@@ -168,11 +175,13 @@ begin
 	call tbtrsi2 (tp)		# read size info & swap bytes
 
 	# Allocate space for the array of pointers to column descriptors.
-	call malloc (TB_COLPTR(tp), TB_MAXCOLS(tp), TY_POINTER)
+	sz_val = TB_MAXCOLS(tp)
+	call malloc (TB_COLPTR(tp), sz_val, TY_POINTER)
 
 	# Create column descriptors & read contents from table.
 	do colnum = 1, TB_NCOLS(tp) {
-	    call malloc (colptr, LEN_COLSTRUCT, TY_STRUCT)
+	    sz_val = LEN_COLSTRUCT
+	    call malloc (colptr, sz_val, TY_STRUCT)
 	    TB_COLINFO(tp,colnum) = colptr
 	    # read column descriptor & swap bytes
 	    call tbcrcd2 (tp, colptr, colnum)
@@ -187,18 +196,30 @@ procedure tbtrsi2 (tp)
 
 pointer tp			# Pointer to table descriptor
 #--
-int	sizinfo[LEN_SIZINFO]	# Size information record
-long	tbtbod()
-int	read()
+long	sizinfo[LEN_SIZINFO]	# Size information record
+long	l_val
+size_t	sz_val
+size_t	c_1
+long	tbtbod(), read()
 errchk	seek, read
 
 begin
-	call seek (TB_FILE(tp), BOF)
-	if (read (TB_FILE(tp), sizinfo, SZ_SIZINFO) == EOF)
+	c_1 = 1
+
+	l_val = BOF
+	call seek (TB_FILE(tp), l_val)
+	sz_val = SZ_SIZINFO
+	# arg2: incompatible pointer
+	if (read (TB_FILE(tp), sizinfo, sz_val) == EOF)
 	    call error (ER_TBFILEMPTY, "table data file is empty")
 
 	# Swap bytes in the size information record.
-	call bswap4 (sizinfo, 1, sizinfo, 1, SZ_SIZINFO*SZB_CHAR)
+	sz_val = SZ_SIZINFO*SZB_CHAR
+	if ( SZ_LONG == 2 ) {
+	    call bswap4 (sizinfo, c_1, sizinfo, c_1, sz_val)
+	} else {
+	    call bswap8 (sizinfo, c_1, sizinfo, c_1, sz_val)
+	}
 
 	TB_TYPE(tp) = S_TYPE(sizinfo)
 	if ((TB_TYPE(tp) != TBL_TYPE_S_ROW) &&
@@ -229,34 +250,46 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 int	colnum			# i: column number
 #--
+size_t	sz_val
+size_t	c_1
 pointer sp
 pointer coldef			# column descriptor read from table
 pointer pformat			# scratch for print format
 long	offset			# location of column descriptor in table file
-int	stat			# status from read operation
-int	read()
+long	stat			# status from read operation
+long	read()
 
 errchk	seek, read
 
 begin
+	c_1 = 1
+
 	if (TB_TYPE(tp) == TBL_TYPE_TEXT || TB_TYPE(tp) == TBL_TYPE_FITS)
 	    call error (1, "tbcrcd:  internal error")
 
 	call smark (sp)
-	call salloc (coldef, LEN_COLDEF, TY_STRUCT)
-	call salloc (pformat, SZ_COLFMT, TY_CHAR)
+	sz_val = LEN_COLDEF
+	call salloc (coldef, sz_val, TY_STRUCT)
+	sz_val = SZ_COLFMT
+	call salloc (pformat, sz_val, TY_CHAR)
 
 	offset = SZ_SIZINFO +
 		TB_MAXPAR(tp) * SZ_PACKED_REC +
 		(colnum-1) * SZ_COLDEF + 1
 	call seek (TB_FILE(tp), offset)
-	stat = read (TB_FILE(tp), Memi[coldef], SZ_COLDEF)
+	sz_val = SZ_COLDEF
+	stat = read (TB_FILE(tp), Memc[P2C(coldef)], sz_val)
 	if (stat == EOF)
 	    call error (ER_TBCINFMISSING,
 			"tbcrcd:  EOF while reading column info for table")
 
 	# Swap bytes in the first four longwords.
-	call bswap4 (Memi[coldef], 1, Memi[coldef], 1, 4*SZ_INT*SZB_CHAR)
+	sz_val = 4*SZ_STRUCT*SZB_CHAR
+	if ( SZ_STRUCT == 2 ) {
+	    call bswap4 (Memp[coldef], c_1, Memp[coldef], c_1, sz_val)
+	} else {
+	    call bswap8 (Memp[coldef], c_1, Memp[coldef], c_1, sz_val)
+	}
 
 	# Check for and correct data type TY_CHAR.
 	if (COL_DTYPE(cp) == TY_CHAR)
@@ -275,18 +308,21 @@ begin
 
 	call tbbncp1 (CD_COL_NAME(coldef), COL_NAME(cp),
 		SZ_CD_COLNAME / SZB_CHAR)
-	call strupk (COL_NAME(cp), COL_NAME(cp), SZ_COLNAME)
+	sz_val = SZ_COLNAME
+	call strupk (COL_NAME(cp), COL_NAME(cp), sz_val)
 
 	call tbbncp1 (CD_COL_UNITS(coldef), COL_UNITS(cp),
 		SZ_CD_COLUNITS / SZB_CHAR)
-	call strupk (COL_UNITS(cp), COL_UNITS(cp), SZ_COLUNITS)
+	sz_val = SZ_COLUNITS
+	call strupk (COL_UNITS(cp), COL_UNITS(cp), sz_val)
 
 	# include a leading '%' in the print format
 	# (tbbncp1 is in tbcrcd.x)
 	Memc[pformat] = '%'
 	call tbbncp1 (CD_COL_FMT(coldef), Memc[pformat+1],
 		SZ_CD_COLFMT / SZB_CHAR)
-	call strupk (Memc[pformat+1], Memc[pformat+1], SZ_COLFMT-1)
+	sz_val = SZ_COLFMT-1
+	call strupk (Memc[pformat+1], Memc[pformat+1], sz_val)
 	call strcpy (Memc[pformat], COL_FMT(cp), SZ_COLFMT)
 
 	call sfree (sp)

@@ -40,6 +40,7 @@ char	rowselect[ARB]	# o: row selector string
 char	colselect[ARB]	# o: column selector string
 int	maxchsel	# i: max size of rowselect and colselect
 #--
+size_t	sz_val
 int	level, ip, op, ch	# for extracting file name
 pointer sp
 pointer tablename	# input name without selectors
@@ -59,8 +60,9 @@ begin
 
 	# Check for blank input name.
 	call smark (sp)
-	call salloc (tablename, localmax, TY_CHAR)
-	call salloc (expr, localmax, TY_CHAR)
+	sz_val = localmax
+	call salloc (tablename, sz_val, TY_CHAR)
+	call salloc (expr, sz_val, TY_CHAR)
 	nchar = nowhite (inputname, Memc[expr], localmax)
 	if (nchar < 1) {
 	    fname[1] = EOS
@@ -226,6 +228,7 @@ int	extver		# o: extension version number
 int	hdu		# o: HDU number for FITS file
 int	overwrite	# o: YES, NO, or YES-1 --> not specified
 #--
+size_t	sz_val
 pointer sp
 pointer token		# scratch for the value of the token
 pointer word		# scratch
@@ -247,8 +250,9 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (token, SZ_LINE, TY_CHAR)
-	call salloc (word, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (token, sz_val, TY_CHAR)
+	call salloc (word, sz_val, TY_CHAR)
 
 	ip = 1
 	done = false

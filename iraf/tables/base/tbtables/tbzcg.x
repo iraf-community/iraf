@@ -13,11 +13,11 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 bool	buffer[ARB]		# o: buffer for values to be gotten
 bool	nullflag[ARB]		# o: true if element is undefined in table
-int	firstrow		# i: number of first row to get
-int	lastrow			# i: number of last row to get
+long	firstrow		# i: number of first row to get
+long	lastrow			# i: number of last row to get
 #--
-int	row			# loop index for row number
-int	k			# index into buffer & nullflag
+long	row			# loop index for row number
+long	k			# index into buffer & nullflag
 errchk	tbzgtb
 
 begin
@@ -35,11 +35,11 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 double	buffer[ARB]		# o: buffer for values to be gotten
 bool	nullflag[ARB]		# o: true if element is undefined in table
-int	firstrow		# i: number of first row to get
-int	lastrow			# i: number of last row to get
+long	firstrow		# i: number of first row to get
+long	lastrow			# i: number of last row to get
 #--
-int	row			# loop index for row number
-int	k			# index into buffer & nullflag
+long	row			# loop index for row number
+long	k			# index into buffer & nullflag
 errchk	tbzgtd
 
 begin
@@ -67,11 +67,11 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 real	buffer[ARB]		# o: buffer for values to be gotten
 bool	nullflag[ARB]		# o: true if element is undefined in table
-int	firstrow		# i: number of first row to get
-int	lastrow			# i: number of last row to get
+long	firstrow		# i: number of first row to get
+long	lastrow			# i: number of last row to get
 #--
-int	row			# loop index for row number
-int	k			# index into buffer & nullflag
+long	row			# loop index for row number
+long	k			# index into buffer & nullflag
 errchk	tbzgtr
 
 begin
@@ -89,11 +89,11 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 int	buffer[ARB]		# o: buffer for values to be gotten
 bool	nullflag[ARB]		# o: true if element is undefined in table
-int	firstrow		# i: number of first row to get
-int	lastrow			# i: number of last row to get
+long	firstrow		# i: number of first row to get
+long	lastrow			# i: number of last row to get
 #--
-int	row			# loop index for row number
-int	k			# index into buffer & nullflag
+long	row			# loop index for row number
+long	k			# index into buffer & nullflag
 errchk	tbzgti
 
 begin
@@ -121,11 +121,11 @@ pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
 short	buffer[ARB]		# o: buffer for values to be gotten
 bool	nullflag[ARB]		# o: true if element is undefined in table
-int	firstrow		# i: number of first row to get
-int	lastrow			# i: number of last row to get
+long	firstrow		# i: number of first row to get
+long	lastrow			# i: number of last row to get
 #--
-int	row			# loop index for row number
-int	k			# index into buffer & nullflag
+long	row			# loop index for row number
+long	k			# index into buffer & nullflag
 errchk	tbzgts
 
 begin
@@ -145,11 +145,11 @@ pointer cp			# i: pointer to column descriptor
 char	buffer[lenstr,ARB]	# o: buffer for values to be gotten
 bool	nullflag[ARB]		# o: true if element is undefined in table
 int	lenstr			# i: size of each element
-int	firstrow		# i: number of first row to get
-int	lastrow			# i: number of last row to get
+long	firstrow		# i: number of first row to get
+long	lastrow			# i: number of last row to get
 #--
-int	row			# loop index for row number
-int	k			# index into buffer & nullflag
+long	row			# loop index for row number
+long	k			# index into buffer & nullflag
 bool	streq()
 errchk	tbzgtt
 

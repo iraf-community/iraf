@@ -11,8 +11,8 @@ pointer colptr[numcols]		# Array of pointers to descr of new columns
 int	numcols			# The number of new columns
 
 int	fd			# identifies the file for the table data
-int	firstrow		# the first row to be set to indef
-int	lastrow			# the last row to be set to indef
+long	firstrow		# the first row to be set to indef
+long	lastrow			# the last row to be set to indef
 errchk	tbyscn
 
 begin

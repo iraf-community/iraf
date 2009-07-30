@@ -9,7 +9,7 @@ include "tbtables.h"
 long procedure tbxoff (tp, rownum)
 
 pointer tp			# Pointer to table descriptor
-int	rownum			# The row number
+long	rownum			# The row number
 
 long	offset			# offset to beginning of row
 

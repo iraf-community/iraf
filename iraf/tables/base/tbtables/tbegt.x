@@ -25,36 +25,38 @@ procedure tbegtd (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 double	buffer			# o: buffer for value to be gotten
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for reading
 int	dtype			# data type of column
-int	nret
+long	nret
 # buffers for copying elements of various data types
 char	cbuf[SZ_FNAME]
 real	rbuf
 int	ibuf
 short	sbuf
 bool	bbuf
-long	tbeoff()
-int	tbfagd()
+long	c_1
+long	tbeoff(), tbfagd()
 int	nscan()
 errchk	tbsirow, tbegpb, tbegpd, tbegpi, tbegps, tbegpr, tbegpt, tbfagd, tbzgtd
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzgtd (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    nret = tbfagd (tp, cptr, rownum, buffer, 1, 1)
+	    nret = tbfagd (tp, cptr, rownum, buffer, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {
@@ -104,36 +106,38 @@ procedure tbegtr (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 real	buffer			# o: buffer for value to be gotten
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for reading
 int	dtype			# data type of column
-int	nret
+long	nret
 # buffers for copying elements of various data types
 char	cbuf[SZ_FNAME]
 double	dbuf
 int	ibuf
 short	sbuf
 bool	bbuf
-long	tbeoff()
-int	tbfagr()
+long	c_1
+long	tbeoff(), tbfagr()
 int	nscan()
 errchk	tbsirow, tbegpb, tbegpd, tbegpi, tbegps, tbegpr, tbegpt, tbfagr, tbzgtr
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzgtr (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    nret = tbfagr (tp, cptr, rownum, buffer, 1, 1)
+	    nret = tbfagr (tp, cptr, rownum, buffer, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {
@@ -141,7 +145,7 @@ begin
 	    call tbegpr (tp, cptr, offset, rownum, buffer)
 	case TBL_TY_DOUBLE:
 	    call tbegpd (tp, cptr, offset, rownum, dbuf)
-	    if (TBL_IS_INDEFD (dbuf) || abs (dbuf) > MAX_REAL)
+	    if (TBL_IS_INDEFD (dbuf) || dabs (dbuf) > MAX_REAL)
 		buffer = INDEFR
 	    else
 		buffer = dbuf
@@ -182,51 +186,54 @@ procedure tbegti (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 int	buffer			# o: buffer for value to be gotten
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for reading
 int	dtype			# data type of column
-int	nret
+long	nret
 # buffers for copying elements of various data types
 char	cbuf[SZ_FNAME]
 double	dbuf
 real	rbuf
 short	sbuf
 bool	bbuf
-long	tbeoff()
-int	tbfagi()
-int	nscan()
+long	c_1
+long	tbeoff(), tbfagi()
+int	nscan(), inint()
+real	aabs()
 errchk	tbsirow, tbegpb, tbegpd, tbegpi, tbegps, tbegpr, tbegpt, tbfagi, tbzgti
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzgti (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    nret = tbfagi (tp, cptr, rownum, buffer, 1, 1)
+	    nret = tbfagi (tp, cptr, rownum, buffer, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {
 	case TBL_TY_REAL:
 	    call tbegpr (tp, cptr, offset, rownum, rbuf)
-	    if (IS_INDEFR(rbuf) || abs (rbuf) > MAX_INT)
+	    if (IS_INDEFR(rbuf) || aabs (rbuf) > MAX_INT)
 		buffer = INDEFI
 	    else
-		buffer = nint (rbuf)
+		buffer = inint (rbuf)
 	case TBL_TY_DOUBLE:
 	    call tbegpd (tp, cptr, offset, rownum, dbuf)
-	    if (TBL_IS_INDEFD (dbuf) || abs (dbuf) > MAX_INT)
+	    if (TBL_IS_INDEFD (dbuf) || dabs (dbuf) > MAX_INT)
 		buffer = INDEFI
 	    else
-		buffer = nint (dbuf)
+		buffer = idnint (dbuf)
 	case TBL_TY_INT:
 	    call tbegpi (tp, cptr, offset, rownum, buffer)
 	case TBL_TY_SHORT:
@@ -248,10 +255,10 @@ begin
 		    call gargd (dbuf)
 		if (nscan() < 1)
 		    buffer = INDEFI
-		else if (IS_INDEFD(dbuf) || abs (dbuf) > MAX_INT)
+		else if (IS_INDEFD(dbuf) || dabs (dbuf) > MAX_INT)
 		    buffer = INDEFI
 		else
-		    buffer = nint (dbuf)
+		    buffer = idnint (dbuf)
 	    } else {
 		call error (ER_TBCOLBADTYP,
 			"tbegti:  bad data type; table or memory corrupted?")
@@ -263,54 +270,58 @@ procedure tbegts (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 short	buffer			# o: buffer for value to be gotten
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for reading
 int	dtype			# data type of column
-int	nret
+long	nret
 # buffers for copying elements of various data types
 char	cbuf[SZ_FNAME]
 double	dbuf
 real	rbuf
 int	ibuf
 bool	bbuf
-long	tbeoff()
-int	tbfags()
+long	c_1
+long	tbeoff(), tbfags()
 int	nscan()
+short	snint(), sdnint()
+real	aabs()
 errchk	tbsirow, tbegpb, tbegpd, tbegpi, tbegps, tbegpr, tbegpt, tbfags, tbzgts
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzgts (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    nret = tbfags (tp, cptr, rownum, buffer, 1, 1)
+	    nret = tbfags (tp, cptr, rownum, buffer, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {
 	case TBL_TY_REAL:
 	    call tbegpr (tp, cptr, offset, rownum, rbuf)
-	    if (IS_INDEFR(rbuf) || (abs (rbuf) > MAX_SHORT))
+	    if (IS_INDEFR(rbuf) || (aabs (rbuf) > MAX_SHORT))
 		buffer = INDEFS
 	    else
-		buffer = nint (rbuf)
+		buffer = snint (rbuf)
 	case TBL_TY_DOUBLE:
 	    call tbegpd (tp, cptr, offset, rownum, dbuf)
-	    if (TBL_IS_INDEFD (dbuf) || abs (dbuf) > MAX_SHORT)
+	    if (TBL_IS_INDEFD (dbuf) || dabs (dbuf) > MAX_SHORT)
 		buffer = INDEFS
 	    else
-		buffer = nint (dbuf)
+		buffer = sdnint (dbuf)
 	case TBL_TY_INT:
 	    call tbegpi (tp, cptr, offset, rownum, ibuf)
-	    if (IS_INDEFI(ibuf) || (abs (ibuf) > MAX_SHORT))
+	    if (IS_INDEFI(ibuf) || (iabs (ibuf) > MAX_SHORT))
 		buffer = INDEFS
 	    else
 		buffer = ibuf
@@ -329,10 +340,10 @@ begin
 		    call gargd (dbuf)
 		if (nscan() < 1)
 		    buffer = INDEFS
-		else if (IS_INDEFD(dbuf) || abs (dbuf) > MAX_SHORT)
+		else if (IS_INDEFD(dbuf) || dabs (dbuf) > MAX_SHORT)
 		    buffer = INDEFS
 		else
-		    buffer = nint (dbuf)
+		    buffer = sdnint (dbuf)
 	    } else {
 		call error (ER_TBCOLBADTYP,
 			"tbegts:  bad data type; table or memory corrupted?")
@@ -344,48 +355,50 @@ procedure tbegtb (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 bool	buffer			# o: buffer for value to be gotten
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for reading
 int	dtype			# data type of column
-int	nret
+long	nret
 # buffers for copying elements of various data types
 char	cbuf[SZ_FNAME]
 double	dbuf
 real	rbuf
 int	ibuf
 short	sbuf
-long	tbeoff()
-int	tbfagb()
-int	nscan()
+long	c_1
+long	tbeoff(), tbfagb()
+int	nscan(), inint()
 errchk	tbsirow, tbegpb, tbegpd, tbegpi, tbegps, tbegpr, tbegpt, tbfagb, tbzgtb
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzgtb (tp, cptr, rownum, buffer)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    nret = tbfagb (tp, cptr, rownum, buffer, 1, 1)
+	    nret = tbfagb (tp, cptr, rownum, buffer, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {
 	case TBL_TY_REAL:
 	    call tbegpr (tp, cptr, offset, rownum, rbuf)
-	    if (IS_INDEFR(rbuf) || (nint (rbuf) == NO))
+	    if (IS_INDEFR(rbuf) || (inint (rbuf) == NO))
 		buffer = false
 	    else
 		buffer = true
 	case TBL_TY_DOUBLE:
 	    call tbegpd (tp, cptr, offset, rownum, dbuf)
-	    if (TBL_IS_INDEFD (dbuf) || (nint (dbuf) == NO))
+	    if (TBL_IS_INDEFD (dbuf) || (idnint (dbuf) == NO))
 		buffer = false
 	    else
 		buffer = true
@@ -421,36 +434,38 @@ procedure tbegtt (tp, cptr, selrow, buffer, maxch)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	selrow			# i: row number (or selected row number)
+long	selrow			# i: row number (or selected row number)
 char	buffer[ARB]		# o: buffer for value to be gotten
 int	maxch			# i: max number of char in output string
 #--
-int	rownum			# actual row number
+long	rownum			# actual row number
 long	offset			# offset in char to location for reading
 int	dtype			# data type of column
-int	nret
+long	nret
 # buffers for copying elements of various data types
 double	dbuf
 real	rbuf
 int	ibuf
 short	sbuf
 bool	bbuf
-long	tbeoff()
-int	tbfagt()
+long	c_1
+long	tbeoff(), tbfagt()
 errchk	tbsirow, tbegpb, tbegpd, tbegpi, tbegps, tbegpr, tbegpt, tbfagt, tbzgtt
 
 begin
+	c_1 = 1
+
 	call tbsirow (tp, selrow, rownum)
 
 	if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 	    call tbzgtt (tp, cptr, rownum, buffer, maxch)
 	    return
 	} else if (TB_TYPE(tp) == TBL_TYPE_FITS) {
-	    nret = tbfagt (tp, cptr, rownum, buffer, maxch, 1, 1)
+	    nret = tbfagt (tp, cptr, rownum, buffer, maxch, c_1, c_1)
 	    return
 	}
 
-	offset = tbeoff (tp, cptr, rownum, 1)
+	offset = tbeoff (tp, cptr, rownum, c_1)
 
 	dtype = COL_DTYPE(cptr)
 	switch (dtype) {

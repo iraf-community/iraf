@@ -34,12 +34,13 @@ procedure tbzmem (tp, buf, row, line, wid, prec, fmt_code)
 
 pointer tp			# i: pointer to table descriptor
 char	buf[ARB]		# i: buffer containing line from file
-int	row			# i: row number
-int	line			# i: line number in input file
+long	row			# i: row number
+long	line			# i: line number in input file
 int	wid[ARB]		# io: width of each column
 int	prec[ARB]		# io: precision of each column
 char	fmt_code[ARB]		# io: format code
 #--
+size_t	sz_val
 pointer sp
 pointer word			# scratch for a word from the line
 pointer message			# scratch for possible error message
@@ -57,7 +58,8 @@ errchk	tbzpbt
 
 begin
 	call smark (sp)
-	call salloc (word, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (word, sz_val, TY_CHAR)
 
 	colnum = 0				# initial values
 	ip = 1
@@ -74,19 +76,21 @@ begin
 		colnum = colnum + 1
 
 		if (colnum > TB_NCOLS(tp)) {
-		    call salloc (message, SZ_LINE, TY_CHAR)
+		    sz_val = SZ_LINE
+		    call salloc (message, sz_val, TY_CHAR)
 		    call sprintf (Memc[message], SZ_LINE,
 	"column found in line %d that was not defined in first row")
-			call pargi (line)
+			call pargl (line)
 		    call error (1, Memc[message])
 		}
 
 		# Check whether the current word is too long.
 		if (width > SZ_LINE-1) {
-		    call salloc (message, SZ_LINE, TY_CHAR)
+		    sz_val = SZ_LINE
+		    call salloc (message, sz_val, TY_CHAR)
 		    call sprintf (Memc[message], SZ_LINE,
 	"string in line %d is too long for a table; the maximum is %s")
-			call pargi (line)
+			call pargl (line)
 			call pargi (SZ_LINE-1)
 		    call error (1, Memc[message])
 		}
@@ -173,9 +177,10 @@ procedure tbzmex (tp, buf, row, line)
 
 pointer tp			# i: pointer to table descriptor
 char	buf[ARB]		# i: buffer containing line from file
-int	row			# i: row number
-int	line			# i: line number in input file
+long	row			# i: row number
+long	line			# i: line number in input file
 #--
+size_t	sz_val
 pointer sp
 pointer word			# scratch for a word from the line
 pointer message			# scratch for possible error message
@@ -191,7 +196,8 @@ errchk	tbzpbt
 
 begin
 	call smark (sp)
-	call salloc (word, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (word, sz_val, TY_CHAR)
 
 	colnum = 0				# initial values
 	ip = 1
@@ -209,25 +215,27 @@ begin
 		colnum = colnum + 1
 
 		if (colnum > TB_NCOLS(tp)) {
-		    call salloc (message, SZ_LINE, TY_CHAR)
+		    sz_val = SZ_LINE
+		    call salloc (message, sz_val, TY_CHAR)
 		    call sprintf (Memc[message], SZ_LINE,
 	"column was found that was not explicitly defined (line %d)")
-			call pargi (line)
+			call pargl (line)
 		    call error (1, Memc[message])
 		}
 
 		# Check whether the current word is too long.
 		if (len > SZ_LINE-1) {
-		    call salloc (message, SZ_LINE, TY_CHAR)
+		    sz_val = SZ_LINE
+		    call salloc (message, sz_val, TY_CHAR)
 		    call sprintf (Memc[message], SZ_LINE,
 	"string in line %d is too long for a table; the maximum is %s")
-			call pargi (line)
+			call pargl (line)
 			call pargi (SZ_LINE-1)
 		    call error (1, Memc[message])
 		}
 
 		# A comma after whitespace means a column value was not given.
-		if (strne (Memc[word], ',')) {
+		if (strne (Memc[word], ",")) {
 
 		    # Check whether current word is consistent with
 		    # the data type of the column.
@@ -260,11 +268,12 @@ procedure tbzpbt (tp, cp, rownum, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
-int	rownum			# i: row number
+long	rownum			# i: row number
 char	buffer[ARB]		# i: value to be put
 #--
 int	lenstr			# length of a string table element
 int	ip			# offset to a string in Memc
+long	pp
 long	lval			# so we can use ctol
 int	ctod(), ctol()
 errchk	tbtchs
@@ -272,8 +281,10 @@ errchk	tbtchs
 begin
 	# Increase the size of buffers for storing column values, if necessary.
 	# (TB_MAXPAR remains unchanged.)
-	if (rownum > TB_ALLROWS(tp))
-	    call tbtchs (tp, -1, -1, -1, rownum + NUM_EXTRA)
+	if (rownum > TB_ALLROWS(tp)) {
+	    lval = -1
+	    call tbtchs (tp, -1, -1, lval, rownum + NUM_EXTRA)
+	}
 
 	# If we're writing beyond EOF, update TB_NROWS.
 	TB_NROWS(tp) = max (TB_NROWS(tp), rownum)
@@ -292,7 +303,7 @@ begin
 
 	} else {				# string
 	    lenstr = -COL_DTYPE(cp)		# not including EOS
-	    ip = (rownum - 1) * (lenstr + 1)	# including EOS
-	    call strcpy (buffer, Memc[COL_OFFSET(cp) + ip], lenstr)
+	    pp = (rownum - 1) * (lenstr + 1)	# including EOS
+	    call strcpy (buffer, Memc[COL_OFFSET(cp) + pp], lenstr)
 	}
 end

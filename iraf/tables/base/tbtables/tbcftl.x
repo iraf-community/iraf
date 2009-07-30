@@ -19,5 +19,5 @@ begin
 	ip = 2			# set ip to skip over the leading '%'
 	if (ctoi (COL_FMT(colptr), ip, ival) <= 0)
 	    ival = 25				# a default value
-	lenfmt = abs (ival)			# be careful of e.g. "%-12s"
+	lenfmt = iabs (ival)			# be careful of e.g. "%-12s"
 end

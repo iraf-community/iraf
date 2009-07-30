@@ -22,6 +22,7 @@ pointer tp			# i: pointer to table descriptor
 char	keyword[SZ_KEYWORD]	# i: keyword to be found
 char	comment[ARB]		# i: comment string for keyword
 #--
+size_t	sz_val
 pointer sp
 pointer str			# scratch for string read from header
 pointer value			# scratch for the string value
@@ -47,13 +48,15 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (str, SZ_PARREC, TY_CHAR)
-	call salloc (value, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
 
 	# Find the keyword in the header.
 	call tbhfkw (tp, keyword, parnum)
 	if (parnum < 1) {
-	    call salloc (errmsg, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (errmsg, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmsg], SZ_FNAME,
 			"tbhpcm:  keyword `%s' not found in table `%s'")
 		call pargstr (keyword)

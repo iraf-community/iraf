@@ -13,14 +13,14 @@ char	colname[SZ_COLNAME]	# i: name of column
 char	colunits[SZ_COLUNITS]	# i: units for column
 char	colfmt[SZ_COLFMT]	# i: print format for column
 int	datatype		# i: data types of column
-int	nelem			# i: number of elements for column
+long	nelem			# i: number of elements for column
 #--
 pointer cp[1]			# pointer to new column
 char	cname[SZ_COLNAME,1]	# name of column
 char	cunits[SZ_COLUNITS,1]	# units for column
 char	cfmt[SZ_COLFMT,1]	# print format for column
 int	dtype[1]		# datatype
-int	larray[1]		# nelem
+long	larray[1]		# nelem
 errchk	tbcdef
 
 begin

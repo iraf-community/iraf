@@ -16,14 +16,17 @@ procedure tbeppb (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 bool	buffer			# i: buffer containing value
 #--
+size_t	sz_val
 errchk	seek, write
 
 begin
 	call seek (TB_FILE(tp), offset)
-	call write (TB_FILE(tp), buffer, SZ_BOOL)
+	sz_val = SZ_BOOL
+	# arg2: incompatible pointer
+	call write (TB_FILE(tp), buffer, sz_val)
 end
 
 procedure tbeppd (tp, cptr, offset, rownum, buffer)
@@ -31,14 +34,17 @@ procedure tbeppd (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 double	buffer			# i: buffer containing value
 #--
+size_t	sz_val
 errchk	seek, write
 
 begin
 	call seek (TB_FILE(tp), offset)
-	call write (TB_FILE(tp), buffer, SZ_DOUBLE)
+	sz_val = SZ_DOUBLE
+	# arg2: incompatible pointer
+	call write (TB_FILE(tp), buffer, sz_val)
 end
 
 procedure tbeppr (tp, cptr, offset, rownum, buffer)
@@ -46,14 +52,17 @@ procedure tbeppr (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 real	buffer			# i: buffer containing value
 #--
+size_t	sz_val
 errchk	seek, write
 
 begin
 	call seek (TB_FILE(tp), offset)
-	call write (TB_FILE(tp), buffer, SZ_REAL)
+	sz_val = SZ_REAL
+	# arg2: incompatible pointer
+	call write (TB_FILE(tp), buffer, sz_val)
 end
 
 procedure tbeppi (tp, cptr, offset, rownum, buffer)
@@ -61,14 +70,17 @@ procedure tbeppi (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 int	buffer			# i: buffer containing value
 #--
+size_t	sz_val
 errchk	seek, write
 
 begin
 	call seek (TB_FILE(tp), offset)
-	call write (TB_FILE(tp), buffer, SZ_INT)
+	sz_val = SZ_INT
+	# arg2: incompatible pointer
+	call write (TB_FILE(tp), buffer, sz_val)
 end
 
 procedure tbepps (tp, cptr, offset, rownum, buffer)
@@ -76,14 +88,16 @@ procedure tbepps (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 short	buffer			# i: buffer containing value
 #--
+size_t	sz_val
 errchk	seek, write
 
 begin
 	call seek (TB_FILE(tp), offset)
-	call write (TB_FILE(tp), buffer, SZ_SHORT)
+	sz_val = SZ_SHORT
+	call write (TB_FILE(tp), buffer, sz_val)
 end
 
 procedure tbeppt (tp, cptr, offset, rownum, buffer)
@@ -91,17 +105,19 @@ procedure tbeppt (tp, cptr, offset, rownum, buffer)
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
 long	offset			# i: offset in char to location for reading
-int	rownum			# i: row number
+long	rownum			# i: row number
 char	buffer[ARB]		# i: buffer containing value
 #--
 char	cbuf[SZ_LINE]		# buffer for packed string
-int	nchar			# number of char to write
-int	tbeszt()
+size_t	nchar			# number of char to write
+size_t	sz_val
+long	tbeszt()
 errchk	seek, write
 
 begin
 	nchar = min (tbeszt (cptr), SZ_LINE)
-	call strpak (buffer, cbuf, SZ_LINE)	# pack the string
+	sz_val = SZ_LINE
+	call strpak (buffer, cbuf, sz_val)	# pack the string
 	call seek (TB_FILE(tp), offset)
 	call write (TB_FILE(tp), cbuf, nchar)
 end

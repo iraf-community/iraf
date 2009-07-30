@@ -23,10 +23,10 @@ include "tblerr.h"
 procedure tbswer (tp, selrow, rownum)
 
 pointer tp		# i: pointer to table descriptor
-int	selrow		# i: row number (or selected row number)
-int	rownum		# o: actual row number
+long	selrow		# i: row number (or selected row number)
+long	rownum		# o: actual row number
 #--
-int	nrows			# number of rows on entry to this routine
+long	nrows			# number of rows on entry to this routine
 errchk	tbsrow, tbfwer, tbxwer, tbywer, tbzwer
 
 begin

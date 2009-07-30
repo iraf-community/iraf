@@ -19,11 +19,11 @@ include "tblerr.h"
 procedure tbrnll (tp, sel_firstrow, sel_lastrow)
 
 pointer tp		# i: pointer to table descriptor
-int	sel_firstrow	# i: first row to be set to INDEF
-int	sel_lastrow	# i: last row to be set to INDEF
+long	sel_firstrow	# i: first row to be set to INDEF
+long	sel_lastrow	# i: last row to be set to INDEF
 #--
-int	firstrow, lastrow	# range of actual row numbers
-int	rst_rownum()
+long	firstrow, lastrow	# range of actual row numbers
+long	rst_rownum()
 errchk	rst_rownum, tbxnll, tbynll, tbznll, tbfnll
 
 begin

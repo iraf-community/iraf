@@ -22,7 +22,7 @@ begin
 	if (TB_SUBTYPE(tp) == TBL_SUBTYPE_BINTABLE || 
 	    TB_SUBTYPE(tp) == TBL_SUBTYPE_ASCII) {
 
-	    call fsmkyj (TB_FILE(tp), "NAXIS2", TB_NROWS(tp), "", status)
+	    call fsmkyk (TB_FILE(tp), "NAXIS2", TB_NROWS(tp), "", status)
 	    if (status != 0)
 		call tbferr (status)
 

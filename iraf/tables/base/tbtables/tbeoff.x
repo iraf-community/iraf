@@ -13,12 +13,12 @@ long procedure tbeoff (tp, cptr, rownum, elnum)
 
 pointer tp			# i: pointer to table descriptor
 pointer cptr			# i: pointer to column descriptor
-int	rownum			# i: row number
-int	elnum			# i: element number
+long	rownum			# i: row number
+long	elnum			# i: element number
 #--
 long	offset			# the offset in char
-int	sz_element		# size of one element (if entry is an array)
-int	tbeszt()
+long	sz_element		# size of one element (if entry is an array)
+long	tbeszt()
 
 begin
 	if (TB_TYPE(tp) == TBL_TYPE_S_ROW)

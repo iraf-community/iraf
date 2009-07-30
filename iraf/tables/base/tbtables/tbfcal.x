@@ -16,6 +16,7 @@ procedure tbfcal (itp, otp)
 pointer itp		# i: pointer to descriptor of input table
 pointer otp		# i: pointer to descriptor of output table
 #--
+size_t	sz_val
 pointer sp
 pointer value		# buffer for header record for parameter
 pointer comment		# scratch for comment string
@@ -38,9 +39,12 @@ errchk	tbferr, tbhgnp, tbhgti, tbhgtt
 
 begin
 	call smark (sp)
-	call salloc (value, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_FNAME, TY_CHAR)
-	call salloc (extname, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (value, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (comment, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (extname, sz_val, TY_CHAR)
 
 	# Copy each parameter except for the reserved keywords,
 	# such as XTENSION, TTYPEn.

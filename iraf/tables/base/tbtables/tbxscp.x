@@ -20,7 +20,7 @@ int	oldfd, newfd	# i: channel numbers for input & output tables
 int	old_maxpar	# i: previous maximum number of user parameters
 int	old_maxcols	# i: previous value for maximum number of columns
 int	old_ncols	# i: previous number of columns
-int	old_rowlen	# i: row length (=record length) in original table
+long	old_rowlen	# i: row length (=record length) in original table
 int	old_colused	# i: previous number of char used in row
 #--
 pointer sp
@@ -28,12 +28,12 @@ pointer sbuf			# size info buffer
 pointer rbuf			# buffer for copying table (row buffer)
 char	zero			# for amovkc
 long	oldoff, newoff		# offsets from start of old & new files
-int	sbufsiz			# size of buffer pointed to by sbuf
-int	rbufsiz			# size of buffer pointed to by rbuf
-int	k			# loop index
-int	stat
-long	tbtbod()
-int	read()
+size_t	sbufsiz			# size of buffer pointed to by sbuf
+size_t	rbufsiz			# size of buffer pointed to by rbuf
+long	k			# loop index
+long	stat
+size_t	sz_val
+long	tbtbod(), read()
 errchk	seek, read, write
 
 begin
@@ -50,10 +50,12 @@ begin
 
 	# Write dummy size info record.
 	zero = 0
-	call amovkc (zero, Memc[sbuf], SZ_SIZINFO)
+	sz_val = SZ_SIZINFO
+	call amovkc (zero, Memc[sbuf], sz_val)
 	newoff = 1
 	call seek (newfd, newoff)
-	call write (newfd, Memc[sbuf], SZ_SIZINFO)
+	sz_val = SZ_SIZINFO
+	call write (newfd, Memc[sbuf], sz_val)
 
 	# Copy each user parameter to the temporary file.
 	call tbtscu (tp, oldfd, newfd, old_maxpar)
@@ -68,8 +70,10 @@ begin
 	do k = 1, TB_NROWS(tp) {
 	    call seek (oldfd, oldoff)
 	    call seek (newfd, newoff)
-	    stat = read (oldfd, Memc[rbuf], old_colused)
-	    call write (newfd, Memc[rbuf], TB_ROWLEN(tp))
+	    sz_val = old_colused
+	    stat = read (oldfd, Memc[rbuf], sz_val)
+	    sz_val = TB_ROWLEN(tp)
+	    call write (newfd, Memc[rbuf], sz_val)
 	    oldoff = oldoff + old_rowlen
 	    newoff = newoff + TB_ROWLEN(tp)
 	}

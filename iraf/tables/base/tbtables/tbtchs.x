@@ -41,20 +41,21 @@ procedure tbtchs (tp, maxpar, maxcols, rowlen, allrows)
 pointer tp			# i: pointer to table descriptor
 int	maxpar			# i: new value for max number of header keywords
 int	maxcols			# i: new value for maximum number of columns
-int	rowlen			# i: new value for row length
-int	allrows			# i: new value of allocated number of rows
+long	rowlen			# i: new value for row length
+long	allrows			# i: new value of allocated number of rows
 #--
 pointer tp_save			# for saving size info from tp
 int	new_maxpar		# New value of max number of header keywords
 int	new_maxcols		# New value of maximum number of columns
-int	new_rowlen		# New value of row length
-int	new_allrows		# New value of allocated number of rows
+long	new_rowlen		# New value of row length
+long	new_allrows		# New value of allocated number of rows
 int	old_maxpar		# Previous value of max number of keywords
 int	old_maxcols		# Previous value of maximum number of columns
-int	old_rowlen		# Previous value of row length
-int	old_allrows		# Previous value of allocated number of rows
+long	old_rowlen		# Previous value of row length
+long	old_allrows		# Previous value of allocated number of rows
 int	old_ncols		# Previous value of number of columns defined
 int	old_colused		# Previous value of used portion of row
+size_t	sz_val
 long	tbtbod()
 
 errchk	realloc, tbtwsi
@@ -129,7 +130,8 @@ begin
 	# Reallocate the array of pointers to column descriptors, and
 	# assign new values in the table descriptor.
 	if (new_maxcols != TB_MAXCOLS(tp)) {
-	    call realloc (TB_COLPTR(tp), new_maxcols, TY_POINTER)
+	    sz_val = new_maxcols
+	    call realloc (TB_COLPTR(tp), sz_val, TY_POINTER)
 	    TB_MAXCOLS(tp) = new_maxcols
 	}
 	TB_MAXPAR(tp)  = new_maxpar

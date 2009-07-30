@@ -33,14 +33,15 @@ pointer tp			# i: pointer to table descriptor
 int	old_maxpar		# i: previous max number of user parameters
 int	old_maxcols		# i: previous value for max number of columns
 int	old_ncols		# i: previous number of columns
-int	old_rowlen		# i: row length (=record len) in original table
+long	old_rowlen		# i: row length (=record len) in original table
 int	old_colused		# i: previous number of char used in row
 #--
 int	iomode			# I/O mode for reopening the table
 int	oldfd, newfd		# channel numbers for old & new table files
-int	bufsize			# save and restore FIO buffer size
+long	bufsize			# save and restore FIO buffer size
 char	temp_file[SZ_FNAME]	# name of temporary file for table data
-int	open(), fstati()
+int	open()
+long	fstatl()
 errchk	realloc, tbtwsi, tbxscp, mktemp, open, close, delete, rename, flush
 
 begin
@@ -54,7 +55,7 @@ begin
 	    return
 
 	oldfd = TB_FILE(tp)
-	bufsize = fstati (oldfd, F_BUFSIZE)
+	bufsize = fstatl (oldfd, F_BUFSIZE)
 
 	call mktemp ("tmp$tbl", temp_file, SZ_FNAME)
 	newfd = open (temp_file, NEW_FILE, BINARY_FILE)
@@ -79,7 +80,7 @@ begin
 	TB_FILE(tp) = open (TB_NAME(tp), iomode, BINARY_FILE)
 
 	# Restore whatever buffer size the old table had.
-	call fseti (TB_FILE(tp), F_BUFSIZE, bufsize)
+	call fsetl (TB_FILE(tp), F_BUFSIZE, bufsize)
 
 	# Update the size information record in the new table.
 	call tbtwsi (tp)			# write size information

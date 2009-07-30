@@ -58,7 +58,7 @@ begin
 
 	if (TB_COLUMN_SELECT(tp) == YES) {
 	    if (TB_SELCOL_PTR(tp) != NULL) {
-		call tcs_close (Memi[TB_SELCOL_PTR(tp)], TB_NSEL_COLS(tp))
+		call tcs_close (Memp[TB_SELCOL_PTR(tp)], TB_NSEL_COLS(tp))
 		call mfree (TB_SELCOL_PTR(tp), TY_POINTER)
 	    }
 	}

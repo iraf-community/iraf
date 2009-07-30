@@ -11,7 +11,7 @@ procedure tbzsub (tp, buf, maxch, line, line_type, subtype)
 pointer tp		# i: pointer to table info structure
 char	buf[ARB]	# o: buffer for the line that was read
 int	maxch		# i: size of line buffer
-int	line		# io: line number in input file
+long	line		# io: line number in input file
 int	line_type	# o: type of line read by tbzlin
 int	subtype		# o: subtype of text table
 #--

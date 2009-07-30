@@ -14,10 +14,10 @@ procedure tbzadd (tp, cp)
 pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to column descriptor
 #--
-int	allrows		# number of allocated rows
-int	row_1		# row number minus one
+size_t	allrows		# number of allocated rows
+long	row_1		# row number minus one
 int	lenstr		# length of each string in a string column
-int	size		# total number of char in a string column
+size_t	size		# total number of char in a string column
 errchk	malloc, calloc
 
 begin

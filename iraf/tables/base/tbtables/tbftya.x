@@ -18,8 +18,9 @@ int	tdtype		# o: true data type in FITS table (e.g. integer)
 int	dtype		# o: data type to use for table interface
 char	pformat[maxch]	# o: spp print format
 int	maxch		# i: size of print format string
-int	len		# o: size of element
+long	len		# o: size of element
 #--
+size_t	sz_val
 pointer sp
 pointer tform_lc	# tform in lower case
 pointer spp_fmt		# format (tdisp or tform) converted to spp
@@ -30,8 +31,9 @@ int	ip, ctoi()
 
 begin
 	call smark (sp)
-	call salloc (tform_lc, SZ_FNAME, TY_CHAR)
-	call salloc (spp_fmt, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (tform_lc, sz_val, TY_CHAR)
+	call salloc (spp_fmt, sz_val, TY_CHAR)
 
 	call strcpy (tform, Memc[tform_lc], SZ_FNAME)
 	call strlwr (Memc[tform_lc])
@@ -56,7 +58,8 @@ begin
 	    dtype = TBL_TY_INT
 	    len = SZ_INT
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 			"unrecognized TFORM:  `%s'")
 		call pargstr (tform)

@@ -17,6 +17,7 @@ char	keyword[SZ_KEYWORD]	# i: keyword to be found
 char	comment[ARB]		# o: comment string for keyword
 int	maxch			# i: max size of comment
 #--
+size_t	sz_val
 pointer sp
 pointer errmsg			# scratch for possible error message
 pointer str			# scratch for string read from header
@@ -39,12 +40,14 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (str, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Find the keyword in the header.
 	call tbhfkw (tp, keyword, parnum)
 	if (parnum < 1) {
-	    call salloc (errmsg, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (errmsg, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmsg], SZ_FNAME,
 			"tbhgcm:  keyword `%s' not found in table `%s'")
 		call pargstr (keyword)

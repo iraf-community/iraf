@@ -1,3 +1,4 @@
+include <mach.h>
 include <tbset.h>
 include "tbtables.h"
 include "tblerr.h"
@@ -15,19 +16,25 @@ include "tblerr.h"
 procedure tbcchg (tp, rowlen)
 
 pointer tp			# Pointer to table descriptor
-int	rowlen			# The new value for the row length in SZ_CHAR
+long	rowlen			# The new value for the row length in SZ_CHAR
 
 int	maxcols			# New value for TB_MAXCOLS
+long	l_val
 errchk	tbtchs
 
 begin
 	if (TB_TYPE(tp) == TBL_TYPE_S_ROW) {
 	    if (TB_IS_OPEN(tp)) {
-		maxcols = TB_NCOLS(tp) + (rowlen - TB_COLUSED(tp)) / SZ_REAL
+		l_val = TB_NCOLS(tp) + (rowlen - TB_COLUSED(tp)) / SZ_REAL
+		if ( l_val > MAX_INT ) {
+		    call error (1, "tbcchg: too large rowlen")
+		}
+		maxcols = l_val
 		# maxcols < 0 means that tbtchs should not change TB_MAXCOLS.
 		if (maxcols <= TB_MAXCOLS(tp))
 		    maxcols = -1
-		call tbtchs (tp, -1, maxcols, rowlen, -1)
+		l_val = -1
+		call tbtchs (tp, -1, maxcols, rowlen, l_val)
 	    } else {
 		TB_ROWLEN(tp) = rowlen
 	    }

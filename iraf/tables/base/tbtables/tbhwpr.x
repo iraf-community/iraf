@@ -31,6 +31,7 @@ pointer tp			# i: pointer to table descriptor
 int	parnum			# i: number of the parameter to be written
 char	str[ARB]		# i: string containing the keyword and value
 #--
+size_t	sz_val
 pointer sp
 pointer par			# for reformatting, or for a packed copy of str
 int	maxch			# size of str, plus extra space
@@ -47,7 +48,8 @@ begin
 	    # Allow extra space, for "#k " and two spaces around "=".
 	    maxch = max (SZ_FNAME, strlen (str) + 5)
 	    call smark (sp)
-	    call salloc (par, maxch, TY_CHAR)
+	    sz_val = maxch
+	    call salloc (par, sz_val, TY_CHAR)
 
 	    # Add to list of keywords in memory.
 
@@ -89,13 +91,16 @@ begin
 	} else {
 
 	    call smark (sp)
-	    call salloc (par, SZ_PARREC, TY_CHAR)
+	    sz_val = SZ_PARREC
+	    call salloc (par, sz_val, TY_CHAR)
 
 	    locn = SZ_PACKED_REC * (parnum - 1) + SZ_SIZINFO + 1
 
 	    call seek (TB_FILE(tp), locn)
-	    call strpak (str, Memc[par], SZ_PARREC)
-	    call write (TB_FILE(tp), Memc[par], SZ_PACKED_REC)
+	    sz_val = SZ_PARREC
+	    call strpak (str, Memc[par], sz_val)
+	    sz_val = SZ_PACKED_REC
+	    call write (TB_FILE(tp), Memc[par], sz_val)
 
 	    call sfree (sp)
 	}

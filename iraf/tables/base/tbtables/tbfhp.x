@@ -31,6 +31,7 @@ pointer tp		# i: pointer to table descriptor
 char	keyword[ARB]	# i: name of parameter to put
 double	value		# i: value of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer sval		# for getting the value as a string
 pointer comment		# for comment string
@@ -40,8 +41,9 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (sval, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	status = 0
 
@@ -89,6 +91,7 @@ pointer tp		# i: pointer to table descriptor
 char	keyword[ARB]	# i: name of parameter to put
 real	value		# i: value of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer sval		# for getting the value as a string
 pointer comment		# for comment string
@@ -98,8 +101,9 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (sval, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	status = 0
 
@@ -147,6 +151,7 @@ pointer tp		# i: pointer to table descriptor
 char	keyword[ARB]	# i: name of parameter to put
 int	value		# i: value of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer sval		# for getting the value as a string
 pointer comment		# for comment string
@@ -156,8 +161,9 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (sval, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	status = 0
 
@@ -203,6 +209,7 @@ pointer tp		# i: pointer to table descriptor
 char	keyword[ARB]	# i: name of parameter to put
 bool	value		# i: value of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer sval		# for getting the value as a string
 pointer comment		# for comment string
@@ -211,8 +218,9 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (sval, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	status = 0
 
@@ -257,6 +265,7 @@ pointer tp		# i: pointer to table descriptor
 char	keyword[ARB]	# i: name of parameter to put
 char	text[ARB]	# i: value of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer sval		# for getting the value as a string
 pointer comment		# for comment string
@@ -291,7 +300,8 @@ begin
 	} else if (uckey[1] == EOS) {
 	    iscomment = true
 	    call smark (sp)
-	    call salloc (comment, SZ_PARREC, TY_CHAR)
+	    sz_val = SZ_PARREC
+	    call salloc (comment, sz_val, TY_CHAR)
 	    call sprintf (Memc[comment], SZ_PARREC, "        %s")
 		call pargstr (text)
 	    call fsprec (TB_FILE(tp), Memc[comment], status)
@@ -307,8 +317,9 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (sval, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (sval, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	# Get current value to see if the keyword already exists.
 	call fsgkys (TB_FILE(tp), keyword, Memc[sval], Memc[comment], status)

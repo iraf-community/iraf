@@ -27,6 +27,8 @@ int	dtype			# i: data type
 char	str[ARB]		# i: string containing the value of the param.
 int	parnum			# o: number of the parameter in the table
 #--
+size_t	sz_val
+long	l_val
 pointer sp
 pointer text_str		# scratch
 pointer word			# value (extracted from str) of parameter
@@ -41,7 +43,8 @@ begin
 
 	if (TB_TYPE(tp) == TBL_TYPE_TEXT) {
 
-	    call salloc (text_str, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (text_str, sz_val, TY_CHAR)
 
 	    # Construct "#k keyword = value", and add to keyword list.
 	    call strcpy ("#k ", Memc[text_str], SZ_LINE)
@@ -57,9 +60,10 @@ begin
 
 	} else {
 
-	    call salloc (text_str, SZ_PARREC, TY_CHAR)
-	    call salloc (word, SZ_PARREC, TY_CHAR)
-	    call salloc (comment, SZ_PARREC, TY_CHAR)
+	    sz_val = SZ_PARREC
+	    call salloc (text_str, sz_val, TY_CHAR)
+	    call salloc (word, sz_val, TY_CHAR)
+	    call salloc (comment, sz_val, TY_CHAR)
 	    do i = 0, SZ_PARREC-1
 		Memc[text_str+i] = ' '
 	    Memc[text_str+SZ_PARREC] = EOS
@@ -91,7 +95,8 @@ begin
 
 	    if (TB_NPAR(tp) >= TB_MAXPAR(tp)) {
 		maxpar = TB_MAXPAR(tp) + DEFMAXPAR
-		call tbtchs (tp, maxpar, -1, -1, -1)	# change size
+		l_val = -1
+		call tbtchs (tp, maxpar, -1, l_val, l_val)	# change size
 	    }
 	    parnum = TB_NPAR(tp) + 1
 	    TB_NPAR(tp) = parnum

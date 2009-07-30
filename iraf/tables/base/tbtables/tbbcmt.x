@@ -26,6 +26,7 @@ int	len1			# length of string to be appended
 int	len2			# length of comment buffer
 int	ip			# for ignoring leading whitespace
 int	new_sz_comment		# new value of allocated buffer length
+size_t	sz_val
 int	strlen()
 
 begin
@@ -38,7 +39,8 @@ begin
 
 	    # Allocate the comment buffer.
 	    new_sz_comment = len1 + INCR_BUFFSIZE
-	    call malloc (TB_COMMENT(tp), new_sz_comment, TY_CHAR)
+	    sz_val = new_sz_comment
+	    call malloc (TB_COMMENT(tp), sz_val, TY_CHAR)
 	    TB_SZ_COMMENT(tp) = new_sz_comment
 
 	} else {
@@ -48,7 +50,8 @@ begin
 	    # If the combined length is too long, reallocate the comment buffer.
 	    if (len1 + len2 > TB_SZ_COMMENT(tp)) {
 		new_sz_comment = TB_SZ_COMMENT(tp) + len1 + INCR_BUFFSIZE
-		call realloc (TB_COMMENT(tp), new_sz_comment, TY_CHAR)
+		sz_val = new_sz_comment
+		call realloc (TB_COMMENT(tp), sz_val, TY_CHAR)
 		TB_SZ_COMMENT(tp) = new_sz_comment
 	    }
 	}

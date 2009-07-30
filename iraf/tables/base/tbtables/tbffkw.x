@@ -16,6 +16,7 @@ pointer tp			# i: Pointer to table descriptor
 char	keyword[SZ_KEYWORD]	# i: Keyword to be found
 int	parnum			# o: Parameter number or zero if not found
 #--
+size_t	sz_val
 pointer sp
 pointer par			# buffer for header record for parameter
 int	status			# error return code from fitsio
@@ -26,7 +27,8 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (par, SZ_FITS_REC, TY_CHAR)
+	sz_val = SZ_FITS_REC
+	call salloc (par, sz_val, TY_CHAR)
 
 	call strcpy (keyword, uckey, SZ_KEYWORD)
 	call strupr (uckey)

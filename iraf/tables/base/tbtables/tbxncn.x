@@ -10,13 +10,13 @@ include "tbtables.h"
 procedure tbxncn (tp, old_colused, indef_rec)
 
 pointer tp			# i: Pointer to table descriptor
-int	old_colused		# i: Previous value of TB_COLUSED (unit=SZ_CHAR)
+long	old_colused		# i: Previous value of TB_COLUSED (unit=SZ_CHAR)
 char	indef_rec[ARB]		# i: INDEF record buffer
 #--
 long	locn			# Location (chars) for writing in table
-int	start			# Location in INDEF record of values to write
-int	k			# Loop index
-int	num_chars		# Number of chars to write as INDEF
+long	start			# Location in INDEF record of values to write
+long	k			# Loop index
+size_t	num_chars		# Number of chars to write as INDEF
 
 begin
 	num_chars = TB_COLUSED(tp) - old_colused

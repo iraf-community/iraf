@@ -14,11 +14,12 @@ include "tbtables.h"
 procedure tbxnll (tp, firstrow, lastrow)
 
 pointer tp			# i: pointer to table descriptor
-int	firstrow		# i: first row to be set to INDEF
-int	lastrow			# i: last row to be set to INDEF
+long	firstrow		# i: first row to be set to INDEF
+long	lastrow			# i: last row to be set to INDEF
 #--
-int	row1, row2		# firstrow, lastrow truncated to 1, nrows
-int	row			# loop index for row number
+long	row1, row2		# firstrow, lastrow truncated to 1, nrows
+long	row			# loop index for row number
+size_t	sz_val
 long	tbxoff()		# function returning offset to beginning of row
 errchk	seek, write
 
@@ -29,6 +30,7 @@ begin
 	# Write the indef record at each row to be set to INDEF.
 	do row = row1, row2 {
 	    call seek (TB_FILE(tp), tbxoff (tp, row))
-	    call write (TB_FILE(tp), Memc[TB_INDEF(tp)], TB_ROWLEN(tp))
+	    sz_val = TB_ROWLEN(tp)
+	    call write (TB_FILE(tp), Memc[TB_INDEF(tp)], sz_val)
 	}
 end

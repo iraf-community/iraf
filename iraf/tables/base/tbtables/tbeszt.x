@@ -11,7 +11,7 @@ include "tbtables.h"
 # Phil Hodge, 28-Jul-1994  Function created.
 # Phil Hodge, 31-Oct-1994  Check for data type = TY_CHAR.
 
-int procedure tbeszt (cptr)
+long procedure tbeszt (cptr)
 
 pointer cptr			# i: pointer to column descriptor
 #--

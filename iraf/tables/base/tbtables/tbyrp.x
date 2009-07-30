@@ -21,8 +21,9 @@ pointer tp			# i: Pointer to table descriptor
 pointer colptr[numcols]		# i: Array of pointers to column descriptors
 bool	buffer[numcols]		# i: Array of values to be put into table
 int	numcols			# i: Number of columns
-int	rownum			# i: Row number; may be beyond end of file
+long	rownum			# i: Row number; may be beyond end of file
 #--
+size_t	sz_val
 long	offset			# Offset of column entry from BOF
 int	k			# Loop index
 int	datatype		# Data type of element in table
@@ -46,33 +47,40 @@ begin
 		    realbuf = real(YES)
 		else
 		    realbuf = real(NO)
-		call write (TB_FILE(tp), realbuf, SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), realbuf, sz_val)
 	    case TY_DOUBLE:
 		if (buffer[k])
 		    dblbuf = double(YES)
 		else
 		    dblbuf = double(NO)
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 	    case TY_INT:
 		if (buffer[k])
 		    intbuf = YES
 		else
 		    intbuf = NO
-		call write (TB_FILE(tp), intbuf, SZ_INT)
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), intbuf, sz_val)
 	    case TY_SHORT:
 		if (buffer[k])
 		    shortbuf = YES
 		else
 		    shortbuf = NO
-		call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), shortbuf, sz_val)
 	    case TY_BOOL:
-		call write (TB_FILE(tp), buffer[k], SZ_BOOL)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), buffer[k], sz_val)
 	    default:
 		if (datatype < 0 || datatype == TY_CHAR) {
 		    call sprintf (charbuf, SZ_LINE, "%-3b")
 			call pargb (buffer[k])
-		    call strpak (charbuf, charbuf, SZ_LINE)
-		    call write (TB_FILE(tp), charbuf, COL_LEN(colptr[k]))
+		    sz_val = SZ_LINE
+		    call strpak (charbuf, charbuf, sz_val)
+		    sz_val = COL_LEN(colptr[k])
+		    call write (TB_FILE(tp), charbuf, sz_val)
 		} else {
 		    call error (ER_TBCOLBADTYP, "tbrptb:  invalid data type")
 		}
@@ -91,8 +99,9 @@ pointer tp			# i: Pointer to table descriptor
 pointer colptr[numcols]		# i: Array of pointers to column descriptors
 double	buffer[numcols]		# i: Array of values to be put into table
 int	numcols			# i: Number of columns
-int	rownum			# i: Row number; may be beyond end of file
+long	rownum			# i: Row number; may be beyond end of file
 #--
+size_t	sz_val
 long	offset			# Offset of column entry from BOF
 int	k			# Loop index
 int	datatype		# Data type of element in table
@@ -104,6 +113,7 @@ short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]
 long	tbyoff()
+short	sdnint()
 errchk	seek, write
 
 begin
@@ -117,37 +127,44 @@ begin
 		    realbuf = INDEFR
 		else
 		    realbuf = buffer[k]
-		call write (TB_FILE(tp), realbuf, SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), realbuf, sz_val)
 	    case TY_DOUBLE:
 		if (IS_INDEFD (buffer[k]))
 		    dblbuf = TBL_INDEFD
 		else
 		    dblbuf = buffer[k]
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 	    case TY_INT:
-		if (IS_INDEFD (buffer[k]) || abs (buffer[k]) > MAX_INT)
+		if (IS_INDEFD (buffer[k]) || dabs (buffer[k]) > MAX_INT)
 		    intbuf = INDEFI
 		else
-		    intbuf = nint (buffer[k])
-		call write (TB_FILE(tp), intbuf, SZ_INT)
+		    intbuf = idnint (buffer[k])
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), intbuf, sz_val)
 	    case TY_SHORT:
-		if (IS_INDEFD (buffer[k]) || abs (buffer[k]) > MAX_SHORT)
+		if (IS_INDEFD (buffer[k]) || dabs (buffer[k]) > MAX_SHORT)
 		    shortbuf = INDEFS
 		else
-		    shortbuf = nint (buffer[k])
-		call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		    shortbuf = sdnint (buffer[k])
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), shortbuf, sz_val)
 	    case TY_BOOL:
-		if (IS_INDEFD (buffer[k]) || abs (buffer[k]) > MAX_INT)
+		if (IS_INDEFD (buffer[k]) || dabs (buffer[k]) > MAX_INT)
 		    boolbuf = false
 		else
-		    boolbuf = (nint(buffer[k]) != NO)
-		call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		    boolbuf = (idnint(buffer[k]) != NO)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), boolbuf, sz_val)
 	    default:
 		if (datatype < 0 || datatype == TY_CHAR) {
 		    call sprintf (charbuf, SZ_LINE, "%-25.17g")
 			call pargd (buffer[k])
-		    call strpak (charbuf, charbuf, SZ_LINE)
-		    call write (TB_FILE(tp), charbuf, COL_LEN(colptr[k]))
+		    sz_val = SZ_LINE
+		    call strpak (charbuf, charbuf, sz_val)
+		    sz_val = COL_LEN(colptr[k])
+		    call write (TB_FILE(tp), charbuf, sz_val)
 		} else {
 		    call error (ER_TBCOLBADTYP, "tbrptd:  invalid data type")
 		}
@@ -166,8 +183,9 @@ pointer tp			# i: Pointer to table descriptor
 pointer colptr[numcols]		# i: Array of pointers to column descriptors
 real	buffer[numcols]		# i: Array of values to be put into table
 int	numcols			# i: Number of columns
-int	rownum			# i: Row number; may be beyond end of file
+long	rownum			# i: Row number; may be beyond end of file
 #--
+size_t	sz_val
 long	offset			# Offset of column entry from BOF
 int	k			# Loop index
 int	datatype		# Data type of element in table
@@ -178,6 +196,9 @@ short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]
 long	tbyoff()
+int	inint()
+short	snint()
+real	aabs()
 errchk	seek, write
 
 begin
@@ -187,37 +208,44 @@ begin
 	    call seek (TB_FILE(tp), offset)
 	    switch (datatype) {
 	    case TY_REAL:
-		call write (TB_FILE(tp), buffer[k], SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), buffer[k], sz_val)
 	    case TY_DOUBLE:
 		if (IS_INDEFR(buffer[k]))
 		    dblbuf = TBL_INDEFD
 		else
 		    dblbuf = buffer[k]
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 	    case TY_INT:
-		if (IS_INDEFR(buffer[k]) || abs (buffer[k]) > MAX_INT)
+		if (IS_INDEFR(buffer[k]) || aabs (buffer[k]) > MAX_INT)
 		    intbuf = INDEFI
 		else
-		    intbuf = nint (buffer[k])
-		call write (TB_FILE(tp), intbuf, SZ_INT)
+		    intbuf = inint (buffer[k])
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), intbuf, sz_val)
 	    case TY_SHORT:
-		if (IS_INDEFR(buffer[k]) || abs (buffer[k]) > MAX_SHORT)
+		if (IS_INDEFR(buffer[k]) || aabs (buffer[k]) > MAX_SHORT)
 		    shortbuf = INDEFS
 		else
-		    shortbuf = nint (buffer[k])
-		call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		    shortbuf = snint (buffer[k])
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), shortbuf, sz_val)
 	    case TY_BOOL:
-		if (IS_INDEFR (buffer[k]) || abs (buffer[k]) > MAX_INT)
+		if (IS_INDEFR (buffer[k]) || aabs (buffer[k]) > MAX_INT)
 		    boolbuf = false
 		else
-		    boolbuf = (nint(buffer[k]) != NO)
-		call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		    boolbuf = (inint(buffer[k]) != NO)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), boolbuf, sz_val)
 	    default:
 		if (datatype < 0 || datatype == TY_CHAR) {
 		    call sprintf (charbuf, SZ_LINE, "%-15.7g")
 			call pargr (buffer[k])
-		    call strpak (charbuf, charbuf, SZ_LINE)
-		    call write (TB_FILE(tp), charbuf, COL_LEN(colptr[k]))
+		    sz_val = SZ_LINE
+		    call strpak (charbuf, charbuf, sz_val)
+		    sz_val = COL_LEN(colptr[k])
+		    call write (TB_FILE(tp), charbuf, sz_val)
 		} else {
 		    call error (ER_TBCOLBADTYP, "tbrptr:  invalid data type")
 		}
@@ -236,8 +264,9 @@ pointer tp			# i: Pointer to table descriptor
 pointer colptr[numcols]		# i: Array of pointers to column descriptors
 int	buffer[numcols]		# i: Array of values to be put into table
 int	numcols			# i: Number of columns
-int	rownum			# i: Row number; may be beyond end of file
+long	rownum			# i: Row number; may be beyond end of file
 #--
+size_t	sz_val
 long	offset			# Offset of column entry from BOF
 int	k			# Loop index
 int	datatype		# Data type of element in table
@@ -261,33 +290,40 @@ begin
 		    realbuf = INDEFR
 		else
 		    realbuf = buffer[k]
-		call write (TB_FILE(tp), realbuf, SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), realbuf, sz_val)
 	    case TY_DOUBLE:
 		if (IS_INDEFI (buffer[k]))
 		    dblbuf = TBL_INDEFD
 		else
 		    dblbuf = buffer[k]
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 	    case TY_INT:
-		call write (TB_FILE(tp), buffer[k], SZ_INT)
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), buffer[k], sz_val)
 	    case TY_SHORT:
-		if (IS_INDEFI (buffer[k]) || abs (buffer[k]) > MAX_SHORT)
+		if (IS_INDEFI (buffer[k]) || iabs (buffer[k]) > MAX_SHORT)
 		    shortbuf = INDEFS
 		else
 		    shortbuf = buffer[k]
-		call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), shortbuf, sz_val)
 	    case TY_BOOL:
 		if (IS_INDEFI (buffer[k]) || (buffer[k] == NO))
 		    boolbuf = false
 		else
 		    boolbuf = true
-		call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), boolbuf, sz_val)
 	    default:
 		if (datatype < 0 || datatype == TY_CHAR) {
 		    call sprintf (charbuf, SZ_LINE, "%-11d")
 			call pargi (buffer[k])
-		    call strpak (charbuf, charbuf, SZ_LINE)
-		    call write (TB_FILE(tp), charbuf, COL_LEN(colptr[k]))
+		    sz_val = SZ_LINE
+		    call strpak (charbuf, charbuf, sz_val)
+		    sz_val = COL_LEN(colptr[k])
+		    call write (TB_FILE(tp), charbuf, sz_val)
 		} else {
 		    call error (ER_TBCOLBADTYP, "tbrpti:  invalid data type")
 		}
@@ -306,8 +342,9 @@ pointer tp			# i: Pointer to table descriptor
 pointer colptr[numcols]		# i: Array of pointers to column descriptors
 short	buffer[numcols]		# i: Array of values to be put into table
 int	numcols			# i: Number of columns
-int	rownum			# i: Row number; may be beyond end of file
+long	rownum			# i: Row number; may be beyond end of file
 #--
+size_t	sz_val
 long	offset			# Offset of column entry from BOF
 int	k			# Loop index
 int	datatype		# Data type of element in table
@@ -331,33 +368,40 @@ begin
 		    realbuf = INDEFR
 		else
 		    realbuf = buffer[k]
-		call write (TB_FILE(tp), realbuf, SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), realbuf, sz_val)
 	    case TY_DOUBLE:
 		if (IS_INDEFS (buffer[k]))
 		    dblbuf = TBL_INDEFD
 		else
 		    dblbuf = buffer[k]
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 	    case TY_INT:
 		if (IS_INDEFS (buffer[k]))
 		    intbuf = INDEFI
 		else
 		    intbuf = buffer[k]
-		call write (TB_FILE(tp), intbuf, SZ_INT)
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), intbuf, sz_val)
 	    case TY_SHORT:
-		call write (TB_FILE(tp), buffer[k], SZ_SHORT)
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), buffer[k], sz_val)
 	    case TY_BOOL:
 		if (IS_INDEFS (buffer[k]) || (buffer[k] == NO))
 		    boolbuf = false
 		else
 		    boolbuf = true
-		call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), boolbuf, sz_val)
 	    default:
 		if (datatype < 0 || datatype == TY_CHAR) {
 		    call sprintf (charbuf, SZ_LINE, "%-11d")
 			call pargs (buffer[k])
-		    call strpak (charbuf, charbuf, SZ_LINE)
-		    call write (TB_FILE(tp), charbuf, COL_LEN(colptr[k]))
+		    sz_val = SZ_LINE
+		    call strpak (charbuf, charbuf, sz_val)
+		    sz_val = COL_LEN(colptr[k])
+		    call write (TB_FILE(tp), charbuf, sz_val)
 		} else {
 		    call error (ER_TBCOLBADTYP, "tbrpts:  invalid data type")
 		}
@@ -377,8 +421,9 @@ pointer colptr[numcols]		# i: Array of pointers to column descriptors
 char	buffer[lenstring, numcols] # i: Array of values to be put into table
 int	lenstring		# i: Length of each string in array buffer
 int	numcols			# i: Number of columns
-int	rownum			# i: Row number; may be beyond end of file
+long	rownum			# i: Row number; may be beyond end of file
 #--
+size_t	sz_val
 long	offset			# Offset of column entry from BOF
 int	k			# Loop index
 int	datatype		# Data type of element in table
@@ -404,7 +449,8 @@ begin
 		    call gargr (realbuf)
 		    if (nscan() < 1)
 			realbuf = INDEFR
-		call write (TB_FILE(tp), realbuf, SZ_REAL)
+		sz_val = SZ_REAL
+		call write (TB_FILE(tp), realbuf, sz_val)
 	    case TY_DOUBLE:
 		call sscan (buffer[1,k])
 		    call gargd (dblbuf)
@@ -412,29 +458,35 @@ begin
 			dblbuf = TBL_INDEFD
 		    else if (IS_INDEFD (dblbuf))
 			dblbuf = TBL_INDEFD
-		call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call write (TB_FILE(tp), dblbuf, sz_val)
 	    case TY_INT:
 		call sscan (buffer[1,k])
 		    call gargi (intbuf)
 		    if (nscan() < 1)
 			intbuf = INDEFI
-		call write (TB_FILE(tp), intbuf, SZ_INT)
+		sz_val = SZ_INT
+		call write (TB_FILE(tp), intbuf, sz_val)
 	    case TY_SHORT:
 		call sscan (buffer[1,k])
 		    call gargs (shortbuf)
 		    if (nscan() < 1)
 			shortbuf = INDEFS
-		call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		sz_val = SZ_SHORT
+		call write (TB_FILE(tp), shortbuf, sz_val)
 	    case TY_BOOL:
 		call sscan (buffer[1,k])
 		    call gargb (boolbuf)
 		    if (nscan() < 1)
 			boolbuf = false
-		call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		sz_val = SZ_BOOL
+		call write (TB_FILE(tp), boolbuf, sz_val)
 	    default:
 		if (datatype < 0 || datatype == TY_CHAR) {
-		    call strpak (buffer[1,k], charbuf, lenstring)
-		    call write (TB_FILE(tp), charbuf, COL_LEN(colptr[k]))
+		    sz_val = lenstring
+		    call strpak (buffer[1,k], charbuf, sz_val)
+		    sz_val = COL_LEN(colptr[k])
+		    call write (TB_FILE(tp), charbuf, sz_val)
 		} else {
 		    call error (ER_TBCOLBADTYP, "tbrptt:  invalid data type")
 		}

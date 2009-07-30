@@ -17,13 +17,13 @@ include "tblerr.h"
 procedure tbrdel (tp, firstrow, lastrow)
 
 pointer tp		# i: pointer to table descriptor
-int	firstrow	# i: first row to be deleted
-int	lastrow		# i: last row to be deleted
+long	firstrow	# i: first row to be deleted
+long	lastrow		# i: last row to be deleted
 #--
-int	row1		# actual first row to be deleted
-int	nrows		# number of rows written to table
-int	ndel		# number of rows to be deleted
-int	rst_rownum()
+long	row1		# actual first row to be deleted
+long	nrows		# number of rows written to table
+long	ndel		# number of rows to be deleted
+long	rst_rownum()
 errchk	tbxnll, tbynll, tbznll, tbfchp, tbrsft
 
 begin

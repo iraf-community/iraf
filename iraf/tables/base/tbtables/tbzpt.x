@@ -13,11 +13,11 @@ procedure tbzptb (tp, cp, rownum, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
-int	rownum			# i: row number
+long	rownum			# i: row number
 bool	buffer			# i: value to be put
 #--
 int	lenstr			# length of a string table element
-int	ip			# offset to a string in Memc
+long	ip			# offset to a string in Memc
 
 begin
 	if (COL_DTYPE(cp) == TBL_TY_DOUBLE) {
@@ -46,12 +46,12 @@ procedure tbzptd (tp, cp, rownum, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
-int	rownum			# i: row number
+long	rownum			# i: row number
 double	buffer			# i: value to be put
 #--
 char	cbuf[SZ_FNAME]		# buffer for character elements
 int	lenstr			# length of a string table element
-int	ip			# offset to a string in Memc
+long	ip			# offset to a string in Memc
 
 begin
 	if (COL_DTYPE(cp) == TBL_TY_DOUBLE) {
@@ -61,7 +61,7 @@ begin
 	    if (IS_INDEFD(buffer))
 		Memi[COL_OFFSET(cp) + rownum - 1] = INDEFI
 	    else
-		Memi[COL_OFFSET(cp) + rownum - 1] = nint (buffer)
+		Memi[COL_OFFSET(cp) + rownum - 1] = idnint (buffer)
 
 	} else {				# string
 	    if (IS_INDEFD(buffer)) {
@@ -80,12 +80,13 @@ procedure tbzptr (tp, cp, rownum, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
-int	rownum			# i: row number
+long	rownum			# i: row number
 real	buffer			# i: value to be put
 #--
 char	cbuf[SZ_FNAME]		# buffer for character elements
 int	lenstr			# length of a string table element
-int	ip			# offset to a string in Memc
+long	ip			# offset to a string in Memc
+real	inint()
 
 begin
 	if (COL_DTYPE(cp) == TBL_TY_DOUBLE) {
@@ -98,7 +99,7 @@ begin
 	    if (IS_INDEF(buffer))
 		Memi[COL_OFFSET(cp) + rownum - 1] = INDEFI
 	    else
-		Memi[COL_OFFSET(cp) + rownum - 1] = nint (buffer)
+		Memi[COL_OFFSET(cp) + rownum - 1] = inint (buffer)
 
 	} else {				# string
 	    if (IS_INDEF(buffer)) {
@@ -117,12 +118,12 @@ procedure tbzpti (tp, cp, rownum, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
-int	rownum			# i: row number
+long	rownum			# i: row number
 int	buffer			# i: value to be put
 #--
 char	cbuf[SZ_FNAME]		# buffer for character elements
 int	lenstr			# length of a string table element
-int	ip			# offset to a string in Memc
+long	ip			# offset to a string in Memc
 
 begin
 	if (COL_DTYPE(cp) == TBL_TY_DOUBLE) {
@@ -151,12 +152,12 @@ procedure tbzpts (tp, cp, rownum, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
-int	rownum			# i: row number
+long	rownum			# i: row number
 short	buffer			# i: value to be put
 #--
 char	cbuf[SZ_FNAME]		# buffer for character elements
 int	lenstr			# length of a string table element
-int	ip			# offset to a string in Memc
+long	ip			# offset to a string in Memc
 
 begin
 	if (COL_DTYPE(cp) == TBL_TY_DOUBLE) {
@@ -188,11 +189,12 @@ procedure tbzptt (tp, cp, rownum, buffer)
 
 pointer tp			# i: pointer to table descriptor
 pointer cp			# i: pointer to column descriptor
-int	rownum			# i: row number
+long	rownum			# i: row number
 char	buffer[ARB]		# i: value to be put
 #--
 int	lenstr			# length of a string table element
 int	ip			# offset to a string in Memc
+long	pp
 long	lval			# so we can use ctol
 int	ctod(), ctol()
 
@@ -213,7 +215,7 @@ begin
 
 	} else {				# string
 	    lenstr = -COL_DTYPE(cp)		# not including EOS
-	    ip = (rownum - 1) * (lenstr + 1)	# including EOS
-	    call strcpy (buffer, Memc[COL_OFFSET(cp) + ip], lenstr)
+	    pp = (rownum - 1) * (lenstr + 1)	# including EOS
+	    call strcpy (buffer, Memc[COL_OFFSET(cp) + pp], lenstr)
 	}
 end

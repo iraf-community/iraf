@@ -29,21 +29,22 @@ pointer tp			# i: pointer to table descriptor
 pointer colptr[numcols]		# i: array of pointers to column descriptors
 bool	buffer[numcols]		# i: array of values to be put into table
 int	numcols			# i: number of columns
-int	rownum			# i: row number; may be beyond end of file
+long	rownum			# i: row number; may be beyond end of file
 #--
+size_t	sz_val
 int	k			# Loop index
 int	datatype		# Data type of element in table
 long	roffset			# Offset of beginning of row from BOF
 long	offset			# Offset of column entry from BOF
 pointer sp, eofbuf
-int	nrows, rowlen
+long	nrows
+size_t	rowlen
 double	dblbuf			# Buffer used when type conversion is needed
 real	realbuf
 int	intbuf
 short	shortbuf
 char	charbuf[SZ_LINE]	# Buffer for character columns
-long	tbxoff()
-int	tbeszt()
+long	tbxoff(), tbeszt()
 errchk	tbxwer, seek, write
 
 begin
@@ -90,7 +91,8 @@ begin
 		    if (datatype < 0 || datatype == TY_CHAR) {
 			call sprintf (charbuf, SZ_LINE, "%-3b")
 			    call pargb (buffer[k])
-			call strpak (charbuf, charbuf, SZ_LINE)
+			sz_val = SZ_LINE
+			call strpak (charbuf, charbuf, sz_val)
 			call tbbcpy (charbuf, Memc[eofbuf+offset],
 				    tbeszt (colptr[k]))
 		    } else {
@@ -127,33 +129,40 @@ begin
 			realbuf = real(YES)
 		    else
 			realbuf = real(NO)
-		    call write (TB_FILE(tp), realbuf, SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), realbuf, sz_val)
 		case TY_DOUBLE:
 		    if (buffer[k])
 			dblbuf = double(YES)
 		    else
 			dblbuf = double(NO)
-		    call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dblbuf, sz_val)
 		case TY_INT:
 		    if (buffer[k])
 			intbuf = YES
 		    else
 			intbuf = NO
-		    call write (TB_FILE(tp), intbuf, SZ_INT)
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), intbuf, sz_val)
 		case TY_SHORT:
 		    if (buffer[k])
 			shortbuf = YES
 		    else
 			shortbuf = NO
-		    call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), shortbuf, sz_val)
 		case TY_BOOL:
-		    call write (TB_FILE(tp), buffer[k], SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), buffer[k], sz_val)
 		default:
 		    if (datatype < 0 || datatype == TY_CHAR) {
 			call sprintf (charbuf, SZ_LINE, "%-3b")
 			    call pargb (buffer[k])
-			call strpak (charbuf, charbuf, SZ_LINE)
-			call write (TB_FILE(tp), charbuf, tbeszt (colptr[k]))
+			sz_val = SZ_LINE
+			call strpak (charbuf, charbuf, sz_val)
+			sz_val = tbeszt (colptr[k])
+			call write (TB_FILE(tp), charbuf, sz_val)
 		    } else {
 			call error (ER_TBCOLBADTYP,
 			"tbrptb:  bad data type; table or memory corrupted?")
@@ -174,22 +183,24 @@ pointer tp			# i: pointer to table descriptor
 pointer colptr[numcols]		# i: array of pointers to column descriptors
 double	buffer[numcols]		# i: array of values to be put into table
 int	numcols			# i: number of columns
-int	rownum			# i: row number; may be beyond end of file
+long	rownum			# i: row number; may be beyond end of file
 #--
+size_t	sz_val
 int	k			# Loop index
 int	datatype		# Data type of element in table
 long	roffset			# Offset of beginning of row from BOF
 long	offset			# Offset of column entry from BOF
 pointer sp, eofbuf
-int	nrows, rowlen
+long	nrows
+size_t	rowlen
 double	dblbuf			# Buffer used when type conversion is needed
 real	realbuf
 int	intbuf
 short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]	# Buffer for character columns
-long	tbxoff()
-int	tbeszt()
+long	tbxoff(), tbeszt()
+short	sdnint()
 errchk	tbxwer, seek, write
 
 begin
@@ -221,19 +232,19 @@ begin
 			dblbuf = buffer[k]
 		    call tbbeqd (dblbuf, Memc[eofbuf+offset])
 		case TY_INT:
-		    if (IS_INDEFD (buffer[k]) || (abs (buffer[k]) > MAX_INT))
+		    if (IS_INDEFD (buffer[k]) || (dabs (buffer[k]) > MAX_INT))
 			intbuf = INDEFI
 		    else
-			intbuf = nint (buffer[k])
+			intbuf = idnint (buffer[k])
 		    call tbbeqi (intbuf, Memc[eofbuf+offset])
 		case TY_SHORT:
-		    if (IS_INDEFD (buffer[k]) || (abs (buffer[k]) > MAX_SHORT))
+		    if (IS_INDEFD (buffer[k]) || (dabs (buffer[k]) > MAX_SHORT))
 			shortbuf = INDEFS
 		    else
-			shortbuf = nint (buffer[k])
+			shortbuf = sdnint (buffer[k])
 		    call tbbeqs (shortbuf, Memc[eofbuf+offset])
 		case TY_BOOL:
-		    if (IS_INDEFD (buffer[k]) || (nint(buffer[k]) == NO))
+		    if (IS_INDEFD (buffer[k]) || (idnint(buffer[k]) == NO))
 			call tbbeqb (false, Memc[eofbuf+offset])
 		    else
 			call tbbeqb (true, Memc[eofbuf+offset])
@@ -241,7 +252,8 @@ begin
 		    if (datatype < 0 || datatype == TY_CHAR) {
 			call sprintf (charbuf, SZ_LINE, "%-25.16g")
 			    call pargd (buffer[k])
-			call strpak (charbuf, charbuf, SZ_LINE)
+			sz_val = SZ_LINE
+			call strpak (charbuf, charbuf, sz_val)
 			call tbbcpy (charbuf, Memc[eofbuf+offset],
 				    tbeszt (colptr[k]))
 		    } else {
@@ -278,37 +290,44 @@ begin
 			realbuf = INDEFR
 		    else
 			realbuf = buffer[k]
-		    call write (TB_FILE(tp), realbuf, SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), realbuf, sz_val)
 		case TY_DOUBLE:
 		    if (IS_INDEFD (buffer[k]))
 			dblbuf = TBL_INDEFD
 		    else
 			dblbuf = buffer[k]
-		    call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dblbuf, sz_val)
 		case TY_INT:
-		    if (IS_INDEFD (buffer[k]) || (abs (buffer[k]) > MAX_INT))
+		    if (IS_INDEFD (buffer[k]) || (dabs (buffer[k]) > MAX_INT))
 			intbuf = INDEFI
 		    else
-			intbuf = nint (buffer[k])
-		    call write (TB_FILE(tp), intbuf, SZ_INT)
+			intbuf = idnint (buffer[k])
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), intbuf, sz_val)
 		case TY_SHORT:
-		    if (IS_INDEFD (buffer[k]) || (abs (buffer[k]) > MAX_SHORT))
+		    if (IS_INDEFD (buffer[k]) || (dabs (buffer[k]) > MAX_SHORT))
 			shortbuf = INDEFS
 		    else
-			shortbuf = nint (buffer[k])
-		    call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+			shortbuf = sdnint (buffer[k])
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), shortbuf, sz_val)
 		case TY_BOOL:
-		    if (IS_INDEFD (buffer[k]) || (nint(buffer[k]) == NO))
+		    if (IS_INDEFD (buffer[k]) || (idnint(buffer[k]) == NO))
 			boolbuf = false
 		    else
 			boolbuf = true
-		    call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), boolbuf, sz_val)
 		default:
 		    if (datatype < 0 || datatype == TY_CHAR) {
 			call sprintf (charbuf, SZ_LINE, "%-25.17g")
 			    call pargd (buffer[k])
-			call strpak (charbuf, charbuf, SZ_LINE)
-			call write (TB_FILE(tp), charbuf, tbeszt (colptr[k]))
+			sz_val = SZ_LINE
+			call strpak (charbuf, charbuf, sz_val)
+			sz_val = tbeszt (colptr[k])
+			call write (TB_FILE(tp), charbuf, sz_val)
 		    } else {
 			call error (ER_TBCOLBADTYP,
 			"tbrptd:  bad data type; table or memory corrupted?")
@@ -329,21 +348,25 @@ pointer tp			# i: pointer to table descriptor
 pointer colptr[numcols]		# i: array of pointers to column descriptors
 real	buffer[numcols]		# i: array of values to be put into table
 int	numcols			# i: number of columns
-int	rownum			# i: row number; may be beyond end of file
+long	rownum			# i: row number; may be beyond end of file
 #--
+size_t	sz_val
 int	k			# Loop index
 int	datatype		# Data type of element in table
 long	roffset			# Offset of beginning of row from BOF
 long	offset			# Offset of column entry from BOF
 pointer sp, eofbuf
-int	nrows, rowlen
+long	nrows
+size_t	rowlen
 double	dblbuf			# Buffer used when type conversion is needed
 int	intbuf
 short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]	# Buffer for character columns
-long	tbxoff()
-int	tbeszt()
+long	tbxoff(), tbeszt()
+short	snint()
+int	inint()
+real	aabs()
 errchk	tbxwer, seek, write
 
 begin
@@ -371,19 +394,19 @@ begin
 			dblbuf = buffer[k]
 		    call tbbeqd (dblbuf, Memc[eofbuf+offset])
 		case TY_INT:
-		    if (IS_INDEFR (buffer[k]) || (abs (buffer[k]) > MAX_INT))
+		    if (IS_INDEFR (buffer[k]) || (aabs (buffer[k]) > MAX_INT))
 			intbuf = INDEFI
 		    else
-			intbuf = nint (buffer[k])
+			intbuf = inint (buffer[k])
 		    call tbbeqi (intbuf, Memc[eofbuf+offset])
 		case TY_SHORT:
-		    if (IS_INDEFR (buffer[k]) || (abs (buffer[k]) > MAX_SHORT))
+		    if (IS_INDEFR (buffer[k]) || (aabs (buffer[k]) > MAX_SHORT))
 			shortbuf = INDEFS
 		    else
-			shortbuf = nint (buffer[k])
+			shortbuf = snint (buffer[k])
 		    call tbbeqs (shortbuf, Memc[eofbuf+offset])
 		case TY_BOOL:
-		    if (IS_INDEFR (buffer[k]) || (nint(buffer[k]) == NO))
+		    if (IS_INDEFR (buffer[k]) || (inint(buffer[k]) == NO))
 			call tbbeqb (false, Memc[eofbuf+offset])
 		    else
 			call tbbeqb (true, Memc[eofbuf+offset])
@@ -391,7 +414,8 @@ begin
 		    if (datatype < 0 || datatype == TY_CHAR) {
 			call sprintf (charbuf, SZ_LINE, "%-15.7g")
 			    call pargr (buffer[k])
-			call strpak (charbuf, charbuf, SZ_LINE)
+			sz_val = SZ_LINE
+			call strpak (charbuf, charbuf, sz_val)
 			call tbbcpy (charbuf, Memc[eofbuf+offset],
 				    tbeszt (colptr[k]))
 		    } else {
@@ -424,37 +448,44 @@ begin
 		call seek (TB_FILE(tp), offset)
 		switch (datatype) {
 		case TY_REAL:
-		    call write (TB_FILE(tp), buffer[k], SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), buffer[k], sz_val)
 		case TY_DOUBLE:
 		    if (IS_INDEFR (buffer[k]))
 			dblbuf = TBL_INDEFD
 		    else
 			dblbuf = buffer[k]
-		    call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dblbuf, sz_val)
 		case TY_INT:
-		    if (IS_INDEFR (buffer[k]) || (abs (buffer[k]) > MAX_INT))
+		    if (IS_INDEFR (buffer[k]) || (aabs (buffer[k]) > MAX_INT))
 			intbuf = INDEFI
 		    else
-			intbuf = nint (buffer[k])
-		    call write (TB_FILE(tp), intbuf, SZ_INT)
+			intbuf = inint (buffer[k])
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), intbuf, sz_val)
 		case TY_SHORT:
-		    if (IS_INDEFR (buffer[k]) || (abs (buffer[k]) > MAX_SHORT))
+		    if (IS_INDEFR (buffer[k]) || (aabs (buffer[k]) > MAX_SHORT))
 			shortbuf = INDEFS
 		    else
-			shortbuf = nint (buffer[k])
-		    call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+			shortbuf = snint (buffer[k])
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), shortbuf, sz_val)
 		case TY_BOOL:
-		    if (IS_INDEFR (buffer[k]) || (nint(buffer[k]) == NO))
+		    if (IS_INDEFR (buffer[k]) || (inint(buffer[k]) == NO))
 			boolbuf = false
 		    else
 			boolbuf = true
-		    call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), boolbuf, sz_val)
 		default:
 		    if (datatype < 0 || datatype == TY_CHAR) {
 			call sprintf (charbuf, SZ_LINE, "%-15.7g")
 			    call pargr (buffer[k])
-			call strpak (charbuf, charbuf, SZ_LINE)
-			call write (TB_FILE(tp), charbuf, tbeszt (colptr[k]))
+			sz_val = SZ_LINE
+			call strpak (charbuf, charbuf, sz_val)
+			sz_val = tbeszt (colptr[k])
+			call write (TB_FILE(tp), charbuf, sz_val)
 		    } else {
 			call error (ER_TBCOLBADTYP,
 			"tbrptr:  bad data type; table or memory corrupted?")
@@ -475,21 +506,22 @@ pointer tp			# i: pointer to table descriptor
 pointer colptr[numcols]		# i: array of pointers to column descriptors
 int	buffer[numcols]		# i: array of values to be put into table
 int	numcols			# i: number of columns
-int	rownum			# i: row number; may be beyond end of file
+long	rownum			# i: row number; may be beyond end of file
 #--
+size_t	sz_val
 int	k			# Loop index
 int	datatype		# Data type of element in table
 long	roffset			# Offset of beginning of row from BOF
 long	offset			# Offset of column entry from BOF
 pointer sp, eofbuf
-int	nrows, rowlen
+long	nrows
+size_t	rowlen
 double	dblbuf			# Buffer used when type conversion is needed
 real	realbuf
 short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]	# Buffer for character columns
-long	tbxoff()
-int	tbeszt()
+long	tbxoff(), tbeszt()
 errchk	tbxwer, seek, write
 
 begin
@@ -523,7 +555,7 @@ begin
 		case TY_INT:
 		    call tbbeqi (buffer[k], Memc[eofbuf+offset])
 		case TY_SHORT:
-		    if (IS_INDEFI (buffer[k]) || (abs (buffer[k]) > MAX_SHORT))
+		    if (IS_INDEFI (buffer[k]) || (iabs (buffer[k]) > MAX_SHORT))
 			shortbuf = INDEFS
 		    else
 			shortbuf = buffer[k]
@@ -537,7 +569,8 @@ begin
 		    if (datatype < 0 || datatype == TY_CHAR) {
 			call sprintf (charbuf, SZ_LINE, "%-11d")
 			    call pargi (buffer[k])
-			call strpak (charbuf, charbuf, SZ_LINE)
+			sz_val = SZ_LINE
+			call strpak (charbuf, charbuf, sz_val)
 			call tbbcpy (charbuf, Memc[eofbuf+offset],
 				    tbeszt (colptr[k]))
 		    } else {
@@ -574,33 +607,40 @@ begin
 			realbuf = INDEFR
 		    else
 			realbuf = buffer[k]
-		    call write (TB_FILE(tp), realbuf, SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), realbuf, sz_val)
 		case TY_DOUBLE:
 		    if (IS_INDEFI (buffer[k]))
 			dblbuf = TBL_INDEFD
 		    else
 			dblbuf = buffer[k]
-		    call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dblbuf, sz_val)
 		case TY_INT:
-		    call write (TB_FILE(tp), buffer[k], SZ_INT)
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), buffer[k], sz_val)
 		case TY_SHORT:
-		    if (IS_INDEFI (buffer[k]) || (abs (buffer[k]) > MAX_SHORT))
+		    if (IS_INDEFI (buffer[k]) || (iabs (buffer[k]) > MAX_SHORT))
 			shortbuf = INDEFS
 		    else
 			shortbuf = buffer[k]
-		    call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), shortbuf, sz_val)
 		case TY_BOOL:
 		    if (IS_INDEFI (buffer[k]) || (buffer[k] == NO))
 			boolbuf = false
 		    else
 			boolbuf = true
-		    call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), boolbuf, sz_val)
 		default:
 		    if (datatype < 0 || datatype == TY_CHAR) {
 			call sprintf (charbuf, SZ_LINE, "%-11d")
 			    call pargi (buffer[k])
-			call strpak (charbuf, charbuf, SZ_LINE)
-			call write (TB_FILE(tp), charbuf, tbeszt (colptr[k]))
+			sz_val = SZ_LINE
+			call strpak (charbuf, charbuf, sz_val)
+			sz_val = tbeszt (colptr[k])
+			call write (TB_FILE(tp), charbuf, sz_val)
 		    } else {
 			call error (ER_TBCOLBADTYP,
 			"tbrpti:  bad data type; table or memory corrupted?")
@@ -621,21 +661,22 @@ pointer tp			# i: pointer to table descriptor
 pointer colptr[numcols]		# i: array of pointers to column descriptors
 short	buffer[numcols]		# i: array of values to be put into table
 int	numcols			# i: number of columns
-int	rownum			# i: row number; may be beyond end of file
+long	rownum			# i: row number; may be beyond end of file
 #--
+size_t	sz_val
 int	k			# Loop index
 int	datatype		# Data type of element in table
 long	roffset			# Offset of beginning of row from BOF
 long	offset			# Offset of column entry from BOF
 pointer sp, eofbuf
-int	nrows, rowlen
+long	nrows
+size_t	rowlen
 double	dblbuf			# Buffer used when type conversion is needed
 real	realbuf
 int	intbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]	# Buffer for character columns
-long	tbxoff()
-int	tbeszt()
+long	tbxoff(), tbeszt()
 errchk	tbxwer, seek, write
 
 begin
@@ -683,7 +724,8 @@ begin
 		    if (datatype < 0 || datatype == TY_CHAR) {
 			call sprintf (charbuf, SZ_LINE, "%-11d")
 			    call pargs (buffer[k])
-			call strpak (charbuf, charbuf, SZ_LINE)
+			sz_val = SZ_LINE
+			call strpak (charbuf, charbuf, sz_val)
 			call tbbcpy (charbuf, Memc[eofbuf+offset],
 				    tbeszt (colptr[k]))
 		    } else {
@@ -720,33 +762,40 @@ begin
 			realbuf = INDEFR
 		    else
 			realbuf = buffer[k]
-		    call write (TB_FILE(tp), realbuf, SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), realbuf, sz_val)
 		case TY_DOUBLE:
 		    if (IS_INDEFS (buffer[k]))
 			dblbuf = TBL_INDEFD
 		    else
 			dblbuf = buffer[k]
-		    call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dblbuf, sz_val)
 		case TY_INT:
 		    if (IS_INDEFS (buffer[k]))
 			intbuf = INDEFI
 		    else
 			intbuf = buffer[k]
-		    call write (TB_FILE(tp), intbuf, SZ_INT)
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), intbuf, sz_val)
 		case TY_SHORT:
-		    call write (TB_FILE(tp), buffer[k], SZ_SHORT)
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), buffer[k], sz_val)
 		case TY_BOOL:
 		    if (IS_INDEFS (buffer[k]) || (buffer[k] == NO))
 			boolbuf = false
 		    else
 			boolbuf = true
-		    call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), boolbuf, sz_val)
 		default:
 		    if (datatype < 0 || datatype == TY_CHAR) {
 			call sprintf (charbuf, SZ_LINE, "%-11d")
 			    call pargs (buffer[k])
-			call strpak (charbuf, charbuf, SZ_LINE)
-			call write (TB_FILE(tp), charbuf, tbeszt (colptr[k]))
+			sz_val = SZ_LINE
+			call strpak (charbuf, charbuf, sz_val)
+			sz_val = tbeszt (colptr[k])
+			call write (TB_FILE(tp), charbuf, sz_val)
 		    } else {
 			call error (ER_TBCOLBADTYP,
 			"tbrpts:  bad data type; table or memory corrupted?")
@@ -768,23 +817,25 @@ pointer colptr[numcols]		# i: array of pointers to column descriptors
 char	buffer[lenstring, numcols]	# i: array of values to be put
 int	lenstring		# i: length of each string in array buffer
 int	numcols			# i: number of columns
-int	rownum			# i: row number; may be beyond end of file
+long	rownum			# i: row number; may be beyond end of file
 #--
+size_t	sz_val
 int	k			# Loop index
 int	datatype		# Data type of element in table
 long	roffset			# Offset of beginning of row from BOF
 long	offset			# Offset of column entry from BOF
 pointer sp, eofbuf
-int	nrows, rowlen
+long	nrows
+size_t	rowlen
 double	dblbuf			# Buffer used when type conversion is needed
 real	realbuf
 int	intbuf
 short	shortbuf
 bool	boolbuf
 char	charbuf[SZ_LINE]	# Buffer for character columns
-long	tbxoff()
-int	tbeszt()
+long	tbxoff(), tbeszt()
 int	nscan()
+short	sdnint()
 errchk	tbxwer, seek, write
 
 begin
@@ -821,20 +872,20 @@ begin
 		    call sscan (buffer[1,k])
 			call gargd (dblbuf)
 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
-				abs (dblbuf) > MAX_INT) {
+				dabs (dblbuf) > MAX_INT) {
 			intbuf = INDEFI
 		    } else {
-			intbuf = nint (dblbuf)
+			intbuf = idnint (dblbuf)
 		    }
 		    call tbbeqi (intbuf, Memc[eofbuf+offset])
 		case TY_SHORT:
 		    call sscan (buffer[1,k])
 			call gargd (dblbuf)
 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
-				abs (dblbuf) > MAX_SHORT) {
+				dabs (dblbuf) > MAX_SHORT) {
 			shortbuf = INDEFS
 		    } else {
-			shortbuf = nint (dblbuf)
+			shortbuf = sdnint (dblbuf)
 		    }
 		    call tbbeqs (shortbuf, Memc[eofbuf+offset])
 		case TY_BOOL:
@@ -845,7 +896,8 @@ begin
 		    call tbbeqb (boolbuf, Memc[eofbuf+offset])
 		default:
 		    if (datatype < 0 || datatype == TY_CHAR) {
-			call strpak (buffer[1,k], charbuf, SZ_LINE)
+			sz_val = SZ_LINE
+			call strpak (buffer[1,k], charbuf, sz_val)
 			call tbbcpy (charbuf, Memc[eofbuf+offset],
 				    tbeszt (colptr[k]))
 		    } else {
@@ -882,7 +934,8 @@ begin
 			call gargr (realbuf)
 		    if (nscan() < 1)
 			realbuf = INDEFR
-		    call write (TB_FILE(tp), realbuf, SZ_REAL)
+		    sz_val = SZ_REAL
+		    call write (TB_FILE(tp), realbuf, sz_val)
 		case TY_DOUBLE:
 		    call sscan (buffer[1,k])
 			call gargd (dblbuf)
@@ -890,37 +943,43 @@ begin
 			dblbuf = TBL_INDEFD
 		    else if (IS_INDEFD (dblbuf))
 			dblbuf = TBL_INDEFD
-		    call write (TB_FILE(tp), dblbuf, SZ_DOUBLE)
+		    sz_val = SZ_DOUBLE
+		    call write (TB_FILE(tp), dblbuf, sz_val)
 		case TY_INT:
 		    call sscan (buffer[1,k])
 			call gargd (dblbuf)
 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
-				abs (dblbuf) > MAX_INT) {
+				dabs (dblbuf) > MAX_INT) {
 			intbuf = INDEFI
 		    } else {
-			intbuf = nint (dblbuf)
+			intbuf = idnint (dblbuf)
 		    }
-		    call write (TB_FILE(tp), intbuf, SZ_INT)
+		    sz_val = SZ_INT
+		    call write (TB_FILE(tp), intbuf, sz_val)
 		case TY_SHORT:
 		    call sscan (buffer[1,k])
 			call gargd (dblbuf)
 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
-				abs (dblbuf) > MAX_SHORT) {
+				dabs (dblbuf) > MAX_SHORT) {
 			shortbuf = INDEFS
 		    } else {
-			shortbuf = nint (dblbuf)
+			shortbuf = sdnint (dblbuf)
 		    }
-		    call write (TB_FILE(tp), shortbuf, SZ_SHORT)
+		    sz_val = SZ_SHORT
+		    call write (TB_FILE(tp), shortbuf, sz_val)
 		case TY_BOOL:
 		    call sscan (buffer[1,k])
 			call gargb (boolbuf)
 		    if (nscan() < 1)
 			boolbuf = false
-		    call write (TB_FILE(tp), boolbuf, SZ_BOOL)
+		    sz_val = SZ_BOOL
+		    call write (TB_FILE(tp), boolbuf, sz_val)
 		default:
 		    if (datatype < 0 || datatype == TY_CHAR) {
-			call strpak (buffer[1,k], charbuf, SZ_LINE)
-			call write (TB_FILE(tp), charbuf, tbeszt (colptr[k]))
+			sz_val = SZ_LINE
+			call strpak (buffer[1,k], charbuf, sz_val)
+			sz_val = tbeszt (colptr[k])
+			call write (TB_FILE(tp), charbuf, sz_val)
 		    } else {
 			call error (ER_TBCOLBADTYP,
 			"tbrptt:  bad data type; table or memory corrupted?")
@@ -939,9 +998,9 @@ procedure tbbcpy (in, out, maxch)
 
 char	in[ARB]		# i: input string
 char	out[ARB]	# o: output string
-int	maxch		# i: maximum number of char to assign in output
+long	maxch		# i: maximum number of char to assign in output
 #--
-int	k
+long	k
 
 begin
 	do k = 1, maxch {

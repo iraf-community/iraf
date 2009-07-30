@@ -12,6 +12,7 @@ pointer tp		# i: pointer to table descriptor
 pointer cp		# i: pointer to a column descriptor
 char	colfmt[ARB]	# i: print format for column
 #--
+size_t	sz_val
 pointer sp
 pointer keyword		# scratch for keyword name
 pointer dummy		# for current value, if keyword already exists
@@ -22,10 +23,11 @@ errchk	tbfptf, tbferr
 
 begin
 	call smark (sp)
-	call salloc (keyword, SZ_FNAME, TY_CHAR)
-	call salloc (dummy, SZ_FNAME, TY_CHAR)
-	call salloc (comment, SZ_FNAME, TY_CHAR)
-	call salloc (pformat, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (keyword, sz_val, TY_CHAR)
+	call salloc (dummy, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
+	call salloc (pformat, sz_val, TY_CHAR)
 
 	# Convert print format to Fortran.
 	call tbfptf (colfmt, Memc[pformat], SZ_FNAME)

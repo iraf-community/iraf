@@ -20,6 +20,7 @@ pointer tp			# i: Pointer to table descriptor
 double	value			# i: Value of parameter
 char	keyword[ARB]		# i: Name of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 int	dtype			# data type
@@ -42,7 +43,8 @@ begin
 
 	dtype = TY_DOUBLE
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 	call sprintf (Memc[par], SZ_PARREC, "%-25.16g")
 	    call pargd (value)
 	call tbhfkw (tp, keyword, parnum)			# find keyword
@@ -64,6 +66,7 @@ pointer tp			# i: Pointer to table descriptor
 real	value			# i: Value of parameter
 char	keyword[ARB]		# i: Name of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 int	dtype			# data type
@@ -86,7 +89,8 @@ begin
 
 	dtype = TY_REAL
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 	call sprintf (Memc[par], SZ_PARREC, "%-15.7g")
 	    call pargr (value)
 	call tbhfkw (tp, keyword, parnum)			# find keyword
@@ -108,6 +112,7 @@ pointer tp			# i: Pointer to table descriptor
 int	value			# i: Value of parameter
 char	keyword[ARB]		# i: Name of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 int	dtype			# data type
@@ -130,7 +135,8 @@ begin
 
 	dtype = TY_INT
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 	call sprintf (Memc[par], SZ_PARREC, "%-11d")
 	    call pargi (value)
 	call tbhfkw (tp, keyword, parnum)			# find keyword
@@ -152,6 +158,7 @@ pointer tp			# i: Pointer to table descriptor
 bool	value			# i: Value of parameter
 char	keyword[ARB]		# i: Name of parameter
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 int	dtype			# data type
@@ -175,7 +182,8 @@ begin
 
 	dtype = TY_BOOL
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 	if (value)
 	    intval = YES
 	else

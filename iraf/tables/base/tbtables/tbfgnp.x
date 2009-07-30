@@ -21,6 +21,7 @@ char	str[maxch]		# o: string to contain the value of the param.
 char	comment[maxch]		# o: string to contain comment, if any
 int	maxch			# i: max size of str
 #--
+size_t	sz_val
 pointer sp
 pointer rec		# scratch for header record
 pointer value		# scratch for value
@@ -33,9 +34,10 @@ errchk	tbferr
 
 begin
 	call smark (sp)
-	call salloc (rec, SZ_LINE, TY_CHAR)
-	call salloc (value, SZ_LINE, TY_CHAR)
-	call salloc (cmt, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (rec, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
+	call salloc (cmt, sz_val, TY_CHAR)
 
 	status = 0
 

@@ -19,14 +19,16 @@ define	DEFNUMROWS	100		# minimum increase in allrows
 procedure tbywer (tp, rownum)
 
 pointer tp		# i: pointer to table descriptor
-int	rownum		# i: (actual) row number in table
+long	rownum		# i: (actual) row number in table
 #--
-int	allrows		# allocated number of rows
+long	allrows		# allocated number of rows
+long	l_val
 errchk	tbtchs
 
 begin
 	if (rownum > TB_ALLROWS(tp)) {
 	    allrows = rownum * FRAC_INCR + DEFNUMROWS
-	    call tbtchs (tp, -1, -1, -1, allrows)	# change table size
+	    l_val = -1
+	    call tbtchs (tp, -1, -1, l_val, allrows)	# change table size
 	}
 end

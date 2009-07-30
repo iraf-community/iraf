@@ -18,19 +18,20 @@ include "tbtables.h"
 procedure tbfsft (tp, first, shift)
 
 pointer tp		# i: pointer to table descriptor
-int	first		# i: first row to be moved
-int	shift		# i: shift by this many rows
+long	first		# i: first row to be moved
+long	shift		# i: shift by this many rows
 #--
-int	abs_shift	# absolute value of shift
-int	row1		# first row of a range to be copied
-int	nrows		# number of rows written to table
-int	j, k		# loop indexes
+long	abs_shift	# absolute value of shift
+long	row1		# first row of a range to be copied
+long	nrows		# number of rows written to table
+long	j, k		# loop indexes
 int	status
+long	labs()
 errchk	tbrcpy, tbferr
 
 begin
 	nrows = TB_NROWS(tp)
-	abs_shift = abs (shift)
+	abs_shift = labs (shift)
 
 	if (first > nrows)
 	    return

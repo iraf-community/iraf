@@ -8,9 +8,9 @@ include "tbtables.h"
 procedure tbfchp (tp, ndel)
 
 pointer tp		# i: pointer to table descriptor
-int	ndel		# i: number of rows to be deleted
+long	ndel		# i: number of rows to be deleted
 #--
-int	nrows		# number of rows in the table before deleting
+long	nrows		# number of rows in the table before deleting
 int	status
 errchk	tbferr
 

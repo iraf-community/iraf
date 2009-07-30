@@ -18,7 +18,9 @@ procedure tbtwsi (tp)
 
 pointer tp			# i: pointer to table descriptor
 #--
-int	sizinfo[LEN_SIZINFO]	# Size information record
+long	sizinfo[LEN_SIZINFO]	# Size information record
+long	l_val
+size_t	sz_val
 errchk	seek, write, tbfwsi
 
 begin
@@ -31,7 +33,9 @@ begin
 	    return
 	}
 
-	call amovki (0, sizinfo, LEN_SIZINFO)	# initialize buffer to zero
+	l_val = 0
+	sz_val = LEN_SIZINFO
+	call amovkl (l_val, sizinfo, sz_val)	# initialize buffer to zero
 
 	if (TB_TYPE(tp) == TBL_TYPE_S_ROW)
 	    TB_ALLROWS(tp) = TB_NROWS(tp)	# appropriate if row-ordered
@@ -48,6 +52,9 @@ begin
 	S_VERSION(sizinfo) = TBL_CURRENT_VERSION
 
 	# Write first record of table.
-	call seek (TB_FILE(tp), BOF)
-	call write (TB_FILE(tp), sizinfo, SZ_SIZINFO)
+	l_val = BOF
+	call seek (TB_FILE(tp), l_val)
+	sz_val = SZ_SIZINFO
+	# arg2: incompatible pointer
+	call write (TB_FILE(tp), sizinfo, sz_val)
 end

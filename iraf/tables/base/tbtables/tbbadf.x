@@ -14,7 +14,7 @@ procedure tbbadf (colfmt, datatype, lendata, pformat, maxchar)
 
 char	colfmt[ARB]		# i: the print format for the column or null
 int	datatype		# i: the SPP data type of the column
-int	lendata			# i: storage requirement in table (unit=char)
+long	lendata			# i: storage requirement in table (unit=char)
 char	pformat[maxchar]	# o: the print format for the column
 int	maxchar			# i: maximum length of the string pformat
 #--
@@ -34,7 +34,7 @@ begin
 	    case TY_CHAR:
 		pformat[1] = '%'
 		call sprintf (pformat[2], maxchar-1, "-%ds")
-		    call pargi (lendata * SZB_CHAR)
+		    call pargl (lendata * SZB_CHAR)
 	    default:
 		# datatype < 0 for character type
 		pformat[1] = '%'

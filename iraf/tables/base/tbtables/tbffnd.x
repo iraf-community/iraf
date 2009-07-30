@@ -24,6 +24,7 @@ int	maxch		# i: size of extname
 int	extver		# o: EXTVER from header, or -1
 int	hdutype		# o: type of HDU
 #--
+size_t	sz_val
 pointer sp
 pointer comment		# for comment for keyword or for error message
 pointer t_extname	# for extension name in table header
@@ -63,8 +64,9 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (t_extname, SZ_LINE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (t_extname, sz_val, TY_CHAR)
+	call salloc (comment, sz_val, TY_CHAR)
 
 	if (hdu > 0) {
 
@@ -103,8 +105,9 @@ begin
 
 	# Search for the table that matches whatever was specified.
 
-	call salloc (u_extname, SZ_LINE, TY_CHAR)
-	call salloc (save, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (u_extname, sz_val, TY_CHAR)
+	call salloc (save, sz_val, TY_CHAR)
 
 	# User-specified values.
 	call strcpy (TB_EXTNAME(tp), Memc[u_extname], SZ_LINE)

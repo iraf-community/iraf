@@ -14,12 +14,12 @@ include "tbtables.h"
 procedure tbxwer (tp, rownum)
 
 pointer tp		# i: pointer to table descriptor
-int	rownum		# i: (actual) row number in table
+long	rownum		# i: (actual) row number in table
 #--
 long	locn		# location for writing (at EOF)
-int	k		# loop index
-int	nrows		# number of rows on entry to this routine
-int	rowlen		# record length
+long	k		# loop index
+long	nrows		# number of rows on entry to this routine
+size_t	rowlen		# record length
 errchk	seek, write
 
 begin

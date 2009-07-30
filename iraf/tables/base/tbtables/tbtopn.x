@@ -46,6 +46,7 @@ char	tablename[ARB]	# i: the name of the table
 int	iomode		# i: I/O mode
 pointer template	# i: pointer to template table, or zero
 #--
+size_t	sz_val
 pointer sp
 pointer brackets
 pointer errmess		# for possible error message
@@ -60,20 +61,24 @@ errchk	malloc, tbuopn, tbsopn, tbctpe, tbnparse, tbttyp, vfn_expand_ldir
 
 begin
 	call smark (sp)
-	call salloc (brackets, SZ_FNAME, TY_CHAR)
-	call salloc (errmess, SZ_LINE, TY_CHAR)
-	call salloc (rowselect, SZ_LINE, TY_CHAR)
-	call salloc (colselect, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (brackets, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmess, sz_val, TY_CHAR)
+	call salloc (rowselect, sz_val, TY_CHAR)
+	call salloc (colselect, sz_val, TY_CHAR)
 
 	crash = false			# initial value
 
 	# Allocate space for the table descriptor and for the table name.
 	# The TB_EXTNAME is the name of the table within a CDF file,
 	# or it can be the EXTNAME in a FITS file.
-	call calloc (tp, LEN_TBLSTRUCT, TY_STRUCT)
-	call malloc (TB_NAME_PTR(tp), SZ_FNAME, TY_CHAR)
-	call malloc (TB_OS_FILENAME_PTR(tp), SZ_FNAME, TY_CHAR)
-	call malloc (TB_EXTNAME_PTR(tp), SZ_FNAME, TY_CHAR)
+	sz_val = LEN_TBLSTRUCT
+	call calloc (tp, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call malloc (TB_NAME_PTR(tp), sz_val, TY_CHAR)
+	call malloc (TB_OS_FILENAME_PTR(tp), sz_val, TY_CHAR)
+	call malloc (TB_EXTNAME_PTR(tp), sz_val, TY_CHAR)
 
 	# Parse the table name, copying the file name to TB_NAME and
 	# extracting information from the bracketed expression (if any)
@@ -173,7 +178,8 @@ begin
 	    # Allocate space for the array of pointers to column descriptors.
 	    if (iomode == NEW_COPY)
 		TB_MAXCOLS(tp) = TB_MAXCOLS(template)
-	    call malloc (TB_COLPTR(tp), TB_MAXCOLS(tp), TY_POINTER)
+	    sz_val = TB_MAXCOLS(tp)
+	    call malloc (TB_COLPTR(tp), sz_val, TY_POINTER)
 	    TB_BOD(tp) = tbtbod (TB_MAXPAR(tp), TB_MAXCOLS(tp))
 	    # Copy column descriptors from template table.
 	    if (iomode == NEW_COPY) {

@@ -17,17 +17,19 @@ int	width		# i: the maximum width for this column
 int	precision	# i: the precision for writing this column
 char	fmt_code	# i: format code for print format
 #--
+size_t	sz_val
 pointer sp
 pointer pform		# scratch for print format for this column
 pointer new		# pointer to new memory for column data
 int	wid, prec	# width & precision, modified for print format
-int	row		# row number
-int	op		# offset in new char array
+long	row		# row number
+long	op		# offset in new char array
 errchk	calloc
 
 begin
 	call smark (sp)
-	call salloc (pform, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pform, sz_val, TY_CHAR)
 
 	# Assign the print format for writing previous values into
 	# the text strings.  Left justify.
@@ -46,7 +48,8 @@ begin
 
 	# Allocate memory for the array of strings.  Note that we use
 	# width rather than wid.
-	call calloc (new, (width+1) * TB_ALLROWS(tp), TY_CHAR)
+	sz_val = (width+1) * TB_ALLROWS(tp)
+	call calloc (new, sz_val, TY_CHAR)
 
 	op = 0					# initial value
 

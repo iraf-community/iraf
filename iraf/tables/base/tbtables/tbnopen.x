@@ -19,13 +19,15 @@ pointer	procedure tbnopenp (param)
 
 char	param[ARB]		# i: CL parameter with string value template
 #--
+size_t	sz_val
 pointer	sp, template, tnt
 pointer	tbnopen()
 errchk	clgstr
 
 begin
 	call smark (sp)
-	call salloc (template, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (template, sz_val, TY_CHAR)
 
 	call clgstr (param, Memc[template], SZ_LINE)
 	tnt = tbnopen (Memc[template])
@@ -40,6 +42,7 @@ pointer	procedure tbnopen (template)
 
 char	template[ARB]		# i: table name template
 #--
+size_t	sz_val
 int	sort, level, ip, ch
 pointer	sp, listp, fnt, op
 define	output {Memc[op]=$1;op=op+1}
@@ -48,7 +51,8 @@ int	strlen()
 
 begin
 	call smark (sp)
-	call salloc (fnt, strlen(template)*12/10 + SZ_FNT, TY_CHAR)
+	sz_val = strlen(template)*12/10 + SZ_FNT
+	call salloc (fnt, sz_val, TY_CHAR)
 
 	# Sorting is disabled as input and output templates, derived from the
 	# same database but with string editing used to modify the output list,
@@ -143,6 +147,7 @@ pointer	tnt			# i: table template descriptor
 char	outstr[ARB]		# o: output string
 int	maxch			# i: max chars out
 #--
+size_t	sz_val
 int	nchars
 pointer	sp, buf
 int	fntgfnb(), tbn_mapname()
@@ -150,7 +155,8 @@ errchk	fntgfnb
 
 begin
 	call smark (sp)
-	call salloc (buf, SZ_PATHNAME, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (buf, sz_val, TY_CHAR)
 
 	if (fntgfnb (tnt, Memc[buf], SZ_PATHNAME) == EOF) {
 	    outstr[1] = EOS

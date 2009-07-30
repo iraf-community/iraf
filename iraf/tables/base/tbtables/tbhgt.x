@@ -22,6 +22,7 @@ bool procedure tbhgtb (tp, keyword)
 pointer tp			# i: pointer to table descriptor
 char	keyword[ARB]		# i: name of parameter to get
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 pointer errmess			# scratch for possible error message
@@ -40,7 +41,8 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 
 	call tbhfkr (tp, keyword, dtype, Memc[par], parnum)	# find keyword
 	if (parnum > 0) {
@@ -58,7 +60,8 @@ begin
 		}
 	    }
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 			    "tbhgtb:  table header parameter `%s' not found")
 		call pargstr (keyword)
@@ -68,7 +71,7 @@ begin
 
 	if (IS_INDEFD (dblval))
 	    return (false)
-	else if (nint(dblval) == YES)
+	else if (idnint(dblval) == YES)
 	    return (true)
 	else
 	    return (false)
@@ -83,6 +86,7 @@ double procedure tbhgtd (tp, keyword)
 pointer tp			# i: pointer to table descriptor
 char	keyword[ARB]		# i: name of parameter to get
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 pointer errmess			# scratch for possible error message
@@ -98,14 +102,16 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 	call tbhfkr (tp, keyword, dtype, Memc[par], parnum)	# find keyword
 	if (parnum > 0) {
 	    dblval = INDEFD
 	    call sscan (Memc[par])
 		call gargd (dblval)
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 			"tbhgtd:  table header parameter `%s' not found")
 		call pargstr (keyword)
@@ -125,6 +131,7 @@ int procedure tbhgti (tp, keyword)
 pointer tp			# i: pointer to table descriptor
 char	keyword[ARB]		# i: name of parameter to get
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 pointer errmess			# scratch for possible error message
@@ -141,14 +148,16 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 	call tbhfkr (tp, keyword, dtype, Memc[par], parnum)	# find keyword
 	if (parnum > 0) {
 	    dblval = INDEFD
 	    call sscan (Memc[par])
 		call gargd (dblval)		# read the value as a double
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 			"tbhgti:  table header parameter `%s' not found")
 		call pargstr (keyword)
@@ -159,7 +168,7 @@ begin
 	if (IS_INDEFD (dblval))
 	    return (INDEFI)
 	else
-	    return (nint(dblval))
+	    return (idnint(dblval))
 end
 
 
@@ -171,6 +180,7 @@ real procedure tbhgtr (tp, keyword)
 pointer tp			# i: pointer to table descriptor
 char	keyword[ARB]		# i: name of parameter to get
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 pointer errmess			# scratch for possible error message
@@ -186,14 +196,16 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 	call tbhfkr (tp, keyword, dtype, Memc[par], parnum)	# find keyword
 	if (parnum > 0) {
 	    realval = INDEFR
 	    call sscan (Memc[par])
 		call gargr (realval)
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 			"tbhgtr:  table header parameter `%s' not found")
 		call pargstr (keyword)
@@ -215,6 +227,7 @@ char	keyword[ARB]		# i: name of parameter
 char	text[ARB]		# o: value of parameter
 int	maxch			# i: maximum number of characters to get
 #--
+size_t	sz_val
 pointer sp
 pointer	par			# buffer for header record for parameter
 pointer errmess			# scratch for possible error message
@@ -229,12 +242,14 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (par, SZ_PARREC, TY_CHAR)
+	sz_val = SZ_PARREC
+	call salloc (par, sz_val, TY_CHAR)
 	call tbhfkr (tp, keyword, dtype, Memc[par], parnum)	# find keyword
 	if (parnum > 0) {
 	    call strcpy (Memc[par], text, maxch)
 	} else {
-	    call salloc (errmess, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call salloc (errmess, sz_val, TY_CHAR)
 	    call sprintf (Memc[errmess], SZ_LINE,
 			"tbhgtt:  table header parameter `%s' not found")
 		call pargstr (keyword)

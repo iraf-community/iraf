@@ -14,6 +14,7 @@ procedure tbznew (tp)
 
 pointer tp		# i: pointer to table descriptor
 #--
+size_t	sz_val
 pointer cp		# pointer to a column descriptor
 int	colnum		# column number
 int	fd		# fd for table file
@@ -39,11 +40,13 @@ begin
 	# Allocate space for the list of keywords.
 	if (TB_MAXPAR(tp) <= 0)
 	    TB_MAXPAR(tp) = INCR_N_KEYWORDS
-	call calloc (TB_KEYLIST_PTR(tp), TB_MAXPAR(tp), TY_POINTER)
+	sz_val = TB_MAXPAR(tp)
+	call calloc (TB_KEYLIST_PTR(tp), sz_val, TY_POINTER)
 
 	# Allocate space for the comment buffer.
 	if (TB_COMMENT(tp) == NULL) {
-	    call malloc (TB_COMMENT(tp), SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (TB_COMMENT(tp), sz_val, TY_CHAR)
 	    TB_SZ_COMMENT(tp) = SZ_LINE
 	    Memc[TB_COMMENT(tp)] = EOS
 	}
