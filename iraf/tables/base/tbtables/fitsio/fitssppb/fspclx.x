@@ -11,13 +11,15 @@ procedure fspclx(iunit,colnum,frow,fbit,nbit,lray,status)
 
 int     iunit           # i input file pointer
 int     colnum          # i column number
-int     frow            # i first row
-int     fbit            # i first bit
-int     nbit            # i number of bits
+long	frow            # i first row
+int	fbit            # i first bit
+int	nbit            # i number of bits
 bool    lray[ARB]       # i logical array
 int     status          # o error status
 
-begin
+int	i_frow
 
-call ftpclx(iunit,colnum,frow,fbit,nbit,lray,status)
+begin
+	i_frow = frow
+	call ftpclx(iunit,colnum,i_frow,fbit,nbit,lray,status)
 end

@@ -7,13 +7,19 @@ procedure fsptbb(iunit,frow,fchar,nchars,value,status)
 # greater than the length of a row.
 
 int     iunit           # i input file pointer
-int     frow            # i first row
-int     fchar           # i first character
-int     nchars          # i number of bytes
-int     value[ARB]      # i data value
+long	frow            # i first row
+long	fchar           # i first character
+long	nchars          # i number of bytes
+char	value[ARB]      # i data value
 int     status          # o error status
 
-begin
+int	i_frow
+int	i_fchar
+int	i_nchars
 
-call ftptbb(iunit,frow,fchar,nchars,value,status)
+begin
+	i_frow = frow
+	i_fchar = fchar
+	i_nchars = nchars
+	call ftptbb(iunit,i_frow,i_fchar,i_nchars,value,status)
 end

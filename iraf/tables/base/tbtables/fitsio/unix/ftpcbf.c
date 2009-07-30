@@ -5,7 +5,7 @@
 int FTPCBF_U(XINT *iunit, XINT *convrt, XINT *nbytes, char *array,
 	     XINT *status, ftnlen array_len)
 {
-    FTPBYT_U(iunit, nbytes, array, status);
+    FTPBYT_U(iunit, nbytes, (XCHAR *)array, status);
     ZZEPRO();
     return 0;
 }

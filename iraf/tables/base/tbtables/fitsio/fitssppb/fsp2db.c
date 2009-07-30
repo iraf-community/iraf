@@ -8,7 +8,7 @@
 */
 
 int FSP2DB_U(XINT *ounit, XINT *group, XINT *dim1, XINT *nx, XINT *ny,
-	     XINT *array, XINT *status)
+	     void *array, XINT *status)
 {
     FTP2DB_U(ounit, group, dim1, nx, ny, array, status, MAX_INT);
     ZZEPRO();

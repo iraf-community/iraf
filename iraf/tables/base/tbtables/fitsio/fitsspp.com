@@ -16,7 +16,9 @@ common	/ft0001/ bufnum[MAXFILES],chdu[NB],hdutyp[NB],maxhdu[NB],
 int	compid
 common	/ftcpid/compid
 
-int	buflun, reclen, bytnum, filesize, recnum, bufid
+int	buflun, reclen, bytnum
+long	filesize, recnum
+int	bufid
 
 common	/ftsbuf/buflun[NB],reclen[NB],
 	bytnum[NB],filesize[NB],recnum[NB],bufid[MAXFILES]

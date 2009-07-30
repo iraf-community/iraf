@@ -5,7 +5,7 @@
 int FTGCBF_U(XINT *iunit, XINT *convrt, XINT *nbytes, char *array,
 	     XINT *status, ftnlen array_len)
 {
-    FTGBYT_U(iunit, nbytes, array, status);
+    FTGBYT_U(iunit, nbytes, (XCHAR *)array, status);
     ZZEPRO();
     return 0;
 }

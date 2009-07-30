@@ -10,7 +10,7 @@
 */
 
 int FSPSSB_U(XINT *iunit, XINT *group, XINT *naxis, XINT *naxes, XINT *fpixel,
-	     XINT *lpixel, XINT *array, XINT *status)
+	     XINT *lpixel, void *array, XINT *status)
 {
     FTPSSB_U(iunit, group, naxis, naxes, fpixel, lpixel, array, status,
 	     MAX_INT);

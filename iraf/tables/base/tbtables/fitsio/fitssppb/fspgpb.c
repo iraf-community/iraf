@@ -7,7 +7,7 @@
   as the array being written).
 */
 
-int FSPGPB_U(XINT *ounit, XINT *group, XINT *fparm, XINT *nparm, XINT *array,
+int FSPGPB_U(XINT *ounit, XINT *group, XINT *fparm, XINT *nparm, void *array,
 	     XINT *status)
 {
     FTPGPB_U(ounit, group, fparm, nparm, array, status, MAX_INT);

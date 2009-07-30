@@ -7,12 +7,14 @@
   as the array being read).
 */
 
-int FSG3DB_U(XINT *ounit, XINT *group, XINT *nulval, XINT *dim1, XINT *dim2,
-	     XINT *nx, XINT *ny, XINT *nz, XINT *array, XBOOL *anyflg,
+int FSG3DB_U(XINT *ounit, XINT *group, XCHAR *nulval, XINT *dim1, XINT *dim2,
+	     XINT *nx, XINT *ny, XINT *nz, void *array, XBOOL *anyflg,
 	     XINT *status)
 {
-    FTG3DB_U(ounit, group, nulval, dim1, dim2, nx, ny, nz, array, anyflg,
+    char c_nulval = *nulval;
+    FTG3DB_U(ounit, group, &c_nulval, dim1, dim2, nx, ny, nz, array, anyflg,
 	     status, MAX_INT, MAX_INT);
+    *nulval = c_nulval;
     ZZEPRO();
     return 0;
 }

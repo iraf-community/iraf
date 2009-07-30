@@ -65,8 +65,9 @@ int	status		#U returned error status (0=ok)
 bool	firsttime
 int	mode, i, nbuff, fd
 char    fname[SZ_PATHNAME]
+size_t	sz_val
 int	access(), open()
-int	fstati()
+long	fstatl()
 include	"fitsspp.com"
 data	firsttime /true/
 
@@ -77,7 +78,8 @@ begin
 	# Initialize fitsspp common.
 	if (firsttime) {
             nxtfld=0
-	    call aclri (buflun, NB)
+	    sz_val = NB
+	    call aclri (buflun, sz_val)
 	    firsttime = false
 	}
 
@@ -150,7 +152,7 @@ begin
 	call fseti (fd, F_ADVICE, SEQUENTIAL)
 
 	# Store the current size of the file
-	filesize[nbuff] = fstati (fd, F_FILESIZE)
+	filesize[nbuff] = fstatl (fd, F_FILESIZE)
 
 	# Initialize the HDU parameters
 	bufnum[funit] = nbuff
@@ -227,42 +229,49 @@ int	mm		#O month of the year (1-12)
 int	yy		#O last 2 digits of the year (1992 = 92, 2001 = 01)
 int	status		#U returned error status
 
-int	itime
+long	itime, l_val
 int	tm[LEN_TMSTRUCT]
 long	clktime()
+int	imod()
 
 begin
 	if (status > 0)
 	    return
 
-	itime = clktime (0)
+	l_val = 0
+	itime = clktime (l_val)
 	call brktime (itime, tm)
 
 	dd = TM_MDAY(tm)
 	mm = TM_MONTH(tm)
-	yy = mod (TM_YEAR(tm), 100)
+	yy = imod (TM_YEAR(tm), 100)
 end
 
 # FTMBYT -- move internal file pointer to specified byte
 
-procedure ftmbyt (iunit, bytno, igneof, status)
+procedure ftmbyt (iunit, i_bytno, igneof, status)
 
-int     iunit   	#I  fortran I/O unit number
-int     bytno   	#I  byte to move to
+int	iunit   	#I  fortran I/O unit number
+int	i_bytno   	#I  byte to move to
 bool	igneof   	#I  ignore moves past EOF?
-int     status  	#U  output error status
+int	status  	#U  output error status
 
+long	bytno, l_val
 int	nbuff
+long	lmod()
 include	"fitsspp.com"
 
 begin
+	bytno = i_bytno
+
 	if (status > 0)
 		return
 
         nbuff = bufnum[iunit]
 
 	recnum[nbuff] = (bytno / reclen[nbuff]) + 1
-        bytnum[nbuff] = mod ((bytno), reclen[nbuff])
+	l_val = reclen[nbuff]
+        bytnum[nbuff] = lmod ((bytno), l_val)
 
 	if ((bytno >= (filesize[nbuff] * SZB_CHAR)) && !(igneof) )
 		status = 107
@@ -272,12 +281,14 @@ end
 
 procedure ftmoff (iunit, offset, igneof, status)
 
-int     iunit   	#I  fortran I/O unit number
-int     offset   	#I  number of byte to move
+int	iunit   	#I  fortran I/O unit number
+int	offset   	#I  number of byte to move
 bool	igneof   	#I  ignore moves past EOF?
-int     status  	#U  output error status
+int	status  	#U  output error status
 
-int	nbuff,bytno
+int	nbuff
+long	bytno, l_val
+long	lmod()
 include	"fitsspp.com"
 
 begin
@@ -288,7 +299,8 @@ begin
         bytno = ((recnum[nbuff]-1) * reclen[nbuff]) + bytnum[nbuff] + offset
 
 	recnum[nbuff] = (bytno / reclen[nbuff]) + 1
-        bytnum[nbuff] = mod ((bytno), reclen[nbuff])
+	l_val = reclen[nbuff]
+        bytnum[nbuff] = lmod ((bytno), l_val)
 
 	if ((bytno >= (filesize[nbuff] * SZB_CHAR)) && !(igneof) )
 		status = 107
@@ -299,17 +311,19 @@ end
 
 procedure ftpi2b (ounit, nvals, incre, i2vals, status)
 
-int     ounit   	#I  fortran I/O unit number
-int     nvals   	#I  number of pixels in the i2vals array
-int     incre   	#I  byte increment between values
+int	ounit   	#I  fortran I/O unit number
+int	nvals   	#I  number of pixels in the i2vals array
+int	incre   	#I  byte increment between values
 short   i2vals[ARB]  	#I  array of input integer*2 values
-int     status  	#U  output error status
+int	status  	#U  output error status
 
+size_t	sz_val
 int	i
 int	offset
 
 begin
-        call miipak(i2vals,i2vals,nvals,TY_SHORT,MII_SHORT)
+	sz_val = nvals
+        call miipak(i2vals, i2vals, sz_val, TY_SHORT, MII_SHORT)
 
         if (incre .le. 2)
                 call ftpbyt(ounit,nvals*2,i2vals,status)
@@ -330,17 +344,19 @@ end
 
 procedure ftpi4b (ounit, nvals, incre, i4vals, status)
 
-int     ounit   	#I  fortran I/O unit number
-int     nvals   	#I  number of pixels in the i4vals array
-int     incre   	#I  byte increment between values
-int     i4vals[ARB]  	#I  array of input integer*4 values
-int     status  	#U  output error status
+int	ounit   	#I  fortran I/O unit number
+int	nvals   	#I  number of pixels in the i4vals array
+int	incre   	#I  byte increment between values
+int	i4vals[ARB]  	#I  array of input integer*4 values
+int	status  	#U  output error status
 
+size_t	sz_val
 int	i
 int	offset
 
 begin
-        call miipak(i4vals,i4vals,nvals,TY_INT,MII_LONG)
+        sz_val = nvals
+        call miipak(i4vals, i4vals, sz_val, TY_INT, MII_LONG)
 
         if (incre .le. 4)
                 call ftpbyt(ounit,nvals*4,i4vals,status)
@@ -361,17 +377,19 @@ end
 
 procedure ftpr4b (ounit, nvals, incre, r4vals, status)
 
-int     ounit   	#I  fortran I/O unit number
-int     nvals   	#I  number of pixels in the r4vals array
-int     incre   	#I  byte increment between values
+int	ounit   	#I  fortran I/O unit number
+int	nvals   	#I  number of pixels in the r4vals array
+int	incre   	#I  byte increment between values
 real    r4vals[ARB]  	#I  array of input real*4 values
-int     status  	#U  output error status
+int	status  	#U  output error status
 
+size_t	sz_val
 int	i
 int	offset
 
 begin
-        call miipak(r4vals,r4vals,nvals,TY_REAL,MII_REAL)
+        sz_val = nvals
+        call miipak(r4vals, r4vals, sz_val, TY_REAL, MII_REAL)
 
         if (incre .le. 4)
                 call ftpbyt(ounit,nvals*4,r4vals,status)
@@ -392,17 +410,19 @@ end
 
 procedure ftpr8b (ounit, nvals, incre, r8vals, status)
 
-int     ounit   	#I  fortran I/O unit number
-int     nvals   	#I  number of pixels in the r8vals array
-int     incre   	#I  byte increment between values
+int	ounit   	#I  fortran I/O unit number
+int	nvals   	#I  number of pixels in the r8vals array
+int	incre   	#I  byte increment between values
 double  r8vals[ARB]  	#I  array of input real*8 values
-int     status  	#U  output error status
+int	status  	#U  output error status
 
+size_t	sz_val
 int	i
 int	offset
 
 begin
-        call miipak(r8vals,r8vals,nvals,TY_DOUBLE,MII_DOUBLE)
+        sz_val = nvals
+        call miipak(r8vals, r8vals, sz_val,TY_DOUBLE, MII_DOUBLE)
 
         if (incre .le. 8)
                 call ftpbyt(ounit,nvals*8,r8vals,status)
@@ -423,12 +443,13 @@ end
 
 procedure ftgi2b (iunit, nvals, incre, i2vals, status)
 
-int     iunit   	#I  fortran I/O unit number
-int     nvals   	#I  number of pixels in the i2vals array
-int     incre   	#I  byte increment between values
+int	iunit   	#I  fortran I/O unit number
+int	nvals   	#I  number of pixels in the i2vals array
+int	incre   	#I  byte increment between values
 short   i2vals[ARB]  	#O  array of output integer*2 values
-int     status  	#U  output error status
+int	status  	#U  output error status
 
+size_t	sz_val
 int	i
 int	offset
 
@@ -444,7 +465,8 @@ begin
                         call ftgbyt(iunit,2,i2vals[i],status)
                 }
         }
-        call miiupk(i2vals,i2vals,nvals,MII_SHORT,TY_SHORT)
+        sz_val = nvals
+        call miiupk(i2vals, i2vals, sz_val, MII_SHORT, TY_SHORT)
 end
 
 
@@ -453,12 +475,13 @@ end
 
 procedure ftgi4b (iunit, nvals, incre, i4vals, status)
 
-int     iunit   	#I  fortran I/O unit number
-int     nvals   	#I  number of pixels in the i4vals array
-int     incre   	#I  byte increment between values
-int     i4vals[ARB]  	#O  array of output integer*4 values
-int     status  	#U  output error status
+int	iunit   	#I  fortran I/O unit number
+int	nvals   	#I  number of pixels in the i4vals array
+int	incre   	#I  byte increment between values
+int	i4vals[ARB]  	#O  array of output integer*4 values
+int	status  	#U  output error status
 
+size_t	sz_val
 int	i
 int	offset
 
@@ -474,7 +497,8 @@ begin
                         call ftgbyt(iunit,4,i4vals[i],status)
                 }
         }
-        call miiupk(i4vals,i4vals,nvals,MII_LONG,TY_INT)
+        sz_val = nvals
+        call miiupk(i4vals, i4vals, sz_val, MII_LONG, TY_INT)
 end
 
 
@@ -483,12 +507,13 @@ end
 
 procedure ftgr4b (iunit, nvals, incre, r4vals, status)
 
-int     iunit   	#I  fortran I/O unit number
-int     nvals   	#I  number of pixels in the r4vals array
-int     incre   	#I  byte increment between values
+int	iunit   	#I  fortran I/O unit number
+int	nvals   	#I  number of pixels in the r4vals array
+int	incre   	#I  byte increment between values
 real    r4vals[ARB]  	#O  array of output real*4 values
-int     status  	#U  output error status
+int	status  	#U  output error status
 
+size_t	sz_val
 int	i
 int	offset
 
@@ -504,7 +529,8 @@ begin
                         call ftgbyt(iunit,4,r4vals[i],status)
                 }
         }
-        call miiupk(r4vals,r4vals,nvals,MII_REAL,TY_REAL)
+        sz_val = nvals
+        call miiupk(r4vals, r4vals, sz_val, MII_REAL, TY_REAL)
 end
 
 
@@ -513,12 +539,13 @@ end
 
 procedure ftgr8b (iunit, nvals, incre, r8vals, status)
 
-int     iunit   	#I  fortran I/O unit number
-int     nvals   	#I  number of pixels in the r8vals array
-int     incre   	#I  byte increment between values
+int	iunit   	#I  fortran I/O unit number
+int	nvals   	#I  number of pixels in the r8vals array
+int	incre   	#I  byte increment between values
 double  r8vals[ARB]  	#O  array of output real*8 values
-int     status  	#U  output error status
+int	status  	#U  output error status
 
+size_t	sz_val
 int	i
 int	offset
 
@@ -534,7 +561,8 @@ begin
                         call ftgbyt(iunit,8,r8vals[i],status)
                 }
         }
-        call miiupk(r8vals,r8vals,nvals,MII_DOUBLE,TY_DOUBLE)
+        sz_val = nvals
+        call miiupk(r8vals, r8vals, sz_val, MII_DOUBLE, TY_DOUBLE)
 end
 
 # FTUPCH -- Convert input string (a Fortran character string) to upper case.
@@ -553,18 +581,22 @@ end
 # FTPBYT -- Write a byte sequence to a file.  The sequence may begin on any
 # byte boundary and may be any number of bytes long.
 
-procedure ftpbyt (iunit, nbytes, array, status)
+procedure ftpbyt (iunit, i_nbytes, array, status)
 
 int	iunit		#I fortran unit number
-int	nbytes		#I number of bytes to be transferred
+int	i_nbytes	#I number of bytes to be transferred
 char	array[ARB]	#I input data buffer
 int	status		#U output error status
 
-int	fd, nbuff, fpos, hdtype
-int	bytes_per_record
+int	fd, nbuff, hdtype
+long	fpos, nbytes
+long	bytes_per_record
+long	lmod()
 include	"fitsspp.com"
 
 begin
+	nbytes = i_nbytes
+
 	# Special cases.
         if (status > 0)
 	    return
@@ -594,26 +626,30 @@ begin
 	fpos = fpos + nbytes
 
 	recnum[nbuff] = (fpos / bytes_per_record)+1
-        bytnum[nbuff] = mod (fpos, bytes_per_record)
+        bytnum[nbuff] = lmod (fpos, bytes_per_record)
 end
 
 # FTGBYT -- Read a byte sequence from a file.  The sequence may begin on any
 # byte boundary and may be any number of bytes long.  An error status is
 # returned if less than the requested amount of data is read.
 
-procedure ftgbyt (iunit, nbytes, array, status)
+procedure ftgbyt (iunit, i_nbytes, array, status)
 
 int	iunit		#I fortran unit number
-int	nbytes		#I number of bytes to be transferred
+int	i_nbytes	#I number of bytes to be transferred
 char	array[ARB]	#O output data buffer
 int	status		#U output error status
 
-int	bytes_per_record
-int	fd, nbuff, fpos, nb
-int	ftread()
+long	nbytes
+long	bytes_per_record, fpos, nb
+int	fd, nbuff
+long	lmod()
+long	ftread()
 include	"fitsspp.com"
 
 begin
+	nbytes = i_nbytes
+
 	# Special cases.
         if (status > 0 || nbytes == 0)
 	    return
@@ -643,7 +679,7 @@ begin
 	fpos = fpos + max (0, nb)
 
 	recnum[nbuff] = (fpos / bytes_per_record)+1
-        bytnum[nbuff] = mod (fpos, bytes_per_record)
+        bytnum[nbuff] = lmod (fpos, bytes_per_record)
 end
 
 # FTWRIT -- Write a sequence of bytes to a file at the indicated
@@ -659,22 +695,28 @@ procedure ftwrit (fd, ibuf, hdtype, fpos, nbytes, fsize)
 int	fd			#I file descriptor
 char	ibuf[ARB]		#I data buffer
 int	hdtype			#I type of HDU (1=ASCII table)
-int	fpos			#I starting byte (0 index) in output file
-int	nbytes			#I number of bytes to transfer
-int	fsize			#I current size of the file
+long	fpos			#I starting byte (0 index) in output file
+long	nbytes			#I number of bytes to transfer
+long	fsize			#I current size of the file
 
 char	ch
 pointer	sp, bp
-int	start_char, endchr
-int	nchars, boff, junk, bufsize, nc
+long	start_char, endchr, l_val
+size_t	boff, bufsize, nc
+int	junk
+size_t	nchars
 errchk	getc, seek, write, malloc
+size_t	sz_val, c_1
 char	getc()
+long	lmod()
 
 bool	initialized
 char	blanks[SZ_FITSREC], zeros[SZ_FITSREC]
 data	initialized /false/
 
 begin
+	c_1 = 1
+
 	call smark (sp)
 
 	# The first time we are called initialize the empty (blank or
@@ -687,7 +729,8 @@ begin
 	    ch = ' '
 	    call amovkc (ch, Memc[bp], bufsize)
 	    call achtcb (Memc[bp], blanks, bufsize)
-	    call aclrc (zeros, SZ_FITSREC)
+	    sz_val = SZ_FITSREC
+	    call aclrc (zeros, sz_val)
 
 	    call mfree (bp, TY_CHAR)
 	    initialized = true
@@ -695,9 +738,10 @@ begin
 
         # Get index of first and last file chars.
         start_char = fpos / SZB_CHAR + 1
-        endchr = (fpos+nbytes - 1) / SZB_CHAR + 1
+        endchr = (fpos + nbytes - 1) / SZB_CHAR + 1
         nchars = endchr - start_char + 1
-	boff = mod (fpos, SZB_CHAR)
+	l_val = SZB_CHAR
+	boff = lmod (fpos, l_val)
 
 	# If write starting point is beyond the end of file,
 	# then insert fill bytes from the current end of file to
@@ -710,7 +754,7 @@ begin
 
 	    call seek (fd, fsize + 1)
 	    while (fsize < start_char) {
-		nc=min(start_char-fsize, SZ_FITSREC)
+		nc = min(start_char - fsize, SZ_FITSREC)
 		if (hdtype == 1)
 		    call write (fd, blanks, nc)
 		else
@@ -722,7 +766,8 @@ begin
 
 	# If things are nicely aligned write data directly to the output file
 
-	if (boff == 0 && mod(nbytes,SZB_CHAR) == 0) {
+	l_val = SZB_CHAR
+	if (boff == 0 && lmod(nbytes,l_val) == 0) {
 	    call seek (fd, start_char)
 	    call write (fd, ibuf, nchars)
 
@@ -736,7 +781,8 @@ begin
 	        call seek (fd, start_char)
 	        junk = getc (fd, Memc[bp])
 	    }
-	    if (mod (fpos+nbytes, SZB_CHAR) != 0) {
+	    l_val = SZB_CHAR
+	    if (lmod (fpos + nbytes, l_val) != 0) {
 		if (endchr > fsize) {
 		    # off end of file, so add correct fill value to last char
 		    if (hdtype == 1)
@@ -751,18 +797,20 @@ begin
 	    }
 
 	    # Insert data segment into buffer.
-	    call bytmov (ibuf, 1, Memc[bp], boff + 1, nbytes)
+	    sz_val = nbytes
+	    call bytmov (ibuf, c_1, Memc[bp], boff + 1, sz_val)
 
 	    # Write edited sequence to output file.
 	    call seek (fd, start_char)
 	    call write (fd, Memc[bp], nchars)
  	}
 
-	fsize=max(fsize,endchr)
+	fsize = max(fsize, endchr)
 
 	# Now, if file is not a multiple of 2880 bytes long, pad it with fill
 
-	nc=SZ_FITSREC - mod(fsize, SZ_FITSREC)
+	l_val = SZ_FITSREC
+	nc = SZ_FITSREC - lmod(fsize, l_val)
 	if (nc .ne. SZ_FITSREC) {
 
 		call seek (fd, fsize + 1)
@@ -784,31 +832,37 @@ end
 # directly access the file buffer for unaligned transfers, but so long
 # as most transfers are aligned the following code is as fast as anything.
 
-int procedure ftread (fd, obuf, fpos, nbytes)
+long procedure ftread (fd, obuf, fpos, nbytes)
 
 int	fd			#I file descriptor
 char	obuf[ARB]		#O output buffer
-int	fpos			#I starting byte (zero index) in input file
-int	nbytes			#I number of bytes to transfer
+long	fpos			#I starting byte (zero index) in input file
+long	nbytes			#I number of bytes to transfer
 
 pointer	sp, bp
-int	start_char, endchr
-int	nchars, boff, iostat, nout
-int	read()
+long	start_char, endchr, l_val
+size_t	nchars, nout, c_1
+long	boff, iostat
+long	read()
+long	lmod()
 errchk	read
 
 begin
+	c_1 = 1
+
         # Get index of first and last file chars.
         start_char = fpos / SZB_CHAR + 1
         endchr = (fpos+nbytes  - 1) / SZB_CHAR + 1
         nchars = endchr - start_char + 1
-	boff = mod (fpos, SZB_CHAR)
+	l_val = SZB_CHAR
+	boff = lmod (fpos, l_val)
 
 	# If things are nicely aligned read data directly into the output
 	# buffer and we are done.
 
 	call seek (fd, start_char)
-	if (boff == 0 && mod(nbytes,SZB_CHAR) == 0)
+	l_val = SZB_CHAR
+	if (boff == 0 && lmod(nbytes, l_val) == 0)
 	    return (read (fd, obuf, nchars) * SZB_CHAR)
 
 	# Allocate intermediate buffer.
@@ -824,7 +878,7 @@ begin
 
 	# Extract and return desired bytes.
 	nout = min (nbytes, iostat * SZB_CHAR - boff)
-	call bytmov (Memc[bp], boff + 1, obuf, 1, nout)
+	call bytmov (Memc[bp], boff + 1, obuf, c_1, nout)
 
 	call sfree (sp)
 	return (nout)

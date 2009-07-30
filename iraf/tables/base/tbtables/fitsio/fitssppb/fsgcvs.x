@@ -10,9 +10,9 @@ procedure fsgcvs(iunit,colnum,frow,felem,nelem,nulval,array,dim1,anynul,
 
 int     iunit           # i input file pointer
 int     colnum          # i column number
-int     frow            # i first row
-int     felem           # i first element in row
-int     nelem           # i number of elements
+long	frow            # i first row
+long	felem           # i first element in row
+long	nelem           # i number of elements
 char    nulval[SZ_FTNULL] # i value for undefined pixels
 %       character fnulva*16
 char    array[dim1,ARB]      # o array of values
@@ -24,18 +24,23 @@ int	i
 int	elem
 bool    null
 
+int	i_frow
+int	i_nelem
+
 begin
+	i_frow = frow
+	i_nelem = nelem
 
-call f77pak(nulval,fnulva,SZ_FTNULL)
+	call f77pak(nulval,fnulva,SZ_FTNULL)
 
-anynul=false
-elem=felem
-do i=1,nelem    {
-  call ftgcvs(iunit,colnum,frow,elem,1,fnulva,farray,null,status)
-  if (null)
-     anynul=true
+	anynul=false
+	elem=felem
 
-  call f77upk(farray,array(1,i),dim1)
-  elem=elem+1
- }
+	do i=1,i_nelem    {
+	    call ftgcvs(iunit,colnum,i_frow,elem,1,fnulva,farray,null,status)
+	    if (null)
+		anynul=true
+	    call f77upk(farray,array(1,i),dim1)
+	    elem=elem+1
+	}
 end

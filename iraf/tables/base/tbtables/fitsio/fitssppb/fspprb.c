@@ -7,7 +7,7 @@
   as the array being written).
 */
 
-int FSPPRB_U(XINT *ounit, XINT *group, XINT *felem, XINT *nelem, XINT *array,
+int FSPPRB_U(XINT *ounit, XINT *group, XINT *felem, XINT *nelem, void *array,
 	     XINT *status)
 {
     FTPPRB_U(ounit, group, felem, nelem, array, status, MAX_INT);

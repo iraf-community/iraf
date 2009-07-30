@@ -7,7 +7,7 @@
   as the array being read).
 */
 
-int FSGGPB_U(XINT *iunit, XINT *group, XINT *fparm, XINT *nparm, XINT *array,
+int FSGGPB_U(XINT *iunit, XINT *group, XINT *fparm, XINT *nparm, void *array,
 	     XINT *status)
 {
     FTGGPB_U(iunit, group, fparm, nparm, array, status, MAX_INT);

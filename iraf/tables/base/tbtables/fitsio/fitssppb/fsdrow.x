@@ -5,11 +5,15 @@ procedure fsdrow(ounit,frow,nrows,status)
 # delete rows in a table
 
 int     ounit           # i output file pointer
-int     frow            # first row to delete
-int     nrows           # number of rows
+long	frow            # first row to delete
+long	nrows           # number of rows
 int     status          # o error status
 
-begin
+int	i_frow
+int	i_nrows
 
-call ftdrow(ounit,frow,nrows,status)
+begin
+	i_frow = frow
+	i_nrows = nrows
+	call ftdrow(ounit,i_frow,i_nrows,status)
 end

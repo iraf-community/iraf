@@ -84,43 +84,43 @@
 
 extern int FSBDEF_U(XINT *ounit, XINT *nfield, XSHORT *tform, XINT *pcount,
 		    XINT *nrows, XINT *status);
-extern int FSG2DB_U(XINT *ounit, XINT *group, XINT *nulval, XINT *dim1,
-		    XINT *nx, XINT *ny, XINT *array, XBOOL *anyflg,
+extern int FSG2DB_U(XINT *ounit, XINT *group, XCHAR *nulval, XINT *dim1,
+		    XINT *nx, XINT *ny, void *array, XBOOL *anyflg,
 		    XINT *status);
-extern int FSG3DB_U(XINT *ounit, XINT *group, XINT *nulval, XINT *dim1,
-		    XINT *dim2, XINT *nx, XINT *ny, XINT *nz, XINT *array,
+extern int FSG3DB_U(XINT *ounit, XINT *group, XCHAR *nulval, XINT *dim1,
+		    XINT *dim2, XINT *nx, XINT *ny, XINT *nz, void *array,
 		    XBOOL *anyflg, XINT *status);
 extern int FSGCFB_U(XINT *iunit, XINT *colnum, XINT *frow, XINT *felem,
-		    XINT *nelem, XINT *array, XBOOL *flgval, XBOOL *anynul,
+		    XINT *nelem, void *array, XBOOL *flgval, XBOOL *anynul,
 		    XINT *status);
-extern int FSGCVB_U(XINT *iunit, XINT *colnum, XINT *frow, XINT *felem,
-		    XINT *nelem, XINT *nulval, XINT *array, XBOOL *anynul,
+extern int FSGCVB_U(XINT *iunit, XINT *colnum, XLONG *frow, XLONG *felem,
+		    XLONG *nelem, XCHAR *nulval, void *array, XBOOL *anynul,
 		    XINT *status);
 extern int FSGGPB_U(XINT *iunit, XINT *group, XINT *fparm, XINT *nparm,
-		    XINT *array, XINT *status);
+		    void *array, XINT *status);
 extern int FSGPFB_U(XINT *iunit, XINT *group, XINT *felem, XINT *nelem,
-		    XINT *array, XBOOL *flgval, XBOOL *anynul, XINT *status);
+		    void *array, XBOOL *flgval, XBOOL *anynul, XINT *status);
 extern int FSGPVB_U(XINT *iunit, XINT *group, XINT *felem, XINT *nelem,
-		    XINT *nulval, XINT *array, XBOOL *anynul, XINT *status);
+		    XCHAR *nulval, void *array, XBOOL *anynul, XINT *status);
 extern int FSGSFB_U(XINT *iunit, XINT *colnum, XINT *naxis, XINT *naxes,
-		    XINT *fpixel, XINT *lpixel, XINT *inc, XINT *array,
+		    XINT *fpixel, XINT *lpixel, XINT *inc, void *array,
 		    XBOOL *flgval, XBOOL *anyflg, XINT *status);
 extern int FSGSVB_U(XINT *iunit, XINT *colnum, XINT *naxis, XINT *naxes,
-		    XINT *fpixel, XINT *lpixel, XINT *inc, XINT *nulval,
-		    XINT *array, XBOOL *anyflg, XINT *status);
+		    XINT *fpixel, XINT *lpixel, XINT *inc, XCHAR *nulval,
+		    void *array, XBOOL *anyflg, XINT *status);
 extern int FSP2DB_U(XINT *ounit, XINT *group, XINT *dim1, XINT *nx, XINT *ny,
-		    XINT *array, XINT *status);
+		    void *array, XINT *status);
 extern int FSP3DB_U(XINT *ounit, XINT *group, XINT *dim1, XINT *dim2, XINT *nx,
-		    XINT *ny, XINT *nz, XINT *array, XINT *status);
-extern int FSPCLB_U(XINT *ounit, XINT *colnum, XINT *frow, XINT *felem,
-		    XINT *nelem, XINT *array, XINT *status);
+		    XINT *ny, XINT *nz, void *array, XINT *status);
+extern int FSPCLB_U(XINT *ounit, XINT *colnum, XLONG *frow, XLONG *felem,
+		    XLONG *nelem, void *array, XINT *status);
 extern int FSPCNB_U(XINT *ounit, XINT *colnum, XINT *frow, XINT *felem,
-		    XINT *nelem, XINT *array, XINT *nulval, XINT *status);
+		    XINT *nelem, void *array, XCHAR *nulval, XINT *status);
 extern int FSPGPB_U(XINT *ounit, XINT *group, XINT *fparm, XINT *nparm,
-		    XINT *array, XINT *status);
+		    void *array, XINT *status);
 extern int FSPPNB_U(XINT *ounit, XINT *group, XINT *felem, XINT *nelem,
-		    XINT *array, XINT *nulval, XINT *status);
+		    void *array, XCHAR *nulval, XINT *status);
 extern int FSPPRB_U(XINT *ounit, XINT *group, XINT *felem, XINT *nelem,
-		    XINT *array, XINT *status);
+		    void *array, XINT *status);
 extern int FSPSSB_U(XINT *iunit, XINT *group, XINT *naxis, XINT *naxes,
-		    XINT *fpixel, XINT *lpixel, XINT *array, XINT *status);
+		    XINT *fpixel, XINT *lpixel, void *array, XINT *status);

@@ -5,11 +5,15 @@ procedure fsirow(ounit,frow,nrows,status)
 # insert rows in a table
 
 int     ounit           # i output file pointer
-int     frow            # insert rows after this row
-int     nrows           # number of rows
+long	frow            # insert rows after this row
+long	nrows           # number of rows
 int     status          # o error status
 
-begin
+int	i_frow
+int	i_nrows
 
-call ftirow(ounit,frow,nrows,status)
+begin
+	i_frow = frow
+	i_nrows = nrows
+	call ftirow(ounit,i_frow,i_nrows,status)
 end

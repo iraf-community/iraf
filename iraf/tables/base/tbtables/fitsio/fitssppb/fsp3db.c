@@ -8,7 +8,7 @@
 */
 
 int FSP3DB_U(XINT *ounit, XINT *group, XINT *dim1, XINT *dim2, XINT *nx,
-	     XINT *ny, XINT *nz, XINT *array, XINT *status)
+	     XINT *ny, XINT *nz, void *array, XINT *status)
 {
     FTP3DB_U(ounit, group, dim1, dim2, nx, ny, nz, array, status, MAX_INT);
     ZZEPRO();

@@ -10,11 +10,13 @@
   ANYNUL is return with a value of .true. if any pixels were undefined.
 */
 
-int FSGPVB_U(XINT *iunit, XINT *group, XINT *felem, XINT *nelem, XINT *nulval,
-	     XINT *array, XBOOL *anynul, XINT *status)
+int FSGPVB_U(XINT *iunit, XINT *group, XINT *felem, XINT *nelem, XCHAR *nulval,
+	     void *array, XBOOL *anynul, XINT *status)
 {
-    FTGPVB_U(iunit, group, felem, nelem, nulval, array, anynul, status,
+    char c_nulval = *nulval;
+    FTGPVB_U(iunit, group, felem, nelem, &c_nulval, array, anynul, status,
 	     MAX_INT, MAX_INT);
+    *nulval = c_nulval;
     ZZEPRO();
     return 0;
 }

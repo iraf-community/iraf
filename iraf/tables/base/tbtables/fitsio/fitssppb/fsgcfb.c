@@ -8,7 +8,7 @@
 */
 
 int FSGCFB_U(XINT *iunit, XINT *colnum, XINT *frow, XINT *felem, XINT *nelem,
-	     XINT *array, XBOOL *flgval, XBOOL *anynul, XINT *status)
+	     void *array, XBOOL *flgval, XBOOL *anynul, XINT *status)
 {
     FTGCFB_U(iunit, colnum, frow, felem, nelem, array, flgval, anynul, status,
 	     MAX_INT);

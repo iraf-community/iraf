@@ -94,6 +94,7 @@ libtbtables.a:
 	fsgkyd.x
 	fsgkye.x
 	fsgkyj.x
+	fsgkyk.x
 	fsgkyl.x
 	fsgkyn.x
 	fsgkys.x
@@ -152,6 +153,7 @@ libtbtables.a:
 	fsmkyf.x
 	fsmkyg.x
 	fsmkyj.x
+	fsmkyk.x
 	fsmkyl.x
 	fsmkys.x
 	fsmnam.x
