@@ -802,6 +802,7 @@ static int do_omake ( struct context *cx, const char *fname )
 	if (recompile) {
 	    /* Get XFLAGS. */
 	    s_xflags = getsym (XFLAGS);
+	    if ( s_xflags == NULL ) s_xflags = "";
 	    xflags[0] = EOS;
 	    if (debug)
 		safe_strcat (xflags, SZ_LINE+1, "-d ");
@@ -922,8 +923,10 @@ static int do_link ( struct context *cx )
 		;
 	    lflags = (*ip == '=') ? ip + 1 : ip;
 	    lflags_set++;
-	} else
+	} else {
 	    lflags = getsym (LFLAGS);
+	    if ( lflags == NULL ) lflags = "";
+	}
 
 	if (irafdir[0])
 	    snprintf (cmd, SZ_CMD+1, "%s %s -r %s", XC, lflags, irafdir);

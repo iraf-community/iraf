@@ -240,24 +240,36 @@ addflag:		for (op=flags;  *op;  op++)
 	/* Append any flags given on the command line to XFLAGS.
 	 */
 	if (flags[0]) {
-	    char   new_xflags[SZ_LINE+1];
-	    snprintf (new_xflags, SZ_LINE+1, "%s %s", getsym(XFLAGS), flags);
+	    char new_xflags[SZ_LINE+1];
+	    const char *fsym = getsym(XFLAGS);
+	    if ( fsym != NULL ) 
+		snprintf (new_xflags, SZ_LINE+1, "%s %s", fsym, flags);
+	    else
+		snprintf (new_xflags, SZ_LINE+1, "%s", flags);
 	    putsym (XFLAGS, new_xflags);
 	}
 
 	/* Append any flags given on the command line to XVFLAGS.
 	 */
 	if (flags[0]) {
-	    char   new_xvflags[SZ_LINE+1];
-	    snprintf (new_xvflags, SZ_LINE+1, "%s %s", getsym(XVFLAGS), flags);
+	    char new_xvflags[SZ_LINE+1];
+	    const char *fsym = getsym(XVFLAGS);
+	    if ( fsym != NULL ) 
+		snprintf (new_xvflags, SZ_LINE+1, "%s %s", fsym, flags);
+	    else
+		snprintf (new_xvflags, SZ_LINE+1, "%s", flags);
 	    putsym (XVFLAGS, new_xvflags);
 	}
 
 	/* Append any flags given on the command line to LFLAGS.
 	 */
 	if (flags[0]) {
-	    char   new_lflags[SZ_LINE+1];
-	    snprintf (new_lflags, SZ_LINE+1, "%s %s", getsym(LFLAGS), flags);
+	    char new_lflags[SZ_LINE+1];
+	    const char *fsym = getsym(LFLAGS);
+	    if ( fsym != NULL ) 
+		snprintf (new_lflags, SZ_LINE+1, "%s %s", fsym, flags);
+	    else
+		snprintf (new_lflags, SZ_LINE+1, "%s", flags);
 	    putsym (LFLAGS, new_lflags);
 	}
 
