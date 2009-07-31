@@ -73,7 +73,9 @@ static const char *esc_val = "\n\t\f\r\\\"\'";
 
 int context = GLOBAL;			/* lexical context variable	*/
 
+#if 0
 static const char *machdefs[] = { "mach.h", "config.h", /* ??? "" ??? */ NULL };
+#endif
 
 /* The task structure is used for TASK declarations.  Since this is a
  * throwaway program we do not bother with dynamic storage allocation,
@@ -637,6 +639,7 @@ void do_include( void )
 	 * attempts to include any of these files since they have already been
 	 * included in the foreign definitions header file.
 	 */
+#if 0
 	if (foreigndefs) {
 	    char sysfile[SZ_PATHNAME];
 	    const char **files;
@@ -649,6 +652,7 @@ void do_include( void )
 		}
 	    }
 	}
+#endif
 
 	if ((yyin = fopen (vfn2osfn(fname[istkptr],0), "r")) == NULL) {
 	    yyin = istk[--istkptr];

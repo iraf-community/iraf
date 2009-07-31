@@ -122,4 +122,6 @@ extern	int yylex( void );
 /* xppmain.c */
 extern	int errflag;			/* set if compiler error	*/
 extern	int hbindefs;
+#if 0
 extern	int foreigndefs;
+#endif

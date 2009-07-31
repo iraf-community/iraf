@@ -1,0 +1,118 @@
+# IRAF.H -- Basic IRAF Definitions.  These definitions are automatically
+# included in every SPP program.  See also hconfig$mach.h.
+
+# Generic constants.
+
+define	ARB		999999999
+define	ERR		-1
+define	EOF		-2
+define	BOF		-3
+define	EOT		-4
+define	BOFL		BOF
+define	EOFL		EOF
+define	EOS		0
+define	NO		0
+define	YES		1
+define	OK		0
+define	NULL		0
+
+# File I/O.
+
+define	READ_ONLY	1		# file access modes
+define	READ_WRITE	2
+define	WRITE_ONLY	3
+define	APPEND		4
+define	NEW_FILE	5
+define	TEMP_FILE	6
+define	NEW_COPY	7
+define	NEW_IMAGE	5		# nice synonyms for NEW_FILE
+define	NEW_STRUCT	5
+define	NEW_TAPE	5
+define	TEXT_FILE	11		# file types
+define	BINARY_FILE	12
+define	DIRECTORY_FILE	13
+define	STATIC_FILE	14
+define	SPOOL_FILE	(-2)
+define	RANDOM		1		# advice for imagefiles
+define	SEQUENTIAL	2
+define	CLIN		1		# STDIN of the ptask
+define	CLOUT		2		# STDOUT of the ptask
+define	STDIN		3		# pseudo files (MAXOFILES + i)
+define	STDOUT		4
+define	STDERR		5
+define	STDGRAPH	6
+define	STDIMAGE	7
+define	STDPLOT		8
+
+# Buffer size.
+
+define	SZ_FNAME	255		# max chars in a file name
+define	SZ_PATHNAME	511		# OS dependent file names
+define	SZ_LINE		1023		# max chars in a line
+define	SZ_COMMAND	2047		# max size command block
+
+# Language Datatypes.
+
+define	TY_BOOL		1		# codes for type arguments, sizeof
+define	TY_CHAR		2
+define	TY_SHORT	3
+define	TY_INT		4
+define	TY_LONG		5
+define	TY_REAL		6
+define	TY_DOUBLE	7
+define	TY_COMPLEX	8
+define	TY_POINTER	9
+define	TY_SIZE_T	9
+define	TY_STRUCT	10		# last (regular) type code
+define	TY_USHORT	11		# for image i/o
+define	TY_UBYTE	12		# (special) for image i/o
+
+
+# Map the following onto host Fortran intrinsic functions if possible,
+# else onto the andi, ori, etc. portable VOS functions.
+
+# define and	andi
+# define or	ori
+# define xor	xori
+# define not	noti
+
+# Name conversions (to avoid conflicts with host system).  Must agree with
+# defines in hinclude$iraf/xnames.h.
+
+define	access	xfaccs
+define	calloc	xcallc
+define	close	xfcloe
+define	delete	xfdele
+define	error	xerror
+define	flush	xffluh
+define	getc	xfgetc
+define	getchar	xfgetr
+define	malloc	xmallc
+define	mfree	xmfree
+define	mktemp	xmktep
+define	note	xfnote
+define	open	xfopen
+define	poll	xfpoll
+define	printf	xprinf
+define	putc	xfputc
+define	putchar	xfputr
+define	qsort	xqsort
+define	read	xfread
+define	realloc	xrealc
+define	seek	xfseek
+define	sizeof	xsizef
+define	strcat	xstrct
+define	strcmp	xstrcp
+define	strcpy	xstrcy
+define	strlen	xstrln
+define	ungetc	xfungc
+define	write	xfwrie
+define  fatal   xfatal
+define  fchdir  xfchdr
+define  fscan   xfscan
+define  getopt  xgtopt
+define  getpid  xgtpid
+define  getuid  xgtuid
+define  rename  xfrnam
+define  reset   xreset
+define  scan    xxscan

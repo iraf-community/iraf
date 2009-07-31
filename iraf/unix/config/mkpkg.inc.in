@@ -8,7 +8,7 @@ $set	SITEID		= @SITEID@		# site name
 
 $set	XFLAGS		= "-c"		# default XC compile flags
 $set	XVFLAGS		= "-c"		# VOPS XC compile flags
-$set	LFLAGS		= "@LFLAGS@"		# default XC link flags
+$set	LFLAGS		= $(XC_XLFLAGS)	# default XC link flags
 
 $set	USE_LIBMAIN	= yes		# update lib$libmain.o (root object)
 $set	USE_KNET	= yes		# use the KI (network interface)

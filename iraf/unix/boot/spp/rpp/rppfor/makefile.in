@@ -1,5 +1,5 @@
 
-.f.o:	; F2C=$(F2C) CFLAGS=-I../../../../include/ $(F77) $(HSI_FF) -c $*.f
+.f.o:	; F2C=$(F2C) CFLAGS='$(HSI_CF)' $(F77) $(HSI_FF) -c $*.f
 
 all:	entxkw.f librpp.a
 

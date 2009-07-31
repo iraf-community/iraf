@@ -45,23 +45,31 @@ set_irafenv() {
   #XC_FFLAGS="-Ns1602 -Nx512"
   XC_LIBS="-lf2c"
   #
-  XC_LFLAGS=""
+  XC_XLFLAGS=""
   #
   # Architecture-dependent settings
   #
   F=""
   case "$ARCHITECTURE" in
   i386)
+    SPP_BYTE_ENDIAN="little"
+    SPP_FLOAT_ENDIAN="little"
     F="$F -DI386"
     ;;
   x86_64)
+    SPP_BYTE_ENDIAN="little"
+    SPP_FLOAT_ENDIAN="little"
     F="$F -DX86_64"
-    #XC_LFLAGS="$XC_LFLAGS -/mcmodel=medium"
+    #XC_XLFLAGS="$XC_XLFLAGS -/mcmodel=medium"
     ;;
   powerpc)
+    SPP_BYTE_ENDIAN="little"
+    SPP_FLOAT_ENDIAN="little"
     F="$F -DPOWERPC"
     ;;
   sparc)
+    SPP_BYTE_ENDIAN="big"
+    SPP_FLOAT_ENDIAN="big"
     F="$F -DSPARC"
     ;;
   *)
@@ -72,11 +80,13 @@ set_irafenv() {
     ;;
   esac
   #
+  HSI_SPP_MODEL_CDEF=""
   if [ "$SPP_DATA_MODEL" = "lp64" ]; then
-    F="$F -DSPP_LP64"
+    HSI_SPP_MODEL_CDEF="-DSPP_LP64"
   elif [ "$SPP_DATA_MODEL" = "ilp64" ]; then
-    F="$F -DSPP_ILP64"
+    HSI_SPP_MODEL_CDEF="-DSPP_ILP64"
   fi
+  F="$F $HSI_SPP_MODEL_CDEF"
   HSI_CF="$HSI_CF $F"
   XC_CFLAGS="$XC_CFLAGS $F"
   XC_FFLAGS="$XC_FFLAGS $F"
@@ -89,7 +99,7 @@ set_irafenv() {
     HSI_CF="$HSI_CF -O $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS -O"
-    XC_LFLAGS="$XC_LFLAGS -Nz"
+    XC_XLFLAGS="$XC_XLFLAGS -Nz"
     XC_LIBS="$XC_LIBS -lm"
     ;;
   freebsd)
@@ -97,7 +107,7 @@ set_irafenv() {
     HSI_CF="$HSI_CF -O $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS -O"
-    XC_LFLAGS="$XC_LFLAGS -z -/static"
+    XC_XLFLAGS="$XC_XLFLAGS -z -/static"
     XC_LIBS="$XC_LIBS -lm -lcompat"
     ;;
   darwin)
@@ -106,7 +116,7 @@ set_irafenv() {
     HSI_CF="$HSI_CF $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS"
-    XC_LFLAGS="$XC_LFLAGS -Nz"
+    XC_XLFLAGS="$XC_XLFLAGS -Nz"
     XC_LIBS="$XC_LIBS -lm"
     ;;
   sunos)
@@ -114,7 +124,7 @@ set_irafenv() {
     HSI_CF="$HSI_CF -O $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS -O"
-    XC_LFLAGS="$XC_LFLAGS -Nz"
+    XC_XLFLAGS="$XC_XLFLAGS -Nz"
     XC_LIBS="$XC_LIBS -lm -lsocket -lnsl -lintl -ldl -lelf"
     ;;
   cygwin)
@@ -122,7 +132,7 @@ set_irafenv() {
     HSI_CF="$HSI_CF -O $CF_DEFS"
     XC_CFLAGS="$XC_CFLAGS -O $CF_DEFS"
     XC_FFLAGS="$XC_FFLAGS -O"
-    XC_LFLAGS="$XC_LFLAGS -Nz"
+    XC_XLFLAGS="$XC_XLFLAGS -Nz"
     XC_LIBS="$XC_LIBS -lm"
     ;;
   *)
@@ -141,7 +151,7 @@ set_irafenv() {
   fi
   export HSI_CF HSI_XF HSI_FF HSI_LF HSI_F77LIBS HSI_LFLAGS HSI_OSLIBS
   export HSI_LIBS
-  export XC_CFLAGS XC_FFLAGS XC_LIBS
+  export XC_CFLAGS XC_FFLAGS XC_XLFLAGS XC_LIBS
 
   # see tables/lib/zzsetenv.def
   #tables=${iraf}tables/
@@ -250,7 +260,6 @@ HSI_LF      = $HSI_LF
 HSI_F77LIBS = $HSI_F77LIBS
 RANLIB      = $RANLIB
 HSI_LIBS    = $HSI_LIBS
-XC_LFLAGS   = $XC_LFLAGS
 $ARG_ADDITIONAL_DEFS
 
 EOF
@@ -307,6 +316,8 @@ ARCHITECTURE=""
 OPERATING_SYSTEM=""
 VENDOR=""
 SPP_DATA_MODEL=""
+SPP_BYTE_ENDIAN=""
+SPP_FLOAT_ENDIAN=""
 
 USER=`whoami`
 
@@ -318,7 +329,8 @@ else
   set_mach "$ARG_MACH"
 fi
 
-export ARCHITECTURE OPERATING_SYSTEM VENDOR SPP_DATA_MODEL
+export ARCHITECTURE OPERATING_SYSTEM VENDOR
+export SPP_DATA_MODEL SPP_BYTE_ENDIAN SPP_FLOAT_ENDIAN
 
 #echo debug: $ARCHITECTURE :: $OPERATING_SYSTEM :: $VENDOR
 #echo debug: $MACH
@@ -376,6 +388,10 @@ EOF
     exit $S
   fi
   if [ "`grep 'X_MARK_X' $F`" != "" ]; then
+    if [ "$SPP_BYTE_ENDIAN" != "little" ]; then
+      echo "[ERROR] Cannot detect endian correctly."
+      exit 1
+    fi
     D="$D -DBYTE_LITTLE"
   fi
   cat <<EOF | cpp -P $HSI_CF > $F
@@ -389,6 +405,10 @@ EOF
     exit $S
   fi
   if [ "`grep 'X_MARK_X' $F`" != "" ]; then
+    if [ "$SPP_FLOAT_ENDIAN" != "little" ]; then
+      echo "[ERROR] Cannot detect endian correctly."
+      exit 1
+    fi
     D="$D -DFLOAT_LITTLE"
   fi
   output_makefile iraf/unix/config makefile.in "$D"
@@ -396,20 +416,23 @@ EOF
   # F2C
   #F="`echo $HSI_CF | tr ' ' '\n' | egrep -e '-DSPP' -e '-I' | tr '\n' ' '`"
   # See also MAX_OUTPUT_SIZE in niceprintf.h
-  F="-DDEF_C_LINE_LENGTH=5120"
+  F="-DDEF_C_LINE_LENGTH=5120 $HSI_SPP_MODEL_CDEF"
   #
   echo Makeing iraf/unix/f2c/src/Makefile.
   ( cd iraf/unix/f2c/src    ; cat makefile.u | \
-    sed -e 's|^\(CFLAGS = \)\(.*\)|\1\2 -Wall '"$F"'|' > Makefile )
+    sed -e 's|^\(CFLAGS = \)\(.*\)|\1\2 -Wall '"$F"'|' \
+        -e 's|^\(CC = \)\(.*\)|\1gcc|' > Makefile )
   #
   echo Makeing iraf/unix/f2c/libf2c/Makefile.
   if [ "$SPP_DATA_MODEL" = "lp64" ]; then
     ( cd iraf/unix/f2c/libf2c ; cat makefile.u | \
     sed -e 's/^\(OFILES = \)\(.*\)/\1$(QINT) \2/' \
-        -e 's|^\(CFLAGS = \)\(.*\)|\1\2 -Wall '"$F"'|' > Makefile )
+        -e 's|^\(CFLAGS = \)\(.*\)|\1\2 -Wall '"$F"'|' \
+        -e 's|^\(CC = \)\(.*\)|\1gcc|' > Makefile )
   else
     ( cd iraf/unix/f2c/libf2c ; cat makefile.u | \
-    sed -e 's|^\(CFLAGS = \)\(.*\)|\1\2 -Wall '"$F"'|' > Makefile )
+    sed -e 's|^\(CFLAGS = \)\(.*\)|\1\2 -Wall '"$F"'|' \
+        -e 's|^\(CC = \)\(.*\)|\1gcc|' > Makefile )
   fi
   #
   output_makefile iraf/unix/os makefile.in

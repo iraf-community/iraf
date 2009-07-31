@@ -18,13 +18,15 @@
  * Main routine for the XPP preprocessor (first pass of the SPP compiler).
  */
 
+#define MAX_IRAFDEFS	64
+#define IRAFCONFIGDIR	"host$config/"
 #define IRAFDEFS	"host$config/iraf.h"
 
 int	errflag;
-int	foreigndefs;
 int	hbindefs = 0;
 
-static char irafdefs[SZ_PATHNAME];
+static int n_irafdefs = 0;
+static char irafdefs[MAX_IRAFDEFS][SZ_PATHNAME];
 static const char *pkgenv = NULL;
 static char v_pkgenv[SZ_FNAME];
 
@@ -63,8 +65,19 @@ int main ( int argc, char *argv[] )
 		    if ((p = argv[++i]) == NULL)
 			--i;
 		    else {
-			foreigndefs++;
-			snprintf (irafdefs, SZ_PATHNAME, "%s", p);
+			if ( n_irafdefs < MAX_IRAFDEFS ) {
+			    if ( p[0] == '/' ) {
+				snprintf (irafdefs[n_irafdefs], SZ_PATHNAME,
+					  "%s", p);
+				n_irafdefs++;
+			    }
+			    else {
+				snprintf (irafdefs[n_irafdefs], SZ_PATHNAME,
+					  "%s%s",
+					  vfn2osfn (IRAFCONFIGDIR,0), p);
+				n_irafdefs++;
+			    }
+			}
 		    }
 		    break;
 		case 'A':
@@ -97,8 +110,10 @@ int main ( int argc, char *argv[] )
 
 	/* Generate pathname of <iraf.h>.
 	 */
-	if (!foreigndefs)
-	    snprintf (irafdefs, SZ_PATHNAME, "%s", vfn2osfn (IRAFDEFS,0));
+	if ( n_irafdefs == 0 ) {
+	    snprintf (irafdefs[0], SZ_PATHNAME, "%s", vfn2osfn (IRAFDEFS,0));
+	    n_irafdefs++;
+	}
 
 	/* Process either the standard input or a list of files.
 	 */
@@ -125,6 +140,7 @@ int main ( int argc, char *argv[] )
 			fflush (stderr);
 			errflag |= XPP_BADXFILE;
 		    } else {
+			int j;
 			/* Open output file.
 			 */
 			if (rfflag) {
@@ -141,17 +157,20 @@ int main ( int argc, char *argv[] )
 			} else
 			    yyout = stdout;
 
-			/* Open and process hconfig$iraf.h.
+			/* Open and process hconfig$iraf.h, etc.
 			 */
-			if ((fp_defs = fopen (irafdefs, "r")) == NULL) {
-			    fprintf (stderr, "cannot open %s\n", irafdefs);
-			    ZZSTOP();
-			    exit (XPP_COMPERR);
+			for ( j=0 ; j < n_irafdefs ; j++ ) {
+			    if ((fp_defs = fopen (irafdefs[j], "r")) == NULL) {
+				fprintf (stderr, "cannot open %s\n",
+					 irafdefs[j]);
+				ZZSTOP();
+				exit (XPP_COMPERR);
+			    }
+			    yyin = fp_defs;
+			    yylex();
+			    linenum[0] = 1;
+			    fclose (fp_defs);
 			}
-			yyin = fp_defs;
-			yylex();
-			linenum[0] = 1;
-			fclose (fp_defs);
 
 			/* Process the source file.
 			 */

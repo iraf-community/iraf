@@ -34,6 +34,7 @@
 #define NO		0
 #define MAXFLAG		64			/* maximum option flags */
 #define MAXFILE		1024			/* maximum files on cmdline */
+#define MAXFOREIGNDEFS	64
 #define SZ_CMDBUF	4096			/* maximum command buffer */
 #define SZ_BUFFER	4096			/* library names, flags */
 #define SZ_LIBBUF	4096			/* full library names */
@@ -127,8 +128,8 @@ static char v_pkgenv[SZ_PKGENV+1];
 static int nflags, nfiles, nhlibs, nxfiles, nffiles;
 static signal_handler_t sig_int, sig_quit, sig_hup, sig_term;
 /* static const char *shellname = "/bin/sh"; */
-static int foreigndefs = NO;
-static const char *foreign_defsfile = "";
+static int foreigndefs = 0;
+static const char *foreign_defsfiles[MAXFOREIGNDEFS];
 static int pid;
 
 static void add_include_dir ( const char * );
@@ -411,9 +412,11 @@ int main ( int argc, char *argv[] )
 			if ((arg = argv[++i]) == EOS)
 			    i--;
 			else {
-			    foreigndefs++;
-			    foreign_defsfile = arg;
-			    continue;
+			    if ( foreigndefs < MAXFOREIGNDEFS ) {
+				foreign_defsfiles[foreigndefs] = arg;
+				foreigndefs++;
+				continue;
+			    }
 			}
 		    }
 
@@ -1103,7 +1106,11 @@ static void printargs ( const char *cmd, const char *arglist[], int nargs )
 static void xtof ( char *file )
 {
 	static char xpp_path[SZ_PATHNAME+1], rpp_path[SZ_PATHNAME+1];
-	char cmdbuf[SZ_CMDBUF], fname[SZ_FNAME];
+	char cmdbuf[SZ_CMDBUF], fname[SZ_FNAME], xpp_h_options[SZ_CMDBUF];
+	const char *ep;
+	char spp_model[SZ_FNAME];
+	char byte_endian[SZ_FNAME];
+	char float_endian[SZ_FNAME];
 
 	if ( MAXFILE <= nxfiles )
 	    fatal ("too many files");
@@ -1119,23 +1126,50 @@ static void xtof ( char *file )
 	    if (os_sysfile (XPP, "sppincludes", xpp_path, SZ_PATHNAME+1) <= 0)
 		strcpy (xpp_path, XPP);
 
+	if ( foreigndefs == 0 ) {
+	    ep = os_getenv("SPP_DATA_MODEL");
+	    if ( ep == NULL ) spp_model[0] = EOS;
+	    else snprintf(spp_model, SZ_FNAME, "%s", ep);
+
+	    ep = os_getenv("SPP_BYTE_ENDIAN");
+	    if ( ep == NULL ) byte_endian[0] = EOS;
+	    else snprintf(byte_endian, SZ_FNAME, "%s", ep);
+
+	    ep = os_getenv("SPP_FLOAT_ENDIAN");
+	    if ( ep == NULL ) float_endian[0] = EOS;
+	    else snprintf(float_endian, SZ_FNAME, "%s", ep);
+
+	    snprintf(xpp_h_options, SZ_CMDBUF,
+		     "-h iraf.h -h %s.h -h byte_%s.h -h float_%s.h",
+		     spp_model, byte_endian, float_endian);
+	}
+	else {
+	    int j;
+	    xpp_h_options[0] = EOS;
+	    for ( j=0 ; j < foreigndefs ; j++ ) {
+		safe_strcat (xpp_h_options, SZ_CMDBUF, "-h ");
+		safe_strcat (xpp_h_options, SZ_CMDBUF, foreign_defsfiles[j]);
+		safe_strcat (xpp_h_options, SZ_CMDBUF, " ");
+	    }
+	}
+
 	if (userincs) {
 	    if (pkgenv)
-	        snprintf (cmdbuf, SZ_CMDBUF, "%s %s -A -R %s", xpp_path, pkgenv, file);
+	        snprintf (cmdbuf, SZ_CMDBUF, "%s %s %s -A -R %s", 
+			  xpp_path, xpp_h_options, pkgenv, file);
 	    else
-	        snprintf (cmdbuf, SZ_CMDBUF, "%s -A -R %s", xpp_path, file);
+	        snprintf (cmdbuf, SZ_CMDBUF, "%s %s -A -R %s", 
+			  xpp_path, xpp_h_options, file);
 	} else {
 	    if (pkgenv)
-	        snprintf (cmdbuf, SZ_CMDBUF, "%s %s -R %s", xpp_path, pkgenv, file);
+	        snprintf (cmdbuf, SZ_CMDBUF, "%s %s %s -R %s",
+			  xpp_path, xpp_h_options, pkgenv, file);
 	    else
-	        snprintf (cmdbuf, SZ_CMDBUF, "%s -R %s", xpp_path, file);
+	        snprintf (cmdbuf, SZ_CMDBUF, "%s %s -R %s",
+			  xpp_path, xpp_h_options, file);
 	}
 
-	if (foreigndefs) {
-	    safe_strcat (cmdbuf, SZ_CMDBUF, " -h ");
-	    safe_strcat (cmdbuf, SZ_CMDBUF, foreign_defsfile);
-	}
-
+	if (outputargs) printargs (cmdbuf, NULL, 0);
 	errflag |= sys (cmdbuf);
 	chdot (file, 'r');
 
@@ -1145,10 +1179,12 @@ static void xtof ( char *file )
 	if (!rpp_path[0])
 	    if (os_sysfile (RPP, "sppincludes", rpp_path, SZ_PATHNAME+1) <= 0)
 		strcpy (rpp_path, RPP);
-	snprintf (cmdbuf, SZ_CMDBUF, "%s %s%s >%s",
-	    rpp_path, dbgout ? "-g " : "", file, fname);
-	if (!(errflag & XPP_BADXFILE))
+	snprintf (cmdbuf, SZ_CMDBUF, "%s %s%s > %s",
+		  rpp_path, dbgout ? "-g " : "", file, fname);
+	if (!(errflag & XPP_BADXFILE)) {
+	    if (outputargs) printargs (cmdbuf, NULL, 0);
 	    errflag |= sys (cmdbuf);
+	}
 
 	unlink (file);			/* remove ".r" file */
 	chdot (file, 'f');		/* change name to ".f" */
@@ -1299,11 +1335,13 @@ static int sys ( const char *cmnd )
 	    else if (*ip == '>') {
 		if (ip[1] == '>') {
 		    append = YES;
-		    outname = ip+2;
+		    ip += 2;
 		} else {
 		    append = NO;
-		    outname = ip+1;
+		    ip += 1;
 		}
+		while ( isspace(*ip) ) ++ip;
+		outname = ip;
 	    } else {
 		if ( argc < 256-1 ) 
 		    argv[argc++] = ip;
