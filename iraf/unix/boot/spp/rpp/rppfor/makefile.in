@@ -1,7 +1,7 @@
 
 .f.o:	; F2C=$(F2C) CFLAGS='$(HSI_CF)' $(F77) $(HSI_FF) -c $*.f
 
-all:	entxkw.f librpp.a
+all::	librpp.a
 
 librpp.a:	addchr.o allblk.o alldig.o baderr.o balpar.o beginc.o \
 		brknxt.o cascod.o caslab.o declco.o deftok.o doarth.o \
@@ -22,9 +22,10 @@ librpp.a:	addchr.o allblk.o alldig.o baderr.o balpar.o beginc.o \
 	$(RANLIB) $@
 	cp -p $@ ../.
 
-entxkw.f::
-	rm -f entxkw.f
-	cpp -traditional-cpp -undef -P $(HSI_CF) entxkw.f.in > entxkw.f
+entxkw.o:
+	cpp -traditional-cpp -undef -P $(HSI_CF) $*.fpp > $*.f
+	F2C=$(F2C) CFLAGS='$(HSI_CF)' $(F77) $(HSI_FF) -c $*.f
+	rm -f $*.f
 
 clean::
-	rm -f *.o *.c librpp.a ../librpp.a entxkw.f
+	rm -f *.o *.c librpp.a ../librpp.a
