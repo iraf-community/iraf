@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <dirent.h>
 #include "xpp.h"
@@ -227,7 +228,7 @@ int main ( int argc, char *argv[] )
 	    char *pp, u_pkgenv[SZ_PKGENV+1];
 	    const char *pkgname;
 
-	    if (ep = os_getenv ("PKGENV")) {
+	    if ((ep = os_getenv ("PKGENV"))) {
 		safe_strcpy (pp = u_pkgenv, SZ_PKGENV+1, ep);
 		while (*pp) {
 		    while (isspace(*pp))
@@ -853,7 +854,7 @@ static void add_include_dir ( const char *env_vals )
 	if ( env_vals == NULL ) return;
 
 	for ( ip=env_vals ; *ip ; ) {
-	    while ( *ip && isspace(*ip) || *ip == ',' )
+	    while ( (*ip && isspace(*ip)) || *ip == ',' )
 		ip++;
 	    maxop = fname + SZ_FNAME -1;
 	    for ( op=fname ; *ip && !(isspace (*ip) || *ip == ',') ; ip++ ) {
@@ -907,7 +908,7 @@ static const char *mkfname ( const char *i_fname )
 	/* Library referenced as -lXXX */
 	if (strncmp (i_fname, "-l", 2) == 0) {
 	    snprintf (fname, SZ_PATHNAME+1, "lib%s.a", &i_fname[2]);
-	    if (oname = iraflib (fname))
+	    if ((oname = iraflib (fname)))
 		return (oname);
 	    else
 		return (i_fname);
@@ -915,7 +916,7 @@ static const char *mkfname ( const char *i_fname )
 
 	/* Must be a library filename or pathname */
 	safe_strcpy (fname, SZ_PATHNAME+1, i_fname);
-	if (oname = iraflib (fname))
+	if ((oname = iraflib (fname)))
 	    safe_strcpy (libp, SZ_LIBBUF+1 - (libp-libbuf), oname);
 	else
 	    safe_strcpy (libp, SZ_LIBBUF+1 - (libp-libbuf), fname);
@@ -1108,9 +1109,6 @@ static void xtof ( char *file )
 	static char xpp_path[SZ_PATHNAME+1], rpp_path[SZ_PATHNAME+1];
 	char cmdbuf[SZ_CMDBUF], fname[SZ_FNAME], xpp_h_options[SZ_CMDBUF];
 	const char *ep;
-	char spp_model[SZ_FNAME];
-	char byte_endian[SZ_FNAME];
-	char float_endian[SZ_FNAME];
 
 	if ( MAXFILE <= nxfiles )
 	    fatal ("too many files");
@@ -1126,26 +1124,13 @@ static void xtof ( char *file )
 	    if (os_sysfile (XPP, "sppincludes", xpp_path, SZ_PATHNAME+1) <= 0)
 		strcpy (xpp_path, XPP);
 
-	if ( foreigndefs == 0 ) {
-	    ep = os_getenv("SPP_DATA_MODEL");
-	    if ( ep == NULL ) spp_model[0] = EOS;
-	    else snprintf(spp_model, SZ_FNAME, "%s", ep);
-
-	    ep = os_getenv("SPP_BYTE_ENDIAN");
-	    if ( ep == NULL ) byte_endian[0] = EOS;
-	    else snprintf(byte_endian, SZ_FNAME, "%s", ep);
-
-	    ep = os_getenv("SPP_FLOAT_ENDIAN");
-	    if ( ep == NULL ) float_endian[0] = EOS;
-	    else snprintf(float_endian, SZ_FNAME, "%s", ep);
-
-	    snprintf(xpp_h_options, SZ_CMDBUF,
-		     "-h iraf.h -h %s.h -h byte_%s.h -h float_%s.h",
-		     spp_model, byte_endian, float_endian);
-	}
-	else {
-	    int j;
+	if ((ep = os_getenv("XC-XPPFLAGS")) || (ep = os_getenv("XC_XPPFLAGS")))
+	    snprintf(xpp_h_options, SZ_CMDBUF, "%s ", ep);
+	else
 	    xpp_h_options[0] = EOS;
+	    
+	if ( 0 < foreigndefs ) {
+	    int j;
 	    for ( j=0 ; j < foreigndefs ; j++ ) {
 		safe_strcat (xpp_h_options, SZ_CMDBUF, "-h ");
 		safe_strcat (xpp_h_options, SZ_CMDBUF, foreign_defsfiles[j]);

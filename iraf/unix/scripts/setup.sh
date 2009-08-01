@@ -40,6 +40,8 @@ set_irafenv() {
   HSI_LFLAGS=""
   HSI_OSLIBS=""
   #
+  XC_XPPFLAGS="-h iraf.h"
+  #
   XC_CFLAGS="-Wall"
   XC_FFLAGS="-Wall"
   #XC_FFLAGS="-Ns1602 -Nx512"
@@ -143,6 +145,25 @@ set_irafenv() {
     ;;
   esac
   #
+  if [ "$SPP_DATA_MODEL" = "lp64" ]; then
+    XC_XPPFLAGS="$XC_XPPFLAGS -h lp64.h"
+  elif [ "$SPP_DATA_MODEL" = "ilp64" ]; then
+    XC_XPPFLAGS="$XC_XPPFLAGS -h ilp64.h"
+  else
+    XC_XPPFLAGS="$XC_XPPFLAGS -h ilp32.h"
+  fi
+  #
+  if [ "$SPP_BYTE_ENDIAN" = "little" ]; then
+    XC_XPPFLAGS="$XC_XPPFLAGS -h byte_little.h"
+  else
+    XC_XPPFLAGS="$XC_XPPFLAGS -h byte_big.h"
+  fi
+  if [ "$SPP_FLOAT_ENDIAN" = "little" ]; then
+    XC_XPPFLAGS="$XC_XPPFLAGS -h float_little.h"
+  else
+    XC_XPPFLAGS="$XC_XPPFLAGS -h float_big.h"
+  fi
+  #
   if [ "$1" = "novos" ]; then
     HSI_CF="$HSI_CF -DNOVOS"
     HSI_LIBS="${hlib}libboot.a ${hlib}libos.a"
@@ -151,7 +172,7 @@ set_irafenv() {
   fi
   export HSI_CF HSI_XF HSI_FF HSI_LF HSI_F77LIBS HSI_LFLAGS HSI_OSLIBS
   export HSI_LIBS
-  export XC_CFLAGS XC_FFLAGS XC_XLFLAGS XC_LIBS
+  export XC_XPPFLAGS XC_CFLAGS XC_FFLAGS XC_XLFLAGS XC_LIBS
 
   # see tables/lib/zzsetenv.def
   #tables=${iraf}tables/
