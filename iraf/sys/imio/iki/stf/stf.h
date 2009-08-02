@@ -46,20 +46,20 @@ define	STF_GROUPS	Memi[P2I($1+12)]	# group format?
 define	STF_GCOUNT	Memi[P2I($1+13)]	# number of groups in STF image
 define	STF_PSIZE	Memi[P2I($1+14)]	# size of GPB, bits
 define	STF_PCOUNT	Memi[P2I($1+15)]	# number of parameters in GPB
-define	STF_DATATYPE	Memc[P2C($1+16)]# datatype string
-define	STF_LENAXIS	Meml[P2L($1+35)+$2-1]# 35:41 = [7] max
+define	STF_DATATYPE	Memc[P2C($1+16)]	# datatype string
+define	STF_LENAXIS	Meml[P2L($1+35)+$2-1]	# 35:41 = [7] max
 define	STF_PDES	(($1)+43+((($2)-1)*LEN_PDES))
 
 # GPB Parameter descriptor.
 define	LEN_PDES	81
-define	P_OFFSET	Memi[P2I($1)]	# struct offset of parameter
-define	P_SPPTYPE	Memi[P2I($1+1)]	# SPP datatype of parameter
-define	P_LEN		Memi[P2I($1+2)]	# number of elements
-define	P_PSIZE		Memi[P2I($1+3)]	# field size, bits
-define	P_PTYPEP	(P2C($1+4))	# pointer to parameter name
-define	P_PTYPE		Memc[P2C($1+4)]	# parameter name
-define	P_PDTYPE	Memc[P2C($1+13)]# datatype string
-define	P_COMMENT	Memc[P2C($1+30)]# comment string
+define	P_OFFSET	Memi[P2I($1)]		# struct offset of parameter
+define	P_SPPTYPE	Memi[P2I($1+1)]		# SPP datatype of parameter
+define	P_LEN		Memi[P2I($1+2)]		# number of elements
+define	P_PSIZE		Memi[P2I($1+3)]		# field size, bits
+define	P_PTYPEP	(P2C($1+4))		# pointer to parameter name
+define	P_PTYPE		Memc[P2C($1+4)]		# parameter name
+define	P_PDTYPE	Memc[P2C($1+13)]	# datatype string
+define	P_COMMENT	Memc[P2C($1+30)]	# comment string
 
 # Reserved FITS keywords known to this code.
 define	KW_BITPIX	1

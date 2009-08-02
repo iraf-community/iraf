@@ -14,6 +14,7 @@ int procedure gi_gfind (im, keyword)
 pointer im		# i: Image descriptor
 char	keyword[ARB] 	# i: Group parameter keyword name
 #--
+size_t	sz_val
 int	pn
 pointer	sp, key, stf, pp
 
@@ -29,7 +30,8 @@ begin
 	# Convert keyword to upper case
 
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
 	call strcpy (keyword, Memc[key], SZ_FNAME)
 	call strupr (Memc[key])
 

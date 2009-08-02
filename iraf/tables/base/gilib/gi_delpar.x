@@ -14,6 +14,7 @@ char	pname[ARB]		#I parameter name
 
 pointer	pp, stf, po, pi
 
+size_t	sz_val
 int	i, j, pnum, strncmp(), nbits, imaccf()
 
 begin
@@ -28,7 +29,8 @@ begin
 	      for (j = i; j < pnum; j=j+1) {
 		  pi = STF_PDES(stf,j+1)
 		  po = STF_PDES(stf,j)
-		  call amovi (P_OFFSET(pi), P_OFFSET(po), LEN_PDES)
+		  sz_val = LEN_PDES
+		  call amovi (P_OFFSET(pi), P_OFFSET(po), sz_val)
 	      }
 	      break
 	   }

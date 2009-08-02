@@ -16,6 +16,7 @@ int	plen			#I length (> 1 if array)
 char	pval[ARB]		#I string encoded initial parameter value
 char	pcomm[ARB]		#I string comment to the new parameter
 
+size_t	sz_val
 bool	bval
 real	rval
 double	dval
@@ -24,8 +25,8 @@ long	lval
 pointer	pp, stf
 
 bool	initparam
-int	ival, ip, junk, pnum, i, strncmp()
-int	ctoi(), ctor(), ctod(), imaccf()
+int	ival, ip, junk, pnum, i
+int	strncmp(), ctoi(), ctol(), ctor(), ctod(), imaccf()
 errchk	imadds, imaddl, imaddr, imaddd, imastr
 
 begin
@@ -44,8 +45,8 @@ begin
 
 	# Get memory for it
 	if (STF_PCOUNT(stf) > 0) {
-	   call realloc (stf,
-	        LEN_STFBASE + STF_PCOUNT(stf) * LEN_PDES, TY_STRUCT)
+	   sz_val = LEN_STFBASE + STF_PCOUNT(stf) * LEN_PDES
+	   call realloc (stf, sz_val, TY_STRUCT)
 	   IM_KDES(im) = stf
 	}
 
@@ -73,12 +74,22 @@ begin
 		sval = ival
 		call imadds (im, P_PTYPE(pp), sval)
 	    }
-	case TY_LONG, TY_INT:
+	case TY_INT:
 	    call strcpy ("INTEGER*4", P_PDTYPE(pp), SZ_PDTYPE)
-	    P_PSIZE(pp) = plen * SZ_LONG * SZB_CHAR * NBITS_BYTE
+	    P_PSIZE(pp) = plen * SZ_INT * SZB_CHAR * NBITS_BYTE
 	    if (initparam) {
 		junk = ctoi (pval, ip, ival)
-		lval = ival
+		call imaddi (im, P_PTYPE(pp), ival)
+	    }
+	case TY_LONG:
+	    if ( SZ_LONG == 2 ) {
+		call strcpy ("INTEGER*4", P_PDTYPE(pp), SZ_PDTYPE)
+	    } else {
+		call strcpy ("INTEGER*8", P_PDTYPE(pp), SZ_PDTYPE)
+	    }
+	    P_PSIZE(pp) = plen * SZ_LONG * SZB_CHAR * NBITS_BYTE
+	    if (initparam) {
+		junk = ctol (pval, ip, lval)
 		call imaddl (im, P_PTYPE(pp), lval)
 	    }
 	case TY_REAL:
@@ -108,7 +119,8 @@ begin
 			P_PSIZE(pp) / (SZB_CHAR * NBITS_BYTE)
 
 	P_OFFSET(pp) = 0
-	if (dtype == TY_INT) dtype = TY_LONG
+	# ???
+	#if (dtype == TY_INT) dtype = TY_LONG
 	P_SPPTYPE(pp) = dtype
 	P_LEN(pp) = plen
 	call strcpy(pcomm, P_COMMENT(pp), FITS_SZCOMMENT)

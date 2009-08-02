@@ -13,22 +13,27 @@ char	image1[SZ_FNAME]		# Input image
 char	image2[SZ_FNAME]		# Output image
 bool	verbose
 
-int	npix, junk,i
+size_t	sz_val, npix
+long	junk, c_1, l_val
+int	i
 pointer	buf1, buf2, im1, im2
 pointer	sp
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld()
-int	impnls(), impnli(), impnll(), impnlr(), impnld(), imaccf()
+long	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld()
+long	impnls(), impnli(), impnll(), impnlr(), impnld()
+int	imaccf()
 pointer	immap()
 
-pointer	tp, cp, pp
+pointer	tp, cp, pp, stf
 char	line[SZ_LINE], tname[SZ_FNAME], extn[MAX_LENEXTN]
 char	pname[SZ_PTYPE]
-int	stf, gn
-int	ngroups, pcount, blklen, ndim2, compress
+int	gn, ngroups, pcount, blklen, ndim2, compress
 real	datamin, datamax
+include	<nullptr.inc>
 
 begin
+	c_1 = 1
+
 	call iki_init
 	call smark (sp)
 
@@ -38,7 +43,7 @@ begin
 	datamax = -datamin
 
 	# Map the input image.
-	iferr (im1 = immap (image1, READ_ONLY, 0))
+	iferr (im1 = immap (image1, READ_ONLY, NULLPTR))
 	    call error (1,"error opening input image")
 
 	stf = IM_KDES(im1)
@@ -95,7 +100,8 @@ begin
 
 
 	npix = IM_LEN(im1, 1)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	sz_val = IM_MAXDIM
+	call amovkl (c_1, v2, sz_val)
 
 	# Open table to contain the gpb values
 	call iki_parse (image2, tname, extn)
@@ -109,21 +115,23 @@ begin
 		call pargstr (tname)
 	    call flush(STDOUT)
 	}
-	call salloc (cp, pcount, TY_INT)
-	call giopn_table (tname, im1, tp, Memi[cp])
+	sz_val = pcount
+	call salloc (cp, sz_val, TY_POINTER)
+	call giopn_table (tname, im1, tp, Memp[cp])
 
 	# Loop through the groups
 	do gn = 1, ngroups {
 
-	   call gi_opengr (im1, gn, datamin, datamax, 0)
+	   call gi_opengr (im1, gn, datamin, datamax, NULLPTR)
 	   # Setup start vector for sequential reads and writes.
-	   call amovkl (long(1), v1, IM_MAXDIM)
+	   sz_val = IM_MAXDIM
+	   call amovkl (c_1, v1, sz_val)
 	   switch (IM_PIXTYPE(im1)) {
 
 	   case TY_USHORT:
-   	       while (imgnll (im1, buf1, v1) != EOF) {
-		   junk = impnll (im2, buf2, v2)
-		   call amovl (Meml[buf1], Meml[buf2], npix)
+   	       while (imgnli (im1, buf1, v1) != EOF) {
+		   junk = impnli (im2, buf2, v2)
+		   call amovi (Memi[buf1], Memi[buf2], npix)
 	       }
 	   case TY_SHORT:
    	       while (imgnls (im1, buf1, v1) != EOF) {
@@ -163,7 +171,8 @@ begin
 	         call imgstr (im1, P_PTYPE(pp), line, SZ_LINE)
 	      }
 	      # write value to table
-	      call tbeptt (tp, Memi[cp+i-1], gn, line)
+	      l_val = gn
+	      call tbeptt (tp, Memp[cp+i-1], l_val, line)
 	   }
 	}
 	call sfree (sp)

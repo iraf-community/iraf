@@ -19,15 +19,19 @@ int	pfd			# Pixel file descriptor
 pointer	im			# IMIO image descriptor
 real	datamin, datamax	# min,max pixel values from GPB
 
+size_t	sz_val, c_1
 long	offset
 pointer	sp, stf, gpb, lbuf, pp
-int	pn, sz_param, sz_gpb
+int	pn, sz_param
+size_t	sz_gpb
 real	imgetr()
-int	read(), imaccf()
+long	read()
+int	imaccf()
 errchk	read
 
 short	bufs
-int	bufl
+int	bufi
+long	bufl
 
  
 string	readerr "cannot read group data block"
@@ -35,8 +39,11 @@ string	badtype "illegal group data parameter datatype"
 define	minmax_ 91
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	stf = IM_KDES(im)
 
@@ -72,10 +79,15 @@ begin
 	    switch (P_PDTYPE(pp)) {
 	    # changed case for int to short and long--dlb 11/3/87
 	    case 'I':
-		if (sz_param == SZ_SHORT)
+		if (sz_param == SZ_SHORT) {
 		    P_SPPTYPE(pp) = TY_SHORT
-		else
-		    P_SPPTYPE(pp) = TY_LONG
+		} else {
+		    if (sz_param == SZ_INT) {
+			P_SPPTYPE(pp) = TY_INT
+		    } else {
+			P_SPPTYPE(pp) = TY_LONG
+		    }
+		}
 		P_LEN(pp) = 1
 	    case 'R':
 		if (sz_param == SZ_REAL)
@@ -102,14 +114,26 @@ begin
 
 	    switch (P_SPPTYPE(pp)) {
 	    case TY_BOOL:
-	       call bswap4 (Memc[gpb+offset], 1, bufl, 1, 4)
-	       call imaddb (im, P_PTYPE(pp),  bufl)
+	       sz_val = 4
+	       call bswap4 (Memc[gpb+offset], c_1, bufi, c_1, sz_val)
+	       call imaddb (im, P_PTYPE(pp), bufi)
 	    # changed case for int to short and long--dlb 11/3/87
 	    case TY_SHORT:
-	       call bswap2 (Memc[gpb+offset], 1, bufs, 1, 2)
+	       sz_val = 2
+	       call bswap2 (Memc[gpb+offset], c_1, bufs, c_1, sz_val)
 	       call imadds (im, P_PTYPE(pp), bufs)
-	    case TY_LONG, TY_INT:
-	       call bswap4 (Memc[gpb+offset], 1, bufl, 1, 4)
+	    case TY_INT:
+	       sz_val = 4
+	       call bswap4 (Memc[gpb+offset], c_1, bufi, c_1, sz_val)
+	       call imaddi (im, P_PTYPE(pp), bufi)
+	    case TY_LONG:
+	       if ( SZ_LONG == 2 ) {
+		   sz_val = 4
+		   call bswap4 (Memc[gpb+offset], c_1, bufl, c_1, sz_val)
+	       } else {
+		   sz_val = 8
+		   call bswap8 (Memc[gpb+offset], c_1, bufl, c_1, sz_val)
+	       }
 	       call imaddl (im, P_PTYPE(pp), bufl)
 	    case TY_REAL:
 	       call ieeupkr (Memc[gpb+offset])
@@ -118,7 +142,8 @@ begin
 	       call ieeupkd (Memc[gpb+offset])
 	       call imaddd (im, P_PTYPE(pp), Memc[gpb+offset])
 	    case TY_CHAR:
-	       call chrupk (Memc[gpb+offset], 1, Memc[lbuf], 1, P_LEN(pp))
+	       sz_val = P_LEN(pp)
+	       call chrupk (Memc[gpb+offset], c_1, Memc[lbuf], c_1, sz_val)
 	       Memc[lbuf+P_LEN(pp)] = EOS
 	       call imastr (im, P_PTYPE(pp), Memc[lbuf])
 	    default:

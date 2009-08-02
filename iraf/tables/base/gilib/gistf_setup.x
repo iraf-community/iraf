@@ -13,11 +13,10 @@ pointer	tp			# i: Input table descriptor
 pointer	stf			# i: STF descriptor
 pointer im			# i: image descriptor
 
-int	ncols, total, i, pp
-int	totpix, pfd, parnum
-long	sz_pixfile
-char	dtype, cbuf[SZ_LINE], uparm[SZ_KEYWORD]
-pointer	colp
+int	ncols, total, pfd, parnum, i, dtype
+long	totpix, sz_pixfile
+char	cbuf[SZ_LINE], uparm[SZ_KEYWORD]
+pointer	pp, colp
 
 int	open(), tbpsta(), tbcigi()
 pointer	tbcnum()
@@ -49,18 +48,19 @@ begin
 
 	   # set up size and length.
 	   switch (P_SPPTYPE(pp)) {
-	   case (TY_BOOL):
+	   case TY_BOOL:
 	      # The STF kernel does not support this type, convert to
 	      # INT
 	      call strcpy ("INT*4", P_PDTYPE(pp), SZ_PDTYPE)
 	      P_PSIZE(pp) = P_LEN(pp) * SZ_BOOL * SZB_CHAR * NBITS_BYTE 
-	      P_SPPTYPE(pp) = TY_LONG
-	   case (TY_INT):
+	      P_SPPTYPE(pp) = TY_INT
+	   case TY_SHORT:
+	      # preparation; currently not used
+	      call strcpy ("INT*2", P_PDTYPE(pp), SZ_PDTYPE)
+	      P_PSIZE(pp) = P_LEN(pp) * SZ_SHORT * SZB_CHAR * NBITS_BYTE
+	   case TY_INT:
 	      call strcpy ("INT*4", P_PDTYPE(pp), SZ_PDTYPE)
 	      P_PSIZE(pp) = P_LEN(pp) * SZ_INT * SZB_CHAR * NBITS_BYTE
-	      # redefine type to LONG since this and SHORT are supported
-	      # in STF.
-	      P_SPPTYPE(pp) = TY_LONG
 	      # see if column was INT*2 defined
 	      call sprintf (uparm, SZ_KEYWORD, "I2COL%d")
 		   call pargi (i)
@@ -69,13 +69,21 @@ begin
 	         P_PSIZE(pp) = P_LEN(pp) * SZ_SHORT * SZB_CHAR * NBITS_BYTE
 		 P_SPPTYPE(pp) = TY_SHORT
 	      }
-	   case (TY_REAL):
+	   case TY_LONG:
+	      # preparation; currently not used
+	      if ( SZ_LONG == 2 ) {
+		  call strcpy ("INT*4", P_PDTYPE(pp), SZ_PDTYPE)
+	      } else {
+		  call strcpy ("INT*8", P_PDTYPE(pp), SZ_PDTYPE)
+	      }
+	      P_PSIZE(pp) = P_LEN(pp) * SZ_LONG * SZB_CHAR * NBITS_BYTE
+	   case TY_REAL:
 	      call strcpy ("REAL*4", P_PDTYPE(pp), SZ_PDTYPE)
 	      P_PSIZE(pp) = P_LEN(pp) * SZ_REAL * SZB_CHAR * NBITS_BYTE
-	   case (TY_DOUBLE):
+	   case TY_DOUBLE:
 	      call strcpy ("REAL*8", P_PDTYPE(pp), SZ_PDTYPE)
 	      P_PSIZE(pp) = P_LEN(pp) * SZ_DOUBLE * SZB_CHAR * NBITS_BYTE
-	   case (TY_CHAR):
+	   case TY_CHAR:
 	      call sprintf (P_PDTYPE(pp), SZ_PDTYPE, "CH*%d")
 		   call pargi(P_LEN(pp))
 	      P_PSIZE(pp) = P_LEN(pp) * NBITS_BYTE

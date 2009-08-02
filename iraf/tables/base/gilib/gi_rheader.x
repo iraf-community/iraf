@@ -17,23 +17,26 @@ procedure gi_rheader (fd, im)
 int	fd		# input file descriptor
 pointer	im		# image descriptor
 
+size_t	sz_val
+long	l_val
+short	s_val
 long	fi[LEN_FINFO]
-pointer	sp, stf, lbuf, root, extn,pn,pp, op
-int	compress, devblksz, ival, ch, i , junk
-int	sz_userarea, sz_gpbhdr
+pointer	sp, stf, lbuf, root, extn, pn, pp, op, fits
+int	compress, ival, ch, i, junk
+int	fitslen, sz_userarea, sz_gpbhdr, len_hdrmem, group, sz_param, offset
+long	pixoff, totpix, devblksz, mtime, ctime
 
-long	totpix, mtime, ctime
-int	strlen(), sizeof(), finfo(), fnroot()
+int	fnroot(), strlen(), sizeof(), finfo()
 errchk	stf_rfitshdr
-int	fits, fitslen, group, pixoff, len_hdrmem
-real	offset, sz_param
 string badtype "illegal group data parameter datatype"
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (extn, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (extn, sz_val, TY_CHAR)
 
 	stf = IM_KDES(im)
 
@@ -69,12 +72,19 @@ begin
 	    if (ch == 'R')
 		ival = TY_REAL
 	    else
-		ival = TY_LONG
+		ival = TY_INT
 	case 64:
-	    if (ch == 'R')
+	    if (ch == 'R') {
 		ival = TY_DOUBLE
-	    else
+	    } else if (ch == 'I') {
+		if (SZ_LONG == 2) {
+		    call error (1,"GI_RHEADER: Cannot handle 64-bit integer")
+		} else {
+		    ival = TY_LONG
+		}
+	    } else {
 		ival = TY_COMPLEX
+	    }
 	default:
 	    ival = ERR
 	}
@@ -132,10 +142,15 @@ begin
 	    switch (P_PDTYPE(pp)) {
  	    # changed case for int to short and long--dlb 11/3/87
 	    case 'I':
-		if (sz_param == SZ_SHORT)
+		if (sz_param == SZ_SHORT) {
 		    P_SPPTYPE(pp) = TY_SHORT
-		else
-		    P_SPPTYPE(pp) = TY_LONG
+		} else {
+		    if (sz_param == SZ_INT) {
+			P_SPPTYPE(pp) = TY_INT
+		    } else {
+			P_SPPTYPE(pp) = TY_LONG
+		    }
+		}
 		P_LEN(pp) = 1
 	    case 'R':
 		if (sz_param == SZ_REAL)
@@ -159,15 +174,19 @@ begin
 		    call imaddb (im, P_PTYPE(pp), 1)
 		# changed case for int to short and long--dlb 11/3/87
 		case TY_SHORT:
-		    call imadds (im, P_PTYPE(pp), 1)
+		    s_val = 1
+		    call imadds (im, P_PTYPE(pp), s_val)
+		case TY_INT:
+		    call imaddi (im, P_PTYPE(pp), 1)
 		case TY_LONG:
-		    call imaddl (im, P_PTYPE(pp), 1)
+		    l_val = 1
+		    call imaddl (im, P_PTYPE(pp), l_val)
 		case TY_REAL:
 		    call imaddr (im, P_PTYPE(pp), 1.0)
 		case TY_DOUBLE:
 		    call imaddd (im, P_PTYPE(pp), 1.0d0)
 		case TY_CHAR:
-		    call imastr (im, P_PTYPE(pp), ' ')
+		    call imastr (im, P_PTYPE(pp), " ")
 		default:
 		    call error (1, badtype)
 		}
@@ -187,14 +206,16 @@ begin
 	
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	   IM_LENHDRMEM(im) = len_hdrmem
-	   call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	   sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	   call realloc (im, sz_val, TY_STRUCT)
 	}
 
 	# Append the spooled FITS cards from the STF header to the user area,
 	# opening the user area as a string file.
 
 	op = IM_USERAREA(im) + sz_gpbhdr
-	call amovc (Memc[fits], Memc[op], fitslen+1)
+	sz_val = fitslen+1
+	call amovc (Memc[fits], Memc[op], sz_val)
 
 	# Call up IMIO set set up the remaining image header fields used to
 	# define the physical offsets of the pixels in the pixfile.

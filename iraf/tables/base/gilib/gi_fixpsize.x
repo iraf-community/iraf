@@ -7,8 +7,8 @@ procedure gi_fixpsize(im)
 
 pointer	im			# i: image descriptor (stf format)
 
-pointer	pp
-int	i, pcount, stf
+pointer	pp, stf
+int	i, pcount
 
 begin
 
@@ -19,7 +19,7 @@ begin
 	   switch (P_SPPTYPE(pp)) {
 	   case TY_SHORT:
 		call strcpy ("INTEGER*4", P_PDTYPE(pp), SZ_PDTYPE)
-		P_SPPTYPE(pp) = TY_LONG
+		P_SPPTYPE(pp) = TY_INT
 		STF_PSIZE(stf) = STF_PSIZE(stf) + SZB_CHAR * NBITS_BYTE 
 		P_PSIZE(pp) = P_PSIZE(pp) + SZB_CHAR * NBITS_BYTE
 		STF_SZGROUP(stf) = STF_SZGROUP(stf) + SZB_CHAR

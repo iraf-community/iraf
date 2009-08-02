@@ -15,8 +15,9 @@ procedure gi_reset (im)
 pointer im	# Image descriptor
 
 pointer stf
-int	totpix, i, ngroups, compress, blklen, pixoff
-int	psize, szgroup, dim
+long	totpix, blklen, pixoff
+int	i, ngroups, compress, psize, dim
+size_t	szgroup
 
 int	open(), sizeof()
 

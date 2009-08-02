@@ -266,6 +266,18 @@ begin
 	}
 end
 
+procedure tbegtl (tp, cptr, selrow, buffer)
+
+pointer tp			# i: pointer to table descriptor
+pointer cptr			# i: pointer to column descriptor
+long	selrow			# i: row number (or selected row number)
+long	buffer			# o: buffer for value to be gotten
+
+begin
+	call error (ER_TBBADTYPE,
+		    "tbegtl:  currently LONG type is not supported.")
+end
+
 procedure tbegts (tp, cptr, selrow, buffer)
 
 pointer tp			# i: pointer to table descriptor

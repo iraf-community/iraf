@@ -10,8 +10,10 @@ pointer im		# image descriptor
 int	pn		# group parameter number 
 char	buff[SZ_LINE] 	# Buffer with the gpv in string form
 
+size_t	sz_val
 char	blank
-int	pp, stf, k, strlen()
+pointer	pp, stf
+int	k, strlen()
 
 data	blank  / ' ' /
 
@@ -23,7 +25,8 @@ begin
 	         call imgstr (im, P_PTYPE(pp), buff, P_LEN(pp))
 		 # Clear noisy characters
 		 k = strlen(buff)
-		 call amovkc (blank, buff(k+1), P_LEN(pp)-k)
+		 sz_val = P_LEN(pp)-k
+		 call amovkc (blank, buff(k+1), sz_val)
 	      } else {
 	         call imgstr (im, P_PTYPE(pp), buff, SZ_LINE)
 		 # If datatype is BOOLEAN (LOGICAL) then change

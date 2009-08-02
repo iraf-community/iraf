@@ -8,7 +8,8 @@ int procedure gi_gfitval (im, what)
 pointer	im	# image descriptor
 char	what[SZ_DATATYPE]
 #--
-int	fit, value
+pointer	fit
+int	value
 
 int	strcmp()
 

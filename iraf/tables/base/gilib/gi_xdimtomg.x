@@ -13,27 +13,32 @@ char	image1[SZ_FNAME]		# Input image
 char	image2[SZ_FNAME]		# Output image
 bool	verbose
 
-int	npix, junk,i, k
+size_t	sz_val
+size_t	npix
+long	junk, l_val
+int	i, k
 pointer	buf1, buf2, im1, im2
 pointer	sp
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
-int	imgnls(), imgnll(), imgnlr(), imgnld()
-int	impnls(), impnll(), impnlr(), impnld()
+long	imgnls(), imgnli(), imgnll(), imgnlr(), imgnld()
+long	impnls(), impnli(), impnll(), impnlr(), impnld()
 pointer	immap()
 
-pointer	tp
+pointer	tp, stf, pp
 char	tname[SZ_FNAME]
 char	temp[SZ_FNAME]
 int	dim1, dim2, nlines, lenu
-int	stf, gn, pp
-int	ngroups, blklen, compress, pixoff
-int	nch, pcount, nlen
+int	gn, ngroups, compress, nch, pcount
+long	blklen, pixoff, nlen
 real	datamin, datamax
 
 int	sizeof(), strlen(), strcmp(), strldx()
 int	tbtacc(), imgeti()
 real	imgetr()
 pointer	tbtopn()
+long	lmod()
+
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
@@ -44,7 +49,7 @@ begin
 	datamax = -datamin
 
 	# Map the input image.
-	iferr (im1 = immap (image1, READ_ONLY, 0))
+	iferr (im1 = immap (image1, READ_ONLY, NULLPTR))
 	    call error(1,"error opening input image")
 	dim1 = IM_NDIM(im1)
 	dim2 = dim1
@@ -100,7 +105,9 @@ begin
 	STF_GROUPS(stf) = YES
 
 	# Setup start vector for sequential reads and writes.
-	call amovkl (long(1), v1, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
 
 	if (ngroups > 1) {
 	    # The groups are stack in the last dimension.
@@ -133,7 +140,7 @@ begin
 	   call flush(STDOUT)
 	}
 	# Set up STFDES for the gpb values.
-	tp = tbtopn (tname, READ_ONLY, 0)
+	tp = tbtopn (tname, READ_ONLY, NULLPTR)
 	call gistfdes_setup (tp, stf, im2)
 	pcount = STF_PCOUNT (stf)
 
@@ -155,7 +162,9 @@ begin
 	   }
 	     
 	   nlen = IM_LEN(im2,dim2)
-	   call amovkl (long(1), v2, IM_MAXDIM)
+	   l_val = 1
+	   sz_val = IM_MAXDIM
+	   call amovkl (l_val, v2, sz_val)
 	   switch (IM_PIXTYPE(im1)) {
 
 	   case TY_SHORT:
@@ -164,7 +173,13 @@ begin
 		   junk = impnls (im2, buf2, v2)
 		   call amovs (Mems[buf1], Mems[buf2], npix)
 	       } until (v2[dim2] == nlen+1 || dim1 == 1)
-	   case TY_USHORT,TY_INT,TY_LONG:
+	   case TY_USHORT,TY_INT:
+	       repeat {
+	           junk = imgnli (im1, buf1, v1) 
+		   junk = impnli (im2, buf2, v2)
+		   call amovi (Memi[buf1], Memi[buf2], npix)
+	       } until (v2[dim2] == nlen+1 || dim1 == 1)
+	   case TY_LONG:
 	       repeat {
 	           junk = imgnll (im1, buf1, v1) 
 		   junk = impnll (im2, buf2, v2)
@@ -191,7 +206,8 @@ begin
 	      call stf_wgpb (im2, STF_GROUP(stf), datamin, datamax)
 	      pixoff = gn*STF_SZGROUP(stf) + 1
 	      call imioff (im2, pixoff, compress, blklen)
-	      if (mod(pixoff, sizeof(IM_PIXTYPE(im2))) != 1)
+	      l_val = sizeof(IM_PIXTYPE(im2))
+	      if (lmod(pixoff, l_val) != 1)
 	          IM_FAST(im2) = NO
 	      STF_NEWIMAGE(stf) = NO
 	   }
@@ -200,8 +216,8 @@ begin
 	}
 	call sfree (sp)
 
-	lenu = strlen (Memc(IM_USERAREA(im2)))
-	Memc(IM_USERAREA(im2)+lenu-nlines) = EOS
+	lenu = strlen (Memc[IM_USERAREA(im2)])
+	Memc[IM_USERAREA(im2)+lenu-nlines] = EOS
 	# Unmap the images.
 	
 	IM_MIN(im2) = datamin

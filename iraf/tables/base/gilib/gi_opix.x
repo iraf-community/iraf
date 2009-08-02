@@ -27,9 +27,11 @@ procedure gi_opix (im, status)
 pointer	im				# image descriptor
 int	status				# return status
 
-int	compress, blklen
+int	compress
+long	blklen
 bool	copy_of_stf_image
-int	pfd, sz_gpb, group, i
+int	pfd, group, i
+size_t	sz_gpb
 pointer	stf, o_stf, o_im, ua, gpb
 long	sz_pixfile, pixoff, totpix, offset
 

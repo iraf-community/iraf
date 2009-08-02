@@ -17,6 +17,8 @@ int	pno		# Parameter number.
 
 pointer	pp, stf
 int	ip
+long	l_val
+short	s_val
 errchk	imadds, imaddl, imaddr, imaddd, imastr
 
 
@@ -27,8 +29,9 @@ begin
 	   dtype = TY_CHAR
 	} else {
 	   plen = 1
-	   if (dtype == TY_INT)
-	      dtype = TY_LONG
+	   # ???
+	   #if (dtype == TY_INT)
+	   #   dtype = TY_LONG
 	}
 
 #	call stf_addpar (im, pname, dtype, len, " ", pno)
@@ -47,11 +50,21 @@ begin
 	case TY_SHORT:
 	    call strcpy ("INTEGER*2", P_PDTYPE(pp), SZ_PDTYPE)
 	    P_PSIZE(pp) = plen * SZ_SHORT * SZB_CHAR * NBITS_BYTE
-	    call imadds (im, P_PTYPE(pp), " ")
-	case TY_LONG:
+	    s_val = 0
+	    call imadds (im, P_PTYPE(pp), s_val)
+	case TY_INT:
 	    call strcpy ("INTEGER*4", P_PDTYPE(pp), SZ_PDTYPE)
+	    P_PSIZE(pp) = plen * SZ_INT * SZB_CHAR * NBITS_BYTE
+	    call imaddi (im, P_PTYPE(pp), 0)
+	case TY_LONG:
+	    if ( SZ_LONG == 2 ) {
+		call strcpy ("INTEGER*4", P_PDTYPE(pp), SZ_PDTYPE)
+	    } else {
+		call strcpy ("INTEGER*8", P_PDTYPE(pp), SZ_PDTYPE)
+	    }
 	    P_PSIZE(pp) = plen * SZ_LONG * SZB_CHAR * NBITS_BYTE
-	    call imaddl (im, P_PTYPE(pp), 0)
+	    l_val = 0
+	    call imaddl (im, P_PTYPE(pp), l_val)
 	case TY_REAL:
 	    call strcpy ("REAL*4", P_PDTYPE(pp), SZ_PDTYPE)
 	    P_PSIZE(pp) = plen * SZ_REAL * SZB_CHAR * NBITS_BYTE

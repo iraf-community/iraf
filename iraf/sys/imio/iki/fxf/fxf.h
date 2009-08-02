@@ -79,7 +79,7 @@ define	FIT_BSCALE	Memd[P2D($1+16)]
 define	FIT_BZERO	Memd[P2D($1+18)]
 define	FIT_BITPIX	Memi[P2I($1+20)]	# bits per pixel
 define	FIT_NAXIS	Memi[P2I($1+21)]	# number of axes in image
-define	FIT_LENAXIS	Meml[P2L($1+22)+$2-1]# 35:41 = [7] max
+define	FIT_LENAXIS	Meml[P2L($1+22)+$2-1]	# 35:41 = [7] max
 define	FIT_ZBYTES	Memi[P2I($1+30)]	# Status value for FIT_ZCNV mode
 define	FIT_HFD		Memi[P2I($1+31)]	# Header file descriptor
 define	FIT_PIXTYPE	Memi[P2I($1+32)]

@@ -13,6 +13,7 @@ procedure gi_update (im)
 
 pointer im
 
+long	l_val
 int	pixtype, bitpix, nbytes
 int     xdim, i
 char    keyw[SZ_KEYWORD]
@@ -55,7 +56,8 @@ begin
 
 	IM_MIN(im) = 0.
 	IM_MAX(im) = 0.
-	IM_LIMTIME(im) = clktime(long(0))
+	l_val = 0
+	IM_LIMTIME(im) = clktime(l_val)
 
 
 	# Do not call stf_updhdr()

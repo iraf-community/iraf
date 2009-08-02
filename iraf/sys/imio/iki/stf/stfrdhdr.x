@@ -20,13 +20,12 @@ int	group		# group to be accessed
 int	acmode		# access mode
 
 size_t	sz_val
-long	pixoff
 long	fi[LEN_FINFO]
 real	datamin, datamax
 pointer	sp, stf, lbuf, root, extn, op, fits
 int	compress, ival, ch, i, junk
 int	fitslen, sz_userarea, sz_gpbhdr, len_hdrmem
-long	totpix, devblksz, mtime, ctime
+long	pixoff, totpix, devblksz, mtime, ctime
 
 real	imgetr()
 int	fnroot(), strlen(), sizeof(), finfo(), imaccf()
@@ -82,12 +81,10 @@ begin
 	    } else if (ch == 'I') {
 		if (SZ_LONG == 2) {
 		    call error (1,"STF_RDHEADER: Cannot handle 64-bit integer")
-		}
-		else {
+		} else {
 		    ival = TY_LONG
 		}
-	    }
-	    else {
+	    } else {
 		ival = TY_COMPLEX
 	    }
 	default:

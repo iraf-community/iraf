@@ -39,12 +39,12 @@ define	STF_CACHE	STF_BITPIX	# cache descriptor starting here
 define	STF_CACHELEN	(33+STF_PCOUNT($1)*LEN_PDES)
 define	LEN_STFBASE	43
 
-define	STF_ACMODE	Memi[P2I($1)]		# image access mode
-define	STF_NEWIMAGE	Memi[P2I($1+1)]		# creating entire new STF format image?
-define	STF_GROUP	Memi[P2I($1+2)]		# group to be accessed
-define	STF_SZGROUP	Memi[P2I($1+3)]		# size of image+hdr in pixfile, chars
-define	STF_PFD		Memi[P2I($1+4)]		# pixfile file descriptor
-define	STF_GRARG	Memi[P2I($1+5)]		# group index given in image name
+define	STF_ACMODE	Memi[P2I($1)]	# image access mode
+define	STF_NEWIMAGE	Memi[P2I($1+1)]	# creating entire new STF format image?
+define	STF_GROUP	Memi[P2I($1+2)]	# group to be accessed
+define	STF_SZGROUP	Meml[P2L($1+3)]	# size of image+hdr in pixfile, chars
+define	STF_PFD		Memi[P2I($1+4)]	# pixfile file descriptor
+define	STF_GRARG	Memi[P2I($1+5)]	# group index given in image name
 			# (extra space)
 define	STF_BITPIX	Memi[P2I($1+10)]	# bits per pixel
 define	STF_NAXIS	Memi[P2I($1+11)]	# number of axes in image
@@ -53,7 +53,7 @@ define	STF_GCOUNT	Memi[P2I($1+13)]	# number of groups in STF image
 define	STF_PSIZE	Memi[P2I($1+14)]	# size of GPB, bits
 define	STF_PCOUNT	Memi[P2I($1+15)]	# number of parameters in GPB
 define	STF_DATATYPE	Memc[P2C($1+16)]	# datatype string
-define	STF_LENAXIS	Memi[P2I($1+35)+$2-1]	# 35:41 = [7] max
+define	STF_LENAXIS	Meml[P2L($1+35)+$2-1]	# 35:41 = [7] max
 define	STF_PDES	(($1)+43+((($2)-1)*LEN_PDES))
 
 # GPB Parameter descriptor.
@@ -121,6 +121,7 @@ define	ENV_ISOCUTOVER	"isodates"	# environment override for default
 define	FITS_BYTE	8	# Bits in a FITS byte
 define	FITS_SHORT	16	# Bits in a FITS short
 define	FITS_LONG	32	# Bits in a FITS long
+define	FITS_LONGLONG	64	# Bits in a FITS longlong
 define	FITS_REAL	-32	# 32 Bits FITS IEEE float representation
 define	FITS_DOUBLE	-64	# 64 Bits FITS IEEE double representation
 
@@ -146,35 +147,35 @@ define	UNKNOWN	 Memc[($1+IMU-1)*SZ_STRUCT+1]
 define	LEN_FITDES	500
 define	LEN_FITBASE	400
 
-define	FIT_ACMODE	Memi[P2I($1)]		# image access mode
-define	FIT_PFD		Memi[P2I($1+1)]		# pixel file descriptor
-define	FIT_PIXOFF	Memi[P2I($1+2)]		# pixel offset
-define	FIT_TOTPIX	Memi[P2I($1+3)]		# size of image in pixfile, chars
-define	FIT_IO		Memi[P2I($1+4)]		# FITS I/O channel
-define	FIT_ZCNV	Memi[$1+5]	# set if on-the-fly conversion needed
-define	FIT_IOSTAT	Memi[$1+6]	# i/o status for zfio routines
-define  FIT_TFORMP      Memi[$1+7]      # TFORM keyword value pointer
-define  FIT_TTYPEP      Memi[$1+8]      # TTYPE keyword value pointer
-define  FIT_TFIELDS     Memi[$1+9]      # number of fields in binary table
-define  FIT_PCOUNT      Memi[$1+10]     # PCOUNT keyword value
+define	FIT_ACMODE	Memi[P2I($1)]	# image access mode
+define	FIT_PFD		Memi[P2I($1+1)]	# pixel file descriptor
+define	FIT_PIXOFF	Meml[P2L($1+2)]	# pixel offset
+define	FIT_TOTPIX	Meml[P2L($1+3)]	# size of image in pixfile, chars
+define	FIT_IO		Memi[P2I($1+4)]	# FITS I/O channel
+define	FIT_ZCNV	Memi[P2I($1+5)]	# set if on-the-fly conversion needed
+define	FIT_IOSTAT	Memi[P2I($1+6)]	# i/o status for zfio routines
+define  FIT_TFORMP      Memp[$1+7]      # TFORM keyword value pointer
+define  FIT_TTYPEP      Memp[$1+8]      # TTYPE keyword value pointer
+define  FIT_TFIELDS     Meml[P2L($1+9)]      # number of fields in binary table
+define  FIT_PCOUNT      Memi[P2I($1+10)]     # PCOUNT keyword value
 			# extra space
 define	FIT_BSCALE	Memd[P2D($1+16)]
 define	FIT_BZERO	Memd[P2D($1+18)]
 define	FIT_BITPIX	Memi[P2I($1+20)]	# bits per pixel
 define	FIT_NAXIS	Memi[P2I($1+21)]	# number of axes in image
-define	FIT_LENAXIS	Memi[P2I($1+22)+$2-1]	# 35:41 = [7] max
+define	FIT_LENAXIS	Meml[P2L($1+22)+$2-1]	# 35:41 = [7] max
 define	FIT_ZBYTES	Memi[P2I($1+30)]	# Status value for FIT_ZCNV mode
 define	FIT_HFD		Memi[P2I($1+31)]	# Header file descriptor
 define	FIT_PIXTYPE	Memi[P2I($1+32)]
-define	FIT_CACHEHDR	Memi[P2I($1+33)]	# Cached main header unit's address.
+define	FIT_CACHEHDR	Memp[$1+33]	# Cached main header unit's address.
 define	FIT_CACHEHLEN	Memi[P2I($1+34)]	# Lenght of the above.
-define	FIT_IM		Memi[P2I($1+35)]	# Has the 'im' descriptor value 
+define	FIT_IM		Memp[$1+35]	# Has the 'im' descriptor value 
 define	FIT_GROUP	Memi[P2I($1+36)]
 define	FIT_NEWIMAGE	Memi[P2I($1+37)]	# Newimage flag
-define	FIT_HDRPTR	Memi[P2I($1+38)]	# Header data Xtension pointer
-define	FIT_PIXPTR	Memi[P2I($1+39)]	# Pixel data Xtension pointer
+define	FIT_HDRPTR	Memp[$1+38]	# Header data Xtension pointer
+define	FIT_PIXPTR	Memp[$1+39]	# Pixel data Xtension pointer
 define	FIT_NUMOFFS	Memi[P2I($1+40)]	# Number of offsets in cache header.
-define	FIT_EOFSIZE	Memi[P2I($1+41)]	# Size in char of file before append.
+define	FIT_EOFSIZE	Meml[P2L($1+41)]	# Size in char of file before append.
 define	FIT_XTENSION	Memi[P2I($1+42)]	# Yes, if an Xtension has been read.
 define	FIT_INHERIT	Memi[P2I($1+43)]	# INHERIT header keyword value.
 define	FIT_EXTVER	Memi[P2I($1+44)]	# EXTVER value (integer only)
@@ -188,8 +189,8 @@ define	FIT_SVMAPRIN	Memi[P2I($1+52)]
 define	FIT_SVMAPROUT	Memi[P2I($1+53)]
 define	FIT_SVMAPDIN	Memi[P2I($1+54)]
 define	FIT_SVMAPDOUT	Memi[P2I($1+55)]
-define	FIT_EXTEND	Memi[$1+56]	# FITS extend keyword
-define	FIT_PLMAXLEN	Memi[$1+57]	# PLIO maximum linelen
+define	FIT_EXTEND	Memi[P2I($1+56)]	# FITS extend keyword
+define	FIT_PLMAXLEN	Memi[P2I($1+57)]	# PLIO maximum linelen
 			# extra space
 define	FIT_EXTTYPE	Memc[P2C($1+70)]  # extension type
 define	FIT_FILENAME	Memc[P2C($1+110)] # FILENAME value 
@@ -201,18 +202,18 @@ define  FIT_EXTSTYPE    Memc[P2C($1+310)] # FITS extension subtype
 			# extra space
 
 # The FKS terms carry the fkinit or kernel section arguments.
-define	FKS_APPEND	Memi[$1+400]	# YES, NO append an extension
-define	FKS_INHERIT	Memi[$1+401]	# YES, NO inherit the main header
-define	FKS_OVERWRITE	Memi[$1+402]	# YES, NO overwrite an extension
-define	FKS_DUPNAME	Memi[$1+403]	# YES, NO allow duplicated EXTNAME
-define	FKS_EXTVER	Memi[$1+404]	# YES, NO allow duplicated EXTNAME
-define	FKS_EXPAND	Memi[$1+405]	# YES, NO expand the header
-define	FKS_PHULINES	Memi[$1+406]	# Allocated lines in PHU
-define	FKS_EHULINES	Memi[$1+407]	# Allocated lines in EHU
-define	FKS_PADLINES	Memi[$1+408]	# Additional lines for HU
-define	FKS_NEWFILE	Memi[$1+409]	# YES, NO force newfile
-define	FKS_CACHESIZE	Memi[$1+410]	# size of header cache
-define  FKS_SUBTYPE     Memi[$1+411]	# BINTABLE subtype
+define	FKS_APPEND	Memi[P2I($1+400)]	# YES, NO append an extension
+define	FKS_INHERIT	Memi[P2I($1+401)]	# YES, NO inherit the main header
+define	FKS_OVERWRITE	Memi[P2I($1+402)]	# YES, NO overwrite an extension
+define	FKS_DUPNAME	Memi[P2I($1+403)]	# YES, NO allow duplicated EXTNAME
+define	FKS_EXTVER	Memi[P2I($1+404)]	# YES, NO allow duplicated EXTNAME
+define	FKS_EXPAND	Memi[P2I($1+405)]	# YES, NO expand the header
+define	FKS_PHULINES	Memi[P2I($1+406)]	# Allocated lines in PHU
+define	FKS_EHULINES	Memi[P2I($1+407)]	# Allocated lines in EHU
+define	FKS_PADLINES	Memi[P2I($1+408)]	# Additional lines for HU
+define	FKS_NEWFILE	Memi[P2I($1+409)]	# YES, NO force newfile
+define	FKS_CACHESIZE	Memi[P2I($1+410)]	# size of header cache
+define  FKS_SUBTYPE     Memi[P2I($1+411)]	# BINTABLE subtype
 define	FKS_EXTNAME	Memc[P2C($1+412)] # EXTNAME value
 			# extra space
 

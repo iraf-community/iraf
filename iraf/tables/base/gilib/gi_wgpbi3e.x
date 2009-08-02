@@ -19,17 +19,21 @@ include	"gi.h"
 procedure gi_wgpb_i3e (im, fd, group)
 
 pointer	im			# IMIO image descriptor
-pointer fd			# output file descriptor
+int	fd			# output file descriptor
 int	group			# group to be accessed
 
+size_t	sz_val
+size_t	c_1
 long	offset
 pointer	sp, stf, gpb, lbuf, pp, op
-int	pfd, pn, sz_param, sz_gpb, i
+int	pfd, pn, i
+size_t	sz_gpb, sz_param
 
 int	strlen()
 bool	bval, imgetb()
 # changed to short and long for short integers in gpb
 short	sval, imgets()
+int	ival, imgeti()
 long	lval, imgetl()
 #
 real	rval, imgetr()
@@ -39,8 +43,11 @@ string	writerr "cannot update group parameter block"
 string	badtype "illegal group data parameter datatype"
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	stf = IM_KDES(im)
 	pfd = STF_PFD(stf)
@@ -73,7 +80,8 @@ begin
 		    bval = false
 		}
 		# Memb[(op-1)/SZ_BOOL+1] = bval
-		call bswap4 (bval, 1, Memc[op], 1, 4)
+		sz_val = 4
+		call bswap4 (bval, c_1, Memc[op], c_1, sz_val)
 
 	    # changed case for int to short and long 
 	    # to allow i*2 in gpb--dlb 11/3/87
@@ -82,14 +90,29 @@ begin
 		    call erract (EA_WARN)
 		    sval = 0
 		}
-		call bswap2 (sval, 1, Memc[op], 1, 2)
+		sz_val = 2
+		call bswap2 (sval, c_1, Memc[op], c_1, sz_val)
 
-	    case TY_LONG, TY_INT:
+	    case TY_INT:
+		iferr (ival = imgeti (im, P_PTYPE(pp))) {
+		    call erract (EA_WARN)
+		    ival = 0
+		}
+		sz_val = 4
+		call bswap4 (ival, c_1, Memc[op], c_1, sz_val)
+
+	    case TY_LONG:
 		iferr (lval = imgetl (im, P_PTYPE(pp))) {
 		    call erract (EA_WARN)
 		    lval = 0
 		}
-		call bswap4 (lval, 1, Memc[op], 1, 4)
+		if ( SZ_LONG == 2 ) {
+		    sz_val = 4
+		    call bswap4 (lval, c_1, Memc[op], c_1, sz_val)
+		} else {
+		    sz_val = 8
+		    call bswap8 (lval, c_1, Memc[op], c_1, sz_val)
+		}
 
 	    case TY_REAL:
 		iferr (rval = imgetr (im, P_PTYPE(pp))) {
@@ -98,7 +121,7 @@ begin
 		}
 		# Memr[(op-1)/SZ_REAL+1] = rval
 #		call vx2sunr (rval, Memc[op], 1)
-		call ieevpakr (rval, Memc[op], 1)
+		call ieevpakr (rval, Memc[op], c_1)
 
 	    case TY_DOUBLE:
 		iferr (dval = imgetd (im, P_PTYPE(pp))) {
@@ -107,7 +130,7 @@ begin
 		}
 		# Memd[(op-1)/SZ_DOUBLE+1] = dval
 #		call vx2sund (dval, Memc[op], 1)
-		call ieevpakd (dval, Memc[op], 1)
+		call ieevpakd (dval, Memc[op], c_1)
 
 	    case TY_CHAR:
 		# Blank fill the string buffer.
@@ -123,7 +146,8 @@ begin
 		Memc[lbuf+i] = ' '
 
 		# Pack the blank filled array into the GPB.
-		call chrpak (Memc[lbuf], 1, Memc[gpb+offset], 1, P_LEN(pp))
+		sz_val = P_LEN(pp)
+		call chrpak (Memc[lbuf], c_1, Memc[gpb+offset], c_1, sz_val)
 
 	    default:
 		call error (1, badtype)

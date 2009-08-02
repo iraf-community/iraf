@@ -12,8 +12,9 @@ pointer	tp		# i: table descriptor
 int	gn		# i: group number, or table line number
 pointer	im		# i: output image descriptor
 
-int	stf, i, ncols
-pointer	pp, colp
+long	l_gn
+int	i, ncols
+pointer	stf, pp, colp
 
 bool	bbuf
 short	sbuf
@@ -29,6 +30,8 @@ pointer	tbcnum()
 string	badtype "illegal group data parameter datatype"
 
 begin
+	   l_gn = gn
+
 	   stf = IM_KDES (im)
 	   ncols = tbpsta (tp, TBL_NCOLS)
 
@@ -37,24 +40,26 @@ begin
 	      pp = STF_PDES(stf,i)
 	      switch (P_SPPTYPE(pp)) {
 	      case TY_BOOL:
-		  call tbegtb (tp, colp, gn, bbuf)
+		  call tbegtb (tp, colp, l_gn, bbuf)
 		  call imaddb (im, P_PTYPE(pp), bbuf)
 	      case TY_SHORT:
-		  call tbegti (tp, colp, gn, ibuf)
+		  call tbegti (tp, colp, l_gn, ibuf)
 		  sbuf = ibuf
 		  call imadds (im, P_PTYPE(pp), sbuf)
+	      case TY_INT:
+		  call tbegti (tp, colp, l_gn, ibuf)
+		  call imaddi (im, P_PTYPE(pp), ibuf)
 	      case TY_LONG:
-		  call tbegti (tp, colp, gn, ibuf)
-		  lbuf = ibuf
+		  call tbegtl (tp, colp, l_gn, lbuf)
 		  call imaddl (im, P_PTYPE(pp), lbuf)
 	      case TY_REAL:
-		  call tbegtr (tp, colp, gn, rbuf)
+		  call tbegtr (tp, colp, l_gn, rbuf)
 		  call imaddr (im, P_PTYPE(pp), rbuf)
 	      case TY_DOUBLE:
-		  call tbegtd (tp, colp, gn, dbuf)
+		  call tbegtd (tp, colp, l_gn, dbuf)
 		  call imaddd (im, P_PTYPE(pp), dbuf)
 	      case TY_CHAR:
-		  call tbegtt (tp, colp, gn, cbuf, P_LEN(pp))
+		  call tbegtt (tp, colp, l_gn, cbuf, P_LEN(pp))
 		  call imastr (im, P_PTYPE(pp), cbuf)
 	      default:
 		  call error (1, badtype)

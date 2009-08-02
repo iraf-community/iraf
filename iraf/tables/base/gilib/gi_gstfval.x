@@ -10,7 +10,7 @@ int procedure gi_gstfval (im, what)
 pointer	im	# image descriptor
 char	what[SZ_DATATYPE]
 #--
-int	stf
+pointer	stf
 
 int	strcmp()
 

@@ -49,11 +49,15 @@ real	datamin		# u: image minimun value
 real	datamax		# u: image maximum value
 pointer imt		# i: image template descriptor (NEW_COPY only)
 #--
-int	stf, fd, compress, blklen, pixoff
-int	save1[IM_MAXDIM], save2[IM_MAXDIM]
+size_t	sz_val
+long	l_val
+pointer	stf
+int	fd, compress
+long	blklen, pixoff
+long	save1[IM_MAXDIM], save2[IM_MAXDIM]
 
 int	sizeof()
-long	fstatl()
+long	fstatl(), lmod()
 errchk	gi_copyua
 
 begin
@@ -83,11 +87,13 @@ begin
 	    IM_MAX(im) = datamax
 
 	    if (IM_SECTUSED(im) == YES) {
-               call amovl (IM_SVLEN(im,1), save1, IM_MAXDIM)
-               call amovl (IM_PHYSLEN(im,1), save2, IM_MAXDIM)
+               sz_val = IM_MAXDIM
+               call amovl (IM_SVLEN(im,1), save1, sz_val)
+               call amovl (IM_PHYSLEN(im,1), save2, sz_val)
 	       call imioff (im, pixoff, compress, blklen)
-               call amovl (save1, IM_SVLEN(im,1), IM_MAXDIM)
-               call amovl (save2, IM_PHYSLEN(im,1), IM_MAXDIM)
+               sz_val = IM_MAXDIM
+               call amovl (save1, IM_SVLEN(im,1), sz_val)
+               call amovl (save2, IM_PHYSLEN(im,1), sz_val)
 	    } else 
 	       call imioff (im, pixoff, compress, blklen)
 	case READ_ONLY:
@@ -96,11 +102,13 @@ begin
 	    IM_MAX(im) = datamax
 	
 	    if (IM_SECTUSED(im) == YES) {
-               call amovl (IM_SVLEN(im,1), save1, IM_MAXDIM)
-               call amovl (IM_PHYSLEN(im,1), save2, IM_MAXDIM)
+               sz_val = IM_MAXDIM
+               call amovl (IM_SVLEN(im,1), save1, sz_val)
+               call amovl (IM_PHYSLEN(im,1), save2, sz_val)
 	       call imioff (im, pixoff, compress, blklen)
-               call amovl (save1, IM_SVLEN(im,1), IM_MAXDIM)
-               call amovl (save2, IM_PHYSLEN(im,1), IM_MAXDIM)
+               sz_val = IM_MAXDIM
+               call amovl (save1, IM_SVLEN(im,1), sz_val)
+               call amovl (save2, IM_PHYSLEN(im,1), sz_val)
 	    } else {
 	       call imioff (im, pixoff, compress, blklen)
 	    }
@@ -135,11 +143,13 @@ begin
 
 	    }
 	    if (IM_SECTUSED(im) == YES) {
-               call amovl (IM_SVLEN(im,1), save1, IM_MAXDIM)
-               call amovl (IM_PHYSLEN(im,1), save2, IM_MAXDIM)
+               sz_val = IM_MAXDIM
+               call amovl (IM_SVLEN(im,1), save1, sz_val)
+               call amovl (IM_PHYSLEN(im,1), save2, sz_val)
 	       call imioff (im, pixoff, compress, blklen)
-               call amovl (save1, IM_SVLEN(im,1), IM_MAXDIM)
-               call amovl (save2, IM_PHYSLEN(im,1), IM_MAXDIM)
+               sz_val = IM_MAXDIM
+               call amovl (save1, IM_SVLEN(im,1), sz_val)
+               call amovl (save2, IM_PHYSLEN(im,1), sz_val)
 	    } else {
 	       call imioff (im, pixoff, compress, blklen)
 	    }
@@ -150,11 +160,13 @@ begin
 	    IM_MAX(im) = datamax
 
 	    if (IM_SECTUSED(im) == YES) {
-               call amovl (IM_SVLEN(im,1), save1, IM_MAXDIM)
-               call amovl (IM_PHYSLEN(im,1), save2, IM_MAXDIM)
+               sz_val = IM_MAXDIM
+               call amovl (IM_SVLEN(im,1), save1, sz_val)
+               call amovl (IM_PHYSLEN(im,1), save2, sz_val)
 	       call imioff (im, pixoff, compress, blklen)
-               call amovl (save1, IM_SVLEN(im,1), IM_MAXDIM)
-               call amovl (save2, IM_PHYSLEN(im,1), IM_MAXDIM)
+               sz_val = IM_MAXDIM
+               call amovl (save1, IM_SVLEN(im,1), sz_val)
+               call amovl (save2, IM_PHYSLEN(im,1), sz_val)
 	    } else{
 	       call imioff (im, pixoff, compress, blklen)
 	    }
@@ -169,7 +181,8 @@ begin
 	    call imsetbuf (fd, im)
 	}
 
-	if (mod(pixoff, sizeof(IM_PIXTYPE(im))) != 1)
+	l_val = sizeof(IM_PIXTYPE(im))
+	if (lmod(pixoff, l_val) != 1)
 	   IM_FAST(im) = NO
 
 	# Update to the new group
@@ -184,13 +197,15 @@ procedure gi_copyua (imt, im)
 
 pointer imt, im
 
-long	offset
+size_t	sz_val
+long	offset, sz_param
 pointer	sp, stf, lbuf, pp
-int	pfd, pn, sz_param, i
+int	pfd, pn, i
 
 bool	bval, imgetb()
 # changed to short and long for short integers in gpb
 short	sval, imgets()
+int	ival, imgeti()
 long	lval, imgetl()
 #
 real	rval, imgetr()
@@ -202,7 +217,8 @@ string	badtype "illegal group data parameter datatype"
 
 begin
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 #	stf = IM_KDES(im)
 	stf = IM_KDES(imt)   # (june 1992) imt is the input descriptor. 
@@ -243,6 +259,16 @@ begin
 		# Transfer the value to an existing parameter only.
 	        if (imaccf (im, P_PTYPE(pp)) == YES) {
 		   call imputs (im, P_PTYPE(pp), sval)
+	        }
+
+	    case TY_INT:
+		iferr (ival = imgeti (imt, P_PTYPE(pp))) {
+		    call erract (EA_WARN)
+		    ival = 0
+		}
+		# Transfer the value to an existing parameter only.
+	        if (imaccf (im, P_PTYPE(pp)) == YES) {
+		   call imputi (im, P_PTYPE(pp), ival)
 	        }
 
 	    case TY_LONG:

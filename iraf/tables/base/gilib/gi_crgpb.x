@@ -10,13 +10,17 @@ pointer	im		# i: image descriptor
 int	group		# i: group number
 char	buffer[ARB]	# i: buffer containing gpb values
 #--
+size_t	sz_val, c_1
 bool	bval
 double	dval
+int	ival
 long	lval
 real	rval
 short	sval
-int	gpboff, bufoff, pfd, pn, sz_param, sz_gpb, i, nch
-pointer	sp, stf, gpb, lbuf, pp, op, ip, ival
+long	gpboff
+size_t	sz_gpb, sz_param
+int	bufoff, pfd, pn, i, nch, ip
+pointer	sp, stf, gpb, lbuf, pp, op
 
 bool	streq()
 int	ctowrd(), ctol(), ctor(), ctod(), ctoi(), gstrcpy(), strlen()
@@ -26,8 +30,11 @@ string	writerr "cannot update group parameter block"
 string	badtype "illegal group data parameter datatype"
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	stf = IM_KDES(im)
 	pfd = STF_PFD(stf)
@@ -51,24 +58,34 @@ begin
 	    case TY_BOOL:
 		nch = ctowrd (buffer[bufoff], ip, Memc[lbuf], SZ_LINE)
 		bval = streq (Memc[lbuf], "T")
-		call amovc (bval, Memc[op], SZ_BOOL)
+		sz_val = SZ_BOOL
+		call amovc (bval, Memc[op], sz_val)
 
 	    case TY_SHORT:
 		nch = ctoi (buffer[bufoff], ip, ival)
 		sval = ival
-		call amovc (sval, Memc[op], SZ_SHORT)
+		sz_val = SZ_SHORT
+		call amovc (sval, Memc[op], sz_val)
 
-	    case TY_INT,TY_LONG:
+	    case TY_INT:
+		nch = ctoi (buffer[bufoff], ip, ival)
+		sz_val = SZ_INT
+		call amovc (ival, Memc[op], sz_val)
+
+	    case TY_LONG:
 		nch = ctol (buffer[bufoff], ip, lval)
-		call amovc (lval, Memc[op], SZ_LONG)
+		sz_val = SZ_LONG
+		call amovc (lval, Memc[op], sz_val)
 
 	    case TY_REAL:
 		nch = ctor (buffer[bufoff], ip, rval)
-		call amovc (rval, Memc[op], SZ_REAL)
+		sz_val = SZ_REAL
+		call amovc (rval, Memc[op], sz_val)
 
 	    case TY_DOUBLE:
 		nch = ctod (buffer[bufoff], ip, dval)
-		call amovc (dval, Memc[op], SZ_DOUBLE)
+		sz_val = SZ_DOUBLE
+		call amovc (dval, Memc[op], sz_val)
 
 	    case TY_CHAR:
 		# Blank fill the string buffer.
@@ -77,7 +94,8 @@ begin
 		    Memc[lbuf+i-1] = ' '
 
 		# Pack the blank filled array into the GPB.
-		call chrpak (Memc[lbuf], 1, Memc[gpb+gpboff], 1, P_LEN(pp))
+		sz_val = P_LEN(pp)
+		call chrpak (Memc[lbuf], c_1, Memc[gpb+gpboff], c_1, sz_val)
 
 	    default:
 		call error (1, badtype)

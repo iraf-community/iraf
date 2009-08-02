@@ -14,7 +14,9 @@ procedure gi_cpdgpb (im, om)
 pointer im	# input image descriptor
 pointer om	# output image descriptor
 
-int	pn, pp, sg, out, in, stf, stfo
+size_t	sz_val
+int	pn, sg, out, in
+pointer	pp, stf, stfo
 int	stropen(), strlen(), len_hdrmem
 char    buf[SZ_OBJ]
 
@@ -32,7 +34,8 @@ begin
 
 	if (IM_LENHDRMEM(om) < len_hdrmem) {
 	    IM_LENHDRMEM(om) = len_hdrmem
-	    call realloc (om, IM_LENHDRMEM(om) + LEN_IMDES, TY_STRUCT)
+	    sz_val = IM_LENHDRMEM(om) + LEN_IMDES
+	    call realloc (om, sz_val, TY_STRUCT)
 	}
 
 	in = stropen (Memc[IM_USERAREA(im)], ARB, READ_ONLY)
