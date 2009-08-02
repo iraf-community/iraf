@@ -145,5 +145,7 @@ libvops.a:
 	xor.x
 	abs.c
 	mod.c
+	dim.c
+	sign.c
 	nint.c
 	;
