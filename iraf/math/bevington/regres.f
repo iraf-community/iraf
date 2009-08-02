@@ -9,7 +9,7 @@ c      function which is linear in coefficients
 c
 c usage
 c   call regres (x, y, sigmay, npts, nterms, m, mode, yfit,
-c      a0, a, sigma0, sigmaa, r, rmul, chisqr, ftest)
+c      a0, a, sigma0, sigmaa, r, rmul, chisqr, ftest, fctn)
 c
 c description of parameters
 c   x	   - array of points for independent variable
@@ -46,7 +46,9 @@ c   dimension statement valid for npts up to 100 and nterms up to 10
 c   sigmaag changed to sigmaa in statement following statement 132
 c
       subroutine regres (x,y,sigmay,npts,nterms,m,mode,yfit,
-     *a0,a,sigma0,sigmaa,r,rmul,chisqr,ftest)
+     *a0,a,sigma0,sigmaa,r,rmul,chisqr,ftest,fctn)
+      real fctn
+      external fctn
       double precision array,sum,ymean,sigma,chisq,xmean,sigmax
       dimension x(1),y(1),sigmay(1),m(1),yfit(1),a(1),sigmaa(1),
      *r(1)

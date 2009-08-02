@@ -8,7 +8,7 @@ c   evaluate derivatives of function for least-squares search
 c      for arbitrary function given by functn
 c
 c usage
-c   call fderiv (x, i, a, deltaa, nterms, deriv)
+c   call fderiv (x, i, a, deltaa, nterms, deriv, functn)
 c
 c description of parameters
 c   x	   - array of data points for independent variable
@@ -22,7 +22,9 @@ c subroutines and function subprograms required
 c   functn (x, i, a)
 c      evaluates the fitting function for the ith term
 c
-	subroutine fderiv (x,i,a,deltaa,nterms,deriv)
+	subroutine fderiv (x,i,a,deltaa,nterms,deriv,functn)
+	real functn
+	external functn
 	dimension x(1),a(1),deltaa(1),deriv(1)
 11	do 18 j=1,nterms
 	aj=a(j)
