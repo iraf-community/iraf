@@ -124,7 +124,7 @@ procedure wl_graphics (wd)
 pointer wd		  # I: the WCSLAB descriptor
 
 real	relative_size, vl, vr, vb, vt
-real	ggetr()
+real	ggetr(), aabs(), iint()
 
 begin
 	# Setup a graphics WCS that mimics the NDC coordinate WCS,
@@ -153,7 +153,7 @@ begin
 	call gadraw (WL_GP(wd), vl, vb)
 
 	# Determine the tick mark size.
-	relative_size = max (abs (vr - vl), abs (vt - vb ))
+	relative_size = max (aabs (vr - vl), aabs (vt - vb ))
 	WL_MAJ_TICK_SIZE(wd) = relative_size * WL_MAJ_TICK_SIZE(wd)
 	WL_MIN_TICK_SIZE(wd) = relative_size * WL_MIN_TICK_SIZE(wd)
 
@@ -178,6 +178,6 @@ begin
 	call gsetr (WL_GP(wd), G_PLWIDTH, LINE_SIZE)
 
 	# Determine the number of segments a "line" should consist of.
-	WL_LINE_SEGMENTS(wd) = int (min (ggetr (WL_GP(wd), "xr"), 
+	WL_LINE_SEGMENTS(wd) = iint (min (ggetr (WL_GP(wd), "xr"), 
 	    ggetr (WL_GP(wd), "yr")) / 5)
 end

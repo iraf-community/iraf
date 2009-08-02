@@ -109,30 +109,42 @@ end
 pointer procedure wl_create()
 
 int	i,j
+size_t	sz_val
 pointer	wd
 
 begin
 	# Allocate the descriptor memory.
-	call malloc (wd, WL_LEN, TY_STRUCT)
+	sz_val = WL_LEN
+	call malloc (wd, sz_val, TY_STRUCT)
 
 	# Allocate the subarrays.
-	call malloc (WL_AXIS_TITLE_PTR(wd), SZ_LINE * N_DIM, TY_CHAR)
-	call malloc (WL_AXIS_TITLE_SIDE_PTR(wd), N_SIDES * N_DIM, TY_BOOL)
-	call malloc (WL_BEGIN_PTR(wd), N_DIM, TY_DOUBLE)
-	call malloc (WL_END_PTR(wd), N_DIM, TY_DOUBLE)
-	call malloc (WL_LABEL_ANGLE_PTR(wd), MAX_LABEL_POINTS, TY_DOUBLE)
-	call malloc (WL_LABEL_AXIS_PTR(wd), MAX_LABEL_POINTS, TY_INT)
-	call malloc (WL_LABEL_POSITION_PTR(wd), N_DIM * MAX_LABEL_POINTS,
-	    TY_DOUBLE)
-	call malloc (WL_LABEL_SIDE_PTR(wd), N_DIM * N_SIDES, TY_BOOL)
-	call malloc (WL_LABEL_VALUE_PTR(wd), MAX_LABEL_POINTS, TY_DOUBLE)
-	call malloc (WL_LOGICAL_CENTER_PTR(wd), N_DIM, TY_DOUBLE)
-	call malloc (WL_MAJ_I_PTR(wd), N_DIM, TY_DOUBLE)
-	call malloc (WL_MIN_I_PTR(wd), N_DIM, TY_INT)
-	call malloc (WL_NV_PTR(wd), N_SIDES, TY_REAL)
-	call malloc (WL_SCREEN_BOUNDARY_PTR(wd), N_SIDES, TY_DOUBLE)
-	call malloc (WL_TITLE_PTR(wd), SZ_LINE, TY_CHAR)
-	call malloc (WL_WORLD_CENTER_PTR(wd), N_DIM, TY_DOUBLE)
+	sz_val = SZ_LINE * N_DIM
+	call malloc (WL_AXIS_TITLE_PTR(wd), sz_val, TY_CHAR)
+	sz_val = N_SIDES * N_DIM
+	call malloc (WL_AXIS_TITLE_SIDE_PTR(wd), sz_val, TY_INT)
+	sz_val = N_DIM
+	call malloc (WL_BEGIN_PTR(wd), sz_val, TY_DOUBLE)
+	call malloc (WL_END_PTR(wd), sz_val, TY_DOUBLE)
+	sz_val = MAX_LABEL_POINTS
+	call malloc (WL_LABEL_ANGLE_PTR(wd), sz_val, TY_DOUBLE)
+	call malloc (WL_LABEL_AXIS_PTR(wd), sz_val, TY_INT)
+	sz_val = N_DIM * MAX_LABEL_POINTS
+	call malloc (WL_LABEL_POSITION_PTR(wd), sz_val, TY_DOUBLE)
+	sz_val = N_DIM * N_SIDES
+	call malloc (WL_LABEL_SIDE_PTR(wd), sz_val, TY_BOOL)
+	sz_val = MAX_LABEL_POINTS
+	call malloc (WL_LABEL_VALUE_PTR(wd), sz_val, TY_DOUBLE)
+	sz_val = N_DIM
+	call malloc (WL_LOGICAL_CENTER_PTR(wd), sz_val, TY_DOUBLE)
+	call malloc (WL_MAJ_I_PTR(wd), sz_val, TY_DOUBLE)
+	call malloc (WL_MIN_I_PTR(wd), sz_val, TY_INT)
+	sz_val = N_SIDES
+	call malloc (WL_NV_PTR(wd), sz_val, TY_REAL)
+	call malloc (WL_SCREEN_BOUNDARY_PTR(wd), sz_val, TY_DOUBLE)
+	sz_val = SZ_LINE
+	call malloc (WL_TITLE_PTR(wd), sz_val, TY_CHAR)
+	sz_val = N_DIM
+	call malloc (WL_WORLD_CENTER_PTR(wd), sz_val, TY_DOUBLE)
 
 	# Initialize the simple values (should be the same as the parameter
 	# file).
@@ -190,26 +202,29 @@ pointer mw              # O: The MWCS descriptor.
 real    log_x1, log_x2, # O: The extent of the logical space to graph.
 real	log_y1, log_y2
 
+size_t	sz_val
 real    cd[2,2], r[2], w[2]
-pointer sp, input, pp
+pointer sp, inputp, pp
 pointer clopset(), mw_open()
 real    clgpsetr()
+include	<nullptr.inc>
 
 begin
         call smark (sp)
-        call salloc (input, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (inputp, sz_val, TY_CHAR)
 
 	# Open the pset.
 	pp = clopset ("wcspars")
 
         # Create an MWCS descriptor.
-        mw = mw_open (NULL, 2)
+        mw = mw_open (NULLPTR, 2)
 
         # Get the types.
-        call clgpset (pp, "ctype1", Memc[input], SZ_LINE)
-        call wl_decode_ctype (mw, Memc[input], 1)
-        call clgpset (pp, "ctype2", Memc[input], SZ_LINE)
-        call wl_decode_ctype (mw, Memc[input], 2)
+        call clgpset (pp, "ctype1", Memc[inputp], SZ_LINE)
+        call wl_decode_ctype (mw, Memc[inputp], 1)
+        call clgpset (pp, "ctype2", Memc[inputp], SZ_LINE)
+        call wl_decode_ctype (mw, Memc[inputp], 2)
 
         # Get the reference coordinates.
         r[1] = clgpsetr (pp, "crpix1")
@@ -249,10 +264,10 @@ end
 #   types are defined in the form "axistype-systemtype".  There may be
 #   any number of '-' in between the values.
 
-procedure wl_decode_ctype (mw, input, axno)
+procedure wl_decode_ctype (mw, sinput, axno)
 
 pointer mw              # I: the MWCS descriptor
-char    input[ARB]      # I: the string input
+char    sinput[ARB]     # I: the string input
 int     axno            # I: the axis being worked on
 
 int     i, input_len
@@ -260,31 +275,30 @@ int     strncmp(), strldx(), strlen()
 string  empty ""
 
 begin
-
-        input_len = strlen (input)
+        input_len = strlen (sinput)
 
         # Fix some characters.
         do i = 1, input_len {
-          if (input[i] == ' ' || input[i] == '\'')
+          if (sinput[i] == ' ' || sinput[i] == '\'')
             break
-          else if (IS_UPPER(input[i]))
-            input[i] = TO_LOWER(input[i])
-          else if (input[i] == '_')
-            input[i] = '-'
+          else if (IS_UPPER(sinput[i]))
+            sinput[i] = TO_LOWER(sinput[i])
+          else if (sinput[i] == '_')
+            sinput[i] = '-'
         }
 
         # Determine the type of function on this axis.
-        if (strncmp (input, "linear", 6) == 0) {
+        if (strncmp (sinput, "linear", 6) == 0) {
           call mw_swtype (mw, 1, 2, "linear", empty)
 
-        } else if (strncmp (input, "ra--", 4) == 0) {
-          i = strldx ("-", input) + 1
-          call mw_swtype (mw, 1, 2, input[i], empty)
+        } else if (strncmp (sinput, "ra--", 4) == 0) {
+          i = strldx ("-", sinput) + 1
+          call mw_swtype (mw, 1, 2, sinput[i], empty)
           call mw_swattrs (mw, axno, "axtype", "ra")
 
-        } else if (strncmp (input, "dec-", 4) == 0) {
-          i = strldx ("-", input) + 1
-          call mw_swtype (mw, 1, 2, input[i], empty) 
+        } else if (strncmp (sinput, "dec-", 4) == 0) {
+          i = strldx ("-", sinput) + 1
+          call mw_swtype (mw, 1, 2, sinput[i], empty) 
           call mw_swattrs (mw, axno, "axtype", "dec")
 
         } else {
@@ -293,7 +307,7 @@ begin
           # something we don't know about, assume a LINEAR axis, using
           # the given value of CTYPEi as the default axis label.
           call mw_swtype (mw, 1, 2, "linear", empty)
-          call mw_swattrs (mw, axno, "label", input)
+          call mw_swattrs (mw, axno, "label", sinput)
         }
         
 end
@@ -330,6 +344,7 @@ double  world_center[N_DIM]   # O: the center point in the world system.
 int	flip                  # O: true if the order of the axes have been
                               #    changed by axis mappins
 
+size_t	sz_val
 double	tmp_logical[MAX_DIM], tmp_world[MAX_DIM]
 int	wcs_dim, axis, index_sys1, index_sys2, found_axis
 int	axno[MAX_DIM], axval[MAX_DIM], found_axis_list[N_DIM]
@@ -340,9 +355,11 @@ errchk	mw_gwattrs
 begin
 	# Get some memory.
 	call smark (sp)
-	call salloc (axtype, SZ_LINE, TY_CHAR)
-	call salloc (cur_type, SZ_LINE, TY_CHAR)
-	call salloc (cd, MAX_DIM, TY_DOUBLE)
+	sz_val = SZ_LINE
+	call salloc (axtype, sz_val, TY_CHAR)
+	call salloc (cur_type, sz_val, TY_CHAR)
+	sz_val = MAX_DIM
+	call salloc (cd, sz_val, TY_DOUBLE)
 
 	# Get the dimensionality of the WCS.
 	call mw_seti (mw, MW_USEAXMAP, NO)
@@ -442,8 +459,9 @@ begin
 	# "first" position in that axis direction.  This will more than likely
 	# be a problem, but no general solution comes to mind this second.
 
-	call amovki (0, axno, wcs_dim)
-	call amovki (0, axval, wcs_dim)
+	sz_val = wcs_dim
+	call amovki (0, axno, sz_val)
+	call amovki (0, axval, sz_val)
 
 	# Setup so that the desired axes are set as the X and Y axis.
 	axno[index_sys1] = X_DIM
@@ -479,6 +497,7 @@ procedure wl_gr_inparams (wd)
 
 pointer wd                       # I: the WCSLAB descriptor
 
+size_t	sz_val
 pointer sp, aline, pp
 bool	clgpsetb(), streq()
 double	wl_string_to_internal()
@@ -489,7 +508,8 @@ real	clgpsetr()
 begin
 	# Get some memory.
 	call smark (sp)
-	call salloc (aline, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (aline, sz_val, TY_CHAR)
 
 	# Open the pset.
 	pp = clopset ("wlpars")
@@ -612,13 +632,15 @@ procedure wl_gr_remparams (wd)
 
 pointer wd  		# I: the WCSLAB descriptor.
 
+size_t	sz_val
 pointer sp, output, pp
 pointer	clopset()
 
 begin
 	# Get some memory.
 	call smark (sp)
-	call salloc (output, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (output, sz_val, TY_CHAR)
 
 	# Open the pset.
 	pp = clopset ("wlpars")
@@ -709,7 +731,7 @@ begin
 	call mfree (WL_LABEL_ANGLE_PTR(wd), TY_DOUBLE)
 	call mfree (WL_END_PTR(wd), TY_DOUBLE)
 	call mfree (WL_BEGIN_PTR(wd), TY_DOUBLE)
-	call mfree (WL_AXIS_TITLE_SIDE_PTR(wd), TY_BOOL)
+	call mfree (WL_AXIS_TITLE_SIDE_PTR(wd), TY_INT)
 	call mfree (WL_AXIS_TITLE_PTR(wd), TY_CHAR)
 
 	# Now deallocate the structure.
@@ -719,9 +741,9 @@ end
 
 # WL_LABEL_SIDE -- Decode string into set of booleans  sides.
 
-procedure wl_label_side (input, flag)
+procedure wl_label_side (sinput, flag)
 
-char	input[ARB]     # I: string listing the sides to be labeled
+char	sinput[ARB]    # I: string listing the sides to be labeled
 bool	flag[N_SIDES]  # O: the flags indicating which sides wll be labeled
 
 int	i 
@@ -733,13 +755,13 @@ begin
 	    flag[i] = false
 
 	# Now set each side that is in the list.
-	if (strmatch (input, "right") != 0)
+	if (strmatch (sinput, "right") != 0)
 	    flag[RIGHT] = true
-	if (strmatch (input, "left") != 0)
+	if (strmatch (sinput, "left") != 0)
 	    flag[LEFT] = true
-	if (strmatch (input, "top") != 0)
+	if (strmatch (sinput, "top") != 0)
 	    flag[TOP] = true
-	if (strmatch (input, "bottom") != 0)
+	if (strmatch (sinput, "bottom") != 0)
 	    flag[BOTTOM] = true
 end
 
@@ -758,9 +780,9 @@ end
 #  This returns the single coordinate value converted to a base system 
 #  (degrees).
 
-double procedure wl_string_to_internal (input, axis_type, which_axis)
+double procedure wl_string_to_internal (sinput, axis_type, which_axis)
 
-char	input[ARB]	# I; the string containing the numerical value
+char	sinput[ARB]	# I; the string containing the numerical value
 int	axis_type   	# I: the type of wcs
 int	which_axis	# I: the axis number
 
@@ -769,7 +791,7 @@ int	strlen(), nscan()
 
 begin
 	# It is possible that the value was not defined.
-	if (strlen (input)  <= 0)
+	if (strlen (sinput)  <= 0)
 	    value = INDEFD
 
 	# Decode based on the system.
@@ -784,7 +806,7 @@ begin
 		# H:M:S from D:M:S. If the axis being read is RA, assume that
 		# it was H:M:S.
 
-	        call sscan (input)
+	        call sscan (sinput)
 	            call gargd (value)
 
 		# If the axis is Longitude == RA, then convert the hours to
@@ -799,7 +821,7 @@ begin
 	    # Default- unknown system, just read the string as a double
 	    # precision and return it.
 	    default:
-		call sscan (input)
+		call sscan (sinput)
 		    call gargd (value)
 		if (nscan() < 1)
 		    value = INDEFD
@@ -882,7 +904,7 @@ procedure wl_side_to_string (side, output, max_len)
 
 int	side              # I: the side to convert
 char	output[max_len]   # O: the string representation of the side
-int	 max_len          # I: the maximum length of the output string
+int	max_len           # I: the maximum length of the output string
 
 begin
 	switch (side) {
@@ -908,6 +930,7 @@ bool	side_flags[N_SIDES]  # I: the boolean array of sides
 char	output[ARB]          # O: the output comma separated list of sides
 int	max_len              # I: maximum length of the output string
 
+size_t	sz_val
 int	i
 pointer sp, side
 int	strlen()
@@ -915,7 +938,8 @@ int	strlen()
 begin
 	# Get memory.
 	call smark (sp)
-	call salloc (side, max_len, TY_CHAR)
+	sz_val = max_len
+	call salloc (side, sz_val, TY_CHAR)
 
 	# Build the list.
 	output[1] = EOS

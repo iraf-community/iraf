@@ -749,7 +749,7 @@ end
 
 procedure wl_label_side (sinput, flag)
 
-char	sinput[ARB]     # I: string listing the sides to be labeled
+char	sinput[ARB]    # I: string listing the sides to be labeled
 bool	flag[N_SIDES]  # O: the flags indicating which sides wll be labeled
 
 int	i 
@@ -910,7 +910,7 @@ procedure wl_side_to_string (side, output, max_len)
 
 int	side              # I: the side to convert
 char	output[max_len]   # O: the string representation of the side
-int	 max_len          # I: the maximum length of the output string
+int	max_len           # I: the maximum length of the output string
 
 begin
 	switch (side) {

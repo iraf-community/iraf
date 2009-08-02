@@ -30,6 +30,7 @@ long	ip, op			# loop indexes
 long	l_val
 size_t	sz_val
 pointer tbcnum()
+long	labs()
 
 begin
 	nrows = TB_NROWS(tp)
@@ -65,7 +66,7 @@ begin
 	if (shift > 0)
 	    TB_NROWS(tp) = TB_NROWS(tp) + shift
 
-	abs_shift = abs (shift)
+	abs_shift = labs (shift)
 
 	# Rows row1:row2 will be copied to row1+shift:row2+shift.
 	if (shift < 0)

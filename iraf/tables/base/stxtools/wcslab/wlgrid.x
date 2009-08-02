@@ -15,11 +15,14 @@ procedure wl_grid (wd)
 
 pointer wd		# I: the WCSLAB descriptor
 
+size_t	c_1
 double	current, tmp_begin, tmp_end, tmp_minor_interval
 int	old_type, old_n_labels, min_counter
-int	gstati()
+int	gstati(), imod()
 
 begin
+	c_1 = 1
+
 	# Initialize the label counter.
 	WL_N_LABELS(wd) = 0
 
@@ -32,7 +35,7 @@ begin
 
 	# If near-polar, the lines should go all the way to the poles.
 	if (WL_GRAPH_TYPE(wd) == NEAR_POLAR)
-	    if (abs (WL_BEGIN(wd,AXIS2)) < abs (WL_END(wd,AXIS2))) {
+	    if (dabs (WL_BEGIN(wd,AXIS2)) < dabs (WL_END(wd,AXIS2))) {
 	        tmp_begin = WL_BEGIN(wd,AXIS2)
 	        tmp_end = NORTH_POLE_LATITUDE
 	    } else {
@@ -49,7 +52,7 @@ begin
 	min_counter = 0
 	repeat {
 
-	    if  (mod (min_counter, WL_MINOR_INTERVAL(wd,AXIS1)) == 0) {
+	    if  (imod (min_counter, WL_MINOR_INTERVAL(wd,AXIS1)) == 0) {
 	        call gseti  (WL_GP(wd), G_PLTYPE, WL_MAJ_LINE_TYPE(wd))
 	        call wl_graph_constant_axis1 (wd, current, tmp_begin, tmp_end, 
 	            WL_MAJ_GRIDON(wd), WL_LABON(wd), WL_MAJ_TICK_SIZE(wd))
@@ -81,7 +84,7 @@ begin
 	min_counter = 0
 	tmp_begin = current 
 	repeat {
-	    if  (mod (min_counter, WL_MINOR_INTERVAL(wd,AXIS2)) == 0) {
+	    if  (imod (min_counter, WL_MINOR_INTERVAL(wd,AXIS2)) == 0) {
 
 	        call gseti  (WL_GP(wd), G_PLTYPE, WL_MAJ_LINE_TYPE(wd))
 	        old_n_labels = WL_N_LABELS(wd)
@@ -99,7 +102,7 @@ begin
 	    	    call wl_w2ld (WL_WLCT(wd), WL_AXIS_FLIP(wd), 
 	                WL_POLAR_LABEL_POSITION(wd), current,
 	                WL_LABEL_POSITION(wd,WL_N_LABELS(wd),X_DIM),
-	                WL_LABEL_POSITION(wd,WL_N_LABELS(wd),Y_DIM), 1)
+	                WL_LABEL_POSITION(wd,WL_N_LABELS(wd),Y_DIM), c_1)
 	    	    WL_LABEL_VALUE(wd,WL_N_LABELS(wd)) = current
 	    	    WL_LABEL_AXIS(wd,WL_N_LABELS(wd)) = AXIS2
 	        }
@@ -141,27 +144,30 @@ pointer wd          	# I: the WCSLAB descriptor
 double  x               # I: X value to hold constant
 double  ymin, ymax      # I: Y values to vary between
 int	gridon          # I: true if gridding is on
-int     label           # I: true if the points should be labelled
+int	label           # I: true if the points should be labelled
 real    tick_size       # I: size of tick marks
 
+size_t	c_1
 bool	done
 double	lastx, lasty, lx, ly, y, yinc
 real	rlx, rly
 
 begin
+	c_1 = 1
+
 	# Determine the scale at which Y should be incremented.
 	yinc =  (ymax - ymin) / WL_LINE_SEGMENTS(wd)
 
 	# Now graph the line segments.
 	y = ymin
-	call wl_w2ld (WL_WLCT(wd), WL_AXIS_FLIP(wd), x, y, lastx, lasty, 1)
+	call wl_w2ld (WL_WLCT(wd), WL_AXIS_FLIP(wd), x, y, lastx, lasty, c_1)
 
 	rlx = lastx
 	rly = lasty
 	call gamove (WL_GP(wd), rlx, rly)
 
 	repeat {
-	    call wl_w2ld (WL_WLCT(wd), WL_AXIS_FLIP(wd), x, y, lx, ly, 1)
+	    call wl_w2ld (WL_WLCT(wd), WL_AXIS_FLIP(wd), x, y, lx, ly, c_1)
 	    call wl_point_to_label (wd, lastx, lasty, lx, ly, AXIS1, x, gridon,
 	        label, tick_size)
 	    if (gridon == YES) {
@@ -202,24 +208,27 @@ int	gridon          # I: true if gridding is on
 int	label           # I: true if points should be labelled
 real    tick_size       # I: tick mark size
 
+size_t	c_1
 bool	done
 double	lx, ly, lastx, lasty, x, xinc
 real	rlx, rly
 
 begin
+	c_1 = 1
+
 	# Determine the scale at which X should be incremented.
 	xinc =  (xmax - xmin) / WL_LINE_SEGMENTS(wd)
 
 	# Now graph the line segments.
 	x = xmin
-	call wl_w2ld (WL_WLCT(wd), WL_AXIS_FLIP(wd), x, y, lastx, lasty, 1)
+	call wl_w2ld (WL_WLCT(wd), WL_AXIS_FLIP(wd), x, y, lastx, lasty, c_1)
 
 	rlx = lastx
 	rly = lasty
 	call gamove (WL_GP(wd), rlx, rly)
 
 	repeat {
-	    call wl_w2ld (WL_WLCT(wd), WL_AXIS_FLIP(wd), x, y, lx, ly, 1)
+	    call wl_w2ld (WL_WLCT(wd), WL_AXIS_FLIP(wd), x, y, lx, ly, c_1)
 	    call wl_point_to_label (wd, lastx, lasty, lx, ly, AXIS2, y, gridon,
 	        label, tick_size)
 	    if  (gridon == YES) {
@@ -266,7 +275,7 @@ procedure wl_point_to_label (wd, x1, y1, x2, y2, axis, axis_value, gridon,
 
 pointer wd                  # I: the WCSLAB descriptor
 double  x1, y1, x2, y2      # I: the two possible points to label
-int     axis                # I: which axis are we dealing with ?
+int	axis                # I: which axis are we dealing with ?
 double  axis_value          # I: the value of the axis at this point
 int	gridon              # I: true if gridding is on
 int	label               # I: true if this point should have a label
@@ -342,7 +351,7 @@ procedure wl_mark_tick (gp, wcs, tick_size, in, x0, y0, x1, y1, sx, sy,
 	tick_x, tick_y)
 
 pointer gp              # I: the graphics pointer
-int     wcs             # I: the WCS to use to draw the tick marks
+int	wcs             # I: the WCS to use to draw the tick marks
 real    tick_size       # I: size of the tick mark
 int	in              # I: true if ticks should be into the graph
 double  x0, y0, x1, y1  # I: the points defining the tick direction

@@ -61,8 +61,8 @@ begin
 	     view_edge[1,Y_DIM], array[1,AXIS1], array[1,AXIS2], sz_val)
 	call alimd (array[1,AXIS1], sz_val, min_value[AXIS1], max_value[AXIS1])
 	call alimd (array[1,AXIS2], sz_val, min_value[AXIS2], max_value[AXIS2])
-	range[AXIS1] = abs (max_value[AXIS1] - min_value[AXIS1])
-	range[AXIS2] = abs (max_value[AXIS2] - min_value[AXIS2])
+	range[AXIS1] = dabs (max_value[AXIS1] - min_value[AXIS1])
+	range[AXIS2] = dabs (max_value[AXIS2] - min_value[AXIS2])
 
 	# The above isn't good enough for the sky projections.  Deal with those.
 	if (WL_SYSTEM_TYPE(wd) == RA_DEC) {
@@ -306,7 +306,7 @@ begin
 	    else
 	        ax2min = SOUTH_POLE_LATITUDE + ((NORTH_POLE_LATITUDE +
 		    ax2max) * DISTANCE_TO_POLE)
-	    ax2ran = abs (ax2max - ax2min)
+	    ax2ran = dabs (ax2max - ax2min)
 
 	    # Mark the pole.
 	    call gmark (WL_GP(wd), real (pole_position[X_DIM]),
@@ -365,14 +365,14 @@ begin
 	            WL_SCREEN_BOUNDARY(wd,1))
 	        if (WL_BAD_LABEL_SIDE(wd) == LEFT || WL_BAD_LABEL_SIDE(wd) ==
 	            RIGHT)
-		    if (abs (ny - WL_SCREEN_BOUNDARY(wd,BOTTOM)) <
-	                abs (ny - WL_SCREEN_BOUNDARY(wd,TOP)))
+		    if (dabs (ny - WL_SCREEN_BOUNDARY(wd,BOTTOM)) <
+	                dabs (ny - WL_SCREEN_BOUNDARY(wd,TOP)))
 		        WL_POLAR_LABEL_DIRECTION(wd) = BOTTOM
 		    else
 		        WL_POLAR_LABEL_DIRECTION(wd) = TOP
 	        else
-		    if (abs (nx - WL_SCREEN_BOUNDARY(wd,LEFT)) <
-	                abs (nx - WL_SCREEN_BOUNDARY(wd,RIGHT)))
+		    if (dabs (nx - WL_SCREEN_BOUNDARY(wd,LEFT)) <
+	                dabs (nx - WL_SCREEN_BOUNDARY(wd,RIGHT)))
 		        WL_POLAR_LABEL_DIRECTION(wd) = LEFT
 		    else
 		        WL_POLAR_LABEL_DIRECTION(wd) = RIGHT
@@ -493,9 +493,9 @@ begin
 	c_1 = 1
 
 	# Determine which direction, up or down, the axis 2's will be labelled.
-	dif = abs (screen_boundary[TOP] - pole_position[AXIS2])
+	dif = dabs (screen_boundary[TOP] - pole_position[AXIS2])
 	bad_label_side= TOP
-	tdif = abs (screen_boundary[BOTTOM] - pole_position[AXIS2])
+	tdif = dabs (screen_boundary[BOTTOM] - pole_position[AXIS2])
 	if (tdif < dif) {
 	  dif = tdif
 	  bad_label_side = BOTTOM
@@ -730,22 +730,22 @@ double	dif, ndif
 int	side
 
 begin
-	dif = abs (x - screen_boundary[LEFT])
+	dif = dabs (x - screen_boundary[LEFT])
 	side = LEFT
 
-	ndif = abs (x - screen_boundary[RIGHT])
+	ndif = dabs (x - screen_boundary[RIGHT])
 	if  (ndif < dif) {
 	  side = RIGHT
 	  dif = ndif
 	}
 	
-	ndif = abs (y - screen_boundary[BOTTOM])
+	ndif = dabs (y - screen_boundary[BOTTOM])
 	if  (ndif < dif) {
 	  side = BOTTOM
 	  dif = ndif
 	}
 	
-	ndif = abs (y - screen_boundary[TOP])
+	ndif = dabs (y - screen_boundary[TOP])
 	if  (ndif < dif)
 	  side = TOP
 
@@ -830,7 +830,7 @@ double	diff        # O: the min, max difference
 bool	wrap	    # I: is the ra wrapped ?
 
 begin
-	if (! wrap && (abs (val1 - val2) > HALF_CIRCLE))
+	if (! wrap && (dabs (val1 - val2) > HALF_CIRCLE))
 	    if (val1 < val2) {
 	        min = val2
 	        max = val1 + FULL_CIRCLE
@@ -956,8 +956,8 @@ int	iexp, num
 double	wl_round_upd()
 
 begin
-	diff = log10 (abs (range) / 4.D0)
-	iexp = diff
+	diff = log10 (dabs (range) / 4.D0)
+	iexp = idint (diff)
 	if (diff < 0)
 	    iexp = iexp - 1
 
@@ -985,15 +985,13 @@ double	x		# I: value to be rounded
 double	y		# I: multiple of X is to be rounded up in
 
 double	z, r
-long	lval
 
 begin
 	if (x < 0.0D0)
 	    z = 0.0D0
 	else
 	    z = y
-	lval = (x + z) / y
-	r = y * lval
+	r = y * dint ((x + z) / y)
 
 	return (r)
 end
@@ -1018,7 +1016,7 @@ begin
 	for (j = 1;  j < n && (ex - arr[j]) > 0.0D0;  j = j + 1)
 	    ;
 	if (j > 1 && j < n)
-	    if (abs (ex - arr[j-1]) < abs (ex - arr[j])) 
+	    if (dabs (ex - arr[j-1]) < dabs (ex - arr[j])) 
 		j = j - 1
 
 	return (arr[j])

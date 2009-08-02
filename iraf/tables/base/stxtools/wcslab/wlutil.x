@@ -14,10 +14,12 @@ pointer	im			# I:   pointer to the input image
 real	c1, c2, l1, l2		# I/O: input/output window
 real	vl, vr, vb, vt		# I/O: input/output viewport
 
-int	wcs_status, dim1, dim2, step1, step2
+size_t	sz_val
+int	wcs_status, dim1, dim2
+long	step1, step2
 pointer	sp, frimage, frim, iw
 real	x1, x2, y1, y2, fx1, fx2, fy1, fy2, junkx, junky
-real	vx1, vx2, vy1, vy2, nx1, nx2, ny1, ny2
+real	vx1, vx2, vy1, vy2, nx1, nx2, ny1, ny2, rval0, rval1
 pointer	imd_mapframe(), iw_open()
 
 
@@ -30,7 +32,8 @@ begin
 
 	# Allocate some memory.
 	call smark (sp)
-	call salloc (frimage, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (frimage, sz_val, TY_CHAR)
 
 	# Open the requested display frame and get the loaded image name.
 	# If this name is blank, use the default viewport and window.
@@ -114,12 +117,15 @@ begin
 	    nx2 = IM_LEN(im,1)
 	} else {
 	    vx2 = 1.0
-	    call iw_fb2im (iw, real(IM_LEN(frim,1)), real (IM_LEN(frim,2)),
-	        junkx, junky)
-	    if (step1 >= 0)
-	        nx2 = min (real (IM_LEN(im,1)),  junkx - x1 + 1.0)
-	    else
-	        nx1 = min (real (IM_LEN(im,1)),  junkx - x2 + 1.0)
+	    rval0 = IM_LEN(frim,1)
+	    rval1 = IM_LEN(frim,2)
+	    call iw_fb2im (iw, rval0, rval1, junkx, junky)
+	    rval0 = IM_LEN(im,1)
+	    if (step1 >= 0) {
+	        nx2 = min (rval0,  junkx - x1 + 1.0)
+	    } else {
+	        nx1 = min (rval0,  junkx - x2 + 1.0)
+	    }
 	}
 
 	# Compute a new viewport and window for Y.
@@ -139,12 +145,15 @@ begin
 	    ny2 = IM_LEN(im,2)
 	} else {
 	    vy2 = 1.0
-	    call iw_fb2im (iw, real (IM_LEN(frim,1)), real (IM_LEN(frim,2)),
-	        junkx, junky)
-	    if (step2 >= 0)
-	        ny2 = min (real (IM_LEN(im,2)), junky - y1 + 1.0)
-	    else
-	        ny1 = min (real (IM_LEN(im,2)), junky - y2 + 1.0)
+	    rval0 = IM_LEN(frim,1)
+	    rval1 = IM_LEN(frim,2)
+	    call iw_fb2im (iw, rval0, rval1, junkx, junky)
+	    rval0 = IM_LEN(im,2)
+	    if (step2 >= 0) {
+	        ny2 = min (rval0, junky - y1 + 1.0)
+	    } else {
+	        ny1 = min (rval0, junky - y2 + 1.0)
+	    }
 	}
 
 	# Define a the new viewport and window. 
@@ -187,17 +196,18 @@ real	c1, c2, l1, l2		# I:   the column and line limits
 real	ux1, ux2, uy1, uy2	# I/O: NDC coordinates of requested viewort
 bool	fill			# I:   fill viewport (vs preserve aspect ratio)
 
-int	ncols, nlines
+long	ncols, nlines
 real	xcen, ycen, ncolsr, nlinesr, ratio, aspect_ratio
 real	x1, x2, y1, y2, ext, xdis, ydis
 bool	fp_equalr()
 real	ggetr()
+long	lnint()
 data	ext /0.0625/
 
 begin
-	ncols = nint (c2 - c1) + 1
+	ncols = lnint (c2 - c1) + 1
 	ncolsr = real (ncols)
-	nlines = nint (l2 - l1) + 1
+	nlines = lnint (l2 - l1) + 1
 	nlinesr = real (nlines)
 
 	# Determine the standard window sizes.
@@ -311,7 +321,7 @@ long procedure wl_max_element_array (array, npts)
 double	array[ARB] 	 # I: the array to look through for the maximum
 size_t	npts             # I: the number of points in the array
 
-int	i, maximum
+long	i, maximum
 
 begin
 	maximum = 1
@@ -370,15 +380,18 @@ size_t	npts                # I: the number of points in the vectors
 real	angle               # I: the angle to rotate (radians)
 real	nx[npts], ny[npts]  # O: the transformed vectors
 
+size_t	sz_val
 pointer sp, center, mw
 pointer mw_open(), mw_sctran()
+include	<nullptr.inc>
 
 begin
 	# Get some memory.
 	call smark (sp)
-	call salloc (center, N_DIM, TY_REAL)
+	sz_val = N_DIM
+	call salloc (center, sz_val, TY_REAL)
 
-	mw = mw_open (NULL, N_DIM)
+	mw = mw_open (NULLPTR, N_DIM)
 	ONER(center,1) = 0.
 	ONER(center,2) = 0.
 	call mw_rotate (mw, -DEGTORAD( angle ), ONER(center,1), 3b)

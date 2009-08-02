@@ -35,7 +35,7 @@ begin
 
 	# If near-polar, the lines should go all the way to the poles.
 	if (WL_GRAPH_TYPE(wd) == NEAR_POLAR)
-	    if (abs (WL_BEGIN(wd,AXIS2)) < abs (WL_END(wd,AXIS2))) {
+	    if (dabs (WL_BEGIN(wd,AXIS2)) < dabs (WL_END(wd,AXIS2))) {
 	        tmp_begin = WL_BEGIN(wd,AXIS2)
 	        tmp_end = NORTH_POLE_LATITUDE
 	    } else {

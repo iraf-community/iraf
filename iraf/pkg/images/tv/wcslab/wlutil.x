@@ -206,9 +206,9 @@ data	ext /0.0625/
 
 begin
 	ncols = lnint (c2 - c1) + 1
-	ncolsr = ncols
+	ncolsr = real (ncols)
 	nlines = lnint (l2 - l1) + 1
-	nlinesr = nlines
+	nlinesr = real (nlines)
 
 	# Determine the standard window sizes.
 	if (fill) {

@@ -36,6 +36,7 @@ procedure wl_wcslab (wd)
 
 pointer wd 	 # I: the WCSLAB descriptor
 
+size_t	sz_val
 int	old_clip, old_pltype, old_txquality, old_wcs
 pointer	sp, wcs_save_block
 real	old_plwidth, old_txsize, old_txup
@@ -45,7 +46,8 @@ real	gstatr()
 begin
 	# Allocate working space.
 	call smark(sp)
-	call salloc(wcs_save_block, SAVE_BLOCK_SIZE, TY_STRUCT)
+	sz_val = SAVE_BLOCK_SIZE
+	call salloc(wcs_save_block, sz_val, TY_STRUCT)
 
 	# Store certain graphics parameters.
 	old_plwidth = gstatr (WL_GP(wd), G_PLWIDTH)
@@ -122,7 +124,7 @@ procedure wl_graphics (wd)
 pointer wd		  # I: the WCSLAB descriptor
 
 real	relative_size, vl, vr, vb, vt
-real	ggetr()
+real	ggetr(), aabs(), iint()
 
 begin
 	# Setup a graphics WCS that mimics the NDC coordinate WCS,
@@ -151,7 +153,7 @@ begin
 	call gadraw (WL_GP(wd), vl, vb)
 
 	# Determine the tick mark size.
-	relative_size = max (abs (vr - vl), abs (vt - vb ))
+	relative_size = max (aabs (vr - vl), aabs (vt - vb ))
 	WL_MAJ_TICK_SIZE(wd) = relative_size * WL_MAJ_TICK_SIZE(wd)
 	WL_MIN_TICK_SIZE(wd) = relative_size * WL_MIN_TICK_SIZE(wd)
 
@@ -176,6 +178,6 @@ begin
 	call gsetr (WL_GP(wd), G_PLWIDTH, LINE_SIZE)
 
 	# Determine the number of segments a "line" should consist of.
-	WL_LINE_SEGMENTS(wd) = int (min (ggetr (WL_GP(wd), "xr"), 
+	WL_LINE_SEGMENTS(wd) = iint (min (ggetr (WL_GP(wd), "xr"), 
 	    ggetr (WL_GP(wd), "yr")) / 5)
 end

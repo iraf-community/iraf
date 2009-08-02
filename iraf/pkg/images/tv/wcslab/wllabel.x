@@ -23,6 +23,7 @@ bool	no_side_axis1, no_side_axis2
 int	i, axis1_side, axis2_side
 pointer	sp, offset_ptr
 real	offset
+real	aabs()
 
 begin
 	# Get some memory.
@@ -105,7 +106,7 @@ begin
 	        offset = 0.
 
 	  # Modify the bounding box for the new viewport.
-	  if (abs (offset) > abs (OFFSET(offset_ptr,i)))
+	  if (aabs (offset) > aabs (OFFSET(offset_ptr,i)))
 	    OFFSET(offset_ptr,i) = offset
 	}
 
@@ -121,7 +122,7 @@ begin
 	    	    offset = 0.
 
 	        # Modify the bounding box for the new viewport.
-	        if (abs (offset) > abs (OFFSET(offset_ptr,i)))
+	        if (aabs (offset) > aabs (OFFSET(offset_ptr,i)))
 	    	    OFFSET(offset_ptr,i) = offset
 	    }
 
@@ -520,12 +521,12 @@ begin
 	    accuracy = HIGH_ACCURACY
 
 	# Seconds of time.
-	fraction = double (abs(DEGTOST (rarad)))
+	fraction = dabs (DEGTOST (rarad))
 	if (precision == SUBSEC_LOW || precision == SUBSEC_HIGH) {
-	    sec = int (fraction)
+	    sec = idint (fraction)
 	    fraction = fraction - double (sec)
 	} else {
-	    sec = int (fraction + 0.5)
+	    sec = idint (fraction + 0.5)
 	    fraction = 0.
 	}
 
@@ -641,12 +642,12 @@ begin
 	    accuracy = HIGH_ACCURACY
 
 	# Seconds of time.
-	fraction = double (abs (DEGTOSA (arcrad)))
+	fraction = dabs (DEGTOSA (arcrad))
 	if (precision == SUBSEC_LOW || precision == SUBSEC_HIGH) {
-	    sec = int (fraction)
+	    sec = idint (fraction)
 	    fraction = fraction - double (sec)
 	} else {
-	    sec = nint  (fraction)
+	    sec = idnint (fraction)
 	    fraction = 0.
 	}
 
@@ -879,7 +880,7 @@ real	unit_off_x, unit_off_y, ux, uy
 bool	fp_equalr()
 double	wl_string_angle()
 int	wl_opposite_side(), strlen()
-real	ggetr(), gstatr()
+real	ggetr(), gstatr(), aabs()
 
 begin
 	c_1 = 1
@@ -944,8 +945,8 @@ begin
 	length = .5 * char_width *  (2 + strlen (Memc[label]))
 
 	call wl_rotate (length, 0., c_1, text_angle - 90., rx, ry)
-	rx = abs (rx)
-	ry = abs (ry)
+	rx = aabs (rx)
+	ry = aabs (ry)
 
 	# If labels are to appear inside the graph, then justification should
 	# appear as if it were done for the opposite side.
@@ -981,7 +982,7 @@ begin
 	    new_offset = ry + ry
 
 	case LEFT:
-	    lx = x - rx - abs (unit_off_x)
+	    lx = x - rx - aabs (unit_off_x)
 	    if (text_angle < 90.) {
 	        ly = y + ry - in_off_y
 	        lx = lx - in_off_x
@@ -989,10 +990,10 @@ begin
 	        ly = y - ry + in_off_y
 	        lx = lx + in_off_x
 	    }
-	    new_offset = rx + rx + abs (unit_off_x)
+	    new_offset = rx + rx + aabs (unit_off_x)
 
 	case RIGHT:
-	    lx = x + rx + abs (unit_off_x)
+	    lx = x + rx + aabs (unit_off_x)
 	    if (text_angle < 90.) {
 	        ly = y - ry + in_off_y
 	        lx = lx + in_off_x
@@ -1000,7 +1001,7 @@ begin
 	        ly = y + ry - in_off_y
 	        lx = lx - in_off_x
 	    }
-	    new_offset = rx + rx + abs (unit_off_x)
+	    new_offset = rx + rx + aabs (unit_off_x)
 	}
 
 	lx = lx - (unit_off_x / 2.)
@@ -1016,7 +1017,7 @@ begin
 	    call gtext (WL_GP(wd), ux, uy, Memc[units], Memc[units_format])
 
 	# Determine new maximum string size.
-	if  ((WL_LABOUT(wd) == YES) &&  (abs (offset) < new_offset))
+	if  ((WL_LABOUT(wd) == YES) &&  (aabs (offset) < new_offset))
 	    if (side == LEFT || side == BOTTOM)
 	        offset = -new_offset
 	    else

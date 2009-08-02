@@ -18,6 +18,7 @@ procedure wl_setup (wd)
 
 pointer wd                       # I: the WCSLAB descriptor
 
+size_t	sz_val
 bool	north
 double	array[N_EDGES,N_DIM], max_value[N_DIM], min_value[N_DIM]
 double	range[N_DIM], pole_position[N_DIM], view_edge[N_EDGES,N_DIM]
@@ -50,22 +51,26 @@ begin
 	# x,y vectors containing evenly spaced points around the edges of
 	# the viewing window.
 
+	sz_val = N_EDGES
 	call wl_construct_edge_vectors (WL_SCREEN_BOUNDARY(wd,1),
-	    view_edge[1,X_DIM], view_edge[1,Y_DIM], N_EDGES)
+	    view_edge[1,X_DIM], view_edge[1,Y_DIM], sz_val)
 	
 	# Find the range of the axes over the graphics viewport.
+	sz_val = N_EDGES
 	call wl_l2wd (WL_LWCT(wd), WL_AXIS_FLIP(wd), view_edge[1,X_DIM], 
-	     view_edge[1,Y_DIM], array[1,AXIS1], array[1,AXIS2], N_EDGES)
-	call alimd (array[1,AXIS1], N_EDGES, min_value[AXIS1], max_value[AXIS1])
-	call alimd (array[1,AXIS2], N_EDGES, min_value[AXIS2], max_value[AXIS2])
-	range[AXIS1] = abs (max_value[AXIS1] - min_value[AXIS1])
-	range[AXIS2] = abs (max_value[AXIS2] - min_value[AXIS2])
+	     view_edge[1,Y_DIM], array[1,AXIS1], array[1,AXIS2], sz_val)
+	call alimd (array[1,AXIS1], sz_val, min_value[AXIS1], max_value[AXIS1])
+	call alimd (array[1,AXIS2], sz_val, min_value[AXIS2], max_value[AXIS2])
+	range[AXIS1] = dabs (max_value[AXIS1] - min_value[AXIS1])
+	range[AXIS2] = dabs (max_value[AXIS2] - min_value[AXIS2])
 
 	# The above isn't good enough for the sky projections.  Deal with those.
-	if (WL_SYSTEM_TYPE(wd) == RA_DEC)
-	    call wl_sky_extrema (wd, array[1,AXIS1], N_EDGES, pole_position,
+	if (WL_SYSTEM_TYPE(wd) == RA_DEC) {
+	    sz_val = N_EDGES
+	    call wl_sky_extrema (wd, array[1,AXIS1], sz_val, pole_position,
 	        north, min_value[AXIS1], max_value[AXIS1], range[AXIS1],
 		min_value[AXIS2], max_value[AXIS2], range[AXIS2])
+	}
 
 	# Determine the rotation between the systems.
 	WL_ROTA(wd) = wl_coord_rotation (WL_WLCT(wd), WL_AXIS_FLIP(wd),
@@ -101,12 +106,15 @@ pointer wlct                  # I: the world-to-logical transformation
 int	flip                  # I: true if the axes are transposed
 double  longitude             # I: the longitude to determine latitude
 bool    north                 # I: true if the pole is in the north
-int     system_type           # I: type of system being examined
+int	system_type           # I: type of system being examined
 double  pole_position[N_DIM]  # O: the pole's logical coordinates
 
+size_t	c_1
 double	sgn
 
 begin
+	c_1 = 1
+
 	switch (system_type) {
 
 	# For Right Ascension/Declination, the pole is at any longitude but
@@ -117,7 +125,7 @@ begin
 	    else
 		sgn = SOUTH_POLE_LATITUDE
 	    call wl_w2ld (wlct, flip, longitude, sgn, pole_position[X_DIM],
-                pole_position[Y_DIM], 1)
+                pole_position[Y_DIM], c_1)
 	}
 
 	# Sanity check on the pole position.  It is very likely that there is
@@ -203,12 +211,15 @@ double	x[vector_size], y[vector_size] # O: the edge vector points
 size_t	vector_size                    # I: the number of edge vector points
 
 double	current, interval
-int	i, left_over, offset1, offset2, side_length
+long	i, left_over, offset1, offset2, side_length, lval
+long	lmod()
 
 begin
 	# Divide the vectors into equal amounts for each side.
 	side_length = vector_size / N_SIDES
-	left_over = mod (vector_size, N_SIDES)
+	lval = vector_size
+	i = N_SIDES
+	left_over = lmod (lval, i)
 
 	# Calculate the horizontal components.
 	interval =  (screen_boundary[RIGHT] - screen_boundary[LEFT]) /
@@ -295,7 +306,7 @@ begin
 	    else
 	        ax2min = SOUTH_POLE_LATITUDE + ((NORTH_POLE_LATITUDE +
 		    ax2max) * DISTANCE_TO_POLE)
-	    ax2ran = abs (ax2max - ax2min)
+	    ax2ran = dabs (ax2max - ax2min)
 
 	    # Mark the pole.
 	    call gmark (WL_GP(wd), real (pole_position[X_DIM]),
@@ -354,14 +365,14 @@ begin
 	            WL_SCREEN_BOUNDARY(wd,1))
 	        if (WL_BAD_LABEL_SIDE(wd) == LEFT || WL_BAD_LABEL_SIDE(wd) ==
 	            RIGHT)
-		    if (abs (ny - WL_SCREEN_BOUNDARY(wd,BOTTOM)) <
-	                abs (ny - WL_SCREEN_BOUNDARY(wd,TOP)))
+		    if (dabs (ny - WL_SCREEN_BOUNDARY(wd,BOTTOM)) <
+	                dabs (ny - WL_SCREEN_BOUNDARY(wd,TOP)))
 		        WL_POLAR_LABEL_DIRECTION(wd) = BOTTOM
 		    else
 		        WL_POLAR_LABEL_DIRECTION(wd) = TOP
 	        else
-		    if (abs (nx - WL_SCREEN_BOUNDARY(wd,LEFT)) <
-	                abs (nx - WL_SCREEN_BOUNDARY(wd,RIGHT)))
+		    if (dabs (nx - WL_SCREEN_BOUNDARY(wd,LEFT)) <
+	                dabs (nx - WL_SCREEN_BOUNDARY(wd,RIGHT)))
 		        WL_POLAR_LABEL_DIRECTION(wd) = LEFT
 		    else
 		        WL_POLAR_LABEL_DIRECTION(wd) = RIGHT
@@ -387,13 +398,16 @@ pointer	wlct               # I: the world-to-logical transformation
 int	flip               # I: true if the coordinates are transposed
 double	wx1, wy1, wx2, wy2 # I: points in world space to figure rotation from
 
+size_t	c_1
 double	delx, dely, rota, x1, y1, x2, y2
 bool	fp_equald()
 
 begin
+	c_1 = 1
+
 	# Transform the points to the logical system.
-	call wl_w2ld (wlct, flip, wx1, wy1, x1, y1, 1)
-	call wl_w2ld (wlct, flip, wx2, wy2, x2, y2, 1)
+	call wl_w2ld (wlct, flip, wx1, wy1, x1, y1, c_1)
+	call wl_w2ld (wlct, flip, wx2, wy2, x2, y2, c_1)
 
 	# Determine the rotation.
 	delx = x2 - x1
@@ -421,7 +435,7 @@ define DEC_POLAR_NUM_TRY  4
 procedure wl_round_axis (wd, axis, minimum, maximum, range)
 
 pointer wd                       # I: the WCSLAB descriptor
-int     axis                     # I: the axis being worked on
+int	axis                     # I: the axis being worked on
 double  minimum, maximum, range  # I: raw values to be rounded
 
 int	num_try
@@ -470,15 +484,18 @@ double  pole_position[N_DIM]      # I: the position of the pole
 double  screen_boundary[N_SIDES]  # I: the edges of the screen
 double  pole_label_position       # O: the axis 1 that axis 2 labels should
 	                          #    appear for polar|near-polar graphs
-int     bad_label_side            # O: side not to place axis 1 labels
+int	bad_label_side            # O: side not to place axis 1 labels
 
+size_t	c_1
 double	dif, tdif, dummy
 
 begin
+	c_1 = 1
+
 	# Determine which direction, up or down, the axis 2's will be labelled.
-	dif = abs (screen_boundary[TOP] - pole_position[AXIS2])
+	dif = dabs (screen_boundary[TOP] - pole_position[AXIS2])
 	bad_label_side= TOP
-	tdif = abs (screen_boundary[BOTTOM] - pole_position[AXIS2])
+	tdif = dabs (screen_boundary[BOTTOM] - pole_position[AXIS2])
 	if (tdif < dif) {
 	  dif = tdif
 	  bad_label_side = BOTTOM
@@ -488,16 +505,16 @@ begin
 	switch (bad_label_side) {
 	case TOP: 
 	    call wl_l2wd (lwct, flip, pole_position[AXIS1],
-	        screen_boundary[BOTTOM], pole_label_position, dummy, 1)
+	        screen_boundary[BOTTOM], pole_label_position, dummy, c_1)
 	case BOTTOM: 
 	    call wl_l2wd (lwct, flip, pole_position[AXIS1],
-	        screen_boundary[TOP], pole_label_position, dummy, 1)
+	        screen_boundary[TOP], pole_label_position, dummy, c_1)
 	case LEFT: 
 	    call wl_l2wd (lwct, flip, screen_boundary[RIGHT],
-	        pole_position[AXIS2], pole_label_position, dummy, 1)
+	        pole_position[AXIS2], pole_label_position, dummy, c_1)
 	case RIGHT:  
 	    call wl_l2wd (lwct, flip, screen_boundary[LEFT],
-	        pole_position[AXIS2], pole_label_position, dummy, 1)
+	        pole_position[AXIS2], pole_label_position, dummy, c_1)
 	}
 
 end
@@ -521,17 +538,20 @@ double  lbegin                    # I: low end of axis 2
 double  lend                      # I: high end of axis 2
 double  screen_boundary[N_SIDES]  # I: the window boundary
 
+size_t	c_1
 double	nx, ny, cx, cy
 int	wl_find_side()
 
 begin
+	c_1 = 1
+
 	# Determine the point in logical space where the axis 1 and the
 	# minimum axis 2 meet.
 
 	if (north)
-	    call wl_w2ld (wlct, flip, polar_label_position, lbegin, nx, ny, 1)
+	    call wl_w2ld (wlct, flip, polar_label_position, lbegin, nx, ny, c_1)
 	else
-	    call wl_w2ld (wlct, flip, polar_label_position, lend, nx, ny, 1)
+	    call wl_w2ld (wlct, flip, polar_label_position, lend, nx, ny, c_1)
 
 	# This line should cross a window boundary.  Find that point.
 
@@ -597,12 +617,14 @@ double	x0, y0, x1, y1            # I: random points in space
 double	screen_boundary[N_SIDES]  # I: sides of the window
 double	nx, ny                    # O: the closest point on a window boundary
 
+size_t	c_2
 double	x_val[N_SIDES], y_val[N_SIDES], tx0, ty0, tx1, ty1, w[2]
 int	i
 pointer	cvx, cvy
 double	dcveval()
 
 begin
+	c_2 = 2
 	# Get the line parameters.
 	x_val[1] = x0
 	x_val[2] = x1
@@ -612,7 +634,7 @@ begin
 	iferr (call dcvinit (cvx, CHEBYSHEV, 2, min (x0, x1), max (x0, x1)))
 	    cvx = NULL
 	else {
-	    call dcvfit (cvx, x_val, y_val, w, 2, WTS_UNIFORM, i)
+	    call dcvfit (cvx, x_val, y_val, w, c_2, WTS_UNIFORM, i)
 	    if (i != OK)
 	        call error (i, "wlaxie: Error solving on X")
 	}
@@ -620,7 +642,7 @@ begin
 	iferr (call dcvinit (cvy, CHEBYSHEV, 2, min (y0, y1), max (y0, y1)))
 	    cvy = NULL
 	else {
-	    call dcvfit (cvy, y_val, x_val, w, 2, WTS_UNIFORM, i)
+	    call dcvfit (cvy, y_val, x_val, w, c_2, WTS_UNIFORM, i)
 	    if (i != OK)
 	        call error (i, "wlaxie: Error solving on Y")
 	}
@@ -708,22 +730,22 @@ double	dif, ndif
 int	side
 
 begin
-	dif = abs (x - screen_boundary[LEFT])
+	dif = dabs (x - screen_boundary[LEFT])
 	side = LEFT
 
-	ndif = abs (x - screen_boundary[RIGHT])
+	ndif = dabs (x - screen_boundary[RIGHT])
 	if  (ndif < dif) {
 	  side = RIGHT
 	  dif = ndif
 	}
 	
-	ndif = abs (y - screen_boundary[BOTTOM])
+	ndif = dabs (y - screen_boundary[BOTTOM])
 	if  (ndif < dif) {
 	  side = BOTTOM
 	  dif = ndif
 	}
 	
-	ndif = abs (y - screen_boundary[TOP])
+	ndif = dabs (y - screen_boundary[TOP])
 	if  (ndif < dif)
 	  side = TOP
 
@@ -749,9 +771,10 @@ double	max		# I/O: the maximum RA
 double	diff		# I/O: the difference between minimum and maximum
 
 bool	wrap
-int	i, j, n_diffs
+long	i, j
+size_t	n_diffs
 pointer	sp, max_array, min_array, ran_array
-int	wl_max_element_array()
+long	wl_max_element_array()
 
 begin
 	call smark (sp)
@@ -807,7 +830,7 @@ double	diff        # O: the min, max difference
 bool	wrap	    # I: is the ra wrapped ?
 
 begin
-	if (! wrap && (abs (val1 - val2) > HALF_CIRCLE))
+	if (! wrap && (dabs (val1 - val2) > HALF_CIRCLE))
 	    if (val1 < val2) {
 	        min = val2
 	        max = val1 + FULL_CIRCLE
@@ -888,13 +911,13 @@ define	NDECGAP    28
 procedure wl_round_dec (latmin, latmax, latran, num_try, minimum, maximum, 
 	major_interval)
 
-double latmin              # I: the latitude minimum
-double latmax              # I: the latitude maximum
-double latran              # I: the latitude range
-int    num_try             # I: number of intervals to try for
-double minimum             # O: the DEC minimum
-double maximum             # O: the DEC maximum
-double major_interval      # O: the labelling interval to use for major lines
+double	latmin              # I: the latitude minimum
+double	latmax              # I: the latitude maximum
+double	latran              # I: the latitude range
+int	num_try             # I: number of intervals to try for
+double	minimum             # O: the DEC minimum
+double	maximum             # O: the DEC maximum
+double	major_interval      # O: the labelling interval to use for major lines
 
 double  decgap[NDECGAP]
 double	wl_check_arrayd(), wl_round_upd()
@@ -933,8 +956,8 @@ int	iexp, num
 double	wl_round_upd()
 
 begin
-	diff = log10 (abs (range) / 4.D0)
-	iexp = int (diff)
+	diff = log10 (dabs (range) / 4.D0)
+	iexp = idint (diff)
 	if (diff < 0)
 	    iexp = iexp - 1
 
@@ -968,7 +991,7 @@ begin
 	    z = 0.0D0
 	else
 	    z = y
-	r = y * double (int ((x + z) / y))
+	r = y * dint ((x + z) / y)
 
 	return (r)
 end
@@ -993,7 +1016,7 @@ begin
 	for (j = 1;  j < n && (ex - arr[j]) > 0.0D0;  j = j + 1)
 	    ;
 	if (j > 1 && j < n)
-	    if (abs (ex - arr[j-1]) < abs (ex - arr[j])) 
+	    if (dabs (ex - arr[j-1]) < dabs (ex - arr[j])) 
 		j = j - 1
 
 	return (arr[j])
