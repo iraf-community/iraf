@@ -16,7 +16,7 @@ is read/written; nothing is physically changed about the table.
 procedure od_set_len (od, len)
 
 pointer	od			# I: OD descriptor.
-int	len			# I: New length.
+long	len			# I: New length.
 
 begin
 	OD_LEN(od) = len

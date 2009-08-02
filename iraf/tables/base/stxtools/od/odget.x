@@ -26,6 +26,7 @@ pointer od                      # I:  The OD I/O descriptor.
 double  data[ARB]               # O:  The data.
 
 pointer null                    # Null flag array for table IO.
+long	l_val0, l_val1
 
 # Functions
 pointer imgl1d()
@@ -40,8 +41,10 @@ begin
             switch (OD_TYPE(od)) {
             case OD_TABLE:
                 call malloc (null, OD_LEN(od), TY_BOOL)
+		l_val0 = 1
+		l_val1 = OD_LEN(od)
                 call tbcgtd (OD_FD(od), OD_CD(od,OD_GRP(od)), data, Memb[null],
-                             1, OD_LEN(od))
+                             l_val0, l_val1)
                 call mfree (null, TY_BOOL)
 
             case OD_IMAGE:

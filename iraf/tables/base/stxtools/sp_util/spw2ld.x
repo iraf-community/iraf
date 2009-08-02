@@ -10,7 +10,7 @@ pointer wlct                # I:  The MWCS coordinate trans. descriptor.
 bool    flip                # I:  True if the axes are transposed.
 double  wx[npts], wy[npts]  # I: The world coordinates.
 double  lx[npts], ly[npts]  # O: The logical coordinates.
-int     npts                # I: The number of points to translate.
+size_t	npts                # I: The number of points to translate.
 
 begin
 
@@ -35,7 +35,7 @@ pointer lwct                # I:  The MWCS coordinate trans. descriptor.
 bool    flip                # I:  True if the axes are transposed.
 double  lx[npts], ly[npts]  # I:  The logical coordinates.
 double  wx[npts], wy[npts]  # O:  The world coordinates.
-int     npts                # I:  The number of points to translate.
+size_t	npts                # I:  The number of points to translate.
 
 begin
 

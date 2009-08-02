@@ -22,12 +22,14 @@ The "group" to open.  For tables, this means the column number to open.
 procedure od_open_group (od, group)
 
 pointer od                      # I:  The 1D descriptor.
-int     group                   # I:  The group to open.
+int	group                   # I:  The group to open.
 
 # Misc.
 real    rx                      # Generic.
 
 errchk	gf_opengr, mw_close, od_wcs_open
+
+include	<nullptr.inc>
 
 begin
         switch (OD_TYPE(od)) {
@@ -45,7 +47,7 @@ begin
             if (OD_OLD(od) != NULL)
                 call gf_opengr (OD_FD(od), group, rx, rx, OD_FD(OD_OLD(od)))
             else
-                call gf_opengr (OD_FD(od), group, rx, rx, NULL)
+                call gf_opengr (OD_FD(od), group, rx, rx, NULLPTR)
             OD_GRP(od) = group
 
             call od_wcs_open (od)

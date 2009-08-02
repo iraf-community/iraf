@@ -32,6 +32,10 @@ pointer	imw		# Temporary MWCS descriptor.
 pointer	mw_newcopy()	# Copy MWCS descriptor.
 pointer	mw_openim()	# Get MWCS descriptor from image.
 char	s[SZ_LINE]	# Generic string.
+pointer	p_val
+long	l_val
+
+include	<nullptr.inc>
 
 string	tmpimage ".SPWCSS"
 
@@ -44,7 +48,8 @@ begin
 	# Create an image.
 	iferr (call imdelete (tmpimage))
 	    ;
-	im = immap (tmpimage, NEW_IMAGE, 20000)
+	p_val = 20000
+	im = immap (tmpimage, NEW_IMAGE, p_val)
 	IM_NDIM(im) = 2
 	IM_LEN(im,1) = 1
 	IM_LEN(im,2) = 1
@@ -65,9 +70,10 @@ begin
 	call imaddd (im, "cd2_2", clgetd ("cd2_2"))
 
 	# Write a pixel, close and reopen the image.
-	b = impl2s (im, 1)
+	l_val = 1
+	b = impl2s (im, l_val)
 	call imunmap (im)
-	im = immap (tmpimage, READ_ONLY, 0)
+	im = immap (tmpimage, READ_ONLY, NULLPTR)
 
 	# Retrieve the MWCS descriptor.  Make a copy so we can close the
 	# temporary image.

@@ -69,10 +69,11 @@ multigroup input.
 pointer procedure od_map(name, mode, old)
 
 char    name[ARB]               # I: The file name to open.
-int     mode                    # I:  The mode to open the file in.
+int	mode                    # I:  The mode to open the file in.
 pointer old                     # I:  Template OD I/O descriptor as template.
 
 # Declarations.
+size_t	sz_val
 pointer od                      # OD I/O descriptor.
 pointer sp                      # Stack Pointer.
 pointer sx                      # Generic string.
@@ -82,14 +83,19 @@ pointer immap()
 
 errchk  malloc, od_image_map, od_table_map
 
+include	<nullptr.inc>
+
 begin
         call smark (sp)
-        call salloc (sx, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (sx, sz_val, TY_CHAR)
 
         # Allocate the od i/o descriptor.
-        call malloc (od, OD_SZ_OD, TY_STRUCT)
-        call malloc (OD_NAME_PTR(od), SZ_LINE, TY_CHAR)
-        call malloc (OD_WSYS_PTR(od), SZ_LINE, TY_CHAR)
+        sz_val = OD_SZ_OD
+        call malloc (od, sz_val, TY_STRUCT)
+        sz_val = SZ_LINE
+        call malloc (OD_NAME_PTR(od), sz_val, TY_CHAR)
+        call malloc (OD_WSYS_PTR(od), sz_val, TY_CHAR)
 
         # If an old descriptor is given, base what open occurs on
         # its type.
@@ -105,14 +111,14 @@ begin
 
         # Else, just open up that data file.  If the image call doesn't fail,
         # then assume its an image.
-        else ifnoerr (OD_FD(od) = immap (name, mode, NULL))
+        else ifnoerr (OD_FD(od) = immap (name, mode, NULLPTR))
             call od_image_map (name, od)
 
         # If it cannot be opened as a table, try changing the extension.
         # If that fails, then give it up.
-        else iferr (call od_table_map (name, mode, NULL, od)) {
+        else iferr (call od_table_map (name, mode, NULLPTR, od)) {
             call change_ext (name, "c1h", Memc[sx], SZ_LINE)
-            iferr (OD_FD(od) = immap (Memc[sx], mode, NULL)) {
+            iferr (OD_FD(od) = immap (Memc[sx], mode, NULLPTR)) {
                 call erract (EA_ERROR)
             }
             call od_image_map (Memc[sx], od)
@@ -131,14 +137,16 @@ char    name[ARB]               # I:  Full specified name.
 pointer od                      # I:  OD I/O descriptor.
 
 # Declarations.
-int     i                       # Generic.
+size_t	sz_val
+int	i                       # Generic.
 
 pointer sp                      # Stack pointer.
 pointer sx
 
 begin
         call smark (sp)
-        call salloc (sx, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (sx, sz_val, TY_CHAR)
 
         # Fill the OD I/O descriptor.
         OD_TYPE(od) = OD_IMAGE
@@ -168,13 +176,14 @@ end
 procedure od_table_map (name, mode, old, od)
 
 char    name[ARB]               # I:  The specified file name.
-int     mode                    # I:  The file access mode.
+int	mode                    # I:  The file access mode.
 pointer old                     # I:  Original OD descriptor.
 pointer od                      # I:  The OD I/O descriptor.
 
 # Declarations.
-int     i, j, k                 # Generic.
-int     ic                      # Pointer into section list.
+size_t	sz_val
+int	i, j, k                 # Generic.
+int	ic                      # Pointer into section list.
 
 pointer colname                 # Current column name.
 pointer section                 # Section specification.
@@ -182,16 +191,18 @@ pointer sp                      # Stack pointer.
 pointer sx                    # Generic.
 
 # Functions.
-int     ctoi(), strlen(), word_count(), word_fetch(), tbpsta()
+int	ctoi(), strlen(), word_count(), word_fetch(), tbpsta()
+long	tbpstl()
 pointer tbcnum(), tbtopn()
 
-errchk  tbcnum, tbpsta, tbtopn, word_count, word_fetch
+errchk  tbcnum, tbpsta, tbpstl, tbtopn, word_count, word_fetch
 
 begin
         call smark (sp)
-        call salloc (colname, SZ_LINE, TY_CHAR)
-        call salloc (section, SZ_LINE, TY_CHAR)
-        call salloc (sx, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (colname, sz_val, TY_CHAR)
+        call salloc (section, sz_val, TY_CHAR)
+        call salloc (sx, sz_val, TY_CHAR)
 
         # Set what type of file.
         OD_TYPE(od) = OD_TABLE
@@ -201,7 +212,7 @@ begin
 
         # Open up and get some parameters.
         OD_FD(od) = tbtopn (OD_NAME(od), mode, old)
-        OD_LEN(od) = tbpsta (OD_FD(od), TBL_NROWS)
+        OD_LEN(od) = tbpstl (OD_FD(od), TBL_NROWS)
         OD_GRP(od) = 1
         OD_MW(od) = NULL
         OD_WL(od) = NULL
@@ -211,7 +222,8 @@ begin
         # all the columns.
         if (strlen (Memc[section]) <= 0) {
             OD_NGRP(od) = tbpsta (OD_FD(od), TBL_NCOLS)
-            call malloc (OD_CD_PTR(od), OD_NGRP(od), TY_POINTER)
+            sz_val = OD_NGRP(od)
+            call malloc (OD_CD_PTR(od), sz_val, TY_POINTER)
             do i = 1, OD_NGRP(od) {
                 OD_CD(od,i) = tbcnum (OD_FD(od), i)
                 if (OD_CD(od,i) == NULL) {
@@ -223,7 +235,8 @@ begin
             }
         } else {
             OD_NGRP(od) = word_count (Memc[section])
-            call malloc (OD_CD_PTR(od), OD_NGRP(od), TY_POINTER)
+            sz_val = OD_NGRP(od)
+            call malloc (OD_CD_PTR(od), sz_val, TY_POINTER)
             i = 0
             ic = 1
             while (word_fetch (Memc[section], ic, Memc[colname], SZ_LINE) > 0) {

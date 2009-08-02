@@ -25,6 +25,8 @@ procedure od_put (od, data)
 pointer od                      # I:  The OD I/O descriptor.
 double  data[ARB]               # I:  The data.
 
+long	l_val0, l_val1
+
 # Functions
 pointer impl1d()
 
@@ -37,8 +39,10 @@ begin
             # Get data depending on file type.
             switch (OD_TYPE(od)) {
             case OD_TABLE:
+		l_val0 = 1
+		l_val1 = OD_LEN(od)
                 call tbcptd (OD_FD(od), OD_CD(od,OD_GRP(od)), data,
-                             1, OD_LEN(od))
+                             l_val0, l_val1)
 
             case OD_IMAGE:
                 call amovd (data, Memd[impl1d (OD_FD(od))], OD_LEN(od))

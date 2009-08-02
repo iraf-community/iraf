@@ -10,7 +10,7 @@ define N_DIM 2
 procedure sp_trans( x, y, npts, center, nx, ny )
 
 real x[npts], y[npts]    # I:  The x, y vectors to translate.
-int  npts                # I:  The number of points in the vectors.
+size_t	npts             # I:  The number of points in the vectors.
 real center[N_DIM]       # I:  The new coordinate center.
 real nx[npts], ny[npts]  # O:  The translated vectors.
 
@@ -20,9 +20,11 @@ pointer mw              # MWCS structure.
 # Function prototypes.
 pointer mw_open(), mw_sctran()
 
+include	<nullptr.inc>
+
 begin
 
-  mw = mw_open( NULL, N_DIM )
+  mw = mw_open( NULLPTR, N_DIM )
   call mw_shift( mw, center, 3b )
   call mw_v2tranr( mw_sctran( mw, "physical", "logical", 3b ),
                    x, y, nx, ny, npts )

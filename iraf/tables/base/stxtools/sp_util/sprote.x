@@ -15,11 +15,12 @@ define ONER Memr[$1+$2-1]
 procedure sp_rotate( x, y, npts, angle, nx, ny )
 
 real x[npts], y[npts]    # I:  The vectors to rotate.
-int  npts                # I:  The number of points in the vectors.
+size_t npts                # I:  The number of points in the vectors.
 real angle               # I:  The angle to rotate (radians).
 real nx[npts], ny[npts]  # O:  The translated vectors.
 
 # Declarations
+size_t	sz_val
 pointer center          # To specify the center.
 pointer mw              # MWCS structure.
 pointer sp              # Stack pointer.
@@ -27,13 +28,16 @@ pointer sp              # Stack pointer.
 # Function prototypes.
 pointer mw_open(), mw_sctran()
 
+include	<nullptr.inc>
+
 begin
 
   # Suck some memory.
   call smark( sp )
-  call salloc( center, N_DIM, TY_REAL )
+  sz_val = N_DIM
+  call salloc( center, sz_val, TY_REAL )
 
-  mw = mw_open( NULL, N_DIM )
+  mw = mw_open( NULLPTR, N_DIM )
   ONER(center,1) = 0.
   ONER(center,2) = 0.
   call mw_rotate( mw, -DEGTORAD( angle ), ONER(center,1), 3b )
