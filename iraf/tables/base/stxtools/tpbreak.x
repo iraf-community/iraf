@@ -9,6 +9,7 @@ char	part[maxch,ARB]		# o: Array of image name parts
 int	npart			# i: Maximum number of parts
 int	maxch			# i: Maximum length of part
 #--
+size_t	sz_val
 bool	inside
 char	ch
 int	ic, jc, ipart
@@ -20,7 +21,8 @@ begin
 	# Allocate memory for error message
 
 	call smark (sp)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	# Initialize output to null string
 

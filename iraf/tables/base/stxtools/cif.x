@@ -315,29 +315,33 @@ int	n_in			# I:  Number of secondary input files.
 int	n_out			# I:  Number of output files.
 
 # Declarations.
-pointer	cif_alloc_file_obj()	# Alloce a CIF FILE object.
-pointer	o			# The CIF object.
+size_t	sz_val
 int	i			# Generic.
+pointer	o			# The CIF object.
+pointer	cif_alloc_file_obj()	# Alloce a CIF FILE object.
 
 errchk	cif_alloc_file_obj, malloc
 
 begin
 	# Allocate the CIF object.
-	call malloc (o, CIF_SZ, TY_STRUCT)
+	sz_val = CIF_SZ
+	call malloc (o, sz_val, TY_STRUCT)
 	
 	# Allocate the CIF FILE object for the primary file.
 	CIF_p(o) = cif_alloc_file_obj()
 
 	# Allocate FILE objects for each input file.
 	CIF_n_in(o) = n_in
-	call malloc (CIF_in_ptr(o), CIF_n_in(o), TY_POINTER)
+	sz_val = CIF_n_in(o)
+	call malloc (CIF_in_ptr(o), sz_val, TY_POINTER)
 	do i = 1, CIF_n_in(o) {
 	    CIF_in(o,i) = cif_alloc_file_obj ()
 	}
 	
 	# Allocate FILE objects for each output file.
 	CIF_n_out(o) = n_out
-	call malloc (CIF_out_ptr(o), CIF_n_out(o), TY_POINTER)
+	sz_val = CIF_n_out(o)
+	call malloc (CIF_out_ptr(o), sz_val, TY_POINTER)
 	do i = 1, CIF_n_out(o) {
 	    CIF_out(o,i) = cif_alloc_file_obj ()
 	}
@@ -384,13 +388,16 @@ pointer procedure cif_alloc_file_obj ()
 
 # Declarations.
 pointer	o			# The CIF FILE object.
+size_t	sz_val
 
 errchk	malloc
 
 begin
 	# Get memory.
-	call malloc (o, CIF_SZ_FILE, TY_STRUCT)
-	call malloc (CIF_cbuf(o), CIF_SZ_FILE_CBUF, TY_CHAR)
+	sz_val = CIF_SZ_FILE
+	call malloc (o, sz_val, TY_STRUCT)
+	sz_val = CIF_SZ_FILE_CBUF
+	call malloc (CIF_cbuf(o), sz_val, TY_CHAR)
 
 	# Setup initial values.
 	call strcpy ("", CIF_file_list(o), CIF_SZ_FNAME)
@@ -439,9 +446,9 @@ int	type			# I:  Get a group or file.
 # Declarations
 bool	another			# True if another set of files are available.
 bool	bx			# Generic.
+int	i			# Generic.
 bool	cif_next_group()	# Get next group.
 bool	cif_next_primary()	# Get next primary files.
-int	i			# Generic.
 int	imtlen()		# Length of a file list.
 pointer	imtopen()		# Open an file list.
 
@@ -501,8 +508,8 @@ pointer	o			# I:  The CIF object.
 # Declarations.
 bool	another			# True if another set of files is available.
 int	i			# Generic.
-int	imtgetim()		# Get next file from file list.
 char	sx[SZ_LINE]		# Generic string.
+int	imtgetim()		# Get next file from file list.
 
 errchk	imtgetim
 
@@ -559,8 +566,8 @@ pointer	p			# I:  CIF FILE Object of primary file.
 
 # Declarations
 bool    bx			# Generic.
-int	cif_file_type()		# Determine file type of file.
 int	i			# Generic.
+int	cif_file_type()		# Determine file type of file.
 int	strlen()		# Get length of string.
 bool	tp_fetch()		# Get next group.
 pointer	tp_open()		# Open a group list.
@@ -611,18 +618,20 @@ int procedure cif_file_type (fname)
 char	fname[ARB]		# I:  The file to determine type of.
 
 # Declarations.
+int	type			# Type of file.
+pointer	px			# Generic.
 int	access()		# Get file access.
 pointer	immap()			# Open an image.
-pointer	px			# Generic.
 int	strlen()		# Get length of string.
-int	type			# Type of file.
 
 errchk	access, imunmap
+
+include	<nullptr.inc>
 
 begin
 	if (strlen (fname) <= 0)
 	    call error (1, "cif: Unknown type")
-	else ifnoerr (px = immap (fname, READ_ONLY, NULL)) {
+	else ifnoerr (px = immap (fname, READ_ONLY, NULLPTR)) {
 	    type = CIF_IMAGE
 	    call imunmap (px)
 	} else if (access (fname, 0, 0) == YES)
@@ -642,6 +651,7 @@ int	loop			# I:  Current loop count.
 
 # Declarations
 bool	tp_fetch()		# Get next group.
+int	imod()
 
 errchk	tp_fetch
 
@@ -650,7 +660,7 @@ begin
 	if (CIF_type(o) == CIF_IMAGE) {
 	    
 	    # Is this loop one to change on?
-	    if (mod (loop-1, CIF_nloop(o)) == 0) {
+	    if (imod (loop-1, CIF_nloop(o)) == 0) {
 
 		# Get the next group.
 		if (tp_fetch (CIF_group(o), CIF_file(o))) {
@@ -684,18 +694,18 @@ pointer	o			# I:  CIF FILE Object to get output name.
 pointer	p			# I:  Primary CIF FILE Object to get info.
 
 # Declarations
-int	access()		# Is file accessable?
 int	cl_index, cl_size	# Cluster info.
 char	dir[CIF_SZ_FNAME]	# Directory of the file name.
 char	ext[CIF_SZ_FNAME]	# Extension of the file name.
 int	i			# Generic.
-int	isdirectory()		# Is a file a directory?
 char	ksection[CIF_SZ_FNAME]	# Ksection of the file name.
 char	root[CIF_SZ_FNAME]	# Root of the file name.
 char	section[CIF_SZ_FNAME]	# Section of the file name.
+char	sx[1]			# Generic.
+int	access()		# Is file accessable?
+int	isdirectory()		# Is a file a directory?
 bool	streq()			# Are strings equal?
 int	strlen()		# Get length of string.
-char	sx[1]			# Generic.
 
 errchk	access, fbuild, fparse, isdirectory
 
@@ -748,9 +758,11 @@ end
 #---------------------------------------------------------------------------
 procedure cif_test()
 
-pointer	cif, cif_alloc()
+int	i
+pointer	cif
+pointer	cif_alloc()
 bool	cif_next()
-int	clgeti(), i
+int	clgeti()
 
 begin
 	cif = cif_alloc (2, 1)

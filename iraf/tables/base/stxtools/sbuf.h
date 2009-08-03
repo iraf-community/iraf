@@ -7,7 +7,7 @@ sbuf.h -- Memory structure for long strings.
 #---------------------------------------------------------------------------
 define  SB_LEN          Memi[P2I($1)]        # Current length of string.
 define  SB_MAXLEN       Memi[P2I($1+1)]      # Current maximum size of buffer.
-define  SB_PTR          Memi[P2I($1+2)]      # Pointer to the string array.
+define  SB_PTR          Memp[$1+2]           # Pointer to the string array.
 define  SB_BUF          Memc[SB_PTR($1)+$2]
 define  SB_SZ_SB        3               # Size of memory structure.
 #---------------------------------------------------------------------------

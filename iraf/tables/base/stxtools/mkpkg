@@ -11,10 +11,22 @@ $checkin  libstxtools.a ../
 
 $exit
 
+tfiles:
+	$ifnewer (vexcompile.y, vexcompile.x)
+	    $ifeq (HOSTID, unix)
+		$echo "stxtools/vexcompile.x is out of date; rebuilding with XYACC:"
+		!(xyacc vexcompile.y; mv -f ytab.x vexcompile.x)
+	    $else
+		$echo "stxtools/vexcompile.x is out of date; rebuild with XYACC"
+	    $endif
+	$endif
+	;
+
 libstxtools.a:
 	@od
 	@sp_util
 	@wcslab
+	$call tfiles
 	changt.x	
 	checkdim.x	<imhdr.h>
 	cif.x		<cif.h>

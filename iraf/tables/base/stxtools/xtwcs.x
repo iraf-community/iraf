@@ -34,11 +34,11 @@ define	W_PROJECTION	Memi[P2I($1+4)]	# projection type
 
 define	W_CD		Memr[P2R($1+6) +($2-1)+($3-1)*7]
 define	W_CDLU		Memr[P2R($1+55) +($2-1)+($3-1)*7]
-define	W_CDINDX	Memr[P2R($1+104)]		# this is an array of 7
-define	W_CRPIX		Memr[P2R($1+110+$2)]
+define	W_CDINDX	Memi[P2I($1+104)]		# this is an array of 7
+define	W_CRPIX		Memr[P2R($1+111)+$2-1]
 define	W_COSDEC	Memd[P2D($1+118)]
 define	W_SINDEC	Memd[P2D($1+120)]
-define	W_CRVAL		Memd[P2D($1+120)+$2]
+define	W_CRVAL		Memd[P2D($1+122)+$2-1]
 
 # Projection types.
 
@@ -63,13 +63,15 @@ procedure xt_wcs_init (im, wcs)
 pointer im			# i: pointer to image descriptor
 pointer wcs			# o: pointer to world coord system struct
 #--
+size_t	sz_val
 real	dummy			# returned by ludcmp and ignored
 int	ira, idec		# index of RA, Dec axes
 int	j, k			# loop indexes
 errchk	xt_load_ctstruct
 
 begin
-	call calloc (wcs, LEN_WCS, TY_STRUCT)
+	sz_val = LEN_WCS
+	call calloc (wcs, sz_val, TY_STRUCT)
 
 	W_VALID(wcs) = YES			# initial value
 	W_NAXIS(wcs) = IM_NDIM(im)
@@ -138,6 +140,7 @@ char	ctype[SZ_CTYPE,naxis]	# i: e.g. "RA---TAN"
 int	naxis			# i: size of arrays
 pointer wcs			# o: pointer to world coord system struct
 #--
+size_t	sz_val
 real	dummy			# returned by ludcmp and ignored
 int	ira, idec		# index of RA, Dec axes
 int	j, k			# loop indexes
@@ -148,7 +151,8 @@ begin
 	    if (cdelt[k] == 0.)
 		call error (0, "xt_wcs_init_c:  zero value of CDELT")
 
-	call calloc (wcs, LEN_WCS, TY_STRUCT)
+	sz_val = LEN_WCS
+	call calloc (wcs, sz_val, TY_STRUCT)
 
 	W_NAXIS(wcs) = naxis
 	W_VALID(wcs) = YES		# initial value
@@ -206,12 +210,14 @@ char	ctype[SZ_CTYPE,naxis]	# i: e.g. "RA---TAN"
 int	naxis			# i: size of arrays
 pointer wcs			# o: pointer to world coord system struct
 #--
+size_t	sz_val
 real	dummy			# returned by ludcmp and ignored
 int	ira, idec		# index of RA, Dec axes
 int	j, k			# loop indexes
 
 begin
-	call calloc (wcs, LEN_WCS, TY_STRUCT)
+	sz_val = LEN_WCS
+	call calloc (wcs, sz_val, TY_STRUCT)
 
 	W_NAXIS(wcs) = naxis
 	W_VALID(wcs) = YES		# initial value
@@ -289,6 +295,7 @@ real	cosrota, sinrota	# cosine & sine of crota
 real	sign_cdelt[2]		# one, with sign of cdelt1 or cdelt2
 int	ira, idec		# index of RA, Dec axes
 int	j, k			# loop indexes
+real	aabs()
 
 begin
 	ira = W_RA_AX(wcs)
@@ -327,8 +334,8 @@ begin
 		sign_cdelt[2] = -1.
 
 	    W_CD(wcs,ira,ira) = cdelt[ira] * cosrota
-	    W_CD(wcs,ira,idec) = abs (cdelt[idec]) * sign_cdelt[1] * sinrota
-	    W_CD(wcs,idec,ira) = -abs (cdelt[ira]) * sign_cdelt[2] * sinrota
+	    W_CD(wcs,ira,idec) = aabs (cdelt[idec]) * sign_cdelt[1] * sinrota
+	    W_CD(wcs,idec,ira) = -aabs (cdelt[ira]) * sign_cdelt[2] * sinrota
 	    W_CD(wcs,idec,idec) = cdelt[idec] * cosrota
 	}
 end

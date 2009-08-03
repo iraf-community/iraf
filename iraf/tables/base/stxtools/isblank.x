@@ -1,3 +1,4 @@
+include	<mach.h>
 include	<ctype.h>
 
 # ISBLANK -- Return true if the string is entirely white space
@@ -10,7 +11,7 @@ char	str[ARB]	# i: string to be tested
 int	ip
 
 begin
-	do ip = 1, ARB
+	do ip = 1, MAX_INT
 	    if (str[ip] == EOS)
 		return (true)
 	    else if (! IS_WHITE(str[ip]) )

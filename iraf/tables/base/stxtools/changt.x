@@ -42,6 +42,7 @@ char    out_name[max_size]      # O:  File name with new extension.
 int     max_size                # I:  Maximum size out_name.
 
 # Misc.
+size_t	sz_val
 pointer dir                     # Directory part of pathname.
 int     index                   # Group index in pathname.
 pointer ksection                # Unparsable part of pathname.
@@ -53,11 +54,12 @@ pointer sx                      # Generic string.
 
 begin
         call smark (sp)
-        call salloc (dir, SZ_LINE, TY_CHAR)
-        call salloc (root, SZ_LINE, TY_CHAR)
-        call salloc (section, SZ_LINE, TY_CHAR)
-        call salloc (ksection, SZ_LINE, TY_CHAR)
-        call salloc (sx, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (dir, sz_val, TY_CHAR)
+        call salloc (root, sz_val, TY_CHAR)
+        call salloc (section, sz_val, TY_CHAR)
+        call salloc (ksection, sz_val, TY_CHAR)
+        call salloc (sx, sz_val, TY_CHAR)
 
         # Parse the file name COMPLETELY.
         call fparse (in_name, Memc[dir], SZ_LINE, Memc[root], SZ_LINE,

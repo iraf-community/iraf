@@ -91,6 +91,7 @@ char    ksection[ksection_size] # O:  The remainder of the pathname.
 int     ksection_size           # I:  Max size of ksection.
 
 # Declarations
+size_t	sz_val
 int     i                       # Generic.
 int     len_dir                 # Length of the directory spec.
 
@@ -109,7 +110,8 @@ bool    streq()
 begin
         
         call smark(sp)
-        call salloc (cluster, SZ_LINE, TY_CHAR)
+        sz_val = SZ_LINE
+        call salloc (cluster, sz_val, TY_CHAR)
         
         # Parse the name with the (illegal) call imparse.
         call imparse (input, Memc[cluster], SZ_LINE, ksection,

@@ -54,7 +54,7 @@ begin
 	    }
 	}
 
-	return (abs(count))
+	return (iabs(count))
 end
 
 # WORD_FETCH -- Retrieve next word from string

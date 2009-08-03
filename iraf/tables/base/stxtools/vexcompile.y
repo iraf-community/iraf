@@ -5,6 +5,11 @@ include	<ctype.h>
 include <fset.h>
 include	"vex.h"
 
+#* HISTORY *
+#* B.Simon	??		original
+#  Phil Hodge	12-Jul-2005	Add 'int vex_gettok()' and declare 'debug'
+#				to be bool rather than int, in vex_compile.
+
 define	YYMAXDEPTH	64
 define	YYOPLEN		1
 define	yyparse		vex_parse
@@ -53,32 +58,32 @@ ifexpr	:	Y_IF expr Y_THEN expr Y_ELSE ifexpr {
 expr	:	Y_VAR {
 			# Code a push variable instruction
 			call vex_addcode (Y_VAR)
-			call vex_addstr (Memi[$1])
+			call vex_addstr (Memp[$1])
 		}
 	|	Y_INT {
 			# Code a push variable instruction
 			call vex_addcode (Y_INT)
-			call vex_addstr (Memi[$1])
+			call vex_addstr (Memp[$1])
 		}
 	|	Y_REAL {
 			# Code a push variable instruction
 			call vex_addcode (Y_REAL)
-			call vex_addstr (Memi[$1])
+			call vex_addstr (Memp[$1])
 		}
 	|	Y_DOUBLE {
 			# Code a push variable instruction
 			call vex_addcode (Y_DOUBLE)
-			call vex_addstr (Memi[$1])
+			call vex_addstr (Memp[$1])
 		}
 	|	Y_FN1 Y_LPAR expr Y_RPAR {
 			# Code a single argument function call
 			call vex_addcode (Y_FN1)
-			call vex_addstr (Memi[$1])
+			call vex_addstr (Memp[$1])
 		}
 	|	Y_FN2 Y_LPAR expr Y_COMMA expr Y_RPAR {
 			# Code a double argument function call
 			call vex_addcode (Y_FN2)
-			call vex_addstr (Memi[$1])
+			call vex_addstr (Memp[$1])
 		}
 	|	Y_SUB expr %prec Y_NEG {
 			# Code a negation instruction
@@ -174,14 +179,18 @@ char	expr[ARB]	# i: Expression to be parsed
 #--
 include	"vex.com"
 
-int	ic, fd, len
+int	ic, len, i_fd
+pointer	fd
 bool	debug
 pointer	sp, pcode
+size_t	sz_val
 
 data	debug	/ false /
 
-int	open(), stropen(), strlen(), fstati(), yyparse()
+int	open(), stropen(), strlen()
+long	fstatl(), yyparse()
 
+int	vex_gettok()
 extern	vex_gettok
 
 begin
@@ -192,24 +201,29 @@ begin
 
 	if (expr[ic] == '@') {
 	    fd = open (expr[ic+1], READ_ONLY, TEXT_FILE)
-	    len = fstati (fd, F_FILESIZE) + 1
+	    i_fd = fd
+	    len = fstatl (i_fd, F_FILESIZE) + 1
 
 	} else {
 	    len = strlen (expr[ic]) + 1
 	    fd = stropen (expr[ic], len, READ_ONLY)
+	    i_fd = fd
 	}
 
 	# Create pseudocode structure
 
-	call malloc (pcode, SZ_VEXSTRUCT, TY_STRUCT)
+	sz_val = SZ_VEXSTRUCT
+	call malloc (pcode, sz_val, TY_STRUCT)
 
-	call malloc (VEX_CODE(pcode), 2 * len, TY_INT)
+	sz_val = 2 * len
+	call malloc (VEX_CODE(pcode), sz_val, TY_INT)
 	call stk_init (VEX_STACK(pcode))
 
 	# Initialize parsing common block
 
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	ch = line
 	Memc[line] = EOS
@@ -224,16 +238,17 @@ begin
 	if (yyparse (fd, debug, vex_gettok) == ERR) {
 	    call eprintf ("%s\n%*t^\n")
 	    call pargstr (Memc[line])
-	    call pargi (ch-line)
+	    call pargp (ch-line)
 
 	    call error (1, "Syntax error in expression")
 	}
+	i_fd = fd
 
 	# Clean up and return pseudocode structure
 
 	call stk_clear (VEX_STACK(pcode))
 
-	call close (fd)
+	call close (i_fd)
 	call sfree (sp)
 	return (pcode)
 end
@@ -242,15 +257,16 @@ end
 
 int procedure vex_gettok (fd, value)
 
-int	fd		# i: File containing expression to be lexed
+pointer	fd		# i: File containing expression to be lexed
 pointer	value		# o: Address on parse stack to store token
 #--
 include	"vex.com"
 
 double	constant
-int	ic, jc, nc, type, index
+int	ic, jc, nc, type, index, i_fd
 int	idftype[4], keytype[3], btype[9]
 pointer	sp, errmsg, token
+size_t	sz_val
 
 string  fn1tok	FN1STR
 string	fn2tok	FN2STR
@@ -272,11 +288,14 @@ begin
 	# Allocate dynamic memory for strings
 
 	call smark (sp)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
-	call malloc (token, MAX_TOKEN, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
+	sz_val = MAX_TOKEN
+	call malloc (token, sz_val, TY_CHAR)
 
 	# Skip over leading white space and comments
 
+	i_fd = fd
 	while (Memc[ch] <= BLANK || Memc[ch] == CMTCHAR) {
 
 	    # If all characters have been read from the current line 
@@ -284,7 +303,7 @@ begin
 
 	    if (Memc[ch] == EOS || Memc[ch] == CMTCHAR) {
 		ch = line
-		if (getline (fd, Memc[line]) == EOF) {
+		if (getline (i_fd, Memc[line]) == EOF) {
 		    Memc[ch] = EOS
 		    break
 		}
@@ -531,7 +550,7 @@ begin
 	    token = NULL
 	}
 
-	Memi[value] = token
+	Memp[value] = token
 	return (type)
 end
 
@@ -589,27 +608,3 @@ begin
 	call mfree (token, TY_CHAR)
 end
 
-# VEX_GETSTR -- Retrieve a token string from the pseudocode array
-
-procedure vex_getstr (op, token, maxch)
-
-pointer	op		# u: Location of token string in pseudocode
-char	token[ARB]	# o: Token string
-int	maxch		# i: Maximum length of token
-#--
-int	ic
-
-begin
-	# The token begins one position after op and is 
-	# termminated by an EOS
-
-	ic = 0
-	repeat {
-	    ic = ic + 1
-	    op = op + 1
-	    if (ic <= maxch)
-		token[ic] = Memi[op]
-
-	} until (Memi[op] == EOS)
-
-end

@@ -14,6 +14,7 @@ int procedure similar (str1, str2)
 char	str1[ARB]	# i: First string
 char	str2[ARB]	# i: Second string
 #--
+size_t	sz_val
 int	score, istack, len1, len2, maxch, ic, nc
 pointer	stack[4,SZ_STACK]
 pointer	sp, word1, word2, s1, s2
@@ -35,8 +36,10 @@ begin
 	# Compare the lower case version of the strings
 
 	call smark (sp)
-	call salloc (word1, len1, TY_CHAR)
-	call salloc (word2, len2, TY_CHAR)
+	sz_val = len1
+	call salloc (word1, sz_val, TY_CHAR)
+	sz_val = len2
+	call salloc (word2, sz_val, TY_CHAR)
 
 	call strcpy (str1, Memc[word1], len1)
 	call strlwr (Memc[word1])

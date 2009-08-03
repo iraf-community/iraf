@@ -9,6 +9,7 @@ char	param[ARB]	# i: parameter name
 char	value[ARB]	# o: parameter value
 int	maxch		# i: maximum length of value
 #--
+size_t	sz_val
 pointer	sp, temp1, temp2
 bool	streq()
 
@@ -16,8 +17,9 @@ begin
 	# Allocate memory for temporary strings
 
 	call smark (sp)
-	call salloc (temp1, maxch, TY_CHAR)
-	call salloc (temp2, maxch, TY_CHAR)
+	sz_val = maxch
+	call salloc (temp1, sz_val, TY_CHAR)
+	call salloc (temp2, sz_val, TY_CHAR)
 
 	# Read parameter and convert to lower case for simpler comparison
 

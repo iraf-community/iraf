@@ -36,6 +36,7 @@ double	ltm[IM_MAXDIM,IM_MAXDIM]	# lterm matrix
 double	i_ltm[IM_MAXDIM,IM_MAXDIM]	# inverse of ltm
 double	ltv[IM_MAXDIM]			# lterm vector
 
+size_t	sz_val
 int	ndim				# dimension of image
 int	wcsdim				# dimension of mwcs coordinates
 pointer mw_openim()
@@ -61,7 +62,8 @@ begin
 
 	# Output CRPIX = R' =  (LTM * R + LTV).
 	call mw_vmuld (ltm, o_crpix, n_crpix, wcsdim)
-	call aaddd (ltv, n_crpix, n_crpix, wcsdim)
+	sz_val = wcsdim
+	call aaddd (ltv, n_crpix, n_crpix, sz_val)
 
 	# Output CD matrix = CD' =  (CD * inv(LTM)).
 	call mw_invertd (ltm, i_ltm, wcsdim)

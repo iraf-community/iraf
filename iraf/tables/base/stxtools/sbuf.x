@@ -43,11 +43,14 @@ pointer procedure sb_open
 
 pointer sb                      # The sbuf pointer
 
+size_t	sz_val
 errchk  malloc
 
 begin
-        call malloc (sb, SB_SZ_SB, TY_STRUCT)
-        call malloc (SB_PTR(sb), SZ_LINE, TY_CHAR)
+        sz_val = SB_SZ_SB
+        call malloc (sb, sz_val, TY_STRUCT)
+        sz_val = SZ_LINE
+        call malloc (SB_PTR(sb), sz_val, TY_CHAR)
         SB_LEN(sb) = 0
         SB_MAXLEN(sb) = SZ_LINE
         
@@ -75,10 +78,12 @@ pointer procedure sb_string (sb)
 
 pointer sb                      # I:  The sbuf descriptor.
 
+size_t	sz_val
 pointer str                     # New string pointer.
 
 begin
-        call malloc (str, SB_LEN(sb), TY_CHAR)
+        sz_val = SB_LEN(sb)
+        call malloc (str, sz_val, TY_CHAR)
         call strcpy (SB_BUF(sb,0), Memc[str], SB_LEN(sb))
 
         return (str)
@@ -91,6 +96,7 @@ procedure sb_cat (sb, str)
 pointer sb                      # I: The sbuf descriptor.
 char    str[ARB]                # I:  The string to concatenate.
 
+size_t	sz_val
 int     i, strlen()             # Length of input string.
 
 errchk  realloc
@@ -99,7 +105,8 @@ begin
         i = strlen (str)
         if (i + SB_LEN(sb) >= SB_MAXLEN(sb)) {
             SB_MAXLEN(sb) = SB_MAXLEN(sb) + i + SZ_LINE
-            call realloc (SB_PTR(sb), SB_MAXLEN(sb), TY_CHAR)
+            sz_val = SB_MAXLEN(sb)
+            call realloc (SB_PTR(sb), sz_val, TY_CHAR)
         }
 
         call strcpy (str, SB_BUF(sb,SB_LEN(sb)), i)

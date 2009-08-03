@@ -39,11 +39,12 @@ int     size                    # I:  The size of the filter.
 int     order                   # I:  The order to preserve while filtering.
 double  in[n]                   # I:  Data to be convolved.
 double  out[n]                  # O:  The convolved data.
-int     n                       # I:  Length of the arrays.
+int	n                       # I:  Length of the arrays.
 
 # Kernel parameters.
-int     half                    # Half size of kernel.
-int     isize                   # Odd size of kernel.
+size_t	sz_val, sz_val1
+int	half                    # Half size of kernel.
+int	isize                   # Odd size of kernel.
 pointer k, kx                   # The kernel in real/double-wrap versions.
 
 # Misc.
@@ -60,12 +61,15 @@ begin
 
         # Make sure there is something to convolve.  If not, just copy and
         # run.
-        if (isize <= 1)
-            call amovd (in, out, n)
-        else {
-            call salloc (k, isize, TY_REAL)
-            call salloc (kx, isize, TY_DOUBLE)
-            call salloc (adx, n+isize, TY_DOUBLE)
+        if (isize <= 1) {
+	    sz_val = n
+            call amovd (in, out, sz_val)
+        } else {
+            sz_val = isize
+            call salloc (k, sz_val, TY_REAL)
+            call salloc (kx, sz_val, TY_DOUBLE)
+            sz_val = n+isize
+            call salloc (adx, sz_val, TY_DOUBLE)
 
             # Compute the kernel.
             call savgol (Memd[kx], isize, half, half, 0, order)
@@ -76,14 +80,17 @@ begin
 
             # Put the data in the extended array and pad the ends as
             # constants.
-            call amovd (in, Memd[adx+half], n)
+	    sz_val = n
+            call amovd (in, Memd[adx+half], sz_val)
             do i = 1, half {
                 Memd[adx+half-i] = in[1]
                 Memd[adx+half+n+i-1] = in[n]
             }
 
             # Filter it.
-            call acnvrd (Memd[adx], out, n, Memr[k], isize)
+	    sz_val = n
+	    sz_val1 = isize
+            call acnvrd (Memd[adx], out, sz_val, Memr[k], sz_val1)
         }
 
         # That's all folks.

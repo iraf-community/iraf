@@ -9,11 +9,14 @@ int procedure tp_count (root)
 
 char	root[ARB]	# i: image name minus any sections
 #--
+size_t	sz_val
 int	imtype, count, lo, hi, mid
 pointer	sp, image, im
 
 int	imgeti(), imaccf(), tp_imtype(), tp_hasgroup()
 pointer	immap()
+
+include	<nullptr.inc>
 
 begin
 	# If the image is not a geis or fits file it can only have one group
@@ -26,12 +29,13 @@ begin
 	# as recorded in the appropriate header keyword
 
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
 
 	call strcpy (root, Memc[image], SZ_FNAME)
 	call strcat ("[0]", Memc[image], SZ_FNAME)
 
-	iferr (im = immap (Memc[image], READ_ONLY, NULL)) {
+	iferr (im = immap (Memc[image], READ_ONLY, NULLPTR)) {
 	    # If image can't be opened, report an error condition
 
 	    count = ERR
@@ -109,20 +113,24 @@ int procedure tp_hasgroup (root, index)
 char	root[ARB]	# i: image name
 int	index		# i: index of group to check
 #--
+size_t	sz_val
 int	has
 pointer	sp, image, im
 
 pointer	immap()
 
+include	<nullptr.inc>
+
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
 
 	call sprintf (Memc[image], SZ_FNAME, "%s[%d]")
 	call pargstr (root)
 	call pargi (index)
 
-	iferr (im = immap (Memc[image], READ_ONLY, NULL)) {
+	iferr (im = immap (Memc[image], READ_ONLY, NULLPTR)) {
 	    has = NO
 	} else {
 	    call imunmap (im)

@@ -15,6 +15,7 @@ int	np		# i: space allocated for a
 int	indx[n]		# o: index to be used by xt_lubksb
 real	d		# o: +1 or -1
 #--
+size_t	sz_val
 pointer sp
 pointer vv		# scratch space
 real	aamax
@@ -22,17 +23,19 @@ real	sum
 real	dum
 int	i, j, k
 int	imax
+real	aabs()
 
 begin
 	call smark (sp)
-	call salloc (vv, n, TY_REAL)
+	sz_val = n
+	call salloc (vv, sz_val, TY_REAL)
 
 	d = 1.
 	do i = 1, n {
 	    aamax = 0.
 	    do j = 1, n
-		if (abs(a[i,j]) > aamax)
-		    aamax = abs(a[i,j])
+		if (aabs(a[i,j]) > aamax)
+		    aamax = aabs(a[i,j])
 	    if (aamax == 0.)
 		call error (0, "singular matrix")
 	    Memr[vv+i-1] = 1. / aamax
@@ -56,7 +59,7 @@ begin
 			sum = sum - a[i,k] * a[k,j]
 		    a[i,j] = sum
 		}
-		dum = Memr[vv+i-1] * abs[sum]
+		dum = Memr[vv+i-1] * aabs[sum]
 		if (dum >= aamax) {
 		    imax = i
 		    aamax = dum

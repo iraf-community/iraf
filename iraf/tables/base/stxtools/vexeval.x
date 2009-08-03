@@ -28,6 +28,7 @@ extern	getvar		# i: Function which returns a vector given a name
 double	nil		# i: Nil value used to replace illegal ops
 int	type		# o: Data type of expression
 #--
+size_t	sz_val
 double	junk
 int	len, toktype
 pointer	sp, token, errmsg, stack, op, var
@@ -35,7 +36,7 @@ pointer	sp, token, errmsg, stack, op, var
 string	fn1tok  FN1STR
 string	fn2tok  FN2STR
 
-int	word_match
+int	word_match()
 double	vex_nilf()
 errchk	vex_push
 
@@ -46,8 +47,10 @@ begin
 	# Allocate dynamic memory for strings
 
 	call smark (sp)
-	call salloc (token, MAX_TOKEN, TY_CHAR)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = MAX_TOKEN
+	call salloc (token, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	# Initialize the undefined operation function
 
@@ -215,7 +218,7 @@ begin
 
 	    default:
 		call sprintf (Memc[errmsg], SZ_LINE, badcode)
-		    call pargs (Memi[op])
+		    call pargi (Memi[op])
 		call error (1, Memc[errmsg])
 	    }
 	}
@@ -225,4 +228,29 @@ begin
 
 	call stk_fetch (stack, 1, var, len, type)
 	call sfree (sp)
+end
+
+# VEX_GETSTR -- Retrieve a token string from the pseudocode array
+
+procedure vex_getstr (op, token, maxch)
+
+pointer	op		# u: Location of token string in pseudocode
+char	token[ARB]	# o: Token string
+int	maxch		# i: Maximum length of token
+#--
+int	ic
+
+begin
+	# The token begins one position after op and is 
+	# termminated by an EOS
+
+	ic = 0
+	repeat {
+	    ic = ic + 1
+	    op = op + 1
+	    if (ic <= maxch)
+		token[ic] = Memi[op]
+
+	} until (Memi[op] == EOS)
+
 end

@@ -15,6 +15,7 @@ char	imname[ARB]		# i: image template
 int	def_count		# i: default image name count
 int	count			# o: number of image names
 #--
+size_t	sz_val
 pointer	ptr
 
 errchk	tp_parse, malloc
@@ -22,9 +23,11 @@ errchk	tp_parse, malloc
 begin
 	# Allocate data structure
 
-	call malloc (ptr, LEN_TPSTRUCT, TY_STRUCT)
-	call malloc (TP_ROOTPTR(ptr), SZ_FNAME, TY_CHAR)
-	call malloc (TP_SECTPTR(ptr), SZ_FNAME, TY_CHAR)
+	sz_val = LEN_TPSTRUCT
+	call malloc (ptr, sz_val, TY_STRUCT)
+	sz_val = SZ_FNAME
+	call malloc (TP_ROOTPTR(ptr), sz_val, TY_CHAR)
+	call malloc (TP_SECTPTR(ptr), sz_val, TY_CHAR)
 
 	# Parse the template into a root name, starting group number,
 	# and group count

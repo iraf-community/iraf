@@ -81,10 +81,11 @@ int	nr			# I:  Points to the right of center.
 int	ld			# I:  Order of derivative to return.
 int	m			# I:  Order of the smoothing polynomial.
 
+size_t	sz_val
 int	imj, ipj, j, k, kk, mm, ix 
 double	d, fac, sum
 pointer	indx, a, b, sp
-int	shifti()
+int	shifti(), imod()
 
 begin
 	call smark (sp)
@@ -93,9 +94,12 @@ begin
 	    call error (1, "savgol: invalid inputs")
 
 	# Allocate memory.
-	call salloc (indx, m+1, TY_INT)
-	call salloc (a, (m+1)**2, TY_DOUBLE)
-	call salloc (b, m+1, TY_DOUBLE)
+	sz_val = m+1
+	call salloc (indx, sz_val, TY_INT)
+	sz_val = (m+1)**2
+	call salloc (a, sz_val, TY_DOUBLE)
+	sz_val = m+1
+	call salloc (b, sz_val, TY_DOUBLE)
 
 	# Do it.
 	ipj = shifti (m, 1)
@@ -128,7 +132,7 @@ begin
 		fac = fac * k
 		sum = sum + B(mm+1) * fac
 	    }
-	    kk = mod (np - k, np) + 1
+	    kk = imod (np - k, np) + 1
 	    c[kk] = sum
 	}
 

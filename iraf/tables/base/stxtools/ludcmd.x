@@ -30,19 +30,21 @@ double	sum
 double	dum
 int	i, j, k
 int	imax
+size_t	sz_val
 
 begin
 	istat = OK				# initial value
 
 	call smark (sp)
-	call salloc (vv, n, TY_DOUBLE)
+	sz_val = n
+	call salloc (vv, sz_val, TY_DOUBLE)
 
 	d = 1.d0
 	do i = 1, n {
 	    aamax = 0.d0
 	    do j = 1, n
-		if (abs(a[i,j]) > aamax)
-		    aamax = abs(a[i,j])
+		if (dabs(a[i,j]) > aamax)
+		    aamax = dabs(a[i,j])
 	    if (aamax == 0.d0) {
 		istat = 1
 		return
@@ -68,7 +70,7 @@ begin
 			sum = sum - a[i,k] * a[k,j]
 		    a[i,j] = sum
 		}
-		dum = Memd[vv+i-1] * abs[sum]
+		dum = Memd[vv+i-1] * dabs[sum]
 		if (dum >= aamax) {
 		    imax = i
 		    aamax = dum

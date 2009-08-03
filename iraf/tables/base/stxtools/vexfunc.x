@@ -27,6 +27,8 @@ int	len, type, i
 pointer	out, in
 
 pointer stk_alloc()
+long	labs()
+real	aabs()
 
 begin
 	call stk_fetch (stack, 1, in, len, type)
@@ -34,17 +36,21 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
-		Memi[out+i] = abs (Memi[in+i])
+		Memi[out+i] = iabs (Memi[in+i])
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = labs (Meml[in+i])
 
 	case TY_REAL:
 	    do i = 0, len-1
-		Memr[out+i] = abs (Memr[in+i])
+		Memr[out+i] = aabs (Memr[in+i])
 
 	case TY_DOUBLE:
 	    do i = 0, len-1
-		Memd[out+i] = abs (Memd[in+i])
+		Memd[out+i] = dabs (Memd[in+i])
 
 	}
 
@@ -67,18 +73,29 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in+i] < -1 || Memi[in+i] > 1) {
 		    Memr[out+i] = vex_errf (stack, i)
 		} else {
 		    Memr[out+i] = acos (real (Memi[in+i]))
+		}
+	    }
+
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in+i] < -1 || Meml[in+i] > 1) {
+		    Memr[out+i] = vex_errf (stack, i)
+		} else {
+		    Memr[out+i] = acos (real (Meml[in+i]))
 		}
 	    }
 
@@ -122,9 +139,13 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memi[out+i] = Memi[in[1]+i] + Memi[in[2]+i]
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = Meml[in[1]+i] + Meml[in[2]+i]
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -156,9 +177,17 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[1]+i] != 0 && Memi[in[2]+i] != 0) {
+		    Memi[out+i] = 1
+		} else {
+		    Memi[out+i] = 0
+		}
+	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in[1]+i] != 0 && Meml[in[2]+i] != 0) {
 		    Memi[out+i] = 1
 		} else {
 		    Memi[out+i] = 0
@@ -201,18 +230,29 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in+i] < -1 || Memi[in+i] > 1) {
 		    Memr[out+i] = vex_errf (stack, i)
 		} else {
 		    Memr[out+i] = asin (real (Memi[in+i]))
+		}
+	    }
+
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in+i] < -1 || Meml[in+i] > 1) {
+		    Memr[out+i] = vex_errf (stack, i)
+		} else {
+		    Memr[out+i] = asin (real (Meml[in+i]))
 		}
 	    }
 
@@ -254,15 +294,21 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memr[out+i] = atan (real (Memi[in+i]))
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Memr[out+i] = atan (real (Meml[in+i]))
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -293,19 +339,31 @@ begin
 	call stk_fetch (stack, 2, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[1]+i] == 0 && Memi[in[2]+i] == 0) {
 		    Memr[out+i] = vex_errf (stack, i)
 		} else {
 		    Memr[out+i] = atan2 (real (Memi[in[1]+i]), 
 					 real (Memi[in[2]+i]))
+		}
+	    }
+
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in[1]+i] == 0 && Meml[in[2]+i] == 0) {
+		    Memr[out+i] = vex_errf (stack, i)
+		} else {
+		    Memr[out+i] = atan2 (real (Meml[in[1]+i]), 
+					 real (Meml[in[2]+i]))
 		}
 	    }
 
@@ -497,15 +555,21 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memr[out+i] = cos (real (Memi[in+i]))
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Memr[out+i] = cos (real (Meml[in+i]))
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -536,18 +600,29 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in+i] > MAX_EXP) {
 		    Memr[out+i] = vex_errf (stack, i)
 		} else {
 		    Memr[out+i] = cosh (real (Memi[in+i]))
+		}
+	    }
+
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in+i] > MAX_EXP) {
+		    Memr[out+i] = vex_errf (stack, i)
+		} else {
+		    Memr[out+i] = cosh (real (Meml[in+i]))
 		}
 	    }
 
@@ -590,9 +665,13 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memi[out+i] = Memi[in+i] * Memi[in+i] * Memi[in+i]
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = Meml[in+i] * Meml[in+i] * Meml[in+i]
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -617,6 +696,8 @@ int	len, type, i
 pointer	out, in[2]
 
 pointer stk_alloc()
+long	ldim()
+real	adim()
 
 begin
 	call stk_fetch (stack, 2, in, len, type)
@@ -624,17 +705,21 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
-		Memi[out+i] = dim (Memi[in[1]+i], Memi[in[2]+i])
+		Memi[out+i] = idim (Memi[in[1]+i], Memi[in[2]+i])
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = ldim (Meml[in[1]+i], Meml[in[2]+i])
 
 	case TY_REAL:
 	    do i = 0, len-1
-		Memr[out+i] = dim (Memr[in[1]+i], Memr[in[2]+i])
+		Memr[out+i] = adim (Memr[in[1]+i], Memr[in[2]+i])
 
 	case TY_DOUBLE:
 	    do i = 0, len-1
-		Memd[out+i] = dim (Memd[in[1]+i], Memd[in[2]+i])
+		Memd[out+i] = ddim (Memd[in[1]+i], Memd[in[2]+i])
 
 	}
 
@@ -652,6 +737,7 @@ pointer	out, in[2]
 
 double	vex_errf()
 pointer stk_alloc()
+real	aabs()
 
 begin
 	call stk_fetch (stack, 2, in, len, type)
@@ -659,7 +745,7 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[2]+i] == 0) {
 		    Memi[out+i] = vex_errf (stack, i)
@@ -667,9 +753,17 @@ begin
 		    Memi[out+i] = Memi[in[1]+i] / Memi[in[2]+i]
 		}
 	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in[2]+i] == 0) {
+		    Meml[out+i] = vex_errf (stack, i)
+		} else {
+		    Meml[out+i] = Meml[in[1]+i] / Meml[in[2]+i]
+		}
+	    }
 	case TY_REAL:
 	    do i = 0, len-1 {
-		if (abs(Memr[in[2]+i]) < MIN_REAL) {
+		if (aabs(Memr[in[2]+i]) < MIN_REAL) {
 		    Memr[out+i] = vex_errf (stack, i)
 		} else {
 		    Memr[out+i] = Memr[in[1]+i] / Memr[in[2]+i]
@@ -678,7 +772,7 @@ begin
 
 	case TY_DOUBLE:
 	    do i = 0, len-1 {
-		if (abs(Memd[in[2]+i]) < MIN_DOUBLE) {
+		if (dabs(Memd[in[2]+i]) < MIN_DOUBLE) {
 		    Memd[out+i] = vex_errf (stack, i)
 		} else {
 		    Memd[out+i] = Memd[in[1]+i] / Memd[in[2]+i]
@@ -719,9 +813,17 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[1]+i] == Memi[in[2]+i]) {
+		    Memi[out+i] = 1
+		} else {
+		    Memi[out+i] = 0
+		}
+	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in[1]+i] == Meml[in[2]+i]) {
 		    Memi[out+i] = 1
 		} else {
 		    Memi[out+i] = 0
@@ -793,18 +895,29 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in+i] > MAX_EXP) {
 		    Memr[out+i] = vex_errf (stack, i)
 		} else {
 		    Memr[out+i] = exp (real (Memi[in+i]))
+		}
+	    }
+
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in+i] > MAX_EXP) {
+		    Memr[out+i] = vex_errf (stack, i)
+		} else {
+		    Memr[out+i] = exp (real (Meml[in+i]))
 		}
 	    }
 
@@ -848,9 +961,17 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[1]+i] >= Memi[in[2]+i]) {
+		    Memi[out+i] = 1
+		} else {
+		    Memi[out+i] = 0
+		}
+	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in[1]+i] >= Meml[in[2]+i]) {
 		    Memi[out+i] = 1
 		} else {
 		    Memi[out+i] = 0
@@ -894,9 +1015,17 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[1]+i] > Memi[in[2]+i]) {
+		    Memi[out+i] = 1
+		} else {
+		    Memi[out+i] = 0
+		}
+	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in[1]+i] > Meml[in[2]+i]) {
 		    Memi[out+i] = 1
 		} else {
 		    Memi[out+i] = 0
@@ -944,12 +1073,20 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[1]+i] != 0) {
 		    Memi[out+i] = Memi[in[2]+i]
 		} else {
 		    Memi[out+i] = Memi[in[3]+i]
+		}
+	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Memi[in[1]+i] != 0) {
+		    Meml[out+i] = Meml[in[2]+i]
+		} else {
+		    Meml[out+i] = Meml[in[3]+i]
 		}
 	    }
 	case TY_REAL:
@@ -1003,9 +1140,17 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[1]+i] <= Memi[in[2]+i]) {
+		    Memi[out+i] = 1
+		} else {
+		    Memi[out+i] = 0
+		}
+	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in[1]+i] <= Meml[in[2]+i]) {
 		    Memi[out+i] = 1
 		} else {
 		    Memi[out+i] = 0
@@ -1049,9 +1194,17 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[1]+i] < Memi[in[2]+i]) {
+		    Memi[out+i] = 1
+		} else {
+		    Memi[out+i] = 0
+		}
+	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in[1]+i] < Meml[in[2]+i]) {
 		    Memi[out+i] = 1
 		} else {
 		    Memi[out+i] = 0
@@ -1094,18 +1247,29 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in+i] <= 0) {
 		    Memr[out+i] = vex_errf (stack, i)
 		} else {
 		    Memr[out+i] = log (real (Memi[in+i]))
+		}
+	    }
+
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in+i] <= 0) {
+		    Memr[out+i] = vex_errf (stack, i)
+		} else {
+		    Memr[out+i] = log (real (Meml[in+i]))
 		}
 	    }
 
@@ -1148,18 +1312,29 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in+i] <= 0) {
 		    Memr[out+i] = vex_errf (stack, i)
 		} else {
 		    Memr[out+i] = log10 (real (Memi[in+i]))
+		}
+	    }
+
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in+i] <= 0) {
+		    Memr[out+i] = vex_errf (stack, i)
+		} else {
+		    Memr[out+i] = log10 (real (Meml[in+i]))
 		}
 	    }
 
@@ -1203,9 +1378,13 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memi[out+i] = max (Memi[in[1]+i], Memi[in[2]+i])
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = max (Meml[in[1]+i], Meml[in[2]+i])
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -1237,9 +1416,13 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memi[out+i] = min (Memi[in[1]+i], Memi[in[2]+i])
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = min (Meml[in[1]+i], Meml[in[2]+i])
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -1264,6 +1447,8 @@ int	len, type, i
 pointer	out, in[2]
 
 pointer stk_alloc()
+int	imod()
+long	lmod()
 
 begin
 	call stk_fetch (stack, 2, in, len, type)
@@ -1271,17 +1456,21 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
-		Memi[out+i] = mod (Memi[in[1]+i], Memi[in[2]+i])
+		Memi[out+i] = imod (Memi[in[1]+i], Memi[in[2]+i])
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = lmod (Meml[in[1]+i], Meml[in[2]+i])
 
 	case TY_REAL:
 	    do i = 0, len-1
-		Memr[out+i] = mod (Memr[in[1]+i], Memr[in[2]+i])
+		Memr[out+i] = amod (Memr[in[1]+i], Memr[in[2]+i])
 
 	case TY_DOUBLE:
 	    do i = 0, len-1
-		Memd[out+i] = mod (Memd[in[1]+i], Memd[in[2]+i])
+		Memd[out+i] = dmod (Memd[in[1]+i], Memd[in[2]+i])
 
 	}
 
@@ -1305,9 +1494,13 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memi[out+i] = Memi[in[1]+i] * Memi[in[2]+i]
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = Meml[in[1]+i] * Meml[in[2]+i]
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -1339,9 +1532,17 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[1]+i] != Memi[in[2]+i]) {
+		    Memi[out+i] = 1
+		} else {
+		    Memi[out+i] = 0
+		}
+	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in[1]+i] != Meml[in[2]+i]) {
 		    Memi[out+i] = 1
 		} else {
 		    Memi[out+i] = 0
@@ -1385,9 +1586,13 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memi[out+i] = - Memi[in+i]
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = - Meml[in+i]
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -1419,9 +1624,13 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 
 		Memi[out+i] = Memi[in+i]
+
+	case TY_LONG:
+	    do i = 0, len-1 
+		Meml[out+i] = Meml[in+i]
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -1429,7 +1638,7 @@ begin
 
 	case TY_DOUBLE:
 	    do i = 0, len-1
-		Memd[out+i] = anint (Memd[in+i])
+		Memd[out+i] = dnint (Memd[in+i])
 
 	}
 
@@ -1453,9 +1662,17 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in+i] != 0) {
+		    Memi[out+i] = 0
+		} else {
+		    Memi[out+i] = 1
+		}
+	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in+i] != 0) {
 		    Memi[out+i] = 0
 		} else {
 		    Memi[out+i] = 1
@@ -1499,9 +1716,17 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in[1]+i] != 0 || Memi[in[2]+i] != 0) {
+		    Memi[out+i] = 1
+		} else {
+		    Memi[out+i] = 0
+		}
+	    }
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in[1]+i] != 0 || Meml[in[2]+i] != 0) {
 		    Memi[out+i] = 1
 		} else {
 		    Memi[out+i] = 0
@@ -1549,7 +1774,7 @@ begin
 
 	call stk_get (stack, TOP, in[2], len, type)
 
-	if (type == TY_INT) {
+	if (type == TY_INT || type == TY_LONG) {
 	    index = stk_pos (stack, 2)
 	    call stk_get (stack, index, in[1], len, type)
 
@@ -1557,9 +1782,12 @@ begin
 	    len = max (len, 1)
 
 	    switch (type) {
-	    case TY_INT, TY_LONG:
+	    case TY_INT:
 		do i = 0, len-1
 		    Memi[out+i] = Memi[in[1]+i] ** Memi[in[2]+i]
+	    case TY_LONG:
+		do i = 0, len-1
+		    Meml[out+i] = Meml[in[1]+i] ** Memi[in[2]+i]
 	    case TY_REAL:
 		do i = 0, len-1
 		    Memr[out+i] = Memr[in[1]+i] ** Memi[in[2]+i]
@@ -1620,6 +1848,7 @@ double	dval
 int	len, ic, nc, ival
 pointer	sp, errmsg, var
 real	rval
+size_t	sz_val
 
 string	badtype  "Unrecognized token type (%d)"
 
@@ -1629,7 +1858,8 @@ errchk	getvar
 
 begin
 	call smark (sp)
-	call salloc (errmsg, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (errmsg, sz_val, TY_CHAR)
 
 	len = STK_LENVAL(stack)
 
@@ -1643,7 +1873,8 @@ begin
 	    ic = 1
 	    len = max (len, 1)
 	    nc = ctoi (token, ic, ival)
-	    call amovki (ival, Memi[var], len)
+	    sz_val = len
+	    call amovki (ival, Memi[var], sz_val)
 
 	case Y_REAL:
 	    var = stk_alloc (stack, len, TY_REAL)
@@ -1651,7 +1882,8 @@ begin
 	    ic = 1
 	    len = max (len, 1)
 	    nc = ctor (token, ic, rval)
-	    call amovkr (rval, Memr[var], len)
+	    sz_val = len
+	    call amovkr (rval, Memr[var], sz_val)
 
 	case Y_DOUBLE:
 	    var = stk_alloc (stack, len, TY_DOUBLE)
@@ -1659,7 +1891,8 @@ begin
 	    ic = 1
 	    len = max (len, 1)
 	    nc = ctod (token, ic, dval)
-	    call amovkd (dval, Memd[var], len)
+	    sz_val = len
+	    call amovkd (dval, Memd[var], sz_val)
 
 	default:
 	    call sprintf (Memc[errmsg], SZ_LINE, badtype)
@@ -1693,6 +1926,8 @@ int	len, type, i
 pointer	out, in[2]
 
 pointer stk_alloc()
+long	lsign()
+real	asign()
 
 begin
 	call stk_fetch (stack, 2, in, len, type)
@@ -1700,17 +1935,21 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
-		Memi[out+i] = sign (Memi[in[1]+i], Memi[in[2]+i])
+		Memi[out+i] = isign (Memi[in[1]+i], Memi[in[2]+i])
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = lsign (Meml[in[1]+i], Meml[in[2]+i])
 
 	case TY_REAL:
 	    do i = 0, len-1
-		Memr[out+i] = sign (Memr[in[1]+i], Memr[in[2]+i])
+		Memr[out+i] = asign (Memr[in[1]+i], Memr[in[2]+i])
 
 	case TY_DOUBLE:
 	    do i = 0, len-1
-		Memd[out+i] = sign (Memd[in[1]+i], Memd[in[2]+i])
+		Memd[out+i] = dsign (Memd[in[1]+i], Memd[in[2]+i])
 
 	}
 
@@ -1732,15 +1971,21 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memr[out+i] = sin (real (Memi[in+i]))
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Memr[out+i] = sin (real (Meml[in+i]))
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -1771,18 +2016,29 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in+i] > MAX_EXP) {
 		    Memr[out+i] = vex_errf (stack, i)
 		} else {
 		    Memr[out+i] = sinh (real (Memi[in+i]))
+		}
+	    }
+
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in+i] > MAX_EXP) {
+		    Memr[out+i] = vex_errf (stack, i)
+		} else {
+		    Memr[out+i] = sinh (real (Meml[in+i]))
 		}
 	    }
 
@@ -1825,9 +2081,13 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memi[out+i] = Memi[in+i] * Memi[in+i]
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = Meml[in+i] * Meml[in+i]
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -1858,18 +2118,29 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1 {
 		if (Memi[in+i] < 0) {
 		    Memr[out+i] = vex_errf (stack, i)
 		} else {
 		    Memr[out+i] = sqrt (real (Memi[in+i]))
+		}
+	    }
+
+	case TY_LONG:
+	    do i = 0, len-1 {
+		if (Meml[in+i] < 0) {
+		    Memr[out+i] = vex_errf (stack, i)
+		} else {
+		    Memr[out+i] = sqrt (real (Meml[in+i]))
 		}
 	    }
 
@@ -1913,9 +2184,13 @@ begin
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memi[out+i] = Memi[in[1]+i] - Memi[in[2]+i]
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Meml[out+i] = Meml[in[1]+i] - Meml[in[2]+i]
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -1945,15 +2220,21 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memr[out+i] = tan (real (Memi[in+i]))
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Memr[out+i] = tan (real (Meml[in+i]))
 
 	case TY_REAL:
 	    do i = 0, len-1
@@ -1983,15 +2264,21 @@ begin
 	call stk_fetch (stack, 1, in, len, type)
 	if (type == TY_INT) {
 	    out = stk_alloc (stack, len, TY_REAL)
+	} else if (type == TY_LONG) {
+	    out = stk_alloc (stack, len, TY_REAL)
 	} else {
 	    out = stk_alloc (stack, len, type)
 	}
 	len = max (len, 1)
 
 	switch (type) {
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    do i = 0, len-1
 		Memr[out+i] = tanh (real (Memi[in+i]))
+
+	case TY_LONG:
+	    do i = 0, len-1
+		Memr[out+i] = tanh (real (Meml[in+i]))
 
 	case TY_REAL:
 	    do i = 0, len-1

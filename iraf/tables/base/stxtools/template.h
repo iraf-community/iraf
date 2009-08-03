@@ -2,8 +2,8 @@
 
 define	LEN_TPSTRUCT	5
 
-define	TP_ROOTPTR	Memi[P2I($1)]	# Pointer to image root name
-define	TP_SECTPTR	Memi[P2I($1+1)]	# Pointer to image section
+define	TP_ROOTPTR	Memp[$1]	# Pointer to image root name
+define	TP_SECTPTR	Memp[$1+1]	# Pointer to image section
 define	TP_START	Memi[P2I($1+2)]	# First group
 define	TP_COUNT	Memi[P2I($1+3)]	# Total number of groups
 define	TP_INDEX	Memi[P2I($1+4)]	# Current group

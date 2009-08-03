@@ -85,22 +85,22 @@ define	MAX_STACK	64
 
 define	SZ_VEXSTRUCT	2
 
-define	VEX_CODE	Memi[P2I($1)]	# pointer to code array
-define	VEX_STACK	Memi[P2I($1+1)]	# pointer to stack structure
+define	VEX_CODE	Memp[$1]	# pointer to code array
+define	VEX_STACK	Memp[$1+1]	# pointer to stack structure
 
 # Stack structure
 
 define	SZ_STKSTRUCT	6
 
-define	STK_TOP		Memi[$1]	# top of stack
-define	STK_HIGH	Memi[$1+1]	# high water mark in stack
-define	STK_LENVAL	Memi[$1+2]	# length of each value array
-define	STK_NULLARY	Memi[$1+3]	# pointer to array of null values
-define	STK_VALARY	Memi[$1+4]	# pointer to value stack
-define	STK_TYPARY	Memi[$1+5]	# pointer to type stack
+define	STK_TOP		Memi[P2I($1)]	# top of stack
+define	STK_HIGH	Memi[P2I($1+1)]	# high water mark in stack
+define	STK_LENVAL	Memi[P2I($1+2)]	# length of each value array
+define	STK_NULLARY	Memp[$1+3]	# pointer to array of null values
+define	STK_VALARY	Memp[$1+4]	# pointer to value stack
+define	STK_TYPARY	Memp[$1+5]	# pointer to type stack
 
 define	STK_NULL	Memb[STK_NULLARY($1)+$2]
-define	STK_VALUE	Memi[STK_VALARY($1)+$2]
+define	STK_VALUE	Memp[STK_VALARY($1)+$2]
 define	STK_TYPE	Memi[STK_TYPARY($1)+$2]
 
 define	TOP		-1		# Symbolic constant for top of stack

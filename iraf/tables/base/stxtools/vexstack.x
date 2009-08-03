@@ -32,6 +32,7 @@ pointer	stack		# i: Stack structure
 int	len		# i: Length of array to allocate
 int	type		# i: Data type of array (spp type)
 #--
+size_t	sz_val
 int	index, stype, top
 pointer	var, svar
 
@@ -74,17 +75,21 @@ begin
 	        svar = STK_VALUE(stack,index)
 		stype = STK_TYPE(stack,index)
 
-		call malloc (var, len, stype)
+		sz_val = len
+		call malloc (var, sz_val, stype)
 		STK_VALUE(stack,index) = var
 		switch (stype) {
-		case TY_INT,TY_LONG:
-		    call amovki (Memi[svar], Memi[var], len)
+		case TY_INT:
+		    call amovki (Memi[svar], Memi[var], sz_val)
 		    call mfree (svar, TY_INT)
+		case TY_LONG:
+		    call amovkl (Meml[svar], Meml[var], sz_val)
+		    call mfree (svar, TY_LONG)
 		case TY_REAL:
-		    call amovkr (Memr[svar], Memr[var], len)
+		    call amovkr (Memr[svar], Memr[var], sz_val)
 		    call mfree (svar, TY_REAL)
 		case TY_DOUBLE:
-		    call amovkd (Memd[svar], Memd[var], len)
+		    call amovkd (Memd[svar], Memd[var], sz_val)
 		    call mfree (svar, TY_DOUBLE)
 		default:
 		    call error (1, badstack)
@@ -199,7 +204,7 @@ begin
 	    svar = STK_VALUE(stack,last)
 
 	    switch (type) {
-	    case TY_INT,TY_LONG:
+	    case TY_INT:
 		switch (stype) {
 		case TY_INT,TY_LONG:
 		    ; # can't happen
@@ -220,14 +225,43 @@ begin
 			}
 		    }
 		}
-	    case TY_REAL:
+	    case TY_LONG:
 		switch (stype) {
 		case TY_INT,TY_LONG:
+		    ; # can't happen
+		case TY_REAL:
+		    do i = 0, len-1 {
+			if (IS_INDEFR(Memr[svar+i])) {
+			    Meml[var+i] = INDEFL
+			} else {
+			    Meml[var+i] = Memr[svar+i]
+			}
+		    }
+		case TY_DOUBLE:
+		    do i = 0, len-1 {
+			if (IS_INDEFD(Memd[svar+i])) {
+			    Meml[var+i] = INDEFL
+			} else {
+			    Meml[var+i] = Memd[svar+i]
+			}
+		    }
+		}
+	    case TY_REAL:
+		switch (stype) {
+		case TY_INT:
 		    do i = 0, len-1 {
 			if (IS_INDEFI(Memi[svar+i])) {
 			    Memr[var+i] = INDEFR
 			} else {
 			    Memr[var+i] = Memi[svar+i]
+			}
+		    }
+		case TY_LONG:
+		    do i = 0, len-1 {
+			if (IS_INDEFL(Meml[svar+i])) {
+			    Memr[var+i] = INDEFR
+			} else {
+			    Memr[var+i] = Meml[svar+i]
 			}
 		    }
 		case TY_REAL:
@@ -243,12 +277,20 @@ begin
 		}
 	    case TY_DOUBLE:
 		switch (stype) {
-		case TY_INT,TY_LONG:
+		case TY_INT:
 		    do i = 0, len-1 {
 			if (IS_INDEFI(Memi[svar+i])) {
 			    Memd[var+i] = INDEFD
 			} else {
 			    Memd[var+i] = Memi[svar+i]
+			}
+		    }
+		case TY_LONG:
+		    do i = 0, len-1 {
+			if (IS_INDEFL(Meml[svar+i])) {
+			    Memd[var+i] = INDEFD
+			} else {
+			    Memd[var+i] = Meml[svar+i]
 			}
 		    }
 		case TY_REAL:
@@ -309,6 +351,8 @@ begin
 	    case TY_REAL:
 		if (type == TY_INT)
 		    type = TY_REAL
+		if (type == TY_LONG)
+		    type = TY_REAL
 	    case TY_DOUBLE:
 		type = TY_DOUBLE
 	    }
@@ -340,6 +384,7 @@ pointer	stack		# i: Stack descriptor
 int	type		# i: Required type
 int	index		# o: Position on the stack
 #--
+size_t	sz_val
 int	len
 pointer	var
 
@@ -363,7 +408,8 @@ begin
 
 	} else if (index == STK_HIGH(stack)) {
 	    len = max (1, STK_LENVAL(stack))
-	    call malloc (var, len, type)
+	    sz_val = len
+	    call malloc (var, sz_val, type)
 
 	    STK_TYPE(stack,index) = type
 	    STK_VALUE(stack,index) = var
@@ -389,11 +435,11 @@ begin
 	if (STK_NULLARY(stack) != NULL)
 	    call mfree (STK_NULLARY(stack), TY_BOOL)
 
-	call mfree (STK_VALARY(stack), TY_INT)
+	call mfree (STK_VALARY(stack), TY_POINTER)
 	call mfree (STK_TYPARY(stack), TY_INT)
 
 	# Free the stack structure
-	call mfree (stack, TY_INT)
+	call mfree (stack, TY_STRUCT)
 end
 
 # STK_FREENULL -- Free the null array in the stack
@@ -456,18 +502,21 @@ end
 
 procedure stk_init (stack)
 
+size_t	sz_val
 pointer	stack		# o: Stack pointer
 #--
 
 begin
 	# Allocate stack and initialize members to zero
 
-	call calloc (stack, SZ_STKSTRUCT, TY_INT)
+	sz_val = SZ_STKSTRUCT
+	call calloc (stack, sz_val, TY_STRUCT)
 
 	# Allocate substructures in stack
 
-	call malloc (STK_VALARY(stack), MAX_STACK, TY_INT)
-	call malloc (STK_TYPARY(stack), MAX_STACK, TY_INT)
+	sz_val = MAX_STACK
+	call malloc (STK_VALARY(stack), sz_val, TY_POINTER)
+	call malloc (STK_TYPARY(stack), sz_val, TY_INT)
 
 end
 
@@ -478,6 +527,7 @@ procedure stk_initnull (stack, value)
 pointer	stack		# u: Stack structure
 bool	value		# i: Value used in initialization
 #--
+size_t	sz_val
 int	len, i
 pointer	nullvec
 
@@ -488,7 +538,8 @@ begin
 	    len = STK_LENVAL(stack)
 
 	    # Allocate array
-	    call malloc (nullvec, len, TY_BOOL)
+	    sz_val = len
+	    call malloc (nullvec, sz_val, TY_BOOL)
 	    STK_NULLARY(stack) = nullvec
 
 	    # Initialize to value

@@ -9,8 +9,9 @@ define	MAXEXT		25
 
 int procedure tp_imtype (root)
 
-int	root[ARB]	# i: image extension
+char	root[ARB]	# i: image extension
 #--
+size_t	sz_val
 int	loadext
 pointer	extlist[MAXEXT]
 pointer	extbuf
@@ -24,7 +25,8 @@ int	fnextn(), strdic(), iki_validextn()
 
 begin
 	call smark (sp)
-	call salloc (ext, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ext, sz_val, TY_CHAR)
 
 	if (loadext == NO) {
 	    call tp_loadext (extlist, extbuf)
@@ -51,10 +53,12 @@ end
 procedure tp_loadext (extlist, extbuf)
 
 pointer	extlist[MAXEXT]		# o: pointers to kernel names
-int	extbuf			# o: string buffer containing names
+pointer	extbuf			# o: string buffer containing names
 #--
+size_t	sz_val
 int	fd, flags, taglen, iext, ic, jc, nc
 pointer	sp, line, jstr, kstr
+long	l_val
 
 string	kernel_tag  "installed kernels "
 
@@ -62,7 +66,8 @@ int	open(), strlen(), getline(), strncmp(), ctoi()
 
 begin
 	call smark (sp)
-	call salloc (line, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (line, sz_val, TY_CHAR)
 
 	# Initialize the image kernel tables
 
@@ -76,7 +81,8 @@ begin
 
 	# Search the file for the line containing the image kernel info
 
-	call seek (fd, BOF)
+	l_val = BOF
+	call seek (fd, l_val)
 	taglen = strlen (kernel_tag)
 
 	while (getline (fd, Memc[line]) != EOF) {
@@ -85,7 +91,8 @@ begin
 
 	    # Parse the line to extract the info
 
-	    call malloc (extbuf, strlen (Memc[line+taglen]), TY_CHAR)
+	    sz_val = strlen (Memc[line+taglen])
+	    call malloc (extbuf, sz_val, TY_CHAR)
 	    jstr = extbuf
 	    kstr = extbuf
 

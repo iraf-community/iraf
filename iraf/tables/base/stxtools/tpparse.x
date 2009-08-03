@@ -26,6 +26,7 @@ char	section[ARB]		# o: image section
 int	index			# o: group index
 int 	count			# o: group count
 #--
+size_t	sz_val
 int	ifield, nc
 pointer	sp, image, root2, sect, ext
 
@@ -40,10 +41,13 @@ begin
 	# Allocate dynamic memory for error string
 
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (root2, SZ_FNAME, TY_CHAR)
-	call salloc (sect, (SZ_FNAME+1)*NFIELD, TY_CHAR)
-	call salloc (ext, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (root2, sz_val, TY_CHAR)
+	sz_val = (SZ_FNAME+1)*NFIELD
+	call salloc (sect, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ext, sz_val, TY_CHAR)
 
 	# Break the image name into its component parts and
 	# get the group index and count
