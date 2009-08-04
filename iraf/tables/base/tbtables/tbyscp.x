@@ -43,7 +43,7 @@ begin
 
 	# Create buffers for I/O
 	call smark (sp)
-	sbufsiz = LEN_SIZINFO				# unit = SZ_INT
+	sbufsiz = LEN_SIZINFO				# unit = SZ_LONG
 	dbufsiz = min (new_allrows, old_allrows)	# unit = SZ_CHAR
 	extrasiz = new_allrows - old_allrows
 	call salloc (sbuf, sbufsiz, TY_LONG)

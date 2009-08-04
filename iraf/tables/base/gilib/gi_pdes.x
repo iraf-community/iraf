@@ -46,7 +46,7 @@ begin
 	case TY_BOOL:
 	    call strcpy ("LOGICAL*4", P_PDTYPE(pp), SZ_PDTYPE)
 	    P_PSIZE(pp) = plen * SZ_BOOL * SZB_CHAR * NBITS_BYTE
-	    call imaddb (im, P_PTYPE(pp), 'F')
+	    call imaddb (im, P_PTYPE(pp), false)
 	case TY_SHORT:
 	    call strcpy ("INTEGER*2", P_PDTYPE(pp), SZ_PDTYPE)
 	    P_PSIZE(pp) = plen * SZ_SHORT * SZB_CHAR * NBITS_BYTE
