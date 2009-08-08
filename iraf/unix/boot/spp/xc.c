@@ -46,6 +46,7 @@
 
 #define CCOMP		"gcc"			/* C compiler (also .s etc.) */
 #define LINKER		"gcc"			/* Linking utility */
+#define FPP		"cpp"			/* Fortran preprocessor */
 #define F77COMP		"f77.sh"		/* Fortran compiler */
 #define DEBUGFLAG	'g'			/* host flag for -x */
 #define USEF2C		1			/* use Fortran to C trans. */
@@ -67,6 +68,7 @@
 
 #define isxfile(str)	(getextn(str) == 'x')
 #define isffile(str)	(getextn(str) == 'f')
+#define isfppfile(str)	(getextn(str) == 'F')
 #define iscfile(str)	(getextn(str) == 'c')
 #define issfile(str)	(getextn(str) == 's')
 #define isefile(str)	(getextn(str) == 'e')
@@ -118,6 +120,7 @@ static char *lfiles[MAXFILE];		/* all files		*/
 static char *hlibs[MAXFILE];		/* host libraries	*/
 static char *lxfiles[MAXFILE];		/* .x files		*/
 static char *lffiles[MAXFILE];		/* .f files		*/
+static char *lfppfiles[MAXFILE];	/* .fpp files		*/
 static char buffer[SZ_BUFFER+1];
 static char libbuf[SZ_LIBBUF+1];
 static char *bp = buffer;
@@ -126,7 +129,7 @@ static char *libp = libbuf;
 static char *maxlibp = libbuf + SZ_LIBBUF+1 -1;
 static const char *pkgenv = NULL;
 static char v_pkgenv[SZ_PKGENV+1];
-static int nflags, nfiles, nhlibs, nxfiles, nffiles;
+static int nflags, nfiles, nhlibs, nxfiles, nffiles, nfppfiles;
 static signal_handler_t sig_int, sig_quit, sig_hup, sig_term;
 /* static const char *shellname = "/bin/sh"; */
 static int foreigndefs = 0;
@@ -140,12 +143,13 @@ static void enbint ( signal_handler_t );
 static void fatal ( const char * );
 static int getextn ( const char * );
 static void xtof ( char * );
+static void fpptof ( char * );
 static int addtolist( const char *, const char ***, int * );
 static int addflags ( const char *, const char ***, int * );
 static void printargs ( const char *, const char *[], int );
 static int run ( const char *, const char *[] );
 static void done ( int );
-static int sys ( const char * );
+static int sys ( const char *, int );
 static void fatalstr ( const char *, const char * );
 static void rmfiles( void );
 static void chdot ( char *, char );
@@ -181,7 +185,7 @@ int main ( int argc, char *argv[] )
 	if (os_sysfile ("f2c.e", "hbin", tempfile, SZ_FNAME) > 0)
 	    strcpy (f2cpath, tempfile);
 
-	nflags = nfiles = nhlibs = nxfiles = nffiles = 0;
+	nflags = nfiles = nhlibs = nxfiles = nffiles = nfppfiles = 0;
 
 	sig_int  = signal (SIGINT,  SIG_IGN);
 	sig_quit = signal (SIGQUIT, SIG_IGN);
@@ -532,6 +536,8 @@ passflag:		    mkobject = YES;
 			    nfiles--;
 			    errflag &= ~(XPP_BADXFILE | XPP_COMPERR);
 			}
+		    } else if (isfppfile (arg)) {
+			fpptof (arg);
 		    } else if (isffile (arg)) {
 			if ( MAXFILE <= nffiles )
 			    fatal ("too many files");
@@ -795,7 +801,7 @@ passflag:		    mkobject = YES;
 		snprintf (command, SZ_CMDBUF, "/bin/cp -f %s %s", tempfile, outfile);
 		if (outputargs)
 		    printargs (command, NULL, 0);
-		status = sys (command);
+		status = sys (command, 0);
 	    } else
 		link (tempfile, outfile);
 
@@ -828,7 +834,7 @@ passflag:		    mkobject = YES;
 			safe_strcat (command, SZ_CMDBUF, " -T");
 		    else if (notvsym)
 			safe_strcat (command, SZ_CMDBUF, " -t");
-		    status = sys (command);
+		    status = sys (command, 0);
 		}
 	    }
 	}
@@ -1155,7 +1161,7 @@ static void xtof ( char *file )
 	}
 
 	if (outputargs) printargs (cmdbuf, NULL, 0);
-	errflag |= sys (cmdbuf);
+	errflag |= sys (cmdbuf, 0);
 	chdot (file, 'r');
 
 	safe_strcpy (fname, SZ_FNAME, file);
@@ -1168,10 +1174,54 @@ static void xtof ( char *file )
 		  rpp_path, dbgout ? "-g " : "", file, fname);
 	if (!(errflag & XPP_BADXFILE)) {
 	    if (outputargs) printargs (cmdbuf, NULL, 0);
-	    errflag |= sys (cmdbuf);
+	    errflag |= sys (cmdbuf, 0);
 	}
 
 	unlink (file);			/* remove ".r" file */
+	chdot (file, 'f');		/* change name to ".f" */
+}
+
+
+/* FPPTOF -- Convert a ".fpp" file into a ".f" file.
+ */
+static void fpptof ( char *file )
+{
+	char fpp_path[SZ_PATHNAME+1];
+	char fpp_options[SZ_CMDBUF];
+	char cmdbuf[SZ_CMDBUF];
+	char fname[SZ_FNAME];
+	const char *ep;
+
+	if ((ep = os_getenv ("XC-FPP")) || (ep = os_getenv ("XC_FPP")))
+	    snprintf(fpp_path, SZ_PATHNAME+1, "%s", ep);
+	else
+	    snprintf(fpp_path, SZ_PATHNAME+1, "%s", FPP);
+
+	if ((ep = os_getenv("XC-FPPFLAGS")) || (ep = os_getenv("XC_FPPFLAGS")))
+	    snprintf(fpp_options, SZ_CMDBUF, "%s", ep);
+	else
+	    fpp_options[0] = EOS;
+
+	if ( MAXFILE <= nfppfiles )
+	    fatal ("too many files");
+	lfppfiles[nfppfiles] = file;
+	nfppfiles++;
+
+	if (nfileargs > 1 || mkobject) {
+	    fprintf (stderr, "%s:\n", file);
+	    fflush (stderr);
+	}
+
+	snprintf(fname, SZ_FNAME, "%s", file);
+	chdot (fname, 'f');		/* foo.fpp -> foo.f */
+
+	snprintf (cmdbuf, SZ_CMDBUF, "%s %s %s > %s", 
+		  fpp_path, fpp_options, file, fname);
+
+	if (outputargs) printargs (cmdbuf, NULL, 0);
+
+	errflag |= sys (cmdbuf, 1);
+
 	chdot (file, 'f');		/* change name to ".f" */
 }
 
@@ -1187,10 +1237,14 @@ static int getextn ( const char *fname )
 	    if (*ip == '.')
 		dot = ip;
 
-	if ( dot == NULL || dot+2 != ip ) {
+	if ( dot == NULL ) {
 	    ch = EOS;
 	} else {
-	    ch = *(dot+1);
+	    if (strcmp(dot+1,"fpp") == 0 || strcmp(dot+1,"FPP") == 0) ch = 'F';
+	    else {
+		if ( dot+2 != ip ) ch = EOS;
+		else ch = tolower(*(dot+1));
+	    }
 	}
 
 	return (ch);
@@ -1214,7 +1268,10 @@ static void chdot ( char *fname, char dotchar )
 		break;
 	    }
 	}
-	if ( p_dot ) *(p_dot+1) = dotchar;
+	if ( p_dot ) {
+	    *(p_dot+1) = dotchar;
+	    *(p_dot+2) = EOS;
+	}
 }
 
 
@@ -1288,7 +1345,7 @@ static int run ( const char *task, const char *argv_in[] )
  * contain i/o redirection metacharacters.  The full path of the command to
  * be executed should be given (and always is in the case of XC).
  */
-static int sys ( const char *cmnd )
+static int sys ( const char *cmnd, int unix_path )
 {
 	char cmd[SZ_CMDBUF];
 	char *ip;
@@ -1356,7 +1413,8 @@ static int sys ( const char *cmnd )
 		freopen (outname, (append ? "a" : "w"), stdout);
 	    enbint (SIG_DFL);
 
-	    execv (argv[0], argv);
+	    if ( unix_path != 0 ) execvp (argv[0], argv);
+	    else execv (argv[0], argv);
 	    fatalstr ("Cannot execute %s", argv[0]);
 	}
 
@@ -1439,6 +1497,11 @@ static void rmfiles( void )
 	for (i=0;  i < nxfiles;  i++) {
 	    chdot (lxfiles[i], 'f');
 	    unlink (lxfiles[i]);
+	}
+
+	for (i=0;  i < nfppfiles;  i++) {
+	    chdot (lfppfiles[i], 'f');
+	    unlink (lfppfiles[i]);
 	}
 }
 

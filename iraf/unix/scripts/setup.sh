@@ -45,6 +45,7 @@ set_irafenv() {
   XC_CFLAGS="-Wall"
   XC_FFLAGS="-Wall"
   #XC_FFLAGS="-Ns1602 -Nx512"
+  XC_FPPFLAGS="-traditional-cpp -undef -P"
   XC_LIBS="-lf2c"
   #
   XC_XLFLAGS=""
@@ -83,15 +84,21 @@ set_irafenv() {
   esac
   #
   HSI_SPP_MODEL_CDEF=""
+  FPP_DEF=""
   if [ "$SPP_DATA_MODEL" = "lp64" ]; then
     HSI_SPP_MODEL_CDEF="-DSPP_LP64"
+    FPP_DEF="-DXINT=integer -DXLONG=integer*8"
   elif [ "$SPP_DATA_MODEL" = "ilp64" ]; then
     HSI_SPP_MODEL_CDEF="-DSPP_ILP64"
+    FPP_DEF="-DXINT=integer -DXLONG=integer"
+  else
+    FPP_DEF="-DXINT=integer -DXLONG=integer"
   fi
   F="$F $HSI_SPP_MODEL_CDEF"
   HSI_CF="$HSI_CF $F"
   XC_CFLAGS="$XC_CFLAGS $F"
   XC_FFLAGS="$XC_FFLAGS $F"
+  XC_FPPFLAGS="$XC_FPPFLAGS $FPP_DEF"
   #
   # OS-dependent settings
   #
@@ -172,7 +179,7 @@ set_irafenv() {
   fi
   export HSI_CF HSI_XF HSI_FF HSI_LF HSI_F77LIBS HSI_LFLAGS HSI_OSLIBS
   export HSI_LIBS
-  export XC_XPPFLAGS XC_CFLAGS XC_FFLAGS XC_XLFLAGS XC_LIBS
+  export XC_XPPFLAGS XC_CFLAGS XC_FFLAGS XC_FPPFLAGS XC_XLFLAGS XC_LIBS
 
   # see tables/lib/zzsetenv.def
   #tables=${iraf}tables/
