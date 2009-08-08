@@ -1,7 +1,7 @@
 
 # FITS reader common
 
-int	len_record		# Length of FITS records in bytes
+size_t	len_record		# Length of FITS records in bytes
 
 # Option flags
 int	print_ext		# Print extension if set

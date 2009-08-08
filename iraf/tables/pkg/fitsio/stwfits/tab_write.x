@@ -14,17 +14,23 @@ char	tab_file[SZ_FNAME]	# IRAF file name
 char	fits_file[SZ_FNAME]	# FITS file name
 int	fits_fd			# Output FITS descriptor
 
-int	chars_rec, dev_blk, ncols
+size_t	sz_val
+char	extn[SZ_EXTN], line[SZ_LINE]
+size_t	chars_rec
+long	dev_blk
+int	ncols, trl, nch, in_type, tfd
 pointer	tp, ext
 
 pointer	tbtopn()
-int	mtopen(), open(), fstati(), mtfile()
-char	extn[SZ_EXTN], line[SZ_LINE]
+int	mtopen(), open(), mtfile()
+long	fstatl()
+int	fnextn(), fnldir(), tbpsta(), strdic()
 
 errchk	immap, imunmap, open, mtopen, close, smark, salloc, sfree
 errchk	delete, tab_write_header, tab_write_data, tbtopn
 errchk  txt_wfits, open, tbtopn
-int	trl, nch, fnextn(), fnldir(), tbpsta(), in_type, strdic()
+
+include	<nullptr.inc>
 
 string  tables_exts "|trl|txt|log|ocx|pdq|pod|cmh|trx|rpt|cgr|dgr|dta|poa"
 define	err_ 99
@@ -51,9 +57,9 @@ begin
 
 	ncols = 1
 	if (trl == YES) {
-	   tp = open (tab_file, READ_ONLY, TEXT_FILE)
+	   tfd = open (tab_file, READ_ONLY, TEXT_FILE)
 	} else {
-	   tp = tbtopn (tab_file, READ_ONLY, 0)
+	   tp = tbtopn (tab_file, READ_ONLY, NULLPTR)
 	   ncols = tbpsta (tp, TBL_NCOLS)
 	}
 	 
@@ -65,7 +71,7 @@ begin
 	        NBITS_BYTE)
 	    if (first_time == YES)
 	       fits_fd = mtopen (fits_file, WRITE_ONLY, chars_rec)
-	    dev_blk = fstati (fits_fd, F_MAXBUFSIZE)
+	    dev_blk = fstatl (fits_fd, F_MAXBUFSIZE)
 	    if (dev_blk != 0 && chars_rec > dev_blk) {
 		call flush(STDOUT)
 		call error (0, "Blocking factor too large for tape drive")
@@ -74,9 +80,11 @@ begin
 	    fits_fd = open (fits_file, NEW_FILE, BINARY_FILE)
 
 	# Allocate memory for program data structure.
-	call calloc (ext, LEN_EXTENSION, TY_STRUCT)
-	call calloc(EXT_PCOL(ext), ncols, TY_POINTER)
-	call calloc(EXT_PCUNDEF(ext), ncols, TY_BOOL)
+	sz_val = LEN_EXTENSION
+	call calloc (ext, sz_val, TY_STRUCT)
+	sz_val = ncols
+	call calloc(EXT_PCOL(ext), sz_val, TY_POINTER)
+	call calloc(EXT_PCUNDEF(ext), sz_val, TY_BOOL)
 
 	nch = fnldir (tab_file, EXTNAME(ext), SZ_FNAME)
 	call strcpy (tab_file[nch+1], EXTNAME(ext), SZ_FNAME)
@@ -88,7 +96,7 @@ begin
 	# Write header and image.
 	iferr {
 	    if (trl == YES) {
-	       call txt_wfits (tp, fits_file, ext, fits_fd)
+	       call txt_wfits (tfd, fits_file, ext, fits_fd)
 	    }else {
 	       call tab_write_header (tp, fits_file, ext, fits_fd)
 	       if (short_header == YES)
@@ -99,13 +107,14 @@ begin
 
 	} then {
 	    # Close files and cleanup.
-	    if (trl == YES)
-	       call close (tp)
-	    else
-	       call tbtclo (tp)
+	    if (trl == YES) {
+		call close (tfd)
+	    } else {
+		call tbtclo (tp)
+	    }
 	    call close (fits_fd)
 	    call mfree(EXT_PCUNDEF(ext), TY_BOOL)
-	    call mfree(EXT_PCOL(ext), TY_INT)
+	    call mfree(EXT_PCOL(ext), TY_POINTER)
 	    call mfree(ext, TY_STRUCT)
 
 	    call errget (line, SZ_LINE)
@@ -115,14 +124,15 @@ begin
 	    if (long_header == YES)
 	        call printf ("\n")
 	    # Close files and cleanup.
-	    if (trl == YES)
-	       call close (tp)
-	    else
-	       call tbtclo (tp)
+	    if (trl == YES) {
+		call close (tfd)
+	    } else {
+		call tbtclo (tp)
+	    }
             if (extensions == NO)
 	       call close (fits_fd)
 	    call mfree(EXT_PCUNDEF(ext), TY_BOOL)
-	    call mfree(EXT_PCOL(ext), TY_INT)
+	    call mfree(EXT_PCOL(ext), TY_POINTER)
 	    call mfree(ext, TY_STRUCT)
 	}
 	return

@@ -11,14 +11,14 @@ include "catf.h"
 int procedure read_tape_only (fi, fits_fd, fitsfile, number)
 
 pointer	fi
-pointer	fits_fd		    # tape descriptor
+int	fits_fd		    # tape descriptor
 char	fitsfile[SZ_FNAME]  # Fits file name
-int	number		    # input file number
+long	number		    # input file number
 
-int	nread, i, stat, enumber
+int	nread, i, stat, enumber, ntab
 char	card[LEN_CARD]
-int	get_tape_info(), rft_init_read_pixels()
-int	read_card(), ntab
+int	read_card(), get_tape_info()
+long	rft_init_read_pixels()
 
 string	badfits  "%s  ** Unexpected data at end of fits file ** \n"
 
@@ -203,15 +203,21 @@ end
 #	      disk file.
 int procedure read_card (fits_fd, card, nread)
 
-pointer	fits_fd		# tape descriptor
+int	fits_fd		# tape descriptor
 char	card[LEN_CARD]	
 int	nread		# card counter
 
+size_t	sz_val
+size_t	c_1
+long	nrec, i
 bool	isblank()
-int	i, rft_read_pixels(), nrec, strmatch()
+long	rft_read_pixels()
+int	strmatch()
 
 begin
-	   i = rft_read_pixels (fits_fd, card, LEN_CARD, nrec, 1)
+	   c_1 = 1
+	   sz_val = LEN_CARD
+	   i = rft_read_pixels (fits_fd, card, sz_val, nrec, c_1)
 	   if (i == EOF && nread == 0)  {		# At EOT
 		return (EOF)
 	   } else if (nread == 0 && isblank (card)) {
@@ -238,24 +244,24 @@ procedure skip_data (fits_fd, fits)
 int	fits_fd		# FITS file descriptor
 pointer	fits		# FITS data structure
 
-int	i, npix_record, blksize, pixsize
-long	nlines, gc, pc
+size_t	npix_record
+int	i, pixsize, bitpix
+long	blksize, nlines, gc, pc, off
+long	l_val
 
 # totpix is the number of SPP char in the data portion, rounded up to a
 # multiple of 2880/SZB_CHAR.
-int	totpix
+long	totpix
 
 # bytes_in_data is the number of bytes in the data portion, NOT rounded up
 # to a multiple of 2880.
-int	bytes_in_data
+long	bytes_in_data
 
 # bytes_in_par is the number of bytes in the random groups parameter section,
 # NOT rounded up to a multiple of 2880.
-int	bytes_in_par
+long	bytes_in_par
 
-int	fstati(), bitpix
-int	rft_init_read_pixels()
-long	off, note()
+long	rft_init_read_pixels(), fstatl(), note(), lmod()
 errchk	rft_init_read_pixels, rft_read_pixels
 
 include "catfits.com"
@@ -276,12 +282,12 @@ begin
 	    totpix = NAXISN(fits,1) * nlines
 	else
 	    totpix = nlines
-	bytes_in_data = totpix * (abs (BITPIX(fits)) / NBITS_BYTE)
-	if (abs (BITPIX(fits)) < (SZB_CHAR * NBITS_BYTE)) {
-	    pixsize = (SZB_CHAR * NBITS_BYTE) / abs(BITPIX(fits))
+	bytes_in_data = totpix * (iabs (BITPIX(fits)) / NBITS_BYTE)
+	if (iabs (BITPIX(fits)) < (SZB_CHAR * NBITS_BYTE)) {
+	    pixsize = (SZB_CHAR * NBITS_BYTE) / iabs(BITPIX(fits))
 	    totpix = totpix / pixsize
 	} else {
-	    pixsize = abs(BITPIX(fits)) / (SZB_CHAR * NBITS_BYTE)
+	    pixsize = iabs(BITPIX(fits)) / (SZB_CHAR * NBITS_BYTE)
 	    totpix = totpix * pixsize
 	}
 
@@ -291,13 +297,14 @@ begin
 	# FITS data is converted to type  LONG.  If BITPIX is not one
 	# of the MII types then rft_read_pixels returns an ERROR.
 
-	bitpix = abs (BITPIX(fits))
+	bitpix = iabs (BITPIX(fits))
 
 	npix_record = len_record * FITS_BYTE / bitpix
 	i = rft_init_read_pixels (npix_record, bitpix, LSBF, TY_LONG)
 
-	blksize = fstati (fits_fd, F_SZBBLK)
-	if (mod (blksize, 2880) == 0)
+	blksize = fstatl (fits_fd, F_SZBBLK)
+	l_val = 2880
+	if (lmod (blksize, l_val) == 0)
 	    blksize = blksize / 2880
 	else
 	    blksize = 1
@@ -306,7 +313,7 @@ begin
         pc = PCOUNT(fits)
         if (pc > 0) {
 	    if (main_header) {
-		bytes_in_par = pc * (abs (BITPIX(fits)) / NBITS_BYTE)
+		bytes_in_par = pc * (iabs (BITPIX(fits)) / NBITS_BYTE)
 		off = note (fits_fd)
 		off = off + (gc * (bytes_in_par + bytes_in_data) + 2879) /
 			2880 * (2880 / SZB_CHAR)
@@ -336,9 +343,12 @@ int procedure get_tape_info (fits, card)
 
 pointer	fits		# FITS data structure
 char	card[ARB]	# FITS card
-int	strmatch(), strncmp(), len, strlen()
+
+int	len
 char    cval, ext_value[SZ_OBJECT]
-int	nk, nchar, cctoc(), i, ctoi(), k, j, strcmp()
+int	nk, nchar, i, k, j
+int	strmatch(), strncmp(), strlen()
+int	cctoc(), ctoi(), ctol(), strcmp()
 
 include "../stwfits/dfits.com"
 include "catfits.com"
@@ -373,7 +383,7 @@ begin
 	   #if (main_header)
 	   #   GCOUNT(fits) = 0
         } else if (strmatch (card, "^PCOUNT ") != 0) {
-	   nchar = ctoi (card, i, PCOUNT(fits))
+	   nchar = ctol (card, i, PCOUNT(fits))
 	   #if (main_header)
 	   #   PCOUNT(fits) = 0
         } else if (strmatch (card, "^TFIELDS ") != 0) {
@@ -381,7 +391,7 @@ begin
         } else if (strmatch (card, "^NAXIS") != 0) {
 	   k = strmatch (card, "^NAXIS")
 	   nchar = ctoi (card, k, j)
-	   nchar = ctoi (card, i, NAXISN(fits, j))
+	   nchar = ctol (card, i, NAXISN(fits, j))
 	} else if (strmatch (card, "^XTENSION") != 0) {
 	   call rft_get_fits_string (card, ext_value, SZ_OBJECT)
 	      if (strcmp (ext_value, "TABLE") == 0 )

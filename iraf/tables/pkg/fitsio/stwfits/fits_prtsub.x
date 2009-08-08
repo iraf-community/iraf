@@ -13,6 +13,7 @@ procedure dfread_formats (name)
  
 char	name[ARB]	# file name of format file
  
+size_t	sz_val
 int	ffd, ip, keylen, fmtlen
 char	line[SZ_LINE], keyword[SZ_LINE], format[SZ_LINE]
  
@@ -66,9 +67,11 @@ begin
 	    # them into the tables
 	    if (nkeywords < MAX_TABLE) {
 		nkeywords = nkeywords + 1
-		call salloc (key_table[nkeywords], SZ_KEYWORD + 1, TY_CHAR)
+		sz_val = SZ_KEYWORD + 1
+		call salloc (key_table[nkeywords], sz_val, TY_CHAR)
 		call strcpy (keyword, Memc[key_table[nkeywords]], SZ_KEYWORD)
-		call salloc (fmt_table[nkeywords], SZ_FORMAT + 1, TY_CHAR)
+		sz_val = SZ_FORMAT + 1
+		call salloc (fmt_table[nkeywords], sz_val, TY_CHAR)
 		call strcpy ("%", Memc[fmt_table[nkeywords]], 1)
 		call strcat (format, Memc[fmt_table[nkeywords]],
 			     strlen (format))
@@ -225,12 +228,12 @@ char	format[SZ_LINE]		# format to use
 char	code			# format code
  
 char	fmtstr[SZ_LINE]
-int	ip, strlen(),pp
+int	ip, pp
 long	lval
 real	rval
 double	dval
  
-int	ctol(), ctor(), ctod()
+int	ctol(), ctor(), ctod(), strlen()
  
 begin
 	# Build up format string
@@ -279,12 +282,12 @@ end
  
 procedure print_titles
  
-int	i, ip, junk
+int	i, ip, len, junk
 char	width[SZ_LINE], format[SZ_LINE], dict[SZ_LINE]
 char    line[SZ_LINE]
  
 include	"dfits.com"
-int	strext(), strlen(), len
+int	strext(), strlen()
  
 begin
 	# Print all the keywords in the title line
@@ -331,26 +334,29 @@ procedure prt_par(fd, version, fits_file, format_file, log_file, bitpix, blkfac,
 	  	  autoscale, newtape)
 #	  	  autoscale, newtape, force_minmax)
 
-pointer fd		# Log file descriptor
-char	fits_file[SZ_FNAME]
+int	fd		# Log file descriptor
 char	version[ARB]
+char	fits_file[SZ_FNAME]
 char	format_file[SZ_FNAME]
 char	log_file[SZ_FNAME]
-int	bitpix, blkfac, sdasmgcv, allgroups, ieee, scale
-int	autoscale
-#int	autoscale, force_minmax
-bool	newtape
+int	bitpix
+size_t	blkfac, c_21
+int	sdasmgcv, allgroups, ieee, scale
 double  bscale, bzero
+int	autoscale
+bool	newtape
+#int	force_minmax
 
 char    line[SZ_LINE]
 char    str[LEN_CARD]
 
 begin
+	c_21 = 21
 
 	call putline (fd, "\n")
 	call putline (fd, "\n")
 	call sysid (line, SZ_LINE)
-	   call amovc (version, line, 21)
+	   call amovc (version, line, c_21)
 	   call putline (fd, line)
 
 	call putline (fd, "\n")
@@ -390,7 +396,7 @@ begin
 #	call putline (fd, line)
 
 	call sprintf (line, SZ_LINE, "\n\tblocking_factor= %d")
-	     call pargi (blkfac)
+	     call pargz (blkfac)
 	call putline (fd, line)
 
 	if (sdasmgcv == YES)
@@ -439,11 +445,11 @@ pointer	im
 pointer fits
 
 char	str[LEN_CARD]		# card data string
-int	nk,strlen(), i, nch
+int	nk, nch, tape, i
 char	sdim[SZ_KEYWORD]
 char    line[SZ_LINE]
  
-int	strmatch(), itoc(), tape, mtfile(), imaccf()
+int	strlen(), strmatch(), ltoc(), mtfile(), imaccf()
 include "wfits.com"
 include	"dfits.com"
  
@@ -459,15 +465,21 @@ begin
 	   } else if (strmatch (Memc[key_table[nk]], "DIMENS") > 0) {
 	      str[1] = EOS
 	      do i = 1, IM_NDIM(im) {
-	         nch= itoc (IM_LEN(im,i), sdim, SZ_KEYWORD)
+	         nch= ltoc (IM_LEN(im,i), sdim, SZ_KEYWORD)
 	         call strcat (sdim, str, LEN_CARD)
 		 if (i != IM_NDIM(im))
 		    call strcat ("x", str, LEN_CARD)
 	      }
 	   } else if (strmatch (Memc[key_table[nk]], "DATATYPE") > 0) {
 		switch (IM_PIXTYPE(im)) {
-		case TY_INT,TY_LONG:
+		case TY_INT:
 	     	     call strcpy ("INT*4", str, LEN_CARD)
+		case TY_LONG:
+		     if ( SZ_LONG == 2 ) {
+			call strcpy ("INT*4", str, LEN_CARD)
+		     } else {
+			call strcpy ("INT*8", str, LEN_CARD)
+		     }
 		case TY_REAL:
 	     	     call strcpy ("REAL*4", str, LEN_CARD)
 		case TY_SHORT:
@@ -481,8 +493,14 @@ begin
 	        }
 	   } else if (strmatch (Memc[key_table[nk]], "BITPIX") > 0) {
 		switch (IM_PIXTYPE(im)) {
-		case TY_INT,TY_LONG:
+		case TY_INT:
 		     call strcpy ("I", sdim, SZ_KEYWORD)
+		case TY_LONG:
+		     if ( SZ_LONG == 2 ) {
+			call strcpy ("I", sdim, SZ_KEYWORD)
+		     } else {
+			call strcpy ("L", sdim, SZ_KEYWORD)
+		     }
 		case TY_REAL:
 		     if (ieee == YES)
 		        call strcpy ("R-", sdim, SZ_KEYWORD)

@@ -33,18 +33,16 @@ procedure t_wfits()
 bool	newtape
 char	fits_files[SZ_FNAME], in_fname[SZ_FNAME], out_fname[SZ_FNAME]
 char	log_file[SZ_FNAME], format_file[SZ_FNAME]
-int	nfiles, fits_record
-
 char	line[SZ_LINE], iextn[SZ_EXTN]
 bool	table
-int	save_sdasmg, save_ieee, tape, save_scale
-int     nch, fits_fd, nerrors, ip
+int	nfiles, fits_record, save_sdasmg, save_ieee, tape, save_scale
+int	nimages, nch, fits_fd, nerrors, ip
 pointer	list, flist
 
-int	open(), clstati()
-int	fntgfnb(), fntlenb(), nimages, strldxs(), access(), strncmp()
-int	imtlen(), strlen(), wft_get_bitpix(), clgeti(), imtgetim()
-int	mtfile(), strmatch(), btoi(), fnextn(), strcmp()
+int	wft_get_bitpix(), open(), access(), clstati(), clgeti()
+int	fntgfnb(), fntlenb(), imtlen(), imtgetim(), mtfile()
+int	btoi(), fnextn(), strldxs(), strncmp(), strlen(), strcmp(), strmatch()
+long	clgetl()
 bool	clgetb()
 double	clgetd()
 pointer	imtopenp(), fntopnb()
@@ -105,7 +103,7 @@ begin
 
 	# Get length of record in FITS bytes
 	len_record = fits_record
-	blkfac = clgeti ("blocking_factor")
+	blkfac = clgetl ("blocking_factor")
 
 	# Get scaling parameters
 	scale = btoi (clgetb ("scale"))
@@ -309,17 +307,17 @@ end
 
 procedure mk_output_name (tape, nfiles, file_number, in_fname,
 				fits_files, out_fname)
-int 	tape			# i: (YES, NO) is output goes to a tape.
+int	tape			# i: (YES, NO) is output goes to a tape.
 int	nfiles			# i: Number of files resolve by template expand.
-int 	file_number		# i: Current number of output files.
+int	file_number		# i: Current number of output files.
 char	in_fname[SZ_FNAME]	# i: input filename.
 char	fits_files[SZ_FNAME]	# i: outout file template or directory.
 char    out_fname[SZ_FNAME]	# o: output FITS name.
 
 char	iextn[SZ_EXTN], oextn[SZ_EXTN], root[SZ_FNAME], temp[SZ_FNAME]
 char	dirname[SZ_FNAME], ch[1]
-int	nch, isdir, ip, junk, isdirectory()
-int	fnextn(), strmatch(), fnroot(), stridxs(), strcmp()
+int	nch, isdir, ip, junk
+int	isdirectory(), fnextn(), strmatch(), fnroot(), stridxs(), strcmp()
 
 begin
 

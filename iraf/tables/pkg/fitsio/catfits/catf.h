@@ -8,12 +8,12 @@ define  XTENSION	Memi[P2I($1+2)]	# Standard extension flags. (see below)
 define  NCOLS		Memi[P2I($1+3)]	# Number of columns in table
 define  DATATYPE	Memi[P2I($1+4)]	# Get datatype from IRAFTYPE or DATATYP
 define  NAXIS		Memi[P2I($1+5)]	# image dimension
-define  NAXISN		Memi[P2I($1+6)+$2]   # Axis size
-define  PCOUNT		Memi[P2I($1+15)]   # Axis size
-define  GCOUNT		Memi[P2I($1+16)]   # Axis size
-define  EXT_NUMBER      Memi[P2I($1+17)]   # Axis size
-define  EXTVER          Memi[P2I($1+18)]   # Axis size
-define  IRAFNAME	Memc[P2C($1+19)]  # Object name, 70 chars
+define  NAXISN		Meml[P2L($1+6)+$2-1]	# Axis size
+define  PCOUNT		Meml[P2L($1+15)] 	# parameter count, or size of data heap
+define  GCOUNT		Memi[P2I($1+16)]	# number of random grouns
+define  EXT_NUMBER      Memi[P2I($1+17)]	# extension number
+define  EXTVER          Memi[P2I($1+18)]	# extension version number
+define  IRAFNAME	Memc[P2C($1+19)]	# Object name, 70 chars
 
 define	SZ_OBJECT	70
 define  CAT_AREA	(P2C($1+LEN_SINFO))

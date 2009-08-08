@@ -142,6 +142,20 @@ begin
 	}
 end
 
+procedure tbrgtl (tp, cp, buffer, nullflag, numcols, selrow)
+
+pointer tp			# i: pointer to table descriptor
+pointer cp[ARB]			# i: array of pointers to column descriptors
+long	buffer[ARB]		# o: buffer for values
+bool	nullflag[ARB]		# o: true if element is undefined in table
+int	numcols			# i: number of columns from which to get values
+long	selrow			# i: row number (or selected row number)
+
+begin
+	call error (ER_TBBADTYPE,
+		    "tbrgtl:  currently LONG type is not supported.")
+end
+
 # tbrgts -- getrow short
 # Read column values from a row.  This is for data type short integer.
 

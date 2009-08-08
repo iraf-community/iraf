@@ -23,20 +23,20 @@ include	"rfits.h"
 int procedure rft_read_fitz (fitsfile, template, iraffile, ext_number)
 
 char	fitsfile[SZ_FNAME]	# FITS file name
-char	iraffile[SZ_FNAME]	# IRAF file name
 char	template[SZ_FNAME]	# Template filename
+char	iraffile[SZ_FNAME]	# IRAF file name
 int	ext_number		# Index of the FITS extension to retrieve
 
-char	uscore
-bool	gi_geis()
+size_t	sz_val
 char	root[SZ_FNAME], cluster[SZ_FNAME]
 char	tempf[SZ_FNAME], extn[SZ_FNAME]
 char	tabfile[SZ_FNAME], seqfile[SZ_FNAME]
 int	fits_fd, istat, pos1, pos2, ntab, nch, junk
-int	nread, fd_usr, ncols, first_im, stat
+int	nread, fd_usr, ncols, first_im, stat, i_val
 bool    trl
 pointer	im, imt, fits, tp, ext
 
+bool	gi_geis()
 int	rft_read_header(), mtopen(), strlen()
 int	tab_read_header(), gstrmatch()
 int	open(), gi_gstfval(), strcmp(), chk_tabname()
@@ -44,20 +44,24 @@ int	strldx(), tbpsta(), rft_image_ext(), fnroot()
 int	bitpix_to_imtype()
 pointer	tbtopn()
 
-data	uscore / '_' /
+include	<nullptr.inc>
+
 errchk	smark, sfree, salloc, fits_reblock, rft_read_header, rft_read_image
 errchk	mtopen, close, imunmap, frename, rft_opnim, mtopen
 	
 include	"rfits.com"
 
 define  read_extn_ 99
+
 begin
 	stat = 0
 	# Open input FITS data
-	fits_fd = mtopen (fitsfile, READ_ONLY, 0)
+	sz_val = 0
+	fits_fd = mtopen (fitsfile, READ_ONLY, sz_val)
 
 	# Allocate memory for program data structure
-	call calloc (fits, LEN_FITS, TY_STRUCT)
+	sz_val = LEN_FITS
+	call calloc (fits, sz_val, TY_STRUCT)
 
 	FITS_XTEN(fits) = NO
 	call pr_files (iraffile, fitsfile)
@@ -161,7 +165,7 @@ begin
 	      # Because of some bug in stf the value below does
 	      # not get change to YES.
 	      if (gkey == NON_GPB && gi_gstfval(im, "PCOUNT") == 0)
-		 call gi_pstfval (im, "GROUPS", YES)
+		 call gi_pstfvali (im, "GROUPS", YES)
 	   }
  	   if (gkey == NON_GPB || gkey == NONDEF_GPB)
 	      call imunmap (imt)
@@ -216,10 +220,11 @@ begin
            repeat {
 	      if (ext_number > 1)
 	         call skip_extensions (ext_number, fits_fd)
-	      tp = tbtopn (seqfile, NEW_FILE, 0)
+	      tp = tbtopn (seqfile, NEW_FILE, NULLPTR)
 	  
 	      # Allocate space for the extension structure
-	      call calloc (ext, LEN_EXTENSION, TY_STRUCT)
+	      sz_val = LEN_EXTENSION
+	      call calloc (ext, sz_val, TY_STRUCT)
 
 	      # Read FITS table header an user parameters if any, also
 	      # create the table 'tbtcre'. Extension structure 'ext' is
@@ -285,7 +290,8 @@ begin
 		    tp = open (seqfile, NEW_FILE, TEXT_FILE)
 		    call tab_read_data (fits_fd, ext, tp, fits)
 		    ncols = 1
-		    call close (tp)
+		    i_val = tp
+		    call close (i_val)
 	         } else {   
 		    call tab_read_data (fits_fd, ext, tp, fits)
 		    ncols = tbpsta(tp, TBL_NCOLS)
@@ -335,6 +341,7 @@ begin
 	call close (fits_fd)
 	return (stat)
 end
+
 procedure ext_free(ext)
 pointer ext
 begin
@@ -342,16 +349,17 @@ begin
 	call mfree (EXT_PDISP(ext), TY_CHAR)
 	call mfree (EXT_PFORM(ext), TY_CHAR)
 	call mfree (EXT_PUNIT(ext), TY_CHAR)
-	call mfree (EXT_PDSIZE(ext), TY_INT)
+	call mfree (EXT_PDSIZE(ext), TY_LONG)
 	call mfree (EXT_PDTYPE(ext), TY_INT)
 	call mfree (EXT_PTYPE(ext), TY_CHAR)
 	call mfree (EXT_PNULL(ext),TY_CHAR)
 	call mfree (EXT_PSCAL(ext),TY_DOUBLE)
 	call mfree (EXT_PZERO(ext), TY_DOUBLE)
-	call mfree (EXT_PCW(ext), TY_INT)
-	call mfree (EXT_PBCOL(ext), TY_INT)
+	call mfree (EXT_PCW(ext), TY_LONG)
+	call mfree (EXT_PBCOL(ext), TY_LONG)
 	call mfree (ext, TY_STRUCT)
 end
+
 # CHANGE_NAME -- Procedure to change the name of the temporary file name
 #		'iraffile'  to the value of IRAFNAME(fits)
 
@@ -359,7 +367,7 @@ procedure change_name (iraffile, fits)
 char	iraffile[SZ_FNAME]
 pointer fits
 
-
+size_t	sz_val
 char	root[SZ_FNAME]
 char	nroot[SZ_FNAME], nextn[SZ_EXTN]
 char	extn[SZ_FNAME]
@@ -373,9 +381,10 @@ include "rfits.com"
 
 begin
 	call smark (sp)
-	call salloc (bf, SZ_FNAME, TY_CHAR)
-	call salloc (dp, SZ_FNAME, TY_CHAR)
-	call salloc (tname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (bf, sz_val, TY_CHAR)
+	call salloc (dp, sz_val, TY_CHAR)
+	call salloc (tname, sz_val, TY_CHAR)
 
 	call imgcluster (iraffile, Memc[bf], SZ_FNAME)
 	call iki_parse (Memc[bf], root, extn)
@@ -509,13 +518,17 @@ int	nread			# number of header lines in the fits header
 pointer	im			# output image descriptor
 pointer	imt			# o: template image pointer
 
+size_t	sz_val
 pointer	ua
-int	i, fd, maxlines, max_lenuser, cl_index,cl_size
-char	cluster[SZ_FNAME], tmp[SZ_FNAME], root[SZ_FNAME] 
+int	i, fd, maxlines, max_lenuser, cl_index, cl_size
+char	cluster[SZ_FNAME], tmp[SZ_FNAME], root[SZ_FNAME]
+long	l_val
 
 bool	gi_geis()
 int	stropen(), strlen(), chk_tabname()
 pointer	immap()
+
+include	<nullptr.inc>
 
 errchk  immap
 include "rfits.com"
@@ -560,15 +573,15 @@ begin
 
 	# Create IRAF image header.
 	   if (gkey == NONDEF_GPB) {
-	   imt = immap (template, READ_ONLY, 0)
+	   imt = immap (template, READ_ONLY, NULLPTR)
 	   im  = immap (iraffile, NEW_COPY, imt)
 	} else if (gkey == NON_GPB) {
-	   imt = immap (NONGPB_HDR, READ_ONLY, 0)
+	   imt = immap (NONGPB_HDR, READ_ONLY, NULLPTR)
 	   im  = immap (iraffile, NEW_COPY, imt)
 	} else if (gkey == IMAGE) {
-	   call gi_newgrp (im, cl_index, IRAFMIN(fits), IRAFMAX(fits), 0)
+	   call gi_newgrp (im, cl_index, IRAFMIN(fits), IRAFMAX(fits), NULLPTR)
 	} else
-	   im = immap (iraffile, NEW_IMAGE, 0)
+	   im = immap (iraffile, NEW_IMAGE, NULLPTR)
 	# reset the naxis things
 	IM_NDIM(im) = NAXIS(fits)
 
@@ -585,11 +598,13 @@ begin
 	   nread = maxlines
 	} 
 	IM_LENHDRMEM(im) = nread*LEN_CARD + LEN_IMHDR + 81*32
-	call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
+	sz_val = IM_LENHDRMEM(im) + LEN_IMDES
+	call realloc (im, sz_val, TY_STRUCT)
 	max_lenuser = (IM_LENHDRMEM(im) + LEN_IMDES - IMU)*SZ_STRUCT
 	ua = IM_USERAREA(im) 
 	fd = stropen (Memc[ua], max_lenuser, NEW_FILE)
-	call seek (fd_usr, BOFL)
+	l_val = BOFL
+	call seek (fd_usr, l_val)
 
 	if (gkey == DEF_GPB && gi_geis (im))
 	   call rft_create_gpb (im, fd)
@@ -614,11 +629,12 @@ pointer fits
 char	fitsfile[SZ_FNAME]
 char	iraffile[SZ_FNAME]
 
+size_t	sz_val
 char	root[SZ_FNAME]
 char	extn[SZ_EXTN]
-int	k, strlen(), itab
-int	len_name
+int	len_name, itab, k
 pointer sp, bf
+int	strlen()
 
 include "rfits.com"
 
@@ -627,7 +643,8 @@ begin
 	   return
 
 	call smark (sp)
-	call salloc (bf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (bf, sz_val, TY_CHAR)
 	call imgcluster (iraffile, Memc[bf], SZ_FNAME)
 	call iki_parse (Memc[bf], root, extn)
 
@@ -652,7 +669,7 @@ begin
 
 	do k = 1, NAXIS(fits) {
 	   call printf("%-5.5d")
-	       call pargi(NAXISN(fits,k))
+	       call pargl(NAXISN(fits,k))
 	}
 	
 
@@ -708,18 +725,19 @@ pointer	ext			#extension descriptor
 char	seqfile[SZ_FNAME]	#sequential table filename
 int	ncols			#NUmber of columns in table.
 
-int	strlen(), k, fnldir(), fnroot(), fnextn(), chk_tabname()
+size_t	sz_val
+int	itab, k
 pointer sp, bf, rr, sf
 char	extn[SZ_FNAME]
-int	itab
 bool    trl
-
+int	strlen(), fnldir(), fnroot(), fnextn(), chk_tabname()
 include "rfits.com"
 
 begin
 	call smark(sp)
-	call salloc (bf, SZ_FNAME, TY_CHAR)
-	call salloc (sf, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (bf, sz_val, TY_CHAR)
+	call salloc (sf, sz_val, TY_CHAR)
 
 	# set tab value for tape or disk file
 	itab = 17
@@ -732,7 +750,8 @@ begin
 	# save 'seqfile' 
 	call strcpy (seqfile, Memc[sf], SZ_FNAME)
 	if (old_name == YES) {
-	   call salloc (rr, SZ_FNAME, TY_CHAR)
+	   sz_val = SZ_FNAME
+	   call salloc (rr, sz_val, TY_CHAR)
 	   if (chk_tabname (IRAFNAME(fits)) == YES) {
 	       call gen_fname (IRAFNAME(fits), EXTNAME(ext), 
 			       Memc[rr], extn, SZ_FNAME)
@@ -778,8 +797,8 @@ begin
 	if (short_header == YES) {
 
 	   call printf ("%-4.4d %-5.5d")
-		call pargi (EXT_ROWLEN(ext))
-		call pargi (EXT_NROWS(ext))
+		call pargl (EXT_ROWLEN(ext))
+		call pargl (EXT_NROWS(ext))
 	   call printf(" Ncols=%3d ")
 		call pargi (ncols)
 
@@ -787,11 +806,12 @@ begin
 	}
 	call sfree(sp)
 end
-define  X_BITPIX          Memi[$1]
-define  X_NAXIS           Memi[$1+2]    
-define  X_PCOUNT          Memi[$1+3]    
-define  X_GCOUNT          Memi[$1+4]    
-define  X_NAXISN          Memi[$1+5+$2-1]
+
+define  X_BITPIX          Memi[P2I($1)]
+define  X_NAXIS           Memi[P2I($1+2)]    
+define  X_PCOUNT          Meml[P2L($1+3)]    
+define  X_GCOUNT          Memi[P2I($1+4)]    
+define  X_NAXISN          Meml[P2L($1+5)+$2-1]
 
 # SKIP_EXTENSIONS -- Procedure to skip a number of extensions in the
 #		     FITS file.
@@ -799,15 +819,19 @@ procedure skip_extensions (n_extensions, fits_fd)
 int	n_extensions		# Number of extensions to skip
 int	fits_fd			# FITS file descriptor
 
-pointer xt,sp
+size_t	sz_val
+pointer xt, sp
 char	card[LEN_CARD]
-int	i, rft_init_read_pixels(), get_min_info()
 int	stat, k
+long	i
+int	get_min_info()
+long	rft_init_read_pixels()
 
 include "rfits.com"
 begin
         call smark(sp)
-	call salloc (xt, 103, TY_INT)   # 4+ naxisn could be up to 99
+	sz_val = 103
+	call salloc (xt, sz_val, TY_STRUCT)   # 4+ naxisn could be up to 99
 
 	do k = 1, n_extensions - 1 {
 	   i = rft_init_read_pixels (len_record, FITS_BYTE, LSBF, TY_CHAR)
@@ -822,16 +846,22 @@ begin
         }
 	call sfree(sp)
 end
+
 int procedure get_min_info (fits_fd, card, xt)
 int	fits_fd
 char    card[ARB]
 pointer xt
 
-int	strmatch(), rft_read_pixels()
-int	nchar, i, ctoi(), k, j, stat, nrec
+size_t	sz_val, c_1
+int	nchar, i, k, j
+long	nrec, stat
+int	strmatch(), ctoi(), ctol()
+long	rft_read_pixels()
 
 begin
-	stat = rft_read_pixels (fits_fd, card, LEN_CARD, nrec, 1)
+	c_1 = 1
+	sz_val = LEN_CARD
+	stat = rft_read_pixels (fits_fd, card, sz_val, nrec, c_1)
 	if (stat == EOF) return (EOF)
 
 	i = COL_VALUE
@@ -842,16 +872,17 @@ begin
 	} else if (strmatch (card, "^NAXIS   ") != 0) {
 	   nchar = ctoi (card, i, X_NAXIS(xt))	
 	} else if (strmatch (card, "^PCOUNT  ") != 0) {
-	   nchar = ctoi (card, i, X_PCOUNT(xt))	
+	   nchar = ctol (card, i, X_PCOUNT(xt))	
 	} else if (strmatch (card, "^GCOUNT  ") != 0) {
 	   nchar = ctoi (card, i, X_GCOUNT(xt))	
         } else if (strmatch (card, "^NAXIS") != 0) {
 	   k = strmatch (card, "^NAXIS")
 	   nchar = ctoi (card, k, j)
-	   nchar = ctoi (card, i, X_NAXISN(xt, j))
+	   nchar = ctol (card, i, X_NAXISN(xt, j))
 	}
 	return(NO)
 end
+
 include <mach.h>
 include <fset.h>
 define  NB_DOUBLE   64
@@ -861,13 +892,14 @@ procedure skip_xdata (fits_fd, xt)
 int	fits_fd		# FITS file descriptor
 pointer	xt		# FITS data structure
 
-int	i, npix, npix_record, blksize, nrec
-long	nlines, il, pc
-pointer	tempbuf,sp,pp
+int	j, bitpix, gc
+long	i, nlines, il, nrec, l_val0, l_val1
+size_t	npix_record, npix, pc, blksize
+pointer	tempbuf, sp, pp
 
-int	fstati(), bitpix, gc
 data	tempbuf /NULL/
-int	rft_init_read_pixels(), rft_read_pixels()
+long	fstatl(), lmod()
+long	rft_init_read_pixels(), rft_read_pixels()
 errchk	rft_init_read_pixels, rft_read_pixels
 
 include "rfits.com"
@@ -879,39 +911,42 @@ begin
 
 	npix = X_NAXISN(xt, 1)
 	nlines = 1
-	do i = 2, X_NAXIS(xt)
-	    nlines = nlines * X_NAXISN(xt, i)
+	do j = 2, X_NAXIS(xt)
+	    nlines = nlines * X_NAXISN(xt, j)
 
 	# FITS data is converted to type  LONG.  If BITPIX is not one
 	# of the MII types then rft_read_pixels returns an ERROR.
 
-	bitpix = abs (X_BITPIX(xt))
+	bitpix = iabs (X_BITPIX(xt))
 	if (tempbuf != NULL)
-	    call mfree (tempbuf, TY_LONG)
+	    call mfree (tempbuf, TY_CHAR)
 	if (bitpix != NB_DOUBLE)
-	   call malloc (tempbuf, npix, TY_LONG)
+	   call malloc (tempbuf, npix * SZ_LONG, TY_CHAR)
 	else
-	   call malloc (tempbuf, npix*2, TY_LONG)
+	   call malloc (tempbuf, npix * SZ_DOUBLE, TY_CHAR)
 
 	npix_record = len_record * FITS_BYTE / bitpix
 	i = rft_init_read_pixels (npix_record, bitpix, LSBF, TY_LONG)
-	blksize = fstati (fits_fd, F_SZBBLK)
-	if (mod (blksize, 2880) == 0)
+	blksize = fstatl (fits_fd, F_SZBBLK)
+	l_val0 = blksize
+	l_val1 = 2880
+	if (lmod (l_val0, l_val1) == 0) {
 	    blksize = blksize / 2880
-	else
+	} else {
 	    blksize = 1
+	}
 
         gc = X_GCOUNT(xt)
 	pc = X_PCOUNT(xt)
 	if (pc > 0) {
 	   call smark(sp)
-	   call salloc (pp, pc, TY_LONG)
+	   call salloc (pp, pc * SZ_LONG, TY_CHAR)
 	}
 	repeat {
 	   # If there are PCOUNT pixel of GROUP info then read that.
 	   # This is for Small Group of data format.
 	   if (pc > 0) {
-	      if (rft_read_pixels (fits_fd, Meml[pp], pc,
+	      if (rft_read_pixels (fits_fd, Memc[pp], pc,
 	         nrec, blksize) != pc)
 	         call printf ("Error reading FITS data\n")
 	   }
@@ -919,7 +954,7 @@ begin
 	   do il = 1, nlines {
 
 	       # Read in image line
-	       i = rft_read_pixels (fits_fd, Meml[tempbuf], npix,
+	       i = rft_read_pixels (fits_fd, Memc[tempbuf], npix,
 	           nrec, blksize)
 	       if (i != npix)
 		call printf ("Error reading FITS data\n")
@@ -930,18 +965,21 @@ begin
 	if (pc > 0)
 	   call sfree (sp)
 end
+
 #SKIP_MDATA -- skip main FITS data unit
 
 procedure skip_mdata(fits_fd, fits)
 int	fits_fd
 pointer fits
 
-pointer xt,sp
+size_t	sz_val
+pointer xt, sp
 int	i
 
 begin
         call smark(sp)
-	call salloc (xt, 103, TY_INT)   # 4+ naxisn could be up to 99
+	sz_val = 103
+	call salloc (xt, sz_val, TY_STRUCT)   # 4+ naxisn could be up to 99
 
 	X_BITPIX(xt) = BITPIX(fits)
 	X_NAXIS(xt) = NAXIS(fits)
@@ -955,15 +993,21 @@ begin
 
 	call sfree(sp)
 end
-procedure pr_files (iraffile, fitsfile)
-char	iraffile[SZ_FNAME], fitsfile[ARB]
 
-pointer	sp,pp
-int	stridx(), len,k,id1,id2
+procedure pr_files (iraffile, fitsfile)
+char	iraffile[SZ_FNAME]
+char	fitsfile[ARB]
+
+size_t	sz_val
+pointer	sp, pp
+int	len, k, id1, id2
+int	stridx()
 include "rfits.com"
+
 begin
 	call smark(sp)
-	call salloc(pp, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc(pp, sz_val, TY_CHAR)
 	if (long_header == YES) {
 	   call printf ("\n**** FILE: %s\n ")
 		call pargstr (iraffile)
@@ -986,6 +1030,7 @@ begin
 	}
 	call sfree(sp)
 end
+
 #Procedure to convert very naively from FITS BIPIX values  to IM_PIXTYPE.
 # This is mainly when we have a FITS file with NAXIS=0, for other cases
 # BSCALE and NZERO values needs to be taken into consideration.
@@ -993,7 +1038,9 @@ end
 int procedure bitpix_to_imtype(fits)
 
 pointer fits
-int	imtype, strcmp()
+
+int	imtype
+int	strcmp()
 
 begin
 	switch (BITPIX(fits)) {
@@ -1005,7 +1052,13 @@ begin
 	   else
 	       imtype = TY_SHORT
 	case 32:
-	   imtype = TY_LONG
+	   imtype = TY_INT
+	case 64:
+	   if ( SZ_LONG == 2 ) {
+	       call error(1, "BITPIX_TO_IMTYPE: BITPIX = 64 is not supported")
+	   } else {
+	       imtype = TY_LONG
+	   }
 	case -32:
 	   imtype = TY_REAL
 	case -64:
@@ -1028,11 +1081,14 @@ define  HDR_TEMPLATE    "dev$pix.hhh"   # used by fmkcopy to create new header
 procedure wr_header(im, fits)
 
 pointer	im			# image descriptor
+pointer	fits
 
-pointer	sp, fname, lbuf, fits
-int	in, out, junk, width, getline()
+size_t	sz_val
+pointer	sp, fname, lbuf
+int	in, out, junk, width
 
 bool	fnullfile()
+int	getline()
 int	stropen(), strcmp(), open(), protect(), strlen() #ditto-dlb
 errchk	fmkcopy, open, stropen, fprintf
 
@@ -1041,8 +1097,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (fname, SZ_PATHNAME, TY_CHAR)
-	call salloc (lbuf, SZ_LINE, TY_CHAR)
+	sz_val = SZ_PATHNAME
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (lbuf, sz_val, TY_CHAR)
 
 	# Open a new header file with a unique, temporary name.  Make a copy
 	# of the template file rather than of the old header file.  Since
@@ -1070,6 +1128,12 @@ begin
 		  call strcpy("INTEGER*2", Memc[lbuf], SZ_LINE)
 	  case 32:
 	     call strcpy("INTEGER*4", Memc[lbuf], SZ_LINE)
+	  case 64:
+	     if ( SZ_LONG == 2 ) {
+		call error(1, "WR_HEADER: BITPIX = 64 is not supported")
+	     } else {
+		call strcpy("INTEGER*8", Memc[lbuf], SZ_LINE)
+	     }
 	  case -32:
 	     call strcpy("REAL*4", Memc[lbuf], SZ_LINE)
 	  case -64:

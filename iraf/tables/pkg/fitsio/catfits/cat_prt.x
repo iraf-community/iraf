@@ -11,16 +11,16 @@ include "catf.h"
  
 procedure cat_print_main (file_number, fits_file, fits)
  
-int	file_number		# input file sequence
+long	file_number		# input file sequence
 char    fits_file[SZ_FNAME]	# Input file name
 pointer fits			# Internal information pointer
 
 char	str[LEN_CARD]		# card data string
-int	nk, i, nch
+int	nk, i, nch, tape
 char	sdim[SZ_KEYWORD]
 char    line[SZ_LINE]
- 
-int	strmatch(), itoc(), tape, mtfile(), strlen(),strcmp()
+
+int	strmatch(), itoc(), ltoc(), mtfile(), strlen(), strcmp()
 include	"../stwfits/dfits.com"
 include "catfits.com"
  
@@ -42,11 +42,11 @@ begin
 	      if (tape == NO)
 	      	 call strcpy (fits_file, str, LEN_CARD)
 	      else
-	         nch= itoc (file_number, str, SZ_KEYWORD)
+	         nch= ltoc (file_number, str, SZ_KEYWORD)
 	   } else if (strmatch (Memc[key_table[nk]], "DIMENS") > 0) {
 	      str[1] = EOS
 	      do i = 1, NAXIS(fits) {
-	         nch= itoc (NAXISN(fits,i), sdim, SZ_KEYWORD)
+	         nch= ltoc (NAXISN(fits,i), sdim, SZ_KEYWORD)
 	         call strcat (sdim, str, LEN_CARD)
 		 if (i != NAXIS(fits))
 		    call strcat ("x", str, LEN_CARD)
@@ -77,9 +77,9 @@ procedure cat_print_ext (fits)
 pointer fits
 
 char	str[LEN_CARD]		# card data string
-int	strlen(), nch, nk, strmatch(), strcmp()
-int	itoc(), i
 char    line[SZ_LINE], sdim[SZ_KEYWORD]
+int	nch, nk, i
+int	strlen(), strmatch(), strcmp(), itoc(), ltoc()
  
 include	"../stwfits/dfits.com"
  
@@ -111,11 +111,11 @@ begin
 	       if (XTENSION(fits) == TABLE || XTENSION(fits) == BINTABLE) {
 	          call sprintf (str, LEN_CARD, "%dFx%dR")
 	   	       call pargi (NCOLS(fits))
-	   	       call pargi (NAXISN(fits,2))
+	   	       call pargl (NAXISN(fits,2))
 	       } else if (XTENSION(fits) == IMAGE) {
 	          str[1] = EOS
 	          do i = 1, NAXIS(fits) {
-	             nch= itoc (NAXISN(fits,i), sdim, SZ_KEYWORD)
+	             nch= ltoc (NAXISN(fits,i), sdim, SZ_KEYWORD)
 	             call strcat (sdim, str, LEN_CARD)
 		     if (i != NAXIS(fits))
 		        call strcat ("x", str, LEN_CARD)
@@ -148,7 +148,8 @@ procedure cat_explanation (fits)
 
 pointer	fits
 char 	line[SZ_LINE], temp[LEN_CARD], format_file[SZ_FNAME]
-int	nk, nchar, strlen(), strmatch(), open(), getline(), fdd, stridx()
+int	nk, nchar, fdd
+int	strlen(), strmatch(), open(), getline(), stridx()
 
 include	"../stwfits/dfits.com"
 include "catfits.com"

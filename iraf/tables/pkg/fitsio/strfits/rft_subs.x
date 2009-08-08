@@ -100,9 +100,9 @@ begin
 #--                                                 cd1_1
 	   CDMATRIX(pn1,1) =   CDELT(pn1) * cosrota
 #--                                                 cd1_2
-	   CDMATRIX(pn1,2) =   abs(CDELT(pn2)) * sign1 * sinrota
+	   CDMATRIX(pn1,2) =   dabs(CDELT(pn2)) * sign1 * sinrota
 #--                                                 cd2_1
-	   CDMATRIX(pn2,1) = - abs(CDELT(pn1)) * sign2 * sinrota
+	   CDMATRIX(pn2,1) = - dabs(CDELT(pn1)) * sign2 * sinrota
 #--                                                 cd2_2
 	   CDMATRIX(pn2,2) =   CDELT(pn2) * cosrota
 
@@ -125,7 +125,7 @@ define	NEPSILON	10.0d0
 procedure rft_create_gpb (im, fd)
 
 pointer	im		# image descriptor
-pointer	fd		# text file descriptor 
+int	fd		# text file descriptor 
 
 char	keyname[SZ_KEYWORD], card[LEN_CARD+1]
 int	k, i, ndim
@@ -308,7 +308,7 @@ begin
 	if (ex != ey)
 	    return (false)
 	else {
-	    x1 = 1.0d0 + abs (normed_x - normed_y)
+	    x1 = 1.0d0 + dabs (normed_x - normed_y)
 	    x2 = 1.0d0 + NEPSILON * EPSILOND
 	    return (x1 <= x2)
 	}
@@ -328,7 +328,7 @@ int	expon			# exponent
 double	ax
 
 begin
-	ax = abs (x)
+	ax = dabs (x)
 	expon = 0
 
 	if (ax > 0) {
@@ -358,6 +358,7 @@ char	incard[LEN_CARD]		# input FITS card image
 char	outcard[LEN_CARD]		# output FITS card
 int	maxch			# maximum size of card
 
+size_t	sz_val
 int	ip
 
 begin
@@ -365,7 +366,8 @@ begin
 	while (incard[ip] == ' ')
 	    ip = ip - 1
 
-	call amovc (incard, outcard, ip)
+	sz_val = ip
+	call amovc (incard, outcard, sz_val)
 
 	outcard[ip+1] = '\n'
 	outcard[ip+2] = EOS
@@ -386,6 +388,7 @@ begin
 	    ip = ip - 1
 	user[ip+1] = EOS
 end
+
 # RFT_CLEAN_CARD -- Procedure to clean HISTORY card from any null value
 
 procedure rft_clean_card (incard, outcard, maxch)
@@ -394,6 +397,7 @@ char	incard[LEN_CARD]		# input FITS card image
 char	outcard[LEN_CARD]		# output FITS card
 int	maxch			# maximum size of card
 
+size_t	sz_val
 int	ip
 
 begin
@@ -404,7 +408,8 @@ begin
 	      incard[ip] = ' '
 	   }
 	}
-	call amovc (incard, outcard, maxch)
+	sz_val = maxch
+	call amovc (incard, outcard, sz_val)
 
 	outcard[maxch+1] = '\n'
 	outcard[maxch+2] = EOS

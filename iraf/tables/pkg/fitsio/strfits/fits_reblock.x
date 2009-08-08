@@ -11,12 +11,16 @@ char	in_fname[ARB]		# i: input file name
 char	out_fname[ARB]		# i: output file name
 #--
 
-int	in, out, sz_charsin, szb_inrecord, sz_charsout, szb_outrecord
-int	rem_in, rem_out, ip, op, sz_inblock, bytes_read, mov_nbytes, nchars
-long	offset
+size_t	sz_val
+long	l_val
+int	in, out
+long	nchars, rem_in, rem_out, sz_inblock, offset
+size_t	sz_charsin, sz_charsout, szb_inrecord, szb_outrecord, mov_nbytes
+size_t	ip, op, bytes_read
 pointer	inbuf, outbuf
 
-int	mtfile(), mtopen(), read(), fstati(), open(), awaitb()
+int	mtfile(), mtopen(), open()
+long	read(), awaitb(), fstatl(), lmod()
 errchk	open, mtopen, read, awriteb, awaitb, close, mfree, malloc, flush
 
 begin
@@ -24,22 +28,24 @@ begin
 	if (mtfile (in_fname) == NO) {
 	    in = open (in_fname, READ_ONLY, BINARY_FILE)
 	} else {
-	    in = mtopen (in_fname, READ_ONLY, 0)
+	    sz_val = 0
+	    in = mtopen (in_fname, READ_ONLY, sz_val)
 	}
 
 	if (mtfile (out_fname) == NO) {
 	    out = open (out_fname, NEW_FILE, BINARY_FILE)
 	} else {
-	    out = mtopen (out_fname, WRITE_ONLY, 0)
+	    sz_val = 0
+	    out = mtopen (out_fname, WRITE_ONLY, sz_val)
 	}
 
 	# Initialize block and record sizes
 	# and allocate space for input and output buffers
-	sz_charsin = fstati (in, F_BUFSIZE)
+	sz_charsin = fstatl (in, F_BUFSIZE)
 	szb_inrecord = sz_charsin * SZB_CHAR
 	call malloc (inbuf, sz_charsin, TY_CHAR)
 
-	sz_charsout = fstati (out, F_BUFSIZE)
+	sz_charsout = fstatl (out, F_BUFSIZE)
 	szb_outrecord = sz_charsout * SZB_CHAR
 	call malloc (outbuf, sz_charsout, TY_CHAR)
 
@@ -52,7 +58,7 @@ begin
 	ip = 1
 	op = 1
 	offset = 1
-	sz_inblock = fstati (in, F_SZBBLK)
+	sz_inblock = fstatl (in, F_SZBBLK)
 
 	# Loop over the input blocks.
 	repeat {
@@ -63,8 +69,9 @@ begin
 		break
 
 	    bytes_read = nchars * SZB_CHAR
-	    if (mod (sz_inblock, SZB_CHAR) != 0)
-		bytes_read = bytes_read - mod (sz_inblock, SZB_CHAR)
+	    l_val = SZB_CHAR
+	    if (lmod (sz_inblock, l_val) != 0)
+		bytes_read = bytes_read - lmod (sz_inblock, l_val)
 
 	    repeat {
 

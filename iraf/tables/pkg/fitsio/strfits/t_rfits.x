@@ -26,18 +26,19 @@ char	cluster[SZ_FNAME], tmp[SZ_FNAME]
 char    root[SZ_FNAME], extn[SZ_EXTN], extn2[SZ_EXTN]
 
 pointer	list, outlist
-int	range[MAX_RANGES*2+1], len_inlist, len_outlist, file_number
-int	offset, stat, fits_record, junk
+long	range[MAX_RANGES*2+1], len_inlist, len_outlist, file_number, offset
+int	stat, fits_record, junk
+int	ipos, dn, save_gkey, save_xdim, save_old_name
+int	cl_index, cl_size, xdimtogf, ext_number, lendir
+char    str_type[SZ_STRTYPE]
 
 bool	clgetb()
-int	rft_get_image_type(), clgeti(), mtfile(), strlen(), btoi()
-int	rft_read_fitz(), decode_ranges(), get_next_number(), fntgfnb()
-int	fntlenb(), save_old_name, fnldir(), strcmp()
-int	ipos, dn, save_gkey, save_xdim, fnroot(), fnextn()
+int	rft_get_image_type(), mtfile(), strlen(), btoi()
+int	rft_read_fitz(), decode_ranges(), fntgfnb(), fntlenb()
+long	get_next_number(), clgetl()
+int	fnldir(), strcmp(), fnroot(), fnextn(), strldx(), ctoi()
 pointer	fntopnb()
 real	clgetr()
-char    str_type[SZ_STRTYPE]
-int	cl_index, cl_size, xdimtogf, ext_number, lendir, strldx(),ctoi()
 data	fits_record/2880/
 include	"rfits.com"
 
@@ -59,7 +60,7 @@ begin
 	xdimtogf = btoi (clgetb ("xdimtogf"))
 	old_name = btoi (clgetb ("oldirafname"))
 	force = btoi (clgetb ("force"))
-	offset = clgeti ("offset")
+	offset = clgetl ("offset")
 
 	len_record = fits_record
 	data_type = rft_get_image_type (str_type)
@@ -110,7 +111,7 @@ begin
 	    len_inlist = fntlenb (list)
 	    if (len_inlist > 0) {
 	        call sprintf  (file_list, SZ_LINE, "1-%d")
-		    call pargi (len_inlist)
+		    call pargl (len_inlist)
 	    } else
 	        call sprintf  (file_list, SZ_LINE, "0")
 	    if (short_header == YES) {
@@ -180,7 +181,7 @@ begin
 	        if (infile[strlen(infile)] != ']') {
 		    call sprintf (in_fname[strlen(in_fname)+1], SZ_FNAME,
 		        "[%d]")
-		        call pargi (file_number)
+		        call pargl (file_number)
 		}
 	    }
 
@@ -199,7 +200,7 @@ begin
 	       call strcpy (cluster, root, lendir)
 	       call strcat (tmp, root, SZ_FNAME)
 	       call sprintf (root[strlen(root)+1], SZ_FNAME, "%03d")
-		      call pargi (file_number + offset)
+		      call pargl (file_number + offset)
 	       call iki_mkfname (root, extn, out_fname, SZ_FNAME)
 	     
 	    } else if (len_outlist > 1) {
@@ -238,6 +239,7 @@ begin
 	if (list != NULL)
 	    call fntclsb (list) 
 end
+
 include <clset.h>
 # POST_HOST_ERRHANDLER -- Set an Onerror routine to be executed at task 
 # termination time. If an error has occurred in the calling task, the 
@@ -251,7 +253,8 @@ int clstati()
 begin
 	if (clstati(CL_PRTYPE) == PR_HOST)
 	call onerror(pevh)
-	end
+end
+
 procedure pevh(ic)
 int ic
 begin
@@ -267,8 +270,10 @@ define NTYPES 7
 int procedure rft_get_image_type (s)
 
 char	s[ARB]
+
 char    keyword[SZ_STRTYPE]
-int	type, strcmp()
+int	type
+int	strcmp()
 
 begin
 
@@ -280,6 +285,8 @@ begin
 	   type = TY_SHORT
 	else if (strcmp (keyword, "integer") == 0) 
 	   type = TY_INT
+	else if (strcmp (keyword, "long") == 0) 
+	   type = TY_LONG
 	else if (strcmp (keyword, "real") == 0) 
 	   type = TY_REAL
 	else if (strcmp (keyword, "double") == 0) 
@@ -292,18 +299,19 @@ begin
 	return(type)
 end
 
-procedure gparse (infile, cluster, root, extn,cl_size,cl_index)
-char 	infile[ARB], cluster[ARB],root[ARB],extn[ARB]
-int	cl_size,cl_index
+procedure gparse (infile, cluster, root, extn, cl_size, cl_index)
+char 	infile[ARB], cluster[ARB], root[ARB], extn[ARB]
+int	cl_size, cl_index
 
-pointer sp,pp
-int	junk, fnroot(), fnextn(), strlen()
-int	clus_len
+size_t	sz_val
+int	clus_len, junk
+pointer sp, pp
+int	fnroot(), fnextn(), strlen()
 
 begin
 	call smark(sp)
-	call salloc(pp, SZ_FNAME, TY_CHAR)
-
+	sz_val = SZ_FNAME
+	call salloc(pp, sz_val, TY_CHAR)
 
 	cl_size = -1
 	cl_index = -1
@@ -329,18 +337,20 @@ end
 
 procedure see_extn (extn, template, out_fname, cluster)
 
-char extn[ARB], template[ARB],out_fname[ARB],cluster[ARB]
+char extn[ARB], template[ARB], out_fname[ARB], cluster[ARB]
 
-int  strcmp(),strlen(),envfind()
+size_t	sz_val
+pointer sp, pp
+int  strcmp(), strlen(), envfind()
 
-pointer sp,pp
 string	noextn  "T_RFITS: Template filename must have extension"
 
 include "rfits.com"
 
 begin
 	call smark(sp)
-	call salloc(pp, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc(pp, sz_val, TY_CHAR)
 
 	if (extn[1] == EOS || strcmp(extn, "tab") == 0 ) {
 	   # No extension encountered. Get the user's 'imtype' value.

@@ -17,18 +17,20 @@ pointer	ext		# Extension data structure.
 pointer	tp 		# IRAF table descriptor.
 pointer	fits 		# FITS structure.
 
-int	i, rowlen, blksize, nch,  len
-long	nlines, il, ncols
-pointer	sp, bfp, tcp, ip, cp
-int	rec_count
+size_t	sz_val
+long	l_val0, l_val1
+int	j, ncols, i_val
+long	nlines, il, rec_count, nch, len, junk
+size_t	npix_record, blksize, rowlen
+pointer	sp, bfp, tcp, ip, cp, i
+bool	trl		# If true convert fits table with trailer file to
+			# ascii file
 
-int	rft_init_read_pixels(), rft_read_pixels()
-int	tbpsta(), npix_record, fstati()
+long	rft_init_read_pixels(), rft_read_pixels(), fstatl(), lmod()
+int	tbpsta()
 pointer	tbcnum()
 errchk	salloc, sfree, rft_init_read_pixels, rft_read_pixels, rft_scale_pix
 errchk	rft_change_pix, rft_put_image_line, rft_pix_limits, smark
-bool	trl		# If true convert fits table with trailer file to
-			# ascii file
 include	"rfits.com"
 
 begin
@@ -42,18 +44,24 @@ begin
 	call smark (sp)
 	if (!trl) {
 	   ncols  = tbpsta (tp, TBL_MAXCOLS)
-	   call salloc (cp, ncols, TY_POINTER)
-	   call salloc (bfp, rowlen, TY_CHAR)
-	   do i = 1, ncols {
-	      Memp[cp+i-1] = tbcnum (tp, i)
-	  }
-	} else
-	   call salloc (bfp, rowlen+1, TY_CHAR)    # to put EOL
+	   sz_val = ncols
+	   call salloc (cp, sz_val, TY_POINTER)
+	   sz_val = rowlen
+	   call salloc (bfp, sz_val, TY_CHAR)
+	   do j = 1, ncols {
+	      Memp[cp+j-1] = tbcnum (tp, j)
+	   }
+	} else {
+	   sz_val = rowlen+1
+	   call salloc (bfp, sz_val, TY_CHAR)    # to put EOL
+	}
 
 	npix_record = len_record * FITS_BYTE / EXT_BITPIX(ext)
-	i = rft_init_read_pixels (npix_record, EXT_BITPIX(ext), LSBF, TY_CHAR)
-	blksize = fstati (fits_fd, F_SZBBLK)
-	if (mod (blksize, 2880) == 0)
+	junk = rft_init_read_pixels (npix_record, EXT_BITPIX(ext), LSBF, TY_CHAR)
+	blksize = fstatl (fits_fd, F_SZBBLK)
+	l_val0 = blksize
+	l_val1 = 2880
+	if (lmod (l_val0, l_val1) == 0)
 	    blksize = blksize / 2880
 	else
 	    blksize = 1
@@ -78,7 +86,8 @@ begin
 
 	      Memc[i+1] = '\n'
 	      Memc[i+2] = EOS
-	      call putline (tp, Memc[bfp])
+	      i_val = tp
+	      call putline (i_val, Memc[bfp])
 	   }
 	} else if (FITS_XTEN(fits) == BINTABLE) { # Is a Binary table extension
 	   call ieesnanr (INDEFR)     # Enable ieee handling of NaN
@@ -88,8 +97,9 @@ begin
 	   call ieesmapd (YES, YES)
 
 	   byte_input = YES
-	   call salloc (tcp, BIN_MAXLEN(ext), TY_CHAR)
-	   call salloc (ip, BIN_MAXLEN(ext), TY_CHAR)
+	   sz_val = BIN_MAXLEN(ext)
+	   call salloc (tcp, sz_val, TY_CHAR)
+	   call salloc (ip, sz_val, TY_CHAR)
 	   if (BIN_DTYNSP(ext))  {
       call eprintf("\n Input file contains Non supported binary table data.\n")
       call eprintf("The data has more that on element per table element.\n")
@@ -115,8 +125,9 @@ begin
 	       if (nch != rowlen)
 		   call printf ("Error reading FITS data\n")
    
+	       l_val0 = rowlen
 	       call rft_put_table_row (tp, ext, Memp[cp], Memc[bfp],
-					rowlen,ncols, il)
+				       l_val0, ncols, il)
 	   }
 	}
 	call sfree (sp)

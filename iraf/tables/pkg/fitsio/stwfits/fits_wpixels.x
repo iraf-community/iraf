@@ -10,7 +10,7 @@ define BUF_LEN   32760
 
 procedure wft_init_write_pixels (npix_record, spp_type, obitpix)
 
-int	npix_record		# number of data pixels per record
+size_t	npix_record		# number of data pixels per record
 int	spp_type		# pixel data type
 int	obitpix			# output bits per pixel
 
@@ -18,14 +18,17 @@ int	obitpix			# output bits per pixel
 
 int	fd			# output file descriptor
 char	buffer[BUF_LEN]		# input buffer
-int	npix			# number of pixels in the input buffer
-int	nrecords		# number of FITS records written
+size_t	npix			# number of pixels in the input buffer
+size_t	nrecords		# number of FITS records written
 
 char	blank
-int	ty_mii, ty_spp, npix_rec, nch_rec, len_mii, sz_rec, nchars, n, nrec
+int	ty_mii, ty_spp
+size_t	npix_rec, nch_rec, len_mii, sz_rec, nchars, n, nrec
 pointer	spp, mii, ip, op
+short	s_val
 
-int	sizeof(), fstati()
+int	sizeof()
+long	fstatl()
 size_t	miipksize()
 errchk	malloc, mfree, write, miipak, amovc
 data	mii /NULL/, spp/NULL/
@@ -86,12 +89,12 @@ entry	wft_write_pixels (fd, buffer, npix)
 		   sz_rec = nch_rec
 		iferr (call write (fd, Memc[spp], sz_rec)) {
 		    call eprintf (" File incomplete: %d logical data")
-		         call pargi (nrec)
+		         call pargz (nrec)
 		    call eprintf (" (%d byte) records written\n")
-			 call pargi(sz_rec)
+			 call pargz (sz_rec)
 		    call error (19, "WRT_RECORD: Error writing data record.")
 		}
-		if (fstati (fd, F_NCHARS) != sz_rec) {
+		if (fstatl (fd, F_NCHARS) != sz_rec) {
 		    call flush (STDOUT)
 	    	    call error (17, "WRT_PIXELS: Error writing image record.")
 	        }
@@ -113,12 +116,12 @@ entry	wft_write_pixels (fd, buffer, npix)
 		call miipak (Memc[spp], Memc[mii], npix_rec, ty_spp, ty_mii)
 		iferr (call write (fd, Memc[mii], sz_rec)) {
 		   call eprintf (" File incomplete: %d logical data")
-		       call pargi (nrec)
+		       call pargz (nrec)
 	           call eprintf (" (%d byte) records written\n")
-		       call pargi(sz_rec)
+		       call pargz (sz_rec)
 		   call error (19, "WRT_RECORD: Error writing data record.")
 	        }
-		if (fstati (fd, F_NCHARS) != sz_rec) {
+		if (fstatl (fd, F_NCHARS) != sz_rec) {
 		    call flush (STDOUT)
 	    	    call error (17, "WRT_PIXELS: Error writing image record.")
 	        }
@@ -141,12 +144,15 @@ entry	wft_write_last_record (fd, nrecords)
 	    if (ieee == YES && ext_type == BINTABLE) {
 	        n = (n-1)/SZB_CHAR + 1
 		op = (op-1)/SZB_CHAR + 1
-	        call amovks (0, Memc[spp + op], n)
-            }else {
-	        if (ty_spp == TY_CHAR)
+		s_val = 0
+	        call amovks (s_val, Memc[spp + op], n)
+            } else {
+	        if (ty_spp == TY_CHAR) {
 		   call amovkc (blank, Memc[spp + op], n)
-	        else
-		   call amovks (0, Memc[spp + op], n)
+	        } else {
+		   s_val = 0
+		   call amovks (s_val, Memc[spp + op], n)
+		}
 	    }
 	    # Write last record.
 
@@ -159,12 +165,12 @@ entry	wft_write_last_record (fd, nrecords)
 		  sz_rec = nch_rec
 	       iferr (call write (fd, Memc[spp], sz_rec)) {
 		   call printf (" File incomplete: %d logical data")
-		       call pargi (nrec)
+		       call pargz (nrec)
 		   call printf (" (%d byte) records written\n")
-		       call pargi(sz_rec)
+		       call pargz (sz_rec)
 		       call error (19, "WRT_RECORD: Error writing last record.")
 	       }
-	       if (fstati (fd, F_NCHARS) != sz_rec) {
+	       if (fstatl (fd, F_NCHARS) != sz_rec) {
 		  call flush (STDOUT)
 		  call error (19,
 			"WRT_LAST_RECORD: Error writing last data record.")
@@ -173,12 +179,12 @@ entry	wft_write_last_record (fd, nrecords)
 	       call miipak (Memc[spp], Memc[mii], npix_rec, ty_spp, ty_mii)
 	       iferr (call write (fd, Memc[mii], sz_rec)) {
                    call printf (" File incomplete: %d logical data")
-		       call pargi (nrec)
+		       call pargz (nrec)
 		   call printf (" (%d byte) records written\n")
-		       call pargi (sz_rec)
+		       call pargz (sz_rec)
 		   call error (19, "WRT_RECORD: Error writing last record.")
 	       }
-	       if (fstati (fd, F_NCHARS) != sz_rec) {
+	       if (fstatl (fd, F_NCHARS) != sz_rec) {
 		   call flush (STDOUT)
 	           if (ty_spp == TY_CHAR)
 	               call error (18,

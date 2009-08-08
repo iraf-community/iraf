@@ -18,6 +18,7 @@ procedure wft_scale_par (im, fits)
 pointer	im		# pointer to the IRAF image
 pointer	fits		# pointer to the FITS structure
 
+real	aabs()
 int	sizeof(), wft_set_bitpix()
 errchk	wft_set_scale, wft_set_bitpix
 errchk	wft_fits_set_scale
@@ -59,7 +60,7 @@ ieee_
 	      call wft_get_tape_limits (FITS_BITPIX(fits), TAPEMIN(fits),
 	                                TAPEMAX(fits))
 	      call wft_data_limits (im, IRAFMIN(fits), IRAFMAX(fits))
-              if (abs(IRAFMIN(fits)) > INDEFR || abs(IRAFMAX(fits)) > INDEFR) {
+              if (aabs(IRAFMIN(fits)) > INDEFR || aabs(IRAFMAX(fits)) > INDEFR) {
 		call flush(STDOUT)
 		call eprintf("\n***** DATAMIN and DATAMAX are out of range,\n")
 		call eprintf("***** force IEEE standard for this file.\n")
@@ -104,27 +105,32 @@ int	data_bitpix	# the bits per pixel in the data
 begin
 	if (bitpix == ERR) {
 	    switch (datatype) {
-	    case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
-	        if (data_bitpix <= FITS_BYTE)
+	    case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
+	        if (data_bitpix <= FITS_BYTE) {
 		    return (FITS_BYTE)
-	        else if (data_bitpix <= FITS_SHORT)
+	        } else if (data_bitpix <= FITS_SHORT) {
 		    return (FITS_SHORT)
-	        else
+	        } else if (data_bitpix <= FITS_LONG) {
 		    return (FITS_LONG)
+	        } else {
+		    return (FITS_LONGLONG)
+		}
 	    case TY_REAL, TY_COMPLEX:
-		if (NDIGITS_RP <= BYTE_PREC)
+		if (NDIGITS_RP <= BYTE_PREC) {
 		    return (FITS_BYTE)
-		else if (NDIGITS_RP <= SHORT_PREC)
+		} else if (NDIGITS_RP <= SHORT_PREC) {
 		    return (FITS_SHORT)
-		else
+		} else {
 		    return (FITS_LONG)
+		}
 	    case TY_DOUBLE:
-		if (NDIGITS_DP <= BYTE_PREC)
+		if (NDIGITS_DP <= BYTE_PREC) {
 		    return (FITS_BYTE)
-		else if (NDIGITS_DP <= SHORT_PREC)
+		} else if (NDIGITS_DP <= SHORT_PREC) {
 		    return (FITS_SHORT)
-		else
+		} else {
 		    return (FITS_LONG)
+		}
 	    default:
 		call flush (STDOUT)
 		call error (2, "wft_set_bitpix: Unknown IRAF data type.")
@@ -237,6 +243,9 @@ begin
 	case FITS_LONG:
 	    maxtape = LONG_MAX #- 2.147d3
 	    mintape = LONG_MIN #+ 2.147d3
+	case FITS_LONGLONG:
+	    maxtape = LONGLONG_MAX
+	    mintape = LONGLONG_MIN
 	default:
 	    call flush (STDOUT)
 	    call error (4, "TAPE_LIMITS: Unknown FITS type.")
@@ -255,7 +264,7 @@ int	bitpix
 
 begin
 	switch (bitpix) {
-	case FITS_BYTE, FITS_SHORT, FITS_LONG:
+	case FITS_BYTE, FITS_SHORT, FITS_LONG, FITS_LONGLONG:
 	    return (bitpix)
 	default:
 	    return (ERR)
@@ -272,14 +281,20 @@ pointer	im		# image pointer
 real	irafmin		# minimum picture value
 real	irafmax		# maximum picture value
 
+size_t	sz_val
+long	l_val
 pointer	buf
-int	npix
+size_t	npix
 long	v[IM_MAXDIM]
 real	maxval, minval
-int	imgnlr(), compress, blklen, gn, ngroups, junk
-int	gi_gstfval(), force_minmax
+int	compress, blklen, gn, ngroups, force_minmax
+long	junk
 real	datamin, datamax
+long	imgnlr()
+int	gi_gstfval()
 errchk	imgnlr
+
+include	<nullptr.inc>
 
 include "wfits.com"
 
@@ -299,14 +314,18 @@ begin
 	       force_minmax == YES) {
 	      npix = NAXISN(im,1)
 
-	      call amovkl (long(1), v, IM_MAXDIM)
+	      l_val = 1
+	      sz_val = IM_MAXDIM
+	      call amovkl (l_val, v, sz_val)
 	      # Read the first line of the 1st group and
 	      # calculate (min,max).
 	      junk = imgnlr (im, buf, v)
 	      call alimr (Memr[buf], npix, irafmin, irafmax)
 	      do gn = 1, ngroups {
-	         call gi_opengr (im, gn, datamin, datamax, 0)
-	         call amovkl (long(1), v, IM_MAXDIM)
+	         call gi_opengr (im, gn, datamin, datamax, NULLPTR)
+	         l_val = 1
+	         sz_val = IM_MAXDIM
+	         call amovkl (l_val, v, sz_val)
 	         while (imgnlr (im, buf, v) != EOF) {
 	            call alimr (Memr[buf], npix, minval, maxval)
 	            irafmin = min (irafmin, minval)
@@ -317,14 +336,14 @@ begin
 	      irafmax = IM_MAX(im)
 	      irafmin = IM_MIN(im)
 	      do gn = 1, ngroups {
-	         call gi_opengr (im, gn, datamin, datamax, 0)
+	         call gi_opengr (im, gn, datamin, datamax, NULLPTR)
 	         irafmin = min (irafmin, datamin)
 	         irafmax = max (irafmax, datamax)
 	      }
            }
 	   #reset to group one
 	   gn = 1
-	   call gi_opengr (im, gn, datamin, datamax, 0)
+	   call gi_opengr (im, gn, datamin, datamax, NULLPTR)
 	} else {
 	   if (LIMTIME(im) < MTIME(im) && NAXIS(im) > 0
 	       || force_minmax == YES) {
@@ -333,7 +352,9 @@ begin
 	      irafmin = MAX_REAL
 	      npix = NAXISN(im,1)
 
-	      call amovkl (long(1), v, IM_MAXDIM)
+	      l_val = 1
+	      sz_val = IM_MAXDIM
+	      call amovkl (l_val, v, sz_val)
 	      while (imgnlr (im, buf, v) != EOF) {
 	         call alimr (Memr[buf], npix, minval, maxval)
 	         irafmin = min (irafmin, minval)

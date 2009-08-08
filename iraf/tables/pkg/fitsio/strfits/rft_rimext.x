@@ -14,8 +14,9 @@ char	template[SZ_FNAME]	# i: template filename
 pointer fits			# i: FITS descriptor
 
 pointer imt
-int	fd_usr, nread, open(), rft_read_header()
+int	fd_usr, nread
 char	cluster[SZ_FNAME]
+int	rft_read_header(), open()
 errchk rft_read_header, rft_opnim, close, rft_read_image
 
 include "rfits.com" 

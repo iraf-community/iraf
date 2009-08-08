@@ -16,12 +16,13 @@ pointer	ext			# Extension data structure
 pointer	tp			# IRAF table descriptor
 pointer fits			# descriptor holding fits file info
 
-int	i, stat
+size_t	sz_val, c_1
+long	i, rec_count
+int	ext_type, stat
 char	card[LEN_CARD+1]
 
-int	rft_init_read_pixels(), rft_read_pixels()
+long	rft_init_read_pixels(), rft_read_pixels()
 int	tab_decode_card(), strncmp(), strmatch()
-int	rec_count, ext_type
 
 errchk	rft_read_pixels
 errchk	stropen, close
@@ -29,9 +30,10 @@ errchk	stropen, close
 include "rfits.com"
 
 begin
+	c_1 = 1
+
 	card[LEN_CARD + 1] = '\n'
 	card[LEN_CARD + 2] = EOS
-	
 
 	# Initialization
 	BIN_MAXLEN(ext) = 0
@@ -46,7 +48,8 @@ begin
 	# Header is character data in FITS_BYTE form
 	i = rft_init_read_pixels (len_record, FITS_BYTE, LSBF, TY_CHAR)
 
-	i = rft_read_pixels (fits_fd, card, LEN_CARD, rec_count, 1)
+	sz_val = LEN_CARD
+	i = rft_read_pixels (fits_fd, card, sz_val, rec_count, c_1)
 
 	if (i == EOF) 		# At EOT
 	   return (EOF)
@@ -65,7 +68,8 @@ begin
 	ext_type = FITS_XTEN(fits)
 	# Loop until the END card is encountered
 	repeat {
-	    i = rft_read_pixels (fits_fd, card, LEN_CARD, rec_count, 1)
+	    sz_val = LEN_CARD
+	    i = rft_read_pixels (fits_fd, card, sz_val, rec_count, c_1)
 
 	    if (i == EOF) {	# At EOT
 		return (EOF)
@@ -100,11 +104,14 @@ pointer	tp		# IRAF table descriptor
 int	ext_type	# FITS XTENSION type
 char	card[LEN_CARD]	# FITS card
 
+size_t	sz_val
 pointer	ppar
-int	nchar, ival, upar, ioff, mtsize, tab_rkval(), tindex
+int	nchar, ival, upar, ioff, mtsize, tindex
 int	icc, j, k, tnaxis, npar
+long	lval
 
-int	strmatch(), ctoi(), ctol(), strncmp(), tbpsta(), chk_ascname()
+int	tab_rkval(), tbpsta(), chk_ascname()
+int	strmatch(), strncmp(), ctoi(), ctol()
 
 include	"rfits.com"
 data	upar /NO/
@@ -147,13 +154,13 @@ begin
 	} else if (strmatch (card, "^NAXIS") != 0) {
 	    k = strmatch (card, "^NAXIS")
 	    nchar = ctoi (card, k, j)
-	    if (j == 1 )
+	    if ( j == 1 )
 	       nchar = ctol (card, icc, EXT_ROWLEN(ext))
 	    else
 	       nchar = ctol (card, icc, EXT_NROWS(ext))
 	} else if (strmatch (card, "^PCOUNT  ") != 0) {
-	    nchar = ctoi (card, icc, ival)
-	    if (ival != 0) 
+	    nchar = ctol (card, icc, lval)
+	    if (lval != 0) 
 	call error (6, "FITS table header has PCOUNT not zero. (Not supported)")
 	} else if (strmatch (card, "^GCOUNT ") != 0) {
 	    nchar = ctoi (card, icc, ival)
@@ -168,24 +175,30 @@ begin
 	    } else {
 	       # The number of fields (or columns) in the table is the 
 	       # number of parameter for the new GEIS file.
-	       call gi_pstfval (im, "PCOUNT", ival)
-	       if (ival > 0)
+	       call gi_pstfvall (im, "PCOUNT", lval)
+	       if (lval > 0)
 		  # Realloc space needed for the stf descriptor
 		  call gi_realloc (im)
 	    }
 	    if (ival > 0) {
-	       call calloc (EXT_PBCOL(ext), ival, TY_INT)
-	       call calloc (EXT_PCW(ext), ival, TY_INT)
-	       call calloc (EXT_PZERO(ext), ival, TY_DOUBLE)
-	       call malloc (EXT_PSCAL(ext), ival, TY_DOUBLE)
-	       call amovkd (1.0d0, Memd[EXT_PSCAL(ext)], ival)
-	       call calloc (EXT_PNULL(ext), ival*(SZ_COLUNITS+1), TY_CHAR)
-	       call calloc (EXT_PTYPE(ext), ival*(SZ_COLNAME+1), TY_CHAR)
-	       call calloc (EXT_PDTYPE(ext), ival, TY_INT)
-	       call calloc (EXT_PDSIZE(ext), ival, TY_INT)
-	       call calloc (EXT_PUNIT(ext), ival*(SZ_COLUNITS+1), TY_CHAR)
-	       call calloc (EXT_PFORM(ext), ival*(SZ_COLFMT+1), TY_CHAR)
-	       call calloc (EXT_PDISP(ext), ival*(SZ_COLFMT+1), TY_CHAR)
+	       sz_val = ival
+	       call calloc (EXT_PBCOL(ext), sz_val, TY_LONG)
+	       call calloc (EXT_PCW(ext), sz_val, TY_LONG)
+	       call calloc (EXT_PZERO(ext), sz_val, TY_DOUBLE)
+	       call malloc (EXT_PSCAL(ext), sz_val, TY_DOUBLE)
+	       call amovkd (1.0d0, Memd[EXT_PSCAL(ext)], sz_val)
+	       sz_val = ival*(SZ_COLUNITS+1)
+	       call calloc (EXT_PNULL(ext), sz_val, TY_CHAR)
+	       sz_val = ival*(SZ_COLNAME+1)
+	       call calloc (EXT_PTYPE(ext), sz_val, TY_CHAR)
+	       sz_val = ival
+	       call calloc (EXT_PDTYPE(ext), sz_val, TY_INT)
+	       call calloc (EXT_PDSIZE(ext), sz_val, TY_LONG)
+	       sz_val = ival*(SZ_COLUNITS+1)
+	       call calloc (EXT_PUNIT(ext), sz_val, TY_CHAR)
+	       sz_val = ival*(SZ_COLFMT+1)
+	       call calloc (EXT_PFORM(ext), sz_val, TY_CHAR)
+	       call calloc (EXT_PDISP(ext), sz_val, TY_CHAR)
 	    }
 	} else if (strmatch (card, "^EXTNAME ") != 0) {
 	    # Do not overwrite if
@@ -218,18 +231,21 @@ begin
 	       if (ppar != NULL)
 		  call mfree (ppar, TY_CHAR)
 	       mtsize = (LEN_CARD+1)*MAX_UPARM
-	       call calloc (ppar, mtsize, TY_CHAR)
+	       sz_val = mtsize
+	       call calloc (ppar, sz_val, TY_CHAR)
 	       ioff = 0
 	       npar = 0
 	    }
 	    # Keep user parameters in a buffer until END
-	    call amovc (card, Memc[ppar+ioff], LEN_CARD)	# copy EOS also
+	    sz_val = LEN_CARD
+	    call amovc (card, Memc[ppar+ioff], sz_val)	# copy EOS also
 	    ioff = ioff + LEN_CARD + 1
 	    Memc[ppar+ioff-1] = EOS
 	    npar = npar + 1
 	    if (npar >= mtsize/(LEN_CARD+1)) {    # increase no. of cards by 10
-	       mtsize = mtsize + (LEN_CARD+1)*50
-	       call realloc(ppar, mtsize, TY_CHAR)
+		mtsize = mtsize + (LEN_CARD+1)*50
+		sz_val = mtsize
+		call realloc(ppar, sz_val, TY_CHAR)
 	    }
 	}
 	return (NO)
@@ -243,9 +259,11 @@ define	TNULL 5
 define	TZERO 6
 define	TSCAL 7
 define	TDISP 8
+
 # TAB_RKVAL -- Accumulate table column descriptors in memory.
 #
 int procedure tab_rkval (card, ext, ext_type)
+
 char 	card[LEN_CARD]
 pointer ext
 int	ext_type
@@ -253,8 +271,9 @@ int	ext_type
 char	key[5], ftnfmt[SZ_COLFMT], sppfmt[SZ_COLFMT]
 char	colfmt[SZ_COLFMT], colunits[SZ_COLUNITS]
 int	index, ip, icc, nchar, jc, col_dtype, width, junk, dlen
-int     nelem ,ctoi(),ctod(), strdic(), strncmp(), poff
-pointer pt, pp, pu, pd, pc, pb, pf, pz
+long	nelem
+pointer pt, pp, pu, pd, pc, pb, pf, pz, poff
+int	strdic(), strncmp(), ctoi(), ctol(), ctod()
 
 string	tbkeys "|TTYPE|TBCOL|TFORM|TUNIT|TNULL|TZERO|TSCAL|TDISP|"
 
@@ -281,7 +300,7 @@ begin
 
 	case TBCOL:
 	    nchar = ctoi (card, ip, jc)
-	    nchar = ctoi (card, icc, Memi[pb+jc-1])
+	    nchar = ctol (card, icc, Meml[pb+jc-1])
 	case TFORM:
 	    # This keyword value will give us the table column datatype,
 	    # the format and the size in chars of the value
@@ -294,7 +313,7 @@ begin
 	       call tbbaln (col_dtype, junk, dlen)
 	       # Get spp format.
 	       call tbbftp (ftnfmt, sppfmt)
-	       Memi[pc+jc-1] = width
+	       Meml[pc+jc-1] = width
 	       nelem = 1
 	    }else { # is BINTABLE
 	       # Use of the pointer (EXT_PBCOL) to indicate a BYTE datatype.
@@ -302,9 +321,9 @@ begin
 	       call tab_gbtyp (ftnfmt, col_dtype, nelem, ext)
 	       if (col_dtype == TY_UBYTE) {
 		  col_dtype = TY_SHORT 
-		  Memi[pb+jc-1] = BYTE2SHORT
+		  Meml[pb+jc-1] = BYTE2SHORT
 	       }
-	       Memi[pc+jc-1] = col_dtype
+	       Meml[pc+jc-1] = col_dtype
 	       # See if One element per char col.
 	       if (nelem < 0) nelem = 1	  
 	       # This call is not needed.
@@ -312,7 +331,7 @@ begin
 	       sppfmt[1] = EOS
 	    }
 	    Memi[pd+jc-1] = col_dtype
-	    Memi[pz+jc-1] = nelem
+	    Meml[pz+jc-1] = nelem
 	    call strcpy (sppfmt, Memc[pf+(jc-1)*SZ_COLFMT], SZ_COLFMT)
 	case TUNIT:
 	    pu = EXT_PUNIT(ext)
@@ -324,10 +343,10 @@ begin
 	       Memi[pd+jc-1] = TY_SHORT
 	    if (ext_type == TABLE && 
 		 strncmp ("LOGICAL-", colunits, 8) == 0) {
-	       Memi[pz+jc-1] = -Memi[pd+jc-1]
+	       Meml[pz+jc-1] = -Memi[pd+jc-1]
 	       colfmt[1] = '%'
 	       call sprintf(colfmt[2], SZ_COLFMT, "%db")
-		    call pargi(Memi[pz+jc-1])
+		    call pargl(Meml[pz+jc-1])
 	       Memi[pd+jc-1] = TY_BOOL
 	       call strcpy (colfmt, Memc[pf+(jc-1)*SZ_COLFMT], SZ_COLFMT)
 	       # Now get rid of the ""LOGICAL-" string.
@@ -361,11 +380,13 @@ end
 
 procedure tab_crtab (im, tp, ext, upar, ppar, npar, ext_type)
 pointer	im, tp, ext, ppar
-int	upar, npar, ext_type
+int	upar, npar, ext_type, i_val
 
-pointer pt, pd, ps, pu, pf, pk, pz,pp, pb, pdis
-int	ncols, tbpsta(), k, gi_gstfval() , junk
+pointer pt, pd, ps, pu, pf, pk, pz, pp, pb, pdis, junk
+int	ncols, k
+int	tbpsta(), gi_gstfval()
 include "rfits.com"
+
 begin
 	# Now define the columns or the gbp's.
 	if (gkey != TO_MG) {
@@ -388,27 +409,41 @@ begin
 		 case TY_SHORT:
 		    if (Memd[pk+k] == 1.0d0) {
 		       Memi[pd+k] = TY_INT
-#		       Memi[ps+k] = SZ_INT
-		       Memi[ps+k] = 1        # Per Phil's advice 10-13-95.
+#		       Meml[ps+k] = SZ_INT
+		       Meml[ps+k] = 1        # Per Phil's advice 10-13-95.
 		       call strcpy("%12d", Memc[pf+k*SZ_COLFMT], SZ_COLFMT)
 		       if (ext_type == BINTABLE)
-			  Memi[pb+k] = SHORT2INT
+			  Meml[pb+k] = SHORT2INT
 	            } else {
 		       Memi[pd+k] = TY_REAL
-#		       Memi[ps+k] = SZ_REAL
-		       Memi[ps+k] = 1        # Per Phil's advice 10-13-95.
+#		       Meml[ps+k] = SZ_REAL
+		       Meml[ps+k] = 1        # Per Phil's advice 10-13-95.
 		       call strcpy("%12.5g", Memc[pf+k*SZ_COLFMT], SZ_COLFMT)
 		       if (ext_type == BINTABLE)
-			  Memi[pb+k] = SHORT2REAL
+			  Meml[pb+k] = SHORT2REAL
 	            }
-	         case TY_INT,TY_LONG:
+	         case TY_INT:
 		    if (Memd[pk+k] != 1.0d0) {
 		       Memi[pd+k] = TY_REAL
-#		       Memi[ps+k] = SZ_REAL
-		       Memi[ps+k] = 1        # Per Phil's advice 10-13-95.
+#		       Meml[ps+k] = SZ_REAL
+		       Meml[ps+k] = 1        # Per Phil's advice 10-13-95.
 		       call strcpy("%12.5g", Memc[pf+k*SZ_COLFMT], SZ_COLFMT)
 		       if (ext_type == BINTABLE)
-			  Memi[pb+k] = INT2REAL
+			  Meml[pb+k] = INT2REAL
+	            }		
+	         case TY_LONG:
+		    if (Memd[pk+k] != 1.0d0) {
+		       Memi[pd+k] = TY_REAL
+#		       Meml[ps+k] = SZ_REAL
+		       Meml[ps+k] = 1        # Per Phil's advice 10-13-95.
+		       call strcpy("%12.5g", Memc[pf+k*SZ_COLFMT], SZ_COLFMT)
+		       if (ext_type == BINTABLE) {
+			  if ( SZ_LONG == 2 ) {
+			     Meml[pb+k] = INT2REAL
+			  } else {
+			     Meml[pb+k] = LONG2REAL
+			  }
+		       }
 	            }		
 	         } #end switch
 	      } #end if
@@ -433,14 +468,15 @@ begin
 		 pp = pdis
 	      call tbcdef (tp, junk, Memc[pt+k*SZ_COLNAME],
 		        Memc[pu+k*SZ_COLUNITS], 
-	               Memc[pp+k*SZ_COLFMT], Memi[pd+k], Memi[ps+k], 1)
+	               Memc[pp+k*SZ_COLFMT], Memi[pd+k], Meml[ps+k], 1)
            }
 
 	} else {
-	   do k = 0, ncols-1 {
-	      call gi_pdes (im, Memc[pt+k*SZ_COLNAME], Memi[pd+k], 
-				       Memi[ps+k], k+1)
-	   }
+	    do k = 0, ncols-1 {
+		call gi_pdes (im, Memc[pt+k*SZ_COLNAME], Memi[pd+k], i_val,
+			      k+1)
+		Meml[ps+k] = i_val
+	    }
 	}
 
 	if (gkey != TO_MG) {
@@ -460,6 +496,7 @@ begin
 	   }
 	}
 end
+
 include <lexnum.h>
 include <ctype.h>
 
@@ -473,13 +510,13 @@ int	npar			     # i: number of parameters read
 char	uparbuf[LEN_CARD, npar]      # i: buffer with user pars
 
 char	keyword[SZ_KEYWORD], sval[LEN_CARD], blkn
-int	i, k, sscan(), stat, strmatch(), j, stridx(), ltype
-int	strncmp()
+int	i, k, stat, j, ltype
+int	ival, iparn, ip, type, junk
 double  dval
 real    rval
-int	bval, ival, iparn, ip, junk, lexnum(), type
-bool    bstring
+bool    bval, bstring
 char 	comment[LEN_CARD]
+int	strncmp(), strmatch(), stridx(), sscan(), lexnum()
 
 begin
 	blkn = ' '
@@ -511,13 +548,13 @@ begin
 	       call tbhadt (tp, "COMMENT", sval)
 	   } else if (strncmp(uparbuf[10,i],
 		      "                    T ", 22) == 0 ) {
-	       bval = YES	
+	       bval = true	
 	       call tbhadb (tp, keyword, bval)
  	       #Add comment
  	       call tbhpcm (tp, keyword, comment)
 	   } else if (strncmp(uparbuf[10,i],
                       "                    F ", 22) == 0 ) {
-	       bval = NO
+	       bval = false
 	       call tbhadb (tp, keyword, bval)
  	       #Add comment
  	       call tbhpcm (tp, keyword, comment)
@@ -549,7 +586,7 @@ begin
 			   ip = ip + 1
 	            }
 		    ltype = TY_REAL
-	 	    if (stridx(ip, "dD") > 0)  
+	 	    if (stridx(sval[ip], "dD") > 0)  
 		       ltype = TY_DOUBLE
 		    if (j > 6 || ltype == TY_DOUBLE) {
 		       call gargd(dval)
@@ -584,17 +621,19 @@ procedure tab_gbtyp (ftnfmt, dtype, nelem, ext)
 
 char	ftnfmt[SZ_COLFMT]	# i: fortran format specification
 int	dtype		        # o: data type expressed as an int
-int	nelem			# 0: number of elements in a column
+long	nelem			# 0: number of elements in a column
 pointer ext
 #--
-int	ctoi(), nchar, len, ipos, strlen()
+long	nchar
+int	len, ipos
+int	ctol(), strlen()
 
 begin
 	call strlwr (ftnfmt)
 	len = strlen(ftnfmt)
 
 	ipos = 1
-	nchar = ctoi (ftnfmt, ipos, nelem)
+	nchar = ctol (ftnfmt, ipos, nelem)
         if (nelem == 0)
 	   nelem = 1
 
@@ -614,6 +653,12 @@ begin
 	} else if (ftnfmt[len] == 'j') {
 	    dtype = TY_INT
 	    nchar = nelem*SZ_INT*SZB_CHAR
+	} else if (ftnfmt[len] == 'k') {
+	    if ( SZ_LONG == 2 ) {
+		call error (0, "TAB_GBTYP: cannot handle 64-bit integer.")
+	    }
+	    dtype = TY_LONG
+	    nchar = nelem*SZ_LONG*SZB_CHAR
 	} else if (ftnfmt[len] == 'e') {
 	    dtype = TY_REAL
 	    nchar = nelem*SZ_REAL*SZB_CHAR
@@ -648,7 +693,8 @@ char	ftnfmt[SZ_COLFMT]	# i: fortran format specification
 int	dtype			# o: data type expressed as an int
 int	width			# 0: field width in character (TBFORM value)
 #--
-int	ctoi(), nchar, ipos
+int	nchar, ipos
+int	ctoi()
 
 begin
 	call strlwr (ftnfmt)
@@ -679,9 +725,13 @@ end
 #
 procedure get_string (instr, outstr, maxch)
 
-char instr[ARB], outstr[ARB]
+char	instr[ARB]
+char	outstr[ARB]
+int	maxch
 
-int ip,k, strlen(), nchar,maxch
+int	ip, k, nchar
+int	strlen()
+
 begin
 	       ip = 1
 	       while (instr[ip] == ' ')
@@ -709,7 +759,8 @@ procedure trimh (card)
 
 char card[LEN_CARD]
 
-int	i , strlen()
+int	i
+int	strlen()
 
 begin
 	for (i=strlen(card); 
@@ -720,9 +771,10 @@ begin
 	     card[i+1] = EOS
 	     
 end
+
 # GET_NULL_STRING -- Get null string with all the significant 
 #		     trailing blanks.
-procedure  get_null_string (card, str, maxchar)
+procedure get_null_string (card, str, maxchar)
 
 char    card[LEN_CARD]          # FITS card
 char    str[LEN_CARD]           # FITS string
@@ -748,12 +800,16 @@ begin
 end
 
 procedure get_val_comm (buf, sval, comment, bstring)
+
 char	buf[ARB]        # Input buffer
 char	sval[ARB]       # Output with keyword value
 char	comment[ARB]    # Output with comment
 bool	bstring		# True is 'sval' is a string.
 
-int     ip, stridx(), nch, ctowrd()
+int     ip, nch
+char	sl
+int	stridx(), ctowrd()
+
 begin
         bstring = false
         if (buf[1] == '=') {   # Is a regular keyword
@@ -764,7 +820,8 @@ begin
            if (buf[ip] == '\'')                         # Is a string
               bstring = true
            nch = ctowrd (buf, ip, sval, LEN_CARD)
-           nch = stridx("/", buf[ip+1])
+	   sl = '/'
+           nch = stridx(sl, buf[ip+1])
            if (nch > 0)
               call get_string (buf[ip+nch+1], comment, LEN_CARD)
         } else {

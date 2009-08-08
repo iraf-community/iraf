@@ -12,18 +12,22 @@ procedure tab_write_data (tp, ext, fits_fd)
 pointer	tp			# IRAF table descriptor
 pointer	ext			# Extension data structure
 int	fits_fd			# FITS file descriptor
+
+size_t	sz_val
 pointer bf, cf, sp
-int	i, ncols, rowlen, npix_record
-int	nrecords, nlines
+long	nlines, i
+int	ncols
+size_t	rowlen, npix_record, nrecords
 
 int	tbpsta()
+long	tbpstl()
 errchk	malloc, mfree, tab_get_data_line, wft_scale_line, wft_long_line
 errchk	wft_init_write_pixels, wft_write_pixels, wft_write_last_record
 
 include "wfits.com"
 
 begin
-	nlines = tbpsta (tp, TBL_NROWS)
+	nlines = tbpstl (tp, TBL_NROWS)
 	if (nlines == 0)
 	    return
 	
@@ -37,7 +41,8 @@ begin
 	rowlen = EXT_LENAXIS(ext,1)
 
 	call smark(sp)
-	call salloc (cf, maxlen, TY_CHAR)
+	sz_val = maxlen
+	call salloc (cf, sz_val, TY_CHAR)
 	call salloc (bf, rowlen, TY_CHAR)
 
 	npix_record = len_record * FITS_BYTE / EXT_BITPIX(ext)
@@ -59,7 +64,7 @@ begin
 	call wft_write_last_record (fits_fd, nrecords)
 	if (long_header == YES) {
 	    call printf ("%d  Data records(s) written\n")
-	        call pargi (nrecords)
+	        call pargz (nrecords)
 	}
 	call  sfree(sp)
 	
@@ -71,11 +76,11 @@ end
 procedure tab_get_data_line (tp, colptr, buf, cbuf, numcols, rownum)
 
 pointer tp			# Pointer to table descriptor
-int 	colptr[numcols]		# Array of pointers to column descriptors
+pointer	colptr[numcols]		# Array of pointers to column descriptors
 char	buf[ARB]		# pointer to table data line
 char	cbuf[ARB]		# pointer temporary char buffer
 int	numcols			# Number of columns from which to get values
-int	rownum			# Row number
+long	rownum			# Row number
 
 pointer colp
 bool	nullflag		# flag:  true ==> element is undefined
@@ -84,8 +89,11 @@ int	lenstring		# Length of each string in array buffer,
 char	sppfmt[SZ_COLFMT], forfmt[SZ_COLFMT]
 bool    bbuf
 pointer sp, pp, pb, sp2
-int	i, k, col, iof, inoff, outoff, nbytes, npcell
-int	datatype, tbcigi(), strlen(), nchar
+int	datatype, i, k, col, iof, nchar
+size_t	inoff, outoff, nbytes, npcell
+long	j
+int	tbcigi(), strlen()
+long	tbcigl()
 
 include "wfits.com"
 
@@ -99,7 +107,7 @@ begin
 	   datatype = tbcigi (colp, TBL_COL_DATATYPE)
 	   # Nelem_per_cell is the number of elements per cell (could be 
 	   # >1 in a binary table)
-	   npcell = tbcigi (colp, TBL_COL_LENDATA)
+	   npcell = tbcigl (colp, TBL_COL_LENDATA)
 	   call smark(sp)
 	   call salloc(pb, npcell, TY_BOOL)
 	   if (datatype < 0) {
@@ -121,7 +129,7 @@ begin
 	      call tbbftp (forfmt, sppfmt)
 	   }
 	   switch (datatype) {
-	   case (TY_SHORT):
+	   case TY_SHORT:
 	      call tbrgts (tp, colp, cbuf, Memb[pb], col, rownum)
 	      if (ext_type == BINTABLE) {
 		 call miipak (cbuf, cbuf, npcell, TY_SHORT, MII_SHORT)
@@ -134,10 +142,10 @@ begin
 	         call sprintf (buf[iof], lenstring, sppfmt)	    
 		     call pargs (cbuf)
 	      }
-	   case (TY_INT):
+	   case TY_INT:
 	      call tbrgti (tp, colp, cbuf, Memb[pb], col, rownum)
 	      if (ext_type == BINTABLE) {
-		 call miipak (cbuf, cbuf, npcell, TY_INT, MII_INT)
+		 call miipak (cbuf, cbuf, npcell, TY_INT, MII_LONG)
 		 inoff = 1       # first byte from input buffer to be move
 		 outoff = outoff + nbytes
 		 nbytes = npcell*SZ_INT*SZB_CHAR
@@ -147,7 +155,24 @@ begin
 	         call sprintf (buf[iof], lenstring, sppfmt)	    
 		     call pargi (cbuf)
 	      }
-	   case (TY_REAL):
+	   case TY_LONG:
+	      call tbrgtl (tp, colp, cbuf, Memb[pb], col, rownum)
+	      if (ext_type == BINTABLE) {
+		 if ( SZ_LONG == 2 ) {
+		    call miipak (cbuf, cbuf, npcell, TY_LONG, MII_LONG)
+		 } else {
+		    call miipak (cbuf, cbuf, npcell, TY_LONG, MII_LONGLONG)
+		 }
+		 inoff = 1       # first byte from input buffer to be move
+		 outoff = outoff + nbytes
+		 nbytes = npcell*SZ_LONG*SZB_CHAR
+		 call bytmov (cbuf, inoff, buf, outoff, nbytes)
+	      } else {
+		 nullflag = Memb[pb]
+	         call sprintf (buf[iof], lenstring, sppfmt)	    
+		     call pargl (cbuf)
+	      }
+	   case TY_REAL:
 	      call tbrgtr (tp, colp, cbuf, Memb[pb], col, rownum)
 	      if (ext_type == BINTABLE) {
 		 # Set the mapping from INDEFR to NaN.
@@ -162,7 +187,7 @@ begin
 	         call sprintf (buf[iof], lenstring, sppfmt)	    
 		   call pargr (cbuf)
 	      }
-	   case (TY_DOUBLE):
+	   case TY_DOUBLE:
 	      call tbrgtd (tp, colp, cbuf, Memb[pb], col, rownum)
 	      if (ext_type == BINTABLE) {
 		 # Set the mapping from INDEFD to NaN.
@@ -177,7 +202,7 @@ begin
 	         call sprintf (buf[iof], lenstring, sppfmt)	    
 		   call pargd (cbuf)
 	      }
-	   case (TY_CHAR):
+	   case TY_CHAR:
 	      if (ext_type == BINTABLE) {
 	         call tbrgtt (tp, colp, cbuf, Memb[pb], maxlen,
 			      col, rownum)
@@ -186,19 +211,19 @@ begin
 		 inoff = 1       # first byte from input buffer to be move
 		 outoff = outoff + nbytes
 		 nbytes = nchar
-		 call miipak (cbuf, cbuf, nchar, TY_CHAR, MII_BYTE)
+		 call miipak (cbuf, cbuf, nbytes, TY_CHAR, MII_BYTE)
 		 call bytmov (cbuf, inoff, buf, outoff, nbytes)
 	      }else
 	         call tbrgtt (tp, colp, buf[iof], nullflag, lenstring, 
 			      col, rownum)
-	   case (TY_BOOL):
+	   case TY_BOOL:
 	      if (ext_type == BINTABLE) {
 		 call smark(sp2)
 		 call salloc (pp, npcell, TY_BOOL)
 	         call tbrgtb (tp, colp, Memb[pp], Memb[pb], col, rownum)
-		 do k = 0, npcell-1
-		    if (Memb[pp+k]) cbuf[k+1] = 'T' 
-		    else cbuf[k+1] = 'F'
+		 do j = 0, npcell-1
+		    if (Memb[pp+j]) cbuf[j+1] = 'T' 
+		    else cbuf[j+1] = 'F'
 		 inoff = 1       # first byte from input buffer to be move
 		 outoff = outoff + nbytes
 		 nbytes = npcell
@@ -330,8 +355,9 @@ begin
 	    call strcpy (p_ftnfmt, ftnfmt, SZ_COLFMT)
 #	    ftnfmt[1] = 'I'				# change to I (1 or 0)
 	    ftnfmt[1] = 'A'		# july 1991 NZ	
-	} else if (p_ftnfmt[1] == 'I' && (datatype != TY_INT) &&
-					 (datatype != TY_SHORT)) { # Logical
+	} else if (p_ftnfmt[1] == 'I' && (datatype != TY_SHORT) &&
+					 (datatype != TY_INT) &&
+					 (datatype != TY_LONG)) { # Logical
 	    if (datatype == TY_DOUBLE) {
 	       ftnfmt[1] = 'F'
 	       w_num = 25

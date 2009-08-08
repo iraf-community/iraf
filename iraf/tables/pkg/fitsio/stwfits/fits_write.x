@@ -14,22 +14,26 @@ procedure wft_write_fitz (iraf_file, out_template, fits_file, fits_fd)
 char	iraf_file[SZ_FNAME]	# IRAF file name
 char	out_template[SZ_FNAME]	# FITS output template
 char	fits_file[SZ_FNAME]	# FITS file name
-
-int	chars_rec, dev_blk, nchars
-pointer	im, fits
-
-pointer	immap()
 int	fits_fd
+
+size_t	sz_val
+pointer	im, fits
+size_t	chars_rec
+long	dev_blk
+int	nchars, gcount, gn, tape, ip, junk
+long    fi[LEN_FINFO]
+char	root[SZ_FNAME], extn[SZ_EXTN], temp[SZ_FNAME], line[SZ_LINE]
 bool	gi_geis()
-int	mtfile(), mtopen(), open(), fnldir(), fstati()
+long	fstatl()
+int	gi_gstfval(), mtfile(), mtopen(), open(), fnldir()
+int	cl_index(), fnextn(), finfo(), itoc()
+pointer	immap()
 
 errchk	immap, imunmap, mtopen, close, smark, sfree, open
 errchk	delete, wft_write_header, wft_write_image, wft_data_limits
 errchk  wft_gi_opengr, wft_wgi_xdim 
-int	gcount, gn, gi_gstfval(), tape
-char	root[SZ_FNAME], extn[SZ_EXTN], temp[SZ_FNAME], line[SZ_LINE]
-int	cl_index(), fnextn(), ip, junk, finfo(), itoc()
-long    fi[LEN_FINFO]
+
+include	<nullptr.inc>
 
 define  err_ 99
 
@@ -42,7 +46,7 @@ begin
 	}
 
 	# Open input image.
-	im = immap (iraf_file, READ_ONLY, 0)
+	im = immap (iraf_file, READ_ONLY, NULLPTR)
 
 	# Do a preliminary input file validation
 	#
@@ -71,7 +75,8 @@ begin
 	   ext_type = NULL
 	
 	# Allocate memory for program data structure.
-	call calloc (fits, LEN_FITS, TY_STRUCT)
+	sz_val = LEN_FITS
+	call calloc (fits, sz_val, TY_STRUCT)
 
 	allgroups = NO
 	call imgcluster (iraf_file, IRAFNAME(fits), SZ_FNAME)
@@ -123,7 +128,7 @@ begin
 	    if (first_time == YES)
 	       fits_fd = mtopen (fits_file, WRITE_ONLY, chars_rec)
 
-	    dev_blk = fstati (fits_fd, F_MAXBUFSIZE)
+	    dev_blk = fstatl (fits_fd, F_MAXBUFSIZE)
 	    if (dev_blk != 0 && chars_rec > dev_blk) {
 		call flush (STDOUT)
 		call error (0, "Blocking factor too large for tape drive")
@@ -149,7 +154,7 @@ begin
         if (tape == NO) {
 	   call zfnbrk (fits_file, ip, junk)
 	   call strcpy (fits_file, root, junk-1)
-	   junk =  fnextn (fits_file, extn, SZ_FNAME)
+	   junk = fnextn (fits_file, extn, SZ_FNAME)
 	}
 
 	iferr {
@@ -167,7 +172,7 @@ begin
 		  } if (tape == YES && extensions == NO)
 	             junk = itoc (file_number, temp, SZ_FNAME)
 		  call wft_gi_opengr (im, gn, iraf_file, fits, 
-				    fits_file, fits_fd)
+				      fits_file, fits_fd)
 	          call wft_write_header (im, fits, fits_fd)
 	          if (short_header == YES) {
 	             call print_key (IRAFNAME(fits), temp, im, fits)
@@ -237,11 +242,12 @@ int procedure cl_index (imspec)
 
 
 char	imspec[ARB]		# full image specification
+
 int	gnum		# receives cluster index (default 0)
 int	cl_size			# receives cluster size (default 0)
-
 bool	is_ksection
 int	ip, op, lbrack, level, ch, n
+
 int	stridx()
 
 begin
@@ -327,9 +333,11 @@ procedure pesc_dash (name)
 
 char name[SZ_FNAME]
 
+size_t	sz_val
 pointer sp, pp
-int	i,j, np, stridx()
-char   dash , plus
+int	i, j, np
+char	dash, plus
+int	stridx()
 
 begin
 
@@ -341,7 +349,8 @@ begin
 
 	if (np != 0) {
 	   call smark(sp)
-	   call salloc(pp,SZ_FNAME,TY_CHAR)
+	   sz_val = SZ_FNAME
+	   call salloc (pp, sz_val, TY_CHAR)
 	   j = 0
 	   for (i=1; i<= SZ_FNAME ||name[i] == EOS; i=i+1) {
 
@@ -363,9 +372,11 @@ procedure cesc_dash (name)
 
 char name[SZ_FNAME]
 
+size_t	sz_val
 pointer sp, pp, np
-int	i,j, stridx()
-char   esc 
+int	i, j
+char	esc 
+int	stridx()
 
 begin
 
@@ -373,7 +384,8 @@ begin
 	np = stridx(esc, name)
  	if (np != 0) {
 	   call smark(sp)
-	   call salloc(pp,SZ_FNAME,TY_CHAR)
+	   sz_val = SZ_FNAME
+	   call salloc (pp, sz_val, TY_CHAR)
 	   j = 0
 	   for (i=1; i<= SZ_FNAME ||name[i] == EOS; i=i+1) {
 

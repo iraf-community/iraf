@@ -22,7 +22,7 @@ define	LIMTIME		IM_LIMTIME($1)
 define	MTIME		IM_MTIME($1)
 define	CTIME		IM_CTIME($1)
 
-define	LEN_BLANK	11	# Length of the blank string
+define	LEN_BLANK	20	# Length of the blank string
 define	LEN_STRING	8	# Minimum length of a FITS string
 define	LEN_DATE	10	# length of a date string
 
@@ -41,7 +41,7 @@ define  FITS_BITPIX     Memi[P2I($1+11)] # FITS bits per pixel
 define  DATA_BITPIX     Memi[P2I($1+12)] # Data bits per pixel
 define  SCALE           Memi[P2I($1+13)] # Scale data?
 define  FITS_NAXIS      Memi[P2I($1+14)] # Iraf number of axis
-define  EXT_POINTER     Memi[P2I($1+15)] # FITS extension pointer
+define  EXT_POINTER     Memp[$1+15]      # FITS extension pointer
 define  BLANK_STRING    Memc[P2C($1+19)] # String containing FITS blank value
 define  TYPE_STRING     Memc[P2C($1+31)] # String containing IRAF type
 define  IRAFNAME        Memc[P2C($1+41)] # IRAF file name
@@ -53,24 +53,24 @@ define	LEN_EXTENSION	(20+SZ_FNAME+1)
 
 define  EXT_BITPIX      Memi[P2I($1)]        # BITPIX value for extension
 define  EXT_NAXIS       Memi[P2I($1+1)]      # Dimensionality of extension
-define  EXT_LENAXIS     Memi[P2I($1+2)+$2-1] # Length of the axes
+define  EXT_LENAXIS     Meml[P2L($1+2)+$2-1] # Length of the axes
 define  EXT_TYPE        Memi[P2I($1+9)]      # Extension type
 define  EXT_DEFFMT      Memi[P2I($1+10)]     # For TABLES, use default fmt?
                                              # values are YES, NO
-define  EXT_LINE_MAXLEN Memi[P2I($1+11)]     # Maximun line length on FITS TABLE
-define  EXT_PCUNDEF     Memi[P2I($1+12)]     # Pointer to array of (true,false) for
+define  EXT_LINE_MAXLEN Meml[P2L($1+11)]     # Maximun line length on FITS TABLE
+define  EXT_PCUNDEF     Memp[$1+12]          # Pointer to array of (true,false) for
                                              # columns with undefined values
-define  EXT_PCOL        Memi[P2I($1+13)]     # Pointer the array of columns
+define  EXT_PCOL        Memp[$1+13]          # Pointer the array of columns
                                              # pointers for TABLES
 define  EXTVER          Memi[P2I($1+14)]     # External version of extension
 define  EXT_NCOLS       Memi[P2I($1+15)]     # Number of columns in table extension
-define  EXT_NROWS       Memi[P2I($1+16)]     # Number of rows in table extension
+define  EXT_NROWS       Meml[P2L($1+16)]     # Number of rows in table extension
 define  EXTNAME         Memc[P2C($1+17)]     # Name of file with Extension
 #	         Next location is 17+32
 
 define	COL_UNDEF	Memb[EXT_PCUNDEF($1)]	# (YES,NO) for undefined in
 						# columns
-define  COLPTR		Memi[EXT_PCOL($1)] # Pointer to table columns
+define  COLPTR		Memp[EXT_PCOL($1)]	# Pointer to table columns
 
 # Define extension types (ext_type)
 
@@ -86,18 +86,21 @@ define  TXT_FILE       	5
 define	FITS_BYTE	8		# Number of bits in a FITS byte
 define	FITS_SHORT	16		# Number of bits in a FITS short
 define	FITS_LONG	32		# NUmber of bits in a FITS long
+define	FITS_LONGLONG	64		# Number of bits in a FITS longlong
 
 # define FITS precision in decimal digits
 
 define	BYTE_PREC	3		# Precision of FITS byte
 define	SHORT_PREC	5		# Precision of FITS short
 define	LONG_PREC	10		# Precision of FITS long
+define	LONGLONG_PREC	19		# Precision of FITS longlong
 
 # define FITS blank values
 
 define	BYTE_BLANK	0.0d0			# Blank value for a FITS byte
 define	SHORT_BLANK	-3.2768d4		# Blank value for a FITS short
 define	LONG_BLANK	-2.147483648d9		# Blank value for a FITS long
+define	LONGLONG_BLANK	-9.223372036854775808d18
 
 # define FITS max and min values
 
@@ -107,6 +110,8 @@ define	SHORT_MAX	        3.2767d4	# Max value for a FITS short
 define	SHORT_MIN              -3.2767d4	# Min value for a FITS short
 define	LONG_MAX	   2.147483647d9	# Max value for a FITS long
 define	LONG_MIN	  -2.147483647d9	# Min value for a FITS long
+define	LONGLONG_MAX	   9.223372036854774784d18
+define	LONGLONG_MIN	  -9.223372036854774784d18
 
 # define the FITS card image parameters
 

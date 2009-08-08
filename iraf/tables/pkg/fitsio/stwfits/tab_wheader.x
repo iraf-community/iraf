@@ -16,11 +16,12 @@ char	fits_file[SZ_FNAME]
 pointer	ext		# pointer to the extension structure
 int	fits_fd		# the FITS file descriptor
 
+size_t	sz_val
 char	card[LEN_CARD+1], trim_card[LEN_CARD+1]
-int	nrecords, recntr, cardptr, cardcnt, stat, cards_per_rec
+size_t	nrecords
+int	recntr, cardptr, cardcnt, stat, cards_per_rec
 
-int	tab_card_encode(), strncmp()
-int	tab_init_card_encode()
+int	tab_init_card_encode(), tab_card_encode(), strncmp(), imod()
 
 errchk	tab_init_card_encode, tab_card_encode
 errchk	wft_init_write_pixels, wft_write_pixels, wft_write_last_record
@@ -56,7 +57,8 @@ begin
 	    if (stat == NO)
 		next
 
-	    call wft_write_pixels (fits_fd, card, LEN_CARD)
+	    sz_val = LEN_CARD
+	    call wft_write_pixels (fits_fd, card, sz_val)
 
 	    if (long_header == YES) {
 		call wft_trimstr (card, trim_card, LEN_CARD)
@@ -65,7 +67,7 @@ begin
 		    call pargi (cardptr)
 		    call pargstr (trim_card)
 
-	        if (mod (cardcnt, cards_per_rec) == 0) {
+	        if (imod (cardcnt, cards_per_rec) == 0) {
 	            recntr = recntr + 1
 	            cardptr = 1
 	        } else
@@ -79,7 +81,7 @@ begin
 	call wft_write_last_record (fits_fd, nrecords)
 	if (long_header == YES) {
 	   call printf ("%d Header  ")
-		call pargi (nrecords)
+		call pargz (nrecords)
 	}
 end
 
@@ -107,12 +109,14 @@ int	descno		# Index for column card used in tab_column_card
 int	ncount		# Counter for user parameter cards
 int	nstandard	# Number of standard cards in header
 
-int	rowlen, lenfmt, npar, nuserp, stat, ncols, i, ndesc
-int	datatype, num_tabdesc, nelem
+long	rowlen, lenfmt, nelem
+int	npar, nuserp, stat, ncols, i, ndesc
+int	datatype, num_tabdesc, i_val
 char	sppfmt[SZ_COLFMT], fntfmt[SZ_COLFMT]
 
 int	tab_standard_card(), tab_column_card(), tbpsta()
 int	wft_last_card(), tab_user_card(), tbcigi()
+long	tbcigl()
 pointer	tbcnum()
 errchk	tab_standard_card, tab_column_card, wft_last_card
 
@@ -140,26 +144,31 @@ begin
 	   colp = tbcnum (tp, i)
 	   call tbcigt (colp, TBL_COL_FMT, sppfmt, SZ_COLFMT)
 	   datatype = tbcigi (colp, TBL_COL_DATATYPE)
-	   nelem = tbcigi (colp, TBL_COL_LENDATA)
+	   nelem = tbcigl (colp, TBL_COL_LENDATA)
 
-	   call chgfmt (sppfmt, datatype, fntfmt, lenfmt)
+	   call chgfmt (sppfmt, datatype, fntfmt, i_val)
+	   lenfmt = i_val
 	   if (ext_type == BINTABLE) {
 	      switch(datatype) {
 	      case TY_BOOL:
 		 lenfmt = nelem 		# Boolean is 1 char long
 	      case TY_SHORT:
 		 lenfmt = nelem*SZ_SHORT*SZB_CHAR
-	      case TY_INT,TY_REAL,TY_LONG:
+	      case TY_INT:
 		 lenfmt = nelem*SZ_INT*SZB_CHAR
+	      case TY_LONG:
+		 lenfmt = nelem*SZ_LONG*SZB_CHAR
+	      case TY_REAL:
+		 lenfmt = nelem*SZ_REAL*SZB_CHAR
 	      case TY_DOUBLE:
 		 lenfmt = nelem*SZ_DOUBLE*SZB_CHAR
 	      default:
-	         lenfmt = abs(datatype)
+	         lenfmt = iabs(datatype)
 	      }
 	   }
 	   rowlen = rowlen + lenfmt
 	   maxlen = max (maxlen, lenfmt)
-	   Memi[cp+i-1] = colp
+	   Memp[cp+i-1] = colp
 	}
 	# For binary tables 'rowlen' is the number of bytes per row
 	# Make this is an even number so we can use TY_CHAR i/o.
@@ -207,44 +216,55 @@ char    fits_file[SZ_FNAME]
 int	fits_fd		# pointer to the fits structure
 char	card[LEN_CARD]	# FITS card image
 
+size_t	sz_val
 char	dname[SZ_FNAME]
 char	datestr[LEN_DATE]
-int	nrecords, wft_last_card(), stat
+size_t	nrecords
+int	stat
+int	wft_last_card()
 errchk	wft_encodeb, wft_encodec, wft_encodei, wft_encodel, wft_axis_encode
 include "wfits.com"
 
 begin
 	call wft_encodeb ("SIMPLE", YES, card, "FITS STANDARD")
-	call wft_write_pixels (fits_fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fits_fd, card, sz_val)
 	
 	call wft_encodei ("BITPIX", 8, card, "Character information")
-	call wft_write_pixels (fits_fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fits_fd, card, sz_val)
 
 	call wft_encodei ("NAXIS", 0, card, "No image data array present")
-	call wft_write_pixels (fits_fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fits_fd, card, sz_val)
 
 	call wft_encodeb ("EXTEND", YES, card,
 	    "There maybe standard extensions")
-	call wft_write_pixels (fits_fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fits_fd, card, sz_val)
 
 	call wft_encode_date (datestr, LEN_DATE)
 	call wft_encodec ("DATE" , datestr, card, 
 	    "Date tape was written")
-	call wft_write_pixels (fits_fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fits_fd, card, sz_val)
 
 	call wft_encodec ("ORIGIN", "STScI-STSDAS", card,
 		"Fitsio version 21-Feb-1996")
-	call wft_write_pixels (fits_fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fits_fd, card, sz_val)
 
 	call strcpy ("null_image", dname, SZ_FNAME)
 	call wft_encodec ("FILENAME", dname, card, 
 		"ZERO LENGTH DUMMY IMAGE")
-	call wft_write_pixels (fits_fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fits_fd, card, sz_val)
 
 	if (short_header == YES)
 	   call prtdumm_key (fits_file, datestr)
 	stat = wft_last_card (card)
-	call wft_write_pixels (fits_fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fits_fd, card, sz_val)
 	call wft_write_last_record (fits_fd, nrecords)
 end
 
@@ -256,11 +276,13 @@ pointer	tp		# i: pointer to table descriptor
 int	ncount		# i: current user parameter number
 char	card[SZ_PARREC] # o: FITS card with user parameter
 
+size_t	sz_val
 char	keyword[SZ_KEYWORD], str[SZ_PARREC], comment[SZ_PARREC]
-int	len_object, strlen(), ival, sscan(), stat, strmatch()
-int	dtype, ip, k
 char    out[SZ_PARREC]
-int	strsearch(), stridx(), eqindex, qoindex, strcmp(), strncmp()
+int	eqindex, qoindex, len_object, ival, stat, dtype, ip, k
+long	lval
+int	strlen(), sscan(), strmatch()
+int	strsearch(), stridx(), strcmp(), strncmp()
 
 include "wfits.com"
 begin
@@ -274,10 +296,12 @@ begin
 	       comment[ip] = comment[ip+2]
 	}
 	if (str[1] == EOS) {
-	    if (keyword[1] == EOS)
-	       call amovkc(" ",card, LEN_CARD)
-	    else
-	       call wft_ncencode (keyword, str, card)
+	    if (keyword[1] == EOS) {
+		sz_val = LEN_CARD
+		call amovkc(" ",card, sz_val)
+	    } else {
+		call wft_ncencode (keyword, str, card)
+	    }
 	    return(YES)
 	}
 	if (dtype == TY_CHAR) {
@@ -328,14 +352,18 @@ begin
 		 }
 	      }
 	   }
-	} else if (dtype == TY_INT ) {
+	} else if (dtype == TY_INT) {
 	   stat = sscan (str)
 		call gargi (ival)
-	   call wft_encodei (keyword, ival, card, comment)	   
+	   call wft_encodei (keyword, ival, card, comment)
+	} else if (dtype == TY_LONG) {
+	   stat = sscan (str)
+		call gargl (lval)
+	   call wft_encodel (keyword, lval, card, comment)
 	} else if (dtype == TY_BOOL) {
 	   stat = sscan (str)
 		call gargi (ival)
-	   call wft_encodeb (keyword, ival, card, comment)	   
+	   call wft_encodeb (keyword, ival, card, comment)
 	} else if (dtype == TY_DOUBLE || dtype == TY_REAL) {
 	   call get_string (str, out, SZ_PARREC)
 	   if (comment[1] == EOS) {
@@ -370,21 +398,23 @@ pointer colp, cp,up
 real	rval
 double  dval
 int	ival
+long	lval
 short   sval
 bool    bval, bnull
 char	chval[SZ_LINE]
 
-int	i, j, datatype, ir, nlines, ncols
-int	tbpsta(), tbcigi() 
+int	i, j, datatype, ncols
+long	ir, nlines
+int	tbpsta(), tbcigi()
+long	tbpstl()
 
 include "wfits.com"
 
 begin
-	nlines = tbpsta (tp, TBL_NROWS)
+	nlines = tbpstl (tp, TBL_NROWS)
 	ncols = tbpsta (tp, TBL_NCOLS)
 	if (nlines == 0)
 	    return
-
 
 	up = EXT_PCUNDEF(ext)
 	cp = EXT_PCOL(ext)
@@ -394,7 +424,7 @@ begin
         do ir = 1, nlines {
 
  	   do i = 0, ncols-1 {
-	      colp = Memi[cp+i]
+	      colp = Memp[cp+i]
               datatype = tbcigi (colp, TBL_COL_DATATYPE)
               switch (datatype) {
 	      case TY_REAL:
@@ -403,6 +433,8 @@ begin
 	        call tbrgtd (tp, colp, dval, bnull, 1, ir) 
 	      case TY_INT:
 	        call tbrgti (tp, colp, ival, bnull, 1, ir) 
+	      case TY_LONG:
+	        call tbrgtl (tp, colp, lval, bnull, 1, ir) 
 	      case TY_SHORT:
 	        call tbrgts (tp, colp, sval, bnull, 1, ir) 
 	      case TY_BOOL:
@@ -431,10 +463,10 @@ char	fits_file[SZ_FNAME]
 char    datestr[LEN_STRING]
 
 char	str[LEN_CARD]		# card data string
-int	nk,strlen(), nch, tape, mtfile()
+int	nk, nch, tape
 char    line[SZ_LINE]
  
-int	strmatch(), itoc()
+int	strmatch(), itoc(), strlen(), mtfile()
 include "wfits.com"
 include	"dfits.com"
  

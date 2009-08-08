@@ -15,23 +15,25 @@ char	fits_file[SZ_FNAME]
 pointer	fits		# fits memory descriptor
 int	fits_fd		# output fits file descriptor
 
-int	npix, i
-pointer	buf, ext
+size_t	sz_val
+pointer	buf, ext, tp, cp, tempbuf
+size_t	npix, nrecords, npix_record
 long	v[IM_MAXDIM]
+long	nlines, stat, j, l_val
+int	gn, ndim, ngroups, pcount, i
 real	datamax, datamin
-char	root[SZ_FNAME], extn[SZ_EXTN]
-
-pointer	tp, cp, tempbuf
-char	line[SZ_LINE], tname[SZ_FNAME]
-int	gn, ndim, nlines, stat, nrecords
-int	ngroups, pcount, npix_record
-int	wft_get_image_line(), gi_gstfval()
-int	strcmp()
 double  dbscale
+char	root[SZ_FNAME], extn[SZ_EXTN]
+char	line[SZ_LINE], tname[SZ_FNAME]
+
+int	gi_gstfval(), strcmp()
+long	wft_get_image_line()
 errchk  gi_opengr, wft_get_image_line, wft_ieee, giopn_table, wft_write_pixels
 errchk  gi_ggpv, tbeptt, wft_write_last_record, tab_write_header
 errchk  tab_write_data
 include "wfits.com"
+
+include	<nullptr.inc>
 
 data	tempbuf /NULL/
 
@@ -60,9 +62,11 @@ begin
 	    call mktemp ("tmp$gf", tname, SZ_FNAME)
 	    call strcat (".tab", tname, SZ_FNAME)
 
-	    call calloc (ext, LEN_EXTENSION, TY_STRUCT)
-	    call calloc (EXT_PCUNDEF(ext), pcount, TY_BOOL)
-	    call calloc (EXT_PCOL(ext), pcount, TY_INT)
+	    sz_val = LEN_EXTENSION
+	    call calloc (ext, sz_val, TY_STRUCT)
+	    sz_val = pcount
+	    call calloc (EXT_PCUNDEF(ext), sz_val, TY_BOOL)
+	    call calloc (EXT_PCOL(ext), sz_val, TY_POINTER)
 	    call giopn_table (tname, im, tp, COLPTR(ext))
 	}
 
@@ -75,24 +79,26 @@ begin
 					FITS_BITPIX(fits))
 
 	if (tempbuf != NULL)
-	    call mfree (tempbuf, TY_LONG)
+	    call mfree (tempbuf, TY_CHAR)
 	if (ieee == YES && PIXTYPE(im) == TY_DOUBLE)
-	    call malloc (tempbuf, 2*npix, TY_LONG)
+	    call malloc (tempbuf, SZ_DOUBLE * npix, TY_CHAR)
 	else
-	    call malloc (tempbuf, npix, TY_LONG)
+	    call malloc (tempbuf, SZ_LONG * npix, TY_CHAR)
 
 
 	# Loop through the groups
 	do gn = 1, ngroups {
 
-	    call amovkl (long(1), v, IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, v, sz_val)
 
-	    call gi_opengr (im, gn, datamin, datamax, 0)
+	    call gi_opengr (im, gn, datamin, datamax, NULLPTR)
 
-	    do i = 1, nlines {
+	    do j = 1, nlines {
 
 		# Get an image line.
-		stat =  wft_get_image_line (im, buf, v, PIXTYPE(im))
+		stat = wft_get_image_line (im, buf, v, PIXTYPE(im))
 		if (stat == EOF )
 		    return
 		if (stat != npix) {
@@ -106,16 +112,19 @@ begin
 		} else {
 		    if (SCALE(fits) == YES) {
 			dbscale = 1.0d0 / BSCALE(fits)
-			call wft_scale_line (buf, Meml[tempbuf], npix, 
+			# arg2: incompatible pointer
+			call wft_scale_line (buf, Memc[tempbuf], npix, 
 					     dbscale, -BZERO(fits), 
 					     PIXTYPE(im))
-		    } else
-			call wft_long_line (buf, Meml[tempbuf], npix, 
-					    PIXTYPE(im)) 
+		    } else {
+			# arg2: incompatible pointer
+			call wft_long_line (buf, Memc[tempbuf], npix, 
+					    PIXTYPE(im))
+		    }
 		}
 
 		# write the pixels
-		call wft_write_pixels (fits_fd, Meml[tempbuf], npix)
+		call wft_write_pixels (fits_fd, Memc[tempbuf], npix)
 	    }
 
 	    # Read gpb	
@@ -126,20 +135,21 @@ begin
 		# Get group parameter value in a string buffer
 		call gi_ggpv (im, i, line)
 		# write value to table
-		call tbeptt (tp, Memi[cp+i-1], gn, line)
+		l_val = gn
+		call tbeptt (tp, Memp[cp+i-1], l_val, line)
 	    }
 	    if (datamin < datamax)
 		IM_LIMTIME(im) = IM_MTIME(im) + 1
 	    else
 		IM_LIMTIME(im) = IM_MTIME(im) - 1
 	}
-	call mfree (tempbuf, TY_LONG)
+	call mfree (tempbuf, TY_CHAR)
 
 	# write the final record
 	call wft_write_last_record (fits_fd, nrecords)
 	if (long_header == YES) {
 	    call printf ("%d  Data records(s) written\n")
-	    call pargi (nrecords)
+	    call pargz (nrecords)
 	}
 
 	# Write now the temporary table
@@ -167,7 +177,7 @@ begin
 	    call tbtclo (tp)
 	    # Delete temporary table name
 	    call delete (tname)
-	    call mfree (EXT_PCOL(ext), TY_INT)
+	    call mfree (EXT_PCOL(ext), TY_POINTER)
 	    call mfree (EXT_PCUNDEF(ext), TY_BOOL)
 	    call mfree (ext, TY_STRUCT)
 	    ext_type = NULL
@@ -177,6 +187,7 @@ begin
 	# Reset extension flag. It was set to YES in wft_xdim_card
 	extensions = NO
 end
+
 include	<imhdr.h>
 include <fset.h>
 
@@ -188,29 +199,30 @@ procedure wft_gi_opengr (im, gn, iraf_file, fits, fits_file, fits_fd)
 
 pointer	im		# image descriptor
 int	gn		# group number to offset to.
-int	fits		# fits memory structure
 char	iraf_file[SZ_FNAME]	# Input filename
+pointer	fits		# fits memory structure
 char	fits_file[SZ_FNAME]	# Current output filename
 int	fits_fd		# output file pointer for the first file
 
+size_t	chars_rec
+int	ngroups, tape, len
+long	dev_blk
 real	datamax, datamin
-char	temp[SZ_FNAME]
-char	lb
+char	temp[SZ_FNAME], lb
 
-pointer	tempbuf
-int	ngroups, tape
-int	mtfile(), open(), mtopen(), fstati()
-int	chars_rec, dev_blk, len, stridx(), gi_gstfval()
+int	gi_gstfval(), mtfile(), open(), mtopen(), stridx()
+long	fstatl()
+
+include	<nullptr.inc>
 
 include "wfits.com"
 define	prt_ 99
-data	tempbuf /NULL/
 
 begin
 
 	ngroups = gi_gstfval (im, "GCOUNT")
 
-	call gi_opengr (im, gn, datamin, datamax, 0)
+	call gi_opengr (im, gn, datamin, datamax, NULLPTR)
 	
 	# Set the IMIO min/max fields.  If the GPB datamin >= datamax the
 	# values are invalidated by setting IM_LIMTIME to before the image
@@ -267,7 +279,7 @@ begin
 		call close (fits_fd)
 		fits_fd = mtopen (fits_file, WRITE_ONLY, chars_rec)
 	    }
-	    dev_blk = fstati (fits_fd, F_MAXBUFSIZE)
+	    dev_blk = fstatl (fits_fd, F_MAXBUFSIZE)
 	    if (dev_blk != 0 && chars_rec > dev_blk) {
 		call flush (STDOUT)
 		call error (0, "Blocking factor too large for tape drive")
@@ -293,6 +305,7 @@ prt_
 	if (long_header == YES)
 	    call printf ("\n")
 end
+
 include <tbset.h>
 include "dfits.h"
 
@@ -307,10 +320,11 @@ pointer tp
 char	irafname[ARB]
 
 char	str[LEN_CARD]		# card data string
-int	nk,strlen(), nch
 char    line[SZ_LINE]
+int	nk, nch
 
-int	strmatch(), tbpsta()
+int	strlen(), strmatch(), tbpsta()
+long	tbpstl()
 include "wfits.com"
 include	"dfits.com"
 
@@ -329,7 +343,7 @@ begin
 		str[1] = EOS
 		call sprintf (str, LEN_CARD, "%dCx%dR")
 		call pargi (tbpsta (tp, TBL_NCOLS))
-		call pargi (tbpsta (tp, TBL_NROWS))
+		call pargl (tbpstl (tp, TBL_NROWS))
 	    } else if (strmatch (Memc[key_table[nk]], "BITPIX") > 0) {
 		if (ext_type == BINTABLE)
 		    call strcpy ("8bin ", str, 4)

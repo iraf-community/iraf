@@ -43,6 +43,7 @@ define	FITS_DOUBLE	-64		# Number of bits in a FITS double * -1
 define	BYTE_PREC	 3		# Precision of FITS byte
 define	SHORT_PREC	 5		# Precision of FITS short
 define	LONG_PREC	10		# Precision of FITS long
+define	LONGLONG_PREC	19		# Precision of FITS longlong
 
 # Define the FITS blank data values
 

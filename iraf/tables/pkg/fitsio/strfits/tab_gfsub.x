@@ -17,12 +17,14 @@ pointer im		# Image descriptor
 int	gcount		# number of groups
 pointer	ext		# Extension data structure
 
-int	i, rowlen, blksize, nch, maxout
-int	gn, pcount, rec_count, npix_record
-pointer	sp, input, output
+long	l_val0, l_val1
+long	i, nch, rec_count
+size_t	rowlen, maxout, blksize, npix_record
+int	gn, pcount
+pointer	sp, inputp, output
 
-int	rft_init_read_pixels(), rft_read_pixels()
-int	fstati(), gi_gstfval()
+long	rft_init_read_pixels(), rft_read_pixels(), fstatl(), lmod()
+int	gi_gstfval()
 
 errchk	rft_init_read_pixels, rft_read_pixels, rgi_fix_nulls
 
@@ -35,21 +37,23 @@ begin
 	maxout = rowlen + SZ_LINE
 
 	call smark (sp)
-	call salloc (input, rowlen, TY_CHAR)
+	call salloc (inputp, rowlen, TY_CHAR)
 	call salloc (output, maxout, TY_CHAR)
 
 	# Put EOS at the end of input buffer
 	# Rft_read_pixels does not put one at rowlen
 
-	Memc[input+rowlen] = EOS
+	Memc[inputp+rowlen] = EOS
 
 	# Initialize variables used to read buffer
 
 	npix_record = len_record * FITS_BYTE / EXT_BITPIX(ext)
 	i = rft_init_read_pixels (npix_record, EXT_BITPIX(ext), LSBF, TY_CHAR)
 
-	blksize = fstati (fits_fd, F_SZBBLK)
-	if (mod (blksize, 2880) == 0)
+	blksize = fstatl (fits_fd, F_SZBBLK)
+	l_val0 = blksize
+	l_val1 = 2880
+	if (lmod (l_val0, l_val1) == 0)
 	    blksize = blksize / 2880
 	else
 	    blksize = 1
@@ -60,7 +64,7 @@ begin
 	do gn = 1, gcount {
 
 	    # Read in table row
-	    nch = rft_read_pixels (fits_fd, Memc[input], rowlen,
+	    nch = rft_read_pixels (fits_fd, Memc[inputp], rowlen,
 				   rec_count, blksize)
 
 	    if (nch != rowlen)
@@ -68,8 +72,8 @@ begin
 
 	    # Convert null values in row
 
-	    call rgi_fix_nulls (ext, Memc[input], pcount, 
-				    Memc[output], maxout)
+	    call rgi_fix_nulls (ext, Memc[inputp], pcount, 
+				Memc[output], maxout)
 
 	    # Write table row to group parameter block
 
@@ -82,18 +86,20 @@ end
 
 # RGI_FIX_NULLS -- Replace null values in the extension buffer
 
-procedure rgi_fix_nulls (ext, input, ncol, output, maxout)
+procedure rgi_fix_nulls (ext, inputb, ncol, output, maxout)
 
 pointer	ext		# i: extension data strc
-char	input[ARB]	# i: input buffer
+char	inputb[ARB]	# i: input buffer
 int	ncol		# i: number of columns in extension table
 char	output[ARB]	# o: output buffer with null values replaced
-int	maxout		# i: declared length of output buffer
+size_t	maxout		# i: declared length of output buffer
 #--
-int	icol, inoff, outoff, len
+long	outoff, len, inoff
+int	icol
 pointer	pc, pl, pn, pd, nullval
 
-int	strlen(), gstrcpy(), cmp_null()
+int	strlen(), cmp_null()
+long	rgi_gstrcpy()
 
 begin
 	# Get info from extension data structure
@@ -114,23 +120,23 @@ begin
 	    # Compare each buffer value to the value representing a null
 
 	    nullval = pn + icol * SZ_COLUNITS
-	    inoff = Memi[pc+icol]
-	    len = Memi[pl+icol]
+	    inoff = Meml[pc+icol]
+	    len = Meml[pl+icol]
 
 	    if (strlen (Memc[nullval]) == 0) {
 		# No null value, copy input to output
-		outoff = gstrcpy (input[inoff], output[outoff], len) +
+		outoff = rgi_gstrcpy (inputb[inoff], output[outoff], len) +
 			 outoff + 1
 
 	    } else {
-		if (cmp_null(input[inoff], Memc[nullval], len) == 0) {
+		if (cmp_null(inputb[inoff], Memc[nullval], len) == 0) {
 		    # Buffer value is not null, copy input to output
-		    outoff = gstrcpy (input[inoff], output[outoff], len) +
+		    outoff = rgi_gstrcpy (inputb[inoff], output[outoff], len) +
 			     outoff + 1
 
 		} else if (Memi[pd+icol] == TY_BOOL){
 		    # Null boolean, replace with false
-		    outoff = gstrcpy ("F", output[outoff], maxout-outoff) +
+		    outoff = rgi_gstrcpy ("F", output[outoff], maxout-outoff) +
 			     outoff + 1
 
 		} else if (Memi[pd+icol] == TY_CHAR) {
@@ -140,7 +146,7 @@ begin
 
 		} else {
 		    # Null number, replace with INDEF
-		    outoff = gstrcpy ("INDEF", output[outoff], maxout-outoff) +
+		    outoff = rgi_gstrcpy ("INDEF", output[outoff], maxout-outoff) +
 			     outoff + 1
 		}
 	    }
@@ -149,4 +155,22 @@ begin
 	if (outoff >= maxout)
 	    call error (1, "RGI_FIX_NULLS: GPB buffer overflow")
 
+end
+
+long procedure rgi_gstrcpy (s1, s2, maxch)
+
+char	s1[ARB], s2[ARB]
+long	maxch
+
+long	i
+
+begin
+	do i = 1, maxch {
+	    s2[i] = s1[i]
+	    if (s2[i] == EOS)
+		return (i - 1)
+	}
+
+	s2[maxch+1] = EOS
+	return (maxch)
 end

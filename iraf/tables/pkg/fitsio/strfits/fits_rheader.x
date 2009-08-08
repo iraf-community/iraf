@@ -14,10 +14,13 @@ int	fits_fd			# FITS file descriptor
 int	fd_usr			# Fits header spool file pointer
 pointer	fits			# FITS data structure
 
-int	i, stat, nread
+size_t	sz_val, c_1
+long	i
+int	stat, nread
 char	card[LEN_CARD+1]
 
-int	rft_decode_card(), rft_init_read_pixels(), rft_read_pixels(), strmatch()
+int	rft_decode_card(), strmatch()
+long	rft_init_read_pixels(), rft_read_pixels()
 
 errchk	rft_decode_card, rft_init_read_pixels, rft_read_pixels
 errchk	close
@@ -25,6 +28,8 @@ errchk	close
 include "rfits.com"
 
 begin
+	c_1 = 1
+
 	card[LEN_CARD + 1] = '\n'
 	card[LEN_CARD + 2] = EOS
 
@@ -54,7 +59,8 @@ begin
 	# Loop until the END card is encountered
 	nread = 0
 	repeat {
-	    i = rft_read_pixels (fits_fd, card, LEN_CARD, NRECORDS(fits), 1)
+	    sz_val = LEN_CARD
+	    i = rft_read_pixels (fits_fd, card, sz_val, NRECORDS(fits), c_1)
 	    if ((i == EOF) && (nread == 0)) {		# At EOT
 		call close(fd_usr)
 		return (EOF)
@@ -99,11 +105,11 @@ char	card[ARB]	# FITS card
 pointer pn
 char	cval, str[LEN_CARD], cdpat[SZ_LINE]
 double	dval
-int	nchar, icol, j, k, ndim
+int	nchar, icol, j, k, ndim, date, origin
 
 bool	rft_equald()
-int	strmatch(), ctoi(), ctol(), ctod(), cctoc(),strlen()
-int	patmake(), patmatch(), date, origin, check_index()
+int	strmatch(), ctoi(), ctol(), ctod(), cctoc(), strlen()
+int	patmake(), patmatch(), check_index()
 errchk	putline
 
 include	"rfits.com"
@@ -329,9 +335,12 @@ begin
 end
 
 int procedure check_index (ind, what)
+
 int	ind
 int	what
+
 char	line[LEN_CARD]
+
 begin
 
 	switch (what) {

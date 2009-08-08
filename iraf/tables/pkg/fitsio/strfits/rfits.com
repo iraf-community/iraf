@@ -1,7 +1,7 @@
 
 # FITS reader common. July 1991. Add binary support
 
-int	len_record		# Length of FITS records in bytes
+size_t	len_record		# Length of FITS records in bytes
 int	data_type		# Output data type
 real	blank			# Blank value
 

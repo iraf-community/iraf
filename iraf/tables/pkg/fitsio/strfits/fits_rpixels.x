@@ -23,28 +23,29 @@ define  BUF_LEN    32760
 # In this case the bytes are first swapped into most significant byte first
 # before the MII unpack routine is called.
 
-int procedure rft_init_read_pixels (npix_record, bitpix, lsbf, spp_type)
+long procedure rft_init_read_pixels (npix_record, bitpix, lsbf, spp_type)
 
-int	npix_record	# Number of pixels per input record
+size_t	npix_record	# Number of pixels per input record
 int	bitpix		# Bits per pixel (must correspond to an MII type)
 int	lsbf		# byte swap?
 int	spp_type	# SPP data type to be returned
 
 # entry rft_read_pixels (fd, buffer, npix)
-int	rft_read_pixels
-int	rft_ieee_read
+long	rft_read_pixels
+long	rft_ieee_read
 int	fd		# Input file descriptor
 pointer	buf
 char	buffer[BUF_LEN]	# Output buffer
-int	npix		# Number of pixels to read
+size_t	npix		# Number of pixels to read
 
-int	swap
-int	ty_mii, ty_spp, npix_rec, nch_rec, sz_rec, nchars, len_mii, recptr
-int	bufsize, i, n, ip, op, nd
+size_t	c_1
+int	swap, ty_mii, ty_spp
+long	recptr, i, l_val
+size_t	npix_rec, nch_rec, sz_rec, nchars, len_mii, bufsize, n, nd, op, ip
 pointer	mii, spp, bufrd
 
-long	read()
-int	sizeof(), nint_rec
+long	read(), lmod()
+int	sizeof()
 size_t	miipksize()
 errchk	mfree, malloc, read
 data	mii/NULL/, spp/NULL/, bufrd/NULL/
@@ -57,23 +58,25 @@ begin
 	npix_rec = npix_record
 	nch_rec = npix_rec * sizeof (ty_spp)
 
-	if (ty_spp == TY_CHAR || ty_spp == TY_LONG) {
-	   ty_mii = bitpix
-	   len_mii = miipksize (npix_rec, ty_mii)
-	   sz_rec = len_mii
-	   if (mii != NULL)
-	      call mfree (mii, TY_CHAR)
-	   call malloc (mii, len_mii, TY_CHAR)
-	   ip = nch_rec
-	} else { # is REAL or DOUBLE
-	   if (bufrd != NULL)
-	      call mfree (bufrd, TY_INT)
-	   nint_rec = npix_rec * sizeof (ty_spp) / SZ_INT
-	   call malloc (bufrd, nint_rec, TY_INT)
-	   ip = npix_rec
+	if (ty_spp == TY_REAL || ty_spp == TY_DOUBLE) {
+	    if (bufrd != NULL) {
+		call mfree (bufrd, TY_CHAR)
+	    }
+	    call malloc (bufrd, nch_rec, TY_CHAR)
+	    ip = npix_rec
+	} else { # is integer type
+	    ty_mii = bitpix
+	    len_mii = miipksize (npix_rec, ty_mii)
+	    sz_rec = len_mii
+	    if (mii != NULL) {
+		call mfree (mii, TY_CHAR)
+	    }
+	    call malloc (mii, len_mii, TY_CHAR)
+	    ip = nch_rec
 	}
-	if (spp != NULL)
+	if (spp != NULL) {
 	    call mfree (spp, TY_CHAR)
+	}
 	call malloc (spp, nch_rec, TY_CHAR)
 
 	return (OK)
@@ -85,43 +88,54 @@ entry	rft_read_pixels (fd, buffer, npix, recptr, bufsize)
 
 	repeat {
 	    # If data is exhausted read the next record
-	    if (ip == nch_rec) {
+	    if (ip == nch_rec) {	# is integer type
 		iferr (i = read (fd, Memc[mii], sz_rec)) {
-		       call fseti (fd, F_VALIDATE, bufsize * sz_rec)
-		       call printf ("Error reading record %d\n")
-		       if (mod (recptr + 1, bufsize) == 0)
-			   call pargi ((recptr + 1) / bufsize)
-		       else
-			   call pargi ((recptr + 1) / bufsize + 1)
-		       i = read (fd, Memc[mii], sz_rec)
+		    l_val = bufsize * sz_rec
+		    call fsetl (fd, F_VALIDATE, l_val)
+		    call printf ("Error reading record %d\n")
+		    l_val = bufsize
+		    if (lmod (recptr + 1, l_val) == 0) {
+			call pargl ((recptr + 1) / bufsize)
+		    } else {
+			call pargl ((recptr + 1) / bufsize + 1)
+		    }
+		    i = read (fd, Memc[mii], sz_rec)
 		}
-		if (i == EOF)
+		if (i == EOF) {
 		    return (EOF)
+		}
 
-		if (swap == YES)
-		   switch (ty_mii) {
-		   case MII_SHORT:
-		      call bswap2 (Memc[mii], 1, Memc[mii], 1,
-				sz_rec * SZB_CHAR)
-		   case MII_LONG:
-		      call bswap4 (Memc[mii], 1, Memc[mii], 1,
-				sz_rec * SZB_CHAR)
-		   }
+		if (swap == YES) {
+		    c_1 = 1
+		    switch (ty_mii) {
+		    case MII_SHORT:
+		        call bswap2 (Memc[mii], c_1, Memc[mii], c_1,
+				     sz_rec * SZB_CHAR)
+		    case MII_LONG:
+		        call bswap4 (Memc[mii], c_1, Memc[mii], c_1,
+				     sz_rec * SZB_CHAR)
+		    case MII_LONGLONG:
+		        call bswap8 (Memc[mii], c_1, Memc[mii], c_1,
+				     sz_rec * SZB_CHAR)
+		    }
+		}
 
-		if (byte_input == YES)
-		   call amovc (Memc[mii], Memc[spp], npix_rec)
-		else
-		  call miiupk (Memc[mii], Memc[spp], npix_rec, ty_mii, ty_spp)
+		if (byte_input == YES) {
+		    call amovc (Memc[mii], Memc[spp], npix_rec)
+		} else {
+		    call miiupk (Memc[mii], Memc[spp], npix_rec, ty_mii, ty_spp)
+		}
 
 		ip = 0
 		recptr = recptr + 1
 	    }
 
 	    n = min (nch_rec - ip, nchars - op)
-	    if (byte_input == YES)
-	       call bytmov (Memc[spp], ip+1, buffer, op+1, n)
-	    else
-	       call amovc (Memc[spp+ip], buffer[1+op], n)
+	    if (byte_input == YES) {
+		call bytmov (Memc[spp], ip+1, buffer, op+1, n)
+	    } else {
+		call amovc (Memc[spp+ip], buffer[1+op], n)
+	    }
 	    ip = ip + n
 	    op = op + n
 
@@ -135,31 +149,33 @@ entry	rft_ieee_read(fd, buf, npix, recptr, bufsize)
 
 	repeat {
 	    # If data is exhausted read the next record
-	    if (ip == npix_rec) {
-		iferr (i = read (fd, Meml[bufrd], nch_rec)) {
-		       call fseti (fd, F_VALIDATE, bufsize * nch_rec)
-		       call printf ("Error reading record %d\n")
-		       if (mod (recptr + 1, bufsize) == 0)
-			   call pargi ((recptr + 1) / bufsize)
-		       else
-			   call pargi ((recptr + 1) / bufsize + 1)
-		       i = read (fd, Meml[bufrd], nch_rec)
+	    if (ip == nch_rec) {	# is integer type
+		iferr (i = read (fd, Memc[bufrd], nch_rec)) {
+		    l_val = bufsize * nch_rec
+		    call fsetl (fd, F_VALIDATE, l_val)
+		    call printf ("Error reading record %d\n")
+		    l_val = bufsize
+		    if (lmod (recptr + 1, l_val) == 0) {
+			call pargl ((recptr + 1) / bufsize)
+		    } else {
+			call pargl ((recptr + 1) / bufsize + 1)
+		    }
+		    i = read (fd, Memc[bufrd], nch_rec)
 		}
 		ip = 0
 		nd = 0
 		recptr = recptr + 1
 	    }
 
- 	    n = min (npix_rec - ip, npix - op)
+	    n = min ((nch_rec - ip)/sizeof(ty_spp), npix - op)
 	    if (ty_spp == TY_REAL) {
-	       call ieevupkr (Meml[bufrd+ip], Memr[buf+op], n)	    
+		call ieevupkr (Memc[bufrd+ip], Memr[buf+op], n)
 	    } else {
-	       call ieevupkd (Meml[bufrd+nd], Memd[buf+op], n)
-	       # There are 2 Meml per Memd
-	       nd = nd + n * 2
+		call ieevupkd (Memc[bufrd+nd], Memd[buf+op], n)
+		nd = nd + n * sizeof (ty_spp)
 	    }
-	       ip = ip + n
-	       op = op + n
+	    ip = ip + n * sizeof (ty_spp)
+	    op = op + n
 
 	} until (op == npix)
 

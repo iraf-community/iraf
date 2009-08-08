@@ -28,6 +28,7 @@ define	FITS_DOUBLE    -64	# Bits in a FITS double * -1
 define	FITSB_PREC	 3	# Decimal digits of precision in a FITS byte
 define	FITSS_PREC	 5	# Decimal digits of precision in a FITS short
 define	FITSL_PREC	10	# Decimal digits of precision in a FITS long
+define	FITSLL_PREC	19	# Decimal digits of precision in a FITS longlong
 
 define	LSBF		NO	# Least significant byte first
 

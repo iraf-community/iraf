@@ -14,11 +14,15 @@ pointer	im			# IRAF image descriptor
 pointer	fits			# FITS data structure
 int	fits_fd			# FITS file descriptor
 
+size_t	sz_val
+long	l_val
 long	v[IM_MAXDIM]
 pointer	tempbuf, buf
-int	npix, nlines, npix_record, i, stat, nrecords
+size_t	npix, npix_record, nrecords
+long	nlines, stat, i
+int	j
 
-int	wft_get_image_line()
+long	wft_get_image_line()
 errchk	malloc, mfree, wft_get_image_line, wft_scale_line, wft_long_line
 errchk	wft_init_write_pixels, wft_write_pixels, wft_write_last_record
 
@@ -33,8 +37,8 @@ begin
 
 	npix = NAXISN(im,1)
 	nlines = 1
-	do i = 2, NAXIS(im)
-	    nlines = nlines * NAXISN(im, i)
+	do j = 2, NAXIS(im)
+	    nlines = nlines * NAXISN(im, j)
 
 	npix_record = len_record * FITS_BYTE / FITS_BITPIX(fits)
 	if (ieee == YES && PIXTYPE(im) == TY_DOUBLE)
@@ -43,13 +47,15 @@ begin
 	  call wft_init_write_pixels (npix_record, TY_LONG, FITS_BITPIX(fits))
 
 	if (tempbuf != NULL)
-	    call mfree (tempbuf, TY_LONG)
+	    call mfree (tempbuf, TY_CHAR)
 	if (ieee == YES && PIXTYPE(im) == TY_DOUBLE)
-	   call malloc (tempbuf, 2*npix, TY_LONG)
+	   call malloc (tempbuf, SZ_DOUBLE * npix, TY_CHAR)
 	else
-	   call malloc (tempbuf, npix, TY_LONG)
+	   call malloc (tempbuf, SZ_LONG * npix, TY_CHAR)
 
-	call amovkl (long(1), v, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v, sz_val)
 	do i = 1, nlines {
 
 	    # Get an image line.
@@ -67,24 +73,26 @@ begin
 	    } else {
 	       if (SCALE(fits) == YES) {
 		  dtemp = 1.0d0/ BSCALE(fits)
-
-	          call wft_scale_line (buf, Meml[tempbuf], npix,
-		        dtemp, -BZERO(fits), PIXTYPE(im))
-	       } else
-		 call wft_long_line (buf, Meml[tempbuf], npix, PIXTYPE(im)) 
+		  # arg2: incompatible pointer
+	          call wft_scale_line (buf, Memc[tempbuf], npix,
+				       dtemp, -BZERO(fits), PIXTYPE(im))
+	       } else {
+		  # arg2: incompatible pointer
+		  call wft_long_line (buf, Memc[tempbuf], npix, PIXTYPE(im)) 
+	       }
 	    }
 	    # not quite sure how to handle blanks at moment
-	    # call map_blanks (im, Meml[tempbuf], blank)
+	    # call map_blanks (im, Memc[tempbuf], blank)
 
 	    # write the pixels
-	    call wft_write_pixels (fits_fd, Meml[tempbuf], npix)
+	    call wft_write_pixels (fits_fd, Memc[tempbuf], npix)
 	}
 
 	# write the final record
 	call wft_write_last_record (fits_fd, nrecords)
 	if (long_header == YES) {
 	    call printf ("%d  Data records(s) written\n")
-	        call pargi (nrecords)
+	        call pargz (nrecords)
 	}
 
 end
@@ -92,15 +100,15 @@ end
 
 # WFT_GET_IMAGE_LINE -- Procedure to fetch the next image line.
 
-int procedure wft_get_image_line (im, buf, v, datatype)
+long procedure wft_get_image_line (im, buf, v, datatype)
 
 pointer	im			# IRAF image descriptor
 pointer	buf			# pointer to image line
 long	v[ARB]			# imio dimension indicator
 int	datatype		# IRAF image data type
 
-int	npix
-int	imgnll(), imgnlr(), imgnld()
+long	npix
+long	imgnll(), imgnlr(), imgnld()
 errchk	imgnll, imgnlr, imgnld, imgnlx
 
 begin
@@ -127,7 +135,7 @@ procedure wft_scale_line (buf, outbuffer, npix, bscale, bzero, datatype)
 
 pointer	buf			# pointer to IRAF image line
 long	outbuffer[ARB]		# FITS integer buffer
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero parameters
 int	datatype		# data type of image
 
@@ -136,7 +144,7 @@ errchk  altal, altar, altad
 
 begin
 	switch (datatype) {
-	case TY_SHORT, TY_INT, TY_LONG, TY_USHORT:
+	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
 	    call altal (Meml[buf], Meml[buf], npix, bzero, bscale)
 	    call achtll (Meml[buf], outbuffer, npix)
 	case TY_REAL, TY_COMPLEX:
@@ -157,10 +165,10 @@ procedure altarl (a, b, npix, k1, k2)
 
 real	a[ARB]		# input vector
 long	b[ARB]		# output vector
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	k1, k2		# scaling factors
 
-int	i
+long	i
 
 begin
 	do i = 1, npix
@@ -173,10 +181,10 @@ procedure altadr (a, b, npix, k1, k2)
 
 real	a[ARB]		# input vector
 real	b[ARB]		# output vector
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	k1, k2		# scaling factors
 
-int	i
+long	i
 
 begin
 	do i = 1, npix
@@ -191,7 +199,7 @@ procedure wft_long_line (buf, outbuffer, npix, datatype)
 
 pointer	buf			# pointer to IRAF image line
 long	outbuffer[ARB]		# buffer of FITS integers
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	datatype		# IRAF image datatype
 
 errchk	achtll, achtrl, achtdl, achtxl
@@ -213,7 +221,7 @@ procedure wft_ieee (buf, outbuf, npix, datatype)
 
 pointer buf		# pointer to IRAF image line
 pointer	outbuf		# pointer to ieee floating point data line
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 int	datatype	# Iraf image datatype
 
 begin
@@ -221,11 +229,11 @@ begin
 	# The flag ieee is reset to NO for this types.
 	switch (datatype) {
 	case TY_REAL:
-#	    call vx2sur (Memr[buf], Meml[outbuf], npix)
-	    call ieevpakr (Memr[buf], Meml[outbuf], npix)
+#	    call vx2sur (Memr[buf], Memc[outbuf], npix)
+	    call ieevpakr (Memr[buf], Memc[outbuf], npix)
 	case TY_DOUBLE:
-#	    call vx2sund (Memd[buf], Meml[outbuf], npix)
-	    call ieevpakd (Memd[buf], Meml[outbuf], npix)
+#	    call vx2sund (Memd[buf], Memc[outbuf], npix)
+	    call ieevpakd (Memd[buf], Memc[outbuf], npix)
 	default:
 	    call flush (STDOUT)
 	    call error (13, "WFT_IEEE: Datatype not supported for change.")

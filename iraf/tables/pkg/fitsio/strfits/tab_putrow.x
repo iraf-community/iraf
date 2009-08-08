@@ -1,3 +1,4 @@
+include <mach.h>
 include	<tbset.h>
 include <mii.h>
 include "rfits.h"
@@ -21,25 +22,28 @@ procedure rft_put_table_row (tp, ext, colptr, buf, rowlen, ncols, rownum)
 
 pointer tp
 pointer ext		# i: extension data structure
-int	colptr[ARB]     # i: column pointer descriptor
+long	colptr[ARB]     # i: column pointer descriptor
 char	buf[ARB]	# i: input string buffer
-int	rowlen		# i: number of chars in buffer
+long	rowlen		# i: number of chars in buffer
 int	ncols		# i: number of columns
-int	rownum		# i: actual row number
+long	rownum		# i: actual row number
 
-pointer	sp, pp,pz,ps,pc,pn,pl, pd
-int	j, nch, ctor(), tbcigi(), ival, ctoi(), ctod()
-int	biof, len, ip, cmp_null(), cn, cptr
+size_t	sz_val
+pointer	sp, pp, pz, ps, pc, pn, pl, pd, cptr
+int	nch, ip, cn, j, ival
+long	biof, len, lval
 real	rval
 double  dval
 
-include "rfits.com"
+int	cmp_null(), tbcigi(), ctor(), ctoi(), ctol(), ctod()
 
+include "rfits.com"
 
 begin
 	call smark (sp)
-	call salloc (pp, rowlen+1, TY_CHAR)
-	call amovkc( " ", Memc[pp], rowlen+1)
+	sz_val = rowlen+1
+	call salloc (pp, sz_val, TY_CHAR)
+	call amovkc( " ", Memc[pp], sz_val)
 
 	pz = EXT_PZERO(ext)
 	ps = EXT_PSCAL(ext)
@@ -50,8 +54,8 @@ begin
 	do cn = 0, ncols-1 {
 	   cptr = colptr[cn+1]
 	   # get position of first character and length of column
-	   biof = Memi[pc+cn]
-	   len = Memi[pl+cn]
+	   biof = Meml[pc+cn]
+	   len = Meml[pl+cn]
 	   if (Memc[pn+(cn)*SZ_COLUNITS] != EOS) {
 	      if (cmp_null (buf[biof], Memc[pn+(cn)*SZ_COLUNITS], len) != 0) {
 		 # if the input buffer has a null value just skip the column,
@@ -75,7 +79,7 @@ begin
 		 Memc[pp] = 'N'
 	      Memc[pp+1] = EOS
 	   } else {
-	      call strcpy (buf[biof], Memc[pp], len)
+	      call rft_strcpy (buf[biof], Memc[pp], len)
 	      # Strip trailing blanks
 	      do j = len-1,0,-1
 		 if (Memc[pp+j] != ' ') {
@@ -99,12 +103,24 @@ begin
 	               rval = rval*Memd[ps+cn] + Memd[pz+cn]
 	               call tbeptr (tp, cptr, rownum, rval)
 		    }
-		 case TY_INT,TY_LONG:
+		 case TY_INT:
 		    if (Memd[ps+cn] == 1.0d0) {
 	               ip = 1
 	               nch = ctoi (Memc[pp], ip, ival)
 	               ival = ival*Memd[ps+cn] + Memd[pz+cn]
 	               call tbepti (tp, cptr, rownum, ival)
+		    } else {
+	               ip = 1
+	               nch = ctor (Memc[pp], ip, rval)
+	               rval = rval*Memd[ps+cn] + Memd[pz+cn]
+	               call tbeptr (tp, cptr, rownum, rval)
+		    }
+		 case TY_LONG:
+		    if (Memd[ps+cn] == 1.0d0) {
+	               ip = 1
+	               nch = ctol (Memc[pp], ip, lval)
+	               lval = lval*Memd[ps+cn] + Memd[pz+cn]
+	               call tbeptl (tp, cptr, rownum, lval)
 		    } else {
 	               ip = 1
 	               nch = ctor (Memc[pp], ip, rval)
@@ -137,50 +153,103 @@ int procedure cmp_null (str, pattern, len)
 
 char	str[ARB]         # String of len characters (with no EOS)
 char    pattern[SZ_COLUNITS]
-int	len, ind, strcmp()
-int     pl, strlen(),k
+long	len
 
+size_t	sz_val
+int	ind
+long	pl, k
 pointer sp, st, pt
+int	rft_strcmp()
+long	rft_strlen()
+
 begin
 	call smark (sp)
-	call salloc (st, len+1, TY_CHAR)
-	call salloc (pt, len+1, TY_CHAR)
+	sz_val = len+1
+	call salloc (st, sz_val, TY_CHAR)
+	call salloc (pt, sz_val, TY_CHAR)
 
 	# string does not have EOS delimiter
-	call strcpy (str, Memc[st], len)
-	call strcpy (pattern, Memc[pt], len)
+	call rft_strcpy (str, Memc[st], len)
+	call rft_strcpy (pattern, Memc[pt], len)
 	# Extend the pattern to 'len' character by filling with
 	# blanks.
-	pl = strlen (pattern)
+	pl = rft_strlen (pattern)
 	if (pl < len) {
 	   do k = pl, len-1
 	      Memc[pt+k] = ' '
 	}
 	Memc[pt+len] = EOS
 	ind = 99
-	if (strcmp(Memc[st], Memc[pt]) != 0)
+	if (rft_strcmp(Memc[st], Memc[pt]) != 0)
 	   ind = 0
 	call sfree(sp)
 	return (ind)
 
 end
-include <mach.h>
+
+procedure rft_strcpy (s1, s2, maxch)
+
+char	s1[ARB]
+char	s2[ARB]
+long	maxch
+
+long	i
+
+begin
+	do i = 1, maxch {
+	    s2[i] = s1[i]
+	    if (s2[i] == EOS)
+		return
+	}
+
+	s2[maxch+1] = EOS
+end
+
+int procedure rft_strcmp (s1, s2)
+
+char	s1[ARB]                         # strings to be compared
+char	s2[ARB]                         # strings to be compared
+
+long	i
+
+begin
+	do i = 1, MAX_LONG
+	    if (s1[i] != s2[i])
+		return (s1[i] - s2[i])
+	    else if (s1[i] == EOS)
+		return (0)
+end
+
+long procedure rft_strlen (str)
+
+char	str[ARB]
+long	ip
+
+begin
+	do ip = 1, MAX_LONG
+	    if (str[ip] == EOS)
+		return (ip - 1)
+end
 
 procedure rft_p3d_table_row (tp, ext, colptr, inbbuf, wcbuf,
 				icbuf, ncols, rownum)
 
 pointer tp
 pointer ext
-int	colptr[ARB]     # i: column pointer descriptor
+pointer	colptr[ARB]     # i: column pointer descriptor
 char	inbbuf[ARB]	# i: input buffer with byte information alignment
 char    wcbuf[ARB]	# Char buffer with char alignment
 char    icbuf[ARB]	# Char buffer with possible int alignment
 int	ncols		# i: number of columns
-int	rownum		# i: actual row number
+long	rownum		# i: actual row number
 
-pointer spp, pb,pd, pc
-int	biof, inoff, outoff, nbytes, cptr, cn
-int	dtype, nelem, tbcigi(), k
+size_t	sz_val
+pointer spp, pb,pd, pc, cptr
+int	cn, i_val
+long	biof, nelem, k
+size_t	inoff, outoff, nbytes
+int	dtype
+long	tbcigl()
 
 include "rfits.com"
 
@@ -194,7 +263,7 @@ begin
 	do cn = 0, ncols-1 {
 	   cptr = colptr[cn+1]
 	   dtype = Memi[pd+cn]
-	   nelem = tbcigi (cptr, TBL_COL_LENDATA)
+	   nelem = tbcigl (cptr, TBL_COL_LENDATA)
 	   if (dtype < 0) {
 	      nelem = -dtype
 	      dtype = TY_CHAR
@@ -204,7 +273,7 @@ begin
 	       inoff =  inoff + nbytes
 	       outoff = 1
 	       # See if data comes from a BYTE FITS column.
-	       if (Memi[pc+cn] == BYTE2SHORT) {    # Yes, is byte.
+	       if (Meml[pc+cn] == BYTE2SHORT) {    # Yes, is byte.
 		  nbytes = nelem
 		  call bytmov (inbbuf, inoff, wcbuf, outoff, nbytes)
                   call miiupk (wcbuf, icbuf, nelem, MII_BYTE, TY_SHORT)
@@ -217,27 +286,35 @@ begin
 	   case TY_INT:
 	       inoff =  inoff + nbytes
 	       outoff = 1
-	       if (Memi[pc+cn] == SHORT2INT) {  # Is short --> int convertion.
+	       if (Meml[pc+cn] == SHORT2INT) {  # Is short --> int convertion.
 	          nbytes = nelem*SZ_SHORT*SZB_CHAR
 	          call bytmov (inbbuf, inoff, wcbuf, outoff, nbytes)
 	          call miiupk (wcbuf, icbuf, nelem, MII_SHORT, TY_INT)
 	       } else {
 	          nbytes = nelem*SZ_INT*SZB_CHAR
 	          call bytmov (inbbuf, inoff, wcbuf, outoff, nbytes)
-	          call miiupk (wcbuf, icbuf, nelem, MII_INT, TY_INT)
+	          call miiupk (wcbuf, icbuf, nelem, MII_LONG, TY_INT)
 	       }
 	       call scale_datai (ext, tp, cn+1, cptr, icbuf, nelem, rownum)
 	   case TY_REAL:
 	       inoff =  inoff + nbytes
 	       outoff = 1
-	       if (Memi[pc+cn] == SHORT2REAL) {
+	       if (Meml[pc+cn] == SHORT2REAL) {
 	          nbytes = nelem*SZ_SHORT*SZB_CHAR
 	          call bytmov (inbbuf, inoff, wcbuf, outoff, nbytes)
 	          call miiupk (wcbuf, icbuf, nelem, MII_SHORT, TY_REAL)
-	       } else if (Memi[pc+cn] == INT2REAL) {
+	       } else if (Meml[pc+cn] == INT2REAL) {
 	          nbytes = nelem*SZ_INT*SZB_CHAR
 	          call bytmov (inbbuf, inoff, wcbuf, outoff, nbytes)
-	          call miiupk (wcbuf, icbuf, nelem, MII_INT, TY_REAL)
+	          call miiupk (wcbuf, icbuf, nelem, MII_LONG, TY_REAL)
+	       } else if (Meml[pc+cn] == LONG2REAL) {
+	          nbytes = nelem*SZ_LONG*SZB_CHAR
+	          call bytmov (inbbuf, inoff, wcbuf, outoff, nbytes)
+		  if ( SZ_LONG == 2 ) {
+		    call miiupk (wcbuf, icbuf, nelem, MII_LONG, TY_REAL)
+		  } else {
+		    call miiupk (wcbuf, icbuf, nelem, MII_LONGLONG, TY_REAL)
+		  }
 	       } else {
 	          nbytes = nelem*SZ_REAL*SZB_CHAR
 	          call bytmov (inbbuf, inoff, wcbuf, outoff, nbytes)
@@ -257,7 +334,8 @@ begin
 		    break
 		  }
 	       wcbuf[k+1] = EOS
-	       call tbrptt (tp, cptr, wcbuf, nelem, 1, rownum)
+	       i_val = nelem
+	       call tbrptt (tp, cptr, wcbuf, i_val, 1, rownum)
 	   case TY_BOOL:
 	       # Boolean elements in 3d tables occupy 1 byte.
 	       inoff =  inoff + nbytes
@@ -266,7 +344,8 @@ begin
 	       call bytmov (inbbuf, inoff, wcbuf, outoff, nbytes)
 	       call miiupk (wcbuf, wcbuf, nelem, MII_BYTE, TY_CHAR)
 	       call smark(spp)
-	       call salloc(pb, nelem, TY_BOOL)
+	       sz_val = nelem
+	       call salloc(pb, sz_val, TY_BOOL)
 	       do k = 0, nelem-1
 		  Memb[pb+k] = (wcbuf[k+1] == 'T')
 	       call tbrptb (tp, cptr, Memb[pb], 1, rownum)
@@ -287,13 +366,18 @@ begin
 end
 
 procedure scale_datas (ext, tp, col, colptr, ibuf, nelem, rownum)
-pointer ext,tp
-int	col, colptr
-short	ibuf[ARB]
-int	nelem, rownum
 
-pointer ps,pz
+pointer ext
+pointer	tp
+int	col
+pointer	colptr
+short	ibuf[ARB]
+long	nelem
+long	rownum
+
+pointer ps, pz
 include "rfits.com"
+
 begin
 
 	pz = EXT_PZERO(ext)
@@ -311,18 +395,25 @@ begin
 end
 
 procedure scale_datai (ext, tp, col, colptr, icbuf, nelem, rownum)
-pointer ext, tp
-int	col, colptr
-char    icbuf[ARB]
-int	nelem, rownum
 
-pointer ps,pz, sp, rb
-int	k
+pointer ext
+pointer	tp
+int	col
+pointer	colptr
+char    icbuf[ARB]
+long	nelem
+long	rownum
+
+size_t	sz_val
+pointer ps, pz, sp, rb
+long	k
 pointer ibuf			# a copy of icbuf, but declared to be int
 include "rfits.com"
+
 begin
 	call smark(sp)
-	call salloc (ibuf, nelem, TY_INT)
+	sz_val = nelem
+	call salloc (ibuf, sz_val, TY_INT)
 	call cpy_xxi (icbuf, Memi[ibuf], nelem)
 
 	pz = EXT_PZERO(ext)
@@ -333,7 +424,8 @@ begin
            if (Memd[ps+col-1] != 1.0d0) {
 	      # Columns datatype has been converted to real only
 	      # if the TSCAL was different from 1.0. (see tab_rheader)
-	      call salloc(rb , nelem, TY_REAL)
+	      sz_val = nelem
+	      call salloc(rb, sz_val, TY_REAL)
 	      do k = 1, nelem
 	         Memr[rb+k-1] = Memi[ibuf+k-1]*Memd[ps+col-1] + Memd[pz+col-1]
 	      call tbrptr (tp, colptr, Memr[rb], 1, rownum)
@@ -349,19 +441,26 @@ begin
 end
 
 procedure scale_datar (ext, tp, col, colptr, icbuf, nelem, rownum)
-pointer ext, tp
-int	col, colptr
-char    icbuf[ARB]
-int	nelem, rownum
 
-pointer ps,pz
-int	k
+pointer ext
+pointer	tp
+int	col
+pointer	colptr
+char    icbuf[ARB]
+long	nelem
+long	rownum
+
+size_t	sz_val
+pointer ps, pz
+long	k
 pointer sp
 pointer rbuf			# a copy of icbuf, but declared to be real
 include "rfits.com"
+
 begin
 	call smark(sp)
-	call salloc (rbuf, nelem, TY_REAL)
+	sz_val = nelem
+	call salloc (rbuf, sz_val, TY_REAL)
 	call cpy_xxr (icbuf, Memr[rbuf], nelem)
 
 	pz = EXT_PZERO(ext)
@@ -377,18 +476,26 @@ begin
 end
 
 procedure scale_datad (ext, tp, col, colptr, icbuf, nelem, rownum)
-pointer ext,tp
-int	col,nelem, rownum, colptr
-char    icbuf[ARB]
 
+pointer ext
+pointer	tp
+int	col
+pointer	colptr
+char    icbuf[ARB]
+long	nelem
+long	rownum
+
+size_t	sz_val
 pointer ps,pz
-int	k
+long	k
 pointer sp
 pointer dbuf			# a copy of icbuf, but declared to be double
 include "rfits.com"
+
 begin
 	call smark(sp)
-	call salloc (dbuf, nelem, TY_DOUBLE)
+	sz_val = nelem
+	call salloc (dbuf, sz_val, TY_DOUBLE)
 	call cpy_xxd (icbuf, Memd[dbuf], nelem)
 
 	pz = EXT_PZERO(ext)
@@ -407,10 +514,10 @@ procedure cpy_xxi (input, output, nelem)
 
 char	input[ARB]
 int	output[ARB]
-int	nelem
+long	nelem
 #--
-int	i, j, k
-int	ratio
+long	i, j
+int	ratio, k
 char	cccbuf[SZ_INT/SZ_CHAR]
 int	iiibuf[1]
 equivalence (iiibuf[1], cccbuf[1])
@@ -431,10 +538,10 @@ procedure cpy_xxr (input, output, nelem)
 
 char	input[ARB]
 real	output[ARB]
-int	nelem
+long	nelem
 #--
-int	i, j, k
-int	ratio
+long	i, j
+int	ratio, k
 char	cccbuf[SZ_REAL/SZ_CHAR]
 real	rrrbuf[1]
 equivalence (rrrbuf[1], cccbuf[1])
@@ -455,10 +562,10 @@ procedure cpy_xxd (input, output, nelem)
 
 char	input[ARB]
 double	output[ARB]
-int	nelem
+long	nelem
 #--
-int	i, j, k
-int	ratio
+long	i, j
+int	ratio, k
 char	cccbuf[SZ_DOUBLE/SZ_CHAR]
 double	dddbuf[1]
 equivalence (dddbuf[1], cccbuf[1])

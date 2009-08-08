@@ -58,6 +58,7 @@ char	fname[ARB]	# i: file name to be checked
 char	list[ARB]	# i: list of extensions to check
 bool	infits		# i: look for extension inside fits filename?
 #--
+size_t	sz_val
 int	nc, ic, status
 pointer	sp, root, extn, match
 
@@ -66,9 +67,10 @@ int	fnextn(), strdic(), btoi()
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (extn, SZ_FNAME, TY_CHAR)
-	call salloc (match, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (extn, sz_val, TY_CHAR)
+	call salloc (match, sz_val, TY_CHAR)
 
 	# If the filename has a fits extension, the original extension
 	# may have been written as a suffix to the root separated

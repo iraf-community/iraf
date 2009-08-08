@@ -23,14 +23,15 @@ char	file_list[SZ_LINE]	# list of tape files
 char	format_file[SZ_FNAME]	# input file name with format information
 				# for one line output per fits file.
 char    log_file[SZ_FNAME]	# Name of output log file
-
+char	sjunk[1]
 pointer	list, fi
-int	lenlist, junk
-int	range[MAX_RANGES*2+1], nfiles, file_number, stat, fits_record
-int	fits_fd, ext_number
+int	lenlist, stat, fits_record, fits_fd, ext_number
+long	range[MAX_RANGES*2+1], nfiles, file_number, junk
+size_t	sz_val
 
 bool	clgetb()
-int	btoi(), decode_ranges(), get_next_number(), fntgfnb()
+long	get_next_number()
+int	btoi(), decode_ranges(), fntgfnb()
 int	fntlenb(), read_tape_only(), mtfile(), open(), mtopen()
 int	mtneedfileno(), get_ext_number()
 pointer	fntopnb()
@@ -88,11 +89,13 @@ begin
 	    call error (1, "T_RFITS: Illegal file number list")
 
 	# Allocate memory to handle the different type of outputs
-	  if (short_header == YES)
-	     call calloc (fi, LEN_SINFO+(MAX_TABLE*SZ_OBJECT)/SZ_STRUCT,
-			TY_STRUCT)
-	  else if (long_header == YES)
-	     call calloc (fi, LEN_SINFO, TY_STRUCT)
+	  if (short_header == YES) {
+	     sz_val = LEN_SINFO+(MAX_TABLE*SZ_OBJECT)/SZ_STRUCT
+	     call calloc (fi, sz_val, TY_STRUCT)
+	  } else if (long_header == YES) {
+	     sz_val = LEN_SINFO
+	     call calloc (fi, sz_val, TY_STRUCT)
+	  }
 	EXT_NUMBER(fi) = ext_number
 	# Read successive FITS files, convert and write into a numbered
 	# succession of output IRAF files.
@@ -109,12 +112,13 @@ begin
                 if (mtneedfileno (infile) == YES)
 		   call mtfname (infile, file_number, in_fname, SZ_FNAME)
 	        else{
-		   call mtparse (infile, junk,0,file_number,junk,junk,0)
+		   call mtparse (infile, sjunk,0,file_number,junk,sjunk,0)
 		   call strcpy (infile, in_fname, SZ_FNAME)
 		}
 	    }
 
-	    iferr (fits_fd = mtopen(in_fname, READ_ONLY, 0)) { 
+	    sz_val = 0
+	    iferr (fits_fd = mtopen(in_fname, READ_ONLY, sz_val)) { 
 		call eprintf("ERROR: cannot open input fits file: %s\n")
 		     call pargstr(in_fname)
 		break
@@ -139,9 +143,12 @@ begin
 end
 
 int procedure get_ext_number (infile)
+
 char infile[ARB]
-int	dn,ipos,junk,strlen(),ctoi(),strldx()
-int	ext_number 
+
+int	ext_number, dn, ipos, junk
+int	strlen(), ctoi(), strldx()
+
 begin
 	ext_number = -1
 	call trimh(infile)

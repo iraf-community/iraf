@@ -12,16 +12,20 @@ int	fits_fd		# FITS file descriptor
 pointer	fits		# FITS data structure
 pointer	im		# IRAF image descriptor
 
-int	i, npix, npix_record, blksize, gn
-long	v[IM_MAXDIM], nlines, il
-pointer	tempbuf, buf, ext
+long	l_val0, l_val1
+size_t	sz_val
+int	i, gn
+size_t	npix, npix_record, blksize
+long	v[IM_MAXDIM], nlines, il, j
+pointer	tempbuf, buf, ext, noop
 real	linemax, linemin, rmax, rmin, datamin, datamax
 
-long	clktime()
-int	gi_gstfval()
-int	fstati(), rft_init_read_pixels(), rft_read_pixels(), open()
-int	rft_ieee_read(), tab_read_header(), noop
+long	rft_init_read_pixels(), rft_read_pixels(), rft_ieee_read()
+long	clktime(), fstatl(), lmod()
+int	tab_read_header(), gi_gstfval(), open()
 data	tempbuf /NULL/
+
+include	<nullptr.inc>
 
 errchk	malloc, mfree, rft_init_read_pixels, rft_read_pixels, rft_scale_pix
 errchk	rft_change_pix, rft_put_image_line, rft_pix_limits, rft_ieee_read
@@ -47,14 +51,17 @@ begin
 	npix_record = len_record * FITS_BYTE / BITPIX(fits)
 	if (ieee == YES) {
 	   if (PIXTYPE(im) == TY_REAL)
-	     i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_REAL)
+	     j = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_REAL)
 	   else
-	     i=rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_DOUBLE)
-	} else
-	   i = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_LONG)
+	     j=rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_DOUBLE)
+	} else {
+	   j = rft_init_read_pixels (npix_record, BITPIX(fits), LSBF, TY_LONG)
+	}
 
-	blksize = fstati (fits_fd, F_SZBBLK)
-	if (mod (blksize, 2880) == 0)
+	blksize = fstatl (fits_fd, F_SZBBLK)
+	l_val0 = blksize
+	l_val1 = 2880
+	if (lmod (l_val0, l_val1) == 0)
 	    blksize = blksize / 2880
 	else
 	    blksize = 1
@@ -65,9 +72,9 @@ begin
 	# but not write in it until all the groups are in the pixel
 	# file. 
 	if (gkey == TO_MG) {
-	   call gi_pstfval (im, "GCOUNT", GCOUNT(fits))
+	   call gi_pstfvali (im, "GCOUNT", GCOUNT(fits))
 	   if (GCOUNT(fits) == 0) GCOUNT(fits) = 1
-	   call gi_pstfval (im, "PSIZE", OPSIZE(fits))
+	   call gi_pstfvali (im, "PSIZE", OPSIZE(fits))
 	   call gi_reset (im)
 	   # Reset the NAXIS(fits) value just for printing statistic on the
 	   # user terminal.
@@ -88,7 +95,9 @@ begin
         }
 
         do gn = 1, GCOUNT(fits) {
-	   call amovkl (long(1), v, IM_MAXDIM)
+	   l_val0 = 1
+	   sz_val = IM_MAXDIM
+	   call amovkl (l_val0, v, sz_val)
 
 	   do il = 1, nlines {
 	      # Write image line
@@ -100,6 +109,7 @@ begin
 				 blksize) != npix)
 	  	    call printf ("Error reading FITS data\n")
 	      } else {
+		 # arg2: incompatible pointer
 	         if (rft_read_pixels (fits_fd, Meml[tempbuf], npix,
 	                              NRECORDS(fits), blksize) != npix)
 	  	     call printf ("Error reading FITS data\n")
@@ -129,8 +139,8 @@ begin
            if (gn < GCOUNT(fits)) {
 	       # Tell stf not to write gpb values into the pixels
 	       # file since they are not available yet.
-	       call gi_pstfval (im, "PSIZE", 0)
-	       call gi_newgrp (im, gn+1, datamin, datamax, 0)
+	       call gi_pstfvali (im, "PSIZE", 0)
+	       call gi_newgrp (im, gn+1, datamin, datamax, NULLPTR)
            }
         }
         call imflush(im)
@@ -145,12 +155,14 @@ begin
 
 	   #Do not read a table if OPSIZE is zero (same as is PCOUNT =0)
 	   if (OPSIZE(fits) != 0) {
-	      call calloc (ext, LEN_EXTENSION, TY_STRUCT)
+	      sz_val = LEN_EXTENSION
+	      call calloc (ext, sz_val, TY_STRUCT)
+	      # ??? noop is not initialized ???
               if (tab_read_header (fits_fd, im, ext, noop, fits) == EOF)
 		  call error (2, "RFT_READ_IMAGE: EOF while reading gpb table")
               # Reset value of PSIZE to the real one since rgi_get_table_val
 	      # will use it to calculate the size of the gpb.
-	      call gi_pstfval (im,"PSIZE", OPSIZE(fits))
+	      call gi_pstfvali (im,"PSIZE", OPSIZE(fits))
               call rgi_read_tfits (fits_fd, im, GCOUNT(fits), ext)
 	      call ext_free(ext)
 	   }
@@ -162,7 +174,8 @@ begin
 	   call mfree (tempbuf, TY_LONG)
 	IRAFMAX(im) = rmax
 	IRAFMIN(im) = rmin
-	LIMTIME(im) = clktime(long(0))
+	l_val0 = 0
+	LIMTIME(im) = clktime(l_val0)
 end
 
 define	SZ_KEYWORD	8
@@ -189,12 +202,15 @@ begin
 		if (BITPIX(fits) == SZ_DOUBLE * SZB_CHAR * NBITS_BYTE)
 		    PIXTYPE(im) = TY_DOUBLE
 	    } else {
-	        if (BITPIX(fits) <= SZ_SHORT * SZB_CHAR * NBITS_BYTE)
+	        if (BITPIX(fits) <= SZ_SHORT * SZB_CHAR * NBITS_BYTE) {
 		    PIXTYPE(im) = TY_SHORT
-		else
+	        } else if (BITPIX(fits) <= SZ_INT * SZB_CHAR * NBITS_BYTE) {
+		    PIXTYPE(im) = TY_INT
+		} else {
 		    PIXTYPE(im) = TY_LONG
+		}
 		if (ieee == YES) {
-	           if (BITPIX(fits) <= SZ_LONG * SZB_CHAR * NBITS_BYTE)
+	           if (BITPIX(fits) <= SZ_INT * SZB_CHAR * NBITS_BYTE)
 		       PIXTYPE(im) = TY_REAL
 		   else
 		       PIXTYPE(im) = TY_DOUBLE
@@ -227,6 +243,8 @@ begin
 	    precision = FITSS_PREC
 	case FITS_LONG:
 	    precision = FITSL_PREC
+	case FITS_LONGLONG:
+	    precision = FITSLL_PREC
 	default:
 	    call error (16, "RFT_SET_PRECISION: Unknown FITS type")
 	}
@@ -240,18 +258,18 @@ procedure rft_map_blanks (a, buf, npts, pixtype, blank_value, blank, nbadpix)
 
 long	a[ARB]		# integer input buffer
 pointer	buf		# pointer to output image buffer
-int	npts		# number of points
+size_t	npts		# number of points
 int	pixtype		# image data type
 long	blank_value	# FITS blank value
 real	blank		# user blank value
 long	nbadpix		# number of bad pixels
 
-int	i
+long	i
 
 begin
 	# Do blank mapping here
 	switch (pixtype) {
-	case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
+	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
 	    do i = 1, npts {
 	        if (a[i] == blank_value) {
 		    nbadpix = nbadpix + 1
@@ -292,12 +310,12 @@ pointer	buf			# Pointer to output image line
 long	v[IM_MAXDIM]			# imio pointer
 int	data_type		# output pixel type
 
-int	impnll(), impnlr(), impnld(), impnlx()
+long	impnll(), impnlr(), impnld(), impnlx()
 errchk	impnll, impnlr, impnld, impnlx
 
 begin
 	switch (data_type) {
-	case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
+	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
 	    if (impnll (im, buf, v) == EOF)
 		call error (3, "RFT_PUT_IMAGE_LINE: Error writing FITS data")
 	case TY_REAL:
@@ -322,7 +340,7 @@ procedure rft_scale_pix (inbuf, outbuf, npix, bscale, bzero, data_type)
 
 long	inbuf[ARB]		# buffer of FITS integers
 pointer	outbuf			# pointer to output image line
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 double	bscale, bzero		# FITS bscale and bzero
 int	data_type		# IRAF image pixel type
 
@@ -354,10 +372,10 @@ procedure altmdr (a, b, npix, bscale, bzero)
 
 real	a[ARB]		# input array
 real	b[ARB]		# output array
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	bscale, bzero	# scaling parameters
 
-int	i
+long	i
 
 begin
 	do i = 1, npix
@@ -368,12 +386,12 @@ end
 
 procedure altmlr (a, b, npix, bscale, bzero)
 
-int	a[ARB]		# input array
+long	a[ARB]		# input array
 real	b[ARB]		# output array
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 double	bscale, bzero	# scaling parameters
 
-int	i
+long	i
 
 begin
 	do i = 1, npix
@@ -387,7 +405,7 @@ procedure rft_change_pix (inbuf, outbuf, npix, data_type)
 
 long	inbuf[ARB]		# array of FITS integers
 pointer	outbuf			# pointer to IRAF image line
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 int	data_type		# IRAF pixel type
 
 begin
@@ -412,7 +430,7 @@ end
 procedure rft_pix_limits (buf, npix, pixtype, linemin, linemax)
 
 pointer	buf				# pointer to IRAF image line
-int	npix				# number of pixels
+size_t	npix				# number of pixels
 int	pixtype				# output data type
 real	linemax, linemin		# min and max pixel values
 
@@ -423,7 +441,7 @@ complex	xmax, xmin
 
 begin
 	switch (pixtype) {
-	case TY_SHORT, TY_INT, TY_USHORT, TY_LONG:
+	case TY_SHORT, TY_USHORT, TY_INT, TY_LONG:
 	    call aliml (Meml[buf], npix, lmin, lmax)
 	    linemax = lmax
 	    linemin = lmin

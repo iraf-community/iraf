@@ -88,6 +88,7 @@ pointer	fits		# pointer to FITS structure
 int	optiono		# number of the option card
 char	card[ARB]	# FITS card image
 
+size_t	sz_val
 char	datestr[LEN_DATE], comment[LEN_CARD]
 int	gcount, stat, prec, len_object
 pointer rp, sp
@@ -153,7 +154,8 @@ begin
 		    # Create Object keyword for input IMH only.
 		    # This is called assume that OIF file index is 1.
 		    call smark(sp)
-		    call salloc(rp, SZ_PATHNAME, TY_CHAR)
+		    sz_val = SZ_PATHNAME
+		    call salloc(rp, sz_val, TY_CHAR)
 		    if (iki_access(IM_NAME(im), Memc[rp], comment,0) == 1) {
 			call wft_encodec ("OBJECT", OBJECT(im), card, "")
 		    }
@@ -233,9 +235,9 @@ pointer	im		# image descriptor
 int	xdimno  	# counter
 char	card[ARB]
 
-int	ndim
+int	ndim, stat, ic
 char	pname[SZ_PTYPE]
-int	gi_gstfval(), stat, ic
+int	gi_gstfval(), imod()
 
 include "wfits.com"
 
@@ -279,16 +281,16 @@ begin
 	    default:
 		if (ndim <= 2)
 		    return(NO) 
-		else if (mod(ic,2) == 0) {
+		else if (imod(ic,2) == 0) {
 		    call sprintf (pname, SZ_PTYPE, "CD%d_%d")
 		    call pargi (ic)
 		    call pargi (ndim)
-		    call wft_encodei (pname, 0.0, card, "")
-		} else if (mod(ic,2) == 1) {
+		    call wft_encoder (pname, 0.0, card, "", NDEC_REAL)
+		} else if (imod(ic,2) == 1) {
 		    call sprintf (pname, SZ_PTYPE, "CD%d_%d")
 		    call pargi (ndim)
 		    call pargi (ic-1)
-		    call wft_encodei (pname, 0.0, card, "")
+		    call wft_encoder (pname, 0.0, card, "", NDEC_REAL)
 		}
 		ic = ic + 1
 		if (ndim*2+1 == xdimno)
@@ -398,9 +400,12 @@ pointer	ext		# pointer to the extension structure
 char	card[ARB]	# FITS card image
 int	cardno		# number of FITS standard card
 
+int	ncols
+long	nrows
 int	tbpsta()
-int	nrows, ncols
+long	tbpstl()
 errchk	wft_encodeb, wft_encodei, wft_encodel, wft_axis_encode
+
 include "wfits.com"
 
 begin
@@ -422,7 +427,7 @@ begin
 	    call wft_encodel ("NAXIS1", EXT_LENAXIS(ext,1), card,
 			      "Number of characters per row")	
 	case FIFTH_CARD:
-	    nrows = tbpsta (tp, TBL_NROWS)	    
+	    nrows = tbpstl (tp, TBL_NROWS)	    
 	    call wft_encodel ("NAXIS2", nrows, card, "The number of rows")
 	case SIXTH_CARD:
 	    call wft_encodei ("PCOUNT", 0, card, "No 'random' parameters")
@@ -459,9 +464,11 @@ char	nullstr[SZ_LINE], keyword[LEN_KEYWORD]
 int	i
 char	colname[SZ_COLNAME], colunits[SZ_COLUNITS], colfmt[SZ_COLFMT]
 char	forfmt[SZ_COLFMT]
-int	type, lenfmt, coloff, nelem
+int	type, lenfmt, coloff
+long	nelem
 
 int	tbcigi()
+long	tbcigl()
 pointer	tbcnum()
 errchk	wft_encoded, wft_encodec, wft_encode_blank, wft_encoder, wft_encodei
 errchk	wft_encode_date, tcbnum, tbcinf
@@ -497,7 +504,7 @@ begin
 	    # change format H to F or G to E or D if any in colfmt.
 	    type = tbcigi (colp, TBL_COL_DATATYPE)
 	    if (ext_type == BINTABLE) {
-		nelem = tbcigi (colp, TBL_COL_LENDATA)
+		nelem = tbcigl (colp, TBL_COL_LENDATA)
 		call chgfmt_3d (colfmt, type, nelem, forfmt)
 	    } else
 		call chgfmt (colfmt, type, forfmt, lenfmt)
@@ -558,9 +565,11 @@ int	type		#i: column datatype
 int     colno           #i: column number
 char	card[ARB]	#o: FITS card
 
+size_t	sz_val
 char	keyword[LEN_STRING]
 char    buf[20]        
-int	top,num,temp
+int	top
+long	num, temp
 
 begin
 	# In binary tables, the TNULL keyword should only be added
@@ -572,8 +581,10 @@ begin
 	    # Convert the numeric value of INDEF to string; we cannot use
 	    # sprintf since it will be 'INDEFI'.
 
-	    call amovkc (" ", buf, 20)
-	    num = INDEFI
+	    sz_val = 20
+	    call amovkc (" ", buf, sz_val)
+	    num = INDEFL
+	    if (type == TY_INT) num = INDEFI
 	    if (type == TY_SHORT) num = INDEFS
 		if (num < 0) {
 		    num = -num
@@ -606,7 +617,7 @@ procedure chgfmt_3d (sppfmt, datatype, nelem, ftnfmt)
 
 char	sppfmt[ARB]		# i: Print format in SPP style
 int	datatype		# i: Column datatype
-int	nelem			# i: Number of elements per column
+long	nelem			# i: Number of elements per column
 char	ftnfmt[ARB]		# o: The corresponding Fortran format
 
 char	format_letter
@@ -619,20 +630,26 @@ begin
 	    format_letter = 'D'
 	case TY_BOOL:
 	    format_letter = 'L'
-	case TY_INT,TY_LONG:
+	case TY_INT:
 	    format_letter = 'J'
 	    #	   case TY_BITARR:
 	    #	       format_letter = 'X'
+	case TY_LONG:
+	    if ( SZ_LONG == 2 ) {
+		format_letter = 'J'
+	    } else {
+		format_letter = 'K'
+	    }
 	case TY_SHORT:
 	    format_letter = 'I'
 	default:
 	    # Datatype is  a negative quantity
 	    # indicating the number of character.
-	    nelem = abs(datatype)
+	    nelem = iabs(datatype)
 	    format_letter = 'A'
 	}
 	call sprintf(ftnfmt, SZ_COLFMT,"%d%c")
-	call pargi(nelem)
+	call pargl(nelem)
 	call pargc(format_letter)
 
 end
@@ -671,8 +688,7 @@ char	dot			# '.'
 int	w_num, d_num		# field width and num of decimals (as in w.d)
 int	nchar, ip		# for reading w and d using ctoi, and for itoc
 int	dot_loc			# location of "." in format
-int	stridx(), ctoi(), itoc()
-int    strncmp()
+int	stridx(), ctoi(), itoc(), strncmp()
 include "wfits.com"
 
 begin
@@ -682,7 +698,7 @@ begin
 	call tbbptf (sppfmt, p_ftnfmt)
 	if (strncmp(sppfmt, "%s", 2) ==0 ){
 	    ip = 2    # NZ March 9 1995
-	    nchar = itoc (abs(datatype), p_ftnfmt[ip], SZ_COLFMT-ip+1)
+	    nchar = itoc (iabs(datatype), p_ftnfmt[ip], SZ_COLFMT-ip+1)
 	}
 	if (p_ftnfmt[2] == '-') {			# get rid of it
 		do ip = 3, SZ_COLFMT
@@ -722,9 +738,17 @@ begin
 		ftnfmt[1] = 'D'
 		w_num = 25
 		d_num = 17
-	    case TY_INT,TY_LONG:
+	    case TY_INT:
 		ftnfmt[1] = 'I'
 		w_num = 12
+		d_num = -1
+	    case TY_LONG:
+		ftnfmt[1] = 'I'
+		if ( SZ_LONG == 2 ) {
+		    w_num = 12
+		} else {
+		    w_num = 20
+		}
 		d_num = -1
 	    case TY_SHORT:
 		ftnfmt[1] = 'I'
@@ -735,8 +759,8 @@ begin
 		ftnfmt[1] = 'A'
 		d_num = -1
 		if (datatype < 0) {
-		    nchar = itoc (abs(datatype), ftnfmt[ip], SZ_COLFMT-ip+1)
-		    lenfmt = abs(datatype) + 1 
+		    nchar = itoc (iabs(datatype), ftnfmt[ip], SZ_COLFMT-ip+1)
+		    lenfmt = iabs(datatype) + 1 
 		    return
 		}
 	    }
@@ -778,7 +802,7 @@ begin
 		if (datatype == TY_DOUBLE)
 		    ftnfmt[1] = 'D'
 	    } else if (p_ftnfmt[1] == 'I' && (datatype != TY_INT) &&
-		       (datatype != TY_SHORT)) {
+		       (datatype != TY_LONG) && (datatype != TY_SHORT)) {
 		if (datatype == TY_DOUBLE) {
 		    ftnfmt[1] = 'D'
 		    w_num = 25
@@ -913,8 +937,11 @@ procedure wft_blank_card (card)
 
 char	card[ARB]	# FITS card image
 
+size_t	sz_val
+
 begin
-	call amovkc (" ", card, LEN_CARD)
+	sz_val = LEN_CARD
+	call amovkc (" ", card, sz_val)
 	card[LEN_CARD+1] = EOS
 end
 

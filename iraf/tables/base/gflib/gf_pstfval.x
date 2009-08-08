@@ -25,7 +25,7 @@ begin
 
 	if (type == GEIS_FMT) {
 	    # Call geis function if this is a geis file
-	    call gi_pstfval (im, keyword, value)
+	    call gi_pstfvali (im, keyword, value)
 	    return
 	}
 

@@ -9,16 +9,19 @@ define	LEN_TRLLINE	132
 #	       ascii file with around 132 character per line. It will
 #	       write a fits table with 132 character per row.
 
-procedure txt_wfits (tp, fits_file, ext, fits_fd)
+procedure txt_wfits (tfd, fits_file, ext, fits_fd)
 
-pointer	tp			# pointer to the IRAF image
+int	tfd			# pointer to the IRAF image
 char    fits_file[SZ_FNAME]	# FITS filename
 pointer	ext			# pointer to the extension structure
 int	fits_fd			# the FITS file descriptor
 
+size_t	sz_val
 char	newline, blank
 char	card[LEN_CARD+1], line[SZ_LINE]
-int	nlines, stat, nrecords, nch, nblanks, ind, lenp1
+long	nlines, nrecords, l_val
+size_t	nblanks
+int	stat, nch, ind, lenp1
 
 data	newline, blank  / '\n', ' ' /
 
@@ -36,7 +39,7 @@ begin
 	# Count the number of lines in the input file and
 	# look if there are lines with more than 132 chars.
 	nlines = 0
-	nch = getline (tp, line) 
+	nch = getline (tfd, line) 
 
         lenp1 = LEN_TRLLINE + 1
 	repeat {
@@ -48,7 +51,7 @@ begin
 		call erract(EA_WARN)
 		return
 	    }
-            nch = getline (tp, line)
+            nch = getline (tfd, line)
 	} until (nch == EOF)
 
 	# Write fit table header		
@@ -66,9 +69,9 @@ begin
 	call txt_wcardi (fits_fd,"BITPIX", EXT_BITPIX(ext), 
 			 "8-bits per 'pixels'")
 	call txt_wcardi (fits_fd,"NAXIS", 2, "Simple 2-D matrix")
-	call txt_wcardi (fits_fd,"NAXIS1",EXT_LENAXIS(ext,1),
+	call txt_wcardl (fits_fd,"NAXIS1",EXT_LENAXIS(ext,1),
 			 "No of characters per row")	
-	call txt_wcardi (fits_fd,"NAXIS2", nlines, "The number of rows")
+	call txt_wcardl (fits_fd,"NAXIS2", nlines, "The number of rows")
 	call txt_wcardi (fits_fd,"PCOUNT", 0, "No 'random' parameters")
 	call txt_wcardi (fits_fd,"GCOUNT", 1, "Only one group")
 	call txt_wcardi (fits_fd,"TFIELDS", 1, "Number of fields per row")
@@ -85,20 +88,22 @@ begin
 	call txt_wcardi (fits_fd,"TBCOL1", 1, "Starting column number")
 	call txt_wcardc (fits_fd,"TFORM1", "A132", "Format")
 	stat = wft_last_card(card)
-	call wft_write_pixels (fits_fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fits_fd, card, sz_val)
 
 
 	# Write last header records.
 	call wft_write_last_record (fits_fd, nrecords)
 	if (long_header == YES) {
 	    call printf ("%d Header  ")
-	    call pargi (nrecords)
+	    call pargl (nrecords)
 	}
 
 	# Now write the data
-	call seek (tp, BOFL)
+	l_val = BOFL
+	call seek (tfd, l_val)
 
-	nch = getline (tp, line)
+	nch = getline (tfd, line)
 	repeat {
 	    if (nch < lenp1) {                   # Pad
 		ind = stridx (newline, line)
@@ -108,14 +113,15 @@ begin
 		nblanks = LEN_TRLLINE - ind + 1
 		call amovkc (blank, line[ind], nblanks)
 	    }
-	    call wft_write_pixels (fits_fd, line, LEN_TRLLINE)
-	    nch = getline (tp, line)
+	    sz_val = LEN_TRLLINE
+	    call wft_write_pixels (fits_fd, line, sz_val)
+	    nch = getline (tfd, line)
 	} until (nch == EOF)
 
 	call wft_write_last_record (fits_fd, nrecords)
 	if (long_header == YES) {
 	    call printf ("%d  Data records written\n")
-	    call pargi (nrecords)
+	    call pargl (nrecords)
 	}
 	
 end
@@ -129,13 +135,15 @@ char	keyword[SZ_KEYWORD]
 char	value[LEN_CARD]
 char	comment[LEN_CARD]
 
+size_t	sz_val
 char	card[LEN_CARD+1]
 
 include "wfits.com"
 
 begin	
 	call wft_encodec (keyword, value, card, comment)
-	call wft_write_pixels (fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fd, card, sz_val)
 	if (long_header == YES) {
 	    call printf("%s\n")
 	    call pargstr(card)
@@ -149,13 +157,38 @@ char	keyword[SZ_KEYWORD]
 int	value
 char	comment[LEN_CARD]
 
+size_t	sz_val
 char	card[LEN_CARD+1]
 
 include "wfits.com"
 
 begin	
 	call wft_encodei (keyword, value, card, comment)
-	call wft_write_pixels (fd, card, LEN_CARD)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fd, card, sz_val)
+	if (long_header == YES) {
+	    call printf("%s\n")
+	    call pargstr(card)
+        }
+	
+end
+
+procedure txt_wcardl (fd, keyword, value, comment)
+
+int	fd			# fits file descriptor
+char	keyword[SZ_KEYWORD]
+long	value
+char	comment[LEN_CARD]
+
+size_t	sz_val
+char	card[LEN_CARD+1]
+
+include "wfits.com"
+
+begin	
+	call wft_encodel (keyword, value, card, comment)
+	sz_val = LEN_CARD
+	call wft_write_pixels (fd, card, sz_val)
 	if (long_header == YES) {
 	    call printf("%s\n")
 	    call pargstr(card)
@@ -173,14 +206,14 @@ include "dfits.h"
 
 procedure prtxinfo_key (nlines, ext)
 
-int     nlines
+long	nlines
 pointer ext
 
 char	str[LEN_CARD]		# card data string
-int	nk,strlen(), nch
+int	nk, nch
 char    line[SZ_LINE]
 
-int	strmatch()
+int	strmatch(), strlen()
 include "wfits.com"
 include	"dfits.com"
 
@@ -195,8 +228,8 @@ begin
 	    else if (strmatch (Memc[key_table[nk]], "DIMENS") > 0) {
 		str[1] = EOS
 		call sprintf (str, LEN_CARD, "%dCHx%dR")
-		call pargi (EXT_LENAXIS(ext,1))
-		call pargi (nlines)
+		call pargl (EXT_LENAXIS(ext,1))
+		call pargl (nlines)
 	    } else if (strmatch (Memc[key_table[nk]], "BITPIX") > 0)
 		call strcpy ("8tab", str, LEN_CARD)
 	    else

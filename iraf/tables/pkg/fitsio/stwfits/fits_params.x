@@ -140,11 +140,13 @@ char	param[ARB]	# FITS string parameter
 char	card[ARB]	# FITS card image
 char	comment[ARB]	# comment string
 
+size_t	sz_val
 pointer	sp, qparam
 
 begin
 	call smark (sp)
-	call salloc (qparam, MAX_STRFIELD, TY_CHAR)
+	sz_val = MAX_STRFIELD
+	call salloc (qparam, sz_val, TY_CHAR)
 
 	call wft_putquote (param, Memc[qparam])
 	call wft_nqencode (keyword, Memc[qparam], card, comment)
@@ -203,11 +205,13 @@ char	keyword[ARB]	# FITS keyword
 char	param[ARB]	# FITS string parameter
 char	card[ARB]	# FITS card image
 
+size_t	sz_val
 pointer	sp, qparam
 
 begin
 	call smark (sp)
-	call salloc (qparam, MAX_STRFIELD, TY_CHAR)
+	sz_val = MAX_STRFIELD
+	call salloc (qparam, sz_val, TY_CHAR)
 
 	call wft_putquote (param, Memc[qparam])
 	call wft_cqencode (keyword, Memc[qparam], card)
@@ -224,11 +228,13 @@ char	keyword[ARB]	# FITS keyword
 char	param[ARB]	# FITS string parameter
 char	card[ARB]	# FITS card image
 
+size_t	sz_val
 pointer	sp, str
 
 begin
 	call smark (sp)
-	call salloc (str, MAX_STRFIELD, TY_CHAR)
+	sz_val = MAX_STRFIELD
+	call salloc (str, sz_val, TY_CHAR)
 
 	call strcpy (param, Memc[str], MAX_STRFIELD)
 
@@ -240,7 +246,7 @@ begin
 end
 
 # WFT_ENCODE_BLANK -- Procedure to encode the FITS blank parameter. Necessary
-# because the 32 bit blank value equals INDEFL.
+# because the 32 bit blank value equals INDEFI.
 
 procedure wft_encode_blank (keyword, blank_str, card, comment)
 
@@ -264,19 +270,21 @@ procedure wft_encode_date (datestr, szdate)
 char	datestr[ARB]	# string containing the date
 int	szdate		# number of chars in the date string
 
-long	ctime
+long	ctime, l_val
 int	time[LEN_TMSTRUCT]
 long	clktime()
+int	imod()
 
 begin
-	ctime = clktime (long (0))
+	l_val = 0
+	ctime = clktime (l_val)
 	call brktime (ctime, time)
 
 	if (TM_YEAR(time) < 1999) {
 	    call sprintf (datestr, szdate, "%02s/%02s/%02s")
 	    call pargi (TM_MDAY(time))
 	    call pargi (TM_MONTH(time))
-	    call pargi (mod (TM_YEAR(time), CENTURY))
+	    call pargi (imod (TM_YEAR(time), CENTURY))
 	} else {
 	    call sprintf (datestr, szdate, "%04s-%02s-%02s")
 	    call pargi (TM_YEAR(time))
@@ -343,8 +351,14 @@ begin
 	    call strcpy ("SHORT", type_str, LEN_STRING) 
 	case TY_USHORT:
 	    call strcpy ("USHORT", type_str, LEN_STRING) 
-	case TY_INT, TY_LONG:
+	case TY_INT:
 	    call strcpy ("INTEGER", type_str, LEN_STRING) 
+	case TY_LONG:
+	    if ( SZ_LONG == 2 ) {
+		call strcpy ("INTEGER", type_str, LEN_STRING) 
+	    } else {
+		call strcpy ("LONG", type_str, LEN_STRING) 
+	    }
 	case TY_REAL:
 	    call strcpy ("FLOATING", type_str, LEN_STRING)
 	case TY_DOUBLE:

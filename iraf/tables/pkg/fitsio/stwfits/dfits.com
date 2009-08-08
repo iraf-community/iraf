@@ -4,7 +4,7 @@
 bool	form_header
  
 # Tables
-pointer log_fd			# log file descriptor
+int	log_fd			# log file descriptor
 int	nkeywords		# number of keywords (and formats) stored
 pointer	key_table[MAX_TABLE]	# keywords
 pointer fmt_table[MAX_TABLE]	# formats
