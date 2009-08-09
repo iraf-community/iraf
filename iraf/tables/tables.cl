@@ -5,7 +5,7 @@ package	tables, bin = tablesbin$
 
 task	fitsio.pkg	= "fitsio$fitsio.cl"
 task	tbplot.pkg	= "tbplot$tbplot.cl"
-task	tobsolete.pkg	= "tobsolete$tobsolete.cl"
+#task	tobsolete.pkg	= "tobsolete$tobsolete.cl"
 task	ttools.pkg	= "ttools$ttools.cl"
 
 
