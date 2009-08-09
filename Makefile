@@ -32,8 +32,8 @@ reboot_makefiles::
 	$(SETUP) reboot_makefiles $(MACH) $(PREFIX)
 
 boot_make::
-	(cd iraf/unix/include ; make)
-	(cd iraf/unix/config ; make)
+	cat iraf/unix/include/f2c.h > iraf/unix/f2c/src/f2c.h
+	cat iraf/unix/include/f2c.h > iraf/unix/f2c/libf2c/f2c.h
 	(cd iraf/unix/f2c/src ; make f2c)
 	cp -p iraf/unix/f2c/src/f2c iraf/unix/bin/f2c.e
 	(cd iraf/unix/f2c/libf2c ; make all)
@@ -84,8 +84,8 @@ clean_f2c::
 	find iraf/unix/f2c -type l -exec rm -f {} \;
 
 clean_unix::
-	(cd iraf/unix/include ; make clean)
-	(cd iraf/unix/config ; make clean)
+	rm -f iraf/unix/f2c/src/f2c.h
+	rm -f iraf/unix/f2c/libf2c/f2c.h
 	(cd iraf/unix/os ; make clean)
 	(cd iraf/unix/boot/bootlib ; make clean)
 	(cd iraf/unix/boot/generic ; make clean)
@@ -99,9 +99,6 @@ clean_unix::
 	(cd iraf/unix/boot/spp/rpp ; make clean)
 	(cd iraf/unix/boot/xyacc ; make clean)
 	(cd iraf/unix/gdev/sgidev ; make clean)
-	rm -f iraf/unix/config/mkpkg.inc
-	find iraf/unix/include -type l -exec rm -f {} \;
-	find iraf/unix/config -type l -exec rm -f {} \;
 	find iraf/unix/os -type l -exec rm -f {} \;
 	find iraf/unix/boot -type l -exec rm -f {} \;
 	find iraf/unix/gdev -type l -exec rm -f {} \;

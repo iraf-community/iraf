@@ -3,8 +3,8 @@
 $verbose
 
 $set	MACH		= $(IRAFARCH)	# machine/fpu type
-$set	HOSTID		= @HOSTID@		# host system name
-$set	SITEID		= @SITEID@		# site name
+$set	HOSTID		= $(IRAFHOSTID)	# host system name
+$set	SITEID		= $(IRAFSITEID)	# site name
 
 $set	XFLAGS		= "-c"		# default XC compile flags
 $set	XVFLAGS		= "-c"		# VOPS XC compile flags

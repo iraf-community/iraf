@@ -5,8 +5,10 @@
 
 set_irafenv() {
   #
+  IRAFHOSTID="$HOSTID"
+  IRAFSITEID="$SITEID"
   IRAFARCH="$MACH"
-  export IRAFARCH
+  export IRAFHOSTID IRAFSITEID IRAFARCH
   #
   if [ "$iraf" = "" ]; then
     iraf="${PREFIX}/iraf/iraf/"
@@ -401,46 +403,6 @@ case "$COMMAND" in
   #( cd iraf/unix/f2c/libf2c ; rm -f f2c.h ; ln -s ../../include/f2c.h . )
   #( cd iraf/unix/boot/spp/rpp/rppfor ; rm -f entxkw.f ; ln -s ../../../../config/entxkw.f . )
   #
-  output_makefile iraf/unix/include makefile.in
-  #
-  F="iraf/unix/config/Makefile"
-  D="DEFS ="
-  cat <<EOF | cpp -P $HSI_CF > $F 
-#include <iraf/endian.h>
-#if BYTE_ORDER == LITTLE_ENDIAN
-X_MARK_X foo;
-#endif
-EOF
-  S=$?
-  if [ ! $S = 0 ]; then
-    exit $S
-  fi
-  if [ "`grep 'X_MARK_X' $F`" != "" ]; then
-    if [ "$SPP_BYTE_ENDIAN" != "little" ]; then
-      echo "[ERROR] Cannot detect endian correctly."
-      exit 1
-    fi
-    D="$D -DBYTE_LITTLE"
-  fi
-  cat <<EOF | cpp -P $HSI_CF > $F
-#include <iraf/endian.h>
-#if FLOAT_WORD_ORDER == LITTLE_ENDIAN
-X_MARK_X foo;
-#endif
-EOF
-  S=$?
-  if [ ! $S = 0 ]; then
-    exit $S
-  fi
-  if [ "`grep 'X_MARK_X' $F`" != "" ]; then
-    if [ "$SPP_FLOAT_ENDIAN" != "little" ]; then
-      echo "[ERROR] Cannot detect endian correctly."
-      exit 1
-    fi
-    D="$D -DFLOAT_LITTLE"
-  fi
-  output_makefile iraf/unix/config makefile.in "$D"
-  #
   # F2C
   #F="`echo $HSI_CF | tr ' ' '\n' | egrep -e '-DSPP' -e '-I' | tr '\n' ' '`"
   # See also MAX_OUTPUT_SIZE in niceprintf.h
@@ -612,17 +574,11 @@ EOF
            iraf/base iraf/config iraf/dev \
            iraf/doc iraf/math iraf/sys \
            iraf/pkg iraf/tables iraf/noao ; do
-    L=`find $i -print | egrep -v -e '\.[acfhlorxy]$' -e '\.[fhx]\....$' -e '\.inc$' -e '\.inc\.orig$' -e '\.com$' -e '\.bd$' -e '\.gy$' -e '\.gh$' -e '\.gc$' -e '\.gx$' -e '\.gx\.old$' -e '/omkpkg$' -e '/mkpkg$' -e '/mkpkg\.[^e][^/]*$' -e '/[mM]akefile[^/]*$' -e '/configure[^/]*$' -e '/strip\.[^/]*$' -e '/strip$' | egrep -v -e '~$' -e '/\.svn'`
+    L=`find $i -print | egrep -v -e '\.[acfhlorxy]$' -e '\.fpp$' -e '\.[fhx]\....$' -e '\.inc$' -e '\.inc\.orig$' -e '\.com$' -e '\.bd$' -e '\.gy$' -e '\.gh$' -e '\.gc$' -e '\.gx$' -e '\.gx\.old$' -e '/omkpkg$' -e '/mkpkg$' -e '/mkpkg\.[^e][^/]*$' -e '/[mM]akefile[^/]*$' -e '/configure[^/]*$' -e '/strip\.[^/]*$' -e '/strip$' | egrep -v -e '~$' -e '/\.svn'`
     for j in $L ; do
       install_file $j
     done
   done
-  #
-  install_file iraf/unix/include/f2c.h
-  install_file iraf/unix/boot/spp/rpp/rppfor/entxkw.f
-  install_file iraf/unix/config/mkpkg.inc
-  install_file iraf/unix/config/iraf.h
-  install_file iraf/unix/config/mach.h
   #
   mkdir -p -m 755 $DESTDIR/$PREFIX/iraf/iraf/config
   mkdir -p -m 777 $DESTDIR/$PREFIX/iraf/imdirs
@@ -701,7 +657,7 @@ EOF
            iraf/base iraf/config iraf/dev \
            iraf/doc iraf/math iraf/sys \
            iraf/pkg iraf/tables iraf/noao ; do
-    L=`find $i -print | egrep -e '\.[acfhlorxy]$' -e '\.[fhx]\....$' -e '\.inc$' -e '\.inc\.orig$' -e '\.com$' -e '\.bd$' -e '\.gy$' -e '\.gh$' -e '\.gc$' -e '\.gx$' -e '\.gx\.old$' -e '/omkpkg$' -e '/mkpkg$' -e '/mkpkg\.[^e][^/]*$' -e '/[mM]akefile[^/]*$' -e '/configure[^/]*$' -e '/strip\.[^/]*$' -e '/strip$' | egrep -v -e '\.[aoe]$' | egrep -v -e 'unix/config/mkpkg.inc$' -e 'unix/config/iraf.h$' -e 'unix/config/mach.h$' -e '~$' -e '/\.svn'`
+    L=`find $i -print | egrep -e '\.[acfhlorxy]$' -e '\.fpp$' -e '\.[fhx]\....$' -e '\.inc$' -e '\.inc\.orig$' -e '\.com$' -e '\.bd$' -e '\.gy$' -e '\.gh$' -e '\.gc$' -e '\.gx$' -e '\.gx\.old$' -e '/omkpkg$' -e '/mkpkg$' -e '/mkpkg\.[^e][^/]*$' -e '/[mM]akefile[^/]*$' -e '/configure[^/]*$' -e '/strip\.[^/]*$' -e '/strip$' | egrep -v -e '\.[aoe]$' | egrep -v -e '~$' -e '/\.svn'`
     for j in $L ; do
       install_file $j
     done
@@ -711,7 +667,7 @@ EOF
            iraf/unix/gdev iraf/unix/include iraf/unix/mkpkg \
            iraf/unix/mkpkg.sh iraf/unix/os iraf/unix/portkit \
            iraf/unix/scripts iraf/unix/shlib iraf/unix/sun ; do
-    L=`find $i -print | egrep -v -e 'unix/scripts/setup.sh$' -e 'unix/include/f2c.h$' -e 'unix/boot/spp/rpp/rppfor/entxkw.f$' -e '\.[aoe]$' | egrep -v -e '~$' -e '/\.svn'`
+    L=`find $i -print | egrep -v -e 'unix/scripts/setup.sh$' -e '\.[aoe]$' | egrep -v -e '~$' -e '/\.svn'`
     for j in $L ; do
       install_file $j
     done
