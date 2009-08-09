@@ -22,9 +22,9 @@ $call @fitsio
 $echo "-------------------  TBPLOT  ------------------------"
 $call @tbplot
 	$ifeq (HOSTID, vms) $purge tablesbin$  $endif
-$echo "-------------------  TOBSOLETE  ------------------------"
-$call @tobsolete
-	$ifeq (HOSTID, vms) $purge tablesbin$  $endif
+#$echo "-------------------  TOBSOLETE  ------------------------"
+#$call @tobsolete
+#	$ifeq (HOSTID, vms) $purge tablesbin$  $endif
 $echo "-------------------  TTOOLS  -------------------------"
 $call @ttools
 	$ifeq (HOSTID, vms) $purge tablesbin$  $endif
