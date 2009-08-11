@@ -9,16 +9,26 @@ procedure smw_onedspec (im, smw)
 pointer	im			#I IMIO pointer
 pointer	smw			#U MWCS pointer input SMW pointer output
 
-int	i, dtype, ap, beam, nw, imgeti(), imofnlu(), imgnfn()
-real	aplow[2], aphigh[2], imgetr(), mw_c1tranr()
-double	ltm, ltv, r, w, dw, z, imgetd()
-pointer	sp, key, mw, ct, mw_openim(), mw_sctran()
+size_t	sz_val
+int	dtype, beam
+long	ap, nw, c_1
+real	aplow[2], aphigh[2]
+double	ltm, ltv, r, w, dw, z
+pointer	sp, key, mw, ct, i
+int	imgeti(), imgnfn()
+long	imgetl()
+pointer	mw_openim(), mw_sctran(), imofnlu()
+real	imgetr(), mw_c1tranr()
+double	imgetd()
 bool	fp_equald()
 errchk	smw_open, smw_saxes, mw_gwtermd, mw_sctran
 
+include	<nullptr.inc>
+
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
 
 	# Convert old W0/WPC keywords if needed.
 	mw = smw
@@ -56,7 +66,7 @@ begin
 		dtype = DCLINEAR
 	}
 	if (dtype==DCLOG) {
-	    if (abs(w)>20. || abs(w+(nw-1)*dw)>20.)
+	    if (dabs(w)>20. || dabs(w+(nw-1)*dw)>20.)
 		dtype = DCLINEAR
 	    else {
 		w = 10D0 ** w
@@ -76,12 +86,12 @@ begin
 	}
 
 	# Set the SMW data structure.
-	call smw_open (smw, NULL, im)
+	call smw_open (smw, NULLPTR, im)
 
 	# Determine the aperture parameters.
 	iferr (beam = imgeti (im, "BEAM-NUM"))
 	    beam = 1
-	iferr (ap = imgeti (im, "APNUM"))
+	iferr (ap = imgetl (im, "APNUM"))
 	    ap = beam
 	iferr (aplow[1] = imgetr (im, "APLOW"))
 	    aplow[1] = INDEF
@@ -90,7 +100,7 @@ begin
 	iferr (z = imgetd (im, "DOPCOR"))
 	    z = 0.
 
-	call smw_swattrs (smw, 1, 1, ap, beam, dtype, w, dw, nw, z,
+	call smw_swattrs (smw, c_1, c_1, ap, beam, dtype, w, dw, nw, z,
 	    aplow, aphigh, "")
 
         # Delete old parameters

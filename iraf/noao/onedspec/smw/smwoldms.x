@@ -9,36 +9,46 @@ procedure smw_oldms (im, smw)
 pointer	im			#I IMIO pointer
 pointer	smw			#U Input MWCS pointer, output SMW pointer
 
-int	i, j, k, nchar, ap, beam, dtype, nw, axes[2]
+size_t	sz_val
+long	ap, nw, i, j, k, c_1
+int	nchar, beam, dtype, ii, ij, ik, axes[2]
 double	w1, dw, z
 real	aplow[2], aphigh[2]
-pointer	sp, key, val, lterm, mw, mw_open()
-int	imgeti(), mw_stati(), ctoi(), ctor(), ctod(), imofnlu(), imgnfn()
+pointer	sp, key, val, lterm, mw, pp
+pointer	mw_open(), imofnlu()
+int	imgeti(), mw_stati(), ctoi(), ctol(), ctor(), ctod(), imgnfn()
 errchk	imgstr, mw_gltermd, mw_sltermd
 data	axes/1,2/
 
+include	<nullptr.inc>
+
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (val, SZ_LINE, TY_CHAR)
-	call salloc (lterm, 12, TY_DOUBLE)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (val, sz_val, TY_CHAR)
+	sz_val = 12
+	call salloc (lterm, sz_val, TY_DOUBLE)
 
 	# Set the basic multispec MWCS
-	i = mw_stati (smw, MW_NDIM)
-	j = max (2, i)
-	mw = mw_open (NULL, j)
-	call mw_newsystem (mw, "multispec", j)
+	ii = mw_stati (smw, MW_NDIM)
+	ij = max (2, ii)
+	mw = mw_open (NULLPTR, ij)
+	call mw_newsystem (mw, "multispec", ij)
 	call mw_swtype (mw, axes, 2, "multispec", "")
-	if (j > 2)
+	if (ij > 2)
 	    call mw_swtype (mw, 3, 1, "linear", "")
-	call mw_gltermd (smw, Memd[lterm+j], Memd[lterm], i)
-	if (i == 1) {
+	call mw_gltermd (smw, Memd[lterm+ij], Memd[lterm], ii)
+	if (ii == 1) {
 	    Memd[lterm+1] = 0.
 	    Memd[lterm+3] = 0.
 	    Memd[lterm+4] = 0.
 	    Memd[lterm+5] = 1.
 	}
-	call mw_sltermd (mw, Memd[lterm+j], Memd[lterm], j)
+	call mw_sltermd (mw, Memd[lterm+ij], Memd[lterm], ij)
 
 	iferr (dtype = imgeti (im, "DC-FLAG"))
 	    dtype = -1
@@ -51,48 +61,48 @@ begin
 	smw = mw
 
 	# Set the SMW data structure.
-	call smw_open (smw, NULL, im)
+	call smw_open (smw, NULLPTR, im)
 	do i = 1, SMW_NSPEC(smw) {
-	    call smw_mw (smw, i, 1, mw, j, k)
+	    call smw_mw (smw, i, c_1, mw, j, k)
 	    call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
-		call pargi (j)
+		call pargl (j)
 	    call imgstr (im, Memc[key], Memc[val], SZ_LINE)
 	    call imdelf (im, Memc[key])
 
-	    k = 1
-	    nchar = ctoi (Memc[val], k, ap)
-	    nchar = ctoi (Memc[val], k, beam)
-	    nchar = ctod (Memc[val], k, w1)
-	    nchar = ctod (Memc[val], k, dw)
-	    nchar = ctoi (Memc[val], k, nw)
-	    if (ctor (Memc[val], k, aplow[1]) == 0)
+	    ik = 1
+	    nchar = ctol (Memc[val], ik, ap)
+	    nchar = ctoi (Memc[val], ik, beam)
+	    nchar = ctod (Memc[val], ik, w1)
+	    nchar = ctod (Memc[val], ik, dw)
+	    nchar = ctol (Memc[val], ik, nw)
+	    if (ctor (Memc[val], ik, aplow[1]) == 0)
 		aplow[1] = INDEF
-	    if (ctor (Memc[val], k, aphigh[1]) == 0)
+	    if (ctor (Memc[val], ik, aphigh[1]) == 0)
 		aphigh[1] = INDEF
 	    z = 0.
 
-	    k = dtype
-	    if (k==1 && (abs(w1)>20. || abs(w1+(nw-1)*dw)>20.))
-		k = 0
-	    call smw_swattrs (smw, i, 1, ap, beam, k, w1, dw, nw, z,
+	    ik = dtype
+	    if (ik==1 && (dabs(w1)>20. || dabs(w1+(nw-1)*dw)>20.))
+		ik = 0
+	    call smw_swattrs (smw, i, c_1, ap, beam, ik, w1, dw, nw, z,
 		aplow, aphigh, "")
 
 	    call sprintf (Memc[key], SZ_FNAME, "APID%d")
-		call pargi (j)
+		call pargl (j)
 	    ifnoerr (call imgstr (im, Memc[key], Memc[val], SZ_LINE)) {
-		call smw_sapid (smw, i, 1, Memc[val])
+		call smw_sapid (smw, i, c_1, Memc[val])
 		call imdelf (im, Memc[key])
 	    }
 	}
 
 	# Delete old parameters
-	i = imofnlu (im,
+	pp = imofnlu (im,
 	    "DISPAXIS,APFORMAT,BEAM-NUM,DC-FLAG,W0,WPC,NP1,NP2")
-	while (imgnfn (i, Memc[key], SZ_FNAME) != EOF) {
+	while (imgnfn (pp, Memc[key], SZ_FNAME) != EOF) {
 	    iferr (call imdelf (im, Memc[key]))
 		;
 	}
-	call imcfnl (i)
+	call imcfnl (pp)
 
 	# Update MWCS
 	call smw_saveim (smw, im)

@@ -31,8 +31,8 @@ begin
 	eccen = 0.01675104d0 - t * (0.00004180d0 + t * 0.000000126d0)
 
 	# Convert to principle angles
-	manom = mod (manom, 360.0D0)
-	lperi = mod (lperi, 360.0D0)
+	manom = dmod (manom, 360.0D0)
+	lperi = dmod (lperi, 360.0D0)
 
 	# Convert to radians
 	r = DEGTORAD (ra * 15)

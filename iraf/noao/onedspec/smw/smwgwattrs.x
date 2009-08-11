@@ -9,33 +9,41 @@ procedure smw_gwattrs (smw, index1, index2, ap, beam, dtype, w1, dw, nw, z,
 	aplow, aphigh, coeff)
 
 pointer	smw				# SMW pointer
-int	index1				# Spectrum index
-int	index2				# Spectrum index
-int	ap				# Aperture number
+long	index1				# Spectrum index
+long	index2				# Spectrum index
+long	ap				# Aperture number
 int	beam				# Beam number
 int	dtype				# Dispersion type
 double	w1				# Starting coordinate
 double	dw				# Coordinate interval
-int	nw				# Number of valid pixels
+long	nw				# Number of valid pixels
 double	z				# Redshift factor
 real	aplow[2], aphigh[2]		# Aperture limits
 pointer	coeff				# Nonlinear coeff string (input/output)
 
-int	i, j, n, ip, sz_coeff, strlen(), ctoi(), ctor(), ctod()
+size_t	sz_val
+int	sz_coeff, ip, ii, ij
+long	i, j, n
 double	a, b
 pointer	sp, key, mw
+int	strlen(), ctoi(), ctol(), ctor(), ctod()
+long	lnint()
 errchk	smw_mw, mw_gwattrs
 
 data	sz_coeff /SZ_LINE/
 
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
 
-	if (coeff == NULL)
-	    call malloc (coeff, sz_coeff, TY_CHAR)
-	else
-	    call realloc (coeff, sz_coeff, TY_CHAR)
+	if (coeff == NULL) {
+	    sz_val = sz_coeff
+	    call malloc (coeff, sz_val, TY_CHAR)
+	} else {
+	    sz_val = sz_coeff
+	    call realloc (coeff, sz_val, TY_CHAR)
+	}
 
 	# Determine parameters based on the SMW format.
 	switch (SMW_FORMAT(smw)) {
@@ -56,15 +64,15 @@ begin
 	    aphigh[2] = 1
 	    if (SMW_LDIM(smw) > 1) {
 		aplow[1] = i - (SMW_NSUM(smw,1)-1) / 2
-		aphigh[1] = nint (aplow[1]) + SMW_NSUM(smw,1) - 1
-		aplow[1] = max (1, nint (aplow[1]))
-		aphigh[1] = min (SMW_LLEN(smw,2), nint (aphigh[1]))
+		aphigh[1] = lnint (aplow[1]) + SMW_NSUM(smw,1) - 1
+		aplow[1] = max (1, lnint (aplow[1]))
+		aphigh[1] = min (SMW_LLEN(smw,2), lnint (aphigh[1]))
 	    }
 	    if (SMW_LDIM(smw) > 2) {
 		aplow[2] = j - (SMW_NSUM(smw,2)-1) / 2
-		aphigh[2] = nint (aplow[2]) + SMW_NSUM(smw,2) - 1
-		aplow[2] = max (1, nint (aplow[2]))
-		aphigh[2] = min (SMW_LLEN(smw,3), nint (aphigh[2]))
+		aphigh[2] = lnint (aplow[2]) + SMW_NSUM(smw,2) - 1
+		aplow[2] = max (1, lnint (aplow[2]))
+		aphigh[2] = min (SMW_LLEN(smw,3), lnint (aphigh[2]))
 	    }
 
 	    Memc[coeff] = EOS
@@ -77,7 +85,7 @@ begin
 	    dw = SMW_DW(smw)
 	    z = SMW_Z(smw)
 
-	    ap = Memi[SMW_APS(smw)+index1-1]
+	    ap = Meml[SMW_APS(smw)+index1-1]
 	    beam = Memi[SMW_BEAMS(smw)+index1-1]
 	    aplow[1] = Memr[SMW_APLOW(smw)+2*index1-2]
 	    aphigh[1] = Memr[SMW_APHIGH(smw)+2*index1-2]
@@ -89,25 +97,26 @@ begin
 	    call smw_mw (smw, index1, index2, mw, i, j)
 
 	    call sprintf (Memc[key], SZ_FNAME, "spec%d")
-		call pargi (i)
+		call pargl (i)
 
 	    call mw_gwattrs (mw, 2, Memc[key], Memc[coeff], sz_coeff)
 	    while (strlen (Memc[coeff]) == sz_coeff) {
 		sz_coeff = 2 * sz_coeff
-		call realloc (coeff, sz_coeff, TY_CHAR)
+		sz_val = sz_coeff
+		call realloc (coeff, sz_val, TY_CHAR)
 		call mw_gwattrs (mw, 2, Memc[key], Memc[coeff], sz_coeff)
 	    }
 
 	    ip = 1
-	    i = ctoi (Memc[coeff], ip, ap)
-	    i = ctoi (Memc[coeff], ip, beam)
-	    i = ctoi (Memc[coeff], ip, j)
-	    i = ctod (Memc[coeff], ip, a)
-	    i = ctod (Memc[coeff], ip, b)
-	    i = ctoi (Memc[coeff], ip, n)
-	    i = ctod (Memc[coeff], ip, z)
-	    i = ctor (Memc[coeff], ip, aplow[1])
-	    i = ctor (Memc[coeff], ip, aphigh[1])
+	    ii = ctol (Memc[coeff], ip, ap)
+	    ii = ctoi (Memc[coeff], ip, beam)
+	    ii = ctoi (Memc[coeff], ip, ij)
+	    ii = ctod (Memc[coeff], ip, a)
+	    ii = ctod (Memc[coeff], ip, b)
+	    ii = ctol (Memc[coeff], ip, n)
+	    ii = ctod (Memc[coeff], ip, z)
+	    ii = ctor (Memc[coeff], ip, aplow[1])
+	    ii = ctor (Memc[coeff], ip, aphigh[1])
 	    aplow[2] = INDEF
 	    aphigh[2] = INDEF
 	    if (Memc[coeff+ip-1] != EOS)
@@ -115,16 +124,16 @@ begin
 	    else
 		Memc[coeff] = EOS
 
-	    if (j==DCLOG) {
-		if (abs(a)>20. || abs(a+(n-1)*b)>20.)
-		    j = DCLINEAR
+	    if (ij==DCLOG) {
+		if (dabs(a)>20. || dabs(a+(n-1)*b)>20.)
+		    ij = DCLINEAR
 		else {
 		    a = 10D0 ** a
 		    b = a * (10D0 ** ((n-1)*b) - 1) / (n - 1)
 		}
 	    }
 
-	    dtype = j
+	    dtype = ij
 	    w1 = a
 	    dw = b
 	    nw = n

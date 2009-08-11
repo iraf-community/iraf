@@ -27,15 +27,19 @@ real	p1[ndim]	#I Input coordinate
 real	p2[ndim]	#O Output coordinate
 int	ndim		#I Dimensionality
 
-int	i, j, format, daxis, aaxis, dtype, naps
+size_t	sz_val
+int	format, daxis, aaxis, dtype
+long	naps, i, j, l_val
 pointer	smw, aps
+long	lnint()
 errchk	mw_ctranr
 
 begin
 	if (SMW_NCT(ct) != 1)
 	    call error (1, "SMW_CTRAN: Wrong WCS type")
 
-	call amovr (p1, p2, ndim)
+	sz_val = ndim
+	call amovr (p1, p2, sz_val)
 
 	smw = SMW_SMW(ct)
 	format = SMW_FORMAT(smw)
@@ -52,17 +56,18 @@ begin
 		if (daxis > 0 && dtype == DCLOG)
 		    p2[daxis] = 10. ** max (-20.0, min (20.0, p2[daxis]))
 		if (aaxis > 0 && format == SMW_ES) {
-		    i = max (1, min (naps, nint (p2[aaxis])))
-		    p2[aaxis] = Memi[aps+i-1]
+		    l_val = lnint (p2[aaxis])
+		    i = max (1, min (naps, l_val))
+		    p2[aaxis] = Meml[aps+i-1]
 		}
 	    case SMW_WL, SMW_WP:
 		if (daxis > 0 && dtype == DCLOG)
 		    p2[daxis] = log10 (p2[daxis])
 		if (aaxis > 0 && format == SMW_ES) {
-		    j = nint (p2[aaxis])
+		    j = lnint (p2[aaxis])
 		    p2[aaxis] = 1
 		    do i = 1, naps {
-			if (j == Memi[aps+i-1]) {
+			if (j == Meml[aps+i-1]) {
 			    p2[aaxis] = i
 			    break
 			}
@@ -103,9 +108,12 @@ real	x1, y1		#I Input coordinates
 real	x2, y2		#O Output coordinates
 
 real	p1[2], p2[2]
-int	i, j, naps
+long	naps, i, j, l_val
 real	xp, yp
-pointer	aps, smw_ct()
+pointer	aps
+pointer	smw_ct()
+long	lmod()
+long	lnint()
 errchk	smw_ct, mw_c2tranr
 
 begin
@@ -126,19 +134,21 @@ begin
 	switch (SMW_CTTYPE(ct)) {
 	case SMW_LW:
 	    call mw_c2tranr (SMW_CTL(ct), x1, y1, xp, yp)
-	    i = nint (yp)
-	    yp = mod (i-1, SMW_NSPLIT) + 1
+	    i = lnint (yp)
+	    l_val = SMW_NSPLIT
+	    yp = lmod (i-1, l_val) + 1
 	    call mw_c2tranr (smw_ct(ct,i), xp, yp, x2, y2)
 	case SMW_PW:
-	    i = nint (y1)
-	    yp = mod (i-1, SMW_NSPLIT) + 1
+	    i = lnint (y1)
+	    l_val = SMW_NSPLIT
+	    yp = lmod (i-1, l_val) + 1
 	    call mw_c2tranr (smw_ct(ct,i), x1, yp, x2, y2)
 	case SMW_WL:
 	    aps = SMW_APS(SMW_SMW(ct))
 	    naps = SMW_NSPEC(SMW_SMW(ct))
-	    j = nint (y1)
+	    j = lnint (y1)
 	    do i = 1, naps {
-		if (Memi[aps+i-1] == j) {
+		if (Meml[aps+i-1] == j) {
 		    call mw_c2tranr (smw_ct(ct,i), x1, y1, xp, yp)
 		    yp = i
 		    call mw_c2tranr (SMW_CTL(ct), xp, yp, x2, y2)
@@ -149,9 +159,9 @@ begin
 	case SMW_WP:
 	    aps = SMW_APS(SMW_SMW(ct))
 	    naps = SMW_NSPEC(SMW_SMW(ct))
-	    j = nint (y1)
+	    j = lnint (y1)
 	    do i = 1, naps {
-		if (Memi[aps+i-1] == j) {
+		if (Meml[aps+i-1] == j) {
 		    call mw_c2tranr (smw_ct(ct,i), x1, y1, x2, y2)
 		    y2 = i
 		    return
@@ -173,15 +183,19 @@ double	p1[ndim]	#I Input coordinate
 double	p2[ndim]	#O Output coordinate
 int	ndim		#I Dimensionality
 
-int	i, j, format, daxis, aaxis, dtype, naps
+size_t	sz_val
+int	format, daxis, aaxis, dtype
+long	naps, i, j, l_val
 pointer	smw, aps
+long	ldnint()
 errchk	mw_ctrand
 
 begin
 	if (SMW_NCT(ct) != 1)
 	    call error (1, "SMW_CTRAN: Wrong WCS type")
 
-	call amovd (p1, p2, ndim)
+	sz_val = ndim
+	call amovd (p1, p2, sz_val)
 
 	smw = SMW_SMW(ct)
 	format = SMW_FORMAT(smw)
@@ -198,17 +212,18 @@ begin
 		if (daxis > 0 && dtype == DCLOG)
 		    p2[daxis] = 10. ** max (-20.0D0, min (20.0D0, p2[daxis]))
 		if (aaxis > 0 && format == SMW_ES) {
-		    i = max (1, min (naps, nint (p2[aaxis])))
-		    p2[aaxis] = Memi[aps+i-1]
+		    l_val = ldnint (p2[aaxis])
+		    i = max (1, min (naps, l_val))
+		    p2[aaxis] = Meml[aps+i-1]
 		}
 	    case SMW_WL, SMW_WP:
 		if (daxis > 0 && dtype == DCLOG)
 		    p2[daxis] = log10 (p2[daxis])
 		if (aaxis > 0 && format == SMW_ES) {
-		    j = nint (p2[aaxis])
+		    j = ldnint (p2[aaxis])
 		    p2[aaxis] = 1
 		    do i = 1, naps {
-			if (j == Memi[aps+i-1]) {
+			if (j == Meml[aps+i-1]) {
 			    p2[aaxis] = i
 			    break
 			}
@@ -249,9 +264,12 @@ double	x1, y1		#I Input coordinates
 double	x2, y2		#O Output coordinates
 
 double	p1[2], p2[2]
-int	i, j, naps
+long	naps, i, j, l_val
 double	xp, yp
-pointer	aps, smw_ct()
+pointer	aps
+pointer	smw_ct()
+long	lmod()
+long	ldnint()
 errchk	smw_ct, mw_c2trand
 
 begin
@@ -272,19 +290,21 @@ begin
 	switch (SMW_CTTYPE(ct)) {
 	case SMW_LW:
 	    call mw_c2trand (SMW_CTL(ct), x1, y1, xp, yp)
-	    i = nint (yp)
-	    yp = mod (i-1, SMW_NSPLIT) + 1
+	    i = ldnint (yp)
+	    l_val = SMW_NSPLIT
+	    yp = lmod (i-1, l_val) + 1
 	    call mw_c2trand (smw_ct(ct,i), xp, yp, x2, y2)
 	case SMW_PW:
-	    i = nint (y1)
-	    yp = mod (i-1, SMW_NSPLIT) + 1
+	    i = ldnint (y1)
+	    l_val = SMW_NSPLIT
+	    yp = lmod (i-1, l_val) + 1
 	    call mw_c2trand (smw_ct(ct,i), x1, yp, x2, y2)
 	case SMW_WL:
 	    aps = SMW_APS(SMW_SMW(ct))
 	    naps = SMW_NSPEC(SMW_SMW(ct))
-	    j = nint (y1)
+	    j = ldnint (y1)
 	    do i = 1, naps {
-		if (Memi[aps+i-1] == j) {
+		if (Meml[aps+i-1] == j) {
 		    call mw_c2trand (smw_ct(ct,i), x1, y1, xp, yp)
 		    yp = i
 		    call mw_c2trand (SMW_CTL(ct), xp, yp, x2, y2)
@@ -295,9 +315,9 @@ begin
 	case SMW_WP:
 	    aps = SMW_APS(SMW_SMW(ct))
 	    naps = SMW_NSPEC(SMW_SMW(ct))
-	    j = nint (y1)
+	    j = ldnint (y1)
 	    do i = 1, naps {
-		if (Memi[aps+i-1] == j) {
+		if (Meml[aps+i-1] == j) {
 		    call mw_c2trand (smw_ct(ct,i), x1, y1, x2, y2)
 		    y2 = i
 		    return

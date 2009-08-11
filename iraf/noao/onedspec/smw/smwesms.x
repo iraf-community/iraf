@@ -10,23 +10,33 @@ procedure smw_esms (smw)
 
 pointer	smw			#U SMW pointer
 
-int	i, j, k, pdim1, pdim2, ap, beam, dtype, nw, axes[2]
+size_t	sz_val
+long	i, j, k, ap, nw, c_1
+int	pdim1, pdim2, beam, dtype, axes[2]
 double	w1, dw, z
 real	aplow, aphigh
-pointer	sp, key, str, lterm, mw, mw1, mw2, apid, mw_open()
+pointer	sp, key, str, lterm, mw, mw1, mw2, apid
+pointer	mw_open()
 data	axes/1,2/
 
+include	<nullptr.inc>
+
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (lterm, 12, TY_DOUBLE)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = 12
+	call salloc (lterm, sz_val, TY_DOUBLE)
 
 	# Set the basic MWCS
 	mw1 = SMW_MW(smw,0)
 	pdim1 = SMW_PDIM(smw)
 	pdim2 = max (2, pdim1)
-	mw2 = mw_open (NULL, pdim2)
+	mw2 = mw_open (NULLPTR, pdim2)
 	call mw_newsystem (mw2, "multispec", pdim2)
 	call mw_swtype (mw2, axes, 2, "multispec", "")
 	if (pdim2 > 2)
@@ -57,36 +67,36 @@ begin
 	    w1 = log10 (w1)
 	}
 
-         call smw_open (mw2, smw, 0)
+         call smw_open (mw2, smw, NULLPTR)
          do i = 1, SMW_NSPEC(smw) {
-	    ap = Memi[SMW_APS(smw)+i-1]
+	    ap = Meml[SMW_APS(smw)+i-1]
 	    beam = Memi[SMW_BEAMS(smw)+i-1]
 	    aplow = Memr[SMW_APLOW(smw)+2*i-2]
 	    aphigh = Memr[SMW_APHIGH(smw)+2*i-2]
-	    apid = Memi[SMW_APIDS(smw)+i-1]
+	    apid = Memp[SMW_APIDS(smw)+i-1]
 	    
-	    call smw_mw (mw2, i, 1, mw, j, k)
+	    call smw_mw (mw2, i, c_1, mw, j, k)
 	    call sprintf (Memc[key], SZ_FNAME, "spec%d")
-		call pargi (j)
+		call pargl (j)
 	    call sprintf (Memc[str], SZ_LINE,
 		"%d %d %d %.14g %.14g %d %.14g %.2f %.2f")
-		call pargi (ap)
+		call pargl (ap)
 		call pargi (beam)
 		call pargi (dtype)
 		call pargd (w1)
 		call pargd (dw)
-		call pargi (nw)
+		call pargl (nw)
 		call pargd (z)
 		call pargr (aplow)
 		call pargr (aphigh)
 	    call mw_swattrs (mw, 2, Memc[key], Memc[str])
 
 	    if (apid != NULL)
-		call smw_sapid (mw2, i, 1, Memc[apid])
+		call smw_sapid (mw2, i, c_1, Memc[apid])
 
 	    # This is used if there is a split MULTISPEC WCS.
 	    if (SMW_APS(mw2) != NULL)
-		Memi[SMW_APS(mw2)+i-1] = ap
+		Meml[SMW_APS(mw2)+i-1] = ap
 	}
 
 	call smw_close (smw)

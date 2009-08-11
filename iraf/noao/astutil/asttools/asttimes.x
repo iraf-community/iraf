@@ -15,7 +15,8 @@ int	day			# Day of month
 double	ut			# Universal time for date (mean solar day)
 double	epoch			# Julian epoch
 
-double	jd, ast_date_to_julday()
+double	jd
+double	ast_date_to_julday()
 
 begin
 	jd = ast_date_to_julday (year, month, day, ut)
@@ -53,10 +54,12 @@ int	d
 int	bom[13]			# Beginning of month
 data	bom/1,32,60,91,121,152,182,213,244,274,305,335,366/
 
+int	imod()
+
 begin
 	d = bom[month] + day - 1
-	if (month > 2 && mod (year, 4) == 0 &&
-	    (mod (year, 100) != 0 || mod (year, 400) == 0))
+	if (month > 2 && imod (year, 4) == 0 &&
+	    (imod (year, 100) != 0 || imod (year, 400) == 0))
 	    d = d + 1
 	return (d)
 end
@@ -74,8 +77,10 @@ int	d		# Day of the week (0=SUN)
 char	name[sz_name]	# Name for day of the week
 int	sz_name		# Size of name string
 
+int	imod()
+
 begin
-	d = mod (int (jd - 0.5) + 2, 7)
+	d = imod (idint (jd - 0.5) + 2, 7)
 	switch (d) {
 	case 0:
 	    call strcpy ("SUN", name, sz_name)
@@ -135,13 +140,13 @@ begin
 	    y = y - 1
 	}
 
-	jd = int (JYEAR * y) + int (30.6001 * m) + day + 1720995
+	jd = dint (JYEAR * y) + aint (30.6001 * m) + day + 1720995
 	if (day + 31 * (m + 12 * y) >= 588829) {
 	    d = int (y / 100)
 	    m = int (y / 400)
 	    jd = jd + 2 - d + m
 	}
-	jd = jd - 0.5 + int (t * 360000. + 0.5) / 360000. / 24.
+	jd = jd - 0.5 + dint (t * 360000. + 0.5) / 360000. / 24.
 	return (jd)
 end
 
@@ -160,20 +165,22 @@ double	t			# Time for date (mean solar day)
 
 int	ja, jb, jc, jd, je
 
+int	iint()
+
 begin
-	ja = nint (j)
+	ja = idnint (j)
 	t = 24. * (j - ja + 0.5)
 
 	if (ja >= 2299161) {
-	    jb = int (((ja - 1867216) - 0.25) / 36524.25)
+	    jb = iint (((ja - 1867216) - 0.25) / 36524.25)
 	    ja = ja + 1 + jb - int (jb / 4)
 	}
 
 	jb = ja + 1524
-	jc = int (6680. + ((jb - 2439870) - 122.1) / JYEAR)
+	jc = idint (6680. + ((jb - 2439870) - 122.1) / JYEAR)
 	jd = 365 * jc + int (jc / 4)
-	je = int ((jb - jd) / 30.6001)
-	day = jb - jd - int (30.6001 * je)
+	je = iint ((jb - jd) / 30.6001)
+	day = jb - jd - iint (30.6001 * je)
 	month = je - 1
 	if (month > 12)
 	    month = month - 12
@@ -200,7 +207,7 @@ double	ast_julday()
 begin
 	# Determine JD and UT, and T (JD in centuries from J2000.0).
 	jd = ast_julday (epoch)
-	ut = (jd - int (jd) - 0.5) * 24.
+	ut = (jd - dint (jd) - 0.5) * 24.
 	t = (jd - 2451545.d0) / 36525.d0
 
 	# The GMST at 0 UT in seconds is a power series in T.
@@ -208,7 +215,7 @@ begin
 	    t * (8640184.812866d0 + t * (0.093104d0 - t * 6.2d-6))
 
 	# Correct for longitude and convert to standard hours.
-	st = mod (st / 3600. + ut - longitude / 15., 24.0D0)
+	st = dmod (st / 3600. + ut - longitude / 15., 24.0D0)
 
 	if (st < 0)
 	    st = st + 24

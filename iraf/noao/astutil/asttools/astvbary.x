@@ -11,7 +11,8 @@ double	epoch		# Julian epoch of observation
 double	v		# Component of orbital velocity (km/s)
 
 double	t, oblq, omega, llong, lperi, inclin, em, anom, vmoon
-double	r, d, l, b, lm, bm, ast_julday()
+double	r, d, l, b, lm, bm
+double	ast_julday()
 
 begin
 	# T is the number of Julian centuries since J1900.

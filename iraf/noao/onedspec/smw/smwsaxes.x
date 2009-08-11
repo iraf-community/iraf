@@ -14,26 +14,34 @@ pointer	smw			#I SMW pointer
 pointer	smw1			#I Template SMW pointer
 pointer	im			#I Template IMIO pointer
 
-int	i, pdim, ldim, paxis, laxis, nw, dtype, nspec
-real	smw_c1tranr()
+size_t	sz_val, c_2, c_3
+int	i, pdim, ldim, paxis, laxis, dtype
+long	nw, nspec, l_val, c_0, c_1
 double	w1, dw
-pointer	sp, str, axno, axval, r, w, cd, mw, ct, smw_sctran()
+pointer	sp, str, axno, axval, r, w, cd, mw, ct
+pointer	smw_sctran()
+real	smw_c1tranr()
 int	mw_stati(), imgeti()
 bool	streq(), fp_equald()
 errchk	smw_sctran
 
 begin
+	c_0 = 0
+	c_1 = 1
+	c_2 = 2
+	c_3 = 3
+
 	# If a template SMW pointer is specified just copy the axes parameters.
 	if (smw1 != NULL) {
 	    call strcpy (Memc[SMW_APID(smw1)], Memc[SMW_APID(smw)], SZ_LINE)
 	    SMW_NSPEC(smw) = SMW_NSPEC(smw1)
 	    SMW_NBANDS(smw) = SMW_NBANDS(smw1)
 	    SMW_TRANS(smw) = SMW_TRANS(smw1)
-	    call amovi (SMW_PAXIS(smw1,1), SMW_PAXIS(smw,1), 3)
+	    call amovi (SMW_PAXIS(smw1,1), SMW_PAXIS(smw,1), c_3)
 	    SMW_LDIM(smw) = SMW_LDIM(smw1)
-	    call amovi (SMW_LAXIS(smw1,1), SMW_LAXIS(smw,1), 3)
-	    call amovi (SMW_LLEN(smw1,1), SMW_LLEN(smw,1), 3)
-	    call amovi (SMW_NSUM(smw1,1), SMW_NSUM(smw,1), 2)
+	    call amovi (SMW_LAXIS(smw1,1), SMW_LAXIS(smw,1), c_3)
+	    call amovl (SMW_LLEN(smw1,1), SMW_LLEN(smw,1), c_3)
+	    call amovi (SMW_NSUM(smw1,1), SMW_NSUM(smw,1), c_2)
 
 	    mw = SMW_MW(smw,0)
 	    SMW_PDIM(smw) = mw_stati (mw, MW_NDIM)
@@ -45,10 +53,11 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (axno, 3, TY_INT)
-	call salloc (axval, 3, TY_INT)
-	call aclri (Memi[axno], 3)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (axno, c_3, TY_INT)
+	call salloc (axval, c_3, TY_INT)
+	call aclri (Memi[axno], c_3)
 
 	# Determine the dimensions.
 	mw = SMW_MW(smw,0)
@@ -59,9 +68,11 @@ begin
 	# Set the physical dispersion axis.
 	switch (SMW_FORMAT(smw)) {
 	case SMW_ND:
-	    call salloc (r, pdim, TY_DOUBLE)
-	    call salloc (w, pdim, TY_DOUBLE)
-	    call salloc (cd, pdim*pdim, TY_DOUBLE)
+	    sz_val = pdim
+	    call salloc (r, sz_val, TY_DOUBLE)
+	    call salloc (w, sz_val, TY_DOUBLE)
+	    sz_val = pdim*pdim
+	    call salloc (cd, sz_val, TY_DOUBLE)
 
 	    # Check for a transposed or rotated 2D image.
 	    SMW_TRANS(smw) = NO
@@ -173,7 +184,7 @@ begin
 		    dtype = DCLINEAR
 	    }
 	    if (dtype==DCLOG) {
-		if (abs(w1)>20. || abs(w1+(nw-1)*dw)>20.)
+		if (dabs(w1)>20. || dabs(w1+(nw-1)*dw)>20.)
 		    dtype = DCLINEAR
 		else {
 		    w1 = 10D0 ** w1
@@ -193,7 +204,8 @@ begin
 	    }
 
 	    SMW_DTYPE(smw) = INDEFI
-	    call smw_swattrs (smw, 1, 1, INDEFI, INDEFI,
+	    l_val = INDEFL
+	    call smw_swattrs (smw, c_1, c_1, l_val, INDEFI,
 		dtype, w1, dw, nw, 0D0, INDEFR, INDEFR, "")
 	case SMW_ES, SMW_MS:
 	    paxis = 1
@@ -241,7 +253,7 @@ begin
 	}
 
 	# Set the default title.
-	call smw_sapid (smw, 0, 1, IM_TITLE(im))
+	call smw_sapid (smw, c_0, c_1, IM_TITLE(im))
 
 	call sfree (sp)
 end

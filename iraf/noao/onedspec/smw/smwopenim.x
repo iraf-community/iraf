@@ -12,14 +12,18 @@ pointer procedure smw_openim (im)
 pointer	im		#I Image pointer
 pointer	mw		#O MWCS pointer
 
-pointer	sp, system, mw_openim()
+size_t	sz_val
+pointer	sp, system
+int	wcsdim, sys, i
 bool	streq()
-int	i, wcsdim, sys, strdic(), mw_stati()
+int	strdic(), mw_stati()
+pointer	mw_openim()
 errchk	mw_openim, smw_oldms, smw_linear
 
 begin
 	call smark (sp)
-	call salloc (system, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (system, sz_val, TY_CHAR)
 
 	# Workaround for truncation of header during image header copy.
 	IM_HDRLEN(im) = IM_LENHDRMEM(im)

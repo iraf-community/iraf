@@ -6,7 +6,7 @@ include	<smw.h>
 procedure smw_smw (smw, line, mw)
 
 pointer	smw		#I SMW pointer
-int	line		#I Physical line
+long	line		#I Physical line
 pointer	mw		#I MWCS pointer
 
 begin

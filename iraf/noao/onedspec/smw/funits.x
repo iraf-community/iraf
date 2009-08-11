@@ -9,10 +9,12 @@ include	<funits.h>
 pointer procedure fun_open (funits)
 
 char	funits[ARB]		# Units string
+size_t	sz_val
 pointer	fun			# Units pointer returned
 
 begin
-	call calloc (fun, FUN_LEN, TY_STRUCT)
+	sz_val = FUN_LEN
+	call calloc (fun, sz_val, TY_STRUCT)
 	iferr (call fun_decode (fun, funits)) {
 	    call fun_close (fun)
 	    call erract (EA_ERROR)
@@ -36,12 +38,16 @@ end
 
 procedure fun_copy (fun1, fun2)
 
+size_t	sz_val
 pointer	fun1, fun2		# Units pointers
 
 begin
-	if (fun2 == NULL)
-	    call malloc (fun2, FUN_LEN, TY_STRUCT)
-	call amovi (Memi[fun1], Memi[fun2], FUN_LEN)
+	if (fun2 == NULL) {
+	    sz_val = FUN_LEN
+	    call malloc (fun2, sz_val, TY_STRUCT)
+	}
+	sz_val = FUN_LEN
+	call amovp (Memp[fun1], Memp[fun2], sz_val)
 end
 
 
@@ -54,8 +60,9 @@ procedure fun_decode (fun, funits)
 pointer	fun			# Units pointer
 char	funits[ARB]		# Units string
 
-bool	streq()
+size_t	sz_val
 pointer	sp, funits1, temp
+bool	streq()
 errchk	fun_decode1, fun_ctranr
 
 begin
@@ -63,8 +70,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (funits1, SZ_LINE, TY_CHAR)
-	call salloc (temp, FUN_LEN, TY_STRUCT)
+	sz_val = SZ_LINE
+	call salloc (funits1, sz_val, TY_CHAR)
+	sz_val = FUN_LEN
+	call salloc (temp, sz_val, TY_STRUCT)
 
 	# Save a copy to restore in case of an error.
 	call fun_copy (fun, temp)
@@ -89,8 +98,9 @@ char	funits[ARB]		# Units string
 char	funits1[sz_funits1]	# Secondary funits string to return
 int	sz_funits1		# Size of secondary funits string
 
+size_t	sz_val
 int	funmod, funtype
-int	i, j, k, nscan(), strdic(), strlen()
+int	i, j, k
 real	funscale
 pointer	sp, str
 
@@ -99,9 +109,12 @@ real	scale[FUN_NUNITS]
 data	class /FUN_FREQ,FUN_FREQ,FUN_FREQ,FUN_WAVE/
 data	scale /FUN_J,FUN_FU,FUN_CGSH,FUN_CGSA/
 
+int	nscan(), strdic(), strlen()
+
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	call strcpy (funits, Memc[str], SZ_FNAME)
 	call strlwr (Memc[str])
@@ -192,25 +205,31 @@ pointer	fun2			# Output funits pointer
 pointer	dun			# Input units pointer
 real	dval[nvals]		# Input dispersion values
 real	fval1[nvals]		# Input flux values
-real	fval2[nvals]		# Output flux values
-int	nvals			# Number of values
+real	fval2[nvals]		# Output flux valu	es
+long	nvals			# Number of values
 
-int	i
+size_t	sz_val
+long	i, c_1
 real	s, lambda
-pointer	ang, un_open()
+pointer	ang
+pointer	un_open()
 bool	fun_compare()
 errchk	un_open, un_ctranr
 
 begin
+	c_1 = 1
+
 	if (fun_compare (fun1, fun2)) {
-	    call amovr (fval1, fval2, nvals)
+	    sz_val = nvals
+	    call amovr (fval1, fval2, sz_val)
 	    return
 	}
 
 	if (FUN_CLASS(fun1) == FUN_UNKNOWN || FUN_CLASS(fun2) == FUN_UNKNOWN)
 	    call error (1, "Cannot convert between selected funits")
 
-	call amovr (fval1, fval2, nvals)
+	sz_val = nvals
+	call amovr (fval1, fval2, sz_val)
 
 	s = FUN_SCALE(fun1)
 	switch (FUN_MOD(fun1)) {
@@ -230,7 +249,7 @@ begin
 		s = s * FUN_VLIGHT
 		ang = un_open ("angstroms")
 		do i = 1, nvals {
-		    call un_ctranr (dun, ang, dval[i], lambda, 1)
+		    call un_ctranr (dun, ang, dval[i], lambda, c_1)
 		    fval2[i] = fval2[i] / s * lambda**2
 		}
 		call un_close (ang)
@@ -250,7 +269,7 @@ begin
 		s = s * FUN_VLIGHT
 		ang = un_open ("angstroms")
 		do i = 1, nvals {
-		    call un_ctranr (dun, ang, dval[i], lambda, 1)
+		    call un_ctranr (dun, ang, dval[i], lambda, c_1)
 		    fval2[i] = fval2[i] * s / lambda**2
 		}
 		call un_close (ang)
@@ -280,11 +299,12 @@ char	funits[ARB]		# Desired funits
 pointer	dun			# Dispersion units pointer
 real	dvals[nvals]		# Dispersion values
 real	fvals[nvals]		# Flux Values
-int	nvals			# Number of values
+long	nvals			# Number of values
 int	update			# Update funits pointer?
 
+pointer	fun1
 bool	streq(), fun_compare()
-pointer	fun1, fun_open()
+pointer	fun_open()
 errchk	fun_open, fun_ctranr
 
 begin
@@ -324,24 +344,30 @@ pointer	dun			# Input dispersion units pointer
 double	dval[nvals]		# Input dispersion values
 double	fval1[nvals]		# Input flux values
 double	fval2[nvals]		# Output flux values
-int	nvals			# Number of values
+long	nvals			# Number of values
 
-int	i
+size_t	sz_val
+long	i, c_1
 double	s, lambda
-pointer	ang, un_open()
+pointer	ang
+pointer	un_open()
 bool	fun_compare()
 errchk	un_open, un_ctrand
 
 begin
+	c_1 = 1
+
 	if (fun_compare (fun1, fun2)) {
-	    call amovd (fval1, fval2, nvals)
+	    sz_val = nvals
+	    call amovd (fval1, fval2, sz_val)
 	    return
 	}
 
 	if (FUN_CLASS(fun1) == FUN_UNKNOWN || FUN_CLASS(fun2) == FUN_UNKNOWN)
 	    call error (1, "Cannot convert between selected funits")
 
-	call amovd (fval1, fval2, nvals)
+	sz_val = nvals
+	call amovd (fval1, fval2, sz_val)
 
 	s = FUN_SCALE(fun1)
 	switch (FUN_MOD(fun1)) {
@@ -361,7 +387,7 @@ begin
 		s = s * FUN_VLIGHT
 		ang = un_open ("angstroms")
 		do i = 1, nvals {
-		    call un_ctrand (dun, ang, dval[i], lambda, 1)
+		    call un_ctrand (dun, ang, dval[i], lambda, c_1)
 		    fval2[i] = fval2[i] / s * lambda**2
 		}
 		call un_close (ang)
@@ -381,7 +407,7 @@ begin
 		s = s * FUN_VLIGHT
 		ang = un_open ("angstroms")
 		do i = 1, nvals {
-		    call un_ctrand (dun, ang, dval[i], lambda, 1)
+		    call un_ctrand (dun, ang, dval[i], lambda, c_1)
 		    fval2[i] = fval2[i] * s / lambda**2
 		}
 		call un_close (ang)
@@ -412,11 +438,12 @@ char	funits[ARB]		# Desired funits
 pointer	dun			# Input dispersion pointer
 double	dvals[nvals]		# Input dispersion values
 double	fvals[nvals]		# Flux values
-int	nvals			# Number of values
+long	nvals			# Number of values
 int	update			# Update funits pointer?
 
+pointer	fun1
 bool	streq(), fun_compare()
-pointer	fun1, fun_open()
+pointer	fun_open()
 errchk	fun_open, fun_ctrand
 
 begin

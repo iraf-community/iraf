@@ -18,7 +18,9 @@ char	system2[ARB]	#I Output coordinate system
 int	axbits		#I Bitmap defining axes to be transformed
 pointer	ct		#O SMW CT pointer
 
-int	i, cttype, nct, axes[3], naxes, strdic()
+size_t	sz_val
+int	i, cttype, nct, axes[3], naxes
+int	strdic()
 pointer	mw_sctran()
 errchk	mw_sctran
 
@@ -31,7 +33,8 @@ begin
 	if (cttype == SMW_LP || cttype == SMW_PL)
 	    nct = 1
 
-	call calloc (ct, SMW_CTLEN(nct), TY_STRUCT)
+	sz_val = SMW_CTLEN(nct)
+	call calloc (ct, sz_val, TY_STRUCT)
 	SMW_SMW(ct) = smw
 	SMW_CTTYPE(ct) = cttype
 	SMW_NCT(ct) = nct

@@ -13,7 +13,8 @@ double	longitude	# Latitude (degrees)
 double	altitude	# Altitude (meters)
 double	v		# Velocity (km / s)
 
-double	lat, dlat, r, vc, lmst, ast_mst()
+double	lat, dlat, r, vc, lmst
+double	ast_mst()
 
 begin
 	# LAT is the latitude in radians.

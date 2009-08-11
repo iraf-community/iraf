@@ -20,9 +20,10 @@ pointer	im			#I IMIO pointer
 int	daxisp			#I Default dispersion axis
 int	nsum1, nsum2		#I Default summing factors
 
+size_t	sz_val
 int	i, da, ns[2]
-int	imgeti(), clgeti(), clscan(), nscan(), nowhite(), strdic()
 pointer	sp, key, val
+int	imgeti(), clgeti(), clscan(), nscan(), nowhite(), strdic()
 data	da/0/, ns/0,0/
 errchk	clgeti
 
@@ -53,8 +54,10 @@ begin
 		iferr (SMW_PAXIS(smw,1) = imgeti (im, "DISPAXIS")) {
 		    SMW_PAXIS(smw,1) = clgeti ("dispaxis")
 		    call smark (sp)
-		    call salloc (key, 8, TY_CHAR)
-		    call salloc (val, SZ_FNAME, TY_CHAR)
+		    sz_val = 8
+		    call salloc (key, sz_val, TY_CHAR)
+		    sz_val = SZ_FNAME
+		    call salloc (val, sz_val, TY_CHAR)
 		    do i = 1, 7 {
 			call sprintf (Memc[key], 8, "CTYPE%d")
 			    call pargi (i)

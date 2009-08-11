@@ -8,22 +8,26 @@ pointer procedure smw_newcopy (smw)
 pointer smw             #I SMW pointer to copy
 pointer new 	        #O SMW copy
 
-int     i, nspec
+long	i
+size_t	nspec, sz_val
 pointer mw_newcopy(), mw_sctran()
 
 begin
-	call calloc (new, SMW_LEN(SMW_NMW(smw)), TY_STRUCT)
-	call amovi (Memi[smw], Memi[new], SMW_LEN(SMW_NMW(smw)))
+	sz_val = SMW_LEN(SMW_NMW(smw))
+	call calloc (new, sz_val, TY_STRUCT)
+	sz_val = SMW_LEN(SMW_NMW(smw))
+	call amovp (Memp[smw], Memp[new], sz_val)
 
 	if (SMW_APID(smw) != NULL) {
-	    call malloc (SMW_APID(new), SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (SMW_APID(new), sz_val, TY_CHAR)
 	    call strcpy (Memc[SMW_APID(smw)], Memc[SMW_APID(new)], SZ_LINE)
 	}
 
 	nspec = SMW_NSPEC(smw)
 	if (SMW_APS(smw) != NULL) {
-	    call malloc (SMW_APS(new), nspec, TY_INT)
-	    call amovi (Memi[SMW_APS(smw)], Memi[SMW_APS(new)], nspec)
+	    call malloc (SMW_APS(new), nspec, TY_LONG)
+	    call amovl (Meml[SMW_APS(smw)], Meml[SMW_APS(new)], nspec)
 	}
 	if (SMW_BEAMS(smw) != NULL) {
 	    call malloc (SMW_BEAMS(new), nspec, TY_INT)
@@ -40,10 +44,11 @@ begin
 	if (SMW_APIDS(smw) != NULL) {
 	    call calloc (SMW_APIDS(new), nspec, TY_POINTER)
 	    do i = 0, nspec-1 {
-		if (Memi[SMW_APIDS(smw)+i] != NULL) {
-		    call malloc (Memi[SMW_APIDS(new)+i], SZ_LINE, TY_CHAR)
-		    call strcpy (Memc[Memi[SMW_APIDS(smw)+i]],
-			Memc[Memi[SMW_APIDS(new)+i]], SZ_LINE)
+		if (Memp[SMW_APIDS(smw)+i] != NULL) {
+		    sz_val = SZ_LINE
+		    call malloc (Memp[SMW_APIDS(new)+i], sz_val, TY_CHAR)
+		    call strcpy (Memc[Memp[SMW_APIDS(smw)+i]],
+			Memc[Memp[SMW_APIDS(new)+i]], SZ_LINE)
 		}
 	    }
 	}

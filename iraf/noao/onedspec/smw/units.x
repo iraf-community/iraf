@@ -9,10 +9,13 @@ include	<units.h>
 pointer procedure un_open (units)
 
 char	units[ARB]		# Units string
+
+size_t	sz_val
 pointer	un			# Units pointer returned
 
 begin
-	call calloc (un, UN_LEN, TY_STRUCT)
+	sz_val = UN_LEN
+	call calloc (un, sz_val, TY_STRUCT)
 	iferr (call un_decode (un, units)) {
 	    call un_close (un)
 	    call erract (EA_ERROR)
@@ -38,10 +41,15 @@ procedure un_copy (un1, un2)
 
 pointer	un1, un2		# Units pointers
 
+size_t	sz_val
+
 begin
-	if (un2 == NULL)
-	    call malloc (un2, UN_LEN, TY_STRUCT)
-	call amovi (Memi[un1], Memi[un2], UN_LEN)
+	if (un2 == NULL) {
+	    sz_val = UN_LEN
+	    call malloc (un2, sz_val, TY_STRUCT)
+	}
+	sz_val = UN_LEN
+	call amovp (Memp[un1], Memp[un2], sz_val)
 end
 
 
@@ -56,8 +64,10 @@ procedure un_decode (un, units)
 pointer	un			# Units pointer
 char	units[ARB]		# Units string
 
-bool	streq()
+size_t	sz_val
+long	l_val
 pointer	sp, units1, temp, un1, un2
+bool	streq()
 errchk	un_decode1, un_ctranr
 
 begin
@@ -65,8 +75,10 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (units1, SZ_LINE, TY_CHAR)
-	call salloc (temp, UN_LEN, TY_STRUCT)
+	sz_val = SZ_LINE
+	call salloc (units1, sz_val, TY_CHAR)
+	sz_val = UN_LEN
+	call salloc (temp, sz_val, TY_STRUCT)
 
 	# Save a copy to restore in case of an error.
 	call un_copy (un, temp)
@@ -77,14 +89,17 @@ begin
 
 	    # Decode velocity reference wavelength if necessary.
 	    if (UN_CLASS(un) == UN_VEL || UN_CLASS(un) == UN_DOP) {
-		call salloc (un1, UN_LEN, TY_STRUCT)
+		sz_val = UN_LEN
+		call salloc (un1, sz_val, TY_STRUCT)
 		call un_decode1 (un1, Memc[units1], Memc[units1], SZ_LINE)
 		if (UN_CLASS(un1) == UN_VEL || UN_CLASS(un1) == UN_DOP)
 		    call error (1,
 			"Velocity reference units may not be velocity")
-		call salloc (un2, UN_LEN, TY_STRUCT)
+		sz_val = UN_LEN
+		call salloc (un2, sz_val, TY_STRUCT)
 		call un_decode1 (un2, "angstroms", Memc[units1], SZ_LINE)
-		call un_ctranr (un1, un2, UN_VREF(un), UN_VREF(un), 1)
+		l_val = 1
+		call un_ctranr (un1, un2, UN_VREF(un), UN_VREF(un), l_val)
 	    }
 	} then {
 	    call un_copy (temp, un)
@@ -106,10 +121,11 @@ char	units[ARB]		# Units string
 char	units1[sz_units1]	# Secondary units string to return
 int	sz_units1		# Size of secondary units string
 
-int	unlog, uninv, untype
-int	i, j, k, nscan(), strdic(), strlen()
-pointer	sp, str
-pointer	stp, sym, stfind(), strefsbuf()
+size_t	sz_val
+int	unlog, uninv, untype, i, j, k
+pointer	sp, str, stp, sym
+int	nscan(), strdic(), strlen()
+pointer	stfind(), strefsbuf()
 
 int	class[UN_NUNITS]
 real	scale[UN_NUNITS]
@@ -122,7 +138,8 @@ data	scale /UN_ANG,UN_NM,UN_MMIC,UN_MIC,UN_MM,UN_CM,UN_M,UN_HZ,UN_KHZ,
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	iferr (call un_abbr (stp))
 	    ;
@@ -131,7 +148,7 @@ begin
 	if (stp != NULL) {
 	    sym = stfind (stp, Memc[str])
 	    if (sym != NULL)
-		call strcpy (Memc[strefsbuf(stp,Memi[sym])],
+		call strcpy (Memc[strefsbuf(stp,Memi[P2I(sym)])],
 		    Memc[str], SZ_FNAME)
 	}
 	call strlwr (Memc[str])
@@ -241,22 +258,25 @@ pointer	un1			# Input units pointer
 pointer	un2			# Output units pointer
 real	val1[nvals]		# Input values
 real	val2[nvals]		# Output values
-int	nvals			# Number of values
+long	nvals			# Number of values
 
-int	i
+size_t	sz_val
+long	i
 real	s, v, z
 bool	un_compare()
 
 begin
 	if (un_compare (un1, un2)) {
-	    call amovr (val1, val2, nvals)
+	    sz_val = nvals
+	    call amovr (val1, val2, sz_val)
 	    return
 	}
 
 	if (UN_CLASS(un1) == UN_UNKNOWN || UN_CLASS(un2) == UN_UNKNOWN)
 	    call error (1, "Cannot convert between selected units")
 
-	call amovr (val1, val2, nvals)
+	sz_val = nvals
+	call amovr (val1, val2, sz_val)
 
 	s = UN_SCALE(un1)
 	if (UN_LOG(un1) == YES)
@@ -326,11 +346,12 @@ procedure un_changer (un, units, vals, nvals, update)
 pointer	un			# Units pointer (may be changed)
 char	units[ARB]		# Desired units
 real	vals[nvals]		# Values
-int	nvals			# Number of values
+long	nvals			# Number of values
 int	update			# Update units pointer?
 
+pointer	un1
 bool	streq(), un_compare()
-pointer	un1, un_open()
+pointer	un_open()
 errchk	un_open, un_ctranr
 
 begin
@@ -368,22 +389,25 @@ pointer	un1			# Input units pointer
 pointer	un2			# Output units pointer
 double	val1[nvals]		# Input values
 double	val2[nvals]		# Output values
-int	nvals			# Number of values
+long	nvals			# Number of values
 
-int	i
+size_t	sz_val
+long	i
 double	s, v, z
 bool	un_compare()
 
 begin
 	if (un_compare (un1, un2)) {
-	    call amovd (val1, val2, nvals)
+	    sz_val = nvals
+	    call amovd (val1, val2, sz_val)
 	    return
 	}
 
 	if (UN_CLASS(un1) == UN_UNKNOWN || UN_CLASS(un2) == UN_UNKNOWN)
 	    call error (1, "Cannot convert between selected units")
 
-	call amovd (val1, val2, nvals)
+	sz_val = nvals
+	call amovd (val1, val2, sz_val)
 
 	s = UN_SCALE(un1)
 	if (UN_LOG(un1) == YES)
@@ -453,11 +477,12 @@ procedure un_changed (un, units, vals, nvals, update)
 pointer	un			# Units pointer (may be changed)
 char	units[ARB]		# Desired units
 double	vals[nvals]		# Values
-int	nvals			# Number of values
+long	nvals			# Number of values
 int	update			# Update units pointer?
 
+pointer	un1
 bool	streq(), un_compare()
-pointer	un1, un_open()
+pointer	un_open()
 errchk	un_open, un_ctrand
 
 begin
@@ -492,9 +517,11 @@ procedure un_abbr (stp)
 
 pointer	stp		#U Symbol table
 
-int	fd, open(), fscan(), nscan(), stpstr()
-pointer	sp, key, val
-pointer	sym, stopen(), stfind(), stenter(), strefsbuf()
+size_t	sz_val
+int	fd
+pointer	sp, key, val, sym
+int	open(), fscan(), nscan(), stpstr()
+pointer	stopen(), stfind(), stenter(), strefsbuf()
 errchk	open
 
 begin
@@ -505,8 +532,9 @@ begin
 	stp = stopen ("unabbr", 20, 20, 40*SZ_LINE)
 
 	call smark (sp)
-	call salloc (key, SZ_LINE, TY_CHAR)
-	call salloc (val, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (key, sz_val, TY_CHAR)
+	call salloc (val, sz_val, TY_CHAR)
 
 	while (fscan (fd) != EOF) {
 	    call gargwrd (Memc[key], SZ_LINE)
@@ -519,9 +547,9 @@ begin
 	    sym = stfind (stp, Memc[key])
 	    if (sym == NULL) {
 		sym = stenter (stp, Memc[key], 1)
-		Memi[sym] = stpstr (stp, Memc[val], SZ_LINE)
+		Memi[P2I(sym)] = stpstr (stp, Memc[val], SZ_LINE)
 	    } else
-		call strcpy (Memc[val], Memc[strefsbuf(stp,Memi[sym])], SZ_LINE)
+		call strcpy (Memc[val], Memc[strefsbuf(stp,Memi[P2I(sym)])], SZ_LINE)
 	}
 
 	call close (fd)

@@ -6,10 +6,11 @@ include	<smw.h>
 procedure smw_sapid (smw, index1, index2, apid)
 
 pointer	smw				#I SMW pointer
-int	index1				#I Spectrum index
-int	index2				#I Spectrum index
+long	index1				#I Spectrum index
+long	index2				#I Spectrum index
 char	apid[ARB]			#I Aperture id
 
+size_t	sz_val
 pointer	ptr
 bool	streq()
 errchk	malloc
@@ -26,15 +27,17 @@ begin
 		call strcpy (apid, Memc[SMW_APID(smw)], SZ_LINE)
 
 	    else {
-		ptr = Memi[SMW_APIDS(smw)+index1-1]
+		ptr = Memp[SMW_APIDS(smw)+index1-1]
 		if (streq (apid, Memc[SMW_APID(smw)]))
 		    call mfree (ptr, TY_CHAR) 
 		else {
-		    if (ptr == NULL)
-			call malloc (ptr, SZ_LINE, TY_CHAR)
+		    if (ptr == NULL) {
+			sz_val = SZ_LINE
+			call malloc (ptr, sz_val, TY_CHAR)
+		    }
 		    call strcpy (apid, Memc[ptr], SZ_LINE)
 		}
-		Memi[SMW_APIDS(smw)+index1-1] = ptr
+		Memp[SMW_APIDS(smw)+index1-1] = ptr
 	    }
 	}
 end

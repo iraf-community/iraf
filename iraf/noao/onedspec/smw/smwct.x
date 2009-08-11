@@ -6,7 +6,7 @@ include	<smw.h>
 pointer procedure smw_ct (sct, line)
 
 pointer	sct		#I SMW pointer
-int	line		#I Physical line
+long	line		#I Physical line
 
 begin
 	if (SMW_NCT(sct) == 1)

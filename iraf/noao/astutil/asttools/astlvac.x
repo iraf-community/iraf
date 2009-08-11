@@ -15,9 +15,9 @@ procedure ast_lvac (lair, lvac, npts)
 
 double	lair[npts]		#I Air wavelength (Angstroms)
 double	lvac[npts]		#O Vacuum wavelength (Angstroms)
-int	npts			#I Number of points
+long	npts			#I Number of points
 
-int	i
+long	i
 double	s2, n
 
 begin

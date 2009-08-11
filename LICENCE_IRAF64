@@ -1,0 +1,9 @@
+See COPYRIGHTS file for original IRAF.
+
+Do not remove CREDITS_IRAF64 and LICENCE_IRAF64 from IRAF package.
+
+Please display following message when starting IRAF shells;
+
+  This product includes results achieved by the IRAF64 project in 2006-
+  2009 directed by Chisato Yamauchi (C-SODA/ISAS/JAXA).
+

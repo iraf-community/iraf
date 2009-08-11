@@ -13,8 +13,10 @@ procedure smw_saveim (smw, im)
 pointer	smw			# SMW pointer
 pointer	im			# Image pointer
 
-int	i, j, format, nl, pdim, pdim1, beam, dtype, dtype1, nw, nw1
-int	ap, axes[3]
+size_t	sz_val
+int	format, pdim, pdim1, beam, dtype, dtype1, ii
+int	axes[3]
+long	ap, nl, nw, nw1, i, j, c_1
 real	aplow[2], aphigh[2]
 double	v, m, w1, dw, z, w11, dw1, z1
 pointer	sp, key, str1, str2, axmap, lterm, coeff, mw, mw1
@@ -25,13 +27,21 @@ pointer	mw_open()
 errchk	smw_merge, imdelf
 data	axes/1,2,3/
 
+include	<nullptr.inc>
+
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
-	call salloc (axmap, 6, TY_INT)
-	call salloc (lterm, 15, TY_DOUBLE)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
+	sz_val = 6
+	call salloc (axmap, sz_val, TY_INT)
+	sz_val = 15
+	call salloc (lterm, sz_val, TY_DOUBLE)
 	coeff = NULL
 
 	# Merge split WCS into a single WCS.
@@ -52,8 +62,8 @@ begin
 	# routine setting up the WCS.
 
 	pdim1 = max (IM_NDIM(im), IM_NPHYSDIM(im))
-	ifnoerr (i = imgeti (im, "SMW_NDIM")) {
-	    pdim1 = i
+	ifnoerr (ii = imgeti (im, "SMW_NDIM")) {
+	    pdim1 = ii
 	    call imdelf (im, "SMW_NDIM")
 	}
 
@@ -61,7 +71,7 @@ begin
 	if (format == SMW_MS) {
 	    format = SMW_ES
 	    do i = 1, nl {
-		call smw_gwattrs (smw, i, 1, ap, beam, dtype, w1, dw, nw, z,
+		call smw_gwattrs (smw, i, c_1, ap, beam, dtype, w1, dw, nw, z,
 		    aplow, aphigh, coeff)
 		if (i == 1) {
 		    dtype1 = dtype
@@ -88,21 +98,21 @@ begin
 	    if (imaccf (im, "DISPAXIS") == YES)
 		call imaddi (im, "DISPAXIS", SMW_PAXIS(smw,1))
 
-	    call smw_gapid (smw, 1, 1, IM_TITLE(im), SZ_IMTITLE)
+	    call smw_gapid (smw, c_1, c_1, IM_TITLE(im), SZ_IMTITLE)
 	    call mw_saveim (mw, im)
 
 	case SMW_ES:
 	    # Save aperture information.
 	    do i = 1, nl {
-		call smw_gwattrs (smw, i, 1, ap, beam, dtype, w1, dw, nw, z,
+		call smw_gwattrs (smw, i, c_1, ap, beam, dtype, w1, dw, nw, z,
 		    aplow, aphigh, coeff)
 		if (i < 1000)
 		    call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
 		else
 		    call sprintf (Memc[key], SZ_FNAME, "AP%d")
-		    call pargi (i)
+		    call pargl (i)
 		call sprintf (Memc[str1], SZ_LINE, "%d %d")
-		    call pargi (ap)
+		    call pargl (ap)
 		    call pargi (beam)
 		if (!IS_INDEF(aplow[1]) || !IS_INDEF(aphigh[1])) {
 		    call sprintf (Memc[str2], SZ_LINE, " %.2f %.2f")
@@ -121,7 +131,7 @@ begin
 		    iferr (call imdelf (im, "APID1"))
 			;
 		}
-		call smw_gapid (smw, i, 1, Memc[str1], SZ_LINE)
+		call smw_gapid (smw, i, c_1, Memc[str1], SZ_LINE)
 		if (Memc[str1] != EOS) {
 		    if (strne (Memc[str1], IM_TITLE(im))) {
 			if (nl == 1) {
@@ -129,7 +139,7 @@ begin
 			    call strcpy (Memc[str1], IM_TITLE(im), SZ_IMTITLE)
 			} else {
 			    call sprintf (Memc[key], SZ_FNAME, "APID%d")
-				call pargi (i)
+				call pargl (i)
 			    call imastr (im, Memc[key], Memc[str1])
 			}
 		    }
@@ -137,16 +147,16 @@ begin
 	    }
 
 	    # Delete unnecessary aperture information.
-	    do i = nl+1, ARB {
+	    do i = nl+1, MAX_LONG {
 		if (i < 1000)
 		    call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
 		else
 		    call sprintf (Memc[key], SZ_FNAME, "AP%d")
-		    call pargi (i)
+		    call pargl (i)
 		iferr (call imdelf (im, Memc[key]))
 		    break
 		call sprintf (Memc[key], SZ_FNAME, "APID%d")
-		    call pargi (i)
+		    call pargl (i)
 		iferr (call imdelf (im, Memc[key]))
 		    ;
 	    }
@@ -157,13 +167,13 @@ begin
 	    else if (imaccf (im, "DC-FLAG") == YES)
 		call imdelf (im, "DC-FLAG")
 	    if (nw < IM_LEN(im,1))
-		call imaddi (im, "NP2", nw)
+		call imaddl (im, "NP2", nw)
 	    else if (imaccf (im, "NP2") == YES)
 		call imdelf (im, "NP2")
 
 	    # Setup EQUISPEC WCS.
 
-	    mw1 = mw_open (NULL, pdim1)
+	    mw1 = mw_open (NULLPTR, pdim1)
 	    call mw_newsystem (mw1, "equispec", pdim1)
 	    call mw_swtype (mw1, axes, pdim1, "linear", "")
 	    ifnoerr (call mw_gwattrs (mw, 1, "label", Memc[str1], SZ_LINE))
@@ -200,17 +210,18 @@ begin
 	    # Delete any APNUM keywords.  If there is only one spectrum
 	    # define the axis mapping.
 
-	    do j = 1, ARB {
+	    do j = 1, MAX_LONG {
 		if (j < 1000)
 		    call sprintf (Memc[key], SZ_FNAME, "APNUM%d")
 		else
 		    call sprintf (Memc[key], SZ_FNAME, "AP%d")
-		    call pargi (j)
+		    call pargl (j)
 		iferr (call imdelf (im, Memc[key]))
 		    break
 	    }
 	    if (IM_NDIM(im) == 1) {
-		call aclri (Memi[axmap], 2*pdim)
+		sz_val = 2*pdim
+		call aclri (Memi[axmap], sz_val)
 		Memi[axmap] = 1
 		call mw_saxmap (mw, Memi[axmap], Memi[axmap+pdim], pdim)
 	    }
@@ -221,7 +232,7 @@ begin
 		    iferr (call imdelf (im, "APID1"))
 			;
 		}
-		call smw_gapid (smw, i, 1, Memc[str1], SZ_LINE)
+		call smw_gapid (smw, i, c_1, Memc[str1], SZ_LINE)
 		if (Memc[str1] != EOS) {
 		    if (strne (Memc[str1], IM_TITLE(im))) {
 			if (nl == 1) {
@@ -229,16 +240,16 @@ begin
 			    call strcpy (Memc[str1], IM_TITLE(im), SZ_IMTITLE)
 			} else {
 			    call sprintf (Memc[key], SZ_FNAME, "APID%d")
-				call pargi (i)
+				call pargl (i)
 			    call imastr (im, Memc[key], Memc[str1])
 			}
 		    }
 		}
 	    }
 
-	    do i = nl+1, ARB {
+	    do i = nl+1, MAX_LONG {
 		call sprintf (Memc[key], SZ_FNAME, "APID%d")
-		    call pargi (i)
+		    call pargl (i)
 		iferr (call imdelf (im, Memc[key]))
 		    break
 	    }

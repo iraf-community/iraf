@@ -10,23 +10,33 @@ procedure smw_ndes (im, smw)
 pointer	im			#I IMIO pointer
 pointer	smw			#U Input NDSPEC SMW, output EQUISPEC SMW
 
-int	i, pdim1, pdim2, daxis, ap, beam, dtype, nw, axes[2]
+size_t	sz_val
+long	ap, nw, i, c_1
+int	pdim1, pdim2, daxis, beam, dtype, axes[2]
 real	aplow[2], aphigh[2]
 double	w1, dw, z
-pointer	sp, key, str, lterm1, lterm2, coeff, mw1, mw2, mw_open()
+pointer	sp, key, str, lterm1, lterm2, coeff, mw1, mw2
+pointer	mw_open()
 errchk	mw_open, mw_gltermd, mw_gwtermd, smw_open, smw_saxes, smw_gwattrs
 data	axes/1,2/, coeff/NULL/
 
+include	<nullptr.inc>
+
 begin
+	c_1 = 1
+
 	# Require the dispersion to be along the first logical axis.
 	if (SMW_LAXIS(smw,1) != 1)
 	    return
 
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (lterm1, 15, TY_DOUBLE)
-	call salloc (lterm2, 15, TY_DOUBLE)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = 15
+	call salloc (lterm1, sz_val, TY_DOUBLE)
+	call salloc (lterm2, sz_val, TY_DOUBLE)
 
 	# Set the MWCS.  Only the logical and world transformations along
 	# the dispersion axis are transfered.
@@ -36,7 +46,7 @@ begin
 	daxis = SMW_PAXIS(smw,1)
 	mw1 = SMW_MW(smw,0)
 
-	mw2 = mw_open (NULL, pdim2)
+	mw2 = mw_open (NULLPTR, pdim2)
 	call mw_newsystem (mw2, "equispec", pdim2)
 	call mw_swtype (mw2, axes, pdim2, "linear", "")
 	ifnoerr (call mw_gwattrs (mw1, daxis, "label", Memc[str], SZ_LINE))
@@ -66,11 +76,11 @@ begin
 	# Set the EQUISPEC SMW.
 	IM_LEN(im,2) = SMW_NSPEC(smw)
 	IM_LEN(im,3) = SMW_NBANDS(smw)
-	call smw_open (mw2, NULL, im)
+	call smw_open (mw2, NULLPTR, im)
 	do i = 1, SMW_NSPEC(smw) {
-	    call smw_gwattrs (smw, i, 1, ap, beam, dtype, w1, dw, nw, z,
+	    call smw_gwattrs (smw, i, c_1, ap, beam, dtype, w1, dw, nw, z,
 		aplow, aphigh, coeff)
-	    call smw_swattrs (mw2, i, 1, ap, beam, dtype, w1, dw, nw, z,
+	    call smw_swattrs (mw2, i, c_1, ap, beam, dtype, w1, dw, nw, z,
 		aplow, aphigh, Memc[coeff])
 	}
 	call mfree (coeff, TY_CHAR)
