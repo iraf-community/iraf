@@ -39,7 +39,9 @@ pointer	key		# pointer to select strucuture
 char	field[ARB]	# field to evaluated
 pointer	o		# operand
 
-int	type, maxnelems, nelems
+size_t	sz_val
+int	type, maxnelems, i_val
+long	nelems
 pointer	sp, root, ranges, list
 bool	pt_kybool()
 int	pt_kytype(), pt_kyinteger(), decode_ranges()
@@ -48,17 +50,19 @@ errchk	pt_kytype(), pt_kybool(), pt_kyreal(), pt_kystr()
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (ranges, SZ_FNAME, TY_CHAR)
-	call salloc (list, 3 * KY_MAXNRANGES + 1, TY_INT)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (ranges, sz_val, TY_CHAR)
+	sz_val = 3 * KY_MAXNRANGES + 1
+	call salloc (list, sz_val, TY_LONG)
 
 	# Select the field.
 	call strupr (field)
 	type = pt_kytype (key, field, Memc[root], Memc[ranges], maxnelems)
 	if (Memc[ranges] == EOS) {
 	    nelems = 1
-	    Memi[list] = 1
-	} else if (decode_ranges (Memc[ranges], Memi[list], KY_MAXNRANGES,
+	    Meml[list] = 1
+	} else if (decode_ranges (Memc[ranges], Meml[list], KY_MAXNRANGES,
 	    nelems) == ERR) {
 	    call sfree (sp)
 	    call error (0, "Cannot decode range string")
@@ -69,7 +73,8 @@ begin
 	case TY_BOOL:
 	    if (nelems == 1) {
 	        call xev_initop (o, 0, TY_BOOL)
-	        O_VALB(o) = pt_kybool (key, Memc[root], Memi[list])
+		i_val = Meml[list]
+	        O_VALB(o) = pt_kybool (key, Memc[root], i_val)
 	    } else {
 		call sfree (sp)
 		call eprintf ("Error decoding boolean field array: %s\n")
@@ -79,7 +84,8 @@ begin
 	case TY_INT:
 	    if (nelems == 1) {
 	        call xev_initop (o, 0, TY_INT)
-	        O_VALI(o) = pt_kyinteger (key, Memc[root], Memi[list])
+		i_val = Meml[list]
+	        O_VALI(o) = pt_kyinteger (key, Memc[root], i_val)
 	    } else {
 		call sfree (sp)
 		call eprintf ("Error decoding integer field array: %s\n")
@@ -89,7 +95,8 @@ begin
 	case TY_REAL:
 	    if (nelems == 1) {
 		call xev_initop (o, 0, TY_REAL)
-	        O_VALR(o) = pt_kyreal (key, Memc[root], Memi[list])
+		i_val = Meml[list]
+	        O_VALR(o) = pt_kyreal (key, Memc[root], i_val)
 	    } else {
 		call sfree (sp)
 		call eprintf ("Error decoding real array field: %s\n")
@@ -99,7 +106,8 @@ begin
 	default:
 	    if (nelems == 1) {
 	        call xev_initop (o, SZ_LINE, TY_CHAR)
-	        call pt_kystr (key, Memc[root], Memi[list], O_VALC(o), SZ_LINE)
+		i_val = Meml[list]
+	        call pt_kystr (key, Memc[root], i_val, O_VALC(o), SZ_LINE)
 	    } else {
 		call eprintf ("Error decoding char array field: %s\n")
 		call sfree (sp)

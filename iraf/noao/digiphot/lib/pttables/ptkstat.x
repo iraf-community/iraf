@@ -8,6 +8,7 @@ pointer	key		# pointer to the database strucuture
 char	column[ARB]	# column name
 int	parameter	# parameter to be returned
 
+size_t	sz_val
 char	left_bracket
 int	index, element, value
 pointer	sp, kname
@@ -16,7 +17,8 @@ data	left_bracket /'['/
 
 begin
 	call smark (sp)
-	call salloc (kname, KY_SZPAR, TY_CHAR)
+	sz_val = KY_SZPAR
+	call salloc (kname, sz_val, TY_CHAR)
 
 	# Get the proper name in upper case and strip off the subscript.
 	call strcpy (column, Memc[kname], KY_SZPAR)
@@ -76,6 +78,7 @@ int	parameter	# parameter to be returned
 char	str[ARB]	# output string
 int	maxch		# maximum number of characters
 
+size_t	sz_val
 char	left_bracket
 int	index, element, ip, len
 pointer	sp, kname
@@ -84,7 +87,8 @@ data	left_bracket /'['/
 
 begin
 	call smark (sp)
-	call salloc (kname, KY_SZPAR, TY_CHAR)
+	sz_val = KY_SZPAR
+	call salloc (kname, sz_val, TY_CHAR)
 
 	# Get the proper name in upper case and strip off the subscript.
 	call strcpy (column, Memc[kname], KY_SZPAR)

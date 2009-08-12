@@ -12,31 +12,31 @@ define	KY_NSTORE	Memi[P2I($1+2)]	# amount of storage space for keys
 # keyword strings
 
 define	LEN_KWORDS	Memi[P2I($1+4)]	# length of the keyword string
-define	KY_WORDS	Memi[P2I($1+5)]	# pointer to the keywords string
-define	KY_VALUES	Memi[P2I($1+6)]	# pointer to the values string
-define	KY_UNITS	Memi[P2I($1+7)]	# pointer to the units string
-define	KY_FORMATS	Memi[P2I($1+8)]	# pointer to the format string
+define	KY_WORDS	Memp[$1+5]	# pointer to the keywords string
+define	KY_VALUES	Memp[$1+6]	# pointer to the values string
+define	KY_UNITS	Memp[$1+7]	# pointer to the units string
+define	KY_FORMATS	Memp[$1+8]	# pointer to the format string
 
 # indices
 
-define	KY_PTRS		Memi[P2I($1+9)]	# pointer to values array
-define	KY_NELEMS	Memi[P2I($1+10)]	# pointer to number of elems array
-define	KY_TYPES	Memi[P2I($1+11)]	# pointer to the keyword data type array
-define	KY_KINDICES	Memi[P2I($1+12)]	# pointer to the keyword indices
-define	KY_UINDICES	Memi[P2I($1+13)]	# pointer to the unit indices
-define	KY_FINDICES	Memi[P2I($1+14)]	# pointer to the format indices
-define	KY_NPLINE	Memi[P2I($1+15)]	# pointer to values per line array
-define	KY_NCONTINUE	Memi[P2I($1+16)]	# pointer to max no of continuations
+define	KY_PTRS		Memp[$1+9]	# pointer to values array
+define	KY_NELEMS	Memp[$1+10]	# pointer to number of elems array
+define	KY_TYPES	Memp[$1+11]	# pointer to the keyword data type array
+define	KY_KINDICES	Memp[$1+12]	# pointer to the keyword indices
+define	KY_UINDICES	Memp[$1+13]	# pointer to the unit indices
+define	KY_FINDICES	Memp[$1+14]	# pointer to the format indices
+define	KY_NPLINE	Memp[$1+15]	# pointer to values per line array
+define	KY_NCONTINUE	Memp[$1+16]	# pointer to max no of continuations
 
 # select buffers
 
 define	KY_NSELECT	Memi[P2I($1+18)]	# number of selected keys
-define  KY_SELECT	Memi[P2I($1+19)]	# indices to selected fields
-define	KY_ELEM_SELECT	Memi[P2I($1+20)]	# index of element to be selected
-define	KY_LEN_SELECT	Memi[P2I($1+21)]	# lengths of the selected fields
-define	KY_NAME_SELECT	Memi[P2I($1+22)]	# pointer to string of selected names
-define	KY_UNIT_SELECT	Memi[P2I($1+23)]	# pointer to string of selected units
-define	KY_FMT_SELECT	Memi[P2I($1+24)]	# pointer to string of selected formats
+define  KY_SELECT	Memp[$1+19]	# indices to selected fields
+define	KY_ELEM_SELECT	Memp[$1+20]	# index of element to be selected
+define	KY_LEN_SELECT	Memp[$1+21]	# lengths of the selected fields
+define	KY_NAME_SELECT	Memp[$1+22]	# pointer to string of selected names
+define	KY_UNIT_SELECT	Memp[$1+23]	# pointer to string of selected units
+define	KY_FMT_SELECT	Memp[$1+24]	# pointer to string of selected formats
 
 
 # test for apphot/daophot database format

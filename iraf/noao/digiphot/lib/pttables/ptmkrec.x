@@ -11,6 +11,7 @@ int	first_rec	# first record read
 int	recptr		# line per record index
 int	ncontinue	# number of unique lines per record
 
+size_t	sz_val
 int	i, cip, nokeys, nckeys, nkeys, nper_line, len_move
 pointer	op
 
@@ -31,13 +32,15 @@ begin
 
 	    nper_line = Memi[KY_NPLINE(key)+recptr-1]
 	    nkeys = nokeys + nper_line
-	    call amovki (int(1), Memi[KY_NELEMS(key)+nokeys], nper_line)
+	    sz_val = nper_line
+	    call amovki (1, Memi[KY_NELEMS(key)+nokeys], sz_val)
 
 	    len_move = 0
 	    do i = nokeys + 1, nkeys
 	        len_move = len_move + Memi[KY_KINDICES(key)+i-1]
-	    op = Memi[KY_PTRS(key)+nokeys]
-	    call amovc (line[cip], Memc[op], len_move)
+	    op = Memp[KY_PTRS(key)+nokeys]
+	    sz_val = len_move
+	    call amovc (line[cip], Memc[op], sz_val)
 
 	    cip = cip + len_move
 	    recptr = recptr + 1
@@ -50,14 +53,15 @@ begin
 
 	    if (first_rec == YES) {
 		Memi[KY_NCONTINUE(key)+recptr-1] = KY_NLINES
-		do i = nckeys, nkeys
-		    call malloc (Memi[KY_PTRS(key)+i-1], KY_NLINES *
-		        Memi[KY_KINDICES(key)+i-1], TY_CHAR)
+		do i = nckeys, nkeys {
+		    sz_val = KY_NLINES * Memi[KY_KINDICES(key)+i-1]
+		    call malloc (Memp[KY_PTRS(key)+i-1], sz_val, TY_CHAR)
+		}
 	    }
 
 	    do i = nckeys, nkeys {
-		call amovc (line[cip], Memc[Memi[KY_PTRS(key)+i-1]],
-		    Memi[KY_KINDICES(key)+i-1])
+		sz_val = Memi[KY_KINDICES(key)+i-1]
+		call amovc (line[cip], Memc[Memp[KY_PTRS(key)+i-1]], sz_val)
 		cip = cip + Memi[KY_KINDICES(key)+i-1]
 	    }
 
@@ -69,16 +73,17 @@ begin
 	    if (ncontinue > Memi[KY_NCONTINUE(key)+recptr-2]) {
 		Memi[KY_NCONTINUE(key)+recptr-2] = Memi[KY_NCONTINUE(key)+
 		    recptr-2] + KY_NLINES
-		do i = nckeys, nkeys
-		    call realloc (Memi[KY_PTRS(key)+i-1], 
-			Memi[KY_NCONTINUE(key)+recptr-2] *
-			Memi[KY_KINDICES(key)+i-1], TY_CHAR) 
+		do i = nckeys, nkeys {
+		    sz_val = Memi[KY_NCONTINUE(key)+recptr-2] * Memi[KY_KINDICES(key)+i-1]
+		    call realloc (Memp[KY_PTRS(key)+i-1], sz_val, TY_CHAR) 
+		}
 	    }
 
 	    do i = nckeys, nkeys {
-		op = Memi[KY_PTRS(key)+i-1] + (ncontinue - 1) *
+		op = Memp[KY_PTRS(key)+i-1] + (ncontinue - 1) *
 		    Memi[KY_KINDICES(key)+i-1]
-		call amovc (line[cip], Memc[op], Memi[KY_KINDICES(key)+i-1])
+		sz_val = Memi[KY_KINDICES(key)+i-1]
+		call amovc (line[cip], Memc[op], sz_val)
 		Memi[KY_NELEMS(key)+i-1] = ncontinue
 		cip = cip + Memi[KY_KINDICES(key)+i-1]
 	    }

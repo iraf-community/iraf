@@ -7,49 +7,62 @@ int procedure pt_choose (key, fields)
 pointer	key		# pointer to key structure
 char	fields[ARB]	# fields to be evaluated
 
-int	max_nkeys, nkeys, index, elems, nelems, element, len
+size_t	sz_val
+int	max_nkeys, nkeys, index, nelems, element, len
+long	elems
 pointer	list, sp, kname, uname, fname, aranges, ranges, rangeset
 pointer	nop, uop, fop
-int	pt_gnfn(), pt_ranges(), strdic(), decode_ranges(), get_next_number()
-int	pt_kstati()
+int	pt_gnfn(), pt_ranges(), strdic(), decode_ranges()
+long	get_next_number()
+int	pt_kstati(), iint()
 pointer	pt_ofnl()
 real	asumi()
 
 begin
 	# Allocate buffer space
 	call smark (sp)
-	call salloc (kname, KY_SZPAR, TY_CHAR)
-	call salloc (uname, KY_SZPAR, TY_CHAR)
-	call salloc (fname, KY_SZPAR, TY_CHAR)
-	call salloc (aranges, SZ_FNAME, TY_CHAR)
-	call salloc (ranges, SZ_FNAME, TY_CHAR)
-	call salloc (rangeset, 3 * KY_MAXNRANGES + 1, TY_INT)
+	sz_val = KY_SZPAR
+	call salloc (kname, sz_val, TY_CHAR)
+	call salloc (uname, sz_val, TY_CHAR)
+	call salloc (fname, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (aranges, sz_val, TY_CHAR)
+	call salloc (ranges, sz_val, TY_CHAR)
+	sz_val = 3 * KY_MAXNRANGES + 1
+	call salloc (rangeset, sz_val, TY_LONG)
 
 	# Allocate space for the select buffers. Space equal to the number
 	# of keys in the database is allocated. Allowance must be made for
 	# array subsripts.
 
-	max_nkeys = int (asumi (Memi[KY_NELEMS(key)], KY_NKEYS(key))) + 1
+	sz_val = KY_NKEYS(key)
+	max_nkeys = iint (asumi (Memi[KY_NELEMS(key)], sz_val)) + 1
 
 	if (KY_SELECT(key) != NULL)
 	    call mfree (KY_SELECT(key), TY_INT)
-	call malloc (KY_SELECT(key), max_nkeys, TY_INT)
+	sz_val = max_nkeys
+	call malloc (KY_SELECT(key), sz_val, TY_INT)
 	if (KY_ELEM_SELECT(key) != NULL)
 	    call mfree (KY_ELEM_SELECT(key), TY_INT)
-	call malloc (KY_ELEM_SELECT(key), max_nkeys, TY_INT)
+	sz_val = max_nkeys
+	call malloc (KY_ELEM_SELECT(key), sz_val, TY_INT)
 	if (KY_LEN_SELECT(key) != NULL)
 	    call mfree (KY_LEN_SELECT(key), TY_INT)
-	call malloc (KY_LEN_SELECT(key), max_nkeys, TY_INT)
+	sz_val = max_nkeys
+	call malloc (KY_LEN_SELECT(key), sz_val, TY_INT)
 
 	if (KY_NAME_SELECT(key) != NULL)
 	    call mfree (KY_NAME_SELECT(key), TY_CHAR)
-	call malloc (KY_NAME_SELECT(key), max_nkeys * KY_SZPAR, TY_CHAR)
+	sz_val = max_nkeys * KY_SZPAR
+	call malloc (KY_NAME_SELECT(key), sz_val, TY_CHAR)
 	if (KY_UNIT_SELECT(key) != NULL)
 	    call mfree (KY_UNIT_SELECT(key), TY_CHAR)
-	call malloc (KY_UNIT_SELECT(key), max_nkeys * KY_SZPAR, TY_CHAR)
+	sz_val = max_nkeys * KY_SZPAR
+	call malloc (KY_UNIT_SELECT(key), sz_val, TY_CHAR)
 	if (KY_FMT_SELECT(key) != NULL)
 	    call mfree (KY_FMT_SELECT(key), TY_CHAR)
-	call malloc (KY_FMT_SELECT(key), max_nkeys * KY_SZPAR, TY_CHAR)
+	sz_val = max_nkeys * KY_SZPAR
+	call malloc (KY_FMT_SELECT(key), sz_val, TY_CHAR)
 
 	nop = KY_NAME_SELECT(key)
 	uop = KY_UNIT_SELECT(key)
@@ -110,12 +123,12 @@ begin
 		    call sprintf (Memc[ranges], SZ_FNAME, "1-%d")
 			call pargi (nelems)
 		}
-		if (decode_ranges (Memc[ranges], Memi[rangeset], KY_MAXNRANGES,
+		if (decode_ranges (Memc[ranges], Meml[rangeset], KY_MAXNRANGES,
 		    elems) == ERR)
 		    call error (0, "Cannot decode ranges string")
 
 		elems = 0
-		while (get_next_number (Memi[rangeset], elems) != EOF) {
+		while (get_next_number (Meml[rangeset], elems) != EOF) {
 
 		    if (elems < 1 || elems > nelems)
 			break
@@ -127,7 +140,7 @@ begin
 		        call pargstr (Memc[kname])
 		        call pargi (-len)
 			call pargi (len)
-			call pargi (elems)
+			call pargl (elems)
 		    nop = nop + len
 
 		    call sprintf (Memc[uop], len, "%*.*s")
@@ -149,12 +162,14 @@ begin
 
 	# Reallocate the select buffer space.
 	KY_NSELECT(key) = nkeys
-	call realloc (KY_SELECT(key), KY_NSELECT(key), TY_INT)
-	call realloc (KY_ELEM_SELECT(key), KY_NSELECT(key), TY_INT)
-	call realloc (KY_LEN_SELECT(key), KY_NSELECT(key), TY_INT)
-	call realloc (KY_NAME_SELECT(key), KY_NSELECT(key) * KY_SZPAR, TY_CHAR)
-	call realloc (KY_UNIT_SELECT(key), KY_NSELECT(key) * KY_SZPAR, TY_CHAR)
-	call realloc (KY_FMT_SELECT(key), KY_NSELECT(key) * KY_SZPAR, TY_CHAR)
+	sz_val = KY_NSELECT(key)
+	call realloc (KY_SELECT(key), sz_val, TY_INT)
+	call realloc (KY_ELEM_SELECT(key), sz_val, TY_INT)
+	call realloc (KY_LEN_SELECT(key), sz_val, TY_INT)
+	sz_val = KY_NSELECT(key) * KY_SZPAR
+	call realloc (KY_NAME_SELECT(key), sz_val, TY_CHAR)
+	call realloc (KY_UNIT_SELECT(key), sz_val, TY_CHAR)
+	call realloc (KY_FMT_SELECT(key), sz_val, TY_CHAR)
 
 	# Free list storage space.
 	call pt_cfnl (list)

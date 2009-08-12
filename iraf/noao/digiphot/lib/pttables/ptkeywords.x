@@ -6,31 +6,42 @@ procedure pt_kyinit (key)
 
 pointer	key	# pointer to the keys structure
 
+size_t	sz_val
+include	<nullptr.inc>
+
 begin
 	# Allocate space for structure and initialize constants.
-	call malloc (key, LEN_KEYSTRUCT, TY_STRUCT)
+	sz_val = LEN_KEYSTRUCT
+	call malloc (key, sz_val, TY_STRUCT)
 	KY_NKEYS(key) = 0
 	KY_NPKEYS(key) = 0
 	KY_NSTORE(key) = KY_NPARS
 	LEN_KWORDS(key) = 0
 
 	# Allocate space for the string buffers.
-	call malloc (KY_WORDS(key), KY_SZPAR * KY_NPARS, TY_CHAR)
-	call malloc (KY_VALUES(key), KY_SZPAR * KY_NPARS, TY_CHAR)
-	call malloc (KY_UNITS(key), KY_SZPAR * KY_NPARS, TY_CHAR)
-	call malloc (KY_FORMATS(key), KY_SZPAR * KY_NPARS, TY_CHAR)
+	sz_val = KY_SZPAR * KY_NPARS
+	call malloc (KY_WORDS(key), sz_val, TY_CHAR)
+	call malloc (KY_VALUES(key), sz_val, TY_CHAR)
+	call malloc (KY_UNITS(key), sz_val, TY_CHAR)
+	call malloc (KY_FORMATS(key), sz_val, TY_CHAR)
 
 	# Allocate space for the indices buffers and initialize.
-	call malloc (KY_PTRS(key), KY_NPARS, TY_INT)
-	call malloc (KY_KINDICES(key), KY_NPARS, TY_INT)
-	call malloc (KY_UINDICES(key), KY_NPARS, TY_INT)
-	call malloc (KY_FINDICES(key), KY_NPARS + 1, TY_INT)
-	call calloc (KY_NELEMS(key), KY_NPARS, TY_INT)
-	call malloc (KY_TYPES(key), KY_NPARS, TY_INT)
-	call calloc (KY_NPLINE(key), KY_NLINES, TY_INT)
-	call calloc (KY_NCONTINUE(key), KY_NLINES, TY_INT)
-	Memi[KY_PTRS(key)] = KY_VALUES(key)
-	call amovki (NULL, Memi[KY_PTRS(key)+1], KY_NPARS - 1)
+	sz_val = KY_NPARS
+	call malloc (KY_PTRS(key), sz_val, TY_POINTER)
+	call malloc (KY_KINDICES(key), sz_val, TY_INT)
+	call malloc (KY_UINDICES(key), sz_val, TY_INT)
+	sz_val = KY_NPARS + 1
+	call malloc (KY_FINDICES(key), sz_val, TY_INT)
+	sz_val = KY_NPARS
+	call calloc (KY_NELEMS(key), sz_val, TY_INT)
+	sz_val = KY_NPARS
+	call malloc (KY_TYPES(key), sz_val, TY_INT)
+	sz_val = KY_NLINES
+	call calloc (KY_NPLINE(key), sz_val, TY_INT)
+	call calloc (KY_NCONTINUE(key), sz_val, TY_INT)
+	Memp[KY_PTRS(key)] = KY_VALUES(key)
+	sz_val = KY_NPARS - 1
+	call amovkp (NULLPTR, Memp[KY_PTRS(key)+1], sz_val)
 
 	# Initialize the select buffers.
 	KY_SELECT(key) = NULL
@@ -79,11 +90,11 @@ begin
 	    call mfree (KY_FINDICES(key), TY_INT)
 	if (KY_PTRS(key) != NULL) {
 	    do i = 1, KY_NSTORE(key) {
-		ptr = Memi[KY_PTRS(key)+i-1]
+		ptr = Memp[KY_PTRS(key)+i-1]
 		if (ptr != NULL && Memi[KY_NELEMS(key)+i-1] > 1)
 		    call mfree (ptr, TY_CHAR)
 	    }
-	    call mfree (KY_PTRS(key), TY_INT)
+	    call mfree (KY_PTRS(key), TY_POINTER)
 	}
 	if (KY_NELEMS(key) != NULL)
 	    call mfree (KY_NELEMS(key), TY_INT)
@@ -118,10 +129,12 @@ pointer	key		# pointer to keyword structure
 char	line[ARB]	# line to be decoded
 int	nchars		# number of characters in the line
 
+size_t	sz_val
 int	index, onstore
-long	optr
-pointer	sp, id, keyword, equals, value, units, format, temp 
+pointer	sp, id, keyword, equals, value, units, format, temp, optr
 int	nscan(), strdic()
+
+include	<nullptr.inc>
 
 begin
 	# Check the buffer sizes.
@@ -129,32 +142,40 @@ begin
 	optr = KY_VALUES(key)
 	if ((KY_NKEYS(key) + 1) > KY_NSTORE(key)) {
 	    KY_NSTORE(key) = KY_NSTORE(key) + KY_NPARS
-	    call realloc (KY_WORDS(key), KY_NSTORE(key) * KY_SZPAR, TY_CHAR)
-	    call realloc (KY_VALUES(key), KY_NSTORE(key) * KY_SZPAR, TY_CHAR)
-	    call realloc (KY_UNITS(key), KY_NSTORE(key) * KY_SZPAR, TY_CHAR)
-	    call realloc (KY_FORMATS(key), KY_NSTORE(key) * KY_SZPAR, TY_CHAR)
-	    call realloc (KY_NELEMS(key), KY_NSTORE(key), TY_INT)
-	    call aclri (Memi[KY_NELEMS(key)+onstore], KY_NSTORE(key) - onstore)
-	    call realloc (KY_PTRS(key), KY_NSTORE(key), TY_INT)
-	    call aaddki (Memi[KY_PTRS(key)], KY_VALUES(key) - optr,
-	        Memi[KY_PTRS(key)], onstore)
-	    call amovki (NULL, Memi[KY_PTRS(key)+onstore], KY_NSTORE(key) -
-	        onstore)
-	    call realloc (KY_TYPES(key), KY_NSTORE(key), TY_INT)
-	    call realloc (KY_KINDICES(key), KY_NSTORE(key), TY_INT)
-	    call realloc (KY_UINDICES(key), KY_NSTORE(key), TY_INT)
-	    call realloc (KY_FINDICES(key), KY_NSTORE(key) + 1, TY_INT)
+	    sz_val = KY_NSTORE(key) * KY_SZPAR
+	    call realloc (KY_WORDS(key), sz_val, TY_CHAR)
+	    call realloc (KY_VALUES(key), sz_val, TY_CHAR)
+	    call realloc (KY_UNITS(key), sz_val, TY_CHAR)
+	    call realloc (KY_FORMATS(key), sz_val, TY_CHAR)
+	    sz_val = KY_NSTORE(key)
+	    call realloc (KY_NELEMS(key), sz_val, TY_INT)
+	    sz_val = KY_NSTORE(key) - onstore
+	    call aclri (Memi[KY_NELEMS(key)+onstore], sz_val)
+	    sz_val = KY_NSTORE(key)
+	    call realloc (KY_PTRS(key), sz_val, TY_POINTER)
+	    sz_val = onstore
+	    call aaddkp (Memp[KY_PTRS(key)], KY_VALUES(key) - optr,
+			 Memp[KY_PTRS(key)], sz_val)
+	    sz_val = KY_NSTORE(key) - onstore
+	    call amovkp (NULLPTR, Memp[KY_PTRS(key)+onstore], sz_val)
+	    sz_val = KY_NSTORE(key)
+	    call realloc (KY_TYPES(key), sz_val, TY_INT)
+	    call realloc (KY_KINDICES(key), sz_val, TY_INT)
+	    call realloc (KY_UINDICES(key), sz_val, TY_INT)
+	    sz_val = KY_NSTORE(key) + 1
+	    call realloc (KY_FINDICES(key), sz_val, TY_INT)
 	}
 
 	# Allocate space for the keywords.
 	call smark (sp)
-	call salloc (id, KY_SZPAR, TY_CHAR)
-	call salloc (keyword, KY_SZPAR, TY_CHAR)
-	call salloc (equals, KY_SZPAR, TY_CHAR)
-	call salloc (value, KY_SZPAR, TY_CHAR)
-	call salloc (units, KY_SZPAR, TY_CHAR)
-	call salloc (format, KY_SZPAR, TY_CHAR)
-	call salloc (temp, KY_SZPAR, TY_CHAR)
+	sz_val = KY_SZPAR
+	call salloc (id, sz_val, TY_CHAR)
+	call salloc (keyword, sz_val, TY_CHAR)
+	call salloc (equals, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
+	call salloc (units, sz_val, TY_CHAR)
+	call salloc (format, sz_val, TY_CHAR)
+	call salloc (temp, sz_val, TY_CHAR)
 
 	# Scan the string and decode the elements.
 	call sscan (line)
@@ -183,13 +204,13 @@ begin
 	    call pt_kyunits (Memc[units], KY_SZPAR, Memc[KY_UNITS(key)],
 	        Memi[KY_UINDICES(key)], KY_NKEYS(key))
 	    call pt_kyformat (Memc[format], KY_SZPAR, Memc[KY_FORMATS(key)],
-	        Memi[KY_FINDICES(key)], Memi[KY_TYPES(key)], Memi[KY_PTRS(key)],
+	        Memi[KY_FINDICES(key)], Memi[KY_TYPES(key)], Memp[KY_PTRS(key)],
 		Memi[KY_KINDICES(key)], KY_NKEYS(key))
 	    call pt_kyvalue (Memc[value], KY_SZPAR, Memc[KY_VALUES(key)],
-	        Memi[KY_PTRS(key)], Memi[KY_KINDICES(key)], KY_NKEYS(key))
+	        Memp[KY_PTRS(key)], Memi[KY_KINDICES(key)], KY_NKEYS(key))
         } else
 	    call pt_kyaddval (Memc[value], KY_SZPAR, Memc[KY_VALUES(key)],
-		Memi[KY_PTRS(key)], Memi[KY_KINDICES(key)], index)
+		Memp[KY_PTRS(key)], Memi[KY_KINDICES(key)], index)
 
 	call sfree (sp)
 end
@@ -388,7 +409,7 @@ int	type		# data type
 char	ctype		# char format type
 
 int	ip
-int	ctoi
+int	ctoi()
 
 begin
 	if (fstr[1] != '%')
@@ -398,7 +419,7 @@ begin
 	ip = 2
 	if (ctoi (fstr, ip, width) == ERR)
 	    return (ERR)
-	width = abs (width)
+	width = iabs (width)
 
 	# Get the precision.
 	if (fstr[ip] == '.')
@@ -435,6 +456,7 @@ char	root[ARB]	# root variable name
 char	ranges[ARB]	# range of selected elements
 int	maxels		# maximum number of elements
 
+size_t	sz_val
 char	left_bkt, right_bkt
 int	findex, lindex, index
 pointer	sp, temp
@@ -444,7 +466,8 @@ data	left_bkt /'['/, right_bkt /']'/
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (temp, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (temp, sz_val, TY_CHAR)
 	root[1] = EOS
 	ranges[1] = EOS
 
@@ -482,22 +505,23 @@ pointer	key		# pointer to keys structure
 char	field[ARB]	# parameter name
 int	element		# element of int array
 
+size_t	sz_val
 int	index
 pointer	sp, temp, ptr
-int	strmatch()
-int	strdic()
+int	strmatch(), strdic()
 
 begin
 	call smark (sp)
-	call salloc (temp, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (temp, sz_val, TY_CHAR)
 	index = strdic (field, Memc[temp], SZ_LINE, Memc[KY_WORDS(key)])
 	call sfree (sp)
 
 	if (index != 0) {
 	    if (Memi[KY_NELEMS(key)+index-1] == 1)
-		ptr = Memi[KY_PTRS(key)+index-1]
+		ptr = Memp[KY_PTRS(key)+index-1]
 	    else
-		ptr = Memi[KY_PTRS(key)+index-1] + (element - 1) *
+		ptr = Memp[KY_PTRS(key)+index-1] + (element - 1) *
 		    Memi[KY_KINDICES(key)+index-1]
 	    if (strmatch (Memc[ptr], "yes") == 0)
 		return (false)
@@ -516,22 +540,23 @@ pointer	key		# pointer to keys structure
 char	field[ARB]	# parameter name
 int	element		# element of int array
 
+size_t	sz_val
 int	index, ip, ival
 pointer	sp, temp, ptr
-int	ctoi()
-int	strdic()
+int	ctoi(), strdic()
 
 begin
 	call smark (sp)
-	call salloc (temp, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (temp, sz_val, TY_CHAR)
 	index = strdic (field, Memc[temp], SZ_LINE, Memc[KY_WORDS(key)])
 	call sfree (sp)
 
 	if (index != 0) {
 	    if (Memi[KY_NELEMS(key)+index-1] == 1)
-		ptr = Memi[KY_PTRS(key)+index-1]
+		ptr = Memp[KY_PTRS(key)+index-1]
 	    else
-		ptr = Memi[KY_PTRS(key)+index-1] + (element - 1) *
+		ptr = Memp[KY_PTRS(key)+index-1] + (element - 1) *
 		    Memi[KY_KINDICES(key)+index-1]
 	    ip = 1
 	    if (ctoi (Memc[ptr], ip, ival) == 0)
@@ -551,23 +576,24 @@ pointer	key		# pointer to keys structure
 char	field[ARB]	# parameter name
 int	element		# which element to extract
 
+size_t	sz_val
 int	index, ip
 pointer	sp, temp, ptr
 real	rval
-int	ctor()
-int	strdic()
+int	ctor(), strdic()
 
 begin
 	call smark (sp)
-	call salloc (temp, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (temp, sz_val, TY_CHAR)
 	index = strdic (field, Memc[temp], SZ_LINE, Memc[KY_WORDS(key)])
 	call sfree (sp)
 
 	if (index != 0) {
 	    if (Memi[KY_NELEMS(key)+index-1] == 1)
-		ptr = Memi[KY_PTRS(key)+index-1]
+		ptr = Memp[KY_PTRS(key)+index-1]
 	    else
-		ptr = Memi[KY_PTRS(key)+index-1] + (element - 1) *
+		ptr = Memp[KY_PTRS(key)+index-1] + (element - 1) *
 		    Memi[KY_KINDICES(key)+index-1]
 	    ip = 1
 	    if (ctor (Memc[ptr], ip, rval) <= 0)
@@ -589,21 +615,23 @@ int	element		# element of the array
 char	str[ARB]	# output string
 int	maxch		# maximum number of character
 
+size_t	sz_val
 int	index, nk
 pointer	sp, temp, ptr
 int	strdic()
 
 begin
 	call smark (sp)
-	call salloc (temp, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (temp, sz_val, TY_CHAR)
 	index = strdic (field, Memc[temp], SZ_LINE, Memc[KY_WORDS(key)])
 	call sfree (sp)
 
 	if (index != 0) {
 	    if (Memi[KY_NELEMS(key)+index-1] == 1)
-		ptr = Memi[KY_PTRS(key)+index-1]
+		ptr = Memp[KY_PTRS(key)+index-1]
 	    else
-		ptr = Memi[KY_PTRS(key)+index-1] + (element - 1) *
+		ptr = Memp[KY_PTRS(key)+index-1] + (element - 1) *
 		    Memi[KY_KINDICES(key)+index-1]
 	    for (; Memc[ptr] == ' ';)
 		ptr = ptr + 1
