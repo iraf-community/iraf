@@ -31,9 +31,9 @@ set_irafenv() {
   F2C="${hbin}f2c.e"
   RANLIB="ranlib"
   export CC F77 F2C RANLIB
-  #
-  # basic settings
-  #
+  #                #
+  # basic settings #
+  #                #
   HSI_CF="-Wall -I$hinclude -DPREFIX=\\\"$PREFIX\\\""
   HSI_XF="-Wall"
   HSI_FF="-Wall"
@@ -51,31 +51,31 @@ set_irafenv() {
   XC_LIBS="-lf2c"
   #
   XC_XLFLAGS=""
-  #
-  # Architecture-dependent settings
-  #
-  F=""
+  #                                 #
+  # Architecture-dependent settings #
+  #                                 #
+  ARCH_C_DEF=""
   case "$ARCHITECTURE" in
   i386)
     SPP_BYTE_ENDIAN="little"
     SPP_FLOAT_ENDIAN="little"
-    F="$F -DI386"
+    ARCH_C_DEF="$ARCH_C_DEF -DI386"
     ;;
   x86_64)
     SPP_BYTE_ENDIAN="little"
     SPP_FLOAT_ENDIAN="little"
-    F="$F -DX86_64"
+    ARCH_C_DEF="$ARCH_C_DEF -DX86_64"
     #XC_XLFLAGS="$XC_XLFLAGS -/mcmodel=medium"
     ;;
   powerpc)
     SPP_BYTE_ENDIAN="little"
     SPP_FLOAT_ENDIAN="little"
-    F="$F -DPOWERPC"
+    ARCH_C_DEF="$ARCH_C_DEF -DPOWERPC"
     ;;
   sparc)
     SPP_BYTE_ENDIAN="big"
     SPP_FLOAT_ENDIAN="big"
-    F="$F -DSPARC"
+    ARCH_C_DEF="$ARCH_C_DEF -DSPARC"
     ;;
   *)
     echo "[ERROR] Unknown Architecture: $ARCHITECTURE"
@@ -85,25 +85,42 @@ set_irafenv() {
     ;;
   esac
   #
-  HSI_SPP_MODEL_CDEF=""
+  SPP_MODEL_C_DEF=""
+  XPP_FLAG=""
   FPP_DEF=""
   if [ "$SPP_DATA_MODEL" = "lp64" ]; then
-    HSI_SPP_MODEL_CDEF="-DSPP_LP64"
-    FPP_DEF="-DXINT=integer -DXLONG=integer*8"
+    SPP_MODEL_C_DEF="-DSPP_LP64"
+    XPP_FLAG="-h lp64.h"
+    FPP_DEF="-DXINT=integer -DXLONG=integer*8 -DSZB_XINT=4 -DSZB_XLONG=8"
   elif [ "$SPP_DATA_MODEL" = "ilp64" ]; then
-    HSI_SPP_MODEL_CDEF="-DSPP_ILP64"
-    FPP_DEF="-DXINT=integer -DXLONG=integer"
+    SPP_MODEL_C_DEF="-DSPP_ILP64"
+    XPP_FLAG="-h ilp64.h"
+    FPP_DEF="-DXINT=integer -DXLONG=integer -DSZB_XINT=8 -DSZB_XLONG=8"
   else
-    FPP_DEF="-DXINT=integer -DXLONG=integer"
+    XPP_FLAG="-h ilp32.h"
+    FPP_DEF="-DXINT=integer -DXLONG=integer -DSZB_XINT=4 -DSZB_XLONG=4"
   fi
-  F="$F $HSI_SPP_MODEL_CDEF"
-  HSI_CF="$HSI_CF $F"
-  XC_CFLAGS="$XC_CFLAGS $F"
-  XC_FFLAGS="$XC_FFLAGS $F"
+  #
+  if [ "$SPP_BYTE_ENDIAN" = "little" ]; then
+    XPP_FLAG="$XPP_FLAG -h byte_little.h"
+  else
+    XPP_FLAG="$XPP_FLAG -h byte_big.h"
+  fi
+  if [ "$SPP_FLOAT_ENDIAN" = "little" ]; then
+    XPP_FLAG="$XPP_FLAG -h float_little.h"
+  else
+    XPP_FLAG="$XPP_FLAG -h float_big.h"
+  fi
+  #
+  ARCH_C_DEF="$ARCH_C_DEF $SPP_MODEL_C_DEF"
+  HSI_CF="$HSI_CF $ARCH_C_DEF"
+  XC_CFLAGS="$XC_CFLAGS $ARCH_C_DEF"
+  XC_FFLAGS="$XC_FFLAGS $ARCH_C_DEF"
+  XC_XPPFLAGS="$XC_XPPFLAGS $XPP_FLAG"
   XC_FPPFLAGS="$XC_FPPFLAGS $FPP_DEF"
-  #
-  # OS-dependent settings
-  #
+  #                       #
+  # OS-dependent settings #
+  #                       #
   case "$OPERATING_SYSTEM" in
   linux)
     CF_DEFS="-DLINUX -DPOSIX -DSYSV"
@@ -153,25 +170,6 @@ set_irafenv() {
     exit 1
     ;;
   esac
-  #
-  if [ "$SPP_DATA_MODEL" = "lp64" ]; then
-    XC_XPPFLAGS="$XC_XPPFLAGS -h lp64.h"
-  elif [ "$SPP_DATA_MODEL" = "ilp64" ]; then
-    XC_XPPFLAGS="$XC_XPPFLAGS -h ilp64.h"
-  else
-    XC_XPPFLAGS="$XC_XPPFLAGS -h ilp32.h"
-  fi
-  #
-  if [ "$SPP_BYTE_ENDIAN" = "little" ]; then
-    XC_XPPFLAGS="$XC_XPPFLAGS -h byte_little.h"
-  else
-    XC_XPPFLAGS="$XC_XPPFLAGS -h byte_big.h"
-  fi
-  if [ "$SPP_FLOAT_ENDIAN" = "little" ]; then
-    XC_XPPFLAGS="$XC_XPPFLAGS -h float_little.h"
-  else
-    XC_XPPFLAGS="$XC_XPPFLAGS -h float_big.h"
-  fi
   #
   if [ "$1" = "novos" ]; then
     HSI_CF="$HSI_CF -DNOVOS"
@@ -406,7 +404,7 @@ case "$COMMAND" in
   # F2C
   #F="`echo $HSI_CF | tr ' ' '\n' | egrep -e '-DSPP' -e '-I' | tr '\n' ' '`"
   # See also MAX_OUTPUT_SIZE in niceprintf.h
-  F="-DDEF_C_LINE_LENGTH=5120 $HSI_SPP_MODEL_CDEF"
+  F="-DDEF_C_LINE_LENGTH=5120 $SPP_MODEL_C_DEF"
   #
   echo Makeing iraf/unix/f2c/src/Makefile.
   ( cd iraf/unix/f2c/src    ; cat makefile.u | \
