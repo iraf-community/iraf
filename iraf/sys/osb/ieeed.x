@@ -48,7 +48,6 @@ be written, placed in AS, and referenced in the MKPKG special file list.
 
 
 # Give the generic preprocessor some help.
-define	IEEE_SWAP	IEEE_SWAP8
 define	BSWAP		bswap8
 define	NSWAP		8
 define	IOFF		1	# MACHDEP (normally 1, 2 on e.g. Intel)

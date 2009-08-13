@@ -16,4 +16,11 @@ define	EPSILONR	(1.192e-7)	# smallest E such that 1.0 + E > 1.0
 define	EPSILOND	(2.220d-16)	# double precision epsilon
 define	EPSILON		EPSILONR
 
+define	BYTE_SWAP2	BYTE_SWAP
+define	BYTE_SWAP4	BYTE_SWAP
+define	BYTE_SWAP8	BYTE_SWAP
+
+define	IEEE_SWAP4	IEEE_SWAP
+define	IEEE_SWAP8	IEEE_SWAP
+
 define	IEEE_USED	YES

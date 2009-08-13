@@ -80,6 +80,13 @@ int main ( int argc, char *argv[] )
 			}
 		    }
 		    break;
+		case 'D':
+		    if ( n_irafdefs < MAX_IRAFDEFS ) {
+			snprintf (irafdefs[n_irafdefs], SZ_PATHNAME,
+				  "%s", argv[i]);
+			n_irafdefs++;
+		    }
+		    break;
 		case 'A':
 		    /* Use architecture-specific include file. */
 		    hbindefs++;
@@ -103,7 +110,7 @@ int main ( int argc, char *argv[] )
 	 * check if the user has a default package set in their environment.
 	 */
 	if (!pkgenv)
-	    if (pkgenv = os_getenv("PKGENV")) {
+	    if ((pkgenv = os_getenv("PKGENV"))) {
 		snprintf (v_pkgenv, SZ_FNAME, "%s", pkgenv);
 		loadpkgenv (pkgenv = v_pkgenv);
 	    }
@@ -160,9 +167,45 @@ int main ( int argc, char *argv[] )
 			/* Open and process hconfig$iraf.h, etc.
 			 */
 			for ( j=0 ; j < n_irafdefs ; j++ ) {
-			    if ((fp_defs = fopen (irafdefs[j], "r")) == NULL) {
-				fprintf (stderr, "cannot open %s\n",
-					 irafdefs[j]);
+			    char tempfile[SZ_FNAME];
+			    const char *def_file = irafdefs[j];
+			    /* process -DFOO=xxx */
+			    if ( strncmp(irafdefs[j], "-D", 2) == 0 ) {
+				const char *p_val;
+				char *p_eq;
+				int tmp_fd;
+				char def_line[SZ_LINE];
+				int len_def_line;
+				snprintf (tempfile, SZ_FNAME,
+					  "/tmp/T_XPP_%s.XXXXXX", argv[i]);
+				tmp_fd = mkstemp (tempfile);
+				if ( tmp_fd == -1 ) {
+				    fprintf (stderr, "mkstemp() failed\n");
+				    ZZSTOP();
+				    exit (XPP_COMPERR);
+				}
+				p_eq = strchr(irafdefs[j],'=');
+				if ( p_eq == NULL ) p_val = "1";
+				else {
+				    if ( p_eq[1] == '\0' ) p_val = "1";
+				    else p_val = p_eq + 1;
+				    *p_eq = '\0';
+				}
+				snprintf(def_line, SZ_LINE, "define %s %s\n",
+					 irafdefs[j]+2, p_val);
+				len_def_line = strlen(def_line) + 1;
+				if ( write(tmp_fd, def_line, len_def_line)
+				     != len_def_line ) {
+				    fprintf (stderr, "write() failed\n");
+				    ZZSTOP();
+				    exit (XPP_COMPERR);
+				}
+				close(tmp_fd);
+				def_file = tempfile;
+			    }
+			    /* parse */
+			    if ((fp_defs = fopen (def_file, "r")) == NULL) {
+				fprintf (stderr, "cannot open %s\n", def_file);
 				ZZSTOP();
 				exit (XPP_COMPERR);
 			    }
@@ -170,6 +213,8 @@ int main ( int argc, char *argv[] )
 			    yylex();
 			    linenum[0] = 1;
 			    fclose (fp_defs);
+			    /* delete temp file */
+			    if ( def_file != irafdefs[j] ) unlink(def_file);
 			}
 
 			/* Process the source file.

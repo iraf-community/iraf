@@ -714,10 +714,13 @@ passflag:		    mkobject = YES;
 	addtolist ("-o", &arglist, &nargs);
 
 	if (link_nfs) {
-	    snprintf (tempfile, SZ_FNAME, "/tmp/T_%s.XXXXXX", outfile);
-	    mkstemp (tempfile);
-	} else
+	    snprintf (tempfile, SZ_FNAME, "/tmp/T_XC_%s.XXXXXX", outfile);
+	    if ( mkstemp (tempfile) == -1 ) {
+		fatal ("mkstemp() failed.");
+	    }
+	} else {
 	    snprintf (tempfile, SZ_FNAME, "T_%s", outfile);
+	}
 	addtolist (tempfile, &arglist, &nargs);
 
 	ncomp = 0;

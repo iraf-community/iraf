@@ -102,14 +102,14 @@ set_irafenv() {
   fi
   #
   if [ "$SPP_BYTE_ENDIAN" = "little" ]; then
-    XPP_FLAG="$XPP_FLAG -h byte_little.h"
+    XPP_FLAG="$XPP_FLAG -DBYTE_SWAP=YES"
   else
-    XPP_FLAG="$XPP_FLAG -h byte_big.h"
+    XPP_FLAG="$XPP_FLAG -DBYTE_SWAP=NO"
   fi
   if [ "$SPP_FLOAT_ENDIAN" = "little" ]; then
-    XPP_FLAG="$XPP_FLAG -h float_little.h"
+    XPP_FLAG="$XPP_FLAG -DIEEE_SWAP=YES"
   else
-    XPP_FLAG="$XPP_FLAG -h float_big.h"
+    XPP_FLAG="$XPP_FLAG -DIEEE_SWAP=NO"
   fi
   #
   ARCH_C_DEF="$ARCH_C_DEF $SPP_MODEL_C_DEF"
