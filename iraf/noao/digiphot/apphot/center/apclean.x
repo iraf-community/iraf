@@ -8,7 +8,7 @@ procedure ap_clean (ap, pix, nx, ny, xc, yc)
 
 pointer	ap		# pointer to the apphot structure
 real	pix[nx,ny]	# data array
-int	nx, ny		# size of subarray
+size_t	nx, ny		# size of subarray
 real	xc, yc		# center of subarray
 
 int	apstati()
@@ -38,15 +38,17 @@ procedure ap_cclean (pix, nx, ny, cxc, cyc, rclip, kclean, skysigma,
     maxshift)
 
 real	pix[nx, ny]		# array of pixels
-int	nx, ny			# dimensions of the subarray
+size_t	nx, ny			# dimensions of the subarray
 real	cxc, cyc		# initial center
 real	rclip			# cleaning and clipping radius
 real	kclean			# k-sigma clipping factor
 real	skysigma		# maxshift
 real	maxshift		# maximum shift
 
-int	i, ii, ixc, j, jj, jyc, ijunk, jjunk
+long	i, ii, ixc, j, jj, jyc, ijunk, jjunk
 real	mindat, maxdat, rclip2, r2, ksigma 
+long	lint()
+real	aabs()
 
 begin
 	# Return if indef valued sigma or sigma <= 0.
@@ -58,9 +60,9 @@ begin
 	# initial center.
 
 	call ap_2dalimr (pix, nx, ny, mindat, maxdat, ijunk, jjunk, ixc, jyc)
-	if (abs (cxc - ixc) > maxshift || abs (cyc - jyc) > maxshift) {
-	    ixc = int (cxc)
-	    jyc = int (cyc)
+	if (aabs (cxc - ixc) > maxshift || aabs (cyc - jyc) > maxshift) {
+	    ixc = lint (cxc)
+	    jyc = lint (cyc)
 	}
 
 	# Clip.
@@ -93,7 +95,7 @@ procedure ap_pclean (pix, nx, ny, cxc, cyc, rclean, rclip, kclean, skysigma,
     padu, maxshift)
 
 real	pix[nx, ny]		# array of pixels
-int	nx, ny			# dimensions of the subarray
+size_t	nx, ny			# dimensions of the subarray
 real	cxc, cyc		# initial center
 real	rclean, rclip		# cleaning and clipping radius
 real	kclean			# k-sigma clipping factor
@@ -101,8 +103,10 @@ real	skysigma		# maxshift
 real	padu			# photons per adu
 real	maxshift		# maximum shift
 
-int	i, ii, ixc, j, jj, jyc, ijunk, jjunk
+long	i, ii, ixc, j, jj, jyc, ijunk, jjunk
 real	mindat, maxdat, rclean2, rclip2, r2, ksigma, ksigma2 
+long	lint()
+real	aabs()
 
 begin
 	# Return if indef-valued sigma.
@@ -114,9 +118,9 @@ begin
 	# initial center.
 
 	call ap_2dalimr (pix, nx, ny, mindat, maxdat, ijunk, jjunk, ixc, jyc)
-	if (abs (cxc - ixc) > maxshift || abs (cyc - jyc) > maxshift) {
-	    ixc = int (cxc)
-	    jyc = int (cyc)
+	if (aabs (cxc - ixc) > maxshift || aabs (cyc - jyc) > maxshift) {
+	    ixc = lint (cxc)
+	    jyc = lint (cyc)
 	}
 
 	# Clip.

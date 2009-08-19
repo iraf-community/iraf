@@ -8,7 +8,7 @@ real procedure ap_csnratio (ap, array, nx, ny, threshold)
 
 pointer	ap		# apphot structure
 real	array[nx,ny]	# data array
-int	nx, ny		# subraster dimensions
+size_t	nx, ny		# subraster dimensions
 real	threshold	# threshold value for snr computation
 
 int	apstati()
@@ -35,11 +35,11 @@ end
 real procedure ap_cratio (array, nx, ny, sky, noise)
 
 real	array[nx,ny]		# centering buffer
-int	nx, ny			# dimensions of the centering buffer
+size_t	nx, ny			# dimensions of the centering buffer
 real	sky			# mean sky value of the data in ADU
 real	noise			# estimate of sky noise in ADU
 
-int	npts
+size_t	npts
 real	signal, tnoise
 real	asumr()
 
@@ -67,22 +67,22 @@ end
 real procedure ap_pratio (array, nx, ny, sky, noise, padu)
 
 real	array[nx,ny]		# centering buffer
-int	nx, ny			# dimensions of the centering buffer
+size_t	nx, ny			# dimensions of the centering buffer
 real	sky			# mean sky value of the data in ADU
 real	noise			# estimate of sky noise in ADU
 real	padu			# photons per adu
 
-int	npts
+size_t	npts
 real	signal, tnoise
-real	asumr()
+real	asumr(), aabs()
 
 begin
 	npts = nx * ny
 	signal = asumr (array, npts) - npts * sky
 	if (IS_INDEFR(noise))
-	    tnoise = sqrt (abs (signal / padu))
+	    tnoise = sqrt (aabs (signal / padu))
 	else
-	    tnoise = sqrt (abs (signal / padu) + npts * noise ** 2)
+	    tnoise = sqrt (aabs (signal / padu) + npts * noise ** 2)
 	if (signal <= 0.0)
 	    return (0.0)
 	else if (tnoise <= 0.0)

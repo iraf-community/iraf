@@ -19,25 +19,32 @@ pointer	gd			# pointer to the graphics stream
 pointer	mgd			# pointer to the plot metacode stream
 pointer	id			# pointer to the image display stream
 int	out			# output file descriptor
-int	stid			# output file sequence number
+long	stid			# output file sequence number
 int	interactive		# interactive mode
 int	cache			# cache the input pixels
 
+size_t	sz_val, c_1
 real	wx, wy, xlist, ylist
 pointer	sp, cmd
-int	wcs, key, colonkey, newimage, newobject, newcenter, newlist, ier, oid
-int	ip, prev_num, req_num, ltid, buf_size, memstat
-size_t	old_size, req_size
+int	wcs, key, colonkey, newimage, newobject, newcenter, newlist, ier
+int	ip, memstat
+long	prev_num, req_num, ltid, oid
+size_t	old_size, req_size, buf_size
+long	l_val
 
 real	apstatr()
-int	ctoi(), clgcur(), apgscur(), apfitcenter(), aprefitcenter(), apstati()
+int	ctol(), clgcur(), apfitcenter(), aprefitcenter(), apstati()
 int	apgqverify(), apgtverify(), apnew(), ap_memstat(), sizeof()
+long	apgscur()
 
 define	endswitch_ 99
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Initialize cursor command.
 	key = ' '
@@ -58,7 +65,7 @@ begin
 	    EOF) {
 
 	    # Store the current cursor coordinates.
-	    call ap_vtol (im, wx, wy, wx, wy, 1)
+	    call ap_vtol (im, wx, wy, wx, wy, c_1)
 	    call apsetr (ap, CWX, wx)
 	    call apsetr (ap, CWY, wy)
 
@@ -98,7 +105,8 @@ begin
 	    # Rewind the coord list.
 	    case 'r':
 		if (cl != NULL) {
-		    call seek (cl, BOF)
+		    l_val = BOF
+		    call seek (cl, l_val)
 		    ltid = 0
 		} else if (interactive == YES)
 		    call printf ("No coordinate list\n")
@@ -149,9 +157,9 @@ begin
 		# Convert coordinates if necessary.
 		switch (apstati (ap, WCSIN)) {
 		case WCS_PHYSICAL, WCS_WORLD:
-		    call ap_itol (ap,  xlist, ylist, xlist, ylist, 1)
+		    call ap_itol (ap,  xlist, ylist, xlist, ylist, c_1)
 		case WCS_TV:
-		    call ap_vtol (im, xlist, ylist, xlist, ylist, 1)
+		    call ap_vtol (im, xlist, ylist, xlist, ylist, c_1)
 		default:
 		    ;
 		}
@@ -215,7 +223,7 @@ begin
 		    # Get next object from list.
 		    ip = ip + 1
 		    prev_num = ltid
-		    if (ctoi (Memc[cmd], ip, req_num) <= 0)
+		    if (ctol (Memc[cmd], ip, req_num) <= 0)
 		        req_num = ltid + 1
 
 		    # Fetch the next object from the list.
@@ -230,9 +238,9 @@ begin
 		    # Convert the coordinates.
 		    switch (apstati (ap, WCSIN)) {
 		    case WCS_PHYSICAL, WCS_WORLD:
-		        call ap_itol (ap,  xlist, ylist, xlist, ylist, 1)
+		        call ap_itol (ap,  xlist, ylist, xlist, ylist, c_1)
 		    case WCS_TV:
-		        call ap_vtol (im, xlist, ylist, xlist, ylist, 1)
+		        call ap_vtol (im, xlist, ylist, xlist, ylist, c_1)
 		    default:
 		        ;
 		    }
@@ -277,8 +285,10 @@ begin
 		    req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
 			sizeof (IM_PIXTYPE(im))
 		    memstat = ap_memstat (cache, req_size, old_size)
-		    if (memstat == YES)
-		        call ap_pcache (im, INDEFI, buf_size)
+		    if (memstat == YES) {
+			l_val = INDEFL
+		        call ap_pcache (im, l_val, buf_size)
+		    }
 		}
 
 		newimage = NO
@@ -307,10 +317,12 @@ begin
 		if (key == ' ') {
 		    if (stid == 1)
 		        call ap_param (ap, out, "center")
-		    if (newlist == YES)
+		    if (newlist == YES) {
 		        call ap_pcenter (ap, out, stid, ltid, ier)
-		    else
-		        call ap_pcenter (ap, out, stid, 0, ier)
+		    } else {
+			l_val = 0
+		        call ap_pcenter (ap, out, stid, l_val, ier)
+		    }
 		    call ap_cplot (ap, stid, mgd, YES)
 		    stid = stid + 1
 		}

@@ -11,8 +11,10 @@ pointer	im			# pointero to the IRAF image
 real	wx, wy			# cursor coordinates
 pointer	gd			# pointer to graphics stream
 int	out			# output file descriptor
-int	stid			# output file sequence number
+long	stid			# output file sequence number
 
+size_t	sz_val
+long	l_val
 int	cier, wcs, key
 pointer	sp, cmd
 real	xcenter, ycenter, xc, yc, rmin, rmax, imin, imax, rval
@@ -41,7 +43,8 @@ begin
 
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call printf (
 	"Waiting for setup menu command (?=help, v=default setup, q=quit):\n")
@@ -94,6 +97,7 @@ begin
 
 	# Fit the center and plot the results.
 	cier = apfitcenter (ap, im, xcenter, ycenter)
-	call ap_cplot (ap, 0, gd, apstati (ap, RADPLOTS))
+	l_val = 0
+	call ap_cplot (ap, l_val, gd, apstati (ap, RADPLOTS))
 	call ap_qcenter (ap, cier)
 end

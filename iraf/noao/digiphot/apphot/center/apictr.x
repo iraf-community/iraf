@@ -6,12 +6,13 @@ procedure ap_ictr (im, wx, wy, radius, emission, xcenter, ycenter)
 pointer	im		# pointer to the iraf image
 real	wx		# initial x coordinate
 real	wy		# initial y coordinate
-int	radius		# half width of centering box
+long	radius		# half width of centering box
 int	emission	# emission feature
 real	xcenter		# fitted x coordinate
 real	ycenter		# fitted y coordinate
 
-int	nx, ny, ier
+size_t	nx, ny
+int	ier
 pointer	cbuf
 real	xc, yc, datamin, datamax, junk
 int	ap_mctr1d()

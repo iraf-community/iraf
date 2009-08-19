@@ -13,11 +13,12 @@ include "../lib/center.h"
 procedure ap_cplot (ap, sid, gd, makeplot)
 
 pointer	ap		# the pointer to the apphot structure
-int	sid		# the output sequence number of the star
+long	sid		# the output sequence number of the star
 pointer	gd		# the graphics stream
 int	makeplot	# the make a plot ?
 
-int	nx, ny
+size_t	sz_val
+size_t	nx, ny
 pointer	ctr, sp, str, r, gt
 real	xcenter, ycenter, xc, yc, rmin, rmax, imin, imax
 real	u1, u2, v1, v2, x1, x2, y1, y2
@@ -51,7 +52,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call salloc (r, nx * ny, TY_REAL)
 
 	# Compute the radii and the plot limits.
@@ -70,7 +72,7 @@ begin
 	call apstats (ap, IMROOT, Memc[str], SZ_LINE)
 	call sprintf (Memc[str], SZ_LINE, "%s  Star %d")
 	    call pargstr (Memc[str])
-	    call pargi (sid)
+	    call pargl (sid)
 	gt = ap_gtinit (Memc[str], apstatr (ap,OXINIT), apstatr (ap, OYINIT))
 
 	# Make the plot.
@@ -107,6 +109,7 @@ pointer	ap		# the apphot pointer
 real	xmin, xmax	# the minimum and maximum radial distance
 real	ymin, ymax	# the minimum and maximum of y axis (ymin not used)
 
+size_t	sz_val
 int	fd
 pointer	sp, str, title
 real	scale, aspect, datalimit, skysigma, threshold, vx1, vx2, vy1, vy2
@@ -116,8 +119,9 @@ real	apstatr(), gstatr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (title, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (title, sz_val, TY_CHAR)
 
 	# Encode the parameter string.
 	fd = stropen (Memc[str], SZ_LINE, WRITE_ONLY)
@@ -203,6 +207,7 @@ procedure ap_cpannotate (gd, ap)
 pointer	gd		# the graphics stream
 pointer	ap		# the apphot structure
 
+size_t	sz_val
 pointer	sp, str
 real	fwhmpsf, capert, datalimit, threshold, skysigma, cthreshold
 real	xmin, xmax, ymin, ymax
@@ -212,7 +217,8 @@ real	apstatr()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call gseti (gd, G_PLTYPE, GL_DASHED)
 	call ggwind (gd, xmin, xmax, ymin, ymax)
 

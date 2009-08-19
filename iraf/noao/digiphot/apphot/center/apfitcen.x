@@ -18,13 +18,16 @@ pointer	ap		# pointer to the apphot structure
 pointer	im		# pointer to the IRAF image
 real	wx, wy		# object coordinates
 
-int	i, niter, ier, fier, lowsnr
+long	i, c_1
+int	niter, ier, fier, lowsnr
 pointer	ctr, nse
 real	cthreshold, datamin, datamax, owx, owy, xshift, yshift, med
 int	apctrbuf(), ap_ctr1d(), ap_mctr1d(), ap_gctr1d(), ap_lgctr1d()
-real	ap_csnratio(), amedr()
+real	ap_csnratio(), amedr(), aabs()
 
 begin
+	c_1 = 1
+
 	ctr = AP_PCENTER(ap)
 	nse = AP_NOISE(ap)
 	ier = AP_OK
@@ -53,11 +56,11 @@ begin
 	    AP_YCENTER(ctr) = wy
 	    switch (AP_WCSOUT(ap)) {
 	    case WCS_WORLD, WCS_PHYSICAL:
-		call ap_ltoo (ap, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
-		call ap_ltoo (ap, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+		call ap_ltoo (ap, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), c_1)
+		call ap_ltoo (ap, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), c_1)
 	    case WCS_TV:
-		call ap_ltov (im, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
-		call ap_ltov (im, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+		call ap_ltov (im, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), c_1)
+		call ap_ltov (im, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), c_1)
 	    default:
 		AP_OXINIT(ctr) = wx
 		AP_OYINIT(ctr) = wy
@@ -94,13 +97,13 @@ begin
 	    	AP_YERR(ctr) = INDEFR
 	        switch (AP_WCSOUT(ap)) {
 	        case WCS_WORLD, WCS_PHYSICAL:
-		    call ap_ltoo (ap, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
+		    call ap_ltoo (ap, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), c_1)
 		    call ap_ltoo (ap, wx, wy, AP_OXCENTER(ctr),
-		        AP_OYCENTER(ctr), 1)
+		        AP_OYCENTER(ctr), c_1)
 	        case WCS_TV:
-		    call ap_ltov (im, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
+		    call ap_ltov (im, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), c_1)
 		    call ap_ltov (im, wx, wy, AP_OXCENTER(ctr),
-		        AP_OYCENTER(ctr), 1)
+		        AP_OYCENTER(ctr), c_1)
 	        default:
 		    AP_OXINIT(ctr) = wx
 		    AP_OYINIT(ctr) = wy
@@ -218,18 +221,18 @@ begin
 	    switch (AP_WCSOUT(ap)) {
 	    case WCS_PHYSICAL, WCS_WORLD:
 		call ap_ltoo (ap, AP_XCENTER(ctr), AP_YCENTER(ctr),
-		    AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+		    AP_OXCENTER(ctr), AP_OYCENTER(ctr), c_1)
 		call ap_ltoo (ap, AP_XCENTER(ctr) - AP_XSHIFT(ctr),
 		    AP_YCENTER(ctr) - AP_YSHIFT(ctr), AP_OXINIT(ctr),
-		    AP_OYINIT(ctr), 1)
+		    AP_OYINIT(ctr), c_1)
 		AP_OXSHIFT(ctr) = AP_OXCENTER(ctr) - AP_OXINIT(ctr)
 		AP_OYSHIFT(ctr) = AP_OYCENTER(ctr) - AP_OYINIT(ctr)
 	    case WCS_TV:
 		call ap_ltov (im, AP_XCENTER(ctr), AP_YCENTER(ctr),
-		    AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+		    AP_OXCENTER(ctr), AP_OYCENTER(ctr), c_1)
 		call ap_ltov (im, AP_XCENTER(ctr) - AP_XSHIFT(ctr),
 		    AP_YCENTER(ctr) - AP_YSHIFT(ctr), AP_OXINIT(ctr),
-		    AP_OYINIT(ctr), 1)
+		    AP_OYINIT(ctr), c_1)
 		AP_OXSHIFT(ctr) = AP_OXCENTER(ctr) - AP_OXINIT(ctr)
 		AP_OYSHIFT(ctr) = AP_OYCENTER(ctr) - AP_OYINIT(ctr)
 	    default:
@@ -248,8 +251,8 @@ begin
 	    owy = AP_YCENTER(ctr)
 
 	} until ((fier != AP_OK && fier != AP_CTR_NOCONVERGE) ||
-	    (niter >= AP_CMAXITER(ctr)) || (abs (xshift) < 1.0 &&
-	    abs (yshift) < 1.0))
+	    (niter >= AP_CMAXITER(ctr)) || (aabs (xshift) < 1.0 &&
+	    aabs (yshift) < 1.0))
 
 	# Return appropriate error code.
 	if (fier != AP_OK) {
@@ -261,11 +264,11 @@ begin
 	    AP_YERR(ctr) = INDEFR
 	    switch (AP_WCSOUT(ap)) {
 	    case WCS_WORLD, WCS_PHYSICAL:
-		call ap_ltoo (ap, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
-		call ap_ltoo (ap, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+		call ap_ltoo (ap, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), c_1)
+		call ap_ltoo (ap, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), c_1)
 	    case WCS_TV:
-		call ap_ltov (im, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), 1)
-		call ap_ltov (im, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), 1)
+		call ap_ltov (im, wx, wy, AP_OXINIT(ctr), AP_OYINIT(ctr), c_1)
+		call ap_ltov (im, wx, wy, AP_OXCENTER(ctr), AP_OYCENTER(ctr), c_1)
 	    default:
 		AP_OXINIT(ctr) = wx
 		AP_OYINIT(ctr) = wy
@@ -279,9 +282,9 @@ begin
 	    return (AP_CTR_BADDATA)
 	} else if (lowsnr == YES) {
 	    return (AP_CTR_LOWSNRATIO)
-	} else if (abs (AP_XSHIFT(ctr)) > (AP_MAXSHIFT(ctr) * AP_SCALE(ap))) {
+	} else if (aabs (AP_XSHIFT(ctr)) > (AP_MAXSHIFT(ctr) * AP_SCALE(ap))) {
 	    return (AP_CTR_BADSHIFT)
-	} else if (abs (AP_YSHIFT(ctr)) > (AP_MAXSHIFT(ctr) * AP_SCALE(ap))) {
+	} else if (aabs (AP_YSHIFT(ctr)) > (AP_MAXSHIFT(ctr) * AP_SCALE(ap))) {
 	    return (AP_CTR_BADSHIFT)
 	} else if (ier == AP_CTR_OUTOFBOUNDS) {
 	    return (AP_CTR_OUTOFBOUNDS)

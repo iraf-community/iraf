@@ -16,11 +16,15 @@ pointer	ap		# pointer to the apphot structure
 pointer	im		# the input image descriptor
 int	ier		# previous error code
 
+size_t	c_1
 int	fier
 pointer	cen, nse
 int	ap_ctr1d(), ap_mctr1d(), ap_gctr1d(), ap_lgctr1d()
+real	aabs()
 
 begin
+	c_1 = 1
+
 	cen = AP_PCENTER(ap)
 	nse = AP_NOISE(ap)
 
@@ -47,14 +51,14 @@ begin
 	switch (AP_WCSOUT(ap)) {
         case WCS_WORLD, WCS_PHYSICAL:
             call ap_ltoo (ap, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXINIT(cen),
-		AP_OYINIT(cen), 1)
+		AP_OYINIT(cen), c_1)
             call ap_ltoo (ap, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXCENTER(cen),
-		AP_OYCENTER(cen), 1)
+		AP_OYCENTER(cen), c_1)
         case WCS_TV:
             call ap_ltov (im, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXINIT(cen),
-		AP_OYINIT(cen), 1)
+		AP_OYINIT(cen), c_1)
             call ap_ltov (im, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXCENTER(cen),
-		AP_OYCENTER(cen), 1)
+		AP_OYCENTER(cen), c_1)
         default:
 	    AP_OXINIT(cen) = AP_CXCUR(cen)
 	    AP_OYINIT(cen) = AP_CYCUR(cen)
@@ -127,18 +131,18 @@ begin
         switch (AP_WCSOUT(ap)) {
         case WCS_WORLD, WCS_PHYSICAL:
             call ap_ltoo (ap, AP_XCENTER(cen), AP_YCENTER(cen),
-                AP_OXCENTER(cen), AP_OYCENTER(cen), 1)
+                AP_OXCENTER(cen), AP_OYCENTER(cen), c_1)
             call ap_ltoo (ap, AP_XCENTER(cen) - AP_XSHIFT(cen),
                 AP_YCENTER(cen) - AP_YSHIFT(cen), AP_OXINIT(cen),
-                AP_OYINIT(cen), 1)
+                AP_OYINIT(cen), c_1)
             AP_OXSHIFT(cen) = AP_OXCENTER(cen) - AP_OXINIT(cen)
             AP_OYSHIFT(cen) = AP_OYCENTER(cen) - AP_OYINIT(cen)
         case WCS_TV:
             call ap_ltov (im, AP_XCENTER(cen), AP_YCENTER(cen),
-                AP_OXCENTER(cen), AP_OYCENTER(cen), 1)
+                AP_OXCENTER(cen), AP_OYCENTER(cen), c_1)
             call ap_ltov (im, AP_XCENTER(cen) - AP_XSHIFT(cen),
                 AP_YCENTER(cen) - AP_YSHIFT(cen), AP_OXINIT(cen),
-                AP_OYINIT(cen), 1)
+                AP_OYINIT(cen), c_1)
             AP_OXSHIFT(cen) = AP_OXCENTER(cen) - AP_OXINIT(cen)
             AP_OYSHIFT(cen) = AP_OYCENTER(cen) - AP_OYINIT(cen)
         default:
@@ -161,14 +165,14 @@ begin
 	    switch (AP_WCSOUT(ap)) {
             case WCS_WORLD, WCS_PHYSICAL:
                 call ap_ltoo (ap, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXINIT(cen),
-		    AP_OYINIT(cen), 1)
+		    AP_OYINIT(cen), c_1)
                 call ap_ltoo (ap, AP_CXCUR(cen), AP_CYCUR(cen),
-		    AP_OXCENTER(cen), AP_OYCENTER(cen), 1)
+		    AP_OXCENTER(cen), AP_OYCENTER(cen), c_1)
             case WCS_TV:
                 call ap_ltov (im, AP_CXCUR(cen), AP_CYCUR(cen), AP_OXINIT(cen),
-		    AP_OYINIT(cen), 1)
+		    AP_OYINIT(cen), c_1)
                 call ap_ltov (im, AP_CXCUR(cen), AP_CYCUR(cen),
-		    AP_OXCENTER(cen), AP_OYCENTER(cen), 1)
+		    AP_OXCENTER(cen), AP_OYCENTER(cen), c_1)
             default:
 	        AP_OXCENTER(cen) = AP_CXCUR(cen)
 	        AP_OYCENTER(cen) = AP_CYCUR(cen)
@@ -182,9 +186,9 @@ begin
 	    return (AP_CTR_BADDATA)
 	} else if (ier == AP_CTR_LOWSNRATIO) {
 	    return (AP_CTR_LOWSNRATIO)
-	} else if (abs (AP_XSHIFT(cen)) > (AP_MAXSHIFT(cen) * AP_SCALE(ap))) {
+	} else if (aabs (AP_XSHIFT(cen)) > (AP_MAXSHIFT(cen) * AP_SCALE(ap))) {
 	    return (AP_CTR_BADSHIFT)
-	} else if (abs (AP_YSHIFT(cen)) > (AP_MAXSHIFT(cen) * AP_SCALE(ap))) {
+	} else if (aabs (AP_YSHIFT(cen)) > (AP_MAXSHIFT(cen) * AP_SCALE(ap))) {
 	    return (AP_CTR_BADSHIFT)
 	} else if (ier == AP_CTR_OUTOFBOUNDS) {
 	    return (AP_CTR_OUTOFBOUNDS)

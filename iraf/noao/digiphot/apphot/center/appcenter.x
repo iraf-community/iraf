@@ -7,8 +7,8 @@ procedure ap_pcenter (ap, fd, id, lid, ier)
 
 pointer	ap	# pointer to apphot structure
 int	fd	# output file descriptor
-int	id	# id of the star
-int	lid	# list number
+long	id	# id of the star
+long	lid	# list number
 int	ier	# comment string
 
 real	xpos, ypos
@@ -36,13 +36,15 @@ procedure ap_qcenter (ap, ier)
 pointer	ap	# pointer to apphot structure
 int	ier	# comment string
 
+size_t	sz_val
 real	owx, owy, wx, wy
 pointer	sp, imname
 real	apstatr()
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	owx = apstatr (ap, OXINIT)
 	owy = apstatr (ap, OYINIT)

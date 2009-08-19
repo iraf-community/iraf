@@ -7,7 +7,7 @@ include "../lib/center.h"
 int procedure ap_ctr1d (ctrpix, nx, ny, norm, xc, yc, xerr, yerr)
 
 real	ctrpix[nx, ny]		# object to be centered
-int	nx, ny			# dimensions of subarray
+size_t	nx, ny			# dimensions of subarray
 real	norm			# the normalization factor
 real	xc, yc			# computed centers
 real	xerr, yerr		# estimate of centering error
@@ -39,12 +39,12 @@ end
 procedure ap_cmarg (a, npts, norm, xc, err)
 
 real	a[npts]		# array
-int	npts		# number of points
+size_t	npts		# number of points
 real	norm		# the normalization factor
 real	xc		# center value
 real	err		# error
 
-int	i, npos
+long	i, npos
 real	val, sumi, sumix, sumix2
 
 begin
@@ -89,9 +89,9 @@ procedure ap_mkmarg (ctrpix, xm, ym, nx, ny)
 real	ctrpix[nx, ny]		# pixels
 real	xm[nx]			# x marginal distribution
 real	ym[ny]			# y marginal distribution
-int	nx, ny			# dimensions of array
+size_t	nx, ny			# dimensions of array
 
-int	i, j
+long	i, j
 real	sum
 
 begin

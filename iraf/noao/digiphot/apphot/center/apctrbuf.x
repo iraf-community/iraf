@@ -15,10 +15,11 @@ pointer	ap		# pointer to apphot structure
 pointer	im		# pointer to the IRAF image
 real	wx, wy		# center coordinates
 
-int	icpix
+long	icpix
 pointer	ctr
 real	cpix, gdatamin, gdatamax, datamin, datamax
 pointer	ap_ctrpix()
+long	lint()
 
 begin
 	# Get pointer to centering structure.
@@ -30,7 +31,7 @@ begin
 
 	# Get the centering buffer of pixels.
 	cpix = max (1.0, AP_CAPERT(ctr) * AP_SCALE(ap))
-	icpix = 2 * int (cpix) + 1
+	icpix = 2 * lint (cpix) + 1
 	if (AP_CTRPIX(ctr) != NULL)
 	    call mfree (AP_CTRPIX(ctr), TY_REAL)
 	AP_CTRPIX(ctr) = ap_ctrpix (im, wx, wy, icpix,
@@ -65,11 +66,11 @@ pointer procedure ap_ctrpix (im, wx, wy, capert, xc, yc, nx, ny)
 
 pointer	im		# pointer to IRAF image
 real	wx, wy		# center of subraster to be extracted
-int	capert		# width of subraster to be extracted
+long	capert		# width of subraster to be extracted
 real	xc, yc		# center of extracted subraster
-int	nx, ny		# dimensions of extracted subraster
+size_t	nx, ny		# dimensions of extracted subraster
 
-int	i, ncols, nlines, c1, c2, l1, l2, half_capert
+long	ncols, nlines, c1, c2, l1, l2, half_capert, i
 pointer	buf, lbuf
 real	xc1, xc2, xl1, xl2
 pointer	imgs2r()

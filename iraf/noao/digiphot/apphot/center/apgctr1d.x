@@ -14,17 +14,20 @@ define	TOL	0.001		# the tolerance for convergence
 int procedure ap_gctr1d (ctrpix, nx, ny, sigma, maxiter, xc, yc, xerr, yerr)
 
 real	ctrpix[nx, ny]		# data subarray
-int	nx, ny			# dimensions of data subarray
+size_t	nx, ny			# dimensions of data subarray
 real	sigma			# sigma of PSF
 int	maxiter			# maximum number of iterations
 real	xc, yc			# computed centers
 real	xerr, yerr		# estimate of centering error
 
+size_t	sz_val0, sz_val1
 extern	cgauss1d, cdgauss1d
-int	i, minel, maxel, xier, yier, npar, npts
+long	i, minel, maxel
+int	xier, yier
+size_t	npts, npar
 pointer	sp, x, xm, ym, w, fit, list, nl
 real	chisqr, variance, p[NPARS], dp[NPARS]
-int	locpr()
+pointer	locpr()
 
 begin
 	# Check the number of points.
@@ -33,12 +36,16 @@ begin
 	npts = max (nx, ny)
 
 	call smark (sp)
-	call salloc (list, NAPARS, TY_INT)
-	call salloc (xm, nx, TY_REAL)
-	call salloc (ym, ny, TY_REAL)
-	call salloc (x, npts, TY_REAL)
-	call salloc (w, npts, TY_REAL)
-	call salloc (fit, npts, TY_REAL)
+	sz_val0 = NAPARS
+	call salloc (list, sz_val0, TY_LONG)
+	sz_val0 = nx
+	call salloc (xm, sz_val0, TY_REAL)
+	sz_val0 = ny
+	call salloc (ym, sz_val0, TY_REAL)
+	sz_val0 = npts
+	call salloc (x, sz_val0, TY_REAL)
+	call salloc (w, sz_val0, TY_REAL)
+	call salloc (fit, sz_val0, TY_REAL)
 	do i = 1, npts
 	    Memr[x+i-1] = i
 
@@ -48,9 +55,9 @@ begin
 	call adivkr (Memr[ym], real (ny), Memr[ym], ny)
 
 	# Specify which parameters are to be fit.
-	Memi[list] = 1
-	Memi[list+1] = 2
-	Memi[list+2] = 4
+	Meml[list] = 1
+	Meml[list+1] = 2
+	Meml[list+2] = 4
 
 	# Initialize the x fit parameters.
 	call ap_alimr (Memr[xm], nx, p[4], p[1], minel, maxel)
@@ -59,8 +66,10 @@ begin
 	p[3] = sigma ** 2
 
 	# Compute the x center and error.
-	call nlinitr (nl, locpr (cgauss1d), locpr (cdgauss1d), p, dp, NPARS,
-	    Memi[list], NAPARS, TOL, maxiter)
+	sz_val0 = NPARS
+	sz_val1 = NAPARS
+	call nlinitr (nl, locpr (cgauss1d), locpr (cdgauss1d), p, dp, sz_val0,
+		      Meml[list], sz_val1, TOL, maxiter)
 	call nlfitr (nl, Memr[x], Memr[xm], Memr[w], nx, 1, WTS_UNIFORM, xier)
 	call nlvectorr (nl, Memr[x], Memr[fit], nx, 1)
 	call nlpgetr (nl, p, npar)
@@ -79,8 +88,10 @@ begin
 	p[3] = sigma ** 2
 
 	# Fit the y marginal.
-	call nlinitr (nl, locpr (cgauss1d), locpr (cdgauss1d), p, dp, NPARS,
-	    Memi[list], NAPARS, TOL, maxiter)
+	sz_val0 = NPARS
+	sz_val1 = NAPARS
+	call nlinitr (nl, locpr (cgauss1d), locpr (cdgauss1d), p, dp, sz_val0,
+		      Meml[list], sz_val1, TOL, maxiter)
 	call nlfitr (nl, Memr[x], Memr[ym], Memr[w], ny, 1, WTS_UNIFORM, yier)
 	call nlvectorr (nl, Memr[x], Memr[fit], ny, 1)
 	call nlpgetr (nl, p, npar)

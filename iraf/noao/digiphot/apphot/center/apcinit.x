@@ -12,9 +12,12 @@ real	cbox		# half width of centering box
 real	fwhmpsf		# FWHM of the PSF
 int	noise		# noise function
 
+size_t	sz_val
+
 begin
 	# Allocate space.
-	call malloc (ap, LEN_APSTRUCT, TY_STRUCT)
+	sz_val = LEN_APSTRUCT
+	call malloc (ap, sz_val, TY_STRUCT)
 
 	# Set up the global apphot package parameters.
 	call ap_defsetup (ap, fwhmpsf)
@@ -45,11 +48,13 @@ pointer	ap		# pointer to apphot structure
 int	function	# centering function
 real	cbox		# radius of centering aperture
 
+size_t	sz_val
 pointer	ctr
 
 begin
 	# Allocate space for the centering structure.
-	call malloc (AP_PCENTER(ap), LEN_CENSTRUCT, TY_STRUCT)
+	sz_val = LEN_CENSTRUCT
+	call malloc (AP_PCENTER(ap), sz_val, TY_STRUCT)
 	ctr = AP_PCENTER(ap)
 	AP_CXCUR(ctr) = INDEFR
 	AP_CYCUR(ctr) = INDEFR

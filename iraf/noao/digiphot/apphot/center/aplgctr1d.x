@@ -13,7 +13,7 @@ int procedure ap_lgctr1d (ctrpix, nx, ny, cx, cy, sigma, maxiter, norm,
 	skysigma, xc, yc, xerr, yerr)
 
 real	ctrpix[nx, ny]		# object to be centered
-int	nx, ny			# dimensions of subarray
+size_t	nx, ny			# dimensions of subarray
 real	cx, cy			# center in subraster coordinates
 real	sigma			# sigma of PSF
 int	maxiter			# maximum number of iterations

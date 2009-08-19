@@ -11,20 +11,26 @@ pointer ap			# pointer to the apphot structure
 pointer	im			# pointer to the IRAF image
 int	cl			# the coordinate file descriptor
 int	out			# output file descriptor
-int	id			# output file sequence number
-int	ld			# the coordinate file list number
+long	id			# output file sequence number
+long	ld			# the coordinate file list number
 pointer	mgd			# pointer to the metacode file stream
 pointer	gid			# pointer to the image display stream
 int	interactive		# mode of use
 
-int	stdin, ier, ild
+size_t	sz_val
+size_t	c_1
+int	stdin, ier
+long	ild
 pointer	sp, str
 real	wx, wy
 int	apfitcenter(), fscan(), nscan(), strncmp(), apstati()
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 	call fstats (cl, F_FILENAME, Memc[str], SZ_FNAME)
 
 	# Initialize.
@@ -56,9 +62,9 @@ begin
 	    # Transform the input coordinates.
 	    switch (apstati(ap,WCSIN)) {
 	    case WCS_WORLD, WCS_PHYSICAL:
-		call ap_itol (ap, wx, wy, wx, wy, 1)
+		call ap_itol (ap, wx, wy, wx, wy, c_1)
 	    case WCS_TV:
-		call ap_vtol (im, wx, wy, wx, wy, 1)
+		call ap_vtol (im, wx, wy, wx, wy, c_1)
 	    default:
 		;
 	    }

@@ -7,7 +7,7 @@ include "../lib/center.h"
 int procedure ap_mctr1d (ctrpix, nx, ny, norm, xc, yc, xerr, yerr)
 
 real	ctrpix[nx, ny]		# object to be centered
-int	nx, ny			# dimensions of subarray
+size_t	nx, ny			# dimensions of subarray
 real	norm			# the normalization factor
 real	xc, yc			# computed centers
 real	xerr, yerr		# estimate of centering error
@@ -42,12 +42,12 @@ end
 procedure ap_cmmarg (a, npts, norm, xc, err)
 
 real	a[npts]		# array
-int	npts		# number of points
+size_t	npts		# number of points
 real	norm		# the normalization factor
 real	xc		# center value
 real	err		# error
 
-int	i, npos
+long	i, npos
 real	sumi, sumix, sumix2, mean, val
 real	asumr()
 
