@@ -15,8 +15,9 @@ pointer	im		# the input image descriptor
 int	positive	# emission or absorption features
 real	skyval		# sky value
 real	skysig		# sigma of sky
-int	nsky		# number of sky pixels
+size_t	nsky		# number of sky pixels
 
+size_t	sz_val, c_1
 int	nap
 pointer	nse, phot
 real	zmag
@@ -25,8 +26,9 @@ begin
 	# Initalize.
 	phot = AP_PPHOT(ap)
 	nse = AP_NOISE(ap)
-	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot))
-	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], AP_NAPERTS(phot))
+	sz_val = AP_NAPERTS(phot)
+	call amovkr (INDEFR, Memr[AP_MAGS(phot)], sz_val)
+	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], sz_val)
         if (IS_INDEFR(AP_PXCUR(phot)) || IS_INDEFR(AP_PYCUR(phot))) {
             AP_OPXCUR(phot) = AP_PXCUR(phot)
             AP_OPYCUR(phot) = AP_PYCUR(phot)
@@ -34,10 +36,10 @@ begin
             switch (AP_WCSOUT(ap)) {
             case WCS_WORLD, WCS_PHYSICAL:
                 call ap_ltoo (ap, AP_PXCUR(phot), AP_PYCUR(phot),
-                    AP_OPXCUR(phot), AP_OPYCUR(phot), 1)
+			      AP_OPXCUR(phot), AP_OPYCUR(phot), c_1)
             case WCS_TV:
                 call ap_ltov (im, AP_PXCUR(phot), AP_PYCUR(phot),
-                    AP_OPXCUR(phot), AP_OPYCUR(phot), 1)
+			      AP_OPXCUR(phot), AP_OPYCUR(phot), c_1)
             default:
                 AP_OPXCUR(phot) = AP_PXCUR(phot)
                 AP_OPYCUR(phot) = AP_PYCUR(phot)
@@ -65,7 +67,8 @@ begin
 
 	# Correct for itime.
 	zmag = 2.5 * log10 (AP_ITIME(ap))
-	call aaddkr (Memr[AP_MAGS(phot)], zmag, Memr[AP_MAGS(phot)], nap)
+	sz_val = nap
+	call aaddkr (Memr[AP_MAGS(phot)], zmag, Memr[AP_MAGS(phot)], sz_val)
 
 	if (AP_NMINAP(phot) <= AP_NMAXAP(phot))
 	    return (AP_APERT_BADDATA)

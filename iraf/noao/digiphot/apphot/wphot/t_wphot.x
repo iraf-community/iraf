@@ -23,11 +23,14 @@ int	verify		# verify critical parameters
 int	update		# update the critical parameters
 int	verbose		# print messages in verbose mode
 
+size_t	sz_val
 pointer	sp, outfname, cname, ap, im, gd, mgd, id, str
 pointer	clist, olist, slist, imlist
-int	limlist, lclist, lolist, lslist, sid, lid, sd, out, cl, root, stat, pfd
-int	wcs, memstat, buf_size
-size_t	req_size, old_size
+int	limlist, lclist, lolist, lslist
+int	sd, out, cl, root, stat, pfd, wcs, memstat
+long	sid, lid
+size_t	req_size, old_size, buf_size
+long	l_val
 
 pointer	immap(), gopen(), clpopnu(), imtopenp()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), apstati(), clgwrd()
@@ -36,19 +39,23 @@ int	ap_memstat(), sizeof()
 bool	clgetb(), streq()
 errchk	gopen
 
+include	<nullptr.inc>
+
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (coords, SZ_FNAME, TY_CHAR)
-	call salloc (skyfile, SZ_FNAME, TY_CHAR)
-	call salloc (plotfile, SZ_FNAME, TY_CHAR)
-	call salloc (graphics, SZ_FNAME, TY_CHAR)
-	call salloc (display, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (cname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
+	call salloc (skyfile, sz_val, TY_CHAR)
+	call salloc (plotfile, sz_val, TY_CHAR)
+	call salloc (graphics, sz_val, TY_CHAR)
+	call salloc (display, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (cname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Set the standard output to flush on newline.
 	call fseti (STDOUT, F_FLUSHNL, YES)
@@ -94,7 +101,8 @@ begin
 
 	# Confirm the algorithm parameters.
 	if (verify == YES && interactive == NO) {
-	    call ap_wconfirm (ap, NULL, 1)
+	    l_val = 1
+	    call ap_wconfirm (ap, NULL, l_val)
 	    if (update == YES)
 		call ap_wpars (ap)
 	}
@@ -180,7 +188,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the image and store image parameters.
-	    im = immap (Memc[image], READ_ONLY, 0)
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call apimkeys (ap, im, Memc[image])
 
 	    # Set the image display viewport.
@@ -191,8 +199,10 @@ begin
             req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
             memstat = ap_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call ap_pcache (im, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call ap_pcache (im, l_val, buf_size)
+	    }
 
 	    # Open the coordinate file, where coords is assumed to be a simple
 	    # text file in which the x and y positions are in columns 1 and 2
@@ -214,8 +224,9 @@ begin
 		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
 	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 		} else {
-		    call apstats (cl, CLNAME, Memc[outfname], SZ_FNAME)
-		    call seek (cl, BOF)
+		    call apstats (ap, CLNAME, Memc[outfname], SZ_FNAME)
+		    l_val = BOF
+		    call seek (cl, l_val)
 		}
 	    }
 	    call apsets (ap, CLNAME, Memc[outfname])
@@ -226,10 +237,12 @@ begin
 	    if (lslist <= 0) {
 		sd = NULL
 		call strcpy ("", Memc[skyfile], SZ_FNAME)
-	    } else if (clgfil (slist, Memc[skyfile], SZ_FNAME) != EOF)
+	    } else if (clgfil (slist, Memc[skyfile], SZ_FNAME) != EOF) {
 		sd = open (Memc[skyfile], READ_ONLY, TEXT_FILE)
-	    else
-		call seek (sd, BOF)
+	    } else {
+		l_val = BOF
+		call seek (sd, l_val)
+	    }
 	    #call apsets (ap, SKYNAME, Memc[skyfile])
 
 	    # Open the output text file, if output is "default", dir$default
@@ -261,7 +274,7 @@ begin
 	    # Do aperture photometry.
 	    if (interactive == NO) {
 	        if (Memc[cname] != EOS)
-		    stat = ap_wphot (ap, im, cl, sd, NULL, mgd, NULL, out,
+		    stat = ap_wphot (ap, im, cl, sd, NULLPTR, mgd, NULLPTR, out,
 		        sid, NO, cache)
 	        else if (cl != NULL) {
 		    lid = 1

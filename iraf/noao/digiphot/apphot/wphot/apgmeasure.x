@@ -6,8 +6,8 @@ procedure ap_gmeasure (im, wx, wy, c1, c2, l1, l2, aperts, sums, areas,
 
 pointer	im			# pointer to image
 real	wx, wy			# center of subraster
-int	c1, c2			# column limits
-int	l1, l2			# line limits
+long	c1, c2			# column limits
+long	l1, l2			# line limits
 real	aperts[ARB]		# array of apertures
 double	sums[ARB]		# array of sums
 double	areas[ARB]		# aperture areas
@@ -16,7 +16,9 @@ real	sigsq			# the profile widht squared
 real	gain			# the sky value
 real	varsky			# the sky variance
 
-int	i, j, k, nx, yindex
+size_t	sz_val
+long	i, j, nx, yindex
+int	k
 double	fctn, weight, norm
 pointer	sp, buf, sump, sumpw
 real	xc, yc, apmaxsq, dy2, r2, r, prof, var
@@ -25,10 +27,12 @@ pointer	imgs2r()
 begin
 	# Initialize.
 	call smark (sp)
-	call salloc (sump, naperts, TY_DOUBLE)
-	call salloc (sumpw, naperts, TY_DOUBLE)
-	call aclrd (Memd[sump], naperts)
-	call aclrd (Memd[sumpw], naperts)
+	sz_val = naperts
+	call salloc (sump, sz_val, TY_DOUBLE)
+	call salloc (sumpw, sz_val, TY_DOUBLE)
+	sz_val = naperts
+	call aclrd (Memd[sump], sz_val)
+	call aclrd (Memd[sumpw], sz_val)
 
 	# Get array boundary parameters.
 	nx = c2 - c1 + 1
@@ -37,8 +41,9 @@ begin
 	apmaxsq = (aperts[naperts] + 0.5) ** 2
 
 	# Clear out the accumulaters
-	call aclrd (sums, naperts)
-	call aclrd (areas, naperts)
+	sz_val = naperts
+	call aclrd (sums, sz_val)
+	call aclrd (areas, sz_val)
 
 	# Loop over the pixels.
 	do j = l1, l2 {
@@ -96,8 +101,8 @@ procedure ap_bgmeasure (im, wx, wy, c1, c2, l1, l2, datamin, datamax,
 
 pointer	im			# pointer to image
 real	wx, wy			# center of subraster
-int	c1, c2			# column limits
-int	l1, l2			# line limits
+long	c1, c2			# column limits
+long	l1, l2			# line limits
 real	datamin			# minimum good data
 real	datamax			# maximum good data
 real	aperts[ARB]		# array of apertures
@@ -109,7 +114,9 @@ real	sigsq			# the profile widht squared
 real	gain			# the image gain value
 real	varsky			# the sky variance
 
-int	i, j, k, nx, yindex, kindex
+size_t	sz_val
+long	i, j, nx, yindex
+int	k, kindex
 double	fctn, weight, norm
 pointer	sp, buf, sump, sumpw
 real	xc, yc, apmaxsq, dy2, r2, r
@@ -119,10 +126,12 @@ pointer	imgs2r()
 begin
 	# Initialize.
 	call smark (sp)
-	call salloc (sump, naperts, TY_DOUBLE)
-	call salloc (sumpw, naperts, TY_DOUBLE)
-	call aclrd (Memd[sump], naperts)
-	call aclrd (Memd[sumpw], naperts)
+	sz_val = naperts
+	call salloc (sump, sz_val, TY_DOUBLE)
+	call salloc (sumpw, sz_val, TY_DOUBLE)
+	sz_val = naperts
+	call aclrd (Memd[sump], sz_val)
+	call aclrd (Memd[sumpw], sz_val)
 	minapert = naperts + 1
 
 	# Get array boundary parameters.
@@ -132,8 +141,9 @@ begin
 	apmaxsq = (aperts[naperts] + 0.5) ** 2
 
 	# Clear out the accumulaters
-	call aclrd (sums, naperts)
-	call aclrd (areas, naperts)
+	sz_val = naperts
+	call aclrd (sums, sz_val)
+	call aclrd (areas, sz_val)
 
 	# Loop over the pixels.
 	do j = l1, l2 {

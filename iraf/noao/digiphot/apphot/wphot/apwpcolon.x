@@ -15,22 +15,24 @@ pointer	ap				# pointer to the apphot structure
 pointer	im				# pointer to the iraf image
 int	cl				# coord file descriptor
 int	out				# output file descriptor
-int	stid				# output file sequence number
-int	ltid				# coord file  sequence number
+long	stid				# output file sequence number
+long	ltid				# coord file  sequence number
 char	cmdstr[ARB]			# command string
 int	newimage			# new image ?
 int	newcenterbuf, newcenter		# new center buffer ? new center fit ?
 int	newskybuf, newsky		# new sky buffer ? new sky fit ?
 int	newmagbuf, newmag		# new aperture buffer ? new fit ?
 
+size_t	sz_val
 pointer	sp, incmd, outcmd
 int	strdic()
 
 begin
 	# Get the command.
 	call smark (sp)
-	call salloc (incmd, SZ_LINE, TY_CHAR)
-	call salloc (outcmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (incmd, sz_val, TY_CHAR)
+	call salloc (outcmd, sz_val, TY_CHAR)
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[incmd], SZ_LINE)
@@ -65,11 +67,12 @@ procedure ap_wmagcolon (ap, out, stid, cmdstr, newmagbuf, newmag)
 
 pointer	ap		# pointer to apphot structure
 int	out		# output file descriptor
-int	stid		# output number
+long	stid		# output number
 char	cmdstr[ARB]	# command string
 int	newmagbuf	# new aperture buffers
 int	newmag		# compute new magnitudes
 
+size_t	sz_val
 bool	bval
 int	ncmd, stat
 pointer	sp, cmd
@@ -81,7 +84,8 @@ real	apstatr()
 begin
 	# Get the command.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)
 	if (Memc[cmd] == EOS) {

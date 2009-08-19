@@ -18,9 +18,11 @@ real	wx, wy		# object coordinates
 int	positive	# emission or absorption features
 real	skyval		# sky value
 real	skysig		# sky sigma
-int	nsky		# number of sky pixels
+size_t	nsky		# number of sky pixels
 
-int	c1, c2, l1, l2, ier, nap
+size_t	sz_val
+long	c1, c2, l1, l2
+int	ier, nap
 pointer	sp, nse, phot, temp
 real	datamin, datamax, zmag, wsigsq, wvarsky
 int	apmagbuf()
@@ -37,18 +39,22 @@ begin
         } else {
             switch (AP_WCSOUT(ap)) {
             case WCS_WORLD, WCS_PHYSICAL:
-                call ap_ltoo (ap, wx, wy, AP_OPXCUR(phot), AP_OPYCUR(phot), 1)
+		sz_val = 1
+                call ap_ltoo (ap, wx, wy, AP_OPXCUR(phot), AP_OPYCUR(phot), sz_val)
             case WCS_TV:
-                call ap_ltov (im, wx, wy, AP_OPXCUR(phot), AP_OPYCUR(phot), 1)
+		sz_val = 1
+                call ap_ltov (im, wx, wy, AP_OPXCUR(phot), AP_OPYCUR(phot), sz_val)
             default:
                 AP_OPXCUR(phot) = wx
                 AP_OPYCUR(phot) = wy
             }
         }
-	call amovkd (0.0d0, Memd[AP_SUMS(phot)], AP_NAPERTS(phot))
-	call amovkd (0.0d0, Memd[AP_AREA(phot)], AP_NAPERTS(phot))
-	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot))
-	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], AP_NAPERTS(phot))
+	sz_val = AP_NAPERTS(phot)
+	call amovkd (0.0d0, Memd[AP_SUMS(phot)], sz_val)
+	call amovkd (0.0d0, Memd[AP_AREA(phot)], sz_val)
+	sz_val = AP_NAPERTS(phot)
+	call amovkr (INDEFR, Memr[AP_MAGS(phot)], sz_val)
+	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], sz_val)
 
 	# Make sure the center is defined.
 	if (IS_INDEFR(wx) || IS_INDEFR(wy))
@@ -60,7 +66,8 @@ begin
 	    return (AP_APERT_NOAPERT)
 
 	call smark (sp)
-	call salloc (temp, AP_NAPERTS(phot), TY_REAL)
+	sz_val = AP_NAPERTS(phot)
+	call salloc (temp, sz_val, TY_REAL)
 
 	# Compute the min and max.
 	if (IS_INDEFR(AP_DATAMIN(ap)))
@@ -74,8 +81,8 @@ begin
 
 	# Do photometry for all the apertures.
 	AP_NMINAP(phot) = AP_NMAXAP(phot) + 1
-	call amulkr (Memr[AP_APERTS(phot)], AP_SCALE(ap), Memr[temp],
-	    AP_NAPERTS(phot)]
+	sz_val = AP_NAPERTS(phot)
+	call amulkr (Memr[AP_APERTS(phot)], AP_SCALE(ap), Memr[temp], sz_val)
 
 	switch (AP_PWEIGHTS(phot)) {
 	case AP_PWCONSTANT:
@@ -146,7 +153,8 @@ begin
 
 	    # Compute correction for itime.
 	    zmag = 2.5 * log10 (AP_ITIME(ap))
-	    call aaddkr (Memr[AP_MAGS(phot)], zmag, Memr[AP_MAGS(phot)], nap)
+	    sz_val = nap
+	    call aaddkr (Memr[AP_MAGS(phot)], zmag, Memr[AP_MAGS(phot)], sz_val)
 	}
 
 	call sfree (sp)
