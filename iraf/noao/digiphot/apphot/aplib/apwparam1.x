@@ -14,6 +14,7 @@ pointer	ap		# pointer to the apphot structure
 int	out		# output file descriptor
 char	task[ARB]	# task name
 
+size_t	sz_val
 int	nchars
 pointer	sp, outstr, date, time
 bool	itob()
@@ -26,9 +27,11 @@ begin
 	 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
 
 	# Write the id.
 
@@ -142,6 +145,7 @@ procedure ap_wctrs (ap, out)
 pointer	ap		# apphot pointer
 int	out		# output file descriptor
 
+size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	apstati()
@@ -152,7 +156,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	if (AP_PCENTER(ap) != NULL) {
 	    call apstats (ap, CSTRING, Memc[str], SZ_FNAME)
@@ -190,6 +195,7 @@ procedure ap_wskys (ap, out)
 pointer	ap		# apphot structure
 int	out		# output pointer
 
+size_t	sz_val
 pointer sp, str
 bool	itob()
 int	apstati()
@@ -200,7 +206,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	if (AP_PSKY(ap) != NULL) {
 	    call apstats (ap, SSTRING, Memc[str], SZ_FNAME)
@@ -246,6 +253,7 @@ procedure ap_wnse (ap, out)
 pointer	ap		# apphot pointer
 int	out		# output file descriptor
 
+size_t	sz_val
 pointer	sp, str
 real	apstatr()
 
@@ -253,7 +261,8 @@ begin
 	if (out == NULL)
 	    return
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	if (AP_NOISE(ap) != NULL) {
 	    call apstats (ap, NSTRING, Memc[str], SZ_FNAME)
@@ -289,6 +298,7 @@ procedure ap_wwphot (ap, out)
 pointer	ap		# apphot structure pointer
 int	out		# output file descriptor
 
+size_t	sz_val
 pointer	sp, str
 real	apstatr()
 
@@ -297,7 +307,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	if (AP_PPHOT(ap) != NULL) {
 	    call apstats (ap, PWSTRING, Memc[str], SZ_LINE)

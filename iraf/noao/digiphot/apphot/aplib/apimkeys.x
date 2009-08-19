@@ -9,14 +9,19 @@ pointer	ap			# pointer to the apphot structure
 pointer	im			# the image descriptor
 char	imname[ARB]		# the input image name
 
+size_t	sz_val
 pointer	sp, imroot, mw, ct
 int	apstati()
+pointer	apstatp()
 pointer	mw_openim(), mw_sctran()
 errchk	mw_openim(), mw_sctran()
 
+include	<nullptr.inc>
+
 begin
 	call smark (sp)
-	call salloc (imroot, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imroot, sz_val, TY_CHAR)
 
 	# Set the image and root names.
         call apsets (ap, IMNAME, imname)
@@ -24,17 +29,17 @@ begin
 	call apsets (ap, IMROOT, Memc[imroot])
 
 	# Set the wcs descriptors.
-	mw = apstati (ap, MW)
+	mw = apstatp (ap, MW)
 	if (mw != NULL)
 	    call mw_close (mw)
 	iferr {
 	    mw = mw_openim (im) 
 	} then {
-	    call apseti (ap, MW, NULL)
-	    call apseti (ap, CTIN, NULL)
-	    call apseti (ap, CTOUT, NULL)
+	    call apsetp (ap, MW, NULLPTR)
+	    call apsetp (ap, CTIN, NULLPTR)
+	    call apsetp (ap, CTOUT, NULLPTR)
 	} else {
-	    call apseti (ap, MW, mw)
+	    call apsetp (ap, MW, mw)
 	    switch (apstati (ap, WCSIN)) {
 	    case WCS_WORLD:
 		iferr (ct = mw_sctran (mw, "world", "logical", 03B))
@@ -47,7 +52,7 @@ begin
 	    default:
 		ct = NULL
 	    }
-	    call apseti (ap, CTIN, ct)
+	    call apsetp (ap, CTIN, ct)
 	    switch (apstati (ap, WCSOUT)) {
 	    case WCS_PHYSICAL:
 		iferr (ct = mw_sctran (mw, "logical", "physical", 03B))
@@ -57,7 +62,7 @@ begin
 	    default:
 		ct = NULL
 	    }
-	    call apseti (ap, CTOUT, ct)
+	    call apsetp (ap, CTOUT, ct)
 	}
 
 	# Set the keywords.

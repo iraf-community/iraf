@@ -12,6 +12,7 @@ procedure ap_cepars (ap)
 
 pointer	ap		# pointer to apphot structure
 
+size_t	sz_val
 pointer	sp, str, cp
 bool	itob()
 int	apstati()
@@ -21,7 +22,8 @@ real	apstatr()
 begin
 	# Open the parameter set.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	cp = clopset ("centerpars")
 
 	# Write the centering parameters.
@@ -51,6 +53,7 @@ procedure ap_sapars (ap)
 
 pointer	ap		# pointer to apphot structure
 
+size_t	sz_val
 pointer	mp, str, sp
 bool	itob()
 int	apstati()
@@ -60,7 +63,8 @@ real	apstatr()
 begin
 	# Open the parameter sets.
 	call smark (mp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	sp = clopset ("fitskypars")
 
 	# Set the sky fitting parameters.
@@ -94,6 +98,7 @@ procedure ap_phpars (ap)
 
 pointer	ap		# pointer to apphot structure
 
+size_t	sz_val
 pointer	mp, str, pp
 bool	itob()
 int	apstati()
@@ -103,7 +108,8 @@ real	apstatr()
 begin
 	# Open the parameter set.
 	call smark (mp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	pp = clopset ("photpars")
 
 	# Set the photometry parameters.

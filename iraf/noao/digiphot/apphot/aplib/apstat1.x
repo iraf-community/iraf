@@ -69,7 +69,7 @@ begin
 	    call strcpy (AP_PSFSTRING(psf), str, maxch)
 
 	default:
-	    call error (0, "APSTATS: Unknown apphot string parameter")
+	    call error (0, "AP1STATS: Unknown apphot string parameter")
 	}
 end
 
@@ -96,12 +96,6 @@ begin
 	    return (AP_WCSIN(ap))
 	case WCSOUT:
 	    return (AP_WCSOUT(ap))
-	case MW:
-	    return (AP_MW(ap))
-	case CTIN:
-	    return (AP_CTIN(ap))
-	case CTOUT:
-	    return (AP_CTOUT(ap))
 
 	case CENTERFUNCTION:
 	    return (AP_CENTERFUNCTION(cen))
@@ -140,7 +134,59 @@ begin
 	    return (AP_PNREJECT(psf))
 
 	default:
-	    call error (0, "APSTATI: Unknown apphot integer parameter")
+	    call error (0, "AP1STATI: Unknown apphot integer parameter")
+	}
+end
+
+
+long procedure ap1statl (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+pointer cen, sky, phot, psf
+
+begin
+	cen = AP_PCENTER(ap)
+	sky = AP_PSKY(ap)
+	phot = AP_PPHOT(ap)
+	psf = AP_PPSF(ap)
+
+	switch (param) {
+	case NSKY:
+	    return (AP_NSKY(sky))
+	case NSKY_REJECT:
+	    return (AP_NSKY_REJECT(sky))
+
+	default:
+	    call error (0, "AP1STATL: Unknown apphot long int parameter")
+	}
+end
+
+
+pointer procedure ap1statp (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+pointer cen, sky, phot, psf
+
+begin
+	cen = AP_PCENTER(ap)
+	sky = AP_PSKY(ap)
+	phot = AP_PPHOT(ap)
+	psf = AP_PPSF(ap)
+
+	switch (param) {
+	case MW:
+	    return (AP_MW(ap))
+	case CTIN:
+	    return (AP_CTIN(ap))
+	case CTOUT:
+	    return (AP_CTOUT(ap))
+
+	default:
+	    call error (0, "AP1STATP: Unknown apphot pointer parameter")
 	}
 end
 
@@ -289,7 +335,7 @@ begin
 	    return (AP_OPFYCUR(psf))
 
 	default:
-	    call error (0, "APSTATR: Unknown apphot real parameter")
+	    call error (0, "AP1STATR: Unknown apphot real parameter")
 	}
 end
 
@@ -311,6 +357,6 @@ begin
 
 	switch (param) {
 	default:
-	    call error (0, "APSTATD: Unknown apphot double parameter")
+	    call error (0, "AP1STATD: Unknown apphot double parameter")
 	}
 end

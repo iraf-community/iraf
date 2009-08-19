@@ -9,6 +9,7 @@ procedure ap_gdapars (ap)
 
 pointer	ap			# pointer to the apphot structure
 
+size_t	sz_val
 int	noise
 pointer	sp, str, np
 bool	clgpsetb()
@@ -19,7 +20,8 @@ real	clgpsetr()
 begin
 	# Allocate workin space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Open the pset parameter file.
 	np = clopset ("datapars")

@@ -11,6 +11,7 @@ procedure ap_dapars (ap)
 
 pointer	ap		# pointer to apphot structure
 
+size_t	sz_val
 pointer	sp, str, np
 bool	itob()
 int	apstati()
@@ -20,7 +21,8 @@ real	apstatr()
 begin
 	# Open the parameter sets.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	np = clopset ("datapars")
 

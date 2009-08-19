@@ -7,6 +7,7 @@ procedure ap_nshow (ap)
 
 pointer	ap	# pointer to the apphot structure
 
+size_t	sz_val
 pointer	sp, str1, str2
 bool	itob()
 int	apstati()
@@ -14,8 +15,9 @@ real	apstatr()
 
 begin
 	call smark (sp)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
 
 	# Set the object charactersitics.
 	call printf ("\nData Characteristics\n")

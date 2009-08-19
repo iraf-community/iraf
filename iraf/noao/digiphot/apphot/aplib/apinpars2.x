@@ -11,6 +11,7 @@ procedure ap_gcepars (ap)
 
 pointer	ap			# pointer to the apphot structure
 
+size_t	sz_val
 int	function
 pointer	sp, str, pp
 bool	clgpsetb()
@@ -20,7 +21,8 @@ real	clgpsetr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Open the pset parameter file.
 	pp = clopset ("centerpars")
@@ -57,6 +59,7 @@ procedure ap_gsapars (ap)
 
 pointer	ap		# pointer to the apphot strucuture
 
+size_t	sz_val
 int	function
 pointer	sp, str, pp
 bool	clgpsetb()
@@ -66,7 +69,8 @@ real	clgpsetr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Open the pset parameter file.
 	pp = clopset ("fitskypars")
@@ -107,6 +111,7 @@ procedure ap_gphars (ap)
 
 pointer	ap		# pointer to the apphot strucuture
 
+size_t	sz_val
 pointer	sp, str, pp
 bool	clgpsetb()
 int	btoi()
@@ -115,7 +120,8 @@ real	clgpsetr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Open the pset parameter file.
 	pp = clopset ("photpars")
@@ -141,6 +147,7 @@ procedure ap_gpopars (ap)
 
 pointer	ap		# pointer to the apphot strucuture
 
+size_t	sz_val
 pointer	sp, str, pp
 bool	clgpsetb()
 int	btoi()
@@ -149,7 +156,8 @@ real	clgpsetr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Open the pset parameter file.
 	pp = clopset ("polypars")
@@ -172,6 +180,7 @@ procedure ap_gwhars (ap)
 
 pointer	ap		# pointer to the apphot strucuture
 
+size_t	sz_val
 int	weight
 pointer	sp, str, pp
 bool	clgpsetb()
@@ -181,7 +190,8 @@ real	clgpsetr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Open the pset parameter file.
 	pp = clopset ("photpars")

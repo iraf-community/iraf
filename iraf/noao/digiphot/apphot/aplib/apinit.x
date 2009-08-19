@@ -65,10 +65,12 @@ procedure ap_noisesetup (ap, noise)
 pointer	ap	# pointer to apphot structure
 int	noise	# noise model
 
+size_t	sz_val
 pointer	nse
 
 begin
-	call malloc (AP_NOISE(ap), LEN_APNOISE, TY_STRUCT)
+	sz_val = LEN_APNOISE
+	call malloc (AP_NOISE(ap), sz_val, TY_STRUCT)
 	nse = AP_NOISE(ap)
 	AP_NOISEFUNCTION(nse) = noise
 	switch (noise) {
@@ -93,10 +95,12 @@ procedure ap_dispsetup (ap)
 
 pointer	ap		# pointer to apphot structure
 
+size_t	sz_val
 pointer	dsp
 
 begin
-	call malloc (AP_PDISPLAY(ap), LEN_DISPLAYSTRUCT, TY_STRUCT)
+	sz_val = LEN_DISPLAYSTRUCT
+	call malloc (AP_PDISPLAY(ap), sz_val, TY_STRUCT)
 	dsp = AP_PDISPLAY(ap)
 	AP_MKSKY(dsp) = DEF_MKSKY
 	AP_MKCENTER(dsp) = DEF_MKCENTER

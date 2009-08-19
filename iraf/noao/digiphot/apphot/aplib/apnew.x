@@ -16,7 +16,7 @@ int	newlist		# integer new list
 bool	fp_equalr()
 int	newobject
 real	deltaxy
-real	apstatr()
+real	apstatr(), aabs()
 
 begin
 	deltaxy = apstatr (ap, FWHMPSF) * apstatr (ap, SCALE)
@@ -27,8 +27,8 @@ begin
 		newobject = YES
 	    else
 		newobject = NO
-	} else if ((abs (xlist - wx) <= deltaxy) &&
-	        (abs (ylist - wy) <= deltaxy)) {
+	} else if ((aabs (xlist - wx) <= deltaxy) &&
+	        (aabs (ylist - wy) <= deltaxy)) {
 	    wx = xlist
 	    wy = ylist
 	    newobject = NO

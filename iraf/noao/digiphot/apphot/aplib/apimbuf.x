@@ -5,7 +5,7 @@ include "../lib/apphotdef.h"
 procedure ap_imbuf (ap, hwidth, sequential)
 
 pointer	ap		# pointer to the apphot structure
-int	hwidth		# halfwidth of the line buffer
+long	hwidth		# halfwidth of the line buffer
 int	sequential	# optimize for sequntial i/o
 
 begin

@@ -38,7 +38,7 @@ begin
 	case CCDREAD:
 	    call strcpy (AP_CCDREAD(nse), str, maxch)
 	default:
-	    call error (0, "APSTATS: Unknown apphot string parameter")
+	    call error (0, "AP2STATS: Unknown apphot string parameter")
 	}
 end
 
@@ -90,8 +90,51 @@ begin
 	case RPNDATAREJ:
 	    return (AP_RPNDATAREJ(rprof))
 	default:
-	    call error (0, "APSTATI: Unknown apphot integer parameter")
+	    call error (0, "AP2STATI: Unknown apphot integer parameter")
 	}
+end
+
+
+long procedure ap2statl (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+pointer dsp, nse, ply, rprof
+
+begin
+	dsp = AP_PDISPLAY(ap)
+	nse = AP_NOISE(ap)
+	ply = AP_POLY(ap)
+	rprof = AP_RPROF(ap)
+
+	switch (param) {
+	case RPNPTS:
+	    return (AP_RPNPTS(rprof))
+	case RPNDATA:
+	    return (AP_RPNDATA(rprof))
+	case RPNDATAREJ:
+	    return (AP_RPNDATAREJ(rprof))
+	default:
+	    call error (0, "AP2STATL: Unknown apphot long int parameter")
+	}
+end
+
+
+pointer procedure ap2statp (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+pointer dsp, nse, ply, rprof
+
+begin
+	dsp = AP_PDISPLAY(ap)
+	nse = AP_NOISE(ap)
+	ply = AP_POLY(ap)
+	rprof = AP_RPROF(ap)
+
+	call error (0, "AP2STATP: Unknown apphot pointer parameter")
 end
 
 
@@ -184,7 +227,7 @@ begin
 	case ROUNDHI:
 	    return (AP_ROUNDHI(fnd))
 	default:
-	    call error (0, "APSTATR: Unknown apphot real parameter")
+	    call error (0, "AP2STATR: Unknown apphot real parameter")
 	}
 end
 
@@ -210,6 +253,6 @@ begin
 	case PYFLUX:
 	    return (AP_PYFLUX(ply))
 	default:
-	    call error (0, "APSTATD: Unknown apphot double parameter")
+	    call error (0, "AP2STATD: Unknown apphot double parameter")
 	}
 end

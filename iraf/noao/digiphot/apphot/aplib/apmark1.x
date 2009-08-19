@@ -16,6 +16,7 @@ int	mkcenter	# mark the computed center
 int	mksky		# mark the sky annulus
 int	mkapert		# mark the aperture(s)
 
+size_t	sz_val
 int	i, marktype
 pointer	sp, temp
 real	inner_sky, outer_sky, apert
@@ -70,7 +71,8 @@ begin
 	if (mkapert == YES) {
 	    iferr {
 		call smark (sp)
-	        call salloc (temp, apstati (ap, NAPERTS), TY_REAL)
+	        sz_val = apstati (ap, NAPERTS)
+	        call salloc (temp, sz_val, TY_REAL)
 	        call ap_arrayr (ap, APERTS, Memr[temp])
 	        call gseti (id, G_PMLTYPE, GL_DASHED)
 	        call gmark (id, apstatr (ap, PXCUR), apstatr (ap, PYCUR),
@@ -108,6 +110,7 @@ int	mkcenter	# mark the computed center
 int	mksky		# mark the sky annulus
 int	mkpolygon	# mark the aperture(s)
 
+size_t	sz_val
 int	marktype, linetype
 real	inner_sky, outer_sky
 int	gstati()
@@ -160,7 +163,8 @@ begin
 	        call gseti (id, G_PLTYPE, GL_DASHED)
 	        call gmark (id, apstatr (ap, PYCX), apstatr (ap, PYCY),
 		    GM_PLUS, -2.0, -2.0)
-	        call gpline (id, x, y, nver)
+		sz_val = nver
+	        call gpline (id, x, y, sz_val)
 	    } then
 		;
 	}
@@ -184,6 +188,7 @@ int	mkcenter	# mark the computed center
 int	mksky		# mark the sky annulus
 int	mkapert		# mark the aperture(s)
 
+size_t	sz_val
 int	i, marktype
 pointer	sp, temp
 real	inner_sky, outer_sky, apert, radius, xc, yc
@@ -240,7 +245,8 @@ begin
 	if (mkapert == YES) {
 	    iferr {
 	        call smark (sp)
-	        call salloc (temp, apstati (ap, NAPERTS), TY_REAL)
+	        sz_val = apstati (ap, NAPERTS)
+	        call salloc (temp, sz_val, TY_REAL)
 	        call gseti (id, G_PMLTYPE, GL_DASHED)
 	        call gmark (id, apstatr (ap, XCENTER), apstatr (ap, YCENTER),
 		    GM_PLUS, -2.0, -2.0)

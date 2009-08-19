@@ -46,7 +46,8 @@ pointer	ap	# pointer to apphot structure
 int	fd	# output text file descriptor
 int	ier	# radial profile error
 
-int	i, nrpts
+size_t	sz_val
+long	i, nrpts
 pointer	sp, str, rprof
 real	apstatr()
 
@@ -56,7 +57,8 @@ begin
 	    return
 	rprof = AP_RPROF(ap)
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Print the radprof parameters.
 	call ap_srerrors (ier, Memc[str], SZ_LINE)

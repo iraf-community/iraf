@@ -7,12 +7,12 @@ include "../lib/phot.h"
 
 # AP_GVRAD -- Verify or get the radius of the extraction box.
 
-int procedure ap_gvrad (defradius, radius)
+long procedure ap_gvrad (defradius, radius)
 
 real	defradius		# the default radius
 real	radius			# the output radius
 
-int	lenbuf
+long	lenbuf
 int	scan(), nscan()
 
 begin
@@ -503,6 +503,7 @@ pointer	ap		# pointer to the apphot structure
 char	str[ARB]	# output string
 int	maxch		# maximum number of characters
 
+size_t	sz_val
 int	i, naperts
 pointer	sp, aperts
 real	scale
@@ -511,7 +512,8 @@ real	apstatr()
 
 begin
 	call smark (sp)
-	call salloc (aperts, MAX_NAPERTS, TY_REAL)
+	sz_val = MAX_NAPERTS
+	call salloc (aperts, sz_val, TY_REAL)
 
 	scale = apstatr (ap, SCALE)
 

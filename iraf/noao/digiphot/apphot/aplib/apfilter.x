@@ -8,12 +8,14 @@ procedure ap_filter (im, ap)
 pointer	im		# pointer to IRAF image
 pointer	ap		# pointer to apphot structure
 
+size_t	sz_val
 pointer	sp, key, filt
 
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (filt, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
+	call salloc (filt, sz_val, TY_CHAR)
 
 	call apstats (ap, FILTER, Memc[key], SZ_FNAME)
 	Memc[filt] = EOS

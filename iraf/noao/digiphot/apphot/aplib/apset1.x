@@ -17,6 +17,7 @@ pointer	ap		# pointer to apphot structure
 int	param		# parameter
 char	str[ARB]	# string parameter
 
+size_t	sz_val
 int	naperts
 pointer	ctr, sky, phot, psf
 real	aperts[MAX_NAPERTS]
@@ -67,14 +68,15 @@ begin
 	    if (naperts > 0) {
 		call strcpy (str, AP_APSTRING(phot), SZ_LINE)
 		AP_NAPERTS(phot) = naperts
-	        call realloc (AP_APERTS(phot), AP_NAPERTS(phot), TY_REAL)
-	        call realloc (AP_AREA(phot), AP_NAPERTS(phot), TY_DOUBLE)
-	        call realloc (AP_SUMS(phot), AP_NAPERTS(phot), TY_DOUBLE)
-	        call realloc (AP_MAGS(phot), AP_NAPERTS(phot), TY_REAL)
-	        call realloc (AP_MAGERRS(phot), AP_NAPERTS(phot), TY_REAL)
-	        call amovr (aperts, Memr[AP_APERTS(phot)], AP_NAPERTS(phot))
+	        sz_val = AP_NAPERTS(phot)
+	        call realloc (AP_APERTS(phot), sz_val, TY_REAL)
+	        call realloc (AP_AREA(phot), sz_val, TY_DOUBLE)
+	        call realloc (AP_SUMS(phot), sz_val, TY_DOUBLE)
+	        call realloc (AP_MAGS(phot), sz_val, TY_REAL)
+	        call realloc (AP_MAGERRS(phot), sz_val, TY_REAL)
+	        call amovr (aperts, Memr[AP_APERTS(phot)], sz_val)
 	        call asrtr (Memr[AP_APERTS(phot)], Memr[AP_APERTS(phot)],
-	            AP_NAPERTS(phot))
+			    sz_val)
 	    }
 	case PWSTRING:
 	    call strcpy (str, AP_PWSTRING(phot), SZ_FNAME)
@@ -83,7 +85,7 @@ begin
 	    call strcpy (str, AP_PSFSTRING(psf), SZ_FNAME)
 
 	default:
-	    call error (0, "APSETS: Unknown apphot string parameter")
+	    call error (0, "AP1SETS: Unknown apphot string parameter")
 	}
 end
 
@@ -111,12 +113,6 @@ begin
 	    AP_WCSIN(ap) = ival
 	case WCSOUT:
 	    AP_WCSOUT(ap) = ival
-	case MW:
-	    AP_MW(ap) = ival
-	case CTIN:
-	    AP_CTIN(ap) = ival
-	case CTOUT:
-	    AP_CTOUT(ap) = ival
 
 	case CENTERFUNCTION:
 	    AP_CENTERFUNCTION(cen) = ival
@@ -153,7 +149,61 @@ begin
 	    AP_PNREJECT(psf) = ival
 
 	default:
-	    call error (0, "APSETI: Unknown apphot integer parameter")
+	    call error (0, "AP1SETI: Unknown apphot integer parameter")
+	}
+end
+
+
+procedure ap1setl (ap, param, lval)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+long	lval		# long int value
+
+pointer	cen, sky, phot, psf
+
+begin
+	cen = AP_PCENTER(ap)
+	sky = AP_PSKY(ap)
+	phot = AP_PPHOT(ap)
+	psf = AP_PPSF(ap)
+
+	switch (param) {
+	case NSKY:
+	    AP_NSKY(sky) = lval
+	case NSKY_REJECT:
+	    AP_NSKY_REJECT(sky) = lval
+
+	default:
+	    call error (0, "AP1SETL: Unknown apphot long int parameter")
+	}
+end
+
+
+procedure ap1setp (ap, param, pval)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+pointer	pval		# pointer value
+
+pointer	cen, sky, phot, psf
+
+begin
+	cen = AP_PCENTER(ap)
+	sky = AP_PSKY(ap)
+	phot = AP_PPHOT(ap)
+	psf = AP_PPSF(ap)
+
+	switch (param) {
+	case MW:
+	    AP_MW(ap) = pval
+	case CTIN:
+	    AP_CTIN(ap) = pval
+	case CTOUT:
+	    AP_CTOUT(ap) = pval
+
+	default:
+	    call error (0, "AP1SETP: Unknown apphot pointer parameter")
 	}
 end
 
@@ -302,7 +352,7 @@ begin
 	    AP_OPFYCUR(psf) = rval
 
 	default:
-	    call error (0, "APSETR: Unknown apphot real parameter")
+	    call error (0, "AP1SETR: Unknown apphot real parameter")
 	}
 end
 
@@ -325,6 +375,6 @@ begin
 
 	switch (param) {
 	default:
-	    call error (0, "APSETD: Unknown apphot double parameter")
+	    call error (0, "AP1SETD: Unknown apphot double parameter")
 	}
 end

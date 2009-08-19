@@ -10,12 +10,13 @@ procedure ap_nscolon (ap, im, out, stid, cmdstr, newcenterbuf,
 pointer	ap			# pointer to the apphot structure
 pointer	im			# pointer to the iraf image
 int	out			# output file descriptor
-int	stid			# output file sequence number
+long	stid			# output file sequence number
 char	cmdstr[ARB]		# command string
 int	newcenterbuf, newcenter	# new centering parameters ?
 int	newskybuf, newsky	# new sky fitting parameters ?
 int	newbuf, newfit		# new photometry parameters ?
 
+size_t	sz_val
 int	ncmd, stat, ip
 pointer	sp, cmd, str
 real	rval
@@ -25,8 +26,9 @@ errchk	immmap
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the command.
 	ip = 1

@@ -19,6 +19,7 @@ procedure ap_wfdparam (out, ap)
 int	out	# the output file descriptor
 pointer	ap	# pointer to the apphot structure
 
+size_t	sz_val
 pointer	sp, str
 real	apstatr()
 
@@ -27,7 +28,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Write out the parameters.
 	call ap_param (ap, out, "daofind")
@@ -86,19 +88,19 @@ procedure apstdout (density, ptrs, ncols, nbox, cols, x, y, sharp, round1,
         round2, nstars, ntotal, threshold)
 
 real	density[ncols,nbox]	# array of densities
-int	ptrs[ARB]		# array of line pointers 
-int	ncols, nbox		# dimensions of the data
-int	cols[ARB]		# array of column numbers
+long	ptrs[ARB]		# array of line pointers 
+size_t	ncols, nbox		# dimensions of the data
+long	cols[ARB]		# array of column numbers
 real	x[ARB]			# x coordinates
 real	y[ARB]			# y coordinates
 real	sharp[ARB]		# sharpness
 real	round1[ARB]		# first roundness parameter
 real	round2[ARB]		# second roundness parameter
-int	nstars			# number of detected stars in the line
-int	ntotal			# total number of detected objects
+long	nstars			# number of detected stars in the line
+long	ntotal			# total number of detected objects
 real	threshold		# threshold for detection
 
-int	i, middle
+long	i, middle
 real	den
 
 begin
@@ -116,7 +118,7 @@ begin
 		call pargr (sharp[i])
 		call pargr (round1[i])
 		call pargr (round2[i])
-		call pargi (ntotal + i)
+		call pargl (ntotal + i)
 	}
 end
 
@@ -128,20 +130,20 @@ procedure apdtfout (fd, density, ptrs, ncols, nbox, cols, x, y, sharp, round1,
 
 int	fd				# the output file descriptor
 real	density[ncols, nbox]		# densities
-int	ptrs[ARB]			# array of line pointers
-int	ncols, nbox			# dimensions of the data
-int	cols[ARB]			# column numbers
+long	ptrs[ARB]			# array of line pointers
+size_t	ncols, nbox			# dimensions of the data
+long	cols[ARB]			# column numbers
 real	x[ARB]				# xcoords
 real	y[ARB]				# y coords
 real	sharp[ARB]			# sharpnesses
 real	round1[ARB]			# first roundness
 real	round2[ARB]			# second roundness
-int	nstars				# number of detected stars in the line
-int	ntotal				# total number of detected objects
+long	nstars				# number of detected stars in the line
+long	ntotal				# total number of detected objects
 real	threshold			# threshold for detection
-int	stid				# output file sequence number
+long	stid				# output file sequence number
 
-int	i, middle
+long	i, middle
 real	den
 
 begin
@@ -162,7 +164,7 @@ begin
 		call pargr (sharp[i])
 		call pargr (round1[i])
 		call pargr (round2[i])
-		call pargi (stid + ntotal + i - 1)
+		call pargl (stid + ntotal + i - 1)
 	}
 end
 
@@ -202,10 +204,11 @@ pointer	ap		# pointer to apphot structure
 int	fd		# output file descriptor
 real	xpos		# x position
 real	ypos		# y position
-int	id		# id of the star
-int	lid		# list number
+long	id		# id of the star
+long	lid		# list number
 int	lastchar	# last character in record
 
+size_t	sz_val
 pointer	sp, imname, clname 
 
 begin
@@ -213,8 +216,9 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (clname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	call salloc (clname, sz_val, TY_CHAR)
 
 	# Print description of object.
 	call apstats (ap, IMROOT, Memc[imname], SZ_FNAME)
@@ -225,9 +229,9 @@ begin
 	    call pargstr (Memc[imname])
 	    call pargr (xpos)
 	    call pargr (ypos)
-	    call pargi (id)
+	    call pargl (id)
 	    call pargstr (Memc[clname])
-	    call pargi (lid)
+	    call pargl (lid)
 	    call pargi (lastchar)
 
 	call sfree (sp)
@@ -272,6 +276,7 @@ int	fd		# output file descriptor
 int	ier		# error code
 int	lastchar	# last character written out
 
+size_t	sz_val
 pointer	sp, str
 real	apstatr()
 
@@ -280,7 +285,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call ap_cserrors (ier, Memc[str], SZ_LINE)
 
 	# Print the computed centers.
@@ -369,7 +375,8 @@ int	fd		# output file descriptor
 int	ier		# error code
 int	lastchar	# last character
 
-int	apstati()
+size_t	sz_val
+long	apstatl()
 real	apstatr()
 
 pointer	sp, str
@@ -379,7 +386,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call ap_sserrors (ier, Memc[str], SZ_LINE)
 
 	# Print the computed sky value and statistics.
@@ -387,8 +395,8 @@ begin
 	    call pargr (apstatr (ap, SKY_MODE))
 	    call pargr (apstatr (ap, SKY_SIGMA))
 	    call pargr (apstatr (ap, SKY_SKEW))
-	    call pargi (apstati (ap, NSKY))
-	    call pargi (apstati (ap, NSKY_REJECT))
+	    call pargl (apstatl (ap, NSKY))
+	    call pargl (apstatl (ap, NSKY_REJECT))
 	    call pargi (ier)
 	    call pargstr (Memc[str])
 	    call pargi (lastchar)

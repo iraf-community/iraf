@@ -11,14 +11,15 @@ pointer	ap			# pointer to the apphot structure
 pointer	im			# pointer to the iraf image
 int	cl			# coordinate file descriptor
 int	out			# output file descriptor
-int	stid			# output file sequence number
-int	ltid			# coordinate file sequence number
+long	stid			# output file sequence number
+long	ltid			# coordinate file sequence number
 char	cmdstr[ARB]		# command string
 int	newimage		# new image ?
 int	newcenterbuf, newcenter	# new centering parameters ?
 int	newskybuf, newsky	# new sky fitting parameters ?
 int	newbuf, newfit		# new photometry parameters ?
 
+size_t	sz_val
 bool	bval
 int	ncmd, ip
 pointer	sp, cmd, str
@@ -30,11 +31,14 @@ pointer	immap()
 real	apstatr()
 errchk	immmap, open
 
+include	<nullptr.inc>
+
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the command.
 	ip = 1
@@ -265,7 +269,7 @@ begin
 	case APCMD_IMAGE:
 	    call gargwrd (Memc[cmd], SZ_LINE)
 	    call apstats (ap, IMNAME, Memc[str], SZ_FNAME)
-	    if (Memc[cmd] == EOS || streq (memc[cmd], Memc[str])) {
+	    if (Memc[cmd] == EOS || streq (Memc[cmd], Memc[str])) {
 		call printf ("%s: %s\n")
 		    call pargstr (KY_IMNAME)
 		    call pargstr (Memc[str])
@@ -275,10 +279,10 @@ begin
 		    im = NULL
 		}
 		iferr {
-		    im = immap (Memc[cmd], READ_ONLY, 0)
+		    im = immap (Memc[cmd], READ_ONLY, NULLPTR)
 		} then {
 		    call erract (EA_WARN)
-		    im = immap (Memc[str], READ_ONLY, 0)
+		    im = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else {
 		    call apimkeys (ap, im, Memc[cmd])
 		    newimage = YES

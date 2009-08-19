@@ -11,6 +11,7 @@ procedure ap_wprofs (ap, out)
 pointer	ap		# apphot structure pointer
 int	out		# output file descriptor
 
+size_t	sz_val
 pointer sp, str
 int	apstati()
 real	apstatr()
@@ -20,7 +21,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	if (AP_RPROF(ap) != NULL) {
 	    call ap_rparam (out, KY_RPRADIUS, apstatr (ap, RPRADIUS),
@@ -47,6 +49,7 @@ procedure ap_wpoly (ap, out)
 pointer	ap		# apphot structure pointer
 int	out		# output file descriptor
 
+size_t	sz_val
 pointer	sp, str
 real	apstatr()
 
@@ -55,7 +58,8 @@ begin
 	    return
 
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	if (AP_POLY(ap) != NULL) {
 	    call ap_sparam (out, "WEIGHTING", "constant", "model", "")
@@ -75,6 +79,7 @@ procedure ap_wpsf (ap, out)
 pointer	ap		# apphot strucuture pointer
 int	out		# output file descriptor
 
+size_t	sz_val
 pointer	sp, str
 int	apstati()
 real	apstatr()
@@ -83,7 +88,8 @@ begin
 	if (out == NULL)
 	    return
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	if (AP_PPSF(ap) != NULL) {
 	    call apstats (ap, PSFSTRING, Memc[str], SZ_FNAME)

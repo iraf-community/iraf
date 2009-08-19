@@ -14,14 +14,18 @@ pointer	im			# pointero to the IRAF image
 real	wx, wy			# cursor coordinates
 pointer	gd			# pointer to graphics stream
 
+size_t	sz_val
 real	gwx, gwy, xcenter, ycenter, xc, yc, radius, rmin, rmax, imin, imax
 real	u1, u2, v1, v2, x1, x2, y1, y2, xold, yold
 pointer	gt, sp, pix, coords, index, r, cmd
-int	maxpix, npix, nx, ny, wcs, key, niter
+int	wcs, key, niter
+long	l_val
+size_t	maxpix, npix, nx, ny
 
-real	apstatr()
+real	apstatr(), aabs()
 pointer	ap_gtinit()
-int	ap_skypix(), clgcur(), apstati()
+int	clgcur(), apstati()
+long	ap_skypix(), lint()
 int	nscan(), scan()
 
 begin
@@ -43,39 +47,42 @@ begin
 	    if (nscan () < 1)
 	        radius = RADIUS
 	}
-	maxpix = (2 * int (radius) + 1) ** 2
+	maxpix = (2 * lint (radius) + 1) ** 2
 	    
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (coords, maxpix, TY_INT)
-	call salloc (index, maxpix, TY_INT)
+	call salloc (coords, maxpix, TY_LONG)
+	call salloc (index, maxpix, TY_LONG)
 	call salloc (pix, maxpix, TY_REAL)
 	call salloc (r, maxpix, TY_REAL)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Fit the center using 3 iterations.
 	xold = wx
 	yold = wy
 	niter = 0
 	repeat {
-	    call ap_ictr (im, xold, yold, CRADIUS, apstati (ap,
-	        POSITIVE), xcenter, ycenter)
+	    l_val = CRADIUS
+	    call ap_ictr (im, xold, yold, l_val, apstati (ap, POSITIVE),
+			  xcenter, ycenter)
 	    niter = niter + 1
-	    if (abs (xcenter - xold) <= 1.0 && abs (ycenter - yold) <= 1.0)
+	    if (aabs (xcenter - xold) <= 1.0 && aabs (ycenter - yold) <= 1.0)
 		break
 	    xold = xcenter
 	    yold = ycenter
 	} until (niter >= 3)
 
 	# Fetch the pixels for the radial profile.
-	npix = ap_skypix (im, xcenter, ycenter, 0.0, radius, Memr[pix],
-	    Memi[coords], xc, yc, nx, ny)
-	if (npix <= 0) {
+	l_val = ap_skypix (im, xcenter, ycenter, 0.0, radius, Memr[pix],
+			   Meml[coords], xc, yc, nx, ny)
+	if (l_val <= 0) {
 	    call gdeactivate (gd, 0)
 	    call sfree (sp)
 	    return
 	}
-	call ap_index (Memi[index], npix)
+	npix = l_val
+	call ap_index (Meml[index], npix)
 
 
 	# Store old viewport and window coordinates.
@@ -85,11 +92,12 @@ begin
 	# Initialize the plot and store the viewport and window limits.
 	#call apstats (ap, IMNAME, Memc[cmd], SZ_FNAME)
 	call apstats (ap, IMROOT, Memc[cmd], SZ_FNAME)
-	call ap_ltov (im, xcenter, ycenter, xcenter, ycenter, 1)
+	sz_val = 1
+	call ap_ltov (im, xcenter, ycenter, xcenter, ycenter, sz_val)
 	gt = ap_gtinit (Memc[cmd], xcenter, ycenter)
 
 	# Compute the radius values.
-	call ap_xytor (Memi[coords], Memi[index], Memr[r], npix, xc, yc, nx)
+	call ap_xytor (Meml[coords], Meml[index], Memr[r], npix, xc, yc, nx)
 	call alimr (Memr[r], npix, rmin, rmax)
 	call alimr (Memr[pix], npix, imin, imax)
 

@@ -33,7 +33,9 @@ pointer	im			# pointer to the input image
 int	max_nframes		# the maximum number of display frames
 real	vx1, vx2, vy1, vy2	# the output viewport
 
-int	i, frame, wcs_status, dim1, dim2, step1, step2
+size_t	sz_val
+int	i, frame, wcs_status, dim1, dim2
+long	step1, step2
 pointer	sp, rimname, frimage, frimname, frim, iw
 real	x1, x2, y1, y2, fx1, fx2, fy1, fy2, junkx, junky
 bool	streq()
@@ -42,9 +44,10 @@ pointer	imd_mapframe(), iw_open()
 begin
 	# Allocate some memory.
 	call smark (sp)
-	call salloc (rimname, SZ_FNAME, TY_CHAR)
-	call salloc (frimage, SZ_FNAME, TY_CHAR)
-	call salloc (frimname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (rimname, sz_val, TY_CHAR)
+	call salloc (frimage, sz_val, TY_CHAR)
+	call salloc (frimname, sz_val, TY_CHAR)
 
 	# Get the root image name.
 	call imgimage (image, Memc[rimname], SZ_FNAME)

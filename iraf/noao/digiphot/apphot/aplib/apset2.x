@@ -37,7 +37,7 @@ begin
 	case CCDREAD:
 	    call strcpy (str, AP_CCDREAD(nse), SZ_FNAME)
 	default:
-	    call error (0, "APSETS: Unknown apphot string parameter")
+	    call error (0, "AP2SETS: Unknown apphot string parameter")
 	}
 end
 
@@ -90,8 +90,53 @@ begin
 	case RPNDATAREJ:
 	    AP_RPNDATAREJ(rprof) = ival
 	default:
-	    call error (0, "APSETI: Unknown apphot integer parameter")
+	    call error (0, "AP2SETI: Unknown apphot integer parameter")
 	}
+end
+
+
+procedure ap2setl (ap, param, lval)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+long	lval		# long int value
+
+pointer	dsp, nse, ply, rprof
+
+begin
+	nse = AP_NOISE(ap)
+	dsp = AP_PDISPLAY(ap)
+	ply = AP_POLY(ap)
+	rprof = AP_RPROF(ap)
+
+	switch (param) {
+	case RPNPTS:
+	    AP_RPNPTS(rprof) = lval
+	case RPNDATA:
+	    AP_RPNDATA(rprof) = lval
+	case RPNDATAREJ:
+	    AP_RPNDATAREJ(rprof) = lval
+	default:
+	    call error (0, "AP2SETL: Unknown apphot long int parameter")
+	}
+end
+
+
+procedure ap2setp (ap, param, pval)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+pointer	pval		# pointer value
+
+pointer	dsp, nse, ply, rprof
+
+begin
+	nse = AP_NOISE(ap)
+	dsp = AP_PDISPLAY(ap)
+	ply = AP_POLY(ap)
+	rprof = AP_RPROF(ap)
+
+	call error (0, "AP2SETP: Unknown apphot pointer parameter")
 end
 
 
@@ -104,6 +149,7 @@ int	param		# parameter
 real	rval		# real value
 
 pointer	nse, ply, rprof, fnd
+long	lint()
 
 begin
 	nse = AP_NOISE(ap)
@@ -130,14 +176,14 @@ begin
 	    AP_ORPYCUR(rprof) = rval
 	case RPRADIUS:
 	    AP_RPRADIUS(rprof) = rval
-	    AP_RPNPTS(rprof) = int (AP_RPRADIUS(rprof) / AP_RPSTEP(rprof)) + 1
+	    AP_RPNPTS(rprof) = lint (AP_RPRADIUS(rprof) / AP_RPSTEP(rprof)) + 1
 	    call realloc (AP_RPDIST(rprof), AP_RPNPTS(rprof), TY_REAL)
 	    call realloc (AP_INTENSITY(rprof), AP_RPNPTS(rprof), TY_REAL)
 	    call realloc (AP_DINTENSITY(rprof), AP_RPNPTS(rprof), TY_REAL)
 	    call realloc (AP_TINTENSITY(rprof), AP_RPNPTS(rprof), TY_REAL)
 	case RPSTEP:
 	    AP_RPSTEP(rprof) = rval
-	    AP_RPNPTS(rprof) = int (AP_RPRADIUS(rprof) / AP_RPSTEP(rprof)) + 1
+	    AP_RPNPTS(rprof) = lint (AP_RPRADIUS(rprof) / AP_RPSTEP(rprof)) + 1
 	    call realloc (AP_RPDIST(rprof), AP_RPNPTS(rprof), TY_REAL)
 	    call realloc (AP_INTENSITY(rprof), AP_RPNPTS(rprof), TY_REAL)
 	    call realloc (AP_DINTENSITY(rprof), AP_RPNPTS(rprof), TY_REAL)
@@ -195,7 +241,7 @@ begin
 	case ROUNDHI:
 	    AP_ROUNDHI(fnd) = rval
 	default:
-	    call error (0, "APSETR: Unknown apphot real parameter")
+	    call error (0, "AP2SETR: Unknown apphot real parameter")
 	}
 end
 
@@ -222,6 +268,6 @@ begin
 	case PYFLUX:
 	    AP_PYFLUX(ply) = dval
 	default:
-	    call error (0, "APSETD: Unknown apphot double parameter")
+	    call error (0, "AP2SETD: Unknown apphot double parameter")
 	}
 end

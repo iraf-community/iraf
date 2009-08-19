@@ -12,10 +12,11 @@ real procedure ap_cfwhmpsf (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# sequence number in output file
+long	stid		# sequence number in output file
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	scale, fwhmpsf, xjunk, yjunk
@@ -24,7 +25,8 @@ real	apstatr(), ap_vfwhmpsf()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Mark the FWHM of the PSF on the plot.
@@ -60,10 +62,11 @@ real procedure ap_cdatamin (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# sequence number in output file
+long	stid		# sequence number in output file
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	datamin, xjunk, yjunk
@@ -72,7 +75,8 @@ real	apstatr(), ap_vdatamin()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Mark the datamin on the plot.
 	call printf ("Mark the good data minimum (%g) counts:")
@@ -108,10 +112,11 @@ real procedure ap_cdatamax (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# sequence number in output file
+long	stid		# sequence number in output file
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	datamax, xjunk, yjunk
@@ -120,7 +125,8 @@ real	apstatr(), ap_vdatamax()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Mark the datamax on the plot.
 	call printf ("Mark the good data maximum (%g) counts:")
@@ -156,10 +162,11 @@ real procedure ap_ccapert (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	scale, capert, xjunk, yjunk
@@ -168,7 +175,8 @@ real	apstatr(), ap_vcapert()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Mark the centering aperture on the plot.
@@ -202,10 +210,11 @@ real procedure ap_crclean (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# sequence number in output file
+long	stid		# sequence number in output file
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	scale, rclean, xjunk, yjunk
@@ -214,7 +223,8 @@ real	apstatr(), ap_vrclean()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Mark the cleaning radius on the plot.
@@ -250,10 +260,11 @@ real procedure ap_crclip (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# sequence number in output file
+long	stid		# sequence number in output file
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	scale, rclip, xjunk, yjunk
@@ -262,7 +273,8 @@ real	apstatr(), ap_vrclip()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Mark clipping radius on the plot.
@@ -298,10 +310,11 @@ real procedure ap_cannulus (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	scale, annulus, xjunk, yjunk
@@ -310,7 +323,8 @@ real	apstatr(), ap_vannulus()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Mark the inner sky radius.
@@ -345,10 +359,11 @@ real procedure ap_crgrow (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# the output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	scale, rgrow, xjunk, yjunk
@@ -357,7 +372,8 @@ real	apstatr(), ap_vrgrow()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Mark the inner sky radius.
@@ -392,10 +408,11 @@ real procedure ap_cdannulus (ap, gd, out, stid, annulus, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	scale, annulus, dannulus, xjunk, yjunk
@@ -404,7 +421,8 @@ real	apstatr(), ap_vdannulus()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Mark the outer sky radius.
@@ -440,20 +458,22 @@ real procedure ap_csigma (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# sequence number in output file
+long	stid		# sequence number in output file
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	mean, sigma3, xjunk, yjunk
 int	clgcur()
 int	apstati()
-real	apstatr(), ap_vsigma()
+real	apstatr(), ap_vsigma(), aabs()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Estimate the mean sky.
 	if (apstati (ap, POSITIVE) == YES)
@@ -486,7 +506,7 @@ begin
 	    if (! IS_INDEFR (sigma3))
 		sigma3 = 3.0 * sigma3
 	} else
-	    sigma3 = abs (yjunk - mean)
+	    sigma3 = aabs (yjunk - mean)
 
 	# Verify the results.
 	if (IS_INDEFR(sigma3))
@@ -516,11 +536,12 @@ procedure ap_caper (ap, gd, out, stid, outstr, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# output file number sequence
+long	stid		# output file number sequence
 char	outstr[ARB]	# output apertures
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	i, wcs, key, naperts
 pointer	sp, cmd, tstr, aperts
 real	scale, xjunk, yjunk
@@ -530,13 +551,15 @@ real	apstatr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (tstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (tstr, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Get the apertures.
 	naperts = apstati (ap, NAPERTS)
-	call salloc (aperts, naperts, TY_REAL)
+	sz_val = naperts
+	call salloc (aperts, sz_val, TY_REAL)
 	call ap_arrayr (ap, APERTS, Memr[aperts])
 
 	# Encode the old aperture string.

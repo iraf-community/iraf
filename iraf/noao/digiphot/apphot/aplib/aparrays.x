@@ -11,17 +11,21 @@ pointer	ap		# pointer to apphot structure
 int	param		# parameter
 real	array[ARB]	# array
 
+size_t	sz_val
 pointer	phot
 
 begin
 	phot = AP_PPHOT(ap)
 	switch (param) {
 	case APERTS:
-	    call amovr (Memr[AP_APERTS(phot)], array, AP_NAPERTS(phot))
+	    sz_val = AP_NAPERTS(phot)
+	    call amovr (Memr[AP_APERTS(phot)], array, sz_val)
 	case MAGS:
-	    call amovr (Memr[AP_MAGS(phot)], array, AP_NAPERTS(phot))
+	    sz_val = AP_NAPERTS(phot)
+	    call amovr (Memr[AP_MAGS(phot)], array, sz_val)
 	case MAGERRS:
-	    call amovr (Memr[AP_MAGERRS(phot)], array, AP_NAPERTS(phot))
+	    sz_val = AP_NAPERTS(phot)
+	    call amovr (Memr[AP_MAGERRS(phot)], array, sz_val)
 	default:
 	    call error (0, "AP_ARRAYR: Unknown apphot real array")
 	}
@@ -37,15 +41,18 @@ pointer	ap		# pointer to apphot structure
 int	param		# parameter
 double	array[ARB]	# array
 
+size_t	sz_val
 pointer	phot
 
 begin
 	phot = AP_PPHOT(ap)
 	switch (param) {
 	case AREAS:
-	    call amovd (Memd[AP_AREA(phot)], array, AP_NAPERTS(phot))
+	    sz_val = AP_NAPERTS(phot)
+	    call amovd (Memd[AP_AREA(phot)], array, sz_val)
 	case SUMS:
-	    call amovd (Memd[AP_SUMS(phot)], array, AP_NAPERTS(phot))
+	    sz_val = AP_NAPERTS(phot)
+	    call amovd (Memd[AP_SUMS(phot)], array, sz_val)
 	default:
 	    call error (0, "AP_ARRAYD: Unknown apphot double array")
 	}

@@ -39,6 +39,40 @@ begin
 end
 
 
+long procedure apstatl (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+long	ap1statl(), ap2statl()
+
+begin
+	if (param <= MAXERR1)
+	    return (ap1statl (ap, param))
+	else if (param <= MAXERR2)
+	    return (ap2statl (ap, param))
+	else
+	    call error (0, "APSTATL: Unknown apphot long int parameter")
+end
+
+
+pointer procedure apstatp (ap, param)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+
+pointer	ap1statp(), ap2statp()
+
+begin
+	if (param <= MAXERR1)
+	    return (ap1statp (ap, param))
+	else if (param <= MAXERR2)
+	    return (ap2statp (ap, param))
+	else
+	    call error (0, "APSTATP: Unknown apphot pointer parameter")
+end
+
+
 # APSTATR -- Procedure to set a real apphot parameter.
 
 real procedure apstatr (ap, param)

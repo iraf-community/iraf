@@ -52,11 +52,12 @@ end
 procedure ap_wmres (ap, fd, i, pier, endstr)
 
 pointer	ap		# pointer to apphot structure
-int 	fd		# output text file
+int	fd		# output text file
 int	i		# index of variable length field
 int	pier		# photometric error
 char	endstr[ARB]	# termination string
 
+size_t	sz_val
 int	ier
 pointer	sp, str, phot
 real	sky_val
@@ -69,7 +70,8 @@ begin
 
 	phot = AP_PPHOT(ap)
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Write out the exposure time, airmass and filter information.
 	if (i <= 1) {
@@ -229,9 +231,10 @@ int	fd		# output file descriptor
 real	xver[ARB]	# coords of x vertices
 real	yver[ARB]	# coords of y vertices
 int	nver		# number of vertices
-int	pid		# polygon number
+long	pid		# polygon number
 int	pier		# photometric error
 
+size_t	sz_val
 int	i
 pointer	sp, str, pyname
 real	sky_val
@@ -245,8 +248,10 @@ begin
 
 	# Allocate space.
 	call smark (sp)
-	call salloc (pyname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pyname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Write out the exposure time, airmass and filter id.
 	call fprintf (fd, PY_WSTR1)
@@ -284,7 +289,7 @@ begin
 		call pargstr ("nullfile")
 	    else
 	        call pargstr (Memc[pyname])
-	    call pargi (pid)
+	    call pargl (pid)
 	    call pargr (apstatr (py, OPYXMEAN))
 	    call pargr (apstatr (py, OPYYMEAN))
 	    call pargr (apstatr (py, OPYCX))

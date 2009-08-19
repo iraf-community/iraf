@@ -36,6 +36,38 @@ begin
 end
 
 
+procedure apsetl (ap, param, lval)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+long	lval		# long int value
+
+begin
+	if (param <= MAXERR1)
+	    call ap1setl (ap, param, lval)
+	else if (param <= MAXERR2)
+	    call ap2setl (ap, param, lval)
+	else
+	    call error (0, "Unknown APPHOT long int parameter")
+end
+
+
+procedure apsetp (ap, param, pval)
+
+pointer	ap		# pointer to apphot structure
+int	param		# parameter
+pointer	pval		# pointer value
+
+begin
+	if (param <= MAXERR1)
+	    call ap1setp (ap, param, pval)
+	else if (param <= MAXERR2)
+	    call ap2setp (ap, param, pval)
+	else
+	    call error (0, "Unknown APPHOT pointer parameter")
+end
+
+
 # APSETR -- Procedure to set a real apphot parameter.
 
 procedure apsetr (ap, param, rval)

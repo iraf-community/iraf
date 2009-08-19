@@ -9,10 +9,11 @@ real procedure ap_crprof (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	scale, radius, xjunk, yjunk
@@ -21,7 +22,8 @@ real	apstatr(), ap_vrpradius()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Estimate the minimum (maximum) data level.
@@ -57,10 +59,11 @@ real procedure ap_crpstep (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	scale, step, xjunk, yjunk
@@ -69,7 +72,8 @@ real	apstatr(), ap_vstep()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Mark the radial profile step size.
@@ -104,10 +108,11 @@ real procedure ap_cpapert (ap, gd, out, stid, rmin, rmax, imin, imax)
 pointer	ap		# pointer to the apphot structure
 pointer	gd		# pointer to the grapics stream
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 real	rmin, rmax	# x axis limits
 real	imin, imax	# y axis limits
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	scale, psfapert, xjunk, yjunk
@@ -116,7 +121,8 @@ real	apstatr(), ap_vpsfapert()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	scale = apstatr (ap, SCALE)
 
 	# Mark the fitting radius on the plot.
