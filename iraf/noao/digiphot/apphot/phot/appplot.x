@@ -13,17 +13,19 @@ procedure ap_pplot (ap, im, sid, gd, makeplot)
 
 pointer	ap		# pointer to the apphot structure
 pointer	im		# pointer to the iraf image
-int	sid		# id number of the star
+long	sid		# id number of the star
 pointer	gd		# graphics stream
 int	makeplot	# make a plot ?
 
-int	apert, nx, ny
+size_t	sz_val
+long	apert
+size_t	nx, ny
 pointer	buf, sp, str, r, gt
 real	xcenter, ycenter, xc, yc, rmin, rmax, imin, imax
 real	u1, u2, v1, v2, x1, x2, y1, y2
-int	ap_ctrpix()
-pointer	ap_gtinit()
+pointer	ap_gtinit(), ap_ctrpix()
 real	apstatr()
+long	lint()
 
 begin
 	# Initialize
@@ -37,7 +39,7 @@ begin
 	    return
 
 	# Fetch the pixels.
-	apert = 2 * int (apstatr (ap, SCALE) * (apstatr (ap, ANNULUS) +
+	apert = 2 * lint (apstatr (ap, SCALE) * (apstatr (ap, ANNULUS) +
 	    apstatr (ap, DANNULUS))) + 1
 	buf = ap_ctrpix (im, xcenter, ycenter, apert, xc, yc, nx, ny)
 	if (buf == NULL)
@@ -48,8 +50,10 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (r, nx * ny, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = nx * ny
+	call salloc (r, sz_val, TY_REAL)
 
 	# Compute the radii and the plot limits.
 	call ap_ijtor2 (Memr[r], nx, ny, xc, yc)
@@ -64,7 +68,7 @@ begin
 	call apstats (ap, IMROOT, Memc[str], SZ_LINE)
 	call sprintf (Memc[str], SZ_LINE, "%s  Star %d")
 	    call pargstr (Memc[str])
-	    call pargi (sid)
+	    call pargl (sid)
 	gt = ap_gtinit (Memc[str], apstatr (ap, OXINIT), apstatr (ap, OYINIT))
 	call gclear (gd)
 
@@ -96,18 +100,23 @@ pointer	ap		# the apphot pointer
 real	xmin, xmax	# the minimum and maximum radial distance
 real	ymin, ymax	# the minimum and maximum of the y axes
 
+size_t	sz_val
 int	fd, naperts
 pointer	sp, str, title, temp
 real	aspect, scale, vx1, vx2, vy1, vy2
 int	stropen(), apstati()
+long	apstatl()
 real	apstatr(), gstatr()
 
 begin
 	call smark (sp)
-	call salloc (str, 5 * SZ_LINE, TY_CHAR)
-	call salloc (title, SZ_LINE, TY_CHAR)
+	sz_val = 5 * SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
 	naperts = apstati (ap, NAPERTS)
-	call salloc (temp, naperts, TY_REAL)
+	sz_val = naperts
+	call salloc (temp, sz_val, TY_REAL)
 
 	fd = stropen (Memc[str], 5 * SZ_LINE, WRITE_ONLY)
 	call sysid (Memc[title], SZ_LINE)
@@ -128,12 +137,13 @@ begin
 	    call pargr (apstatr (ap, SKY_MODE))
 	    call pargr (apstatr (ap, SKY_SIGMA))
 	    call pargr (apstatr (ap, SKY_SKEW))
-	    call pargi (apstati (ap, NSKY))
-	    call pargi (apstati (ap, NSKY_REJECT))
+	    call pargl (apstatl (ap, NSKY))
+	    call pargl (apstatl (ap, NSKY_REJECT))
 
 	# Encode the apertures and magnitudes.
 	call ap_arrayr (ap, APERTS, Memr[temp])
-	call amulkr (Memr[temp], apstatr (ap, SCALE), Memr[temp], naperts)
+	sz_val = naperts
+	call amulkr (Memr[temp], apstatr (ap, SCALE), Memr[temp], sz_val)
 	call fprintf (fd, "Photometry: maxapert=")
 	call fprintf (fd, "%0.2f  mag=")
 	    call pargr (Memr[temp+naperts-1])
@@ -190,6 +200,7 @@ pointer	ap		# apphot structure
 real	xmin, xmax	# minimum and maximum of the x axis
 real	ymin, ymax	# minimum and maximum of the y axis
 
+size_t	sz_val
 int	i, naperts
 pointer	sp, str, temp
 real	annulus, dannulus, skyval, skysigma
@@ -199,8 +210,10 @@ real	apstatr ()
 begin
 	naperts = apstati (ap, NAPERTS)
 	call smark (sp)
-	call salloc (str, SZ_LINE + 1, TY_CHAR)
-	call salloc (temp, naperts, TY_REAL)
+	sz_val = SZ_LINE + 1
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = naperts
+	call salloc (temp, sz_val, TY_REAL)
 
 	# Define some temporary variables
 	annulus = apstatr (ap, SCALE) * apstatr (ap, ANNULUS)
@@ -258,7 +271,8 @@ begin
 	# Mark the appertures.
 	call gseti (gd, G_PLTYPE, GL_SOLID)
 	call ap_arrayr (ap, APERTS, Memr[temp])
-	call amulkr (Memr[temp], apstatr (ap, SCALE), Memr[temp], naperts)
+	sz_val = naperts
+	call amulkr (Memr[temp], apstatr (ap, SCALE), Memr[temp], sz_val)
 	do i = 1, naperts {
 	    call gamove (gd, Memr[temp+i-1], ymin)
 	    call gadraw (gd, Memr[temp+i-1], ymax)

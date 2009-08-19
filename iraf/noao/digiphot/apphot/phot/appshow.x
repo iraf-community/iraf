@@ -50,6 +50,7 @@ procedure ap_mpshow (ap)
 
 pointer	ap		# pointer to apphot structure
 
+size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	apstati()
@@ -58,7 +59,8 @@ real	apstatr()
 begin
 	# Write out the image and cursor position.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Write out the phot parameters.
 	call printf ("Photometry Parameters\n")

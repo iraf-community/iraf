@@ -55,12 +55,5 @@ begin
 	if (AP_AREA(phot) != NULL)
 	    call mfree (AP_AREA(phot), TY_DOUBLE)
 
-	#if (AP_APIX(phot) != NULL)
-	    #call mfree (AP_APIX(phot), TY_REAL)
-	#if (AP_XAPIX(phot) != NULL)
-	    #call mfree (AP_XAPIX(phot), TY_REAL)
-	#if (AP_YAPIX(phot) != NULL)
-	    #call mfree (AP_YAPIX(phot), TY_REAL)
-
 	call mfree (AP_PPHOT(ap), TY_STRUCT)
 end

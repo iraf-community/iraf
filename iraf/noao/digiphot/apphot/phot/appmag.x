@@ -12,8 +12,8 @@ procedure ap_pmag (ap, fd, id, lid, cier, sier, pier)
 
 pointer	ap	# pointer to apphot structure
 int 	fd	# output text file
-int	id	# id number of str
-int	lid	# list id of star
+long	id	# id number of str
+long	lid	# list id of star
 int	cier	# centering error
 int	sier	# sky fitting error
 int	pier	# photometric error
@@ -64,6 +64,7 @@ int	cier	# centering error
 int	sier	# sky fitting error
 int	pier	# photometry error
 
+size_t	sz_val
 int	i
 pointer	sp, imname, phot
 real	apstatr()
@@ -71,7 +72,8 @@ real	apstatr()
 begin
 	# Initialize.
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 	phot = AP_PPHOT(ap)
 
 	# Print the center and sky value.

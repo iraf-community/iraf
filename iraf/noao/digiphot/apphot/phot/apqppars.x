@@ -11,6 +11,7 @@ procedure ap_qppars (ap)
 
 pointer	ap		# pointer to apphot structure
 
+size_t	sz_val
 pointer	mp, str
 bool	itob()
 int	apstati()
@@ -18,7 +19,8 @@ real	apstatr()
 
 begin
 	call smark (mp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	call clputr ("cbox", 2.0 * apstatr (ap, CAPERT))
 	call clputr ("annulus", apstatr (ap, ANNULUS))

@@ -22,29 +22,34 @@ pointer	gd			# pointer to graphcis descriptor
 pointer	mgd			# pointer to the metacode file
 pointer	id			# pointer to image display stream
 int	out			# output file descriptor
-int	stid			# output file sequence number
+long	stid			# output file sequence number
 int	interactive		# interactive mode
 int	cache			# cache the input image pixels
 
+size_t	sz_val, c_1
 real	wx, wy, xlist, ylist
 pointer	sp, cmd
 int	newimage, newskybuf, newsky, newcenterbuf, newcenter, newmagbuf, newmag
-int	colonkey, prev_num, req_num, ip, cier, sier, pier, oid
-int	buf_size, memstat, wcs, key, ltid, newlist
-size_t	req_size, old_size
+int	colonkey, ip, cier, sier, pier, memstat, wcs, key, newlist
+long	prev_num, req_num, ltid, oid, l_val
+size_t	req_size, old_size, buf_size
 
 real	apstatr()
 int	clgcur(), apfitsky(), aprefitsky(), apfitcenter(), aprefitcenter()
-int	apmag(), apremag(), apgscur(), ctoi(), apstati(), apgqverify()
+int	apmag(), apremag(), ctol(), apstati(), apgqverify()
 int	apgtverify(), apnew(), ap_avsky(), ap_memstat(), sizeof()
+long	apstatl(), apgscur()
 bool	fp_equalr()
 
 define  endswitch_ 99
 
 begin
+	c_1 = 1
+
 	# Initialize.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Initialize cursor command.
 	key = ' '
@@ -71,7 +76,7 @@ begin
 	    EOF) {
 
 	    # Store the current cursor coordinates.
-	    call ap_vtol (im, wx, wy, wx, wy, 1)
+	    call ap_vtol (im, wx, wy, wx, wy, c_1)
 	    call apsetr (ap, CWX, wx)
 	    call apsetr (ap, CWY, wy)
 
@@ -128,7 +133,8 @@ begin
 	    # Rewind the list.
 	    case 'r':
 		if (cl != NULL) {
-		    call seek (cl, BOFL)
+		    l_val = BOFL
+		    call seek (cl, l_val)
 		    ltid = 0
 		} else if (interactive == YES)
 		    call printf ("No coordinate list\n")
@@ -159,9 +165,9 @@ begin
                 # Convert coordinates if necessary.
                 switch (apstati (ap, WCSIN)) {
                 case WCS_PHYSICAL, WCS_WORLD:
-                    call ap_itol (ap,  xlist, ylist, xlist, ylist, 1)
+                    call ap_itol (ap,  xlist, ylist, xlist, ylist, c_1)
                 case WCS_TV:
-                    call ap_vtol (im, xlist, ylist, xlist, ylist, 1)
+                    call ap_vtol (im, xlist, ylist, xlist, ylist, c_1)
                 default:
                     ;
                 }
@@ -181,7 +187,7 @@ begin
 		    YCENTER), sd, gd)
 		pier = apmag (ap, im, apstatr (ap, XCENTER), apstatr (ap,
 		    YCENTER), apstati (ap, POSITIVE), apstatr (ap, SKY_MODE),
-		    apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
+		    apstatr (ap, SKY_SIGMA), apstatl (ap, NSKY))
 		if (id != NULL) {
 		    call apmark (ap, id, apstati (ap, MKCENTER), apstati (ap,
 			MKSKY), apstati (ap, MKAPERT))
@@ -245,7 +251,7 @@ begin
 		    # Get next object from the list.
 		    ip = ip + 1
 		    prev_num = ltid
-		    if (ctoi (Memc[cmd], ip, req_num) <= 0)
+		    if (ctol (Memc[cmd], ip, req_num) <= 0)
 		        req_num = ltid + 1
 
 		    # Fetch the next object from the list.
@@ -260,9 +266,9 @@ begin
                     # Convert the coordinates.
                     switch (apstati (ap, WCSIN)) {
                     case WCS_PHYSICAL, WCS_WORLD:
-                        call ap_itol (ap,  xlist, ylist, xlist, ylist, 1)
+                        call ap_itol (ap,  xlist, ylist, xlist, ylist, c_1)
                     case WCS_TV:
-                        call ap_vtol (im, xlist, ylist, xlist, ylist, 1)
+                        call ap_vtol (im, xlist, ylist, xlist, ylist, c_1)
                     default:
                         ;
                     }
@@ -280,7 +286,7 @@ begin
 			apstatr (ap, YCENTER), sd, gd)
 		    pier = apmag (ap, im, apstatr (ap, XCENTER), apstatr (ap,
 			YCENTER), apstati (ap, POSITIVE), apstatr (ap,
-			SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
+			SKY_MODE), apstatr (ap, SKY_SIGMA), apstatl (ap, NSKY))
 		    if (id != NULL) {
 		        call apmark (ap, id, apstati (ap, MKCENTER),
 			    apstati (ap, MKSKY), apstati (ap, MKAPERT))
@@ -315,8 +321,10 @@ begin
                     req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                         sizeof (IM_PIXTYPE(im))
                     memstat = ap_memstat (cache, req_size, old_size)
-                    if (memstat == YES)
-                        call ap_pcache (im, INDEFI, buf_size)
+                    if (memstat == YES) {
+			l_val = INDEFL
+                        call ap_pcache (im, l_val, buf_size)
+		    }
 		}
 
 		newimage = NO
@@ -420,10 +428,10 @@ begin
 		    PYCUR), apstatr (ap, YCENTER)))
 		    pier = apmag (ap, im, apstatr (ap, XCENTER), apstatr (ap,
 		        YCENTER), apstati (ap, POSITIVE), apstatr (ap,
-			SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
+			SKY_MODE), apstatr (ap, SKY_SIGMA), apstatl (ap, NSKY))
 		else
 		    pier = apremag (ap, im, apstati (ap, POSITIVE), apstatr (ap,
-		        SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
+		        SKY_MODE), apstatr (ap, SKY_SIGMA), apstatl (ap, NSKY))
 		if (id != NULL) {
 		    call apmark (ap, id, NO, NO, apstati (ap, MKAPERT))
 		    if (id == gd)
@@ -439,10 +447,12 @@ begin
 		if (key == 'o') {
 		    if (stid == 1)
 		        call ap_param (ap, out, "phot")
-		    if (newlist == YES)
+		    if (newlist == YES) {
 		        call ap_pmag (ap, out, stid, ltid, cier, sier, pier)
-		    else
-		        call ap_pmag (ap, out, stid, 0, cier, sier, pier)
+		    } else {
+			l_val = 0
+		        call ap_pmag (ap, out, stid, l_val, cier, sier, pier)
+		    }
 		    call ap_pplot (ap, im, stid, mgd, YES)
 		    stid = stid + 1
 		}
@@ -466,10 +476,10 @@ begin
 		    pier = apmag (ap, im, apstatr (ap, XCENTER),
 		        apstatr (ap, YCENTER), apstati (ap, POSITIVE),
 			apstatr (ap, SKY_MODE), apstatr (ap, SKY_SIGMA),
-			apstati (ap, NSKY))
+			apstatl (ap, NSKY))
 		else
 		    pier = apremag (ap, im, apstati (ap, POSITIVE), apstatr (ap,
-		        SKY_MODE), apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
+		        SKY_MODE), apstatr (ap, SKY_SIGMA), apstatl (ap, NSKY))
 
 		if (id != NULL) {
 		    call apmark (ap, id, apstati (ap, MKCENTER), apstati (ap,
@@ -490,10 +500,12 @@ begin
 		if (key == ' ') {
 		    if (stid == 1)
 		        call ap_param (ap, out, "phot")
-		    if (newlist == YES)
+		    if (newlist == YES) {
 		        call ap_pmag (ap, out, stid, ltid, cier, sier, pier)
-		    else
-		        call ap_pmag (ap, out, stid, 0, cier, sier, pier)
+		    } else {
+			l_val = 0
+		        call ap_pmag (ap, out, stid, l_val, cier, sier, pier)
+		    }
 		    call ap_pplot (ap, im, stid, mgd, YES)
 		    stid = stid + 1
 		}

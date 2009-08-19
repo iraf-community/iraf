@@ -11,6 +11,7 @@ procedure ap_qshow (ap)
 
 pointer	ap	# pointer to the apphot strucuture
 
+size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	apstati()
@@ -18,7 +19,8 @@ real	apstatr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Set the object charactersitics.
 	call printf ("Quick Phot Parameters\n")

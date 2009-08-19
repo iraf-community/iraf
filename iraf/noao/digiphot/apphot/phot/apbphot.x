@@ -14,22 +14,28 @@ pointer	im			# pointer to IRAF image
 int	cl			# starlist file descriptor
 int	sd			# sky file descriptor
 int	out			# output file descriptor
-int	id, ld			# sequence and list numbers
+long	id, ld			# sequence and list numbers
 pointer	gd			# pointer to stdgraph stream
 pointer	mgd			# pointer to plot metacode file
 pointer	gid			# pointer to image display stream
 int	interactive		# interactive pr batch mode
 
-int	stdin, ild, radius, cier, sier, pier
+size_t	sz_val, c_1
+int	stdin, cier, sier, pier
+long	radius, ild, l_val
 pointer	sp, str
 real	wx, wy
 int	fscan(), nscan(), apfitsky(), apfitcenter(), apmag(), strncmp()
 int	apstati()
+long	apstatl()
 real	apstatr()
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 	call fstats (cl, F_FILENAME, Memc[str], SZ_FNAME)
 
 	# Initialize
@@ -65,9 +71,9 @@ begin
             # Transform the input coordinates.
             switch (apstati(ap,WCSIN)) {
             case WCS_WORLD, WCS_PHYSICAL:
-                call ap_itol (ap, wx, wy, wx, wy, 1)
+                call ap_itol (ap, wx, wy, wx, wy, c_1)
             case WCS_TV:
-                call ap_vtol (im, wx, wy, wx, wy, 1)
+                call ap_vtol (im, wx, wy, wx, wy, c_1)
             default:
                 ;
             }
@@ -80,7 +86,7 @@ begin
 	        YCENTER), sd, gd)
 	    pier = apmag (ap, im, apstatr (ap, XCENTER), apstatr (ap, YCENTER),
 	        apstati (ap, POSITIVE), apstatr (ap, SKY_MODE),
-		apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
+		apstatr (ap, SKY_SIGMA), apstatl (ap, NSKY))
 
 	    # Print the results if interactive mode.
 	    if (interactive == YES) {
@@ -110,6 +116,7 @@ begin
 	    }
 	}
 
-	call ap_imbuf (ap, 0, YES)
+	l_val = 0
+	call ap_imbuf (ap, l_val, YES)
 	call sfree (sp)
 end

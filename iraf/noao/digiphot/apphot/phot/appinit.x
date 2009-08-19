@@ -19,9 +19,12 @@ int	weight		# weight for photometry
 real	fwhmpsf		# FWHM of the PSF
 int	noise		# noise model
 
+size_t	sz_val
+
 begin
 	# Set the image parameters.
-	call malloc (ap, LEN_APSTRUCT, TY_STRUCT)
+	sz_val = LEN_APSTRUCT
+	call malloc (ap, sz_val, TY_STRUCT)
 
 	# Set up the apphot package defaults.
 	call ap_defsetup (ap, fwhmpsf)
@@ -57,11 +60,13 @@ real	aperts[ARB]	# array of apertures
 int	napert		# number of apertures
 int	weight		# weighting function for photometry
 
+size_t	sz_val
 pointer	phot
 
 begin
 	# phot structure
-	call malloc (AP_PPHOT(ap), LEN_PHOTSTRUCT, TY_STRUCT)
+	sz_val = LEN_PHOTSTRUCT
+	call malloc (AP_PPHOT(ap), sz_val, TY_STRUCT)
 	phot = AP_PPHOT(ap)
 
 	# Set the default values forthe photometry parameters.
@@ -90,11 +95,14 @@ begin
 	AP_YAPIX(phot) = NULL
 
 	# Allocate the buffers to hold the answers.
-	call malloc (AP_APERTS(phot), napert, TY_REAL)
-	call malloc (AP_MAGS(phot), napert, TY_REAL)
-	call malloc (AP_MAGERRS(phot), napert, TY_REAL)
-	call malloc (AP_AREA(phot), napert, TY_DOUBLE)
-	call malloc (AP_SUMS(phot), napert, TY_DOUBLE)
-	call amovr (aperts, Memr[AP_APERTS(phot)], napert)
-	call asrtr (Memr[AP_APERTS(phot)], Memr[AP_APERTS(phot)], napert)
+	sz_val = napert
+	call malloc (AP_APERTS(phot), sz_val, TY_REAL)
+	call malloc (AP_MAGS(phot), sz_val, TY_REAL)
+	call malloc (AP_MAGERRS(phot), sz_val, TY_REAL)
+	call malloc (AP_AREA(phot), sz_val, TY_DOUBLE)
+	call malloc (AP_SUMS(phot), sz_val, TY_DOUBLE)
+	sz_val = napert
+	call amovr (aperts, Memr[AP_APERTS(phot)], sz_val)
+	sz_val = napert
+	call asrtr (Memr[AP_APERTS(phot)], Memr[AP_APERTS(phot)], sz_val)
 end

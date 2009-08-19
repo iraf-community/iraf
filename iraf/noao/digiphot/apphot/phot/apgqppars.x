@@ -11,6 +11,7 @@ procedure ap_gqppars (ap)
 
 pointer	ap		# pointer to apphot structure
 
+size_t	sz_val
 int	naperts
 pointer	mp, aperts, str, apstr
 real	cbox, annulus, dannulus
@@ -20,9 +21,11 @@ real	clgetr()
 
 begin
 	call smark (mp)
-	call salloc (aperts, MAX_NAPERTS, TY_REAL)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (apstr, SZ_LINE, TY_CHAR)
+	sz_val = MAX_NAPERTS
+	call salloc (aperts, sz_val, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (apstr, sz_val, TY_CHAR)
 
 	# Get the center, sky fitting and photometry apertures.
 	cbox = clgetr ("cbox") / 2.0

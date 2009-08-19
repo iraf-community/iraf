@@ -15,8 +15,8 @@ pointer	ap		# pointer to apphot structure
 pointer	im		# pointer to the iraf image
 int	cl		# coordinate file descriptor
 int	out		# output file descriptor
-int	stid		# output file sequence number
-int	ltid		# coordinate file sequence number
+long	stid		# output file sequence number
+long	ltid		# coordinate file sequence number
 char	cmdstr[ARB]	# command string
 int	newimage	# new image ?
 int	newcbuf		# new centering buffers ?
@@ -26,6 +26,7 @@ int	newsky		# compute new sky ?
 int	newmagbuf	# new aperture buffers ?
 int	newmag		# compute new magnitudes ?
 
+size_t	sz_val
 bool	bval
 int	ip, ncmd
 pointer	sp, cmd, str
@@ -37,11 +38,14 @@ pointer	immap()
 real	apstatr()
 errchk	immap, open
 
+include	<nullptr.inc>
+
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)
@@ -250,12 +254,12 @@ begin
 		    im = NULL
 		}
 		iferr {
-		    im = immap (Memc[cmd], READ_ONLY, 0)
+		    im = immap (Memc[cmd], READ_ONLY, NULLPTR)
 		} then {
 		    call erract (EA_WARN)
 		    call printf ("Reopening image %s.\n")
 			call pargstr (Memc[str])
-		    im = immap (Memc[str], READ_ONLY, 0)
+		    im = immap (Memc[str], READ_ONLY, NULLPTR)
 		} else {
 		    call apimkeys (ap, im, Memc[cmd])
 		    newimage = YES

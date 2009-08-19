@@ -11,13 +11,13 @@ int procedure apmagbuf (ap, im, wx, wy, c1, c2, l1, l2)
 pointer	ap		# pointer to apphot structure
 pointer	im		# pointer to the IRAF image
 real	wx, wy		# center coordinates
-int	c1, c2		# column limits
-int	l1, l2		# line limits
+long	c1, c2		# column limits
+long	l1, l2		# line limits
 
 int	i
 pointer	phot
 real	rbuf
-int	ap_photpix()
+long	ap_photpix()
 
 begin
 	# Check for 0 radius aperture.
@@ -51,15 +51,15 @@ end
 # AP_PHOTPIX -- Procedure to determine the line and column limits of the
 # required subraster.
 
-int procedure ap_photpix (im, wx, wy, papert, c1, c2, l1, l2)
+long procedure ap_photpix (im, wx, wy, papert, c1, c2, l1, l2)
 
 pointer	im		# pointer to IRAF image
 real	wx, wy		# center of centering subraster annulus
 real	papert		# centering radius
-int	c1, c2		# column limits
-int	l1, l2		# line limits
+long	c1, c2		# column limits
+long	l1, l2		# line limits
 
-int	ncols, nlines
+long	ncols, nlines
 real	half_papert, xc1, xc2, xl1, xl2
 
 begin

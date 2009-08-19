@@ -14,7 +14,7 @@ real	magerrs[ARB]		# errors in the magnitudes
 int	naperts			# number of apertures
 real	sky			# sky value
 real	sigma			# sigma of the sky values
-int	nsky			# number of sky pixels
+size_t	nsky			# number of sky pixels
 real	zmag			# sky value, sigma and zero point magnitudes
 int	noise			# noise model
 real	padu			# photons per adu
@@ -73,7 +73,7 @@ int	naperts			# number of apertures
 real	sky			# sky value
 real	readnoise		# readout noise in electrons
 real	sigma			# sigma of the sky values
-int	nsky			# number of sky pixels
+size_t	nsky			# number of sky pixels
 real	zmag			# sky value, sigma and zero point magnitudes
 int	noise			# noise model
 real	padu			# photons per adu
@@ -96,7 +96,7 @@ begin
 		case AP_NCONSTANT:
 		    err2 = 0.0
 		case AP_NPOISSON:
-		    err2 = abs (sums[i]) / padu
+		    err2 = dabs (sums[i]) / padu
 		default:
 		    err2 = 0.0
 		}
@@ -110,7 +110,7 @@ begin
 		if (err <= 0.0)
 		    magerrs[i] = 0.0
 		else {
-		    magerrs[i] = 1.0857 * sqrt (err) / abs (sums[i])
+		    magerrs[i] = 1.0857 * sqrt (err) / dabs (sums[i])
 		}
 		mags[i] = zmag - 2.5 * log10 (mags[i])
 	    }
