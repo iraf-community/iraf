@@ -24,11 +24,13 @@ int	skysave			# save the sky image
 int	interactive		# interactive mode
 int	cache			# cache the input image pixels
 
+size_t	sz_val
 real	wx, wy
 pointer	sp, cmd, root, den, sky
-int	wcs, key, newimage, newden, newfit, stid, memstat
-int	buf_size
-size_t	req_size, old_size
+int	wcs, key, newimage, newden, newfit, memstat
+long	stid
+size_t	req_size, old_size, buf_size
+long	l_val
 
 real	apstatr()
 pointer	ap_immap()
@@ -36,8 +38,10 @@ int	clgcur(), apgqverify(), apgtverify(), sizeof(), ap_memstat()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (root, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
 
 	# Initialize cursor command.
 	key = ' '
@@ -58,7 +62,8 @@ begin
 	    EOF) {
 
 	    # Store the current cursor coordinates.
-	    call ap_vtol (im, wx, wy, wx, wy, 1)
+	    sz_val = 1
+	    call ap_vtol (im, wx, wy, wx, wy, sz_val)
 	    call apsetr (ap, CWX, wx)
 	    call apsetr (ap, CWY, wy)
 
@@ -133,8 +138,10 @@ begin
                 	sizeof (IM_PIXTYPE(im)) + 2 * IM_LEN(im,1) *
 			IM_LEN(im,2) * sizeof (TY_REAL))
                     memstat = ap_memstat (cache, req_size, old_size)
-                    if (memstat == YES)
-                        call ap_pcache (im, INDEFI, buf_size)
+                    if (memstat == YES) {
+			l_val = INDEFL
+                        call ap_pcache (im, l_val, buf_size)
+		    }
 		}
 		newimage = NO
 
@@ -148,15 +155,19 @@ begin
 		        call imdelete (denname)
 		    }
 		    den = ap_immap (denname, im, ap, save)
-                    if (memstat == YES)
-                        call ap_pcache (den, INDEFI, buf_size)
+                    if (memstat == YES) {
+			l_val = INDEFL
+                        call ap_pcache (den, l_val, buf_size)
+		    }
 
 		    if (sky != NULL)
 			call imunmap (sky)
 		    if (skysave == YES) {
 		        sky = ap_immap (skyname, im, ap, YES)
-                        if (memstat == YES)
-                            call ap_pcache (den, INDEFI, buf_size)
+                        if (memstat == YES) {
+			    l_val = INDEFL
+                            call ap_pcache (den, l_val, buf_size)
+			}
 		    } else
 			sky = NULL
 		    newden = NO

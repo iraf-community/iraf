@@ -14,10 +14,11 @@ pointer	sky			# pointer to the output sky image
 real	kernel1[nxk,nyk]	# the first convolution kernel
 real	kernel2[nxk,nyk]	# the second convolution kernel
 int	skip[nxk,nyk]		# the skip array
-int	nxk, nyk		# dimensions of the kernel
+size_t	nxk, nyk		# dimensions of the kernel
 real	const2			# subtraction constant for the skyimage
 
-int	i, ncols, nlines, col1, col2, inline, outline
+long	i, col1, col2, inline, outline, l_val
+size_t	ncols, nlines
 pointer	sp, lineptrs, outbuf1, outbuf2
 pointer	imgs2r(), impl2r()
 errchk	imgs2r, impl2r, imflush
@@ -28,7 +29,8 @@ begin
 	call salloc (lineptrs, nyk, TY_POINTER)
 
 	# Set the number of image buffers.
-	call imseti (im, IM_NBUFS, nyk)
+	l_val = nyk
+	call imsetl (im, IM_NBUFS, l_val)
 
 	ncols = IM_LEN(den,1)
 	nlines = IM_LEN(den,2)
@@ -40,7 +42,7 @@ begin
 	# Initialise the line buffers.
 	inline = 1 - nyk / 2
 	do i = 1 , nyk - 1 {
-	    Memi[lineptrs+i] = imgs2r (im, col1, col2, inline, inline)
+	    Memp[lineptrs+i] = imgs2r (im, col1, col2, inline, inline)
 	    inline = inline + 1
 	}
 
@@ -49,10 +51,10 @@ begin
 
 	    # Scroll the input buffers.
 	    do i = 1, nyk - 1
-		Memi[lineptrs+i-1] = Memi[lineptrs+i]
+		Memp[lineptrs+i-1] = Memp[lineptrs+i]
 
 	    # Read in new image line.
-	    Memi[lineptrs+nyk-1] = imgs2r (im, col1, col2, inline,
+	    Memp[lineptrs+nyk-1] = imgs2r (im, col1, col2, inline,
 	        inline)
 
 	    # Get first output image line.
@@ -63,7 +65,7 @@ begin
 	    # Generate first output image line.
 	    call aclrr (Memr[outbuf1], ncols)
 	    do i = 1, nyk
-		call ap_skcnvr (Memr[Memi[lineptrs+i-1]], Memr[outbuf1],
+		call ap_skcnvr (Memr[Memp[lineptrs+i-1]], Memr[outbuf1],
 		    ncols, kernel1[1,i], skip[1,i], nxk)
 
 	    if (sky != NULL) {
@@ -76,7 +78,7 @@ begin
 	        # Generate second output image line.
 	        call aclrr (Memr[outbuf2], ncols)
 	        do i = 1, nyk
-		    call ap_skcnvr (Memr[Memi[lineptrs+i-1]], Memr[outbuf2],
+		    call ap_skcnvr (Memr[Memp[lineptrs+i-1]], Memr[outbuf2],
 		        ncols, kernel2[1,i], skip[1,i], nxk)
 		call ap_w1sur (Memr[outbuf2], Memr[outbuf1], Memr[outbuf2],
 		    ncols, -const2)
@@ -106,11 +108,12 @@ pointer	den			# pointer to the output density image
 pointer	sky			# pointer to the output sky image
 real	kernel1[nxk,nyk]	# the first convolution kernel
 int	skip[nxk,nyk]		# the sky array
-int	nxk, nyk		# dimensions of the kernel
+size_t	nxk, nyk		# dimensions of the kernel
 real	gsums[ARB]		# array of kernel sums
 real	datamin, datamax	# the good data minimum and maximum
 
-int	i, ncols, nlines, col1, col2, inline, outline
+long	i, col1, col2, inline, outline, l_val
+size_t	ncols, nlines
 pointer	sp, lineptrs, sd, sgd, sg, sgsq, p, outbuf2
 pointer	imgs2r(), impl2r()
 errchk	imgs2r, impl2r, imflush
@@ -121,7 +124,8 @@ begin
 	call salloc (lineptrs, nyk, TY_POINTER)
 
 	# Set the number of image buffers.
-	call imseti (im, IM_NBUFS, nyk)
+	l_val = nyk
+	call imsetl (im, IM_NBUFS, l_val)
 
 	ncols = IM_LEN(den,1)
 	nlines = IM_LEN(den,2)
@@ -139,7 +143,7 @@ begin
 	# Initialise the line buffers.
 	inline = 1 - nyk / 2
 	do i = 1 , nyk - 1 {
-	    Memi[lineptrs+i] = imgs2r (im, col1, col2, inline, inline)
+	    Memp[lineptrs+i] = imgs2r (im, col1, col2, inline, inline)
 	    inline = inline + 1
 	}
 
@@ -148,10 +152,10 @@ begin
 
 	    # Scroll the input buffers.
 	    do i = 1, nyk - 1
-		Memi[lineptrs+i-1] = Memi[lineptrs+i]
+		Memp[lineptrs+i-1] = Memp[lineptrs+i]
 
 	    # Read in new image line.
-	    Memi[lineptrs+nyk-1] = imgs2r (im, col1, col2, inline,
+	    Memp[lineptrs+nyk-1] = imgs2r (im, col1, col2, inline,
 	        inline)
 
 	    # Get first output image line.
@@ -166,7 +170,7 @@ begin
 	    call amovkr (gsums[GAUSS_SUMGSQ], Memr[sgsq], ncols)
 	    call amovkr (gsums[GAUSS_PIXELS], Memr[p], ncols)
 	    do i = 1, nyk
-		call ap_gdsum (Memr[Memi[lineptrs+i-1]], Memr[sgd], Memr[sd],
+		call ap_gdsum (Memr[Memp[lineptrs+i-1]], Memr[sgd], Memr[sd],
 		    Memr[sg], Memr[sgsq], Memr[p], ncols, kernel1[1,i],
 		    skip[1,i], nxk, datamin, datamax)
 	    call ap_gdavg (Memr[sgd], Memr[sd], Memr[sg], Memr[sgsq],
@@ -204,12 +208,12 @@ procedure ap_skcnvr (in, out, npix, kernel, skip, nk)
 
 real	in[npix+nk-1]		# the input vector
 real	out[npix]		# the output vector
-int	npix			# the size of the vector
+size_t	npix			# the size of the vector
 real	kernel[ARB]		# the convolution kernel
 int	skip[ARB]		# the skip array
-int	nk			# the size of the convolution kernel
+size_t	nk			# the size of the convolution kernel
 
-int	i, j
+long	i, j
 real	sum
 
 begin
@@ -236,13 +240,13 @@ real	sd[ARB]			# the computed input/output sum vector
 real	sg[ARB]			# the input/ouput first normalization factor
 real	sgsq[ARB]		# the input/ouput second normalization factor
 real	p[ARB]			# the number of points vector
-int	npix			# the size of the vector
+size_t	npix			# the size of the vector
 real	kernel[ARB]		# the convolution kernel
 int	skip[ARB]		# the skip array
-int	nk			# the size of the convolution kernel
+size_t	nk			# the size of the convolution kernel
 real	datamin, datamax	# the good data limits.
 
-int	i, j
+long	i, j
 real	data
 
 begin
@@ -273,12 +277,12 @@ real	sd[ARB]			# the computed input/output sum vector
 real	sg[ARB]			# the input/ouput first normalization factor
 real	sgsq[ARB]		# the input/ouput second normalization factor
 real	p[ARB]			# the number of points vector
-int	npix			# the size of the vector
+size_t	npix			# the size of the vector
 real	pixels			# number of pixels
 real	denom			# kernel normalization factor
 real	sgop			# kernel normalization factor
 
-int	i
+long	i
 
 begin
 	do i = 1, npix {
@@ -306,9 +310,9 @@ real	sgd[ARB]		# the computed input/output convolution vector
 real	sg[ARB]			# the input/ouput first normalization factor
 real	p[ARB]			# the number of points vector
 real	out[ARB]		# the output array
-int	npix			# the size of the vector
+size_t	npix			# the size of the vector
 
-int	i
+long	i
 
 begin
 	do i = 1, npix {

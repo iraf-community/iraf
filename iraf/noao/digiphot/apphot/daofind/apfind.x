@@ -6,7 +6,7 @@ include "../lib/apphot.h"
 # AP_FIND -- Detect images in the convolved image and then compute image
 # characteristics using the original image.
 
-int procedure ap_find (ap, im, cnv, out, id, ker2d, skip, nxk, nyk, skymode,
+long procedure ap_find (ap, im, cnv, out, id, ker2d, skip, nxk, nyk, skymode,
 	threshold, relerr, emission, xsigsq, ysigsq, datamin, datamax,
 	sharplo, sharphi, roundlo, roundhi, interactive, stid, mkdetections)
 
@@ -17,7 +17,7 @@ int	out			# the output file descriptor
 pointer	id			# pointer to the display stream
 real	ker2d[nxk,ARB]		# 2D Gaussian kernel
 int	skip[nxk,ARB]		# 2D skip kernel
-int	nxk, nyk		# dimensions of the kernel
+size_t	nxk, nyk		# dimensions of the kernel
 real	skymode			# estimate of the sky
 real	threshold		# threshold for image detection
 real	relerr			# the relative error of the convolution kernel
@@ -27,15 +27,18 @@ real	datamin, datamax	# minimum and maximum good data values
 real	sharplo, sharphi	# sharpness limits
 real	roundlo,roundhi		# roundness parameter limits
 int	interactive		# interactive mode
-int	stid			# sequence number
+long	stid			# sequence number
 int	mkdetections		# mark detections
 
-int	inline, i, j, ncols, col1, col2, line1, line2, index, pos
-int	xmiddle, ymiddle, nonzero, nobjs, nstars, ntotal
+long	inline, i, j, col1, col2, line1, line2, index, pos, l_val
+size_t	ncols
+long	xmiddle, ymiddle, nonzero
+long	nobjs, nstars, ntotal
 pointer	sp, bufptrs, imlbuf, cnvlbuf, imbuf, cnvbuf, cols
 pointer	satur, sharp, round1, round2, x, y
 
-int	ap_detect(), ap_test(), apstati()
+long	ap_detect(), ap_test(), lmod()
+int	apstati()
 pointer	imgs2r()
 errchk	imgs2r()
 
@@ -64,10 +67,10 @@ begin
 	# Set up a cylindrical buffers and some working space for
 	# the detected images.
 	call smark (sp)
-	call salloc (bufptrs, nyk, TY_INT)
+	call salloc (bufptrs, nyk, TY_LONG)
 	call salloc (imbuf, nyk * ncols, TY_REAL)
 	call salloc (cnvbuf, nyk * ncols, TY_REAL)
-	call salloc (cols, ncols, TY_INT)
+	call salloc (cols, ncols, TY_LONG)
 	call salloc (satur, ncols, TY_INT)
 	call salloc (sharp, ncols, TY_REAL)
 	call salloc (round1, ncols, TY_REAL)
@@ -91,7 +94,7 @@ begin
 	        call amulkr (Memr[cnvlbuf], -1.0, Memr[cnvbuf+(inline+ymiddle-
 		    2)* ncols], ncols)
 	    }
-	    Memi[bufptrs+pos-1] = pos - 1
+	    Meml[bufptrs+pos-1] = pos - 1
 	    pos = pos - 1
 	}
 
@@ -102,8 +105,8 @@ begin
 
 	    # Setup the buffer pointer array.
 	    do j = 2, nyk
-		Memi[bufptrs+j-2] = Memi[bufptrs+j-1]
-	    Memi[bufptrs+nyk-1] = pos
+		Meml[bufptrs+j-2] = Meml[bufptrs+j-1]
+	    Meml[bufptrs+nyk-1] = pos
 	    index = (pos - 1) * ncols
 
 	    # Read in new image line.
@@ -124,28 +127,29 @@ begin
 	    # and be greater than any other pixel within nsigma sigma.
 
 	    # Increment the cylindrical buffer.
-	    if (mod (pos, nyk) == 0)
+	    l_val = nyk
+	    if (lmod (pos, l_val) == 0)
 		pos = 1
 	    else
 		pos = pos + 1
 
-	    nobjs = ap_detect (Memr[cnvbuf], Memi[bufptrs], ncols, skip, nxk,
-	        nyk, relerr * threshold, Memi[cols])
+	    nobjs = ap_detect (Memr[cnvbuf], Meml[bufptrs], ncols, skip, nxk,
+	        nyk, relerr * threshold, Meml[cols])
 	    if (nobjs <= 0)
 		next
 
 	    # Compute the sharpness parameter.
-	    call ap_sharp_round (Memr[imbuf], Memr[cnvbuf], Memi[bufptrs],
-	        ncols, skip, nxk, nyk, Memi[cols], Memi[satur], Memr[round1],
+	    call ap_sharp_round (Memr[imbuf], Memr[cnvbuf], Meml[bufptrs],
+	        ncols, skip, nxk, nyk, Meml[cols], Memi[satur], Memr[round1],
 		Memr[sharp], nobjs, nonzero, skymode, datamin, datamax) 
 
 	    # Compute the roundness parameters.
-	    call ap_xy_round (Memr[imbuf], Memi[bufptrs], ncols, ker2d, nxk,
-	         nyk, Memi[cols], inline, Memr[round2], Memr[x],
+	    call ap_xy_round (Memr[imbuf], Meml[bufptrs], ncols, ker2d, nxk,
+	         nyk, Meml[cols], inline, Memr[round2], Memr[x],
 		 Memr[y], nobjs, skymode, datamin, datamax, xsigsq, ysigsq)
 
 	    # Test the image characeteristics of detected objects.
-	    nstars = ap_test (Memi[cols], Memr[x], Memr[y], Memi[satur],
+	    nstars = ap_test (Meml[cols], Memr[x], Memr[y], Memi[satur],
 		Memr[round1], Memr[round2], Memr[sharp], nobjs, IM_LEN(im,1),
 		IM_LEN(im,2), sharplo, sharphi, roundlo, roundhi)
 
@@ -172,13 +176,13 @@ begin
 
 	    # Print results on the standard output.
 	    if (interactive == YES)
-	        call apstdout (Memr[cnvbuf], Memi[bufptrs], ncols, nyk,
-	            Memi[cols], Memr[x], Memr[y], Memr[sharp], Memr[round1],
+	        call apstdout (Memr[cnvbuf], Meml[bufptrs], ncols, nyk,
+	            Meml[cols], Memr[x], Memr[y], Memr[sharp], Memr[round1],
 		    Memr[round2], nstars, ntotal, relerr * threshold)
 
 	    # Save the results in the file.
-	    call apdtfout (out, Memr[cnvbuf], Memi[bufptrs], ncols, nyk,
-	        Memi[cols], Memr[x], Memr[y], Memr[sharp], Memr[round1],
+	    call apdtfout (out, Memr[cnvbuf], Meml[bufptrs], ncols, nyk,
+	        Meml[cols], Memr[x], Memr[y], Memr[sharp], Memr[round1],
 		Memr[round2], nstars, ntotal, relerr * threshold, stid)
 
 
@@ -197,17 +201,18 @@ end
 # detected as a star the candidate object must be above threshold and have
 # a maximum pixel value greater than any pixels within nsigma * sigma.
 
-int procedure ap_detect (density, ptrs, ncols, skip, nxk, nyk, threshold, cols)
+long procedure ap_detect (density, ptrs, ncols, skip, nxk, nyk, threshold, cols)
 
 real	density[ncols, ARB]	# density array
-int	ptrs[ARB]		# pointer array
-int	ncols			# x dimesnsion of intensity buffer
+long	ptrs[ARB]		# pointer array
+size_t	ncols			# x dimesnsion of intensity buffer
 int	skip[nxk,ARB]		# skip array
-int	nxk, nyk		# size of convolution kernel
+size_t	nxk, nyk		# size of convolution kernel
 real	threshold		# density threshold
-int	cols[ARB]		# column numbers of detected stars
+long	cols[ARB]		# column numbers of detected stars
 
-int	i, j, k, kk, middle, nhalf, nobjs
+long	i, j, k, kk, middle, nhalf, nobjs
+
 define	nextpix_	11
 
 begin
@@ -262,21 +267,22 @@ procedure ap_sharp_round (data, density, ptrs, ncols, skip, nxk, nyk, cols,
 
 real	data[ncols,ARB]		# image data
 real	density[ncols,ARB]	# density enhancements
-int	ptrs[ARB]		# buffer pointers
-int	ncols			# length of data array
+long	ptrs[ARB]		# buffer pointers
+size_t	ncols			# length of data array
 int	skip[nxk,ARB]		# 2D kernel
-int	nxk, nyk		# size of convolution kernel
-int	cols[ARB]		# array of columns
+size_t	nxk, nyk		# size of convolution kernel
+long	cols[ARB]		# array of columns
 int	satur[ARB]		# array of saturated state parameters
 real	round[ARB]		# array of roundness parameters
 real	sharps[ARB]		# array of sharpness parameters
-int	nobjs			# number of objects
-int	nonzero			# number of nonzero kernel elements
+long	nobjs			# number of objects
+long	nonzero			# number of nonzero kernel elements
 real	skymode			# estimate of the sky mode
 real	datamin, datamax	# minimum and maximum good data values
 
-int	i, j, k, xmiddle, ymiddle, npixels, nhalf
+long	i, j, k, xmiddle, ymiddle, npixels, nhalf
 real	pixval, midpix, temp, sharp, sum2, sum4
+real	aabs()
 
 begin
 	# Loop over the detected objects.
@@ -296,10 +302,10 @@ begin
 		        density[cols[i]-j,ptrs[ymiddle+k]] -
 		        density[cols[i]+j,ptrs[ymiddle-k]]
 		    sum4 = sum4 +
-		        abs (density[cols[i]-k,ptrs[ymiddle-j]]) +
-		        abs (density[cols[i]+k,ptrs[ymiddle+j]]) +
-		        abs (density[cols[i]-j,ptrs[ymiddle+k]]) +
-		        abs (density[cols[i]+j,ptrs[ymiddle-k]])
+		        aabs (density[cols[i]-k,ptrs[ymiddle-j]]) +
+		        aabs (density[cols[i]+k,ptrs[ymiddle+j]]) +
+		        aabs (density[cols[i]-j,ptrs[ymiddle+k]]) +
+		        aabs (density[cols[i]+j,ptrs[ymiddle-k]])
 		}
 	    }
 	    if (sum2 == 0.0)
@@ -367,24 +373,26 @@ procedure ap_xy_round (data, ptrs, ncols, ker2d, nxk, nyk, cols, inline,
 	rounds, x, y, nobjs, skymode, datamin, datamax, xsigsq, ysigsq)
 
 real	data[ncols,ARB]		# density enhancements
-int	ptrs[ARB]		# buffer pointers
-int	ncols			# number of columns in cylindrical buffer
+long	ptrs[ARB]		# buffer pointers
+size_t	ncols			# number of columns in cylindrical buffer
 real	ker2d[nxk,ARB]		# the gaussian convolution kernel
-int	nxk			# size of kernel in x
-int	nyk			# size of kernel in y
-int	cols[ARB]		# the input positions	
-int	inline			# the input image line
+size_t	nxk			# size of kernel in x
+size_t	nyk			# size of kernel in y
+long	cols[ARB]		# the input positions	
+long	inline			# the input image line
 real	rounds[ARB]		# array of sharpness parameters
 real	x[ARB]			# output x coords
 real	y[ARB]			# output y coords
-int	nobjs			# number of objects
+long	nobjs			# number of objects
 real	skymode			# estimate of the sky mode
 real	datamin, datamax	# minium and maximum data values
 real	xsigsq, ysigsq		# x-y gaussian sigma squared
 
-int	i, j, k, xmiddle, ymiddle, n
+long	i, j, k, xmiddle, ymiddle, n
 real	sumgd, sumgsq, sumg, sumd, sumdx, dgdx, sdgdx, sdgdxsq, sddgdx, sgdgdx
 real	pixval, p, sg, sd, wt, hx, hy, dx, dy, skylvl, xhalf, yhalf
+long	labs()
+real	aabs()
 
 begin
 	xhalf = real (nxk / 2) + 0.5
@@ -414,7 +422,7 @@ begin
 		sg = 0.0
 		sd = 0.0
 		do j = 1, nyk {
-		    wt = real (ymiddle - abs (j - ymiddle))
+		    wt = real (ymiddle - labs (j - ymiddle))
 		    pixval = data[cols[i]-xmiddle+k,ptrs[j]]
 		    if (pixval < datamin || pixval > datamax)
 			next
@@ -424,7 +432,7 @@ begin
 
 	        if (sg <= 0.0)
 		    next
-	        wt = real (xmiddle - abs (k - xmiddle))
+	        wt = real (xmiddle - labs (k - xmiddle))
 	        sumgd = sumgd + wt * sg * sd
 	        sumgsq = sumgsq + wt * sg ** 2
 	        sumg = sumg + wt * sg
@@ -471,12 +479,12 @@ begin
 	    skylvl = (sumd - hx * sumg) / p
 	    dx = (sgdgdx - (sddgdx - sdgdx * (hx * sumg + skylvl * p))) /
 		(hx * sdgdxsq / xsigsq)
-	    if (abs (dx) > xhalf) {
+	    if (aabs (dx) > xhalf) {
 		if (sumd == 0.0)
 		    dx = 0.0
 		else
 		    dx = sumdx / sumd 
-		if (abs (dx) > xhalf)
+		if (aabs (dx) > xhalf)
 		    dx = 0.0
 	    }
 	    x[i] = (cols[i] - xmiddle + 1) + dx 
@@ -498,7 +506,7 @@ begin
 		sg = 0.0
 		sd = 0.0
 		do k = 1, nxk {
-		    wt = real (xmiddle - abs (k - xmiddle))
+		    wt = real (xmiddle - labs (k - xmiddle))
 		    pixval = data[cols[i]-xmiddle+k,ptrs[j]]
 		    if (pixval < datamin || pixval > datamax)
 			next
@@ -507,7 +515,7 @@ begin
 		}
 	        if (sg <= 0.0)
 		    next
-	        wt = real (ymiddle - abs (j - ymiddle))
+	        wt = real (ymiddle - labs (j - ymiddle))
 	        sumgd = sumgd + wt * sg * sd
 	        sumgsq = sumgsq + wt * sg ** 2
 	        sumg = sumg + wt * sg
@@ -554,12 +562,12 @@ begin
 	    skylvl = (sumd - hy * sumg) / p
 	    dy = (sgdgdx - (sddgdx - sdgdx * (hy * sumg + skylvl * p))) /
 		(hy * sdgdxsq / ysigsq)
-	    if (abs (dy) > yhalf) {
+	    if (aabs (dy) > yhalf) {
 		if (sumd == 0.0)
 		    dy = 0.0
 		else
 		    dy = sumdx / sumd 
-		if (abs (dy) > yhalf)
+		if (aabs (dy) > yhalf)
 		    dy = 0.0
 	    }
 	    y[i] = (inline - ymiddle + 1) + dy
@@ -573,22 +581,22 @@ end
 # AP_TEST -- Test the characteristic of the detected images for roundness
 # and sharpness.
 
-int procedure ap_test (cols, x, y, satur, round1, round2, sharps, nobjs,
-	ncols, nlines, sharplo, sharphi, roundlo, roundhi)
+long procedure ap_test (cols, x, y, satur, round1, round2, sharps, nobjs,
+			ncols, nlines, sharplo, sharphi, roundlo, roundhi)
 
-int	cols[ARB]			# col IDS of detected images
+long	cols[ARB]			# col IDS of detected images
 real	x[ARB]				# x positions
 real	y[ARB]				# y positions
 int	satur[ARB]			# saturation condition
 real	round1[ARB]			# first roundness parameters
 real	round2[ARB]			# second roundness parameters
 real	sharps[ARB]			# sharpness parameters
-int	nobjs				# number of objects
-int	ncols, nlines			# size of the input image
+long	nobjs				# number of objects
+size_t	ncols, nlines			# size of the input image
 real	sharplo, sharphi		# sharpness parameters
 real	roundlo, roundhi		# roundness parameters
 
-int	i, nstars
+long	i, nstars
 
 begin
 	# Loop over the detected objects.

@@ -10,20 +10,23 @@ procedure ap_fdcolon (ap, im, out, stid, cmdstr, newimage, newbuf, newfit)
 pointer	ap		# pointer to the apphot structure
 pointer	im		# pointer to the iraf image
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 char	cmdstr		# command string
 int	newimage	# new mage ?
 int	newbuf		# new center buffer ?
 int	newfit		# new center fit ?
 
+size_t	sz_val
 int	cl, junk
+long	ljunk
 pointer	sp, incmd, outcmd
 int	strdic()
 
 begin
 	call smark (sp)
-	call salloc (incmd, SZ_LINE, TY_CHAR)
-	call salloc (outcmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (incmd, sz_val, TY_CHAR)
+	call salloc (outcmd, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)
@@ -37,12 +40,12 @@ begin
 	# coords file is always NULL.
 	if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, APCMDS) != 0) {
 	    cl = NULL
-	    call ap_apcolon (ap, im, cl, out, stid, junk, cmdstr, newimage,
+	    call ap_apcolon (ap, im, cl, out, stid, ljunk, cmdstr, newimage,
 	        junk, junk, junk, junk, newbuf, newfit)
 	    if (cl != NULL) {
 		call close (cl)
 		cl = NULL
-		call apsets (cl, CLNAME, "")
+		call apsets (ap, CLNAME, "")
 	    }
 	} else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0) {
 	    call ap_nscolon (ap, im, out, stid, cmdstr, junk, junk,
@@ -64,10 +67,11 @@ procedure ap_fcolon (ap, out, stid, cmdstr, newbuf, newfit)
 
 pointer	ap			# pointer to the apphot structure
 int	out			# output file descriptor
-int	stid			# file number id
+long	stid			# file number id
 char	cmdstr[ARB]		# command string
 int	newbuf, newfit		# change magnitude parameters
 
+size_t	sz_val
 bool	bval
 int	ncmd
 pointer	sp, cmd, str
@@ -79,8 +83,9 @@ real	apstatr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)
@@ -239,6 +244,7 @@ procedure ap_fimcolon (ap, cmdstr)
 pointer	ap			# pointer to the apphot structure
 char	cmdstr[ARB]		# command string
 
+size_t	sz_val
 int	ncmd
 pointer	sp, cmd
 int	strdic()
@@ -246,7 +252,8 @@ int	strdic()
 begin
 	# Get the command.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)
 	if (Memc[cmd] == EOS) {

@@ -9,9 +9,12 @@ pointer	ap		# pointer to the apphot structure
 real	fwhmpsf		# FWHM of the PSF
 int	noise		# noise function
 
+size_t	sz_val
+
 begin
 	# Allocate space.
-	call malloc (ap, LEN_APSTRUCT, TY_STRUCT)
+	sz_val = LEN_APSTRUCT
+	call malloc (ap, sz_val, TY_STRUCT)
 
 	# Set the default global apphot package parameters.
 	call ap_defsetup (ap, fwhmpsf)
@@ -41,10 +44,12 @@ procedure ap_fdsetup (ap)
 
 pointer	ap		# pointer to the apphot strucuture
 
+size_t	sz_val
 pointer	fnd
 
 begin
-	call malloc (AP_PFIND(ap), LEN_FIND, TY_STRUCT)
+	sz_val = LEN_FIND
+	call malloc (AP_PFIND(ap), sz_val, TY_STRUCT)
 	fnd = AP_PFIND(ap)
 
 	AP_RATIO(fnd) = DEF_RATIO

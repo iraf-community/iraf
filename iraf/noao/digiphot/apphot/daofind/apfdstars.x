@@ -19,13 +19,17 @@ pointer	id		# pointer to image display stream
 int	boundary	# type of boundary extension
 real	constant	# constant for constant boundary extension
 int	refit		# detect stars again
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 
-int	norm, nxk, nyk, nstars
+size_t	sz_val
+int	norm
+long	nstars
+size_t	nxk, nyk
 pointer	sp, str, gker2d, ngker2d, dker2d, skip
 real	a, b, c, f, skysigma, skymode, threshold, relerr, gsums[LEN_GAUSS]
 real	dmin, dmax, xsigsq, ysigsq
-int	apstati(), ap_find()
+int	apstati()
+long	ap_find()
 real	ap_egkernel(), apstatr()
 data	gker2d/NULL/, ngker2d/NULL/, dker2d/NULL/ skip /NULL/
 
@@ -33,7 +37,8 @@ define	detect_ 99
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	if (refit == YES)
 	    goto detect_

@@ -15,7 +15,7 @@ procedure t_daofind ()
 pointer	image			# pointer to input image
 pointer denimage		# pointer to density enhancement image
 pointer	skyimage		# pointer to the sky image
-int	output			# the results file descriptor
+pointer	output			# the results file descriptor
 int	boundary		# type of boundary extension
 real	constant		# constant for constant boundary extension
 int	interactive		# interactive mode
@@ -24,11 +24,13 @@ int	update			# update critical parameters
 int	verbose			# verbose mode
 int	cache			# cache the image pixels
 
+size_t	sz_val
 pointer	im, cnv, sky, sp, outfname, denname, skyname, str
 pointer	ap, cname, display, graphics, id, gd, olist, imlist
 int	limlist, lolist, densave, skysave, out, root, stat
-int	wcs, buf_size, memstat
-size_t	req_size, old_size
+int	wcs, memstat
+size_t	req_size, old_size, buf_size
+long	l_val
 
 real	clgetr()
 pointer	gopen(), immap(), ap_immap()
@@ -38,24 +40,29 @@ int	clgfil(), imtgetim(), ap_memstat(), sizeof()
 bool	clgetb(), streq()
 pointer	imtopenp(), clpopnu()
 
+include	<nullptr.inc>
+
 begin
 	# Flush STDOUT on a new line.
 	call fseti (STDOUT, F_FLUSHNL, YES)
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (denimage, SZ_FNAME, TY_CHAR)
-	call salloc (skyimage, SZ_FNAME, TY_CHAR)
-	call salloc (display, SZ_FNAME, TY_CHAR)
-	call salloc (graphics, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	call salloc (denimage, sz_val, TY_CHAR)
+	call salloc (skyimage, sz_val, TY_CHAR)
+	call salloc (display, sz_val, TY_CHAR)
+	call salloc (graphics, sz_val, TY_CHAR)
 
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (denname, SZ_FNAME, TY_CHAR)
-	call salloc (skyname, SZ_FNAME, TY_CHAR)
-	call salloc (cname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (denname, sz_val, TY_CHAR)
+	call salloc (skyname, sz_val, TY_CHAR)
+	call salloc (cname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Fetch the image and output file lists.
 	imlist = imtopenp ("image")
@@ -141,7 +148,7 @@ begin
 
 	    # Open the image and get the required keywords from the header.
 
-	    im = immap (Memc[image], READ_ONLY, 0)
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call apimkeys (ap, im, Memc[image])
 
 	    # Set the image display viewport.
@@ -153,8 +160,10 @@ begin
                 sizeof (IM_PIXTYPE(im)) + 2 * IM_LEN(im,1) * IM_LEN(im,2) *
 		sizeof (TY_REAL))
             memstat = ap_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call ap_pcache (im, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call ap_pcache (im, l_val, buf_size)
+	    }
 
 	    # Determine the results file name. If output is a null string or
 	    # a directory name then the extension "coo" is added to the
@@ -203,16 +212,20 @@ begin
 		cnv = NULL
 		if (Memc[cname] != EOS) {
 		    stat = ap_fdfind (Memc[denname], Memc[skyname], ap, im,
-		        NULL, NULL, out, boundary, constant, densave,
+		        NULLPTR, NULLPTR, out, boundary, constant, densave,
 			skysave, NO, cache)
 		} else {
 	            cnv = ap_immap (Memc[denname], im, ap, densave)
-                    if (memstat == YES)
-                	call ap_pcache (cnv, INDEFI, buf_size)
+                    if (memstat == YES) {
+			l_val = INDEFL
+                	call ap_pcache (cnv, l_val, buf_size)
+		    }
 		    if (skysave == YES) {
 			sky = ap_immap (Memc[skyname], im, ap, skysave)
-                        if (memstat == YES)
-                	    call ap_pcache (sky, INDEFI, buf_size)
+                        if (memstat == YES) {
+			    l_val = INDEFL
+                	    call ap_pcache (sky, l_val, buf_size)
+			}
 		    } else
 			sky = NULL
 		    if (Memc[outfname] != EOS)
@@ -282,6 +295,8 @@ pointer	immap()
 real	apstatr(), imgetr()
 errchk	imgetr()
 
+include	<nullptr.inc>
+
 begin
 	# Check to see if the image already exists. If it does not
 	# open a new image and write the PSF characteristics into the
@@ -302,7 +317,7 @@ begin
 
 	} else {
 
-	    outim = immap (outname, READ_ONLY, 0)
+	    outim = immap (outname, READ_ONLY, NULLPTR)
 	    iferr (tmp_scale = 1.0 / imgetr (outim, "SCALE"))
 		tmp_scale = INDEFR
 	    iferr (tmp_fwhmpsf = imgetr (outim, "FWHMPSF"))
@@ -368,6 +383,7 @@ int	out		# the output file descriptor
 char	root[ARB]	# root of the previous output file name, may be
 			# updated
 
+size_t	sz_val
 int	findex, lindex, version
 pointer	sp, image, outname, newoutname
 int	strmatch(), gstrmatch(), open(), fnldir(), access()
@@ -377,9 +393,10 @@ begin
 	    call close (out)
 
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (outname, SZ_FNAME, TY_CHAR)
-	call salloc (newoutname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (outname, sz_val, TY_CHAR)
+	call salloc (newoutname, sz_val, TY_CHAR)
 
 	# Get the old names.
 	call apstats (ap, IMNAME, Memc[image], SZ_FNAME)

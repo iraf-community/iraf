@@ -19,12 +19,17 @@ int	boundary	# type of boundary extension
 real	constant	# constant for constant boundary extension
 int	verbose		# verbose switch
 
-int	norm, nxk, nyk, nstars, stid
+int	norm
+long	nstars, stid
+size_t	nxk, nyk
 pointer	sp, gker2d, ngker2d, dker2d, skip
 real	a, b, c, f, gsums[LEN_GAUSS], skysigma, skymode, threshold, relerr
 real	dmax, dmin, xsigsq, ysigsq
-int	apstati(), ap_find()
+int	apstati()
+long	ap_find()
 real	ap_egkernel(), apstatr()
+
+include	<nullptr.inc>
 
 begin
 	# Compute the parameters of the Gaussian kernel.
@@ -117,7 +122,7 @@ begin
 
 	# Find the stars.
 	stid = 1
-	nstars = ap_find (ap, im, cnv, out, NULL, Memr[gker2d],
+	nstars = ap_find (ap, im, cnv, out, NULLPTR, Memr[gker2d],
 	    Memi[skip], nxk, nyk, skymode, threshold, relerr,
 	    apstati (ap,POSITIVE), xsigsq, ysigsq, dmin, dmax,
 	    apstatr (ap, SHARPLO), apstatr (ap, SHARPHI), apstatr (ap,

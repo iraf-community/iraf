@@ -13,10 +13,12 @@ real	ratio			# Ratio of half-width in y to x
 real	theta			# position angle of Gaussian
 real	nsigma			# limit of convolution
 real	a, b, c, f		# ellipse parameters
-int	nx, ny			# dimensions of the kernel
+size_t	nx, ny			# dimensions of the kernel
 
 real	sx2, sy2, cost, sint, discrim
-bool	fp_equalr ()
+bool	fp_equalr()
+real	aabs()
+long	lint()
 
 begin
 	# Define some temporary variables.
@@ -38,16 +40,16 @@ begin
 	    } else
 		call error (0, "AP_EGPARAMS: Cannot make 1D Gaussian.")
 	    f = nsigma ** 2 / 2.
-	    nx = 2 * int (max (sigma * nsigma * abs (cost), RMIN)) + 1
-	    ny = 2 * int (max (sigma * nsigma * abs (sint), RMIN)) + 1
+	    nx = 2 * lint (max (sigma * nsigma * aabs (cost), RMIN)) + 1
+	    ny = 2 * lint (max (sigma * nsigma * aabs (sint), RMIN)) + 1
 	} else {
 	    a = cost ** 2 / sx2 + sint ** 2 / sy2
 	    b = 2. * (1.0 / sx2 - 1.0 / sy2) * cost * sint
 	    c = sint ** 2 / sx2 + cost ** 2 / sy2
 	    discrim = b ** 2 - 4. * a * c
 	    f = nsigma ** 2 / 2.
-	    nx = 2 * int (max (sqrt (-8. * c * f / discrim), RMIN)) + 1
-	    ny = 2 * int (max (sqrt (-8. * a * f / discrim), RMIN)) + 1
+	    nx = 2 * lint (max (sqrt (-8. * c * f / discrim), RMIN)) + 1
+	    ny = 2 * lint (max (sqrt (-8. * a * f / discrim), RMIN)) + 1
 	}
 end
 
@@ -61,11 +63,11 @@ real	gkernel[nx,ny]		# output Gaussian amplitude kernel
 real	ngkernel[nx,ny]		# output normalized Gaussian amplitude kernel
 real	dkernel[nx,ny]		# output Gaussian sky kernel
 int	skip[nx,ny]		# output skip subraster
-int	nx, ny			# input dimensions of the kernel
+size_t	nx, ny			# input dimensions of the kernel
 real	gsums[ARB]		# output array of gsums
 real	a, b, c, f		# ellipse parameters
 
-int	i, j, x0, y0, x, y
+long	i, j, x0, y0, x, y
 real	npts, rjsq, rsq, relerr,ef
 
 begin
