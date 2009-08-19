@@ -17,23 +17,25 @@ pointer	im				# pointer to the iraf image
 int	pl				# polygon file descriptor
 int     cl				# coord file descriptor
 int	out				# output file descriptor	
-int	stid				# output file number
-int	ptid				# polygon file sequence number
-int	ltid				# coord file sequence number
+long	stid				# output file number
+long	ptid				# polygon file sequence number
+long	ltid				# coord file sequence number
 char	cmdstr[ARB]			# command string
 int	newimage			# new image ?
 int	newcenterbuf, newcenter		# new center buffer ?, new center fit ?
 int	newskybuf, newsky		# new sky buffer ?, new sky fit ?
 int	newmagbuf, newmag		# new aperture buffer ?, new fit ?
 
+size_t	sz_val
 pointer	sp, incmd, outcmd
 int	strdic()
 
 begin
 	# Fetch the command.
 	call smark (sp)
-	call salloc (incmd, SZ_LINE, TY_CHAR)
-	call salloc (outcmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (incmd, sz_val, TY_CHAR)
+	call salloc (outcmd, sz_val, TY_CHAR)
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[incmd], SZ_LINE)
@@ -70,6 +72,7 @@ procedure ap_yimcolon (ap, cmdstr)
 pointer	ap			# pointer to the apphot structure
 char	cmdstr[ARB]		# command string
 
+size_t	sz_val
 int	ncmd
 pointer	sp, cmd
 int	strdic()
@@ -77,7 +80,8 @@ int	strdic()
 begin
 	# Fetch the command.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)
@@ -129,13 +133,14 @@ procedure ap_yycolon (ap, pl, out, stid, ptid, ltid, cmdstr, newmagbuf, newmag)
 pointer	ap		# pointer to apphot structure
 int	pl		# polygon file descriptor
 int	out		# output file descriptor
-int	stid		# output file sequence number
-int	ptid		# polygon file sequence number
-int	ltid		# coords file sequence number
+long	stid		# output file sequence number
+long	ptid		# polygon file sequence number
+long	ltid		# coords file sequence number
 char	cmdstr[ARB]	# command string
 int	newmagbuf	# new aperture buffers ?
 int	newmag		# compute new magnitudes ?
 
+size_t	sz_val
 bool	bval
 int	ncmd
 pointer	sp, cmd, str
@@ -150,8 +155,10 @@ errchk	open, close
 begin
 	# Allocate the space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)

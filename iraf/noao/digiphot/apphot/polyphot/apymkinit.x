@@ -7,8 +7,11 @@ procedure ap_ymkinit (ap)
 
 pointer	ap		# pointer to the apphot structure
 
+size_t	sz_val
+
 begin
-	call calloc (ap, LEN_APSTRUCT, TY_STRUCT)
+	sz_val = LEN_APSTRUCT
+	call calloc (ap, sz_val, TY_STRUCT)
 
 	# Set the main structure parameters.
 	call ap_defsetup (ap, 2.5)

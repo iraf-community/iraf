@@ -12,9 +12,9 @@ int	fd		# output file descriptor
 real	xver[ARB]	# coords of x vertices
 real	yver[ARB]	# coords of y vertices
 int	nver		# number of vertices
-int	id		# id number of str
-int	lid		# list id number of star
-int	pid		# polygon number
+long	id		# id number of str
+long	lid		# list id number of star
+long	pid		# polygon number
 int	cier		# centering error
 int	sier		# sky fitting error
 int	pier		# photometric error
@@ -50,13 +50,15 @@ int	cier	# centering error
 int	sier	# sky fitting error
 int	pier	# photometry error
 
+size_t	sz_val
 pointer	sp, imname
 real	apstatr()
 
 begin
 	# Allocate space.
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 
 	# Print polyphot magnitudes.
 	#call apstats (py, IMNAME, Memc[imname], SZ_FNAME)

@@ -16,6 +16,7 @@ real	x[ARB]		# x coords of vertices
 real	y[ARB]		# y coords of vertices
 int	max_nvertices	# maximum number of vertices
 
+size_t	sz_val, c_1
 real	xc, yc, r2max, r2, xtemp, ytemp
 pointer	sp, str
 int	i, nvertices, nreal, stat
@@ -24,8 +25,11 @@ real	asumr()
 int	fscan(), nscan(), strncmp(), apstati()
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Print prompts if input file is STDIN.
 	call fstats (fd, F_FILENAME, Memc[str], SZ_LINE)
@@ -103,16 +107,19 @@ begin
             # Transform the input coordinates.
             switch (apstati(py,WCSIN)) {
             case WCS_WORLD, WCS_PHYSICAL:
-                call ap_itol (py, x, y, x, y, nvertices + 1)
+		sz_val = nvertices + 1
+                call ap_itol (py, x, y, x, y, sz_val)
             case WCS_TV:
-                call ap_vtol (im, x, y, x, y, nvertices + 1)
+		sz_val = nvertices + 1
+                call ap_vtol (im, x, y, x, y, sz_val)
             default:
                 ;
             }
 
 	    # Compute the mean polygon coordinates.
-	    xc = asumr (x, nvertices) / nvertices
-	    yc = asumr (y, nvertices) / nvertices
+	    sz_val = nvertices
+	    xc = asumr (x, sz_val) / nvertices
+	    yc = asumr (y, sz_val) / nvertices
 	    call apsetr (py, PYXMEAN, xc)
 	    call apsetr (py, PYYMEAN, yc)
 	    call apsetr (py, PYCX, xc)
@@ -128,9 +135,9 @@ begin
 
             switch (apstati(py,WCSOUT)) {
             case WCS_WORLD, WCS_PHYSICAL:
-                call ap_ltoo (py, xc, yc, xc, yc, 1)
+                call ap_ltoo (py, xc, yc, xc, yc, c_1)
             case WCS_TV:
-                call ap_ltov (im, xc, yc, xc, yc, 1)
+                call ap_ltov (im, xc, yc, xc, yc, c_1)
             default:
     		;
 	    }
@@ -160,6 +167,7 @@ real	y[ARB]		# y coords of vertices
 int	max_nvertices	# maximum number of vertices
 int	idflush		# flush the imd interface ?
 
+size_t	sz_val, c_1
 int	i, nvertices, stat, wcs, key
 pointer	sp, cmd
 real	xtemp, ytemp, xc, yc, r2max, r2
@@ -168,19 +176,22 @@ int	clgcur(), apstati()
 errchk	gscur
 
 begin
+	c_1 = 1
+
 	# Reopen the device.
 	if (id != NULL)
 	    call greactivate (id, 0)
 
 	# Initialize.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Type prompt.
 	call printf (
 	    "Mark polygon vertex [space=mark,q=quit].\n")
 	stat = clgcur ("icommands", xtemp, ytemp, wcs, key, Memc[cmd], SZ_LINE)
-	call ap_vtol (im, xtemp, ytemp, xtemp, ytemp, 1)
+	call ap_vtol (im, xtemp, ytemp, xtemp, ytemp, c_1)
 
 
 	# Fetch the polygon and draw it on the display.
@@ -214,7 +225,7 @@ begin
 	        "Mark polygon vertex [space=mark,q=quit].\n")
 	    stat = clgcur ("icommands", xtemp, ytemp, wcs, key, Memc[cmd],
 	        SZ_LINE)
-	    call ap_vtol (im, xtemp, ytemp, xtemp, ytemp, 1)
+	    call ap_vtol (im, xtemp, ytemp, xtemp, ytemp, c_1)
 	}
 	call printf ("\n")
 
@@ -263,8 +274,9 @@ begin
 	    }
 
 	    # Compute and save the mean polygon coords.
-	    xc = asumr (x, nvertices) / nvertices
-	    yc = asumr (y, nvertices) / nvertices
+	    sz_val = nvertices
+	    xc = asumr (x, sz_val) / nvertices
+	    yc = asumr (y, sz_val) / nvertices
 	    call apsetr (py, PYXMEAN, xc)
 	    call apsetr (py, PYYMEAN, yc)
 	    call apsetr (py, PYCX, xc)
@@ -283,9 +295,9 @@ begin
 	    # Compute output coordinate centers.
             switch (apstati(py,WCSOUT)) {
             case WCS_WORLD, WCS_PHYSICAL:
-                call ap_ltoo (py, xc, yc, xc, yc, 1)
+                call ap_ltoo (py, xc, yc, xc, yc, c_1)
             case WCS_TV:
-                call ap_ltov (im, xc, yc, xc, yc, 1)
+                call ap_ltov (im, xc, yc, xc, yc, c_1)
             default:
                 ;
             }

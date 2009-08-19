@@ -17,25 +17,31 @@ int	delim		# delimiter character
 real	x[ARB]		# x coordinates of the polygon vertices
 real	y[ARB]		# y coordinates of the polygon vertices
 int	maxnver		# maximum number of vertices
-int	prev_num	# previous object
-int	req_num		# requested object
-int	ld		# current object
-int	pd		# current polygon
+long	prev_num	# previous object
+long	req_num		# requested object
+long	ld		# current object
+long	pd		# current polygon
 
+size_t	sz_val, c_1
+long	l_val
 real	xshift, yshift
 pointer	sp, fname
-int	stdin, nskip, ncount, nver, stat
+int	stdin, nver, stat
+long	nskip, ncount
 real	apstatr()
 int	strncmp(), ap_yget(), ap_ycoords(), apstati()
 errchk	greactivate, gdeactivate, gscur
 
 begin
+	c_1 = 1
+
 	# The coordinate list is undefined.
 	if (cl == NULL) {
 
 	    # Get the input file name.
 	    call smark (sp)
-	    call salloc (fname, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (fname, sz_val, TY_CHAR)
 	    call fstats (pl, F_FILENAME, Memc[fname], SZ_FNAME)
 
 	    # Compute the number of polygons that must be skipped.
@@ -45,7 +51,8 @@ begin
 	    } else {
 		stdin = NO
 		if (req_num <= prev_num) {
-		    call seek (pl, BOF)
+		    l_val = BOF
+		    call seek (pl, l_val)
 		    nskip = req_num
 		} else
 		    nskip = req_num - prev_num
@@ -97,7 +104,8 @@ begin
 
 	    # Get the input file name.
 	    call smark (sp)
-	    call salloc (fname, SZ_FNAME, TY_CHAR)
+	    sz_val = SZ_FNAME
+	    call salloc (fname, sz_val, TY_CHAR)
 	    call fstats (cl, F_FILENAME, Memc[fname], SZ_FNAME)
 
 	    # Compute the number of objects that must be skipped.
@@ -107,8 +115,9 @@ begin
 	    } else {
 		stdin = NO
 		if (req_num <= prev_num) {
-		    call seek (cl, BOF)
-		    call seek (pl, BOF)
+		    l_val = BOF
+		    call seek (cl, l_val)
+		    call seek (pl, l_val)
 		    pd = 0
 		    nskip = req_num
 		} else
@@ -140,21 +149,22 @@ begin
 		if (stat == THIS_OBJECT && ncount != EOF && nver > 0) {
             	    switch (apstati(py,WCSIN)) {
             	    case WCS_WORLD, WCS_PHYSICAL:
-                	call ap_itol (py, xshift, yshift, xshift, yshift, 1)
+                	call ap_itol (py, xshift, yshift, xshift, yshift, c_1)
             	    case WCS_TV:
-                	call ap_vtol (im, xshift, yshift, xshift, yshift, 1)
+                	call ap_vtol (im, xshift, yshift, xshift, yshift, c_1)
             	    default:
                 	;
             	    }
-		    call aaddkr (x, (xshift - apstatr (py, PYCX)), x, nver + 1)
-		    call aaddkr (y, (yshift - apstatr (py, PYCY)), y, nver + 1)
+		    sz_val = nver + 1
+		    call aaddkr (x, (xshift - apstatr (py, PYCX)), x, sz_val)
+		    call aaddkr (y, (yshift - apstatr (py, PYCY)), y, sz_val)
 		    call apsetr (py, PYCX, xshift)
 		    call apsetr (py, PYCY, yshift)
                     switch (apstati(py,WCSOUT)) {
             	    case WCS_WORLD, WCS_PHYSICAL:
-                	call ap_ltoo (py, xshift, yshift, xshift, yshift, 1)
+                	call ap_ltoo (py, xshift, yshift, xshift, yshift, c_1)
             	    case WCS_TV:
-                	call ap_ltov (im, xshift, yshift, xshift, yshift, 1)
+                	call ap_ltov (im, xshift, yshift, xshift, yshift, c_1)
             	    default:
     			;
             	    }

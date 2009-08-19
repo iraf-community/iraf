@@ -17,12 +17,13 @@ int	cache			# cache the input image pixels in memory
 pointer	display			# pointer to display device name
 pointer	graphics		# pointer to the graphics device
 
+size_t	sz_val
 pointer	sp, cfname, pfname, im, py, id, gd, str
 pointer	plist, clist, imlist
 int	limlist, lplist, lclist, stat, pl, cl, root, pid, cid, wcs
 int	newpy, newcoo, memstat
-int	buf_size
-size_t	req_size, old_size
+size_t	req_size, old_size, buf_size
+long	l_val
 
 pointer	gopen(), immap(), clpopnu(), imtopenp()
 int	imtlen(), clplen(), imtgetim(), clgfil(), strncmp(), strlen()
@@ -31,17 +32,21 @@ int	access(), btoi(), ap_memstat(), sizeof()
 bool	clgetb(), streq()
 errchk	gopen()
 
+include	<nullptr.inc>
+
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (coords, SZ_FNAME, TY_CHAR)
-	call salloc (polygons, SZ_FNAME, TY_CHAR)
-	call salloc (display, SZ_FNAME, TY_CHAR)
-	call salloc (graphics, SZ_FNAME, TY_CHAR)
-	call salloc (cfname, SZ_FNAME, TY_CHAR)
-	call salloc (pfname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
+	call salloc (polygons, sz_val, TY_CHAR)
+	call salloc (display, sz_val, TY_CHAR)
+	call salloc (graphics, sz_val, TY_CHAR)
+	call salloc (cfname, sz_val, TY_CHAR)
+	call salloc (pfname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Set STDOUT.
 	call fseti (STDOUT, F_FLUSHNL, YES)
@@ -124,7 +129,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 	    
 	    # Open image.
-	    im = immap (Memc[image], READ_ONLY, 0)
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
             call apimkeys (py, im, Memc[image])
 
 	    # Establish the image display viewport and window.
@@ -135,8 +140,10 @@ begin
             req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
             memstat = ap_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call ap_pcache (im, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call ap_pcache (im, l_val, buf_size)
+	    }
 
 	    # Set the polygon file name.
 	    if (lplist == 0)
@@ -206,7 +213,8 @@ begin
 	    # Close the coordinate file.
 	    if (cl != NULL) {
 		if (cid > 1) {
-		    call seek (cl, EOF)
+		    l_val = EOF
+		    call seek (cl, l_val)
 		    call fprintf (cl, ";\n")
 		}
 		call close (cl)

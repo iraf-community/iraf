@@ -13,31 +13,41 @@ pointer	im			# pointer to IRAF image
 int	cl			# coordinates file descriptor
 int	pl			# vertices list file descriptor
 int	out			# output file descriptor
-int	id			# output file sequence number
-int	ld			# coordinate list number
-int	pd			# polygon list number
+long	id			# output file sequence number
+long	ld			# coordinate list number
+long	pd			# polygon list number
 pointer	gid			# pointer to image display stream
 int	interactive		# interactive or batch mode
 
-real	apstatr()
+size_t	sz_val
 pointer	sp, x, y, xout, yout
-int	req_num, prev_num, cier, sier, pier, nvertices, delim
+int	cier, sier, pier, nvertices, delim
+long	req_num, prev_num, l_val
 int	ap_ynextobj(), ap_ycenter(), apfitsky(), ap_yfit(), apstati()
+long	apstatl()
+real	apstatr()
 data	delim /';'/
+
+include	<nullptr.inc>
 
 begin
 	# Allocate temporary space for arrays.
 	call smark (sp)
-	call salloc (x, MAX_NVERTICES + 1, TY_REAL)
-	call salloc (y, MAX_NVERTICES + 1, TY_REAL)
-	call salloc (xout, MAX_NVERTICES + 1, TY_REAL)
-	call salloc (yout, MAX_NVERTICES + 1, TY_REAL)
+	sz_val = MAX_NVERTICES + 1
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (xout, sz_val, TY_REAL)
+	call salloc (yout, sz_val, TY_REAL)
 
 	# Initialize
-	if (pl != NULL)
-	    call seek (pl, BOF)
-	if (cl != NULL)
-	    call seek (cl, BOF)
+	if (pl != NULL) {
+	    l_val = BOF
+	    call seek (pl, l_val)
+	}
+	if (cl != NULL) {
+	    l_val = BOF
+	    call seek (cl, l_val)
+	}
 
 	# Get the first polygon.
 	pd = 0
@@ -52,10 +62,10 @@ begin
 	    cier = ap_ycenter (py, im, apstatr (py, PYCX), apstatr (py, PYCY),
 	        Memr[x], Memr[y], nvertices + 1)
 	    sier = apfitsky (py, im, apstatr (py, PYCX), apstatr (py,
-	        PYCY), NULL, NULL)
+	        PYCY), NULL, NULLPTR)
 	    pier = ap_yfit (py, im, Memr[x], Memr[y],
 		nvertices + 1, apstatr (py, SKY_MODE), apstatr (py,
-		SKY_SIGMA), apstati (py, NSKY))
+		SKY_SIGMA), apstatl (py, NSKY))
 
 	    # Write the output to the standard output.
 	    if (interactive == YES) {
@@ -70,14 +80,17 @@ begin
 	        call ap_param (py, out, "polyphot")
             switch (apstati(py,WCSOUT)) {
             case WCS_WORLD, WCS_PHYSICAL:
+		sz_val = nvertices + 1
                 call ap_ltoo (py, Memr[x], Memr[y], Memr[xout], Memr[yout],
-		    nvertices + 1)
+			      sz_val)
             case WCS_TV:
+		sz_val = nvertices + 1
                 call ap_ltov (im, Memr[x], Memr[y], Memr[xout], Memr[yout],
-		    nvertices + 1)
+			      sz_val)
             default:
-		call amovr (Memr[x], Memr[xout], nvertices + 1)
-		call amovr (Memr[y], Memr[yout], nvertices + 1)
+		sz_val = nvertices + 1
+		call amovr (Memr[x], Memr[xout], sz_val)
+		call amovr (Memr[y], Memr[yout], sz_val)
             }
 	    call ap_yprint (py, out, Memr[xout], Memr[yout], nvertices, id, ld,
 	        pd, cier, sier, pier) 

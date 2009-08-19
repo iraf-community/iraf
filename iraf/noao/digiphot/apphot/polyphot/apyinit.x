@@ -15,8 +15,11 @@ real	dannulus	# width of sky annulus
 real	fwhmpsf		# fwhmpsf
 int	noise		# Noise function
 
+size_t	sz_val
+
 begin
-	call malloc (ap, LEN_APSTRUCT, TY_STRUCT)
+	sz_val = LEN_APSTRUCT
+	call malloc (ap, sz_val, TY_STRUCT)
 
 	# Set the global apphot package parameters.
 	call ap_defsetup (ap, fwhmpsf)
@@ -49,10 +52,12 @@ procedure ap_ysetup (ap)
 
 pointer	ap		# pointer to apphot strucuture
 
+size_t	sz_val
 pointer	ply
 
 begin
-	call malloc (AP_POLY(ap), LEN_PYSTRUCT, TY_STRUCT)
+	sz_val = LEN_PYSTRUCT
+	call malloc (AP_POLY(ap), sz_val, TY_STRUCT)
 	ply = AP_POLY(ap)
 	AP_PYCX(ply) = INDEFR
 	AP_PYCY(ply) = INDEFR

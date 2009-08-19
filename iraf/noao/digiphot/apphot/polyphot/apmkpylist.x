@@ -18,26 +18,31 @@ pointer	gd		# pointer to graphics display stream
 int	pid		# polygon id sequence number
 int	cid		# coordinate list sequence number
 
-int	key, nvertices, wcs, ptid, ltid, prev_num, req_num
-int	ip, colonkey, firstpoly, newpoly, delim
+size_t	sz_val
+int	ip, colonkey, firstpoly, newpoly, delim, key, nvertices, wcs
+long	ptid, ltid, prev_num, req_num, l_val
 pointer	sp, cmd, x, y, xshift, yshift
 real	wx, wy, xmean, ymean
 
-int	clgcur(), apgqverify(), apgtverify(), ap_ymkpoly(), ctoi()
+int	clgcur(), apgqverify(), apgtverify(), ap_ymkpoly(), ctol()
 int	ap_ynextobj()
 real	apstatr()
 data	delim /';'/
+
+include	<nullptr.inc>
 
 define	endswitch_  99
 
 begin
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (x, MAX_NVERTICES + 1, TY_REAL)
-	call salloc (y, MAX_NVERTICES + 1, TY_REAL)
-	call salloc (xshift, MAX_NVERTICES + 1, TY_REAL)
-	call salloc (yshift, MAX_NVERTICES + 1, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = MAX_NVERTICES + 1
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (xshift, sz_val, TY_REAL)
+	call salloc (yshift, sz_val, TY_REAL)
 
 	# Initialize the cursor read.
 	key = ' '
@@ -57,7 +62,8 @@ begin
 	    EOF) {
 
 	    # Set the current cursor coordinates.
-	    call ap_vtol (im, wx, wy, wx, wy, 1)
+	    sz_val = 1
+	    call ap_vtol (im, wx, wy, wx, wy, sz_val)
 	    call apsetr (py, CWX, wx)
 	    call apsetr (py, CWY, wy)
 
@@ -66,7 +72,7 @@ begin
 
 	    # Quit.
 	    case 'q':
-		 if (apgqverify ("polymark", NULL, key) == YES) {
+		 if (apgqverify ("polymark", NULLPTR, key) == YES) {
 		    call sfree (sp)
 		    return (apgtverify (key))
 		 }
@@ -107,7 +113,7 @@ begin
 		    # Read the next polygon.
 		    ip = ip + 1
 		    prev_num = ltid
-		    if (ctoi (Memc[cmd], ip, req_num) <= 0)
+		    if (ctol (Memc[cmd], ip, req_num) <= 0)
 			req_num = ltid + 1
 		    nvertices = ap_ynextobj (py, im, id, pl, cl, delim,
 			Memr[xshift], Memr[yshift], MAX_NVERTICES, prev_num,
@@ -179,9 +185,12 @@ begin
 	    # Rewind the polygon and coordinate lists.
 	    case 'r':
 		if (pl != NULL) {
-		    call seek (pl, BOF)
-		    if (cl != NULL)
-		        call seek (cl, BOF)
+		    l_val = BOF
+		    call seek (pl, l_val)
+		    if (cl != NULL) {
+			l_val = BOF
+		        call seek (cl, l_val)
+		    }
 		    ptid = 0
 		    ltid = 0
 		} else 
@@ -230,10 +239,10 @@ begin
 	    case 'f':
 		if (id != NULL) {
 		    if (! IS_INDEFR(xmean) && ! IS_INDEFR(ymean)) {
-		        call aaddkr (Memr[x], wx - xmean, Memr[xshift],
-			    nvertices + 1)
-		        call aaddkr (Memr[y], wy - ymean, Memr[yshift],
-			    nvertices + 1)
+		        sz_val = nvertices + 1
+		        call aaddkr (Memr[x], wx - xmean, Memr[xshift], sz_val)
+		        sz_val = nvertices + 1
+		        call aaddkr (Memr[y], wy - ymean, Memr[yshift], sz_val)
 		        call appymark (py, id, Memr[xshift], Memr[yshift],
 		            nvertices + 1, NO, NO, YES)
 			if (gd == id)
@@ -251,10 +260,10 @@ begin
 		    call ap_ywrite (py, im, cl, pl, Memr[x], Memr[y], nvertices,
 		        cid, pid, firstpoly, newpoly)
 		    if (id != NULL) {
-		        call aaddkr (Memr[x], wx - xmean, Memr[xshift],
-			    nvertices + 1)
-		        call aaddkr (Memr[y], wy - ymean, Memr[yshift],
-			    nvertices + 1)
+		        sz_val = nvertices + 1
+		        call aaddkr (Memr[x], wx - xmean, Memr[xshift], sz_val)
+		        sz_val = nvertices + 1
+		        call aaddkr (Memr[y], wy - ymean, Memr[yshift], sz_val)
 		        call appymark (py, id, Memr[xshift], Memr[yshift],
 		            nvertices + 1, NO, NO, YES)
 			if (gd == id)

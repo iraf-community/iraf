@@ -8,11 +8,13 @@ pointer py			# pointer to apphot structure
 pointer	im			# theinput image descriptor
 int	cl			# coordinates file descriptor
 int	pl			# vertices list file descriptor
-int	ld			# coordinate list number
-int	pd			# polygon list number
+long	ld			# coordinate list number
+long	pd			# polygon list number
 pointer	id			# pointer to image display stream
 
-int	req_num, prev_num, nvertices, delim
+size_t	sz_val
+long	req_num, prev_num, l_val
+int	nvertices, delim
 pointer	sp, x, y
 int	ap_ynextobj()
 data	delim /';'/
@@ -20,14 +22,19 @@ data	delim /';'/
 begin
 	# Allocate temporary space for arrays.
 	call smark (sp)
-	call salloc (x, MAX_NVERTICES + 1, TY_REAL)
-	call salloc (y, MAX_NVERTICES + 1, TY_REAL)
+	sz_val = MAX_NVERTICES + 1
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
 
 	# Rewind the polygon and coordinate files.
-	if (pl != NULL)
-	    call seek (pl, BOF)
-	if (cl != NULL)
-	    call seek (cl, BOF)
+	if (pl != NULL) {
+	    l_val = BOF
+	    call seek (pl, l_val)
+	}
+	if (cl != NULL) {
+	    l_val = BOF
+	    call seek (cl, l_val)
+	}
 
 	# Initialize.
 	pd = 0

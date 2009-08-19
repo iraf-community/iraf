@@ -16,7 +16,7 @@ real	yver[ARB]	# y vertices coords
 int	nver		# number of vertices
 real	skyval		# sky value
 real	skysig		# sigma of sky pixels
-int	nsky		# number of sky pixels
+size_t	nsky		# number of sky pixels
 
 double	flux, area
 int	noise, badpix, ier
@@ -98,11 +98,13 @@ int	nver		# number of vertices
 double	flux		# flux interior to the polygon
 double	area		# approximate area of polygon
 
+size_t	sz_val
 double	fluxx, areax, fctnx, fctny
 real	xmin, xmax, ymin, ymax, x1, x2, lx, ld
 pointer	sp, work1, work2, xintr, buf
-int	i, j, k, linemin, linemax, colmin, colmax, nintr, ier
-int	ap_yclip()
+long	i, j, k, linemin, linemax, colmin, colmax, nintr
+int	ier
+long	ap_yclip(), lint()
 pointer	imgl2r()
 
 begin
@@ -115,15 +117,17 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (work1, nver, TY_REAL)
-	call salloc (work2, nver, TY_REAL)
-	call salloc (xintr, nver, TY_REAL)
+	sz_val = nver
+	call salloc (work1, sz_val, TY_REAL)
+	call salloc (work2, sz_val, TY_REAL)
+	call salloc (xintr, sz_val, TY_REAL)
 
 	# Find the minimum and maximum x and y values of the polygon
 	# and detemine whether the polygon is partially off the image.
 
-	call alimr (xver, nver, xmin, xmax)
-	call alimr (yver, nver, ymin, ymax)
+	sz_val = nver
+	call alimr (xver, sz_val, xmin, xmax)
+	call alimr (yver, sz_val, ymin, ymax)
 	if (xmin < 0.5 || xmax > (IM_LEN(im,1) + 0.5) || ymin < 0.5 || ymax >
 	    (IM_LEN(im,2) + 0.5))
 	    ier = PY_OUTOFBOUNDS
@@ -133,8 +137,8 @@ begin
 	# Find the minimum and maximum image line numbers.
 	ymin = max (0.5, min (real (IM_LEN (im,2) + 0.5), ymin))
 	ymax = min (real (IM_LEN(im,2) + 0.5), max (0.5, ymax))
-	linemin = min (int (ymin + 0.5), int (IM_LEN(im,2)))
-	linemax = min (int (ymax + 0.5), int (IM_LEN(im,2)))
+	linemin = min (lint (ymin + 0.5), IM_LEN(im,2))
+	linemax = min (lint (ymax + 0.5), IM_LEN(im,2))
 
 	# Set up the line segment parameters and initialize fluxes and areas.
 	x1 = 0.5
@@ -165,7 +169,8 @@ begin
 	    fctny = min (i + 0.5, ymax) - max (i - 0.5, ymin)
 
 	    # Sort the x intersection points
-	    call asrtr (Memr[xintr], Memr[xintr], nintr)
+	    sz_val = nintr
+	    call asrtr (Memr[xintr], Memr[xintr], sz_val)
 
 	    # Integrate the flux in each line segment.
 	    fluxx = 0.0d0
@@ -177,8 +182,8 @@ begin
 		    Memr[xintr+j-1]))
 		xmax = min (real (IM_LEN(im,1) + 0.5), max (0.5,
 		    Memr[xintr+j]))
-		colmin = min (int (xmin + 0.5), int (IM_LEN(im,1)))
-		colmax = min (int (xmax + 0.5), int (IM_LEN(im,1)))
+		colmin = min (lint (xmin + 0.5), IM_LEN(im,1))
+		colmax = min (lint (xmax + 0.5), IM_LEN(im,1))
 
 		# Sum the contribution from a particular line segment.
 		do k = colmin, colmax {
@@ -221,11 +226,13 @@ double	flux		# flux interior to the polygon
 double	area		# approximate area of polygon
 int	badpix		# are there bad pixels
 
-int	i, j, k, linemin, linemax, colmin, colmax, nintr, ier
+size_t	sz_val
+long	i, j, k, linemin, linemax, colmin, colmax, nintr
+int	ier, j
 pointer	sp, work1, work2, xintr, buf
 real	xmin, xmax, ymin, ymax, x1, x2, lx, ld
 double	fluxx, areax, fctnx, fctny
-int	ap_yclip()
+long	ap_yclip(), lint()
 pointer	imgl2r()
 
 begin
@@ -239,15 +246,17 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (work1, nver, TY_REAL)
-	call salloc (work2, nver, TY_REAL)
-	call salloc (xintr, nver, TY_REAL)
+	sz_val = nver
+	call salloc (work1, sz_val, TY_REAL)
+	call salloc (work2, sz_val, TY_REAL)
+	call salloc (xintr, sz_val, TY_REAL)
 
 	# Find minimum and maximum y values of the polygon vertices and
 	# compute the minimum and maximum image line limits.
 
-	call alimr (xver, nver, xmin, xmax)
-	call alimr (yver, nver, ymin, ymax)
+	sz_val = nver
+	call alimr (xver, sz_val, xmin, xmax)
+	call alimr (yver, sz_val, ymin, ymax)
 	if (xmin < 0.5 || xmax > (IM_LEN(im,1) + 0.5) || ymin < 0.5 || ymax >
 	    (IM_LEN(im,2) + 0.5))
 	    ier = PY_OUTOFBOUNDS
@@ -257,8 +266,8 @@ begin
 	# Find the min and max image line numbers.
 	ymin = max (0.5, min (real (IM_LEN (im,2) + 0.5), ymin))
 	ymax = min (real (IM_LEN(im,2) + 0.5), max (0.5, ymax))
-	linemin = max (1, min (int (ymin + 0.5), int (IM_LEN(im,2))))
-	linemax = max (1, min (int (ymax + 0.5), int (IM_LEN(im,2))))
+	linemin = max (1, min (lint (ymin + 0.5), IM_LEN(im,2)))
+	linemax = max (1, min (lint (ymax + 0.5), IM_LEN(im,2)))
 
 	# Set up line segment parameters and initialize fluxes.
 	x1 = 0.5
@@ -290,7 +299,8 @@ begin
 	    fctny = min (i + 0.5, ymax) - max (i - 0.5, ymin)
 
 	    # Sort the x intersection points
-	    call asrtr (Memr[xintr], Memr[xintr], nintr)
+	    sz_val = nintr
+	    call asrtr (Memr[xintr], Memr[xintr], sz_val)
 
 	    # Integrate the flux in the line segment
 	    fluxx = 0.0d0
@@ -301,8 +311,8 @@ begin
 		xmin = min (real (IM_LEN(im,1) + 0.5), max (0.5,
 		    Memr[xintr+j-1]))
 		xmax = min (real (IM_LEN(im,1) + 0.5), max (0.5, Memr[xintr+j]))
-		colmin = min (int (xmin + 0.5), int (IM_LEN(im,1)))
-		colmax = min (int (xmax + 0.5), int (IM_LEN(im,1)))
+		colmin = min (lint (xmin + 0.5), IM_LEN(im,1))
+		colmax = min (lint (xmax + 0.5), IM_LEN(im,1))
 
 		# Sum the contribution from a particular line segment.
 		do k = colmin, colmax {
@@ -347,8 +357,11 @@ real	xranges[ARB]		# x line segments
 int	nver			# number of vertices
 real	lx, ld 			# equation of image line
 
+size_t	sz_val
 bool	collinear
-int	i, j, nintr, nplus, nzero, nneg, imin, imax, nadd
+int	ii
+long	i, j, nintr, nplus, nzero, nneg, nadd
+long	imin, imax
 real	u1, u2, u1u2, dx, dy, dd, xa, wa
 
 begin
@@ -360,10 +373,10 @@ begin
 	nintr = 0
 	#u1 = - lx * yver[1] + ld
 	u1 = lx * (- yver[1] + ld)
-	do i = 2, nver {
+	do ii = 2, nver {
 
-	    #u2 = - lx * yver[i] + ld
-	    u2 = lx * (- yver[i] + ld)
+	    #u2 = - lx * yver[ii] + ld
+	    u2 = lx * (- yver[ii] + ld)
 	    u1u2 = u1 * u2
 
 	    # Does the polygon side intersect the image line ?
@@ -375,9 +388,9 @@ begin
 
 		if ((u1 != 0.0) && (u2 != 0.0)) {
 
-		    dy = yver[i-1] - yver[i]
-		    dx = xver[i-1] - xver[i]
-		    dd = xver[i-1] * yver[i] - yver[i-1] * xver[i]
+		    dy = yver[ii-1] - yver[ii]
+		    dx = xver[ii-1] - xver[ii]
+		    dd = xver[ii-1] * yver[ii] - yver[ii-1] * xver[ii]
 		    #xa = (dx * ld - lx * dd)
 		    xa = lx * (dx * ld - dd)
 		    wa = dy * lx
@@ -399,11 +412,11 @@ begin
 
 		    if (! collinear) {
 		        nintr = nintr + 1
-			xranges[nintr] = xver[i-1]
-			if (i == 2)
+			xranges[nintr] = xver[ii-1]
+			if (ii == 2)
 			    slope[nintr] = yver[1] - yver[nver-1]
 			else
-			    slope[nintr] = yver[i-1] - yver[i-2]
+			    slope[nintr] = yver[ii-1] - yver[ii-2]
 		        if (slope[nintr] < 0.0)
 			    nneg = nneg + 1
 		        else if (slope[nintr] > 0.0)
@@ -411,11 +424,11 @@ begin
 		        else
 			    nzero = nzero + 1
 		        nintr = nintr + 1
-		        xranges[nintr] = xver[i]
+		        xranges[nintr] = xver[ii]
 			slope[nintr] = 0.0
 			nzero = nzero + 1
 		    } else {
-		        xranges[nintr] = xver[i]
+		        xranges[nintr] = xver[ii]
 			slope[nintr] = 0.0
 			nzero = nzero + 1
 		    }
@@ -428,14 +441,14 @@ begin
 
 		} else if (u1 != 0.0) {
 
-		    if (i == nver) {
+		    if (ii == nver) {
 		        dx = (xver[2] - xver[nver])
 			dy = (yver[2] - yver[nver])
 			dd = dy * (yver[nver-1] - yver[nver])
 		    } else {
-			dx = (xver[i+1] - xver[i])
-			dy = (yver[i+1] - yver[i])
-			dd = dy * (yver[i-1] - yver[i])
+			dx = (xver[ii+1] - xver[ii])
+			dy = (yver[ii+1] - yver[ii])
+			dd = dy * (yver[ii-1] - yver[ii])
 		    }
 
 		    # Test whether the point is collinear with the point
@@ -443,8 +456,8 @@ begin
 
 		    if (dy != 0.0) {
 			nintr = nintr + 1
-			xranges[nintr] = xver[i]
-			slope[nintr] = yver[i] - yver[i-1]
+			xranges[nintr] = xver[ii]
+			slope[nintr] = yver[ii] - yver[ii-1]
 		        if (slope[nintr] < 0.0)
 			    nneg = nneg + 1
 		        else if (slope[nintr] > 0.0)
@@ -458,7 +471,7 @@ begin
 
 		    if (dd > 0.0) {
 			nintr = nintr + 1
-			xranges[nintr] = xver[i]
+			xranges[nintr] = xver[ii]
 			slope[nintr] = dy
 		        if (slope[nintr] < 0.0)
 			    nneg = nneg + 1
@@ -492,7 +505,8 @@ begin
 	    return (nintr)
 
 	# Find the minimum and maximum intersection points.
-	call ap_alimr (xranges, nintr, u1, u2, imin, imax)
+	sz_val = nintr
+	call ap_alimr (xranges, sz_val, u1, u2, imin, imax)
 
 	# Check for vertices at the ends of the ranges.
 
@@ -531,23 +545,27 @@ begin
 
 	# Reorder the x ranges and slopes if necessary. 
 	if ((imax < imin) && ! (imin == nintr && imax == 1)) {
-	    call amovr (xranges, xintr, nintr)
+	    sz_val = nintr
+	    call amovr (xranges, xintr, sz_val)
 	    do i = 1, imax
 	        xranges[nintr-imax+i] = xintr[i]
 	    do i = imin, nintr
 	        xranges[i-imax] = xintr[i]
-	    call amovr (slope, xintr, nintr)
+	    sz_val = nintr
+	    call amovr (slope, xintr, sz_val)
 	    do i = 1, imax
 	        slope[nintr-imax+i] = xintr[i]
 	    do i = imin, nintr
 	        slope[i-imax] = xintr[i]
 	} else if ((imin < imax) && ! (imin == 1 && imax == nintr)) {
-	    call amovr (xranges, xintr, nintr)
+	    sz_val = nintr
+	    call amovr (xranges, xintr, sz_val)
 	    do i = 1, imin
 		xranges[nintr-imin+i] = xintr[i]
 	    do i = imax, nintr
 		xranges[i-imin] = xintr[i]
-	    call amovr (slope, xintr, nintr)
+	    sz_val = nintr
+	    call amovr (slope, xintr, sz_val)
 	    do i = 1, imin
 		slope[nintr-imin+i] = xintr[i]
 	    do i = imax, nintr

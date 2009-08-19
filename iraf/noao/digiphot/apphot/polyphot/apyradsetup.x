@@ -13,18 +13,20 @@ pointer	im			# pointer to the IRAF image
 pointer	id			# pointer to the image display
 pointer	gd			# pointer to graphics stream
 int	out			# output file descriptor
-int	stid			# output file sequence number
+long	stid			# output file sequence number
 real	x[ARB]			# array of x vertices
 real	y[ARB]			# array of y vertices
 int	max_nvertices		# maximum number of vertices
 
+size_t	sz_val
 int	nvertices, cier, sier, pier, key, wcs
 pointer	sp, str, cmd
 real	rmin, rmax, imin, imax, u1, u2, v1, v2, x1, x2, y1, y2
 real	xcenter, ycenter, xc, yc, rval
 
 int	ap_ycenter(), clgcur(), ap_showplot()
-int	apfitsky(),  ap_yfit(), apstati(), ap_ymkpoly()
+int	apfitsky(),  ap_yfit(), ap_ymkpoly()
+long	apstatl()
 real	apstatr(), ap_cfwhmpsf(), ap_ccapert(), ap_cannulus(), ap_csigma()
 real	ap_cdannulus(), ap_cdatamin(), ap_cdatamax()
 real	ap_crgrow(), ap_crclean(), ap_crclip()
@@ -62,8 +64,9 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (cmd, sz_val, TY_CHAR)
 
         call printf (
 	"Waiting for setup menu command (?=help, v=default setup, q=quit):\n")
@@ -128,7 +131,7 @@ begin
 	sier = apfitsky (ap, im, apstatr (ap, PYCX), apstatr (ap, PYCY),
 	    NULL, gd)
 	pier = ap_yfit (ap, im, x, y, nvertices + 1, apstatr (ap, SKY_MODE),
-	    apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
+	    apstatr (ap, SKY_SIGMA), apstatl (ap, NSKY))
 	call ap_qyprint (ap, cier, sier, pier)
 
 	return (nvertices)

@@ -18,18 +18,25 @@ int	pid		# polygon list index
 int	firstpoly	# first polygon measured
 int	newpoly		# new polygon
 
+size_t	c_1
 real	xtemp, ytemp
 int	i
+long	l_val
 real	apstatr()
 int	apstati()
 
 begin
+	c_1 = 1
+
 	# Make sure the output files are at EOF.
 	if (pl == NULL)
 	    return
-	call seek (pl, EOF)
-	if (cl != NULL)
-	    call seek (cl, EOF)
+	l_val = EOF
+	call seek (pl, l_val)
+	if (cl != NULL) {
+	    l_val = EOF
+	    call seek (cl, l_val)
+	}
 
 	if (newpoly == YES) {
 
@@ -41,9 +48,9 @@ begin
 	    do i = 1, nvertices {
                 switch (apstati(py, WCSOUT)) {
                 case WCS_WORLD, WCS_PHYSICAL:
-                    call ap_ltoo (py, x[i], y[i], xtemp, ytemp, 1)
+                    call ap_ltoo (py, x[i], y[i], xtemp, ytemp, c_1)
                 case WCS_TV:
-                    call ap_ltov (im, x[i], y[i], xtemp, ytemp, 1)
+                    call ap_ltov (im, x[i], y[i], xtemp, ytemp, c_1)
                 default:
 		    xtemp = x[i]
 		    ytemp = y[i]
@@ -69,10 +76,10 @@ begin
             switch (apstati(py, WCSOUT)) {
             case WCS_WORLD, WCS_PHYSICAL:
                 call ap_ltoo (py, apstatr(py,CWX), apstatr(py,CWY), xtemp,
-		    ytemp, 1)
+			      ytemp, c_1)
             case WCS_TV:
                 call ap_ltov (im, apstatr(py,CWX), apstatr(py,CWY), xtemp,
-		    ytemp, 1)
+			      ytemp, c_1)
             default:
 		xtemp = apstatr (py, CWX)
 		ytemp = apstatr (py, CWY)

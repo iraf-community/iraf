@@ -9,8 +9,9 @@ procedure ap_yconfirm (ap, out, stid)
 
 pointer	ap		# pointer to the apphot structure
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 
+size_t	sz_val
 pointer	sp, cstr, sstr
 real	fwhmpsf, capert, annulus, dannulus, skysigma
 real	datamin, datamax
@@ -20,8 +21,9 @@ real	ap_vannulus(), ap_vdannulus(), ap_vdatamin(), ap_vdatamax()
 
 begin
 	call smark (sp)
-	call salloc (cstr, SZ_FNAME, TY_CHAR)
-	call salloc (sstr, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (cstr, sz_val, TY_CHAR)
+	call salloc (sstr, sz_val, TY_CHAR)
 
 	call printf ("\n")
 

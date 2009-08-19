@@ -20,11 +20,13 @@ int	verify			# verify critical parameters
 int	update			# update the critical parameters
 int	verbose			# print messages
 
+size_t	sz_val
 pointer	sp, outfname, cname, im, py, id, gd, str
 pointer	plist, olist, clist, imlist
-int	limlist, lplist, lolist, lclist, sid, lid, pid, pl, cl, out, root, stat
-int	memstat, wcs, buf_size
-size_t	req_size, old_size
+int	limlist, lplist, lolist, lclist, pl, cl, out, root, stat, memstat, wcs
+long	sid, lid, pid
+size_t	req_size, old_size, buf_size
+long	l_val
 
 pointer	immap(), gopen(), clpopnu(), imtopenp()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), strncmp()
@@ -33,18 +35,22 @@ int	clgwrd(), ap_memstat(), sizeof()
 bool	clgetb(), streq()
 errchk	gopen
 
+include	<nullptr.inc>
+
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (coords, SZ_FNAME, TY_CHAR)
-	call salloc (polygon, SZ_FNAME, TY_CHAR)
-	call salloc (graphics, SZ_FNAME, TY_CHAR)
-	call salloc (display, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (cname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
+	call salloc (polygon, sz_val, TY_CHAR)
+	call salloc (graphics, sz_val, TY_CHAR)
+	call salloc (display, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (cname, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Set STDOUT.
 	call fseti (STDOUT, F_FLUSHNL, YES)
@@ -101,7 +107,8 @@ begin
 
 	# Confirm the algorithm parameters.
 	if (verify == YES && interactive == NO) {
-	    call ap_yconfirm (py, NULL, 1)
+	    l_val = 1
+	    call ap_yconfirm (py, NULL, l_val)
 	    if (update == YES)
 		call ap_pypars (py)
 	}
@@ -162,7 +169,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 	    
 	    # Open image.
-	    im = immap (Memc[image], READ_ONLY, 0)
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call apimkeys (py, im, Memc[image])
 	    if ((id != NULL) && (id != gd))
 		call ap_gswv (id, Memc[image], im, 4)
@@ -171,8 +178,10 @@ begin
             req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
             memstat = ap_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call ap_pcache (im, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call ap_pcache (im, l_val, buf_size)
+	    }
 
 	    # Open the polygons file.
 	    if (lplist <= 0) {
@@ -192,7 +201,8 @@ begin
 		    pl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 		} else {
 		    call apstats (py, PYNAME, Memc[outfname], SZ_FNAME)
-		    call seek (pl, BOF)
+		    l_val = BOF
+		    call seek (pl, l_val)
 		}
 	    }
 	    call apsets (py, PYNAME, Memc[outfname])
@@ -217,7 +227,8 @@ begin
 	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 		} else {
 		    call apstats (py, CLNAME, Memc[outfname], SZ_FNAME)
-		    call seek (cl, BOF)
+		    l_val = BOF
+		    call seek (cl, l_val)
 		}
 	    }
 	    call apsets (py, CLNAME, Memc[outfname])
@@ -248,13 +259,13 @@ begin
 	    # Do the photometry.
 	    if (interactive == NO) {
 		if (Memc[cname] != EOS)
-		    stat = ap_yphot (py, im, cl, pl, NULL, NULL, out, sid, NO,
-			cache)
+		    stat = ap_yphot (py, im, cl, pl, NULLPTR, NULLPTR, out,
+				     sid, NO, cache)
 		else if (pl != NULL) {
 		    lid = 0
 		    pid = 0
-		    call ap_ybphot (py, im, cl, pl, out, sid, lid, pid, NULL,
-		        verbose)
+		    call ap_ybphot (py, im, cl, pl, out, sid, lid, pid,
+				    NULLPTR, verbose)
 		    stat = NO
 		} else
 		    stat = NO

@@ -19,21 +19,24 @@ int	pl		# starlist file descriptor
 pointer	gd		# pointer to graphcis stream
 pointer	id		# pointer to image display stream
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 int	interactive	# interactive mode
 int	cache		# cache the input image pixels
 
+size_t	sz_val, c_1
 real	wx, wy
 pointer	sp, x, y, xout, yout, cmd
-int	nvertices, cier, sier, pier, wcs, key, ip, colonkey
-int	prev_num, req_num, ptid, ltid, delim, newlist, newimage
-int	newcenterbuf, newcenter, newskybuf, newsky, newmagbuf, newmag
-int	buf_size, memstat
-size_t	req_size, old_size
+int	nvertices, cier, sier, pier, wcs, key, ip, colonkey, newlist, newimage
+int	newcenterbuf, newcenter, newskybuf, newsky, newmagbuf, newmag, memstat
+int	delim
+long	ptid, ltid, prev_num, req_num
+size_t	req_size, old_size, buf_size
+long	l_val, c_0
 
 real	apstatr()
 int	ap_ymkpoly(), ap_yfit(), clgcur(), apfitsky(), aprefitsky()
-int	apstati(), ctoi(), ap_ynextobj(), ap_ycenter(), ap_yrecenter()
+int	apstati(), ctol(), ap_ynextobj(), ap_ycenter(), ap_yrecenter()
+long	apstatl()
 int	apgqverify(), apgtverify(), ap_yradsetup(), apnew(), ap_avsky()
 int	ap_memstat(), sizeof()
 bool	fp_equalr()
@@ -42,13 +45,18 @@ data	delim /';'/
 define	endswitch_  99
 
 begin
+	c_0 = 0
+	c_1 = 1
+
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (x, MAX_NVERTICES + 1, TY_REAL)
-	call salloc (y, MAX_NVERTICES + 1, TY_REAL)
-	call salloc (xout, MAX_NVERTICES + 1, TY_REAL)
-	call salloc (yout, MAX_NVERTICES + 1, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = MAX_NVERTICES + 1
+	call salloc (x, sz_val, TY_REAL)
+	call salloc (y, sz_val, TY_REAL)
+	call salloc (xout, sz_val, TY_REAL)
+	call salloc (yout, sz_val, TY_REAL)
 
 	# Initialize the cursor read.
 	key = ' '
@@ -72,7 +80,7 @@ begin
 	    EOF) {
 
 	    # Store the current coordinates.
-	    call ap_vtol (im, wx, wy, wx, wy, 1)
+	    call ap_vtol (im, wx, wy, wx, wy, c_1)
 	    call apsetr (py, CWX, wx)
 	    call apsetr (py, CWY, wy)
 
@@ -158,9 +166,12 @@ begin
 	    # Rewind the polygon and coordinate lists.
 	    case 'r':
 		if (pl != NULL) {
-		    call seek (pl, BOF)
-		    if (cl != NULL)
-		        call seek (cl, BOF)
+		    l_val = BOF
+		    call seek (pl, l_val)
+		    if (cl != NULL) {
+			l_val = BOF
+		        call seek (cl, l_val)
+		    }
 		    ptid = 0
 		    ltid = 0
 		} else if (interactive == YES)
@@ -193,7 +204,7 @@ begin
 		    # Get the next polygon.
 		    ip = ip + 1
 		    prev_num = ltid
-		    if (ctoi (Memc[cmd], ip, req_num) <= 0)
+		    if (ctol (Memc[cmd], ip, req_num) <= 0)
 		        req_num = ltid + 1
 		    nvertices = ap_ynextobj (py, im, id, pl, cl, delim, Memr[x],
 			Memr[y], MAX_NVERTICES, prev_num, req_num, ltid, ptid)
@@ -220,7 +231,7 @@ begin
 		        PYCY), NULL, gd)
 		    pier = ap_yfit (py, im, Memr[x], Memr[y], nvertices + 1,
 		        apstatr (py, SKY_MODE), apstatr (py, SKY_SIGMA),
-			apstati (py, NSKY))
+			apstatl (py, NSKY))
 		    if (interactive == YES)
 		        call ap_qyprint (py, cier, sier, pier)
 
@@ -241,21 +252,24 @@ begin
 
             	    switch (apstati(py,WCSOUT)) {
             	    case WCS_WORLD, WCS_PHYSICAL:
+                	sz_val = nvertices + 1
                 	call ap_ltoo (py, Memr[x], Memr[y], Memr[xout],
-			    Memr[yout], nvertices + 1)
+				      Memr[yout], sz_val)
             	    case WCS_TV:
+                	sz_val = nvertices + 1
                 	call ap_ltov (im, Memr[x], Memr[y], Memr[xout],
-			    Memr[yout], nvertices + 1)
+				      Memr[yout], sz_val)
             	    default:
-			call amovr (Memr[x], Memr[xout], nvertices + 1)
-			call amovr (Memr[y], Memr[yout], nvertices + 1)
+			sz_val = nvertices + 1
+			call amovr (Memr[x], Memr[xout], sz_val)
+			call amovr (Memr[y], Memr[yout], sz_val)
             	    }
 		    if (newlist == YES)
 		        call ap_yprint (py, out, Memr[xout], Memr[yout],
 			    nvertices, stid, ltid, ptid, cier, sier, pier)
 		    else
 			call ap_yprint (py, out, Memr[xout], Memr[yout],
-			    nvertices, stid, 0, ptid, cier, sier, pier)
+			    nvertices, stid, c_0, ptid, cier, sier, pier)
 
 		     # Set up for the next object.
 		     stid = stid + 1
@@ -277,8 +291,10 @@ begin
                     req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                         sizeof (IM_PIXTYPE(im))
                     memstat = ap_memstat (cache, req_size, old_size)
-                    if (memstat == YES)
-                        call ap_pcache (im, INDEFI, buf_size)
+                    if (memstat == YES) {
+			l_val = INDEFL
+                        call ap_pcache (im, l_val, buf_size)
+		    }
 		}
 		newimage = NO
 
@@ -318,7 +334,7 @@ begin
 		    PYCY), NULL, gd)
 		pier = ap_yfit (py, im, Memr[x], Memr[y], nvertices + 1,
 		    apstatr (py, SKY_MODE), apstatr (py, SKY_SIGMA),
-		    apstati (py, NSKY))
+		    apstatl (py, NSKY))
 	        if (interactive == YES)
 	            call ap_qyprint (py, cier, sier, pier)
 
@@ -338,21 +354,24 @@ begin
 		    call ap_param (py, out, "polyphot")
                 switch (apstati(py,WCSOUT)) {
                 case WCS_WORLD, WCS_PHYSICAL:
+                    sz_val = nvertices + 1
                     call ap_ltoo (py, Memr[x], Memr[y], Memr[xout], Memr[yout],
-			nvertices + 1)
+				  sz_val)
                 case WCS_TV:
+                    sz_val = nvertices + 1
                     call ap_ltov (im, Memr[x], Memr[y], Memr[xout], Memr[yout],
-			nvertices + 1)
+				  sz_val)
                 default:
-		    call amovr (Memr[x], Memr[xout], nvertices + 1)
-		    call amovr (Memr[y], Memr[yout], nvertices + 1)
+		    sz_val = nvertices + 1
+		    call amovr (Memr[x], Memr[xout], sz_val)
+		    call amovr (Memr[y], Memr[yout], sz_val)
                 }
 		if (newlist == YES)
 		    call ap_yprint (py, out, Memr[xout], Memr[yout], nvertices,
 		        stid, ltid, ptid, cier, sier, pier)
 		else
 		    call ap_yprint (py, out, Memr[xout], Memr[yout], nvertices,
-		        stid, 0, ptid, cier, sier, pier)
+		        stid, c_0, ptid, cier, sier, pier)
 
 		# Set up for the next object.
 		stid = stid + 1
@@ -454,7 +473,7 @@ begin
 		        nvertices + 1, cier)
 		pier = ap_yfit (py, im, Memr[x], Memr[y], nvertices + 1,
 		    apstatr (py, SKY_MODE), apstatr (py, SKY_SIGMA),
-		    apstati (py, NSKY))
+		    apstatl (py, NSKY))
 		if (interactive == YES)
 		    call ap_qyprint (py, cier, sier, pier)
 		if (id != NULL) {
@@ -474,21 +493,24 @@ begin
 		        call ap_param (py, out, "polyphot")
             	    switch (apstati(py,WCSOUT)) {
             	    case WCS_WORLD, WCS_PHYSICAL:
+                	sz_val = nvertices + 1
                 	call ap_ltoo (py, Memr[x], Memr[y], Memr[xout],
-			    Memr[yout], nvertices + 1)
+				      Memr[yout], sz_val)
             	    case WCS_TV:
+                	sz_val = nvertices + 1
                 	call ap_ltov (im, Memr[x], Memr[y], Memr[xout],
-			    Memr[yout], nvertices + 1)
+				      Memr[yout], sz_val)
             	    default:
-		        call amovr (Memr[x], Memr[xout], nvertices + 1)
-		        call amovr (Memr[y], Memr[yout], nvertices + 1)
+		        sz_val = nvertices + 1
+		        call amovr (Memr[x], Memr[xout], sz_val)
+		        call amovr (Memr[y], Memr[yout], sz_val)
             	    }
 		    if (newlist == YES)
 		        call ap_yprint (py, out, Memr[xout], Memr[yout],
 			    nvertices, stid, ltid, ptid, cier, sier, pier)
 		    else
 		        call ap_yprint (py, out, Memr[xout], Memr[yout],
-			    nvertices, stid, 0, ptid, cier, sier, pier)
+			    nvertices, stid, c_0, ptid, cier, sier, pier)
 		    stid = stid + 1
 		}
 
@@ -521,7 +543,7 @@ begin
 		    sier = aprefitsky (py, im, gd)
 		pier = ap_yfit (py, im, Memr[x], Memr[y], nvertices + 1,
 		    apstatr (py, SKY_MODE), apstatr (py, SKY_SIGMA),
-		    apstati (py, NSKY))
+		    apstatl (py, NSKY))
 
 		if (interactive == YES)
 		    call ap_qyprint (py, cier, sier, pier)
@@ -545,21 +567,24 @@ begin
 		        call ap_param (py, out, "polyphot")
             	    switch (apstati(py,WCSOUT)) {
             	    case WCS_WORLD, WCS_PHYSICAL:
+                	sz_val = nvertices + 1
                 	call ap_ltoo (py, Memr[x], Memr[y], Memr[xout],
-			    Memr[yout], nvertices + 1)
+				      Memr[yout], sz_val)
             	    case WCS_TV:
+                	sz_val = nvertices + 1
                 	call ap_ltov (im, Memr[x], Memr[y], Memr[xout],
-			    Memr[yout], nvertices + 1)
+				      Memr[yout], sz_val)
             	    default:
-		        call amovr (Memr[x], Memr[xout], nvertices + 1)
-		        call amovr (Memr[y], Memr[yout], nvertices + 1)
+		        sz_val = nvertices + 1
+		        call amovr (Memr[x], Memr[xout], sz_val)
+		        call amovr (Memr[y], Memr[yout], sz_val)
             	    }
 		    if (newlist == YES)
 		        call ap_yprint (py, out, Memr[xout], Memr[yout],
 			    nvertices, stid, ltid, ptid, cier, sier, pier)
 		    else
 		        call ap_yprint (py, out, Memr[xout], Memr[yout],
-			    nvertices, stid, 0, ptid, cier, sier, pier)
+			    nvertices, stid, c_0, ptid, cier, sier, pier)
 		    stid = stid + 1
 		}
 
