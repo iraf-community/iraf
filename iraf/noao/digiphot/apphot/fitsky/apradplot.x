@@ -10,18 +10,19 @@ int procedure ap_radplot (gd, gt, skypix, coords, index, nskypix, sxc, syc,
 pointer	gd			# pointer to graphics stream
 pointer	gt			# pointer to gtools structure
 real	skypix[ARB]		# array of sky pixels
-int	coords[ARB]		# array of sky coordinates
-int	index[ARB]		# the index array
-int	nskypix			# number of sky pixels
+long	coords[ARB]		# array of sky coordinates
+long	index[ARB]		# the index array
+size_t	nskypix			# number of sky pixels
 real	sxc, syc		# sky subraster center
-int	snx, sny		# sky subraster size
+size_t	snx, sny		# sky subraster size
 real	scale			# the image scale
 real	sky_mode		# computed sky value
 real	sky_sigma		# computed sigma of sky pixels
 real	sky_skew		# computed skew of sky pixels
-int	nsky			# number of sky pixels used in fit
-int	nsky_reject		# number of rejected sky pixels
+size_t	nsky			# number of sky pixels used in fit
+size_t	nsky_reject		# number of rejected sky pixels
 
+size_t	sz_val
 double	sumpx, sumsqpx, sumcbpx
 int	wcs, key
 pointer	sp, r, cmd
@@ -45,7 +46,8 @@ begin
 
 	call smark (sp)
 	call salloc (r, nskypix, TY_REAL)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Compute an initial guess at the data characteristics.
 	nsky = nskypix

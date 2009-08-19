@@ -12,11 +12,12 @@ include "../lib/fitsky.h"
 procedure ap_splot (ap, sid, gd, makeplot)
 
 pointer	ap		# pointer to the apphot structure
-int	sid		# id number of the star
+long	sid		# id number of the star
 pointer	gd		# graphics stream
 int	makeplot	# make a plot
 
-int	nx, ny, nskypix
+size_t	sz_val
+size_t	nx, ny, nskypix
 pointer	sp, sky, str, r, gt
 real	xcenter, ycenter, rmin, rmax, imin, imax
 real	u1, u2, v1, v2, x1, x2, y1, y2
@@ -47,11 +48,13 @@ begin
 
 	# Allocate working space
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (r, nskypix, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = nskypix
+	call salloc (r, sz_val, TY_REAL)
 
 	# Compute the radii and the plot limits.
-	call ap_xytor (Memi[AP_COORDS(sky)], Memi[AP_INDEX(sky)],
+	call ap_xytor (Meml[AP_COORDS(sky)], Meml[AP_INDEX(sky)],
 	    Memr[r], nskypix, AP_SXC(sky), AP_SYC(sky), nx)
 	call alimr (Memr[r], nskypix, rmin, rmax)
 	rmin = rmin - 1.0
@@ -69,7 +72,7 @@ begin
 	call apstats (ap, IMROOT, Memc[str], SZ_LINE)
 	call sprintf (Memc[str], SZ_LINE, "%s  Star %d")
 	    call pargstr (Memc[str])
-	    call pargi (sid)
+	    call pargl (sid)
 	gt = ap_gtinit (Memc[str], apstatr (ap,OSXCUR), apstatr(ap,OSYCUR))
 	
 	# Draw the plot.
@@ -100,16 +103,20 @@ pointer	ap		# apphot pointer
 real	xmin, xmax	# minimum and maximum radial distance
 real	ymin, ymax	# minimum and maximum of the y axis
 
+size_t	sz_val
 int	fd
 pointer	sp, str, title
 real	aspect, scale, vx1, vx2, vy1, vy2
-int	apstati(), stropen()
+int	stropen()
+long	apstatl()
 real	apstatr(), gstatr()
 
 begin
 	call smark (sp)
-	call salloc (str, 3 * SZ_LINE, TY_CHAR)
-	call salloc (title, SZ_LINE, TY_CHAR)
+	sz_val = 3 * SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
 
 	# Encode the parameter string.
 	fd = stropen (Memc[str], 3 * SZ_LINE, WRITE_ONLY)
@@ -123,8 +130,8 @@ begin
 	    call pargr (apstatr (ap, SKY_MODE))
 	    call pargr (apstatr (ap, SKY_SIGMA))
 	    call pargr (apstatr (ap, SKY_SKEW))
-	    call pargi (apstati (ap, NSKY))
-	    call pargi (apstati (ap, NSKY_REJECT))
+	    call pargl (apstatl (ap, NSKY))
+	    call pargl (apstatl (ap, NSKY_REJECT))
 
 	call gt_gets (gt, GTTITLE, Memc[title], SZ_LINE)
 	call fprintf (fd, "%s\n")
@@ -167,13 +174,15 @@ pointer	ap		# apphot structure
 real	xmin, xmax	# min and max of x axis
 real	ymin, ymax	# min and max of y axis
 
+size_t	sz_val
 pointer	sp, str
 real	annulus, dannulus, sigma, skyval, skysigma
 real	apstatr ()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 	call gseti (gd, G_PLTYPE, GL_DASHED)
 
 	# Mark the inner sky annulus.

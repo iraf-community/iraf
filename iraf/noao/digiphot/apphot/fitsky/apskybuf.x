@@ -15,10 +15,10 @@ pointer	ap		# pointer to apphot structure
 pointer	im		# pointer to the IRAF image
 real	wx, wy		# center coordinates
 
-int	lenbuf
+size_t	lenbuf
 pointer	sky
 real	annulus, dannulus, datamin, datamax
-int	ap_skypix(), ap_bskypix()
+long	ap_skypix(), ap_bskypix()
 
 begin
 	# Check for 0 radius annulus.
@@ -36,11 +36,11 @@ begin
 		call mfree (AP_SKYPIX(sky), TY_REAL)
 	    call malloc (AP_SKYPIX(sky), lenbuf, TY_REAL)
 	    if (AP_COORDS(sky) != NULL)
-		call mfree (AP_COORDS(sky), TY_INT)
-	    call malloc (AP_COORDS(sky), lenbuf, TY_INT)
+		call mfree (AP_COORDS(sky), TY_LONG)
+	    call malloc (AP_COORDS(sky), lenbuf, TY_LONG)
 	    if (AP_INDEX(sky) != NULL)
-		call mfree (AP_INDEX(sky), TY_INT)
-	    call malloc (AP_INDEX(sky), lenbuf, TY_INT)
+		call mfree (AP_INDEX(sky), TY_LONG)
+	    call malloc (AP_INDEX(sky), lenbuf, TY_LONG)
 	    if (AP_SWGT(sky) != NULL)
 		call mfree (AP_SWGT(sky), TY_REAL)
 	    call malloc (AP_SWGT(sky), lenbuf, TY_REAL)
@@ -50,7 +50,7 @@ begin
 	# Fetch the sky pixels.
 	if (IS_INDEFR(AP_DATAMIN(ap)) && IS_INDEFR(AP_DATAMAX(ap))) {
 	    AP_NSKYPIX(sky) = ap_skypix (im, wx, wy, annulus, (annulus +
-	        dannulus), Memr[AP_SKYPIX(sky)], Memi[AP_COORDS(sky)],
+	        dannulus), Memr[AP_SKYPIX(sky)], Meml[AP_COORDS(sky)],
 		AP_SXC(sky), AP_SYC(sky), AP_SNX(sky), AP_SNY(sky))
 	    AP_NBADSKYPIX(sky) = 0
 	} else {
@@ -64,7 +64,7 @@ begin
 		datamax = AP_DATAMAX(ap)
 	    AP_NSKYPIX(sky) = ap_bskypix (im, wx, wy, annulus, (annulus +
 	        dannulus), datamin, datamax, Memr[AP_SKYPIX(sky)],
-		Memi[AP_COORDS(sky)], AP_SXC(sky), AP_SYC(sky), AP_SNX(sky),
+		Meml[AP_COORDS(sky)], AP_SXC(sky), AP_SYC(sky), AP_SNX(sky),
 		AP_SNY(sky), AP_NBADSKYPIX(sky))
 	}
 
@@ -80,18 +80,18 @@ end
 
 # AP_SKYPIX -- Procedure to fetch the sky pixels from the image
 
-int procedure ap_skypix (im, wx, wy, rin, rout, skypix, coords, xc, yc,
-        nx, ny)
+long procedure ap_skypix (im, wx, wy, rin, rout, skypix, coords, xc, yc,
+			  nx, ny)
 
 pointer	im		# pointer to IRAF image
 real	wx, wy		# center of sky annulus
 real	rin, rout	# inner and outer radius of sky annulus
 real	skypix[ARB]	# skypixels
-int	coords[ARB]	# sky subraster coordinates [i + nx * (j - 1)]
+long	coords[ARB]	# sky subraster coordinates [i + nx * (j - 1)]
 real	xc, yc		# center of sky subraster
-int	nx, ny		# max dimensions of sky subraster (output)
+size_t	nx, ny		# max dimensions of sky subraster (output)
 
-int	i, j, ncols, nlines, c1, c2, l1, l2, nskypix
+long	nskypix, i, j, ncols, nlines, c1, c2, l1, l2
 pointer	buf
 real	xc1, xc2, xl1, xl2, rin2, rout2, rj2, r2
 pointer	imgs2r()
@@ -161,8 +161,8 @@ end
 
 # AP_BSKYPIX -- Procedure to fetch the sky pixels from the image
 
-int procedure ap_bskypix (im, wx, wy, rin, rout, datamin, datamax,
-	skypix, coords, xc, yc, nx, ny, nbad)
+long procedure ap_bskypix (im, wx, wy, rin, rout, datamin, datamax,
+			   skypix, coords, xc, yc, nx, ny, nbad)
 
 pointer	im		# pointer to IRAF image
 real	wx, wy		# center of sky annulus
@@ -170,12 +170,12 @@ real	rin, rout	# inner and outer radius of sky annulus
 real	datamin		# minimum good value
 real	datamax		# maximum good value
 real	skypix[ARB]	# skypixels
-int	coords[ARB]	# sky subraster coordinates [i + nx * (j - 1)]
+long	coords[ARB]	# sky subraster coordinates [i + nx * (j - 1)]
 real	xc, yc		# center of sky subraster
-int	nx, ny		# max dimensions of sky subraster (output)
-int	nbad		# number of bad pixels
+size_t	nx, ny		# max dimensions of sky subraster (output)
+size_t	nbad		# number of bad pixels
 
-int	i, j, ncols, nlines, c1, c2, l1, l2, nskypix
+long	nskypix, i, j, ncols, nlines, c1, c2, l1, l2
 pointer	buf
 real	xc1, xc2, xl1, xl2, rin2, rout2, rj2, r2, pixval
 pointer	imgs2r()

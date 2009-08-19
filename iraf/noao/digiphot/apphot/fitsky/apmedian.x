@@ -10,24 +10,26 @@ int procedure ap_median (skypix, coords, wgt, index, nskypix, snx, sny, losigma,
 	nsky_reject)
 
 real	skypix[ARB]		# unsorted array of sky pixels
-int	coords[ARB]		# coordinate array for regions growing
+long	coords[ARB]		# coordinate array for regions growing
 real	wgt[ARB]		# array of weights for rejections
-int	index[ARB]		# sky pixel indices in sort order
-int	nskypix			# total number of sky pixels
-int	snx, sny		# dimensions of the sky subraster
+long	index[ARB]		# sky pixel indices in sort order
+size_t	nskypix			# total number of sky pixels
+size_t	snx, sny		# dimensions of the sky subraster
 real	losigma, hisigma	# upper and lower sigma for rejection
 real	rgrow			# radius of region growing
 int	maxiter			# maximum number of cycles of rejection
 real	sky_med			# computed sky value
 real	sky_sigma		# the computed sky sigma
 real	sky_skew		# skewness of sky distribution
-int	nsky			# the number of sky pixels used
-int	nsky_reject		# the number of sky pixels rejected
+size_t	nsky			# the number of sky pixels used
+size_t	nsky_reject		# the number of sky pixels rejected
 
 double  dsky, sumpx, sumsqpx, sumcbpx
-int	i, j, ilo, ihi, il, ih, med, medcut
+int	i
+long	j, ilo, ihi, il, ih, med, medcut
 real	sky_zero, sky_mean, locut, hicut, dmin, dmax
-int	ap_grow_regions(), apimed()
+int	ap_grow_regions()
+long	apimed(), lnint()
 real	apsmed(), apwsmed(), ap_asumr()
 
 begin
@@ -44,7 +46,7 @@ begin
 	# MEDCUT tries to correct for quantization effects
 	call ap_ialimr (skypix, index, nskypix, dmin, dmax)
 	sky_zero = ap_asumr (skypix, index, nskypix) / nskypix
-	medcut = nint (MEDCUT * real (nskypix))
+	medcut = lnint (MEDCUT * real (nskypix))
 	sky_med = apsmed (skypix, index, nskypix, medcut)
 	sky_med = max (dmin, min (sky_med, dmax))
 	call apfimoments (skypix, index, nskypix, sky_zero, sumpx, sumsqpx,
@@ -149,7 +151,7 @@ begin
 		break
 
 	    # Recompute the median, sigma and skew.
-	    medcut = nint (MEDCUT * real (nsky))
+	    medcut = lnint (MEDCUT * real (nsky))
 	    sky_med = apwsmed (skypix, index, wgt, nskypix, med, medcut)
 	    sky_med = max (dmin, min (sky_med, dmax))
 	    call apmoments (sumpx, sumsqpx, sumcbpx, nsky, sky_zero,

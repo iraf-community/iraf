@@ -8,22 +8,23 @@ int procedure ap_mean (skypix, coords, wgt, index, nskypix, snx, sny, losigma,
 	nsky_reject)
 
 real	skypix[ARB]		# unsorted array of skypixels
-int	coords[ARB]		# coordinate array for region growing
+long	coords[ARB]		# coordinate array for region growing
 real	wgt[ARB]		# the weight array for rejection
-int	index[ARB]		# sorted array of indices
-int	nskypix			# total number of sky pixels
-int	snx, sny		# dimensions of the sky subraster
+long	index[ARB]		# sorted array of indices
+size_t	nskypix			# total number of sky pixels
+size_t	snx, sny		# dimensions of the sky subraster
 real	losigma, hisigma	# number of sky_sigma for rejection
 real	rgrow			# radius of region growing
 int	maxiter			# maximum number of cycles of rejection
 real	sky_mean		# computed sky value
 real	sky_sigma		# the computed sky sigma
 real	sky_skew		# skewness of sky distribution
-int	nsky			# the number of sky pixels used
-int	nsky_reject		# the number of sky pixels rejected
+size_t	nsky			# the number of sky pixels used
+size_t	nsky_reject		# the number of sky pixels rejected
 
 double  dsky, sumpx, sumsqpx, sumcbpx
-int	i, j, nreject
+int	i
+long	j, nreject
 real	sky_zero, dmin, dmax, locut, hicut
 int	ap_grow_regions()
 real	ap_asumr()

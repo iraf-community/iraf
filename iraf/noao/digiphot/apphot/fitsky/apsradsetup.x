@@ -13,9 +13,11 @@ pointer	im			# pointero to the IRAF image
 real	wx, wy			# cursor coordinates
 pointer	gd			# pointer to graphics stream
 int	out			# output file descriptor
-int	stid			# output file sequence number
+long	stid			# output file sequence number
 
+size_t	sz_val
 int	ier, key, wcs
+long	l_val
 pointer	sp, cmd
 real	xcenter, ycenter, xc, yc, rmin, rmax, imin, imax, rval
 real	u1, u2, v1, v2, x1, x2, y1, y2
@@ -42,7 +44,8 @@ begin
 
 	# Allocate memory.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call printf (
 	    "Waiting for setup menu command (?=help, v=default setup, q=quit):")
@@ -92,6 +95,7 @@ begin
 
 	# Fit the new sky value and print it on the standard output.
 	ier = apfitsky (ap, im, xcenter, ycenter, NULL, gd)
-	call ap_splot (ap, 0, gd, apstati (ap, RADPLOTS))
+	l_val = 0
+	call ap_splot (ap, l_val, gd, apstati (ap, RADPLOTS))
 	call ap_qspsky (ap, ier)
 end

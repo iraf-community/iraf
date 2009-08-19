@@ -12,8 +12,8 @@ pointer	gd			# pointer to graphics stream
 pointer	gt			# pointer to GTOOLS structure
 real	skypix[ARB]		# array of unsorted sky pixels
 real	wgt[ARB]		# array of weights for rejection
-int	index[ARB]		# array of sort indices
-int	nskypix			# number of sky pixels
+long	index[ARB]		# array of sort indices
+size_t	nskypix			# number of sky pixels
 real	k1			# rejection criterion
 real	hwidth			# half width of histogram in k1 units
 real	binsize			# histogram binsize in units of sigma
@@ -21,15 +21,19 @@ int	smooth			# smooth the histogram
 real	sky_mode		# sky value
 real	sky_sigma		# sigma of sky pixels
 real	sky_skew		# skew of sky pixels
-int	nsky			# number of sky pixels
-int	nsky_reject		# number of rejected sky pixels
+size_t	nsky			# number of sky pixels
+size_t	nsky_reject		# number of rejected sky pixels
 
+size_t	sz_val
 double	dsky, sumpx, sumsqpx, sumcbpx
-int	i, nbins, nker, wcs, key
+long	i
+int	wcs, key
+size_t	nbins, nker
 pointer	sp, x, hgm, shgm, cmd
 real	dmin, dmax, hmin, hmax, dh, ymin, ymax, symin, symax, wx, wy
 real	u1, u2, v1, v2, x1, x2, y1, y2, cut, sky_mean, sky_zero
-int	clgcur(), aphigmr()
+int	clgcur()
+long	aphigmr(), lnint()
 real	apmedr(), ap_asumr()
 
 begin
@@ -71,7 +75,7 @@ begin
 	    nbins = 1
 	    dh = 0.0
 	} else {
-	    nbins = 2 * nint ((hmax - sky_mode) / dh) + 1
+	    nbins = 2 * lnint ((hmax - sky_mode) / dh) + 1
 	    dh = (hmax - hmin) / (nbins - 1)
 	}
 
@@ -89,7 +93,8 @@ begin
 	call salloc (x, nbins, TY_REAL)
 	call salloc (hgm, nbins, TY_REAL)
 	call salloc (shgm, nbins, TY_REAL)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Compute the x array and accumulate the histogram.
 	do i = 1, nbins
@@ -117,7 +122,7 @@ begin
 
 	# Smooth the histogram and compute the histogram plot limits.
 	if (smooth == YES) {
-	    nker = max (1, nint (sky_sigma / dh))
+	    nker = max (1, lnint (sky_sigma / dh))
 	    #call ap_lucy_smooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	    call ap_bsmooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	    call alimr (Memr[hgm], nbins, ymin, ymax)
@@ -179,7 +184,7 @@ pointer	gd		# pointer to graphics stream
 pointer	gt		# GTOOLS pointer
 real	x[ARB]		# the histogram bin values
 real	hgm[ARB]	# histogram
-int	nbins		# number of bins
+size_t	nbins		# number of bins
 char	plottype[ARB]	# the plot type "histogram" or "line"
 int	polytype	# polyline type
 
@@ -199,21 +204,23 @@ pointer	gd		# pointer to GRAPHICS stream
 pointer	gt		# pointer to GTOOLS structure
 real	xmin, xmax	# min and max of x vector
 real	ymin, ymax	# min and max of y vector
-int	nbins		# number of bins
+size_t	nbins		# number of bins
 int	smooth		# smooth histogram
 
+size_t	sz_val
 pointer	sp, str
 
 begin
 	# Initialize
 	call gclear (gd)
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Set up the gtools parameter string.
 	call sprintf (Memc[str], SZ_LINE,
 	    "Sky Histogram: nbins = %d hmin = %g hmax = %g smooth=%b")
-	    call pargi (nbins)
+	    call pargz (nbins)
 	    call pargr (xmin)
 	    call pargr (xmax)
 	    call pargi (smooth)

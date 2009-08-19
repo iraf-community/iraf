@@ -13,13 +13,14 @@ pointer	ap				# pointer to the apphot structure
 pointer	im				# pointer to the iraf image
 int	cl				# coordinate file descriptor
 int	out				# output file descriptor
-int	stid				# output file sequence number
-int	ltid				# coord list sequence number
+long	stid				# output file sequence number
+long	ltid				# coord list sequence number
 char	cmdstr[ARB]			# command string
 int	newimage			# new image ?
 int	newskybuf			# new sky buffer ?
 int	newsky				# new sky fit ?
 
+size_t	sz_val
 int	junk
 pointer	sp, incmd, outcmd
 int	strdic()
@@ -27,8 +28,9 @@ int	strdic()
 begin
 	# Get the command.
 	call smark (sp)
-	call salloc (incmd, SZ_LINE, TY_CHAR)
-	call salloc (outcmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (incmd, sz_val, TY_CHAR)
+	call salloc (outcmd, sz_val, TY_CHAR)
 	call sscan (cmdstr)
 	call gargwrd (Memc[incmd], SZ_LINE)
 	if (Memc[incmd] == EOS) {
@@ -58,11 +60,12 @@ procedure apscolon (ap, out, stid, cmdstr, newbuf, newfit)
 
 pointer	ap		# pointer to the apphot structure
 int	out		# output file descriptor
-int	stid		# output file number
+long	stid		# output file number
 char	cmdstr		# command string
 int	newbuf		# new sky buffer
 int	newfit		# new sky fit
 
+size_t	sz_val
 bool	bval
 int	ncmd, ival, stat
 pointer	sp, cmd
@@ -76,7 +79,8 @@ real	apstatr()
 begin
 	# Get the command
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)
 	if (Memc[cmd] == EOS) {
@@ -312,6 +316,7 @@ procedure ap_simcolon (ap, cmdstr)
 pointer	ap			# pointer to the apphot structure
 char	cmdstr[ARB]		# command string
 
+size_t	sz_val
 bool	bval
 int	ncmd
 pointer	sp, cmd
@@ -320,7 +325,8 @@ int	strdic(), nscan(), apstati(), btoi()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 		
 	# Get the command.
 	call sscan (cmdstr)

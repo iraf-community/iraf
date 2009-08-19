@@ -12,11 +12,11 @@ int procedure ap_crosscor (skypix, coords, wgt, index, nskypix, snx, sny, k1,
 	sky_sigma, sky_skew, nsky, nsky_reject)
 
 real	skypix[ARB]		# array of sky pixels
-int	coords[ARB]		# array of sky coordinates for region growing
+long	coords[ARB]		# array of sky coordinates for region growing
 real	wgt[ARB]		# array of weights for rejection
-int	index[ARB]		# array of sort indices
-int	nskypix			# the number of sky pixels
-int	snx, sny		# the maximum dimensions of sky raster
+long	index[ARB]		# array of sort indices
+size_t	nskypix			# the number of sky pixels
+size_t	snx, sny		# the maximum dimensions of sky raster
 real	k1			# half-width of the histogram in sky sigma
 real	hwidth			# the input sky sigma
 real	binsize			# the size of the histogram in sky sigma
@@ -27,15 +27,17 @@ int	maxiter			# maximum number of rejection cycles
 real	sky_mode		# computed sky value
 real	sky_sigma		# computed standard deviation of the sky pixels
 real	sky_skew		# computed skew of sky pixels
-int	nsky			# number of sky pixels used in fit
-int	nsky_reject		# number of sky pixels rejected
+size_t	nsky			# number of sky pixels used in fit
+size_t	nsky_reject		# number of sky pixels rejected
 
 double 	dsky, sumpx, sumsqpx, sumcbpx
-int	nreject, nbins, nker, nsmooth, ier, i, j
+int	ier, ii
+long	nreject, i, j
+size_t	nbins, nker, nsmooth
 pointer	sp, x, hgm, shgm, kernel
 real	dmin, dmax, hmin, hmax, dh, kmin, kmax, locut, hicut, sky_mean, cut
 real	sky_zero
-int	ap_grow_hist2(), aphigmr()
+long	aphigmr(), ap_grow_hist2(), lnint()
 real	ap_asumr(), apmedr()
 
 begin
@@ -75,8 +77,8 @@ begin
 	    nsmooth = 1
 	    dh = 0.0
 	} else {
-    	    nbins = 2 * nint ((hmax - sky_mean) / dh) + 1
-	    nker = 2 * nint (2.0 * (hmax - sky_mean) / (dh * 3.0)) + 1
+    	    nbins = 2 * lnint ((hmax - sky_mean) / dh) + 1
+	    nker = 2 * lnint (2.0 * (hmax - sky_mean) / (dh * 3.0)) + 1
 	    nsmooth = nbins - nker + 1
 	    dh = (hmax - hmin) / (nbins - 1)
 	}
@@ -146,7 +148,7 @@ begin
 	}
 
 	# Fit histogram with pixel rejection and optional region growing.
-	do i = 1, maxiter {
+	do ii = 1, maxiter {
 
 	    # Compute new histogram limits.
 	    if (IS_INDEFR(losigma))
@@ -224,11 +226,11 @@ end
 procedure ap_gauss_kernel (kernel, nker, kmin, kmax, sky_sigma)
 
 real	kernel[ARB]		# kernel 
-int	nker			# length of kernel
+size_t	nker			# length of kernel
 real	kmin, kmax		# limits of the kernel
 real	sky_sigma		# sigma of the sky
 
-int	i
+long	i
 real	dk, x, sumx
 
 begin
@@ -261,11 +263,11 @@ procedure ap_corfit (x, shgm, nbins, sky_mode, ier)
 
 real	x[ARB]				# x coordinates of histogram
 real	shgm[ARB]			# convolved histogram
-int	nbins				# number of histogram bins
+size_t	nbins				# number of histogram bins
 real	sky_mode			# computed sky_mode
 int	ier				# error code
 
-int	bin
+long	bin
 real	max, xo, dh1, dh2
 
 begin

@@ -8,21 +8,25 @@ int procedure ap_avsky (ap, im, stid, sd, id, gd, interactive)
 
 pointer	ap			# the pointer to the main apphot data structure
 pointer	im			# the pointer to the input image
-int	stid			# the current sequence number
+long	stid			# the current sequence number
 int	sd			# the sky file descriptor
 pointer	id			# the display stream descriptor
 pointer	gd			# the graphics stream descriptor
 int	interactive		# interactive mode
 
-int	wcs, key, nmsky, nmsigma, nmskew, nsky, nrej, sier, ier
+size_t	sz_val
+int	wcs, key, nmsky, nmsigma, nmskew, sier, ier
+long	nsky, nrej
 pointer	sp, cmd
 real	wx, wy, msky, msigma, mskew
 int	clgcur(), apfitsky(), apstati()
+long	apstatl()
 real	apstatr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Initialize the skyvalues.
 	msky = 0.0
@@ -72,8 +76,8 @@ begin
 		    mskew = mskew + apstatr (ap, SKY_SKEW)
 		    nmskew = nmskew + 1
 		}
-		nsky = nsky + apstati (ap, NSKY)
-		nrej = nrej + apstati (ap, NSKY_REJECT)
+		nsky = nsky + apstatl (ap, NSKY)
+		nrej = nrej + apstatl (ap, NSKY_REJECT)
 
 	    default:
 		;
@@ -98,8 +102,8 @@ begin
 	call apsetr (ap, SKY_MODE, msky)
 	call apsetr (ap, SKY_SIGMA, msigma)
 	call apsetr (ap, SKY_SKEW, mskew)
-	call apseti (ap, NSKY, nsky)
-	call apseti (ap, NSKY_REJECT, nrej)
+	call apsetl (ap, NSKY, nsky)
+	call apsetl (ap, NSKY_REJECT, nrej)
 
 	call sfree (sp)
 

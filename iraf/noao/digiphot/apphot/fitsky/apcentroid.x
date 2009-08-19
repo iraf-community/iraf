@@ -9,11 +9,11 @@ int procedure ap_centroid (skypix, coords, wgt, index, nskypix, snx, sny, k1,
 	sky_sigma, sky_skew, nsky, nsky_reject)
 
 real	skypix[ARB]		# array of sky pixels
-int	coords[ARB]		# array of coordinates for regions growing
+long	coords[ARB]		# array of coordinates for regions growing
 real	wgt[ARB]		# array of weights for rejection
-int	index[ARB]		# array of sorted indices
-int	nskypix			# the number of sky pixels
-int	snx, sny		# the maximum dimensions of sky raster
+long	index[ARB]		# array of sorted indices
+size_t	nskypix			# the number of sky pixels
+size_t	snx, sny		# the maximum dimensions of sky raster
 real	k1			# extent of the histogram in skysigma
 real	hwidth			# width of the histogram
 real	binsize			# the size of the histogram in sky sigma
@@ -24,15 +24,17 @@ int	maxiter			# maximum number of rejection cycles
 real	sky_mode		# computed sky value
 real	sky_sigma		# computed sigma of the sky pixels
 real	sky_skew		# skew of sky pixels
-int	nsky			# number of sky pixels used in fit
-int	nsky_reject		# number of sky pixels rejected
+size_t	nsky			# number of sky pixels used in fit
+size_t	nsky_reject		# number of sky pixels rejected
 
 double	dsky, sumpx, sumsqpx, sumcbpx
-int	nreject, nbins, nker, ier, i, j
+int	ier, ii
+long	nreject, i, j
+size_t	nbins, nker
 pointer	sp, hgm, shgm
 real	dmin, dmax, sky_mean, hmin, hmax, dh, locut, hicut, cut
 real	sky_zero
-int	ap_grow_hist2(), aphigmr()
+long	aphigmr(), ap_grow_hist2(), lnint()
 real	ap_asumr(), apmedr()
 
 begin
@@ -68,7 +70,7 @@ begin
 	    nbins = 1
 	    dh = 0.0
 	} else {
-	    nbins = 2 * nint ((hmax - sky_mean) / dh) + 1
+	    nbins = 2 * lnint ((hmax - sky_mean) / dh) + 1
 	    dh = (hmax - hmin) / (nbins - 1)
 	}
 
@@ -108,7 +110,7 @@ begin
 
 	# Fit the mode, sigma an skew of the histogram.
 	if (smooth == YES) {
-	    nker = max (1, nint (sky_sigma / dh))
+	    nker = max (1, lnint (sky_sigma / dh))
 	    #call ap_lucy_smooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	    call ap_bsmooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	    call ap_imode (Memr[shgm], nbins, hmin, hmax, YES, sky_mode, ier)
@@ -122,7 +124,7 @@ begin
 	}
 
 	# Fit histogram with pixel rejection and optional region growing.
-	do i = 1, maxiter {
+	do ii = 1, maxiter {
 
 	    # Compute new histogram limits.
 	    if (IS_INDEFR(losigma))
@@ -163,7 +165,7 @@ begin
 
 	    # Recompute the histogram peak.
 	    if (smooth == YES) {
-		nker = max (1, nint (sky_sigma / dh))
+		nker = max (1, lnint (sky_sigma / dh))
 	        #call ap_lucy_smooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	        call ap_bsmooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	        call ap_imode (Memr[shgm], nbins, hmin, hmax, YES, sky_mode,
@@ -195,13 +197,13 @@ end
 procedure ap_imode (hgm, nbins, z1, z2, smooth, sky_mode, ier)
 
 real	hgm[ARB]		# histogram
-int	nbins			# number of bins
+size_t	nbins			# number of bins
 real	z1, z2			# min and max of the histogram
 int	smooth			# is the histogram smoothed
 real	sky_mode		# mode of histogram
 int	ier			# error code
 
-int	i, noccup
+long	i, noccup
 double	sumi, sumix, x, dh
 real	hmean, dz
 real	asumr()

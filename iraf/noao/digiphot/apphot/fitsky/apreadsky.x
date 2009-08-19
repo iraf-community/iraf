@@ -11,10 +11,11 @@ real	x, y		# center of sky annulus
 real	sky_mode	# sky valye
 real	sky_sigma	# sky sigma
 real	sky_skew	# skew of sky pixels
-int	nsky		# number of sky pixels
-int	nsky_reject	# number of rejected pixesl
+size_t	nsky		# number of sky pixels
+size_t	nsky_reject	# number of rejected pixesl
 
 int	stat
+long	l_val0, l_val1
 int	fscan(), nscan()
 
 begin
@@ -34,7 +35,9 @@ begin
 	call gargr (sky_mode)
 	call gargr (sky_sigma)
 	call gargr (sky_skew)
-	call gargi (nsky)
-	call gargi (nsky_reject)
+	call gargl (l_val0)
+	call gargl (l_val1)
+	nsky = l_val0
+	nsky_reject = l_val1
 	return (nscan ())
 end

@@ -8,8 +8,8 @@ procedure ap_pssky (ap, fd, id, ld, ier)
 
 pointer	ap		# pointer to apphot structure
 int	fd		# output file descriptor
-int	id		# sequence number of star
-int	ld		# list number of star
+long	id		# sequence number of star
+long	ld		# list number of star
 int	ier		# error code
 
 real	apstatr()
@@ -34,14 +34,16 @@ procedure ap_qspsky (ap, ier)
 pointer	ap		# pointer to apphot structure
 int	ier		# error code
 
+size_t	sz_val
 pointer	sp, imname
-int	apstati()
+long	apstatl()
 real	apstatr()
 
 begin
 	# Print out the results on the standard output.
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 	call apstats (ap, IMROOT, Memc[imname], SZ_FNAME)
 	call printf ( "%s  %8.2f %8.2f  %8g %8g ") 
 	    call pargstr (Memc[imname])
@@ -51,8 +53,8 @@ begin
 	    call pargr (apstatr (ap, SKY_SIGMA))
 	call printf ("%8g  %5d %5d  %s\n")
 	    call pargr (apstatr (ap, SKY_SKEW))
-	    call pargi (apstati (ap, NSKY))
-	    call pargi (apstati (ap, NSKY_REJECT))
+	    call pargl (apstatl (ap, NSKY))
+	    call pargl (apstatl (ap, NSKY_REJECT))
 	    if (ier != AP_OK)
 		call pargstr ("err")
 	    else
@@ -69,7 +71,7 @@ procedure ap_qaspsky (ap, ier)
 pointer	ap		# pointer to apphot structure
 int	ier		# error code
 
-int	apstati()
+long	apstatl()
 real	apstatr()
 
 begin
@@ -79,8 +81,8 @@ begin
 	    call pargr (apstatr (ap, SKY_SIGMA))
 	call printf ("%8g  %5d %5d  %s\n\n")
 	    call pargr (apstatr (ap, SKY_SKEW))
-	    call pargi (apstati (ap, NSKY))
-	    call pargi (apstati (ap, NSKY_REJECT))
+	    call pargl (apstatl (ap, NSKY))
+	    call pargl (apstatl (ap, NSKY_REJECT))
 	    if (ier != AP_OK)
 		call pargstr ("err")
 	    else

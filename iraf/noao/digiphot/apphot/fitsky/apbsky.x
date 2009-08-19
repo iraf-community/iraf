@@ -12,20 +12,25 @@ pointer	im			# pointer to IRAF image
 int	cl			# starlist file descriptor
 int	sd			# sky file descriptor
 int	out			# output file descriptor
-int	id, ld			# sequence and list numbers
-int	gd			# pointer to stdgraph stream
+long	id, ld			# sequence and list numbers
+pointer	gd			# pointer to stdgraph stream
 pointer	mgd			# pointer to graphics metacode file
 pointer	gid			# pointer to image display stream
 int	interactive		# interactive mode
 
-int	stdin, ier, ild
+size_t	sz_val, c_1
+int	stdin, ier
+long	ild
 pointer	sp, str
 real	wx, wy
 int	apfitsky(), fscan(), nscan(), strncmp(), apstati()
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 	call fstats (cl, F_FILENAME, Memc[str], SZ_FNAME)
 
 	# Initialize.
@@ -57,9 +62,9 @@ begin
             # Transform the input coordinates.
             switch (apstati(ap,WCSIN)) {
             case WCS_WORLD, WCS_PHYSICAL:
-                call ap_itol (ap, wx, wy, wx, wy, 1)
+                call ap_itol (ap, wx, wy, wx, wy, c_1)
             case WCS_TV:
-                call ap_vtol (im, wx, wy, wx, wy, 1)
+                call ap_vtol (im, wx, wy, wx, wy, c_1)
             default:
                 ;
             }

@@ -11,11 +11,13 @@ int	function	# sky fitting algorithm
 real	annulus		# radius of sky annulus
 real	dannulus	# width of sky annulus
 real	fwhmpsf		# FWHM of the PSF
+size_t	sz_val
 int	noise		# noise function
 
 begin
 	# Set up the object parameters.
-	call malloc (ap, LEN_APSTRUCT, TY_STRUCT)
+	sz_val = LEN_APSTRUCT
+	call malloc (ap, sz_val, TY_STRUCT)
 
 	# Set up the global apphot package parameters.
 	call ap_defsetup (ap, fwhmpsf)
@@ -47,10 +49,12 @@ int	function	# sky fitting function
 real	annulus		# inner radius of sky annulus
 real	dannulus	# outer radius of sky annulus
 
+size_t	sz_val
 pointer	sky
 
 begin
-	call malloc (AP_PSKY(ap), LEN_SKYSTRUCT, TY_STRUCT)
+	sz_val = LEN_SKYSTRUCT
+	call malloc (AP_PSKY(ap), sz_val, TY_STRUCT)
 	sky = AP_PSKY(ap)
 	AP_SXCUR(sky) = INDEFR
 	AP_SYCUR(sky) = INDEFR

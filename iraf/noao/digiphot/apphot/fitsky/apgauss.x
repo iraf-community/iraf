@@ -12,11 +12,11 @@ int procedure ap_gauss (skypix, coords, wgt, index, nskypix, snx, sny, maxfit,
 	sky_mode, sky_sigma, sky_skew, nsky, nsky_reject)
 
 real	skypix[ARB]		# array of unsorted sky pixels
-int	coords[ARB]		# array of coordinates for region growing
+long	coords[ARB]		# array of coordinates for region growing
 real	wgt[ARB]		# weights for pixel rejection
-int	index[ARB]		# array of sort indices
-int	nskypix			# the number of sky pixels
-int	snx, sny		# the maximum dimensions of sky raster
+long	index[ARB]		# array of sort indices
+size_t	nskypix			# the number of sky pixels
+size_t	snx, sny		# the maximum dimensions of sky raster
 int	maxfit			# maximum number of iterations per fit
 real	k1			# extent of the histogram in skysigma
 real	hwidth			# width of the histogram
@@ -28,15 +28,17 @@ int	maxiter			# maximum number of rejection cycles
 real	sky_mode		# computed sky value
 real	sky_sigma		# computed sigma of the sky pixels
 real	sky_skew		# skew of sky pixels
-int	nsky			# number of sky pixels used in fit
-int	nsky_reject		# number of sky pixels rejected
+size_t	nsky			# number of sky pixels used in fit
+size_t	nsky_reject		# number of sky pixels rejected
 
 double	dsky, sumpx, sumsqpx, sumcbpx
-int	i, j, nreject, nbins, nker, ier
+long	i, j, nreject
+size_t	nbins, nker
+int	ier, ii
 pointer	sp, x, hgm, shgm, w
 real	sky_mean, sky_msigma, dmin, dmax, hmin, hmax, dh, locut, hicut, cut
 real	sky_zero
-int	ap_grow_hist2(), aphigmr()
+long	aphigmr(), ap_grow_hist2(), lnint()
 real	ap_asumr(), apmedr()
 
 begin
@@ -74,7 +76,7 @@ begin
 	    nbins = 1
 	    dh = 0.0
 	} else {
-	    nbins = 2 * nint ((hmax - sky_mean) / dh) + 1
+	    nbins = 2 * lnint ((hmax - sky_mean) / dh) + 1
 	    dh = (hmax - hmin) / (nbins - 1)
 	}
 
@@ -122,7 +124,7 @@ begin
 
 	# Find the mode, sigma and skew of the histogram.
 	if (smooth == YES) {
-	    nker = max (1, nint (sky_msigma / dh))
+	    nker = max (1, lnint (sky_msigma / dh))
 	    #call ap_lucy_smooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	    call ap_bsmooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	    call ap_hist_mode (Memr[x], Memr[shgm], Memr[w], nbins,
@@ -142,7 +144,7 @@ begin
 	}
 
 	# Fit histogram with pixel rejection and optional region growing.
-	do i = 1, maxiter {
+	do ii = 1, maxiter {
 
 	    # Compute the new rejection limits.
 	    if (IS_INDEFR(losigma))
@@ -181,7 +183,7 @@ begin
 
 	    # Recompute mean, mode, sigma and skew.
 	    if (smooth == YES) {
-		nker = max (1, nint (sky_msigma / dh))
+		nker = max (1, lnint (sky_msigma / dh))
 	        #call ap_lucy_smooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	        call ap_bsmooth (Memr[hgm], Memr[shgm], nbins, nker, 2)
 	    	call ap_hist_mode (Memr[x], Memr[shgm], Memr[w], nbins,
@@ -223,7 +225,7 @@ procedure ap_hist_mode (x, hgm, w, nbins, sky_mode, sky_sigma, sky_skew,
 real	x[ARB]		# x array
 real	hgm[ARB]	# histogram
 real	w[ARB]		# weights
-int	nbins		# number of bins
+size_t	nbins		# number of bins
 real	sky_mode	# sky value
 real	sky_sigma	# sky sigma
 real	sky_skew	# sky skew
@@ -232,32 +234,37 @@ real	tol		# tolerances
 int	ier		# error code
 
 extern  gausskew, dgausskew
-int	i, imin, imax, np, fier
+int	i, fier
+long	imin, imax
+size_t	np, c_4
 pointer	sp, list, fit, nl
 real	p[4], dp[4], dummy1
-int	locpr()
+pointer	locpr()
+real	aabs()
 
 begin
+	c_4 = 4
+
 	# Allocate working memory.
 	call smark (sp)
-	call salloc (list, 4, TY_INT)
+	call salloc (list, c_4, TY_LONG)
 	call salloc (fit, nbins, TY_REAL)
 
 	# Initialize.
 	do i = 1, 4
-	    Memi[list+i-1] = i
+	    Meml[list+i-1] = i
 
 	# Compute initial guesses for the parameters.
 	call ap_alimr (hgm, nbins, dummy1, p[1], imin, imax)
 	p[2] = x[imax]
-	#p[3] = max (sky_sigma ** 2, abs (x[2] - x[1]) ** 2)
-	p[3] = abs ((x[nbins] - x[1]) / 6.0) ** 2
+	#p[3] = max (sky_sigma ** 2, aabs (x[2] - x[1]) ** 2)
+	p[3] = aabs ((x[nbins] - x[1]) / 6.0) ** 2
 	p[4] = 0.0
 	np = 4
 
 	# Fit the histogram.
 	call nlinitr (nl, locpr (gausskew), locpr (dgausskew), p, dp, np,
-	    Memi[list], 4, tol, maxiter)
+	    Meml[list], c_4, tol, maxiter)
 	call nlfitr (nl, x, hgm, w, nbins, 1, WTS_UNIFORM, fier)
 	call nlvectorr (nl, x, Memr[fit], nbins, 1)
 	call nlpgetr (nl, p, np)
@@ -288,7 +295,7 @@ begin
 		ier = AP_BADPARAMS
 	    } else {
 	        sky_sigma = sqrt (p[3])
-	        sky_skew = 1.743875281 * abs (p[4]) ** (1.0 / 3.0) * sky_sigma
+	        sky_skew = 1.743875281 * aabs (p[4]) ** (1.0 / 3.0) * sky_sigma
 	        if (p[4] < 0.0)
 		    sky_skew = - sky_skew
 	    }
