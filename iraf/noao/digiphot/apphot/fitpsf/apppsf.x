@@ -9,8 +9,8 @@ procedure ap_ppsf (ap, fd, id, lid, ier)
 
 pointer	ap	# pointer to apphot structure
 int	fd	# output file descriptor
-int	id	# sequence number of star
-int	lid	# list id of star
+long	id	# sequence number of star
+long	lid	# list id of star
 int	ier	# comment string
 
 real	apstatr()
@@ -37,12 +37,14 @@ procedure ap_qppsf (ap, ier)
 pointer	ap	# pointer to apphot structure
 int	ier	# comment string
 
+size_t	sz_val
 pointer	sp, imname, psf
 
 begin
 	# Initialize.
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 	psf = AP_PPSF(ap)
 
 	# Print the parameters on the standard output.

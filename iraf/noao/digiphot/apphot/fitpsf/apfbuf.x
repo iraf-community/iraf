@@ -13,10 +13,11 @@ pointer	ap		# pointer to apphot structure
 pointer	im		# pointer to the IRAF image
 real	wx, wy		# center coordinates
 
-int	ippix
+long	ippix
 pointer	psf
 real	ppix
 pointer	ap_psfpix()
+long	lint()
 
 begin
 	# Check for 0 sized aperture.
@@ -26,7 +27,7 @@ begin
 
 	# Get the PSF pixels.
 	ppix = max (1.0, AP_PSFAPERT(psf) * AP_SCALE(ap))
-	ippix = 2 * int (ppix) + 1
+	ippix = 2 * lint (ppix) + 1
 	AP_PSFPIX(psf) = ap_psfpix (im, wx, wy, ippix, AP_PXC(psf), AP_PYC(psf),
 	    AP_PNX(psf), AP_PNY(psf))
 	if (AP_PSFPIX(psf) == NULL)
@@ -44,11 +45,11 @@ pointer procedure ap_psfpix (im, wx, wy, papert, xc, yc, nx, ny)
 
 pointer	im		# pointer to IRAF image
 real	wx, wy		# center of subraster to be extracted
-int	papert		# width of subraster to be extracted
+long	papert		# width of subraster to be extracted
 real	xc, yc		# center of extracted subraster
-int	nx, ny		# dimensions of extracted subraster
+size_t	nx, ny		# dimensions of extracted subraster
 
-int	ncols, nlines, c1, c2, l1, l2, half_papert
+long	ncols, nlines, c1, c2, l1, l2, half_papert
 pointer	buf
 real	xc1, xc2, xl1, xl2
 pointer	imgs2r()

@@ -13,12 +13,15 @@ pointer	ap		# pointer to the apphot structure
 pointer	im		# pointer to the IRAF image
 real	wx, wy		# object coordinates
 
+size_t	c_1
 int	ier, fier
 pointer	psf, nse
 real	datamin, datamax, dmin, dmax, threshold
 int	apfbuf(), apsfradgauss(), apsfelgauss(), apsfmoments()
 
 begin
+	c_1 = 1
+
 	# Initialize.
 	psf = AP_PPSF(ap)
 	nse = AP_NOISE(ap)
@@ -30,9 +33,9 @@ begin
 	} else {
             switch (AP_WCSOUT(ap)) {
             case WCS_WORLD, WCS_PHYSICAL:
-                call ap_ltoo (ap, wx, wy, AP_OPFXCUR(psf), AP_OPFYCUR(psf), 1)
+                call ap_ltoo (ap, wx, wy, AP_OPFXCUR(psf), AP_OPFYCUR(psf), c_1)
             case WCS_TV:
-                call ap_ltov (im, wx, wy, AP_OPFXCUR(psf), AP_OPFYCUR(psf), 1)
+                call ap_ltov (im, wx, wy, AP_OPFXCUR(psf), AP_OPFYCUR(psf), c_1)
             default:
                 AP_OPFXCUR(psf) = wx
                 AP_OPFYCUR(psf) = wy
@@ -113,10 +116,10 @@ begin
         switch (AP_WCSOUT(ap)) {
         case WCS_WORLD, WCS_PHYSICAL:
             call ap_ltoo (ap, Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2],
-		Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], 1)
+		Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], c_1)
         case WCS_TV:
             call ap_ltov (im, Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2],
-		Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], 1)
+		Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], c_1)
         default:
 	    ;
         }

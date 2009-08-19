@@ -12,21 +12,23 @@ pointer	ap		# pointer to the apphot structure
 pointer	im		# pointer to the iraf image
 int	cl		# coordinate file descriptor
 int	out		# output file descriptor
-int	stid		# output file sequence number
-int	ltid		# coord file sequence number
+long	stid		# output file sequence number
+long	ltid		# coord file sequence number
 char	cmdstr		# command string
 int	newimage	# new image ?
 int	newbuf		# new psf buffer ?
 int	newfit		# new psf fit ?
 
+size_t	sz_val
 int	junk
 pointer	sp, incmd, outcmd
 int	strdic()
 
 begin
 	call smark (sp)
-	call salloc (incmd, SZ_LINE, TY_CHAR)
-	call salloc (outcmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (incmd, sz_val, TY_CHAR)
+	call salloc (outcmd, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)
@@ -58,11 +60,12 @@ procedure ap_fitcolon (ap, out, stid, cmdstr, newbuf, newfit)
 
 pointer	ap		# pointer to the apphot structure
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 char	cmdstr		# command string
 int	newbuf		# new psf buffer
 int	newfit		# new psf fit
 
+size_t	sz_val
 bool	bval
 int	ncmd, ival, stat
 pointer	sp, cmd, str
@@ -74,8 +77,10 @@ real	apstatr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)
@@ -194,6 +199,7 @@ procedure ap_pfimcolon (ap, cmdstr)
 pointer	ap		# pointer to the apphot structure
 char	cmdstr		# command string
 
+size_t	sz_val
 int	ncmd
 pointer	sp, cmd
 int	strdic()
@@ -201,7 +207,8 @@ int	strdic()
 begin
 	# Get the command.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call sscan (cmdstr)
 	    call gargwrd (Memc[cmd], SZ_LINE)

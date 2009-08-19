@@ -21,6 +21,7 @@ procedure ap_pfshow (ap)
 
 pointer	ap		# pointer to apphot structure
 
+size_t	sz_val
 pointer	sp, str
 bool	itob()
 int	apstati()
@@ -29,7 +30,8 @@ real	apstatr()
 begin
 	# Print the PSF fitting parameters.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	call printf ("Psf Modelling Parameters\n")
 	call apstats (ap, PSFSTRING, Memc[str], SZ_FNAME)

@@ -13,12 +13,15 @@ int procedure apsfrefit (ap, im)
 pointer	ap		# pointer to the apphot structure
 pointer	im		# the input image descriptor
 
+size_t	c_1
 int	ier
 pointer	psf, nse
 int	apsfradgauss(), apsfelgauss(), apsfmoments()
 real	datamin, datamax, dmin, dmax, threshold
 
 begin
+	c_1 = 1
+
 	psf = AP_PPSF(ap)
 	nse = AP_NOISE(ap)
 	call amovkr (INDEFR, Memr[AP_PPARS(psf)], AP_MAXNPARS(psf))
@@ -96,10 +99,10 @@ begin
         switch (AP_WCSOUT(ap)) {
         case WCS_WORLD, WCS_PHYSICAL:
             call ap_ltoo (ap, Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2],
-                Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], 1)
+                Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], c_1)
         case WCS_TV:
             call ap_ltov (im, Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2],
-                Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], 1)
+                Memr[AP_PPARS(psf)+1], Memr[AP_PPARS(psf)+2], c_1)
         default:
             ;
         }

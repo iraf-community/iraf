@@ -12,9 +12,12 @@ real	rbox		# fitting radius
 real	fwhmpsf		# full width half max of psf
 int	noise		# noise model
 
+size_t	sz_val
+
 begin
 	# Initialize the image parameters.
-	call malloc (ap, LEN_APSTRUCT, TY_STRUCT)
+	sz_val = LEN_APSTRUCT
+	call malloc (ap, sz_val, TY_STRUCT)
 
 	# Set up the global apphot package parameters.
 	call ap_defsetup (ap, fwhmpsf)
@@ -45,10 +48,12 @@ pointer	ap 		# pointer to apphot structure
 int	function	# fitting function
 real	rbox		# fitting aperture
 
+size_t	sz_val
 pointer	psf
 
 begin
-	call malloc (AP_PPSF(ap), LEN_PSFSTRUCT, TY_STRUCT)
+	sz_val = LEN_PSFSTRUCT
+	call malloc (AP_PPSF(ap), sz_val, TY_STRUCT)
 	psf = AP_PPSF(ap)
 
 	# Set PSF fitting function.
@@ -89,6 +94,7 @@ begin
 	AP_PSFYPIX(psf) = NULL
 
 	# Allocate space for computed parameters.
-	call calloc (AP_PPARS(psf), AP_MAXNPARS(psf), TY_REAL)
-	call calloc (AP_PPERRS(psf), AP_MAXNPARS(psf), TY_REAL)
+	sz_val = AP_MAXNPARS(psf)
+	call calloc (AP_PPARS(psf), sz_val, TY_REAL)
+	call calloc (AP_PPERRS(psf), sz_val, TY_REAL)
 end

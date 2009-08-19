@@ -11,7 +11,7 @@ int procedure apsfradgauss (ctrpix, nx, ny, emission, fwhmpsf, datamin,
 	datamax, noise, gain, sigma, maxiter, k2, nreject, par, perr, npar)
 
 real	ctrpix[nx, ny]		# object to be centered
-int	nx, ny			# dimensions of subarray
+size_t	nx, ny			# dimensions of subarray
 int	emission		# emission or absorption version
 real	fwhmpsf			# full width half max of the psf
 real	datamin			# minimum good data value
@@ -24,14 +24,18 @@ real	k2			# k-sigma rejection criterion
 int	nreject			# maximum number of rejection cycles
 real	par[ARB]		# parameters
 real	perr[ARB]		# errors in parameters
-int	npar			# number of parameters
+size_t	npar			# number of parameters
 
 extern	gaussr, dgaussr
-int	i, j, npts, list, imin, imax, fier
-pointer	sp, x, w, zfit, nl, ptr
+size_t	sz_val
+int	ii, fier
+long	i, j, imin, imax, l_val
+size_t	npts
+pointer	sp, x, w, zfit, nl, ptr, list
 real	sumw, dummy, chisqr, locut, hicut
-int	locpr(), apreject()
-real	asumr(), apwssqr()
+long	apreject(), lmod()
+real	asumr(), apwssqr(), aabs()
+pointer	locpr()
 
 begin
 	# Initialize.
@@ -43,11 +47,12 @@ begin
 	call salloc (x, 2 * npts, TY_REAL)
 	call salloc (w, npts, TY_REAL)
 	call salloc (zfit, npts, TY_REAL)
-	call salloc (list, NPARAMETERS, TY_INT)
+	sz_val = NPARAMETERS
+	call salloc (list, sz_val, TY_LONG)
 
 	# Define the active parameters.
-	do i = 1, NPARAMETERS
-	    Memi[list+i-1] = i
+	do ii = 1, NPARAMETERS
+	    Meml[list+ii-1] = ii
 
 	# Set variables array.
 	ptr = x
@@ -82,7 +87,8 @@ begin
 	    call ap_wlimr (ctrpix, Memr[w], npts, datamin, datamax,
 	        par[1], par[5], imax, imin)
 	par[1] = par[1] - par[5]
-	if (mod (imax, nx) == 0)
+	l_val = nx
+	if (lmod (imax, l_val) == 0)
 	    imin = imax / nx
 	else
 	    imin = imax / nx + 1
@@ -92,13 +98,14 @@ begin
 	par[4] = (fwhmpsf ** 2 / 4.0)
 
 	# Fit the function and the errors.
+	sz_val = NPARAMETERS
 	call nlinitr (nl, locpr (gaussr), locpr (dgaussr), par, perr,
-	    NPARAMETERS, Memi[list], NPARAMETERS, TOL, maxiter)
+		      sz_val, Meml[list], sz_val, TOL, maxiter)
 	call nlfitr (nl, Memr[x], ctrpix, Memr[w], npts, 2, WTS_USER, fier)
 
 	# Perform the rejection cycle.
 	if ((nreject > 0) && (k2 > 0.0)) {
-	    do i = 1, nreject {
+	    do ii = 1, nreject {
 		call nlvectorr (nl, Memr[x], Memr[zfit], npts, 2)
 		call asubr (ctrpix, Memr[zfit], Memr[zfit], npts)
 		chisqr = apwssqr (Memr[zfit], Memr[w], npts)
@@ -115,8 +122,9 @@ begin
 		    break
 		call nlpgetr (nl, par, npar)
 		call nlfreer (nl)
+		sz_val = NPARAMETERS
 		call nlinitr (nl, locpr (gaussr), locpr (dgaussr), par, perr,
-		    NPARAMETERS, Memi[list], NPARAMETERS, TOL, maxiter)
+			      sz_val, Meml[list], sz_val, TOL, maxiter)
 		call nlfitr (nl, Memr[x], ctrpix, Memr[w], npts, 2, WTS_USER,
 		    fier)
 	    }
@@ -124,13 +132,13 @@ begin
 
 	# Get the parameters.
 	call nlpgetr (nl, par, npar)
-	par[4] = sqrt (abs(par[4]))
+	par[4] = sqrt (aabs(par[4]))
 
 	# Get the errors.
 	call nlvectorr (nl, Memr[x], Memr[zfit], npts, 2)
 	call nlerrorsr (nl, ctrpix, Memr[zfit], Memr[w], npts, dummy,
 	    chisqr, perr)
-	perr[4] = sqrt (abs(perr[4]))
+	perr[4] = sqrt (aabs(perr[4]))
 
 	# Compute the mean errors in the parameters.
 	dummy = 0.0
@@ -162,14 +170,14 @@ end
 # APREJECT -- Reject points outside of the specified intensity limits by
 # setting their weights to zero.
 
-int procedure apreject (pix, w, npts, locut, hicut)
+long procedure apreject (pix, w, npts, locut, hicut)
 
 real	pix[ARB]		# data
 real	w[ARB]			# weights
-int	npts			# number of data points
+size_t	npts			# number of data points
 real	locut, hicut		# data limits
 
-int	i, nreject
+long	i, nreject
 
 begin
 	nreject = 0

@@ -9,8 +9,9 @@ pointer	im			# pointer to to the IRAF image
 real	wx, wy			# cursor coordinates
 pointer	gd			# pointer to graphics stream
 int	out			# output file descriptor
-int	stid			# output file sequence number
+long	stid			# output file sequence number
 
+size_t	sz_val
 int	ier, wcs, key
 pointer	sp, cmd
 real	xcenter, ycenter, rmin, rmax, imin, imax, xc, yc, rval
@@ -38,7 +39,8 @@ begin
 
 	# Allocate temporary space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 	
 	call printf (
 	"Waiting for setup menu command (?=help, v=default setup, q=quit):\n")

@@ -8,8 +8,9 @@ procedure ap_pfconfirm (ap, out, stid)
 
 pointer	ap		# pointer to the apphot structure
 int	out		# the output file descriptor
-int	stid		# the output file sequence number
+long	stid		# the output file sequence number
 
+size_t	sz_val
 pointer	sp, str
 real	fwhmpsf, psfapert, datamin, datamax
 int	apstati()
@@ -18,7 +19,8 @@ real	ap_vdatamin(), ap_vdatamax()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	call printf ("\n")
 

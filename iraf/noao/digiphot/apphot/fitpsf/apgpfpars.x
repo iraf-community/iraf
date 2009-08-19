@@ -8,6 +8,7 @@ procedure ap_gpfpars (ap)
 
 pointer	ap		# pointer to the apphot structure
 
+size_t	sz_val
 int	function
 pointer	sp, str
 bool	clgetb()
@@ -16,7 +17,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Open the apphot structure.
 	call apsfinit (ap, AP_RADGAUSS, 3.5, 2.0, AP_NPOISSON)

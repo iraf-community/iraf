@@ -10,15 +10,16 @@ int procedure apsfmoments (ctrpix, nx, ny, lthreshold, uthreshold, positive,
 	par, perr, npar)
 
 real	ctrpix[nx, ny]		# object to be centered
-int	nx, ny			# dimensions of subarray
+size_t	nx, ny			# dimensions of subarray
 real	lthreshold		# lower threshold for moment computation
 real	uthreshold		# upper threshold for moment computation
 int	positive		# emission feature
 real	par[ARB]		# parameters
 real	perr[ARB]		# errors in parameters
-int	npar			# number of parameters
+size_t	npar			# number of parameters
 
-int	i, j
+size_t	sz_val
+long	i, j
 real	temp, sumi, sumxi, sumyi, sumx2i, sumy2i, sumxyi, r2, varx, vary, varxy
 bool	fp_equalr()
 
@@ -101,6 +102,7 @@ begin
 
 	# Compute the errors.
 	npar = NPARAMETERS
-	call amovkr (0.0, perr, NPARAMETERS)
+	sz_val = NPARAMETERS
+	call amovkr (0.0, perr, sz_val)
 	return (AP_OK)
 end
