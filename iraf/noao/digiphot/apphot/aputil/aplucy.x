@@ -4,11 +4,13 @@ procedure ap_lucy_smooth (hgm, shgm, nbins, nker, iter)
 
 real	hgm[ARB]		# the original histogram
 real	shgm[ARB]		# smoothed histogram
-int	nbins			# length of the histogram
-int	nker			# length of box kernel
+size_t	nbins			# length of the histogram
+size_t	nker			# length of box kernel
 int	iter			# number of iterations
 
-int	i, j, nsmooth
+int	i
+long	j
+size_t	nsmooth
 pointer	sp, work1, work2
 real	ap_diverr()
 

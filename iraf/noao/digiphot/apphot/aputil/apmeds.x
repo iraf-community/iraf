@@ -4,16 +4,18 @@
 real procedure apsmed (pix, index, npts, medcut)
 
 real	pix[ARB]	# array of sky pixels
-int	index[ARB]	# sorted index array
-int	npts		# number of pixels
-int	medcut		# averaging half width
+long	index[ARB]	# sorted index array
+size_t	npts		# number of pixels
+long	medcut		# averaging half width
 
-int	med, j, nmed, medlo, medhi
+long	med, j, nmed, medlo, medhi, c_2
 real	sumed
+long	lmod()
 
 begin
+	c_2 = 2
 	med = (npts + 1) / 2
-	if (mod (med, 2) == 1) {
+	if (lmod (med, c_2) == 1) {
 	    medlo = max (1, med - medcut)
 	    medhi = min (npts, med + medcut)
 	} else {
@@ -36,14 +38,14 @@ end
 # weight array which is assumed to be zero if the pixels has been rejected
 # and is positive otherwise.
 
-int procedure apimed (weight, index, lo, hi, nmed)
+long procedure apimed (weight, index, lo, hi, nmed)
 
 real	weight[ARB]		# array of weights
-int	index[ARB]		# array of sorted indices
-int	lo, hi			# ranges of weights
-int	nmed			# number of good sky pixels
+long	index[ARB]		# array of sorted indices
+long	lo, hi			# ranges of weights
+long	nmed			# number of good sky pixels
 
-int	npts, med
+long	npts, med
 
 begin
 	npts = 0
@@ -65,18 +67,20 @@ end
 real procedure apwsmed (pix, index, weight, npix, med, medcut)
 
 real	pix[ARB]		# pixel values array
-int	index[ARB]		# sorted indices array
+long	index[ARB]		# sorted indices array
 real	weight[ARB]		# the weights array
-int	npix			# number of pixels
-int	med			# index of median value
-int	medcut			# of median cut
+size_t	npix			# number of pixels
+long	med			# index of median value
+long	medcut			# of median cut
 
-int	j, nmed, maxmed
+long	j, nmed, maxmed, c_2
 real	sumed
+long	lmod()
 
 begin
+	c_2 = 2
 	sumed = pix[index[med]]
-	if (mod (med, 2) == 1)
+	if (lmod (med, c_2) == 1)
 	    maxmed = 2 * medcut + 1 
 	else
 	    maxmed = 2 * medcut + 2 
@@ -111,10 +115,10 @@ end
 real procedure apmedr (a, index, npix)
 
 real	a[ARB]				# input array of values
-int	index[ARB]			# sorted index array
-int	npix				# number of pixels
+long	index[ARB]			# sorted index array
+size_t	npix				# number of pixels
 
-int	i
+long	i
 pointer	sp, aa
 real	median
 real	asokr()		# select the Kth smallest element from A

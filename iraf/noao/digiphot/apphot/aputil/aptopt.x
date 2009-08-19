@@ -9,7 +9,7 @@ define	MAX_SEARCH	3	# Max initial search steps
 int procedure aptopt (data, npix, center, sigma, tol, maxiter, ortho)
 
 real	data[ARB]		# initial data
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 real	center			# initial guess at center
 real	sigma			# sigma of Gaussian
 real	tol			# gap tolerance for sigma
@@ -19,7 +19,7 @@ int	ortho			# orthogonalize weighting vector
 int	i, iter
 pointer	sp, wgt
 real	newx, x[3], news, s[3], delx
-real	adotr(), apqzero()
+real	adotr(), apqzero(), aabs()
 
 begin
 	if (sigma <= 0.0)
@@ -81,9 +81,9 @@ begin
 	    #if (abs (s[2]) <= EPSILONR)
 	    if (s[2] == 0.0)
 		break
-	    if (abs (x[2] - x[1]) <= tol)
+	    if (aabs (x[2] - x[1]) <= tol)
 		break
-	    if (abs (x[3] - x[2]) <= tol)
+	    if (aabs (x[3] - x[2]) <= tol)
 		break
 
 	    # Compute new intermediate value.
@@ -118,19 +118,20 @@ procedure ap_tprofder (data, der, npix, center, sigma, ampl)
 
 real	data[ARB]		# input data
 real	der[ARB]		# derivatives
-int	npix			# number of pixels
+size_t	npix			# number of pixels
 real	center			# center of input Gaussian function
 real	sigma			# sigma of input Gaussian function
 real	ampl			# amplitude
 
-int	i
+long	i
 real	x, xabs, width
+real	aabs()
 
 begin
 	width = sigma * 2.35
 	do i = 1, npix {
 	    x = (i - center) / width
-	    xabs = abs (x)
+	    xabs = aabs (x)
 	    if (xabs <= 1.0) {
 		data[i] = ampl * (1.0 - xabs)
 		der[i] = x * data[i]
@@ -147,7 +148,7 @@ end
 procedure mkt_prof_derv (weight, npix, center, sigma, norm)
 
 real	weight[ARB]	# input weight
-int	npix		# number of pixels
+size_t	npix		# number of pixels
 real	center		# center
 real	sigma		# center
 int	norm		# orthogonalise weight
@@ -204,6 +205,7 @@ real	y[3]
 
 real	a, b, c, det, dx
 real	x2, x3, y2, y3
+real	aabs()
 
 begin
 	# Compute the determinant.
@@ -215,17 +217,17 @@ begin
 
 	# Compute the shift in x.
 	#if (abs (det) > 100.0 * EPSILONR) {
-	if (abs (det) > 0.0) {
+	if (aabs (det) > 0.0) {
 	    a = (x3 * y2 - x2 * y3) / det
 	    b = - (x3 * x3 * y2 - x2 * x2 * y3) / det
 	    c =  a * y[1] / (b * b)
-	    if (abs (c) > QTOL)
+	    if (aabs (c) > QTOL)
 		dx = (-b / (2.0 * a)) * (1.0 - sqrt (1.0 - 4.0 * c))
 	    else
 		dx = - (y[1] / b) * (1.0 + c)
 	    return (dx)
-	#} else if (abs (y3) > EPSILONR)
-	} else if (abs (y3) > 0.0)
+	#} else if (aabs (y3) > EPSILONR)
+	} else if (aabs (y3) > 0.0)
 	    return (-y[1] * x3 / y3)
 	else
 	    return (0.0)

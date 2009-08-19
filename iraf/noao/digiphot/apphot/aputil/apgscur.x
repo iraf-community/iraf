@@ -4,17 +4,19 @@ include <fset.h>
 # APGSCUR -- Read the x and y coordinates of an object from a file and move
 # the cursor to those coordinates.
 
-int procedure apgscur (sl, gd, xcur, ycur, prev_num, req_num, num)
+long procedure apgscur (sl, gd, xcur, ycur, prev_num, req_num, num)
 
 int	sl		# coordinate file descriptor
 pointer	gd		# pointer to graphics stream
 real	xcur, ycur	# x cur and y cur
-int	prev_num	# previous number
-int	req_num		# requested number
-int	num		# list number
+long	prev_num	# previous number
+long	req_num		# requested number
+long	num		# list number
 
-int	stdin, nskip, ncount
+size_t	sz_val
+int	stdin
 pointer	sp, fname
+long	nskip, ncount, l_val
 int	fscan(), nscan(), strncmp()
 errchk	greactivate, gdeactivate, gscur
 
@@ -23,7 +25,8 @@ begin
 	    return (EOF)
 
 	call smark (sp)
-	call salloc (fname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fname, sz_val, TY_CHAR)
 
 	# Find the number of objects to be skipped.
 	call fstats (sl, F_FILENAME, Memc[fname], SZ_FNAME)
@@ -33,7 +36,8 @@ begin
 	} else {
 	    stdin = NO
 	    if (req_num <= prev_num) {
-		call seek (sl, BOF)
+		l_val = BOF
+		call seek (sl, l_val)
 		nskip = req_num
 	    } else
 		nskip = req_num - prev_num

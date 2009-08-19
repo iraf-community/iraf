@@ -4,8 +4,8 @@ procedure ap_bsmooth (hgm, shgm, nbins, nker, iter)
 
 real	hgm[ARB]		# the original histogram
 real	shgm[ARB]		# the smoothed histogram
-int	nbins			# length of the histogram
-int	nker			# half width of box kernel
+size_t	nbins			# length of the histogram
+size_t	nker			# half width of box kernel
 int	iter			# number of iterations
 
 pointer	sp, work1, work2

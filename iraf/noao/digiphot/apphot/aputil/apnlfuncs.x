@@ -10,17 +10,18 @@ procedure cgauss1d (x, nvars, p, np, z)
 real	x[ARB]		# variables, x[1] = position coordinate
 int	nvars		# the number of variables, not used
 real	p[ARB]		# p[1]=amplitude p[2]=center p[3]=sigma p[4]=sky
-int	np		# number of parameters np = 4
+size_t	np		# number of parameters np = 4
 real	z		# function return
 
 real	r2
+real	aabs()
 
 begin
 	if (p[3] == 0.)
 	    z = 30.
 	else
 	    r2 = (x[1] - p[2]) ** 2 / (2. * p[3])
-	if (abs (r2) > 25.0)
+	if (aabs (r2) > 25.0)
 	    z = p[4]
 	else
 	    z = p[1] * exp (-r2) + p[4]
@@ -36,11 +37,12 @@ real	x[ARB]		# variables, x[1] = position coordinate
 int	nvars		# the number of variables, not used
 real	p[ARB]		# p[1]=amplitude, p[2]=center, p[3]=sky p[4]=sigma
 real	dp[ARB]		# parameter derivatives
-int	np		# number of parameters np=4
+size_t	np		# number of parameters np=4
 real	z		# function value
 real	der[ARB]	# derivatives
 
 real	dx, r2
+real	aabs()
 
 begin
 	dx = x[1] - p[2]
@@ -48,7 +50,7 @@ begin
 	    r2 = 30.
 	else
 	    r2 = dx * dx / (2.0 * p[3])
-	if (abs (r2) > 25.0) {
+	if (aabs (r2) > 25.0) {
 	    z = p[4]
 	    der[1] = 0.0
 	    der[2] = 0.0
@@ -80,10 +82,11 @@ procedure gaussr (x, nvars, p, np, z)
 real	x[ARB]		# the input variables
 int	nvars		# the number of variables
 real	p[np]		# parameter vector
-int	np		# number of parameters
+size_t	np		# number of parameters
 real	z		# function return
 
 real	dx, dy, r2
+real	aabs()
 
 begin
 	dx = x[1] - p[2]
@@ -92,7 +95,7 @@ begin
 	    r2 = 30.
 	else
 	    r2 = (dx * dx + dy * dy) / (2.0 * p[4])
-	if (abs (r2) > 25.0)
+	if (aabs (r2) > 25.0)
 	    z = p[5]
 	else
 	    z = p[1] * exp (- r2) + p[5]
@@ -108,11 +111,12 @@ real	x[ARB]		# the input variables
 int	nvars		# the number of variables
 real	p[np]		# parameter vector
 real	dp[np]		# dummy array of parameter increments
-int	np		# number of parameters
+size_t	np		# number of parameters
 real	z		# function return
 real	der[np]		# derivatives
 
 real	dx, dy, r2
+real	aabs()
 
 begin
 	dx = x[1] - p[2]
@@ -122,7 +126,7 @@ begin
 	else
 	    r2 = (dx * dx + dy * dy) / (2.0 * p[4])
 
-	if (abs (r2) > 25.0) {
+	if (aabs (r2) > 25.0) {
 	    z = p[5]
 	    der[1] = 0.0
 	    der[2] = 0.0
@@ -158,10 +162,11 @@ procedure elgauss (x, nvars, p, np, z)
 real	x[ARB]		# input variables, x[1] = x, x[2] = y
 int	nvars		# number of variables, not used
 real	p[np]		# parameter vector
-int	np		# number of parameters
+size_t	np		# number of parameters
 real	z		# function return
 
 real	dx, dy, crot, srot, xt, yt, r2
+real	aabs()
 
 begin
 	dx = x[1] - p[2]
@@ -174,7 +179,7 @@ begin
 	    r2 = 30.
 	else
 	    r2 = (xt ** 2 / p[4] + yt ** 2 / p[5]) / 2.0
-	if (abs (r2) > 25.0)
+	if (aabs (r2) > 25.0)
 	    z = p[7]
 	else
 	    z = p[1] * exp (-r2) + p[7]
@@ -190,12 +195,13 @@ real	x[ARB]		# input variables, x[1] = x, x[2] = y
 int	nvars		# number of variables, not used
 real	p[np]		# parameter vector
 real	dp[np]		# delta of parameters
-int	np		# number of parameters
+size_t	np		# number of parameters
 real	z		# function value
 real	der[np]		# function return
 
 real	crot, srot, crot2, srot2, sigx2, sigy2, a, b, c
 real	dx, dy, dx2, dy2, r2
+real	aabs()
 
 begin
 	crot = cos (p[6])
@@ -218,7 +224,7 @@ begin
 	    r2 = 0.5 * (a * dx2 + b * dx * dy + c * dy2)
 	}
 
-	if (abs (r2) > 25.0) {
+	if (aabs (r2) > 25.0) {
 	    z = p[7]
 	    der[1] = 0.0
 	    der[2] = 0.0
@@ -252,17 +258,18 @@ procedure gauss1d (x, nvars, p, np, z)
 real	x[ARB]		# list of variables, x[1] = position coordinate
 int	nvars		# number of variables
 real	p[ARB]		# p[1]=amplitude p[2]=center p[3]=sigma
-int	np		# number of parameters == 3
+size_t	np		# number of parameters == 3
 real	z		# function return
 
 real	r
+real	aabs()
 
 begin
 	if (p[3] == 0.)
 	    r = 30.
 	else
 	    r = (x[1] - p[2]) / (p[3] * SQRTOF2)
-	if (abs (r) > 5.0)
+	if (aabs (r) > 5.0)
 	    z = 0.0
 	else
 	    z = p[1] * exp (- r ** 2)
@@ -278,18 +285,19 @@ real	x[ARB]		# list of variables, x[1] = position coordinate
 int	nvars		# number of variables
 real	p[ARB]		# p[1]=amplitude, p[2]=center, p[3]=sigma
 real	dp[ARB]		# parameter derivatives
-int	np		# number of parameters
+size_t	np		# number of parameters
 real	z		# function value
 real	der[ARB]	# derivatives
 
 real	r
+real	aabs()
 
 begin
 	if (p[3] == 0.)
 	    r = 30.
 	else
 	    r = (x[1] - p[2]) / (SQRTOF2 * p[3])
-	if (abs (r) > 5.0) {
+	if (aabs (r) > 5.0) {
 	    z = 0.0
 	    der[1] = 0.0
 	    der[2] = 0.0
@@ -311,10 +319,11 @@ procedure gausskew (x, nvars, p, np, z)
 real	x[ARB]		# list of variables, x[1] = position coordinate
 int	nvars		# number of variables, not used
 real	p[ARB]		# p[1]=amplitude p[2]=center p[3]=sigma p[4]=skew
-int	np		# number of parameters == 3
+size_t	np		# number of parameters == 3
 real	z		# function return
 
 real	dx, r2, r3
+real	aabs()
 
 begin
 	dx = (x[1] - p[2])
@@ -322,9 +331,9 @@ begin
 	    r2 = 30.
 	else {
 	    r2 = dx ** 2 / (2.0 * p[3])
-	    r3 = r2 * dx / sqrt (2.0 * abs (p[3])) 
+	    r3 = r2 * dx / sqrt (2.0 * aabs (p[3])) 
 	}
-	if (abs (r2) > 25.0)
+	if (aabs (r2) > 25.0)
 	    z = 0.0
 	else
 	    z = (1.0 + p[4] * r3) * p[1] * exp (-r2)
@@ -340,11 +349,12 @@ real	x[ARB]		# list of variables, x[1] = position coordinate
 int	nvars		# number of variables, not used
 real	p[ARB]		# p[1]=amplitude, p[2]=center, p[3]=sigma, p[4]=skew
 real	dp[ARB]		# parameter derivatives
-int	np		# number of parameters
+size_t	np		# number of parameters
 real	z		# function value
 real	der[ARB]	# derivatives
 
 real	dx, d1, d2, d3, r, r2, r3, rint
+real	aabs()
 
 begin
 	dx = x[1] - p[2]
@@ -352,14 +362,14 @@ begin
 	    r2 = 30.
 	else
 	    r2 = dx ** 2 / (2.0 * p[3])
-	if (abs (r2) > 25.0) {
+	if (aabs (r2) > 25.0) {
 	    z = 0.0
 	    der[1] = 0.0
 	    der[2] = 0.0
 	    der[3] = 0.0
 	    der[4] = 0.0
 	} else {
-	    r = dx / sqrt (2.0 * abs (p[3]))
+	    r = dx / sqrt (2.0 * aabs (p[3]))
 	    r3 = r2 * r
 	    d1 = exp (-r2)
 	    z = d1 * p[1]
