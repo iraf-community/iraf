@@ -17,17 +17,17 @@ define	AP_CMAXITER	    Memi[P2I($1+9)]	# Maximum number of iterations
 
 # centering buffers
 
-define	AP_CTRPIX	    Memi[P2I($1+10)]	# Pointer to pixels
-define	AP_XCTRPIX	    Memi[P2I($1+11)]	# Pointer to x coords (not used)
-define	AP_YCTRPIX	    Memi[P2I($1+12)]	# Pointer to y coords (not used)
-define	AP_NCTRPIX	    Memi[P2I($1+13)]	# Number of pixels (not used)
-define	AP_LENCTRBUF	    Memi[P2I($1+14)]	# Centering buffer size (not used)
+define	AP_CTRPIX	    Memp[$1+10]		# Pointer to pixels
+define	AP_XCTRPIX	    Memp[$1+11]		# Pointer to x coords (not used)
+define	AP_YCTRPIX	    Memp[$1+12]		# Pointer to y coords (not used)
+define	AP_NCTRPIX	    Memz[P2Z($1+13)]	# Number of pixels (not used)
+define	AP_LENCTRBUF	    Memz[P2Z($1+14)]	# Centering buffer size (not used)
 define	AP_CXCUR	    Memr[P2R($1+15)]	# Centering buffer x center
 define	AP_CYCUR	    Memr[P2R($1+16)]	# Centering buffer y center
 define	AP_CXC		    Memr[P2R($1+17)]	# X center of subraster
 define	AP_CYC		    Memr[P2R($1+18)]	# Y center of subraster
-define	AP_CNX		    Memi[P2I($1+19)]	# Y dimension of subraster
-define	AP_CNY		    Memi[P2I($1+20)]	# Y dimension of subraster
+define	AP_CNX		    Memz[P2Z($1+19)]	# Y dimension of subraster
+define	AP_CNY		    Memz[P2Z($1+20)]	# Y dimension of subraster
 
 # center fitting output
 

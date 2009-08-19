@@ -6,7 +6,7 @@ define	LEN_FIND		(10)
 
 define	AP_RATIO	Memr[P2R($1)]	# Gaussian axis ratio
 define	AP_THETA 	Memr[P2R($1+1)]	# Gaussian position angle
-define	AP_NSIGMA	memr[$1+2]	# Size of convolution kernel
+define	AP_NSIGMA	Memr[P2R($1+2)]	# Size of convolution kernel
 define	AP_SHARPLO	Memr[P2R($1+3)]	# Lower sharpness bound
 define	AP_SHARPHI	Memr[P2R($1+4)]	# Upper sharpness bound
 define	AP_ROUNDLO	Memr[P2R($1+5)]	# Lower roundness bound

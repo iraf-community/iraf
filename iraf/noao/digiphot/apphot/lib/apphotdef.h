@@ -19,34 +19,34 @@ define	AP_XAIRMASS	Memr[P2R($1+11)]	# Air mass
 
 # pointer to the apphot strucutures
 
-define	AP_NOISE	Memi[P2I($1+12)]	# Pointer to noise structure
-define	AP_PCENTER	Memi[P2I($1+13)]	# Pointer to center structure
-define	AP_PSKY		Memi[P2I($1+14)]	# Pointer to sky structure
-define	AP_PPSF		Memi[P2I($1+15)]	# Pointer to psf structure
-define  AP_PPHOT        Memi[P2I($1+16)]	# Pointer to phot structure
-define	AP_PDISPLAY	Memi[P2I($1+17)]	# Pointer to display structure
-define	AP_POLY		Memi[P2I($1+18)]	# Pointer to polyphot structure
-define	AP_RPROF	Memi[P2I($1+19)]	# Pointer to radprof strucuture
-define	AP_PFIND	Memi[P2I($1+20)]	# Pointer to the find structure
+define	AP_NOISE	Memp[$1+12]		# Pointer to noise structure
+define	AP_PCENTER	Memp[$1+13]		# Pointer to center structure
+define	AP_PSKY		Memp[$1+14]		# Pointer to sky structure
+define	AP_PPSF		Memp[$1+15]		# Pointer to psf structure
+define  AP_PPHOT        Memp[$1+16]		# Pointer to phot structure
+define	AP_PDISPLAY	Memp[$1+17]		# Pointer to display structure
+define	AP_POLY		Memp[$1+18]		# Pointer to polyphot structure
+define	AP_RPROF	Memp[$1+19]		# Pointer to radprof strucuture
+define	AP_PFIND	Memp[$1+20]		# Pointer to the find structure
 
 # pointer to sequential access buffer (not used currently)
 
 define	AP_SEQUENTIAL	Memi[P2I($1+21)]	# Sequential or random access
-define	AP_IMBUF	Memi[P2I($1+22)]	# Pointer to internal buffer
-define	AP_HWIDTH	Memi[P2I($1+23)]	# Half-width of buffer in image lines
-define	AP_IMX1		Memi[P2I($1+24)]	# Lower column limit of buffer
-define	AP_IMX2		Memi[P2I($1+25)]	# Upper column limit of buffer
-define	AP_IMY1		Memi[P2I($1+26)]	# Lower line limit of buffer
-define	AP_IMY2		Memi[P2I($1+27)]	# Upper line limit of buffer
+define	AP_IMBUF	Memp[$1+22]		# Pointer to internal buffer
+define	AP_HWIDTH	Meml[P2L($1+23)]	# Half-width of buffer in image lines
+define	AP_IMX1		Meml[P2L($1+24)]	# Lower column limit of buffer
+define	AP_IMX2		Meml[P2L($1+25)]	# Upper column limit of buffer
+define	AP_IMY1		Meml[P2L($1+26)]	# Lower line limit of buffer
+define	AP_IMY2		Meml[P2L($1+27)]	# Upper line limit of buffer
 
 # pointer to the wcs info
 
 
 define	AP_WCSIN	Memi[P2I($1+28)]	# the input wcs
 define	AP_WCSOUT	Memi[P2I($1+29)]	# the output wcs
-define	AP_MW		Memi[P2I($1+30)]	# the mwcs pointer
-define	AP_CTIN	        Memi[P2I($1+31)]	# the input transformation pointer
-define	AP_CTOUT        Memi[P2I($1+32)]	# the output transformation pointer
+define	AP_MW		Memp[$1+30]		# the mwcs pointer
+define	AP_CTIN	        Memp[$1+31]	# the input transformation pointer
+define	AP_CTOUT        Memp[$1+32]	# the output transformation pointer
 
 # image, file and keyword names
 

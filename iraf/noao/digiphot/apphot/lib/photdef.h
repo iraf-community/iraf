@@ -9,25 +9,25 @@ define	AP_PXCUR	Memr[P2R($1+1)]	# X aperture center
 define	AP_PYCUR	Memr[P2R($1+2)]	# Y aperture center
 define	AP_NMAXAP	Memi[P2I($1+3)]	# Maximum number of apertures
 define	AP_NMINAP	Memi[P2I($1+4)]	# Minimum number of apertures
-define	AP_APERTS	Memi[P2I($1+5)]	# Pointer to aperture array
-define	AP_APIX		Memi[P2I($1+6)]	# Pointer to pixels
-define	AP_XAPIX	Memi[P2I($1+7)]	# Pointer to x coords array (not used)
-define	AP_YAPIX	Memi[P2I($1+8)]	# Pointer to y coords array (not used)
-define	AP_NAPIX	Memi[P2I($1+9)]	# Number of pixels (not used)
-define	AP_LENABUF	Memi[P2I($1+10)]	# Size of pixels buffer (not used)
+define	AP_APERTS	Memp[$1+5]	# Pointer to aperture array
+define	AP_APIX		Meml[P2L($1+6)]	# Pointer to pixels
+define	AP_XAPIX	Meml[P2L($1+7)]	# Pointer to x coords array (not used)
+define	AP_YAPIX	Meml[P2L($1+8)]	# Pointer to y coords array (not used)
+define	AP_NAPIX	Memz[P2Z($1+9)]	# Number of pixels (not used)
+define	AP_LENABUF	Memz[P2Z($1+10)]	# Size of pixels buffer (not used)
 define	AP_AXC		Memr[P2R($1+11)]	# X center of subraster
 define	AP_AYC		Memr[P2R($1+12)]	# X center of subraster
-define	AP_ANX		Memi[P2I($1+13)]	# X dimension of subraster
-define	AP_ANY		Memi[P2I($1+14)]	# Y dimension of subraster
+define	AP_ANX		Memz[P2Z($1+13)]	# X dimension of subraster
+define	AP_ANY		Memz[P2Z($1+14)]	# Y dimension of subraster
 define	AP_OPXCUR	Memr[P2R($1+15)]	# X aperture center
 define	AP_OPYCUR	Memr[P2R($1+16)]	# Y aperture center
 
 # photometry output
 
-define	AP_MAGS		Memi[P2I($1+17)]	# Pointer to magnitude array
-define	AP_MAGERRS	Memi[P2I($1+18)]	# Pointer to mag errors array
-define	AP_AREA		Memi[P2I($1+19)]	# Pointer to areas array
-define	AP_SUMS		Memi[P2I($1+20)]	# Pointer to aperture sums array
+define	AP_MAGS		Memp[$1+17]		# Pointer to magnitude array
+define	AP_MAGERRS	Memp[$1+18]		# Pointer to mag errors array
+define	AP_AREA		Memp[$1+19]		# Pointer to areas array
+define	AP_SUMS		Memp[$1+20]		# Pointer to aperture sums array
 
 # photometry parameters
 
