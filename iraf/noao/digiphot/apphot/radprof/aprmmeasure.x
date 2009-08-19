@@ -5,22 +5,25 @@ include <math/curfit.h>
 procedure ap_rmmeasure (pixels, nx, ny, wx, wy, aperts, sums, areas, naperts)
 
 real	pixels[nx,ARB]		# subraster pixel values
-int	nx, ny			# dimensions of the subraster
+size_t	nx, ny			# dimensions of the subraster
 real	wx, wy			# center of subraster
 real	aperts[ARB]		# array of apertures
 double	sums[ARB]		# array of sums
 double	areas[ARB]		# aperture areas
 int	naperts			# number of apertures
 
-int	i, j, k
+size_t	sz_val
+long	i, j
+int	k
 double	fctn
 real	apmaxsq, dy2, r2, r
 
 begin
 	# Initialize.
 	apmaxsq = (aperts[naperts] + 0.5) ** 2
-	call aclrd (sums, naperts)
-	call aclrd (areas, naperts)
+	sz_val = naperts
+	call aclrd (sums, sz_val)
+	call aclrd (areas, sz_val)
 
 	# Loop over the pixels.
 	do j = 1, ny {
@@ -48,7 +51,7 @@ procedure ap_brmmeasure (pixels, nx, ny, wx, wy, datamin, datamax, aperts,
 	sums, areas, naperts, minapert)
 
 real	pixels[nx,ARB]		# subraster pixel values
-int	nx, ny			# dimensions of the subraster
+size_t	nx, ny			# dimensions of the subraster
 real	wx, wy			# center of subraster
 real	datamin			# minimum good data value
 real	datamax			# maximum good data value
@@ -58,15 +61,18 @@ double	areas[ARB]		# aperture areas
 int	naperts			# number of apertures
 int	minapert		# minimum number of apertures
 
-int	i, j, k, kindex
+size_t	sz_val
+long	i, j
+int	k, kindex
 double	fctn
 real	apmaxsq, dy2, r2, r, pixval
 
 begin
 	# Initialize.
 	apmaxsq = (aperts[naperts] + 0.5) ** 2
-	call aclrd (sums, naperts)
-	call aclrd (areas, naperts)
+	sz_val = naperts
+	call aclrd (sums, sz_val)
+	call aclrd (areas, sz_val)
 	minapert = naperts + 1
 
 	# Loop over the pixels.

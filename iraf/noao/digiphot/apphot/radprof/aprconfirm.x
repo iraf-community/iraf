@@ -11,8 +11,9 @@ procedure ap_rconfirm (ap, out, stid)
 
 pointer	ap		# pointer to the apphot structure
 int	out		# output file descriptor
-int	stid		# output file sequence number
+long	stid		# output file sequence number
 
+size_t	sz_val
 pointer	sp, cstr, sstr, aperts
 real	fwhmpsf, capert, annulus, dannulus, skysigma
 real	datamin, datamax, radius, step
@@ -23,9 +24,11 @@ real	ap_vdatamin(), ap_vdatamax(), ap_vrpradius()
 
 begin
 	call smark (sp)
-	call salloc (cstr, SZ_FNAME, TY_CHAR)
-	call salloc (sstr, SZ_FNAME, TY_CHAR)
-	call salloc (aperts, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (cstr, sz_val, TY_CHAR)
+	call salloc (sstr, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (aperts, sz_val, TY_CHAR)
 
 	call printf ("\n")
 

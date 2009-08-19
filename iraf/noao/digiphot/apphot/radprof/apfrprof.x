@@ -22,10 +22,14 @@ pointer	im		# pointer to the IRAF image
 real	wx, wy		# object coordinates
 int	pier		# photometry error
 
-int	i, ier, fier, nxpts, nypts, nrpts, order
+size_t	c_1
+long	i
+int	ier, fier, order
+size_t	nxpts, nypts, nrpts
 pointer	sky, rprof, cv, asi
 real	datamin, datamax, step, rmin, rmax, inorm, tinorm
-int	ap_rpbuf(), ap_rmag(), ap_rpmeasure(), ap_rpiter()
+int	ap_rpbuf(), ap_rmag(), ap_rpmeasure()
+long	ap_rpiter()
 real	asigrl(), cveval(), ap_rphalf()
 
 errchk	cvinit(), cvfit(), cvvector(), cveval(), cvfree()
@@ -33,6 +37,8 @@ errchk	asinit(), asifit(), asigrl(), asifree()
 errchk	ap_rpmeasure(), ap_rpiter()
 
 begin
+	c_1 = 1
+
 	# Set up some apphot pointers.
 	sky = AP_PSKY(ap)
 	rprof = AP_RPROF(ap)
@@ -48,10 +54,10 @@ begin
             switch (AP_WCSOUT(ap)) {
             case WCS_WORLD, WCS_PHYSICAL:
                 call ap_ltoo (ap, wx, wy, AP_ORPXCUR(rprof),
-		    AP_ORPYCUR(rprof), 1)
+		    AP_ORPYCUR(rprof), c_1)
             case WCS_TV:
                 call ap_ltov (im, wx, wy, AP_ORPXCUR(rprof),
-		    AP_ORPYCUR(rprof), 1)
+		    AP_ORPYCUR(rprof), c_1)
             default:
                 AP_ORPXCUR(rprof) = wx
                 AP_ORPYCUR(rprof) = wy
@@ -171,6 +177,7 @@ int procedure ap_rmag (ap)
 
 pointer	ap		# pointer to the apphot structure
 
+size_t	sz_val
 int	pier, nap
 pointer	sp, nse, sky, phot, rprof, aperts
 real	datamin, datamax, zmag
@@ -184,7 +191,8 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (aperts, AP_NAPERTS(phot), TY_REAL)
+	sz_val = AP_NAPERTS(phot)
+	call salloc (aperts, sz_val, TY_REAL)
 
 	# Check for out of bounds apertures.
 	call ap_maxap (ap, pier)
@@ -201,7 +209,8 @@ begin
 
 	# Compute the sums.
 	call ap_arrayr (ap, APERTS, Memr[aperts])
-	call amulkr (Memr[aperts], AP_SCALE(ap), Memr[aperts], AP_NAPERTS(phot))
+	sz_val = AP_NAPERTS(phot)
+	call amulkr (Memr[aperts], AP_SCALE(ap), Memr[aperts], sz_val)
 	if (IS_INDEFR(AP_DATAMIN(ap)) && IS_INDEFR(AP_DATAMAX(ap))) {
 	    call ap_rmmeasure (Memr[AP_RPIX(rprof)], AP_RPNX(rprof),
 	        AP_RPNY(rprof), AP_RPXC(rprof), AP_RPYC(rprof), Memr[aperts],
@@ -245,15 +254,16 @@ int procedure ap_rpmeasure (cv, pixels, nx, ny, wx, wy, datamin, datamax,
 
 pointer	cv			# pointer to curfit structure
 real	pixels[nx,ARB]		# subraster pixel values
-int	nx, ny			# dimensions of the subraster
+size_t	nx, ny			# dimensions of the subraster
 real	wx, wy			# center of subraster
 real	datamin			# minimum good data value
 real	datamax			# maximum good data value
 real	rmax			# the maximum radius
-int	ndata			# the number of ok data points
-int	nbad			# the number of bad data points
+size_t	ndata			# the number of ok data points
+size_t	nbad			# the number of bad data points
 
-int	i, j, ier
+long	i, j
+int	ier
 real	weight, dy2, r2, rcv
 
 begin
@@ -286,12 +296,12 @@ end
 
 # AP_RPITER -- Procedure to reject pixels from the fit.
 
-int procedure ap_rpiter (cv, pixels, nx, ny, wx, wy, rmax, datamin, datamax,
-	niter, ksigma, fier)
+long procedure ap_rpiter (cv, pixels, nx, ny, wx, wy, rmax, datamin, datamax,
+			  niter, ksigma, fier)
 
 pointer	cv		# pointer to the curfit structure
 real	pixels[nx,ARB]	# pixel values
-int	nx, ny		# dimensions of image subraster
+size_t	nx, ny		# dimensions of image subraster
 real	wx, wy		# x and y coordinates of the center
 real	rmax		# maximum radius value
 real	datamin		# minimum good data value
@@ -300,7 +310,7 @@ int	niter		# maximum number of rejection cycles
 real	ksigma		# ksigma rejection limit
 int	fier		# fitting error code
 
-int	i, j, k, npts, ntreject, nreject
+long	i, j, k, npts, ntreject, nreject
 pointer	sp, rtemp, w, ptr
 real	chisqr, diff, locut, hicut
 real	cveval()
@@ -393,9 +403,9 @@ real procedure ap_rphalf (radius, intensity, npts)
 
 real	radius[ARB]		# radius in pixels
 real	intensity[ARB]		# profile intensity
-int	npts			# number of points
+size_t	npts			# number of points
 
-int	i
+long	i
 real	halfp
 
 begin

@@ -16,10 +16,12 @@ pointer	gid			# display device stream
 pointer	gd			# pointer to graphics stream
 pointer	mgd			# pointer to metacode file
 int	out			# output file descriptor
-int	id, ld			# sequence and list numbers
+long	id, ld			# sequence and list numbers
 int	interactive		# interactive pr batch mode
 
-int	stdin, ild, cier, sier, pier, rier
+size_t	sz_val, c_1
+int	stdin, cier, sier, pier, rier
+long	ild
 pointer	sp, str
 real	wx, wy
 int	fscan(), nscan(), apfitsky(), apfitcenter(), ap_frprof(), apstati()
@@ -27,8 +29,11 @@ int	strncmp()
 real	apstatr()
 
 begin
+	c_1 = 1
+
 	call smark (sp)
-	call salloc (str, SZ_FNAME + 1, TY_CHAR)
+	sz_val = SZ_FNAME + 1
+	call salloc (str, sz_val, TY_CHAR)
 	call fstats (cl, F_FILENAME, Memc[str], SZ_FNAME)
 
 	# Initialize.
@@ -61,9 +66,9 @@ begin
             # Transform the input coordinates.
             switch (apstati(ap,WCSIN)) {
             case WCS_WORLD, WCS_PHYSICAL:
-                call ap_itol (ap, wx, wy, wx, wy, 1)
+                call ap_itol (ap, wx, wy, wx, wy, c_1)
             case WCS_TV:
-                call ap_vtol (im, wx, wy, wx, wy, 1)
+                call ap_vtol (im, wx, wy, wx, wy, c_1)
             default:
                 ;
             }

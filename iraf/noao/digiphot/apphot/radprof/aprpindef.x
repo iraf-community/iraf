@@ -11,6 +11,7 @@ procedure ap_rpindef (ap)
 
 pointer	ap		# pointer to the apphot structure
 
+size_t	sz_val
 pointer	phot, rprof
 
 begin
@@ -23,10 +24,11 @@ begin
 
 	call amovkr (INDEFR, Memr[AP_INTENSITY(rprof)], AP_RPNPTS(rprof))
 	call amovkr (INDEFR, Memr[AP_TINTENSITY(rprof)], AP_RPNPTS(rprof))
-	call amovkd (0.0d0, Memd[AP_AREA(phot)], AP_NAPERTS(phot))
-	call amovkd (0.0d0, Memd[AP_SUMS(phot)], AP_NAPERTS(phot))
-	call amovkr (INDEFR, Memr[AP_MAGS(phot)], AP_NAPERTS(phot))
-	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], AP_NAPERTS(phot))
+	sz_val = AP_NAPERTS(phot)
+	call amovkd (0.0d0, Memd[AP_AREA(phot)], sz_val)
+	call amovkd (0.0d0, Memd[AP_SUMS(phot)], sz_val)
+	call amovkr (INDEFR, Memr[AP_MAGS(phot)], sz_val)
+	call amovkr (INDEFR, Memr[AP_MAGERRS(phot)], sz_val)
 end
 
 
@@ -40,6 +42,7 @@ int	pier		# photometric error
 int	i
 pointer	phot, rprof
 real	dxc1, dxc2, dyc1, dyc2, rdist, rapert
+real	aabs()
 
 begin
 	phot = AP_PPHOT(ap)
@@ -52,7 +55,7 @@ begin
 
 	# Compute the maximum aperture.
 	AP_NMAXAP(phot) = 0
-	rdist = min (abs (dxc1), abs (dxc2), abs (dyc1), abs (dyc2))
+	rdist = min (aabs (dxc1), aabs (dxc2), aabs (dyc1), aabs (dyc2))
 	do i = 1, AP_NAPERTS(phot) {
 	    rapert = AP_SCALE(ap) * Memr[AP_APERTS(phot)+i-1]
 	    if (rapert <= rdist) {

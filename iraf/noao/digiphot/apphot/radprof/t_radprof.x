@@ -20,10 +20,12 @@ int	verify		# verify the critical parameters
 int	update		# update the critical parameters
 int	verbose		# verbose mode
 
+size_t	sz_val
 pointer	sp, cname, outfname, ap, im, id, gd, mgd, str
 pointer	clist, olist, imlist
-int	limlist, lclist, lolist, sid, lid, cl, out, pfd, root, stat
-int	wcs, memstat, req_size, old_size, buf_size
+int	limlist, lclist, lolist, cl, out, pfd, root, stat, wcs, memstat
+long	sid, lid, l_val
+size_t	req_size, old_size, buf_size
 
 pointer	immap(), gopen(), clpopnu(), imtopenp()
 int	imtlen(), imtgetim(), clplen(), clgfil(), btoi(), fnldir(), strncmp()
@@ -32,18 +34,21 @@ int	ap_memstat(), sizeof()
 bool	clgetb(), streq()
 errchk	gopen
 
+include	<nullptr.inc>
+
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (output, SZ_FNAME, TY_CHAR)
-	call salloc (coords, SZ_FNAME, TY_CHAR)
-	call salloc (plotfile, SZ_FNAME, TY_CHAR)
-	call salloc (graphics, SZ_FNAME, TY_CHAR)
-	call salloc (display, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (cname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (output, sz_val, TY_CHAR)
+	call salloc (coords, sz_val, TY_CHAR)
+	call salloc (plotfile, sz_val, TY_CHAR)
+	call salloc (graphics, sz_val, TY_CHAR)
+	call salloc (display, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (cname, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Set standard output to flush on newline.
 	call fseti (STDOUT, F_FLUSHNL, YES)
@@ -89,7 +94,8 @@ begin
 
 	# Verify the radial profile fitting parameters.
 	if (verify == YES && interactive == NO) {
-	    call ap_rconfirm (ap, NULL, 1)
+	    l_val = 1
+	    call ap_rconfirm (ap, NULL, l_val)
 	    if (update == YES)
 		call ap_rpars (ap)
 	}
@@ -161,7 +167,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the image.
-	    im = immap (Memc[image], READ_ONLY, 0)
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 
 	    # Set the image display viewport.
 	    call apimkeys (ap, im, Memc[image])
@@ -172,8 +178,10 @@ begin
             req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
             memstat = ap_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call ap_pcache (im, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call ap_pcache (im, l_val, buf_size)
+	    }
 
 	    # Open the coordinate file, where coords is assumed to be a simple
 	    # text file in which the x and y positions are in columns 1 and 2
@@ -196,7 +204,8 @@ begin
 	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 		} else {
 		    call apstats (ap, CLNAME, Memc[outfname], SZ_FNAME)
-		    call seek (cl, BOF)
+		    l_val = BOF
+		    call seek (cl, l_val)
 		}
 	    }
 	    call apsets (ap, CLNAME, Memc[outfname])
@@ -232,7 +241,7 @@ begin
 	    # Fit the radial profiles.
 	    if (interactive == NO) {
 	        if (Memc[cname] != EOS)
-		    stat = ap_radprof (ap, im, cl, NULL, mgd, NULL, out,
+		    stat = ap_radprof (ap, im, cl, NULLPTR, mgd, NULLPTR, out,
 		        sid, NO, cache)
 	        else  if (cl != NULL) {
 		    lid = 1

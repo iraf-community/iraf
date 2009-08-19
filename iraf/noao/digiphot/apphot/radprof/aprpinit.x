@@ -20,9 +20,12 @@ real	step		# step size of output
 real	fwhmpsf		# FWHM of the PSF
 int	noise		# Noise model
 
+size_t	sz_val
+
 begin
 	# Set the image dependent parameters.
-	call malloc (ap, LEN_APSTRUCT, TY_STRUCT)
+	sz_val = LEN_APSTRUCT
+	call malloc (ap, sz_val, TY_STRUCT)
 
 	# Set up the global apphot package defaults.
 	call ap_defsetup (ap, fwhmpsf)
@@ -59,17 +62,20 @@ pointer	ap		# pointer to apphot structure
 real	radius		# radius of psf to be fit
 real	step		# step size
 
+size_t	sz_val
 pointer	rprof
+long	lint()
 
 begin
-	call malloc (AP_RPROF(ap), LEN_RPSTRUCT, TY_STRUCT)
+	sz_val = LEN_RPSTRUCT
+	call malloc (AP_RPROF(ap), sz_val, TY_STRUCT)
 	rprof = AP_RPROF(ap)
 	AP_RPXCUR(rprof) = INDEFR
 	AP_RPYCUR(rprof) = INDEFR
 	AP_RPRADIUS(rprof) = radius
 	AP_RPSTEP(rprof) = step
 	AP_RPIX(rprof) = NULL
-	AP_RPNPTS(rprof) = int (AP_RPRADIUS(rprof) / AP_RPSTEP(rprof)) + 1
+	AP_RPNPTS(rprof) = lint (AP_RPRADIUS(rprof) / AP_RPSTEP(rprof)) + 1
 	call malloc (AP_RPDIST(rprof), AP_RPNPTS(rprof), TY_REAL)
 	call malloc (AP_INTENSITY(rprof), AP_RPNPTS(rprof), TY_REAL)
 	call malloc (AP_DINTENSITY(rprof), AP_RPNPTS(rprof), TY_REAL)

@@ -12,7 +12,7 @@ pointer	ap		# pointer to apphot structure
 pointer	im		# pointer to the IRAF image
 real	wx, wy		# center coordinates
 
-int	c1, c2, l1, l2
+long	c1, c2, l1, l2
 pointer	rprof
 real	rbuf
 pointer ap_rppix()
@@ -49,10 +49,10 @@ pointer procedure ap_rppix (im, wx, wy, papert, c1, c2, l1, l2)
 pointer	im		# pointer to IRAF image
 real	wx, wy		# center of centering subraster annulus
 real	papert		# centering radius
-int	c1, c2		# column limits
-int	l1, l2		# line limits
+long	c1, c2		# column limits
+long	l1, l2		# line limits
 
-int	ncols, nlines
+long	ncols, nlines
 real	half_papert, xc1, xc2, xl1, xl2
 pointer	imgs2r()
 

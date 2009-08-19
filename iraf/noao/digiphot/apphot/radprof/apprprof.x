@@ -12,8 +12,8 @@ procedure ap_prprof (ap, fd, id, lid, cier, sier, pier, rier)
 
 pointer	ap	# pointer to apphot structure
 int	fd	# output text file descriptor
-int	id	# id number of str
-int	lid	# list id of star
+long	id	# id number of str
+long	lid	# list id of star
 int	cier	# centering error
 int	sier	# sky fitting error
 int	pier	# photometric error
@@ -82,12 +82,14 @@ int	sier	# sky fitting error
 int	pier	# phot error
 int	rier	# radprof error
 
+size_t	sz_val
 pointer	sp, imname, phot
 real	apstatr()
 
 begin
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
 	phot = AP_PPHOT(ap)
 
 	# Print quick summary of radprof results on the standard output.

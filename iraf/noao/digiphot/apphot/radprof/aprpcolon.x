@@ -15,21 +15,23 @@ pointer	ap				# pointer to the apphot structure
 pointer	im				# pointer to iraf image
 int	cl				# coord file descriptor
 int	out				# output file descriptor
-int	stid				# output file sequence number
-int	ltid				# coord list sequence number
+long	stid				# output file sequence number
+long	ltid				# coord list sequence number
 char	cmdstr[ARB]			# command string
 int	newimage			# new image 
 int	newcenterbuf, newcenter		# new sky fit
 int	newskybuf, newsky		# new sky buffer
 int	newbuf, newfit			# new aperture
 
+size_t	sz_val
 pointer	sp, incmd, outcmd
 int	strdic()
 
 begin
 	call smark (sp)
-	call salloc (incmd, SZ_LINE, TY_CHAR)
-	call salloc (outcmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (incmd, sz_val, TY_CHAR)
+	call salloc (outcmd, sz_val, TY_CHAR)
 
 	# Get the commands.
 	call sscan (cmdstr)
@@ -67,11 +69,12 @@ procedure ap_profcolon (ap, out, stid, cmdstr, newbuf, newfit)
 
 pointer	ap		# pointer to apphot structure
 int	out		# output file descriptor
-int	stid		# output file number
+long	stid		# output file number
 char	cmdstr[ARB]	# command string
 int	newbuf		# new aperture buffers
 int	newfit		# compute new magnitudes
 
+size_t	sz_val
 int	ival, ncmd
 pointer	sp, cmd
 real	rval
@@ -81,7 +84,8 @@ real	apstatr()
 begin
 	# Get the command.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call sscan (cmdstr)
 	call gargwrd (Memc[cmd], SZ_LINE)
@@ -175,6 +179,7 @@ procedure ap_rpimcolon (ap, cmdstr)
 pointer	ap			# pointer to the apphot structure
 char	cmdstr[ARB]		# command string
 
+size_t	sz_val
 bool	bval
 int	ncmd
 pointer	sp, cmd
@@ -183,7 +188,8 @@ int	apstati(), strdic(), nscan(), btoi()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)

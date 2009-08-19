@@ -14,12 +14,14 @@ pointer	im			# pointer to the IRAF image
 real	wx, wy			# cursor coordinates
 pointer	gd			# pointer to graphics stream
 int	out			# output file descriptor
-int	stid			# output file sequence number
+long	stid			# output file sequence number
 
+size_t	sz_val
 int	cier, sier, pier, rier, wcs, key
 pointer	sp, str, cmd
 real	xc, yc, xcenter, ycenter, rmin, rmax, imin, imax, rval
 real	u1, u2, v1, v2, x1, x2, y1, y2
+long	l_val
 
 int	apfitcenter(), clgcur(), apfitsky(), ap_frprof(), apstati()
 int	ap_showplot()
@@ -44,8 +46,9 @@ begin
 	}
 
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (cmd, sz_val, TY_CHAR)
         call printf (
         "Waiting for setup menu command (?=help, v=default setup, q=quit):\n")
 	while (clgcur ("gcommands", xc, yc, wcs, key, Memc[cmd],
@@ -118,6 +121,7 @@ begin
 	    NULL, gd)
 	rier = ap_frprof (ap, im, apstatr (ap, XCENTER), apstatr (ap, YCENTER),
 	    pier)
-	call ap_rpplot (ap, 0, gd, apstati (ap, RADPLOTS))
+	l_val = 0
+	call ap_rpplot (ap, l_val, gd, apstati (ap, RADPLOTS))
 	call ap_qprprof (ap, cier, sier, pier, rier)
 end

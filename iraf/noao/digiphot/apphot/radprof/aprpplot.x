@@ -17,14 +17,14 @@ define	IMAX	1.1		# Maximum intensity value for plot
 procedure ap_rpplot (ap, sid, gd, makeplots)
 
 pointer	ap		# pointer to the apphot structure
-int	sid		# output file id number (not used)
+long	sid		# output file id number (not used)
 pointer	gd		# pointer to the plot stream
 int	makeplots	# make plots on the screen ?
 
-int	nxpts, nypts, nrpts
+long	nxpts, nypts, nrpts
 pointer	rprof, gt
 real	rmin, rmax, inorm, x1, x2, y1, y2, u1, u2, v1, v2
-int	apstati()
+long	apstatl()
 pointer	ap_gtinit()
 real	apstatr()
 
@@ -48,7 +48,7 @@ begin
 	rmax = apstatr (ap, SCALE) * apstatr (ap, RPRADIUS)
 	nxpts = AP_RPNX(rprof)
 	nypts = AP_RPNY(rprof)
-	nrpts = apstati (ap, RPNPTS)
+	nrpts = apstatl (ap, RPNPTS)
 	inorm = apstatr (ap, INORM)
 
 	# Reopen the work station.
@@ -96,18 +96,23 @@ pointer	ap		# apphot pointer
 real	xmin, xmax	# minimum and maximum radial distance
 real	ymin, ymax	# minimum and maximum of the y axis
 
+size_t	sz_val
 int	fd, naperts
 pointer	sp, str, tstr, temp
 real	scale, aspect, vx1, vx2, vy1, vy2
 int	stropen(), apstati()
+long	apstatl()
 real	apstatr(), gstatr()
 
 begin
 	call smark (sp)
-	call salloc (str, 6 * SZ_LINE, TY_CHAR)
-	call salloc (tstr, SZ_LINE, TY_CHAR)
+	sz_val = 6 * SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (tstr, sz_val, TY_CHAR)
 	naperts = apstati (ap, NAPERTS)
-	call salloc (temp, naperts, TY_REAL)
+	sz_val = naperts
+	call salloc (temp, sz_val, TY_REAL)
 
 	# Open the title string. 
 	fd = stropen (Memc[str], 6 * SZ_LINE, WRITE_ONLY)
@@ -131,14 +136,15 @@ begin
 	    call pargr (apstatr (ap, SKY_MODE))
 	    call pargr (apstatr (ap, SKY_SIGMA))
 	    call pargr (apstatr (ap, SKY_SKEW))
-	    call pargi (apstati (ap, NSKY))
-	    call pargi (apstati (ap, NSKY_REJECT))
+	    call pargl (apstatl (ap, NSKY))
+	    call pargl (apstatl (ap, NSKY_REJECT))
 
 	# Encode the value of the magnitude at the maximum aperture.
 	call fprintf (fd, "Photometry: fwhmpsf=%0.3f  maxapert=")
 	    call pargr (apstatr (ap, RPFWHM))
 	call ap_arrayr (ap, APERTS, Memr[temp])
-	call amulkr (Memr[temp], apstatr (ap, SCALE), Memr[temp], naperts)
+	sz_val = naperts
+	call amulkr (Memr[temp], apstatr (ap, SCALE), Memr[temp], sz_val)
 	call fprintf (fd, "%0.2f  mags=")
 	    call pargr (Memr[temp+naperts-1])
 	call ap_arrayr (ap, MAGS, Memr[temp])
@@ -150,8 +156,8 @@ begin
 	    "Fit: spline3 order=%d krej=%0.1f sigma np=%d nprej=%d\n")
 	    call pargi (apstati (ap, RPORDER))
 	    call pargr (apstatr (ap, RPKSIGMA))
-	    call pargi (apstati (ap, RPNDATA))
-	    call pargi (apstati (ap, RPNDATAREJ))
+	    call pargl (apstatl (ap, RPNDATA))
+	    call pargl (apstatl (ap, RPNDATAREJ))
 
 	# Encode the title.
 	call gt_gets (gt, GTTITLE, Memc[tstr], SZ_LINE)
@@ -198,6 +204,7 @@ pointer	ap		# apphot structure
 real	xmin, xmax	# min and max of x axis
 real	ymin, ymax	# min and max of y axis
 
+size_t	sz_val
 int	naperts
 pointer	sp, str, temp
 real	scale, rpfwhm, annulus, dannulus, inorm, tinorm
@@ -208,8 +215,10 @@ begin
 	# Allocate working space.
 	naperts = apstati (ap, NAPERTS)
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (temp, naperts, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = naperts
+	call salloc (temp, sz_val, TY_REAL)
 	call gseti (gd, G_PLTYPE, GL_DASHED)
 
 	# Draw the zero level line.
@@ -255,7 +264,8 @@ begin
 
 	# Plot the aperture value.
 	call ap_arrayr (ap, APERTS, Memr[temp])
-	call amulkr (Memr[temp], scale, Memr[temp], naperts)
+	sz_val = naperts
+	call amulkr (Memr[temp], scale, Memr[temp], sz_val)
 	call gseti (gd, G_PLTYPE, GL_SOLID)
 	if (Memr[temp+naperts-1] >= xmin && Memr[temp+naperts-1] <= xmax) {
     	    call gamove (gd, Memr[temp+naperts-1], ymin)
@@ -290,10 +300,10 @@ procedure rp_ptsplot (gd, gt, pixels, nx, ny, wx, wy)
 pointer	gd		# pointer to the graphics stream
 pointer	gt		# pointer to the gtools structure
 real	pixels[nx,ARB]	# subraster of pixel values
-int	nx, ny		# dimensions of the pixel subraster
+size_t	nx, ny		# dimensions of the pixel subraster
 real	wx, wy		# x and y coordinates of the center
 
-int	i
+long	i
 pointer	sp, rtemp
 
 begin
