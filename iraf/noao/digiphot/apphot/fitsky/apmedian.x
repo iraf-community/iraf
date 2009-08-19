@@ -28,8 +28,7 @@ double  dsky, sumpx, sumsqpx, sumcbpx
 int	i
 long	j, ilo, ihi, il, ih, med, medcut
 real	sky_zero, sky_mean, locut, hicut, dmin, dmax
-int	ap_grow_regions()
-long	apimed(), lnint()
+long	ap_grow_regions(), apimed(), lnint()
 real	apsmed(), apwsmed(), ap_asumr()
 
 begin

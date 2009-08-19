@@ -347,7 +347,7 @@ end
 # xranges. Two work additional work arrays xintr and slope are required for
 # the computation.
 
-int procedure ap_yclip (xver, yver, xintr, slope, xranges, nver, lx, ld)
+long procedure ap_yclip (xver, yver, xintr, slope, xranges, nver, lx, ld)
 
 real	xver[ARB]		# x vertex coords
 real	yver[ARB]		# y vertex coords

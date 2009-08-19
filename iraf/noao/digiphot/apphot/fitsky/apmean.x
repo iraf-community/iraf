@@ -26,7 +26,7 @@ double  dsky, sumpx, sumsqpx, sumcbpx
 int	i
 long	j, nreject
 real	sky_zero, dmin, dmax, locut, hicut
-int	ap_grow_regions()
+long	ap_grow_regions()
 real	ap_asumr()
 
 begin
