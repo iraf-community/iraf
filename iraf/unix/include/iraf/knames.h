@@ -772,6 +772,10 @@ extern int ZZWTMT ( XINT *, XLONG *, XLONG * );
 #define	SSIGN		ssign_
 #define	LSIGN		lsign_
 #define	ASIGN		asign_
+#define	SMIN		smin_
+#define	LMIN		lmin_
+#define	SMAX		smax_
+#define	LMAX		lmax_
 #define	SMOD		smod_
 #define	IMOD		imod_
 #define	LMOD		lmod_
@@ -1102,6 +1106,10 @@ extern XREAL ADIM ( XREAL *, XREAL * );
 extern XSHORT SSIGN ( XSHORT *, XSHORT * );
 extern XLONG LSIGN ( XLONG *, XLONG * );
 extern XREAL ASIGN ( XREAL *, XREAL * );
+extern XSHORT SMIN ( XSHORT *, XSHORT * );
+extern XLONG LMIN ( XLONG *, XLONG * );
+extern XSHORT SMAX ( XSHORT *, XSHORT * );
+extern XLONG LMAX ( XLONG *, XLONG * );
 extern XSHORT SMOD ( XSHORT *, XSHORT * );
 extern XINT IMOD ( XINT *, XINT * );
 extern XLONG LMOD ( XLONG *, XLONG * );
