@@ -12,8 +12,8 @@ pointer procedure dp_psubrast (dao, im, lowbad, highbad, x1, x2, y1, y2,
 pointer	dao		# pointer to the daophot structure
 pointer	im		# pointer to the input image
 real	lowbad, highbad	# minimum and maximum good data values
-int	x1, x2		# output x limits of the extracted subraster
-int	y1, y2		# output y limits of the extracted subraster
+long	x1, x2		# output x limits of the extracted subraster
+long	y1, y2		# output y limits of the extracted subraster
 int	saturated	# is the star saturated ?
 
 pointer	psf, buf
@@ -55,14 +55,16 @@ int procedure dp_lsubrast (im, xcen, ycen, radius, x1, x2, y1, y2)
 pointer	im			# input image descriptor
 real	xcen, ycen		# center of subraster
 real	radius			# radius of the box
-int	x1, y1, x2, y2		# boundaries of subraster
+long	x1, y1, x2, y2		# boundaries of subraster
+
+long	lint()
 
 begin
 	# Calculate start position of extraction box.
-	x1 = int (xcen - radius) - 2
-	x2 = int (xcen + radius) + 3
-	y1 = int (ycen - radius) - 2
-	y2 = int (ycen + radius) + 3
+	x1 = lint (xcen - radius) - 2
+	x2 = lint (xcen + radius) + 3
+	y1 = lint (ycen - radius) - 2
+	y2 = lint (ycen + radius) + 3
 	if (x1 > IM_LEN(im,1) || x2 < 1 || y1 > IM_LEN(im,2) || y2 < 1)
 	    return (ERR)
 
@@ -81,18 +83,20 @@ pointer procedure dp_subrast (im, xcen, ycen, radius, x1, x2, y1, y2)
 pointer	im			# input image descriptor
 real	xcen, ycen		# center of subraster
 real	radius			# radius of the box
-int	x1, y1, x2, y2		# boundaries of subraster
+long	x1, y1, x2, y2		# boundaries of subraster
 
-int	j, ncols
+long	j
+size_t	ncols
 pointer	buf, ptr, imbuf
 pointer imgs2r()
+long	lint()
 
 begin
 	# Calculate start position of extraction box.
-	x1 = int (xcen - radius) - 2
-	x2 = int (xcen + radius) + 3
-	y1 = int (ycen - radius) - 2
-	y2 = int (ycen + radius) + 3
+	x1 = lint (xcen - radius) - 2
+	x2 = lint (xcen + radius) + 3
+	y1 = lint (ycen - radius) - 2
+	y2 = lint (ycen + radius) + 3
 	if (x1 > IM_LEN(im,1) || x2 < 1 || y1 > IM_LEN(im,2) || y2 < 1)
 	    return (NULL)
 
@@ -121,8 +125,8 @@ int procedure dp_chksr (x, y, sr, xdim, ydim, x1, y1, psfrad, fitrad, lowbad,
 
 real	x, y			# position of the star
 real	sr[xdim,ydim]		# the data subraster
-int	xdim, ydim		# the dimensions of the subraster
-int	x1, y1			# the lower left hand coordinates of the array
+long	xdim, ydim		# the dimensions of the subraster
+long	x1, y1			# the lower left hand coordinates of the array
 real	psfrad			# the psf radius
 real	fitrad			# the fitting radius
 real	lowbad, highbad		# the good data limits
@@ -130,7 +134,7 @@ int	saturated		# is the star saturated
 real	dmin, dmax		# output data limits
 real	gmax			# maximum good data limit
 
-int	i,j
+long	i, j
 real	pradsq, fradsq, dy2, r2
 
 begin

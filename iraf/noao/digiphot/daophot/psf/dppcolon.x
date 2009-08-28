@@ -8,32 +8,37 @@ procedure dp_pcolon (dao, psfim, opst, psfgr, cmdstr, psf_new, psf_computed,
 
 pointer	dao			# pointer to the daophot structure
 pointer	psfim			# pointer to the output psf image
-int	opst			# the output psf star list file descriptor
-int	psfgr			# the output psf group file descriptor
+pointer	opst			# the output psf star list file descriptor
+pointer	psfgr			# the output psf group file descriptor
 char	cmdstr[ARB]		# the input command string
 bool	psf_new			# is the psf star list defined ?
 bool	psf_computed		# has the psf been fit ?
 bool	psf_written		# has the psf been updated ?
 
+size_t	sz_val
 bool	bval
 int	ncmd, ival
-pointer	sp, cmd, str1, str2, str3
+pointer	sp, cmd, str1, str2, str3, p_val
 real	rval
 
 bool	itob()
 int	strdic(), nscan(), btoi(), dp_stati(), open(), dp_fctdecode()
-int	dp_pstati(), strlen()
+int	strlen()
+long	dp_pstatl()
 pointer	immap(), tbtopn()
 real	dp_statr()
 errchk	immap(), open(), tbtopn()
 
+include	<nullptr.inc>
+
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
-	call salloc (str1, SZ_LINE, TY_CHAR)
-	call salloc (str2, SZ_LINE, TY_CHAR)
-	call salloc (str3, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
+	call salloc (str1, sz_val, TY_CHAR)
+	call salloc (str2, sz_val, TY_CHAR)
+	call salloc (str3, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)
@@ -64,45 +69,49 @@ begin
 		    call imunmap (psfim)
 		psfim = NULL
 		if (opst != NULL) {
-		    if (dp_stati (dao, TEXT) == YES)
-			call close (opst)
-		    else
+		    if (dp_stati (dao, TEXT) == YES) {
+			ival = opst
+			call close (ival)
+		    } else
 			call tbtclo (opst)
 		}
 		opst = NULL
 		if (psfgr != NULL) {
-		    if (dp_stati (dao, TEXT) == YES)
-			call close (psfgr)
-		    else
+		    if (dp_stati (dao, TEXT) == YES) {
+			ival = psfgr
+			call close (ival)
+		    } else
 			call tbtclo (psfgr)
 		}
 		psfgr = NULL
 		iferr {
-		    psfim = immap (Memc[str1], NEW_IMAGE, dp_pstati (dao,
-		        LENUSERAREA))
+		    p_val = dp_pstatl (dao, LENUSERAREA)
+		    psfim = immap (Memc[str1], NEW_IMAGE, p_val)
 		    if (dp_stati (dao, TEXT) == YES)
 			opst = open (Memc[str2], NEW_FILE, TEXT_FILE)
 		    else
-			opst = tbtopn (Memc[str2], NEW_FILE, 0)
+			opst = tbtopn (Memc[str2], NEW_FILE, NULLPTR)
 		    if (dp_stati (dao, TEXT) == YES)
 			psfgr = open (Memc[str3], NEW_FILE, TEXT_FILE)
 		    else
-			psfgr = tbtopn (Memc[str3], NEW_FILE, 0)
+			psfgr = tbtopn (Memc[str3], NEW_FILE, NULLPTR)
 		} then {
 		    if (psfim != NULL)
 		        call imunmap (psfim)
 		    psfim = NULL
 		    if (opst != NULL) {
-		        if (dp_stati (dao, TEXT) == YES)
-			    call close (opst)
-		        else
+		        if (dp_stati (dao, TEXT) == YES) {
+			    ival = opst
+			    call close (ival)
+		        } else
 			    call tbtclo (opst)
 		    }
 		    opst = NULL
 		    if (psfgr != NULL) {
-		        if (dp_stati (dao, TEXT) == YES)
-			    call close (psfgr)
-		        else
+		        if (dp_stati (dao, TEXT) == YES) {
+			    ival = psfgr
+			    call close (ival)
+		        } else
 			    call tbtclo (psfgr)
 		    }
 		    psfgr = NULL

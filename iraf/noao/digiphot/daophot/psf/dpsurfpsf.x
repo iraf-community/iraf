@@ -17,12 +17,12 @@ procedure dp_surfpsf (dao, subras, ncols, nlines, title, gd)
 
 pointer	dao				# pointer to DAOPHOT structure
 real	subras[ncols,nlines]		# pointer to subraster
-int	ncols, nlines			# dimensions of subraster
+size_t	ncols, nlines			# dimensions of subraster
 char	title[ARB]			# title string
 pointer	gd				# pointer to graphics stream
 
 char	sysidstr[SZ_LINE]
-int	first, wkid, status
+int	first, wkid, status, i_val0, i_val1
 pointer	epa, old_onint
 pointer	tsujmp[LEN_JUMPBUF]
 pointer	sp, temp, work, psf
@@ -85,9 +85,17 @@ begin
 
 	# Plot the surface.
 	call zsvjmp (tsujmp, status)
-	if (status == OK)
-	    call ezsrfc (Memr[temp], ncols, nlines, angh, angv, Memr[work])
-	else {
+	if (status == OK) {
+	    if ( ncols > MAX_INT ) {	# limited by sys/gio/ncarutil/srface.f
+		call error (0, "DP_SURFPSF: Too large ncols (32-bit limit)")
+	    }
+	    if ( nlines > MAX_INT ) {	# limited by sys/gio/ncarutil/srface.f
+		call error (0, "DP_SURFPSF: Too large nlines (32-bit limit)")
+	    }
+	    i_val0 = ncols
+	    i_val1 = nlines
+	    call ezsrfc (Memr[temp], i_val0, i_val1, angh, angv, Memr[work])
+	} else {
 	    call gcancel (gd)
 	    call fseti (STDOUT, F_CANCEL, OK)
 	}
@@ -111,7 +119,7 @@ end
 procedure dp_sonint (vex, next_handler)
 
 int	vex		# virtual exception
-int	next_handler	# not used
+pointer	next_handler	# not used
 
 pointer	tsujmp[LEN_JUMPBUF]
 common	/tsucom/ tsujmp
@@ -128,9 +136,9 @@ end
 procedure dp_slimits (ras, m, n, floor, ceiling)
 
 real	ras[m,n]
-int	m, n
+size_t	m, n
 real	floor, ceiling
-int	i
+long	i
 
 begin
 	do i = 1, n {
@@ -149,8 +157,8 @@ define	SZ_TLABEL	10
 procedure dp_sperimeter (gp, z, ncols, nlines, angh, angv)
 
 pointer	gp			# Graphics pointer
-int	ncols			# Number of image columns
-int	nlines			# Number of image lines
+size_t	ncols			# Number of image columns
+size_t	nlines			# Number of image lines
 real	z[ncols, nlines]	# Array of intensity values
 real	angh			# Angle of horizontal inclination
 real	angv			# Angle of vertical inclination
@@ -160,13 +168,16 @@ char	tlabel[SZ_TLABEL]
 real	xmin, ymin, delta, fact1, flo, hi, xcen, ycen
 real	x1_perim, x2_perim, y1_perim, y2_perim, z1, z2
 real	wc1, wc2, wl1, wl2, del
-int	i, j
-int	itoc()
+long	i, j, l_val, c_2
+int	ltoc()
+long	lint(), lmod()
 data  	fact1 /2.0/
 real	vpx1, vpx2, vpy1, vpy2
 common	/noaovp/ vpx1, vpx2, vpy1, vpy2
 
 begin
+	c_2 = 2
+
 	call smark (sp)
 	call salloc (x_val,   ncols + 2,  TY_REAL)
 	call salloc (y_val,  nlines + 2, TY_REAL)
@@ -191,8 +202,10 @@ begin
 	# Set up linear endpoints and spacing as used in surface.
 
         delta = (hi-flo) / (max (ncols,nlines) -1.) * fact1
-        xmin = -(real (ncols/2)  * delta + real (mod (ncols+1, 2))  * delta)
-        ymin = -(real (nlines/2) * delta + real (mod (nlines+1, 2)) * delta)
+	l_val = ncols+1
+        xmin = -(real (ncols/2)  * delta + real (lmod (l_val, c_2)) * delta)
+	l_val = nlines+1
+        ymin = -(real (nlines/2) * delta + real (lmod (l_val, c_2)) * delta)
 	del = 2.0 * delta
 
 	# The perimeter is separated from the surface plot by the 
@@ -239,7 +252,7 @@ begin
 		call dp_draw_ticksx (Memr[x_val+1], y2_perim, y2_perim+delta, 
 		    flo, ncols)
 		call dp_label_axis (xmin, y2_perim+del, flo, "1", -1, -2)
-		if (itoc (int (wc2), tlabel, SZ_TLABEL) <= 0)
+		if (ltoc (lint (wc2), tlabel, SZ_TLABEL) <= 0)
 		    tlabel[1] = EOS
 		call dp_label_axis (Memr[x_val+ncols], y2_perim+del, flo, 
 		    tlabel, -1, -2)
@@ -251,7 +264,7 @@ begin
 		call dp_draw_ticksy (x2_perim, x2_perim+delta, Memr[y_val+1],
 		    flo, nlines)
 		call dp_label_axis (x2_perim+del, ymin, flo, "1", 2, -1)
-		if (itoc (int (wl2), tlabel, SZ_TLABEL) <= 0)
+		if (ltoc (lint (wl2), tlabel, SZ_TLABEL) <= 0)
 		    tlabel[1] = EOS
 		call dp_label_axis (x2_perim+del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, -1)
@@ -266,7 +279,7 @@ begin
 		call dp_draw_ticksx (Memr[x_val+1], y1_perim, y1_perim-delta, 
 		    flo, ncols)
 		call dp_label_axis (xmin, y1_perim-del, flo, "1", -1, 2)
-		if (itoc (int (wc2), tlabel, SZ_TLABEL) <= 0)
+		if (ltoc (lint (wc2), tlabel, SZ_TLABEL) <= 0)
 		    tlabel[1] = EOS
 		call dp_label_axis (Memr[x_val+ncols], y1_perim-del, flo, 
 		    tlabel, -1, 2)
@@ -278,7 +291,7 @@ begin
 		call dp_draw_ticksy (x1_perim, x1_perim-delta, Memr[y_val+1],
 		    flo, nlines)
 		call dp_label_axis (x1_perim-del, ymin, flo, "1", 2, 1)
-		if (itoc (int (wl2), tlabel, SZ_TLABEL) <= 0)
+		if (ltoc (lint (wl2), tlabel, SZ_TLABEL) <= 0)
 		    tlabel[1] = EOS
 		call dp_label_axis (x1_perim-del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, 1)
@@ -296,7 +309,7 @@ begin
 		call dp_draw_ticksx (Memr[x_val+1], y1_perim, y1_perim-delta, 
 		    flo, ncols)
 		call dp_label_axis (xmin, y1_perim-del, flo, "1", 1, 2)
-		if (itoc (int (wc2), tlabel, SZ_TLABEL) <= 0)
+		if (ltoc (lint (wc2), tlabel, SZ_TLABEL) <= 0)
 		    tlabel[1] = EOS
 		call dp_label_axis (Memr[x_val+ncols], y1_perim-del, flo, 
 		    tlabel, 1, 2)
@@ -308,7 +321,7 @@ begin
 		call dp_draw_ticksy (x2_perim, x2_perim+delta, Memr[y_val+1],
 		    flo, nlines)
 		call dp_label_axis (x2_perim+del, ymin, flo, "1", 2, -1)
-		if (itoc (int (wl2), tlabel, SZ_TLABEL) <= 0)
+		if (ltoc (lint (wl2), tlabel, SZ_TLABEL) <= 0)
 		    tlabel[1] = EOS
 		call dp_label_axis (x2_perim+del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, -1)
@@ -322,7 +335,7 @@ begin
 		call dp_draw_ticksx (Memr[x_val+1], y2_perim, y2_perim+delta,
 		    flo, ncols)
 		call dp_label_axis (xmin, y2_perim+del, flo, "1", 1, -2)
-		if (itoc (int (wc2), tlabel, SZ_TLABEL) <= 0)
+		if (ltoc (lint (wc2), tlabel, SZ_TLABEL) <= 0)
 		    tlabel[1] = EOS
 		call dp_label_axis (Memr[x_val+ncols], y2_perim+del, flo, 
 		    tlabel, 1, -2)
@@ -334,7 +347,7 @@ begin
 		call dp_draw_ticksy (x1_perim, x1_perim-delta, Memr[y_val+1],
 		    flo, nlines)
 		call dp_label_axis (x1_perim-del, ymin, flo, "1", 2, 1)
-		if (itoc (int (wl2), tlabel, SZ_TLABEL) <= 0)
+		if (ltoc (lint (wl2), tlabel, SZ_TLABEL) <= 0)
 		    tlabel[1] = EOS
 		call dp_label_axis (x1_perim-del, Memr[y_val+nlines], flo, 
 		    tlabel, 2, 1)
@@ -351,12 +364,13 @@ end
 
 procedure dp_draw_axis (xvals, yvals, zval, nvals)
 
-int	nvals
 real	xvals[nvals]
 real	yvals[nvals]
 real	zval
+size_t	nvals
+
 pointer	sp, xt, yt
-int	i
+long	i
 real	dum
 
 begin
@@ -401,19 +415,19 @@ end
 
 procedure dp_draw_ticksx (x, y1, y2, zval, nvals)
 
-int	nvals
 real	x[nvals]
 real	y1, y2
 real	zval
+size_t	nvals
 
-int	i
+long	i
 real	tkx[2], tky[2], dum
 
 begin
 	do i = 1, nvals {
 	    call trn32s (x[i], y1, zval, tkx[1], tky[1], dum, 1)
 	    call trn32s (x[i], y2, zval, tkx[2], tky[2], dum, 1)
-	    call gpl (2, tkx[1], tky[1])
+	    call gpl32 (2, tkx[1], tky[1])
 	}
 end
 
@@ -422,18 +436,18 @@ end
 
 procedure dp_draw_ticksy (x1, x2, y, zval, nvals)
 
-int	nvals
 real	x1, x2
 real	y[nvals]
 real	zval
+size_t	nvals
 
-int	i
+long	i
 real	tkx[2], tky[2], dum
 
 begin
 	do i = 1, nvals {
 	    call trn32s (x1, y[i], zval, tkx[1], tky[1], dum, 1)
 	    call trn32s (x2, y[i], zval, tkx[2], tky[2], dum, 1)
-	    call gpl (2, tkx[1], tky[1])
+	    call gpl32 (2, tkx[1], tky[1])
 	}
 end

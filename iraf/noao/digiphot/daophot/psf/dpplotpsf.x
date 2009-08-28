@@ -8,10 +8,11 @@ procedure dp_plotpsf (dao, im, subrast, ncols, nlines, x1, y1, gd)
 pointer	dao			# pointer to the daophot structure
 pointer	im			# the input image descriptor
 real	subrast[ncols,nlines]	# image subraster
-int	ncols, nlines		# dimensions of the subraster
-int	x1, y1			# coordinates of the lower left corner
+size_t	ncols, nlines		# dimensions of the subraster
+long	x1, y1			# coordinates of the lower left corner
 pointer	gd			# pointer to the graphics stream
 
+size_t	sz_val
 real	tx, ty
 pointer	sp, title
 real	dp_pstatr()
@@ -23,12 +24,14 @@ begin
 	    return
 
 	# Comvert the coordinates if necessary.
+	sz_val = 1
 	call dp_wout (dao, im, dp_pstatr(dao, CUR_PSFX), dp_pstatr(dao,
-       	    CUR_PSFY), tx, ty, 1)
+       	    CUR_PSFY), tx, ty, sz_val)
 
 	# Construct the title.
 	call smark (sp)
-	call salloc (title, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (title, sz_val, TY_CHAR)
 	call sprintf (Memc[title], SZ_LINE, "Star: %d  X: %g  Y: %g  Mag: %g")
 	    call pargi (dp_pstati (dao, CUR_PSFID))
 	    call pargr (tx)

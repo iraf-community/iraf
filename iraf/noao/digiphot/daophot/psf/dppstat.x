@@ -47,6 +47,27 @@ begin
 end
 
 
+# DP_PSTATL -- Fetch a psf fitting long int parameter.
+
+long procedure dp_pstatl (dao, param)
+
+pointer	dao		# pointer to daophot structure
+int	param		# parameter
+
+pointer	psf
+
+begin
+	psf = DP_PSF(dao)
+
+	switch (param) {
+	case LENUSERAREA:
+	    return (DP_LENUSERAREA(psf))
+	default:
+	    call error (0, "DP_PSTATL: Unknown psf fitting long int parameter")
+	}
+end
+
+
 # DP_PSTATR -- Fetch a psf fitting real parameter.
 
 real procedure dp_pstatr (dao, param)

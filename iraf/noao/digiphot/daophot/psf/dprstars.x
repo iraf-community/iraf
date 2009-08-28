@@ -11,7 +11,7 @@ procedure dp_rpstars (dao, im, pst, text_file, gd, mgd, id, mkstars,
 
 pointer	dao		# pointer to the daophot structure
 pointer	im		# the input image descriptor
-int	pst		# the psf star list file descriptor
+pointer	pst		# the psf star list file descriptor
 bool	text_file	# text or table file ?
 pointer	gd		# the graphics descriptor
 pointer	mgd		# the plot file descriptor
@@ -20,16 +20,25 @@ bool	mkstars		# mark the stars added to the psf
 bool	matchbyid	# match psf stars by id or position
 bool	showplots	# show the psf star plots
 
+size_t	sz_val
 real	x, y, mag, rjunk
-pointer	sp, fields, indices, key
-int	i, nrow, idno
+pointer	sp, fields, key, indices, p_indices
+long	i, nrow
+int	idno, i_val
 real	dp_pstatr()
-int	tbpsta(), dp_apsel(), dp_addstar()
+int	dp_apsel(), dp_addstar()
+long	tbpstl()
 
 begin
 	call smark (sp)
-	call salloc (fields, SZ_LINE, TY_CHAR)
-	call salloc (indices, PSF_NINCOLS, TY_INT) 
+	sz_val = SZ_LINE
+	call salloc (fields, sz_val, TY_CHAR)
+	sz_val = PSF_NINCOLS
+	if (text_file) {
+	    call salloc (indices, sz_val, TY_INT) 
+	} else {
+	    call salloc (p_indices, sz_val, TY_POINTER)
+	}
 
 	if (text_file) {
 	    call pt_kyinit (key)
@@ -39,8 +48,8 @@ begin
 	    Memi[indices+3] = DP_PAPMAG1
 	    call dp_gappsf (Memi[indices], Memc[fields], PSF_NINCOLS)
 	} else {
-	    call dp_tptinit (pst, Memi[indices])
-	    nrow = tbpsta (pst, TBL_NROWS)
+	    call dp_tptinit (pst, Memp[p_indices])
+	    nrow = tbpstl (pst, TBL_NROWS)
 	}
 
 	i = 1
@@ -49,16 +58,18 @@ begin
 	    # Read the next star.
 
 	    if (text_file) {
-		if (dp_apsel (key, pst, Memc[fields], Memi[indices], idno,
+		i_val = pst
+		if (dp_apsel (key, i_val, Memc[fields], Memi[indices], idno,
 		    x, y, rjunk, mag) == EOF)
 		    break
 	    } else {
 		if (i > nrow)
 		    break
-		call dp_tptread (pst, Memi[indices], idno, x, y, mag, i)
+		call dp_tptread (pst, Memp[p_indices], idno, x, y, mag, i)
 	    }
 
-	    call dp_win (dao, im, x, y, x, y, 1)
+	    sz_val = 1
+	    call dp_win (dao, im, x, y, x, y, sz_val)
 
 	    # Add it to the PSF star list.
 	    if (idno > 0) {
@@ -103,8 +114,8 @@ end
 
 procedure dp_tptinit (pst, column)
 
-int	pst		# the psf star list file descriptor
-int	column[ARB]	# array of column pointers
+pointer	pst		# the psf star list file descriptor
+pointer	column[ARB]	# array of column pointers
 
 begin
 	call tbcfnd (pst, ID, column[1], 1)
@@ -138,11 +149,11 @@ end
 procedure dp_tptread (pst, column, idno, x, y, mag, rowno)
 
 pointer	pst		# pointer to the ST table
-int	column[ARB]	# array of column pointers
+pointer	column[ARB]	# array of column pointers
 int	idno		# the output id number
 real	x, y		# the output x and y position
 real	mag		# the output magnitude
-int	rowno		# the row number
+long	rowno		# the row number
 
 bool	nullflag
 

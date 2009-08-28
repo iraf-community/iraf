@@ -15,8 +15,8 @@ procedure dp_mkpsf (dao, im, psfim, opst, psfgr, gd, mgd, id, mkstars,
 pointer	dao			# pointer to the main daophot structure
 pointer im			# pointer to the input image
 pointer	psfim			# pointer to the output psfimage
-int	opst			# the psf star list file descriptor
-int	psfgr			# the psf group file descriptor
+pointer	opst			# the psf star list file descriptor
+pointer	psfgr			# the psf group file descriptor
 pointer gd			# pointer to graphics descriptor
 pointer mgd			# pointer to the metacode file
 pointer id			# pointer to image display stream
@@ -24,6 +24,7 @@ bool	mkstars			# mark the added and deleted psf stars
 bool	interactive		# interactive mode
 bool	showplots		# show the plots
 
+size_t	sz_val
 real	wx, wy
 pointer apsel, sp, cmd, str
 int	i, key, wcs, idnum, istar, ip, npsf, verbose
@@ -41,8 +42,9 @@ begin
 
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Initialize some variables.
 	key = 'a'
@@ -58,7 +60,8 @@ begin
 	    EOF) {
 
 	    # Convert coordinates if necessary.
-	    call dp_vtol (im, wx, wy, wx, wy, 1)
+	    sz_val = 1
+	    call dp_vtol (im, wx, wy, wx, wy, sz_val)
 
 	    switch (key) {
 

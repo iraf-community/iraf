@@ -16,6 +16,7 @@ real	x, y			# input position
 int	i
 pointer	psf, apsel
 real	crit_rad, fitrad, rad, ax, ay
+long	lint()
 
 begin
 	# Set up some constants.
@@ -46,8 +47,8 @@ begin
 		DP_CUR_PSFMAG(psf) = Memr[DP_APMAG(apsel)+i-1]
 
 		# Is the star too close to the edge ?
-		if (int (ax - fitrad) < 0 || int (ax + fitrad) > IM_LEN(im,1) ||
-		    int (ay - fitrad) < 0 || int (ay + fitrad) > IM_LEN(im,2))
+		if (lint (ax - fitrad) < 0 || lint (ax + fitrad) > IM_LEN(im,1) ||
+		    lint (ay - fitrad) < 0 || lint (ay + fitrad) > IM_LEN(im,2))
 		    return (-i)
 		else
 		    return (i)
@@ -70,6 +71,7 @@ int	idnum			# id number from photometry list
 int	i
 pointer	psf, apsel
 real	fitrad, x, y
+long	lint()
 
 begin
 	# Set up some constants.
@@ -97,8 +99,8 @@ begin
 	    # Is the star too close to the edge ?
 	    if (IS_INDEFR(x) || IS_INDEFR(y))
 		return (0)
-	    else if (int (x - fitrad) < 0 || int (x + fitrad) >
-	        IM_LEN(im,1) || int (y - fitrad) < 0 || int (y + fitrad) >
+	    else if (lint (x - fitrad) < 0 || lint (x + fitrad) >
+	        IM_LEN(im,1) || lint (y - fitrad) < 0 || lint (y + fitrad) >
 		IM_LEN(im,2))
 	    	return (-i)
 	    else

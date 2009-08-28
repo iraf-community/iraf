@@ -16,9 +16,11 @@ pointer	gd			# pointer to the graphics stream
 pointer	mgd			# pointer to the metacode descriptor
 bool 	showplots		# show plots?
 
+size_t	c_1
 real	tx, ty
 pointer	srim
-int	x1, x2, y1, y2, starnum, saturated
+long	x1, x2, y1, y2
+int	starnum, saturated
 bool	star_ok
 
 real	dp_statr()
@@ -26,11 +28,13 @@ pointer	dp_psubrast()
 int	dp_locstar(), dp_idstar(), dp_pstati(), dp_issat()
 
 begin
+	c_1 = 1
+
         # Convert coordinates for display.
 	if (showplots)
-            call dp_ltov (im, x, y, tx, ty, 1)
+            call dp_ltov (im, x, y, tx, ty, c_1)
 	else
-            call dp_wout (dao, im, x, y, tx, ty, 1)
+            call dp_wout (dao, im, x, y, tx, ty, c_1)
 
 	# Check that the position of the star is within the image.
 	if (idnum == 0 && (x < 1.0 || x > real (IM_LEN(im,1)) || y < 1.0 || y >
@@ -138,12 +142,12 @@ procedure dp_spstar (dao, data, nx, ny, x1, y1, starno, psfradsq)
 
 pointer	dao			# pointer to the daophot structure
 real	data[nx,ARB]		# the data subraster
-int	nx, ny			# the dimensions of the data subraster
-int	x1, y1			# the coordinates of the ll pixel
+size_t	nx, ny			# the dimensions of the data subraster
+long	x1, y1			# the coordinates of the ll pixel
 int	starno			# the index of the star in question
 real	psfradsq		# the psf radius squared
 
-int	i, j
+long	i, j
 pointer	psf, psffit
 real	xstar, ystar, scale, deltax, deltay, dx, dy, dysq, rsq, svdx, svdy
 real	dp_usepsf()

@@ -9,7 +9,7 @@ define PS_DATA1STR "%-9d%10t%-10.3f%20t%-10.3f%30t%-12.3f%42t%-15.7g%80t \n"
 
 procedure dp_xpselmer (tpout, id, x, y, mag, sky)
 
-pointer	tpout		# pointer to the output table
+int	tpout		# pointer to the output table
 int	id		# id of the star
 real	x, y		# position of the star
 real	mag		# magnitude of the star
@@ -29,14 +29,14 @@ end
 
 procedure dp_tpselmer (tp_out, id, x, y, mag, sky, colpoint, row)
 
-int	tp_out			# the output table descriptor
+pointer	tp_out			# the output table descriptor
 int	id			# the object id
 real	x			# the object x coordinate
 real	y			# the object y coordinate
 real	mag			# the object mangitude
 real	sky			# the object sky value
-int	colpoint[ARB]		# the column pointers
-int	row			# current table row
+pointer	colpoint[ARB]		# the column pointers
+long	row			# current table row
 
 begin
 	# Write out the data.
@@ -52,18 +52,20 @@ end
 
 procedure dp_xpselpars (tp, image, maxnpsf, scale, psfrad, fitrad)
 
-pointer	tp			# pointer to the table
+int	tp			# pointer to the table
 char	image[ARB]		# input image name
 int	maxnpsf			# maximum number of psfstars
 real	scale			# the image scale
 real	psfrad			# the psf radius
 real	fitrad			# the fitting radius
 
+size_t	sz_val
 pointer	sp, str
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Add the image name nad maxnpsf parameters.
 	call dp_imroot (image, Memc[str], SZ_FNAME)
@@ -87,7 +89,7 @@ define PS_FORMAT1STR "#F%4t%%-9d%10t%%-10.3f%20t%%-10.3f%30t%%-12.3f%42t\
 
 procedure dp_xpbanner (tp)
 
-pointer	tp		# pointer to the output file
+int	tp		# pointer to the output file
 
 begin
 	# Print out the banner file.
@@ -104,19 +106,24 @@ end
 procedure dp_tpdefcol (tp, colpoint)
 
 pointer	tp		# pointer to the output table
-int	colpoint[ARB]	# array of column pointers
+pointer	colpoint[ARB]	# array of column pointers
 
+size_t	sz_val
 int	i
 pointer	sp, colnames, colunits, colformat, col_dtype, col_len
 
 begin
 	# Allocate space for the table definition.
 	call smark (sp)
-	call salloc (colnames, NCOLUMN * (SZ_COLNAME + 1), TY_CHAR)
-	call salloc (colunits, NCOLUMN * (SZ_COLUNITS + 1), TY_CHAR)
-	call salloc (colformat, NCOLUMN * (SZ_COLFMT + 1), TY_CHAR)
-	call salloc (col_dtype, NCOLUMN, TY_INT)
-	call salloc (col_len, NCOLUMN, TY_INT)
+	sz_val = NCOLUMN * (SZ_COLNAME + 1)
+	call salloc (colnames, sz_val, TY_CHAR)
+	sz_val = NCOLUMN * (SZ_COLUNITS + 1)
+	call salloc (colunits, sz_val, TY_CHAR)
+	sz_val = NCOLUMN * (SZ_COLFMT + 1)
+	call salloc (colformat, sz_val, TY_CHAR)
+	sz_val = NCOLUMN
+	call salloc (col_dtype, sz_val, TY_INT)
+	call salloc (col_len, sz_val, TY_LONG)
 
 	# Set up the column definitions.
 	call strcpy (ID, Memc[colnames], SZ_COLNAME)
@@ -148,11 +155,11 @@ begin
 
 	# Define the column lengths.
 	do i = 1, NCOLUMN 
-	    Memi[col_len+i-1] = 1
+	    Meml[col_len+i-1] = 1
 	
 	# Define and create the table.
 	call tbcdef (tp, colpoint, Memc[colnames], Memc[colunits],
-	    Memc[colformat], Memi[col_dtype], Memi[col_len], NCOLUMN)
+	    Memc[colformat], Memi[col_dtype], Meml[col_len], NCOLUMN)
 	call tbtcre (tp)
 
 	call sfree (sp)
@@ -170,11 +177,13 @@ real	scale			# the image scale
 real	psfrad			# the psf radius
 real	fitrad			# the fitting radius
 
+size_t	sz_val
 pointer	sp, str
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Add the min_group and max_group parameters.
 	call dp_imroot (image, Memc[str], SZ_FNAME)
@@ -193,8 +202,8 @@ end
 procedure dp_wpstars (tp_out, colpoint, text_file, ids, xcen, ycen, mag,
 	sky, npsf)
 
-int	tp_out			# the output file descriptor
-int	colpoint[ARB]		# array of column pointers
+pointer	tp_out			# the output file descriptor
+pointer	colpoint[ARB]		# array of column pointers
 bool	text_file		# is the output file a text file
 int	ids[ARB]		# array of star ids
 real	xcen[ARB]		# array of x coordinates
@@ -203,15 +212,17 @@ real	mag[ARB]		# array of magnitudes
 real	sky[ARB]		# array of sky values
 int	npsf			# the number of stars
 
-int	istar, row
+int	istar, i_val
+long	row
 
 begin
 	row = 0
 	do istar = 1, npsf {
-	    if (text_file)
-		call dp_xpselmer (tp_out, ids[istar], xcen[istar], ycen[istar],
+	    if (text_file) {
+		i_val = tp_out
+		call dp_xpselmer (i_val, ids[istar], xcen[istar], ycen[istar],
 		    mag[istar], sky[istar])
-	    else {
+	    } else {
 		row = row + 1
 		call dp_tpselmer (tp_out, ids[istar], xcen[istar], ycen[istar],
 		    mag[istar], sky[istar], colpoint, row)

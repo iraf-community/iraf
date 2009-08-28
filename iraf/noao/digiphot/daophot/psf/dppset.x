@@ -47,6 +47,28 @@ begin
 end
 
 
+# DP_PSETL -- Set a daophot psf fitting long int parameter.
+
+procedure dp_psetl (dao, param, lval)
+
+pointer	dao		# pointer to daophot structure
+int	param		# parameter
+long	lval		# integer value
+
+pointer	psf
+
+begin
+	psf = DP_PSF(dao)
+
+	switch (param) {
+	case LENUSERAREA:
+	    DP_LENUSERAREA(psf) = lval
+	default:
+	    call error (0, "DP_PSETL: Unknown long int psf fitting parameter")
+	}
+end
+
+
 # DP_PSETR -- Set a real psf fitting parameter.
 
 procedure dp_psetr (dao, param, rval)

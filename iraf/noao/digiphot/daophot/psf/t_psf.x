@@ -26,23 +26,26 @@ bool	showplots			# display plots of the psf stars
 pointer	plottype			# type of psf plot
 bool	mkstars				# mark deleted and accepted psf stars
 
+size_t	sz_val
 pointer	sp, im, apd, psfim, dao, mgd, gd, id
-pointer	outfname, curfile, str
-pointer	alist, clist, olist, oclist, imlist, pimlist
+pointer	outfname, curfile, str, psfgr, opst, pst
+pointer	alist, clist, olist, oclist, imlist, pimlist, p_val
 int	limlist, lalist, lclist, lpimlist
 int	lolist, loclist, up, verify, update, wcs
-int	root, min_lenuserarea, pltype, pfd, pst, psfgr, opst
-int	buf_size, memstat
+int	root, pltype, pfd, memstat, i_val
+long	min_lenuserarea, l_val
 bool	ap_text, pst_text
-size_t	req_size, old_size
+size_t	req_size, old_size, buf_size
 
 pointer	immap(), tbtopn(), gopen(), fntopnb(), imtopen()
-int	fnldir(), strlen(), strncmp(), btoi(), envfind(), ctoi(), clgwrd()
+int	fnldir(), strlen(), strncmp(), btoi(), envfind(), ctol(), clgwrd()
 int	strdic(), open(), access(), fstati(), dp_stati(), dp_pstati()
 int	imtlen(), imtgetim(), fntlenb(), fntgfnb()
 int	sizeof(), dp_memstat()
 bool	streq(), clgetb(), itob(), dp_updatepsf()
 errchk 	gopen
+
+include	<nullptr.inc>
 
 begin
 	# Set the standard output to flush on newline.
@@ -51,19 +54,20 @@ begin
 
 	# Get some working memory.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (photfile, SZ_FNAME, TY_CHAR)
-	call salloc (pstarfile, SZ_FNAME, TY_CHAR)
-	call salloc (psfimage, SZ_FNAME, TY_CHAR)
-	call salloc (groupfile, SZ_FNAME, TY_CHAR)
-	call salloc (opstfile, SZ_FNAME, TY_CHAR)
-	call salloc (plottype, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (graphics, SZ_FNAME, TY_CHAR)
-	call salloc (display, SZ_FNAME, TY_CHAR)
-	call salloc (plotfile, SZ_FNAME, TY_CHAR)
-	call salloc (curfile, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (photfile, sz_val, TY_CHAR)
+	call salloc (pstarfile, sz_val, TY_CHAR)
+	call salloc (psfimage, sz_val, TY_CHAR)
+	call salloc (groupfile, sz_val, TY_CHAR)
+	call salloc (opstfile, sz_val, TY_CHAR)
+	call salloc (plottype, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (graphics, sz_val, TY_CHAR)
+	call salloc (display, sz_val, TY_CHAR)
+	call salloc (plotfile, sz_val, TY_CHAR)
+	call salloc (curfile, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the various task parameters.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -273,7 +277,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open input image
-	    im = immap (Memc[image], READ_ONLY, 0)		
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
 
@@ -285,8 +289,10 @@ begin
             req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
             memstat = dp_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call dp_pcache (im, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call dp_pcache (im, l_val, buf_size)
+	    }
 
 	    # Open the input photometry list and store the descriptor.
 	    # PSF can read either an APPHOT PHOT file or an ST TABLE 
@@ -305,7 +311,7 @@ begin
 	    if (ap_text)
 	        apd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else
-	        apd = tbtopn (Memc[outfname], READ_ONLY, 0)
+	        apd = tbtopn (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_wgetapert (dao, im, apd, dp_stati (dao, MAXNSTAR), ap_text)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 
@@ -330,7 +336,7 @@ begin
 	        if (pst_text)
 	            pst = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	        else
-	            pst = tbtopn (Memc[outfname], READ_ONLY, 0)
+	            pst = tbtopn (Memc[outfname], READ_ONLY, NULLPTR)
 	    }
 	    call dp_sets (dao, COORDS, Memc[outfname])
 
@@ -353,14 +359,15 @@ begin
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
 	    if (envfind ("min_lenuserarea", Memc[str], SZ_FNAME) > 0) {
 	        up = 1
-	        if (ctoi (Memc[str], up, min_lenuserarea) <= 0)
+	        if (ctol (Memc[str], up, min_lenuserarea) <= 0)
 		    min_lenuserarea = MIN_LENUSERAREA
 	        else
 		    min_lenuserarea = max (MIN_LENUSERAREA, min_lenuserarea)
             } else
 	        min_lenuserarea = MIN_LENUSERAREA
-	    call dp_pseti (dao, LENUSERAREA, min_lenuserarea)
-	    psfim = immap (Memc[outfname], NEW_IMAGE, min_lenuserarea)
+	    call dp_psetl (dao, LENUSERAREA, min_lenuserarea)
+	    p_val = min_lenuserarea
+	    psfim = immap (Memc[outfname], NEW_IMAGE, p_val)
 	    call dp_sets (dao, PSFIMAGE, Memc[outfname])
 
 	    if (fntgfnb (olist, Memc[groupfile], SZ_FNAME) == EOF)
@@ -375,7 +382,7 @@ begin
 	    if (dp_stati (dao, TEXT) == YES)
 	        psfgr = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	    else
-	        psfgr = tbtopn (Memc[outfname], NEW_FILE, 0)
+	        psfgr = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 	    call dp_sets (dao, OUTPHOTFILE, Memc[outfname])
 
 
@@ -391,7 +398,7 @@ begin
 	    if (dp_stati (dao, TEXT) == YES)
 	        opst = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	    else
-	        opst = tbtopn (Memc[outfname], NEW_FILE, 0)
+	        opst = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 	    call dp_sets (dao, OUTREJFILE, Memc[outfname])
 
 	    # Print banner.
@@ -433,18 +440,22 @@ begin
 
 	    # Close the input photometry file.
 	    if (apd != NULL) {
-	        if (ap_text)
-	    	    call close (apd)
-	        else
+	        if (ap_text) {
+		    i_val = apd
+	    	    call close (i_val)
+		} else {
 		    call tbtclo (apd)
+		}
 	    }
 
 	    # Close the input psf star file.
 	    if (pst != NULL) {
-	        if (pst_text)
-	    	    call close (pst)
-	        else
+	        if (pst_text) {
+		    i_val = pst
+	    	    call close (i_val)
+		} else {
 		    call tbtclo (pst)
+		}
 	    }
 
 	    # Close PSF image.
@@ -453,18 +464,22 @@ begin
 
 	    # Close the output PSF star file.
 	    if (opst != NULL) {
-	        if (dp_stati (dao, TEXT) == YES)
-		    call close (opst)
-	        else
+	        if (dp_stati (dao, TEXT) == YES) {
+		    i_val = opst
+		    call close (i_val)
+		} else {
 	            call tbtclo (opst)
+		}
 	    }
 
 	    # Close the group file.
 	    if (psfgr != NULL) {
-	        if (dp_stati (dao, TEXT) == YES)
-		    call close (psfgr)
-	        else
+	        if (dp_stati (dao, TEXT) == YES) {
+		    i_val = psfgr
+		    call close (i_val)
+		} else {
 	            call tbtclo (psfgr)
+		}
 	    }
 
             # Uncache memory.
@@ -484,8 +499,9 @@ begin
 	# Close the metacode plot files.
 	if (mgd != NULL)
 	    call gclose (mgd)
-	if (pfd != NULL)
+	if (pfd != NULL) {
 	    call close (pfd)
+	}
 
 	# Close the image / file lists.
 	call imtclose (imlist)

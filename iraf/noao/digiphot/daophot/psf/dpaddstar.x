@@ -17,9 +17,11 @@ pointer	gd			# pointer to the graphics stream
 pointer	mgd			# pointer to the metacode descriptor
 bool 	showplots		# show plots?
 
+size_t	ncols, nlines, c_1
 real	tx, ty, logood, higood
 pointer	srim
-int	x1, x2, y1, y2, starnum, saturated
+long	x1, x2, y1, y2
+int	starnum, saturated
 bool	star_ok
 
 real	dp_statr(), dp_pstatr()
@@ -27,11 +29,13 @@ pointer	dp_psubrast()
 int	dp_locstar(), dp_idstar(), dp_stati(), dp_pstati()
 
 begin
+	c_1 = 1
+
 	# Convert coordinates for display.
 	if (showplots)
-	    call dp_ltov (im, x, y, tx, ty, 1)
+	    call dp_ltov (im, x, y, tx, ty, c_1)
 	else
-	    call dp_wout (dao, im, x, y, tx, ty, 1)
+	    call dp_wout (dao, im, x, y, tx, ty, c_1)
 
 	# Check that the position of the star is within the image.
 	if (idnum == 0 && (x < 1.0 || x > real (IM_LEN(im,1)) || y < 1.0 || y >
@@ -119,8 +123,10 @@ begin
 
 	# Now let's look at the extracted subraster.
 	if (showplots) {
-	    call dp_showpsf (dao, im, Memr[srim], (x2 - x1 + 1), (y2 - y1 + 1),
-	        x1, y1, gd, star_ok)
+	    ncols = x2 - x1 + 1
+	    nlines = y2 - y1 + 1
+	    call dp_showpsf (dao, im, Memr[srim], ncols, nlines, x1, y1, gd,
+			     star_ok)
 	} else if (saturated == YES) {
 	    if (DP_VERBOSE(dao) == YES) {
 	        call printf (
@@ -150,9 +156,11 @@ begin
 	}
 
 	# Save the plot in the metacode file.
-	if (mgd != NULL)
-	    call dp_plotpsf (dao, im, Memr[srim], (x2 - x1 + 1), (y2 - y1 + 1),
-	        x1, y1, mgd)
+	if (mgd != NULL) {
+	    ncols = x2 - x1 + 1
+	    nlines = y2 - y1 + 1
+	    call dp_plotpsf (dao, im, Memr[srim], ncols, nlines, x1, y1, mgd)
+	}
 
 	# Add the star to the PSF star list by swapping its position with the
 	# position of the star currently in PNUM + 1.
@@ -173,7 +181,7 @@ begin
 	    call printf ("Star %d has been added to the PSF star list\n")
 	        call pargi (dp_pstati (dao, CUR_PSFID))
 	    call dp_ltov (im, dp_pstatr (dao, CUR_PSFX),
-	        dp_pstatr(dao, CUR_PSFY), tx, ty, 1)
+			  dp_pstatr(dao, CUR_PSFY), tx, ty, c_1)
 	    call printf (
 	        "\tX: %7.2f Y: %7.2f  Mag: %7.3f  Dmin: %g  Dmax: %g\n")
 		call pargr (tx)

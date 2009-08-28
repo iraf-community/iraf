@@ -15,20 +15,24 @@ int	idnum		        # id number of desired star
 pointer	gd			# pointer to the graphics stream
 bool 	showplots		# show plots?
 
+size_t	c_1
 real	tx, ty
 pointer	srim
-int	starnum, saturated, x1, x2, y1, y2
+int	starnum, saturated
+long	x1, x2, y1, y2
 bool	star_ok
 
 pointer	dp_psubrast()
 int	dp_locstar(), dp_idstar(), dp_pstati()
 
 begin
+	c_1 = 1
+
 	# Convert coordinates for display.
 	if (showplots)
-	    call dp_ltov (im, x, y, tx, ty, 1)
+	    call dp_ltov (im, x, y, tx, ty, c_1)
 	else
-	    call dp_wout (dao, im, x, y, tx, ty, 1)
+	    call dp_wout (dao, im, x, y, tx, ty, c_1)
 
 	# Check that the position of the star is within the image.
 	if (idnum == 0 && (x < 1.0 || x > real (IM_LEN(im,1)) || y < 1.0 || y >

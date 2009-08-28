@@ -10,32 +10,38 @@ procedure dp_oppsf (dao, psfim, opst, psfgr)
 
 pointer	dao			# pointer to the daophot structure
 pointer	psfim			# pointer to the psf image
-int	opst			# the psf star list descriptor
-int	psfgr			# the psf group file descriptor
+pointer	opst			# the psf star list descriptor
+pointer	psfgr			# the psf group file descriptor
 
-pointer	sp, str
-int	open(), dp_stati(), dp_pstati()
+size_t	sz_val
+pointer	sp, str, p_val
+int	open(), dp_stati()
+long	dp_pstatl()
 pointer	immap(), tbtopn()
+
+include	<nullptr.inc>
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Reopen the PSF star and group files.
 	call dp_stats (dao, OUTREJFILE, Memc[str], SZ_FNAME)
 	if (dp_stati (dao, TEXT) == YES)
 	    opst = open (Memc[str], NEW_FILE, TEXT_FILE)
 	else
-	    opst = tbtopn (Memc[str], NEW_FILE, 0)
+	    opst = tbtopn (Memc[str], NEW_FILE, NULLPTR)
 	call dp_stats (dao, OUTPHOTFILE, Memc[str], SZ_FNAME)
 	if (dp_stati (dao, TEXT) == YES)
 	    psfgr = open (Memc[str], NEW_FILE, TEXT_FILE)
 	else
-	    psfgr = tbtopn (Memc[str], NEW_FILE, 0)
+	    psfgr = tbtopn (Memc[str], NEW_FILE, NULLPTR)
 
 	# Reopen the psf image.
 	call dp_stats (dao, PSFIMAGE, Memc[str], SZ_FNAME)
-	psfim = immap (Memc[str], NEW_IMAGE, dp_pstati (dao, LENUSERAREA))
+	p_val = dp_pstatl (dao, LENUSERAREA)
+	psfim = immap (Memc[str], NEW_IMAGE, p_val)
 
 	call sfree (sp)
 end
@@ -49,19 +55,21 @@ bool procedure dp_updatepsf (dao, im, psfim, opst, psfgr, psf_new, psf_current,
 pointer	dao			# pointer to the daophot structure
 pointer	im			# pointer to the input image
 pointer	psfim			# pointer to the psf image
-int	opst			# the psf star list file descriptor
-int	psfgr			# the psf group file descriptor
+pointer	opst			# the psf star list file descriptor
+pointer	psfgr			# the psf group file descriptor
 bool	psf_new			# is the psf star list defined ?
 bool	psf_current		# is the psf fit uptodate
 bool	psf_written		# has the psf been saved on disk
 
+size_t	sz_val
 bool	update
 pointer	sp, str
 int	dp_fitpsf()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	update = false
 	if (psfim == NULL) {
@@ -110,21 +118,25 @@ procedure dp_rmpsf (dao, psfim, opst, psfgr)
 
 pointer	dao			# pointer to the daophot structure
 pointer	psfim			# pointer to the psf image
-int	opst			# the psf star list file descriptor
-int	psfgr			# the psf group file descriptor
+pointer	opst			# the psf star list file descriptor
+pointer	psfgr			# the psf group file descriptor
 
+size_t	sz_val
+int	i_val
 pointer	sp, temp
 int	dp_stati(), access()
 
 begin
 	call smark (sp)
-	call salloc (temp, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (temp, sz_val, TY_CHAR)
 
 	# Delete the psf star file. The access check is necessary because
 	# an empty tables file is automatically deleted by the system.
 	if (dp_stati (dao, TEXT) == YES) {
-	    call fstats (opst, F_FILENAME, Memc[temp], SZ_FNAME)
-	    call close (opst)
+	    i_val = opst
+	    call fstats (i_val, F_FILENAME, Memc[temp], SZ_FNAME)
+	    call close (i_val)
 	} else {
 	    call tbtnam (opst, Memc[temp], SZ_FNAME)
 	    call tbtclo (opst)
@@ -136,8 +148,9 @@ begin
 	# Delete the neighbours file. The access check is necessary because
 	# an empty tables file is automatically deleted by the system.
 	if (dp_stati (dao, TEXT) == YES) {
-	    call fstats (psfgr, F_FILENAME, Memc[temp], SZ_FNAME)
-	    call close (psfgr)
+	    i_val = psfgr
+	    call fstats (i_val, F_FILENAME, Memc[temp], SZ_FNAME)
+	    call close (i_val)
 	} else {
 	    call tbtnam (psfgr, Memc[temp], SZ_FNAME)
 	    call tbtclo (psfgr)

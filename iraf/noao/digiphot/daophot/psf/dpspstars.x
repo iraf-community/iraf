@@ -12,8 +12,8 @@ procedure dp_gpstars (dao, im, tp_in, tp_out, text_file, maxnpsf, gd, mgd, id,
 
 pointer	dao			# pointer to the daophot structure
 pointer	im			# pointer to the input image
-int	tp_in			# the input file descriptor
-int	tp_out			# the output file descriptor
+pointer	tp_in			# the input file descriptor
+pointer	tp_out			# the output file descriptor
 bool	text_file		# text or table file
 int	maxnpsf			# the maximum number of psf stars
 pointer	gd			# pointer to the graphics stream
@@ -23,7 +23,9 @@ bool	mkstars			# mark the accepted and deleted stars
 bool	interactive		# interactive mode
 bool	use_cmdfile		# cursor command file mode
 
-int	ier, npsf
+size_t	sz_val
+long	l_val
+int	ier, npsf, i_tpin, i_tpout
 pointer	apsel, sp, ocolpoint, index
 real	radius
 int	dp_pfstars(), dp_ipfstars()
@@ -37,18 +39,23 @@ begin
 
 	# Allocate some working memory.
 	call smark (sp)
-	call salloc (ocolpoint, NCOLUMN, TY_POINTER)
-	call salloc (index, DP_APNUM(apsel), TY_INT)
+	sz_val = NCOLUMN
+	call salloc (ocolpoint, sz_val, TY_POINTER)
+	sz_val = DP_APNUM(apsel)
+	call salloc (index, sz_val, TY_INT)
 
 	# Initialize the output file.
 	if (text_file) {
-	    call seek (tp_in, BOF)
-	    call dp_apheader (tp_in, tp_out)
-	    call dp_xpselpars (tp_out, DP_INIMAGE(dao), maxnpsf, DP_SCALE(dao),
+	    i_tpin = tp_in
+	    l_val = BOF
+	    call seek (i_tpin, l_val)
+	    i_tpout = tp_out
+	    call dp_apheader (i_tpin, i_tpout)
+	    call dp_xpselpars (i_tpout, DP_INIMAGE(dao), maxnpsf, DP_SCALE(dao),
 	        DP_SPSFRAD(dao), DP_SFITRAD(dao))
-	    call dp_xpbanner (tp_out)
+	    call dp_xpbanner (i_tpout)
 	} else {
-	    call dp_tpdefcol (tp_out, Memi[ocolpoint])
+	    call dp_tpdefcol (tp_out, Memp[ocolpoint])
 	    call tbhcal (tp_in, tp_out)
 	    call dp_tpselpars (tp_out, DP_INIMAGE(dao), maxnpsf, DP_SCALE(dao),
 	        DP_SPSFRAD(dao), DP_SFITRAD(dao))
@@ -84,9 +91,10 @@ begin
 	}
 
 	# Write out the stars.
+	sz_val = npsf
 	call dp_wout (dao, im, Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
-	    Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)], npsf)
-	call dp_wpstars (tp_out, Memi[ocolpoint], text_file,
+	    Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)], sz_val)
+	call dp_wpstars (tp_out, Memp[ocolpoint], text_file,
 	    Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
 	    Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
 	    Memr[DP_APMSKY(apsel)], npsf)
@@ -139,6 +147,9 @@ bool	omit
 int	istar, jstar, npsf
 real	radsq, dy2, dr2
 int	dp_addstar()
+real	aabs()
+
+include	<nullptr.inc>
 
 begin
 	# Initialize the list.
@@ -149,7 +160,7 @@ begin
 
 	# Get the first star.
 	if ((mag[1] > lolimit) && (dp_addstar (dao, im, xcen[1], ycen[1],
-	    INDEFR, ids[1], NULL, mgd, false)) == OK) {
+	    INDEFR, ids[1], NULLPTR, mgd, false)) == OK) {
 	    npsf = 1
 	} else
 	    npsf = 0
@@ -171,7 +182,7 @@ begin
 	    # of radsq.
 	    omit = false
 	    do jstar = 1, istar - 1 {
-		dy2 = abs (ycen[jstar] - ycen[istar])
+		dy2 = aabs (ycen[jstar] - ycen[istar])
 		if (dy2 >= radius)
 		    next
 		dr2 = (xcen[jstar] - xcen[istar]) ** 2 + dy2 ** 2
@@ -185,7 +196,7 @@ begin
 		next
 
 	    if (dp_addstar (dao, im, xcen[istar], ycen[istar], INDEFR,
-	        ids[istar], NULL, mgd, false) == ERR)
+	        ids[istar], NULLPTR, mgd, false) == ERR)
 		next
 	    npsf = npsf + 1
 	}

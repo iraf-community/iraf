@@ -38,6 +38,7 @@ procedure dp_widpars (dao, psfim)
 pointer	dao			# pointer to the daophot structure
 pointer	psfim			# the psf image descriptor
 
+size_t	sz_val
 pointer	sp, outstr, date, time
 bool	itob()
 int	envfind()
@@ -45,9 +46,11 @@ int	envfind()
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
 
 	# Record IRAF version, user, host, date, time, package and task.
 	if (envfind ("version", Memc[outstr], SZ_LINE) <= 0)
@@ -104,6 +107,7 @@ procedure dp_wfuncpars (dao, psfim)
 pointer	dao			# pointer to the daophot structure
 pointer	psfim			# image descriptor
 
+size_t	sz_val
 int	i
 pointer	sp, str, psffit
 bool	itob()
@@ -118,7 +122,8 @@ begin
 	call imaddr (psfim, "PSFMAG", DP_PSFMAG (psffit))
 
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	switch (DP_PSFUNCTION(psffit)) {
 	case FCTN_MOFFAT25:
@@ -165,6 +170,7 @@ pointer	dao			# pointer to the daophot descriptor
 pointer	im			# the input image descriptor
 pointer	psfim			# the psfimage descriptor
 
+size_t	sz_val
 real	tx, ty
 pointer	apsel, psf, sp, str
 int	i
@@ -174,7 +180,8 @@ begin
 	psf = DP_PSF(dao)
 
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Write out the number of PSF stars.
 	call sprintf (Memc[str], SZ_FNAME, "NPSFSTAR")
@@ -183,8 +190,9 @@ begin
 	# Write out the ids of all the PSF stars.
 	do i = 1, DP_PNUM(psf) {
 
+	    sz_val = 1
 	    call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+i-1],
-		Memr[DP_APYCEN(apsel)+i-1], tx, ty, 1)
+		Memr[DP_APYCEN(apsel)+i-1], tx, ty, sz_val)
 	    call sprintf (Memc[str], SZ_FNAME, "ID%d")
 	        call pargi (i)
 	    call imaddi (psfim, Memc[str], Memi[DP_APID(apsel)+i-1])
@@ -246,17 +254,24 @@ procedure dp_wltim (psfim, psflut, nxlut, nylut, nexp)
 
 pointer	psfim			# image descriptor
 real	psflut[nexp,nxlut,ARB]	# the psf lookup table
-int	nxlut, nylut,nexp	# the dimensions of the psf look-up table
+size_t	nxlut, nylut		# the dimensions of the psf look-up table
+int	nexp
 
-int	i, j, k
+size_t	sz_val
+long	i, j
+int	k
+long	l_val
 pointer	sp, v, buf
-int	impnlr()
+long	impnlr()
 
 begin
 	call smark (sp)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
 
-	call amovkl (long(1), Meml[v], IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, Meml[v], sz_val)
 	do k = 1, nexp {
 	    do j = 1, nylut {
 		if (impnlr (psfim, buf, Meml[v]) == EOF)

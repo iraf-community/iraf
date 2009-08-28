@@ -23,14 +23,14 @@ procedure dp_contpsf (dao, subras, ncols, nlines, title, gp)
 
 pointer	dao				# pointer to DAOPHOT structure
 real	subras[ncols,nlines]		# data subraster
-int	ncols, nlines			# dimesnions of subraster
+size_t	ncols, nlines			# dimesnions of subraster
 char	title[ARB]			# title string
 pointer	gp				# pointer to graphics descriptor
 
 bool	perimeter
 char	system_id[SZ_LINE], label[SZ_LINE]
 pointer	epa, old_onint
-int	status
+int	status, i_val0, i_val1
 pointer	tcojmp[LEN_JUMPBUF]
 int	wkid, nset, ncontours, dashpat, nhi
 pointer	sp, temp, psf
@@ -39,6 +39,7 @@ real	vx1, vx2, vy1, vy2, wx1, wx2, wy1, wy2
 real	first_col, last_col, first_row, last_row
 
 bool	fp_equalr()
+real	aabs()
 extern	dp_conint()
 common	/tcocom/ tcojmp
 
@@ -76,9 +77,9 @@ begin
 	# a special number for the floor and ceiling, so do not change value
 	# if set to zero.
 
-	if (abs (floor) > EPSILON)
+	if (aabs (floor) > EPSILON)
 	    floor = floor - zero
-	if (abs (ceiling) > EPSILON)
+	if (aabs (ceiling) > EPSILON)
 	    ceiling = ceiling - zero
 
 	# User can specify either the number of contours or the contour
@@ -92,8 +93,9 @@ begin
 		finc = 0
 	    else
 		finc = interval
-	} else
-	    finc = - abs (ncontours)
+	} else {
+	    finc = - iabs (ncontours)
+	}
 
 	# Make a copy of the data and do the contouring on this.
 	call smark (sp)
@@ -134,7 +136,15 @@ begin
 	else {
 	    # Draw plain old conrec perimeter, set ioffm = 0 to enable label.
 	    ioffm = 0
-	    call perim  (ncols - 1, 1, nlines - 1, 1)
+	    if ( ncols > MAX_INT ) {	# limited by sys/gio/ncarutil/gridal.f
+		call error (0, "DP_CONTPSF: Too large ncols (32-bit limit)")
+	    }
+	    if ( nlines > MAX_INT ) {	# limited by sys/gio/ncarutil/gridal.f
+		call error (0, "DP_CONTPSF: Too large nlines (32-bit limit)")
+	    }
+	    i_val0 = ncols - 1
+	    i_val1 = nlines - 1
+	    call perim  (i_val0, 1, i_val1, 1)
 	}
 
 	# Install interrupt exception handler.
@@ -145,8 +155,16 @@ begin
 	# with an error status.
 	call zsvjmp (tcojmp, status)
 	if (status == OK) {
-	    call conrec (Memr[temp], ncols, ncols, nlines, floor, ceiling,
-	        finc, nset, nhi, -dashpat)
+	    if ( ncols > MAX_INT ) {	# limited by sys/gio/ncarutil/conrec.f
+		call error (0, "DP_CONTPSF: Too large ncols (32-bit limit)")
+	    }
+	    if ( nlines > MAX_INT ) {	# limited by sys/gio/ncarutil/conrec.f
+		call error (0, "DP_CONTPSF: Too large nlines (32-bit limit)")
+	    }
+	    i_val0 = ncols
+	    i_val1 = nlines
+	    call conrec (Memr[temp], i_val0, i_val0, i_val1, floor, ceiling,
+			 finc, nset, nhi, -dashpat)
 	} else {
 	    call gcancel (gp)
 	    call fseti (STDOUT, F_CANCEL, OK)
@@ -201,7 +219,7 @@ end
 procedure dp_conint (vex, next_handler)
 
 int	vex		# virtual exception
-int	next_handler	# not used
+pointer	next_handler	# not used
 
 pointer	tcojmp[LEN_JUMPBUF]
 common	/tcocom/ tcojmp
@@ -224,15 +242,17 @@ pointer	gp			# graphics descriptor
 real	xs, xe, ys, ye		# WCS coordinates of pixel window
 
 char	label[SZ_LABEL], fmt1[SZ_FMT], fmt2[SZ_FMT], fmt3[SZ_FMT], fmt4[SZ_FMT]
-int	i, first_col, last_col, first_tick, last_tick, bias
-int	nchar, first_row, last_row, cnt_step, cnt_label
+int	ii, nchar
+long	first_col, last_col, first_tick, last_tick, i
+long	first_row, last_row, cnt_step, cnt_label, bias
 real	dist, kk, col, row, dx, dy, sz_char, cw, xsz, label_pos
 real	xdist, ydist, xspace, yspace, k[3]
 bool	ggetb()
-int	itoc()
+int	ltoc()
+long	lint(), lmod()
 real 	ggetr()
 data 	k/1.0,2.0,3.0/
-errchk	ggwind, gseti, gctran, gline, gtext, itoc
+errchk	ggwind, gseti, gctran, gline, gtext, ltoc
 
 begin
 	# First, get window coordinates and turn off clipping.
@@ -275,7 +295,7 @@ begin
 
 	# Draw inner and outer perimeter
 	kk = k[1]
-	do i = 1, 2 {
+	do ii = 1, 2 {
 	    xspace = kk * xdist
 	    yspace = kk * ydist
 	    call gline (gp, xs - xspace, ys - yspace, xe + xspace, ys - yspace)
@@ -288,8 +308,8 @@ begin
 	# Now draw x axis tick marks, along both the bottom and top of
 	# the picture.  First find the endpoint integer pixels.
 
-	first_col = int (xs)
-	last_col = int (xe)
+	first_col = lint (xs)
+	last_col = lint (xe)
 
 	# Determine increments of ticks and tick labels for x axis.
 	cnt_step  = 1
@@ -303,7 +323,7 @@ begin
 	}
 
 	first_tick = first_col
-	bias = mod (first_tick, cnt_step)
+	bias = lmod (first_tick, cnt_step)
 	last_tick = last_col + bias
 
 	do i = first_tick, last_tick, cnt_step {
@@ -311,15 +331,15 @@ begin
 	    call gline (gp, col, ys - k[1] * ydist, col, ys - k[2] * ydist)
 	    call gline (gp, col, ye + k[1] * ydist, col, ye + k[2] * ydist)
 
-	    if (mod ((i - bias), cnt_label)  == 0) {
+	    if (lmod ((i - bias), cnt_label)  == 0) {
 
 		# Label tick mark; calculate number of characters needed.
 		nchar = 3
-		if (int (col) == 0)
+		if (lint (col) == 0)
 		    nchar = 1
-		if (int (col) >= 1000)
+		if (lint (col) >= 1000)
 		    nchar = 4
-		if (itoc (int(col), label, nchar) <= 0)
+		if (ltoc (lint(col), label, nchar) <= 0)
 		    label[1] = EOS
 
 		# Position label slightly below outer perimeter.  Seperation
@@ -336,8 +356,8 @@ begin
 	# Label the y axis tick marks along the left and right sides of the
 	# picture.  First find the integer pixel endpoints.
 	
-	first_row = int (ys)
-	last_row = int (ye)
+	first_row = lint (ys)
+	last_row = lint (ye)
 
 	# Determine increments of ticks and tick labels for y axis.
 	cnt_step  = 1
@@ -351,7 +371,7 @@ begin
 	}
 
 	first_tick = first_row 
-	bias = mod (first_tick, cnt_step)
+	bias = lmod (first_tick, cnt_step)
 	last_tick = last_row + bias
 
 	do i = first_tick, last_tick, cnt_step {
@@ -359,15 +379,15 @@ begin
 	    call gline (gp, xs - k[1] * xdist, row, xs - k[2] * xdist, row)
 	    call gline (gp, xe + k[1] * xdist, row, xe + k[2] * xdist, row)
 
-	    if (mod ((i - bias), cnt_label) == 0) {
+	    if (lmod ((i - bias), cnt_label) == 0) {
 
 		# Label tick mark; calculate number of characters needed
 		nchar = 3
-		if (int (row) == 0)
+		if (lint (row) == 0)
 		    nchar = 1
-		else if (int (row) >= 1000)
+		else if (lint (row) >= 1000)
 		    nchar = 4
-	        if (itoc (int(row), label, nchar) <= 0)
+	        if (ltoc (lint(row), label, nchar) <= 0)
 		    label[1] = EOS
 
 		# Position label slightly to the left of outer perimeter.
@@ -389,8 +409,8 @@ end
 procedure dp_map_viewport (gp, ncols, nlines, ux1, ux2, uy1, uy2, fill)
 
 pointer	gp			# graphics pointer
-int	ncols			# number of image cols
-int	nlines			# number of image lines
+size_t	ncols			# number of image cols
+size_t	nlines			# number of image lines
 real	ux1, ux2, uy1, uy2	# NDC coordinates of requested viewort
 bool	fill			# fill viewport (vs enforce unity aspect ratio?)
 

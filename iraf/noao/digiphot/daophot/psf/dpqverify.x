@@ -11,8 +11,8 @@ int procedure dp_qverify (dao, im, psfim, opst, psfgr, psf_new, psf_computed,
 pointer	dao		# pointer to the daophot structure
 pointer	im		# the input image descriptor
 pointer	psfim		# the output psf image descriptor
-int	opst		# the output psf star list file descriptor
-int	psfgr		# the output psf group file descriptor
+pointer	opst		# the output psf star list file descriptor
+pointer	psfgr		# the output psf group file descriptor
 bool	psf_new		# has the psf star list been defined ?
 bool	psf_computed	# is the psf fit defined ?
 bool	psf_written	# has the psf been saved ?

@@ -8,11 +8,13 @@ procedure dp_psfsetup (dp)
 
 pointer	dp		# pointer to daophot structure
 
+size_t	sz_val
 pointer	psf
 
 begin
 	# Allocate memory for the psf fitting structure.
-	call malloc (DP_PSF(dp), LEN_PSFSTRUCT, TY_STRUCT)
+	sz_val = LEN_PSFSTRUCT
+	call malloc (DP_PSF(dp), sz_val, TY_STRUCT)
 	psf = DP_PSF(dp)
 
 	# Set the size of the data box t be extracted.
@@ -74,21 +76,23 @@ procedure dp_lmempsf (dao)
 
 pointer	dao			# pointer to daophot structure
 
+size_t	sz_val
 pointer	psf
 
 begin
 	psf = DP_PSF(dao)
 	if (DP_PNUM(psf) > 0) {
-	    call realloc (DP_PXCEN(psf), DP_PNUM(psf), TY_REAL)
-	    call realloc (DP_PYCEN(psf), DP_PNUM(psf), TY_REAL)
-	    call realloc (DP_PMAG(psf), DP_PNUM(psf), TY_REAL)
-	    call realloc (DP_PH(psf), DP_PNUM(psf), TY_REAL)
-	    call realloc (DP_PWEIGHT(psf), DP_PNUM(psf), TY_REAL)
-	    call realloc (DP_PSAT(psf), DP_PNUM(psf), TY_INT)
-	    call realloc (DP_PXCLAMP(psf), DP_PNUM(psf), TY_REAL)
-	    call realloc (DP_PYCLAMP(psf), DP_PNUM(psf), TY_REAL)
-	    call realloc (DP_PXOLD(psf), DP_PNUM(psf), TY_REAL)
-	    call realloc (DP_PYOLD(psf), DP_PNUM(psf), TY_REAL)
+	    sz_val = DP_PNUM(psf)
+	    call realloc (DP_PXCEN(psf), sz_val, TY_REAL)
+	    call realloc (DP_PYCEN(psf), sz_val, TY_REAL)
+	    call realloc (DP_PMAG(psf), sz_val, TY_REAL)
+	    call realloc (DP_PH(psf), sz_val, TY_REAL)
+	    call realloc (DP_PWEIGHT(psf), sz_val, TY_REAL)
+	    call realloc (DP_PSAT(psf), sz_val, TY_INT)
+	    call realloc (DP_PXCLAMP(psf), sz_val, TY_REAL)
+	    call realloc (DP_PYCLAMP(psf), sz_val, TY_REAL)
+	    call realloc (DP_PXOLD(psf), sz_val, TY_REAL)
+	    call realloc (DP_PYOLD(psf), sz_val, TY_REAL)
 	}
 end
 
@@ -100,6 +104,7 @@ procedure dp_amempsf (dao)
 
 pointer	dao			# pointer to daophot structure
 
+size_t	sz_val
 int	npars
 pointer	psf, psffit
 
@@ -108,12 +113,15 @@ begin
 	psffit = DP_PSFFIT(dao)
 	npars = DP_PSFNPARS(psffit)
 
-	call realloc (DP_PC(psf), npars * npars, TY_REAL)
-	call realloc (DP_PV(psf), npars, TY_REAL)
-	call realloc (DP_PZ(psf), npars, TY_REAL)
-	call realloc (DP_PCLAMP(psf), npars, TY_REAL)
-	call realloc (DP_POLD(psf), npars, TY_REAL)
-	call realloc (DP_PTMP(psf), MAX_NFCTNPARS, TY_REAL)
+	sz_val = npars * npars
+	call realloc (DP_PC(psf), sz_val, TY_REAL)
+	sz_val = npars
+	call realloc (DP_PV(psf), sz_val, TY_REAL)
+	call realloc (DP_PZ(psf), sz_val, TY_REAL)
+	call realloc (DP_PCLAMP(psf), sz_val, TY_REAL)
+	call realloc (DP_POLD(psf), sz_val, TY_REAL)
+	sz_val = MAX_NFCTNPARS
+	call realloc (DP_PTMP(psf), sz_val, TY_REAL)
 end
 
 
@@ -123,37 +131,42 @@ procedure dp_tmempsf (dao)
 
 pointer	dao			# pointer to daophot structure
 
+size_t	sz_val
 int	nexp
 pointer	psf, psffit
+long	lnint()
 
 begin
 	psf = DP_PSF(dao)
 	psffit = DP_PSFFIT(dao)
 
 	nexp = DP_NVLTABLE(psffit) + DP_NFEXTABLE(psffit)
-	DP_PSFSIZE(psffit) = 2 * (nint (2.0 * DP_PSFRAD(dao)) + 1) + 1
+	DP_PSFSIZE(psffit) = 2 * (lnint (2.0 * DP_PSFRAD(dao)) + 1) + 1
 	DP_PSFRAD(dao) = (real (DP_PSFSIZE(psffit) - 1) / 2.0 - 1.0) / 2.0
 	DP_SPSFRAD(dao) = DP_PSFRAD(dao) * DP_SCALE(dao)
 	DP_RPSFRAD(dao) = DP_PSFRAD(dao) * DP_SCALE(dao)
 
-	call realloc (DP_PC(psf), nexp * nexp, TY_REAL)
-	call realloc (DP_PV(psf), nexp, TY_REAL)
-	call realloc (DP_PTMP(psf), nexp, TY_REAL)
+	sz_val = nexp * nexp
+	call realloc (DP_PC(psf), sz_val, TY_REAL)
+	sz_val = nexp
+	call realloc (DP_PV(psf), sz_val, TY_REAL)
+	call realloc (DP_PTMP(psf), sz_val, TY_REAL)
 
-	call realloc (DP_PSUMN(psf), DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit),
-	    TY_REAL)
-	call realloc (DP_PSUMSQ(psf), DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit),
-	    TY_REAL)
-	call realloc (DP_PSIGMA(psf), DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit),
-	    TY_REAL)
-	call realloc (DP_POLDLUT(psf), nexp * DP_PSFSIZE(psffit) *
-	    DP_PSFSIZE(psffit), TY_REAL)
-	if (nexp > 1)
-	    call realloc (DP_PCONST(psf), DP_PSFSIZE(psffit) *
-	        DP_PSFSIZE(psffit), TY_REAL)
+	sz_val = DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit)
+	call realloc (DP_PSUMN(psf), sz_val, TY_REAL)
+	sz_val = DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit)
+	call realloc (DP_PSUMSQ(psf), sz_val, TY_REAL)
+	sz_val = DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit)
+	call realloc (DP_PSIGMA(psf), sz_val, TY_REAL)
+	sz_val = nexp * DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit)
+	call realloc (DP_POLDLUT(psf), sz_val, TY_REAL)
+	if (nexp > 1) {
+	    sz_val = DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit)
+	    call realloc (DP_PCONST(psf), sz_val, TY_REAL)
+	}
 
-	call realloc (DP_PSFLUT(psffit), nexp * DP_PSFSIZE(psffit) *
-	    DP_PSFSIZE(psffit), TY_REAL)
+	sz_val = nexp * DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit)
+	call realloc (DP_PSFLUT(psffit), sz_val, TY_REAL)
 end
 
 

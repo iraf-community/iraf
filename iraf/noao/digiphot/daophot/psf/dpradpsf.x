@@ -11,15 +11,16 @@ procedure dp_radpsf (dao, subras, ncols, nlines, x1, y1, title, gp)
 
 pointer	dao				# pointer to DAOPHOT structure
 real	subras[ncols,nlines]		# data subraster
-int	ncols, nlines			# dimesnions of subraster
-int	x1, y1				# coordinates of left hand corner
+size_t	ncols, nlines			# dimesnions of subraster
+long	x1, y1				# coordinates of left hand corner
 char	title[ARB]			# title string
 pointer	gp				# pointer to graphics descriptor
 
-int	npts
+size_t	sz_val
+size_t	npts
 pointer	psf, sp, radius, intensity, str
 real	ymin, ymax, r1, r2, i1, i2
-int	dp_rivectors()
+long	dp_rivectors()
 
 begin
 	# Get the pointer to the DAOPHOT PSF fitting substructure.
@@ -29,7 +30,8 @@ begin
 	call smark (sp)
 	call salloc (radius, ncols * nlines, TY_REAL)
 	call salloc (intensity, ncols * nlines, TY_REAL)
-	call salloc (str, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Compute the radial profile.
 	npts = dp_rivectors (subras, ncols, nlines, x1, y1, DP_CUR_PSFX(psf),

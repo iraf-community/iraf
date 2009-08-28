@@ -14,10 +14,12 @@ pointer	im				# pointer to the input image
 char	errmsg[ARB]			# string containing error message
 int	maxch				# max characters in errmsg
 
+size_t	sz_val
 int	nfunc, func
 pointer	sp, flist, fstr, psf, psffit
-int	dp_pstati(), dp_unsatstar(), dp_fitana(), dp_ifitana()
+int	dp_pstati(), dp_fitana(), dp_ifitana()
 int	dp_fitlt(), dp_fctdecode(), dp_strwrd(), strdic()
+int	dp_unsatstar()
 
 begin
 	# Get some daophot pointers.
@@ -40,8 +42,9 @@ begin
 
 	# Determine the analytic function.
 	call smark (sp)
-	call salloc (flist, SZ_FNAME, TY_CHAR)
-	call salloc (fstr, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (flist, sz_val, TY_CHAR)
+	call salloc (fstr, sz_val, TY_CHAR)
 	call dp_stats (dao, FUNCLIST, Memc[flist], SZ_FNAME)
 	nfunc = dp_fctdecode (Memc[flist], Memc[fstr], SZ_FNAME)
 	func = dp_strwrd (1, Memc[fstr], SZ_FNAME, Memc[flist])
@@ -224,6 +227,7 @@ pointer	im				# pointer to the input image
 char	funclist			# the list of functions to be fit
 int	nfunc				# number of functions
 
+size_t	sz_val
 int	i, psftype, npars
 pointer	psf, psffit, sp, fstr, func
 pointer	ixtmp, iytmp, ihtmp, istmp, xtmp, ytmp, htmp, ptmp, stmp
@@ -238,28 +242,33 @@ begin
 
 	# Allocate some temporary storage space.
 	call smark (sp)
-	call salloc (fstr, SZ_FNAME, TY_CHAR)
-	call salloc (func, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (fstr, sz_val, TY_CHAR)
+	call salloc (func, sz_val, TY_CHAR)
 
-	call salloc (ixtmp, DP_PNUM(psf), TY_REAL)
-	call salloc (iytmp, DP_PNUM(psf), TY_REAL)
-	call salloc (ihtmp, DP_PNUM(psf), TY_REAL)
-	call salloc (istmp, DP_PNUM(psf), TY_INT)
+	sz_val = DP_PNUM(psf)
+	call salloc (ixtmp, sz_val, TY_REAL)
+	call salloc (iytmp, sz_val, TY_REAL)
+	call salloc (ihtmp, sz_val, TY_REAL)
+	call salloc (istmp, sz_val, TY_INT)
 
-	call salloc (xtmp, DP_PNUM(psf), TY_REAL)
-	call salloc (ytmp, DP_PNUM(psf), TY_REAL)
-	call salloc (htmp, DP_PNUM(psf), TY_REAL)
-	call salloc (stmp, DP_PNUM(psf), TY_INT)
-	call salloc (ptmp, MAX_NFCTNPARS, TY_REAL)
+	sz_val = DP_PNUM(psf)
+	call salloc (xtmp, sz_val, TY_REAL)
+	call salloc (ytmp, sz_val, TY_REAL)
+	call salloc (htmp, sz_val, TY_REAL)
+	call salloc (stmp, sz_val, TY_INT)
+	sz_val = MAX_NFCTNPARS
+	call salloc (ptmp, sz_val, TY_REAL)
 
 	# Initialize.
 	call strcpy (DP_FUNCTION(dao), Memc[func], SZ_FNAME)
 	npars = 0
 	osig = MAX_REAL
-	call amovr (Memr[DP_PXCEN(psf)], Memr[ixtmp], DP_PNUM(psf))
-	call amovr (Memr[DP_PYCEN(psf)], Memr[iytmp], DP_PNUM(psf))
-	call amovr (Memr[DP_PH(psf)], Memr[ihtmp], DP_PNUM(psf))
-	call amovi (Memi[DP_PSAT(psf)], Memr[istmp], DP_PNUM(psf))
+	sz_val = DP_PNUM(psf)
+	call amovr (Memr[DP_PXCEN(psf)], Memr[ixtmp], sz_val)
+	call amovr (Memr[DP_PYCEN(psf)], Memr[iytmp], sz_val)
+	call amovr (Memr[DP_PH(psf)], Memr[ihtmp], sz_val)
+	call amovi (Memi[DP_PSAT(psf)], Memi[istmp], sz_val)
 	ofactor = dp_profile (DP_PSFUNCTION(psffit), 0.0, 0.0,
 	    Memr[DP_PSFPARS(psffit)], dhdxc, dhdyc, junk, 0)
 
@@ -275,16 +284,17 @@ begin
 
 	    # Start from the same initial state.
 	    call dp_reinit (dao)
-	    call amovr (Memr[ixtmp], Memr[xtmp], DP_PNUM(psf))
-	    call amovr (Memr[iytmp], Memr[ytmp], DP_PNUM(psf))
+	    sz_val = DP_PNUM(psf)
+	    call amovr (Memr[ixtmp], Memr[xtmp], sz_val)
+	    call amovr (Memr[iytmp], Memr[ytmp], sz_val)
 	    if (i == 1)
-	        call amovr (Memr[ihtmp], Memr[htmp], DP_PNUM(psf))
+	        call amovr (Memr[ihtmp], Memr[htmp], sz_val)
 	    else {
 		factor = ofactor / dp_profile (DP_PSFUNCTION(psffit), 0.0, 0.0,
 	    	    Memr[DP_PSFPARS(psffit)], dhdxc, dhdyc, junk, 0)
-		call amulkr (Memr[ihtmp], factor, Memr[htmp], DP_PNUM(psf))
+		call amulkr (Memr[ihtmp], factor, Memr[htmp], sz_val)
 	    }
-	    call amovi (Memi[istmp], Memi[stmp], DP_PNUM(psf))
+	    call amovi (Memi[istmp], Memi[stmp], sz_val)
 
 	    call printf ("Trying function %s norm scatter = ")
 		call pargstr (Memc[fstr])
@@ -305,12 +315,13 @@ begin
 		psftype = DP_PSFUNCTION(psffit)
 		height = DP_PSFHEIGHT(psffit)
 		npars = DP_PSFNPARS(psffit)
-		call amovr (Memr[DP_PSFPARS(psffit)], Memr[ptmp],
-		    MAX_NFCTNPARS)
-	        call amovr (Memr[xtmp], Memr[DP_PXCEN(psf)], DP_PNUM(psf))
-	        call amovr (Memr[ytmp], Memr[DP_PYCEN(psf)], DP_PNUM(psf))
-	        call amovr (Memr[htmp], Memr[DP_PH(psf)], DP_PNUM(psf))
-	        call amovi (Memi[stmp], Memi[DP_PSAT(psf)], DP_PNUM(psf))
+		sz_val = MAX_NFCTNPARS
+		call amovr (Memr[DP_PSFPARS(psffit)], Memr[ptmp], sz_val)
+		sz_val = DP_PNUM(psf)
+	        call amovr (Memr[xtmp], Memr[DP_PXCEN(psf)], sz_val)
+	        call amovr (Memr[ytmp], Memr[DP_PYCEN(psf)], sz_val)
+	        call amovr (Memr[htmp], Memr[DP_PH(psf)], sz_val)
+	        call amovi (Memi[stmp], Memi[DP_PSAT(psf)], sz_val)
 		osig = DP_PSIGANA(psf)
 		osum = DP_PSUMANA(psf)
 	    }
@@ -324,8 +335,8 @@ begin
 	    DP_PSFNPARS(psffit) = npars
 	    DP_PSIGANA(psf) = osig
 	    DP_PSUMANA(psf) = osum
-	    call amovr (Memr[ptmp], Memr[DP_PSFPARS(psffit)],
-	        MAX_NFCTNPARS)
+	    sz_val = MAX_NFCTNPARS
+	    call amovr (Memr[ptmp], Memr[DP_PSFPARS(psffit)], sz_val)
 	    call printf ("Best fitting function is %s\n")
 		call pargstr (DP_FUNCTION(dao))
 	}
@@ -352,10 +363,14 @@ real	ph[ARB]				# heights of the psf stars
 int	pstat[ARB]			# saturation status of psf stars
 int	npsfstars			# the number of psf stars
 
-int	i, niter, istar, mpar, lx, ly, nx, ny, ier
+size_t	sz_val
+int	i, niter, mpar, istar, ier
+long	lx, ly
+size_t	nx, ny
 pointer	apsel, psf, psffit, data
 real	fitrad, rsq, oldchi, sumfree
 pointer	imgs2r()
+long	lint()
 
 begin
 	# Get the psf fitting structure pointer.
@@ -373,24 +388,27 @@ begin
 	call dp_amempsf (dao)
 
 	# Initialize the fit.
-	call amovkr (0.5, Memr[DP_PCLAMP(psf)], DP_PSFNPARS(psffit))
-	call aclrr (Memr[DP_PZ(psf)], DP_PSFNPARS(psffit))
-	call aclrr (Memr[DP_POLD(psf)], DP_PSFNPARS(psffit))
+	sz_val = DP_PSFNPARS(psffit)
+	call amovkr (0.5, Memr[DP_PCLAMP(psf)], sz_val)
+	call aclrr (Memr[DP_PZ(psf)], sz_val)
+	call aclrr (Memr[DP_POLD(psf)], sz_val)
 	Memr[DP_PCLAMP(psf)] = 2.0
 	Memr[DP_PCLAMP(psf)+1] = 2.0
 
-	call aclrr (Memr[DP_PXOLD(psf)], npsfstars)
-	call aclrr (Memr[DP_PYOLD(psf)], npsfstars)
-	call amovkr (1.0, Memr[DP_PXCLAMP(psf)], npsfstars)
-	call amovkr (1.0, Memr[DP_PYCLAMP(psf)], npsfstars)
+	sz_val = npsfstars
+	call aclrr (Memr[DP_PXOLD(psf)], sz_val)
+	call aclrr (Memr[DP_PYOLD(psf)], sz_val)
+	call amovkr (1.0, Memr[DP_PXCLAMP(psf)], sz_val)
+	call amovkr (1.0, Memr[DP_PYCLAMP(psf)], sz_val)
 
 	# Iterate.
 	do niter = 1, MAX_NPSFITER {
 
 	    # Initialize the current integration.
-	    call aclrr (Memr[DP_PV(psf)], DP_PSFNPARS(psffit)) 
-	    call aclrr (Memr[DP_PC(psf)], DP_PSFNPARS(psffit) *
-	        DP_PSFNPARS(psffit)) 
+	    sz_val = DP_PSFNPARS(psffit)
+	    call aclrr (Memr[DP_PV(psf)], sz_val)
+	    sz_val = DP_PSFNPARS(psffit) * DP_PSFNPARS(psffit)
+	    call aclrr (Memr[DP_PC(psf)], sz_val)
 
 	    # Loop over the stars.
 	    DP_PSIGANA(psf) = 0.0
@@ -402,10 +420,10 @@ begin
 		    next
 
 		# Define the subraster to be read in.
-		lx = int (pxcen[istar] - fitrad) + 1
-		ly = int (pycen[istar] - fitrad) + 1
-		nx = (int (pxcen[istar] + fitrad) - lx) + 1
-		ny = (int (pycen[istar] + fitrad) - ly) + 1
+		lx = lint (pxcen[istar] - fitrad) + 1
+		ly = lint (pycen[istar] - fitrad) + 1
+		nx = (lint (pxcen[istar] + fitrad) - lx) + 1
+		ny = (lint (pycen[istar] + fitrad) - ly) + 1
 
 		# Is the star off the image?
 		if (lx > IM_LEN(im,1) || ly > IM_LEN(im,2) || (lx + nx - 1) <
@@ -463,9 +481,10 @@ begin
 		    Memr[DP_PCLAMP(psf)+i-1] = 1.1 *
 		        Memr[DP_PCLAMP(psf)+i-1]
 	    }
-	    call amovr (Memr[DP_PZ(psf)], Memr[DP_POLD(psf)], mpar)
+	    sz_val = mpar
+	    call amovr (Memr[DP_PZ(psf)], Memr[DP_POLD(psf)], sz_val)
 	    call amulr (Memr[DP_PZ(psf)], Memr[DP_PCLAMP(psf)],
-		Memr[DP_PZ(psf)], mpar)
+			Memr[DP_PZ(psf)], sz_val)
 
 	    Memr[DP_PZ(psf)] = max (-0.1 * Memr[DP_PSFPARS(psffit)],
 		min (0.1 * Memr[DP_PSFPARS(psffit)], Memr[DP_PZ(psf)]))
@@ -475,8 +494,9 @@ begin
 	        #Memr[DP_PZ(psf)+2] = Memr[DP_PZ(psf)+2] /
 		    #(1.0 + abs (Memr[DP_PZ(psf)+2]) /
 		    #(min (0.1, 1.0 - abs (Memr[DP_PSFPARS(psffit)+2]))))
+	    sz_val = mpar
 	    call aaddr (Memr[DP_PSFPARS(psffit)], Memr[DP_PZ(psf)],
-		Memr[DP_PSFPARS(psffit)], mpar)
+			Memr[DP_PSFPARS(psffit)], sz_val)
 
 	    # Check for convergence.
 	    sumfree = DP_PSUMANA(psf) - real (mpar + 3 * npsfstars)
@@ -519,15 +539,15 @@ int	psftype		# analytic point spread function type
 real	params[ARB]	# current function parameter values
 real	rsq		# the fitting radius squared
 real	data[nx,ARB]	# the input image data
-int	nx, ny		# the dimensions of the input image data
-int	lx, ly		# the coordinates of the ll corner of the image data
+size_t	nx, ny		# the dimensions of the input image data
+long	lx, ly		# the coordinates of the ll corner of the image data
 real	x, y		# the input/output stellar coordinates
 real	sky		# the input sky value
 real	h		# the input/output height value
 real	xclamp, yclamp	# the input/output clamping factors for x and y
 real	xold, yold	# the input/output x and y correction factors
 
-int	i, j
+long	i, j
 real	dhn, dhd, dxn, dxd, dyn, dyd, dx, dy, wt, dhdxc, dhdyc, junk, p, dp
 real	prod
 real	dp_profile()
@@ -590,8 +610,8 @@ int	npars		# number of function parameters
 int	mpars		# the number of active parameters
 real	rsq		# the fitting radius squared
 real	data[nx,ARB]	# the input image data
-int	nx, ny		# the dimensions of the input image data
-int	lx, ly		# the coordinates of the ll corner of the image data
+size_t	nx, ny		# the dimensions of the input image data
+long	lx, ly		# the coordinates of the ll corner of the image data
 real	x, y		# the input/output stellar coordinates
 real	sky		# the input sky value
 real	h		# the input/output height value
@@ -602,7 +622,8 @@ real	temp[ARB]	# temporary storage vector
 real	chi		# the chi sum
 real	sumwt		# the number of points sum
 
-int	i, j, k, l
+long	i, j
+int	k, l
 real	peak, dx, dy, wt, dhdxc, dhdyc, p, dp
 real	dp_profile()
 
@@ -643,16 +664,20 @@ int procedure dp_fitlt (dao, im)
 pointer	dao		# pointer to the daophot structure
 pointer	im		# pointer to the input image
 
-int	istar, nexp, lx, mx, ly, my, iter, nclean, ndata, fit_saturated, nfit
-int	nunsat
+size_t	sz_val
+int	iter, fit_saturated, nexp, istar, nunsat, nfit
+long	lx, mx, ly, my, nclean, ndata, l_val0, l_val1, l_val2
 double	volume
 pointer	apsel, psf, psffit, sp, wimname, wim, data
 real	datamin, datamax, sumfree, resid, dfdx, dfdy, junk
-int	dp_dclean(), dp_resana(), dp_ltcompute(), dp_fsaturated()
+int	dp_ltcompute(), dp_fsaturated()
+long	dp_resana(), dp_dclean()
 double	dp_pnorm()
 pointer	immap(), imps2r(), dp_subrast()
 real	dp_profile(), dp_sweight()
 define	fitsaturated_	11
+
+include	<nullptr.inc>
 
 begin
 	# Get some pointers.
@@ -707,11 +732,12 @@ begin
 
 	# Get the image name.
 	call smark (sp)
-	call salloc (wimname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (wimname, sz_val, TY_CHAR)
 	call mktemp ("tmp", Memc[wimname], SZ_FNAME)
 
 	# Open a temporary image to hold the weights.
-	wim = immap (Memc[wimname], NEW_IMAGE, 0)
+	wim = immap (Memc[wimname], NEW_IMAGE, NULLPTR)
 	IM_NDIM(wim) = 2
 	IM_LEN(wim,1) = DP_PNUM(psf)
 	IM_LEN(wim,2) = DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit) 
@@ -731,21 +757,25 @@ fitsaturated_
 	do iter = 1, DP_NCLEAN(dao) + 1 {
 
 	    # Initialize the fitting arrays.
-	    call aclrr (Memr[DP_PV(psf)], nexp)
-	    call aclrr (Memr[DP_PC(psf)], nexp * nexp)
-	    call aclrr (Memr[DP_PSUMN(psf)], DP_PSFSIZE(psffit) *
-	        DP_PSFSIZE(psffit))
-	    call aclrr (Memr[DP_PSUMSQ(psf)], DP_PSFSIZE(psffit) *
-	        DP_PSFSIZE(psffit))
-	    call aclrr (Memr[DP_PSFLUT(psffit)], nexp * DP_PSFSIZE(psffit) *
-	        DP_PSFSIZE(psffit))
+	    sz_val = nexp
+	    call aclrr (Memr[DP_PV(psf)], sz_val)
+	    sz_val = nexp * nexp
+	    call aclrr (Memr[DP_PC(psf)], sz_val)
+	    call aclrr (Memr[DP_PSUMN(psf)],
+			DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit))
+	    call aclrr (Memr[DP_PSUMSQ(psf)],
+			DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit))
+	    call aclrr (Memr[DP_PSFLUT(psffit)],
+			nexp * DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit))
 
 	    # Loop over the PSF stars.
 	    do istar = 1, DP_PNUM(psf) {
 
 		# Get the weight image.
-		DP_PSUMW(psf) = imps2r (wim, istar, istar, 1,
-		    DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit)) 
+		l_val0 = 1
+		l_val1 = DP_PSFSIZE(psffit) * DP_PSFSIZE(psffit)
+		l_val2 = istar
+		DP_PSUMW(psf) = imps2r (wim, l_val2, l_val2, l_val0, l_val1) 
 	        call aclrr (Memr[DP_PSUMW(psf)], DP_PSFSIZE(psffit) *
 	            DP_PSFSIZE(psffit))
 
@@ -897,18 +927,18 @@ end
 # the data. Note that the star must not be considered to be saturated to
 # arrive at this point.
 
-int procedure dp_dclean (data, nx, ny, lx, ly, x, y, fitrad, datamin, datamax)
+long procedure dp_dclean (data, nx, ny, lx, ly, x, y, fitrad, datamin, datamax)
 
 real	data[nx,ARB]		# the input image data
-int	nx, ny			# the dimensions of the input image data
-int	lx, ly			# the coordinates of the ll image corner
+size_t	nx, ny			# the dimensions of the input image data
+long	lx, ly			# the coordinates of the ll image corner
 real	x, y			# the input/output stellar coordinates
 real	fitrad			# the fitting radius
 real	datamin			# the min good data value
 real	datamax			# the max good data value
 
 bool	redo
-int	i, j, l, k, nclean
+long	i, j, l, k, nclean
 real	frad2, dy2, dr2, sumd, sumn
 
 begin
@@ -958,15 +988,15 @@ end
 
 # DP_RESANA -- Compute the residuals from the analytic function.
 
-int procedure dp_resana (im, psftype, params, data, nx, ny, lx, ly,
+long procedure dp_resana (im, psftype, params, data, nx, ny, lx, ly,
 	x, y, sky, h, nstar, psfstar, psfrad, fitrad, maxgdata, resid)
 
 pointer	im			# the input image descriptor
 int	psftype			# analytic point spread function type
 real	params[ARB]		# current function parameter values
 real	data[nx,ARB]		# the input image data
-int	nx, ny			# the dimensions of the input image data
-int	lx, ly			# the coordinates of the ll image corner
+size_t	nx, ny			# the dimensions of the input image data
+long	lx, ly			# the coordinates of the ll image corner
 real	x[ARB]			# the input x coords of the psf stars
 real	y[ARB]			# the input y coords of the psf stars
 real	sky[ARB]		# the input sky values of the psf stars
@@ -978,7 +1008,8 @@ real	fitrad			# the fitting radius
 real	maxgdata		# the maximum good data value
 real	resid			# standard deviation of fit
 
-int	i, j, istar, rx, ry, x1, x2, y1, y2, nresid
+long	i, j, rx, ry, x1, x2, y1, y2, nresid
+int	istar
 real	frad2, dx, dy, dy2, dr2, p, dhdxc, dhdyc, junk
 int	dp_lsubrast()
 real	dp_profile()
@@ -1097,9 +1128,9 @@ begin
 	# The fractional pixel expansion terms if any.
 	if (nfexp > 0) {
 	    j = nvexp + 1
-	    junk[j] = 2.0 * (x - real (nint(x)))
+	    junk[j] = 2.0 * (x - anint(x))
 	    j = j + 1
-	    junk[j] = 2.0 * (y - real (nint(y)))
+	    junk[j] = 2.0 * (y - anint(y))
 	    j = j + 1
 	    junk[j] = (1.5 * (junk[j-2] ** 2)) - 0.5
 	    j = j + 1
@@ -1118,8 +1149,8 @@ procedure dp_ltinterp (data, nx, ny, lx, ly, x, y, sky, hratio, weight, sumn,
 	sumw, sumsq, sig, old, temp, psflut, nexp, nxlut, maxgdata, iter, niter)
 
 real	data[nx,ARB]		# the input image data
-int	nx, ny			# the dimensions of the input image data
-int	lx, ly			# the coordinates of the ll image corner
+size_t	nx, ny			# the dimensions of the input image data
+long	lx, ly			# the coordinates of the ll image corner
 real	x, y			# the input/output stellar coordinates
 real	sky			# sky value for star
 real	hratio			# scale factor for star
@@ -1131,15 +1162,18 @@ real	sig[nxlut,ARB]		# residuals of previous iteration
 real	old[nexp,nxlut,ARB]	# old lookup table
 real	temp[ARB]		# the single star expansion vector
 real	psflut[nexp,nxlut,ARB]	# the psf lookup table
-int	nexp, nxlut		# the dimensions of the lookup table
+int	nexp			# the dimensions of the lookup table
+size_t	nxlut
 real	maxgdata		# maximum good data value
 int	iter			# the current iteration
 int	niter			# the maximum number of iterations
 
 bool	omit
-int	i, j, k, kx, ky, ii, jj, middle, jysq, irsq, midsq
+int	k
+long	i, j, middle, jysq, irsq, midsq, kx, ky, ii, jj
 real	jy, ix, dx, dy, diff, dfdx, dfdy, wt, oldsum
 real	bicubic()
+long	lint()
 
 begin
 	middle = (nxlut + 1) / 2
@@ -1149,7 +1183,7 @@ begin
 	    if (jysq > midsq)
 		next
 	    jy = y + real (j - (nxlut + 1) / 2) / 2.0 - real (ly - 1)
-	    ky = int (jy)
+	    ky = lint (jy)
 	    if (ky < 2 || (ky + 2) > ny) 
 		next
 	    dy = jy - real (ky)
@@ -1158,7 +1192,7 @@ begin
 		if (irsq > midsq)
 		    next
 		ix = x + real (i - (nxlut + 1) / 2) / 2.0 - real (lx - 1)
-		kx = int (ix)
+		kx = lint (ix)
 	        if (kx < 2 || (kx + 2) > nx) 
 		    next
 		omit = false
@@ -1214,13 +1248,16 @@ real	psflut[nexp,nxlut,ARB]	# the psf lookup table
 real	c[nexp,ARB]		# the expansion matrix
 real	junk[ARB]		# temporary junk vector
 real	v[ARB]			# temporary vector
-int	nexp, nxlut		# the size of the lookup table
+int	nexp			# the size of the lookup table
+size_t	nxlut
 int	nvexp, nfexp		# size of the expansion look-up tables
 
-int	i, j, k, l, line, istar, ier, middle, midsq, jysq, irsq
+int	ier, istar, k, l
+long	i, j, middle, midsq, jysq, irsq, line, l_val0, l_val1
 pointer	sumw
 real	weight
 pointer	imgs2r()
+int	inint()
 
 begin
 	middle = (nxlut + 1) / 2
@@ -1233,10 +1270,12 @@ begin
 		irsq = (i - middle) ** 2 + jysq 
 		if (irsq > midsq)
 		    next
-		if (nint (sumn[i,j]) < nexp)
+		if (inint (sumn[i,j]) < nexp)
 		    return (ERR)
 		line = i + (j - 1) * nxlut
-		sumw = imgs2r (wim, 1, npsf, line, line)
+		l_val0 = 1
+		l_val1 = npsf
+		sumw = imgs2r (wim, l_val0, l_val1, line, line)
 		do k = 1, nexp
 		    do l = 1, nexp
 			c[k,l] = 0.0
@@ -1268,10 +1307,10 @@ procedure dp_stdcompute (sumn, sumsq, sigma, nx, ny, nexp)
 real	sumn[nx,ARB]		# number of point
 real	sumsq[nx,ARB]		# sum of the standard deviations
 real	sigma[nx,ARB]		# output standard deviation array
-int	nx, ny			# size of the arrays
+size_t	nx, ny			# size of the arrays
 int	nexp			# number of expansion vectors
 
-int	i, j
+long	i, j
 
 begin
 	do j = 1, ny {
@@ -1303,7 +1342,7 @@ int	nexp			# the total number of expansion terms
 int	nvexp			# number of variable expansion terms
 int	nfexp			# number of fractional pixel expansion terms
 
-int	k, j
+int	j, k
 
 begin
 	# Zero the accumulation vector
@@ -1334,9 +1373,9 @@ begin
 	    # The fractional pixel expansion terms if any.
 	    if (nfexp > 0) {
 	        j = nvexp + 1
-	        junk[j] = 2.0 * (x[k] - real (nint(x[k])))
+	        junk[j] = 2.0 * (x[k] - anint(x[k]))
 	        j = j + 1
-	        junk[j] = 2.0 * (y[k] - real (nint(y[k])))
+	        junk[j] = 2.0 * (y[k] - anint(y[k]))
 	        j = j + 1
 	        junk[j] = (1.5 * (junk[j-2] ** 2)) - 0.5
 	        j = j + 1
@@ -1364,9 +1403,9 @@ int	psftype			# the type of analytic psf function
 real	params[ARB]		# the analytic parameters array
 real	hpsf1			# the height of the psf function
 real	ana[nxlut,ARB]		# the computed analytic function
-int	nxlut			# the size of the constant lookup table
+size_t	nxlut			# the size of the constant lookup table
 
-int	i, j, middle, midsq, dj2, dr2
+long	i, j, middle, midsq, dj2, dr2
 real	dx, dy, dfdx, dfdy, junk
 real	dp_profile()
 
@@ -1397,9 +1436,9 @@ double procedure dp_pnorm (ana, pixels, nxlut)
 
 real	ana[nxlut,ARB]		# the computed analytic function
 real	pixels[ARB]		# pixel storage array
-int	nxlut			# the size of the constant lookup table
+size_t	nxlut			# the size of the constant lookup table
 
-int	i, j, middle, midsq, edgesq, npts, dj2, dr2
+long	i, j, middle, midsq, edgesq, npts, dj2, dr2
 double	vol
 real	median
 real	pctile()
@@ -1455,10 +1494,12 @@ real	ana[nxlut,ARB]		# analytic part of the profile
 real	v[ARB]			# the expansion vector
 real	psflut[nexp,nxlut,ARB]	# the psf lookup table
 real	pixels[ARB]		# scratch array for determining median
-int	nexp, nxlut		# the size of the lookup table
+int	nexp	 		# the size of the lookup table
+size_t	nxlut
 double	volume			# total flux in the constant psf
 
-int	i, j, k, middle, midsq, edgesq, npts, dj2, dr2
+int	k
+long	i, j, middle, midsq, edgesq, npts, dj2, dr2
 double	sum
 real	median, dmedian
 real	pctile()
@@ -1560,8 +1601,9 @@ real	sky[ARB]		# array of sky values
 int	sat[ARB]		# array of saturation indicators
 int	nstars			# number of stars
 
-int	nfit, nsat, istar, lowx, lowy, nxpix, nypix, recenter, fitsky
-int	clipexp, ier, niter
+int	recenter, fitsky, clipexp, ier, niter, istar, nfit, nsat
+long	lowx, lowy
+size_t	nxpix, nypix
 pointer	psf, psffit, subim, psflut
 real	x, y, dx, dy, skyval, scale, errmag, chi, sharp, cliprange
 int	dp_pkfit()
@@ -1675,9 +1717,11 @@ procedure dp_pcopy (inlut, outlut, nx, ny, nexp)
 
 real	inlut[nexp,nx,ny]		# the input look-up table
 real	outlut[nx,ny,nexp]		# the output look-up table
-int	nx,ny,nexp			# the size of the look-up table
+size_t	nx, ny				# the size of the look-up table
+int	nexp
 
-int	k,i,j
+long	i, j
+int	k
 
 begin
 	do k = 1, nexp {

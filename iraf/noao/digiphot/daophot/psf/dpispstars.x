@@ -25,6 +25,7 @@ bool	mkstars			# marked the selected and deleted psf stars
 bool	interactive		# interactive mode
 bool	showplots		# show the plots
 
+size_t	sz_val
 int	key, nxstar, wcs, idnum, istar, ip
 pointer apsel, sp, cmd, str
 real	wx, wy
@@ -39,8 +40,9 @@ begin
 
 	# Allocate some working space.
 	call smark (sp)
-	call salloc (str, SZ_LINE, TY_CHAR)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Initialize some variables.
 	key = 'a'
@@ -52,7 +54,8 @@ begin
 	    EOF) {
 
 	    # Correct for tv coordinates if necessary.
-	    call dp_vtol (im, wx, wy, wx, wy, 1)
+	    sz_val = 1
+	    call dp_vtol (im, wx, wy, wx, wy, sz_val)
 
 	    switch (key) {
 
@@ -285,6 +288,7 @@ real	radius			# minimum separation
 bool	omit
 int	istar, jstar
 real	radsq, dy2, dr2
+real	aabs()
 
 begin
 	radsq = radius * radius
@@ -308,7 +312,7 @@ begin
 	    # of radsq.
 	    omit = false
 	    do jstar = 1, istar - 1 {
-		dy2 = abs (ycen[jstar] - ycen[istar])
+		dy2 = aabs (ycen[jstar] - ycen[istar])
 		if (dy2 >= radius)
 		    next
 		dr2 = (xcen[jstar] - xcen[istar]) ** 2 + dy2 ** 2

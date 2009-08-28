@@ -24,21 +24,24 @@ pointer	graphics		# the graphics device
 pointer	display			# the display device
 bool	mkstars			# mark deleted and accepted psf stars
 
+size_t	sz_val
 pointer	sp, pfd, dao, outfname, curfile, str, im, gd, id, mgd
-pointer	alist, olist, imlist
-int	limlist, lalist, lolist, root, apd, pmgd, pltype
-int	wcs, buf_size, memstat()
+pointer	alist, olist, imlist, apd
+int	limlist, lalist, lolist, root, pmgd, pltype, wcs, memstat, i_val
+long	l_val
 bool	ap_text
-size_t	req_size, old_size
+size_t	req_size, old_size, buf_size
 
-pointer	immap(), gopen(), fntopnb(), imtopen()
-int	tbtopn(), open(), fnldir(), strlen(), strncmp(), fstati(), btoi()
+pointer	immap(), gopen(), fntopnb(), imtopen(), tbtopn()
+int	open(), fnldir(), strlen(), strncmp(), fstati(), btoi()
 int	access(), fntlenb(), clgeti(), imtlen()
 int	fntgfnb(), imtgetim(), strdic(), dp_stati(), clgwrd(), sizeof()
 int	dp_memstat()
 bool	clgetb(), itob(), streq()
 
 errchk	gopen()
+
+include	<nullptr.inc>
 
 begin
 	# Set the standard output to flush on newline.
@@ -47,16 +50,17 @@ begin
 
 	# Get some working memory.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (photfile, SZ_FNAME, TY_CHAR)
-	call salloc (pstfile, SZ_FNAME, TY_CHAR)
-	call salloc (plotfile, SZ_FNAME, TY_CHAR)
-	call salloc (plottype, SZ_FNAME, TY_CHAR)
-	call salloc (graphics, SZ_FNAME, TY_CHAR)
-	call salloc (display, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (curfile, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (photfile, sz_val, TY_CHAR)
+	call salloc (pstfile, sz_val, TY_CHAR)
+	call salloc (plotfile, sz_val, TY_CHAR)
+	call salloc (plottype, sz_val, TY_CHAR)
+	call salloc (graphics, sz_val, TY_CHAR)
+	call salloc (display, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (curfile, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the various task parameters.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -201,7 +205,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the input image.
-	    im = immap (Memc[image], READ_ONLY, 0)
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
 
@@ -213,8 +217,10 @@ begin
             req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
             memstat = dp_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call dp_pcache (im, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call dp_pcache (im, l_val, buf_size)
+	    }
 
 	    # Open the input photometry table and read in the photometry.
 	    if (fntgfnb (alist, Memc[photfile], SZ_FNAME) == EOF)
@@ -230,7 +236,7 @@ begin
 	    if (ap_text)
 	        apd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else
-	        apd = tbtopn (Memc[outfname], READ_ONLY, 0)
+	        apd = tbtopn (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_wgetapert (dao, im, apd, DP_MAXNSTAR(dao), ap_text)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 
@@ -251,7 +257,7 @@ begin
 	    if (ap_text)
 	        pfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	    else
-	        pfd = tbtopn (Memc[outfname], NEW_FILE, 0)
+	        pfd = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 	    call dp_sets (dao, OUTPHOTFILE, Memc[outfname])
 
 	    if (DP_VERBOSE(dao) == YES) {
@@ -265,29 +271,33 @@ begin
 
 	    # Now select the PSF stars.
 	    if (Memc[curfile] != EOS)
-	        call dp_gpstars (dao, im, apd, pfd, ap_text, maxnpsf, NULL,
-		    mgd, NULL, false, false, true)
+	        call dp_gpstars (dao, im, apd, pfd, ap_text, maxnpsf, NULLPTR,
+		    mgd, NULLPTR, false, false, true)
 	    else if (interactive)
 	        call dp_gpstars (dao, im, apd, pfd, ap_text, maxnpsf, gd, mgd,
 		    id, mkstars, true, false)
 	    else
-	        call dp_gpstars (dao, im, apd, pfd, ap_text, maxnpsf, NULL,
-		    mgd, NULL, false, false, false)
+	        call dp_gpstars (dao, im, apd, pfd, ap_text, maxnpsf, NULLPTR,
+		    mgd, NULLPTR, false, false, false)
 
 	    # Close the input image.
 	    call imunmap (im)
 
 	    # Close the photometry file. 
-	    if (ap_text)
-	        call close (apd)
-	    else
+	    if (ap_text) {
+		i_val = apd
+	        call close (i_val)
+	    } else {
 	        call tbtclo (apd)
+	    }
 
 	    # Close the output table.
-	    if (ap_text)
-	        call close (pfd)
-	    else
+	    if (ap_text) {
+		i_val = pfd
+	        call close (i_val)
+	    } else {
 	        call tbtclo (pfd)
+	    }
 
             # Uncache memory.
             call fixmem (old_size)
