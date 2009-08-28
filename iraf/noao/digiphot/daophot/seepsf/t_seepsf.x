@@ -6,33 +6,41 @@ procedure t_seepsf ()
 
 pointer	psfimage			# name of the input PSF
 pointer	image				# name of the output image
-int	dimen				# size of the image
+long	dimen				# size of the image
 real	magnitude			# magnitude of star
 
-int	psffd, lpimlist, limlist
-pointer	im, sp, dao, pimlist, imlist
+size_t	sz_val
+long	c_2
+int	lpimlist, limlist
+pointer	im, sp, dao, pimlist, imlist, psffd
 real	xpsf, ypsf
 
-int	clgeti(), fstati(), imtlen(), imtgetim()
+int	fstati(), imtlen(), imtgetim()
+long	clgetl(), lmod()
 real	clgetr()
 pointer	immap(), imtopen()
 
+include	<nullptr.inc>
+
 begin
+	c_2 = 2
+
 	# Set the standard output to flush on newline.
 	if (fstati (STDOUT, F_REDIR) == NO)
 	     call fseti (STDOUT, F_FLUSHNL, YES)
 
 	# Get some memory.
 	call smark (sp)
-	call salloc (psfimage, SZ_FNAME, TY_CHAR)
-	call salloc (image, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (psfimage, sz_val, TY_CHAR)
+	call salloc (image, sz_val, TY_CHAR)
 
 	# Get the various task parameters.
 	call clgstr ("psfimage", Memc[psfimage], SZ_FNAME)
 	call clgstr ("image", Memc[image], SZ_FNAME)
-	dimen = clgeti ("dimension")
-	if (! IS_INDEFI(dimen)) {
-	    if (mod (dimen, 2) == 0)
+	dimen = clgetl ("dimension")
+	if (! IS_INDEFL(dimen)) {
+	    if (lmod (dimen, c_2) == 0)
 	        dimen = dimen + 1
 	}
 	xpsf = clgetr ("xpsf")
@@ -63,7 +71,7 @@ begin
 	    (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF)) {
 
 	    # Open the psfimage.
-	    psffd = immap (Memc[psfimage], READ_ONLY, 0)
+	    psffd = immap (Memc[psfimage], READ_ONLY, NULLPTR)
 
 	    # Open the output image.
 	    im = immap (Memc[image], NEW_COPY, psffd)

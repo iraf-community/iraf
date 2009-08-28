@@ -8,20 +8,23 @@ procedure dp_mkimage (dao, im_psf, im_out, dimen, xpsf, ypsf, magnitude)
 pointer	dao			# pointer to the DAOPHOT structure
 pointer	im_psf			# pointer to the psf image descriptor
 pointer	im_out			# pointer to the image descriptor
-int	dimen			# size of the image (square)
+long	dimen			# size of the image (square)
 real	xpsf			# x position of the psf
 real	ypsf			# y position of the psf
 real	magnitude		# magnitude of the PSF
 
-int	i, j, psf_size, im_size 
+long	i, j, im_size, psf_size, c_1
 pointer	psffit, pixels, pixel
 real	psfrad, dxfrom_psf, dyfrom_psf, dvdx, dvdy, start, delta, dx, dy, scale
 real	dysq, drsq, psfradsq
 pointer	imps2r()
 real	imgetr(), dp_usepsf()
+long	lint()
 errchk	imgetr()
 
 begin
+	c_1 = 1
+
 	# Get the other pointers.
 	psffit = DP_PSFFIT (dao)
 	if (DP_PSFSIZE(psffit) > 0)
@@ -36,10 +39,10 @@ begin
             }
 	}
 	psfradsq = psfrad ** 2
-	psf_size = 2 * int (psfrad) + 1 
+	psf_size = 2 * lint (psfrad) + 1 
 
 	IM_NDIM(imout) = 2
-	if (IS_INDEFI(dimen)) {
+	if (IS_INDEFL(dimen)) {
 	    IM_LEN(im_out, 1) = psf_size
 	    IM_LEN(im_out, 2) = psf_size
 	    im_size = psf_size
@@ -81,8 +84,8 @@ begin
 	    call pargr (magnitude)
 
         # Get the image buffer and evaluate the PSF.
-        pixels = imps2r (im_out, 1, int (IM_LEN (im_out, 1)), 1,
-	    int (IM_LEN (im_out, 2)))
+        pixels = imps2r (im_out, c_1, IM_LEN (im_out, 1), c_1,
+			 IM_LEN (im_out, 2))
 
 	# Get the starting coordinates and interpolation interval.
 	start = - (psf_size - 1) / 2.0
