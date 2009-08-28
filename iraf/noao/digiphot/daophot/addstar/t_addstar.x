@@ -17,14 +17,16 @@ int	nstar				# number of artificial stars
 int	nimage				# number of new images
 int	cache				# cache the output image pixels
 
+size_t	sz_val
 pointer	sp, outfname, im, psffd, oim, dao, str
-pointer	plist, imlist, pimlist, oimlist
-int	limlist, lplist, lpimlist, loimlist
-int	ifd, ofd, j, simple, idoffset, root, verbose, verify, update, wcs
-int	buf_size, memstat
-int	seed, iseed[NSEED]
+pointer	plist, imlist, pimlist, oimlist, ifd, ofd
+int	limlist, lplist, lpimlist, loimlist, j
+int	simple, root, verbose, verify, update, wcs, seed, memstat, idoffset
+int	i_val
+int	iseed[NSEED]
+long	l_val
 bool	coo_text
-size_t	req_size, old_size
+size_t	req_size, old_size, buf_size
 
 real	clgetr()
 pointer	immap(), tbtopn(), fntopnb(), imtopen()
@@ -33,6 +35,8 @@ int	access(), open(), imtlen(), imtgetim(), fntlenb()
 int	fntgfnb(), clgwrd(), sizeof(), dp_memstat()
 bool	itob(), clgetb()
 
+include	<nullptr.inc>
+
 begin
 	# Set the standard output to flush on newline.
 	if (fstati (STDOUT, F_REDIR) == NO)
@@ -40,12 +44,13 @@ begin
 
 	# Allocate some memory.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (psfimage, SZ_FNAME, TY_CHAR)
-	call salloc (photfile, SZ_FNAME, TY_CHAR)
-	call salloc (addimage, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (psfimage, sz_val, TY_CHAR)
+	call salloc (photfile, sz_val, TY_CHAR)
+	call salloc (addimage, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the file names.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -158,7 +163,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the input image.
-	    im = immap (Memc[image], READ_ONLY, 0)		
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
 
@@ -166,8 +171,10 @@ begin
             req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
             memstat = dp_memstat (cache, req_size, old_size)
-            #if (memstat == YES)
-                #call dp_pcache (im, INDEFI, buf_size)
+            #if (memstat == YES) {
+		#l_val = INDEFL
+                #call dp_pcache (im, l_val, buf_size)
+	    #}
 
 	    # Read the PSF image.
 	    if (imtgetim (pimlist, Memc[psfimage], SZ_FNAME) == EOF)
@@ -179,7 +186,7 @@ begin
 		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
-	    psffd = immap (Memc[outfname], READ_ONLY, 0)
+	    psffd = immap (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_sets (dao, PSFIMAGE, Memc[outfname])
 	    call dp_readpsf (dao, psffd)
 
@@ -192,9 +199,12 @@ begin
 		if (coo_text)
 	    	    ifd = open (Memc[photfile], READ_ONLY, TEXT_FILE)
 		else
-		    ifd = tbtopn (Memc[photfile], READ_ONLY, 0)
-	    } else
-	    	call seek (ifd, BOF)
+		    ifd = tbtopn (Memc[photfile], READ_ONLY, NULLPTR)
+	    } else {
+		i_val = ifd
+		l_val = BOF
+	    	call seek (i_val, l_val)
+	    }
 	    call dp_sets (dao, INPHOTFILE, Memc[photfile])
 
 	    # Get the output image and file root name.
@@ -221,8 +231,10 @@ begin
 		    oim = immap (Memc[outfname], NEW_COPY, im)
 		}
 		call dp_sets (dao, OUTIMAGE, Memc[outfname])
-                if (memstat == YES)
-                    call dp_pcache (oim, INDEFI, buf_size)
+                if (memstat == YES) {
+		    l_val = INDEFL
+                    call dp_pcache (oim, l_val, buf_size)
+		}
 
 		# Copy the input image to the new output image.
 	    	call dp_imcopy (im, oim)
@@ -238,7 +250,7 @@ begin
 		    if (DP_TEXT(dao) == YES)
 		        ofd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 		    else
-	    	        ofd = tbtopn (Memc[outfname], NEW_FILE, 0)
+	    	        ofd = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 		} else {
 		    call strcpy (Memc[addimage], Memc[outfname], SZ_FNAME)
 		    if (nimage > 1) {
@@ -250,7 +262,7 @@ begin
 		    if (DP_TEXT(dao) == YES)
 		        ofd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 		    else
-	    	        ofd = tbtopn (Memc[outfname], NEW_FILE, 0)
+	    	        ofd = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 		}
 		call dp_sets (dao, OUTPHOTFILE, Memc[outfname])
 
@@ -260,10 +272,12 @@ begin
 
 	    	# Close the output image and output table. 
 	    	call imunmap (oim)
-		if (DP_TEXT(dao) == YES)
-		    call close (ofd)
-		else
+		if (DP_TEXT(dao) == YES) {
+		    i_val = ofd
+		    call close (i_val)
+		} else {
 		    call tbtclo (ofd)
+		}
 	    }
 
 	    # Close the input image
@@ -274,10 +288,12 @@ begin
 
 	    # Close the input photometry file if there is more than one.
 	    if ((ifd != NULL) && (lplist > 1)) {
-		if (coo_text)
-		    call close (ifd)
-		else
+		if (coo_text) {
+		    i_val = ifd
+		    call close (i_val)
+		} else {
 		    call tbtclo (ifd)
+		}
 		ifd = NULL
 	    }
 
@@ -287,10 +303,12 @@ begin
 
 	# If there was only a single photometry file close it.
 	if (ifd != NULL && lplist == 1) {
-	    if (coo_text)
-		call close (ifd)
-	    else
+	    if (coo_text) {
+		i_val = ifd
+		call close (i_val)
+	    } else {
 		call tbtclo (ifd)
+	    }
 	}
 
 	# Close the image/file lists.
@@ -316,15 +334,18 @@ procedure  dp_imcopy (in, out)
 pointer	in		# the input image
 pointer	out		# input and output descriptors
 
-int	npix
+size_t	sz_val, npix
 long	v1[IM_MAXDIM], v2[IM_MAXDIM]
+long	l_val
 pointer	l1, l2
-pointer	imgnlr(), impnlr()
+long	imgnlr(), impnlr()
 
 begin
 	# Initialize position vectors.
-	call amovkl (long(1), v1, IM_MAXDIM)
-	call amovkl (long(1), v2, IM_MAXDIM)
+	l_val = 1
+	sz_val = IM_MAXDIM
+	call amovkl (l_val, v1, sz_val)
+	call amovkl (l_val, v2, sz_val)
 	npix = IM_LEN(in, 1)
 
 	# Copy the image.

@@ -13,8 +13,8 @@ procedure dp_artstar (dao, iim, oim, cl, ofd, nstar, minmag, maxmag, iseed,
 pointer	dao				# pointer to DAOPHOT structure
 pointer	iim				# the input image descriptor
 pointer	oim				# image to add stars to
-int	cl				# fd of input photometry file
-int	ofd				# fd of output photometry file
+pointer	cl				# fd or ptr of input photometry file
+pointer	ofd				# fd or ptr of output photometry file
 int	nstar				# number of stars to be added
 real	minmag, maxmag			# min. and max. magnitudes to add
 int	iseed[ARB]			# the random number generator array
@@ -23,27 +23,38 @@ int	simple				# simple text file ?
 int	offset				# id offset for output photometry file
 int	cache				# cache the output pixels
 
+size_t	sz_val, c_1
 real	xmin, ymin, xwide, ywide, mwide, x, y, dxfrom_psf, dyfrom_psf, mag
 real	radius, psfradsq, rel_bright, sky, tx, ty
-pointer	sp, colpoint, psffit, subim, subim_new, indices, fields, key
-int	i, iid, id, lowx, lowy, nxpix, nypix, nrow
+pointer	sp, colpoint, psffit, subim, subim_new, fields, key, indices, p_indices
+int	i_cl, i_ofd, iid, id, i, nrow
+long	lowx, lowy, l_val
+size_t	nxpix, nypix
 
-pointer	dp_gsubrast(), imps2r(), tbpsta()
+pointer	dp_gsubrast(), imps2r()
 int	dp_gcoords(), dp_apsel()
+long	tbpstl()
 
 begin
+	c_1 = 1
+	i_cl = cl
+	i_ofd = ofd
+
 	# Get some memory.
 	call smark (sp)
-	call salloc (fields, SZ_LINE, TY_CHAR)
-	call salloc (indices, ADD_NINCOLUMN, TY_INT)
-	call salloc (colpoint, ADD_NINCOLUMN, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (fields, sz_val, TY_CHAR)
+	sz_val = ADD_NINCOLUMN
+	call salloc (indices, sz_val, TY_INT)
+	call salloc (p_indices, sz_val, TY_POINTER)
+	call salloc (colpoint, sz_val, TY_POINTER)
 
 	# Initialize the input photometry file.
 	key = NULL
 	if (cl != NULL) {
 	    if (! coo_text) {
-		call dp_tadinit (cl, Memi[indices])
-		nrow = tbpsta (cl, TBL_NROWS)
+		call dp_tadinit (cl, Memp[p_indices])
+		nrow = tbpstl (cl, TBL_NROWS)
 	    #} else if (coo_text && simple == NO) {
 	    } else if (simple == NO) {
 	        call pt_kyinit (key)
@@ -57,9 +68,9 @@ begin
 
 	# Initialize the output table.
 	if (DP_TEXT(dao) == YES)
-	    call dp_xnaddstar (dao, ofd)
+	    call dp_xnaddstar (dao, i_ofd)
 	else
-	    call dp_tnaddstar (dao, ofd, Memi[colpoint])
+	    call dp_tnaddstar (dao, ofd, Memp[colpoint])
 
 	# Get some daophot pointers.
 	psffit = DP_PSFFIT (dao)
@@ -99,42 +110,43 @@ begin
 	    } else if (! coo_text) {
 		if (i > nrow)
 		    break
-		call dp_tadread (cl, Memi[indices], iid, x, y, mag, i)
-	        call dp_win (dao, iim, x, y, x, y, 1)
+		l_val = i
+		call dp_tadread (cl, Memp[p_indices], iid, x, y, mag, l_val)
+	        call dp_win (dao, iim, x, y, x, y, c_1)
 		if (iid == 0)
 		    iid = i + offset
 		else
 		    id = iid
 	    } else {
 		if (simple == YES) {
-	            if (dp_gcoords (cl, x, y, mag, iid) == EOF)
+	            if (dp_gcoords (i_cl, x, y, mag, iid) == EOF)
 		        break
 		    if (iid == 0)
 			id = i + offset
 		    else
 			id = iid
 		} else {
-		    if (dp_apsel (key, cl, Memc[fields], Memi[indices], iid, x,
-			y, sky, mag) == EOF) 
+		    if (dp_apsel (key, i_cl, Memc[fields], Memi[indices], iid,
+				  x, y, sky, mag) == EOF) 
 		        break
 		    if (iid == 0)
 			id = i + offset
 		    else
 			id = iid
 		}
-	        call dp_win (dao, iim, x, y, x, y, 1)
+	        call dp_win (dao, iim, x, y, x, y, c_1)
 	    }
 
 	    # Increment the counter
 	    i = i + 1
 
 	    # Compute the psf coordinates.
-	    call dp_wpsf (dao, iim, x, y, dxfrom_psf, dyfrom_psf, 1)
+	    call dp_wpsf (dao, iim, x, y, dxfrom_psf, dyfrom_psf, c_1)
 	    dxfrom_psf = (dxfrom_psf - 1.0) / DP_PSFX(psffit) - 1.0
 	    dyfrom_psf = (dyfrom_psf - 1.0) / DP_PSFY(psffit) - 1.0
 
 	    # Compute output coordinates.
-	    call dp_wout (dao, iim, x, y, tx, ty, 1)
+	    call dp_wout (dao, iim, x, y, tx, ty, c_1)
 
 	    # Read in the subraster and compute the relative x-y position.
 	    subim = dp_gsubrast (oim, x, y, radius, lowx, lowy, nxpix, nypix)
@@ -155,10 +167,12 @@ begin
 		    call pargr (mag)
 	    }
 
-	    if (DP_TEXT(dao) == YES)
-		call dp_xwadd (ofd, id, tx, ty, mag)
-	    else
-		call dp_twadd (ofd, Memi[colpoint], id, tx, ty, mag, id)
+	    if (DP_TEXT(dao) == YES) {
+		call dp_xwadd (i_ofd, id, tx, ty, mag)
+	    } else {
+		l_val = id
+		call dp_twadd (ofd, Memp[colpoint], id, tx, ty, mag, l_val)
+	    }
 
 	    # Get the relative brightness
 	    rel_bright = DAO_RELBRIGHT (psffit, mag)
@@ -196,7 +210,7 @@ procedure dp_artone (dao, subin, nxpix, nypix, x, y, rel_bright, xfrom_psf,
 
 pointer	dao				# pointer to the daophot structure
 real	subin[nxpix,nypix]		# input subraster
-int	nxpix, nypix			# dimensions of subrasters
+size_t	nxpix, nypix			# dimensions of subrasters
 real	x, y				# input position
 real	rel_bright			# relative brightness
 real	xfrom_psf			# x distance from the psf
@@ -205,10 +219,11 @@ real	psfradsq			# psf radius squared
 real	gain				# gain
 int	iseed[ARB]			# random number seed array
 
-int	ix, iy
+long	ix, iy, l_val
 pointer	psffit
 real	dx, dy, dxsq, dysq, radsq, dvdx, dvdy, value, err
 real	dp_usepsf(), dp_nrml(), daoran()
+long	lmod()
 
 begin
 	psffit = DP_PSFFIT(dao)
@@ -226,7 +241,8 @@ begin
 			Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
 			DP_NVLTABLE(psffit), DP_NFEXTABLE(psffit),
 			xfrom_psf, yfrom_psf, dvdx, dvdy)
-		    err = daoran (iseed[mod(ix+iy,3)+1])
+		    l_val = 3
+		    err = daoran (iseed[lmod(ix+iy,l_val)+1])
 		    err = sqrt (max (0.0, value / gain)) * dp_nrml (err)
 		    subin[ix,iy] = subin[ix,iy] + value + err
 		}

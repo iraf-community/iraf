@@ -11,19 +11,24 @@ procedure dp_tnaddstar (dao, tp, columns)
 
 pointer	dao			# pointer to daophot structure
 pointer	tp			# output table decscriptor
-int columns[ARB]		# pointer to columns
+pointer	columns[ARB]		# pointer to columns
 
+size_t	sz_val
 int	i
 pointer	sp, colnames, colunits, colformat, col_dtype, col_len
 
 begin
 	# Allocate space for table definition.
 	call smark (sp)
-	call salloc (colnames, ADD_NOUTCOLUMN * (SZ_COLNAME + 1), TY_CHAR)
-	call salloc (colunits, ADD_NOUTCOLUMN * (SZ_COLUNITS + 1), TY_CHAR)
-	call salloc (colformat, ADD_NOUTCOLUMN * (SZ_COLFMT + 1), TY_CHAR)
-	call salloc (col_dtype, ADD_NOUTCOLUMN, TY_INT)
-	call salloc (col_len, ADD_NOUTCOLUMN, TY_INT)
+	sz_val = ADD_NOUTCOLUMN * (SZ_COLNAME + 1)
+	call salloc (colnames, sz_val, TY_CHAR)
+	sz_val = ADD_NOUTCOLUMN * (SZ_COLUNITS + 1)
+	call salloc (colunits, sz_val, TY_CHAR)
+	sz_val = ADD_NOUTCOLUMN * (SZ_COLFMT + 1)
+	call salloc (colformat, sz_val, TY_CHAR)
+	sz_val = ADD_NOUTCOLUMN
+	call salloc (col_dtype, sz_val, TY_INT)
+	call salloc (col_len, sz_val, TY_LONG)
 
 	# Set up the column definitions.
 	call strcpy (ID, Memc[colnames], SZ_COLNAME)
@@ -51,10 +56,10 @@ begin
 	Memi[col_dtype+3] = TY_REAL
 
 	do i = 1, ADD_NOUTCOLUMN 
-	    Memi[col_len+i-1] = 1
+	    Meml[col_len+i-1] = 1
 	
 	call tbcdef (tp, columns, Memc[colnames], Memc[colunits],
-	    Memc[colformat], Memi[col_dtype], Memi[col_len], ADD_NOUTCOLUMN)
+	    Memc[colformat], Memi[col_dtype], Meml[col_len], ADD_NOUTCOLUMN)
 	call tbtcre (tp)
 
 	# Write out the header parameters.
@@ -116,13 +121,13 @@ end
 
 procedure dp_twadd (tp, colpoint, id, x, y, mag, row)
 
-int	tp			# pointer to group output table
-int	colpoint[ARB]		# column pointers
+pointer	tp			# pointer to group output table
+pointer	colpoint[ARB]		# column pointers
 int	id			# id number
 real	x			# x value
 real	y			# y value
 real	mag			# magnitude
-int	row			# row number to be added
+long	row			# row number to be added
 
 begin
 	call tbrpti (tp, colpoint[1], id, 1, row)
@@ -140,15 +145,18 @@ procedure dp_xgadppars (dao, tp)
 pointer	dao			# pointer to the DAOPHOT structure
 int	tp			# output file descriptor
 
+size_t	sz_val
 pointer	sp, outstr, date, time
 int	envfind()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
 
 	# Write the id.
 	if (envfind ("version", Memc[outstr], SZ_LINE) <= 0)
@@ -206,15 +214,18 @@ procedure dp_tgadppars (dao, tp)
 pointer	dao			# pointer to the DAOPHOT structure
 pointer	tp			# pointer to the output table
 
+size_t	sz_val
 pointer	sp, outstr, date, time
 int	envfind()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
 
 	# Write the id.
 

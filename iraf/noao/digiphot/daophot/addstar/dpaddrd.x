@@ -6,7 +6,7 @@ include	"../lib/apseldef.h"
 procedure dp_tadinit (tp, column)
 
 pointer	tp			# table descriptor
-int	column[ARB]		# column pointer array
+pointer	column[ARB]		# column pointer array
 
 begin
 	# Find the column pointers
@@ -41,17 +41,19 @@ end
 procedure dp_tadread (tp, column, id, x, y, mag, row)
 
 pointer	tp			# table descriptor
-int	column[ARB]		# column pointer array
+pointer	column[ARB]		# column pointer array
 int	id			# output id
 real	x			# output x value
 real	y			# output y value
 real	mag			# output magnitude
-int	row			# integer row
+long	row			# integer row
 
+int	i_val
 bool	nullflag
 
 begin
-	call tbrgti (tp, column[1], id, nullflag, 1, row)
+	call tbrgti (tp, column[1], i_val, nullflag, 1, row)
+	id = i_val
 	if (nullflag)
 	    id = 0
 	call tbrgtr (tp, column[2], x, nullflag, 1, row)
