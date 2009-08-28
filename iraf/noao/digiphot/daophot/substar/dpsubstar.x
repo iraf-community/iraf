@@ -11,16 +11,18 @@ procedure dp_substar (dao, inim, exfd, ex_text, outim)
 
 pointer	dao			# pointer to the DAOPHOT structure
 pointer	inim			# pointer to the input image
-int	exfd			# exclude file descriptor
+pointer	exfd			# exclude file descriptor
 bool	ex_text			# text or table exclude file
 pointer	outim			# pointer to the output image
 
+size_t	sz_val
 real	pradius, psfradsq, x, y, dxfrom_psf, dyfrom_psf, mag, tx, ty
 real	rel_bright, maxgdata
+long	lowy, highy, line1, line2, nline_buf, x1, x2, y1, y2
+int	i, id, offset, nstars, ier
 pointer	apsel, psffit, buf, sp, index
-int	i, id, line1, line2, nline_buf, x1, x2, y1, y2
-int	lowy, highy, offset, nstars, ier
 int	dp_restars()
+long	lint()
 
 begin
 	# Get the daophot pointers.
@@ -55,7 +57,8 @@ begin
 
 	# Get some working memory.
 	call smark (sp)
-	call salloc (index, DP_APNUM (apsel), TY_INT)
+	sz_val = DP_APNUM (apsel)
+	call salloc (index, sz_val, TY_INT)
 	 
 	# Sort the photometry on increasing Y.
 	if (DP_APNUM(apsel) > 0)
@@ -77,7 +80,8 @@ begin
 	    y = Memr[DP_APYCEN(apsel)+i-1]
 	    id = Memi[DP_APID(apsel)+offset]
 	    mag = Memr[DP_APMAG (apsel)+offset]
-	    call dp_wpsf (dao, inim, x, y, dxfrom_psf, dyfrom_psf, 1)
+	    sz_val = 1
+	    call dp_wpsf (dao, inim, x, y, dxfrom_psf, dyfrom_psf, sz_val)
 	    dxfrom_psf = (dxfrom_psf - 1.0) / DP_PSFX(psffit) - 1.0
 	    dyfrom_psf = (dyfrom_psf - 1.0) / DP_PSFY(psffit) - 1.0
 
@@ -87,8 +91,10 @@ begin
 		    if (IS_INDEFR(x) || IS_INDEFR(y)) {
 			tx = x
 			ty = y
-		    } else
-	                call dp_wout (dao, inim, x, y, tx, ty, 1)
+		    } else {
+			sz_val = 1
+	                call dp_wout (dao, inim, x, y, tx, ty, sz_val)
+		    }
 	            call printf (
 		    "REJECTING   - Star:%5d X =%8.2f Y =%8.2f Mag =%8.2f\n")
 	   	        call pargi (id)
@@ -101,7 +107,8 @@ begin
 	    
 	    # Print out the verbose message.
 	    if (DP_VERBOSE(dao) == YES) {
-	        call dp_wout (dao, inim, x, y, tx, ty, 1)
+		sz_val = 1
+	        call dp_wout (dao, inim, x, y, tx, ty, sz_val)
 	        call printf (
 		    "SUBTRACTING - Star:%5d X =%8.2f Y =%8.2f Mag =%8.2f\n")
 	   	    call pargi (id)
@@ -111,8 +118,8 @@ begin
  	    }
 
 	    # Determine the range of lines required.
-	    lowy = max (1, int (y - pradius) + 1)
-	    highy = min (IM_LEN (inim, 2), int (y + pradius))
+	    lowy = max (1, lint (y - pradius) + 1)
+	    highy = min (IM_LEN (inim, 2), lint (y + pradius))
 	    if (highy > line2) {
 		line1 = max (1, lowy)
 		line2 = min (line1 + nline_buf, IM_LEN (inim, 2))
@@ -121,16 +128,16 @@ begin
 
 	    # Change coordinates to reference frame of buffer.
 	    y = y - line1 + 1.0
-	    y1 = max (1, int (y - pradius) + 1)
-	    y2 = min (line2 - line1 + 1, int (y + pradius))
-	    x1 = max (1, int (x - pradius) + 1)
-	    x2 = min (IM_LEN (inim, 1), int (x + pradius))
+	    y1 = max (1, lint (y - pradius) + 1)
+	    y2 = min (line2 - line1 + 1, lint (y + pradius))
+	    x1 = max (1, lint (x - pradius) + 1)
+	    x2 = min (IM_LEN (inim, 1), lint (x + pradius))
 
 	    # Computee the relative brightness.
 	    rel_bright = DAO_RELBRIGHT (psffit, mag)
 
 	    # Subtract this star.
-	    call dp_sstar (dao, Memr[buf], int (IM_LEN(inim,1)), nline_buf,
+	    call dp_sstar (dao, Memr[buf], IM_LEN(inim,1), nline_buf,
 	        x1, x2, y1, y2, x, y, psfradsq, rel_bright, dxfrom_psf,
 		dyfrom_psf, maxgdata)
 
@@ -160,15 +167,15 @@ procedure dp_sstar (dao, data, nx, ny, x1, x2, y1, y2, xstar, ystar, psfradsq,
 
 pointer	dao				# pointer to the daophot structure
 real	data[nx,ny]			# sata buffer
-int	nx, ny				# size of buffer
-int	x1, x2, y1, y2			# area of interest
+long	nx, ny				# size of buffer
+long	x1, x2, y1, y2			# area of interest
 real	xstar, ystar			# position of star to subtract
 real	psfradsq			# PSF radius ** 2
 real	rel_bright			# relative brightness of star
 real	dxfrom_psf, dyfrom_psf		# not currently used
 real	maxgdata			# maximum good data
 
-int	ix, iy
+long	ix, iy
 pointer	psffit
 real	dx, dy, dxsq, dysq, radsq, dvdx, dvdy
 real	dp_usepsf()

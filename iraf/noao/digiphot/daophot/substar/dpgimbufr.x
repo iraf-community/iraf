@@ -10,12 +10,13 @@ procedure dp_gimbufr (inim, outim, line1, line2, buf, flush)
 
 pointer	inim		# input image pointer
 pointer	outim		# output image pointer
-int	line1		# first image line of buffer
-int	line2		# last image line of buffer
+long	line1		# first image line of buffer
+long	line2		# last image line of buffer
 pointer	buf		# buffer
 bool	flush		# flush the current contents of the buffer
 
-int	i, ncols, nlines, llast1, llast2, nllast, lp, lout
+size_t	ncols, nlines
+long	i, llast1, llast2, nllast, lp, lout
 pointer	buf1, buf2
 pointer	imgl2r(), impl2r()
 

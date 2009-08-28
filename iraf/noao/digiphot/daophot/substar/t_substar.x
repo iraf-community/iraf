@@ -12,19 +12,22 @@ pointer	exfile				# input exclude file
 pointer	psfimage			# name of the output PSF
 pointer	subimage			# subtracted image
 
+size_t	sz_val
 pointer	sp, input, output, dao, outfname, str
-pointer	alist, elist, imlist, pimlist, simlist
-int	psffd, photfd, root, verify, update, wcs
-int	limlist, lalist, lpimlist, lsimlist
-int	exfd, lelist, cache, buf_size, memstat
+pointer	alist, elist, imlist, pimlist, simlist, exfd, photfd, psffd
+int	root, verify, update, wcs
+int	limlist, lalist, lpimlist, lsimlist, lelist, cache, memstat, i_val
+long	l_val
 bool	ap_text, ex_text
-size_t	req_size, old_size
+size_t	req_size, old_size, buf_size
 
 pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	open(), fnldir(), strlen(), strncmp(), access(), fstati(), btoi()
 int	imtlen(), imtgetim(), fntlenb(), fntgfnb()
 int	clgwrd(), sizeof(), dp_memstat()
 bool	clgetb(), itob()
+
+include	<nullptr.inc>
 
 begin
 	# Set the standard output to flush on newline.
@@ -33,13 +36,14 @@ begin
 
 	# Get some working memory.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (photfile, SZ_FNAME, TY_CHAR)
-	call salloc (exfile, SZ_FNAME, TY_CHAR)
-	call salloc (psfimage, SZ_FNAME, TY_CHAR)
-	call salloc (subimage, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (photfile, sz_val, TY_CHAR)
+	call salloc (exfile, sz_val, TY_CHAR)
+	call salloc (psfimage, sz_val, TY_CHAR)
+	call salloc (subimage, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the various task parameters.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -160,15 +164,17 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open input and output images
-	    input = immap (Memc[image], READ_ONLY, 0)		
+	    input = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call dp_sets (dao, INIMAGE, Memc[image])
 
             # Cache the input image pixels.
             req_size = MEMFUDGE * (2 * IM_LEN(input,1) * IM_LEN(input,2) *
                 sizeof (IM_PIXTYPE(input)))
             memstat = dp_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call dp_pcache (input, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call dp_pcache (input, l_val, buf_size)
+	    }
 
 	    # If the output image name is DEF_DEFNAME, dir$default or a
 	    # directory specification then the extension "sub" is added to
@@ -188,8 +194,10 @@ begin
 	        output = immap (Memc[outfname], NEW_COPY, input)
 	    }
 	    call dp_sets (dao, OUTIMAGE, Memc[outfname])
-            if (memstat == YES)
-                call dp_pcache (output, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call dp_pcache (output, l_val, buf_size)
+	    }
 
 	    # Open input photometry table and read in the photometry.
 	    if (fntgfnb (alist, Memc[photfile], SZ_FNAME) == EOF)
@@ -205,7 +213,7 @@ begin
 	    if (ap_text)
 	        photfd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else 
-	        photfd = tbtopn (Memc[outfname], READ_ONLY, 0)
+	        photfd = tbtopn (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_wgetapert (dao, input, photfd, DP_MAXNSTAR(dao), ap_text)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 
@@ -227,7 +235,7 @@ begin
 	        if (ex_text)
 	            exfd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	        else 
-	            exfd = tbtopn (Memc[outfname], READ_ONLY, 0)
+	            exfd = tbtopn (Memc[outfname], READ_ONLY, NULLPTR)
 	    }
 	    call dp_sets (dao, COORDS, Memc[outfname])
 
@@ -241,7 +249,7 @@ begin
 		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
-	    psffd = immap (Memc[outfname], READ_ONLY, 0)
+	    psffd = immap (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_readpsf (dao, psffd)
 	    call dp_sets (dao, PSFIMAGE, Memc[outfname])
 	
@@ -253,16 +261,20 @@ begin
 	    call imunmap (output)
 
 	    # Close the photometry file.
-	    if (ap_text)
-		call close (photfd)
-	    else
+	    if (ap_text) {
+		i_val = photfd
+		call close (i_val)
+	    } else {
 	        call tbtclo (photfd)
+	    }
 
 	    # Close the exclude file.
-	    if (ex_text)
-		call close (exfd)
-	    else
+	    if (ex_text) {
+		i_val = exfd
+		call close (i_val)
+	    } else {
 	        call tbtclo (exfd)
+	    }
 
 	    # Close the PSF image.
 	    call imunmap (psffd)

@@ -10,13 +10,16 @@ int procedure dp_restars (dao, im, ext, text_file)
 
 pointer	dao		# pointer to the daophot structure
 pointer	im		# the input image descriptor
-int	ext		# the exclude list file descriptor
+pointer	ext		# the exclude list file descriptor
 bool	text_file	# text or table file ?
 
+size_t	sz_val
 real	tx, ty, rjunk
-pointer	apsel, sp, fields, indices, key
-int	i, nrow, idno, nexcl, starno
-int	tbpsta(), dp_apsel(), dp_exfind()
+pointer	apsel, sp, fields, key, indices, p_indices
+long	i, nrow
+int	idno, nexcl, starno, i_val
+int	dp_apsel(), dp_exfind()
+long	tbpstl()
 
 begin
 	# Get some pointers.
@@ -24,8 +27,14 @@ begin
 
 	# Get some working space.
 	call smark (sp)
-	call salloc (fields, SZ_LINE, TY_CHAR)
-	call salloc (indices, 1, TY_INT) 
+	sz_val = SZ_LINE
+	call salloc (fields, sz_val, TY_CHAR)
+	sz_val = 1
+	if (text_file) {
+	    call salloc (indices, sz_val, TY_INT)
+	} else {
+	    call salloc (p_indices, sz_val, TY_POINTER)
+	}
 
 	# Initialize the read.
 	if (text_file) {
@@ -33,8 +42,8 @@ begin
 	    Memi[indices] = DP_PAPID
 	    call dp_gappsf (Memi[indices], Memc[fields], 1)
 	} else {
-	    call dp_tptinit (ext, Memi[indices])
-	    nrow = tbpsta (ext, TBL_NROWS)
+	    call dp_tptinit (ext, Memp[p_indices])
+	    nrow = tbpstl (ext, TBL_NROWS)
 	}
 
 	i = 1
@@ -43,13 +52,14 @@ begin
 
 	    # Read the next star.
 	    if (text_file) {
-		if (dp_apsel (key, ext, Memc[fields], Memi[indices], idno,
+		i_val = ext
+		if (dp_apsel (key, i_val, Memc[fields], Memi[indices], idno,
 		    rjunk, rjunk, rjunk, rjunk) == EOF)
 		    break
 	    } else {
 		if (i > nrow)
 		    break
-		call dp_tptread (ext, Memi[indices], idno, rjunk, rjunk, rjunk,
+		call dp_tptread (ext, Memp[p_indices], idno, rjunk, rjunk, rjunk,
 		    i)
 	    }
 
@@ -60,8 +70,9 @@ begin
 		    Memr[DP_APMAG(apsel)], DP_APNUM(apsel), idno)
 		if (starno > 0) {
 		    if (DP_VERBOSE(dao) == YES) {
+			sz_val = 1
 			call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+starno-1],
-			    Memr[DP_APYCEN(apsel)+starno-1], tx, ty, 1)
+			    Memr[DP_APYCEN(apsel)+starno-1], tx, ty, sz_val)
 		        call printf (
 		        "EXCLUDING   - Star:%5d X =%8.2f Y =%8.2f Mag =%8.2f\n")
 		        call pargi (Memi[DP_APID(apsel)+starno-1])
