@@ -7,11 +7,13 @@ real	x[ARB]
 int	index[ARB]
 int	nitem
 
+size_t	sz_val
 pointer	sp, hold
 
 begin
 	call smark (sp)
-	call salloc (hold, nitem, TY_REAL)
+	sz_val = nitem
+	call salloc (hold, sz_val, TY_REAL)
 	call dp_dorect (x, Memr[hold], index, nitem)
 	call sfree (sp)
 end
@@ -26,11 +28,13 @@ int	x[ARB]
 int	index[ARB]
 int	nitem
 
+size_t	sz_val
 pointer	sp, hold
 
 begin
 	call smark (sp)
-	call salloc (hold, nitem, TY_INT)
+	sz_val = nitem
+	call salloc (hold, sz_val, TY_INT)
 	call dp_idorect (x, Memi[hold], index, nitem)
 	call sfree (sp)
 end
@@ -46,10 +50,12 @@ real	hold[ARB]
 int	index[ARB]
 int	nitem
 
+size_t	sz_val
 int	i
 
 begin
-	call amovr (x, hold, nitem)
+	sz_val = nitem
+	call amovr (x, hold, sz_val)
 	do i = 1, nitem
 	    x[i] = hold[index[i]]
 end
@@ -65,10 +71,12 @@ int	hold[ARB]
 int	index[ARB]
 int	nitem
 
+size_t	sz_val
 int	i
 
 begin
-	call amovi (x, hold, nitem)
+	sz_val = nitem
+	call amovi (x, hold, sz_val)
 	do i = 1, nitem
 	    x[i] = hold[index[i]]
 end

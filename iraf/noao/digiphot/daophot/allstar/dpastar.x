@@ -12,24 +12,29 @@ procedure dp_astar (dao, im, subim, allfd, rejfd, cache, savesub, version)
 pointer	dao		# pointer to the daophot structure
 pointer	im		# pointer to the input image
 pointer	subim		# pointer to the subtracted image
-int	allfd		# file descriptor for the output photometry file
-int	rejfd		# file descriptor for rejections files
+pointer	allfd		# file descriptor for the output photometry file
+pointer	rejfd		# file descriptor for rejections files
 int	cache 		# cache the data ?
 int	savesub		# save the subtracted image ?
 int	version		# version number
 
+size_t	sz_val
 bool	clip
-int	nstar, row1_number, row2_number, niter, itsky, x1, x2, y1, y2, istar
-int	lstar, ldummy, newsky
+int	nstar, niter, itsky, newsky
+int	istar, lstar, i_val0, i_val1
+long	x1, x2, y1, y2, row1_number, row2_number, ldummy, c_1
 pointer	apsel, psffit, allstar, sp, indices, colpoints
 real	fradius, sepcrt, sepmin, clmpmx, wcrit, radius, xmin, xmax, ymin, ymax
 real	csharp, rdummy
 
-int	dp_alphot(), dp_alnstar()
+int	dp_alphot(), dp_alnstar(), imod()
+long	lint()
 pointer	dp_gst(), dp_gwt(), dp_gdc()
 real	dp_usepsf()
 
 begin
+	c_1 = 1
+
 	# Define some daophot structure pointers.
 	apsel = DP_APSEL(dao)
 	psffit = DP_PSFFIT (dao)
@@ -42,8 +47,10 @@ begin
 
 	# Get some working memory.
 	call smark (sp)
-	call salloc (indices, NAPPAR, TY_INT)
-	call salloc (colpoints, ALL_NOUTCOLUMN, TY_INT)
+	sz_val = NAPPAR
+	call salloc (indices, sz_val, TY_INT)
+	sz_val = ALL_NOUTCOLUMN
+	call salloc (colpoints, sz_val, TY_POINTER)
 
 	# Define some daophot constants.
 	nstar = DP_APNUM(apsel)
@@ -64,13 +71,16 @@ begin
 	row1_number = 0
 	row2_number = 0
 	if (DP_TEXT(dao) == YES) {
-	    call dp_xnewal (dao, allfd)
-	    if (rejfd != NULL)
-	        call dp_xnewal (dao, rejfd)
+	    i_val0 = allfd
+	    call dp_xnewal (dao, i_val0)
+	    if (rejfd != NULL) {
+		i_val1 = rejfd
+	        call dp_xnewal (dao, i_val1)
+	    }
 	} else {
-	    call dp_tnewal (dao, allfd, Memi[colpoints])
+	    call dp_tnewal (dao, allfd, Memp[colpoints])
 	    if (rejfd != NULL)
-	        call dp_tnewal (dao, rejfd, Memi[colpoints])
+	        call dp_tnewal (dao, rejfd, Memp[colpoints])
 	}
 
 	# Allocate memory for the input, output and fitting arrays.
@@ -86,23 +96,27 @@ begin
 	call dp_alzero (dao, Memr[DP_APMAG(apsel)], nstar)
 
 	# Initialize all the fit/nofit indices and the error codes.
-	call amovki (NO, Memi[DP_ASKIP(allstar)], nstar)
-	call amovki (ALLERR_OK, Memi[DP_AIER(allstar)], nstar)
+	sz_val = nstar
+	call amovki (NO, Memi[DP_ASKIP(allstar)], sz_val)
+	call amovki (ALLERR_OK, Memi[DP_AIER(allstar)], sz_val)
 
 	# Remove stars that have INDEF centers, are off the image altogether,
 	# or are too close to another star before beginning to fit.
 	call dp_strip (Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
 	    Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
 	    Memr[DP_APMSKY(apsel)], Memi[DP_ASKIP(allstar)],
-	    Memi[DP_AIER(allstar)], nstar, sepmin, int(IM_LEN(im,1)),
-	    int(IM_LEN(im,2)), DP_FITRAD(dao), DP_VERBOSE(dao))
+	    Memi[DP_AIER(allstar)], nstar, sepmin, IM_LEN(im,1),
+	    IM_LEN(im,2), DP_FITRAD(dao), DP_VERBOSE(dao))
 
 	# Write out results for the rejected stars.
+	sz_val = DP_APNUM(apsel) - nstar
 	call dp_wout (dao, im, Memr[DP_APXCEN(apsel)+nstar],
 	    Memr[DP_APYCEN(apsel)+nstar], Memr[DP_APXCEN(apsel)+nstar],
-	    Memr[DP_APYCEN(apsel)+nstar], DP_APNUM(apsel) - nstar)
+	    Memr[DP_APYCEN(apsel)+nstar], sz_val)
 	if (DP_TEXT(dao) == YES) {
-	    call dp_xalwrite (allfd, rejfd, Memi[DP_APID(apsel)],
+	    i_val0 = allfd
+	    i_val1 = rejfd
+	    call dp_xalwrite (i_val0, i_val1, Memi[DP_APID(apsel)],
 		Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
 		Memr[DP_APMAG(apsel)], Memr[DP_APERR(apsel)],
 		Memr[DP_APMSKY(apsel)], Memr[DP_APCHI(apsel)],
@@ -110,7 +124,7 @@ begin
 		Memi[DP_ASKIP(allstar)], Memi[DP_AIER(allstar)], niter,
 		nstar + 1, DP_APNUM(apsel), DP_PSFMAG(psffit), csharp)
 	} else {
-	    call dp_talwrite (allfd, rejfd, Memi[colpoints],
+	    call dp_talwrite (allfd, rejfd, Memp[colpoints],
 	        Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
 	        Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
 	        Memr[DP_APERR(apsel)], Memr[DP_APMSKY(apsel)],
@@ -122,11 +136,12 @@ begin
 
 	# Do some initialization for the fit.
 	clmpmx = CLAMP_FRACTION * DP_FITRAD(dao)
-	call aclrr (Memr[DP_AXOLD(allstar)], nstar)
-	call aclrr (Memr[DP_AYOLD(allstar)], nstar)
-	call amovkr (clmpmx, Memr[DP_AXCLAMP(allstar)], nstar)
-	call amovkr (clmpmx, Memr[DP_AYCLAMP(allstar)], nstar)
-	call amovkr (1.0, Memr[DP_ASUMWT(allstar)], nstar)
+	sz_val = nstar
+	call aclrr (Memr[DP_AXOLD(allstar)], sz_val)
+	call aclrr (Memr[DP_AYOLD(allstar)], sz_val)
+	call amovkr (clmpmx, Memr[DP_AXCLAMP(allstar)], sz_val)
+	call amovkr (clmpmx, Memr[DP_AYCLAMP(allstar)], sz_val)
+	call amovkr (1.0, Memr[DP_ASUMWT(allstar)], sz_val)
 
 	# Begin iterating.
 	for (niter = 1; (nstar > 0) && (niter <= DP_MAXITER (dao));
@@ -162,7 +177,7 @@ begin
 	    # Compute the working radius. This is either the fitting radius
 	    # or the outer sky radius if this is an iteration during which
 	    # sky is to be determined whichever is larger.
-	    if ((DP_FITSKY(dao) == YES) && (mod (niter, itsky) == 0)) {
+	    if ((DP_FITSKY(dao) == YES) && (imod (niter, itsky) == 0)) {
 		newsky = YES
 	        if ((DP_ANNULUS(dao) + DP_DANNULUS(dao)) > DP_FITRAD(dao))
 		    radius = DP_ANNULUS(dao) + DP_DANNULUS(dao)
@@ -174,12 +189,13 @@ begin
 	    }
 
 	    # Define region of the image used to fit the remaining stars.
-	    call alimr (Memr[DP_APXCEN(apsel)], nstar, xmin, xmax)
-	    call alimr (Memr[DP_APYCEN(apsel)], nstar, ymin, ymax)
-	    x1 = max (1, min (IM_LEN(im,1), int (xmin-radius)+1))
-	    x2 = max (1, min (IM_LEN(im,1), int (xmax+radius)))
-	    y1 = max (1, min (IM_LEN(im,2), int (ymin-radius)+1))
-	    y2 = max (1, min (IM_LEN (im,2), int (ymax+radius)))
+	    sz_val = nstar
+	    call alimr (Memr[DP_APXCEN(apsel)], sz_val, xmin, xmax)
+	    call alimr (Memr[DP_APYCEN(apsel)], sz_val, ymin, ymax)
+	    x1 = max (c_1, min (IM_LEN(im,1), lint (xmin-radius)+1))
+	    x2 = max (c_1, min (IM_LEN(im,1), lint (xmax+radius)))
+	    y1 = max (c_1, min (IM_LEN(im,2), lint (ymin-radius)+1))
+	    y2 = max (c_1, min (IM_LEN (im,2), lint (ymax+radius)))
 
 	    # Reinitialize the weight and scratch arrays / images .
 	    call dp_wstinit (dao, im, Memr[DP_APXCEN(apsel)],
@@ -187,11 +203,13 @@ begin
 		nstar, radius, x1, x2, y1, y2)
 
 	    # Recompute the initial sky estimates if that switch is enabled.
-	    if (newsky == YES)
+	    if (newsky == YES) {
+		sz_val = 100
 	        call dp_alsky (dao, im, Memr[DP_APXCEN(apsel)],
 		    Memr[DP_APYCEN(apsel)], Memr[DP_APMSKY(apsel)], nstar,
 		    x1, x2, y1, y2, DP_ANNULUS(dao), DP_ANNULUS(dao) +
-		    DP_DANNULUS(dao), 100, -MAX_REAL)
+		    DP_DANNULUS(dao), sz_val, -MAX_REAL)
+	    }
 
 	    # Group the remaining stars.
 	    call dp_regroup (Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)], 
@@ -202,7 +220,8 @@ begin
 		DP_FITRAD(dao), Memi[DP_ALAST(allstar)])
 
 	    # Reset the error codes.
-	    call amovki (ALLERR_OK, Memi[DP_AIER(allstar)], nstar)
+	    sz_val = nstar
+	    call amovki (ALLERR_OK, Memi[DP_AIER(allstar)], sz_val)
 
 	    # Do the serious fitting one group at a time.
 	    for (istar = 1; istar <= nstar; istar = lstar + 1) {
@@ -213,7 +232,9 @@ begin
 
 		# Write the results.
 	        if (DP_TEXT(dao) == YES) {
-		    call dp_xalwrite (allfd, rejfd, Memi[DP_APID(apsel)],
+		    i_val0 = allfd
+		    i_val1 = rejfd
+		    call dp_xalwrite (i_val0, i_val1, Memi[DP_APID(apsel)],
 		        Memr[DP_APXCEN(apsel)], Memr[DP_APYCEN(apsel)],
 		        Memr[DP_APMAG(apsel)], Memr[DP_APERR(apsel)],
 		        Memr[DP_APMSKY(apsel)], Memr[DP_APCHI(apsel)],
@@ -221,7 +242,7 @@ begin
 		        Memi[DP_ASKIP(allstar)], Memi[DP_AIER(allstar)],
 			niter, istar, lstar, DP_PSFMAG(psffit), csharp)
 	        } else {
-		    call dp_talwrite (allfd, rejfd, Memi[colpoints],
+		    call dp_talwrite (allfd, rejfd, Memp[colpoints],
 		    Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
 		    Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
 		    Memr[DP_APERR(apsel)], Memr[DP_APMSKY(apsel)],

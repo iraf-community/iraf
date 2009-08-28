@@ -13,15 +13,18 @@ pointer procedure dp_gwt (dao, im, line1, line2, mode, flush)
 
 pointer	dao			# pointer to the daophot strucuture
 pointer	im			# pointer to the input image
-int	line1			# the lower line limit
-int	line2			# the upper line limit
+long	line1			# the lower line limit
+long	line2			# the upper line limit
 int	mode			# input / output mode
 int	flush 			# flush the output
 
-int	nx, ny, xoff, yoff, llast1, llast2
+size_t	nx, ny
+long	xoff, yoff, llast1, llast2, c_0
 pointer	allstar
 
 begin
+	c_0 = 0
+
 	allstar = DP_ALLSTAR(dao)
 	if (DP_WBUF(allstar) == NULL) {
 	    llast1 = 0
@@ -91,9 +94,9 @@ begin
 
 	# Update the buffer definition which is currently not used.
 	DP_WLX(allstar) = xoff
-	DP_WMX(allstar) = max (xoff + nx - 1, 0)
+	DP_WMX(allstar) = max (xoff + nx - 1, c_0)
 	DP_WLY(allstar) = yoff
-	DP_WMY(allstar) = max (yoff + ny - 1, 0)
+	DP_WMY(allstar) = max (yoff + ny - 1, c_0)
 
 	return (DP_WBUF(allstar))
 end
@@ -110,15 +113,18 @@ pointer procedure dp_gst (dao, im, line1, line2, mode, flush)
 
 pointer	dao			# pointer to the daophot structure
 pointer	im			# pointer to the input image
-int	line1			# the lower line limit
-int	line2			# the upper line limit
+long	line1			# the lower line limit
+long	line2			# the upper line limit
 int	mode			# input / output mode
 int	flush			# flush the buffer
 
-int	nx, ny, xoff, yoff, llast1, llast2
+size_t	nx, ny
+long	xoff, yoff, llast1, llast2, c_0
 pointer	allstar
 
 begin
+	c_0 = 0
+
 	allstar = DP_ALLSTAR(dao)
 	if (DP_SBUF(allstar) == NULL) {
 	    llast1 = 0
@@ -188,9 +194,9 @@ begin
 
 	# Update the buffer description which is not currently used.
 	DP_SLX(allstar) = xoff
-	DP_SMX(allstar) = max (xoff + nx - 1, 0)
+	DP_SMX(allstar) = max (xoff + nx - 1, c_0)
 	DP_SLY(allstar) = yoff
-	DP_SMY(allstar) = max (yoff + ny - 1, 0)
+	DP_SMY(allstar) = max (yoff + ny - 1, c_0)
 
 	return (DP_SBUF(allstar))
 end
@@ -207,14 +213,17 @@ pointer procedure dp_gdc (dao, im, line1, line2, mode, flush)
 
 pointer	dao			# pointer to the daophot strucuture
 pointer	im			# pointer to the input image
-int	line1, line2		# the upper and lower line limits
+long	line1, line2		# the upper and lower line limits
 int	mode			# input / output mode
 int	flush			# flush the input data
 
-int	nx, ny, xoff, yoff, llast1, llast2
+size_t	nx, ny
+long	xoff, yoff, llast1, llast2, c_0
 pointer	allstar
 
 begin
+	c_0 = 0
+
 	allstar = DP_ALLSTAR(dao)
 	if (DP_DBUF(allstar) == NULL) {
 	    llast1 = 0
@@ -284,9 +293,9 @@ begin
 
 	# Update the buffer definition which is currently not used.
 	DP_DLX(allstar) = xoff
-	DP_DMX(allstar) = max (xoff + nx - 1, 0)
+	DP_DMX(allstar) = max (xoff + nx - 1, c_0)
 	DP_DLY(allstar) = yoff
-	DP_DMY(allstar) = max (yoff + ny - 1, 0)
+	DP_DMY(allstar) = max (yoff + ny - 1, c_0)
 
 	return (DP_DBUF(allstar))
 end
@@ -302,11 +311,12 @@ procedure dp_albufl2rw (inim, outim, buf, llast1, llast2, line1, line2, flush)
 pointer	inim		# the input image pointer
 pointer	outim		# the output image pointer
 pointer	buf		# pointer to the internal buffer
-int	llast1, llast2	# the line limits of the previous buffer
-int	line1, line2	# the line limits of the requested buffer
+long	llast1, llast2	# the line limits of the previous buffer
+long	line1, line2	# the line limits of the requested buffer
 int	flush		# flush the output buffer
 
-int	i, ncols, nlines, nllast, lout, nmove
+size_t	ncols, nlines
+long	i, nllast, lout, nmove
 pointer	buf1, buf2
 pointer	imgl2r(), impl2r()
 
@@ -414,11 +424,12 @@ procedure dp_albufl2r (inim, buf, llast1, llast2, line1, line2, flush)
 
 pointer	inim		# pointer to the input image
 pointer	buf		# pointer to the internal buffer
-int	llast1, llast2	# the line limits of the previous buffer
-int	line1, line2	# the line limits of the requested buffer
+long	llast1, llast2	# the line limits of the previous buffer
+long	line1, line2	# the line limits of the requested buffer
 int	flush		# flush the output buffer
 
-int	i, ncols, nlines, nllast, lout, nmove
+long	i, nllast, lout, nmove
+size_t	ncols, nlines
 pointer	buf1, buf2
 pointer	imgl2r()
 

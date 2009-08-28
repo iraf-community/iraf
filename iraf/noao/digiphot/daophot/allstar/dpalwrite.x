@@ -10,19 +10,24 @@ procedure dp_tnewal (dao, tp, colpoint)
 
 pointer	dao		# pointer to the daophot strucuture
 pointer	tp		# pointer to the output table
-int	colpoint[ARB]	# array of column pointers
+pointer	colpoint[ARB]	# array of column pointers
 
+size_t	sz_val
 int	i
 pointer	sp, colnames, colunits, colformat, col_dtype, col_len
 
 begin
 	# Allocate space for table definition.
 	call smark (sp)
-	call salloc (colnames, ALL_NOUTCOLUMN * (SZ_COLNAME + 1), TY_CHAR)
-	call salloc (colunits, ALL_NOUTCOLUMN * (SZ_COLUNITS + 1), TY_CHAR)
-	call salloc (colformat, ALL_NOUTCOLUMN * (SZ_COLFMT + 1), TY_CHAR)
-	call salloc (col_dtype, ALL_NOUTCOLUMN, TY_INT)
-	call salloc (col_len, ALL_NOUTCOLUMN, TY_INT)
+	sz_val = ALL_NOUTCOLUMN * (SZ_COLNAME + 1)
+	call salloc (colnames, sz_val, TY_CHAR)
+	sz_val = ALL_NOUTCOLUMN * (SZ_COLUNITS + 1)
+	call salloc (colunits, sz_val, TY_CHAR)
+	sz_val = ALL_NOUTCOLUMN * (SZ_COLFMT + 1)
+	call salloc (colformat, sz_val, TY_CHAR)
+	sz_val = ALL_NOUTCOLUMN
+	call salloc (col_dtype, sz_val, TY_INT)
+	call salloc (col_len, sz_val, TY_LONG)
 
 	# Set up the column definitions.
 	call strcpy (ID, Memc[colnames], SZ_COLNAME)
@@ -78,11 +83,11 @@ begin
 
 	# Define the column lengths.
 	do i = 1, ALL_NOUTCOLUMN 
-	    Memi[col_len+i-1] = 1
+	    Meml[col_len+i-1] = 1
 	
 	# Define and create the table.
 	call tbcdef (tp, colpoint, Memc[colnames], Memc[colunits],
-	    Memc[colformat], Memi[col_dtype], Memi[col_len], ALL_NOUTCOLUMN)
+	    Memc[colformat], Memi[col_dtype], Meml[col_len], ALL_NOUTCOLUMN)
 	call tbtcre (tp)
 
 	# Write out the header parameters.
@@ -136,6 +141,7 @@ procedure dp_talpars (dao, tp)
 pointer	dao			# pointer to the daophot structure
 pointer	tp			# pointer to the output table
 
+size_t	sz_val
 pointer	sp, psffit, outstr, date, time
 bool	itob()
 int	envfind()
@@ -146,9 +152,11 @@ begin
 
 	# Allocate workin space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
 
 	# Write the id.
 	if (envfind ("version", Memc[outstr], SZ_LINE) <= 0)
@@ -224,6 +232,7 @@ procedure dp_xalpars (dao, tp)
 pointer	dao			# pointer to the daophot structure
 int	tp			# the output file descriptor
 
+size_t	sz_val
 pointer	sp, psffit, outstr, date, time, dummy
 bool	itob()
 int	envfind()
@@ -234,10 +243,13 @@ begin
 
 	# Allocate workin space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
-	call salloc (dummy, 2, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
+	sz_val = 2
+	call salloc (dummy, sz_val, TY_CHAR)
 	Memc[dummy] = EOS
 
 	# Write the id.
@@ -330,7 +342,7 @@ procedure dp_talwrite (tpout, tprout, colpoint, id, x, y, mag, magerr, sky,
 
 pointer	tpout		# the output photometry file descriptor
 pointer	tprout		# the output rejections file descriptor
-int	colpoint[ARB]	# array of column pointers
+pointer	colpoint[ARB]	# array of column pointers
 int	id[ARB]		# array of ids
 real	x[ARB]		# array of xpositions
 real	y[ARB]		# array of y positions
@@ -344,11 +356,12 @@ int	skip[ARB]	# array of skipped stars
 int	aier[ARB]	# array of error codes
 int	niter		# number of iterations
 int	istar, lstar	# first and last stars
-int	star		# photometry file row number
-int	rstar		# rejections file row number
+long	star		# photometry file row number
+long	rstar		# rejections file row number
 real	psfmag		# magnitude of the psf
 real	csharp		# the sharpness constant
 
+size_t	sz_val
 int	i, iter, pier, plen
 pointer	sp, perror
 real	err, sharp
@@ -356,7 +369,8 @@ int	dp_gallerr()
 
 begin
 	call smark (sp)
-	call salloc (perror, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (perror, sz_val, TY_CHAR)
 
 	do i = istar, lstar {
 
@@ -448,6 +462,7 @@ int	istar, lstar	# first and last stars
 real	psfmag		# magnitude of the psf
 real	csharp		# sharpness constant
 
+size_t	sz_val
 int	i, iter, pier, plen
 pointer	sp, perror
 real	err, sharp
@@ -455,7 +470,8 @@ int	dp_gallerr()
 
 begin
 	call smark (sp)
-	call salloc (perror, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (perror, sz_val, TY_CHAR)
 
 	do i = istar, lstar {
 

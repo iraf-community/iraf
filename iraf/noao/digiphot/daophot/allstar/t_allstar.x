@@ -20,19 +20,19 @@ int	verify			# verify critical task parameters ?
 int	update			# update the task parameters ?
 int	version			# version number
 
-pointer	sp, outfname, im, subim, dao, str
+size_t	sz_val
+pointer	sp, outfname, im, subim, dao, str, allfd, photfd, psffd, rejfd
 pointer	alist, olist, rlist, imlist, pimlist, simlist
-int	limlist, lalist, lpimlist, lolist
-int	lsimlist, lrlist, photfd, psffd, allfd, root, savesub
-int	rejfd, wcs
+int	limlist, lalist, lpimlist, lolist, i_val
+int	lsimlist, lrlist, root, savesub, wcs
 bool	ap_text
 
 pointer	immap(), tbtopn(), fntopnb(), imtopen()
-int	clgwrd(), clgeti()
-int	open(), fnldir(), strncmp(), strlen(), btoi(), access()
-int	fstati(), imtlen(), imtgetim(), fntlenb()
-int	fntgfnb()
+int	clgwrd(), clgeti(), open(), fnldir(), strncmp(), strlen(), access()
+int	btoi(), fstati(), imtlen(), imtgetim(), fntlenb(), fntgfnb()
 bool	itob(), clgetb()
+
+include	<nullptr.inc>
 
 begin
 	# Set the standard output to flush on newline.
@@ -41,14 +41,15 @@ begin
 
 	# Get some working memory.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (psfimage, SZ_FNAME, TY_CHAR)
-	call salloc (photfile, SZ_FNAME, TY_CHAR)
-	call salloc (allstarfile, SZ_FNAME, TY_CHAR)
-	call salloc (rejfile, SZ_FNAME, TY_CHAR)
-	call salloc (subimage, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (psfimage, sz_val, TY_CHAR)
+	call salloc (photfile, sz_val, TY_CHAR)
+	call salloc (allstarfile, sz_val, TY_CHAR)
+	call salloc (rejfile, sz_val, TY_CHAR)
+	call salloc (subimage, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the task input and output file names.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -199,7 +200,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the image and store some header parameters.
-	    im = immap (Memc[image], READ_ONLY, 0)		
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
 
@@ -217,7 +218,7 @@ begin
 	    if (ap_text)
 	        photfd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else
-	        photfd = tbtopn (Memc[outfname], READ_ONLY, 0)
+	        photfd = tbtopn (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 	    call dp_wgetapert (dao, im, photfd, DP_MAXNSTAR(dao), ap_text)
 
@@ -231,7 +232,7 @@ begin
 		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
-	    psffd = immap (Memc[outfname], READ_ONLY, 0)
+	    psffd = immap (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_sets (dao, PSFIMAGE, Memc[outfname])
 	    call dp_readpsf (dao, psffd)
 	
@@ -252,7 +253,7 @@ begin
 	    if (DP_TEXT(dao)  == YES)
 	        allfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	    else
-	        allfd = tbtopn (Memc[outfname], NEW_FILE, 0)
+	        allfd = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 	    call dp_sets (dao, OUTPHOTFILE, Memc[outfname])
 
 	    if (lrlist <= 0) {
@@ -271,7 +272,7 @@ begin
 	        if (DP_TEXT(dao)  == YES)
 	            rejfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	        else
-	            rejfd = tbtopn (Memc[outfname], NEW_FILE, 0)
+	            rejfd = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 	    }
 	    call dp_sets (dao, OUTREJFILE, Memc[outfname])
 
@@ -303,26 +304,32 @@ begin
 	    call imunmap (im)
 
 	    # Close the input photometry file.
-	    if (ap_text)
-		call close (photfd)
-	    else
+	    if (ap_text) {
+		i_val = photfd
+		call close (i_val)
+	    } else {
 	        call tbtclo (photfd)
+	    }
 
 	    # Close PSF image.
 	    call imunmap (psffd)
 
 	    # Close the output photometry file.
-	    if (DP_TEXT(dao) == YES)
-		call close (allfd)
-	    else
+	    if (DP_TEXT(dao) == YES) {
+		i_val = allfd
+		call close (i_val)
+	    } else {
 	        call tbtclo (allfd)
+	    }
 
 	    # Close the output rejections files.
 	    if (rejfd != NULL) {
-	        if (DP_TEXT(dao) == YES)
-		    call close (rejfd)
-	        else
+	        if (DP_TEXT(dao) == YES) {
+		    i_val = rejfd
+		    call close (i_val)
+		} else {
 	            call tbtclo (rejfd)
+		}
 	    }
 
 	    # Close the output subtracted image.

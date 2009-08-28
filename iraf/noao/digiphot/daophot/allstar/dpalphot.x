@@ -21,19 +21,25 @@ bool	clip			# clip the data
 real	clampmax		# maximum clamping factor
 int	version			# version number
 
+size_t	sz_val
 bool	regroup
-int	cdimen, lstar, nstar, fstar, nterm, ixmin, ixmax, iymin, iymax
-int	fixmin, fixmax, fiymin, fiymax, nxpix, nypix, flag, i, j, k, ifaint
+int	cdimen, lstar, nstar, fstar, nterm
+long	ixmin, ixmax, iymin, iymax, fixmin, fixmax, fiymin, fiymax, c_1
+size_t	nxpix, nypix
+int	flag, ifaint, i, j, k
 pointer	apsel, psffit, allstar, data, subt, weights
 real	radius, totradius, mean_sky, pererr, peakerr, faint
 real	xmin, xmax, ymin, ymax, sumres, grpwt, chigrp
 
 bool	dp_alredo(), dp_checkc(), dp_almerge(), dp_alclamp(), dp_alfaint()
 int	dp_laststar(), dp_delfaintest()
+long	lint()
 pointer	dp_gwt(), dp_gst(), dp_gdc()
 real	dp_almsky(), asumr()
 
 begin
+	c_1 = 1
+
 	# Get some daophot pointers.
 	psffit = DP_PSFFIT (dao)
 	apsel = DP_APSEL(dao)
@@ -67,8 +73,9 @@ begin
 	    # Don't compute the subraster limits if no regroup has been
 	    # performed.
 	    if (! regroup) {
-	        call alimr (Memr[DP_APXCEN(apsel)+istar-1], nstar, xmin, xmax)	
-	        call alimr (Memr[DP_APYCEN(apsel)+istar-1], nstar, ymin, ymax)	
+		sz_val = nstar
+	        call alimr (Memr[DP_APXCEN(apsel)+istar-1], sz_val, xmin, xmax)	
+	        call alimr (Memr[DP_APYCEN(apsel)+istar-1], sz_val, ymin, ymax)	
 	    }
 
 	    # Determine whether the group is too large to be fit.
@@ -133,10 +140,11 @@ begin
 	    # reject the group.
 	    mean_sky = dp_almsky (Memr[DP_APMSKY(apsel)+istar-1], nstar)
 	    if (IS_INDEFR(mean_sky)) {
-		call amovkr (INDEFR, Memr[DP_APMAG(apsel)+istar-1], nstar)
-		call amovki (YES, Memi[DP_ASKIP(allstar)+istar-1], nstar)
+		sz_val = nstar
+		call amovkr (INDEFR, Memr[DP_APMAG(apsel)+istar-1], sz_val)
+		call amovki (YES, Memi[DP_ASKIP(allstar)+istar-1], sz_val)
 		call amovki (ALLERR_INDEFSKY, Memi[DP_AIER(allstar)+istar-1],
-		    nstar)
+			     sz_val)
 		if (DP_VERBOSE(dao) == YES) {
 		    do i = istar, lstar {
 		        call printf (
@@ -154,21 +162,24 @@ begin
 	        nterm = nstar
 
 	    # Zero the fitting arrays.
-	    chigrp = asumr (Memr[DP_ASUMWT(allstar)+istar-1], nstar) / nstar
-	    call aclrr (Memr[DP_APCHI(apsel)+istar-1], nstar)
-	    call aclrr (Memr[DP_ASUMWT(allstar)+istar-1], nstar)
-	    call aclrr (Memr[DP_ANUMER(allstar)+istar-1], nstar)
-	    call aclrr (Memr[DP_ADENOM(allstar)+istar-1], nstar)
-	    call aclri (Memi[DP_ANPIX(allstar)+istar-1], nstar)
-	    call aclrr (Memr[DP_AV(allstar)], nterm)
-	    call aclrr (Memr[DP_AC(allstar)], cdimen * cdimen)
+	    sz_val = nstar
+	    chigrp = asumr (Memr[DP_ASUMWT(allstar)+istar-1], sz_val) / nstar
+	    call aclrr (Memr[DP_APCHI(apsel)+istar-1], sz_val)
+	    call aclrr (Memr[DP_ASUMWT(allstar)+istar-1], sz_val)
+	    call aclrr (Memr[DP_ANUMER(allstar)+istar-1], sz_val)
+	    call aclrr (Memr[DP_ADENOM(allstar)+istar-1], sz_val)
+	    call aclri (Memi[DP_ANPIX(allstar)+istar-1], sz_val)
+	    sz_val = nterm
+	    call aclrr (Memr[DP_AV(allstar)], sz_val)
+	    sz_val = cdimen * cdimen
+	    call aclrr (Memr[DP_AC(allstar)], sz_val)
 
 	    # Compute the subraster limits.
 
-	    ixmin = min (IM_LEN (im,1), max (1, int (xmin - totradius) + 1))
-	    ixmax = min (IM_LEN (im,1), max (1,int (xmax + totradius)))
-	    iymin = min (IM_LEN (im,2), max (1, int (ymin - totradius) + 1))
-	    iymax = min (IM_LEN (im,2), max (1, int (ymax + totradius)))
+	    ixmin = min (IM_LEN (im,1), max (c_1, lint (xmin - totradius) + 1))
+	    ixmax = min (IM_LEN (im,1), max (c_1, lint (xmax + totradius)))
+	    iymin = min (IM_LEN (im,2), max (c_1, lint (ymin - totradius) + 1))
+	    iymax = min (IM_LEN (im,2), max (c_1, lint (ymax + totradius)))
 
 	    # Get pointer to the required weight, scratch image and
 	    # subtracted image pixels. Need to modify this so writing
@@ -180,10 +191,10 @@ begin
 
 	    # Compute the fitting limits in the subraster.
 
-	    fixmin = min (ixmax, max (ixmin, int (xmin - DP_FITRAD(dao)) + 1))
-	    fixmax = min (ixmax, max (ixmin, int (xmax + DP_FITRAD(dao))))
-	    fiymin = min (iymax, max (iymin, int (ymin - DP_FITRAD(dao)) + 1))
-	    fiymax = min (iymax, max (iymin, int (ymax + DP_FITRAD(dao))))
+	    fixmin = min (ixmax, max (ixmin, lint (xmin - DP_FITRAD(dao)) + 1))
+	    fixmax = min (ixmax, max (ixmin, lint (xmax + DP_FITRAD(dao))))
+	    fiymin = min (iymax, max (iymin, lint (ymin - DP_FITRAD(dao)) + 1))
+	    fiymax = min (iymax, max (iymin, lint (ymax + DP_FITRAD(dao))))
 	    nypix = fiymax - fiymin + 1
 	    nxpix = fixmax - fixmin + 1
 
@@ -314,12 +325,13 @@ begin
 		    Memi[DP_AIER(allstar)+j-1] = ALLERR_MERGE
 
 		    # Loosen the clamps of every star in the group
-		    call aclrr (Memr[DP_AXOLD(allstar)+istar-1], nstar)
-		    call aclrr (Memr[DP_AYOLD(allstar)+istar-1], nstar)
+		    sz_val = nstar
+		    call aclrr (Memr[DP_AXOLD(allstar)+istar-1], sz_val)
+		    call aclrr (Memr[DP_AYOLD(allstar)+istar-1], sz_val)
 		    call amaxkr (Memr[DP_AXCLAMP(allstar)+istar-1], 0.5 *
-		        clampmax, Memr[DP_AXCLAMP(allstar)+istar-1], nstar)
+		        clampmax, Memr[DP_AXCLAMP(allstar)+istar-1], sz_val)
 		    call amaxkr (Memr[DP_AYCLAMP(allstar)+istar-1], 0.5 *
-			clampmax, Memr[DP_AYCLAMP(allstar)+istar-1], nstar)
+			clampmax, Memr[DP_AYCLAMP(allstar)+istar-1], sz_val)
 
 	        }
 	    }
@@ -356,12 +368,13 @@ begin
 	        Memi[DP_ASKIP(allstar)+ifaint-1] = YES
 	        Memi[DP_AIER(allstar)+ifaint-1] = ALLERR_FAINT
 
-	        call aclrr (Memr[DP_AXOLD(allstar)+istar-1], nstar)
-	        call aclrr (Memr[DP_AYOLD(allstar)+istar-1], nstar)
+		sz_val = nstar
+	        call aclrr (Memr[DP_AXOLD(allstar)+istar-1], sz_val)
+	        call aclrr (Memr[DP_AYOLD(allstar)+istar-1], sz_val)
 	        call amaxkr (Memr[DP_AXCLAMP(allstar)+istar-1], 0.5 *
-	            clampmax, Memr[DP_AXCLAMP(allstar)+istar-1], nstar)
+	            clampmax, Memr[DP_AXCLAMP(allstar)+istar-1], sz_val)
 	        call amaxkr (Memr[DP_AYCLAMP(allstar)+istar-1], 0.5 *
-		    clampmax, Memr[DP_AYCLAMP(allstar)+istar-1], nstar)
+		    clampmax, Memr[DP_AYCLAMP(allstar)+istar-1], sz_val)
 		
 	    # If no star is more than 12.5 magnitudes fainter than the PSF
 	    # then after the 50th iteration delete the least certain star i
@@ -386,12 +399,13 @@ begin
 	            Memi[DP_AIER(allstar)+ifaint-1] = ALLERR_FAINT
 
 	            # Loosen the clamps of every star in the group.
-	            call aclrr (Memr[DP_AXOLD(allstar)+istar-1], nstar)
-	            call aclrr (Memr[DP_AYOLD(allstar)+istar-1], nstar)
+		    sz_val = nstar
+	            call aclrr (Memr[DP_AXOLD(allstar)+istar-1], sz_val)
+	            call aclrr (Memr[DP_AYOLD(allstar)+istar-1], sz_val)
 	            call amaxkr (Memr[DP_AXCLAMP(allstar)+istar-1], 0.5 *
-	                clampmax, Memr[DP_AXCLAMP(allstar)+istar-1], nstar)
+	                clampmax, Memr[DP_AXCLAMP(allstar)+istar-1], sz_val)
 	            call amaxkr (Memr[DP_AYCLAMP(allstar)+istar-1], 0.5 *
-		        clampmax, Memr[DP_AYCLAMP(allstar)+istar-1], nstar)
+		        clampmax, Memr[DP_AYCLAMP(allstar)+istar-1], sz_val)
 	        }
 	    }
 
@@ -485,16 +499,16 @@ procedure dp_alaccum (dao, im, data, dnx, dny, dxoff, dyoff, subt, snx, sny,
 pointer	dao			# pointer to the daophot structure
 pointer	im			# the input image descriptor
 real	data[dnx,dny]		# the subtracted data array
-int	dnx, dny		# dimenions of the data array
-int	dxoff, dyoff		# lower left corner of the data array
+size_t	dnx, dny		# dimenions of the data array
+long	dxoff, dyoff		# lower left corner of the data array
 real	subt[snx,sny]		# the scratch array
-int	snx, sny		# dimensions of the scratch array
-int	sxoff, syoff		# lower left corner of the scratch array
+size_t	snx, sny		# dimensions of the scratch array
+long	sxoff, syoff		# lower left corner of the scratch array
 real	weights[wnx,wny]	# the weight array
-int	wnx, wny		# dimensions of the weight array
-int	wxoff, wyoff		# lower left corner of the weight array
-int	nxpix, nypix		# the dimensions of the area of interest
-int	ixmin,iymin		# lower left corner of area of interest
+size_t	wnx, wny		# dimensions of the weight array
+long	wxoff, wyoff		# lower left corner of the weight array
+size_t	nxpix, nypix		# the dimensions of the area of interest
+long	ixmin,iymin		# lower left corner of area of interest
 real	mean_sky		# the group sky value
 int	istar			# the index of the first star in current group
 int	lstar			# the index of the last star in current group
@@ -510,8 +524,8 @@ int	nterm			# number of terms in the matrix to fit
 
 real	fitradsq, maxgdata, fix, fiy, d, delta, sigmasq, relerr, wt, dwt
 pointer	psffit, apsel, allstar
-int	dix, diy, sxdiff, sydiff, wxdiff, wydiff
-real	sky_value, dp_alskyval()
+long	dix, diy, sxdiff, sydiff, wxdiff, wydiff
+real	sky_value, dp_alskyval(), aabs()
 bool	dp_alomit()
 
 begin
@@ -613,7 +627,7 @@ begin
 		    (peakerr * (delta - sky_value)) ** 2
 		if (sigmasq <= 0.0)
 		    next
-		relerr = abs (d) / sqrt (sigmasq)
+		relerr = aabs (d) / sqrt (sigmasq)
 
 		if (clip && (relerr > MAX_RELERR))
 		    next
@@ -786,6 +800,7 @@ real	sigmasq			# the sigma squared value
 int	nterm			# number of terms in the matrix
 real	fitradsq		# fitting radius squared
 
+size_t	sz_val
 real	psfsigsqx, psfsigsqy, dx, dy, deltax, deltay, value, radsq, rhosq
 real	dvdx, dvdy, dfdsig
 pointer	psffit
@@ -826,7 +841,8 @@ begin
 
 	    dx = fix - xcen[i]
 	    dy = fiy - ycen[i]
-	    call dp_wpsf (dao, im, xcen[i], ycen[i], deltax, deltay, 1)
+	    sz_val = 1
+	    call dp_wpsf (dao, im, xcen[i], ycen[i], deltax, deltay, sz_val)
 	    deltax = (deltax - 1.0) / DP_PSFX(psffit) - 1.0
 	    deltay = (deltay - 1.0) / DP_PSFY(psffit) - 1.0
 	    value = dp_usepsf (DP_PSFUNCTION(psffit), dx, dy,
@@ -1073,7 +1089,7 @@ real	ycen[ARB]		# array of star y centers
 real	mag[ARB]		# array of relative brightnesses
 real	magerr[ARB]		# array of relative brightness errors
 real	sumwt[ARB]		# array of pixel distance squared values
-int 	skip[ARB]		# include / exclude array
+int	skip[ARB]		# include / exclude array
 real	xold[ARB]		# xold array
 real	xclamp[ARB]		# xclamp array
 real	yold[ARB]		# yold array
@@ -1088,10 +1104,14 @@ real	clampmax		# the maximum clamp value
 real	pererr			# flat field error
 real	peakerr			# the profile error
 
+size_t	sz_val
 bool	redo, bufwrite
-int	i, l, k, j, lx, mx, ly, my, nx, ny
+int	i, l, k, j
+long	lx, mx, ly, my
+size_t	nx, ny
 pointer	psffit, allstar
 real	dwt, psfrad, psfradsq, df
+real	aabs()
 
 begin
 	# Get some daophot pointers.
@@ -1130,7 +1150,7 @@ begin
 		        xclamp[i])
 		else
 		    xclamp[i] = min (clampmax, MAX_XYCLAMP_FRACTION * xclamp[i])
-		xcen[i] = xcen[i] - x[k] / (1.0 + abs (x[k] / xclamp[i]))
+		xcen[i] = xcen[i] - x[k] / (1.0 + aabs (x[k] / xclamp[i]))
 		xold[i] = x[k]
 		
 		dwt = yold[i] * x[l]
@@ -1139,7 +1159,7 @@ begin
 		        yclamp[i])
 		else
 		    yclamp[i] = min (clampmax, MAX_XYCLAMP_FRACTION * yclamp[i])
-		ycen[i] = ycen[i] - x[l] / (1.0 + abs (x[l] / yclamp[i]))
+		ycen[i] = ycen[i] - x[l] / (1.0 + aabs (x[l] / yclamp[i]))
 		yold[i] = x[l]
 
 		mag[i] = mag[i] - x[j] / (1.0 + max (x[j] / (MAX_DELTA_FAINTER *
@@ -1148,7 +1168,7 @@ begin
 
 		if (niter >= MIN_ITER) {
 		    redo = false
-		    if (abs(x[j]) > max (MAX_NEW_ERRMAG * magerr[i],
+		    if (aabs(x[j]) > max (MAX_NEW_ERRMAG * magerr[i],
 		        MAX_NEW_RELBRIGHT2 * mag[i]))
 			redo = true
 		    else {
@@ -1163,11 +1183,11 @@ begin
 
 	    } else {
 		j = i - istar + 1
-		mag[i] = mag[i] - x[j] / (1.0 + 1.2 * abs (x[j] / mag[i]))
+		mag[i] = mag[i] - x[j] / (1.0 + 1.2 * aabs (x[j] / mag[i]))
 		magerr[i] = sumwt[i] * sqrt (c[j,j])
 		if (niter >= 2) {
 		    redo = false
-		    if (abs(x[j]) > max (MAX_NEW_ERRMAG * magerr[i],
+		    if (aabs(x[j]) > max (MAX_NEW_ERRMAG * magerr[i],
 			MAX_NEW_RELBRIGHT2 * mag[i]))
 			redo = true
 		} else
@@ -1201,7 +1221,8 @@ begin
 	    skip[i] = YES
 
 	    if (DP_VERBOSE(dao) == YES) {
-		call dp_wout (dao, im, xcen[i], ycen[i], xcen[i], ycen[i], 1)
+		sz_val = 1
+		call dp_wout (dao, im, xcen[i], ycen[i], xcen[i], ycen[i], sz_val)
 		call printf (
 		"FITTING:   ID: %5d  XCEN: %8.2f  YCEN: %8.2f  MAG: %8.2f\n")
 		    call pargi (id[i])
@@ -1230,31 +1251,33 @@ procedure dp_swstar (dao, im, data, dnx, dny, dxoff, dyoff, weights, wnx, wny,
 pointer	dao				# pointer to the daophot structure
 pointer	im				# pointer to the input image
 real	data[dnx,dny]			# the data array
-int	dnx, dny			# dimensions of the data array
-int	dxoff, dyoff			# lower left corner of data array
+size_t	dnx, dny			# dimensions of the data array
+long	dxoff, dyoff			# lower left corner of data array
 real	weights[wnx,wny]		# the weights array
-int	wnx, wny			# dimensions of the weights array
-int	wxoff, wyoff			# lower left corner of weights array
+size_t	wnx, wny			# dimensions of the weights array
+long	wxoff, wyoff			# lower left corner of weights array
 real	xcen, ycen			# the position of the star
 real	mag				# relative brightness of the star
-int	lx, ly				# lower left corner region of interest
-int	nx, ny				# size of region of interest
+long	lx, ly				# lower left corner region of interest
+size_t	nx, ny				# size of region of interest
 real	psfradsq			# the psf radius squared
 real	gain				# the gain in photons per adu
 real	pererr				# the flat field error factor
 real	peakerr				# the peak error factor
 
+size_t	sz_val
 real	deltax, deltay, dx, dy, dysq, diff, dvdx, dvdy
 pointer	psffit
-int	di, dj, wxdiff, wydiff
-real	dp_usepsf()
+long	wxdiff, wydiff, di, dj
+real	dp_usepsf(), aabs()
 
 begin
 	psffit = DP_PSFFIT(dao)
 
 	wxdiff = dxoff - wxoff
 	wydiff = dyoff - wyoff
-	call dp_wpsf (dao, im, xcen, ycen, deltax, deltay, 1)
+	sz_val = 1
+	call dp_wpsf (dao, im, xcen, ycen, deltax, deltay, sz_val)
 	deltax = (deltax - 1.0) / DP_PSFX(psffit) - 1.0
 	deltay = (deltay - 1.0) / DP_PSFY(psffit) - 1.0
 
@@ -1281,7 +1304,7 @@ begin
 			weights[di+wxdiff,dj+wydiff] = weights[di+wxdiff,
 			    dj+wydiff] + diff
 		    else
-			weights[di+wxdiff,dj+wydiff] = - (abs (weights[di+
+			weights[di+wxdiff,dj+wydiff] = - (aabs (weights[di+
 			    wxdiff,dj+wydiff]) + diff)
 		}
 	    }

@@ -15,13 +15,15 @@ real	xclamp[ARB]		# the x array clamps
 real	yclamp[ARB]		# the y array clamps
 int	nstar			# the number of stars
 
+size_t	sz_val
 int	ier
 pointer	sp, index
 
 begin
 	# Allocate some working memory.
 	call smark (sp)
-	call salloc (index, nstar, TY_INT)
+	sz_val = nstar
+	call salloc (index, sz_val, TY_INT)
 
 	# Sort the star list on y.
 	call quick (y, nstar, Memi[index], ier)
@@ -61,9 +63,11 @@ int	nstar			# the number of stars
 real	radius			# the fitting radius
 int	last[ARB]		# the last array (NO or YES for last star)
 
+size_t	sz_val
 int	itop, itest, j, k, i, ier
 pointer sp, index
 real	critrad, critradsq, xtest, ytest, dx, dy
+real	aabs()
 
 begin
 	# If there is only one stars its value of last is YES.
@@ -74,7 +78,8 @@ begin
 
 	# Allocate some working memory.
 	call smark (sp)
-	call salloc (index, nstar, TY_INT)
+	sz_val = nstar
+	call salloc (index, sz_val, TY_INT)
 
 	# Compute the critical radius.
 	critrad = 2.0 * radius
@@ -147,7 +152,7 @@ begin
 		if (dy > critrad)
 		    break
 		dx = x[i] - xtest
-		if (abs (dx) > critrad)
+		if (aabs (dx) > critrad)
 		    next
 		if ((dx * dx + dy * dy) > critradsq)
 		    next

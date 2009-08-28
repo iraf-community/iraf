@@ -15,9 +15,9 @@ pointer	im			# pointer to the input image
 pointer	subim			# pointer to the output subtracted image
 int	cache			# cache the data ?
 
-int	npix
+size_t	sz_val
 pointer	sp, temp, allstar, data, weights, subt
-size_t	req_mem1, req_mem2, req_mem3, old_mem, max_mem, sz_0
+size_t	npix, req_mem1, req_mem2, req_mem3, old_mem, max_mem, sz_0
 int	sizeof()
 size_t	begmem()
 pointer	immap()
@@ -26,7 +26,8 @@ errchk	begmem(), calloc()
 begin
 	# Allocate some working memory.
 	call smark (sp)
-	call salloc (temp, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (temp, sz_val, TY_CHAR)
 
 	# Define the allstar pointer.
 	allstar = DP_ALLSTAR(dao)
@@ -180,15 +181,19 @@ pointer	dao		# pointer to the daophot strucuture
 pointer	subim		# pointer to the output subtracted image
 int	savesub		# save the subtracted image ?
 
-int	j, ncol, nline
+size_t	sz_val
+size_t	ncol, nline
+long	j, l_val
 pointer	sp, imname, v, data, buf, allstar
-pointer	impnlr()
+long	impnlr()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (imname, SZ_FNAME, TY_CHAR)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = SZ_FNAME
+	call salloc (imname, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
 
 	# Define the allstar pointer.
 	allstar = DP_ALLSTAR(dao)
@@ -199,7 +204,9 @@ begin
 	# Write out the subtracted image.
 	if (DP_CACHE(allstar,A_DCOPY) == YES && savesub == YES) {
 	    data = DP_DBUF(allstar)
-	    call amovkl (long(1), Meml[v], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[v], sz_val)
 	    do j = 1, nline {
 		if (impnlr (subim, buf, Meml[v]) != EOF)
 		    call amovr (Memr[data], Memr[buf], ncol)

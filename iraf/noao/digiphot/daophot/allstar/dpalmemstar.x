@@ -7,11 +7,13 @@ procedure dp_allstarsetup (dp)
 
 pointer	dp		# pointer to daophot structure
 
+size_t	sz_val
 pointer	allstar
 
 begin
 	# Allocate memory.
-	call malloc (DP_ALLSTAR(dp), LEN_ALLSTARSTRUCT, TY_STRUCT)
+	sz_val = LEN_ALLSTARSTRUCT
+	call malloc (DP_ALLSTAR(dp), sz_val, TY_STRUCT)
 	allstar = DP_ALLSTAR(dp)
 
 	DP_DATA(allstar) = NULL
@@ -47,58 +49,61 @@ pointer	dao			# pointer to daophot structure
 int	max_star		# maximum number of stars
 int	max_group		# maximum group size
 
+size_t	sz_maxstar, sz_maxgroup
 pointer	allstar
 
 begin
 	allstar = DP_ALLSTAR(dao)
+	sz_maxstar = max_star
+	sz_maxgroup = max_group
 
 	if (DP_ANUMER (allstar) != NULL)
 	    call mfree (DP_ANUMER (allstar), TY_REAL)
-	call malloc (DP_ANUMER (allstar), max_star, TY_REAL)
+	call malloc (DP_ANUMER (allstar), sz_maxstar, TY_REAL)
 
 	if (DP_ADENOM (allstar) != NULL)
 	    call mfree (DP_ADENOM (allstar), TY_REAL)
-	call malloc (DP_ADENOM (allstar), max_star, TY_REAL)
+	call malloc (DP_ADENOM (allstar), sz_maxstar, TY_REAL)
 
 	if (DP_ARPIXSQ (allstar) != NULL)
 	    call mfree (DP_ARPIXSQ (allstar), TY_REAL)
-	call malloc (DP_ARPIXSQ (allstar), max_star, TY_REAL)
+	call malloc (DP_ARPIXSQ (allstar), sz_maxstar, TY_REAL)
 
 	if (DP_ASUMWT (allstar) != NULL)
 	    call mfree (DP_ASUMWT (allstar), TY_REAL)
-	call malloc (DP_ASUMWT (allstar), max_star, TY_REAL)
+	call malloc (DP_ASUMWT (allstar), sz_maxstar, TY_REAL)
 
 	if (DP_ANPIX (allstar) != NULL)
 	    call mfree (DP_ANPIX (allstar), TY_INT)
-	call malloc (DP_ANPIX (allstar), max_star, TY_INT)
+	call malloc (DP_ANPIX (allstar), sz_maxstar, TY_INT)
 
 	if (DP_AIER (allstar) != NULL)
 	    call mfree (DP_AIER (allstar), TY_INT)
-	call malloc (DP_AIER (allstar), max_star, TY_INT)
+	call malloc (DP_AIER (allstar), sz_maxstar, TY_INT)
 
 	if (DP_ASKIP (allstar) != NULL)
 	    call mfree (DP_ASKIP (allstar), TY_INT)
-	call malloc (DP_ASKIP (allstar), max_star, TY_INT)
+	call malloc (DP_ASKIP (allstar), sz_maxstar, TY_INT)
 
 	if (DP_ALAST (allstar) != NULL)
 	    call mfree (DP_ALAST (allstar), TY_INT)
-	call malloc (DP_ALAST (allstar), max_star, TY_INT)
+	call malloc (DP_ALAST (allstar), sz_maxstar, TY_INT)
 
 	if (DP_AXCLAMP (allstar) != NULL)
 	    call mfree (DP_AXCLAMP (allstar), TY_REAL)
-	call malloc (DP_AXCLAMP (allstar), max_star, TY_REAL)
+	call malloc (DP_AXCLAMP (allstar), sz_maxstar, TY_REAL)
 
 	if (DP_AYCLAMP (allstar) != NULL)
 	    call mfree (DP_AYCLAMP (allstar), TY_REAL)
-	call malloc (DP_AYCLAMP (allstar), max_star, TY_REAL)
+	call malloc (DP_AYCLAMP (allstar), sz_maxstar, TY_REAL)
 
 	if (DP_AXOLD (allstar) != NULL)
 	    call mfree (DP_AXOLD (allstar), TY_REAL)
-	call malloc (DP_AXOLD (allstar), max_star, TY_REAL)
+	call malloc (DP_AXOLD (allstar), sz_maxstar, TY_REAL)
 
 	if (DP_AYOLD (allstar) != NULL)
 	    call mfree (DP_AYOLD (allstar), TY_REAL)
-	call malloc (DP_AYOLD (allstar), max_star, TY_REAL)
+	call malloc (DP_AYOLD (allstar), sz_maxstar, TY_REAL)
 
         # Allocate space for the fitting matrices. Note that nine
         # times less space is required if recentering is turned
@@ -107,31 +112,31 @@ begin
 
 	    if (DP_AX (allstar) != NULL)
 	        call mfree (DP_AX (allstar), TY_REAL)
-	    call malloc (DP_AX (allstar), 3 * max_group + 1, TY_REAL)
+	    call malloc (DP_AX (allstar), 3 * sz_maxgroup + 1, TY_REAL)
 
 	    if (DP_AV (allstar) != NULL)
 	        call mfree (DP_AV (allstar), TY_REAL)
-	    call malloc (DP_AV (allstar), 3 * max_group + 1, TY_REAL)
+	    call malloc (DP_AV (allstar), 3 * sz_maxgroup + 1, TY_REAL)
 
 	    if (DP_AC (allstar) != NULL)
 	        call mfree (DP_AC (allstar), TY_REAL)
-	    call malloc (DP_AC (allstar), (3 * max_group + 1) *
-	        (3 * max_group + 1), TY_REAL)
+	    call malloc (DP_AC (allstar), 
+			(3 * sz_maxgroup + 1) * (3 * sz_maxgroup + 1), TY_REAL)
 
         } else {
 
             if (DP_AX (allstar) != NULL)
                 call mfree (DP_AX (allstar), TY_REAL)
-            call malloc (DP_AX (allstar), max_group + 1, TY_REAL)
+            call malloc (DP_AX (allstar), sz_maxgroup + 1, TY_REAL)
 
             if (DP_AV (allstar) != NULL)
                 call mfree (DP_AV (allstar), TY_REAL)
-            call malloc (DP_AV (allstar), max_group + 1, TY_REAL)
+            call malloc (DP_AV (allstar), sz_maxgroup + 1, TY_REAL)
 
             if (DP_AC (allstar) != NULL)
                 call mfree (DP_AC (allstar), TY_REAL)
-            call malloc (DP_AC (allstar), (max_group + 1) * (max_group + 1),
-                TY_REAL)
+            call malloc (DP_AC (allstar),
+			 (sz_maxgroup + 1) * (sz_maxgroup + 1), TY_REAL)
         }
 end
 
