@@ -9,32 +9,43 @@ define	NCOLUMN	5
 
 procedure dp_pfmerge (infd, outfd, in_text, out_text, first_file)
 
-int	infd		# the input file descriptor
-int	outfd		# the output file descriptor
+pointer	infd		# the input file descriptor
+pointer	outfd		# the output file descriptor
 int	in_text		# input text file ?
 int	out_text	# output text file ?
 int	first_file	# first file ?
 
-int	nrow, instar, outstar, id
-pointer	sp, indices, fields, ocolpoint, key
+size_t	sz_val
+long	nrow, instar, outstar, l_val
+int	id, i_infd, i_outfd
+pointer	sp, fields, ocolpoint, key, indices, p_indices
 real	x, y, mag, sky
-int	tbpsta(), dp_rrphot()
+int	dp_rrphot()
+long	tbpstl()
 
 begin
+	i_infd = infd
+	i_outfd = outfd
+
 	# Allocate some memory.
 	call smark (sp)
-	call salloc (indices, NAPPAR, TY_INT)
-	call salloc (fields, SZ_LINE, TY_CHAR)
-	call salloc (ocolpoint, NCOLUMN, TY_POINTER)
+	sz_val = NAPPAR
+	call salloc (indices, sz_val, TY_INT)
+	call salloc (p_indices, sz_val, TY_POINTER)
+	sz_val = SZ_LINE
+	call salloc (fields, sz_val, TY_CHAR)
+	sz_val = NCOLUMN
+	call salloc (ocolpoint, sz_val, TY_POINTER)
 
 	# Initialize the output file.
 	if (first_file == YES) {
 	    if (out_text == YES) {
-		call seek (infd, BOF)
-		call dp_apheader (infd, outfd)
-		call dp_xpbanner (outfd)
+		l_val = BOF
+		call seek (i_infd, l_val)
+		call dp_apheader (i_infd, i_outfd)
+		call dp_xpbanner (i_outfd)
 	    } else {
-		call dp_tpdefcol (outfd, Memi[ocolpoint])
+		call dp_tpdefcol (outfd, Memp[ocolpoint])
 		call tbhcal (infd, outfd)
 	    }
 	    outstar = 0
@@ -51,8 +62,8 @@ begin
 	    call dp_gappsf (Memi[indices], Memc[fields], NAPRESULT)
 	    nrow = 0
 	} else {
-	    call dp_tpkinit (infd, Memi[indices])
-	    nrow = tbpsta (infd, TBL_NROWS)
+	    call dp_tpkinit (infd, Memp[p_indices])
+	    nrow = tbpstl (infd, TBL_NROWS)
 	}
 
 	# Loop over the stars.
@@ -60,16 +71,17 @@ begin
 	repeat {
 	    
 	    # Read the input record.
-	    if (dp_rrphot (infd, key, Memc[fields], Memi[indices], id,
-	        x, y, sky, mag, instar, nrow) == EOF)
+	    if (dp_rrphot (infd, key, Memc[fields],
+			   Memi[indices], Memp[p_indices], id,
+			   x, y, sky, mag, instar, nrow) == EOF)
 		break
 
 	    # Write the output record.
 	    outstar = outstar + 1
 	    if (out_text == YES)
-		call dp_xpselmer (outfd, id, x, y, mag, sky)
+		call dp_xpselmer (i_outfd, id, x, y, mag, sky)
 	    else
-		call dp_tpselmer (outfd, id, x, y, mag, sky, Memi[ocolpoint],
+		call dp_tpselmer (outfd, id, x, y, mag, sky, Memp[ocolpoint],
 		    outstar)
 	}
 

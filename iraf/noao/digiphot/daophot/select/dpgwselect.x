@@ -10,7 +10,7 @@ define GR_DATASTR "%-9d%10t%-6d%16t%-10.3f%26t%-10.3f%36t%-12.3f%48t%-15.7g%80t 
 procedure dp_xwrtselect (dao, grp, ngroup, group_id)
 
 pointer	dao			# pointer to the daophot structure
-pointer	grp			# pointer to group output file
+int	grp			# pointer to group output file
 int	ngroup			# number in the group
 int	group_id		# the id of the group
 
@@ -44,7 +44,7 @@ pointer	colpoint[ARB]		# column pointers
 int	ngroup			# number in group
 int	cur_group		# current group
 
-int	i, row
+long	i, row
 pointer	apsel
 
 begin
@@ -69,7 +69,7 @@ end
 
 procedure dp_xgselpars (tp, min_group, max_group)
 
-pointer	tp			# pointer to the table
+int	tp			# pointer to the table
 int	min_group		# minimum group size
 int	max_group		# maximum group size
 

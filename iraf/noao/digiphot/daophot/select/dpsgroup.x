@@ -16,17 +16,27 @@ bool	text_file			# text or table file
 int 	min_group			# minimum sized group to extract
 int	max_group			# maximum sized group to extract
 
-int	nrow_in_table, output_row, in_record, ngroup, cur_group
+size_t	sz_val
+int	i_tpin, i_tpout
+int	ngroup, cur_group
+long	nrow_in_table, in_record, output_row
 pointer	sp, indices, fields, key, icolpoint, ocolpoint
-int	tbpsta(), dp_ggroup()
+int	dp_ggroup()
+long	tbpstl()
 
 begin
+	i_tpin = tp_in
+	i_tpout = tp_out
+
 	# Allocate some working memory.
 	call smark (sp)
-	call salloc (icolpoint, NAPGROUP, TY_POINTER)
-	call salloc (indices, NAPGROUP, TY_INT)
-	call salloc (fields, SZ_LINE, TY_CHAR)
-	call salloc (ocolpoint, NCOLUMN, TY_POINTER)
+	sz_val = NAPGROUP
+	call salloc (icolpoint, sz_val, TY_POINTER)
+	call salloc (indices, sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (fields, sz_val, TY_CHAR)
+	sz_val = NCOLUMN
+	call salloc (ocolpoint, sz_val, TY_POINTER)
 
 	# Allocate some memory for reading in the group.
 	call dp_gnindices (Memi[indices])
@@ -34,13 +44,13 @@ begin
 
 	# Initialize the output file.
 	if (text_file) {
-	    call dp_apheader (tp_in, tp_out)
-	    call dp_xgselpars (tp_out, min_group, max_group)
-	    call dp_apbanner (tp_in, tp_out)
+	    call dp_apheader (i_tpin, i_tpout)
+	    call dp_xgselpars (i_tpout, min_group, max_group)
+	    call dp_apbanner (i_tpin, i_tpout)
 	} else {
 	    call tbtcre (tp_out)
 	    call tbhcal (tp_in, tp_out)
-	    call dp_tgselcol (tp_out, Memi[ocolpoint])
+	    call dp_tgselcol (tp_out, Memp[ocolpoint])
 	    call dp_tgselpars (tp_out, min_group, max_group)
 	}
 
@@ -51,8 +61,8 @@ begin
 	    nrow_in_table = 0
 	} else {
 	    key = NULL
-	    call dp_tnsinit (tp_in, Memi[icolpoint])
-	    nrow_in_table = tbpsta (tp_in, TBL_NROWS)
+	    call dp_tnsinit (tp_in, Memp[icolpoint])
+	    nrow_in_table = tbpstl (tp_in, TBL_NROWS)
 	}
 
 	# Initialize the output record counter.
@@ -65,7 +75,7 @@ begin
 
 	    # Read in the group.
 	    ngroup = dp_ggroup (dao, tp_in, key, Memc[fields], Memi[indices],
-		Memi[icolpoint], nrow_in_table, max_group, in_record,
+		Memp[icolpoint], nrow_in_table, max_group, in_record,
 		cur_group)
 	    if (ngroup <= 0)
 		break
@@ -80,11 +90,12 @@ begin
 	    }
 
 	    # Write the group to the output file.
-	    if (text_file)
-		call dp_xwrtselect (dao, tp_out, ngroup, cur_group)
-	    else
-		call dp_twrtselect (dao, tp_out, Memi[ocolpoint], ngroup,
+	    if (text_file) {
+		call dp_xwrtselect (dao, i_tpout, ngroup, cur_group)
+	    } else {
+		call dp_twrtselect (dao, tp_out, Memp[ocolpoint], ngroup,
 		   cur_group, output_row) 
+	    }
 	}
 
 	if (text_file)

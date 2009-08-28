@@ -12,14 +12,16 @@ pointer	outgroup			# the output GROUP file
 int	min_group			# the minimum group size
 int	max_group			# the maximum group size
 
+size_t	sz_val
 bool	gr_text
-int	lilist, lolist, verbose
+int	lilist, lolist, verbose, i_val
 pointer ilist, olist, sp, tp_in, tp_out, dao
 
 bool	clgetb(), itob()
-int	open(), tbtopn(), clgeti(), fstati(), btoi(), access()
-int	fntlenb(), fntgfnb()
-pointer	fntopnb()
+int	open(), clgeti(), fstati(), btoi(), access(), fntlenb(), fntgfnb()
+pointer	tbtopn(), fntopnb()
+
+include	<nullptr.inc>
 
 begin
 	# Set the standard output to flush on newline.
@@ -28,8 +30,9 @@ begin
 
 	# Get some memory.
 	call smark (sp)
-	call salloc (ingroup, SZ_FNAME, TY_CHAR)
-	call salloc (outgroup, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (ingroup, sz_val, TY_CHAR)
+	call salloc (outgroup, sz_val, TY_CHAR)
 
 	# Get the various task parameters.
 	call clgstr ("ingroupfile", Memc[ingroup], SZ_FNAME)
@@ -71,7 +74,7 @@ begin
 	    if (gr_text)
 	        tp_in = open (Memc[ingroup], READ_ONLY, TEXT_FILE)
 	    else
-	        tp_in = tbtopn (Memc[ingroup], READ_ONLY, 0)
+	        tp_in = tbtopn (Memc[ingroup], READ_ONLY, NULLPTR)
 
 	    # Open an output file of the same type as the input file.
 	    if (gr_text)
@@ -84,8 +87,10 @@ begin
 
 	    # Close the input and output files.
 	    if (gr_text) {
-	        call close (tp_in)
-	        call close (tp_out)
+		i_val = tp_in
+	        call close (i_val)
+		i_val = tp_out
+	        call close (i_val)
 	    } else {
 	        call tbtclo (tp_in)
 	        call tbtclo (tp_out)

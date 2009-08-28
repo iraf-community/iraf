@@ -14,11 +14,14 @@ pointer	inphotfiles		# the input photometry files
 pointer	outphotfile		# the output photometry file
 bool	verbose			# verbose output ?
 
-int	lplist, infd, outfd, first_file, in_text, out_text
-pointer	plist, sp, infname
+size_t	sz_val
+int	lplist, first_file, in_text, out_text, i_val
+pointer	plist, sp, infname, infd, outfd
 bool	clgetb()
 int	fstati(), fntlenb(), fntgfnb(), access(), open()
 pointer	tbtopn(), fntopnb()
+
+include	<nullptr.inc>
 
 begin
 	# Set the standard output to flush on newline.
@@ -27,9 +30,10 @@ begin
 
 	# Get some working memory.
 	call smark (sp)
-	call salloc (inphotfiles, SZ_FNAME, TY_CHAR)
-	call salloc (outphotfile, SZ_FNAME, TY_CHAR)
-	call salloc (infname, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (inphotfiles, sz_val, TY_CHAR)
+	call salloc (outphotfile, sz_val, TY_CHAR)
+	call salloc (infname, sz_val, TY_CHAR)
 
 	# Get the various task parameters.
 	call clgstr ("inphotfiles", Memc[inphotfiles], SZ_FNAME)
@@ -58,7 +62,7 @@ begin
 	if (out_text == YES)
 	    outfd = open (Memc[outphotfile], NEW_FILE, TEXT_FILE)
 	else
-	    outfd = tbtopn (Memc[outphotfile], NEW_FILE, 0)
+	    outfd = tbtopn (Memc[outphotfile], NEW_FILE, NULLPTR)
 
 	# Loop over the list of input files
 	first_file = YES
@@ -83,25 +87,29 @@ begin
 	    if (in_text == YES)
 	        infd = open (Memc[infname], READ_ONLY, TEXT_FILE)
 	    else
-	        infd = tbtopn (Memc[infname], READ_ONLY, 0)
+	        infd = tbtopn (Memc[infname], READ_ONLY, NULLPTR)
 
 	    # Now merge the files.
 	    call dp_pfmerge (infd, outfd, in_text, out_text, first_file)
 
 	    # Close the photometry file. 
-	    if (in_text == YES)
-	        call close (infd)
-	    else
+	    if (in_text == YES) {
+		i_val = infd
+	        call close (i_val)
+	    } else {
 	        call tbtclo (infd)
+	    }
 
 	    first_file = NO
 	}
 
 	# Close the output file.
-	if (out_text == YES)
-	    call close (outfd)
-	else
+	if (out_text == YES) {
+	    i_val = outfd
+	    call close (i_val)
+	} else {
 	    call tbtclo (outfd)
+	}
 
 	# Close the input file list.
 	call fntclsb (plist)
