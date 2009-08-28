@@ -8,10 +8,12 @@ procedure dp_pksetup (dao)
 
 pointer	dao			# pointer to the daophot structure
 
+size_t	sz_val
 pointer	peak
 
 begin
-	call malloc (DP_PEAK(dao), LEN_PKSTRUCT, TY_STRUCT)
+	sz_val = LEN_PKSTRUCT
+	call malloc (DP_PEAK(dao), sz_val, TY_STRUCT)
 	peak = DP_PEAK(dao)
 
 	DP_PKNTERM(peak) = 0
@@ -31,17 +33,19 @@ procedure dp_mempk (dao, nterm)
 pointer	dao			# pointer to the daophot structure
 int	nterm			# the number of terms to be fit
 
+size_t	sz_nterm
 pointer	peak
 
 begin
 	peak = DP_PEAK(dao)
+	sz_nterm = nterm
 
-	call malloc (DP_PKCLAMP(peak), nterm, TY_REAL)
-	call malloc (DP_PKNORMAL(peak), nterm * nterm, TY_REAL)
-	call malloc (DP_PKRESID(peak), nterm * nterm, TY_REAL)
-	call malloc (DP_PKDERIV(peak), nterm * nterm, TY_REAL)
-	call malloc (DP_PKRESULT(peak), nterm * nterm, TY_REAL)
-	call malloc (DP_PKOLDRESULT(peak), nterm * nterm, TY_REAL)
+	call malloc (DP_PKCLAMP(peak), sz_nterm, TY_REAL)
+	call malloc (DP_PKNORMAL(peak), sz_nterm * sz_nterm, TY_REAL)
+	call malloc (DP_PKRESID(peak), sz_nterm * sz_nterm, TY_REAL)
+	call malloc (DP_PKDERIV(peak), sz_nterm * sz_nterm, TY_REAL)
+	call malloc (DP_PKRESULT(peak), sz_nterm * sz_nterm, TY_REAL)
+	call malloc (DP_PKOLDRESULT(peak), sz_nterm * sz_nterm, TY_REAL)
 	DP_PKNTERM(peak) = nterm
 end
 

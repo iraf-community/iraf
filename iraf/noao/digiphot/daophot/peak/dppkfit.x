@@ -9,7 +9,7 @@ int procedure dp_pkfit (dao, subim, nx, ny, radius, x, y, dx, dy, rel_bright,
 
 pointer	dao		# pointer to the DAOPHOT Structure
 real	subim[nx,ny]	# pointer to the image subraster
-int	nx, ny		# size of the image subraster
+size_t	nx, ny		# size of the image subraster
 real	radius		# the fitting radius
 real	x, y		# initial estimate of the stellar position
 real	dx, dy		# distance of star from the psf position
@@ -20,11 +20,14 @@ real	chi		# estimated goodness of fit parameter
 real	sharp		# broadness of the profile compared to the PSF
 int	iter		# number of iterations needed for a fit.
 
+size_t	sz_val
 bool	clip, redo
-int	i, flag, npix
+int	i, flag
+long	npix
 pointer	psffit, peak
 real	ronoise, numer, denom, chiold, sum_weight, noise, wcrit
-int	dp_fitbuild()
+long	dp_fitbuild()
+real	aabs()
 
 begin
 	# Get the pointer to the PSF structure.
@@ -38,8 +41,9 @@ begin
 	clip = false
 	ronoise = (DP_READNOISE(dao) / DP_PHOTADU(dao)) ** 2
 
-	call amovkr (1.0, Memr[DP_PKCLAMP(peak)], DP_PKNTERM(peak))
-	call amovkr (0.0, Memr[DP_PKOLDRESULT(peak)], DP_PKNTERM(peak))
+	sz_val = DP_PKNTERM(peak)
+	call amovkr (1.0, Memr[DP_PKCLAMP(peak)], sz_val)
+	call amovkr (0.0, Memr[DP_PKOLDRESULT(peak)], sz_val)
 
 	# Iterate until a solution is found.
 
@@ -51,9 +55,10 @@ begin
 	    numer = 0.0
 	    denom = 0.0
 	    sum_weight = 0.0
-	    call aclrr (Memr[DP_PKRESID(peak)], DP_PKNTERM(peak))
-	    call aclrr (Memr[DP_PKNORMAL(peak)], DP_PKNTERM(peak) *
-	        DP_PKNTERM(peak))
+	    sz_val = DP_PKNTERM(peak)
+	    call aclrr (Memr[DP_PKRESID(peak)], sz_val)
+	    sz_val = DP_PKNTERM(peak) * DP_PKNTERM(peak)
+	    call aclrr (Memr[DP_PKNORMAL(peak)], sz_val)
 
 	    # Set up the critical error limit.
 	    if (iter >= WCRIT_NMAX)
@@ -133,15 +138,15 @@ begin
 
 	    if (DP_RECENTER(dao) == YES) {
 	        x = x + Memr[DP_PKRESULT(peak)+1] / (1.0 +
-	            abs (Memr[DP_PKRESULT(peak)+1]) / (MAX_DELTA_PIX *
+	            aabs (Memr[DP_PKRESULT(peak)+1]) / (MAX_DELTA_PIX *
 		    Memr[DP_PKCLAMP(peak)+1]))
 	        y = y + Memr[DP_PKRESULT(peak)+2] / (1.0 +
-	            abs (Memr[DP_PKRESULT(peak)+2]) / (MAX_DELTA_PIX *
+	            aabs (Memr[DP_PKRESULT(peak)+2]) / (MAX_DELTA_PIX *
 		    Memr[DP_PKCLAMP(peak)+2]))
 	    }
 
 	    if (DP_FITSKY(dao) == YES) {
-		noise = sqrt ((abs (sky / DP_PHOTADU(dao)) + ronoise)) 
+		noise = sqrt ((aabs (sky / DP_PHOTADU(dao)) + ronoise)) 
 	        sky = sky + max (-3.0 * noise, min (Memr[DP_PKRESULT(peak)+
 		    DP_PKNTERM(peak)-1], 3.0 * noise)) 
 	    }
@@ -161,33 +166,33 @@ begin
 
 	    errmag = chiold * sqrt (Memr[DP_PKNORMAL(peak)])
 	    if (clip) {
-	        if (abs (Memr[DP_PKRESULT(peak)]) > max ((MAX_NEW_ERRMAG *
+	        if (aabs (Memr[DP_PKRESULT(peak)]) > max ((MAX_NEW_ERRMAG *
 		    errmag), (MAX_NEW_RELBRIGHT1 * rel_bright))) {
 		    redo = true
 	        } else {
 		    if (DP_RECENTER(dao) == YES) {
-		        if (max (abs (Memr[DP_PKRESULT(peak)+1]),
-	                    abs (Memr[DP_PKRESULT(peak)+2])) > MAX_PIXERR1)
+		        if (max (aabs (Memr[DP_PKRESULT(peak)+1]),
+	                    aabs (Memr[DP_PKRESULT(peak)+2])) > MAX_PIXERR1)
 		            redo = true
 		    }
 		    if (DP_FITSKY(dao) == YES) {
-		        if (abs (Memr[DP_PKRESULT(peak)+DP_PKNTERM(peak)-1]) >
+		        if (aabs (Memr[DP_PKRESULT(peak)+DP_PKNTERM(peak)-1]) >
 			    1.0e-4 * sky)
 			    redo = true
 		    }
 		}
 	    } else {
-	        if (abs (Memr[DP_PKRESULT(peak)]) > max (errmag,
+	        if (aabs (Memr[DP_PKRESULT(peak)]) > max (errmag,
 		    (MAX_NEW_RELBRIGHT2 * rel_bright))) {
 		    redo = true
 	        } else {
 		    if (DP_RECENTER(dao) == YES) {
-		        if (max (abs (Memr[DP_PKRESULT(peak)+1]),
-	                    abs (Memr[DP_PKRESULT(peak)+2])) > MAX_PIXERR2)
+		        if (max (aabs (Memr[DP_PKRESULT(peak)+1]),
+	                    aabs (Memr[DP_PKRESULT(peak)+2])) > MAX_PIXERR2)
 		            redo = true
 		    }
 		    if (DP_FITSKY(dao) == YES) {
-		        if (abs (Memr[DP_PKRESULT(peak)+DP_PKNTERM(peak)-1]) >
+		        if (aabs (Memr[DP_PKRESULT(peak)+DP_PKNTERM(peak)-1]) >
 			    1.0e-4 * sky)
 			    redo = true
 		    }
@@ -199,9 +204,11 @@ begin
 	    if ((iter < DP_MAXITER(dao)) && (! clip)) {
 		if (DP_CLIPEXP(dao) > 0)
 		    clip = true
-		call aclrr (Memr[DP_PKOLDRESULT(peak)], DP_PKNTERM(peak))
+		sz_val = DP_PKNTERM(peak)
+		call aclrr (Memr[DP_PKOLDRESULT(peak)], sz_val)
+		sz_val = DP_PKNTERM(peak)
 		call amaxkr (Memr[DP_PKCLAMP(peak)], MAX_CLAMPFACTOR,
-		    Memr[DP_PKCLAMP(peak)], DP_PKNTERM(peak))
+			     Memr[DP_PKCLAMP(peak)], sz_val)
 	    } else {
 		sharp = 1.4427 * Memr[DP_PSFPARS(psffit)] *
 	    	    Memr[DP_PSFPARS(psffit)+1] * numer / (DP_PSFHEIGHT(psffit) *
@@ -223,13 +230,13 @@ end
 
 # DP_FITBUILD -- Build the normal and vector of residuals for the fit.
 
-int procedure dp_fitbuild (dao, subim, nx, ny, radius, x, y, xfrom_psf,
+long procedure dp_fitbuild (dao, subim, nx, ny, radius, x, y, xfrom_psf,
 	yfrom_psf, rel_bright, sky, chiold, chi, clip, iter, clamp, normal,
 	resid, deriv, nterm, numer, denom, sum_weight)
 
 pointer	dao			# pointer to the DAOPHOT Structure
 real	subim[nx,ny]		# subimage containing star
-int	nx, ny			# size of the image subraster
+size_t	nx, ny			# size of the image subraster
 real	radius			# the fitting radius
 real	x, y			# initial estimate of the position
 real	xfrom_psf, yfrom_psf	# distance from the psf star
@@ -247,14 +254,16 @@ int	nterm			# the number of terms to be fit
 real	numer, denom		# used in sharpness calculation
 real	sum_weight		# sum of the weights
 
-int	i, j, ix, iy, lowx, lowy, highx, highy, npix
+int	i, j
+long	ix, iy, lowx, lowy, highx, highy, npix
 pointer	psffit
 real	fitradsq, pererr, peakerr, datamin, datamax, read_noise
 real	dx, dy, dxsq, dysq, radsq, dvdx, dvdy, d_pixval
 real	pred_pixval, sigma, sigmasq, relerr, weight
 real 	rhosq, pixval, dfdsig
 
-real	dp_usepsf()
+real	dp_usepsf(), aabs()
+long	lint()
 
 begin
 	# Get the pointer to the PSF structure.
@@ -276,10 +285,10 @@ begin
 	    datamax = DP_MAXGDATA(dao)
 
 	# Define the size of the subraster to be used in the fit.
-	lowx = max (1, int (x - radius))
-	lowy = max (1, int (y - radius))
-	highx = min (nx, int (x + radius) + 1)	
-	highy = min (ny, int (y + radius) + 1)	
+	lowx = max (1, lint (x - radius))
+	lowy = max (1, lint (y - radius))
+	highx = min (nx, lint (x + radius) + 1)	
+	highy = min (ny, lint (y + radius) + 1)	
 
 	npix = 0
 	do iy = lowy, highy {
@@ -331,7 +340,7 @@ begin
 		if (sigmasq <= 0.0)
 		    next
 		sigma = sqrt (sigmasq)
-		relerr = abs (d_pixval / sigma)
+		relerr = aabs (d_pixval / sigma)
 
 		# Compute the radial wweighting function.
 		weight = 5.0 / (5.0 + radsq / (1.0 - radsq))

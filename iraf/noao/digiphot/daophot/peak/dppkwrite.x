@@ -10,19 +10,24 @@ procedure dp_tnewpeak (dao, tp, colpoint)
 
 pointer	dao		# pointer to the daophot strucuture
 pointer	tp		# pointer to the output table
-int	colpoint[ARB]	# array of column pointers
+pointer	colpoint[ARB]	# array of column pointers
 
+size_t	sz_val
 int	i
 pointer	sp, colnames, colunits, colformat, col_dtype, col_len
 
 begin
 	# Allocate space for the table definition.
 	call smark (sp)
-	call salloc (colnames, PK_NOUTCOL * (SZ_COLNAME + 1), TY_CHAR)
-	call salloc (colunits, PK_NOUTCOL * (SZ_COLUNITS + 1), TY_CHAR)
-	call salloc (colformat, PK_NOUTCOL * (SZ_COLFMT + 1), TY_CHAR)
-	call salloc (col_dtype, PK_NOUTCOL, TY_INT)
-	call salloc (col_len, PK_NOUTCOL, TY_INT)
+	sz_val = PK_NOUTCOL * (SZ_COLNAME + 1)
+	call salloc (colnames, sz_val, TY_CHAR)
+	sz_val = PK_NOUTCOL * (SZ_COLUNITS + 1)
+	call salloc (colunits, sz_val, TY_CHAR)
+	sz_val = PK_NOUTCOL * (SZ_COLFMT + 1)
+	call salloc (colformat, sz_val, TY_CHAR)
+	sz_val = PK_NOUTCOL
+	call salloc (col_dtype, sz_val, TY_INT)
+	call salloc (col_len, sz_val, TY_LONG)
 
 	# Set up the column definitions.
 	call strcpy (ID, Memc[colnames], SZ_COLNAME)
@@ -78,11 +83,11 @@ begin
 
 	# Define the column lengths.
 	do i = 1, PK_NOUTCOL 
-	    Memi[col_len+i-1] = 1
+	    Meml[col_len+i-1] = 1
 	
 	# Define and create the table.
 	call tbcdef (tp, colpoint, Memc[colnames], Memc[colunits],
-	    Memc[colformat], Memi[col_dtype], Memi[col_len], PK_NOUTCOL)
+	    Memc[colformat], Memi[col_dtype], Meml[col_len], PK_NOUTCOL)
 	call tbtcre (tp)
 
 	# Write out some header parameters.
@@ -135,6 +140,7 @@ procedure dp_tpeakpars (dao, tp)
 pointer	dao			# pointer to the daophot structure
 pointer	tp			# pointer to the output table
 
+size_t	sz_val
 pointer	sp, psffit, outstr, date, time
 bool	itob()
 int	envfind()
@@ -145,9 +151,11 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
 
 	# Write the id.
 	if (envfind ("version", Memc[outstr], SZ_LINE) <= 0)
@@ -216,6 +224,7 @@ procedure dp_xpeakpars (dao, tp)
 pointer	dao			# pointer to the daophot structure
 int	tp			# the output file descriptor
 
+size_t	sz_val
 pointer	sp, psffit, outstr, date, time
 bool	itob()
 int	envfind()
@@ -226,9 +235,11 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
 
 	# Write the id.
 	if (envfind ("version", Memc[outstr], SZ_LINE) <= 0)
@@ -297,7 +308,7 @@ procedure dp_tpkwrite (tpout, colpoint, id, x, y, mag, errmag, sky, niter, chi,
 	sharp, pier, perror, plen, star)
 
 pointer	tpout		# pointer to the output table
-int	colpoint[ARB]	# array of column pointers
+pointer	colpoint[ARB]	# array of column pointers
 int	id		# id of the star
 real	x, y		# position of the star
 real	mag		# magnitude of the star
@@ -309,7 +320,7 @@ real	sharp		# sharpness characteristic
 int	pier		# the error code
 char	perror[ARB]	# the error string
 int	plen		# the length of the error code string
-int	star		# row number
+long	star		# row number
 
 begin
 	call tbrpti (tpout, colpoint[1], id, 1, star)
@@ -335,7 +346,7 @@ define PK_DATA2STR "%12t%-12.3f%24t%-12.3f%36t%-6d%42t%-13.13s%80t \n"
 procedure dp_xpkwrite (tpout, id, x, y, mag, errmag, sky, niter, chi, sharp,
 	pier, perror, plen)
 
-int 	tpout		# the output file descriptor
+int	tpout		# the output file descriptor
 int	id		# id of the star
 real	x, y		# position of the star
 real	mag		# magnitude of the star

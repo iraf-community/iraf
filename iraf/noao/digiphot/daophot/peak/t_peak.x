@@ -12,19 +12,22 @@ pointer	psfimage			# the PSF image
 pointer	peakfile			# output PEAK photometry file
 pointer	rejfile				# output PEAK rejections file
 
+size_t	sz_val
 pointer	sp, im, psfim, outfname, dao, str
-pointer	alist, olist, rlist, imlist, pimlist
-int	apd, root, verbose, verify, cache, update, pkfd, rejfd
-int	limlist, lalist, lpimlist, lolist
-int	lrlist, wcs, buf_size, memstat
+pointer	alist, olist, rlist, imlist, pimlist, pkfd, rejfd, apd
+int	root, verbose, verify, cache, update, i_val
+int	limlist, lalist, lpimlist, lolist, lrlist, wcs, memstat
+long	l_val
 bool	ap_text
-size_t	req_size, old_size
+size_t	req_size, old_size, buf_size
 
 pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	open(), fnldir(), strlen(), strncmp(), fstati(), btoi()
 int	access(), imtlen(), imtgetim(), fntlenb()
 int	fntgfnb(), clgwrd(), sizeof(), dp_memstat()
 bool	clgetb(), itob()
+
+include	<nullptr.inc>
 
 begin
 	# Set the standard output to flush on newline.
@@ -33,13 +36,14 @@ begin
 
 	# Get some working memory.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (photfile, SZ_FNAME, TY_CHAR)
-	call salloc (psfimage, SZ_FNAME, TY_CHAR)
-	call salloc (peakfile, SZ_FNAME, TY_CHAR)
-	call salloc (rejfile, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (photfile, sz_val, TY_CHAR)
+	call salloc (psfimage, sz_val, TY_CHAR)
+	call salloc (peakfile, sz_val, TY_CHAR)
+	call salloc (rejfile, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the various task parameters
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -160,7 +164,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the image.
-	    im = immap (Memc[image], READ_ONLY, 0)		
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
 
@@ -168,8 +172,10 @@ begin
             req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
             memstat = dp_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call dp_pcache (im, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call dp_pcache (im, l_val, buf_size)
+	    }
 
 	    # Open the input photometry file.
 	    if (fntgfnb (alist, Memc[photfile], SZ_FNAME) == EOF)
@@ -185,7 +191,7 @@ begin
 	    if (ap_text)
 	        apd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else
-	        apd = tbtopn (Memc[outfname], READ_ONLY, 0)
+	        apd = tbtopn (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 
 	    # Read in the PSF function.
@@ -198,7 +204,7 @@ begin
 		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
-	    psfim = immap (Memc[outfname], READ_ONLY, 0)
+	    psfim = immap (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_readpsf (dao, psfim)
 	    call dp_sets (dao, PSFIMAGE, Memc[outfname])
 	
@@ -219,7 +225,7 @@ begin
 	    if (DP_TEXT(dao) == YES)
 	        pkfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	    else
-	        pkfd = tbtopn (Memc[outfname], NEW_FILE, 0)
+	        pkfd = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 	    call dp_sets (dao, OUTPHOTFILE, Memc[outfname])
 
 	    # Open the output rejections file if any are defined. If the
@@ -243,7 +249,7 @@ begin
 	        if (DP_TEXT(dao) == YES)
 	            rejfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	        else
-	            rejfd = tbtopn (Memc[outfname], NEW_FILE, 0)
+	            rejfd = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 	    }
 	    call dp_sets (dao, OUTREJFILE, Memc[outfname])
 
@@ -254,26 +260,32 @@ begin
 	    call imunmap (im)
 
 	    # Close the input photometry file. 
-	    if (ap_text)
-	        call close (apd)
-	    else
+	    if (ap_text) {
+		i_val = apd
+	        call close (i_val)
+	    } else {
 	        call tbtclo (apd)
+	    }
 
 	    # Close the PSF image.
 	    call imunmap (psfim)
 
 	    # Close the output photometry file.
-	    if (DP_TEXT(dao) == YES)
-	        call close (pkfd)
-	    else
+	    if (DP_TEXT(dao) == YES) {
+		i_val = pkfd
+	        call close (i_val)
+	    } else {
 	        call tbtclo (pkfd)
+	    }
 
 	    # Close the output rejections file.
 	    if (rejfd != NULL) {
-	        if (DP_TEXT(dao) == YES)
-	            call close (rejfd)
-	        else
+	        if (DP_TEXT(dao) == YES) {
+		    i_val = rejfd
+	            call close (i_val)
+		} else {
 	            call tbtclo (rejfd)
+		}
 	    }
 
             # Uncache memory.

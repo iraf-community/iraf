@@ -11,21 +11,26 @@ procedure dp_peakphot (dao, im, tp, tpout, tprej, ap_text)
 
 pointer	dao			# pointer to the daophot structure
 pointer	im			# the input image descriptor
-int	tp			# the input photometry file descriptor
-int	tpout			# the ouput photometry file descriptor
-int	tprej			# the rejections file descriptor
+pointer	tp			# the input photometry file descriptor
+pointer	tpout			# the ouput photometry file descriptor
+pointer	tprej			# the rejections file descriptor
 bool	ap_text			# which style of photometry
 
+size_t	sz_val, c_1
 real	rel_bright, xold, yold, x, y, dx, dy, mag, sky, errmag
 real	chi, sharp, radius, itx, ity, otx, oty
-pointer	psffit, key, sp, subim, colpoint, indices, fields, perror
-int	id, in_nrow, instar, lowx, lowy, nxpix, nypix, niter, out_nrow
-int	rout_nrow, nterm, ier, plen
+pointer	psffit, key, sp, subim, colpoint, fields, perror, indices, p_indices
+int	id, niter, nterm, ier, plen, i_val
+long	lowx, lowy, in_nrow, instar, out_nrow, rout_nrow
+size_t	nxpix, nypix
 
-int	tbpsta(), dp_rrphot(), dp_pkfit(), dp_gpkerr()
+int	dp_rrphot(), dp_pkfit(), dp_gpkerr()
+long	tbpstl()
 pointer	dp_gsubrast()
 
 begin
+	c_1 = 1
+
 	# Get the daophot pointers.
 	psffit = DP_PSFFIT (dao)
 
@@ -38,20 +43,29 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (indices, NAPPAR, TY_INT)
-	call salloc (fields, SZ_LINE, TY_CHAR)
-	call salloc (colpoint, PK_NOUTCOL, TY_INT)
-	call salloc (perror, SZ_FNAME, TY_CHAR)
+	sz_val = NAPPAR
+	call salloc (indices, sz_val, TY_INT)
+	call salloc (p_indices, sz_val, TY_POINTER)
+	sz_val = SZ_LINE
+	call salloc (fields, sz_val, TY_CHAR)
+	sz_val = PK_NOUTCOL
+	call salloc (colpoint, sz_val, TY_POINTER)
+	sz_val = SZ_FNAME
+	call salloc (perror, sz_val, TY_CHAR)
 
 	# Initialze the output table.
 	if (DP_TEXT(dao) == YES) {
-	    call dp_xnewpeak (dao, tpout)
-	    if (tprej != NULL)
-	        call dp_xnewpeak (dao, tprej)
+	    i_val = tpout
+	    call dp_xnewpeak (dao, i_val)
+	    if (tprej != NULL) {
+		i_val = tprej
+	        call dp_xnewpeak (dao, i_val)
+	    }
 	} else {
-	    call dp_tnewpeak (dao, tpout, Memi[colpoint])
-	    if (tprej != NULL)
-	        call dp_tnewpeak (dao, tprej, Memi[colpoint])
+	    call dp_tnewpeak (dao, tpout, Memp[colpoint])
+	    if (tprej != NULL) {
+	        call dp_tnewpeak (dao, tprej, Memp[colpoint])
+	    }
 	}
 
 	# Intialize the input table.
@@ -65,8 +79,8 @@ begin
 	    call dp_gappsf (Memi[indices], Memc[fields], NAPRESULT)
 	    in_nrow = 0
 	} else {
-	    call dp_tpkinit (tp, Memi[indices])
-	    in_nrow = tbpsta (tp, TBL_NROWS)
+	    call dp_tpkinit (tp, Memp[indices])
+	    in_nrow = tbpstl (tp, TBL_NROWS)
 	}
 
 	# Initialize the photometry file reading code.
@@ -86,13 +100,14 @@ begin
 	repeat {
 
 	    # Read in the photometry for a single star.
-	    if (dp_rrphot (tp, key, Memc[fields], Memi[indices], id, itx,
-	        ity, sky, mag, instar, in_nrow) == EOF)
+	    if (dp_rrphot (tp, key, Memc[fields],
+			   Memi[indices], Memp[p_indices], id, itx,
+			   ity, sky, mag, instar, in_nrow) == EOF)
 		break
 
 	    # Convert to and from logical coordinates.
-	    call dp_win (dao, im, itx, ity, x, y, 1)
-	    call dp_wout (dao, im, x, y, otx, oty, 1)
+	    call dp_win (dao, im, itx, ity, x, y, c_1)
+	    call dp_wout (dao, im, x, y, otx, oty, c_1)
 
 	    if (DP_VERBOSE(dao) == YES) {
 	        call printf (
@@ -130,7 +145,7 @@ begin
 	    # option.
 	    xold = x
 	    yold = y
-	    call dp_wpsf (dao, im, xold, yold, xold, yold, 1)
+	    call dp_wpsf (dao, im, xold, yold, xold, yold, c_1)
 
 	    # Compute the relative centers and the relative brightness and
 	    # fit the star.
@@ -153,7 +168,7 @@ begin
 	        y = y + lowy - 1.0
 	    }
 
-	    call dp_wout (dao, im, x, y, otx, oty, 1)
+	    call dp_wout (dao, im, x, y, otx, oty, c_1)
 
 	    if (ier != PKERR_OK) {
 
@@ -213,21 +228,24 @@ begin
 	    # Now write the results to the output photometry or rejections
 	    # file.
 	    if (DP_TEXT(dao) == YES) {
-		if ((tprej != NULL) && (ier != PKERR_OK))
-		    call dp_xpkwrite (tprej, id, otx, oty, mag, errmag, sky,
+		if ((tprej != NULL) && (ier != PKERR_OK)) {
+		    i_val = tprej
+		    call dp_xpkwrite (i_val, id, otx, oty, mag, errmag, sky,
 		        niter, chi, sharp, ier, Memc[perror], plen)
-		else
-		    call dp_xpkwrite (tpout, id, otx, oty, mag, errmag, sky,
+		} else {
+		    i_val = tpout
+		    call dp_xpkwrite (i_val, id, otx, oty, mag, errmag, sky,
 		        niter, chi, sharp, ier, Memc[perror], plen)
+		}
 	    } else {
 		if ((tprej != NULL) && (ier != PKERR_OK)) {
 	            rout_nrow = rout_nrow + 1
-		    call dp_tpkwrite (tprej, Memi[colpoint], id, otx, oty, mag,
+		    call dp_tpkwrite (tprej, Memp[colpoint], id, otx, oty, mag,
 		        errmag, sky, niter, chi, sharp, ier,
 			Memc[perror], plen, rout_nrow)
 		} else {
 	            out_nrow = out_nrow + 1
-		    call dp_tpkwrite (tpout, Memi[colpoint], id, otx, oty, mag,
+		    call dp_tpkwrite (tpout, Memp[colpoint], id, otx, oty, mag,
 		        errmag, sky, niter, chi, sharp, ier, Memc[perror],
 			plen, out_nrow)
 		}
