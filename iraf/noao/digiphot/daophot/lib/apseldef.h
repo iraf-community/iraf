@@ -44,14 +44,14 @@ define	PERROR		"PERROR"
 define	LEN_DPAPSTRUCT	(15)
 
 define	DP_APNUM	Memi[P2I($1)]	# number of stars in list
-define	DP_APRESULT	Memi[P2I($1+1)]	# pointer to fields needed
-define	DP_APID		Memi[P2I($1+2)]	# pointer to star ids
-define	DP_APXCEN	Memi[P2I($1+3)]	# pointer to stellar x centers
-define	DP_APYCEN	Memi[P2I($1+4)]	# pointer to stellar y centers
-define	DP_APMAG	Memi[P2I($1+5)]	# pointer to magnitudes
-define	DP_APERR	Memi[P2I($1+6)]	# pointer to magnitude errors
-define	DP_APMSKY	Memi[P2I($1+7)]	# pointer to sky values
-define	DP_APGROUP	Memi[P2I($1+8)]	# pointer to group numbers
-define	DP_APNITER	Memi[P2I($1+9)]	# pointer to number of iterations
-define	DP_APCHI	Memi[P2I($1+10)]	# pointer to output chi values
-define	DP_APSHARP	Memi[P2I($1+11)]	# pointer to output sharp values
+define	DP_APRESULT	Memp[$1+1]	# pointer to fields needed
+define	DP_APID		Memp[$1+2]	# pointer to star ids
+define	DP_APXCEN	Memp[$1+3]	# pointer to stellar x centers
+define	DP_APYCEN	Memp[$1+4]	# pointer to stellar y centers
+define	DP_APMAG	Memp[$1+5]	# pointer to magnitudes
+define	DP_APERR	Memp[$1+6]	# pointer to magnitude errors
+define	DP_APMSKY	Memp[$1+7]	# pointer to sky values
+define	DP_APGROUP	Memp[$1+8]	# pointer to group numbers
+define	DP_APNITER	Memp[$1+9]	# pointer to number of iterations
+define	DP_APCHI	Memp[$1+10]	# pointer to output chi values
+define	DP_APSHARP	Memp[$1+11]	# pointer to output sharp values

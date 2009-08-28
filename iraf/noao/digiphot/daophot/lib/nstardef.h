@@ -4,19 +4,19 @@ define	LEN_NSTARSTRUCT (20)
 
 define	DP_NGNUM	Memi[P2I($1)]	# current group number 
 define	DP_NNUM		Memi[P2I($1+1)]	# number of stars in current group
-define	DP_NSTARCOLS	Memi[P2I($1+2)]	# pointer to NSTAR table columns
-define	DP_NNPIX	Memi[P2I($1+3)]	# pointer to number of pixels
-define	DP_NNUMER	Memi[P2I($1+4)]	# pointer to NUMER in curr group
-define	DP_NDENOM	Memi[P2I($1+5)]	# pointer to DENOM stat in curr group
-define	DP_NSKIP	Memi[P2I($1+6)]	# pointer to SKIP in curr group
-define	DP_NXCLAMP	Memi[P2I($1+7)]	# pointer to CLAMP stat in curr group
-define	DP_NXOLD	Memi[P2I($1+8)]	# pointer to XOLD stat in curr group
-define  DP_NX		Memi[P2I($1+9)]	# pointer to X array in curr group
-define  DP_NV		Memi[P2I($1+10)]	# pointer to V array in curr group
-define  DP_NSUMWT	Memi[P2I($1+11)]	# pointer to SUMWT array in curr group
-define  DP_NC	        Memi[P2I($1+12)]	# pointer to C array in curr group
-define	DP_NRPIXSQ	Memi[P2I($1+13)]	# pointer to RPIXSQ array in curr group
-define	DP_NIER		Memi[P2I($1+14)]	# pointer to NSTAR error codes
+define	DP_NSTARCOLS	Memp[$1+2]	# pointer to NSTAR table columns
+define	DP_NNPIX	Memp[$1+3]	# pointer to number of pixels
+define	DP_NNUMER	Memp[$1+4]	# pointer to NUMER in curr group
+define	DP_NDENOM	Memp[$1+5]	# pointer to DENOM stat in curr group
+define	DP_NSKIP	Memp[$1+6]	# pointer to SKIP in curr group
+define	DP_NXCLAMP	Memp[$1+7]	# pointer to CLAMP stat in curr group
+define	DP_NXOLD	Memp[$1+8]	# pointer to XOLD stat in curr group
+define  DP_NX		Memp[$1+9]	# pointer to X array in curr group
+define  DP_NV		Memp[$1+10]	# pointer to V array in curr group
+define  DP_NSUMWT	Memp[$1+11]	# pointer to SUMWT array in curr group
+define  DP_NC	        Memp[$1+12]	# pointer to C array in curr group
+define	DP_NRPIXSQ	Memp[$1+13]	# pointer to RPIXSQ array in curr group
+define	DP_NIER		Memp[$1+14]	# pointer to NSTAR error codes
 
 # Definitions controlling the input / output format
 

@@ -55,38 +55,38 @@ define 	LEN_PSFSTRUCT (50)
 
 # arrays required for fitting analytic psf and the look-up table 
 
-define	DP_LENUSERAREA	Memi[P2I($1)]	# size of the output psf user area
-define	DP_PC		Memi[P2I($1+1)]	# pointer to fitting matrix
-define	DP_PV		Memi[P2I($1+3)]	# pointer to fitting vector
-define	DP_PTMP		Memi[P2I($1+4)]	# pointer to temporary vector
-define	DP_PZ		Memi[P2I($1+5)]	# pointer to parameter changes
-define	DP_PCLAMP	Memi[P2I($1+6)]	# pointer to clamp vector
-define	DP_POLD		Memi[P2I($1+7)]	# pointer to previous parameter changes
+define	DP_LENUSERAREA	Memz[P2Z($1)]	# size of the output psf user area
+define	DP_PC		Memp[$1+1]	# pointer to fitting matrix
+define	DP_PV		Memp[$1+3]	# pointer to fitting vector
+define	DP_PTMP		Memp[$1+4]	# pointer to temporary vector
+define	DP_PZ		Memp[$1+5]	# pointer to parameter changes
+define	DP_PCLAMP	Memp[$1+6]	# pointer to clamp vector
+define	DP_POLD		Memp[$1+7]	# pointer to previous parameter changes
 define	DP_PSIGANA	Memr[P2R($1+8)]	# normalized sigma for analytic fit
 define	DP_PSUMANA	Memr[P2R($1+9)]	# number of points in analytic fit
 
 # dimensions and arrays required for psf star list
 
 define	DP_PNUM		Memi[P2I($1+10)]	# number of stars in PSF
-define	DP_PSAT		Memi[P2I($1+11)]	# pointer to PSF star saturation indices
-define	DP_PXCEN	Memi[P2I($1+12)]	# pointer to the PSF star x coords
-define  DP_PYCEN	Memi[P2I($1+13)]	# pointer to the PSF star y coords
-define	DP_PMAG		Memi[P2I($1+14)]	# pointer to the PSF star list mags
-define	DP_PH		Memi[P2I($1+15)]	# pointer to the PSF star heights
-define	DP_PWEIGHT	Memi[P2I($1+16)]	# pointer to the PSF star weights
-define	DP_PXCLAMP	Memi[P2I($1+17)]	# pointer to the PSF star x clamps
-define	DP_PYCLAMP	Memi[P2I($1+18)]	# pointer to the PSF star y clamps
-define	DP_PXOLD	Memi[P2I($1+19)]	# pointer to the old PSF star x values
-define	DP_PYOLD	Memi[P2I($1+20)]	# pointer to the old PSF star y values 
+define	DP_PSAT		Memp[$1+11]	# pointer to PSF star saturation indices
+define	DP_PXCEN	Memp[$1+12]	# pointer to the PSF star x coords
+define  DP_PYCEN	Memp[$1+13]	# pointer to the PSF star y coords
+define	DP_PMAG		Memp[$1+14]	# pointer to the PSF star list mags
+define	DP_PH		Memp[$1+15]	# pointer to the PSF star heights
+define	DP_PWEIGHT	Memp[$1+16]	# pointer to the PSF star weights
+define	DP_PXCLAMP	Memp[$1+17]	# pointer to the PSF star x clamps
+define	DP_PYCLAMP	Memp[$1+18]	# pointer to the PSF star y clamps
+define	DP_PXOLD	Memp[$1+19]	# pointer to the old PSF star x values
+define	DP_PYOLD	Memp[$1+20]	# pointer to the old PSF star y values 
 
 # additional arrays required for fitting the look-up table
 
-define	DP_PSUMN	Memi[P2I($1+21)]	# pointer to the number of points
-define	DP_PSUMW	Memi[P2I($1+22)]	# pointer to the weights corrections
-define	DP_PSUMSQ	Memi[P2I($1+23)]	# pointer to the resdiduals
-define	DP_PSIGMA	Memi[P2I($1+24)]	# pointer to the standard deviations
-define	DP_PCONST	Memi[P2I($1+25)]	# pointer to the const part of psf
-define	DP_POLDLUT 	Memi[P2I($1+26)]	# pointer to the old lookup table
+define	DP_PSUMN	Memp[$1+21]	# pointer to the number of points
+define	DP_PSUMW	Memp[$1+22]	# pointer to the weights corrections
+define	DP_PSUMSQ	Memp[$1+23]	# pointer to the resdiduals
+define	DP_PSIGMA	Memp[$1+24]	# pointer to the standard deviations
+define	DP_PCONST	Memp[$1+25]	# pointer to the const part of psf
+define	DP_POLDLUT 	Memp[$1+26]	# pointer to the old lookup table
 
 # description of current psf star
 

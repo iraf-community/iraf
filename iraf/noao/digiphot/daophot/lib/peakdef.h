@@ -14,12 +14,12 @@ define	PKERR_FAINT		4
 define	LEN_PKSTRUCT	10
 
 define	DP_PKNTERM	Memi[P2I($1)]	# the number of terms to be fit
-define	DP_PKCLAMP	Memi[P2I($1+1)]	# pointer to the clamp array
-define	DP_PKNORMAL	Memi[P2I($1+2)]	# pointer to the norm array
-define	DP_PKRESID	Memi[P2I($1+3)]	# pointer to the residuals vector
-define	DP_PKDERIV	Memi[P2I($1+4)]	# pointer to the derivative array
-define	DP_PKRESULT	Memi[P2I($1+5)]	# pointer to the results vector
-define	DP_PKOLDRESULT	Memi[P2I($1+6)]	# pointer to the old results vector
+define	DP_PKCLAMP	Memp[$1+1]	# pointer to the clamp array
+define	DP_PKNORMAL	Memp[$1+2]	# pointer to the norm array
+define	DP_PKRESID	Memp[$1+3]	# pointer to the residuals vector
+define	DP_PKDERIV	Memp[$1+4]	# pointer to the derivative array
+define	DP_PKRESULT	Memp[$1+5]	# pointer to the results vector
+define	DP_PKOLDRESULT	Memp[$1+6]	# pointer to the old results vector
 
 # Definitions controlling input / output variables
 

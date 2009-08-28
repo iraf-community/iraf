@@ -121,25 +121,25 @@ define	LEN_DPSTRUCT (70 + 17 * SZ_FNAME + 17)
 # sub-structure pointers
 
 define	DP_VERSION	Memi[P2I($1)]	# package version number
-define	DP_ADDSTAR	Memi[P2I($1+1)]	# pointer to addstar structure
-define	DP_ALLSTAR	Memi[P2I($1+2)]	# pointer to allstar structure (used)
-define	DP_APSEL	Memi[P2I($1+3)]	# pointer to phot structure (used)
-define	DP_GROUP	Memi[P2I($1+4)]	# pointer to group structure
-define	DP_NSTAR	Memi[P2I($1+5)]	# pointer to nstar structure (used)
-define	DP_PEAK		Memi[P2I($1+6)]	# pointer to the peak structure
-define	DP_PSF		Memi[P2I($1+7)]	# pointer to psf structure (used)
-define	DP_PSFFIT	Memi[P2I($1+8)]	# pointer to psffit structure (used)
-define	DP_SUBSTAR	Memi[P2I($1+9)]	# pointer to substar structure
+define	DP_ADDSTAR	Memp[$1+1]	# pointer to addstar structure
+define	DP_ALLSTAR	Memp[$1+2]	# pointer to allstar structure (used)
+define	DP_APSEL	Memp[$1+3]	# pointer to phot structure (used)
+define	DP_GROUP	Memp[$1+4]	# pointer to group structure
+define	DP_NSTAR	Memp[$1+5]	# pointer to nstar structure (used)
+define	DP_PEAK		Memp[$1+6]	# pointer to the peak structure
+define	DP_PSF		Memp[$1+7]	# pointer to psf structure (used)
+define	DP_PSFFIT	Memp[$1+8]	# pointer to psffit structure (used)
+define	DP_SUBSTAR	Memp[$1+9]	# pointer to substar structure
 
 # the wcs parameters
 
 define  DP_WCSIN        Memi[P2I($1+10)]     # the input wcs
 define  DP_WCSOUT       Memi[P2I($1+11)]     # the output wcs
 define  DP_WCSPSF       Memi[P2I($1+12)]     # the psf wcs
-define	DP_MW		Memi[P2I($1+13)]	# pointer to mwcs structure
-define  DP_CTIN         Memi[P2I($1+14)]     # the input transformation pointer
-define  DP_CTOUT        Memi[P2I($1+15)]     # the output transformation pointer
-define  DP_CTPSF        Memi[P2I($1+16)]     # the psf transformation pointer
+define	DP_MW		Memp[$1+13]	     # pointer to mwcs structure
+define  DP_CTIN         Memp[$1+14]	     # the input transformation pointer
+define  DP_CTOUT        Memp[$1+15]	     # the output transformation pointer
+define  DP_CTPSF        Memp[$1+16]	     # the psf transformation pointer
 
 # parameters
 
@@ -223,9 +223,9 @@ define	LEN_PSFFIT	(20)
 
 define	DP_PSFUNCTION	Memi[P2I($1)]	# PSF type
 define	DP_PSFNPARS	Memi[P2I($1+1)]	# number of psf parameters
-define	DP_PSFSIZE	Memi[P2I($1+2)]	# size of PSF lut
-define	DP_PSFPARS	Memi[P2I($1+3)]	# pointer to the PSF parameters 
-define	DP_PSFLUT	Memi[P2I($1+4)]	# pointer to the PSF lookup table
+define	DP_PSFSIZE	Memz[P2Z($1+2)]	# size of PSF lut
+define	DP_PSFPARS	Memp[$1+3]	# pointer to the PSF parameters 
+define	DP_PSFLUT	Memp[$1+4]	# pointer to the PSF lookup table
 define	DP_NVLTABLE	Memi[P2I($1+5)]	# number of variability luts
 define	DP_NFEXTABLE	Memi[P2I($1+6)]	# number of PSF expansion luts
 define  DP_PSFHEIGHT 	Memr[P2R($1+7)]	# brightness of psf
