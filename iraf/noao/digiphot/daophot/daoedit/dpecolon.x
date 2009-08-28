@@ -6,9 +6,10 @@ include "daoedit.h"
 procedure dp_ecolon (cmdstr, gd, redraw)
 
 char	cmdstr[ARB]	# input colon command
-int	gd		# pointer to the graphics stream
+pointer	gd		# pointer to the graphics stream
 int	redraw		# redraw the radial profile plot
 
+size_t	sz_val
 bool	bval
 int	cmd, pset, ival
 pointer	sp, incmd, param, value
@@ -25,9 +26,10 @@ string	findpars	"findpars"
 
 begin
 	call smark (sp)
-	call salloc (incmd, SZ_LINE, TY_CHAR)
-	call salloc (param, SZ_LINE, TY_CHAR)
-	call salloc (value, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (incmd, sz_val, TY_CHAR)
+	call salloc (param, sz_val, TY_CHAR)
+	call salloc (value, sz_val, TY_CHAR)
 
 	# Get the command.
 	call sscan (cmdstr)

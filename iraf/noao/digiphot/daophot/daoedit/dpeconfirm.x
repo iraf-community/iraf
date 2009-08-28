@@ -329,14 +329,18 @@ procedure dp_caper()
 int	i, naperts
 pointer	sp, apstr, newapstr, aperts
 real	scale
+size_t	sz_val
+
 int	scan(), nscan(), dp_gaperts()
 real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (apstr, SZ_LINE, TY_CHAR)
-	call salloc (newapstr, SZ_LINE, TY_CHAR)
-	call salloc (aperts, MAX_NAPERTS, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (apstr, sz_val, TY_CHAR)
+	call salloc (newapstr, sz_val, TY_CHAR)
+	sz_val = MAX_NAPERTS
+	call salloc (aperts, sz_val, TY_REAL)
 
 	# Get the current values.
 	scale = 1.0 / clgetr ("datapars.scale")

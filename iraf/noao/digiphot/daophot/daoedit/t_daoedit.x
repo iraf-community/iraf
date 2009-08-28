@@ -16,11 +16,12 @@ int	cache			# cache the image pixels
 pointer	graphics		# the graphics device
 pointer	display			# the image display
 
+size_t	sz_val
 real	wx, wy, xlast, ylast
 pointer	sp, cmd, im, gd, id
-int	wcs, key, redraw, gcurtype, curtype, xwcs, ywcs, lastkey
-int	memstat, buf_size
-size_t	req_size, old_size
+int	wcs, key, redraw, gcurtype, curtype, xwcs, ywcs, lastkey, memstat
+long	l_val
+size_t	req_size, old_size, buf_size
 
 pointer	immap(), gopen()
 int	dp_gcur(), btoi(), sizeof(), dp_memstat()
@@ -29,15 +30,19 @@ errchk	gopen()
 
 data	gcurtype /'g'/
 
+include	<nullptr.inc>
+
 begin
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (graphics, SZ_FNAME, TY_CHAR)
-	call salloc (display, SZ_FNAME, TY_CHAR)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (graphics, sz_val, TY_CHAR)
+	call salloc (display, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call clgstr ("image", Memc[image], SZ_FNAME)
-	im = immap (Memc[image], READ_ONLY, 0)
+	im = immap (Memc[image], READ_ONLY, NULLPTR)
 
 	call clgstr ("graphics", Memc[graphics], SZ_FNAME)
 	iferr (gd = gopen (Memc[graphics], AW_DEFER+NEW_FILE, STDGRAPH))
@@ -66,8 +71,10 @@ begin
         req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
 	    sizeof (IM_PIXTYPE(im))
         memstat = dp_memstat (cache, req_size, old_size)
-        if (memstat == YES)
-            call dp_pcache (im, INDEFI, buf_size)
+        if (memstat == YES) {
+	    l_val = INDEFL
+            call dp_pcache (im, l_val, buf_size)
+	}
 
 	xlast = INDEFR
 	ylast = INDEFR
@@ -80,8 +87,10 @@ begin
 	while (dp_gcur (curtype, wx, wy, wcs, key, Memc[cmd], SZ_LINE) != EOF) {
 
 	    # Convert the cursor coordinates if necessary.
-	    if (curtype == 'i')
-		call dp_vtol (im, wx, wy, wx, wy, 1)
+	    if (curtype == 'i') {
+		sz_val = 1
+		call dp_vtol (im, wx, wy, wx, wy, sz_val)
+	    }
 
 	    switch (key) {
 
@@ -128,12 +137,12 @@ begin
 	    case 'a':
 		if (curtype == 'i') {
 		    if (lastkey == 'a')
-		        call dp_erprofile (NULL, id, NO, xwcs, ywcs, im, wx, wy)
+		        call dp_erprofile (NULLPTR, id, NO, xwcs, ywcs, im, wx, wy)
 		    else
-		        call dp_erprofile (NULL, id, YES, xwcs, ywcs, im,
+		        call dp_erprofile (NULLPTR, id, YES, xwcs, ywcs, im,
 			    wx, wy)
 		} else {
-		    call dp_erprofile (NULL, id, NO, xwcs, ywcs, im,
+		    call dp_erprofile (NULLPTR, id, NO, xwcs, ywcs, im,
 		        xlast, ylast)
 		}
 
@@ -195,12 +204,12 @@ end
 
 int procedure dp_gcur (curtype, x, y, wcs, key, strval, maxch)
 
-int     curtype                 # cursor type
+int	curtype                 # cursor type
 real    x, y                    # cursor position
 int	wcs			# cursor wcs
-int     key                     # keystroke value of cursor event
+int	key                     # keystroke value of cursor event
 char    strval[ARB]             # string value, if any
-int     maxch                   # max chars out
+int	maxch                   # max chars out
 
 int	nitems
 int	clgcur()
@@ -229,6 +238,7 @@ procedure dp_isetup (curtype, gd)
 int	curtype			# the cursor type graphics or display
 pointer	gd			# pointer to the graphics stream
 
+size_t	sz_val
 int	wcs, key
 pointer	sp, cmd
 real	wx, wy
@@ -236,7 +246,8 @@ int	dp_gcur()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	call printf (
 	    "Interactive setup menu (?=help, spbar=default, q=quit):\n")

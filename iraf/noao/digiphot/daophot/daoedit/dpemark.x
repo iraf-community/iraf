@@ -7,6 +7,7 @@ procedure dp_mfwhmpsf (gd)
 
 pointer	gd		# pointer to the graphics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, scale, fwhmpsf, wx, wy
@@ -15,7 +16,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Determine the x and y limits of the current plot.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -47,15 +49,17 @@ procedure dp_msigma (gd)
 
 pointer	gd		# pointer to the grapics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, mean, sigma, wx, wy
 int	clgcur()
-real	clgetr()
+real	clgetr(), aabs()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Determine the range of the plot
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -85,7 +89,7 @@ begin
         if (stat == EOF || wy < imin || wy > imax)
 	    ;
 	else
-	    sigma = abs (wy - mean) / 3.0
+	    sigma = aabs (wy - mean) / 3.0
 
 	# Store the new sky sigma.
 	call clputr ("datapars.sigma", sigma)
@@ -101,6 +105,7 @@ procedure dp_mdmin (gd)
 
 pointer	gd		# pointer to the grapics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, datamin, wx, wy
@@ -109,7 +114,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Determine the limits of the plot.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -145,6 +151,7 @@ procedure dp_mdmax (gd)
 
 pointer	gd		# pointer to the grapics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, datamax, wx, wy
@@ -153,7 +160,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Determine the limits of the plot.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -189,6 +197,7 @@ procedure dp_mcbox (gd)
 
 pointer	gd		# pointer to the grapics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, scale, capert, wx, wy
@@ -197,7 +206,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Determine the x and y limits of the current plot.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -230,6 +240,7 @@ procedure dp_mrclean (gd)
 
 pointer	gd		# pointer to the graphics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, scale, rclean, wx, wy
@@ -238,7 +249,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Get the current plot window.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -272,6 +284,7 @@ procedure dp_mrclip (gd)
 
 pointer	gd		# pointer to the grapics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, scale, rclip, wx, wy
@@ -280,7 +293,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Get the current plot window.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -313,6 +327,7 @@ procedure dp_mannulus (gd)
 
 pointer	gd		# pointer to the grapics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, scale, annulus, wx, wy
@@ -321,7 +336,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Get the current plot window.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -355,6 +371,7 @@ procedure dp_mdannulus (gd)
 
 pointer	gd		# pointer to the grapics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, scale, annulus, dannulus, wx, wy
@@ -363,7 +380,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Get the current plot window.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -396,6 +414,7 @@ procedure dp_mrgrow (gd)
 
 pointer	gd		# pointer to the grapics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, scale, rgrow, wx, wy
@@ -404,7 +423,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Get the current plot window.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -438,6 +458,7 @@ procedure dp_maper (gd)
 
 pointer	gd		# pointer to the grapics stream
 
+size_t	sz_val
 int	wcs, key, naperts
 pointer	sp, oapstr, aperts, tapstr, apstr, cmd
 real	rmin, rmax, imin, imax, scale, wx, wy
@@ -446,11 +467,14 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (oapstr, SZ_LINE, TY_CHAR)
-	call salloc (aperts, MAX_NAPERTS, TY_REAL)
-	call salloc (apstr, SZ_LINE, TY_CHAR)
-	call salloc (tapstr, SZ_LINE, TY_CHAR)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (oapstr, sz_val, TY_CHAR)
+	sz_val = MAX_NAPERTS
+	call salloc (aperts, sz_val, TY_REAL)
+	sz_val = SZ_LINE
+	call salloc (apstr, sz_val, TY_CHAR)
+	call salloc (tapstr, sz_val, TY_CHAR)
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Determine the current plot window.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -496,6 +520,7 @@ procedure dp_mpsfrad (gd)
 
 pointer	gd		# pointer to the graphics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, scale, psfrad, wx, wy
@@ -504,7 +529,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Determine the x and y limits of the current plot.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -536,6 +562,7 @@ procedure dp_mfitrad (gd)
 
 pointer	gd		# pointer to the graphics stream
 
+size_t	sz_val
 int	wcs, key, stat
 pointer	sp, cmd
 real	rmin, rmax, imin, imax, scale, fitrad, wx, wy
@@ -544,7 +571,8 @@ real	clgetr()
 
 begin
 	call smark (sp)
-	call salloc (cmd, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (cmd, sz_val, TY_CHAR)
 
 	# Determine the x and y limits of the current plot.
 	call ggwind (gd, rmin, rmax, imin, imax)
@@ -578,6 +606,7 @@ char	str[ARB]		# aperture string
 real	aperts[ARB]		# aperture array
 int	max_naperts		# maximum number of apertures
 
+size_t	sz_val
 int	naperts, ip, op, ndecode, nap
 pointer	sp, outstr
 real	apstart, apend, apstep
@@ -586,7 +615,8 @@ int	dp_gctor()
 
 begin
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
 
 	naperts = 0
 	for (ip = 1; str[ip] != EOS && naperts < max_naperts;) {

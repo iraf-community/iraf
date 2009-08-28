@@ -15,11 +15,11 @@ int	xwcs			# the x wcs type of the final plot
 int	ywcs			# the y wcs type of the final plot
 real	radius[ARB]		# the radius vector
 real	intensity[ARB]		# the intensity vector
-int	npts			# number of points in the profile
+size_t	npts			# number of points in the profile
 real	rcentroid[ARB]		# the radius centroid vector
 real	pmean[ARB]		# the mean intensity vector
 real	integral[ARB]		# the integral of the profile
-int	nbins			# the number of bins
+size_t	nbins			# the number of bins
 real	rmin, rmax		# min and max radius
 real	iannulus		# the inner radius of the sky annulus
 real	oannulus		# the outer radius of the sky annulus
@@ -29,17 +29,19 @@ real	skysigma		# the sigma of the sky value
 real	rscale			# the image scale
 real	pnorm			# the profile normalization factor
 
-int	i, j
+size_t	sz_val
+long	i, j
 pointer	sp, pxlabel, pylabel, sxlabel, sylabel
 real	r1, r2, rp1, rp2, rs1, rs2, i1, i2, ip1, ip2, is1, is2, dr, fraction
 
 begin
 	# Get space for the x and y labels.
 	call smark (sp)
-	call salloc (pxlabel, SZ_FNAME, TY_CHAR)
-	call salloc (pylabel, SZ_FNAME, TY_CHAR)
-	call salloc (sxlabel, SZ_FNAME, TY_CHAR)
-	call salloc (sylabel, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (pxlabel, sz_val, TY_CHAR)
+	call salloc (pylabel, sz_val, TY_CHAR)
+	call salloc (sxlabel, sz_val, TY_CHAR)
+	call salloc (sylabel, sz_val, TY_CHAR)
 
 	# Clear the plot.
 	call gclear (gd)
