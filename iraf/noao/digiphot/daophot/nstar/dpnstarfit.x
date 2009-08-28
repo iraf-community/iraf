@@ -18,9 +18,11 @@ int	cdimen			# dimensions of the coefficient matrix
 int	iter			# the current iteration
 bool	converge		# did the fit converge ?
 
+size_t	sz_val
 bool 	clip, refit
-int	i, j, k, xpix, ypix, group_size, nterm, ncols, mindex, ifaint, tifaint
-int	ntmin, ixmin, ixmax, iymin, iymax, ifxmin, ifxmax, ifymin, ifymax, flag
+int	i, j, k, group_size, nterm, mindex, ifaint, tifaint, ntmin, flag
+long	xpix, ypix
+long	ixmin, ixmax, iymin, iymax, ifxmin, ifxmax, ifymin, ifymax, ncols
 pointer	apsel, psffit, nstar, subim, ypixel, pixel
 real	fitradsq, cutoff, psfradsq, sepcrit, sepmin, perr, peakerr, sky_value
 real	read_noise, mingdata, maxgdata, chigrp, wcrit, xmin, xmax, ymin, ymax
@@ -29,7 +31,8 @@ real	relerr, dswt, faint, tfaint, noise
 
 bool	dp_nstmerge(), dp_ntomit(), dp_ntmin(), dp_ncheckc()
 pointer imgs2r()
-real	dp_ntskyval(), dp_ntsubtract()
+real	dp_ntskyval(), dp_ntsubtract(), aabs()
+long	lint()
 
 begin
 	# Define the daophot pointers.
@@ -89,8 +92,10 @@ begin
 		nterm = nterm + 1
 		ntmin = ntmin + 1
 	    }
-	    call aclrr (Memr[DP_NXOLD(nstar)], nterm) 
-	    call amovkr (1.0, Memr[DP_NXCLAMP(nstar)], nterm)
+	    sz_val = nterm
+	    call aclrr (Memr[DP_NXOLD(nstar)], sz_val) 
+	    sz_val = nterm
+	    call amovkr (1.0, Memr[DP_NXCLAMP(nstar)], sz_val)
 	}
 
 	# Start a new iteration.
@@ -127,15 +132,18 @@ begin
 	        Memr[DP_NX(nstar)+nterm-1] = -1.0
 
 	    # Initialize arrays.
-	    call aclrr (Memr[DP_APCHI(apsel)], group_size)
-	    call aclrr (Memr[DP_NSUMWT(nstar)], group_size)
-	    call aclrr (Memr[DP_NNUMER(nstar)], group_size)
-	    call aclrr (Memr[DP_NDENOM(nstar)], group_size)
-	    call amovki (NSTERR_OK, Memi[DP_NIER(nstar)], group_size)
+	    sz_val = group_size
+	    call aclrr (Memr[DP_APCHI(apsel)], sz_val)
+	    call aclrr (Memr[DP_NSUMWT(nstar)], sz_val)
+	    call aclrr (Memr[DP_NNUMER(nstar)], sz_val)
+	    call aclrr (Memr[DP_NDENOM(nstar)], sz_val)
+	    sz_val = group_size
+	    call amovki (NSTERR_OK, Memi[DP_NIER(nstar)], sz_val)
 
 	    # Compute the minimum and maximum x and y values.
-	    call alimr (Memr[DP_APXCEN(apsel)], group_size, xmin, xmax) 
-	    call alimr (Memr[DP_APYCEN(apsel)], group_size, ymin, ymax) 
+	    sz_val = group_size
+	    call alimr (Memr[DP_APXCEN(apsel)], sz_val, xmin, xmax) 
+	    call alimr (Memr[DP_APYCEN(apsel)], sz_val, ymin, ymax) 
 
 	    # Check to see whether any two stars are within the critical
 	    # difference from each other.
@@ -177,8 +185,10 @@ begin
 		if (DP_FITSKY(dao) == YES)
 		    nterm = nterm + 1
 		clip = false
-		call aclrr (Memr[DP_NXOLD(nstar)], nterm)
-		call amovkr (1.0, Memr[DP_NXCLAMP(nstar)], nterm)
+		sz_val = nterm
+		call aclrr (Memr[DP_NXOLD(nstar)], sz_val)
+		sz_val = nterm
+		call amovkr (1.0, Memr[DP_NXCLAMP(nstar)], sz_val)
 		iter = max (1, iter - 1)
 		next
 	    }
@@ -188,13 +198,13 @@ begin
 	    # subraster we need to extract from the image for this group.
 
 	    if (iter == 1) {
-	        ixmin = max (1, int (xmin - DP_PSFRAD(dao) -
+	        ixmin = max (1, lint (xmin - DP_PSFRAD(dao) -
 		    DP_FITRAD(dao)) + 1)
-	        iymin = max (1, int (ymin - DP_PSFRAD(dao) -
+	        iymin = max (1, lint (ymin - DP_PSFRAD(dao) -
 		    DP_FITRAD(dao)) + 1)
-	        ixmax = min (IM_LEN(im,1), int (xmax + DP_PSFRAD(dao) +
+	        ixmax = min (IM_LEN(im,1), lint (xmax + DP_PSFRAD(dao) +
 		    DP_FITRAD(dao)))
-	        iymax = min (IM_LEN(im,2), int (ymax + DP_PSFRAD(dao) +
+	        iymax = min (IM_LEN(im,2), lint (ymax + DP_PSFRAD(dao) +
 		    DP_FITRAD(dao)))
 	        subim = imgs2r (im, ixmin, ixmax, iymin, iymax)
 	        ncols = ixmax - ixmin + 1
@@ -203,16 +213,19 @@ begin
 	    # Compute the area on the subraster that is off interest to
 	    # the current iteration.
 
-	    ifxmin = max (ixmin, int (xmin - DP_FITRAD(dao)) + 1)
-	    ifymin = max (iymin, int (ymin - DP_FITRAD(dao)) + 1)
-	    ifxmax = min (ixmax, int (xmax + DP_FITRAD(dao)))
-	    ifymax = min (iymax, int (ymax + DP_FITRAD(dao)))
+	    ifxmin = max (ixmin, lint (xmin - DP_FITRAD(dao)) + 1)
+	    ifymin = max (iymin, lint (ymin - DP_FITRAD(dao)) + 1)
+	    ifxmax = min (ixmax, lint (xmax + DP_FITRAD(dao)))
+	    ifymax = min (iymax, lint (ymax + DP_FITRAD(dao)))
 
 	    # Zero the normal matrix and the vector of residuals.
 
-	    call aclrr (Memr[DP_NV(nstar)], nterm)
-	    call aclrr (Memr[DP_NC(nstar)], cdimen * cdimen)
-	    call aclri (Memi[DP_NNPIX(nstar)], group_size)
+	    sz_val = nterm
+	    call aclrr (Memr[DP_NV(nstar)], sz_val)
+	    sz_val = cdimen * cdimen
+	    call aclrr (Memr[DP_NC(nstar)], sz_val)
+	    sz_val = group_size
+	    call aclrl (Meml[DP_NNPIX(nstar)], sz_val)
 
 	    sumres = 0.0
 	    grpwt = 0.0
@@ -343,7 +356,7 @@ begin
 		        (pred_pixval - sky_value)) ** 2
 		    if (sigmasq <= 0.0)
 			next
-		    relerr = abs (ds) / sqrt (sigmasq)
+		    relerr = aabs (ds) / sqrt (sigmasq)
 
 		    # Add this residual into the weighted sum of the
 		    # absolute relative residuals.
@@ -362,7 +375,7 @@ begin
 
 		    call dp_acsharp (Memr[DP_APXCEN(apsel)],
 		        Memr[DP_APYCEN(apsel)], Memi[DP_NSKIP(nstar)],
-			Memi[DP_NNPIX(nstar)], Memr[DP_NNUMER(nstar)],
+			Meml[DP_NNPIX(nstar)], Memr[DP_NNUMER(nstar)],
 			Memr[DP_NDENOM(nstar)], Memr[DP_NSUMWT(nstar)],
 			Memr[DP_APCHI(apsel)], group_size, xtemp, ytemp,
 			Memr[DP_PSFPARS(psffit)], Memr[DP_PSFPARS(psffit)+1],
@@ -395,7 +408,7 @@ begin
 
 	    refit = dp_ntmin (Memi[DP_APID(apsel)], Memr[DP_APXCEN(apsel)],
 	        Memr[DP_APYCEN(apsel)], Memr[DP_APMAG(apsel)],
-	        Memr[DP_APMSKY(apsel)], Memi[DP_NNPIX(nstar)],
+	        Memr[DP_APMSKY(apsel)], Meml[DP_NNPIX(nstar)],
 		Memi[DP_NIER(nstar)], group_size, nterm, DP_RECENTER(dao),
 		DP_FITSKY(dao), DP_GROUPSKY(dao), mean_sky, DP_VERBOSE(dao))
 	    if (group_size < 1)
@@ -471,10 +484,10 @@ begin
 
 	    # Fit the sky.
 	    if (DP_FITSKY(dao) == YES) {
-	        noise = sqrt (abs (mean_sky / DP_PHOTADU(dao)) + read_noise)
+	        noise = sqrt (aabs (mean_sky / DP_PHOTADU(dao)) + read_noise)
 	        mean_sky = mean_sky - max (-3.0 * noise,
 		    min (Memr[DP_NX(nstar)+nterm-1], 3.0 * noise))
-		if (abs (Memr[DP_NX(nstar)+nterm-1]) > (1.0e-4 * mean_sky))
+		if (aabs (Memr[DP_NX(nstar)+nterm-1]) > (1.0e-4 * mean_sky))
 		    refit = true
 	    }
 
@@ -590,8 +603,10 @@ begin
 		    nterm = group_size
 		if (DP_FITSKY(dao) == YES)
 		    nterm = nterm + 1
-	        call aclrr (Memr[DP_NXOLD(nstar)], nterm)
-	        call amovkr (1.0, Memr[DP_NXCLAMP(nstar)], nterm)
+	        sz_val = nterm
+	        call aclrr (Memr[DP_NXOLD(nstar)], sz_val)
+	        sz_val = nterm
+	        call amovkr (1.0, Memr[DP_NXCLAMP(nstar)], sz_val)
 	        clip = false
 	        iter = max (1, iter - 1)
 	        next
@@ -608,9 +623,10 @@ begin
 		if (DP_CLIPEXP(dao) > 0)
 	            clip = true
 	        converge = false
-	        call aclrr (Memr[DP_NXOLD(nstar)], nterm)
+	        sz_val = nterm
+	        call aclrr (Memr[DP_NXOLD(nstar)], sz_val)
 	        call amaxkr (Memr[DP_NXCLAMP(nstar)], 0.25,
-	            Memr[DP_NXCLAMP(nstar)], nterm)
+			     Memr[DP_NXCLAMP(nstar)], sz_val)
 	        return (group_size)
 	    }
 
@@ -773,6 +789,7 @@ real	psfradsq		# psf radius squared
 real	fitradsq		# fit radius squared
 int	recenter		# recenter the coordinates
 
+size_t	sz_val
 int	i, i3, k
 pointer	psffit
 real	weight, dx, dy, deltax, deltay, val, dvdx, dvdy, rsq
@@ -787,7 +804,8 @@ begin
 		next
 	    dx = fx - xcen[i]
 	    dy = fy - ycen[i]
-	    call dp_wpsf (dao, im, xcen[i], ycen[i], deltax, deltay, 1)
+	    sz_val = 1
+	    call dp_wpsf (dao, im, xcen[i], ycen[i], deltax, deltay, sz_val)
 	    deltax = (deltax - 1.0) / DP_PSFX(psffit) - 1.0
 	    deltay = (deltay - 1.0) / DP_PSFY(psffit) - 1.0
 	    val = dp_usepsf (DP_PSFUNCTION(psffit), dx, dy,
@@ -825,7 +843,7 @@ procedure dp_acsharp (xcen, ycen, skip, npix, numer, denom, sumwt, chi,
 real	xcen[ARB]		# array of object x centers
 real	ycen[ARB]		# array of object y centers
 int	skip[ARB]		# array of skip values
-int	npix[ARB]		# array of numbers of pixels
+long	npix[ARB]		# array of numbers of pixels
 real	numer[ARB]		# numerator array
 real	denom[ARB]		# denominator array
 real	sumwt[ARB]		# array of summed weights
@@ -939,7 +957,7 @@ real	xcen[ARB]		# array of x centers
 real	ycen[ARB]		# array of y centers
 real	mag[ARB]		# array of magnitudes
 real	sky[ARB]		# array of sky values
-int	npix[ARB]		# array of pixel numbers
+long	npix[ARB]		# array of pixel numbers
 int	nier[ARB]		# array of error codes
 int	group_size		# size of the group
 int	nterm			# number of terms
@@ -1049,6 +1067,7 @@ int	groupsky		# use group sky value
 real	mean_sky		# the current mean sky value
 int	verbose			# verbose flag
 
+size_t	sz_val
 bool	redo
 int	j, starno, i
 
@@ -1072,7 +1091,8 @@ begin
 			    call pargi (ids[i])
 		    }
 		}
-		call amovki (NSTERR_SINGULAR, nier, group_size)
+		sz_val = group_size
+		call amovki (NSTERR_SINGULAR, nier, sz_val)
 		group_size = 0
 	    } else {
 		if (verbose == YES) {
@@ -1122,6 +1142,7 @@ bool	redo			# redo the solution
 
 int	i, l, j, k
 real	df
+real	aabs()
 
 begin
 	do i = 1, group_size {
@@ -1158,9 +1179,9 @@ begin
 		    clamp[k] = 0.5 * clamp[k]
 	        if ((xold[l] * x[l]) < 0.0)
 		    clamp[l] = 0.5 * clamp[l]
-	        xcen[i] = xcen[i] - x[k] / (1.0 + abs(x[k]) / (clamp[k] *
+	        xcen[i] = xcen[i] - x[k] / (1.0 + aabs(x[k]) / (clamp[k] *
 	            MAX_DELTA_PIX))
-	        ycen[i] = ycen[i] - x[l] / (1.0 + abs(x[l]) / (clamp[l] *
+	        ycen[i] = ycen[i] - x[l] / (1.0 + aabs(x[l]) / (clamp[l] *
 	            MAX_DELTA_PIX))
 	        xold[k] = x[k]
 	        xold[l] = x[l]
@@ -1193,7 +1214,7 @@ begin
 		next
 
 	    if (clip) {
-		if (abs (x[j]) > max (MAX_NEW_ERRMAG * magerr[i],
+		if (aabs (x[j]) > max (MAX_NEW_ERRMAG * magerr[i],
 		        MAX_NEW_RELBRIGHT2 * mag[i])) {
 		    redo = true
 		} else if (recenter == YES) {
@@ -1204,7 +1225,7 @@ begin
 			redo = true
 		}
 	    } else {
-		if (abs (x[j]) > max (magerr[i], MAX_NEW_RELBRIGHT1 *
+		if (aabs (x[j]) > max (magerr[i], MAX_NEW_RELBRIGHT1 *
 		        mag[i])) {
 		    redo = true
 		} else if (recenter == YES) {
@@ -1233,8 +1254,8 @@ real	mag[ARB]			# array of magnitudes
 real	sky[ARB]			# array of sky values
 int	nier[ARB]			# array of error codes
 int	group_size			# size of the group
-int	ixmin,ixmax			# subraster x limits
-int	iymin,iymax			# subraster y limits
+long	ixmin,ixmax			# subraster x limits
+long	iymin,iymax			# subraster y limits
 real	fitradsq			# fit radius squared
 int	fitsky				# fit the sky value
 int	groupsky			# use the group sky value

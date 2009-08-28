@@ -13,18 +13,22 @@ pointer	dao			# pointer to the daophot structure
 pointer	nst			# pointer to output photometry file
 pointer	colpoint[ARB]		# array  of column pointers
 
-
+size_t	sz_val
 int	i
 pointer	sp, colnames, colunits, colformat, col_dtype, col_len
 
 begin
 	# Allocate space for table definition.
 	call smark (sp)
-	call salloc (colnames, NST_NOUTCOL * (SZ_COLNAME + 1), TY_CHAR)
-	call salloc (colunits, NST_NOUTCOL * (SZ_COLUNITS + 1), TY_CHAR)
-	call salloc (colformat, NST_NOUTCOL * (SZ_COLFMT + 1), TY_CHAR)
-	call salloc (col_dtype, NST_NOUTCOL, TY_INT)
-	call salloc (col_len, NST_NOUTCOL, TY_INT)
+	sz_val = NST_NOUTCOL * (SZ_COLNAME + 1)
+	call salloc (colnames, sz_val, TY_CHAR)
+	sz_val = NST_NOUTCOL * (SZ_COLUNITS + 1)
+	call salloc (colunits, sz_val, TY_CHAR)
+	sz_val = NST_NOUTCOL * (SZ_COLFMT + 1)
+	call salloc (colformat, sz_val, TY_CHAR)
+	sz_val = NST_NOUTCOL
+	call salloc (col_dtype, sz_val, TY_INT)
+	call salloc (col_len, sz_val, TY_LONG)
 
 	# Set up the column definitions.
 	call strcpy (ID, Memc[colnames], SZ_COLNAME)
@@ -84,11 +88,11 @@ begin
 
 	# Define columnlengths.
 	do i = 1, NST_NOUTCOL 
-	    Memi[col_len+i-1] = 1
+	    Meml[col_len+i-1] = 1
 	
 	# Define and create the table.
 	call tbcdef (nst, colpoint, Memc[colnames], Memc[colunits],
-	    Memc[colformat], Memi[col_dtype], Memi[col_len], NST_NOUTCOL)
+	    Memc[colformat], Memi[col_dtype], Meml[col_len], NST_NOUTCOL)
 	call tbtcre (nst)
 
 	# Write out some header parameters.
@@ -143,6 +147,7 @@ procedure dp_xnstarpars (dao, nst)
 pointer	dao			# pointer to the daophot structure
 int	nst			# the output file descriptor
 
+size_t	sz_val
 pointer	psffit, sp, outstr, date, time, comment
 bool	itob()
 int	envfind()
@@ -153,10 +158,13 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
-	call salloc (comment, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (comment, sz_val, TY_CHAR)
 	Memc[comment] = EOS
 
 	# Write the id.
@@ -251,6 +259,7 @@ procedure dp_tnstarpars (dao, nst)
 pointer	dao			# pointer to the daophot structure
 pointer	nst			# pointer to the output photometry table
 
+size_t	sz_val
 pointer	psffit, sp, outstr, date, time
 bool	itob()
 int	envfind()
@@ -261,9 +270,11 @@ begin
 
 	# Allocate working space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
 
 	# Write the id.
 	if (envfind ("version", Memc[outstr], SZ_LINE) <=0)
@@ -335,13 +346,14 @@ procedure dp_tntwrite (dao, im, nst, rej, niter, old_size, output_row,
 pointer	dao			# pointer to the daophot structure
 pointer	im			# the input image descriptor
 pointer	nst			# output photometry file descriptor
-int	rej			# output rejections file descriptor
+pointer	rej			# output rejections file descriptor
 int	niter			# number of iterations
 int	old_size		# original size of group
-int	output_row		# output photometry file row number
-int	routput_row		# output rejections file row number
+long	output_row		# output photometry file row number
+long	routput_row		# output rejections file row number
 pointer	colpoint[ARB]		# column pointer array
 
+size_t	sz_val
 int	i, id, nkeep, nreject, pier, plen, iter
 pointer	psffit, nstar, apsel, sp, perror
 real	xcen, ycen, mag, errmag, sharp
@@ -357,13 +369,15 @@ begin
 	nkeep = DP_NNUM(nstar)
 	nreject = old_size - nkeep
 	if (nreject  > 0) {
-	    call amovkr (INDEFR, Memr[DP_APMAG(apsel)+nkeep], nreject)
-	    call amovkr (INDEFR, Memr[DP_APERR(apsel)+nkeep], nreject)
-	    call amovkr (INDEFR, Memr[DP_APCHI(apsel)+nkeep], nreject)
+	    sz_val = nreject
+	    call amovkr (INDEFR, Memr[DP_APMAG(apsel)+nkeep], sz_val)
+	    call amovkr (INDEFR, Memr[DP_APERR(apsel)+nkeep], sz_val)
+	    call amovkr (INDEFR, Memr[DP_APCHI(apsel)+nkeep], sz_val)
 	}
 
 	call smark (sp)
-	call salloc (perror, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (perror, sz_val, TY_CHAR)
 
 	# Now write out the results.
 	do i = 1, old_size {
@@ -374,7 +388,8 @@ begin
 	    ycen = Memr[DP_APYCEN (apsel)+i-1]
 	    if (IS_INDEFR(xcen) || IS_INDEFR(ycen))
 		next
-	    call dp_wout (dao, im, xcen, ycen, xcen, ycen, 1)
+	    sz_val = 1
+	    call dp_wout (dao, im, xcen, ycen, xcen, ycen, sz_val)
 	    mag = Memr[DP_APMAG(apsel)+i-1]
 	    errmag = Memr[DP_APERR(apsel)+i-1]
 	    if (! IS_INDEFR(mag)) {
@@ -462,6 +477,7 @@ int	rej			# the output rejections file descriptor
 int	niter			# the number of the iteration
 int	old_size		# old size of group
 
+size_t	sz_val
 int	i, id, nkeep, nreject, pier, plen, iter
 pointer	nstar, psffit, apsel, sp, perror
 real	xcen, ycen, mag, errmag, sharp
@@ -477,13 +493,15 @@ begin
 	nkeep = DP_NNUM(nstar)
 	nreject = old_size - nkeep
 	if (nreject  > 0) {
-	    call amovkr (INDEFR, Memr[DP_APMAG(apsel)+nkeep], nreject)
-	    call amovkr (INDEFR, Memr[DP_APERR(apsel)+nkeep], nreject)
-	    call amovkr (INDEFR, Memr[DP_APCHI(apsel)+nkeep], nreject)
+	    sz_val = nreject
+	    call amovkr (INDEFR, Memr[DP_APMAG(apsel)+nkeep], sz_val)
+	    call amovkr (INDEFR, Memr[DP_APERR(apsel)+nkeep], sz_val)
+	    call amovkr (INDEFR, Memr[DP_APCHI(apsel)+nkeep], sz_val)
 	}
 
 	call smark (sp)
-	call salloc (perror, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (perror, sz_val, TY_CHAR)
 
 	# Now write out the results.
 	do i = 1, old_size {
@@ -494,7 +512,8 @@ begin
 	    ycen = Memr[DP_APYCEN (apsel)+i-1]
 	    if (IS_INDEFR(xcen) || IS_INDEFR(ycen))
 		next
-	    call dp_wout (dao, im, xcen, ycen, xcen, ycen, 1)
+	    sz_val = 1
+	    call dp_wout (dao, im, xcen, ycen, xcen, ycen, sz_val)
 	    mag = Memr[DP_APMAG(apsel)+i-1]
 	    errmag = Memr[DP_APERR(apsel)+i-1]
 	    if (! IS_INDEFR(mag)) {
@@ -567,12 +586,12 @@ end
  
 int procedure dp_gnsterr (ier, perror, maxch)
  
-int     ier             # the integer error code
+int	ier             # the integer error code
 char    perror          # the output error code string
-int     maxch           # the maximum size of the error code string
+int	maxch           # the maximum size of the error code string
  
-int     plen
-int     gstrcpy()
+int	plen
+int	gstrcpy()
  
 begin
         switch (ier) {

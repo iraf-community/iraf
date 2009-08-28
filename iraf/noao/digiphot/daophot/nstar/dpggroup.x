@@ -114,18 +114,18 @@ int procedure dp_ggroup (dao, tp, key, fields, indices, colpoint, max_row,
 	max_group, in_record, curr_group)
 
 pointer	dao				# pointer to daophot structure
-int	tp				# input file/table descriptor
+pointer	tp				# input file/table descriptor
 pointer	key				# pointer to text database structure
 char	fields[ARB]			# nstar fields to be read
 int	indices[ARB]			# array of text file field pointers
-int	colpoint[ARB]			# array of column pointers
-int	max_row				# number of rows in table
+pointer	colpoint[ARB]			# array of column pointers
+long	max_row				# number of rows in table
 int	max_group			# maximum group size
-int	in_record			# pointer to current input record
+long	in_record			# pointer to current input record
 int	curr_group			# current group number
 
 bool	nullflag
-int	istar, group, buf_size
+int	istar, group, buf_size, i_val
 pointer	apsel
 int	dp_nstsel()
 
@@ -164,10 +164,13 @@ begin
 	    # In this case we have a text database file.
 	    if (key != NULL) {
 
-	        if (dp_nstsel (key, tp, fields, indices, Memi[DP_APID(apsel)+
-		    istar], group, Memr[DP_APXCEN(apsel)+istar],
-		    Memr[DP_APYCEN(apsel)+istar], Memr[DP_APMSKY(apsel)+
-		    istar], Memr[DP_APMAG(apsel)+ istar]) == EOF) {
+		i_val = tp
+	        if ( dp_nstsel (key, i_val, fields, indices,
+				Memi[DP_APID(apsel)+istar], group,
+				Memr[DP_APXCEN(apsel)+istar],
+				Memr[DP_APYCEN(apsel)+istar],
+				Memr[DP_APMSKY(apsel)+istar],
+				Memr[DP_APMAG(apsel)+istar]) == EOF ) {
 		    in_record = 0
 		    break
 		}
@@ -230,8 +233,9 @@ real	y		# y center
 real	sky		# sky value
 real	mag		# magnitude
 
+size_t	sz_val
 int	nchars, nunique, uunique, funique, ncontinue, recptr
-int 	first_rec, nselect, record
+int	first_rec, nselect, record
 pointer	line
 int	getline(), strncmp(), pt_choose()
 data	first_rec /YES/
@@ -244,7 +248,8 @@ begin
 	    funique = 0
 	    nselect = 0
 	    record = 0
-	    call malloc (line, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (line, sz_val, TY_CHAR)
 	}
 
 	# Initialize the record read.
@@ -342,7 +347,9 @@ real	y		# y position
 real	sky		# sky value
 real	mag		# magnitude
 
-int	i, index, elem, maxch, kip, ip
+size_t	sz_val
+int	i, index, elem, maxch, ip
+pointer	kip
 int	ctoi(), ctor()
 char	buffer[SZ_LINE]
 
@@ -353,8 +360,9 @@ begin
 	    index = Memi[KY_SELECT(key)+i-1]
 	    elem = Memi[KY_ELEM_SELECT(key)+i-1]
 	    maxch = Memi[KY_LEN_SELECT(key)+i-1]
-	    kip = Memi[KY_PTRS(key)+index-1] + (elem - 1) * maxch
-	    call amovc (Memc[kip], buffer, maxch)
+	    kip = Memp[KY_PTRS(key)+index-1] + (elem - 1) * maxch
+	    sz_val = maxch
+	    call amovc (Memc[kip], buffer, sz_val)
 	    buffer[maxch+1] = EOS
 
 	    # Decode the output value.

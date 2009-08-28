@@ -16,19 +16,21 @@ int	verify				# verify the critical parameters
 int	update				# update the parameter set
 int	cache				# cache the input image pixels
 
+size_t	sz_val
 pointer	sp, outfname, im, psfim, dao, str
-pointer	alist, olist, rlist, imlist, pimlist
-int	limlist, lalist, lpimlist, lolist
-int	lrlist, root, grp, nst, rejfd, wcs
-int	buf_size, memstat
+pointer	alist, olist, rlist, imlist, pimlist, grp, nst, rejfd
+int	limlist, lalist, lpimlist, lolist, lrlist, root, wcs, memstat, i_val
+long	l_val
 bool	ap_text
-size_t	req_size, old_size
+size_t	req_size, old_size, buf_size
 
 pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	strlen(), strncmp(), fnldir(), fstati(), open(), btoi()
 int	access(), imtlen(), imtgetim(), fntlenb()
 int	fntgfnb(), clgwrd(), sizeof(), dp_memstat()
 bool	clgetb(), itob()
+
+include	<nullptr.inc>
 
 begin
 	# Set the standard output to flush on newline.
@@ -37,13 +39,14 @@ begin
 
 	# Allocate working memory.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (groupfile, SZ_FNAME, TY_CHAR)
-	call salloc (psfimage, SZ_FNAME, TY_CHAR)
-	call salloc (nstarfile, SZ_FNAME, TY_CHAR)
-	call salloc (rejfile, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (groupfile, sz_val, TY_CHAR)
+	call salloc (psfimage, sz_val, TY_CHAR)
+	call salloc (nstarfile, sz_val, TY_CHAR)
+	call salloc (rejfile, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the input and output file names.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -171,7 +174,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open the input image.
-	    im = immap (Memc[image], READ_ONLY, 0)		
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
 
@@ -179,8 +182,10 @@ begin
             req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
             memstat = dp_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call dp_pcache (im, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call dp_pcache (im, l_val, buf_size)
+	    }
 
 	    # Open the input group table.
 	    if (fntgfnb (alist, Memc[groupfile], SZ_FNAME) == EOF)
@@ -196,7 +201,7 @@ begin
 	    if (ap_text)
 	        grp = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else
-	        grp = tbtopn (Memc[outfname], READ_ONLY, 0)
+	        grp = tbtopn (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 
 	    # Open and read the PSF image.
@@ -209,7 +214,7 @@ begin
 		    Memc[outfname], SZ_FNAME)
 	    else
 	        call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
-	    psfim = immap (Memc[outfname], READ_ONLY, 0)
+	    psfim = immap (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_readpsf (dao, psfim)
 	    call dp_sets (dao, PSFIMAGE, Memc[outfname])
 	
@@ -230,7 +235,7 @@ begin
 	    if (DP_TEXT(dao) == YES)
 	        nst = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	    else
-	        nst = tbtopn (Memc[outfname], NEW_FILE, 0)
+	        nst = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 	    call dp_sets (dao, OUTPHOTFILE, Memc[outfname])
 
 	    if (lrlist <= 0) {
@@ -249,7 +254,7 @@ begin
 	        if (DP_TEXT(dao) == YES)
 	            rejfd = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	        else
-	            rejfd = tbtopn (Memc[outfname], NEW_FILE, 0)
+	            rejfd = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 	    }
 	    call dp_sets (dao, OUTREJFILE, Memc[outfname])
 
@@ -260,26 +265,32 @@ begin
 	    call imunmap (im)
 
 	    # Close the group file. 
-	    if (ap_text)
-		call close (grp)
-	    else
+	    if (ap_text) {
+		i_val = grp
+		call close (i_val)
+	    } else {
 	        call tbtclo (grp)
+	    }
 
 	    # Close the PSF image.
 	    call imunmap (psfim)
 
 	    # Close the output photometry file.
-	    if (DP_TEXT(dao) == YES)
-		call close (nst)
-	    else
+	    if (DP_TEXT(dao) == YES) {
+		i_val = nst
+		call close (i_val)
+	    } else {
 	        call tbtclo (nst)
+	    }
 
 	    # Close the output rejections file.
 	    if (rejfd != NULL) {
-	        if (DP_TEXT(dao) == YES)
-		    call close (rejfd)
-	        else
+		if (DP_TEXT(dao) == YES) {
+		    i_val = rejfd
+		    call close (i_val)
+		} else {
 	            call tbtclo (rejfd)
+		}
 	    }
 
             # Uncache memory.

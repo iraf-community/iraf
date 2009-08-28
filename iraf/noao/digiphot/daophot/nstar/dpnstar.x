@@ -13,18 +13,20 @@ procedure dp_nphot (dao, im, grp, nst, rej, ap_text)
 
 pointer	dao			# pointer to the daophot structure
 pointer	im			# input image descriptor
-int	grp			# input group file descriptor
-int	nst			# output photometry file descriptor
-int	rej			# rejections file descriptor
+pointer	grp			# input group file descriptor
+pointer	nst			# output photometry file descriptor
+pointer	rej			# rejections file descriptor
 bool	ap_text			# photometry text file
 
+size_t	sz_val
 bool	converge 
-int	out_record, rout_record, in_record, nrow_in_table, old_size, niter
-int	cdimen, stat
+int	old_size, niter, cdimen, stat, i_val0, i_val1
+long	in_record, nrow_in_table, out_record, rout_record
 pointer	sp, indices, fields, icolpoint, ocolpoint, key, nstar, apsel
 real	radius, mean_sky
 
-int	dp_ggroup(), tbpsta(), dp_nstarfit(), dp_nxycheck()
+int	dp_ggroup(), dp_nstarfit(), dp_nxycheck()
+long	tbpstl()
 real	dp_nmsky()
 
 begin
@@ -35,10 +37,14 @@ begin
 
 	# Allocate working memory.
 	call smark (sp)
-	call salloc (icolpoint, NAPGROUP, TY_INT)
-	call salloc (indices, NAPPAR, TY_INT)
-	call salloc (fields, SZ_LINE, TY_CHAR)
-	call salloc (ocolpoint, NST_NOUTCOL, TY_INT)
+	sz_val = NAPGROUP
+	call salloc (icolpoint, sz_val, TY_POINTER)
+	sz_val = NAPPAR
+	call salloc (indices, sz_val, TY_INT)
+	sz_val = SZ_LINE
+	call salloc (fields, sz_val, TY_CHAR)
+	sz_val = NST_NOUTCOL
+	call salloc (ocolpoint, sz_val, TY_POINTER)
 
 	# Get some daophot pointers.
 	apsel = DP_APSEL(dao)
@@ -46,13 +52,16 @@ begin
 
 	# Allocate space for and define the output table.
 	if (DP_TEXT(dao) == YES) { 
-	    call dp_xpnewnstar (dao, nst)
-	    if (rej != NULL)
-	        call dp_xpnewnstar (dao, rej)
+	    i_val0 = nst
+	    call dp_xpnewnstar (dao, i_val0)
+	    if (rej != NULL) {
+		i_val0 = rej
+	        call dp_xpnewnstar (dao, i_val0)
+	    }
 	} else {
-	    call dp_tpnewnstar (dao, nst, Memi[ocolpoint])
+	    call dp_tpnewnstar (dao, nst, Memp[ocolpoint])
 	    if (rej != NULL)
-	        call dp_tpnewnstar (dao, rej, Memi[ocolpoint])
+	        call dp_tpnewnstar (dao, rej, Memp[ocolpoint])
 	}
 
 	# Set up the input file.
@@ -63,8 +72,8 @@ begin
 	    nrow_in_table = 0
 	} else {
 	    key = NULL
-	    call dp_tnstinit (grp, Memi[icolpoint])
-	    nrow_in_table = tbpsta (grp, TBL_NROWS)
+	    call dp_tnstinit (grp, Memp[icolpoint])
+	    nrow_in_table = tbpstl (grp, TBL_NROWS)
 	}
 
 	# Allocate some memory for fitting.
@@ -80,16 +89,17 @@ begin
 
 	    # Read in the next group of stars.
 	    old_size = dp_ggroup (dao, grp, key, Memc[fields], Memi[indices],
-	        Memi[icolpoint], nrow_in_table, DP_MAXGROUP(dao), in_record,
+	        Memp[icolpoint], nrow_in_table, DP_MAXGROUP(dao), in_record,
 		DP_NGNUM(nstar))
 	    if (old_size <= 0)
 		break
 	    DP_NNUM(nstar) = old_size
 
 	    # Convert coordinates if necessary.
+	    sz_val = DP_NNUM(nstar)
 	    call dp_win (dao, im, Memr[DP_APXCEN(apsel)],
 	        Memr[DP_APYCEN(apsel)], Memr[DP_APXCEN(apsel)],
-		Memr[DP_APYCEN(apsel)], DP_NNUM(nstar))
+		Memr[DP_APYCEN(apsel)], sz_val)
 
 	    # Print out the group number and number of stars.
 	    if (DP_VERBOSE (dao) == YES) {
@@ -122,7 +132,8 @@ begin
 			call pargi (DP_MAXGROUP(dao))
 		}
 		niter = 0
-		call realloc (DP_NIER(nstar), DP_NNUM(nstar), TY_INT)
+		sz_val = DP_NNUM(nstar)
+		call realloc (DP_NIER(nstar), sz_val, TY_INT)
 		call dp_nstindef (dao, DP_NNUM(nstar), NSTERR_BIGGROUP)
 
 	    # If the mean sky value of group is undefined skip to next group.
@@ -165,11 +176,14 @@ begin
 	    }
 
 	    # Now write out the results.
-	    if (DP_TEXT(dao) == YES)
-	        call dp_xntwrite (dao, im, nst, rej, niter, old_size)
-	    else
+	    if (DP_TEXT(dao) == YES) {
+		i_val0 = nst
+		i_val1 = rej
+	        call dp_xntwrite (dao, im, i_val0, i_val1, niter, old_size)
+	    } else {
 	        call dp_tntwrite (dao, im, nst, rej, niter, old_size,
-		    out_record, rout_record, Memi[ocolpoint])
+		    out_record, rout_record, Memp[ocolpoint])
+	    }
 	} 
 
 	if (ap_text)
@@ -247,6 +261,7 @@ int	stat			# the return status
 
 int	i, nxy
 real	xmin, xmax, ymin, ymax, xx, yy
+long	lint()
 
 begin
 	# Initialize.
@@ -278,13 +293,13 @@ begin
 
 	# Test the min and max values. 
 	stat = GRP_CTROFFIMAGE
-	if ((int (xmin - radius) + 1) > IM_LEN(im,1))
+	if ((lint (xmin - radius) + 1) > IM_LEN(im,1))
 	    return (stat)
-	if (int (xmax + radius) < 1)
+	if (lint (xmax + radius) < 1)
 	    return (stat)
-	if ((int (ymin - radius) + 1) > IM_LEN(im,2))
+	if ((lint (ymin - radius) + 1) > IM_LEN(im,2))
 	    return (stat)
-	if (int (ymax + radius) < 1)
+	if (lint (ymax + radius) < 1)
 	    return (stat)
 	
 	# The group is on the image.
