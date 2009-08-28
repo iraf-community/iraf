@@ -10,23 +10,25 @@ pointer im                      # the image descriptor
 
 pointer mw, ct
 int     dp_stati()
-pointer mw_openim(), mw_sctran()
+pointer	dp_statp(), mw_openim(), mw_sctran()
 errchk  mw_openim(), mw_sctran()
+
+include	<nullptr.inc>
 
 begin
         # Set the wcs descriptors.
-        mw = dp_stati (dp, MW)
+        mw = dp_statp (dp, MW)
         if (mw != NULL)
             call mw_close (mw)
         iferr {
             mw = mw_openim (im)
         } then {
-            call dp_seti (dp, MW, NULL)
-            call dp_seti (dp, CTIN, NULL)
-            call dp_seti (dp, CTOUT, NULL)
-            call dp_seti (dp, CTPSF, NULL)
+            call dp_setp (dp, MW, NULLPTR)
+            call dp_setp (dp, CTIN, NULLPTR)
+            call dp_setp (dp, CTOUT, NULLPTR)
+            call dp_setp (dp, CTPSF, NULLPTR)
         } else {
-            call dp_seti (dp, MW, mw)
+            call dp_setp (dp, MW, mw)
             switch (dp_stati (dp, WCSIN)) {
             case WCS_WORLD:
                 iferr (ct = mw_sctran (mw, "world", "logical", 03B))
@@ -39,7 +41,7 @@ begin
             default:
                 ct = NULL
             }
-            call dp_seti (dp, CTIN, ct)
+            call dp_setp (dp, CTIN, ct)
             switch (dp_stati (dp, WCSOUT)) {
             case WCS_PHYSICAL:
                 iferr (ct = mw_sctran (mw, "logical", "physical", 03B))
@@ -49,7 +51,7 @@ begin
             default:
                 ct = NULL
             }
-            call dp_seti (dp, CTOUT, ct)
+            call dp_setp (dp, CTOUT, ct)
             switch (dp_stati (dp, WCSPSF)) {
             case WCS_PHYSICAL:
                 iferr (ct = mw_sctran (mw, "logical", "physical", 03B))
@@ -59,7 +61,7 @@ begin
             default:
                 ct = NULL
             }
-            call dp_seti (dp, CTPSF, ct)
+            call dp_setp (dp, CTPSF, ct)
         }
 
 	# Get the proper values from the image header if an image is defined.

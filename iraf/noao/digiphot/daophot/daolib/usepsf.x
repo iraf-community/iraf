@@ -10,15 +10,17 @@ real	dx, dy			# distance for center of function
 real	bright			# the relative brightness of the object
 real	par[ARB]		# current values of the parameters
 real    psf[npsf,npsf,ARB]	# the psf lookup tables	
-int	npsf			# size of the psf look-up table
+size_t	npsf			# size of the psf look-up table
 int	nexp			# number pf look-up tables
 int	nfrac			# fractional pixel expansion
 real	deltax, deltay		# distance from center of look-up tables
 real	dvdxc, dvdyc		# derivatives with respect to position
 
-int	nterm, j, k, lx, ly
+int	nterm, j, k
+long	lx, ly
 real	psfval, middle, junk[MAX_NEXPTERMS], xx, yy, corr, dfdx, dfdy
 real	dp_profile(), bicubic()
+long	lint()
 
 begin
 	nterm = nexp + nfrac
@@ -49,9 +51,9 @@ begin
 
 	if (nfrac >  0) {
 	    j = nexp + 1
-	    junk[j] = - 2. * (dx - real(nint(dx)))
+	    junk[j] = - 2. * (dx - anint(dx))
 	    j = j + 1
-	    junk[j] = - 2. * (dy - real(nint(dy)))
+	    junk[j] = - 2. * (dy - anint(dy))
 	    j = j + 1
 	    junk[j] = 1.5 * junk[j-2] ** 2 - 0.5
 	    j = j + 1
@@ -65,9 +67,9 @@ begin
 
 	middle = (npsf + 1) / 2
 	xx = (2. * dx) + middle
-	lx = int (xx)
+	lx = lint (xx)
 	yy = (2. * dy) + middle
-	ly = int (yy)
+	ly = lint (yy)
 
 	do k = 1, nterm {
 	    corr = bicubic (psf[lx-1,ly-1,k], npsf, xx - real(lx),

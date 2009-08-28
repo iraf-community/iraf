@@ -42,7 +42,8 @@ libpkg.a:
 	invers2.x
 	mvmul.x
 	quick.f
-	pctile.f
+	quickl.fpp
+	pctile.fpp
 	profile.x	../lib/daophotdef.h
 	usepsf.x	../lib/daophotdef.h
 	;

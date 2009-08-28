@@ -9,12 +9,13 @@ char	time[ARB]	# the time string
 int	maxch		# the maximum number of character in the string
 
 int	tm[LEN_TMSTRUCT]
-long	ctime
+long	ctime, l_val
 long	clktime()
 #long	lsttogmt()
 
 begin
-	ctime = clktime (long(0))
+	l_val = 0
+	ctime = clktime (l_val)
 	#ctime = lsttogmt (ctime)
 	call brktime (ctime, tm)
 	call sprintf (date, maxch, "%04d-%02d-%02d")

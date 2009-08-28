@@ -6,14 +6,16 @@ procedure dp_vfunction (dao)
 
 pointer	dao		# pointer to the daophot structure.
 
+size_t	sz_val
 int	len
 pointer	sp, str, pstr
 int	scan(), nscan(), strlen(), dp_fctdecode(), dp_strwrd()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (pstr, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (pstr, sz_val, TY_CHAR)
 
 	# Print the current function list.
 	len = strlen (DP_FUNCLIST(dao))

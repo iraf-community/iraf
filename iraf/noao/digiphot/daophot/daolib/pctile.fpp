@@ -16,15 +16,16 @@ c
       real function pctile (datum, n, npct)
 c
       implicit none
-      integer n, npct
+      XLONG n, npct
       real datum(1)
-      integer min0, max0
       real dkey
-      integer lo, hi, limlo, limhi
+      XLONG lo, hi, limlo, limhi, tmp0, tmp1
 c
 c Initialize the pointers.
 c
-      npct = max0 (1, min0 (n,npct))
+      tmp0 = 1
+      tmp1 = min (n, npct)
+      npct = max (tmp0, tmp1)
       limlo = 1
       limhi = n
 c

@@ -7,8 +7,8 @@ procedure dp_gppars (dao)
 
 pointer	dao		# pointer to daophot structure
 
-int	dp, dap
-pointer	mp, str, tstr
+size_t	sz_val
+pointer	dap, dp, mp, str, tstr
 real	scale, fwhmpsf, psfrad, matchrad, fitrad, annulus, dannulus, mergerad
 
 bool	clgetb(), clgpsetb()
@@ -19,8 +19,9 @@ real	clgpsetr()
 begin
 	# Allocate working space.
 	call smark (mp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (tstr, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (tstr, sz_val, TY_CHAR)
 
 	# Open the daophot structure.
 	call dp_init (dao)
@@ -143,13 +144,15 @@ char	instr[ARB]		# the input list of functions
 char	outstr[ARB]		# the output list of functions
 int	maxch			# maximum size of the output string
 
+size_t	sz_val
 int	ip, op, ntok, tok
 pointer	sp, token
 int	ctotok(), strdic(), gstrcpy, gstrcat()
 
 begin
 	call smark (sp)
-	call salloc (token, maxch, TY_CHAR)
+	sz_val = maxch
+	call salloc (token, sz_val, TY_CHAR)
 
 	outstr[1] = ','
 	outstr[2] = EOS

@@ -6,7 +6,7 @@
 real procedure bicubic (f, nbox, dx, dy, dfdx, dfdy)
 
 real	f[nbox,nbox]		# input real array to be interpolated
-int	nbox			# size of the input array
+size_t	nbox			# size of the input array
 real	dx, dy			# point at which array is to be interpolated
 real	dfdx, dfdy		# output derivative of the interpolant
 

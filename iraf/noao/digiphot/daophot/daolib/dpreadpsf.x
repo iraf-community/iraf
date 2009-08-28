@@ -9,19 +9,24 @@ procedure dp_readpsf (dao, im)
 pointer	dao			# pointer to the DAOPHOT Structure
 pointer	im			# image descriptor
 
+long	l_val
+size_t	sz_val
 int	i, ival, npsfstars
 pointer	sp, str, v, psffit, psflut, buf
 real	scale, rval
 bool	imgetb(), streq()
-int	imgeti(), imgnlr(), btoi()
+int	imgeti(), btoi()
 real	imgetr()
+long	imgnlr()
 errchk	imgetr(), imgeti()
 
 begin
 	# Allocate working memory.
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (v, IM_MAXDIM, TY_LONG)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	sz_val = IM_MAXDIM
+	call salloc (v, sz_val, TY_LONG)
 
 	# Set up needed daophot pointers.
 	psffit = DP_PSFFIT(dao)
@@ -104,7 +109,9 @@ begin
 	    call realloc (DP_PSFLUT(psffit), DP_PSFSIZE(psffit) *
 	        DP_PSFSIZE(psffit) * IM_LEN(im,3), TY_REAL)
 	    psflut = DP_PSFLUT (psffit)
-	    call amovkl (long(1), Meml[v], IM_MAXDIM)
+	    l_val = 1
+	    sz_val = IM_MAXDIM
+	    call amovkl (l_val, Meml[v], sz_val)
 	    while (imgnlr (im, buf, Meml[v]) != EOF) {
 	        call amovr (Memr[buf], Memr[psflut], DP_PSFSIZE(psffit))
 	        psflut = psflut + DP_PSFSIZE(psffit)

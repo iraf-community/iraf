@@ -45,15 +45,16 @@ end
 procedure dp_pcache (im, req_size, buf_size)
 
 pointer im                      #I the input image point
-int     req_size                #I the requested working set size in chars
-int	buf_size		#O the new image buffer size
+long	req_size                #I the requested working set size in chars
+size_t	buf_size		#O the new image buffer size
 
-int     def_size, new_imbufsize
-int     sizeof(), imstati()
+long	def_size, new_imbufsize
+int     sizeof()
+long	imstatl()
 
 begin
 	# Find the default buffer size.
-	def_size = imstati (im, IM_BUFSIZE)
+	def_size = imstatl (im, IM_BUFSIZE)
 
         # Return if the image is not 2-dimensional.
         if (IM_NDIM(im) != 2) {
@@ -62,7 +63,7 @@ begin
 	}
 
         # Compute the new required image i/o buffer size in chars.
-        if (IS_INDEFI(req_size)) {
+        if (IS_INDEFL(req_size)) {
             new_imbufsize = IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
         } else {
@@ -77,7 +78,7 @@ begin
 	}
 
         # Reset the image i/o buffer.
-        call imseti (im, IM_BUFSIZE, new_imbufsize)
+        call imsetl (im, IM_BUFSIZE, new_imbufsize)
         call imseti (im, IM_BUFFRAC, 0)
 	buf_size = new_imbufsize
         return 

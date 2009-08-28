@@ -6,6 +6,7 @@ procedure dp_pppars (dao)
 
 pointer	dao		# pointer to daophot structure
 
+size_t	sz_val
 pointer	sp, str, fstr, dap
 bool	itob()
 int	dp_stati(), strlen()
@@ -14,8 +15,9 @@ real	dp_statr()
 
 begin
 	call smark (sp)
-	call salloc (str, SZ_FNAME, TY_CHAR)
-	call salloc (fstr, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (str, sz_val, TY_CHAR)
+	call salloc (fstr, sz_val, TY_CHAR)
 
 	# Set the package parameter text.
 	call clputb ("text", itob (dp_stati (dao, TEXT)))

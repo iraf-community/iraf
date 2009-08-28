@@ -8,6 +8,7 @@ procedure dp_airmass (im, dao)
 pointer	im		# pointer to IRAF image
 pointer	dao		# pointer to the daophot structure
 
+size_t	sz_val
 pointer	sp, key
 real	xair
 real	imgetr(), dp_statr()
@@ -15,7 +16,8 @@ real	imgetr(), dp_statr()
 begin
 	# Get the airmass keyword.
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
 	call dp_stats (dao, AIRMASS, Memc[key], SZ_FNAME)
 
 	# Get the value.

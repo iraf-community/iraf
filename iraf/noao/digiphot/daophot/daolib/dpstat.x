@@ -65,20 +65,12 @@ begin
 	apsel = DP_APSEL(dao)
 
 	switch (param) {
-	case MW:
-	    return (DP_MW(dao))
 	case WCSIN:
 	    return (DP_WCSIN(dao))
 	case WCSOUT:
 	    return (DP_WCSOUT(dao))
 	case WCSPSF:
 	    return (DP_WCSPSF(dao))
-	case CTIN:
-	    return (DP_CTIN(dao))
-	case CTOUT:
-	    return (DP_CTOUT(dao))
-	case CTPSF:
-	    return (DP_CTPSF(dao))
 	case MAXITER:
 	    return (DP_MAXITER(dao))
 	case VERBOSE:
@@ -109,6 +101,33 @@ begin
 	    return (DP_APNUM(apsel))
 	default:
 	    call error (0, "DP_STATI: Unknown integer daophot parameter")
+	}
+end
+
+
+# DP_STATO -- Fetch a daophot pointer parameter.
+
+pointer procedure dp_statp (dao, param)
+
+pointer	dao		# pointer to daophot structure
+int	param		# parameter
+
+pointer	apsel
+
+begin
+	apsel = DP_APSEL(dao)
+
+	switch (param) {
+	case MW:
+	    return (DP_MW(dao))
+	case CTIN:
+	    return (DP_CTIN(dao))
+	case CTOUT:
+	    return (DP_CTOUT(dao))
+	case CTPSF:
+	    return (DP_CTPSF(dao))
+	default:
+	    call error (0, "DP_STATP: Unknown pointer daophot parameter")
 	}
 end
 

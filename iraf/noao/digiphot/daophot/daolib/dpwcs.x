@@ -13,7 +13,7 @@ real	xin[ARB]		# the input x coordinate
 real	yin[ARB]		# the input y coordinate
 real	xout[ARB]		# the output x coordinate 
 real	yout[ARB]		# the output y coordinate
-int	npts			# the number of coordinates to convert
+size_t	npts			# the number of coordinates to convert
 
 int	dp_stati()
 
@@ -41,7 +41,7 @@ real	xin[ARB]		# the input x coordinate
 real	yin[ARB]		# the input y coordinate
 real	xout[ARB]		# the output x coordinate 
 real	yout[ARB]		# the output y coordinate
-int	npts			# the number of coordinates to convert
+size_t	npts			# the number of coordinates to convert
 
 int	dp_stati()
 
@@ -69,7 +69,7 @@ real	xin[ARB]		# the input x coordinate
 real	yin[ARB]		# the input y coordinate
 real	xout[ARB]		# the output x coordinate 
 real	yout[ARB]		# the output y coordinate
-int	npts			# the number of coordinates to convert
+size_t	npts			# the number of coordinates to convert
 
 int	dp_stati()
 
@@ -97,15 +97,15 @@ real	xin[ARB]		# the input x coordinate
 real	yin[ARB]		# the input y coordinate
 real	xout[ARB]		# the output x coordinate 
 real	yout[ARB]		# the output y coordinate
-int	npts			# the number of coordinates to convert
+size_t	npts			# the number of coordinates to convert
 
 double	xt, yt
 pointer	ct
-int	i
-int	dp_stati()
+long	i
+pointer	dp_statp()
 
 begin
-	ct = dp_stati (dp, CTIN)
+	ct = dp_statp (dp, CTIN)
 	if (ct == NULL) {
 	    call amovr (xin, xout, npts)
 	    call amovr (yin, yout, npts)
@@ -130,15 +130,15 @@ real	xin[ARB]		# the input x coordinate
 real	yin[ARB]		# the input y coordinate
 real	xout[ARB]		# the output x coordinate 
 real	yout[ARB]		# the output y coordinate
-int	npts			# the number of coordinates to convert
+size_t	npts			# the number of coordinates to convert
 
 double	xt, yt
 pointer	ct
-int	i
-int	dp_stati()
+long	i
+pointer	dp_statp()
 
 begin
-	ct = dp_stati (dp, CTOUT)
+	ct = dp_statp (dp, CTOUT)
 	if (ct == NULL) {
 	    call amovr (xin, xout, npts)
 	    call amovr (yin, yout, npts)
@@ -163,15 +163,15 @@ real	xin[ARB]		# the input x coordinate
 real	yin[ARB]		# the input y coordinate
 real	xout[ARB]		# the output x coordinate 
 real	yout[ARB]		# the output y coordinate
-int	npts			# the number of coordinates to convert
+size_t	npts			# the number of coordinates to convert
 
 double	xt, yt
 pointer	ct
-int	i
-int	dp_stati()
+long	i
+pointer	dp_statp()
 
 begin
-	ct = dp_stati (dp, CTPSF)
+	ct = dp_statp (dp, CTPSF)
 	if (ct == NULL) {
 	    call amovr (xin, xout, npts)
 	    call amovr (yin, yout, npts)
@@ -196,9 +196,10 @@ real	xin[ARB]		# the input x coordinate
 real	yin[ARB]		# the input y coordinate
 real	xout[ARB]		# the output x coordinate 
 real	yout[ARB]		# the output y coordinate
-int	npts			# the number of coordinates to convert
+size_t	npts			# the number of coordinates to convert
 
-int	i, index1, index2
+int	index1, index2
+long	i
 
 begin
 	index1 = IM_VMAP(im,1)
@@ -220,9 +221,10 @@ real	xin[ARB]		# the input x coordinate
 real	yin[ARB]		# the input y coordinate
 real	xout[ARB]		# the output x coordinate 
 real	yout[ARB]		# the output y coordinate
-int	npts			# the number of coordinates to convert
+size_t	npts			# the number of coordinates to convert
 
-int	i, index1, index2
+int	index1, index2
+long	i
 
 begin
 	index1 = IM_VMAP(im,1)

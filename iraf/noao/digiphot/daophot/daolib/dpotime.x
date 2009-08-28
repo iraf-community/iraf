@@ -8,6 +8,7 @@ procedure dp_otime (im, dao)
 pointer	im		# pointer to IRAF image
 pointer	dao		# pointer to the daophot structure
 
+size_t	sz_val
 char	timechar
 int	index
 pointer	sp, key, otime
@@ -16,8 +17,9 @@ int	strldx()
 
 begin
 	call smark (sp)
-	call salloc (key, SZ_FNAME, TY_CHAR)
-	call salloc (otime, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (key, sz_val, TY_CHAR)
+	call salloc (otime, sz_val, TY_CHAR)
 
 	call dp_stats (dao, OBSTIME, Memc[key], SZ_FNAME)
 	Memc[otime] = EOS

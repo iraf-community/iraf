@@ -12,14 +12,16 @@ char	ext[ARB]		# extension
 char	name[ARB]		# input name
 int	maxch			# maximum size of name
 
+size_t	sz_val
 int	ndir, nimdir, clindex, clsize
 pointer	sp, root, str
 int	fnldir(), strlen()
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	ndir = fnldir (input, name, maxch)
 	if (strlen (input) == ndir) {
@@ -54,16 +56,20 @@ char    image[ARB]              # image specification
 char    root[ARB]               # output root name
 int     maxch                   # maximum number of characters
 
+size_t	sz_val
 pointer sp, imroot, kernel, section, str
 int     clindex, clsize, nchars
 int     fnldir()
 
 begin
         call smark (sp)
-        call salloc (imroot, SZ_PATHNAME, TY_CHAR)
-        call salloc (kernel, SZ_FNAME, TY_CHAR)
-        call salloc (section, SZ_FNAME, TY_CHAR)
-        call salloc (str, SZ_PATHNAME, TY_CHAR)
+        sz_val = SZ_PATHNAME
+        call salloc (imroot, sz_val, TY_CHAR)
+        sz_val = SZ_FNAME
+        call salloc (kernel, sz_val, TY_CHAR)
+        call salloc (section, sz_val, TY_CHAR)
+        sz_val = SZ_PATHNAME
+        call salloc (str, sz_val, TY_CHAR)
 
         call imparse (image, Memc[imroot], SZ_PATHNAME, Memc[kernel], SZ_FNAME,
             Memc[section], SZ_FNAME, clindex, clsize)
@@ -94,6 +100,7 @@ char	template[ARB]			# name template
 char	filename[ARB]			# output name
 int	maxch				# maximum number of characters
 
+size_t	sz_val
 char	period
 int	newversion, version, len
 pointer	sp, list, name
@@ -103,7 +110,8 @@ pointer	imtopen()
 begin
 	# Allocate temporary space
 	call smark (sp)
-	call salloc (name, maxch, TY_CHAR)
+	sz_val = maxch
+	call salloc (name, sz_val, TY_CHAR)
 	period = '.'
 	list = imtopen (template)
 
@@ -139,6 +147,7 @@ char	template[ARB]			# name template
 char	filename[ARB]			# output name
 int	maxch				# maximum number of characters
 
+size_t	sz_val
 char	period
 int	newversion, version, len
 pointer	sp, list, name
@@ -148,7 +157,8 @@ pointer	imtopen()
 begin
 	# Allocate temporary space
 	call smark (sp)
-	call salloc (name, maxch, TY_CHAR)
+	sz_val = maxch
+	call salloc (name, sz_val, TY_CHAR)
 	period = '.'
 	list = imtopen (template)
 
@@ -188,14 +198,16 @@ char	ext[ARB]		# extension
 char	name[ARB]		# output name
 int	maxch			# maximum size of name
 
+size_t	sz_val
 int	ndir, nimdir, clindex, clsize
 pointer	sp, root, str
 int	fnldir(), strlen()
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	ndir = fnldir (output, name, maxch)
 	if (strlen (output) == ndir) {
@@ -233,14 +245,16 @@ char	ext[ARB]		# extension
 char	name[ARB]		# input name
 int	maxch			# maximum size of name
 
+size_t	sz_val
 int	ndir, nimdir, clindex, clsize
 pointer	sp, root, str
 int	fnldir(), strlen()
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	ndir = fnldir (input, name, maxch)
 	if (strlen (input) == ndir) {
@@ -278,14 +292,16 @@ char	ext[ARB]		# extension
 char	name[ARB]		# output name
 int	maxch			# maximum size of name
 
+size_t	sz_val
 int	ndir, nimdir, clindex, clsize
 pointer	sp, root, str
 int	fnldir(), strlen()
 
 begin
 	call smark (sp)
-	call salloc (root, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (root, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	ndir = fnldir (output, name, maxch)
 	if (strlen (output) == ndir) {
@@ -319,6 +335,7 @@ char	template[ARB]			# name template
 char	filename[ARB]			# output name
 int	maxch				# maximum number of characters
 
+size_t	sz_val
 char	period
 int	newversion, version, len
 pointer	sp, list, name
@@ -328,7 +345,8 @@ pointer	fntopnb()
 begin
 	# Allocate temporary space
 	call smark (sp)
-	call salloc (name, maxch, TY_CHAR)
+	sz_val = maxch
+	call salloc (name, sz_val, TY_CHAR)
 	period = '.'
 	list = fntopnb (template, NO)
 
@@ -362,6 +380,7 @@ char	template[ARB]			# name template
 char	filename[ARB]			# output name
 int	maxch				# maximum number of characters
 
+size_t	sz_val
 char	period
 int	newversion, version, len
 pointer	sp, list, name
@@ -371,7 +390,8 @@ pointer	fntopnb()
 begin
 	# Allocate temporary space
 	call smark (sp)
-	call salloc (name, maxch, TY_CHAR)
+	sz_val = maxch
+	call salloc (name, sz_val, TY_CHAR)
 	period = '.'
 	list = fntopnb (template, NO)
 
@@ -404,13 +424,15 @@ char    filename[ARB]           # input file name
 char    root[ARB]               # output root file name
 int     maxch                   # maximum number of characters
 
+size_t	sz_val
 pointer sp, str
 int     nchars
 int     fnldir()
 
 begin
         call smark (sp)
-        call salloc (str, SZ_PATHNAME, TY_CHAR)
+        sz_val = SZ_PATHNAME
+        call salloc (str, sz_val, TY_CHAR)
 
         nchars = fnldir (filename, Memc[str], SZ_PATHNAME)
         call strcpy (filename[nchars+1], root, maxch)

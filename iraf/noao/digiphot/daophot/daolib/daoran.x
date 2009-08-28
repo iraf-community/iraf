@@ -12,6 +12,7 @@ int	idum			# seed for the random number generator
 
 int	j, iff, iy, ir[LEN_IR]
 real	rnum2
+int	imod()
 data	iff /0/
 
 begin
@@ -20,12 +21,12 @@ begin
 	    # Initialize the random number generator.
 	    if ((idum < 0) || (iff == 0)) {
 		iff = 1
-		idum = mod (abs (IC - idum), M)
+		idum = imod (iabs (IC - idum), M)
 		do j = 1, LEN_IR {
-		    idum = mod (IA * idum + IC, M)
+		    idum = imod (IA * idum + IC, M)
 		    ir[j] = idum
 		}
-		idum = mod (IA * idum + IC, M)
+		idum = imod (IA * idum + IC, M)
 		iy = idum
 	    }
 
@@ -34,7 +35,7 @@ begin
 	    j = max (1, min (LEN_IR, j))
 	    iy = ir[j]
 	    rnum2 = iy * RM
-	    idum = mod (IA * idum + IC, M)
+	    idum = imod (IA * idum + IC, M)
 	    ir[j] = idum
 
 	} until (rnum2 > 0.0)

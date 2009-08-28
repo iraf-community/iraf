@@ -65,20 +65,12 @@ begin
 	apsel = DP_APSEL(dao)
 
 	switch (param) {
-	case MW:
-	    DP_MW(dao) = ival
 	case WCSIN:
 	    DP_WCSIN(dao) = ival
 	case WCSOUT:
 	    DP_WCSOUT(dao) = ival
 	case WCSPSF:
 	    DP_WCSPSF(dao) = ival
-	case CTIN:
-	    DP_CTIN(dao) = ival
-	case CTOUT:
-	    DP_CTOUT(dao) = ival
-	case CTPSF:
-	    DP_CTPSF(dao) = ival
 	case MAXITER:
 	    DP_MAXITER(dao) = ival
 	case VERBOSE:
@@ -109,6 +101,34 @@ begin
 	    DP_APNUM(apsel) = ival
 	default:
 	    call error (0, "DP_SETI: Unknown integer daophot parameter")
+	}
+end
+
+
+# DP_SETP -- Set a daophot pointer parameter.
+
+procedure dp_setp (dao, param, pval)
+
+pointer	dao		# pointer to daophot structure
+int	param		# parameter
+pointer	pval		# pointer value
+
+pointer	apsel
+
+begin
+	apsel = DP_APSEL(dao)
+
+	switch (param) {
+	case MW:
+	    DP_MW(dao) = pval
+	case CTIN:
+	    DP_CTIN(dao) = pval
+	case CTOUT:
+	    DP_CTOUT(dao) = pval
+	case CTPSF:
+	    DP_CTPSF(dao) = pval
+	default:
+	    call error (0, "DP_SETP: Unknown pointer daophot parameter")
 	}
 end
 

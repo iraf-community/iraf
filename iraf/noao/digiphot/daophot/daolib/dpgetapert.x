@@ -11,10 +11,11 @@ procedure dp_wgetapert (dao, im, apd, max_nstars, old_ap)
 
 pointer	dao			# pointer to the DAOPHOT structure
 pointer	im			# the input image descriptor
-int	apd			# input photometry file descriptor
+pointer	apd			# input photometry file descriptor
 int	max_nstars		# maximum number of stars
 bool	old_ap			# YES indicates old APPHOT file
 
+size_t	sz_val
 pointer	apsel
 int	dp_stati()
 
@@ -24,10 +25,12 @@ begin
 
 	# Transform the coordinates if necessary.
 	apsel = DP_APSEL (dao)
-	if (dp_stati (dao, WCSIN) != WCS_LOGICAL)
+	if (dp_stati (dao, WCSIN) != WCS_LOGICAL) {
+	    sz_val = DP_APNUM(apsel)
 	    call dp_win (dao, im, Memr[DP_APXCEN(apsel)],
 	        Memr[DP_APYCEN(apsel)], Memr[DP_APXCEN(apsel)],
-		Memr[DP_APYCEN(apsel)], DP_APNUM(apsel))
+		Memr[DP_APYCEN(apsel)], sz_val)
+	}
 end
 
 
@@ -37,13 +40,14 @@ end
 procedure dp_getapert (dao, apd, max_nstars, old_ap)
 
 pointer	dao			# pointer to the DAOPHOT structure
-int	apd			# input Photometry file descriptor
+pointer	apd			# input Photometry file descriptor
 int	max_nstars		# maximum number of stars
 bool	old_ap			# YES indicates old APPHOT file
 
-int	nstars
+int	nstars, i_val
 pointer	apsel
-int	tbpsta(), dp_goldap(), dp_gtabphot()
+int	dp_goldap(), dp_gtabphot()
+long	tbpstl()
 
 begin
 	# Get APSEL pointer.
@@ -60,11 +64,13 @@ begin
 	if (old_ap) {
 	    call dp_memapsel (dao, Memi[DP_APRESULT(apsel)], NAPRESULT,
 	        max_nstars)
-	    nstars = dp_goldap (apd, dao, max_nstars)
+	    i_val = apd
+	    nstars = dp_goldap (i_val, dao, max_nstars)
 	} else {
-	    call dp_memapsel (dao, Memi[DP_APRESULT(apsel)], NAPRESULT,
-	        tbpsta (apd, TBL_NROWS))
-	    nstars = dp_gtabphot (apd, dao, tbpsta (apd, TBL_NROWS))
+	    i_val = tbpstl (apd, TBL_NROWS)
+	    call dp_memapsel (dao, Memi[DP_APRESULT(apsel)], NAPRESULT, i_val)
+	    i_val = tbpstl (apd, TBL_NROWS)
+	    nstars = dp_gtabphot (apd, dao, i_val)
 	}
 
 	# Reallocate to save space if appropopriate.
@@ -84,10 +90,12 @@ int	nfields		# number of fields to allocate space for
 int	max_nstars	# maximum number of stars
 
 int	i
+size_t	sz_maxnstars
 pointer	apsel
 
 begin
 	apsel = DP_APSEL(dao)
+	sz_maxnstars = max_nstars
 
 	# Allocate space for results.
 	do i = 1, nfields {
@@ -95,52 +103,52 @@ begin
 	    case DP_PAPID:
 	        if (DP_APID(apsel) != NULL)
 	            call mfree (DP_APID(apsel), TY_INT)
-	        call malloc (DP_APID(apsel), max_nstars, TY_INT)
+	        call malloc (DP_APID(apsel), sz_maxnstars, TY_INT)
 
 	    case DP_PAPXCEN:
 	        if (DP_APXCEN(apsel) != NULL)
 	            call mfree (DP_APXCEN(apsel), TY_REAL)
-	        call malloc (DP_APXCEN(apsel), max_nstars, TY_REAL)
+	        call malloc (DP_APXCEN(apsel), sz_maxnstars, TY_REAL)
 
 	    case DP_PAPYCEN:
 	        if (DP_APYCEN(apsel) != NULL)
 	            call mfree (DP_APYCEN(apsel), TY_REAL)
-	        call malloc (DP_APYCEN(apsel), max_nstars, TY_REAL)
+	        call malloc (DP_APYCEN(apsel), sz_maxnstars, TY_REAL)
 
 	    case DP_PAPSKY:
 	        if (DP_APMSKY(apsel) != NULL)
 	            call mfree (DP_APMSKY(apsel), TY_REAL)
-	        call malloc (DP_APMSKY(apsel), max_nstars, TY_REAL)
+	        call malloc (DP_APMSKY(apsel), sz_maxnstars, TY_REAL)
 
 	    case DP_PAPMAG1:
 		if (DP_APMAG(apsel) != NULL)
 	    	    call mfree (DP_APMAG(apsel), TY_REAL)
-		call malloc (DP_APMAG(apsel), max_nstars, TY_REAL)
+		call malloc (DP_APMAG(apsel), sz_maxnstars, TY_REAL)
 
 	    case DP_PAPGROUP:
 		if (DP_APGROUP(apsel) != NULL)
 	    	    call mfree (DP_APGROUP(apsel), TY_INT)
-		#call malloc (DP_APGROUP(apsel), max_nstars, TY_INT)
+		#call malloc (DP_APGROUP(apsel), sz_maxnstars, TY_INT)
 
 	    case DP_PAPMERR1:
 		if (DP_APERR(apsel) != NULL)
 	    	    call mfree (DP_APERR(apsel), TY_REAL)
-		call malloc (DP_APERR(apsel), max_nstars, TY_REAL)
+		call malloc (DP_APERR(apsel), sz_maxnstars, TY_REAL)
 
 	    case DP_PAPNITER:
 		if (DP_APNITER(apsel) != NULL)
 	    	    call mfree (DP_APNITER(apsel), TY_INT)
-		#call malloc (DP_APNITER(apsel), max_nstars, TY_INT)
+		#call malloc (DP_APNITER(apsel), sz_maxnstars, TY_INT)
 
 	    case DP_PAPCHI:
 		if (DP_APCHI(apsel) != NULL)
 	    	    call mfree (DP_APCHI(apsel), TY_REAL)
-		call malloc (DP_APCHI(apsel), max_nstars, TY_REAL)
+		call malloc (DP_APCHI(apsel), sz_maxnstars, TY_REAL)
 
 	    case DP_PAPSHARP:
 		if (DP_APSHARP(apsel) != NULL)
 	    	    call mfree (DP_APSHARP(apsel), TY_REAL)
-		call malloc (DP_APSHARP(apsel), max_nstars, TY_REAL)
+		call malloc (DP_APSHARP(apsel), sz_maxnstars, TY_REAL)
 	    }
 	}
 end
@@ -154,6 +162,7 @@ int	apd		# the input file descriptor
 pointer	dao		# pointer to the daophot structure
 int	max_nstars	# maximum number of stars
 
+size_t	sz_val
 int	nstars, bufsize, stat
 pointer	apsel, apkey, sp, fields
 int	dp_apsel()
@@ -164,7 +173,8 @@ begin
 
 	# Allocate some temporary space.
 	call smark (sp)
-	call salloc (fields, SZ_LINE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (fields, sz_val, TY_CHAR)
 
 	# Initialize the keyword structure.
 	call pt_kyinit (apkey)
@@ -217,9 +227,10 @@ pointer	dao			# pointer to daophot structure
 int	max_nstars		# maximum number of stars
 
 bool	nullflag
-int	record, index, nrow
+int	index
+long	record, nrow
 pointer	apsel, idpt, xcenpt, ycenpt, magpt, skypt
-int	tbpsta()
+long	tbpstl()
 
 begin
 	# Define the point to the apselect structure.
@@ -258,7 +269,7 @@ begin
 
 
 	# Get the results ignoring any record with ID = NULL.
-	nrow = min (tbpsta (tp, TBL_NROWS), max_nstars)
+	nrow = min (tbpstl (tp, TBL_NROWS), max_nstars)
 	index = 0
 	do record = 1, nrow {
 
@@ -295,35 +306,37 @@ int	fields[ARB]	# integer fields
 int	nfields		# number of fields
 int	max_nstars	# maximum number of stars
 
+size_t	sz_maxnstars
 int	i
 pointer	apsel
 
 begin
 	# Reallocate space for results.
 	apsel = DP_APSEL(dao)
+	sz_maxnstars = max_nstars
 
 	do i = 1,  nfields {
 	    switch (fields[i]) {
 	    case DP_PAPID:
-	        call realloc (DP_APID(apsel), max_nstars, TY_INT)
+	        call realloc (DP_APID(apsel), sz_maxnstars, TY_INT)
 	    case DP_PAPXCEN:
-	        call realloc (DP_APXCEN(apsel), max_nstars, TY_REAL)
+	        call realloc (DP_APXCEN(apsel), sz_maxnstars, TY_REAL)
 	    case DP_PAPYCEN:
-	        call realloc (DP_APYCEN(apsel), max_nstars, TY_REAL)
+	        call realloc (DP_APYCEN(apsel), sz_maxnstars, TY_REAL)
 	    case DP_PAPSKY:
-	        call realloc (DP_APMSKY(apsel), max_nstars, TY_REAL)
+	        call realloc (DP_APMSKY(apsel), sz_maxnstars, TY_REAL)
 	    case DP_PAPGROUP:
-		#call realloc (DP_APGROUP(apsel), max_nstars, TY_INT)
+		#call realloc (DP_APGROUP(apsel), sz_maxnstars, TY_INT)
 	    case DP_PAPMAG1:
-	        call realloc (DP_APMAG(apsel), max_nstars, TY_REAL)
+	        call realloc (DP_APMAG(apsel), sz_maxnstars, TY_REAL)
 	    case DP_PAPMERR1:
-	        call realloc (DP_APERR(apsel), max_nstars, TY_REAL)
+	        call realloc (DP_APERR(apsel), sz_maxnstars, TY_REAL)
 	    case DP_PAPNITER:
-	        #call realloc (DP_APNITER(apsel), max_nstars, TY_INT)
+	        #call realloc (DP_APNITER(apsel), sz_maxnstars, TY_INT)
 	    case DP_PAPSHARP:
-	        call realloc (DP_APSHARP(apsel), max_nstars, TY_REAL)
+	        call realloc (DP_APSHARP(apsel), sz_maxnstars, TY_REAL)
 	    case DP_PAPCHI:
-	        call realloc (DP_APCHI(apsel), max_nstars, TY_REAL)
+	        call realloc (DP_APCHI(apsel), sz_maxnstars, TY_REAL)
 	    }
 	}
 end
@@ -383,6 +396,7 @@ real	y		# y center
 real	sky		# sky value
 real	mag		# magnitude
 
+size_t	sz_val
 int	nchars, nunique, uunique, funique, ncontinue, recptr
 int 	first_rec, nselect, record
 pointer	line
@@ -398,7 +412,8 @@ begin
 	    funique = 0
 	    nselect = 0
 	    record = 0
-	    call malloc (line, SZ_LINE, TY_CHAR)
+	    sz_val = SZ_LINE
+	    call malloc (line, sz_val, TY_CHAR)
 	}
 
 	ncontinue = 0
@@ -487,7 +502,9 @@ real	y		# y position
 real	sky		# sky value
 real	mag		# magnitude
 
-int	i, index, elem, maxch, kip, ip
+size_t	sz_val
+int	i, index, elem, maxch, ip
+pointer	kip
 int	ctoi(), ctor()
 char	buffer[SZ_LINE]
 
@@ -498,10 +515,11 @@ begin
 	    index = Memi[KY_SELECT(key)+i-1]
 	    elem = Memi[KY_ELEM_SELECT(key)+i-1]
 	    maxch = Memi[KY_LEN_SELECT(key)+i-1]
-	    kip = Memi[KY_PTRS(key)+index-1] + (elem - 1) * maxch
+	    kip = Memp[KY_PTRS(key)+index-1] + (elem - 1) * maxch
 
 	    # Extract the appropriate field.
-	    call amovc (Memc[kip], buffer, maxch)
+	    sz_val = maxch
+	    call amovc (Memc[kip], buffer, sz_val)
 	    buffer[maxch+1] = EOS
 
 	    # Decode the output value.

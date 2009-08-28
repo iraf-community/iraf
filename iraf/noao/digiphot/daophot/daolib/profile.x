@@ -14,6 +14,7 @@ real	dhdxc, dhdyc		# derivatives of the function integral wrt x,y
 real	term[ARB]		# derivatives of the function wrt parameters
 int	ideriv			# compute the derivatives ?
 
+size_t	sz_val
 int	npt, ix, iy
 real	d[NGL,NGL], w[NGL,NGL], x[NGL], xsq[NGL], p1xsq[NGL]
 real	p1p2, dhdsx, dhdsy, erfx, erfy, p1sq, p2sq, y, ysq, p2ysq, profile
@@ -82,8 +83,10 @@ begin
 	    p2sq = par[2] ** 2
 	    p1p2 = par[1] * par[2]
 	    xy = dx * dy
-	    if (ideriv > 0)
-	        call aclrr (term, 4)
+	    if (ideriv > 0) {
+	        sz_val = 4
+	        call aclrr (term, sz_val)
+	    }
 
 	    denom = 1.0 + alpha * (dx ** 2 / p1sq + dy ** 2 / p2sq + xy *
 		par[3])
@@ -159,8 +162,10 @@ begin
 	    p2sq = par[2] ** 2
 	    onemp3 = 1.0 - par[3]
 	    xy = dx * dy
-	    if (ideriv > 0)
-	        call aclrr (term, 4)
+	    if (ideriv > 0) {
+	        sz_val = 4
+	        call aclrr (term, sz_val)
+	    }
 
 	    rsq = dx ** 2 / p1sq + dy ** 2 / p2sq
 	    if (rsq > 1.0e10)
@@ -253,8 +258,10 @@ begin
 	    p2sq = par[2] ** 2
 	    onemp3 = 1.0 - par[3]
 	    xy = dx * dy
-	    if (ideriv > 0)
-	        call aclrr (term, 5)
+	    if (ideriv > 0) {
+	        sz_val = 5
+	        call aclrr (term, sz_val)
+	    }
 
 	    rsq = dx ** 2 / p1sq + dy ** 2 / p2sq
 	    dfby = rsq + par[5] * xy
@@ -368,8 +375,10 @@ begin
 	    p2sq = par[2] ** 2
 	    p1p2 = par[1] * par[2]
 	    xy = dx * dy
-	    if (ideriv > 0)
-	        call aclrr (term, 4)
+	    if (ideriv > 0) {
+	        sz_val = 4
+	        call aclrr (term, sz_val)
+	    }
 
 	    denom = 1.0 + alpha * (dx ** 2 / p1sq + dy ** 2 / p2sq + xy *
 		par[3])
@@ -442,8 +451,10 @@ begin
 	    p2sq = par[2] ** 2
 	    p1p2 = par[1] * par[2]
 	    xy = dx * dy
-	    if (ideriv > 0)
-	        call aclrr (term, 3)
+	    if (ideriv > 0) {
+	        sz_val = 3
+	        call aclrr (term, sz_val)
+	    }
 
 	    denom = 1.0 + dx ** 2 / p1sq + dy ** 2 / p2sq + xy * par[3]
 	    if (denom > 1.0e10)

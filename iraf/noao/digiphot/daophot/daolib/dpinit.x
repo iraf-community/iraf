@@ -6,11 +6,13 @@ include "../lib/allstardef.h"
 
 procedure dp_init (dp)
 
+size_t	sz_val
 pointer	dp		# pointer to the daophot structure
 
 begin
 	# Set the daophot structure.
-	call calloc (dp, LEN_DPSTRUCT, TY_STRUCT)
+	sz_val = LEN_DPSTRUCT
+	call calloc (dp, sz_val, TY_STRUCT)
 
 	# Initalize the output type parameters.
 	DP_TEXT(dp) = YES
@@ -101,14 +103,17 @@ procedure dp_fitsetup (dp)
 
 pointer	dp		# pointer to daophot structure
 
+size_t	sz_val
 pointer	psffit
 bool	streq()
 
 begin
 	# Set up the psf fit structure.
-	call malloc (DP_PSFFIT(dp), LEN_PSFFIT, TY_STRUCT)
+	sz_val = LEN_PSFFIT
+	call malloc (DP_PSFFIT(dp), sz_val, TY_STRUCT)
 	psffit = DP_PSFFIT(dp)
-	call calloc (DP_PSFPARS(psffit), MAX_NFCTNPARS, TY_REAL)
+	sz_val = MAX_NFCTNPARS
+	call calloc (DP_PSFPARS(psffit), sz_val, TY_REAL)
 
 	# Define the psf function. The if user entered string is "auto"
 	# or a list then intialize the psf function to "gauss" or the
@@ -203,13 +208,16 @@ procedure dp_apselsetup (dp)
 
 pointer	dp		# pointer to daophot structure
 
+size_t	sz_val
 pointer	apsel
 
 begin
 	# APSEL structure
-	call malloc (DP_APSEL(dp), LEN_DPAPSTRUCT, TY_STRUCT)
+	sz_val = LEN_DPAPSTRUCT
+	call malloc (DP_APSEL(dp), sz_val, TY_STRUCT)
 	apsel = DP_APSEL(dp)
-	call malloc (DP_APRESULT(apsel), NAPPAR, TY_INT)
+	sz_val = NAPPAR
+	call malloc (DP_APRESULT(apsel), sz_val, TY_INT)
 
 	# Set the default values for the apsel parameters.
 	DP_APID(apsel) = NULL
