@@ -12,18 +12,22 @@ pointer	apfile				# aperture photometry file
 pointer	psfimage			# name of the output PSF
 pointer	groupfile			# output group table
 
+size_t	sz_val
 pointer	sp, im, dao, outfname, str, alist, olist, imlist, pimlist
-int	apd, root, cache, verbose, verify, update, grp, tp, wcs
-int	limlist, lalist, lpimlist, lolist
-int	buf_size, memstat
+pointer	apd, grp, tp
+int	root, cache, verbose, verify, update, wcs
+int	limlist, lalist, lpimlist, lolist, memstat, i_val
+long	l_val
 bool	ap_text
-size_t	req_size, old_size
+size_t	req_size, old_size, buf_size
 
 pointer	immap(), tbtopn(), fntopnb(), imtopen()
 int	access(), fnldir(), strlen(), strncmp(), fstati(), btoi()
 int	imtlen(), imtgetim(), fntlenb(), fntgfnb()
 int	open(), clgwrd(), sizeof(), dp_memstat()
 bool	clgetb(), itob()
+
+include	<nullptr.inc>
 
 begin
 	# Set the standard output to flush on newline.
@@ -32,12 +36,13 @@ begin
 
 	# Get some memory.
 	call smark (sp)
-	call salloc (image, SZ_FNAME, TY_CHAR)
-	call salloc (apfile, SZ_FNAME, TY_CHAR)
-	call salloc (psfimage, SZ_FNAME, TY_CHAR)
-	call salloc (groupfile, SZ_FNAME, TY_CHAR)
-	call salloc (outfname, SZ_FNAME, TY_CHAR)
-	call salloc (str, SZ_FNAME, TY_CHAR)
+	sz_val = SZ_FNAME
+	call salloc (image, sz_val, TY_CHAR)
+	call salloc (apfile, sz_val, TY_CHAR)
+	call salloc (psfimage, sz_val, TY_CHAR)
+	call salloc (groupfile, sz_val, TY_CHAR)
+	call salloc (outfname, sz_val, TY_CHAR)
+	call salloc (str, sz_val, TY_CHAR)
 
 	# Get the various task parameters.
 	call clgstr ("image", Memc[image], SZ_FNAME)
@@ -139,7 +144,7 @@ begin
 	while (imtgetim (imlist, Memc[image], SZ_FNAME) != EOF) {
 
 	    # Open input image and grab some header parameters.
-	    im = immap (Memc[image], READ_ONLY, 0)		
+	    im = immap (Memc[image], READ_ONLY, NULLPTR)
 	    call dp_imkeys (dao, im)
 	    call dp_sets (dao, INIMAGE, Memc[image])
 
@@ -147,8 +152,10 @@ begin
             req_size = MEMFUDGE * IM_LEN(im,1) * IM_LEN(im,2) *
                 sizeof (IM_PIXTYPE(im))
             memstat = dp_memstat (cache, req_size, old_size)
-            if (memstat == YES)
-                call dp_pcache (im, INDEFI, buf_size)
+            if (memstat == YES) {
+		l_val = INDEFL
+                call dp_pcache (im, l_val, buf_size)
+	    }
 
 	    # Open input photometry list and read in the photometry.
 	    if (fntgfnb (alist, Memc[apfile], SZ_FNAME) == EOF)
@@ -164,7 +171,7 @@ begin
 	    if (ap_text)
 	        apd = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 	    else
-	        apd = tbtopn (Memc[outfname], READ_ONLY, 0)
+	        apd = tbtopn (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_wgetapert (dao, im, apd, DP_MAXNSTAR(dao), ap_text)
 	    call dp_sets (dao, INPHOTFILE, Memc[outfname])
 
@@ -178,7 +185,7 @@ begin
 		    Memc[outfname], SZ_FNAME)
 	    else
 	    	call strcpy (Memc[psfimage], Memc[outfname], SZ_FNAME)
-	    tp = immap (Memc[outfname], READ_ONLY, 0)
+	    tp = immap (Memc[outfname], READ_ONLY, NULLPTR)
 	    call dp_readpsf (dao, tp)
 	    call dp_sets (dao, PSFIMAGE, Memc[outfname])
 
@@ -199,7 +206,7 @@ begin
 	    if (DP_TEXT(dao) == YES)
 		grp = open (Memc[outfname], NEW_FILE, TEXT_FILE)
 	    else
-	        grp = tbtopn (Memc[outfname], NEW_FILE, 0)
+	        grp = tbtopn (Memc[outfname], NEW_FILE, NULLPTR)
 	    call dp_sets (dao, OUTPHOTFILE, Memc[outfname])
 
 	    # Now go and group the stars.
@@ -209,19 +216,23 @@ begin
 	    call imunmap (im)
 
 	    # Close up the photometry file.
-	    if (ap_text)
-	        call close (apd)
-	    else
+	    if (ap_text) {
+		i_val = apd
+	        call close (i_val)
+	    } else {
 		call tbtclo (apd)
+	    }
 
 	    # Close up the PSF image.
 	    call imunmap (tp)
 
 	    # Close up the group table.
-	    if (DP_TEXT(dao) == YES)
-		call close (grp)
-	    else
+	    if (DP_TEXT(dao) == YES) {
+		i_val = grp
+		call close (i_val)
+	    } else {
 	        call tbtclo (grp)
+	    }
 
             # Uncache memory.
             call fixmem (old_size)

@@ -11,8 +11,9 @@ procedure dp_mkgroup (dao, im, grp)
 
 pointer	dao			# pointer to the daophot structure
 pointer	im			# pointer to input image
-int	grp			# the output file descriptor
+pointer	grp			# the output file descriptor
 
+size_t	sz_val
 bool	overlap
 int	i, maxgroup, curr_star, first_unknown, first_ingrp, nin_currgrp
 int	curr_point, crit_point, ier
@@ -23,7 +24,7 @@ real	skycurr, magcrit, skycrit, dxcrit_frompsf, dycrit_frompsf
 real	deltax, deltay, radsq, rel_bright, radius, ratio, stand_err, dvdx, dvdy
 
 bool 	dp_gchkstar()
-real	dp_usepsf()
+real	dp_usepsf(), aabs()
 
 begin
 	# Get the daophot pointers.
@@ -40,14 +41,16 @@ begin
 	DP_SFITRAD(dao) = DP_FITRAD(dao) * DP_SCALE(dao)
 
 	# Get some working memory.
-	call malloc (index, DP_APNUM(apsel), TY_INT)
-	call malloc (group_size, DP_APNUM(apsel), TY_INT)
-	call malloc (number, DP_APNUM(apsel), TY_INT)
+	sz_val = DP_APNUM(apsel)
+	call malloc (index, sz_val, TY_INT)
+	call malloc (group_size, sz_val, TY_INT)
+	call malloc (number, sz_val, TY_INT)
 
 	# Initialize the group information.
-	call aclri (Memi[index], DP_APNUM(apsel))
-	call aclri (Memi[group_size], DP_APNUM(apsel))
-	call aclri (Memi[number], DP_APNUM(apsel))
+	sz_val = DP_APNUM(apsel)
+	call aclri (Memi[index], sz_val)
+	call aclri (Memi[group_size], sz_val)
+	call aclri (Memi[number], sz_val)
 
 	# Check for INDEF results and fix them up..
 	call dp_gpfix (dao, im, bright_mag)
@@ -134,15 +137,16 @@ begin
 		curr_point = Memi[index+curr_star-1]
 		xcurr = Memr[DP_APXCEN(apsel)+curr_point-1]
 		ycurr = Memr[DP_APYCEN(apsel)+curr_star-1]
+		sz_val = 1
 		call dp_wpsf (dao, im, xcurr, ycurr, dxcurr_frompsf,
-		    dycurr_frompsf, 1)
+			      dycurr_frompsf, sz_val)
 		dxcurr_frompsf = (dxcurr_frompsf - 1.0) / DP_PSFX(psffit) - 1.0
 		dycurr_frompsf = (dycurr_frompsf - 1.0) / DP_PSFY(psffit) - 1.0
 		magcurr = Memr[DP_APMAG(apsel)+curr_point-1]
 		skycurr = Memr[DP_APMSKY(apsel)+curr_point-1]
 		if (IS_INDEFR(magcurr))
 		    magcurr = bright_mag
-		else if (abs (DAO_MAGCHECK(psffit, magcurr)) > (MAX_EXPONENTR -
+		else if (aabs(DAO_MAGCHECK(psffit, magcurr)) > (MAX_EXPONENTR -
 		    1))
 		    magcurr = bright_mag	    
 		else
@@ -173,9 +177,10 @@ begin
 		    crit_point = Memi[index+i-1]
 		    magcrit = Memr[DP_APMAG(apsel)+crit_point-1]
 		    skycrit = Memr[DP_APMSKY(apsel)+crit_point-1]
+		    sz_val = 1
 		    call dp_wpsf (dao, im, Memr[DP_APXCEN(apsel)+crit_point-1],
-		        Memr[DP_APYCEN(apsel)+i-1], dxcrit_frompsf,
-		        dycrit_frompsf, 1)
+				  Memr[DP_APYCEN(apsel)+i-1], dxcrit_frompsf,
+				  dycrit_frompsf, sz_val)
 		    dxcrit_frompsf = (dxcrit_frompsf - 1.0) / DP_PSFX(psffit) -
 		        1.0
 		    dycrit_frompsf = (dycrit_frompsf - 1.0) / DP_PSFY(psffit) -
@@ -192,7 +197,7 @@ begin
 
 			if (IS_INDEFR(magcrit))
 			    rel_bright = bright_mag
-			else if (abs (DAO_MAGCHECK (psffit, magcrit)) >
+			else if (aabs (DAO_MAGCHECK (psffit, magcrit)) >
 			    (MAX_EXPONENTR - 1))
 			    rel_bright = bright_mag
 			else
@@ -355,7 +360,9 @@ pointer	dao			# pointer to the daophot structure
 pointer	im			# pointer to the input image
 real	bright_mag		# apparent magnitude of the brightest star
 
-int	i, lowx, lowy, nxpix, nypix
+int	i
+long	lowx, lowy
+size_t	nxpix, nypix
 pointer apsel, subim
 real 	fitrad, fitradsq, mingdata, maxgdata, x, y, sky, mag
 
@@ -432,14 +439,14 @@ real procedure dp_gaccum (dao, subim, nxpix, nypix, lowx, lowy, x, y, sky,
 
 pointer	dao			# pointer to the daophot structure
 real	subim[nxpix,nypix]	# the input data subraster
-int	nxpix, nypix		# the dimensions of the data subraster
-int	lowx, lowy		# the lower left corner of the subraster
+size_t	nxpix, nypix		# the dimensions of the data subraster
+long	lowx, lowy		# the lower left corner of the subraster
 real	x, y			# the coordinates of the star
 real	sky			# the sky value of the star
 real	fitradsq		# the fitting radius of the star
 real	mingdata, maxgdata	# the minimum and maximum good data values
 
-int	k, j
+long	k, j
 pointer	psffit
 real	mag, dxfrom_psf, dyfrom_psf, numer, denom, dx, dy, radsq, dvdx, dvdy
 real	weight, value

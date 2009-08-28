@@ -13,16 +13,21 @@ procedure dp_tgnewgrp (tp, colpoint)
 pointer	tp			# pointer to outpu ST table
 pointer	colpoint[ARB]		# array of pointers to columns
 
+size_t	sz_val
 pointer	sp, colnames, colunits, colformat, col_dtype, col_len
 
 begin
 	# Allocate space for table definition.
 	call smark (sp)
-	call salloc (colnames, NCOLUMN * (SZ_COLNAME + 1), TY_CHAR)
-	call salloc (colunits, NCOLUMN * (SZ_COLUNITS + 1), TY_CHAR)
-	call salloc (colformat, NCOLUMN * (SZ_COLFMT + 1), TY_CHAR)
-	call salloc (col_dtype, NCOLUMN, TY_INT)
-	call salloc (col_len, NCOLUMN, TY_INT)
+	sz_val = NCOLUMN * (SZ_COLNAME + 1)
+	call salloc (colnames, sz_val, TY_CHAR)
+	sz_val = NCOLUMN * (SZ_COLUNITS + 1)
+	call salloc (colunits, sz_val, TY_CHAR)
+	sz_val = NCOLUMN * (SZ_COLFMT + 1)
+	call salloc (colformat, sz_val, TY_CHAR)
+	sz_val = NCOLUMN
+	call salloc (col_dtype, sz_val, TY_INT)
+	call salloc (col_len, sz_val, TY_LONG)
 
 	# Set up the column definitions.
 	call strcpy (GROUP, Memc[colnames], SZ_COLNAME)
@@ -57,16 +62,16 @@ begin
 	Memi[col_dtype+5] = TY_REAL
 
 	# Define the column lengths.
-	Memi[col_len] = 1
-	Memi[col_len+1] = 1
-	Memi[col_len+2] = 1
-	Memi[col_len+3] = 1
-	Memi[col_len+4] = 1
-	Memi[col_len+5] = 1
+	Meml[col_len] = 1
+	Meml[col_len+1] = 1
+	Meml[col_len+2] = 1
+	Meml[col_len+3] = 1
+	Meml[col_len+4] = 1
+	Meml[col_len+5] = 1
 	
 	# Define and create the table.
 	call tbcdef (tp, colpoint, Memc[colnames], Memc[colunits],
-	    Memc[colformat], Memi[col_dtype], Memi[col_len], NCOLUMN)
+	    Memc[colformat], Memi[col_dtype], Meml[col_len], NCOLUMN)
 	call tbtcre (tp)
 
 	call sfree (sp)
@@ -81,15 +86,18 @@ procedure dp_xggrppars (dao, tp)
 pointer	dao			# pointer to the DAOPHOT structure
 int	tp			# the output file descriptor
 
+size_t	sz_val
 pointer	sp, outstr, date, time, psffit
 int	envfind()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
 
 	psffit = DP_PSFFIT(dao)
 
@@ -154,15 +162,18 @@ procedure dp_tggrppars (dao, tp)
 pointer	dao			# pointer to the DAOPHOT structure
 pointer	tp			# pointer to the output table
 
+size_t	sz_val
 pointer	sp, outstr, date, time, psffit
 int	envfind()
 
 begin
 	# Allocate working space.
 	call smark (sp)
-	call salloc (outstr, SZ_LINE, TY_CHAR)
-	call salloc (date, SZ_DATE, TY_CHAR)
-	call salloc (time, SZ_DATE, TY_CHAR)
+	sz_val = SZ_LINE
+	call salloc (outstr, sz_val, TY_CHAR)
+	sz_val = SZ_DATE
+	call salloc (date, sz_val, TY_CHAR)
+	call salloc (time, sz_val, TY_CHAR)
 
 	psffit = DP_PSFFIT(dao)
 
@@ -224,19 +235,23 @@ procedure dp_wrtgroup (dao, im, grp, number, index, group_size, maxgroup)
 
 pointer	dao			# pointer to daophot structure
 pointer	im			# the input image descriptor
-int	grp			# the output file descriptor
+pointer	grp			# the output file descriptor
 int	number[ARB]		# number in group of each size
 int	index[ARB]		# index to results
 int	group_size[ARB]		# size of groups
 int	maxgroup		# maximum group size
 
+int	i_grp
+
 begin
-	if (DP_TEXT(dao) == YES)
-	    call dp_xwrtgroup (dao, im, grp, number, index, group_size,
+	if (DP_TEXT(dao) == YES) {
+	    i_grp = grp
+	    call dp_xwrtgroup (dao, im, i_grp, number, index, group_size,
 	        maxgroup)
-	else
+	} else {
 	    call dp_twrtgroup (dao, im, grp, number, index, group_size,
 	        maxgroup)
+	}
 end
 
 
@@ -262,6 +277,7 @@ int	index[ARB]		# index to results
 int	group_size[ARB]		# size of groups
 int	maxgroup		# maximum group size
 
+size_t	sz_val
 int	i, j, k, id, ngroup, nstars, first_ingrp
 pointer	apsel
 real	x, y, mag, sky
@@ -306,7 +322,8 @@ begin
 		y = Memr[DP_APYCEN(apsel)+j-1]
 		if (IS_INDEFR(x) || IS_INDEFR(y))
 		    break
-		call dp_wout (dao, im, x, y, x, y, 1)
+		sz_val = 1
+		call dp_wout (dao, im, x, y, x, y, sz_val)
 
 		# Get the rest of the numbers.
 		id = Memi[DP_APID(apsel)+k-1]
@@ -357,7 +374,9 @@ int	index[ARB]		# index to results
 int	group_size[ARB]		# size of groups
 int	maxgroup		# maximum group size
 
-int	row, first_ingrp, ngroup, nstars, i, j, k, id
+size_t	sz_val
+int	first_ingrp, ngroup, nstars, i, j, k, id
+long	row
 pointer	apsel, sp, colpoint
 real	x, y, mag, sky
 
@@ -367,10 +386,11 @@ begin
 
 	# Allocate space for the column pointers.
 	call smark( sp)
-	call salloc (colpoint, NCOLUMN, TY_INT)
+	sz_val = NCOLUMN
+	call salloc (colpoint, sz_val, TY_POINTER)
 
 	# Get the necessary info to create the ST table.
-	call dp_tgnewgrp  (grp, Memi[colpoint])
+	call dp_tgnewgrp  (grp, Memp[colpoint])
 
 	# Add header parameters to the ST table.
 	call dp_tggrppars (dao, grp)
@@ -406,7 +426,8 @@ begin
 		y = Memr[DP_APYCEN(apsel)+j-1]
 		if (IS_INDEFR(x) || IS_INDEFR(y))
 		    break
-		call dp_wout (dao, im, x, y, x, y, 1)
+		sz_val = 1
+		call dp_wout (dao, im, x, y, x, y, sz_val)
 
 		# Get the rest of the values.
 		id = Memi[DP_APID(apsel)+k-1]
@@ -415,12 +436,12 @@ begin
 
 		# Copy the values to the correct table row.
 		row = row + 1
-		call tbrpti (grp, Memi[colpoint], ngroup, 1, row)
-		call tbrpti (grp, Memi[colpoint+1], id, 1, row)
-	    	call tbrptr (grp, Memi[colpoint+2], x, 1, row)
-	    	call tbrptr (grp, Memi[colpoint+3], y, 1, row)
-	    	call tbrptr (grp, Memi[colpoint+4], mag, 1, row)
-	    	call tbrptr (grp, Memi[colpoint+5], sky, 1, row)
+		call tbrpti (grp, Memp[colpoint], ngroup, 1, row)
+		call tbrpti (grp, Memp[colpoint+1], id, 1, row)
+	    	call tbrptr (grp, Memp[colpoint+2], x, 1, row)
+	    	call tbrptr (grp, Memp[colpoint+3], y, 1, row)
+	    	call tbrptr (grp, Memp[colpoint+4], mag, 1, row)
+	    	call tbrptr (grp, Memp[colpoint+5], sky, 1, row)
 	    }
 
 	    ngroup = ngroup + 1

@@ -10,9 +10,12 @@ procedure dp_smpsf (dao)
 
 pointer	dao			# pointer to the daophot strucuture
 
-int	k, icenter, irmax, nexpand
+size_t	sz_val
+int	k, nexpand
+long	icenter, irmax, l_val
 pointer	psffit, sum, high, low, n
 real	rmax
+long	lint()
 
 begin
 	# Get some pointers.
@@ -21,42 +24,47 @@ begin
 	# Get some constants.
 	icenter = (DP_PSFSIZE(psffit) + 1) / 2
 	rmax = .7071068 * real (DP_PSFSIZE(psffit) - 1)
-	irmax = int (rmax + 1.0e-5)
+	irmax = lint (rmax + 1.0e-5)
 	nexpand = DP_NVLTABLE(psffit) + DP_NFEXTABLE(psffit)
 
 	# Allocate working memory.
-	call malloc (sum, NSEC * irmax, TY_REAL)
-	call malloc (high, NSEC * irmax, TY_REAL)
-	call malloc (low, NSEC * irmax, TY_REAL)
-	call malloc (n, NSEC * irmax, TY_INT)
+	sz_val = NSEC * irmax
+	call malloc (sum, sz_val, TY_REAL)
+	call malloc (high, sz_val, TY_REAL)
+	call malloc (low, sz_val, TY_REAL)
+	call malloc (n, sz_val, TY_LONG)
 
 	# Do the smoothing.
 	do k = 1, nexpand {
 
 	    # Initialize.
-	    call aclrr (Memr[sum], NSEC * irmax)
-	    call amovkr (-MAX_REAL, Memr[high], NSEC * irmax)
-	    call amovkr (MAX_REAL, Memr[low], NSEC * irmax)
-	    call aclri (Memi[n], NSEC * irmax)
+	    sz_val = NSEC * irmax
+	    call aclrr (Memr[sum], sz_val)
+	    call amovkr (-MAX_REAL, Memr[high], sz_val)
+	    call amovkr (MAX_REAL, Memr[low], sz_val)
+	    call aclrl (Meml[n], sz_val)
 
 	    # Acumulate.
+	    l_val = IRMIN
 	    call dp_smaccum (Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
-		DP_PSFSIZE(psffit), Memr[sum], Memr[low], Memr[high], Memi[n],
-		NSEC, IRMIN, icenter, rmax, k)
+		DP_PSFSIZE(psffit), Memr[sum], Memr[low], Memr[high], Meml[n],
+		NSEC, l_val, icenter, rmax, k)
 
 	    # Normalize.
-	    call dp_smnorm (Memr[sum], Memr[low], Memr[high], Memi[n], NSEC,
-	        IRMIN, irmax)
+	    l_val = IRMIN
+	    call dp_smnorm (Memr[sum], Memr[low], Memr[high], Meml[n], NSEC,
+			    l_val, irmax)
 
 	    # Smooth.
+	    l_val = IRMIN
 	    call dp_smo (Memr[DP_PSFLUT(psffit)], DP_PSFSIZE(psffit),
-		DP_PSFSIZE(psffit), Memr[sum], NSEC, IRMIN, icenter, rmax, k)
+		DP_PSFSIZE(psffit), Memr[sum], NSEC, l_val, icenter, rmax, k)
 	}
 
 	call mfree (sum, TY_REAL)
 	call mfree (low, TY_REAL)
 	call mfree (high, TY_REAL)
-	call mfree (n, TY_INT)
+	call mfree (n, TY_LONG)
 end
 
 
@@ -66,20 +74,22 @@ procedure dp_smaccum (psflut, nxpsf, nypsf, sum, low, high, n, nsec, irmin,
 	icenter, rmax, k)
 
 real	psflut[nxpsf,nypsf,ARB]		# the psf lookup table
-int	nxpsf, nypsf			# size of the psf lookup table
+size_t	nxpsf, nypsf			# size of the psf lookup table
 real	sum[nsec,ARB]			# array of sums
 real	low[nsec,ARB]			# array of low values
 real	high[nsec,ARB]			# array of high values
-int	n[nsec,ARB]			# array of number of points
+long	n[nsec,ARB]			# array of number of points
 int	nsec				# dimension of sum arrays
-int	irmin				# number of sums
-int	icenter				# center of the array
+long	irmin				# number of sums
+long	icenter				# center of the array
 real	rmax				# max radius
 int	k				# third dimension array index
 
-int	i, j, idx, idy, is, ir
+long	i, j, idx, idy, ir
+int	is
 real	dxsq, dysq, r
 int	dp_isctr()
+long	lint()
 
 begin
 	do j = 1, nypsf {
@@ -91,7 +101,7 @@ begin
 		r = sqrt (dxsq + dysq)
 		if (r > rmax)
 		    next
-		ir = int (r + 1.0e-5)
+		ir = lint (r + 1.0e-5)
 		if (ir < irmin)
 		    next
 		is = dp_isctr (idx, idy)
@@ -113,12 +123,13 @@ procedure dp_smnorm (sum, low, high, n, nsec, irmin, irmax)
 real	sum[nsec,ARB]		# array of sums
 real	low[nsec,ARB]		# array of low values
 real	high[nsec,ARB]		# array of high values
-int	n[nsec,ARB]		# array of counter
+long	n[nsec,ARB]		# array of counter
 int	nsec			# array dimension
-int	irmin			# radius index
-int	irmax			# maximum radius index
+long	irmin			# radius index
+long	irmax			# maximum radius index
 
-int	ir, is
+long	ir
+int	is
 
 begin
 	do ir = irmin, irmax {
@@ -136,17 +147,19 @@ end
 procedure dp_smo (psflut, nxpsf, nypsf, sum, nrec, irmin, icenter, rmax, k)
 
 real	psflut[nxpsf,nypsf,ARB]		# the lookup table
-int	nxpsf, nypsf			# size of the psf lookup table
+size_t	nxpsf, nypsf			# size of the psf lookup table
 real	sum[nrec,ARB]			# array of sums
 int	nrec				# dimension of sum array
-int	irmin				# min radius index
-int	icenter				# index of center
+long	irmin				# min radius index
+long	icenter				# index of center
 real	rmax				# maximum radius
 int	k				# index of third dimension
 
-int	i, j, idx, idy, ir, is
+long	i, j, idx, idy, ir
+int	is
 real	dysq, r
 int	dp_isctr()
+long	lint()
 
 begin
 	do j = 1, nypsf {
@@ -157,7 +170,7 @@ begin
 		r = sqrt (real (idx ** 2) + dysq)
 		if (r > rmax)
 		    next
-		ir = int (r + 1.0e-5)
+		ir = lint (r + 1.0e-5)
 		if (ir < irmin)
 		    next
 		is = dp_isctr (idx, idy)
@@ -171,8 +184,8 @@ end
 
 int procedure dp_isctr (i, j)
 
-int	i		# first index
-int	j		# second index
+long	i		# first index
+long	j		# second index
 
 int	isctr
 
