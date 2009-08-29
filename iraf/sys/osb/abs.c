@@ -17,11 +17,13 @@ XLONG LABS ( XLONG *a )
     else return *a;
 }
 
+/*
 XPOINTER PABS ( XPOINTER *a )
 {
     if ( *a < 0 ) return 0 - *a;
     else return *a;
 }
+*/
 
 XREAL AABS ( XREAL *a )
 {

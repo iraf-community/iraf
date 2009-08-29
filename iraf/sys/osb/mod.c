@@ -20,7 +20,9 @@ XLONG LMOD ( XLONG *a, XLONG *b )
     return (*a) % (*b);
 }
 
+/*
 XPOINTER PMOD ( XPOINTER *a, XPOINTER *b )
 {
     return (*a) % (*b);
 }
+*/
