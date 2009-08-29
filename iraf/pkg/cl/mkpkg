@@ -14,30 +14,30 @@ relink:
 	# grammar of the CL.  On other systems the files lexyy.c, ytab.c, and
 	# ytab.h may be used without modification.
 
-	$ifeq (hostid, unix)
-	    $ifolder (lexyy.c, grammar.l)
-		$echo "rebuilding lexyy.c"
-		!lex -t grammar.l | sed -f lex.sed > lexyy.c
-	    $endif
-	    $ifolder (ytab.c,  grammar.y)
-		$echo "rebuilding ytab.c"
-		!yacc -vd grammar.y; mv y.tab.c ytab.c; mv y.tab.h ytab.h
-	    $endif
-	$endif
+	#$ifeq (hostid, unix)
+	#    $ifolder (lexyy.c, grammar.l)
+	#	$echo "rebuilding lexyy.c"
+	#	!lex -t grammar.l | sed -f lex.sed > lexyy.c
+	#    $endif
+	#    $ifolder (ytab.c,  grammar.y)
+	#	$echo "rebuilding ytab.c"
+	#	!yacc -vd grammar.y; mv y.tab.c ytab.c; mv y.tab.h ytab.h
+	#    $endif
+	#$endif
 
-	$ifeq (siteid, stsci)
-	$ifeq (hostid, vms)
-	    $ifolder (lexyy.c, grammar.l)
-		$echo "rebuilding lexyy.c"
-		!lex grammar.l
-		!@lex.com
-	    $endif
-	    $ifolder (ytab.c,  grammar.y)
-		$echo "rebuilding ytab.c"
-		!yacc -vd grammar.y
-	    $endif
-	$endif
-	$endif
+	#$ifeq (siteid, stsci)
+	#$ifeq (hostid, vms)
+	#    $ifolder (lexyy.c, grammar.l)
+	#	$echo "rebuilding lexyy.c"
+	#	!lex grammar.l
+	#	!@lex.com
+	#    $endif
+	#    $ifolder (ytab.c,  grammar.y)
+	#	$echo "rebuilding ytab.c"
+	#	!yacc -vd grammar.y
+	#    $endif
+	#$endif
+	#$endif
 
 	$update libpkg.a
 
