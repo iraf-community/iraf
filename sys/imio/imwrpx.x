@@ -21,26 +21,29 @@ bool	rlio
 long	offset
 pointer	pl, sp, ibuf
 long	o_v[IM_MAXDIM]
-int	sz_pixel, nbytes, nchars, ip, step
+int	sz_pixel, sz_dtype, nbytes, nchars, ip, step
+
+int	sizeof()
 long	imnote()
 errchk	imerr, imwrite
-include	<szdtype.inc>
+include	<szpixtype.inc>
 
 begin
 	pl = IM_PL(im)
-	sz_pixel = ty_size[IM_PIXTYPE(im)]
+	sz_dtype = sizeof (IM_PIXTYPE(im))
+	sz_pixel = pix_size[IM_PIXTYPE(im)]
 	step = abs (xstep)
 	if (v[1] < 1 || ((npix-1) * step) + v[1] > IM_SVLEN(im,1))
 	    call imerr (IM_NAME(im), SYS_IMREFOOB)
 
 	# Flip the pixel array end for end.
 	if (xstep < 0)
-	    call imaflp (buf, npix, sz_pixel)
+	    call imaflp (buf, npix, sz_dtype)
 
 	# Byte swap if necessary.
 	if (IM_SWAP(im) == YES) {
-	    nbytes = npix * sz_pixel * SZB_CHAR
-	    switch (sz_pixel * SZB_CHAR) {
+	    nbytes = npix * sz_dtype * SZB_CHAR
+	    switch (sz_dtype * SZB_CHAR) {
 	    case 2:
 		call bswap2 (buf, 1, buf, 1, nbytes)
 	    case 4:
@@ -50,9 +53,16 @@ begin
 	    }
 	}
 
-	if (pl != NULL) {
-	    # Write to a pixel list.
 
+	if (pl != NULL) {
+
+	    # Need to unpack again on 64-bit systems.
+	    if ((IM_PIXTYPE(im) == TY_INT || IM_PIXTYPE(im) == TY_LONG) &&
+		SZ_INT != SZ_INT32) {
+		    call iupk32 (buf, buf, npix)
+	    }
+
+	    # Write to a pixel list.
 	    rlio = (and (IM_PLFLAGS(im), PL_FAST+PL_RLIO) == PL_FAST+PL_RLIO)
 	    call amovl (v, o_v, IM_MAXDIM)
 	    nchars = npix * sz_pixel

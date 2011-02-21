@@ -6,11 +6,17 @@
 #define import_xnames
 #define import_math
 #define import_ctype
+#define import_stdio
 #include <iraf.h>
 
 #include "config.h"
 #include "operand.h"
 #include "errs.h"
+#include "param.h"
+#include "mem.h"
+#include "task.h"
+#include "proto.h"
+
 
 /*
  * BINOP.C -- Perform binary operations or expressions on two operands.
@@ -35,9 +41,10 @@
 #define	RIGHTSIDE	1
 
 char *
-strint (s, side)
-register char *s;
-int	side;
+strint (
+    register char  *s,
+    int	  side
+)
 {
 	if (side == LEFTSIDE) {
 	    while (isdigit (*s))
@@ -66,15 +73,15 @@ int	side;
  * Call error() and do not return if internal error or undefined string
  *   operation.
  */
-binop (opcode)
-int	opcode;
+void
+binop (int opcode)
 {
-	register typ1, typ2;
+	register int typ1, typ2;
 	struct	operand o1, o2, result;
 	char	res[2*SZ_LINE];
 	char	*o1sp;
-	double	dresult;
-	int	iresult, typecode;	/*  > 0 if real		*/
+	double	dresult=0.0;
+	int	iresult=0, typecode=0;	/*  > 0 if real		*/
 	long	lval;
 
 	o2 = popop();		/* operands will be on stack backwards	*/
@@ -537,12 +544,12 @@ pushresult:
  * INDEF operands propagate through. we should never see an UNDEF operand.
  * all error() and do not return on internal error or bad string operations.
  */
-binexp (opcode)
-int	opcode;
+void
+binexp (int opcode)
 {
-	register typ1, typ2;
+	register int typ1, typ2;
 	struct	operand o1, o2, result;
-	int	strres, dostr;
+	int	strres=0, dostr=0;
 
 	o2 = popop();		/* operands will be on stack backwards	*/
 	o1 = popop();

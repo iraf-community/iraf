@@ -64,7 +64,7 @@ static	int cmdline;			/* last line on screen		      */
 static	int maxcol;			/* last column on screen	      */
 static	int line, topline, botline;	/* current, top, bottom lines	      */
 static	int col, startcol, nextcol;	/* current, first, last columns	      */
-static	int tty_fd, tty;		/* define the terminal globally       */
+static	XINT tty_fd, tty;		/* define the terminal globally       */
 static	int botkeyline, nextline,	/* various global variables for       */
 	    keyid, numkeys, topkey,	/*   keeping track of lines and keys  */
 	    botkey, nextkey;
@@ -105,8 +105,10 @@ char	epar_cmdbuf[SZ_LINE];
  * in pfiles, load psets from pfiles, and so on.  ERR is returned if the user
  * wants to quit altogether, e.g., when epset is called in a loop.
  */
-epset (pset)
-char	*pset;			/* ltaskname or pfilename */
+int 
+epset (
+    char *pset			/* ltaskname or pfilename */
+)
 {
 	struct  ep_context context[20], *cx;
 	char    newpset[SZ_FNAME+1];
@@ -194,11 +196,13 @@ char	*pset;			/* ltaskname or pfilename */
  * structure, allowing the editor to be reentered at the same point
  * on the old pset.
  */
-eparam (cx, update, nextcmd, nextpset)
-struct	ep_context *cx;		/* eparam editor context	*/
-int	*update;		/* update pset upon exit	*/
-int	*nextcmd;		/* receives next command	*/
-char	*nextpset;		/* receives next pset name	*/
+int 
+eparam (
+    struct ep_context *cx,		/* eparam editor context	*/
+    int *update,		/* update pset upon exit	*/
+    int *nextcmd,		/* receives next command	*/
+    char *nextpset		/* receives next pset name	*/
+)
 {
 	char	string[G_MAXSTRING];
 
@@ -291,8 +295,8 @@ exit:
  * multiline prompt environment, we need a table of pointers to the firstline
  * of each keyword.
  */
-e_makelist (pfileptr)
-struct	pfile  *pfileptr;
+int 
+e_makelist (struct pfile *pfileptr)
 {
 	register struct param *pp;
 	register char c, *p;
@@ -392,9 +396,11 @@ struct	pfile  *pfileptr;
 /* E_TESTTOP -- Check to see if we have filled up a screen and if so,
  * start a new page.
  */
-e_testtop (cur, new)
-int	cur;			/* current line count on screen */
-int	new;			/* new count, returned if new page */
+int 
+e_testtop (
+    int cur,			/* current line count on screen */
+    int new			/* new count, returned if new page */
+)
 {
 	if (cur > (botline - topline + 1)) {
 	    topkeys[++maxpage] = numkeys;
@@ -406,7 +412,8 @@ int	new;			/* new count, returned if new page */
 
 /* E_REPAINT -- Repaint the current screen.
  */
-e_repaint()
+int 
+e_repaint (void)
 {
 	static	char *static_prompt = "--------- parameter array ---------";
 	char	promptbuf[MAXPROMPT];
@@ -480,10 +487,12 @@ e_repaint()
 
 /* E_PHEADER -- Print the EPARAM form header.
  */
-e_pheader (pfp, cmdline, maxcol)
-struct	pfile *pfp;		/* pfile pointer		*/
-int	cmdline;		/* terminal command line number	*/
-int	maxcol;			/* max cols on a line		*/
+int 
+e_pheader (
+    struct pfile *pfp,		/* pfile pointer		*/
+    int cmdline,		/* terminal command line number	*/
+    int maxcol			/* max cols on a line		*/
+)
 {
 	static	char	*logo = "  I R A F  ";
 	static  char	*title= "Image Reduction and Analysis Facility";
@@ -547,7 +556,8 @@ int	maxcol;			/* max cols on a line		*/
  * For maximum drawing speed output is optimized using line clears and screen 
  * gotos rather than blanks to erase and position text.
  */
-e_drawkey()
+int 
+e_drawkey (void)
 {
 	char	valuebuf[MAXPROMPT];
 	char	tempbuf[MAXPROMPT];
@@ -627,9 +637,8 @@ int	indent;
  * get several of the values.  If it is an array, make sure the undefined values
  * get a '***', without calling spparval (which would bomb).
  */
-e_encode_vstring (pp, outbuf)
-struct	param *pp;
-char	*outbuf;
+int 
+e_encode_vstring (struct param *pp, char *outbuf)
 {
 	char valuebuf[G_MAXSTRING];
 	char colbuf[16];
@@ -694,8 +703,8 @@ char	*outbuf;
  * the array and check it.  Also check whether there are enough elements in the
  * array.  In any case, if gquery returns an error, report that to the user.
  */
-e_check_vals (string)
-char    *string;
+int 
+e_check_vals (char *string)
 {
 	char *gquery();		/* declare gquery as returning a pointer  */
 	char *errstr;		/* pointer to the error string (or 0)     */
@@ -781,8 +790,8 @@ char    *string;
 
 /* E_UNDEF -- Recognize the undefined string of 3 asterisks.
  */
-e_undef (s)
-register char *s;
+int 
+e_undef (register char *s)
 {
 	register int	n = 0;
 
@@ -799,8 +808,8 @@ static	char	message[SZ_LINE];	/* used by e_rpterror and e_clrerror */
 
 /* E_RPTERROR -- Report the error for the eparam user.
  */
-e_rpterror (errstr)
-char	*errstr;
+int 
+e_rpterror (char *errstr)
 {
 	char	*range;		/* pointer to the range error string	*/
 
@@ -833,7 +842,8 @@ char	*errstr;
 
 /* E_CLRERROR -- Clear the error line, i.e. the last error message.
  */
-e_clrerror ()
+int 
+e_clrerror (void)
 {
 	register int	i, len;
 
@@ -860,10 +870,11 @@ e_clrerror ()
  * after the token.
  */
 char *
-e_getfield (ip, outstr, maxch)
-register char	*ip;		/* pointer into input string	*/
-char	*outstr;		/* receives token		*/
-int	maxch;			/* max chars out		*/
+e_getfield (
+    register char *ip,		/* pointer into input string	*/
+    char *outstr,		/* receives token		*/
+    int maxch			/* max chars out		*/
+)
 {
 	register char	*op, *otop;
 
@@ -884,8 +895,8 @@ int	maxch;			/* max chars out		*/
 /* E_MOREFLAG -- Signal that there are more parameters above or below the
  * window.
  */
-e_moreflag (topkey)
-register int topkey;
+int 
+e_moreflag (register int topkey)
 {
 	if ((numkeys == botkey) && (topkey == 1))
 	    return;
@@ -916,7 +927,8 @@ register int topkey;
 
 /* E_SCROLLIT -- Scroll the window if possible.
  */
-e_scrollit()
+int 
+e_scrollit (void)
 {
 	register int i;
 
@@ -967,9 +979,11 @@ e_scrollit()
  * A 'return' or EXIT_UPDATE will execute the edited command.
  * An EXIT_NOUPDATE will not execute the edited command.
  */
-edit_history_directive (args, new_cmd)
-char	*args;			/* ehistory argument list */
-char	*new_cmd;		/* the command to be executed after editing */
+int 
+edit_history_directive (
+    char *args,			/* ehistory argument list */
+    char *new_cmd		/* the command to be executed after editing */
+)
 {
 	static	char *firstchr[MAX_COMMANDS]; /*array of character pointers */
 	static	char string[G_MAXSTRING];
@@ -1112,9 +1126,11 @@ char	*new_cmd;		/* the command to be executed after editing */
 /* EDITSTRING -- A very limited string editor for interactive input.  The number
  * of characters in the edited string is returned as the function value.
  */
-editstring (string, eparam)
-char	*string;
-int	eparam;				/* flag to indicate eparam or ehis  */
+int 
+editstring (
+    char *string,
+    int eparam				/* flag to indicate eparam or ehis  */
+)
 {
 	char	oldchar;		/* save old character after delete  */
 	char    oldword[G_MAXSTRING];   /* save the deleted word            */
@@ -1524,7 +1540,8 @@ int	eparam;				/* flag to indicate eparam or ehis  */
 /* E_TTYINIT -- Initialize the terminal, i.e., set raw mode and standout mode
  * (if enabled).  Get dimensions of terminal screen.
  */
-e_ttyinit()
+int 
+e_ttyinit (void)
 {
 	/* Open the tty (termcap) descriptor for the terminal.
 	 */
@@ -1541,8 +1558,8 @@ e_ttyinit()
 	 * interface case mapping is disabled.  Determine if ucasein and
 	 * ucaseout have been selected, e.g., with `stty ucasein ucaseout'.
 	 */
-	e_ucasein  = c_ttstati (STDIN,  TT_UCASEIN);
-	e_ucaseout = c_ttstati (STDOUT, TT_UCASEOUT);
+	e_ucasein  = c_ttstati ((XINT)STDIN,  TT_UCASEIN);
+	e_ucaseout = c_ttstati ((XINT)STDOUT, TT_UCASEOUT);
 
 	/* Get the dimensions of the terminal screen from the environment.
 	 * These need not agree with the physical screen dimensions given
@@ -1564,7 +1581,8 @@ e_ttyinit()
  * does not exit when an invalid colon escape is entered.  EP_EOF is returned
  * as the function value if eparam is to exit.
  */
-e_colon()
+int 
+e_colon (void)
 {
 	register char	*ip, *op;
 	register int	ch;
@@ -1573,7 +1591,7 @@ e_colon()
 	int	ucasein_set;
 	int	force, n;
 
-	ucasein_set = c_ttstati (STDIN, TT_UCASEIN);
+	ucasein_set = c_ttstati ((XINT)STDIN, TT_UCASEIN);
 
 	/* Go to the command line, clear it and read the string value.
 	 * The read is performed in raw mode to avoid a line feed and scroll
@@ -1768,12 +1786,12 @@ again_:
 /* E_PSETOK -- Verify that the named pfile exists and can be read.  Report
  * any problems to the user.
  */
-e_psetok (pset)
-char	*pset;
+int 
+e_psetok (char *pset)
 {
 	register struct pfile *pfp;
 	char	errmsg[SZ_LINE+1], *errfmt, *errarg;
-	int	save_topd;
+	XINT	save_topd;
 
 	save_topd = topd;
 	errarg = pset;
@@ -1804,7 +1822,7 @@ char	*pset;
 		errfmt = e_pcknonexist;
 		errarg = pk;
 		goto error_;
-	    } else if ((int)pkp == ERR) {
+	    } else if ((XINT)pkp == ERR) {
 		errfmt = e_pckambig;
 		errarg = pk;
 		goto error_;
@@ -1812,7 +1830,7 @@ char	*pset;
 		errfmt = e_tnonexist;
 		errarg = lt;
 		goto error_;
-	    } else if ((int)ltp == ERR) {
+	    } else if ((XINT)ltp == ERR) {
 		errfmt = e_tambig;
 		errarg = lt;
 		goto error_;
@@ -1844,8 +1862,8 @@ error_:
 
 /* E_PUTERR -- Put an error message on the command line.
  */
-e_puterr (errmsg)
-char	*errmsg;
+int 
+e_puterr (char *errmsg)
 {
 	c_ttygoto (tty_fd, tty, 1, cmdline);
 	c_ttyclearln (tty_fd, tty);
@@ -1856,7 +1874,8 @@ char	*errmsg;
 /* E_TTYEXIT -- Turn off raw mode and standout mode and close the termcap
  * descriptor, leaving everything as we found it.
  */
-e_ttyexit()
+int 
+e_ttyexit (void)
 {
 	c_fseti (fileno(stdin), F_RAW, NO);	/* unset raw mode */
 
@@ -1870,8 +1889,8 @@ e_ttyexit()
 
 /* E_MOVEUP -- Move the cursor up one line.
  */
-e_moveup (eparam)
-int	eparam;
+int 
+e_moveup (int eparam)
 {
 	if (keyid != 1) {
 	    /* Can go up further.
@@ -1905,8 +1924,8 @@ int	eparam;
 
 /* E_MOVEDOWN -- Move the cursor down one line.
  */
-e_movedown (eparam)
-int	eparam;
+int 
+e_movedown (int eparam)
 {
 	if (keyid != numkeys) { 
 	    /* get downnnnn!! 
@@ -1948,8 +1967,7 @@ int	eparam;
 /* E_TONEXTWORD -- Skip forward to the beginning of the next word.
  */
 char *
-e_tonextword (ip)
-register char	*ip;
+e_tonextword (register char *ip)
 {
 	ip++;
 
@@ -1968,9 +1986,7 @@ register char	*ip;
 /* E_TOPREVWORD -- Find the beginning of the previous word.
  */
 char *
-e_toprevword (ip, string)
-char	*ip;
-char	*string;
+e_toprevword (char *ip, char *string)
 {
 	--ip;
 
@@ -1993,8 +2009,8 @@ char	*string;
 
 /* E_CTRL -- Send a control sequence to the terminal.
  */
-e_ctrl (cap)
-char	*cap;
+int 
+e_ctrl (char *cap)
 {
 	/* Check for start standout or start underline mode.
 	 */
@@ -2008,8 +2024,8 @@ char	*cap;
 
 /* E_GOTO -- High level edcap version of ttygoto (cursor addressing).
  */
-e_goto (col, line)
-int    col, line;
+int 
+e_goto (int col, int line)
 {
 	c_ttygoto (tty_fd, tty, col, line);
 }
@@ -2018,8 +2034,8 @@ int    col, line;
 /* E_PUTLINE -- Put a line of text to the terminal.  Do not map any embedded
  * control codes (bell will get lost).
  */
-e_putline (stwing)
-char      *stwing;
+int 
+e_putline (char *stwing)
 {
 	register char	*ip, *op;
 	register int	ch, n;
@@ -2050,7 +2066,8 @@ char      *stwing;
 
 /* E_CLEAR -- Clear the screen (disables standout mode as a side effect).
  */
-e_clear()
+int 
+e_clear (void)
 {
 	c_ttyctrl (tty_fd, tty, "se", 1);
 	c_ttyctrl (tty_fd, tty, "ue", 1);
@@ -2060,7 +2077,8 @@ e_clear()
 
 /* E_CLRLINE -- Clear the current line.
  */
-e_clrline()
+int 
+e_clrline (void)
 {
 	c_ttyclearln (tty_fd, tty);
 }
@@ -2070,9 +2088,12 @@ e_clrline()
  * coordinates.  Each line is written starting at the same column on the
  * screen.
  */
-e_display (string, sline, scol)
-char	*string;		/* string to be printed		*/
-int	sline, scol;		/* starting line and column	*/
+int 
+e_display (
+    char *string,		/* string to be printed		*/
+    int sline,
+    int scol		/* starting line and column	*/
+)
 {
 	e_displayml (string, sline, scol, scol);
 }
@@ -2083,10 +2104,13 @@ int	sline, scol;		/* starting line and column	*/
  * line begins with \r (CR) it will be displayed starting at column 1, rather
  * than starting at column scol.
  */
-e_displayml (string, sline, scol, ccol)
-char	*string;		/* string to be printed			*/
-int	sline, scol;		/* starting line and column		*/
-int	ccol;			/* start col of continuation lines	*/
+int 
+e_displayml (
+    char *string,		/* string to be printed			*/
+    int sline,
+    int scol,		/* starting line and column		*/
+    int ccol			/* start col of continuation lines	*/
+)
 {
 	register char	*ip, *op;
 	char	lbuf[512], *line;

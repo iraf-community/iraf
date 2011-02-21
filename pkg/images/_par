@@ -1,0 +1,7 @@
+imheader.images = "/tmp/filters.fits"
+imheader.imlist = "*.imh,*.fits,*.pl,*.qp,*.hhh"
+imheader.longheader = no
+imheader.userfields = yes
+imheader.mode = "ql"
+$nargs = 1
+# EOF

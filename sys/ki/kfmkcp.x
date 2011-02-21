@@ -55,6 +55,31 @@ begin
 		    status = p_arg[1]
 	    }
 
+	} else if (server1 != NULL && server2 != NULL) {
+	    # Both files are remote.  Cannot transfer all attributes;
+	    # the best we can do is create either a text or binary file.
+
+	    call kfacss (old_osfn, 0, TEXT_FILE, status)
+            call strpak (Memc[fname], Memc[fname], SZ_FNAME)
+
+	    if (status == YES) {
+		# Create a text file.
+		call kopntx (new_osfn, NEW_FILE, chan)
+		if (chan != ERR) {
+		    call kclstx (chan, junk)
+		    status = chan
+		} else
+		    status = ERR
+	    } else {
+		# Create a binary file.
+		call kopnbf (new_osfn, NEW_FILE, chan)
+		if (chan != ERR) {
+		    call kclsbf (chan, junk)
+		    status = chan
+		} else
+		    status = ERR
+	    }
+
 	} else if (server1 != NULL) {
 	    # The existing file is remote.  Cannot transfer all attributes;
 	    # the best we can do is create either a text or binary file.

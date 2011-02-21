@@ -2,14 +2,19 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/mtio.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef sun
 #include <sundev/tmreg.h>
 #include <sundev/xtreg.h>
 #include <sundev/arreg.h>
 #endif
+
 
 /*
  * TAPE.C -- Magtape test program (for most UNIX systems).
@@ -82,18 +87,26 @@ static	int sp;
 char	*nextcmd(), *prompt();
 char	*gettok(), *getenv();
 
+void  	mtop (int op, int count);
+char 	*nextcmd (FILE *in);
+char 	*gettok (void);
+char 	*prompt (void);
+void  	pstatus (void);
+void  	output (char *text);
+void  	phelp (void);
+
 
 /* TAPE program main.
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
 	char	lbuf[256];
 	int	nrec, nbytes;
 	char	*token;
 	FILE	*in;
 	FILE	*fp;
+
 
 	errno = 0;
 	t_blkno = 0;
@@ -159,7 +172,7 @@ quit:		if (in != stdin)
 		    fclose (logfp);
 		    logfp = NULL;
 		} else {
-		    if (token = gettok())
+		    if ( (token = gettok()) )
 			strcpy (logfile, token);
 		    if ((logfp = fopen (logfile, "a")) == NULL)
 			printf ("cannot open logfile %s\n", logfile);
@@ -295,7 +308,7 @@ quit:		if (in != stdin)
 		char *ip;
 		int fwd, bak, i;
 
-		if (token = gettok()) {
+		if ( (token = gettok()) ) {
 		    ip = token;
 		    fwd = bak = 0;
 		    if (*ip == '-') {
@@ -341,14 +354,18 @@ quit:		if (in != stdin)
 		pstatus();
 	    fflush (stdout);
 	}
+
+	return (0);
 }
 
 
 /* MTOP -- Execute a magtape operation.
  */
-mtop (op, count)
-int	op;		/* operation code */
-int	count;		/* count argument */
+void
+mtop (
+  int	op,		/* operation code */
+  int	count 		/* count argument */
+)
 {
 	struct mtop mt;
 
@@ -363,8 +380,7 @@ int	count;		/* count argument */
 /* NEXTCMD -- Get next command.
  */
 char *
-nextcmd (in)
-FILE	*in;
+nextcmd (FILE *in)
 {
 	fflush (stdout);
 	if (fgets (cmdbuf, SZ_COMMAND, in) == NULL)
@@ -377,7 +393,7 @@ FILE	*in;
 /* GETTOK -- Get next token from the input stream.
  */
 char *
-gettok()
+gettok (void)
 {
 	register char *op;
 	register int ch;
@@ -398,7 +414,7 @@ gettok()
 /* PROMPT -- Return a pointer to the prompt string.
  */
 char *
-prompt()
+prompt (void)
 {
 	static char prompt[32];
 	static char defp[] = "% ";
@@ -418,10 +434,11 @@ prompt()
 
 /* PSTATUS -- Print status of tape and last operation.
  */
-pstatus()
+void
+pstatus (void)
 {
 	char	obuf[512];
-	int	stat;
+
 
 #ifdef sun
 	static	struct mt_tape_info info[] = MT_TAPE_INFO;
@@ -458,8 +475,8 @@ pstatus()
 /* OUTPUT -- Write text to the standard output, and to the logfile output
  * if enabled.
  */
-output (text)
-char	*text;
+void
+output (char *text)
 {
 	fputs (text, stdout);
 	if (logfp) {
@@ -481,7 +498,8 @@ char *helptxt[] = {
 
 /* PHELP -- Print list of commands.
  */
-phelp()
+void
+phelp (void)
 {
 	register int i;
 

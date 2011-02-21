@@ -51,7 +51,7 @@ Apply dark count correction?  If yes a dark count image must be specified.
 Apply flat field correction?  If yes flat field images must be specified.
 .le
 .ls illumcor = no
-Apply illumination correction?  If yes illumination images must be specified.
+Apply iillumination correction?  If yes iillumination images must be specified.
 .le
 .ls fringecor = no
 Apply fringe correction?  If yes fringe images must be specified.
@@ -105,9 +105,9 @@ in the input list.  The flat field image with the same subset as the
 input image being processed is selected.
 .le
 .ls illum = ""
-Illumination correction images.  The CCD image type is not checked for these
-images and they take precedence over any illumination correction images given
-in the input list.  The illumination image with the same subset as the
+Iillumination correction images.  The CCD image type is not checked for these
+images and they take precedence over any iillumination correction images given
+in the input list.  The iillumination image with the same subset as the
 input image being processed is selected.
 .le
 .ls fringe = ""
@@ -170,7 +170,7 @@ Number of points to average or median to form fitting points.  Positive
 numbers specify averages and negative numbers specify medians.
 .le
 .ls niterate = 1
-Number of rejection interations to remove deviant points from the overscan fit.
+Number of rejection iterations to remove deviant points from the overscan fit.
 If 0 then no points are rejected.
 .le
 .ls low_reject = 3., high_reject = 3.
@@ -183,7 +183,7 @@ One dimensional growing radius for rejection of neighbors to deviant points.
 .ih
 DESCRIPTION
 \fBQuadproc\fR processes CCD images to remove all "instrumental signatures" from
-the data. The opperations performed are:
+the data. The operations performed are:
 .ls
 .nf
 o correct detector defects (bad lines and columns)
@@ -192,13 +192,13 @@ o trim off the overscan regions and unwanted border pixels
 o subtract zero level bias
 o subtract dark counts
 o correct for pixel-to-pixel sensitivity variations
-o correct for non-uniform illumination
+o correct for non-uniform iillumination
 o correct for fringing
 .fi
 .le
 .sp 1
 \fBQuadproc\fR is a cl script based on the task \fBccdproc\fR in the
-\fBccdred\fR package. It is specificaly designed to deal with Arcon data
+\fBccdred\fR package. It is specifically designed to deal with Arcon data
 obtained in multi-readout mode (see \fBquadformat\fR). A feature of such
 images is that each readout typically has a slightly different, DC bias
 level, gain, and readout noise. As a result both zero frames and uniformly 
@@ -209,7 +209,7 @@ level, for each readout. The location of these overscan strips in the raw
 frame depends on which amplifiers are used. \fBQuadproc\fR splits each 
 multi-readout image into subimages, one for each amplifier, and also calculates
 the biassec and trimsec appropriately for each. It then calls \fBccdproc\fR to
-perform the first three opperations listed above. The sub-images are then glued
+perform the first three operations listed above. The sub-images are then glued
 back together. Finaly, \fBccdproc\fR is called a second time to perform all the
 remaining reduction steps. 
 
@@ -228,7 +228,7 @@ To run it, all one has to do is set the parameters and then begin processing
 the images.  The task takes care of most of the record keeping and
 automatically does the prerequisite processing of calibration images. For
 ease of reference, the following sections provide a simple outline of how to
-use the task, together with a description of the opperations performed. They 
+use the task, together with a description of the operations performed. They 
 are taken almost verbatim from the help page for \fBccdproc\fR. If you are 
 already familiar with that task you should read sections 2., 3. and 4. below,
 which include information on the preparation of the badpixel file, and on how
@@ -384,7 +384,7 @@ or \fBhselect\fR to determine the value of \fBtrimsec\fR stored in the image
 header. If this is, for instance, "[1:1024,1:1028]" then setting
 \fBtrimsec\fR = "[10:1015,20:998]" would trim 9 columns from the left and right
 edges and 19 and 29 lines from the bottom and top edges respectively. If you
-need to perform an assymmetric trim in the horizontal direction this can be
+need to perform an asymmetric trim in the horizontal direction this can be
 done, after processing, by using \fBimcopy\fR to copy the required portion of
 the image.
 
@@ -429,8 +429,8 @@ scaled flat field calibration image.  A flat field image is obtained by
 exposure to a spatially uniform source of light such as an lamp or
 twilight sky.  Flat field images may be corrected for the spectral
 signature in spectroscopic images (see \fBresponse\fR and
-\fBapnormalize\fR), or for illumination effects (see \fBmkillumflat\fR
-or \fBmkskyflat\fR).  For more on flat fields and illumination corrections
+\fBapnormalize\fR), or for iillumination effects (see \fBmkillumflat\fR
+or \fBmkskyflat\fR).  For more on flat fields and iillumination corrections
 see \fBflatfields\fR.  The flat field response is dependent on the
 wavelength of light so if different filters or spectroscopic wavelength
 coverage are used a flat field calibration for each one is required.
@@ -461,32 +461,32 @@ during processing using the \fIminreplace\fR parameter.  Note that the
 CCD images processed through the flat field calibration may not be
 completely flat (in the absence of objects).  In particular, a blank
 sky image may still show gradients.  This residual nonflatness is called
-the illumination pattern.  It may be introduced even if the detector is
+the iillumination pattern.  It may be introduced even if the detector is
 uniformly illuminated by the sky because the flat field lamp
-illumination may be nonuniform.  The illumination pattern is found from a
+iillumination may be nonuniform.  The iillumination pattern is found from a
 blank sky, or even object image, by heavily smoothing and rejecting
-objects using sigma clipping.  The illumination calibration image is
-divided into the data being processed to remove the illumination
-pattern.  The illumination pattern is a function of the subset so there
-must be an illumination correction image for each subset to be
+objects using sigma clipping.  The iillumination calibration image is
+divided into the data being processed to remove the iillumination
+pattern.  The iillumination pattern is a function of the subset so there
+must be an iillumination correction image for each subset to be
 processed.  The tasks \fBmkillumcor\fR and \fBmkskycor\fR are used to
-create the illumination correction images.  For more on illumination
+create the iillumination correction images.  For more on iillumination
 corrections see \fBflatfields\fR.
 
-An alternative to treating the illumination correction as a separate
-operation is to combine the flat field and illumination correction
+An alternative to treating the iillumination correction as a separate
+operation is to combine the flat field and iillumination correction
 into a corrected flat field image before processing the object
 images.  This will save some processing time but does require creating
 the flat field first rather than correcting the images at the same
 time or later.  There are two methods, removing the large scale
-shape of the flat field and combining a blank sky image illumination
+shape of the flat field and combining a blank sky image iillumination
 with the flat field.  These methods are discussed further in the
 tasks which create them; \fBmkillumcor\fR and \fBmkskycor\fR.
 .sh
 9. Fringecor
 There may be a fringe pattern in the images due to the night sky lines.
 To remove this fringe pattern a blank sky image is heavily smoothed
-to produce an illumination image which is then subtracted from the
+to produce an iillumination image which is then subtracted from the
 original sky image.  The residual fringe pattern is scaled to the
 exposure time of the image to be fringe corrected and then subtracted.
 Because the intensity of the night sky lines varies with time an
@@ -545,22 +545,22 @@ correction image.
 12. Outline of Processing Steps
 
 Because of the special handling required for multi-readout data
-\fBquadproc\fR internaly reduces the data in two stages.
+\fBquadproc\fR internally reduces the data in two stages.
 
 .ls Stage one
-The opperations which may be performed in the first stage are badpixel
+The operations which may be performed in the first stage are badpixel
 correction, determination and subtraction of the readout bias level, and
 trimming. This stage is only performed if one or more of the \fBfixpix\fR,
 \fBoverscan\fR or \fBtrim\fR flags is set to yes.
 
 First, all the calibration images which will be needed are identified. Any
 which were obtained in multi-readout mode AND which have not already been
-trimmed are selected for processing during this stage. This is neccesary to
+trimmed are selected for processing during this stage. This is necessary to
 ensure that the calibration images will be reduced properly. Similarly, the
 input list is searched and all multi-readout images, which have not already
 been trimmed are selected for processing.
 
-The images selected in this way are then processed sequentialy. Each is split
+The images selected in this way are then processed sequentially. Each is split
 into separate images one for each amplifier. The values of the trimsec and
 biassec header keywords for each of these sub-images are set as required. 
 \fBccdproc\fR is then run to correct bad pixels, determine and subtract the
@@ -599,10 +599,10 @@ These backup images may quickly fill up the available disk space.
 .le
 .ls
 Images may not be processed in the order they appear in the input list. Stage
-one processing is performed (if neccessary) on all calibration images, then on
+one processing is performed (if necessary) on all calibration images, then on
 all images in the input list. Any images which have already been trimmed, or
 which were taken in mono-readout mode will be skipped. Stage two processing is 
-then done sequentialy on all images in the input list.
+then done sequentially on all images in the input list.
 .le
 .sh
 13. Processing Arithmetic
@@ -627,7 +627,7 @@ is truncated.
 .le
 .ls (3)
 The overscan vector and the scale factors for dark count, flat field,
-illumination, and fringe calibrations are always of type real.  Therefore,
+iillumination, and fringe calibrations are always of type real.  Therefore,
 in the short data path any processing which includes these operations
 will be coerced to real arithmetic and the result truncated at the end
 of the computation.

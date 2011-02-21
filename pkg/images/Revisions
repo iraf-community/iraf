@@ -1,5 +1,158 @@
 .help revisions Jan97 images
 .nf
+immatch/src/imcombine/src/icaclip.gx
+immatch/src/imcombine/src/iccclip.gx
+immatch/src/imcombine/src/icmm.gx
+immatch/src/imcombine/src/icpclip.gx
+immatch/src/imcombine/src/icsclip.gx
+    The change that allowed the array containing the number of good pixels
+    to be negative was not taken into account in these routines.  While I
+    did not fully check the logic the simple step of applying a floor of
+    zero to the array values should be safe since these routines were
+    originally written to expect values from 0 on up.  (1/10/11, Valdes)
+
+immatch/src/imcombine/src/generic/mkpkg
+immatch/src/imcombine/src/mkpkg
+immatch/src/imcombine/mkpkg
+mkpkg
+    Converted the generic combining code into a core library so that
+    other versions of combine (such as in ccdred, mscred, nfextern)
+    will share the same code rather than have copies.  (1/4/11, Valdes)
+
+immatch/src/imcombine/src/ichdr.x
+    Accidentally left a debugging statement that printed the letter C.
+    This is now removed.  (12/10/10, Valdes)
+
+immatch/src/imcombine/src/ichdr.x
+    The step that stripped any directory from the image name for the $I
+    value of the imcmb parameter failed for extensions.  (11/17/10, Valdes)
+
+immatch/doc/imcombine.hlp
+immatch/src/imcombine/imcombine.par
+immatch/src/imcombine/src/generic/mkpkg
+immatch/src/imcombine/src/icaverage.gx
+immatch/src/imcombine/src/iclog.x
+immatch/src/imcombine/src/icnmodel.gx   +
+immatch/src/imcombine/src/icomb.gx
+immatch/src/imcombine/src/icombine.h
+immatch/src/imcombine/src/icquad.gx     +
+immatch/src/imcombine/src/mkpkg
+    Added two combine options -- "quadrature" and "nmodel".  This allows
+    sigma images to be input and output.  (4/21/10, Valdes)
+
+immatch/src/imcombine/t_imcombine.x
+immatch/imcombine.par
+immatch/src/imcombine/imcombine.par
+immatch/src/imcombine/src/generic/icmedian.x
+immatch/src/imcombine/src/icmedian.gx
+immatch/src/imcombine/src/icombine.com
+immatch/src/imcombine/src/icombine.h
+immatch/doc/imcombine.hlp
+    Added a specialized "lmedian" option to use the lower value when there
+    are only two values contributing to the output.  (4/12/10, Valdes)
+
+images/imcoords/src/t_hpctran.x
+images/imcoords/src/healpix.x
+images/imcoords/src/mkpkg
+images/imcoords/doc/hpctran.hlp
+images/imcoords/hpctran.par
+images/imcoords/imcoords.cl
+images/imcoords/imcoords.hd
+images/imcoords/imcoords.men
+images/x_images.x
+    A new task to convert between HEALPix row and spherical coordinates.
+    Data access to a HEALPix FITS binary table can be done with the
+    TABLES package but being able to compute the row from a coordinate
+    was needed.  (7/28/09, Valdes)
+
+images/immatch/src/imcombine/src/icombine.x
+    The earlier change 10/22/08 that closes the masks between each line
+    had an error that instead of doing this only after trying without
+    closing the masks it was doing it every time.
+    (7/21/09, Valdes)
+
+images/immatch/src/imcombine/src/icomb.gx
+    The data buffers were not initialized after a salloc which could
+    cause a arithmetic error when doing offset images.  This came up
+    with mergeamps.  (7/9/09, Valdes)
+
+images/immatch/src/imcombine/src/icsetout.x
+    To protect against wild errors in the offsets (usually from a problem
+    with the WCS) for making a stack a warning error occurs if the output
+    size exceeds 1Gpixels when offsets used.  (6/11/09, Valdes)
+
+images/imcoords/src/t_ccsetwcs.x
+    The behavior described in the help when there is more than one image and
+    only one solution specified does not agree with the code.  I changed the
+    code to agree with the help.  (5/21/09, Valdes)
+
+images/imutil/src/nhedit.x
+images/imutil/src/getcmd.x
+images/imutil/nhedit.par
+images/imutil/doc/nhedit.hlp
+    A "rename" parameter switch was added for renaming a keyword.  The
+    value field is the new keyword name.  (2/25/09, Valdes)
+
+images/immatch/src/imcombine/src/icombine.x
+    If the input images have "[0]" and the output is to list only then
+    the extension is stripped.  This is to allow a grouping task to
+    output the parent images of mefs.  (1/20/09, Valdes)
+
+images/immatch/src/imcombine/src/icgdata.gx
+    When keepids=yes (such as with weighting) and using the "novalue" masktype
+    the id array was not set causing errors in icaverage.
+    (1/5/09, Valdes)
+
+images/imutil/src/hedit.x
+    Fixed a problem in the he_gval() procedure in which the use of '$'
+    in a field name was causing the imgstr to always fail.  Added a check
+    so the field name is queried witout the leading '$'  (1/2/09, MJF)
+
+pkg/xtools/imfilter/src/runmed.x
+    Modified because of an argument change in an xtools/rmmed.x routine.  
+    There was not functional change.  (10/29/08, Valdes)
+
+images/immatch/src/imcombine/src/icemask.x
+images/immatch/src/imcombine/src/icomb.gx
+images/immatch/src/imcombine/src/icombine.x
+images/immatch/src/imcombine/src/icsetout.x
+images/immatch/src/imcombine/src/xtimmap.gx
+images/immatch/src/imcombine/src/imcombine.h
+images/immatch/src/imcombine/src/generic/xtimmap.com
+    More changes to optimize large number of image and memory behavior.
+    (10/23/08, Valdes)
+
+images/immatch/src/imcombine/src/xtimmap.gx
+    Debugging statements were added controled by an define at the top.
+    This allows watching when images are mapped and unmapped.
+    (10/22/08, Valdes)
+
+images/immatch/src/imcombine/src/icmask.x
+images/immatch/src/imcombine/src/icmask.h
+images/immatch/src/imcombine/src/icombine.x
+    If memory runs out not only is the image buffer size reduced but the
+    pixel masks (if used) are closed after each access.  This may be
+    rather inefficient but was the simplest way to handle the fact that
+    masks are stored in memory and can't easily be buffered in line
+    blocks.  (10/22/08, Valdes)
+
+images/immatch/src/imcombine/src/icaclip.gx
+    When too many pixels are rejected the operation of adding back some
+    pixels would clobber the sigma value; i.e. reuse of a variable still
+    in use.  (10/13/08, Valdes)
+
+images/immatch/src/imcombine/src/icaclip.gx
+images/immatch/src/imcombine/src/iccclip.gx
+images/immatch/src/imcombine/src/icsclip.gx
+    When clipping about the median from below the rejection could
+    terminate early, because the wrong variable was used, resulting in
+    an incorrect value.  I believe this will only be a problem when the
+    sigma factor is very small.  (10/07/08, Valdes)
+
+=======
+V2.14.1
+=======
+
 images/x_images.x
 images/imutil/imutil.cl
 images/imutil/imutil.hd

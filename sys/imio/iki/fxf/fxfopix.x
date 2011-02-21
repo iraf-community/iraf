@@ -23,8 +23,10 @@ char    pathname[SZ_PATHNAME]
 int	compress, blklen, pixoff, filesize
 int	i, hdr_size, sz_pixfile, sz_fitfile, junk, npix
 extern  fxfzop(), fxfzrd(), fxfzwr(), fxfzwt(), fxfzst(), fxfzcl()
-int	strncmp(), fxf_header_size(), fxf_totpix(), sizeof()
+int	strncmp(), fxf_header_size(), fxf_totpix()
 int     strlen(), fopnbf(), fstatl(), itoc()
+
+include	<szpixtype.inc>
 
 define  err_ 91
 define  endowr_ 92
@@ -123,7 +125,7 @@ begin
 	    FIT_BSCALE(fit) = 1.0d0
 	    FIT_BZERO(fit) = 0.0d0
 
-	    sz_pixfile = npix * sizeof (IM_PIXTYPE(im))
+	    sz_pixfile = npix * pix_size[IM_PIXTYPE(im)]
 
 	    # The pixel file needs to be a multiple of 1440 chars.
 	    sz_pixfile = FITS_LEN_CHAR (sz_pixfile)
@@ -437,7 +439,9 @@ int	pixoff, compress, blklen, sz_fitfile, i, group, filesize
 int	junk, in_fd, out_fd, nblocks, nk, hdr_size, sz_pixfile
 extern  fxfzop(), fxfzrd(), fxfzwr(), fxfzwt(), fxfzst(), fxfzcl()
 int	fnroot(), open(), read(), fxf_totpix(), strncmp(), itoc()
-int	strlen(), fopnbf(), fstatl(), sizeof(), fxf_header_size()
+int	strlen(), fopnbf(), fstatl(), fxf_header_size()
+
+include	<szpixtype.inc>
 
 errchk	syserr, syserrs
 define  err_ 91
@@ -511,7 +515,7 @@ begin
 	junk = itoc (fit, Memc[file+i], SZ_PATHNAME) 
 
 	# The pixel file needs to be a multiple of 1440 chars.
-	sz_pixfile = fxf_totpix(im) * sizeof (IM_PIXTYPE(im))
+	sz_pixfile = fxf_totpix(im) * pix_size[IM_PIXTYPE(im)]
 	sz_pixfile = FITS_LEN_CHAR(sz_pixfile)
 	sz_fitfile = sz_pixfile + hdr_size
 

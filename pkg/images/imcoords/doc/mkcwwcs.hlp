@@ -8,7 +8,7 @@ mkcwwcs wcsname
 .ih
 PARAMETERS
 .ls wcsname
-Image to be created or modified.  If a new (non-existant) image is specified
+Image to be created or modified.  If a new (non-existent) image is specified
 then a data-less image (NDIM=0) is created.
 .le 
 .ls wcsref = ""
@@ -20,13 +20,13 @@ Equinox of the coordinates specified in decimal years.  If INDEF then the
 current value is not modified.
 .le
 .ls ra = INDEF
-Right ascension in hours.  This may be typed in standard sexigesimal
+Right ascension in hours.  This may be typed in standard sexagesimal
 notation though it will be converted to decimal hours in EPARAM and
 to decimal degrees in the WCS as required by the standard.  If INDEF
 then the current value is not modified.
 .le
 .ls dec = INDEF
-Declination in degrees.  This may be typed in standard sexigesimal
+Declination in degrees.  This may be typed in standard sexagesimal
 notation though it will be converted to decimal degrees in EPARAM.
 If INDEF then the current value is not modified.
 .le
@@ -95,7 +95,7 @@ EXAMPLES
 
 The reference pixel will be (0,0,0).  To apply it later to an actual
 image (say with WCSCOPY) would require assigning the reference pixel.
-Note the use of sexigesimal notation.
+Note the use of sexagesimal notation.
 
 2. Modify the WCS of an existing image by changing the reference value
 and pixel.

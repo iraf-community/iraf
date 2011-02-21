@@ -184,7 +184,7 @@ begin
 		# Memory is allocated in blocks of number of columns.
 		call salloc (rms, nl, TY_POINTER)
 		do j = 1, nl {
-		    rm = rm_open (window, nc, stype)
+		    rm = rm_open (window, "median", nc, stype)
 		    Memi[rms+j-1] = rm
 		}
 	    }

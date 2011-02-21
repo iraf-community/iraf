@@ -4,7 +4,7 @@
 #define import_spp
 #include <iraf.h>
 
-extern	char *environ[];
+extern	char **environ;
 
 #ifdef LINUXPPC
 #define xargc	f__xargc
@@ -25,15 +25,18 @@ static	int xargc = 0;
  * the environment list, so we can locate the ARGV array by searching back
  * up the stack a bit.  This is very host OS dependent.
  */
-ZGCMDL (cmd, maxch, status)
-PKCHAR	*cmd;			/* receives the command line	*/
-XINT	*maxch;			/* maxch chars out		*/
-XINT	*status;
+int
+ZGCMDL (
+  PKCHAR  *cmd,				/* receives the command line	*/
+  XINT	  *maxch,			/* maxch chars out		*/
+  XINT	  *status
+)
 {
 	register char	*ip, *op;
 	unsigned int	*ep;
 	register int	n;
 	char	**argv;
+
 
 	if (!(argv = xargv)) {
 	    /* Locate the ARGV array.  This assumes that argc,argv are
@@ -69,4 +72,6 @@ XINT	*status;
 
 	*op = EOS;
 	*status = op - (char *)cmd;
+
+	return (XOK);
 }

@@ -4,6 +4,7 @@
 #define import_spp
 #define import_libc
 #define import_stdio
+#define import_ctype
 #include <iraf.h>
 
 #include "config.h"
@@ -15,6 +16,8 @@
 #include "errs.h"
 #include "clmodes.h"
 #include "construct.h"
+#include "proto.h"
+
 
 /*
  * PARAM -- Operations upon parameters.
@@ -27,7 +30,7 @@ extern char *eofstr;
 extern char *indefstr;
 extern char *indeflc;
 
-int parhead;			/* dict index of first pfile 		*/
+XINT parhead;			/* dict index of first pfile 		*/
 
 
 #define	INDEX_OFFSET	0	/* Offsets using index list.		*/
@@ -45,10 +48,7 @@ char	*loc_field = "Attempt to access undefined field in local variable %s.\n";
  *   Depend on this and don't check for ERR; beware if change it.
  */
 struct param *
-paramfind (pfp, pname, pos, exact)
-struct	pfile *pfp;
-char	*pname;
-int	pos, exact;
+paramfind (struct pfile *pfp, char *pname, int pos, int exact)
 {
 	register char first_char;
 	register struct	param *pp;
@@ -137,9 +137,8 @@ int	pos, exact;
  *
  *	order of interpolator (3|5|7) (5):
  */
-paramset (pp, field)
-register struct param *pp;
-char	field;
+void 
+paramset (register struct param *pp, int field)
 {
 	struct	operand o;
 	int	bastype;	/* OT_BASIC portion of p_type		*/
@@ -306,7 +305,7 @@ char	field;
 
 	case FN_MAX:				 /* maximum */
 	    if (bastype == OT_BOOL || 
-		bastype == OT_STRING && !(pp->p_type & PT_FILNAM)) {
+		(bastype == OT_STRING && !(pp->p_type & PT_FILNAM))) {
 		cl_error (E_UERR, e_nominmax);
 	    }
 
@@ -358,9 +357,8 @@ char	field;
  * in file if list-structured.  If getting FN_NULL, query if in query mode
  * or if pp is out of range.  Call error if return value would be undefined.
  */
-validparamget (pp, field)
-register struct param *pp;
-char	field;
+void 
+validparamget (register struct param *pp, int field)
 {
 	struct operand o;
 
@@ -380,9 +378,8 @@ char	field;
  * if list-structured.  If getting FN_NULL, query if in query mode or if pp
  * is out of range.  Value returned may be undefined.
  */
-paramget (pp, field)
-register struct param *pp;
-char	field;
+void 
+paramget (register struct param *pp, int field)
 {
 	char	mode[5];	/* used to turn bits into string	*/
 	struct	operand result;
@@ -590,6 +587,7 @@ char	field;
 	 */
 	if ((result.o_type & OT_BASIC) == OT_STRING &&
 	    *result.o_val.v_s == PF_INDIRECT) {
+
 	    char	redir[SZ_FNAME];
 	    struct	param *np;
 	    char	*pk, *t, *p, *f;
@@ -622,6 +620,17 @@ char	field;
 
 		    setopindef (&result);
 		}
+
+            } else if ((result.o_type & OT_BASIC) == OT_STRING) {
+                char *ip = result.o_val.v_s;
+
+		/* Check for an escaped string indirection, e.g. "\)param".
+		** If we have one, remove the escape char from the result
+		** string.
+		*/
+                if (*ip == '\\' && *(ip+1) == PF_INDIRECT)
+                    strcpy (ip, &result.o_val.v_s[1]);
+
 	    }
 
 	    pushop (&result);
@@ -633,11 +642,10 @@ char	field;
  * are on in param pp.  S should be at least 5 characters long, in the
  * (impossible) worse case.
  */
-makemode (pp, s)
-struct param *pp;
-char	*s;
+void 
+makemode (struct param *pp, char *s)
 {
-	register m = pp->p_mode;
+	register int m = pp->p_mode;
 
 	if (m & M_AUTO)
 	    *s++ = PF_AUTO;
@@ -659,8 +667,7 @@ char	*s;
  * Null out all unused fields except the three union values.
  */
 struct param *
-newparam (pfp)
-struct	pfile *pfp;
+newparam (struct pfile *pfp)
 {
 	register struct param *newpp;
 
@@ -705,8 +712,7 @@ struct	pfile *pfp;
  * Call error() and do not return if cannot find it.
  */
 struct param *
-paramsrch (pkname, ltname, pname)
-char	*pkname, *ltname, *pname;
+paramsrch (char *pkname, char *ltname, char *pname)
 {
 	register struct param *pp;
 	struct	pfile *pfp;
@@ -718,7 +724,7 @@ char	*pkname, *ltname, *pname;
 	pp = lookup_param (pkname, ltname, pname);
 
 	if (currentask->t_pfp->pf_flags & PF_FAKE) {
-	    if (((int)pp == ERR || pp == NULL) && *pname != '$') {
+	    if (((XINT)pp == ERR || pp == NULL) && *pname != '$') {
 		/* If dealing with a task that has no param file, try to
 		 * satisfy the request from positional args.  If that fails,
 		 * make one that will query.
@@ -743,7 +749,7 @@ char	*pkname, *ltname, *pname;
 	    }
 	}
 
-	if ((int)pp == ERR)
+	if ((XINT)pp == ERR)
 	    cl_error (E_UERR, e_nopfile, ltname);
 	if (pp == NULL)
 	    cl_error (E_UERR, e_pnonexist, pname);
@@ -757,8 +763,8 @@ char	*pkname, *ltname, *pname;
  * with appropriate searching as necessary.  False is returned if either the
  * task has no param file or the param does not exist.
  */
-defpar (param_spec)
-char	*param_spec;
+int 
+defpar (char *param_spec)
 {
 	char	sbuf[SZ_LINE];
 	char	*pkname, *ltname, *pname, *junk;
@@ -766,7 +772,7 @@ char	*param_spec;
 	strcpy (sbuf, param_spec);
 	breakout (sbuf, &pkname, &ltname, &pname, &junk);
 
-	switch ((int) lookup_param (pkname, ltname, pname)) {
+	switch ((XINT) lookup_param (pkname, ltname, pname)) {
 	case NULL:
 	case ERR:
 	    return (NO);
@@ -778,8 +784,8 @@ char	*param_spec;
 
 /* DEFVAR -- Determine if the named environment variable exists.
  */
-defvar (envvar)
-char	*envvar;
+int 
+defvar (char *envvar)
 {
 	char	sbuf[SZ_LINE];
 
@@ -799,8 +805,7 @@ char	*envvar;
  * Called by PARAMSRCH and by DEFPAR.
  */
 struct param *
-lookup_param (pkname, ltname, pname)
-char	*pkname, *ltname, *pname;
+lookup_param (char *pkname, char *ltname, char *pname)
 {
 	register struct param *pp;
 	register struct package *pkp;
@@ -846,13 +851,14 @@ char	*pkname, *ltname, *pname;
 		for (i=0;  i <= 1;  i++)
 		    if ((pfp = pfp_head[i]) != NULL) {
 			pfiles[npfiles++] = pfp;
-			if (pfp->pf_flags & PF_PSETREF)
-			    while (pfp = pfp->pf_npset) {
+			if (pfp->pf_flags & PF_PSETREF) {
+			    while ( (pfp = pfp->pf_npset) ) {
 				pfiles[npfiles++] = pfp;
 				if (npfiles >= 62)
 				    cl_error (E_IERR,
 					"lookup_param: too many pfiles");
 			    }
+			}
 		    }
 	    }
 
@@ -868,8 +874,8 @@ char	*pkname, *ltname, *pname;
 	    ambig = 0;
 	    for (i=0;  i < npfiles;  i++) {
 		pfp = pfiles[i];
-		if (pfp != NULL && (pp = paramfind (pfp, pname, 0, NO)) != NULL)
-		    if ((int)pp == -1) {
+		if (pfp != NULL && (pp = paramfind(pfp, pname,0,NO)) != NULL) {
+		    if ((XINT)pp == -1) {
 			ambig++;
 		    } else if (!strcmp (pp->p_name, pname)) {
 			ambig = 0;
@@ -879,6 +885,7 @@ char	*pkname, *ltname, *pname;
 		    } else {
 			candidate = pp;
 		    }
+		}
 	    }
 
 	    if (ambig)
@@ -891,7 +898,7 @@ char	*pkname, *ltname, *pname;
 		/* If the package name is given, search only that package.
 		 */
 		pkp = pacfind (pkname);
-		if ((int)pkp == ERR)
+		if ((XINT)pkp == ERR)
 		    cl_error (E_UERR, e_pckambig, pkname);
 		if (pkp == NULL)
 		    cl_error (E_UERR, e_pcknonexist, pkname);
@@ -902,7 +909,7 @@ char	*pkname, *ltname, *pname;
 		ltp = ltaskfind (pkp, ltname, 1);
 		if (ltp == NULL)
 		    cl_error (E_UERR, e_tnonexist, ltname);
-		if ((int)ltp == ERR)
+		if ((XINT)ltp == ERR)
 		    cl_error (E_UERR, e_tambig, ltname);
 
 	    } else {
@@ -922,7 +929,7 @@ char	*pkname, *ltname, *pname;
 		    return ((struct param *)ERR);
 	    }
 	    pp = paramfind (pfp, pname, 0, NO);
-	    if ((int)pp == ERR)
+	    if ((XINT)pp == ERR)
 		cl_error (E_UERR, e_pambig, pname, ltp->lt_lname);
 	}
 
@@ -936,16 +943,15 @@ char	*pkname, *ltname, *pname;
  * Put quotes around strings; convert escape chars into escape sequences.
  * Don't call error() so caller can have a chance to close the file.
  */
-printparam (pp, fp)
-struct	param *pp;
-register FILE *fp;
+int 
+printparam (struct param *pp, register FILE *fp)
 {
-	register type, bastype;
+	register int type, bastype;
 	register char *bp;
 	char	*index();
 	char	buf[20];
 	int	arrflag;
-	int	size_arr;
+	int	size_arr=0;
 	int	i;		/* a misc variable.	*/
 
 	if ((pp->p_mode & M_FAKE) && fp != stderr)
@@ -1119,9 +1125,9 @@ register FILE *fp;
 	    /* For a first approximation use a fixed number of
 	     * values per line.
 	     */
-	    int    count, lcount, n_per, *p_i;
-	    double *p_r;
-	    char   **p_s;
+	    int    count=0, lcount=0, n_per=0, *p_i= (int *) NULL;
+	    double *p_r= (double *) NULL;
+	    char   **p_s = NULL;
 
 	    if (bastype == OT_BOOL) {
 		n_per = 20;
@@ -1191,9 +1197,8 @@ register FILE *fp;
  * control characters (newline, tab, and string delimiters) into escape
  * sequences, so that they can later be read back in unmodified.
  */
-qputs (str, fp)
-register char	*str;
-register FILE	*fp;
+void 
+qputs (register char *str, register FILE *fp)
 {
 	register char	ch;
 
@@ -1237,9 +1242,8 @@ register FILE	*fp;
  * the null string a null string per se does not qualify as an undefined
  * value.
  */
-pvaldefined (pp, s)
-struct	param *pp;
-char	*s;
+int 
+pvaldefined (struct param *pp, char *s)
 {
 	int val;
 
@@ -1262,11 +1266,13 @@ char	*s;
  * Check for both kinds of null strings, just in case.
  */
 struct param *
-newfakeparam (pfp, name, pos, type, string_len)
-struct	pfile *pfp;
-char	*name;
-int	pos, type;
-int	string_len;	/* if new param is type string, size of string */
+newfakeparam (
+    struct pfile *pfp,
+    char *name,
+    int pos,
+    int type,
+    int string_len	/* if new param is type string, size of string */
+)
 {
 	register struct param *pp;
 
@@ -1309,8 +1315,8 @@ int	string_len;	/* if new param is type string, size of string */
 /* GETOFFSET -- Getoffset returns the offset from the beginning of the array
  * for using the index values stored on the stack.
  */
-getoffset(pp)
-struct param	*pp;
+int 
+getoffset (struct param *pp)
 {
 	int	dim, offset, index;
 	short	*plen, *poff, len, off;
@@ -1359,8 +1365,8 @@ struct param	*pp;
  * the offsets using an index list, or to push the offset onto the stack
  * directly.
  */
-offsetmode (mode)
-int	mode;
+void 
+offsetmode (int mode)
 {
 	if (mode)
 	    mode_offset = DIRECT_OFFSET;
@@ -1371,8 +1377,8 @@ int	mode;
 
 /* SIZE_ARRAY -- Get the number of elements in an array.
  */
-size_array (pp)
-struct param *pp;
+int 
+size_array (struct param *pp)
 {
 	int dim, d, size;
 	short *len;

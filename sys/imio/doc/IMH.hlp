@@ -22,7 +22,7 @@ upon DBIO.
 
 A secondary purpose of this revision was to make several minor enhancements
 to IMIO to better support groups of images.  The image template syntax
-has been extended to provide a speical selection syntax for specifying the
+has been extended to provide a special selection syntax for specifying the
 subset of the images in a group or set of groups to be operated upon.
 Minor changes were made to the filenames of the files used to store IRAF
 format images to make identification of the header and pixel files easier.
@@ -57,7 +57,7 @@ following constructs:
 
 These elements may appear in any order, although not all orderings make
 sense.  The \fIpattern\fR string may contain any of the standard pattern
-matching characters, but the pattern matching metacharacters {} (ignore
+matching characters, but the pattern matching meta-characters {} (ignore
 case) and [] (character class) must be escaped to avoid interpretation as
 the subset selection and image section operators.  An \fIimages\fR string
 may contain at most one list construct, i.e., listfile reference, pattern,

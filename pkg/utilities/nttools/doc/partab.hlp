@@ -1,0 +1,62 @@
+.help partab Nov91 tables
+.ih
+NAME
+partab -- Copy an IRAF parameter to a table element.
+.ih
+USAGE
+partab value table column row
+.ih
+DESCRIPTION
+This task changes the value of a table element to the value of the input
+parameter 'value'.  If 'value' is set to "INDEF", the table element will be
+set to undefined.  If the data type of the table element is different from
+that of the input parameter 'value', this task will perform 
+type conversion.  The strings
+"yes", "y", "no", "n", "true", "t", "false", and "f", in either upper or
+lower case are interpreted as boolean values.
+.ih
+PARAMETERS
+.ls value [string]
+The IRAF parameter that will be copied into the table element.
+.le
+.ls table [file name]
+Name of the table.
+.le
+.ls column [string]
+Column name. (Column names are not case sensitive).
+.le
+.ls row [integer, min=1, max=INDEF]
+Row number.
+.le
+.ih
+EXAMPLES
+1. Set the twelfth component (i.e., row 12 of column 'COMPNAME') 
+in the file 'graph.tab' to "FILTER1":
+
+.nf
+tt> partab FILTER1 graph.tab COMPNAME 12
+.fi
+
+2. Set the first wavelength (i.e., row 1 of column 'WAVELENGTH') in 
+the file 'spectrum.tab' to the value contained in parameter
+'x':
+
+.nf
+tt> partab (x) spectrum.tab WAVELENGTH 1
+.fi
+
+3. Set the hundreth wavelength (i.e., row 100 of column 'WAVELENGTH')
+in 'spectrum.tab' to undefined:
+
+.nf
+tt> partab INDEF spectrum.tab WAVELENGTH 100
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+keypar, keytab, parkey, tabkey, tabpar
+.endhelp

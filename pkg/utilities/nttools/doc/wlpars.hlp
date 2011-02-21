@@ -1,0 +1,440 @@
+.help wlpars Jul93 tables
+.ih
+NAME
+wlpars -- Edit the parameter set that determines how WCS labeling 
+appears.
+.ih
+USAGE
+wlpars
+.ih
+DESCRIPTION
+These parameters determine the characteristics of plots that are
+produced by the various tasks that use the World Coordinate System
+(WCS) information from image data. Various
+parameters can be set in 'wlpars', including those controlling
+the appearance of features such as
+major and minor tick marks, the use of grid lines, etc.
+
+Note that this is a pset, not an executable task; it defines a set of
+parameters used by other tasks.  Invoking the pset by name runs
+`eparam' on the parameter set, allowing you to modify the
+parameters.  Alternatively, the parameters may be modified on the
+command line by specifying the pset name and parameter name.  For
+example, the user can type "wlpars.major_grid=no" to not draw lines
+for the major grid, but to include tick marks.  
+Parameters can also be edited by
+using `eparam' on the calling task (e.g., by typing "eparam wcslab"),
+in which case, `wlpars' will appear as one of the task parameters; the
+`wlpars' parameters may then be edited by positioning the cursor on
+the line containing the pset name and typing ":e".  After editing the
+pset parameters, press Control-Z to return to the main task parameter
+menu.
+
+Below is a list of areas that explain in more detail what the
+parameters in this pset accomplish.  This explanation also occurs in
+the help for 'wcslab'.
+
+.ls Axis Specification
+For all linear transformations axis 1 and axis 2 specify which axis in
+the image WCS is being referred to.
+For example in a 2-dimensional image, the FITS image header keywords
+CTYPE1, CRPIX1, CRVAL1, CDELT1,
+CD1_1, and CD1_2 define the world coordinate transformation for axis 1.
+Similarly the FITS image header keywords
+CTYPE2, CRPIX2, CRVAL2, CDELT2,
+CD2_1, CD2_2, define the world coordinate transformation for axis 2.
+
+THIS RULE DOES NOT APPLY TO THE CELESTIAL plane projection WCSs.
+For this type of WCS, axis 1 and axis 2 
+always refer to right ascension and declination respectively,
+and 'wcslab' assumes that all axis 1 parameters refer to right
+ascension and all axis 2 parameters refer to declination, regardless of
+which axis in the image WCS actually specifies right ascension and declination.
+
+.le
+.ls Grid Drawing
+There are two types of grid lines and tick marks, "major" and
+"minor".  The major grid lines and tick marks are the lines or ticks
+that will be labeled.  The minor grid lines or tick marks are plotted
+between the major marks.  Whether lines or tick marks are drawn is
+determined by the boolean parameters 'major_grid' and 'minor_grid'.
+If these are set to "yes", lines are drawn; if "no", 
+tick marks are drawn.  How the lines
+appear is controlled by the parameters 'major_line' and 'minor_line'.
+
+The spacing of minor marks is controlled by the parameters 'axis1_minor'
+and 'axis2_minor'. These parameters specify the number of minor marks
+that will appear between the major marks along the axis 1
+and axis 2 axes.
+
+Spacing of major marks is more complicated.  'wcslab' tries to
+present major marks only along "significant values" in the
+coordinate system.  For example, if the graph spans several hours of
+right ascension,  the interval between major marks will generally be an
+hour and the major marks will appear at whole hours within the graph.
+If the values chosen by 'wcslab' are unacceptable, the interval and range can
+be modified by the parameters 'axis1_int', 'axis1_beg',
+'axis1_end' for the 'axis 1', and 'axis2_int', 'axis2_beg',
+and 'axis2_end' for 'axis 2'. All three parameters must be specified for
+each axis in order for the new values to take affect
+
+.le
+.ls Graph Appearance
+'wcslab' supports three types of graph: normal, polar, and near_polar.
+
+A normal graph is the usual Cartesian graph where lines of constant
+axis 1 or 2 values cross at least two different sides of the graph.
+'wcslab' will, by default, plot a normal type graph for any image that
+meets the following criteria: 1)
+has no defined WCS, 2) has a linear WCS, and 3) where the sky
+projection WCS approximates a Cartesian system.
+
+A polar graph is one in which the north or south pole of the
+coordinate system actually appears on the graph.
+Lines of constant declination are no longer approximately
+straight lines, but are circles that may not intersect any
+of the edges of the graph. In this type of graph, axis 1 values
+are labeled all the way around the graph. 
+Axis 2 values are labeled within the graph
+next to each circle.  An attempt is made to label as many circles as
+possible.  If you don't like the labeling defaults,
+the parameters, 'axis2_dir' and 'justify' can be modified
+to control how the labeling is done.
+The parameter 'axis2_dir' specifies along which axis 1 value the
+axis 2 labels should be written; 'justify' specifies the side of
+the value on which the label will appear.
+
+The "near_polar" graph is a cross between the normal graph and the polar
+graph.  In this case the pole is not on the graph, but is close enough
+to significantly affect the appearance of the plot.  The "near_polar" graph
+is handled like a polar graph.
+
+The parameter 'graph_type' can be used to force 'wcslab'
+to plot a graph of the type specified, although you may need to
+change other 'wlpars' parameters to get good results.
+For example, trying to plot a polar graph as
+cartesian may producing a strange looking graph.
+.le
+.ls Graph Labeling
+Due to the variety of graph types that can be plotted (see above), and
+the arbitrary rotation that any WCS can have, the task of labeling
+the major grid lines in a coherent and pleasing manner is not trivial.
+
+The basic model used is the cartesian or normal graph.  Labels
+normally appear on the left and bottom edges of the graph with one side
+devoted solely to one of the WCS coordinate axis.  For example, right
+ascension might be labeled only along the bottom edge of the graph
+and declination only along the left edge, or vice versa. 
+
+If the defaults chosen by the task are unacceptable, the
+parameters 'axis1_side' and 'axis2_side', can be used to specify which
+side (or sides) the labels for axis 1 and axis 2 will appear.
+Either a single side or a list of sides can be specified for either
+axis.  If a list is specified, labels will appear on each side listed,
+even if the same side appears in both of the parameters.  In this way,
+labels can be made to appear on the same side of the graph.
+.le
+.ls Label Appearance
+Due to coordinate rotations, lines of constant axis 1 or axis 2 value
+may not intersect the edges
+of the graph perpendicularly.  To help clarify which line belongs to
+which label, the labels will be drawn at an angle equal to that of the
+line which is being labeled.  If this is not desired, 
+the parameter rotate may be set to no, and labels will always appear
+"normal", i.e.,  the text will not be rotated in any way.
+
+By default, all labels will be shortened to the smallest unit
+needed to indicate the value of the labeled line.  For example, if the
+graph spans about 30 seconds of declination, the interval between the
+labels will be approximately 5 or 10 seconds. The first label will contain the
+full specification, i.e., -22:32:20.  But the rest of the labels will
+only be the seconds, i.e., 30, 40, 50.  However, at the change in
+minutes, the full format would be used again, -22:33:00, but then
+again afterwards only seconds will be displayed, i.e., 10, 20, etc.
+If this shortening of labels is undesirable, it
+can be turned off by setting the parameter 'full_label = yes'.  This
+forces every label to use the full specification.
+
+Finally, the parameter 'label_size' can be used to adjust the size of the
+characters used in the axis labels.
+.le
+.ls Titles
+A graph title may specified using the parameter 'title'. 
+If 'title = "imtitle"', a default title constructed from the image name and title
+is used. The location and size of the graph title are controlled by
+the parameters 'title_side' and 'title_size'.
+Similarly the content, placement and size of the axis titles are
+controlled by the parameters 'axis1_title', 'axis2_title',
+'axis1_title_side', 'axis2_title_side',  and
+'axis_title_size'.
+.le
+.ls Interactive Cursor
+'wcslab' provides a simple cursor readback capability for retrieving
+coordinates of objects and saving them in a file.  However, you should
+also look at the tasks 'tvmark' and 'rimcursor' for more advance
+functionality.
+
+The cursor allows the user to examine
+coordinates of specific objects and to make a file containing a
+list of coordinates.  For graphic displays, the user has the full cursor
+functionality described by 'gcur'.  However, there are a few extra
+commands provided for transforming cursor position to celestial
+coordinates.  While in cursor mode, striking most lower-case
+characters will result in the celestial coordinates of the cursor
+position to be displayed on the terminal.
+
+Coordinates can also be written to a file by
+striking the lower-case 'm'.  When 'm' is hit, an 'X' is placed on the
+display, and the coordinates are written to a coordinate list file.
+This file can be specified in two ways.  If you just start hitting
+'m', a file called '<imagename>.coord.list' will be created.  You can 
+specify a 
+different
+file with the colon command ":open <filename>".  After opening the 
+file, any 
+new coordinates marked with the 'm' key are written to the
+file.  You can go through as many files as you like.  If a file is
+specified that already exists, an attempt is made to read the file.
+If it contains coordinate values, those coordinate positions are
+displayed as crosses in the window, and any new position marked 
+will be appended.
+
+Striking the '?' key will display help concerning these task-specific
+commands.  Striking the 'q' key will exit the task.
+.le
+.ls Output Formats
+Currently, only one coordinate format is supported: all right
+ascensions are output in HH:MM:SS (hours:minutes:seconds) format 
+and
+all declinations are output in DD:MM:SS (degrees:minutes:seconds).  If 
+parameters are changed, such as 'axis1_int', they should be
+input in the same format.  For the coordinate list files, the first
+line of the file begins with the comment character, '#', and displays
+the format used in the file.
+
+If the WCS is linear, then output will not be formatted in any special
+way; i.e., no assumptions are made about units, etc.
+.le
+.ih
+PARAMETERS
+.ls (major_grid = yes) [boolean]
+Draw a coordinate grid instead of tick marks at the position of the major
+intervals?  
+
+If set to "yes", lines of constant axis1 and axis2 values are drawn.
+If set to "no", tick marks will be drawn instead.  Major grid lines and
+tick marks will be labeled with the appropriate axis values.
+.le
+.ls (minor_grid = no) [boolean]
+Draw a coordinate grid instead of tick marks at the position of the
+minor intervals?  
+
+If set to "yes", lines of constant axis1 and axis2 values
+are drawn between the major grid lines and tick
+marks.  If this is set to "no", tick 
+marks will be drawn instead. Minor grid lines and  tick
+marks are not labeled.
+.le
+.ls (dolabel = yes) [boolean]
+Label the major grid lines or tick marks?
+.le
+.ls (remember = no) [boolean]
+Modify the 'wlpars' parameter file when done?  
+
+Setting this to "yes" allows  parameters that may have been calculated
+by the task to be written back to the parameter file.  If set to "no",
+the default, the parameter file is left untouched by the task.  This is
+useful if some slight modification is desired to produce a slightly
+different graph.
+.le
+.ls (axis1_beg = "") [string]
+The lowest value of axis 1 in world coordinates units at which a major
+grid line or tick mark will be plotted.  If set to null ('axis1_beg =
+""'), 'wcslab'  will compute this quantity.  'axis1_beg' will be
+ignored if 'axis1_end' and 'axis1_int' are undefined.
+.le
+.ls (axis1_end = "") [string]
+The highest value of axis 1 in world coordinate
+units at which a major grid line or tick mark will be plotted.
+If 'axis1_end = ""', the task will compute this quantity.
+'axis1_end' will be ignored if 'axis1_beg' and 'axis1_int' are undefined.
+.le
+.ls (axis1_int = "") [string]
+The interval in world coordinate units at which
+major grid lines and tick marks will be drawn along axis 1.
+If 'axis1_int = ""', 'wcslab' will compute this quantity.
+'axis1_int' will be ignored if 'axis1_beg' and 'axis1_end' are undefined.
+.le
+.ls (axis2_beg = "") [string]
+The lowest value of axis 2 in world coordinates units
+at which a major grid line or tick mark will be plotted.
+If 'axis2_beg = ""', 'wcslab'  will compute this quantity.
+'axis2_beg' will be ignored if 'axis2_end' and 'axis2_int' are undefined.
+.le
+.ls (axis2_end = "") [string]
+The highest value of axis 2 in world coordinate
+units at which a major grid line or tick mark will be plotted.
+If 'axis2_end = ""', 'wcslab' will compute this quantity.
+'axis2_end' will be ignored if 'axis2_beg' and 'axis2_int' are undefined.
+.le
+.ls (axis2_int = "") [string]
+The interval in world coordinate units at which
+major grid lines or tick marks will be drawn along axis 2.
+If 'axis2_int = ""', 'wcslab' will compute this quantity.
+'axis2_int' will be ignored if 'axis1_beg' and 'axis1_end' are undefined.
+.le
+.ls (major_line = "solid") [string, allowed values: solid | 
+dotted | dashed | dotdash]
+
+The type of major grid lines to be plotted.
+The permitted values are "solid", "dotted", "dashed", and "dotdash".
+.le
+.ls (major_tick = .03) [real]
+Size of major tick marks relative to the size of the viewport.
+By default the major tick marks are .03 times the size of the
+viewport.
+.le
+.ls (axis1_minor = 5) [integer]
+The number of minor grid lines or tick marks that will appear between major 
+grid lines or tick marks for axis 1.
+.le
+.ls (axis2_minor = 5) [integer]
+The number of minor grid lines or tick marks that will appear between major
+grid lines or tick marks for axis 2.
+.le
+.ls (minor_line = "dotted") [string, allowed values: solid | 
+dotted | dashed | dotdash]
+
+The type of minor grid lines to be plotted.
+The permitted values are "solid", "dotted", "dashed", and "dotdash".
+.le
+.ls (minor_tick = .01) [real]
+Size of minor tick marks relative to the size of the viewport.
+BY default the minor tick marks are .01 times the size of the
+viewport.
+.le
+.ls (tick_in = yes) [boolean]
+Do tick marks point into instead of away from the graph?
+.le
+.ls (axis1_side = "default") [string]
+The list of viewport edges, separated by commas, on which to place the axis
+1 labels.  If 'axis1_side' is "default", 'wcslab' will choose a side.
+'axis1_side' may contain any combination of "left", "right",
+"bottom", "top", or "default".
+.le
+.ls (axis2_side = "default") [string]
+The list of viewport edges, separated by commas, on which to place the axis
+2 labels.  If 'axis2_side' is "default", 'wcslab' will choose a side.
+'axis2_side' may contain any combination of "left", "right",
+"bottom", "top", or "default".
+.le
+.ls (axis2_dir = "") [string]
+The axis 1 value at which the axis 2 labels will be written for polar graphs. 
+If 'axis2_dir' is "", 'wcslab' will compute this number.
+.le
+.ls (justify = "default") [string]
+The direction with respect to axis 2 along which the axis 2
+labels will be drawn from the point they are labeling on polar graphs.
+If 'justify = ""', then 'wcslab' will calculate this quantity.  The permitted
+values are "default", "left", "right", "top", and "bottom".
+.le
+.ls (labout = yes) [boolean]
+Draw the labels outside the axes?  
+
+Setting this to "yes", draws labels outside the image viewport.
+Otherwise, the axes labels will be drawn inside
+the image border.  The latter option is useful if the image fills the
+display frame buffer.
+.le
+.ls (full_label = no) [boolean]
+Always draw all the labels in full format (h:m:s or d:m:s) if the world
+coordinate system of the image is in RA and DEC?   
+
+If 'full_label = no', then
+only certain axes will be labeled in full format, with the rest
+labeled in minutes or seconds, as appropriate.
+.le
+.ls (rotate = yes) [boolean]
+Permit the labels to rotate ?
+
+If 'rotate = yes', then labels will be written
+at an angle to match that of the major grid lines that are being
+labeled.  If 'rotate = no', then labels are always written
+"normally", that is horizontally. If 'labout = no', then rotate is
+set to "no" by default.
+.le
+.ls (label_size = 1.0) [real]
+The size of the characters used to draw the major grid line labels.
+.le
+.ls (title = "imtitle") [string]
+The graph title. If 'title = "imtitle"', then a default title containing
+the image name and title is created.
+.le
+.ls (axis1_title = "") [string]
+The title for axis 1. By default no axis 1 title is drawn.
+.le
+.ls (axis2_title = "") [string]
+The title for axis 2. By default no axis title will be written.
+.le
+.ls (title_side = "top") [string, allowed values: top | bottom | 
+left | right]
+
+The side of the plot on which to place the title.
+The options are "left", "right", "bottom", and "top".
+.le
+.ls (axis1_title_side = "default") [string, allowed values: default |
+top | bottom | left | right]
+
+The side of the plot on which to place the axis 1 title.
+If 'axis1_title_side = "default"', 'wcslab' will choose a side for the title.
+The permitted values are "default", "right", "left", "top", and
+"bottom".
+.le
+.ls (axis2_title_side = "default") [string, allowed values: default |
+top | bottom | left | right]
+
+The side of the plot on which to place the axis 2 title.
+If 'axis2_title_side = "default"', 'wcslab' will choose a side for the title.
+The permitted values are "default", "right", "left", "top", and
+"bottom".
+.le
+.ls (title_size = 1.0) [real]
+The size of characters used to draw the title.
+.le
+.ls (axis_title_size = 1.0) [real]
+The size of the characters used to draw the axis titles.
+.le
+.ls (linecolor = INDEF) [integer]
+Color used for drawing lines and tick marks. If this is not specified,
+the default color
+for the graphics output device will be used.
+.le
+.ls (labelcolor = INDEF) [integer]
+Color used to write axis labels.  If not specified, the color for the lines
+and tickmarks will be used.
+.le
+.ls (titlecolor = INDEF) [integer]
+Color used to write the plot title. If not specified, the color for the
+labels will be used.
+.le
+.ls (graph_type = "") [normal | polar | near_polar]
+String indicating what type of graph will be drawn.  If empty, the
+default, the task will determine the type.   
+.le
+.ls (coords) [gcur]
+The graphics cursor.
+.le
+.ls (image_coord) [imcur]
+The image display cursor.
+.le
+.ls (version = "16Jun92" ) [string]
+The date the current software was installed.
+.le
+.ih
+EXAMPLES
+.ih
+BUGS
+.ih
+SEE ALSO
+wcslab, cursors, newcont
+.endhelp

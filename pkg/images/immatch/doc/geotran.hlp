@@ -4,7 +4,7 @@ NAME
 geotran -- geometrically transform a list of images
 .ih
 USAGE
-geotran input output database transform
+geotran input output database transforms
 .ih
 PARAMETERS
 .ls input
@@ -32,7 +32,7 @@ The list of record name(s) in the file \fIdatabase\fR containing the
 desired transformations.
 This record name is usually the name of the text file input to geomap
 listing the reference and input coordinates of the control points.
-The number of records must 1 or equal to the number of input images.
+The number of records must be 1 or equal to the number of input images.
 The record names may be listed in a text file 1 record per line.
 The transforms parameter is only
 requested if database is not equal to the null string.

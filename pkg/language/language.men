@@ -40,6 +40,7 @@ Builtin Commands and Functions:
 	 defpac - Test if a package is defined
 	 defpar - Test if a parameter is defined
         deftask - Test if a task is defined
+	 defvar - Test if an environment variable is defined
 	 dparam - Dump a pset as a series of task.param=value assignments
 	   edit - Edit a text file
        ehistory - Edit history file to re-execute commands
@@ -53,6 +54,7 @@ Builtin Commands and Functions:
 	 gflush - Flush any buffered graphics output
        hidetask - Make a task invisible to the user
         history - Display  commands previously executed
+       imaccess - Test if an image exists
            jobs - Display status of background jobs
 	   keep - Make recent set, task, etc. declarations permanent
 	   kill - Kill a background job

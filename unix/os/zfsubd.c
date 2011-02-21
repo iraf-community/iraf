@@ -16,11 +16,13 @@
  * but this is consistent with UNIX so we need not recognize these as special
  * cases.  The return OS directory prefix need not be an absolute pathname.
  */
-ZFSUBD (osdir, maxch, subdir, nchars)
-XCHAR	*osdir;			/* pathname		[NOT PACKED]	*/
-XINT	*maxch;			/* max xchars in osdir			*/
-XCHAR	*subdir;		/* subdirectory name	[NOT PACKED]	*/
-int	*nchars;		/* receives lenght of osdir		*/
+int
+ZFSUBD (
+  XCHAR	 *osdir,		/* pathname		[NOT PACKED]	*/
+  XINT	 *maxch,		/* max xchars in osdir			*/
+  XCHAR	 *subdir,		/* subdirectory name	[NOT PACKED]	*/
+  XINT	 *nchars		/* receives lenght of osdir		*/
+)
 {
 	register XCHAR	*ip, *op;
 	register int	n;
@@ -29,12 +31,15 @@ int	*nchars;		/* receives lenght of osdir		*/
 	XCHAR	*slash;
 	char	*cp;
 
+	extern  int ZFGCWD();
+
+
 	/* If osdir is null, use the current directory.
 	 */
 	if (osdir[0] == XEOS) {
 	    ZFGCWD (cwd, &x_maxch, nchars);
 	    if (*nchars == XERR)
-		return;
+		return (XERR);
 	    n = *maxch;
 	    for (cp=(char *)cwd, op=osdir;  --n >= 0 && (*op = *cp++);  op++)
 		;
@@ -94,4 +99,6 @@ subdir_:    while (--n >= 0 && (*op = *ip++) != XEOS)
 
 	*op = XEOS;
 	*nchars = op - osdir;
+
+	return (XOK);
 }

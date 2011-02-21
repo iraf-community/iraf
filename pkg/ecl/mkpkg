@@ -70,7 +70,11 @@ relink:
 link:
 	$set	LIBS = "-lc -lcur -lds -lstg"
 	$ifneq (MACH, sparc) then
-	$set	LIBS2 = "libreadline.a -ltermcap"
+	  $ifeq (MACH, linux) then
+	    $set	LIBS2 = "libreadline.a -/L/usr/lib32 -lncurses"
+	  $else
+	    $set	LIBS2 = "libreadline.a -lncurses"
+	  $endif
 	$else
 	$set	LIBS2 = ""
 	$endif
@@ -100,7 +104,7 @@ libpkg.a:
 			config.h mem.h operand.h param.h task.h errs.h
 
 	clprintf.c	<libc/spp.h> <libc/libc.h> <libc/stdio.h>\
-			<libc/varargs.h> config.h operand.h param.h\
+			config.h operand.h param.h\
 			task.h errs.h
 
 	clsystem.c	<libc/spp.h> <libc/libc.h> <libc/stdio.h>\
@@ -128,7 +132,7 @@ libpkg.a:
 
 	errs.c		<libc/spp.h> <libc/libc.h> <libc/fset.h>\
 			<libc/stdio.h> <libc/setjmp.h> <libc/knames.h>\
-			<libc/xnames.h> <libc/varargs.h> clmodes.h\
+			<libc/xnames.h> clmodes.h\
 			config.h operand.h param.h task.h mem.h errs.h\
 			grammar.h construct.h
 

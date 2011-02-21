@@ -144,7 +144,7 @@ mode is set before entering raw mode, and will behave as expected.  Ucase mode
 is also disabled by the STDGRAPH kernel whenever the graphics workstation is
 activated.
 
-Note that ^ is also the history metacharacter, hence ^^ must be used when
+Note that ^ is also the history meta-character, hence ^^ must be used when
 in \fIucasein\fR mode to pass a single ^ to the CL history mechanism.
 In cursor mode, upper case keystrokes are intercepted by cursor mode unless
 escaped with a backslash.  Escaped keystrokes are mapped to lower case by
@@ -351,7 +351,7 @@ Note that the newline following the "\{%5000" in the above example is textual
 data, and will be output to the terminal along with whatever follows, up until
 the closing brace, i.e., "\}".  The amount of text to be output may be
 arbitrarily large; there is a builtin limit (currently 4096 characters),
-but it is unlikely that this limit will ever be exceeded, since no more than
+but it is unlikely that this limit will ever be exceedd, since no more than
 one pageful of text should ever be output in a single call.
 
 Normally, a %V or %NNN control directive refers only to the input record

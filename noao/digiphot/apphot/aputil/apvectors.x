@@ -467,13 +467,14 @@ int	nskypix			# number of sky pixels
 real	xc, yc			# center of sky subraster
 int	blklen			# x dimension of sky subraster
 
-int	i, x, y
+int	i
+real	x, y
 
 begin
 	do i = 1, nskypix {
 	    x = real (mod (coords[index[i]], blklen))
 	    if (x == 0)
-		x = blklen
+		x = real (blklen)
 	    y = (coords[index[i]] - x) / blklen + 1 
 	    r[i] = sqrt ((x - xc) ** 2 + (y - yc) ** 2)
 	}

@@ -2,8 +2,10 @@
  */
 
 #include <stdio.h>
-#define	import_knames
+
 #define import_spp
+#define import_kernel
+#define import_knames
 #include <iraf.h>
 
 /* ZCALL[0-10] -- Call the procedure whose entry point address is pointed to
@@ -12,90 +14,78 @@
  * reference to the called subprocedure.
  */
 
-typedef	int (*PFI)();		/* pointer to function returning an int	*/
 
-ZCALL0 (proc)
-XINT	*proc;
+
+
+int ZCALL0 (XINT *proc)
 {
-	(*(PFI)(*proc))();
+	return (*(PFI)(*proc))();
 }
 
-ZCALL1 (proc, arg1)
-XINT	*proc;
-int	*arg1;
+int ZCALL1 (XINT *proc, void *arg1)
 {
-	(*(PFI)(*proc)) (arg1);
-}
-
-
-ZCALL2 (proc, arg1, arg2)
-XINT	*proc;
-int	*arg1, *arg2;
-{
-	(*(PFI)(*proc)) (arg1, arg2);
+	return (*(PFI)(*proc)) (arg1);
 }
 
 
-ZCALL3 (proc, arg1, arg2, arg3)
-XINT	*proc;
-int	*arg1, *arg2, *arg3;
+int ZCALL2 (XINT *proc, void *arg1, void *arg2)
 {
-	(*(PFI)(*proc)) (arg1, arg2, arg3);
+	return (*(PFI)(*proc)) (arg1, arg2);
 }
 
 
-ZCALL4 (proc, arg1, arg2, arg3, arg4)
-XINT	*proc;
-int	*arg1, *arg2, *arg3, *arg4;
+int ZCALL3 (XINT *proc, void *arg1, void *arg2, void *arg3)
 {
-	(*(PFI)(*proc)) (arg1, arg2, arg3, arg4);
+	return (*(PFI)(*proc)) (arg1, arg2, arg3);
 }
 
 
-ZCALL5 (proc, arg1, arg2, arg3, arg4, arg5)
-XINT	*proc;
-int	*arg1, *arg2, *arg3, *arg4, *arg5;
+int ZCALL4 (XINT *proc, void *arg1, void *arg2, void *arg3, void *arg4)
 {
-	(*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5);
+	return (*(PFI)(*proc)) (arg1, arg2, arg3, arg4);
 }
 
 
-ZCALL6 (proc, arg1, arg2, arg3, arg4, arg5, arg6)
-XINT	*proc;
-int	*arg1, *arg2, *arg3, *arg4, *arg5, *arg6;
+int ZCALL5 (XINT *proc, void *arg1, void *arg2, void *arg3, void *arg4, 
+	     void *arg5)
 {
-	(*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5, arg6);
+	return (*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5);
 }
 
 
-ZCALL7 (proc, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
-XINT	*proc;
-int	*arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7;
+int ZCALL6 (XINT *proc, void *arg1, void *arg2, void *arg3, void *arg4,
+	     void *arg5, void *arg6)
 {
-	(*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+	return (*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5, arg6);
 }
 
 
-ZCALL8 (proc, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
-XINT	*proc;
-int	*arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8;
+int ZCALL7 (XINT *proc, void *arg1, void *arg2, void *arg3, void *arg4, 
+	     void *arg5, void *arg6, void *arg7)
 {
-	(*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+	return (*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 }
 
 
-ZCALL9 (proc, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-XINT	*proc;
-int	*arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9;
+int ZCALL8 (XINT *proc, void *arg1, void *arg2, void *arg3, void *arg4,
+	     void *arg5, void *arg6, void *arg7, void *arg8)
 {
-	(*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+	return (*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 }
 
 
-ZCALLA (proc, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10)
-XINT	*proc;
-int	*arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *arg7, *arg8, *arg9, *arg10;
+int ZCALL9 (XINT *proc, void *arg1, void *arg2, void *arg3, void *arg4,
+	     void *arg5, void *arg6, void *arg7, void *arg8, void *arg9)
 {
-	(*(PFI)(*proc)) (arg1,
-	    arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+	return (*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5, arg6, arg7, 
+				arg8, arg9);
+}
+
+
+int ZCALLA (XINT *proc, void *arg1, void *arg2, void *arg3, void *arg4,
+	     void *arg5, void *arg6, void *arg7, void *arg8, void *arg9, 
+	     void *arg10)
+{
+	return (*(PFI)(*proc)) (arg1, arg2, arg3, arg4, arg5, arg6, arg7, 
+				arg8, arg9, arg10);
 }

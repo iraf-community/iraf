@@ -5,6 +5,13 @@
  * the (generally) machine independent kernel definitions.
  */
 
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <string.h>
+
+
+
 #ifndef NOKNET
 #define	NOKNET			/* no networking desired in kernel	*/
 #endif
@@ -37,10 +44,13 @@
 #define LP_OPTBUFSIZE	1024	/* optimum buffer size for line printer	*/
 #define LP_MAXBUFSIZE	0	/* maximum buffer size for line printer	*/
 
-/* ZLOCVA style pointer to address conversions.
+/* ZLOCVA style pointer to address conversions.  These macros are used to
+ * convert host pointer addresses (in bytes) to/from iraf pointer values
+ * in units of XCHAR.
  */
-#define	ADDR_TO_LOC(addr)	(((int)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1))
-#define	LOC_TO_ADDR(loc,type)	((type *)((XCHAR *)((loc)<<(sizeof(XCHAR)-1))))
+#define	ADDR_TO_LOC(addr) 	(((XINT)((XCHAR *)(addr)))>>(sizeof(XCHAR)-1))
+#define	LOC_TO_ADDR(loc,type)   ((type *)((XCHAR *)((loc)<<(sizeof(XCHAR)-1))))
+
 
 /* Kernel file descriptor for accessing UNIX files.  A static array ZFD of
  * descriptor structures is used, indexed by UNIX file descriptor numbers
@@ -72,6 +82,7 @@ extern	struct fiodes zfd[];		/* array of descriptors		*/
 #define	LEN_SETREDRAW	6		/* nchars in setredraw string	*/
 #define SETREDRAW	"\033=rDw"	/* set/enable screenredraw code	*/
 
+
 #ifdef AUX
 #define SIGFUNC sigfunc_t
 #else
@@ -79,7 +90,12 @@ typedef	void  (*SIGFUNC)();
 #endif
 
 typedef	void  (*PFV)();
-typedef	int  (*PFI)();
+#ifdef MACH64
+typedef	long  (*PFI)();
+#else
+typedef	int   (*PFI)();
+#endif
+
 
 #ifdef SOLARIS
 #define bzero(a,n)	memset(a,0,n)

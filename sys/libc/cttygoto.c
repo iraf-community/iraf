@@ -1,18 +1,23 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
- */
+*/
 
 #define	import_spp
 #define	import_libc
 #define	import_xnames
 #include <iraf.h>
 
+
 /* C_TTYGOTO -- Move the cursor to the indicated X,Y position (one-indexed).
- */
-c_ttygoto (fd, tty, col, line)
-int	fd;			/* output file			*/
-int	tty;			/* tty descriptor		*/
-int	col;			/* x coordinate			*/
-int	line;			/* y coordinate			*/
+*/
+void
+c_ttygoto (
+  XINT	fd,			/* output file			*/
+  XINT	tty,			/* tty descriptor		*/
+  int	col,			/* x coordinate			*/
+  int	line			/* y coordinate			*/
+)
 {
-	TTYGOTO (&fd, &tty, &col, &line);
+	XINT  x_fd = fd, x_tty = tty, x_col = col, x_line = line;
+
+	TTYGOTO (&x_fd, &x_tty, &x_col, &x_line);
 }

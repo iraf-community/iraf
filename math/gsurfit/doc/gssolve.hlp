@@ -27,7 +27,7 @@ fitting the data.
 .le
 .ih
 DESCRIPTION
-GSSOLVE computes the Cholesky factoriztion of the data matrix and
+GSSOLVE computes the Cholesky factorization of the data matrix and
 solves for the coefficients
 of the fitting function by forward and back substitution. An error code is
 returned by GSSOLVE if it is unable to solve the normal equations as

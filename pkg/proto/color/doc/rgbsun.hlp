@@ -1,0 +1,92 @@
+.help rgbsun Oct92 color
+.ih
+NAME
+rgbsun -- make a Sun 24-bit RGB rasterfile from three IRAF images
+.ih
+USAGE
+rgbsun red green blue rgb
+.ih
+PARAMETERS
+.ls red, green, blue
+Input image names for the red, green, and blue components.  The images
+must all be two dimensional and of the same size.
+.le
+.ls rgb
+Output file name for the Sun 24-bit RGB rasterfile.
+.le
+.ls rz1, rz2, gz1, gz2, bz1, bz2
+Range of values in the input images to be mapped to the minimum and maximum
+intensity in each color.  Image pixel values outside the range are mapped
+to the nearest endpoint.  The values correspond to the input image
+intensities even when using logarithmic mapping.
+.le
+.ls logmap = no
+Use logarithmic intensity mapping?  The logarithm of the input pixel
+values, in the range given by the z1 and z2 parameters, is taken before
+dividing the range into the 85 display levels.  Logarithmic mapping allows
+a greater dynamic range.
+.le
+.ls swap = no
+Swap rasterfile bytes on output?  Used when rasterfiles are being written
+to a computer with opposite byte-swapping from that of the home computer
+(e.g. between VAX and Sun).
+.le
+.ih
+DESCRIPTION
+\fBRgbsun\fR takes three input IRAF images and produces a 24-bit Sun
+rasterfile.  Though this file type was developed by Sun Microcomputers it
+is a relatively simple format which may useful on other machines have
+software designed to use it.  The color image may be display with a variety
+of tools such as \fBxv\fR (a very powerful and generic, public domain
+viewer for X-window systems), \fBxloadimage\fR (another X-window display
+tool), \fBscreenload\fR (a simple displayer on Sun computers), and
+\fBsnapshot\fR (a Open-Look tool).  Also some color printers can be used
+with this format such as a Shinko color printer.
+
+If one wants to display images which have a large dyanmic range it
+may be desirable to first take the logarithm of each image.  This may
+be done with the \fIlogmap\fR parameter.  Other types of stretching may
+be accomplished by modifying the individual images first, say with
+\fBimfunction\fR.
+
+If the output rasterfiles are being sent to a computer with opposite
+byte-swapping characteristics, set \fIswap\fR = yes (e.g., when running
+\fBrgbsun\fR on a VAX, with output to a Sun).
+
+The rasterfile format produced is quite simple.  There is a header with 8
+integer values immediately followed by the data values.  The header has the
+following values of interest:
+
+	Word 1:  Magic numer = 1504078485
+	Word 2:  The number of columns
+	Word 3:  The number of lines
+	Word 4:  The number of bits per pixel = 24
+
+The data consists of triplets of 8-bit data values in the order blue,
+green, and red.  The triplet pixels are ordered by varying the column
+elements first and then the line elements.  The sequence is continuous
+except that each line is padded, if necessary, to maintain a multiple of 2
+bytes per line (with 3 bytes per pixel this means that images with an odd
+number of columns will have an extra zero byte).
+.ih
+EXAMPLES
+1.  Three 2048x2048 images of the Trifid nebula are obtained in the B, V,
+and R bandpasses.  These images are properly registered.  Examination of
+the histograms leads to selecting the display ranges 1-500 in each band.
+The image is then displayed on a workstation running an X-window system
+using the \fBxv\fR utility.  The file is also printed to a local
+color printer interfaced as a Unix printer (the Shinko at NOAO).
+
+.nf
+	cl> rgbsun trifidr trifidv trifidb trifid.ras \
+	>>> rz1=1 rz2=500 gz1=1 gz2=500 bz1=1 bz2=500
+	cl> !xv -swap24 trifid.ras
+	cl> !lpr -Pclp trifd.ras
+.fi
+.ih
+TIME REQUIREMENTS
+Example 1 takes 2:20 minutes (33 seconds CPU) on a SparcStation 2.
+.ih
+SEE ALSO
+rgbdither, rgbto8, color.package
+.endhelp

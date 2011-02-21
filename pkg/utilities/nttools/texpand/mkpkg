@@ -1,0 +1,21 @@
+# Update the texpand application code in the ttools package library
+# Author: B.Simon, 20-APR-1989
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	dbgrules.x	<tbset.h>
+	lexer.x		"lexoper.h"
+	mkrules.x
+	movelem.x	<tbset.h>
+	movtbrow.x	<tbset.h>
+	parser.x	"lexoper.h"
+	pushstack.x	<tbset.h>
+	span.x
+	texpand.x
+	userules.x	<tbset.h>
+	;
+                            

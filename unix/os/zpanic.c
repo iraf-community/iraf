@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 #define	import_kernel
 #define	import_knames
@@ -21,12 +23,15 @@ extern	int debug_sig;
  * occurs in the kernel (a "can't happen" type error) or if an error occurs
  * during error recovery, and error recursion would otherwise result.
  */
-ZPANIC (errcode, errmsg)
-XINT	*errcode;		/* integer error code at time of crash	*/
-PKCHAR	*errmsg;		/* packed error message string		*/
+int
+ZPANIC (
+  XINT	  *errcode,		/* integer error code at time of crash	*/
+  PKCHAR  *errmsg 		/* packed error message string		*/
+)
 {
 	char	msg[512];
 	int	fd;
+
 
 	/* \nPANIC in `procname': error message\n
 	 */
@@ -68,18 +73,23 @@ PKCHAR	*errmsg;		/* packed error message string		*/
 #endif
 	} else
 	    _exit ((int)*errcode);
+
+	return (XOK);
 }
 
 
 /* KERNEL_PANIC -- Called by a kernel routine if a fatal error occurs in the
  * kernel.
  */
-kernel_panic (errmsg)
-char	*errmsg;
+int
+kernel_panic (char *errmsg)
 {
 	XINT	errcode = 0;
 	PKCHAR	pkmsg[SZ_LINE];
 	register char	*ip, *op;
+
+	extern  int ZPANIC();
+
 
 	/* It is necessary to copy the error message string to get a PKCHAR
 	 * type string since misalignment is possible when coercing from char
@@ -88,4 +98,6 @@ char	*errmsg;
 	for (ip=errmsg, op=(char *)pkmsg;  (*op++ = *ip++) != EOS;  )
 	    ;
 	ZPANIC (&errcode, pkmsg);
+
+	return (XOK);
 }

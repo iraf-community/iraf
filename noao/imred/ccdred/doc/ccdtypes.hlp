@@ -13,7 +13,7 @@ The following CCD image types may be specified as the value of the parameter
 	zero	- zero level images such as a bias or preflash
 	dark	- dark count images
 	flat	- flat field images
-	illum	- illumination images
+	illum	- iillumination images
 	fringe	- fringe correction images
 	other   - other image types defined in the translation file
 	none	- images without an image type parameter

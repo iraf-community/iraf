@@ -31,6 +31,12 @@ The difference between the image and the fit (i.e. residuals).
 The ratio of the image and fit.
 .le
 .le
+.ls bpm = ""
+List of bad pixel masks.  This may be a null string to not use a
+bad pixel mask, a single mask that applies to all input images, or
+a matching list.  The value may also be !<keyword> to specify a keyword whose
+value is the mask to use.
+.le
 .ls axis = 1
 Axis along which the one dimensional fitting is done.  Axis 1 corresponds
 to fitting the image lines and axis 2 corresponds to fitting the columns.
@@ -87,6 +93,12 @@ that part of the output image to be changed.  If the output image does not
 exist it is first created with a size given by the full (without a section)
 input image and initialized to zero for fit and difference output types
 and one for ratio output types.
+
+A bad pixel mask may be specified to exclude data from the fitting.  Any
+non-zero value in the mask is excluded.   It appears in the interactive
+fitting in the same way as manually deleted points.  The mask is matched to
+the input image(s) as described by \fBpmmatch\fR.  The default is matching
+in physical coordinates.
 
 The points fit are determined by selecting a sample of lines or columns
 specified by the parameter \fIsample\fR and taking either the average or

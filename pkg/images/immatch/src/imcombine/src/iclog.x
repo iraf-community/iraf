@@ -73,6 +73,13 @@ begin
 	    call pargstr (sname)
 	    call pargstr (zname)
 	    call pargstr (wname)
+	if (combine == NMODEL && reject!=CCDCLIP && reject!=CRREJECT) {
+	    call fprintf (logfd,
+	    "  rdnoise = %s, gain = %s, snoise = %s\n")
+		call pargstr (Memc[rdnoise])
+		call pargstr (Memc[gain])
+		call pargstr (Memc[snoise])
+	}
 
 	switch (reject) {
 	case MINMAX:
@@ -96,7 +103,7 @@ begin
 		call pargb (mclip)
 		call pargi (nkeep)
 	    call fprintf (logfd,
-		"  rdnoise = %s, gain = %s, snoise = %s, hsigma = %g\n")
+	    "  rdnoise = %s, gain = %s, snoise = %s, hsigma = %g\n")
 		call pargstr (Memc[rdnoise])
 		call pargstr (Memc[gain])
 		call pargstr (Memc[snoise])
@@ -206,7 +213,7 @@ begin
 		if (Memc[bpname] != EOS)
 		    prmask = true
 	    }
-	    if (reject == CCDCLIP || reject == CRREJECT) {
+	    if (combine == NMODEL || reject == CCDCLIP || reject == CRREJECT) {
 		j = 1
 		if (ctor (Memc[rdnoise], j, rval) == 0)
 		    prrdn = true

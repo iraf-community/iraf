@@ -1,0 +1,27 @@
+# Library for the I2SUN task.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	t_i2sun.x	<imhdr.h> <ctype.h> i2sun.h
+	trulut.x	<error.h> <ctype.h> i2sun.h
+	trsetup.x	<imhdr.h> i2sun.h
+	cnvimage.x	<imhdr.h> i2sun.h
+	sigln.x		<error.h> <imhdr.h>
+	;
+
+dbx:
+	$set	XFLAGS = "-c -g -F -q"
+	$set	LFLAGS = "-g -q"
+	$omake	x_i2sun.x
+	$omake	t_i2sun.x
+	$omake	trulut.x
+	$omake	trsetup.x
+	$omake	cnvimage.x
+	$omake	sigln.x
+	$link	x_i2sun.o t_i2sun.o trulut.o trsetup.o cnvimage.o sigln.o \
+		-o xx_i2sun.e
+	;

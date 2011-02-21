@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 #define	import_kernel
@@ -15,20 +17,24 @@
  * desired end of file and writing some data.  Standard UNIX does not provide
  * any way to allocate a contiguous or near-contiguous file.
  */
-ZFALOC (fname, nbytes, status)
-PKCHAR	*fname;
-XLONG	*nbytes;
-XINT	*status;
+int
+ZFALOC (
+  PKCHAR  *fname,
+  XLONG	  *nbytes,
+  XINT	  *status
+)
 {
 	char	data = 0;
 	char	*s;
 	int	fd;
 	off_t	lseek();
 	extern	char *getenv();
+	extern  int  _u_fmode();
+
 
 	if ((fd = creat ((char *)fname, _u_fmode(FILE_MODEBITS))) == ERR) {
 	    *status = XERR;
-	    return;
+	    return (XERR);
 	}
 
 	/* Fix size of file by seeking to the end of file minus one byte,
@@ -40,12 +46,12 @@ XINT	*status;
 	    if (lseek (fd, (off_t)(*nbytes - 1), 0) == ERR) {
 		close (fd);
 		*status = XERR;
-		return;
+		return (XERR);
 	    }
 	    if (write (fd, &data, 1) == ERR) {
 		close (fd);
 		*status = XERR;
-		return;
+		return (XERR);
 	    }
 	    lseek (fd, (off_t)0, 0);
 	}
@@ -59,7 +65,7 @@ XINT	*status;
 	 * pattern strings.  A file is matched, and space preallocated, if
 	 * the given substring appears anywhere in the file name.
 	 */
-	if (s = getenv ("ZFALOC")) {
+	if ( (s = getenv ("ZFALOC")) ) {
 	    register char *ip, *op;
 	    char    patstr[SZ_PATHNAME];
 	    int     match = (*s == '\0');
@@ -86,11 +92,13 @@ XINT	*status;
 		    if (write (fd, &data, 1) < 0) {
 			*status = XERR;
 			close (fd);
-			return;
+			return (XERR);
 		    }
 		}
 	}
 
 	close (fd);
 	*status = XOK;
+
+	return (XOK);
 }

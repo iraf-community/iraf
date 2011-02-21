@@ -5,3 +5,5 @@ if (yyout==NULL) yyout = stdout;
 FILE *yyin, *yyout;
 s/"stdio.h"/<stdio.h>/
 s/YYLMAX 200/YYLMAX 1024/
+s/static int input/int input/g
+s/static void yyunput/void yyunput/g

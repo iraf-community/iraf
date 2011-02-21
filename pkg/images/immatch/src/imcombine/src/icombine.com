@@ -1,6 +1,7 @@
 # ICOMBINE Common
 
 int	combine			# Combine algorithm
+int	medtype			# Median type
 int	reject			# Rejection algorithm
 bool	project			# Combine across the highest dimension?
 real	blank			# Blank value
@@ -37,7 +38,7 @@ bool	verbose			# Verbose?
 
 pointer	icm			# Mask data structure
 
-common	/imccom/ combine, reject, blank, expkeyword, statsec, rdnoise,
+common	/imccom/ combine, medtype, reject, blank, expkeyword, statsec, rdnoise,
 		 gain, snoise, lsigma, hsigma, lthresh, hthresh, nkeep,
 		 pclip, flow, fhigh, grow, logfd, dflag, sigscale, project,
 		 mclip, aligned, doscale, doscale1, dothresh, dowts,

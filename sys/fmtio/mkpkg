@@ -119,5 +119,7 @@ libsys.a:
 	strsrt.x	
 	strtbl.x	
 	strupr.x	<ctype.h>
+	xevgettok.x	<lexnum.h> <ctype.h> <evexpr.h>
+	xvvgettok.x	<lexnum.h> <ctype.h> <mach.h> <math.h> <evexpr.h>
 	xtoc.x	
 	;

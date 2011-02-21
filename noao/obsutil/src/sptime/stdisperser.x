@@ -32,7 +32,7 @@ begin
 	    if (Memc[str] == EOS) {
 		iferr (call tabgstr (ST_TAB(st), "disperser", "spectrograph",
 		    "type", Memc[str], SZ_LINE))
-		    call strcpy ("grating", Memc[str], SZ_LINE)
+		    call strcpy ("generic", Memc[str], SZ_LINE)
 	    }
 	} else if (streq (name, "xdisperser")) {
 	    call stgstr (st, "xdisptype", "xdisperser", "", Memc[str], SZ_LINE)
@@ -109,11 +109,11 @@ begin
 #		db = db / f
 
 	    iferr (gr = gr_open (ST_CW(st), ST_ORDER(st,index), ref, wb, db,
-		oref, f, g, blaze, 1., phi, INDEF, INDEF, 1)) {
+		oref, f, g, blaze, 1., phi, INDEF, INDEF, 1, YES)) {
 		g = 300.
 		blaze = 6
 	        gr = gr_open (ST_CW(st), ST_ORDER(st,index), ref, wb, db,
-		    oref, f, g, blaze, 1., phi, INDEF, INDEF, 1)
+		    oref, f, g, blaze, 1., phi, INDEF, INDEF, 1, YES)
 	    }
 	    ST_GR(st,index) = gr
 
@@ -199,13 +199,79 @@ begin
 	    oref = 1
 
 	    iferr (gr = gr_open (ST_CW(st), ST_ORDER(st,index), ref, INDEF,
-		INDEF, oref, f, g, blaze, db, 0., blaze, blaze, 1)) {
+		INDEF, oref, f, g, blaze, db, 0., blaze, blaze, 1, YES)) {
 		g = 300.
 		blaze = 6.
 		gr = gr_open (ST_CW(st), ST_ORDER(st,index), ref, INDEF,
-		    INDEF, oref, f, g, blaze, db, 0., blaze, blaze, 1)
+		    INDEF, oref, f, g, blaze, db, 0., blaze, blaze, 1, YES)
 	    }
 
+	    ST_GR(st,index) = gr
+
+	    if (IS_INDEF(ST_CW(st)))
+		ST_CW(st,index) = gr_getr (gr, "wavelength")
+	    if (IS_INDEFI(ST_ORDER(st,index)))
+		ST_ORDER(st,index) = nint (gr_getr (gr, "order"))
+	    ST_DISP(st,index) = gr_getr (gr, "dblaze") * oref * f
+
+	    # Look for explicit blaze functions.
+	    do order = ST_ORDER(st,index)-1, ST_ORDER(st,index)+1 {
+		call sprintf (Memc[str], SZ_LINE, "eff%d")
+		    call pargi (order)
+		ifnoerr (call tabgstr (ST_TAB(st), name, "spectrograph",
+		    Memc[str], Memc[fname], SZ_LINE)) {
+		    if (streq (name, "disperser"))
+			call st_gtable1 (st, Memc[str], Memc[fname])
+		    else if (streq (name, "xdisperser")) {
+			call sprintf (Memc[str], SZ_LINE, "xeff%d")
+			    call pargi (order)
+			call st_gtable1 (st, Memc[str], Memc[fname])
+		    }
+		}
+	    }
+	case GENERIC:
+	    f = ST_CAMFL(st) * 1000
+	    g = INDEFR
+	    blaze = INDEFR
+	    oref = 1
+
+	    switch (index) {
+	    case 1:
+		g = INDEFR
+		blaze = INDEFR
+		oref = 1
+		wb = stgetr (st, "wavelength", name, INDEFR)
+		db = stgetr (st, "dispersion", name, INDEFR)
+		ref = stgetr (st, "eff", name, INDEFR)
+	    case 2:
+		g = INDEFR
+		blaze = INDEFR
+		oref = 1
+		wb = stgetr (st, "xwavelength", name, INDEFR)
+		db = stgetr (st, "xdispersion", name, INDEFR)
+		ref = stgetr (st, "xeff", name, INDEFR)
+	    }
+
+	    if (IS_INDEFR(wb)) {
+		iferr (wb = tabgetr (ST_TAB(st), name, "spectrograph",
+		    "wavelength"))
+		    wb = INDEFR
+	    }
+	    if (IS_INDEFR(db)) {
+		iferr (db = tabgetr (ST_TAB(st), name, "spectrograph",
+		    "dispersion"))
+		    db = INDEFR
+	    }
+	    if (IS_INDEFR(ref)) {
+		iferr (ref = tabgetr (ST_TAB(st), name, "spectrograph",
+		    "reflectance"))
+		    ref = 1.
+	    }
+
+	    phi = ST_INOUTA(st,index)
+
+	    gr = gr_open (ST_CW(st), ST_ORDER(st,index), ref, wb, db,
+		oref, f, g, blaze, 1., phi, INDEF, INDEF, 1, NO)
 	    ST_GR(st,index) = gr
 
 	    if (IS_INDEF(ST_CW(st)))
@@ -331,6 +397,8 @@ begin
 	    w = gr_x2w (ST_GR(st,index), x, ST_ORDER(st,index)) 
 	case GRISM:
 	    w = gr_x2w (ST_GR(st,index), x, ST_ORDER(st,index)) 
+	case GENERIC:
+	    w = gr_x2w (ST_GR(st,index), x, ST_ORDER(st,index)) 
 	}
 
 	return (w)
@@ -354,6 +422,8 @@ begin
 	    x = gr_w2x (ST_GR(st,index), w, ST_ORDER(st,index)) 
 	case GRISM:
 	    x = gr_w2x (ST_GR(st,index), w, ST_ORDER(st,index)) 
+	case GENERIC:
+	    x = gr_w2x (ST_GR(st,index), w, ST_ORDER(st,index)) 
 	}
 
 	return (x)
@@ -376,6 +446,8 @@ begin
 	case GRATING:
 	    d = gr_w2dw (ST_GR(st,index), w, ST_ORDER(st,index)) 
 	case GRISM:
+	    d = gr_w2dw (ST_GR(st,index), w, ST_ORDER(st,index)) 
+	case GENERIC:
 	    d = gr_w2dw (ST_GR(st,index), w, ST_ORDER(st,index)) 
 	}
 

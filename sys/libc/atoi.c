@@ -1,20 +1,22 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
- */
+*/
 
 #define	import_spp
 #define	import_libc
 #define	import_ctype
 #include <iraf.h>
 
+
 /* ATOI -- Ascii to integer.  Convert a simple integer in decimal radix to
- * a binary integer value.
- */
-atoi (str)
-char	*str;
+** a binary integer value.
+*/
+int
+atoi (char *str)
 {
 	register char	*ip = str;
 	register int	ch, ival;
 	int	neg;
+
 
 	if (*str == EOS)
 	    return (0);
@@ -22,7 +24,7 @@ char	*str;
 	/* Skip leading whitespace. */
 	while (isspace (*ip))
 	    ip++;
-
+	
 	/* Check for indefinite. */
 	if ((ch = *ip) == 'I')
 	    if (strncmp (ip, "INDEF", 5) == 0)

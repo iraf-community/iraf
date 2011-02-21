@@ -15,6 +15,8 @@
 #include "task.h"		/* to get currentask for prop		*/
 #include "construct.h"
 #include "eparam.h"
+#include "proto.h"
+
 
 /*
  * OPERAND -- Primitives for operations upon operands, as used on the
@@ -33,9 +35,8 @@ extern char *epsilonstr;
 
 /* SPROP -- Format the value of a parameter into the output string.
  */
-sprop (outstr, op)
-register char *outstr;
-register struct operand *op;
+void 
+sprop (register char *outstr, register struct operand *op)
 {
 	register int type;
 	char	*index();
@@ -75,9 +76,8 @@ register struct operand *op;
 
 /* SPPARVAL -- Print value field of a parameter into a string.
  */
-spparval (outstr, pp)
-char	*outstr;
-struct	param *pp;
+void 
+spparval (char *outstr, struct param *pp)
 {
 	struct	operand o;
 
@@ -94,9 +94,8 @@ struct	param *pp;
  * o_val is printed with proper format; no trailing nl.
  * handle indefinite and abort on undefined.
  */
-fprop (fp, op)
-FILE	*fp;
-struct	operand *op;
+void 
+fprop (FILE *fp, struct operand *op)
 {
 	/* Use MAXPROMPT to give greatest length we expect to print.
 	 */
@@ -127,8 +126,8 @@ struct	operand *op;
 
 /* print operand, using fprop, to our t_stdout.
  */
-oprop (op)
-struct operand *op;
+void 
+oprop (struct operand *op)
 {
 	fprop (currentask->t_stdout, op);
 }
@@ -136,8 +135,8 @@ struct operand *op;
 
 /* print operand, using fprintf, to currentask.
  */
-prop (op)
-struct operand *op;
+void 
+prop (struct operand *op)
 {
 	fprop (currentask->t_out, op);
 }
@@ -147,7 +146,8 @@ struct operand *op;
  *   name of a parameter which is then found and pushed.
  * call error() if popped op is not a string; DO NOT CAST into string.
  */
-opindir()
+void 
+opindir (void)
 {
 	struct operand nameop;
 	struct param *indirpp;
@@ -172,8 +172,8 @@ opindir()
  *   or undef.
  * N.B. we use intimate knowledge of the stack layout to do the simple cases.
  */
-opcast (newtype)
-int	newtype;
+void 
+opcast (int newtype)
 {
 	struct operand o, result;
 	struct operand *op;
@@ -292,10 +292,8 @@ err:
  * indefstr..  Null length strings of type OT_STRING are not considered
  * undefined, however.
  */
-struct operand
-makeop (str, type)
-char	*str;
-int	type;
+struct operand 
+makeop (char *str, int type)
 {
 	register char *s, *ip;
 	register char c;
@@ -316,7 +314,7 @@ int	type;
 		s++;
 
 	if (type != OT_STRING && 
-		!strcmp (indefstr, s) || !strcmp (indeflc, s)) {
+		(!strcmp (indefstr, s) || !strcmp (indeflc, s))) {
 	    setopindef (&o);
 	    return (o);
 	}
@@ -330,10 +328,10 @@ int	type;
 	    /* s is converted, IN PLACE, to lower case */
 	    makelower (s);
 	    /* Accept either "y" or "yes", "n" or "no" */
-	    if ((s[0] == truestr[0]) && (s[1] == '\0') ||
+	    if (((s[0] == truestr[0]) && (s[1] == '\0')) ||
 		(strcmp (s, truestr) == 0))
 		o.o_val.v_i = YES;
-	    else if ((s[0] == falsestr[0]) && (s[1] == '\0') ||
+	    else if (((s[0] == falsestr[0]) && (s[1] == '\0')) ||
 		(strcmp (s, falsestr) == 0))
 		o.o_val.v_i = NO;
 	    else

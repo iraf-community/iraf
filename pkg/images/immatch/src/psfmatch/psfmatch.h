@@ -4,57 +4,57 @@ define	LEN_PSFSTRUCT (45 + 12 * SZ_FNAME + 12)
 
 # Define the psf fitting structure
 
-define	PM_RC1		Memi[$1]	# pointer to first column of region
-define	PM_RC2		Memi[$1+1]	# pointer to last column of region
-define	PM_RL1		Memi[$1+2]	# pointer to first line of region
-define	PM_RL2		Memi[$1+3]	# pointer to last line of region
-define	PM_RZERO	Memi[$1+4]	# pointer to zero point of ref regions
-define	PM_RXSLOPE	Memi[$1+5]	# pointer to x slopes of ref regions
-define	PM_RYSLOPE	Memi[$1+6]	# pointer to y slopes of ref regions
-define	PM_NREGIONS	Memi[$1+7]	# total number of regions
-define	PM_CNREGION	Memi[$1+8]	# the current region
+define	PM_RC1		Memi[$1]	 # pointer to first column of region
+define	PM_RC2		Memi[$1+1]	 # pointer to last column of region
+define	PM_RL1		Memi[$1+2]	 # pointer to first line of region
+define	PM_RL2		Memi[$1+3]	 # pointer to last line of region
+define	PM_RZERO	Memi[$1+4]	 # pointer to zero point of ref regions
+define	PM_RXSLOPE	Memi[$1+5]	 # pointer to x slopes of ref regions
+define	PM_RYSLOPE	Memi[$1+6]	 # pointer to y slopes of ref regions
+define	PM_NREGIONS	Memi[$1+7]	 # total number of regions
+define	PM_CNREGION	Memi[$1+8]	 # the current region
 
-define	PM_CENTER	Memi[$1+9]	# the the psf objects
-define	PM_BACKGRD	Memi[$1+10]	# type of background subtraction
-define	PM_BVALUER	Memr[$1+11]	# reference background value
-define	PM_BVALUE	Memr[$1+12]	# image background value
-define	PM_LOREJECT	Memr[$1+13]	# low side rejection
-define	PM_HIREJECT	Memr[$1+14]	# high side rejection
-define	PM_APODIZE	Memr[$1+15]	# fraction of region to be apodized
+define	PM_CENTER	Memi[$1+9]	 # the the psf objects
+define	PM_BACKGRD	Memi[$1+10]	 # type of background subtraction
+define	PM_BVALUER	Memr[P2R($1+11)] # reference background value
+define	PM_BVALUE	Memr[P2R($1+12)] # image background value
+define	PM_LOREJECT	Memr[P2R($1+13)] # low side rejection
+define	PM_HIREJECT	Memr[P2R($1+14)] # high side rejection
+define	PM_APODIZE	Memr[P2R($1+15)] # fraction of region to be apodized
 
-define	PM_CONVOLUTION	Memi[$1+16]	# the convolution type
-define	PM_DNX		Memi[$1+17]	# x dimension of kernel
-define	PM_DNY		Memi[$1+18]	# y dimension of kernel
-define	PM_PNX		Memi[$1+19]	# x dimension of user kernel
-define	PM_PNY		Memi[$1+20]	# y dimension of user kernel
-define	PM_KNX		Memi[$1+21]	# x size of kernel
-define	PM_KNY		Memi[$1+22]	# x size of kernel
+define	PM_CONVOLUTION	Memi[$1+16]	 # the convolution type
+define	PM_DNX		Memi[$1+17]	 # x dimension of kernel
+define	PM_DNY		Memi[$1+18]	 # y dimension of kernel
+define	PM_PNX		Memi[$1+19]	 # x dimension of user kernel
+define	PM_PNY		Memi[$1+20]	 # y dimension of user kernel
+define	PM_KNX		Memi[$1+21]	 # x size of kernel
+define	PM_KNY		Memi[$1+22]	 # x size of kernel
 
-define	PM_POWER	Memi[$1+23]	# save power spectrum of kernel ?
+define	PM_POWER	Memi[$1+23]	 # save power spectrum of kernel ?
 
-define	PM_UFLUXRATIO	Memr[$1+24]	# the user ref / input flux ratio
-define	PM_FLUXRATIO	Memr[$1+25]	# ref / input flux ratio
-define	PM_FILTER	Memi[$1+26]	# background filtering
-define	PM_SXINNER	Memr[$1+27]	# inner radius for cosine bell
-define	PM_SXOUTER	Memr[$1+28]	# outer radius for cosine bell
-define	PM_SYINNER	Memr[$1+29]	# inner radius for cosine bell
-define	PM_SYOUTER	Memr[$1+30]	# outer radius for cosine bell
-define	PM_RADSYM	Memi[$1+31]	# radial symmetry in convolution
-define	PM_THRESHOLD	Memr[$1+32]	# threshold in divisor for model
+define	PM_UFLUXRATIO	Memr[P2R($1+24)] # the user ref / input flux ratio
+define	PM_FLUXRATIO	Memr[P2R($1+25)] # ref / input flux ratio
+define	PM_FILTER	Memi[$1+26]	 # background filtering
+define	PM_SXINNER	Memr[P2R($1+27)] # inner radius for cosine bell
+define	PM_SXOUTER	Memr[P2R($1+28)] # outer radius for cosine bell
+define	PM_SYINNER	Memr[P2R($1+29)] # inner radius for cosine bell
+define	PM_SYOUTER	Memr[P2R($1+30)] # outer radius for cosine bell
+define	PM_RADSYM	Memi[$1+31]	 # radial symmetry in convolution
+define	PM_THRESHOLD	Memr[P2R($1+32)] # threshold in divisor for model
 
-define	PM_NORMFACTOR	Memr[$1+34]	# the normalization factor
+define	PM_NORMFACTOR	Memr[P2R($1+34)] # the normalization factor
 
-#define	PM_PRATIO	Memr[$1+24]	# power ration threshold
-#define	PM_XSHIFTS	Memi[$1+26]	# pointer to x shifts
-#define	PM_YSHIFTS	Memi[$1+27]	# pointer to y shifts
+#define	PM_PRATIO	Memr[P2R($1+24)] # power ration threshold
+#define	PM_XSHIFTS	Memi[$1+26]	 # pointer to x shifts
+#define	PM_YSHIFTS	Memi[$1+27]	 # pointer to y shifts
 
-define	PM_REFFFT	Memi[$1+35]	# pointer to reference fft
-define  PM_IMFFT	Memi[$1+36]	# pointer to image fft
-define  PM_FFT		Memi[$1+37]	# pointer to unfiltered fft
-define  PM_CONV		Memi[$1+38]	# pointer to kernel
-define	PM_ASFFT	Memi[$1+39]	# pointer to power spectrum
-define  PM_NXFFT	Memi[$1+40]	# x dimension of FFT
-define  PM_NYFFT	Memi[$1+41]	# y dimension of FFT
+define	PM_REFFFT	Memi[$1+35]	 # pointer to reference fft
+define  PM_IMFFT	Memi[$1+36]	 # pointer to image fft
+define  PM_FFT		Memi[$1+37]	 # pointer to unfiltered fft
+define  PM_CONV		Memi[$1+38]	 # pointer to kernel
+define	PM_ASFFT	Memi[$1+39]	 # pointer to power spectrum
+define  PM_NXFFT	Memi[$1+40]	 # x dimension of FFT
+define  PM_NYFFT	Memi[$1+41]	 # y dimension of FFT
 
 define	PM_BSTRING	Memc[P2C($1+42)]              # background string
 define	PM_CSTRING	Memc[P2C($1+42+SZ_FNAME+1)]   # convolution string

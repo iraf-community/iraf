@@ -66,7 +66,7 @@ begin
 	    # on the next device block boundary.
 
 	    blklen = fdevblk (Memc[pixfile])
-	    pixoff = LEN_PIXHDR * SZ_STRUCT
+	    pixoff = LEN_PIXHDR * SZ_MII_INT
 	    call imalign (pixoff, blklen)
 
 	    # Call IMIO to initialize the physical dimensions of the image

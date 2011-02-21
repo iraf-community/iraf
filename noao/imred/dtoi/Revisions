@@ -1,6 +1,14 @@
 .help revisions Jun88 noao.imred.dtoi
 .nf
 
+imred$dtoi/hdtoi.x
+	The hd_fogcalc() procedure was being called with too few arguments
+	(7/12/09, MJF)
+
+=======
+V2.14.1
+=======
+
 imred$dtoi/hdicfit/mkpkg
 	Added missing dependencies.  (12/13/01, MJF)
 

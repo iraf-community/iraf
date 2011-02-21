@@ -1,4 +1,5 @@
-#! /bin/csh
+#!/bin/csh
+#
 # MKFLOAT.CSH -- Install the indicated version of the IRAF binaries, i.e.,
 # archive the current objects and libraries, set BIN to point to bin.FFF,
 # and set mkpkg to produce FFF binaries (FFF = f68881, ffpa, sparc, etc.).

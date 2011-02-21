@@ -129,7 +129,7 @@ EXAMPLE
 .sp
 Many examples of the use of the \fBlroff\fR command directives in help text
 can be found by browsing about in source listings.
-A brief example is included here for convienent reference.
+A brief example is included here for convenient reference.
 .sp
 The ".help" directive, used to mark the beginning
 of a block of help text, is used by HELP and MANPAGE rather than \fBlroff\fR.

@@ -279,7 +279,7 @@ The polynomial can be expressed as the sum
 .fi
 
 where the the c_i are the coefficients and the z_i are defined
-interatively as:
+interactively as:
 
 .nf
 	z_1 = 1
@@ -296,7 +296,7 @@ The polynomial can be expressed as the sum
 .fi
 
 where the the c_i are the coefficients and the z_i are defined
-interatively as:
+interactively as:
 
 .nf
 	z_1 = 1

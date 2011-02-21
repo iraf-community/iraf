@@ -34,9 +34,9 @@ begin
 	if (mclip) {
 	    if (dflag == D_ALL) {
 		n1 = n[1]
-		even = (mod (n1, 2) == 0)
 		j1 = n1 / 2 + 1
 		j2 = n1 / 2
+		even = (mod(n1,2)==0 && (medtype==MEDAVG || n1>2))
 		do i = 1, npts {
 		    k = i - 1
 		    if (even) {
@@ -63,7 +63,7 @@ begin
 			n1 = n[i]
 			if (n1 > 0) {
 			    j1 = n1 / 2 + 1
-			    if (mod (n1, 2) == 0) {
+			    if (mod(n1,2)==0 && (medtype==MEDAVG || n1>2)) {
 				j2 = n1 / 2
 				val1 = Mems[d[j1]+k]
 				val2 = Mems[d[j2]+k]
@@ -118,7 +118,7 @@ begin
 
 		median[i] = Mems[d[j]+k]
 
-		if (mod (n1,2) == 0) {
+		if (mod(n1,2)==0 && (medtype==MEDAVG || n1 > 2)) {
 		    lo = 1
 		    up = n1
 		    j  = max (lo, min (up, (up+1)/2)+1)
@@ -175,7 +175,10 @@ begin
 	    } else if (n1 == 2) {
 		val1 = Mems[d[1]+k]
 		val2 = Mems[d[2]+k]
-		median[i] = (val1 + val2) / 2
+		if (medtype == MEDAVG)
+		    median[i] = (val1 + val2) / 2
+		else
+		    median[i] = min (val1, val2)
 
 	    # If 1 point return the value.
 	    } else if (n1 == 1)
@@ -218,9 +221,9 @@ begin
 	if (mclip) {
 	    if (dflag == D_ALL) {
 		n1 = n[1]
-		even = (mod (n1, 2) == 0)
 		j1 = n1 / 2 + 1
 		j2 = n1 / 2
+		even = (mod(n1,2)==0 && (medtype==MEDAVG || n1>2))
 		do i = 1, npts {
 		    k = i - 1
 		    if (even) {
@@ -247,7 +250,7 @@ begin
 			n1 = n[i]
 			if (n1 > 0) {
 			    j1 = n1 / 2 + 1
-			    if (mod (n1, 2) == 0) {
+			    if (mod(n1,2)==0 && (medtype==MEDAVG || n1>2)) {
 				j2 = n1 / 2
 				val1 = Memi[d[j1]+k]
 				val2 = Memi[d[j2]+k]
@@ -302,7 +305,7 @@ begin
 
 		median[i] = Memi[d[j]+k]
 
-		if (mod (n1,2) == 0) {
+		if (mod(n1,2)==0 && (medtype==MEDAVG || n1 > 2)) {
 		    lo = 1
 		    up = n1
 		    j  = max (lo, min (up, (up+1)/2)+1)
@@ -359,7 +362,10 @@ begin
 	    } else if (n1 == 2) {
 		val1 = Memi[d[1]+k]
 		val2 = Memi[d[2]+k]
-		median[i] = (val1 + val2) / 2
+		if (medtype == MEDAVG)
+		    median[i] = (val1 + val2) / 2
+		else
+		    median[i] = min (val1, val2)
 
 	    # If 1 point return the value.
 	    } else if (n1 == 1)
@@ -402,9 +408,9 @@ begin
 	if (mclip) {
 	    if (dflag == D_ALL) {
 		n1 = n[1]
-		even = (mod (n1, 2) == 0)
 		j1 = n1 / 2 + 1
 		j2 = n1 / 2
+		even = (mod(n1,2)==0 && (medtype==MEDAVG || n1>2))
 		do i = 1, npts {
 		    k = i - 1
 		    if (even) {
@@ -431,7 +437,7 @@ begin
 			n1 = n[i]
 			if (n1 > 0) {
 			    j1 = n1 / 2 + 1
-			    if (mod (n1, 2) == 0) {
+			    if (mod(n1,2)==0 && (medtype==MEDAVG || n1>2)) {
 				j2 = n1 / 2
 				val1 = Memr[d[j1]+k]
 				val2 = Memr[d[j2]+k]
@@ -486,7 +492,7 @@ begin
 
 		median[i] = Memr[d[j]+k]
 
-		if (mod (n1,2) == 0) {
+		if (mod(n1,2)==0 && (medtype==MEDAVG || n1 > 2)) {
 		    lo = 1
 		    up = n1
 		    j  = max (lo, min (up, (up+1)/2)+1)
@@ -543,7 +549,10 @@ begin
 	    } else if (n1 == 2) {
 		val1 = Memr[d[1]+k]
 		val2 = Memr[d[2]+k]
-		median[i] = (val1 + val2) / 2
+		if (medtype == MEDAVG)
+		    median[i] = (val1 + val2) / 2
+		else
+		    median[i] = min (val1, val2)
 
 	    # If 1 point return the value.
 	    } else if (n1 == 1)
@@ -586,9 +595,9 @@ begin
 	if (mclip) {
 	    if (dflag == D_ALL) {
 		n1 = n[1]
-		even = (mod (n1, 2) == 0)
 		j1 = n1 / 2 + 1
 		j2 = n1 / 2
+		even = (mod(n1,2)==0 && (medtype==MEDAVG || n1>2))
 		do i = 1, npts {
 		    k = i - 1
 		    if (even) {
@@ -615,7 +624,7 @@ begin
 			n1 = n[i]
 			if (n1 > 0) {
 			    j1 = n1 / 2 + 1
-			    if (mod (n1, 2) == 0) {
+			    if (mod(n1,2)==0 && (medtype==MEDAVG || n1>2)) {
 				j2 = n1 / 2
 				val1 = Memd[d[j1]+k]
 				val2 = Memd[d[j2]+k]
@@ -670,7 +679,7 @@ begin
 
 		median[i] = Memd[d[j]+k]
 
-		if (mod (n1,2) == 0) {
+		if (mod(n1,2)==0 && (medtype==MEDAVG || n1 > 2)) {
 		    lo = 1
 		    up = n1
 		    j  = max (lo, min (up, (up+1)/2)+1)
@@ -727,7 +736,10 @@ begin
 	    } else if (n1 == 2) {
 		val1 = Memd[d[1]+k]
 		val2 = Memd[d[2]+k]
-		median[i] = (val1 + val2) / 2
+		if (medtype == MEDAVG)
+		    median[i] = (val1 + val2) / 2
+		else
+		    median[i] = min (val1, val2)
 
 	    # If 1 point return the value.
 	    } else if (n1 == 1)

@@ -1,15 +1,21 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <fcntl.h>
 #include "bootlib.h"
+
+extern 	int  os_createfile (char *fname, int mode, int type);
+
 
 /* OS_OPEN -- Open or create a host system file for reading or writing (text
  * and binary disk files only).
  */
-os_open (vfn, mode, type)
-char	*vfn;			/* file to be opened		*/
-int	mode;			/* access mode 0=R, 1=W, 2=RW	*/
-int	type;			/* file type			*/
+int
+os_open (
+  char	*vfn,			/* file to be opened		*/
+  int	mode,			/* access mode 0=R, 1=W, 2=RW	*/
+  int	type 			/* file type			*/
+)
 {
 	extern	char *vfn2osfn();
 

@@ -18,13 +18,10 @@
 # of one longword containing the address of the STATUS variable, followed
 # by the "jmp_buf" used by setjmp/longjmp.
 #
-# This file contains the OS X Intel (x86) version of ZSVJMP.
+# This file contains the FreeBSD (x86) version of ZSVJMP.
 # Modified to remove leading underscore for ELF (Jan99).
  
         .globl	_zsvjmp_
-        .globl	_sfpucw_
-        .globl	_gfpucw_
-        .globl	_gfpusw_
 
 	# The following has nothing to do with ZSVJMP, and is included here
 	# only because this assembler module is loaded with every process.
@@ -35,61 +32,15 @@
 	# advantage is that references to NULL pointers are likely to cause a
 	# memory violation.
 
-	.globl	mem_
-	mem_	=	0
 	.globl	_mem_
-	_mem_	=	0
+	.abs	_mem_,  0
+	#_mem_	=	0
 
-	.text
 _zsvjmp_:
-	movl	4(%esp), %edx	# &jmpbuf to EDX
-	movl	8(%esp), %eax	# &status to EAX
-	movl	%eax, (%edx)	# store value-of &status in &jmpbuf[0]
-	movl	$0, (%eax)	# zero the value of status
-	addl	$4, %edx	# change stack to point to &jmpbuf[1]
-	movl	%edx, 4(%esp)
-	jmp	L_setjmp$stub
-	leave
-	ret
-_gfpucw_:				# Get fpucw:  gfpucw_ (&cur_fpucw)
-	pushl   %ebp
-	movl    %esp,%ebp
-	subl    $0x4,%esp
-	movl    0x8(%ebp), %eax
-	fnstcw  0xfffffffe(%ebp)
-	movw    0xfffffffe(%ebp), %dx
-	movl    %edx,(%eax)
-	movl    %ebp, %esp
-	popl    %ebp
-	ret
+	# %rsi ... &status  %rdi ... &jumpbuf
+	movq    %rsi, (%rdi)    # store &status in jmpbuf[0]
+	movl    $0, (%rsi)      # zero the value of status
+	addq    $8, %rdi        # change point to &jmpbuf[1]
+	movl    $0, %esi        # change arg2 to zero
+	jmp     _sigsetjmp     # let sigsetjmp do the rest
 
-_sfpucw_:				# Set fpucw:  sfpucw_ (&new_fpucw)
-	pushl   %ebp
-	movl    %esp,%ebp
-	subl    $0x4,%esp
-	movl    0x8(%ebp), %eax
-	movl    (%eax), %eax
-	andl    $0xf3f, %eax
-	fclex
-	movw    %ax, 0xfffffffe(%ebp)
-	fldcw   0xfffffffe(%ebp)
-	leave  
-	ret    
-
-_gfpusw_:				# Get fpusw:  gfpusw_ (&cur_fpusw)
-	pushl   %ebp
-	movl    %esp,%ebp
-	subl    $0x4,%esp
-	movl    0x8(%ebp), %eax
-	fstsw   0xfffffffe(%ebp)
-	movw    0xfffffffe(%ebp), %dx
-	movl    %edx,(%eax)
-	movl    %ebp, %esp
-	popl    %ebp
-	ret
-
-	.section __IMPORT,__jump_table,symbol_stubs,self_modifying_code+pure_instructions,5
-L_setjmp$stub:
-	.indirect_symbol _setjmp
-	hlt ; hlt ; hlt ; hlt ; hlt
-	.subsections_via_symbols

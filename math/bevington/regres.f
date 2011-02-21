@@ -51,6 +51,9 @@ c
       dimension x(1),y(1),sigmay(1),m(1),yfit(1),a(1),sigmaa(1),
      *r(1)
       dimension weight(1000),xmean(10),sigmax(10),array(10,10)
+      REAL FCTN
+      EXTERNAL FCTN
+
 c
 c initialize sums and arrays
 c

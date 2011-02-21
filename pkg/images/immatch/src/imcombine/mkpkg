@@ -6,16 +6,14 @@ $checkin  libpkg.a ../../../
 $exit
 
 standalone:
-	$set LIBS1 = "-lxtools -lcurfit -lsurfit -lgsurfit -liminterp -lnlfit"
-	$set LIBS2 = "-lslalib -lncar -lgks"
+	$set LIBS1 = "-limc -lxtools -lcurfit -lsurfit -lgsurfit -liminterp"
+	$set LIBS2 = "-lnlfilt -lslalib -lncar -lgks"
 	$update	libpkg.a
 	$omake	x_imcombine.x
 	$link	x_imcombine.o libpkg.a $(LIBS1) $(LIBS2) -o xx_imcombine.e
 	;
 
 libpkg.a:
-	@src
-
 	t_imcombine.x	src/icombine.com src/icombine.h <error.h> <mach.h> \
 			<imhdr.h>
 	;

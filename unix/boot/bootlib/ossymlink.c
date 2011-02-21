@@ -1,6 +1,7 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <unistd.h>
 #include <iraf.h>
 
 #ifndef VMS
@@ -10,10 +11,12 @@
 
 /* OS_SYMLINK -- Determine if a file is a symbolic link.
  */
-os_symlink (fname, valbuf, maxch)
-char	*fname;			/* file to be tested */
-char	*valbuf;		/* buffer to receive link path, else NULL */
-int	maxch;
+int
+os_symlink (
+  char	*fname,			/* file to be tested */
+  char	*valbuf,		/* buffer to receive link path, else NULL */
+  int	maxch 
+)
 {
 #ifndef VMS
 	struct	stat fi;

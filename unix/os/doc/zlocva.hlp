@@ -29,7 +29,7 @@ comparisons and arithmetic operations (additions and subtractions) upon the
 addresses returned by \fBzlocva\fR to check arrays for equality and overlap
 and to compute offsets when generating pointers into Mem.
 Negative addresses are permitted provided the signed arithmetic and
-comparision operations work properly, i.e., provided the negative addresses
+comparison operations work properly, i.e., provided the negative addresses
 are assigned to the first half of the process logical address space.
 The following relationship must hold:
 

@@ -9,7 +9,7 @@ define	TAB_SZPARAMS	(10*SZ_LINE)		# Size of parameter string
 define	TAB_SIZE	(55+2*TAB_DIM)		# Size of table structure
 
 define	TAB_FNAME	Memc[P2C($1)]		# File name
-define	TAB_VALUE	Memr[$1+50]		# Constant table value
+define	TAB_VALUE	Memr[P2R($1+50)]	# Constant table value
 define	TAB_PARAMS	Memi[$1+51]		# Pointer to parameters
 define	TAB_NDIM	Memi[$1+52]		# Dimension of table
 define	TAB_INTERP	Memi[$1+53]		# Interpolation pointer

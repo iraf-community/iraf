@@ -73,7 +73,7 @@ spectra having names nite1.1221 ... nite1.1240.
 
 	cl> flatdiv nite1 1201-1220 nite1 1221
 
-The same spectra as above are simulataneously corrected for
+The same spectra as above are simultaneously corrected for
 coincidence losses.
 
 	cl> flatdiv nite1 1201-1220 nite1 1221 coincor=yes

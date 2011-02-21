@@ -399,7 +399,7 @@ band 3 is the sky, and band 4 is the sigma:
 
 Note that this could also be done with \fBimcopy\fR.  The last example
 is done in place; i.e. replacing the input image by the output image
-with the other bands elimintated; i.e. the output image is two dimensional.
+with the other bands eliminatated; i.e. the output image is two dimensional.
 
 II.  ONEDSPEC IMAGES
 

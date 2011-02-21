@@ -16,8 +16,10 @@
 /* ZGMTCO -- Return the correction, in seconds, from local standard time
  * (clock time) to GMT.   GMT = LST + gmtco (seconds), or gmtco = GMT-LST.
  */
-ZGMTCO (gmtcor)
-XINT	*gmtcor;				/* seconds */
+int
+ZGMTCO (
+  XINT	*gmtcor				/* seconds */
+)
 {
 	time_t gmt_to_lst(), ltime;
 
@@ -42,4 +44,6 @@ XINT	*gmtcor;				/* seconds */
 	ltime = time(0);
 	if (localtime(&ltime)->tm_isdst)
 	    *gmtcor = *gmtcor - 60L * 60L;
+
+	return (XOK);
 }

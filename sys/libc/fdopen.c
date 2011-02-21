@@ -1,5 +1,5 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
- */
+*/
 
 #define	import_spp
 #define	import_libc
@@ -7,17 +7,23 @@
 #define	import_fset
 #include <iraf.h>
 
+	
+extern int c_fstati();
+
+
 /* FDOPEN -- Reopen a file for i/o with the STDIO package, after the file
- * as already been opened by FIO.  It is an error if the access modes are
- * incompatible.
- */
+** as already been opened by FIO.  It is an error if the access modes are
+** incompatible.
+*/
 FILE *
-fdopen (fd, mode)
-int	fd;			/* FIO file descriptor		*/
-char	*mode;			/* STDIO access mode		*/
+fdopen (
+  XINT	fd,			/* FIO file descriptor		*/
+  char	*mode			/* STDIO access mode		*/
+)
 {
 	register int	fio_mode = c_fstati (fd, F_MODE);
 	register int	fio_type = c_fstati (fd, F_TYPE);
+
 
 	/* Verify file access mode.  No mode checking is performed for the
 	 * special file types.

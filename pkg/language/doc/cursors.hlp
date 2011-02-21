@@ -244,7 +244,7 @@ Filling and Writing the Frame Buffer
     The graphics system will automatically clear the frame buffer whenever
 the screen is cleared when plotting.  For example, in a heavy interactive
 graphics session, the frame buffer will be filled and cleared many times,
-and at the end only the last screenful will be left in the frame buffer.
+and at the end only the last screenfull will be left in the frame buffer.
 When reading a metacode file containing several frames with ":.read",
 all frames will be plotted in sequence, but only the last one will remain
 in the buffer when the sequence finishes.

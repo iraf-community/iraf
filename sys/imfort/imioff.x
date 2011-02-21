@@ -24,7 +24,7 @@ begin
 	# Allow space for the pixhdr pixel storage file header.  Advance
 	# "offset" to the next device block boundary.
 
-	offset = LEN_PIXHDR * SZ_STRUCT
+	offset = LEN_PIXHDR * SZ_MII_INT
 	call imf_align (offset, pblksize)
 
 	# Set the offset of the pixel storage area.  Compute the physical

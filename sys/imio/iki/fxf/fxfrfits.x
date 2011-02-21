@@ -309,9 +309,9 @@ pointer extv			#I Pointer to extver's array
 char	messg[SZ_LINE]
 pointer lfit, sp, po, ln
 int	spool, ig, acmode, i
-int	fitslen, xtn_hd, nrec1440, totpix, in, offset, group
+int	fitslen, xtn_hd, nrec1440, totpix, in, group
 int	strcmp(), getline()
-long	fstatl()
+long	offset, fstatl()
 int	open(), fxf_extnv_error()
 bool	ext_append, get_group
 
@@ -557,7 +557,7 @@ begin
 end
 
 
-# FXF_SKIP_XTN -- Kkip over a FITS extension.  The procedure will read the
+# FXF_SKIP_XTN -- Skip over a FITS extension.  The procedure will read the
 # current extension header and calculates the respectives offset for later
 # usage.
 
@@ -573,7 +573,8 @@ pointer extv			#I points to the arrays of extver
 
 pointer sp, lfit, fit, hdrfile
 bool    streq()
-int	spool, in, nrec1440, totpix, offset, i, k, cindx
+int	spool, in, nrec1440, totpix, i, k, cindx
+long	offset
 errchk	fxf_load_header
 int	strcmp()
 
@@ -871,9 +872,9 @@ begin
 	    sz_userarea = sz_userarea + FIT_CACHEHLEN(fit)
 
 	IM_HDRLEN(im) = LEN_IMHDR +
-	    (sz_userarea - SZ_EXTRASPACE + SZ_STRUCT-1) / SZ_STRUCT
+	    (sz_userarea - SZ_EXTRASPACE + SZ_MII_INT-1) / SZ_MII_INT
 	len_hdrmem = LEN_IMHDR +
-	    (sz_userarea+1 + SZ_STRUCT-1) / SZ_STRUCT
+	    (sz_userarea+1 + SZ_MII_INT-1) / SZ_MII_INT
 
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	    IM_LENHDRMEM(im) = len_hdrmem
@@ -989,9 +990,11 @@ begin
 		minutes = 0
 		seconds = 0
 	    } else {
- 		if (IS_INDEFD(dsec))
+ 		if (IS_INDEFD(dsec)) {
+                    hours   = 0
+                    minutes = 0
                     seconds = 0
-		else
+		} else
                     seconds = nint(dsec)
             }
 	} else {

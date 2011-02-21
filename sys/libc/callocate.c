@@ -1,15 +1,18 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
- */
+*/
 
 #define import_spp
 #define	import_libc
 #define	import_xnames
 #include <iraf.h>
 
+
 /* C_ALLOCATE -- Allocate a device (and mount it, if necessary).
- */
-c_allocate (device)
-char	*device;		/* device to be allocated	*/
+*/
+int
+c_allocate (
+  char *device			/* device to be allocated	*/
+)
 {
 	int	status;
 
@@ -21,14 +24,17 @@ char	*device;		/* device to be allocated	*/
 
 
 /* C_DEALLOCATE -- Deallocate a device.
- */
-c_deallocate (device, rewind)
-char	*device;		/* device to be allocated	*/
-int	rewind;			/* rewind flag, if magtape	*/
+*/
+int
+c_deallocate (
+  char	*device,		/* device to be allocated	*/
+  int	rewind			/* rewind flag, if magtape	*/
+)
 {
 	int	status;
+	XINT    x_rewind = rewind;
 
-	iferr (status = XDEALLOCATE (c_sppstr(device), &rewind))
+	iferr (status = (int) XDEALLOCATE (c_sppstr(device), &x_rewind))
 	    return (ERR);
 	else
 	    return (status);
@@ -36,28 +42,35 @@ int	rewind;			/* rewind flag, if magtape	*/
 
 
 /* C_DEVSTATUS -- Print the current status of the named device.
- */
-c_devstatus (device, out)
-char	*device;	/* device name		*/
-int	out;		/* output file		*/
+*/
+void
+c_devstatus (
+  char	*device,		/* device name		*/
+  int	out			/* output file		*/
+)
 {
-	XDEVSTATUS (c_sppstr(device), &out);
+	XINT  x_out = out;
+
+	XDEVSTATUS (c_sppstr(device), &x_out);
 }
 
 
 /* C_DEVOWNER -- Determine if a device is allocated, and if so return
- * the name of the owner.
- */
-c_devowner (device, owner, maxch)
-char	*device;		/* device to be allocated	*/
-char	*owner;			/* receives owner name string	*/
-int	maxch;
+** the name of the owner.
+*/
+int
+c_devowner (
+  char	*device,		/* device to be allocated	*/
+  char	*owner,			/* receives owner name string	*/
+  int	maxch 
+)
 {
 	PKCHAR	x_owner[SZ_FNAME+1];
 	XINT	x_maxch = SZ_FNAME;
 	int	status;
 
-	iferr (status = XDEVOWNER (c_sppstr(device), x_owner, &x_maxch)) {
+
+	iferr (status = (int) XDEVOWNER(c_sppstr(device), x_owner, &x_maxch)) {
 	    owner[0] = EOS;
 	    return (ERR);
 	} else {

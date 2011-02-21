@@ -50,7 +50,7 @@ begin
 	    # The following is the length of the user area in chars.
 	    len_userarea = strlen (Memc[IM_USERAREA(im)]) + 1
 	    IM_V1HDRLEN(v1) = LEN_V1IMHDR +
-		(len_userarea + SZ_STRUCT-1) / SZ_STRUCT
+		(len_userarea + SZ_MII_INT-1) / SZ_MII_INT
 
 	    IM_V1PIXTYPE(v1) = IM_PIXTYPE(im)
 	    IM_V1NDIM(v1) = IM_NDIM(im)
@@ -87,7 +87,7 @@ begin
 
 	    # Write the file header.
 	    call seek (fd, BOFL)
-	    call write (fd, IM_V1MAGIC(v1), hdrlen * SZ_STRUCT)
+	    call write (fd, IM_V1MAGIC(v1), hdrlen * SZ_MII_INT)
 
 	    # Write the user area.
 	    if (htype == TY_IMHDR)
@@ -123,7 +123,7 @@ v2start_
 
 	    # The following is the length of the user area in SU.
 	    len_userarea = strlen (Memc[IM_USERAREA(im)]) + 1
-	    hdrlen = LEN_V2IMHDR + (len_userarea + SZ_STRUCT-1) / SZ_STRUCT
+	    hdrlen = LEN_V2IMHDR + (len_userarea + SZ_MII_INT-1) / SZ_MII_INT
 
 	    call miiwritei (fd, hdrlen, 1)
 	    call miiwritei (fd, IM_PIXTYPE(im), 1)

@@ -67,7 +67,7 @@ begin
 		    status = ERR
 		    goto err_
 		}
-		nchars = LEN_IMHDR * SZ_STRUCT
+		nchars = LEN_IMHDR * SZ_MII_INT
 		if (oif_rdhdr (hfd, im, nchars, TY_IMHDR) < 0) {
 		    status = ERR
 		    goto err_
@@ -109,7 +109,7 @@ begin
 		;
 	} else {
 	    iferr {
-		nchars = (IM_LENHDRMEM(im) - LEN_IMHDR) * SZ_STRUCT
+		nchars = (IM_LENHDRMEM(im) - LEN_IMHDR) * SZ_MII_INT
 		if (oif_rdhdr (hfd, im, nchars, TY_IMHDR) < 0)
 		    status = ERR
 		else {

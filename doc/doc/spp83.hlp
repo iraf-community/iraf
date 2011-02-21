@@ -1483,7 +1483,7 @@ Example 6: Pattern Matching
     The next example was selected for inclusion here because it demonstrates
 most of the control flow constructs, as well as the use of defined
 parameters.  The STRMATCH procedure searches a string for the specified
-pattern.  The pattern may contain several metacharacters, or characters
+pattern.  The pattern may contain several meta-characters, or characters
 which are not matched but rather which tell STRMATCH what constitutes
 a match.  For example:
 
@@ -1493,7 +1493,7 @@ a match.  For example:
 .fi
 
 In this case, STRMATCH would search for the string "naxis =", returning
-the index of the first character matched or zero.  The metacharacters are
+the index of the first character matched or zero.  The meta-characters are
 defined in the INCLUDE file "pattern.h", as follows:
 .nf
 
@@ -1533,7 +1533,7 @@ GSTRMATCH -- More general version of strmatch.  The indices of the
 first and last characters matched are returned as arguments.  The
 function value is the same as for STRMATCH.
 
-STRMATCH recognizes the metacharacters BOL, EOL, ANY, WHITESPACE,
+STRMATCH recognizes the meta-characters BOL, EOL, ANY, WHITESPACE,
 IGNORECASE, and MATCHCASE (BOL and EOL are special only as the first
 and last chars in the pattern).  The null pattern matches any string.
 Metacharacters can be escaped.

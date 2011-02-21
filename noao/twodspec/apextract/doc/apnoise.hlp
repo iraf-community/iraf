@@ -155,7 +155,7 @@ I  Interupt immediately
 :gain <value>		Check or set the gain model parameter
 :readnoise <value>	Check or set the read noise model parameter
 
-Also see the CURSOR MODE commads (:.help) and the windowing commands
+Also see the CURSOR MODE commands (:.help) and the windowing commands
 (:/help).
 .fi
 .ih

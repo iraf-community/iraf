@@ -1,4 +1,4 @@
-.help geomap Jan01 immatch
+.help geomap Jan01 images.immatch
 .ih
 NAME
 geomap -- compute one or more spatial transformation functions
@@ -125,8 +125,8 @@ The maximum number of rejection iterations. The default is no rejection.
 The rejection limit in units of sigma.
 .le
 .ls calctype = "real"
-The precision of coordinate transformation calculations. The options are real
-and double.
+The precision of the coordinate transformation calculations. The options are
+real and double.
 .le
 .ls verbose = yes
 Print messages about actions taken by the task ?
@@ -147,7 +147,7 @@ DESCRIPTION
 GEOMAP computes the transformation required to map the reference coordinate
 system to the input coordinate system.  The coordinates of points in common
 to the two systems are listed in the input text file(s) \fIinput\fR
-one per line in the following format: "xref yref xin yin.
+one per line in the following format: "xref yref xin yin".
 
 The computed transforms are stored in the text database file \fIdatabase\fR
 in records with names specified by the parameter \fItransforms\fR. If the
@@ -225,7 +225,7 @@ GEOMAP may be run interactively by setting \fIinteractive\fR = yes and
 inputting commands by the use of simple keystrokes.
 In interactive mode the user has the option of changing the
 fit parameters and displaying the data graphically until a satisfactory
-fit has been achieved. The available keystroke command are listed
+fit has been achieved. The available keystroke commands are listed
 below.
 
 .nf
@@ -243,7 +243,7 @@ q	Exit the interactive curve fitting
 .fi
 
 The parameters listed below can be changed interactively with simple colon
-commands. Typing the parameter name along will list the current value.
+commands. Typing the parameter name alone will list the current value.
 
 .nf
 :show				List parameters
@@ -259,7 +259,7 @@ commands. Typing the parameter name along will list the current value.
 .fi
 
 The final fit is stored in a simple text file in a format suitable for use
-by the REGISTER or GEOTRAN tasks.
+by the GREGISTER or GEOTRAN tasks.
 
 If \fIverbose\fR  is "yes", various pieces of useful information are printed
 to the terminal as the task proceeds. If \fIresults\fR is set to a file name

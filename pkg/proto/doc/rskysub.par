@@ -1,0 +1,33 @@
+# PARAMETERS FOR THE RUNNING SKY SUBTRACTION TASK
+
+input,f,a,,,,"List of input images to be sky subtracted"
+output,f,a,"",,,"List of output sky subtracted images"
+imasks,f,h,"",,,"List of input image masks"
+omasks,f,h,"",,,"List of output input image masks"
+hmasks,f,h,"",,,"List of output image holes masks\n"
+
+rescale,b,h,yes,,,"Force recomputation of the scale factors ?"
+scale,f,h,"median",,,"The scale factor computation method"
+useimasks,b,h,no,,,"Use input masks to compute image statistics"
+statsec,s,h,"",,,"Image section used for computing image medians"
+lower,r,h,INDEF,,,"Minimum good data value"
+upper,r,h,INDEF,,,"Maximum good data value"
+maxiter,i,h,20,0,,"Maximum number of clipping iterations"
+lnsigrej,r,h,3.0,0,,"Lower side sigma clipping factor"
+unsigrej,r,h,3.0,0,,"Upper side sigma clipping factor"
+binwidth,r,h,0.1,,,"Histogram bin width in sigma\n"
+skyscale,s,h,"SKYSCALE",,,"The scale factor storage keyword"
+
+resubtract,b,h,yes,,,"Force recomputation and subtraction of sky frame ?"
+combine,s,h,average,|average|median|,,"The input image combining method"
+ncombine,i,h,6,2,,"The default number of input images to combine"
+nmin,i,h,3,2,,"The minimum number of input images to combine"
+nlorej,i,h,0,0,,"The number of low side pixels to reject"
+nhirej,i,h,0,0,,"The number of high side pixels to reject"
+blank,r,h,0.0,,,"Value assigned to undefined output image pixels"
+skysub,s,h,"SKYSUB",,,"The output sky subtraction keyword"
+holes,s,h,"HOLES",,,"The output sky subtraction keyword\n"
+
+cache,b,h,yes,,,"Cache images in memory if possible ?"
+verbose,b,h,yes,,,"Print messages about the progress of the task ?"
+

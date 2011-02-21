@@ -1,0 +1,40 @@
+.help imaccess July97 language
+.ih
+NAME
+imaccess -- test whether an image exists
+.ih
+USAGE
+bool = imaccess (image)
+.ih 
+PARAMETERS
+.ls image
+The name of the image whose existence is to be tested.
+.le
+.ih
+DESCRIPTION
+\fIImaccess\fR is a boolean intrinsic function returning true ("yes") if the
+named image exists.  The function will return false ("no") if the image doesn't
+exist, or if no image extension is supplied and the image name is ambiguous.
+\fIImaccess\fR can only be called as a function in an expression, not as a task.
+.ih
+EXAMPLES
+1. Print the header of an image if it exists.
+
+.nf
+    if (imaccess ("dev$wpix"))
+	imheader ("dev$wpix",long+)
+    else
+	error (11, "Image not found")
+.fi
+
+2. Tell if a image exists.
+
+	cl> = imaccess ("dev$pix")
+.ih
+BUGS
+An optional second argument should be added to test whether the named file
+can be accessed for reading or writing.
+.endhelp
+.ih
+SEE ALSO
+access, directory

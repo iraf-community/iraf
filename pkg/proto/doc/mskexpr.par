@@ -1,0 +1,10 @@
+# MSKEXPR parameters
+
+expr,s,a,,,,The mask generating expression
+masks,f,a,,,,The list of output mask images
+refimages,f,a,,,,The list of input reference images
+refmasks,f,h,"",,,The list of input reference masks
+dims,s,h,"512,512",,,The default output mask dimensions
+depth,i,h,0,,,The default output mask depth in bits
+exprdb,s,h,none,,,The optional expression database
+verbose,b,h,yes,,,Print task status messages ?

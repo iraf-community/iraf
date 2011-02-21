@@ -206,7 +206,7 @@ various buffers were increased in size all over the system.  The
 maximum length of an environment variable such as \fIhelpdb\fR is now 960
 characters (12 80 character lines of text).  String parameters to tasks can
 also be larger, and the system is more resistant to problems when size limits
-are exceeded.  Foreign task commands, OS escapes, etc., can all be larger now.
+are exceedd.  Foreign task commands, OS escapes, etc., can all be larger now.
 The current limit on such strings is about 1024 characters, and is defined
 at sysgen time by the new system parameter \fISZ_COMMAND\fR in
 \fIhlib$iraf.h\fR.

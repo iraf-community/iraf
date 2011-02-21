@@ -52,10 +52,10 @@ begin
 	# is recomputed.  Corrections for scaling may be performed.
 	# Depending on other flags the image IDs may also need to be adjusted.
 
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -244,7 +244,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -292,10 +292,10 @@ begin
 	call salloc (resid, nimages+1, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -317,7 +317,7 @@ begin
 
 		if (n1 >= max (MINCLIP, maxkeep+1)) {
 		    if (doscale1) {
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
 			    s = scales[l]
 			    r = max (zero, s * (med + zeros[l]))
@@ -344,7 +344,7 @@ begin
 			    s = max (zero, med)
 			    s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
 			}
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    if (keepids) {
 				l = Memi[m[nl]+k]
 				s = max (zero, med)
@@ -375,7 +375,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -435,7 +435,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -498,10 +498,10 @@ begin
 	# is recomputed.  Corrections for scaling may be performed.
 	# Depending on other flags the image IDs may also need to be adjusted.
 
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -690,7 +690,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -738,10 +738,10 @@ begin
 	call salloc (resid, nimages+1, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -763,7 +763,7 @@ begin
 
 		if (n1 >= max (MINCLIP, maxkeep+1)) {
 		    if (doscale1) {
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
 			    s = scales[l]
 			    r = max (zero, s * (med + zeros[l]))
@@ -790,7 +790,7 @@ begin
 			    s = max (zero, med)
 			    s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
 			}
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    if (keepids) {
 				l = Memi[m[nl]+k]
 				s = max (zero, med)
@@ -821,7 +821,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -881,7 +881,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -944,10 +944,10 @@ begin
 	# is recomputed.  Corrections for scaling may be performed.
 	# Depending on other flags the image IDs may also need to be adjusted.
 
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1136,7 +1136,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1184,10 +1184,10 @@ begin
 	call salloc (resid, nimages+1, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1209,7 +1209,7 @@ begin
 
 		if (n1 >= max (MINCLIP, maxkeep+1)) {
 		    if (doscale1) {
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
 			    s = scales[l]
 			    r = max (zero, s * (med + zeros[l]))
@@ -1236,7 +1236,7 @@ begin
 			    s = max (zero, med)
 			    s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
 			}
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    if (keepids) {
 				l = Memi[m[nl]+k]
 				s = max (zero, med)
@@ -1267,7 +1267,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -1327,7 +1327,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1390,10 +1390,10 @@ begin
 	# is recomputed.  Corrections for scaling may be performed.
 	# Depending on other flags the image IDs may also need to be adjusted.
 
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1582,7 +1582,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1630,10 +1630,10 @@ begin
 	call salloc (resid, nimages+1, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1655,7 +1655,7 @@ begin
 
 		if (n1 >= max (MINCLIP, maxkeep+1)) {
 		    if (doscale1) {
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
 			    s = scales[l]
 			    r = max (zero, s * (med + zeros[l]))
@@ -1682,7 +1682,7 @@ begin
 			    s = max (zero, med)
 			    s = sqrt (nm[1,1] + s/nm[2,1] + (s*nm[3,1])**2)
 			}
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    if (keepids) {
 				l = Memi[m[nl]+k]
 				s = max (zero, med)
@@ -1713,7 +1713,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -1773,7 +1773,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1788,3 +1788,4 @@ begin
 
 	call sfree (sp)
 end
+

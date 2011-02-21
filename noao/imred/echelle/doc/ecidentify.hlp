@@ -326,7 +326,7 @@ Fit a dispersion function including determining the order offset.
 .le
 .ls o
 Fit a dispersion function with the order offset fixed.  The user is queried
-for the order offset.  This is faster than the interative fit to also
+for the order offset.  This is faster than the interactive fit to also
 determine the order.
 .le
 .ls q
@@ -496,7 +496,7 @@ database entry is examined, such as when going to the next image in the
 input list or selecting a new image with the ":image" command, the
 current feature list and coordinate function are kept.  Alternatively,
 a database record from a different image may be read with the ":read"
-command.  When transfering feature identifications between images the
+command.  When transferring feature identifications between images the
 feature coordinates will not agree exactly with the new image feature
 positions and several options are available to reregister the feature
 positions.  The key 'c' centers the feature nearest the cursor using
@@ -554,8 +554,8 @@ reciprocal of the order number.  Because of distortions, the differing
 extraction paths through the two dimensional image, and rotations of
 the spectra relative to the axis of constant dispersion (i.e. aligning
 the orders with the image columns or lines instead of aligning the
-emission and absorption features) there will be residual dependences on
-the extracted pixel positions and orders.  These residual dependences
+emission and absorption features) there will be residual dependancies on
+the extracted pixel positions and orders.  These residual dependancies
 are fit by a two dimensional polynomial of arbitrary order including
 cross terms.  Because the basic order number dependence has been
 removed the orders should be relatively low.  Currently the functions

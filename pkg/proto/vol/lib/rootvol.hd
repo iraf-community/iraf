@@ -1,0 +1,8 @@
+# Root task entry for the VOL package help tree.  Defines `vol'
+# as both a task and a package in the vol help database.
+
+vol		men  = vol$vol.men,
+		hlp  = vol$vol.men,
+		sys  = vol$vol.hlp,
+		pkg  = vol$vol.hd,
+		src  = vol$vol.cl

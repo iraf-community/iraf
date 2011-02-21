@@ -505,7 +505,7 @@ The parameter \fIngrow\fR selects the maximum number of growing iterations.
 The parameter \fIagrow\fR selects the maximum fractional increase in
 the number  of original detected object pixels.  The number of pixels
 is called the "area"  of the object.  The growing of an object stops
-when either maximum is exceeded at the end of a growing iteration.
+when either maximum is exceedd at the end of a growing iteration.
 .ih
 EXAMPLES
 1.  The following is a test example with default parameters that can be run

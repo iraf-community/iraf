@@ -107,7 +107,7 @@ begin
                     call chp_pixtype (im1, im2, chp_gettype (outtype))
                 }
 
-                # Close up ther input and output images.
+                # Close up the input and output images.
                 call imunmap (im1)
                 if (im2 != NULL) {
                     call imunmap (im2)
@@ -149,6 +149,7 @@ errchk	impnls, impnli, impnll, impnlr, impnld, impnlx
 
 begin
         ncols = IM_LEN(im1, 1)
+
         IM_PIXTYPE(im2) = outtype
         call amovkl (long(1), v1, IM_MAXDIM)
         call amovkl (long(1), v2, IM_MAXDIM)
@@ -176,6 +177,8 @@ begin
             while (impnlx(im2,buf2,v2) != EOF && imgnlx(im1,buf1,v1) != EOF)
                 call amovx (Memx[buf1], Memx[buf2], ncols)
         }
+
+	call imflush (im2)
 end
 
 

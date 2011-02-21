@@ -1,6 +1,0 @@
-infile,s,a,"STDIN",,,"input file name(s)"
-from_string,s,a,"/",,,"set of characters to be replaced or deleted"
-to_string,s,a,"\%2f",,,"set of characters to be substituted"
-delete,b,h,no,,,"delete chars in from string from input file?"
-collapse,b,h,no,,,"remove repeated characters in output?"
-mode,s,h,"ql",,,

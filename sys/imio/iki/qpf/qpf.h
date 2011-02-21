@@ -10,8 +10,8 @@ define	LEN_QPFDES	10
 define	QPF_IM		Memi[$1]	# backpointer to image descriptor
 define	QPF_QP		Memi[$1+1]	# QPOE datafile descriptor
 define	QPF_IO		Memi[$1+2]	# QPIO descriptor
-define	QPF_XBLOCK	Memr[$1+3]	# X block factor for sampling
-define	QPF_YBLOCK	Memr[$1+4]	# Y block factor for sampling
+define	QPF_XBLOCK	Memr[P2R($1+3)]	# X block factor for sampling
+define	QPF_YBLOCK	Memr[P2R($1+4)]	# Y block factor for sampling
 define	QPF_VS		Memi[$1+5+$2-1]	# start vector of active rect
 define	QPF_VE		Memi[$1+7+$2-1]	# end vector of active rect
 define	QPF_IOSTAT	Memi[$1+9]	# i/o status (byte count)

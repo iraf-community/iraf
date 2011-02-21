@@ -1,7 +1,7 @@
 .help msider Dec98 "Image Interpolation Package"
 .ih
 NAME
-msider -- evaulate the interpolant derivatives at x and y 
+msider -- evaluate the interpolant derivatives at x and y 
 .ih
 SYNOPSIS
 msider (msi, x, y, der, nxder, nyder, len_der)
@@ -22,7 +22,7 @@ Pointer to the 2D sequential interpolant descriptor.
 .le
 .ls x, y
 The single x and y values or in the case of the drizzle interpolant the
-single quarilateral at / over which the point is to be evaluated.
+single quadrilateral at / over which the point is to be evaluated.
 .le
 .ls der
 The array containing the derivatives. Der[1,1] contains the value of

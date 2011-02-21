@@ -40,7 +40,8 @@ begin
 
 	call pl_compress (pl)
 	sz_index = pl_p2li (PL_LP(pl,1), 1, Mems[index], PL_NLP(pl))
-	n_buflen = (LEN_PLEXTERN * SZ_STRUCT + PL_LLLEN(pl) * SZ_SHORT +
+	#n_buflen = (LEN_PLEXTERN * SZ_STRUCT + PL_LLLEN(pl) * SZ_SHORT +
+	n_buflen = (LEN_PLEXTERN * SZ_MII_INT + PL_LLLEN(pl) * SZ_SHORT +
 	    sz_index * SZ_SHORT) / SZ_SHORT
 
 	# Allocate or resize the output buffer.
@@ -69,7 +70,8 @@ begin
 	call amovl (PL_AXLEN(pl,1), PLE_AXLEN(ex,1), PL_MAXDIM)
 	call miipak32 (Memi[ex], Memi[coerce(op,TY_SHORT,TY_INT)],
 	    LEN_PLEXTERN, TY_STRUCT)
-	op = op + (LEN_PLEXTERN * SZ_STRUCT) / SZ_SHORT
+	#op = op + (LEN_PLEXTERN * SZ_STRUCT) / SZ_SHORT
+	op = op + (LEN_PLEXTERN * SZ_MII_INT) / SZ_SHORT
 
 	# Append the compressed index...
 	call miipak16 (Mems[index], Mems[op], sz_index, TY_SHORT)

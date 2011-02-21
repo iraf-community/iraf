@@ -8204,3 +8204,204 @@ BUG:	The "ocolors" parameter was being used in place of the "bpcolors"
 	parameter.  There is no workaround.
 
 STATUS:	Fixed for the next release.
+
+NUMBER:	567
+MODULE:	apall, apedit
+SYSTEM:	V2.11-V2.14.1
+DATE:	Tue Oct  7 10:53:14 MST 2008
+FROM:	valdes
+
+BUG:	The :parameters and :apertures commands cause the task to exit with
+	an error that parameter "apertures" isn't found.  This problem has
+	existed for a long time due to a missing parameter in the hidden
+	parameter sets.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	568
+MODULE:	imcombine
+SYSTEM:	-V2.14.1
+DATE:	Tue Oct  7 12:52:35 MST 2008
+FROM:	valdes
+
+BUG:	When using avsigclip, ccdclip, or sigclip rejection around the
+	median (mclip=yes) the resulting final median may be incorrect.
+	This will generally only occur if unusually small low sigma values,
+	such as lsigma=1, are used.  This was due to using a wrong
+	variable.
+
+STATUS:	This is fixed for the next release.
+
+
+NUMBER:	569
+MODULE:	cosmicrays
+SYSTEM:	-V2.14.1
+DATE:	Mon Oct 13 10:33:15 MST 2008
+FROM:	valdes
+
+BUG:	The message
+
+	    ERROR: PLIO: reference out of bounds on mask 
+
+	occurs when the image is not 2D.  This can be a conceptual problem
+	for data which define a higher dimensionality but with length of 1;
+	e.g. [2048,2048,1].  This is effectively a 2D image but some
+	IRAF tasks designed for 2D images can have problems with this.
+
+	The workaround is simply to use a 2D image section:
+
+	    cosmicrays image[*,*,1]
+
+	Of course one can also convert the image to 2D with imcopy or imslice.
+
+STATUS:	No updates are currently planned and users should use the workarounds
+	noted above.
+
+NUMBER:	570
+MODULE:	imexpr, mskexpr, or tasks other asks using the expression evaluator
+SYSTEM:	-V2.14.1
+DATE:	Mon Nov  3 22:16:41 MST 2008
+FROM:	valdes
+
+BUG:	Use of the built-in functions mod, min, max, and median produce an
+	"incompatible types" error even though the types of the arguments are
+	correct.  This is a due to a coding error.  There is no workaround
+	other than using alternative ways to express the desired
+	expression.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	571
+MODULE:	IMAGES.IMUTIL.HSELECT
+SYSTEM:	V2.14
+DATE:	Fri Jan  2 21:41:53 MST 2009
+FROM:	fitz
+
+BUG:	The use of a '$' in a field name was causing the 'missing' value
+	to always be printed even if the field exists in the image.  This
+	was caused by a failure to check for the character and removing it
+	prior to getting the value from the header.  There is no workaround,
+	the code change is trivial.
+
+STATUS:	Fixed for the next release.
+
+NUMBER:	572
+MODULE:	dotasks
+SYSTEM:	-V2.14
+DATE:	Tue Apr 28 11:19:41 MST 2009
+FROM:	valdes
+
+BUG:	It is likely that the DO tasks (e.g. doslit) will not work correctly
+	if the input image names have a path.  This is because
+	internal database filenames are derived from the image names.
+	The recommended action is to work in the data directory.
+
+STATUS:	Work on these and related tasks is currently frozen and since
+	there is a basic workaround (working in the data directory)
+	nothing may be done for some time.
+
+NUMBER:	573
+MODULE:	mscimage
+SYSTEM:	- V4.9 August, 2008
+DATE:	Fri Sep 18 08:36:30 MST 2009
+FROM:	valdes (discovered and diagosed by Thomas de Boer)
+
+BUG:	The task ignores the parameters "boundary" and "blank" which are
+	fixed to be "constant" and "0." respectively.
+
+STATUS:	This is fixed for the next release.
+
+NUMBER: 574
+MODULE: daophot.psf
+SYSTEM: -V2.14
+DATE:   Tue Apr 13 22:01:52 MST 2010
+FROM:   fitz
+
+BUG:    The ":function" command was not properly saving the new function
+        when refitting is done with the 'f' keystroke.  This is because the
+        fitting function reinitializes the parameters to the startup
+        values without first saving the modified function.
+
+STATUS: Fixed for the next release
+
+NUMBER: 575
+MODULE: all tasks using the icfit tools
+SYSTEM:  - V2.14
+DATE:   Mon Jun 28 14:08:48 MST 2010
+FROM:   valdes
+
+BUG:    The icfit tools are used in many tasks involving 1D function fitting.
+       These include onedspec tasks like continuum and identify.  The
+       tools provide for a grow radius where any sigma rejected points
+       have neighbors also rejected.  The logic was wrong
+       in two ways; one where if a neighbor was also a rejected point
+       it did not also reject neighbors of that point, and another where
+       the grow radius units were used both as in pixels and in user
+       coordinates.  In reality the grow is supposed to be in user
+       coordinate units.  In addition some tasks, like continuum, incorrectly
+       described the units adding to the confusion.
+
+STATUS: Fixed for the next IRAF release.
+
+NUMBER: 576
+MODULE: imcombine
+SYSTEM: V2.14
+DATE:   Wed Nov 17 15:20:16 MST 2010
+FROM:   valdes
+
+BUG:    The addition of the image names using imcmb="$I" does not work for
+        input images with a square bracket; e.g. foo[1], foo[im1], foo[*,*].
+        The IMCMB value, in order to allow long filenames, is stripped of
+        any path.  For an obscure reason related to VMS directories this
+        code failed to find a rootname.
+
+STATUS: This has been fixed for the next release.
+
+NUMBER: 577
+MODULE: dohydra, dofibers, doargus, do3fiber
+SYSTEM: -V2.15.1
+DATE:   Fri Feb 11 12:30:46 MST 2011
+FROM:   valdes
+
+BUG:    The tasks will shorten root input image names to six characters by
+        using the first five and last characters.  Depending on the style
+        of image names this can result in name conflicts.  The reason for
+        this shortening is no longer known so it is now considered a bug.
+        Workarounds are to be aware of this and rename image names to avoid
+        conflicts.
+
+STATUS: This is fixed in the next release.  The fix is to modify the file
+        $iraf/noao/imred/src/fibers/proc.cl as shown (replace lines 125 to
+        129 with "extn = extn // ".ms").  If you don't have permission
+        to make this change then copy the file to your iraf "home$"
+        directory, edit it, load the desired package, and then override
+        the definition of the file with "redefine proc = home$proc.cl".
+
+        125,129c125
+        < i = strlen (extn)
+        < if (i < 7)
+        <     extn = extn // ".ms"
+        < else
+        <     extn = substr (extn, 1, 5) // substr (extn, i, i) // ".ms"
+        ---
+        > extn = extn // ".ms"
+
+
+NUMBER:	578
+MODULE:	splot, scombine, fxcor, identify tasks, dispcor, disptrans
+SYSTEM:	v2.15-V2.15.1a  (64-bit platforms only)
+DATE:	Tue Mar  8 21:57:38 MST 2011
+FROM:	fitz
+
+BUG:	The 64-bit port changes to smw.h improperly added a P2R() macro to 
+	the APLOW/APHIGH macro declarations.  This was causing tasks with 
+	2-D data to make an out-of-bounds request for data and leading to
+	and error message such as
+
+		ERROR: Pixel subscript out of bounds (spec.fits) 
+
+	Normal onedspec data or use on 32-bit platforms is not affected.
+
+STATUS:	Fixed for the next release.  A re-application of the v2.15.1a patch
+	file will replace the affected binaries on 'linux64' and 'macintel'
+	platforms.

@@ -8,6 +8,8 @@ procedure impakl (a, b, npix, dtype)
 long	a[npix]
 int	b[npix], npix, dtype
 
+pointer	bp
+
 begin
 	switch (dtype) {
 	case TY_USHORT:
@@ -15,9 +17,23 @@ begin
 	case TY_SHORT:
 	    call achtls (a, b, npix)
 	case TY_INT:
-	    call achtli (a, b, npix)
+	    if (SZ_INT == SZ_INT32)
+	        call achtli (a, b, npix)
+	    else {
+		call malloc (bp, npix, TY_INT)
+	        call achtli (a, Memi[bp], npix)
+		call ipak32 (Memi[bp], b, npix)
+		call mfree (bp, TY_INT)
+	    }
 	case TY_LONG:
-	    call achtll (a, b, npix)
+	    if (SZ_INT == SZ_INT32)
+	        call achtll (a, b, npix)
+	    else {
+		call malloc (bp, npix, TY_LONG)
+	        call achtll (a, Meml[bp], npix)
+		call ipak32 (Meml[bp], b, npix)
+		call mfree (bp, TY_LONG)
+	    }
 	case TY_REAL:
 	    call achtlr (a, b, npix)
 	case TY_DOUBLE:

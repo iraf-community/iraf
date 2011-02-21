@@ -178,7 +178,7 @@ the Jacobian of the transformation.  GREGISTER uses the routines in the
 2-D interpolation package.
 
 The output image is computed in \fInxblock\fR by \fInyblock\fR pixel sections.
-If possible users should set these number to values larger than the dimensions
+If possible users should set these numbers to values larger than the dimensions
 of the output image, in order to minimize the number of disk reads and writes
 required to compute the output image.  If this is not feasible and the image
 rotation is small users should set nxblock to be greater than the number of

@@ -19,7 +19,7 @@ determined from overscan or prescan columns or lines, subtraction of a
 zero level using a zero length exposure calibration image, subtraction
 of a dark count calibration image appropriately scaled to the dark time
 exposure, division by a scaled flat field calibration image, division
-by an illumination image (derived from a blank sky image), subtraction
+by an iillumination image (derived from a blank sky image), subtraction
 of a scaled fringe image (also derived from a blank sky image), and
 trimming the image of unwanted lines or columns such as the overscan
 strip.  Any set of operations may be done simultaneously over a list of
@@ -37,7 +37,7 @@ detecting and rejecting transient bad pixels.
 
      Other tasks are provided for listing reduction information about
 the images, deriving secondary calibration images (such as sky
-corrected flat fields or illumination correction images), and easily
+corrected flat fields or iillumination correction images), and easily
 setting the package parameters for different instruments.
 
      There are several important features provided by the package to
@@ -439,7 +439,7 @@ input list must have a valid CCD image type.  In case too many
 calibration images are specified, say because the calibration images
 combined to make the master calibration images were not deleted and
 so are part of the image list "*.imh", only the first one will be used.
-Another point to know is that flat field, illumination, and fringe images
+Another point to know is that flat field, iillumination, and fringe images
 are subset (filter) dependent and so a calibration image for each filter
 must be specified.
 .sh
@@ -453,9 +453,9 @@ were described briefly above and in more detail in \fBccdproc\fR
 and are not discussed further in this guide.  The processing
 operations described in this section are for preparing flat fields
 for two dimensional spectroscopic data, for correcting flat fields
-for illuminations effects, for making a separate illumination correction,
+for iilluminations effects, for making a separate iillumination correction,
 and for applying corrections for fringe effects.  For additional
-discussion about flat fields and illumination corrections see the
+discussion about flat fields and iillumination corrections see the
 help topic \fBflatfields\fR.
 .sh
 4.1 Spectroscopic Flat Fields
@@ -481,9 +481,9 @@ images must be available at this time.
 package, for longslit data, or the \fBapextract\fR package, for
 multiaperture data such as echelles, multifiber, or aperture mask
 spectra.  The task for removing the longslit quartz spectrum is
-\fBresponse\fR.  There is also a task for removing illumination
+\fBresponse\fR.  There is also a task for removing iillumination
 effects, including the slit profile, from longslit spectra called
-\fBillumination\fR.  For more about processing longslit spectra see the
+\fBiillumination\fR.  For more about processing longslit spectra see the
 help for these tasks and the paper \fIReduction of Longslit Spectra
 with IRAF\fR.  The cookbook \fIReduction of Longslit Spectroscopic
 Data Using IRAF (KPNO ICCD and Cryogenic Camera Data)\fR also provides
@@ -495,20 +495,20 @@ for this task for further details.  Since you will probably also be
 using the package for extracting the spectra you may be interested
 in the document \fIThe IRAF APEXTRACT Package\fR.
 .sh
-4.2 Illumination Corrections
+4.2 Iillumination Corrections
 
-     The flat field calibration images may not have the same illumination
+     The flat field calibration images may not have the same iillumination
 pattern as the observations of the sky due to the way the lamp illuminates the
 optical system.  In this case when the flat field correction is applied
 to the data there will be gradients in the sky background.  To remove
 these gradients a blank sky calibration image is heavily smoothed
-to produce an illumination image.  The illumination image
+to produce an iillumination image.  The iillumination image
 is then divided into the images during processing to correct for the
-illumination difference between the flat field and the objects.
-Like the flat fields, the illumination corrections images may be subset
-dependent so there should be an illumination image for each subset.
+iillumination difference between the flat field and the objects.
+Like the flat fields, the iillumination corrections images may be subset
+dependent so there should be an iillumination image for each subset.
 
-The task which makes illumination correction images is \fBmkskycor\fR.
+The task which makes iillumination correction images is \fBmkskycor\fR.
 Some examples are
 
 .nf
@@ -516,36 +516,36 @@ Some examples are
     cl> mkskycor sky*.imh ""
 .fi
 
-In the first example the sky image "sky004" is used to make the illumination
+In the first example the sky image "sky004" is used to make the iillumination
 correction image "Illum004".  In the second example the sky images are
-converted to illumination correction images by specifying no output image
+converted to iillumination correction images by specifying no output image
 names.  Like \fBccdproc\fR if the input images have not been processed they
 are first processed automatically.
 
-To apply the illumination correction
+To apply the iillumination correction
 
 .nf
     cl> ccdproc *.imh ccdtype=object illumcor+ illum=Illum004
     cl> ccdproc *.imh ccdtype=object illumcor+ illum=sky*.imh
 .fi
 
-The illumination images could also be set using \fBeparam\fR or given
+The iillumination images could also be set using \fBeparam\fR or given
 on the command line.
 .sh
 4.3 Sky Flat Fields
 
-    You will notice that when you process images with an illumination
+    You will notice that when you process images with an iillumination
 correction you are dividing each image by a flat field calibration and
-an illumination correction.  If the illumination corrections are not
+an iillumination correction.  If the iillumination corrections are not
 done as a later step but at the same time as the rest of the processing
 one will get the same calibration by multiplying the flat field by
-the illumination correction and using this product alone as the
+the iillumination correction and using this product alone as the
 flat field.  Such an image is called a \fIsky flat\fR since it is
 a flat field which has been corrected to yield a flat sky when applied
 to the observations.  This approach has the advantage of one less
 calibration image and two less computations (scaling and dividing the
-illumination correction).  As an added short cut, rather than compute
-the illumination image with \fBmkskycor\fR and then multiplying, the
+iillumination correction).  As an added short cut, rather than compute
+the iillumination image with \fBmkskycor\fR and then multiplying, the
 task \fBmkskyflat\fR does all this in one step.  Thus, \fBmkskyflat\fR
 takes an input blank sky image, processes it if needed, determines the
 appropriate flat field (sky flats are also subset dependent) from the
@@ -561,22 +561,22 @@ input images are converted to sky flats are
     cl> mkskyflat sky*.imh ""
 .fi
 .sh
-4.4 Illumination Corrected Flat Fields
+4.4 Iillumination Corrected Flat Fields
 
-     A third method to account for illumination problems in the flat fields
+     A third method to account for iillumination problems in the flat fields
 is to remove the large scale pattern from the flat field itself.  This is
 useful if there are no reasonable blank sky calibration images and the
 astronomical exposures are evenly illuminated but the flat fields are not.
 This is done by smoothing the flat field images instead of blank sky
 images.  As with using the sky images there are two methods, creating
-an illumination correction to be applied as a separate step or fixing
+an iillumination correction to be applied as a separate step or fixing
 the original flat field.  The smoothing algorithm is
 the same as that used in the other tasks.  The tasks to make these types
 of corrections are \fBmkillumcor\fR and \fBmkillumflat\fR.  The usage
-is pretty much the same as the other illumination correction tasks
+is pretty much the same as the other iillumination correction tasks
 except that it is more reasonable to replace the original flat fields
 by the corrected flat fields when fixing the flat field.  Examples
-of an illumination correction and removing the illumination pattern
+of an iillumination correction and removing the iillumination pattern
 from the flat field are
 
 .nf
@@ -604,9 +604,9 @@ requires either an interactive display tool or a very clever task.
 Such tasks will also be added in the future.
 
      The task to make a fringe correction image is \fBmkfringecor\fR.
-the sky background is determined in exactly the same way as the illumination
+the sky background is determined in exactly the same way as the iillumination
 pattern, in fact the same sky image may be used for both the sky
-illumination and for the fringe correction.  The task works consistently
+iillumination and for the fringe correction.  The task works consistently
 with the "mk" tasks in that the input images are processed first if needed
 and then the output correction image is produced with the specified name
 or replaces the input image if no output image is specified.
@@ -661,7 +661,7 @@ Central Computer Services (NOAO-CCS).
 
      A more detailed description of the \fBccdred\fR package including
 a discussion of the design and some of the algorithms see \fIThe IRAF
-CCD Reduction Package -- CCDRED\fR" by F. Valdes.  This paper is available
+CCD Reduction Package -- CCDRED\fR by F. Valdes.  This paper is available
 from NOAO-CCS and appears in the proceedings of the Santa Cruz Summer
 Workshop in Astronomy and Astrophysics, \fIInstrumentation for Ground-Based
 Optical Astronomy: Present and Future\fR, edited by Lloyd B. Robinson and
@@ -688,9 +688,9 @@ where \fItopic\fR is one of the following.
   darkcombine - Combine and process dark count images
   flatcombine - Combine and process flat field images
   mkfringecor - Make fringe correction images from sky images
-   mkillumcor - Make flat field illumination correction images
-  mkillumflat - Make illumination corrected flat fields
-     mkskycor - Make sky illumination correction images
+   mkillumcor - Make flat field iillumination correction images
+  mkillumflat - Make iillumination corrected flat fields
+     mkskycor - Make sky iillumination correction images
     mkskyflat - Make sky corrected flat field images
 setinstrument - Set instrument parameters
   zerocombine - Combine and process zero level images

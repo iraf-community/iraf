@@ -1,21 +1,26 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <unistd.h>
 #include "bootlib.h"
 
 /* OS_WRITE -- Write to the output file.  If the output file is a text file
  * we must convert the binary input (text) stream to the record structured
  * stream required by the host.
  */
-os_write (fd, buf, nbytes)
-int	fd;			/* output file			*/
-char	*buf;			/* data to be written		*/
-int	nbytes;			/* num bytes to be written	*/
+int
+os_write (
+  int	fd,			/* output file			*/
+  char	*buf,			/* data to be written		*/
+  int	nbytes 			/* num bytes to be written	*/
+)
 {
 	register char	*ip;
 	register XCHAR	*op, *otop;
 	register int	ch, n;
-	int	nchars, status;
+	XINT	nchars, status, xfd=fd;
+	extern  int ZPUTTX();
+
 
 	if (osfiletype == BINARY_FILE)
 	    return (write (fd, buf, nbytes));
@@ -32,7 +37,7 @@ int	nbytes;			/* num bytes to be written	*/
 	    *op++ = ch = *ip++;
 	    if (ch == '\n' || op >= otop) {
 		nchars = op - text;
-		ZPUTTX (&fd, text, &nchars, &status);
+		ZPUTTX (&xfd, text, &nchars, &status);
 		op = txop = text;
 		if (status == XERR)
 		    return (ERR);

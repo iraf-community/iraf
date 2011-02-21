@@ -6,6 +6,8 @@ $checkin  libimfort.a lib$
 $exit
 
 libimfort.a:
+	#$set XFLAGS	= "$XFLAGS -/DBLD_KERNEL"
+	$set XFLAGS	= "$(XFLAGS) -/DBLD_KERNEL"
 	@db
 
 	bfio.x		imfort.h <config.h> <mach.h> <fio.h>

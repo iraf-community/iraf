@@ -28,8 +28,10 @@ int	fits, fitslen, sz_userarea, sz_gpbhdr, len_hdrmem
 long	totpix, mtime, ctime
 
 real	imgetr()
-int	fnroot(), strlen(), sizeof(), finfo(), imaccf()
+int	fnroot(), strlen(), finfo(), imaccf()
 errchk	stf_rfitshdr, stf_rgpb, open, realloc, imaddb, imaddi, imgetr
+
+include <szpixtype.inc>
 
 begin
 	call smark (sp)
@@ -111,7 +113,7 @@ begin
 	do i = 2, IM_NDIM(im)
 	    totpix = totpix * IM_LEN(im,i)
 
-	STF_SZGROUP(stf) = totpix * sizeof (IM_PIXTYPE(im)) +
+	STF_SZGROUP(stf) = totpix * pix_size[IM_PIXTYPE(im)] +
 	    STF_PSIZE(stf) / (SZB_CHAR * NBITS_BYTE)
 
 	# Write GPB related cards to the beginning of the IMIO user area.
@@ -134,9 +136,9 @@ begin
 	sz_userarea = sz_gpbhdr + fitslen + SZ_EXTRASPACE
 
 	IM_HDRLEN(im) = LEN_IMHDR +
-	    (sz_userarea - SZ_EXTRASPACE + SZ_STRUCT-1) / SZ_STRUCT
+	    (sz_userarea - SZ_EXTRASPACE + SZ_MII_INT-1) / SZ_MII_INT
 	len_hdrmem = LEN_IMHDR +
-	    (sz_userarea+1 + SZ_STRUCT-1) / SZ_STRUCT
+	    (sz_userarea+1 + SZ_MII_INT-1) / SZ_MII_INT
 
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	    IM_LENHDRMEM(im) = len_hdrmem

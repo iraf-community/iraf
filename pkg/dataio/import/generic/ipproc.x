@@ -34,7 +34,7 @@ begin
 	switch (optype) {
 	case TY_UBYTE:			nbytes_pix = 1
 	case TY_USHORT, TY_SHORT:	nbytes_pix = SZB_CHAR * SZ_SHORT
-	case TY_INT:			nbytes_pix = SZB_CHAR * SZ_INT
+	case TY_INT:			nbytes_pix = SZB_CHAR * SZ_INT32
 	case TY_LONG:			nbytes_pix = SZB_CHAR * SZ_LONG
 	case TY_REAL:			nbytes_pix = SZB_CHAR * SZ_REAL
 	case TY_DOUBLE:			nbytes_pix = SZB_CHAR * SZ_DOUBLE
@@ -239,23 +239,38 @@ begin
                     call bswap2 (Mems[data], 1, Mems[data], 1, 
 		        (totpix*(SZ_SHORT*SZB_CHAR)))
 	        }
+
 	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_SHORT)))
 
 	    case TY_INT:
 	        call ip_ageti (fd, data, totpix)
-                if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4) {
-                    call bswap4 (Memi[data], 1, Memi[data], 1, 
-		        (totpix*(SZ_INT*SZB_CHAR)))
+                if (and(swap, S_ALL) == S_ALL || and(swap, S_I4) == S_I4) {
+		    if (SZ_INT != SZ_INT32) {
+			call ipak32 (Memi[data], Memi[data], totpix)
+                        call bswap4 (Memi[data], 1, Memi[data], 1, 
+		            (totpix*(SZ_INT32*SZB_CHAR)))
+		    } else {
+                        call bswap4 (Memi[data], 1, Memi[data], 1, 
+		            (totpix*(SZ_INT*SZB_CHAR)))
+		    }
 	        }
-	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_INT)))
+
+	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_INT32)))
 
 	    case TY_LONG:
 	        call ip_agetl (fd, data, totpix)
-                if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4) {
-                    call bswap4 (Meml[data], 1, Meml[data], 1, 
-		        (totpix*(SZ_LONG*SZB_CHAR)))
+                if (and(swap, S_ALL) == S_ALL || and(swap, S_I4) == S_I4) {
+		    if (SZ_INT != SZ_INT32) {
+			call ipak32 (Meml[data], Meml[data], totpix)
+                        call bswap4 (Meml[data], 1, Meml[data], 1, 
+		            (totpix*(SZ_INT32*SZB_CHAR)))
+		    } else {
+                        call bswap4 (Meml[data], 1, Meml[data], 1, 
+		            (totpix*(SZ_INT*SZB_CHAR)))
+		    }
 	        }
-	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_LONG)))
+
+	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_INT32)))
 
 	    case TY_REAL:
 	        call ip_agetr (fd, data, totpix)
@@ -263,6 +278,7 @@ begin
                     call bswap4 (Memr[data], 1, Memr[data], 1, 
 		        (totpix*(SZ_REAL*SZB_CHAR)))
 	        }
+
 	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_REAL)))
 
 	    case TY_DOUBLE:
@@ -271,6 +287,7 @@ begin
                     call bswap8 (Memd[data], 1, Memd[data], 1, 
 		        (totpix*(SZ_DOUBLE*SZB_CHAR)))
 	        }
+
 	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_DOUBLE)))
 
 	    }
@@ -372,23 +389,38 @@ begin
                 call bswap2 (Mems[data], 1, Mems[data], 1, 
 		    (npix*(SZ_SHORT*SZB_CHAR)))
 	    }
+
 	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_SHORT))
 
 	case TY_INT:
 	    call ip_ageti (fd, data, npix)
             if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4) {
-                call bswap4 (Memi[data], 1, Memi[data], 1, 
-		    (npix*(SZ_INT*SZB_CHAR)))
+		    if (SZ_INT != SZ_INT32) {
+			call ipak32 (Memi[data], Memi[data], npix)
+                	call bswap4 (Memi[data], 1, Memi[data], 1, 
+		    	    (npix*(SZ_INT32*SZB_CHAR)))
+		    } else {
+                	call bswap4 (Memi[data], 1, Memi[data], 1, 
+		    	    (npix*(SZ_INT*SZB_CHAR)))
+		    }
 	    }
-	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_INT))
+
+	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_INT32))
 
 	case TY_LONG:
 	    call ip_agetl (fd, data, npix)
             if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4) {
-                call bswap4 (Meml[data], 1, Meml[data], 1, 
-		    (npix*(SZ_LONG*SZB_CHAR)))
+		    if (SZ_INT != SZ_INT32) {
+			call ipak32 (Meml[data], Meml[data], npix)
+                	call bswap4 (Meml[data], 1, Meml[data], 1, 
+		    	    (npix*(SZ_INT32*SZB_CHAR)))
+		    } else {
+                	call bswap4 (Meml[data], 1, Meml[data], 1, 
+		    	    (npix*(SZ_LONG*SZB_CHAR)))
+		    }
 	    }
-	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_LONG))
+
+	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_INT32))
 
 	case TY_REAL:
 	    call ip_agetr (fd, data, npix)
@@ -396,6 +428,7 @@ begin
                 call bswap4 (Memr[data], 1, Memr[data], 1, 
 		    (npix*(SZ_REAL*SZB_CHAR)))
 	    }
+
 	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_REAL))
 
 	case TY_DOUBLE:
@@ -404,6 +437,7 @@ begin
                 call bswap8 (Memd[data], 1, Memd[data], 1, 
 		    (npix*(SZ_DOUBLE*SZB_CHAR)))
 	    }
+
 	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_DOUBLE))
 
 	}

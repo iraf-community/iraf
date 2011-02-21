@@ -97,7 +97,7 @@ as long as you take a sufficient number of them, say 20-30.
 3) Twilight sky flats are necessary if you want to do photometry to better
 than 2%-3%, if you are doing surface photometry of extended objects,
 or if sky subtraction is critical. We suggest that everyone take sky flats
-since it is a good check of your dome flat illumination. For some CCDs it
+since it is a good check of your dome flat iillumination. For some CCDs it
 is better to use a sky flat to flatten your objects and this may depend
 upon the filters being used.
 It was found at the 0.9-m and 1.5-m telescopes that
@@ -157,7 +157,7 @@ frames, and the final image to check
 for potential problems.
 
 Having obtained the combined calibration images you should flatten your sky flat
-using the dome flat and examine the result for any significant illumination 
+using the dome flat and examine the result for any significant iillumination 
 variation. If these variations are significant they may be fit in order to
 correct your dome flat. 
 Fringing corrections may be
@@ -841,7 +841,7 @@ the image type [flat], the filter used in the observation
 At this level you should have the flats processed up through [OTZ] which
 means that the image has been [O]verscan subtracted, [T]rimmed, and
 [Z]ero subtracted. Additional codes for other operations in 'ccdproc'
-are [F]lat correction, [B]ad pixel correction, [I]llumination correction.
+are [F]lat correction, [B]ad pixel correction, [I]illumination correction.
 
 .nf
 			\fIccdproc for zero1\fR
@@ -856,7 +856,7 @@ are [F]lat correction, [B]ad pixel correction, [I]llumination correction.
      (\fIzerocor\fR = no)             Apply zero level correction?
      (\fIdarkcor\fR = no)             Apply dark count correction?
      (\fIflatcor\fR = no)             Apply flat field correction?
-    (illumcor = no)             Apply illumination correction?
+    (illumcor = no)             Apply iillumination correction?
    (fringecor = no)             Apply fringe correction?
      (readcor = no)             Convert zero level image to readout cor?
      (scancor = no)             Convert flat field image to scan correction?
@@ -867,7 +867,7 @@ are [F]lat correction, [B]ad pixel correction, [I]llumination correction.
         (\fIzero\fR = "zero1")        Zero level calibration image
         (\fIdark\fR = "dark1")        Dark count calibration image
         (\fIflat\fR = "")             Flat field images
-       (illum = "")             Illumination correction images
+       (illum = "")             Iillumination correction images
       (fringe = "")             Fringe correction images
   (minreplace = 1.)             Minimum flat field value
     (scantype = "shortscan")    Scan type (shortscan|longscan)
@@ -895,7 +895,7 @@ are [F]lat correction, [B]ad pixel correction, [I]llumination correction.
      (\fIzerocor\fR = yes)            Apply zero level correction?
      (\fIdarkcor\fR = no)             Apply dark count correction?
      (\fIflatcor\fR = no)             Apply flat field correction?
-    (illumcor = no)             Apply illumination correction?
+    (illumcor = no)             Apply iillumination correction?
    (fringecor = no)             Apply fringe correction?
      (readcor = no)             Convert zero level image to readout corr?
      (scancor = no)             Convert flat field image to scan correction?
@@ -906,7 +906,7 @@ are [F]lat correction, [B]ad pixel correction, [I]llumination correction.
         (\fIzero\fR = "zero1")        Zero level calibration image
         (\fIdark\fR = "dark1")        Dark count calibration image
         (\fIflat\fR = "")             Flat field images
-       (illum = "")             Illumination correction images
+       (illum = "")             Iillumination correction images
       (fringe = "")             Fringe correction images
   (minreplace = 1.)             Minimum flat field value
     (scantype = "shortscan")    Scan type (shortscan|longscan)
@@ -934,7 +934,7 @@ are [F]lat correction, [B]ad pixel correction, [I]llumination correction.
      (\fIzerocor\fR = yes)            Apply zero level correction?
      (\fIdarkcor\fR = yes)            Apply dark count correction?
      (\fIflatcor\fR = no)             Apply flat field correction?
-    (illumcor = no)             Apply illumination correction?
+    (illumcor = no)             Apply iillumination correction?
    (fringecor = no)             Apply fringe correction?
      (readcor = no)             Convert zero level image to readout corr?
      (scancor = no)             Convert flat field image to scan correction?
@@ -945,7 +945,7 @@ are [F]lat correction, [B]ad pixel correction, [I]llumination correction.
         (\fIzero\fR = "zero1")        Zero level calibration image
         (\fIdark\fR = "dark1")        Dark count calibration image
         (\fIflat\fR = "")             Flat field images
-       (illum = "")             Illumination correction images
+       (illum = "")             Iillumination correction images
       (fringe = "")             Fringe correction images
   (minreplace = 1.)             Minimum flat field value
     (scantype = "shortscan")    Scan type (shortscan|longscan)
@@ -965,10 +965,10 @@ are [F]lat correction, [B]ad pixel correction, [I]llumination correction.
 .bp
 .ls \fI3.6 Preparing a Final Flat Field\fR
 
-Next we want to check the illumination of the flat by applying it to the sky
+Next we want to check the iillumination of the flat by applying it to the sky
 flat. Load the 'imred' and 'ccdred' packages if they are
 not already loaded.
-There is no tried and true method for testing the illumination of
+There is no tried and true method for testing the iillumination of
 the sky flats except for applying them on a long exposure taken in the same
 filter and implotting it or doing image statistics.
 
@@ -978,7 +978,7 @@ that the dark is
 necessary for the reductions. Be sure that the images you are using for
 the flat field division have the proper filter identification.
 First edit the parameters for 'ccdproc', and then run
-this task to process your skys to see if the illumination of the dome
+this task to process your skys to see if the iillumination of the dome
 flat is uniform;
 
 .nf
@@ -999,7 +999,7 @@ using 'implot' and plotting some lines or a group of lines,
 	    q
 .fi
 
-Ideally if the illumination was uniform, sky1R should not show any variation.
+Ideally if the iillumination was uniform, sky1R should not show any variation.
 In plotting several lines together, you may get a small slope (see figure 4).
 If you see any    
 variations, including a slope even near the edges of the image, then you must
@@ -1046,7 +1046,7 @@ Now you can process your images.
      (\fIzerocor\fR = yes)            Apply zero level correction?
      (\fIdarkcor\fR = yes)            Apply dark count correction?
      (\fIflatcor\fR = yes)            Apply flat field correction?
-    (illumcor = no)             Apply illumination correction?
+    (illumcor = no)             Apply iillumination correction?
    (fringecor = no)             Apply fringe correction?
      (readcor = no)             Convert zero level image to readout corr?
      (scancor = no)             Convert flat field image to scan correction?
@@ -1057,7 +1057,7 @@ Now you can process your images.
         (\fIzero\fR = "zero1")        Zero level calibration image
         (\fIdark\fR = "dark1")        Dark count calibration image
         (\fIflat\fR = "flat1*imh")    Flat field images
-       (illum = "")             Illumination correction images
+       (illum = "")             Iillumination correction images
       (fringe = "")             Fringe correction images
   (minreplace = 1.)             Minimum flat field value
     (scantype = "shortscan")    Scan type (shortscan|longscan)
@@ -1162,7 +1162,7 @@ where the [OTZF] code reveals the degree of processing of the images.
      (\fIzerocor\fR = yes)            Apply zero level correction?
      (\fIdarkcor\fR = yes)            Apply dark count correction?
      (\fIflatcor\fR = yes)            Apply flat field correction?
-    (illumcor = no)             Apply illumination correction?
+    (illumcor = no)             Apply iillumination correction?
    (fringecor = no)             Apply fringe correction?
      (readcor = no)             Convert zero level image to readout corr?
      (scancor = no)             Convert flat field image to scan correction?
@@ -1173,7 +1173,7 @@ where the [OTZF] code reveals the degree of processing of the images.
         (\fIzero\fR = "zero1")        Zero level calibration image
         (\fIdark\fR = "dark1")        Dark count calibration image
         (\fIflat\fR = "finalflat1*imh")    Flat field images
-       (illum = "")             Illumination correction images
+       (illum = "")             Iillumination correction images
       (fringe = "")             Fringe correction images
   (minreplace = 1.)             Minimum flat field value
     (scantype = "shortscan")    Scan type (shortscan|longscan)
@@ -1274,7 +1274,7 @@ to be used. If you plan to do photometry in IRAF see section VI of this manual.
      (\fIzerocor\fR = yes)            Apply zero level correction?
      (\fIdarkcor\fR = yes)            Apply dark count correction?
      (\fIflatcor\fR = yes)            Apply flat field correction?
-    (illumcor = no)             Apply illumination correction?
+    (illumcor = no)             Apply iillumination correction?
    (fringecor = no)             Apply fringe correction?
      (readcor = no)             Convert zero level image to readout corr?
      (scancor = no)             Convert flat field image to scan correction?
@@ -1285,7 +1285,7 @@ to be used. If you plan to do photometry in IRAF see section VI of this manual.
         (\fIzero\fR = "zero1")        Zero level calibration image
         (\fIdark\fR = "dark1")        Dark count calibration image
         (\fIflat\fR = "finalflat1*imh")    Flat field images
-       (illum = "")             Illumination correction images
+       (illum = "")             Iillumination correction images
       (fringe = "")             Fringe correction images
   (minreplace = 1.)             Minimum flat field value
     (scantype = "shortscan")    Scan type (shortscan|longscan)

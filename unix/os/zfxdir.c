@@ -12,14 +12,18 @@
  * returned if there is no directory prefix.  The status value is the number
  * of characters in the output string.
  */
-ZFXDIR (osfn, osdir, maxch, nchars)
-XCHAR	*osfn;			/* OS filename		[NOT PACKED]	*/
-XCHAR	*osdir; 		/* receives osdir	[NOT PACKED]	*/
-XINT	*maxch, *nchars;
+int
+ZFXDIR (
+  XCHAR	 *osfn,			/* OS filename		[NOT PACKED]	*/
+  XCHAR	 *osdir, 		/* receives osdir	[NOT PACKED]	*/
+  XINT	 *maxch, 
+  XINT   *nchars
+)
 {
 	register XCHAR	*ip, *op;
 	register int	n = *maxch;
 	XCHAR	*last_slash;
+
 
 	for (ip=osfn;  *ip == ' ';  ip++)
 	    ;
@@ -42,4 +46,6 @@ XINT	*maxch, *nchars;
 
 	*op = XEOS;
 	*nchars = op - osdir;
+
+	return (XOK);
 }

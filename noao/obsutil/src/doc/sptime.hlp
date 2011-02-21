@@ -121,7 +121,7 @@ Power law index for the power law source spectrum.
 
 
 The following parameters are observational parameters describing either
-the observing conditions or spectrorgraph setup.
+the observing conditions or spectrograph setup.
 .ls seeing = 1. (1.) [spectrograph]
 The full width at half maximum (FWHM) of a point source in arc seconds.
 .le
@@ -434,7 +434,11 @@ other orders are given by table parameters "effN", where N is the order.
 Title for disperser.
 .le
 .ls disptype = "" ("grating") [disperser|spectrograph]
-Type of disperser element.  The chocies are "grating" and "grism".
+Type of disperser element.  The chocies are "grating", "grism", or "generic".
+The generic setting will simply use the desired central wavelength and
+dispersion without a grating or grism model.  One effect of this is that
+the mapping between detector pixel and wavelength is linear; i.e. a constant
+dispersion per pixel.
 .le
 .ls gmm = INDEF (300.) [disperser|spectrograph]
 Ruling in lines per mm.  If not specified it will be derived from the
@@ -483,7 +487,12 @@ other orders are given by table parameters "xeffN", where N is the order.
 Title for crossdisperser.
 .le
 .ls disptype = "" ("grating") [xdisperser|spectrograph]
-Type of crossdisperser element.  The chocies are "grating" and "grism".
+Type of crossdisperser element.  The chocies are "", "grating", "grism",
+or "generic".  The empty string eliminates use of a cross disperser.
+The generic setting will simply use the desired central wavelength and
+dispersion without a grating or grism model.  One effect of this is that
+the mapping between detector pixel and wavelength is linear; i.e. a constant
+dispersion per pixel.
 .le
 .ls gmm = INDEF (INDEF) [xdisperser|spectrograph]
 Ruling in lines per mm.  If not specified it will be derived from the
@@ -574,7 +583,7 @@ If "yes" then no check will be made for other orders.
 
 .ls collimator = "" (1.) [spectrograph]
 Collimator transmission table.  The transmission is a function of
-wavlength in Angstroms.  If no collimator is specified then a unit
+wavelength in Angstroms.  If no collimator is specified then a unit
 transmission is used.
 .le
 .ls coltitle = "" [collimator|spectrograph]
@@ -739,7 +748,7 @@ set values have precedence.   But if the values are "" for string  parameters
 or INDEF for numeric parameters the values are found either in the
 spectrograph table or in a table that is associated with the parameter.
 
-Therefore table files provide for interchangable components, each with
+Therefore table files provide for interchangeable components, each with
 their own transmission curves, and for organizing parameters for different
 instruments.  Note that a table file may contain only parameters, only
 a table, or both.
@@ -812,7 +821,7 @@ in fractional transmission or DQE.  There is a special parameter,
 column.  This would mainly be used to provide tables in percent rather
 than fraction.
 
-The indepdent variable columns depend on the type of table.  Most tables
+The independent variable columns depend on the type of table.  Most tables
 are a function of wavelength.  Currently wavelengths must be in Angstroms.
 
 The types of tables and the units of the columns are listed below.

@@ -15,6 +15,7 @@ procedure t_fit1d ()
 
 int	listin				# Input image list
 int	listout				# Output image list
+int	listbpm				# Bad pixel mask list
 bool	interactive			# Interactive?
 
 char	sample[SZ_LINE]			# Sample ranges
@@ -29,7 +30,8 @@ int	axis				# Image axis to fit
 int	ntype				# Type of output
 char	input[SZ_LINE]			# Input image
 char	output[SZ_FNAME]		# Output image
-pointer	in, out				# IMIO pointers
+char	bpm[SZ_FNAME]			# Bad pixel mask
+pointer	in, out, bp			# IMIO pointers
 pointer	ic				# ICFIT pointer
 pointer	gt				# GTOOLS pointer
 
@@ -50,6 +52,14 @@ begin
 	    call imtclose (listin)
 	    call imtclose (listout)
 	    call error (0, "Input and output image lists do not match")
+	}
+	call clgstr ("bpm", input, SZ_LINE)
+	listbpm = imtopen (input)
+	if (imtlen (listbpm) > 1 && imtlen (listin) != imtlen (listbpm)) {
+	    call imtclose (listin)
+	    call imtclose (listout)
+	    call imtclose (listbpm)
+	    call error (0, "Input and mask lists do not match")
 	}
 
 	# Get task parameters.
@@ -89,17 +99,22 @@ begin
 
 	# Fit the lines in each input image.
 
+	bpm[1] = EOS
 	while ((imtgetim (listin, input, SZ_LINE) != EOF) &&
 	    (imtgetim (listout, output, SZ_FNAME) != EOF)) {
+	    if (imtgetim (listbpm, bpm, SZ_FNAME) == EOF)
+		;
 
-	    iferr (call f1d_immap (input, output, ntype, in, out, same)) {
+	    iferr (call f1d_immap (input,output,bpm,ntype,in,out,bp,same)) {
 		call erract (EA_WARN)
 		next
 	    }
-	    call f1d_fit1d (in, out, ic, gt, input, axis, ntype, interactive)
+	    call f1d_fit1d (in,out,bp,ic,gt,input,axis,ntype,interactive)
 	    call imunmap (in)
 	    if (!same)
 		call imunmap (out)
+	    if (bp != NULL)
+		call yt_pmunmap (bp)
 	}
 
 	call ic_closer (ic)
@@ -113,10 +128,11 @@ end
 # for each line or column and create an output image.  If the interactive flag
 # is set then set the fitting parameters interactively.
 
-procedure f1d_fit1d (in, out, ic, gt, title, axis, ntype, interactive)
+procedure f1d_fit1d (in, out, bp, ic, gt, title, axis, ntype, interactive)
 
 pointer	in				# IMIO pointer for input image
 pointer	out				# IMIO pointer for output image
+pointer	bp				# IMIO pointer for bad pixel mask
 pointer	ic				# ICFIT pointer
 pointer	gt				# GTOOLS pointer
 char	title[ARB]			# Title
@@ -146,11 +162,9 @@ begin
 	nx = IM_LEN (in, axis)
 	call smark (sp)
 	call salloc (x, nx, TY_REAL)
-	call salloc (wts, nx, TY_REAL)
 
 	do i = 1, nx
 	    Memr[x+i-1] = i
-	call amovkr (1., Memr[wts], nx)
 
 	call ic_putr (ic, "xmin", Memr[x])
 	call ic_putr (ic, "xmax", Memr[x+nx-1])
@@ -166,13 +180,13 @@ begin
 
 	    i = strlen (title)
 	    indata = NULL
-	    while (f1d_getline (ic, gt, in, axis, title, indata) != EOF) {
+	    while (f1d_getline (ic,gt,in,bp,axis,title,indata,wts) != EOF) {
 		title[i + 1] = EOS
 	        call icg_fit (ic, gp, "cursor", gt, cv, Memr[x], Memr[indata],
 		    Memr[wts], nx)
-		call amovkr (1., Memr[wts], nx)
 	    }
 	    call mfree (indata, TY_REAL)
+	    call mfree (wts, TY_REAL)
 	    call gclose (gp)
 	}
 
@@ -180,7 +194,7 @@ begin
 
 	new = YES
 
-	while (f1d_getdata (in, out, axis, MAXBUF, indata, outdata) != EOF) {
+	while (f1d_getdata (in,out,bp,axis,MAXBUF,indata,outdata,wts) != EOF) {
 
 	    call ic_fit (ic, cv, Memr[x], Memr[indata], Memr[wts],
 		nx, new, YES, new, new)
@@ -204,19 +218,22 @@ begin
 	}
 
 	call cvfree (cv)
+	call mfree (wts, TY_REAL)
 	call sfree (sp)
 end
 
 
 # F1D_IMMAP -- Map images for fit1d.
 
-procedure f1d_immap (input, output, ntype, in, out, same)
+procedure f1d_immap (input, output, bpm, ntype, in, out, bp, same)
 
 char	input[ARB]		# Input image
 char	output[ARB]		# Output image
+char	bpm[ARB]		# Bad pixel mask
 int	ntype			# Type of fit1d output
 pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
+pointer	bp			# Mask IMIO pointer
 bool	same			# Same image?
 
 int	i
@@ -224,8 +241,8 @@ pointer	sp, iroot, isect, oroot, osect, line, data
 
 bool	streq()
 int	imaccess(), impnlr()
-pointer	immap()
-errchk	immap
+pointer	immap(), yt_pmmap()
+errchk	immap, yt_pmmap
 
 begin
 	# Get the root name and section of the input image.
@@ -266,7 +283,7 @@ begin
 	    call imunmap (out)
 	}
 
-	# Map the input and output images.  If the output image has a section
+	# Map the images.  If the output image has a section
 	# then use it.  If the input image has a section and the output image
 	# does not then add the image section to the output image.  Finally
 	# check the input and output images have the same size.
@@ -296,24 +313,29 @@ begin
 		call error (0, "Input and output images have different sizes")
 	    }
 
+	bp = yt_pmmap (bpm, in, Memc[iroot], SZ_FNAME)
+
 	call sfree (sp)
 end
 
 
 # F1D_GETDATA -- Get a line of image data.
 
-int procedure f1d_getdata (in, out, axis, maxbuf, indata, outdata)
+int procedure f1d_getdata (in, out, bp, axis, maxbuf, indata, outdata, wts)
 
 pointer	in			# Input IMIO pointer
 pointer	out			# Output IMIO pointer
+pointer	bp			# Bad pixel mask IMIO pointer
 int	axis			# Image axis
 int	maxbuf			# Maximum buffer size for column axis
 pointer	indata			# Input data pointer
 pointer	outdata			# Output data pointer
+pointer	wts			# Weights pointer
 
 int	i, index, last_index, col1, col2, nc, ncols, nlines, ncols_block
-pointer	inbuf, outbuf, ptr
-pointer	imgl1r(), impl1r(), imgl2r(), impl2r(), imgs2r(), imps2r()
+pointer	inbuf, outbuf, wtbuf, ptr
+pointer	imgl1r(), imgl1s(), impl1r(), imgl2r(), imgl2s(), impl2r()
+pointer	imgs2r(), imgs2s(), imps2r()
 data	index/0/
 
 begin
@@ -333,6 +355,8 @@ begin
 	    switch (axis) {
 	    case 1:
 		last_index = nlines
+
+	        call malloc (wts, ncols, TY_REAL)
 	    case 2:
 		last_index = ncols
 	        ncols_block = max (1, min (ncols, maxbuf / nlines))
@@ -340,13 +364,17 @@ begin
 
 	        call malloc (indata, nlines, TY_REAL)
 	        call malloc (outdata, nlines, TY_REAL)
+	        call malloc (wts, nlines, TY_REAL)
 	    }
 	}
 
 	# Finish up if the last vector has been done.
 
 	if (index > last_index) {
-	    if (axis == 2) {
+	    switch (axis) {
+	    case 1:
+	        call mfree (wts, TY_REAL)
+	    case 2:
 	        ptr = outbuf + index - 1 - col1
 	        do i = 1, nlines {
 		    Memr[ptr] = Memr[outdata+i-1]
@@ -355,6 +383,7 @@ begin
 
 	        call mfree (indata, TY_REAL)
 	        call mfree (outdata, TY_REAL)
+	        call mfree (wts, TY_REAL)
 	    }
 
 	    index = 0
@@ -365,12 +394,35 @@ begin
 
 	switch (axis) {
 	case 1:
+	    ncols = IM_LEN(in,1)
 	    if (IM_NDIM (in) == 1) {
 		indata = imgl1r (in)
 		outdata = impl1r (out)
+		if (bp == NULL)
+		    call amovkr (1., Memr[wts], ncols)
+		else {
+		    wtbuf = imgl1s (bp)
+		    do i = 0, ncols-1 {
+		        if (Mems[wtbuf+i] == 0)
+			    Memr[wts+i] = 1.
+			else
+			    Memr[wts+i] = 0.
+		    }
+		}
 	    } else {
 		indata = imgl2r (in, index)
 		outdata = impl2r (out, index)
+		if (bp == NULL)
+		    call amovkr (1., Memr[wts], ncols)
+		else {
+		    wtbuf = imgl2s (bp, index)
+		    do i = 0, ncols-1 {
+		        if (Mems[wtbuf+i] == 0)
+			    Memr[wts+i] = 1.
+			else
+			    Memr[wts+i] = 0.
+		    }
+		}
 	    }
 	case 2:
 	    if (index > 1) {
@@ -386,13 +438,28 @@ begin
 		col2 = min (ncols, col1 + ncols_block - 1)
 		inbuf = imgs2r (in, col1, col2, 1, nlines)
 		outbuf = imps2r (out, col1, col2, 1, nlines)
+		if (bp != NULL)
+		    wtbuf = imgs2s (bp, col1, col2, 1, nlines)
 		nc = col2 - col1 + 1
 	    }
 
 	    ptr = inbuf + index - col1
-	    do i = 1, nlines {
-		Memr[indata+i-1] = Memr[ptr]
+	    do i = 0, nlines-1 {
+		Memr[indata+i] = Memr[ptr]
 		ptr = ptr + nc
+	    }
+
+	    if (bp == NULL)
+		call amovkr (1., Memr[wts], nlines)
+	    else {
+		ptr = wtbuf + index - col1
+		do i = 0, nlines-1 {
+		    if (Mems[ptr] == 0)
+			Memr[wts+i] = 1.
+		    else
+			Memr[wts+i] = 0.
+		    ptr = ptr + nc
+		}
 	    }
 	}
 
@@ -404,20 +471,22 @@ end
 # when the user enters EOF or CR.  Default is 1 and the out of bounds
 # requests are silently limited to the nearest in edge.
 
-int procedure f1d_getline (ic, gt, im, axis, title, data)
+int procedure f1d_getline (ic, gt, im, bp, axis, title, data, wts)
 
 pointer	ic			# ICFIT pointer
 pointer	gt			# GTOOLS pointer
-pointer	im			# IMIO pointer
+pointer	im			# IMIO pointer input image
+pointer	bp			# IMIO pointer for bad pixel mask
 int	axis			# Image axis
 char	title[ARB]		# Title
 pointer	data			# Image data
+pointer	wts			# Weights
 
-pointer	x
+pointer	x, wtbuf
 char	line[SZ_LINE]
 int	i, j, stat, imlen
 int	getline(), nscan()
-pointer	imgl1r()
+pointer	imgl1r(), imgl1s()
 data	stat/EOF/
 
 begin
@@ -430,8 +499,21 @@ begin
 	    	    call pargstr (IM_TITLE(im))
 		call gt_sets (gt, GTTITLE, title)
 		call mfree (data, TY_REAL)
-		call malloc (data, IM_LEN(im, 1), TY_REAL)
-		call amovr (Memr[imgl1r(im)], Memr[data], IM_LEN(im, 1))
+		imlen = IM_LEN(im,1)
+		call malloc (data, imlen, TY_REAL)
+		call amovr (Memr[imgl1r(im)], Memr[data], imlen)
+		call malloc (wts, imlen, TY_REAL)
+		if (bp == NULL)
+		    call amovkr (1., Memr[wts], imlen)
+		else {
+		    wtbuf = imgl1s (bp)
+		    do i = 0, imlen-1 {
+		        if (Mems[wtbuf+i] == 0)
+			    Memr[wts+i] = 1.
+			else
+			    Memr[wts+i] = 0.
+		    }
+		}
 		stat = OK
 	    } else
 		stat = EOF
@@ -483,13 +565,30 @@ begin
 
 	call gt_sets (gt, GTTITLE, title)
 
+	call malloc (wts, imlen, TY_REAL)
 	switch (axis) {
 	case 1:
 	    call ic_pstr (ic, "xlabel", "Column")
-	    call xt_21imavg (im, axis, 1, IM_LEN(im, 1), i, j, x, data, imlen)
+	    call xt_21imavg (im, axis, 1, IM_LEN(im,1), i, j, x, data, imlen)
+	    if (bp != NULL)
+		call xt_21imsum (bp, axis, 1, IM_LEN(im,1), i, j, x, wts, imlen)
 	case 2:
 	    call ic_pstr (ic, "xlabel", "Line")
-	    call xt_21imavg (im, axis, i, j, 1, IM_LEN(im, 2), x, data, imlen)
+	    call xt_21imavg (im, axis, i, j, 1, IM_LEN(im,2), x, data, imlen)
+	    if (bp != NULL)
+		call xt_21imsum (bp, axis, i, j, 1, IM_LEN(im,2), x, wts, imlen)
+	}
+	if (bp == NULL) {
+	    call mfree (wts, TY_REAL)
+	    call malloc (wts, imlen, TY_REAL)
+	    call amovkr (1., Memr[wts], imlen)
+	} else {
+	    do i = 0, imlen-1 {
+		if (Memr[wts+i] == 0.)
+		    Memr[wts+i] = 1.
+		else
+		    Memr[wts+i] = 0.
+	    }
 	}
 	call mfree (x, TY_REAL)
 

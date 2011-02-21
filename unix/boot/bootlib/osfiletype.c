@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <strings.h>
 #define import_spp
 #include <iraf.h>
 
@@ -16,6 +17,8 @@ char *binextn[] = {		/* Known binary file extensions */
 	".o",
 	".e",
 	".a",
+	".so",
+	".pyc",
 	NULL
 };
 
@@ -23,20 +26,41 @@ char *srcextn[] = {		/* Known source file extensions */
 	".x",
 	".h",
 	".f",
+	".f77",
+	".f90",
 	".s",
+	".c",
+	".cpp",
 	".hlp",
 	".mip",
+	".imh",
+	".pix",
+	".gki",
+	".vdm",
 	".fits",
 	".fit",
+	".ftz",
 	".pl",
 	".gif",
 	".jpeg",
 	".jpg",
 	".tiff",
 	".tif",
+	".png",
 	".gz",
+	".tar",
+	".jar",
+	".java",
+	".py",
+	".pdf",
+	".ps",
+	".hqx",
+	".std",
 	NULL
 };
+
+extern 	int  os_access (char *fname, int mode, int type);
+
 
 
 /* OS_FILETYPE -- Determine the type of a file.  If the file has one of the
@@ -44,12 +68,15 @@ char *srcextn[] = {		/* Known source file extensions */
  * known binary file extension we assume it is a binary file; otherwise we call
  * os_access to determine the file type.
  */
-os_filetype (fname)
-char	*fname;			/* name of file to be examined	*/
+int
+os_filetype (
+  char	*fname			/* name of file to be examined	*/
+)
 {
 	register char	*ip, *ep;
 	register int	ch, i;
 	char	*extn;
+
 
 	/* Get filename extension.
 	 */
@@ -68,13 +95,13 @@ char	*fname;			/* name of file to be examined	*/
 	    /* Known source file extension? */
 	    for (i=0;  (ep = srcextn[i]);  i++)
 		if (*(ep+1) == ch)
-		    if (strcmp (ep, extn) == 0)
+		    if (strcasecmp (ep, extn) == 0)
 			return (TEXT_FILE);
 
 	    /* Known binary file extension? */
 	    for (i=0;  (ep = binextn[i]);  i++)
 		if (*(ep+1) == ch)
-		    if (strcmp (ep, extn) == 0)
+		    if (strcasecmp (ep, extn) == 0)
 			return (BINARY_FILE);
 	}
 

@@ -17,14 +17,15 @@ int	npix			#I number of pixels in buffer
 int	pixtype			#I input pixel datatype
 
 int	nbytes, nchars
-int	sizeof()
 errchk	syserr
+
+include <szpixtype.inc>
 
 begin
 	### Possibly the MII conversion routines should be used here as
 	### they handle all these datatypes (except maybe ushort).
 
-	nchars = npix * sizeof (pixtype)
+	nchars = npix * pix_size[pixtype]
 	nbytes = nchars * SZB_CHAR
 
 	switch (pixtype) {

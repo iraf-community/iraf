@@ -59,7 +59,7 @@ begins in column 11. Comments to the parameter may follow a "/" after
 the value field.  The value type code is as follows:
 .RS
 .IP SX
-This is a sexigesimal string of the form '12:34:56   ' where the first
+This is a sexagesimal string of the form '12:34:56   ' where the first
 quote appears in column 11 and the last in column 30.
 .IP R
 This is a floating point ("real") value beginning in column 11 and
@@ -173,7 +173,7 @@ value_start	T{The starting column number at which the string describing the
 value of the parameter starts in the header. T}
 
 type	T{The format type of the parameter: integer, real, string, boolean,
-sexigesimal. T}
+sexagesimal. T}
 
 conversion	T{If the format type is string, a further conversion may 
 optionally be made to one of the formats listed under type. T}

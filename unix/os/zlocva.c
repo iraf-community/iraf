@@ -13,9 +13,12 @@
  * The transformation from a machine address into a "location" is machine
  * dependent, and is given by the macro ADDR_TO_LOC defined in kernel.h.
  */
-ZLOCVA (variable, location)
-XCHAR	*variable;
-XINT	*location;
+int
+ZLOCVA (
+  XCHAR	*variable,
+  XINT	*location
+)
 {
 	*location = ADDR_TO_LOC (variable);
+	return (XOK);
 }

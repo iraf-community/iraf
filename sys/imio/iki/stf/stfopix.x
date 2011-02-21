@@ -33,9 +33,11 @@ int	pfd, sz_gpb, group, i
 pointer	stf, o_stf, o_im, ua, gpb
 long	sz_pixfile, pixoff, totpix, offset
 
-int	open(), sizeof()
+int	open()
 errchk	open, fseti, falloc, seek, syserrs, imioff, calloc
 errchk	write
+
+include <szpixtype.inc>
 
 begin
 	status = OK
@@ -180,7 +182,7 @@ begin
 		do i = 2, IM_NDIM(im)
 		    totpix = totpix * IM_LEN(im,i)
 
-		STF_SZGROUP(stf) = totpix * sizeof (IM_PIXTYPE(im)) +
+		STF_SZGROUP(stf) = totpix * pix_size[IM_PIXTYPE(im)] +
 		    STF_PSIZE(stf) / (SZB_CHAR * NBITS_BYTE)
 	    }
 

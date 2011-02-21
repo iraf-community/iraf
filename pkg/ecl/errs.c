@@ -9,9 +9,6 @@
 #define import_knames
 #define	import_xnames
 #define	import_stdarg
-/*
-#include <stdarg.h>
-*/
 #include <iraf.h>
 
 #include "config.h"
@@ -23,6 +20,8 @@
 #include "errs.h"
 #include "grammar.h"
 #include "construct.h"
+#include "proto.h"
+
 
 /*
  * ERRS -- When a runtime operation detects an error, it calls error with an
@@ -120,28 +119,15 @@ extern  char *onerr_handler;
  * which task aborted.
  */
 
-
-#ifdef USE_STDARG
+void
 cl_error (int errtype, char *diagstr, ...)
-#else
-cl_error (va_alist)
-va_dcl
-#endif
 {
 	va_list	args;
 	register struct task *tp;
 	static	int nfatal = 0;
 	static	int break_locks = 1;
 
-#ifdef USE_STDARG
 	va_start (args, diagstr);
-#else
-	int errtype;
-	char *diagstr;
-	va_start (args);
-	errtype = va_arg (args, int);
-	diagstr = va_arg (args, char *);
-#endif
 
         /* (Re)-initialize the error action.
          */
@@ -198,7 +184,7 @@ va_dcl
 	XER_RESET();	/* TODO: move into LIBC interface */
 
 	/* Clear terminal raw mode if still set. */
-	c_fseti (STDIN, F_RAW, NO);
+	c_fseti ((XINT)STDIN, F_RAW, NO);
 
 	if (firstask->t_flags & T_BATCH)
 	    eprintf ("\n[%d] ", bkgno);
@@ -359,7 +345,8 @@ va_dcl
                     if (!*act) break;
 #define NEXT_WHITE  while (*act != ' ' && *act != '\t' && *act != '\0') act++;
 
-erract_init ()
+void 
+erract_init (void)
 {
 	char *act, *envget();
 	char opt[SZ_LINE];

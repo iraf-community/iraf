@@ -17,9 +17,11 @@ extern	unsigned VSHLIB[], VSHEND;	/* shared library descriptor */
  * integer value.  A subsequent call to one of the ZCALL primitives is used
  * to call the procedure.
  */
-ZLOCPR (proc, o_epa)
-PFI	proc;			/* procedure for which we desire address */
-XINT	*o_epa;			/* entry point address */
+int
+ZLOCPR (
+  PFI	proc,			/* procedure for which we desire address */
+  XINT	*o_epa			/* entry point address */
+)
 {
 	register unsigned *epa = (unsigned *) proc;
 	*o_epa = (XINT) epa;
@@ -27,7 +29,7 @@ XINT	*o_epa;			/* entry point address */
 #ifdef SUNOS
 	/* Return immediately if the shared library is not in use. */
 	if (VSHLIB[0] == 0)
-	    return;
+	    return (XOK);
 
 	/* If the shared library is in use and the reference procedure is
 	 * a transfer vector, return the address of the actual function.
@@ -36,7 +38,7 @@ XINT	*o_epa;			/* entry point address */
 	 * library image and the client process.
 	 */
 	if (epa < VSHLIB || epa >= (unsigned *)&VSHEND)
-	    return;
+	    return (XOK);
 
 	/* Disassemble the JMP instruction in the transfer vector to get the
 	 * address of the referenced procedure in the shared library. [MACHDEP]
@@ -54,4 +56,6 @@ XINT	*o_epa;			/* entry point address */
 #endif
 
 #endif
+
+	return (XOK);
 }

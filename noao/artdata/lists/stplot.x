@@ -656,7 +656,7 @@ begin
 	call gt_plot (gd, gt, Memr[hx], Memr[hgm], nbins)
 	call gline (gd, mmin, Memr[hgm], Memr[hx], Memr[hgm])
 	call gline (gd, Memr[hx+nbins-1], Memr[hgm+nbins-1], mval,
-	    memr[hgm+nbins-1])
+	    Memr[hgm+nbins-1])
 
 	call sfree (sp)
 end

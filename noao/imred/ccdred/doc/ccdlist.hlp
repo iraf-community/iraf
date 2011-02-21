@@ -48,7 +48,7 @@ performed on the image are given by the following single letter codes.
 	Z - Zero level subtraction
 	D - Dark count subtraction
 	F - Flat field calibration
-	I - Illumination correction
+	I - Iillumination correction
 	Q - Fringe correction
 .fi
 

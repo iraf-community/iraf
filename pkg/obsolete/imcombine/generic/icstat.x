@@ -29,7 +29,9 @@ int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp, imgnls()
-short	ic_modes(), asums()
+short	ic_modes()
+real    asums()
+
 
 include	"../icombine.com"
 
@@ -246,7 +248,9 @@ int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp, imgnli()
-int	ic_modei(), asumi()
+int	ic_modei()
+real    asumi()
+
 
 include	"../icombine.com"
 
@@ -463,7 +467,9 @@ int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp, imgnlr()
-real	ic_moder(), asumr()
+real	ic_moder()
+real    asumr()
+
 
 include	"../icombine.com"
 
@@ -678,7 +684,9 @@ int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp, imgnld()
-double	ic_moded(), asumd()
+double	ic_moded()
+double  asumd()
+
 
 include	"../icombine.com"
 
@@ -869,3 +877,4 @@ begin
 
 	return (mode)
 end
+

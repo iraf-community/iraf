@@ -22,9 +22,11 @@ begin
 	    bp = BD_BUFPTR(bdes)
 
 	    # Convert datatype of pixels, if necessary, and flush buffer.
-	    if (IM_PIXTYPE(imdes) != TY_LONG)
+	    if (IM_PIXTYPE(imdes) != TY_LONG || SZ_INT != SZ_INT32) {
 		call impakl (Memc[bp], Memc[bp], BD_NPIX(bdes),
 		    IM_PIXTYPE(imdes))
+	    }
+
 	    call imflsh (imdes, bp, BD_VS(bdes,1), BD_VE(bdes,1), BD_NDIM(bdes))
 
 	    IM_FLUSH(imdes) = NO

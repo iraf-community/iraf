@@ -396,7 +396,7 @@ only a measure of the noise in the data.
 Using the residual to establish a convergence criterium seems reasonable
 except that it is hard to reliably say what the criterium should be.
 Assuming that the algorithm converges, the value of the residual when
-convergence is acheived is in general hard to predict, so it seems to me to
+convergence is achieved is in general hard to predict, so it seems to me to
 be difficult to establish a convergence criterium.  The conventional way
 to establish when a nonlinear fit converges is by measuring the norm of
 the correction vector.  When the norm becomes less than some small number

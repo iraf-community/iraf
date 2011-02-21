@@ -29,7 +29,17 @@ int	i, j, ndim, n, nv
 real	a
 pointer	sp, v1, v2, dv, va, vb
 pointer	data, mask, dp, lp, mp, imgnl$t()
-PIXEL	ic_mode$t(), asum$t()
+PIXEL	ic_mode$t()
+$if (datatype == irs)
+real    asum$t()
+$endif
+$if (datatype == dl)
+double  asum$t()
+$endif
+$if (datatype == x)
+complex asum$t()
+$endif
+
 
 include	"../icombine.com"
 

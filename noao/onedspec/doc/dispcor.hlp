@@ -77,7 +77,7 @@ If "no", the output spectrum is average of the input spectrum across each
 output wavelength coordinate.  This conserves flux density.  If "yes" the
 input spectrum is integrated over the extent of each output pixel.  This
 conserves the total flux.  Note that in this case units of the flux will
-change; for example rebinning to logrithmic wavelengths will produce flux
+change; for example rebinning to logarithmic wavelengths will produce flux
 per log lambda.  For flux calibrated data you most likely would not want to
 conserve flux.
 .le
@@ -241,7 +241,7 @@ packages.  The reference shift correction feature was added primarily for
 use in those reduction packages.
 
 If the \fIlinearize\fR parameter is no the dispersion functions, weights,
-and shifts are transfered from the database to the world coordinate system
+and shifts are transferred from the database to the world coordinate system
 keywords in the image header.  Except for printing processing information
 that is all that is done to the spectra.
 

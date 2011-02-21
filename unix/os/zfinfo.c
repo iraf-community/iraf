@@ -15,10 +15,12 @@
 /* ZFINFO -- Get information describing the named file.  Access times
  * are returned in units of seconds since 00:00:00 01-Jan-80, local time.
  */
-ZFINFO (fname, finfo_struct, status)
-PKCHAR	*fname;
-XLONG	*finfo_struct;
-XINT	*status;
+int
+ZFINFO (
+  PKCHAR  *fname,
+  XLONG	  *finfo_struct,
+  XINT	  *status
+)
 {
 	struct	stat osfile;
 	struct	_finfo *fs;
@@ -31,7 +33,7 @@ XINT	*status;
 	fs = (struct _finfo *)finfo_struct;
 	if (stat ((char *)fname, &osfile) == ERR) {
 	    *status = XERR;
-	    return;
+	    return (XERR);
 	}
 
 	/* Determine file type.
@@ -92,4 +94,6 @@ XINT	*status;
 	}
 
 	*status = XOK;
+
+	return (*status);
 }

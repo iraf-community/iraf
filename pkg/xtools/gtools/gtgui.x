@@ -111,8 +111,8 @@ begin
 	    case 3:
 		call pargstr ("both")
 	    }
-	    call pargr (Memr[gt+GT_XAXISWIDTH])
-	    call pargr (Memr[gt+GT_YAXISWIDTH])
+	    call pargr (Memr[P2R(gt+GT_XAXISWIDTH)])
+	    call pargr (Memr[P2R(gt+GT_YAXISWIDTH)])
 	    call pargstr (Memc[str1])
 	    call pargstr (Memc[str2])
 	    call pargi (Memi[gt+GT_XDRAWGRID])

@@ -315,7 +315,7 @@ retry_
 	    if (wtype == S_WTMAP || wtype == S_SIGMAP) {
 		do j = 1, nimages {
 		    if (Memi[wtp+j-1] != NULL)
-			call xt_imunmap (memi[wtp+j-1], nimages+j)
+			call xt_imunmap (Memi[wtp+j-1], nimages+j)
 		}
 	    }
 	    if (out[2] != NULL) {

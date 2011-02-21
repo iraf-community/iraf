@@ -393,6 +393,8 @@ procedure fxf_alloc (fit)
 
 pointer fit	 		#I input fits descriptor
 
+errchk	calloc
+
 begin
 	call calloc (fit, LEN_FITDES, TY_STRUCT)
 
@@ -729,9 +731,9 @@ begin
 	sz_userarea = nlines * (LEN_CARD+1) + SZ_EXTRASPACE
 
 	IM_HDRLEN(im) = LEN_IMHDR +
-	    (sz_userarea - SZ_EXTRASPACE + SZ_STRUCT-1) / SZ_STRUCT
+	    (sz_userarea - SZ_EXTRASPACE + SZ_MII_INT-1) / SZ_MII_INT
 	len_hdrmem = LEN_IMHDR +
-	    (sz_userarea+1 + SZ_STRUCT-1) / SZ_STRUCT
+	    (sz_userarea+1 + SZ_MII_INT-1) / SZ_MII_INT
 
 	if (IM_LENHDRMEM(im) < len_hdrmem) {
 	    IM_LENHDRMEM(im) = len_hdrmem

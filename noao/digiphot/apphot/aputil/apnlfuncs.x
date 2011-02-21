@@ -9,7 +9,7 @@ procedure cgauss1d (x, nvars, p, np, z)
 
 real	x[ARB]		# variables, x[1] = position coordinate
 int	nvars		# the number of variables, not used
-real	p[ARB]		# p[1]=amplitude p[2]=center p[3]=sigma p[4]=sky
+real	p[ARB]		# p[1]=amplitude p[2]=center p[3]=variance p[4]=sky
 int	np		# number of parameters np = 4
 real	z		# function return
 
@@ -17,7 +17,7 @@ real	r2
 
 begin
 	if (p[3] == 0.)
-	    z = 30.
+	    r2 = 36.0
 	else
 	    r2 = (x[1] - p[2]) ** 2 / (2. * p[3])
 	if (abs (r2) > 25.0)
@@ -34,7 +34,7 @@ procedure cdgauss1d (x, nvars p, dp, np, z, der)
 
 real	x[ARB]		# variables, x[1] = position coordinate
 int	nvars		# the number of variables, not used
-real	p[ARB]		# p[1]=amplitude, p[2]=center, p[3]=sky p[4]=sigma
+real	p[ARB]		# p[1]=amplitude, p[2]=center, p[3]=sky p[4]=variance
 real	dp[ARB]		# parameter derivatives
 int	np		# number of parameters np=4
 real	z		# function value
@@ -45,7 +45,7 @@ real	dx, r2
 begin
 	dx = x[1] - p[2]
 	if (p[3] == 0.)
-	    r2 = 30.
+	    r2 = 36.0
 	else
 	    r2 = dx * dx / (2.0 * p[3])
 	if (abs (r2) > 25.0) {
@@ -72,7 +72,7 @@ end
 # 1	Amplitude
 # 2	X-center
 # 3	Y-center
-# 4	Sigma
+# 4	Variance
 # 5	Sky
 
 procedure gaussr (x, nvars, p, np, z)
@@ -89,7 +89,7 @@ begin
 	dx = x[1] - p[2]
 	dy = x[2] - p[3]
 	if (p[4] == 0.)
-	    r2 = 30.
+	    r2 = 36.0
 	else
 	    r2 = (dx * dx + dy * dy) / (2.0 * p[4])
 	if (abs (r2) > 25.0)
@@ -118,7 +118,7 @@ begin
 	dx = x[1] - p[2]
 	dy = x[2] - p[3]
 	if (p[4] == 0.)
-	    r2 = 30.
+	    r2 = 36.0
 	else
 	    r2 = (dx * dx + dy * dy) / (2.0 * p[4])
 
@@ -148,8 +148,8 @@ end
 # 1	Amplitude
 # 2	X-center
 # 3	Y-center
-# 4	Sigma-x
-# 5	Sigma-y
+# 4	Variance-x
+# 5	Variance-y
 # 6	Theta-rotation
 # 7	Sky
 
@@ -170,8 +170,8 @@ begin
 	srot = sin (p[6])
 	xt = (dx * crot + dy * srot)
 	yt = (-dx * srot + dy * crot)
-	if (p[5] == 0)
-	    r2 = 30.
+	if (p[4] == 0. || p[5] == 0.)
+	    r2 = 36.0
 	else
 	    r2 = (xt ** 2 / p[4] + yt ** 2 / p[5]) / 2.0
 	if (abs (r2) > 25.0)
@@ -205,7 +205,7 @@ begin
 	sigx2 = p[4]
 	sigy2 = p[5]
 	if (sigx2 == 0. || sigy2 == 0.)
-	    r2 = 30.
+	    r2 = 36.0
 	else {
 	    a = (crot2 / sigx2 + srot2 / sigy2)
 	    b = 2.0 * crot * srot * (1.0 / sigx2 - 1.0 /sigy2)
@@ -259,7 +259,7 @@ real	r
 
 begin
 	if (p[3] == 0.)
-	    r = 30.
+	    r = 6.0
 	else
 	    r = (x[1] - p[2]) / (p[3] * SQRTOF2)
 	if (abs (r) > 5.0)
@@ -286,7 +286,7 @@ real	r
 
 begin
 	if (p[3] == 0.)
-	    r = 30.
+	    r = 6.0
 	else
 	    r = (x[1] - p[2]) / (SQRTOF2 * p[3])
 	if (abs (r) > 5.0) {
@@ -310,7 +310,7 @@ procedure gausskew (x, nvars, p, np, z)
 
 real	x[ARB]		# list of variables, x[1] = position coordinate
 int	nvars		# number of variables, not used
-real	p[ARB]		# p[1]=amplitude p[2]=center p[3]=sigma p[4]=skew
+real	p[ARB]		# p[1]=amplitude p[2]=center p[3]=variance p[4]=skew
 int	np		# number of parameters == 3
 real	z		# function return
 
@@ -319,7 +319,7 @@ real	dx, r2, r3
 begin
 	dx = (x[1] - p[2])
 	if (p[3] == 0.)
-	    r2 = 30.
+	    r2 = 36.0
 	else {
 	    r2 = dx ** 2 / (2.0 * p[3])
 	    r3 = r2 * dx / sqrt (2.0 * abs (p[3])) 
@@ -338,7 +338,7 @@ procedure dgausskew (x, nvars, p, dp, np, z, der)
 
 real	x[ARB]		# list of variables, x[1] = position coordinate
 int	nvars		# number of variables, not used
-real	p[ARB]		# p[1]=amplitude, p[2]=center, p[3]=sigma, p[4]=skew
+real	p[ARB]		# p[1]=amplitude, p[2]=center, p[3]=variance, p[4]=skew
 real	dp[ARB]		# parameter derivatives
 int	np		# number of parameters
 real	z		# function value
@@ -349,7 +349,7 @@ real	dx, d1, d2, d3, r, r2, r3, rint
 begin
 	dx = x[1] - p[2]
 	if (p[3] == 0.)
-	    r2 = 30.
+	    r2 = 36.0
 	else
 	    r2 = dx ** 2 / (2.0 * p[3])
 	if (abs (r2) > 25.0) {

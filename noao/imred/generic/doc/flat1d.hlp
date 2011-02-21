@@ -79,7 +79,7 @@ averaged and graphed.
 Note that the lines or columns are relative the input image section; for
 example line 1 is the first line of the image section and not the first
 line of the image.  Any number of lines or columns may be examined.
-When satisified with the fit parameters the user
+When satisfied with the fit parameters the user
 responds with a carriage return to the line or column prompt.
 The function is then fit to all the lines or columns and the flat field
 ratios are determined.
@@ -121,7 +121,7 @@ parameters need not be specified.  The command would be
 .fi
 
 The user selects sample columns to be fit interactively with the interactive
-curve fitting package.  When satisified with the fit parameters
+curve fitting package.  When satisfied with the fit parameters
 respond with a carriage return to the prompt.  The function is then fit to
 all the columns and the flat field ratios are determined.
 

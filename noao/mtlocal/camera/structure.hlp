@@ -71,7 +71,7 @@ The CAMERA header information is formatted and printed.  Because of a string
 limitation in the SPP half of the header information must be printed by
 a call to PRCAM1.
 .ls prcam1
-The second half of the CAMERA header information is formated and printed.
+The second half of the CAMERA header information is formatted and printed.
 .le
 .le
 .le

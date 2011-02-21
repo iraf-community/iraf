@@ -1,9 +1,10 @@
- Make the IMCOMBINE Task.
+# Make the IMCOMBINE library.
 
-$checkout libpkg.a ../../../../
-$update   libpkg.a
-$checkin  libpkg.a ../../../../
-$exit
+update:
+	$checkout libimc.a lib$
+	$update   libimc.a
+	$checkin  libimc.a lib$
+	;
 
 generic:
 	$set	GEN = "$$generic -k"
@@ -12,6 +13,10 @@ generic:
 	    $(GEN) icaclip.gx -o generic/icaclip.x $endif
         $ifolder (generic/icaverage.x, icaverage.gx)
 	    $(GEN) icaverage.gx -o generic/icaverage.x $endif
+        $ifolder (generic/icquad.x, icquad.gx)
+	    $(GEN) icquad.gx -o generic/icquad.x $endif
+        $ifolder (generic/icnmodel.x, icnmodel.gx)
+	    $(GEN) icnmodel.gx -o generic/icnmodel.x $endif
         $ifolder (generic/iccclip.x, iccclip.gx)
 	    $(GEN) iccclip.gx -o generic/iccclip.x $endif
         $ifolder (generic/icgdata.x, icgdata.gx)
@@ -39,7 +44,7 @@ generic:
 	    $(GEN) xtimmap.gx -o generic/xtimmap.x $endif
 	;
 
-libpkg.a:
+libimc.a:
 	$ifeq (USE_GENERIC, yes) $call generic $endif
 
 	@generic

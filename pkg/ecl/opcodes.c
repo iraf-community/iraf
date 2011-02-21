@@ -15,6 +15,7 @@
 #include "opcodes.h"
 #include "errs.h"
 #include "construct.h"
+#include "proto.h"
 
 /*
  * OPCODES -- This is the instruction set that forms the internal language of
@@ -41,7 +42,8 @@ extern	struct param *ppfind();		/* search task psets for param */
 extern	int currentline;
 
 
-o_undefined ()
+void 
+o_undefined (void)
 {
 	cl_error (E_IERR, e_uopcode, 0);
 }
@@ -50,8 +52,8 @@ o_undefined ()
  * Assign the top operand to the named parameter.  Also, make the type of the
  * fake parameter the same as the type of the operand.
  */
-o_absargset (argp)
-memel *argp;
+void 
+o_absargset (memel *argp)
 {
 	char	*argname = (char *) argp;
 	char	*pk, *t, *p, *f;
@@ -63,7 +65,7 @@ memel *argp;
 	    /* use full argname and always assign to value field.
 	     */
 	    struct operand o;
-	    int	string_len;
+	    int	string_len=0;
 	    o = popop();
 	    if ((o.o_type & OT_BASIC) == OT_STRING)
 		string_len = strlen (o.o_val.v_s);
@@ -79,7 +81,7 @@ memel *argp;
 	    pp = ppfind (pfp, t, p, 0, NO);
 	    if (pp == NULL)
 		cl_error (E_UERR, e_pnonexist, p);
-	    if ((int)pp == ERR)
+	    if ((XINT)pp == ERR)
 		cl_error (E_UERR, e_pambig, p, pfp->pf_ltp->lt_lname);
 	}
 
@@ -91,15 +93,16 @@ memel *argp;
 
 /* <op1> <op2> . <op2 + op1>
  */
-o_add ()
+void 
+o_add (void)
 {
 	binop (OP_ADD);
 }
 
 /* <increment to be added to named parameter> .
  */
-o_addassign (argp)
-memel *argp;
+void 
+o_addassign (memel *argp)
 {
 	/* order of operands will be incorrect.
 	 * strictly speaking, only strings are not commutative but we need
@@ -122,7 +125,7 @@ memel *argp;
 	     * as long as whatever code copies the string works when the
 	     * strings overlap.
 	     */
-	    int oldtopd = topd;
+	    XINT oldtopd = topd;
 	    char *s2 = memneed (btoi (strlen (o2.o_val.v_s) + 1));
 	    strcpy (s2, o2.o_val.v_s);
 	    o2.o_val.v_s = s2;
@@ -143,7 +146,8 @@ memel *argp;
 /* <name of file to be appended> .
  * includes stdout as well as stderr.
  */
-o_allappend ()
+void 
+o_allappend (void)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -176,7 +180,8 @@ o_allappend ()
 /* <name of file to be used as stderr> .
  * redirect everything, including the stderr channel.
  */
-o_allredir ()
+void 
+o_allredir (void)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -207,14 +212,16 @@ o_allredir ()
 
 /* <op1> <op2> . <op1 && op2>
  */
-o_and ()
+void 
+o_and (void)
 {
 	binexp (OP_AND);
 }
 
 /* <name of file to be appended> .
  */
-o_append()
+void 
+o_append (void)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -241,8 +248,8 @@ o_append()
 
 /* <new value for named parameter> .
  */
-o_assign (argp)
-memel *argp;
+void 
+o_assign (memel *argp)
 {
 	char *pname = (char *) argp;
 	char *pk, *t, *p, *f;
@@ -257,10 +264,10 @@ memel *argp;
 /* <truth value> .
  * branch if false (or INDEF).
  */
-o_biff (argp)
-memel *argp;
+void 
+o_biff (memel *argp)
 {
-	extern int pc;
+	extern XINT pc;
 	struct operand o;
 
 	opcast (OT_BOOL);
@@ -273,15 +280,16 @@ memel *argp;
  * arrange to start a new task. set newtask.
  * see runtime.c
  */
-o_call (argp)
-memel *argp;
+void 
+o_call (memel *argp)
 {
 	callnewtask ((char *) argp);
 }
 
 /* <op> . <- op>
  */
-o_chsign ()
+void 
+o_chsign (void)
 {
 	unop (OP_MINUS);
 }
@@ -289,26 +297,29 @@ o_chsign ()
 /* <op> // <op>
  * string concatenation
  */
-o_concat ()
+void 
+o_concat (void)
 {
 	binop (OP_CONCAT);
 }
 
 /* <op1> <op2> . <op1 / op2>
  */
-o_div ()
+void 
+o_div (void)
 {
 	binop (OP_DIV);
 }
 
-o_doend()
+void 
+o_doend (void)
 {
 }
 
 /* <value to be divided into named parameter> .
  */
-o_divassign (argp)
-memel *argp;
+void 
+o_divassign (memel *argp)
 {
 	char	*pname = (char *) argp;
 	char	*pk, *t, *p, *f;
@@ -330,8 +341,8 @@ memel *argp;
 
 /* <value to be concatenated onto named parameter> .
  */
-o_catassign (argp)
-memel *argp;
+void 
+o_catassign (memel *argp)
 {
 	char	*pname = (char *) argp;
 	char	*pk, *t, *p, *f;
@@ -367,21 +378,24 @@ memel *argp;
 
 /* <op1> <op2> . <op1 == op2>
  */
-o_eq ()
+void 
+o_eq (void)
 {
 	binexp (OP_EQ);
 }
 
 /* run the newtask. see exec.c.
  */
-o_exec ()
+void 
+o_exec (void)
 {
 	execnewtask ();
 }
 
 /* <op1> <op2> . <op1 > op2>
  */
-o_ge ()
+void 
+o_ge (void)
 {
 	binexp (OP_GE);
 }
@@ -389,10 +403,10 @@ o_ge ()
 /* unconditional goto.
  * *argp is the SIGNED increment to be added to pc.
  */
-o_dogoto (argp)
-memel *argp;
+void 
+o_dogoto (memel *argp)
 {
-	extern int pc;
+	extern XINT pc;
 	pc += (int)*argp;
 	if (pc >= STACKSIZ)
 	    cl_error (E_IERR, "pc set wildly to %d during goto", pc);
@@ -400,7 +414,8 @@ memel *argp;
 
 /* <op1> <op2> . <op1 > op2>
  */
-o_gt ()
+void 
+o_gt (void)
 {
 	binexp (OP_GT);
 }
@@ -415,8 +430,8 @@ o_gt ()
  * if the parameter is to be fake, make it type string and do not do the
  *   indirection.
  */
-o_indirabsset (argp)
-memel *argp;
+void 
+o_indirabsset (memel *argp)
 {
 	char	*argname = (char *) argp;
 	char	*pk, *t, *p, *f;
@@ -441,7 +456,7 @@ memel *argp;
 	    pp = ppfind (pfp, t, p, 0, NO);
 	    if (pp == NULL)
 		cl_error (E_UERR, e_pnonexist, p);
-	    if ((int)pp == ERR)
+	    if ((XINT)pp == ERR)
 		cl_error (E_UERR, e_pambig, p, pfp->pf_ltp->lt_lname);
 	}
 
@@ -474,8 +489,8 @@ memel *argp;
  * compiled when the parser sees a simple identifier, not in an expression.
  *   this avoids quotes around simple strings and filenames.
  */
-o_indirposset (argp)
-memel *argp;
+void 
+o_indirposset (memel *argp)
 {
 	int pos = (int) *argp;
 	struct pfile *pfp;
@@ -517,8 +532,8 @@ memel *argp;
 
 /* Increment the loop counters for an implicit loop.
  */
-o_indxincr (argp)
-memel	*argp;
+void 
+o_indxincr (memel *argp)
 {
 	int	i;
 	i = 0;
@@ -545,8 +560,8 @@ memel	*argp;
 /* .
  * given the name of a parameter, print it on t_out, the task pipe channel.
  */
-o_inspect (argp)
-memel *argp;
+void 
+o_inspect (memel *argp)
 {
 	char *pname = (char *) argp;
 	char *pk, *t, *p, *f;
@@ -586,8 +601,8 @@ memel *argp;
  * all the defines are in operand.h. the function names and running them is
  * done by intrfunc() in gram.c.
  */
-o_intrinsic (argp)
-memel *argp;
+void 
+o_intrinsic (memel *argp)
 {
 	char *funcname = (char *) argp;
 	struct operand o;
@@ -601,29 +616,32 @@ memel *argp;
 
 /* <op1> <op2> . <op1 <= op2>
  */
-o_le ()
+void 
+o_le (void)
 {
 	binexp (OP_LE);
 }
 
 /* <op1> <op2> . <op1 < op2>
  */
-o_lt ()
+void 
+o_lt (void)
 {
 	binexp (OP_LT);
 }
 
 /* <op1> <op2> . <op2 * op1>
  */
-o_mul()
+void 
+o_mul (void)
 {
 	binop (OP_MUL);
 }
 
 /* <value to be multiplied into named parameter> .
  */
-o_mulassign (argp)
-memel *argp;
+void 
+o_mulassign (memel *argp)
 {
 	char	*pname = (char *) argp;
 	char	*pk, *t, *p, *f;
@@ -640,21 +658,24 @@ memel *argp;
 
 /* <op1> <op2> . <op1 != op2>
  */
-o_ne ()
+void 
+o_ne (void)
 {
 	binexp (OP_NE);
 }
 
 /* <op> . <!op>
  */
-o_not ()
+void 
+o_not (void)
 {
 	unexp (OP_NOT);
 }
 
 /* <op1> <op2> . <op1 || op2>
  */
-o_or()
+void 
+o_or (void)
 {
 	binexp (OP_OR);
 }
@@ -664,8 +685,8 @@ o_or()
  * to by argp.  Try to run it so its stdout and stderr will go to out t_stdout
  * and t_stderr of the current task.
  */
-o_osesc (argp)
-memel *argp;
+void 
+o_osesc (memel *argp)
 {
 	char *command = (char *)argp;
 
@@ -675,14 +696,14 @@ memel *argp;
 
 /* <new value for argument at command position *argp> .
  */
-o_posargset (argp)
-memel *argp;
+void 
+o_posargset (memel *argp)
 {
 	int	pos = (int) *argp;
 	struct	pfile *pfp;
 	struct	param *pp;
 	struct	operand o;
-	int	string_len;
+	int	string_len=0;
 
 	pfp = newtask->t_pfp;
 
@@ -712,7 +733,8 @@ memel *argp;
 
 /* <op1> <op2> . <op1 ** op2>
  */
-o_dopow ()
+void 
+o_dopow (void)
 {
 	binop (OP_POW);
 }
@@ -723,7 +745,8 @@ o_dopow ()
  * Next one is the name of the destination parameter, rest are values to
  * be printed.
  */
-o_doprint()
+void 
+o_doprint (void)
 {
 	/* This is not used -- print is imp. as a builtin task.
 	struct operand o;
@@ -736,7 +759,8 @@ o_doprint()
 /* <value to be printed> .
  * used to print an operand on the stack. not to be confused with doprint.
  */
-o_immed()
+void 
+o_immed (void)
 {
 	struct operand o;
 
@@ -751,8 +775,8 @@ o_immed()
  * We don't want to abort in sexa() because it may be used to digest a query
  * response and producing a quiet undefined op there is correct.
  */
-o_pushconst (argp)
-memel *argp;
+void 
+o_pushconst (memel *argp)
 {
 	/* argument is pointer to an operand */
 	struct operand *op;
@@ -766,8 +790,8 @@ memel *argp;
 /* Push an index value onto the control stack for later use
  * when the parameter is accessed.
  */
-o_pushindex (mode)
-int	*mode;
+void 
+o_pushindex (int *mode)
 {
 	struct operand op;
 
@@ -816,8 +840,8 @@ int	*mode;
 
 /* . <value of parameter>
  */
-o_pushparam (argp)
-memel *argp;
+void 
+o_pushparam (memel *argp)
 {
 	char *pname = (char *) argp;
 	char *pk, *t, *p, *f;
@@ -831,7 +855,8 @@ memel *argp;
 
 /* <name of file to be used as stdout> .
  */
-o_redir ()
+void 
+o_redir (void)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -863,7 +888,8 @@ o_redir ()
 
 /* <name of file to be used as stdin> .
  */
-o_redirin ()
+void 
+o_redirin (void)
 {
 	struct	operand o;
 	char	*fname, *mode;
@@ -890,8 +916,8 @@ o_redirin ()
 /* GSREDIR -- Graphics stream redirection.
  * <filename> .
  */
-o_gsredir (argp)
-memel *argp;
+void 
+o_gsredir (memel *argp)
 {
 	register char	*ip;
 	register FILE	*fp;
@@ -937,10 +963,10 @@ memel *argp;
 }
 
 
-o_doaddpipe (argp)
-memel *argp;
+void 
+o_doaddpipe (memel *argp)
 {
-	int	getpipe_pc = *argp;
+	XINT	getpipe_pc = *argp;
 	char	*x1, *pk, *t, *x2;	
 	char	*ltname;
 	struct	operand	o;
@@ -972,8 +998,10 @@ memel *argp;
 }
 
 
-o_dogetpipe (argp)
-memel *argp;			/* name of ltask (not used) */
+void 
+o_dogetpipe (
+    memel *argp			/* name of ltask (not used) */
+)
 {
 	struct	operand o;
 	char	*getpipe(), *comdstr();
@@ -992,14 +1020,15 @@ memel *argp;			/* name of ltask (not used) */
 }
 
 
-o_rmpipes (argp)
-memel *argp;
+void 
+o_rmpipes (memel *argp)
 {
 	delpipes ((int)*argp);
 }
 
 
-o_doreturn()
+void 
+o_doreturn (void)
 {
 	eprintf ("return not implemented\n");
 }
@@ -1009,7 +1038,8 @@ o_doreturn()
  * follow, rest are names of destination params.  SCAN scans the standard
  * input.
  */
-o_doscan()
+void 
+o_doscan (void)
 {
 	struct operand o;
 
@@ -1017,7 +1047,8 @@ o_doscan()
 	cl_scan (o.o_val.v_i - 1, "stdin");
 }
 
-o_doscanf()
+void 
+o_doscanf (void)
 {
 	struct operand o;
 	struct operand o_sv[64];
@@ -1052,7 +1083,8 @@ o_doscanf()
  * follow.  Next one is the name of the source parameter, rest are names of
  * destination params.
  */
-o_dofscan()
+void 
+o_dofscan (void)
 {
 	struct operand o;
 
@@ -1060,10 +1092,10 @@ o_dofscan()
 	cl_scan (o.o_val.v_i - 1, "");
 }
 
-o_dofscanf()
+void 
+o_dofscanf (void)
 {
-	struct operand o, param;
-	struct operand o_sv[64];
+	struct operand o, o_sv[64];
 	char	format[SZ_LINE];
 	char	pname[SZ_FNAME];
 	int	nargs, i;
@@ -1108,15 +1140,16 @@ o_dofscanf()
 
 /* <op1> <op2> . <op1 - op2>
  */
-o_sub()
+void 
+o_sub (void)
 {
 	binop (OP_SUB);
 }
 
 /* <value to be subtracted from named parameter> .
  */
-o_subassign (argp)
-memel *argp;
+void 
+o_subassign (memel *argp)
 {
 	/* operands are backwards on stack, so negate and add. can get by
 	 * with this as long as subtraction is never defined for strings.
@@ -1139,12 +1172,12 @@ memel *argp;
 /* Doswitch finds the appropriate location to jump to in the
  * jump table and goes there.
  */
-o_doswitch (jmpdelta)
-int	*jmpdelta;
+void 
+o_doswitch (int *jmpdelta)
 
 {
 	int pdft, icase, jmptable;
-	int value;
+	int value=0;
 	struct operand o;
 	memel delta;
 	/* Remember to subtract SZ_CE 'cuz PC has already been incremented. */
@@ -1205,8 +1238,8 @@ int	*jmpdelta;
 }
 
 
-o_swoff (argp)
-memel *argp;
+void 
+o_swoff (memel *argp)
 {
 	register char *pname = (char *)argp;
 	register struct param *pp;
@@ -1221,7 +1254,7 @@ memel *argp;
 	pp = ppfind (pfp, t, p, 0, NO);
 	if (pp == NULL)
 	    cl_error (E_UERR, e_pnonexist, p);
-	if ((int)pp == ERR)
+	if ((XINT)pp == ERR)
 	    cl_error (E_UERR, e_pambig, p, newtask->t_ltp->lt_lname);
 
 	o.o_type = OT_BOOL;
@@ -1234,8 +1267,8 @@ memel *argp;
 	pp->p_flags |= P_CLSET;
 }
 
-o_swon (argp)
-memel *argp;
+void 
+o_swon (memel *argp)
 {
 	register char *pname = (char *)argp;
 	register struct param *pp;
@@ -1251,7 +1284,7 @@ memel *argp;
 	pp = ppfind (pfp, t, p, 0, NO);
 	if (pp == NULL)
 	    cl_error (E_UERR, e_pnonexist, p);
-	if ((int)pp == ERR)
+	if ((XINT)pp == ERR)
 	    cl_error (E_UERR, e_pambig, p, newtask->t_ltp->lt_lname);
 
 	o.o_type = OT_BOOL;
@@ -1272,7 +1305,8 @@ memel *argp;
  * done in the conventional way since clpackage.language() is never
  * executed to load the language package, since it is the root package.
  */
-o_fixlanguage()
+void 
+o_fixlanguage (void)
 {
 	register struct ltask *ltp;
 
@@ -1289,7 +1323,7 @@ o_fixlanguage()
  * then precede it with "do" but alphabetize it according to its intended name.
  */
 
-int (*opcodetbl[])() = {
+void (*opcodetbl[])() = {
 /*  0 */	o_undefined,
 
 /*  1 */	o_absargset,

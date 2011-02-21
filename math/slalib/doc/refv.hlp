@@ -34,7 +34,7 @@
 
   2  Though optimized for speed rather than precision, the present
      routine achieves consistency with the refracted-to-unrefracted
-     A tan Z + B tan**3 Z model at better than 1 microarcsecond within
+     A tan Z + B tan**3 Z model at better than 1 micro-arcsecond within
      30 degrees of the zenith and remains within 1 milliarcsecond to
      beyond ZD 70 degrees.  The inherent accuracy of the model is, of
      course, far worse than this - see the documentation for slRFCO

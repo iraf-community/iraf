@@ -1,0 +1,789 @@
+\documentstyle{article}
+\topmargin	-30mm
+\textheight	250mm
+\oddsidemargin   -5mm
+\evensidemargin  -5mm
+\textwidth      170mm
+
+\begin{document}
+
+\tableofcontents
+
+\newpage
+
+\addcontentsline{toc}{section}{loc.txt}
+\begin{verbatim}
+
+Filename               Total   Blanks   Comments   Help    Execute   Nonexec
+============================================================================
+  tiimage.h                9        1          0       0          0        8
+  tiimage.x              141       36         31       0         53       21
+  tmloop.x                96       23         15       0         40       18
+  tmmode.x               108       24         24       0         30       30
+  tmscan.x                92       21         15       0         38       18
+  tmheader.x              59       19          8       0         19       13
+  tmhc.x                  54       16          9       0         15       14
+  tmcopy.x                63       18          9       0         23       13
+  tmcp1.gx                53       17         11       0         10       15
+TOTAL                    834      226        155       0        258      195
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tiimage.h}
+\begin{verbatim}
+
+define        OUTPUT_TYPE        1        # Output-type file
+define        TEMPLATE_TYPE        2        # Template-type file
+
+define        MODE_OUT_SINGLE        1        # Output with single column
+define        MODE_OUT_ALL        2        # Output with all columns
+define        MODE_TEM_SINGLE        3        # Template with single column
+define        MODE_TEM_ALL        4        # Template with all columns
+define        MODE_SCRATCH        5        # No output nor template, create from scratch
+define        MODE_ERROR        -1
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tiimage.x}
+\begin{verbatim}
+
+include <tbset.h>
+include "tiimage.h"
+
+#  TIIMAGE  --  Insert 1D images into 3D table rows.
+#
+#  Input images are given by a filename template list. The output is a 
+#  3D table with optional column selector. 
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  30-Jan-97  -  Task created (I.Busko)
+
+
+procedure t_tiimage()
+
+char        imlist[SZ_LINE]                        # Input image list
+char        output[SZ_PATHNAME]                # Output table name
+char        template[SZ_PATHNAME]                # Template table name
+int        row                                # Row where to begin insertion
+bool        verbose                                # Print operations ?
+#--
+char        root[SZ_FNAME]                        # String storage areas used
+char        rs[SZ_FNAME]                        # by row/column selector
+char        cs[SZ_FNAME]                        # mechanism
+char        cn[SZ_COLNAME]
+char        cu[SZ_COLUNITS]
+char        cf[SZ_COLFMT]
+pointer        sp, otp, ttp, ocp, tcp, newocp, tempp, list
+int        nocp, mode, numcol, dtyp, lend, lenf, cnum, i
+
+pointer        tbtopn(), tcs_column(), imtopen()
+int        clgeti(), tbpsta(), tm_mode(), imtlen()
+bool        clgetb(), streq()
+
+begin
+        # Get task parameters.
+        call clgstr ("input", imlist, SZ_LINE)
+        call clgstr ("outtable", output, SZ_PATHNAME)
+        call clgstr ("template", template, SZ_PATHNAME)
+        row     = clgeti ("row")
+        verbose = clgetb ("verbose")
+
+        # Abort if invalid output name.
+        if (streq (output, "STDOUT"))
+            call error (1, "Invalid output file name.")
+
+        # Decide which mode to use.
+        mode = tm_mode (output, template, root, rs, cs, cn, cu, cf)
+
+        call smark (sp)
+        switch (mode) {
+
+        case MODE_OUT_SINGLE,MODE_OUT_ALL:
+
+            # Break output table name into bracketed selectors.
+            call rdselect (output, root, rs, cs, SZ_PATHNAME)
+
+            # Open output table.
+            otp = tbtopn (root, READ_WRITE, 0)
+
+            # Create arrays with selected column pointer(s).
+            numcol = tbpsta (otp, TBL_NCOLS)
+            call salloc (ocp,    numcol, TY_INT)
+            call salloc (newocp, numcol, TY_INT)
+            call tcs_open (otp, cs, Memi[ocp], nocp, numcol)
+
+            # Translate pointer to tbtables-compatible format.
+            do i = 1, nocp
+                Memi[newocp+i-1] = tcs_column (Memi[ocp+i-1])
+
+            # Do the insertion by looping over all input images.
+            call tm_loop (otp, newocp, nocp, row, imlist, mode, output,
+                          verbose)
+
+            # Close output table.
+            call tbtclo (otp)
+
+        case MODE_TEM_SINGLE,MODE_TEM_ALL:
+
+            # Get output table root name and open it.
+            call rdselect (output, root, rs, cs, SZ_PATHNAME)
+            otp = tbtopn (root, NEW_FILE, 0)
+
+            # Break template table name into bracketed 
+            # selectors and open it.
+            call rdselect (template, root, rs, cs, SZ_PATHNAME)
+            ttp = tbtopn (root, READ_ONLY, 0)
+
+            # Create arrays with selected column pointer(s).
+            numcol = tbpsta (ttp, TBL_NCOLS)
+            call salloc (tcp,    numcol, TY_INT)
+            call salloc (newocp, numcol, TY_INT)
+            call tcs_open (ttp, cs, Memi[tcp], nocp, numcol)
+
+            # Copy column info from template to output table.
+            do i = 1, nocp {
+                tempp = tcs_column (Memi[tcp+i-1])
+                call tbcinf (tempp, cnum, cn, cu, cf, dtyp, lend, lenf)
+                call tbcdef (otp, tempp, cn, cu, cf, dtyp, lend, 1)
+                Memi[newocp+i-1] = tempp
+            }
+
+            # Create output and close template.
+            call tbtcre (otp)
+            call tbtclo (ttp)
+
+            # Do the insertion by looping over all input images.
+            call tm_loop (otp, newocp, nocp, row, imlist, mode, output,
+                          verbose)
+
+            # Close output table.
+            call tbtclo (otp)
+
+        case MODE_SCRATCH:
+
+            # Alloc memory for column pointer array, assuming  
+            # the worst case of each input image in the list 
+            # belonging to a separate column.
+            list = imtopen (imlist)
+            numcol = imtlen (list)
+            call imtclose (list)
+            call salloc (newocp, numcol, TY_INT)
+
+            # Open output table.
+            call rdselect (output, root, rs, cs, SZ_PATHNAME)
+            otp = tbtopn (root, NEW_FILE, 0)
+
+            # Build column descriptor array from info in image headers.
+            ifnoerr (call tm_scan (otp, newocp, numcol, nocp, imlist)) {
+
+                # Pretend that template table exists and do the insertion. 
+                mode = MODE_TEM_ALL
+                call tm_loop (otp, newocp, nocp, row, imlist, mode, output,
+                              verbose)
+            }
+
+            # Close output table.
+            call tbtclo (otp)
+
+        case MODE_ERROR:
+            call error (1, "Cannot process.")
+        }
+
+        call sfree (sp)
+end
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tmloop.x}
+\begin{verbatim}
+
+include <error.h>
+include "tiimage.h"
+
+#  TM_LOOP  --  Scan input list and insert each image in turn.
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  30-Jan-97  -  Task created (I.Busko)
+
+
+procedure tm_loop (tp, cp, ncp, row, imlist, mode, outname, verbose)
+
+pointer        tp                # table pointer
+pointer        cp                # column pointer array
+int        ncp                # size of column pointer array
+int        row                # row where to begin insertion
+char        imlist[ARB]        # input image list
+int        mode                # operating mode
+char        outname[ARB]        # output table name (for listing only)
+bool        verbose                # print info ?
+#--
+pointer        sp, im, list, fname
+int        i, rowc, imc, image
+bool        rflag
+
+errchk        immap, tm_hc, tm_copy
+
+pointer        immap(), imtopen()
+int        imtlen(), imtgetim()
+
+begin
+        call smark (sp)
+        call salloc (fname, SZ_PATHNAME, TY_CHAR)
+
+        # Initialize row counter.
+        rowc  = row
+        rflag = false
+        if (rowc <= 0 || IS_INDEFI(rowc)) rflag = true
+
+        # Initialize successful image counter.
+        imc = 0
+
+        # Open input list.
+        list = imtopen (imlist)        
+
+        # Loop over input list.
+        do image = 1, imtlen(list) {
+
+            # Get input image name and open it. Skip if error.
+            i = imtgetim (list, Memc[fname], SZ_PATHNAME)
+            iferr (im = immap (Memc[fname], READ_ONLY, 0)) {
+                call erract (EA_WARN)
+                next
+            }
+            if (verbose) {
+                call printf ("%s ")
+                call pargstr (Memc[fname])
+                call flush (STDOUT)
+            }
+
+            # Look into image header for columnar info and do the copy.
+            if (mode == MODE_OUT_ALL || mode == MODE_TEM_ALL) {
+                iferr (call tm_hc (tp, cp, ncp, rowc, rflag, im)) {
+                    call erract (EA_WARN)
+                    call imunmap (im)
+                    next
+                }
+
+                # Bump row and image counters.
+                rowc = rowc + 1
+                imc  = imc  + 1
+
+            # Just copy into single column.
+            } else if (mode == MODE_OUT_SINGLE || mode == MODE_TEM_SINGLE) {
+                iferr (call tm_copy (tp, Memi[cp], rowc, rflag, im)) {
+                    call erract (EA_WARN)
+                    call imunmap (im)
+                    next
+                }
+
+                # Bump row and image counters.
+                rowc = rowc + 1
+                imc  = imc  + 1
+            }
+
+            if (verbose) {
+                call printf ("-> %s row=%d \n")
+                call pargstr (outname)
+                call pargi (rowc-1)
+                call flush (STDOUT)
+            }
+
+            # Close current image.
+            call imunmap (im)
+        }
+
+        call imtclose (list)
+        call sfree (sp)
+        if (imc == 0)
+            call error (1, "No images were inserted.")
+end
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tmmode.x}
+\begin{verbatim}
+
+include <tbset.h>
+include "../whatfile.h"
+include "tiimage.h"
+
+#  TM_MODE  --  Detect mode of operation.
+#
+#  There are five possible modes:
+#  1 - Output table exists and one column was selected.
+#  2 - Output table exists and no valid column was selected.
+#  3 - Output table does not exist but template exists and one column was 
+#      selected.
+#  4 - Output table does not exist but template exists and no valid column 
+#      was selected.
+#  5 - New table has to be created from scratch.
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  30-Jan-97  -  Task created (I.Busko)
+
+
+int procedure tm_mode (output, template, root, rs, cs, cn, cu, cf)
+
+char        output[SZ_PATHNAME]
+char        template[SZ_PATHNAME]
+char        root[SZ_FNAME]
+char        rs[SZ_FNAME]
+char        cs[SZ_FNAME]
+char        cn[SZ_COLNAME]
+char        cu[SZ_COLUNITS]
+char        cf[SZ_COLFMT]
+#-
+int        mode
+
+int        access(), tm_m1()
+
+begin
+        # Process output name. Notice that routine access() must be 
+        # supplied with only the root name in order to succeed.
+        call rdselect (output, root, rs, cs, SZ_PATHNAME)
+        if (access (root, READ_WRITE, 0) == YES) {
+            mode = tm_m1 (OUTPUT_TYPE, root,rs,cs,cn,cu,cf)
+            if (mode == MODE_ERROR)
+                call error (1, "Cannot use output file.")
+
+        # If no valid output, try with template name.
+        } else {
+            call rdselect (template, root, rs, cs, SZ_PATHNAME)
+            if (access (root, READ_ONLY, 0) == YES) {
+                mode = tm_m1 (TEMPLATE_TYPE, root, rs, cs, cn, cu, cf)
+                if (mode == MODE_ERROR)
+                    call error (1, "Cannot use template file.")
+            } else {
+                mode = MODE_SCRATCH
+            }
+        }
+
+        return (mode)
+end
+
+
+#  TM_M1  --  Verify status of file and column selector.
+
+int procedure tm_m1 (type, root, rs, cs, cn, cu, cf)
+
+int        type
+char        root[SZ_FNAME]
+char        rs[SZ_FNAME]
+char        cs[SZ_FNAME]
+char        cn[SZ_COLNAME]
+char        cu[SZ_COLUNITS]
+char        cf[SZ_COLFMT]
+#-
+pointer        tp, cp
+int        numcol, ncp
+
+pointer        tbtopn()
+int        whatfile(), tbpsta()
+
+begin
+        # Test if it is a valid table.
+        if (whatfile (root) != IS_TABLE)
+            return (MODE_ERROR)
+ 
+        # Open table
+        tp = tbtopn (root, READ_ONLY)
+
+        # Get its total number of columns.
+        numcol = tbpsta (tp, TBL_NCOLS)
+
+        # Create array of column pointers from column selector. 
+        # This is just to get the actual number of selected columns.
+        call malloc (cp, numcol, TY_INT)
+        call tcs_open (tp, cs, Memi[cp], ncp, numcol)
+        call tbtclo (tp)
+        call mfree (cp)
+
+        # Decide mode.
+        if (type == OUTPUT_TYPE) {
+            if (ncp == 1)
+                return (MODE_OUT_SINGLE)
+            else
+                return (MODE_OUT_ALL)
+        } else if (type == TEMPLATE_TYPE) {
+            if (ncp == 1)
+                return (MODE_TEM_SINGLE)
+            else
+                return (MODE_TEM_ALL)
+        }
+        return (MODE_ERROR)
+end
+
+
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tmscan.x}
+\begin{verbatim}
+
+include <error.h>
+include <imhdr.h>
+include <tbset.h>
+
+#  TM_SCAN  --  Scan input image list and create column pointer array 
+#               and table from information stored in image headers.
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  30-Jan-97  -  Task created (I.Busko)
+
+
+procedure tm_scan (otp, ocp, ocpsize, nocp, imlist)
+
+pointer        otp                # i:  output table pointer
+pointer        ocp                # io: output table column pointer array
+int        ocpsize                # i:  size of above array
+int        nocp                # o:  actual number of columns in array
+char        imlist[ARB]        # i:  input image list
+#--
+pointer        sp, im, list
+pointer        imname, cn, cn1, cu, cf, duma
+int        image, column, lendata, dumi, i
+bool        match
+
+errchk        tm_header
+
+pointer        imtopen(), immap()
+int        imtlen(), imtgetim()
+bool        streq()
+
+begin
+        call smark (sp)
+        call salloc (imname, SZ_PATHNAME, TY_CHAR)
+        call salloc (cn, SZ_COLNAME, TY_CHAR)
+        call salloc (cn1, SZ_COLNAME, TY_CHAR)
+        call salloc (cu, SZ_COLUNITS, TY_CHAR)
+        call salloc (cf, SZ_COLFMT, TY_CHAR)
+        call salloc (duma, max(SZ_COLUNITS,SZ_COLFMT),TY_CHAR)
+
+        # Open input list and initialize number of columns.
+        list = imtopen (imlist)
+        nocp = 0
+
+        # Scan input list.
+        do image = 1, imtlen(list) {
+
+            # Open image.
+            i = imtgetim (list, Memc[imname], SZ_PATHNAME)
+            iferr (im = immap (Memc[imname], READ_ONLY, 0)) {
+                call erract (EA_WARN)
+                next
+            }
+
+            # Get column data from image header.
+            iferr (call tm_header (im, Memc[cn], Memc[cu], Memc[cf])) {
+                call erract (EA_WARN)
+                next
+            }
+
+            # Array size is full image size.
+            lendata = 0
+            do i = 1, IM_NDIM(im)
+                lendata = lendata + IM_LEN(im,i)
+
+            if (nocp > 0) {
+
+                # See if column name from header matches any name
+                # already stored in column pointer array.
+                match = false
+                do column = 1, nocp {
+                    call tbcinf (Memi[ocp+column-1], dumi, Memc[cn1], 
+                                 Memc[duma], Memc[duma], dumi, dumi, dumi)
+                    if (streq (Memc[cn1], Memc[cn])) {
+                        match = true
+                        break
+                    }
+                }
+                if (!match) {
+
+                # No names matched, efine new column.
+                    call tbcdef (otp, Memi[ocp+nocp], Memc[cn], Memc[cu], 
+                                 Memc[cf], IM_PIXTYPE(im), lendata, 1)
+                    nocp = nocp + 1
+                }
+            } else {
+
+                # Array is empty, define first column.
+                call tbcdef (otp, Memi[ocp], Memc[cn], Memc[cu], Memc[cf], 
+                            IM_PIXTYPE(im), lendata, 1)
+                nocp = 1
+            }
+        }
+
+        call imtclose (list)
+        call sfree (sp)
+        if (nocp == 0)
+            call error (1, "No images with column data in header.")
+        call tbtcre (otp)
+end
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tmheader.x}
+\begin{verbatim}
+
+include <tbset.h>
+
+#  TM_HEADER  --  Decode column info in image header.
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  30-Jan-97  -  Task created (I.Busko)
+
+
+procedure tm_header (im, colname, colunits, colfmt)
+
+pointer        im                        # image pointer
+char        colname[SZ_COLNAME]        # column name        
+char        colunits[SZ_COLUNITS]        # column units        
+char        colfmt[SZ_COLFMT]        # column print format
+#--
+pointer        sp, kwval
+int        colnum
+
+string        corrupt  "Corrupted header in input image."
+
+bool        streq()
+int        imaccf(), nscan()
+
+begin
+        if (imaccf (im, "COLDATA") == NO)
+            call error (1, "No column information in image header.")
+
+        call smark (sp)
+        call salloc (kwval, SZ_LINE, TY_CHAR)
+
+        # Get keyword value.
+        call imgstr (im, "COLDATA", Memc[kwval], SZ_LINE)
+
+        # Read fields.
+        call sscan (Memc[kwval])
+        call gargi (colnum)
+        if (nscan() < 1) call error (1, corrupt)
+        call gargwrd (colname, SZ_COLNAME) 
+        if (nscan() < 1) call error (1, corrupt)
+        call gargwrd (colunits, SZ_COLUNITS)
+        if (nscan() < 1) call error (1, corrupt)
+        call gargwrd (colfmt, SZ_COLFMT)
+        if (nscan() < 1) call error (1, corrupt)
+
+        # Decode custom-encoded values.
+        if (streq (colunits, "default"))
+            call strcpy ("", colunits, SZ_COLUNITS)
+        if (streq (colfmt, "default"))
+            call strcpy ("", colfmt, SZ_COLFMT)
+
+        call sfree (sp)
+end
+
+
+
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tmhc.x}
+\begin{verbatim}
+
+include <tbset.h>
+
+#  TM_HC  --  Get column name from image header and copy image into table.
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  30-Jan-97  -  Task created (I.Busko)
+
+
+procedure tm_hc (tp, cp, ncp, row, rflag, im)
+
+pointer        tp                # table pointer
+pointer        cp                # column pointer array
+int        ncp                # size of column pointer array
+int        row                # row where to begin insertion
+bool        rflag                # use row number in header ?
+pointer        im                # image pointer
+#--
+pointer        sp, colname, cn, duma
+int        i, dumi
+bool        match
+
+errchk        tm_header, tm_copy
+
+bool        streq()
+
+begin
+        call smark (sp)
+        call salloc (colname, SZ_COLNAME, TY_CHAR)
+        call salloc (cn, SZ_COLNAME, TY_CHAR)
+        call salloc (duma, max(SZ_COLUNITS,SZ_COLFMT),TY_CHAR)
+
+        # Get column name from image header.
+        call tm_header (im, Memc[colname], Memc[duma], Memc[duma])
+
+        # Loop over table columns.
+        match = false
+        do i = 1, ncp {
+
+            # Get column name from table.
+            call tbcinf (Memi[cp+i-1], dumi, Memc[cn], Memc[duma], 
+                        Memc[duma], dumi, dumi, dumi)
+
+            # Copy array if names match.
+            if (streq (Memc[colname], Memc[cn])) {
+                call tm_copy (tp, Memi[cp+i-1], row, rflag, im)
+                match = true
+            }
+        }
+        if (!match)
+            call error (1, "No column matched.")
+
+        call sfree (sp)
+end
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tmcopy.x}
+\begin{verbatim}
+
+include <imhdr.h>
+include <tbset.h>
+
+#  TM_COPY  --  Copy image into designated row/column.
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  30-Jan-97  -  Task created (I.Busko)
+
+
+procedure tm_copy (tp, cp, row, rflag, im)
+
+pointer        tp                # table pointer
+pointer        cp                # column pointer
+int        row                # row where to begin insertion
+bool        rflag                # use row number in image header ?
+pointer        im                # imio pointer
+#--
+pointer        sp, duma
+int        i, lena, leni, dumi
+
+int        tbcigi(), imgeti(), imaccf()
+
+begin
+        # See if table and image pixel types match.
+        if (tbcigi (tp, TBL_COL_DATATYPE) == IM_PIXTYPE(im))
+            call error (1, "Pixel type mismatch.")
+
+        # Look for row information in image header.
+        if (imaccf (im, "ORIG_ROW") == YES) {
+            if (rflag)
+                 row = imgeti (im, "ORIG_ROW")   
+        }
+
+        # Get column array size and image size. 
+        call smark (sp)
+        call salloc (duma, max(max(SZ_COLNAME,SZ_COLUNITS),SZ_COLFMT),TY_CHAR)
+        call tbcinf (cp, dumi, Memc[duma], Memc[duma], Memc[duma], dumi, 
+                     lena, dumi)
+        call sfree (sp)
+        leni = 0
+        do i = 1, IM_NDIM(im)
+            leni = leni + IM_LEN(im,i)
+
+        # Copy.
+        switch (IM_PIXTYPE(im)) {
+        case TY_SHORT:
+            call tm_cp1s (im, tp, cp, row, lena, leni)
+        case TY_INT:
+            call tm_cp1i (im, tp, cp, row, lena, leni)
+        case TY_REAL:
+            call tm_cp1r (im, tp, cp, row, lena, leni)
+        case TY_DOUBLE:
+            call tm_cp1d (im, tp, cp, row, lena, leni)
+        default:
+            call error (1, "Non-supported data type.")
+        }
+
+end
+
+
+
+
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tmcp1.gx}
+\begin{verbatim}
+
+
+#  TM_CP1  --  Fill pixel buffer and copy into table.
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  30-Jan-97  -  Task created (I.Busko)
+
+
+procedure tm_cp1$t (im, tp, cp, row, lena, leni)
+
+pointer        im                # imio pointer
+pointer        tp                # table pointer
+pointer        cp                # column pointer
+int        row                # row where to begin insertion
+int        lena                # array length
+int        leni                # image length
+#--
+pointer        buf
+double        undefd
+real        undefr
+int        undefi, i, len
+short        undefs
+
+pointer imgl1$t()
+
+begin
+        # Read pixels into buffer.
+        buf = imgl1$t (im)
+
+        # Choose the minimum between image and table array 
+        # lengths as the array size to be written to table.
+        len = min (lena, leni)
+
+        # Write buffer into array cell element.
+        call tbapt$t (tp, cp, row, Mem$t[buf], 1, len)
+
+        # If image is smaller than array, set
+        # remaining elements to INDEF.
+        if (leni < lena) {
+            undefd = INDEFD
+            undefr = INDEFR
+            undefi = INDEFI
+            undefs = INDEFS
+            do i = len+1, lena
+                call tbapt$t (tp, cp, row, undef$t, i, 1)
+        }
+end
+
+
+
+
+\end{verbatim}
+\newpage
+\end{document}

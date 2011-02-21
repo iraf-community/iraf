@@ -36,7 +36,7 @@ WTS_UNIFORM. If wtflag = WTS_USER individual weights for each data point
 are supplied by the calling program and points with zero-valued weights are
 not included in the fit. If wtflag = WTS_UNIFORM, all weights are assigned
 values of 1. If wtflag = WTS_SPACING, the weights are set equal to the
-differenece between adjacent data points. In order to correctly use the
+difference between adjacent data points. In order to correctly use the
 WTS_SPACING option the data must be sorted in x.
 .le
 .ih

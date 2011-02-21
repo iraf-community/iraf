@@ -1,4 +1,0 @@
-votfile,s,a,"demo.vot",,,"VOTable to load"
-sync,b,h,yes,,,"Synchronous command?"
-status,i,h,0,,,"Service status code"
-mode,s,h,"ql",,,

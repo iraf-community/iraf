@@ -3,30 +3,30 @@
 define	ID_LENSTRING	99		# Length of strings in ID structure
 define	ID_LENSTRUCT	354		# Length ID structure
 
-define	ID_IMAGE	Memc[P2C($1)]	# Image
-define	ID_SECTION	Memc[P2C($1+50)]# Section for 2D and 3D images
-define	ID_DATABASE	Memc[P2C($1+100)]# Name of database
-define	ID_COORDLIST	Memc[P2C($1+150)]# Name of coordinate list
-define	ID_COORDSPEC	Memc[P2C($1+200)]# Name of coordinate spectrum
-define	ID_SAVEID	Memc[P2C($1+250)]# ID for save structure
-define	ID_LINE		Memi[$1+$2+299]	# Image line or column [2]
-define	ID_MAXLINE	Memi[$1+$2+301]	# Maximum line or column [2]
-define	ID_AP		Memi[$1+$2+303]	# Aperture if appropriate [2]
-define	ID_APS		Memi[$1+306]	# Array of apertures (pointer)
-define	ID_NSUM		Memi[$1+$2+306]	# Number of lines to sum [2]
-define	ID_MAXFEATURES	Memi[$1+309]	# Maximum number of features
-define	ID_FTYPE	Memi[$1+310]	# Feature type
-define	ID_MINSEP	Memr[$1+311]	# Minimum pixel separation
-define	ID_MATCH	Memr[$1+312]	# Maximum matching separation
-define	ID_FWIDTH	Memr[$1+313]	# Feature width in pixels
-define	ID_CRADIUS	Memr[$1+314]	# Centering radius in pixels
-define	ID_THRESHOLD	Memr[$1+315]	# Centering threshold
-define	ID_ZWIDTH	Memr[$1+316]	# Zoom window width in fit units
-define	ID_LL		Memi[$1+317]	# Pointer to coordinate list lines
-define	ID_LLL		Memi[$1+318]	# Pointer to coordinate list labels
-define	ID_NLL		Memi[$1+319]	# Number of coordinate list lines
-define	ID_LABELS	Memi[$1+320]	# Type of feature labels
-define	ID_LOGFILES	Memi[$1+321]	# List of logfiles
+define	ID_IMAGE	Memc[P2C($1)]	  # Image
+define	ID_SECTION	Memc[P2C($1+50)]  # Section for 2D and 3D images
+define	ID_DATABASE	Memc[P2C($1+100)] # Name of database
+define	ID_COORDLIST	Memc[P2C($1+150)] # Name of coordinate list
+define	ID_COORDSPEC	Memc[P2C($1+200)] # Name of coordinate spectrum
+define	ID_SAVEID	Memc[P2C($1+250)] # ID for save structure
+define	ID_LINE		Memi[$1+$2+299]	  # Image line or column [2]
+define	ID_MAXLINE	Memi[$1+$2+301]	  # Maximum line or column [2]
+define	ID_AP		Memi[$1+$2+303]	  # Aperture if appropriate [2]
+define	ID_APS		Memi[$1+306]	  # Array of apertures (pointer)
+define	ID_NSUM		Memi[$1+$2+306]	  # Number of lines to sum [2]
+define	ID_MAXFEATURES	Memi[$1+309]	  # Maximum number of features
+define	ID_FTYPE	Memi[$1+310]	  # Feature type
+define	ID_MINSEP	Memr[P2R($1+311)] # Minimum pixel separation
+define	ID_MATCH	Memr[P2R($1+312)] # Maximum matching separation
+define	ID_FWIDTH	Memr[P2R($1+313)] # Feature width in pixels
+define	ID_CRADIUS	Memr[P2R($1+314)] # Centering radius in pixels
+define	ID_THRESHOLD	Memr[P2R($1+315)] # Centering threshold
+define	ID_ZWIDTH	Memr[P2R($1+316)] # Zoom window width in fit units
+define	ID_LL		Memi[$1+317]	  # Pointer to coordinate list lines
+define	ID_LLL		Memi[$1+318]	  # Pointer to coordinate list labels
+define	ID_NLL		Memi[$1+319]	  # Number of coordinate list lines
+define	ID_LABELS	Memi[$1+320]	  # Type of feature labels
+define	ID_LOGFILES	Memi[$1+321]	  # List of logfiles
 
 # Common image data
 

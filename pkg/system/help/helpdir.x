@@ -67,7 +67,7 @@ int	fd, junk
 bool	streq()
 int	open(), getline(), fnroot(), fnldir(), ctowrd()
 int	hd_putstr()
-errchk	salloc, open, calloc, malloc, getline, hd_putstr
+errchk	salloc, open, calloc, getline, hd_putstr
 errchk	hd_putldiry, hd_putmodule, hd_sort_modules
 
 begin
@@ -90,7 +90,7 @@ begin
 	# nextch to 1 because 0 is the null index.
 
 	call calloc (hp, LEN_HDSTRUCT, TY_STRUCT)
-	call malloc (HD_SBUF(hp), SZ_SBUF, TY_CHAR)
+	call calloc (HD_SBUF(hp), SZ_SBUF, TY_CHAR)
 	HD_DEFDIR(hp) = NULL
 	HD_NEXTCH(hp) = 1
 	HD_SZSBUF(hp) = SZ_SBUF

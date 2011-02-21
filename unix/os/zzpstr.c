@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <fcntl.h>
 
 #define	import_spp
@@ -45,34 +46,39 @@
 
 #define	LOGFILE "/tmp/k.log"
 
+void 	spp_printmemc (int memc_ptr);
+void 	spp_printstr (XCHAR *s);
+
+
 
 /* SPP_DEBUG -- Dummy function called to link the SPP debug functions into
  * a program.
  */
-spp_debug() { return (0); }
+int spp_debug (void) { return (0); }
 
 
 /* ZZPSTR -- Write SPP text data directly to the host stderr.  Up to two
  * strings may be ouptut.  Either may be the null pointer to disable.
  * A newline is added at the end if not present in the last string.
  */
-zzpstr_ (s1, s2)
-XCHAR *s1, *s2;
+int
+zzpstr_ (XCHAR *s1, XCHAR *s2)
 {
 	register XCHAR *s, *ip;
 	register char *op;
 	char buf[4096];
-	int lastch;
+	int lastch = 0;
 
-	if (s = s1) {
-	    for (ip=s, op=buf;  *op = *ip++;  op++)
+
+	if ( (s = s1) ) {
+	    for (ip=s, op=buf; (*op = *ip++);  op++)
 		;
 	    lastch = *(op-1);
 	    write (2, buf, op-buf);
 	}
 
-	if (s = s2) {
-	    for (ip=s, op=buf;  *op = *ip++;  op++)
+	if ( (s = s2) ) {
+	    for (ip=s, op=buf; (*op = *ip++);  op++)
 		;
 	    lastch = *(op-1);
 	    write (2, buf, op-buf);
@@ -80,32 +86,34 @@ XCHAR *s1, *s2;
 
 	if (lastch != '\n')
 	    write (2, "\n", 1);
+
+	return (XOK);
 }
 
 
 /* ZZLSTR -- Write SPP text data to a log file.
  */
-zzlstr_ (s1, s2)
-XCHAR *s1, *s2;
+int
+zzlstr_ (XCHAR *s1, XCHAR *s2)
 {
 	register XCHAR *s, *ip;
 	register char *op;
 	char buf[4096];
-	int lastch;
+	int lastch = 0;
 	int status = 0, fd;
 
 	if ((fd = open (LOGFILE, O_CREAT|O_WRONLY|O_APPEND, 0644)) < 0)
 	    return (fd);
 
-	if (s = s1) {
-	    for (ip=s, op=buf;  *op = *ip++;  op++)
+	if ( (s = s1) ) {
+	    for (ip=s, op=buf;  (*op = *ip++);  op++)
 		;
 	    lastch = *(op-1);
 	    status = write (fd, buf, op-buf);
 	}
 
-	if (s = s2) {
-	    for (ip=s, op=buf;  *op = *ip++;  op++)
+	if ( (s = s2) ) {
+	    for (ip=s, op=buf;  (*op = *ip++);  op++)
 		;
 	    lastch = *(op-1);
 	    status = write (fd, buf, op-buf);
@@ -123,8 +131,7 @@ XCHAR *s1, *s2;
  * string passed as a char array.
  */
 void
-spp_printstr (s)
-XCHAR *s;
+spp_printstr (XCHAR *s)
 {
 	register XCHAR *ip;
 	register char *op, *otop;
@@ -162,8 +169,7 @@ XCHAR *s;
  * string passed as a pointer to char.
  */
 void
-spp_printmemc (memc_ptr)
-int memc_ptr;
+spp_printmemc (int memc_ptr)
 {
 	spp_printstr ((XCHAR *) ((memc_ptr - 1) * 2 - 2));
 }

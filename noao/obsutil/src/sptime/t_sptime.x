@@ -514,9 +514,9 @@ int	fd		#I Output file descriptor
 
 char	eff[SZ_FNAME]
 real	x, y
-int	npix, order, tabgeti()
+int	npix, order, tabgeti(), stgeti()
 pointer	tab
-real	stgetr(), gr_getr()
+real	gr_getr()
 bool	tabexists()
 
 begin
@@ -758,7 +758,7 @@ begin
 		call pargi (ST_BIN(st,1))
 		call pargi (ST_BIN(st,2))
 	}
-	npix = stgetr (st, "ndisp", "detector", 2048) / ST_BIN(st,1)
+	npix = stgeti (st, "ndisp", "detector", 2048) / ST_BIN(st,1)
 	call fprintf (fd, "\tNumber of pixels = %d\n")
 	    call pargi (npix)
 	call fprintf (fd,
@@ -1773,7 +1773,8 @@ begin
 	Memr[ydata+npts] = INDEF
 	Memr[ydata+2*npts] = INDEF
 	Memr[ydata+3*npts] = INDEF
-	wx1 = INDEF; wx2 = INDEF; wy1 = -4.; wy2 = 104.
+	#wx1 = INDEF; wx2 = INDEF; wy1 = -4.; wy2 = 104.
+	wx1 = INDEF; wx2 = INDEF; wy1 = INDEF; wy2 = INDEF
 
 	type = strdic (output, Memc[name], SZ_LINE, OUTTYPES)
 	switch (type) {

@@ -93,7 +93,7 @@ ray mask by the \fIcrval\fR value are increased in size in the mask (but
 not replaced in the output image) by also flagging all zero valued mask
 pixels within this specified radius with the cosmic ray mask value.  This
 is done after the detection phase is complete.  The separation between
-pixels is the distance between pixel centers conmputed as a real value.
+pixels is the distance between pixel centers computed as a real value.
 Note a value of at least one is required to affect other mask pixels.
 .le
 
@@ -116,7 +116,7 @@ flagging all zero valued mask pixels within this specified radius with the
 cosmic ray mask value.  This is done after the detection phase is complete
 and so object grown pixels are not used in excluding cosmic ray
 candidates.  The separation between pixels is the distance between pixel
-centers conmputed as a real value.  Note a value of at least one is
+centers computed as a real value.  Note a value of at least one is
 required to affect other mask pixels.
 .le
 .ih
@@ -195,7 +195,7 @@ the average filtered values and the sigma values.
 
 If a mask is specified the detected cosmic rays will be identified with
 values given by the \fIcrval\fR parameter and object pixels will be
-identifed with values given by the \fIobjval\fR parameter.  Note that one
+identified with values given by the \fIobjval\fR parameter.  Note that one
 does not need to use an output image and the cosmic rays can be replaced by
 interpolation in the data using the tasks \fIcrfix\fR, \fIfixpix\fR, or
 \fIccdproc\fR.

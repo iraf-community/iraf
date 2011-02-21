@@ -19,7 +19,7 @@ The pointer to the surface descriptor structure.
 .le
 .ls parameter
 Parameter to be returned. The options are GSTYPE, GSXORDER, GSYORDER,
-GSNXCOEFF, GSNYCOEFF, and GSNSAVE. The parameter defintions are
+GSNXCOEFF, GSNYCOEFF, and GSNSAVE. The parameter definitions are
 found in the package header file math/gsurfit.h.
 .le
 .ih

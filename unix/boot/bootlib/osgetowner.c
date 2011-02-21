@@ -5,15 +5,19 @@
 #include <sys/stat.h>
 #include "bootlib.h"
 
+
 /* OS_GETOWNER -- Get the user and group identifications for a file.  This is
  * not a required function and is expected to rarely work when transporting
  * files to a host at a different site.  Nonetheless it is useful when moving
  * files between compatible hosts at a single site, so we make use of it in
  * case it works.  It is sufficient to merely set uid and gid to 0 and return.
  */
-os_getowner (fname, uid, gid)
-char	*fname;
-int	*uid, *gid;
+void
+os_getowner (
+  char	*fname,
+  int	*uid, 
+  int	*gid 
+)
 {
 	struct	stat fi;
 

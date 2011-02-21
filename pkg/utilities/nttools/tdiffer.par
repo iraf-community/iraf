@@ -1,0 +1,6 @@
+intable1,f,a,,,,name of the first table
+intable2,f,a,,,,name of the second table
+outtable,s,a,,,,name of output table
+colnam1,s,a,,,,name of columns in first table
+colnam2,s,a,,,,name of columns in second table
+mode,s,h,"a",,,

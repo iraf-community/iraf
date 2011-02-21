@@ -35,8 +35,8 @@ define  IM_V2NBPIX	Meml[$1+27]		# number of bad pixels
 define	IM_V2CTIME	Meml[$1+28]		# time of image creation
 define	IM_V2MTIME	Meml[$1+29]		# time of last modify
 define	IM_V2LIMTIME	Meml[$1+30]		# time min,max computed
-define	IM_V2MAX	Memr[$1+31]		# max pixel value
-define	IM_V2MIN	Memr[$1+32]		# min pixel value
+define	IM_V2MAX	Memr[P2R($1+31)]	# max pixel value
+define	IM_V2MIN	Memr[P2R($1+32)]	# min pixel value
 define	IM_V2PIXFILE	Memc[P2C($1+37)]	# name of pixel storage file
 define	IM_V2HDRFILE	Memc[P2C($1+165)]	# name of header storage file
 define	IM_V2TITLE	Memc[P2C($1+293)]	# image name string

@@ -10,3 +10,5 @@
       files written in text database format (the default) but will not
       run on files written in ST tables format. Check the value of the
       DAOPHOT package parameter "text" before beginning reductions.
+
+

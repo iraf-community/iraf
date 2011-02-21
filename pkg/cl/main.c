@@ -14,6 +14,7 @@
 #define import_xnames
 #include <iraf.h>
 
+#include <ctype.h>
 #include "config.h"
 #include "grammar.h"
 #include "opcodes.h"
@@ -23,6 +24,8 @@
 #include "task.h"
 #include "errs.h"
 #include "mem.h"
+#include "proto.h"
+
 
 #define CLDIR	"cl$"
 #define HOSTLIB "hlib$"
@@ -50,9 +53,9 @@ typedef	int (*PFI)();
 
 extern	int yydebug;		/* print each parser state if set	*/
 extern	FILE *yyin;		/* where parser reads from		*/
-extern	yeof;			/* set when yacc sees eof 		*/
-extern	dobkg;			/* set when code is to be done in bkg	*/
-extern	bkgno;			/* job number if bkg job		*/
+extern	int yeof;		/* set when yacc sees eof 		*/
+extern	int dobkg;		/* set when code is to be done in bkg	*/
+extern	int bkgno;		/* job number if bkg job		*/
 
 int	cldebug = 0;		/* print out lots of goodies if > 0	*/
 int	cltrace = 0;		/* trace instruction execution if > 0	*/
@@ -62,7 +65,7 @@ static	long *jumpcom;		/* IRAF Main setjmp/longjmp buffer	*/
 static	jmp_buf jmp_save;	/* save IRAF Main jump vector		*/
 static	jmp_buf jmp_clexit;	/* clexit() jumps here			*/
 static	int intr_sp;		/* interrupt save stack pointer		*/
-static	int intr_save[LEN_INTRSTK];	/* the interrupt save stack	*/
+static	XINT intr_save[LEN_INTRSTK];	/* the interrupt save stack	*/
 memel	cl_dictbuf[DICTSIZE];	/* the dictionary area			*/
 
 jmp_buf errenv;			/* cl_error() jumps here		*/
@@ -79,8 +82,12 @@ int	logout_status = 0;	/* optional status arg to logout()	*/
 
 
 static void execute();
-static	void login(), logout();
-static	void startup(), shutdown();
+static void login(), logout();
+static void startup(), shutdown();
+
+extern void ZDOJMP();
+extern void c_xwhen(), onint();
+extern int yyparse();
 
 
 /* C_MAIN -- Called by the SPP procedure in cl.x to fire up the CL.
@@ -88,12 +95,14 @@ static	void startup(), shutdown();
  * the file system, etc. is initialized.  When we exit we signal that the
  * interpreter be skipped, proceeding directly to process shutdown.
  */
-c_main (prtype, bkgfile, cmd)
-int	*prtype;		/* process type (connected, detached)	*/
-PKCHAR	*bkgfile;		/* bkgfile filename if detached		*/
-PKCHAR	*cmd;			/* host command line			*/
+int
+c_main (
+  int	 *prtype,		/* process type (connected, detached)	*/
+  PKCHAR *bkgfile,		/* bkgfile filename if detached		*/
+  PKCHAR *cmd 			/* host command line			*/
+)
 {
-	int	bp;
+	XINT	bp;
 
 	/* Save the setjmp vector of the IRAF Main for restoration at clexit
 	 * time.  We need to intercept all errors and do error recovery
@@ -135,7 +144,7 @@ exit_:
 	 * This is ugly, but the real problem is the jump vectors.  There
 	 * seems to be no alternative to this sort of thing...
 	 */
-	cl_amovi ((int *)jmp_save, jumpcom, LEN_JUMPBUF);
+	cl_amovi ((int *)jmp_save, (int *)jumpcom, LEN_JUMPBUF);
 	return (PR_EXIT | (logout_status << 1));
 }
 
@@ -143,7 +152,8 @@ exit_:
 /* CLEXIT -- Called on fatal error from error() when get an error so bad that we
  * should commit suicide.
  */
-clexit()
+void
+clexit (void)
 {
 	longjmp (jmp_clexit, 1);
 }
@@ -151,7 +161,8 @@ clexit()
 
 /* CLSHUTDOWN -- Public entry for shutdown.
  */
-clshutdown()
+void
+clshutdown (void)
 {
 	shutdown();
 }
@@ -179,9 +190,9 @@ clshutdown()
  *   the dictionary, which is not what C likes to do.
  */
 static void
-startup()
+startup (void)
 {
-	int	onint(), onipc();
+	void	onint(), onipc(), c_xwhen();
 
 	/* Set up pointers to dictionary buffer.
 	 */
@@ -215,7 +226,7 @@ startup()
  *   anything then anyway.
  */
 static void
-shutdown()
+shutdown (void)
 {
 	float	cpu, clk;
 
@@ -247,11 +258,10 @@ shutdown()
  * compiled code.
  */
 static void
-execute (mode)
-int	mode;
+execute (int mode)
 {
 	int	parsestat;
-	int	old_parhead;
+	XINT	old_parhead;
 	char	*curcmd();
 
 	alldone = 0;
@@ -342,8 +352,7 @@ bkg:
  * If any of this fails, we die.
  */
 static void
-login (cmd)
-char *cmd;
+login (char *cmd)
 { 
 	register struct task *tp;
 	register char *ip, *op;
@@ -499,7 +508,7 @@ char *cmd;
  * logout file is seen the CL really does exit.
  */
 static void
-logout ()
+logout (void)
 { 
 	register struct task *tp;
 	char	logoutfile[SZ_PATHNAME];
@@ -525,8 +534,9 @@ logout ()
  * is fixed in size, abort if the dictionary overflows.
  */
 char *
-memneed (incr)
-int	incr;		/* amount of space desired in ints, not bytes	*/
+memneed (
+  int	incr 		/* amount of space desired in ints, not bytes	*/
+)
 {
 	memel *old;
 
@@ -556,9 +566,11 @@ int	incr;		/* amount of space desired in ints, not bytes	*/
  *   before shutting down.
  */
 /* ARGSUSED */
-onint (vex, next_handler)
-int	*vex;			/* virtual exception code	*/
-int	(**next_handler)();	/* next handler to be called	*/
+void
+onint (
+  int	*vex,			/* virtual exception code	*/
+  int	(**next_handler)() 	/* next handler to be called	*/
+)
 {
 	if (firstask->t_flags & T_BATCH) {
 	    /* Batch task.
@@ -615,20 +627,25 @@ int	(**next_handler)();	/* next handler to be called	*/
 /* INTR_DISABLE -- Disable interrupts, e.g., to protect a critical section
  * of code.
  */
-intr_disable()
+void
+intr_disable (void)
 {
+	PFI	junk;
+
 	if (intr_sp >= LEN_INTRSTK)
 	    cl_error (E_IERR, "interrupt save stack overflow");
-	c_xwhen (X_INT, X_IGNORE, &intr_save[intr_sp++]);
+	c_xwhen (X_INT, X_IGNORE, &junk);
+	intr_save[intr_sp++] = (XINT) junk;
 }
 
 
 /* INTR_ENABLE -- Reenable interrupts, reposting the interrupt vector saved
  * in a prior call to INTR_DISABLE.
  */
-intr_enable()
+void
+intr_enable (void)
 {
-	int	junk;
+	PFI	junk;
 
 	if (--intr_sp < 0)
 	    cl_error (E_IERR, "interrupt save stack underflow");
@@ -639,10 +656,10 @@ intr_enable()
 /* INTR_RESET -- Post the interrupt handler and clear the interrupt vector
  * save stack.
  */
-intr_reset()
+void
+intr_reset (void)
 {
-	int	junk;
-	int	onint();
+	PFI	junk;
 
 	c_xwhen (X_INT, onint, &junk);
 	intr_sp = 0;
@@ -657,7 +674,8 @@ intr_reset()
  * the system and call cl_error() which eventually does a longjmp back to
  * the errenv in execute().
  */
-onerr()
+void
+onerr (void)
 {
 	char	errmsg[SZ_LINE];
 
@@ -673,10 +691,12 @@ onerr()
 
 /* CL_AMOVI -- Copy an integer sized block of memory.
  */
-cl_amovi (ip, op, len)
-register int	*ip;
-register int	*op;
-register int	len;
+void
+cl_amovi (
+  register int	*ip,
+  register int	*op,
+  register int	len 
+)
 {
 	while (--len)
 	    *op++ = *ip++;

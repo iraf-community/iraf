@@ -8,20 +8,29 @@
 #define	import_knames
 #include <iraf.h>
 
+static char *_ev_scaniraf (char *envvar);
+static int   _ev_loadcache (char *fname);
+static int   _ev_streq (char *s1, char *s2, int n);
+
+
 /* ZGTENV -- Get the value of a host system environment variable.  Look first
  * in the process environment.  If no entry is found there and the variable is
  * one of the standard named variables, get the system wide default value from
  * the file <iraf.h>, which is assumed to be located in /usr/include.
  */
-ZGTENV (envvar, outstr, maxch, status)
-PKCHAR	*envvar;		/* name of variable to be fetched	*/
-PKCHAR	*outstr;		/* output string			*/
-XINT	*maxch, *status;
+int
+ZGTENV (
+  PKCHAR  *envvar,		/* name of variable to be fetched	*/
+  PKCHAR  *outstr,		/* output string			*/
+  XINT	  *maxch, 
+  XINT    *status
+)
 {
 	register char	*ip, *op;
 	register int	n;
 	char	*getenv();
 	char	*_ev_scaniraf();
+
 
 	op = (char *)outstr;
 	if ((ip = getenv ((char *)envvar)) == NULL)
@@ -36,6 +45,8 @@ XINT	*maxch, *status;
 	    for (n = *maxch;  --n >= 0 && (*op++ = *ip++);  )
 		(*status)++;
 	}
+
+	return (XOK);
 }
 
 
@@ -56,9 +67,9 @@ struct	env {
 
 int	ev_cacheloaded = 0;
 struct	env ev_table[NENV] = {
-	"host",		"",
-	"iraf",		"",
-	"tmp",		""
+	{ "host",		""},
+	{ "iraf",		""},
+	{ "tmp",		""}
 };
 
 
@@ -101,11 +112,11 @@ struct	env ev_table[NENV] = {
  * Although the definitions are entered as standard C #defines, they should not
  * be directly referenced in C programs.
  */
-char *
-_ev_scaniraf (envvar)
-char	*envvar;
+static char *
+_ev_scaniraf (char *envvar)
 {
 	int	i;
+
 
 	for (i=0;  i < NENV;  i++)
 	    if (strcmp (ev_table[i].ev_name, envvar) == 0)
@@ -114,11 +125,12 @@ char	*envvar;
 	if (i >= NENV)
 	    return (NULL);
 
-	if (!ev_cacheloaded)
+	if (!ev_cacheloaded) {
 	    if (_ev_loadcache (TABLE) == ERR)
 		return (NULL);
 	    else
 		ev_cacheloaded++;
+	}
 
 	return (ev_table[i].ev_value);
 }
@@ -129,26 +141,44 @@ char	*envvar;
  * cannot cache them in memory).  Any errors in accessing the table probably
  * indicate an error in installing IRAF hence should be reported immediately.
  */
-_ev_loadcache (fname)
-char	*fname;
+static int
+_ev_loadcache (char *fname)
 {
 	register char	*ip, *op;
 	register FILE	*fp;
 	register int	n;
 
+	static  char   *home, hpath[SZ_PATHNAME+1];
 	static	char	delim[] = DELIM;
 	char	lbuf[SZ_LINE+1];
 	int	len_delim, i;
 
-	if ((fp = fopen (fname, "r")) == NULL) {
-	    fprintf (stderr, "os.zgtenv: cannot open `%s'\n", fname);
-	    return (ERR);
+
+	if ((home = getenv ("HOME"))) {
+	    memset (hpath, 0, SZ_PATHNAME);
+	    sprintf (hpath, "%s/.iraf.h", home);
+	    if ((fp = fopen (hpath, "r")) == NULL) {
+		/*  No personal $HOME/.iraf.h file, try the system request.
+		 */
+		if ((fp = fopen (fname, "r")) == NULL) {
+	            fprintf (stderr, "os.zgtenv: cannot open `%s'\n", fname);
+	            return (ERR);
+	    	}
+	    }
+	} else {
+	    /*  We should always have a $HOME, but try this to be safe.
+	     */
+	    if ((fp = fopen (fname, "r")) == NULL) {
+	        fprintf (stderr, "os.zgtenv: cannot open `%s'\n", fname);
+	        return (ERR);
+	    }
 	}
 
 	len_delim = strlen (delim);
-	while (fgets (lbuf, SZ_LINE, fp) != NULL)
+	while (fgets (lbuf, SZ_LINE, fp) != NULL) {
 	    if (strncmp (lbuf, delim, len_delim) == 0)
 		break;
+	}
 
 	/* Extract the values of the variables from the table.  The format is
 	 * rather rigid; in particular, the variables must be given in the
@@ -195,9 +225,8 @@ error:
  * names are given in upper case in <iraf.h> since they are presented as
  * macro defines.
  */
-_ev_streq (s1, s2, n)
-register char	*s1, *s2;
-int	n;
+static int
+_ev_streq (char *s1, char *s2, int n)
 {
 	register int	ch1, ch2;
 

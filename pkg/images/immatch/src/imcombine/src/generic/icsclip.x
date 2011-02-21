@@ -51,10 +51,10 @@ begin
 	    call salloc (w, nimages, TY_REAL)
 
 	# Do sigma clipping.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -274,7 +274,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -324,10 +324,10 @@ begin
 	    call salloc (w, nimages, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -360,7 +360,7 @@ begin
 
 			# Reject pixels and save the residuals.
 			if (s > 0.) {
-			    for (; nl <= n2; nl = nl + 1) {
+			    for (; nl <= nh; nl = nl + 1) {
 				r = (med - Mems[d[nl]+k]) / (s * Memr[w+nl-1])
 				if (r <= lsigma)
 				    break
@@ -384,7 +384,7 @@ begin
 
 			# Reject pixels and save the residuals.
 			if (s > 0.) {
-			    for (; nl <= n2; nl = nl + 1) {
+			    for (; nl <= nh; nl = nl + 1) {
 				r = (med - Mems[d[nl]+k]) / s
 				if (r <= lsigma)
 				    break
@@ -408,7 +408,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -468,7 +468,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -530,10 +530,10 @@ begin
 	    call salloc (w, nimages, TY_REAL)
 
 	# Do sigma clipping.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -753,7 +753,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -803,10 +803,10 @@ begin
 	    call salloc (w, nimages, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -839,7 +839,7 @@ begin
 
 			# Reject pixels and save the residuals.
 			if (s > 0.) {
-			    for (; nl <= n2; nl = nl + 1) {
+			    for (; nl <= nh; nl = nl + 1) {
 				r = (med - Memi[d[nl]+k]) / (s * Memr[w+nl-1])
 				if (r <= lsigma)
 				    break
@@ -863,7 +863,7 @@ begin
 
 			# Reject pixels and save the residuals.
 			if (s > 0.) {
-			    for (; nl <= n2; nl = nl + 1) {
+			    for (; nl <= nh; nl = nl + 1) {
 				r = (med - Memi[d[nl]+k]) / s
 				if (r <= lsigma)
 				    break
@@ -887,7 +887,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -947,7 +947,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1009,10 +1009,10 @@ begin
 	    call salloc (w, nimages, TY_REAL)
 
 	# Do sigma clipping.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1232,7 +1232,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1282,10 +1282,10 @@ begin
 	    call salloc (w, nimages, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1318,7 +1318,7 @@ begin
 
 			# Reject pixels and save the residuals.
 			if (s > 0.) {
-			    for (; nl <= n2; nl = nl + 1) {
+			    for (; nl <= nh; nl = nl + 1) {
 				r = (med - Memr[d[nl]+k]) / (s * Memr[w+nl-1])
 				if (r <= lsigma)
 				    break
@@ -1342,7 +1342,7 @@ begin
 
 			# Reject pixels and save the residuals.
 			if (s > 0.) {
-			    for (; nl <= n2; nl = nl + 1) {
+			    for (; nl <= nh; nl = nl + 1) {
 				r = (med - Memr[d[nl]+k]) / s
 				if (r <= lsigma)
 				    break
@@ -1366,7 +1366,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -1426,7 +1426,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1488,10 +1488,10 @@ begin
 	    call salloc (w, nimages, TY_REAL)
 
 	# Do sigma clipping.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1711,7 +1711,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1761,10 +1761,10 @@ begin
 	    call salloc (w, nimages, TY_REAL)
 
 	# Compute median and sigma and iteratively clip.
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1797,7 +1797,7 @@ begin
 
 			# Reject pixels and save the residuals.
 			if (s > 0.) {
-			    for (; nl <= n2; nl = nl + 1) {
+			    for (; nl <= nh; nl = nl + 1) {
 				r = (med - Memd[d[nl]+k]) / (s * Memr[w+nl-1])
 				if (r <= lsigma)
 				    break
@@ -1821,7 +1821,7 @@ begin
 
 			# Reject pixels and save the residuals.
 			if (s > 0.) {
-			    for (; nl <= n2; nl = nl + 1) {
+			    for (; nl <= nh; nl = nl + 1) {
 				r = (med - Memd[d[nl]+k]) / s
 				if (r <= lsigma)
 				    break
@@ -1845,7 +1845,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -1905,7 +1905,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1920,3 +1920,4 @@ begin
 
 	call sfree (sp)
 end
+

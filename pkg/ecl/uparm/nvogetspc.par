@@ -1,5 +1,0 @@
-id,s,a,"ivo://jhu/sdss/dr4#145464500152172544",,,"Image ID"
-oname,s,a,"foog.fits",,,"Output image"
-verbose,b,h,yes,,,"Verbose output?"
-status,i,h,0,,,"Service status code"
-mode,s,h,"ql",,,

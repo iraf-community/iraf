@@ -21,6 +21,10 @@ begin
 	if (PL_LLNUPDATES(pl) <= 0)
 	    return
 
+        # Return if there was a prior error with plalloc.
+	if (PL_LLBP(pl) == NULL)
+	    call syserr (SYS_PLBADMASK)
+
 	# Count the total space in the active line lists.
 	nwords = 0
 	for (i=0;  i < PL_LLOP(pl);  i=i+b_len) {

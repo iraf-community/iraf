@@ -20,7 +20,7 @@ contain a squibby brightness smaller than the threshold value.  This is
 done in place, that is, the input image gets modified.
 .ih
 EXAMPLES
-1. To trim a data image called 'data' with a squibby brighness threshold
+1. To trim a data image called 'data' with a squibby brightness threshold
 of 4 (the standard value) the command would be:
 
 .nf

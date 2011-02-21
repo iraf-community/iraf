@@ -1,4 +1,4 @@
-images,s,a,"foo.fits",,,"List of input images"
+images,s,a,"dev$pix",,,"List of input images"
 fields,s,h,"image,npix,mean,stddev,min,max",,,"Fields to be printed"
 lower,r,h,INDEF,,,"Lower limit for pixel values"
 upper,r,h,INDEF,,,"Upper limit for pixel values"

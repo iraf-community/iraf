@@ -159,7 +159,7 @@ If dispersion information is present, \fIwindow\fR is specified in Km/s.
 A value of INDEF results in a default window size of 20 pixels.  If the
 window proves to be too small for the number of points to be fit selected 
 with the \fIwidth\fR, \fIheight\fR, and/or \fIpeak\fR parameters, a message
-will be written to the ".log" file and/or screen explaing that points
+will be written to the ".log" file and/or screen explaining that points
 outside the window bounds were used in the fit.  The user may wish to
 review this fit or increase the window size.
 .le
@@ -373,12 +373,12 @@ the \fIfiltpars\fR pset prior to the correlation computation.
 Once the correlation is computed, the maximum peak within the window
 specified by the \fIwincenter\fR and \fIwindow\fR parameters is found and
 fit according to the \fIwidth\fR or \fIheight\fR and \fIpeak\fR parameters.
-A small, unlabelled plot of the entire cross correlation function (hereafter
+A small, unlabeled plot of the entire cross correlation function (hereafter
 CCF) is drawn above a larger, expanded plot centered on the peak in a window
 of size specified by the \fIwindow\fR parameter.  The dashed lines in the
 small plot show the limits of the expanded plot.  The bottom axis of the
-expanded plot is labelled with pixel lag and, if dispersion information is
-present, the top axis is labelled with relative velocity.  To choose a
+expanded plot is labeled with pixel lag and, if dispersion information is
+present, the top axis is labeled with relative velocity.  To choose a
 different peak to fit, move the cursor to the top plot of the whole ccf and
 hit the 'z' keystroke at the desired peak.  The plot will be redrawn with
 the new peak now centered in the window and a fit automatically done.  The
@@ -410,7 +410,7 @@ computed when these modes are exited.
 
 The 'c' keystroke may be used to get a printout of the cursor position in both 
 lag and relative velocity.  The cursor may be positioned in either the
-unlabelled CCF plot on the top, or in the zoomed plot on the bottom.  This is
+unlabeled CCF plot on the top, or in the zoomed plot on the bottom.  This is
 useful for judging the FWHM calculation, or estimating the velocity of a
 peak without using the 'z' keystroke to zoom and fit.  Note that because of
 the plotting implementation, the normal cursor mode keystroke \fIshift-C\fR
@@ -440,7 +440,7 @@ move to the next object image, again resetting the template image and/or
 aperture list.  To override this sequence, the user may use the ":next" or
 ":previous" commands and specify one of "aperture", "object", or
 "template".  If \fIautowrite\fR is set, the results of the last fit will be
-written to the log automatically.  To write any one of the fits explicity,
+written to the log automatically.  To write any one of the fits explicitly,
 use the 'w' keystroke.
 
 The \fIfxcor\fR task also contains three submodes discussed in detail below.
@@ -493,7 +493,7 @@ FOURIER MODE DESCRIPTION
 Fourier mode is entered from the main task mode via the 'f' keystroke.  By 
 default, the user is presented with a split plot of the power spectra of
 the object and template spectra (object on top) and the requested filter
-overlayed. The X-axis is double-labelled with wavenumbers on the bottom of
+overlayed. The X-axis is double-labeled with wavenumbers on the bottom of
 the screen and frequency on top.  The ":log_scale" command can be used to 
 toggle the log scaling of the Y-axis of the plot, and the ":overlay" command 
 will toggle whether or not the filter function (if specified) is overlayed 
@@ -547,7 +547,7 @@ keystroke to select the endpoints of the region.  An 's' keystroke on the
 top plot will select a sample region for the object spectrum, and an 's' on
 the bottom plot will select a template sample, using the 'b' keystroke will
 select both samples simultaneously.  The regions may be selected
-explicity by using the ":osample" and ":rsample" commands, and selected
+explicitly by using the ":osample" and ":rsample" commands, and selected
 sample regions may be cleared entirely using the (e.g.) ":osample *" command,
 or individual regions may be unselected by putting the cursor within the
 region and typing 'u'.  See the
@@ -626,7 +626,7 @@ There are six types of fits which may be selected.  This covers all
 combinations of fixing the absolute positions, the relative positions,
 the sigmas to be the same, and letting all parameters be determined.
 In all cases the peak intensities are also determined for each line.
-The options are given below with the appropriate key and mneumonic.
+The options are given below with the appropriate key and mnemonic.
 
 .nf
     a=0p1s	Fit intensities and one sigma with positions fixed
@@ -667,7 +667,7 @@ be performed. This allows you to fit a portion of a peak which may
 be contaminated by a blend and then subtract away the entire peak
 to examine the remaining components.
 
-The fitting uses an interative algorithm based on the Levenberg-Marquardt
+The fitting uses an interactive algorithm based on the Levenberg-Marquardt
 method.  The iterations attempt to improve the fit by varying the parameters
 along the gradient of improvement in the chi square.  This method requires
 that the initial values for the parameters be close enough that the
@@ -689,7 +689,7 @@ are reset.  Thus the results do not depend on the history of previous fits.
 However, within each option an iteration of parameters is performed as
 described next.
 
-The interation is more likely to fail if one initially attempts to fit too
+The iteration is more likely to fail if one initially attempts to fit too
 many parameters simultaneously.  A constrained approach to the solution
 is obtained by iterating starting with a few parameters and then adding
 more parameters as the solution approaches the true chi square minimum.

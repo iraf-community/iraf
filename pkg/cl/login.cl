@@ -2,15 +2,15 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.12.2a July 2004"
+    logver = "IRAF V2.15 Oct 2009"
 
-set	home		= "cl$"
+set	home		= "pkg$ecl/"
 set	imdir		= "uparm$"
 set	uparm		= "home$uparm/"
-set	userid		= "CLTEST"
+set	userid		= "ECLTEST"
 
 # Set the terminal type.
-stty xterm nl=44
+stty xgterm
 
 # Uncomment and edit to change the defaults.
 #set	editor		= vi
@@ -28,10 +28,14 @@ stty xterm nl=44
 # enable remote image display.
 #set	node		= ""
 
-# CL parameters you mighth want to change.
+# CL parameters you might want to change.
 #ehinit   = "nostandout eol noverify"
 #epinit   = "standout showall"
-showtype = yes
+showtype  = yes
+
+# Environment values you might want to change.
+#reset erract    = "noabort notrace noclear flpr" ; keep
+#reset erract    = "abort trace flpr" ; keep
 
 # Default USER package; extend or modify as you wish.  Note that this can
 # be used to call FORTRAN programs from IRAF.
@@ -52,8 +56,8 @@ task	$nbugs = ("$(setenv EDITOR 'buglog -e';" //
 	    "less -Cqm +G " // envget ("iraf") // "local/bugs.*)")
 task	$cls = "$clear;ls"
 
-if (access ("home$loginuser.cl"))
-    cl < "home$loginuser.cl"
+if (access ("loginuser.cl"))
+    cl < "loginuser.cl"
 ;
 
 keep;   clpackage
@@ -67,6 +71,7 @@ if (access (".hushiraf"))
 else {
     clear; type hlib$motd
 }
+
 
 # Delete any old MTIO lock (magtape position) files.
 if (deftask ("mtclean"))
@@ -89,3 +94,4 @@ utilities       # miscellaneous utilities
 noao            # optical astronomy packages
 
 keep
+

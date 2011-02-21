@@ -1,6 +1,8 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <stdio.h>
+
 #ifdef LINUX
 #define NOINDEX
 #endif
@@ -22,9 +24,7 @@
  * or null if the char is not found.
  */
 char *
-index (str, ch)
-char	*str;
-register int ch;
+index ( char *str, int ch)
 {
 	register char	*ip;
 	register int	cch;
@@ -33,7 +33,7 @@ register int ch;
 	    if (cch == ch)
 		return (ip);
 
-	return (0);
+	return (NULL);
 }
 
 #endif

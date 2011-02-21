@@ -3,17 +3,21 @@
 
 #include "bootlib.h"
 
+
 /* OS_SUBDIR -- Fold a subdirectory name into a directory pathname and return
  * a pointer to the pathname of the subdirectory.
  */
 char *
-os_subdir (dir, subdir)
-char	*dir;			/* OS pathname of directory	*/
-char	*subdir;		/* name of subdirectory		*/
+os_subdir (
+  char	*dir,			/* OS pathname of directory	*/
+  char	*subdir 		/* name of subdirectory		*/
+)
 {
 	static	XCHAR x_path[SZ_PATHNAME+1];
 	XCHAR	x_subdir[SZ_FNAME+1];
 	XINT	x_maxch = SZ_PATHNAME, x_nchars;
+	extern  int ZFSUBD();
+
 
 	os_strupk (dir,    x_path,   SZ_PATHNAME);
 	os_strupk (subdir, x_subdir, SZ_FNAME);

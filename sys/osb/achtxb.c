@@ -8,10 +8,12 @@
 /* ACHT_B -- Pack SPP array into an unsigned byte array.
  * [MACHDEP]: The underscore appended to the procedure name is OS dependent.
  */
-ACHTXB (a, b, npix)
-XCOMPLEX	*a;
-XCHAR	*b;
-XINT	*npix;
+void
+ACHTXB (
+  XCOMPLEX  	*a,
+  XCHAR	    	*b,
+  XINT	    	*npix
+)
 {
 	register XCOMPLEX	*ip;
 	register XUBYTE	*op;

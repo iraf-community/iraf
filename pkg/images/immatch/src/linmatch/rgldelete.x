@@ -765,7 +765,7 @@ begin
 	if (wcs == 1) {
 	    call asubkr (Memr[rg_lstatp(ls,RBSCALE)], bscale, Memr[yreg],
 	        nregions)
-	    region = rg_lpfind (gd, 1, wx, wy, Memr[xreg], memr[yreg],
+	    region = rg_lpfind (gd, 1, wx, wy, Memr[xreg], Memr[yreg],
 	        nregions)
 	} else if (wcs == 2) {
 	    call asubkr (Memr[rg_lstatp(ls,RBZERO)], bzero, Memr[yreg],

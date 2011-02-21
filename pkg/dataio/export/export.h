@@ -38,10 +38,10 @@ define	EX_OBPTR	Memi[$1+24]	    # outbands expression string (ptr)
 define	EX_CMPTR	Memi[$1+25]	    # colormap filename (ptr)
 define	EX_LUTPTR	Memi[$1+26]	    # LUT filename (ptr)
 define	EX_TIMPTR	Memi[$1+27]	    # temp image name (ptr)
-define	EX_PSDPI	Memr[$1+28]	    # EPS dpi resolution
-define	EX_PSSCALE	Memr[$1+29]	    # EPS scale
-define	EX_BRIGHTNESS	Memr[$1+30]	    # display brightness value
-define	EX_CONTRAST	Memr[$1+31]	    # display contrast value
+define	EX_PSDPI	Memr[P2R($1+28)]    # EPS dpi resolution
+define	EX_PSSCALE	Memr[P2R($1+29)]    # EPS scale
+define	EX_BRIGHTNESS	Memr[P2R($1+30)]    # display brightness value
+define	EX_CONTRAST	Memr[P2R($1+31)]    # display contrast value
 
 define 	EX_CMAP		Memi[$1+32]	    # colormap struct (ptr)
 define 	EX_NCOLORS	Memi[$1+33]	    # no. of colors in colormap

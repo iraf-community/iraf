@@ -27,10 +27,12 @@
  * The end of the logical directory prefix, if present, is marked by the index
  * of the last non-VFN character encountered.
  */
-ZFNBRK (vfn, uroot_offset, uextn_offset)
-XCHAR	*vfn;			/* VFN to be scanned			*/
-XINT	*uroot_offset;		/* index of first char in root, or 0	*/
-XINT	*uextn_offset;		/* index of first char in extn, or 0	*/
+int
+ZFNBRK (
+  XCHAR	*vfn,			/* VFN to be scanned			*/
+  XINT	*uroot_offset,		/* index of first char in root, or 0	*/
+  XINT	*uextn_offset		/* index of first char in extn, or 0	*/
+)
 {
 	register int	ch;
 	register XCHAR	*ip;
@@ -56,4 +58,6 @@ XINT	*uextn_offset;		/* index of first char in extn, or 0	*/
 
 	*uroot_offset = root_offset - vfn + 1;
 	*uextn_offset = extn_offset - vfn + 1;
+
+	return (XOK);
 }

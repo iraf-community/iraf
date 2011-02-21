@@ -28,11 +28,12 @@ double	bzero			#I offset to applied to input data
 
 int	nchars, nbytes
 bool	fp_equald()
-int	sizeof()
 errchk	syserr
 
+include <szpixtype.inc>
+
 begin
-        nchars = npix * sizeof (pixtype)
+        nchars = npix * pix_size[pixtype]
 	nbytes = nchars * SZB_CHAR
 
 	switch (pixtype) {

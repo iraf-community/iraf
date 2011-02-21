@@ -13,10 +13,10 @@ define	LEN_MOD		7		# Length of model spectrum structure
 define	SPEC	Memi[$1]		# Pointer to spectrum
 define	NPTS	Memi[$1+1]		# Number of points in spectrum
 define	PTYPE	Memi[$1+2]		# Profile type
-define	WIDTH	Memr[$1+3]		# Profile width (FWHM at center line)
-define	DWIDTH	Memr[$1+4]		# Derivative of width
-define	POS	Memr[$1+5]		# Profile position (at center line)
-define	DPOS	Memr[$1+6]		# Derivative of position
+define	WIDTH	Memr[P2R($1+3)]		# Profile width (FWHM at center line)
+define	DWIDTH	Memr[P2R($1+4)]		# Derivative of width
+define	POS	Memr[P2R($1+5)]		# Profile position (at center line)
+define	DPOS	Memr[P2R($1+6)]		# Derivative of position
 
 define	PTYPES	"|gaussian|slit|"
 define	GAUSS	1			# Gaussian (pexp = 2)

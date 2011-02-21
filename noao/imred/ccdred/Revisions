@@ -1,6 +1,20 @@
 .help revisions Jun88 noao.imred.ccdred
 .nf
 
+various
+    Separated the generic combine code to a subdirectory as is done
+    for imcombine, mscred, etc.  This is only a partial step towards
+    sharing the standard imcombine code.  Because this is really old,
+    working code that has diverged significantly it will take some time
+    to update/merge the new imcombine code.  (1/6/11, Valdes)
+
+=====
+V2.15
+=====
+
+src/icstat.gx
+    Fixed type declarations for the asum() procedures (8/25/09, MJF)
+
 doc/ccdproc.hlp
     Removed the statements that calibration images are not reprocessed
     if they have CCDPROC even if they lack the keywords for specific

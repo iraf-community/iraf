@@ -3,17 +3,21 @@
 
 #include "bootlib.h"
 
+
 /* OS_FPATHNAME -- Map a VFN (virtual filename) into a pathname (filename
  * specification which is independent of the current directory).
  */
-os_fpathname (vfn, osfn, maxch)
-char	*vfn;			/* virtual filename		*/
-char	*osfn;			/* OS filename			*/
-int	maxch;
+int
+os_fpathname (
+  char	*vfn,			/* virtual filename		*/
+  char	*osfn,			/* OS filename			*/
+  int	maxch 
+)
 {
 	XCHAR	x_vfn[SZ_PATHNAME+1];
 	XCHAR	x_osfn[SZ_PATHNAME+1];
 	XINT	x_maxch = SZ_PATHNAME, x_nchars;
+
 
 	if (vfn[0])
 	    os_strupk (vfn2osfn(vfn,0), x_vfn, x_maxch);

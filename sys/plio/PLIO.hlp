@@ -968,7 +968,7 @@ If the length of a line segment of constant value or the difference between
 two successive high values exceeds 4096 (12 bits), then multiple instructions
 are required to describe the segment or intensity change.
 
-The performance of this encoding is very good for typical masks consisisting
+The performance of this encoding is very good for typical masks consisting
 of isolated high or low values or extended regions at the same level.
 The worst case performance occurs when successive pixels have different values.
 Even in this case the encoding will only require one word (16 bits) per mask
@@ -1332,7 +1332,7 @@ The line list index, containing one integer entry for each line in the mask
 in the runtime format, is compressed using \fIpl_p2li\fR, storing in the
 external representation the compressed array encoded as a line list in
 \fIple_pkindex\fR.  This is especially important for large masks, as otherwise
-the index array could be by far the biggest contributer to the size of the
+the index array could be by far the biggest contributor to the size of the
 mask when encoded into its external format.
 
 No format conversions are required other than decoding the compressed line list

@@ -17,6 +17,8 @@
 #include "errs.h"
 #include "param.h"
 #include "task.h"
+#include "proto.h"
+
 
 /*
  * BKG -- All the functions relating to background ("&" asychronous) jobs.
@@ -93,7 +95,7 @@ struct bkgfilehdr {
 	int	b_szstack;		/* size of stack area, bytes	*/
 	int	b_szdict;		/* size of dictionary, bytes	*/
 	memel	*b_dict;		/* ptr to start of dict		*/
-	int	b_topd,			/* dict ptr			*/
+	XINT	b_topd,			/* dict ptr			*/
 		b_maxd,			/* top of dict			*/
 		b_pachead,		/* head of package list		*/
 		b_parhead,		/* head of param list		*/
@@ -124,7 +126,8 @@ struct _bkgjob {
 #define	J_KILLED	04		/* job was killed 		*/
 #define	busy(job)	(jobtable[(job)-1].b_flags & J_RUNNING)
 
-static	bkg_close();
+
+static void bkg_close (int job, int pmsg);
 
 
 /* BKG_INIT -- Setup to execute a background job.  Called by the lexical
@@ -132,8 +135,10 @@ static	bkg_close();
  * following the & to end of line) and set the dobkg flag to flag background
  * execution of the command block currently being parsed.
  */
-bkg_init (bcs)
-char	*bcs;		/* background control string	*/
+void
+bkg_init (
+  char	*bcs		/* background control string	*/
+)
 {
 	strncpy (bkgmsg, bcs, SZ_BKGMSG);
 	dobkg++;
@@ -143,13 +148,14 @@ char	*bcs;		/* background control string	*/
 /* BKG_SPAWN -- Spawn a new background job.  Called by main() when we have
  * seen an '&'.
  */
-bkg_spawn (cmd)
-char	*cmd;		/* command entered by user to spawn job	*/
+void
+bkg_spawn (
+  char	*cmd		/* command entered by user to spawn job	*/
+)
 {
 	register struct _bkgjob *bk;
 	register int	jobno, stat;
 	char	clprocess[SZ_PATHNAME];
-	char	*wbkgfile();
 	char	*bkgfile;
 
 	/* Find first unused slot in a circular search.
@@ -206,8 +212,10 @@ char	*cmd;		/* command entered by user to spawn job	*/
 /* BKG_WAIT -- Wait for a background job to terminate.  If job=0, wait for
  * all bkg jobs to terminate.
  */
-bkg_wait (job)
-register int	job;
+void
+bkg_wait (
+  register int	job
+)
 {
 	register int	j;
 	int	active_jobs;
@@ -234,8 +242,10 @@ register int	job;
 /* BKG_KILL -- Kill a background job.  If job=0, kill all background jobs.
  * If the job cannot be killed assume it is because it died unexpectedly.
  */
-bkg_kill (job)
-int	job;
+void
+bkg_kill (
+  int	job
+)
 {
 	register struct _bkgjob *bk;
 	register int	j;
@@ -244,8 +254,8 @@ int	job;
 	if (job < 0 || job > NBKG)
 	    eprintf ("[%d] invalid job number\n", job);
 	else {
-	    for (bk=jobtable, j=1;  j <= NBKG;  j++, bk++)
-		if ((job == 0 && busy(j)) || job == j)
+	    for (bk=jobtable, j=1;  j <= NBKG;  j++, bk++) {
+		if ((job == 0 && busy(j)) || job == j) {
 		    if (!busy(j))
 			eprintf ("[%d] not in use\n", j);
 		    else if (c_prkill (bk->b_jobno) == ERR)
@@ -254,6 +264,8 @@ int	job;
 			bk->b_flags |= J_KILLED;
 			bkg_close (j, 2);
 		    }
+		}
+	    }
 	}
 }
 
@@ -269,9 +281,11 @@ int	job;
  * A job will remain in the job table until another job is submitted which uses
  * the same slot.
  */
-bkg_jobstatus (fp, job)
-FILE	*fp;			/* output file		*/
-int	job;			/* job(s)		*/
+void
+bkg_jobstatus (
+  FILE	*fp,			/* output file		*/
+  int	job			/* job(s)		*/
+)
 {
 	register struct _bkgjob *bk;
 	register int	j, n, ch;
@@ -329,8 +343,10 @@ int	job;			/* job(s)		*/
  * job is still running.  It does not matter if the job is waiting for
  * service.
  */
-bkg_jobactive (job)
-int	job;
+int
+bkg_jobactive (
+  int	job
+)
 {
 	bkg_update (1);
 	return (busy (job));
@@ -344,14 +360,16 @@ int	job;
  * the notify option is off the done or wait message will not have been printed
  * by the bkg job, so we output the message ourselves.
  */
-bkg_update (pmsg)
-int	pmsg;			/* print event messages		*/
+void
+bkg_update (
+  int	pmsg			/* print event messages		*/
+)
 {
 	register struct	_bkgjob *bk;
 	register int	j;
 
-	for (bk=jobtable, j=1;  j <= NBKG;  j++, bk++)
-	    if (busy(j))
+	for (bk=jobtable, j=1;  j <= NBKG;  j++, bk++) {
+	    if (busy(j)) {
 		if (c_prdone (bk->b_jobno)) {
 		    bkg_close (j, pmsg);
 		} else if (bkg_wfservice (j)) {
@@ -361,16 +379,19 @@ int	pmsg;			/* print event messages		*/
 		    bk->b_flags |= J_SERVICE;
 		} else
 		    bk->b_flags &= ~J_SERVICE;
+	    }
+	}
 }
 
 
 /* BKG_CLOSE -- Close a bkg job.  Called after determining that the job has
  * terminated.
  */
-static
-bkg_close (job, pmsg)
-int	job;			/* job ordinal			*/
-int	pmsg;			/* print termination message	*/
+static void
+bkg_close (
+  int	job,			/* job ordinal			*/
+  int	pmsg			/* print termination message	*/
+)
 {
 	register struct	_bkgjob *bk = &jobtable[job-1];
 
@@ -378,11 +399,12 @@ int	pmsg;			/* print termination message	*/
 	bk->b_exitcode = c_prcldpr (bk->b_jobno);
 	bk->b_flags &= ~(J_RUNNING|J_SERVICE);
 
-	if (pmsg > 1 || pmsg == 1 && !notify()) {
-	    if (bk->b_exitcode != OK)
+	if (pmsg > 1 || (pmsg == 1 && !notify())) {
+	    if (bk->b_exitcode != OK) {
 		eprintf ("[%d] exit %d\n", job, bk->b_exitcode);
-	    else
+	    } else {
 		eprintf ("[%d] done\n", job);
+	    }
 	}
 
 	/* Make a logfile entry, saying the background job ended.
@@ -398,8 +420,10 @@ int	pmsg;			/* print termination message	*/
 /* BKG_WFSERVICE -- Determine if a bkg job is waiting for service (for the
  * user to answer a query).
  */
-bkg_wfservice (job)
-int	job;
+int
+bkg_wfservice (
+  int	job
+)
 {
 	char	bkg_query_file[SZ_PATHNAME];
 	char	query_response_file[SZ_PATHNAME];
@@ -413,8 +437,10 @@ int	job;
  * are no dreg query service files lying about from a prior job which did not
  * complete normally.
  */
-bkg_delfiles (job)
-int	job;
+void
+bkg_delfiles (
+  int	job
+)
 {
 	char	bkg_query_file[SZ_PATHNAME];
 	char	query_response_file[SZ_PATHNAME];
@@ -428,8 +454,10 @@ int	job;
 /* BKG_STARTUP -- Called by a background CL during process startup.  Read in
  * the bkgfile and restore runtime context of the parent.
  */
-bkg_startup (bkgfile)
-char	*bkgfile;
+void
+bkg_startup (
+  char	*bkgfile
+)
 {
 	rbkgfile (bkgfile);
 	setclmodes (firstask);
@@ -443,7 +471,8 @@ char	*bkgfile;
  * file, kill all tasks back to the one that started us as background and
  * write a message on stderr.
  */
-bkg_abort()
+void
+bkg_abort (void)
 {
 	register int	job;
 	register struct task *tp;
@@ -473,9 +502,10 @@ bkg_abort()
  * No error return, but we may call error() and never return.
  */
 char *
-wbkgfile (jobno, cmd)
-int	jobno;			/* ordinal jobnumber of child	*/
-char	*cmd;			/* command to be run in bkg	*/
+wbkgfile (
+  int	jobno,			/* ordinal jobnumber of child	*/
+  char	*cmd			/* command to be run in bkg	*/
+)
 {
 	static	char *bkgwerr = "error writing background job file";
 	static	char bkgfile[SZ_PATHNAME];
@@ -539,8 +569,10 @@ char	*cmd;			/* command to be run in bkg	*/
  * we are called during process startup and error recovery is not yet
  * possible (a memory fault will result).
  */
-rbkgfile (bkgfile)
-char	*bkgfile;
+void
+rbkgfile (
+  char	*bkgfile
+)
 {
 	char	set[SZ_ENVDEF];
 	struct	bkgfilehdr bh;

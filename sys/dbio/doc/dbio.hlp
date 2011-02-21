@@ -356,7 +356,7 @@ number of links to the record, the datatype, size, and length of the record,
 the dates of creation and last modify, the offset of the record in the
 datafile (or the offset of the index block in the case of an array of records),
 and so on.  The inode structures shall be stored in the datafile as a
-contigous array of records; the inode array may be stored at any offset in
+contiguous array of records; the inode array may be stored at any offset in
 the datafile.  Overflow of the inode array will be handled by moving the
 array to the end of the file and doubling its size.
 

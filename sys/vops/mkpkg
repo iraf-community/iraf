@@ -21,12 +21,14 @@ tfiles:
 
 	# The acht (change type) procedures are doubly generic and must be
 	# expanded twice, producing 7*7=49 files as output.
+	#
+	# We force this to be regenerated on each platform since there are
+	# differences in the generated code between 32 and 64-bit platforms.
 
-	$ifolder (ak/achtii.x, acht.gx  )
-	    $generic -k        -t csilrdx acht.gx
-	    $generic -k -p ak/ -t csilrdx $(ACHT)
-	    $delete $(ACHT)
-	$endif
+	$generic -k        -t csilrdx acht.gx
+	$generic -k -p ak/ -t csilrdx $(ACHT)
+	$delete $(ACHT)
+
 
 	# The following files are not generic hence are merely copied to the
 	# type specific directory.

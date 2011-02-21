@@ -88,12 +88,12 @@ define	BADCOLS		Memi[$1+50]	# Pointer to col interpolation regions
 define	NBADLINES	Memi[$1+51]	# Number of line interpolation regions
 define	BADLINES	Memi[$1+52]	# Pointer to line interpolation regions
 define	OVERSCAN_VEC	Memi[$1+53]	# Pointer to overscan vector
-define	DARKSCALE	Memr[$1+54]	# Dark count scale factor
-define	FRINGESCALE	Memr[$1+55]	# Fringe scale factor
-define	FLATSCALE	Memr[$1+56]	# Flat field scale factor
-define	ILLUMSCALE	Memr[$1+57]	# Illumination scale factor
-define	MINREPLACE	Memr[$1+58]	# Minimum replacement value
-define	MEAN		Memr[$1+59]	# Mean of output image
+define	DARKSCALE	Memr[P2R($1+54)]	# Dark count scale factor
+define	FRINGESCALE	Memr[P2R($1+55)]	# Fringe scale factor
+define	FLATSCALE	Memr[P2R($1+56)]	# Flat field scale factor
+define	ILLUMSCALE	Memr[P2R($1+57)]	# Illumination scale factor
+define	MINREPLACE	Memr[P2R($1+58)]	# Minimum replacement value
+define	MEAN		Memr[P2R($1+59)]	# Mean of output image
 define	COR		Memi[$1+60]	# Overall correction flag
 define	CORS		Memi[$1+61+($2-1)]  # Individual correction flags
 

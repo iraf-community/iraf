@@ -1,6 +1,18 @@
 .help revisions Jun88 pkg.dataio
 .nf
 
+dataio$lib/mkpkg
+    The getdatatype.x and ranges.x files were duplicates of those in the
+    XTOOLS library which is linked in dataio.  These files should be the
+    versions actually linked in the binary, making XTOOLS unnecessary, but
+    I think the intent was to use XTOOLS.  The getdatatype.x is identical
+    but there are slight changes in ranges.x.  These files were left in
+    place in case there are problems found but the binary should now be
+    using the XTOOLS versions.  (12/5/08, MJF)
+
+dataio$import/ipproc.gx
+    Fixed a type flag being used to determine byte-swapping. (12/5/08, MJF)
+
 dataio$import/t_import.x
     Fixed a type declaration (1/21/08, MJF)
 

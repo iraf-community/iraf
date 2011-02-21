@@ -47,6 +47,8 @@ libvops.a:
 	# may result in an exception on some hosts.
 
 	urand.x		<mach.h>
+	imul32.c			# added to support 64-bit
+	iand32.c			# added to support 64-bit
 
 	# If a C compiler is not available for the following they will have
 	# to be written in assembler or some other low level language, and
@@ -88,6 +90,14 @@ libvops.a:
 	not.c
 	or.c
 	shift.c
+	abs.c
+	i32to64.c
+	i64to32.c
+	ipak32.c
+	iupk32.c
+	ipak16.c
+	iupk16.c
+
 
 	# Both C and Fortran versions of the following are provided.
 	# The C versions are normally preferred and are the most portable.
@@ -114,6 +124,7 @@ libvops.a:
 
 	ieeer.x		<mach.h>
 	ieeed.x		<mach.h>
+
 	miilen.x	<mach.h>
 	miinelem.x	<mach.h>
 	miipak.x	<mii.h>
@@ -129,6 +140,22 @@ libvops.a:
 	miiupk8.x	
 	miiupkd.x	<mach.h>
 	miiupkr.x	<mach.h>
+
+	nmilen.x	<mach.h>
+	nminelem.x	<mach.h>
+	nmipak.x	<nmi.h>
+	nmipak16.x	<mach.h>
+	nmipak32.x	<mach.h>
+	nmipak8.x	
+	nmipakd.x	<mach.h>
+	nmipakr.x	<mach.h>
+	nmipksize.x	<mach.h>
+	nmiupk.x	<nmi.h>
+	nmiupk16.x	<mach.h>
+	nmiupk32.x	<mach.h>
+	nmiupk8.x	
+	nmiupkd.x	<mach.h>
+	nmiupkr.x	<mach.h>
 
 	f77pak.f
 	f77upk.f

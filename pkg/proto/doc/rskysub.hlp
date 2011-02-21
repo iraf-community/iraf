@@ -177,7 +177,7 @@ the input image pixels is computed using the input image masks \fIimasks\fR,
 the good data limits \fIlower\fR and \fIupper\fR, the clipping factors
 \fImaxiter\fR, \fIlnsigrej\fR, and \fIunisgrej\fR, and the histogram
 resolution parameter \fIbinwidth\fR. The scaling factor is set to 1 / median.
-If \fIscale\fR is "none", "!<keyword>, or "@<file>" the individual
+If \fIscale\fR is "none", "!<keyword>", or "@<file>" the individual
 scale factors are set to 1, read from the input image header keyword
 \fI<keyword>\fR, or from a file \fI@<file>\fR respectively. If \fIrescale\fR is
 yes and \fIscale\fR is "median" then the scaling computation is  redone

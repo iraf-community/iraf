@@ -1,6 +1,15 @@
 .help revisions Jun88 noao.nproto
 .nf
 
+ace/t_acedisplay.x
+    The alogr() was being called without an errfcn (7/12/09, MJF)
+
+skysep.cl
+    Added an 'enum' to the 'raunit' param to enforce choices (1/12/09, MJF)
+
+doc/skysep.hlp
+    Fixed a typo. (1/12/09, MJF)
+
 skygroup.cl		+
 skysep.cl		+
 doc/skygroup.hlp	+

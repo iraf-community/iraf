@@ -3,12 +3,14 @@
 
 #include "bootlib.h"
 
+
 /* OS_DELETE -- Delete a file.
  */
-os_delete (fname)
-char	*fname;
+int
+os_delete (char *fname)
 {
-	int	status;
+	XINT	status;
+
 
 	ZFDELE ((PKCHAR *)vfn2osfn (fname, 0), &status);
 	return (status);

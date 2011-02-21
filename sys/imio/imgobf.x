@@ -11,8 +11,11 @@ pointer	im, bdes
 int	ndim, dtype, i
 long	vs[ndim], ve[ndim]
 long	nchars, totpix, imcssz(), clktime()
+int	sizeof()
+
 errchk	imopsf, malloc, realloc, calloc
-include	<szdtype.inc>
+
+include	<szpixtype.inc>
 
 begin
 	# If first write, and if new image, create pixel storage file,
@@ -55,5 +58,5 @@ begin
 	    BD_VE(bdes,i) = ve[i]
 	}
 
-	return ((BD_BUFPTR(bdes) - 1) / ty_size[dtype] + 1)
+	return ((BD_BUFPTR(bdes) - 1) / sizeof(dtype) + 1)
 end

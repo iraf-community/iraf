@@ -1,6 +1,11 @@
 .help revisions Jun88 noao.astutil
 .nf
 
+t_astcalc.x
+doc/astcalc.hlp
+    The $D variable was changed from the old MM/DD/YY format to the post-Y2K
+    YYYY-MM-DD format.  (4/6/10, MJF)
+
 asttools/refrac.x
     A development routine for refraction correction from apparent to
     observed place.  As noted in the comments, this seems to be correct

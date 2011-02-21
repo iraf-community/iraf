@@ -58,7 +58,7 @@ Drizzle interpolation. Users can specify the drizzle pixel fraction by
 appending the pixel fraction value to the interpolant string in square
 brackets, e.g. drizzle[0.5] specifies a pixel fraction of 0.5 in x and y.
 The default pixel fraction is 1.0. If either of the x or y pixel
-fractions are 0.0, then both are set to 0.0. A miniminum value of 0.001
+fractions are 0.0, then both are set to 0.0. A minimum value of 0.001
 is imposed on the actual value of pixfrac.
 .le
 .le

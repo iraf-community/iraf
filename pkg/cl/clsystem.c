@@ -7,14 +7,17 @@
 #include <iraf.h>
 #include "errs.h"
 
+
 /* CLSYSTEM -- Run a host system command and try to arrange for its standard
  * output and standard error output to go where our t_stdout is going; this
  * will let us redirect its output and use it with pipes..
  */
-clsystem (cmd, taskout, taskerr)
-char	*cmd;			/* command to be executed	*/
-FILE	*taskout;		/* stdout of task		*/
-FILE	*taskerr;		/* stderr of task		*/
+void
+clsystem (
+  char	*cmd,			/* command to be executed	*/
+  FILE	*taskout,		/* stdout of task		*/
+  FILE	*taskerr		/* stderr of task		*/
+)
 {
 	register char	*ip;
 	register int	ch;

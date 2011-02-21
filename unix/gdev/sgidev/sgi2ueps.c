@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <time.h>
 #include <pwd.h>
 
 #define	import_spp
@@ -583,7 +584,7 @@ int	def_val;
 eps_comments (out)
 FILE	*out;
 {
-	long	clock;
+	time_t	clock;
 	int	llx, lly, urx, ury;
 
 	clock = time(0);

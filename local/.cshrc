@@ -3,6 +3,7 @@
 
 umask 022
 setenv iraf /iraf/iraf/
+setenv IRAFARCH  `$iraf/unix/hlib/irafarch.csh -actual`
 source $iraf/unix/hlib/irafuser.csh
 
 #setenv IRAFARCH macintel
@@ -11,6 +12,8 @@ source $iraf/unix/hlib/irafuser.csh
 #setenv XC_XFLAGS "-/mfpmath=sse -/free-vectorize -/msse"
 #setenv XC_FFLAGS "-mfpmath=sse -ftree-vectorize -msse"
 #setenv XC_CFLAGS "-mfpmath=sse -ftree-vectorize -msse"
+
+setenv  LC_COLLATE	POSIX
 
 
 switch (`uname`)
@@ -21,7 +24,7 @@ case FreeBSD:
     breaksw
 case Linux:
     set path = (. $HOME/bin /sbin /bin /usr/sbin /usr/bin /usr/games \
-	/usr/local/bin /usr/local/sbin \
+	/usr/local/bin /usr/local/sbin /usr/java/j2sdk/bin \
 	/usr/X11R6/bin)
     breaksw
 case Darwin:
@@ -56,19 +59,7 @@ if ($?prompt) then
 	set savehist = 100
 	set mail = (/var/mail/$USER)
 
-	if (`uname` == SunOS) then
-	    if ($?PS1) then
-		set prompt = "root@`hostname`% "
-	    else
-		set prompt = "$user@`hostname`% "
-	    endif
-	else
-	    if ($HOME == "/root") then
-		set prompt = "root@`hostname`% "
-	    else
-		set prompt = "$user@`hostname`% "
-	    endif
-	endif
+	set prompt = "`hostname -s`> "
 
 	# make mail(1) happy:
 	setenv	crt	24

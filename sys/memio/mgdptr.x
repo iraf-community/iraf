@@ -8,7 +8,8 @@
 pointer procedure mgdptr (fwa, dtype, sz_align, fwa_align)
 
 int	fwa, dtype, sz_align, fwa_align
-long	bufadr
+#long	bufadr
+int	bufadr
 pointer	bufptr
 int	modulus, loc_Mem
 int	sizeof()

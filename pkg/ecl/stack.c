@@ -12,6 +12,8 @@
 #include "param.h"
 #include "task.h"
 #include "errs.h"
+#include "proto.h"
+
 
 /*
  * STACK -- "stack" is actually two stacks:
@@ -34,9 +36,9 @@
  */
 
 memel stack[STACKSIZ];		/* control and operand stack combined	*/
-int topcs = STACKSIZ;		/* index of last cstack; grows downward	*/
-int topos = -1;			/* index of last ostack; grows upward	*/
-int basos = -1;			/* lowest legal index of operand stack	*/
+XINT topcs = STACKSIZ;		/* index of last cstack; grows downward	*/
+XINT topos = -1;		/* index of last ostack; grows upward	*/
+XINT basos = -1;		/* lowest legal index of operand stack	*/
 
 /* Push a memel value onto the control stack.  Return ERR if it would cause
  * overflow, else OK.  The control stack is used by the parser during
@@ -44,8 +46,8 @@ int basos = -1;			/* lowest legal index of operand stack	*/
  * call poptask() to pop tasks off the control stack.  We must be careful
  * to avoid having the compiler temporaries interfere with task frames.
  */
-pushmem (v)
-memel v;
+void 
+pushmem (memel v)
 {
 	if (topcs - 1 > topos)
 	    stack[--topcs] = v;
@@ -58,7 +60,8 @@ memel v;
 /* Pop top memory value off control stack and return it.
  * ==> no real err return, although it is checked.
  */
-popmem ()
+memel 
+popmem (void)
 {
 	if (topcs < STACKSIZ)
 	    return (stack[topcs++]);
@@ -71,8 +74,8 @@ popmem ()
 /* PPush pushes an element onto the stack, but leaves the top
  * of the stack untouched.
  */
-ppushmem (p)
-register memel p;
+void 
+ppushmem (register memel p)
 {
 	register memel	q;
 
@@ -104,10 +107,11 @@ register memel p;
  *		    |--------------|
  *			...
  */
-struct operand
-pushop (op)
-struct operand *op;
+struct operand 
+pushop (struct operand *op)
 {
+	struct operand  junk;
+
 	if (topos + OPSIZ+1 < topcs) {
 	    int		lasttopos = topos;
 	    struct	operand *dest;
@@ -133,6 +137,7 @@ struct operand *op;
 overflow:
 	cl_error (E_IERR, e_soverflow, topcs, topos);
 	/* NOTREACHED */
+	return ((struct operand) junk);
 }
 
 /* pop top operand from stack and return copy of it. If type is string,
@@ -140,9 +145,11 @@ overflow:
  * set topos to top of stack; see diagram with pushop().
  * call error() and do not return if underflow.
  */
-struct operand
-popop ()
+struct operand 
+popop (void)
 {
+	struct operand  junk;
+
 	if (topos > basos) {
 	    struct	operand *op;
 
@@ -151,7 +158,9 @@ popop ()
 	    return (*op);
 	}
 	cl_error (E_UERR, e_sunderflow);
+
 /* NOTREACHED */
+	return ((struct operand) junk);
 }
 
 
@@ -163,7 +172,7 @@ popop ()
 int last_task_frame;				/* for error recovery */
 
 struct task *
-pushtask ()
+pushtask (void)
 {
 	if (topcs - TASKSIZ  > topos) {
 	    topcs -= TASKSIZ;
@@ -171,7 +180,9 @@ pushtask ()
 	    return ((struct task *) &stack[topcs]);
 	} 
 	cl_error (E_UERR, "task stack overflow");	/* does not return */
+
 /* NOTREACHED */
+	return ((struct task *) NULL);
 }
 
 
@@ -180,7 +191,7 @@ pushtask ()
  * Call error() and do not return on underflow.
  */
 struct task *
-poptask ()
+poptask (void)
 {
 	if (topcs <= STACKSIZ - TASKSIZ) {
 	    if (topcs < last_task_frame) {
@@ -196,5 +207,7 @@ poptask ()
 	    return ((struct task *) &stack[topcs]);
 	} 
 	cl_error (E_IERR, "Control stack underflow: topcs = %d", topcs);
+
 /* NOTREACHED */
+	return ((struct task *) NULL);
 }

@@ -1,6 +1,36 @@
 .HELP revisions Jun88 noao.digiphot.apphot
 .nf
 
+
+apphot/wphot/apwmag.x
+    Minor typo where procedure closed with a ']'  (8/19/09, MJF)
+
+apphot/wphot/t_wphot.x
+    A call to apstats() was being passed 'cl' instead of 'ap' (8/19/09, MJF)
+
+apphot/phot/apqradsetup.x 
+apphot/phot/apradsetup.x 
+apphot/wphot/apbwphot.x
+    The ap_wmag() was incorrectly being used as apwmag() (8/17/09, MJF)
+
+apphot/aputil/apvectors.x
+    Modified so the calculation is done in floating point (8/15/09, MJF)
+
+apphot/daofind/apfdcolon.x
+    A call to apsets() was mistakenly using a closed 'cl' pointer instead
+    of the 'ap' apphot struct pointer (8/15/09, MJF)
+
+apphot/radprof/apfrprof.x
+    The cvrject() subroutine was called w/ an extra argument (7/12/09, MJF)
+
+apphot/aputil/apnlfuncs.x
+    1.	Comments now say whether a parameter is a variance or a sigma.
+    2.  Check for zero variance or sigma were improved.  The default value
+    	is a sigma of 6 or a variance of 36.
+    3.  CGAUSS1D was setting the wrong variable (z instead of r2) when
+    	a zero variance is found.
+    (3/18/09, Valdes: reported by Jason Quinn)
+
 aplib/apwparam1.x
      The CLEAN parameter was being printed with UN_CSCALEUNIT units instead
      of UN_CSWITCH (7/8/08, MJF)

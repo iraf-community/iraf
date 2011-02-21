@@ -76,12 +76,15 @@
       integer dbool(8)
       integer dchar(10)
       integer dshort(10)
+C     integer dint(10)
+C     integer dlong(10)
+C     integer dpntr(10)
       integer dint(8)
-      integer dlong(10)
+      integer dlong(8)
+      integer dpntr(8)
       integer dreal(5)
       integer ddble(17)
       integer dcplx(8)
-      integer dpntr(8)
       integer dfchr(10)
       integer dfunc(9)
       integer dsubr(11)
@@ -120,11 +123,20 @@
       data dshort(1)/105/,dshort(2)/110/,dshort(3)/116/,dshort(4)/101/,d
      *short(5)/103/,dshort(6)/101/,dshort(7)/114/,dshort(8)/42/,dshort(9
      *)/50/,dshort(10)/-2/
+C     data dint(1)/105/,dint(2)/110/,dint(3)/116/,dint(4)/101/,dint(5)/1
+C    *03/,dint(6)/101/,dint(7)/114/,dint(8)/42/,dint(9)/56/,dint(10)/-2/
       data dint(1)/105/,dint(2)/110/,dint(3)/116/,dint(4)/101/,dint(5)/1
      *03/,dint(6)/101/,dint(7)/114/,dint(8)/-2/
+C     data dlong(1)/105/,dlong(2)/110/,dlong(3)/116/,dlong(4)/101/,dlong
+C    *(5)/103/,dlong(6)/101/,dlong(7)/114/,dlong(8)/42/,dlong(9)/52/,dlo
+C    *ng(10)/-2/
       data dlong(1)/105/,dlong(2)/110/,dlong(3)/116/,dlong(4)/101/,dlong
-     *(5)/103/,dlong(6)/101/,dlong(7)/114/,dlong(8)/42/,dlong(9)/52/,dlo
-     *ng(10)/-2/
+     *(5)/103/,dlong(6)/101/,dlong(7)/114/,dlong(8)/-2/
+C     data dpntr(1)/105/,dpntr(2)/110/,dpntr(3)/116/,dpntr(4)/101/,dpntr
+C    *(5)/103/,dpntr(6)/101/,dpntr(7)/114/,dpntr(8)/42/,dpntr(9)/56/,dpn
+C    *tr(10)/-2/
+      data dpntr(1)/105/,dpntr(2)/110/,dpntr(3)/116/,dpntr(4)/101/,dpntr
+     *(5)/103/,dpntr(6)/101/,dpntr(7)/114/,dpntr(8)/-2/
       data dreal(1)/114/,dreal(2)/101/,dreal(3)/97/,dreal(4)/108/,dreal(
      *5)/-2/
       data ddble(1)/100/,ddble(2)/111/,ddble(3)/117/,ddble(4)/98/,ddble(
@@ -133,8 +145,6 @@
      *105/,ddble(15)/111/,ddble(16)/110/,ddble(17)/-2/
       data dcplx(1)/99/,dcplx(2)/111/,dcplx(3)/109/,dcplx(4)/112/,dcplx(
      *5)/108/,dcplx(6)/101/,dcplx(7)/120/,dcplx(8)/-2/
-      data dpntr(1)/105/,dpntr(2)/110/,dpntr(3)/116/,dpntr(4)/101/,dpntr
-     *(5)/103/,dpntr(6)/101/,dpntr(7)/114/,dpntr(8)/-2/
       data dfchr(1)/99/,dfchr(2)/104/,dfchr(3)/97/,dfchr(4)/114/,dfchr(5
      *)/97/,dfchr(6)/99/,dfchr(7)/116/,dfchr(8)/101/,dfchr(9)/114/,dfchr
      *(10)/-2/
@@ -150,10 +160,10 @@
       call entdef (sshort, dshort, xpptbl)
       call entdef (sint, dint, xpptbl)
       call entdef (slong, dlong, xpptbl)
+      call entdef (spntr, dpntr, xpptbl)
       call entdef (sreal, dreal, xpptbl)
       call entdef (sdble, ddble, xpptbl)
       call entdef (scplx, dcplx, xpptbl)
-      call entdef (spntr, dpntr, xpptbl)
       call entdef (sfchr, dfchr, xpptbl)
       call entdef (sfunc, dfunc, xpptbl)
       call entdef (ssubr, dsubr, xpptbl)

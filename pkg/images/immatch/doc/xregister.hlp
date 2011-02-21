@@ -42,7 +42,7 @@ then x and y shifts are computed for each input image and written to
 then the number of output images must equal the number of input images.
 .le
 .ls databasefmt = yes
-If \fIdatabasefmt\fR is "yes the results are written to a text database
+If \fIdatabasefmt\fR is "yes" the results are written to a text database
 file, otherwise they are written to a simple text file.
 .le
 .ls records = ""

@@ -14,7 +14,7 @@ from one in the order of the list.
 .ls apertures = ""
 List of apertures to plot.  An empty list selects all apertures.
 An aperture list consists of a comma separated list of aperture numbers or
-hyphen sperated range of numbers.  A step size may also be specified preceded
+hyphen separated range of numbers.  A step size may also be specified preceded
 by 'x'.  See \fBranges\fR for more.
 .le
 .ls bands = "1"
@@ -51,6 +51,14 @@ is specified than the units of the coordinate system are used.
 The units
 may also be changed interactively.  See the units section of the
 \fBonedspec\fR help for a further description and available units.
+.le
+.ls transform = "none" (none|log)
+Transform for the input pixel values.  Currently only "log" is implemented.
+If all pixels are negative the spectrum values will be unchanged and if
+some pixels are negative they are mapped to the lowest non-negative value in
+the spectrum.  Note that this cannot be changed interactively or applied
+independently for each spectrum.  To change the setting one must exit
+the task and execute it with the new value.
 .le
 .ls scale = 1., offset = 0. (value, @file, keyword)
 The scale and offset to apply to each spectrum.  The value of the parameter

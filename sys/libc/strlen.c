@@ -4,10 +4,13 @@
 #define	import_libc
 #include <iraf.h>
 
+
 /* STRLEN -- Length of a string.
- */
-strlen (s)
-char	*s;
+*/
+int
+strlen (
+  char	*s
+)
 {
 	register char	*ip=s;
 

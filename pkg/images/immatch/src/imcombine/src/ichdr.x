@@ -9,7 +9,7 @@ pointer	in[nimages]		#I Input images
 pointer	out[ARB]		#I Output images
 int	nimages			#I Number of images
 
-int	i, j, imgnfn(), fnroot(), nowhite()
+int	i, j, imgnfn(), nowhite(), strldxs()
 pointer	sp, inkey, key, str, list, imofnlu()
 bool	streq()
 
@@ -53,7 +53,9 @@ begin
 	    do i = 1, nimages {
 	        if (streq (Memc[inkey], "$I")) {
 		    call imstats (in[i], IM_IMAGENAME, Memc[str], SZ_LINE)
-		    j = fnroot (Memc[str], Memc[str], SZ_LINE)
+		    j = strldxs ("/$", Memc[str])
+		    if (j > 0)
+		        call strcpy (Memc[str+j], Memc[str], SZ_LINE)
 		} else {
 		    iferr (call imgstr (in[i], Memc[inkey], Memc[str], SZ_LINE))
 		        Memc[str] = EOS

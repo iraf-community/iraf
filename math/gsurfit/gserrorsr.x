@@ -3,7 +3,7 @@
 include <mach.h>
 include "gsurfitdef.h"
 
-define	COV	Memr[$1]	# element of COV
+define	COV	Memr[P2P($1)]	# element of COV
 
 # GSERRORS -- Procedure to calculate the reduced chi-squared of the fit
 # and the standard deviations of the coefficients. First the variance

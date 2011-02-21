@@ -1,15 +1,17 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
- */
+*/
 
 #define	import_libc
 #include <iraf.h>
 
+
 /* STRCAT -- Concatenate S2 onto S1.
- */
+*/
 char *
-strcat (s1, s2)
-char	*s1;			/* output string		*/
-char	*s2;			/* string to be appended	*/
+strcat (
+  char	*s1,			/* output string		*/
+  char	*s2			/* string to be appended	*/
+)
 {
 	register char	*ip, *op;
 

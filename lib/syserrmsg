@@ -27,23 +27,27 @@
 570 Memory has been corrupted
 571 STROPEN: String not aligned with Mem
 572 Out of memory
-573 System stack underflow (invalid SFREE)
-574 Too many child processes
-575 Cannot open connected subprocess
-576 Process PID not found in process table
-577 Cannot send signal to child process
-578 Invalid IPC syntax or protocol
-579 Background job not found in job table
-580 Cannot kill background job
-581 Too many background jobs
-582 Cannot open detached process
-583 Prstat: unrecognized parameter code
-584 Unsolicited command input from a subprocess
-585 This stty parameter requires a numeric argument
-586 Stdgraph device not recorded in stty playback file
-587 PS_OPEN: cannot allocate descriptor
-588 Unrecognized postscript font
-589 Unrecognized postscript special font
+573 Pointer underflow
+574 Pointer overflow
+575 Attempt to free already freed pointer
+576 Attempt to free NULL pointer
+577 System stack underflow (invalid SFREE)
+578 Too many child processes
+579 Cannot open connected subprocess
+580 Process PID not found in process table
+581 Cannot send signal to child process
+582 Invalid IPC syntax or protocol
+583 Background job not found in job table
+584 Cannot kill background job
+585 Too many background jobs
+586 Cannot open detached process
+587 Prstat: unrecognized parameter code
+588 Unsolicited command input from a subprocess
+589 This stty parameter requires a numeric argument
+590 Stdgraph device not recorded in stty playback file
+591 PS_OPEN: cannot allocate descriptor
+592 Unrecognized postscript font
+593 Unrecognized postscript special font
 
 # CLIO (600-649)
 598 Task has too many psets

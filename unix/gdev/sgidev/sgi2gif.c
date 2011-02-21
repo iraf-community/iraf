@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 /*
  *  SGI2GIF.C -- Read an IRAF SGI bitmap file on standard input and convert
@@ -85,9 +88,8 @@ static void 	char_out(), flush_char(), unpack1to8(), bswap4();
 
 /* MAIN -- Main entry point for the task.
  */
-main (argc, argv)
-int	argc;
-char	**argv;
+int
+main (int argc, char *argv[])
 {
 	FILE	*fdi, *fdo;
 	char	fname[SZ_FNAME];
@@ -197,16 +199,19 @@ char	**argv;
 	    GIFEncode (fdo, px, py, (interlace=0), (background=0), (bpp=1),
 		red, green, blue);
 
+	    fflush (fdi);
+	    fflush (fdo);
 	    if (fdi != stdin)
 	        fclose (fdi);
 	    if (fdo != stdout)
-	        fclose (fdi);
-	    fflush (fdi);
+	        fclose (fdo);
 	}
 
 	/* Clean up. */
 	free (buffer);
 	free (pixels);
+
+	return (0);
 }
 
 
@@ -214,9 +219,7 @@ char	**argv;
  */
 
 static void
-unpack1to8 (dest, src, len)
-byte 	*dest, *src;
-int 	len;
+unpack1to8 (byte *dest, byte *src, int len)
 {
         register int i, b;
         byte 	c = 0;
@@ -235,7 +238,7 @@ int 	len;
  */
 
 static int
-isSwappedMachine ()
+isSwappedMachine (void)
 {
         union {
             char ch[4];

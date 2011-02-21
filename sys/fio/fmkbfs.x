@@ -13,7 +13,7 @@ int	fd
 pointer	bp
 int	dev_blksz
 long	offset
-errchk	malloc
+errchk	malloc, FBUF_ALLOC
 include	<fio.com>
 
 begin

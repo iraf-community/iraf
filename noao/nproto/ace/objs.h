@@ -68,7 +68,7 @@ define	ID_CXYERR	1019 # r pixels ""	"Error in CXY"
 # the generic OBJ[IRDC] macros or with the individual structure macros.
 
 define	OBJI		Memi[$1+$2]		# Reference integer parameter
-define	OBJR		Memr[$1+$2]		# Reference real parameter
+define	OBJR		Memr[P2R($1+$2)]	# Reference real parameter
 define	OBJD		Memd[P2D($1+$2)]	# Reference double parameter
 define	OBJC		Memc[P2C($1+$2)]	# Reference char parameter
 

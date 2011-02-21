@@ -116,8 +116,11 @@ short	lut1, lut2, dz1_s, dz2_s, z1_s, z2_s
 
 bool	fp_equalr()
 int	imstati()
+real	if_elogr()
 pointer	ds_pmmap(), imps2s(), imps2r(), sigm2s(), sigm2r(), sigm2_setup()
 errchk	ds_pmmap, imps2s, imps2r, sigm2s, sigm2r, sigm2_setup
+
+extern  if_elogr
 
 begin
 	wdwin = W_WC(wdes,W_DWIN)
@@ -305,7 +308,7 @@ begin
 		} else if (zt == W_LOG) {
 		    call amapr (Memr[in], Memr[out], nx,
 			z1, z2, 1.0, 10.0 ** MAXLOG)
-		    call alogr (Memr[out], Memr[out], nx)
+		    call alogr (Memr[out], Memr[out], nx, if_elogr)
 		    call amapr (Memr[out], Memr[out], nx,
 			0.0, real(MAXLOG), dz1, dz2)
 		} else
@@ -620,4 +623,17 @@ begin
 	call imunmap (im)
 	im = imnew
 	call imseti (im, IM_PMDES, pmnew)
+end
+
+
+# IF_ELOG -- The error function for log10. Note that MAX_EXPONENT is
+# currently an integer so it is converted to the appropriate data type
+# before being returned.
+
+real procedure if_elogr (x)
+
+real   x                               # the input pixel value
+
+begin
+        return (real(-MAX_EXPONENT))
 end

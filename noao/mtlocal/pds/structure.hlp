@@ -4,7 +4,7 @@ PDSREAD Structure Chart
 
 .nf
 t_pdsread()
-# Returns when file list is satified or if EOT is encountered.
+# Returns when file list is satisfied or if EOT is encountered.
 
     read_pds (pdsfile, iraffile)
     # Returns OK or EOF

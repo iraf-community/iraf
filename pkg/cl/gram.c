@@ -17,6 +17,8 @@
 #include "errs.h"
 #include "construct.h"
 #include "ytab.h"		/* pick up yacc token #defines		*/
+#include "proto.h"
+
 
 /*
  * GRAM -- These routines are used by the parser and lex files grammar.y and
@@ -31,7 +33,7 @@
 #define	MAX_PIPECODE		30000		/* modulus for pipecodes   */
 
 int	yeof;			/* set by yywrap when it sees eof.	*/
-extern	yylval;			/* declared in y.tab.c			*/
+extern	int yylval;		/* declared in y.tab.c			*/
 extern	int cldebug;
 
 extern	int inarglist;		/* set by parser when in argument list	*/
@@ -57,7 +59,8 @@ extern  char  cmdblk[SZ_CMDBLK+1]; /* current command block (in history.c) */
 /* Usually the following routine is provided by the yacc library but we need
  * our own here to signal the parser that an eof has been read.
  */
-yywrap ()
+int
+yywrap (void)
 {
 	yeof = 1;
 	return (1);
@@ -68,8 +71,8 @@ yywrap ()
  * error occurred in the input stream.
  */
 /* ARGSUSED */
-yyerror (s)
-char	*s;
+void
+yyerror (char *s)
 {
 	extern	char	*ip_cmdblk;
 
@@ -83,7 +86,8 @@ char	*s;
  * All we need to do is advance the pc up to what it would be if the
  * command were typed in again.  See grammar.y '.' rule.
  */
-rerun()
+void
+rerun (void)
 {
 	register struct codeentry *cp;
 
@@ -103,8 +107,8 @@ rerun()
  * TODO: sort keyword list and do binary search if things get slow.
  *   (better yet use a hashed symbol table - this list is getting huge)
  */
-crackident (s)
-char *s;
+int
+crackident (char *s)
 {
 	struct keywords {
 		char *k_name;		/* the keyword string itself.	*/
@@ -116,47 +120,47 @@ char *s;
 
 	    /* Control flow keywords.
 	     */
-	    "while", Y_WHILE, 0,	"if", Y_IF, 0,
-	    "else", Y_ELSE, 0,		"switch", Y_SWITCH, 0,
-	    "case", Y_CASE, 0,		"default", Y_DEFAULT, 0,
-	    "break", Y_BREAK, 0,	"next", Y_NEXT, 0, 
-	    "return", Y_RETURN, 0,	"goto", Y_GOTO, 0,
-	    "for", Y_FOR, 0,		"procedure", Y_PROCEDURE, 0,
-	    "begin", Y_BEGIN, 0,	"end", Y_END, 0,
+	  { "while", Y_WHILE, 0},	{ "if", Y_IF, 0},
+	  { "else", Y_ELSE, 0},		{ "switch", Y_SWITCH, 0},
+	  { "case", Y_CASE, 0},		{ "default", Y_DEFAULT, 0},
+	  { "break", Y_BREAK, 0},	{ "next", Y_NEXT, 0}, 
+	  { "return", Y_RETURN, 0},	{ "goto", Y_GOTO, 0},
+	  { "for", Y_FOR, 0},		{ "procedure", Y_PROCEDURE, 0},
+	  { "begin", Y_BEGIN, 0},	{ "end", Y_END, 0},
 
 	    /* Parameter and variable types.
 	     */
-	    "int", Y_INT, 0,		"char", Y_STRING, 0,
-	    "real", Y_REAL, 0,		"string", Y_STRING, 0,
-	    "file", Y_FILE, 0,		"gcur", Y_GCUR, 0,
-	    "imcur", Y_IMCUR, 0,	"ukey", Y_UKEY, 0,
-	    "pset", Y_PSET, 0,		"bool", Y_BOOL, 0,
-	    "struct", Y_STRUCT, 0,
+	  { "int", Y_INT, 0},		{ "char", Y_STRING, 0},
+	  { "real", Y_REAL, 0},		{ "string", Y_STRING, 0},
+	  { "file", Y_FILE, 0},		{ "gcur", Y_GCUR, 0},
+	  { "imcur", Y_IMCUR, 0},	{ "ukey", Y_UKEY, 0},
+	  { "pset", Y_PSET, 0},		{ "bool", Y_BOOL, 0},
+	  { "struct", Y_STRUCT, 0},
 
 	    /* debugging commands.
 	     */
-	    "d_d", D_D, 0,
-	    "d_peek", D_PEEK, 0,
+	  { "d_d", D_D, 0},
+	  { "d_peek", D_PEEK, 0},
 
 	    /* sentinel; leave it here... */
-	    "", 0, 0 
+	  { "", 0, 0} 
 	};
 
 	static struct keywords kf[] = {
 	    /* Keywords of intrinsic functions that get built into
 	     * the grammar.  Most intrinsics handled by intrinsic().
 	     */
-	    "scan", Y_SCAN, 0,
-	    "scanf", Y_SCANF, 0,
-	    "fscan", Y_FSCAN, 0,
-	    "fscanf", Y_FSCANF, 0,
+	  { "scan", Y_SCAN, 0},
+	  { "scanf", Y_SCANF, 0},
+	  { "fscan", Y_FSCAN, 0},
+	  { "fscanf", Y_FSCANF, 0},
 
 	    /* sentinel; leave it here... */
-	    "", 0, 0 
+	  { "", 0, 0} 
 	};
 
 	register struct keywords *kp;
-	int	oldtopd;
+	XINT	oldtopd;
 	static	char sch, kch;		/* static storage is faster here   */
 	char	*scopy;			/* non-makelower'd copy		   */
 
@@ -235,12 +239,13 @@ char *s;
  * Return dictionary index of new operand entry so that it may be used as
  *   ((struct operand *)&dictionary[$1])->o_... in yacc specs.
  */
+XINT
 addconst (s, t)
 char	*s;
 int	t;
 {
 	register struct operand *op;
-	int	lasttopd;
+	XINT	lasttopd;
 
 	lasttopd = topd;		/* could just derefenece op	*/
 	op = (struct operand *) memneed (OPSIZ);
@@ -264,8 +269,10 @@ int	t;
  * t_stdout.  Give all non-hidden ones first, then all hidden ones in
  * parentheses.
  */
-listparams (pfp)
-struct pfile *pfp;
+void
+listparams (
+  struct pfile *pfp
+)
 {
 	register struct param *pp;
 
@@ -283,9 +290,11 @@ struct pfile *pfp;
  * a parameter on the output file.  Put parens around the name=value string
  * if a hidden parameter.
  */
-pretty_param (pp, fp)
-struct	param *pp;
-FILE	*fp;
+void
+pretty_param (
+  struct param *pp,
+  FILE	*fp 
+)
 {
 	register char	ch, *p;
 	char	buf[SZ_LINE];
@@ -399,8 +408,10 @@ FILE	*fp;
 /* DUMPPARAMS -- Go through the given pfile and list out its parameters on
  * t_stdout in the form `task.param=value'.
  */
-dumpparams (pfp)
-struct pfile *pfp;
+void
+dumpparams (
+  struct pfile *pfp
+)
 {
 	register struct param *pp;
 	register FILE	*fp = currentask->t_stdout;
@@ -420,10 +431,12 @@ struct pfile *pfp;
 /* SHOW_PARAM -- Print the name and value of a parameter on the output file
  * in the format `task.param = value'.
  */
-show_param (ltp, pp, fp)
-struct	ltask *ltp;
-struct	param *pp;
-FILE	*fp;
+void
+show_param (
+  struct ltask *ltp,
+  struct param *pp,
+  FILE	*fp
+)
 {
 	char	buf[SZ_LINE+1];
 	int	isstr;
@@ -453,9 +466,11 @@ FILE	*fp;
 /* LISTHELP -- List all the (visible) ltasks in the given package in the form
  * of a sorted table.  Used to give menus in response to ? and ?? directives.
  */
-listhelp (pkp, show_invis)
-struct	package *pkp;
-int	show_invis;
+void
+listhelp (
+  struct package *pkp,
+  int	show_invis
+)
 {
 	static	int first_col=7, maxch=20, ncol=0;
 	register struct ltask *ltp;
@@ -483,11 +498,12 @@ int	show_invis;
 		;
 
 	    /* If special task, add character defining task type. */
-	    if (showtype())
+	    if (showtype()) {
 		if (ltp->lt_flags & LT_DEFPCK)
 		    *op++ = '.';
 		else if (ltp->lt_flags & LT_PSET)
 		    *op++ = '@';
+	    }
 
 	    *op++ = EOS;
 	}
@@ -505,8 +521,10 @@ int	show_invis;
  * path works.  Label the current package in some way.  Serves ?? directive.
  * TODO: this should be optimized once a nice form is settled on.
  */
-listallhelp (show_invis)
-int	show_invis;
+void
+listallhelp (
+  int	show_invis
+)
 {
 	register struct package *pkp;
 
@@ -541,8 +559,14 @@ int	show_invis;
  * This bug is particularly manifest when accessing arrays in specified tasks,
  *   e.g. = task.array[*]
  */
-breakout (full, pk, t, p, f)
-char	*full, **pk, **t, **p, **f;
+void
+breakout (
+  char	*full, 
+  char **pk, 
+  char **t, 
+  char **p, 
+  char **f 
+)
 {
 	register char *cp;
 	register int npts, n;
@@ -553,7 +577,7 @@ char	*full, **pk, **t, **p, **f;
 	buffer[SZ_LINE] = '\0';
 
 	for (npts=0, cp=buffer;  *cp;  cp++)
-	    if (*cp == '.')
+	    if (*cp == '.') {
 		if (*(cp+1) == EOS) {
 		    *cp = EOS;		/* chop dot if last character	*/
 		    break;
@@ -563,6 +587,7 @@ char	*full, **pk, **t, **p, **f;
 			    full);
 		    pts[npts++] = cp;
 		}
+	    }
 
 	for (n=0;  n < npts;  n++)
 	    *(pts[n]++) = '\0';		/* null over and skip dots	*/
@@ -607,8 +632,10 @@ char	*full, **pk, **t, **p, **f;
  * Call error() if f starts with p_ but is not found or if ambiguous
  *   (and abbrevs are enabled).
  */
-fieldcvt (f)
-register char *f;
+int
+fieldcvt (
+  register char *f
+)
 {
 	/* Field name and corresponding code tables.
 	 */
@@ -649,8 +676,11 @@ register char *f;
  * than one entry in tbl would match s, else the ordinal (index) into tbl
  * at which s matched.
  */
-keyword (tbl, s)
-register char *tbl[], *s;
+int
+keyword (
+  register char *tbl[], 
+  register char *s
+)
 {
 	register int i;
 	register char *kentry;
@@ -682,9 +712,11 @@ register char *tbl[], *s;
 /* Given a, possibly abbreviated, function name to run, look it up and
  * run it if found. it gets nargs arguments from the operand stack.
  */
-intrfunc (fname, nargs)
-char	*fname;
-int	nargs;
+void
+intrfunc (
+  char	*fname,
+  int	nargs
+)
 {
 	static char *ifnames[] = {
 	    "abs",       "access",    "atan2",     "cos",
@@ -810,8 +842,7 @@ err:	    cl_error (E_IERR, e_badsw, op, "intrfunc()");
  * if conversion is bad somehow.  Allow both h:m and h:m:s forms.
  */
 struct operand 
-sexa (s)
-char	*s;
+sexa (char *s)
 {
 	struct operand o;
 	int	n, sign;
@@ -838,9 +869,12 @@ char	*s;
 
 /* Convert a sexagesimal real back to an index range.
  */
-sexa_to_index (r, i1, i2)
-double	r;
-int	*i1, *i2;
+void
+sexa_to_index (
+  double r,
+  int	*i1, 
+  int   *i2
+)
 {
 	int	sgn;
 
@@ -862,7 +896,7 @@ int	*i1, *i2;
  *   pipe stack.  Return a pointer to the name of the new pipefile.
  */
 char *
-addpipe()
+addpipe (void)
 {
 	static	int pipecode = 0;
 	char	*pipefile();
@@ -905,7 +939,7 @@ addpipe()
 /* GETPIPE -- Get the name of the last pipefile.
  */
 char *
-getpipe()
+getpipe (void)
 {
 	char	*pipefile();
 
@@ -919,8 +953,10 @@ getpipe()
  * yet), and pop N pipes off the pipe stack.  If N is zero, all pipefiles are
  * deleted and the pipestack is cleared (i.e., during error recovery).
  */
-delpipes (npipes)
-register int npipes;
+void
+delpipes (
+  register int npipes
+)
 {
 	register int pipe;
 	char	*pipefile();
@@ -942,8 +978,9 @@ register int npipes;
  * buffer and return pointer to pipefile name to caller.
  */
 char *
-pipefile (pipecode)
-int	pipecode;
+pipefile (
+  int	pipecode
+)
 {
 	static	char fname[SZ_PIPEFILENAME+1];
 	char	*dir;
@@ -969,7 +1006,8 @@ int	pipecode;
  * address for NEXT statements.  It should be called just before the
  * destination is compiled.
  */
-loopincr ()
+void
+loopincr (void)
 {
 	if (nestlevel >= MAX_LOOP)
 	    cl_error (E_UERR, "Nesting too deeply.");
@@ -984,7 +1022,8 @@ loopincr ()
  * has been set it resolves the GOTO statement which has been made
  * the target of BREAK's.
  */
-loopdecr()
+void
+loopdecr (void)
 {
 	int	p_goto;
 
@@ -1001,7 +1040,8 @@ loopdecr()
  * GOTO operands which terminate each block.
  * The jumptable is created at the location of the current pc.
  */
-setswitch ()
+void
+setswitch (void)
 {
 	int	code, jmp, njump, assgn, oper, delta;
 
@@ -1082,7 +1122,8 @@ setswitch ()
 /* IN_SWITCH -- determines whether a CASE or DEFAULT block is
  * legal at the current location.
  */
-in_switch()
+int
+in_switch (void)
 {
 	int 	oper, code, oper2, code2, status;
 
@@ -1117,9 +1158,11 @@ in_switch()
 /* CASESET -- Fill in the values for which the current case block is to be
  * executed.
  */
-caseset (parg, ncaseval)
-memel	*parg;
-int	ncaseval;
+void
+caseset (
+  memel	*parg,
+  int	ncaseval 
+)
 {
 	struct	operand	*o;
 	static	char *badcase = "Invalid case constant.";
@@ -1154,8 +1197,9 @@ int	ncaseval;
  * top of a linked list.
  */
 struct label *
-setlabel (name)
-struct operand *name;
+setlabel (
+  struct operand *name
+)
 {
 	struct	label	*p;
 
@@ -1176,8 +1220,9 @@ struct operand *name;
  * name, or NULL if the label has not been defined.
  */
 struct label *
-getlabel (name)
-struct operand	*name;
+getlabel (
+  struct operand *name
+)
 {
 	struct	label	*l;
 
@@ -1198,8 +1243,10 @@ struct operand	*name;
  * is used as the list pointer.  When the destination is defined,
  * the GOTO is taken out of the indirect list.
  */
-setigoto (loc)
-int	loc;
+void
+setigoto (
+  int	loc
+)
 {
 	if (igoto1 < 0)
 	    coderef(loc)->c_args = -1;
@@ -1213,8 +1260,10 @@ int	loc;
 /* UNSETIGOTO -- takes a GOTO out of the indirect list so that
  * the target may be put in the argument.
  */
-unsetigoto (loc)
-int loc;
+void
+unsetigoto (
+  int loc
+)
 {
 	int 	last, curr;
 
@@ -1236,8 +1285,11 @@ int loc;
 /* MAKE_IMLOOP -- compiles the meta-code for the indexing of arrays in
  * implicit array loops e.g. a[*,5].
  */
-make_imloop (i1, i2)
-int	i1, i2;
+int
+make_imloop (
+  int  i1, 
+  int  i2
+)
 {
 	int 	mode;
 
@@ -1266,8 +1318,8 @@ int	i1, i2;
 
 /* Y_TYPEDEF -- Convert a type specifier keyword into a datatype code.
  */
-y_typedef (key)
-char	*key;
+int
+y_typedef (char *key)
 {
 	if (strcmp (key, "string") == 0 || strcmp (key, "char") == 0)
 	    return (V_STRING);
@@ -1298,7 +1350,8 @@ char	*key;
 /* P_POSITION -- Called when we get a syntax error in the parser.  Print
  * the current cmdblk and point to the offending token.
  */
-p_position()
+void
+p_position (void)
 {
 	register int i;
 

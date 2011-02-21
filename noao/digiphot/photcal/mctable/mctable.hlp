@@ -33,15 +33,15 @@ of the table, and also fills all the physical memory with INDEF values.
 The mct_clear() procedure fills all the physical memory with a specified
 value, but does not modify the logical size of the table.
 .sp
-It is possible to enter data into the table either sequentialy, randomly,
+It is possible to enter data into the table either sequentially, randomly,
 or a combination of both. The mct_put() procedures enter data randomly into
 the table at given row and column. The mct_sput() procedures enter data 
-sequentialy into the table after the highest row and column, i.e., they
+sequentially into the table after the highest row and column, i.e., they
 start after the last element in table, increasing the logical size by one
 element. The physical size is increased automaticaly if needed.
 .sp
 Data can be retrieved from the table as a pointer to the whole data buffer,
-a pointer to a single row, randomly, or sequentaly. The mct_getbuf() returns
+a pointer to a single row, randomly, or sequentially. The mct_getbuf() returns
 a pointer to the data buffer, the mct_getrow() returns a pointer to the
 beginning of a given row, the mct_get() procedures return a single data
 value for a given row and column, and the mct_sget() procedures return the
@@ -84,7 +84,7 @@ pval  =	mct_getrow (table, row)			    Get row pointer
 value =	mct_get[csilrdxp] (table, row, col)	    Get value randomly
 	mct_put[csilrdxp] (table, row, col, value)  Put value randomly
 
-	mct_sput[csilrdxp] (table, value)	    Put value sequentialy
-stat  = mct_sget[csilrdxp] (table, value)	    Get value sequentialy
+	mct_sput[csilrdxp] (table, value)	    Put value sequentially
+stat  = mct_sget[csilrdxp] (table, value)	    Get value sequentially
 .fi
 .endhelp

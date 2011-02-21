@@ -5,7 +5,7 @@ include <mii.h>
 # MIIWRITE -- Write a block of data to a file in MII format.
 # The input data is in the host system native binary format.
 
-procedure miiwritei (fd, spp, nelem)
+procedure mii_writei (fd, spp, nelem)
 
 int	fd			#I output file
 int	spp[ARB]		#I native format data to be written

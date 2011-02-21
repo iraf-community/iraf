@@ -50,9 +50,9 @@ The following logical operators can be used in the expression.
 The pattern match character ?=  takes a
 string expression as its first argument and a pattern as its second argument.
 The result is yes if the pattern is contained in the string expression.
-Patterns are strings which may contain pattern matching metacharacters.
-The metacharacters themselves can be matched by preceeding them with the escape
-character.  The metacharacters are listed below. 
+Patterns are strings which may contain pattern matching meta-characters.
+The meta-characters themselves can be matched by preceeding them with the escape
+character.  The meta-characters are listed below. 
 
 .nf
 	beginning of string	^	end of string		$

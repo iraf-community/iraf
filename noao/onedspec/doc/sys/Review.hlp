@@ -136,7 +136,7 @@ inspect, analyze, and manipulate the contents of a database.
 .le
 .ls database
 A set of one or more "relations" or tables (DBIO is a conventional relational
-database).  A convienent way to think of an IRAF database is as a directory.
+database).  A convenient way to think of an IRAF database is as a directory.
 The relations appear as distinct files in the directory.
 .le
 .ls relation
@@ -147,7 +147,7 @@ visualize a relation is as a \fBtable\fR.  The rows and columns of the table
 correspond to the records and fields of the relation.
 .le
 .ls field
-A field of a record is characterized by an alphnumeric name, datatype, and
+A field of a record is characterized by an alphanumeric name, datatype, and
 size.  Fields may be one dimensional arrays of variable size.  Fields may be
 added to a relation dynamically at run time.  When a new field is added to
 a relation it is added to all records in the relation, but the value of the
@@ -212,7 +212,7 @@ should be implemented as hidden parameters.
 	imop (input, output, data_dependent_control_params)
 
 	imop	image operator name
-	input	image template specifing set of input images
+	input	image template specifying set of input images
 	output	filename of output datagroup
 
 	data_dependent_control_parameters

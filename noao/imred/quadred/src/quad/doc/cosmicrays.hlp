@@ -136,7 +136,7 @@ creating a different output image a difference image between the
 original and the modified image may be made using \fBimarith\fR.
 
 This task may be applied to an image previously processed to detect
-addtional cosmic rays.  A warning will be given (because of the
+additional cosmic rays.  A warning will be given (because of the
 CRCOR header parameter) and the previous processing header keyword will
 be overwritten.
 

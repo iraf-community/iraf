@@ -24,17 +24,17 @@ define	MK_AXES		Memi[$1+15]	# Pointer to list of semi-major axes
 define	MK_SLENGTHS	Memi[$1+16]	# Pointer to list of square lengths
 define	MK_RLENGTHS	Memi[$1+17]	# Pointer to list of rectangle lengths
 
-define	MK_RATIO	Memr[$1+18]	# Ratio of width/length rectangles
-define	MK_ELLIPTICITY	Memr[$1+19]	# Ellipticity of ellipses
-define	MK_RTHETA	Memr[$1+20]	# Position angle of rectangle
-define	MK_ETHETA	Memr[$1+21]	# Position angle of ellipse
+define	MK_RATIO	Memr[P2R($1+18)] # Ratio of width/length rectangles
+define	MK_ELLIPTICITY	Memr[P2R($1+19)] # Ellipticity of ellipses
+define	MK_RTHETA	Memr[P2R($1+20)] # Position angle of rectangle
+define	MK_ETHETA	Memr[P2R($1+21)] # Position angle of ellipse
 
 define	MK_X1		Memi[$1+22]	# LL corner x coord
 define	MK_Y1		Memi[$1+23]	# LL corner y coord
 define	MK_X2		Memi[$1+24]	# UR corner x coord
 define	MK_Y2		Memi[$1+25]	# UR corner y coord
 
-define	MK_TOLERANCE	Memr[$1+26]	# Tolerance for deleting objects
+define	MK_TOLERANCE	Memr[P2R($1+26)] # Tolerance for deleting objects
 
 define	MK_IMAGE	Memc[P2C($1+40)]		# Image name
 define	MK_OUTIMAGE	Memc[P2C($1+40+SZ_FNAME+1)]	# Output image

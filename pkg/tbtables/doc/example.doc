@@ -1,0 +1,122 @@
+     Here is a sample program that demonstrates creating a new table,
+opening an existing table, and creating a new table based on a template.
+The example can be compiled and linked using:
+
+xc -p tables test.x -ltbtables
+
+You can use xc regardless of whether you are logged into the cl or not;
+it doesn't matter.
+
+
+include <tbset.h>
+
+task	ttt
+
+define	MAXROWS		10	# just for local buffer size
+
+procedure ttt()
+
+pointer tp, template		# pointers to table descriptors
+int	nrows
+int	k
+pointer outdec			# column pointer for output column "Dec"
+pointer inra, outra             # column pointers for input & output "RA"
+bool	nullflag[MAXROWS]
+double	ra, dec, racol[MAXROWS]
+pointer tbtopn()
+int	tbpsta()
+
+begin
+#
+# This section creates a new table (without using a template):
+#
+        tp = tbtopn ("ex1", NEW_FILE, 0)	# initialize for a new table
+
+        call tbcdef (tp, outra,			# define column with name "RA"
+		"RA", "degrees", "%12.1h", TY_DOUBLE, 1, 1)
+
+        call tbtcre (tp)			# open the table
+
+        do k = 1, MAXROWS {			# put RA in each row
+            ra = k/60.
+            call tbrptd (tp, outra, ra, 1, k)
+	}
+        call tbtclo (tp)			# close the table
+#
+# Example for an existing table.
+#
+        tp = tbtopn ("ex1", READ_ONLY, 0)	# initialize and open the table
+
+        call tbcfnd (tp, "RA", inra, 1)		# find column "RA"
+        if (inra ==NULL)
+	    call eprintf ("column RA not found\n")
+
+        nrows = tbpsta (tp, TBL_NROWS)		# how many rows?
+
+        do k = 1, nrows {
+            call tbrgtd (tp, inra, ra, nullflag, 1, k)	# read RA from each row
+            if (nullflag[1]) {
+                call eprintf ("column is null for row %d\n")
+		    call pargi (k)
+            } else {
+		call printf ("ra = %12.1h\n")
+		    call pargd (ra)
+            }
+	}
+        call tbtclo (tp)
+#
+# Example for creating a new table using a template to define column(s).
+#
+	# Initialize and open the template table.
+        template = tbtopn ("ex1", READ_ONLY, 0)
+
+	# Initialize using template.
+        tp = tbtopn ("ex2", NEW_COPY, template)
+
+        call tbcdef (tp, outdec,		# define new column "Dec"
+		"Dec", "degrees", "%12.0h", TY_DOUBLE, 1, 1)
+
+        call tbtcre (tp)			# open the output table
+
+        call tbcfnd (template, "RA", inra, 1)	# find col "RA" in input table
+        if (inra == NULL)
+	    call eprintf ("column RA not found in input table\n")
+
+        call tbcfnd (tp, "RA", outra, 1)	# find col "RA" in output table
+        if (inra == NULL)
+	    call eprintf ("column RA not found in output table\n")
+
+        nrows = tbpsta (template, TBL_NROWS)	# how many rows in template?
+        if (nrows > MAXROWS)
+	    call error (1,
+		"input table has too many rows for size of input buffer")
+
+	# Copy column "RA" from template to output.
+        call tbcgtd (template, inra, racol, nullflag, 1, nrows)
+        call tbcptd (tp, outra, racol, 1, nrows)
+
+        call tbtclo (template)			# we're done with the template
+
+        do k = 1, nrows {			# put Dec in each row
+            dec = -k/60.D0
+            call tbrptd (tp, outdec, dec, 1, k)
+	}
+
+        call tbtclo (tp)			# close the output table
+end
+
+     The tprint task gave the following output for table ex2.tab:
+
+#  ex2 has 10 rows and 2 columns
+
+(row)           RA          Dec
+    1    0:01:00.0     -0:01:00
+    2    0:02:00.0     -0:02:00
+    3    0:03:00.0     -0:03:00
+    4    0:04:00.0     -0:04:00
+    5    0:05:00.0     -0:05:00
+    6    0:06:00.0     -0:06:00
+    7    0:07:00.0     -0:07:00
+    8    0:08:00.0     -0:08:00
+    9    0:09:00.0     -0:09:00
+   10    0:10:00.0     -0:10:00

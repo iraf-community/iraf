@@ -365,7 +365,7 @@ reduce the pattern matching.  The line patterns are normally restricted
 to be somewhat near each other by the \fInneighbors\fR so some degree of
 distortion can be tolerated.  But in order to provide the ability to remove
 some of this distortion when it is known the parameter \fIcrquad\fR is
-provided.  This parameter applies a quadratic transformion to the measured
+provided.  This parameter applies a quadratic transformation to the measured
 pixel positions to another set of "linearized" positions  which are used
 in the line ratio pattern matching.  The form of the transformation is
 

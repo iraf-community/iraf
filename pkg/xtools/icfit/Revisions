@@ -1,5 +1,10 @@
 .help revisions Jun88 pkg.xtools.icfit
 .nf
+icdeviant.gx
+    There were two bugs related to growing.  First, the logic was wrong.
+    Second, in one place the grow parameter was treated as being in pixels
+    and in another as being in user coordinate units.
+    (6/28/10, Valdes)
 
 icdosetup.gx
     When there is only one sample range that is binned to a single point

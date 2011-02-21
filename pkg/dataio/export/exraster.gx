@@ -298,7 +298,11 @@ begin
 		data = imgl3$t (im, line, band)
 		call amov$t (Mem$t[data], Mem$t[IO_DATA(op)], IM_LEN(im,1))
 	        IO_TYPE(op) = TY_PIXEL
-		IO_NBYTES(op) = SZ_PIXEL * SZB_CHAR
+		$if (datatype == i)
+		    IO_NBYTES(op) = SZ_INT32 * SZB_CHAR
+		$else
+		    IO_NBYTES(op) = SZ_PIXEL * SZB_CHAR
+		$endif
 	        IO_ISIM(op) = YES
 	    $endfor
 	    }
@@ -325,7 +329,13 @@ begin
             call write (fd, Mems[pix], npix * SZ_SHORT/SZ_CHAR)
 	$for (silrd)
         case TY_PIXEL:
+	    $if (datatype == i)
+	    if (SZ_INT != SZ_INT32)
+		call ipak32 (Memi[pix], Memi[pix], npix)
+            call write (fd, Memi[pix], npix * SZ_INT32/SZ_CHAR)
+	    $else
             call write (fd, Mem$t[pix], npix * SZ_PIXEL/SZ_CHAR)
+	    $endif
 	$endfor
 	}
 end

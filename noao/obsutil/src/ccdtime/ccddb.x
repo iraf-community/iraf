@@ -59,7 +59,7 @@ begin
 		if (nscan()<3 || Memc[key]=='#' || strne (Memc[key], kname))
 		    next
 		call printf ("\t%s\n")
-		    call pargstr (memc[str])
+		    call pargstr (Memc[str])
 	    }
 	    call close (fd)
 	    call sfree (sp)

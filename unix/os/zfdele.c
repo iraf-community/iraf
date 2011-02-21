@@ -9,13 +9,19 @@
 
 /* ZFDELE -- Delete a file.
  */
-ZFDELE (fname, status)
-PKCHAR	*fname;
-XINT	*status;
+int
+ZFDELE (
+  PKCHAR  *fname,
+  XINT	  *status
+)
 {
+	extern  int vm_delete();
+
 	vm_delete ((char *)fname, 0);
 	if (unlink ((char *)fname) == ERR)
 	    *status = XERR;
 	else
 	    *status = XOK;
+
+	return (*status);
 }

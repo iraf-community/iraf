@@ -22,7 +22,7 @@ pointer	sp, cmd, str
 real	xcenter, ycenter, xc, yc, rmin, rmax, imin, imax
 real	u1, u2, v1, v2, x1, x2, y1, y2, rval
 
-int	apfitcenter(), apfitsky(), apwmag(), apstati(), clgcur(), ap_showplot()
+int	apfitcenter(), apfitsky(), ap_wmag(), apstati(), clgcur(), ap_showplot()
 real	apstatr(), ap_cfwhmpsf(), ap_ccapert(), ap_cannulus(), ap_cdannulus()
 real	ap_csigma(), ap_crgrow(), ap_crclean(), ap_crclip()
 real	ap_cdatamin(), ap_cdatamax()
@@ -118,7 +118,7 @@ begin
 	    sier = apfitsky (ap, im, apstatr (ap, XCENTER), apstatr (ap,
 	        YCENTER), NULL, gd)
 	if (! IS_INDEFR (apstatr (ap, SKY_MODE)))
-	    pier = apwmag (ap, im, apstatr (ap, XCENTER), apstatr (ap,
+	    pier = ap_wmag (ap, im, apstatr (ap, XCENTER), apstatr (ap,
 		YCENTER), apstati (ap, POSITIVE), apstatr (ap, SKY_MODE),
 		apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
 	call ap_pplot (ap, im, 0, gd, apstati (ap, RADPLOTS))

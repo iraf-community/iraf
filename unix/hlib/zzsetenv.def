@@ -35,7 +35,7 @@ set	terminal	= xgterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
 set	ttynlines	= 40
-set	version		= "NOAO/IRAF V2.14.1"
+set	version		= "NOAO/IRAF V2.15.1a"
 
 # System directories.
 
@@ -96,3 +96,4 @@ set	xtools		= "pkg$xtools/"
 # Load definitions for any locally added external packages.
 
 set	@hlib$extern.pkg
+set	@iraf$extern/.zzsetenv.def

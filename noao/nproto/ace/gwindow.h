@@ -22,14 +22,14 @@ define	W_WC		($1+$2*LEN_WC+210)	# ptr to coord descriptor
 # Fields of the WC coordinate descriptor, a substructure of the window
 # descriptor.  "W_XB(W_WC(w,0))" is the XB field of wc 0 of window W.
 
-define	W_XS		Memr[$1]		# starting X value
-define	W_XE		Memr[$1+1]		# ending X value
+define	W_XS		Memr[P2R($1)]		# starting X value
+define	W_XE		Memr[P2R($1+1)]		# ending X value
 define	W_XT		Memi[$1+2]		# X transformation type
-define	W_YS		Memr[$1+3]		# starting Y value
-define	W_YE		Memr[$1+4]		# ending Y value
+define	W_YS		Memr[P2R($1+3)]		# starting Y value
+define	W_YE		Memr[P2R($1+4)]		# ending Y value
 define	W_YT		Memi[$1+5]		# Y transformation type
-define	W_ZS		Memr[$1+6]		# starting Z value (greyscale)
-define	W_ZE		Memr[$1+7]		# ending Z value
+define	W_ZS		Memr[P2R($1+6)]		# starting Z value (greyscale)
+define	W_ZE		Memr[P2R($1+7)]		# ending Z value
 define	W_ZT		Memi[$1+8]		# Z transformation type
 define	W_UPTR		Memi[$1+9] 		# LUT when ZT=USER
 

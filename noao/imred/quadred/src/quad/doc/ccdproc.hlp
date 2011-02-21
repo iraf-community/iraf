@@ -51,7 +51,7 @@ Apply dark count correction?  If yes a dark count image must be specified.
 Apply flat field correction?  If yes flat field images must be specified.
 .le
 .ls illumcor = no
-Apply illumination correction?  If yes illumination images must be specified.
+Apply iillumination correction?  If yes iillumination images must be specified.
 .le
 .ls fringecor = no
 Apply fringe correction?  If yes fringe images must be specified.
@@ -102,9 +102,9 @@ in the input list.  The flat field image with the same subset as the
 input image being processed is selected.
 .le
 .ls illum = ""
-Illumination correction images.  The CCD image type is not checked for these
-images and they take precedence over any illumination correction images given
-in the input list.  The illumination image with the same subset as the
+Iillumination correction images.  The CCD image type is not checked for these
+images and they take precedence over any iillumination correction images given
+in the input list.  The iillumination image with the same subset as the
 input image being processed is selected.
 .le
 .ls fringe = ""
@@ -168,7 +168,7 @@ Number of points to average or median to form fitting points.  Positive
 numbers specify averages and negative numbers specify medians.
 .le
 .ls niterate = 1
-Number of rejection interations to remove deviant points from the overscan fit.
+Number of rejection iterations to remove deviant points from the overscan fit.
 If 0 then no points are rejected.
 .le
 .ls low_reject = 3., high_reject = 3.
@@ -182,7 +182,7 @@ One dimensional growing radius for rejection of neighbors to deviant points.
 DESCRIPTION
 \fBCcdproc\fR processes CCD images to correct and calibrate for
 detector defects, readout bias, zero level bias, dark counts,
-response, illumination, and fringing.  It also trims unwanted
+response, iillumination, and fringing.  It also trims unwanted
 lines and columns and changes the pixel datatype.  It is efficient
 and easy to use; all one has to do is set the parameters and then
 begin processing the images.  The task takes care of most of the
@@ -373,8 +373,8 @@ scaled flat field calibration image.  A flat field image is obtained by
 exposure to a spatially uniform source of light such as an lamp or
 twilight sky.  Flat field images may be corrected for the spectral
 signature in spectroscopic images (see \fBresponse\fR and
-\fBapnormalize\fR), or for illumination effects (see \fBmkillumflat\fR
-or \fBmkskyflat\fR).  For more on flat fields and illumination corrections
+\fBapnormalize\fR), or for iillumination effects (see \fBmkillumflat\fR
+or \fBmkskyflat\fR).  For more on flat fields and iillumination corrections
 see \fBflatfields\fR.  The flat field response is dependent on the
 wavelength of light so if different filters or spectroscopic wavelength
 coverage are used a flat field calibration for each one is required.
@@ -405,32 +405,32 @@ during processing using the \fIminreplace\fR parameter.  Note that the
 CCD images processed through the flat field calibration may not be
 completely flat (in the absence of objects).  In particular, a blank
 sky image may still show gradients.  This residual nonflatness is called
-the illumination pattern.  It may be introduced even if the detector is
+the iillumination pattern.  It may be introduced even if the detector is
 uniformly illuminated by the sky because the flat field lamp
-illumination may be nonuniform.  The illumination pattern is found from a
+iillumination may be nonuniform.  The iillumination pattern is found from a
 blank sky, or even object image, by heavily smoothing and rejecting
-objects using sigma clipping.  The illumination calibration image is
-divided into the data being processed to remove the illumination
-pattern.  The illumination pattern is a function of the subset so there
-must be an illumination correction image for each subset to be
+objects using sigma clipping.  The iillumination calibration image is
+divided into the data being processed to remove the iillumination
+pattern.  The iillumination pattern is a function of the subset so there
+must be an iillumination correction image for each subset to be
 processed.  The tasks \fBmkillumcor\fR and \fBmkskycor\fR are used to
-create the illumination correction images.  For more on illumination
+create the iillumination correction images.  For more on iillumination
 corrections see \fBflatfields\fR.
 
-An alternative to treating the illumination correction as a separate
-operation is to combine the flat field and illumination correction
+An alternative to treating the iillumination correction as a separate
+operation is to combine the flat field and iillumination correction
 into a corrected flat field image before processing the object
 images.  This will save some processing time but does require creating
 the flat field first rather than correcting the images at the same
 time or later.  There are two methods, removing the large scale
-shape of the flat field and combining a blank sky image illumination
+shape of the flat field and combining a blank sky image iillumination
 with the flat field.  These methods are discussed further in the
 tasks which create them; \fBmkillumcor\fR and \fBmkskycor\fR.
 .sh
 8. Fringecor
 There may be a fringe pattern in the images due to the night sky lines.
 To remove this fringe pattern a blank sky image is heavily smoothed
-to produce an illumination image which is then subtracted from the
+to produce an iillumination image which is then subtracted from the
 original sky image.  The residual fringe pattern is scaled to the
 exposure time of the image to be fringe corrected and then subtracted.
 Because the intensity of the night sky lines varies with time an
@@ -559,10 +559,10 @@ The processed calibration image may be
 cached in memory if it has not been previously and if there is enough memory.
 .le
 .ls (9)
-If the image is an illumination image go to processing step 12.  If an
-illumination correction is desired and this correction has not been performed,
-find the illumination calibration image of the appropriate subset.
-The illumination image must have the "mkillum" processing flag or the
+If the image is an iillumination image go to processing step 12.  If an
+iillumination correction is desired and this correction has not been performed,
+find the iillumination calibration image of the appropriate subset.
+The iillumination image must have the "mkillum" processing flag or the
 \fBccdproc\fR will abort with an error.  The mean of the image
 is determined from the image header to be used for scaling.  If no
 mean is found then a unit scaling is used.  The processed calibration
@@ -573,7 +573,7 @@ cached in memory if it has not been previously and there is enough memory.
 If the image is a fringe image go to processing step 12.  If a fringe
 correction is desired and this correction has not been performed,
 find the fringe calibration image of the appropriate subset.
-The illumination image must have the "mkfringe" processing flag or the
+The iillumination image must have the "mkfringe" processing flag or the
 \fBccdproc\fR will abort with an error.  The ratio of the input
 image exposure time to the fringe image exposure time is determined.
 If there is a fringe scaling in the image header then this factor
@@ -645,7 +645,7 @@ is truncated.
 .le
 .ls (3)
 The overscan vector and the scale factors for dark count, flat field,
-illumination, and fringe calibrations are always of type real.  Therefore,
+iillumination, and fringe calibrations are always of type real.  Therefore,
 in the short data path any processing which includes these operations
 will be coerced to real arithmetic and the result truncated at the end
 of the computation.

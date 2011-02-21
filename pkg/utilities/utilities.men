@@ -1,3 +1,4 @@
+          bases - Convert an integer to hex, octal, and binary
 	 curfit - Fit data with Chebyshev, Legendre or spline curve
 	  detab	- Replace tabs with tabs and blanks
 	  entab - Replace blanks with tabs and blanks
@@ -8,3 +9,5 @@
        translit - Replace or delete specified characters in a file
 	  ucase - Convert a file to upper case
 	  urand - Uniform random number generator
+
+	nttools - NOAO version of TTOOLS package

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <ctype.h>
 
 #define	import_kernel
@@ -17,15 +18,20 @@
 #define W		02
 #define ctrlcode(c)	((c) >= '\007' && (c) <= '\017')
 
+
 /* ZFACSS -- Try to determine if FILE is accessible in the indicated MODE.
  * If file is accessible for reading and TYPE is given as TEXT_FILE,
  * look at the first block of data to see if it is legal text data.
  * ACCESS(file,0,0) merely checks that the file exists.  Any file is a
  * legal binary file.
  */
-ZFACSS (fname, mode, type, status)
-PKCHAR	*fname;
-XINT	*mode, *type, *status;
+int
+ZFACSS (
+  PKCHAR  *fname,
+  XINT	  *mode, 
+  XINT 	  *type,
+  XINT 	  *status
+)
 {
 	static	char modebits[] = { 0, R, R|W, W, R|W };
 	register char	*ip, ch;
@@ -37,7 +43,7 @@ XINT	*mode, *type, *status;
 	/* Null filename? */
 	if (*(char *)fname == EOS) {
 	    *status = NO;
-	    return;
+	    return (NO);
 	}
 
 	/* Map IRAF access mode into UNIX access mode.
@@ -59,7 +65,7 @@ XINT	*mode, *type, *status;
 		*status = YES;
 	    else
 		*status = NO;
-	    return;
+	    return (*status);
 	}
 
 	/* If we have to check the file type (text or binary), then we must
@@ -104,4 +110,6 @@ XINT	*mode, *type, *status;
 	}
 		
 	(*status) = accessible;
+
+	return (*status);
 }

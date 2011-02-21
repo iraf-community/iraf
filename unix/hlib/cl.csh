@@ -14,12 +14,14 @@ set cl_binary		= "ecl.e"
 
 if (`echo $0 | egrep ecl` != "") then
     set cl_binary	= "ecl.e"
+
 else if (`echo $0 | egrep vo` != "") then
     set cl_binary	= "vocl.e"
+
 else if ($#argv > 0) then
     if ("$argv[1]" == "-old" || "$argv[1]" == "-o") then
         set cl_binary	= "cl.e"
-    else if ("$argv[1]" == "-vo" || "$argv[1]" == "-o") then
+    else if ("$argv[1]" == "-vo") then
         set cl_binary	= "vocl.e"
     else if ("$argv[1]:e" == "c") then
 	# Workaround for autoconf scripts attempting to use this command as
@@ -45,7 +47,6 @@ if ($?iraf == 0) then
     setenv iraf "$d_iraf"
 endif
 
-
 # Check for a version query.
 if ($#argv > 0) then
     if ("$argv[1]" == "-v" || "$argv[1]" == "-version" || \
@@ -57,66 +58,71 @@ endif
 
 
 # Determine platform architecture.
+if (-e $iraf/unix/hlib/irafarch.csh) then
+    set ACTUAL_ARCH = `$iraf/unix/hlib/irafarch.csh -actual`
+else
+    set ACTUAL_ARCH = $IRAFARCH
+endif
+
 if ($?IRAFARCH) then
     if (-e $iraf/bin.${IRAFARCH}/${cl_binary}) then
 	set MACH = $IRAFARCH
-    endif
-endif
-
-if (! $?MACH) then
-    set os_mach = `uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
-    if (-f /etc/redhat-release) then
-	if (`uname -m` == "ppc") then
-	    setenv mach linuxppc
-	else
-	    setenv mach redhat
-	endif
     else
-	set mach = `uname -s | tr '[A-Z]' '[a-z]'`
+        echo "ERROR:  No $iraf/bin.${IRAFARCH}/${cl_binary} binary found."
+	if ("$ACTUAL_ARCH" != "$IRAFARCH") then
+            echo "ERROR:  IRAFARCH set to '$IRAFARCH', should be '$ACTUAL_ARCH'"
+	endif
+	exit 1
+    endif
+    setenv arch ".$MACH"
+
+else
+    set os_mach = `uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
+ 
+    if (-e $iraf/unix/hlib/irafarch.csh) then
+        set MACH = `$iraf/unix/hlib/irafarch.csh`
+    else
+        set MACH = $os_mach
     endif
 
-    if ($mach == "darwin") then
-        if ("`uname -m`" == "i386") then
+    if ("$os_mach" == "linux") then		# handle linux systems
+        if (`uname -m` == "x86_64") then
+            setenv mach linux64
+        else
+            setenv mach linux
+        endif
+    else if ("$os_mach" == "darwin") then	# handle Mac systems
+        if ("`uname -m`" == "x86_64") then
             setenv mach macintel
         else
             setenv mach macosx
         endif
-    else if ($os_mach == "cygwin") then
+    else if ("$os_mach" == "cygwin") then
         setenv mach cygwin
+    else
+        set mach = `uname -s | tr '[A-Z]' '[a-z]'`
     endif
 
+    setenv arch ".$MACH"
+    if (! $?IRAFARCH) then
+        setenv IRAFARCH "$MACH"
+    endif
 
-    if (-e $iraf/bin.$mach/$cl_binary) then
-	set MACH = $mach
-    else if (-e $iraf/bin.freebsd/$cl_binary) then
-	set MACH = freebsd
-    else if (-e $iraf/bin.macosx/$cl_binary) then
-	set MACH = macosx
-    else if (-e $iraf/bin.macintel/$cl_binary) then
-	set MACH = macintel
-    else if (-e $iraf/bin.cygwin/$cl_binary) then
-	set MACH = cygwin
-    else if (-e $iraf/bin.linux/$cl_binary) then
-	set MACH = linux
-    else if (-e $iraf/bin.redhat/$cl_binary) then
-	set MACH = redhat
-    else if (-e $iraf/bin.linuxppc/$cl_binary) then
-	set MACH = linuxppc
-    else if (-e $iraf/bin.sunos/$cl_binary) then
-	set MACH = sunos
-    else if (-e $iraf/bin.linuz/$cl_binary) then
-	set MACH = linuz
-    else
-	echo "cannot find $iraf/bin.xxx/$cl_binary"
+    if (! (-e $iraf/bin.${MACH}/${cl_binary}) ) then
+        echo "ERROR:  No $iraf/bin.${IRAFARCH}/${cl_binary} binary found."
 	exit 1
     endif
 endif
 
-# Check for obsolete IRAFBIN definition.
-if ($?IRAFBIN && !($?IRAFARCH)) then
-    echo "Use IRAFARCH rather than IRAFBIN to specify the machine architecture"
-    echo "IRAFARCH, if defined, should be one of ffpa,f68881,i386,sparc, etc."
+# Recent linux systems display a problem in how pointer addresses 
+# interact with the stack and can result in a segfault.  Remove the
+# stacksize limit for IRAF processes until this is better understood.
+if ("$IRAFARCH" == "redhat" || \
+    "$IRAFARCH" == "linux64" || \
+    "$IRAFARCH" == "linux") then
+	limit stacksize unlimited
 endif
+
 
 # Just run the CL if IRAFARCH already defined.
 if ($?IRAFARCH) then
@@ -124,15 +130,6 @@ if ($?IRAFARCH) then
 	setenv arch ""
     else
 	setenv arch ".$IRAFARCH"
-    endif
-
-    # Recent linux systems display a problem in how pointer addresses 
-    # interact with the stack and can result in a segfault.  Remove the
-    # stacksize limit for IRAF processes until this is better understood.
-    if ("$IRAFARCH" == "redhat" || \
-        "$IRAFARCH" == "linux" || \
-        "$IRAFARCH" == "linuxppc") then
-	    limit stacksize unlimited
     endif
 
     setenv IRAFBIN ${iraf}bin$arch/
@@ -145,39 +142,12 @@ if ($?IRAFARCH) then
 endif
 
 
-# Determine the architecture to be used.
-if ("$MACH" == "freebsd") then
-    setenv IRAFARCH "freebsd"
-else if ("$MACH" == "linux") then
-    setenv IRAFARCH "linux"
-else if ("$MACH" == "redhat") then
-    setenv IRAFARCH "redhat"
-else if ("$MACH" == "linuxppc") then
-    setenv IRAFARCH "linuxppc"
-else if ("$MACH" == "macosx") then
-    setenv IRAFARCH "macosx"
-else if ("$MACH" == "macintel") then
-    setenv IRAFARCH "macintel"
-else if ("$MACH" == "cygwin") then
-    setenv IRAFARCH "cygwin"
-else if ("$MACH" == "sunos") then
-    setenv IRAFARCH "sunos"
-else if ("$MACH" == "linuz") then
-    setenv IRAFARCH "linuz"
-endif
+# Set the architecture to be used.
+setenv IRAFARCH   $MACH
 
-# Recent linux systems display a problem in how pointer addresses 
-# interact with the stack and can result in a segfault.  Remove the
-# stacksize limit for IRAF processes until this is better understood.
-if ("$IRAFARCH" == "redhat" || \
-    "$IRAFARCH" == "linux" || \
-    "$IRAFARCH" == "linuxppc") then
-	limit stacksize unlimited
-endif
 
-setenv arch .$IRAFARCH
-setenv IRAFBIN ${iraf}bin$arch/
-set file = ${IRAFBIN}$cl_binary
+setenv arch 	.$IRAFARCH
+setenv IRAFBIN 	${iraf}bin$arch/
 
 # Run the desired CL.
-exec $file
+exec  ${IRAFBIN}$cl_binary

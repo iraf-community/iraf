@@ -27,11 +27,11 @@ define	IC_SAMPLE	Memi[$1+2]	# Pointer to sample string
 define	IC_NAVERAGE	Memi[$1+3]	# Sampling averaging bin
 define	IC_NITERATE	Memi[$1+4]	# Number of rejection interation
 define	IC_TRANSFORM	Memi[$1+5]	# Type of transformation ** DTOI ONLY **
-define	IC_XMIN		Memr[$1+6]	# Minimum value for curve
-define	IC_XMAX		Memr[$1+7]	# Maximum value for curve
-define	IC_LOW		Memr[$1+8]	# Low rejection value
-define	IC_HIGH		Memr[$1+9]	# Low rejection value
-define	IC_GROW		Memr[$1+10]	# Rejection growing radius
+define	IC_XMIN		Memr[P2R($1+6)]	# Minimum value for curve
+define	IC_XMAX		Memr[P2R($1+7)]	# Maximum value for curve
+define	IC_LOW		Memr[P2R($1+8)]	# Low rejection value
+define	IC_HIGH		Memr[P2R($1+9)]	# Low rejection value
+define	IC_GROW		Memr[P2R($1+10)]# Rejection growing radius
 
 # ICFIT parameters used for fitting
 define	IC_NFIT		Memi[$1+11]	# Number of fit points
@@ -53,12 +53,12 @@ define	IC_FITERROR	Memi[$1+24]	# Error in fit
 define	IC_LABELS	Memi[$1+25+$2-1]# Graph axis labels
 define	IC_UNITS	Memi[$1+27+$2-1]# Graph axis units
 
-define	IC_FOG		Memr[$1+29]	# *** DTOI ONLY *** value of fog level
+define	IC_FOG		Memr[P2R($1+29)]# *** DTOI ONLY *** value of fog level
 define	IC_NEWFOG	Memi[$1+30]	# Flag for change in fog
 define	IC_RESET	Memi[$1+31]	# Flag for resetting variables
 define	IC_UPDATE	Memi[$1+32]
 define	IC_EBARS	Memi[$1+33]	# Flag for plotting error bars
-define	IC_RFOG		Memr[$1+34]	# Reference value of fog for resetting
+define	IC_RFOG		Memr[P2R($1+34)]# Reference value of fog for resetting
 
 # ICFIT key definitions
 define	IC_GKEY		Memi[$1+35]			# Graph key

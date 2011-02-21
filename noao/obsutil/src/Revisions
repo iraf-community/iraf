@@ -1,5 +1,23 @@
 .help Revisions Nov01 obsutuil
 
+sptime/t_sptime.x
+    Made the graphs all auto-scale.  (11/14/08, Valdes)
+
+sptime/t_sptime.x
+sptime/stdisperser.x
+sptime/grating.x
+sptime/specpars.par
+sptime/sptime.h
+doc/sptime.hlp
+    Added a "generic" disperser type to force using the desired wavelength
+    and dispersion without defining a grating whose mapping between
+    position on the detector and wavelength might be wrong.  Also fixed
+    a couple of typos.  (11/13/08, Valdes)
+
+=======
+V2.14.1
+=======
+
 =======
 V2.13
 =======

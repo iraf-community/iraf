@@ -11,16 +11,21 @@
 /* ZFPATH -- Return the absolute pathname equivalent of an OSFN.  If the null
  * string is given the OSFN of the current working directory is returned.
  */
-ZFPATH (osfn, pathname, maxch, nchars)
-XCHAR	*osfn;			/* input OS filename	[NOT PACKED]	*/
-XCHAR	*pathname;		/* output pathname	[NOT PACKED]	*/
-XINT	*maxch;
-XINT	*nchars;
+int
+ZFPATH (
+  XCHAR	*osfn,			/* input OS filename	[NOT PACKED]	*/
+  XCHAR	*pathname,		/* output pathname	[NOT PACKED]	*/
+  XINT	*maxch,
+  XINT	*nchars
+)
 {
 	register char	*cp;
 	register XCHAR	*ip, *op;
 	register int	n = *maxch;
 	PKCHAR	cwd[SZ_PATHNAME+1];
+
+	extern  int ZFGCWD();
+
 
 	op = pathname;
 	for (ip=osfn;  *ip == ' ';  ip++)
@@ -40,4 +45,6 @@ XINT	*nchars;
 
 	*op = XEOS;
 	*nchars = (op - pathname);
+
+	return (XOK);
 }

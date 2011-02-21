@@ -72,7 +72,7 @@ appropriate substitution for DISK.
 In pre-V2.3 versions of VMS/IRAF it was necessary to define a system or
 job logical name for each disk an IRAF user might need to access which
 did not contain the $ character, since $ is the logical directory
-metacharacter in IRAF virtual filenames.  This step is no longer necessary
+meta-character in IRAF virtual filenames.  This step is no longer necessary
 as the $ can be escaped with backslash in IRAF virtual filenames, e.g.,
 "usr\$0:[iraf...]".  The MKIRAF script will automatically insert the escape
 characters when building the LOGIN.CL file; do not escape the $ characters
@@ -408,7 +408,7 @@ IRAF.  No other privileges are required or useful for normal activities.
 Although privileges are no problem for VMS/IRAF, it is absolutely essential
 that the IRAF user have sufficient VMS quota, and that the system tuning
 parameters be set correctly, otherwise IRAF will not be able to function
-correctly.  If a quota is exceeded, or if the system runs out of some
+correctly.  If a quota is exceedd, or if the system runs out of some
 limited resource, the affected VMS system service will return an error code
 to IRAF and the operation will fail (this usually happens when trying to
 spawn a connected subprocess).

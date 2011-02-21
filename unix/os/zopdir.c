@@ -47,7 +47,7 @@ struct dir {
 
 static	int _getfile();
 static	int d_compar();
-static	d_qsort();
+static	void d_qsort();
 static	char *sbuf;
 static	int *soff;
 static	int nentries;
@@ -59,9 +59,8 @@ static	int nentries;
  * driver subroutines to read successive machine dependent filenames from
  * a directory.
  */
-ZOPDIR (fname, chan)
-PKCHAR	*fname;
-XINT	*chan;
+int
+ZOPDIR (PKCHAR *fname, XINT *chan)
 {
 	register char	*ip, *op;
 	register DIR	*dir;
@@ -70,10 +69,12 @@ XINT	*chan;
 	int	nchars, sbufoff, fd;
 	struct	dir *dp = NULL;
 
+
 	/* The file name should have an "/" appended, if it is a proper
 	 * directory prefix.  This must be removed to get the name of the
 	 * directory file.
 	 */
+	memset (osfn, 0, SZ_PATHNAME+1);
 	for (ip=(char *)fname, op=osfn;  (*op = *ip++) != EOS;  op++)
 	    ;
 	if (*--op == '/' && op > osfn)
@@ -83,7 +84,7 @@ XINT	*chan;
 	dir = opendir (osfn);
 	if (dir == NULL) {
 	    *chan = XERR;
-	    return;
+	    return (XERR);
 	}
 
 	nentries = 0;
@@ -133,7 +134,7 @@ XINT	*chan;
 	dp->entry = 0;
 	dp->dir = dir;
 
-#if (defined(REDHAT) || defined(LINUX))
+#if (defined(REDHAT) || defined(LINUX) || defined(MACOSX) || defined (IPOD))
 	fd = dirfd(dir);
 #else
 	fd = dir->dd_fd;		/* MACHDEP */
@@ -142,7 +143,7 @@ XINT	*chan;
 	zfd[fd].fp = (FILE *)dp;
 
 	*chan = fd;
-	return;
+	return (*chan);
 
 err:
 	if (soff)
@@ -153,14 +154,15 @@ err:
 	    free (dp);
 	closedir (dir);
 	*chan = XERR;
+
+	return (XERR);
 }
 
 
 /* ZCLDIR -- Close a directory file.
  */
-ZCLDIR (chan, status)
-XINT	*chan;
-XINT	*status;
+int
+ZCLDIR (XINT *chan, XINT *status)
 {
 	register struct dir *dp = (struct dir *)zfd[*chan].fp;
 
@@ -170,6 +172,8 @@ XINT	*status;
 	free (dp);
 
 	*status = XOK;
+
+	return (XOK);
 }
 
 
@@ -177,9 +181,13 @@ XINT	*status;
  * called by the text file driver for a directory file, hence file names
  * are returned as simple packed strings.
  */
-ZGFDIR (chan, outstr, maxch, status)
-XINT	*chan, *maxch, *status;
-PKCHAR	*outstr;
+int
+ZGFDIR (
+  XINT	  *chan, 
+  PKCHAR  *outstr,
+  XINT    *maxch, 
+  XINT    *status
+)
 {
 	register struct dir *dp = (struct dir *)zfd[*chan].fp;
 	register int	n, nchars;
@@ -194,16 +202,15 @@ PKCHAR	*outstr;
 	    *status = nchars;
 	} else
 	    *status = XEOF;
+
+	return (*status);
 }
 
 
 /* GETFILE -- Get the next file name from an open directory file.
  */
 static int
-_getfile (dir, outstr, maxch)
-DIR	*dir;
-char	*outstr;
-int	maxch;
+_getfile (DIR *dir, char *outstr, int maxch)
 {
 	register char *ip, *op;
 	register int n;
@@ -244,8 +251,7 @@ int	maxch;
 /* COMPAR -- String comparision routine for what follows.
  */
 static int
-d_compar (a, b)
-char	*a, *b;
+d_compar (char *a, char *b)
 {
 	return (strcmp (&sbuf[*(int *)a], &sbuf[*(int *)b]));
 }
@@ -283,18 +289,14 @@ static  int (*qcmp)();			/* the comparison routine */
 static  int qsz;			/* size of each record */
 static  int thresh;			/* THRESHold in chars */
 static  int mthresh;			/* MTHRESHold in chars */
-static	d_qst();
+static	void d_qst();
 
 /* QSORT -- First, set up some global parameters for qst to share.  Then,
  * quicksort with qst(), and then a cleanup insertion sort ourselves.
  * Sound simple? It's not...
  */
-static
-d_qsort (base, n, size, compar)
-char	*base;
-int	n;
-int	size;
-int	(*compar)();
+static void
+d_qsort (char *base, int n, int size, int (*compar)())
 {
 	register char c, *i, *j, *lo, *hi;
 	char	*min, *max;
@@ -364,9 +366,8 @@ int	(*compar)();
  * All data swaps are done in-line, which is space-losing but time-saving.
  * (And there are only three places where this is done).
  */
-static
-d_qst (base, max)
-char	*base, *max;
+static void
+d_qst (char *base, char *max)
 {
 	register char c, *i, *j, *jj;
 	register int ii;

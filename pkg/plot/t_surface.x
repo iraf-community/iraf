@@ -98,7 +98,8 @@ begin
 	call imunmap (im)
 
 	# Allocate the working storage needed by EZSRFC.
-	call malloc (work, (2 * nx * ny) + nx + ny, TY_REAL)
+	#call malloc (work, (2 * nx * ny) + nx + ny, TY_REAL)
+	call malloc (work, 2 * ((2 * nx * ny) + nx + ny), TY_REAL)
 
 	# Take floor and ceiling if enabled (nonzero).
 	npix = nx * ny

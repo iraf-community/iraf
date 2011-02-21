@@ -10,12 +10,16 @@
 
 extern	char oscwd[];
 
+
 /* ZFGCWD -- Get working (current) UNIX directory.  The current working
  * directory, once set, is saved in oscwd.
  */
-ZFGCWD (outstr, maxch, status)
-PKCHAR	*outstr;
-XINT	*maxch, *status;
+int
+ZFGCWD (
+  PKCHAR  *outstr,
+  XINT	  *maxch, 
+  XINT    *status
+)
 {
 	register char	*ip, *op;
 	register int	n;
@@ -39,7 +43,7 @@ XINT	*maxch, *status;
 #endif
 	    if (ip == NULL) {
 		*status = XERR;
-		return;
+		return (XERR);
 	    } else
 		strcpy (oscwd, dirname);
 	}
@@ -56,4 +60,6 @@ XINT	*maxch, *status;
 	}
 
 	*status = op - (char *)outstr;
+
+	return (*status);
 }

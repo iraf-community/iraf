@@ -1,0 +1,46 @@
+18 Sep 1987  get/put element routines
+
+     The user-callable get/put element routines are tbegt[tbird] and
+tbept[tbird].  In outline, each of these routines calls tbeoff to get
+the offset to the element (i.e. row & column) to be gotten or put,
+then calls a get/put primitive routine (tbegp[], tbepp[]) of the data
+type of the column, and finally converts the data type if that is
+necessary.  If the data type of the column is the same as that of the
+I/O buffer then the value is read directly into or from that buffer.
+No separate null flag is returned by tbegt[]; if the table value is
+undefined the output value will be INDEF.
+
+     A subroutine call could have been saved by writing tbeoff into
+each of the get/put primitives.  That would have been very reasonable,
+but there were a couple of reasons for not doing it that way.  I would
+like to replace the seek & read or seek & write in get/put row (tbrgt[],
+tbrpt[]) by calls to these get/put primitives, and in that case the
+offset does not need to be recomputed from scratch for each column.
+If we ever have 3-D tables (i.e. entries which are arrays) then these
+primitives could still be used for getting/putting single elements in
+the arrays.
+
+     I should also write get/put array primitives for get/put column
+or for arrays in 3-D tables.  Eventually it would be nice to include
+conversion between machine-dependent and machine-independent formats
+in these primitives.
+
+     The use of TB_CURROW and TB_OFFSET in tbrgt[] and tbrpt[] seems
+rather clumsy.  I think it would be better to just call tbxoff or tbeoff.
+
+1 Oct 1987  tbpset & tbpsta for FIO buffer size
+
+     I have not handled this very well.  It is supposed to be not possible
+to set the FIO buffer size after the first I/O operation to a file.  When
+an existing table is opened by tbtopn, the size-information record is read.
+For a new table tbtopn does not actually call open (but perhaps it should!),
+so the buffer size can't be set before calling tbtcre, which does call open
+but which also writes the size-info record to the table.  So in neither case
+is it possible to change the FIO buffer size.  My solution, in the routine
+tbtfst, was to close the table file (using close, not tbtclo), reopen it,
+and then call fset before any I/O operation is done.  This precludes calling
+tbpset to set the buffer size (e.g. advice=RANDOM) for a new table between
+calls to tbtopn and tbtcre.  This is just where you would expect to be able
+to set it, however, so one of these days I will have to make that possible.
+This could be done by calling open in tbtopn even for a new table but not
+writing to the table until the call to tbtcre.

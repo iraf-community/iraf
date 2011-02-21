@@ -42,7 +42,7 @@ begin
 	    if (cl != NULL) {
 		call close (cl)
 		cl = NULL
-		call apsets (cl, CLNAME, "")
+		call apsets (ap, CLNAME, "")
 	    }
 	} else if (strdic (Memc[incmd], Memc[outcmd], SZ_LINE, NCMDS) != 0) {
 	    call ap_nscolon (ap, im, out, stid, cmdstr, junk, junk,

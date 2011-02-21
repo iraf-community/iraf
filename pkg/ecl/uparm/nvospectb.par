@@ -1,8 +1,0 @@
-image,s,a,"",,,"Image (Footprint) Name"
-output,s,h,"STDOUT",,,"Output table"
-ra,r,h,INDEF,,,"RA of query (hours)"
-dec,r,h,INDEF,,,"Dec of query (deg)"
-sr,r,h,15.,,,"Search radius (arcmin)"
-verbose,b,h,yes,,,"Verbose output?"
-status,i,h,0,,,"Service status code"
-mode,s,h,"ql",,,

@@ -24,31 +24,31 @@ define	SF_YMATRIX	Memi[$1+17]	# Pointer to y data matrix
 define	SF_XCOEFF	Memi[$1+18]	# X coefficient matrix
 define	SF_COEFF	Memi[$1+19]	# Pointer to coefficient vector
 
-define	SF_XMIN		Memr[$1+20]	# Min x value
-define	SF_XMAX		Memr[$1+21]	# Max x value
-define	SF_XRANGE	Memr[$1+22]	# 2. / (xmax - xmin), polynomials
-define	SF_XMAXMIN	Memr[$1+23]	# - (xmax + xmin) / 2., polynomials
-define	SF_XSPACING	Memr[$1+24]	# order / (xmax - xmin), splines
-define	SF_YMIN		Memr[$1+25]	# Min y value
-define	SF_YMAX		Memr[$1+26]	# Max y value
-define	SF_YRANGE	Memr[$1+27]	# 2. / (ymax - ymin), polynomials
-define	SF_YMAXMIN	Memr[$1+28]	# - (ymax + ymin) / 2., polynomials
-define	SF_YSPACING	Memr[$1+29]	# order / (ymax - ymin), splines
+define	SF_XMIN		Memr[P2R($1+20)] # Min x value
+define	SF_XMAX		Memr[P2R($1+21)] # Max x value
+define	SF_XRANGE	Memr[P2R($1+22)] # 2. / (xmax - xmin), polynomials
+define	SF_XMAXMIN	Memr[P2R($1+23)] # - (xmax + xmin) / 2., polynomials
+define	SF_XSPACING	Memr[P2R($1+24)] # order / (xmax - xmin), splines
+define	SF_YMIN		Memr[P2R($1+25)] # Min y value
+define	SF_YMAX		Memr[P2R($1+26)] # Max y value
+define	SF_YRANGE	Memr[P2R($1+27)] # 2. / (ymax - ymin), polynomials
+define	SF_YMAXMIN	Memr[P2R($1+28)] # - (ymax + ymin) / 2., polynomials
+define	SF_YSPACING	Memr[P2R($1+29)] # order / (ymax - ymin), splines
 
 define	SF_WZ		Memi[$1+30]
 define	SF_TLEFT	Memi[$1+31]
 
 # matrix and vector element definitions
 
-define	XBASIS		Memr[$1]	#
-define	XBS		Memr[$1]	#
-define	YBASIS		Memr[$1]	#
-define	YBS		Memr[$1]	#
-define	XMATRIX		Memr[$1]	#
-define	XCHOFAC		Memr[$1]	# 
-define	YMATRIX		Memr[$1]	#
-define	XCOEFF		Memr[$1]	#
-define	COEFF		Memr[$1]	#
+define	XBASIS		Memr[P2P($1)]	#
+define	XBS		Memr[P2P($1)]	#
+define	YBASIS		Memr[P2P($1)]	#
+define	YBS		Memr[P2P($1)]	#
+define	XMATRIX		Memr[P2P($1)]	#
+define	XCHOFAC		Memr[P2P($1)]	# 
+define	YMATRIX		Memr[P2P($1)]	#
+define	XCOEFF		Memr[P2P($1)]	#
+define	COEFF		Memr[P2P($1)]	#
 define	XLEFT		Memi[$1]	#
 define	YLEFT		Memi[$1]	#
 

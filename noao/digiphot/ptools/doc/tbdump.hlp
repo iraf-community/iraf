@@ -16,7 +16,7 @@ The template specifying the names of the columns to be dumped.
 A null or blank string means
 dump all columns.  A column template consists of a list
 of either column names or column patterns containing the usual pattern matching
-metacharacters.  The names or patterns are separated by commas or white space.
+meta-characters.  The names or patterns are separated by commas or white space.
 Column names must be spelled in full but may be upper or lower case.
 The columns list can be placed in a file and the name of the file preceded
 by an '@' character given in place of the column template.
@@ -133,9 +133,9 @@ The following logical operators can be used in the boolean expression.
 The pattern match character ?=  takes a
 string expression as its first argument and a pattern as its second argument.
 The result is yes if the pattern is contained in the string expression.
-Patterns are strings which may contain pattern matching metacharacters.
-The metacharacters themselves can be matched by preceeding them with the escape
-character.  The metacharacters listed below. 
+Patterns are strings which may contain pattern matching meta-characters.
+The meta-characters themselves can be matched by preceeding them with the escape
+character.  The meta-characters listed below. 
 
 .nf
 	beginning of string	^	end of string		$
@@ -172,7 +172,7 @@ output to the standard output.
     pt> tbdump n4147.nst.1 "ID,MAG,MAGERR" yes
 
 2. Dump the "ID", "MAG", and "MAGERR" columns of the above file for records
-which have  MAG <= 20.0".
+which have  "MAG <= 20.0".
 
     pt> tbdump n4147.nst.1 "ID,MAG,MAGERR" "MAG <= 20.0"
 

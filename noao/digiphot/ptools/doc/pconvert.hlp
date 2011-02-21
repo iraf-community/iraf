@@ -21,7 +21,7 @@ are specified by using the names defined in the APPHOT/DAOPHOT text
 database by the
 #N entries. Upper or lower case and minimum match abbreviations are
 permissible. For those fields which have multiple entries such as 
-magnitiude, an individual value can be referenced by specifying an array
+magnitude, an individual value can be referenced by specifying an array
 index, e.g. MAG[2] or several values can be selected by specifying a
 range of elements, e.g. MAG[1-4].
 .le
@@ -69,9 +69,9 @@ The following logical operators can be used in the boolean expression.
 The pattern match character ?=  takes a
 string expression as its first argument and a pattern as its second argument.
 The result is yes if the pattern is contained in the string expression.
-Patterns are strings which may contain pattern matching metacharacters.
-The metacharacters themselves can be matched by preceeding them with the escape
-character.  The metacharacters are described below. 
+Patterns are strings which may contain pattern matching meta-characters.
+The meta-characters themselves can be matched by preceeding them with the escape
+character.  The meta-characters are described below. 
 
 .nf
 	beginning of string	^	end of string		$

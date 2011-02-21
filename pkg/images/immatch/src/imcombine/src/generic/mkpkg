@@ -1,11 +1,11 @@
 # Make IMCOMBINE.
 
-$checkout libpkg.a ../../../../
-$update   libpkg.a
-$checkin  libpkg.a ../../../../
+$checkout libimc.a lib$
+$update   libimc.a
+$checkin  libimc.a lib$
 $exit
 
-libpkg.a:
+libimc.a:
 	icaclip.x	../icombine.com ../icombine.h
 	icaverage.x	../icombine.com ../icombine.h <imhdr.h>
 	iccclip.x	../icombine.com ../icombine.h
@@ -13,9 +13,11 @@ libpkg.a:
 	icgrow.x	../icombine.com ../icombine.h <imhdr.h> <pmset.h>
 	icmedian.x	../icombine.com ../icombine.h
 	icmm.x		../icombine.com ../icombine.h
+	icnmodel.x	../icombine.com ../icombine.h <imhdr.h>
 	icomb.x		../icombine.com ../icombine.h <error.h> <imhdr.h>\
 			<imset.h> <mach.h> <pmset.h> <syserr.h>
 	icpclip.x	../icombine.com ../icombine.h
+	icquad.x	../icombine.com ../icombine.h <imhdr.h>
 	icsclip.x	../icombine.com ../icombine.h
 	icsigma.x	../icombine.com ../icombine.h <imhdr.h>
 	icsort.x	

@@ -535,7 +535,7 @@ saved parameters. Verify the critical parameters.
 
 6. Repeat example 5 but assume that the input coordinate are ra and dec
 in degrees and degrees, turn off verification, and submit the task to to
-the backgournd.
+the background.
 
 .nf
 	ap> display dev$ypix

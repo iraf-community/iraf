@@ -121,7 +121,7 @@ shown below.
 
 In all cases the mask values are assumed to be 0 in good data regions and 
 non-zero in rejected data regions. The input masks may in pixel list, e.g.
-:.pl" format, or integer images format, e.g. ".imh", ".fits", etc.
+".pl" format, or integer images format, e.g. ".imh", ".fits", etc.
 
 
 .ih

@@ -1,0 +1,5 @@
+table,s,a,,,,"Tables to sort"
+columns,s,a,,,,"Columns to sort on"
+ascend,b,h,yes,,,"Ascending order?"
+casesens,b,h,yes,,,"Case sensitive sort?"
+mode,s,h,"a",,,

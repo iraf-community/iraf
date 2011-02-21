@@ -58,22 +58,26 @@ int	ipc_isatty = 0;			/* set when debugging IPC at TTY  */
 /* ZOPCPR -- Open a connected subprocess.  Spawn process and open bidirectional
  * IPC channels, implemented with pipes for this version of Berkeley UNIX.
  */
-ZOPCPR (osfn, inchan, outchan, pid)
-PKCHAR	*osfn;			/* name of executable file		*/
-XINT	*inchan, *outchan;	/* IPC channels (parent reads inchan)	*/
-XINT	*pid;
+int
+ZOPCPR (
+  PKCHAR  *osfn,		/* name of executable file		*/
+  XINT	  *inchan, 
+  XINT    *outchan,		/* IPC channels (parent reads inchan)	*/
+  XINT	  *pid 
+)
 {
 	int	pin[2], pout[2];
 	int	maxforks = 3, fd;
 
 	if (debug_ipc)
 	    fprintf (stderr, "zopcpr (`%s')", (char *)osfn);
+	    
 
 	/* Check that the process file exists and is executable.
 	 */
 	if (access ((char *)osfn, 1) == ERR) {
 	    *pid = XERR;
-	    return;
+	    return (XERR);
 	}
 
 	/* Open binary IPC channels.  Clear byte counts.
@@ -88,7 +92,7 @@ XINT	*pid;
 err:	    close (pin[0]);  close (pin[1]);
 	    close (pout[0]);  close (pout[1]);
 	    *pid = XERR;
-	    return;
+	    return (XERR);
 	}
 
 	pr_ionbytes[pin[0]] = 0;
@@ -107,7 +111,7 @@ err:	    close (pin[0]);  close (pin[1]);
 		close (pin[0]);  close (pin[1]);
 		close (pout[0]); close (pout[1]);
 		*pid = XERR;
-		return;
+		return (XERR);
 	    }
 	    sleep (2);
 	}
@@ -156,6 +160,7 @@ err:	    close (pin[0]);  close (pin[1]);
 	    _exit (1);
 
 	} else {
+
 	    /* Existing, parent process. */
 	    close (pin[1]);
 	    close (pout[0]);
@@ -172,17 +177,20 @@ err:	    close (pin[0]);  close (pin[1]);
 	    if (debug_ipc)
 		fprintf (stderr, " [%d]\n", *pid);
 	}
+
+	return (XOK);
 }
 
 
 /* ZCLCPR -- Close a connected subprocess.  Wait for subprocess to terminate,
  * close the IPC channels, and return the exit status.
  */
-ZCLCPR (pid, exit_status)
-XINT	*pid;
-XINT	*exit_status;
+int 
+ZCLCPR (XINT *pid, XINT *exit_status)
 {
 	int	inchan, outchan;
+	extern  int pr_getipc(), pr_wait();
+
 
 	if (pr_getipc ((int)*pid, &inchan, &outchan) == ERR)
 	    *exit_status = XERR;
@@ -195,6 +203,8 @@ XINT	*exit_status;
 	if (debug_ipc)
 	    fprintf (stderr, "[%d] terminated, exit code %d\n",
 		*pid, *exit_status);
+
+	return (*exit_status);
 }
 
 
@@ -210,11 +220,13 @@ XINT	*exit_status;
  * does not agree with the header, but that cannot happen since only ZAWRPR
  * writes to an IPC channel.
  */
-ZARDPR (chan, buf, maxbytes, loffset)
-XINT	*chan;
-XCHAR	*buf;
-XINT	*maxbytes;
-XLONG	*loffset;		/* not used */
+int
+ZARDPR (
+  XINT	*chan,
+  XCHAR	*buf,
+  XINT	*maxbytes,
+  XLONG	*loffset 		/* not used */
+)
 {
 	register char *op;
 	register int fd, nbytes;
@@ -241,20 +253,20 @@ XLONG	*loffset;		/* not used */
 	 */
 	if (ipc_isatty) {
 	    char	ibuf[SZ_TTYIBUF], *ip;
-	    XCHAR	*op;
+	    XCHAR	*xop;
 	    int		maxch = min (SZ_TTYIBUF, *maxbytes / sizeof(XCHAR));
 	    int		ntrys = MAX_TRYS;
 
 	    do {
 		errno = 0;
 		if ((pr_ionbytes[fd] = nbytes = read (fd, ibuf, maxch)) > 0) {
-		    for (ip=ibuf, op=buf;  --nbytes >= 0;  )
-			*op++ = *ip++;
+		    for (ip=ibuf, xop=buf;  --nbytes >= 0;  )
+			*xop++ = *ip++;
 		    pr_ionbytes[fd] *= sizeof (XCHAR);
 		}
 	    } while (nbytes <= 0 && errno == EINTR && --ntrys >= 0);
 
-	    return;
+	    return (XOK);
 	}
 
 	/* Read 2-byte magic number to verify that the channel was written to
@@ -263,14 +275,14 @@ XLONG	*loffset;		/* not used */
 	switch (status = read (fd, &temp, 2)) {
 	case 0:
 	    pr_ionbytes[fd] = 0;
-	    return;
+	    return (0);
 	case ERR:
 	    pr_ionbytes[fd] = ERR;
-	    return;
+	    return (XERR);
 	default:
 	    if (status != 2 || temp != IPC_MAGIC) {
 		pr_ionbytes[fd] = ERR;
-		return;
+		return (XERR);
 	    }
 	}
 
@@ -281,7 +293,7 @@ XLONG	*loffset;		/* not used */
 	 */
 	if (read (fd, &temp, 2) != 2) {
 	    pr_ionbytes[fd] = ERR;
-	    return;
+	    return (XERR);
 	}
 	record_length = temp;
 	nbytes = min (record_length, *maxbytes);
@@ -304,7 +316,7 @@ XLONG	*loffset;		/* not used */
 	sigmask_save = sigblock (mask(SIGINT) | mask(SIGTERM));
 #endif
 
-	while (nbytes > 0)
+	while (nbytes > 0) {
 	    switch (status = read (fd, op, nbytes)) {
 	    case 0:
 		pr_ionbytes[fd] -= nbytes;
@@ -316,8 +328,16 @@ XLONG	*loffset;		/* not used */
 		nbytes -= status;
 		op += status;
 	    }
+	}
 
 	if (debug_ipc) {
+/*
+char ch, *bp = buf, nc=0;
+for (nc=0; nc < 30; nc++) {
+    ch = (char)(*(buf + nc));
+    fprintf (stderr, "rd ipc_in=%d [%d] '%c' %d \n", ipc_in, nc, ch, ch);
+}
+*/
 	    fprintf (stderr, "[%d] read %d bytes from IPC channel %d:\n",
 		getpid(), op - (char *)buf, fd);
 	    write (2, (char *)buf, op - (char *)buf);
@@ -339,17 +359,21 @@ reenab_:
 #else
 	sigsetmask (sigmask_save);
 #endif
+
+	return (XOK);
 }
 
 
 /* ZAWRPR -- Write to an IPC channel.  Write the IPC block header followed by
  * the data block.
  */
-ZAWRPR (chan, buf, nbytes, loffset)
-XINT	*chan;
-XCHAR	*buf;
-XINT	*nbytes;
-XLONG	*loffset;
+int
+ZAWRPR (
+  XINT	  *chan,
+  XCHAR	  *buf,
+  XINT	  *nbytes,
+  XLONG	  *loffset 
+)
 {
 	register int fd;
 	short	temp;
@@ -375,7 +399,7 @@ XLONG	*loffset;
 		*op++ = *ip++;
 	    if ((pr_ionbytes[fd] = write (fd, obuf, nchars)) > 0)
 		pr_ionbytes[fd] *= sizeof (XCHAR);
-	    return;
+	    return (XOK);
 	}
 
 	/* Write IPC block header.
@@ -411,10 +435,20 @@ XLONG	*loffset;
 #endif
 
 	if (debug_ipc) {
+/*
+char ch, *bp = buf, nc=0;
+for (nc=0; nc < 30; nc++) {
+    ch = (char)(*(buf + nc));
+    fprintf (stderr, "wr ipc_out=%d [%d] '%c' %d  pr_io=%d\n", 
+	ipc_out, nc, ch, ch, pr_ionbytes[fd]);
+}
+*/
 	    fprintf (stderr, "[%d] wrote %d bytes to IPC channel %d:\n",
 		getpid(), (int)*nbytes, fd);
 	    write (2, (char *)buf, (int)*nbytes);
 	}
+
+	return (XOK);
 }
 
 
@@ -422,22 +456,25 @@ XLONG	*loffset;
  * asynchronous we do not really wait, rather we return the status value
  * (byte count) from the last read or write to the channel.
  */
-ZAWTPR (chan, status)
-XINT	*chan;
-XINT	*status;
+int
+ZAWTPR (XINT *chan, XINT *status)
 {
 	if ((*status = pr_ionbytes[*chan]) == ERR)
 	    *status = XERR;
+
+	return (*status);
 }
 
 
 /* ZSTTPR -- Get binary file status for an IPC channel.  An IPC channel is a
  * streaming binary file.
  */
-ZSTTPR (chan, param, lvalue)
-XINT	*chan;		/* not used; all IPC channels have same status */
-XINT	*param;
-XLONG	*lvalue;
+int
+ZSTTPR (
+  XINT	*chan,		/* not used; all IPC channels have same status */
+  XINT	*param,
+  XLONG	*lvalue 
+)
 {
 	switch (*param) {
 	case FSTT_BLKSIZE:
@@ -453,4 +490,6 @@ XLONG	*lvalue;
 	default:
 	    *lvalue = XERR;
 	}
+
+	return (*lvalue);
 }

@@ -170,9 +170,11 @@ double	ra, dec, ep			#O position info
 double  ut				#O UT of observation
 int	day, month, year		#O Date of observation
 
-double	ut_start, int_time, time, imgetd()
-int	code, flags
-int	rv_parse_date(), rv_parse_timed(), imaccf()
+double	ut_start, ut_mid, int_time, time, imgetd()
+int	code, flags, idx
+char 	buf[SZ_LINE]
+
+int	rv_parse_date(), rv_parse_timed(), imaccf(), stridx()
 errchk 	imgetd()
 
 begin
@@ -190,23 +192,40 @@ begin
 	    call rv_err_comment (rv, "ERROR: Missing EPOCH keyword.", "")
 	    code = ERR_RVCOR
 	}
+	ut_start = time
 
 	# If we have a UTMIDDLE keyword use that as the midpoint of the
 	# observation.
 
 	if (imaccf(im,KW_UTMID(rv)) == YES) {
-	    iferr (ut = imgetd (im, KW_UTMID(rv))) {
-		# Try to recover
-	        if (rv_parse_timed (rv, im, is_obj, KW_UT(rv), ut_start) 
-		    == ERR_RVCOR) {
-	                code = ERR_RVCOR
+            # If this is a DATE-OBS type of string, look for the time delimiter.
+	    call aclrc (buf, SZ_LINE)
+	    call imgstr (im, KW_UTMID(rv), buf, SZ_LINE)
+            idx = stridx("T", buf)
+
+	    if (idx > 0) {
+		if (rv_parse_date (rv, im, KW_UTMID(rv), is_obj, 
+		    day, month, year, time, flags) == ERR_RVCOR) {
+	        	code = ERR_RVCOR
 		}
-	        iferr (int_time = imgetd (im, KW_EXPTIME(rv))) {
-	            call rv_err_comment (rv, 
-			"ERROR: Missing exposure time keyword.", "")
-	            code = ERR_RVCOR
+		ut = time
+	    } 
+
+	    if (idx == 0 || code == ERR_RVCOR) {
+	        iferr (ut = imgetd (im, KW_UTMID(rv))) {
+		    # Try to recover
+	            if (rv_parse_timed (rv, im, is_obj, KW_UT(rv), ut_start) 
+		        == ERR_RVCOR) {
+	                    code = ERR_RVCOR
+		    }
+	            iferr (int_time = imgetd (im, KW_EXPTIME(rv))) {
+	                call rv_err_comment (rv, 
+			    "ERROR: Missing exposure time keyword.", "")
+	                code = ERR_RVCOR
+	            }
+	            ut = double (ut_start + (int_time/3600.0)/2.0)
 	        }
-	        ut = double (ut_start + (int_time/3600.0)/2.0)
+		ut_mid = ut
 	    }
 	} else {
 
@@ -233,9 +252,48 @@ begin
 		int_time = 0.0d0
 	    }
 	    ut = double (ut_start + (int_time/3600.0)/2.0)
+	    ut_mid = ut
 	}
 
+	# Check for a rollover of the date.  This can happen e.g. when
+	# UT observing starts before midnight but the midpoint of the
+	# exposure is after midnight, the date and time are then separated
+	# by 24 hr.  Likewise, if the midpoint is less that the start
+	# time, we've rolled over midnight.
+	if (ut > 24.0) {
+	    call rv_incr_date (day, month, year)
+	    ut = ut - 24
+	}
+	if (ut_mid < ut_start)
+	    call rv_incr_date (day, month, year)
+
 	return (code)
+end
+
+
+# RV_INCR_DATE - Increment the date by 1 day, taking into account month,
+# year and leap-year rollovers.
+
+procedure rv_incr_date (day, month, year)
+
+int	day, month, year		#I Date of observation
+
+int     days_per_month[12]      # days per month
+data    days_per_month/31,28,31,30,31,30,31,31,30,31,30,31/
+
+begin
+        if (mod (year, 4) == 0) 	# set the days/month for leap years
+            days_per_month[2] = 29
+
+	day = day + 1			# increment day
+	if (day > days_per_month[month]) {
+	    day = 1
+	    month = month + 1
+	} 
+	if (month > 12) {
+	    month = 1
+	    year = year + 1
+	} 
 end
 
 
@@ -436,10 +494,10 @@ begin
 
 
 	# If this is a DATE-OBS type of string, look for the time delimiter.
-	idx = stridx('T', Memc[buf])
+	idx = stridx("T", Memc[buf])
 
 	# Allow only sexigesimal or decimal values.
-    	if (stridx(':', Memc[buf]) == 0 && stridx ('.', Memc[buf]) == 0) {
+    	if (stridx(":", Memc[buf]) == 0 && stridx (".", Memc[buf]) == 0) {
 	    if (is_obj == YES) { 
 	        call rv_err_comment (rv,
 	    	    "ERROR: Invalid time string '%s' from object header.",param)

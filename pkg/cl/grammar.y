@@ -16,6 +16,7 @@
 #include "task.h"
 #include "construct.h"
 #include "errs.h"
+#include "proto.h"
 
 
 /* CL parser, written as a yacc grammar:
@@ -48,14 +49,14 @@ extern	int cldebug;
 
 int	dobkg = 0;		/* set when want to do code in bkground	*/
 int	npipes = 0;		/* number of pipes in a command		*/
-int	pipe_pc;		/* pc of last ADDPIPE instruction	*/
+XINT	pipe_pc;		/* pc of last ADDPIPE instruction	*/
 int	posit = 0;		/* positional argument count		*/
 int	inarglist = 0;		/* set when in argument list		*/
 int	parenlevel = 0;		/* level of paren nesting in command	*/
 int	index_cnt;		/* Index counter in array ref's		*/
 char	curr_param[SZ_FNAME];	/* Parameter name of ref's		*/
 char	curr_task[SZ_FNAME];	/* ltaskname of command 		*/
-int	stmt_pc;		/* PC at beginning of current statement */
+XINT	stmt_pc;		/* PC at beginning of current statement */
 int	varlist;		/* Declaration is list directed.	*/
 int	vartype;		/* Type of declaration.			*/
 int	do_params;		/* Are param definitions legal here?	*/
@@ -296,6 +297,7 @@ script_body:	begin_stmt {
 			 */
 			if (cldebug)
 			    eprintf ("parse init (script_body)...\n");
+ready_();
 
 			errcnt     = 0;
 			err_cmdblk = 0;
@@ -1327,7 +1329,7 @@ popstk	:	equals {
 if	:	if_stat {
 		    /* pop BIFF addr and set branch to just after statement
 		     */
-		    int   biffaddr;
+		    XINT   biffaddr;
 		    if (!errcnt) {
 			biffaddr = pop();
 		    	coderef (biffaddr)->c_args = pc - biffaddr - 3;
@@ -1369,7 +1371,7 @@ if_stat	:	Y_IF LP expr RP {
 	;
 
 ifelse	:	if_stat Y_ELSE {
-		    int  biffaddr;
+		    XINT  biffaddr;
 
 		    ifseen = NULL;
 		    if (!errcnt) {
@@ -1381,7 +1383,7 @@ ifelse	:	if_stat Y_ELSE {
 			coderef (biffaddr)->c_args = pc - biffaddr - 3;
 		    }
 		} opnl xstmt {
-		    int  gotoaddr;
+		    XINT  gotoaddr;
 		    if (!errcnt) {
 			/* Pop GOTO addr and set branch to just after statement
 			 */
@@ -1404,7 +1406,7 @@ while	:	Y_WHILE LP {
 		    if (!errcnt)
 			push (compile (BIFF, 0));
 		} opnl xstmt {
-		    int  biffaddr;
+		    XINT  biffaddr;
 
 		    if (!errcnt) {
 			/* Pop and save addr of BIFF instruction.	   */
@@ -1457,7 +1459,7 @@ for	:	Y_FOR LP opnl xassign ';' opnl {
 			}
 		}
 		xassign RP opnl {
-			int  stmtaddr;
+			XINT  stmtaddr;
 
 			if (!errcnt) {
 			    stmtaddr = pop();
@@ -1467,7 +1469,7 @@ for	:	Y_FOR LP opnl xassign ';' opnl {
 			}
 		}
 		stmt {
-			int  stmtaddr;
+			XINT  stmtaddr;
 
 			if (!errcnt) {
 			    stmtaddr = pop();
@@ -1544,7 +1546,7 @@ case	:	Y_CASE {
 			    }
 			}
 		} const_expr_list ':' opnl {
-			int  pcase;
+			XINT  pcase;
 
 			if (!errcnt) {
 			    pcase = compile (CASE, ncaseval);
@@ -1667,7 +1669,7 @@ label_stmt:	Y_IDENT ':' opnl {
 				 * indirect list so we can use
 				 * the argument as the destination
 				 */
-				int  gotopc;
+				XINT  gotopc;
 				gotopc = l->l_loc;
 				unsetigoto (gotopc);
 
@@ -1723,7 +1725,7 @@ xstmt	:	/* empty */ {
 		      	/* If there was an open reference compile the
 			 * loop increment and goback.
 			 */
-			int push_pc;
+			XINT push_pc;
 
 			if (!errcnt) {
 			    if (n_oarr) {

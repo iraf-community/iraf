@@ -141,7 +141,7 @@ the CL).
 In keeping with the C language tradition, all FIO offsets are \fIzero\fR
 indexed, and all integer valued procedures return ERR as the function value
 in the event of an error.  Pointer valued functions return NULL in the
-event of an error.  Although only "signficant" function values are shown in the
+event of an error.  Although only "significant" function values are shown in the
 calling sequences below, all procedures return a function value.
 
 
@@ -316,7 +316,7 @@ To execute a task in a connected child process the CL writes a command to
 the \fIout\fR channel with a conventional \fBfputs\fR or other STDIO call.
 After starting the task the CL redirects its command input to the \fIin\fR
 channel of the task; conventional \fBfgets\fR or \fBgetc\fR calls are made
-to read commands from the task, until "bye" is received, signalling task
+to read commands from the task, until "bye" is received, signaling task
 termination.
 
 New \fBset\fR or \fBchdir\fR statements may be broadcast to all connected

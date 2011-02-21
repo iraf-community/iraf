@@ -16,6 +16,8 @@
 #include "mem.h"
 #include "task.h"
 #include "errs.h"
+#include "proto.h"
+
 
 /*
  * MODES -- Handle the parameter mode operations, such as determining effective
@@ -63,8 +65,10 @@ int	cllogmode = LOG_COMMANDS;	/* Logging control flag */
  * Local variables cannot be prompted for so it is an error if their
  *   values are undefined.
  */
-effmode (pp)
-struct param *pp;
+int
+effmode (
+  struct param *pp
+)
 {
 	static	char	*localerr =
 		"Attempt to access undefined local variable `%s'.\n";
@@ -106,9 +110,9 @@ struct param *pp;
 	     * parameter, task, package, cl.  The mode is taken from the first
 	     * of these which is not automatic.
 	     */
-	    if (mode = (pp->p_mode & modebits))
+	    if ((mode = (pp->p_mode & modebits)))
 		;
-	    else if (mode = (ltmode & modebits))
+	    else if ((mode = (ltmode & modebits)))
 		;
 	    else {
 		/* Check the mode of the package to which the ltask belongs,
@@ -116,7 +120,7 @@ struct param *pp;
 		 */
 		struct pfile *pfp;
 
-		if (pfp = currentask->t_ltp->lt_pkp->pk_pfp) {
+		if ((pfp = currentask->t_ltp->lt_pkp->pk_pfp)) {
 	 	    struct param   *ppx;
 	 	    ppx = paramfind (pfp, "mode", 0, YES);
 	 	    if ((ppx != NULL)  &&  (ppx != (struct param *)ERR))
@@ -125,7 +129,7 @@ struct param *pp;
 
 		if (pkmode > 0 && (mode = (pkmode & modebits)))
 		    ;
-		else if (mode = (clmode & modebits))
+		else if ((mode = (clmode & modebits)))
 		    ;
 		else
 		    mode = M_AUTO;
@@ -186,8 +190,10 @@ struct param *pp;
 
 /* TASKMODE -- Determine the effective mode for a task.
  */
-taskmode (tp)
-register struct task *tp;
+int
+taskmode (
+  register struct task *tp
+)
 {
 	register int	modebits, mode;
 	struct	pfile *pfp;
@@ -211,14 +217,14 @@ register struct task *tp;
 
 	/* If the mode of the task is anything but AUTO we are done.
 	 */
-	if (mode = (ltmode & modebits))
+	if ((mode = (ltmode & modebits)))
 	    if (interactive || !(mode & M_MENU))
 		return (mode|learn);
 
 	/* If the package to which the task belongs has a pfile and the mode
 	 * of the package is anything but AUTO, we are done.
 	 */
-	if (pfp = tp->t_ltp->lt_pkp->pk_pfp) {
+	if ((pfp = tp->t_ltp->lt_pkp->pk_pfp)) {
 	    struct param   *ppx;
 
 	    pkmode = ERR;
@@ -254,8 +260,10 @@ register struct task *tp;
  *   another file which we read and then delete.  If we wait a long time and
  *   get no response, we timeout.
  */
-query (pp)
-struct param *pp;
+void
+query (
+  struct param *pp
+)
 {
 	static	char *oormsg =
 		"ERROR: Parameter value is out of range; try again";
@@ -337,13 +345,13 @@ struct param *pp;
 			    sprintf (keystr, "\\%03o", key);
 			sprintf (buf, "%.3f %.3f %d %s %s\n",
 			    x, y, wcs, keystr, str);
-			query_status = (char *)strlen(buf);
+			query_status = (char *) ((XINT)strlen(buf));
 		    }
 
 		} else if (c_rcursor (cursor, buf, SZ_PROMPTBUF) == EOF) {
 		    query_status = NULL;
 		} else
-		    query_status = (char *)strlen(buf);
+		    query_status = (char *) ((XINT)strlen(buf));
 
 	    } else if (pp->p_type & PT_UKEY) {
 		/* Read a user keystroke command from the terminal.
@@ -352,16 +360,16 @@ struct param *pp;
 		if (c_rdukey (buf, SZ_PROMPTBUF) == EOF)
 		    query_status = NULL;
 		else
-		    query_status = (char *)strlen(buf);
+		    query_status = (char *) ((XINT)strlen(buf));
 
 	    } else {
 text_query:	fd = spf_open (buf, SZ_PROMPTBUF);
 		pquery (pp, fdopen(fd,"a"));
 		spf_close (fd);
 
-		c_stgputline (STDOUT, buf);
-		if (c_stggetline (STDIN, buf, SZ_PROMPTBUF) > 0)
-		    query_status = (char *) strlen(buf);
+		c_stgputline ((XINT)STDOUT, buf);
+		if (c_stggetline ((XINT)STDIN, buf, SZ_PROMPTBUF) > 0)
+		    query_status = (char *) ((XINT) strlen(buf));
 		else
 		    query_status = NULL;
 	    }
@@ -531,9 +539,10 @@ testval:
 /* NEXTSTR -- Get the next string in a prompt.
  */
 char *
-nextstr (pbuf, fp)
-char	**pbuf;
-FILE	*fp;
+nextstr (
+  char	**pbuf,
+  FILE	*fp
+)
 {
 	char	*p, *nxtchr();
 	static	char	tbuf[SZ_LINE];
@@ -613,9 +622,10 @@ FILE	*fp;
 /* NXTCHR -- Get a pointer to the next char, reading the next line if necessary.
  */
 char *
-nxtchr (p, fp)
-char	*p;
-FILE	*fp;
+nxtchr (
+  char	*p,
+  FILE	*fp
+)
 {
 	/* P may point to within readbuf on return, so it had better be
 	 * static.
@@ -625,8 +635,8 @@ FILE	*fp;
 	if (*p)
 	    p++;
 start:
-	if (*p == '\\')
-	    if (*(p+1) == '\n')
+	if (*p == '\\') {
+	    if (*(p+1) == '\n') {
 		if (fgets (readbuf, SZ_LINE, fp) == NULL)
 		    /* We assume that the newline is always followed by a
 		     * null in return from fgets.
@@ -636,6 +646,8 @@ start:
 		    p = readbuf;
 		    goto start;
 		}
+	    }
+	}
 
 	return (p);
 }
@@ -643,9 +655,11 @@ start:
 
 /* PQUERY -- Print the query message.
  */
-pquery (pp, fp)
-register struct param *pp;
-FILE	*fp;
+void
+pquery (
+  register struct param *pp,
+  FILE	*fp
+)
 {
 	struct	operand o;
 	int	offset, arrflag;
@@ -742,10 +756,11 @@ FILE	*fp;
  * after a suitable interval if no response.
  */
 char *
-bkg_query (obuf, maxch, pp)
-char	*obuf;			/* same calling sequence as 'fgets' */
-int	maxch;
-register struct param *pp;
+bkg_query (
+  char	*obuf,			/* same calling sequence as 'fgets' */
+  int	maxch,
+  register struct param *pp
+)
 {
 	char	bqfile[SZ_PATHNAME], qrfile[SZ_PATHNAME];
 	int	waitime, delay;
@@ -805,8 +820,10 @@ register struct param *pp;
  * are done.  When the bkg job wakes up it will read the response file and
  * (assuming there are no errors) continue on.
  */
-service_bkgquery (bkgno)
-int	bkgno;			/* ordinal of job requiring service	*/
+void
+service_bkgquery (
+  int	bkgno			/* ordinal of job requiring service	*/
+)
 {
 	register int ch;
 	char	bqfile[SZ_PATHNAME], qrfile[SZ_PATHNAME];
@@ -858,9 +875,13 @@ int	bkgno;			/* ordinal of job requiring service	*/
  * expect to find the files.  We assume that the user does not start a bkg
  * job and then change uparm$ in the foreground cl.
  */
-get_bkgqfiles (bkgno, pid, bkg_query_file, query_response_file)
-int	bkgno, pid;
-char	*bkg_query_file, *query_response_file;
+void
+get_bkgqfiles (
+  int	bkgno, 
+  int   pid,
+  char	*bkg_query_file, 
+  char  *query_response_file
+)
 {
 	int	filecode;
 	char	*envget();
@@ -887,9 +908,11 @@ char	*bkg_query_file, *query_response_file;
  *   Always return NO if op is UNDEFined.
  * This routine uses binexp() and thus the operand stack.
  */
-inrange (pp, op)
-register struct param *pp;
-register struct operand *op;
+int
+inrange (
+  register struct param *pp,
+  register struct operand *op
+)
 {
 	register int fulltype, bastype;
 	struct	operand omin, test;
@@ -956,12 +979,13 @@ register struct operand *op;
 		delim = index (s, '|');
 		if (delim)
 		    *delim = '\0';
-		if (strncmp (s, val, n) == 0)
+		if (strncmp (s, val, n) == 0) {
 		    if (match) {
 			eprintf ("ambiguous abbreviation '%s'\n", val);
 			return (NO);
 		    } else
 			match = s;
+		}
 	    }
 
 	    if (match != NULL)
@@ -999,8 +1023,10 @@ register struct operand *op;
  * If both the min and max fields are set, but max is less than min, checking
  * is disabled.
  */
-range_check (pp)
-struct	param *pp;
+int
+range_check (
+  struct param *pp
+)
 {
 	int	fulltype, bastype;
 	struct	operand test, omin, omax;
@@ -1041,8 +1067,10 @@ struct	param *pp;
  * parameter is not found.  Called once by login() after the cl's pfile has
  * been read in.
  */
-setclmodes (tp)
-struct task *tp;
+void
+setclmodes (
+  struct task *tp
+)
 {
 	register struct param *pp;
 	register char *name;
@@ -1104,9 +1132,11 @@ struct task *tp;
  * appropriately.  Tokens in the parameter strings are white-space 
  * delimited.
  */
-parse_clmodes (pp, newval)
-struct param	*pp;
-struct operand	*newval;
+void
+parse_clmodes (
+  struct param	*pp,
+  struct operand *newval
+)
 {
 	register char  *name, *ip;
 
@@ -1214,7 +1244,8 @@ struct operand	*newval;
  * currentask is a builtin and the previous task is interactive (or batch),
  * regardless of value of clabbrev parameter.
  */
-abbrev ()
+int
+abbrev (void)
 {
 	/* Enable abbreviations everywhere for now.
 	int	cflags = currentask->t_flags;
@@ -1239,8 +1270,8 @@ abbrev ()
 
 /* POFFSET--push an offset in an array for a later reference.
  */
-poffset (off)
-int	off;
+void
+poffset (int off)
 {
 	n_indexes++;
 	push (off);

@@ -15,7 +15,7 @@ int	pid				# pid of child
 .ih
 DESCRIPTION
 The executable file \fIprocess_file\fR is spawned as a child process and
-connected to the parent via the IPC (interprocess communication) channels
+connected to the parent via the IPC (inter-process communication) channels
 \fIinchan\fR and \fIoutchan\fR.
 .ih
 RETURN VALUE

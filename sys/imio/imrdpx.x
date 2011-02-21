@@ -24,10 +24,12 @@ pointer	pl
 long	offset
 int	sz_pixel, nbytes, fd, op, step, nchars, n
 
+char	zbuf[1024]
+
 int	read()
 long	imnote()
 errchk	imerr, seek, read, pl_glpi, pl_glri
-include	<szdtype.inc>
+include	<szpixtype.inc>
 
 begin
 	step = abs (xstep)
@@ -37,7 +39,7 @@ begin
 	pl = IM_PL(im)
 	fd = IM_PFD(im)
 	offset = imnote (im, v)
-	sz_pixel = ty_size[IM_PIXTYPE(im)]
+	sz_pixel = pix_size[IM_PIXTYPE(im)]
 
 	# If the step size is small, read in all the data at once and
 	# resample.  Requires a buffer STEP times larger than necessary,
@@ -67,7 +69,7 @@ begin
 
 	    call seek (fd, offset)
 	    nchars = ((npix-1) * step + 1) * sz_pixel
-	    
+
 	    if (read (fd, obuf, nchars) != nchars)
 		call imerr (IM_NAME(im), SYS_IMNOPIX)
 	    if (step > 1)
@@ -90,8 +92,8 @@ begin
 	    call imaflp (obuf, npix, sz_pixel)
 
 	# Byte swap if necessary.
+	nbytes = npix * sz_pixel * SZB_CHAR
 	if (IM_SWAP(im) == YES) {
-	    nbytes = npix * sz_pixel * SZB_CHAR
 	    switch (sz_pixel * SZB_CHAR) {
 	    case 2:
 		call bswap2 (obuf, 1, obuf, 1, nbytes)
@@ -100,5 +102,11 @@ begin
 	    case 8:
 		call bswap8 (obuf, 1, obuf, 1, nbytes)
 	    }
+	}
+
+	if (pl == NULL) {
+	    if ((IM_PIXTYPE(im) == TY_INT || IM_PIXTYPE(im) == TY_LONG) &&
+	        SZ_INT != SZ_INT32)
+	            call iupk32 (obuf, obuf, npix)
 	}
 end

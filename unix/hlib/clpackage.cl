@@ -34,6 +34,20 @@ task	$_logout	= "home$logout.cl"
 # Define the external (user-configurable) packages.
 cl < hlib$extern.pkg
 
+
+# Load dynamically-defined external packages.
+if (access ("hlib$extpkg.cl") == yes)
+    cl < hlib$extpkg.cl
+;
+
+
+# Load packages needed by dynamic external packages.  These are reloaded
+# in the login.cl.
+images
+proto
+utilities
+noao
+
 # Load the SYSTEM package.  Avoid printing menu, but do not change the
 # default value of the menus switch.
 

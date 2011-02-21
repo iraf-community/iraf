@@ -29,12 +29,12 @@ define	IMT_IMSETNO	Memi[$1]		     # the image set id number
 define	IMT_IMNO	Memi[$1+1]		     # the image sequence number
 define	IMT_OFFSET	Memi[$1+2]		     # offset to image data
 define	IMT_NENTRIES	Memi[$1+3]		     # number of data entries 
-define	IMT_XSHIFT	Memr[$1+4]		     # x shift in pixels
-define	IMT_YSHIFT	Memr[$1+5]		     # y shift in pixels
-define	IMT_APERCOR	Memr[$1+6]		     # aperture corrections
-define	IMT_ITIME	Memr[$1+7]		     # the exposure times
-define	IMT_XAIRMASS	Memr[$1+8]		     # the airmasses
-define	IMT_OTIME	Memr[$1+9]		     # time of observations
+define	IMT_XSHIFT	Memr[P2R($1+4)]		     # x shift in pixels
+define	IMT_YSHIFT	Memr[P2R($1+5)]		     # y shift in pixels
+define	IMT_APERCOR	Memr[P2R($1+6)]		     # aperture corrections
+define	IMT_ITIME	Memr[P2R($1+7)]		     # the exposure times
+define	IMT_XAIRMASS	Memr[P2R($1+8)]		     # the airmasses
+define	IMT_OTIME	Memr[P2R($1+9)]		     # time of observations
 define	IMT_IFILTER	Memc[P2C($1+10)]	     # the filter ids
 define	IMT_LABEL	Memc[P2C($1+10+SZ_FNAME+1)]   # image set labels
 define	IMT_IMNAME	Memc[P2C($1+10+2*SZ_FNAME+2)] # image names

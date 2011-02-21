@@ -44,7 +44,7 @@
   certain compilers (Microsoft Fortran on PC aborted with stack
   overflow, Convex compiled successfully but extremely slowly).  The
   present implementation is a complete recoding, with the original
-  Fairhead coefficients held in a table.  To optimise arithmetic
+  Fairhead coefficients held in a table.  To optimize arithmetic
   precision, the terms are accumulated in reverse order, smallest
   first.  A number of other coding changes were made, in order to match
   the calling sequence of previous versions of the present routine, and

@@ -130,7 +130,7 @@ the catalog server.
 
 The \fIaddress\fR keyword  "domain", "port", and "flags" fields are almost
 always "inet", "80", and "text" respectively. The remaining field
-is the address field :www.noao.edu" in this case.
+is the address field "www.noao.edu" in this case.
 
 The \fIquery\fR keyword defines the query command. The form of the query command
 is server dependent. Note the %-s formatting strings in the above examples.

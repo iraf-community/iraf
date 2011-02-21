@@ -8,8 +8,8 @@ define	BSCALE		Memd[P2D($1)]	  # FITS bscale value
 define	BZERO		Memd[P2D($1+2)]	  # FITS bzero value
 define	TAPEMAX		Memd[P2D($1+4)]	  # IRAF tape max
 define	TAPEMIN		Memd[P2D($1+6)]	  # IRAF tape min
-define	IRAFMAX		Memr[$1+8]	  # IRAF image maximum
-define	IRAFMIN		Memr[$1+9]	  # IRAF image minimum
+define	IRAFMAX		Memr[P2R($1+8)]	  # IRAF image maximum
+define	IRAFMIN		Memr[P2R($1+9)]	  # IRAF image minimum
 define	BLANK		Meml[P2L($1+10)]  # FITS blank value
 define	FITS_BITPIX	Memi[$1+11]	  # FITS bits per pixel
 define	DATA_BITPIX	Memi[$1+12]	  # Data bits per pixel

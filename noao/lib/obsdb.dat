@@ -499,3 +499,43 @@ observatory = "boyden"
 	altitude = 1387
 	timezone = -2
 
+# Submitted by Mike Yang 8/19/09
+observatory = "lulin"
+	name = "Lulin Observatory"
+	longitude = 240:52.4
+	latitude = 23:28.1
+	altitude = 2862.
+	timezone = -8
+
+# Submitted by Mairan Teodoro 1/27/10
+observatory = "soar" 
+	name = "Southern Astrophysical Research Telescope" 
+	longitude = 70:44:01.4 
+	latitude = -30:14:16.8 
+	altitude = 2738 
+	timezone = 4
+
+# Submitted from iraf.net 4/12/10
+observatory = "baker" 
+	name = "Baker Observatory" 
+	longitude = 93:02:30.29 
+	latitude = 37:23:55.05 
+	altitude = 418.2 
+	timezone = 6 
+
+# Added MJF 6/1/2010
+observatory = "het"
+        name = "McDonald Observatory - Hobby-Eberly Telescope"
+        longitude = 104.014722222
+        latitude = 30.68144444
+        altitude = 2026
+        timezone = 6
+
+# Submitted by Robert D. Collier 9/1/10
+observatory = "jcdo"
+       name = "Jack C. Davis Observatory, Western Nevada College"
+       longitude = 119:47:26.4
+       latitude = 39:11:08.6
+       altitude = 1534
+       timezone = 8 
+

@@ -20,7 +20,7 @@ struct codeentry {
 #define	SZ_CE		4	/* size of codeentry			*/
 
 
-extern int (*opcodetbl[])();
+extern void (*opcodetbl[])();
 
 /* manifest constant opcodes used in c_opcode.
  * value is index into opcodetbl[].
@@ -99,6 +99,7 @@ extern int (*opcodetbl[])();
 #define	CATASSIGN	60
 
 
+#ifdef OP_DEBUG
 /* Opcodes string definitions for debug output.
  */
 static char *opstrings[] = {
@@ -118,3 +119,9 @@ static char *opstrings[] = {
 };
 
 #define op2str(op) 	((char *)(opstrings[op-1] ? opstrings[op-1] : ""))
+
+#else
+
+#define op2str(op) 	(" ")
+
+#endif

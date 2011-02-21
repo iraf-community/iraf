@@ -1,0 +1,7 @@
+file	f2c/mswin/README
+
+file	f2c/mswin/f2c.exe.gz
+for	Win32 console version of f2c (compiled by MSVC++ 6.0)
+
+file	f2c/mswin/makefile.vc
+for	compiling f2c.exe by MSVC++

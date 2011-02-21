@@ -278,19 +278,19 @@ begin
 		    ip = id[i] + n1 - 1
 		    mp = m[i] + n1 - 1
 		    do j = n1, n2 {
+			Memi[ip] = l
 			if (Memi[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
 			    if (k < i) {
-				Mems[d[k]+j-1] = Mems[dp]
 				temp = Mems[d[k]+j-1]
 				Mems[d[k]+j-1] = Mems[dp]
 				Mems[dp] = temp
+				Memi[ip] = Memi[id[k]+j-1]
+				Memi[id[k]+j-1] = l
 				Memi[mp] = Memi[m[k]+j-1]
 				Memi[m[k]+j-1] = 0
-				Memi[id[k]+j-1] = l
-			    } else
-				Memi[ip] = l
+			    }
 			}
 			dp = dp + 1
 			ip = ip + 1
@@ -348,17 +348,37 @@ begin
 	# If no good pixels set the number of usable values as -n and
 	# shift them to lower values.
 	if (mtype == M_NOVAL) {
-	    do j = 1, npts {
-	        if (n[j] > 0)
-		    next
-		n[j] = 0
-		do i = 1, nused {
-		    dp = d[i] + j - 1
-		    if (Mems[dp] < max_pixel) {
-		        n[j] = n[j] - 1
-			k = -n[j]
-			if (k < i)
-			    Mems[d[k]+j-1] = Mems[dp]
+	    if (keepids) {
+		do j = 1, npts {
+		    if (n[j] > 0)
+			next
+		    n[j] = 0
+		    do i = 1, nused {
+			dp = d[i] + j - 1
+			ip = id[i] + j - 1
+			if (Mems[dp] < max_pixel) {
+			    n[j] = n[j] - 1
+			    k = -n[j]
+			    if (k < i) {
+				Mems[d[k]+j-1] = Mems[dp]
+				Memi[id[k]+j-1] = Memi[ip]
+			    }
+			}
+		    }
+		}
+	    } else {
+		do j = 1, npts {
+		    if (n[j] > 0)
+			next
+		    n[j] = 0
+		    do i = 1, nused {
+			dp = d[i] + j - 1
+			if (Mems[dp] < max_pixel) {
+			    n[j] = n[j] - 1
+			    k = -n[j]
+			    if (k < i)
+				Mems[d[k]+j-1] = Mems[dp]
+			}
 		    }
 		}
 	    }
@@ -638,19 +658,19 @@ begin
 		    ip = id[i] + n1 - 1
 		    mp = m[i] + n1 - 1
 		    do j = n1, n2 {
+			Memi[ip] = l
 			if (Memi[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
 			    if (k < i) {
-				Memi[d[k]+j-1] = Memi[dp]
 				temp = Memi[d[k]+j-1]
 				Memi[d[k]+j-1] = Memi[dp]
 				Memi[dp] = temp
+				Memi[ip] = Memi[id[k]+j-1]
+				Memi[id[k]+j-1] = l
 				Memi[mp] = Memi[m[k]+j-1]
 				Memi[m[k]+j-1] = 0
-				Memi[id[k]+j-1] = l
-			    } else
-				Memi[ip] = l
+			    }
 			}
 			dp = dp + 1
 			ip = ip + 1
@@ -708,17 +728,37 @@ begin
 	# If no good pixels set the number of usable values as -n and
 	# shift them to lower values.
 	if (mtype == M_NOVAL) {
-	    do j = 1, npts {
-	        if (n[j] > 0)
-		    next
-		n[j] = 0
-		do i = 1, nused {
-		    dp = d[i] + j - 1
-		    if (Memi[dp] < max_pixel) {
-		        n[j] = n[j] - 1
-			k = -n[j]
-			if (k < i)
-			    Memi[d[k]+j-1] = Memi[dp]
+	    if (keepids) {
+		do j = 1, npts {
+		    if (n[j] > 0)
+			next
+		    n[j] = 0
+		    do i = 1, nused {
+			dp = d[i] + j - 1
+			ip = id[i] + j - 1
+			if (Memi[dp] < max_pixel) {
+			    n[j] = n[j] - 1
+			    k = -n[j]
+			    if (k < i) {
+				Memi[d[k]+j-1] = Memi[dp]
+				Memi[id[k]+j-1] = Memi[ip]
+			    }
+			}
+		    }
+		}
+	    } else {
+		do j = 1, npts {
+		    if (n[j] > 0)
+			next
+		    n[j] = 0
+		    do i = 1, nused {
+			dp = d[i] + j - 1
+			if (Memi[dp] < max_pixel) {
+			    n[j] = n[j] - 1
+			    k = -n[j]
+			    if (k < i)
+				Memi[d[k]+j-1] = Memi[dp]
+			}
 		    }
 		}
 	    }
@@ -998,19 +1038,19 @@ begin
 		    ip = id[i] + n1 - 1
 		    mp = m[i] + n1 - 1
 		    do j = n1, n2 {
+			Memi[ip] = l
 			if (Memi[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
 			    if (k < i) {
-				Memr[d[k]+j-1] = Memr[dp]
 				temp = Memr[d[k]+j-1]
 				Memr[d[k]+j-1] = Memr[dp]
 				Memr[dp] = temp
+				Memi[ip] = Memi[id[k]+j-1]
+				Memi[id[k]+j-1] = l
 				Memi[mp] = Memi[m[k]+j-1]
 				Memi[m[k]+j-1] = 0
-				Memi[id[k]+j-1] = l
-			    } else
-				Memi[ip] = l
+			    }
 			}
 			dp = dp + 1
 			ip = ip + 1
@@ -1068,17 +1108,37 @@ begin
 	# If no good pixels set the number of usable values as -n and
 	# shift them to lower values.
 	if (mtype == M_NOVAL) {
-	    do j = 1, npts {
-	        if (n[j] > 0)
-		    next
-		n[j] = 0
-		do i = 1, nused {
-		    dp = d[i] + j - 1
-		    if (Memr[dp] < max_pixel) {
-		        n[j] = n[j] - 1
-			k = -n[j]
-			if (k < i)
-			    Memr[d[k]+j-1] = Memr[dp]
+	    if (keepids) {
+		do j = 1, npts {
+		    if (n[j] > 0)
+			next
+		    n[j] = 0
+		    do i = 1, nused {
+			dp = d[i] + j - 1
+			ip = id[i] + j - 1
+			if (Memr[dp] < max_pixel) {
+			    n[j] = n[j] - 1
+			    k = -n[j]
+			    if (k < i) {
+				Memr[d[k]+j-1] = Memr[dp]
+				Memi[id[k]+j-1] = Memi[ip]
+			    }
+			}
+		    }
+		}
+	    } else {
+		do j = 1, npts {
+		    if (n[j] > 0)
+			next
+		    n[j] = 0
+		    do i = 1, nused {
+			dp = d[i] + j - 1
+			if (Memr[dp] < max_pixel) {
+			    n[j] = n[j] - 1
+			    k = -n[j]
+			    if (k < i)
+				Memr[d[k]+j-1] = Memr[dp]
+			}
 		    }
 		}
 	    }
@@ -1358,19 +1418,19 @@ begin
 		    ip = id[i] + n1 - 1
 		    mp = m[i] + n1 - 1
 		    do j = n1, n2 {
+			Memi[ip] = l
 			if (Memi[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
 			    if (k < i) {
-				Memd[d[k]+j-1] = Memd[dp]
 				temp = Memd[d[k]+j-1]
 				Memd[d[k]+j-1] = Memd[dp]
 				Memd[dp] = temp
+				Memi[ip] = Memi[id[k]+j-1]
+				Memi[id[k]+j-1] = l
 				Memi[mp] = Memi[m[k]+j-1]
 				Memi[m[k]+j-1] = 0
-				Memi[id[k]+j-1] = l
-			    } else
-				Memi[ip] = l
+			    }
 			}
 			dp = dp + 1
 			ip = ip + 1
@@ -1428,17 +1488,37 @@ begin
 	# If no good pixels set the number of usable values as -n and
 	# shift them to lower values.
 	if (mtype == M_NOVAL) {
-	    do j = 1, npts {
-	        if (n[j] > 0)
-		    next
-		n[j] = 0
-		do i = 1, nused {
-		    dp = d[i] + j - 1
-		    if (Memd[dp] < max_pixel) {
-		        n[j] = n[j] - 1
-			k = -n[j]
-			if (k < i)
-			    Memd[d[k]+j-1] = Memd[dp]
+	    if (keepids) {
+		do j = 1, npts {
+		    if (n[j] > 0)
+			next
+		    n[j] = 0
+		    do i = 1, nused {
+			dp = d[i] + j - 1
+			ip = id[i] + j - 1
+			if (Memd[dp] < max_pixel) {
+			    n[j] = n[j] - 1
+			    k = -n[j]
+			    if (k < i) {
+				Memd[d[k]+j-1] = Memd[dp]
+				Memi[id[k]+j-1] = Memi[ip]
+			    }
+			}
+		    }
+		}
+	    } else {
+		do j = 1, npts {
+		    if (n[j] > 0)
+			next
+		    n[j] = 0
+		    do i = 1, nused {
+			dp = d[i] + j - 1
+			if (Memd[dp] < max_pixel) {
+			    n[j] = n[j] - 1
+			    k = -n[j]
+			    if (k < i)
+				Memd[d[k]+j-1] = Memd[dp]
+			}
 		    }
 		}
 	    }

@@ -117,8 +117,8 @@ define	PS_STSTABLEN	Memi[$1+13]	# SYMTAB stab len (start)
 define	PS_STSBUFSIZE	Memi[$1+14]	# SYMTAB sbuf size (start)
 define	PS_NODEFFILT	Memi[$1+15]	# Disable use of default filter
 define	PS_NODEFMASK	Memi[$1+16]	# Disable use of default mask
-define	PS_XBLOCK	Memr[$1+17]	# QPIO blocking factor in X
-define	PS_YBLOCK	Memr[$1+18]	# QPIO blocking factor in Y
+define	PS_XBLOCK	Memr[P2R($1+17)]# QPIO blocking factor in X
+define	PS_YBLOCK	Memr[P2R($1+18)]# QPIO blocking factor in Y
 define	PS_DEBUG	Memi[$1+19]	# debug level
 define	PS_OPTBUFSIZE	Memi[$1+20]	# QPIO/QPF FIO optimum buffer size 
 

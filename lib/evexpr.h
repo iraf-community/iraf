@@ -10,4 +10,4 @@ define	O_VALB		Memb[($1)+2]		# bool value (stored as int)
 define	O_VALC		Memc[Memi[($1)+2]]	# string val (in string buffer)
 define	O_VALI		Memi[($1)+2]		# int value
 define	O_VALP		Memi[($1)+2]		# pointer value (same as int)
-define	O_VALR		Memr[($1)+2]		# real value
+define	O_VALR		Memr[P2R(($1)+2)]	# real value

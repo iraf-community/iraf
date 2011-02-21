@@ -1,6 +1,19 @@
 .help revisions Sep01 noao.astcat
 .nf
 
+astcat$src/attools/atsort.x
+    A strcmp() should have been strncmp()  (7/12/09, MJF)
+
+astcat$src/agetcat/t_agetim.x
+    Some strcat() calls were missing a maxch arg (7/12/09, MJF)
+
+=======
+V2.14
+=======
+
+astcat$lib/catdb.dat
+    Added usnob1@usno, usnoa2@usno, nomad@usno and act@usno (12/3/08, MJF)
+
 astcat$src/attools/atcathdr.x
      Fixed some procedure calls being closed with a ']' instead of a ')'
      (2/17/08, MJF)

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 
@@ -25,26 +26,29 @@
  * "Jobcode" can be anything we want, provided it is unique.  Since detached
  * processes run concurrently we return the pid of the child as the jobcode.
  */
-ZOPDPR (osfn, bkgfile, queue, jobcode)
-PKCHAR	*osfn;
-PKCHAR	*bkgfile;
-PKCHAR	*queue;
-XINT	*jobcode;
+int
+ZOPDPR (
+  PKCHAR  *osfn,
+  PKCHAR  *bkgfile,
+  PKCHAR  *queue,
+  XINT	  *jobcode
+)
 {
 	register char	*ip;
 	register int	sum;
 	int	pid, maxforks = 3;
 	int	curpri, priority, delta, neg;
 
+
 	/* Check that the process file exists and is executable.
 	 * Check that the background file exists and is readable.
 	 */
 	if (access ((char *)osfn, 1) == ERR) {
 	    *jobcode = XERR;
-	    return;
+	    return (XERR);
 	} else if (access ((char *)bkgfile, 4) == ERR) {
 	    *jobcode = XERR;
-	    return;
+	    return (XERR);
 	}
 
 	/* Determine priority at which child process is to run.  A relative
@@ -93,7 +97,7 @@ XINT	*jobcode;
 	while ((pid = vfork()) == ERR) {
 	    if (--maxforks == 0) {
 		*jobcode = XERR;
-		return;
+		return (XERR);
 	    }
 	    sleep (2);
 	}
@@ -117,7 +121,8 @@ XINT	*jobcode;
 		fcntl (fd, F_SETFD, 1);
 
 #ifdef SYSV
-	    nice (0, priority * 2);
+	    /* nice (0, priority * 2); */
+	    nice ( priority * 2);
 #else
 	    setpriority (PRIO_PROCESS, 0, priority);
 #endif
@@ -150,6 +155,8 @@ XINT	*jobcode;
 	}
 
 	*jobcode = pid;
+
+	return (XOK);
 }
 
 
@@ -159,25 +166,31 @@ XINT	*jobcode;
  * the interrupt and continues execution.  The process itself deletes the
  * bkgfile before exiting.
  */
-ZCLDPR (jobcode, killflag, exit_status)
-XINT	*jobcode;
-XINT	*killflag;
-XINT	*exit_status;
+int
+ZCLDPR (
+  XINT	*jobcode,
+  XINT	*killflag,
+  XINT	*exit_status
+)
 {
 	int	pid = *jobcode;
 
+
 	/* If killing process do not wait for it to die.
 	 */
-	if (*killflag == XYES)
+	if (*killflag == XYES) {
 	    if (kill (pid, SIGTERM) == ERR) {
 		*exit_status = XERR;
-		return;
+		return (XERR);
 	    } else {
 		pr_release (pid);
 		*exit_status = X_INT;
-		return;
+		return (*exit_status);
 	    }
+	}
 
 	if ((*exit_status = pr_wait (pid)) == ERR)
 	    *exit_status = XERR;
+
+	return (*exit_status);
 }

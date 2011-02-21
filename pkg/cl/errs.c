@@ -20,6 +20,8 @@
 #include "errs.h"
 #include "grammar.h"
 #include "construct.h"
+#include "proto.h"
+
 
 /*
  * ERRS -- When a runtime operation detects an error, it calls error with an
@@ -85,6 +87,8 @@ char	*e_idivzero =	"integer divide by zero";
  */
 int	errlog = 0;
 
+extern  int u_doprnt();
+
 
 /* CL_ERROR -- print error info according to errtype on our t_stderr, pop back
  * to an interactive task and do a longjmp back to setjmp (errenv) in
@@ -94,27 +98,15 @@ int	errlog = 0;
  * If we are a background task, print the task ordinal to tell the user
  * which task aborted.
  */
-#ifdef USE_STDARG
+void
 cl_error (int errtype, char *diagstr, ...)
-#else
-cl_error (va_alist)
-va_dcl
-#endif
 {
 	va_list	args;
 	register struct task *tp;
 	static	int nfatal = 0;
 	static	int break_locks = 1;
 
-#ifdef USE_STDARG
 	va_start (args, diagstr);
-#else
-	int errtype;
-	char *diagstr;
-	va_start (args);
-	errtype = va_arg (args, int);
-	diagstr = va_arg (args, char *);
-#endif
 
 	/* Safety measure, in the event of error recursion.
 	 */
@@ -164,7 +156,7 @@ va_dcl
 	XER_RESET();	/* TODO: move into LIBC interface */
 
 	/* Clear terminal raw mode if still set. */
-	c_fseti (STDIN, F_RAW, NO);
+	c_fseti ((XINT)STDIN, F_RAW, NO);
 
 	if (firstask->t_flags & T_BATCH)
 	    eprintf ("\n[%d] ", bkgno);

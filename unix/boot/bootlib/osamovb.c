@@ -5,15 +5,21 @@
 #define import_knames
 #include <iraf.h>
 
+
 /* OS_AMOVB -- Memory to memory copy using BYTMOV.
  */
-os_amovb (a, b, nbytes)
-char	*a;
-char	*b;
-int	nbytes;
+void
+os_amovb (
+  char	*a,
+  char	*b,
+  int	nbytes
+)
 {
 	XCHAR	*a_wp, *b_wp;
 	XINT	a_off, b_off;
+
+	extern void BYTMOV();
+
 
 	a_wp = (XCHAR *)a;
 	b_wp = (XCHAR *)b;

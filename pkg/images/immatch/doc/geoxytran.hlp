@@ -26,7 +26,7 @@ and yrotation parameters.
 The database record containing the desired spatial transformation. 
 The number of records must be one or equal to the number of input coordinate
 files. Transforms is usually the name of the coordinate file that the
-geomap task used to compute the spatial transformation,
+geomap task used to compute the spatial transformation.
 If defined the values of xref, yref, xout, yout, xshift, yshift, xmag, ymag,
 xrotation, and yrotation will supersede the computed values in the
 database file.
@@ -41,7 +41,7 @@ Perform only the linear part of the spatial transformation.
 Compute both the linear and distortion portions of the spatial transformation.
 .le
 .le
-.ls direction = "forward" (forward|backwards)
+.ls direction = "forward" (forward|backward)
 The transformation direction may be "forward" or "backward".  The forward
 direction directly evaluates the database solution.  The backward
 direction iteratively determines the coordinate which evaluates to the
@@ -102,8 +102,8 @@ is always calculated in double precision to get the best convergence.
 .ls xformat = "", yformat = ""
 The default output format for the computed x and y coordinates. If
 xformat and yformat are undefined geoxytran outputs the coordinates
-using the maximum of, the the precision of the input coordinates,
-and the value of the min_sigdigits parameter.
+using the maximum of the precision of the input coordinates
+and the value of the \fImin_sigdigits\fR parameter.
 .le
 .ls min_sigdigits = 7
 The minimum precision of the output x and y coordinates.
@@ -153,8 +153,8 @@ interpretation shown below.
 	   c = ymag * sin (yrotation)
 	   e = -xmag * sin (xrotation)
 	   f = ymag * cos (yrotation)
-	   a = xo - b * xref0 - c * yref0 = xshift
-	   d = yo - e * xref0 - f * yref0 = xshift
+	   a = x0 - b * xref0 - c * yref0 = xshift
+	   d = y0 - e * xref0 - f * yref0 = xshift
 .fi
 
 Xref0, yref0, x0, and
@@ -368,6 +368,7 @@ the list of unknowns.
 
     cl> geoxytran unknowns unknowns.tran rtran.db rtran
 
+
 2.  Evaluate the backward transformation to take coordinates from the
 output system to the reference system.  In this example we use the
 output of the first example to illustrate getting back the coordinates
@@ -403,5 +404,5 @@ BUGS
 
 .ih
 SEE ALSO
-geomap, lists.lintran
+geomap, lists.lintran, geotran, gregister
 .endhelp

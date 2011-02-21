@@ -2,7 +2,7 @@ line,i,h,INDEF,,,Default dispersion line
 nsum,i,h,10,,,Number of dispersion lines to sum or median
 width,r,h,,,,Width of profiles
 minsep,r,h,1.,,,Minimum separation between spectra
-maxsep,r,h,1000.,,,Maximum separation between spectra
+maxsep,r,h,100000.,,,Maximum separation between spectra
 order,s,h,"increasing","increasing|decreasing",,"Order of apertures"
 extras,b,h,no,,,"Extract sky, sigma, etc.?
 

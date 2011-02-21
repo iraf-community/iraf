@@ -121,6 +121,8 @@ errchk	sigl2s, sigl2r, sigl2_setup
 real	xs, xe, y
 pointer	sp, outr
 bool    fp_equalr()
+real	if_elogr()
+extern	if_elogr
 
 include "cv.com"
 
@@ -218,7 +220,7 @@ begin
 		if (zt == W_LOG) {
 		    call amapr (Memr[in], Memr[outr], nx,
 			z1, z2, 1.0, 10.0 ** MAXLOG)
-		    call alogr (Memr[outr], Memr[outr], nx)
+		    call alogr (Memr[outr], Memr[outr], nx, if_elogr)
 		    call amapr (Memr[outr], Memr[outr], nx,
 			1.0, real(MAXLOG), dz1, dz2)
 		    call achtrs (Memr[outr], Mems[out], nx)
@@ -317,3 +319,17 @@ begin
 
 	call sfree (sp)
 end
+
+
+# IF_ELOG -- The error function for log10. Note that MAX_EXPONENT is
+# currently an integer so it is converted to the appropriate data type
+# before being returned.
+
+real procedure if_elogr (x)
+
+real   x                               # the input pixel value
+
+begin
+        return (real(-MAX_EXPONENT))
+end
+

@@ -12,6 +12,8 @@
 #include "grammar.h"
 #include "task.h"
 #include "errs.h"
+#include "proto.h"
+
 
 /*
  * SCAN -- free-format and formatted scan functions.
@@ -49,10 +51,11 @@ static	int nscan_val=0;	/* value returned by NSCAN intrinsic	*/
  * query if readlist yields undefined.
  * error() may be called on various conditions.
  */
-
-cl_scan (nargs, source)
-int	nargs;
-char	*source;
+void
+cl_scan (
+  int	nargs,
+  char	*source
+)
 {
 	char	buf[SZ_LINE];
 	char	*bp, *start, c;
@@ -194,14 +197,16 @@ char	*source;
 /* CL_SCANF -- Formatted scan.  Like SCAN except that a C-scanf like format
  * statement is used to decode the input text.
  */
-cl_scanf (format, nargs, input)
-char	*format;
-int	nargs;
-char	*input;
+void
+cl_scanf (
+  char	*format,
+  int	nargs,
+  char	*input
+)
 {
 	int	nscan_val, eoftst, n;
 	char	*pk, *t, *p, *f;
-	struct	operand o, pv;
+	struct	operand o;
 	char	buf[SZ_LINE];
 	char	*v[MAXARGS];
 	struct	param *pp;
@@ -319,7 +324,8 @@ char	*input;
 /* GET_NSCANVAL -- Return the number of items successfully scanned in the
  * last call to SCAN.
  */
-get_nscanval()
+int
+get_nscanval (void)
 {
 	return (nscan_val);
 }
@@ -328,8 +334,10 @@ get_nscanval()
 /* LENTST -- Test that the scan line just read did not overflow the line
  * buffer.
  */
-lentst (buf)
-char	*buf;
+void
+lentst (
+  char	*buf
+)
 {
 	char	*index();
 	char	*bp;

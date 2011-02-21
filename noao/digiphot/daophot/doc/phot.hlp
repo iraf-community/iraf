@@ -85,7 +85,7 @@ of the output coordinates written to \fIoutput\fR respectively. The image
 header coordinate system is used to transform from the input coordinate
 system to the "logical" pixel coordinate system used internally,
 and from the internal "logical" pixel coordinate system to the output
-coordinate system. The input coordinate system options are "logical", tv",
+coordinate system. The input coordinate system options are "logical", "tv",
 "physical", and "world". The output coordinate system options are "logical",
 "tv", and "physical". The image cursor coordinate system is assumed to
 be the "tv" system.

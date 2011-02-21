@@ -286,19 +286,19 @@ begin
 		    ip = id[i] + n1 - 1
 		    mp = m[i] + n1 - 1
 		    do j = n1, n2 {
+			Memi[ip] = l
 			if (Memi[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
 			    if (k < i) {
-				Mem$t[d[k]+j-1] = Mem$t[dp]
 				temp = Mem$t[d[k]+j-1]
 				Mem$t[d[k]+j-1] = Mem$t[dp]
 				Mem$t[dp] = temp
+				Memi[ip] = Memi[id[k]+j-1]
+				Memi[id[k]+j-1] = l
 				Memi[mp] = Memi[m[k]+j-1]
 				Memi[m[k]+j-1] = 0
-				Memi[id[k]+j-1] = l
-			    } else
-				Memi[ip] = l
+			    }
 			}
 			dp = dp + 1
 			ip = ip + 1
@@ -356,17 +356,37 @@ begin
 	# If no good pixels set the number of usable values as -n and
 	# shift them to lower values.
 	if (mtype == M_NOVAL) {
-	    do j = 1, npts {
-	        if (n[j] > 0)
-		    next
-		n[j] = 0
-		do i = 1, nused {
-		    dp = d[i] + j - 1
-		    if (Mem$t[dp] < max_pixel) {
-		        n[j] = n[j] - 1
-			k = -n[j]
-			if (k < i)
-			    Mem$t[d[k]+j-1] = Mem$t[dp]
+	    if (keepids) {
+		do j = 1, npts {
+		    if (n[j] > 0)
+			next
+		    n[j] = 0
+		    do i = 1, nused {
+			dp = d[i] + j - 1
+			ip = id[i] + j - 1
+			if (Mem$t[dp] < max_pixel) {
+			    n[j] = n[j] - 1
+			    k = -n[j]
+			    if (k < i) {
+				Mem$t[d[k]+j-1] = Mem$t[dp]
+				Memi[id[k]+j-1] = Memi[ip]
+			    }
+			}
+		    }
+		}
+	    } else {
+		do j = 1, npts {
+		    if (n[j] > 0)
+			next
+		    n[j] = 0
+		    do i = 1, nused {
+			dp = d[i] + j - 1
+			if (Mem$t[dp] < max_pixel) {
+			    n[j] = n[j] - 1
+			    k = -n[j]
+			    if (k < i)
+				Mem$t[d[k]+j-1] = Mem$t[dp]
+			}
 		    }
 		}
 	    }

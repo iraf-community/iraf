@@ -46,7 +46,7 @@ begin
 	    call salloc (v1, LEN_V1IMHDR, TY_STRUCT)
 
 	    call seek (fd, BOFL)
-	    nchars = LEN_V1IMHDR * SZ_STRUCT
+	    nchars = LEN_V1IMHDR * SZ_MII_INT
 	    if (read (fd, IM_V1MAGIC(v1), nchars) != nchars) {
 		call sfree (sp)
 		return (ERR)
@@ -85,7 +85,7 @@ begin
 
 	    # Read and output the user area.
 	    if (uchars > 0 && sulen_userarea > 0) {
-		nchars = min (uchars, sulen_userarea * SZ_STRUCT)
+		nchars = min (uchars, sulen_userarea * SZ_MII_INT)
 		if (read (fd, Memc[IM_USERAREA(im)], nchars) <= 0)
 		    return (ERR)
 	    }
@@ -182,7 +182,7 @@ begin
 
 	    # Read the variable-length user area.
 	    if (uchars > 0 && sulen_userarea > 0) {
-		nchars = min (uchars, sulen_userarea * SZ_STRUCT)
+		nchars = min (uchars, sulen_userarea * SZ_MII_INT)
 		if (miireadc (fd, Memc[IM_USERAREA(im)], nchars) < 0)
 		    goto readerr_
 	    }

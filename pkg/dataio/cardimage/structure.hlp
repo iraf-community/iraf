@@ -72,7 +72,7 @@ read and converted to one or more lines card_length + 1 long by
 calls to FETCHLINE.
 .ls fetchline
 FETCHLINE fetches lines of text and splits them into pieces <=
-maxch characters long optinally prefixing the remainders with
+maxch characters long optionally prefixing the remainders with
 an identifying continuation string. If the detab switch is set
 tabs in the lines are replaced with blanks.
 .ls text_to_card

@@ -1,19 +1,7 @@
 # Package script task for the DAOPHOTX package.
 #{ DAOPHOTX -- Point Spread Function photometry package.
 
-if (! defpac ("tables")) {
-    if (deftask ("tables")) {
-        if (defpar ("tables.motd")) {
-	    tables.motd = no
-	    tables
-        } else {
-            tables
-        }
-    } else {
-        type "daophot$lib/warning.dat"
-    }
-}
-;
+
 
 # Load other packages
 

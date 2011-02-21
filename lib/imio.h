@@ -51,7 +51,7 @@ define	IM_SECTUSED	Memi[$1+21]		# image section in use
 define	IM_FAST		Memi[$1+22]		# fast i/o permitted
 define	IM_SWAP		Memi[$1+23]		# byte swapping required
 define	IM_SVMTIME	Meml[$1+24]		# new time of last modify
-define	IM_OOBPIX	Memr[$1+25]		# value for out of bounds pixels
+define	IM_OOBPIX	Memr[P2R($1+25)]	# value for out of bounds pixels
 define	IM_KERNEL	Memi[$1+26]		# IKI kernel assigned (runtime)
 define	IM_KDES		Memi[$1+27]		# IKI kernel descriptor
 define	IM_HFD		Memi[$1+28]		# header file descriptor

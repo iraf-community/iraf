@@ -36,7 +36,7 @@ The order of the polynomials or the number of spline pieces.
 Replace rejected data points with continuum fit points prior to the
 subtraction?  If set to yes, points lying outside the \fIlow_reject\fR or
 \fIhigh_reject\fR limits are replaced by the fit values prior to the 
-continuum subtraction.  This can be useful in removing emmission features 
+continuum subtraction.  This can be useful in removing emission features 
 or cosmic ray events, but great care must be taken in setting other parameters
 in order to get satisfactory results.  Adjusting the \fIgrow\fR or 
 \fIaverage\fR parameters, and using a low order function usually provide

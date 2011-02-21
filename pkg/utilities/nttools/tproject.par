@@ -1,0 +1,5 @@
+intable,s,a,,,,"Input tables"
+outtable,s,a,,,,"Output tables"
+columns,s,a,,,,"Column names"
+uniq,b,h,no,,,"Unique rows?"
+mode,s,h,"a",,,

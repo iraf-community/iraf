@@ -1,0 +1,29 @@
+# COLOR package
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	color
+	;
+
+install:
+	$move	xx_color.e bin$x_color.e
+	;
+
+color:
+	$omake	x_color.x
+	$link	x_color.o libpkg.a -o xx_color.e
+	;
+
+libpkg.a:
+	t_rgbdither.x	<imhdr.h>
+	t_rgbsun.x	<imhdr.h> <mach.h>
+	t_rgbto8.x	<imhdr.h>
+	;

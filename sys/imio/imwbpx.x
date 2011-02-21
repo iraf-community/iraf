@@ -24,10 +24,10 @@ bool	oob
 int	npix, ndim, sz_pixel, btype, ip, xstep, step, i
 long	xs[3], xe[3], x1, x2, p, v1[IM_MAXDIM], v2[IM_MAXDIM], linelen
 errchk	imwrpx
-include	<szdtype.inc>
+include	<szpixtype.inc>
 
 begin
-	sz_pixel = ty_size[IM_PIXTYPE(im)]
+	sz_pixel = pix_size[IM_PIXTYPE(im)]
 	ndim = IM_NPHYSDIM(im)
 
 	# Flip the input array if the step size in X is negative.

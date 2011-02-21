@@ -1,6 +1,33 @@
 .help revisions Jun88 noao.twodspec.apextract
 .nf
 
+apall.par
+     Changed the default for maxsep from 1000 to 100000.  This is because
+     the default is when the user doesn't want to skip apertures and it is
+     strange when the id jumps in the (rare) case that two apertures are
+     marked with a separation of more than 1000.  (2/17/09, Valdes)
+
+apedit.x
+    The 's' key now works on the current aperture rather than the nearest.
+    (10/7/08, Valdes)
+
+apcolon.x
+    The "all" mode was missing with :center.  (10/7/08, Valdes)
+
+apall1.par
+apfit1.par
+apnoise1.par
+apnorm1.par
+apscat1.par
+apparams.dat
+    When the apertures parameter was added in 1996 the :apertures and
+    :parameters commands were broken because of missing references in
+    the associated hidden psets.  (10/7/08, Valdes)
+
+=======
+V2.14.1
+=======
+
 ========
 V2.12.2a
 ========

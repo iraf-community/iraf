@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #define	import_spp
 #define	import_xnames
 #include <iraf.h>
@@ -14,11 +15,17 @@
 #define	IRAFARCH	"IRAFARCH"
 #define	ARCH		"arch"
 
-extern	char *_os_getenv();
-extern	char *os_getenv();
-extern	char *os_strpak();
-extern	char *vfn2osfn();
+extern	char  *_os_getenv (char *envvar, char *outstr, int maxch);
+extern	char  *os_getenv (char *envvar);
+extern	char  *os_strpak (XCHAR *sppstr, char *cstr, int maxch);
+extern	char  *vfn2osfn (char *vfn, int new);
+extern  XCHAR *os_strupk (char *str, XCHAR *outstr, int maxch);
+extern	void   os_putenv (char *name, char *value);
 extern	int bdebug;
+
+void 	_envinit (void);
+void 	loadenv (char *osfn);
+
 
 
 /* LOADPKGENV -- Load the environment definitions for the named package.
@@ -28,8 +35,8 @@ extern	int bdebug;
  * assumptions are true, call loadenv(osfn) with the host filename of the
  * file to be loaded.
  */
-loadpkgenv (pkg)
-char	*pkg;
+void
+loadpkgenv (char *pkg)
 {
 	char	vfn[SZ_PATHNAME+1];
 	char	pkglibs[SZ_COMMAND+1];
@@ -90,24 +97,28 @@ char	*pkg;
 
 
 #ifdef NOVOS
-_envinit(){}
-loadenv (osfn) char *osfn; { printf ("HSI is compiled NOVOS\n"); }
+void _envinit (void) {}
+void loadenv (char *osfn) { printf ("HSI is compiled NOVOS\n"); }
 #else
 
 /* ENVINIT -- Initialize the VOS environment list by scanning the file
  * hlib$zzsetenv.def.  HLIB is defined in terms of HOST which is sufficiently
  * well known to have a value before the environment list is loaded.
  */
-_envinit()
+void
+_envinit (void)
 {
 	static	int initialized = 0;
 	char	osfn[SZ_PATHNAME+1], *hlib;
 	char	irafarch[SZ_PATHNAME+1];
 
+	extern  void ENVINIT(), ENVRESET();
+
+
 	if (initialized++)
 	    return;
 
-	if (hlib = os_getenv ("hlib")) {
+	if ( (hlib = os_getenv ("hlib")) ) {
 	    strcpy (osfn, hlib);
 	    strcat (osfn, SETENV);
 	} else {
@@ -138,8 +149,8 @@ _envinit()
 
 /* LOADENV -- Load environment definitions from the named host file.
  */
-loadenv (osfn)
-char	*osfn;
+void
+loadenv (char *osfn)
 {
 	register char	*ip;
 	register XCHAR	*op;
@@ -149,6 +160,9 @@ char	*osfn;
 	XCHAR	name[SZ_FNAME+1], value[SZ_VALUE+1];
 	FILE	*fp, *sv_fp[MAXLEV];
 	int	lev=0;
+
+	extern  void ENVRESET();
+
 
 	if ((fp = fopen (osfn, "r")) == NULL) {
 	    printf ("envinit: cannot open `%s'\n", osfn);
@@ -222,7 +236,7 @@ char	*osfn;
 	     * to break a long value string over several lines of the input
 	     * file.
 	     */
-	    for (;  *ip && *ip == '=' || *ip == '"' || isspace (*ip);  ip++)
+	    for (; *ip && (*ip == '=' || *ip == '"' || isspace (*ip));  ip++)
 		;
 	    for (op=value;  *ip && *ip != '"' && *ip != '\n';  op++)
 		if (*ip == '\\' && *(ip+1) == '\n') {

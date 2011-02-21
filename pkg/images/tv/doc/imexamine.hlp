@@ -202,7 +202,7 @@ not apply a ceiling.  (In contour plots a value of 0. also does not
 apply a ceiling.)
 .le
 .ls center = yes			(jkr.)
-Apply a centering algorithm for doing aperture sums, 1D guassian fits,
+Apply a centering algorithm for doing aperture sums, 1D gaussian fits,
 and radial profile plots?
 .le
 .ls constant = 0.			(v)

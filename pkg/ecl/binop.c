@@ -15,6 +15,7 @@
 #include "param.h"
 #include "mem.h"
 #include "task.h"
+#include "proto.h"
 
 			    
 
@@ -44,9 +45,7 @@
 
 
 char *
-strint (s, side)
-register char *s;
-int	side;
+strint (register char *s, int side)
 {
 	if (side == LEFTSIDE) {
 	    while (isdigit (*s))
@@ -75,15 +74,15 @@ int	side;
  * Call error() and do not return if internal error or undefined string
  *   operation.
  */
-binop (opcode)
-int	opcode;
+void 
+binop (int opcode)
 {
-	register typ1, typ2;
+	register int typ1, typ2;
 	struct	operand o1, o2, result;
 	char	res[2*SZ_LINE];
 	char	*o1sp;
-	double	dresult;
-	int	iresult, typecode;	/*  > 0 if real		*/
+	double	dresult=0.0;
+	int	iresult=0, typecode=0;	/*  > 0 if real		*/
 	long	lval;
 	extern  int errorline, err_abort, err_trace, do_error;
 	extern  ErrCom errcom;
@@ -111,7 +110,7 @@ int	opcode;
 	    case OP_DIV:
 	    case OP_POW:
 		cl_error (E_UERR,
-		"Illegal boolean operand in arithmetic expression");
+		    "Illegal boolean operand in arithmetic expression");
 		break;
 
 	    case OP_MAX:
@@ -704,12 +703,12 @@ pushresult:
  * INDEF operands propagate through. we should never see an UNDEF operand.
  * all error() and do not return on internal error or bad string operations.
  */
-binexp (opcode)
-int	opcode;
+void 
+binexp (int opcode)
 {
-	register typ1, typ2;
+	register int typ1, typ2;
 	struct	operand o1, o2, result;
-	int	strres, dostr;
+	int	strres = NULL, dostr;
 
 	o2 = popop();		/* operands will be on stack backwards	*/
 	o1 = popop();

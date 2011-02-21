@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #define	NOLIBCNAMES
 #define	import_spp
 #define	import_libc
@@ -31,9 +32,10 @@ extern	char	*os_getenv();
  * things by using the host environment facilities.
  */
 char *
-vfn2osfn (vfn, new)
-char	*vfn;			/* input IRAF virtual filename	*/
-int	new;			/* new file			*/
+vfn2osfn (
+  char	*vfn,			/* input IRAF virtual filename	*/
+  int	new 			/* new file			*/
+)
 {
 	register char	*ip, *op;
 	char	fname[SZ_PATHNAME+1], *ldir;
@@ -45,7 +47,7 @@ int	new;			/* new file			*/
 	for (ip=vfn, op=fname;  (*op = *ip++);  op++)
 	    if (*op == '$') {
 		*op = EOS;
-		if (ldir = os_getenv (fname))
+		if ( (ldir = os_getenv (fname)) )
 		    strcpy (fname, ldir);
 		strcat (fname, ip);
 		return (vfn2osfn (fname, 0));
@@ -71,16 +73,21 @@ int	new;			/* new file			*/
  * of course.
  */
 char *
-vfn2osfn (vfn, new)
-char	*vfn;			/* input IRAF virtual filename	*/
-int	new;			/* new file			*/
+vfn2osfn (
+  char	*vfn,			/* input IRAF virtual filename	*/
+  int	new 			/* new file			*/
+)
 {
 	register char	*ip;
 	register XCHAR	*op;
 	register int	n = SZ_PATHNAME;
 	XINT	vp, mode, maxch = SZ_PATHNAME;
 	PKCHAR	upkvfn[SZ_PATHNAME+1];
-	int	err, status;
+	int	err;
+
+        extern  void  _envinit();
+
+
 
 	/* Copy the input filename into local storage before calling envinit,
 	 * below, to avoid any chance of overwriting the input string in a
@@ -127,9 +134,9 @@ int	new;			/* new file			*/
  * is done when VOS filename mapping is in use to avoid linking in a lot of
  * objects that will never be used, since the HSI does not use networking.
  */
-KI_GETHOSTS() { return (0); }
-KI_SEND(){}
-KI_RECEIVE(){}
+int  KI_GETHOSTS() { return (0); }
+void KI_SEND(){}
+void KI_RECEIVE(){}
 #endif
 
 #ifdef SUNOS

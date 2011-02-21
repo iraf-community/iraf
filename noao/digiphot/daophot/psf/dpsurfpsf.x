@@ -61,7 +61,7 @@ begin
 	call amovr (subras, Memr[temp], nlines * ncols)
 
 	# Allocate the working storage needed by EZSRFC.
-	call malloc (work, 2 * ncols * nlines + ncols + nlines, TY_REAL)
+	call malloc (work, 2 * (2 * ncols * nlines + ncols + nlines), TY_REAL)
 
 	# Take off floor and ceiling if enabled (nonzero).
 	call dp_slimits (Memr[temp], ncols, nlines, floor, ceiling)

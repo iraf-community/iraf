@@ -38,7 +38,7 @@ define	SGI_DEVNAME	Memi[$1+26]		# name of open device
 	# extra space
 define	SGI_CHARHEIGHT	Memi[$1+30+$2-1]	# character height
 define	SGI_CHARWIDTH 	Memi[$1+40+$2-1]	# character width
-define	SGI_CHARSIZE	Memr[$1+50+$2-1]	# text sizes permitted
+define	SGI_CHARSIZE	Memr[P2R($1+50+$2-1)]	# text sizes permitted
 define	SGI_PLAP	($1+60)			# polyline attributes
 define	SGI_PMAP	($1+64)			# polymarker attributes
 define	SGI_FAAP	($1+68)			# fill area attributes
@@ -68,7 +68,7 @@ define	TX_STATE	Memi[$1]
 define	TX_UP		Memi[$1+1]
 define	TX_SIZE		Memi[$1+2]
 define	TX_PATH		Memi[$1+3]
-define	TX_SPACING	Memr[$1+4]
+define	TX_SPACING	Memr[P2R($1+4)]
 define	TX_HJUSTIFY	Memi[$1+5]
 define	TX_VJUSTIFY	Memi[$1+6]
 define	TX_FONT		Memi[$1+7]

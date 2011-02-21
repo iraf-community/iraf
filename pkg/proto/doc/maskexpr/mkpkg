@@ -1,0 +1,26 @@
+# Make the MSKEXPR and MSKREGIONS tasks
+
+$checkout	libpkg.a	../
+$update		libpkg.a
+$checkin	libpkg.a	../
+$exit
+
+libpkg.a:
+	t_mskexpr.x	<fset.h> <ctype.h> <imhdr.h>
+	memkmask.x	<mach.h> <ctype.h> <imhdr.h> <imset.h> <pmset.h> \
+	                <evvexpr.h>
+
+	t_mskregions.x	<fset.h> <ctype.h> <imhdr.h> <imset.h> <pmset.h>
+	mesetreg.x	<plset.h> <imset.h> 
+	mesetexpr.x
+	meregmask.x	<mach.h> <ctype.h> <imhdr.h> <imset.h> <pmset.h> \
+	                <evvexpr.h>
+	peregfuncs.x	<plset.h> <plio.h> <math.h> peregfuncs.h
+	peregufcn.x	<plset.h> <plio.h> <math.h> peregfuncs.h
+	megeom.x	<math.h>
+
+	meregfuncs.x	<mach.h> <ctype.h> <math.h>
+	mskexpand.x	<ctotok.h> <ctype.h> gettok.h
+	megsym.x	<ctotok.h> <ctype.h> gettok.h
+        gettok.x        <syserr.h> <error.h> <fset.h> <ctype.h> gettok.h
+	;

@@ -2,6 +2,8 @@
  */
 
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include <ctype.h>
 
 #define	NOKNET
@@ -53,19 +55,26 @@ struct mtpos {
 #define MF_EOR  0010    /* a record advance occurred in the last operation */
 
 static	int ftype;
-static	int acmode;
+static	XINT acmode;
 static	int ateof;
-static	long offset = 0;
+static	XLONG offset = 0;
+
+static  int os_mtname (char *fname, char *osdev);
+
 
 
 /* TAPE_OPEN -- Open the named file, which need not actually be a tape device.
  */
-tape_open (fname, mode)
-char	*fname;		/* file or device to be opened	*/
-int	mode;		/* access mode			*/
+int
+tape_open (
+  char	*fname,		/* file or device to be opened	*/
+  int	mode 		/* access mode			*/
+)
 {
 	PKCHAR	osfn[SZ_PATHNAME+1];
-	int	chan;
+	XINT	chan;
+	extern  char *vfn2osfn();
+
 
 	if (strcmp (fname, "stdin") == 0) {
 	    ftype = TF_STDIN;
@@ -88,7 +97,7 @@ int	mode;		/* access mode			*/
 	    register int *op;
 	    struct  mtpos devpos;
 	    int     nwords = sizeof(devpos) / sizeof(int);
-	    int     newfile = 0;
+	    XINT    newfile = 0;
 	    char    *tapecap = ":np";
 
 	    for (op = (int *)&devpos;  --nwords >= 0;  )
@@ -99,7 +108,8 @@ int	mode;		/* access mode			*/
 	    else
 		acmode = WRITE_ONLY;
 
-	    ZZOPMT (osfn, &acmode, tapecap, &devpos, &newfile, &chan);
+	    ZZOPMT (osfn, &acmode, (PKCHAR *)tapecap, (XINT *)&devpos, 
+		&newfile, &chan);
 
 	} else {
 	    /* Open a binary disk file.
@@ -126,16 +136,16 @@ int	mode;		/* access mode			*/
 
 /* TAPE_CLOSE -- Close a file opened with tape_open.
  */
-tape_close (fd)
-int	fd;
+int
+tape_close (int fd)
 {
 	struct	mtpos devpos;
-	int	status;
+	XINT	x_fd=fd, status;
 
 	if (ftype == TF_BINARY)
-	    ZCLSBF (&fd, &status);
+	    ZCLSBF (&x_fd, &status);
 	else if (ftype == TF_TAPE)
-	    ZZCLMT (&fd, &devpos, &status);
+	    ZZCLMT (&x_fd, (XINT *)&devpos, &status);
 	else
 	    status = XOK;
 
@@ -145,13 +155,15 @@ int	fd;
 
 /* TAPE_READ -- Read from a file opened with tape_open.
  */
-tape_read (fd, buf, maxbytes)
-int	fd;			/* input file		*/
-char	*buf;			/* output buffer	*/
-int	maxbytes;		/* max bytes to read	*/
+int
+tape_read (
+  int	fd,			/* input file		*/
+  char	*buf,			/* output buffer	*/
+  int	maxbytes 		/* max bytes to read	*/
+)
 {
 	struct	mtpos devpos;
-	int	status;
+	XINT	x_fd=fd, x_maxbytes=maxbytes, status;
 
 	if (ateof)
 	    return (0);
@@ -159,13 +171,13 @@ int	maxbytes;		/* max bytes to read	*/
 	if (ftype == TF_STDIN) {
 	    status = read (0, buf, maxbytes);
 	} else if (ftype == TF_BINARY) {
-	    ZARDBF (&fd, (XCHAR *)buf, &maxbytes, &offset);
-	    ZAWTBF (&fd, &status);
+	    ZARDBF (&x_fd, (XCHAR *)buf, &x_maxbytes, &offset);
+	    ZAWTBF (&x_fd, &status);
 	    if (status > 0)
 		offset += status;
 	} else if (ftype == TF_TAPE){
-	    ZZRDMT (&fd, (XCHAR *)buf, &maxbytes, &offset);
-	    ZZWTMT (&fd, &devpos, &status);
+	    ZZRDMT (&x_fd, (XCHAR *)buf, &x_maxbytes, &offset);
+	    ZZWTMT (&x_fd, (XINT *)&devpos, &status);
 	    if (devpos.pflags & MF_EOF)
 		ateof++;
 	} else
@@ -177,24 +189,26 @@ int	maxbytes;		/* max bytes to read	*/
 
 /* TAPE_WRITE -- Write to a file opened with tape_open.
  */
-tape_write (fd, buf, nbytes)
-int	fd;			/* output file		*/
-char	*buf;			/* input bufferr	*/
-int	nbytes;			/* nbytes to write	*/
+int
+tape_write (
+  int	fd,			/* output file		*/
+  char	*buf,			/* input bufferr	*/
+  int	nbytes 			/* nbytes to write	*/
+)
 {
 	struct	mtpos devpos;
-	int	status;
+	XINT	x_fd=fd, x_nbytes=nbytes, status;
 
 	if (ftype == TF_STDOUT) {
 	    status = write (1, buf, nbytes);
 	} else if (ftype == TF_BINARY) {
-	    ZAWRBF (&fd, (XCHAR *)buf, &nbytes, &offset);
-	    ZAWTBF (&fd, &status);
+	    ZAWRBF (&x_fd, (XCHAR *)buf, &x_nbytes, &offset);
+	    ZAWTBF (&x_fd, &status);
 	    if (status > 0)
 		offset += status;
 	} else if (ftype == TF_TAPE) {
-	    ZZWRMT (&fd, (XCHAR *)buf, &nbytes, &offset);
-	    ZZWTMT (&fd, &devpos, &status);
+	    ZZWRMT (&x_fd, (XCHAR *)buf, &x_nbytes, &offset);
+	    ZZWTMT (&x_fd, (XINT *)&devpos, &status);
 	} else
 	    status = XERR;
 
@@ -206,13 +220,16 @@ int	nbytes;			/* nbytes to write	*/
  * device or something else.  A nonzero return indicates that the device
  * is a tape.
  */
-os_mtname (fname, osdev)
-char	*fname;		/* filename e.g., "foo.tar" or "mua0:". */
-char	*osdev;		/* receives host system drive name */
+static int
+os_mtname (
+  char	*fname,		/* filename e.g., "foo.tar" or "mua0:". */
+  char	*osdev 		/* receives host system drive name */
+)
 {
+#ifdef VMS
 	register char	*ip;
 	char	drive[SZ_FNAME+1];
-	char	*strchr();
+#endif
 
 	/* Ignore any "mt." prefix.  This is for backwards compatibility,
 	 * to permit old-style names like "mt.MUA0:".

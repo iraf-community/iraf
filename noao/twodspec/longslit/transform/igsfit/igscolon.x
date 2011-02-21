@@ -81,7 +81,9 @@ begin
 	    if (nscan() == 1) {
 		call printf ("xorder %d\n")
 		    call pargi (xorder)
-	    } else
+	    } else if (ival < 2)
+		call printf ("xorder must be at least 2\n")
+	    else
 		xorder = ival
 
 	case YORDER: # yorder: List or set the function order.
@@ -89,7 +91,9 @@ begin
 	    if (nscan() == 1) {
 		call printf ("yorder %d\n")
 		    call pargi (yorder)
-	    } else
+	    } else if (ival < 2)
+		call printf ("yorder must be at least 2\n")
+	    else
 		yorder = ival
 	case CORNERS: # corners: List coordinates at corners.
 	    call printf ("(%d,%d)=%g (%d,%d)=%g (%d,%d)=%g (%d,%d)=%g\n")

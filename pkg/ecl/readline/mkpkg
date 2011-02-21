@@ -6,22 +6,33 @@ $exit
 libs:
 	$ifnfile (../libreadline.a)
 	    $ifeq (IRAFARCH, macosx) then
-	        !(set IRAFARCH=macosx  ; ./configure --disable-dynamic --enable-static |& tee spool)
-	        !make libreadline.a >>& spool
+	        !(./configure --disable-dynamic --enable-static CFLAGS="-arch ppc -arch i386")
+	        !make libreadline.a >& spool
 	        !cp libreadline.a ../ 
 	    $else $ifeq (IRAFARCH, macintel) then
-	        !(set IRAFARCH=macintel  ; ./configure --disable-dynamic --enable-static |& tee spool)
-	        !make libreadline.a >>& spool
+	        !(./configure --disable-dynamic --enable-static)
+	        !make libreadline.a >& spool
+	        !cp libreadline.a ../ 
+	    $else $ifeq (IRAFARCH, linux) then
+	        !(./configure --disable-dynamic --enable-static CFLAGS="-m32")
+	        !make libreadline.a >& spool
+	        !cp libreadline.a ../ 
+	    $else $ifeq (IRAFARCH, freebsd) then
+	        !(./configure --disable-dynamic --enable-static CFLAGS="-m32")
+	        !make libreadline.a >& spool
 	        !cp libreadline.a ../ 
 	    $else
-	        !./configure --disable-dynamic --enable-static >& spool
-	        !make libreadline.a >>& spool
+	        !(./configure --disable-dynamic --enable-static)
+	        !make libreadline.a >& spool
 	        !cp libreadline.a ../ 
 	    $endif
+	    !make clean
+	    !rm Makefile spool
 	$endif
 	;
 
 clean:
 	!make clean
+	!rm Makefile spool
 	;
 

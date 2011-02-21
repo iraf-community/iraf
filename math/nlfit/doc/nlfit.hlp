@@ -46,7 +46,7 @@ the fit is significantly greater than 1.
 Error code for the fit. The options are DONE, SINGULAR,
 NO_DEG_FREEDOM and NOT_DONE. If ier = SINGULAR, the numerical routines
 will compute a
-solution but one or more of the coefficents will be
+solution but one or more of the coefficients will be
 zero. If ier = NO_DEG_FREEDOM, there were too few data points to solve the
 matrix equations and the routine returns without fitting the data.
 If ier = NOT_DONE, the fit could not achieve the desired tolerance with

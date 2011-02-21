@@ -21,7 +21,7 @@ First and second zero frames (zero length dark exposures).
 .ls section = ""
 The selected image section for the statistics.  This should be chosen
 to exclude bad columns or rows, cosmic rays and other blemishes, and
-the overscan region.  The flat field illumination should be constant
+the overscan region.  The flat field iillumination should be constant
 over this section.
 .le
 .ls center = "mean"

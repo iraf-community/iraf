@@ -23,6 +23,8 @@
 #include "task.h"
 #include "errs.h"
 #include "mem.h"
+#include "proto.h"
+
 
 #define CLDIR	"cl$"
 #define HOSTLIB "hlib$"
@@ -62,7 +64,7 @@ static	long *jumpcom;		/* IRAF Main setjmp/longjmp buffer	*/
 static	jmp_buf jmp_save;	/* save IRAF Main jump vector		*/
 static	jmp_buf jmp_clexit;	/* clexit() jumps here			*/
 static	int intr_sp;		/* interrupt save stack pointer		*/
-static	int intr_save[LEN_INTRSTK];	/* the interrupt save stack	*/
+static	XINT intr_save[LEN_INTRSTK];	/* the interrupt save stack	*/
 memel	cl_dictbuf[DICTSIZE];	/* the dictionary area			*/
 
 jmp_buf errenv;			/* cl_error() jumps here		*/
@@ -79,10 +81,13 @@ int	errorline;		/* error line being recovered		*/
 long	cpustart, clkstart;	/* starting cpu, clock times if bkg	*/
 int	logout_status = 0;	/* optional status arg to logout() 	*/
 
-static void execute();
-static	void login(), logout();
-static	void startup(), shutdown();
+static  void execute();
+static  void login(), logout();
+static  void startup(), shutdown();
+static  char *file_concat (char  *in1, char  *in2);
 
+	
+static  char *tmpfile = NULL;
 extern	char epar_cmdbuf[];
 
 
@@ -96,7 +101,7 @@ int	*prtype;		/* process type (connected, detached)	*/
 PKCHAR	*bkgfile;		/* bkgfile filename if detached		*/
 PKCHAR	*cmd;			/* host command line			*/
 {
-	int	bp;
+	XINT	bp;
 
 	/* Save the setjmp vector of the IRAF Main for restoration at clexit
 	 * time.  We need to intercept all errors and do error recovery
@@ -138,7 +143,7 @@ exit_:
 	 * This is ugly, but the real problem is the jump vectors.  There
 	 * seems to be no alternative to this sort of thing...
 	 */
-	cl_amovi ((int *)jmp_save, jumpcom, LEN_JUMPBUF);
+	cl_amovi ((int *)jmp_save, (int *)jumpcom, LEN_JUMPBUF);
 	return (PR_EXIT | (logout_status << 1));
 }
 
@@ -146,7 +151,8 @@ exit_:
 /* CLEXIT -- Called on fatal error from error() when get an error so bad that we
  * should commit suicide.
  */
-clexit()
+int 
+clexit (void)
 {
 	longjmp (jmp_clexit, 1);
 }
@@ -154,7 +160,8 @@ clexit()
 
 /* CLSHUTDOWN -- Public entry for shutdown.
  */
-clshutdown()
+int 
+clshutdown (void)
 {
 	shutdown();
 }
@@ -181,8 +188,8 @@ clshutdown()
  *   The only alternative would be to use indices rather than pointers in
  *   the dictionary, which is not what C likes to do.
  */
-static void
-startup()
+static void 
+startup (void)
 {
 	int	onint(), onipc();
 
@@ -217,8 +224,8 @@ startup()
  * Don't bother with restor'ing if BATCH since we don't want to write out
  *   anything then anyway.
  */
-static void
-shutdown()
+static void 
+shutdown (void)
 {
 	float	cpu, clk;
 
@@ -239,6 +246,11 @@ shutdown()
 	    restor (firstask);
 	}
 
+	/* Clean up and temp file created for startup.
+	*/
+	if (tmpfile)				
+	    c_delete (tmpfile);
+
 	yy_startblock (LOG);			/* flush and close log	*/
 	close_logfile (logfile());
 	clexit();
@@ -250,12 +262,11 @@ shutdown()
  * mode, we skip the preliminaries and jump right in and interpret the
  * compiled code.
  */
-static void
-execute (mode)
-int	mode;
+static void 
+execute (int mode)
 {
 	int	parsestat;
-	int	old_parhead;
+	XINT	old_parhead;
 	char	*curcmd();
 	extern  char *onerr_handler;
 
@@ -359,21 +370,31 @@ bkg:
  * Add the builtin function ltasks.  Run the startup file as the stdin of cl.
  * If any of this fails, we die.
  */
-static void
-login (cmd)
-char *cmd;
+static void 
+login (char *cmd)
 { 
 	register struct task *tp;
-	register char *ip, *op;
+	register char *ip, *op, *arg;
 	register struct param *pp;
 	struct	ltask *ltp;
 	struct	operand o;
 	char	*loginfile = LOGINFILE;
 	char	alt_loginfile[SZ_PATHNAME];
+	char	init_envfile[SZ_PATHNAME];
 	char	clstartup[SZ_PATHNAME];
 	char	clprocess[SZ_PATHNAME];
         char 	ebuf[FAKEPARAMLEN];
-	char	*arglist;
+	char	arglist[SZ_LINE], *ap;
+
+
+	/* Initialize.
+	*/
+	memset (alt_loginfile, 0, SZ_PATHNAME);
+	memset (init_envfile, 0, SZ_PATHNAME);
+	memset (clstartup, 0, SZ_PATHNAME);
+	memset (clprocess, 0, SZ_PATHNAME);
+	memset (arglist, 0, SZ_LINE);
+	memset (ebuf, 0, FAKEPARAMLEN);
 
 	strcpy (clstartup, HOSTLIB);
 	strcat (clstartup, CLSTARTUP);
@@ -403,11 +424,6 @@ char *cmd;
 
 	/* Initialize the input buffers.  */
 	strcpy (epar_cmdbuf, "");
-/*
-#ifdef USE_READLINE
-	using_history ();
-#endif
-*/
 
 	/* Make first ltask.
 	 */
@@ -462,21 +478,29 @@ char *cmd;
 	/* Nondestructively decompose the host command line into the startup
 	 * filename and/or the argument string.
 	 */
-	if (strncmp (cmd, "-f", 2) == 0) {
-	    for (ip=cmd+2;  *ip && isspace(*ip);  ip++)
-		;
-	    for (op=alt_loginfile;  *ip && ! isspace(*ip);  *op++ = *ip++)
-		;
-	    *op = EOS;
-
-	    for (  ;  *ip && isspace(*ip);  ip++)
-		;
-	    arglist = ip;
-
-	} else {
-	    *alt_loginfile = EOS;
-	    arglist = cmd;
+	ap = &arglist[0];
+	arg = cmd;
+	while ( *arg ) {
+	    if (strncmp (arg, "-i ", 3) == 0) {
+	        for (ip=arg+2;  *ip && isspace(*ip);  ip++) ;
+	        for (op=init_envfile;  *ip && *ip != ' ';  *op++ = *ip++) ;
+	        *op = EOS;
+	        for (  ;  *ip && isspace(*ip);  ip++) ;
+	        arg = ip;
+	    } else if (strncmp (arg, "-f ", 3) == 0) {
+	        for (ip=arg+2;  *ip && isspace(*ip);  ip++) ;
+	        for (op=alt_loginfile;  *ip && *ip != ' ';  *op++ = *ip++) ;
+	        *op = EOS;
+	        for (  ;  *ip && isspace(*ip);  ip++) ;
+	        arg = ip;
+	    } else {
+		while (*arg && *arg != ' ')
+		    *ap++ = *arg++;
+		if (*arg == ' ') 
+		    *ap++ = *arg++;
+	    }
 	}
+
 
 	/* Copy any user supplied host command line arguments into the
 	 * CL parameter $args to use in the startup script (for instance).
@@ -486,16 +510,22 @@ char *cmd;
 	compile (PUSHCONST, &o);
 	compile (ASSIGN, "args");
 
-	if (alt_loginfile[0]) {
-	    if (c_access (alt_loginfile,0,0) == NO)
-		printf ("Warning: script file %s not found\n", alt_loginfile);
-	    else {
-		o.o_val.v_s = alt_loginfile;
-		compile (CALL, "cl");
-		compile (PUSHCONST, &o);
-		compile (REDIRIN);
-		compile (EXEC);
-	    }
+	if (alt_loginfile[0] || init_envfile[0]) {
+	    if (init_envfile[0] && (c_access (init_envfile,0,0) == YES)) {
+		/*  Concatentate init and login files. 
+		 */
+		tmpfile = file_concat (init_envfile, alt_loginfile);
+		o.o_val.v_s = tmpfile;
+
+	    } else
+		o.o_val.v_s = alt_loginfile; 	/* no init, use alt */
+
+	    /* Execute the file.
+	    */
+	    compile (CALL, "cl");
+	    compile (PUSHCONST, &o);
+	    compile (REDIRIN);
+	    compile (EXEC);
 
 	} else if (c_access (loginfile,0,0) == NO) {
 	    printf ("Warning: no login.cl found in login directory\n");
@@ -507,7 +537,6 @@ char *cmd;
 	    compile (REDIRIN);
 	    compile (EXEC);
 	}
-
 
 	/* Initialize the fake error params.
 	 */
@@ -539,13 +568,52 @@ char *cmd;
 }
 
 
+/*  FILE_CONCAT -- Concatenate two files to a temporary output file.  Return
+ *  the name of the output file created.
+ */
+static char *
+file_concat (char  *in1, char  *in2)
+{
+	FILE *fd1, *fd2, *out;
+	static char *tmpfile, buf[SZ_LINE];
+
+
+	strcpy (buf, "/tmp/envcl");
+	tmpfile = mktemp (buf);
+	if (c_access (tmpfile, 0, 0) == YES)
+	    c_delete (tmpfile);
+	if ((out = fopen (tmpfile, "wt")) == NULL)
+	    printf ("Warning: tmp output file '%s' not found\n", tmpfile);
+
+
+	if (c_access (in1, 0, 0) == YES) {
+	    if ((fd1 = fopen (in1, "rt")) == NULL)
+	        printf ("Warning: file1 '%s' not found\n", in1);
+	    while (fgets (buf, SZ_LINE, fd1))
+	        fputs (buf, out);
+	    fclose (fd1);
+	}
+
+	if (c_access (in2, 0, 0) == YES) {
+	    if ((fd2 = fopen (in2, "rt")) == NULL)
+	        printf ("Warning: file2 '%s' not found\n", in2);
+	    while (fgets (buf, SZ_LINE, fd2))
+	        fputs (buf, out);
+	    fclose (fd2);
+	}
+
+	fclose (out);
+	return (tmpfile);
+}
+
+
 /* LOGOUT -- Process the system logout file.  Called when the user logs
  * off in an interactive CL (not called by bkg cl's).  The standard input
  * of the CL is hooked to the system logout file and when the eof of the
  * logout file is seen the CL really does exit.
  */
-static void
-logout ()
+static void 
+logout (void)
 { 
 	register struct task *tp;
 	char	logoutfile[SZ_PATHNAME];
@@ -571,8 +639,9 @@ logout ()
  * is fixed in size, abort if the dictionary overflows.
  */
 char *
-memneed (incr)
-int	incr;		/* amount of space desired in ints, not bytes	*/
+memneed (
+    int incr		/* amount of space desired in ints, not bytes	*/
+)
 {
 	memel *old;
 
@@ -602,9 +671,11 @@ int	incr;		/* amount of space desired in ints, not bytes	*/
  *   before shutting down.
  */
 /* ARGSUSED */
-onint (vex, next_handler)
-int	*vex;			/* virtual exception code	*/
-int	(**next_handler)();	/* next handler to be called	*/
+int 
+onint (
+    int *vex,			/* virtual exception code	*/
+    int (**next_handler)(void)	/* next handler to be called	*/
+)
 {
 	if (firstask->t_flags & T_BATCH) {
 	    /* Batch task.
@@ -661,20 +732,25 @@ int	(**next_handler)();	/* next handler to be called	*/
 /* INTR_DISABLE -- Disable interrupts, e.g., to protect a critical section
  * of code.
  */
-intr_disable()
+int 
+intr_disable (void)
 {
+	PFI	junk;
+
 	if (intr_sp >= LEN_INTRSTK)
 	    cl_error (E_IERR, "interrupt save stack overflow");
-	c_xwhen (X_INT, X_IGNORE, &intr_save[intr_sp++]);
+	c_xwhen (X_INT, X_IGNORE, &junk);
+	intr_save[intr_sp++] = (XINT) junk;
 }
 
 
 /* INTR_ENABLE -- Reenable interrupts, reposting the interrupt vector saved
  * in a prior call to INTR_DISABLE.
  */
-intr_enable()
+int 
+intr_enable (void)
 {
-	int	junk;
+	PFI	junk;
 
 	if (--intr_sp < 0)
 	    cl_error (E_IERR, "interrupt save stack underflow");
@@ -685,9 +761,10 @@ intr_enable()
 /* INTR_RESET -- Post the interrupt handler and clear the interrupt vector
  * save stack.
  */
-intr_reset()
+int 
+intr_reset (void)
 {
-	int	junk;
+	PFI	junk;
 	int	onint();
 
 	c_xwhen (X_INT, onint, &junk);
@@ -703,7 +780,8 @@ intr_reset()
  * the system and call cl_error() which eventually does a longjmp back to
  * the errenv in execute().
  */
-onerr()
+int 
+onerr (void)
 {
 	char	errmsg[SZ_LINE];
 	extern	int do_error;
@@ -722,10 +800,8 @@ onerr()
 
 /* CL_AMOVI -- Copy an integer sized block of memory.
  */
-cl_amovi (ip, op, len)
-register int	*ip;
-register int	*op;
-register int	len;
+int 
+cl_amovi (register int *ip, register int *op, register int len)
 {
 	while (--len)
 	    *op++ = *ip++;

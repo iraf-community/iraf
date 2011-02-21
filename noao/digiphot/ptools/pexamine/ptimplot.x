@@ -298,7 +298,7 @@ begin
 
 	angh = clgetr ("surfplot.angh")
 	angv = clgetr ("surfplot.angv")
-	call salloc (work, 2*nx*ny+nx+ny, TY_REAL)
+	call salloc (work, 2 * (2*nx*ny+nx+ny), TY_REAL)
 	call ezsrfc (Memr[sdata], nx, ny, angh, angv, Memr[work])
 
 	if (clgetb ("surfplot.axes")) {

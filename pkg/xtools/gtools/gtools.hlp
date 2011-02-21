@@ -9,7 +9,7 @@ package.  The graphics tools control labeling and titling of graphs and
 interactive formatting.  The user changes the defaults via colon commands
 and with cursor keys.  The windowing options are usually entered with the
 'w' key from an application program but other keys may be used instead.
-Not all of the formating options may be available in a particular
+Not all of the formatting options may be available in a particular
 application; for example the graph type and mark type options.  Check the
 documentation for the application program.  Some applications set the
 values every time the graph is redraw so any user changes will be

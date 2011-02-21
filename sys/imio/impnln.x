@@ -18,7 +18,7 @@ long	v[IM_MAXDIM]			# loop counter
 int	dtype				# eventual datatype of pixels
 
 long	lineoff, line, band, offset
-int	dim, ndim, junk, sz_pixel, fd, nchars, pixtype
+int	dim, ndim, junk, sz_pixel, sz_dtype, fd, nchars, pixtype
 long	vs[IM_MAXDIM], ve[IM_MAXDIM], unit_v[IM_MAXDIM], npix
 
 int	imloop()
@@ -27,7 +27,9 @@ errchk	imgobf, fwritep, imerr, imopsf
 define	retry_ 91
 define	oob_ 92
 define	misaligned_ 93
-include	<szdtype.inc>
+
+int	sizeof()
+include	<szpixtype.inc>
 data	unit_v /IM_MAXDIM * 1/
 
 begin
@@ -37,7 +39,8 @@ begin
 
 	npix = IM_LEN(im,1)			# write entire line
 	pixtype = IM_PIXTYPE(im)
-	sz_pixel = ty_size[pixtype]
+	sz_pixel = pix_size[pixtype]
+	sz_dtype = sizeof(pixtype)
 
 	# Perform "zero trip" check (V >= VE), before entering "loop".
 	if (v[ndim] > IM_LEN(im,ndim))

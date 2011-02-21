@@ -330,7 +330,7 @@ The sense of the xshift and yshift definitions is the following.
 .fi
 
 Sier and serror are the sky fitting error code and accompanying error message
-respectively.  Msky, stdev and sskew are the best estimage of the sky value
+respectively.  Msky, stdev and sskew are the best estimate of the sky value
 (per pixel), standard deviation and skew respectively. Nsky and nsrej are
 the number of sky pixels used and the number of sky pixels rejected
 respectively.

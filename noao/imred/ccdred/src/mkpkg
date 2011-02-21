@@ -14,38 +14,13 @@ generic:
 	    $(GEN) proc.gx -o generic/proc.x $endif
         $ifolder (generic/cor.x,  cor.gx)
 	    $(GEN) cor.gx -o generic/cor.x $endif
-
-        $ifolder (generic/icaclip.x, icaclip.gx)
-	    $(GEN) icaclip.gx -o generic/icaclip.x $endif
-        $ifolder (generic/icaverage.x, icaverage.gx)
-	    $(GEN) icaverage.gx -o generic/icaverage.x $endif
-        $ifolder (generic/iccclip.x, iccclip.gx)
-	    $(GEN) iccclip.gx -o generic/iccclip.x $endif
-        $ifolder (generic/icgdata.x, icgdata.gx)
-	    $(GEN) icgdata.gx -o generic/icgdata.x $endif
-        $ifolder (generic/icgrow.x, icgrow.gx)
-	    $(GEN) icgrow.gx -o generic/icgrow.x $endif
-        $ifolder (generic/icmedian.x, icmedian.gx)
-	    $(GEN) icmedian.gx -o generic/icmedian.x $endif
-        $ifolder (generic/icmm.x, icmm.gx)
-	    $(GEN) icmm.gx -o generic/icmm.x $endif
-        $ifolder (generic/icombine.x, icombine.gx)
-	    $(GEN) icombine.gx -o generic/icombine.x $endif
-        $ifolder (generic/icpclip.x, icpclip.gx)
-	    $(GEN) icpclip.gx -o generic/icpclip.x $endif
-        $ifolder (generic/icsclip.x, icsclip.gx)
-	    $(GEN) icsclip.gx -o generic/icsclip.x $endif
-        $ifolder (generic/icsigma.x, icsigma.gx)
-	    $(GEN) icsigma.gx -o generic/icsigma.x $endif
-        $ifolder (generic/icsort.x, icsort.gx)
-	    $(GEN) icsort.gx -o generic/icsort.x $endif
-        $ifolder (generic/icstat.x, icstat.gx)
-	    $(GEN) icstat.gx -o generic/icstat.x $endif
 	;
 
 libpkg.a:
 	$ifeq (USE_GENERIC, yes) $call generic $endif
 	@generic
+
+	@combine
 
 	calimage.x	ccdtypes.h <error.h> <imset.h>
 	ccdcache.x	ccdcache.com ccdcache.h ccdcache.com <imhdr.h>\
@@ -64,14 +39,6 @@ libpkg.a:
 	ccdtypes.x	ccdtypes.h
 	doproc.x	ccdred.h
 	hdrmap.x	hdrmap.com <error.h> <syserr.h>
-	icimstack.x	<error.h> <imhdr.h>
-	iclog.x		icmask.h icombine.com icombine.h <imhdr.h> <imset.h>\
-			<mach.h>
-	icmask.x	icmask.h icombine.com icombine.h icombine.com <imhdr.h>\
-			<pmset.h>
-	icscale.x	icombine.com icombine.h <error.h> <imhdr.h> <imset.h>
-	icsection.x	<ctype.h>
-	icsetout.x	icombine.com <imhdr.h> <mwset.h>
 	readcor.x	<imhdr.h>
 	scancor.x	<imhdr.h> <imset.h>
 	setdark.x	ccdred.h ccdtypes.h <imhdr.h>
@@ -96,8 +63,8 @@ libpkg.a:
 	t_ccdlist.x	ccdtypes.h <error.h> <imhdr.h>
 	t_ccdmask.x	<imhdr.h>
 	t_ccdproc.x	ccdred.h ccdtypes.h <error.h> <imhdr.h>
-	t_combine.x	ccdred.h icombine.com icombine.h <error.h> <imhdr.h>\
-			<mach.h> <syserr.h>
+	t_combine.x	ccdred.h combine/icombine.com combine/icombine.h\
+			<error.h> <imhdr.h> <mach.h> <syserr.h>
 	t_mkfringe.x	ccdred.h <imhdr.h>
 	t_mkillumcor.x	ccdred.h
 	t_mkillumft.x	ccdred.h <imhdr.h>

@@ -31,7 +31,7 @@ be present.
 .ls apreference
 Aperture reference spectrum.  If not specified the apertures are defined
 using the flat field or throughput images.  If only a throughput file
-is used then an aperture reference spectrum must be specifed to define
+is used then an aperture reference spectrum must be specified to define
 the apertures and dimensions of the final response image.
 .le
 .ls response

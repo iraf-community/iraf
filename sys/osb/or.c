@@ -8,8 +8,7 @@
 /* ORI -- Bitwise boolean OR of two integer variables.
  */
 XINT
-ORI (a, b)
-XINT	*a, *b;
+ORI (XINT *a, XINT *b)
 {
 	return (*a | *b);
 }
@@ -18,8 +17,7 @@ XINT	*a, *b;
 /* ORS -- Bitwise boolean OR of two short integer variables.
  */
 XSHORT
-ORS (a, b)
-XSHORT	*a, *b;
+ORS (XSHORT *a, XSHORT *b)
 {
 	return (*a | *b);
 }
@@ -28,8 +26,7 @@ XSHORT	*a, *b;
 /* ORL -- Bitwise boolean OR of two long integer variables.
  */
 XLONG
-ORL (a, b)
-XLONG	*a, *b;
+ORL (XLONG *a, XLONG *b)
 {
 	return (*a | *b);
 }

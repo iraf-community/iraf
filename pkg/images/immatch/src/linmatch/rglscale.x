@@ -303,7 +303,7 @@ begin
 
 	# Move to the next region if current reference region is off the image.
         if (rc1 < 1 || rc1 > nrimcols || rc2 < 1 || rc2 > nrimcols ||
-	    rl1 > nrimlines || rl1 < 1 || rl2 < 1 || rl2 > nrimcols) {
+	    rl1 > nrimlines || rl1 < 1 || rl2 < 1 || rl2 > nrimlines) {
             call rg_lstats (ls, REFIMAGE, Memc[str], SZ_LINE)
             call eprintf (
                 "Reference region %d: %s[%d:%d:%d,%d:%d:%d] is off image.\n")

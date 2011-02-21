@@ -1,0 +1,4 @@
+input,s,a,,,,List of images
+output,f,a,,,,Output image
+reference,f,h,"",,,Optional reference image
+exclude,s,h,"",,,Optional keyword exclusion list

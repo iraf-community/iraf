@@ -62,7 +62,7 @@ Override previous solutions?  If there are previous measurements for a
 particular image vector being identified, because of a previous
 \fBrvidlines\fR or \fBrvreidlines\fR, this parameter selects whether
 to simply skip the reidentification or do a reidentification and
-velocity measurment and overwrite the results in the logfile and database.
+velocity measurement and overwrite the results in the logfile and database.
 .le
 
 The following parameters are used for selecting and reidentifying additional

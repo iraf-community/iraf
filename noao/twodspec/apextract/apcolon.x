@@ -232,13 +232,27 @@ begin
 		    call printf ("center %g")
 		        call pargr (center)
 		    statline = YES
-	        } else {
+	        } else if (all == NO) {
 	            call ap_values (current, Memi[aps], line, apid,
 			apbeam, center, low, high)
 		    iferr (call ap_update (gp, Memi[aps+current-1], line, apid,
 			apbeam, rval, low, high)) {
 			call erract (EA_WARN)
 			statline = YES
+		    }
+	        } else {
+	            call ap_values (current, Memi[aps], line, apid,
+			apbeam, center, low, high)
+		    rval = rval - center
+		    do i = 1, naps {
+			call ap_values (i, Memi[aps], line, apid,
+			    apbeam, center, low, high)
+			center = center + rval
+			iferr (call ap_update (gp, Memi[aps+i-1], line, apid,
+			    apbeam, center, low, high)) {
+			    call erract (EA_WARN)
+			    statline = YES
+			}
 		    }
 	        }
 	    case LOWER: # :lower - Set lower aperture limit

@@ -13,20 +13,27 @@
 
 #define	PREFIX		".."		/* hidden link for protected files */
 
+static int chk_prot (char *fname, char *link_name);
+
+
 /* ZFPROT -- Protect a file from accidental deletion.  In UNIX, this is
  * done by making another link to the file.  If ZFPROT is directed to protect
  * a file, and the file is already protected, the call is ignored.  Similarly,
  * if ZFPROT is directed to remove protection, and the file is not protected,
  * the call is ignored.
  */
-ZFPROT (fname, action, status)
-PKCHAR	*fname;
-XINT	*action, *status;
+int
+ZFPROT (
+  PKCHAR  *fname,
+  XINT	  *action, 
+  XINT    *status
+)
 {
 	register char	*p;
 	char	link_name[SZ_PATHNAME];
 	int	first, link(), chk_prot();
 	char	*strrchr();
+
 
 	/* Build up name of link file: "dir/..fname".  This is done by copying
 	 * fname to the filename buffer of the link file and truncating the
@@ -45,7 +52,7 @@ XINT	*action, *status;
 	strcat (link_name, &((char *)fname)[first]);
 
 	if (access ((char *)fname, 0) == ERR)
-	    return (*status = XERR);
+	    return ((*status = XERR));
 
 	switch (*action) {
 	case REMOVE_PROTECTION:
@@ -55,7 +62,7 @@ XINT	*action, *status;
 		*status = XERR;
 	    else 
 		*status = XOK;
-	    return;
+	    return (*status);
 
 	case SET_PROTECTION:
 	    *status = XOK;
@@ -64,19 +71,19 @@ XINT	*action, *status;
 		if (link ((char *)fname, link_name) == ERR)
 		    *status = XERR;
 	    }
-	    return;
+	    return (*status);
 
 	default:
 	    *status = chk_prot ((char *)fname, link_name);
-	    return;
+	    return (*status);
 	}
 }
 
 
 /* CHK_PROT -- Determine whether or not a file is protected.
  */
-chk_prot (fname, link_name)
-char	*fname, *link_name;
+static int
+chk_prot (char *fname, char *link_name)
 {
 	int	access();
 	struct	stat file1, file2;

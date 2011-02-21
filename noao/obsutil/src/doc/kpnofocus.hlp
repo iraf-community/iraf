@@ -168,7 +168,7 @@ focus is shown along with a magnitude weighted, parabolic
 interpolated estimate for the best focus.  One may delete bad points
 with the cursor 'd' key.  To exit and record the results to
 a logfile use the 'q' key.  There are many graphical display
-options for more sopisticated analysis such as variations with
+options for more sophisticated analysis such as variations with
 position.  The best thing to do is to try the various keystroke
 commands given in the CURSOR section.  For details about
 the various plots see the \fBstarfocus\fR help.

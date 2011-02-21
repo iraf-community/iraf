@@ -47,7 +47,7 @@ convert from air to vacuum, and "vac2air" to convert from vacuum
 to air.
 .le
 .ls t = 15, p = 760, f = 4
-Temperture t in degrees C, pressure p in mmHg, and water vapour pressure f
+Temperature t in degrees C, pressure p in mmHg, and water vapour pressure f
 in mmHg for the air index of refraction.
 .le
 

@@ -2,19 +2,19 @@
 
 define	LEN_STARFIND (15)
 
-define	SF_HWHMPSF	Memr[$1]	# HWHM of the PSF in pixels
-define	SF_FRADIUS	Memr[$1+1]	# Fitting radius in HWHM
-define	SF_DATAMIN	Memr[$1+2]	# Minimum good data limit in ADU
-define	SF_DATAMAX	Memr[$1+3]	# Maximum good data limit in ADU
-define	SF_THRESHOLD	Memr[$1+4]	# Detection threshold in ADU
-define	SF_SEPMIN	Memr[$1+5]	# Minimum separation in HWHM
-define	SF_SHARPLO	Memr[$1+6]	# Lower sharpness limit
-define	SF_SHARPHI	Memr[$1+7]	# Upper sharpness limit
-define	SF_ROUNDLO	Memr[$1+8]	# Lower roundness limit
-define	SF_ROUNDHI	Memr[$1+9]	# Upper roundness limit
-define	SF_MAGLO	Memr[$1+10]	# Lower magnitude limit
-define	SF_MAGHI	Memr[$1+11]	# Upper magnitude limit
-define	SF_NPIXMIN	Memi[$1+12]	# Minimum pixels above  threshold
+define	SF_HWHMPSF	Memr[P2R($1)]	 # HWHM of the PSF in pixels
+define	SF_FRADIUS	Memr[P2R($1+1)]	 # Fitting radius in HWHM
+define	SF_DATAMIN	Memr[P2R($1+2)]	 # Minimum good data limit in ADU
+define	SF_DATAMAX	Memr[P2R($1+3)]	 # Maximum good data limit in ADU
+define	SF_THRESHOLD	Memr[P2R($1+4)]	 # Detection threshold in ADU
+define	SF_SEPMIN	Memr[P2R($1+5)]	 # Minimum separation in HWHM
+define	SF_SHARPLO	Memr[P2R($1+6)]	 # Lower sharpness limit
+define	SF_SHARPHI	Memr[P2R($1+7)]	 # Upper sharpness limit
+define	SF_ROUNDLO	Memr[P2R($1+8)]	 # Lower roundness limit
+define	SF_ROUNDHI	Memr[P2R($1+9)]	 # Upper roundness limit
+define	SF_MAGLO	Memr[P2R($1+10)] # Lower magnitude limit
+define	SF_MAGHI	Memr[P2R($1+11)] # Upper magnitude limit
+define	SF_NPIXMIN	Memi[$1+12]	 # Minimum pixels above  threshold
 
 
 # default values

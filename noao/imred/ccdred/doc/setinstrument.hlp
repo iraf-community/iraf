@@ -29,7 +29,7 @@ Parameter query if initial instrument is not found.
 DESCRIPTION
 The purpose of the task is to allow the user to easily set default
 parameters for a new instrument.  The default parameters are generally
-defined by support personel in an instrument directory for a particular
+defined by support personal in an instrument directory for a particular
 site.  The instrument directory is the concatenation of the specified
 directory and the site.  For example if the directory is "ccddb$" and
 the site is "kpno" then the instrument directory is "ccddb$kpno/".

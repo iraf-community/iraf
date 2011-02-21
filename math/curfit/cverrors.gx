@@ -8,7 +8,7 @@ $else
 include "dcurfitdef.h"
 $endif
 
-define	COV	Mem$t[$1]	# element of COV
+define	COV	Mem$t[P2P($1)]	# element of COV
 
 # CVERRORS -- Procedure to calculate the reduced chi-squared of the fit
 # and the standard deviations of the coefficients. First the variance

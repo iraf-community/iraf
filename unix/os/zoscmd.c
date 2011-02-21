@@ -33,10 +33,14 @@ extern	int pr_onint();
  * system.  If nonnull stdout or stderr filenames are given, try to spool
  * the output in these files.
  */
-ZOSCMD (oscmd, stdin_file, stdout_file, stderr_file, status)
-PKCHAR	*oscmd;
-PKCHAR	*stdin_file, *stdout_file, *stderr_file;
-XINT	*status;
+int
+ZOSCMD (
+  PKCHAR  *oscmd,
+  PKCHAR  *stdin_file, 
+  PKCHAR  *stdout_file, 
+  PKCHAR  *stderr_file,
+  XINT	  *status
+)
 {
 	char	*shell, *sh = "/bin/sh";
 	char	*sin, *sout, *serr, *cmd;
@@ -48,6 +52,9 @@ XINT	*status;
 #else
 	SIGFUNC	old_sigint;
 #endif
+
+	extern  int _u_fmode();
+
 
 	cmd  = (char *)oscmd;
 	sin  = (char *)stdin_file;
@@ -185,6 +192,8 @@ XINT	*status;
 #else
 	signal (SIGINT, old_sigint);
 #endif
+
+	return (XOK);
 }
 
 
@@ -192,11 +201,15 @@ XINT	*status;
  * interrupted, post a flag to indicate this to ZOSCMD when the pr_wait()
  * returns.
  */
-pr_onint (usig, hwcode, scp)
-int	usig;				/* SIGINT, SIGFPE, etc.		*/
-int	*hwcode;			/* not used */
-int	*scp;				/* not used */
+int
+pr_onint (
+  int	usig,				/* SIGINT, SIGFPE, etc.		*/
+  int	*hwcode,			/* not used */
+  int	*scp 				/* not used */
+)
 {
 	lastsig = usig;
 	/* return to wait() */
+
+	return (XOK);
 }

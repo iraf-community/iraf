@@ -60,7 +60,7 @@ system is used to transform from the input coordinate system to the "logical"
 pixel coordinate system used internally, from the internal logical system to
 the PSF model system, and from the internal "logical" pixel coordinate system
 to the output coordinate system. The input coordinate system options are
-"logical", tv", "physical", and "world". The PSF model and output coordinate
+"logical", "tv", "physical", and "world". The PSF model and output coordinate
 system options are "logical", "tv", and "physical". The image cursor coordinate
 system is assumed to be the "tv" system.
 .ls logical

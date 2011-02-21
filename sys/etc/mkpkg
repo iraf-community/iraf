@@ -12,6 +12,12 @@ generic:
 	$ifolder (gen/miiwritei.x, miiwrite.gx)
 		$generic -k -p gen/ -t silrd miiwrite.gx
 	$endif
+	$ifolder (gen/nmireadi.x, nmiread.gx) 
+		$generic -k -p gen/ -t silrd nmiread.gx
+	$endif
+	$ifolder (gen/nmiwritei.x, nmiwrite.gx)
+		$generic -k -p gen/ -t silrd nmiwrite.gx
+	$endif
 	;
 
 libsys.a:
@@ -57,6 +63,10 @@ libsys.a:
 			<knet.h> <printf.h> <xwhen.h>
 	miireadc.x	<mii.h>
 	miiwritec.x	<mii.h>
+	nmireadb.x	<nmi.h>
+	nmireadc.x	<nmi.h>
+	nmiwriteb.x	<nmi.h>
+	nmiwritec.x	<nmi.h>
 	onentry.x	<clset.h> <error.h> <fset.h> <knet.h>
 	onerror.x	<config.h> <error.h>
 	onexit.x	<config.h> <error.h>

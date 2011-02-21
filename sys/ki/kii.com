@@ -4,7 +4,7 @@
 # size of the packed packet in host ints will only damage the area used by
 # the unpacked packet, causing no harm.
 
-int	p_packet[SZB_PACKET/SZB_CHAR/SZ_INT]	# packed packet
+int	p_packet[SZB_PACKET/SZB_CHAR/SZ_MII_INT]	# packed packet
 
 int	p_opcode		# instruction opcode
 int	p_subcode		# subcode, if device driver

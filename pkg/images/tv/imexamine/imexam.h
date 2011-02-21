@@ -26,22 +26,22 @@ define	IE_NEWFRAME	Memi[$1+13]		# new (current) display frame
 define	IE_NFRAMES	Memi[$1+14]		# number of image frames
 define	IE_ALLFRAMES	Memi[$1+15]		# use all frames for display?
 define	IE_LOGFD	Memi[$1+16]		# log file descriptor
-define	IE_MAGZERO	Memr[$1+17]		# magnitude zero point
-define	IE_XORIGIN	Memr[$1+18]		# X origin
-define	IE_YORIGIN	Memr[$1+19]		# Y origin
+define	IE_MAGZERO	Memr[P2R($1+17)]	# magnitude zero point
+define	IE_XORIGIN	Memr[P2R($1+18)]	# X origin
+define	IE_YORIGIN	Memr[P2R($1+19)]	# Y origin
 define	IE_GTYPE	Memi[$1+20]		# current graph type
-define	IE_X1		Memr[$1+21]		# current graph x1
-define	IE_X2		Memr[$1+22]		# current graph x2
-define	IE_Y1		Memr[$1+23]		# current graph y1
-define	IE_Y2		Memr[$1+24]		# current graph y2
+define	IE_X1		Memr[P2R($1+21)]	# current graph x1
+define	IE_X2		Memr[P2R($1+22)]	# current graph x2
+define	IE_Y1		Memr[P2R($1+23)]	# current graph y1
+define	IE_Y2		Memr[P2R($1+24)]	# current graph y2
 define	IE_IX1		Memi[$1+25]		# image section coordinate
 define	IE_IX2		Memi[$1+26]		# image section coordinate
 define	IE_IY1		Memi[$1+27]		# image section coordinate
 define	IE_IY2		Memi[$1+28]		# image section coordinate
 define	IE_P1		Memi[$1+29]		# Physical axis for logical x
 define	IE_P2		Memi[$1+30]		# Physical axis for logical y
-define	IE_IN		Memr[$1+31+$2-1]	# Input coordinate vector
-define	IE_OUT		Memr[$1+38+$2-1]	# Output coordinate vector
+define	IE_IN		Memr[P2R($1+31)+$2-1]	# Input coordinate vector
+define	IE_OUT		Memr[P2R($1+38)+$2-1]	# Output coordinate vector
 define	IE_WCSDIM	Memi[$1+45]		# WCS dimension
 define	IE_LASTKEY	Memi[$1+46]		# last type of keyed output
 	# (available)

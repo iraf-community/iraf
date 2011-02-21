@@ -28,36 +28,7 @@ setenv TAPE 	     /dev/nrsa0
 setenv SHELL 	     /bin/csh
 
 # Uncomment for IRAF admin/prog definitions.
-if (-f /etc/redhat-release) then
-    if ("`uname -m`" == "ppc") then
-	setenv IRAFARCH linuxppc
-    else
-	setenv IRAFARCH redhat
-    endif
-else if (-f /etc/SuSE-release) then
-    if ("`uname -m`" == "ppc") then
-	setenv IRAFARCH linuxppc
-    else
-	setenv IRAFARCH suse
-    endif
-else if (-f /etc/yellowdog-release || "`uname -m`" == "ppc") then
-    setenv IRAFARCH linuxppc
-else
-    setenv lmach `uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
-    if ("$lmach" == "darwin") then
-        if ("`uname -m`" == "i386") then
-            setenv IRAFARCH macintel
-        else
-	    setenv IRAFARCH macosx
-        endif
-    else if ("$lmach" == "cygwin") then
-	setenv IRAFARCH cygwin
-    else 
-        setenv IRAFARCH `uname -s | tr '[A-Z]' '[a-z]'`
-    endif
-    unsetenv lmach
-endif
-
+#setenv IRAFARCH	    `/iraf/iraf/unix/hlib/irafarch.csh -actual`
 
 # Setup the iraf environment.
 setenv iraf /iraf/iraf/
@@ -69,6 +40,7 @@ foreach f ($iraf/unix/hlib/irafuser.csh ~/.alias)
   unset f
 end
 
+set    prompt  = "iraf> "
 
 # Pick up C-shell definitions.
 #source ~iraf/.cshrc

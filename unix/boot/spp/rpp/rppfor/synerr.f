@@ -65,7 +65,7 @@
       integer i, junk
       integer itoc
       integer of(5)
-      integer errmsg(15)
+      integer errmsg(100)
       data of(1)/32/,of(2)/111/,of(3)/102/,of(4)/32/,of(5)/-2/
       data errmsg(1)/69/,errmsg(2)/114/,errmsg(3)/114/,errmsg(4)/111/,er
      *rmsg(5)/114/,errmsg(6)/32/,errmsg(7)/111/,errmsg(8)/110/,errmsg(9)

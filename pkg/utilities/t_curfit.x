@@ -215,10 +215,11 @@ int	datatype		# Datatype of x and Y values
 int	buflen, n, fd, ncols, lineno
 pointer	sp, lbuf, ip
 
-double	cf_divzd()
 int	getline(), nscan(), open()
-real	cf_divzr()
+real	cf_divzr(), cfz_divzr()
+double	cf_divzd(), cfz_divzd()
 extern	cf_divzr(), cf_divzd()
+extern	cfz_divzr(), cfz_divzd()
 errchk	open, sscan, getline, malloc
 
 begin
@@ -337,18 +338,18 @@ begin
 	case CF_STATISTICAL:
 	    if (datatype == TY_REAL) {
 		call aabsr (Memr[y], Memr[w], n)
-		call arczr (1.0, Memr[w], Memr[w], n, cf_divzr (1.0))
+		call arczr (1.0, Memr[w], Memr[w], n, cf_divzr)
 	    } else {
 		call aabsd (Memd[y], Memd[w], n)
-		call arczd (1.0d0, Memd[w], Memd[w], n, cf_divzd (1.0d0))
+		call arczd (1.0d0, Memd[w], Memd[w], n, cf_divzd)
 	    }
 	case CF_INSTRUMENTAL:
 	    if (datatype == TY_REAL) {
 		call apowkr (Memr[w], 2, Memr[w], n)
-		call arczr (1.0, Memr[w], Memr[w], n, cf_divzr (0.0))
+		call arczr (1.0, Memr[w], Memr[w], n, cfz_divzr)
 	    } else {
 		call apowkd (Memd[w], 2, Memd[w], n)
-		call arczd (1.0d0, Memd[w], Memd[w], n, cf_divzd (0.0d0))
+		call arczd (1.0d0, Memd[w], Memd[w], n, cfz_divzd)
 	    }
 	}
 
@@ -356,6 +357,7 @@ begin
 	call sfree (sp)
 	return (n)
 end
+
 
 # CF_RIMAGE -- Read an image section and compute the projection about
 # one dimension, producing x and y vectors as output.
@@ -419,4 +421,26 @@ double	a	# double precision number number
 
 begin
 	return (a)
+end
+
+
+# CFZ_DIVZR -- Procedure to return a real number in case of a divide by zero.
+
+real procedure cfz_divzr (a)
+
+real	a	# real number
+
+begin
+	return (0.0)
+end
+
+
+# CFZ_DIVZD -- Procedure to return a double number in case of a divide by zero.
+
+double procedure cfz_divzd (a)
+
+double	a	# double precision number number
+
+begin
+	return (0.0d0)
 end

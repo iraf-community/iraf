@@ -78,6 +78,7 @@ do
 		;;
 
 	-f2c)	F2C="$2"
+		#F2C="${iraf}/unix/bin/f2c.e"
 		shift 2
 		;;
 
@@ -88,6 +89,9 @@ do
 	-g)	CFLAGS="$CFLAGS -g"
 		F2CFLAGS="$F2CFLAGS -g"
 		G="-g"
+		shift;;
+
+	-x64)	CFLAGS="$CFLAGS -mfloat64"
 		shift;;
 
 	-I)	CFLAGS="$CFLAGS -I$2"
@@ -121,6 +125,14 @@ do
 
 	-u)	F2CFLAGS="$F2CFLAGS -u"
 		shift
+		;;
+
+	-P)	F2CFLAGS="$F2CFLAGS -P"
+		shift
+		;;
+
+	-FP)	CFLAGS="$CFLAGS -include $2"
+		shift 2
 		;;
 
 	-W*)	CFLAGS="$CFLAGS $1"

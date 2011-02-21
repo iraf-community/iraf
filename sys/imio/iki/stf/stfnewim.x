@@ -22,9 +22,10 @@ long	totpix
 char	pname[SZ_KEYWORD]
 int	old_kernel, pixtype, bitpix, nbytes, pno, ndim, i, j
 errchk	stf_addpar
-int	sizeof()
 string	zero "0"
 string	one  "1"
+
+include <szpixtype.inc>
 
 begin
 	# Get length of axes and datatype from imio descriptor;
@@ -45,7 +46,7 @@ begin
 
 	pixtype = IM_PIXTYPE(im)
 
-	bitpix = sizeof(pixtype) * NBITS_CHAR
+	bitpix = pix_size[pixtype] * NBITS_CHAR
 	nbytes = bitpix / NBITS_BYTE
 
 	call sprintf (STF_DATATYPE(stf), SZ_DATATYPE, "%s*%d")
@@ -140,6 +141,6 @@ begin
 	do i = 2, ndim
 	    totpix = totpix * IM_LEN(im,i)
 
-	STF_SZGROUP(stf) = totpix * sizeof (IM_PIXTYPE(im)) +
+	STF_SZGROUP(stf) = totpix * pix_size[IM_PIXTYPE(im)] +
 	    STF_PSIZE(stf) / (SZB_CHAR * NBITS_BYTE)
 end

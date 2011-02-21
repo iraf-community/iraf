@@ -11,8 +11,8 @@ define	DTYPE	Memi[$1+2]		# Dispersion type
 define	W1	Memd[P2D($1+4)]		# Starting wavelength
 define	DW	Memd[P2D($1+6)]		# Wavelength per pixel
 define	Z	Memd[P2D($1+8)]		# Doppler factor
-define	APLOW	Memr[$1+10]		# Low aperture
-define	APHIGH	Memr[$1+11]		# High aperture
+define	APLOW	Memr[P2R($1+10)]	# Low aperture
+define	APHIGH	Memr[P2R($1+11)]	# High aperture
 define	TITLE	Memc[P2C($1+12)]	# Title
  
  

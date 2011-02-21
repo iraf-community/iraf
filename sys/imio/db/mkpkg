@@ -40,4 +40,5 @@ libex.a:
 	imputl.x	
 	imputr.x	<mach.h>
 	imputs.x	
+	imrenf.x	idb.h <imhdr.h>
 	;

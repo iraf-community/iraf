@@ -1215,10 +1215,10 @@ irmatch2d(3)   proto      Align and intensity match image produced by irmosaic
 irmosaic(3)    proto      Mosaic an ordered list of images onto a grid
 mkfringecor    ccdred     Make fringe correction images from sky images
 mkhistogram    proto      List or plot the histogram of a data stream
-mkillumcor     ccdred     Make flat field illumination correction images
-mkillumflat    ccdred     Make illumination corrected flat fields
+mkillumcor     ccdred     Make flat field iillumination correction images
+mkillumflat    ccdred     Make iillumination corrected flat fields
 mkimage        ccdtest    Make or modify an image with simple values
-mkskycor       ccdred     Make sky illumination correction images
+mkskycor       ccdred     Make sky iillumination correction images
 mkskyflat      ccdred     Make sky corrected flat field images
 mosproc        irred      Prepare images for quick look mosaicing
 msdispcor      msred      Dispersion correct spectra

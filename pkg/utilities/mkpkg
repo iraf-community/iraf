@@ -4,11 +4,15 @@ $call	relink
 $exit
 
 update:
+	@nttools
+
 	$call	relink
 	$call	install
 	;
 
 relink:
+	@nttools
+
 	$set	LIBS = "-lxtools -lcurfit -lbev -lgsurfit"
 
 	$update	libpkg.a

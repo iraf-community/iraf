@@ -9,15 +9,15 @@ define	LEN_TR		9		# Length of structure TR
 
 # The TR transformation descriptor structure.
 
-define	X1		Memr[$1]	# Input origin
-define	Y1		Memr[$1+1]
-define	XSCALE		Memr[$1+2]	# Scale factors
-define	YSCALE		Memr[$1+3]
-define	THETA		Memr[$1+4]	# Rotation angle
-define	X2		Memr[$1+5]	# Output origin
-define	Y2		Memr[$1+6]
-define  COS_THETA	Memr[$1+7]
-define	SIN_THETA	Memr[$1+8]
+define	X1		Memr[P2R($1)]	# Input origin
+define	Y1		Memr[P2R($1+1)]
+define	XSCALE		Memr[P2R($1+2)]	# Scale factors
+define	YSCALE		Memr[P2R($1+3)]
+define	THETA		Memr[P2R($1+4)]	# Rotation angle
+define	X2		Memr[P2R($1+5)]	# Output origin
+define	Y2		Memr[P2R($1+6)]
+define  COS_THETA	Memr[P2R($1+7)]
+define	SIN_THETA	Memr[P2R($1+8)]
 
 
 # LINTRAN -- Performs a linear translation on each element of the

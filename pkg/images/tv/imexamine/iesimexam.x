@@ -135,7 +135,7 @@ begin
 	call srfabd()
 	call ggview (gp, vpx1, vpx2, vpy1, vpy2)
 	call set (vpx1, vpx2, vpy1, vpy2, 1.0, 1024., 1.0, 1024., 1)
-	call salloc (work, 2*nx*ny+nx+ny, TY_REAL)
+	call salloc (work, 2 * (2*nx*ny+nx+ny), TY_REAL)
 	call ezsrfc (Memr[sdata], nx, ny, angh, angv, Memr[work])
 
 	if (mode != APPEND) {

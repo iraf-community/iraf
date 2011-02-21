@@ -4,7 +4,7 @@ include <mach.h>
 
 include "dcurfitdef.h"
 
-define	COV	Memd[$1]	# element of COV
+define	COV	Memd[P2P($1)]	# element of COV
 
 # CVERRORS -- Procedure to calculate the reduced chi-squared of the fit
 # and the standard deviations of the coefficients. First the variance

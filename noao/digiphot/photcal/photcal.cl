@@ -1,20 +1,6 @@
 # Package script task for the PHOTCAL package.
 #{ PHOTCAL package definition
 
-if (! defpac ("tables")) {
-    if (deftask ("tables")) {
-        if (defpar ("tables.motd")) {
-	    tables.motd = no
-	    tables
-        } else {
-            tables
-        }
-    } else {
-        type "photcal$lib/warning.dat"
-    }
-}
-;
-
 
 # Load other packages
 

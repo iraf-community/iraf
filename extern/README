@@ -1,0 +1,183 @@
+
+		  Dynamic External Package Loading
+							
+			 November 2, 2010
+
+
+    Dynamic package loading is a new feature in v2.15 that allows for
+package directories created in the iraf$extern directory to be automatically
+defined when the CL is started.  The means that external package installation
+no longer *requires* that the hlib$extern.pkg file be edited to define the
+package, although that remains an option for packages which somehow cannot
+conform to this new scheme.
+
+
+
+Getting Started
+---------------
+
+    The IRAF v2.15 system is shipped with no defined external packages,
+instead we assume packages will be installed using this new feature.  To
+begin, simply execute the 'configure' script in this directory to create
+the files needed.  For example,
+
+	% ./configure
+
+This will create a local 'manifest' file of packages available form
+the IRAF reposistory and iraf.noao.edu and skeleton directories of
+available packages will be created automatically along with a Makefile
+used to do the actual installation.  THIS STEP IS REQUIRED BEFORE PACKAGE
+INSTALLATION!
+
+    To get a listing of packages that can be installed, or to check
+which installed packages might need to be updated or are newly available,
+use the command:
+
+	% make check
+
+Each listed package may then be installed using a simple 'make' command.
+For packages not on the list, a manual install is still required.
+
+    The external package tree may be initialize to the distribution state
+using the command:
+
+	% make init
+
+Updates to the distribution mechanism itself is done using the command:
+
+	% make self_update
+
+This last command is used to update the system to new features or bug fixes
+that might be available as the mechanism evolves.
+
+
+
+Installing and Updating Packages
+--------------------------------
+
+    External packages may now be installed with a command such as:
+	
+	% make ctio mscred stsdas
+
+Note that dependency packages for each requested package will
+automatically be added to the installation so you do not need to
+necessarily list every package (e.g. you'll get FITSUTIL automatically
+by installing MSCRED).  The next time you login to the CL the requested
+package will be defined.
+
+    To update packages to the latest version, use the command
+
+	% make update
+
+The information about available packages will be updated, then a
+comparison of the timestamps of your installed packages with those on
+the repository will be made.  If newer package versions are available
+they will be updated (along with their depencies) automatically.
+
+    If a binary repository distribution of a package is not available
+at the moment, a 'source only' distribution will be installed and you will
+not a "[SOURCE ONLY]' status from the make command.  The user is then
+responsible for compiling th epackages locally even though the package
+will still be defined for use (but unusable).  Our goal is to provide a
+binary distribution for all available packages we can reasonably support.
+
+
+
+How it Works
+------------
+
+    This scheme relies on IRAF v2.15 changes to the CL login process to
+scan this directory for packages, as well as a server-side respository of
+distribution files suited for this method (see below).  The 'configure'
+script customizes the package information for your platform and creates a
+'Makefile' based on that information.  Subsequent commands update these
+files, however we don't yet provide an automated system for multi-platform
+support.
+
+    The bulk of the work is done using utility scripts found in the
+iraf@util directory and called from the makefile.  The management of the
+repository files is the rsponsibility of the distribution maintainers
+(by default this is NOAO).  Please contact us if you wish to have your
+package added to the system.
+
+
+
+Repositories
+------------
+
+    The default package repository is defined in the $iraf/util/pkgrepo
+script and may be changed to point to a local respository (e.g. a mirror
+site).  It may also be changed by pointing the 'IRAF_REPO' environment
+variable to a new URI source, e.g.
+
+	setenv IRAF_REPO  "ftp://localhost/myrepository"
+
+Of course, a network connection is assumed to exist in most cases.  Local
+repositories may be preferred for faster local access via mirrors, please
+contact us for information on creating one.
+
+
+
+
+==================================
+Server-Side Repository Description
+==================================
+
+
+[The following comes from the README file on the repository]
+
+	This is the IRAF v2.15 distribution repository directory.  Files
+    here are bundled so as to allow them to operate with the dynamic
+    package mechanism or IRAF install procedurs for v2.15. Aside from
+    the repository files themselves, this directory contains
+
+	README		This file REPO.DESC	  A description of
+	each package MK		     Utility script to update repo
+	checksum/manifest
+
+	CHECKSUM	Checksums files on repo tarballs created by MK
+	REPO.MANIFEST	Manifest file
+
+    The MK script is used to generate the CHECKSUMS file and REPO.MANIFEST
+    file automatically, it should be run whenever a package is installed
+    or updated.  The REPO.DESC file is a handcrafted description of the
+    available package, this is important to describing the dependencies
+    of each package.  The MK script is also capable of determining
+    which of the available packages may be used on which platform.
+    For example, a "redhat" package will suffice for both a linux64
+    and linux IRAF system if there is no specific version available.
+    The manifest file created will then list the redhat version as the
+    file to be installed for the linux/linux64 platforms.
+
+	If a binary distribution for a particular package is not provided,
+    the MK script will default to use the source distribution tarball
+    (if available).  On the receiving end the user will then have the
+    option of compiling the package locally.  The reserved <arch> name
+    "universal" is used for script-only packages, or distributions
+    containing binaries for all supported platforms.
+
+	When packages are installed in the IRAF dynamic package tree,
+    both the REPO.MANIFEST and REPO.DESC files are downloaded.	Scripts
+    use these files to build up package lists that are available for a
+    particular platform, as well as which packages are required to be
+    installed to support the requested package. We assume the REPO.DESC
+    file lists full dependencies, e.g. if A requires B, and B requires
+    C the the dependency list for A is both B and C.
+
+
+    The convention for file names is as follows:
+
+		<pkg>-<arch>.tar.gz
+
+    where <pkg> is the package name and <arch> is the iraf architecture.
+
+	For external packages, tarfiles are build at the toplevel, i.e.
+    when unpacked, a subdirectory of the package is created in th current
+    directory.	For IRAF distributions we violate this rule and assume
+    the tarball is built from the $iraf root directory.
+
+    When installing a new package, the REPO.DESC file should be edited
+    and the MK script should be run.
+
+    When installing an update to an existing repo package, or a new
+    architecture version of a package, the MK script should be re-run.

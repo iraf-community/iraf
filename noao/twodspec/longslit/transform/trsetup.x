@@ -428,7 +428,7 @@ real	der[8]			#U Last result as input, new result as output
 real	xmin, xmax, ymin, ymax	#I Limits of coordinate surfaces.
 
 int	i, j, nedge
-real	fudge, du, dv, dx, dy, tmp[4]
+real	fudge, du, dv, dx, dy, a, b, tmp[4]
 
 begin
 	# If using a WCS we let MWCS do the inversion.
@@ -454,9 +454,24 @@ begin
 	do i = 1, MAX_ITERATE {
 	    du = u - der[3]
 	    dv = v - der[6]
-	    dx = (der[8] * du - der[5] * dv) /
-		(der[8] * der[4] - der[5] * der[7])
-	    dy = (dv - der[7] * dx) / der[8]
+	    a = der[8] * du - der[5] * dv
+	    b = der[8] * der[4] - der[5] * der[7]
+	    if (b == 0.) {
+		if (a < 0.)
+		    dx = -2.
+		else
+		    dx = 2.
+	    } else
+	        dx = a / b
+	    a = dv - der[7] * dx
+	    b = der[8]
+	    if (b == 0.) {
+		if (a < 0.)
+		    dy = -2.
+		else
+		    dy = 2.
+	    } else
+	        dy = a / b
 	    fudge = 1 - FUDGE / i
 	    x = der[1] + fudge * dx
 	    y = der[2] + fudge * dy

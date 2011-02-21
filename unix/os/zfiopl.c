@@ -2,6 +2,8 @@
  */
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <ctype.h>
 
 #define	import_kernel
@@ -58,14 +60,21 @@ char	plstr[SZ_PLSTR+1];		/* save zopnpl argument		*/
 int	pltr_inuse = NO;		/* set if plotter is open	*/
 
 
+extern  int ZOPNBF (), ZCLSBF (), ZOSCMD (), ZFDELE (), ZARDBF ();
+extern  int ZAWRBF (), ZAWTBF (), ZSTTBF ();
+
+
+
 /* ZOPNPL -- Open a plotter device for binary file i/o.  If we can talk
  * directly to the plotter, do so, otherwise open a spoolfile which is
  * to be sent to the plotter when ZCLSPL is later called.
  */
-ZOPNPL (plotter, mode, chan)
-PKCHAR	*plotter;		/* plotter device descriptor		*/
-XINT	*mode;			/* file access mode			*/
-XINT	*chan;			/* UNIX file number (output)		*/
+int
+ZOPNPL (
+  PKCHAR  *plotter,		/* plotter device descriptor		*/
+  XINT	  *mode,		/* file access mode			*/
+  XINT	  *chan 		/* UNIX file number (output)		*/
+)
 {
 	register char *ip;
 	static char delim;
@@ -77,7 +86,7 @@ XINT	*chan;			/* UNIX file number (output)		*/
 	 */
 	if (pltr_inuse == YES) {
 	    *chan = XERR;
-	    return;
+	    return (XERR);
 	} else
 	    pltr_inuse = YES;
 	
@@ -114,16 +123,15 @@ XINT	*chan;			/* UNIX file number (output)		*/
 		close (fd);
 	    }
 	
-	ZOPNBF ((PKCHAR *)pltr.spoolfile, mode, chan);
+	return ZOPNBF ((PKCHAR *)pltr.spoolfile, mode, chan);
 }
 
 
 /* ZCLSPL -- To close a plotter we merely close the "spoolfile", and then
  * dispose of the spoolfile to the OS if so indicated.
  */
-ZCLSPL (chan, status)
-XINT	*chan;
-XINT	*status;
+int
+ZCLSPL (XINT *chan, XINT *status)
 {
 	static	PKCHAR	xnullstr[1] = { EOS };
 	register char *ip, *op, *f;
@@ -161,6 +169,8 @@ XINT	*status;
 	    } else
 		ZFDELE ((PKCHAR *)pltr.spoolfile, &junk);
 	}
+
+	return (*status);
 }
 
 
@@ -170,13 +180,15 @@ XINT	*status;
  * move the data to the device.  The read primitive is not likely to be needed
  * for a plotter, but you never know...
  */
-ZARDPL (chan, buf, maxbytes, offset)
-XINT	*chan;
-XCHAR	*buf;
-XINT	*maxbytes;
-XLONG	*offset;
+int
+ZARDPL (
+  XINT	 *chan,
+  XCHAR	 *buf,
+  XINT	 *maxbytes,
+  XLONG	 *offset
+)
 {
-	ZARDBF (chan, buf, maxbytes, offset);
+	return ZARDBF (chan, buf, maxbytes, offset);
 }
 
 
@@ -192,11 +204,13 @@ XLONG	*offset;
  * N.B.: We ASSUME that the FIO buffer has been set to the size of a metafile
  * record, i.e., 1440 bytes or 720 chars on the VAX.
  */
-ZAWRPL (chan, buf, nbytes, offset)
-XINT	*chan;
-XCHAR	*buf;
-XINT	*nbytes;
-XLONG	*offset;			/* not used		*/
+int
+ZAWRPL (
+  XINT	 *chan,
+  XCHAR	 *buf,
+  XINT	 *nbytes,
+  XLONG	 *offset 			/* not used		*/
+)
 {
 	static	XINT hdrlen=sizeof(int);
 	static	XLONG noffset=0L;
@@ -224,6 +238,8 @@ XLONG	*offset;			/* not used		*/
 	reclen = *nbytes;
 	ZAWRBF (chan, (XCHAR *)&reclen, &hdrlen, &noffset);
 	ZAWTBF (chan, &status);
+
+	return (status);
 }
 
 
@@ -232,13 +248,14 @@ XLONG	*offset;			/* not used		*/
  * record header, since that was written with a separate write unbeknownst
  * to FIO, so the status value returned refers only to the metacode data.
  */
-ZAWTPL (chan, status)
-XINT	*chan;
-XINT	*status;
+int
+ZAWTPL (XINT *chan, XINT *status)
 {
 	ZAWTBF (chan, status);
 	if (*status > 0)
 	    *status = pltr.status;
+
+	return (*status);
 }
 
 
@@ -248,16 +265,15 @@ XINT	*status;
  * device is a streaming file, regardless of whether or not the output
  * is spooled.
  */
-ZSTTPL (chan, param, lvalue)
-XINT	*chan;
-XINT	*param;
-XLONG	*lvalue;
+int
+ZSTTPL (XINT *chan, XINT *param, XLONG *lvalue)
 {
 	switch (*param) {
 	case FSTT_BLKSIZE:
 	    *lvalue = 0L;
 	    break;
 	default:
-	    ZSTTBF (chan, param, lvalue);
+	    return ZSTTBF (chan, param, lvalue);
 	}
+	return (XOK);
 }

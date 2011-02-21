@@ -8,19 +8,4 @@ $exit
 libpkg.a:
 	cor.x		ccdred.h
 	proc.x		ccdred.h <imhdr.h>
-
-	icaclip.x	../icombine.com ../icombine.h
-	icaverage.x	../icombine.com ../icombine.h <imhdr.h>
-	iccclip.x	../icombine.com ../icombine.h
-	icgdata.x	../icombine.com ../icombine.h <imhdr.h> <mach.h>
-	icgrow.x	../icombine.com ../icombine.h
-	icmedian.x	../icombine.com ../icombine.h
-	icmm.x		../icombine.com ../icombine.h
-	icombine.x	../icombine.com ../icombine.h <error.h> <syserr.h>\
-			<imhdr.h> <imset.h> <mach.h>
-	icpclip.x	../icombine.com ../icombine.h
-	icsclip.x	../icombine.com ../icombine.h
-	icsigma.x	../icombine.com ../icombine.h <imhdr.h>
-	icsort.x	
-	icstat.x	../icombine.com ../icombine.h <imhdr.h>
 	;

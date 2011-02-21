@@ -229,7 +229,7 @@ distortions and dispersions were used.  It was selected because it was
 relatively fast.  However, it cannot be proved to work in all cases; in
 one instance in which an invalid surface was used the inversion was
 actually much poorer than expected.  Therefore a more direct iterative
-inversion algorithm is now used.  This is guarenteed to give the
+inversion algorithm is now used.  This is guaranteed to give the
 correct inversion to within a set error (0.05 of a pixel in X and Y).
 It is slightly slower than the previous algorithm but it is still not
 as major a factor as the image interpolation itself.

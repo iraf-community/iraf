@@ -1,6 +1,17 @@
 .help revisions Jun88 noao.twodspec.longslit
 .nf
 
+transform/trsetup.x
+transform/igsfit/igscolon.x
+fitcoords.par
+    1. The fitcoords fitting orders can not be set to less than 2.
+    2. There is an attempt to avoid divide by zero in trsetup.x.
+    (2/1/11, Valdes)
+
+=====
+v2.15
+=====
+
 transform/t_transform.x
 lscombine/t_lscombine.x
     Replaced xt_mappm to yt_mappm thus supporting world coordinate pixel mask

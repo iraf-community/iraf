@@ -75,7 +75,9 @@ pointer	qpf, im, io
 int	vs[2], ve[2]
 real	xblock, yblock
 int	szb_pixel, ncols, pixel, nev, xoff, yoff
-int	sizeof(), qpio_readpixs(), qpio_readpixi()
+int	qpio_readpixs(), qpio_readpixi()
+
+include	<szpixtype.inc>
 
 begin
 	qpf = chan
@@ -87,7 +89,7 @@ begin
 	ncols = IM_PHYSLEN(im,1)
 	xoff  = QPF_VS(qpf,1)
 	yoff  = QPF_VS(qpf,2)
-	szb_pixel = sizeof(IM_PIXTYPE(im)) * SZB_CHAR
+	szb_pixel = pix_size[IM_PIXTYPE(im)] * SZB_CHAR
 
 	# Convert boffset, nbytes to vs, ve.
 	pixel = (boffset - 1) / szb_pixel
@@ -161,14 +163,16 @@ int	value			#O parameter value
 
 pointer	qpf, im, io
 int	szb_pixel, npix
-int	qpio_stati(), sizeof()
+int	qpio_stati()
+
+include	<szpixtype.inc>
 
 begin
 	qpf = chan
 	im = QPF_IM(qpf)
 	io = QPF_IO(qpf)
 	npix = IM_PHYSLEN(im,1) * IM_PHYSLEN(im,2)
-	szb_pixel = sizeof(IM_PIXTYPE(im)) * SZB_CHAR
+	szb_pixel = pix_size[IM_PIXTYPE(im)] * SZB_CHAR
 
 	switch (param) {
 	case FSTT_BLKSIZE:

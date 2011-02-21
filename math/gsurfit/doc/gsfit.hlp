@@ -53,7 +53,7 @@ DESCRIPTION
 GSFIT zeroes the matrix and vectors, calculates the non-zero basis functions,
 computes the contribution of each data point to the normal equations
 and accumulates it into the appropriate array and vector elements. The
-Cholesky factoriztion of the coefficient array is computed and the coefficients
+Cholesky factorization of the coefficient array is computed and the coefficients
 of the fitting function are calculated.
 .ih
 NOTES

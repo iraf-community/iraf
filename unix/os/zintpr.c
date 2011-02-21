@@ -13,13 +13,17 @@
  * exception, hence we send SIGTERM instead and the exception handling code
  * maps both to X_INT.
  */
-ZINTPR (pid, exception, status)
-XINT	*pid;
-XINT	*exception;		/* not used at present */
-XINT	*status;
+int
+ZINTPR (
+  XINT	*pid,
+  XINT	*exception,		/* not used at present */
+  XINT	*status 
+)
 {
 	if (kill (*pid, SIGTERM) == ERR)
 	    *status = XERR;
 	else
 	    *status = XOK;
+
+	return (*status);
 }

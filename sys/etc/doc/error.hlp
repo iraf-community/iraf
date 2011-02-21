@@ -11,7 +11,7 @@ or to cause a particular error action to be taken.  ERRCODE returns either
 OK or the integer code of the posted error.
 
 Language support includes the IFERR and IFNOERR statements and the ERRCHK
-declaration.  The IFERR statement is gramatically equivalent to the IF
+declaration.  The IFERR statement is grammatically equivalent to the IF
 statement.  Note that the condition to be tested in an IFERR statement may
 be a procedure call or assignment statement, while the IF statement tests
 a boolean expression.

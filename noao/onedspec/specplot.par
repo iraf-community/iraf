@@ -5,6 +5,7 @@ autolayout,b,h,yes,,,Use automatic layout algorithm?
 autoscale,b,h,yes,,,Scale to common mean for automatic layout?
 fraction,r,h,1.0,,,Fraction of automatic minimum separation step
 units,s,h,"",,,Coordinate units
+transform,s,h,"none","none|log",,Flux transformation
 scale,s,h,1.,,,"Intensity scale (value, @file, keyword)"
 offset,s,h,0.,,,"Intensity offset (value, @file, keyword)"
 step,r,h,0.,,,Default separation step

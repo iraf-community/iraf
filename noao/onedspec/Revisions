@@ -1,5 +1,24 @@
 .help revisions Jun88 noao.onedspec
 .nf
+
+continuum.par
+odcombine.par
+sfit.par
+splot.par
+    The prompt strings which said the "grow" parameter is in pixels were
+    changed to remove this.  The grow parameter is in user coordinate units.
+    (6/28/10, Valdes)
+
+=======
+V2.14.1
+=======
+
+t_specplot.x
+specplot.par
+doc/specplot.hlp
+    Added a new "transform" parameter to allow scaling the spectrum pixel
+    values.  Currently on "log" is implemented.  (1/5/09, Valdes)
+
 doc/splot.hlp
     The description of the 'e' key incorrectly said a core flux is
     output.  (8/22/08, Valdes)

@@ -8,11 +8,14 @@
 #define	import_math
 #include <iraf.h>
 
+#include <ctype.h>
 #include "config.h"
 #include "operand.h"
 #include "errs.h"
 #include "task.h"
 #include "param.h"
+#include "proto.h"
+
 
 extern	int	cldebug;
 
@@ -33,15 +36,15 @@ extern	int	cldebug;
  * fatal but is propagated through.  Call error() and do not return if find an
  * internal error or an undefined string operation.
  */
-unop (opcode)
-int	opcode;
+void 
+unop (int opcode)
 {
-	register out_type;		/* bool, int, real, string	*/
-	register in_type;		/* bool, int, real, string	*/
+	register int out_type;		/* bool, int, real, string	*/
+	register int in_type;		/* bool, int, real, string	*/
 	struct	operand o, result;
-	double	rval, rresult;		/* input value, result		*/
-	long	ival, iresult;
-	char	*sval, *sresult;
+	double	rval=0., rresult;	/* input value, result		*/
+	long	ival=0, iresult;
+	char	*sval=NULL, *sresult=NULL;
 	char	fname[SZ_PATHNAME];
 	char	ch, sbuf[SZ_LINE];
 	char	*envget();
@@ -381,8 +384,8 @@ pushresult:
  * It is illegal to perform a boolean operation on a non-boolean operand;
  *   there is no automatic type coercion for booleans.
  */
-unexp (opcode)
-int	opcode;
+void 
+unexp (int opcode)
 {
 	struct	operand o, result;
 	int	type;

@@ -5,10 +5,10 @@ include "wcs_desc.h"
 
 # Define the memory structure for saving the graphics wcs.
 define SAVE_BLOCK_SIZE  16
-define OLD_NDC_VIEW     Memr[wcs_save_block-1+$1]
-define OLD_NDC_WIND     Memr[wcs_save_block+3+$1]
-define OLD_PLT_VIEW     Memr[wcs_save_block+7+$1]
-define OLD_PLT_WIND     Memr[wcs_save_block+11+$1]
+define OLD_NDC_VIEW     Memr[P2R(wcs_save_block-1+$1)]
+define OLD_NDC_WIND     Memr[P2R(wcs_save_block+3+$1)]
+define OLD_PLT_VIEW     Memr[P2R(wcs_save_block+7+$1)]
+define OLD_PLT_WIND     Memr[P2R(wcs_save_block+11+$1)]
 
 # WL_WCSLAB -- Label using a defined wcs.
 #

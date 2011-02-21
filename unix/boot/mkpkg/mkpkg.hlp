@@ -337,7 +337,7 @@ major logical directories are recognized, e.g., "iraf$", "host$", "hlib$",
 
 
 The use of the \fB$set\fR directive is illustrated in the example below.
-Note the doubling of the preprocessor metacharacter to avoid macro expansion
+Note the doubling of the preprocessor meta-character to avoid macro expansion
 when entering the value of the GEN macro into the symbol table.  The sequence
 "$$" is replaced by a single "$" whenever it is encountered in the input
 stream.

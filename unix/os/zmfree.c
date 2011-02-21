@@ -7,14 +7,17 @@
 #define import_spp
 #include <iraf.h>
 
+
 /* ZMFREE -- Return heap space previously allocated by ZMALOC or ZRALOC.
  * The manual page for FREE says nothing about error checking, so we do
  * not look at the return value.
  */
-ZMFREE (buf, status)
-XINT	*buf;
-XINT	*status;
+int
+ZMFREE (
+  XINT	*buf,
+  XINT	*status
+)
 {
 	free (LOC_TO_ADDR (*buf, char));
-	*status = XOK;
+	return ( (*status = XOK) );
 }

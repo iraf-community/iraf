@@ -79,8 +79,8 @@ define	PINP_SPARE	Memi[$1+3]		# spare flag (YES/NO)
 define	LEN_PFIT	2
 
 # Fitting parameter substructure definition
-define	PFIT_VALUE	Memr[$1+0]		# parameter value
-define	PFIT_DELTA	Memr[$1+1]		# parameter delta
+define	PFIT_VALUE	Memr[P2R($1+0)]		# parameter value
+define	PFIT_DELTA	Memr[P2R($1+1)]		# parameter delta
 # next free location	    ($1 + 2) == LEN_PFIT !!!
 
 
@@ -321,7 +321,7 @@ define	PTEQ_AREFCNT	Memi[PTEQ_SREFCNT($1)]	    # ref. variable counters
 define	PTEQ_AFITVAR	Memi[PTEQ_SFITVAR($1)]	    # fit variable sym. off.
 define	PTEQ_AFITCNT	Memi[PTEQ_SFITCNT($1)]	    # fit variable counters
 define	PTEQ_APAR	Memi[PTEQ_SPAR($1)]	    # parameter sym. offsets
-define	PTEQ_APARVAL	Memr[PTEQ_SPARVAL($1)]	    # parameter values
+define	PTEQ_APARVAL	Memr[P2R(PTEQ_SPARVAL($1))]	    # parameter values
 define	PTEQ_APLIST	Memi[PTEQ_SPLIST($1)]	    # fitting parameter list
 define	PTEQ_ADER	Memi[PTEQ_SDER($1)]	    # derivative string offsets
 define	PTEQ_ARPNDER	MEMP[PTEQ_SRPNDER($1)]	    # derivative code
@@ -335,7 +335,7 @@ define	PTEQ_FITCNT	Memi[PTEQ_SFITCNT($1) + $2 - 1] # fit var. counter
 # Individual access for fitting parameter symbols, values and list. The
 # second argument is the parameter number, relative to the equation.
 define	PTEQ_PAR	Memi[PTEQ_SPAR($1)    + $2 - 1] # symbol offset
-define	PTEQ_PARVAL	Memr[PTEQ_SPARVAL($1) + $2 - 1] # value
+define	PTEQ_PARVAL	Memr[P2R(PTEQ_SPARVAL($1) + $2 - 1)] # value
 define	PTEQ_PLIST	Memi[PTEQ_SPLIST($1)  + $2 - 1] # list element
 
 # Individual access for derivative equation string offsets and codes. The

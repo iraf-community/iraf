@@ -34,7 +34,7 @@ These three parameters are stored in the output "data" image header as
 MEAN_FLD, MEANAFLD, and NUMPIX respectively.
 .ih
 EXAMPLES
-1. To project an image called "im10830" and produce output images "im10830.d,
+1. To project an image called "im10830" and produce output images "im10830.d",
 "im10830.w", and "im10830.a", one would use the following command:
 
 .nf

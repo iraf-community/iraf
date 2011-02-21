@@ -1,0 +1,13 @@
+# Update the tcopy application code in the ttools package library
+# Author: HODGE, 2-FEB-1988
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	iswholetab.x
+	tcopy.x        		<error.h> <tbset.h>
+	tdelete.x      		<error.h> 
+	;

@@ -161,7 +161,7 @@ points are marked on the graphs with diamonds.
 .le
 .ls :niterate [value]
 Show the current value or set a new value for the number of rejection
-interations.
+iterations.
 .le
 .ls :sample [value]
 Show the current value or set the sample points to use in the fits.  This

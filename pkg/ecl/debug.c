@@ -13,6 +13,8 @@
 #include "opcodes.h"
 #include "param.h"
 #include "task.h"
+#include "proto.h"
+
 
 /*
  * DEBUG -- The various debugging functions.
@@ -28,7 +30,7 @@
 extern	char *nullstr;
 extern	int cldebug;
 extern	int cltrace;
-static	dd_f();
+static	void dd_f();
 
 
 /* D_STACK -- Go through the instruction stack, starting at locpc, printing
@@ -37,7 +39,8 @@ static	dd_f();
  */
 static	int	pc_mark = 0;
 
-d_asmark () 
+void 
+d_asmark (void) 
 { 
 	/* Mark the PC to begin the instruction output.  If not defined,
 	 * do the whole script.
@@ -46,16 +49,15 @@ d_asmark ()
 }
 
 
-d_assemble () 
+void 
+d_assemble (void) 
 { 
 	d_stack ((pc_mark ? pc_mark : pc), 0, pc); 
 	pc_mark = 0; 
 }
 
-d_stack (locpc, ss, endpc)
-register int locpc;
-int ss;
-int endpc;
+void 
+d_stack (register XINT locpc, int ss, int endpc)
 {
 	register struct codeentry *cep;
 	int n, opcode, errs = 0;
@@ -83,10 +85,8 @@ int endpc;
 /* D_INSTR -- Decode a single instruction on the output file.  The length of
  * the instruction in memel is returned as the function value.
  */
-d_instr (fp, prefix, locpc)
-FILE *fp;
-char *prefix;
-register int locpc;
+int 
+d_instr (FILE *fp, char *prefix, register XINT locpc)
 {
 	register struct codeentry *cep;
 	int opcode, extra=0;
@@ -207,8 +207,8 @@ oneint:
 	    /* Output array index ranges: {beg, end} * N. */
 	    {   memel *ip = (memel *) &cep->c_args;
 		int i, n = (int)ip[2];
-		for (ip += 2, i=0;  i < n;  i++)
-		    fprintf (fp, "%d:%d ", (int)*ip++, (int)*ip++);
+		for (ip += 2, i=0;  i < n;  i++, ip += 2)
+		    fprintf (fp, "%d:%d ", (XINT)*ip, (XINT)(*ip+1));
 		fprintf (fp, "\n");
 		extra = 2*n + 1;
 	    }
@@ -226,10 +226,12 @@ oneint:
 /* print neat things about the dictionary and stack.
  * done directly.
  */
-d_d()
+void 
+d_d (void)
 {
 	char *stackaddr = (char *)stack;  /*  just so we may subtract	*/
 	char *otheraddr;
+
 
 	eprintf ("\ndictionary indices:\n");
 	eprintf ("\tmaxd-1\t%u (%u)\n", maxd-1, dictionary[maxd-1]);
@@ -263,7 +265,8 @@ d_d()
  * has been unlinked from parhead before the builtin is run to avoid showing
  * it. see execnewtask().
  */
-d_p()
+void 
+d_p (void)
 {
 	register struct pfile *pfp;
 	register struct param *pp;
@@ -290,13 +293,14 @@ d_p()
  * done as a builtin. no attempt is made to hide the task running for this 
  * builtin.
  */
-d_t()
+void 
+d_t (void)
 {
-	register struct task *tp;
-	int flags;
+	struct task *tp;
+	int    flags;
 
 	eprintf ("stacked tasks (most recent first)\n\n");
-	for (tp=currentask; (int)tp < (int)&stack[STACKSIZ]; tp=next_task(tp)) {
+	for (tp=currentask; (XINT)tp<(XINT)&stack[STACKSIZ]; tp=next_task(tp)) {
 	    flags = tp->t_flags;
 	    eprintf ("%s:\t", tp->t_ltp->lt_lname);
 	    if (flags & T_SCRIPT) eprintf ("script, ");
@@ -320,7 +324,8 @@ d_t()
 /* print all loaded packages and their ltasks from pachead.
  * builtin.
  */
-d_l()
+void 
+d_l (void)
 {
 	register struct package *pkp;
 	register struct ltask *ltp;
@@ -351,16 +356,15 @@ d_l()
 /* D_F -- Determine the number of logical (e.g. dev$null, stropen) and physical
  * (host system) file slots available.
  */
-d_f()
+void 
+d_f (void)
 {
 	dd_f ("logical:  ", "dev$null");
 	dd_f ("physical: ", "hlib$iraf.h");
 }
 
-static
-dd_f (msg, fname)
-char	*msg;
-char	*fname;
+static void
+dd_f (char *msg, char *fname)
 {
 	FILE	*fp[128];
 	int	fn;
@@ -381,22 +385,24 @@ char	*fname;
 /* enable debugging messages.
  * builtins.
  */
-d_on()
+void 
+d_on (void)
 {
 	cldebug = 1;
 }
 
 /* disable debugging.
  */
-d_off()
+void 
+d_off (void)
 {
 	cldebug = 0;
 }
 
 /* Enable/disable instruction tracing.
  */
-d_trace (value)
-int value;
+void 
+d_trace (int value)
 {
 	cltrace = value;
 }
@@ -404,7 +410,8 @@ int value;
 
 /* Dump operand stack until underflow occurs.
  */
-e_dumpop()
+void 
+e_dumpop (void)
 {
 	struct	operand o;
 
@@ -417,11 +424,8 @@ e_dumpop()
 
 /* Format a multiline exec-task message string for debug output.
  */
-d_fmtmsg (fp, prefix, message, width)
-FILE *fp;
-char *prefix;
-char *message;
-int width;
+void 
+d_fmtmsg (FILE *fp, char *prefix, char *message, int width)
 {
 	register char *ip, *op, *cp;
 	char lbuf[SZ_COMMAND], obuf[SZ_COMMAND];
@@ -431,7 +435,7 @@ int width;
 
 	for (ip=message, op=obuf;  *ip;  ) {
 	    /* Get next message line. */
-	    for (cp=lbuf, nchars=0;  *cp++ = *ip;  ip++, nchars++) {
+	    for (cp=lbuf, nchars=0;  (*cp++ = *ip);  ip++, nchars++) {
 		if (*ip == '\\' && *(ip+1) == '\n') {
 		    *cp++ = 'n';
 		    nchars += 2;
@@ -448,7 +452,7 @@ int width;
 	    *cp++ = '\0';
 
 	    /* Flush output line if it is full. */
-	    if (len_prefix + op-obuf + nchars > width)
+	    if (len_prefix + op-obuf + nchars > width) {
 		if (op > obuf) {
 		    *op++ = '\0';
 		    fprintf (fp, "%s%s\n", prefix, obuf);
@@ -458,6 +462,7 @@ int width;
 		    op = obuf;
 		    continue;
 		}
+	    }
 
 	    /* Copy line to output buffer. */
 	    for (cp=lbuf;  *cp;  )
@@ -474,7 +479,8 @@ int width;
 
 /* D_PROF -- Enable script execution profiling.
  */
-d_prof () 
+void 
+d_prof (void) 
 {
 }
 

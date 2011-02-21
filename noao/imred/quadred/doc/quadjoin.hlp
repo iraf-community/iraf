@@ -1,7 +1,7 @@
 .help quadjoin Aug01 noao.imred.quadred
 .ih
 NAME
-quadjoin -- Split quadformat data into single amplifer images
+quadjoin -- Split quadformat data into single amplifier images
 .ih
 USAGE
 quadjoin input

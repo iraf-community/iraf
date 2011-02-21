@@ -17,8 +17,11 @@ real procedure urand (lseed)
 
 long	lseed				# seed value on first call
 long	n, a, c, m, mic
+
 real	scale
 data	m /0/
+
+int	imul32()
 
 begin
 	# When first called, compute multiplier, increment, and miscellaneous
@@ -36,7 +39,7 @@ begin
 	# Compute next random number, taking care not to cause an arithmetic
 	# exception.
 
-	n = lseed * a			# [MACHDEP] - integer overflow
+	n = imul32 (lseed, a)			# [MACHDEP] - integer overflow
 	if (n > mic)
 	    n = (n - m) - m
 	n = n + c

@@ -15,6 +15,8 @@
 #include "param.h"
 #include "task.h"
 #include "grammar.h"
+#include "proto.h"
+
 
 /*
  * PFILES -- Parameter file access procedures.
@@ -27,7 +29,9 @@ extern	char *indefstr, *indeflc;
 extern	FILE *yyin;
 char	*uparmdir = UPARM;
 long	filetime();
-static	mapname();
+static	void mapname();
+
+extern  int c_finfo();
 
 
 /* NEWPFILE -- Allocate a new pfile on the dictionary and link in at parhead.
@@ -35,8 +39,9 @@ static	mapname();
  * return if not enough core.
  */
 struct pfile *
-newpfile (ltp)
-struct	ltask *ltp;		/* ltask descriptor */
+newpfile (
+  struct ltask *ltp 			/* ltask descriptor */
+)
 {
 	register struct pfile *pfp, *head_pfp;
 
@@ -62,8 +67,10 @@ struct	ltask *ltp;		/* ltask descriptor */
 
 /* PFILEUNLINK -- Unlink a pfile from the pfile list.
  */
-pfileunlink (pfp)
-register struct pfile *pfp;	/* pfile to be unlinked	*/
+void
+pfileunlink (
+  register struct pfile *pfp 	/* pfile to be unlinked	*/
+)
 {
 	register struct pfile *npf;
 
@@ -72,11 +79,12 @@ register struct pfile *pfp;	/* pfile to be unlinked	*/
 	else {
 	    while (npf && npf->pf_npf != pfp)
 		npf = npf->pf_npf;
-	    if (npf)
+	    if (npf) {
 		if (pfp->pf_npf == npf)
 		    cl_error (E_IERR, "in pfileunlink: circular reference");
 		else
 		    npf->pf_npf = pfp->pf_npf;
+	    }
 	}
 }
 
@@ -86,8 +94,9 @@ register struct pfile *pfp;	/* pfile to be unlinked	*/
  * linked on a single list regardless of which package or task they belong to.
  */
 struct pfile *
-pfilefind (ltp)
-register struct ltask *ltp;		/* ltask descriptor */
+pfilefind (
+  register struct ltask *ltp 		/* ltask descriptor */
+)
 {
 	register struct pfile *pfp;
 
@@ -104,8 +113,9 @@ register struct ltask *ltp;		/* ltask descriptor */
  * descriptor.
  */
 struct pfile *
-pfilesrch (pfilepath)
-char	*pfilepath;		/* filename or ltask pathname	*/
+pfilesrch (
+  char	*pfilepath 		/* filename or ltask pathname	*/
+)
 {
 	struct	pfile *pfp;
 
@@ -143,8 +153,9 @@ char	*pfilepath;		/* filename or ltask pathname	*/
  * in place.
  */
 struct pfile *
-pfileload (ltp)
-register struct ltask *ltp;		/* ltask descriptor */
+pfileload (
+  register struct ltask *ltp 		/* ltask descriptor */
+)
 {
 	static	long sys_ftime = 0;
 	register struct	task *tp;
@@ -304,15 +315,17 @@ epset_:
 /* PFILEMERGE -- Merge the parameter values from the named (old user) pfile
  * into a loaded parameter set.
  */
-pfilemerge (npf, opfile)
-struct	pfile *npf;			/* loaded parameter set	*/
-char	*opfile;			/* old parameter file	*/
+int
+pfilemerge (
+  struct pfile *npf,			/* loaded parameter set	*/
+  char	*opfile 			/* old parameter file	*/
+)
 {
 	register struct param *o_pp, *n_pp, *l_pp;
-	int	bastype, pfflags;
+	int	bastype;
 	struct	pfile *opf;
 	struct	ltask *ltp;
-	int	save_topd;
+	XINT	save_topd;
 
 	if (cldebug)
 	    eprintf ("pfilemerge, task %s, pfile %s\n",
@@ -408,8 +421,10 @@ char	*opfile;			/* old parameter file	*/
  * originally read.  Nothing is done unless the parameter set has been
  * modified and needs updating, or if we have a fake (in-core) parameter set.
  */
-pfileupdate (pfp)
-struct	pfile *pfp;		/* parameter file descriptor */
+void
+pfileupdate (
+  struct pfile *pfp 		/* parameter file descriptor */
+)
 {
 	if ((pfp->pf_flags & (PF_FAKE|PF_UPDATE)) != PF_UPDATE)
 	    return;
@@ -435,10 +450,11 @@ struct	pfile *pfp;		/* parameter file descriptor */
  * The input file may be either a parameter file or a CL procedure script.
  */
 struct pfile *
-pfileread (ltp, pfilename, checkmode)
-struct	ltask *ltp;		/* associated ltask		*/
-char	*pfilename;		/* parameter file filename	*/
-int	checkmode;		/* check for "mode" parameter	*/
+pfileread (
+  struct ltask *ltp,		/* associated ltask		*/
+  char	*pfilename,		/* parameter file filename	*/
+  int	checkmode 		/* check for "mode" parameter	*/
+)
 {
 	register char	*ip;
 	char	buf[SZ_LINE+1];
@@ -446,12 +462,12 @@ int	checkmode;		/* check for "mode" parameter	*/
 	struct	param *pp;
 	int	nerrs, gotmode, status, oldlines;
 	FILE	*fp, *yysave;
-	int	save_topd;
+	XINT	save_topd;
 
 	if (cldebug)
 	    eprintf ("pfileread, task %s, pfile %s\n",
 		ltp ? ltp->lt_lname : "", pfilename);
-
+	    
 	if ((fp = fopen (pfilename, "r")) == NULL)
 	    return (NULL);
 
@@ -495,6 +511,8 @@ int	checkmode;		/* check for "mode" parameter	*/
 		goto error_;
 
 	} else if (procscript (fp)) {
+	    extern int yyparse();
+
 	    /* Parse the declarations section of a procedure script.
 	     * The procscript() call leaves us positioned to the procedure
 	     * statement.
@@ -576,9 +594,11 @@ error_:
  * Any existing file is silently clobbered.  The filename extension is
  * always ".par".
  */
-pfilewrite (pfp, pfilename)
-struct	pfile *pfp;		/* pfile descriptor	*/
-char	*pfilename;		/* file to be written	*/
+int
+pfilewrite (
+  struct pfile *pfp,		/* pfile descriptor	*/
+  char	*pfilename 		/* file to be written	*/
+)
 {
 	register char	*ip, *op, *dot;
 	char	pfname[SZ_PATHNAME+1];
@@ -615,7 +635,7 @@ char	*pfilename;		/* file to be written	*/
 	else {
 	    struct param *modepp = NULL;
 	    for (pp = pfp->pf_pp;  pp != NULL;  pp = pp->p_np) {
-		if (!(pp->p_mode & M_LOCAL))
+		if (!(pp->p_mode & M_LOCAL)) {
 		    if (!strcmp (pp->p_name, "mode")) {
 			modepp = pp;
 		    } else if (printparam (pp, fp) == ERR) {
@@ -624,6 +644,7 @@ char	*pfilename;		/* file to be written	*/
 			    "Error writing local pfile `%s'", pfname);
 		    } else
 			nparams++;
+		}
 	    }
 
 	    if (modepp) {
@@ -643,8 +664,10 @@ char	*pfilename;		/* file to be written	*/
  * pfile list.  Fix up flag bits in ltask descriptor.  We are called from
  * "unlearn" to restore the package default parameters for an ltask or package.
  */
-pfileinit (ltp)
-struct	ltask *ltp;
+int
+pfileinit (
+  struct ltask *ltp
+)
 {
 	struct	task *tp;
 	struct	pfile *pfp;
@@ -703,8 +726,8 @@ struct	ltask *ltp;
 /* IS_PFILENAME -- Test whether a string is a pfile filename, i.e., whether
  * or not the string has a ".par" extension.
  */
-is_pfilename (opstr)
-char	*opstr;
+int
+is_pfilename (char *opstr)
 {
 	register char	*ip;
 	char	*dot;
@@ -729,12 +752,14 @@ char	*opstr;
  * squeezed to LEN_PFILENAME characters.  If not writing to UPARM, we just
  * use the full filename.
  */
-mkpfilename (buf, dir, pkname, ltname, extn)
-char	*buf;			/* receives output filename	*/
-char	*dir;			/* dir name or prefix		*/
-char	*pkname;		/* package name			*/
-char	*ltname;		/* ltask name			*/
-char	*extn;			/* filename extension		*/
+void
+mkpfilename (
+  char	*buf,			/* receives output filename	*/
+  char	*dir,			/* dir name or prefix		*/
+  char	*pkname,		/* package name			*/
+  char	*ltname,		/* ltask name			*/
+  char	*extn 			/* filename extension		*/
+)
 {
 	char	temp[SZ_FNAME+1];
 
@@ -757,11 +782,12 @@ char	*extn;			/* filename extension		*/
  * to generate a name no longer than N characters.  Returns the number of
  * characters generated.
  */
-static
-mapname (in, out, maxlen)
-char	*in;
-char	*out;
-int	maxlen;
+static void
+mapname (
+  char	*in,
+  char	*out,
+  int	maxlen
+)
 {
 	register int ip, op;
 
@@ -784,9 +810,10 @@ int	maxlen;
  * file does not exist or cannot be accessed zero is returned.
  */
 long
-filetime (fname, timecode)
-char	*fname;			/* file name		*/
-char	*timecode;		/* "c" or "m"		*/
+filetime (
+  char	*fname,			/* file name		*/
+  char	*timecode 		/* "c" or "m"		*/
+)
 {
 	struct	_finfo fi;
 
@@ -814,18 +841,20 @@ char	*timecode;		/* "c" or "m"		*/
  *   these events happened for this particular run of the task.
  */
 struct pfile *
-pfilecopy (pfp)
-register struct pfile *pfp;
+pfilecopy (
+  register struct pfile *pfp
+)
 {
 	register struct param *pp, *newpp;
 	struct	pfile *newpfp;
 	int	bastype;
 
-	if (cldebug)
+	if (cldebug) {
 	    if (pfp->pf_ltp)
 		eprintf ("copying pfile for `%s'\n", pfp->pf_ltp->lt_lname);
 	    else
 		eprintf ("copying pfile `%s'\n", pfp->pf_pfilename);
+	}
 
 	newpfp = newpfile (pfp->pf_ltp);
 	for (pp = pfp->pf_pp;  pp;  pp = pp->p_np) {
@@ -928,6 +957,7 @@ register struct pfile *pfp;
 	    newpp->p_listfp = pp->p_listfp;
 	    newpp->p_listval = pp->p_listval;
 	    newpp->p_lenval = pp->p_lenval;
+
 	}
 
 	newpfp->pf_oldpfp = pfp;
@@ -958,11 +988,13 @@ register struct pfile *pfp;
  *   termination of a task which called KEEP.  Restor() will not lop off the
  *   dead pfile if it is below the new topd set by keep.
  */
-pfcopyback (pff)
-struct	pfile *pff;
+void
+pfcopyback (
+  struct pfile *pff
+)
 {
 	register struct param *pt, *pf;
-	struct	pfile *pft, *pfp;
+	struct	pfile *pft;
 	int	bastype;
 	int	pfflags;
 	int	copy;			/* set if a real copy occurred	*/
@@ -990,8 +1022,8 @@ struct	pfile *pff;
 	     * or if it was set in a query or on the command line, and we are
 	     * in learn mode, and the parameter is not hidden.
 	     */
-	    if (!((pfflags & P_SET) || (pfflags&(P_QUERY|P_CLSET)) && learn &&
-		!(pf->p_mode & M_HIDDEN)))
+	    if (!((pfflags & P_SET) || ((pfflags&(P_QUERY|P_CLSET)) && learn &&
+		!(pf->p_mode & M_HIDDEN))))
 		continue;
 
 	    bastype = pt->p_type & OT_BASIC;
@@ -1044,12 +1076,13 @@ struct	pfile *pff;
 			strcpy(*q++, *p++) ;
 		}
 
-	    } else if (!(pf->p_valo.o_type & (OT_INDEF|OT_UNDEF)))
+	    } else if (!(pf->p_valo.o_type & (OT_INDEF|OT_UNDEF))) {
 		if (((pf->p_valo.o_type & OT_BASIC) == OT_STRING) &&
 		   (pt->p_val.v_s != NULL)) {
 		    strncpy (pt->p_val.v_s, pf->p_val.v_s, pf->p_lenval-1);
 		} else
 		    pt->p_valo.o_val = pf->p_valo.o_val;
+	    }
 		
 	    /* Copy min */
 	    if (!(pf->p_flags & P_UMIN)) {
@@ -1073,12 +1106,13 @@ struct	pfile *pff;
 	}
 
 	if (copy) {
-	    if (cldebug)
+	    if (cldebug) {
 		if (pff->pf_ltp) {
 		    eprintf ("copied back pfile for `%s'\n",
 			pff->pf_ltp->lt_lname);
 		} else
 		    eprintf ("copied back pfile `%s'\n", pff->pf_pfilename);
+	    }
 	    pft->pf_flags |= PF_UPDATE;
 	}
 
@@ -1102,10 +1136,11 @@ struct	pfile *pff;
  *   execnewtask(), to add such parameters as $nargs and mode.
  */
 struct param *
-addparam (pfp, buf, fp)
-struct	pfile *pfp;
-char	*buf;
-FILE	*fp;
+addparam (
+  struct pfile *pfp,
+  char	*buf,
+  FILE	*fp
+)
 {
 	static char *minfields =
 		"must specify at least name,type,mode for `%s'\n";
@@ -1159,7 +1194,6 @@ FILE	*fp;
 	}
 	bastype = pp->p_type & OT_BASIC;
 	arrflag = pp->p_type & PT_ARRAY;
-
 
 	/* P_MODE */
 
@@ -1569,9 +1603,11 @@ FILE	*fp;
 
 /* CK_ATOI -- Check a string for non-numerics before conversion.
  */
-ck_atoi (str, val)
-char	*str;
-int	*val;
+int
+ck_atoi (
+  char	*str,
+  int	*val
+)
 {
 	char	*s;
 
@@ -1607,9 +1643,10 @@ int	*val;
  *   empty return a pointer to the string "undefval".
  */
 char *
-nextfield (pp, fp)
-char	**pp;
-FILE	*fp;
+nextfield (
+  char	**pp,
+  FILE	*fp
+)
 {
 	static char readbuf[SZ_LINE];
 	register char c, *p;	/* fast references to field	 	*/
@@ -1774,8 +1811,9 @@ FILE	*fp;
  * you have ASCII.
  */
 char *
-makelower (cp)
-register char *cp;
+makelower (
+  register char *cp
+)
 {
 	char *start = cp;
 	register char c;
@@ -1796,8 +1834,8 @@ register char *cp;
  *   caller can include more info if necessary.
  * N.B. we assume ERR doesn't map into a reasonable set of flags.
  */
-scanmode (s)
-char	*s;
+int
+scanmode (char *s)
 {
 	register int mode = 0;
 	register char *str, *ip, *op;
@@ -1886,8 +1924,10 @@ char	*s;
  *   caller can include more info if necessary.
  * N.B. hope ERR doesn't map into a reasonable set of flags.
  */
-scantype (s)
-register char *s;
+int
+scantype (
+  register char *s
+)
 {
 	static char *badtype =  "bad type spec `%c'";
 	static char *cnfltype = "conflicting type spec `%c'";

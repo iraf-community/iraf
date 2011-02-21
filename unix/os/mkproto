@@ -1,0 +1,5 @@
+#!/bin/csh -f 
+
+set  flags	= "-DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64"
+
+cproto -e $flags *.c > ../hlib/libc/kproto64.h

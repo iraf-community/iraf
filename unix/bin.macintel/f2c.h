@@ -1,4 +1,4 @@
-/* f2c.h  --  Standard Fortran to C header file */
+/* f2c.h  --  Standard Fortran to C header file.	 		 */
 
 /**  barf  [ba:rf]  2.  "He suggested using FORTRAN, and everybody barfed."
 
@@ -7,32 +7,44 @@
 #ifndef F2C_INCLUDE
 #define F2C_INCLUDE
 
-/*
+
+/*  For ILP64
+*/
+#define INTEGER_STAR_8
 typedef long int integer;
 typedef long int logical;
-*/
+typedef unsigned long int uinteger;
+/* typedef double real; */
+
+
+/*  For ILP32
 typedef int integer;
 typedef int logical;
-
-typedef unsigned long int uinteger;
-typedef char *address;
-typedef short int shortint;
+typedef unsigned int uinteger;
+*/
 typedef float real;
+typedef short int shortint;
+
+
+typedef char *address;
 typedef double doublereal;
 typedef struct { real r, i; } complex;
 typedef struct { doublereal r, i; } doublecomplex;
 typedef short int shortlogical;
 typedef char logical1;
 typedef char integer1;
-#ifdef INTEGER_STAR_8	/* Adjust for integer*8. */
-typedef long long longint;		/* system-dependent */
-typedef unsigned long long ulongint;	/* system-dependent */
+
+#ifdef INTEGER_STAR_8			/* Adjust for integer*8. */
+typedef long longint;			/* system-dependent */
+typedef unsigned long ulongint;		/* system-dependent */
+
 #define qbit_clear(a,b)	((a) & ~((ulongint)1 << (b)))
 #define qbit_set(a,b)	((a) |  ((ulongint)1 << (b)))
 #endif
 
 #define TRUE_ (1)
 #define FALSE_ (0)
+
 
 /* Extern is for use with -E */
 #ifndef Extern
@@ -159,7 +171,9 @@ struct Namelist {
 	};
 typedef struct Namelist Namelist;
 
+#ifndef abs
 #define abs(x) ((x) >= 0 ? (x) : -(x))
+#endif
 #define dabs(x) (doublereal)abs(x)
 #define min(a,b) ((a) <= (b) ? (a) : (b))
 #define max(a,b) ((a) >= (b) ? (a) : (b))
@@ -201,7 +215,8 @@ typedef /* Subroutine */ int (*S_fp)();
 typedef VOID C_f;	/* complex function */
 typedef VOID H_f;	/* character function */
 typedef VOID Z_f;	/* double complex function */
-typedef doublereal E_f;	/* real function with -R not specified */
+/*typedef doublereal E_f;	// real function with -R not specified */
+typedef real E_f;	/* real function with -R not specified */
 
 /* undef any lower-case symbols that your C compiler predefines, e.g.: */
 
@@ -226,3 +241,12 @@ typedef doublereal E_f;	/* real function with -R not specified */
 #undef vax
 #endif
 #endif
+
+
+
+/*
+#ifndef BLD_KERNEL
+#include "/iraf/iraf/unix/hlib/libc/kproto.h"
+#include "/iraf/iraf/unix/hlib/libc/vosproto.h"
+#endif
+*/

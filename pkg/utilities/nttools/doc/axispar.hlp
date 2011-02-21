@@ -1,0 +1,138 @@
+.help axispar Jul93 tables
+.ih
+NAME
+pltpar -- Edit the parameter set that describes axis attributes.
+.ih
+USAGE
+pltpar
+.ih
+DESCRIPTION
+The 'axispar' parameters specify the attributes of plot axes.
+
+Note that this is a pset, not an executable task;  it defines a set of 
+parameters used by other tasks.  Invoking the pset by name runs
+'eparam' on the parameter set, allowing the user to modify the
+parameters.  Alternatively, the parameters may be modified on the
+command line by specifying the pset name and parameter name, for
+example, the user can type "pltpar.pointmode=yes" to set only the
+'pointmode' parameter.  Parameters can also be edited by using
+'eparam' on the calling task (e.g., by typing "eparam sgraph"), in 
+which case, 'pltpar' will appear as one of the task parameters; the
+'pltpar' parameters may then be edited by positioning the cursor on
+the line containing the pset name and typing ":e".  After editing
+the pset parameters, type Control-Z (or ":q") 
+to return to the main task parameter menu.
+.ih
+PARAMETERS
+.ls (wl = 0.) [real]
+Left world X-coordinate if not autoscaling.
+.le
+.ls (wr = 0.) [real]
+Right world X-coordinate if not autoscaling.
+.le
+.ls (wb = 0.) [real]
+Lower world Y-coordinate if not autoscaling.
+.le
+.ls (wt = 0.) [real]
+Upper world Y-coordinate if not autoscaling.
+.le
+.ls (xflip = no) [boolean]
+Flip the autoscaled X axis?
+.le
+.ls (yflip = no) [boolean]
+Flip the autoscaled Y axis?
+.le
+.ls (transpose = no) [boolean]
+Transpose the X and Y axes of the plot?  If 'transpose = no', the
+horizontal axis will have the X values or pixel number.
+.le
+.ls (logx = no) [boolean]
+Scale the X axis logarithmically?
+.le
+.ls (logy = no) [boolean]
+Scale the Y axis logarithmically?
+.le
+.ls (rejectlog = yes) [boolean]
+Replace invalid logarithmic values with 'INDEF'?  Invalid values will
+be ignored in scaling and plotting.
+.le
+.ls (box = yes) [boolean]
+Draw the box containing the axes and labels around the edge of the
+window?
+.le
+.ls (ticklabels = yes) [boolean]
+Label major tick marks?
+.le
+.ls (grid = no) [boolean]
+Draw grid lines on the plot?
+.le
+.ls (xlabel) [string]
+X-axis label.
+.le
+.ls (ylabel) [string]
+Y-axis label.
+.le
+.ls (title = imtitle) [string]
+The plot title may consist of one or two lines of text.  If the
+parameter 'sysid' is set to "yes", then the first line of the title is
+a standard system-supplied string containing the user's name, date,
+etc.  If the 'title' parameter contains the string "imtitle" (the
+default), then the plot title will contain a line made up from the
+input file, image, or table name.  The user can supply an optional
+string for the 'title' parameter--this string will replace the string
+resulting from the "imtitle" specification.
+.le
+.ls (sysid = yes) [boolean]
+Include standard system information in the plot title?  If the 'sysid'
+parameter is "yes", then a string including the user's name, date, host
+name, etc. is included in the plot title.
+.le
+.ls (lintran = no) [boolean]
+Perform a linear transformation of the X axis?
+.le
+.ls (p1 = 0.) [real]
+Starting input pixel value if 'lintran = yes'.
+.le
+.ls (p2 = 0.) [real]
+Ending input pixel value if 'lintran = yes'.
+.le
+.ls (q1 = 0.) [real]
+Starting output pixel value if 'lintran = yes'.
+.le
+.ls (q2 = 1.) [real]
+Ending output pixel value if 'lintran = yes'.
+.le
+.ls (majrx = 5) [integer]
+Number of major divisions along the X grid.
+.le
+.ls (minrx = 5) [integer]
+Number of minor divisions along the X grid.
+.le
+.ls (majry = 5) [integer]
+Number of major divisions along the Y grid.
+.le
+.ls (minry = 5) [integer]
+Number of minor divisions along the Y grid.
+.le
+.ls (round = no) [boolean]
+Round axes to nice values?  (Values at tick marks will be significant,
+based on scale of the data.)
+.le
+.ls (margin = INDEF) [real, min = 0, max = 1]
+The margin between the viewport edges (plot axes) and the limits of the
+plotted curve(s) as a fraction of the viewport (NDC).  If 'margin =
+INDEF', the default, a 2.5% margin will apply.  That is, the plotted
+curve(s) will be inset .025 times the size of the viewport.  Set
+'margin = 0' to plot curves to the axes.
+.le
+.ls (version = 17August92) [string]
+Date the task was installed.  This should not be changed by the user. 
+.le
+.ih
+EXAMPLES
+.ih
+BUGS
+.ih
+SEE ALSO
+sgraph, pltpar, dvpar
+.endhelp

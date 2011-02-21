@@ -17,7 +17,7 @@ define	IR_YREF		Memi[$1+9]	# y offset of reference subraster
 define	IR_CORNER	Memi[$1+10]	# starting corner for insertion
 define	IR_ORDER	Memi[$1+11]	# row or column insertion
 define	IR_RASTER	Memi[$1+12]	# raster order
-define	IR_OVAL		Memr[$1+13]	# undefined value
+define	IR_OVAL		Memr[P2R($1+13)] # undefined value
 
 define	IR_IC1		Memi[$1+14]	# input image lower column limit
 define	IR_IC2		Memi[$1+15]	# input image upper column limit

@@ -262,7 +262,7 @@ second by DCL.
 .nh 2
 Filenames
 
-    Avoid using the VMS metacharacters [ and $ in filenames when working
+    Avoid using the VMS meta-characters [ and $ in filenames when working
 within the IRAF environment (except in calls to foreign tasks).  To reference
 a file in an arbitrary VMS directory you must first define the VMS directory
 as an IRAF logical directory.  Directories which are frequently referenced
@@ -546,10 +546,10 @@ is the best documentation currently available for the VMS debugger.
 .nh
 Comments on Performance
 
-    Process spawning and interprocess communication appear to be slow in the
+    Process spawning and inter-process communication appear to be slow in the
 VMS operating system, compared to UNIX.  When programming in an equivalent VMS
 system (e.g., the VMS 11/750) all operations which involve process spawning
-or interprocess communication will be noticeable slow compared to UNIX.
+or inter-process communication will be noticeable slow compared to UNIX.
 When programming on the VMS/8600 these operations seem to be comparable
 in speed to an 11/750 running UNIX (actual process execution is of course
 much faster on the 8600).  Large files will compile faster on VMS than on

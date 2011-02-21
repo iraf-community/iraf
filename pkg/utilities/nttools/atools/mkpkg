@@ -1,0 +1,10 @@
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	taextract.x		<tbset.h> 
+	tainsert.x		<tbset.h> 
+	taincr.x
+	;

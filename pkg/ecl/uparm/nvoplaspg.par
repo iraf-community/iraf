@@ -1,5 +1,0 @@
-target,s,a,"topcat",,,"Target application"
-start,b,h,yes,,,"Start task if not running?"
-verbose,b,h,yes,,,"Verbose output?"
-status,i,h,0,,,"Service status code"
-mode,s,h,"ql",,,

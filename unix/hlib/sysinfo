@@ -111,7 +111,16 @@ switch ($UNAME)
         endif
         breaksw
     case linux:
-        if (`$uname_cmd -m` == "ppc") then		# LinuxPPC
+        if (`$uname_cmd -m` == "x86_64") then		# Linux64
+            set mach 		= "linux64"
+            set hmach 		= "linux64"
+	    set TAPES		= "/dev/*st[0-7]"
+	    set shlib		= "no"
+	    set LIBFILES    	= ""
+	    set LS		= "/bin/ls -s"
+	    set LSDF		= "-lLt"
+
+        else if (`$uname_cmd -m` == "ppc") then		# LinuxPPC
             set mach 		= "linuxppc"
             set hmach 		= "linuxppc"
 	    set TAPES		= "/dev/*st[0-7]"
@@ -141,11 +150,13 @@ switch ($UNAME)
 	set pciraf 		= 1
         breaksw
     case darwin: 					# Mac OS X
-        if (`$uname_cmd -m` == "i386") then		# LinuxPPC
+    case macosx:
+    case macintel:
+        if (`$uname_cmd -m` == "x86_64") then		# 64-bit
             set mach 		= "macintel"
             set hmach 		= "macintel"
 	else
-            set mach 		= "macosx"
+            set mach 		= "macosx"		# 32-bit
             set hmach 		= "macosx"
 	endif
 	set TAPES		= "/dev/*sa[0-7]"

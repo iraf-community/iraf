@@ -10,8 +10,9 @@
 /* ZGTPID -- Get process id number (used for process control and to make
  * unique file names).
  */
-ZGTPID (pid)
-XINT	*pid;
+int
+ZGTPID (XINT *pid)
 {
-	*pid = getpid();
+	*pid = (XINT) getpid();
+	return (XOK);
 }

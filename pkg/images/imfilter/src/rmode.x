@@ -65,7 +65,7 @@ begin
 
 	# Free space.
 	call mfree (filter, TY_REAL)
-	call mfree (inbuf, TY_INT)
+	call mfree (inbuf, TY_REAL)
 end
 
 

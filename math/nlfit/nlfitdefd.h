@@ -1,21 +1,16 @@
 # The NLFIT data structure.
 
-# Pointer conversion for reals. This definition is needed to use the
-# generic preprocessor with this file.
-define	P2R		($1)
-
-
 # Structure length
 define	LEN_NLSTRUCT	35
 
 
 # Structure definition
-define	NL_TOL		Memd[P2D($1+0)]	# Tolerance for convergence
-define	NL_LAMBDA	Memd[P2D($1+2)]	# Damping factor
-define	NL_OLDSQ	Memd[P2D($1+4)]	# Sum resid. squared last iter.
-define	NL_SUMSQ	Memd[P2D($1+6)]	# Sum of residuals squared 
-define	NL_REFSQ	Memd[P2D($1+8)]	# Reference sum of squares
-define	NL_SCATTER	Memd[P2D($1+10)]	# Additional scatter
+define  NL_TOL          Memd[P2D($1+0)]   # Tolerance for convergence
+define  NL_LAMBDA       Memd[P2D($1+2)]   # Damping factor
+define	NL_OLDSQ	Memd[P2D($1+4)]   # Sum resid. squared last iter.
+define	NL_SUMSQ	Memd[P2D($1+6)]   # Sum of residuals squared 
+define	NL_REFSQ	Memd[P2D($1+8)]   # Reference sum of squares
+define	NL_SCATTER	Memd[P2D($1+10)]  # Additional scatter
 
 define	NL_FUNC		Memi[$1+12]	# Fitting function
 define	NL_DFUNC	Memi[$1+13]	# Derivative function
@@ -40,10 +35,10 @@ define	NL_CHOFAC	Memi[$1+29]	# Pointer to Cholesky factorization
 # next free location	($1 + 30)
 
 # Access to buffers
+define	PLIST		Memi[$1]	# Parameter list
+define	OPARAM		Memd[$1]	# Original parameter vector
 define	PARAM		Memd[$1]	# Parameter vector
 define	DPARAM		Memd[$1]	# Parameter change vector
-define	OPARAM		Memd[$1]	# Original parameter vector
-define	PLIST		Memi[$1]	# Parameter list
 define	ALPHA		Memd[$1]	# Alpha matrix
 define	BETA		Memd[$1]	# Beta matrix
 define	TRY		Memd[$1]	# Trial vector

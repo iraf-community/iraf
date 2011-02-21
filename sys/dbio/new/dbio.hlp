@@ -187,7 +187,7 @@ general plotting capability will automatically be provided by "piping" the
 list format output of a DBMS task to a PLOT task.  Additional graphics
 capabilities will be provided as built in functions in the DBMS
 \fBquery language\fR, which will access GIO directly to make plots.
-The query language graphics facilties will be faster and more convenient
+The query language graphics facilities will be faster and more convenient
 to use but less extensive and less sophisticated than those provided by PLOT.
 
 The LISTS package is interesting because the facilities provided and operations
@@ -842,7 +842,7 @@ algebra\fR, a branch of mathematics based on set theory which defines a
 fundamental and mathematically complete set of operations upon relations
 (tables).  The relational algebra is fundamental to the DBMS query language
 (section 4.3) but can be safely ignored in the rest of the DBSS.  The reader
-is referred to any intoductory database text for a discussion of the relational
+is referred to any introductory database text for a discussion of the relational
 algebra and other database technotrivia.  The classic introductory database
 text is \fI"An Introduction to Database Systems"\fR, Volume 1 (Fourth Edition,
 1986) by C. J. Date.
@@ -1079,7 +1079,7 @@ Forms Based Data Entry and Retrieval
     Many of the records typically stored in a database are too large to be
 printed in list format on a single line.  Some form of multiline output is
 necessary; this multiline representation is called a \fBform\fR.  The full
-terminal screen is used to display a form, e.g. with the fields labelled
+terminal screen is used to display a form, e.g. with the fields labeled
 in reverse video and the field values in normal video.  Records are viewed
 one at a time.
 
@@ -2301,7 +2301,7 @@ The mask itself, a variable length integer array.
 
 
 Examples of the use of region masks include specifying the regions to be
-used in a surface fit to a two dimensional image, or specifing the regions
+used in a surface fit to a two dimensional image, or specifying the regions
 to be used to correlate two or more images for image registration.
 A variety of utility tasks will be provided in the \fIimages\fR package for
 creating mask images, interactively and otherwise.  For example, it will
@@ -2533,7 +2533,7 @@ Most commercial systems emphasize the query language, which forms the basis
 for the host language interface as well as the user interface.  The query
 language is the focus of these systems.  In our case the DBSS is embedded
 within IRAF as one of many subsystems.  While we do need query language
-facilities at the user level, we do not need such sophisticated facilites
+facilities at the user level, we do not need such sophisticated facilities
 at the DBIO level and would rather do without the attendant complexity and
 overhead.
 .le

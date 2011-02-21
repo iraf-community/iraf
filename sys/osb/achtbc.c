@@ -9,10 +9,12 @@
  * The loop runs in the reverse direction so that the unpack can be
  * performed in place (a and b can be the same array).
  */
-ACHTBC (a, b, npix)
-XCHAR	*a;
-XCHAR	*b;
-XINT	*npix;
+void
+ACHTBC (
+  XCHAR		*a,
+  XCHAR	*b,
+  XINT		*npix
+)
 {
 	register XUBYTE	*ip, *first = (XUBYTE *)a;
 	register XCHAR	*op;

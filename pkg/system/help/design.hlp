@@ -25,7 +25,7 @@ as shown above.  These may be omitted if the package directory is already
 defined in the CL environment.  The "defdir" prefix will be added to any
 file name that does not contain an explicit logical or OS directory
 specification.  The default directory may be an OS pathname or a logical
-directory guraranteed to be defined in the CL environment at the time that
+directory guaranteed to be defined in the CL environment at the time that
 \fBhelp\fR is run.  There should be no OS dependent file names in the
 module lists.
 
@@ -289,7 +289,7 @@ begin
 	    pattern, hp, and the module index.
 
 	save hp
-	encode template into descriptor; turn "*" metacharacters
+	encode template into descriptor; turn "*" meta-characters
 	    into "?*" if not following character class
 	set module index to zero
 

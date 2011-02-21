@@ -10,11 +10,11 @@ define	IC_ORDER	Memi[$1+1]	# Order of function
 define	IC_SAMPLE	Memi[$1+2]	# Pointer to sample string
 define	IC_NAVERAGE	Memi[$1+3]	# Sampling averaging bin
 define	IC_NITERATE	Memi[$1+4]	# Number of rejection interation
-define	IC_XMIN		Memr[$1+5]	# Minimum value for curve
-define	IC_XMAX		Memr[$1+6]	# Maximum value for curve
-define	IC_LOW		Memr[$1+7]	# Low rejection value
-define	IC_HIGH		Memr[$1+8]	# Low rejection value
-define	IC_GROW		Memr[$1+9]	# Rejection growing radius
+define	IC_XMIN		Memr[P2R($1+5)]	# Minimum value for curve
+define	IC_XMAX		Memr[P2R($1+6)]	# Maximum value for curve
+define	IC_LOW		Memr[P2R($1+7)]	# Low rejection value
+define	IC_HIGH		Memr[P2R($1+8)]	# Low rejection value
+define	IC_GROW		Memr[P2R($1+9)]	# Rejection growing radius
 
 # ICFIT parameters used for fitting
 define	IC_NFIT		Memi[$1+10]	# Number of fit points

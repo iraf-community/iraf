@@ -1,6 +1,9 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <sys/stat.h>
+#include <sys/types.h>
+
 #include <stdio.h>
 #define	import_kernel
 #define	import_knames
@@ -9,12 +12,17 @@
 
 /* ZFMKDR -- Create a new directory.
  */
-ZFMKDR (newdir, status)
-PKCHAR	*newdir;
-XINT	*status;
+int
+ZFMKDR (
+  PKCHAR  *newdir,
+  XINT	  *status
+)
 {
 	char	osdir[SZ_PATHNAME];
 	register char *ip, *op;
+
+	extern  int _u_fmode();
+
 
 	/* Change pathnames like "a/b/c/" to "a/b/c".  Probably not necessary,
 	 * but...
@@ -28,4 +36,6 @@ XINT	*status;
 	    *status = XERR;
 	else
 	    *status = XOK;
+
+	return (*status);
 }

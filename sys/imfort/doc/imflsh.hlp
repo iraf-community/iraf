@@ -16,7 +16,7 @@ The \fIimflsh\fR procedure flushes any buffered image data to disk.  Both the
 image header and pixel file are updated if either has been modified since
 the image was opened, or since the last call to \fIimflsh\fR.  All buffered
 image data is automatically flushed when an image is closed with \fIimclos\fR.
-Explicit calls to \fIimflsh\fR are rarely needed since syncronization occurs
+Explicit calls to \fIimflsh\fR are rarely needed since synchronization occurs
 automatically when the image is closed, but may be desirable in applications
 where the image will be open for a substantial period of time, increasing the
 possibility of a program abort or interrupt before the image is closed.

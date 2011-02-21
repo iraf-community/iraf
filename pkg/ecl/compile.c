@@ -4,6 +4,7 @@
 #define import_spp
 #define import_libc
 #define import_stdio
+#define import_stdarg
 #include <iraf.h>
 
 #include "config.h"
@@ -12,6 +13,8 @@
 #include "mem.h"
 #include "errs.h"
 #include "task.h"
+#include "proto.h"
+
 
 /*
  * COMPILE -- compile instructions at compile time, compile constants,
@@ -19,8 +22,8 @@
  */
 
 memel *dictionary;		/* base of dictionary			*/
-int pc;				/* program-counter			*/
-int topd, maxd;			/* current top and highest d. indices	*/
+XINT   pc;			/* program-counter			*/
+XINT   topd, maxd;		/* current top and highest d. indices	*/
 
 extern	int	cldebug, cltrace;
 
@@ -34,16 +37,20 @@ extern	int	cldebug, cltrace;
  */
 
 /*VARARGS1*/
-compile (opcode, args, args2)
-int opcode, args, args2;
+int 
+compile (int opcode, ... )
 {
 	register struct codeentry *cep;
-	register status = OK;
+	register int status = OK;
+	va_list argp;
+
 
 	if (pc > topcs - 20) {
 	    eprintf ("INTERNAL ERROR: pc/topcs collision: %d/%d\n", pc, topcs);
 	    return (ERR);
 	}
+
+	va_start (argp, opcode);
 
 	cep = coderef (pc);
 	cep->c_opcode = opcode;
@@ -74,8 +81,7 @@ int opcode, args, args2;
 	case SUBASSIGN:
 	case SWOFF:
  	case SWON: {
-		register char *sp;
-		sp = (char *)args;
+                char *sp = va_arg (argp, char *);
 		status = comstr (sp, &cep->c_args);
 		if (status != ERR)
 		    cep->c_length += status;
@@ -91,7 +97,7 @@ int opcode, args, args2;
 		register memel *argsaddr;
 		struct operand *op, *dp;
 
-		op = (struct operand *) args;
+                op = va_arg (argp, struct operand *);
 		argsaddr = (memel *) &cep->c_args;
 		dp = (struct operand *) argsaddr;
 		*dp = *op;
@@ -153,7 +159,7 @@ int opcode, args, args2;
 	case PUSHINDEX:
 	case POSARGSET:
 	case RMPIPES:
-		cep->c_args = args;
+		cep->c_args = va_arg (argp, int);
 		cep->c_length++;
 		break;
 
@@ -171,7 +177,7 @@ int opcode, args, args2;
 	 * the parser fill in the argument list.
 	 */
 	case CASE:
-		cep->c_length += args;
+		cep->c_length += va_arg (argp, int);
 		cep->c_args = INDEFI;	    /* sentinel be filled in later */
 		break;
 
@@ -181,8 +187,8 @@ int opcode, args, args2;
 
 		cep->c_length += 2;
 		pargs = (memel *) &(cep->c_args);
-		*pargs++ = args;
-		*pargs = args2;
+		*pargs++ = va_arg (argp, int);
+		*pargs = va_arg (argp, int);
 		break;
 		}
 
@@ -195,7 +201,7 @@ int opcode, args, args2;
     	    d_instr (stderr, "\t", pc);
 
 	if (status != ERR) {
-	    int oldpc = pc;
+	    XINT oldpc = pc;
 	    pc += cep->c_length;
 	    return (oldpc);
 	}
@@ -204,19 +210,17 @@ int opcode, args, args2;
 
 
 /* COMSTR -- compile string s into an arbitrary core address loc, which must be
- *   on an int boundry. 
- * allow for trailing '\0'.
- * return number of whole ints taken up by string else ERR if no room.
+ * on an int boundry.  Allow for trailing '\0'.  Return number of whole ints 
+ * taken up by string else ERR if no room.  
  * (comdstr() should be used to copy a string into the dictionary)
  */
-comstr (s, loc)
-register char *s;
-memel *loc;
+int 
+comstr (register char *s, memel *loc)
 {
 	register char *to, *from;
 
 	from = to = (char *)loc;
-	while (*to++ = *s++)
+	while ( (*to++ = *s++) )
 	    ;
 	return (btoi((memel)to - (memel)from));
 }
@@ -226,8 +230,7 @@ memel *loc;
  * allow for trailing '\0'.
  */
 char *
-comdstr (s)
-char *s;
+comdstr (char *s)
 {
 	char *start;
 
@@ -240,8 +243,8 @@ char *s;
  * only works, of course, if memneed() was not called since es was compiled
  * originally.
  */
-catdstr (es, ns)
-char *es, *ns;
+void 
+catdstr (char *es, char *ns)
 {
 	int eslen = strlen (es) + 1;
 

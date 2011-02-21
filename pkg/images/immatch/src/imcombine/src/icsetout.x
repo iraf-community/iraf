@@ -19,7 +19,7 @@ pointer	out[ARB]		# Output images
 int	offsets[nimages,ARB]	# Offsets
 int	nimages			# Number of images
 
-int	i, j, indim, outdim, mwdim, a, b, amin, bmax, fd, offtype
+int	i, j, indim, outdim, mwdim, a, b, amin, bmax, fd, offtype, npix
 real	val
 bool	proj, reloff, flip, streq(), fp_equald()
 pointer	sp, str, fname
@@ -142,7 +142,7 @@ begin
 		    call imstats (in[i], IM_IMAGENAME, Memc[fname], SZ_FNAME)
 		    call strcat (Memc[section], Memc[fname], SZ_FNAME)
 		    call xt_imunmap (in[i], i)
-		    in[i] = xt_immap (Memc[fname], READ_ONLY, TY_CHAR, i) 
+		    in[i] = xt_immap (Memc[fname], READ_ONLY, TY_CHAR, i, 0) 
 		    call mw_close (mw)
 		    mw = mw_openim (in[i])
 		    call mw_gltermd (mw, Memd[cd], Memd[coord], indim)
@@ -317,6 +317,15 @@ newscan_	if (fscan (fd) == EOF)
 	    call mw_saveim (mw, out)
 	}
 	call mw_close (mw)
+
+	# Throw an error if the output size is too large.
+	if (offtype != NONE) {
+	    npix = IM_LEN(out[1],1)
+	    do i = 2, outdim
+		npix = npix * IM_LEN(out[1],i)
+	    if (npix > 1000000000)
+		call error (1, "Output has more than 1 Gpixels (check offsets)")
+	}
 
 	call sfree (sp)
 end

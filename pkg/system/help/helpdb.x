@@ -6,6 +6,7 @@ include	<error.h>
 include	<finfo.h>
 include	<fset.h>
 include	<time.h>
+include	<mii.h>
 include	"help.h"
 include	"helpdir.h"
 
@@ -218,13 +219,13 @@ int	pk_stk[MAX_DEPTH]	# subpackage index stack
 char	fname[SZ_FNAME]		# helpdir filename
 
 int	sp, pk, len_index
-pointer	ix, hp, modname, data
+pointer	ix, hp, modname, data, sv_sbuf
 long	mtime, fi[LEN_FINFO], savepos
 
 long	note(), clktime()
 int	hd_getname(), finfo()
 pointer	hd_open(), hdb_make_rhd()
-errchk	finfo, seek, note, mii_writei, malloc
+errchk	finfo, seek, note, mii_writei
 errchk	hd_getname, hdb_make_rhd, hdb_getdata
 
 begin
@@ -282,14 +283,19 @@ begin
 	    # the buffer.
 
 	    HD_NEXTCH(hp) = HD_LENHD(hp)
+	    sv_sbuf = HD_SBUF(hp)
+	    HD_SBUF(hp) = 0
 	    call mii_writei (fd, Memi[hp], HD_LENHD(hp))
+	    HD_SBUF(hp) = sv_sbuf
 	    call mii_writec (fd, Memc[HD_SBUF(hp)], HD_SZSBUF(hp))
 
 	    # Keep track of the amount of struct storage that will be
 	    # required later to hold the UNPACKED helpdir data.
 
+	    #HDB_DATALEN(db) = HDB_DATALEN(db) +
+	    #	HD_LENHD(hp) + ((HD_SZSBUF(hp) + SZ_STRUCT-1) / SZ_STRUCT)
 	    HDB_DATALEN(db) = HDB_DATALEN(db) +
-		HD_LENHD(hp) + ((HD_SZSBUF(hp) + SZ_STRUCT-1) / SZ_STRUCT)
+	    	HD_LENHD(hp) + ((HD_SZSBUF(hp) + SZ_STRUCT32-1) / SZ_STRUCT32)
 
 	    call printf ("%3d %15s (%s): %d help modules\n")
 		call pargi (sp + 1)
@@ -375,8 +381,9 @@ begin
 			savepos = note (fd)
 
 			# Load the database into memory.
+			
 			call seek (fd, HDB_DATAOFFSET(db))
-			call malloc (data, HDB_DATALEN(db), TY_STRUCT)
+			call calloc (data, 4*HDB_DATALEN(db), TY_STRUCT)
 			call hdb_getdata (fd, data, HDB_DATALEN(db))
 
 			hp = hdb_make_rhd (db, data, index)
@@ -440,7 +447,7 @@ begin
 	# nextch to 1 because 0 is the null index.
 
 	call calloc (hp, LEN_HDSTRUCT, TY_STRUCT)
-	call malloc (sbuf, SZ_SBUF, TY_CHAR)
+	call calloc (sbuf, SZ_SBUF, TY_CHAR)
 
 	HD_SBUF(hp)   = sbuf
 	HD_DEFDIR(hp) = NULL
@@ -488,7 +495,7 @@ begin
 	# in the new modlist.
 
 	len_modlist = HD_NMODULES(hp) * LEN_MODSTRUCT
-	call malloc (c_modlist, len_modlist, TY_STRUCT)
+	call calloc (c_modlist, len_modlist, TY_STRUCT)
 	call amovi (Memi[HD_MODULE(hp,1)], Memi[c_modlist], len_modlist)
 
 	pos = 0
@@ -552,7 +559,7 @@ bool	streq(), strgt()
 pointer	hd_open(), hdb_make_rhd()
 int	open(), mii_readi(), mii_readc()
 int	envgets(), access(), fntopnb(), fntgfnb()
-errchk	calloc, realloc, malloc, open, seek, syserrs
+errchk	calloc, realloc, open, seek, syserrs
 errchk	hd_open, fntopnb, fntgfnb, hdb_make_rhd, hdb_getdata
 define	rejectfile_ 91
 define	readerr_  92
@@ -729,7 +736,7 @@ rejectfile_
 	# this structure).
 
 	d_len = HDB_DATALEN(db)
-	nints = HD_LENHD(hp) + (HD_SZSBUF(hp) + SZ_STRUCT-1) / SZ_STRUCT
+	nints = HD_LENHD(hp) + (HD_SZSBUF(hp) + SZ_STRUCT32-1) / SZ_STRUCT32
 	HDB_DATALEN(db) = HDB_DATALEN(db) + nints
 	call realloc (HDB_DATAPTR(db), HDB_DATALEN(db), TY_STRUCT)
 	d_op = HDB_DATAPTR(db) + d_len
@@ -1154,33 +1161,38 @@ int	fd			#I input file
 pointer	obuf			#O receives unpacked helpdir data
 int	buflen			#O max su out
 
-int	nelem
+int	i, nelem, nr, sz_mii_struct
 pointer	op, hp
 int	mii_readi(), mii_readc()
 errchk	mii_readi, mii_readc
 define	readerr_ 91
 
 begin
-	for (op=obuf;  op < obuf+buflen;  ) {
+	nr = 0
+	for (op=obuf;  nr < buflen;  ) {
 	    hp = op
 
 	    # Get fixed size helpdir header.
 	    if (mii_readi (fd, Memi[op], LEN_BASEHD) < LEN_BASEHD)
 		goto readerr_
+	    nr = nr + LEN_BASEHD
 
 	    # Get module entries.
 	    op = op + LEN_BASEHD
 	    nelem = HD_LENHD(hp) - LEN_BASEHD
 	    if (mii_readi (fd, Memi[op], nelem) < nelem)
 		goto readerr_
+	    nr = nr + nelem
 
 	    # Get string buffer.
 	    op = op + nelem
-	    nelem = HD_SZSBUF(hp)
+	    nelem = HD_SZSBUF(hp) # / (SZ_INT / SZ_INT32)
 	    if (mii_readc (fd, Memi[op], nelem) < nelem)
 		goto readerr_
 
-	    op = op + ((nelem + SZ_STRUCT-1) / SZ_STRUCT)
+	    nr = nr + ((nelem + SZ_STRUCT32-1) / SZ_STRUCT32)
+            sz_mii_struct = MII_INT / NBITS_BYTE / SZB_CHAR
+            op = op + ((nelem + sz_mii_struct-1) / sz_mii_struct)
 	}
 
 	return

@@ -17,121 +17,121 @@ define	RV_WKPIXX	Memi[$1+4]	# Working array x-axis (ptr)
 define	RV_WKPIXY	Memi[$1+5]	# Working array y-axis (ptr)
 
 # Task Parameters
-define	RV_APODIZE	Memr[$1+10]	# Endmask percentage
-define	RV_AUTOWRITE	Memi[$1+11]	# Auto record results?
-define	RV_AUTODRAW	Memi[$1+12]	# Auto redraw fit results?
-define	RV_CONTINUUM	Memi[$1+13]	# Continuum subtract spectra?
-define	RV_FILTER	Memi[$1+14]	# Fourier filter data?
-define	RV_INTERACTIVE	Memi[$1+15]	# Interactive flag?
-define  RV_PIXCORR	Memi[$1+16]	# Do a pixel-only correlation?
-define	RV_INTERP	Memi[$1+17]	# Rebinning interpolator
+define	RV_APODIZE	Memr[P2R($1+10)] # Endmask percentage
+define	RV_AUTOWRITE	Memi[$1+11]	 # Auto record results?
+define	RV_AUTODRAW	Memi[$1+12]	 # Auto redraw fit results?
+define	RV_CONTINUUM	Memi[$1+13]	 # Continuum subtract spectra?
+define	RV_FILTER	Memi[$1+14]	 # Fourier filter data?
+define	RV_INTERACTIVE	Memi[$1+15]	 # Interactive flag?
+define  RV_PIXCORR	Memi[$1+16]	 # Do a pixel-only correlation?
+define	RV_INTERP	Memi[$1+17]	 # Rebinning interpolator
 
 # Peak Fitting Misc.
-define	RV_BACKGROUND	Memr[$1+20]	# baseline for FWHM computation
-define	RV_FITDONE	Memi[$1+21]	# Has a fit been done?
-define	RV_FITFUNC	Memi[$1+22]	# Correlation fitting func
-define	RV_FITHGHT	Memr[$1+23]	# Height of peak to begin fit
-define	RV_FITWIDTH	Memr[$1+24]	# Width of fitting region
-define	RV_ISHIFT	Memi[$1+25]	# Initial shift of ccf
-define	RV_ISTART	Memi[$1+26]	# Start element of ccf fit
-define	RV_IEND		Memi[$1+27]	# Ending element of ccf fit
-define	RV_MINWIDTH	Memr[$1+28]	# Min Width of fitting region
-define	RV_MAXWIDTH	Memr[$1+29]	# Max Width of fitting region
-define	RV_MAXITERS	Memi[$1+30]	# Max number of iterations
-define	RV_PEAK		Memi[$1+31]	# Is fitheight relative to peak height?
-define	RV_TOLERANCE	Memr[$1+32]	# Fitting tolerance
-define	RV_WEIGHTS	Memr[$1+33]	# Weighting power
-define	RV_WINPAR	Memr[$1+34]	# Size of plot window
-define	RV_WINCENPAR	Memr[$1+35]	# Center of plot window
-define	RV_WINDOW	Memi[$1+36]	# Size of plot window (array index)
-define	RV_WINCENTER	Memi[$1+37]	# Center of plot window (array index)
-define	RV_WINL		Memi[$1+38]	# Left edge of window (array index)
-define	RV_WINR		Memi[$1+39]	# Right edge of window (array index)
+define	RV_BACKGROUND	Memr[P2R($1+20)] # baseline for FWHM computation
+define	RV_FITDONE	Memi[$1+21]	 # Has a fit been done?
+define	RV_FITFUNC	Memi[$1+22]	 # Correlation fitting func
+define	RV_FITHGHT	Memr[P2R($1+23)] # Height of peak to begin fit
+define	RV_FITWIDTH	Memr[P2R($1+24)] # Width of fitting region
+define	RV_ISHIFT	Memi[$1+25]	 # Initial shift of ccf
+define	RV_ISTART	Memi[$1+26]	 # Start element of ccf fit
+define	RV_IEND		Memi[$1+27]	 # Ending element of ccf fit
+define	RV_MINWIDTH	Memr[P2R($1+28)] # Min Width of fitting region
+define	RV_MAXWIDTH	Memr[P2R($1+29)] # Max Width of fitting region
+define	RV_MAXITERS	Memi[$1+30]	 # Max number of iterations
+define	RV_PEAK		Memi[$1+31]	 # Is fitheight relative to peak height?
+define	RV_TOLERANCE	Memr[P2R($1+32)] # Fitting tolerance
+define	RV_WEIGHTS	Memr[P2R($1+33)] # Weighting power
+define	RV_WINPAR	Memr[P2R($1+34)] # Size of plot window
+define	RV_WINCENPAR	Memr[P2R($1+35)] # Center of plot window
+define	RV_WINDOW	Memi[$1+36]	 # Size of plot window (array index)
+define	RV_WINCENTER	Memi[$1+37]	 # Center of plot window (array index)
+define	RV_WINL		Memi[$1+38]	 # Left edge of window (array index)
+define	RV_WINR		Memi[$1+39]	 # Right edge of window (array index)
 
 # Miscellaneous values
-define  RV_APNUM	Memi[$1+40]	# Aperture number
-define	RV_CCFNPTS	Memi[$1+41]	# No. points in CCF
-define  RV_CURAPNUM	Memi[$1+42]	# Current aperture
-define  RV_DI1		Memi[$1+43]	# Deblend continuum start index
-define  RV_DSCALE	Memr[$1+44]	# Deblend continuum scale
-define  RV_DSLOPE	Memr[$1+45]	# Deblend continuum slope
-define  RV_DX1		Memr[$1+46]	# Start of deblend region
-define  RV_DY1		Memr[$1+47]	# End of deblend region
-define  RV_DX2		Memr[$1+48]	# Start of deblend region
-define  RV_DY2		Memr[$1+49]	# End of deblend region
-define  RV_FILL		Memi[$1+50]	# Sample region filling type
-define  RV_FFTNPTS	Memi[$1+51]	# Npts in FFT of spectrum
-define	RV_IMNUM	Memi[$1+52]	# Image no. in input list
-define	RV_IMUPDATE	Memi[$1+53]	# Update image headers?
-define	RV_IS_DOUBLE	Memi[$1+54]	# Update image headers?
-define	RV_MODES	Memi[$1+55]	# Command mode structure
-define	RV_NOBJS	Memi[$1+56]	# Number of object spectra
-define	RV_NTEMPS	Memi[$1+57]	# Number of template spectra
-define  RV_NFITP	Memi[$1+58]	# Number of peak points fit
-define	RV_NPTS		Memi[$1+59]	# No. points in object
-define	RV_NSHIFTS	Memi[$1+60]	# No. of shift in deblend
-define	RV_NUMAPS	Memi[$1+61]	# No. of apertures in image
-define  RV_OAPNUM	Memi[$1+62]	# Object aperture number
-define	RV_REBIN	Memi[$1+63]	# Which spectrum to rebin
-define	RV_RNPTS	Memi[$1+64]	# No. points in refrence
-define  RV_RAPNUM	Memi[$1+65]	# Template aperture number
-define  RV_TEMPNUM	Memi[$1+66]	# Template image number
-define  RV_UPDATE	Memi[$1+67]	# Update since write flag
-define  RV_VERBOSE	Memi[$1+68]	# Verbose output format types
-define	RV_ZTHRESH	Memr[$1+69]	# Output redshift threshold
+define  RV_APNUM	Memi[$1+40]	 # Aperture number
+define	RV_CCFNPTS	Memi[$1+41]	 # No. points in CCF
+define  RV_CURAPNUM	Memi[$1+42]	 # Current aperture
+define  RV_DI1		Memi[$1+43]	 # Deblend continuum start index
+define  RV_DSCALE	Memr[P2R($1+44)] # Deblend continuum scale
+define  RV_DSLOPE	Memr[P2R($1+45)] # Deblend continuum slope
+define  RV_DX1		Memr[P2R($1+46)] # Start of deblend region
+define  RV_DY1		Memr[P2R($1+47)] # End of deblend region
+define  RV_DX2		Memr[P2R($1+48)] # Start of deblend region
+define  RV_DY2		Memr[P2R($1+49)] # End of deblend region
+define  RV_FILL		Memi[$1+50]	 # Sample region filling type
+define  RV_FFTNPTS	Memi[$1+51]	 # Npts in FFT of spectrum
+define	RV_IMNUM	Memi[$1+52]	 # Image no. in input list
+define	RV_IMUPDATE	Memi[$1+53]	 # Update image headers?
+define	RV_IS_DOUBLE	Memi[$1+54]	 # Update image headers?
+define	RV_MODES	Memi[$1+55]	 # Command mode structure
+define	RV_NOBJS	Memi[$1+56]	 # Number of object spectra
+define	RV_NTEMPS	Memi[$1+57]	 # Number of template spectra
+define  RV_NFITP	Memi[$1+58]	 # Number of peak points fit
+define	RV_NPTS		Memi[$1+59]	 # No. points in object
+define	RV_NSHIFTS	Memi[$1+60]	 # No. of shift in deblend
+define	RV_NUMAPS	Memi[$1+61]	 # No. of apertures in image
+define  RV_OAPNUM	Memi[$1+62]	 # Object aperture number
+define	RV_REBIN	Memi[$1+63]	 # Which spectrum to rebin
+define	RV_RNPTS	Memi[$1+64]	 # No. points in refrence
+define  RV_RAPNUM	Memi[$1+65]	 # Template aperture number
+define  RV_TEMPNUM	Memi[$1+66]	 # Template image number
+define  RV_UPDATE	Memi[$1+67]	 # Update since write flag
+define  RV_VERBOSE	Memi[$1+68]	 # Verbose output format types
+define	RV_ZTHRESH	Memr[P2R($1+69)] # Output redshift threshold
  
 # Observatory values
-define	RV_OBSPTR	Memi[$1+70]	# Observation Location (ptr)
-define	RV_ALTITUDE	Memr[$1+71]	# Altitude of observation
-define	RV_LATITUDE	Memr[$1+72]	# Latitude of observation
-define	RV_LONGITUDE	Memr[$1+73]	# Logitude of observation
+define	RV_OBSPTR	Memi[$1+70]	 # Observation Location (ptr)
+define	RV_ALTITUDE	Memr[P2R($1+71)] # Altitude of observation
+define	RV_LATITUDE	Memr[P2R($1+72)] # Latitude of observation
+define	RV_LONGITUDE	Memr[P2R($1+73)] # Logitude of observation
 
 # Output Miscellaneous values
-define	RV_NEWGRAPH	Memi[$1+75]	# GTOOLS newgraph flag
-define  RV_RECORD	Memi[$1+76]	# Output record being written
-define	RV_TXFD		Memi[$1+77]  	# Text file FD
-define	RV_GRFD		Memi[$1+78]	# Metacode file FD
-define	RV_VBFD		Memi[$1+79]	# Verbose logfile FD
-define	RV_CCFFILE	Memi[$1+80]	# Output ccf File
-define	RV_CCFTYPE	Memi[$1+81]	# Output ccf Type (image|text)
-define	RV_STATLINE	Memi[$1+82]	# Status line output flag
-define	RV_TEMPCODE	Memi[$1+83]	# Template code on output
-define	RV_TCODE	Memi[$1+84]	# Template code array ptr
-define	RV_PRINTZ	Memi[$1+85]	# Output z values instead of velocities
+define	RV_NEWGRAPH	Memi[$1+75]	 # GTOOLS newgraph flag
+define  RV_RECORD	Memi[$1+76]	 # Output record being written
+define	RV_TXFD		Memi[$1+77]  	 # Text file FD
+define	RV_GRFD		Memi[$1+78]	 # Metacode file FD
+define	RV_VBFD		Memi[$1+79]	 # Verbose logfile FD
+define	RV_CCFFILE	Memi[$1+80]	 # Output ccf File
+define	RV_CCFTYPE	Memi[$1+81]	 # Output ccf Type (image|text)
+define	RV_STATLINE	Memi[$1+82]	 # Status line output flag
+define	RV_TEMPCODE	Memi[$1+83]	 # Template code on output
+define	RV_TCODE	Memi[$1+84]	 # Template code array ptr
+define	RV_PRINTZ	Memi[$1+85]	 # Output z values instead of velocities
 
 # Plotting Miscellaneous values
-define	RV_DTYPE	Memi[$1+90]	# Data type
-define	RV_GTYPE	Memi[$1+91]	# Graph type
-define	RV_RESDONE	Memi[$1+92]	# Residuals plotted?
-define	RV_SPMKEY	Memi[$1+93]	# Spec-mode plot switch
-define	RV_SPMPLOT	Memi[$1+94]	# Spec-mode plot switch
-define	RV_WHERE	Memi[$1+95]	# Where is data plotted on split screen
-define  RV_X1           Memr[$1+96]     # Starting plot scale
-define  RV_X2           Memr[$1+97]     # Ending plot scale
-define  RV_Y1           Memr[$1+98]     # Bottom plot scale (ccf plot)
-define  RV_Y2           Memr[$1+99]     # Top plot scale (ccf plot)
+define	RV_DTYPE	Memi[$1+90]	 # Data type
+define	RV_GTYPE	Memi[$1+91]	 # Graph type
+define	RV_RESDONE	Memi[$1+92]	 # Residuals plotted?
+define	RV_SPMKEY	Memi[$1+93]	 # Spec-mode plot switch
+define	RV_SPMPLOT	Memi[$1+94]	 # Spec-mode plot switch
+define	RV_WHERE	Memi[$1+95]	 # Where is data plotted on split screen
+define  RV_X1           Memr[P2R($1+96)] # Starting plot scale
+define  RV_X2           Memr[P2R($1+97)] # Ending plot scale
+define  RV_Y1           Memr[P2R($1+98)] # Bottom plot scale (ccf plot)
+define  RV_Y2           Memr[P2R($1+99)] # Top plot scale (ccf plot)
 
 # Dispersion Info and Misc.
-define	RV_APPARAM	Memi[$1+100]	# APNUM parameter string (ptr)
-define	RV_APLIST	Memi[$1+101]	# Aperture ranges list
-define	RV_CMD		Memi[$1+102]	# Current cursor keystroke command
-define	RV_DCBIAS	Memr[$1+103]	# DC BIAS of the object spectrum
-define	RV_DCFLAG	Memi[$1+104]	# Is data in log-lambda space?
-define	RV_DELTAV	Memr[$1+105]	# Velocity per pixel
-define	RV_DO_CORRECT	Memi[$1+106]	# Do the heliocentric correction?
-define	RV_OFORMAT	Memi[$1+107]	# Data format (1D, echelle, multispec)
-define	RV_RFORMAT	Memi[$1+108]	# Data format (1D, echelle, multispec)
-define	RV_FWHM_Y	Memr[$1+109]	# Correlation coeff for FWHM calc.
-define	RV_GLOB_W1	Memr[$1+110]	# Global w1
-define	RV_GLOB_W2	Memr[$1+111]	# Global w2
-define	RV_NEWXCOR	Memi[$1+112]	# Do a new correlation?
-define	RV_OW0		Memr[$1+113]	# Object W0
-define	RV_OW2		Memr[$1+114]	# Object endpoint of dispersion
-define	RV_OWPC		Memr[$1+115]	# Object WPC
-define	RV_RW0		Memr[$1+116]	# Reference W0
-define	RV_RW2		Memr[$1+117]	# Template endpoint of dispersion
-define	RV_RWPC		Memr[$1+118]	# Reference WPC
-define	RV_DO_REBIN	Memi[$1+119]	# Rebin the data?
+define	RV_APPARAM	Memi[$1+100]	  # APNUM parameter string (ptr)
+define	RV_APLIST	Memi[$1+101]	  # Aperture ranges list
+define	RV_CMD		Memi[$1+102]	  # Current cursor keystroke command
+define	RV_DCBIAS	Memr[P2R($1+103)] # DC BIAS of the object spectrum
+define	RV_DCFLAG	Memi[$1+104]	  # Is data in log-lambda space?
+define	RV_DELTAV	Memr[P2R($1+105)] # Velocity per pixel
+define	RV_DO_CORRECT	Memi[$1+106]	  # Do the heliocentric correction?
+define	RV_OFORMAT	Memi[$1+107]	  # Data format (1D, echelle, multispec)
+define	RV_RFORMAT	Memi[$1+108]	  # Data format (1D, echelle, multispec)
+define	RV_FWHM_Y	Memr[P2R($1+109)] # Correlation coeff for FWHM calc.
+define	RV_GLOB_W1	Memr[P2R($1+110)] # Global w1
+define	RV_GLOB_W2	Memr[P2R($1+111)] # Global w2
+define	RV_NEWXCOR	Memi[$1+112]	  # Do a new correlation?
+define	RV_OW0		Memr[P2R($1+113)] # Object W0
+define	RV_OW2		Memr[P2R($1+114)] # Object endpoint of dispersion
+define	RV_OWPC		Memr[P2R($1+115)] # Object WPC
+define	RV_RW0		Memr[P2R($1+116)] # Reference W0
+define	RV_RW2		Memr[P2R($1+117)] # Template endpoint of dispersion
+define	RV_RWPC		Memr[P2R($1+118)] # Reference WPC
+define	RV_DO_REBIN	Memi[$1+119]	  # Rebin the data?
 
 # The answers
 define	RV_VOBS		Memd[P2D($1+120)]  # Observed velocity (vel)
@@ -139,13 +139,13 @@ define	RV_VCOR		Memd[P2D($1+122)]  # Corrected velocity (vel)
 define	RV_ERROR	Memd[P2D($1+124)]  # Obs. Velocity error (vel)
 define	RV_HJD		Memd[P2D($1+126)]  # Heliocentric JD of obs (days)
 define	RV_MJD_OBS	Memd[P2D($1+128)]  # Heliocentric JD of obs (days)
-define	RV_VREL		Memr[$1+131]	   # Relative vel. from pix shift
-define	RV_R		Memr[$1+132]	   # Tonry&Davis 'R' parameter (vel)
-define	RV_SHIFT	Memr[$1+133]	   # Computed shift value (pix)
-define	RV_SIGMA	Memr[$1+134]	   # Error of fit (pix)
-define  RV_FWHM		Memr[$1+135]	   # FWHM of ccf peak
-define  RV_HEIGHT	Memr[$1+136]	   # Height of ccf peak (fft only)
-define  RV_DISP		Memr[$1+137]	   # Dispersion
+define	RV_VREL		Memr[P2R($1+131)]  # Relative vel. from pix shift
+define	RV_R		Memr[P2R($1+132)]  # Tonry&Davis 'R' parameter (vel)
+define	RV_SHIFT	Memr[P2R($1+133)]  # Computed shift value (pix)
+define	RV_SIGMA	Memr[P2R($1+134)]  # Error of fit (pix)
+define  RV_FWHM		Memr[P2R($1+135)]  # FWHM of ccf peak
+define  RV_HEIGHT	Memr[P2R($1+136)]  # Height of ccf peak (fft only)
+define  RV_DISP		Memr[P2R($1+137)]  # Dispersion
 define  RV_ERRCODE	Memi[$1+138]       # Error code for comment
 define  RV_DBL_SHIFT	Memi[$1+139]       # Deblended velocity struct ptr
 

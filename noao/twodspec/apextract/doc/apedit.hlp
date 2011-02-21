@@ -176,7 +176,7 @@ the specified dispersion line are summed or medianed.  This improves the
 signal in the profiles of weaker spectra.  Once the graph is drawn an
 interactive cursor loop is entered.  The set of cursor keys and colon
 commands is given above and may be printed when the task is running using
-the '?' key.  The CURSOR MODE keys and graph formating options are also
+the '?' key.  The CURSOR MODE keys and graph formatting options are also
 available (see \fBcursor\fR and \fBgtools\fR).
 
 A status line, usually at the bottom of the graphics terminal,

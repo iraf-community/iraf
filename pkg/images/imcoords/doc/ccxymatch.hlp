@@ -149,7 +149,7 @@ matching algorithm.
 .ls lngformat = "", latformat = ""
 The format of the output celestial coordinates. The default formats are
 "%13.3h", "%13.3h", and "%13.7g" for units of "hours", "degrees", and
-"radians respectively.
+"radians" respectively.
 .le
 .ls xformat = "%13.3f", yformat = "%13.3f"
 The format of the output pixel coordinates.

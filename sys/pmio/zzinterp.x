@@ -149,7 +149,7 @@ begin
 	v[1] = DEF_MASKSIZE_X
 	v[2] = DEF_MASKSIZE_Y
 	do i = 1, MAXMREG
-	    v_mask[i] = pm_create (2, v, 7, 0)
+	    v_mask[i] = pm_create (2, v, 7)
 	def_pm = v_mask[1]
 
 	# Initialize the vector registers.

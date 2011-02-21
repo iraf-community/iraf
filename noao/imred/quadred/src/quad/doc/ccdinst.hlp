@@ -186,7 +186,7 @@ scancor		Scan mode correction flag
 
 illumflt	Ilumination flat image
 mkfringe	Fringe image
-mkillum		Illumination image
+mkillum		Iillumination image
 skyflat		Sky flat image
 
 ccdmean		Mean value

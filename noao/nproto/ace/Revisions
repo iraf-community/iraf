@@ -1,3 +1,6 @@
+objs.h
+    Added P2R for 64-bit systems.
+
 skyfit.x
     If a complete line is exceptionally deviant from the true sky it
     will bias the sky surface.  As a quick fix for the possibly common

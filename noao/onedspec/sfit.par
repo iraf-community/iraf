@@ -17,7 +17,7 @@ order,i,h,1,1,,Order of fitting function
 low_reject,r,h,3.,0.,,Low rejection in sigma of fit
 high_reject,r,h,3.,0.,,High rejection in sigma of fit
 niterate,i,h,0,0,,Number of rejection iterations
-grow,r,h,1.,0.,,Rejection growing radius in pixels
+grow,r,h,1.,0.,,Rejection growing radius
 markrej,b,h,yes,,,Mark rejected points?
 graphics,s,h,"stdgraph",,,Graphics output device
 cursor,*gcur,h,"",,,Graphics cursor input

@@ -58,7 +58,7 @@ Package version.
 .le
 .ih
 DESCRIPTION
-The \fBquad\fR package contains all the basic tasks neccesary for the
+The \fBquad\fR package contains all the basic tasks necessary for the
 reduction of CCD data obtained with Arcon. With Arcon images are often readout
 using four ("quad") or two ("dual") amplifiers in order to reduce readout time.
 The \fBquad\fR package includes the few special tasks needed to deal with such

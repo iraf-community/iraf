@@ -32,7 +32,7 @@
 
   The axis names can be any of the following, in any order or
   combination:  X, Y, Z, uppercase or lowercase, 1, 2, 3.  Normal
-  axis labelling/numbering conventions apply;  the xyz (=123)
+  axis labeling/numbering conventions apply;  the xyz (=123)
   triad is right-handed.  Thus, the 'ZXZ' example given above
   could be written 'zxz' or '313' (or even 'ZxZ' or '3xZ').  ORDER
   is terminated by length or by the first unrecognized character.

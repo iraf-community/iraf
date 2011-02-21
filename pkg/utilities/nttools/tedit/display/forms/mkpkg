@@ -1,0 +1,19 @@
+# Update the display library.
+# Author: B.Simon 01-APR-91
+
+$checkout libpkg.a ../../
+$update   libpkg.a
+$checkin  libpkg.a ../../
+$exit
+
+libpkg.a:
+	fmbegin.x	"forms.com"
+	fmcheck.x	<lexnum.h>  <ctype.h>  <mach.h>
+	fmend.x
+	fmhelp.x	"../curses.h"  "forms.com"
+	fmgetform.x	"formfn.h"
+	fmmkform.x	"formfn.h"
+	fmprompt.x
+	fmredraw.x	"formfn.h"
+	formfn.x	"../curses.h"  "formfn.h"
+	;

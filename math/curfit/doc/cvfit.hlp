@@ -35,13 +35,13 @@ WTS_UNIFORM. If wtflag = WTS_USER individual weights for each data point
 are supplied by the calling program and points with zero-valued weights are
 not included in the fit. If wtflag = WTS_UNIFORM, all weights are assigned
 values of 1. If wtflag = WTS_SPACING, the weights are set equal to the
-differenece between adjacent data points. In order to correctly use the
+difference between adjacent data points. In order to correctly use the
 WTS_SPACING option the data must be sorted in x.
 .le
 .ls ier
 Error code for the fit. The options are OK, SINGULAR and
 NO_DEG_FREEDON. If ier = SINGULAR, the numerical routines will compute a
-solution but one or more of the coefficents will be
+solution but one or more of the coefficients will be
 zero. If ier = NO_DEG_FREEDOM, there were too few data points to solve the
 matrix equations and the routine returns without fitting the data.
 .le
@@ -51,7 +51,7 @@ CVFIT zeroes the matrix and vectors, calculates the non-zero basis functions,
 calculates the contribution
 of each data point to the normal equations and accumulates it into the
 appropriate array and vector elements. The Cholesky factorization of the
-data array is computed and the coefficents of the fitting function are
+data array is computed and the coefficients of the fitting function are
 calculated.
 .ih
 NOTES

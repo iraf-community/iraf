@@ -34,14 +34,14 @@ No dispersion function and nothing is added to the image header.
 .ls linear
 Store the linear dispersion parameters \fBcrval1\fR and \fBcdelt1\fR
 in the image header.  The wavelength values are ignored.  This may
-be used if the wavlength values are known to be linear but one wants
+be used if the wavelength values are known to be linear but one wants
 to avoid possible roundoff and resampling errors introduced by the
 "interp" option.
 .le
 .ls log
 Store the log-linear dispersion parameters \fBcrval1\fR and \fBcdelt1\fR in
 the image header.  The wavelength values are ignored.  This may be used if
-the wavlength values are known to be linear in the log of the wavelength
+the wavelength values are known to be linear in the log of the wavelength
 but one wants to avoid possible roundoff and resampling errors introduced
 by the "interp" option.
 .le

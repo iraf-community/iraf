@@ -363,7 +363,7 @@ begin
 	        cur_offset = O_VALI(args[1]) + (SZB_CHAR * SZ_LONG)
 	    }
 	    if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4)
-		call bswap4 (ival, 1, ival, 1, (SZ_INT*SZB_CHAR))
+		call bswap4 (ival, 1, ival, 1, (SZ_INT32*SZB_CHAR))
 	    O_TYPE(o) = TY_INT
 
         case GETR, GETR4:
@@ -442,7 +442,7 @@ begin
 	    case TY_SHORT:
 		call bswap2 (O_VALS(args[1]), 1, sval, 1, (SZ_SHORT*SZB_CHAR))
 	    case TY_INT:
-		call bswap4 (O_VALI(args[1]), 1, ival, 1, (SZ_INT*SZB_CHAR))
+		call bswap4 (O_VALI(args[1]), 1, ival, 1, (SZ_INT32*SZB_CHAR))
 	    case TY_LONG:
 		call bswap4 (O_VALL(args[1]), 1, ival, 1, (SZ_LONG*SZB_CHAR))
 	    case TY_REAL:

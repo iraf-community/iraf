@@ -1,0 +1,114 @@
+.help mkglbhdr Feb09 proto
+.ih
+NAME
+mkgblhdr -- make a global header
+.ih
+USAGE
+mkgblhdr input output
+.ih
+PARAMETERS
+.ls input
+List of input images.
+.le
+.ls output
+Output global dataless image.
+.le
+.ls reference = ""
+Optional reference image defining the allowed keywords, order, and
+blank cards.  If no reference image is specified the first image in
+the input list serves as the reference image.
+.le
+.ls exclude = ""
+List of keywords to be excluded from the global header even if present
+in the reference header and with common values in all the input images.
+The case of the keywords in the list is ignored and the are matched to
+the headers in uppercase.  Typically the list would be specified as an
+@file; i.e. the contents of a file with keywords on separate lines.
+Note that one may use the output of a header listing without editing
+since only the first eight characters of each line are used.
+.le
+.ih
+DESCRIPTION
+\fBMkgblhdr\fR makes a global (dataless) header with keywords common to a
+set of \fIinput\fR images.  Common means present in all headers and
+with identical card records (value, formatting, and comments).  The
+purpose of this thask is to allow appending the images using the FITS
+"inherit" convention into a multi-extension file.
+
+The set of keywords which are allowed to appear in the global header are
+those in a reference image which are not in the \fIexclude\fR list and
+which have identical card records in all images.  The reference image is
+that specified by the \fIreference\fR parameter.  If the value of that
+parameter is a null string then the first image in the \fIinput\fR list
+is used.  The \fIreference\fR image also determines the order of the cards
+including blank cards.
+
+The way the task works is that the header card records are read from
+the reference image.  Keywords in the excluded list are eliminated.
+Then reference card records which are not exactly matched in the input
+headers, independent of position, are eliminated.  Finally any leading
+blank cards are removed and consecutive blank cards are reduced to single
+blank lines.
+
+.ih
+EXAMPLES
+
+1.  An initial multi-extension file with inherited global keywords is split
+into separate images.  The headers of the separate images are the union
+of the global and extension headers as is the convention for inheritance.
+After operating on the separate images it is desired to recreate a new
+MEF without having recourse to the original global header.
+
+.nf
+    cl> type images
+    image1
+    image2
+    cl> mkglbhdr @images newimage
+    cl> imcopy image1 newimage[im1,append,inherit]
+    cl> imcopy image2 newimage[im2,append,inherit]
+.fi
+
+To check the headers separately use the "noinherit" flag.
+
+.nf
+    cl> imhead newimage[0] l+
+    cl> imhead newimage[im1,noinherit] l+
+.fi
+
+Note that if the global header of the original MEF is available it is
+probably better to use that header instead of \fBmkglbhdr\fR as follows.
+
+.nf
+    cl> imcopy mefimage[0] newimage
+    cl> imcopy image1 newimage[im1,append,inherit]
+    cl> imcopy image2 newimage[im2,append,inherit]
+.fi
+
+It is important to understand how inheritance works when appending extensions.
+The IRAF FITS "kernel" eliminates keywords from the extension header when
+they have the same value as the global header.  If there are common
+keywords but with different values then they are both present and any
+task that read the union of the global and extension headers will see
+the value from the extension.
+
+2. The following example uses an exclusion list.
+
+.nf
+    cl> type exclude.dat
+    CTYPE1
+    CTYPE2
+    CRVAL1
+    CRVAL2
+    CRPIX1
+    CRPIX2
+    CD1_1
+    CD1_2
+    CD2_1
+    CD2_2
+    cl> mkglbhdr @images newimage exclude="@exclude.dat"
+.fi
+
+.ih
+SEE ALSO
+mscsplit, mscjoin
+.endhelp

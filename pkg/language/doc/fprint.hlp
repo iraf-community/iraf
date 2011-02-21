@@ -2,8 +2,8 @@
 .ih
 NAME
 .nf
-fprint -- print to a parameter
 print  -- print to the standard output
+fprint -- print to a parameter
 printf -- formatted print to the standard output
 .fi
 .ih
@@ -19,8 +19,8 @@ PARAMETERS
 Any expression, the string value of which is to be printed.
 .le
 .ls param
-\fIFprint\fR will deposit the output string in the value field of this
-parameter.
+The \fIfprint\fR call will deposit the output string in the value field of 
+this parameter.
 .le
 .ls format
 A C-like format specification string containing plain characters, which 
@@ -51,7 +51,7 @@ escape sequences for printing tabs, newlines, etc. Unlike the other
 two commands, spaces and newlines must be explicitly given in the format
 string.  
 
-A format specification has the form "%w.dCn", where W is  the  field
+A format specification has the form "%[W][.D]Cn", where W is  the  field
 width,  D is the number of decimal places or the number of digits of
 precision, C is the format  code,  and  N  is  radix  character  for
 format  code "r" only.  The W and D fields are optional.  The format
@@ -112,7 +112,7 @@ EXAMPLES
 3. Format a command and send it to the host system.  In this example,
 "fname" is a string valued parameter.
 
-	cl> print ("!dir/full ", fname) | cl
+	cl> print ("!ls -l ", fname) | cl
 
 4. Write to a file.
 
@@ -126,8 +126,22 @@ EXAMPLES
 .nf
 	cl> printf ("pi = %.6f\n", 2*atan2(1.0,0.0))
 	pi = 3.141593
-	cl> printf ("RA = %h  DEC = %m\Exptime = %8.2f\n",ra,dec,etime)
+	cl> printf ("RA = %h  DEC = %m\nExptime = %8.2f\n",ra,dec,etime)
 	RA = 18:32:33.5 DEC = 23:45.2	Exptime =     1.57
+.fi
+
+6. Print to a parameter.  Note that \fIfprint\fR allows you to create a 
+formatted string, whereas the scan() example requires a struct parameter.
+
+.nf
+	cl> x = 3.14159
+	cl> fprint (s1, "pi = ", x)
+	cl> = s1
+	pi = 3.14159
+
+	     or 
+
+	cl> printf ("pi = %g\n", x) | scan (line)
 .fi
 
 .ih
@@ -136,5 +150,5 @@ The \fIfprint\fR task is not very useful since the same thing can be
 accomplished by string concatenation and assignment.
 .ih
 SEE ALSO
-scan, scanf, fscan, fscanf
+scan, scanf, fscan, fscanf, strings
 .endhelp

@@ -66,13 +66,17 @@ begin
 	# otherwise use the IMIO buffers.
 
 	if (!aligned || grow >= 1.) {
-	    do i = 1, nimages
+	    do i = 1, nimages {
 		call salloc (Memi[dbuf+i-1], npts, TY_SHORT)
+		call aclrs (Mems[Memi[dbuf+i-1]], npts)
+	    }
 	} else {
 	    do i = 1, nimages {
 		im = xt_opix (in[i], i, 1)
-		if (im != in[i])
+		if (im != in[i]) {
 		    call salloc (Memi[dbuf+i-1], npts, TY_SHORT)
+		    call aclrs (Mems[Memi[dbuf+i-1]], npts)
+		}
 	    }
 	    call amovki (NULL, Memi[dbuf], nimages)
 	}
@@ -185,10 +189,11 @@ int	npts			# Number of points per output line
 int	i, ext, ctor(), errcode()
 real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
-pointer	outdata, buf, nm, pms
+pointer	outdata, buf, nmod, nm, pms
 pointer	immap(), impnli()
 pointer	impnlr(), imgnlr()
-errchk	immap, ic_scale, imgetr, ic_grow, ic_grows, ic_rmasks, ic_gdatas
+errchk	immap, ic_scale, imgetr, ic_grow, ic_grows, ic_rmasks, ic_emask
+errchk	ic_gdatas
 
 include	"../icombine.com"
 data	ext/0/
@@ -208,7 +213,7 @@ begin
 
 	# Set combine parameters
 	switch (combine) {
-	case AVERAGE, SUM:
+	case AVERAGE, SUM, QUAD, NMODEL:
 	    if (dowts)
 		keepids = true
 	    else
@@ -218,6 +223,46 @@ begin
 	    keepids = false
 	}
 	docombine = true
+
+	# Get noise model parameters.
+	if (combine==NMODEL) {
+	    call salloc (nmod, 3*nimages, TY_REAL)
+	    i = 1
+	    if (ctor (Memc[rdnoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)] = r
+	    } else {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)] = imgetr (in[i], Memc[rdnoise])
+	    }
+	    i = 1
+	    if (ctor (Memc[gain], i, r) > 0) {
+		do i = 1, nimages {
+		    Memr[nmod+3*(i-1)+1] = r * scales[i]
+		    Memr[nmod+3*(i-1)] =
+			max ((Memr[nmod+3*(i-1)] / Memr[nmod+3*(i-1)+1]) ** 2,
+			1e4 / MAX_REAL)
+		}
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[gain])
+		    Memr[nmod+3*(i-1)+1] = r * scales[i]
+		    Memr[nmod+3*(i-1)] =
+			max ((Memr[nmod+3*(i-1)] / Memr[nmod+3*(i-1)+1]) ** 2,
+			1e4 / MAX_REAL)
+		}
+	    }
+	    i = 1
+	    if (ctor (Memc[snoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)+2] = r
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[snoise])
+		    Memr[nmod+3*(i-1)+2] = r
+		}
+	    }
+	}
 
 	# Set rejection algorithm specific parameters
 	switch (reject) {
@@ -302,6 +347,10 @@ begin
 		call salloc (id[i], npts, TY_INT)
 	}
 
+        # Reduce header memory use.
+	do i = 1, nimages
+	    call xt_minhdr (i)
+
 	while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 	    call ic_gdatas (in, out, dbuf, d, id, n, m, lflag, offsets,
 		scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -345,6 +394,12 @@ begin
 		    case SUM:
 			call ic_averages (d, id, n, wts, nimages, npts,
 			    YES, NO, Memr[outdata])
+		    case QUAD:
+			call ic_quads (d, id, n, wts, nimages, npts,
+			    YES, YES, Memr[outdata])
+		    case NMODEL:
+			call ic_nmodels (d, id, n, Memr[nmod], wts,
+			    nimages, npts, YES, YES, Memr[outdata])
 		    }
 		}
 	    }
@@ -456,6 +511,12 @@ begin
 		case SUM:
 		    call ic_averages (d, id, n, wts, nimages, npts,
 		        NO, NO, Memr[outdata])
+		case QUAD:
+		    call ic_quads (d, id, n, wts, nimages, npts,
+		        NO, YES, Memr[outdata])
+		case NMODEL:
+		    call ic_nmodels (d, id, n, Memr[nmod], wts,
+		        nimages, npts, NO, YES, Memr[outdata])
 		}
 
 		if (out[2] != NULL) {
@@ -543,13 +604,17 @@ begin
 	# otherwise use the IMIO buffers.
 
 	if (!aligned || grow >= 1.) {
-	    do i = 1, nimages
+	    do i = 1, nimages {
 		call salloc (Memi[dbuf+i-1], npts, TY_INT)
+		call aclri (Memi[Memi[dbuf+i-1]], npts)
+	    }
 	} else {
 	    do i = 1, nimages {
 		im = xt_opix (in[i], i, 1)
-		if (im != in[i])
+		if (im != in[i]) {
 		    call salloc (Memi[dbuf+i-1], npts, TY_INT)
+		    call aclri (Memi[Memi[dbuf+i-1]], npts)
+		}
 	    }
 	    call amovki (NULL, Memi[dbuf], nimages)
 	}
@@ -662,10 +727,11 @@ int	npts			# Number of points per output line
 int	i, ext, ctor(), errcode()
 real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
-pointer	outdata, buf, nm, pms
+pointer	outdata, buf, nmod, nm, pms
 pointer	immap(), impnli()
 pointer	impnlr(), imgnlr()
-errchk	immap, ic_scale, imgetr, ic_grow, ic_growi, ic_rmasks, ic_gdatai
+errchk	immap, ic_scale, imgetr, ic_grow, ic_growi, ic_rmasks, ic_emask
+errchk	ic_gdatai
 
 include	"../icombine.com"
 data	ext/0/
@@ -685,7 +751,7 @@ begin
 
 	# Set combine parameters
 	switch (combine) {
-	case AVERAGE, SUM:
+	case AVERAGE, SUM, QUAD, NMODEL:
 	    if (dowts)
 		keepids = true
 	    else
@@ -695,6 +761,46 @@ begin
 	    keepids = false
 	}
 	docombine = true
+
+	# Get noise model parameters.
+	if (combine==NMODEL) {
+	    call salloc (nmod, 3*nimages, TY_REAL)
+	    i = 1
+	    if (ctor (Memc[rdnoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)] = r
+	    } else {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)] = imgetr (in[i], Memc[rdnoise])
+	    }
+	    i = 1
+	    if (ctor (Memc[gain], i, r) > 0) {
+		do i = 1, nimages {
+		    Memr[nmod+3*(i-1)+1] = r * scales[i]
+		    Memr[nmod+3*(i-1)] =
+			max ((Memr[nmod+3*(i-1)] / Memr[nmod+3*(i-1)+1]) ** 2,
+			1e4 / MAX_REAL)
+		}
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[gain])
+		    Memr[nmod+3*(i-1)+1] = r * scales[i]
+		    Memr[nmod+3*(i-1)] =
+			max ((Memr[nmod+3*(i-1)] / Memr[nmod+3*(i-1)+1]) ** 2,
+			1e4 / MAX_REAL)
+		}
+	    }
+	    i = 1
+	    if (ctor (Memc[snoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)+2] = r
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[snoise])
+		    Memr[nmod+3*(i-1)+2] = r
+		}
+	    }
+	}
 
 	# Set rejection algorithm specific parameters
 	switch (reject) {
@@ -779,6 +885,10 @@ begin
 		call salloc (id[i], npts, TY_INT)
 	}
 
+        # Reduce header memory use.
+	do i = 1, nimages
+	    call xt_minhdr (i)
+
 	while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 	    call ic_gdatai (in, out, dbuf, d, id, n, m, lflag, offsets,
 		scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -822,6 +932,12 @@ begin
 		    case SUM:
 			call ic_averagei (d, id, n, wts, nimages, npts,
 			    YES, NO, Memr[outdata])
+		    case QUAD:
+			call ic_quadi (d, id, n, wts, nimages, npts,
+			    YES, YES, Memr[outdata])
+		    case NMODEL:
+			call ic_nmodeli (d, id, n, Memr[nmod], wts,
+			    nimages, npts, YES, YES, Memr[outdata])
 		    }
 		}
 	    }
@@ -933,6 +1049,12 @@ begin
 		case SUM:
 		    call ic_averagei (d, id, n, wts, nimages, npts,
 		        NO, NO, Memr[outdata])
+		case QUAD:
+		    call ic_quadi (d, id, n, wts, nimages, npts,
+		        NO, YES, Memr[outdata])
+		case NMODEL:
+		    call ic_nmodeli (d, id, n, Memr[nmod], wts,
+		        nimages, npts, NO, YES, Memr[outdata])
 		}
 
 		if (out[2] != NULL) {
@@ -1020,13 +1142,17 @@ begin
 	# otherwise use the IMIO buffers.
 
 	if (!aligned || grow >= 1.) {
-	    do i = 1, nimages
+	    do i = 1, nimages {
 		call salloc (Memi[dbuf+i-1], npts, TY_REAL)
+		call aclrr (Memr[Memi[dbuf+i-1]], npts)
+	    }
 	} else {
 	    do i = 1, nimages {
 		im = xt_opix (in[i], i, 1)
-		if (im != in[i])
+		if (im != in[i]) {
 		    call salloc (Memi[dbuf+i-1], npts, TY_REAL)
+		    call aclrr (Memr[Memi[dbuf+i-1]], npts)
+		}
 	    }
 	    call amovki (NULL, Memi[dbuf], nimages)
 	}
@@ -1139,10 +1265,11 @@ int	npts			# Number of points per output line
 int	i, ext, ctor(), errcode()
 real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
-pointer	outdata, buf, nm, pms
+pointer	outdata, buf, nmod, nm, pms
 pointer	immap(), impnli()
 pointer	impnlr(), imgnlr
-errchk	immap, ic_scale, imgetr, ic_grow, ic_growr, ic_rmasks, ic_gdatar
+errchk	immap, ic_scale, imgetr, ic_grow, ic_growr, ic_rmasks, ic_emask
+errchk	ic_gdatar
 
 include	"../icombine.com"
 data	ext/0/
@@ -1162,7 +1289,7 @@ begin
 
 	# Set combine parameters
 	switch (combine) {
-	case AVERAGE, SUM:
+	case AVERAGE, SUM, QUAD, NMODEL:
 	    if (dowts)
 		keepids = true
 	    else
@@ -1172,6 +1299,46 @@ begin
 	    keepids = false
 	}
 	docombine = true
+
+	# Get noise model parameters.
+	if (combine==NMODEL) {
+	    call salloc (nmod, 3*nimages, TY_REAL)
+	    i = 1
+	    if (ctor (Memc[rdnoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)] = r
+	    } else {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)] = imgetr (in[i], Memc[rdnoise])
+	    }
+	    i = 1
+	    if (ctor (Memc[gain], i, r) > 0) {
+		do i = 1, nimages {
+		    Memr[nmod+3*(i-1)+1] = r * scales[i]
+		    Memr[nmod+3*(i-1)] =
+			max ((Memr[nmod+3*(i-1)] / Memr[nmod+3*(i-1)+1]) ** 2,
+			1e4 / MAX_REAL)
+		}
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[gain])
+		    Memr[nmod+3*(i-1)+1] = r * scales[i]
+		    Memr[nmod+3*(i-1)] =
+			max ((Memr[nmod+3*(i-1)] / Memr[nmod+3*(i-1)+1]) ** 2,
+			1e4 / MAX_REAL)
+		}
+	    }
+	    i = 1
+	    if (ctor (Memc[snoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)+2] = r
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[snoise])
+		    Memr[nmod+3*(i-1)+2] = r
+		}
+	    }
+	}
 
 	# Set rejection algorithm specific parameters
 	switch (reject) {
@@ -1256,6 +1423,10 @@ begin
 		call salloc (id[i], npts, TY_INT)
 	}
 
+        # Reduce header memory use.
+	do i = 1, nimages
+	    call xt_minhdr (i)
+
 	while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 	    call ic_gdatar (in, out, dbuf, d, id, n, m, lflag, offsets,
 		scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -1299,6 +1470,12 @@ begin
 		    case SUM:
 			call ic_averager (d, id, n, wts, nimages, npts,
 			    YES, NO, Memr[outdata])
+		    case QUAD:
+			call ic_quadr (d, id, n, wts, nimages, npts,
+			    YES, YES, Memr[outdata])
+		    case NMODEL:
+			call ic_nmodelr (d, id, n, Memr[nmod], wts,
+			    nimages, npts, YES, YES, Memr[outdata])
 		    }
 		}
 	    }
@@ -1411,6 +1588,12 @@ begin
 		case SUM:
 		    call ic_averager (d, id, n, wts, nimages, npts,
 		        NO, NO, Memr[outdata])
+		case QUAD:
+		    call ic_quadr (d, id, n, wts, nimages, npts,
+		        NO, YES, Memr[outdata])
+		case NMODEL:
+		    call ic_nmodelr (d, id, n, Memr[nmod], wts,
+		        nimages, npts, NO, YES, Memr[outdata])
 		}
 
 		if (out[2] != NULL) {
@@ -1498,13 +1681,17 @@ begin
 	# otherwise use the IMIO buffers.
 
 	if (!aligned || grow >= 1.) {
-	    do i = 1, nimages
+	    do i = 1, nimages {
 		call salloc (Memi[dbuf+i-1], npts, TY_DOUBLE)
+		call aclrd (Memd[Memi[dbuf+i-1]], npts)
+	    }
 	} else {
 	    do i = 1, nimages {
 		im = xt_opix (in[i], i, 1)
-		if (im != in[i])
+		if (im != in[i]) {
 		    call salloc (Memi[dbuf+i-1], npts, TY_DOUBLE)
+		    call aclrd (Memd[Memi[dbuf+i-1]], npts)
+		}
 	    }
 	    call amovki (NULL, Memi[dbuf], nimages)
 	}
@@ -1617,10 +1804,11 @@ int	npts			# Number of points per output line
 int	i, ext, ctor(), errcode()
 real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
-pointer	outdata, buf, nm, pms
+pointer	outdata, buf, nmod, nm, pms
 pointer	immap(), impnli()
 pointer	impnld(), imgnld
-errchk	immap, ic_scale, imgetr, ic_grow, ic_growd, ic_rmasks, ic_gdatad
+errchk	immap, ic_scale, imgetr, ic_grow, ic_growd, ic_rmasks, ic_emask
+errchk	ic_gdatad
 
 include	"../icombine.com"
 data	ext/0/
@@ -1640,7 +1828,7 @@ begin
 
 	# Set combine parameters
 	switch (combine) {
-	case AVERAGE, SUM:
+	case AVERAGE, SUM, QUAD, NMODEL:
 	    if (dowts)
 		keepids = true
 	    else
@@ -1650,6 +1838,46 @@ begin
 	    keepids = false
 	}
 	docombine = true
+
+	# Get noise model parameters.
+	if (combine==NMODEL) {
+	    call salloc (nmod, 3*nimages, TY_REAL)
+	    i = 1
+	    if (ctor (Memc[rdnoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)] = r
+	    } else {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)] = imgetr (in[i], Memc[rdnoise])
+	    }
+	    i = 1
+	    if (ctor (Memc[gain], i, r) > 0) {
+		do i = 1, nimages {
+		    Memr[nmod+3*(i-1)+1] = r * scales[i]
+		    Memr[nmod+3*(i-1)] =
+			max ((Memr[nmod+3*(i-1)] / Memr[nmod+3*(i-1)+1]) ** 2,
+			1e4 / MAX_REAL)
+		}
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[gain])
+		    Memr[nmod+3*(i-1)+1] = r * scales[i]
+		    Memr[nmod+3*(i-1)] =
+			max ((Memr[nmod+3*(i-1)] / Memr[nmod+3*(i-1)+1]) ** 2,
+			1e4 / MAX_REAL)
+		}
+	    }
+	    i = 1
+	    if (ctor (Memc[snoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)+2] = r
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[snoise])
+		    Memr[nmod+3*(i-1)+2] = r
+		}
+	    }
+	}
 
 	# Set rejection algorithm specific parameters
 	switch (reject) {
@@ -1734,6 +1962,10 @@ begin
 		call salloc (id[i], npts, TY_INT)
 	}
 
+        # Reduce header memory use.
+	do i = 1, nimages
+	    call xt_minhdr (i)
+
 	while (impnld (out[1], outdata, Meml[v1]) != EOF) {
 	    call ic_gdatad (in, out, dbuf, d, id, n, m, lflag, offsets,
 		scales, zeros, nimages, npts, Meml[v2], Meml[v3])
@@ -1777,6 +2009,12 @@ begin
 		    case SUM:
 			call ic_averaged (d, id, n, wts, nimages, npts,
 			    YES, NO, Memd[outdata])
+		    case QUAD:
+			call ic_quadd (d, id, n, wts, nimages, npts,
+			    YES, YES, Memd[outdata])
+		    case NMODEL:
+			call ic_nmodeld (d, id, n, Memr[nmod], wts,
+			    nimages, npts, YES, YES, Memd[outdata])
 		    }
 		}
 	    }
@@ -1889,6 +2127,12 @@ begin
 		case SUM:
 		    call ic_averaged (d, id, n, wts, nimages, npts,
 		        NO, NO, Memd[outdata])
+		case QUAD:
+		    call ic_quadd (d, id, n, wts, nimages, npts,
+		        NO, YES, Memd[outdata])
+		case NMODEL:
+		    call ic_nmodeld (d, id, n, Memr[nmod], wts,
+		        nimages, npts, NO, YES, Memd[outdata])
 		}
 
 		if (out[2] != NULL) {

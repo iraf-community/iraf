@@ -10,12 +10,14 @@
  * few bytes, hence comparison of the addresses of the arrays is necessary
  * to determine if they overlap.
  */
-BYTMOV (a, aoff, b, boff, nbytes)
-XCHAR	*a;			/* input byte array			*/
-XINT	*aoff;			/* first byte in A to be moved		*/
-XCHAR	*b;			/* output byte array			*/
-XINT	*boff;			/* first byte in B to be written	*/
-XINT	*nbytes;		/* number of bytes to move		*/
+void
+BYTMOV (
+  XCHAR	*a,			/* input byte array			*/
+  XINT	*aoff,			/* first byte in A to be moved		*/
+  XCHAR	*b,			/* output byte array			*/
+  XINT	*boff,			/* first byte in B to be written	*/
+  XINT	*nbytes 		/* number of bytes to move		*/
+)
 {
 	register char	*ip, *op;
 	register int	n = *nbytes;

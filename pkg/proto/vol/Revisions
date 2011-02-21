@@ -1,0 +1,12 @@
+.help revisions Sep89 vol
+.nf
+vol$src/vtransmit.gx
+	Was attempting to calculate opacity factor even when mode did not
+	include opacity (task default parameters include INDEFs).  Generated
+	a floating exception in iraf 2.8 not present before.  (7/5/89 SRo)
+
+====
+V2.8
+====
+
+.endhelp

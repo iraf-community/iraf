@@ -1,0 +1,8 @@
+table,f,a,,,,"Table name"
+column,s,a,,,,"Column name"
+newunits,s,a,,,,"New column units"
+oldunits,s,h," ",,,"Old column units"
+abrevtab,f,h,"ttools$tunits/abrev.tab",,,"Table of unit abbreviations"
+unittab,f,h,"ttools$tunits/units.tab",,,"Table of unit conversions"
+verbose,b,h,no,,,"Print diagnostic messages?"
+mode,s,h,al

@@ -12,7 +12,7 @@ define	O_VALC		Memc[Memi[($1)+4]]	# string val (in string buffer)
 define	O_VALS		Mems[P2S(($1)+4)]	# short int value
 define	O_VALI		Memi[($1)+4]		# bool or int value
 define	O_VALL		Meml[P2L(($1)+4)]	# long int value
-define	O_VALR		Memr[($1)+4]		# real value
+define	O_VALR		Memr[P2R(($1)+4)]	# real value
 define	O_VALD		Memd[P2D(($1)+4)]	# double value
 define	O_VALP		Memi[($1)+4]		# pointer
 

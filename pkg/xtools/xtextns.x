@@ -275,8 +275,20 @@ begin
 	    # Check the extension type.
 	    if (exttype[1] != EOS && !streq (exttype, MEF_EXTTYPE(mef))) {
 		if (!streq (exttype, "IMAGE") ||
-		    !streq (MEF_EXTTYPE(mef), "SIMPLE"))
-		    next
+		    !streq (MEF_EXTTYPE(mef), "SIMPLE")) {
+		    # Check for PLIO mask which is a kind of image.
+		    if (streq (MEF_EXTTYPE(mef), "BINTABLE")) {
+		        call sprintf (Memc[str], SZ_LINE, "%s[%d]")
+			    call pargstr (Memc[clust])
+			    call pargi (MEF_CGROUP(mef))
+			iferr (im = immap (Memc[str], READ_ONLY, 0))
+			    im = NULL
+			if (im == NULL)
+			    next
+			else
+			    call imunmap (im)
+		    }
+		}
 	    }
 
 	    # Check the extension name.

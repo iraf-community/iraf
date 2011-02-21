@@ -34,7 +34,7 @@ begin
 	switch (optype) {
 	case TY_UBYTE:			nbytes_pix = 1
 	case TY_USHORT, TY_SHORT:	nbytes_pix = SZB_CHAR * SZ_SHORT
-	case TY_INT:			nbytes_pix = SZB_CHAR * SZ_INT
+	case TY_INT:			nbytes_pix = SZB_CHAR * SZ_INT32
 	case TY_LONG:			nbytes_pix = SZB_CHAR * SZ_LONG
 	case TY_REAL:			nbytes_pix = SZB_CHAR * SZ_REAL
 	case TY_DOUBLE:			nbytes_pix = SZB_CHAR * SZ_DOUBLE
@@ -242,9 +242,15 @@ begin
 	        }
 	        $endif
 	        $if (datatype == il)
-                if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4) {
-                    call bswap4 (Mem$t[data], 1, Mem$t[data], 1, 
-		        (totpix*(SZ_PIXEL*SZB_CHAR)))
+                if (and(swap, S_ALL) == S_ALL || and(swap, S_I4) == S_I4) {
+		    if (SZ_INT != SZ_INT32) {
+			call ipak32 (Mem$t[data], Mem$t[data], totpix)
+                        call bswap4 (Mem$t[data], 1, Mem$t[data], 1, 
+		            (totpix*(SZ_INT32*SZB_CHAR)))
+		    } else {
+                        call bswap4 (Mem$t[data], 1, Mem$t[data], 1, 
+		            (totpix*(SZ_INT*SZB_CHAR)))
+		    }
 	        }
 	        $endif
 	        $if (datatype == r)
@@ -259,7 +265,12 @@ begin
 		        (totpix*(SZ_PIXEL*SZB_CHAR)))
 	        }
 	        $endif
+
+	        $if (datatype == il)
+	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_INT32)))
+	        $else
 	        call ip_lskip (fd, (totpix * (SZB_CHAR * SZ_PIXEL)))
+	        $endif
 	    $endfor
 	    }
 
@@ -364,8 +375,14 @@ begin
 	    $endif
 	    $if (datatype == il)
             if (and(swap, S_ALL) == S_ALL || and(swap, S_I2) == S_I4) {
-                call bswap4 (Mem$t[data], 1, Mem$t[data], 1, 
-		    (npix*(SZ_PIXEL*SZB_CHAR)))
+		    if (SZ_INT != SZ_INT32) {
+			call ipak32 (Mem$t[data], Mem$t[data], npix)
+                	call bswap4 (Mem$t[data], 1, Mem$t[data], 1, 
+		    	    (npix*(SZ_INT32*SZB_CHAR)))
+		    } else {
+                	call bswap4 (Mem$t[data], 1, Mem$t[data], 1, 
+		    	    (npix*(SZ_PIXEL*SZB_CHAR)))
+		    }
 	    }
 	    $endif
 	    $if (datatype == r)
@@ -380,7 +397,12 @@ begin
 		    (npix*(SZ_PIXEL*SZB_CHAR)))
 	    }
 	    $endif
+
+	    $if (datatype == il)
+	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_INT32))
+	    $else
 	    call ip_lskip (fd, npix * (SZB_CHAR * SZ_PIXEL))
+	    $endif
 	$endfor
 	}
 	IO_DATA(op) = data

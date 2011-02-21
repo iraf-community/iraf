@@ -112,7 +112,8 @@ int	status, totpix, npix
 int	datasizeb, pixoffb, nb_skipped, i
 double  dtemp
 real    rtemp, rscale, roffset
-int	sizeof()
+
+include <szpixtype.inc>
 
 begin
 	fit = chan
@@ -131,7 +132,7 @@ begin
 	}
 
 	pixtype = IM_PIXTYPE(im)
-	datasizeb = totpix * (sizeof(pixtype) * SZB_CHAR)
+	datasizeb = totpix * (pix_size[pixtype] * SZB_CHAR)
 	pixoffb = (FIT_PIXOFF(fit) - 1) * SZB_CHAR + 1
 
 	# We can read the data directly into the caller's output buffer as 
@@ -163,7 +164,7 @@ begin
 	    nb = min (status + nb_skipped, datasizeb)
 	else
 	    nb = min (status, datasizeb - nb_skipped)
-	npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
+	npix = max (0, nb / (pix_size[pixtype] * SZB_CHAR))
 
 	if (FIT_ZCNV(fit) == YES) {
 	    if (FIT_PIXTYPE(fit) == TY_REAL) {
@@ -226,7 +227,8 @@ int	ip, op, pixtype, npix, totpix, nb, nchars, i
 int	datasizeb, pixoffb, nb_skipped, obufsize
 
 bool	fxf_fpl_equald()
-int	sizeof()
+
+include	<szpixtype.inc>
 
 begin
 	fit = chan
@@ -275,7 +277,7 @@ begin
 	do i = 2, IM_NPHYSDIM(im)
 	    totpix = totpix * IM_PHYSLEN(im,i)
 
-	datasizeb = totpix * (sizeof(pixtype) * SZB_CHAR)
+	datasizeb = totpix * (pix_size[pixtype] * SZB_CHAR)
 	pixoffb = (FIT_PIXOFF(fit) - 1) * SZB_CHAR + 1
 
 	### Same comments as for fxfzrd apply here.
@@ -293,7 +295,7 @@ begin
 	    nb = min (nbytes + nb_skipped, datasizeb)
 	else
 	    nb = min (nbytes, datasizeb - nb_skipped)
-	npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
+	npix = max (0, nb / (pix_size[pixtype] * SZB_CHAR))
 
 	if (npix == 0) 
 	    return
@@ -325,7 +327,7 @@ begin
 
 	# Convert and output the pixels.
 	call fxf_pak_data (ibuf[ip], Memc[obuf+op-1], npix, pixtype)
-	op = op + npix * sizeof(pixtype)
+	op = op + npix * pix_size[pixtype]
 
 	# Preserve any remaining non-pixel data.
 	nchars = obufsize - op + 1
@@ -385,7 +387,8 @@ int	value			#O parameter value
 
 pointer fit, im
 int	i, totpix, szb_pixel, szb_real
-int	sizeof()
+
+include	<szpixtype.inc>
 
 begin
 	fit = chan
@@ -395,7 +398,7 @@ begin
 	do i = 2, IM_NPHYSDIM(im)
 	    totpix = totpix * IM_PHYSLEN(im,i)
 
-        szb_pixel = sizeof(IM_PIXTYPE(im)) * SZB_CHAR
+        szb_pixel = pix_size[IM_PIXTYPE(im)] * SZB_CHAR
 	szb_real = SZ_REAL * SZB_CHAR
 
 	call zsttbf (FIT_IO(fit), param, value)
@@ -436,7 +439,8 @@ int	ip, nelem, pfactor
 int	pixtype, nb, buf_size, bzoff, nboff
 int	status, offset, npix
 int	datasizeb, pixoffb, nb_skipped
-int	sizeof()
+
+include	<szpixtype.inc>
 
 begin
 	fit = IM_KDES(im)
@@ -460,7 +464,7 @@ begin
 	} else if (FIT_PIXTYPE(fit) == TY_SHORT) {
 	    pfactor = SZ_REAL / SZ_SHORT
 	    pixtype = TY_SHORT
-	    datasizeb = totpix * (sizeof(pixtype) * SZB_CHAR)
+	    datasizeb = totpix * (pix_size[pixtype] * SZB_CHAR)
 	} else {
 	    FIT_IOSTAT(fit) = ERR
 	    return
@@ -532,7 +536,7 @@ begin
 	    }
 	case TY_SHORT:
 	    op = buf + ip - 1
-	    npix = max (0, nb / (sizeof(pixtype) * SZB_CHAR))
+	    npix = max (0, nb / (pix_size[pixtype] * SZB_CHAR))
 	    if (BYTE_SWAP2 == YES)
 		call bswap2 (Mems[op], 1, Mems[op], 1, npix*SZB_CHAR)
 	    call fxf_astmr (Mems[op], obuf[ip], npix, bscale, bzero)

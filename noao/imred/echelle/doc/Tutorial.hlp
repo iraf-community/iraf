@@ -45,7 +45,7 @@ Use arc calibration spectra to determine wavelength solutions.
 .le
 .ls (6)
 Apply the wavelength solutions to the other spectra and rebin the spectra
-into linear or logrithmic wavelength intervals.
+into linear or logarithmic wavelength intervals.
 .le
 .ls (7)
 Determine flux calibrations using standard star observations.
@@ -107,7 +107,7 @@ satisfied with the marked apertures type 'q'.
 The positions of the orders are now traced in steps from the initial point.
 Once the positions have been traced you are asked whether to fit the
 traced apertures interactively.  Respond with "yes".  You will now be
-asked specificly if the first aperture is to be fit.  Respond with "yes"
+asked specifically if the first aperture is to be fit.  Respond with "yes"
 again.  The traced positions are graphed along with a fitted curve.  You now
 have many options for adjusting the fit.  The most important one is the
 order which is set by typing ":order value", where value is the desired

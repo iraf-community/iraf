@@ -3,7 +3,7 @@
 include <math/iminterp.h>
 include "im1interpdef.h"
 
-define	TEMP	Memr[$1]
+define	TEMP	Memr[P2P($1)]
 
 # ASIFIT -- Fit the interpolant to the data.
 

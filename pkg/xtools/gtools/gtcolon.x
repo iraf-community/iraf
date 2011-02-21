@@ -570,11 +570,11 @@ begin
 	case TXUP:
 	    Memi[gt+GT_TXUP] = nint (rval[1])
 	case TXSIZE:
-	    Memr[gt+GT_TXSIZE] = rval[1]
+	    Memr[P2R(gt+GT_TXSIZE)] = rval[1]
 	case TXPATH:
 	    Memi[gt+GT_TXPATH] = nint (rval[1])
 	case TXSPACING:
-	    Memr[gt+GT_TXSPACING] = rval[1]
+	    Memr[P2R(gt+GT_TXSPACING)] = rval[1]
 	case TXHJUSTIFY:
 	    Memi[gt+GT_TXHJUSTIFY] = nint (rval[1])
 	case TXVJUSTIFY:
@@ -589,15 +589,15 @@ begin
 	case DRAWTITLE:
 	    Memi[gt+GT_DRAWTITLE] = nint (rval[1])
 	case TITLESIZE:
-	    Memr[gt+GT_TITLESIZE] = rval[1]
+	    Memr[P2R(gt+GT_TITLESIZE)] = rval[1]
 	case TITLEJUST:
 	    Memi[gt+GT_TITLEJUST] = nint (rval[1])
 	case NTITLELINES:
 	    Memi[gt+GT_NTITLELINES] = nint (rval[1])
 	case ASPECT:
-	    Memr[gt+GT_ASPECT] = rval[1]
+	    Memr[P2R(gt+GT_ASPECT)] = rval[1]
 	case CHARSIZE:
-	    Memr[gt+GT_CHARSIZE] = rval[1]
+	    Memr[P2R(gt+GT_CHARSIZE)] = rval[1]
 	case TITLECOLOR:
 	    Memi[gt+GT_TITLECOLOR] = nint (rval[1])
 	case FRAMECOLOR:
@@ -612,11 +612,11 @@ begin
 	    Memi[gt+GT_XSETAXISPOS] = nint (rval[1])
 	    Memi[gt+GT_YSETAXISPOS] = nint (rval[2])
 	case AXISPOS1:
-	    Memr[gt+GT_XAXISPOS1] = rval[1]
-	    Memr[gt+GT_YAXISPOS1] = rval[2]
+	    Memr[P2R(gt+GT_XAXISPOS1)] = rval[1]
+	    Memr[P2R(gt+GT_YAXISPOS1)] = rval[2]
 	case AXISPOS2:
-	    Memr[gt+GT_XAXISPOS2] = rval[1]
-	    Memr[gt+GT_YAXISPOS2] = rval[2]
+	    Memr[P2R(gt+GT_XAXISPOS2)] = rval[1]
+	    Memr[P2R(gt+GT_YAXISPOS2)] = rval[2]
 	case DRAWGRID:
 	    Memi[gt+GT_XDRAWGRID] = nint (rval[1])
 	    Memi[gt+GT_YDRAWGRID] = nint (rval[2])
@@ -627,8 +627,8 @@ begin
 	    Memi[gt+GT_XLABELAXIS] = nint (rval[1])
 	    Memi[gt+GT_YLABELAXIS] = nint (rval[2])
 	case AXISLABELSIZE:
-	    Memr[gt+GT_XAXISLABELSIZE] = rval[1]
-	    Memr[gt+GT_YAXISLABELSIZE] = rval[2]
+	    Memr[P2R(gt+GT_XAXISLABELSIZE)] = rval[1]
+	    Memr[P2R(gt+GT_YAXISLABELSIZE)] = rval[2]
 	case DRAWTICKS:
 	    Memi[gt+GT_XDRAWTICKS] = nint (rval[1])
 	    Memi[gt+GT_YDRAWTICKS] = nint (rval[2])
@@ -642,23 +642,23 @@ begin
 	    Memi[gt+GT_XNMINOR] = nint (rval[1])
 	    Memi[gt+GT_YNMINOR] = nint (rval[2])
 	case MAJORLENGTH:
-	    Memr[gt+GT_XMAJORLENGTH] = rval[1]
-	    Memr[gt+GT_YMAJORLENGTH] = rval[2]
+	    Memr[P2R(gt+GT_XMAJORLENGTH)] = rval[1]
+	    Memr[P2R(gt+GT_YMAJORLENGTH)] = rval[2]
 	case MINORLENGTH:
-	    Memr[gt+GT_XMINORLENGTH] = rval[1]
-	    Memr[gt+GT_YMINORLENGTH] = rval[2]
+	    Memr[P2R(gt+GT_XMINORLENGTH)] = rval[1]
+	    Memr[P2R(gt+GT_YMINORLENGTH)] = rval[2]
 	case MAJORWIDTH:
-	    Memr[gt+GT_XMAJORWIDTH] = rval[1]
-	    Memr[gt+GT_YMAJORWIDTH] = rval[2]
+	    Memr[P2R(gt+GT_XMAJORWIDTH)] = rval[1]
+	    Memr[P2R(gt+GT_YMAJORWIDTH)] = rval[2]
 	case MINORWIDTH:
-	    Memr[gt+GT_XMINORWIDTH] = rval[1]
-	    Memr[gt+GT_YMINORWIDTH] = rval[2]
+	    Memr[P2R(gt+GT_XMINORWIDTH)] = rval[1]
+	    Memr[P2R(gt+GT_YMINORWIDTH)] = rval[2]
 	case AXISWIDTH:
-	    Memr[gt+GT_XAXISWIDTH] = rval[1]
-	    Memr[gt+GT_YAXISWIDTH] = rval[2]
+	    Memr[P2R(gt+GT_XAXISWIDTH)] = rval[1]
+	    Memr[P2R(gt+GT_YAXISWIDTH)] = rval[2]
 	case TICKLABELSIZE:
-	    Memr[gt+GT_XTICKLABELSIZE] = rval[1]
-	    Memr[gt+GT_YTICKLABELSIZE] = rval[2]
+	    Memr[P2R(gt+GT_XTICKLABELSIZE)] = rval[1]
+	    Memr[P2R(gt+GT_YTICKLABELSIZE)] = rval[2]
 	case GRIDCOLOR:
 	    Memi[gt+GT_XGRIDCOLOR] = nint (rval[1])
 	    Memi[gt+GT_YGRIDCOLOR] = nint (rval[2])
@@ -688,14 +688,14 @@ begin
 	    rval[6] = btoi (bval)
 	    if (nscan() == 7) {
 		Memi[gt+GT_XDRAWAXES] = nint (rval[1])
-		Memr[gt+GT_XAXISWIDTH] = rval[2]
-		Memr[gt+GT_XMAJORWIDTH] = rval[2]
-		Memr[gt+GT_XMINORWIDTH] = rval[2]
+		Memr[P2R(gt+GT_XAXISWIDTH)] = rval[2]
+		Memr[P2R(gt+GT_XMAJORWIDTH)] = rval[2]
+		Memr[P2R(gt+GT_XMINORWIDTH)] = rval[2]
 		Memi[gt+GT_XDRAWGRID] = nint (rval[3])
 		Memi[gt+GT_YDRAWAXES] = nint (rval[4])
-		Memr[gt+GT_YAXISWIDTH] = rval[5]
-		Memr[gt+GT_YMAJORWIDTH] = rval[5]
-		Memr[gt+GT_YMINORWIDTH] = rval[5]
+		Memr[P2R(gt+GT_YAXISWIDTH)] = rval[5]
+		Memr[P2R(gt+GT_YMAJORWIDTH)] = rval[5]
+		Memr[P2R(gt+GT_YMINORWIDTH)] = rval[5]
 		Memi[gt+GT_YDRAWGRID] = nint (rval[6])
 	    }
 	case TICKS:

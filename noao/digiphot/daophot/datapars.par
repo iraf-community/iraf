@@ -2,7 +2,7 @@
 
 scale,r,h,1.0,0.0,,Image scale in units per pixel
 fwhmpsf,r,h,2.5,0.0,,FWHM of the PSF in scale units
-emission,b,h,y,,,Features are positive ?
+emission,b,h,y,,,Features are positive?
 sigma,r,h,0.0,0.0,,Standard deviation of background in counts
 datamin,r,h,INDEF,,,Minimum good data value
 datamax,r,h,INDEF,,,Maximum good data value

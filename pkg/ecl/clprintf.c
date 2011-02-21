@@ -12,6 +12,11 @@
 #include "param.h"
 #include "task.h"
 #include "errs.h"
+#include "proto.h"
+
+
+extern void u_doprnt ();
+
 
 /*
  * CLPRINTF -- These are just printf's with various implied write files for
@@ -20,23 +25,13 @@
 
 /* EPRINTF -- Printf that always writes to the current pseudo-file t_stderr.
  */
-#ifdef USE_STDARG
+void
 eprintf (char *fmt, ...)
-#else
-eprintf (va_alist)
-va_dcl
-#endif
 {
 	va_list	args;
 	FILE *eout;
 
-#ifdef USE_STDARG
 	va_start (args, fmt);
-#else
-	char *fmt;
-	va_start (args);
-	fmt = va_arg (args, char *);
-#endif
 	eout = currentask->t_stderr;
 	u_doprnt (fmt, &args, eout);
 	va_end (args);
@@ -46,23 +41,12 @@ va_dcl
 
 /* OPRINTF -- Printf that always writes to the current pseudo-file t_stdout.
  */
-#ifdef USE_STDARG
 oprintf (char *fmt, ...)
-#else
-oprintf (va_alist)
-va_dcl
-#endif
 {
 	va_list	args;
 	FILE *sout;
 
-#ifdef USE_STDARG
 	va_start (args, fmt);
-#else
-	char *fmt;
-	va_start (args);
-	fmt = va_arg (args, char *);
-#endif
 	sout = currentask->t_stdout;
 	u_doprnt (fmt, &args, sout);
 	va_end (args);
@@ -74,12 +58,7 @@ va_dcl
  * running task.  Be a bit more careful here in case a pipe is broken or
  * something is going haywire.
  */
-#ifdef USE_STDARG
 tprintf (char *fmt, ...)
-#else
-tprintf (va_alist)
-va_dcl
-#endif
 {
 	va_list	args;
 	FILE *out;
@@ -89,13 +68,7 @@ va_dcl
 	    cl_error (E_IERR, "no t_out for currentask `%s'",
 	    currentask->t_ltp->lt_lname);
 	else {
-#ifdef USE_STDARG
 	    va_start (args, fmt);
-#else
-	    char *fmt;
-	    va_start (args);
-	    fmt = va_arg (args, char *);
-#endif
 	    u_doprnt (fmt, &args, out);
 	    va_end (args);
 	    fflush (out);
@@ -134,9 +107,8 @@ int	nbytes;
  * Give name of file if list, don't do anything if undefinded. 
  * Do not include a trailing \n.
  */
-prparamval (pp, fp)
-struct	param *pp;
-FILE	*fp;
+int 
+prparamval (struct param *pp, FILE *fp)
 {
 	char	buf[SZ_LINE];
 
@@ -147,9 +119,11 @@ FILE	*fp;
 
 /* STRSORT -- Sort a list of pointers to strings.
  */
-strsort (list, nstr)
-char	*list[];		/* array of string pointers */
-int	nstr;			/* number of strings */
+int 
+strsort (
+    char *list[],		/* array of string pointers */
+    int nstr			/* number of strings */
+)
 {
 	extern	qstrcmp();
 
@@ -159,8 +133,8 @@ int	nstr;			/* number of strings */
 
 /* QSTRCMP -- String comparison routine (strcmp interface) for STRSRT.
  */
-qstrcmp (a, b)
-char	*a, *b;
+int 
+qstrcmp (char *a, char *b)
 {
 	return (strcmp (*(char **)a, *(char **)b));
 }
@@ -172,13 +146,16 @@ char	*a, *b;
  * with at least two spaces between strings.  Excessively long strings
  * are truncated (adapted from "fmtio/strtbl.x").
  */
-strtable (fp, list, nstr, first_col, last_col, maxch, ncol)
-FILE	*fp;			/* output file */
-char	*list[];		/* array of string pointers */
-int	nstr;			/* number of strings */
-int	first_col, last_col;	/* where to place table on a line */
-int	maxch;			/* maximum chars to print from a string */
-int	ncol;			/* desired # of columns (0 to autoscale) */
+int 
+strtable (
+    FILE *fp,			/* output file */
+    char *list[],		/* array of string pointers */
+    int nstr,			/* number of strings */
+    int first_col,
+    int last_col,	/* where to place table on a line */
+    int maxch,			/* maximum chars to print from a string */
+    int ncol			/* desired # of columns (0 to autoscale) */
+)
 {
 	int	row, i, j, nspaces, len, maxlen, colwidth;
 	int	numcol, numrow, str;

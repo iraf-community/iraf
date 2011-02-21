@@ -20,7 +20,7 @@ and which make the only calls to the Calcomp library.
 The driver task, \fBcalcomp\fR, allows a user to direct an existing GKI metacode
 file to a particular Calcomp plotter under control of a set of CL parameters.
 The task is loaded either by being run directly from the CL as a task, or by
-being invoked through interprocess control following a write-to-pseudofile
+being invoked through inter-process control following a write-to-pseudofile
 containing the GKI_OPENWS metacode instruction.  The task may 
 optionally control certain kinds of debug output.
 

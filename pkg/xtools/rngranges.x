@@ -27,9 +27,9 @@ define	RNG_MAXINT	(MAX_INT/2)		# Maximum range integer
 
 define	RNG_NPTS	Memi[$1]		# Number of points in ranges
 define	RNG_NRNGS	Memi[$1+1]		# Number of range intervals
-define	RNG_X1		Memr[$1+4*($2)-2]	# Start of range
-define	RNG_X2		Memr[$1+4*($2)-1]	# End of range
-define	RNG_DX		Memr[$1+4*($2)]		# Interval step
+define	RNG_X1		Memr[P2R($1+4*($2)-2)]	# Start of range
+define	RNG_X2		Memr[P2R($1+4*($2)-1)]	# End of range
+define	RNG_DX		Memr[P2R($1+4*($2))]	# Interval step
 define	RNG_NX		Memi[$1+4*($2)+1]	# Number of intervals step
 
 

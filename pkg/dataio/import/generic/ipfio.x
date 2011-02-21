@@ -95,7 +95,7 @@ short   val
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_SHORT * SZB_CHAR)
+            nstat = read (fd, val, SZ_SHORT * SZB_CHAR)
 
 	if (DEBUG) { call eprintf ("ip_get: %g\n"); call pargs(val) }
         return (val)
@@ -112,7 +112,9 @@ int   val
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_INT * SZB_CHAR)
+            nstat = read (fd, val, SZ_INT32 * SZB_CHAR)
+	    if (SZ_INT != SZ_INT32)
+		call iupk32 (val, val, 1)
 
 	if (DEBUG) { call eprintf ("ip_get: %g\n"); call pargi(val) }
         return (val)
@@ -129,7 +131,9 @@ long   val
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_LONG * SZB_CHAR)
+            nstat = read (fd, val, SZ_INT32 * SZB_CHAR)
+	    if (SZ_INT != SZ_INT32)
+		call iupk32 (val, val, 1)
 
 	if (DEBUG) { call eprintf ("ip_get: %g\n"); call pargl(val) }
         return (val)
@@ -146,7 +150,7 @@ real   val
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_REAL * SZB_CHAR)
+            nstat = read (fd, val, SZ_REAL * SZB_CHAR)
 	call ieeupkr (val)
 
 	if (DEBUG) { call eprintf ("ip_get: %g\n"); call pargr(val) }
@@ -164,7 +168,7 @@ double   val
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_DOUBLE * SZB_CHAR)
+            nstat = read (fd, val, SZ_DOUBLE * SZB_CHAR)
 	call ieeupkd (val)
 
 	if (DEBUG) { call eprintf ("ip_get: %g\n"); call pargd(val) }
@@ -278,7 +282,7 @@ int     read()
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_SHORT)
-        nstat = read (fd, Mems[ptr], len * SZ_SHORT)
+            nstat = read (fd, Mems[ptr], len * SZ_SHORT)
 end
 
 
@@ -294,7 +298,9 @@ int     read()
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_INT)
-        nstat = read (fd, Memi[ptr], len * SZ_INT)
+            nstat = read (fd, Memi[ptr], len * SZ_INT32)
+	    if (SZ_INT != SZ_INT32)
+	        call iupk32 (Memi[ptr], Memi[ptr], len)
 end
 
 
@@ -310,7 +316,9 @@ int     read()
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_LONG)
-        nstat = read (fd, Meml[ptr], len * SZ_LONG)
+            nstat = read (fd, Meml[ptr], len * SZ_INT32)
+	    if (SZ_INT != SZ_INT32)
+	        call iupk32 (Meml[ptr], Meml[ptr], len)
 end
 
 
@@ -326,7 +334,7 @@ int     read()
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_REAL)
-        nstat = read (fd, Memr[ptr], len * SZ_REAL)
+            nstat = read (fd, Memr[ptr], len * SZ_REAL)
 	call ieevupkr (Memr[ptr], Memr[ptr], len)
 end
 
@@ -343,7 +351,7 @@ int     read()
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_DOUBLE)
-        nstat = read (fd, Memd[ptr], len * SZ_DOUBLE)
+            nstat = read (fd, Memd[ptr], len * SZ_DOUBLE)
 	call ieevupkd (Memd[ptr], Memd[ptr], len)
 end
 

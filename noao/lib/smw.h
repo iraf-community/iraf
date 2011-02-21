@@ -96,20 +96,20 @@ define	PINDEX		Memi[$1+$2+291]		# Physical image index [2]
 define	APINDEX		Memi[$1+294]		# Aperture index
 
 define	AP		Memi[$1+295]		# Aperture ID
-define	APLOW		Memr[$1+$2+295]		# Aperture lower limit [2]
-define	APHIGH		Memr[$1+$2+297]		# Aperture lower limit [2]
+define	APLOW		Memr[P2R($1+$2+295)]	# Aperture lower limit [2]
+define	APHIGH		Memr[P2R($1+$2+297)]	# Aperture lower limit [2]
 define	BEAM		Memi[$1+300]		# Beam ID
 define	OFLAG		Memi[$1+301]		# Spectrum object type flag
-define	IT		Memr[$1+302]		# Integ. time
-define	RA		Memr[$1+303]		# Right ascension
-define	DEC		Memr[$1+304]		# Declination
-define	UT		Memr[$1+305]		# Universal time
-define	ST		Memr[$1+306]		# Siderial time
-define	HA		Memr[$1+307]		# Hour angle
-define	AM		Memr[$1+308]		# Airmass
-define	W0		Memr[$1+309]		# Starting wavelength
-define	W1		Memr[$1+310]		# Ending wavelength
-define	WP		Memr[$1+311]		# Wavelength increment per pixel
+define	IT		Memr[P2R($1+302)]	# Integ. time
+define	RA		Memr[P2R($1+303)]	# Right ascension
+define	DEC		Memr[P2R($1+304)]	# Declination
+define	UT		Memr[P2R($1+305)]	# Universal time
+define	ST		Memr[P2R($1+306)]	# Siderial time
+define	HA		Memr[P2R($1+307)]	# Hour angle
+define	AM		Memr[P2R($1+308)]	# Airmass
+define	W0		Memr[P2R($1+309)]	# Starting wavelength
+define	W1		Memr[P2R($1+310)]	# Ending wavelength
+define	WP		Memr[P2R($1+311)]	# Wavelength increment per pixel
 define	DC		Memi[$1+312]		# Dispersion correction
 define	EC		Memi[$1+313]		# Extinction correction
 define	FC		Memi[$1+314]		# Flux calibration

@@ -98,10 +98,11 @@ real	ieee[ARB]		#I input IEEE floating format array
 real	native[ARB]		#O output native floating format array
 int	nelem			#I number of floating point numbers
 
-int	expon, i
+int	expon, i, val
 real	fval
 int	ival[1]
 %	equivalence (fval, ival)
+%	equivalence (ival, val)
 
 real	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
@@ -110,7 +111,7 @@ common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 begin
 	if (IEEE_SWAP == YES) {
 	    call BSWAP (ieee, 1, native, 1, nelem * NSWAP)
-	    if (mapin != NO)
+	    if (mapin != NO) {
 		# Check for IEEE exceptional values and map NaN to the native
 		# NaN value, and denormalized numbers (zero exponent) to zero.
 
@@ -124,6 +125,7 @@ begin
 			nin = nin + 1
 		    }
 		}
+	    }
 	} else {
 	    if (mapin == NO)
 		call amovr (ieee, native, nelem)
@@ -174,10 +176,11 @@ procedure ieeupkr (x)
 
 real	x			#U datum to be converted
 
-int	expon
+int	expon, val
 real	fval
 int	ival[1]
 %	equivalence (fval, ival)
+%	equivalence (val, ival)
 
 real	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
@@ -315,23 +318,27 @@ int	inval				#I enable NaN mapping for input?
 int	outval				#I enable NaN mapping for output?
 
 # MACHDEP.
-real	fval
-int	ival[1]
+#$if (datatype == r)
+#%	real r_quiet_nan
+#$else
+#%	double precision d_quiet_nan
+#$endif
 
 real	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
 common	/ieenanr/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
-
-%	equivalence (fval, ival)
-%	data	ival(1) / '7ff7ffff'x /
 
 begin
 	mapin = inval
 	mapout = outval
 
 	# MACHDEP.
-	if (mapout == YES)
-	    ieee_NaN = fval
+#	if (mapout == YES)
+#	$if (datatype == r)
+#%	    ieeenn = r_quiet_NaN()
+#	$else
+#%	    ieeenn = d_quiet_NaN()
+#	$endif
 
 	if (mapin == YES)
 	    NaNmask = 7F800000X

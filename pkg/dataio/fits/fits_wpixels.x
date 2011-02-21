@@ -44,7 +44,7 @@ begin
 
 	# Compute the size of the mii buffer.
 	len_mii = miilen (npix_rec, ty_mii)
-	sz_rec = len_mii * SZ_INT
+	sz_rec = len_mii * SZ_INT32
 
 	# Allocate space for the buffers.
 	if (spp != NULL)

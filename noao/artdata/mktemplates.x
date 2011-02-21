@@ -9,8 +9,8 @@ define	MKT_PROF	Memi[$1]	# Pointer to profile
 define	MKT_MSI		Memi[$1+1]	# MSI interpolation pointer
 define	MKT_NXM		Memi[$1+2]	# Number of X points in model
 define	MKT_NYM		Memi[$1+3]	# Number of Y points in model
-define	MKT_F		Memr[$1+4]	# Fraction of total flux in profile
-define	MKT_SCALE	Memr[$1+5]	# Radius scale
+define	MKT_F		Memr[P2R($1+4)]	# Fraction of total flux in profile
+define	MKT_SCALE	Memr[P2R($1+5)]	# Radius scale
 
 define	MKT_NALLOC	Memi[$1+6]	# Allocated space for saved templates
 define	MKT_N		Memi[$1+7]	# Number of saved templates
@@ -475,12 +475,15 @@ pointer procedure mkt_object (name)
 
 char	name[ARB]	# Profile name or file
 
-int	i, j, nxm, nym, fd
-real	radius, r, dr, flux, c3, c4, c5, c6, c7, der[2]
+int	i, j, n, nxm, nym, fd
+real	radius, r, dr, s, b, flux, der[2]
 pointer	sym, mkt, prof, asi, msi, buf, im
 
+real	c3, c4, c5, c6, c7
+
 real	asieval()
-int	open(), fscan(), nscan()
+double	uigamma()
+int	open(), fscan(), nscan(), strncmp(), ctor()
 pointer	immap(), imgs2r(), stfind(), stenter()
 bool	streq()
 errchk	open, immap, asifit, asieval, asider
@@ -498,36 +501,64 @@ begin
 
 	prof = NULL
 	msi = NULL
-	if (streq (name, "expdisk")) {
+	if (strncmp (name, "sersic", 6) == 0) {
+	    i = 7
+	    if (ctor (name, i, s) == 0) {
+		call eprintf ("WARNING: Bad sersic profile syntax (%s).\n")
+		    call pargstr (name)
+		return (NULL)
+	    }
+	    n = nint (2 * (s + 0.01))
+	    s = n / 2.
+	    if (n < 1 || n > 20) {
+		call eprintf (
+		    "WARNING: Sersic index out of allowed range (%.1f).\n")
+		    call pargi (s)
+		return (NULL)
+	    }
 	    nxm = NPROF
 	    call malloc (prof, nxm, TY_REAL)
-	    radius = log (dynrange)
+	    radius = log (dynrange) ** s
 	    dr = radius / (nxm - 1)
 	    do i = 0, nxm - 1 {
-		r = i * dr
+		r = (i * dr) ** (1/s)
 		Memr[prof+i] = exp (-r)
 	    }
 
-	    flux = 1 - Memr[prof+nxm-1] * (1 + r)
-	    radius = radius / 1.6783
+	    flux = 1 - uigamma (n, r)
+	    r = n - 1./3. + 4./(405.*s) + 46./(25515.*s*s)
+	    radius = radius / r ** s
+	} else if (streq (name, "expdisk")) {
+	    s = 1.
+	    n = nint (2 * s)
+
+	    nxm = NPROF
+	    call malloc (prof, nxm, TY_REAL)
+	    radius = log (dynrange) ** s
+	    dr = radius / (nxm - 1)
+	    do i = 0, nxm - 1 {
+		r = (i * dr) ** (1/s)
+		Memr[prof+i] = exp (-r)
+	    }
+
+	    flux = 1 - uigamma (n, r)
+	    r = n - 1./3. + 4./(405.*s) + 46./(25515.*s*s)
+	    radius = radius / r ** s
 	} else if (streq (name, "devauc")) {
+	    s = 4.
+	    n = nint (2 * s)
 	    nxm = NPROF
 	    call malloc (prof, nxm, TY_REAL)
-	    radius = log (dynrange) ** 4
+	    radius = log (dynrange) ** s
 	    dr = radius / (nxm - 1)
 	    do i = 0, nxm - 1 {
-		r = (i * dr) ** 0.25
+		r = (i * dr) ** (1/s)
 		Memr[prof+i] = exp (-r)
 	    }
 
-	    c3 = 1. / 6
-	    c4 = c3 / 4
-	    c5 = c4 / 5
-	    c6 = c5 / 6
-	    c7 = c6 / 7
-	    flux = 1 - Memr[prof+nxm-1] *
-		(1+r*(1+r*(.5+r*(c3+r*(c4+r*(c5+r*(c6+c7*r)))))))
-	    radius = radius / 7.67 ** 4
+	    flux = 1 - uigamma (n, r)
+	    r = n - 1./3. + 4./(405.*s) + 46./(25515.*s*s)
+	    radius = radius / r ** s
 	} else ifnoerr (im = immap (name, READ_ONLY, 0)) {
 	    iferr {
 		nxm = IM_LEN(im,1)
@@ -571,10 +602,10 @@ begin
 
 	    call asiinit (asi, II_SPLINE3)
 	    call asifit (asi, Memr[buf], j)
-	    c3 = Memr[buf]
+	    s = Memr[buf]
 	    call mfree (buf, TY_REAL)
 
-	    if (c3 == 0.) {
+	    if (s == 0.) {
 		do i = 1, nxm - 1 {
 		    r = i * dr
 		    call asider (asi, 1+j*r, der, 2)
@@ -608,6 +639,14 @@ begin
 	    MKT_NYM(mkt) = nym
 	    MKT_F(mkt) = flux
 	    MKT_SCALE(mkt) = radius
+#call eprintf ("flux = %g, radius = %g\n")
+#call pargr (MKT_F(mkt))
+#call pargr (MKT_SCALE(mkt))
+#do i = 0, nxm {
+#call eprintf ("%d: %g\n")
+#call pargi (i)
+#call pargr (Memr[prof+i])
+#}
 	}
 
 	# Enter object model name in symbol table.
@@ -1323,4 +1362,29 @@ see_	n = nx * ny
 	    }
 	} else
 	    call amulkr (Memr[data], flux/sum, Memr[data], n)
+end
+
+
+# UIGAMMA -- Upper Incomplete Gamma Function ratioed to Complete.
+#
+#	uigamma(n,x) = e^(x) sum (x^k/k!) for k=0, n-1
+
+double procedure uigamma (n, x)
+
+int	n		#I argument
+real	x		#I argument
+
+int	i
+double	uigamma, numerator, denominator
+
+begin
+	numerator = exp(-x)
+	denominator = 1
+	uigamma = numerator / denominator
+	do i = 1, n-1 {
+	    numerator = numerator * x
+	    denominator = denominator * i
+	    uigamma = uigamma + numerator / denominator
+	}
+	return (uigamma)
 end

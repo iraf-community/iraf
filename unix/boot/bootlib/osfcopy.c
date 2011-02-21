@@ -1,19 +1,26 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "bootlib.h"
+
+extern	int  os_access (char *fname, int mode, int type);
+
 
 /* OS_FCOPY -- Copy a file.  Used by RTAR to resolve links.
  */
-os_fcopy (oldfile, newfile)
-char	*oldfile;
-char	*newfile;
+int
+os_fcopy (
+  char	*oldfile,
+  char	*newfile
+)
 {
 	XCHAR	buf[SZ_FBUF];
-	int	mode = 0;
-	int	status, junk, maxch = SZ_FBUF;
-	int	in, out;
-	int	n;
+	XINT	status,	junk, maxch = SZ_FBUF, mode = 0, in, out, n, nw;
+
 
 	if (os_access (oldfile,0,0) == NO)
 	    return (ERR);
@@ -63,7 +70,7 @@ char	*newfile;
 	    }
 
 	    while ((n = read (in, (char *)buf, SZ_FBUF)) > 0)
-		write (out, (char *)buf, n);
+		nw = write (out, (char *)buf, n);
 
 	    close (in);
 	    close (out);

@@ -25,7 +25,7 @@ char *
 irafpath (fname)
 char *fname;			/* simple filename, no dirs */
 {
-	static	char pathname[SZ_PATHNAME+1], arch[SZ_FNAME+1];
+	static	char pathname[SZ_PATHNAME+1];
 	PKCHAR	ulibs[SZ_ULIBSTR+1];
 	PKCHAR	hostdir[SZ_LINE+1];
 	PKCHAR	irafdir[SZ_LINE+1];
@@ -34,9 +34,12 @@ char *fname;			/* simple filename, no dirs */
 	XINT	x_maxch=SZ_LINE, x_status;
 	char	*ip, *op, *irafarch;
 
+	extern  int  ZGTENV();
+
+
 	/* Search any user libraries first. */
 	strcpy ((char *)ldir, ULIB);
-	ZGTENV (ldir, ulibs, &sz_ulibs, &x_status);
+	(void) ZGTENV (ldir, ulibs, &sz_ulibs, &x_status);
 	if (x_status > 0)
 	    for (ip=(char *)ulibs;  *ip;  ) {
 		/* Get next user directory pathname. */
@@ -76,6 +79,9 @@ char *fname;			/* simple filename, no dirs */
 #ifdef CYGWIN
 	strcat (pathname, "cygwin");
 #else
+#ifdef LINUX64
+	strcat (pathname, "linux64");
+#else
 #ifdef REDHAT
 	strcat (pathname, "redhat");
 #else
@@ -84,6 +90,9 @@ char *fname;			/* simple filename, no dirs */
 #else
 #ifdef BSD
 	strcat (pathname, "freebsd");
+#else
+#ifdef IPAD
+	strcat (pathname, "ipad");
 #else
 #ifdef MACOSX
 	/* Setup for cross-compilation.
@@ -118,6 +127,8 @@ char *fname;			/* simple filename, no dirs */
 #endif
 #endif
 #endif
+#endif
+#endif
 
 	strcat (pathname, "/");
 	strcat (pathname, fname);
@@ -132,7 +143,7 @@ char *fname;			/* simple filename, no dirs */
 	    return (pathname);
 
 	/* Try BIN - use IRAFARCH if defined. */
-	if (irafarch = getenv("IRAFARCH")) {
+	if ( (irafarch = getenv("IRAFARCH")) ) {
 	    strcpy (pathname, (char *)irafdir);
 	    strcat (pathname, "bin.");
 	    strcat (pathname, irafarch);

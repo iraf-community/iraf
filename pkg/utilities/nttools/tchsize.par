@@ -1,0 +1,8 @@
+intable,s,a,"",,,"input tables"
+outtable,s,a,"",,,"output tables or directory"
+maxpar,i,a,-1,,,"new maximum number of header parameters"
+maxcols,i,a,-1,,,"new maximum space for column descriptors"
+rowlen,i,a,-1,,,"new row length"
+allrows,i,a,-1,,,"new allocated number of rows"
+verbose,b,h,yes,,,"print operations performed?"
+mode,s,h,"al",,,

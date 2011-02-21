@@ -8,7 +8,7 @@ r2df r2df_file file_list iraf_file
 .ih
 PARAMETERS
 .ls 4 r2df_file
-The 2D-Frutti data source.  If the data source is a disk file or an explict
+The 2D-Frutti data source.  If the data source is a disk file or an explicit
 tape file
 specification of the form mt*[n] where n is a file number then only that file
 is converted.  If the general tape device name is given, i.e. mta, mtb800, etc,

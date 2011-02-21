@@ -20,6 +20,7 @@ c -- Unpack string.
  10     continue
 c
 c -- Add EOS delimiter to SPP string, trimming blank padding at right.
+	if (lastch .gt. maxch) lastch = maxch
 	sppstr(lastch+1) = EOS
 c
         end

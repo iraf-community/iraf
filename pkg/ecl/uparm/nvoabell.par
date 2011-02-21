@@ -1,4 +1,0 @@
-num,i,a,2255,,,"Abell Number"
-size,r,h,0.2,,,"Size (degrees)"
-fields,s,h,"G_Lens,Xray,Radio,QSO",,,"Objects to mark"
-mode,s,h,"ql",,,

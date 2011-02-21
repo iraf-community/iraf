@@ -106,7 +106,7 @@ begin
         ip = ix
 	do j = 1, axlen[3] {
             do i = 1, axlen[2] {
-	       maxoff = max (maxoff, Memi[ip+1]) 
+	       maxoff = max (maxoff, Memi[ip+1]+2*Memi[ip]) 
    	       ip = ip + 2
 	    }
 	}

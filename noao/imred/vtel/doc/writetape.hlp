@@ -17,9 +17,9 @@ Tape file descriptor.
 .ih
 DESCRIPTION
 Writetape takes as input five(5) full disk grams in IRAF image format
-and writes them to tape in a format identicle to the original full disk
+and writes them to tape in a format identical to the original full disk
 grams produced on the vacuum telescope.  The input image names are expected
-to be the "input_root" name concatinated with the numbers "1", "2", ... "5".
+to be the "input_root" name concatenated with the numbers "1", "2", ... "5".
 Writetape calls 'writevt' and is a cl script file.
 .ih
 EXAMPLES

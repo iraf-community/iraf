@@ -212,7 +212,7 @@ begin
 		    call strcpy (Memc[coords], Memc[outfname], SZ_FNAME)
 	            cl = open (Memc[outfname], READ_ONLY, TEXT_FILE)
 		} else {
-		    call apstats (cl, CLNAME, Memc[outfname], SZ_FNAME)
+		    call apstats (ap, CLNAME, Memc[outfname], SZ_FNAME)
 		    call seek (cl, BOF)
 		}
 	    }

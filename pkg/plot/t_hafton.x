@@ -277,8 +277,8 @@ begin
 	    while (imgnll (im, buf, v) != EOF) {
 		call aliml (Meml[buf], IM_LEN(im,1), minval_l, maxval_l)
 		if (first_line) {
-		    min_value = minval_s
-		    max_value = maxval_s
+		    min_value = minval_l
+		    max_value = maxval_l
 		    first_line = false
 		} else {
 		    if (minval_l < min_value)

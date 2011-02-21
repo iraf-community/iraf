@@ -166,7 +166,7 @@ A few parameters will be updated to reflect the operation
 .ih
 EXAMPLES
 The following example will accumulate a series of 16 spectra obtained
-in the normal beam-switched mode and create two new extincton corrected
+in the normal beam-switched mode and create two new extinction corrected
 spectra having names nite1bs.1 and nite1bs.2:
 
 	cl> bswitch nite1 1011-1026 nite1bs 1

@@ -60,7 +60,7 @@ threshold,r,h,10.,0.,,"Detection threshold for profile centering
 "
 nfind,i,h,1,,,Number of apertures to be found automatically
 minsep,r,h,1.,,,Minimum separation between spectra
-maxsep,r,h,1000.,,,Maximum separation between spectra
+maxsep,r,h,100000.,,,Maximum separation between spectra
 order,s,h,"increasing",,,"Order of apertures
 
 # RECENTERING PARAMETERS

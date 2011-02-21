@@ -5,13 +5,13 @@ NAME
 instruments -- Instrument specific data files
 .ih
 DESCRIPTION
-The \fBccdred\fR package has been designed to accomodate many different
+The \fBccdred\fR package has been designed to accommodate many different
 instruments, detectors, and observatories.  This is done by having
 instrument specific data files.  Note that by instrument we mean a
 combination of detector, instrument, application, and observatory, so
 there might be several "instruments" associated with a particular CCD
 detector.  Creating and maintaining the instrument files is generally
-the responsiblity of the support staff, though the user may create or
+the responsibility of the support staff, though the user may create or
 copy and modify his/her own instrument/application specific files.  The
 task \fBsetinstrument\fR makes this information available to the user
 and package easily.
@@ -122,7 +122,7 @@ The CCD image types recognized by the package are:
 	zero   - zero level image such as a bias or preflash
 	dark   - dark count image
 	flat   - flat field image
-	illum  - illumination image such as a sky image
+	illum  - iillumination image such as a sky image
 	fringe - fringe correction image
 	object - object image
 .fi
@@ -194,7 +194,7 @@ section, or from the image header itself.
 The instrument setup script for setting default task parameters may be
 easily created by the support person as follows.  Set the package
 parameters using \fBeparam\fR or with CL statements.  Setting the
-parameters might involve testing.  When satisified with the way the
+parameters might involve testing.  When satisfied with the way the
 package is set then the parameters may be dumped to a setup script
 using the task \fBdparam\fR.  The final step is editing this script to
 delete unimportant and query parameters.  For example,

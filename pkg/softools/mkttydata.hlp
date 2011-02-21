@@ -103,7 +103,7 @@ EXAMPLES
 .ih
 BUGS
 There is a fixed limit on the amount of data that can be cached.
-If the limit is exceeded the affected TTY modules will fail to compile.
+If the limit is exceedd the affected TTY modules will fail to compile.
 .ih
 SEE ALSO
 showcap, IRAF Site Manager's Guide

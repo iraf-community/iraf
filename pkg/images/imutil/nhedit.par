@@ -9,5 +9,6 @@ update,b,h,yes,,,Update image header?
 add,b,h,no,,,add rather than edit fields
 addonly,b,h,no,,,add only if field does not exist
 delete,b,h,no,,,delete rather than edit fields
+rename,b,h,no,,,rename field names
 verify,b,h,yes,,,verify each edit operation
 show,b,h,yes,,,print record of each edit operation

@@ -1,7 +1,7 @@
 include	<pkg/rmsorted.h>
 
 
-# RMSORTED -- Compute running median value.
+# RMSORTED -- Compute running sorted value.
 
 real procedure rmsorted (rm, nclip, index, data)
 
@@ -9,16 +9,18 @@ pointer	rm			#I Method pointer
 real	nclip			#I Clipping factor
 int	index			#I Index of new data
 real	data			#I Input data  value
-real	med			#R Return value
+real	val			#R Return value
 
-int	i, i1, box, outnext, out
+int	i, i1, box, outnext, out, nused
 real	clip
 
 begin
+	# Extract from structure.
 	box = RMS_BOX(rm)
 	outnext = mod (index-1, box)
 	out = OUT(rm,outnext)
 
+	# Find value to replace.
 	if (out == 0) {
 	    do i = out, box-2 {
 	        i1 = i + 1
@@ -57,40 +59,51 @@ begin
 	    }
 	}
 
+	# Set new value.
 	DATA(rm,i) = data
 	IN(rm,i) = outnext
 	OUT(rm,outnext) = i
 
-	i1 = box / 2
-	if (mod (box, 2) == 0)
-	    med = (DATA(rm,i1) + DATA(rm,i1-1)) / 2
-	else
-	    med = DATA(rm,i1)
-
-	if (nclip > 0.) {
-	    clip = med + nclip * (med - DATA(rm,0))
-	    do i = box, 1, -1 {
+	# Apply clipping if needed.
+	nused = box
+	if (nused > 2 && nclip > 0.) {
+	    i = nused / 2
+	    if (mod (nused, 2) == 0)
+		val = (DATA(rm,i) + DATA(rm,i-1)) / 2
+	    else
+		val = DATA(rm,i)
+	    clip = val + nclip * (val - DATA(rm,0))
+	    do i = nused, 1, -1 {
 		if (DATA(rm,i-1) < clip)
 		    break
 	    }
-	    if (i < box) {
-		i1 = i / 2
-		if (mod (i, 2) == 0)
-		    med = (DATA(rm,i1) + DATA(rm,i1-1)) / 2
-		else
-		    med = DATA(rm,i1)
-	    }
+	    nused = i
 	}
 
-	return (med)
+	# Compute output value.
+	switch (RMS_TYPE(rm)) {
+	case RMS_TYMED:
+	    i = nused / 2
+	    if (mod (nused, 2) == 0)
+		val = (DATA(rm,i) + DATA(rm,i-1)) / 2
+	    else
+		val = DATA(rm,i)
+	case RMS_TYMAX:
+	    val = DATA(rm,nused-1)
+	case RMS_TYMIN:
+	    val = DATA(rm,0)
+	}
+
+	return (val)
 end
 
 
-# RMS_OPEN -- Open running median sorted algorithm.
+# RMS_OPEN -- Open running sorted algorithm.
 
-pointer procedure rms_open (box, data)
+pointer procedure rms_open (box, type, data)
 
-int	box			#I Running median box
+int	box			#I Running box
+int	type			#I Output type
 real	data			#I Initial data value
 pointer	rm			#R Method pointer
 
@@ -99,6 +112,7 @@ int	i
 begin
 	call malloc (rm, RMS_LEN(box), TY_STRUCT)
 	RMS_BOX(rm) = box
+	RMS_TYPE(rm) = type
 	RMS_DATA(rm) = rm + RMS_OFFSET
 	RMS_IN(rm) = P2S(RMS_DATA(rm) + box)
 	RMS_OUT(rm) = RMS_IN(rm) + box
@@ -113,7 +127,7 @@ begin
 end
 
 
-# RMS_CLOSE -- Close running median sorted algorithm.
+# RMS_CLOSE -- Close running sorted algorithm.
 
 procedure rms_close (rm)
 

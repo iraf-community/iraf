@@ -8,6 +8,8 @@ procedure impakd (a, b, npix, dtype)
 double	a[npix]
 int	b[npix], npix, dtype
 
+pointer	bp
+
 begin
 	switch (dtype) {
 	case TY_USHORT:
@@ -15,9 +17,23 @@ begin
 	case TY_SHORT:
 	    call achtds (a, b, npix)
 	case TY_INT:
-	    call achtdi (a, b, npix)
+	    if (SZ_INT == SZ_INT32)
+	        call achtdi (a, b, npix)
+	    else {
+		call malloc (bp, npix, TY_INT)
+	        call achtdi (a, Memi[bp], npix)
+		call ipak32 (Memi[bp], b, npix)
+		call mfree (bp, TY_INT)
+	    }
 	case TY_LONG:
-	    call achtdl (a, b, npix)
+	    if (SZ_INT == SZ_INT32)
+	        call achtdl (a, b, npix)
+	    else {
+		call malloc (bp, npix, TY_LONG)
+	        call achtdl (a, Meml[bp], npix)
+		call ipak32 (Meml[bp], b, npix)
+		call mfree (bp, TY_LONG)
+	    }
 	case TY_REAL:
 	    call achtdr (a, b, npix)
 	case TY_DOUBLE:

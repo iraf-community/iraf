@@ -1,0 +1,231 @@
+.help tmerge Jun1999 tables
+.nj
+.ih
+NAME
+tmerge -- Merge two tables, or append one to the other.
+.ih
+USAGE
+tmerge intable outtable option
+.ih
+DESCRIPTION
+This task is used to either merge or append tables,
+depending on the option selected by the 'option' parameter.
+The data type of each column is defined by
+the first table in the input list containing that column.
+If subsequent tables use the same column name,
+then data are converted to the type defined by the first table.
+Problems may occur when numerical data are written to
+a boolean column or a narrow character column.
+
+The "merge" option is normally used for tables containing few,
+if any, common columns.
+When the user selects "merge",
+an output table is created containing as many columns
+as there are unique column names in all the input tables.
+(But see the description of the 'allcols' parameter.)
+The output table will have as many rows as the largest
+number of rows in the input tables.
+The input tables are read in order,
+with all values being placed into the output table.
+If different input tables have the same column names
+then the first values put into the output table
+will be overwritten by the later table values.
+For example, if the two input tables both have the column name "X_VAL",
+then for each row number,
+the values written to the output table
+will be taken from the second input table.
+See below regarding text tables.
+
+On the other hand, if the "append" option is selected, all rows of
+the first input table are written to the output table, followed by all
+rows of the second table, and so on, until all input tables are written
+to the output table.
+The total number of output rows will be the sum
+of the numbers of rows in the input tables.
+Columns with the same name in different
+input tables will be written into the same output column, but no data
+will be overwritten because they are put into different rows.
+The "append" option would normally be used for tables that have all
+the same columns.
+
+An input table may have no rows.
+Such a table may be used as the first input table
+to control the order and definitions of columns in the output table.
+
+Header parameters are appended,
+and parameters with the same keyword name
+in different input tables are overwritten in the output file,
+except for history and comment keywords.
+
+Care must be taken with text tables.
+It is very likely that you would want
+'allcols = yes' if 'option = merge' and
+'allcols = no' if 'option = append'.
+See the description of the 'allcols' parameter for details.
+If the output table is a text file,
+the line length may not be longer than 4095 characters,
+which is a limitation for any text table.
+
+Column units are not checked.
+If columns with the same name have different units
+in two different input tables,
+the merged (or appended) data are likely to have mixed units.
+In addition, the column definition is taken from the first input table,
+but some and perhaps all of the data would come from the second input table,
+so the units in the output column definition would not be correct
+for those data.
+.ih
+PARAMETERS
+.ls intable [file name template]
+Names of the tables to be merged or appended.  This parameter will take
+either a file name template describing several input tables, and may include
+wildcard characters, or it will take the name of a list file preceded by the
+"@" character; in the latter case the list file contains a list of file names
+with each file name on a separate line.  Wildcard characters should not be
+used for file name extensions because files other than tables will be
+processed, causing the program to crash.  For example, if the directory
+contains files "table.tab" and "table.lis", the command "tmerge tab*" would
+open both files.
+.le
+.ls outtable [file name]
+The name of the output table.
+.le
+.ls option = "merge" [string]
+allowed values:  merge | append
+
+Either merge the columns in each row of each input table--overwriting
+previous values--or append files to each other.
+See also 'allcols' below.
+(These options are discussed in greater detail in the DESCRIPTION section.)
+.le
+.ls (allcols = yes) [boolean]
+Define output table columns using columns from
+all input tables?
+
+If 'allcols = no', the output table will contain
+only those columns defined in the first input table.
+If 'allcols = yes', the output table will contain
+all columns from all input tables.
+If 'option = merge', then it is likely that 'allcols' should be set to yes.
+
+For input tables that are simple text tables
+(i.e. that do not contain explicit column definitions),
+the 'allcols' parameter serves an additional function.
+When 'allcols = yes' the name of each column
+in a simple text table is changed
+to be "c" followed by the column number in the output table.
+This is intended to make the column names unique
+in order to allow merging text tables
+without having the columns overwrite previously written columns.
+Since the column names in simple text tables are just c1, c2, etc.,
+columns would overwrite previously written columns in the output
+if the names were not modified.
+If all input tables are simple text tables,
+and the output is also a text table,
+the new names will be discarded,
+so the net effect of this scheme is just to preserve all input data.
+If the output is a binary table, however,
+the modified column names will be retained.
+If the modified column names turn out not to be unique,
+a warning message will be printed.
+.le
+.ls (tbltype = "default") [string, allowed values:  default | row | 
+column | text]
+
+This parameter specifies the table type.
+Setting 'tbltype' to "row" or "column" results in an stsdas binary table,
+the contents of which may be either row ordered or column ordered;
+row order is recommended.
+You can also specify that the output be a text table.
+The default ('tbltype = "default"') means that the type of the output table
+will be taken from the first input table.
+
+If the extension of the output file name is ".fits" or ".??f",
+the table to be created will be a BINTABLE extension in a FITS file,
+regardless of how 'tbltype' is set.
+.le
+.ls (allrows = 100) [integer, min=1, max=INDEF]
+The number of rows to allocate.
+This parameter is only used for column-ordered tables
+(specified by the 'tbltype' parameter).
+The 'allrows' parameter is the minimum number of rows an output
+table will contain.
+If the number of rows required by the input tables
+is greater than 'allrows' then the number of rows in the output table will
+be greater than 'allrows'.
+If 'option = merge', then the total number of rows will be
+the larger of 'allrows' or the number of rows in the largest table.
+If 'option = append', the total rows in the output table will be the larger
+of 'allrows' or the total number of rows in all input tables.
+.le
+.ls (extracol = 0) [integer, min=0, max=INDEF]
+Extra space to be reserved for columns in the output table.
+
+This parameter is relevant only for a row-ordered table
+(specified by the 'tbltype' parameter).
+The default value of zero is normally appropriate,
+but if you expect to define additional columns in the output table
+at a later time
+then you can allocate the necessary space
+by specifying a value for 'extracol'.
+One unit of space is taken by each single-precision real value,
+integer value, or boolean value.
+A double-precision column requires two units of allocated space,
+and a character-string column takes one unit of space for each four
+characters, or fraction thereof.
+.le
+.ih
+EXAMPLES
+.nf
+1. Suppose you have the following two tables.
+
+tbl1.tab:
+	one	two	three
+	---	---	-----
+	1	-17	alpha
+	2	-19	beta
+	3	-23	gamma
+
+tbl2.tab:
+	one	three	four
+	---	-----	----
+	27	beta	3.14
+	28	delta	2.72
+
+then the statement
+
+	cl> tmerge tbl1,tbl2 mrg merge
+
+would create the following output table:
+
+mrg.tab:
+	one	two	three	four
+	---	---	-----	----
+	27	-17	beta	3.14
+	28	-19	delta	2.72
+	3	-23	gamma	INDEF
+
+while the statement
+
+	cl> tmerge tbl1,tbl2 app append
+
+would create the following table:
+
+app.tab:
+	one	two	three	four
+	---	---	-----	----
+	1	-17	alpha	INDEF
+	2	-19	beta	INDEF
+	3	-23	gamma	INDEF
+	27	INDEF	beta	3.14
+	28	INDEF	delta	2.72
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+tselect, tproject, and proto.joinlines for text files
+.endhelp

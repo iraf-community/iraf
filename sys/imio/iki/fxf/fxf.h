@@ -52,6 +52,7 @@ define	FK_PLIO		1
 # Mapping of FITS Keywords to IRAF image header.  All unrecognized keywords
 # are stored here.
 
+#define	UNKNOWN	 Memc[($1+IMU-1)*SZ_MII_INT+1]
 define	UNKNOWN	 Memc[($1+IMU-1)*SZ_STRUCT+1]
 
 
@@ -95,10 +96,10 @@ define	FIT_XTENSION	Memi[$1+42]	# Yes, if an Xtension has been read.
 define	FIT_INHERIT	Memi[$1+43]	# INHERIT header keyword value.
 define	FIT_EXTVER	Memi[$1+44]	# EXTVER value (integer only)
 define	FIT_EXPAND	Memi[$1+45]	# Expand the header?
-define	FIT_MIN		Memr[$1+46]	# Minimum pixel value
-define	FIT_MAX		Memr[$1+47]	# Maximum pixel value
+define	FIT_MIN		Memr[P2R($1+46)]# Minimum pixel value
+define	FIT_MAX		Memr[P2R($1+47)]# Maximum pixel value
 define	FIT_MTIME	Meml[$1+48]	# Time of last mod. for FITS unit 
-define	FIT_SVNANR	Memr[$1+49]
+define	FIT_SVNANR	Memr[P2R($1+49)]
 define	FIT_SVNAND	Memd[P2D($1+50)]
 define	FIT_SVMAPRIN	Memi[$1+52]
 define	FIT_SVMAPROUT	Memi[$1+53]

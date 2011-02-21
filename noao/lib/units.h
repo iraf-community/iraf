@@ -7,8 +7,8 @@ define	UN_TYPE		Memi[$1]		# Unit type code
 define	UN_CLASS	Memi[$1+1]		# Unit class code
 define	UN_LOG		Memi[$1+2]		# Log code
 define	UN_INV		Memi[$1+3]		# Inverse code
-define	UN_SCALE	Memr[$1+4]		# Scale factor
-define	UN_VREF		Memr[$1+5]		# Ref lambda (ang) for velocity
+define	UN_SCALE	Memr[P2R($1+4)]		# Scale factor
+define	UN_VREF		Memr[P2R($1+5)]		# Ref lambda (ang) for velocity
 define	UN_LABEL	Memc[P2C($1+6)]		# Unit label
 define	UN_UNITS	Memc[P2C($1+46)]	# Units string
 define	UN_USER		Memc[P2C($1+86)]	# User units string 

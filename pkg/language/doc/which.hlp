@@ -1,4 +1,4 @@
-.help which Mar04 language
+.help "which,whereis" Mar04 language
 .ih
 NAME
 .nf

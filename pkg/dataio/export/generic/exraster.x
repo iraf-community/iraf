@@ -298,35 +298,35 @@ begin
 		data = imgl3s (im, line, band)
 		call amovs (Mems[data], Mems[IO_DATA(op)], IM_LEN(im,1))
 	        IO_TYPE(op) = TY_SHORT
-		IO_NBYTES(op) = SZ_SHORT * SZB_CHAR
+		    IO_NBYTES(op) = SZ_SHORT * SZB_CHAR
 	        IO_ISIM(op) = YES
 
             case TY_INT:
 		data = imgl3i (im, line, band)
 		call amovi (Memi[data], Memi[IO_DATA(op)], IM_LEN(im,1))
 	        IO_TYPE(op) = TY_INT
-		IO_NBYTES(op) = SZ_INT * SZB_CHAR
+		    IO_NBYTES(op) = SZ_INT32 * SZB_CHAR
 	        IO_ISIM(op) = YES
 
             case TY_LONG:
 		data = imgl3l (im, line, band)
 		call amovl (Meml[data], Meml[IO_DATA(op)], IM_LEN(im,1))
 	        IO_TYPE(op) = TY_LONG
-		IO_NBYTES(op) = SZ_LONG * SZB_CHAR
+		    IO_NBYTES(op) = SZ_LONG * SZB_CHAR
 	        IO_ISIM(op) = YES
 
             case TY_REAL:
 		data = imgl3r (im, line, band)
 		call amovr (Memr[data], Memr[IO_DATA(op)], IM_LEN(im,1))
 	        IO_TYPE(op) = TY_REAL
-		IO_NBYTES(op) = SZ_REAL * SZB_CHAR
+		    IO_NBYTES(op) = SZ_REAL * SZB_CHAR
 	        IO_ISIM(op) = YES
 
             case TY_DOUBLE:
 		data = imgl3d (im, line, band)
 		call amovd (Memd[data], Memd[IO_DATA(op)], IM_LEN(im,1))
 	        IO_TYPE(op) = TY_DOUBLE
-		IO_NBYTES(op) = SZ_DOUBLE * SZB_CHAR
+		    IO_NBYTES(op) = SZ_DOUBLE * SZB_CHAR
 	        IO_ISIM(op) = YES
 
 	    }
@@ -356,7 +356,9 @@ begin
             call write (fd, Mems[pix], npix * SZ_SHORT/SZ_CHAR)
 
         case TY_INT:
-            call write (fd, Memi[pix], npix * SZ_INT/SZ_CHAR)
+	    if (SZ_INT != SZ_INT32)
+		call ipak32 (Memi[pix], Memi[pix], npix)
+            call write (fd, Memi[pix], npix * SZ_INT32/SZ_CHAR)
 
         case TY_LONG:
             call write (fd, Meml[pix], npix * SZ_LONG/SZ_CHAR)

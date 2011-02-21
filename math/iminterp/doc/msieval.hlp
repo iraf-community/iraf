@@ -18,7 +18,7 @@ The pointer to the sequential interpolant descriptor structure.
 .le
 .ls x, y
 The single x and y values of or in the case of the drizzle interpolant
-the single quadrileteral over which the point is to be evaluated.
+the single quadrilateral over which the point is to be evaluated.
 .le
 .ih
 DESCRIPTION
@@ -34,7 +34,7 @@ using an a pre-computed look--up table entry. The boundary extension
 algorithm is nerest neighbor.
 
 The drizzle interpolant is computed by computing the mean value of the
-data within the user supplied quarilateral.
+data within the user supplied quadrilateral.
 .ih
 NOTES
 Checking for out of bounds and INDEF valued pixels is the responsibility of

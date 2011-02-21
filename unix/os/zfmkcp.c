@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 #define	import_kernel
 #define	import_knames
@@ -21,21 +22,26 @@
  * we must take special measures to pass the file protection attribute to
  * the new copy.
  */
-ZFMKCP (osfn, new_osfn, status)
-PKCHAR	*osfn;
-PKCHAR	*new_osfn;
-XINT	*status;
+int
+ZFMKCP (
+  PKCHAR  *osfn,
+  PKCHAR  *new_osfn,
+  XINT	  *status
+)
 {
 	struct	stat statbuf;
 	int	fd, mode;
 	XINT	prot;
+
+	extern  int ZFPROT();
+
 
 	/* Get directory information for the old file.  Most of the file
 	 * attributes reside in the st_mode field.
 	 */
 	if (stat ((char *)osfn, &statbuf) == ERR) {
 	    *status = XERR;
-	    return;
+	    return (XERR);
 	}
 
 	mode = statbuf.st_mode;
@@ -44,7 +50,7 @@ XINT	*status;
 	 */
 	if ((fd = creat ((char *)new_osfn, mode | 0600)) == ERR) {
 	    *status = XERR;
-	    return;
+	    return (XERR);
 	} else
 	    close (fd);
 
@@ -60,4 +66,6 @@ XINT	*status;
 
 	if (*status == XERR)
 	    unlink ((char *)new_osfn);
+
+	return (XOK);
 }

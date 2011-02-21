@@ -1,4 +1,0 @@
-input,s,a,"dev$wpix",,,"Input images"
-output,s,a,"foo.fits",,,"Output images or directory"
-verbose,b,h,yes,,,"Print operations performed?"
-mode,s,h,"ql",,,

@@ -122,11 +122,7 @@ begin
 		j = strlen (extn)
 		extn = substr (extn, i+1, j)
 	    }
-	    i = strlen (extn)
-	    if (i < 7)
-		extn = extn // ".ms"
-	    else
-		extn = substr (extn, 1, 5) // substr (extn, i, i) // ".ms"
+	    extn = extn // ".ms"
 	}
 
 	# Get query parameter.

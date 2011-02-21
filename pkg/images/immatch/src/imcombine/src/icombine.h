@@ -1,7 +1,7 @@
 # ICOMBINE Definitions
 
 # Memory management parameters;
-define	MAXMEMORY		250000000	# maximum memory
+define	MAXMEMORY		500000000	# maximum memory
 define	FUDGE			0.8		# fudge factor
 
 # Rejection options:
@@ -15,10 +15,17 @@ define	SIGCLIP		6	# Sigma clip
 define	AVSIGCLIP	7	# Sigma clip with average poisson sigma
 
 # Combine options:
-define	COMBINE	"|average|median|sum|"
+define	COMBINE	"|average|median|lmedian|sum|quadrature|nmodel|"
 define	AVERAGE		1
 define	MEDIAN		2
-define	SUM		3
+define	LMEDIAN		3
+define	SUM		4
+define	QUAD		5
+define	NMODEL		6
+
+# Median types:
+define	MEDAVG		1	# Central average for even N
+define	MEDLOW		2	# Lower value for even N
 
 # Scaling options:
 define	STYPES		"|none|mode|median|mean|exposure|"

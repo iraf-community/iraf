@@ -17,8 +17,8 @@
 /* ZWMSEC -- Suspend task execution (sleep) for the specified number
  * of milliseconds.
  */
-ZWMSEC (msec)
-XINT	*msec;
+int
+ZWMSEC (XINT *msec)
 {
 	/* Usleep doesn't really appear to be a standard, but it is
 	 * available on most platforms.
@@ -27,6 +27,8 @@ XINT	*msec;
 	    sleep (*msec / 1000);
 	else
 	    (void) usleep ((unsigned int)(*msec) * 1000);
+
+	return (XOK);
 }
 
 
@@ -43,8 +45,8 @@ static void napmsx();
 /* ZWMSEC -- Suspend task execution (sleep) for the specified number
  * of milliseconds.
  */
-ZWMSEC (msec)
-XINT	*msec;
+int
+ZWMSEC (XINT *msec)
 {
 	struct itimerval itv, oitv;
 	register struct itimerval *itp = &itv;
@@ -52,12 +54,12 @@ XINT	*msec;
 	int omask;
 
 	if (*msec == 0)
-	    return;
+	    return (XOK);
 
 	timerclear (&itp->it_interval);
 	timerclear (&itp->it_value);
 	if (setitimer (ITIMER_REAL, itp, &oitv) < 0)
-	    return;
+	    return (XERR);
 
 #ifndef SOLARIS
 	omask = sigblock(0);
@@ -94,6 +96,8 @@ XINT	*msec;
 
 	signal (SIGALRM, sv_handler);
 	(void) setitimer (ITIMER_REAL, &oitv, (struct itimerval *)0);
+
+	return (XOK);
 }
 
 

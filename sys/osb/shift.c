@@ -15,9 +15,10 @@
 /* SHIFTI -- Bitwise boolean SHIFT of two integer variables.
  */
 XINT
-SHIFTI (a_a, a_bits)
-XINT	*a_a;			/* operand to be shifted	*/
-XINT	*a_bits;		/* number of bits to shift	*/
+SHIFTI (
+  XINT	*a_a,			/* operand to be shifted	*/
+  XINT	*a_bits 		/* number of bits to shift	*/
+)
 {
 	register XINT	a = *a_a, bits = *a_bits;
 	return (bits > 0 ? (a << bits) : (a >> -bits));
@@ -26,9 +27,10 @@ XINT	*a_bits;		/* number of bits to shift	*/
 /* SHIFTS -- Bitwise boolean SHIFT of two short-integer variables.
  */
 XSHORT
-SHIFTS (a_a, a_bits)
-XSHORT	*a_a;			/* operand to be shifted	*/
-XSHORT	*a_bits;		/* number of bits to shift	*/
+SHIFTS (
+  XSHORT *a_a,			/* operand to be shifted	*/
+  XSHORT *a_bits 		/* number of bits to shift	*/
+)
 {
 	register XSHORT	a = *a_a, bits = *a_bits;
 	return (bits > 0 ? (a << bits) : (a >> -bits));
@@ -37,9 +39,10 @@ XSHORT	*a_bits;		/* number of bits to shift	*/
 /* SHIFTL -- Bitwise boolean SHIFT of two long-integer variables.
  */
 XLONG
-SHIFTL (a_a, a_bits)
-XLONG	*a_a;			/* operand to be shifted	*/
-XLONG	*a_bits;		/* number of bits to shift	*/
+SHIFTL (
+  XLONG	*a_a,			/* operand to be shifted	*/
+  XLONG	*a_bits 		/* number of bits to shift	*/
+)
 {
 	register XLONG	a = *a_a, bits = *a_bits;
 	return (bits > 0 ? (a << bits) : (a >> -bits));

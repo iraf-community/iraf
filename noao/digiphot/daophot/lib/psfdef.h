@@ -62,8 +62,8 @@ define	DP_PTMP		Memi[$1+4]	# pointer to temporary vector
 define	DP_PZ		Memi[$1+5]	# pointer to parameter changes
 define	DP_PCLAMP	Memi[$1+6]	# pointer to clamp vector
 define	DP_POLD		Memi[$1+7]	# pointer to previous parameter changes
-define	DP_PSIGANA	Memr[$1+8]	# normalized sigma for analytic fit
-define	DP_PSUMANA	Memr[$1+9]	# number of points in analytic fit
+define	DP_PSIGANA	Memr[P2R($1+8)]	# normalized sigma for analytic fit
+define	DP_PSUMANA	Memr[P2R($1+9)]	# number of points in analytic fit
 
 # dimensions and arrays required for psf star list
 
@@ -92,20 +92,20 @@ define	DP_POLDLUT 	Memi[$1+26]	# pointer to the old lookup table
 
 define	DP_CUR_PSF	Memi[$1+27]	# position of current PSF star in file
 define	DP_CUR_PSFID	Memi[$1+28]	# id of current PSF star
-define	DP_CUR_PSFX	Memr[$1+29]	# x position of current PSF star
-define	DP_CUR_PSFY	Memr[$1+30]	# y position of current PSF star
-define	DP_CUR_PSFSKY	Memr[$1+31]	# sky for current PSF star
-define	DP_CUR_PSFMAG	Memr[$1+32]	# magnitude for current PSF star
-define	DP_CUR_PSFMIN	Memr[$1+33]	# minimum data value in PSF subrast
-define	DP_CUR_PSFMAX	Memr[$1+34]	# maximum data value in PSF subrast
-define	DP_CUR_PSFGMAX	Memr[$1+35]	# maximum good data value  in fitrad
+define	DP_CUR_PSFX	Memr[P2R($1+29)]# x position of current PSF star
+define	DP_CUR_PSFY	Memr[P2R($1+30)]# y position of current PSF star
+define	DP_CUR_PSFSKY	Memr[P2R($1+31)]# sky for current PSF star
+define	DP_CUR_PSFMAG	Memr[P2R($1+32)]# magnitude for current PSF star
+define	DP_CUR_PSFMIN	Memr[P2R($1+33)]# minimum data value in PSF subrast
+define	DP_CUR_PSFMAX	Memr[P2R($1+34)]# maximum data value in PSF subrast
+define	DP_CUR_PSFGMAX	Memr[P2R($1+35)]# maximum good data value  in fitrad
 
 # the psf plotting parameters
 
 define	DP_PLOTTYPE	Memi[$1+36]	# type of PSF plot
-define	DP_MANGV	Memr[$1+37]	# vertical angle for surface plot
-define	DP_MANGH	Memr[$1+38]	# horizontal angle for surface plot
-define  DP_MFLOOR	Memr[$1+39]	# floor value for surface plot
-define	DP_MCEILING	Memr[$1+40]	# ceiling for surface plot
-define	DP_CFLOOR	Memr[$1+41]	# floor for contour
-define  DP_CCEILING	Memr[$1+42]	# ceiling for contour
+define	DP_MANGV	Memr[P2R($1+37)]# vertical angle for surface plot
+define	DP_MANGH	Memr[P2R($1+38)]# horizontal angle for surface plot
+define  DP_MFLOOR	Memr[P2R($1+39)]# floor value for surface plot
+define	DP_MCEILING	Memr[P2R($1+40)]# ceiling for surface plot
+define	DP_CFLOOR	Memr[P2R($1+41)]# floor for contour
+define  DP_CCEILING	Memr[P2R($1+42)]# ceiling for contour

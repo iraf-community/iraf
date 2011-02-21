@@ -297,6 +297,12 @@
 #define	XORI		xori_
 #define	XORL		xorl_
 #define	XORS		xors_
+#define I32TO64		i32to4_
+#define I64TO32		i64to2_
+#define IPAK32		ipak32_
+#define IUPK32		iupk32_
+#define IPAK16		ipak16_
+#define IUPK16		iupk16_
 
 #define	ACLRC		aclrc_
 #define	ACLRD		aclrd_
@@ -348,5 +354,9 @@
 #define	ACHTUX		achtux_
 #define	ACHTXB		achtxb_
 #define	ACHTXU		achtxu_
+
+/*
+#define import_kproto
+*/
 
 #define	D_knames

@@ -46,7 +46,7 @@
      Very fast.
 
   Accuracy:
-     Fairly accurate - errors 1 to 4 times those of routines optimised
+     Fairly accurate - errors 1 to 4 times those of routines optimized
      for accuracy.
 
   Note:  replaces the obsolete slSMATRX routine.

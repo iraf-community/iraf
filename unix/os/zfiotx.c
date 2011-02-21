@@ -96,8 +96,8 @@ static	struct sigaction oldact;
 static	SIGFUNC	sigint, sigterm;
 static	SIGFUNC	sigtstp, sigcont;
 #endif
-static	tty_rawon(), tty_reset(), uio_bwrite();
-static	tty_onsig(), tty_stop(), tty_continue();
+static	void  tty_rawon(), tty_reset(), uio_bwrite();
+static	void  tty_onsig(), tty_stop(), tty_continue();
 
 /* The ttyports array describes up to MAXOTTYS open terminal i/o ports.
  * Very few processes will ever have more than one or two ports open at
@@ -132,10 +132,12 @@ struct ttyport *lastdev = NULL;
  * by this driver, but ZOPNTX should be called on these streams to
  * properly initialize the file descriptor.
  */
-ZOPNTX (osfn, mode, chan)
-PKCHAR	*osfn;			/* UNIX filename			*/
-XINT	*mode;			/* file access mode			*/
-XINT	*chan;			/* UNIX channel of file (output)	*/
+int
+ZOPNTX (
+  PKCHAR *osfn,			/* UNIX filename			*/
+  XINT	 *mode,			/* file access mode			*/
+  XINT	 *chan 			/* UNIX channel of file (output)	*/
+)
 {
 	register int fd;
 	register FILE *fp;
@@ -246,19 +248,18 @@ XINT	*chan;			/* UNIX channel of file (output)	*/
 
 done:
 	*chan = fd;
-	return;
+	return (*chan);
 
 error:
 	*chan = XERR;
-	return;
+	return (*chan);
 }
 
 
 /* ZCLSTX -- Close a text file.
  */
-ZCLSTX (fd, status)
-XINT	*fd;
-XINT	*status;
+int
+ZCLSTX (XINT *fd, XINT *status)
 {
 	register struct	fiodes *kfp = &zfd[*fd];
 	register struct ttyport *port = (struct ttyport *) kfp->port;
@@ -286,16 +287,18 @@ XINT	*status;
 	    if (lastdev == port)
 		lastdev = NULL;
 	}
+
+	return (*status);
 }
 
 
 /* ZFLSTX -- Flush any buffered textual output.
  */
-ZFLSTX (fd, status)
-XINT	*fd;
-XINT	*status;
+int
+ZFLSTX (XINT *fd, XINT *status)
 {
 	*status = (fflush (zfd[*fd].fp) == EOF) ? XERR : XOK;
+	return ((int) *status);
 }
 
 
@@ -305,11 +308,8 @@ XINT	*status;
  * current line will NOT be newline terminated.  If maxchar==1 assert
  * character mode, otherwise assert line mode.
  */
-ZGETTX (fd, buf, maxchars, status)
-XINT	*fd;
-XCHAR	*buf;
-XINT	*maxchars;
-XINT	*status;
+int
+ZGETTX (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 {
 	register FILE *fp;
 	register XCHAR *op;
@@ -320,7 +320,7 @@ XINT	*status;
 
 	if (maxch <= 0) {
 	    *status = 0;
-	    return;
+	    return (*status);
 	}
 
 	kfp = &zfd[*fd];
@@ -365,9 +365,10 @@ XINT	*status;
 		clearerr (fp);
 		op = buf;
 		errno = 0;
-		while (*op++ = ch = getc(fp), ch != EOF)
+		while (*op++ = ch = getc(fp), ch != EOF) {
 		    if (--maxch <= 0 || ch == NEWLINE)
 			break;
+		}
 #ifdef FCANCEL
 		if (errno == EINTR)
 		    fcancel (fp);
@@ -395,14 +396,14 @@ XINT	*status;
 	    if (select (chan+1, &rfds, NULL, NULL, &timeout)) {
 		if (read (chan, data, 1) != 1) {
 		    *status = XERR;
-		    return;
+		    return (XERR);
 		}
 		ch = *data;
 		goto outch;
 	    } else {
 		*buf = XEOS;
 		*status = 0;
-		return;
+		return (*status);
 	    }
 
 	} else {
@@ -492,17 +493,19 @@ outch:	    op = buf;
 	}
 
 	*status = nbytes;
+
+	return (*status);
 }
 
 
 /* ZNOTTX -- Return the seek offset of the beginning of the current line
  * of text (file offset of char following last newline seen).
  */
-ZNOTTX (fd, offset)
-XINT	*fd;
-XLONG	*offset;
+int
+ZNOTTX (XINT *fd, XLONG *offset)
 {
 	*offset = zfd[*fd].fpos;
+	return ((int) *offset);
 }
 
 
@@ -514,11 +517,13 @@ XLONG	*offset;
  * offset of the beginning of a line of text only if we are called to write
  * full lines of text.
  */
-ZPUTTX (fd, buf, nchars, status)
-XINT	*fd;				/* file to be written to	*/
-register XCHAR	*buf;			/* data to be output		*/
-XINT	*nchars;			/* nchars to write to file	*/
-XINT	*status;			/* return status		*/
+int
+ZPUTTX (
+  XINT	*fd,				/* file to be written to	*/
+  XCHAR	*buf,				/* data to be output		*/
+  XINT	*nchars,			/* nchars to write to file	*/
+  XINT	*status 			/* return status		*/
+)
 {
 	register FILE *fp;
 	register int nbytes;
@@ -540,7 +545,7 @@ XINT	*status;			/* return status		*/
 	 * mode on.  The SETREDRAW sequence is used to permit an automatic
 	 * screen redraw when a suspended process receives SIGCONT.
 	 */
-	if (*buf == '\033' && count == LEN_RAWCMD || count == LEN_SETREDRAW) {
+	if ((*buf == '\033' && count == LEN_RAWCMD) || count == LEN_SETREDRAW) {
 	    /* Note that we cannot use strcmp since buf is XCHAR. */
 
 	    /* The disable rawmode sequence. */
@@ -549,7 +554,7 @@ XINT	*status;			/* return status		*/
 	    if (*cp == EOS) {
 		tty_reset (port);
 		*status = XOK;
-		return;
+		return (XOK);
 	    }
 
 	    /* The enable rawmode sequence.  The control sequence is followed
@@ -561,7 +566,7 @@ XINT	*status;			/* return status		*/
 	    if (*cp == EOS) {
 		tty_rawon (port, (*ip++ == 'N') ? KF_NDELAY : 0);
 		*status = XOK;
-		return;
+		return (XOK);
 	    }
 	
 	    /* The set-redraw control sequence.  If the redraw code is
@@ -575,7 +580,7 @@ XINT	*status;			/* return status		*/
 		if (port)
 		    port->redraw = *ip;
 		*status = XOK;
-		return;
+		return (XOK);
 	    }
 	}
 
@@ -615,16 +620,16 @@ XINT	*status;			/* return status		*/
 		*status = XERR;
 	} else
 	    *status = count;
+
+	return (*status);
 }
 
 
 /* ZSEKTX -- Seek on a text file to the character offset given by a prior
  * call to ZNOTTX.  This offset should always refer to the beginning of a line.
  */
-ZSEKTX (fd, znottx_offset, status)
-XINT	*fd;
-XLONG	*znottx_offset;
-XINT	*status;
+int
+ZSEKTX (XINT *fd, XLONG *znottx_offset, XINT *status)
 {
 	register struct fiodes *kfp = &zfd[*fd];
 
@@ -674,15 +679,19 @@ XINT	*status;
 	    kfp->fpos = ftell (kfp->fp);
 	    *status = XOK;
 	}
+
+	return (*status);
 }
 
 
 /* ZSTTTX -- Get file status for a text file.
  */
-ZSTTTX (fd, param, value)
-XINT	*fd;			/* file number				*/
-XINT	*param;			/* status parameter to be returned	*/
-XLONG	*value;			/* return value				*/
+int
+ZSTTTX (
+  XINT	*fd,			/* file number				*/
+  XINT	*param,			/* status parameter to be returned	*/
+  XLONG	*value 			/* return value				*/
+)
 {
 	struct	stat filestat;
 
@@ -706,6 +715,8 @@ XLONG	*value;			/* return value				*/
 	    *value = XERR;
 	    break;
 	}
+
+	return (*value);
 }
 
 
@@ -716,10 +727,11 @@ XLONG	*value;			/* return value				*/
  * is last accessed in character mode, then ZCLSTX will automatically restore
  * line mode.
  */
-static
-tty_rawon (port, flags)
-struct	ttyport *port;		/* tty port */
-int	flags;			/* file mode control flags */
+static void
+tty_rawon (
+  struct  ttyport *port,		/* tty port */
+  int	  flags 			/* file mode control flags */
+)
 {
 	register struct	fiodes *kfp;
 	register int fd;
@@ -733,7 +745,6 @@ int	flags;			/* file mode control flags */
 	if (!(port->flags & KF_CHARMODE)) {
 #ifdef SYSV
 	    struct  termios tc;
-	    int     i;
 
 	    tcgetattr (fd, &port->tc);
 	    port->flags |= KF_CHARMODE;
@@ -809,15 +820,18 @@ int	flags;			/* file mode control flags */
  * mode i/o was set on the physical device when the ioctl status flags were
  * saved.
  */
-static
-tty_reset (port)
-struct	ttyport *port;		/* tty port */
+static void
+tty_reset (
+  struct ttyport *port		/* tty port */
+)
 {
 	register struct	fiodes *kfp;
 	register int fd;
 #ifdef SYSV
+	/*
 	struct termios tc;
 	int i;
+	*/
 #else
 	struct	sgttyb tc;
 #endif
@@ -864,11 +878,12 @@ struct	ttyport *port;		/* tty port */
 /* TTY_ONSIG -- Catch interrupt and return a nonzero status.  Active only while
  * we are reading from the terminal in raw mode.
  */
-static
-tty_onsig (sig, code, scp)
-int	sig;			/* signal which was trapped	*/
-int	*code;			/* not used */
-int	*scp;			/* not used */
+static void
+tty_onsig (
+  int	sig,			/* signal which was trapped	*/
+  int	*code,			/* not used */
+  int	*scp 			/* not used */
+)
 {
 	longjmp (jmpbuf, CTRLC);
 }
@@ -877,15 +892,18 @@ int	*scp;			/* not used */
 /* TTY_STOP -- Called when a process is suspended while the terminal is in raw
  * mode; our function is to restore the terminal to normal mode.
  */
-static
-tty_stop (sig, code, scp)
-int	sig;			/* signal which was trapped	*/
-int	*code;			/* not used */
-int	*scp;			/* not used */
+static void
+tty_stop (
+  int	sig,			/* signal which was trapped	*/
+  int	*code,			/* not used */
+  int	*scp 			/* not used */
+)
 {
 	register struct ttyport *port = lastdev;
 	register int fd = port ? port->chan : 0;
+	/*
         register struct fiodes *kfp = port ? &zfd[fd] : NULL;
+	*/
 #ifdef SYSV
 	struct termios tc;
 #else
@@ -922,11 +940,12 @@ int	*scp;			/* not used */
  * the terminal in raw mode is resumed; our function is to restore the terminal
  * to raw mode.
  */
-static
-tty_continue (sig, code, scp)
-int	sig;			/* signal which was trapped	*/
-int	*code;			/* not used */
-int	*scp;			/* not used */
+static void
+tty_continue (
+  int	sig,			/* signal which was trapped	*/
+  int	*code,			/* not used */
+  int	*scp 			/* not used */
+)
 {
 	register struct ttyport *port = lastdev;
 
@@ -948,11 +967,12 @@ int	*scp;			/* not used */
  * to memory copy, hence this is a lot more efficient than calling putc in a
  * loop.
  */
-static
-uio_bwrite (fp, buf, nbytes)
-FILE	*fp;			/* output file		*/
-XCHAR	*buf;			/* data buffer		*/
-int	nbytes;			/* data size		*/
+static void
+uio_bwrite (
+  FILE	*fp,			/* output file		*/
+  XCHAR	*buf,			/* data buffer		*/
+  int	nbytes 			/* data size		*/
+)
 {
 	register XCHAR *ip = buf;
 	register char *op;

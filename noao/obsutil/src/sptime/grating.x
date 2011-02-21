@@ -2,31 +2,31 @@ include	<error.h>
 include	<math.h>
 
 define	GR_LEN		24
-define	GR_W		Memr[$1]	# Wavelength
+define	GR_W		Memr[P2R($1)]	# Wavelength
 define	GR_O		Memi[$1+1]	# Order
-define	GR_P		Memr[$1+2]	# Blaze peak scale factor
-define	GR_WB		Memr[$1+3]	# First order wavelength at blaze (A)
-define	GR_DB		Memr[$1+4]	# First order dispersion at blaze (A/mm)
+define	GR_P		Memr[P2R($1+2)]	# Blaze peak scale factor
+define	GR_WB		Memr[P2R($1+3)]	# First order wavelength at blaze (A)
+define	GR_DB		Memr[P2R($1+4)]	# First order dispersion at blaze (A/mm)
 define	GR_OREF		Memi[$1+5]	# Reference order
-define	GR_F		Memr[$1+6]	# Focal length (mm)
-define	GR_G		Memr[$1+7]	# Ruling (groves/A)
-define	GR_BLAZE	Memr[$1+8]	# Blaze angle (rad)
-define	GR_N		Memr[$1+9]	# Index of refraction
-define	GR_PHI		Memr[$1+10]	# Alpha - beta (rad)
-define	GR_ALPHA	Memr[$1+11]	# Incident angle (rad)
-define	GR_BETA		Memr[$1+12]	# Diffraction angle (rad)
-define	GR_TYPE		Memr[$1+13]	# 1=Reflection, -1=Transmission
-define	GR_FULL		Memi[$1+14]	# Full solution?
+define	GR_F		Memr[P2R($1+6)]	# Focal length (mm)
+define	GR_G		Memr[P2R($1+7)]	# Ruling (groves/A)
+define	GR_BLAZE	Memr[P2R($1+8)]	# Blaze angle (rad)
+define	GR_N		Memr[P2R($1+9)]	# Index of refraction
+define	GR_PHI		Memr[P2R($1+10)]	# Alpha - beta (rad)
+define	GR_ALPHA	Memr[P2R($1+11)]	# Incident angle (rad)
+define	GR_BETA		Memr[P2R($1+12)]	# Diffraction angle (rad)
+define	GR_TYPE		Memr[P2R($1+13)]	# 1=Reflection, -1=Transmission
+define	GR_FULL		Memi[$1+14]		# Full solution?
 
-define	GR_PIS		Memr[$1+15]	# PI/G*S
-define	GR_CA		Memr[$1+16]	# cos (ALPHA)
-define	GR_SA		Memr[$1+17]	# sin (ALPHA)
-define	GR_CB		Memr[$1+18]	# cos (BETA)
-define	GR_TB		Memr[$1+19]	# tan (BETA)
-define	GR_SE		Memr[$1+20]	# sin (ALPHA - BLAZE)
-define	GR_CE		Memr[$1+21]	# cos (ALPHA - BLAZE)
-define	GR_CBLZ		Memr[$1+22]	# cos (BLAZE)
-define	GR_T2BLZ	Memr[$1+23]	# tan (2 * BLAZE)
+define	GR_PIS		Memr[P2R($1+15)]	# PI/G*S
+define	GR_CA		Memr[P2R($1+16)]	# cos (ALPHA)
+define	GR_SA		Memr[P2R($1+17)]	# sin (ALPHA)
+define	GR_CB		Memr[P2R($1+18)]	# cos (BETA)
+define	GR_TB		Memr[P2R($1+19)]	# tan (BETA)
+define	GR_SE		Memr[P2R($1+20)]	# sin (ALPHA - BLAZE)
+define	GR_CE		Memr[P2R($1+21)]	# cos (ALPHA - BLAZE)
+define	GR_CBLZ		Memr[P2R($1+22)]	# cos (BLAZE)
+define	GR_T2BLZ	Memr[P2R($1+23)]	# tan (2 * BLAZE)
 
 
 # Definitions of INDEF parameter flags.
@@ -74,7 +74,7 @@ define	GTA	16B
 # alpha=beta=blaze=prism angle.
 
 pointer procedure gr_open (w, o, p, wb, db, oref, f, gmm, blaze, n, phi,
-	alpha, beta, mode)
+	alpha, beta, mode, full)
 
 real	w		#I Wavelength (A)
 int	o		#I Order
@@ -90,6 +90,7 @@ real	phi		#I Incident - diffracted (deg)
 real	alpha		#I Incident angle (deg)
 real	beta		#I Diffracted angle (deg)
 int	mode		#I 1 = incident > diffracted
+int	full		#I Do full solution?
 pointer	gr		#O Grating pointer
 
 int	flags
@@ -504,8 +505,7 @@ begin
 	}
 			   
 	# If all the other parameters cannot be computed then use linear.
-	if (IS_INDEF(GR_F(gr)) || IS_INDEF(GR_G(gr)) ||
-	    IS_INDEF(GR_BLAZE(gr)) || IS_INDEF(GR_ALPHA(gr)) ||
+	if (full==NO || IS_INDEF(GR_F(gr)) || IS_INDEF(GR_G(gr)) ||
 	    IS_INDEF(GR_BETA(gr)) || IS_INDEF(GR_PHI(gr)) ||
 	    IS_INDEF(GR_N(gr))) {
 	    GR_FULL(gr) = NO
@@ -733,7 +733,7 @@ begin
 		    (GR_G(gr) * order *GR_F(gr)))
 	    call printf ("%*tOrder = %d\n")
 		call pargi (col)
-		call pargr (GR_O(gr))
+		call pargi (GR_O(gr))
 	    call printf ("%*tTilt = %.1f degrees\n")
 		call pargi (col)
 		call pargr (RADTODEG(GR_ALPHA(gr) - GR_PHI(gr) / 2))

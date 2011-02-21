@@ -126,7 +126,7 @@ for all images.
 .ls maskvalue = 0
 Mask value used with the \fImasktype\fR parameter.  If the mask type
 selects good or bad bits the value may be specified using IRAF notation
-for decimal, octal, or hexidecimal; i.e 12, 14b, 0cx to select bits 3
+for decimal, octal, or hexadecimal; i.e 12, 14b, 0cx to select bits 3
 and 4.
 .le
 .ls blank = 0.
@@ -748,7 +748,7 @@ the sigmas are computed for each pixel from each image using the
 same estimated true value.
 
 If the images are scaled and shifted and the \fIsigscale\fR threshold
-is exceeded then a sigma is computed for each pixel based on the
+is exceedd then a sigma is computed for each pixel based on the
 image scale parameters; i.e. the median or average is scaled to that of the
 original image before computing the sigma and residuals.
 
@@ -846,7 +846,7 @@ rejected or the number of remaining input values falls below three.  Note
 that the proportionality factor is not recomputed after rejections.
 
 If the images are scaled differently and the sigma scaling correction
-threshold is exceeded then a correction is made in the sigma
+threshold is exceedd then a correction is made in the sigma
 calculations for these differences, again under the assumption that
 the noise in an image scales as the square root of the mean intensity.
 

@@ -30,31 +30,6 @@
  * greater machine independence.
  */
 
-#define	F77			/* Fortran 77 target compiler?		*/
-
-#define	IRAFLIB		"iraf$lib/"
-#define	HOSTLIB		"host$hlib/"
-#define HBIN_INCLUDES	"hbin$arch_includes/"
-
-/* Size limiting definitions.
- */
-#define MAX_TASKS	100	/* max no. of tasks we can handle	*/
-#define SZ_OBUF		131072	/* buffers procedure body		*/
-#define SZ_DBUF		8192	/* for errchk, common, ect. decls	*/
-#define SZ_SBUF		8192	/* buffers text of strings		*/
-#define MAX_STRINGS	256	/* max strings in a procedure		*/
-#define MAX_INCLUDE	5	/* maximum nesting of includes		*/
-#define	MIN_REALPREC	7	/* used by HMS				*/
-#define	SZ_NUMBUF	32	/* for numeric constants		*/
-#define	SZ_STBUF	4096	/* text of defined strings		*/
-#define	MAX_DEFSTR	128	/* max defined strings			*/
-
-#define	RUNTASK		"sysruk.x"
-#define OCTAL		8
-#define DECIMAL		10
-#define HEX		16
-#define CHARCON		1
-#define SEXAG		2
 
 extern	char *vfn2osfn();
 
@@ -76,9 +51,17 @@ extern	char	yytchar, *yysptr, yysbuf[];
 extern	int	yylineno;
 
 #define U(x) x
+/*
 #define input() (((yytchar=yysptr>yysbuf?U(*--yysptr):getc(yyin))==10\
 ?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
 #define unput(c) {yytchar= (c);if(yytchar=='\n')yylineno--;*yysptr++=yytchar;}
+*/
+
+extern int input();
+extern void yyunput();
+extern char *yytext_ptr;
+#define unput(c) yyunput( c, (yytext_ptr)  )
+
 
 
 int	context = GLOBAL;		/* lexical context variable	*/
@@ -389,6 +372,7 @@ str_enter()
 	register int	n;
 	char	name[SZ_FNAME+1];
 
+
 	/* Skip to the first char of the name string.
 	 */
 	ip = yytext;
@@ -464,6 +448,122 @@ register char *strname;
 }
 
 
+/*  MACRO_REDEF --  Redefine the macro to automatically add a P2<T> macro
+ *  to struct definitions.
+ */
+macro_redef ()
+{
+	register int	n, nb=0;
+	register char	*ip, *op, ch;
+	char	name[SZ_FNAME];
+	char	value[SZ_LINE];
+
+
+	outstr ("define\t");
+	memset (name, 0, SZ_FNAME);
+	memset (value, 0, SZ_LINE);
+
+	/* Skip to the first char of the name string.
+	 */
+	ip = yytext;
+	while (isspace (*ip))
+	    ip++;
+	while (!isspace (*ip))
+	    ip++;
+	while (isspace (*ip))
+	    ip++;
+
+	/* Extract macro name. */
+	for (op=name;  (isalnum(*ip) || *ip == '_');  )
+	    *op++ = *ip++;
+	*op = EOS;
+	outstr (name);
+	outstr ("\t");
+
+
+	/*  Modify value.
+	 */
+	op = value;
+        while ( (ch = input()) != EOF ) {
+	    if (ch == '\n') {
+		break;
+	    } else if (ch == '#') {		/* eat a comment	*/
+		while ((ch = input()) != '\n')
+		    ;
+		break;
+
+
+	    } else {
+		if (ch == '[') {
+		    nb++; 
+		    if (nb > 1) *op++ = '(';
+		} else if (ch == ']') {
+		    nb--; 
+		    if (nb <= 0)
+		        break;
+		    else
+		        *op++ = ')';
+		} else if (nb >= 1)
+		    *op++ = ch;
+	    }
+	}
+
+	outstr ("Memr(");
+	if (strcmp (value, "$1") == 0) {
+	    char *emsg[SZ_LINE];
+	    int strict = 0;
+
+	    /*  A macro such as "Memr[$1]" which is typically used as a 
+	     *  shorthand for an array allocated as TY_REAL and not a part
+	     *  of a struct, however it might also be the first element of
+	     *  a struct.  In this case, print a warning so it can be checked
+	     *  manually and just pass it through.
+	     */
+#if defined(MACH64) && defined(AUTO_P2R)
+	    memset (emsg, 0, SZ_LINE);
+	    sprintf (emsg, 
+		"Error in %s: line %d: ambiguous Memr for '%s' needs P2R/P2P", 
+		fname[istkptr], linenum[istkptr], name);
+	    if (strict)
+	        error (XPP_COMPERR, emsg);
+	    else
+		fprintf (stderr, "%s\n", emsg);
+#endif
+	    outstr (value);
+
+	} else if (strncmp ("Mem", value, 3) == 0 || isupper (value[0])) {
+	    /*  In this case we assume a complex macro using some other
+	     *  Mem element or an upper-case macro.  These are again used
+	     *  typically as a shorthand and use pointers directly, so pass
+	     *  it through unchanged.
+	     */
+	    outstr (value);
+
+	} else {
+	    /*  Assume it's part of a struct, e.g. "Memr[$1+N]".  
+	     *
+	     *  FIXME --  We should really be more careful to check the syntax.
+	    fprintf (stderr, "INFO %s line %d: ", 
+		fname[istkptr], linenum[istkptr]);
+	    fprintf (stderr, "adding P2R macro for '%s'\n", name);
+	     */
+#if defined(MACH64) && defined(AUTO_P2R)
+	    if (value[0] == '$') {
+	        outstr ("P2R(");
+	        outstr (value);
+	        outstr (")");
+	    } else
+	        outstr (value);
+#else
+	    outstr (value);
+#endif
+	}
+	outstr (")\n");
+
+	linenum[istkptr]++;
+}
+
+
 /* SETLINE -- Set the file line number.  Used by the first pass to set
  * line number after processing an include file and in various other
  * places.  Necessary to get correct line numbers in error messages from
@@ -512,175 +612,6 @@ char	ch;
 	     */
 	    putc (ch, yyout);
 	}
-}
-
-
-/* DO_INCLUDE -- Process an include statement, i.e., eat up the include
- * statement, push the current input file on a stack, and open the new file.
- * System include files are referenced as "<file>", other files as "file".
- */
-do_include()
-{
-	char    *p, delim, *rindex();
-	char    hfile[SZ_FNAME+1], *op;
-	int	root_len;
-	int	strcmp();
-
-	/* Push current input file status on the input file stack istk.
-	 */
-	istk[istkptr] = yyin;
-	if (++istkptr >= MAX_INCLUDE) {
-	    --istkptr;
-	    error (XPP_COMPERR, "Maximum include nesting exceeded");
-	    return;
-	}
-
-	/* If filespec "<file>", call os_sysfile to get the pathname of the
-	 * system include file.
-	 */
-	if (yytext[yyleng-1] == '<') {
-
-	    for (op=hfile;  (*op = input()) != EOF;  op++)
-		if (*op == '\n') {
-		    --istkptr;
-		    error (XPP_SYNTAX, "missing > delim in include statement");
-		    return;
-		} else if (*op == '>')
-		    break;
-
-	    *op = EOS;
-
-	    if (os_sysfile (hfile, fname[istkptr], SZ_PATHNAME) == ERR) {
-		--istkptr;
-		error (XPP_COMPERR, "cannot find include file");
-		return;
-	    }
-
-	} else {
-	    /* Prepend pathname leading to the file in which the current
-	     * include statement was found.  Compiler may not have been run
-	     * from the directory containing the source and include file.
-	     */
-	    if (!hbindefs) {
-	        if ((p = rindex (fname[istkptr-1], '/')) == NULL)
-		    root_len = 0;
-	        else
-		    root_len = p - fname[istkptr-1] + 1;
-	        strncpy (fname[istkptr], fname[istkptr-1], root_len);
-
-	    } else {
-	        if ((p = vfn2osfn (HBIN_INCLUDES, 0))) {
-		    root_len = strlen (p);
-	            strncpy (fname[istkptr], p, root_len);
-	        } else {
-		    --istkptr;
-		    error (XPP_COMPERR, "cannot find hbin$ directory");
-		    return;
-	        }
-	    }
-	    fname[istkptr][root_len] = EOS;
-
-	    delim = '"';
-
-	    /* Advance to end of whatever is in the file name string.
-	     */
-	    for (p=fname[istkptr];  *p != EOS;  p++)
-		;
-	    /* Concatenate name of referenced file.
-	     */
-	    while ((*p = input()) != delim) {
-		if (*p == '\n' || *p == EOF) {
-		    --istkptr;
-		    error (XPP_SYNTAX, "bad include file name");
-		    return;
-		}
-		p++;
-	    }
-	    *p = EOS;
-	}
-
-	/* If the foreign defs option is in effect, the machine dependent defs
-	 * for a foreign machine are given by a substitute "iraf.h" file named
-	 * on the command line.  This foreign machine header file includes
-	 * not only the iraf.h for the foreign machine, but the equivalent of
-	 * all the files named in the array of strings "machdefs".  Ignore any
-	 * attempts to include any of these files since they have already been
-	 * included in the foreign definitions header file.
-	 */
-	if (foreigndefs) {
-	    char	sysfile[SZ_PATHNAME];
-	    char	**files;
-
-	    for (files=machdefs;  *files != NULL;  files++) {
-		strcpy (sysfile, HOSTLIB);
-		strcat (sysfile, *files);
-		if (strcmp (sysfile, fname[istkptr]) == 0) {
-		    --istkptr;
-		    return;
-		}
-	    }
-	}
-
-	if ((yyin = fopen (vfn2osfn(fname[istkptr],0), "r")) == NULL) {
-	    yyin = istk[--istkptr];
-	    error (XPP_SYNTAX, "Cannot open include file");
-	    return;
-	}
-
-	/* Keep track of the line number within the include file.  */
-	linenum[istkptr] = 1;
-
-	/* Put the newline back so that LEX "^..." matches will work on
-	 * first line of include file.
-	 */
-	unput ('\n');
-}
-
-
-/* YYWRAP -- Called by LEX when end of file is reached.  If input stack is
- * not empty, close off include file and continue on in old file.  Return 
- * nonzero when the stack is empty, i.e., when we reach the end of the
- * main file.
- */
-yywrap()
-{
-	/* The last line of a file is not necessarily newline terminated.
-	 * Output a newline just in case.
-	 */
-	fprintf (yyout, "\n");
-
-	if (istkptr <= 0) {
-	    /* ALL DONE with main file.
-	     */
-	    return (1);
-
-	} else {
-	    /* End of include file.  Pop old input file and set line number
-	     * for error messages.
-	     */
-	    fclose (yyin);
-	    yyin = istk[--istkptr];
-	    if (istkptr == 0)
-		setline();
-	    return (0);
-	}
-}
-
-
-/* YY_INPUT -- Get a character from the input stream.
- */
-yy_input()
-{
-	return (input());
-}
-
-
-/* YY_UNPUT -- Put a character back into the input stream.
- */
-yy_unput(ch)
-char	ch;
-{
-	unput(ch);
 }
 
 
@@ -793,6 +724,10 @@ do_char()
  */
 skip_helpblock()
 {
+	char   ch;
+
+
+	/*  fgets() no longer works with FLEX 
 	while (fgets (yytext, SZ_LINE, yyin) != NULL) {
 	    if (istkptr == 0)
 		linenum[istkptr]++;
@@ -804,62 +739,31 @@ skip_helpblock()
 			break;
 	    }
 	}
-}
+	*/
 
-
-/* PROCESS_TASK_STATEMENT -- Parse the TASK statement.  The task statement
- * is replaced by the "sys_runtask" procedure (sysruk), which is called by
- * the IRAF main to run a task, or to print the dictionary (cmd "?").
- * The source for the basic sys_runtask procedure is in "lib$sysruk.x".
- * We process the task statement into some internal tables, then open the
- * sysruk.x file as an include file.  Special macros therein are
- * replaced by the taskname dictionary as processing continues.
- */
-process_task_statement()
-{
-	char	ch;
-
-	if (ntasks > 0) {		/* only one task statement permitted */
-	    error (XPP_SYNTAX, "Only one TASK statement permitted per file");
-	    return;
-	}
-
-	/* Process the task statement into the TASK_LIST structure.
-	 */
-	if (parse_task_statement() == ERR) {
-	    error (XPP_SYNTAX, "Syntax error in TASK statement");
-	    while ((ch = input()) != EOF && ch != '\n')
-		;
-	    unput ('\n');
-	    return;
-	}
-
-	/* Open RUNTASK ("lib$sysruk.x") as an include file.
-	 */
-	istk[istkptr] = yyin;
-	if (++istkptr >= MAX_INCLUDE) {
-	    istkptr--;
-	    error (XPP_COMPERR, "Maximum include nesting exceeded");
-	    return;
-	}
-
-	strcpy (fname[istkptr], IRAFLIB);
-	strcat (fname[istkptr], RUNTASK);
-	if ((yyin = fopen (vfn2osfn (fname[istkptr],0), "r")) == NULL) {
-	    yyin = istk[--istkptr];
-	    error (XPP_SYNTAX, "Cannot read lib$sysruk.x");
-	    return;
-	}
-
-	linenum[istkptr] = 1;
-
-	/* Put the newline back so that LEX "^..." matches will work on
-	 * first line of the include file.
-	 */
-	unput ('\n');
-}
-
+	while ( (ch = input()) != EOF ) {
+	    if (ch == '.') {		/* check for ".endhelp"		*/
+		ch = input ();
+		if (ch == 'e' || ch == 'E') {
+		    for (ch = input() ; ch != '\n' && ch != EOS;  ch=input())
+	    	        ;
+		    break;
+		} else
+		    for (ch = input() ; ch != '\n' && ch != EOS;  ch=input())
+	    	        ;
 	
+	    } else if (ch == '\n') {	/* skip line			*/
+		;
+	    } else {
+		for (ch=input();  ch != '\n' && ch != EOS;  ch=input())
+	    	    ;
+	    }
+	    if (istkptr == 0)
+	        linenum[istkptr]++;
+        }
+}
+
+
 /* PARSE_TASK_STATEMENT -- Parse the task statement, building up a list
  *   of task_name/procedure_name structures in the "task_list" array.
  *
@@ -1150,7 +1054,6 @@ char	*string;
 	    /* Output of a miscellaneous declaration in the declarations
 	     * section.
 	     */
-if (string[0] == '}') bob();
 	    for (ip=string;  (*dp++ = *ip++) != EOS;  )
 		;
 	    if (--dp >= &dbuf[SZ_DBUF]) {
@@ -1163,8 +1066,6 @@ if (string[0] == '}') bob();
 	    fputs (string, yyout);
 	}
 }
-
-bob() { int i = 0; i++; }
 
 
 /* BEGIN_CODE -- Code that gets executed when the keyword BEGIN is encountered,
@@ -1189,6 +1090,7 @@ begin_code()
 	setcontext (BODY);
 	d_runtime (text);  outstr (text);
 	outstr ("begin\n");
+	linenum[istkptr]++;
 
 	/* Initialization. */
 	nbrace = 0;

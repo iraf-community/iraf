@@ -89,7 +89,11 @@ begin
 		    bval = false
 		}
 		# Memb[(op-1)/SZ_BOOL+1] = bval
-		call amovc (bval, Memc[op], SZ_BOOL)
+		if (SZ_INT != SZ_INT32) {
+		    call i64to32 (bval, bval, 1)
+		    call amovc (bval, Memc[op], SZ_INT32)
+		} else
+		    call amovc (bval, Memc[op], SZ_BOOL)
 
 	    # changed case for int to short and long 
 	    # to allow i*2 in gpb--dlb 11/3/87
@@ -105,7 +109,11 @@ begin
 		    call erract (EA_WARN)
 		    lval = 0
 		}
-		call amovc (lval, Memc[op], SZ_LONG)
+		if (SZ_INT != SZ_INT32) {
+		    call i64to32 (lval, lval, 1)
+		    call amovc (lval, Memc[op], SZ_INT32)
+		} else
+		    call amovc (lval, Memc[op], SZ_LONG)
 
 	    case TY_REAL:
 		iferr (rval = imgetr (im, P_PTYPE(pp))) {

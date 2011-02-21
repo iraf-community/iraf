@@ -90,6 +90,7 @@ begin
 	# to be called when the first i/o operation occurs.
 
 	IM_FAST(im) = YES
+IM_FAST(im) = NO
 
 	# Set the image name field, used by IMERR everywhere.
 	call strcpy (imspec, IM_NAME(im), SZ_IMNAME)

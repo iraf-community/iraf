@@ -8,6 +8,11 @@
 #define import_spp
 #include <iraf.h>
 
+
+extern  int  ZOPNTX (), ZCLSTX (), ZFLSTX (), ZGETTX ();
+extern  int  ZNOTTX (), ZPUTTX (), ZSEKTX (), ZSTTTX ();
+
+
 /*
  * ZFIOTY -- Device driver for terminals.  In the 4.1BSD UNIX kernel the same
  * driver is used for both terminals and ordinary text files, hence all we
@@ -20,10 +25,12 @@
  * to the terminal in this way (possibly from a subprocess) may not be possible
  * on all host systems.
  */
-ZOPNTY (osfn, mode, chan)
-PKCHAR	*osfn;			/* UNIX filename			*/
-XINT	*mode;			/* file access mode			*/
-XINT	*chan;			/* UNIX channel of file (output)	*/
+int
+ZOPNTY (
+  PKCHAR  *osfn,		/* UNIX filename			*/
+  XINT	  *mode,		/* file access mode			*/
+  XINT	  *chan 		/* UNIX channel of file (output)	*/
+)
 {
 	PKCHAR	ttyname[SZ_FNAME+1];
 
@@ -32,27 +39,25 @@ XINT	*chan;			/* UNIX channel of file (output)	*/
 	else
 	    strcpy ((char *)ttyname, (char *)osfn);
 
-	ZOPNTX (ttyname, mode, chan);
+	return ZOPNTX (ttyname, mode, chan);
 }
 
 
 /* ZCLSTY -- Close a text file.
  */
-ZCLSTY (fd, status)
-XINT	*fd;
-XINT	*status;
+int
+ZCLSTY (XINT *fd, XINT *status)
 {
-	ZCLSTX (fd, status);
+	return ZCLSTX (fd, status);
 }
 
 
 /* ZFLSTY -- Flush any buffered textual output.
  */
-ZFLSTY (fd, status)
-XINT	*fd;
-XINT	*status;
+int
+ZFLSTY (XINT *fd, XINT *status)
 {
-	ZFLSTX (fd, status);
+	return ZFLSTX (fd, status);
 }
 
 
@@ -62,24 +67,20 @@ XINT	*status;
  * current line will NOT be newline terminated.  If maxchar==1 assert
  * character mode, otherwise assert line mode.
  */
-ZGETTY (fd, buf, maxchars, status)
-XINT	*fd;
-XCHAR	*buf;
-XINT	*maxchars;
-XINT	*status;
+int
+ZGETTY (XINT *fd, XCHAR *buf, XINT *maxchars, XINT *status)
 {
-	ZGETTX (fd, buf, maxchars, status);
+	return ZGETTX (fd, buf, maxchars, status);
 }
 
 
 /* ZNOTTY -- Return the seek offset of the beginning of the current line
  * of text.
  */
-ZNOTTY (fd, offset)
-XINT	*fd;
-XLONG	*offset;
+int
+ZNOTTY (XINT *fd, XLONG *offset)
 {
-	ZNOTTX (fd, offset);
+	return ZNOTTX (fd, offset);
 }
 
 
@@ -91,34 +92,36 @@ XLONG	*offset;
  * offset of the beginning of a line of text only if we are called to write
  * full lines of text.
  */
-ZPUTTY (fd, buf, nchars, status)
-XINT	*fd;				/* file to be written to	*/
-XCHAR	*buf;				/* data to be output		*/
-XINT	*nchars;			/* nchars to write to file	*/
-XINT	*status;			/* return status		*/
+int
+ZPUTTY (
+  XINT	*fd,				/* file to be written to	*/
+  XCHAR	*buf,				/* data to be output		*/
+  XINT	*nchars,			/* nchars to write to file	*/
+  XINT	*status 			/* return status		*/
+)
 {
-	ZPUTTX (fd, buf, nchars, status);
+	return ZPUTTX (fd, buf, nchars, status);
 }
 
 
 /* ZSEKTY -- Seek on a text file to the character offset given by a prior
  * call to ZNOTTY.  This offset should always refer to the beginning of a line.
  */
-ZSEKTY (fd, znotty_offset, status)
-XINT	*fd;
-XLONG	*znotty_offset;
-XINT	*status;
+int
+ZSEKTY (XINT *fd, XLONG *znotty_offset, XINT *status)
 {
-	ZSEKTX (fd, znotty_offset, status);
+	return ZSEKTX (fd, znotty_offset, status);
 }
 
 
 /* ZSTTTY -- Get file status for a text file.
  */
-ZSTTTY (fd, param, value)
-XINT	*fd;			/* file number				*/
-XINT	*param;			/* status parameter to be returned	*/
-XLONG	*value;			/* return value				*/
+int
+ZSTTTY (
+  XINT	*fd,			/* file number				*/
+  XINT	*param,			/* status parameter to be returned	*/
+  XLONG	*value 			/* return value				*/
+)
 {
-	ZSTTTX (fd, param, value);
+	return ZSTTTX (fd, param, value);
 }

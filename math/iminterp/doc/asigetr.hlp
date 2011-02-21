@@ -27,7 +27,7 @@ DESCRIPTION
 ASIGETR is used to set the value of undefined drizzle interpolant pixels.
 Undefined pixels are those for which the interpolation coordinates do not
 overlap the input coordinates, but are still, within the boundaries of the input
-image, a situtation which may occur when the pixel fraction is < 1.0.
+image, a situation which may occur when the pixel fraction is < 1.0.
 .ih
 NOTES
 .ih

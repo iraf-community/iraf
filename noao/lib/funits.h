@@ -6,7 +6,7 @@ define	SZ_UNITS	79			# Length of funits strings
 define	FUN_TYPE	Memi[$1]		# Unit type code
 define	FUN_CLASS	Memi[$1+1]		# Unit class code
 define	FUN_MOD		Memi[$1+2]		# Modifier code
-define	FUN_SCALE	Memr[$1+3]		# Scale factor
+define	FUN_SCALE	Memr[P2R($1+3)]		# Scale factor
 define	FUN_LABEL	Memc[P2C($1+4)]		# Unit label
 define	FUN_UNITS	Memc[P2C($1+44)]	# Units string
 define	FUN_USER	Memc[P2C($1+84)]	# User units string 

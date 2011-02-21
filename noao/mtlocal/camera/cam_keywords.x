@@ -356,7 +356,7 @@ begin
 	case IRSPECTRA:
 	    nchars = gstrcpy ("INFRARED SPECTRA", Memc[str], LEN_OBJECT)
 	case IRSPECKLE:
-	    nchars = gstrcpy ("INFRARED SPECKLE", memc[str], LEN_OBJECT)
+	    nchars = gstrcpy ("INFRARED SPECKLE", Memc[str], LEN_OBJECT)
 	default:
 	    nchars = itoc (int (data_code), Memc[str], LEN_OBJECT)
 	}

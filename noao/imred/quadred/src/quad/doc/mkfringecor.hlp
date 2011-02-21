@@ -42,7 +42,7 @@ CCD processing parameters.
 .ih
 DESCRIPTION
 The input blank sky images are automatically processed up through the
-illumination correction before computing the fringe correction images.
+iillumination correction before computing the fringe correction images.
 The fringe corrections are subset dependent.
 The slowly varying background is determined and subtracted leaving only
 the fringe pattern caused by the sky emission lines.  These fringe images

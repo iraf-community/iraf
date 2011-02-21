@@ -13,6 +13,8 @@
 #include "task.h"
 #include "errs.h"
 #include "clmodes.h"
+#include "proto.h"
+
 
 /*
  * TASK -- Operators for tasks.
@@ -29,7 +31,7 @@ struct task *newtask;		/* ptr to new, but unlinked, task	*/
 struct task *currentask;	/* ptr to ltask currently running	*/
 struct package *curpack;	/* current package in effect		*/
 
-int pachead;			/* dict index of first package		*/
+XINT pachead;			/* dict index of first package		*/
 
 
 /* CMDSRCH -- Used by callnewtask() to find the ltask to be run.  Ltname is
@@ -46,10 +48,9 @@ int pachead;			/* dict index of first package		*/
  *   to clpackage; see clpkg().
  */
 struct ltask *
-cmdsrch (pkname, ltname)
-char	*pkname, *ltname;
+cmdsrch (char *pkname, char *ltname)
 {
-	register struct ltask *ltp;
+	register struct ltask *ltp = (struct ltask *) NULL;
 	register struct package *pkp, *pkcand;
 	static	struct ltask pacltask;	/* used to signal a package change */
 	struct	ltask *temptaskset();
@@ -59,7 +60,7 @@ char	*pkname, *ltname;
 	    pkp = pacfind (pkname);
 	    if (pkp == NULL)
 		cl_error (E_UERR, e_pcknonexist, pkname);
-	    else if ((int)pkp == ERR)
+	    else if ((XINT)pkp == ERR)
 		cl_error (E_UERR, e_pckambig, pkname);
 	    else
 		ltp = ltaskfind (pkp, ltname, 1);
@@ -69,7 +70,7 @@ char	*pkname, *ltname;
 		cl_error (E_UERR, e_tnonexist, ltname);
 	    }
 
-	    if ((int)ltp == ERR)
+	    if ((XINT)ltp == ERR)
 		cl_error (E_UERR, e_tambig, ltname);
 
 	} else
@@ -126,8 +127,7 @@ char	*pkname, *ltname;
  *   error.
  */
 struct ltask *
-ltasksrch (pkname, ltname)
-char	*pkname, *ltname;
+ltasksrch (char *pkname, char *ltname)
 {
 	struct	ltask *ltp;
 	struct	package *pkp;
@@ -137,7 +137,7 @@ char	*pkname, *ltname;
 	if (*pkname != EOS) {
 	    if (pkp == NULL)
 		cl_error (E_UERR, e_pcknonexist, pkname);
-	    if ((int)pkp == ERR)
+	    if ((XINT)pkp == ERR)
 		cl_error (E_UERR, e_pckambig, pkname);
 	}
 
@@ -153,9 +153,7 @@ char	*pkname, *ltname;
 /* _LTASKSRCH -- Same as ltasksrch(), except that cl_error is not called.
  */
 struct ltask *
-_ltasksrch (pkname, ltname, o_pkp)
-char	*pkname, *ltname;
-struct	package **o_pkp;
+_ltasksrch (char *pkname, char *ltname, struct package **o_pkp)
 {
 	register struct ltask *ltp, *ltcand;
 	register struct package *pkp;
@@ -165,7 +163,7 @@ struct	package **o_pkp;
 	if (*pkname != '\0') {
 	    /* Package name included; just search it. */
 	    pkp = pacfind (pkname);
-	    if (pkp != NULL && (int)pkp != ERR)
+	    if (pkp != NULL && (XINT)pkp != ERR)
 		ltcand = ltaskfind (pkp, ltname, 1);
 
 	} else if (abbrev()) {
@@ -230,8 +228,7 @@ struct	package **o_pkp;
  * NULL if not found.
  */
 struct package *
-pacfind (name)
-char	*name;
+pacfind (char *name)
 {
 	struct	package *pkp;
 	struct	package *candidate;
@@ -265,10 +262,10 @@ char	*name;
 /* DEFPAC -- Return true/false if the named package is/isnot loaded.
  * Call error if an ambiguous abbreviation is given.
  */
-defpac (pkname)
-char	*pkname;
+int 
+defpac (char *pkname)
 {
-	switch ((int)pacfind (pkname)) {
+	switch ((XINT) pacfind (pkname)) {
 	case NULL:
 	    return (NO);
 	case ERR:
@@ -283,10 +280,11 @@ char	*pkname;
  * Return NULL if not found, ERR if ambiguous or pointer if found.
  */
 struct ltask *
-ltaskfind (pkp, name, enable_abbreviations)
-struct	package *pkp;			/* package to be searched	*/
-char	*name;				/* ltask name			*/
-int	enable_abbreviations;		/* enable abbrev. in search	*/
+ltaskfind (
+    struct package *pkp,			/* package to be searched	*/
+    char *name,				/* ltask name			*/
+    int enable_abbreviations		/* enable abbrev. in search	*/
+)
 {
 	register struct ltask *ltp;
 	struct	ltask *candidate;
@@ -325,8 +323,8 @@ int	enable_abbreviations;		/* enable abbrev. in search	*/
  * If a specific package is named, look only there; otherwise search
  * the usual path.  Call error if an ambiguous abbreviation is given.
  */
-deftask (task_spec)
-char	*task_spec;
+int 
+deftask (char *task_spec)
 {
 	char	buf[SZ_LINE];
 	char	*pkname, *ltname, *junk;
@@ -339,7 +337,7 @@ char	*task_spec;
 	if (pkname[0] != '\0') {	/* explicit package named	*/
 	    if ((pkp = pacfind (pkname)) == NULL)
 		cl_error (E_UERR, e_pcknonexist, pkname);
-	    if ((stat = (int) ltaskfind (pkp, ltname, 1)) == NULL)
+	    if ((stat = (XINT) ltaskfind (pkp, ltname, 1)) == NULL)
 		return (NO);
 
 	} else {			/* search all packages		*/
@@ -347,7 +345,7 @@ char	*task_spec;
 	    stat = NULL;
 
 	    while (pkp != NULL) {
-		stat = (int) ltaskfind (pkp, ltname, 1);
+		stat = (XINT) ltaskfind (pkp, ltname, 1);
 		if (stat == ERR)
 		    break;
 		else if (stat != NULL)
@@ -376,7 +374,8 @@ char	*task_spec;
 
 int unwind_level = 0;
 
-taskunwind()
+void 
+taskunwind (void)
 {
 	struct task *lastask = currentask;
 
@@ -412,10 +411,7 @@ taskunwind()
  * N.B. ptname and ltname may be changed IN PLACE to simplify suffix tests.
  */
 struct ltask *
-addltask (pkp, ptname, ltname, redef)
-struct	package *pkp;
-char	*ptname, *ltname;
-int	redef;
+addltask (struct package *pkp, char *ptname, char *ltname, int redef)
 {
 	register char *cp;
 	register struct ltask *ltp;
@@ -504,10 +500,7 @@ int	redef;
  * Null out all unused fields.
  */
 struct ltask *
-newltask (pkp, lname, pname, oldltp)
-register struct package *pkp;
-char	*lname, *pname;
-struct	ltask	 *oldltp;
+newltask (register struct package *pkp, char *lname, char *pname, struct ltask *oldltp)
 {
 	register struct ltask *ltp, *newltp;
 
@@ -554,9 +547,7 @@ link:
  * call error() if no core or if name already exists.
  */
 struct package *
-newpac (name, bin)
-char *name;
-char *bin;
+newpac (char *name, char *bin)
 {
 	register struct package *pkp;
 

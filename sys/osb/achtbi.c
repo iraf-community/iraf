@@ -9,10 +9,12 @@
  * The loop runs in the reverse direction so that the unpack can be
  * performed in place (a and b can be the same array).
  */
-ACHTBI (a, b, npix)
-XCHAR	*a;
-XINT	*b;
-XINT	*npix;
+void
+ACHTBI (
+  XCHAR		*a,
+  XINT	*b,
+  XINT		*npix
+)
 {
 	register XUBYTE	*ip, *first = (XUBYTE *)a;
 	register XINT	*op;

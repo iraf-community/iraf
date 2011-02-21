@@ -1,5 +1,6 @@
 input,s,a,,,,Images to be fit
 output,s,a,,,,Output images
+bpm,s,h,"",,,Bad pixel mask(s)
 axis,i,h,1,1,2,Axis to be fit
 type,s,a,,,,"Type of output (fit, difference, ratio)"
 interactive,b,h,yes,,,Set fitting parameters interactively?

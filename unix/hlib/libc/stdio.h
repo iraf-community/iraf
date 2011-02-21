@@ -48,7 +48,7 @@ struct _iobuf {
 	XINT	_fflags;		/* bit flags			*/
 };
 
-extern	int FIOCOM[];			/* the FIO common		*/
+extern	XINT FIOCOM[];			/* the FIO common		*/
 
 #define	_FFLUSHNL	01		/* flush buffer on newline	*/
 #define	_FREAD		02		/* read perm on file		*/
@@ -65,7 +65,7 @@ extern	int FIOCOM[];			/* the FIO common		*/
 /* Convert FILE pointers to and from FIO integer file descriptors.
  */
 #define	FDTOFP(fd)	((FILE *)(&FIOCOM[(fd)-1]))
-#define	FPTOFD(fp)	((int *)(fp) - FIOCOM + 1)
+#define	FPTOFD(fp)	((XINT)((XINT *)(fp) - FIOCOM + 1))
 
 #define	stdin		(FDTOFP(3))
 #define	stdout		(FDTOFP(4))

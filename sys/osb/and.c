@@ -8,8 +8,7 @@
 /* ANDI -- Bitwise boolean AND of two integer variables.
  */
 XINT
-ANDI (a, b)
-XINT	*a, *b;
+ANDI (XINT *a, XINT *b)
 {
 	return (*a & *b);
 }
@@ -18,8 +17,7 @@ XINT	*a, *b;
 /* ANDS -- Bitwise boolean AND of two short integer variables.
  */
 XSHORT
-ANDS (a, b)
-XSHORT	*a, *b;
+ANDS (XSHORT *a, XSHORT *b)
 {
 	return (*a & *b);
 }
@@ -28,8 +26,7 @@ XSHORT	*a, *b;
 /* ANDL -- Bitwise boolean AND of two long integer variables.
  */
 XLONG
-ANDL (a, b)
-XLONG	*a, *b;
+ANDL (XLONG *a, XLONG *b)
 {
 	return (*a & *b);
 }

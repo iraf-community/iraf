@@ -207,7 +207,7 @@ but with different world coordinate windows.
 Graphics Output Procedures
 
     The GIO output procedures range from \fBgplotv\fR and \fBgploto\fR,
-which can draw an entire plot with autoscaling and axis labelling in one call,
+which can draw an entire plot with autoscaling and axis labeling in one call,
 to the polyline, polymarker, move, draw, and text drawing primitives at
 the low end.
 
@@ -363,7 +363,7 @@ the spooled graphics frame, mapping a rectangular window of the spooled
 frame onto the device screen.  The graphics frame itself is not modified,
 hence zoom out or reset and redraw will restore the original display.
 
-If the graphics frame is a typical vector plot with drawn and labelled
+If the graphics frame is a typical vector plot with drawn and labeled
 axes, magnifying a portion of the plot may cause the axes to be lost.
 If this is not what is desired a keystroke is provided to draw and label
 the axes of the displayed window.  The axes will be overplotted on the
@@ -371,7 +371,7 @@ current display and will not be saved in the frame buffer, hence they
 will be lost when the frame is redrawn.  In cursor mode the viewport is
 the full display area of the output device, hence the tick mark labels
 of the drawn axes will be drawn inside the viewport.  This form of axes
-labelling is used because it is simple and because it is appropriate for
+labeling is used because it is simple and because it is appropriate for
 both vector graphics and image display output devices (and cursor mode
 must serve both).
 
@@ -929,7 +929,7 @@ used to plot entire data vectors.  Second are the control procedures,
 used to open and close a device, to flush output and clear the screen,
 and to cancel output in the event of an interrupt.
 Third are the procedures used to set and stat (inquire) the GIO
-internal parameters, e.g. to define a WCS, change pens, select axis labelling
+internal parameters, e.g. to define a WCS, change pens, select axis labeling
 options, or inquire the device resolution.  Fourth and last are the output
 procedures, used to draw and label the axes of a viewport, set the cursor,
 draw lines or marks, plot text, or fill areas.
@@ -949,7 +949,7 @@ char	title[ARB]	# plot title
 
 Open GIO, clear the screen, autoscale and plot the data vector, then close GIO.
 A default viewport is used.  The axes are drawn, tick marks are selected,
-marked, and labelled, and the plot title is printed.  The data is plotted
+marked, and labeled, and the plot title is printed.  The data is plotted
 using solid line segments.  The X values of the data points are evenly
 distributed from X1 to X2.
 .le
@@ -1388,7 +1388,7 @@ If desired, \fBglabax\fR may modify the window slightly to place
 simple values on the tick marks.  Numerous \fBgset\fR options are
 available for controlling the number and sizes of the tick marks,
 the format of tick labels, the axes on which tick labels appear,
-and so on.  If the device viewport has not yet been set and axis labelling
+and so on.  If the device viewport has not yet been set and axis labeling
 is enabled, \fBglabax\fR will set a default size viewport which allows room
 for the label text outside the viewport.
 .le
@@ -1637,7 +1637,7 @@ would plot characters downward in a vertical string centered at the position
 given.
 
 The default font is set by the font attribute at the beginning of each call.
-Font changes may also be signalled by placing the sequence "\fF" in the text,
+Font changes may also be signaled by placing the sequence "\fF" in the text,
 where F is one of the characters RGIB, denoting the fonts roman, greek,
 italic, and bold.  In this manner the font may change from character
 to character within a single line of text.  Additional escape sequences may
@@ -1752,7 +1752,7 @@ The physical cursor of the graphics device associated with graphics
 descriptor \fIgp\fR is read and the cursor coordinates in NDC units are
 returned as output arguments, along with the keystroke value, i.e.,
 the character typed or button pushed causing the cursor to be read.
-On many devices the cursor read will be instantanenous (the cursor position
+On many devices the cursor read will be instantaneous (the cursor position
 will be sampled), and the keystroke value will always be zero.  The range
 of possible keystroke values is device dependent.  EOF is returned as the
 function value when the end of the cursor list is reached.  An error action
@@ -1833,7 +1833,7 @@ and their default values are shown below.
 
 .tp 9
 .nf
-	    (axis labelling parameters)
+	    (axis labeling parameters)
 
 	drawtitle	yes	draw plot title if given
 	titlesize	1.0	character size for plot title
@@ -1881,12 +1881,12 @@ The \fBglabax\fR code and parameters are built upon the GIO graphics
 primitives and may be replaced by a more sophisticated user program
 if desired.
 
-Drawing and labelling of the X and Y axes is parameterized independently
-in X and Y.  If drawing and labelling of an axis is disabled, tick drawing
-and labelling is automatically disabled.  Drawing and labelling of an axis
+Drawing and labeling of the X and Y axes is parameterized independently
+in X and Y.  If drawing and labeling of an axis is disabled, tick drawing
+and labeling is automatically disabled.  Drawing and labeling of an axis
 may be disabled on only one side of the viewport (useful when a single viewport
 is used simultaneously for two different world coordinate systems).
-If tick drawing is disabled tick labelling is automatically disabled.
+If tick drawing is disabled tick labeling is automatically disabled.
 The tick marks, if drawn, may be connected by dotted lines within the
 interior of the plot.
 
@@ -1924,7 +1924,7 @@ The set of capabilities defined for a graphics device is however quite
 different than that defined for a terminal.  Capabilities are typed 
 parameters referred to by a two character internal name.  The restriction to
 two characters is perhaps unfortunate but is desirable for efficiency reasons
-(as well as for compatiblity with the original termcap) and may be alleviated
+(as well as for compatablity with the original termcap) and may be alleviated
 at some point in the future by the use of macro defines.
 
 Graphcap parameters fall into two classes, those parameters which are
@@ -2710,7 +2710,7 @@ All WCS coordinate transformations and clipping at the viewport boundary.
 The kernel sees only NDC coordinates.
 .le
 .ls o
-Axis drawing and labelling.  GIO processes a \fBglabax\fR call into a
+Axis drawing and labeling.  GIO processes a \fBglabax\fR call into a
 sequence of polylines in NDC coordinates.
 .le
 .ls o

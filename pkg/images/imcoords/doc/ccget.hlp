@@ -269,7 +269,7 @@ COLUMN EXPRESSIONS
 
 Expressions must consist of operands and operators. The operands may be
 column names, numeric constants, functions, and quoted string constants.
-Values given as sexigesimal strings are automatically converted to
+Values given as sexagesimal strings are automatically converted to
 decimal numbers. The operators are arithmetic, logical, and string.
 
 The following operators are supported:

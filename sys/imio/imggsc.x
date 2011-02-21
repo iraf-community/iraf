@@ -27,12 +27,14 @@ long	pvs[IM_MAXDIM], pve[IM_MAXDIM]
 int	sz_pixel, inbounds, npix, xstep, n
 
 pointer	imgibf()
-int	imsinb(), imloop(), pl_p2ri()
+int	imsinb(), imloop(), pl_p2ri(), sizeof()
 errchk	imgibf, imrdpx, imrbpx
-include	<szdtype.inc>
+include <szpixtype.inc>
 
 begin
-	sz_pixel = ty_size[IM_PIXTYPE(im)]
+	#sz_pixel = sizeof(IM_PIXTYPE(im))
+	#sz_pixel = max ( sizeof(dtype), sizeof(IM_PIXTYPE(im)) )
+	sz_pixel = pix_size[IM_PIXTYPE(im)]
 	rlio = (and (IM_PLFLAGS(im), PL_RLIO+PL_FAST) == PL_RLIO)
 
 	# Check that the section does not extend out of bounds.
@@ -98,5 +100,5 @@ begin
 	if (rlio)
 	    call sfree (sp)
 
-	return ((bp - 1) / ty_size[dtype] + 1)
+	return ((bp - 1) / sizeof(dtype) + 1)
 end

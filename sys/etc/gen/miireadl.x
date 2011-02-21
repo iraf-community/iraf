@@ -5,7 +5,7 @@ include <mii.h>
 # MIIREAD -- Read a block of data stored externally in MII format.
 # Data is returned in the format of the local host machine.
 
-int procedure miireadl (fd, spp, maxelem)
+int procedure mii_readl (fd, spp, maxelem)
 
 int	fd			#I input file
 long	spp[ARB]		#O receives data
@@ -15,6 +15,8 @@ pointer	sp, bp
 int	pksize, nchars, nelem
 int	miipksize(), miinelem(), read()
 errchk	read()
+
+long	note()
 
 begin
 	pksize = miipksize (maxelem, MII_LONG)

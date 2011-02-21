@@ -52,7 +52,7 @@ filenames to be used as @files.
 The format for printing the RA and Dec in the output lists if
 \fIkeepcoords\fR is yes.  See the help for \fBprintf\fR for the formats.
 Note that the raformat may be given in %H format to convert input RA
-in degrees into output hours.  The default produces sexigesimal format
+in degrees into output hours.  The default produces sexagesimal format
 keeping the RA in the same units as the input.
 .le
 .ih

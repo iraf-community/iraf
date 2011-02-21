@@ -9,18 +9,28 @@
 
 /* ZRALOC -- Reallocate space on the heap (change the size of the area).
  */
-ZRALOC (buf, nbytes, status)
-XINT	*buf;			/* receives address of buffer */
-XINT	*nbytes;		/* buffer size, machine bytes */
-XINT	*status;		/* status return: XOK or XERR		*/
+int
+ZRALOC (
+  XINT	*buf,			/* receives address of buffer 		*/
+  XINT	*nbytes,		/* buffer size, machine bytes 		*/
+  XINT	*status 		/* status return: XOK or XERR		*/
+)
 {
 	register char *bufptr;
-	char    *realloc();
+	char  *ptr = (void *) NULL;
 
-	bufptr = realloc (LOC_TO_ADDR (*buf, char), (int)*nbytes);
+
+        ptr = LOC_TO_ADDR(*buf,char);
+	bufptr = realloc (ptr, (int)*nbytes);
+
 	if (bufptr != NULL) {
-	    *buf = ADDR_TO_LOC (bufptr);
-	    *status = XOK;
+            *buf = ADDR_TO_LOC(bufptr);
+            if (*buf > 0)
+                *status = XOK;
+            else
+                *status = XERR;
 	} else
 	    *status = XERR;
+
+	return (*status);
 }

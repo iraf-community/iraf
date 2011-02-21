@@ -400,7 +400,7 @@ REVISIONS
 .ls REFSPECTRA V2.10.3
 If no reference spectrum is found in the interp, nearest, following,
 preceding methods then a list of the reference spectra is given
-showing why each was not acceptible.
+showing why each was not acceptable.
 .le
 .ls REFSPECTRA V2.10
 A group parameter was added to allow restricting assignments by observing

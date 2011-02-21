@@ -347,9 +347,9 @@ begin
 
 	# Check to see if the tables package is loaded.
 
-	if (! defpac ("tables")) {
+	if (! defpac ("nttools")) {
 
-	    print ("THE TABLES PACKAGE IS NOT LOADED: TERMINATING PTTEST")
+	    print ("THE NTTOOLS PACKAGE IS NOT LOADED: TERMINATING PTTEST")
 
 	} else {
 

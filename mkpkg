@@ -77,31 +77,13 @@ summary:
 	    $ifndef (spool)
 		$set spool = spool
 	    $endif
-	    $ifeq (MACH, dmip)
-		! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
-		    | grep -v '^check file' | grep -v 'never used$'
-	    $else $ifeq (MACH, rs6000)
-		! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
-		    | grep -v '^check file' | grep -v 'Compilation successful'\
-		    | grep -v 'End of Compilation'
-	    $else
-		! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
-		    | grep -v '^check file'
-	    $endif $endif
+	    ! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
+	        | grep -v '^check file'
 	$else
 	    $echo "mkpkg summary only available on a UNIX system"
 	$endif
 	;
 
-# REVIEW -- Full spool listing minus unwanted messages. [AIX]
-
-review:
-	$ifndef (spool)
-	    $set spool = spool
-	$endif
-	! cat $(spool) | grep -v 'End of Compilation' |\
-	    grep -v 'Compilation successful'
-	;
 
 # STRIP -- Strip the system of all sources and other files not required to
 # run the system, or for user programming.
@@ -131,148 +113,62 @@ showfloat:				# show current float option
 generic:				# make architecture indep. (no bins)
 	$verbose off
 	!$(hlib)/mkfloat.csh generic
-	!(cd ./unix; setenv MACH generic; sh -x setarch.sh)
+	!(cd ./unix; setenv MACH generic; sh setarch.sh)
 	;
-f68881:					# install f68881 binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh f68881
-	!(cd ./unix; setenv MACH mc68020; sh -x setarch.sh)
-	;
-ffpa:					# install ffpa binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh ffpa
-	!(cd ./unix; setenv MACH mc68020; sh -x setarch.sh)
-	;
-fswitch:				# install fswitch binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh fswitch
-	!(cd ./unix; setenv MACH mc68020; sh -x setarch.sh)
-	;
-fsoft:					# install fsoft binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh fsoft
-	!(cd ./unix; setenv MACH mc68020; sh -x setarch.sh)
-	;
-pg:					# install profiled binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh pg
-	!(cd ./unix; setenv MACH mc68020; sh -x setarch.sh)
-	;
-sparc:					# install sparc binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh sparc
-	!(cd ./unix; setenv MACH sparc; sh -x setarch.sh)
-	;
-ssun:					# install ssun binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh ssun
-	!(cd ./unix; setenv MACH ssol; sh -x setarch.sh)
-	;
-sf2c:					# install sf2c binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh sf2c
-	!(cd ./unix; setenv MACH ssol; sh -x setarch.sh)
-	;
-386i:
-i386:					# install 386i binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh i386
-	!(cd ./unix; setenv MACH i386; sh -x setarch.sh)
-	;
-alpha:					# install DEC Alpha/OSF binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh alpha
-	!(cd ./unix; setenv MACH alpha; sh -x setarch.sh)
-	;
-ddec:					# install DSUX DEC Fortran binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh ddec
-	#!(cd ./unix; setenv MACH ddec; sh -x setarch.sh)
-	;
-dmip:					# install DSUX MIPS Fortran binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh dmip
-	#!(cd ./unix; setenv MACH dmip; sh -x setarch.sh)
-	;
-rs6000:					# install rs6000 binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh rs6000
-	!(cd ./unix; setenv MACH rs6000; sh -x setarch.sh)
-	;
-mips:					# install mips binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh mips
-	!(cd ./unix; setenv MACH mips; sh -x setarch.sh)
-	;
-f2c:					# install F2C/GCC binaries
-	$verbose off
-	!$(hlib)/mkfloat.csh f2c
-	!(cd ./unix; setenv MACH mac; sh -x setarch.sh)
-	;
-irix:                                   # install irix binaries
+
+cygwin:					# install WinXP/Cygwin binaries
         $verbose off
-        !$(hlib)/mkfloat.csh irix
-        !(cd ./unix; setenv MACH irix; sh -x setarch.sh)
-        ;
-hp300:                                  # install HPUX series 300 binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh hp300
-        !(cd ./unix; setenv MACH hp300; sh -x setarch.sh)
-        ;
-hp700:                                  # install HPUX series 700 binaries
-hp800:					# install HPUX series 800/700 binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh hp700
-        !(cd ./unix; setenv MACH hp700; sh -x setarch.sh)
+        !$(hlib)/mkfloat.csh cygwin
+        !(cd ./unix; setenv MACH cygwin; sh setarch.sh)
         ;
 freebsd:				# install freebsd binaries
         $verbose off
         !$(hlib)/mkfloat.csh freebsd
-        !(cd ./unix; setenv MACH freebsd; sh -x setarch.sh)
+        !(cd ./unix; setenv MACH freebsd; sh setarch.sh)
         ;
         ;
-sunos:					# install sunos binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh sunos
-        !(cd ./unix; setenv MACH sunos; sh -x setarch.sh)
-        ;
-linux:					# install linux binaries
+linux:					# install linux (32-bit) binaries
         $verbose off
         !$(hlib)/mkfloat.csh linux
-        !(cd ./unix; setenv MACH linux; sh -x setarch.sh)
+        !(cd ./unix; setenv MACH linux; sh setarch.sh)
+        ;
+linux64:				# install linux (64-bit) binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh linux64
+        !(cd ./unix; setenv MACH linux64; sh setarch.sh)
+        ;
+macintel:				# install MacOS X (x86_64) binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh macintel
+        !(cd ./unix; setenv MACH macintel; sh setarch.sh)
+        ;
+macosx:					# install MacOS X (Unix 32-bit) binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh macosx
+        !(cd ./unix; setenv MACH macosx; sh setarch.sh)
+        ;
+ipad:					# install Mac iPad binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh ipad
+        !(cd ./unix; setenv MACH ipad; sh setarch.sh)
         ;
 redhat:					# install redhat binaries
         $verbose off
         !$(hlib)/mkfloat.csh redhat
-        !(cd ./unix; setenv MACH redhat; sh -x setarch.sh)
+        !(cd ./unix; setenv MACH redhat; sh setarch.sh)
         ;
-suse:					# install suse binaries
+sparc:					# install sparc binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh sparc
+	!(cd ./unix; setenv MACH sparc; sh setarch.sh)
+	;
+sunos:					# install sunos binaries
         $verbose off
-        !$(hlib)/mkfloat.csh suse
-        !(cd ./unix; setenv MACH suse; sh -x setarch.sh)
+        !$(hlib)/mkfloat.csh sunos
+        !(cd ./unix; setenv MACH sunos; sh setarch.sh)
         ;
-linuxppc:				# install Linux PPC binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh linuxppc
-        !(cd ./unix; setenv MACH linuxppc; sh -x setarch.sh)
-        ;
-macosx:					# install MacOS X (PPC) binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh macosx
-        !(cd ./unix; setenv MACH macosx; sh -x setarch.sh)
-        ;
-macintel:				# install MacOS X (Intel) binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh macintel
-        !(cd ./unix; setenv MACH macintel; sh -x setarch.sh)
-        ;
-cygwin:					# install WinXP/Cygwin binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh cygwin
-        !(cd ./unix; setenv MACH cygwin; sh -x setarch.sh)
-        ;
-linuz:					# install linuz binaries
-        $verbose off
-        !$(hlib)/mkfloat.csh linuz
-        !(cd ./unix; setenv MACH linux; sh -x setarch.sh)
-        ;
+ssun:					# install ssun binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh ssun
+	!(cd ./unix; setenv MACH ssol; sh setarch.sh)
+	;

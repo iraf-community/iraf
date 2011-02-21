@@ -88,7 +88,7 @@ when defining a new feature.
 
 The following parameters control the input and output.
 .ls logfile = "logfile"
-Log file for recording the results of the velocity measurments.  The
+Log file for recording the results of the velocity measurements.  The
 results are written when exiting or changing input images.  The
 results can be previewed with the ":features" command.  If no log file
 is specified then the results are not saved.
@@ -272,7 +272,7 @@ minimum data range and the \fIcradius\fR parameter checks for a maximum
 error in the center from the initial value.
 
 For a more critical setting of the background in the gaussian algorithm or
-for the simultanous solution of multiple gaussian components (deblending)
+for the simultaneous solution of multiple gaussian components (deblending)
 the 'b' key is available.  The 'b' key is used to mark the initial
 positions of up to ten features.  The feature marking ends with 'q'.  The
 user is then queried to mark two points for the linear background.  After
@@ -366,7 +366,7 @@ is examined, such as when going to the next image in the input list,
 changing image lines or columns with 'j', 'k' and 'o', or selecting
 a new image with the ":image" command, the current feature list and
 velocity are kept.  Alternatively, a database record from a different
-image may be read with the ":read" command.  When transfering feature
+image may be read with the ":read" command.  When transferring feature
 identifications between images the feature coordinates will not agree exactly
 with the new image feature positions and several options are available to
 reregister the feature positions.  The key 'c' centers the feature nearest

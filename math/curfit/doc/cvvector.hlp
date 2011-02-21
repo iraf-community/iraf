@@ -18,7 +18,7 @@ ARGUMENTS
 Pointer to the curve descriptor structure.
 .le
 .ls x     
-Array of x valaues
+Array of x values
 .le
 .ls yfit   
 Array of fitted y values
@@ -34,7 +34,7 @@ stored in the curve descriptor structure.
 NOTES
 The x values are assumed to lie
 in the region xmin <= x <= xmax. Checking for out of bounds x values is the
-resposibility of the user.
+responsibility of the user.
 .ih
 SEE ALSO
 cveval

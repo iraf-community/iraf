@@ -18,7 +18,7 @@ same then the flipped spectrum will replace the original spectrum.
 .le
 .ls coord_flip = no
 Flip the dispersion coordinates?  If yes then the relationship between the
-logical pixel coodinates and the dispersion coordinates will be reversed so
+logical pixel coordinates and the dispersion coordinates will be reversed so
 that the dispersion coordinate of the first pixel of the output image will
 correspond to the coordinate of the last pixel in the input image and
 vice-versa for the other endpoint pixel.  The physical coordinates

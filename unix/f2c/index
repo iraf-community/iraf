@@ -1,0 +1,50 @@
+file	f2c/changes
+
+file	f2c/f2c.1
+lang	man page
+
+file	f2c/f2c.1t
+lang	troff -man source for man page
+
+file	f2c/f2c.h
+
+file	f2c/f2c.ps
+lang	Postscript
+
+file	f2c/fc
+lang	Bourne shell script
+
+file	f2c/getopt.c
+for	Source for "getopt" command used by fc (for systems lacking getopt)
+
+file	f2c/index
+
+file	f2c/libf77
+lang	C (bundle of source)
+
+file	f2c/libi77
+lang	C (bundle of source)
+
+file	f2c/libf2c.zip
+for	combined libf77, libi77, with several makefile variants
+size	102 KB
+#	DO NOT REQUEST BY EMAIL, USE FTP!
+
+lib	f2c/msdos
+for	MS-DOS f2c binaries (ftp only)
+
+lib	f2c/mswin
+for	Win32 f2c binaries (ftp only)
+
+lib	f2c/src
+for	f2c source
+,	The request "send all from f2c/src" emailed to
+,	netlib@research.bell-labs.com retrieves the
+,	complete source for f2c (sans libraries).  Other files
+,	in src are component modules, so you can request just the
+,	modules that have changed since last you got f2c source
+,	(look at the timestamps at the end of "readme from f2c").
+,	Alternatively, get ftp://netlib.bell-labs.com:21/netlib/f2c/src.tar
+
+file	f2c/readme
+

@@ -192,7 +192,8 @@ begin
 
 	    } else {
 		if (imtgetim (reclist, Memc[record], SZ_FNAME) == EOF)
-		    call strcpy (Memc[image], Memc[record], SZ_FNAME)
+		    #call strcpy (Memc[image], Memc[record], SZ_FNAME)
+		    ;
 	        if (verbose) {
 		    call printf ("Image: %s  Database: %s  Solution: %d\n")
 		        call pargstr (Memc[image])

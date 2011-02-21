@@ -19,6 +19,7 @@ int	npts			#I Number of output pixels per line
 int	i, j, k, impnli()
 real	exp
 pointer	buf
+errchk	impnli
 
 pointer	exps			# Exposure times
 pointer	ev			# IMIO coordinate vector

@@ -16,7 +16,7 @@ define	KSHIFT			10000	# encode pr ("etc$prpsio.x") such that
 					#
 					# see also <gio.h>
 
-define	LEN_TRSTRUCT	(564+187)
+define	LEN_TRSTRUCT	(564+204)
 
 define	TR_PID		Memi[$1]		# process id of kernel
 define	TR_IN		Memi[$1+1]		# input from process

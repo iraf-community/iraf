@@ -1,11 +1,26 @@
 .help xyacc
 .nf
-This directory contains the source for the Yacc compiler compiler (Stephen C.
-Johnson), as modified to produce SPP language parsers.  You should have a
-UNIX source license to use this software on your machine.  For the most part,
-the operation of SPP/Yacc is as described in the Yacc reference manual, with
-the important differences noted below.  A complete working example of a desk
-calculator program may be found in the subdirectory debug, file dc.y.
+This directory contains the source for the Yacc compiler compiler as modified
+to produce SPP language parsers.  This version of XYACC is based on code
+obtained from the OpenSolaris project and distributed under the Common
+Development and Distribution License (CDDL), considered to be a 'free'
+license.  All parsers in the system will be regenerated using this new
+version of XYACC, all vestiges of the original XYACC code have been
+removed.
+
+Notes regarding the changes required for SPP from the original README
+file are included below.
+
+Mike Fitzpatrick 
+1/25/2011
+
+
+------------------------------------------------------------------------------
+
+    For the most part, the operation of SPP/Yacc is as described in the 
+Yacc reference manual, with the important differences noted below.  A 
+complete working example of a desk calculator program may be found in 
+the subdirectory debug, file dc.y.
 
 Notes on SPP Yacc
 

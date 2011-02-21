@@ -16,6 +16,8 @@
 #include "task.h"
 #include "errs.h"
 #include "grammar.h"
+#include "proto.h"
+
 
 /*
  * EXEC -- Functions that prepare tasks for running, the actual runtime
@@ -61,7 +63,8 @@ char	*findexe();
  *   a longjmp(errenv,1), causing setjmp to return (in main) and an
  *   immediate retreat to the most recent terminaltask with unwind().
  */
-run ()
+void 
+run (void)
 {
 	register struct codeentry *cp;
 	register int opcode;
@@ -132,8 +135,8 @@ run ()
  *   ability to have multiple package defn's in a script ltask.
  *   Any parameter references will refer to the cl's also.
  */
-callnewtask (name)
-char	*name;
+void 
+callnewtask (char *name)
 {
 	/* x1 and x2 are just place holders to call breakout().
 	 */
@@ -285,7 +288,8 @@ char	*name;
  * main()'s loop.  Do not set newtask to NULL so that run() can tell what it
  * exec'd.
  */
-execnewtask ()
+void 
+execnewtask (void)
 {
 	/* VMS C V2.1 cannot handle this (see below).
 	 * register struct pfile *pfp;
@@ -413,7 +417,7 @@ execnewtask ()
 	 *   Point t_modep to the mode param for newtask.
 	 */
 	pp = paramfind (pfp, "$nargs", 0, YES);
-	if (pp == NULL || (int)pp == ERR) {
+	if (pp == NULL || (XINT)pp == ERR) {
 	    char nabuf[FAKEPARAMLEN];
 	    sprintf (nabuf, "$nargs,i,h,%d\n", pfp->pf_n);
 	    pp = addparam (pfp, nabuf, NULL);
@@ -442,11 +446,12 @@ execnewtask ()
 	 * update the incore version created earlier by callnewtask().
 	 */
 	if ((taskmode(newtask) & M_MENU) || (newtask->t_flags & T_PSET)) {
-	    if (epset (newtask->t_ltp->lt_lname) == ERR)
+	    if (epset (newtask->t_ltp->lt_lname) == ERR) {
 		if (newtask->t_flags & T_PSET)
 		    cl_error (E_UERR, "parameter file not updated");
 		else
 		    cl_error (E_UERR, "menu mode task execution aborted");
+	    }
 	}
 
 	/* Set up bascode so new task has a good place to start building
@@ -557,10 +562,12 @@ execnewtask ()
  * i.e., with predefined values that are not expected to change during task
  * execution (no queries) may be passed on the command line.
  */
-mk_startupmsg (tp, cmd, maxch)
-struct	task *tp;			/* task being executed		*/
-char	*cmd;				/* receives formatted command	*/
-int	maxch;				/* max chars out		*/
+void 
+mk_startupmsg (
+    struct task *tp,			/* task being executed		*/
+    char *cmd,				/* receives formatted command	*/
+    int maxch				/* max chars out		*/
+)
 {
 	register char	*ip, *op, *cp;
 	struct	pfile *pfp;
@@ -715,20 +722,92 @@ int	maxch;				/* max chars out		*/
  * the pathname given, which is the pathname specified in the TASK declaration.
  */
 char *
-findexe (pkg, pkg_path)
-struct	package *pkg;	/* package in which task resides */
-char	*pkg_path;	/* pathname of exe file given in TASK statement	*/	
+findexe (
+    struct package *pkg,	/* package in which task resides */
+    char *pkg_path	/* pathname of exe file given in TASK statement	*/
+)	
 {
 	static	char bin_path[SZ_PATHNAME+1], loc_path[SZ_PATHNAME+1];
-	char	root[SZ_FNAME+1];
+	char	root[SZ_FNAME+1], root_path[SZ_PATHNAME+1];
+	char	bindir[SZ_FNAME+1], *ip = NULL, *arch = NULL;
+	char	bin_root[SZ_PATHNAME+1];
+	char   *envget();
+
+
+	memset (root, 0, SZ_FNAME);
+	memset (bindir, 0, SZ_FNAME);
+	memset (bin_path, 0, SZ_PATHNAME);
+	memset (loc_path, 0, SZ_PATHNAME);
+	memset (bin_root, 0, SZ_PATHNAME);
+	memset (root_path, 0, SZ_PATHNAME);
 
 	c_fnroot (pkg_path, root, SZ_FNAME);
+	c_fpathname ((pkg ? pkg->pk_bin : BINDIR), root_path, SZ_PATHNAME);
 	sprintf (bin_path, "%s%s.e", pkg ? pkg->pk_bin : BINDIR, root);
 	sprintf (loc_path, "./%s.e", root);
+	arch = envget ("arch");
 
-	if (c_access (bin_path, 0, 0) == YES)
+
+	if (c_access (bin_path, 0, 0) == YES) {
 	    return (bin_path);
-	else if (c_access (pkg_path, 0, 0) == YES)
+	} else {
+	    /*  The binary wasn't found in the expected bin directory, but
+	     *  on certain platforms look for alternate binaries that may
+	     *  work.  This supports backward compatability with older
+	     *  packages that may not have been upgraded to architecture
+	     *  conventions in this release but which may contain usable
+	     *  binaries (e.g. 32-bit 'linux' binaries on 64-bit systems
+	     *  or older 'redhat' binaries where the core arch is 'linux').
+	     */
+	    memset (bin_root, 0, SZ_PATHNAME);
+	    strcpy (bin_root, root_path);
+	    if ((ip = strstr (bin_root, arch)))
+		*ip = '\0';
+	    else {
+		int len = strlen (bin_root);
+		if (bin_root[len-1] == '/')
+		    bin_root[len-1] = '\0';
+	    }
+
+	    if (strcmp (arch, ".linux64") == 0) {
+		/*  On 64-bit Linux systems we can use either of the
+		 *  available 32-bit binaries if needed.  In v2.15 and
+		 *  later, 'linux' is the preferred arch but look for
+		 *  'redhat' in case it's a package that hasn't been
+		 *  updated.
+		 */
+		sprintf (bin_path, "%s.linux/%s.e", bin_root, root);
+		if (c_access (bin_path, 0, 0) == YES)
+	    	    return (bin_path);
+
+		sprintf (bin_path, "%s.redhat/%s.e", bin_root, root);
+		if (c_access (bin_path, 0, 0) == YES)
+	    	    return (bin_path);
+
+	    } else if (strcmp (arch, ".linux") == 0) {
+		/*  On 32-bit Linux systems, check for older 'redhat' binaries.
+		 */
+		sprintf (bin_path, "%s.redhat/%s.e", bin_root, root);
+		if (c_access (bin_path, 0, 0) == YES)
+	    	    return (bin_path);
+
+	    } else if (strcmp (arch, ".macintel") == 0) {
+		/*  On 64-bit Mac systems, check for older 32-bin binaries.
+		 */
+		sprintf (bin_path, "%s.macosx/%s.e", bin_root, root);
+		if (c_access (bin_path, 0, 0) == YES)
+	    	    return (bin_path);
+
+	    } else if (strcmp (arch, ".macosx") == 0) {
+		/*  On 32-bit Mac systems, check for older 'macintel' binaries.
+		 */
+		sprintf (bin_path, "%s.macintel/%s.e", bin_root, root);
+		if (c_access (bin_path, 0, 0) == YES)
+	    	    return (bin_path);
+	    }
+	}
+
+	if (c_access (pkg_path, 0, 0) == YES)
 	    return (pkg_path);
 	else
 	    return (loc_path);
@@ -743,8 +822,8 @@ char	*pkg_path;	/* pathname of exe file given in TASK statement	*/
  * used to change packages, change the current package and push a cl() on the
  * control stack but continue reading from the current command stream.
  */
-set_clio (newtask)
-register struct task *newtask;
+void 
+set_clio (register struct task *newtask)
 {
 	register struct task *tp;
 
@@ -786,21 +865,22 @@ register struct task *newtask;
  * assignments to parameters.
  */
 struct param *
-ppfind (pfp, tn, pn, pos, abbrev)
-struct	pfile *pfp;		/* first pfile in chain		*/
-char	*tn;			/* psetname (taskname) or null	*/
-char	*pn;			/* parameter name		*/
-int	pos;			/* for paramfind		*/
-int	abbrev;			/* for paramfind		*/
+ppfind (
+    struct pfile *pfp,		/* first pfile in chain		*/
+    char *tn,			/* psetname (taskname) or null	*/
+    char *pn,			/* parameter name		*/
+    int pos,			/* for paramfind		*/
+    int abbrev			/* for paramfind		*/
+)
 {
 	struct	param *pp, *m_pp;
-	struct	pfile *m_pfp;
+	struct	pfile *m_pfp = (struct pfile *) NULL;
 	int	nchars;
 
 	if (tn != NULL && *tn != EOS) {
 	    /* Locate the named pset and search it. */
 	    for (nchars=strlen(tn), m_pp=NULL;  pfp;  pfp = pfp->pf_npset)
-		if (pp = pfp->pf_psetp)
+		if ( (pp = pfp->pf_psetp) )
 		    if (strncmp (pp->p_name, tn, nchars) == 0) {
 			if (strlen (pp->p_name) == nchars)
 			    return (paramfind (pfp, pn, pos, abbrev));
@@ -833,11 +913,14 @@ int	abbrev;			/* for paramfind		*/
  * been used by callnewtask() to load a pset.  We must replace the old pset
  * by the new one.
  */
-psetreload (main_pfp, psetp)
-struct	pfile *main_pfp;		/* main task pfile	*/
-struct	param *psetp;			/* pset param		*/
+void 
+psetreload (
+    struct pfile *main_pfp,		/* main task pfile	*/
+    struct param *psetp			/* pset param		*/
+)
 {
-	struct	pfile *o_pfp, *n_pfp, *prev_pfp, *next_pfp;
+	struct	pfile *o_pfp, *n_pfp, *prev_pfp;
+	struct	pfile *next_pfp = (struct pfile *) NULL;
 
 	if (cldebug)
 	    eprintf ("psetreload, pset %s\n", psetp->p_name);
@@ -883,8 +966,8 @@ struct	param *psetp;			/* pset param		*/
  * Don't call error() because in trying to restor to an interactive task
  *   it might call us again and cause an inf. loop.
  */
-iofinish (tp)
-register struct task *tp;
+void 
+iofinish (register struct task *tp)
 {
 	register FILE *fp;
 	int	flags;
@@ -972,8 +1055,8 @@ register struct task *tp;
  *   of each pfile below topd and lob off any params above topd.
  *   The way posargset, et al, and call/execnewtask are now, we are safe.
  */
-restor (tp)
-struct task *tp;
+void 
+restor (struct task *tp)
 {
 	memel *topdp;
 	register struct ltask *ltp;
@@ -1115,7 +1198,8 @@ struct task *tp;
  * If currentask is the first cl or we are batch, then we are truely done.
  *   Return true to the caller (EXECUTE), causing a return to the main.
  */
-oneof()
+void 
+oneof (void)
 {
 	register struct pfile *pfp;
 	register struct package *pkp;
@@ -1168,7 +1252,7 @@ oneof()
 	if (currentask->t_ltp->lt_flags & LT_PFILE) {
 	    pfcopyback (pfp = currentask->t_pfp);
 	    if (currentask->t_ltp->lt_flags & LT_DEFPCK)
-		if (pkp = pacfind(currentask->t_ltp->lt_lname))
+		if ( (pkp = pacfind(currentask->t_ltp->lt_lname)) )
 		    if (pkp->pk_pfp == pfp)
 			pkp->pk_pfp = pfp->pf_oldpfp;
 	    for (pfp = pfp->pf_npset;  pfp != NULL;  pfp = pfp->pf_npset)
@@ -1190,9 +1274,8 @@ oneof()
 /* PRINTCALL -- Print the calling sequence for a task.  Called by killtask()
  * to print stack trace.
  */
-printcall (fp, tp)
-FILE	*fp;
-struct	task *tp;
+void 
+printcall (FILE *fp, struct task *tp)
 {
 	register struct param *pp;
 	int	 notfirst = 0;
@@ -1237,14 +1320,10 @@ struct	task *tp;
 
 /* PRINT_CALL_LINE -- Print the line of the file being called.
  */
-
-print_call_line (out, line, fname, flags)
-FILE	*out;
-int	line;
-char	*fname;
-int	flags;
+void 
+print_call_line (FILE *out, int line, char *fname, int flags)
 {
-    	register int i, len, stat;
+    	register int i, len;
 	register FILE *fp;
 	char 	buf[SZ_LINE+1];
 	extern  int unwind_level;
@@ -1293,8 +1372,8 @@ int	flags;
  *   it resides.  The process is left running in the cache in case it is needed
  *   again.
  */
-killtask (tp)
-register struct task *tp;
+void 
+killtask (register struct task *tp)
 {
 	char	buf[128];
 

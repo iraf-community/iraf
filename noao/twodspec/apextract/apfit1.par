@@ -1,5 +1,6 @@
 # OUTPUT PARAMETERS
 
+apertures,s,h,)apall.apertures,,,>apfit.apertures
 format,s,h,)apsum.format,,,>apsum.format
 extras,b,h,)apsum.extras,,,>apsum.extras
 dbwrite,s,h,yes,,,Write to database?

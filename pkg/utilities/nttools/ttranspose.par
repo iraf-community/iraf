@@ -1,0 +1,6 @@
+intable,s,a,"",,,"input tables"
+outtable,s,a,"",,,"output tables"
+action,s,a,"t",,,"operations (t,h,v) to perform"
+verbose,b,h,yes,,,"print table names?"
+Version,s,h,"30Nov94",,,"date of installation"
+mode,s,h,"al"

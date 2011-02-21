@@ -3,18 +3,21 @@
 
 #include <stdio.h>
 
-#ifdef i386
-#define PORTAR 1
-#endif
 #include <ar.h>
 #ifdef MACOSX
 #include <ranlib.h>
+#include <mach-o/fat.h>
 #endif
 
 #define import_spp
 #include <iraf.h>
 #include "mkpkg.h"
 #include "extern.h"
+
+#ifdef  MACOSX
+#define AR_EFMT1	1
+#endif
+
 
 /*
  * SCANLIB.C -- Routines to scan a 4.2BSD UNIX archive file and create a
@@ -50,7 +53,7 @@ h_scanlibrary (library)
 char	*library;
 {
 	register char	*ip, *op;
-	register int	i;
+	register int	i, is_fat = 0;
 	char	libfname[SZ_PATHNAME+1];
 	char	modname[SZ_KEY+1];
 	char	lbuf[SZ_LINE];
@@ -86,14 +89,62 @@ char	*library;
 
 	/* Verify that file is indeed an archive file.
 	 */
+	memset (lbuf, 0, SZ_LINE);
 	fread (lbuf, 1, SARMAG, fp);
 	if (strncmp (lbuf, ARMAG, SARMAG) != 0) {
+#ifndef MACOSX
 	    printf ("file `%s' is not a library\n", libfname);
 	    goto err;
+#else
+	    /* See if it's a FAT archive file.
+	    */
+	    struct fat_header fh;
+	    struct fat_arch   fa;
+	    char *ip;
+
+	    rewind (fp);
+	    memset (&fh, 0, sizeof(struct fat_header));
+	    fread (&fh, 1, sizeof(struct fat_header), fp);  /* read header */
+	    if (fh.magic == FAT_MAGIC || fh.magic == FAT_CIGAM) {
+		int   narch = 0;
+
+		is_fat++;
+
+		/* The following is a cheat to avoid byte swapping the
+		 * nfat_arch field in Intel systems.  Assumes we'll never
+		 * see more that 8-bits worth of architectures. 8-)
+		 */
+	    	ip = &fh, ip += 7;
+		memmove (&narch, ip, 1);
+		for (i=0; i < narch; i++) {	    /* skip headers */
+		    memset (&fa, 0, sizeof(struct fat_arch));
+	            fread (&fa, 1, sizeof(struct fat_arch), fp);
+	        }
+
+		/* Read the AR header.
+		 */
+		memset (lbuf, 0, SZ_LINE);
+		fread (lbuf, 1, SARMAG, fp);
+	        if (strncmp (lbuf, ARMAG, SARMAG) != 0) {
+	            printf ("file `%s' is not a library\n", libfname);
+	            goto err;
+	        }
+	    } else {
+	        printf ("file `%s' is not a library\n", libfname);
+	        goto err;
+	    }
+#endif
 	}
 
 	len_arfmag = strlen (ARFMAG);
+	memset (&arf, 0, sizeof(arf));
 	while ((int)(fread (&arf, 1, sizeof(arf), fp)) > 0) {
+
+	    /* Don't scan past the first architecture for FAT libs.
+	     */
+	    if (is_fat && strncmp (arf.ar_name, ARMAG, SARMAG) == 0) 
+		break;
+
 	    if (strncmp (arf.ar_fmag, ARFMAG, len_arfmag) != 0) {
 		printf ("cannot decode library `%s'\n", libfname);
 		goto err;
@@ -161,6 +212,8 @@ char	*library;
 		    arf.ar_size);
 		goto err;
 	    }
+	
+	    memset (&arf, 0, sizeof(arf));
 	}
 
 	fclose (fp);
@@ -198,6 +251,7 @@ long	fdate;			/* object file date	*/
 	register int	hashval, keylen, i;
 	register char	*ip;
 	int	start;
+
 
 	if (*modname == EOS || fdate <= 0) {
 	    printf ("warning, mlb_setdate: attempted illegal entry for %s\n",

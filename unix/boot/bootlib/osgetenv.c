@@ -1,17 +1,19 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
 #define	import_xnames
 #include "bootlib.h"
 
+
 char *_os_getenv();
+
 
 /* OS_GETENV -- Return the value of the named environment variable.  Null is
  * returned if the named variable is not found.
  */
 char *
-os_getenv (envvar)
-char	*envvar;
+os_getenv (char *envvar)
 {
 	static	char	irafdir[SZ_PATHNAME+1] = "";
 	static	char	hostdir[SZ_PATHNAME+1] = "";
@@ -20,8 +22,10 @@ char	*envvar;
 	extern	char	*os_subdir();
 	char	*vp;
 
+
 	/* Try the standard environment first. */
-	if (vp = _os_getenv (envvar, valstr, SZ_COMMAND))
+	memset (valstr, 0, SZ_COMMAND+1);
+	if ( (vp = _os_getenv (envvar, valstr, SZ_COMMAND)) )
 	    return (vp);
 
 	/* The following maps certain well-known IRAF logical directories
@@ -53,7 +57,6 @@ char	*envvar;
 	    strcpy (valstr, os_subdir (irafdir, "sys"));
 	else if (strcmp (envvar, "math") == 0)
 	    strcpy (valstr, os_subdir (irafdir, "math"));
-
 	else if (strcmp (envvar, "hlib") == 0)			/* host/. */
 	    strcpy (valstr, os_subdir (hostdir, "hlib"));
 	else if (strcmp (envvar, "as") == 0)
@@ -70,10 +73,11 @@ char	*envvar;
  * host environment.
  */
 char *
-_os_getenv (envvar, outstr, maxch)
-char	*envvar;		/* name of environment variable	*/
-char	*outstr;		/* receives value		*/
-int	maxch;
+_os_getenv (
+  char	*envvar,		/* name of environment variable	*/
+  char	*outstr,		/* receives value		*/
+  int	maxch 
+)
 {
 	PKCHAR	symbol[SZ_FNAME+1];
 	PKCHAR	value[SZ_COMMAND+1];
@@ -97,14 +101,17 @@ int	maxch;
  * host environment.
  */
 char *
-_os_getenv (envvar, outstr, maxch)
-char	*envvar;		/* name of environment variable	*/
-char	*outstr;		/* receives value		*/
-int	maxch;
+_os_getenv (
+  char	*envvar,		/* name of environment variable	*/
+  char	*outstr,		/* receives value		*/
+  int	maxch 
+)
 {
 	XCHAR	x_symbol[SZ_FNAME+1];
 	XCHAR	x_value[SZ_COMMAND+1];
 	XINT	x_maxch = SZ_COMMAND, status=1;
+	extern  XINT ENVFIND();
+
 
 	os_strupk (envvar, x_symbol, SZ_FNAME);
 	status = ENVFIND (x_symbol, x_value, &x_maxch);

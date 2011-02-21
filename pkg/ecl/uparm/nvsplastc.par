@@ -1,7 +1,0 @@
-target,s,a,"aladin",,,"Target application"
-msg,s,a,"loadimage",,,"Plastic Message"
-plargs,s,a,"M33small.fits",,,"Message arguments"
-sync,b,h,yes,,,"Synchronous command?"
-verbose,b,h,yes,,,"Verbose output?"
-status,i,h,0,,,"Service status code"
-mode,s,h,"ql",,,

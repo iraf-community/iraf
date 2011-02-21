@@ -95,7 +95,7 @@ new_	call ap_getdata (image, line, nsum, im, imdata, npts, apaxis, title)
 	    # For those keys affecting the nearest aperture set the current
 	    # aperture to be the aperture nearest the cursor.
 	    switch (key) {
-	    case '.','b','c','d','e','g','i','j','o','s','t','y','z':
+	    case '.','b','c','d','e','g','i','j','o','t','y','z':
 		# The current aperture is the one nearest the cursor.
 	        call ap_nearest (current, line, Memi[aps], naps, wx)
 	    }

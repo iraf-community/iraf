@@ -38,8 +38,8 @@ begin
 	    call smark (sp)
 	    call salloc (buf, nwords, TY_SHORT)
 
-	    call amovs (hdr, Mems[buf], ARB)
-	    call amovs (data, Mems[buf+hdrlen], ARB)
+	    call amovs (hdr, Mems[buf], hdrlen)
+	    call amovs (data, Mems[buf+hdrlen], datalen)
 
 	    epa = gk_dd[GKI_ESCAPE]
 	    if (epa != 0)

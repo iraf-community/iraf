@@ -22,7 +22,7 @@ adctitle,s,h,"",,,"ADC title
 # Disperser"
 disperser,s,h,"",,,Disperser efficiency or table
 disptitle,s,h,"",,,Disperser title
-disptype,s,h,"",,,Disperser type (grating|grism)
+disptype,s,h,"",,,Disperser type (grating|grism|generic)
 gmm,r,h,INDEF,,,Grating (grooves/mm)
 blaze,r,h,INDEF,,,Blaze or prism angle (deg)
 oref,r,h,INDEF,,,Reference order
@@ -34,7 +34,7 @@ eff,r,h,INDEF,,,"Peak efficiency
 # Crossdisperser"
 xdisperser,s,h,"",,,Crossdisperser efficiency or table
 xdisptitle,s,h,"",,,Crossdisperser title
-xdisptype,s,h,"",,,Disperser type (grating|grism)
+xdisptype,s,h,"",,,Disperser type (grating|grism|generic)
 xgmm,r,h,INDEF,,,Grating (grooves/mm)
 xblaze,r,h,INDEF,,,Blaze or prism angle (deg)
 xoref,r,h,INDEF,,,Reference order

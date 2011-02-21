@@ -47,27 +47,27 @@ libex.a:
 	imbln3.x	<imhdr.h> <imio.h>
 	imbtran.x	<imhdr.h> <imio.h> <imset.h>
 	imcopy.x	
-	imcssz.x	<imhdr.h> <imio.h> <plset.h> <szdtype.inc>
+	imcssz.x	<imhdr.h> <imio.h> <plset.h>
 	imdelete.x	
 	imdmap.x	<error.h> <imhdr.h> <imio.h> <imset.h>
 	imerr.x	
-	imflsh.x	<imhdr.h> <imio.h> <szdtype.inc>
+	imflsh.x	<imhdr.h> <imio.h>
 	imflush.x	<imhdr.h> <imio.h>
 	imgclust.x	
-	imggsc.x	<imhdr.h> <imio.h> <plset.h> <szdtype.inc>
+	imggsc.x	<imhdr.h> <imio.h> <plset.h>
 	imgibf.x	<imhdr.h> <imio.h>
 	imgimage.x	
-	imgnln.x	<imhdr.h> <imio.h> <szdtype.inc>
-	imgobf.x	<imhdr.h> <imio.h> <szdtype.inc>
+	imgnln.x	<imhdr.h> <imio.h> <szpixtype.inc>
+	imgobf.x	<imhdr.h> <imio.h>
 	imgsect.x	
 	iminie.x	<imhdr.h> <imio.h>
-	imioff.x	<config.h> <imhdr.h> <imio.h> <mach.h>
+	imioff.x	<config.h> <imhdr.h> <imio.h> <mach.h> <szpixtype.inc>
 	imisec.x	<ctype.h> <imhdr.h> <imio.h> <mach.h>
 	imloop.x	<imio.h>
 	immaky.x	<error.h> <imhdr.h> <imio.h>
 	immap.x	
 	immapz.x	<error.h> <imhdr.h> <imio.h> <mach.h>
-	imnote.x	<imhdr.h> <imio.h> <szdtype.inc>
+	imnote.x	<imhdr.h> <imio.h> <szpixtype.inc>
 	imopsf.x	<fset.h> <imhdr.h> <imio.h> <plset.h> <pmset.h>
 	imparse.x	<ctype.h>
 	impmhdr.x	<ctype.h> <imhdr.h> <imio.h>
@@ -82,9 +82,9 @@ libex.a:
 	impmsne2.x	<imio.h>
 	impmsne3.x	<imio.h>
 	impmsnev.x	<imhdr.h> <imio.h>
-	impnln.x	<imhdr.h> <imio.h> <szdtype.inc>
-	imrbpx.x	<imhdr.h> <imio.h> <imset.h> <szdtype.inc>
-	imrdpx.x	<imhdr.h> <imio.h> <mach.h> <plset.h> <szdtype.inc>
+	impnln.x	<imhdr.h> <imio.h> <szpixtype.inc>
+	imrbpx.x	<imhdr.h> <imio.h> <imset.h> <szpixtype.inc>
+	imrdpx.x	<imhdr.h> <imio.h> <mach.h> <plset.h> <szpixtype.inc>
 	imrename.x	
 	imrmbufs.x	<imio.h>
 	imsamp.x	
@@ -98,7 +98,8 @@ libex.a:
 	imstats.x	<imhdr.h> <imio.h> <imset.h>
 	imt.x	
 	imunmap.x	<imhdr.h> <imio.h>
-	imwbpx.x	<imhdr.h> <imio.h> <imset.h> <szdtype.inc>
+	imwbpx.x	<imhdr.h> <imio.h> <imset.h> <szpixtype.inc>
 	imwrite.x	<fset.h> <imio.h>
-	imwrpx.x	<imhdr.h> <imio.h> <mach.h> <plset.h> <szdtype.inc>
+	imwrpx.x	<imhdr.h> <imio.h> <mach.h> <plset.h> <szpixtype.inc>
+	zzdebug.x	
 	;

@@ -1,0 +1,61 @@
+.help keytab Dec94 tables
+.ih
+NAME
+keytab -- Copy a header keyword to a table element.
+.ih
+USAGE
+keytab input keyword table column row
+.ih
+DESCRIPTION
+This task reads a header keyword from either an image or a table file
+and writes it to a table element (row and column position). If the
+data type of the header keyword differs from that of the table
+element, then the value is converted to the appropriate data type. If
+the keyword is not found in the header, the element will be set to the
+null value appropriate for the column type.
+.ih
+PARAMETERS
+.ls input [file name]
+Name of the file containing header keyword.
+.le
+.ls keyword [string]
+Name of the header keyword to be read. (Keyword names are not case sensitive.)
+.le
+.ls table [file name]
+Name of the table to which the value will be written.
+.le
+.ls column [string]
+Name of table column. (Column names are not case sensitive.)
+.le
+.ls row [integer, min=1, max=INDEF]
+Table row number.
+.le
+.ls (silent = no) [bool]
+If this parameter is set to no (the default) a warning message will be
+printed if the keyword is not found in the header. If it is set
+to yes, the warning message is suppressed.
+.le
+.ih
+EXAMPLES
+1. Copy the component name (i.e., the 'COMPNAME' header keyword) 
+from the table 'thruput.tab' to the
+first row of the table 'graph.tab'.
+
+.nf
+tt> keytab thruput.tab COMPNAME graph.tab COMPNAME 1
+.fi
+
+2. Copy the zero point of the second group (i.e., the 'CRVAL1' keyword)
+in the image file 'image.hhh' to the first
+wavelength in the table 'spectrum.tab'.
+
+.nf
+tt> keytab image.hhh[2] CRVAL1 spectrum.tab WAVELENGTH 1
+.fi
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+keypar, parkey, partab, tabkey, tabpar
+.endhelp

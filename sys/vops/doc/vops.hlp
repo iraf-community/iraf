@@ -105,7 +105,7 @@ preprocessor does not support type boolean.
 .le
 .ls -p
 An optional prefix string to be added to each file name generated.  Provided
-to make it convienient to place all generated files in a subdirectory.
+to make it convenient to place all generated files in a subdirectory.
 If the name of the file(s) being preprocessed is "aadd.x", and the prefix
 is "d/", the names of the generated files will be "d/aadds.x", "d/aaddi.x",
 "d/aaddl.x", and so on.

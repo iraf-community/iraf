@@ -345,6 +345,7 @@ begin
 
 	# Free save structure.
 	call mfree (Memi[ims+index-1], TY_STRUCT)
+	Memi[ims+index-1] = NULL
 end
 
 

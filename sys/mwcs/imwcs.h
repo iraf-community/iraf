@@ -28,7 +28,7 @@ define	IW_SBUFLEN	Memi[$1+6]	# SBUF allocated length, chars
 define	IW_SBUFOP	Memi[$1+7]	# current offset in sbuf
 define	IW_CARD		(IW_CBUF($1)+(($2)-1)*LEN_CDES)
 	# (avail)
-define	IW_CROTA	Memr[$1+9]				# obsolete
+define	IW_CROTA	Memr[P2R($1+9)]				# obsolete
 define	IW_CTYPE	Memi[$1+10+($2)-1]			# axtype (strp)
 define	IW_CRPIX	Memd[P2D($1+20)+($2)-1]			# CRPIXi
 define	IW_CRVAL	Memd[P2D($1+40)+($2)-1]			# CRVALi

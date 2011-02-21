@@ -72,6 +72,8 @@ begin
 	# Now the pointer to the current stored line list.
 	o_lp = PL_LP(pl,index)
 	o_pp = Ref (pl, o_lp)
+	if (o_pp == NULL)
+	    return
 
 	# Has the line been modified?
 	n_len = LL_LEN(ll)

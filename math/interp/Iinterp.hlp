@@ -8,7 +8,7 @@ Due to the very large amount of data involved, efficiency is quite important,
 and the general purpose routines available from many sources cannot be used.
 
 
-The task of interplolating image data is simplified by the following
+The task of interpolating image data is simplified by the following
 considerations:
 .ls 4
 .ls o

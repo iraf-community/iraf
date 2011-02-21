@@ -12,30 +12,56 @@ int	mii[ARB]		#O output MII format array
 int	nelems			#I number of integers to be converted
 int	spp_datatype		#I SPP datatype code
 
+int	mii_bytes
+int	spp_bytes
+int	sizeof()
+pointer	tmpp
+
 begin
+	call malloc (tmpp, nelems, TY_LONG)
+
+	mii_bytes = 32 / NBITS_BYTE
+	spp_bytes = sizeof(spp_datatype) * SZB_CHAR
+
 	switch (spp_datatype) {
 	case TY_UBYTE:
-	    call achtbl (spp, mii, nelems)
+	    call achtbl (spp, Meml[tmpp], nelems)
 	case TY_USHORT:
-	    call achtul (spp, mii, nelems)
+	    call achtul (spp, Meml[tmpp], nelems)
 	case TY_CHAR:
-	    call achtcl (spp, mii, nelems)
+	    call achtcl (spp, Meml[tmpp], nelems)
 	case TY_SHORT:
-	    call achtsl (spp, mii, nelems)
+	    call achtsl (spp, Meml[tmpp], nelems)
 	case TY_INT, TY_POINTER, TY_STRUCT:
-	    call achtil (spp, mii, nelems)
+	    call achtil (spp, Meml[tmpp], nelems)
 	case TY_LONG:
-	    call achtll (spp, mii, nelems)
+	    call achtll (spp, Meml[tmpp], nelems)
 	case TY_REAL:
-	    call achtrl (spp, mii, nelems)
+	    call achtrl (spp, Meml[tmpp], nelems)
 	case TY_DOUBLE:
-	    call achtdl (spp, mii, nelems)
+	    call achtdl (spp, Meml[tmpp], nelems)
 	case TY_COMPLEX:
-	    call achtxl (spp, mii, nelems)
+	    call achtxl (spp, Meml[tmpp], nelems)
 	}
 
-	if (BYTE_SWAP4 == YES)
-	    call bswap4 (mii, 1, mii, 1, nelems * (32 / NBITS_BYTE))    
-	else if (BYTE_SWAP2 == YES)
-	    call bswap2 (mii, 1, mii, 1, nelems * (32 / NBITS_BYTE))    
+        if ( mii_bytes == spp_bytes ) {
+	    if (BYTE_SWAP4 == YES)
+		call bswap4 (Meml[tmpp], 1, mii, 1, nelems * (mii_bytes))
+	    else if (BYTE_SWAP2 == YES)
+		call bswap2 (Meml[tmpp], 1, mii, 1, nelems * (mii_bytes))
+	}
+	else if ( 2 * mii_bytes == spp_bytes ) {
+	    if (BYTE_SWAP8 == YES)
+		call bswap8 (Meml[tmpp], 1, Meml[tmpp], 1, nelems * (spp_bytes))
+	    else if (BYTE_SWAP4 == YES)
+		call bswap4 (Meml[tmpp], 1, Meml[tmpp], 1, nelems * (spp_bytes))
+	    else if (BYTE_SWAP2 == YES)
+		call bswap2 (Meml[tmpp], 1, Meml[tmpp], 1, nelems * (spp_bytes))
+	    call i64to32 ( Meml[tmpp], mii, nelems )
+	}
+	else {
+	    call eprintf("[ERROR] miipak32.x: unexpected integer size\n")
+	}
+
+        call mfree (tmpp, TY_LONG)
 end

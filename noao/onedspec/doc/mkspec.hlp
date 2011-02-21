@@ -1,7 +1,7 @@
 .help mkspec Mar92 noao.onedspec
 .ih
 NAME
-mkspec -- generate an artifical spectrum or image (obsolete)
+mkspec -- generate an artificial spectrum or image (obsolete)
 .ih
 USAGE
 mkspec image_name image_title ncols nlines function

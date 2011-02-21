@@ -1,0 +1,4 @@
+# parameter file for the tlcol task
+table,s,a,"",,,"name of table"
+nlist,i,h,4,1,4,"number of items to list"
+mode,s,h,"al",,,

@@ -86,13 +86,17 @@ begin
 		ip = ip + 1
 
 	    scalar = scalar / 60.0
-	    if (str[ip] == ':') {			# sexagesimal number?
+	    if (ip > 1 && stridx(str[ip], "'\":dDhHmMsS")>0) {  # sexagesimal?
 		ip = ip + 1
 		dig[j] = EOS
 		value = 0.0				# convert digits
 		for (j=1;  dig[j] != EOS;  j=j+1)
 		    value = value * 10.0D0 + TO_INTEG (dig[j])
 		dval = dval + value * scalar * (10.0 ** e)
+
+		while (str[ip] != EOS && 		# multiple spaces etc
+		    stridx(str[ip]," '\":dDhHmMsS")>0)
+		        ip = ip + 1
 	    } else
 		break
 	}

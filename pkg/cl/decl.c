@@ -17,6 +17,8 @@
 #include "errs.h"
 #include "construct.h"
 #include "ytab.h"		/* pick up yacc token #defines		*/
+#include "proto.h"
+
 
 /*
  * DECL -- contains routines used by the parser for referencing parameters
@@ -33,9 +35,13 @@ char	*dup_def     = "Duplicate definition of `%s' ignored.\n";
 /* GETLIMITS -- Get the limits for the n'th index of a parameter.
  * Returns ERR if the parameter is not defined, or has fewer than n indexes.
  */
-getlimits (pname, n, i1, i2)
-char	*pname;
-int	n, *i1, *i2;
+int
+getlimits (
+  char	*pname,
+  int	 n, 
+  int   *i1, 
+  int   *i2
+)
 {
 	struct param *pp;
 	char	*pk, *t, *p, *f;
@@ -67,8 +73,8 @@ int	n, *i1, *i2;
 
 /* GET_DIM -- Get the dimensionality of an parameter.  If not an array return 0.
  */
-get_dim (pname)
-char	*pname;
+int
+get_dim (char *pname)
 {
 	struct param *pp, *lookup_param();
 	char	*pk, *t, *p, *f;
@@ -81,7 +87,7 @@ char	*pname;
 	 */
 	pp = lookup_param (pk, t, p);
 
-	if (pp == NULL || (int) pp == ERR)
+	if (pp == NULL || (XINT) pp == ERR)
 	    dim = -1;
 	else if (!(pp->p_type & PT_ARRAY))
 	    dim = 0;
@@ -94,10 +100,10 @@ char	*pname;
 
 /* MAKETYPE -- Set the type of a parameter.
  */
-maketype (type, list)
-int	type, list;
+int
+maketype (int type, int list)
 {
-	register int	p;
+	register int	p = -1;
 
 	switch (type) {
 	case V_BOOL:	p = OT_BOOL;
@@ -148,9 +154,12 @@ int	type, list;
  * we may find that some values are not initialized and so we
  * may need to allocate more memory.
  */
-do_arrayinit (pp, nval, nindex)
-struct	param *pp;
-int	nval, nindex;
+void
+do_arrayinit (
+  struct param *pp,
+  int	 nval, 
+  int    nindex
+)
 {
 	int	block1, block2, dim, asiz, asiz2, asiz2x, bastype, i;
 	int	slen;
@@ -310,9 +319,11 @@ int	nval, nindex;
 
 /* DO_SCALARINIT -- Initialize a scalar.  Mostly copied from ADDPARAM.
  */
-do_scalarinit (pp, inited)
-struct	param	*pp;
-int	inited;
+void
+do_scalarinit (
+  struct param	*pp,
+  int	inited
+)
 {
 	struct	operand	*o, undefoper;
 	extern	char	*e_invaldef;
@@ -430,9 +441,11 @@ int	inited;
 
 /* SCANFTYPE -- Get file type for file parameter.
  */
-scanftype (pp, o)
-struct	param	*pp;
-struct	operand	*o;
+int
+scanftype (
+  struct param	*pp,
+  struct operand *o
+)
 {
 	int	type;
 	char	*s;
@@ -460,9 +473,11 @@ struct	operand	*o;
 
 /* C_SCANMODE -- Get the mode for a parameter.
  */
-c_scanmode (pp, o)
-struct	param	*pp;
-struct	operand	*o;
+int
+c_scanmode (
+  struct param	*pp,
+  struct operand *o
+)
 {
 	if (o->o_type != OT_STRING)
 	    return (ERR);
@@ -474,9 +489,11 @@ struct	operand	*o;
 
 /* SCANLEN -- Get the length for structs and strings.
  */
-scanlen (pp, o)
-struct	param	*pp;
-struct	operand	*o;
+int
+scanlen (
+  struct param	*pp,
+  struct operand *o
+)
 {
 	if (o->o_type != OT_INT  ||
 	    !(pp->p_type & (OT_STRING|PT_LIST|PT_STRUCT)))
@@ -489,9 +506,11 @@ struct	operand	*o;
 
 /* SCANMIN -- Get the minimum for a parameter.
  */
-scanmin (pp, o)
-struct	param	*pp;
-struct	operand	*o;
+int
+scanmin (
+  struct param	*pp,
+  struct operand *o
+)
 {
 	int 	bastype, otype;
 
@@ -526,9 +545,11 @@ struct	operand	*o;
 /* SCANENUM -- Get the legal values for an enumerated string an store in the
  * min field of the parameter.
  */
-scanenum (pp, o)
-register struct	param	*pp;
-register struct	operand	*o;
+int
+scanenum (
+  register struct param	*pp,
+  register struct operand *o
+)
 {
 	register int bastype;
 
@@ -543,9 +564,11 @@ register struct	operand	*o;
 
 /* SCANMAX -- Get the maximum for a param.
  */
-scanmax (pp, o)
-struct	param	*pp;
-struct	operand	*o;
+int
+scanmax (
+  struct param	*pp,
+  struct operand *o
+)
 {	
 	int	otype;
 
@@ -582,8 +605,8 @@ struct	operand	*o;
  * set it to AUTO mode.  Also rearrange the parameters so they
  * agree with order of definition in the procedure statement.
  */
-proc_params (npar)
-int	npar;
+void
+proc_params (int npar)
 {
 	struct	operand	*o;
 	struct	param	*pp, *fp, *lp, *op, *tp;
@@ -674,9 +697,12 @@ setmodes_:
 /* INITPARAM -- Get a new parameter and initialize appropriate fields.
  */
 struct param *
-initparam (op, isparam, type, list)
-struct	operand *op;
-int	isparam, list, type;
+initparam (
+  struct operand *op,
+  int	isparam, 
+  int   type,
+  int   list
+)
 {
 	struct	param *pp;
 	extern	char *e_lookparm;
@@ -722,8 +748,8 @@ int	isparam, list, type;
 
 /* PROCSCRIPT -- Is this a procedure script? 
  */
-procscript (fp)
-FILE	*fp;
+int
+procscript (FILE *fp)
 {
 	char	*p, buf[PF_MAXLIN+1];
 	int	result;
@@ -761,9 +787,11 @@ FILE	*fp;
 
 /* SKIP_TO -- Within a file, skip to the statement beginning with the key.
  */
-skip_to (fp, key)
-FILE	*fp;
-char	*key;
+int
+skip_to (
+  FILE	*fp,
+  char	*key
+)
 {
 	char	*p, buf[PF_MAXLIN+1];
 	int 	count, len;
@@ -796,9 +824,12 @@ char	*key;
 /* DO_OPTION -- Set parameter attributes which have been explicitly
  * defined by the user.
  */
-do_option (pp, oo, o)
-struct	param	*pp;
-struct	operand	*oo, *o;
+void
+do_option (
+  struct param	*pp,
+  struct operand *oo,
+  struct operand *o
+)
 {
 	char	*opt;
 

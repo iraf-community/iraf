@@ -84,7 +84,7 @@ case characters may be used and are considered different characters; i.e.
 identifiers are case sensitive (as are function names).
 
 There are a few special predefined variables: "$D" contains the current
-local date (in old FITS DD/MM/YY format), "$T" contains the current local
+local date (in new FITS YYYY-MM-DD), "$T" contains the current local
 time, "$GMD" contains the current Greenwich meridian date (in FITS
 YYYY-MM-DD format), "$GMT" contains the current Greenwich meridian time,
 and "$GMDT" contains the current date and time in FITS YYYY-MM-DDTHH:MM:SS
@@ -148,7 +148,7 @@ expressions.
 
 .nf
         $I      The name of the current image (if used)
-        $D      The current date in the DD/MM/YY format
+        $D      The current date in the YYYY-MM-DD format
         $T      The current (local) time as a sexagesimal string
 .fi
 
@@ -634,6 +634,10 @@ data file for the \fBastradius\fR script task.
 
 .ih
 REVISIONS
+.ls ASTCALC V2.15
+The $D variable was changed from the old MM/DD/YY format to the post-Y2K
+YYYY-MM-DD format.
+.le
 .ls ASTCALC V2.11.2
 Y2K update:  The epoch, julday, and mst functions now take either the old
 or new FITS style date strings.  The time argument is optional and if

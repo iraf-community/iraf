@@ -13,7 +13,7 @@ packed	char errmsg[maxch]	# machine dependent error message
 .ih
 DESCRIPTION
 A description of the most recent hardware or software exception is returned.
-The integer code \fIos_exception\fR is the machine depenent code for the
+The integer code \fIos_exception\fR is the machine dependent code for the
 exception, and \fIerrmsg\fR is a specific, machine dependent string
 describing the exception.  A program which merely calls \fBzxgmes\fR
 to fetch and print the error message can be informative without compromising

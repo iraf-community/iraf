@@ -28,7 +28,7 @@ facility, used by tasks which operate upon sets of images and which is
 documented in the manual page for the \fIsections\fR task.
 
 Pattern matching in a file template is provided by the usual pattern matching
-metacharacters "*?[]", documented in the CL User's Guide.  Pattern matching 
+meta-characters "*?[]", documented in the CL User's Guide.  Pattern matching 
 is used to select files from one or more directories.  In addition, the
 filename template notation provides two operators for generating new filenames
 from the matched filenames.  These are the \fBconcatenation\fR operator "//",

@@ -90,12 +90,12 @@ define	READAXIS	Memi[$1+110]	# Read out axis (1=cols, 2=lines)
 define	CALCTYPE	Memi[$1+111]	# Calculation data type
 define	OVERSCAN_TYPE	Memi[$1+112]	# Overscan type
 define	OVERSCAN_VEC	Memi[$1+113]	# Pointer to overscan vector
-define	DARKSCALE	Memr[$1+114]	# Dark count scale factor
-define	FRINGESCALE	Memr[$1+115]	# Fringe scale factor
-define	FLATSCALE	Memr[$1+116]	# Flat field scale factor
-define	ILLUMSCALE	Memr[$1+117]	# Illumination scale factor
-define	MINREPLACE	Memr[$1+118]	# Minimum replacement value
-define	MEAN		Memr[$1+119]	# Mean of output image
+define	DARKSCALE	Memr[P2R($1+114)]	# Dark count scale factor
+define	FRINGESCALE	Memr[P2R($1+115)]	# Fringe scale factor
+define	FLATSCALE	Memr[P2R($1+116)]	# Flat field scale factor
+define	ILLUMSCALE	Memr[P2R($1+117)]	# Illumination scale factor
+define	MINREPLACE	Memr[P2R($1+118)]	# Minimum replacement value
+define	MEAN		Memr[P2R($1+119)]	# Mean of output image
 define	COR		Memi[$1+120]	# Overall correction flag
 define	CORS		Memi[$1+121+($2-1)]  # Individual correction flags
 

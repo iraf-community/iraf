@@ -241,7 +241,7 @@ coordinates rather than physical or logical pixel coordinates.  If the
 spectra to be combined do not have identical dispersion coordinates then
 the spectra are interpolated to a common dispersion sampling before
 combining.  The interpolation conserves pixel values rather pixel fluxes.
-This means that flux calibrated data is treated correctedly and that
+This means that flux calibrated data is treated correctly and that
 spectra in counts are not corrected in the interpolation for changes
 in pixel widths.  
 The default interpolation function is a 5th order polynomial.  The
@@ -507,7 +507,7 @@ the sigmas are computed for each pixel from each image using the
 same estimated true value.
 
 If the images are scaled and shifted and the \fIsigscale\fR threshold
-is exceeded then a sigma is computed for each pixel based on the
+is exceedd then a sigma is computed for each pixel based on the
 spectrum scale parameters; i.e. the median or average is scaled to that of the
 original image before computing the sigma and residuals.
 
@@ -602,7 +602,7 @@ rejected or the number of remaining input values falls below three.  Note
 that the proportionality factor is not recomputed after rejections.
 
 If the spectra are scaled differently and the sigma scaling correction
-threshold is exceeded then a correction is made in the sigma
+threshold is exceedd then a correction is made in the sigma
 calculations for these differences, again under the assumption that
 the noise in an spectra scales as the square root of the mean intensity.
 
@@ -747,7 +747,7 @@ or spectrum statistics to using the values directly.  This corresponds
 to variance weighting.  Other options for specifying the scaling and
 weighting factors were added; namely from a file or from a different
 image header keyword.  The \fInkeep\fR parameter was added to allow
-controling the maximum number of pixels to be rejected by the clipping
+controlling the maximum number of pixels to be rejected by the clipping
 algorithms.  The \fIsnoise\fR parameter was added to include a sensitivity
 or scale noise component to the noise model.
 .le

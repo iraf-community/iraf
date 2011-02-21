@@ -12,6 +12,8 @@
 #include "param.h"
 #include "task.h"
 #include "errs.h"
+#include "proto.h"
+
 
 /*
  * LISTS -- Access lists for list-structured parameters.
@@ -30,8 +32,9 @@ extern	int	cldebug;
  * Call error() if get ferror while reading or can't open list file.
  */
 struct operand
-readlist (pp)
-struct	param *pp;
+readlist (
+  struct param *pp
+)
 {
 	struct	operand result;
 	int	bastype;
@@ -109,8 +112,10 @@ again:	    fgets (line, SZ_LINE, pp->p_listfp);
  * We assume (pp->p_type & PT_LIST) but do check that the file is not
  * already closed and that we're not closing the real stdin.
  */
-closelist (pp)
-register struct param *pp;
+void
+closelist (
+  register struct param *pp
+)
 {
 	if (pp->p_listfp != NULL) {
 	    if (pp->p_listfp != stdin)

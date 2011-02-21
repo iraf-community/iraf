@@ -2,11 +2,14 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <utmp.h>
 #include <pwd.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <string.h>
 
 #define	import_spp
 #define	import_alloc
@@ -51,9 +54,18 @@ int	debug=0;
 int	nsfiles;			/* number of special files	*/
 int	mode;				/* 07 mode, ie, 04, 02, or 06	*/
 
-main (argc, argv)
-int	argc;
-char	*argv[];
+
+/* System prototypes.
+*/
+int findsfs (char *argv[]);
+int dealloc (char *argv[]);
+int alloc (char	*argv[], int statonly);
+
+extern  int	uid_executing (int uid);
+
+
+
+int main (int argc, char *argv[])
 {
 	int	iexit = DV_ERROR;
 
@@ -82,9 +94,11 @@ char	*argv[];
 /* ALLOC -- Allocate device with given generic name if its owner is not
  * logged in.
  */
-alloc (argv, statonly)
-char	*argv[];
-int	statonly;		/* if set, just return device status */
+int
+alloc (
+  char	*argv[],
+  int    statonly		/* if set, just return device status */
+)
 {
 	register int ruid, mode, i;
 	register struct file *fp;
@@ -147,8 +161,8 @@ int	statonly;		/* if set, just return device status */
 /* DEALLOC -- Deallocate device with given generic name if real uid owns all
  * sfiles.
  */
-dealloc (argv)
-char	*argv[];
+int
+dealloc (char *argv[])
 {
 	register int	uid, ruid, i;
 	register struct	file *fp;
@@ -187,8 +201,8 @@ char	*argv[];
 /* FINDSFS -- Fill in sfiles table with special file names associated with
  * device with given generic name.
  */
-findsfs (argv)
-char	*argv[];
+int
+findsfs (char *argv[])
 {
 	register struct file *fp;
 	register char	*argp, *ip;
@@ -222,8 +236,8 @@ char	*argv[];
 /* This is no longer used since we now read the process table instead. */
 /* LOGGEDIN -- Return 1 if uid is logged in, else 0.
  */
-loggedin (uid)
-int	uid;
+int
+loggedin (int uid)
 {
 	register int i;
 	static	int uidcache[10];

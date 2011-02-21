@@ -17,16 +17,16 @@
 # The curve is aplied to the column positions if the curve axis is 1 and
 # to the line positions if the curve axis is 2.
 
-define	AP_LEN		13		# Length of aperture structure
-define	SZ_APTITLE	60		# Length of aperture title
+define	AP_LEN		13			# Length of aperture structure
+define	SZ_APTITLE	60			# Length of aperture title
 
-define	AP_ID		Memi[$1]	# Aperture ID
-define	AP_TITLE	Memi[$1+1]	# Pointer to title
-define	AP_BEAM		Memi[$1+2]	# Aperture beam number
-define	AP_CEN		Memr[$1+3+$2-1]	# Aperture center
-define	AP_LOW		Memr[$1+5+$2-1]	# Aperture limit
-define	AP_HIGH		Memr[$1+7+$2-1]	# Aperture limit
-define	AP_AXIS		Memi[$1+9]	# Axis for curve
-define	AP_CV		Memi[$1+10]	# Aperture curve
-define	AP_IC		Memi[$1+11]	# ICFIT pointer
-define	AP_SELECT	Memi[$1+12]	# Aperture selected?
+define	AP_ID		Memi[$1]		# Aperture ID
+define	AP_TITLE	Memi[$1+1]		# Pointer to title
+define	AP_BEAM		Memi[$1+2]		# Aperture beam number
+define	AP_CEN		Memr[P2R($1+3+$2-1)]	# Aperture center
+define	AP_LOW		Memr[P2R($1+5+$2-1)]	# Aperture limit
+define	AP_HIGH		Memr[P2R($1+7+$2-1)]	# Aperture limit
+define	AP_AXIS		Memi[$1+9]		# Axis for curve
+define	AP_CV		Memi[$1+10]		# Aperture curve
+define	AP_IC		Memi[$1+11]		# ICFIT pointer
+define	AP_SELECT	Memi[$1+12]		# Aperture selected?

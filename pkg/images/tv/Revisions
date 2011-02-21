@@ -2,6 +2,14 @@
 .help revisions Nov93 nmisc
 .nf
 
+imexamine/imexam.h
+    The coordinates arrays in the main structure were improperly indexed
+    with the P2R macro (2/10/11, MJF)
+
+imexamine/t_imexam.x
+    Removed some accidental code that was causing the frame number to
+    be prompted for.  (12/4/08, MJF)
+
 display/t_display.x
     The change of 8/16/07 results in the ocolors parameter being used
     in place of the bpcolors parameter.

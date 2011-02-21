@@ -27,9 +27,15 @@ extern  FILE	*_fdtofile[];	/* map file descriptor (small integer) to
  * The following typedefs refer to the data types passed by the
  * Fortran compiler (Ratfor) calling us.
  */
+#ifdef ILP32
 typedef int RCHAR;		/* Ratfor character string */
 typedef int FINT;		/* Fortran plain vanilla integer */
 				/* integer*2 with new f77 on Unix */
+#else
+typedef long int RCHAR;		/* Ratfor character string */
+typedef long int FINT;		/* Fortran plain vanilla integer */
+				/* integer*2 with new f77 on Unix */
+#endif
 
 
 /* All names of C functions called from ratfor are defined here to make them

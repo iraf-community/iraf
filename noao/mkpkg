@@ -242,17 +242,29 @@ macintel:				# install MACOSX (x86) binaries
 	             nproto nobsolete rv surfphot twodspec obsutil"
 	!$(hlib)/mkfloat.csh macintel -d $(DIRS)
 	;
+ipad:					# install Mac iPad  binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh ipad -d $(DIRS)
+	;
 cygwin:					# install WinXP/Cygwin binaries
 	$verbose off
 	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
 	             nproto nobsolete rv surfphot twodspec obsutil"
 	!$(hlib)/mkfloat.csh cygwin -d $(DIRS)
 	;
-linux:					# install Slackwkare Linux binaries
+linux:					# install Linux binaries
 	$verbose off
 	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
 	             nproto nobsolete rv surfphot twodspec obsutil"
 	!$(hlib)/mkfloat.csh linux -d $(DIRS)
+	;
+linux64:				# install Linux x86_64 binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh linux64 -d $(DIRS)
 	;
 redhat:					# install Redhat Linux binaries
 	$verbose off
@@ -283,4 +295,10 @@ linuxppc:				# install Linux (PPC) binaries
 	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
 	             nproto nobsolete rv surfphot twodspec obsutil"
 	!$(hlib)/mkfloat.csh linuxppc -d $(DIRS)
+	;
+linux64:				# install Linux (64-bit) binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh linux64 -d $(DIRS)
 	;

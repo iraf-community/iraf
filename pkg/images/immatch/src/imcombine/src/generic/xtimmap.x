@@ -8,6 +8,8 @@ include	<config.h>
 define	IM_BUFFRAC	IM_BUFSIZE
 include	<imset.h>
 
+define	VERBOSE		false
+
 # These routines maintain an arbitrary number of indexed "open" images which
 # must be READ_ONLY.  The calling program may use the returned pointer for
 # header accesses but must call xt_opix before I/O.  Subsequent calls to
@@ -37,12 +39,13 @@ define	XT_MAPUNMAP	1	# Map and unmap images.
 # The returned pointer may be used for header access but not I/O.
 # The indexed image is closed by xt_imunmap.
 
-pointer procedure xt_immap (imname, acmode, hdr_arg, index)
+pointer procedure xt_immap (imname, acmode, hdr_arg, index, retry)
 
 char	imname[ARB]		#I Image name
 int	acmode			#I Access mode
 int	hdr_arg			#I Header argument
 int	index			#I Save index
+int	retry			#I Retry counter
 pointer	im			#O Image pointer (returned)
 
 int	i, envgeti()
@@ -58,6 +61,12 @@ begin
 	if (acmode != READ_ONLY)
 	    call error (1, "XT_IMMAP: Only READ_ONLY allowed")
 
+	# Set maximum number of open images based on retry.
+	if (retry > 0)
+	    max_openim = min (1024, MAX_OPENIM) / retry
+	else
+	    max_openim = MAX_OPENIM
+
 	# Initialize once per process.
 	if (first_time == YES) {
 	    iferr (option = envgeti ("imcombine_option"))
@@ -65,7 +74,7 @@ begin
 	    min_open = 1
 	    nopen = 0
 	    nopenpix = 0
-	    nalloc = MAX_OPENIM
+	    nalloc = max_openim
 	    call calloc (ims, nalloc, TY_POINTER)
 	    first_time = NO
 	}
@@ -76,7 +85,7 @@ begin
 	# Allocate structure.
 	if (index > nalloc) {
 	    i = nalloc
-	    nalloc = index + MAX_OPENIM
+	    nalloc = index + max_openim
 	    call realloc (ims, nalloc, TY_STRUCT)
 	    call amovki (NULL, Memi[ims+i], nalloc-i)
 	}
@@ -138,6 +147,11 @@ begin
 		im = XT_IM(xt1)
 		if (im == NULL || XT_FLAG(xt1) == last_flag)
 		    next
+		if (VERBOSE) {
+		    call eprintf ("%d: xt_opix imunmap %s\n")
+			call pargi (i)
+			call pargstr (XT_IMNAME(xt1))
+		}
 		call imunmap (XT_IM(xt1))
 		call mfree (XT_BUF(xt1), XT_BTYPE(xt1))
 		nopen = nopen - 1
@@ -173,7 +187,7 @@ begin
 	}
 
 	# Handle more images than the maximum that can be open at one time.
-	if (nopen >= MAX_OPENIM) {
+	if (nopen >= max_openim) {
 	    if (option == XT_MAPUNMAP || flag == 0) {
 		do i = min_open, nalloc {
 		    xt1 = Memi[ims+i-1]
@@ -182,6 +196,11 @@ begin
 		    im = XT_IM(xt1)
 		    if (im == NULL)
 			next
+		    if (VERBOSE) {
+			call eprintf ("%d: imunmap %s\n")
+			    call pargi (i)
+			    call pargstr (XT_IMNAME(xt1))
+		    }
 		    call imunmap (XT_IM(xt1))
 		    nopen = nopen - 1
 		    if (XT_CLOSEFD(xt1) == NO)
@@ -213,6 +232,11 @@ begin
 	}
 	
 	# Open image.
+	if (VERBOSE) {
+	    call eprintf ("%d: xt_opix immap %s\n")
+	        call pargi (index)
+		call pargstr (XT_IMNAME(xt))
+	}
 	im = immap (XT_IMNAME(xt), READ_ONLY, XT_ARG(xt))
 	XT_IM(xt) = im
 	if (!IS_INDEFI(XT_BUFSIZE(xt)))
@@ -253,6 +277,11 @@ begin
 	    return
 
 	if (XT_IM(xt) != NULL) {
+	    if (VERBOSE) {
+		call eprintf ("%d: xt_cpix imunmap %s\n")
+		    call pargi (index)
+		    call pargstr (XT_IMNAME(xt))
+	    }
 	    call imunmap (XT_IM(xt))
 	    nopen = nopen - 1
 	    if (XT_CLOSEFD(xt) == NO)
@@ -323,6 +352,11 @@ begin
 
 	# Close indexed image.
 	if (XT_IM(xt) != NULL) {
+	    if (VERBOSE) {
+		call eprintf ("%d: xt_imunmap imunmap %s\n")
+		    call pargi (index)
+		    call pargstr (XT_IMNAME(xt))
+	    }
 	    iferr (call imunmap (XT_IM(xt))) {
 		XT_IM(xt) = NULL
 		call erract (EA_WARN)
@@ -345,6 +379,40 @@ begin
 
 	# Free save structure.
 	call mfree (Memi[ims+index-1], TY_STRUCT)
+	Memi[ims+index-1] = NULL
+end
+
+
+# XT_MINHDR -- Minimize header assuming keywords will not be accessed.
+
+procedure xt_minhdr (index)
+
+int	index			#I index
+
+pointer	xt
+errchk	realloc
+
+include	"xtimmap.com"
+
+begin
+	# Check for an indexed image.  If it is not unmap the pointer
+	# as a regular IMIO pointer.
+
+	xt = NULL
+	if (index <= nalloc && index > 0)
+	    xt = Memi[ims+index-1]
+	if (xt == NULL)
+	    return
+
+	# Minimize header pointer.
+	if (VERBOSE) {
+	    call eprintf ("%d: xt_minhdr %s\n")
+		call pargi (index)
+		call pargstr (XT_IMNAME(xt))
+	}
+	call realloc (XT_HDR(xt), IMU+1, TY_STRUCT)
+	if (XT_IM(xt) != NULL)
+	    call realloc (XT_IM(xt), IMU+1, TY_STRUCT)
 end
 
 
@@ -416,6 +484,11 @@ begin
 		im = XT_IM(xt1)
 		if (im == NULL || XT_FLAG(xt1) == last_flag)
 		    next
+		if (VERBOSE) {
+		    call eprintf ("%d: xt_imgnl imunmap %s\n")
+			call pargi (i)
+			call pargstr (XT_IMNAME(xt1))
+		}
 		call imunmap (XT_IM(xt1))
 		call mfree (XT_BUF(xt1), XT_BTYPE(xt1))
 		nopen = nopen - 1
@@ -475,7 +548,7 @@ begin
 	}
 
 	# Handle more images than the maximum that can be open at one time.
-	if (nopen >= MAX_OPENIM) {
+	if (nopen >= max_openim) {
 	    if (option == XT_MAPUNMAP || v[2] == 0) {
 		do i = min_open, nalloc {
 		    xt1 = Memi[ims+i-1]
@@ -502,6 +575,11 @@ begin
 			call amovs (Mems[ptr], Mems[XT_BUF(xt1)], nl*nc)
 		    }
 
+		    if (VERBOSE) {
+			call eprintf ("%d: xt_imgnl imunmap %s\n")
+			    call pargi (i)
+			    call pargstr (XT_IMNAME(xt1))
+		    }
 		    call imunmap (XT_IM(xt1))
 		    nopen = nopen - 1
 		    if (XT_CLOSEFD(xt1) == NO)
@@ -532,6 +610,11 @@ begin
 	}
 	
 	# Open image.
+	if (VERBOSE) {
+	    call eprintf ("%d: xt_imgnl immap %s\n")
+	        call pargi (index)
+		call pargstr (XT_IMNAME(xt))
+	}
 	im = immap (XT_IMNAME(xt), READ_ONLY, XT_ARG(xt))
 	XT_IM(xt) = im
 	call imseti (im, IM_BUFSIZE, XT_BUFSIZE(xt))
@@ -592,6 +675,11 @@ begin
 		im = XT_IM(xt1)
 		if (im == NULL || XT_FLAG(xt1) == last_flag)
 		    next
+		if (VERBOSE) {
+		    call eprintf ("%d: xt_imgnl imunmap %s\n")
+			call pargi (i)
+			call pargstr (XT_IMNAME(xt1))
+		}
 		call imunmap (XT_IM(xt1))
 		call mfree (XT_BUF(xt1), XT_BTYPE(xt1))
 		nopen = nopen - 1
@@ -651,7 +739,7 @@ begin
 	}
 
 	# Handle more images than the maximum that can be open at one time.
-	if (nopen >= MAX_OPENIM) {
+	if (nopen >= max_openim) {
 	    if (option == XT_MAPUNMAP || v[2] == 0) {
 		do i = min_open, nalloc {
 		    xt1 = Memi[ims+i-1]
@@ -678,6 +766,11 @@ begin
 			call amovi (Memi[ptr], Memi[XT_BUF(xt1)], nl*nc)
 		    }
 
+		    if (VERBOSE) {
+			call eprintf ("%d: xt_imgnl imunmap %s\n")
+			    call pargi (i)
+			    call pargstr (XT_IMNAME(xt1))
+		    }
 		    call imunmap (XT_IM(xt1))
 		    nopen = nopen - 1
 		    if (XT_CLOSEFD(xt1) == NO)
@@ -708,6 +801,11 @@ begin
 	}
 	
 	# Open image.
+	if (VERBOSE) {
+	    call eprintf ("%d: xt_imgnl immap %s\n")
+	        call pargi (index)
+		call pargstr (XT_IMNAME(xt))
+	}
 	im = immap (XT_IMNAME(xt), READ_ONLY, XT_ARG(xt))
 	XT_IM(xt) = im
 	call imseti (im, IM_BUFSIZE, XT_BUFSIZE(xt))
@@ -768,6 +866,11 @@ begin
 		im = XT_IM(xt1)
 		if (im == NULL || XT_FLAG(xt1) == last_flag)
 		    next
+		if (VERBOSE) {
+		    call eprintf ("%d: xt_imgnl imunmap %s\n")
+			call pargi (i)
+			call pargstr (XT_IMNAME(xt1))
+		}
 		call imunmap (XT_IM(xt1))
 		call mfree (XT_BUF(xt1), XT_BTYPE(xt1))
 		nopen = nopen - 1
@@ -827,7 +930,7 @@ begin
 	}
 
 	# Handle more images than the maximum that can be open at one time.
-	if (nopen >= MAX_OPENIM) {
+	if (nopen >= max_openim) {
 	    if (option == XT_MAPUNMAP || v[2] == 0) {
 		do i = min_open, nalloc {
 		    xt1 = Memi[ims+i-1]
@@ -854,6 +957,11 @@ begin
 			call amovr (Memr[ptr], Memr[XT_BUF(xt1)], nl*nc)
 		    }
 
+		    if (VERBOSE) {
+			call eprintf ("%d: xt_imgnl imunmap %s\n")
+			    call pargi (i)
+			    call pargstr (XT_IMNAME(xt1))
+		    }
 		    call imunmap (XT_IM(xt1))
 		    nopen = nopen - 1
 		    if (XT_CLOSEFD(xt1) == NO)
@@ -884,6 +992,11 @@ begin
 	}
 	
 	# Open image.
+	if (VERBOSE) {
+	    call eprintf ("%d: xt_imgnl immap %s\n")
+	        call pargi (index)
+		call pargstr (XT_IMNAME(xt))
+	}
 	im = immap (XT_IMNAME(xt), READ_ONLY, XT_ARG(xt))
 	XT_IM(xt) = im
 	call imseti (im, IM_BUFSIZE, XT_BUFSIZE(xt))
@@ -944,6 +1057,11 @@ begin
 		im = XT_IM(xt1)
 		if (im == NULL || XT_FLAG(xt1) == last_flag)
 		    next
+		if (VERBOSE) {
+		    call eprintf ("%d: xt_imgnl imunmap %s\n")
+			call pargi (i)
+			call pargstr (XT_IMNAME(xt1))
+		}
 		call imunmap (XT_IM(xt1))
 		call mfree (XT_BUF(xt1), XT_BTYPE(xt1))
 		nopen = nopen - 1
@@ -1003,7 +1121,7 @@ begin
 	}
 
 	# Handle more images than the maximum that can be open at one time.
-	if (nopen >= MAX_OPENIM) {
+	if (nopen >= max_openim) {
 	    if (option == XT_MAPUNMAP || v[2] == 0) {
 		do i = min_open, nalloc {
 		    xt1 = Memi[ims+i-1]
@@ -1030,6 +1148,11 @@ begin
 			call amovd (Memd[ptr], Memd[XT_BUF(xt1)], nl*nc)
 		    }
 
+		    if (VERBOSE) {
+			call eprintf ("%d: xt_imgnl imunmap %s\n")
+			    call pargi (i)
+			    call pargstr (XT_IMNAME(xt1))
+		    }
 		    call imunmap (XT_IM(xt1))
 		    nopen = nopen - 1
 		    if (XT_CLOSEFD(xt1) == NO)
@@ -1060,6 +1183,11 @@ begin
 	}
 	
 	# Open image.
+	if (VERBOSE) {
+	    call eprintf ("%d: xt_imgnl immap %s\n")
+	        call pargi (index)
+		call pargstr (XT_IMNAME(xt))
+	}
 	im = immap (XT_IMNAME(xt), READ_ONLY, XT_ARG(xt))
 	XT_IM(xt) = im
 	call imseti (im, IM_BUFSIZE, XT_BUFSIZE(xt))

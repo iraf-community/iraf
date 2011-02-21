@@ -54,6 +54,14 @@ begin
 
 	project = clgetb ("project")
 	combine = clgwrd ("combine", Memc[fname], SZ_FNAME, COMBINE)
+	if (combine == MEDIAN || combine == LMEDIAN) {
+	    if (combine == MEDIAN)
+		medtype = MEDAVG
+	    else {
+		medtype = MEDLOW
+		combine = MEDIAN
+	    }
+	}
 	reject = clgwrd ("reject", Memc[fname], SZ_FNAME, REJECT)
 	blank = clgetr ("blank")
 	call clgstr ("expname", Memc[expkeyword], SZ_FNAME)

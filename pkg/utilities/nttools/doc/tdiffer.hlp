@@ -1,0 +1,65 @@
+.help tdiffer May92 tables
+.ih
+NAME
+tdiffer -- Create a new table which is the difference of two tables.
+.ih
+USAGE
+tdiffer intable1 intable2 outtable colnam1 colnam2
+.ih
+DESCRIPTION
+This task creates an output table containing all the rows of the first table
+which do not match the rows in the second table.
+The first, second, and output tables are given by the task
+parameters 'intable1', 'intable2', and 'outtable' respectively.
+The match is done on the columns specified by the task parameters 'colnam1'
+and 'colnam2'.
+Other columns are ignored.
+If the two tables are disjoint, the output table will be a copy of
+the first table, except the rows will be sorted.
+If the first table is a subset of the second, the output table will be empty.
+.ih
+PARAMETERS
+.ls intable1 [file name]
+The name of the first input table.
+.le
+.ls intable2 [file name]
+The name of the second input table.
+.le
+.ls outtable [file name]
+The name of the output table.  The output table has the same header parameters
+and column names as the first table. 
+.le
+.ls colnam1 [string]
+The column names in the first table used in the match.  If more than one
+column is used, columns from the first and second
+table are associated with each other based on their position in the list
+and not on their names, i.e., the first column name in 'colnam1' is matched
+to the first column name passed to 'colnam2', regardless of whether the
+names match.
+.le
+.ls colnam2 [string]
+The column names in the second table used in the match.  The same number of
+column names must be passed to both the 'colnam1' and 'colnam2' parameters.
+.le
+.ih
+EXAMPLES
+1. There are two tables, "targets.tab", containing a list of targets
+for observation, and "images.tab", containing a list of targets which
+have already been observed.  Create a table named "new.tab" containing
+those targets which have not previously been observed:
+
+.nf
+tt> tdiffer targets.tab images.tab new.tab targetid targetid
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+tselect
+
+Type "help tables opt=sys" for a higher-level description of the 'tables' 
+package.
+.endhelp

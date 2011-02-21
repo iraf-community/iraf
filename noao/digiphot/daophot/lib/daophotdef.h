@@ -157,42 +157,42 @@ define	DP_CLIPEXP	Memi[$1+27]	# clip exponent
 define	DP_TEXT		Memi[$1+28]	# text file or table input/output ?
 define	DP_VERBOSE	Memi[$1+29]	# verbose mode ?
 
-define	DP_SCALE	Memr[$1+30]	# image scale in units/pixel
-define	DP_SFWHMPSF	Memr[$1+31]	# fwhm of the psf (scale)
-define	DP_FWHMPSF	Memr[$1+32]	# fwhm of the psf (pixels)
-define	DP_MAXGDATA	Memr[$1+33]	# maximum good data value (ADU)
-define	DP_MINGDATA	Memr[$1+34]	# minimum good data value (ADU)
-define 	DP_PHOTADU	Memr[$1+35]	# gain in electrons/ADU
-define	DP_READNOISE 	Memr[$1+36]	# readout noise (electrons)
-define	DP_XAIRMASS	Memr[$1+37]	# value of the airmass
-define	DP_ITIME	Memr[$1+38]	# value of the exposure time
-define	DP_SMATCHRAD	Memr[$1+39]	# matching radius (scale)
-define	DP_MATCHRAD	Memr[$1+40]	# matching radius (pixels)
-define	DP_RPSFRAD	Memr[$1+41]	# requested psf radius (scale)
-define	DP_SPSFRAD	Memr[$1+42]	# actual psf radius (scale)
-define	DP_PSFRAD	Memr[$1+43]	# actual psf radius (pixels)
-define	DP_SFITRAD	Memr[$1+44]	# fitting radius (scale)
-define	DP_FITRAD	Memr[$1+45]	# fitting radius (pixels)
-define	DP_SANNULUS	Memr[$1+46]	# inner sky radius (scale)
-define	DP_ANNULUS	Memr[$1+47]	# inner sky radius (pixels)
-define	DP_SDANNULUS	Memr[$1+48]	# width of sky annulus (scale)
-define	DP_DANNULUS	Memr[$1+49]	# width of sky annulus (pixels)
-define	DP_CRITSNRATIO	Memr[$1+50]	# critical S/N overlap 
-define	DP_FLATERR	Memr[$1+51]	# percent flat field error
-define	DP_PROFERR	Memr[$1+52]	# percent profile error
-define	DP_CLIPRANGE	Memr[$1+53]	# clipping range
-define	DP_SMERGERAD	Memr[$1+54]	# merging radius (scale)
-define	DP_MERGERAD	Memr[$1+55]	# merging radius (pixels)
+define	DP_SCALE	Memr[P2R($1+30)]	# image scale in units/pixel
+define	DP_SFWHMPSF	Memr[P2R($1+31)]	# fwhm of the psf (scale)
+define	DP_FWHMPSF	Memr[P2R($1+32)]	# fwhm of the psf (pixels)
+define	DP_MAXGDATA	Memr[P2R($1+33)]	# maximum good data value (ADU)
+define	DP_MINGDATA	Memr[P2R($1+34)]	# minimum good data value (ADU)
+define 	DP_PHOTADU	Memr[P2R($1+35)]	# gain in electrons/ADU
+define	DP_READNOISE 	Memr[P2R($1+36)]	# readout noise (electrons)
+define	DP_XAIRMASS	Memr[P2R($1+37)]	# value of the airmass
+define	DP_ITIME	Memr[P2R($1+38)]	# value of the exposure time
+define	DP_SMATCHRAD	Memr[P2R($1+39)]	# matching radius (scale)
+define	DP_MATCHRAD	Memr[P2R($1+40)]	# matching radius (pixels)
+define	DP_RPSFRAD	Memr[P2R($1+41)]	# requested psf radius (scale)
+define	DP_SPSFRAD	Memr[P2R($1+42)]	# actual psf radius (scale)
+define	DP_PSFRAD	Memr[P2R($1+43)]	# actual psf radius (pixels)
+define	DP_SFITRAD	Memr[P2R($1+44)]	# fitting radius (scale)
+define	DP_FITRAD	Memr[P2R($1+45)]	# fitting radius (pixels)
+define	DP_SANNULUS	Memr[P2R($1+46)]	# inner sky radius (scale)
+define	DP_ANNULUS	Memr[P2R($1+47)]	# inner sky radius (pixels)
+define	DP_SDANNULUS	Memr[P2R($1+48)]	# width of sky annulus (scale)
+define	DP_DANNULUS	Memr[P2R($1+49)]	# width of sky annulus (pixels)
+define	DP_CRITSNRATIO	Memr[P2R($1+50)]	# critical S/N overlap 
+define	DP_FLATERR	Memr[P2R($1+51)]	# percent flat field error
+define	DP_PROFERR	Memr[P2R($1+52)]	# percent profile error
+define	DP_CLIPRANGE	Memr[P2R($1+53)]	# clipping range
+define	DP_SMERGERAD	Memr[P2R($1+54)]	# merging radius (scale)
+define	DP_MERGERAD	Memr[P2R($1+55)]	# merging radius (pixels)
 
 # temporary variables, not yet used
 
-#define	DP_FITRADSQ	Memr[$1+56]	# fit radius squared (pixels)
-#define	DP_PSFRADSQ	Memr[$1+57]	# psf radius squared (pixels)
-#define	DP_RNOISESQ	Memr[$1+58]	# read noise squared (ADU)
-#define	DP_PERR		Memr[$1+59]	# percentage error
-#define	DP_PKERR	Memr[$1+60]	# peak error
-#define	DP_TMAXGDATA	Memr[$1+61]	# true data max
-#define	DP_TMINGDATA	Memr[$1+62]	# true data min
+#define	DP_FITRADSQ	Memr[P2R($1+56)]	# fit radius squared (pixels)
+#define	DP_PSFRADSQ	Memr[P2R($1+57)]	# psf radius squared (pixels)
+#define	DP_RNOISESQ	Memr[P2R($1+58)]	# read noise squared (ADU)
+#define	DP_PERR		Memr[P2R($1+59)]	# percentage error
+#define	DP_PKERR	Memr[P2R($1+60)]	# peak error
+#define	DP_TMAXGDATA	Memr[P2R($1+61)]	# true data max
+#define	DP_TMINGDATA	Memr[P2R($1+62)]	# true data min
 
 # file / image names
 
@@ -228,10 +228,10 @@ define	DP_PSFPARS	Memi[$1+3]	# pointer to the PSF parameters
 define	DP_PSFLUT	Memi[$1+4]	# pointer to the PSF lookup table
 define	DP_NVLTABLE	Memi[$1+5]	# number of variability luts
 define	DP_NFEXTABLE	Memi[$1+6]	# number of PSF expansion luts
-define  DP_PSFHEIGHT 	Memr[$1+7]	# brightness of psf
-define	DP_PSFMAG	Memr[$1+8]	# magnitude of the PSF
-define	DP_PSFX		Memr[$1+9]	# x position of the PSF
-define	DP_PSFY		Memr[$1+10]	# y position of the PSF
+define  DP_PSFHEIGHT 	Memr[P2R($1+7)]	# brightness of psf
+define	DP_PSFMAG	Memr[P2R($1+8)]	# magnitude of the PSF
+define	DP_PSFX		Memr[P2R($1+9)]	# x position of the PSF
+define	DP_PSFY		Memr[P2R($1+10)]# y position of the PSF
 
 define	MAX_NFCTNPARS	(6)		# max number of pars in psf function
 define	MAX_NEXPTERMS	(11)		# max number of expansion terms

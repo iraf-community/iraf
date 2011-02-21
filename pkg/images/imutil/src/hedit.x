@@ -609,6 +609,8 @@ int	maxch			# max chars out
 begin
 	if (field[1] == '$' && field[2] == 'I')
 	    call strcpy (image, strval, maxch)
+	else if (field[1] == '$')
+	    call imgstr (im, field[2], strval, maxch)
 	else
 	    call imgstr (im, field, strval, maxch)
 end

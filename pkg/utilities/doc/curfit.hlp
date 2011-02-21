@@ -142,7 +142,7 @@ order legendre polynomial.  The printed output is shown.
 	nrejected = 0
 	deleted = 0
 	square root of reduced chi square = 3.008706E-6
-		coefficent	  error
+		coefficient	  error
  	1	   2.633E1	  1.098E-6
  	2	   3.150E1	  1.820E-6
  	3	   8.167E0	  1.896E-6

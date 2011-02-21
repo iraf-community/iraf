@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
 
 #ifdef CYGWIN
 #  include <mingw/fenv.h>
@@ -64,9 +66,9 @@
 /* #define DEBUG */
 
 static	int prtype, ipc_isatty=NO;
+static	int ipc_in = 0, ipc_out = 0;
 static	char os_process_name[SZ_FNAME];
 static	char osfn_bkgfile[SZ_PATHNAME];
-extern	malloc(), realloc(), free();
 extern	int errno;
 
 #ifdef SHLIB
@@ -97,10 +99,14 @@ static	unsigned vshlib[8];
 int	BSS_kludge[256];
 #endif
 
+void 	ready_ (void);
+
+
 
 /* ZZSTRT -- Initialize the IRAF kernel at process startup time.
  */
-ZZSTRT()
+int
+ZZSTRT (void)
 {
 	XINT	wsetsize=0L, junk;
 #ifdef SHLIB
@@ -109,7 +115,13 @@ ZZSTRT()
 	char	*segname;
 	XCHAR	*bp;
 #endif
-	spp_debug();
+#ifndef LINUX64
+	extern  void sfpucw_();
+#endif
+	extern  int  spp_debug();
+
+
+	spp_debug ();
 
 	/* Initialize globals.
 	 */
@@ -437,10 +449,10 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	    VLIBINIT (environ, malloc, realloc, free);
 #endif
 	}
-#endif SHLIB
+#endif 	/* SHLIB */
 
 	/* Dummy routine called to indicate that mapping is complete. */
-	ready();
+	ready_();
 
 #if defined(MACOSX) || defined(CYGWIN)
         /*  Clears the exception-occurred bits in the FP status register.
@@ -464,7 +476,17 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 #else
 	    int fpucw = 0x332;
 #endif
+#ifdef LINUX64
+            /*
+            XINT fpucw = 0x332;
+            SFPUCW (&fpucw);
+            */
+            fpu_control_t cw = 
+                (_FPU_EXTENDED | _FPU_MASK_PM | _FPU_MASK_UM | _FPU_MASK_DM);
+            _FPU_SETCW(cw);
+#else
 	    sfpucw_ (&fpucw);
+#endif
 	}
 #endif
 #endif
@@ -577,22 +599,28 @@ maperr:		fprintf (stderr, "Error: cannot map the iraf shared library");
 	ZAWSET (&wsetsize, &junk, &junk, &junk);
 
 	/* Initialize the stdio streams. */
-	{   int ro = READ_ONLY, wo = WRITE_ONLY, chan;
-	    ZOPNTY (U_STDIN, &ro, &chan);
-	    ZOPNTY (U_STDOUT, &wo, &chan);
-	    ZOPNTY (U_STDERR, &wo, &chan);
+	{   XINT ro = READ_ONLY, wo = WRITE_ONLY, chan;
+
+	    ZOPNTY ((PKCHAR *)U_STDIN, &ro, &chan);
+	    ZOPNTY ((PKCHAR *)U_STDOUT, &wo, &chan);
+	    ZOPNTY ((PKCHAR *)U_STDERR, &wo, &chan);
 	}
 
 	/* Pass the values of the kernel parameters into the kernel. */
-	ZZSETK (os_process_name, osfn_bkgfile, prtype, ipc_isatty);
+	ZZSETK (os_process_name, osfn_bkgfile, prtype, ipc_isatty,
+	    &ipc_in, &ipc_out);
+
+	return (XOK);
 }
 
 
 /* ZZSTOP -- Clean up prior to process shutdown.
  */
-ZZSTOP(){}
+int ZZSTOP (void) { return (XOK); }
+
 
 /* ready -- This is a dummy routine used when debugging to allow a breakpoint
  * to be set at a convenient point after the shared image has been mapped in.
  */
-ready(){}
+void ready_ (void) {}
+

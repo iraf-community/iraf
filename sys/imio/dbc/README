@@ -17,7 +17,6 @@ imaklc.x:# IMAKLC -- Add a new field to the image header and initialize to the v
 imakrc.x:# IMAKRC -- Add a new field to the image header and initialize to the value
 imaksc.x:# IMAKSC -- Add a new field to the image header and initialize to the value
 imastrc.x:# IMASTRC -- Add a new field to the image header and initialize to the value
-imdcom.x:# IMDCOM -- Remove the comment field for a keyword.
 imgcom.x:# IMGCOM -- Get the comment field for a keyword.
 impcom.x:# IMPCOM -- Change the comment field for a keyword.
 impkbc.x:# IMPKBC -- Put an image header parameter of type boolean.
@@ -25,5 +24,6 @@ impkdc.x:# IMPKDDC -- Put an image header parameter of type double.
 impkic.x:# IMPKIC -- Put an image header parameter of type integer.
 impklc.x:# IMPKLC -- Put an image header parameter of type long integer.
 impkrc.x:# IMPKRC -- Put an image header parameter of type real.
+imdrmcom.x:# IMDRMCOM -- Remove the comment field for a keyword.
 impksc.x:# IMPKSC -- Put an image header parameter of type short integer.
 impstrc.x:# IMPSTRC -- Put an image header parameter of type string.  If the named

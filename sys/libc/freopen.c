@@ -1,23 +1,26 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
- */
+*/
 
 #define	import_spp
 #define	import_libc
 #define	import_stdio
 #include <iraf.h>
 
+
 /* FREOPEN -- Close a stream and reopen it upon the named file.  This is
- * commonly used to redirect one of the standard streams stdin, stdout,
- * or stderr to a named file.
- */
+** commonly used to redirect one of the standard streams stdin, stdout,
+** or stderr to a named file.
+*/
 FILE *
-freopen (fname, modestr, fp)
-char	*fname;			/* vfn of file to be opened	*/
-char	*modestr;		/* access mode [and type]	*/
-FILE	*fp;			/* stream to be reopened	*/
+freopen (
+  char	*fname,			/* vfn of file to be opened	*/
+  char	*modestr,		/* access mode [and type]	*/
+  FILE	*fp			/* stream to be reopened	*/
+)
 {
-	register int	fd = fileno(fp);
+	register XINT	fd = fileno(fp);
 	register int	status, filetype;
+
 
 	/* Determine the file type of the file to be opened.  This is given
 	 * by an optional second character in the mode string.  Default is

@@ -27,12 +27,12 @@ indexed with the origin at the upper left.
 
 define	LEN_IWDES	6
 
-define	IW_A		Memr[$1]	# x scale
-define	IW_B		Memr[$1+1]	# cross term (not used)
-define	IW_C		Memr[$1+2]	# cross term (not used)
-define	IW_D		Memr[$1+3]	# y scale
-define	IW_TX		Memr[$1+4]	# x shift
-define	IW_TY		Memr[$1+5]	# y shift
+define	IW_A		Memr[P2R($1)]	# x scale
+define	IW_B		Memr[P2R($1+1)]	# cross term (not used)
+define	IW_C		Memr[P2R($1+2)]	# cross term (not used)
+define	IW_D		Memr[P2R($1+3)]	# y scale
+define	IW_TX		Memr[P2R($1+4)]	# x shift
+define	IW_TY		Memr[P2R($1+5)]	# y shift
 
 
 # IW_OPEN -- Retrieve the WCS information for the given frame of the stdimage

@@ -23,7 +23,7 @@ int	interactive		# interactive pr batch mode
 int	stdin, ild, cier, sier, pier
 pointer	sp, str
 real	wx, wy
-int	fscan(), nscan(), apfitsky(), apfitcenter(), apwmag(), strncmp()
+int	fscan(), nscan(), apfitsky(), apfitcenter(), ap_wmag(), strncmp()
 int	apstati()
 real	apstatr()
 
@@ -76,7 +76,7 @@ begin
 	    cier = apfitcenter (ap, im, wx, wy)
 	    sier = apfitsky (ap, im, apstatr (ap, XCENTER), apstatr (ap,
 	        YCENTER), sd, gd)
-	    pier = apwmag (ap, im, apstatr (ap, XCENTER), apstatr (ap, YCENTER),
+	    pier = ap_wmag (ap, im, apstatr (ap, XCENTER), apstatr(ap, YCENTER),
 	        apstati (ap, POSITIVE), apstatr (ap, SKY_MODE),
 		apstatr (ap, SKY_SIGMA), apstati (ap, NSKY))
 

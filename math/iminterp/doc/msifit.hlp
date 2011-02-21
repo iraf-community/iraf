@@ -29,7 +29,7 @@ The row length of the datain array. Len_datain must be >= nxpix.
 .le
 .ih
 DESCRIPTION
-The datain array is checked for size, memory is allocated for the coeffcient
+The datain array is checked for size, memory is allocated for the coefficient
 array and the end conditions are specified. The interior polynomial, sinc,
 and drizzle interpolants are saved as the data points. The polynomial
 coefficients are calculated from the data points in the evaluation stage.

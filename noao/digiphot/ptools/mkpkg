@@ -10,19 +10,11 @@ update:
 
 relink:
 	$omake x_ptools.x
-	$ifdef (tables)
-	    !mkpkg -p noao -p tables trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
-	$else
-	    $call tundefined
-	$endif
+	!mkpkg -p noao trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
 	;
 
 linkonly:
-	$ifdef (tables)
-	    !mkpkg -p noao -p tables trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
-	$else
-	    $call tundefined
-	$endif
+	!mkpkg -p noao trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
 	$call install
 	;
 
@@ -36,12 +28,6 @@ trelink:
 	$set LFLAGS = "$(LFLAGS) $(LF)"
 	$update libpkg.a
 	$link x_ptools.o libpkg.a ../lib/libpttables.a $(LIBS) -o xx_ptools.e
-	;
-
-tundefined:
-	$echo "cannot find file tbset.h"
-	$echo "tbtables library is not defined"
-	$echo "cannot build xx_ptools.e"
 	;
 
 libpkg.a:

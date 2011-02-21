@@ -8,10 +8,14 @@ include	<imio.h>
 pointer procedure imgibf (im, vs, ve, ndim, dtype)
 
 pointer	im
-long	vs[ndim], ve[ndim]
-int	dtype, ndim, i
-long	nget, nchars, totpix, imcssz()
+long	vs[ARB], ve[ARB]
+int	dtype, ndim
+
 pointer	bdes
+int	i
+long	nget, nchars, totpix
+
+long	imcssz()
 errchk	imopsf, calloc, realloc, mfree, malloc
 
 begin

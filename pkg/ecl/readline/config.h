@@ -149,7 +149,7 @@
 #define HAVE_UNISTD_H 1
 
 /* Define if you have the <varargs.h> header file.  */
-#define HAVE_VARARGS_H 1
+/* #undef HAVE_VARARGS_H */
 
 /* Define if you have the <wchar.h> header file.  */
 #define HAVE_WCHAR_H 1
@@ -193,7 +193,7 @@
 
 #define HAVE_POSIX_SIGSETJMP 1
 
-#define CTYPE_NON_ASCII 1
+/* #undef CTYPE_NON_ASCII */
 
 /* modify settings or make new ones based on what autoconf tells us. */
 

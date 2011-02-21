@@ -35,7 +35,7 @@ begin
 	# to the blank value if requested.
 
 	if (dflag == D_ALL) {
-	    if (dowts) {
+	    if (dowts && doaverage == YES) {
 		do i = 1, npts {
 		    k = i - 1
 		    wt = wts[Memi[m[1]+k]]
@@ -64,7 +64,7 @@ begin
 		    average[i] = blank
 	    }
 	} else {
-	    if (dowts) {
+	    if (dowts && doaverage == YES) {
 		do i = 1, npts {
 		    n1 = abs(n[i])
 		    if (n1 > 0) {
@@ -139,7 +139,7 @@ begin
 	# to the blank value if requested.
 
 	if (dflag == D_ALL) {
-	    if (dowts) {
+	    if (dowts && doaverage == YES) {
 		do i = 1, npts {
 		    k = i - 1
 		    wt = wts[Memi[m[1]+k]]
@@ -168,7 +168,7 @@ begin
 		    average[i] = blank
 	    }
 	} else {
-	    if (dowts) {
+	    if (dowts && doaverage == YES) {
 		do i = 1, npts {
 		    n1 = abs(n[i])
 		    if (n1 > 0) {
@@ -243,7 +243,7 @@ begin
 	# to the blank value if requested.
 
 	if (dflag == D_ALL) {
-	    if (dowts) {
+	    if (dowts && doaverage == YES) {
 		do i = 1, npts {
 		    k = i - 1
 		    wt = wts[Memi[m[1]+k]]
@@ -272,7 +272,7 @@ begin
 		    average[i] = blank
 	    }
 	} else {
-	    if (dowts) {
+	    if (dowts && doaverage == YES) {
 		do i = 1, npts {
 		    n1 = abs(n[i])
 		    if (n1 > 0) {
@@ -347,7 +347,7 @@ begin
 	# to the blank value if requested.
 
 	if (dflag == D_ALL) {
-	    if (dowts) {
+	    if (dowts && doaverage == YES) {
 		do i = 1, npts {
 		    k = i - 1
 		    wt = wts[Memi[m[1]+k]]
@@ -376,7 +376,7 @@ begin
 		    average[i] = blank
 	    }
 	} else {
-	    if (dowts) {
+	    if (dowts && doaverage == YES) {
 		do i = 1, npts {
 		    n1 = abs(n[i])
 		    if (n1 > 0) {

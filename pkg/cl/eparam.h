@@ -30,7 +30,7 @@
  */
 struct ep_context {
 	int	e_init;			/* set on first call		*/
-	int	e_topd;			/* save top of dictionary	*/
+	XINT	e_topd;			/* save top of dictionary	*/
 	int	e_topkey;		/* saved context variables	*/
 	int	e_line;			/* 		"		*/
 	int	e_col;			/* 		"		*/

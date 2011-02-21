@@ -1,6 +1,18 @@
 .help revisions Jun88 proto
 .nf
 
+t_mkglbhdr.x		+
+mkglbhdr.par		+
+doc/mkglbhdr.hlp	+
+x_proto.x
+mkpkg
+proto.cl
+proto.hd
+proto.men
+    A new task that creates a global, dataless image header from keywords
+    which are in common in an input image list and an optional reference
+    image.  (2/6/09, Valdes)
+
 masks$t_mimstat.x
     The clipping calculation was resetting the user supplied pixel limits.
     Instead, any clipping limits need to remain bounded by the user

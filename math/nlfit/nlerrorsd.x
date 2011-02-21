@@ -2,7 +2,7 @@ include <mach.h>
 include <math/nlfit.h>
 include "nlfitdefd.h"
 
-define	COV	Memd[$1]	# element of COV
+define	COV	Memd[P2P($1)]	# element of COV
 
 
 # NLERRORS -- Procedure to calculate the reduced chi-squared of the fit

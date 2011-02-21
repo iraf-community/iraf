@@ -1,0 +1,14 @@
+input,s,a,,,,Input image template or 3d image
+output,s,a,,,,Output rasterfile template
+z1,r,a,,,,Minimum greylevel to be displayed
+z2,r,a,,,,Maximum greylevel to be displayed
+clutfile,f,h,"",,,Input rasterfile containing color lookup table
+ztrans,s,h,linear,,,Greylevel transformation (linear|log|none|user)
+ulutfile,f,h,"",,,File containing user defined look up table
+xsize,i,h,INDEF,1,,Output rasterfile horizontal size
+ysize,i,h,INDEF,1,,Output rasterfile vertical size
+xmag,r,h,1.,,,Output rasterfile horizontal magnification
+ymag,r,h,1.,,,Output rasterfile vertical magnification
+order,i,h,1,0,1,"Spatial interpolator order; 0=replic., 1=linear"
+sliceaxis,i,h,3,,,"Slice a 3d or higher image through this axis"
+swap,b,h,no,,,"Swap bytes in output rasterfiles?"

@@ -33,7 +33,7 @@ The number of points
 Reduced chi-squared of the fit.
 .le
 .ls errors
-Array of standard deviations of the coefficents.
+Array of standard deviations of the coefficients.
 .le
 .ih
 DESCRIPTION

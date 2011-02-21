@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -31,6 +32,7 @@
 #define	SZ_CMD		512		/* max size OS command	*/
 #define	SZ_LIBPATH	512		/* path to library */
 #define	LIBRARIAN	"ar"
+#define	LIBTOOL		"libtool"
 #define	LIBFLAGS	"r"
 #define	REBUILD		"ranlib"
 #define	XC		"xc"
@@ -60,13 +62,15 @@ char	*xflags;		/* XC compiler flags		*/
 char	*irafdir;		/* iraf root directory		*/
 {
 	char	cmd[SZ_CMD+1], *args;
-	int	exit_status, baderr;
+	int	exit_status, baderr, npass;
 	int	nsources, nfiles, ndone, nleft;
 	int	hostnames, status;
 	char	libfname[SZ_PATHNAME+1];
+	char   *lname = NULL;
 
 	/* Get the library file name. */
 	h_getlibname (library, libfname);
+	lname = resolvefname(libfname);
 
 	/*
 	 * Compile the files.
@@ -147,7 +151,16 @@ char	*irafdir;		/* iraf root directory		*/
 	 * ---------------------
 	 */
 #if defined(LINUX) || defined(BSD) || defined(MACOSX)
+#if defined(MACOSX) && !defined(MACH64)
+	/* For FAT libraries we need to use libtool to update.
+	 */
+	if (access (lname, F_OK) == 0)
+	    sprintf (cmd, "%s %s %s %s", LIBTOOL, "-a -T -o", lname, lname);
+	else
+	    sprintf (cmd, "%s %s %s ", LIBTOOL, "-a -T -o", lname);
+#else
 	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, resolvefname(libfname));
+#endif
 #else
 	sprintf (cmd, "%s %s %s", LIBRARIAN, LIBFLAGS, libfname);
 #endif
@@ -160,7 +173,20 @@ char	*irafdir;		/* iraf root directory		*/
 	nleft = totfiles;
 	ndone = 0;
 
-	while (nleft > 0) {
+	for (npass=0; nleft > 0; npass++) {
+
+#if defined(MACOSX) && !defined(MACH64)
+	    if (npass > 0) {
+	        /* For FAT libraries we need to use libtool to update.
+	         */
+	        if (access (lname, F_OK) == 0)
+	            sprintf (cmd, "%s %s %s %s", LIBTOOL, "-a -T -o", 
+			lname, lname);
+	        else
+	            sprintf (cmd, "%s %s %s ", LIBTOOL, "-a -T -o", lname);
+	    }
+#endif
+
 	    /* Add as many filenames as will fit on the command line.  */
 	    nfiles = add_objects (cmd, SZ_CMD, &flist[ndone], nleft,
 		hostnames=NO);
@@ -196,6 +222,10 @@ char	*irafdir;		/* iraf root directory		*/
 
 	    ndone += nfiles;
 	    nleft -= nfiles;
+
+#if defined(MACOSX) && !defined(MACH64)
+	    h_rebuildlibrary (lname);
+#endif
 	}
 
 	return (exit_status);

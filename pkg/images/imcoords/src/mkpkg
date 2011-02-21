@@ -19,6 +19,7 @@ libpkg.a:
 			<math/gsurfit.h>
         ccstd.x         <mach.h> <math.h> <math/gsurfit.h> <pkg/skywcs.h>
         ccxytran.x      <math.h> <pkg/skywcs.h>
+	healpix.x	<math.h>
 	rgstr.x		<ctype.h>
         sfconvolve.x    <imset.h> <math.h> starfind.h
         sffind.x        <error.h> <mach.h> <imhdr.h> <imset.h> <fset.h> \
@@ -34,6 +35,7 @@ libpkg.a:
         t_ccstd.x       <fset.h> <ctype.h> <math.h> <pkg/skywcs.h>
         t_cctran.x      <fset.h> <ctype.h> <math.h> <pkg/skywcs.h>
 	t_ccxymatch.x   <fset.h> <pkg/skywcs.h> "../../lib/xyxymatch.h"
+	t_hpctran.x	<math.h>
         t_imcctran.x    <fset.h> <imhdr.h> <mwset.h> <math.h> <math/gsurfit.h> \
 			<pkg/skywcs.h>
         t_skyctran.x    <fset.h> <pkg/skywcs.h>

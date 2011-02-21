@@ -19,7 +19,7 @@ long	loffset, lvalue
 .fi
 .ih
 DESCRIPTION
-A binary file is an extendible array of machine bytes.  There are two types
+A binary file is an extendable array of machine bytes.  There are two types
 of binary files: \fBblocked\fR files, which are randomly accessible in chunks
 the size of a device block, and \fBstreaming\fR binary files, which are
 restricted to sequential access and characterized by a variable block size.

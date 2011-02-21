@@ -27,7 +27,7 @@ By allocating a device we mean that [1] the device is reserved for use by the
 owner of the process issuing the request, and [2] the device is readied for
 opening by the process issuing the request, or by a subprocess of the process
 issuing the request.  If the device is a tape drive the drive should be
-mounted foreign (unlabelled) and the density should be set if so indicated
+mounted foreign (unlabeled) and the density should be set if so indicated
 in the 
 
 It is not an error to attempt to allocate a device which is already allocated,

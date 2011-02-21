@@ -5,6 +5,9 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <sys/types.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 #define import_spp
 #define	import_kernel
@@ -24,8 +27,8 @@ extern	int sh_debug;
 
 static	char os_process_name[SZ_FNAME];
 static	char osfn_bkgfile[SZ_PATHNAME];
-static	ipc_in = 0, ipc_out = 0;
-static	ipc_isatty = NO;
+static	int ipc_in = 0, ipc_out = 0;
+static	int ipc_isatty = NO;
 static	int prtype;
 char	*getenv();
 
@@ -46,9 +49,8 @@ char	*getenv();
  *	-h			host process (default)
  *	-w			permit writing into shared image (debugging)
  */
-main (argc, argv)
-int	argc;
-char	*argv[];
+int
+main (int argc, char *argv[])
 {
 	XINT	inchan=0, outchan=1;	/* process stdin, stdout	*/
 	XINT	errchan=2;		/* process std error output	*/
@@ -60,7 +62,9 @@ char	*argv[];
 	char	*ip;
 
 	int	arg = 1;
-	int	ZGETTX(), ZGETTY(), ZARDPR(), SYSRUK(), ONENTRY();
+	extern  int  ZGETTX(), ZGETTY(), ZARDPR(), SYSRUK(), ONENTRY();
+	extern  int  ZZSTRT(), ZLOCPR(), ZZSETK(), IRAF_MAIN();
+
 
 	/* The following flag must be set before calling ZZSTRT. */
 	if (argc > 1 && strcmp (argv[arg], "-w") == 0) {
@@ -129,7 +133,7 @@ ipc_:
 		 * root menu].
 		 */
 		jobcode = getpid();
-#ifdef SYSV
+#if defined(SYSV) || (defined(MACH64) && defined(MACOSX) || defined(IPAD))
 		setpgrp ();
 #else
 		setpgrp (0, jobcode);
@@ -195,4 +199,6 @@ ipc_:
 	    unlink ((char *)osfn_bkgfile);
 
 	exit (errstat);
+
+	return (0);
 }

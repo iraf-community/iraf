@@ -50,7 +50,7 @@ The long output format is blocked by image and gives the image name
 and title on the first line, the exposure time, universal time,
 and siderial time on the second line, the right ascention, declination,
 hour angle, and airmass on the third line, and then the individual
-aperture informations on the remaining lines.  If some of the header
+aperture information on the remaining lines.  If some of the header
 information is missing a value of INDEF is printed.  The keywords used
 are EXPTIME/ITIME/EXPOSURE (in that order) for the exposure time,
 and UT, ST, RA, DEC, HA, and AIRMASS for the remaining values.

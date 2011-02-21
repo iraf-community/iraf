@@ -1,6 +1,0 @@
-image,s,a,"M33small",,,"Input image"
-append,b,h,yes,,,"Append display?"
-mkcolor,i,h,208,,,"Marker color"
-verbose,b,h,yes,,,"Verbose output?"
-status,i,h,0,,,"Service status code"
-mode,s,h,"ql",,,

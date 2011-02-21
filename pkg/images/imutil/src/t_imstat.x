@@ -113,6 +113,7 @@ begin
 			    int (IM_LEN(im,1)), low, up, YES)
 	        }
 
+
 	        # Compute the central moment statistics.
 	        call ist_stats (ist)
 
@@ -216,7 +217,7 @@ int     max_nfields             #I maximum number of fields
 
 int     nfields, flist, field
 pointer sp, fname
-int     fntopenb(), fntgfnb(), strdic()
+int     fntopnb(), fntgfnb(), strdic()
 
 begin
         nfields = 0
@@ -224,7 +225,7 @@ begin
         call smark (sp)
         call salloc (fname, SZ_FNAME, TY_CHAR)
 
-        flist = fntopenb (fieldstr, NO)
+        flist = fntopnb (fieldstr, NO)
         while (fntgfnb (flist, Memc[fname], SZ_FNAME) != EOF &&
             (nfields < max_nfields)) {
             field = strdic (Memc[fname], Memc[fname], SZ_FNAME, IST_FIELDS)

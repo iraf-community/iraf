@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/file.h>
+#include <ctype.h>
 #include <unistd.h>
 
 # ifndef O_NDELAY
@@ -46,6 +47,12 @@
  * position to avoid a seek on every i/o access.
  */
 
+int _u_fmode (int mode);
+int vm_access (char *fname, int mode);
+int vm_reservespace (long nbytes);
+int vm_largefile (long nbytes);
+int vm_directio (int fd, int flag);
+
 
 /* ZOPNBF -- Open a binary file.  The file must exist for modes RO, WO, RW.
  * A new file will always be created for mode NF, and a file will be created
@@ -53,10 +60,12 @@
  * It is also legal to open RW and append by seeking to EOF and writing,
  * if more generality is required.
  */
-ZOPNBF (osfn, mode, chan)
-PKCHAR	*osfn;			/* UNIX name of file		*/
-XINT	*mode;			/* file access mode		*/
-XINT	*chan;			/* file number (output)		*/
+int
+ZOPNBF (
+  PKCHAR  *osfn,			/* UNIX name of file		*/
+  XINT	  *mode,			/* file access mode		*/
+  XINT	  *chan 			/* file number (output)		*/
+)
 {
 	register int fd;
 	struct	stat filstat;
@@ -135,14 +144,15 @@ XINT	*chan;			/* file number (output)		*/
 		zfd[fd].flags |= KF_DIRECTIO;
 	    *chan = fd;
 	}
+
+	return (*chan);
 }
 
 
 /* ZCLSBF -- Close a binary file.
  */
-ZCLSBF (fd, status)
-XINT	*fd;
-XINT	*status;
+int
+ZCLSBF (XINT *fd, XINT *status)
 {
 	extern	int errno;
 
@@ -155,6 +165,8 @@ XINT	*status;
 	if ((*status = (close (*fd) == ERR) ? XERR : XOK) == XERR)
 	    if (errno == EPERM)
 		*status = XOK;
+
+	return (*status);
 }
 
 
@@ -162,11 +174,13 @@ XINT	*status;
  * maxbytes bytes from the file FD into the buffer BUF.  Status is returned
  * in a subsequent call to ZAWTBF.
  */
-ZARDBF (chan, buf, maxbytes, offset)
-XINT	*chan;			/* UNIX file number			*/
-XCHAR	*buf;			/* output buffer			*/
-XINT	*maxbytes;		/* max bytes to read			*/
-XLONG	*offset;		/* 1-indexed file offset to read at	*/
+int
+ZARDBF (
+  XINT	*chan,			/* UNIX file number			*/
+  XCHAR	*buf,			/* output buffer			*/
+  XINT	*maxbytes,		/* max bytes to read			*/
+  XLONG	*offset 		/* 1-indexed file offset to read at	*/
+)
 {
 	register struct	fiodes *kfp;
 	register int fd;
@@ -182,11 +196,12 @@ XLONG	*offset;		/* 1-indexed file offset to read at	*/
 	 * be zero (as when called by ZARDCL).  Otherwise, we must seek to
 	 * the desired position.
 	 */
-	if (*offset > 0 && kfp->fpos != fileoffset)
+	if (*offset > 0 && kfp->fpos != fileoffset) {
 	    if ((kfp->fpos = lseek(fd,fileoffset,0)) == ERR) {
 		kfp->nbytes = ERR;
-		return;
+		return (XERR);
 	    }
+	}
 
 	/* Disable direct i/o if transfers are not block aligned. */
 	aligned = (!(fileoffset % SZ_DISKBLOCK) && !(*maxbytes % SZ_DISKBLOCK));
@@ -201,6 +216,8 @@ XLONG	*offset;		/* 1-indexed file offset to read at	*/
 
 	if (kfp->flags & KF_DIRECTIO && aligned)
 	    vm_directio (fd, 0);
+
+	return (XOK);
 }
 
 
@@ -208,11 +225,13 @@ XLONG	*offset;		/* 1-indexed file offset to read at	*/
  * nbytes bytes from the buffer BUF to the file FD.  Status is returned in a
  * subsequent call to ZAWTBF.
  */
-ZAWRBF (chan, buf, nbytes, offset)
-XINT	*chan;			/* UNIX file number		*/
-XCHAR	*buf;			/* buffer containing data	*/
-XINT	*nbytes;		/* nbytes to be written		*/
-XLONG	*offset;		/* 1-indexed file offset	*/
+int
+ZAWRBF (
+  XINT	*chan,			/* UNIX file number		*/
+  XCHAR	*buf,			/* buffer containing data	*/
+  XINT	*nbytes,		/* nbytes to be written		*/
+  XLONG	*offset 		/* 1-indexed file offset	*/
+)
 {
 	register int fd;
 	register struct	fiodes *kfp;
@@ -231,7 +250,7 @@ XLONG	*offset;		/* 1-indexed file offset	*/
 	if (*offset > 0 && kfp->fpos != fileoffset)
 	    if ((kfp->fpos = lseek(fd,fileoffset,0)) == ERR) {
 		kfp->nbytes = ERR;
-		return;
+		return (XERR);
 	    }
 
 	/* Disable direct i/o if transfers are not block aligned. */
@@ -241,7 +260,7 @@ XLONG	*offset;		/* 1-indexed file offset	*/
 
 	if (kfp->flags & KF_DIRECTIO) {
 	    vm_directio (fd, 1);
-	} else if (vm_largefile(offset) || vm_largefile(*nbytes)) {
+	} else if (vm_largefile((long)offset) || vm_largefile((long)*nbytes)) {
 	    /* Reserve VM space if writing at EOF. */
 	    struct stat st;
 	    if (!fstat(fd,&st) && fileoffset >= st.st_size)
@@ -258,18 +277,21 @@ XLONG	*offset;		/* 1-indexed file offset	*/
 	 * the file size the next time ZSTTBF is called.
 	 */
 	kfp->filesize = -1;
+
+	return (XOK);
 }
 
 
 /* ZAWTBF -- "Wait" for an "asynchronous" read or write to complete, and
  * return the number of bytes read or written, or ERR.
  */
-ZAWTBF (fd, status)
-XINT	*fd;
-XINT	*status;
+int
+ZAWTBF (XINT *fd, XINT *status)
 {
 	if ((*status = zfd[*fd].nbytes) == ERR)
 	    *status = XERR;
+
+	return (*status);
 }
 
 
@@ -279,10 +301,8 @@ XINT	*status;
  * such is not necessarily the case.  Seeks are illegal on character special
  * devices.  The test for file type is made when the file is opened.
  */
-ZSTTBF (fd, param, lvalue)
-XINT	*fd;
-XINT	*param;
-XLONG	*lvalue;
+int
+ZSTTBF (XINT *fd, XINT *param, XLONG *lvalue)
 {
 	register struct fiodes *kfp = &zfd[*fd];
 	struct	stat filstat;
@@ -337,14 +357,15 @@ XLONG	*lvalue;
 	    (*lvalue) = XERR;
 	    break;
 	}
+
+	return (XOK);
 }
 
 
 /* _U_FMODE -- Compute the effective file mode, taking into account the
  * current process umask.  (A no-op at present).
  */
-_u_fmode (mode)
-int	mode;
+int _u_fmode (int mode)
 {
 	return (mode);
 }
@@ -397,18 +418,18 @@ static int vm_connect();
 static int getstr();
 
 
+
 /* VM_ACCESS -- Access a file via the VM subsystem.  A return value of 1
  * indicates that the file is (or will be) "cached" in virtual memory, i.e.,
  * that normal virtual memory file system (normal file i/o) should be used
  * to access the file.  A return value of 0 indicates that direct i/o should
  * be used to access the file, bypassing the virtual memory file system.
  */
-vm_access (fname, mode)
-char *fname;
-int mode;
+int
+vm_access (char *fname, int mode)
 {
 	struct stat st;
-	char *modestr, buf[SZ_COMMAND];
+	char *modestr = NULL, buf[SZ_COMMAND];
 	char pathname[SZ_PATHNAME];
 	int status;
 
@@ -493,9 +514,8 @@ done:
  * actually deleted so that the cache can determine its device and inode
  * values.
  */
-vm_delete (fname, force)
-char *fname;
-int force;
+int
+vm_delete (char *fname, int force)
 {
 	struct stat st;
 	char buf[SZ_COMMAND];
@@ -563,8 +583,8 @@ done:
  * useful if VM is being used but the VM space could not be preallocated
  * at file access time, e.g., when opening a new file.
  */
-vm_reservespace (nbytes)
-long nbytes;
+int
+vm_reservespace (long nbytes)
 {
 	char buf[SZ_CMDBUF];
 	int status;
@@ -580,7 +600,7 @@ long nbytes;
 	 * The status from the server is returned as an ascii integer value
 	 * on the same socket.
 	 */
-	sprintf (buf, "reservespace %d\n", nbytes);
+	sprintf (buf, "reservespace %ld\n", nbytes);
 	if (vm_debug)
 	    fprintf (stderr, "vmclient (%s): %s", vm_client, buf);
 
@@ -605,10 +625,9 @@ long nbytes;
  * opening a new client connection.
  */
 static void
-vm_identify()
+vm_identify (void)
 {
 	char buf[SZ_CMDBUF];
-	int status;
 
 	if (vm_write (vm_server, vm_client, strlen(vm_client)) < 0)
 	    vm_shutdown();
@@ -626,8 +645,8 @@ vm_identify()
  * threshold.  Zero (false) is returned if the offset is below the threshold
  * or if VMcache is disabled.
  */
-vm_largefile (nbytes)
-long nbytes;
+int
+vm_largefile (long nbytes)
 {
 	return (vm_enabled && nbytes >= vm_threshold);
 }
@@ -636,9 +655,8 @@ long nbytes;
 /* VM_DIRECTIO -- Turn direct i/o on or off for a file.  Direct i/o is raw
  * i/o from the device to process memory, bypassing system virtual memory.
  */
-vm_directio (fd, flag)
-int fd;
-int flag;
+int
+vm_directio (int fd, int flag)
 {
 #ifdef SOLARIS
 	/* Currently direct i/o is implemented only for Solaris. */
@@ -656,29 +674,29 @@ int flag;
  * subsequent vmcache requests by the process.
  */
 static void
-vm_initialize()
+vm_initialize (void)
 {
 	register int ch;
 	register char *ip, *op;
-	XINT acmode = READ_WRITE;
 	char token[SZ_FNAME], value[SZ_FNAME];
 	extern char os_process_name[];
 	char *argp, buf[SZ_FNAME];
-	int fd;
+
 
 	/* Extract the process name minus the file path. */
-	for (ip=os_process_name, op=vm_client;  *op++ = ch = *ip;  ip++)
+	for (ip=os_process_name, op=vm_client;  (*op++ = (ch = *ip));  ip++) {
 	    if (ch == '/')
 		op = vm_client;
+	}
 
 	/* Get the server socket port if set in the user environment. */
-	if (argp = getenv (ENV_VMPORT))
+	if ((argp = getenv (ENV_VMPORT)))
 	    vm_port = atoi (argp);
 
 	/* Get the VM client parameters if an initialization string is
 	 * defined in the user environment.
 	 */
-	if (argp = getenv (ENV_VMCLIENT)) {
+	if ((argp = getenv (ENV_VMCLIENT))) {
 	    while (getstr (&argp, buf, SZ_FNAME, ',') > 0) {
 		char *modchar, *cp = buf;
 		int haveval;
@@ -741,11 +759,14 @@ vm_initialize()
 /* VM_CONNECT -- Connect to the VMcache server.
  */
 static int
-vm_connect()
+vm_connect (void)
 {
 	XINT acmode = READ_WRITE;
 	char osfn[SZ_FNAME];
 	int fd, status = 0;
+
+	extern int ZOPNND();
+
 
 	/* Already connected? */
 	if (vm_server)
@@ -777,9 +798,10 @@ vm_connect()
  * connection.
  */
 static void
-vm_shutdown()
+vm_shutdown (void)
 {
 	int status;
+	extern  int  ZCLSND();
 
 	if (vm_server) {
 	    if (vm_debug)
@@ -797,10 +819,7 @@ vm_shutdown()
  * calling process to abort if the VMcache server goes away.
  */
 static int
-vm_write (fd, buf, nbytes)
-int fd;
-char *buf;
-int nbytes;
+vm_write (int fd, char *buf, int nbytes)
 {
 	int status;
 #ifdef USE_SIGACTION
@@ -840,10 +859,7 @@ int nbytes;
  * the function value, or zero if EOS or the delimiter is reached.
  */
 static int
-getstr (ipp, obuf, maxch, delim)
-char **ipp;
-char *obuf;
-int maxch, delim;
+getstr (char **ipp, char *obuf, int maxch, int delim)
 {
 	register char *op, *ip = *ipp;
 	register char *otop = obuf + maxch;

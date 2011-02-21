@@ -192,7 +192,7 @@ The form of a pattern is
 	package_pattern.module_pattern
 
 If the "." is omitted \fImodule_pattern\fR is assumed.  The standard pattern
-matching metacharacters, i.e., "*?[]", are permitted in patterns.
+matching meta-characters, i.e., "*?[]", are permitted in patterns.
 Simple patterns are assumed to be abbreviations.
 
 .ih

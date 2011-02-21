@@ -12,7 +12,7 @@ The sky fitting algorithm to be employed. The sky fitting options are:
 .ls constant
 Use a user supplied constant value \fIskyvalue\fR for the sky.
 This algorithm is useful for measuring large resolved objects on flat
-backgrounds such as galaxies or commets.
+backgrounds such as galaxies or comments.
 .le
 .ls file
 Read sky values from a text file. This option is useful for importing
@@ -160,7 +160,7 @@ Two interactive methods of fitting sky are also available. If \fIsalgorithm\fR
 is "radplot" or "histplot", the user must interactively set the value of the
 sky using a radial profile or a histogram profile plot.
 
-Pixels which deviate from the sky value by more than \fIkreject times the
+Pixels which deviate from the sky value by more than \fIkreject\fR times the
 computed sky sigma are rejected from the fit. If \fIrgrow\fR > 0, pixels
 within a radius of rgrow / scale of the rejected pixel are also rejected from
 the fit. The rejection procedure iterates until no further pixels are rejected,

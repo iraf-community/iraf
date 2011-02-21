@@ -12,6 +12,10 @@
 #include "config.h"
 #include "errs.h"
 #include "task.h"
+#include "operand.h"
+#include "param.h"
+#include "proto.h"
+
 
 /*
  * PRCACHE -- To minimize spawns, we maintain a cache of processes.  Each
@@ -60,7 +64,7 @@
 extern	int	cldebug;
 extern	int	cltrace;
 
-typedef	int (*PFI)();
+typedef	XINT (*PFI)();
 
 struct process {
 	int	pr_pid;			/* process id of subprocess	*/
@@ -84,6 +88,13 @@ int	sz_prcache = 2;			/* nprocess slots in cache	*/
 struct	process pr_cache[MAXSUBPROC];
 struct	process *pr_head = NULL, *pr_tail = NULL;
 extern	char *findexe();
+extern int c_finfo();
+
+
+static void pr_pdisconnect (register struct process *pr);
+static void pr_tohead (register struct process *pr);
+static void pr_totail (register struct process *pr);
+static void pr_unlink (register struct process *pr);
 
 
 /* PR_CONNECT -- Run a task resident in an external process.  Look in the cache
@@ -99,13 +110,20 @@ extern	char *findexe();
  * and should support i/o redirection to named files for (greatly) increased
  * efficiency of pipes.
  */
-pr_connect (process, command, in,out, t_in,t_out,t_err, t_gr,t_im,t_pl, timeit)
-char	*process;			/* filename of process		*/
-char	*command;			/* IRAF Main command		*/
-FILE	**in, **out;			/* IPC channels (output)	*/
-FILE	*t_in, *t_out, *t_err;		/* task stdin,out,err (input)	*/
-FILE	*t_gr, *t_im, *t_pl;		/* task graphics streams	*/
-int	timeit;				/* if !0, time command		*/
+int
+pr_connect (
+  char	*process,			/* filename of process		*/
+  char	*command,			/* IRAF Main command		*/
+  FILE	**in, 				/* IPC channels (output)	*/
+  FILE  **out,
+  FILE	*t_in, 				/* task stdin,out,err (input)	*/
+  FILE  *t_out, 
+  FILE  *t_err,
+  FILE	*t_gr,				/* task graphics streams	*/ 
+  FILE  *t_im, 
+  FILE  *t_pl,
+  int	timeit 				/* if !0, time command		*/
+)
 {
 	register int	pid;
 
@@ -146,17 +164,20 @@ int	timeit;				/* if !0, time command		*/
  * Our only function for normal task termination is to clear the active flag.
  * Until the active flag is cleared the process cannot be reused nor terminated.
  */
-pr_disconnect (pid)
-int	pid;			/* process id returned by connect	*/
+void
+pr_disconnect (
+  int	pid 			/* process id returned by connect	*/
+)
 {
 	register struct process *pr;
 
 	pr_checkup();
-	for (pr=pr_head;  pr != NULL;  pr = pr->pr_dn)
+	for (pr=pr_head;  pr != NULL;  pr = pr->pr_dn) {
 	    if (pr->pr_pid == pid) {
 		pr->pr_flags &= ~P_ACTIVE;
 		return;
 	    }
+	}
 }
 
 
@@ -165,9 +186,12 @@ int	pid;			/* process id returned by connect	*/
  * and add it to the cache.  Return the process id and file pointers to the
  * IPC channels to the caller.
  */
-pr_pconnect (process, in, out)
-char	*process;			/* filename of process		*/
-FILE	**in, **out;			/* IPC channels (output)	*/
+int
+pr_pconnect (
+  char	*process,			/* filename of process		*/
+  FILE	**in, 
+  FILE  **out 				/* IPC channels (output)	*/
+)
 {
 	register struct process *pr;
 	struct	process *pr_findproc();
@@ -245,8 +269,10 @@ FILE	**in, **out;			/* IPC channels (output)	*/
 /* PR_PDISCONNECT -- Remove a process from the process cache.  Processes are
  * disconnected when pushed out of the cache or when the cache is flushed.
  */
-pr_pdisconnect (pr)
-register struct process *pr;
+static void
+pr_pdisconnect (
+  register struct process *pr
+)
 {
 	/* Ignore attempts to dump active processes.  This might happen
 	 * when an active process executes a command which calls dumpcache.
@@ -274,8 +300,8 @@ register struct process *pr;
  * the cache size on an active cache causes the cache to be flushed and all
  * locked processes to be reconnected.
  */
-pr_setcache (new_szprcache)
-int	new_szprcache;
+void
+pr_setcache (int new_szprcache)
 {
 	register struct	process *pr;
 	char	pname[MAXSUBPROC][SZ_PATHNAME+1];
@@ -323,15 +349,15 @@ int	new_szprcache;
  * processes.
  */
 struct process *
-pr_findproc (process)
-char	*process;
+pr_findproc (char *process)
 {
 	register struct	process *pr;
 
-	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
+	for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn) {
 	    if (pr->pr_pid != NULL && pr_idle(pr))
 		if (strcmp (process, pr->pr_name) == 0)
 		    return (pr);
+	}
 
 	return (NULL);
 }
@@ -341,10 +367,12 @@ char	*process;
  * If the process is already connected merely returns its pid, else connect
  * the process and return its pid.
  */
-pr_cachetask (ltname)
-char	*ltname;		/* logical task name	*/
+int
+pr_cachetask (
+  char	*ltname 		/* logical task name	*/
+)
 {
-	register int n, pid;
+	register int  pid;
 	struct	ltask *ltp;
 	FILE	*fdummy;
 
@@ -365,17 +393,20 @@ char	*ltname;		/* logical task name	*/
  * as deadlock may occur.  Locked processes are also not disconnected by
  * pr_dumpcache, which may not be what is desired.
  */
-pr_lock (pid)
-register int	pid;			/* process id			*/
+void
+pr_lock (
+  register int	pid 			/* process id			*/
+)
 {
 	register struct process *pr;
 
-	if (pid != NULL)
+	if (pid != NULL) {
 	    for (pr=pr_head;  pr != NULL;  pr=pr->pr_dn)
 		if (pr->pr_pid == pid) {
 		    pr->pr_flags |= P_LOCKED;
 		    break;
 		}
+	}
 }
 
 
@@ -384,8 +415,10 @@ register int	pid;			/* process id			*/
  *
  * This function is currently unused.
  */
-pr_unlock (pid)
-register int	pid;			/* process id			*/
+int
+pr_unlock (
+  register int	pid 			/* process id			*/
+)
 {
 	register struct process *pr;
 
@@ -401,8 +434,10 @@ register int	pid;			/* process id			*/
 /* PR_LISTCACHE -- Info command, used to display the contents of the process
  * cache.  Format:  pid [RH][L] process_name
  */
-pr_listcache (fp)
-FILE	*fp;			/* output file		*/
+void
+pr_listcache (
+  FILE	*fp 			/* output file		*/
+)
 {
 	register struct process *pr;
 
@@ -441,12 +476,15 @@ FILE	*fp;			/* output file		*/
  * value.  Locks may be forced if desired, i.e., when dumping the cache prior
  * to process termination.
  */
-pr_dumpcache (pid, break_locks)
-int	pid;
-int	break_locks;
+void
+pr_dumpcache (
+  int	pid,
+  int	break_locks 
+)
 {
 	register struct	process *pr;
 	register int	n;
+
 
 	pr_checkup();
 
@@ -471,8 +509,8 @@ int	break_locks;
  * connected since the given PNO was assigned.  Locked processes are not
  * affected.
  */
-pr_prunecache (pno)
-int	pno;
+void
+pr_prunecache (int pno)
 {
 	register struct	process *pr;
 	register int	n;
@@ -494,7 +532,8 @@ int	pno;
  * called, the counter might wrap around, but that does not seem likely and is
  * harmless in any case.
  */
-pr_getpno()
+int
+pr_getpno (void)
 {
 	return (pr_pno++);
 }
@@ -503,8 +542,8 @@ pr_getpno()
 /* PR_PNAMETOPID -- Lookup the named process in the cache and return the pid
  * if found, NULL otherwise.
  */
-pr_pnametopid (pname)
-char	*pname;
+int
+pr_pnametopid (char *pname)
 {
 	register struct process *pr;
 
@@ -513,16 +552,18 @@ char	*pname;
 	    if (strcmp (pr->pr_name, pname) == 0)
 		return (pr->pr_pid);
 
-	return (NULL);
+	return ((int) NULL);
 }
 
 
 /* PR_CHDIR -- Change the current working directory of a child process, or
  * of all connected but idle processes if pid=0.
  */
-pr_chdir (pid, newdir)
-register int	pid;
-char	*newdir;
+void
+pr_chdir (
+  register int	pid,
+  char	*newdir
+)
 {
 	register struct process *pr;
 
@@ -538,10 +579,12 @@ char	*newdir;
 /* PR_ENVSET -- Set the value of an environment variable in a child process,
  * or in all connected but idle processes if pid=0.
  */
-pr_envset (pid, envvar, valuestr)
-register int	pid;
-char	*envvar;
-char	*valuestr;
+void
+pr_envset (
+  register int	pid,
+  char	*envvar,
+  char	*valuestr 
+)
 {
 	register struct process *pr;
 
@@ -558,7 +601,8 @@ char	*valuestr;
  * if any have died.  If a process has died we must disconnect the process
  * to free file descriptors and the process cache slot.
  */
-pr_checkup()
+void
+pr_checkup (void)
 {
 	register struct	process *pr;
 	register int	n;
@@ -582,9 +626,11 @@ pr_checkup()
  * disabling any further output to the process.
  */
 /* ARGSUSED */
-onipc (vex, next_handler)
-int	*vex;			/* virtual exception code	*/
-PFI	*next_handler;		/* next handler to be called	*/
+void
+onipc (
+  int	*vex,			/* virtual exception code	*/
+  PFI	*next_handler 		/* next handler to be called	*/
+)
 {
 	register struct	process *pr;
 
@@ -601,7 +647,8 @@ PFI	*next_handler;		/* next handler to be called	*/
 /* PR_INITCACHE -- Initialize the process cache, i.e., set up the queue for the
  * first time.  The minimum cache size is 2.
  */
-pr_initcache()
+void
+pr_initcache (void)
 {
 	register struct process *pr;
 	register int	n;
@@ -624,8 +671,10 @@ pr_initcache()
 
 /* PR_TOHEAD -- Relink a process at the head of the cache list.
  */
-pr_tohead (pr)
-register struct process *pr;
+void
+pr_tohead (
+  register struct process *pr
+)
 {
 	if (pr_head != pr) {
 	    pr_unlink (pr);
@@ -639,8 +688,10 @@ register struct process *pr;
 
 /* PR_TOTAIL -- Relink a process at the tail of the cache list.
  */
-pr_totail (pr)
-register struct process *pr;
+static void
+pr_totail (
+  register struct process *pr
+)
 {
 	if (pr_tail != pr) {
 	    pr_unlink (pr);
@@ -654,8 +705,10 @@ register struct process *pr;
 
 /* PR_UNLINK -- Unlink a process from the list.
  */
-pr_unlink (pr)
-register struct process *pr;
+static void
+pr_unlink (
+  register struct process *pr
+)
 {
 	if (pr->pr_up) {
 	    (pr->pr_up)->pr_dn = pr->pr_dn;

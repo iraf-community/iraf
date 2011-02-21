@@ -31,7 +31,7 @@ fitting the data.
 .le
 .ih
 DESCRIPTION
-ISLSOLVE computes the Cholesky factoriztion of the data matrix and
+ISLSOLVE computes the Cholesky factorization of the data matrix and
 solves for the coefficients
 of the x fitting function by forward and back substitution.
 An error code is

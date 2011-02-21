@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #define	NOLIBCNAMES
 #define	import_spp
 #define	import_libc
@@ -9,6 +10,7 @@
 #define	import_knames
 #include <iraf.h>
 #include "bootlib.h"
+
 
 static	char	vfn[SZ_PATHNAME+1];
 
@@ -19,8 +21,9 @@ static	char	vfn[SZ_PATHNAME+1];
  * the IRAF file extensions are the same as UNIX.
  */
 char *
-osfn2vfn (osfn)
-char	*osfn;			/* input OS filename	*/
+osfn2vfn (
+  char	*osfn 			/* input OS filename	*/
+)
 {
 	strcpy (vfn, osfn);		/* [MACHDEP */
 	return (vfn);
@@ -41,12 +44,15 @@ char	*osfn;			/* input OS filename	*/
 	XINT	x_maxch = SZ_PATHNAME;
 	XINT	x_mode, vp, nchars;
 
+	extern  void _envinit();
+
+
 	_envinit();
 	
 	os_strupk ("./", x_vfn, SZ_PATHNAME);
 	x_mode = VFN_UNMAP;
 	iferr (vp = VFNOPEN (x_vfn, &x_mode)) {
-	    vp = NULL;
+	    vp = 0;
 	    goto err_;
 	}
 

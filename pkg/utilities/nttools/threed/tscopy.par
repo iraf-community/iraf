@@ -1,0 +1,5 @@
+intable,s,a,"",,,"input tables"
+outtable,s,a,"",,,"output tables or directory"
+verbose,b,h,yes,,,"print operations performed?"
+version,s,h,"test",,,
+mode,s,h,"al",,,

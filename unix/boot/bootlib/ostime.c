@@ -26,8 +26,7 @@ static	long os_timezone();
  * but it probably won't matter.
  */
 long
-os_utime (iraf_time)
-long	iraf_time;
+os_utime (long iraf_time)
 {
 	struct	tm *localtime();
 	time_t	time_var, lst;
@@ -57,8 +56,7 @@ long	iraf_time;
  * 1980).	[MACHDEP]
  */
 long
-os_itime (unix_time)
-long	unix_time;
+os_itime (long unix_time)
 {
 	struct	tm *localtime();
 	time_t	time_var, gmt;

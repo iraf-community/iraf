@@ -1,4 +1,0 @@
-imname,s,a,"M33small.fits",,,"FITS Image name to load"
-sync,b,h,yes,,,"Synchronous command?"
-status,i,h,0,,,"Service status code"
-mode,s,h,"ql",,,

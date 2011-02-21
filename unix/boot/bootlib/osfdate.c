@@ -5,11 +5,11 @@
 #include <sys/stat.h>
 #include "bootlib.h"
 
+
 /* FDATE -- Get the date of last modification of a file.  [MACHDEP]
  */
 long
-os_fdate (fname)
-char	*fname;
+os_fdate (char *fname)
 {
 	struct	stat buf;
 

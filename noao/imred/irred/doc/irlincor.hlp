@@ -50,7 +50,7 @@ maximum possible value 32767, in order that their values can be input
 more easily.
 .ih
 EXAMPLES
-1. Correct input to output using the default values for the coefficients (not a very rewarding opperation!)
+1. Correct input to output using the default values for the coefficients (not a very rewarding operation!)
 
 .nf
 	cl> irlincor input output
@@ -72,7 +72,7 @@ CTIO package.
 .ih
 BUGS
 The form of the correction equation is currently experimental;
-a higher order polynomial or a different functional form could be accomodated
+a higher order polynomial or a different functional form could be accommodated
 very easily if required.
 It may be advisable to carry out the calculations in double precision.
 .ih

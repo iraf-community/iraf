@@ -994,7 +994,7 @@ The following binary devices are fully supported by the program interface:
 A new device may be interfaced to FIO at run time with the procedure FIODEV.
 Repetitive calls to FIODEV for the same device are harmless and are
 ignored.  The maximum number of devices that may be interfaced to FIO is set
-when FIO is compiled.  An error action will occur if this number is exceeded.
+when FIO is compiled.  An error action will occur if this number is exceedd.
 
 	fiodev	(zaread, zawrit, zawait, zaseek, zanote, zblksz)
 

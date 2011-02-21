@@ -692,7 +692,8 @@ int	*useobj;		/* obj exists and is usable	*/
 
 	/* Compare lib module date and source file date.
  	 */
-	if ((date = os_fdate (module)) == 0) {
+	date = os_fdate (module);
+	if (date == 0) {
 	    warns ("module source file `%s' not found", module);
 	    return (YES);
 	} else if (armod_date < date) {
@@ -708,7 +709,8 @@ int	*useobj;		/* obj exists and is usable	*/
 	/* Compare dates of archive file and any dependent files.
 	 */
 	for (i=0;  (fname = dflist[i]) != NULL;  i++) {
-	    if ((date = m_fdate (fname)) == 0) {
+	    date = m_fdate (fname);
+	    if (date == 0) {
 		warns ("dependency file `%s' not found", fname);
 	    } else if (armod_date < date) {
 		old = YES;

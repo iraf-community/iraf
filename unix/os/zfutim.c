@@ -24,23 +24,27 @@
  * in units of seconds since 00:00:00 01-Jan-80, local time, as returned
  * by ZFINFO.  A NULL time value will not modify the field.
  */
-ZFUTIM (fname, atime, mtime, status)
-PKCHAR	*fname;
-XLONG	*atime;
-XLONG	*mtime;
-XINT	*status;
+int
+ZFUTIM (
+  PKCHAR  *fname,
+  XLONG	  *atime,
+  XLONG	  *mtime,
+  XINT	  *status
+)
 {
 	struct	stat osfile;
 	struct	utimbuf time;
-	time_t	gmt = 0, time_var;
 	int	offset = 0;
 	int	stat(), utime();
+
+	extern  int ZGMTCO ();
+
 
 	/* Get UNIX file info.
 	 */
 	if (stat ((char *)fname, &osfile) == ERR) {
 	    *status = XERR;
-	    return;
+	    return (XERR);
 	}
 
 	/* Get the timezone offset.  Correct for daylight savings time,
@@ -51,12 +55,14 @@ XINT	*status;
 
 	/* Set file access times.  If time is NULL use the current value.
 	 */
-	time.actime  = ((*atime == NULL) ? osfile.st_atime : (*atime+offset));
-	time.modtime = ((*mtime == NULL) ? osfile.st_mtime : (*mtime+offset));
+	time.actime  = ((*atime == 0) ? osfile.st_atime : (*atime+offset));
+	time.modtime = ((*mtime == 0) ? osfile.st_mtime : (*mtime+offset));
 
 	if (utime ((char *)fname, &time) == ERR) {
 	    *status = XERR;
-	    return;
+	    return (XERR);
 	}
 	*status = XOK;
+
+	return (*status);
 }

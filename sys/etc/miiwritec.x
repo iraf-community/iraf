@@ -5,7 +5,7 @@ include <mii.h>
 # MIIWRITEC -- Write a block of character data to a file in MII format.
 # The input data is assumed to be in a machine independent format. 
 
-procedure miiwritec (fd, spp, nchars)
+procedure mii_writec (fd, spp, nchars)
 
 int	fd			# output file
 int	spp[ARB]		# data to be written

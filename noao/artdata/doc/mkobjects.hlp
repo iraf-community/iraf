@@ -266,13 +266,13 @@ flux.  In particular, cumulative flux profiles may give a spike at the
 center.  In either case, the profile should be specified fairly finely,
 many points, to avoid interpolation effects.
 
-The functional form of the analytic profiles
-the user profiles, and
+The functional form of the analytic profiles the user profiles, and
 image template are given below.
 
 .nf
       gaussian:  I = exp (-ln (2) * (R/radius)**2)
         moffat:  I = (1 + (2**(1/beta)-1) * (R/radius)**2) ** -beta
+     sersic<n>:  I = exp (-b * (R/radius)**1/n)
        expdisk:  I = exp (-1.6783 * R/radius)
         devauc:  I = exp (-7.67 * (R/radius)**1/4)
   flux profile:  I = intensity (nprofile * R/radius)
@@ -285,8 +285,8 @@ and \fIbeta\fR is the Moffat parameter specified by the user,
 nprofile is the number of profile points in the user profile, and nc and nl
 are the image template column and line dimensions.  The Gaussian, "gaussian",
 and Moffat, "moffat", profiles are used for stars and the point spread
-function, while the exponential disk, "expdisk", and De Vaucouleurs,
-"devauc", profiles are common models for spiral and elliptical
+function, while the Sersic (sersic),  exponential disk (expdisk), and
+De Vaucouleurs (devauc) profiles are common models for spiral and elliptical
 galaxies.  The image templates are intended to model images with
 some complex structure.  The usual case is to have a very well sampled
 and high signal-to-noise image be reduced in scale (a more distant
@@ -321,23 +321,25 @@ The \fIradius\fR parameter defines the size, in pixels, of the model
 object (before seeing for the galaxies) in the output image.  It
 consistently refers to the major axis of the object but its meaning
 does depend on the model.  For the gaussian and moffat profiles it is
-defined as the half-intensity radius.  For the expdisk and devauc
+defined as the half-intensity radius.  For the sersic, expdisk, and devauc
 profiles it is defined as the half-flux radius.  For the user specified
 profiles it is the radius of the last profile point.  And for the image
 templates it is the radius of the image along the first or x axis given
 by one-half of the image dimension; i.e. nc/2.
 
-The profiles of the analytic functions extend to infinity so a
-dynamic range, the ratio of the peak intensity to the cutoff intensity,
-is imposed to cutoff the profiles.  The \fIdynrange\fR package
-parameter applies to the stellar and galaxy analytic profiles.  The
-larger this parameter the further the profile extends, particularly for
-De Vaucouleurs models.  When modeling large galaxies this has a fairly
-strong affect on the execution time because the overall extent of the
-images becomes rapidly greater.  Only for very high
-signal-to-noise objects will the cutoff be noticeable.  A correction is
-made to account for lost light so that an aperture magnitude will give
-the correct value for an object of the specified total magnitude.
+The profiles of the analytic functions extend to infinity so a dynamic
+range, the ratio of the peak intensity to the cutoff intensity, is imposed
+to cutoff the profiles.  The \fIdynrange\fR package parameter applies to
+the stellar and galaxy analytic profiles.  The larger this parameter the
+further the profile extends, particularly for the large index Sersic and De
+Vaucouleurs models.  When modeling large galaxies this has a fairly strong
+affect on the execution time because the overall extent of the images
+becomes rapidly greater.  Only for very high signal-to-noise objects will
+the cutoff be noticeable.  A correction is made to account for lost light
+(light beyond the modeled dynamic range) so that an aperture magnitude
+will give the correct value for an object of the specified total magnitude.
+This can become quite significant for larger index Sersic profiles and
+for the default dynamic range.
 
 The object models are integrated over the size of the image pixels.  This
 is done by subsampling, dividing up a pixel into smaller pieces called
@@ -463,21 +465,47 @@ requested.
 .le
 .ls model:
 The types of galaxy models are as follows:
+.ls 4 sersic<n>
+A Sersic model of index n.  The index may real but the value will be rounded
+to the nearest multiple of 0.5 or, equivalently, two times the index value will
+be rounded to an integer.  The index must be between 0.5 and 10.  The Sersic
+model defined as
+
+.nf
+	I = exp (-b * (R/radius)**1/n)
+.fi
+
+where radius is the major axis scale length corresponding to half of the
+total flux.  The value of b is computed using the formula of Ciotti and
+Bertin (AA v352, p447, 1999);
+
+.nf
+	b = 2n - 1/3 + 4/(405n) + 46 / (25515n^2)
+.fi
+.le
 .ls 4 expdisk
 An exponential disk model defined as
 
-	I = exp (-1.6783 * R/radius)
+.nf
+	I = exp (-b * R/radius)
+.fi
 
 where radius is the major axis scale length corresponding to half of the total
-flux.
+flux and b is computed as with the Sersic model for n=1.  In fact, the
+algorithm is identical with that for the Sersic model using n=1.  Note that
+because of this there will be slight differences with the earlier versions.
 .le
 .ls devauc
 A De Vaucouleurs profile defined as
 
-	I = exp (-7.67 * (R/radius)**1/4)
+.nf
+	I = exp (-b * (R/radius)**1/4)
+.fi
 
 where radius is the major axis scale length corresponding to half of the total
-flux.
+flux and b is computed as with the Sersic model for n=4.  In fact, the
+algorithm is identical with that for the Sersic model using n=4.  Note that
+because of this there will be slight differences with the earlier versions.
 .le
 .ls <image>
 If not one of the profiles above an image of the specified name is

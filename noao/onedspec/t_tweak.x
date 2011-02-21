@@ -10,25 +10,25 @@ include	<units.h>
 include	<pkg/xtanswer.h>
 
 # Tweak data object definitions.
-define	TWK_SLEN	999		# Length of sample region string
-define	TWK_LEN		580		# Length of data object
+define	TWK_SLEN	999		  # Length of sample region string
+define	TWK_LEN		580		  # Length of data object
 
-define	TWK_TYPE	Memc[P2C($1)]	# Tweak type (maxchars=19)
-define	TWK_SH		Memi[$1+11]	# Spectrum pointer
-define	TWK_CAL		Memi[$1+12]	# Calibration pointer
-define	TWK_WAVE	Memi[$1+13]	# Pointer to wavelengths
-define	TWK_SPEC	Memi[$1+14]	# Pointer to calibrated spectrum
-define	TWK_SHIFT	Memr[$1+15]	# Shift
-define	TWK_DSHIFT	Memr[$1+16]	# Shift step
-define	TWK_SCALE	Memr[$1+17]	# Scaling factor
-define	TWK_DSCALE	Memr[$1+18]	# Scaling factor step
-define	TWK_RG		Memi[$1+19]	# Range pointer
-define	TWK_RMS		Memr[$1+20]	# RMS in sample regions
-define	TWK_OFFSET	Memr[$1+21]	# Offset in graphs
-define	TWK_BOX		Memi[$1+22]	# Boxcar smoothing size
-define	TWK_THRESH	Memr[$1+23]	# Calibration threshold
-define	TWK_SAMPLE	Memc[P2C($1+30)]# Sample regions (maxchars=999)
-define	TWK_HELP	Memc[P2C($1+530)]# Help file (maxchars=99)
+define	TWK_TYPE	Memc[P2C($1)]	  # Tweak type (maxchars=19)
+define	TWK_SH		Memi[$1+11]	  # Spectrum pointer
+define	TWK_CAL		Memi[$1+12]	  # Calibration pointer
+define	TWK_WAVE	Memi[$1+13]	  # Pointer to wavelengths
+define	TWK_SPEC	Memi[$1+14]	  # Pointer to calibrated spectrum
+define	TWK_SHIFT	Memr[P2R($1+15)]  # Shift
+define	TWK_DSHIFT	Memr[P2R($1+16)]  # Shift step
+define	TWK_SCALE	Memr[P2R($1+17)]  # Scaling factor
+define	TWK_DSCALE	Memr[P2R($1+18)]  # Scaling factor step
+define	TWK_RG		Memi[$1+19]	  # Range pointer
+define	TWK_RMS		Memr[P2R($1+20)]  # RMS in sample regions
+define	TWK_OFFSET	Memr[P2R($1+21)]  # Offset in graphs
+define	TWK_BOX		Memi[$1+22]	  # Boxcar smoothing size
+define	TWK_THRESH	Memr[P2R($1+23)]  # Calibration threshold
+define	TWK_SAMPLE	Memc[P2C($1+30)]  # Sample regions (maxchars=999)
+define	TWK_HELP	Memc[P2C($1+530)] # Help file (maxchars=99)
 
 # Tweak types.
 define	SKYTWEAK	1		# Sky subtraction

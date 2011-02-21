@@ -22,12 +22,11 @@ pointer	line
 long	pvs[IM_MAXDIM], pve[IM_MAXDIM]
 long	v[IM_MAXDIM], vinc[IM_MAXDIM]
 int	sz_pixel, inbounds, npix, xstep
-int	imsinb(), imloop()
+int	imsinb(), imloop(), sizeof()
 errchk	imwrpx, imwbpx
-include	<szdtype.inc>
 
 begin
-	sz_pixel = ty_size[IM_PIXTYPE(im)]
+	sz_pixel = sizeof(IM_PIXTYPE(im))
 
 	# Check if the section extends out of bounds.
 	inbounds = imsinb (im, vs, ve, ndim)

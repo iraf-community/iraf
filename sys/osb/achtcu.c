@@ -8,10 +8,12 @@
 /* ACHT_U -- Pack an SPP datatype array into an unsigned short integer.
  * [MACHDEP]: The underscore appended to the procedure name is OS dependent.
  */
-ACHTCU (a, b, npix)
-XCHAR	*a;
-XUSHORT	*b;
-XINT	*npix;
+void
+ACHTCU (
+  XCHAR   	*a,
+  XUSHORT  	*b,
+  XINT	   	*npix
+)
 {
 	register XCHAR		*ip;
 	register XUSHORT	*op;

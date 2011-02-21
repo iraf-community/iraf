@@ -33,8 +33,8 @@ define	NPRU_ROW	Memi[$1+3]
 define	PRU_ROW_ONE     Memi[$1+4]
 define	NCOLS		Memi[$1+5]
 define	NROWS		Memi[$1+6]
-define	DATA_MIN	Memr[$1+7]
-define	DATA_MAX	Memr[$1+8]
+define	DATA_MIN	Memr[P2R($1+7)]
+define	DATA_MAX	Memr[P2R($1+8)]
 define	IPPS_ID		Memc[P2C($1+10)]
 
 

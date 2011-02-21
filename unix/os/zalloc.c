@@ -37,18 +37,26 @@
 
 #define	ALLOCEXE	"alloc.e"
 
+static int u_allocstat (char *aliases);
+
+
 
 /* ZDVALL -- Allocate or deallocate a device.  UNIX does not explicitly support
  * device allocation, so we fake it by setting the device owner and removing
  * group and other permissions.  This requires superuser privilege, hence a
  * separate process HLIB$ALLOC.E is used to set/remove device allocation.
  */
-ZDVALL (aliases, allflg, status)
-PKCHAR	*aliases;		/* list of aliases for device		*/
-XINT	*allflg;		/* allocate or deallocate device?	*/
-XINT	*status;		/* receives status word			*/
+int
+ZDVALL (
+  PKCHAR  *aliases,		/* list of aliases for device		*/
+  XINT	  *allflg,		/* allocate or deallocate device?	*/
+  XINT	  *status		/* receives status word			*/
+)
 {
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
+
+	extern int ZOSCMD ();
+
 
 	/* Syntax: $host/hlib/alloc.e -[ad] aliases
 	 */
@@ -57,9 +65,11 @@ XINT	*status;		/* receives status word			*/
 	strcat ((char *)cmd, (char *)aliases);
 
 	*nullstr = XEOS;
-	ZOSCMD (cmd, nullstr, nullstr, nullstr, status);
+	(void) ZOSCMD (cmd, nullstr, nullstr, nullstr, status);
 	if (*status == DV_ERROR)
 	    *status = XERR;
+
+	return (*status);
 }
 
 
@@ -73,16 +83,19 @@ XINT	*status;		/* receives status word			*/
  * Device files may be specified by a full pathname, as a user directory
  * relative pathname, or by the device name in /dev or /dev/rmt.
  */
-ZDVOWN (device, owner, maxch, status)
-PKCHAR	*device;		/* device name (not a list)	*/
-PKCHAR	*owner;			/* receives owner string	*/
-XINT	*maxch;			/* max chars out		*/
-XINT	*status;		/* receives allocation status	*/
+int
+ZDVOWN (
+  PKCHAR  *device,		/* device name (not a list)	*/
+  PKCHAR  *owner,		/* receives owner string	*/
+  XINT	  *maxch,		/* max chars out		*/
+  XINT	  *status		/* receives allocation status	*/
+)
 {
 	register int	uid;
 	char	*dev, devname[SZ_FNAME+1];
 	struct	passwd *pw, *getpwuid();
 	struct	stat fi;
+
 
 	/* Get device pathname. */
 	dev = (char *)device;
@@ -106,7 +119,7 @@ XINT	*status;		/* receives allocation status	*/
 
 	if (stat (devname, &fi) == ERR) {
 	    *status = XERR;
-	    return;
+	    return (XERR);
 	}
 
 	uid = fi.st_uid;
@@ -126,13 +139,15 @@ XINT	*status;		/* receives allocation status	*/
 		strncpy ((char *)owner, pw->pw_name, *maxch);
 	    *status = DV_DEVINUSE;
 	}
+
+	return (*status);
 }
 
 
 /* LOGGEDIN -- Return 1 if uid is logged in, else 0.
  */
-loggedin (uid)
-int	uid;
+int
+loggedin (int uid)
 {
 	struct	utmp ubuf;
 	struct	passwd *pw, *getpwuid();
@@ -149,13 +164,14 @@ int	uid;
 	}
 
 	do {
-	    if (fread (&ubuf, sizeof (struct utmp), 1, ufp) == NULL) {
+	    if (fread (&ubuf, sizeof (struct utmp), 1, ufp) == (size_t) 0) {
 		fclose (ufp);
 		return (0);
 	    }
 	} while (strncmp (ubuf.ut_name, pw->pw_name, 8) != 0);
 
 	fclose (ufp);
+
 	return (1);
 }
 
@@ -164,11 +180,16 @@ int	uid;
  * to be done by a priviledged process as the process table is used in some
  * cases.
  */
-u_allocstat (aliases)
-char	*aliases;		/* list of aliases for device		*/
+static int
+u_allocstat (
+  char	*aliases		/* list of aliases for device		*/
+)
 {
 	PKCHAR	cmd[SZ_LINE+1], nullstr[1];
 	XINT	x_status;
+
+	extern int ZOSCMD();
+
 
 	/* Syntax: $host/hlib/alloc.e -s aliases
 	 */
@@ -177,7 +198,7 @@ char	*aliases;		/* list of aliases for device		*/
 	strcat ((char *)cmd, aliases);
 
 	*nullstr = XEOS;
-	ZOSCMD (cmd, nullstr, nullstr, nullstr, &x_status);
+	(void) ZOSCMD (cmd, nullstr, nullstr, nullstr, &x_status);
 	if (x_status == DV_ERROR)
 	    x_status = XERR;
 

@@ -1,0 +1,6 @@
+images,s,a,,,,List of images to be fixed
+masks,s,a,,,,List of bad pixel masks
+linterp,s,h,"INDEF",,,Mask values for line interpolation
+cinterp,s,h,"INDEF",,,Mask values for column interpolation
+verbose,b,h,no,,,Verbose output?
+pixels,b,h,no,,,List pixels?

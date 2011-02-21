@@ -67,6 +67,9 @@ begin
 
 	} else {
 
+	    # Save the analytic function for the new fit.
+	    call strcpy (Memc[fstr], DP_FUNCTION(dao), SZ_LINE)
+
 	    # Initialize the parameters.
 	    call dp_reinit (dao)
 
@@ -259,7 +262,7 @@ begin
 	call amovr (Memr[DP_PXCEN(psf)], Memr[ixtmp], DP_PNUM(psf))
 	call amovr (Memr[DP_PYCEN(psf)], Memr[iytmp], DP_PNUM(psf))
 	call amovr (Memr[DP_PH(psf)], Memr[ihtmp], DP_PNUM(psf))
-	call amovi (Memi[DP_PSAT(psf)], Memr[istmp], DP_PNUM(psf))
+	call amovi (Memi[DP_PSAT(psf)], Memi[istmp], DP_PNUM(psf))
 	ofactor = dp_profile (DP_PSFUNCTION(psffit), 0.0, 0.0,
 	    Memr[DP_PSFPARS(psffit)], dhdxc, dhdyc, junk, 0)
 

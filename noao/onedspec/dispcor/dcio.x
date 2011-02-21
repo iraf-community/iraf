@@ -18,7 +18,7 @@ define	DC_NAPS		Memi[$1+6]	# Number of apertures
 define  DC_OFFSET       Memi[$1+7]      # Aperture to order offset
 define  DC_SLOPE        Memi[$1+8]      # Aperture to order slope
 define  DC_COEFFS       Memi[$1+9]      # Dispersion coefficients
-define  DC_SHIFT        Memr[$1+10]      # Dispersion function shift
+define  DC_SHIFT        Memr[P2R($1+10)]# Dispersion function shift
 
 
 # DC_OPEN    -- Initialize the dispersion data structures

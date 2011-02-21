@@ -33,7 +33,7 @@ The number of points
 Reduced chi-squared of the fit.
 .le
 .ls errors
-Array of standard deviations of the equivalent power series coefficents.
+Array of standard deviations of the equivalent power series coefficients.
 .le
 .ih
 DESCRIPTION

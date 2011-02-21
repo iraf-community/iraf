@@ -363,8 +363,7 @@ begin
 		    diff = pixels[k,j] - cveval (cv, Memr[rtemp+k-1])
 		    if (diff >= locut && diff <= hicut)
 			next
-		    call cvrject (cv, Memr[rtemp+k-1], pixels[k,j], 1.0,
-			WTS_UNIFORM)
+		    call cvrject (cv, Memr[rtemp+k-1], pixels[k,j], 1.0)
 		    nreject = nreject + 1
 		    Memr[ptr+k-1] = 0.0
 		}

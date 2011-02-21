@@ -1,8 +1,18 @@
 # Help directory for the UTILITIES package.
 
-$defdir	= "pkg$utilities/"
-$doc = "./doc/"
+$defdir	 = "pkg$utilities/"
+$nttools = "pkg$utilities/nttools/"
+$doc     = "./doc/"
 
+
+nttools         men=nttools$nttools.men,
+                hlp=..,
+                sys=nttools$nttools.hlp,
+                pkg=nttools$nttools.hd,
+                src=nttools$nttools.cl
+
+
+bases           hlp=doc$bases.hlp,      src=bases.cl
 curfit		hlp=doc$curfit.hlp,	src=t_curfit.x
 detab		hlp=doc$detab.hlp,	src=detab.x
 entab		hlp=doc$entab.hlp,	src=entab.x

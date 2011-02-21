@@ -1,0 +1,65 @@
+
+# Update the newdisp library.
+# Author: B.Simon 26-SEP-90
+
+$set XFLAGS = "-fgq $(XFLAGS)"
+$call default
+$exit
+
+debug:
+	$set XFLAGS = "-fgq $(XFLAGS)"
+	$call default
+	;
+
+strip:
+	$delete newdisp.a
+	$call default
+	;
+
+update:
+default:
+	$checkout newdisp.a ../../
+	$update   newdisp.a
+	$checkin  newdisp.a ../../
+	;
+
+newdisp.a:
+	addch.x		<curses.h>
+	addstr.x	<ctype.h>  <curses.h>  "window.h"  "window.com"
+	bindstruct.x	<curses.h>  "window.h"  "window.com"
+	box.x		<curses.h>  "window.h"  "window.com"
+	clear.x		<curses.h>  "window.h"  "window.com"
+	clearok.x	"window.h"  "window.com"
+	clrtobot.x	<curses.h>  "window.h"  "window.com"
+	clrtoeol.x	<curses.h>  "window.h"  "window.com"
+	delch.x		<curses.h>  "window.h"  "window.com"
+	deleteln.x	<curses.h>  "window.h"  "window.com"
+	delwin.x	<curses.h>  "window.h"  "window.com"
+	echo.x		"window.h"  "window.com"
+	endwin.x	"window.h"  "window.com"
+	erase.x		<curses.h>  "window.h"  "window.com"
+	freescreen.x
+	getch.x		<curses.h>  "window.h"  "window.com"
+	getscreen.x	<curses.h>
+	getstr.x	<curses.h>  "window.h"  "window.com"
+	getstruct.x	<curses.h>  "window.h"  "window.com"
+	getyx.x		"window.h"  "window.com"
+	hidewin.x	<curses.h>  "window.h"  "window.com"
+	inch.x		<curses.h>  "window.h"  "window.com"
+	initscr.x	<curses.h>  "window.h"  "window.com"
+	insch.x		<curses.h>  "window.h"  "window.com"
+	insertln.x	<curses.h>  "window.h"  "window.com"
+	leaveok.x	"window.h"  "window.com"
+	move.x		<curses.h>  "window.h"  "window.com"
+	mvwin.x		<curses.h>  "window.h"  "window.com"
+	newwin.x	<curses.h>  "window.h"  "window.com"
+	putscreen.x	<curses.h>
+	refresh.x	<curses.h>  "window.h"  "window.com"
+	savewin.x	"window.h"  "window.com"
+	scrollok.x	"window.h"  "window.com"
+	showwin.x	<curses.h>  "window.h"  "window.com"
+	standout.x	<curses.h>  "window.h"  "window.com"
+	wdimen.x	<curses.h>  "window.h"  "window.com"
+	winstat.x	<curses.h>  "window.h"  "window.com"
+	wslide.x	<curses.h>  
+	;

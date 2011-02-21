@@ -1,10 +1,11 @@
-.help "defpac,defpar,deftask" Feb86 language
+.help "defpac,defpar,deftask,defvar" Feb86 language
 .ih
 NAME
 .nf
 defpac  -- test if the named package is defined
 deftask -- test if the named task is defined
 defpar  -- test if the named parameter is defined
+defvar  -- test if the named environment variable is defined
 .fi
 .ih
 USAGE
@@ -12,6 +13,7 @@ USAGE
 defpac  (pacname)
 deftask (taskname)
 defpar  (param)
+defvar  (variable)
 .fi
 .ih 
 PARAMETERS
@@ -26,6 +28,9 @@ An IRAF taskname.  It may be specified as "taskname" or as
 An IRAF parameter name.  It may be specified as "paramname",
 "taskname.paramname" or "packagename.taskname.paramname".
 .le
+.ls variable
+An environment variable name.  It may be specified as "varname".
+.le
 .ih
 DESCRIPTION
 These routines return a boolean value indicating whether the
@@ -36,7 +41,9 @@ declaration is input to the CL.  A parameter becomes defined when the
 task to which it belongs is defined; the task need not be currently
 executing for its parameters to be defined.  When a package is exited,
 e.g., after entry of the \fIbye\fR command, all the task and parameter
-declarations for the package are discarded.
+declarations for the package are discarded.  Environment variables may
+be either in the host environment, or in the CL environment as a result
+of a \fIset\fR or \fIreset\fR statement.
 .ih
 EXAMPLES
 1. Test if a task exists.
@@ -60,6 +67,15 @@ exists (the example is for a script).
 	    if (defpar (parname)
 		sum += parname
 	}
+.fi
+
+3. Checked whether the 'IRAFARCH' environment variable is defined.
+
+.nf
+	cl> if (defvar("IRAFARCH")) {
+	>>>    print ("IRAFARCH is " // envget("IRAFARCH")
+	>>> }
+	>>> ;
 .fi
 .ih
 SEE ALSO

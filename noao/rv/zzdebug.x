@@ -283,16 +283,6 @@ begin
 end
 
 
-procedure zz_msg(str)
-char	str[SZ_LINE]
-
-begin
-	call eprintf ("%s\n")
-	     call pargstr(str)
-	call flush(STDERR)
-end
-
-
 procedure zz_pause(str)
 char 	str[ARB]
 

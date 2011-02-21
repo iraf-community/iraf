@@ -3,6 +3,10 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
 #include <pwd.h>
 
 #ifdef SOLARIS
@@ -530,7 +534,7 @@ make_label()
 	char	hostname[32];
 	char	username[32];
 	struct	passwd *pw;
-	long	clock;
+	time_t	clock;
 
 #ifdef SOLARIS
 	sysinfo (SI_HOSTNAME, hostname, 32);

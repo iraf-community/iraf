@@ -156,7 +156,7 @@ database.
 .nh
 Conceptual Design
     
-    The DBIO database faciltities shall be based upon the relational model.
+    The DBIO database facilities shall be based upon the relational model.
 The relational model is preferred due to its simplicity (to the user)
 and due to the demonstrable fact that relational databases can efficiently
 handle large amounts of data.  In the relational model the database appears
@@ -541,7 +541,7 @@ To minimize buffer space and memory to memory copies when accessing a
 relation it is desirable to work directly out of the FIO buffers.
 To make this possible records will not be permitted to straddle logical
 block boundaries.  A file block will typically contain several records
-followed by a gap.  The gap may be used to accomodate record expansion
+followed by a gap.  The gap may be used to accommodate record expansion
 without moving a record to EOF.  The size of a file block is fixed when
 the relation is created.
 

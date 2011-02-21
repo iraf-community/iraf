@@ -8,5 +8,5 @@ sharplo,r,h,.2,,,Lower bound on sharpness for feature detection
 sharphi,r,h,1.0,,,Upper bound on sharpness for  feature detection
 roundlo,r,h,-1.0,,,Lower bound on roundness for feature detection
 roundhi,r,h,1.0,,,Upper bound on roundness for feature detection
-mkdetections,b,h,no,,,Mark detections on the image display ?
+mkdetections,b,h,no,,,Mark detections on the image display?
 mode,s,h,'ql'

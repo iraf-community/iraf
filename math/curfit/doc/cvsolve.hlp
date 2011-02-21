@@ -28,7 +28,7 @@ without fitting the data.
 DESCRIPTION
 CVSOLVE call two routines CVCHOFAC and CVCHOSLV. CVCHOFAC computes the
 Cholesky factorization of the data matrix. CVCHOSLV solves for the
-coefficents of the fitting function by forward and back substitution.
+coefficients of the fitting function by forward and back substitution.
 An error code is returned by CVSOLVE if it is unable to solve the normal
 equations as formulated.
 .ih

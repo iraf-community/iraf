@@ -71,13 +71,17 @@ begin
 	# otherwise use the IMIO buffers.
 
 	if (!aligned || grow >= 1.) {
-	    do i = 1, nimages
+	    do i = 1, nimages {
 		call salloc (Memi[dbuf+i-1], npts, TY_PIXEL)
+		call aclr$t (Mem$t[Memi[dbuf+i-1]], npts)
+	    }
 	} else {
 	    do i = 1, nimages {
 		im = xt_opix (in[i], i, 1)
-		if (im != in[i])
+		if (im != in[i]) {
 		    call salloc (Memi[dbuf+i-1], npts, TY_PIXEL)
+		    call aclr$t (Mem$t[Memi[dbuf+i-1]], npts)
+		}
 	    }
 	    call amovki (NULL, Memi[dbuf], nimages)
 	}
@@ -199,14 +203,15 @@ int	npts			# Number of points per output line
 int	i, ext, ctor(), errcode()
 real	r, imgetr()
 pointer	sp, fname, imname, v1, v2, v3, work
-pointer	outdata, buf, nm, pms
+pointer	outdata, buf, nmod, nm, pms
 pointer	immap(), impnli()
 $if (datatype == sil)
 pointer	impnlr(), imgnlr()
 $else
 pointer	impnl$t(), imgnl$t
 $endif
-errchk	immap, ic_scale, imgetr, ic_grow, ic_grow$t, ic_rmasks, ic_gdata$t
+errchk	immap, ic_scale, imgetr, ic_grow, ic_grow$t, ic_rmasks, ic_emask
+errchk	ic_gdata$t
 
 include	"../icombine.com"
 data	ext/0/
@@ -226,7 +231,7 @@ begin
 
 	# Set combine parameters
 	switch (combine) {
-	case AVERAGE, SUM:
+	case AVERAGE, SUM, QUAD, NMODEL:
 	    if (dowts)
 		keepids = true
 	    else
@@ -236,6 +241,46 @@ begin
 	    keepids = false
 	}
 	docombine = true
+
+	# Get noise model parameters.
+	if (combine==NMODEL) {
+	    call salloc (nmod, 3*nimages, TY_REAL)
+	    i = 1
+	    if (ctor (Memc[rdnoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)] = r
+	    } else {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)] = imgetr (in[i], Memc[rdnoise])
+	    }
+	    i = 1
+	    if (ctor (Memc[gain], i, r) > 0) {
+		do i = 1, nimages {
+		    Memr[nmod+3*(i-1)+1] = r * scales[i]
+		    Memr[nmod+3*(i-1)] =
+			max ((Memr[nmod+3*(i-1)] / Memr[nmod+3*(i-1)+1]) ** 2,
+			1e4 / MAX_REAL)
+		}
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[gain])
+		    Memr[nmod+3*(i-1)+1] = r * scales[i]
+		    Memr[nmod+3*(i-1)] =
+			max ((Memr[nmod+3*(i-1)] / Memr[nmod+3*(i-1)+1]) ** 2,
+			1e4 / MAX_REAL)
+		}
+	    }
+	    i = 1
+	    if (ctor (Memc[snoise], i, r) > 0) {
+		do i = 1, nimages
+		    Memr[nmod+3*(i-1)+2] = r
+	    } else {
+		do i = 1, nimages {
+		    r = imgetr (in[i], Memc[snoise])
+		    Memr[nmod+3*(i-1)+2] = r
+		}
+	    }
+	}
 
 	# Set rejection algorithm specific parameters
 	switch (reject) {
@@ -320,6 +365,10 @@ begin
 		call salloc (id[i], npts, TY_INT)
 	}
 
+        # Reduce header memory use.
+	do i = 1, nimages
+	    call xt_minhdr (i)
+
 	$if (datatype == sil)
 	while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 	    call ic_gdata$t (in, out, dbuf, d, id, n, m, lflag, offsets,
@@ -364,6 +413,12 @@ begin
 		    case SUM:
 			call ic_average$t (d, id, n, wts, nimages, npts,
 			    YES, NO, Memr[outdata])
+		    case QUAD:
+			call ic_quad$t (d, id, n, wts, nimages, npts,
+			    YES, YES, Memr[outdata])
+		    case NMODEL:
+			call ic_nmodel$t (d, id, n, Memr[nmod], wts,
+			    nimages, npts, YES, YES, Memr[outdata])
 		    }
 		}
 	    }
@@ -453,6 +508,12 @@ begin
 		    case SUM:
 			call ic_average$t (d, id, n, wts, nimages, npts,
 			    YES, NO, Mem$t[outdata])
+		    case QUAD:
+			call ic_quad$t (d, id, n, wts, nimages, npts,
+			    YES, YES, Mem$t[outdata])
+		    case NMODEL:
+			call ic_nmodel$t (d, id, n, Memr[nmod], wts,
+			    nimages, npts, YES, YES, Mem$t[outdata])
 		    }
 		}
 	    }
@@ -567,6 +628,12 @@ begin
 		case SUM:
 		    call ic_average$t (d, id, n, wts, nimages, npts,
 		        NO, NO, Memr[outdata])
+		case QUAD:
+		    call ic_quad$t (d, id, n, wts, nimages, npts,
+		        NO, YES, Memr[outdata])
+		case NMODEL:
+		    call ic_nmodel$t (d, id, n, Memr[nmod], wts,
+		        nimages, npts, NO, YES, Memr[outdata])
 		}
 
 		if (out[2] != NULL) {
@@ -634,6 +701,12 @@ begin
 		case SUM:
 		    call ic_average$t (d, id, n, wts, nimages, npts,
 		        NO, NO, Mem$t[outdata])
+		case QUAD:
+		    call ic_quad$t (d, id, n, wts, nimages, npts,
+		        NO, YES, Mem$t[outdata])
+		case NMODEL:
+		    call ic_nmodel$t (d, id, n, Memr[nmod], wts,
+		        nimages, npts, NO, YES, Mem$t[outdata])
 		}
 
 		if (out[2] != NULL) {

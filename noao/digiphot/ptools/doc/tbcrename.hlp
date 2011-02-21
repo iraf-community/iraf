@@ -33,7 +33,7 @@ EXAMPLES
 
 1. For the list of ST tables in tablelist, rename the columns "MAG,MERR"
 to "MAG[1],MERR[1]". Note the use of '\' to escape the pattern matching
-metacharacter '['.
+meta-character '['.
 
 .nf
    pt> tbcrename @tablelist "MAG,MERR" "MAG\[1],MERR\[1]"

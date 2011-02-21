@@ -110,7 +110,7 @@ file name comes from the image header keyword BPM.
 .ls maskvalue = 0
 Mask value used with the \fImasktype\fR parameter.  If the mask type
 selects good or bad bits the value may be specified using IRAF notation
-for decimal, octal, or hexidecimal; i.e 12, 14b, 0cx to select bits 3
+for decimal, octal, or hexadecimal; i.e 12, 14b, 0cx to select bits 3
 and 4.
 .le
 .ls blank = 0.
@@ -373,7 +373,7 @@ where we assume the second dimension has zero offsets.
 
 The offsets need not have zero for one of the images.  The offsets may
 include negative values or refer to some arbitrary common point.
-When the offsets are read by the program it will find the mininum
+When the offsets are read by the program it will find the minimum
 value in each dimension and subtract it from all the other offsets
 in that dimension.  The above example could also be specified as:
 
@@ -383,7 +383,7 @@ in that dimension.  The above example could also be specified as:
 	245 15
 .fi
 
-There may be cases where one doesn't want the mininum offsets reset
+There may be cases where one doesn't want the minimum offsets reset
 to zero.  If all the offsets are positive and the comment "# Absolute"
 appears in the offset file then the images will be combined with
 blank values between the first output pixel and the first overlapping
@@ -657,7 +657,7 @@ the sigmas are computed for each pixel from each image using the
 same estimated true value.
 
 If the images are scaled and shifted and the \fIsigscale\fR threshold
-is exceeded then a sigma is computed for each pixel based on the
+is exceedd then a sigma is computed for each pixel based on the
 image scale parameters; i.e. the median or average is scaled to that of the
 original image before computing the sigma and residuals.
 
@@ -754,7 +754,7 @@ rejected or the number of remaining input values falls below three.  Note
 that the proportionality factor is not recomputed after rejections.
 
 If the images are scaled differently and the sigma scaling correction
-threshold is exceeded then a correction is made in the sigma
+threshold is exceedd then a correction is made in the sigma
 calculations for these differences, again under the assumption that
 the noise in an image scales as the square root of the mean intensity.
 

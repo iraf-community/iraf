@@ -1,7 +1,7 @@
 .help quadsplit Aug01 noao.imred.quadred
 .ih
 NAME
-quadsplit -- Split quadformat data into single amplifer images
+quadsplit -- Split quadformat data into single amplifier images
 .ih
 USAGE
 quadsplit input

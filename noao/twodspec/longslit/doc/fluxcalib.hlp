@@ -55,7 +55,7 @@ It is possible to flux calibrate images which are binned in logarithmic
 wavelength intervals.  The point to note is that the units of the flux
 calibrated image will be the same.  Therefore, rebinning to linear
 wavelength coordinates requires only interpolation and not flux conservation.
-When extracting standard stars from logarithmicly bin spectra for determination
+When extracting standard stars from logarithmicaly bin spectra for determination
 of a flux calibration it is necessary to rebin the extracted one dimensional
 spectra to linear wavelength (required by \fBonedspec\fR) conserving
 flux so that the instrumental counts are preserved.

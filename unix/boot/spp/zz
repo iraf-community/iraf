@@ -1,8 +1,0 @@
-gcc -c -g -O -DLINUX -DREDHAT -DPOSIX -DSYSV -w -Wunused xc.c
-gcc -g xc.o  \
-    /iraf/irafnet/iraf/unix/hlib/libboot_p.a \
-    /iraf/irafnet/iraf/lib/libsys_p.a  \
-    /iraf/irafnet/iraf/lib/libvops_p.a \
-    /iraf/irafnet/iraf/unix/hlib/libos_p.a  -o xc.e
-mv -f xc.e ../../bin.redhat
-

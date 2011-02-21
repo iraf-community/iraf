@@ -24,7 +24,7 @@ begin
 	    return
 
 	if (dflag == D_ALL) {
-	    n1 = n[1]
+	    n1 = max (0, n[1])
 	    nlow = flow * n1 + 0.001
 	    nhigh = fhigh * n1 + 0.001
 	    ncombine = n1 - nlow -  nhigh
@@ -35,7 +35,7 @@ begin
 
 	do i = 1, npts {
 	    i1 = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (dflag == D_MIX) {
 		nlow = flow * n1 + 0.001
 		nhigh = fhigh * n1 + 0.001
@@ -184,7 +184,7 @@ begin
 	    return
 
 	if (dflag == D_ALL) {
-	    n1 = n[1]
+	    n1 = max (0, n[1])
 	    nlow = flow * n1 + 0.001
 	    nhigh = fhigh * n1 + 0.001
 	    ncombine = n1 - nlow -  nhigh
@@ -195,7 +195,7 @@ begin
 
 	do i = 1, npts {
 	    i1 = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (dflag == D_MIX) {
 		nlow = flow * n1 + 0.001
 		nhigh = fhigh * n1 + 0.001
@@ -344,7 +344,7 @@ begin
 	    return
 
 	if (dflag == D_ALL) {
-	    n1 = n[1]
+	    n1 = max (0, n[1])
 	    nlow = flow * n1 + 0.001
 	    nhigh = fhigh * n1 + 0.001
 	    ncombine = n1 - nlow -  nhigh
@@ -355,7 +355,7 @@ begin
 
 	do i = 1, npts {
 	    i1 = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (dflag == D_MIX) {
 		nlow = flow * n1 + 0.001
 		nhigh = fhigh * n1 + 0.001
@@ -504,7 +504,7 @@ begin
 	    return
 
 	if (dflag == D_ALL) {
-	    n1 = n[1]
+	    n1 = max (0, n[1])
 	    nlow = flow * n1 + 0.001
 	    nhigh = fhigh * n1 + 0.001
 	    ncombine = n1 - nlow -  nhigh
@@ -515,7 +515,7 @@ begin
 
 	do i = 1, npts {
 	    i1 = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (dflag == D_MIX) {
 		nlow = flow * n1 + 0.001
 		nhigh = fhigh * n1 + 0.001
@@ -642,3 +642,4 @@ begin
 	if (dflag == D_ALL && npairs + nlow + nhigh > 0)
 		dflag = D_MIX
 end
+

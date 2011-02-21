@@ -1,22 +1,23 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
- */
+*/
 
 #define	import_spp
 #define	import_libc
 #define	import_ctype
 #include <iraf.h>
 
+
 /* ATOL -- Ascii to long integer.  Convert a simple integer in decimal radix to
- * a binary long integer value.
- */
+** a binary long integer value.
+*/
 long
-atol (str)
-char	*str;
+atol (char *str)
 {
 	register char	*ip = str;
 	register int	ch;
 	register long	lval;
 	int	neg;
+
 
 	if (*str == EOS)
 	    return (0);

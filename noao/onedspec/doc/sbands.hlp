@@ -52,7 +52,7 @@ the bandpasses, and column headings?
 DESCRIPTION
 \fBSbands\fR performs bandpass spectrophotometry with one or more bandpasses
 on one or more spectra.  A list of input spectra is specified.  The spectra
-may be of any type acceptible in the \fBnoao.onedspec\fR package including
+may be of any type acceptable in the \fBnoao.onedspec\fR package including
 multispec format with nonlinear dispersion, long slit spectra, and even
 3D cubes with one dispersion axis.  The \fIapertures\fR parameter allows
 selecting a subset of the spectra by aperture number.
@@ -93,7 +93,7 @@ using the formula
 
 where \fImagzero\fR is a parameter for the zero point magnitude and log10
 is the base 10 logarithm.  Note that there is no attempt to deal with the
-pixel flux units.  This is the responsiblity of the user.
+pixel flux units.  This is the responsibility of the user.
 
 If there is only one bandpass (on one line of the band file) then only
 the band flux or magnitude is reported.  If there are two bandpasses
@@ -106,7 +106,7 @@ first bandpass.  The special bandpass identification "cont" will
 be reported.
 
 The equivalent width is obtained from the two bandpasses by the
-formala
+formula
 
 .nf
     eq. width = (1 - flux1 / flux2) * width1
@@ -159,7 +159,7 @@ the bandpass file.
 	     oned(1)    test   44.33
 .fi
 
-2.  This example shows measurments on a long slit spectrum with an
+2.  This example shows measurements on a long slit spectrum with an
 aperture selection and magnitude output.
 
 .nf

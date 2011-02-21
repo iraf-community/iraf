@@ -49,3 +49,8 @@ $CC -c $HSI_CF	sgi2xbm.c
 $CC $HSI_LF	sgi2xbm.o $HSI_LIBS -o sgi2xbm.e
 mv -f		sgi2xbm.e ../../hlib
 rm		sgi2xbm.o
+
+$CC -c $HSI_CF	sgi2svg.c
+$CC $HSI_LF	sgi2svg.o $HSI_LIBS -o sgi2svg.e
+mv -f		sgi2svg.e ../../hlib
+rm		sgi2svg.o

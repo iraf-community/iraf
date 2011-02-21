@@ -1,6 +1,23 @@
 .help revisions Jan90 noao.digiphot.daophot
 .nf
 
+daophot/psf/dpfitpsf.x
+    The ":function <func>" command was not saving the new functon when
+    refitting with the 'f' keystroke.  In dp_fitpsf() the parameters are
+    reinitialized and the startup function was being reused. (4/13/10, MJF)
+
+daophot/psf/dpfitpsf.x
+    An amovi() call referenced a Memr[] array that was declared as
+    int, changed to Memi[]  (8/28/09, MJF)
+
+daophot/*.par
+    Minor changes for readability suggested by Jason Quinn, i.e. made
+    consistent use of space before question marks (12/23/08, MJF)
+
+daophot/lib/warning.dat
+    Added some blank lines for readability before the package menu 
+    (12/11/08, MJF)
+
 =======
 V2.14.1
 =======

@@ -1,0 +1,44 @@
+# Make the VOLUMES tasks.
+
+$call	relink
+$exit
+
+update:
+	$call relink
+	$call install
+	;
+
+relink:
+	$set	LIBS = "-lxtools"
+	$update	libpkg.a
+	$omake	x_vol.x
+	$link	x_vol.o libpkg.a $(LIBS) -o xx_vol.e
+	;
+
+install:
+	$move	xx_vol.e bin$x_vol.e
+	;
+
+tfiles:
+	$ifolder (vtransmit.x, vtransmit.gx)
+	    $generic -k vtransmit.gx -o vtransmit.x		$endif
+	$ifolder (imjoin.x, imjoin.gx)
+	    $generic -k imjoin.gx -o imjoin.x			$endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+
+	t_pvol.x	<ctype.h> <imhdr.h> pvol.h
+	vproject.x	<math.h> <imhdr.h> pvol.h
+	vmatrix.x	<imhdr.h> pvol.h
+	vtransmit.x	<imhdr.h> pvol.h
+	vgetincr.x	pvol.h
+	pv_gmem.x	<imhdr.h>
+	t_imjoin.x	<imhdr.h> <error.h> <syserr.h>
+	imjoin.x	<imhdr.h>
+	imminmax.x	<imhdr.h>
+	@im3dtran
+	@i2sun
+	;
+

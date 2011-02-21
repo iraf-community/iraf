@@ -4,7 +4,7 @@ NAME
 skysep -- Compute arc separation of two RA/Dec values
 .ih
 SYNOPSIS
-Given to RA/Dec value pairs the spherical separation is computed.  This
+Given two RA/Dec value pairs the spherical separation is computed.  This
 task can be used in scripts and has both text and parameter output.
 .ih
 USAGE	
@@ -14,7 +14,7 @@ PARAMETERS
 .ls ra1, dec1, ra2, dec2
 The RA and Dec of two points on the sky for which a separation is to be
 computed.  The RA may be in hours or degrees and the Dec is in degrees.
-The values may be in decimal or sexigesimal format.
+The values may be in decimal or sexagesimal format.
 .le
 .ls raunit = "hr"
 Units for right ascension.  The value "hr" selects hours and "deg"

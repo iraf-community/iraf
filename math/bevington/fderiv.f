@@ -24,6 +24,9 @@ c      evaluates the fitting function for the ith term
 c
 	subroutine fderiv (x,i,a,deltaa,nterms,deriv)
 	dimension x(1),a(1),deltaa(1),deriv(1)
+        real FUNCTN
+        external FUNCTN
+
 11	do 18 j=1,nterms
 	aj=a(j)
 	delta=deltaa(j)

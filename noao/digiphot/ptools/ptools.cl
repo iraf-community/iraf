@@ -1,20 +1,6 @@
 # Package script task for the PTOOLSX package.
 #{ PTOOLSX -- Photometry tools package.
 
-if (! defpac ("tables")) {
-    if (deftask ("tables")) {
-        if (defpar ("tables.motd")) {
-	    tables.motd = no
-	    tables
-        } else {
-            tables
-        }
-    } else {
-        type "ptools$lib/warning.dat"
-    }
-}
-
-;
 
 package ptools
 

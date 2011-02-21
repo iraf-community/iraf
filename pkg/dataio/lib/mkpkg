@@ -7,6 +7,6 @@ $exit
 
 libpkg.a:
 	addcards.x	
-	getdatatype.x	
-	ranges.x	<ctype.h> <mach.h>
+	#getdatatype.x	
+	#ranges.x	<ctype.h> <mach.h>
 	;

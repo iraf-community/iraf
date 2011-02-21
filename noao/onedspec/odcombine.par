@@ -47,7 +47,7 @@ gain,s,h,"1.",,,ccdclip: CCD gain (electrons/DN)
 snoise,s,h,"0.",,,ccdclip: Sensitivity noise (fraction)
 sigscale,r,h,0.1,0.,,Tolerance for sigma clipping scaling corrections
 pclip,r,h,-0.5,,,pclip: Percentile clipping parameter
-grow,r,h,0.,0.,,"Radius (pixels) for neighbor rejection
+grow,r,h,0.,0.,,"Radius for neighbor rejection
 "
 offsets,f,h,"physical","physical"
 masktype,s,h,"none"

@@ -1,0 +1,113 @@
+.help rgbdisplay Oct92 color
+.ih
+NAME
+rgbdisplay -- display an RGB image
+.ih
+USAGE
+rgbdisplay rgb
+.ih
+PARAMETERS
+.ls rgb
+Image name of the 8-bit RGB dithered composite image to be displayed.
+.le
+.ls frame = 1
+Image display frame.
+.le
+.ih
+DESCRIPTION
+\fBRgbdisplay\fR displays an 8-bit RGB color mapped or dithered image produced
+by the tasks \fBrgbto8\fR or \fBrgbdither\fR.  This task is a simple script
+calling
+the \fBdisplay\fR task with parameters fixed appropriately for the
+images.  The actual display command is:
+
+.nf
+	display rgb frame fill- ztrans=none
+.fi
+
+where rgb and frame are the parameters of this task.
+
+In addition to loading the image with the \fBrgbdisplay\fR task
+it is also necessary to adjust the image display server.  Either
+SAOimage or IMTOOL may be used.  SAOimage is to be prefered because
+it is possible to make some adjustments in the color mapping while with
+IMTOOL one must modify the composite image by varying the z1 and z2
+values for the three images.
+
+Both display servers must be set so that there is no contrast stretching.
+This is how both programs start initially but it may be difficult to return
+to this state if you adjust the contrast with the right mouse button in
+IMTOOL or the contrast adjustments in the (COLOR) menu of SAOimage.
+
+You must first determine where the special color maps are located.
+For the images produced by \fBrgbto8\fR the color map will be in
+the same directory as the image and have the same name with either
+the extension ".sao" or ".imt" depending on the target display server.
+Since the display servers are host programs they require host pathnames.
+
+For the images produced by \fBrgbdither\fR
+you can determine the host pathname for the special color map
+from within IRAF using the command
+
+.nf
+	cl> path colorlib$saorgb.lut
+	puppis!/ursa/iraf/extern/color/lib/saorgb.lut
+
+			or
+
+	cl> path colorlib$imtoolrgb.lut
+	puppis!/ursa/iraf/extern/color/lib/imtoolrgb.lut
+.fi
+
+You can either remember these names (without the node prefix) or
+more simply copy the one you need to your IRAF home directory
+(or any place else you like) with the command
+
+.nf
+	cl> copy colorlib$saorgb.lut home$
+
+			or
+
+	cl> copy colorlib$imtoolrgb.lut home$
+.fi
+
+With SAOimage load the appropriate color map look up table by entering the
+(COLOR) menu, then the (CMAP) menu, and then pushing the (READ) button.
+When you are prompted for the map enter the pathname for the file
+saorgb.lut.  For IMTOOL you need to call up the setup menu and set the
+pathname for the file imtoolrgb.lut in either of the user look up tables
+and then select the appropriate map.
+
+For IMTOOL that is all you can do.  Beware, don't adjust the contrast (the
+right mouse button) since this destroys the mapping between the composite
+image values and the look up table.
+
+In SAOimage there are a couple of things you can do to make adjustments to
+the display.  If you select (GAMMA) in the (COLOR) menu you can then move
+the mouse with a button down and vary the linearity of the color maps.
+This may be used with either of the 8-bit algorithms.
+
+For the pixel dithered images you can also directly manipulate the color
+map.  Bring up the color editor by clicking on the color bar.  Even if you
+don't adjust the look up table this can be instructive.  You can also
+adjust the individual colors by clicking the left (red), middle (green), or
+right (blue) buttons to either move the shown points or add and move points
+in the middle.  Note that the abrupt discontinuity between the colors can
+cause sudden jumps in the color map if one point is moved past the other
+but you can recover by bring the point slowly back.  If the map gets too
+messed up you can always reload the color map.
+.ih
+EXAMPLES
+1.  Display a dithered composite image.
+
+.nf
+	cl> rgbdisplay tucana!/d1/testdata/rgb/trifid8
+	<Load the color map tucana!/d1/testdata/rgb/trifid8.sao or
+	<tucana!/d1/testdata/rgb/trifid8.imt. Because the display
+	<server is a host program you may need to copy the map
+	<first.
+.fi
+.ih
+SEE ALSO
+rgbto8, rgbdither, color.package
+.endhelp

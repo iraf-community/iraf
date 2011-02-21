@@ -9,15 +9,15 @@ match pattern files
 PARAMETERS
 .ls pattern
 The pattern to be matched.  A pattern may contain any of the
-pattern matching \fImetacharacters\fR described below.
+pattern matching \fImeta-characters\fR described below.
 .le
 .ls files
 A template specifying the file or files to be searched.  Omitted if the
 standard input is redirected.
 .le
-.ls metacharacters = yes
-Set to "no" to disable the pattern matching metacharacters, e.g., when
-you want to explicitly match one of the metacharacters as a regular character.
+.ls meta-characters = yes
+Set to "no" to disable the pattern matching meta-characters, e.g., when
+you want to explicitly match one of the meta-characters as a regular character.
 .le
 .ls stop = no
 If \fIstop\fR is enabled, lines with match the pattern are "stopped" (not
@@ -34,7 +34,7 @@ The listed files are searched for the given pattern, copying each line that
 matches to the standard output.  If "stop" is set the action is reversed,
 i.e., all lines are passed on to the output except those which match the
 pattern.  If no files are named text is read from the standard input.
-The pattern matching metacharacters are described in the table below.
+The pattern matching meta-characters are described in the table below.
 
 .nf
 	^		matches the beginning of a line
@@ -46,7 +46,7 @@ The pattern matching metacharacters are described in the table below.
 	[^a-z]		matches any character NOT in the range/set
 	#		matches whitespace
 	{chars}		turns off case sensitivity inside the braces
-	\		used to include a metacharacter in the pattern
+	\		used to include a meta-character in the pattern
 .fi
 
 If more than one file is being searched, each output line is prefixed

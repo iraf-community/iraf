@@ -11,7 +11,7 @@ single dimension. This primarily refers to spectra, but may have
 applicability to time series photometry, or any other
 source of data which can be considered a simple vector.
 All such data will be referred to as spectra in the following discussion.
-Furthermore, the spectrum vector is asssumed to be equally spaced
+Furthermore, the spectrum vector is assumed to be equally spaced
 along the independent variable (wavelength, channel, frequency,
 wavenumber,...). For the purposes of discussion, the independent
 variable will be referred to as wavelength but may be any of the
@@ -142,7 +142,7 @@ will be magtape, direct links from other computers will
 be a likely source of input. The IRAF DATAIO package
 treats magtape as simple bit streams so that alternate
 input devices (e.g. disk, ethernet, phone lines) can also
-be accomodated with no programming modifications.
+be accommodated with no programming modifications.
 
 This section describes the different formats to be made
 available in the initial release of the Spectroscopic
@@ -181,7 +181,7 @@ copy the data to disk for most applications.
 .ih
 PARAMETERS
 .ls 4 fits_source
-The FITS data source.  If the data source is a disk file or an explict tape file
+The FITS data source.  If the data source is a disk file or an explicit tape file
 specification of the form mt*[n] where n is a file number then only that file
 is converted.  If the general tape device name is given, i.e. mta, mtb800, etc,
 then the files specified by the files parameter will be read from the tape.
@@ -495,7 +495,7 @@ set with the blank_value parameter.
 .ih
 PARAMETERS
 .ls 4 text_source
-The input data source. See the defintion of this parameter under FITS.
+The input data source. See the definition of this parameter under FITS.
 .le
 .ls 4 filename
 The IRAF file which will contain the image data if the make_image
@@ -800,7 +800,7 @@ REDUCTION OPERATORS
 
 Most of the reduction operators discussed in this section are
 intended for spectra of the IIDS/IRS class, although they
-are sufficiently general to accomodate data obtained with
+are sufficiently general to accommodate data obtained with
 the CryoCam (either multi-aperture or long-slit mode), Echelle,
 Coude Feed, and photographic (PDS) instruments. Some 
 application to FTS data is also feasible.
@@ -1304,7 +1304,7 @@ wavelength is obtained from the list file(s) created by the
 task MLINID and defined by the parameters mfilename and mfiles. 
 A single preliminary estimate may be applied to a number of
 spectra by specifying a null mfiles string. Otherwise,
-a one-to-one correspondance is assumed between preliminary
+a one-to-one correspondence is assumed between preliminary
 list files and spectra. If the entry for mfilename is also null,
 the linear dispersion relation for the pixel coordinate contained
 in the image header will be used. This provides the option
@@ -1638,7 +1638,7 @@ Otherwise the division will add these variations into the spectrum.
 
 There are basically two aspects to flat fielding spectra. The first
 is the removal of pixel-to-pixel sensitivity variations. The second
-is a more global pattern due to non-uniform illumination and
+is a more global pattern due to non-uniform iillumination and
 spatial and wavelength sensitivity variations across the detector.
 
 The very high frequency pixel-to-pixel variations are easily handled

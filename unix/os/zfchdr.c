@@ -14,12 +14,15 @@ extern	char oscwd[];
  * excluding the trailing "/", in oscwd so that a subsequent call to ZFGCWD
  * will be able to return directory name without a big hassle.
  */
-ZFCHDR (newdir, status)
-PKCHAR	*newdir;
-XINT	*status;
+int
+ZFCHDR (
+  PKCHAR  *newdir,
+  XINT	  *status
+)
 {
 	register char *ip, *op;
 	char	dirname[SZ_PATHNAME];
+
 
 	/* Change pathnames like "a/b/c/" to "a/b/c".
 	 */
@@ -49,4 +52,6 @@ XINT	*status;
 	    for (ip=dirname;  (*op++ = *ip++);  )
 		;
 	}
+
+	return (*status);
 }

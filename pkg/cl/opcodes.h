@@ -16,7 +16,7 @@ struct codeentry {
 	memel c_args;		/* addr of this is addr of first arg	*/
 };
 
-extern int (*opcodetbl[])();
+extern void (*opcodetbl[])();
 
 /* manifest constant opcodes used in c_opcode.
  * value is index into opcodetbl[].

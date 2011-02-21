@@ -5,6 +5,36 @@
 #define	XPP_BADXFILE	102		/* cannot open .x file */
 #define	XPP_SYNTAX	104		/* language error */
 
+
+
+#define F77                     /* Fortran 77 target compiler?          */
+
+#define IRAFLIB         "iraf$lib/"
+#define HOSTLIB         "host$hlib/"
+#define HBIN_INCLUDES   "hbin$arch_includes/"
+
+
+/* Size limiting definitions.
+ */
+#define MAX_TASKS       100     /* max no. of tasks we can handle       */
+#define SZ_OBUF         131072  /* buffers procedure body               */
+#define SZ_DBUF         8192    /* for errchk, common, ect. decls       */
+#define SZ_SBUF         8192    /* buffers text of strings              */
+#define MAX_STRINGS     256     /* max strings in a procedure           */
+#define MAX_INCLUDE     5       /* maximum nesting of includes          */
+#define MIN_REALPREC    7       /* used by HMS                          */
+#define SZ_NUMBUF       32      /* for numeric constants                */
+#define SZ_STBUF        4096    /* text of defined strings              */
+#define MAX_DEFSTR      128     /* max defined strings                  */
+
+#define RUNTASK         "sysruk.x"
+#define OCTAL           8
+#define DECIMAL         10
+#define HEX             16
+#define CHARCON         1
+#define SEXAG           2
+
+
 /* Contexts.
  */
 #define	GLOBAL		01

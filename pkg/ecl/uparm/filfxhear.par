@@ -1,5 +1,0 @@
-fits_file,f,a,"../../ecliptic1.fits",,,"FITS data source"
-format_file,s,h,"",,,"Output format file?"
-long_header,b,h,no,,,"Print long header?"
-count_lines,b,h,no,,,"Long header line number?"
-mode,s,h,"ql",,,

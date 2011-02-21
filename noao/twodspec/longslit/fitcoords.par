@@ -5,8 +5,8 @@ combine,b,h,no,,,Combine input coordinates for a single fit?
 database,f,h,database,,,Database
 deletions,s,h,"deletions.db",,,Deletion list file (not used if null)
 function,s,h,"chebyshev","chebyshev|legendre",,Type of fitting function
-xorder,i,h,6,1,,X order of fitting function
-yorder,i,h,6,1,,Y order of fitting function
+xorder,i,h,6,2,,X order of fitting function
+yorder,i,h,6,2,,Y order of fitting function
 logfiles,f,h,"STDOUT,logfile",,,Log files
 plotfile,f,h,"plotfile",,,Plot log file
 graphics,s,h,"stdgraph",,,Graphics output device

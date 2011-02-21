@@ -70,7 +70,7 @@ EXAMPLES
 the query and capture the results. The aslist task is used  to list
 the supported image surveys and the query and output formats for the selected
 image survey as shown below. The query format tells the user that the input
-ra and dec must be in sexigesimal hours and degrees and in the J2000
+ra and dec must be in sexagesimal hours and degrees and in the J2000
 coordinate system that the size parameter is a radius in minutes.
 
 .nf

@@ -99,6 +99,7 @@
 #define	FPATHNAME	fpathe_
 #define	FPRINTF		fprinf_
 #define	FREDIR		fredir_
+#define	FREDIRO		fredio_
 #define	FSETI		fseti_
 #define	FSTATI		fstati_
 #define	FSTATL		fstatl_

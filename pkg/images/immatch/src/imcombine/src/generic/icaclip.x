@@ -53,12 +53,12 @@ begin
 	# the mean sigma.  Corrections for differences in the image
 	# scale factors are selected by the doscale1 flag.
 
-	nin = n[1]
+	nin = max (0, n[1])
 	s = 0.
 	n2 = 0
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (n1 < 3)
 		next
 
@@ -119,7 +119,7 @@ begin
 
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -283,7 +283,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -310,7 +310,7 @@ real	median[npts]		# Median
 
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 pointer	sp, resid, mp1, mp2
-real	med, low, high, r, s, s1, one
+real	med, low, high, sig, r, s, s1, one
 data	one /1.0/
 
 include	"../icombine.com"
@@ -336,10 +336,10 @@ begin
 
 	s = 0.
 	n2 = 0
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (n1 < 3) {
 		if (n1 == 0)
 		    median[i] = blank
@@ -382,7 +382,7 @@ begin
 
 	# Here is the final sigma.
 	if (n2 > 1)
-	    s = sqrt (s / (n2 - 1))
+	    sig = sqrt (s / (n2 - 1))
 	else {
 	    call sfree (sp)
 	    return
@@ -391,7 +391,7 @@ begin
 	# Compute individual sigmas and iteratively clip.
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -406,11 +406,11 @@ begin
 		n2 = n1
 		n3 = nl + n1 / 2
 
-		if (n1 >= max (MINCLIP, maxkeep+1) && s > 0.) {
+		if (n1 >= max (MINCLIP, maxkeep+1) && sig > 0.) {
 		    if (doscale1) {
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
-			    s1 = s * sqrt (max (one, (med+zeros[l])/scales[l]))
+			    s1 = sig * sqrt (max (one, (med+zeros[l])/scales[l]))
 			    r = (med - Mems[d[nl]+k]) / s1
 			    if (r <= lsigma)
 				break
@@ -419,7 +419,7 @@ begin
 			}
 			for (; nh >= nl; nh = nh - 1) {
 			    l = Memi[m[nh]+k]
-			    s1 = s * sqrt (max (one, (med+zeros[l])/scales[l]))
+			    s1 = sig * sqrt (max (one, (med+zeros[l])/scales[l]))
 			    r = (Mems[d[nh]+k] - med) / s1
 			    if (r <= hsigma)
 				break
@@ -427,8 +427,8 @@ begin
 			    n1 = n1 - 1
 			}
 		    } else {
-			s1 = s * sqrt (max (one, med))
-			for (; nl <= n2; nl = nl + 1) {
+			s1 = sig * sqrt (max (one, med))
+			for (; nl <= nh; nl = nl + 1) {
 			    r = (med - Mems[d[nl]+k]) / s1
 			    if (r <= lsigma)
 				break
@@ -465,7 +465,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -539,7 +539,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -603,12 +603,12 @@ begin
 	# the mean sigma.  Corrections for differences in the image
 	# scale factors are selected by the doscale1 flag.
 
-	nin = n[1]
+	nin = max (0, n[1])
 	s = 0.
 	n2 = 0
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (n1 < 3)
 		next
 
@@ -669,7 +669,7 @@ begin
 
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -833,7 +833,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -860,7 +860,7 @@ real	median[npts]		# Median
 
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 pointer	sp, resid, mp1, mp2
-real	med, low, high, r, s, s1, one
+real	med, low, high, sig, r, s, s1, one
 data	one /1.0/
 
 include	"../icombine.com"
@@ -886,10 +886,10 @@ begin
 
 	s = 0.
 	n2 = 0
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (n1 < 3) {
 		if (n1 == 0)
 		    median[i] = blank
@@ -932,7 +932,7 @@ begin
 
 	# Here is the final sigma.
 	if (n2 > 1)
-	    s = sqrt (s / (n2 - 1))
+	    sig = sqrt (s / (n2 - 1))
 	else {
 	    call sfree (sp)
 	    return
@@ -941,7 +941,7 @@ begin
 	# Compute individual sigmas and iteratively clip.
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -956,11 +956,11 @@ begin
 		n2 = n1
 		n3 = nl + n1 / 2
 
-		if (n1 >= max (MINCLIP, maxkeep+1) && s > 0.) {
+		if (n1 >= max (MINCLIP, maxkeep+1) && sig > 0.) {
 		    if (doscale1) {
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
-			    s1 = s * sqrt (max (one, (med+zeros[l])/scales[l]))
+			    s1 = sig * sqrt (max (one, (med+zeros[l])/scales[l]))
 			    r = (med - Memi[d[nl]+k]) / s1
 			    if (r <= lsigma)
 				break
@@ -969,7 +969,7 @@ begin
 			}
 			for (; nh >= nl; nh = nh - 1) {
 			    l = Memi[m[nh]+k]
-			    s1 = s * sqrt (max (one, (med+zeros[l])/scales[l]))
+			    s1 = sig * sqrt (max (one, (med+zeros[l])/scales[l]))
 			    r = (Memi[d[nh]+k] - med) / s1
 			    if (r <= hsigma)
 				break
@@ -977,8 +977,8 @@ begin
 			    n1 = n1 - 1
 			}
 		    } else {
-			s1 = s * sqrt (max (one, med))
-			for (; nl <= n2; nl = nl + 1) {
+			s1 = sig * sqrt (max (one, med))
+			for (; nl <= nh; nl = nl + 1) {
 			    r = (med - Memi[d[nl]+k]) / s1
 			    if (r <= lsigma)
 				break
@@ -1015,7 +1015,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -1089,7 +1089,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1153,12 +1153,12 @@ begin
 	# the mean sigma.  Corrections for differences in the image
 	# scale factors are selected by the doscale1 flag.
 
-	nin = n[1]
+	nin = max (0, n[1])
 	s = 0.
 	n2 = 0
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (n1 < 3)
 		next
 
@@ -1219,7 +1219,7 @@ begin
 
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1383,7 +1383,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1410,7 +1410,7 @@ real	median[npts]		# Median
 
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 pointer	sp, resid, mp1, mp2
-real	med, low, high, r, s, s1, one
+real	med, low, high, sig, r, s, s1, one
 data	one /1.0/
 
 include	"../icombine.com"
@@ -1436,10 +1436,10 @@ begin
 
 	s = 0.
 	n2 = 0
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (n1 < 3) {
 		if (n1 == 0)
 		    median[i] = blank
@@ -1482,7 +1482,7 @@ begin
 
 	# Here is the final sigma.
 	if (n2 > 1)
-	    s = sqrt (s / (n2 - 1))
+	    sig = sqrt (s / (n2 - 1))
 	else {
 	    call sfree (sp)
 	    return
@@ -1491,7 +1491,7 @@ begin
 	# Compute individual sigmas and iteratively clip.
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1506,11 +1506,11 @@ begin
 		n2 = n1
 		n3 = nl + n1 / 2
 
-		if (n1 >= max (MINCLIP, maxkeep+1) && s > 0.) {
+		if (n1 >= max (MINCLIP, maxkeep+1) && sig > 0.) {
 		    if (doscale1) {
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
-			    s1 = s * sqrt (max (one, (med+zeros[l])/scales[l]))
+			    s1 = sig * sqrt (max (one, (med+zeros[l])/scales[l]))
 			    r = (med - Memr[d[nl]+k]) / s1
 			    if (r <= lsigma)
 				break
@@ -1519,7 +1519,7 @@ begin
 			}
 			for (; nh >= nl; nh = nh - 1) {
 			    l = Memi[m[nh]+k]
-			    s1 = s * sqrt (max (one, (med+zeros[l])/scales[l]))
+			    s1 = sig * sqrt (max (one, (med+zeros[l])/scales[l]))
 			    r = (Memr[d[nh]+k] - med) / s1
 			    if (r <= hsigma)
 				break
@@ -1527,8 +1527,8 @@ begin
 			    n1 = n1 - 1
 			}
 		    } else {
-			s1 = s * sqrt (max (one, med))
-			for (; nl <= n2; nl = nl + 1) {
+			s1 = sig * sqrt (max (one, med))
+			for (; nl <= nh; nl = nl + 1) {
 			    r = (med - Memr[d[nl]+k]) / s1
 			    if (r <= lsigma)
 				break
@@ -1565,7 +1565,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -1639,7 +1639,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1703,12 +1703,12 @@ begin
 	# the mean sigma.  Corrections for differences in the image
 	# scale factors are selected by the doscale1 flag.
 
-	nin = n[1]
+	nin = max (0, n[1])
 	s = 0.
 	n2 = 0
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (n1 < 3)
 		next
 
@@ -1769,7 +1769,7 @@ begin
 
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -1933,7 +1933,7 @@ begin
 	# Check if the data flag has to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -1960,7 +1960,7 @@ double	median[npts]		# Median
 
 int	i, j, k, l, id, n1, n2, n3, nl, nh, nin, maxkeep
 pointer	sp, resid, mp1, mp2
-double	med, low, high, r, s, s1, one
+double	med, low, high, sig, r, s, s1, one
 data	one /1.0D0/
 
 include	"../icombine.com"
@@ -1986,10 +1986,10 @@ begin
 
 	s = 0.
 	n2 = 0
-	nin = n[1]
+	nin = max (0, n[1])
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (n1 < 3) {
 		if (n1 == 0)
 		    median[i] = blank
@@ -2032,7 +2032,7 @@ begin
 
 	# Here is the final sigma.
 	if (n2 > 1)
-	    s = sqrt (s / (n2 - 1))
+	    sig = sqrt (s / (n2 - 1))
 	else {
 	    call sfree (sp)
 	    return
@@ -2041,7 +2041,7 @@ begin
 	# Compute individual sigmas and iteratively clip.
 	do i = 1, npts {
 	    k = i - 1
-	    n1 = n[i]
+	    n1 = max (0, n[i])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -2056,11 +2056,11 @@ begin
 		n2 = n1
 		n3 = nl + n1 / 2
 
-		if (n1 >= max (MINCLIP, maxkeep+1) && s > 0.) {
+		if (n1 >= max (MINCLIP, maxkeep+1) && sig > 0.) {
 		    if (doscale1) {
-			for (; nl <= n2; nl = nl + 1) {
+			for (; nl <= nh; nl = nl + 1) {
 			    l = Memi[m[nl]+k]
-			    s1 = s * sqrt (max (one, (med+zeros[l])/scales[l]))
+			    s1 = sig * sqrt (max (one, (med+zeros[l])/scales[l]))
 			    r = (med - Memd[d[nl]+k]) / s1
 			    if (r <= lsigma)
 				break
@@ -2069,7 +2069,7 @@ begin
 			}
 			for (; nh >= nl; nh = nh - 1) {
 			    l = Memi[m[nh]+k]
-			    s1 = s * sqrt (max (one, (med+zeros[l])/scales[l]))
+			    s1 = sig * sqrt (max (one, (med+zeros[l])/scales[l]))
 			    r = (Memd[d[nh]+k] - med) / s1
 			    if (r <= hsigma)
 				break
@@ -2077,8 +2077,8 @@ begin
 			    n1 = n1 - 1
 			}
 		    } else {
-			s1 = s * sqrt (max (one, med))
-			for (; nl <= n2; nl = nl + 1) {
+			s1 = sig * sqrt (max (one, med))
+			for (; nl <= nh; nl = nl + 1) {
 			    r = (med - Memd[d[nl]+k]) / s1
 			    if (r <= lsigma)
 				break
@@ -2115,7 +2115,7 @@ begin
 	    while (n1 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -2189,7 +2189,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -2204,3 +2204,4 @@ begin
 
 	call sfree (sp)
 end
+

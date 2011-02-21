@@ -83,7 +83,7 @@ ctios8			: ctios8!/iraf/iraf/bin.redhat/irafks.e
 cygnus			: cygnus!/local/iraf/bin.sparc/irafks.e
 data			: data!/iraf/iraf/bin.ssun/irafks.e
 defiant			: defiant!/iraf/iraf/bin.ssun/irafks.e
-denali			: denali!/iraf/iraf/bin.redhat/irafks.e
+denali			: denali!/iraf/iraf/bin.linux64/irafks.e
 deneb			: deneb!/local/iraf/iraf/bin.ssun/irafks.e
 draco			: @robur!draco
 driftwood		: driftwood!/iraf/iraf/bin.ssun/irafks.e
@@ -93,7 +93,7 @@ dropbear		: dropbear!/iraf/iraf/bin.redhat/irafks.e
 dtsn1			: dtsn1!/iraf/iraf/bin.redhat/irafks.e
 dynamo dynamo.kpno.noao.edu     : dynamo!/usr/iraf/iraf/bin.sparc/irafks.e
 eagle			: eagle!/iraf/iraf/bin.sparc/irafks.e
-elqui			: elqui!/iraf/iraf/bin.sparc/irafks.e
+elqui			: elqui!/iraf/iraf/bin.redhat/irafks.e
 enzo                    : enzo!/iraf/iraf/bin.ssun/irafks.e
 equuleus		: equuleus!/local/iraf/iraf/bin.ssun/irafks.e
 felis			: felis!/u1/iraf/iraf/bin.rs6000/irafks.e
@@ -169,7 +169,6 @@ pipedevn		: pipedevn!/iraf/iraf/bin.redhat/irafks.e
 pisces pi		: pisces!/iraf/iraf/bin.ssun/irafks.e
 potosi 			: potosi!/iraf/iraf/bin.ssun/irafks.e
 prometheus prometheu    : prometheus!/local/iraf/iraf/bin.ssun/irafks.e
-puppis pu		: puppis!/iraf/iraf/bin.ssun/irafks.e
 pym			: pym!/iraf/iraf/bin.redhat/irafks.e
 radix			: radix!/iraf/iraf/bin.sparc/irafks.e
 rainbow                 : rainbow!/iraf/iraf/bin.sparc/irafks.e
@@ -206,6 +205,7 @@ tarat			: tarat!/iraf/iraf/bin.ssun/irafks.e
 taupe taupe.kpno.noao.edu       : taupe!/usr/iraf/iraf/bin.sparc/irafks.e
 taurus taurus.kpno.noao.edu     : taurus!/usr/iraf/iraf/bin.sparc/irafks.e
 tesla			: tesla!/iraf/iraf/bin.sparc/irafks.e
+tiamat tiamat.tuc.noao.edu	: tiamat!/iraf/iraf/bin.macosx/irafks.e
 tofu			: tofu!/iraf/iraf/bin.ssun/irafks.e
 tribble			: tribble!/iraf/iraf/bin.ssun/irafks.e
 trout			: trout!/iraf/iraf/bin.redhat/irafks.e

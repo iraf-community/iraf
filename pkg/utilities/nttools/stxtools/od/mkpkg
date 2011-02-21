@@ -1,0 +1,15 @@
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+        odget.x         "od.h"
+        odmap.x         <error.h> <imhdr.h> <imio.h> <tbset.h> "od.h"
+        odopep.x        "od.h"
+        odpare.x
+        odput.x         "od.h"
+        odsetn.x        <imhdr.h> "od.h"
+        odunmp.x        "od.h"
+        odwcsn.x        <mwset.h> "od.h"
+        ;

@@ -55,7 +55,7 @@ begin
 	nch_rec = npix_rec * sizeof (ty_spp)
 
 	len_mii = miilen (npix_rec, ty_mii)
-	sz_rec = len_mii * SZ_INT
+	sz_rec = len_mii * SZ_INT32
 
 	if (mii != NULL)
 	    call mfree (mii, TY_INT)

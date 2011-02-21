@@ -27,7 +27,7 @@ errchk	imggsc, imerr, imopsf
 define	retry_ 91
 define	oob_ 92
 define	misaligned_ 93
-include	<szdtype.inc>
+include	<szpixtype.inc>
 data	unit_v /IM_MAXDIM * 1/
 
 begin
@@ -37,7 +37,7 @@ begin
 
 	npix = IM_LEN(im,1)			# read entire line
 	pixtype = IM_PIXTYPE(im)
-	sz_pixel = ty_size[pixtype]
+	sz_pixel = pix_size[pixtype]
 
 	# Perform "zero trip" check (V >= VE), before entering "loop".
 	if (v[ndim] > IM_LEN(im,ndim))
@@ -85,7 +85,7 @@ misaligned_
 		vs[dim] = v[dim]
 		ve[dim] = v[dim]
 	    }
-	    
+
 	    # Get the line.
 	    lineptr = imggsc (im, vs, ve, ndim, dtype, junk)
 	}

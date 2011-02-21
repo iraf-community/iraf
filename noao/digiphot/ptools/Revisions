@@ -1,5 +1,12 @@
 .help revisions Jan90 noao.digiphot.ptools
 .nf
+
+ptools$pconvert/ptdeftable.x
+    pt_kstati() was being declared pointer instead of int (7/13/09, MJF)
+
+ptools$pexamine/ptsetup.x
+    pt_getnames() was declared a pointer instead of int (7/12/09, MJF)
+
 ptools$pconvert/ptconvert.x
 ptools$pconvert/txtools/ptxcalc.x
 ptools$pconvert/txtools/ptxdump.x

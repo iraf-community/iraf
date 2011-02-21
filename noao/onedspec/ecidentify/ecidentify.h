@@ -5,12 +5,12 @@ define	LEN_EC		52		# Length ID structure
 define	EC_IMAGE	Memi[$1]	# Image name (pointer)
 define	EC_MAXFEATURES	Memi[$1+1]	# Maximum number of features
 define	EC_FTYPE	Memi[$1+2]	# Feature type
-define	EC_MINSEP	Memr[$1+3]	# Minimum pixel separation
-define	EC_MATCH	Memr[$1+4]	# Maximum matching separation
-define	EC_FWIDTH	Memr[$1+5]	# Feature width in pixels
-define	EC_CRADIUS	Memr[$1+6]	# Centering radius in pixels
-define	EC_THRESHOLD	Memr[$1+7]	# Centering threshold
-define	EC_ZWIDTH	Memr[$1+8]	# Zoom window width in fit units
+define	EC_MINSEP	Memr[P2R($1+3)]	# Minimum pixel separation
+define	EC_MATCH	Memr[P2R($1+4)]	# Maximum matching separation
+define	EC_FWIDTH	Memr[P2R($1+5)]	# Feature width in pixels
+define	EC_CRADIUS	Memr[P2R($1+6)]	# Centering radius in pixels
+define	EC_THRESHOLD	Memr[P2R($1+7)]	# Centering threshold
+define	EC_ZWIDTH	Memr[P2R($1+8)]	# Zoom window width in fit units
 define	EC_DATABASE	Memi[$1+9]	# Name of database (pointer)
 define	EC_COORDLIST	Memi[$1+10]	# Name of coordinate list (pointer)
 define	EC_LABELS	Memi[$1+11]	# Type of feature labels

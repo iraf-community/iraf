@@ -36,7 +36,7 @@ Fit the curve to an array of data points.
 .ih
 NOTES
 NLVECTOR uses the coefficient array stored in the curfit descriptor
-strucuture.
+structure.
 .ih
 SEE ALSO
 nleval

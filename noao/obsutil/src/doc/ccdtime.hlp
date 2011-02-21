@@ -79,7 +79,7 @@ to define the expected photon/electron count rates.  These rates along with
 a specified seeing and airmass are used to estimate the signal-to-noise
 ratio (SNR) for a stellar observation in each filter.  The output provides
 three results per filter; the exposure time to achieve a desired SNR for a
-given magnitude, the magnitude to achive a desired SNR in a given time, and
+given magnitude, the magnitude to achieve a desired SNR in a given time, and
 the SNR at a specified magnitude and exposure time.  With each of these,
 the number of star photons (or CCD electrons) in an area 1.4 times the
 square of the seeing, the number of sky photons per pixel, and the RMS noise
@@ -97,7 +97,7 @@ include a focal ratio if there are multiple ones), detector name,
 and filter name.  One of the standard files may be used as a template.
 
 The file is actually in free format with whitespace and comments ignored.
-However, following the template formating makes it easy to see the logical
+However, following the template formatting makes it easy to see the logical
 structure.  All lines, except the "end" line which separates the different
 catagories of entries, consist of a keyword an equal sign, and a value
 separated by whitespace.  An entry begins with one of the keywords

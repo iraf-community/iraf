@@ -55,12 +55,13 @@ struct task {
 	char	*ft_out;	/* stdout file for foreign task		*/
 	char	*ft_err;	/* stderr file for foreign task		*/
 	struct ltask *t_ltp;	/* link back to fostering ltask		*/
-	unsigned t_topd,	/* topd when this task was last pushed	*/
+	unsigned XINT
+		t_topd,		/* topd when this task was last pushed	*/
 		t_pc,		/* pc			"		*/
 		t_topos,	/* topos		"		*/
 		t_basos,	/* basos		"		*/
 		t_topcs;	/* topcs		"		*/
-	int	t_envp;		/* environment stack pointer		*/
+	XINT	t_envp;		/* environment stack pointer		*/
 	int	t_pno;		/* mark package load time in prcache	*/
 	struct package *t_curpack;/* curpack		"		*/
 	unsigned t_bascode;	/* base addr of currently running code	*/
@@ -143,7 +144,7 @@ struct ltask {
 	char *lt_lname;		/* name of this logical task		*/
 	union {
 		char *ltu_pname;/* name of this ltask's physical file	*/
-		int (*ltu_f)();	/* function to run for this builtin	*/
+		void (*ltu_f)();/* function to run for this builtin	*/
 	} lt_u;
 	char	*lt_ftprefix;	/* OSCMD command prefix for foreign tsk	*/
 	struct	ltask *lt_nlt;	/* ptr to next ltask in this package	*/

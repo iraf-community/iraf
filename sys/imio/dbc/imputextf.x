@@ -123,7 +123,7 @@ begin
 		    # Copy the string to the output buffer, marking the
 		    # last blank found.
 
-		    do op = 1, LEN_HISTSTR {
+		    for (op=1; op <= LEN_HISTSTR; op=op+1) {
 			if (Memc[ln+ip-1] == lf) {
 			    ip=ip+1
 			}    

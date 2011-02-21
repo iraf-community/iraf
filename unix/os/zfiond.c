@@ -6,9 +6,11 @@
 #include <sys/file.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/un.h>
 #include <netdb.h>
 #include <fcntl.h>
+#include <ctype.h>
 #include <signal.h>
 #include <setjmp.h>
 
@@ -160,102 +162,106 @@ static	int jmpset = 0;
 static	int recursion = 0;
 extern	int errno;
 static	int getstr();
-static	nd_onsig();
+
+static void nd_onsig (int sig, int *arg1, int *arg2);
+
 
 
 /* ZOPNND -- Open a network device.
  */
-ZOPNND (pk_osfn, mode, chan)
-PKCHAR	*pk_osfn;		/* UNIX name of file */
-XINT	*mode;			/* file access mode */
-XINT	*chan;			/* file number (output) */
+int
+ZOPNND (
+  PKCHAR  *pk_osfn,		/* UNIX name of file */
+  XINT	  *mode,			/* file access mode */
+  XINT	  *chan 			/* file number (output) */
+)
 {
 	register int fd;
-	register struct portal *np, *s_np;
-	unsigned short host_port;
-	unsigned long host_addr;
-	char osfn[SZ_NAME*2];
-	char flag[SZ_NAME];
-	char *ip;
+	    register struct portal *np, *s_np = (struct portal *) NULL;
+	    unsigned short host_port = 0;
+	    unsigned long host_addr = 0;
+	    char osfn[SZ_NAME*2];
+	    char flag[SZ_NAME];
+	    char *ip;
 
-	/* Get network device descriptor. */
-	if (!(np = (struct portal *) calloc (1, sizeof(struct portal)))) {
-	    *chan = XERR;
-	    return;
-	}
+	    /* Get network device descriptor. */
+	    if (!(np = (struct portal *) calloc (1, sizeof(struct portal)))) {
+		*chan = XERR;
+		return (XERR);
+	    }
 
-	/* Expand any %d fields in the network address to the UID. */
-	sprintf (osfn, (char *)pk_osfn, getuid(), getuid());
+	    /* Expand any %d fields in the network address to the UID. */
+	    sprintf (osfn, (char *)pk_osfn, getuid(), getuid());
 
-	/* Parse the network filename to determine the domain type and
-	 * network address.
-	 */
-	if (strncmp (osfn, "inet:", 5) == 0) {
-	    /* Internet connection.
+	    /* Parse the network filename to determine the domain type and
+	     * network address.
 	     */
-	    char port_str[SZ_NAME];
-	    char host_str[SZ_NAME];
-	    unsigned short port;
-	    struct servent *sv;
-	    struct hostent *hp;
+	    if (strncmp (osfn, "inet:", 5) == 0) {
+		/* Internet connection.
+		 */
+		char port_str[SZ_NAME];
+		char host_str[SZ_NAME];
+		unsigned short port;
+		struct servent *sv;
+		struct hostent *hp;
 
-	    /* Get port number.  This may be specified either as a service
-	     * name or as a decimal port number.
-	     */
-	    ip = osfn + 5;
-	    if (getstr (&ip, port_str, SZ_NAME, ':') <= 0)
-		goto err;
-	    if (isdigit (port_str[0])) {
-		port = atoi (port_str);
-		host_port = htons (port);
-	    } else if (sv = getservbyname(port_str,"tcp")) {
-		host_port = sv->s_port;
-	    } else
-		goto err;
-
-	    /* Get host address.  This may be specified either has a host
-	     * name or as an Internet address in dot notation.  If no host
-	     * name is specified default to the local host.
-	     */
-	    if (getstr (&ip, host_str, SZ_NAME, ':') <= 0)
-		strcpy (host_str, "localhost");
-	    if (isdigit (host_str[0])) {
-		host_addr = inet_addr (host_str);
-		if ((int)host_addr == -1)
+		/* Get port number.  This may be specified either as a service
+		 * name or as a decimal port number.
+		 */
+		ip = osfn + 5;
+		if (getstr (&ip, port_str, SZ_NAME, ':') <= 0)
 		    goto err;
-	    } else if (hp = gethostbyname(host_str)) {
-		bcopy (hp->h_addr, (char *)&host_addr, sizeof(host_addr));
-	    } else
-		goto err;
+		if (isdigit (port_str[0])) {
+		    port = atoi (port_str);
+		    host_port = htons (port);
+		} else if ((sv = getservbyname(port_str,"tcp"))) {
+		    host_port = sv->s_port;
+		} else
+		    goto err;
 
-	    np->domain = INET;
+		/* Get host address.  This may be specified either has a host
+		 * name or as an Internet address in dot notation.  If no host
+		 * name is specified default to the local host.
+		 */
+		if (getstr (&ip, host_str, SZ_NAME, ':') <= 0)
+		    strcpy (host_str, "localhost");
+		if (isdigit (host_str[0])) {
+		    host_addr = inet_addr (host_str);
+		    if ((int)host_addr == -1)
+			goto err;
+		} else if ((hp = gethostbyname(host_str))) {
+		    bcopy (hp->h_addr, (char *)&host_addr, sizeof(host_addr));
+		} else
+		    goto err;
 
-	} else if (strncmp (osfn, "unix:", 5) == 0) {
-	    /* Unix domain socket connection.
-	     */
-	    ip = osfn + 5;
-	    if (!getstr (&ip, np->path1, SZ_NAME, ':'))
-		goto err;
-	    np->domain = UNIX;
+		np->domain = INET;
 
-	} else if (strncmp (osfn, "sock:", 5) == 0) {
-	    /* Open (accept) a client connection on an existing, open
-	     * server socket.
-	     */
-	    char chan_str[SZ_NAME];
-	    int channel;
+	    } else if (strncmp (osfn, "unix:", 5) == 0) {
+		/* Unix domain socket connection.
+		 */
+		ip = osfn + 5;
+		if (!getstr (&ip, np->path1, SZ_NAME, ':'))
+		    goto err;
+		np->domain = UNIX;
 
-	    /* Get the channel of the server socket. */
-	    ip = osfn + 5;
-	    if (getstr (&ip, chan_str, SZ_NAME, ':') <= 0)
-		goto err;
-	    if (isdigit (chan_str[0]))
-		channel = atoi (chan_str);
-	    else
-		goto err;
+	    } else if (strncmp (osfn, "sock:", 5) == 0) {
+		/* Open (accept) a client connection on an existing, open
+		 * server socket.
+		 */
+		char chan_str[SZ_NAME];
+		int channel;
 
-	    /* Get the server portal descriptor. */
-	    s_np = get_desc(channel);
+		/* Get the channel of the server socket. */
+		ip = osfn + 5;
+		if (getstr (&ip, chan_str, SZ_NAME, ':') <= 0)
+		    goto err;
+		if (isdigit (chan_str[0]))
+		    channel = atoi (chan_str);
+		else
+		    goto err;
+
+		/* Get the server portal descriptor. */
+		s_np = get_desc(channel);
 	    if (!(s_np->flags & F_SERVER))
 		goto err;
 
@@ -535,7 +541,7 @@ XINT	*chan;			/* file number (output) */
 
 	    } else if (np->domain == FIFO) {
 		/* Server side FIFO connection. */
-		int fd1, fd2, keepalive;
+		int fd1=0, fd2=0, keepalive=0;
 
 		/* Create fifos if necessary. */
 		if (access (np->path1, 0) < 0) {
@@ -619,14 +625,15 @@ err:	    free (np);
 	    set_desc(fd,np);
 	    np->channel = fd;
 	}
+
+	return (*chan);
 }
 
 
 /* ZCLSND -- Close a network device.
  */
-ZCLSND (fd, status)
-XINT	*fd;
-XINT	*status;
+int
+ZCLSND (XINT *fd, XINT *status)
 {
 	register struct portal *np = get_desc(*fd);
 	register int flags;
@@ -652,6 +659,8 @@ XINT	*status;
 
 	} else
 	    *status = XERR;
+
+	return (*status);
 }
 
 
@@ -659,11 +668,13 @@ XINT	*status;
  * maxbytes bytes from the file FD into the buffer BUF.  Status is returned
  * in a subsequent call to ZAWTND.
  */
-ZARDND (chan, buf, maxbytes, offset)
-XINT	*chan;			/* UNIX file number */
-XCHAR	*buf;			/* output buffer */
-XINT	*maxbytes;		/* max bytes to read */
-XLONG	*offset;		/* 1-indexed file offset to read at */
+int
+ZARDND (
+  XINT	*chan,			/* UNIX file number */
+  XCHAR	*buf,			/* output buffer */
+  XINT	*maxbytes,		/* max bytes to read */
+  XLONG	*offset 		/* 1-indexed file offset to read at */
+)
 {
 	register int n;
 	int fd = *chan;
@@ -721,6 +732,8 @@ XLONG	*offset;		/* 1-indexed file offset to read at */
 	}
 
 	kfp->nbytes = nbytes;
+
+	return (nbytes);
 }
 
 
@@ -728,11 +741,13 @@ XLONG	*offset;		/* 1-indexed file offset to read at */
  * nbytes bytes from the buffer BUF to the file FD.  Status is returned in a
  * subsequent call to ZAWTND.
  */
-ZAWRND (chan, buf, nbytes, offset)
-XINT	*chan;			/* UNIX file number */
-XCHAR	*buf;			/* buffer containing data */
-XINT	*nbytes;		/* nbytes to be written	 */
-XLONG	*offset;		/* 1-indexed file offset */
+int
+ZAWRND (
+  XINT	*chan,			/* UNIX file number */
+  XCHAR	*buf,			/* buffer containing data */
+  XINT	*nbytes,		/* nbytes to be written	 */
+  XLONG	*offset 		/* 1-indexed file offset */
+)
 {
 	register int fd = *chan;
 	register struct	fiodes *kfp = &zfd[fd];
@@ -790,16 +805,19 @@ XLONG	*offset;		/* 1-indexed file offset */
 	signal (SIGPIPE, sigpipe);
 
 	kfp->nbytes = nwritten;
+
+	return (nwritten);
 }
 
 
 /* ND_ONSIG -- Catch a signal.
  *  */
-static
-nd_onsig (sig, arg1, arg2)
-int     sig;                    /* signal which was trapped     */
-int     *arg1;                  /* not used */
-int     *arg2;                  /* not used */
+static void
+nd_onsig (
+  int     sig,                    /* signal which was trapped     */
+  int     *arg1,                  /* not used */
+  int     *arg2                   /* not used */
+)
 {
         /* If we get a SIGPIPE writing to a server the server has probably
          * died.  Make it look like there was an i/o error on the channel.
@@ -815,25 +833,21 @@ int     *arg2;                  /* not used */
 /* ZAWTND -- "Wait" for an "asynchronous" read or write to complete, and
  * return the number of bytes read or written, or ERR.
  */
-ZAWTND (fd, status)
-XINT	*fd;
-XINT	*status;
+int
+ZAWTND (XINT *fd, XINT *status)
 {
 	if ((*status = zfd[*fd].nbytes) == ERR)
 	    *status = XERR;
+
+	return (*status);
 }
 
 
 /* ZSTTND -- Return file status information for a network device.
  */
-ZSTTND (fd, param, lvalue)
-XINT	*fd;
-XINT	*param;
-XLONG	*lvalue;
+int
+ZSTTND (XINT *fd, XINT *param, XLONG *lvalue)
 {
-	register struct fiodes *kfp = &zfd[*fd];
-	struct	stat filstat;
-
 	switch (*param) {
 	case FSTT_BLKSIZE:
 	    (*lvalue) = 0L;
@@ -861,6 +875,8 @@ XLONG	*lvalue;
 	    (*lvalue) = XERR;
 	    break;
 	}
+
+	return (XOK);
 }
 
 
@@ -876,10 +892,7 @@ XLONG	*lvalue;
  * the function value, or zero if EOS or the delimiter is reached.
  */
 static int
-getstr (ipp, obuf, maxch, delim)
-char **ipp;
-char *obuf;
-int maxch, delim;
+getstr (char **ipp, char *obuf, int maxch, int delim)
 {
 	register char *op, *ip = *ipp;
 	register char *otop = obuf + maxch;

@@ -740,7 +740,7 @@ image display.
     pt> pexamine m92.als.1 m92.als.ed use_display-
 
 	... a plot of magnitude error versus magnitude appears on the
-	    screean and the graphics cursor comes up ready to accept
+	    screen and the graphics cursor comes up ready to accept
 	    commands
 
 	... after looking at the plot the user decides that what they

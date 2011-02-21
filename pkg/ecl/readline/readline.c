@@ -279,7 +279,10 @@ char *
 readline (prompt)
      const char *prompt;
 {
-  char *value;
+  char *value = NULL;
+  static char result[4096];
+
+
 
   /* If we are at EOF return a NULL string. */
   if (rl_pending_input == EOF)
@@ -304,7 +307,13 @@ readline (prompt)
   rl_clear_signals ();
 #endif
 
-  return (value);
+  memset (result, 0, 4096);
+  if (value) {
+    strcpy (result, value);
+    free (value);
+  }
+
+  return (result);
 }
 
 #if defined (READLINE_CALLBACKS)

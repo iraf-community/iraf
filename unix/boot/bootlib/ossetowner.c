@@ -1,6 +1,7 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <unistd.h>
 #include "bootlib.h"
 
 /* OS_SETOWNER -- Set the user and group identifications for the file.  This is
@@ -9,9 +10,12 @@
  * files between compatible hosts at a single site, so we make use of it in
  * case it works.
  */
-os_setowner (fname, uid, gid)
-char	*fname;
-int	uid, gid;
+int
+os_setowner (
+  char	*fname,
+  int	uid, 
+  int	gid
+)
 {
 	return (chown (vfn2osfn(fname,0), uid, gid));
 }

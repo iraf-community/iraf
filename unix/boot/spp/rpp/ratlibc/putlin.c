@@ -4,11 +4,11 @@
 #include "ratdef.h"
 
 PUTLIN(line, fd)
-register RCHAR *line;
+RCHAR *line;
 FINT	*fd;
 {
 	register FILE *fp;
-	register c;
+	register int c;
 
 	fp = _fdtofile[*fd];
 	while((c = *line++) != REOS)

@@ -1,7 +1,7 @@
 .help quadformat Aug01 imred.quadred
 .ih
 NAME
-quadformat - Description of the special multi-amplifer CCD format
+quadformat - Description of the special multi-amplifier CCD format
 .ih
 DESCRIPTION
 CCDs may be readout from multiple amplifiers at the same time to increase

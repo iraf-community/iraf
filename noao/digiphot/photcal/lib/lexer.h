@@ -5,7 +5,7 @@ define	LEN_LEX		(3+LEN_ID+LEN_CODE)	# total structure length
 
 # Lexer structure
 define	LEX_TOK		Memi[$1+0]		# token
-define	LEX_VAL		Memr[$1+1]		# numeric value (if any)
+define	LEX_VAL		Memr[P2R($1+1)]		# numeric value (if any)
 define	LEX_ID		Memc[P2C($1+2)]		# character string
 define	LEX_CLEN	Memi[$1+LEN_ID+2]	# code length
 define	LEX_CODE	($1+LEN_ID+3)		# RPN code buffer

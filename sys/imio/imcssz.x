@@ -16,14 +16,16 @@ pointer	im			# image descriptor
 long	vs[ARB], ve[ARB]	# endpoints of section
 int	ndim			# dimensionality of section
 int	dtype			# datatype of pixels in section
-int	npix			# number of pixels in section (output)
+long	npix			# number of pixels in section (output)
 int	rwflag			# section is to be read or written
 
-int	step, i, sz_pixel, npix_per_line, extra_pix, buf_size
-include	<szdtype.inc>
+int	step, i, sz_pixel, npix_per_line, extra_pix
+long	buf_size
+
+int	sizeof()
 
 begin
-	sz_pixel = max (ty_size[IM_PIXTYPE(im)], ty_size[dtype])
+	sz_pixel = max (sizeof(IM_PIXTYPE(im)), sizeof(dtype))
 	
 	if (IM_VMAP(im,1) == 1)
 	    step = abs (IM_VSTEP(im,1))

@@ -19,7 +19,7 @@ long	loffset, lvalue
 .fi
 .ih
 DESCRIPTION
-The IPC driver is used to read and write the interprocess communications
+The IPC driver is used to read and write the inter-process communications
 channels connecting parent and child processes.  Except where noted herein,
 the specifications of the IPC driver are equivalent to those of the ordinary
 streaming binary file driver.
@@ -43,7 +43,7 @@ suspended until enough data has been read from the channel to permit
 completion of the write.  If a process tries to read from an empty channel
 it will be suspended until the process at the other end writes into the
 channel or until the writing process closes the channel, in which case the
-reader sees EOF.  If the IPC driver is fully asynchronous process excecution
+reader sees EOF.  If the IPC driver is fully asynchronous process execution
 will not be suspended until \fBzawtpr\fR is called.  The wait primitive
 returns when the data block has been written into the channel, rather than
 when the data has been read by the process at the other end.

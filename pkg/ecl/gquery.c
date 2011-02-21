@@ -12,6 +12,8 @@
 #include "grammar.h"
 #include "task.h"
 #include "clmodes.h"
+#include "proto.h"
+
 
 /* Contains modified portions of modes.c for range checking etc. for use
  * by EPARAM.  The problem with modes.c is that it not only checks ranges, 
@@ -30,14 +32,12 @@ static  char *e2 = "Parameter value is out of range";
  * is inrange and set the new value if so.
  */
 char *
-gquery (pp, string)
-struct	param *pp;
-char	*string;
+gquery (struct param *pp, char *string)
 {
 	register char *ip;
 	char	buf[SZ_LINE];
 	char	*query_status, *nlp, *errmsg;
-	int	arrflag, offset, bastype, batch;
+	int	arrflag=0, offset=0, bastype=0, batch=0;
 	struct	operand o;
 	char	*strcpy(), *index();
 
@@ -143,8 +143,7 @@ testval:
 /* MINMAX -- Format the minimum and maximum values of a parameter, if any.
  */
 char *
-minmax (pp)
-register struct param *pp;
+minmax (register struct param *pp)
 {
 	static char  message[SZ_LINE];
 
@@ -180,8 +179,7 @@ register struct param *pp;
 /* ENUMIN -- Format the enumeration string for a parameter.
  */
 char *
-enumin (pp)
-register struct param *pp;
+enumin (register struct param *pp)
 {
 	static char  message[SZ_LINE];
 

@@ -51,7 +51,7 @@ begin
 
 	# If there are no rejected pixels compute certain parameters once.
 	if (dflag == D_ALL) {
-	    n1 = n[1]
+	    n1 = max (0, n[1])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -72,7 +72,7 @@ begin
 	do i = 1, npts {
 	    # Compute median.
 	    if (dflag == D_MIX) {
-		n1 = n[i]
+		n1 = max (0, n[i])
 		if (nkeep < 0)
 		    maxkeep = max (0, n1 + nkeep)
 		else
@@ -138,7 +138,7 @@ begin
 	    while (n4 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -207,7 +207,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels.
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -269,7 +269,7 @@ begin
 
 	# If there are no rejected pixels compute certain parameters once.
 	if (dflag == D_ALL) {
-	    n1 = n[1]
+	    n1 = max (0, n[1])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -290,7 +290,7 @@ begin
 	do i = 1, npts {
 	    # Compute median.
 	    if (dflag == D_MIX) {
-		n1 = n[i]
+		n1 = max (0, n[i])
 		if (nkeep < 0)
 		    maxkeep = max (0, n1 + nkeep)
 		else
@@ -356,7 +356,7 @@ begin
 	    while (n4 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -425,7 +425,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels.
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -487,7 +487,7 @@ begin
 
 	# If there are no rejected pixels compute certain parameters once.
 	if (dflag == D_ALL) {
-	    n1 = n[1]
+	    n1 = max (0, n[1])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -508,7 +508,7 @@ begin
 	do i = 1, npts {
 	    # Compute median.
 	    if (dflag == D_MIX) {
-		n1 = n[i]
+		n1 = max (0, n[i])
 		if (nkeep < 0)
 		    maxkeep = max (0, n1 + nkeep)
 		else
@@ -574,7 +574,7 @@ begin
 	    while (n4 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -643,7 +643,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels.
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -705,7 +705,7 @@ begin
 
 	# If there are no rejected pixels compute certain parameters once.
 	if (dflag == D_ALL) {
-	    n1 = n[1]
+	    n1 = max (0, n[1])
 	    if (nkeep < 0)
 		maxkeep = max (0, n1 + nkeep)
 	    else
@@ -726,7 +726,7 @@ begin
 	do i = 1, npts {
 	    # Compute median.
 	    if (dflag == D_MIX) {
-		n1 = n[i]
+		n1 = max (0, n[i])
 		if (nkeep < 0)
 		    maxkeep = max (0, n1 + nkeep)
 		else
@@ -792,7 +792,7 @@ begin
 	    while (n4 < maxkeep) {
 		if (nl == 1)
 		    nh = nh + 1
-		else if (nh == n[i])
+		else if (nh == max (0, n[i]))
 		    nl = nl - 1
 		else {
 		    r = Memr[resid+nl-1]
@@ -861,7 +861,7 @@ begin
 	# Check if data flag needs to be reset for rejected pixels.
 	if (dflag == D_ALL) {
 	    do i = 1, npts {
-		if (n[i] != nin) {
+		if (max (0, n[i]) != nin) {
 		    dflag = D_MIX
 		    break
 		}
@@ -876,3 +876,4 @@ begin
 
 	call sfree (sp)
 end
+

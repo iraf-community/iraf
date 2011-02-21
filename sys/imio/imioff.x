@@ -18,11 +18,13 @@ int	devblksz		# FIO device block size
 
 real	impkden, envgetr()
 long	offset, temp1, temp2, imnote()
-int	ndim, dim, sz_pixel, lblksize, pblksize, sizeof()
+int	ndim, dim, sz_pixel, lblksize, pblksize
 errchk	imerr
 
+include	<szpixtype.inc>
+
 begin
-	sz_pixel = sizeof (IM_PIXTYPE(im))
+	sz_pixel = pix_size[IM_PIXTYPE(im)]
 	pblksize = max (devblksz, SZ_VMPAGE)
 
 	if (compress == YES)

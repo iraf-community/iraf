@@ -30,11 +30,11 @@ define	LEN_IMT_STRUCT	(8 + 2 * SZ_FNAME + 2)
 define	IMT_IMNO	Memi[$1]	         # the image sequence number
 define	IMT_NENTRIES	Memi[$1+1]	         # number of data entries 
 define	IMT_OFFSET	Memi[$1+2]	         # offset to image data
-define	IMT_RO		Memr[$1+3]	         # the HWHM of the psf
-define	IMT_ITIME	Memr[$1+4]		 # the exposure time
-define	IMT_XAIRMASS	Memr[$1+5]	         # the airmass
-define	IMT_NXAIRMASS	Memr[$1+6]	         # the normalized airmass
-define	IMT_OTIME	Memr[$1+7]	         # the normalized airmass
+define	IMT_RO		Memr[P2R($1+3)]	         # the HWHM of the psf
+define	IMT_ITIME	Memr[P2R($1+4)]		 # the exposure time
+define	IMT_XAIRMASS	Memr[P2R($1+5)]	         # the airmass
+define	IMT_NXAIRMASS	Memr[P2R($1+6)]	         # the normalized airmass
+define	IMT_OTIME	Memr[P2R($1+7)]	         # the normalized airmass
 define	IMT_IFILTER	Memc[P2C($1+8)]		 # the filter id
 define	IMT_IMNAME	Memc[P2C($1+8+SZ_FNAME+1)]	 # the image name
 

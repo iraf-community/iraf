@@ -33,7 +33,7 @@ filenames have the form [svb]nnn e.g. s034 or b122.  The b is for a brightness
 image, the v is for a velocity image, and the s is for a select image.  The
 'nnn' is the tape sequence number or the filenumber in a template expansion.
 If this flag is set to false the long filenames described below in the 
-'Description" section will be produced.
+"Description" section will be produced.
 .le
 .ls select = yes
 Flag to tell the program to make a select image.
@@ -44,6 +44,7 @@ Flag to tell the program to make a brightness image.
 .ls velocity = yes
 Flag to tell the program to make a velocity image.
 .le
+.ih
 DESCRIPTION
 Mscan reads all or selected area scans from a vacuum telescope tape
 and formats the data into multiple IRAF images.  Type 1, 2, and 3 area

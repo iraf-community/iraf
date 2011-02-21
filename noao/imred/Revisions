@@ -1,5 +1,16 @@
 .help revisions Jun88 noao.imred
 .nf
+
+imred$src/doecslit/apslitproc.par
+imred$src/dofoe/apscript.par
+imred$src/doslit/apslitproc.par
+imred$src/fibers/apscript.par
+imred$src/fibers/params.par
+    Changed the default maxsep from 1000 to 100000.  Unless users reset
+    the default their expectation is that marking apertures will not
+    skip an aperture number no matter how far apart the aperturers are.
+    (2/17/09, Valdes)
+
 imred$src/fibers/skysub.cl
 imred$src/fibers/skysub.par
     Added sum as an enumerated "combine" choice.  (8/11/08, Valdes)

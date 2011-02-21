@@ -134,7 +134,7 @@ It is possible to specify an averaging width
 which determines how many pixels perpendicular to the vector are averaged.
 This averaging window is centered
 on the vector pixel.  When this window is greater than one pixel, it
-is possible that the extraction process might try to exceede the
+is possible that the extraction process might try to exceed the
 image boundary, in which case the specified type of boundary extension
 is employed. The extraction algorithm uses bilinear interpolation to
 evaluate points at non-integral pixel positions.

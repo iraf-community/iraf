@@ -28,7 +28,7 @@ header keywords.  It is an error if the named keyword does not already
 exist; the \fIimakw\fR procedures should be used if one wants the keyword
 to be automatically added if not found, but if the keyword is known
 to exist it is preferable to use the \fIimpkw\fR procedures since they
-are more efficient and will detect mispelled keyword names and foreign
+are more efficient and will detect misspelled keyword names and foreign
 images.  Automatic datatype conversion is provided, i.e., it is not
 necessary to know the exact datatype of a keyword to update its value.
 .ih

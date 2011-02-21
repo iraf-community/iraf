@@ -26,7 +26,7 @@ int	refit				# Refit the curve?
 int	nreject				# Number of points rejected
 int	newreject			# Number of new points rejected
 
-int	i, j, i_min, i_max, ilast
+int	i, j, i_min, i_max, ilast, pixgrow
 double	sigma, low_cut, high_cut, residual
 pointer	sp, residuals
 
@@ -80,30 +80,39 @@ begin
 	# A for loop is used instead of do because with region growing we
 	# want to modify the loop index.
 
+	do i = 1, npts-1 {
+	    if (i == 1)
+		pixgrow = grow / abs (x[i+1] - x[i])
+	    else
+		pixgrow = max (grow / abs (x[i+1] - x[i]), pixgrow)
+	}
+
 	newreject = 0
 	for (i = 1; i <= npts; i = i + 1) {
-	    if ((w[i] == 0.) || (rejpts[i] == YES))
+	    if (w[i] == 0. || rejpts[i] == YES)
 		next
 
 	    residual = Memd[residuals + i - 1]
-	    if ((residual > high_cut) || (residual < low_cut)) {
-		i_min = max (1, int (i - grow))
-		i_max = min (npts, int (i + grow))
+	    if (residual < high_cut && residual > low_cut)
+		next
 
-		# Reject points from the fit and flag them.
-		do j = i_min, i_max {
-		    if ((abs (x[i] - x[j]) <= grow) && (w[j] != 0.) &&
-		        (rejpts[j] == NO)) {
-			if (refit == YES)
-	        	    call dcvrject (cv, x[j], y[j], w[j])
-			rejpts[j] = YES
-		        newreject = newreject + 1
-			ilast = j
-		    }
+	    i_min = max (1, i - pixgrow)
+	    i_max = min (npts, i + pixgrow)
+
+	    # Reject points from the fit and flag them.
+	    do j = i_min, i_max {
+		if ((abs (x[i] - x[j]) <= grow) && (w[j] != 0.) &&
+		    (rejpts[j] == NO)) {
+		    if (refit == YES)
+			call dcvrject (cv, x[j], y[j], w[j])
+		    rejpts[j] = 2
+		    newreject = newreject + 1
 		}
-		i = ilast
 	    }
 	}
+	do i = 1, npts
+	    if (rejpts[i] != NO)
+		rejpts[i] = YES
 
 	nreject = nreject + newreject
 	call sfree (sp)

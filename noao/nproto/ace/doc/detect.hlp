@@ -264,7 +264,7 @@ When the sky sigma is being determined, the absolute value of the residuals
 relative to the mean sky divided by 0.7979 are computed.  A gaussian noise
 distribution will have a mean value of this quantity equal to the sigma of
 the distribution.  In other words, the mean of the absolute deviations of a
-guassian distribution is 0.7979 times sigma.  By fitting a function to
+gaussian distribution is 0.7979 times sigma.  By fitting a function to
 these residual values a position variable estimate of the sky sigma is
 obtained without needing to compute standard deviations over some set of
 points.  The fitted values at the block centers are evaluated to give the
@@ -395,7 +395,7 @@ The sky sigma of a convolved pixel is approximated by
 
 In the presence of bad pixels identified by a bad pixel mask the convolution
 weight applied to a bad pixel is set to zero.  The sum of the weights
-used to normalize the covolution is then modified from the situation with
+used to normalize the convolution is then modified from the situation with
 no bad pixels.  This will correct the convolved pixel value for the missing
 data and the estimated sky sigma is appropriately larger.
 
@@ -426,7 +426,7 @@ two numbers following the word "block".
 .le
 .ls bilinear [NX] [NY]
 The weights are the bilinear matrix product of triangular one dimensional
-matices of sizes given by the two numbers following the word "bilinear".
+matrices of sizes given by the two numbers following the word "bilinear".
 The weights are described by the matrix product relation 
 
 .nf

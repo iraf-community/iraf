@@ -30,15 +30,18 @@ struct proctable {
 } prtable[MAXPROCS];
 
 
+
 /* PR_ENTER -- Make a new entry in the process table.  Something is very wrong
  * if the table overflows.
  */
-pr_enter (pid, inchan, outchan)
-int	pid;
-int	inchan, outchan;
+void
+pr_enter (int pid, int inchan, int outchan)
 {
 	register struct proctable *pr;
 	struct	proctable *pr_findpid();
+
+	extern  int kernel_panic (char *msg);
+
 
 	if ((pr = pr_findpid (NULL)) == NULL)
 	    kernel_panic ("process table overflow");
@@ -55,8 +58,8 @@ int	inchan, outchan;
  * and return it's exit status.  If there is no such process in the table
  * return ERR.  The table entry is cleared by this call.
  */
-pr_wait (pid)
-int	pid;
+int
+pr_wait (int pid)
 {
 	register struct proctable *pr;
 	int	waitpid, error_code;
@@ -67,6 +70,7 @@ int	pid;
 	union	wait exit_status;
 #endif
 
+
 	/* Lookup process in table.  Return ERR if there is no entry.
 	 */
 	if ((pr = pr_findpid (pid)) == NULL)
@@ -76,7 +80,7 @@ int	pid;
 	    /* Process has already terminated.  Clear table entry and return
 	     * exit status (set in a previous call).
 	     */
-	    pr->pr_pid = NULL;
+	    pr->pr_pid = (int) NULL;
 	    return (pr->pr_exit_status);
 
 	} else {
@@ -102,7 +106,7 @@ int	pid;
 		    pr->pr_exit_status = error_code ? error_code : XOK;
 
 		    if (waitpid == pid) {
-			pr->pr_pid = NULL;
+			pr->pr_pid = (int) NULL;
 			return (pr->pr_exit_status);
 		    }
 		}
@@ -113,12 +117,12 @@ int	pid;
 
 /* PR_GETIPC -- Get the codes for the IPC channels assigned to a process.
  */
-pr_getipc (pid, inchan, outchan)
-int	pid;
-int	*inchan, *outchan;
+int
+pr_getipc (int pid, int *inchan, int *outchan)
 {
 	register struct proctable *pr;
 	struct	proctable *pr_findpid();
+
 
 	/* Lookup process in table.  Return ERR if there is no entry.
 	 */
@@ -137,10 +141,10 @@ int	*inchan, *outchan;
  * returned.
  */
 struct proctable *
-pr_findpid (pid)
-int	pid;
+pr_findpid (int pid)
 {
 	register int	pr;
+
 
 	for (pr=0;  pr < MAXPROCS;  pr++)
 	    if (prtable[pr].pr_pid == pid)
@@ -153,11 +157,12 @@ int	pid;
 /* PR_RELEASE -- Release the table entry for the process.  Used when a process
  * is killed and we do not wish to wait for process termination.
  */
-pr_release (pid)
-int	pid;
+void
+pr_release (int pid)
 {
 	register struct proctable *pr;
 
+
 	if ((pr = pr_findpid (pid)) != NULL)
-	    pr->pr_pid = NULL;
+	    pr->pr_pid = (int) NULL;
 }

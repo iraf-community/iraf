@@ -1,0 +1,208 @@
+.help thedit Feb2002 ttools
+.nj
+.ih
+NAME
+thedit -- Edit or view keyword values in tables.
+.ih
+USAGE
+thedit table keywords value
+.ih
+DESCRIPTION
+This table header editor can be used to add, delete, edit,
+or just print the values of table header keywords.
+
+Although this task was based on 'hedit',
+there are significant differences.
+The 'add', 'verify', and 'update' parameters of 'hedit'
+are not included in 'thedit'.
+If a specified keyword does not already exist,
+then it will be added
+(equivalent to add=yes in 'hedit').
+If a keyword does not exist,
+and the value expression is ".",
+a warning will be printed
+('hedit' is silent in this case).
+
+Such parameters as the number of rows or columns in the table
+are stored differently in FITS, STSDAS, and text tables.
+The following special "keywords" can be used
+to reference such information regardless of table type.
+These may be used in the 'keywords' parameter when value=".",
+or they can be used in the 'value' parameter as part of an expression.
+
+.nf
+    i_table   string    table name (may include extension ID)
+    i_file    string    name of the file containing the table
+    i_ctime   string    file modification (or creation) time
+    i_nrows   int       number of rows in the table
+    i_ncols   int       number of columns in the table
+    i_npar    int       number of keywords in the table header
+    i_type    string    table type
+.fi
+
+'thedit' supports two of the special operands
+that are available in 'hedit':  "$" and "$I".
+When 'value' is an expression,
+"$" gives the value of the current keyword.
+"$I" is equivalent to "i_table",
+the name of the current table.
+"$I" can be used as a keyword or as part of an expression.
+.ih
+PARAMETERS
+.ls table [file name template]
+A list of tables for which keywords are to be edited or printed.
+If 'value' is ".", each table will be opened read-only;
+otherwise, each table will be opened read-write.
+.le
+.ls keywords [string]
+One or more keywords, separated by commas and/or blanks,
+which are to be added, modified, or printed.
+If the value expression (see 'value') is not ".",
+any keyword in 'keywords' that is not already present
+will be added to the header.
+
+Wildcards are supported; however,
+the "@filename" syntax is not supported.
+Do not use wildcard or other special characters
+if a keyword is to be added to the header.
+.le
+.ls value = "." [string]
+This is the value to be assigned to each keyword in 'keywords'.
+The special value "." means that
+the keywords should be printed rather than edited,
+and in this case the table will be opened read-only.
+If 'value' is not equal to ".",
+the same value will be assigned to all the keywords
+matching the template 'keywords'.
+
+In order to set a keyword value to "." or ",",
+specify the value as "\." or "\," respectively.
+(Note that if given on the command line,
+the quotes are required in this case.)  Requiring "," to be escaped
+was added as protection against accidentally typing "," instead of ".".
+
+As with 'hedit',
+a general expression may be given for 'value'
+by enclosing the expression in parentheses.
+The expression may include constants and/or keyword names;
+it will be evaluated and then assigned to each keyword in 'keywords'.
+
+Note that if delete = yes, then 'value' will be ignored.
+.le
+.ls (delete = no) [bool]
+If delete = yes, the specified keywords will be deleted.
+All the keywords listed in 'keywords' will be deleted,
+for each table in 'table'.
+.le
+.ls (show = yes) [bool]
+Print a record of each edit operation?
+.le
+.ih
+EXAMPLES
+1.  Display all the header keywords (except blank) in "example.tab".
+
+.nf
+    tt> thedit example.tab * .
+.fi
+
+2.  Display only the special keywords for "timetag.fits[events]".
+
+.nf
+    tt> thedit timetag.fits[events] i_* .
+
+    timetag.fits[events],i_table = timetag.fits[events]
+    timetag.fits[events],i_file = timetag.fits
+    timetag.fits[events],i_ctime = "Wed 12:07:58 31-May-2000"
+    timetag.fits[events],i_nrows = 337824
+    timetag.fits[events],i_ncols = 6
+    timetag.fits[events],i_npar = 58
+    timetag.fits[events],i_type = "fits, binary"
+.fi
+
+3.  Print all HISTORY keywords in "example.txt".
+
+.nf
+    tt> thedit example.txt history .
+.fi
+
+4.  Add a new HISTORY keyword to "example.tab".
+
+.nf
+    tt> thedit example.tab history \
+    "('file name is ' // i_file) // '; number of rows = ' // str (i_nrows)"
+.fi
+
+5.  Increment the value of COUNT.
+
+.nf
+    tt> thedit example.tab count "($ + 1)"
+.fi
+
+6.  Delete all HISTORY and COMMENT keywords in "example.fits[1]".
+
+.nf
+    tt> thedit example.fits history,comment delete+
+.fi
+
+7.  Evaluate a simple expression
+and assign the result to keyword WAVELEN.
+Keywords TCRVL1, TCDLT1, and NELEM
+are assumed to be already present in the header.
+
+.nf
+    tt> thedit example.fits wavelen "(tcrvl1 + tcdlt1 * nelem/2.)"
+.fi
+
+8.  A keyword can be renamed by using a two-step process,
+first creating a new keyword with the old value, and then
+deleting the old keyword.
+Note that while this procedure does copy the value,
+the comment will be lost.
+(The "k" instruction in 'tupar' can also be used to rename a keyword.)
+
+.nf
+    tt> thedit example.tab newkey "(oldkey)"
+    tt> thedit example.tab oldkey delete+
+.fi
+
+9.  The primary header or an image extension of a FITS file
+can also be opened as a table in order to access the keywords.
+
+.nf
+    tt> thedit o47s01kdm_raw.fits[0] rootname .
+    tt> thedit o47s01kdm_flt.fits[1] bunit "COUNTS/S"
+.fi
+
+10.  This could have been a big mistake.
+
+.nf
+    tt> thedit abc.fits[1] * ,
+
+    ERROR: In order to set a keyword value to ',' you must use value='\,'
+.fi
+.ih
+BUGS
+Expressions are evaluated using EVEXPR,
+which does not support double precision.
+
+Header lines with keyword = '        ' cannot be displayed.
+
+The 'value' parameter is of type string,
+and 'thedit' interprets the value
+to determine what data type to use
+when writing the value to the table.
+This can fail when a value appears to be a number
+but really should be treated as a string.
+For example, a date and time could be written as "19940531:11515000".
+'thedit' would interpret this as hours and minutes (HH:MMss)
+and convert the value to 1994053. + 11515000./60.
+A workaround for this case is to use 'tupar' instead of 'thedit';
+use the "pt" instruction, meaning put a keyword of type text.
+.ih
+REFERENCES
+This task was written by Phil Hodge,
+based on the 'hedit' task.
+.ih
+SEE ALSO
+hedit, tupar
+.endhelp

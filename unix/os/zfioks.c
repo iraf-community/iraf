@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <setjmp.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -14,6 +15,8 @@
 #include <sys/wait.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <fcntl.h>
+#include <time.h>
 #include <pwd.h>
 
 #ifdef SYSV
@@ -183,10 +186,20 @@ static  int ks_pchan[MAXOFILES];
 static  int ks_achan[MAXOFILES];
 static	int ks_getresvport(), ks_rexecport();
 static	int ks_socket(), ks_geti(), ks_puti(), ks_getlogin();
-static	dbgmsg(), dbgmsg1(), dbgmsg2(), dbgmsg3(), dbgmsg4();
+static	void dbgsp(), dbgmsg(), dbgmsg1(), dbgmsg2(), dbgmsg3(), dbgmsg4();
 static	char *ks_getpass();
-static	ks_onsig(), ks_reaper();
+static	void ks_onsig(), ks_reaper();
 
+static int ks_getlogin (char *hostname, char *loginname, char *password,
+  				struct ksparam *ks);
+static char *ks_username (char *filename, char *pathname, char *username);
+static char *ks_sysname (char *filename, char *pathname);
+static struct irafhosts *ks_rhosts (char *filename);
+static int   ks_getword (char **ipp, char *obuf);
+static void  ks_whosts (struct irafhosts *hp, char *filename);
+static char *ks_getpass (char *user, char *host);
+
+void  pr_mask (char *str);
 
 /* ZOPNKS -- Open a connected subprocess on a remote node.  Parse the "server"
  * argument to obtain the node name and the command to be issued to connect the
@@ -195,24 +208,26 @@ static	ks_onsig(), ks_reaper();
  * dependent and normally comes from the file dev$hosts.  This file is read
  * by the high level VOS code before we are called.
  */
-ZOPNKS (x_server, mode, chan)
-PKCHAR	*x_server;		/* type of connection */
-XINT	*mode;			/* access mode (not used) */
-XINT	*chan;			/* receives channel code (socket) */
+int
+ZOPNKS (
+  PKCHAR  *x_server,		/* type of connection */
+  XINT	  *mode,		/* access mode (not used) */
+  XINT	  *chan 		/* receives channel code (socket) */
+)
 {
 	register char	*ip, *op;
 	char	*server = (char *)x_server;
 	char	host[SZ_NAME+1], username[SZ_NAME+1], password[SZ_NAME+1];
-	int	proctype, port, auth, s_port, pid, s, i;
-	struct  sockaddr_in sockaddr, from;
-	char	*hostp, *cmd;
+	int	proctype=0, port=0, auth=0, s_port=0, pid=0, s=0, i=0;
+	struct  sockaddr_in  from;
+	char	*hostp=NULL, *cmd=NULL;
 	char	obuf[SZ_LINE];
 	struct	ksparam ks;
 
 
 
 	/* Initialize local arrays */
-	host[0] = username[0] = password[0] = NULL;
+	host[0] = username[0] = password[0] = (char) NULL;
 
 	/* Parse the server specification.  We can be called to set up either
 	 * the irafks daemon or to open a client connection.
@@ -453,8 +468,8 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 	     * server in response to each such request.
 	     */
 
-	    dbgmsg3 ("S:in.irafksd started, pid=%d ppid=%d pgid=%d\n",
-		getpid(), getppid(), getpgid(0));
+	    dbgmsg3 ("S:in.irafksd started, pid=%d ppid=%d\n",
+		getpid(), getppid());
 	    old_sigcld = (SIGFUNC) signal (SIGCHLD, (SIGFUNC)ks_reaper);
 
 	    /* Reset standard streams to console to record error messages. */
@@ -480,10 +495,10 @@ d_err:		dbgmsg1 ("S:in.irafksd parent exit, status=%d\n", status);
 		 * started server exits.
 		 */
 		jmpset++;
-		if (sig = setjmp(jmpbuf)) {
+		if ((sig = setjmp(jmpbuf))) {
 	    	    if (sig == SIGCHLD) {
 	    		dbgmsg ("S:in.irafksd sigchld return\n");
-			while (waitpid (NULL, NULL, WNOHANG) > 0) 
+			while (waitpid ((pid_t)NULL, NULL, WNOHANG) > 0) 
 			    ;
 		    } else
 			exit (0);
@@ -555,8 +570,8 @@ s_err:		    dbgmsg1 ("S:in.irafksd fork complete, status=%d\n",
 		    u_long  n_addr, addr;
 		    unsigned char *ap = (unsigned char *)&n_addr;
 
-		    dbgmsg2 ("S:irafks server started, pid=%d ppid=%d pgid=%d\n",
-			getpid(), getppid(), getpgid(0));
+		    dbgmsg2 ("S:irafks server started, pid=%d ppid=%d\n",
+			getpid(), getppid());
 		    signal (SIGCHLD, old_sigcld);
 		    /*
 		    old_sigcld = (SIGFUNC) signal (SIGCHLD, (SIGFUNC)ks_reaper);
@@ -617,7 +632,7 @@ s_err:		    dbgmsg1 ("S:in.irafksd fork complete, status=%d\n",
 	    char    localhost[SZ_FNAME];
 	    char    callback_cmd[SZ_LINE];
 	    struct  hostent *hp;
-	    int     tfd, fd, ss;
+	    int     tfd=0, fd=0, ss=0;
 
 	    /* Get reserved port for direct communications link. */
 	    s_port = IPPORT_USERRESERVED - 1;
@@ -677,15 +692,13 @@ r_err:		dbgmsg ("rexec-callback connect failed\n");
 	     * on the remote node, and thereafter merely places requests to
 	     * in.irafksd to spawn each instance of the irafks.e server.
 	     */
-	    struct  hostent *hp;
-	    struct  sockaddr *ap;
 	    char    command[SZ_LINE], *nretryp;
 	    int     pin[2], pout[2];
 	    int     status = 0;
 	    int     ntries = 0, nretries = 0;
 	    char    *password;
 	    int     fd, tfd;
-	    int     t, s;
+	    int     t=0, s=0;
 
 	    /* Get reserved port for client. */
 	    s_port = IPPORT_USERRESERVED - 1;
@@ -855,7 +868,7 @@ retry:
 	     * If this happens the first client will get the in.irafksd daemon
 	     * and the other client will have to do an rsh connect each time.
 	     */
-	    if (status = ks_geti(t))
+	    if ((status = ks_geti(t))) {
 		if (port && status == UNAUTH) {
 		    close(t);
 		    port = 0;
@@ -866,6 +879,7 @@ retry:
 		    status |= 020000;
 		    goto c_err;
 		}
+	    }
 
 	    /* Wait for the server to call us back. */
 	    if ((tfd = accept (s, (struct sockaddr *)0, (int *)0)) < 0) {
@@ -892,14 +906,18 @@ done:
 	}
 
 	dbgmsg1 ("zopnks returns status=%d\n", *chan);
+
+	return (*chan);
 }
 
 
 /* ZCLSKS -- Close a kernel server connection.
  */
-ZCLSKS (chan, status)
-XINT	*chan;				/* socket to kernel server	*/
-XINT	*status;			/* receives close status	*/
+int
+ZCLSKS (
+  XINT	*chan,			/* socket to kernel server	*/
+  XINT	*status 		/* receives close status	*/
+)
 {
 	int	i;
 
@@ -915,6 +933,8 @@ XINT	*status;			/* receives close status	*/
 	}
 
 	dbgmsg2 ("server [%d] terminated, status = %d\n", *chan, *status);
+
+	return (*status);
 }
 
 
@@ -926,11 +946,13 @@ XINT	*status;			/* receives close status	*/
  * the channel until the specified number of bytes have been read or ERR
  * or EOF is seen on the stream.
  */
-ZARDKS (chan, buf, totbytes, loffset)
-XINT	*chan;			/* kernel server channel (socket)	*/
-XCHAR	*buf;			/* output buffer			*/
-XINT	*totbytes;		/* total number of bytes to read	*/
-XLONG	*loffset;		/* not used				*/
+int
+ZARDKS (
+  XINT	*chan,			/* kernel server channel (socket)	*/
+  XCHAR	*buf,			/* output buffer			*/
+  XINT	*totbytes,		/* total number of bytes to read	*/
+  XLONG	*loffset 		/* not used				*/
+)
 {
 #ifdef ANSI
 	volatile char	*op;
@@ -940,7 +962,7 @@ XLONG	*loffset;		/* not used				*/
 	int	fd, nbytes;
 #endif
 	SIGFUNC	sigint, sigterm;
-	int	status;
+	int	status = ERR;
 
 	fd = *chan;
 	op = (char *)buf;
@@ -968,10 +990,10 @@ XLONG	*loffset;		/* not used				*/
 	    switch (status) {
 	    case 0:
 		zfd[fd].nbytes -= nbytes;
-		return;
+		return (XERR);
 	    case ERR:
 		zfd[fd].nbytes = ERR;
-		return;
+		return (XERR);
 	    default:
 		nbytes -= status;
 		op += status;
@@ -984,16 +1006,20 @@ XLONG	*loffset;		/* not used				*/
 	signal (SIGTERM, sigterm);
 	if (debug_ks > 1)
 	    dbgmsg2 ("read %d bytes from KS channel %d:\n", op-(char *)buf, fd);
+
+	return (status);
 }
 
 
 /* ZAWRKS -- Write to a kernel server channel.
  */
-ZAWRKS (chan, buf, totbytes, loffset)
-XINT	*chan;			/* kernel server channel (socket)	*/
-XCHAR	*buf;			/* output buffer			*/
-XINT	*totbytes;		/* number of bytes to write		*/
-XLONG	*loffset;		/* not used				*/
+int
+ZAWRKS (
+  XINT	*chan,			/* kernel server channel (socket)	*/
+  XCHAR	*buf,			/* output buffer			*/
+  XINT	*totbytes,		/* number of bytes to write		*/
+  XLONG	*loffset 		/* not used				*/
+)
 {
 	SIGFUNC	sigint, sigterm, sigpipe;
 #ifdef ANSI
@@ -1038,16 +1064,19 @@ XLONG	*loffset;		/* not used				*/
 	signal (SIGPIPE, sigpipe);
 	if (debug_ks > 1)
 	    dbgmsg2 ("wrote %d bytes to KS channel %d:\n", zfd[fd].nbytes, ofd);
+
+	return (XOK);
 }
 
 
 /* KS_ONSIG -- Catch a signal.
  */
-static
-ks_onsig (sig, arg1, arg2)
-int	sig;			/* signal which was trapped	*/
-int	*arg1;			/* not used */
-int	*arg2;			/* not used */
+static void
+ks_onsig (
+  int	sig,			/* signal which was trapped	*/
+  int	*arg1,			/* not used */
+  int	*arg2 			/* not used */
+)
 {
 	/* If we get a SIGPIPE writing to a server the server has probably
 	 * died.  Make it look like there was an i/o error on the channel.
@@ -1062,15 +1091,16 @@ int	*arg2;			/* not used */
 
 /* KS_REAPER -- Catch a SIGCHLD signal and reap all children.
  */
-static
-ks_reaper (sig, arg1, arg2)
-int     sig;                    /* signal which was trapped     */
-int     *arg1;                  /* not used */
-int     *arg2;                  /* not used */
+static void
+ks_reaper (
+  int     sig,                  /* signal which was trapped     */
+  int     *arg1,                /* not used */
+  int     *arg2                 /* not used */
+)
 {
         int status=0, pid=0;
 
-        while ((pid = waitpid (NULL, &status, WNOHANG)) > 0)
+        while ((pid = waitpid ((pid_t)NULL, &status, WNOHANG)) > 0)
 	    dbgmsg2 ("ks_reaper -- pid=%d, status=%d\n", pid, status);
 
 	if (jmpset)
@@ -1082,22 +1112,25 @@ int     *arg2;                  /* not used */
  * we do not really wait, rather we return the status value (byte count) from
  * the last read or write to the channel.
  */
-ZAWTKS (chan, status)
-XINT	*chan;
-XINT	*status;
+int
+ZAWTKS (XINT *chan, XINT *status)
 {
 	if ((*status = zfd[*chan].nbytes) == ERR)
 	    *status = XERR;
+
+	return (*status);
 }
 
 
 /* ZSTTKS -- Get binary file status for an KS channel.  A KS channel is a
  * streaming binary file.
  */
-ZSTTKS (chan, param, lvalue)
-XINT	*chan;			/* not used; all KS channels have same status */
-XINT	*param;
-XLONG	*lvalue;
+int
+ZSTTKS (
+  XINT	*chan,			/* not used; all KS channels have same status */
+  XINT	*param,
+  XLONG	*lvalue 
+)
 {
 	switch (*param) {
 	case FSTT_BLKSIZE:
@@ -1113,6 +1146,8 @@ XLONG	*lvalue;
 	default:
 	    *lvalue = XERR;
 	}
+
+	return (XOK);
 }
 
 
@@ -1231,7 +1266,7 @@ ks_rexecport()
 	if (port)
 	    return (port);
 
-	if (sv = getservbyname ("exec", "tcp"))
+	if ((sv = getservbyname ("exec", "tcp")))
 	    return (port = sv->s_port);
 	else
 	    return (port = REXEC_PORT);
@@ -1271,9 +1306,9 @@ int	fd;
 	char	ch;
 
 	jmpset++;
-	if (sig = setjmp(jmpbuf))
+	if ((sig = setjmp(jmpbuf)))
 	    if (sig == SIGCHLD)
-		waitpid (NULL, NULL, WNOHANG);
+		waitpid ((pid_t)NULL, NULL, WNOHANG);
 
 	timeout.tv_sec = PRO_TIMEOUT;
 	timeout.tv_usec = 0;
@@ -1341,7 +1376,7 @@ char	*outstr;
 
 /* KS_MSG -- Print debugging messages.
  */
-static char *dbgsp (pid)
+static void dbgsp (pid)
 int	pid;
 {
 	int i, nsp = ((parent > 0) ? (pid - parent) : 0);
@@ -1349,7 +1384,7 @@ int	pid;
 	    fprintf (debug_fp, "  ");
 }
 
-static
+static void
 dbgmsg (msg)
 char    *msg;
 {
@@ -1359,7 +1394,7 @@ char    *msg;
 	    fprintf (debug_fp, msg);
 	}
 }
-static
+static void
 dbgmsg1 (fmt, arg)
 char    *fmt;
 int     arg;
@@ -1371,7 +1406,7 @@ int     arg;
 	    fflush (debug_fp);
 	}
 }
-static
+static void
 dbgmsg2 (fmt, arg1, arg2)
 char    *fmt;
 int     arg1, arg2;
@@ -1383,7 +1418,7 @@ int     arg1, arg2;
 	    fflush (debug_fp);
 	}
 }
-static
+static void
 dbgmsg3 (fmt, arg1, arg2, arg3)
 char    *fmt;
 int     arg1, arg2, arg3;
@@ -1395,7 +1430,7 @@ int     arg1, arg2, arg3;
 	    fflush (debug_fp);
 	}
 }
-static
+static void
 dbgmsg4 (fmt, arg1, arg2, arg3, arg4)
 char    *fmt;
 int     arg1, arg2, arg3, arg4;
@@ -1444,11 +1479,6 @@ struct irafhosts {
 	char	sbuf[SZ_SBUF];
 };
 
-static	int ks_getword();
-static	char *ks_username(), *ks_sysname();
-static	struct irafhosts *ks_rhosts();
-static	ks_whosts();
-
 
 /* KS_GETLOGIN -- Read the irafhosts file to determine how to connect to
  * the indicated host.  If the user has a .irafhosts file read that, otherwise
@@ -1460,11 +1490,12 @@ static	ks_whosts();
  * file has read-only access privileges.
  */
 static int
-ks_getlogin (hostname, loginname, password, ks)
-char	*hostname;		/* node we wish a login for */
-char	*loginname;		/* receives the login name */
-char	*password;		/* receives the login password */
-struct	ksparam *ks;		/* networking parameters */
+ks_getlogin (
+  char	 *hostname,		/* node we wish a login for */
+  char	 *loginname,		/* receives the login name */
+  char	 *password,		/* receives the login password */
+  struct ksparam *ks 		/* networking parameters */
+)
 {
 	register struct irafhosts *hp;
 	register int i;
@@ -1485,7 +1516,7 @@ struct	ksparam *ks;		/* networking parameters */
 	 * irafhosts file, and read the system file instead if the user file
 	 * is the old obsolete version.
 	 */
-	if (hp = ks_rhosts (userfile)) {
+	if ((hp = ks_rhosts (userfile))) {
 	    /* Old style irafhosts file? */
 	    if (hp->nparams == 0) {
 		/* Attempt to preserve old file with .OLD extension. */
@@ -1540,7 +1571,7 @@ struct	ksparam *ks;		/* networking parameters */
 		else
 		    goto query;  /* need a valid password for rexec */
 	    } else if (strcmp (np->password, "?") == 0) {
-query:		if (namep = ks_getpass (loginname, hostname))
+query:		if ((namep = ks_getpass (loginname, hostname)))
 		    strcpy (password, namep);
 		else
 		    password[0] = EOS;
@@ -1664,10 +1695,7 @@ query:		if (namep = ks_getpass (loginname, hostname))
  * the user's name is returned as well.
  */
 static char *
-ks_username (filename, pathname, username)
-char	*filename;
-char	*pathname;
-char	*username;
+ks_username (char *filename, char *pathname, char *username)
 {
 	register struct passwd *pwd;
 
@@ -1691,12 +1719,11 @@ char	*username;
  * function value.
  */
 static char *
-ks_sysname (filename, pathname)
-char	*filename;
-char	*pathname;
+ks_sysname (char *filename, char *pathname)
 {
 	XCHAR	irafdir[SZ_PATHNAME+1];
-	int	x_maxch=SZ_PATHNAME, x_nchars;
+	XINT	x_maxch=SZ_PATHNAME, x_nchars;
+
 
 	ZGTENV ("iraf", irafdir, &x_maxch, &x_nchars);
 	if (x_nchars <= 0)
@@ -1713,8 +1740,7 @@ char	*pathname;
  * the descriptor as the function value.
  */
 static struct irafhosts *
-ks_rhosts (filename)
-char	*filename;
+ks_rhosts (char *filename)
 {
 	char	lbuf[SZ_LINE];
 	char	word[SZ_LINE];
@@ -1858,9 +1884,7 @@ char	*filename;
 /* KS_GETWORD -- Get a quoted or whitespace delimited word.
  */
 static int
-ks_getword (ipp, obuf)
-char	**ipp;
-char	*obuf;
+ks_getword (char **ipp, char *obuf)
 {
 	register char *ip = *ipp, *op = obuf;
 
@@ -1883,10 +1907,11 @@ char	*obuf;
 
 /* KS_WHOSTS -- Write out a hosts file from the internal descriptor to disk.
  */
-static
-ks_whosts (hp, filename)
-struct	irafhosts *hp;
-char	*filename;
+static void
+ks_whosts (
+  struct irafhosts *hp,
+  char 	*filename
+)
 {
 	register char *ip;
 	struct	nodelist *np;
@@ -1978,10 +2003,7 @@ char	*filename;
 /* KS_GETPASS -- Access the terminal in raw mode to get the user's
  * password.
  */
-static char *
-ks_getpass (user, host)
-char	*user;
-char	*host;
+static char *ks_getpass (char *user, char *host)
 {
 	static	char password[SZ_NAME];
 	char    prompt[80];
@@ -2045,8 +2067,7 @@ char	*host;
 
 /* PR_MASK -- Debug routine to print the current SIGCHLD mask.
  */
-void pr_mask (str)
-char	*str;
+void pr_mask (char *str)
 {
 	sigset_t	sigset, pending;
 

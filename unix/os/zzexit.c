@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #define import_spp
 #include <iraf.h>
 
@@ -6,8 +8,10 @@
  * require this procedure.  We implement it as a separate library procedure
  * so that it can be replaced by a user exit procedure.
  */
+int
 exit_ (code)
 XINT *code;
 {
 	exit (*code);
+	return (XOK);
 }

@@ -122,7 +122,7 @@ required by the \fItar\fR format).
 Filenames appearing in the file list are interpreted as prefix strings,
 i.e., a match occurs if the given string is a prefix of an actual filename
 in the archive.  If the last character in the \fIfiles\fR filename is
-a \fB$\fR then an exact match is required (excluding the $ metacharacter).
+a \fB$\fR then an exact match is required (excluding the $ meta-character).
 .IH
 DIAGNOSTICS
 A file read error occurring while reading the archive file is fatal unless

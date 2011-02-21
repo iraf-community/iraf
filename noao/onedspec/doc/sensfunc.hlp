@@ -238,7 +238,7 @@ If a revised extinction function E(W) has been determined for one or
 more of the apertures then the functions are averaged over all
 apertures, added to the original extinction, and written to the
 specified extinction table.  The format of this table is the same as
-the standard extinction tables and are, thus, interchangable.  If no
+the standard extinction tables and are, thus, interchangeable.  If no
 new extinction filename is specified then no extinction table is
 recorded.
 
@@ -292,7 +292,7 @@ graph types and their single character code used to select them are:
 .fi
 
 The initial graphs are selected with the parameter \fBgraphs\fR and changed
-interactively with the colon command ":graphs \fItypes\fR".  The ability
+interactively with the colon command ':graphs \fItypes\fR'.  The ability
 to view a variety of graphs allows evaluating the effects of the
 sensitivity curve and extinction in various ways.  The flux calibrated
 spectrum graph uses the current sensitivity function and checks for
@@ -303,7 +303,7 @@ information available simultaneously.  Thus, with some graphics devices
 or over a slow line one can reduce the number of graphs for greater speed
 while on very fast devices with large screens one can look at more
 data.  The parameter \fImarks\fR and the associated colon command
-":marks \fItypes\fR" also let the user define the symbols used to mark
+':marks \fItypes\fR' also let the user define the symbols used to mark
 included, deleted, and added data points.
 
 The list of interactive commands in given in the section on CURSOR COMMANDS.

@@ -55,7 +55,7 @@ reidentified in other echelle spectra.  The features for the reference
 image and those determined for reidentified images are recorded in the
 specified database.
 
-The first step in transfering identifications from the reference
+The first step in transferring identifications from the reference
 spectrum to another spectrum is to add a shift (in wavelength) to each
 feature in the reference image.  The shift is specified by the
 parameter \fIshift\fR.  This shift is for the fundamental order (order
@@ -92,7 +92,7 @@ wavelengths.
 EXAMPLES
 The features in the spectrum f033.ec were identified previously
 with the task \fBecidentify\fR.  The features positions in f043.ec are
-are reidentified with and without refitting the dispersion fucuntion as
+are reidentified with and without refitting the dispersion function as
 follows:
 
 .nf

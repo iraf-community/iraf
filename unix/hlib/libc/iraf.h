@@ -103,6 +103,9 @@
 #ifdef import_knames
 #ifndef D_knames
 #include "/iraf/iraf/unix/hlib/libc/knames.h"
+/*
+#include "/iraf/iraf/unix/hlib/libc/kproto.h"
+*/
 #endif
 #undef import_knames
 #endif
@@ -175,13 +178,6 @@
 #include "/iraf/iraf/unix/hlib/libc/ttset.h"
 #endif
 #undef import_ttset
-#endif
-
-#ifdef import_varargs
-#ifndef D_varargs
-#include "/iraf/iraf/unix/hlib/libc/varargs.h"
-#endif
-#undef import_varargs
 #endif
 
 #ifdef import_stdarg

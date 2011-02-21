@@ -83,14 +83,27 @@ produced.  The special filename "STDOUT" prints log information to the
 terminal.
 .le
 
-.ls combine = "average" (average|median|sum)
+.ls combine = "average" (average|median|lmedian|sum|quadrature|nmodel)
 Type of combining operation performed on the final set of pixels (after
-offsetting, masking, thresholding, and rejection).  The choices are
-"average", "median", or "sum".  The median uses the average of the two central
-values when the number of pixels is even.  For the average and sum, the
-pixel values are multiplied by the weights (1 if no weighting is used)
-and summed.  The average is computed by dividing by the sum of the weights.
-If the sum of the weights is zero then the unweighted average is used.
+offsetting, masking, thresholding, and rejection).  The choices are:
+
+.nf
+    average - weighted average
+     median - median
+    lmedian - median except use the lower value if only two
+        sum - (weighted) sum
+ quadrature - weighted quadrature average
+     nmodel - weighted quadrature average of noise model values
+.fi
+
+The details of each choice is given in the DESCRIPTION.
+Note that if weights are used then the weighted "sum" is the same as
+the weighted "average" since the weights are normalized to unit total weight.
+The "lmedian" option is intended for minimizing the effects of cosmic rays
+when there are more than two images but some pixels may only have two
+contributing images.  The "quadrature" and "nmodel" options are used
+for error propagation either with input sigma images (quadrature) or where the
+pixel sigmas may be computed by the noise model used by this task (nmodel).
 .le
 .ls reject = "none" (none|minmax|ccdclip|crreject|sigclip|avsigclip|pclip)
 Type of rejection operation performed on the pixels remaining after offsetting,
@@ -208,7 +221,7 @@ bad data was used.
 .ls maskvalue = 0
 Mask value used with the \fImasktype\fR parameter.  If the mask type
 selects good or bad bits the value may be specified using IRAF notation
-for decimal, octal, or hexidecimal; i.e 12, 14b, 0cx to select bits 3
+for decimal, octal, or hexadecimal; i.e 12, 14b, 0cx to select bits 3
 and 4.
 .le
 .ls blank = 0.
@@ -298,10 +311,11 @@ median value for rejecting pixels.  The lower sigma is ignored for the
 "crreject" algorithm.
 .le
 .ls rdnoise = "0.", gain = "1.", snoise = "0." (ccdclip, crreject)
-CCD readout noise in electrons, gain in electrons/DN, and sensitivity noise
-as a fraction.  These parameters are used with the "ccdclip" and "crreject"
-algorithms.  The values may be either numeric or an image header keyword
-which contains the value.  The noise model for a pixel is:
+Readout noise in electrons, gain in electrons/DN, and sensitivity noise as
+a fraction.  These parameters are used with the "ccdclip" and "crreject"
+algorithms as well as with the "nmodel" combining option.  The values may
+be either numeric or an image header keyword which contains the value.
+The noise model for a pixel is:
 
 .nf
     variance in DN = (rdnoise/gain)^2 + DN/gain + (snoise*DN)^2
@@ -703,7 +717,7 @@ four groups along the first dimension to produce subimages each 5200 pixels
 wide which have no overlap.  The reason for wanting to create
 non-overlapping subregions is to simplify creation of the related masks,
 most importantly, the exposure masks.  The \fIoutlimits\fR parameter would
-have the values "1 5200", "5201 10400", 10401 15600", and "15601 20800".
+have the values "1 5200", "5201 10400", "10401 15600", and "15601 20800".
 The second pair of limits is not specified to obtain the full size along
 the second dimension.  Note that the last block will actually be smaller
 than 5200 pixels since the survey is less than 20800 pixels.
@@ -907,7 +921,7 @@ If a pixel mask is associated with an image the mask is used when the
 \fImasktype\fR parameter is set to a value other than "none" or "".  Note that
 when it is set to "none", mask information is not used even if it exists for
 the image.  The values of \fImasktype\fR which apply masks are "goodvalue",
-"badvalue", "novalue", "goodbits", "badbits", and "!<keyword>.  The last choice
+"badvalue", "novalue", "goodbits", "badbits", and "!<keyword>".  The last choice
 allows specifying the keyword whose value is the mask to be used otherwise
 the keyword "BPM" is used.
 
@@ -965,8 +979,9 @@ The \fIreject\fR parameter selects a type of rejection operation to
 be applied to pixels not masked or thresholded.  If no rejection
 operation is desired the value "none" is specified.
 
+.in 2
 MINMAX
-.in 4
+.in 2
 A specified fraction of the highest and lowest pixels are rejected.
 The fraction is specified as the number of high and low pixels, the
 \fInhigh\fR and \fInlow\fR parameters, when data from all the input images
@@ -995,9 +1010,9 @@ and the number rejected as a function of n is:
 	 nh  0  0  0  0  0  1  1  1  1  1  2
 .fi
 
-.in -4
+.in -2
 CCDCLIP
-.in 4
+.in 2
 If the images are obtained using a CCD with known read out noise, gain, and
 sensitivity noise parameters and they have been processed to preserve the
 relation between data values and photons or electrons then the noise
@@ -1043,7 +1058,7 @@ the sigmas are computed for each pixel from each image using the
 same estimated true value.
 
 If the images are scaled and shifted and the \fIsigscale\fR threshold
-is exceeded then a sigma is computed for each pixel based on the
+is exceedd then a sigma is computed for each pixel based on the
 image scale parameters; i.e. the median or average is scaled to that of the
 original image before computing the sigma and residuals.
 
@@ -1067,17 +1082,17 @@ rejected, the CCD noise parameters \fIrdnoise, gain\fR and \fIsnoise\fR,
 and \fIsigscale\fR to set the threshold for making corrections to the sigma
 calculation for different image scale factors.
 
-.in -4
+.in -2
 CRREJECT
-.in 4
+.in 2
 This algorithm is identical to "ccdclip" except that only pixels above
 the average are rejected based on the \fIhsigma\fR parameter.  This
 is appropriate for rejecting cosmic ray events and works even with
 two images.
 
-.in -4
+.in -2
 SIGCLIP
-.in 4
+.in 2
 The sigma clipping algorithm computes at each output pixel the median or
 average excluding the high and low values.  The sigma is then computed
 about this estimate (without excluding the low and high values).  There
@@ -1106,9 +1121,9 @@ clipping thresholds, and \fIsigscale\fR to set the threshold for
 making corrections to the sigma calculation for different image scale
 factors.
 
-.in -4
+.in -2
 AVSIGCLIP
-.in 4
+.in 2
 The averaged sigma clipping algorithm assumes that the sigma about the
 median or mean (average excluding the low and high values) is proportional
 to the square root of the median or mean at each point.  This is
@@ -1141,7 +1156,7 @@ rejected or the number of remaining input values falls below three.  Note
 that the proportionality factor is not recomputed after rejections.
 
 If the images are scaled differently and the sigma scaling correction
-threshold is exceeded then a correction is made in the sigma
+threshold is exceedd then a correction is made in the sigma
 calculations for these differences, again under the assumption that
 the noise in an image scales as the square root of the mean intensity.
 
@@ -1171,9 +1186,9 @@ clipping thresholds, and \fIsigscale\fR to set the threshold for
 making corrections to the sigma calculation for different image scale
 factors.
 
-.in -4
+.in -2
 PCLIP
-.in 4
+.in 2
 The percentile clipping algorithm is similar to sigma clipping using the
 median as the center of the distribution except that, instead of computing
 the sigma of the pixels from the CCD noise parameters or from the data
@@ -1231,8 +1246,8 @@ The  parameters affecting this algorithm are \fIreject\fR to select this
 algorithm, \fIpclip\fR to select the percentile pixel, \fInkeep\fR to limit
 the number of pixels rejected, and \fIlsigma\fR and \fIhsigma\fR to select
 the clipping thresholds.
-
 .in -4
+
 GROW REJECTION
 
 Neighbors of pixels rejected by the rejection algorithms
@@ -1246,9 +1261,72 @@ COMBINING
 
 After all the steps of offsetting the input images, masking pixels,
 threshold rejection, scaling, and applying a rejection algorithms the
-remaining pixels are combined and output.  The pixels may be combined
-by computing the median or by computing a weighted average.
+remaining pixels are combined and output as specified by the \fIcombine\fR
+parameter.  In all cases if there are no remaining pixels the \fIblank\fR
+is produced.  The combining choices are as follows.
 
+.in 2
+AVERAGE
+.in 2
+The weighted average of the remaining pixels is computed.  If no
+weighting was specified then a simple, unweighted average is used.
+If the sum of the weights of for the accepted pixels is zero then the
+unweighted average is output.
+
+.in -2
+MEDIAN
+.in 2
+The median of the remaining pixels is computed.  The median is the
+usual mathematical definition where a particular pixel value is produced
+for an odd number of pixels and the average of the two central values
+is computed for an even number of pixels.
+
+.in -2
+SUM
+.in 2
+The sum of the unrejected pixels is computed.  
+
+.in -2
+LMEDIAN
+.in 2
+The median of the remaining pixels is computed except that for two
+pixels the lower value is used.  This is a specialized feature useful
+for minimizing the effects of cosmic rays in dithered and/or masked data.
+
+.in -2
+QUADRATURE
+.in 2
+The pixels are combined as
+
+.nf
+    sqrt (sum {(wt * sigma)^2}) / sum {wt}
+.fi
+
+This is used when the input pixel values represent "sigmas".  This option
+is usually a second pass after the input data has been combined.  It is
+important that the input is arranged such that the same scaling and
+pixel rejections are used.  This means that these cannot be given by
+explicit lists and masks and not generated from the data.
+
+.in -2
+QUADRATURE
+.in 2
+The pixels are combined as
+
+.nf
+    value = max (0, scaled_pixel_value)
+    variance = rdnoise^2 + value / gain + (snoise * value)^2
+    output = sqrt (sum {variance * wt^2}) / sum {wt}
+.fi
+
+This is used when the variances in the input images can be computed
+by the above noise model.  Note that the gain and rdnoise are adjusted
+for any scaling applied to the pixel values.
+
+This method has the advantage that the input images are the same as
+those used to form a combined image and so all the steps of deriving
+scaling and rejecting pixels by some rejection method will be the same.
+.in -4
 
 SIGMA OUTPUT
 

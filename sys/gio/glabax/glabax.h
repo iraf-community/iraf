@@ -16,29 +16,29 @@ define	AX_DRAWME		Memi[$1+4]		# draw this axis
 define	AX_HORIZONTAL		Memi[$1+5]		# axis is horizontal
 define	AX_SCALING		Memi[$1+6]		# type of scaling
 define	AX_DRAWTICKS		Memi[$1+7]		# draw the ticks
-define	AX_START		Memr[$1+8+$2-1]		# axis starts here
-define	AX_END			Memr[$1+10+$2-1]	# axis ends here
-define	AX_TICK1		Memr[$1+12+$2-1]	# first tick is here
-define	AX_STEP			Memr[$1+14+$2-1]	# offset between ticks
-define	AX_ISTEP		Memr[$1+16+$2-1]	# intial offset
-define	AX_KSTEP		Memr[$1+18]		# step scalar at majors
-define	AX_IKSTEP		Memr[$1+19]		# initial kstep
+define	AX_START		Memr[P2R($1+8+$2-1)]	# axis starts here
+define	AX_END			Memr[P2R($1+10+$2-1)]	# axis ends here
+define	AX_TICK1		Memr[P2R($1+12+$2-1)]	# first tick is here
+define	AX_STEP			Memr[P2R($1+14+$2-1)]	# offset between ticks
+define	AX_ISTEP		Memr[P2R($1+16+$2-1)]	# intial offset
+define	AX_KSTEP		Memr[P2R($1+18)]	# step scalar at majors
+define	AX_IKSTEP		Memr[P2R($1+19)]	# initial kstep
 define	AX_NMINOR		Memi[$1+20]		# nminor ticks
 define	AX_NLEFT		Memi[$1+21]		# nminor to next major
 define	AX_INLEFT		Memi[$1+22]		# initial nleft
 define	AX_NDIGITS		Memi[$1+23]		# ndigits of precision
-define	AX_MINORTICK		Memr[$1+24+$2-1]	# offset to draw minor
-define	AX_MAJORTICK		Memr[$1+26+$2-1]	# offset to draw major
-define	AX_MINORWIDTH		Memr[$1+28]		# minor tick linewidth
-define	AX_MAJORWIDTH		Memr[$1+29]		# major tick linewidth
+define	AX_MINORTICK		Memr[P2R($1+24+$2-1)]	# offset to draw minor
+define	AX_MAJORTICK		Memr[P2R($1+26+$2-1)]	# offset to draw major
+define	AX_MINORWIDTH		Memr[P2R($1+28)]	# minor tick linewidth
+define	AX_MAJORWIDTH		Memr[P2R($1+29)]	# major tick linewidth
 define	AX_LABELTICKS		Memi[$1+30]		# draw tick labels
-define	AX_TICKLABELOFFSET	Memr[$1+31+$2-1]	# offset to ticklabel
-define	AX_TICKLABELSIZE	Memr[$1+33]		# char size of ticklabel
+define	AX_TICKLABELOFFSET	Memr[P2R($1+31+$2-1)]	# offset to ticklabel
+define	AX_TICKLABELSIZE	Memr[P2R($1+33)]	# char size of ticklabel
 define	AX_TICKLABELCOLOR	Memi[$1+34]		# char size of ticklabel
 define	AX_TICKCOLOR		Memi[$1+35]		# grid between ticks
-define	AX_AXISLABELSIZE	Memr[$1+36]		# char size axislabel
+define	AX_AXISLABELSIZE	Memr[P2R($1+36)]	# char size axislabel
 define	AX_AXISLABELCOLOR	Memi[$1+37]		# char size axislabel
-define	AX_AXISWIDTH		Memr[$1+38]		# axis linewidth
+define	AX_AXISWIDTH		Memr[P2R($1+38)]	# axis linewidth
 define	AX_AXISCOLOR		Memi[$1+39]		# axis linewidth
 define	AX_GRIDCOLOR		Memi[$1+40]		# grid between ticks
 

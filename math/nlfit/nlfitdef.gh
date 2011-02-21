@@ -1,21 +1,16 @@
 # The NLFIT data structure.
 
-# Pointer conversion for reals. This definition is needed to use the
-# generic preprocessor with this file.
-define	P2R		($1)
-
-
 # Structure length
 define	LEN_NLSTRUCT	35
 
 
 # Structure definition
-define	NL_TOL		Mem$t[P2$T($1+0)]	# Tolerance for convergence
-define	NL_LAMBDA	Mem$t[P2$T($1+2)]	# Damping factor
-define	NL_OLDSQ	Mem$t[P2$T($1+4)]	# Sum resid. squared last iter.
-define	NL_SUMSQ	Mem$t[P2$T($1+6)]	# Sum of residuals squared 
-define	NL_REFSQ	Mem$t[P2$T($1+8)]	# Reference sum of squares
-define	NL_SCATTER	Mem$t[P2$T($1+10)]	# Additional scatter
+define  NL_TOL          Mem$t[P2$T($1+0)]   # Tolerance for convergence
+define  NL_LAMBDA       Mem$t[P2$T($1+2)]   # Damping factor
+define	NL_OLDSQ	Mem$t[P2$T($1+4)]   # Sum resid. squared last iter.
+define	NL_SUMSQ	Mem$t[P2$T($1+6)]   # Sum of residuals squared 
+define	NL_REFSQ	Mem$t[P2$T($1+8)]   # Reference sum of squares
+define	NL_SCATTER	Mem$t[P2$T($1+10)]  # Additional scatter
 
 define	NL_FUNC		Memi[$1+12]	# Fitting function
 define	NL_DFUNC	Memi[$1+13]	# Derivative function
@@ -40,16 +35,16 @@ define	NL_CHOFAC	Memi[$1+29]	# Pointer to Cholesky factorization
 # next free location	($1 + 30)
 
 # Access to buffers
-define	PARAM		Mem$t[$1]	# Parameter vector
-define	DPARAM		Mem$t[$1]	# Parameter change vector
 define	PLIST		Memi[$1]	# Parameter list
-define	ALPHA		Mem$t[$1]	# Alpha matrix
-define	BETA		Mem$t[$1]	# Beta matrix
-define	TRY		Mem$t[$1]	# Trial vector
-define	DERIV		Mem$t[$1]	# Derivatives
-define	CHOFAC		Mem$t[$1]	# Cholesky factorization
-define	COVAR		Mem$t[$1]	# Covariance matrix
-
+define	OPARAM		Mem$t[P2P($1)]	# Original parameter vector
+define	PARAM		Mem$t[P2P($1)]	# Parameter vector
+define	DPARAM		Mem$t[P2P($1)]	# Parameter change vector
+define	ALPHA		Mem$t[P2P($1)]	# Alpha matrix
+define	BETA		Mem$t[P2P($1)]	# Beta matrix
+define	TRY		Mem$t[P2P($1)]	# Trial vector
+define	DERIV		Mem$t[P2P($1)]	# Derivatives
+define	CHOFAC		Mem$t[P2P($1)]	# Cholesky factorization
+define	COVAR		Mem$t[P2P($1)]	# Covariance matrix
 
 # Defined constants alter for tricky problems
 define	LAMBDAMAX	1000.0

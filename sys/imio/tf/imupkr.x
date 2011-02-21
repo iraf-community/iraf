@@ -8,6 +8,8 @@ procedure imupkr (a, b, npix, dtype)
 real	b[npix]
 int	a[npix], npix, dtype
 
+pointer	bp
+
 begin
 	switch (dtype) {
 	case TY_USHORT:
@@ -28,3 +30,5 @@ begin
 	    call error (1, "Unknown datatype in imagefile")
 	}
 end
+
+

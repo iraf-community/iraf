@@ -184,7 +184,7 @@ Reading the Cursor
 which is suitable for centering on two dimensional objects.  The default cursor
 will be a pair of 64 pixel long crosshairs with a gap in the middle.  When a
 cursor read is in progress the cursor will blink rapidly, e.g., at 4-8 Hz,
-signalling to the user that the program is waiting for a cursor read (this is
+signaling to the user that the program is waiting for a cursor read (this is
 like turning on the full crosshairs on the GTERM graphics screen).  The cursor
 may be moved either with the mouse or with the HJKL keys in cursor mode.
 A cursor read will be terminated by typing a key on the keyboard, or by

@@ -43,7 +43,7 @@ The pattern string \fIpatstr\fR is used to specify the subset of header keywords
 to be used to form the output list.  Some useful values are "*", which returns
 the names of all header keywords, and "i_", which returns the names of only the
 standard header keywords.  If the pattern string does not contain any pattern
-matching metacharacters it is treated as a prefix string (e.g., as "^patstr*").
+matching meta-characters it is treated as a prefix string (e.g., as "^patstr*").
 .ih
 RETURN VALUE
 The \fIimokwl\fR procedure returns a nonzero status only if it runs out of

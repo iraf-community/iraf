@@ -1,3 +1,4 @@
+        bpmedit - examine and edit bad pixel masks associated with images
 	display - Load an image or image section into the display
 	    iis - IIS image display control package
          imedit - Examine and edit pixels in images

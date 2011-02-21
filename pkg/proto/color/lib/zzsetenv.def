@@ -1,0 +1,7 @@
+# Global environment definitions for the COLOR package.
+
+set	colorlib	= "color$lib/"
+set	colorsrc	= "color$src/"
+set	colorbin	= "color$bin(arch)/"
+
+keep

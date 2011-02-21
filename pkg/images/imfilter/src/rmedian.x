@@ -60,12 +60,11 @@ begin
 	    # Median filter the image line.
 	    call med_remedfilter (med, Memr[inbuf], ncols, nlines, Memr[outbuf],
 		int (IM_LEN(im2, 1)), Memr[filter], kernel, nxk, nyk)
-
 	}
 
 	# Free space.
 	call mfree (filter, TY_REAL)
-	call mfree (inbuf, TY_INT)
+	call mfree (inbuf, TY_REAL)
 end
 
 
@@ -125,4 +124,3 @@ begin
 		medline[i] = zlo
 	}
 end
-

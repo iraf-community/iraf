@@ -164,7 +164,7 @@ point-spread function. Once an optimum set of algorithm parameters is
 chosen, the user need only alter the DATAPARS scale parameter before
 executing an APPHOT task on a new image.
 
-If  \fIemission\fR is "yes, the features to be measured are assumed to be
+If  \fIemission\fR is "yes", the features to be measured are assumed to be
 above sky. By default the APPHOT package considers all measurements to
 be measurements of emission features. In most cases APPHOT users should
 leave emission set to "yes".

@@ -533,6 +533,11 @@ g-xbm|UNIX generic interface to multi-frame XBM file generator:\
 	$F.[1-8]  > sgi$$.xbm; rm $F.[1-8]; }&:\
 	:MF#8:NF:tc=sgi_image_format:
 
+g-svg|UNIX generic interface to SVG file generator:\
+        :DD=usvg,tmp$sgk,!{ sgidispatch sgi2svg -w $(PX) -h $(PY) \
+        -bg FFF -fg 000 -fill FFF $F > sgi$$.svg ; }&:PX#640:PY#480:\
+	:kf=bin$x_sgikern.e:tn=sgikern:tc=sgi_apl:
+
 sgi_image_format|Generic raster file format specification:\
 	:kf=bin$x_sgikern.e:tn=sgikern:\
 	:ar#.75:xr#640:yr#480:PX#640:PY#480:XW#640:YW#480:\
@@ -830,6 +835,8 @@ nas_solitaire|Common parameters for above different resolutions:\
 # can have their own copy of the graphcap file if a more personalized
 # ordering is called for.
 
+xxgterm|xgterm-nogui|XGterm with GUI messaging disabled:\
+	:EM=^]^Y:ED=lib$scr/xxgterm.gui:tc=xgterm:
 xgtermb|XGterm graphics terminal emulator for the X window system:\
 	:tc=gterm:
 xgtermd|xgterm-nogui|XGterm with GUI messaging disabled:\

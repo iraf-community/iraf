@@ -75,7 +75,7 @@ begin
 	# Do photometry for all the apertures.
 	AP_NMINAP(phot) = AP_NMAXAP(phot) + 1
 	call amulkr (Memr[AP_APERTS(phot)], AP_SCALE(ap), Memr[temp],
-	    AP_NAPERTS(phot)]
+	    AP_NAPERTS(phot))
 
 	switch (AP_PWEIGHTS(phot)) {
 	case AP_PWCONSTANT:

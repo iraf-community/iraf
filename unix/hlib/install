@@ -57,7 +57,8 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 set LS			= "/bin/ls"				# [MACHDEP]
 set LSDF        	= "-lLtgs"				# [MACHDEP]
 
-set VERSION		= "V2.14"
+set VERSION		= "V2.15.1a"
+set V 			= `echo $VERSION | cut -c2-5`
 set hmach 		= "INDEF"
 set pciraf 		= 0
 set suniraf 		= 0
@@ -111,6 +112,17 @@ else
     exit 1
 endif
 
+set WHOAMI=`whoami`
+if (-e /usr/bin/whoami) then
+    set WHOAMI=`/usr/bin/whoami`
+else if (-e /usr/ucb/whoami) then
+    set WHOAMI=`/usr/ucb/whoami`
+else
+    WARNING  "No 'whoami' command found for this architecture."
+    exit 1
+endif
+
+
 
 
 switch ($UNAME) 
@@ -146,7 +158,13 @@ switch ($UNAME)
     case linux:
 	set pciraf		= 1
 	set do_tapecaps 	= 1
-        if (`$uname_cmd -m` == "ppc") then		    # LinuxPPC
+        if (`$uname_cmd -m` == "x86_64") then		    # Linux x86_64
+            set mach 		= "linux64"
+            set hmach 		= "linux64"
+	    set TAPES		= "/dev/*st[0-7]"
+	    set shlib		= "no"
+	    set LIBFILES    	= ""
+        else if (`$uname_cmd -m` == "ppc") then		    # LinuxPPC
             if (-f /etc/redhat-release) then
                 set mach 	= "linuxppc"
                 set hmach 	= "linuxppc"
@@ -186,15 +204,19 @@ switch ($UNAME)
     case darwin: 					    # Mac OS X
     case macosx:
     case macintel:
+    case ipad:
 	# Mac OS X doesn't appear to have tape support 
 	# at this point.
 	set do_tapecaps 	= 0
 	set do_tapes 		= 0
 	set do_pipes 		= 0
-        if (`$uname_cmd -m` == "i386") then		    # LinuxPPC
+        if (`$uname_cmd -m` == "x86_64") then		    # 64-bit OSX
             set mach 		= "macintel"
             set hmach 		= "macintel"
-        else
+        else if (`$uname_cmd -m |cut -c1-4` == "iPad") then # iPad/iPod OSX
+            set mach 		= "ipad"
+            set hmach 		= "ipad"
+        else						    # 32-bit OSX
             set mach 		= "macosx"
             set hmach 		= "macosx"
         endif
@@ -403,6 +425,11 @@ while ("$1" != "")
 	    exit 1
 	endif
 	set mach = "$1"
+	if ("$1" == "ssun") then
+	    set hmach = "ssol"
+	else
+	    set hmach = "$1"
+	endif
 	breaksw
     case -r:				# set root directory
 	if ("$2" != "") then
@@ -458,7 +485,7 @@ end
 #=============================================================================
 # See whether we're gonna work ...
 #=============================================================================
-if ($exec == yes && `whoami` != "root" && $mach != "cygwin") then
+if ($exec == yes && $WHOAMI != "root" && $mach != "cygwin") then
   clear
   NEWLINE
   BOLD_ON
@@ -1048,6 +1075,9 @@ endif
 
 # Check iraf user.
 
+goto _no_user_check
+
+#  Check for iraf user disabled for all platforms with v2.15
 if ($mach == "macosx" || $mach == "macintel" || $mach == "cygwin") then
     goto _no_user_check
 endif
@@ -1168,7 +1198,8 @@ _no_user_check:
 
 
 # Skip the ownership check on some platforms.
-if ($mach != "cygwin" && $mach != "macosx" && $mach != "macintel") then
+if ($V != "2.15") then
+ if ($mach != "cygwin" && $mach != "macosx" && $mach != "macintel") then
 
   # Check file ownership.
   if ($mach == "hp700" || $mach == "rs6000") then
@@ -1207,7 +1238,7 @@ if ($mach != "cygwin" && $mach != "macosx" && $mach != "macintel") then
     set warn_count = `expr $warn_count + 1`
   endif
 
-endif
+ endif
 
 # Check file/directory permissions.
 echo -n "Checking file permissions ...					"
@@ -1232,15 +1263,26 @@ else
     set err_count = `expr $err_count + 1`
 endif
 
+endif
 
 
 # Check iraf tree for proper structure.
+set check_iraf_tree = 0			# for v214 and earlier
+
 set iraf_r  = $iraf			# iraf root directory
 set iraf_p  = $iraf_r:h			# iraf parent directory
 set iraf_b  = $iraf_p/irafbin		# irafbin directory
+set iraf_tree_ok = 1
+
+set iraf_ib = $iraf/bin.$mach		# irafbin IB directory
+set iraf_nb = $iraf/noao/bin.$mach	# irafbin NB directory
+
+
+if ($check_iraf_tree == 1) then
+
 set iraf_ib = $iraf_b/bin.$mach		# irafbin IB directory
 set iraf_nb = $iraf_b/noao.bin.$mach	# irafbin NB directory
-set iraf_tree_ok = 1
+
 
 echo "Checking proper iraf tree structure in $iraf_p ..."
 
@@ -1310,6 +1352,11 @@ if ("$iraf_tree_ok" == 0) then
       MSG  "system architecture."
   NEWLINE
 endif
+
+endif	# if (check_iraf_tree)
+
+
+
 
 # Check binary dirs are both populated correctly.
 echo -n "Checking Core system binary directory ...			"
@@ -1433,9 +1480,9 @@ set BINDIRS	= "$hbin $hlib $fbin $host"
 
 # The following file lists are partially system dependent.
 set PATHFILES	= "mkiraf.csh libc/iraf.h cl.csh"
-set MODEFILES	= "cl.csh fc.csh mkiraf.csh mkfloat.csh mkmlist.csh $host/reboot generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e"
+set MODEFILES	= "cl.csh fc.csh mkiraf.csh mkfloat.csh mkmlist.csh $host/reboot generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e irafarch.csh"
 set LINKFILES	= "ecl.e cl.e mkiraf.csh mkmlist.csh generic.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
-set CMDLINKS	= "ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc"
+set CMDLINKS	= "ecl cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc irafarch"
 
 
 #=============================================================================
@@ -1620,8 +1667,11 @@ endif
 # directory so the account has the proper environment.
 
 set err_seen = 0
-if ($pciraf && ($mach == "macosx" || $mach == "macintel" || $mach == "cygwin")) then
-echo -n "Creating iraf user .login/.cshrc links ...			"
+
+if ($V != "2.15") then
+
+ if ($pciraf && ($mach == "macosx" || $mach == "macintel" || $mach == "cygwin")) then
+ echo -n "Creating iraf user .login/.cshrc links ...			"
 
     set v = `finger iraf |& egrep '^Directory'`
     set ihome = `echo $v[2] | sed -e 's+/\(["]*\)$+\1+'`
@@ -1659,8 +1709,9 @@ echo -n "Creating iraf user .login/.cshrc links ...			"
     if ("$err_seen" == 0) then
         DO_OK
     endif
-endif
+ endif
 
+endif
 
 
 # Edit the $iraf and $imdir paths in mkiraf.csh, cl.csh, and libc/iraf.h files.
@@ -2105,10 +2156,13 @@ endif
 
 # Verify imtoolrc link.
 echo -n "Checking /usr/local/lib directory ...				"
-if (! -e /usr/local) then
+if (! -e /usr/local/lib) then
     if ($exec == yes) then
-	mkdir /usr/local
-	if (-d /usr/local) then
+	if (! -e /usr/local) then
+	    mkdir /usr/local
+	endif
+	mkdir /usr/local/lib
+	if (-d /usr/local/lib) then
 	    DO_OK
 	else
 	    DO_FAIL
@@ -2120,21 +2174,7 @@ if (! -e /usr/local) then
 else
     DO_OK
 endif
-if (! -e /usr/local/lib) then
-    if ($exec == yes) then
-	mkdir /usr/local/lib
-        if (-d /usr/local/lib) then
-            DO_OK
-        else
-            DO_FAIL
-    	    set err_count = `expr $err_count + 1`
-        endif
-    else
-	DO_OK
-    endif
-else
-    DO_OK
-endif
+
 
 # Verify or set the IMTOOLRC link.
 if ($exec == yes) then
@@ -2160,7 +2200,7 @@ else
 	ln -s $file2 $file1
     endif
 endif
-if (("$err_seen" == 0 && -e $file) || $exec == "no") then
+if (("$err_seen" == 0 && -e $file1) || $exec == "no") then
     DO_OK
 else
     DO_FAIL
@@ -2836,7 +2876,7 @@ endif
 
 # Get the set of currently installed system binaries.
 set archs = ""
-foreach i ($iraf_p/irafbin/bin.*)
+foreach i ($iraf/bin.*)
   set dir = $i:t
   if ($dir:r == "bin") then
     set sz = `(chdir $i ; du -s | awk '{printf ("%d", $1)}')`

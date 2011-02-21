@@ -100,7 +100,7 @@ Implementation
     Little effort should be made to make the prototype optimal.  All
 buffering will be locally allocated, and data will be copied to and from
 the FIO buffers (the FIO buffers will not be directly accessed).  Special
-cases will not be optimised.  The most general entry points are IMGGSR
+cases will not be optimized.  The most general entry points are IMGGSR
 and IMPGSR (get/put general section).  Initially, all of the other entry
 points can be defined in terms of these.
 

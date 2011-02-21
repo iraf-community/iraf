@@ -23,6 +23,7 @@ c       # Unpack the EOS delimited SPP string.
  20     continue
 c
 c       # Pad on the right with blanks.
+	if (last .gt. maxch) last = maxch
 	if (last .le. 0) then
 	    f77str = ' '
 	else

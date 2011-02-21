@@ -66,7 +66,7 @@ begin
 
 	# Read in the rasterfile header, dump it directly to the task struct.
 	call ip_ageti (fd, ras, 8)
-	filepos = filepos + SZ_INT*SZB_CHAR*8
+	filepos = filepos + SZ_INT32 * SZB_CHAR * 8
 	call ip_lseek (fd, filepos)
 
 	# Now do some sanity checking on the values.

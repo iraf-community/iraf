@@ -8,8 +8,7 @@
 /* NOTI -- Bitwise boolean NOT of an integer variable.
  */
 XINT
-NOTI (a)
-XINT	*a;
+NOTI (XINT *a)
 {
 	return (~(*a));
 }
@@ -18,8 +17,7 @@ XINT	*a;
 /* NOTS -- Bitwise boolean NOT of a short integer variable.
  */
 XSHORT
-NOTS (a)
-XSHORT	*a;
+NOTS (XSHORT *a)
 {
 	return (~(*a));
 }
@@ -28,8 +26,7 @@ XSHORT	*a;
 /* NOTL -- Bitwise boolean NOT of a long integer variable.
  */
 XLONG
-NOTL (a)
-XLONG	*a;
+NOTL (XLONG *a)
 {
 	return (~(*a));
 }

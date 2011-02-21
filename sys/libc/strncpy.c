@@ -1,18 +1,20 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
- */
+*/
 
 #define	import_libc
 #include <iraf.h>
 
+
 /* STRNCPY -- Copy exactly N characters from S2 to S1, truncating or null
- * padding S2; the output string may not be null terminated if the length
- * of S2 is N or more.
- */
+** padding S2; the output string may not be null terminated if the length
+** of S2 is N or more.
+*/
 char *
-strncpy (s1, s2, n)
-char	*s1;			/* output string		*/
-char	*s2;			/* string to be moved		*/
-register int n;
+strncpy (
+  char	*s1,			/* output string		*/
+  char	*s2,			/* string to be moved		*/
+  int   n
+)
 {
 	register char	*ip, *op;
 

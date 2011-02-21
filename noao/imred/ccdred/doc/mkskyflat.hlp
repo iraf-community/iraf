@@ -34,7 +34,7 @@ Clean the input images of objects?  If yes then a clipping algorithm is
 used to detect and exclude objects from the smoothing.
 .le
 .ls lowsigma = 2.5, highsigma = 2.5
-Sigma clipping thresholds above and below the smoothed illumination.
+Sigma clipping thresholds above and below the smoothed iillumination.
 .le
 .ls ccdproc (pset)
 CCD processing parameter set.
@@ -47,35 +47,35 @@ scale gradients.  Flat field images are generally obtained by exposures
 to lamps either illuminating the telescope field or a surface in the dome
 at which the telescope is pointed.  Because the detector is not illuminated
 in the same way as an observation of the sky there may be large
-scale illumination patterns introduced into the observations with such
+scale iillumination patterns introduced into the observations with such
 a flat field.  To correct this type of flat field a blank sky observation
 (which has been divided by the original flat field) is heavily smoothed
-to remove the noise leaving only the residual large scale illumination
-pattern.  This illumination pattern is divided into the original flat
+to remove the noise leaving only the residual large scale iillumination
+pattern.  This iillumination pattern is divided into the original flat
 field to remove this residual.
 
 The advantage of creating a sky flat field is that when processing
 the observations no additional operations are required.  However,
 if the observations have already been processed with the original
-flat field then the residual illumination pattern of blank sky
-calibration images may be created as an illumination correction
+flat field then the residual iillumination pattern of blank sky
+calibration images may be created as an iillumination correction
 to be applied by \fBccdproc\fR.  Such a correction is created by the
 task \fBmkskycor\fR.  If a good blank sky image is not
-available then it may be desirable to remove the illumination pattern
+available then it may be desirable to remove the iillumination pattern
 of the flat field image using \fBmkillumflat\fR or \fBmkillumcor\fR
 provided the sky observations are truly uniformly illuminated.
-For more on flat fields and illumination corrections see \fBflatfields\fR.
+For more on flat fields and iillumination corrections see \fBflatfields\fR.
 
 The input, blank sky images are first processed, based on the
 \fBccdproc\fR parameters, if needed.  These parameters also determine
 the flat field image to be used in making the sky flat.  The residual
-illumination pattern is determined by heavily smoothing the image using
+iillumination pattern is determined by heavily smoothing the image using
 a moving "boxcar" average.  The effects of objects in the input image
 may be minimized by using a sigma clipping algorithm to detect and
 exclude the objects from the average.  The output image is ratio of the
 flat field image, for the same subset as the input image, to the
-residual illumination pattern determined from the processed blank sky
-input image.  The illumination pattern is normalized by its mean to
+residual iillumination pattern determined from the processed blank sky
+input image.  The iillumination pattern is normalized by its mean to
 preserve the mean level of the flat field image.
 
 The smoothing algorithm is a moving average over a two dimensional
@@ -90,7 +90,7 @@ algorithms such as surface fitting, more processing time.
 
 Blank sky images may not be completely blank so a sigma clipping
 algorithm may be used to detect and exclude objects from the
-illumination pattern.  This is done by computing the rms of the image
+iillumination pattern.  This is done by computing the rms of the image
 lines relative to the smoothed background and excluding points
 exceeding the specified threshold factors times the rms.  This is done
 before each image line is added to the moving average, except for the

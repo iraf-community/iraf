@@ -58,7 +58,8 @@ begin
 	    call realloc (PL_LPP(pl), nlp, TY_INT)
 
 	call salloc (index, sz_index, TY_SHORT)
-	ip = bp + (LEN_PLEXTERN * SZ_STRUCT) / SZ_SHORT
+	#ip = bp + (LEN_PLEXTERN * SZ_STRUCT) / SZ_SHORT
+	ip = bp + (LEN_PLEXTERN * SZ_MII_INT) / SZ_SHORT
 	call miiupk16 (Mems[ip], Mems[index], sz_index, TY_SHORT)
 	PL_NLP(pl) = pl_l2pi (Mems[index], 1, PL_LP(pl,1), nlp)
 

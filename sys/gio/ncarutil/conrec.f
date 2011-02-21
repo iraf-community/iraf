@@ -616,7 +616,8 @@ C
          IWORK = 'CONSTANT FIELD'
 C +NOAO 
 C     WRITE( ENCSCR, '(G22.14)' ) GL
-      call encode (22, '(g22.14)', encscr, gl)
+      i = gl
+      call encode (22, '(g22.14)', encscr, i)
 C -NOAO
       DO 126 I=1,22
          IWORK(I+14:I+14) = ENCSCR(I:I)

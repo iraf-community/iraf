@@ -3,7 +3,7 @@ define	NUMSTART		11	# First object number
 # Header structure.
 define	HDR_SZFNAME	99		# Length of filename strings.
 define	HDR_LEN		101
-define	HDR_MAGZERO	Memr[$1]		# Magnitude zero point
+define	HDR_MAGZERO	Memr[P2R($1)]		# Magnitude zero point
 define	HDR_IMAGE	Memc[P2C($1+1)]		# Image name
 define	HDR_MASK	Memc[P2C($1+51)]	# Object mask name
 

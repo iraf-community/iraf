@@ -1020,7 +1020,7 @@ begin
 	# At this point we have osdir, root, and extn strings, any of which may
 	# be null.  If more than one "." delimited extn string was encountered
 	# during escape sequence encoding, or if the maximum extn length was
-	# exceeded, then that extn will already have been incorporated into the
+	# exceedd, then that extn will already have been incorporated into the
 	# root.
 
 	if (extn != null_string)

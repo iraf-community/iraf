@@ -12,12 +12,12 @@ define	ID_APS		Memi[$1+9]	# Array of apertures (pointer)
 define	ID_NSUM		Memi[$1+$2+10]	# Number of lines to sum [2]
 define	ID_MAXFEATURES	Memi[$1+13]	# Maximum number of features
 define	ID_FTYPE	Memi[$1+14]	# Feature type
-define	ID_MINSEP	Memr[$1+15]	# Minimum pixel separation
-define	ID_MATCH	Memr[$1+16]	# Maximum matching separation
-define	ID_FWIDTH	Memr[$1+17]	# Feature width in pixels
-define	ID_CRADIUS	Memr[$1+18]	# Centering radius in pixels
-define	ID_THRESHOLD	Memr[$1+19]	# Centering threshold
-define	ID_ZWIDTH	Memr[$1+20]	# Zoom window width in fit units
+define	ID_MINSEP	Memr[P2R($1+15)] # Minimum pixel separation
+define	ID_MATCH	Memr[P2R($1+16)] # Maximum matching separation
+define	ID_FWIDTH	Memr[P2R($1+17)] # Feature width in pixels
+define	ID_CRADIUS	Memr[P2R($1+18)] # Centering radius in pixels
+define	ID_THRESHOLD	Memr[P2R($1+19)] # Centering threshold
+define	ID_ZWIDTH	Memr[P2R($1+20)] # Zoom window width in fit units
 define	ID_DATABASE	Memi[$1+21]	# Name of database (pointer)
 define	ID_COORDLIST	Memi[$1+22]	# Name of coordinate list (pointer)
 define	ID_LL		Memi[$1+23]	# Pointer to lines in coordinate list

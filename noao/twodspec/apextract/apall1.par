@@ -1,5 +1,6 @@
 # OUTPUT PARAMETERS
 
+apertures,s,h,)apall.apertures,,,>apall.apertures
 format,s,h,)apall.format,,,>apall.format
 extras,b,h,)apall.extras,,,>apall.extras
 dbwrite,s,h,yes,,,Write to database?

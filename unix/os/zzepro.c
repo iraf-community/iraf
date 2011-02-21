@@ -18,16 +18,20 @@
  */
 
 /* NOTE: Following is also picked up by Mac/Intel. */
-#if defined(MACOSX) || defined(CYGWIN)
+#if ( (defined(MACOSX) || defined(CYGWIN)) && !defined(IPAD))
 
 int macosx_sigmask = (FE_DIVBYZERO|FE_OVERFLOW|FE_INVALID);
+
+void mxmask_ (void);
+void mxumsk_ (void);
 
 
 /* ZZEPRO.C -- On MacOSX (which under 10.1.x can't raise a hardware
  * exception) we check at the end of every procedure to see if a floating
  * exception occurred.
  */
-ZZEPRO()
+int
+ZZEPRO (void)
 {
 	fexcept_t  flagp;
 
@@ -41,18 +45,20 @@ ZZEPRO()
 	/* Clear the exception. */
     	flagp = (fexcept_t) NULL;
     	feclearexcept (FE_ALL_EXCEPT);
+
+	return (XOK);
 }
 
 /* Mask or unmask the invalid operand exception.  Invalid must be
  * masked to be able to operate upon invalid operands, e.g., to filter
  * out NaN/Inf in IEEE i/o code (see as$ieee.gx).
  */
-mxmask_()
+void mxmask_ (void)
 {
 	macosx_sigmask &= ~FE_INVALID;
 }
 
-mxumsk_()
+void mxumsk_ (void)
 {	
 	fexcept_t  flagp;
 
@@ -65,5 +71,5 @@ mxumsk_()
 
 
 #else
-ZZEPRO() {}
+int ZZEPRO ( void) { return (XOK); }
 #endif

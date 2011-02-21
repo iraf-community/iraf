@@ -55,7 +55,7 @@ define	SG_UIFDATE	Memi[$1+30]		# UI file date
 			# empty
 define	SG_CHARHEIGHT	Memi[$1+40+$2-1]	# character height
 define	SG_CHARWIDTH 	Memi[$1+50+$2-1]	# character width
-define	SG_CHARSIZE	Memr[$1+60+$2-1]	# text sizes permitted
+define	SG_CHARSIZE	Memr[P2R($1+60+$2-1)]	# text sizes permitted
 define	SG_PLAP		($1+70)			# polyline attributes
 define	SG_PMAP		($1+74)			# polymarker attributes
 define	SG_FAAP		($1+78)			# fill area attributes
@@ -85,7 +85,7 @@ define	TX_STATE	Memi[$1]
 define	TX_UP		Memi[$1+1]
 define	TX_SIZE		Memi[$1+2]
 define	TX_PATH		Memi[$1+3]
-define	TX_SPACING	Memr[$1+4]
+define	TX_SPACING	Memr[P2R($1+4)]
 define	TX_HJUSTIFY	Memi[$1+5]
 define	TX_VJUSTIFY	Memi[$1+6]
 define	TX_FONT		Memi[$1+7]

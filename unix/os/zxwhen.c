@@ -89,7 +89,13 @@ int debug_sig = 0;
 #endif
 #endif
 
-int ex_handler();
+
+#if (defined(MACOSX) && defined(OLD_MACOSX))
+void ex_handler ( int, int, struct sigcontext * );
+#else
+void ex_handler ( int, siginfo_t *, void * );
+#endif
+
 static long setsig();
 static int ignore_sigint = 0;
 
@@ -129,11 +135,11 @@ static int ignore_sigint = 0;
 int	last_os_exception;	/* save OS code of last exception	*/
 int	last_os_hwcode;		/* hardware exception code		*/
 
-int handler_epa[] = {		/* table of handler EPAs		*/
-	NULL,			/* X_ACV    				*/
-	NULL,			/* X_ARITH  				*/
-	NULL,			/* X_INT    				*/
-	NULL,			/* X_IPC    				*/
+XINT handler_epa[] = {		/* table of handler EPAs		*/
+	0,			/* X_ACV    				*/
+	0,			/* X_ARITH  				*/
+	0,			/* X_INT    				*/
+	0,			/* X_IPC    				*/
 };
 
 struct osexc {
@@ -142,24 +148,24 @@ struct osexc {
 };
 
 struct osexc unix_exception[] = {
-	NULL,		"",
-	NULL,		"hangup",
-	X_INT,		"interrupt",
-	NULL,		"quit",
-	X_ACV,		"illegal instruction",
-	NULL,		"trace trap",
-	X_ACV,		"abort",
-	X_ACV,		"EMT exception",
-	X_ARITH,	"arithmetic exception",
-	NULL,		"kill",
-	X_ACV,		"bus error",
-	X_ACV,		"segmentation violation",
-	X_ACV,		"bad arg to system call",
-	X_IPC,		"write to pipe with no reader",
-	NULL,		"alarm clock",
-	X_INT,		"software terminate (interrupt)",
-	X_ARITH,	"STKFLT",
-	EOMAP,		""
+	{ 0,		""					},
+	{ 0,		"hangup"				},
+	{ X_INT,	"interrupt"				},
+	{ 0,		"quit"					},
+	{ X_ACV,	"illegal instruction"			},
+	{ 0,		"trace trap"				},
+	{ X_ACV,	"abort"					},
+	{ X_ACV,	"EMT exception"				},
+	{ X_ARITH,	"arithmetic exception"			},
+	{ 0,		"kill"					},
+	{ X_ACV,	"bus error"				},
+	{ X_ACV,	"segmentation violation"		},
+	{ X_ACV,	"bad arg to system call"		},
+	{ X_IPC,	"write to pipe with no reader"		},
+	{ 0,		"alarm clock"				},
+	{ X_INT,	"software terminate (interrupt)" 	},
+	{ X_ARITH,	"STKFLT"				},
+	{ EOMAP,	""					}
 };
 
 
@@ -184,15 +190,15 @@ struct	_hwx {
 #endif
 
 struct	_hwx hwx_exception[] = {
-	FPE_INTDIV,             "integer divide by zero",
-	FPE_INTOVF,             "integer overflow",
-	FPE_FLTDIV,             "floating point divide by zero",
-	FPE_FLTOVF,             "floating point overflow",
-	FPE_FLTUND,             "floating point underflow",
-	FPE_FLTRES,             "floating point inexact result",
-	FPE_FLTINV,             "floating point invalid operation",
-	FPE_FLTSUB,             "subscript out of range",
-	EOMAP,			""
+	{ FPE_INTDIV,             "integer divide by zero"		},
+	{ FPE_INTOVF,             "integer overflow"			},
+	{ FPE_FLTDIV,             "floating point divide by zero"	},
+	{ FPE_FLTOVF,             "floating point overflow"		},
+	{ FPE_FLTUND,             "floating point underflow"		},
+	{ FPE_FLTRES,             "floating point inexact result"	},
+	{ FPE_FLTINV,             "floating point invalid operation"	},
+	{ FPE_FLTSUB,             "subscript out of range"		},
+	{ EOMAP,			""				}
 };
 
 
@@ -200,14 +206,19 @@ struct	_hwx hwx_exception[] = {
  * value of old handler, so that it may be restored by the user code if
  * desired.  The function EPA's are the type of value returned by ZLOCPR.
  */
-ZXWHEN (sig_code, epa, old_epa)
-XINT	*sig_code;
-XINT	*epa;			/* EPA of new exception handler	*/
-XINT	*old_epa;		/* receives EPA of old handler	*/
+int
+ZXWHEN (
+  XINT	*sig_code,
+  XINT	*epa,			/* EPA of new exception handler	*/
+  XINT	*old_epa 		/* receives EPA of old handler	*/
+)
 {
 	static	int first_call = 1;
 	int     vex, uex;
 	SIGFUNC	vvector;
+
+	extern  int  kernel_panic ();
+
 
 	/* Convert code for virtual exception into an index into the table
 	 * of exception handler EPA's.
@@ -220,7 +231,7 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
 	    vex = *sig_code - X_FIRST_EXCEPTION;
 	    break;
 	default:
-	    vex = NULL;
+	    vex = (int) NULL;
 	    kernel_panic ("zxwhen: bad exception code");
 	}
 	    
@@ -231,10 +242,10 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
 	/* Check for attempt to post same handler twice.  Do not return EPA
 	 * of handler as old_epa as this could lead to recursion.
 	 */
-	if (*epa == X_IGNORE)
+	if (*epa == (XINT) X_IGNORE)
 	    vvector = (SIGFUNC) SIG_IGN;
 	else if (*epa == *old_epa)
-	    *old_epa = X_IGNORE;
+	    *old_epa = (XINT) X_IGNORE;
 
 	/* Set all hardware vectors in the indicated exception class.
 	 * If interrupt (SIGINT) was disabled when we were spawned (i.e.,
@@ -242,7 +253,7 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
 	 * we will get interrupted when the user interrupts the parent.
 	 */
 	for (uex=1;  unix_exception[uex].x_vex != EOMAP;  uex++) {
-	    if (unix_exception[uex].x_vex == *sig_code)
+	    if (unix_exception[uex].x_vex == *sig_code) {
 		if (uex == SIGINT) {
 		    if (first_call) {
 			if (setsig (uex, vvector) == (long) SIG_IGN) {
@@ -262,7 +273,10 @@ XINT	*old_epa;		/* receives EPA of old handler	*/
 		    else
 			setsig (uex, vvector);
 		}
+	    }
 	}
+
+	return (XOK);
 }
 
 
@@ -295,8 +309,9 @@ SIGFUNC	handler;
  * handler.  If we get the software termination signal from the CL, 
  * stop process execution immediately (used to kill detached processes).
  */
-#ifdef MACOSX
+#if (defined(MACOSX) && defined(OLD_MACOSX))
 
+void
 ex_handler (unix_signal, info, scp)
 int unix_signal;
 #ifdef OLD_MACOSX
@@ -312,15 +327,20 @@ struct sigcontext *scp;
 
 #else
 
-ex_handler (unix_signal, info, ucp)
-int unix_signal;
-siginfo_t *info;
-void *ucp;
-
+void
+ex_handler (
+  int  	    unix_signal,
+  siginfo_t *info,
+  void      *ucp
+)
 #endif
 {
-	XINT next_epa, epa, x_vex;
-	int *frame, vex;
+	XINT  next_epa, epa, x_vex;
+	int   vex;
+
+#ifndef LINUX64
+	extern  int sfpucw_();
+#endif
 
 	last_os_exception = unix_signal;
         last_os_hwcode = info ? info->si_code : 0;
@@ -354,8 +374,19 @@ void *ucp;
 
 	    sfpucw_ (&fpucw);
 #else
+#ifdef LINUX64
+            /*
+            XINT fpucw = 0x336;
+            SFPUCW (&fpucw);
+            */
+            fpu_control_t cw = 
+                (_FPU_EXTENDED | _FPU_MASK_PM | _FPU_MASK_UM | _FPU_MASK_ZM | _FPU_MASK_DM);
+            _FPU_SETCW(cw);
+
+#else
 	    int fpucw = 0x336;
 	    sfpucw_ (&fpucw);
+#endif
 #endif
 	}
 #endif
@@ -378,9 +409,9 @@ void *ucp;
 	 * wishes to restart the process, i.e., initiate error recovery, then
 	 * the handler procedure will not return.
 	 */
-	for (next_epa=epa;  next_epa != X_IGNORE;
-		((SIGFUNC)epa)(&x_vex,&next_epa))
-	    epa = next_epa;
+	for (next_epa=epa;  next_epa != (XINT) X_IGNORE;
+	    ((SIGFUNC)epa)(&x_vex,&next_epa))
+	        epa = next_epa;
 }
 
 
@@ -388,10 +419,12 @@ void *ucp;
  * most recent exception.  The integer code XOK is returned if no exception
  * has occurred, or if we are called more than once.
  */
-ZXGMES (os_exception, errmsg, maxch)
-XINT	*os_exception;
-PKCHAR	*errmsg;
-XINT	*maxch;
+int
+ZXGMES (
+  XINT	  *os_exception,
+  PKCHAR  *errmsg,
+  XINT	  *maxch
+)
 {
 	register int	v;
 	char	*os_errmsg;
@@ -415,4 +448,28 @@ XINT	*maxch;
 	((char *)errmsg)[*maxch] = EOS;
 
 	last_os_exception = XOK;
+
+	return (XOK);
 }
+
+
+#ifdef LINUX64
+
+int
+gfpucw_ (XINT *xcw)
+{
+        fpu_control_t cw;
+        _FPU_GETCW(cw);
+        *xcw = cw;
+        return cw;
+}
+
+int
+sfpucw_ (XINT *xcw)
+{
+        fpu_control_t cw = *xcw;
+        _FPU_SETCW(cw);
+        return cw;
+}
+
+#endif

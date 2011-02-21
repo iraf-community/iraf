@@ -9,7 +9,7 @@ rcamera camera_file file_list iraf_file
 PARAMETERS
 .ls 4 camera_file
 The CAMERA data source.  If the data source is a list of disk files or an
-explict tape file
+explicit tape file
 specification of the form mt*[n] where n is a file number. If the file
 number is specified then only that file
 is converted.  If the general tape device name is given, i.e. mta, mtb800, etc,

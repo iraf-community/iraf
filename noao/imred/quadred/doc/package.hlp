@@ -61,7 +61,7 @@ Package version.
 .le
 .ih
 DESCRIPTION
-The \fBquadred\fR package contains all basic tasks neccesary for the
+The \fBquadred\fR package contains all basic tasks necessary for the
 reduction of CCD data in single image format.  This includes both single
 amplifier readout data and multi-amplifier data stored as sections in a
 single two-dimensional image.  One example of this type of multi-amplifier

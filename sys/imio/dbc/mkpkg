@@ -20,7 +20,6 @@ libex.a:
 	imaksci.x
 	imastrc.x
 	imastrci.x
-	imdcom.x        idbc.h
 	imgcom.x        idbc.h <ctype.h>
 	iminfi.x        idbc.h <fset.h> <imhdr.h> <imio.h>
 	impcom.x        idbc.h
@@ -30,6 +29,7 @@ libex.a:
 	impklc.x
 	impkrc.x        <mach.h>
 	impksc.x
+	imdrmcom.x      idbc.h
 	impstrc.x       idbc.h
 	imputextf.x     idbc.h <ctype.h> <imhdr.h> <imio.h>
 	imputhi.x       idbc.h <fset.h> <imhdr.h> <imio.h>

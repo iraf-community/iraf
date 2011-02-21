@@ -408,8 +408,8 @@ begin
 			break
 		    dx = (-f * gy + g * fy) / denom
 		    dy = (-g * fx + f * gx) / denom
-		    x = x + dx
-		    y = y + dy
+		    x = x + max (-1.0D0, min (1.0D0, dx))
+		    y = y + max (-1.0D0, min (1.0D0, dy))
 		    if (max (abs (dx), abs (dy), abs(f), abs(g)) < 2.80d-7)
 			break
 

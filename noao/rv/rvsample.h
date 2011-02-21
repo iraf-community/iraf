@@ -14,8 +14,8 @@ define	SR_NPSAMP	Memi[$1+4]		# Npts in sample region (ptr)
 define	SR_IMTYPE	Memi[$1+5]		# Image type for sample
 define	SR_MODIFY	Memi[$1+6]		# Sample was modified
 define	SR_PARENT	Memi[$1+7]		# Structure parent pointer
-define	SR_W0		Memr[$1+8]		# Structure W0 value
-define	SR_WPC		Memr[$1+9]		# Structure WPC value
+define	SR_W0		Memr[P2R($1+8)]		# Structure W0 value
+define	SR_WPC		Memr[P2R($1+9)]		# Structure WPC value
 
 
 #####################  END OF STRUCTURE DEFINITIONS  ##########################

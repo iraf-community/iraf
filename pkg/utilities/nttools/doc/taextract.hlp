@@ -1,0 +1,109 @@
+.help taextract Jan98 tables
+.nj
+.ih
+NAME
+taextract -- Copy an array entry from one table
+to a column of scalars in another.
+.ih
+USAGE
+taextract intable outtable row column
+.ih
+DESCRIPTION
+This task extracts one entry (presumably an array of values)
+at a specified row and column
+and writes it as a column of scalar values to another table.
+If the output table exists it will be written to in-place;
+otherwise, it will be created.
+
+By default, the same column name is used in both tables.
+If the output table and column already exist,
+the data in that column will be overwritten;
+otherwise, the column will be created.
+If the array size for the specified column in the input table is N,
+then the values will be written to rows 1 through N of the output table.
+If the output column already exists,
+and the output table contains more than N rows,
+then rows N+1 through the last will be set to INDEF for this column.
+
+The input row number is written to the header of the output table
+using keyword ORIG_ROW.
+This allows 'tainsert' to put the data back where 'taextract' got them from.
+.ih
+PARAMETERS
+.ls intable [file name]
+Name of the input table containing a column with array entries.
+It is not an error for the array length to be one.
+.le
+.ls outtable [file name]
+Name of the output table.
+If this table doesn't exist it will be created.
+If the table does exist the column will either be created or overwritten.
+The input and output tables may not be the same,
+and they may not be in the same file if FITS format is used.
+.le
+.ls row [integer, min=1, max=INDEF]
+This is the row number in the input table.
+In the output table there will be as many rows
+as there are elements in the input table entry for 'column'.
+.le
+.ls column [string]
+Column name.
+This is used to find the column in the input table,
+and by default the same name is used to create
+(or find, if it already exists)
+the column in the output table.
+See the description for 'outcolumn'.
+.le
+.ls outcolumn = "" [string]
+If 'outcolumn' is specified,
+that name will be used for the output table;
+otherwise, 'column' will be used for both input and output tables.
+This provides an easier way to change the name of the output column
+than by running 'tchcol' after running 'taextract'.
+Note that if 'outcolumn' is specified,
+it is used not only for finding the column in the output table
+but also for creating the column if it wasn't found.
+The 'datatype', 'colunits', and 'colfmt' parameters, by contrast,
+are only used when creating a new column.
+.le
+.ls (datatype = "") [string]
+When creating a new column in the output table,
+the default is to use the same data type as the column in the input table.
+However, if 'datatype' is specified (i.e. not null or blank),
+this will be used as the data type when creating the new column.
+For numeric and boolean columns, only the first character is used:
+"r" and "d" for single and double precision floating point,
+"s" and "i" for short integer and integer,
+"b" for boolean.
+For a character string of maximum length 12 (for example), use "ch*12".
+.le
+.ls (colunits = "") [string]
+When creating a new column in the output table,
+the units will be set to 'colunits' if it has been specified;
+otherwise, the units will be copied from the column in the input table.
+.le
+.ls (colfmt = "") [string]
+When creating a new column in the output table,
+the print format will be set to 'colfmt' if it has been specified;
+otherwise, the print format will be copied from the column in the input table.
+.le
+.ih
+EXAMPLES
+1. Extract the array from row 5, column "polar", from table "array.tab",
+putting the values in column "polar" of table "scalar.tab".
+
+.nf
+at> taextract array.tab scalar.tab 5 polar
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+tainsert
+
+Type "help ttools opt=sysdoc" for a higher-level description of the 'ttools'
+package.
+.endhelp

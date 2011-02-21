@@ -1,9 +1,9 @@
 include	<mach.h>
 include	<pkg/rmsorted.h>
 
-# RM_MED -- Running median library.
+# RM_MED -- Running median/maximum/minimum library.
 #
-# This is a layer over the sorted running median routines.
+# This is a layer over the sorted running routines.
 # This layer provides:
 #
 #    1. Support for multiple datasets (e.g. pixels in running image)
@@ -13,18 +13,19 @@ include	<pkg/rmsorted.h>
 
 
 # Method object structure.
-define	RM_LEN		25		# Structure size
+define	RM_LEN		26		# Structure size
 define	RM_RMS		Memi[$1]	# Pointer to RMEDSRT method
 define	RM_BOX		Memi[$1+1]	# Box size
-define	RM_NDATA	Memi[$1+2]	# Number of datasets
-define	RM_PIXTYPE	Memi[$1+3]	# Internal storage type
-define	RM_GOOD		Memi[$1+4]	# Ptr to good array (box)
-define	RM_MASK		Memi[$1+5]	# Ptr to mask array
-define	RM_PWIN		Memi[$1+6]	# Ptr to packed window data (n*box)
-define	RM_POUT		Memi[$1+7]	# Ptr to packed outlist data (n*box)
-define	RM_PMASK	Memi[$1+8]	# Ptr to mask data (n*(box+15)/16)
-define	RM_SETMASK	P2S($1+9)	# Ptr to set mask array (16)
-define	RM_UNSETMASK	P2S($1+17)	# Ptr to unset mask array (16)
+define	RM_TYPE		Memi[$1+2]	# Type of output
+define	RM_NDATA	Memi[$1+3]	# Number of datasets
+define	RM_PIXTYPE	Memi[$1+4]	# Internal storage type
+define	RM_GOOD		Memi[$1+5]	# Ptr to good array (box)
+define	RM_MASK		Memi[$1+6]	# Ptr to mask array
+define	RM_PWIN		Memi[$1+7]	# Ptr to packed window data (n*box)
+define	RM_POUT		Memi[$1+8]	# Ptr to packed outlist data (n*box)
+define	RM_PMASK	Memi[$1+9]	# Ptr to mask data (n*(box+15)/16)
+define	RM_SETMASK	P2S($1+10)	# Ptr to set mask array (16)
+define	RM_UNSETMASK	P2S($1+18)	# Ptr to unset mask array (16)
 
 define	GOOD		Memr[RM_GOOD($1)+$2]
 define	MASK		Mems[RM_MASK($1)+$2/16]
@@ -35,8 +36,13 @@ define	PWINR		Memr[RM_PWIN($1)+RM_BOX($1)*($2-1)]
 define	PWINS		Mems[RM_PWIN($1)+RM_BOX($1)*($2-1)]
 define	POUT		Mems[RM_POUT($1)+(RM_BOX($1)+1)/2*($2-1)]
 
+define	RM_TYPES	"|median|maximum|minimum|"
+define	RM_TYMED	1		# Medain
+define	RM_TYMAX	2		# Maximum
+define	RM_TYMIN	3		# Maximum
 
-# RM_MED -- Compute next running median value.
+
+# RM_MED -- Compute next running value.
 
 real procedure rm_med (rm, nclip, navg, blank, exclude, index, in, mask, nused)
 
@@ -49,7 +55,7 @@ int	index			#I Index of new data (one indexed)
 real	in			#I Input data value
 short	mask			#I Input mask value	
 short	nused			#O Number of values in calculated result
-real	med			#R Return value
+real	val			#R Return value
 
 int	i, j, iexclude
 short	s1, s2, ors(), ands()
@@ -57,9 +63,9 @@ pointer	rms
 real	clip, rmsorted()
 
 begin
-	# Call running median sorted routine.
+	# Call sorted running routine.
 	rms = RM_RMS(rm)
-	med = rmsorted (rms, nclip, index, in)
+	val = rmsorted (rms, nclip, index, in)
 
 	# Set mask if needed.
 	s2 = mod (index-1, RM_BOX(rm))
@@ -100,10 +106,10 @@ begin
 	    if (nused > 2 && nclip > 0.) {
 	        i = nused / 2
 		if (mod (nused, 2) == 0)
-		    med = (GOOD(rm,i) + GOOD(rm,i-1)) / 2
+		    val = (GOOD(rm,i) + GOOD(rm,i-1)) / 2
 		else
-		    med = GOOD(rm,i)
-		clip = med + nclip * (med - GOOD(rm,0))
+		    val = GOOD(rm,i)
+		clip = val + nclip * (val - GOOD(rm,0))
 		do i = nused, 1, -1 {
 		    if (GOOD(rm,i-1) < clip)
 		        break
@@ -111,29 +117,48 @@ begin
 		nused = i
 	    }
 
-	    if (nused > 2) {
-		for (i = 0; nused-2*i>max(2,navg); i=i+1)
-		    ;
-		med = GOOD(rm,i)
-		do j = i+1, nused-i-1 {
-		    med = med + GOOD(rm,j)
+	    switch (RM_TYPE(rm)) {
+	    case RM_TYMED:
+		switch (nused) {
+		case 0:
+		    val = blank
+		case 1:
+		    val = GOOD(rm,0)
+		case 2:
+		    val = (GOOD(rm,0) + GOOD(rm,1)) / 2.
+		default:
+		    for (i = 0; nused-2*i>max(2,navg); i=i+1)
+			;
+		    val = GOOD(rm,i)
+		    do j = i+1, nused-i-1 {
+			val = val + GOOD(rm,j)
+		    }
+		    nused = nused - 2 * i
+		    val = val / nused
 		}
-		nused = nused - 2 * i
-		med = med / nused
-	    } else if (nused == 0)
-	        med = blank
-	    else if (nused == 1)
-	        med = GOOD(rm,0)
-	    else
-	        med = (GOOD(rm,0) + GOOD(rm,1)) / 2.
+	    case RM_TYMAX:
+		switch (nused) {
+		case 0:
+		    val = blank
+		default:
+		    val = GOOD(rm,nused-1)
+		}
+	    case RM_TYMIN:
+		switch (nused) {
+		case 0:
+		    val = blank
+		default:
+		    val = GOOD(rm,0)
+		}
+	    }
 	} else
 	    nused = min (navg, RM_BOX(rm))
 
-	return (med)
+	return (val)
 end
 
 
-# RM_GMED -- Running median value.
+# RM_GMED -- Running sorted value.
 
 real procedure rm_gmed (rm, nclip, navg, blank, exclude, nused)
 
@@ -143,7 +168,7 @@ int	navg			#I Number of central values to average
 real	blank			#I Blank value
 int	exclude			#I Index of excluded data (one indexed)
 short	nused			#O Number of values in calculated result
-real	med			#R Return value
+real	val			#R Return value
 
 int	i, j, iexclude
 short	mask, ands()
@@ -173,10 +198,10 @@ begin
 	if (nused > 2 && nclip > 0.) {
 	    i = nused / 2
 	    if (mod (nused, 2) == 0)
-		med = (GOOD(rm,i) + GOOD(rm,i-1)) / 2
+		val = (GOOD(rm,i) + GOOD(rm,i-1)) / 2
 	    else
-		med = GOOD(rm,i)
-	    clip = med + nclip * (med - GOOD(rm,0))
+		val = GOOD(rm,i)
+	    clip = val + nclip * (val - GOOD(rm,0))
 	    do i = nused, 1, -1 {
 		if (GOOD(rm,i-1) < clip)
 		    break
@@ -184,23 +209,42 @@ begin
 	    nused = i
 	}
 
-	# Compute the interior average or median.
-	if (nused > 2) {
-	    for (i = 0; nused-2*i>max(2,navg); i=i+1)
-		;
-	    med = GOOD(rm,i)
-	    do j = i+1, nused-i-1
-		med = med + GOOD(rm,j)
-	    nused = nused - 2 * i
-	    med = med / nused
-	} else if (nused == 0)
-	    med = blank
-	else if (nused == 1)
-	    med = GOOD(rm,0)
-	else
-	    med = (GOOD(rm,0) + GOOD(rm,1)) / 2.
+	switch (RM_TYPE(rm)) {
+	case RM_TYMED:
+	    switch (nused) {
+	    case 0:
+		val = blank
+	    case 1:
+		val = GOOD(rm,0)
+	    case 2:
+		val = (GOOD(rm,0) + GOOD(rm,1)) / 2.
+	    default:
+		for (i = 0; nused-2*i>max(2,navg); i=i+1)
+		    ;
+		val = GOOD(rm,i)
+		do j = i+1, nused-i-1 {
+		    val = val + GOOD(rm,j)
+		}
+		nused = nused - 2 * i
+		val = val / nused
+	    }
+	case RM_TYMAX:
+	    switch (nused) {
+	    case 0:
+		val = blank
+	    default:
+		val = GOOD(rm,nused-1)
+	    }
+	case RM_TYMIN:
+	    switch (nused) {
+	    case 0:
+		val = blank
+	    default:
+		val = GOOD(rm,0)
+	    }
+	}
 
-	return (med)
+	return (val)
 end
 
 
@@ -225,30 +269,58 @@ end
 
 
 
-# RM_OPEN -- Open running median package.
+# RM_OPEN -- Open running sorted package.
 #
 # This is called once to allocate memory and initialize the algorithms.
 
-pointer procedure rm_open (box, ndatasets, pixtype)
+pointer procedure rm_open (box, type, ndatasets, pixtype)
 
 int	box			#I Median box size (<= 128)
+char	type[ARB]		#I Output type
 int	ndatasets		#I Number of datasets
 int	pixtype			#I Internal storage type
 pointer	rm			#O RM pointer
 
-int	i
+char	str[8]
+int	i, j, strdic()
 short	s, nots(), shifts()
+real	val
 pointer	rms, rms_open()
 
 begin
-	# Open sorted running median method.
-	rms = rms_open (box, 0.)
-
-	# Set higher level data structure.
+	# Set internal storage type.
 	if (pixtype == TY_SHORT)
 	    i = TY_SHORT
 	else
 	    i = TY_REAL
+
+	# Set the output type.
+	j = strdic (type, str, 8, RM_TYPES)
+	switch (j) {
+	case RM_TYMED:
+	    val = 0.
+	    rms = rms_open (box, RMS_TYMED, val)
+	case RM_TYMAX:
+	    switch (i) {
+	    case TY_SHORT:
+		val = -MAX_SHORT
+		rms = rms_open (box, RMS_TYMAX, val)
+	    case TY_REAL:
+		val = -MAX_REAL
+		rms = rms_open (box, RMS_TYMAX, val)
+	    }
+	case RM_TYMIN:
+	    switch (i) {
+	    case TY_SHORT:
+		val = MAX_SHORT
+		rms = rms_open (box, RMS_TYMIN, val)
+	    case TY_REAL:
+		val = MAX_REAL
+		rms = rms_open (box, RMS_TYMIN, val)
+	    }
+	default:
+	    call error (1, "Unknown running type")
+	}
 
 	call calloc (rm, RM_LEN, TY_STRUCT)
 	call calloc (RM_GOOD(rm), box, TY_REAL)
@@ -258,6 +330,7 @@ begin
 	
 	RM_RMS(rm) = rms
 	RM_BOX(rm) = box
+	RM_TYPE(rm) = j
 	RM_NDATA(rm) = ndatasets
 	RM_PIXTYPE(rm) = i
 	RM_MASK(rm) = RM_PMASK(rm)
@@ -277,7 +350,7 @@ begin
 end
 
 
-# RM_CLOSE -- Close running median package.
+# RM_CLOSE -- Close running sorted package.
 
 procedure rm_close (rm)
 

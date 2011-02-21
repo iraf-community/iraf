@@ -15,12 +15,13 @@ include	"icmask.h"
 
 # IC_MOPEN -- Initialize mask interface.
 
-procedure ic_mopen (in, out, nimages, offsets)
+procedure ic_mopen (in, out, nimages, offsets, iomode)
 
 pointer	in[nimages]		#I Input images
 pointer	out[ARB]		#I Output images
 int	nimages			#I Number of images
 int	offsets[nimages,ARB]	#I Offsets to  output image
+int	iomode			#I I/O mode
 
 int	mtype			# Mask type
 int	mvalue			# Mask value
@@ -174,6 +175,7 @@ begin
 	call calloc (icm, ICM_LEN, TY_STRUCT)
 	ICM_TYPE(icm) = mtype
 	ICM_VALUE(icm) = mvalue
+	ICM_IOMODE(icm) = iomode
 	ICM_BUFS(icm) = bufs
 	ICM_PMS(icm) = pms
 	ICM_NAMES(icm) = names
@@ -317,6 +319,7 @@ int	nimages			# Number of images
 
 int	mtype			# Mask type
 int	mvalue			# Mask value
+int	iomode			# I/O mode
 pointer	bufs			# Pointer to data line buffers
 pointer	pms			# Pointer to array of PMIO pointers
 
@@ -342,6 +345,7 @@ begin
 
 	mtype = ICM_TYPE(icm)
 	mvalue = ICM_VALUE(icm)
+	iomode = ICM_IOMODE(icm)
 	bufs = ICM_BUFS(icm)
 	pms = ICM_PMS(icm)
 	names = ICM_NAMES(icm)
@@ -476,6 +480,9 @@ begin
 		    lflag[i] = D_NONE
 		}
 	    }
+
+	    if (iomode == ICM_CLOSED)
+	        call ic_mclose1 (i, nimages)
 	}
 
 	# Set overall data flag

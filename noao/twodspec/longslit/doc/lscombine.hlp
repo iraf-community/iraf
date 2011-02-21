@@ -272,7 +272,7 @@ coordinate system is specified by parameters or by looking at the maximum
 ranges and minimum intervals over the input data.
 
 Algorithmically it is a combination of the tasks \fBTRANSFORM\fR (using
-the WCS) and \fBIMCOMBINE\fR.  When excuting it will generate temporary
+the WCS) and \fBIMCOMBINE\fR.  When executing it will generate temporary
 images ("lsc*") and masks ("mlsc*") if the images are not already on a
 common world coordinate system.  The user only need be aware of this
 in case of an unexpected abort leaving these files behind.

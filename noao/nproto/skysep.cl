@@ -2,13 +2,13 @@
 
 procedure sep (ra1, dec1, ra2, dec2)
 
-real	ra1				{prompt="RA (hr|deg)"}
-real	dec1				{prompt="DEC (deg)"}
-real	ra2				{prompt="RA (hr|deg)"}
-real	dec2				{prompt="DEC (deg)"}
-string	raunit = "hr"			{prompt="RA unit (hr|deg)"}
-bool	verbose = no			{prompt="Verbose?"}
-real	sep				{prompt="Separation (arcsec)"}
+real	ra1			{ prompt="RA (hr|deg)"}
+real	dec1			{ prompt="DEC (deg)"}
+real	ra2			{ prompt="RA (hr|deg)"}
+real	dec2			{ prompt="DEC (deg)"}
+string	raunit = "hr"		{ prompt="RA unit (hr|deg)", enum="hr|deg" }
+bool	verbose = no		{ prompt="Verbose?"}
+real	sep			{ prompt="Separation (arcsec)"}
 
 begin
 	real	r1, d1, r2, d2

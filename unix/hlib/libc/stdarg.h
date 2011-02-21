@@ -12,11 +12,6 @@
  */
 #ifndef D_stdarg
 
-#if (defined(MACOSX) || defined(__CYGWIN__) || defined(LINUX) || defined(SOLARIS) || defined(BSD))
-#define USE_STDARG
-#endif
-
-#ifdef USE_STDARG
 
 #ifdef MACOSX
 #include "stdarg-osx.h"
@@ -40,9 +35,6 @@
 #endif
 #endif
 
-#else
-#include "/iraf/iraf/unix/hlib/libc/varargs.h"
-#endif
 
 #define	D_stdarg
 #endif

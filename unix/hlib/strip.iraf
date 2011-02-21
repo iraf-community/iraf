@@ -3,6 +3,7 @@
 # program which reads this must be run from the IRAF root directory.
 
   unix/as.linux		-all
+  unix/as.linux64	-all
   unix/as.i386		-all
   unix/as.mc68020	-all
   unix/as.rs6000	-all
@@ -55,6 +56,7 @@
 
 -file bin.redhat/OBJS.arc.Z
 -file bin.linux/OBJS.arc.Z
+-file bin.linux64/OBJS.arc.Z
 -file bin.macosx/OBJS.arc.Z
 -file bin.macintel/OBJS.arc.Z
 -file bin.cygwin/OBJS.arc.Z

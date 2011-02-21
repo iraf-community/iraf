@@ -55,10 +55,10 @@ define	PS_PRMPOS	Memi[$1+16]	# perm R margin pos (pixres)
 define	PS_CRMPOS	Memi[$1+17]	# cur. R margin pos (pixres)
 define	PS_CURPOS	Memi[$1+18]	# current page pos  (pixres)
 
-define	PS_LMARGIN	Memr[$1+20]	# left margin	    (inches)
-define	PS_RMARGIN	Memr[$1+21]	# right margin	    (inches)
-define	PS_TMARGIN	Memr[$1+22]	# top margin	    (inches)
-define	PS_BMARGIN	Memr[$1+23]	# bottom margin	    (inches)
+define	PS_LMARGIN	Memr[P2R($1+20)]# left margin	    (inches)
+define	PS_RMARGIN	Memr[P2R($1+21)]# right margin	    (inches)
+define	PS_TMARGIN	Memr[P2R($1+22)]# top margin	    (inches)
+define	PS_BMARGIN	Memr[P2R($1+23)]# bottom margin	    (inches)
 
 define	PS_HLE		Memi[$1+25]	# header left edge tag str
 define	PS_HCE		Memi[$1+26]	# header center tag str

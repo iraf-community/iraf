@@ -95,7 +95,13 @@ PIXEL   val
 
 begin
         call ip_lseek (fd, offset)
-        nstat = read (fd, val, SZ_PIXEL * SZB_CHAR)
+	$if (datatype == il)
+            nstat = read (fd, val, SZ_INT32 * SZB_CHAR)
+	    if (SZ_INT != SZ_INT32)
+		call iupk32 (val, val, 1)
+	$else
+            nstat = read (fd, val, SZ_PIXEL * SZB_CHAR)
+	$endif
 	$if (datatype == rd)
 	call ieeupk$t (val)
 	$endif
@@ -211,7 +217,13 @@ int     read()
 begin
         if (ptr == NULL)
             call malloc (ptr, len, TY_PIXEL)
-        nstat = read (fd, Mem$t[ptr], len * SZ_PIXEL)
+	$if (datatype == il)
+            nstat = read (fd, Mem$t[ptr], len * SZ_INT32)
+	    if (SZ_INT != SZ_INT32)
+	        call iupk32 (Mem$t[ptr], Mem$t[ptr], len)
+	$else
+            nstat = read (fd, Mem$t[ptr], len * SZ_PIXEL)
+	$endif
 	$if (datatype == rd)
 	call ieevupk$t (Mem$t[ptr], Mem$t[ptr], len)
 	$endif

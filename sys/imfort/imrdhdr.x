@@ -49,7 +49,7 @@ begin
 		call sfree (sp)
 		return (ERR)
 	    }
-	    nchars = LEN_V1IMHDR * SZ_STRUCT
+	    nchars = LEN_V1IMHDR * SZ_MII_INT
 	    if (bfrseq (fp, IM_V1MAGIC(v1), nchars) != nchars) {
 		call sfree (sp)
 		return (ERR)
@@ -88,7 +88,7 @@ begin
 
 	    # Read and output the user area.
 	    if (uchars > 0) {
-		nchars = min (uchars, sulen_userarea * SZ_STRUCT)
+		nchars = min (uchars, sulen_userarea * SZ_MII_INT)
 		if (bfrseq (fp, Memc[IM_USERAREA(im)], nchars) <= 0)
 		    return (ERR)
 	    }
@@ -186,7 +186,7 @@ begin
 
 	    # Read the variable-length user area.
 	    if (uchars > 0) {
-		nchars = min (uchars, sulen_userarea * SZ_STRUCT)
+		nchars = min (uchars, sulen_userarea * SZ_MII_INT)
 		if (i_miirdc (fp, Memc[IM_USERAREA(im)], nchars) < 0)
 		    goto readerr_
 	    }

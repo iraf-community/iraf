@@ -1,5 +1,5 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
- */
+*/
 
 #define import_spp
 #define	import_libc
@@ -7,9 +7,11 @@
 #include <iraf.h>
 
 /* C_DELETE -- FIO delete file.
- */
-c_delete (fname)
-char	*fname;			/* name of file to be opened	*/
+*/
+int
+c_delete (
+  char	*fname			/* name of file to be opened	*/
+)
 {
 	iferr (DELETE (c_sppstr(fname)))
 	    return (ERR);

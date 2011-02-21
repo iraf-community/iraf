@@ -1,0 +1,62 @@
+     This note describes some specific characteristics and limitations
+of STSDAS tables.
+
+1.  Six data types are supported:
+
+     single-precision real
+     double-precision real
+     integer (same number of bytes as real)
+     short integer (int*2)
+     boolean (Fortran logical; same size as real)
+     text (character strings) in multiples of four characters up to
+         160 characters
+
+Type conversion is done implicitly if the data type of the column differs
+from that of the buffer.  Boolean true and false are converted to YES and NO
+respectively if they are read as integer values.
+
+2.  Header parameters:
+
+     The same data types are supported for header (user) parameters as for
+table data, except for short integers, and text strings are limited to 70
+characters.  Type conversion is done for numeric and boolean parameters,
+but text parameters may only be gotten as text.  The I/O routines for header
+parameters get and put single parameters, not arrays.  A user program may
+construct array elements by appending numbers to a root portion of a keyword,
+and the array elements may be gotten or put one at a time.
+
+     The table must exist in order to get or put header parameters.
+
+3.  Undefined elements are flagged by using special values.  There is at
+present no undefined value for a boolean element; the default value is false
+(or no).  A null character string is regarded as undefined.  Trailing blanks
+are truncated by the Fortran-callable routines (ut...) but not by the
+SPP-callable (tb...) routines.
+
+4.  The format for printing table values supports the more common Fortran
+formats with a few differences and some additional options:
+
+     h:  H:M:S.d
+     m:  H:M.d (or M:S.d)
+    i-:  left justified (but SPP uses d instead of i)
+    i0:  fill the field with zeros on the left; Fortran also allows filling
+         a portion of the field (e.g. I4.2)
+     o:  octal
+     x:  hexadecimal
+     b:  "yes" or "no" instead of "T" or "F"
+
+5.  The header parameters and column descriptors are stored in the table
+together with the data, so if more parameters are written or more columns
+defined than there is space in the table, the table will be rewritten to
+allocate more room.  If the table is large, this can be a problem either
+due to the time involved or because of disk space limitations.  When a new
+table is created it is possible to specify the amount of space to be
+allocated for header parameters and for column descriptors.
+
+     A table may be row-ordered (which is the default) or column-ordered.
+If the table is row-ordered then rows may be written at the end of the table
+without ever specifying the maximum number of rows.  Adding new columns after
+creating the table, however, requires rewriting the table unless space was
+allocated for new columns.
+
+     There is no intrinsic limit on the number of columns or rows.

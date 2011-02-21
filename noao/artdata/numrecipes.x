@@ -98,7 +98,8 @@ real procedure gasdev (seed)
 
 long	seed		# Seed for random numbers
 
-real	v1, v2, r, fac, urand()
+real	urand()
+double	v1, v2, r, fac
 int	iset
 data	iset/0/
 

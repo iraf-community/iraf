@@ -1,7 +1,9 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
 #include "bootlib.h"
+
 
 /*
  * OS_DIR -- A package for accessing a directory as a list of files.
@@ -11,8 +13,8 @@
 
 /* OS_DIROPEN -- Open the directory.
  */
-os_diropen (dirname)
-char	*dirname;
+int
+os_diropen (char *dirname)
 {
 	PKCHAR	osfn[SZ_PATHNAME+1];
 	XINT	chan;
@@ -26,29 +28,30 @@ char	*dirname;
 
 /* OS_DIRCLOSE -- Close the directory.
  */
-os_dirclose (chan)
-int	chan;
+int
+os_dirclose (int chan)
 {
-	XINT	status;
+	XINT	x_chan=chan, status;
 
-	ZCLDIR (&chan, &status);
+	ZCLDIR (&x_chan, &status);
 	return (status);
 }
 
 
 /* OS_GFDIR -- Get the next filename from the directory.
  */
-os_gfdir (chan, fname, maxch)
-int	chan;
-char	*fname;
-int	maxch;
+int
+os_gfdir (
+  int	chan,
+  char	*fname,
+  int	maxch
+)
 {
 	PKCHAR	osfn[SZ_PATHNAME+1];
-	XINT	x_maxch, status;
+	XINT	x_chan=chan, x_maxch=maxch, status;
 
-	x_maxch = maxch;
 	for (;;) {
-	    ZGFDIR (&chan, osfn, &x_maxch, &status);
+	    ZGFDIR (&x_chan, osfn, &x_maxch, &status);
 	    if (status > 0) {
 		/* Omit the self referential directory files "." and ".."
 		 * or recursion may result.
@@ -75,8 +78,8 @@ int	maxch;
  * VOS libs, which provide zopdir.
  */
 
-os_dirclose (chan) { return (-1); }
-os_diropen (dirname) { return (-1); }
-os_gfdir (chan, fname, maxch) { return (0); }
+int os_dirclose (int chan) { return (-1); }
+int os_diropen (char *dirname) { return (-1); }
+int os_gfdir (int chan, char *fname, int maxch) { return (0); }
 
 #endif

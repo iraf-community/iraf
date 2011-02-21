@@ -184,7 +184,8 @@ libsys.a:				# Core system
 	@clio
 	@etc
 	@gty
-	@memio
+	#@memio
+	@nmemio
 	@mtio
 	@symtab
 	@tty

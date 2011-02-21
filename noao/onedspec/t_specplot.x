@@ -1479,15 +1479,17 @@ real	offset			# Default intensity offset
 real	xlpos, ylpos		# Default position of labels
 char	ptype[SP_SZPTYPE]	# Default plot type
 
-int	i, j, k, l
+int	i, j, k, l, m, trans
 pointer	sp, im, mw, sh, stack, aps, bands, str, ptr
 
-int	ctor(), open(), fscan(), nowhite()
-bool	rng_elementi()
-real	clgetr(), asumr(), imgetr()
+int	ctor(), open(), fscan(), nowhite(), clgwrd()
+bool	rng_elementi(), fp_equalr()
+real	clgetr(), asumr(), imgetr(), sp_logerr()
 pointer	immap(), smw_openim(), rng_open()
 
 errchk	immap, smw_openim, open
+
+extern	sp_logerr
 
 begin
 	call smark (stack)
@@ -1504,6 +1506,7 @@ begin
 	    xlpos = clgetr ("xlpos")
 	    ylpos = clgetr ("ylpos")
 	    call clgstr ("ptype", ptype, SP_SZPTYPE)
+	    trans = clgwrd ("transform", Memc[str], SZ_LINE, TRANSFORMS)    
 	}
 
 	call clgstr ("scale", Memc[str], SZ_LINE)
@@ -1577,6 +1580,25 @@ begin
 		SP_W0(sp) = Memr[SX(sh)]
 		SP_WPC(sp) = (Memr[SX(sh)+SN(sh)-1] - Memr[SX(sh)]) /
 		    (SN(sh) - 1)
+		switch (trans) {
+		case TRANS_LOG:
+		    SP_OMIN(sp) = MAX_REAL; SP_OMAX(sp) = -MAX_REAL
+		    ptr = SY(sh);
+		    do m = 1, SP_NPTS(sp) {
+		        if (Memr[ptr] > 0.) {
+			    SP_OMIN(sp) = min (SP_OMIN(sp), Memr[ptr])
+			    SP_OMAX(sp) = max (SP_OMAX(sp), Memr[ptr])
+			}
+			ptr = ptr + 1
+		    }
+		    if (SP_OMAX(sp) > 0.) {
+		        call amaxkr (Memr[SY(sh)], SP_OMIN(sp), Memr[SY(sh)],
+			    SN(sh))
+			call alogr (Memr[SY(sh)], Memr[SY(sh)], SN(sh),
+			    sp_logerr)
+			call amovr (Memr[SY(sh)], Memr[SY(SP_SH(sp))], SN(sh))
+		    }
+		}
 	        SP_OMEAN(sp) = asumr (Memr[SY(sh)], SN(sh)) / SN(sh)
 	        call alimr (Memr[SY(sh)], SN(sh), SP_OMIN(sp), SP_OMAX(sp))
 
@@ -1994,4 +2016,15 @@ begin
 	call close (fd)
 	if (gp != NULL)
 	    call greactivate (gp, AW_PAUSE)
+end
+
+
+# SP_LOGERR -- Value for non-positive values in log function.
+
+real procedure sp_logerr (x)
+
+real	x
+
+begin
+	return (0.)
 end

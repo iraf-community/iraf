@@ -1,0 +1,11 @@
+#!/bin/csh -f
+#
+
+set  iraf 	= $cwd/
+
+cd $iraf/				# build core system
+mkpkg -x
+
+cd $iraf/noao				# build NOAO package
+setenv noao $cwd/
+mkpkg -x -p noao

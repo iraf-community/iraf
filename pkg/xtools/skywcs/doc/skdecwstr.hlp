@@ -15,7 +15,7 @@ pointer	imcoo		# the input image sky coordinate descriptor
 ARGUMENTS
 .ls  csystem 
 The sky coordinates definition. Ccsystem is a system name,  e.g. "J2000"
-or "galactic.
+or "galactic".
 .le
 .ls coo
 The output sky coordinate descriptor.

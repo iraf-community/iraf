@@ -56,7 +56,7 @@ Call ISINIT to initialize the surface fitting parameters.
 .ls (3)
 Call ISLACCUM to select a weighting function and accumulate data points
 for each line into the appropriate arrays and vectors. Call ISLSOLVE
-to compute the coefficients in x for each line. The coefficents are
+to compute the coefficients in x for each line. The coefficients are
 stored inside SURFIT. Repeat this procedure for each line. ISLACCUM
 and SFLSOLVE can be combined by a call to SFLFIT. If the x values
 and weights remain the same from line to line ISLREFIT can be called.

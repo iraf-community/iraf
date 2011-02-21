@@ -1,0 +1,150 @@
+.help tdump Nov2000 tables
+.nj
+.ih
+NAME
+tdump -- Convert an STSDAS table to ASCII format.
+.ih
+USAGE
+tdump table
+.ih
+DESCRIPTION
+This task converts an STSDAS table to ASCII format.
+The output does not include row numbers or column names;
+use the 'tprint' task for more readable output.
+
+The two primary uses for 'tdump' are to allow editing that would be
+difficult or impossible with 'tedit' (such as global substitutions)
+and copying a table over a network to another computer.
+For such purposes the table can be dumped to three separate files
+(i.e., one containing column definitions, one for header parameters,
+and one for table data),
+the data may be edited, column data types changed, etc.,
+and then the 'tcreate' task can be used to reassemble the table 
+from the three ASCII files.
+To prevent loss of information due to truncation,
+floating point data are printed using g format with a wide field.
+A character value with multiple words is printed with enclosing quotes
+to make it clear that it is the value for a single column
+and also for compatibility with 'tcreate'.
+
+All rows and columns of the table are dumped by default,
+but ranges of rows and individual columns may be specified.
+
+The order of printing the data is as follows.
+The first column of the first row is printed,
+then the second column of the first row is printed,
+then the third column of the first row, etc.
+If any column contains arrays,
+each element of the column array in the current row is printed
+before moving on to the next column.
+If the printed output is wider than a page (see 'pwidth'),
+the output will consist of more than one line per row of the table.
+After printing all columns in the first row,
+the second row is printed in the same way.
+Each row begins with a new line in the output text file.
+Note that this can be different from 'tprint',
+which prints all rows for those columns that will fit on a page,
+then prints all rows for the next set of columns.
+.ih
+PARAMETERS
+.ls table [file name]
+The name of the STSDAS table to be dumped.
+.le
+.ls (cdfile = STDOUT) [file name]
+If 'cdfile' is not null (i.e., it is not passed a value of "")
+then the column definitions will be written
+to an output file having the name passed to 'cdfile'.
+(Note:  A space is not null.)  The column definitions consist of
+the column name, data type ("R" for real,
+"D" for double, "I" for integer, "B" for boolean,
+or "CH*n" for character strings of length n), print format, and units.
+For columns of arrays,
+the array size is shown in square brackets appended to the data type.
+.le
+.ls (pfile = STDOUT) [file name]
+If 'pfile' is not null (i.e., it is not passed a value of "") 
+then the header parameters will be written
+to an output file with the name passed to 'pfile'.
+This file will not be created
+if there are no header parameters in the input file.
+.le
+.ls (datafile = STDOUT) [file name]
+If 'datafile' is not null (i.e., it is not passed a value of "") then 
+the table data will be written
+to an output file with the name passed to 'datafile'.
+This file will not be created if the input table is empty.
+.le
+.ls (columns = "") [string]
+The names of the columns to be printed.
+A null value causes all columns to be printed.
+A column template consists of a list
+of either column names or column name templates that include wildcards.
+Individual column names or templates are separated by commas or white space.
+This list of column names can be placed in a list file and 'column'
+will then be passed the file name preceded by a "@" character.
+If the first non-white character in the column template
+is the negation character (either "~" or "!")
+the columns NOT named in the template will be printed.
+
+The 'tlcol' task (with the 'nlist' parameter set to 1) may be used 
+to generate a list of column names so there is no question about spelling.
+This list may be edited to rearrange or delete columns.
+.le
+.ls (rows = "-") [string]
+The range of rows to be printed.
+The default of "-" means print all rows.
+The first ten rows could be specified as 'rows="1-10"'.
+To print the first ten rows and all rows from 900 through
+the last (inclusive), use 'rows="1-10,900-"'.
+Setting 'rows="1,3,7,23"' will print only those four rows.
+It is not an error to specify rows larger than the largest row number;
+they will simply be ignored.
+Type "help xtools.ranges" for more information.
+.le
+.ls (pwidth = -1) [integer, min=-1, max=INDEF]
+Width of the output for printing the table data.
+The default value of -1 means that
+checking the width should be disabled,
+and each table row will be written to one line in the output file.
+
+If any column to be printed is wider than 'pwidth',
+a warning message will be displayed,
+and the data will overflow the page width.
+The width of each character column is
+increased by two to allow space for a pair of enclosing quotes,
+which will be used if the value to be printed includes a blank or tab.
+.le
+.ih
+EXAMPLES
+1.  Dump the table "junk.tab" to STDOUT:
+.nf
+
+     tt> tdump junk.tab cdfile=STDOUT pfile=STDOUT datafile=STDOUT
+
+.fi
+2.  Dump "junk.tab", but with the order of the columns rearranged:
+.nf
+
+     tt> tlcol junk.tab nlist=1 > colnames.lis
+     tt> edit colnames.lis
+        (Rearrange the column names and perhaps delete some of them.)
+     tt> tdump junk.tab columns=@colnames.lis
+.fi
+
+3.  Dump only the first 100 rows of the file "big.fits":
+
+.nf
+	tt> tdump big.fits rows="1-100"
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+tprint, tlcol, tcreate, ranges
+
+Type "help tables opt=sys" for a higher-level description of the 'tables' 
+package.
+.endhelp

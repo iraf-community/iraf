@@ -50,7 +50,7 @@ data blocks.  Successive data blocks may vary in size; very short blocks
 and odd size blocks (block size not commensurate with the size of an SPP char)
 can cause problems.  The high level code tries hard to deal with odd size
 blocks and such but success is not guaranteed.  A tapemark is a double end
-of file mark.  As far as the i/o system is concerned tapes are unlabelled
+of file mark.  As far as the i/o system is concerned tapes are unlabeled
 and files do not have headers; everything but filemarks and tapemarks is data.
 
 There is no explicit provision for multivolume sets.  It is assumed that either

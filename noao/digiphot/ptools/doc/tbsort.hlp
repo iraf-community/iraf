@@ -14,7 +14,7 @@ All tables are sorted on the same column or columns.
 .ls columns
 The list of columns to sort on.  A column template consists of a list of
 either column names, or column patterns containing the usual pattern matching
-metacharacters.  The names or patterns are separated by commas or white space.
+meta-characters.  The names or patterns are separated by commas or white space.
 The list can be placed in a file and the name of the file preceeded by a
 '@' can be given in place of the column template.
 .le

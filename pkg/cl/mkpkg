@@ -75,7 +75,7 @@ libpkg.a:
 			config.h mem.h operand.h param.h task.h errs.h
 
 	clprintf.c	<libc/spp.h> <libc/libc.h> <libc/stdio.h>\
-			<libc/varargs.h> config.h operand.h param.h\
+			config.h operand.h param.h\
 			task.h errs.h
 
 	clsystem.c	<libc/spp.h> <libc/libc.h> <libc/stdio.h>\
@@ -103,7 +103,7 @@ libpkg.a:
 
 	errs.c		<libc/spp.h> <libc/libc.h> <libc/fset.h>\
 			<libc/stdio.h> <libc/setjmp.h> <libc/knames.h>\
-			<libc/xnames.h> <libc/varargs.h> clmodes.h\
+			<libc/xnames.h> clmodes.h\
 			config.h operand.h param.h task.h mem.h errs.h\
 			grammar.h construct.h
 

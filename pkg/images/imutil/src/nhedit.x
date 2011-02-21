@@ -16,11 +16,12 @@ define	OP_INIT		2
 define	OP_ADD		3
 define	OP_DELETE	4
 define  OP_DEFPAR       5
+define  OP_RENAME       6
 define  BEFORE		1
 define  AFTER           2
 
 
-# HEDIT -- Edit or view selected fields of an image header or headers.  This
+# NHEDIT -- Edit or view selected fields of an image header or headers.  This
 # editor performs a single edit operation upon a relation, e.g., upon a set
 # of fields of a set of images.  Templates and expressions may be used to 
 # automatically select the images and fields to be edited, and to compute
@@ -33,15 +34,14 @@ pointer	valexpr			# the value expression (if op=edit|add)
 
 bool	noupdate, quit
 int	imlist, nfields, up, min_lenuserarea
-pointer	sp, field, sections, s_fields, im, ip, image, buf
-pointer s_comm, cmd, pkey
-int	operation, verify, show, update, comfile, fd, baf
-int     def_pars, dp_oper, dp_update, dp_verify, dp_show	
-char    sharp
+pointer	sp, field, comment, sections, im, ip, image, buf
+pointer cmd, pkey
+int	operation, verify, show, update, fd, baf
+int     dp_oper, dp_update, dp_verify, dp_show	
 
 pointer	immap()
 bool    streq()
-int	imtopenp(), imtgetim(), getline()
+int	imtopenp(), imtgetim(), getline(), nowhite()
 int	envfind(), ctoi(), open()
 
 begin
@@ -51,36 +51,29 @@ begin
 	call salloc (field,     SZ_FNAME, TY_CHAR)
 	call salloc (fields,    SZ_FNAME, TY_CHAR)
 	call salloc (pkey,      SZ_FNAME, TY_CHAR)
-	call salloc (s_fields,  SZ_LINE,  TY_CHAR)
 	call salloc (valexpr,   SZ_LINE,  TY_CHAR)
-	call salloc (s_comm,    SZ_LINE,  TY_CHAR)
+	call salloc (comment,   SZ_LINE,  TY_CHAR)
 	call salloc (sections,  SZ_FNAME, TY_CHAR)
 	call salloc (cmd,       SZ_LINE,  TY_CHAR)
 
 	# Get the primary operands.
 	imlist = imtopenp ("images")
 
-	# Determine type of operation to be performed.  The default operation
-	# is edit.
+	# Determine type of operation to be performed (default is edit).
 
-	# Do we have a command file instead of a command line?
-	comfile=NO
-	fd = 0
-	call aclrc (Memc[s_fields], SZ_LINE)
-        call clgstr ("comfile", Memc[s_fields], SZ_LINE)
-        if (streq(Memc[s_fields], "")) {
-	    call he_getpars (operation, fields, valexpr, Memc[s_comm], 
-	        Memc[pkey], baf, update, verify, show)
+	# Do we have a command file instead of a command line?  Allow either
+	# a null string or the string "NULL" to indicate we don't.
+
+        call clgstr ("comfile", Memc[fields], SZ_LINE)
+	if (nowhite (Memc[fields], Memc[fields], SZ_LINE) == 0 ||
+            streq (Memc[fields], "NULL")) {
+	        call he_getpars (operation, fields, valexpr, Memc[comment], 
+	            Memc[pkey], baf, update, verify, show)
+	        fd = 0
         } else {
-	    comfile = YES
-	    update=YES
-            # Set default parameters
-            def_pars = NO
-	    dp_oper = OP_EDIT
-	    dp_update = YES
-            dp_verify = NO
-            dp_show = NO
-	    fd = open(Memc[s_fields], READ_ONLY, TEXT_FILE)
+	    call he_getpars (dp_oper, NULL, valexpr, Memc[comment], 
+	        Memc[pkey], baf, dp_update, dp_verify, dp_show)
+	    fd = open(Memc[fields], READ_ONLY, TEXT_FILE)
         }
 
 	# Main processing loop.  An image is processed in each pass through
@@ -100,8 +93,8 @@ begin
 
 	    # Open the image.
 	    iferr {
-		if (update == YES)
-		    im = immap (Memc[image], READ_WRITE, min_lenuserarea)
+		if (update == YES || fd != 0)
+		    im = immap (Memc[image], READ_WRITE,  min_lenuserarea)
 		else
 		    im = immap (Memc[image], READ_ONLY,  min_lenuserarea)
 	    } then {
@@ -109,33 +102,30 @@ begin
 		next
 	    }
             
-	    sharp = '#'
-	    if (comfile == YES) {
+	    if (fd != 0) {
 	        # Open the command file and start processing each line. 
-                #rewind file before  proceeding
+                # rewind file before  proceeding
 
 	        call seek(fd, BOF)
                 while (getline(fd, Memc[cmd]) != EOF) {
 		    for (ip=cmd;  IS_WHITE(Memc[ip]);  ip=ip+1)
 			    ;
-		    if (Memc[cmd] == sharp || Memc[ip] == '\n')
+		    if (Memc[cmd] == '#' || Memc[ip] == '\n')
 		        next
 
-                    #fields = s_fields
-	            #valexpr = s_valexpr
                     call he_getcmdf (Memc[cmd], operation, Memc[fields],
-		        Memc[valexpr], Memc[s_comm], Memc[pkey], baf, 
+		        Memc[valexpr], Memc[comment], Memc[pkey], baf, 
 			update, verify, show)
 
+		    # Set the default parameters for the command file.
                     if (operation < 0) {
-
-                        # Set the default parameters for the rest of the
-		        # command file.
 			dp_oper = -operation
- 			dp_update = update
- 			dp_verify = verify
-			dp_show = show
-			def_pars = YES
+			if (update != -1)
+			    dp_update = update
+			if (verify != -1)
+			    dp_verify = verify
+			if (show != -1)
+			    dp_show = show
                         next
 		    }
 
@@ -144,16 +134,18 @@ begin
                     call nh_setpar (operation, dp_oper, dp_update, 
 			   dp_verify, dp_show, update, verify, show)
 
-                    call nh_edit (im, Memc[image], operation, Memc[fields],
-	                Memc[valexpr], Memc[s_comm], Memc[pkey], baf, 
-			update, verify, show, nfields)
+		    iferr (call nh_edit (im, Memc[image], operation,
+			Memc[fields], Memc[valexpr], Memc[comment],
+			Memc[pkey], baf, update, verify, show, nfields))
+			call erract (EA_WARN)
+
                 }
 
-            } else {
-                call nh_edit (im, Memc[image], operation, Memc[fields],
-	            Memc[valexpr], Memc[s_comm], Memc[pkey], baf, update,
-		    verify, show, nfields)
-            }
+            } else
+                iferr (call nh_edit (im, Memc[image], operation, Memc[fields],
+	            Memc[valexpr], Memc[comment], Memc[pkey], baf, update,
+		    verify, show, nfields))
+		    call erract (EA_WARN)
 
 	    # Update the image header and unmap the image.
 
@@ -202,7 +194,7 @@ begin
 	} #end of while
 
 	# Close command file
-        if (comfile == YES)
+        if (fd != 0)
             call close(fd)
 	call imtclose (imlist)
 	call sfree (sp)
@@ -219,7 +211,7 @@ char    image[ARB]      #
 int	operation	#I operation code
 char    keyws[ARB]      # Memc[fields]
 char    exprs[ARB]	# Memc[valexpr]
-char    comment[ARB]	# Memc[s_comm]
+char    comment[ARB]	# Memc[comment]
 char    pkey[ARB]	# 
 int	baf
 int	update
@@ -243,7 +235,7 @@ begin
 	    # since it does not yet exist.
 
 	    nfields = 1
-	    call he_getopsetimage (im, image, Memc[field])
+	    call he_getopsetimage (im, image, keyws)
 	    switch (operation) {
 	    case OP_INIT:
 	        call nh_initfield (im, image, keyws, exprs, comment, 
@@ -255,23 +247,26 @@ begin
 	} else {
 	    # Open list of fields to be processed.
 	    flist = imofnlu (im, keyws)
-		nfields = 0
-		while (imgnfn (flist, Memc[field], SZ_FNAME) != EOF) {
-		    call he_getopsetimage (im, image, Memc[field])
+	    nfields = 0
+	    while (imgnfn (flist, Memc[field], SZ_FNAME) != EOF) {
+		call he_getopsetimage (im, image, Memc[field])
 
-		    switch (operation) {
-		    case OP_EDIT:
-			call nh_editfield (im, image, Memc[field],
-			    exprs, comment, verify, show, update)
-		    case OP_DELETE:
-			call nh_deletefield (im, image, Memc[field],
-			    exprs, verify, show, update)
-		    }
-		    nfields = nfields + 1
+		switch (operation) {
+		case OP_EDIT:
+		    call nh_editfield (im, image, Memc[field],
+			exprs, comment, verify, show, update)
+		case OP_RENAME:
+		    call nh_renamefield (im, image, Memc[field],
+			exprs, verify, show, update)
+		case OP_DELETE:
+		    call nh_deletefield (im, image, Memc[field],
+			exprs, verify, show, update)
 		}
-
-		call imcfnl (flist)
+		nfields = nfields + 1
 	    }
+
+	    call imcfnl (flist)
+	}
 	call sfree(sp)
 end
 
@@ -424,6 +419,128 @@ begin
 		call pargstr (field)
 		call nh_pargstrc (Memc[oldval], Memc[fcomm])
 		call nh_pargstrc (Memc[newval], Memc[ncomm])
+	}
+
+	call sfree (sp)
+end
+
+
+# NH_RENAMEFIELD -- Rename the named field of the indicated image.
+# The value expression is evaluated, interactively inspected if desired,
+# and the resulting value put to the image.
+
+procedure nh_renamefield (im, image, field, valexpr, verify, show, update)
+
+pointer	im			# image descriptor of image to be edited
+char	image[ARB]		# name of image to be edited
+char	field[ARB]		# name of field to be edited
+char	valexpr[ARB]		# value expression
+int	verify			# verify new value interactively
+int	show			# print record of edit
+int	update			# enable updating of the image
+
+int	goahead, nl
+pointer	sp, ip, oldval, newval, defval, o
+
+bool	streq()
+pointer	evexpr()
+extern	he_getop()
+int	getline(), imaccf(), strldxs(), locpr()
+errchk	evexpr, getline, imaccf, he_gval
+
+begin
+	call smark (sp)
+	call salloc (oldval, SZ_LINE, TY_CHAR)
+	call salloc (newval, SZ_LINE, TY_CHAR)
+	call salloc (defval, SZ_LINE, TY_CHAR)
+
+	# Verify that the named field exists before going any further.
+	if (field[1] != '$')
+	    if (imaccf (im, field) == NO) {
+		call eprintf ("parameter %s,%s not found\n")
+		    call pargstr (image)
+		    call pargstr (field)
+		call sfree (sp)
+		return
+	    }
+
+	# Get the old value.
+	call he_gval (im, image, field, Memc[oldval], SZ_LINE)
+
+	# Evaluate the expression.  Encode the result operand as a string.
+	# If the expression is not parenthesized, assume that is is already
+	# a string literal.
+
+	if (valexpr[1] == '(') {
+	    o = evexpr (valexpr, locpr (he_getop), 0)
+	    call he_encodeop (o, Memc[newval], SZ_LINE)
+	    call xev_freeop (o)
+	    call mfree (o, TY_STRUCT)
+	} else
+	    call strcpy (valexpr, Memc[newval], SZ_LINE)
+	call strupr (Memc[newval])
+
+	if (verify == YES) {
+	    # Query for new value and edit the field.  If the response is a
+	    # blank line, use the default new value.  If the response is "$"
+	    # or EOF, do not change the value of the parameter.
+
+	    call strcpy (field, Memc[oldval], SZ_LINE)
+	    if (streq (Memc[newval], "."))
+		call strcpy (Memc[oldval], Memc[newval], SZ_LINE)
+	    call strcpy (Memc[newval], Memc[defval], SZ_LINE)
+	    call eprintf ("%s,%s (%s -> %s): ")
+		call pargstr (image)
+		call pargstr (field)
+		call pargstr (field)
+		call pargstr (Memc[newval])
+	    call flush (STDERR)
+
+	    if (getline (STDIN, Memc[newval]) != EOF) {
+		# Do not skip leading whitespace; may be significant in a
+		# string literal.
+
+		ip = newval
+
+		# Do strip trailing newline since it is an artifact of getline.
+		nl = strldxs ("\n", Memc[ip]) 
+		if (nl > 0)
+		    Memc[ip+nl-1] = EOS
+
+		# Decode user response.
+		if (Memc[ip] == '\\') {
+		    ip = ip + 1
+		    goahead = YES
+		} else if (streq(Memc[ip],"n") || streq(Memc[ip],"no")) {
+		    goahead = NO
+		} else if (streq(Memc[ip],"y") || streq(Memc[ip],"yes") ||
+		    Memc[ip] == EOS) {
+		    call strcpy (Memc[defval], Memc[newval], SZ_LINE)
+		    goahead = YES
+		} else {
+		    if (ip > newval)
+			call strcpy (Memc[ip], Memc[newval], SZ_LINE)
+		    goahead = YES
+		}
+
+		# Edit field if so indicated.
+		if (goahead == YES && update == YES)
+		    call nh_updatekey (im, image, field, Memc[newval], show)
+
+		call flush (STDOUT)
+	    }
+
+	} else {
+	    call strcpy (field, Memc[oldval], SZ_LINE)
+	    if (update == YES)
+		call nh_updatekey (im, image, field, Memc[newval], show)
+	}
+	if (update == NO && show == YES) {
+	    call printf ("%s,%s: %s -> %s\n")
+		call pargstr (image)
+		call pargstr (field)
+		call pargstr (field)
+		call pargstr (Memc[newval])
 	}
 
 	call sfree (sp)
@@ -753,6 +870,34 @@ begin
 end
 
 
+# NH_UPDATEKEY -- Update the image header field.
+
+procedure nh_updatekey (im, image, field, newkey, show)
+
+pointer	im			# image descriptor
+char	image[ARB]		# image name
+char	field[ARB]		# field name
+char	newkey[ARB]		# new key
+int	show			# print record of update
+
+begin
+	iferr (call imrenf (im, field, newkey)) {
+	    call eprintf ("cannot update %s,%s\n")
+		call pargstr (image)
+		call pargstr (field)
+	    return
+	}
+	if (show == YES) {
+	    call printf ("%s,%s: %s -> %s\n")
+		call pargstr (image)
+		call pargstr (field)
+		call pargstr (field)
+		call pargstr (newkey)
+
+	}
+end
+
+
 # NH_CPSTR -- Copy a string to a header record with optional comment.
 
 procedure nh_cpstr (str, outbuf)
@@ -849,14 +994,11 @@ int	verify
 int	show
 bool	clgetb(), streq()
 
-pointer sp, ip, s_fields, s_valexpr
+pointer ip
 int	btoi()
 
 begin
-        call smark(sp)
-	call salloc (s_fields,  SZ_LINE,  TY_CHAR)
-	call salloc (s_valexpr,  SZ_LINE,  TY_CHAR)
-
+	# Set switches.
 	operation = OP_EDIT
 	if (clgetb ("add"))
 	    operation = OP_ADD
@@ -864,42 +1006,54 @@ begin
 	    operation = OP_INIT
 	else if (clgetb ("delete"))
 	    operation = OP_DELETE
+	else if (clgetb ("rename"))
+	    operation = OP_RENAME
 
-	# Get list of fields to be edited, added, or deleted.
-	call clgstr ("fields", Memc[s_fields], SZ_LINE)
-	for (ip=s_fields;  IS_WHITE (Memc[ip]);  ip=ip+1)
-	    ;
-        call strcpy (Memc[ip], Memc[fields], SZ_LINE)
+	# If fields is NULL then this will be done in a command file.
+	if (fields != NULL) {
 
-	# The value expression parameter is not used for the delete operation.
-	if (operation != OP_DELETE) {
-	    call clgstr ("value", Memc[s_valexpr], SZ_LINE)
-	    call clgstr ("comment", comment, SZ_LINE)
-	       
-	    if (streq(Memc[fields], "add_blank")) {
-                call strcpy (Memc[s_valexpr], Memc[valexpr], SZ_LINE)
-            } else {     
-                # Justify value
-	        for (ip=s_valexpr;  IS_WHITE (Memc[ip]);  ip=ip+1)
+	    # Get list of fields to be edited, added, or deleted.
+	    call clgstr ("fields", Memc[fields], SZ_LINE)
+	    for (ip=fields;  IS_WHITE (Memc[ip]);  ip=ip+1)
+		;
+	    call strcpy (Memc[ip], Memc[fields], SZ_LINE)
+
+	    # Set value expression.
+	    Memc[valexpr] = EOS
+	    if (operation != OP_DELETE) {
+		call clgstr ("value", Memc[valexpr], SZ_LINE)
+		if (operation != OP_RENAME)
+		    call clgstr ("comment", comment, SZ_LINE)
+		   
+		# Justify value
+		for (ip=valexpr;  IS_WHITE (Memc[ip]);  ip=ip+1)
 		    ;
-                call strcpy (Memc[ip], Memc[valexpr], SZ_LINE)
-	        #valexpr = ip
-                ip = valexpr
-	        while (Memc[ip] != EOS)
+		call strcpy (Memc[ip], Memc[valexpr], SZ_LINE)
+		ip = valexpr
+		while (Memc[ip] != EOS)
 		    ip = ip + 1
-	        while (ip > valexpr && IS_WHITE (Memc[ip-1]))
+		while (ip > valexpr && IS_WHITE (Memc[ip-1]))
 		    ip = ip - 1
-	        Memc[ip] = EOS
-            }
+		Memc[ip] = EOS
+	    }
+
+	    # If only printing results ignore the RENAME flag.
+	    if (operation == OP_RENAME && streq (Memc[valexpr], ".")) {
+		operation = OP_EDIT
+		call strcpy (".", comment, SZ_LINE)
+	    }
+
 	} else {
 	    Memc[valexpr] = EOS
+	    comment[1] = EOS
 	}
+
 
 	# Get switches.  If the expression value is ".", meaning print value
 	# rather than edit, then we do not use the switches.
 	
-	if (operation == OP_EDIT && streq (Memc[valexpr], ".") && 
-	       streq (comment, ".")) {
+	if (operation == OP_EDIT && streq (Memc[valexpr], ".") &&
+	    streq (comment, ".")) {
 	    update = NO
 	    verify = NO
 	    show   = NO
@@ -916,7 +1070,6 @@ begin
                    baf = BEFORE
 	    }
 	}
-        call sfree(sp)
 end
 
 
@@ -939,17 +1092,10 @@ begin
 
 	if (operation == OP_DEFPAR)
             operation = dp_oper
-        if (update < 0)
+        if (update == -1)
             update = dp_update
-	if (verify < 0)
+	if (verify == -1)
             verify = dp_verify
-        if (show < 0)
+        if (show == -1)
             show = dp_show
 end
-
-
-
-
-
-
-

@@ -88,8 +88,8 @@ begin
 
 	# Open and initialize the tape file, and read the permanent file table
 	fd = mtopen (in_fname, READ_ONLY, SZ_TAPE_BUFFER)
-	junk = get_cyber_words_init(fd)
-	junk = read_dumpf_init(fd)
+	junk = get_cyber_words_init()
+	junk = read_dumpf_init()
 	if (get_cyber_words (fd, Memi[pft], LEN_PFT) == EOF) {
 	    call printf ("DUMPF tape at EOT\n")
 	    call sfree (sp)

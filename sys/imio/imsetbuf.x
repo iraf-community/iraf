@@ -29,7 +29,7 @@ begin
 	opt_bufsize = fstati (fd, F_OPTBUFSIZE)
 	dev_blksize = max (1, fstati (fd, F_BLKSIZE))
 
-	szline = IM_PHYSLEN(im,1) * sizeof (IM_PIXTYPE(im))
+	szline = IM_PHYSLEN(im,1) * sizeof(IM_PIXTYPE(im))
 	imsize = szline
 	do i = 2, IM_NDIM(im)
 	    imsize = imsize * IM_PHYSLEN(im,i)
@@ -112,5 +112,6 @@ begin
 	    IM_SWAP(im) == NO) {
 
 	    IM_FAST(im) = YES
+IM_FAST(im) = NO
 	}
 end

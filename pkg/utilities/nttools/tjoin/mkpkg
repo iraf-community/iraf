@@ -1,0 +1,23 @@
+# Update the tjoin application code in the ttools package library
+# Author: B.Simon, 25-NOV-1987
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	closeiotab.x	"tjoin.h"
+	dojoin.x	<tbset.h>  "tjoin.h"
+	freetol.x	"tjoin.h"
+	isnumber.x	<ctype.h>  <lexnum.h>
+	issame.x	"tjoin.h"
+	mkjoin.x	<tbset.h>
+	openitab.x	<tbset.h>  "tjoin.h"
+	openotab.x	<tbset.h>  "tjoin.h"
+	readtol.x	"tjoin.h"
+	removejcol.x	"tjoin.h"
+	renamecol.x	<ctype.h>  <tbset.h>  "tjoin.h"
+	spptype.x	<tbset.h>
+	tjoin.x		<tbset.h>  "tjoin.h"
+	;

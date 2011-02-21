@@ -467,7 +467,7 @@ forth.
 A previously fitted model is used to extract the spectra luminosity
 within a specified sigma of the peak.  Because the model is not necessarily
 a Gaussian the sigma is used to compute
-the intensity ratio of the cutoff to the peak assumining a Gaussian profile
+the intensity ratio of the cutoff to the peak assuming a Gaussian profile
 and then the data is extracted to the point the model intensity falls below that
 cutoff.  If the clean option is specified then the model is used to detect
 pixels which deviate from the model by a specified amount.

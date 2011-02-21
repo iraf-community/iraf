@@ -53,6 +53,9 @@ int	forceupdate = NO;		/* forcibly update libmod dates	*/
 extern	char *os_getenv();
 
 
+zzpause () { printf ("ready ...."); (void) getc(stdin); }
+
+
 /* MAIN -- Entry point of mkpkg.e
  */
 main (argc, argv)
@@ -133,6 +136,9 @@ char	*argv[];
 			break;
 		    case 'v':
 			verbose = YES;
+			break;
+		    case 'w':
+			zzpause();
 			break;
 		    case 'r':
 			if (*argp == NULL)

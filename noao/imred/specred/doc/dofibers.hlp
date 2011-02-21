@@ -764,7 +764,7 @@ arc spectra taken during the object observation.  The flat field,
 throughput image or file, auxiliary emission line spectra, and simultaneous
 comparison fibers are optional.  If a flat field is used then the sky flat
 or throughput file is optional assuming the flat field has the same fiber
-illumination.  It is legal to specify only a throughput image or file and
+iillumination.  It is legal to specify only a throughput image or file and
 leave the flat field blank in order to simply apply a throughput
 correction.  Because only the total counts through each fiber are used from
 a throughput image, sky flat exposures need not be of high signal per
@@ -950,7 +950,7 @@ The sky alignment option allows applying a zeropoint dispersion shift
 to all fibers based on one or more sky lines.  This requires all fibers
 to have the sky lines visible.  When there are sky lines this will
 improve the sky subtraction if there is a systematic error in the
-fiber illumination between the sky and the arc calibration.
+fiber iillumination between the sky and the arc calibration.
 
 The sky subtraction option selects whether to combine the sky fiber spectra
 and subtract this sky from the object fiber spectra.  \fIDispersion
@@ -1214,7 +1214,7 @@ corrections.  If a flat field is specified then each sky spectrum is
 divided by the appropriate flat field spectrum.  The total counts through
 each fiber are multiplied into the flat field spectrum thus making the sky
 throughput of each fiber the same.  This correction is important if the
-illumination of the fibers differs between the flat field source and the
+iillumination of the fibers differs between the flat field source and the
 sky.  Since only the total counts are required the sky or dome flat field
 spectra need not be particularly strong though care must be taken to avoid
 objects.
@@ -1337,7 +1337,7 @@ for ordering the arc and object observations.
 
 An optional step is to use sky lines in the spectra to compute a zeropoint
 dispersion shift that will align the sky lines.  This may improve sky
-subtraction if the illumination is not the same between the arc calibration
+subtraction if the iillumination is not the same between the arc calibration
 and the sky.  When selected the object spectrum is dispersion corrected
 using a non-linear dispersion function to avoid resampling the spectrum.
 The sky lines are then reidentified in wavelength space from a template

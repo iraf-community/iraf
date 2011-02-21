@@ -1,0 +1,87 @@
+		IRAF Tools for Color Image Display
+
+A prototype IRAF color image display package, COLOR, is now available.
+Currently this package provides conversion of 3 bandpass IRAF images to a
+Sun 24-bit RGB rasterfile format, a 24-bit to 8-bit compression algorithm
+and Floyd-Steinberg dithering, and an RGB 8-bit pixel dithering algorithm.
+The Sun rasterfiles are displayed using non-IRAF tools and the others use
+only IRAF images and SAOimage or IMTOOL.  These tasks are usable with the
+currently common 8-bit color workstations and are provided for those users
+which don't have more capable hardware such as 24-bit workstations, IIS
+displays, and 24-bit addon cards.  Addtional functionality will be added to
+the COLOR package in time.
+
+The task RGBSUN takes three input IRAF images and produces a 24-bit Sun
+rasterfile.  Though this file type was developed by Sun Microsystems it is
+a relatively simple format which may useful on other machines having
+software designed to use it.  The color image may be displayed with a variety
+of non-IRAF tools such as XV (a very powerful and generic viewer for
+X-window systems), XLOADIMAGE (another X-window display tool), SCREENLOAD
+(a simple displayer on Sun computers), and SNAPSHOT (an Open-Look tool).
+Also some color printers can be used with this format such as a Shinko
+color printer.
+
+The recommended display tool is XV which provides a great deal of
+capability in adjusting the color map and size.  This program compress the
+24-bit colors to 8-bits on an 8-bit workstation using color dithering
+techniques (there is a choice of a slow and fast method).  This program
+also provides the capability to write the picture out to other formats and
+one may also use screen capture tools such as XWD or SNAPSHOT
+to extract and possibly print the picture.
+
+For hardcopy there is always the option of photographing the workstation
+screen.  Different sites may also have color printers which accept
+the rasterfile directly or some other form of capture from the screen.
+At NOAO there is a Shinko color printer which may be used directly with
+the rasterfile to make moderate quality color prints and slides.
+
+The task RGBTO8 takes three input IRAF images, maps them to 8-bits each,
+compresses the 24-bit RGB colors to 8-bits using the Heckbert Median
+Cut Algorithm, and applies a Floyd-Steinberg dither to the output
+8-bit IRAF image.  The task also outputs a color map suitable for use
+with (V1.07) SAOimage and IMTOOL.  Basically this does the same thing
+as the X tools except in an IRAF task which produces and IRAF image and
+separate color map.  This approach, thus, only requires this package
+and the standard IRAF display server and only uses IRAF images.
+
+The pixel dithering techique takes three input IRAF images and makes a
+special output image in which each pixel in the input images is expanded
+into nine pixels in the output image with a specified pattern such as
+the default of
+
+				brg
+		r + g + b =	gbr
+				rgb
+
+where r is the red image pixel, g is the green image pixel, and b is the
+blue image pixel.
+
+The pixel intensities are linearly mapped from a specified input range to
+one of three sets of 85 levels.  The red pixels map to the values 0 to 84,
+the green pixels to the range 85 to 169, and the blue pixels to the range
+170 to 254.  The display server then uses a special 8-bit look up table
+that maps each set of 85 levels in each pure color from off to the maximum
+intensity.  The displayed image counts on the nearby grouping of pure
+colors to blend in the detector, such as the eye, to give a color composite
+effect.
+
+This is essentially the same technique used in some kinds of color printing
+and CRT monitors where each resolution element has three color phosphors
+and three guns to excite them.  The pixel dithering is also related to
+black and white half-toning.  As with any of these, if the image is
+magnified or viewed with enough resolution (by looking very closely at the
+display) the individual color elements can be distinguished.  However, when
+viewed normally without magnification the effect is reasonably good.
+
+The advantages of the last two techniques for IRAF users are that the
+currently common 8-bit color workstation displays, the standard IRAF
+display servers SAOimage and IMTOOL, and the standard IRAF image formats
+are all that is required.  The pixel dither technique has the advantage of
+using a palette of colors which is wider than attempting to compress the
+three images into a single 8-bit word (color compression) and the method is
+more intuitive than the 24-bit to 8-bit compress and dithering used in XV
+RGBTO8.  The disadvantages of the pixel dithering are the loss of
+resolution, the decrease in overall brightness (since at most only one
+color is at maximum at each resolution element), and the special nature of
+the composite image (which, however, is an IRAF image rather than one of
+the many other color picture formats).

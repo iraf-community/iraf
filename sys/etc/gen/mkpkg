@@ -16,4 +16,15 @@ libsys.a:
 	miiwritel.x	<mii.h>
 	miiwriter.x	<mii.h>
 	miiwrites.x	<mii.h>
+
+	nmireadd.x	<nmi.h>
+	nmireadi.x	<nmi.h>
+	nmireadl.x	<nmi.h>
+	nmireadr.x	<nmi.h>
+	nmireads.x	<nmi.h>
+	nmiwrited.x	<nmi.h>
+	nmiwritei.x	<nmi.h>
+	nmiwritel.x	<nmi.h>
+	nmiwriter.x	<nmi.h>
+	nmiwrites.x	<nmi.h>
 	;

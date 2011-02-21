@@ -259,7 +259,7 @@ to set bitpix.
 The IRAF datatype value is set to either INTEGER, FLOATING or COMPLEX.
 .le
 .ls set_scale
-The bscale and bzero values are caculated from the IRAF minimum and maximum
+The bscale and bzero values are calculated from the IRAF minimum and maximum
 data values and the FITS bitpix.
 .ls tape_limits
 The maximum and minimum FITS integer values are calculated from the FITS bitpix.
@@ -277,7 +277,7 @@ always TY_CHAR.
 .le
 .ls init_card_encode
 The card encoding procedure is initialized. The number of standard keyword,
-optional keywords, coordinate tranformation keywords, and history keywords
+optional keywords, coordinate transformation keywords, and history keywords
 are calculated.
 .le
 .ls card_encode

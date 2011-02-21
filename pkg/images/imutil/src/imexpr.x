@@ -43,7 +43,7 @@ define	IE_INTYPE	Memi[$1+10]		# minimum input operand type
 define	IE_OUTTYPE	Memi[$1+11]		# datatype of output image
 define	IE_BWIDTH	Memi[$1+12]		# npixels boundary extension
 define	IE_BTYPE	Memi[$1+13]		# type of boundary extension
-define	IE_BPIXVAL	Memr[$1+14]		# boundary pixel value
+define	IE_BPIXVAL	Memr[P2R($1+14)]	# boundary pixel value
 define	IE_V		Memi[$1+15+($2)-1]	# position in output image
 define	IE_NOPERANDS	Memi[$1+22]		# number of input operands
 			# align
@@ -525,7 +525,7 @@ image_
 	# are writing to a section of an existing image.
 
 	call imgsection (Memc[output], Memc[section], SZ_FNAME)
-	if (Memc[section] != EOS) {
+	if (Memc[section] != EOS && Memc[section] != NULL) {
 	    outim = immap (Memc[output], READ_WRITE, 0)
 	    IE_AXLEN(ie,1) = IM_LEN(outim,1)
 	} else {
@@ -567,21 +567,22 @@ image_
 		    switch (O_TYPE(out)) {
 		    case TY_BOOL:
 			Memi[op] = O_VALI(out)
+			call amovki (O_VALI(out), Memi[op], IM_LEN(outim,1))
 
 		    case TY_SHORT:
-			Mems[op] = O_VALS(out)
+			call amovks (O_VALS(out), Mems[op], IM_LEN(outim,1))
 
 		    case TY_INT:
-			Memi[op] = O_VALI(out)
+			call amovki (O_VALI(out), Memi[op], IM_LEN(outim,1))
 
 		    case TY_LONG:
-			Meml[op] = O_VALL(out)
+			call amovkl (O_VALL(out), Meml[op], IM_LEN(outim,1))
 
 		    case TY_REAL:
-			Memr[op] = O_VALR(out)
+			call amovkr (O_VALR(out), Memr[op], IM_LEN(outim,1))
 
 		    case TY_DOUBLE:
-			Memd[op] = O_VALD(out)
+			call amovkd (O_VALD(out), Memd[op], IM_LEN(outim,1))
 
 		    }
 

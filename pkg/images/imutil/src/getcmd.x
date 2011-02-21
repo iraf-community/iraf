@@ -11,11 +11,12 @@ define	HS_UPDATE	3
 define	HS_VERIFY	4
 define	HS_SHOW		5
 define  HS_DELETE	6
-define  HS_FIELD	7
-define  HS_VALUE	8
-define  HS_COMMENT	9
-define  HS_BEFORE	10
-define  HS_AFTER	11
+define  HS_RENAME	7
+define  HS_FIELD	8
+define  HS_VALUE	9
+define  HS_COMMENT	10
+define  HS_BEFORE	11
+define  HS_AFTER	12
 define	ERROR           -2
 
 define  HADD		Memi[$1]
@@ -24,7 +25,8 @@ define	HUPDATE         Memi[$1+2]
 define	HVERIFY         Memi[$1+3]
 define	HSHOW           Memi[$1+4]
 define  HDELETE         Memi[$1+5]
-define  HBAF	        Memi[$1+6]
+define  HRENAME         Memi[$1+6]
+define  HBAF	        Memi[$1+7]
 define	HFIELD          Memc[P2C($1+10)]
 define  HVALUE	        Memc[P2C($1+46)]
 define  HCOMMENT        Memc[P2C($1+86)]
@@ -37,6 +39,7 @@ define  OP_INIT         2
 define  OP_ADD          3
 define  OP_DELETE       4
 define  OP_DEFPAR       5
+define  OP_RENAME       6
 define  BEFORE		1
 define  AFTER		2
 
@@ -63,131 +66,144 @@ int	show
 pointer hc
 char    outstr[LEN_CARD]
 char 	identif[LEN_CARD], dot
-int     ip, nexpr, token, add, addonly, delete, nch
+int     ip, nexpr, token, add, addonly, delete, rename, nch
 bool    streq()
 int	lex_type, ctotok(), he_ks_lex(), ctowrd()
 errchk	syserr, syserrs
 
 begin
-       # The default values should have been already initialized 
-       # with a call fxf_ksinit().
+	# The default values should have been already initialized 
+	# with a call fxf_ksinit().
 
-       call calloc(hc, HSZ, TY_STRUCT)
-       call  he_ksinit (hc)
+	call calloc(hc, HSZ, TY_STRUCT)
+	call  he_ksinit (hc)
 
-       ip = 1
-       nexpr = 0
-       identif[1] = EOS
+	ip = 1
+	nexpr = 0
+	identif[1] = EOS
 
-       repeat {
-	   # Advance to the next keyword.
-	   if (ip == 1) {
+	repeat {
+	    # Advance to the next keyword.
+	    if (ip == 1) {
 	       nch= ctowrd(cmd, ip, outstr, LEN_CARD)
-               token = TOK_IDENTIFIER
-           } else {
+	       token = TOK_IDENTIFIER
+	    } else {
 	       token = ctotok (cmd, ip, outstr, LEN_CARD)
-           } 
+	    } 
 
-           if (token == TOK_CHARCON) {
+	    if (token == TOK_CHARCON) {
 	       ip = ip - 2
 	       nch= ctowrd(cmd, ip, outstr, LEN_CARD)
 	       if (nexpr >= 1)
-	           token = TOK_STRING
-               if (nch <=3) {
-                   #ctowrd will not parse one letter string, doit in here.
-                   outstr[1]=cmd[ip-2]
-                   outstr[2]=EOS
-               }
-	   }
+		   token = TOK_STRING
+	       if (nch <=3) {
+		   #ctowrd will not parse one letter string, doit in here.
+		   outstr[1]=cmd[ip-2]
+		   outstr[2]=EOS
+	       }
+	    }
 
-           if (token == TOK_STRING && nexpr == 0)
+	    if (token == TOK_STRING && nexpr == 0)
 	       token = TOK_IDENTIFIER
-	   switch (token) {
-	   case TOK_EOS:
+	    switch (token) {
+	    case TOK_EOS:
 	       break
-	   case TOK_NEWLINE:
+	    case TOK_NEWLINE:
 	       break
 
-	   case TOK_NUMBER:
-	       if (nexpr != 1)
+	    case TOK_NUMBER:
+	       if (nexpr != 1) {
+		   call eprintf ("%s\n")
+		       call pargstr (cmd)
 		   call error (13,"Numeric value not allow in this field")
+		}
 	       call strcpy (outstr, HVALUE(hc), LEN_CARD)
 	       nexpr = nexpr + 1
-	   case TOK_CHARCON:
+	    case TOK_CHARCON:
 	       ip = ip - 1
-	   case TOK_STRING:
-	       if (nexpr != 1 && nexpr != 2)
+	    case TOK_STRING:
+	       if (nexpr != 1 && nexpr != 2) {
+		   call eprintf ("%s\n")
+		       call pargstr (cmd)
 		   call error(13, "Value or comment error")
-               if (nexpr == 1) 
-	           call strcpy (outstr, HVALUE(hc), LEN_CARD)
-               if (nexpr == 2) 
-	           call strcpy (outstr, HCOMMENT(hc), LEN_CARD)
+		}
+	       if (nexpr == 1) 
+		   call strcpy (outstr, HVALUE(hc), LEN_CARD)
+	       if (nexpr == 2) 
+		   call strcpy (outstr, HCOMMENT(hc), LEN_CARD)
 	       nexpr = nexpr + 1
 
-	   case TOK_IDENTIFIER:
-	       call strcpy (outstr, identif, LEN_CARD] 
+	    case TOK_IDENTIFIER:
+	       call strcpy (outstr, identif, LEN_CARD)
 	       call strlwr (outstr)
 	       lex_type = he_ks_lex (outstr)
 
-               if (streq(identif, "comment") && nexpr == 0)
-	           lex_type = 0
+	       if (streq(identif, "comment") && nexpr == 0)
+		   lex_type = 0
 	       # look for =<value>, + or -
 	       if (lex_type > 0) {
-	   	   call he_ks_gvalue (lex_type, cmd, ip, hc)
+		   call he_ks_gvalue (lex_type, cmd, ip, hc)
 	       } else {
-	           #if (nexpr == 0 || nexpr == 1)
-	           if (nexpr == 0)
+		   #if (nexpr == 0 || nexpr == 1)
+		   if (nexpr == 0)
 		       call strcpy (identif, HFIELD(hc), LEN_CARD)
 		   else if (nexpr == 1)
 		       call strcpy (outstr, HVALUE(hc), LEN_CARD)
-	           else
+		   else {
+		       call eprintf ("%s\n")
+			   call pargstr (cmd)
 		       call error(13, "Field or value error")
+		    }
 	       }
 	       nexpr = nexpr + 1
 
-	   case TOK_OPERATOR:
-               dot = outstr[1]
-               if (nexpr == 1 && dot == '.')
-                   call strcpy (outstr, HVALUE(hc), LEN_CARD)
-               else if (nexpr == 2 && dot == '.')
-                   call strcpy (outstr, HCOMMENT(hc), LEN_CARD)
-               else
+	    case TOK_OPERATOR:
+		dot = outstr[1]
+		if (nexpr == 1 && dot == '.')
+		   call strcpy (outstr, HVALUE(hc), LEN_CARD)
+		else if (nexpr == 2 && dot == '.')
+		   call strcpy (outstr, HCOMMENT(hc), LEN_CARD)
+		else {
+		   call eprintf ("%s\n")
+		       call pargstr (cmd)
 		   call error(13,"error in tok_operator value")
-	       nexpr = nexpr + 1
+		}
+		nexpr = nexpr + 1
 
-	   default:
+	    default:
 		#call error(13,"error in command line")
-	   }
+	    }
 	}	   
 
-        call strcpy (HFIELD(hc), fields, LEN_CARD)
-        call strcpy (HVALUE(hc), valexpr, LEN_CARD)
-        call strcpy (HCOMMENT(hc), comment, LEN_CARD)
-        call strcpy (HBAFVALUE(hc), pkey, LEN_CARD)
-        baf = HBAF(hc)
-        add    = HADD(hc)
-        addonly = HADDONLY(hc)
-        update = HUPDATE(hc)
-        verify = HVERIFY(hc)
-        show   = HSHOW(hc)
-        delete = HDELETE(hc)
+	call strcpy (HFIELD(hc), fields, LEN_CARD)
+	call strcpy (HVALUE(hc), valexpr, LEN_CARD)
+	call strcpy (HCOMMENT(hc), comment, LEN_CARD)
+	call strcpy (HBAFVALUE(hc), pkey, LEN_CARD)
+	baf	= HBAF(hc)
+	add	= HADD(hc)
+	addonly	= HADDONLY(hc)
+	update	= HUPDATE(hc)
+	verify	= HVERIFY(hc)
+	show	= HSHOW(hc)
+	delete	= HDELETE(hc)
+	rename	= HRENAME(hc)
 
-        #operation = OP_EDIT
-        operation = -1
-        if (add == YES)
-            operation = OP_ADD
-        else if (addonly == YES)
-            operation = OP_INIT
-        else if (delete == YES)
-            operation = OP_DELETE
+	operation = OP_EDIT
+	if (add == -1 && addonly == -1 && delete == -1 && rename == -1)
+	    operation = OP_DEFPAR
+	else if (add == YES)
+	    operation = OP_ADD
+	else if (addonly == YES)
+	    operation = OP_INIT
+	else if (delete == YES)
+	    operation = OP_DELETE
+	else if (rename == YES)
+	    operation = OP_RENAME
 
-        if (streq (fields, "default_pars")) {
-            operation = -operation
-        } else if (operation < 0) {
-            operation = OP_DEFPAR
-        }
+	if (streq (fields, "default_pars"))
+	    operation = -operation
 
-        call mfree(hc, TY_STRUCT)
+	call mfree(hc, TY_STRUCT)
 end
 
 
@@ -225,10 +241,13 @@ begin
             return (HS_ADDONLY)
         if (strncmp (outstr, "delete", len) == 0)
             return (HS_DELETE)
+        if (strncmp (outstr, "rename", len) == 0)
+            return (HS_RENAME)
         if (strncmp (outstr, "verify", len) == 0)
             return (HS_VERIFY)
-        if (strncmp (outstr, "show", len) == 0)
+        if (strncmp (outstr, "show", len) == 0) {
             return (HS_SHOW)
+	}
         if (strncmp (outstr, "update", len) == 0)
             return (HS_UPDATE)
 
@@ -324,6 +343,8 @@ begin
 	    HSHOW(hc) = ival
 	case HS_DELETE:
 	    HDELETE(hc) = ival
+	case HS_RENAME:
+	    HRENAME(hc) = ival
 	default:
             call syserr (SYS_FXFKSSYN)
 	}
@@ -360,6 +381,8 @@ begin
 	    HSHOW(hc) = ival
 	case HS_DELETE:
 	    HDELETE(hc) = ival
+	case HS_RENAME:
+	    HRENAME(hc) = ival
 	default:
 	    call error(13, "ks_pm: invalid value")
 	}
@@ -373,14 +396,11 @@ procedure he_ksinit (hc)
 pointer	hc			#I 
 
 begin
-	HADD(hc)	= NO
-	HADDONLY(hc)    = NO
+	HADD(hc)	= -1
+	HADDONLY(hc)    = -1
+	HDELETE(hc)     = -1
+	HRENAME(hc)     = -1
 	HUPDATE(hc)     = -1
 	HVERIFY(hc)     = -1
 	HSHOW(hc)       = -1
-	HDELETE(hc)     = NO
-
-	#HUPDATE(hc)     = YES
-	#HVERIFY(hc)     = NO
-	#HSHOW(hc)       = NO
 end

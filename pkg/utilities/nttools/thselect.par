@@ -1,0 +1,5 @@
+table,s,a,"",,,input tables
+keywords,s,a,"",,,keywords to be listed
+expr,s,a,"yes",,,boolean expression governing selection
+Version,s,h,"21July2000",,,"date of installation"
+mode,s,h,"al"

@@ -87,10 +87,10 @@ begin
 	# Set special operands.
 	pos = clktime(0)
 	call brktime (pos, tm)
-	call sprintf (Memc[expr], sz_cmd, "\"%02d/%02d/%02d\"")
+	call sprintf (Memc[expr], sz_cmd, "\"%04d-%02d-%02d\"")
+	    call pargi (TM_YEAR(tm))
 	    call pargi (TM_MDAY(tm))
 	    call pargi (TM_MONTH(tm))
-	    call pargi (mod (TM_YEAR(tm), 100))
 	call ac_evaluate (ast, "$D", Memc[expr], eval, verbose)
 	call sprintf (Memc[expr], sz_cmd, "\"%02d:%02d:%02d\"")
 	    call pargi (TM_HOUR(tm))

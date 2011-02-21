@@ -33,7 +33,7 @@ int	listonly			#I List images to combine?
 
 bool	proj
 char	input[SZ_FNAME], errstr[SZ_LINE]
-int	i, j, nimages, intype, bufsize, oldsize, stack1, err
+int	i, j, nimages, intype, bufsize, oldsize, stack1, err, retry
 int	maxsize, maxmemory, memory
 pointer	sp, im, in1, in, out[6], offsets, key, tmp, bpmstack 
 
@@ -54,6 +54,9 @@ begin
 	    if (output[1] == EOS) {
 		call imtrew (list)
 		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
+		    i = strmatch (input, "[0]") - 3
+		    if (i > 0)
+		        call strcpy (input[i+3], input[i], SZ_FNAME)
 		    call printf ("%s\n")
 			call pargstr (input)
 		}
@@ -64,6 +67,9 @@ begin
 		    call erract (EA_WARN)
 		call imtrew (list)
 		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
+		    i = strmatch (input, "[0]") - 3
+		    if (i > 0)
+		        call strcpy (input[i+3], input[i], SZ_FNAME)
 		    call printf ("%s -> %s\n")
 			call pargstr (input)
 			call pargstr (errstr)
@@ -89,6 +95,8 @@ begin
 #	    stack1 = YES
 #	else
 	    stack1 = stack
+
+	retry = 0
 
 retry_
 	iferr {
@@ -131,7 +139,7 @@ retry_
 		call imtrew (list)
 		while (imtgetim (list, input, SZ_FNAME)!=EOF) {
 		    nimages = nimages + 1
-		    tmp = xt_immap (input, READ_ONLY, 0, nimages)
+		    tmp = xt_immap (input, READ_ONLY, 0, nimages, retry)
 		    Memi[in+nimages-1] = tmp
 		}
 
@@ -277,7 +285,8 @@ retry_
 		out[3] = NULL
 
 	    # Open masks.
-	    call ic_mopen (Memi[in], out, nimages, Memi[offsets])
+	    call ic_mopen (Memi[in], out, nimages, Memi[offsets],
+	        min(retry,1))
 
 	    # Open the log file.
 	    logfd = NULL
@@ -325,6 +334,9 @@ retry_
 	    }
 	} then {
 	    err = errget (errstr, SZ_LINE)
+call eprintf ("TRAP: %d %s\n")
+call pargi (err)
+call pargstr (errstr)
 	    if (err == SYS_IKIOPIX && nimages < 250)
 		err = SYS_MFULL
 	    call ic_mclose (nimages)
@@ -335,32 +347,38 @@ retry_
 		}
 	    }
 	    if (out[2] != NULL) {
-		call imunmap (out[2])
+		iferr (call imunmap (out[2]))
+		    ;
 		iferr (call imdelete (bmask))
 		    ;
 	    }
 	    if (out[3] != NULL) {
-		call imunmap (out[3])
+		iferr (call imunmap (out[3]))
+		    ;
 		iferr (call imdelete (sigma))
 		    ;
 	    }
 	    if (out[4] != NULL) {
-		call imunmap (out[4])
+		iferr (call imunmap (out[4]))
+		    ;
 		iferr (call imdelete (rmask))
 		    ;
 	    }
 	    if (out[5] != NULL) {
-		call imunmap (out[5])
+		iferr (call imunmap (out[5]))
+		    ;
 		iferr (call imdelete (nrmask))
 		    ;
 	    }
 	    if (out[6] != NULL) {
-		call imunmap (out[6])
+		iferr (call imunmap (out[6]))
+		    ;
 		iferr (call imdelete (emask))
 		    ;
 	    }
 	    if (out[1] != NULL) {
-		call imunmap (out[1])
+		iferr (call imunmap (out[1]))
+		    ;
 		iferr (call imdelete (output))
 		    ;
 	    }
@@ -376,13 +394,14 @@ retry_
 		if (project)
 		    goto err_
 
-		if (bufsize < 10000) {
+		if (bufsize < 10000 && retry > 2) {
 		    call strcat ("- Maybe min_lenuserarea is too large",
 			errstr, SZ_LINE)
 		    goto err_
 		}
 
 		bufsize = bufsize / 2
+		retry = retry + 1
 		call sfree (sp)
 		goto retry_
 	    case SYS_FTOOMANYFILES, SYS_IKIOPEN, SYS_IKIOPIX, SYS_FOPEN, SYS_FWTNOACC:

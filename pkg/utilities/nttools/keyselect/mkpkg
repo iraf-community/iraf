@@ -1,0 +1,15 @@
+# Update the keyselect application code in the ttools package library
+# Author: B.Simon, 12-Mar-92
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	expr.x		<evexpr.h>  "keyselect.h"
+	keyselect.x	"keyselect.com"
+	keyword.x	<imio.h>  <imhdr.h>  "keyselect.h"  "keyselect.com"
+	list.x		"keyselect.h"
+	tab.x		<imhdr.h>  <tbset.h>  "keyselect.h" 
+	;

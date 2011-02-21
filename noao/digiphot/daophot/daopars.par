@@ -3,14 +3,14 @@
 function,s,h,"gauss",,,"Form of analytic component of psf model"
 varorder,i,h,0,-1,2,"Order of empirical component of psf model"
 nclean,i,h,0,,,Number of cleaning iterations for computing psf model
-saturated,b,h,no,,,"Use wings of saturated stars in psf model computation ?"
+saturated,b,h,no,,,"Use wings of saturated stars in psf model computation?"
 matchrad,r,h,3.0,0.0,,"Object matching radius in scale units"
 psfrad,r,h,11.0,0.0,,"Radius of psf model in scale units"
 
 fitrad,r,h,3.0,0.0,,"Fitting radius in scale units"
-recenter,b,h,yes,,,"Recenter stars during fit ?"
-fitsky,b,h,no,,,"Recompute group sky value during fit ?"
-groupsky,b,h,yes,,,"Use group rather than individual sky values ?"
+recenter,b,h,yes,,,"Recenter stars during fit?"
+fitsky,b,h,no,,,"Recompute group sky value during fit?"
+groupsky,b,h,yes,,,"Use group rather than individual sky values?"
 sannulus,r,h,0.0,,,"Inner radius of sky fitting annulus in scale units"
 wsannulus,r,h,11.0,,,"Width of sky fitting annulus in scale units"
 flaterr,r,h,0.75,0.0,100.0,"Flat field error in percent"

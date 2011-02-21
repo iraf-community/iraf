@@ -36,7 +36,7 @@ An array of points can be removed from the fit by repeated calls to GSREJECT
 followed by a single call to GSSOLVE to calculate a new set of coefficients.
 .ih
 NOTES
-Out of bounds x and y values and INDEF valued data values are the resonsibility
+Out of bounds x and y values and INDEF valued data values are the responsibility
 of the calling program.
 .ih
 SEE ALSO

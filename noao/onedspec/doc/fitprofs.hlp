@@ -125,7 +125,7 @@ list, "", selects all profiles.
 .ls verbose = yes
 Print fitting results and record of output images created on the
 standard output (normally the terminal).
-The fitting informations is printed to the logfile so there is normally
+The fitting information is printed to the logfile so there is normally
 no need to redirect this output.  The output may be turned off when
 the task is run as a background task.
 .le

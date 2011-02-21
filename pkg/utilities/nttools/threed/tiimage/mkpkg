@@ -1,0 +1,29 @@
+# Update the tiimage application code in the threed package library.
+# Author: I.Busko, 30-Jan-1997
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+# This module is called from the threed mkpkg.
+generic:
+	$ifnfile (generic/tmcp1i.x)
+	$generic -k -p generic/ -t sird tmcp1.gx
+	$endif
+	$ifolder (generic/tmcp1i.x, tmcp1.gx)
+	$generic -k -p generic/ -t sird tmcp1.gx
+	$endif
+	;
+
+libpkg.a:
+	@generic
+	tiimage.x	<tbset.h> tiimage.h
+	tmcopy.x	<imhdr.h> <tbset.h>
+	tmhc.x		<tbset.h>
+	tmheader.x	<tbset.h>
+	tmloop.x	<error.h> tiimage.h
+	tmmode.x	<tbset.h> tiimage.h
+	tmscan.x	<error.h> <imhdr.h> <tbset.h>
+	;
+

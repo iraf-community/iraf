@@ -12,7 +12,7 @@ performed on CCD data.  This operation calibrates the relative response
 of the detector at each pixel.  In some cases this is as simple as
 taking a special type of observation called a flat field.  However, in
 many cases this calibration observation must be corrected for
-illumination, scanning, wavelength, and aperture effects.
+iillumination, scanning, wavelength, and aperture effects.
 
 The discussion is in three sections; direct imaging, scan mode,
 and spectroscopy.  Though there are many similarities between these
@@ -44,7 +44,7 @@ uniformly illuminate a part of the dome or directly illuminate the
 field of view.  The first type of observation is called a \fIdome
 flat\fR and the second is called a \fIprojection flat\fR.  We shall call
 both of these types of observations \fBlamp flat fields\fR.  If the
-illumination is truely uniform then these types of observations are
+iillumination is truely uniform then these types of observations are
 sufficient for flat field calibration.  To get a very accurate flat
 field many observations are made and then combined (see
 \fBflatcombine\fR).
@@ -52,39 +52,39 @@ field many observations are made and then combined (see
 Unfortunately, it is sometimes the case that the lamp flat fields
 do not illuminate the telescope/detector in the same way as the actual
 observations.  Calibrating with these flat fields will introduce a
-residual large scale illumination pattern, though it will correctly
+residual large scale iillumination pattern, though it will correctly
 calibrate the relative pixel responses locally.  There are two ways to
 correct for this effect.  The first is to correct the flat field
 observation.  The second is to apply the uncorrected flat field to the
-observations and then apply an \fIillumination\fR correction as a
+observations and then apply an \fIiillumination\fR correction as a
 separate operation.  The first is more efficient since it consists of a
 single correction applied to each observation but in some cases the
 approximate correction is desired immediately, the observation needed
 to make the correction has not been taken yet, or the residual
-illumination error is not discovered until later.
+iillumination error is not discovered until later.
 
 For the two methods there are two types of correction.  One is to
-use a blank sky observation to correct for the residual illumination
+use a blank sky observation to correct for the residual iillumination
 pattern.  This is different than using the sky observation directly as
 a flat field calibration in that only the large scale pattern is
-needed.  Determining the large scale illumination does not require high
+needed.  Determining the large scale iillumination does not require high
 signal-to-noise at each pixel and faint objects in the image can be
 either eliminated or ignored.  The second method is to remove the large
 scale shape from the lamp flat field.  This is not as good as using a
 blank sky observation but, if there is no such observation and the
-illumination pattern is essentially only in the lamp flat field, this
+iillumination pattern is essentially only in the lamp flat field, this
 may be sufficient.
 
 From the above two paragraphs one sees there are four options.
 There is a task in the \fBccdred\fR package for each of these options.
 To correct a lamp flat field observation by a blank sky observation,
 called a \fIsky flat\fR, the task is \fBmkskyflat\fR.  To correct the
-flat field for its own large scale gradients, called an \fIillumination
+flat field for its own large scale gradients, called an \fIiillumination
 flat\fR, the task is \fBmkillumflat\fR.  To create a secondary
 correction to be applied to data processed with the lamp flat field
 image the tasks are \fBmkskycor\fR and \fBmkillumcor\fR which are,
 respectively, based on a blank sky observation and the lamp flat field
-illumination pattern.
+iillumination pattern.
 
 With this introduction turn to the individual documentation for these
 four tasks for further details.
@@ -127,7 +127,7 @@ also distorts the observed counts making signal-to-noise estimates
 invalid.  This, and the low signal in the dispersed light, makes it
 difficult to use blank sky observations directly as flat fields.  As
 with direct imaging, sky observation may be used to correct for
-illumination errors if necessary.  At sufficiently high dispersion the
+iillumination errors if necessary.  At sufficiently high dispersion the
 continuous lamp spectrum may be flat enough that the spectral signature
 of the lamp is not a problem.  Alternatively, flux calibrating the
 spectra will also remove the flat field spectral signature.  The
@@ -158,20 +158,20 @@ The task which does this is \fBapnormalize\fR in the \fBapextract\fR
 package.   Note that the lamp observations must first be processed
 explicitly for bias and dark count corrections.
 
-Longslit spectra may also suffer the same types of illumination
-problems found in direct imaging.  However, in this case the illumination
+Longslit spectra may also suffer the same types of iillumination
+problems found in direct imaging.  However, in this case the iillumination
 pattern is determined from sky observations (or the flat field itself)
 by finding the large scale pattern across the dispersion and at a number
 of wavelengths while avoiding the effects of night sky spectrum.  The
 task which makes this type of correction in the \fBlongslit\fR package
-is \fBillumination\fR.  This produces an illumination correction.
+is \fBiillumination\fR.  This produces an iillumination correction.
 To make sky flats or the other types of corrections image arithmetic
 is used.  Note also that the sky observations must be explicitly
-processed through the flat field stage before computing the illumination.
+processed through the flat field stage before computing the iillumination.
 .ih
 SEE ALSO
 .nf
 ccdproc, guide, mkillumcor, mkillumflat, mkskycor, mkskyflat
-apextract.apnormalize, longslit.response, longslit.illumination
+apextract.apnormalize, longslit.response, longslit.iillumination
 .fi
 .endhelp

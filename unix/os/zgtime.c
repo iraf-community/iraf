@@ -19,9 +19,11 @@
  * since 00:00:00 01-Jan-80.  Return the total cpu time consumed by the
  * process (and any subprocesses), in units of milliseconds.
  */
-ZGTIME (clock_time, cpu_time)
-XLONG	*clock_time;				/* seconds */
-XLONG	*cpu_time;				/* milliseconds */
+int
+ZGTIME (
+  XLONG	 *clock_time,				/* seconds */
+  XLONG	 *cpu_time 				/* milliseconds */
+)
 {
 	struct	tms t;
 #ifdef BSD
@@ -32,10 +34,15 @@ XLONG	*cpu_time;				/* milliseconds */
 	time_t	gmt_to_lst();
 	long	cpu, clkfreq;
 
+
 #ifdef LINUX
-	clkfreq = CLK_TCK;
+	clkfreq = CLOCKS_PER_SEC;
 #else
-	clkfreq = CLKFREQ;
+#ifdef MACOSX
+	clkfreq = CLOCKS_PER_SEC;
+#else
+	clkfreq = CLKFREQ;			/* from <kernel.h> */
+#endif
 #endif
 
 	times (&t);
@@ -48,7 +55,11 @@ XLONG	*cpu_time;				/* milliseconds */
 	cpu = (t.tms_utime + t.tms_cutime);
 
 	if (cpu > MAX_LONG/1000)
-	    *cpu_time = cpu / clkfreq * 1000;
+	    /* *cpu_time = cpu / clkfreq * 1000;*/
+	    *cpu_time = cpu / 10;
 	else
-	    *cpu_time = cpu * 1000 / clkfreq;
+	    /* *cpu_time = cpu * 1000 / clkfreq;*/
+	    *cpu_time = cpu * 10;
+
+	return (XOK);
 }

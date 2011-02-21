@@ -13,7 +13,7 @@ Image to create or modify.
 .ls option
 Editing option which is one one of the following:
 .ls make
-Make a new image of the specifed size, dimensionality, pixel type, and values.
+Make a new image of the specified size, dimensionality, pixel type, and values.
 .le
 .ls replace
 Replace pixel values in the image.

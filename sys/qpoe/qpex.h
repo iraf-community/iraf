@@ -82,10 +82,10 @@ define	LT_LUTP		Memi[$1+2]	# TY_SHORT pointer to stored LUT
 define	LT_NBINS	Memi[$1+3]	# number of lookup table entries
 define	LT_LEFT		Memi[$1+4]	# lut value if index off left end
 define	LT_RIGHT	Memi[$1+5]	# lut value if index off right end
-define	LT_I0		Memr[$1+6]	# zero point for integer LUT
-define	LT_IS		Memr[$1+8]	# scale factor for integer LUT
-define	LT_R0		Memr[$1+6]	# zero point for real LUT
-define	LT_RS		Memr[$1+8]	# scale factor for real LUT
+define	LT_I0		Memr[P2R($1+6)]	# zero point for integer LUT
+define	LT_IS		Memr[P2R($1+8)]	# scale factor for integer LUT
+define	LT_R0		Memr[P2R($1+6)]	# zero point for real LUT
+define	LT_RS		Memr[P2R($1+8)]	# scale factor for real LUT
 define	LT_D0		Memd[P2D($1+6)]	# zero point for double LUT
 define	LT_DS		Memd[P2D($1+8)]	# scale factor for double LUT
 
@@ -100,9 +100,9 @@ define	OPCODE		Memi[$1]	# instruction opcode.
 define	IARG1		Memi[$1+1]	# first integer argument
 define	IARG2		Memi[$1+2]	# second integer argument
 define	IARG3		Memi[$1+3]	# third integer argument
-define	RARG1		Memr[$1+1]	# first real argument
-define	RARG2		Memr[$1+2]	# second real argument
-define	RARG3		Memr[$1+3]	# third real argument
+define	RARG1		Memr[P2R($1+1)]	# first real argument
+define	RARG2		Memr[P2R($1+2)]	# second real argument
+define	RARG3		Memr[P2R($1+3)]	# third real argument
 define	DARG1		Memd[IARG1($1)]	# first double argument
 define	DARG2		Memd[IARG2($1)]	# second double argument
 define	DARG3		Memd[IARG3($1)]	# third double argument

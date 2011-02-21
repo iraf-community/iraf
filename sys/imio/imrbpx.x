@@ -26,10 +26,10 @@ char	pixval[8]
 int	npix, ndim, sz_pixel, btype, op, off, step, xstep, i, j, k
 long	xs[3], xe[3], x1, x2, p, v1[IM_MAXDIM], v2[IM_MAXDIM], linelen
 errchk	imrdpx
-include	<szdtype.inc>
+include	<szpixtype.inc>
 
 begin
-	sz_pixel = ty_size[IM_PIXTYPE(im)]
+	sz_pixel = pix_size[IM_PIXTYPE(im)]
 	ndim = IM_NPHYSDIM(im)
 
 	# Cache the left and right endpoints of the line segment and the

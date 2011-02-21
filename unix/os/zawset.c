@@ -46,10 +46,13 @@ extern char *getenv();
 /* ZAWSET -- Adjust or query the "working set", i.e., the maximum amount of
  * physical memory allocated to the process.
  */
-ZAWSET (best_size, new_size, old_size, max_size)
-XINT	*best_size;		/* requested working set size, bytes.	*/
-XINT	*new_size, *old_size;	/* actual new and old sizes, bytes.	*/
-XINT	*max_size;		/* max working set size, bytes		*/
+int
+ZAWSET (
+  XINT	*best_size,		/* requested working set size, bytes.	*/
+  XINT	*new_size, 
+  XINT  *old_size,		/* actual new and old sizes, bytes.	*/
+  XINT	*max_size 		/* max working set size, bytes		*/
+)
 {
 	int physmem=0, kb_page;
 	int debug = (getenv(ENV_DEBUG) != NULL);
@@ -59,6 +62,7 @@ XINT	*max_size;		/* max working set size, bytes		*/
 	unsigned int working_set_size;
 	struct rlimit rlp;
 #endif
+
 
 	/* Get the page size in kilobytes. */
 	kb_page = getpagesize() / KB;
@@ -90,13 +94,14 @@ XINT	*max_size;		/* max working set size, bytes		*/
 	 * kernel, or by the value set in the user environment variable
 	 * MAXWORKSET, given in units of Mb.
 	 */
-	if (!max_wss)
-	    if (s = getenv ("MAXWORKSET")) {
+	if (!max_wss) {
+	    if ( (s = getenv ("MAXWORKSET")) ) {
 		max_wss = atoi(s) * 1024*1024;
 		if (max_wss < 1024*1024)
 		    max_wss = maxworkset;
 	    } else
 		max_wss = maxworkset;
+	}
 
 	if (debug)
 	    fprintf(stderr,"zawset: physmem=%dm, maxworkset=%dm max_wss=%dm\n",
@@ -111,7 +116,7 @@ XINT	*max_size;		/* max working set size, bytes		*/
 #else
 	getrlimit (RLIMIT_RSS, &rlp);
 	if (debug)
-	    fprintf (stderr, "zawset: starting rlimit cur=%dm, max=%dm\n",
+	    fprintf (stderr, "zawset: starting rlimit cur=%ldm, max=%ldm\n",
 		(rlp.rlim_cur == RLIM_INFINITY ? 0 : rlp.rlim_cur) / MB,
 		(rlp.rlim_max == RLIM_INFINITY ? 0 : rlp.rlim_max) / MB);
 
@@ -136,11 +141,13 @@ XINT	*max_size;		/* max working set size, bytes		*/
 		rlp.rlim_cur == RLIM_INFINITY ? max_wss : rlp.rlim_cur));
 	}
 	if (debug)
-	    fprintf (stderr, "zawset: adjusted rlimit cur=%dm, max=%dm\n",
+	    fprintf (stderr, "zawset: adjusted rlimit cur=%ldm, max=%ldm\n",
 		(rlp.rlim_cur == RLIM_INFINITY ? 0 : rlp.rlim_cur) / MB,
 		(rlp.rlim_max == RLIM_INFINITY ? 0 : rlp.rlim_max) / MB);
 #endif
 	if (debug)
 	    fprintf (stderr, "zawset: best=%dm, old=%dm, new=%dm, max=%dm\n",
 		*best_size/MB, *old_size/MB, *new_size/MB, *max_size/MB);
+
+	return (XOK);
 }

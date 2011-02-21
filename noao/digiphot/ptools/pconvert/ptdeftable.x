@@ -258,7 +258,8 @@ pointer columns[ARB]		# Array of pointers for columns
 int	max_nkeys, index, ncols, element, nelems
 pointer	list, sp, kname, aranges, ranges, rangeset, colname
 int	pt_gnfn(), strdic(), pt_ranges(), get_next_number(), decode_ranges()
-pointer	pt_ofnl(), pt_kstati()
+int     pt_kstati()
+pointer	pt_ofnl()
 real	asumi()
 
 begin

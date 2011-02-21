@@ -12,14 +12,20 @@
  * fails.  File must retain all attributes; special action is required
  * to transfer file protection.
  */
-ZFRNAM (oldname, newname, status)
-PKCHAR	*oldname, *newname;
-XINT	*status;
+int
+ZFRNAM (
+  PKCHAR  *oldname, 
+  PKCHAR  *newname,
+  XINT	  *status
+)
 {
 	static	XINT queryprot  = QUERY_PROTECTION;
 	static	XINT removeprot = REMOVE_PROTECTION;
 	static	XINT setprot    = SET_PROTECTION;
 	XINT	protected;
+
+	extern  int ZFPROT();
+
 
 	/* Most remove file protection before renaming the file, else
 	 * zfprot will not find the file and will refuse to delete the
@@ -39,4 +45,6 @@ XINT	*status;
 	    else
 		*status = XOK;
 	}
+
+	return (*status);
 }

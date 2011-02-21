@@ -2,6 +2,8 @@
  */
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <ctype.h>
 
 #define	import_kernel
@@ -65,18 +67,25 @@ int	lpr_inuse = NO;			/* set if printer is open	*/
 char	lpstr[SZ_LPSTR+1];		/* save zopnlp argument		*/
 
 
+extern  int ZOPNBF (), ZCLSBF (), ZOSCMD (), ZFDELE (), ZARDBF ();
+extern  int ZAWRBF (), ZAWTBF (), ZSTTBF ();
+
+
 /* ZOPNLP -- Open a printer device for binary file i/o.  If we can talk
  * directly to the printer, do so, otherwise open a spoolfile which is
  * to be sent to the printer when ZCLSLP is later called.
  */
-ZOPNLP (printer, mode, chan)
-PKCHAR	*printer;		/* logical name of printer device	*/
-XINT	*mode;			/* file access mode			*/
-XINT	*chan;			/* UNIX file number (output)		*/
+int
+ZOPNLP (
+  PKCHAR  *printer,		/* logical name of printer device	*/
+  XINT	  *mode,		/* file access mode			*/
+  XINT	  *chan 		/* UNIX file number (output)		*/
+)
 {
 	register char *ip;
 	static char delim;
 	int fd;
+
 
 	/* We do not see a need to have more than one printer open at
 	 * a time, and it makes things simpler.  We can easily generalize
@@ -84,7 +93,7 @@ XINT	*chan;			/* UNIX file number (output)		*/
 	 */
 	if (lpr_inuse == YES) {
 	    *chan = XERR;
-	    return;
+	    return (XERR);
 	} else
 	    lpr_inuse = YES;
 	
@@ -122,16 +131,15 @@ XINT	*chan;			/* UNIX file number (output)		*/
 		close (fd);
 	    }
 	
-	ZOPNBF ((PKCHAR *)lpr.spoolfile, mode, chan);
+	return ZOPNBF ((PKCHAR *)lpr.spoolfile, mode, chan);
 }
 
 
 /* ZCLSLP -- To close a printer we merely close the "spoolfile", and then
  * dispose of the spoolfile to the OS if so indicated.
  */
-ZCLSLP (chan, status)
-XINT	*chan;
-XINT	*status;
+int
+ZCLSLP (XINT *chan, XINT *status)
 {
 	static	PKCHAR	xnullstr[1] = { XEOS };
 	register char *ip, *op, *f;
@@ -169,6 +177,8 @@ XINT	*status;
 	    } else
 		ZFDELE ((PKCHAR *)lpr.spoolfile, &junk);
 	}
+
+	return (*status);
 }
 
 
@@ -178,15 +188,12 @@ XINT	*status;
  * level code; our function is merely to move the data to the device.  The read
  * primitive is not likely to be needed for a printer, but you never know...
  */
-ZARDLP (chan, buf, maxbytes, offset)
-XINT	*chan;
-XCHAR	*buf;
-XINT	*maxbytes;
-XLONG	*offset;
+int
+ZARDLP (XINT *chan, XCHAR *buf, XINT *maxbytes, XLONG *offset)
 {
 	XLONG	dummy_offset = 0;
 
-	ZARDBF (chan, buf, maxbytes, &dummy_offset);
+	return ZARDBF (chan, buf, maxbytes, &dummy_offset);
 }
 
 
@@ -194,27 +201,23 @@ XLONG	*offset;
  * of bytes written so we know whether or not to dispose of the spoolfile
  * at close time.
  */
-ZAWRLP (chan, buf, nbytes, offset)
-XINT	*chan;
-XCHAR	*buf;
-XINT	*nbytes;
-XLONG	*offset;
+int
+ZAWRLP (XINT *chan, XCHAR *buf, XINT *nbytes, XLONG *offset)
 {
 	XLONG	dummy_offset = 0;
 
 	lpr.wbytes += *nbytes;
-	ZAWRBF (chan, buf, nbytes, &dummy_offset);
+	return ZAWRBF (chan, buf, nbytes, &dummy_offset);
 }
 
 
 /* ZAWTLP -- Wait for i/o and return the status of the channel, i.e., the
  * number of bytes read or written or XERR.
  */
-ZAWTLP (chan, status)
-XINT	*chan;
-XINT	*status;
+int
+ZAWTLP (XINT *chan, XINT *status)
 {
-	ZAWTBF (chan, status);
+	return ZAWTBF (chan, status);
 }
 
 
@@ -222,16 +225,15 @@ XINT	*status;
  * the output file was opened by ZOPNBF.  The actual output file may be either
  * a blocked or streaming file depending on whether the output is spooled.
  */
-ZSTTLP (chan, param, lvalue)
-XINT	*chan;
-XINT	*param;
-XLONG	*lvalue;
+int
+ZSTTLP (XINT *chan, XINT *param, XLONG *lvalue)
 {
 	switch (*param) {
 	case FSTT_BLKSIZE:
 	    *lvalue = 0L;		/* streaming device	*/
 	    break;
 	default:
-	    ZSTTBF (chan, param, lvalue);
+	    return ZSTTBF (chan, param, lvalue);
 	}
+	return (*lvalue);
 }

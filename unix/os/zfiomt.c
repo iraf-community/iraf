@@ -2,9 +2,12 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <sys/errno.h>
+#include <fcntl.h>
 #include <ctype.h>
 #include <pwd.h>
 
@@ -21,7 +24,9 @@
 #define	mt_op		st_op
 #define	mt_count	st_count
 #else
+#ifndef MACOSX
 #include <sys/mtio.h>
+#endif
 #endif
 
 /* Define if status logging to sockets is desired. */
@@ -38,6 +43,7 @@
 #define	import_kernel
 #define	import_knames
 #define	import_zfstat
+#define	import_stdarg
 #define import_spp
 #include <iraf.h>
 
@@ -297,64 +303,88 @@ static struct mtchar {
 	int	bitflag;	/* flag bit */
 	int	valset;		/* value has been set */
 } devpar[] = {
-	{ PNAME('a','l'), P_AL, 0, 0 },
-	{ PNAME('b','f'), P_BF, 0, 0 },
+	{ PNAME('a','l'), P_AL,  0, 0 },
+	{ PNAME('b','f'), P_BF,  0, 0 },
 	{ PNAME('b','o'), P_BO, BO, 0 },
-	{ PNAME('b','r'), P_BR, 0, 0 },
-	{ PNAME('b','s'), P_BS, 0, 0 },
+	{ PNAME('b','r'), P_BR,  0, 0 },
+	{ PNAME('b','s'), P_BS,  0, 0 },
 	{ PNAME('c','e'), P_CE, CE, 0 },
-	{ PNAME('c','t'), P_CT, 0, 0 },
-	{ PNAME('d','n'), P_DN, 0, 0 },
-	{ PNAME('d','t'), P_DT, 0, 0 },
-	{ PNAME('d','v'), P_DV, 0, 0 },
+	{ PNAME('c','t'), P_CT,  0, 0 },
+	{ PNAME('d','n'), P_DN,  0, 0 },
+	{ PNAME('d','t'), P_DT,  0, 0 },
+	{ PNAME('d','v'), P_DV,  0, 0 },
 	{ PNAME('e','o'), P_EO, EO, 0 },
 	{ PNAME('f','c'), P_FC, FC, 0 },
-	{ PNAME('f','f'), P_FF, 0, 0 },
-	{ PNAME('f','r'), P_FR, 0, 0 },
-	{ PNAME('f','s'), P_FS, 0, 0 },
+	{ PNAME('f','f'), P_FF,  0, 0 },
+	{ PNAME('f','r'), P_FR,  0, 0 },
+	{ PNAME('f','s'), P_FS,  0, 0 },
 	{ PNAME('i','r'), P_IR, IR, 0 },
 	{ PNAME('m','f'), P_MF, MF, 0 },
-	{ PNAME('m','r'), P_MR, 0, 0 },
+	{ PNAME('m','r'), P_MR,  0, 0 },
 	{ PNAME('n','b'), P_NB, NB, 0 },
 	{ PNAME('n','f'), P_NF, NF, 0 },
 	{ PNAME('n','p'), P_NP, NP, 0 },
-	{ PNAME('o','r'), P_OR, 0, 0 },
+	{ PNAME('o','r'), P_OR,  0, 0 },
 	{ PNAME('o','w'), P_OW, OW, 0 },
-	{ PNAME('r','d'), P_RD, 0, 0 },
+	{ PNAME('r','d'), P_RD,  0, 0 },
 	{ PNAME('r','e'), P_RE, RE, 0 },
 	{ PNAME('r','f'), P_RF, RF, 0 },
-	{ PNAME('r','i'), P_RI, 0, 0 },
+	{ PNAME('r','i'), P_RI,  0, 0 },
 	{ PNAME('r','o'), P_RO, RO, 0 },
 	{ PNAME('r','r'), P_RR, RR, 0 },
-	{ PNAME('r','s'), P_RS, 0, 0 },
+	{ PNAME('r','s'), P_RS,  0, 0 },
 	{ PNAME('s','e'), P_SE, SE, 0 },
 	{ PNAME('s','k'), P_SK, SK, 0 },
-	{ PNAME('s','o'), P_SO, 0, 0 },
-	{ PNAME('t','s'), P_TS, 0, 0 },
-	{ PNAME('t','t'), P_TT, 0, 0 },
+	{ PNAME('s','o'), P_SO,  0, 0 },
+	{ PNAME('t','s'), P_TS,  0, 0 },
+	{ PNAME('t','t'), P_TT,  0, 0 },
 	{ PNAME('u','e'), P_UE, UE, 0 },
 	{ PNAME('w','c'), P_WC, WC, 0 },
 	{ 0, 0, 0, 0 },
 };
 
 static	int zmtgetfd();
-static	struct mtdesc *zmtdesc();
-static	zmtbsr(), zmtbsf(), zmtfsr(), zmtfsf();
-static	zmtopen(), zmtclose(), zmtfree(), zmtfpos(), zmtrew();
-char	*malloc();
+static	int zmtbsr(), zmtbsf(), zmtfsr(), zmtfsf();
+static	int zmtclose(), zmtfpos(), zmtrew();
 
+static int zmtopen (char *dev, int u_acmode);
+static int zmtclose (int fd);
+static struct mtdesc *zmtdesc (char *device, int acmode, char *devcap,
+				struct _mtpos *devpos);
+static int zmtfpos (struct mtdesc *mp, int newfile);
+static int zmtrew (int fd);
+static void zmtfls (struct mtdesc *mp);
+static void zmtfree (struct mtdesc *mp);
+static int zmtfsf (int fd, int nfiles);
+static int zmtbsf (int fd, int nfiles);
+static int zmtfsr (int fd, int nrecords);
+static int zmtbsr (int fd, int nrecords);
+
+
+static void zmtdbgn (struct mtdesc *mp, const char *argsformat, ... );
+static void zmtdbg (struct mtdesc *mp, char *msg);
+static void zmtdbgopen (struct mtdesc *mp);
+static void zmtdbgclose (struct mtdesc *mp);
+
+
+
+/* Tape drives aren't supported on Mac systems currently.
+*/
+#ifndef MACOSX
 
 /* ZZOPMT -- Open the named magtape device and position to the given file.
  * On output, "newfile" contains the number of the file actually opened,
  * which may be less than what was requested if EOT is reached.
  */
-ZZOPMT (device, acmode, devcap, devpos, newfile, chan)
-PKCHAR	*device;	/* device name */
-XINT	*acmode;	/* access mode: read_only or write_only for tapes */
-PKCHAR	*devcap;	/* tapecap entry for device */
-XINT	*devpos;	/* pointer to tape position info struct */
-XINT	*newfile;	/* file to be opened or EOT */
-XINT	*chan;		/* OS channel of opened file */
+int
+ZZOPMT (
+  PKCHAR  *device,	/* device name */
+  XINT	  *acmode,	/* access mode: read_only or write_only for tapes */
+  PKCHAR  *devcap,	/* tapecap entry for device */
+  XINT	  *devpos,	/* pointer to tape position info struct */
+  XINT	  *newfile,	/* file to be opened or EOT */
+  XINT	  *chan 	/* OS channel of opened file */
+)
 {
 	register int fd;
 	register struct	mtdesc *mp;
@@ -365,10 +395,10 @@ XINT	*chan;		/* OS channel of opened file */
 	    (struct _mtpos *)devpos);
 	if (mp == NULL) {
 	    *chan = XERR;
-	    return;
+	    return (XERR);
 	}
 
-	zmtdbg1 (mp, "open device %s\n", (char *)device);
+	zmtdbgn (mp, "open device %s\n", (char *)device);
 
 	/* Save the channel pointer for the delayed open used for file
 	 * positioning.  If file positioning is needed the device will
@@ -403,18 +433,18 @@ XINT	*chan;		/* OS channel of opened file */
 	    pp->tapeused = 0;
 
 	/* Status output. */
-	zmtdbg1 (mp, "devtype = %s", mp->mtdev.devtype);
-	zmtdbg1 (mp, "tapetype = %s", mp->mtdev.tapetype);
-	zmtdbg1 (mp, "tapesize = %d", mp->mtdev.tapesize);
-	zmtdbg1 (mp, "density = %s",
+	zmtdbgn (mp, "devtype = %s", mp->mtdev.devtype);
+	zmtdbgn (mp, "tapetype = %s", mp->mtdev.tapetype);
+	zmtdbgn (mp, "tapesize = %d", mp->mtdev.tapesize);
+	zmtdbgn (mp, "density = %s",
 	    mp->mtdev.density[0] ? mp->mtdev.density : "na");
-	zmtdbg1 (mp, "blksize = %d", mp->mtdev.blksize);
-	zmtdbg1 (mp, "acmode = %s", mp->acmode == READ_ONLY ? "read" :
+	zmtdbgn (mp, "blksize = %d", mp->mtdev.blksize);
+	zmtdbgn (mp, "acmode = %s", mp->acmode == READ_ONLY ? "read" :
 	    ((*newfile < 0) ? "append" : "write"));
-	zmtdbg2 (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
-	zmtdbg1 (mp, "record = %d", pp->recno);
-	zmtdbg1 (mp, "nfiles = %d", pp->nfiles);
-	zmtdbg1 (mp, "tapeused = %d", pp->tapeused);
+	zmtdbgn (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
+	zmtdbgn (mp, "record = %d", pp->recno);
+	zmtdbgn (mp, "nfiles = %d", pp->nfiles);
+	zmtdbgn (mp, "tapeused = %d", pp->tapeused);
 	zmtfls (mp);
 
 	/* Position to the desired file.  Do not move the tape if newfile=0
@@ -452,7 +482,7 @@ XINT	*chan;		/* OS channel of opened file */
 	    }
 	    (*chan) = fd = zmtopen (mp->iodev, WRONLY);
 	    if (fd != ERR)
-		zmtdbg2 (mp,
+		zmtdbgn (mp,
 		    "device %s opened on descriptor %d\n", mp->iodev, fd);
 	} else
 	    fd = zmtgetfd (mp);
@@ -462,8 +492,8 @@ XINT	*chan;		/* OS channel of opened file */
 	set_mtdesc(fd,mp);
 	mp->errcnt = 0;
 
-	zmtdbg2 (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
-	zmtdbg1 (mp, "record = %d", mp->mtpos.recno);
+	zmtdbgn (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
+	zmtdbgn (mp, "record = %d", mp->mtpos.recno);
 	zmtfls (mp);
 
 	if (mp->acmode == WRITE_ONLY)
@@ -471,11 +501,13 @@ XINT	*chan;		/* OS channel of opened file */
 	else
 	    zmtdbg (mp, "reading...\n");
 
-	return;
+	return (XOK);
 err:
 	/* Error exit. */
 	zmtfree (mp);
 	*chan = XERR;
+
+	return (*chan);
 }
 
 
@@ -483,10 +515,8 @@ err:
  * if tape is open for writing, leaving tape positioned ready to write the
  * next file.
  */
-ZZCLMT (chan, devpos, o_status)
-XINT	*chan;
-XINT	*devpos;
-XINT	*o_status;
+int
+ZZCLMT (XINT *chan, XINT *devpos, XINT *o_status)
 {
 	register int fd;
 	register struct mtdesc *mp;
@@ -500,9 +530,9 @@ XINT	*o_status;
 	 */
 	*o_status = XERR;
 	if ((fd = *chan) <= 0)
-	    return;
+	    return (XERR);
 	if ((mp = get_mtdesc(fd)) == NULL)
-	    return;
+	    return (XERR);
 	pp = &mp->mtpos;
 
 	eof_seen = 0;
@@ -522,8 +552,8 @@ XINT	*o_status;
 		    status = ERR;
 		else {
 		    pp->filno = pp->recno = 1;
-		    zmtdbg1 (mp, "file = %d", pp->filno);
-		    zmtdbg1 (mp, "record = %d", pp->recno);
+		    zmtdbgn (mp, "file = %d", pp->filno);
+		    zmtdbgn (mp, "record = %d", pp->recno);
 		}
 	    }
 
@@ -606,28 +636,30 @@ XINT	*o_status;
 	    pp->recno = 1;
 	    if (mp->acmode == WRITE_ONLY) {
 		pp->nfiles = pp->filno - 1;
-		zmtdbg1 (mp, "nfiles = %d", pp->nfiles);
+		zmtdbgn (mp, "nfiles = %d", pp->nfiles);
 	    }
 	    if (mp->acmode == WRITE_ONLY || spaceused(pp))
 		mp->tbytes += mp->mtdev.eofsize;
-	    zmtdbg1 (mp, "record = %d", pp->recno);
-	    zmtdbg2 (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
+	    zmtdbgn (mp, "record = %d", pp->recno);
+	    zmtdbgn (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
 	}
 	if (eor_seen) {
 	    pp->pflags |= MF_EOR;
 	    pp->recno++;
 	    if (mp->acmode == WRITE_ONLY || spaceused(pp))
 		mp->tbytes += mp->mtdev.gapsize;
-	    zmtdbg1 (mp, "record = %d", pp->recno);
+	    zmtdbgn (mp, "record = %d", pp->recno);
 	}
 	
 	pp->tapeused += ((mp->tbytes + 512) / 1024);
-	zmtdbg1 (mp, "tapeused = %d", pp->tapeused);
+	zmtdbgn (mp, "tapeused = %d", pp->tapeused);
 	zmtfls (mp);
 
 	*((struct _mtpos *)devpos) = *pp;
 	*o_status = status ? XERR : XOK;
 	zmtfree (mp);
+
+	return (status);
 }
 
 
@@ -637,11 +669,13 @@ XINT	*o_status;
  * do nothing special in that case.  Tape is left positioned just past the
  * tape mark.
  */
-ZZRDMT (chan, buf, maxbytes, offset)
-XINT	*chan;
-XCHAR	*buf;
-XINT	*maxbytes;
-XLONG	*offset;		/* fixed block devices only */
+int
+ZZRDMT (
+  XINT	*chan,
+  XCHAR	*buf,
+  XINT	*maxbytes,
+  XLONG	*offset 		/* fixed block devices only */
+)
 {
 	register int fd = *chan, mb = (int)*maxbytes;
 	register struct mtdesc *mp = get_mtdesc(fd);
@@ -649,7 +683,7 @@ XLONG	*offset;		/* fixed block devices only */
 	int	status;
 
 	if (mp->mtdev.blksize && (mb % mp->mtdev.blksize)) {
-	    zmtdbg1 (mp,
+	    zmtdbgn (mp,
 		"read request %d not a multiple of device block size\n", mb);
 	    zmtfls (mp);
 	}
@@ -661,7 +695,7 @@ XLONG	*offset;		/* fixed block devices only */
 	    blkno = *offset / mp->mtdev.blksize + 1;
 	    oldblk = mp->mtpos.recno;
 	    if (blkno != oldblk) {
-		zmtdbg1 (mp, "position to block %d\n", blkno);
+		zmtdbgn (mp, "position to block %d\n", blkno);
 		if (blkno > oldblk) {
 		    if (zmtfsr (fd, blkno - oldblk) == ERR) {
 			status = ERR;
@@ -682,7 +716,7 @@ XLONG	*offset;		/* fixed block devices only */
 	 * record of a file (i.e. are positioned to EOT) or if IR is set.
 	 */
 	status = read (fd, (char *)buf, mb);
-	if (status == ERR)
+	if (status == ERR) {
 	    if ((mp->flags & RE) && pp->recno == 1) {
 		status = 0;
 	    } else if (mp->flags & IR) {
@@ -690,6 +724,7 @@ XLONG	*offset;		/* fixed block devices only */
 		zmtfls (mp);
 		status = 0;
 	    }
+	}
 
 	/* If an error occurs on the read we assume that the tape has advanced
 	 * beyond the bad record, and that the next read will return the next
@@ -698,29 +733,33 @@ XLONG	*offset;		/* fixed block devices only */
 	 * read errors, we give up and return a premature EOF on the file.
 	 */
 	if (status == ERR) {
-	    zmtdbg1 (mp, "read error, errno = %d\n", errno);
+	    zmtdbgn (mp, "read error, errno = %d\n", errno);
 	    zmtfls (mp);
 	    if ((mp->errcnt)++ >= MAX_ERRCNT)
 		status = 0;			/* give up; return EOF */
 	    else if ((mp->flags & SK) || mp->errcnt >= MAX_ERRIGNORE)
 		zmtfsr (fd, 1);
 	}
-done:
+
 	mp->nbytes = status;
 	if (status >= 0 && mp->mtdev.recsize != status)
-	    zmtdbg1 (mp, "recsize = %d", mp->mtdev.recsize = status);
+	    zmtdbgn (mp, "recsize = %d", mp->mtdev.recsize = status);
 	zmtfls (mp);
+
+	return (status);
 }
 
 
 /* ZZWRMT -- Write next tape record.  We are supposed to be asynchronous,
  * so save write status for return by next call to ZZWTMT.
  */
-ZZWRMT (chan, buf, nbytes, offset)
-XINT	*chan;
-XCHAR	*buf;
-XINT	*nbytes;
-XLONG	*offset;		/* ignored on a write */
+int
+ZZWRMT (
+  XINT	*chan,
+  XCHAR	*buf,
+  XINT	*nbytes,
+  XLONG	*offset 		/* ignored on a write */
+)
 {
 	register int fd = *chan, nb = *nbytes;
 	register struct mtdesc *mp = get_mtdesc(fd);
@@ -731,28 +770,32 @@ XLONG	*offset;		/* ignored on a write */
 	 */
 	if (blksize > 0 && (nb % blksize)) {
 	    nb += blksize - (nb % blksize);
-	    zmtdbg2 (mp, "partial record promoted from %d to %d bytes\n",
+	    zmtdbgn (mp, "partial record promoted from %d to %d bytes\n",
 		*nbytes, nb);
 	}
 
 	if (mp->mtdev.recsize != nb)
-	    zmtdbg1 (mp, "recsize = %d", mp->mtdev.recsize = nb);
+	    zmtdbgn (mp, "recsize = %d", mp->mtdev.recsize = nb);
 	if ((mp->nbytes = write (fd, (char *)buf, nb)) != nb) {
-	    zmtdbg2 (mp, "write error, status=%d, errno=%d\n",
+	    zmtdbgn (mp, "write error, status=%d, errno=%d\n",
 		mp->nbytes, errno);
 	    mp->nbytes = ERR;
 	}
 	zmtfls (mp);
+
+	return (XOK);
 }
 
 
 /* ZZWTMT -- "Wait" for i/o transfer to complete, and return the number of
  * bytes transferred or XERR.  A read at EOF returns a byte count of zero.
  */
-ZZWTMT (chan, devpos, o_status)
-XINT	*chan;
-XINT	*devpos;
-XINT	*o_status;
+int
+ZZWTMT (
+  XINT	*chan,
+  XINT	*devpos,
+  XINT	*o_status 
+)
 {
 	register int fd = *chan;
 	register struct mtdesc *mp = get_mtdesc(fd);
@@ -773,8 +816,8 @@ XINT	*o_status;
 		 * EOT.  The file number does not change.
 		 */
 		pp->nfiles = pp->filno - 1;
-		zmtdbg1 (mp, "nfiles = %d", pp->nfiles);
-		zmtdbg2 (mp, "file = %d%s",
+		zmtdbgn (mp, "nfiles = %d", pp->nfiles);
+		zmtdbgn (mp, "file = %d%s",
 		    pp->filno, ateot(pp) ? " (EOT)" : "");
 		zmtfls (mp);
 		eot_seen = 1;
@@ -784,7 +827,7 @@ XINT	*o_status;
 		 * reads could result in tape runaway.
 		 */
 		if (flags & SE) {
-		    if ((flags & NB) || (flags & FC) && !(flags & RF)) {
+		    if ((flags & NB) || ((flags & FC) && !(flags & RF))) {
 			/* Cannot backspace; must rewind and space forward. */
 			if (zmtrew(fd) == ERR)
 			    status = ERR;
@@ -812,7 +855,7 @@ XINT	*o_status;
 	    zmtdbg (mp, "record = 1");
 	    if (spaceused(pp))
 		mp->tbytes += mp->mtdev.eofsize;
-	    zmtdbg2 (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
+	    zmtdbgn (mp, "file = %d%s", pp->filno, ateot(pp) ? " (EOT)" : "");
 	}
 	if (eor_seen) {
 	    pp->pflags |= MF_EOR;
@@ -822,32 +865,33 @@ XINT	*o_status;
 		pp->recno++;
 	    if (spaceused(pp))
 		mp->tbytes += mp->mtdev.gapsize;
-	    zmtdbg1 (mp, "record = %d", pp->recno);
+	    zmtdbgn (mp, "record = %d", pp->recno);
 	}
 
 	if (status >= 0 && spaceused(pp)) {
 	    mp->tbytes += status;
 	    pp->tapeused += mp->tbytes / 1024;
 	    mp->tbytes %= 1024;
-	    zmtdbg1 (mp, "tapeused = %d", pp->tapeused);
+	    zmtdbgn (mp, "tapeused = %d", pp->tapeused);
 	}
 
 	*((struct _mtpos *)devpos) = *pp;
 	*o_status = (status < 0) ? XERR : status;
 	zmtfls (mp);
+
+	return (status);
 }
 
 
 /* ZZSTMT -- Query a device or device driver parameter.
  */
-ZZSTMT (chan, param, lvalue)
-XINT    *chan;
-XINT    *param;
-XLONG   *lvalue;
+int
+ZZSTMT (XINT *chan, XINT *param, XLONG *lvalue)
 {
 	register int fd = *chan;
 	register struct mtdesc *mp = get_mtdesc(fd);
-	register struct _mtpos *pp = &mp->mtpos;
+	/* register struct _mtpos *pp = &mp->mtpos; */
+
 
         switch (*param) {
         case FSTT_BLKSIZE:
@@ -876,6 +920,8 @@ XLONG   *lvalue;
         default:
             (*lvalue) = XERR;
         }
+
+	return (*lvalue);
 }
 
 
@@ -885,20 +931,22 @@ XLONG   *lvalue;
  *
  * This routine is not part of the normal binary file driver.
  */
-ZZRWMT (device, devcap, o_status)
-PKCHAR	*device;	/* device name */
-PKCHAR	*devcap;	/* tapecap entry for device */
-XINT	*o_status;
+int
+ZZRWMT (
+  PKCHAR  *device,		/* device name */
+  PKCHAR  *devcap,		/* tapecap entry for device */
+  XINT	  *o_status 
+)
 {
 	register struct	mtdesc *mp;
 	register int fd;
 	int	status;
 
 	/* Open the main device descriptor. */
-	mp = zmtdesc ((char *)device, READ_ONLY, (struct _mtpos *)devcap, NULL);
+	mp = zmtdesc ((char *)device, READ_ONLY, (char *)devcap, NULL);
 	if (mp == NULL) {
 	    *o_status = ERR;
-	    return;
+	    return (XERR);
 	}
 
 	/* If a rewind-on-close device is defined for this device use that
@@ -922,7 +970,7 @@ XINT	*o_status;
 		 */
 		static FILE *tty = NULL;
 		if (!tty && (tty = fopen (CONSOLE, "a")) != NULL) {
-		    fprintf (tty, "cannot rewind device %s: ", device);
+		    fprintf (tty, "cannot rewind device %s: ", (char *)device);
 		    fprintf (tty, "add RD capability to dev$devices entry\n");
 		    fclose (tty);
 		}
@@ -939,7 +987,10 @@ XINT	*o_status;
 	zmtfls (mp);
 	*o_status = status ? XERR : XOK;
 	zmtfree (mp);
+
+	return (status);
 }
+
 
 
 /*
@@ -969,9 +1020,9 @@ register struct	mtdesc *mp;
 	}
 
 	if (fd == ERR)
-	    zmtdbg1 (mp, "failed to open device %s\n", mp->iodev);
+	    zmtdbgn (mp, "failed to open device %s\n", mp->iodev);
 	else {
-	    zmtdbg2 (mp, "device %s opened on descriptor %d\n", mp->iodev, fd);
+	    zmtdbgn (mp, "device %s opened on descriptor %d\n", mp->iodev, fd);
 	    set_mtdesc (fd, mp);
 	    mp->errcnt = 0;
 	    mp->tbytes = 0;
@@ -992,10 +1043,11 @@ register struct	mtdesc *mp;
  *
  * Returns the unix file descriptor or ERR.
  */
-static
-zmtopen (dev, u_acmode)
-char	*dev;		/* device name or pathname		*/
-int	u_acmode;	/* read only or write only for tapes	*/
+static int
+zmtopen (
+  char	*dev,		/* device name or pathname		*/
+  int	u_acmode 	/* read only or write only for tapes	*/
+)
 {
 	char	path[SZ_PATHNAME+1];
 	int	fd = ERR;
@@ -1039,9 +1091,7 @@ int	u_acmode;	/* read only or write only for tapes	*/
 
 /* ZMTCLOSE -- Close a magtape device.
  */
-static
-zmtclose (fd)
-int	fd;
+static int zmtclose (int fd)
 {
 	register struct mtdesc *mp = get_mtdesc(fd);
 	zmtdbg (get_mtdesc(fd), "close device\n");
@@ -1053,11 +1103,12 @@ int	fd;
 /* ZMTDESC -- Allocate and initialize the main magtape device descriptor.
  */
 static struct mtdesc *
-zmtdesc (device, acmode, devcap, devpos)
-char	*device;		/* host device to be used for i/o */
-int	acmode;			/* iraf file access mode code */
-char	*devcap;		/* tapecap entry for device */
-struct	_mtpos *devpos;	/* device position info (or NULL ptr) */
+zmtdesc (
+  char	*device,		/* host device to be used for i/o */
+  int	acmode,			/* iraf file access mode code */
+  char	*devcap,		/* tapecap entry for device */
+  struct _mtpos *devpos 	/* device position info (or NULL ptr) */
+)
 {
 	register struct mtdesc *mp;
 	register struct mtdev *dp;
@@ -1214,9 +1265,8 @@ struct	_mtpos *devpos;	/* device position info (or NULL ptr) */
 
 /* ZMTFREE -- Free the magtape device descriptor.
  */
-static
-zmtfree (mp)
-struct	mtdesc *mp;
+static void
+zmtfree (struct mtdesc *mp)
 {
 	zmtdbgclose (mp);
 	free (mp);
@@ -1226,10 +1276,11 @@ struct	mtdesc *mp;
 /* ZMTFPOS -- Position to the indicated file.  The first file is #1.
  * A negative newfile number signifies EOT.
  */
-static
-zmtfpos (mp, newfile)
-register struct mtdesc *mp;
-int	newfile;		/* file we want to position to */
+static int
+zmtfpos (
+  register struct mtdesc *mp,
+  int	newfile 		/* file we want to position to */
+)
 {
 	register struct _mtpos *pp = &mp->mtpos;
 	register int flags = mp->flags;
@@ -1241,7 +1292,7 @@ int	newfile;		/* file we want to position to */
 	oldrec  = pp->recno;
 
 	if (newfile > 0)
-	    zmtdbg1 (mp, "position to file %d\n", newfile);
+	    zmtdbgn (mp, "position to file %d\n", newfile);
 	else if (newfile < 0)
 	    zmtdbg (mp, "position to end of tape\n");
 	else
@@ -1253,7 +1304,7 @@ int	newfile;		/* file we want to position to */
 	 */
 	if (newfile < 0 && !(flags&UE) && pp->nfiles > 0) {
 	    newfile = pp->nfiles + 1;
-	    zmtdbg1 (mp, "end of tape is file %d\n", newfile);
+	    zmtdbgn (mp, "end of tape is file %d\n", newfile);
 	}
 	zmtfls (mp);
 
@@ -1286,7 +1337,7 @@ int	newfile;		/* file we want to position to */
 		if (zmtrew(fd) < 0)
 		    return (ERR);
 		oldfile = oldrec = 1;
-		zmtdbg1 (mp, "file = %d", oldfile);
+		zmtdbgn (mp, "file = %d", oldfile);
 		zmtfls (mp);
 		goto fwd;
 	    } else if (flags & BO) {
@@ -1376,7 +1427,7 @@ fwd:
 		     */
 
 		    pp->nfiles = (newfile=oldfile) - 1;
-		    zmtdbg1 (mp, "nfiles = %d", pp->nfiles);
+		    zmtdbgn (mp, "nfiles = %d", pp->nfiles);
 		    zmtdbg (mp, "at end of tape\n");
 		    zmtfls (mp);
 
@@ -1433,7 +1484,7 @@ err:			free (buf);
 
 		oldfile++;
 		oldrec = 1;
-		zmtdbg1 (mp, "file = %d", oldfile);
+		zmtdbgn (mp, "file = %d", oldfile);
 		zmtfls (mp);
 	    }
 
@@ -1452,9 +1503,8 @@ done:
 
 /* ZMTREW -- Rewind the tape.
  */
-static
-zmtrew (fd)
-int	fd;
+static int
+zmtrew (int fd)
 {
 	register struct mtdesc *mp = get_mtdesc(fd);
 	struct	mtop mt_rewind;
@@ -1466,7 +1516,7 @@ int	fd;
 	zmtdbg (mp, "rewinding...");
 	zmtfls (mp);
 	status = ioctl (fd, mp->mtioctop, (char *)&mt_rewind);
-	zmtdbg1 (mp, "%s\n", status < 0 ? "failed" : "done");
+	zmtdbgn (mp, "%s\n", status < 0 ? "failed" : "done");
 	zmtfls (mp);
 
 	return (status);
@@ -1475,10 +1525,8 @@ int	fd;
 
 /* ZMTFSF -- Skip file forward.
  */
-static
-zmtfsf (fd, nfiles)
-int	fd;
-int	nfiles;
+static int
+zmtfsf (int fd, int nfiles)
 {
 	register struct mtdesc *mp = get_mtdesc(fd);
 	struct mtop mt_fwdskipfile;
@@ -1487,11 +1535,11 @@ int	nfiles;
 	mt_fwdskipfile.mt_op = mp->mtfsf;
 	mt_fwdskipfile.mt_count = nfiles;
 
-	zmtdbg2 (mp, "skip %d file%s forward...", nfiles,
+	zmtdbgn (mp, "skip %d file%s forward...", nfiles,
 	    nfiles > 1 ? "s" : "");
 	zmtfls (mp);
 	status = ioctl (fd, mp->mtioctop, (char *)&mt_fwdskipfile);
-	zmtdbg1 (mp, "%s\n", status < 0 ? "failed" : "done");
+	zmtdbgn (mp, "%s\n", status < 0 ? "failed" : "done");
 	zmtfls (mp);
 
 	return (status);
@@ -1500,10 +1548,8 @@ int	nfiles;
 
 /* ZMTBSF -- Skip file backward.
  */
-static
-zmtbsf (fd, nfiles)
-int	fd;
-int	nfiles;
+static int
+zmtbsf (int fd, int nfiles)
 {
 	register struct mtdesc *mp = get_mtdesc(fd);
 	struct mtop mt_backskipfile;
@@ -1512,11 +1558,11 @@ int	nfiles;
 	mt_backskipfile.mt_op = mp->mtbsf;
 	mt_backskipfile.mt_count = nfiles;
 
-	zmtdbg2 (mp, "skip %d file%s backward...", nfiles,
+	zmtdbgn (mp, "skip %d file%s backward...", nfiles,
 	    nfiles > 1 ? "s" : "");
 	zmtfls (mp);
 	status = ioctl (fd, mp->mtioctop, (char *)&mt_backskipfile);
-	zmtdbg1 (mp, "%s\n", status < 0 ? "failed" : "done");
+	zmtdbgn (mp, "%s\n", status < 0 ? "failed" : "done");
 	zmtfls (mp);
 
 	return (status);
@@ -1525,10 +1571,8 @@ int	nfiles;
 
 /* ZMTFSR -- Skip record forward.
  */
-static
-zmtfsr (fd, nrecords)
-int	fd;
-int	nrecords;
+static int
+zmtfsr (int fd, int nrecords)
 {
 	register struct mtdesc *mp = get_mtdesc(fd);
 	struct mtop mt_fwdskiprecord;
@@ -1537,11 +1581,11 @@ int	nrecords;
 	mt_fwdskiprecord.mt_op = mp->mtfsr;
 	mt_fwdskiprecord.mt_count = nrecords;
 
-	zmtdbg2 (mp, "skip %d record%s forward...", nrecords,
+	zmtdbgn (mp, "skip %d record%s forward...", nrecords,
 	    nrecords > 1 ? "s" : "");
 	zmtfls (mp);
 	status = ioctl (fd, mp->mtioctop, (char *)&mt_fwdskiprecord);
-	zmtdbg1 (mp, "%s\n", status < 0 ? "failed" : "done");
+	zmtdbgn (mp, "%s\n", status < 0 ? "failed" : "done");
 	zmtfls (mp);
 
 	return (status);
@@ -1550,10 +1594,8 @@ int	nrecords;
 
 /* ZMTBSR -- Skip record backward.
  */
-static
-zmtbsr (fd, nrecords)
-int	fd;
-int	nrecords;
+static int
+zmtbsr (int fd, int nrecords)
 {
 	register struct mtdesc *mp = get_mtdesc(fd);
 	struct mtop mt_backskiprecord;
@@ -1562,11 +1604,11 @@ int	nrecords;
 	mt_backskiprecord.mt_op = mp->mtbsr;
 	mt_backskiprecord.mt_count = nrecords;
 
-	zmtdbg2 (mp, "skip %d record%s backward...", nrecords,
+	zmtdbgn (mp, "skip %d record%s backward...", nrecords,
 	    nrecords > 1 ? "s" : "");
 	zmtfls (mp);
 	status = ioctl (fd, mp->mtioctop, (char *)&mt_backskiprecord);
-	zmtdbg1 (mp, "%s\n", status < 0 ? "failed" : "done");
+	zmtdbgn (mp, "%s\n", status < 0 ? "failed" : "done");
 	zmtfls (mp);
 
 	return (status);
@@ -1578,8 +1620,8 @@ int	nrecords;
  *
  *	     zmtdbgopen (mp)
  *	         zmtdbg (mp, msg)
- *	        zmtdbg1 (mp, fmt, arg)
- *	        zmtdbg2 (mp, fmt, arg1, arg2)
+ *	        zmtdbgn (mp, fmt, arg)
+ *	        zmtdbgn (mp, fmt, arg1, arg2)
  *	        zmtdbg3 (mp, fmt, arg1, arg2, arg3)
  *		 zmtfls (mp)
  *	    zmtdbgclose (mp)
@@ -1599,8 +1641,7 @@ static	int s_checksum[MAXDEV];
 
 /* ZMTDBGOPEN -- Attempt to open a file or socket for status logging.
  */
-zmtdbgopen (mp)
-struct	mtdesc *mp;
+static void zmtdbgopen (struct mtdesc *mp)
 {
 #ifndef TCPIP
         if (!mp->mtdev.statusdev[0] || mp->mtdev.statusout)
@@ -1613,7 +1654,8 @@ struct	mtdesc *mp;
 	int	port, isfile, sum, s, i;
 	char	host[SZ_FNAME];
 	struct	hostent *hp;
-	FILE	*fp;
+	FILE	*fp = (FILE *) NULL;
+
 
 	/* Status logging disabled. */
         if (!mp->mtdev.statusdev[0])
@@ -1635,7 +1677,7 @@ struct	mtdesc *mp;
 	/* Log status output to a file if a pathname is specified.
 	 */
 	for (isfile=0, ip=mp->mtdev.statusdev;  *ip;  ip++)
-	    if (isfile = (*ip == '/'))
+	    if ((isfile = (*ip == '/')))
 		break;
 	if (isfile) {
 	    mp->mtdev.statusout = fopen (mp->mtdev.statusdev, "a");
@@ -1710,9 +1752,9 @@ struct	mtdesc *mp;
 	    sigpipe = signal (SIGPIPE, SIG_IGN);
 
 	mp->mtdev.statusout = fp;
-	zmtdbg1 (mp, "iodev = %s", mp->iodev);
+	zmtdbgn (mp, "iodev = %s", mp->iodev);
 	if (gethostname (host, SZ_FNAME) == 0)
-	    zmtdbg1 (mp, "host = %s", host);
+	    zmtdbgn (mp, "host = %s", host);
 #endif
 }
 
@@ -1726,8 +1768,7 @@ struct	mtdesc *mp;
  * be worth fixing since the status output device, if used, should change
  * infrequently.
  */
-zmtdbgclose (mp)
-struct	mtdesc *mp;
+static void zmtdbgclose (struct mtdesc *mp)
 {
 	register int i;
 
@@ -1758,14 +1799,12 @@ struct	mtdesc *mp;
 	}
 }
 
-zmtdbg (mp, msg)
-struct	mtdesc *mp;
-char	*msg;
+static void zmtdbg (struct	mtdesc *mp, char *msg)
 {
 	register FILE *out;
 	register char *ip;
 
-	if (out = mp->mtdev.statusout) {
+	if ((out = mp->mtdev.statusout)) {
 	    for (ip=msg;  *ip;  ip++) {
 		if (*ip == '\n') {
 		    putc ('\\', out);
@@ -1777,56 +1816,95 @@ char	*msg;
 	}
 }
 
-zmtfls (mp)
-struct	mtdesc *mp;
+static void zmtfls (struct mtdesc *mp)
 {
 	FILE	*out;
-	if (out = mp->mtdev.statusout)
+	if ((out = mp->mtdev.statusout))
 	    fflush (out);
 }
 
-zmtdbg1 (mp, fmt, arg)
-struct	mtdesc *mp;
-char	*fmt;
-int	arg;
+static void zmtdbgn ( struct mtdesc *mp, const char *argsformat, ... )
 {
-	char	obuf[SZ_LINE];
-	sprintf (obuf, fmt, arg);
-	zmtdbg (mp, obuf);
+        va_list ap;
+        char obuf[SZ_LINE];
+        va_start (ap, argsformat);
+        vsnprintf (obuf, SZ_LINE, argsformat, ap);
+        va_end (ap);
+        obuf[SZ_LINE-1]='\0';
+        zmtdbg (mp, obuf);
 }
-zmtdbg2 (mp, fmt, arg1, arg2)
-struct	mtdesc *mp;
-char	*fmt;
-int	arg1, arg2;
+
+
+
+#else
+
+int ZZOPMT (
+  PKCHAR  *device,	/* device name */
+  XINT	  *acmode,	/* access mode: read_only or write_only for tapes */
+  PKCHAR  *devcap,	/* tapecap entry for device */
+  XINT	  *devpos,	/* pointer to tape position info struct */
+  XINT	  *newfile,	/* file to be opened or EOT */
+  XINT	  *chan 	/* OS channel of opened file */
+)
 {
-	char	obuf[SZ_LINE];
-	sprintf (obuf, fmt, arg1, arg2);
-	zmtdbg (mp, obuf);
+	return (XERR);
 }
-zmtdbg3 (mp, fmt, arg1, arg2, arg3)
-struct	mtdesc *mp;
-char	*fmt;
-int	arg1, arg2, arg3;
+
+
+int ZZCLMT (XINT *chan, XINT *devpos, XINT *o_status)
 {
-	char	obuf[SZ_LINE];
-	sprintf (obuf, fmt, arg1, arg2, arg3);
-	zmtdbg (mp, obuf);
+	return (XERR);
 }
-zmtdbg4 (mp, fmt, arg1, arg2, arg3, arg4)
-struct	mtdesc *mp;
-char	*fmt;
-int	arg1, arg2, arg3, arg4;
+
+
+int ZZRDMT (
+  XINT	*chan,
+  XCHAR	*buf,
+  XINT	*maxbytes,
+  XLONG	*offset 		/* fixed block devices only */
+)
 {
-	char	obuf[SZ_LINE];
-	sprintf (obuf, fmt, arg1, arg2, arg3, arg4);
-	zmtdbg (mp, obuf);
+	return (XERR);
 }
-zmtdbg5 (mp, fmt, arg1, arg2, arg3, arg4, arg5)
-struct	mtdesc *mp;
-char	*fmt;
-int	arg1, arg2, arg3, arg4, arg5;
+
+
+int ZZWRMT (
+  XINT	*chan,
+  XCHAR	*buf,
+  XINT	*nbytes,
+  XLONG	*offset 		/* ignored on a write */
+)
 {
-	char	obuf[SZ_LINE];
-	sprintf (obuf, fmt, arg1, arg2, arg3, arg4, arg5);
-	zmtdbg (mp, obuf);
+	return (XERR);
 }
+
+
+int ZZWTMT (
+  XINT	*chan,
+  XINT	*devpos,
+  XINT	*o_status 
+)
+{
+	return (XERR);
+}
+
+
+int ZZSTMT (XINT *chan, XINT *param, XLONG *lvalue)
+{
+	return (XERR);
+}
+
+
+int ZZRWMT (
+  PKCHAR  *device,		/* device name */
+  PKCHAR  *devcap,		/* tapecap entry for device */
+  XINT	  *o_status 
+)
+{
+	return (XERR);
+}
+
+
+#endif
+
+

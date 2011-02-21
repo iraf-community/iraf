@@ -132,13 +132,19 @@ begin
 	    if (acmode != NEW_COPY || imaccf (im, P_PTYPE(pp)) == NO) {
 		switch (P_SPPTYPE(pp)) {
 		case TY_BOOL:
-		    call amovc (Memc[gpb+offset], bval, SZ_BOOL)
+                    if (SZ_INT != SZ_INT32)
+		        call amovc (Memc[gpb+offset], bval, SZ_INT32)
+                    else
+		        call amovc (Memc[gpb+offset], bval, SZ_BOOL)
 		    call imaddb (im, P_PTYPE(pp), bval)
 		case TY_SHORT:
 		    call amovc (Memc[gpb+offset], sval, SZ_SHORT)
 		    call imadds (im, P_PTYPE(pp), sval)
 		case TY_LONG:
-		    call amovc (Memc[gpb+offset], lval, SZ_LONG)
+                    if (SZ_INT != SZ_INT32)
+		        call amovc (Memc[gpb+offset], lval, SZ_INT32)
+                    else
+		        call amovc (Memc[gpb+offset], lval, SZ_LONG)
 		    call imaddl (im, P_PTYPE(pp), lval)
 		case TY_REAL:
 		    call amovc (Memc[gpb+offset], rval, SZ_REAL)

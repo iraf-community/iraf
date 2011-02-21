@@ -25,11 +25,11 @@ string dbool	"logical"
 string dchar	"integer*2"
 string dshort	"integer*2"
 string dint	"integer"
-string dlong	"integer*4"
+string dlong	"integer"
+string dpntr	"integer"
 string dreal	"real"
 string ddble	"double precision"
 string dcplx	"complex"
-string dpntr	"integer"
 string dfchr	"character"
 string dfunc	"function"
 string dsubr	"subroutine"
@@ -40,10 +40,10 @@ string dextn	"external"
 	call entdef (sshort, dshort, xpptbl)
 	call entdef (sint,   dint,   xpptbl)
 	call entdef (slong,  dlong,  xpptbl)
+	call entdef (spntr,  dpntr,  xpptbl)
 	call entdef (sreal,  dreal,  xpptbl)
 	call entdef (sdble,  ddble,  xpptbl)
 	call entdef (scplx,  dcplx,  xpptbl)
-	call entdef (spntr,  dpntr,  xpptbl)
 	call entdef (sfchr,  dfchr,  xpptbl)
 	call entdef (sfunc,  dfunc,  xpptbl)
 	call entdef (ssubr,  dsubr,  xpptbl)

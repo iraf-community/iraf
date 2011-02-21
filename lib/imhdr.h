@@ -41,8 +41,8 @@ define	IM_NBPIX	Meml[$1+IMD+28]		# number of bad pixels
 define	IM_CTIME	Meml[$1+IMD+29]		# time of image creation
 define	IM_MTIME	Meml[$1+IMD+30]		# time of last modify
 define	IM_LIMTIME	Meml[$1+IMD+31]		# time min,max computed
-define	IM_MAX		Memr[$1+IMD+32]		# max pixel value
-define	IM_MIN		Memr[$1+IMD+33]		# min pixel value
+define	IM_MAX		Memr[P2R($1+IMD+32)]	# max pixel value
+define	IM_MIN		Memr[P2R($1+IMD+33)]	# min pixel value
 define	IM_PIXFILE	Memc[P2C($1+IMD+37)]	# name of pixel storage file
 define	IM_HDRFILE	Memc[P2C($1+IMD+165)]	# name of header storage file
 define	IM_TITLE	Memc[P2C($1+IMD+293)]	# image name string
@@ -53,27 +53,27 @@ define	LEN_HGMSTRUCT	20
 define	HGM_TIME	Meml[$1]		# time when hgm was computed
 define	HGM_LEN		Meml[$1+1]		# number of bins in hgm
 define	HGM_NPIX	Meml[$1+2]		# npix used to compute hgm
-define	HGM_MIN		Memr[$1+3]		# min hgm value
-define	HGM_MAX		Memr[$1+4]		# max hgm value
-define	HGM_INTEGRAL	Memr[$1+5]		# integral of hgm
-define	HGM_MEAN	Memr[$1+6]		# mean value
-define	HGM_VARIANCE	Memr[$1+7]		# variance about mean
-define	HGM_SKEWNESS	Memr[$1+8]		# skewness of hgm
-define	HGM_MODE	Memr[$1+9]		# modal value of hgm
-define	HGM_LCUT	Memr[$1+10]		# low cutoff value
-define	HGM_HCUT	Memr[$1+11]		# high cutoff value
+define	HGM_MIN		Memr[P2R($1+3)]		# min hgm value
+define	HGM_MAX		Memr[P2R($1+4)]		# max hgm value
+define	HGM_INTEGRAL	Memr[P2R($1+5)]		# integral of hgm
+define	HGM_MEAN	Memr[P2R($1+6)]		# mean value
+define	HGM_VARIANCE	Memr[P2R($1+7)]		# variance about mean
+define	HGM_SKEWNESS	Memr[P2R($1+8)]		# skewness of hgm
+define	HGM_MODE	Memr[P2R($1+9)]		# modal value of hgm
+define	HGM_LCUT	Memr[P2R($1+10)]		# low cutoff value
+define	HGM_HCUT	Memr[P2R($1+11)]		# high cutoff value
 # next available field: ($1+12)
 
 
 # The Coordinate Transformation Structure (IM_CTRAN)
 define	LEN_CTSTRUCT	50
 define	CT_VALID	Memi[$1]		# (y/n) is structure valid?
-define	CT_BSCALE	Memr[$1+1]		# pixval scale factor
-define	CT_BZERO	Memr[$1+2]		# pixval offset
-define	CT_CRVAL	Memr[$1+$2+3-1]		# value at pixel
-define	CT_CRPIX	Memr[$1+$2+10-1]	# index of pixel
-define	CT_CDELT	Memr[$1+$2+17-1]	# increment along axis
-define	CT_CROTA	Memr[$1+$2+24-1]	# rotation angle
+define	CT_BSCALE	Memr[P2R($1+1)]		# pixval scale factor
+define	CT_BZERO	Memr[P2R($1+2)]		# pixval offset
+define	CT_CRVAL	Memr[P2R($1+$2+3-1)]	# value at pixel
+define	CT_CRPIX	Memr[P2R($1+$2+10-1)]	# index of pixel
+define	CT_CDELT	Memr[P2R($1+$2+17-1)]	# increment along axis
+define	CT_CROTA	Memr[P2R($1+$2+24-1)]	# rotation angle
 define	CT_BUNIT	Memc[P2C($1+31)]	# pixval ("brightness") units
 define	CT_CTYPE	Memc[P2C($1+36)]	# coord units string
 # next available field: ($1+41)

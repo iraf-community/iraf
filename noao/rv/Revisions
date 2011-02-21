@@ -2,10 +2,28 @@
 .nf
 
 rvrvcor.x
+	Modified so UTMIDDLE now properly accepts a DATE-OBS-like
+	timestamp.  Also modified so the date is properly incremented
+	in the case the midpoint observation crosses midnight (7/20/10)
+
+rvrvcor.x
+	An earlier change used stridx() but was passing in a singly-quoted
+	character, this caused a runtime error when checking string values
+	on Sun systems.  (9/26/08)
+
+========
+V2.14.1
+========
+
+rvrvcor.x
 	Changed the rv_parse_timed() procedure to permit DATE-OBS strings.
 	This is used to parse the time from UT/UTMIDDLE keywords, the change
 	allows these to be in DATE-OBS format rather than restrict them
 	to being sexigesimal strings.  (7/25/08)
+
+========
+V2.14
+========
 
 filtpars.x
 	Fixed an error in the filtpars code where missing braces meant

@@ -7,9 +7,8 @@
 
 /* ACLRB -- Clear a block of memory.
  */
-ACLRB (a, nbytes)
-XCHAR	*a;
-XINT	*nbytes;
+void
+ACLRB (XCHAR *a, XINT *nbytes)
 {
 	register char	*p;
 	register int	n;

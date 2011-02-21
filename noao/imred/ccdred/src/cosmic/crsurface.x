@@ -20,7 +20,7 @@ common  /noaovp/ vpx1, vpx2, vpy1, vpy2
 
 begin
 	call smark (sp)
-	call salloc (work, 2 * ncols * nlines + ncols + nlines, TY_REAL)
+	call salloc (work, 2 * (2 * ncols * nlines + ncols + nlines), TY_REAL)
 
 	# Initialize surface common blocks
 	first = 1

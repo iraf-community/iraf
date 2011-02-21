@@ -49,7 +49,7 @@ begin
 	    # The following is the length of the user area in chars.
 	    len_userarea = strlen (Memc[IM_USERAREA(im)]) + 1
 	    IM_V1HDRLEN(v1) = LEN_V1IMHDR +
-		(len_userarea + SZ_STRUCT-1) / SZ_STRUCT
+		(len_userarea + SZ_MII_INT-1) / SZ_MII_INT
 
 	    IM_V1PIXTYPE(v1) = IM_PIXTYPE(im)
 	    IM_V1NDIM(v1) = IM_NDIM(im)
@@ -87,7 +87,7 @@ begin
 	    # Write the file header.
 	    if (bfseek (fp, BOFL) == ERR)
 		goto v1done_
-	    if (bfwseq (fp, IM_V1MAGIC(v1), hdrlen * SZ_STRUCT) == ERR)
+	    if (bfwseq (fp, IM_V1MAGIC(v1), hdrlen * SZ_MII_INT) == ERR)
 		goto v1done_
 
 	    # Write the user area.
@@ -126,7 +126,7 @@ v2start_
 
 	    # The following is the length of the user area in SU.
 	    len_userarea = strlen (Memc[IM_USERAREA(im)]) + 1
-	    hdrlen = LEN_V2IMHDR + (len_userarea + SZ_STRUCT-1) / SZ_STRUCT
+	    hdrlen = LEN_V2IMHDR + (len_userarea + SZ_MII_INT-1) / SZ_MII_INT
 
 	    if (i_miiwri (fp, hdrlen, 1) == ERR)
 		goto v2done_

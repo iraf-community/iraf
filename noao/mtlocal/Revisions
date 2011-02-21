@@ -1,5 +1,8 @@
 .help revisions Jun88 noao.mtlocal
 .nf
+noao$mtlocal/cyber/t_ridsfile.x
+    Fixed minor error in calling procedures. (7/11/09, MJF)
+
 noao$mtlocal/camera/t_rcamera.x
 noao$mtlocal/camera/cam_rheader.x.x
 noao$mtlocal/r2df/t_r2df.x

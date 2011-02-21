@@ -1,5 +1,5 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
- */
+*/
 
 #define	import_spp
 #define	import_libc
@@ -9,12 +9,13 @@
 #define	import_stdarg
 #include <iraf.h>
 
+
 /* PRINTF -- Emulation of the UNIX printf facilities with the IRAF FMTIO
- * interface as the backend.  All features of the UNIX printf are supported
- * without modification.  Additional format codes are supported in conformance
- * with the IRAF printf, e.g., hms format, variable radix, tabstops, etc.,
- * but these are upward compatible with standard UNIX usage.
- */
+** interface as the backend.  All features of the UNIX printf are supported
+** without modification.  Additional format codes are supported in conformance
+** with the IRAF printf, e.g., hms format, variable radix, tabstops, etc.,
+** but these are upward compatible with standard UNIX usage.
+*/
 
 #define	SZ_FMTSPEC	25		/* max size single format spec	*/
 #define	SZ_OBUF		SZ_COMMAND	/* sz intermediate buffer	*/
@@ -23,63 +24,45 @@
 
 
 /* PRINTF -- Formatted print to the standard output.
- */
-#ifdef USE_STDARG
+*/
+void
 printf (char *format, ...)
-#else
-printf (va_alist)
-va_dcl
-#endif
 {
         va_list argp;
+	void u_doprnt();
 
-#ifdef USE_STDARG
 	va_start (argp, format);
-#else
-	char *format;
-	va_start (argp);
-	format = va_arg (argp, char *);
-#endif
 	u_doprnt (format, &argp, stdout);
 	va_end (argp);
 }
 
 
 /* FPRINTF -- Formatted print to a file.
- */
-#ifdef USE_STDARG
+*/
+void
 fprintf (FILE *fp, char *format, ...)
-#else
-fprintf (va_alist)
-va_dcl
-#endif
 {
         va_list argp;
+	void u_doprnt();
 
-#ifdef USE_STDARG
 	va_start (argp, format);
-#else
-	FILE *fp;
-	char *format;
-	va_start (argp);
-	fp = va_arg (argp, FILE *);
-	format = va_arg (argp, char *);
-#endif
 	u_doprnt (format, &argp, fp);
 	va_end (argp);
 }
 
 
 /* U_DOPRNT -- Process the format to the output file, taking arguments from
- * the list pointed to by argp as % format specs are encountered in the input.
- * The main point of this routine is to handle the variable number of arguments.
- * The actual encoding is all handled by the IRAF FPRINF and PARG calls.
- * N.B. we assume chars are stacked as ints, and floats are stacked as doubles.
- */
-u_doprnt (format, argp, fp)
-register char *format;			/* "%w.dC" etc. format spec	*/
-va_list	*argp;				/* pointer to first value arg	*/
-FILE	*fp;				/* output file			*/
+** the list pointed to by argp as % format specs are encountered in the input.
+** The main point of this routine is to handle the variable number of arguments.
+** The actual encoding is all handled by the IRAF FPRINF and PARG calls.
+** N.B. we assume chars are stacked as ints, and floats are stacked as doubles.
+*/
+void
+u_doprnt (
+  char *format,				/* "%w.dC" etc. format spec	*/
+  va_list *argp,			/* pointer to first value arg	*/
+  FILE	*fp				/* output file			*/
+)
 {
 	register int ch;		/* next format char reference	*/
 	XCHAR	formspec[SZ_FMTSPEC];	/* copy of single format spec	*/
@@ -88,7 +71,10 @@ FILE	*fp;				/* output file			*/
 	int	varprec;		/* runtime precision is used	*/
 	int	prec[MAX_PREC];		/* values of prec args		*/
 
-	while (ch = *format++) {
+	void  u_doarg ();
+
+
+	while ( (ch = *format++) ) {
 	    if (ch == '%') {
 		fsp = formspec;
 		*fsp++ = ch;
@@ -210,9 +196,10 @@ rval:			if (!dotseen) {
 
 
 /* U_DOARG -- Encode a single argument acording to the simplified format
- * specification given by formspec.  This is the interface to the IRAF
- * formatted output procedures.
- */
+** specification given by formspec.  This is the interface to the IRAF
+** formatted output procedures.
+*/
+void
 u_doarg (fp, formspec, argp, prec, varprec, dtype)
 FILE	*fp;			/* output file			*/
 XCHAR	*formspec;		/* format string		*/
@@ -227,6 +214,7 @@ int	dtype;			/* datatype of data value	*/
 	XINT	ival;
 	XDOUBLE	dval;
 	char	*cptr;
+
 
 	/* Pass format string and any variable precision arguments.
 	 */

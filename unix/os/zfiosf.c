@@ -35,35 +35,39 @@
  * during file creation and deletion.
  */
 
+extern int  ZOPNBF(), ZCLSBF (), ZARDBF (), ZAWRBF (), ZAWTBF (), ZSTTBF ();
+
 
 /* ZOPNSF -- Open a static file.  Only RO, WO, and RW modes are permitted
  * for static files, since allocation is via ZFALOC and appending is not
  * permitted.
  */
-ZOPNSF (osfn, mode, chan)
-PKCHAR	*osfn;			/* UNIX name of file		*/
-XINT	*mode;			/* file access mode		*/
-XINT	*chan;			/* file number (output)		*/
+int
+ZOPNSF (
+  PKCHAR  *osfn,			/* UNIX name of file		*/
+  XINT	  *mode,			/* file access mode		*/
+  XINT	  *chan 			/* file number (output)		*/
+)
 {
 	switch (*mode) {
 	case READ_ONLY:
 	case WRITE_ONLY:
 	case READ_WRITE:
-	    ZOPNBF (osfn, mode, chan);
+	    return ZOPNBF (osfn, mode, chan);
 	    break;
 	default:
 	    *chan = XERR;
+	    return (*chan);
 	}
 }
 
 
 /* ZCLSSF -- Close a static file.
  */
-ZCLSSF (fd, status)
-XINT	*fd;
-XINT	*status;
+int
+ZCLSSF (XINT *fd, XINT *status)
 {
-	ZCLSBF (fd, status);
+	return ZCLSBF (fd, status);
 }
 
 
@@ -71,13 +75,15 @@ XINT	*status;
  * maxbytes bytes from the file FD into the buffer BUF.  Status is returned
  * in a subsequent call to ZAWTSF.
  */
-ZARDSF (chan, buf, maxbytes, offset)
-XINT	*chan;			/* UNIX file number			*/
-XCHAR	*buf;			/* output buffer			*/
-XINT	*maxbytes;		/* max bytes to read			*/
-XLONG	*offset;		/* 1-indexed file offset to read at	*/
+int
+ZARDSF (
+  XINT	*chan,			/* UNIX file number			*/
+  XCHAR	*buf,			/* output buffer			*/
+  XINT	*maxbytes,		/* max bytes to read			*/
+  XLONG	*offset 		/* 1-indexed file offset to read at	*/
+)
 {
-	ZARDBF (chan, buf, maxbytes, offset);
+	return ZARDBF (chan, buf, maxbytes, offset);
 }
 
 
@@ -85,33 +91,36 @@ XLONG	*offset;		/* 1-indexed file offset to read at	*/
  * nbytes bytes from the buffer BUF to the file FD.  Status is returned in a
  * subsequent call to ZAWTSF.
  */
-ZAWRSF (chan, buf, nbytes, offset)
-XINT	*chan;			/* UNIX file number		*/
-XCHAR	*buf;			/* buffer containing data	*/
-XINT	*nbytes;		/* nbytes to be written		*/
-XLONG	*offset;		/* 1-indexed file offset	*/
+int
+ZAWRSF (
+  XINT	*chan,			/* UNIX file number		*/
+  XCHAR	*buf,			/* buffer containing data	*/
+  XINT	*nbytes,		/* nbytes to be written		*/
+  XLONG	*offset 		/* 1-indexed file offset	*/
+)
 {
-	ZAWRBF (chan, buf, nbytes, offset);
+	return ZAWRBF (chan, buf, nbytes, offset);
 }
 
 
 /* ZAWTSF -- "Wait" for an "asynchronous" read or write to complete, and
  * return the number of bytes read or written, or ERR.
  */
-ZAWTSF (fd, status)
-XINT	*fd;
-XINT	*status;
+int
+ZAWTSF (XINT *fd, XINT *status)
 {
-	ZAWTBF (fd, status);
+	return ZAWTBF (fd, status);
 }
 
 
 /* ZSTTSF -- Return status on a static file.
  */
-ZSTTSF (fd, param, lvalue)
-XINT	*fd;
-XINT	*param;
-XLONG	*lvalue;
+int
+ZSTTSF (
+  XINT	*fd,
+  XINT	*param,
+  XLONG	*lvalue
+)
 {
-	ZSTTBF (fd, param, lvalue);
+	return ZSTTBF (fd, param, lvalue);
 }

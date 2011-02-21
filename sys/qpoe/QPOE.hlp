@@ -65,7 +65,7 @@ events) may be limited, so one wants to preserve all events, but since the
 quality of the data may vary both with time and with position, it is common
 to want to reject a portion of the data.  Conversely, the analysis being
 performed may require one to examine only a portion of the data, e.g., only
-events with a certain range of energies or arrival times, occuring within a
+events with a certain range of energies or arrival times, occurring within a
 given region of the image.  Often the analysis will be repeated many times
 wtih different filters.
 
@@ -156,11 +156,11 @@ into the interface by the user as part of the file specification),
 or procedurally, via \fIset\fR-parameter calls issued by the client program.
 .le
 
-The above issues need to be adquately addressed in order to have a useful
+The above issues need to be adequately addressed in order to have a useful
 interface.  In the longer term there are many other considerations, e.g.,
 it is also desirable for the data format to be machine independent, and the
-data format should be flexible, to accomodate the inevitable evolutionary
-revisions as well as to accomodate data from a variety of instruments or
+data format should be flexible, to accommodate the inevitable evolutionary
+revisions as well as to accommodate data from a variety of instruments or
 projects.  The event files can be very large, hence efficiency is a major
 consideration for event i/o and filtering.
 
@@ -449,10 +449,10 @@ Under QPOE, an event list is stored as a variable length array (i.e., as a
 named header parameter) of type \fIevent\fR.  The QPIO package takes this
 basic object and adds additional structure for more efficient i/o, e.g., events
 are blocked into large, fixed size \fIbuckets\fR of N events, the first two
-events of each bucket containing the minimum and maxixum event values for that
+events of each bucket containing the minimum and maximum event values for that
 bucket.  If the event list is sorted an \fIindex\fR may be maintained for the
 list; this index, plus the min/max event values maintained for a bucket, are
-used to optimise basic event i/o and filtering.  During event i/o the raw
+used to optimize basic event i/o and filtering.  During event i/o the raw
 event list may be filtered spatially or by event attribute.  All this is
 transparent to the application, which merely opens the event list parameter
 and begins reading (or writing) blocks of events.
@@ -602,7 +602,7 @@ Mask values are integers prefixed by `%', e.g.,
 
 Note that the mask may be specified in decimal (the default), octal (`b' or
 `B' suffix), or hex (`x' or `X' suffix), in accord with the usual IRAF
-conventions.  The metacharacters used in selection expressions have been
+conventions.  The meta-characters used in selection expressions have been
 selected to avoid or at least minimize the need to quote such expressions
 in CL commands.
 
@@ -648,7 +648,7 @@ or include file is expanded.  Include files should have the extension ".qpm".
 Macros are permitted only if the variable \fBqpinit\fR is defined in the user's
 environment, the string value consisting if the filename of the user's QPOE
 macro file.  In a reference to a macro \fImacro\fR, QPOE will look first in
-the macro defininitions file pointed to by \fIqpinit\fR for the named macro,
+the macro definitions file pointed to by \fIqpinit\fR for the named macro,
 then it will look for the file "\fImacro\fR.qpm" in the current directory.
 
 Parenthesis are optional and may be included to, for example, make attribute
@@ -671,7 +671,7 @@ region mask is input already encoded into a PLIO binary mask.  Since PLIO
 includes high level primitives for defining masks in terms of include and
 exclude circles, boxes, lines, polygons, etc., it is easy to extend QPOE at
 the applications level to include support for a region specification language
-tailored to the specific appplication.
+tailored to the specific application.
 
 While QPOE cannot itself process a user defined region description to create
 new region masks, it is possible to \fIselect\fR from any number of region
@@ -822,7 +822,7 @@ and of the data argument or arguments, if any.  Only event attributes for
 which restricted values were specified are tested, hence the cost of the
 evaluator depends only upon the complexity of the expression to be evaluated.
 An interpreter of this type can be coded very efficiently as a switch-case
-statement (jump table) within an optimised DO-loop.
+statement (jump table) within an optimized DO-loop.
 
 Simple attribute value tests are most efficiently coded as several \fIMSK\fR,
 \fIEQL\fR, etc., instructions.  The only case of any complexity is where the
@@ -885,7 +885,7 @@ i.e., the MIO package).
 
 If the event structure supports multiple coordinate systems and the region
 mask refers to a non-PO coordinate system, then the only approach is to first
-perform event-attribute filtering on the non-positional event atributes,
+perform event-attribute filtering on the non-positional event attributes,
 then for each event passing the event-attribute filter, fetch the mask value
 corresponding to the x,y coordinates of the event.  This is still an efficient
 technique since only mask pixel lookup is required (no complicated region
@@ -1031,7 +1031,7 @@ asynchronous, and that i/o must be in units of datafile pages.
 level facility for i/o to lfiles).
 
 .nf
-        yes|no = fm_acccess (datafile, mode)
+        yes|no = fm_access (datafile, mode)
                   fm_rename (datafile, newname)
                     fm_copy (datafile, newname)
                   fm_delete (datafile)

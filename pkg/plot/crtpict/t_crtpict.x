@@ -44,7 +44,7 @@ begin
 	if (fstati (STDIN, F_REDIR) == YES) {
 	    call printf ("Input has been redirected\n")
 	    redir = true
-	    cmd = open (STDIN, READ_ONLY, TEXT_FILE)
+	    cmd = open ("STDIN", READ_ONLY, TEXT_FILE)
 	} else 
 	    list = imtopenp ("input")
 

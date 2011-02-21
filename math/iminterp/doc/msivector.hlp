@@ -1,7 +1,7 @@
 .help msivector Dec98 "Image Interpolation Package"
 .ih
 NAME
-msivector -- evaulate the interpolant at an array of x and y points
+msivector -- evaluate the interpolant at an array of x and y points
 .ih
 SYNOPSIS
 msivector (msi, x, y, zfit, npts)

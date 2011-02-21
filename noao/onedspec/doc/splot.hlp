@@ -447,7 +447,7 @@ Smooth via a boxcar.  The user is prompted for the box size.
 .le
 .ls t
 Fit a function to the spectrum using the ICFIT mode.  Typically
-interative rejection is used to exclude spectra lines from the fit
+interactive rejection is used to exclude spectra lines from the fit
 in order to fit a smooth continuum.  A second keystroke
 selects what to do with the fit.
 .ls /
@@ -537,7 +537,7 @@ the normal interupt character is ignored in graphics mode.
 
 .ls :show
 Page the full output of the previous deblend and equivalent width
-measurments.
+measurements.
 .le
 .ls :log
 Enable logging of measurements to the file specified by the parameter
@@ -675,7 +675,7 @@ are known a priori and this information may be entered by typing the
 wavelengths explicitly using the 't' option or read from a file using the
 'f' option during marking.  In this case one should fix or fit a single
 shift for the position.  The latter may be useful if the lines are known
-but there is a measureable doppler shift.
+but there is a measurable doppler shift.
 
 After the fit, the modeled lines are overplotted.  The line center,
 flux, equivalent width, and full width half maxima are printed on the
@@ -699,7 +699,7 @@ for which the subtraction is to be performed. This allows you to fit a
 portion of a line which may be contaminated by a blend and then subtract
 away the entire line to examine the remaining components.
 
-The fitting uses an interative algorithm based on the Levenberg-Marquardt
+The fitting uses an interactive algorithm based on the Levenberg-Marquardt
 method.  The iterations attempt to improve the fit by varying the parameters
 along the gradient of improvement in the chi square.  This method requires
 that the initial values for the parameters be close enough that the
@@ -809,7 +809,7 @@ the point half way between the line core and the continuum.  In both cases
 the width at the appropriate level is determined by the interception of the
 y level with the data using linear interpolation between pixels.  The
 one-sided measurements use the half-width on the appropriate side and
-the two-sided measurments use the full-width.
+the two-sided measurements use the full-width.
 
 The adopted gaussian line profile is drawn over the spectrum and the
 horizontal and vertical lines show the measured line width and the depth of
@@ -832,13 +832,13 @@ fitting methods the core intensity above or below the continuum, and the
 FWHMs are also printed.  A zero value is record for the gaussian or
 lorentzian width if the value is not determined by profile fit.  A brief
 line of data for each measurement is printed on the graphics status line.
-To get the full output and the output from previous measurments use the
+To get the full output and the output from previous measurements use the
 command ":show".  This pages the output on the text output which may
 involve erasing the graphics.
 
 The integrated fluxes for all the methods  are in the same units as the
 intensities and the integration is done in the same units as the
-plotted scale.  It is the user's responsiblity to keep track of the flux
+plotted scale.  It is the user's responsibility to keep track of the flux
 units.  As a caution, if the data is in flux per unit frequency, say
 ergs/cm2/sec/hz, and the dispersion in Angstroms then the integrated
 flux will not be in the usual units but will be A-ergs/cm2/sec/hz.

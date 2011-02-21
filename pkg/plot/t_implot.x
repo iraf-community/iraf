@@ -968,7 +968,7 @@ pointer	sp, ip, plot_title, op
 bool	fp_equalr()
 
 real	x1, x2, y1, y2
-common	/impcom/ x1, x2, y1, y2
+common	/implcom/ x1, x2, y1, y2
 
 begin
 	call smark (sp)
@@ -981,8 +981,8 @@ begin
 	Memc[op] = '\n'
 	op = op + 1
 	maxch = SZ_PLOTTITLE - (op - plot_title)
-
 	# Format the remainder of the plot title.
+
 	if (IM_LEN(im,2) <= 1) {
 	    # Plot of a one-dim image.
 	    call strcpy (IM_TITLE(im), Memc[op], maxch)
@@ -1014,6 +1014,7 @@ begin
 		call pargstr (image)
 		call pargstr (IM_TITLE(im))
 	}
+
 
 	# Delete trailing newline and any whitespace from image title string.
 	# Trailing whitespace causes plot title to not be drawn centered on
@@ -1104,7 +1105,7 @@ real	n_x1, n_x2		# range of world coords in X
 real	n_y1, n_y2		# range of world coords in Y
 
 real	x1, x2, y1, y2
-common	/impcom/ x1, x2, y1, y2
+common	/implcom/ x1, x2, y1, y2
 
 begin
 	if (!IS_INDEF(n_x1))

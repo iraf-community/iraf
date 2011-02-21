@@ -1,0 +1,15 @@
+# Update the tximage application code in the threed package library.
+# Author: I.Busko, 26-Nov-1996
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	tximage.x	<error.h>
+	txione.x	<imhdr.h> <tbset.h>
+	txicpy.x	<tbset.h>
+	txihc.x
+	;
+

@@ -11,22 +11,22 @@ define	EP_SECTION	Memc[P2C($1+150)]	# Image section
 define	EP_GRAPHICS	Memc[P2C($1+200)]	# Graphics device
 define	EP_COMMAND	Memc[P2C($1+250)]	# Display command
  
-define	EP_ANGH		Memr[$1+350]		# Horizontal viewing angle
-define	EP_ANGV		Memr[$1+351]		# Vertical viewing angle
+define	EP_ANGH		Memr[P2R($1+350)]	# Horizontal viewing angle
+define	EP_ANGV		Memr[P2R($1+351)]	# Vertical viewing angle
 define	EP_APERTURE	Memi[$1+352]		# Aperture type
 define	EP_AUTODISPLAY	Memi[$1+353]		# Automatic image display?
 define	EP_AUTOSURFACE	Memi[$1+354]		# Automatic surface plots?
-define	EP_BUFFER	Memr[$1+355]		# Background buffer width
+define	EP_BUFFER	Memr[P2R($1+355)]	# Background buffer width
 define	EP_DEFAULT	Memi[$1+356]		# Default edit option
 define	EP_DISPLAY	Memi[$1+357]		# Display images?
 define	EP_FIXPIX	Memi[$1+358]		# Fixpix input?
-define	EP_RADIUS	Memr[$1+359]		# Aperture radius
-define	EP_SEARCH	Memr[$1+360]		# Search radius
-define	EP_SIGMA	Memr[$1+361]		# Added noise sigma
-define	EP_VALUE	Memr[$1+362]		# Substitution value
-define	EP_MINVALUE	Memr[$1+363]		# Minimum value for edit
-define	EP_MAXVALUE	Memr[$1+364]		# Maximum value for edit
-define	EP_WIDTH	Memr[$1+365]		# Background width
+define	EP_RADIUS	Memr[P2R($1+359)]	# Aperture radius
+define	EP_SEARCH	Memr[P2R($1+360)]	# Search radius
+define	EP_SIGMA	Memr[P2R($1+361)]	# Added noise sigma
+define	EP_VALUE	Memr[P2R($1+362)]	# Substitution value
+define	EP_MINVALUE	Memr[P2R($1+363)]	# Minimum value for edit
+define	EP_MAXVALUE	Memr[P2R($1+364)]	# Maximum value for edit
+define	EP_WIDTH	Memr[P2R($1+365)]	# Background width
 define	EP_XORDER	Memi[$1+366]		# Background xorder
 define	EP_YORDER	Memi[$1+367]		# Background xorder
  

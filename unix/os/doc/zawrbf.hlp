@@ -26,7 +26,7 @@ boundary.  A request to write zero bytes is ignored.
 
 If writing entirely within the interior of the file \fInbytes\fR must be an
 integral multiple of the device block size.  If writing at EOF any number of
-bytes may be written (provided the maximum transfer size is not exceeded).
+bytes may be written (provided the maximum transfer size is not exceedd).
 A file may be extended by writing at EOF or by overwriting EOF in a large
 transfer.  If the last block in the file is a partial block the file must
 be extended by reading the partial block into memory, appending the new data,

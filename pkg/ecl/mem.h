@@ -39,8 +39,12 @@ extern memel *dictionary;    /* base of the dictionary; never moves */
  */
 
 #define	reference(sname,index)	((struct sname *) (&dictionary[index]))
+/*
 #define	dereference(ptr) \
 (((unsigned)(char *)(ptr) - (unsigned)(char *)(dictionary))/BPI)
+*/
+#define	dereference(ptr) \
+(((char *)(ptr) - (char *)(dictionary))/BPI)
 
 /* ----------
  * Generic push/pop memory routines.  Can be used to push/pop any integer type
@@ -67,11 +71,11 @@ extern memel *dictionary;    /* base of the dictionary; never moves */
  * envhead:                "                        environment.
  */
 
-extern int maxd;
-extern int topd;
-extern int pachead;
-extern int parhead;
-extern int envhead;
+extern XINT maxd;
+extern XINT topd;
+extern XINT pachead;
+extern XINT parhead;
+extern XINT envhead;
 
 /* ----------
  * these are indices into the stack defined in stack.c.
@@ -91,10 +95,10 @@ extern int envhead;
  */
 
 extern memel stack[];		/* space for the stacks			*/
-extern int topcs;		/* top of control stack			*/
-extern int topos;		/* top of operand stack			*/
-extern int basos;		/* base of operand stack		*/
-extern int pc;			/* program counter			*/
+extern XINT topcs;		/* top of control stack			*/
+extern XINT topos;		/* top of operand stack			*/
+extern XINT basos;		/* base of operand stack		*/
+extern XINT pc;			/* program counter			*/
 
 /* ----------
  * reference a codeentry in stack at x.

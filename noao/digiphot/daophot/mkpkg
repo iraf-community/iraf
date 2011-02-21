@@ -10,19 +10,11 @@ update:
 
 relink:
 	$omake x_daophot.x
-	$ifdef (tables)
-	    !mkpkg -p noao -p tables trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
-	$else
-	    $call tundefined
-	$endif
+	!mkpkg -p noao trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
 	;
 
 linkonly:
-	$ifdef (tables)
-	    !mkpkg -p noao -p tables trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
-	$else
-	    $call tundefined
-	$call install
+	!mkpkg -p noao trelink XF="$(XFLAGS)" LF="$(LFLAGS)"
 	;
 
 install:
@@ -34,14 +26,7 @@ trelink:
 	$set XFLAGS = "$(XFLAGS) $(XF)"
 	$set LFLAGS = "$(LFLAGS) $(LF)"
 	$update libpkg.a
-	$link x_daophot.o libpkg.a ../lib/libpttables.a $(LIBS) \
-	 -o xx_daophot.e
-	;
-
-tundefined:
-	$echo "cannot find file tbset.h"
-	$echo "tbtables library is not defined"
-	$echo "cannot build xx_daophot.e"
+	$link x_daophot.o libpkg.a ../lib/libpttables.a $(LIBS) -o xx_daophot.e
 	;
 
 libpkg.a:

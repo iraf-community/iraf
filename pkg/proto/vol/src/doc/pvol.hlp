@@ -1,0 +1,398 @@
+.help pvol Jan89 volumes
+.ih
+NAME
+pvol -- project rotations of a volume datacube onto series of 2d images
+.ih
+USAGE
+pvol input output 
+.ih
+PARAMETERS
+.ls input
+Input 3d or 4d image (datacube).
+.le
+.ls output
+Output datacube, one image band per rotation (type real only).
+.le
+.ls nframes = (360 / \fBdegrees\fR)
+Number of frames to generate, 1 per rotation.
+.le
+.ls degrees = 10
+Number of degrees to rotate datacube for each successive projection.
+.le
+.ls theta0 = 0.0
+Initial projection angle for rotation sequence by \fBdegrees\fR increments.
+Measured counterclockwise from +x axis when looking back toward the image
+origin.
+.le
+.ls ptype = 2
+Projection type;
+1 = opacity:  attenuation along projection column by voxel opacity value.
+2 = average voxel intensity along projection column.
+3 = sum of voxel intensities.
+4 = proportional distance weighting: voxel intensity
+along projection column weighted by (curvoxel / voxels_in_column)
+**\fBdispower\fR.
+5 = mod(n):  same as proportional distance weighting, but use only voxel values
+which match mod(normalized_voxel * 100) = \fBmodn\fR.
+6 = use last voxel value within cutoffs only.
+.le
+.ls imin, imax = INDEF
+Input voxel intensity ranges within which to apply intensity transformation.
+Defaults to input image min and max if not specified (see comments below).
+.le
+.ls omin, omax = INDEF
+Input voxel opacity ranges within which to apply opacity transformation.
+Defaults to input image min and max if not specified (see comments below).
+.le
+.ls amin, amax = 0.0, 1.0
+Attenuation factor minimum and maximum for ptype=1 (opacity).  Voxel values
+<= omin map to attenuation factor amin, >= omax map to attenuation amax.
+.le
+.ls izero = 1.0
+Initial background iillumination intensity when \fBptype\fR = 1 (opacity).
+This intensity will be attenuated consecutively by (transformed voxel_value *
+\fBoscale\fR)
+along the projection column toward the projection plane.
+.le
+.ls oscale = 1.0
+Voxel opacity scale factor.  Multiplied by voxel value before attenuating
+remaining light along projection column for \fBptype\fR = 1.
+.le
+.ls opacelem = 1
+Opacity element in 4th dimension of input image.  When input image is 4d,
+and there are two elements in the 4th dimension, the \fBopacelem\fR element
+will be treated as opacity and the other will be considered intensity.
+.le
+.ls dispower = 2.0
+Inverse distance weighting power for \fBptype\fR = 4,5.  Voxel intensities will
+be multiplied by (voxel position in column / voxels in column) **
+\fBdispower\fR before being summed into the output projection pixel.
+.le
+.ls discutoff = no
+When distance weighting, measure the distance within that set of projecting
+voxels that lies between the intensity cutoffs rather than from
+the edges of the datacube.  Usually results in faster run times and is
+appropriate when the interior of a well-defined object is of interest
+rather than its placement inside the datacube.
+.le
+.ls modn = 10
+For ptype=5, only voxel values satisfying mod (int (voxval * 100.0)) =
+\fBmodn\fR will be proportional distance-weighted and summed into
+projection pixel.  Useful for viewing volume interiors with high contrast
+voxel values (like solid objects in an otherwise empty datacube).
+.le
+.ls vecx = 1.0
+Rotation axis X vector.  Part of the specification of a three-dimensional
+orientation vector around which the datacube will appear to rotate when
+viewed from the front.  PROTOTYPE only supports rotations around the x axis.
+.le
+.ls vecy, vecz = 0.0
+Rotation axis Y and Z vectors.  In prototype, must be zero.
+.le
+.ls title = ""
+Output datacube title for rotation sequence.
+.le
+.ls maxws = 2000000
+Maximum workingset size in chars (usually 2 bytes).  Decrease if machine
+performance degrades noticeably during a run.  Increase if the machine has
+lots of memory and PVOL does not affect other processes.
+.le
+.ls abs = no
+If yes, take absolute value of voxel before applying any transformation.
+.le
+.ls verbose = yes
+Report memory usage, progress around the rotation, and more detail on
+errors if yes.
+.le
+
+
+.ih
+DESCRIPTION
+
+PVOL is used for visualizing the interiors of three-dimensional images.
+Opacity and intensity information is used to construct projected 2d images
+approximating an "xray" view through the original "solid", with varying
+amounts of apparent translucency.  Playing the resulting 2d images back
+rapidly as a filmloop generates the impression of a rotating translucent
+datacube inside of which you can view much of the original information with
+the illusion of seeing it in 3 dimensions.
+
+Given an input datacube plus rotation and projection parameters, PVOL
+produces a series of projected 2d images written out as another datacube.
+Rotation parameters control the number of frames to project, their
+angular separation, and the 3 vectors comprising the axis of rotation.
+In the prototype, only one rotation axis is allowed, counterclockwise
+about the X-axis when viewed facing the origin from +X (however, the user
+is viewing the datacube from -Z, and so sees the datacube rotating toward
+him/her).  When off-axis rotations are added, the view angle will still be
+from the front of the datacube.
+Non-orthogonal rotations in the prototype will have to be accomplished by
+first rotating the input datacube appropriately with other tools.
+
+Projection parameters
+provide control over the appearance of the projected images.  They may be
+tuned to visually enhance the apparent placement of interior regions in three
+dimensions during the rotation sequence.  Frames from the output datacube
+may be viewed individually on standard image display devices, may be
+played back rapidly with filmloop tools, or may be recorded to video as
+smooth, rotating volumes.  [At present the only filmloop tool available to us
+is MOVIE on Sun workstations, which requires preprocessing the datacube
+output from this task with another task called I2SUN].
+
+Sequences where the volume's rotation axis is the same as the viewing or
+projection axis are little more useful than a block average of the datacube,
+as hidden regions never rotate into view.  Volume rotations about the cube's
+X-axis (viewed from the front, or -Z) are the fastest and the only type
+implemented in the prototype.
+
+The \fBptype\fR parameter provides control over the type of projection.
+There are three main types of projection:  opacity, intensity, and both
+together.  If the
+input datacube is 4-dimensional, with two elements in the 4th dimension,
+both opacity and intensity information will be used -- first the remaining
+light along the projection will be attenuated by the opacity function, then
+the new voxel's intensity contribution added, according to \fBptype\fR.  Before
+the projection function is applied, the raw voxel intensity or opacity is
+clipped and scaled by transformation functions under control of task 
+parameters.
+.PP
+The image MIN and MAX must be present in the input image header, or they
+will default to 0.0 and 1.0 and a warning will be issued (run IMAGES.MINMAX
+with \fBupdate\fR=yes to set them if not already present).
+If intensity information is being used, \fBimin\fR and \fBimax\fR
+must be specified, or they will default to the image min and max.
+First we consider the intensity/opacity transformation functions, then we
+discuss how the transformed value contributes to the final projected image.
+
+.nf
+	Intensity transformation:
+
+	if (voxval < imin)
+	    newval = imin
+	else if (imin <= voxval && voxval < imax)
+	    newval = im_min + (im_max-im_min) * (voxval-imin)/(imax-imin)
+	else
+	    newval = imax
+	
+	Opacity transformation (0.0 <= attenuation <= 1.0):
+	if (voxval < omin)	# let maximum amount of light through
+	    attenuation = amax
+	else if (omin <= voxval && voxval < omax)
+	    attenuation = amin + (amax-amin) * (voxval*oscale - omin) /
+		(omax-omin)
+	else			# let minimum amount of light through
+	    attenuation = amin
+
+.fi
+
+The intensity class of projections includes \fBptype\fR = 2, 3, 4, 5, and 6.
+The default, \fBptype\fR 2, results in the AVERAGE transformed intensity along
+the projection column, while type 3 yields the SUM of transformed intensities.
+
+Type 4, PROPORTIONAL DISTANCE WEIGHTING, is used in conjunction with the 
+\fBdispower\fR parameter to weight the transformed voxel intensities by
+their inverse proportional depth along the projection column.
+If \fBdiscutoff\fR is no, the default, the distance will be that portion of
+the datacube intersected by the projection ray, measured starting at the
+rear (far side from the projection plane).  If \fBdiscutoff\fR is yes,
+the distance will be measured between the first and last voxels that fell
+between the cutoffs \fBimin\fR and \fBimax\fR.
+This projection generates a kind
+of depth cueing often useful in determining visually during filmloop playback
+which portions of the rotating image are in the foreground and which in the
+background (and how far).  The distance weighting is accomplished as follows,
+where voxposition and totvoxels are determined according to \fBdiscutoff\fR:
+
+.nf
+	\fBptype\fR = 4 (distance weighting):
+	newval = newval * (voxposition / voxelsincolumn) ** \fBdispower\fR
+.fi
+
+\fBptype\fR = 5, MODULAR PROPORTIONAL DISTANCE WEIGHTING, is useful for better
+seeing into the interiors of high-contrast datacubes.  Rather than using each
+voxel value along the projection column, only certain voxel values contribute,
+based on the \fBmodn\fR parameter (sometimes it is necessary to artificially
+"thin out" the data to see far enough into or through it).
+
+.nf
+	\fBptype\fR = 5 (modular distance weighting):
+	if (mod (int (newval/val_range * 100)) = \fBmodn\fR)
+	    use newval as in normal distance weighting
+	else
+	    ignore newval
+.fi
+
+\fBptype\fR = 6 results in only the LAST transformed voxel intensity that
+is between the \fBimin\fR and \fBimax\fR cutoffs being used.  This corresponds
+to seeing only the outer surface of datacube interior regions between the
+cutoffs (though since not every projection ray will pass through voxels
+right on the cutoff boundary, this will not necessarily result in a three
+dimensional intensity contour of an interior object; i.e. the intensities
+of those outer voxels can vary).
+
+OPACITY information can be used in viewing the interiors of 3d images, unlike
+in 2d images.  For \fBptype=1\fR parallel rays of light may be pictured
+shining through the datacube toward the projection plane, along the normal
+to that plane.  The voxel values in this
+case are considered to represent a degree of opacity, and a column of light
+will be attenuated by each voxel according to a function of its opacity value
+as the ray proceeds through the volume.  The \fBizero\fR parameter provides
+the initial incident "light" intensity before any attenuation.  The
+amount of remaining light after projection through the datacube is very
+sensitive to the voxel opacities and the number of voxels in each projection
+column.  Consequently, the \fBoscale\fR parameter is supplied to enable
+adjusting the relative attenuation in a single step while scouting for
+the right opacity transformation function to generate the desired effect
+during playback rotation.  Given the amount of attenuation
+as determined in the opacity transformation function above, for each 
+contributing voxel along the projection column:
+
+.nf
+	projection pixel = projection pixel * attenuation
+.fi
+
+If the input image is 4-dimensional, with 2 elements in the 4th dimension,
+voxel intensities will be added after attenuation 
+to contribute to the total projected pixel value (like a cloud
+with both absorption and emission).  For
+purposes of visualization only, it is not necessary that the voxel value
+represent a physically real opacity; any data value may be treated as
+attenuating an imaginary xray passing through the solid in order to help
+image the volume in three apparent dimensions.
+
+For all of the projection types, once the modified intensity
+has been determined, it contributes to the output pixel onto which the
+current, arbitrarily-oriented column of voxels projects.  To summarize:
+
+.nf
+	1 OPACITY:
+	    proj_pix = proj_pix * attenuation
+	2 AVERAGE:
+	    proj_pix = proj_pix + newval / nvox
+	3 SUM:
+	    proj_pix = proj_pix + newval
+	4 INVDISPOW:
+	    proj_pix = proj_pix + newval * (vox/voxincol)**dispow
+	5 MOD:
+	    if mod (int (newval/val_range * 100.0)) = \fBmodn\fR
+		proj_pix = proj_pix + newval * (vox/voxincol)**dispow
+	6 LASTONLY:
+	    if (\fBimin\fR < newval && newval <= \fBimax\fR)
+		proj_pix = newval
+
+.fi
+
+.ih
+PERFORMANCE AND SIZE CONSTRAINTS
+
+Projections through 3d images inherently require large amounts of memory,
+or else the tasks will spend all their time thrashing with I/O.  In volume
+rotations about the X-axis, each output pixel is derived by projecting at
+an arbitrary angle through a YZ slice of the input image.  Because of otherwise
+excessive thrashing, PVOL requires sufficient memory for at least one YZ
+slice.  The more YZ slices that will fit into memory at one time, the better,
+because I/O is more efficient the larger the chunk of the image that can
+be read at one time.  It is best if the entire image will fit into memory,
+as the output image (all rotations) will not have to be reread for each
+successive chunk of YZ slices.  Available memory is that actually allocable
+by PVOL for the slices plus one line of the output image.  On a workstation
+there will usually be considerably less memory available for PVOL than
+the amount physically in the machine if running in a window environment.
+Examples of the number of YZ slices that will fit based on image size and
+available memory follow; image datatype is assumed to be REAL -- multiply
+number of YZ slices by 2 for SHORT images.
+
+.nf
+	Usable Memory	Image Size	Approx YZ Slices
+	------------------------------------------------
+	1 Mb		64*64*64	64 (whole image)
+	1 Mb		512*512*512	1
+	4 Mb		101*101*101	101 (whole image)
+	4 Mb		1024*1024*1024	1
+	8 Mb		128*128*128	128 (whole image)
+	8 Mb		1448*1448*1448	1
+	16 Mb		161*161*161	161 (whole image)
+	16 Mb		2048*2048*2048	1
+	32 Mb		203*203*203	203 (whole image)
+	32 Mb		2896*2896*2896	1
+	64 Mb		256*256*256	256 (whole image)
+	128 Mb		322*322*322	322 (whole image)
+	512 Mb		512*512*512	512 (whole image)
+.fi
+
+PVOL checks to see how much memory it can grab, then actually allocates
+somewhat less than this (otherwise you wouldn't be able to do anything 
+except run IRAF tasks already loaded in the process cache until PVOL
+finishes).  With \fBverbose\fR on, the task reports memory usage figures.  
+On some machines the system will continue to allocate more memory for a
+task even above that reported by PVOL.  This can be a problem if you fire
+up PVOL from a workstation (even with lots of windows already open);
+after you log out, the system may grab that extra memory you were using,
+and not even let you back in later.  This is why the \fBmaxws\fR
+parameter is supplied -- lower it if this type of behavior is experienced.
+
+.ih
+EXAMPLES
+
+.nf
+1.  Produce 36 rotation projections (one every 10 degrees) around the
+    x-axis of a datacube, viewed from the front (negative z
+    direction).  Assume that the single-valued input voxel values
+    are intensities, and that the image header contains MIN and MAX.
+
+    cl> pvol input output
+
+2.  Generate 180 frames, one every two degrees.
+
+    cl> pvol input output nframes=180 degrees=2
+
+3.  Use inverse proportional distance cubed weighting in two
+    subsampled projections for a quick look.  Distance-weight
+    only between projection voxels falling within the specified
+    cutoffs (0.1 to 1.0).
+
+    cl> pvol input[*:4,*:4,*:4] output nfr=2 deg=90 ptype=4 \
+	dispower=3 discutoff+ imin=.1 imax=1.0
+
+4.  Project through a 4d image containing opacity information in
+    element 2 of the 4th axis and intensity in element 1.  Scale
+    the voxel opacities by 0.1 to allow more light through.  Use
+    the SUM of the voxel intensity values (which will be attenuated
+    by subsequent opacities), with no distance weighting.
+
+    cl> pvol input output ptype=3 opacelem=2
+
+.fi
+
+.ih
+TIMINGS
+
+1min 12sec cpu on an unloaded Sun-4 to produce
+36 rotation increments around a 50*50*50 datacube with \fBptype\fR=2
+(uses less than 1 Mb of memory for image data); 46sec for \fBptype\fR=1;
+2min 19sec for \fBptype\fR=4.
+
+4min 32sec cpu on an unloaded Sun-3 with 8 Mb memory to do 36 steps around a
+50*50*50 datacube with \fBptype\fR=2 (also uses less than 1 Mb);
+3min 20sec for \fBptype\fR=1; 10min 51sec for \fBptype\fR=4.
+
+17hr 20 min cpu on a Sun-4 to do 36 rotation steps around a 450*450*450
+datacube with \fBptype\fR=4.
+
+.ih
+BUGS
+
+Maximizing memory usage without adversely impacting other functions can be
+tricky.  Adverse effects may result from using too high a \fBmaxws\fR.
+
+Cannot rotate around arbitrary axis yet.
+
+Lacks shading algorithm.
+
+Needs easier user interface to adjust translucency parameters (e.g. with
+mouse when workstations become fast enough to do this in real time).
+
+.ih
+SEE ALSO
+i2sun, im3dtran, im3dstack
+.endhelp

@@ -7,5 +7,8 @@ procedure rg_free (rg)
 pointer	rg				# Ranges
 
 begin
-	call mfree (rg, TY_STRUCT)
+	if (rg != NULL) {
+	    call mfree (rg, TY_STRUCT)
+	    rg = NULL
+	}
 end

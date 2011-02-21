@@ -1,6 +1,7 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <string.h>
 #include "bootlib.h"
 
 /* Uncomment the following if the kernel for this machine does not need
@@ -15,6 +16,8 @@
 
 char	*irafpath();
 char	*os_getenv();
+extern  int  os_access (char *fname, int mode, int type);
+
 
 /* OS_SYSFILE -- Return the pathname of a system library file.  The library
  * search order is
@@ -30,13 +33,16 @@ char	*os_getenv();
  * libraries of installed layered packages, rather than private user libraries
  * (the IRAFULIB mechanism is better for the latter).
  */
-os_sysfile (sysfile, fname, maxch)
-char	*sysfile;		/* filename from include statement	*/
-char	*fname;			/* receives filename			*/
-int	maxch;
+int
+os_sysfile (
+  char	*sysfile,		/* filename from include statement	*/
+  char	*fname,			/* receives filename			*/
+  int	maxch 
+)
 {
 	register char *ip, *op;
 	char	*files, *ip_save;
+
 
 	/* Search the standard system libraries and exit if the named
 	 * file is found.
@@ -48,7 +54,7 @@ int	maxch;
 
 	/* Search the designated package libraries, if any.
 	 */
-	if (files = os_getenv ("pkglibs")) {
+	if ( (files = os_getenv ("pkglibs")) ) {
 	    for (ip=files;  *ip;  ) {
 		/* Get the next library name from the list. */
 		while (isspace(*ip) || *ip == ',')
@@ -58,7 +64,7 @@ int	maxch;
 		*op = EOS;
 
 		/* Append the target filename. */
-		for (ip_save=ip, ip=sysfile;  *op++ = *ip++;  )
+		for (ip_save=ip, (ip=sysfile);  (*op++ = *ip++);  )
 		    ;
 		ip = ip_save;
 

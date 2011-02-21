@@ -20,7 +20,7 @@ errchk	malloc, calloc, nl_list
 
 begin
 	# Allocate space for the non-linear package structure.
-	call malloc (nl, LEN_NLSTRUCT, TY_STRUCT)
+	call calloc (nl, LEN_NLSTRUCT, TY_STRUCT)
 
 	# Store the addresses of the non-linear functions.
 	NL_FUNC(nl) = fnc

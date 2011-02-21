@@ -16,6 +16,7 @@
 #define	MAX_LONG	2147483647
 #define	FNNODE_CHAR	'!'		/* node name delimiter character */
 
+
 /* Indefinite valued numbers. (potentially MACHDEP)
  */
 #define	INDEFS		(-32767)
@@ -68,27 +69,35 @@
 #define	BOFL		(-3L)
 #define EOFL		(-2L)
 
-/* SPP datatypes. (potentially MACHDEP)
+
+/*  SPP datatypes. (potentially MACHDEP)
+ *  Must match sizes in hlib$iraf.h
  */
 #ifndef XCHAR
 #define	XCHAR		short
 #endif
 
-#ifndef XINT
-#define	XINT		int
+#ifdef MACH64
+#define	XINT		long 		/*  ILP64  */
+#define	XLONG		long
+#define	XSTRUCT		long
+#define	XPOINTER	long
+#define	XBOOL		long	
+#else
+#define	XINT		int 		/*  ILP32  */
+#define	XLONG		int
+#define	XSTRUCT		int
+#define	XPOINTER	int
+#define	XBOOL		int	
 #endif
 
 #define	PKCHAR		XCHAR
 #define XUBYTE		unsigned char
-#define	XBOOL		int	
 #define	XSHORT		short
 #define	XUSHORT		unsigned short
-#define	XLONG		int
 #define	XREAL		float
 #define	XDOUBLE		double
 #define XCOMPLEX	struct cplx
-#define	XSTRUCT		int
-#define	XPOINTER	int
 
 struct cplx {
 	float	r;

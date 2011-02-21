@@ -66,7 +66,7 @@ EXAMPLES
 and capture the results. The aclist task is used to list the supported
 catalogs, as well as to list the query and output formats for the selected
 catalog as shown below. The query format tells the user that the input
-ra and dec must be entered in J2000 sexigesimal hours and degrees and
+ra and dec must be entered in J2000 sexagesimal hours and degrees and
 that the size parameter is a halfwidth in minutes.  In this case the
 results containing leading and trailing comments and
 HTML markup as shown below.

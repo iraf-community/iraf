@@ -37,7 +37,7 @@ term is fit to the data.
 Minimum and maximum x values. All x values of interest
 including the data x values and the x values of any curve to be evaluated
 must fall in the range xmin <= x <= xmax. Checking for out of bounds x
-values is the responsiblity of user.
+values is the responsibility of user.
 .le
 .ih
 DESCRIPTION

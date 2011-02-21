@@ -1,6 +1,11 @@
 .help revisions May91 noao.digiphot.photcal
 .nf
 
+lib/lexer.h
+lib/prstruct.h
+    Added necessary P2R macros for 64-bit systems (9/8/10, MJF)
+
+
 =======
 V2.12.2
 =======

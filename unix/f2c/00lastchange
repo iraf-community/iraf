@@ -1,0 +1,8 @@
+Tue Oct  4 23:38:54 MDT 2005
+libf2c.zip:  uninit.c:  on IA32 Linux systems, leave the rounding
+precision alone rather than forcing it to 53 bits; compile with
+-DUNINIT_F2C_PRECISION_53 to get the former behavior.  This only
+affects Fortran files translated by f2c -trapuv .
+
+NOTE:  the old libf77 and libi77 bundles are no longer being updated.
+Use libf2c.zip instead.

@@ -1,0 +1,60 @@
+# Conversion factors for tunits task
+#
+# Read this table as "There are <factor> <from> in a <to>."
+# For example, "There are 100 centimeters in a meter." 
+# The last column, swap, does not change the sense of the sentence
+# but does change the direction that the conversion is applied,
+# For example, "60 seconds in a minute" is actually a conversion 
+# from minutes to seconds because swap is yes. Unit conversions
+# should set swap to yes when the desired conversion is not an exact
+# value, but its inverse is. Only one conversion is allowed per
+# unit, which simplifies the program logic considerably. Conversions
+# should be chosen so that they ultimately resolve to MKS units. To
+# prevent endless loops conversions from the fundamental units are
+# checked for and forbidden. However, the program does not check for
+# other loops, so be careful when adding new conversions!
+#
+# factor	from		to		swap?
+#----------------------------------------------------
+100		centimeter	meter		no
+1e-3		kilometer	meter		no
+1e3		millimeter	meter		no
+1e6		micron		meter		no
+1e9		nanometer	meter		no
+1e10		angstrom	meter		no
+1e3		gram		kilogram	no
+1e6		milligram	kilogram	no
+60		second		minute		yes
+60		minute		hour		yes
+24		hour		day		yes
+365.2421897	day		year		yes
+57.2957795131	degree		radian		no
+60		arcminute	degree		no
+60		arcsecond	arcminute	no
+1.4959787066e11	meter		au		yes
+206264.806247	au		parsec		yes
+1e3		parsec		kiloparsec	yes
+1e6		parsec		megaparsec	yes
+9.46073047e15	meter		lightyear	yes
+1e3		liter		m^3		no
+1		newton		kg*m/s^2	no
+1		joule		kg*m^2/s^2	no
+1		watt		kg*m^2/s^3	no
+1		dyne		gm*cm/s^2	no
+1		erg		gm*cm^2/s^2	no
+2.54		centimeter	inch		yes
+12		inch		foot		yes
+5280		foot		mile		yes
+16		ounce		pound		no
+0.45359237	pound		kilogram	no
+1054.4		btu		joule		no
+4.184		calorie		joule		no
+1e-3		kilocalorie	calorie		no
+6.24150648e18	ev		joule		no
+1e-3		kev		ev		no
+1e-6		mev		ev		no
+1e23		jansky		erg/s*cm^2*hz	no
+1e3		millijansky	jansky		no
+1e-3		kilohertz	hertz		no
+1e-6		megahertz	hertz		no
+1e-9		gigahertz	hertz		no

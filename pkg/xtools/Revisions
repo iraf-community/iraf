@@ -1,5 +1,22 @@
 .help revisions Jun88 pkg.xtools
 .nf
+pkg/xtools/icfit/icdeviant.gx
+    There were two bugs related to growing.  First, the logic was wrong.
+    Second, in one place the grow parameter was treated as being in pixels
+    and in another as being in user coordinate units.
+    (6/28/10, Valdes)
+
+pkg/xtools/xtextns.x
+     Pixel list masks were not recognized as images.
+     (2/13/09, Valdes)
+
+lib/pkg/rmsorted.h
+pkg/xtools/rmmed.x
+pkg/xtools/rmsorted.x
+     Modified the running median library to allow running minimum and
+     running maximum.  An argument addition required a change in the 
+     runmed task but there was no functional change.
+     (10/29/08, Valdes)
 
 xtextns.x
     1.  The wrong ranges package was used for the extension versions.  Calling		the correct one requires extension versions to be positive integers.

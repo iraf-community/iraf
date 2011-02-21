@@ -13,6 +13,8 @@
 #include "param.h"
 #include "task.h"
 #include "eparam.h"
+#include "proto.h"
+
 
 #define	COLWIDTH	40		/* column width for showhelp	*/
 
@@ -37,12 +39,13 @@
  */
 
 static	char ed_editorcmd[SZ_LINE+1];
-static	map_escapes();
+static	void map_escapes();
 
 
 /* EDTINIT -- Initialize the editor.
  */
-edtinit()
+void 
+edtinit (void)
 {
 	register int	i;
 	char 	editor[SZ_FNAME];	/* the name of the editor	 */
@@ -71,16 +74,17 @@ edtinit()
 	 */
 	for (i=FIRST_CMD;  command[i].cmd < NOMORE_COMMANDS;  i++)
 	    if (command[i].cmd == REPAINT && strlen(command[i].escape)==1)
-		c_fseti (STDOUT, F_SETREDRAW, command[i].escape[0]);
+		c_fseti ((XINT)STDOUT, F_SETREDRAW, command[i].escape[0]);
 }
 
 
 /* EDTEXIT -- Terminate the editor.  Send an escape sequence to the terminal
  * if necessary.
  */
-edtexit()
+void 
+edtexit (void)
 {
-	c_fseti (STDOUT, F_SETREDRAW, 0);
+	c_fseti ((XINT)STDOUT, F_SETREDRAW, 0);
 	if (*(command[EDIT_TERM].escape) != '\0')
 	    printf ("%s",command[EDIT_TERM].escape); 
 }
@@ -90,8 +94,7 @@ edtexit()
  * host system to run an editor, given the user name for the editor.
  */
 char *
-host_editor (editor)
-char	*editor;
+host_editor (char *editor)
 {
 	get_editor (editor);
 	return (ed_editorcmd);
@@ -102,8 +105,10 @@ char	*editor;
  * Search for that file first in the users home directory.  If not found
  * there, look in the standard device directory.
  */
-get_editor (editor)
-char	*editor;		/* the name of the editor		*/
+void 
+get_editor (
+    char *editor		/* the name of the editor		*/
+)
 {
 	FILE	*fp;		/* pointer to the editor.ed file	*/
 	char	string[SZ_LINE];/* an edcap string from the .ed file	*/
@@ -229,10 +234,11 @@ char	*editor;		/* the name of the editor		*/
  *
  * Ordinary characters are copied to the output.
  */
-static
-map_escapes (input, output)
-char	*input;			/* pointer into input string	*/
-char	*output;		/* pointer into output string	*/
+static void
+map_escapes (
+    char *input,			/* pointer into input string	*/
+    char *output		/* pointer into output string	*/
+)
 {
 	static char	*echars = "befnrt";
 	static char	*ecodes = "\b\033\f\n\r\t";
@@ -273,8 +279,10 @@ char	*output;		/* pointer into output string	*/
  * command (some control code).  Additional keystrokes are read from the
  * standard input until an editor command is recognized.
  */
-what_cmd (first_char)
-char	first_char;		/* the first unprintable character */
+int 
+what_cmd (
+    int first_char		/* the first unprintable character */
+)
 {
 	register int	nchars, k;
 	char	cmd_string[9];
@@ -304,9 +312,11 @@ char	first_char;		/* the first unprintable character */
  * match any editor escape sequence, else return the index of the first
  * command code matched.
  */
-cmd_match (cstring, nchars)
-char	*cstring;		/* command string	*/
-int	nchars;			/* nchars to compare	*/
+int 
+cmd_match (
+    char *cstring,		/* command string	*/
+    int nchars			/* nchars to compare	*/
+)
 {
 	int	k;
 
@@ -321,7 +331,8 @@ int	nchars;			/* nchars to compare	*/
 /* SHOW_EDITORHELP -- Display the edit commands and their keystroke
  * equivalences.
  */
-show_editorhelp()
+void 
+show_editorhelp (void)
 {
 	char	sbuf[MAX_COMMANDS*COLWIDTH];
 	char	*strp[MAX_COMMANDS];
@@ -334,8 +345,8 @@ show_editorhelp()
 	/* Disable raw mode output so that output processing will be enabled,
 	 * e.g., to map newlines into crlfs.
 	 */
-	save_raw = c_fstati (STDOUT, F_RAW);
-	c_fseti (STDOUT, F_RAW, NO);
+	save_raw = c_fstati ((XINT)STDOUT, F_RAW);
+	c_fseti ((XINT)STDOUT, F_RAW, NO);
 
 	/* Format the help strings for the individual keystrokes.
 	 */
@@ -370,7 +381,7 @@ show_editorhelp()
 
 	/* Restore raw mode.
 	 */
-	c_fseti (STDOUT, F_RAW, save_raw);
+	c_fseti ((XINT)STDOUT, F_RAW, save_raw);
 
 	fflush (stdout);
 

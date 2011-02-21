@@ -1,6 +1,9 @@
 /* Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
  */
 
+#include <stdio.h>
+
+#include <string.h>
 #define	import_spp
 #include <iraf.h>
 
@@ -13,19 +16,21 @@
  * in argument lists.
  */
 XCHAR *
-os_strupk (str, outstr, maxch)
-char	*str;			/* C string			*/
-XCHAR	*outstr;		/* SPP string			*/
-int	maxch;			/* max chars out, excl EOS	*/
+os_strupk (
+  char	*str,			/* C string			*/
+  XCHAR	*outstr,		/* SPP string			*/
+  int	maxch 			/* max chars out, excl EOS	*/
+)
 {
 	register char	*ip = str;
 	register XCHAR	*op = outstr;
 	register int	  n = maxch;
 
+
 	/* Is is necessary to determine the length of the string in order to
 	 * be able to unpack the string in place, i.e., from right to left.
 	 */
-	if (maxch)
+	if (maxch) {
 	    if (sizeof(char) != sizeof(XCHAR) || str != (char *)outstr) {
 		n = min (n, strlen(ip));
 		op[n] = XEOS;
@@ -33,6 +38,7 @@ int	maxch;			/* max chars out, excl EOS	*/
 		while (--n >= 0)
 		    op[n] = ip[n];
 	    }
+	}
 
 	return (outstr);
 }

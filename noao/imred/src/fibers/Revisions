@@ -1,6 +1,16 @@
 .help revisions Nov90 noao.imred.src.fibers
 .nf
 
+srcfibers$proc.cl
+srcfibers$listonly.cl
+    For reasons that are now lost in the mists of time, the shortening of
+    filenames can cause problems.  This has been removed.
+    (2/11/11, Valdes) (See bug log 577)
+
+=======
+V2.15.1
+=======
+
 =======
 V2.12.3
 =======

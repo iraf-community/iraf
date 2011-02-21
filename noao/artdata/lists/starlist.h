@@ -27,31 +27,31 @@ define LEN_STSTRUCT		(45 + 4 * SZ_FNAME + 4)
 
 define	ST_TYPE			Memi[$1]	# Stars or galaxies
 define	ST_SPATIAL		Memi[$1+1]	# Spatial function
-define	ST_XC			Memr[$1+2]	# X center
-define	ST_YC			Memr[$1+3]	# Y center
-define	ST_CORE			Memr[$1+4]	# Hubble core radius
-define	ST_BASE			Memr[$1+5]	# Hubble baseline probability
-define	ST_XMIN			Memr[$1+6]	# Minimum x value
-define	ST_XMAX			Memr[$1+7]	# Maximum x value
-define	ST_YMIN			Memr[$1+8]	# Minimum y value
-define	ST_YMAX			Memr[$1+9]	# Maximum y value
+define	ST_XC			Memr[P2R($1+2)]	# X center
+define	ST_YC			Memr[P2R($1+3)]	# Y center
+define	ST_CORE			Memr[P2R($1+4)]	# Hubble core radius
+define	ST_BASE			Memr[P2R($1+5)]	# Hubble baseline probability
+define	ST_XMIN			Memr[P2R($1+6)]	# Minimum x value
+define	ST_XMAX			Memr[P2R($1+7)]	# Maximum x value
+define	ST_YMIN			Memr[P2R($1+8)]	# Minimum y value
+define	ST_YMAX			Memr[P2R($1+9)]	# Maximum y value
 
 define	ST_LUMINOSITY		Memi[$1+10]	# Luminosity function
-define	ST_POWER		Memr[$1+11]	# Power law
-define	ST_MZERO		Memr[$1+12]	# Zero point of magnitudes
-define	ST_ALPHA		Memr[$1+13]	# Bands function alpha
-define	ST_BETA			Memr[$1+14]	# Bands function beta
-define	ST_DELTA		Memr[$1+15]	# Bands function delta
-define	ST_MSTAR		Memr[$1+16]	# Bands function mstar
-define	ST_MINMAG		Memr[$1+17]	# Minimum magnitude
-define	ST_MAXMAG		Memr[$1+18]	# Maximum magnitude
+define	ST_POWER		Memr[P2R($1+11)]# Power law
+define	ST_MZERO		Memr[P2R($1+12)]# Zero point of magnitudes
+define	ST_ALPHA		Memr[P2R($1+13)]# Bands function alpha
+define	ST_BETA			Memr[P2R($1+14)]# Bands function beta
+define	ST_DELTA		Memr[P2R($1+15)]# Bands function delta
+define	ST_MSTAR		Memr[P2R($1+16)]# Bands function mstar
+define	ST_MINMAG		Memr[P2R($1+17)]# Minimum magnitude
+define	ST_MAXMAG		Memr[P2R($1+18)]# Maximum magnitude
 
-define	ST_Z			Memr[$1+19]	# Minimum redshift
-define	ST_AR			Memr[$1+20]	# Minimum roundness
-define	ST_ERADIUS		Memr[$1+21]	# Maximum elliptical radius
-define	ST_SRADIUS		Memr[$1+22]	# Maximum spiral radius
-define	ST_EGALMIX		Memr[$1+23]	# Egal fraction
-define	ST_ABSORPTION		Memr[$1+24]	# Absorption
+define	ST_Z			Memr[P2R($1+19)]# Minimum redshift
+define	ST_AR			Memr[P2R($1+20)]# Minimum roundness
+define	ST_ERADIUS		Memr[P2R($1+21)]# Maximum elliptical radius
+define	ST_SRADIUS		Memr[P2R($1+22)]# Maximum spiral radius
+define	ST_EGALMIX		Memr[P2R($1+23)]# Egal fraction
+define	ST_ABSORPTION		Memr[P2R($1+24)]# Absorption
 
 define	ST_SSEED		Meml[$1+25]	# Spatial function seed
 define	ST_LSEED		Meml[$1+26]	# Luminosity function seed
@@ -61,11 +61,11 @@ define	ST_SORDER		Memi[$1+29]	# Spatial spline order
 define	ST_LORDER		Memi[$1+30]	# Luminosity spline order
 define	ST_NSTARS		Memi[$1+31]	# Number of stars
 
-define	ST_RBINSIZE		Memr[$1+32]	# Radial histogram resolution
-define	ST_MBINSIZE		Memr[$1+33]	# Magnitude histogram resolution
-define	ST_DBINSIZE		Memr[$1+34]	# Diameter histogram resolution
-define	ST_EBINSIZE		Memr[$1+35]	# Roundness histogram resolution
-define	ST_PBINSIZE		Memr[$1+36]	# Posang histogram resolution
+define	ST_RBINSIZE		Memr[P2R($1+32)]# Radial histogram resolution
+define	ST_MBINSIZE		Memr[P2R($1+33)]# Magnitude histogram resolution
+define	ST_DBINSIZE		Memr[P2R($1+34)]# Diameter histogram resolution
+define	ST_EBINSIZE		Memr[P2R($1+35)]# Roundness histogram resolution
+define	ST_PBINSIZE		Memr[P2R($1+36)]# Posang histogram resolution
 
 define	ST_SPSTRING		Memc[P2C($1+37)]
 define	ST_LFSTRING		Memc[P2C($1+37+SZ_FNAME+1)]

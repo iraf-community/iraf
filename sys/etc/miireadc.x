@@ -5,7 +5,7 @@ include <mii.h>
 # MIIREADC -- Read a block of character data stored externally in MII format.
 # Data is returned in the machine independent character format.
 
-int procedure miireadc (fd, spp, maxchars)
+int procedure mii_readc (fd, spp, maxchars)
 
 int	fd			# input file
 int	spp[ARB]		# receives data
@@ -15,6 +15,8 @@ pointer	sp, bp
 int	pksize, nchars
 int	miipksize(), miinelem(), read()
 errchk	read()
+
+long	note()
 
 begin
 	pksize = miipksize (maxchars, MII_BYTE)

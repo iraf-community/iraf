@@ -25,7 +25,7 @@
  * system.
  */
 
-#define VERSION		"IRAFNET XC V2.3 May 21 2006"
+#define VERSION		"IRAFNET XC V2.4 Jan 21 2010"
 
 #define	ERR		(-1)
 #define	EOS		'\0'
@@ -72,7 +72,9 @@ char *fortlib[] = { "-lf2c",			/*  0  (host progs) */
 		    "-lf2c",			/*  1  */
 		    "-lm",			/*  2  */
 #ifndef LINUXPPC
-		    "-lcompat",			/*  3  */
+#ifndef LINUX64
+		    "",				/*  3  -lcompat */
+#endif
 #else
 		    "-lg2c",			/*  3  */
 #endif
@@ -216,6 +218,7 @@ int  nopt_flags	   = 1;				/* No. optimizer flags */
 #define isefile(str)	(getextn(str) == 'e')
 #define isafile(str)	(getextn(str) == 'a')
 #define isofile(str)	(getextn(str) == 'o')
+#define ispfile(str)	(getextn(str) == 'P')	/* func prototypes	*/
 
 
 #ifdef SOLARIS
@@ -256,7 +259,7 @@ int	hostprog 	= NO;
 int	voslibs 	= YES;
 int	nolibc 		= NO;
 int	usef2c 		= YES;
-int	useg95 		= YES;
+int	useg95 		= NO;
 int	userincs	= NO;
 #ifdef LINUXPPC
 int	useg2c 		= YES;
@@ -413,24 +416,24 @@ char	*argv[];
 	for (i=1;  (arg = argv[i]) != NULL;  i++) {
 	    if (arg[0] == '-') {
 		switch (arg[1]) {
-		case '/':
-		    /* Pass flag on without further interpretation.
-		     *     -/hostflag
-		     */
-		    lflags[nflags] = bp;
-		    *bp++ = '-';
-		    for (ip = &arg[2];  (*bp++ = *ip++);  )
-			;
-		    if (nflags++ >= MAXFLAG)
-			fatal ("Too many compiler options");
-#ifdef sun
-		    /* Check for an explicit architecture setting.  If given
-		     * this will override IRAFARCH.
-		     */
-		    if (strncmp (arg, "-/f", 3) == 0)
-			sprintf (floatoption, "-%s", &arg[2]);
-#endif
-		    break;
+                case '/':
+                    /* Pass flag on without further interpretation.
+                     *     "-/foo"    ->  "-foo"
+                     *     "-//foo"   ->  "foo"
+                     */
+                    lflags[nflags] = bp;
+                    ip = &arg[2];
+                    if (*ip == '/')
+                        ip++;
+                    else
+                        *bp++ = '-';
+
+                    while (*bp++ = *ip++)
+                        ;
+
+                    if (nflags++ >= MAXFLAG)
+                        fatal ("Too many compiler options");
+                    break;
 
 		case 'D':
 		    /* Pass a -D<define> flag on to the host compiler.
@@ -763,13 +766,26 @@ passflag:		    mkobject = YES;
 #ifdef MACOSX
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
-	        arglist[nargs++] = "-arch";
-	        if (strcmp (irafarch, "macosx") == 0) 
+	        if (strcmp (irafarch, "macosx") == 0) {
+	            arglist[nargs++] = "-arch";
 	    	    arglist[nargs++] = "ppc";
-	        else if (strcmp (irafarch, "macintel") == 0) 
+	            arglist[nargs++] = "-arch";
 	    	    arglist[nargs++] = "i386";
+	    	    arglist[nargs++] = "-m32";
+	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
+	        } else if (strcmp (irafarch, "macintel") == 0) {
+	            arglist[nargs++] = "-arch";
+	    	    arglist[nargs++] = "x86_64";
+	    	    arglist[nargs++] = "-m64";
+		}
 	    }
 	}
+#endif
+#if (defined(LINUX) && !defined(MACH64))
+	arglist[nargs++] = "-m32";
+#endif
+#if (defined(BSD))
+	arglist[nargs++] = "-m32";
 #endif
 
 #ifdef LINUXAOUT
@@ -830,13 +846,27 @@ passflag:		    mkobject = YES;
 #ifdef MACOSX
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
-	        arglist[nargs++] = "-arch";
-	        if (strcmp (irafarch, "macosx") == 0) 
-	    	    arglist[nargs++] = "ppc";
-	        else if (strcmp (irafarch, "macintel") == 0) 
-	    	    arglist[nargs++] = "i386";
+                if (strcmp (irafarch, "macosx") == 0) {
+                    arglist[nargs++] = "-arch";
+                    arglist[nargs++] = "ppc";
+                    arglist[nargs++] = "-arch";
+                    arglist[nargs++] = "i386";
+                    arglist[nargs++] = "-m32";
+	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
+                } else if (strcmp (irafarch, "macintel") == 0) {
+                    arglist[nargs++] = "-arch";
+                    arglist[nargs++] = "x86_64";
+                    arglist[nargs++] = "-m64";
+                }
+
 	    }
 	}
+#endif
+#if (defined(LINUX) && !defined(MACH64))
+	arglist[nargs++] = "-m32";
+#endif
+#if (defined(BSD))
+	arglist[nargs++] = "-m32";
 #endif
 
 #ifdef LINUXAOUT
@@ -897,6 +927,15 @@ passflag:		    mkobject = YES;
 	arglist[nargs++] = ccomp;
 	arglist[nargs++] = "-c";
 
+#ifdef MACH64
+	arglist[nargs++] = "-DMACH64";		/* needed for zmain.c */
+#endif
+#ifdef LINUX64
+	arglist[nargs++] = "-DLINUX64";		/* needed for zmain.c */
+#endif
+#if (defined(LINUX) && !defined(MACH64))
+	arglist[nargs++] = "-m32";
+#endif
 #ifdef LINUX
 	arglist[nargs++] = "-DLINUX";
 #ifdef REDHAT
@@ -910,6 +949,7 @@ passflag:		    mkobject = YES;
 #endif
 
 #ifdef BSD
+	arglist[nargs++] = "-m32";
 	arglist[nargs++] = "-DBSD";
 #endif
 
@@ -917,11 +957,19 @@ passflag:		    mkobject = YES;
 	arglist[nargs++] = "-DMACOSX";
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
-	        arglist[nargs++] = "-arch";
-	        if (strcmp (irafarch, "macosx") == 0) 
-	    	    arglist[nargs++] = "ppc";
-	        else if (strcmp (irafarch, "macintel") == 0) 
-	    	    arglist[nargs++] = "i386";
+                if (strcmp (irafarch, "macosx") == 0) {
+                    arglist[nargs++] = "-arch";
+                    arglist[nargs++] = "ppc";
+                    arglist[nargs++] = "-arch";
+                    arglist[nargs++] = "i386";
+                    arglist[nargs++] = "-m32";
+	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
+                } else if (strcmp (irafarch, "macintel") == 0) {
+                    arglist[nargs++] = "-arch";
+                    arglist[nargs++] = "x86_64";
+                    arglist[nargs++] = "-m64";
+                }
+
 	    }
 	}
 #endif
@@ -992,19 +1040,34 @@ passflag:		    mkobject = YES;
 
 #ifdef MACOSX
 	if (useg95 == 0 && (irafarch = os_getenv("IRAFARCH"))) {
-	    arglist[nargs++] = "-arch";
-	    if (strcmp (irafarch, "macosx") == 0) 
-	    	arglist[nargs++] = "ppc";
-	    else if (strcmp (irafarch, "macintel") == 0) 
-	    	arglist[nargs++] = "i386";
+            if (strcmp (irafarch, "macosx") == 0) {
+                arglist[nargs++] = "-arch";
+                arglist[nargs++] = "ppc";
+                arglist[nargs++] = "-arch";
+                arglist[nargs++] = "i386";
+                arglist[nargs++] = "-m32";
+	    	arglist[nargs++] = "-mmacosx-version-min=10.4";
+            } else if (strcmp (irafarch, "macintel") == 0) {
+                arglist[nargs++] = "-arch";
+                arglist[nargs++] = "x86_64";
+                arglist[nargs++] = "-m64";
+            }
 	}
 #endif
 
 #ifdef SOLARIS
 	arglist[nargs++] = "-Wl,-t";
 #endif
-#ifdef LINUX
+#if (defined(LINUX) && !defined(MACH64))
 	arglist[nargs++] = "-Wl,--defsym,mem_=0";
+#endif
+#if (defined(LINUX) && !defined(MACH64))
+	arglist[nargs++] = "-m32";
+#endif
+#if (defined(BSD))
+	arglist[nargs++] = "-m32";
+	arglist[nargs++] = "-L/usr/lib32";
+	arglist[nargs++] = "-B/usr/lib32";
 #endif
 #ifdef NEED_GCC_SPECS
 	{   char gcc_specs[SZ_PATHNAME];
@@ -1438,6 +1501,8 @@ char	*file;
 {
 	static  char xpp_path[SZ_PATHNAME+1], rpp_path[SZ_PATHNAME+1];
 	char	cmdbuf[SZ_CMDBUF], fname[SZ_FNAME];
+	char    iraf_h[SZ_PATHNAME];
+
 
 	lxfiles[nxfiles++] = file;
 	if (nxfiles > MAXFILE)
@@ -1464,10 +1529,22 @@ char	*file;
 	        sprintf (cmdbuf, "%s -R %s", xpp_path, file);
 	}
 
+
+	/* Include a custom 64-bit iraf.h file.
+	 */
+#if defined(LINUX64) || defined(MACH64)
+	memset (iraf_h, 0, SZ_PATHNAME);
+
+	if (os_sysfile ("iraf.h", iraf_h, SZ_PATHNAME) <= 0)
+	    strcpy (iraf_h, "iraf.h");
+	strcat (cmdbuf, " -h ");
+	strcat (cmdbuf, iraf_h);
+#else
 	if (foreigndefs) {
 	    strcat (cmdbuf, " -h ");
 	    strcat (cmdbuf, foreign_defsfile);
 	}
+#endif
 
 	errflag |= sys (cmdbuf);
 	chdot (file, 'r');
@@ -1535,7 +1612,8 @@ run (task, argv)
 char	*task;
 char	*argv[];
 {
-	int	waitpid, fork();
+	int	waitpid;
+	pid_t	fork();
 	char	path[SZ_PATHNAME];
 
 	if ((waitpid = fork()) == 0) {
@@ -1804,6 +1882,7 @@ isv13()
 	char	*name;
 	DIR	*dirp;
 
+return (0);
 #ifdef SOLARIS
 	return (v13 = 0);
 #else

@@ -1,0 +1,26 @@
+The VOLumes package is a possibly temporary collection of tasks related to
+manipulating and viewing 3d or in some cases 4d "volume" images, and a few
+other things.
+
+IMJOIN joins sets of N-dimensional images together along a specified axis.
+IM3DTRAN performs 3d image transposes; if appropriate [*,-*,*] type image
+sections are given as input, it also accomplishes rotates.  Tasks such as
+these may later be integrated into a standard IRAF package.
+
+PVOL projects through volume images, casting rays onto a set of output
+2d images distributed along a great circle around the volume image.  When
+the output images are displayed or recorded onto video and played back,
+the volume image appears to rotate.  Various translucency and opacity 
+algorithms are employed.
+
+I2SUN is a temporary task for converting IRAF images into Sun rasterfiles,
+primarily to take advantage of a Sun-specific MOVIE utility for viewing
+digital movies on a workstation screen; it will no longer be necessary when 
+the IRAF image display servers can display movies.
+
+# Not currently distributed:
+#VIDRECORD is an NOAO-specific IRAF script that is used to display successive
+#images from template or datacube on a display device connected to a recorder.
+#The recorder is assumed to be connected via rs-232 to a port on some IRAF node.
+#Other sites may wish to modify the associated host-level task that sends the
+#device-control commands to the rs-232 port.

@@ -13,16 +13,16 @@ define	TYPE_OUTPUT	Memi[$1+4]
 define	MEDIAN		Memi[$1+5]
 define	XMEDIAN		Memi[$1+6]
 define	YMEDIAN		Memi[$1+7]
-define	MEDIAN_PERCENT	Memr[$1+8]
+define	MEDIAN_PERCENT	Memr[P2R($1+8)]
 
 # pixel rejection parameters
 define	REJECT		Memi[$1+9]
 define	NGROW		Memi[$1+10]
 define	NITER		Memi[$1+11]
-define	LOWER		Memr[$1+12]
-define	UPPER		Memr[$1+13]
+define	LOWER		Memr[P2R($1+12)]
+define	UPPER		Memr[P2R($1+13)]
 
-define	DIV_MIN		Memr[$1+14]
+define	DIV_MIN		Memr[P2R($1+14)]
 
 # definitions for type_output
 define	FIT		1

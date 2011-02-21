@@ -31,9 +31,9 @@ RL_LIBRARY_NAME = readline
 srcdir = .
 VPATH = .:..
 topdir = ..
-BUILD_DIR = /u3/iraf/iraf.v214/iraf/pkg/ecl/readline
+BUILD_DIR = /iraf/iraf.v215/iraf/pkg/ecl/readline
 
-INSTALL = /usr/bin/install -c
+INSTALL = /usr/bin//install -c
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_DATA = ${INSTALL} -m 644
 

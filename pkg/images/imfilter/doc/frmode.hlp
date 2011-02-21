@@ -124,7 +124,7 @@ if the majority of pixels are greater than zhireject.
 REFERENCES
 
 A description of the fast median algorithm used here can be found in
-"Topics in Applied Physics: "Two-Dimensional Digital Signal Processing II:
+"Topics in Applied Physics: Two-Dimensional Digital Signal Processing II:
 Transforms and Median Filters", Volume 43, 1981, Springer-Verlag,
 edited by T.S. Huang, page 209.
 

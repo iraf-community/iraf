@@ -1,4 +1,6 @@
 
+# line 2 "parser.y"
+
 include	<ctype.h>
 include	<lexnum.h>
 include "../lib/lexer.h"
@@ -59,10 +61,9 @@ define	yyerrok		yyerrflag = 0
 define	YYMOVE		call amovi (Memi[$1], Memi[$2], YYOPLEN)
 define	YYERRCODE	256
 
-# line 461 "parser.y"
-
 define	YYNPROD		104
 define	YYLAST		337
+# line	1 "/iraf/iraf/lib/yaccpar.x"
 # Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
 
 # Parser for yacc output, translated to the IRAF SPP language.  The contents

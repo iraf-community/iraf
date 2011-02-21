@@ -13,10 +13,10 @@ long	v[IM_MAXDIM]		# physical coords of pixel
 
 int	sz_pixel, i
 long	pixel_index, dim_offset, char_offset0
-include	<szdtype.inc>
+include	<szpixtype.inc>
 
 begin
-	sz_pixel = ty_size[IM_PIXTYPE(im)]
+	sz_pixel = pix_size[IM_PIXTYPE(im)]
 	pixel_index = v[1]
 	dim_offset = 1
 

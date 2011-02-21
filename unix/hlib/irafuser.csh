@@ -1,15 +1,23 @@
 # IRAF definitions for the UNIX/csh user.  The additional variables iraf$ and
 # home$ should be defined in the user's .login file.
 
+
+set old_method		= 0
+
+if ($old_method == 1) then
+
 setenv OS_MACH	`uname -s | tr '[A-Z]' '[a-z]' | cut -c1-6`
-if (-f /etc/redhat-release) then
-    if (`uname -m` == "ppc") then
-	setenv MACH linuxppc
+
+if (`uname -m` == "x86_64") then
+    if ($OS_MACH == "darwin") then
+        setenv MACH darwin
+        setenv IRAFARCH darwin
     else
-	setenv MACH redhat
+        setenv MACH linux64
+        setenv IRAFARCH linux64
     endif
-else if (-f /etc/yellowdog-release || "`uname -m`" == "ppc") then
-	setenv MACH linuxppc
+else if (-f /etc/redhat-release) then
+    setenv MACH redhat
 else
     setenv MACH		`uname -s | tr '[A-Z]' '[a-z]'`
 endif
@@ -24,16 +32,28 @@ if ($MACH == "darwin") then
         endif
     else
         if ("`uname -m`" == "i386") then
-            setenv MACH macintel
-            setenv IRAFARCH macintel
-        else
             setenv MACH macosx
             setenv IRAFARCH macosx
+        else if ("`uname -m`" == "x86_64") then
+            setenv MACH macintel
+            setenv IRAFARCH macintel
+        else 
+            setenv MACH ipad
+            setenv IRAFARCH ipad
         endif
     endif
 else if ($OS_MACH == "cygwin") then
     setenv MACH cygwin
 endif
+
+else		# old_method
+            
+    setenv MACH 	`$iraf/unix/hlib/irafarch.csh`
+    setenv IRAFARCH 	`$iraf/unix/hlib/irafarch.csh`
+            
+endif		# old_method
+
+
 
 setenv	hostid	unix
 setenv	host	${iraf}unix/
@@ -49,10 +69,10 @@ setenv	RANLIB	ranlib
 
 switch ($MACH)
 case freebsd:
-    setenv HSI_CF "-O -DBSD -DPOSIX -w -Wunused"
-    setenv HSI_XF "-Inolibc -/DBSD -w -/Wunused"
-    setenv HSI_FF "-O"
-    setenv HSI_LF "-static"
+    setenv HSI_CF "-O -DBSD -DPOSIX -w -Wunused -m32"
+    setenv HSI_XF "-Inolibc -/DBSD -w -/Wunused -/m32"
+    setenv HSI_FF "-O -DBLD_KERNEL -m32"
+    setenv HSI_LF "-static -m32 -B/usr/lib32 -L/usr/lib32"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS "-lcompat"
@@ -60,18 +80,13 @@ case freebsd:
     breaksw
 
 case macosx:
-    setenv CC cc
-    setenv CC_f2c cc
-    setenv F2C $hbin/f2c.e
+    setenv CC 	cc
+    setenv F2C 	$hbin/f2c.e
 
-    setenv HSI_CF "-O -DMACOSX -w -Wunused -arch ppc"
-    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused"
-    if (`uname -r` == "5.5") then
-	setenv HSI_CF 	"$HSI_CF -DOLD_MACOSX"
-	setenv HSI_XF 	"$HSI_XF -DOLD_MACOSX"
-    endif
-    setenv HSI_FF "-O -arch ppc"
-    setenv HSI_LF "-arch ppc"
+    setenv HSI_CF "-O -DMACOSX -w -Wunused -arch ppc -arch i386 -m32 -mmacosx-version-min=10.4"
+    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//ppc -/arch -//i386 -/mmacosx-version-min=10.4"
+    setenv HSI_FF "-O -arch ppc -arch i386 -m32 -DBLD_KERNEL -mmacosx-version-min=10.4"
+    setenv HSI_LF "-arch ppc -arch i386 -m32 -mmacosx-version-min=10.4"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS ""
@@ -79,56 +94,51 @@ case macosx:
     breaksw
 
 case macintel:
-    setenv CC cc
-    #setenv F77	gcc
-    setenv CC_f2c cc
-    setenv F2C $hbin/f2c.e
+    setenv CC 	cc
+    setenv F2C 	$hbin/f2c.e
 
-    setenv HSI_CF "-O -DMACOSX -DMACINTEL -w -Wunused -arch i386"
-    setenv HSI_FF "-O -arch i386"
-    setenv HSI_LF "-arch i386"
-    setenv HSI_XF "-Inolibc -/DMACOSX -/DMACINTEL -w -/Wunused"
+    setenv HSI_CF "-O -DMACOSX -DMACINTEL -DMACH64 -w -Wunused -m64"
+    setenv HSI_XF "-Inolibc -/DMACOSX -/DMACINTEL -w -/Wunused -/DMACH64 -/m64"
+    setenv HSI_FF "-O -m64 -DMACH64 -DBLD_KERNEL"
+    setenv HSI_LF "-m64 -DMACH64 "
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
-    if ($?IRAF_UNIBIN) then
-        setenv HSI_CF "$HSI_CF -arch ppc -arch i386"
-        setenv HSI_FF "$HSI_FF -arch ppc -arch i386"
-        setenv HSI_LF "$HSI_LF"
-        setenv HSI_LFLAGS "$HSI_LFLAGS -arch ppc -arch i386"
-    endif
     setenv HSI_OSLIBS ""
     set    mkzflags = "'lflags=-z'"
     breaksw
 
+case ipad:
+    setenv CC 	cc
+    setenv F2C 	$hbin/f2c.e
+
+    setenv XC_CFLAGS	"-I/var/include"
+    setenv HSI_CF "-O -I/var/include -DMACOSX -DMACINTEL -DIPAD -w -Wunused"
+    setenv HSI_XF "-Inolibc -/DMACOSX -/DMACINTEL -/DIPAD -w -/Wunused"
+    setenv HSI_FF "-O -DBLD_KERNEL"
+    setenv HSI_LF ""
+    setenv HSI_F77LIBS ""
+    setenv HSI_LFLAGS ""
+    setenv HSI_OSLIBS ""
+    set    mkzflags = "'lflags=-z'"
+    breaksw
+
+case linux64:
+    setenv HSI_CF "-g -DLINUX -DREDHAT -DPOSIX -DSYSV -DLINUX64 -DMACH64 -w -m64"
+    setenv HSI_XF "-g -Inolibc -w -/m64 -/Wunused"
+    setenv HSI_FF "-g -m64 -DBLD_KERNEL"
+    setenv HSI_LF "-m64 "
+    setenv HSI_F77LIBS ""
+    setenv HSI_LFLAGS ""
+    setenv HSI_OSLIBS ""
+    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
+    breaksw
+
 case linux:
-    setenv HSI_CF "-O -DLINUX -DPOSIX -DSYSV -w -Wunused"
-    setenv HSI_XF "-Inolibc -w -/Wunused"
-    setenv HSI_FF "-O"
-    setenv HSI_LF ""
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
-    setenv HSI_OSLIBS ""
-    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
-    breaksw
-
 case redhat:
-    setenv HSI_CF "-O -DLINUX -DREDHAT -DPOSIX -DSYSV -w -Wunused"
-    setenv HSI_XF "-Inolibc -w -/Wunused"
-    setenv HSI_FF "-O"
-    #setenv HSI_LF "-Wl,-Bstatic"
-    setenv HSI_LF ""
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
-    setenv HSI_OSLIBS ""
-    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
-    breaksw
-
-case suse:
-    setenv HSI_CF "-O -DSUSE -DLINUX -DPOSIX -DSYSV -w -Wunused"
-    setenv HSI_XF "-Inolibc -w -/Wunused"
-    setenv HSI_FF "-O"
-    #setenv HSI_LF "-Wl,-Bstatic -specs=/iraf/iraf//unix/bin.suse/gcc-specs"
-    setenv HSI_LF "-specs=/iraf/iraf//unix/bin.suse/gcc-specs"
+    setenv HSI_CF "-O -DLINUX -DREDHAT -DPOSIX -DSYSV -w -m32 -Wunused"
+    setenv HSI_XF "-Inolibc -w -/Wunused -/m32"
+    setenv HSI_FF "-O -DBLD_KERNEL -m32"
+    setenv HSI_LF "-m32"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS ""
@@ -150,17 +160,6 @@ case sunos:
     set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
     breaksw
 
-case linuxppc:
-    setenv HSI_CF "-O -DLINUX -DREDHAT -DLINUXPPC -DPOSIX -DSYSV -w -Wunused"
-    setenv HSI_XF "-Inolibc -w -/Wunused"
-    setenv HSI_FF "-O"
-    setenv HSI_LF ""
-    setenv HSI_F77LIBS ""
-    setenv HSI_LFLAGS ""
-    setenv HSI_OSLIBS ""
-    set    mkzflags = "'lflags=-Nxz -/Wl,-Bstatic'"
-    breaksw
-
 case cygwin:
     setenv HSI_CF "-O -DCYGWIN -DLINUX -DREDHAT -DPOSIX -DSYSV -w -Wunused"
     setenv HSI_XF "-Inolibc -w -/Wunused -/DCYGWIN"
@@ -179,10 +178,20 @@ default:
     breaksw
 endsw
 
+
+# Prepend a user <iraf.h> file to the compile flags in case we don't
+# install as root.
+#
+setenv HSI_CF  "-I${HOME}/.iraf/ $HSI_CF"
+setenv HSI_FF  "-I${HOME}/.iraf/ $HSI_FF"
+setenv HSI_LF  "-I${HOME}/.iraf/ $HSI_LF"
+setenv HSI_XF  "-I${HOME}/.iraf/ $HSI_XF"
+
+
 # The following determines whether or not the VOS is used for filename mapping.
 if (-f ${iraf}lib/libsys.a) then
 	setenv	HSI_LIBS\
-    "${hlib}libboot.a ${iraf}lib/libsys.a ${iraf}lib/libvops.a ${hlib}libos.a"
+    "${hlib}libboot.a ${iraf}lib/libsys.a ${iraf}lib/libvops.a ${hlib}libos.a ${hbin}libf2c.a -lm"
 else
 	setenv	HSI_CF "$HSI_CF -DNOVOS"
 	setenv	HSI_LIBS "${hlib}libboot.a ${hlib}libos.a"

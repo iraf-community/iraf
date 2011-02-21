@@ -9,13 +9,17 @@
 
 /* ZGHOST -- Get the network name of the host computer.
  */
-ZGHOST (outstr, maxch)
-PKCHAR	*outstr;		/* receives host name		*/
-XINT	*maxch;
+int
+ZGHOST (
+  PKCHAR  *outstr,		/* receives host name		*/
+  XINT	  *maxch 
+)
 {
 	char namebuf[SZ_FNAME];
 
 	gethostname (namebuf, SZ_FNAME);
 	strncpy ((char *)outstr, namebuf, *maxch);
 	((char *)outstr)[*maxch] = EOS;
+
+	return (XOK);
 }

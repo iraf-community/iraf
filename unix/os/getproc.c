@@ -17,8 +17,8 @@
 /* UID_EXECUTING -- Search the process table to determine if the given UID
  * belongs to any currently running processes.
  */
-uid_executing (uid)
-register int	uid;
+int
+uid_executing (int uid)
 {
 	register struct proc *pt;
 	register int	found, kmem, i;
@@ -48,9 +48,10 @@ register int	uid;
 /* GET_PROCESSTABLE -- Take a snapshot of the current kernel process table.
  */
 struct proc *
-get_processtable (kmem, o_nproc)
-int	kmem;			/* fd of kernel memory file */
-int	*o_nproc;		/* number of processes in output table */
+get_processtable (
+    int	kmem,			/* fd of kernel memory file */
+    int	*o_nproc		/* number of processes in output table */
+)
 {
 	char	*symbols = SYMBOLS;
 	struct	proc *pt = NULL;
@@ -109,8 +110,8 @@ kerr:	    fprintf (stderr, "Cannot read kernel memory\n");
  * belongs to any currently running processes.  This is straightfoward for
  * Solaris since each process has a file entry in /proc.
  */
-uid_executing (uid)
-register int	uid;
+int
+uid_executing (int uid)
 {
 	register struct dirent *direntp;
 	register DIR *dirp;
