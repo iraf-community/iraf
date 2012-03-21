@@ -1,4 +1,5 @@
 include <tbset.h>
+include "tblerr.h"
 
 # tbfpri -- copy primary header
 # This routine may copy the primary header of an input FITS file to
@@ -31,13 +32,14 @@ pointer ifname, ofname	# input & output file names
 pointer os_infile, os_outfile	# host operating system file names
 pointer fname, extn	# for discarding directory from output file name
 pointer dummy		# misc ignored strings
+pointer	intbl, cnv, url
 int	ifd[2]		# C pointer for input (template) FITS file
 int	ofd[2]		# C pointer for output FITS file
 # These variables and equivalence statements are used to force 8-byte
 # alignment of ifd and ofd.
-double	d_ifd, d_ofd
-equivalence (ifd, d_ifd)
-equivalence (ofd, d_ofd)
+#double	d_ifd, d_ofd
+#equivalence (ifd, d_ifd)
+#equivalence (ofd, d_ofd)
 int	naxis		# NAXIS from primary header of input
 int	status		# zero is OK
 int	itype, otype	# file type based on filename extension
@@ -46,13 +48,18 @@ int	exists		# YES if the file exists
 int	blocksize
 int	nchar
 int	morekeys	# extra space (none) in primary header
-int	fnroot(), fnextn(), tbparse(), tbttyp()
+int	fnroot(), fnextn(), tbparse(), tbttyp(), vot_to_fits()
+int	access(), strncmp()
+bool	is_votable()
 errchk	tbferr, tbparse, tbttyp, vfn_expand_ldir
 
 begin
 	call smark (sp)
 	call salloc (ifname, SZ_FNAME, TY_CHAR)
 	call salloc (ofname, SZ_FNAME, TY_CHAR)
+	call salloc (intbl, SZ_PATHNAME, TY_CHAR)
+	call salloc (cnv, SZ_PATHNAME, TY_CHAR)
+	call salloc (url, SZ_PATHNAME, TY_CHAR)
 	call salloc (dummy, SZ_FNAME, TY_CHAR)
 	call salloc (os_infile, SZ_FNAME, TY_CHAR)
 	call salloc (os_outfile, SZ_FNAME, TY_CHAR)
@@ -73,8 +80,32 @@ begin
 	    return
 	}
 
+
+	# Check if we're opening a URL, and whether it is already cached.
+        call aclrc (Memc[cnv], SZ_PATHNAME)
+        call aclrc (Memc[intbl], SZ_PATHNAME)
+        if (strncmp ("http:", intable, 5) == 0) {
+            call strcpy (intable, Memc[url], SZ_PATHNAME)
+            call fcname ("cache$", Memc[url], "f", Memc[intbl], SZ_PATHNAME)
+            call strcpy (Memc[intbl], Memc[cnv], SZ_PATHNAME)
+            call strcat (".fits", Memc[cnv], SZ_PATHNAME)
+
+            if (access (Memc[cnv], 0, 0) == NO) {
+                call fcadd ("cache$", Memc[url], "", Memc[intbl], SZ_PATHNAME)
+                if (access (Memc[cnv],0,0) == YES && is_votable (Memc[cnv])) {
+                    if (vot_to_fits (Memc[intbl], Memc[intbl]) != OK) {
+                        call error (ER_TBCONVERT,
+                            "tbtopn: cannot convert table format")
+                    }
+                }
+            } else
+                call strcpy (Memc[cnv], Memc[intbl], SZ_PATHNAME)
+	} else
+            call strcpy (intable, Memc[intbl], SZ_PATHNAME)
+
+
 	# Get name of input file, and get file type.
-	nchar = tbparse (intable, Memc[ifname], Memc[dummy], SZ_FNAME, hdu)
+	nchar = tbparse (Memc[intbl], Memc[ifname], Memc[dummy], SZ_FNAME, hdu)
 	call vfn_expand_ldir (Memc[ifname], Memc[os_infile], SZ_FNAME)
 
 	itype = tbttyp (Memc[ifname], exists)	# exists for input is ignored

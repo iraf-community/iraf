@@ -95,7 +95,7 @@ Wfits normally writes \fIblocking_factor\fR * 2880 byte records,
 where \fIblocking_factor\fR is an integer from 1 to 10.
 If \fIblocking_factor\fR = 0, wfits uses the default FITS blocking
 factor specified for the device  by the "fb" parameter in the
-file dev$tapecap, or 1 if if the "fb" parameter is not present. For
+file dev$tapecap, or 1 if the "fb" parameter is not present. For
 devices which support variable block sizes, e.g. 9-track tapes, exabytes
 and dats, "fb" is normally set to 10.
 The user may override this value by setting \fIblocking_factor\fR
@@ -124,7 +124,7 @@ IRAF data is read from disk and written to the specified destination,
 either disk or magnetic tape. The FITS header may optionally be printed
 on the standard output as either a full listing or a short description,
 with or without creating an output image file. If a the default value
-of bitpix (default = 0) is entered, wfits will select the the appropriate
+of bitpix (default = 0) is entered, wfits will select the appropriate
 bitpix value based on the precision of the IRAF data. Otherwise the
 user value is used and loss of precision is possible. Two data scaling
 options are available. In autoscale mode wfits calculates the appropriate
@@ -146,7 +146,7 @@ and scaling parameters.
 2. Convert a list of IRAF image files to FITS image files on disk,
 allowing wfits to select the appropriate bitpix and scaling parameters.
 In the first example below the images specified by the template are written
-to files fits001, fits002, etc. In the second second the list of input images
+to files fits001, fits002, etc. In the second the list of input images
 specified one per line in the text file imlist are written to the
 files specified one per line in the text file fitslist.
 

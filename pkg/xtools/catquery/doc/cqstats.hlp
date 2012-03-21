@@ -20,7 +20,7 @@ ARGUMENTS
 The catalog / survey configuration file descriptor.
 .le
 .ls parameter
-The parameter to be returned.  The string parameters parameters defined
+The parameter to be returned.  The string parameters defined
 in cq.h are:
 .nf
 	CQCATDB		# the name of the configuration file

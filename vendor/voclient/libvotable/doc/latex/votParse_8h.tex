@@ -1,0 +1,1201 @@
+\hypertarget{votParse_8h}{
+\section{votParse.h File Reference}
+\label{votParse_8h}\index{votParse.h@{votParse.h}}
+}
+Public procedure declarations for the VOTable interface.  
+
+
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\#define \hyperlink{votParse_8h_ace45ef90989b1c716603f996516f8b7}{NUM\_\-ELEMENTS}~25
+\item 
+\hypertarget{votParse_8h_a832b850219535ab1bd54e0386622dc1}{
+\#define \textbf{TY\_\-ROOT}~0}
+\label{votParse_8h_a832b850219535ab1bd54e0386622dc1}
+
+\item 
+\hypertarget{votParse_8h_135ddc4864a81538a2f034a5ed848ccf}{
+\#define \textbf{TY\_\-VOTABLE}~1}
+\label{votParse_8h_135ddc4864a81538a2f034a5ed848ccf}
+
+\item 
+\hypertarget{votParse_8h_63df219e760b82aa181f9aec48f7ba3f}{
+\#define \textbf{TY\_\-RESOURCE}~2}
+\label{votParse_8h_63df219e760b82aa181f9aec48f7ba3f}
+
+\item 
+\hypertarget{votParse_8h_818a38972b006d7f9143a8c05092dc56}{
+\#define \textbf{TY\_\-FIELD}~3}
+\label{votParse_8h_818a38972b006d7f9143a8c05092dc56}
+
+\item 
+\hypertarget{votParse_8h_f0ba471f9d5dc3d024767b82c585dd09}{
+\#define \textbf{TY\_\-PARAM}~4}
+\label{votParse_8h_f0ba471f9d5dc3d024767b82c585dd09}
+
+\item 
+\hypertarget{votParse_8h_d0c58c62b549f55bcd0ad24cd178895a}{
+\#define \textbf{TY\_\-INFO}~5}
+\label{votParse_8h_d0c58c62b549f55bcd0ad24cd178895a}
+
+\item 
+\hypertarget{votParse_8h_4559aa043e7dbfab26af37e2adb0e9d9}{
+\#define \textbf{TY\_\-TR}~6}
+\label{votParse_8h_4559aa043e7dbfab26af37e2adb0e9d9}
+
+\item 
+\hypertarget{votParse_8h_507b3dd939d538845ebaa051867ed151}{
+\#define \textbf{TY\_\-TD}~7}
+\label{votParse_8h_507b3dd939d538845ebaa051867ed151}
+
+\item 
+\hypertarget{votParse_8h_bc24ef4260e3bdadaae175090f0c18f4}{
+\#define \textbf{TY\_\-TABLE}~8}
+\label{votParse_8h_bc24ef4260e3bdadaae175090f0c18f4}
+
+\item 
+\hypertarget{votParse_8h_961903e872b8931221ee868a9e6271bb}{
+\#define \textbf{TY\_\-STREAM}~9}
+\label{votParse_8h_961903e872b8931221ee868a9e6271bb}
+
+\item 
+\hypertarget{votParse_8h_142448de2054dc9ea788ed9fd6c9e3b2}{
+\#define \textbf{TY\_\-FITS}~10}
+\label{votParse_8h_142448de2054dc9ea788ed9fd6c9e3b2}
+
+\item 
+\hypertarget{votParse_8h_cfc374b14f75d09131592c8ec86c55da}{
+\#define \textbf{TY\_\-GROUP}~11}
+\label{votParse_8h_cfc374b14f75d09131592c8ec86c55da}
+
+\item 
+\hypertarget{votParse_8h_24c9142c9bc8148935afb43eb78b8504}{
+\#define \textbf{TY\_\-FIELDREF}~12}
+\label{votParse_8h_24c9142c9bc8148935afb43eb78b8504}
+
+\item 
+\hypertarget{votParse_8h_aa8d72abe715413fa0254171406f073d}{
+\#define \textbf{TY\_\-PARAMREF}~13}
+\label{votParse_8h_aa8d72abe715413fa0254171406f073d}
+
+\item 
+\hypertarget{votParse_8h_7d6de4c04e6841a5c80b6c76ce0713df}{
+\#define \textbf{TY\_\-MIN}~14}
+\label{votParse_8h_7d6de4c04e6841a5c80b6c76ce0713df}
+
+\item 
+\hypertarget{votParse_8h_34fb8f38fb1fb44efb8b43da1aa429d5}{
+\#define \textbf{TY\_\-MAX}~15}
+\label{votParse_8h_34fb8f38fb1fb44efb8b43da1aa429d5}
+
+\item 
+\hypertarget{votParse_8h_121940b63885291f0985c2971d274c7e}{
+\#define \textbf{TY\_\-OPTION}~16}
+\label{votParse_8h_121940b63885291f0985c2971d274c7e}
+
+\item 
+\hypertarget{votParse_8h_1da20f5a57261b08deb23234bbacf444}{
+\#define \textbf{TY\_\-VALUES}~17}
+\label{votParse_8h_1da20f5a57261b08deb23234bbacf444}
+
+\item 
+\hypertarget{votParse_8h_d7d509f638ab642c3ed2884aa7514c85}{
+\#define \textbf{TY\_\-LINK}~18}
+\label{votParse_8h_d7d509f638ab642c3ed2884aa7514c85}
+
+\item 
+\hypertarget{votParse_8h_d8680a396a46475feb48191e866a91d7}{
+\#define \textbf{TY\_\-DATA}~19}
+\label{votParse_8h_d8680a396a46475feb48191e866a91d7}
+
+\item 
+\hypertarget{votParse_8h_2a6eb3ef209064256d4a6d48f9692e1b}{
+\#define \textbf{TY\_\-DESCRIPTION}~20}
+\label{votParse_8h_2a6eb3ef209064256d4a6d48f9692e1b}
+
+\item 
+\hypertarget{votParse_8h_6659bbf505e460ee92f6aaa4454b6595}{
+\#define \textbf{TY\_\-TABLEDATA}~21}
+\label{votParse_8h_6659bbf505e460ee92f6aaa4454b6595}
+
+\item 
+\hypertarget{votParse_8h_e4363421d1d10f2fb5fe6c6e72469f9e}{
+\#define \textbf{TY\_\-BINARY}~22}
+\label{votParse_8h_e4363421d1d10f2fb5fe6c6e72469f9e}
+
+\item 
+\hypertarget{votParse_8h_e810b38d3da160c2b889050581b4622a}{
+\#define \textbf{TY\_\-COOSYS}~23}
+\label{votParse_8h_e810b38d3da160c2b889050581b4622a}
+
+\item 
+\hypertarget{votParse_8h_0d87be648b329a9700a1fca67bfa121e}{
+\#define \textbf{TY\_\-DEFINITIONS}~24}
+\label{votParse_8h_0d87be648b329a9700a1fca67bfa121e}
+
+\item 
+\hypertarget{votParse_8h_ba51915c87d64af47fb1cc59348961c9}{
+\#define \textbf{OK}~0}
+\label{votParse_8h_ba51915c87d64af47fb1cc59348961c9}
+
+\item 
+\hypertarget{votParse_8h_735563036dced0b7d6cc98f97ea4978b}{
+\#define \textbf{ERR}~1}
+\label{votParse_8h_735563036dced0b7d6cc98f97ea4978b}
+
+\item 
+\hypertarget{votParse_8h_3b0e3f6e2463bfe3ab40dd8377272fb6}{
+\#define \textbf{handle\_\-t}~int}
+\label{votParse_8h_3b0e3f6e2463bfe3ab40dd8377272fb6}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+handle\_\-t \hyperlink{votParse_8h_9949868e8d3fcb547d15c5c9f2cdb76f}{vot\_\-openVOTABLE} (char $\ast$arg)
+\begin{CompactList}\small\item\em Parse a VOTable and return a handle to it. \item\end{CompactList}\item 
+void \hyperlink{votParse_8h_f4d1bf001b1268e52a9c2bcf45c8a435}{vot\_\-closeVOTABLE} (handle\_\-t vot)
+\begin{CompactList}\small\item\em Destroy the root node and all of it's children. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_5df6ad7d9312f05a27ccc3252f1c5d11}{vot\_\-getRESOURCE} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the RESOURCE node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_4e3e3176986838c27989df64c426b30e}{vot\_\-getTABLE} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the TABLE node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_20a84235c2704f19afb05fd2db7fcf07}{vot\_\-getFIELD} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the FIELD node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_05535a56a31eb34b865bd7d592fe9292}{vot\_\-getDATA} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the DATA node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_4a558147c79deacfd6ca4d0b93ee100d}{vot\_\-getTABLEDATA} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the TABLEDATA node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_2e9ba287229978519224dfea2ecc984f}{vot\_\-getTR} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the TR node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_824a7f85d4c8bac6d5fd6cfb8b3b3810}{vot\_\-getTD} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the TD node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_014fabbc855181d68dfea2ddfd0fc1a2}{vot\_\-getBINARY} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the BINARY node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_fadc14723954225b56a12b48ab78a50b}{vot\_\-getFITS} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the FITS node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_97433b62adc9545b4f1971cfbcb4819d}{vot\_\-getGROUP} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the GROUP node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_0fd5f65c27adc084af8ea3f611556c52}{vot\_\-getFIELDRef} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the FIELDref node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_ded8082390ce6a5b085ac15f0212ddd7}{vot\_\-getPARAMRef} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the PARAMRef node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_41964f8885bc352af793bf552541d5e4}{vot\_\-getDESCRIPTION} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the DESCRIPTION node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_42e5538ca7d06238d7242c40daaf9bf7}{vot\_\-getPARAM} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the PARAM node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_7de82f980273251a4a00df7435b29948}{vot\_\-getINFO} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the INFO node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_4bae0337352f1ba53865e1419917dc30}{vot\_\-getSTREAM} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the STREAM node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_b019a523ddca596e9f80c284e5954b44}{vot\_\-getVALUES} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the VALUES node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_a00dc12eff5fe09c71ff0c5c86aadfaf}{vot\_\-getMIN} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the MIN node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_89897e1c3ead93bef9b107707fa2eda5}{vot\_\-getMAX} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the MAX node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_6120eea01cc0c348fc99dd9c0e6dc060}{vot\_\-getOPTION} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the OPTION node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_729cd64c53d713a473d611dc7941e4f3}{vot\_\-getLINK} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the LINK node from the parent handle. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_33e1c4a4f3752beeb62fd8d88d1d2ca2}{vot\_\-getCOOSYS} (handle\_\-t handle)
+\begin{CompactList}\small\item\em Gets the COOSYS node from the parent handle. \item\end{CompactList}\item 
+\hypertarget{votParse_8h_22027ab5bee16020fd23a4a2132a80d8}{
+int \textbf{vot\_\-getDATAType} (handle\_\-t data\_\-h)}
+\label{votParse_8h_22027ab5bee16020fd23a4a2132a80d8}
+
+\item 
+char $\ast$ \hyperlink{votParse_8h_7d034113dc25f5b11f24eaf4ce33b73e}{vot\_\-getDATATypeString} (handle\_\-t data\_\-h)
+\begin{CompactList}\small\item\em Returns the type of the DATA element. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_d87843bde9d0d99c5e20311f8820eba6}{vot\_\-newNode} (handle\_\-t parent, int type)
+\begin{CompactList}\small\item\em Creates a new blank unlinked node. \item\end{CompactList}\item 
+void \hyperlink{votParse_8h_59b75d46df34b8bc3a1416b69fe04691}{vot\_\-freeNode} (handle\_\-t delete\_\-me)
+\begin{CompactList}\small\item\em Destroys the node and all of it's children. \item\end{CompactList}\item 
+void \hyperlink{votParse_8h_e1f1571e52d088bad9485ef5bad8e55a}{vot\_\-attachNode} (handle\_\-t parent, handle\_\-t new)
+\begin{CompactList}\small\item\em Adds a node as a child of parent. \item\end{CompactList}\item 
+void \hyperlink{votParse_8h_1806a8f080d37db9ee12dba84f3c7378}{vot\_\-deleteNode} (handle\_\-t element)
+\begin{CompactList}\small\item\em Destroys the node and all of it's children. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_b180aad1ee8971e252f8ececd5d245da}{vot\_\-copyElement} (handle\_\-t src\_\-h, handle\_\-t parent\_\-h)
+\begin{CompactList}\small\item\em Adds a node as a child of parent. \item\end{CompactList}\item 
+int \hyperlink{votParse_8h_48775f435829934c1f2b9022af12a86a}{vot\_\-getNCols} (handle\_\-t tdata\_\-h)
+\begin{CompactList}\small\item\em Return the nuber of columns in the table structure. \item\end{CompactList}\item 
+int \hyperlink{votParse_8h_67e90b853666bbc4ef40ead211a116bd}{vot\_\-getNRows} (handle\_\-t tdata\_\-h)
+\begin{CompactList}\small\item\em Return the nuber of columns in the table structure. \item\end{CompactList}\item 
+char $\ast$ \hyperlink{votParse_8h_b377b70336b7bf129f1cb32cd3b3f4f2}{vot\_\-getTableCell} (handle\_\-t tdata\_\-h, int row, int col)
+\begin{CompactList}\small\item\em Return the nuber of columns in the structure. \item\end{CompactList}\item 
+int \hyperlink{votParse_8h_02de38f123a9b7cbd24bee996b8ecc10}{vot\_\-getLength} (handle\_\-t elem\_\-h)
+\begin{CompactList}\small\item\em Return the number of sibling Elements of the same type. \item\end{CompactList}\item 
+int \hyperlink{votParse_8h_6b7565c412ba45c5578a61dda5afd1c1}{vot\_\-getNumberOf} (handle\_\-t elem\_\-h, int type)
+\begin{CompactList}\small\item\em Return the number of sibling Elements of the type. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_a11bb4e59e1dd773771e25ce7a40bb61}{vot\_\-findByAttr} (handle\_\-t parent, char $\ast$name, char $\ast$value)
+\begin{CompactList}\small\item\em Get a handle to an \hyperlink{structElement}{Element} with the requested attribute. \item\end{CompactList}\item 
+handle\_\-t $\ast$ \hyperlink{votParse_8h_03251a012c19d03ea436a2191ffc48ec}{vot\_\-findInGroup} (handle\_\-t group, int type)
+\begin{CompactList}\small\item\em Return a handle array of the requested \hyperlink{structElement}{Element} type. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_dc2e5f39a6273bca5fa0fdf46b2c3751}{vot\_\-getNext} (handle\_\-t elem\_\-h)
+\begin{CompactList}\small\item\em Return a handle\_\-t of the next \hyperlink{structElement}{Element} of the same type. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_4fb6813e03dd7b75710cfaa27f3ffb2e}{vot\_\-getSibling} (handle\_\-t elem\_\-h)
+\begin{CompactList}\small\item\em Return a handle\_\-t of the next \hyperlink{structElement}{Element}. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_e0b096dc07c30708e6e86cf81750a01f}{vot\_\-getChild} (handle\_\-t elem\_\-h)
+\begin{CompactList}\small\item\em Return a handle\_\-t of the child \hyperlink{structElement}{Element}. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_8930fc6a9ea4dec1d8694582d93ee146}{vot\_\-getParent} (handle\_\-t elem\_\-h)
+\begin{CompactList}\small\item\em Return the handle of the parent \hyperlink{structElement}{Element}. \item\end{CompactList}\item 
+handle\_\-t \hyperlink{votParse_8h_fc2659e6a84d200c4b01c9460acaefb1}{vot\_\-getChildOfType} (handle\_\-t elem\_\-h, int type)
+\begin{CompactList}\small\item\em Get the handle of the next \hyperlink{structElement}{Element} of the same type. \item\end{CompactList}\item 
+int \hyperlink{votParse_8h_3136956d2035d6b297aa623f87f4b807}{vot\_\-valueOf} (handle\_\-t elem\_\-h)
+\begin{CompactList}\small\item\em Return type of the \hyperlink{structElement}{Element}. \item\end{CompactList}\item 
+int \hyperlink{votParse_8h_1c319696d8efc593266b9409303054c6}{vot\_\-typeOf} (handle\_\-t elem\_\-h)
+\begin{CompactList}\small\item\em Return type of the \hyperlink{structElement}{Element}. \item\end{CompactList}\item 
+int \hyperlink{votParse_8h_6faba02860fcb0a51315f1863fd29094}{vot\_\-setValue} (handle\_\-t elem\_\-h, char $\ast$value)
+\begin{CompactList}\small\item\em Set the Value for the ELEMENT. \item\end{CompactList}\item 
+char $\ast$ \hyperlink{votParse_8h_b1636a63f89ad6f2994855187d85777f}{vot\_\-getValue} (handle\_\-t elem\_\-h)
+\begin{CompactList}\small\item\em Get the Value for the ELEMENT. \item\end{CompactList}\item 
+int \hyperlink{votParse_8h_2b73f93210316d7714201e751cad77ad}{vot\_\-setAttr} (handle\_\-t elem\_\-h, char $\ast$attr, char $\ast$value)
+\begin{CompactList}\small\item\em Set the attribute for the \hyperlink{structElement}{Element}. \item\end{CompactList}\item 
+char $\ast$ \hyperlink{votParse_8h_5c10aa73cde19e122f5bc85a1a006ff8}{vot\_\-getAttr} (handle\_\-t elem\_\-h, char $\ast$attr)
+\begin{CompactList}\small\item\em Return the attribute for the \hyperlink{structElement}{Element}. \item\end{CompactList}\item 
+void \hyperlink{votParse_8h_d04bd4a950e829cb2b473e246806cea7}{vot\_\-setWarnings} (int value)
+\begin{CompactList}\small\item\em Set the warning level. \item\end{CompactList}\item 
+void \hyperlink{votParse_8h_151bcdd0133b4b6e1a8d8d11d2008ea5}{vot\_\-writeVOTable} (handle\_\-t node, FILE $\ast$fd)
+\begin{CompactList}\small\item\em Write the VOTable to the file descriptor. \item\end{CompactList}\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Public procedure declarations for the VOTable interface. 
+
+VOTPARSE.H -- Public procedure declarations for the VOTable interface.
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick and Eric Timmermann \end{Desc}
+\begin{Desc}
+\item[Date:]8/03/09 \end{Desc}
+
+
+\subsection{Define Documentation}
+\hypertarget{votParse_8h_ace45ef90989b1c716603f996516f8b7}{
+\index{votParse.h@{votParse.h}!NUM\_\-ELEMENTS@{NUM\_\-ELEMENTS}}
+\index{NUM\_\-ELEMENTS@{NUM\_\-ELEMENTS}!votParse.h@{votParse.h}}
+\subsubsection[{NUM\_\-ELEMENTS}]{\setlength{\rightskip}{0pt plus 5cm}\#define NUM\_\-ELEMENTS~25}}
+\label{votParse_8h_ace45ef90989b1c716603f996516f8b7}
+
+
+VOTable element types 
+
+\subsection{Function Documentation}
+\hypertarget{votParse_8h_e1f1571e52d088bad9485ef5bad8e55a}{
+\index{votParse.h@{votParse.h}!vot\_\-attachNode@{vot\_\-attachNode}}
+\index{vot\_\-attachNode@{vot\_\-attachNode}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-attachNode}]{\setlength{\rightskip}{0pt plus 5cm}void vot\_\-attachNode (handle\_\-t {\em parent}, \/  handle\_\-t {\em new})}}
+\label{votParse_8h_e1f1571e52d088bad9485ef5bad8e55a}
+
+
+Adds a node as a child of parent. 
+
+vot\_\-attachNode -- Adds a node as a child of parent.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em parent}]A handle to the \hyperlink{structElement}{Element} that you want to add a node to \item[{\em new}]A handle to the \hyperlink{structElement}{Element} that you want to add \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{votParse_8h_f4d1bf001b1268e52a9c2bcf45c8a435}{
+\index{votParse.h@{votParse.h}!vot\_\-closeVOTABLE@{vot\_\-closeVOTABLE}}
+\index{vot\_\-closeVOTABLE@{vot\_\-closeVOTABLE}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-closeVOTABLE}]{\setlength{\rightskip}{0pt plus 5cm}void vot\_\-closeVOTABLE (handle\_\-t {\em vot})}}
+\label{votParse_8h_f4d1bf001b1268e52a9c2bcf45c8a435}
+
+
+Destroy the root node and all of it's children. 
+
+vot\_\-closeVOTABLE -- Destroy the root node and all of it's children.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em vot}]A handle to the \hyperlink{structElement}{Element} that you want deleted \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing\end{Desc}
+\begin{Desc}
+\item[Warning:]Destroys the node and all of it's children. \end{Desc}
+\hypertarget{votParse_8h_b180aad1ee8971e252f8ececd5d245da}{
+\index{votParse.h@{votParse.h}!vot\_\-copyElement@{vot\_\-copyElement}}
+\index{vot\_\-copyElement@{vot\_\-copyElement}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-copyElement}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-copyElement (handle\_\-t {\em src\_\-h}, \/  handle\_\-t {\em parent\_\-h})}}
+\label{votParse_8h_b180aad1ee8971e252f8ececd5d245da}
+
+
+Adds a node as a child of parent. 
+
+vot\_\-copyElement -- Adds a node as a child of parent.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em src\_\-h}]A handle to the \hyperlink{structElement}{Element} to copy \item[{\em parent\_\-h}]A handle to the Elements parent \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle\_\-t of the copy of the structure \end{Desc}
+\hypertarget{votParse_8h_1806a8f080d37db9ee12dba84f3c7378}{
+\index{votParse.h@{votParse.h}!vot\_\-deleteNode@{vot\_\-deleteNode}}
+\index{vot\_\-deleteNode@{vot\_\-deleteNode}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-deleteNode}]{\setlength{\rightskip}{0pt plus 5cm}void vot\_\-deleteNode (handle\_\-t {\em element})}}
+\label{votParse_8h_1806a8f080d37db9ee12dba84f3c7378}
+
+
+Destroys the node and all of it's children. 
+
+vot\_\-deleteNode -- Destroys the node and all of it's children.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em element}]A handle to the \hyperlink{structElement}{Element} that you want deleted \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{votParse_8h_a11bb4e59e1dd773771e25ce7a40bb61}{
+\index{votParse.h@{votParse.h}!vot\_\-findByAttr@{vot\_\-findByAttr}}
+\index{vot\_\-findByAttr@{vot\_\-findByAttr}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-findByAttr}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-findByAttr (handle\_\-t {\em parent}, \/  char $\ast$ {\em name}, \/  char $\ast$ {\em value})}}
+\label{votParse_8h_a11bb4e59e1dd773771e25ce7a40bb61}
+
+
+Get a handle to an \hyperlink{structElement}{Element} with the requested attribute. 
+
+vot\_\-findByAttr -- Get a handle to an \hyperlink{structElement}{Element} with the requested attribute.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em parent}]A handle\_\-t the parent \hyperlink{structElement}{Element} \item[{\em name}]A string holding the Value type \item[{\em value}]A string holding the Value value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The handle to the element \end{Desc}
+\hypertarget{votParse_8h_03251a012c19d03ea436a2191ffc48ec}{
+\index{votParse.h@{votParse.h}!vot\_\-findInGroup@{vot\_\-findInGroup}}
+\index{vot\_\-findInGroup@{vot\_\-findInGroup}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-findInGroup}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t$\ast$ vot\_\-findInGroup (handle\_\-t {\em group}, \/  int {\em type})}}
+\label{votParse_8h_03251a012c19d03ea436a2191ffc48ec}
+
+
+Return a handle array of the requested \hyperlink{structElement}{Element} type. 
+
+vot\_\-findInGroup -- Return a handle array of the requested \hyperlink{structElement}{Element} type.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em group}]A handle\_\-t the parent \hyperlink{structElement}{Element} \item[{\em type}]Value of the type \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]An array of handles \end{Desc}
+\hypertarget{votParse_8h_59b75d46df34b8bc3a1416b69fe04691}{
+\index{votParse.h@{votParse.h}!vot\_\-freeNode@{vot\_\-freeNode}}
+\index{vot\_\-freeNode@{vot\_\-freeNode}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-freeNode}]{\setlength{\rightskip}{0pt plus 5cm}void vot\_\-freeNode (handle\_\-t {\em node})}}
+\label{votParse_8h_59b75d46df34b8bc3a1416b69fe04691}
+
+
+Destroys the node and all of it's children. 
+
+vot\_\-freeNode -- Destroys the node and all of it's children.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em node}]A handle to the \hyperlink{structElement}{Element} that you want deleted \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{votParse_8h_5c10aa73cde19e122f5bc85a1a006ff8}{
+\index{votParse.h@{votParse.h}!vot\_\-getAttr@{vot\_\-getAttr}}
+\index{vot\_\-getAttr@{vot\_\-getAttr}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getAttr}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ vot\_\-getAttr (handle\_\-t {\em elem\_\-h}, \/  char $\ast$ {\em attr})}}
+\label{votParse_8h_5c10aa73cde19e122f5bc85a1a006ff8}
+
+
+Return the attribute for the \hyperlink{structElement}{Element}. 
+
+vot\_\-getAttr -- Return the attribute for the \hyperlink{structElement}{Element}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \item[{\em attr}]A string holding the attribute name \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A string of the value or the attr \end{Desc}
+\hypertarget{votParse_8h_014fabbc855181d68dfea2ddfd0fc1a2}{
+\index{votParse.h@{votParse.h}!vot\_\-getBINARY@{vot\_\-getBINARY}}
+\index{vot\_\-getBINARY@{vot\_\-getBINARY}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getBINARY}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getBINARY (handle\_\-t {\em handle})}}
+\label{votParse_8h_014fabbc855181d68dfea2ddfd0fc1a2}
+
+
+Gets the BINARY node from the parent handle. 
+
+vot\_\-getBINARY -- Gets the BINARY node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a BINARY \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first BINARY node, or zero \end{Desc}
+\hypertarget{votParse_8h_e0b096dc07c30708e6e86cf81750a01f}{
+\index{votParse.h@{votParse.h}!vot\_\-getChild@{vot\_\-getChild}}
+\index{vot\_\-getChild@{vot\_\-getChild}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getChild}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getChild (handle\_\-t {\em elem\_\-h})}}
+\label{votParse_8h_e0b096dc07c30708e6e86cf81750a01f}
+
+
+Return a handle\_\-t of the child \hyperlink{structElement}{Element}. 
+
+vot\_\-getChild -- Return a handle\_\-t of the child \hyperlink{structElement}{Element}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle of the child \hyperlink{structElement}{Element} \end{Desc}
+\hypertarget{votParse_8h_fc2659e6a84d200c4b01c9460acaefb1}{
+\index{votParse.h@{votParse.h}!vot\_\-getChildOfType@{vot\_\-getChildOfType}}
+\index{vot\_\-getChildOfType@{vot\_\-getChildOfType}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getChildOfType}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getChildOfType (handle\_\-t {\em elem\_\-h}, \/  int {\em type})}}
+\label{votParse_8h_fc2659e6a84d200c4b01c9460acaefb1}
+
+
+Get the handle of the next \hyperlink{structElement}{Element} of the same type. 
+
+vot\_\-getChildOfType -- Get the handle of the next \hyperlink{structElement}{Element} of the same type.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \item[{\em type}]An integer of the \hyperlink{structElement}{Element} type for find \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle of the \hyperlink{structElement}{Element} \end{Desc}
+\hypertarget{votParse_8h_33e1c4a4f3752beeb62fd8d88d1d2ca2}{
+\index{votParse.h@{votParse.h}!vot\_\-getCOOSYS@{vot\_\-getCOOSYS}}
+\index{vot\_\-getCOOSYS@{vot\_\-getCOOSYS}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getCOOSYS}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getCOOSYS (handle\_\-t {\em handle})}}
+\label{votParse_8h_33e1c4a4f3752beeb62fd8d88d1d2ca2}
+
+
+Gets the COOSYS node from the parent handle. 
+
+vot\_\-getCOOSYS -- Gets the COOSYS node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a COOSYS \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first COOSYS node, or zero \end{Desc}
+\hypertarget{votParse_8h_05535a56a31eb34b865bd7d592fe9292}{
+\index{votParse.h@{votParse.h}!vot\_\-getDATA@{vot\_\-getDATA}}
+\index{vot\_\-getDATA@{vot\_\-getDATA}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getDATA}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getDATA (handle\_\-t {\em handle})}}
+\label{votParse_8h_05535a56a31eb34b865bd7d592fe9292}
+
+
+Gets the DATA node from the parent handle. 
+
+vot\_\-getDATA -- Gets the DATA node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a DATA \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first DATA node, or zero \end{Desc}
+\hypertarget{votParse_8h_7d034113dc25f5b11f24eaf4ce33b73e}{
+\index{votParse.h@{votParse.h}!vot\_\-getDATATypeString@{vot\_\-getDATATypeString}}
+\index{vot\_\-getDATATypeString@{vot\_\-getDATATypeString}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getDATATypeString}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ vot\_\-getDATATypeString (handle\_\-t {\em data\_\-h})}}
+\label{votParse_8h_7d034113dc25f5b11f24eaf4ce33b73e}
+
+
+Returns the type of the DATA element. 
+
+Returns the type of the DATA element as a string.
+
+vot\_\-getDATAType -- Returns the type of the DATA element.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em data\_\-h}]A handle\_\-t to a DATA \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The type as an int\end{Desc}
+vot\_\-getDATATypeString -- Returns the type of the DATA element as a string.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em data\_\-h}]A handle\_\-t to a DATA \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The type as an string \end{Desc}
+\hypertarget{votParse_8h_41964f8885bc352af793bf552541d5e4}{
+\index{votParse.h@{votParse.h}!vot\_\-getDESCRIPTION@{vot\_\-getDESCRIPTION}}
+\index{vot\_\-getDESCRIPTION@{vot\_\-getDESCRIPTION}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getDESCRIPTION}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getDESCRIPTION (handle\_\-t {\em handle})}}
+\label{votParse_8h_41964f8885bc352af793bf552541d5e4}
+
+
+Gets the DESCRIPTION node from the parent handle. 
+
+vot\_\-getDESCRIPTION -- Gets the DESCRIPTION node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a DESCRIPTION \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first DESCRIPTION node, or zero \end{Desc}
+\hypertarget{votParse_8h_20a84235c2704f19afb05fd2db7fcf07}{
+\index{votParse.h@{votParse.h}!vot\_\-getFIELD@{vot\_\-getFIELD}}
+\index{vot\_\-getFIELD@{vot\_\-getFIELD}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getFIELD}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getFIELD (handle\_\-t {\em handle})}}
+\label{votParse_8h_20a84235c2704f19afb05fd2db7fcf07}
+
+
+Gets the FIELD node from the parent handle. 
+
+vot\_\-getFIELD -- Gets the FIELD node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a FIELD \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first FIELD node, or zero \end{Desc}
+\hypertarget{votParse_8h_0fd5f65c27adc084af8ea3f611556c52}{
+\index{votParse.h@{votParse.h}!vot\_\-getFIELDRef@{vot\_\-getFIELDRef}}
+\index{vot\_\-getFIELDRef@{vot\_\-getFIELDRef}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getFIELDRef}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getFIELDRef (handle\_\-t {\em handle})}}
+\label{votParse_8h_0fd5f65c27adc084af8ea3f611556c52}
+
+
+Gets the FIELDref node from the parent handle. 
+
+vot\_\-getFIELDref -- Gets the FIELDref node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a FIELDref \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first FIELDref node, or zero \end{Desc}
+\hypertarget{votParse_8h_fadc14723954225b56a12b48ab78a50b}{
+\index{votParse.h@{votParse.h}!vot\_\-getFITS@{vot\_\-getFITS}}
+\index{vot\_\-getFITS@{vot\_\-getFITS}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getFITS}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getFITS (handle\_\-t {\em handle})}}
+\label{votParse_8h_fadc14723954225b56a12b48ab78a50b}
+
+
+Gets the FITS node from the parent handle. 
+
+vot\_\-getFITS -- Gets the FITS node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a FITS \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first FITS node, or zero \end{Desc}
+\hypertarget{votParse_8h_97433b62adc9545b4f1971cfbcb4819d}{
+\index{votParse.h@{votParse.h}!vot\_\-getGROUP@{vot\_\-getGROUP}}
+\index{vot\_\-getGROUP@{vot\_\-getGROUP}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getGROUP}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getGROUP (handle\_\-t {\em handle})}}
+\label{votParse_8h_97433b62adc9545b4f1971cfbcb4819d}
+
+
+Gets the GROUP node from the parent handle. 
+
+vot\_\-getGROUP -- Gets the GROUP node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a GROUP \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first GROUP node, or zero \end{Desc}
+\hypertarget{votParse_8h_7de82f980273251a4a00df7435b29948}{
+\index{votParse.h@{votParse.h}!vot\_\-getINFO@{vot\_\-getINFO}}
+\index{vot\_\-getINFO@{vot\_\-getINFO}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getINFO}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getINFO (handle\_\-t {\em handle})}}
+\label{votParse_8h_7de82f980273251a4a00df7435b29948}
+
+
+Gets the INFO node from the parent handle. 
+
+vot\_\-getINFO -- Gets the INFO node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a INFO \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first INFO node, or zero \end{Desc}
+\hypertarget{votParse_8h_02de38f123a9b7cbd24bee996b8ecc10}{
+\index{votParse.h@{votParse.h}!vot\_\-getLength@{vot\_\-getLength}}
+\index{vot\_\-getLength@{vot\_\-getLength}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getLength}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-getLength (handle\_\-t {\em elem\_\-h})}}
+\label{votParse_8h_02de38f123a9b7cbd24bee996b8ecc10}
+
+
+Return the number of sibling Elements of the same type. 
+
+vot\_\-getLength -- Return the number of sibling Elements of the same type.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The status of the set \end{Desc}
+\hypertarget{votParse_8h_729cd64c53d713a473d611dc7941e4f3}{
+\index{votParse.h@{votParse.h}!vot\_\-getLINK@{vot\_\-getLINK}}
+\index{vot\_\-getLINK@{vot\_\-getLINK}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getLINK}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getLINK (handle\_\-t {\em handle})}}
+\label{votParse_8h_729cd64c53d713a473d611dc7941e4f3}
+
+
+Gets the LINK node from the parent handle. 
+
+vot\_\-getLINK -- Gets the LINK node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a LINK \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first LINK node, or zero \end{Desc}
+\hypertarget{votParse_8h_89897e1c3ead93bef9b107707fa2eda5}{
+\index{votParse.h@{votParse.h}!vot\_\-getMAX@{vot\_\-getMAX}}
+\index{vot\_\-getMAX@{vot\_\-getMAX}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getMAX}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getMAX (handle\_\-t {\em handle})}}
+\label{votParse_8h_89897e1c3ead93bef9b107707fa2eda5}
+
+
+Gets the MAX node from the parent handle. 
+
+vot\_\-getMAX -- Gets the MAX node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a MAX \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first MAX node, or zero \end{Desc}
+\hypertarget{votParse_8h_a00dc12eff5fe09c71ff0c5c86aadfaf}{
+\index{votParse.h@{votParse.h}!vot\_\-getMIN@{vot\_\-getMIN}}
+\index{vot\_\-getMIN@{vot\_\-getMIN}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getMIN}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getMIN (handle\_\-t {\em handle})}}
+\label{votParse_8h_a00dc12eff5fe09c71ff0c5c86aadfaf}
+
+
+Gets the MIN node from the parent handle. 
+
+vot\_\-getMIN -- Gets the MIN node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a MIN \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first MIN node, or zero \end{Desc}
+\hypertarget{votParse_8h_48775f435829934c1f2b9022af12a86a}{
+\index{votParse.h@{votParse.h}!vot\_\-getNCols@{vot\_\-getNCols}}
+\index{vot\_\-getNCols@{vot\_\-getNCols}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getNCols}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-getNCols (handle\_\-t {\em tdata\_\-h})}}
+\label{votParse_8h_48775f435829934c1f2b9022af12a86a}
+
+
+Return the nuber of columns in the table structure. 
+
+$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$ Utility methods vot\_\-getNCols -- Return the nuber of columns in the table structure.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em tdata\_\-h}]A handle\_\-t to a TABLEDATA \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The number of cols \end{Desc}
+\hypertarget{votParse_8h_dc2e5f39a6273bca5fa0fdf46b2c3751}{
+\index{votParse.h@{votParse.h}!vot\_\-getNext@{vot\_\-getNext}}
+\index{vot\_\-getNext@{vot\_\-getNext}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getNext}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getNext (handle\_\-t {\em elem\_\-h})}}
+\label{votParse_8h_dc2e5f39a6273bca5fa0fdf46b2c3751}
+
+
+Return a handle\_\-t of the next \hyperlink{structElement}{Element} of the same type. 
+
+vot\_\-getNext -- Return a handle\_\-t of the next \hyperlink{structElement}{Element} of the same type.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle of the next \hyperlink{structElement}{Element} of the same type \end{Desc}
+\hypertarget{votParse_8h_67e90b853666bbc4ef40ead211a116bd}{
+\index{votParse.h@{votParse.h}!vot\_\-getNRows@{vot\_\-getNRows}}
+\index{vot\_\-getNRows@{vot\_\-getNRows}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getNRows}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-getNRows (handle\_\-t {\em tdata\_\-h})}}
+\label{votParse_8h_67e90b853666bbc4ef40ead211a116bd}
+
+
+Return the nuber of columns in the table structure. 
+
+vot\_\-getNRows -- Return the nuber of columns in the table structure.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em tdata\_\-h}]A handle\_\-t to a TABLEDATA \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The number of cols \end{Desc}
+\hypertarget{votParse_8h_6b7565c412ba45c5578a61dda5afd1c1}{
+\index{votParse.h@{votParse.h}!vot\_\-getNumberOf@{vot\_\-getNumberOf}}
+\index{vot\_\-getNumberOf@{vot\_\-getNumberOf}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getNumberOf}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-getNumberOf (handle\_\-t {\em elem\_\-h}, \/  int {\em type})}}
+\label{votParse_8h_6b7565c412ba45c5578a61dda5afd1c1}
+
+
+Return the number of sibling Elements of the type. 
+
+vot\_\-getNumberOf -- Return the number of sibling Elements of the type.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \item[{\em type}]An int of the type of element you wish to count \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The status of the set \end{Desc}
+\hypertarget{votParse_8h_6120eea01cc0c348fc99dd9c0e6dc060}{
+\index{votParse.h@{votParse.h}!vot\_\-getOPTION@{vot\_\-getOPTION}}
+\index{vot\_\-getOPTION@{vot\_\-getOPTION}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getOPTION}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getOPTION (handle\_\-t {\em handle})}}
+\label{votParse_8h_6120eea01cc0c348fc99dd9c0e6dc060}
+
+
+Gets the OPTION node from the parent handle. 
+
+vot\_\-getOPTION -- Gets the OPTION node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a OPTION \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first OPTION node, or zero \end{Desc}
+\hypertarget{votParse_8h_42e5538ca7d06238d7242c40daaf9bf7}{
+\index{votParse.h@{votParse.h}!vot\_\-getPARAM@{vot\_\-getPARAM}}
+\index{vot\_\-getPARAM@{vot\_\-getPARAM}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getPARAM}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getPARAM (handle\_\-t {\em handle})}}
+\label{votParse_8h_42e5538ca7d06238d7242c40daaf9bf7}
+
+
+Gets the PARAM node from the parent handle. 
+
+vot\_\-getPARAM -- Gets the PARAM node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a PARAM \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first PARAM node, or zero \end{Desc}
+\hypertarget{votParse_8h_ded8082390ce6a5b085ac15f0212ddd7}{
+\index{votParse.h@{votParse.h}!vot\_\-getPARAMRef@{vot\_\-getPARAMRef}}
+\index{vot\_\-getPARAMRef@{vot\_\-getPARAMRef}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getPARAMRef}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getPARAMRef (handle\_\-t {\em handle})}}
+\label{votParse_8h_ded8082390ce6a5b085ac15f0212ddd7}
+
+
+Gets the PARAMRef node from the parent handle. 
+
+vot\_\-getPARAMRef -- Gets the PARAMref node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a PARAMRef \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first PARAMRef node, or zero \end{Desc}
+\hypertarget{votParse_8h_8930fc6a9ea4dec1d8694582d93ee146}{
+\index{votParse.h@{votParse.h}!vot\_\-getParent@{vot\_\-getParent}}
+\index{vot\_\-getParent@{vot\_\-getParent}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getParent}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getParent (handle\_\-t {\em elem\_\-h})}}
+\label{votParse_8h_8930fc6a9ea4dec1d8694582d93ee146}
+
+
+Return the handle of the parent \hyperlink{structElement}{Element}. 
+
+vot\_\-getParent -- Return the handle of the parent \hyperlink{structElement}{Element}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle of the paretn \hyperlink{structElement}{Element} \end{Desc}
+\hypertarget{votParse_8h_5df6ad7d9312f05a27ccc3252f1c5d11}{
+\index{votParse.h@{votParse.h}!vot\_\-getRESOURCE@{vot\_\-getRESOURCE}}
+\index{vot\_\-getRESOURCE@{vot\_\-getRESOURCE}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getRESOURCE}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getRESOURCE (handle\_\-t {\em handle})}}
+\label{votParse_8h_5df6ad7d9312f05a27ccc3252f1c5d11}
+
+
+Gets the RESOURCE node from the parent handle. 
+
+vot\_\-getRESOURCE -- Gets the RESOURCE node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a RESOURCE \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first RESOURCE node, or zero \end{Desc}
+\hypertarget{votParse_8h_4fb6813e03dd7b75710cfaa27f3ffb2e}{
+\index{votParse.h@{votParse.h}!vot\_\-getSibling@{vot\_\-getSibling}}
+\index{vot\_\-getSibling@{vot\_\-getSibling}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getSibling}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getSibling (handle\_\-t {\em elem\_\-h})}}
+\label{votParse_8h_4fb6813e03dd7b75710cfaa27f3ffb2e}
+
+
+Return a handle\_\-t of the next \hyperlink{structElement}{Element}. 
+
+vot\_\-getSibling -- Return a handle\_\-t of the next signling \hyperlink{structElement}{Element}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle of the next \hyperlink{structElement}{Element} \end{Desc}
+\hypertarget{votParse_8h_4bae0337352f1ba53865e1419917dc30}{
+\index{votParse.h@{votParse.h}!vot\_\-getSTREAM@{vot\_\-getSTREAM}}
+\index{vot\_\-getSTREAM@{vot\_\-getSTREAM}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getSTREAM}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getSTREAM (handle\_\-t {\em handle})}}
+\label{votParse_8h_4bae0337352f1ba53865e1419917dc30}
+
+
+Gets the STREAM node from the parent handle. 
+
+vot\_\-getSTREAM -- Gets the STREAM node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a STREAM \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first STREAM node, or zero \end{Desc}
+\hypertarget{votParse_8h_4e3e3176986838c27989df64c426b30e}{
+\index{votParse.h@{votParse.h}!vot\_\-getTABLE@{vot\_\-getTABLE}}
+\index{vot\_\-getTABLE@{vot\_\-getTABLE}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getTABLE}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getTABLE (handle\_\-t {\em handle})}}
+\label{votParse_8h_4e3e3176986838c27989df64c426b30e}
+
+
+Gets the TABLE node from the parent handle. 
+
+vot\_\-getTABLE -- Gets the TABLE node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a TABLE \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first TABLE node, or zero \end{Desc}
+\hypertarget{votParse_8h_b377b70336b7bf129f1cb32cd3b3f4f2}{
+\index{votParse.h@{votParse.h}!vot\_\-getTableCell@{vot\_\-getTableCell}}
+\index{vot\_\-getTableCell@{vot\_\-getTableCell}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getTableCell}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ vot\_\-getTableCell (handle\_\-t {\em tdata\_\-h}, \/  int {\em row}, \/  int {\em col})}}
+\label{votParse_8h_b377b70336b7bf129f1cb32cd3b3f4f2}
+
+
+Return the nuber of columns in the structure. 
+
+vot\_\-getTableCell -- Return the nuber of columns in the structure.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em tdata\_\-h}]A handle\_\-t to a TABLEDATA \item[{\em row}]An int for a row \item[{\em col}]An int for a col \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The content of the cell \end{Desc}
+\hypertarget{votParse_8h_4a558147c79deacfd6ca4d0b93ee100d}{
+\index{votParse.h@{votParse.h}!vot\_\-getTABLEDATA@{vot\_\-getTABLEDATA}}
+\index{vot\_\-getTABLEDATA@{vot\_\-getTABLEDATA}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getTABLEDATA}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getTABLEDATA (handle\_\-t {\em handle})}}
+\label{votParse_8h_4a558147c79deacfd6ca4d0b93ee100d}
+
+
+Gets the TABLEDATA node from the parent handle. 
+
+vot\_\-getTABLEDATA -- Gets the TABLEDATA node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a TABLEDATA \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first TABLEDATA node, or zero \end{Desc}
+\hypertarget{votParse_8h_824a7f85d4c8bac6d5fd6cfb8b3b3810}{
+\index{votParse.h@{votParse.h}!vot\_\-getTD@{vot\_\-getTD}}
+\index{vot\_\-getTD@{vot\_\-getTD}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getTD}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getTD (handle\_\-t {\em handle})}}
+\label{votParse_8h_824a7f85d4c8bac6d5fd6cfb8b3b3810}
+
+
+Gets the TD node from the parent handle. 
+
+vot\_\-getTD -- Gets the TD node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a TD \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first TD node, or zero \end{Desc}
+\hypertarget{votParse_8h_2e9ba287229978519224dfea2ecc984f}{
+\index{votParse.h@{votParse.h}!vot\_\-getTR@{vot\_\-getTR}}
+\index{vot\_\-getTR@{vot\_\-getTR}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getTR}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getTR (handle\_\-t {\em handle})}}
+\label{votParse_8h_2e9ba287229978519224dfea2ecc984f}
+
+
+Gets the TR node from the parent handle. 
+
+vot\_\-getTR -- Gets the TR node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a TR \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first TR node, or zero \end{Desc}
+\hypertarget{votParse_8h_b1636a63f89ad6f2994855187d85777f}{
+\index{votParse.h@{votParse.h}!vot\_\-getValue@{vot\_\-getValue}}
+\index{vot\_\-getValue@{vot\_\-getValue}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getValue}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ vot\_\-getValue (handle\_\-t {\em elem\_\-h})}}
+\label{votParse_8h_b1636a63f89ad6f2994855187d85777f}
+
+
+Get the Value for the ELEMENT. 
+
+vot\_\-getValue -- Get the Value for the ELEMENT.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the ELEMENT \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A string of the value or the Value \end{Desc}
+\hypertarget{votParse_8h_b019a523ddca596e9f80c284e5954b44}{
+\index{votParse.h@{votParse.h}!vot\_\-getVALUES@{vot\_\-getVALUES}}
+\index{vot\_\-getVALUES@{vot\_\-getVALUES}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-getVALUES}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-getVALUES (handle\_\-t {\em handle})}}
+\label{votParse_8h_b019a523ddca596e9f80c284e5954b44}
+
+
+Gets the VALUES node from the parent handle. 
+
+vot\_\-getVALUES -- Gets the VALUES node from the parent handle
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]Parent handle containing a VALUES \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the first VALUES node, or zero \end{Desc}
+\hypertarget{votParse_8h_d87843bde9d0d99c5e20311f8820eba6}{
+\index{votParse.h@{votParse.h}!vot\_\-newNode@{vot\_\-newNode}}
+\index{vot\_\-newNode@{vot\_\-newNode}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-newNode}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-newNode (handle\_\-t {\em parent}, \/  int {\em type})}}
+\label{votParse_8h_d87843bde9d0d99c5e20311f8820eba6}
+
+
+Creates a new blank unlinked node. 
+
+vot\_\-newNode -- Creates a new blank unlinked node.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em parent}]A handle to the \hyperlink{structElement}{Element} that you want to add a node to \item[{\em type}]The type of node you wish to create \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A handle to the created node \end{Desc}
+\hypertarget{votParse_8h_9949868e8d3fcb547d15c5c9f2cdb76f}{
+\index{votParse.h@{votParse.h}!vot\_\-openVOTABLE@{vot\_\-openVOTABLE}}
+\index{vot\_\-openVOTABLE@{vot\_\-openVOTABLE}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-openVOTABLE}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t vot\_\-openVOTABLE (char $\ast$ {\em arg})}}
+\label{votParse_8h_9949868e8d3fcb547d15c5c9f2cdb76f}
+
+
+Parse a VOTable and return a handle to it. 
+
+$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$ Public LIBVOTABLE interface.
+
+vot\_\-openVOTABLE -- Parse a VOTable and return a handle to it
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em arg}]The source of the table \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The root node handle of the VOTable \end{Desc}
+\hypertarget{votParse_8h_2b73f93210316d7714201e751cad77ad}{
+\index{votParse.h@{votParse.h}!vot\_\-setAttr@{vot\_\-setAttr}}
+\index{vot\_\-setAttr@{vot\_\-setAttr}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-setAttr}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-setAttr (handle\_\-t {\em elem\_\-h}, \/  char $\ast$ {\em attr}, \/  char $\ast$ {\em value})}}
+\label{votParse_8h_2b73f93210316d7714201e751cad77ad}
+
+
+Set the attribute for the \hyperlink{structElement}{Element}. 
+
+vot\_\-setAttr -- Set the attribute for the \hyperlink{structElement}{Element}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \item[{\em attr}]A string holding the attribute name \item[{\em value}]A string holding the attribute value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The status of the set \end{Desc}
+\hypertarget{votParse_8h_6faba02860fcb0a51315f1863fd29094}{
+\index{votParse.h@{votParse.h}!vot\_\-setValue@{vot\_\-setValue}}
+\index{vot\_\-setValue@{vot\_\-setValue}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-setValue}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-setValue (handle\_\-t {\em elem\_\-h}, \/  char $\ast$ {\em value})}}
+\label{votParse_8h_6faba02860fcb0a51315f1863fd29094}
+
+
+Set the Value for the ELEMENT. 
+
+vot\_\-setValue -- Set the Value for the ELEMENT.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the ELEMENT \item[{\em value}]A string holding the value \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]The status of the set \end{Desc}
+\hypertarget{votParse_8h_d04bd4a950e829cb2b473e246806cea7}{
+\index{votParse.h@{votParse.h}!vot\_\-setWarnings@{vot\_\-setWarnings}}
+\index{vot\_\-setWarnings@{vot\_\-setWarnings}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-setWarnings}]{\setlength{\rightskip}{0pt plus 5cm}void vot\_\-setWarnings (int {\em value})}}
+\label{votParse_8h_d04bd4a950e829cb2b473e246806cea7}
+
+
+Set the warning level. 
+
+vot\_\-setWarnings -- Set the warning level.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em value}]Warning level \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{votParse_8h_1c319696d8efc593266b9409303054c6}{
+\index{votParse.h@{votParse.h}!vot\_\-typeOf@{vot\_\-typeOf}}
+\index{vot\_\-typeOf@{vot\_\-typeOf}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-typeOf}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-typeOf (handle\_\-t {\em elem\_\-h})}}
+\label{votParse_8h_1c319696d8efc593266b9409303054c6}
+
+
+Return type of the \hyperlink{structElement}{Element}. 
+
+vot\_\-typeOf -- Return type of the \hyperlink{structElement}{Element}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]An integer of the type \end{Desc}
+\hypertarget{votParse_8h_3136956d2035d6b297aa623f87f4b807}{
+\index{votParse.h@{votParse.h}!vot\_\-valueOf@{vot\_\-valueOf}}
+\index{vot\_\-valueOf@{vot\_\-valueOf}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-valueOf}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-valueOf (handle\_\-t {\em elem\_\-h})}}
+\label{votParse_8h_3136956d2035d6b297aa623f87f4b807}
+
+
+Return type of the \hyperlink{structElement}{Element}. 
+
+vot\_\-valueOf -- Return type of the \hyperlink{structElement}{Element}.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em elem\_\-h}]A handle\_\-t the \hyperlink{structElement}{Element} \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]An integer of the type \end{Desc}
+\hypertarget{votParse_8h_151bcdd0133b4b6e1a8d8d11d2008ea5}{
+\index{votParse.h@{votParse.h}!vot\_\-writeVOTable@{vot\_\-writeVOTable}}
+\index{vot\_\-writeVOTable@{vot\_\-writeVOTable}!votParse.h@{votParse.h}}
+\subsubsection[{vot\_\-writeVOTable}]{\setlength{\rightskip}{0pt plus 5cm}void vot\_\-writeVOTable (handle\_\-t {\em node}, \/  FILE $\ast$ {\em fd})}}
+\label{votParse_8h_151bcdd0133b4b6e1a8d8d11d2008ea5}
+
+
+Write the VOTable to the file descriptor. 
+
+vot\_\-writeVOTable -- Write the VOTable to the file descriptor.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em node}]A handle to an \hyperlink{structElement}{Element} that you to print \item[{\em fd}]The file descriptor to send teh output to \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}

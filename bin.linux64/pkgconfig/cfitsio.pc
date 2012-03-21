@@ -1,0 +1,11 @@
+prefix=/iraf/iraf.v216
+exec_prefix=/iraf/iraf.v216
+libdir=/iraf/iraf.v216/bin
+includedir=${prefix}/include
+
+Name: cfitsio
+Description: FITS File Subroutine Library
+Version: 3.28
+Libs: -L${libdir} -lcfitsio 
+Libs.private: -lm
+Cflags: -I${includedir}

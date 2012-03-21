@@ -44,7 +44,7 @@ on the value of the parameter 'errignore', the error record is either
 thrown out or considered valid data.  If 'errignore' is 'no' when an error
 is found, the input buffer is validated to the most recent 'good record'
 length and written to disk.  If 'errignore' is 'yes' when an error is
-found, the the input buffer is disposed of for that record.
+found, the input buffer is disposed of for that record.
 .ih
 EXAMPLES
 1. To read the second image from mta at 1600 bpi, store the image into

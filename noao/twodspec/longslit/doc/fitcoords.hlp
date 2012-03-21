@@ -113,7 +113,7 @@ coordinates from the specified images;
 .fi
 
 The coordinates from all the input images may be combined in a single fit or
-the coordinates from each image may be fit separately.  If the the
+the coordinates from each image may be fit separately.  If the
 coordinates from the input images are combined then the fitted function
 is recorded in the database under the specified name.  If
 the coordinates are fit separately the fitted function is recorded under
@@ -153,7 +153,7 @@ coordinates.  This is generally used when fitting a series of images
 non-interactively.
 
 Information about the fitted function may be recorded.  Textual information
-is written to the the specified log files (which may include the standard
+is written to the specified log files (which may include the standard
 output STDOUT).  The last interactive plot or a default non-interactive
 plot is written the specified plot file which may be examined and spooled
 at a later time.

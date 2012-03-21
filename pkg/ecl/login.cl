@@ -93,13 +93,8 @@ tv              # image display
 utilities       # miscellaneous utilities
 noao            # optical astronomy packages
 
+stsdas
+stplot
+
 keep
 
-#print "1 ----------------------"
-#hello > h
-#od -c h
-#print "2 ----------------------"
-#hello >> hh
-#od -c hh
-#print "3 ----------------------"
-#logout

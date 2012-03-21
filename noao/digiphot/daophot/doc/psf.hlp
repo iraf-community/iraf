@@ -203,7 +203,7 @@ in coordinate system defined by \fIwcsin\fR. The options are "logical", "tv",
 system to the internal "logical" system is defined by the image coordinate
 system. The simplest default is the "logical" pixel system. Users working on
 with image sections but importing pixel coordinate lists generated from the
-parent image must use use the "tv" or "physical" input coordinate systems.
+parent image must use the "tv" or "physical" input coordinate systems.
 
 The coordinates written to \fIpsfimage\fR, \fIpstfile\fR and \fIgroupfile\fR
 are in the coordinate system defined by \fIwcsout\fR with the exception

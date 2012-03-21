@@ -412,11 +412,11 @@ begin
 
 		    # Read pseudofile number.
 		    iotype = 0
-		    if (read (in, ps, SZ_INT) < SZ_INT)
+		    if (read (in, ps, SZ_INT32) < SZ_INT32)
 			call syserr (SYS_PRIPCSYNTAX)
 
 		    # Read data block.
-		    nchars = nchars - SZ_INT
+		    nchars = nchars - SZ_INT32
 		    if (read (in, Memc[ip], nchars) < nchars)
 			call syserr (SYS_PRIPCSYNTAX)
 

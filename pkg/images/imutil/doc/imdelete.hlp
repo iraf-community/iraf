@@ -24,6 +24,10 @@ DESCRIPTION
 IMDELETE takes as input a list of IRAF images specified by \fIimages\fR and
 deletes both the header and pixel files. In \fIverify\fR mode IMDELETE
 queries the user for the appropriate action to be taken for each IRAF image.
+
+If the \fIimages\fR parameter is a URL, it will be accessed and put into 
+the file cache, then immediately deleted.  To simply remove a file from
+the cache, use the \fIfcache\fR command instead.
 .ih
 EXAMPLES
 1. Delete a list of images
@@ -47,5 +51,5 @@ TIME REQUIREMENTS
 BUGS
 .ih
 SEE ALSO
-imcopy
+imcopy, fcache
 .endhelp

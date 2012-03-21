@@ -18,6 +18,12 @@ int	maxch			# i: maximum number of characters in name
 char    scratch[SZ_SCRATCH]     # scratch for appending EXTVER
  
 begin
+	# Use the source name/url if it is present.
+	if (TB_SRC_PTR(tp) != NULL) {
+	    call strcpy (TB_SRC(tp), tblname, maxch)
+	    return
+	}
+
 	call strcpy (TB_NAME(tp), tblname, maxch)
  
 	if (TB_TYPE(tp) == TBL_TYPE_FITS || TB_TYPE(tp) == TBL_TYPE_CDF) {

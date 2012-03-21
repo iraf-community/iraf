@@ -50,7 +50,7 @@ begin
 	} else if (lflag == D_MIX || rg != NULL) {
 	    if (dothresh) {
 		do i = 1, npts {
-		    if (Memi[mp] == 0) {
+		    if (Memr[mp] == 0) {
 			a = Memr[lp]
 			if (a >= lthresh && a <= hthresh) {
 			    w = shdr_lw (sh, double (i))
@@ -65,7 +65,7 @@ begin
 		}
 	    } else {
 		do i = 1, npts {
-		    if (Memi[mp] == 0) {
+		    if (Memr[mp] == 0) {
 			w = shdr_lw (sh, double (i))
 			if (ic_wisinrange (rg, w)) {
 			    Memr[dp] = Memr[lp]

@@ -77,7 +77,7 @@ begin
 		# Enter the line identifier in the symbol table.
 		if (stfind (ctable, Memc[token]) == NULL) {
 		    sym = stenter (ctable, Memc[token], nvars)
-		    call amovkr (INDEFR, Memr[sym], nvars)
+		    call amovkr (INDEFR, Memr[P2R(sym)], nvars)
 		} else
 		    next
 
@@ -94,7 +94,7 @@ begin
 			do i = 1, num {
 			    index = Memi[indices+i-1]
 		            if (! IS_INDEFI (index))
-			        Memr[sym+index-1] = rval
+			        Memr[P2R(sym+index-1)] = rval
 			}
 		    }
 
@@ -282,7 +282,7 @@ begin
 			    call mct_putr (otable, nobs, nvars + num, INDEFR)
 		    } else {
 		        do num = 1, ncatvars {
-			    rval = Memr[sym+num-1]
+			    rval = Memr[P2R(sym+num-1)]
 			    call mct_putr (otable, nobs, nvars + num, rval)
 		        }
 		    }

@@ -334,9 +334,6 @@ retry_
 	    }
 	} then {
 	    err = errget (errstr, SZ_LINE)
-call eprintf ("TRAP: %d %s\n")
-call pargi (err)
-call pargstr (errstr)
 	    if (err == SYS_IKIOPIX && nimages < 250)
 		err = SYS_MFULL
 	    call ic_mclose (nimages)

@@ -53,6 +53,7 @@ libsys.a:
 	kfpath.x	ki.h kinode.com <chars.h>
 	kfprot.x	ki.h kii.com <mach.h>
 	kfrnam.x	ki.h kii.com <mach.h>
+	kfrmdr.x	ki.h kii.com <mach.h>
 	kfsubd.x	ki.h
 	kfutim.x	ki.h kii.com <mach.h>
 	kfxdir.x	ki.h kinode.com <chars.h>

@@ -2,23 +2,23 @@
 
 $curfit	= "math$curfit/"
 
-cvaccum		hlp = cvaccum.hlp,	src = curfit$cvaccum.x
-cvacpts		hlp = cvacpts.hlp,	src = curfit$cvacpts.x
-cvcoeff		hlp = cvcoeff.hlp,	src = curfit$cvcoeff.x
-cvepower	hlp = cvepower.hlp,	src = curfit$cvepower.x
-cverrors	hlp = cverrors.hlp,	src = curfit$cverrors.x
-cveval		hlp = cveval.hlp,	src = curfit$cveval.x
-cvinit		hlp = cvinit.hlp,	src = curfit$cvinit.x
-cvfit		hlp = cvfit.hlp,	src = curfit$cvfit.x
-cvfree		hlp = cvfree.hlp,	src = curfit$cvfree.x
-cvpower		hlp = cvpower.hlp,	src = curfit$cvpower.x
-cvrefit		hlp = cvrefit.hlp,	src = curfit$cvrefit.x
-cvreject	hlp = cvreject.hlp,	src = curfit$cvreject.x
-cvrestore	hlp = cvrestore.hlp,	src = curfit$cvrestore.x
-cvsave		hlp = cvsave.hlp,	src = curfit$cvsave.x
-cvsolve		hlp = cvsolve.hlp,	src = curfit$cvsolve.x
-cvstati		hlp = cvstati.hlp,	src = curfit$cvstat.x
-cvstatr		hlp = cvstatr.hlp,	src = curfit$cvstat.x
-cvvector	hlp = cvvector.hlp,	src = curfit$cvvector.x
-cvzero		hlp = cvzero.hlp,	src = curfit$cvzero.x
-cvset		hlp = cvset.hlp,	src = curfit$cvset.x
+cvaccum		hlp = cvaccum.hlp,	src = curfit$cvaccum.gx
+cvacpts		hlp = cvacpts.hlp,	src = curfit$cvacpts.gx
+cvcoeff		hlp = cvcoeff.hlp,	src = curfit$cvcoeff.gx
+cvepower	hlp = cvepower.hlp,	src = curfit$cvepower.gx
+cverrors	hlp = cverrors.hlp,	src = curfit$cverrors.gx
+cveval		hlp = cveval.hlp,	src = curfit$cveval.gx
+cvinit		hlp = cvinit.hlp,	src = curfit$cvinit.gx
+cvfit		hlp = cvfit.hlp,	src = curfit$cvfit.gx
+cvfree		hlp = cvfree.hlp,	src = curfit$cvfree.gx
+cvpower		hlp = cvpower.hlp,	src = curfit$cvpower.gx
+cvrefit		hlp = cvrefit.hlp,	src = curfit$cvrefit.gx
+cvreject	hlp = cvreject.hlp,	src = curfit$cvreject.gx
+cvrestore	hlp = cvrestore.hlp,	src = curfit$cvrestore.gx
+cvsave		hlp = cvsave.hlp,	src = curfit$cvsave.gx
+cvsolve		hlp = cvsolve.hlp,	src = curfit$cvsolve.gx
+cvstati		hlp = cvstati.hlp,	src = curfit$cvstat.gx
+cvstatr		hlp = cvstatr.hlp,	src = curfit$cvstat.gx
+cvvector	hlp = cvvector.hlp,	src = curfit$cvvector.gx
+cvzero		hlp = cvzero.hlp,	src = curfit$cvzero.gx
+cvset		hlp = cvset.hlp,	src = curfit$cvset.gx

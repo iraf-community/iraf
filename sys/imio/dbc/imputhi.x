@@ -63,7 +63,6 @@ begin
 	    call realloc (im, IM_LENHDRMEM(im) + LEN_IMDES, TY_STRUCT)
 	    buflen = LEN_IMDES + IM_LENHDRMEM(im)
 	    max_lenuserarea = (buflen - IMU) * SZ_STRUCT - 1
-call eprintf("REALLOC MORE SPACE in UA >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
 	}
 
 	# If the user area is not empty the last character must be the newline

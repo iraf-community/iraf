@@ -761,7 +761,7 @@ begin
 	    do i = 1, npts {
 		if (index[i] == 0)
 		    next
-		data = Memr[sym+i-1]
+		data = Memr[P2R(sym+i-1)]
 		if (IS_INDEFR(data))
 		    next
 		avg[i] = avg[i] + data

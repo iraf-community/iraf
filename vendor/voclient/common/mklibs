@@ -1,0 +1,59 @@
+#!/bin/csh -f
+
+#set top = `(chdir .. ; pwd)`
+set p = `pwd`
+set top = $p:h
+
+setenv CC 	"gcc"
+setenv CXX 	"g++"
+
+set	build_curl	= 1
+
+
+
+echo "Building support libraries ...."
+echo "  (Using toplevel directory '"$top/"' ....)"
+
+# Global options.
+set	gopts = "--prefix=$top/ --exec-prefix=$top/ --disable-shared"
+
+#echo "    Cleaning files ...."
+#./mkclean
+
+if ($build_curl == 1) then
+
+  echo -n "    Building CURL libs ...."
+  set	opts = "$gopts \
+		--disable-ftp \
+		--disable-file \
+		--disable-ldap \
+		--disable-ldaps \
+		--disable-proxy \
+		--disable-dict \
+		--disable-telnet \
+		--disable-tftp \
+		--disable-manual \
+		--disable-ipv6 \
+		--disable-ares \
+		--disable-sspi \
+		--disable-crypto-auth \
+		--without-krb4 \
+		--without-ssl \
+		--without-zlib \
+		--without-libssh2 \
+		--without-gnutls \
+		--without-nss \
+		--without-ca-path \
+		--without-libidn"
+  (chdir curl ;  \
+    ./configure $opts  				 >& _spool ; \
+    make clean 					>>& _spool ; \
+    make 					>>& _spool ; \
+    make install				>>& _spool)
+  cp -rp curl/lib/libcurl.*a ../lib/
+  cp -rp curl/include/* ../include/
+  /bin/rm -rf lib include share bin
+  (chdir curl ; make clean			>>& _spool)
+  echo "done"
+
+endif

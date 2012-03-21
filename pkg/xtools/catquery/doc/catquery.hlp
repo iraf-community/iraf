@@ -143,7 +143,7 @@ Example 1: Query a catalog and dump the results to a catalog file.
     if (catno == 0)
 	...
 
-    # Set the query parameters. Assume the input input units match the
+    # Set the query parameters. Assume the input units match the
     # the expected units. The input size is a width so divide by two 
     # if the query expects a radius.
     nqpars = cq_nqpars (cq)
@@ -251,7 +251,7 @@ Example 3: Make an image survey query and dump the results to a fits file.
     if (catno == 0)
 	...
 
-    # Set the query parameters. Assume the input input units match the
+    # Set the query parameters. Assume the input units match the
     # the expected units. 
     nqpars = cq_nqpars (cq)
     do i = 1, nqpars {

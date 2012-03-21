@@ -104,7 +104,7 @@ of the analytic curve of growth function.
 .ls rgescale = 0.9
 The ratio of the exponential to the gaussian radial scale
 lengths in the seeing dependent part of the profile.
-In practice the the curve of growth model fits for most data do not depend
+In practice the curve of growth model fits for most data do not depend
 significantly on this parameter and it can be left at its default value.
 .le
 .ls xwings = 0.0

@@ -95,7 +95,7 @@ one will note an extra scale on the right hand edge.  This scale gives the
 "other" axis of the image in units of pixels.  For example, if the current
 plot is a line plot (rather than a column plot), the X axis of the plot
 will correspond to the X axis of the image, and the right Y axis of the plot
-will correspond the the Y axis of the image.  Both axes will be scaled
+will correspond to the Y axis of the image.  Both axes will be scaled
 linearly in units of pixels.  The left Y axis is scaled in either linear or
 logarithmic pixel intensity units.  In the case of a column plot the bottom
 axis will correspond to image Y and the right axis to image X.

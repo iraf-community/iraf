@@ -168,7 +168,7 @@ The acatpars parameters define the default astrometry file format. These
 parameters are used if the input astrometry file does not contain a standard
 header describing the file format. By default standard headers are written
 by all astcat package tasks which create astrometry files. If the
-astrometry file does not have a header the the acatpars parameters
+astrometry file does not have a header the acatpars parameters
 are used to define one.
 
 By default acatpars assumes that the input astrometry file is a

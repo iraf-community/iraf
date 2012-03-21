@@ -79,7 +79,7 @@ Missing or unknown data values should be set to  INDEF not left blank.
 Normal catalog and observations files records are restricted in length to
 the maximum size of a text
 file line in IRAF, currently 161 characters including the newline. The maximum
-record length can be extended by replacing the the star id in column 1
+record length can be extended by replacing the star id in column 1
 with the continuation character "*".
 
 Several preprocessors are provided to convert data coming from other
@@ -107,7 +107,7 @@ catalogs and their format files can be found in the file
 The principal advantage of this option is that no data entry is
 required on the part of the user. The principal disadvantage is that
 PHOTCAL, in preparation for id matching,  loads the entire standard
-star catalog into memory, even though the the number of observed
+star catalog into memory, even though the number of observed
 standard stars may have been only a few dozen. For typical standard
 star catalogs containing a few hundred objects this is not a problem,
 but very large standard star catalogs should be avoided.

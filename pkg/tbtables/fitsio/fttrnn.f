@@ -36,6 +36,8 @@ C           3   SUN workstation, or IBM mainframe
 C          -2305843009213693952   Cray (64-bit) machine
 
         fttrnn=.false.
+	return
+
         if (compid .eq. 1)then
 C           on the VAX we can assume that all NaNs will be set to all bits on
 C           (which is equivalent to an integer with a value of -1) because

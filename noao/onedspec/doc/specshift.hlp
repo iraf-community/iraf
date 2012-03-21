@@ -63,5 +63,5 @@ First version.
 .le
 .ih
 SEE ALSO
-sapertures, dpocor, proto.wcsreset, hedit, ranges, onedspec.package
+sapertures, dopcor, imcoords.wcsreset, hedit, ranges, onedspec.package
 .endhelp

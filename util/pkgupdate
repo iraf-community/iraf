@@ -45,12 +45,24 @@ echo "Updating repository data ...."
 
 # Check for a self-update.
 if ("$pkg" == "-self") then
+    echo "Updating utility scripts ...."
     /bin/rm -f /tmp/util.tgz
     ../util/pkgget ${REPO}/util-universal.tar.gz /tmp/util.tgz
     (chdir ../util ; tar zxf /tmp/util.tgz ; /bin/rm -f /tmp/util.tgz)
+    echo "Done"
     exit 0
 endif
  
+# Check for a extern update.
+if ("$pkg" == "-config") then
+    echo "Updating config script ...."
+    ../util/pkgget ${REPO}/config-universal configure
+    chmod 777 configure
+    echo "Done"
+    exit 0
+endif
+ 
+
 
 # Process the requested package and any dependencies.
 foreach ip ( `cat .repo_pkgs` )
@@ -67,7 +79,7 @@ foreach ip ( `cat .repo_pkgs` )
        # Update each installed architecture automatically.
        foreach a ( $alist )
 
-	 if ("$list_only" == "yes" || $rd <= $pd) then
+	 if ("$list_only" == "yes") then
             printf "Package %-12s for %-8s is out of date ....\n" $ip $a
 	 else
 	    if ("$all" == "yes" || "$ip" == "$pkg") then
@@ -78,7 +90,7 @@ foreach ip ( `cat .repo_pkgs` )
        end
 
      else
-	if ("$list_only" == "yes") then
+	if ("$list_only" == "yes" || $rd <= $pd) then
            printf "Package %-12s is current ....\n" $ip
 	endif
      endif
@@ -90,4 +102,5 @@ foreach ip ( `cat .repo_pkgs` )
   ${irafdir}/util/pkgenv -init
 end
 
+echo "Done"
 exit 0

@@ -1,5 +1,13 @@
 .help revisions May93 noao.lib
 .nf
+noaolib$ccdtime/kpno.dat
+    Added data for MOSAIC1_1 provided by Jannuzi.  (9/28/11, Valdes)
+
+noaolib$smw.h
+    An earlier change to smw.h improperly added a P2R() macro to the
+    APLOW/APHIGH declarations causing tasks with 2-D data to request data
+    out of bounds.  (3/7/11, MJF)
+
 noaolib$obsdb.dat
     Added entry for Boyden Observatory (11/20/06, MJF)
 

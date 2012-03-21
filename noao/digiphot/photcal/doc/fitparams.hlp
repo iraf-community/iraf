@@ -536,7 +536,7 @@ means that automatic bad data rejection is turned off.
 Show or set the values of the bad data rejection limits.
 If both low_reject and high_reject are zero then automatic bad data
 rejection is turned off.
-If either of the high or low rejection rejection limits are greater than zero,
+If either of the high or low rejection limits are greater than zero,
 and nreject is greater than zero, the rms of the initial fit is computed.
 Points with residuals
 more than low_reject * rms below zero and high_reject * rms above zero
@@ -605,7 +605,7 @@ eye instead of using the automatic rejection algorithm.
 	... delete bad points with the 'd' key and refit using the 'f'
 	    key
 
-	... check for any dependencies of the residuals on the the color
+	... check for any dependencies of the residuals on the color
 	    term by reprogramming the graph key 'l' using the 'g' key 
 	    (type 'g' to enter the reprogramming menu, 'l' after the
 	    prompt to reprogram the 'l' key, and "UB, residuals" in

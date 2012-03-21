@@ -68,4 +68,5 @@ libpkg.a:
 			"geogmap.h"
         geograph.x      <mach.h> <math.h> <gset.h> <math/gsurfit.h> \
                         <pkg/gtools.h> "geomap.h" "geogmap.h"
+	geoset.x	"geomap.h"
 	;

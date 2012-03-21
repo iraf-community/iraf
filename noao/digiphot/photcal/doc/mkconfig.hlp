@@ -31,7 +31,7 @@ description. \fIObservations\fR is not prompted for if \fItemplate\fR is "".
 The source of the transformation equations definition.
 \fITransform\fR may be the name of one of the supported standard star
 catalogs maintained in the directory "photcal$catalogs/",
-the standard input "STDIN", or a file created by the the user
+the standard input "STDIN", or a file created by the user
 containing the transformation equations definition.
 \fITransform\fR is not prompted for if \fItemplate\fR is "".
 .le

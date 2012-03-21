@@ -174,7 +174,7 @@ are the x and y axes rotation angles measured counter-clockwise from original
 x and y axes.
 
 If the CCMAP database is undefined then CCTRAN computes a linear plate
-solution using the the parameters \fIxref\fR, \fIyref\fR, \fIxmag\fR,
+solution using the parameters \fIxref\fR, \fIyref\fR, \fIxmag\fR,
 \fIymag\fR, \fIxrotation\fR, \fIyrotation\fR, \fIlngref\fR, \fIlatref\fR,
 \fIlngunits\fR, \fIlatunits\fR and \fIprojection\fR as shown below. Note
 that in this case xrotation and yrotation are interpreted as the rotation

@@ -8,8 +8,8 @@
 void
 IUPK32 (void *a, void *b, XINT *nelems)
 {
-	XINT i;
-	XINT *op = (XINT *) calloc (*nelems, sizeof (XINT)), *tmp;
+	XINT i, *tmp;
+	XINT *op = (XINT *) calloc (*nelems, sizeof (XINT));
 	int  *ip = (int *) a;
 
 

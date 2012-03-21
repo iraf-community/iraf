@@ -1,5 +1,4 @@
-
-#!/bin/csh
+#!/bin/csh -f
 #
 # INSTALL -- Install IRAF on a UNIX/IRAF host.  May also be run after the
 # initial installation as a consistency check to verify that all the necessary

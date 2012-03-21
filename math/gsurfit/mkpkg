@@ -5,6 +5,12 @@ $update   libgsurfit.a
 $checkin  libgsurfit.a lib$
 $exit
 
+zzdebug:
+	$update libgsurfit.a
+	$omake zzdebug.x
+	$link	zzdebug.o libgsurfit.a -o zzdebug
+	;
+
 tfiles:
 	$set GEN = "$$generic -k -t rd"
 

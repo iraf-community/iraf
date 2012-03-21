@@ -273,10 +273,10 @@ begin
 	}
 
 	# Compute the mean of the reference and input coordinates.
-	GM_XOREF(fit) = asumr (Memr[xref], npts) / npts
-	GM_YOREF(fit) = asumr (Memr[yref], npts) / npts
-	GM_XOIN(fit) = asumr (Memr[xin], npts) / npts
-	GM_YOIN(fit) = asumr (Memr[yin], npts) / npts
+	GM_XOREF(fit) = double (asumr (Memr[xref], npts) / npts)
+	GM_YOREF(fit) = double (asumr (Memr[yref], npts) / npts)
+	GM_XOIN(fit) = double (asumr (Memr[xin], npts) / npts)
+	GM_YOIN(fit) = double (asumr (Memr[yin], npts) / npts)
 
 	# Set the reference point for the projections to INDEF.
 	GM_XREFPT(fit) = INDEFD
@@ -292,32 +292,32 @@ begin
 	if (IS_INDEFR(xmin) || IS_INDEFR(xmax)) {
 	    call alimr (Memr[xref], npts, mintemp, maxtemp)
 	    if (! IS_INDEFR(xmin))
-		GM_XMIN(fit) = xmin
+		GM_XMIN(fit) = double (xmin)
 	    else
-		GM_XMIN(fit) = mintemp
+		GM_XMIN(fit) = double (mintemp)
 	    if (! IS_INDEFR(xmax))
-		GM_XMAX(fit) = xmax
+		GM_XMAX(fit) = double (xmax)
 	    else
-		GM_XMAX(fit) = maxtemp
+		GM_XMAX(fit) = double (maxtemp)
 	} else {
-	    GM_XMIN(fit) = xmin
-	    GM_XMAX(fit) = xmax
+	    GM_XMIN(fit) = double (xmin)
+	    GM_XMAX(fit) = double (xmax)
 	}
 
 	# Determine the y max and min.
 	if (IS_INDEFR(ymin) || IS_INDEFR(ymax)) {
 	    call alimr (Memr[yref], npts, mintemp, maxtemp)
 	    if (! IS_INDEFR(ymin))
-		GM_YMIN(fit) = ymin
+		GM_YMIN(fit) = double (ymin)
 	    else
-		GM_YMIN(fit) = mintemp
+		GM_YMIN(fit) = double (mintemp)
 	    if (! IS_INDEFR(ymax))
-		GM_YMAX(fit) = ymax
+		GM_YMAX(fit) = double (ymax)
 	    else
-		GM_YMAX(fit) = maxtemp
+		GM_YMAX(fit) = double (maxtemp)
 	} else {
-	    GM_YMIN(fit) = ymin
-	    GM_YMAX(fit) = ymax
+	    GM_YMIN(fit) = double (ymin)
+	    GM_YMAX(fit) = double (ymax)
 	}
 
 	# Initalize surface pointers.
@@ -595,13 +595,13 @@ begin
 
 	# Print the x and y mean values.
 	call dtput (out, "\txrefmean\t%g\n")
-	    call pargr (real(GM_XOREF(fit)))
+	    call pargd (GM_XOREF(fit))
 	call dtput (out, "\tyrefmean\t%g\n")
-	    call pargr (real(GM_YOREF(fit)))
+	    call pargd (GM_YOREF(fit))
 	call dtput (out, "\txmean\t\t%g\n")
-	    call pargr (real(GM_XOIN(fit)))
+	    call pargd (GM_XOIN(fit))
 	call dtput (out, "\tymean\t\t%g\n")
-	    call pargr (real(GM_YOIN(fit)))
+	    call pargd (GM_YOIN(fit))
 
 	# Print some of the fitting parameters.
 	if (rg_wrdstr (GM_FIT(fit), Memc[str], SZ_FNAME, GM_GEOMETRIES) <= 0)
@@ -797,12 +797,12 @@ begin
         if (comment == NO) {
 	    call fprintf (fd,
 		"    Mean Xref and Yref: %0.7g  %0.7g\n")
-		call pargr (real(GM_XOREF(fit)))
-		call pargr (real(GM_YOREF(fit)))
+		call pargd (GM_XOREF(fit))
+		call pargd (GM_YOREF(fit))
 	    call fprintf (fd,
 		"    Mean Xin and Yin: %0.7g  %0.7g\n")
-		call pargr (real(GM_XOIN(fit)))
-		call pargr (real(GM_YOIN(fit)))
+		call pargd (GM_XOIN(fit))
+		call pargd (GM_YOIN(fit))
             call fprintf (fd,
                 "    X and Y shift: %0.7g  %0.7g  (xin  yin)\n")
                 call pargr (xshift)
@@ -810,12 +810,12 @@ begin
         } else {
 	    call fprintf (fd,
 		"#     Mean Xref and Yref: %0.7g  %0.7g\n")
-		call pargr (real(GM_XOREF(fit)))
-		call pargr (real(GM_YOREF(fit)))
+		call pargd (GM_XOREF(fit))
+		call pargd (GM_YOREF(fit))
 	    call fprintf (fd,
 		"#     Mean Xin and Yin: %0.7g  %g0.7\n")
-		call pargr (real(GM_XOIN(fit)))
-		call pargr (real(GM_YOIN(fit)))
+		call pargd (GM_XOIN(fit))
+		call pargd (GM_YOIN(fit))
             call fprintf (fd,
                 "#     X and Y shift: %0.7g  %0.7g  (xin  yin)\n")
                 call pargr (xshift)
@@ -914,10 +914,10 @@ begin
 	}
 
 	# Compute the mean of the reference and input coordinates.
-	GM_XOREF(fit) = asumd (Memd[xref], npts) / npts
-	GM_YOREF(fit) = asumd (Memd[yref], npts) / npts
-	GM_XOIN(fit) = asumd (Memd[xin], npts) / npts
-	GM_YOIN(fit) = asumd (Memd[yin], npts) / npts
+	GM_XOREF(fit) = double (asumd (Memd[xref], npts) / npts)
+	GM_YOREF(fit) = double (asumd (Memd[yref], npts) / npts)
+	GM_XOIN(fit) = double (asumd (Memd[xin], npts) / npts)
+	GM_YOIN(fit) = double (asumd (Memd[yin], npts) / npts)
 
 	# Set the reference point for the projections to INDEF.
 	GM_XREFPT(fit) = INDEFD
@@ -933,32 +933,32 @@ begin
 	if (IS_INDEFD(xmin) || IS_INDEFD(xmax)) {
 	    call alimd (Memd[xref], npts, mintemp, maxtemp)
 	    if (! IS_INDEFD(xmin))
-		GM_XMIN(fit) = xmin
+		GM_XMIN(fit) = double (xmin)
 	    else
-		GM_XMIN(fit) = mintemp
+		GM_XMIN(fit) = double (mintemp)
 	    if (! IS_INDEFD(xmax))
-		GM_XMAX(fit) = xmax
+		GM_XMAX(fit) = double (xmax)
 	    else
-		GM_XMAX(fit) = maxtemp
+		GM_XMAX(fit) = double (maxtemp)
 	} else {
-	    GM_XMIN(fit) = xmin
-	    GM_XMAX(fit) = xmax
+	    GM_XMIN(fit) = double (xmin)
+	    GM_XMAX(fit) = double (xmax)
 	}
 
 	# Determine the y max and min.
 	if (IS_INDEFD(ymin) || IS_INDEFD(ymax)) {
 	    call alimd (Memd[yref], npts, mintemp, maxtemp)
 	    if (! IS_INDEFD(ymin))
-		GM_YMIN(fit) = ymin
+		GM_YMIN(fit) = double (ymin)
 	    else
-		GM_YMIN(fit) = mintemp
+		GM_YMIN(fit) = double (mintemp)
 	    if (! IS_INDEFD(ymax))
-		GM_YMAX(fit) = ymax
+		GM_YMAX(fit) = double (ymax)
 	    else
-		GM_YMAX(fit) = maxtemp
+		GM_YMAX(fit) = double (maxtemp)
 	} else {
-	    GM_YMIN(fit) = ymin
-	    GM_YMAX(fit) = ymax
+	    GM_YMIN(fit) = double (ymin)
+	    GM_YMAX(fit) = double (ymax)
 	}
 
 	# Initalize surface pointers.
@@ -1236,13 +1236,13 @@ begin
 
 	# Print the x and y mean values.
 	call dtput (out, "\txrefmean\t%g\n")
-	    call pargd (double(GM_XOREF(fit)))
+	    call pargd (GM_XOREF(fit))
 	call dtput (out, "\tyrefmean\t%g\n")
-	    call pargd (double(GM_YOREF(fit)))
+	    call pargd (GM_YOREF(fit))
 	call dtput (out, "\txmean\t\t%g\n")
-	    call pargd (double(GM_XOIN(fit)))
+	    call pargd (GM_XOIN(fit))
 	call dtput (out, "\tymean\t\t%g\n")
-	    call pargd (double(GM_YOIN(fit)))
+	    call pargd (GM_YOIN(fit))
 
 	# Print some of the fitting parameters.
 	if (rg_wrdstr (GM_FIT(fit), Memc[str], SZ_FNAME, GM_GEOMETRIES) <= 0)
@@ -1438,12 +1438,12 @@ begin
         if (comment == NO) {
 	    call fprintf (fd,
 		"    Mean Xref and Yref: %0.7g  %0.7g\n")
-		call pargd (double(GM_XOREF(fit)))
-		call pargd (double(GM_YOREF(fit)))
+		call pargd (GM_XOREF(fit))
+		call pargd (GM_YOREF(fit))
 	    call fprintf (fd,
 		"    Mean Xin and Yin: %0.7g  %0.7g\n")
-		call pargd (double(GM_XOIN(fit)))
-		call pargd (double(GM_YOIN(fit)))
+		call pargd (GM_XOIN(fit))
+		call pargd (GM_YOIN(fit))
             call fprintf (fd,
                 "    X and Y shift: %0.7g  %0.7g  (xin  yin)\n")
                 call pargd (xshift)
@@ -1451,12 +1451,12 @@ begin
         } else {
 	    call fprintf (fd,
 		"#     Mean Xref and Yref: %0.7g  %0.7g\n")
-		call pargd (double(GM_XOREF(fit)))
-		call pargd (double(GM_YOREF(fit)))
+		call pargd (GM_XOREF(fit))
+		call pargd (GM_YOREF(fit))
 	    call fprintf (fd,
 		"#     Mean Xin and Yin: %0.7g  %g0.7\n")
-		call pargd (double(GM_XOIN(fit)))
-		call pargd (double(GM_YOIN(fit)))
+		call pargd (GM_XOIN(fit))
+		call pargd (GM_YOIN(fit))
             call fprintf (fd,
                 "#     X and Y shift: %0.7g  %0.7g  (xin  yin)\n")
                 call pargd (xshift)

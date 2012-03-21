@@ -2,12 +2,13 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.14.1 September 2008"
+    logver = "IRAF V2.16 March 2012"
 
-set	home		= "iraf$local/"
-set	imdir		= "HDR$/"
+set     home            = "iraf$local/"
+set     imdir           = "HDR$/"
 set	uparm		= "home$uparm/"
-set	userid		= "iraf"
+set	cache		= "home$cache/"
+set	userid		= "fitz"
 
 # Set the terminal type.  We assume the user has defined this correctly 
 # when issuing the MKIRAF and no longer key off the unix TERM to set a
@@ -25,6 +26,7 @@ stty xgterm
 #set	stdimcur	= stdimage
 #set	stdplot		= lw
 #set	clobber		= no
+#set	imclobber	= no
 #set	filewait	= yes
 #set	cmbuflen	= 512000
 #set	min_lenuserarea	= 64000
@@ -42,11 +44,6 @@ set	imextn		= "oif:imh fxf:fits,fit fxb:fxb plf:pl qpf:qp stf:hhh,??h"
 showtype = yes
 
 
-# Load the default CL package.  Doing so here allows us to override package
-# paths and load personalized packages from our loginuser.cl. 
-clpackage
-
-
 # Default USER package; extend or modify as you wish.  Note that this can
 # be used to call FORTRAN programs from IRAF.
 
@@ -56,7 +53,7 @@ task	$adb $bc $cal $cat $comm $cp $csh $date $dbx $df $diff	= "$foreign"
 task	$du $find $finger $ftp $grep $lpq $lprm $ls $mail $make	= "$foreign"
 task	$man $mon $mv $nm $od $ps $rcp $rlogin $rsh $ruptime	= "$foreign"
 task	$rwho $sh $spell $sps $strings $su $telnet $tip $top	= "$foreign"
-task	$vi $emacs $w $wc $less $rusers $sync $pwd $gdb		= "$foreign"
+task	$awk $vi $emacs $w $wc $less $rusers $sync $pwd $gdb	= "$foreign"
 
 task	$xc $mkpkg $generic $rtar $wtar $buglog			= "$foreign"
 #task	$fc = "$xc -h $* -limfort -lsys -lvops -los"
@@ -71,25 +68,12 @@ task	$pg = ("$(less -Cqm $*)")
 if (access ("home$loginuser.cl"))
     cl < "home$loginuser.cl"
 ;
-
 keep
 
+# Load the default CL package.  Doing so here allows us to override package
+# paths and load personalized packages from our loginuser.cl. 
+clpackage
 
-prcache directory
-cache   directory page type help
-
-# Print the message of the day.
-if (access (".hushiraf"))
-    menus = no
-else {
-    clear; type hlib$motd
-}
-
-# Delete any old MTIO lock (magtape position) files.
-if (deftask ("mtclean"))
-    mtclean
-else
-    delete uparm$mt?.lok,uparm$*.wcs verify-
 
 # List any packages you want loaded at login time, ONE PER LINE.
 images          # general image operators
@@ -104,5 +88,45 @@ if (deftask ("proto"))
 tv              # image display
 utilities       # miscellaneous utilities
 noao            # optical astronomy packages
+vo              # Virtual Observatory tools
+
+prcache directory
+cache   directory page type help
+
+# Print the message of the day.
+if (access (".hushiraf"))
+    menus = no
+else {
+    clear; type hlib$motd
+}
+
+
+# Uncomment to initialize the SAMP interface on startup.
+if (deftask ("samp") == yes) {
+  printf ("Initializing SAMP .... ")
+  if (sampHubAccess() == yes) {
+     samp quiet
+
+     # Enable SAMP messaaging.
+     samp ("on",                                                >& "dev$null")
+
+     # Set default handlers that don't require VO capabilities.
+#    samp ("handler", "table.load.votable", "tinfo $url",       >& "dev$null")
+#    samp ("handler", "image.load.fits", "imstat $url",         >& "dev$null")
+
+     samp noquiet
+     print ("on")
+  } else 
+     print ("No Hub Available\n")
+}
+
+
+
+# Delete any old MTIO lock (magtape position) files.
+if (deftask ("mtclean"))
+    mtclean
+else
+    delete uparm$mt?.lok,uparm$*.wcs verify-
 
 keep
+

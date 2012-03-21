@@ -101,9 +101,11 @@ echo "		Done"
 
 echo -n "Clean '$arch' bin directories ...."
 if ($exec == "yes") then
-    /bin/rm -rf bin.$arch/*.[aeoZ] 				>& /dev/null
+    /bin/rm -rf bin.$arch/lib[a-z]*.a 				>& /dev/null
+    /bin/rm -rf bin.$arch/*.[eoZ] 				>& /dev/null
     /bin/rm -rf noao/bin.$arch/*.[aeoZ] 			>& /dev/null
 else
+    /bin/ls -l  bin.$arch/lib[a-z]*.a 				>& /dev/null
     /bin/ls -l  bin.$arch/*.[aeoZ] 				>& /dev/null
     /bin/ls -l  noao/bin.$arch/*.[aeoZ] 			>& /dev/null
 endif

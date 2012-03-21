@@ -55,7 +55,7 @@ contains any desired zero level, bias, flat field, and dark count
 effects.  The bias section is then added with a bias value given by
 \fBartobs.biasval\fR with noise given by \fBartobs.sigma\fR.
 
-Also the image image header parameters from the reference image are
+Also the image header parameters from the reference image are
 copied and the data, bias, trim, and ccd section parameters are
 updated.
 .ih

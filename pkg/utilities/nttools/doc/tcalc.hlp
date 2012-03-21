@@ -33,7 +33,7 @@ division by zero) the output column will also be set to INDEF.
 
 The following Fortran-type arithmetic operators are supported.  If the
 second argument of the exponentiation is not an integer, the result
-will be undefined if the the first argument is not positive.  Again, 
+will be undefined if the first argument is not positive.  Again, 
 remember that integer division truncates.
  
 .nf

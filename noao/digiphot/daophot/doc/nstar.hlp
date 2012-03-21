@@ -151,7 +151,7 @@ and "world" and the transformation from the input coordinate system to the
 internal "logical" system is defined by the image coordinate system. The
 simplest default is the "logical" pixel system. Users working on with image
 sections but importing pixel coordinate lists generated from the parent image
-must use use the "tv" or "physical" input coordinate systems.
+must use the "tv" or "physical" input coordinate systems.
 
 The coordinate system of the PSF model is the coordinate system defined by the
 \fIwcspsf\fR parameter. Normally the PSF model was derived from the input image
@@ -426,7 +426,7 @@ making the PSF model can be found at (442,410), (348,189), and (379,67).
     da> pdump ypix.nst.1 sharpness,chi yes | graph
 
         ... plot chi versus sharpness, the stars should cluster around
-            sharpness = 0.0 and chi = 1.0, note that that the frame does
+            sharpness = 0.0 and chi = 1.0, note that the frame does
             not have a lot of stars
 
     da> substar dev$ypix default  "" default default

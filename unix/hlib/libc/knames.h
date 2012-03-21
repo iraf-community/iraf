@@ -79,6 +79,7 @@
 #define	ZFINFO		zfinfo_
 #define	ZFLSTX		zflstx_
 #define	ZFLSTY		zflsty_
+#define	ZFLINK		zflink_
 #define	ZFMKCP		zfmkcp_
 #define	ZFMKDR		zfmkdr_
 #define	ZFNBRK		zfnbrk_
@@ -86,7 +87,9 @@
 #define	ZFPROT		zfprot_
 #define ZFPOLL		zfpoll_
 #define	ZFRNAM		zfrnam_
+#define	ZFRMDR		zfrmdr_
 #define	ZFSUBD		zfsubd_
+#define	ZFULNK		zfulnk_
 #define	ZFUNC0		zfunc0_
 #define	ZFUNC1		zfunc1_
 #define	ZFUNC2		zfunc2_
@@ -221,6 +224,7 @@
 #define zfmkdr_	kfmkdr_
 #define zfprot_	kfprot_
 #define zfrnam_	kfrnam_
+#define zfrmdr_	kfrmdr_
 #define zfutim_	kfutim_
 #define zgettx_	kgettx_
 #define zgetty_	kgetty_
@@ -303,6 +307,10 @@
 #define IUPK32		iupk32_
 #define IPAK16		ipak16_
 #define IUPK16		iupk16_
+#define IMUL32		imul32_
+#define ISCL32          iscl32_
+#define ISCL64          iscl64_
+#define	STRSUM		strsum_
 
 #define	ACLRC		aclrc_
 #define	ACLRD		aclrd_

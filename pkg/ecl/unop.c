@@ -266,8 +266,11 @@ unop (int opcode)
 	    } else
 		iresult = ival;
 	    break;
-	case OP_ISINDEF:
-	    iresult = opindef(&o);
+        case OP_ISINDEF:
+            if (in_type == OT_STRING)
+                iresult = (strcmp (o.o_val.v_s, "INDEF") == 0);
+            else
+                iresult = opindef(&o);
 	    break;
 	case OP_LOG:
 	    if (rval <= 0)
@@ -336,13 +339,13 @@ unop (int opcode)
 	    break;
 	case OP_STRLWR:
 	    for (i=0; (ch = o.o_val.v_s[i]) != EOS; i++)
-		sbuf[i] = tolower (ch);
+		sbuf[i] = (isupper (ch) ? tolower (ch) : ch);
 	    sbuf[i] = EOS;
 	    sresult = sbuf;
 	    break;
 	case OP_STRUPR:
 	    for (i=0; (ch = o.o_val.v_s[i]) != EOS; i++)
-		sbuf[i] = toupper (ch);
+		sbuf[i] = (islower (ch) ? toupper (ch) : ch);
 	    sbuf[i] = EOS;
 	    sresult = sbuf;
 	    break;

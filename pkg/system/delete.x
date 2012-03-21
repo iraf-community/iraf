@@ -15,7 +15,7 @@ int	list
 pointer	tty
 
 bool	clgetb()
-int	clpopns(), clgfil(), access(), btoi()
+int	clpopns(), clgfil(), access(), btoi(), strncmp()
 pointer	ttyodes()
 
 begin
@@ -50,6 +50,12 @@ begin
 
 		if (!clgetb ("go_ahead"))
 		    next
+	    }
+
+	    if (strncmp ("http:", fname, 5) == 0) {
+		call eprintf ("Cannot delete URL `%s'\n")
+		    call pargstr (fname)
+		next
 	    }
 
 	    iferr (call deletefg (fname, btoi(allversions), btoi(subfiles)))

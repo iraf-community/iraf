@@ -509,8 +509,13 @@ fitb_	    call printf ("Fit background (no, yes, quit) ")
 	    wyc = (wyc + slope * wx1) * scale
 	    slope = slope * scale
 
-	    # Compute model spectrum with continuum and plot.
 	    fitit = true
+
+	    # Compute model spectrum with continuum and plot.
+	    call printf ("Overplot (total, components, both, none) ")
+	    if (clgcur ("cursor", wx, wy, wc, key, Memc[cmd], SZ_FNAME) == EOF)
+		break
+
 	    rms = 0.
 	    do i = 1, npts {
 		w = Memr[x+i-1]
@@ -520,14 +525,40 @@ fitb_	    call printf ("Fit background (no, yes, quit) ")
 		rms = rms + (Memr[z+i-1] / scale - Memr[y+i-1]) ** 2
 	    }
 
-	    call gseti (gfd, G_PLTYPE, 2)
-	    call gseti (gfd, G_PLCOLOR, 2)
-	    call gpline (gfd, Memr[x], Memr[z], npts)
-	    call gseti (gfd, G_PLTYPE, 3)
-	    call gseti (gfd, G_PLCOLOR, 3)
-	    call gline (gfd, wx1, wyc, wx2, wyc + slope * (wx2 - wx1))
-	    call gseti (gfd, G_PLTYPE, 1)
-	    call gflush (gfd)
+	    # Total.
+	    if (key == 't' || key == 'b') {
+		call gseti (gfd, G_PLTYPE, 2)
+		call gseti (gfd, G_PLCOLOR, 2)
+		call gpline (gfd, Memr[x], Memr[z], npts)
+		call gseti (gfd, G_PLTYPE, 1)
+		call gflush (gfd)
+	    }
+
+	    # Components.
+	    if (key == 'c' || key == 'b') {
+		call gseti (gfd, G_PLTYPE, 3)
+		call gseti (gfd, G_PLCOLOR, 5)
+		do j = 0, ng-1 {
+		    do i = 1, npts {
+			w = Memr[x+i-1]
+			Memr[z+i-1] = model (w, dw, nsub, Memr[xg+j], Memr[yg+j],
+			    Memr[sg+j], Memr[lg+j], Memi[pg+j], 1)
+			Memr[z+i-1] = Memr[z+i-1] + wyc + slope * (w - wx1)
+		    }
+		    call gpline (gfd, Memr[x], Memr[z], npts)
+		}
+		call gseti (gfd, G_PLTYPE, 1)
+		call gflush (gfd)
+	    }
+
+	    if (key != 'n') {
+		call gseti (gfd, G_PLTYPE, 4)
+		call gseti (gfd, G_PLCOLOR, 3)
+		call gline (gfd, wx1, wyc, wx2, wyc + slope * (wx2 - wx1))
+		call gseti (gfd, G_PLTYPE, 1)
+		call gflush (gfd)
+	    }
+
 
 	    # Print computed values on status line.
 	    i = 1
@@ -682,7 +713,7 @@ done_
 	    call mfree (yg, TY_REAL)
 	    call mfree (sg, TY_REAL)
 	    call mfree (lg, TY_REAL)
-	    call mfree (pg, TY_REAL)
+	    call mfree (pg, TY_INT)
 	    ng = 0
 	}
 
@@ -749,7 +780,7 @@ begin
 	call mfree (yg, TY_REAL)
 	call mfree (sg, TY_REAL)
 	call mfree (lg, TY_REAL)
-	call mfree (pg, TY_REAL)
+	call mfree (pg, TY_INT)
 	ng = 0
 	call sfree (sp)
 end

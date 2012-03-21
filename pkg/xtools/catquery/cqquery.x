@@ -1,4 +1,5 @@
 include <fset.h>
+include <ctype.h>
 include "cqdef.h"
 include "cq.h"
 
@@ -13,11 +14,12 @@ pointer	procedure cq_query (cq)
 pointer	cq			#I the catalog database descriptor
 
 pointer	cc, res, inbuf, line, sp, spfname
-int	j, fd, nchars, nlines, nrecs, szindex
+char    url[SZ_PATHNAME], addr[SZ_LINE], query[SZ_LINE], buf[SZ_LINE]
+int	j, fd, nchars, nlines, nrecs, szindex, ip, op
 bool	done
 long	note()
 pointer	cq_rinit()
-int	ndopen(), strlen(), read(), open(), getline(), fstati()
+int	ndopen(), strlen(), read(), open(), getline(), fstati(), url_get()
 errchk	ndopen(), fprintf(), areadb(), awriteb(), open(), read()
 
 begin
@@ -28,75 +30,144 @@ begin
             return (NULL)
 	cc = CQ_CAT(cq)
 
-	# Open the network connection.
-	iferr (fd = ndopen (CQ_ADDRESS(cc), READ_WRITE))
-	    return (NULL)
 
-	# Initialize the results structure.
-	res = cq_rinit (cq)
+        if (0<1&& USE_URLGET) {
+            # Initialize the image results structure.
+	    res = cq_rinit (cq)
 
-	# Send the query and get back the results.
-	iferr {
+            call strcpy (CQ_ADDRESS(cc), buf, SZ_LINE)
+            for (ip=1; buf[ip] != ':'; ip=ip+1) ;       # skip 'inet:'
+            ip = ip + 1
+            for (    ; buf[ip] != ':'; ip=ip+1) ;       # skip '80:'
+            ip = ip + 1
+            for (op=1; buf[ip] != ':'; ip=ip+1) {
+                addr[op] = buf[ip]
+                op = op + 1
+            }
+            addr[op] = EOS
 
-	    call smark (sp)
+            call strcpy (CQ_RQUERY(res), buf, SZ_LINE)
+            for (op=1; !IS_WHITE(buf[op+4]); op=op+1)
+                query[op] = buf[op+4]
+            query[op] = EOS
 
-	    # Formulate the query.
-	    switch (CQ_RTYPE(res)) {
-	    case CQ_STEXT, CQ_BTEXT:
-	        call fprintf (fd, "%s")
-	            call pargstr (CQ_RQUERY(res))
-	    default:
-	        nchars = strlen (CQ_RQUERY(res))
-		call write (fd, CQ_RQUERY(res), nchars)
-	    }
-	    call flush (fd)
+            call sprintf (url, SZ_LINE, "http://%s%s")
+                call pargstr (addr)
+                call pargstr (query)
 
-	    # Open the output spool file.
-	    call salloc (spfname, SZ_FNAME, TY_CHAR)
-	    call mktemp ("query", Memc[spfname], SZ_FNAME)
-	    CQ_RFD(res) = open (Memc[spfname], READ_WRITE, SPOOL_FILE)
-	    call sfree (sp)
+            iferr {
+	        call smark (sp)
+	        call salloc (spfname, SZ_FNAME, TY_CHAR)
 
-	    # Get the data.
-	    call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
-	    call fseti (fd, F_CANCEL, OK)
+                call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
 
-	    switch (CQ_HFMT(cc)) {
-	    case CQ_HNONE:
-		;
-	    case CQ_HHTTP:
+	        # Open the output spool file.
+	        call mktemp ("query", Memc[spfname], SZ_FNAME)
+
+                if (url_get (url, Memc[spfname], inbuf) < 0)
+                    call error (0, "Cannot access url")
+
+	        fd = open (Memc[spfname], READ_ONLY, TEXT_FILE)
+	        CQ_RFD(res) = open (Memc[spfname], READ_WRITE, SPOOL_FILE)
 	        repeat {
-	            nchars = getline (fd, Memc[inbuf])
-	            if (nchars <= 0)
-		        break
-		    Memc[inbuf+nchars] = EOS
-	        } until ((Memc[inbuf] == '\r' && Memc[inbuf+1] == '\n') ||
-	            (Memc[inbuf] == '\n'))
-	    default:
-		;
+	 	    call aclrc (Memc[inbuf], DEF_SZ_INBUF)
+	            nchars = read (fd, Memc[inbuf], DEF_SZ_INBUF)
+	            if (nchars > 0) {
+		        Memc[inbuf+nchars] = EOS
+	                call write (CQ_RFD(res), Memc[inbuf], nchars)
+		        done = false
+	            } else
+	                done = true
+	        } until (done)
+	        call flush (CQ_RFD(res))
+		call close (fd)
+
+	        CQ_RBUF(res) = fstati (CQ_RFD(res), F_BUFPTR)
+	        call seek (CQ_RFD(res), BOF)
+
+                call mfree (inbuf, TY_CHAR)
+		call sfree (sp)
+
+            } then {
+                if (res != NULL)
+	    	    call cq_rfree (res)
+                return (NULL)
+            }
+
+        } else {
+
+	    # Open the network connection.
+	    iferr (fd = ndopen (CQ_ADDRESS(cc), READ_WRITE))
+	        return (NULL)
+
+	    # Initialize the results structure.
+	    res = cq_rinit (cq)
+
+	    # Send the query and get back the results.
+	    iferr {
+
+	        call smark (sp)
+
+	        # Formulate the query.
+	        switch (CQ_RTYPE(res)) {
+	        case CQ_STEXT, CQ_BTEXT:
+	            call fprintf (fd, "%s")
+	                call pargstr (CQ_RQUERY(res))
+	        default:
+	            nchars = strlen (CQ_RQUERY(res))
+		    call write (fd, CQ_RQUERY(res), nchars)
+	        }
+	        call flush (fd)
+
+	        # Open the output spool file.
+	        call salloc (spfname, SZ_FNAME, TY_CHAR)
+	        call mktemp ("query", Memc[spfname], SZ_FNAME)
+	        CQ_RFD(res) = open (Memc[spfname], READ_WRITE, SPOOL_FILE)
+	        call sfree (sp)
+
+	        # Get the data.
+	        call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
+	        call fseti (fd, F_CANCEL, OK)
+
+	        switch (CQ_HFMT(cc)) {
+	        case CQ_HNONE:
+		    ;
+	        case CQ_HHTTP:
+	            repeat {
+	                nchars = getline (fd, Memc[inbuf])
+	                if (nchars <= 0)
+		            break
+		        Memc[inbuf+nchars] = EOS
+	            } until ((Memc[inbuf] == '\r' && Memc[inbuf+1] == '\n') ||
+	                (Memc[inbuf] == '\n'))
+	        default:
+		    ;
+	        }
+
+	        repeat {
+	            nchars = read (fd, Memc[inbuf], DEF_SZ_INBUF)
+	            if (nchars > 0) {
+		        Memc[inbuf+nchars] = EOS
+	                call write (CQ_RFD(res), Memc[inbuf], nchars)
+		        done = false
+	            } else {
+	                done = true
+	            }
+	        } until (done)
+
+	        # Cleanup.
+	        call flush (CQ_RFD(res))
+	        call mfree (inbuf, TY_CHAR)
+	        CQ_RBUF(res) = fstati (CQ_RFD(res), F_BUFPTR)
+	        call seek (CQ_RFD(res), BOF)
+	        call close (fd)
+
+	    } then {
+	        call cq_rfree (res)
+	        call close (fd)
+	        return (NULL)
 	    }
 
-	    repeat {
-	        nchars = read (fd, Memc[inbuf], DEF_SZ_INBUF)
-	        if (nchars > 0) {
-		    Memc[inbuf+nchars] = EOS
-	            call write (CQ_RFD(res), Memc[inbuf], nchars)
-		    done = false
-	        } else {
-	            done = true
-	        }
-	    } until (done)
-
-	    # Cleanup.
-	    call flush (CQ_RFD(res))
-	    call mfree (inbuf, TY_CHAR)
-	    CQ_RBUF(res) = fstati (CQ_RFD(res), F_BUFPTR)
-	    call close (fd)
-
-	} then {
-	    call cq_rfree (res)
-	    call close (fd)
-	    return (NULL)
 	}
 
 	# Construct the record index.
@@ -114,7 +185,6 @@ begin
 	    call calloc (CQ_RINDEX(res), szindex, TY_LONG)
 
 	    # Create the index array.
-	    call seek (CQ_RFD(res), BOF)
 	    repeat {
 		Meml[CQ_RINDEX(res)+nrecs] = note (CQ_RFD(res)) 
 		nchars = getline (CQ_RFD(res), Memc[line])

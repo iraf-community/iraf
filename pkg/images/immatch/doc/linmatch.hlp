@@ -86,7 +86,7 @@ respectively. The shifts parameter is ignored if the \fIscaling\fR
 parameter is set to "photometry".
 .le
 .ls xshift = 0.0 yshift = 0.0
-The default x and y shifts to be be applied to the reference image regions
+The default x and y shifts to be applied to the reference image regions
 or objects to compute their positions in the input image.
 Values in \fIshifts\fR take precedence over the values of \fIxshift\fR and
 \fIyshift\fR. xshift and yshift are ignored if the \fIscaling\fR parameter
@@ -94,7 +94,7 @@ is set to "photometry".
 .le
 .ls dnx = 31 dny = 31
 The default size of a single image region used to compute the bscale
-and bzero factors if \fIscaling\fR is one of the the "mean", "median", "mode",
+and bzero factors if \fIscaling\fR is one of the "mean", "median", "mode",
 or "fit" algorithms and \fIregions\fR is a coordinate list rather than
 a sections list.  dnx and dny are ignored if the \fIscaling\fR parameter
 is set to "photometry".
@@ -315,7 +315,7 @@ record will be used.
 In non-interactive mode the task parameters are set at task startup time
 and the input images are processed sequentially. If the \fIverbose\fR
 flag is set, messages about the progress of the task are printed on the
-screen as the the task is running.
+screen as the task is running.
 
 In interactive mode the user can mark the regions to be used
 to compute the matching function on the image display, show/set the data

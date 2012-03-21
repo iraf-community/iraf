@@ -272,7 +272,7 @@ Note that if \fIlog\fR=yes the input spectra in either linear
 or log sampling will be resampled to produces an output spectrum in
 log sampling.  Similarly, if \fIlog\fR=no the input spectra will
 be resampled to linear sampling.  This means that log sampled input
-spectra will be resampled to to linear sampling.
+spectra will be resampled to linear sampling.
 
 Default values for any parameters which are not specified, by using the
 value INDEF, are supplied based on the wavelengths of the first and last

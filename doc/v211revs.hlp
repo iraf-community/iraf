@@ -1015,7 +1015,7 @@ release.
         behavior is unchanged. (V2.10.4p2)
  
         Changed the name of the "critovlap" parameter to "critsnratio" to
-        avoid confusion with the the meaning of the parameter especially
+        avoid confusion with the meaning of the parameter especially
         with regard the mergerad parameter. The behavior of the parameter is
         unchanged. (V2.10.4p2)
 .fi
@@ -1152,7 +1152,7 @@ the change.
 
 \fBARGUS, HYDRA, KPNOCOUDE, KPNOSLIT, SPECRED:\fR
  c  params.match: default value changed to -3 (3 pixels instead of Angstroms)
- c  sparams.match: default value changed to to -3 (3 pixels instead of Angs)
+ c  sparams.match: default value changed to -3 (3 pixels instead of Angs)
 
 \fBONEDSPEC, IMRED\fR spectral packages:
  d  fitprofs.sigma: replaced by gfwhm

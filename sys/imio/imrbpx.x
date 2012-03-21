@@ -23,7 +23,7 @@ long	vinc[ARB]		# step on each axis
 
 bool	oob
 char	pixval[8]
-int	npix, ndim, sz_pixel, btype, op, off, step, xstep, i, j, k
+int	npix, ndim, sz_pixel, btype, op, off, step, xstep, imtyp, i, j, k, ncp
 long	xs[3], xe[3], x1, x2, p, v1[IM_MAXDIM], v2[IM_MAXDIM], linelen
 errchk	imrdpx
 include	<szpixtype.inc>
@@ -71,6 +71,7 @@ begin
 	# of the image.
 
 	btype = IM_VTYBNDRY(im)
+	imtyp = IM_PIXTYPE(im)
 	op = 1
 
 	do i = 1, 3 {
@@ -93,25 +94,33 @@ begin
 		step = xstep
 
 	    # Perform the boundary extension.
+	    call aclrc (pixval, 8)
 	    if ((i == 2 && !oob) || btype == BT_REFLECT || btype == BT_WRAP)
 		call imrdpx (im, obuf[op], npix, v1, step)
 	    else {
 		# Use constant or value of nearest boundary pixel.
+		ncp = sz_pixel
 		if (btype == BT_CONSTANT)
 		    call impakr (IM_OOBPIX(im), pixval, 1, IM_PIXTYPE(im))
 		else
 		    call imrdpx (im, pixval, 1, v1, step)
 
+	    	if ((imtyp == TY_INT || imtyp == TY_LONG) && 
+		    SZ_INT != SZ_INT32) {
+	            	call iupk32 (pixval, pixval, 2) 
+			ncp = sz_pixel * 2
+		}
+		
 		# Fill the output array.
 		off = op - 1
 		do j = 1, npix {
-		    do k = 1, sz_pixel
+		    do k = 1, ncp
 			obuf[off+k] = pixval[k]
-		    off = off + sz_pixel
+		    off = off + ncp
 		}
 	    }
 
-	    op = op + (npix * sz_pixel)
+	    op = op + (npix * ncp)
 	}
 
 	# Flip the output array if the step size in X is negative.

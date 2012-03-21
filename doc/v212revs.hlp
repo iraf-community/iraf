@@ -597,7 +597,7 @@ General Task Changes
 
   \fBIMCOORDS.CCGET\fR
       The new task ccget was added to the imcoords package. Ccget extracts
-      objects in a user specified region from a a simple text file catalog.
+      objects in a user specified region from a simple text file catalog.
 
   \fBIMCOORDS.CCSTD\fR
       The task ccstd was added to the imcoords package. Ccstd transforms pixel

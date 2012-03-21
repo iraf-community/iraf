@@ -165,7 +165,7 @@ lower, probably because the kernel and i/o system are so much simpler.
 
 Interrupting a process at the wrong time can cause many problems, e.g.,
 [1] subprocess memory can be corrupted, resulting in unpredictable behavior
-and possibly deadlock when the CL later tries to talk the the process,
+and possibly deadlock when the CL later tries to talk to the process,
 [2] a VMS forced exit of the process can occur, e.g., when trying to deliver
 an AST to an invalid address, [3] corruption of the CL/subprocess communications
 protocol can occur, resulting in deadlock or the loss of sync (the output of

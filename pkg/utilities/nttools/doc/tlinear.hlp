@@ -68,7 +68,7 @@ of 1. is used.  The value of the 'wcol' column is copied to 'outtable' unless
 .le
 .ls (scol) [string]
 Column in 'intable' containing the standard deviation of X and Y.
-The X and Y values are weighted by the the values in 'scol'
+The X and Y values are weighted by the values in 'scol'
 as the reciprocal of the values squared.  (The same column name is used for each
 input table.)  If no value is passed to 'wcol' or 'scol', then
 a weight of 1. is used.  This task can accept either a weight value or a

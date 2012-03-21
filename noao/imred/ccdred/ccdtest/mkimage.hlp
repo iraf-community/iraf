@@ -11,7 +11,7 @@ PARAMETERS
 Image to create or modify.
 .le
 .ls option
-Editing option which is one one of the following:
+Editing option which is one of the following:
 .ls make
 Make a new image of the specified size, dimensionality, pixel type, and values.
 .le

@@ -116,7 +116,7 @@ of the analytic curve of growth function.
 .ls rgescale = 0.9
 The ratio of the exponential to the gaussian radial scale
 lengths in the seeing dependent part of the profile.
-In practice the the curve of growth model fits for most data do not depend
+In practice the curve of growth model fits for most data do not depend
 significantly on this parameter and it can be left at its default value.
 .le
 .ls xwings = 0.0
@@ -478,7 +478,7 @@ details and plots of the fit in the log and plot file respectively.
 stars observed in a night using the observed magnitude and computed magnitude
 correction at the aperture radius with the lowest error. Assume that the
 format of the input photometry files is the same as in the two previous
-examples and the the filter ids (U,B,V), exposure times, and airmasses were
+examples and the filter ids (U,B,V), exposure times, and airmasses were
 all present and correct in the photometry files.
 
 .nf

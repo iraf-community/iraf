@@ -1,5 +1,15 @@
 .help revisions Jan90 noao.artdata
 .nf
+
+mktemplates.x
+doc/mkobjects.hlp
+    Added Sersic model profiles.  This was done using only the model
+    name to avoid any additional parameters.  (2/24/11, Valdes)
+
+=======
+V2.15.2
+=======
+
 =======
 V2.12.2
 =======

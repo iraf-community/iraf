@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/csh
 #
 #  INSTALL -- Install IRAF on a UNIX/IRAF host.  May also be run after the
 #  initial installation as a consistency check to verify that all the necessary
@@ -57,14 +57,15 @@ setenv	path  "(/sbin /usr/sbin /bin /usr/bin /usr/5bin /usr/ucb /etc /usr/etc $p
 set LS			= "/bin/ls"				# [MACHDEP]
 set LSDF        	= "-lLtgs"				# [MACHDEP]
 
-set VERSION		= "V2.15.1a"
+set VERSION		= "V2.16"
 set V 			= `echo $VERSION | cut -c2-5`
 set hmach 		= "INDEF"
 set pciraf 		= 0
 set suniraf 		= 0
 set do_tapecaps 	= 0
 set do_tapes 		= 1
-set do_pipes 		= 1
+set do_pipes 		= 0
+set has_pipes 		= 1
 set hilite    		= 1
 set no_edit		= 0
 
@@ -192,7 +193,7 @@ switch ($UNAME)
 	set do_tapecaps 	= 1
         setenv OSVERSION `$uname_cmd -r | cut -c1`
         if ($OSVERSION == 5) then			    # Sparc Solaris
-	    set do_pipes 	= 0
+	    set has_pipes 	= 0
 	endif
         set mach 		= "freebsd"
         set hmach 		= "freebsd"
@@ -209,7 +210,7 @@ switch ($UNAME)
 	# at this point.
 	set do_tapecaps 	= 0
 	set do_tapes 		= 0
-	set do_pipes 		= 0
+	set has_pipes 		= 0
         if (`$uname_cmd -m` == "x86_64") then		    # 64-bit OSX
             set mach 		= "macintel"
             set hmach 		= "macintel"
@@ -217,8 +218,14 @@ switch ($UNAME)
             set mach 		= "ipad"
             set hmach 		= "ipad"
         else						    # 32-bit OSX
-            set mach 		= "macosx"
-            set hmach 		= "macosx"
+	    if ($?IRAFARCH == 1) then
+		# Let IRAFARCH override the default for the machine.
+                set mach 		= "$IRAFARCH"
+                set hmach 		= "$IRAFARCH"
+	    else
+                set mach 		= "macosx"
+                set hmach 		= "macosx"
+	    endif
         endif
 	set TAPES		= "/dev/*st[0-7]*"
 	set shlib		= "no"
@@ -280,7 +287,7 @@ switch ($UNAME)
 	    set TAPES		= ""		# no tape support
 	    set do_tapecaps 	= 0
 	    set do_tapes 	= 0
-	    set do_pipes 	= 0
+	    set has_pipes 	= 0
             breaksw
 
 	else
@@ -307,6 +314,7 @@ set port	= 0
 set imdir	= ""				# Initialize paths
 set lbin	= ""
 set llib	= ""
+set cache	= ""
 set o_iraf 	= ""
 set o_imdir 	= ""
 
@@ -379,6 +387,9 @@ while ("$1" != "")
 	alias SO_ON     "(if ($hilite) tput smso)"
 	alias SO_OFF    "(if ($hilite) tput rmso)"
 	breaksw
+    case -f:				# create fifo pipes
+	set do_pipes = 1
+	breaksw
     case -h:				# print help summary
 	goto Usage
     case -help:				# print help summary
@@ -408,6 +419,15 @@ while ("$1" != "")
             shift
 	endif
         breaksw
+    case -c:				# set cache directory
+	if ("$2" != "") then
+	    shift
+	else
+	    ERRMSG  "missing argument to '-c <cache>' switch"
+	    exit 1
+	endif
+	set cache = "$1"
+	breaksw
     case -i:				# set imdir directory
 	if ("$2" != "") then
 	    shift
@@ -430,6 +450,7 @@ while ("$1" != "")
 	else
 	    set hmach = "$1"
 	endif
+	setenv IRAFARCH  $mach
 	breaksw
     case -r:				# set root directory
 	if ("$2" != "") then
@@ -761,7 +782,7 @@ imdir_prompt:
             MSG ""
             MSG 'The "HDR$" syntax should not be used at this stage, please'
             MSG 'edit the hlib$mkiraf.csh script after installation if you wish'
-	    MSG 'to make this the default.'
+	    MSG "to make this the default."
         NEWLINE
 	setenv imdir $d_imdir
         goto imdir_prompt
@@ -777,6 +798,59 @@ imdir_prompt:
   	NEWLINE
   	NEWLINE
   	goto imdir_prompt
+    endif
+endif
+
+
+#=============================================================================
+# Set $cache, the default user file cache root directory.
+#=============================================================================
+
+if ("$cache" == "") then
+
+    if (-d /iraf) then
+	set d_cache = /iraf/cache
+    else if (-d /home/iraf) then
+	set d_cache = /home/iraf/cache
+    else if (-d $iraf_p) then
+	set d_cache = $iraf_p/cache
+    else if (-d /usr/local/iraf) then
+	set d_cache = /usr/local/iraf/cache
+    else
+	set d_cache = /tmp
+    endif
+
+cache_prompt:
+    BOLD_ON ; echo -n "Default root cache directory " ; BOLD_OFF
+    echo -n "($d_cache): "
+    set cache = "$<"
+    if ("$cache" == "") then
+	set cache = "$d_cache"
+    else if ("$cache" == "quit" || "$cache" == "q") then
+        exit 0
+    else if ("$cache" == "help" || "$cache" == "h" || "$cache" == "?") then
+        NEWLINE
+            MSG "The root cache directory is the default storage directory for"
+	    MSG "URL-referenced files. Individual user dirs will be created as"
+	    MSG "needed. It should be some large data disk on the machine "
+	    MSG "which has a regular backup, scratch or tmp disks should be"
+	    MSG "avoided or data may be lost."
+            MSG ""
+        NEWLINE
+	setenv cache $d_cache
+        goto cache_prompt
+    endif
+
+    # Cannot have iraf and cache the same.
+    if ("$cache" == "$iraf") then
+  	NEWLINE
+            MSG  "The definition of cache cannot be the same as the iraf"
+	    MSG  "root, please choose a different directory.  Ideally this"
+	    MSG  "should be some large data area on your system or a user"
+	    MSG  "data area such as /home, /users, /u1, etc."
+  	NEWLINE
+  	NEWLINE
+  	goto cache_prompt
     endif
 endif
 
@@ -959,6 +1033,8 @@ BOLD_ON; echo -n "New imdir     = "; \
     BOLD_OFF; echo $imdir | awk '{printf("%-20s  ", $1)}'
 BOLD_ON; echo -n "Old imdir     = "; \
     BOLD_OFF; echo $o_imdir | awk '{printf("%-20s\n", $1)}'
+BOLD_ON; echo -n "New cache     = "; \
+    BOLD_OFF; echo $cache | awk '{printf("%-20s  ", $1)}'
 BOLD_ON; echo -n "Local bin dir = "; \
     BOLD_OFF; echo $lbin | awk '{printf("%-20s\n", $1)}'
 if ("$shlib" == "yes") then
@@ -1010,6 +1086,20 @@ if ($iraf == $imdir) then
 else
   DO_OK
 endif
+
+# Cannot have iraf and cache the same.
+echo -n "Checking iraf root and cache directory ...			"
+if ($iraf == $cache) then
+  DO_FAIL ; set err_stat = 1
+  NEWLINE
+      MSG  "The 'cache' storage directory cannot be the same as the"
+      MSG  "iraf root directory.  Please choose another directory."
+  NEWLINE
+  set err_count = `expr $err_count + 1`
+else
+  DO_OK
+endif
+
 
 
 if ($no_edit == 0) then
@@ -1198,7 +1288,7 @@ _no_user_check:
 
 
 # Skip the ownership check on some platforms.
-if ($V != "2.15") then
+if ($V != "2.15" && $V != "2.16") then
  if ($mach != "cygwin" && $mach != "macosx" && $mach != "macintel") then
 
   # Check file ownership.
@@ -1368,8 +1458,7 @@ if (! (-e "$iraf_ib/cl.e" && -e "$iraf_ib/x_system.e")) then
   endif
   NEWLINE
       MSG  "The core system binary directory, $iraf_ib, does"
-      MSG  "not appear to contain the proper binaries.  The IB distribution"
-      MSG  "files should be unpacked in this directory."
+      MSG  "not appear to contain the proper binaries."
   NEWLINE
   set err_count = `expr $err_count + 1`
 else
@@ -1395,8 +1484,7 @@ if (! (-e "$iraf_nb/x_apphot.e" && -e "$iraf_nb/x_rv.e")) then
   else
       NEWLINE
           MSG  "The NOAO package binary directory, $iraf_nb, does"
-          MSG  "not appear to contain the proper files.  The NB distribution"
-          MSG  "files should be unpacked in this directory."
+          MSG  "not appear to contain the proper files."
       NEWLINE
   endif
   set err_count = `expr $err_count + 1`
@@ -1603,8 +1691,9 @@ endif
 #	2) Creating the <iraf.h> link
 #	3) Creating the system command links
 #	4) Creating the image directory (imdir)
-#	5) Tape setup (modes on alloc.e and /dev tape devices)
-#	6) Graphics/Display file installation/setup
+#	5) Creating the cache directory (cache)
+#	6) Tape setup (modes on alloc.e and /dev tape devices)
+#	7) Graphics/Display file installation/setup
 #
 ##############################################################################
 
@@ -1668,7 +1757,7 @@ endif
 
 set err_seen = 0
 
-if ($V != "2.15") then
+if ($V != "2.15" && $V != "2.16") then
 
  if ($pciraf && ($mach == "macosx" || $mach == "macintel" || $mach == "cygwin")) then
  echo -n "Creating iraf user .login/.cshrc links ...			"
@@ -1748,6 +1837,42 @@ if ("$err_seen" == 0) then
 endif
 
 
+
+# Edit the $iraf and $cache paths in mkiraf.csh, cl.csh, and libc/iraf.h files.
+
+echo -n "Editing iraf/cache paths into system files ...			"
+cd $iraf/unix/hlib
+
+set err_seen = 0
+foreach i ($PATHFILES)
+    if (-e $i) then
+	RM $TEMP >& /dev/null
+	sed -e "s+$W$o_iraf+\1$iraf+" $i  > $TEMP
+	cmp -s $i $TEMP
+	if ($status) then
+	    if ($exec == yes) then
+	        PUT $TEMP $i
+		chmod 755 $i
+	    endif
+	endif
+        RM $TEMP >& /dev/null
+    else
+	if ("$err_seen" == 0) then
+	    DO_FAIL
+	    set err_seen = 1
+            set err_count = `expr $err_count + 1`
+	endif
+	MSG  "File $i not found."
+        RM $TEMP >& /dev/null
+    endif
+end
+if ("$err_seen" == 0) then
+    DO_OK
+endif
+
+
+
+
 NEWLINE
 BOLD_ON
 echo "                       Checking File Permissions"
@@ -1819,6 +1944,30 @@ endif
 if ("$err_seen" == 0) then
     DO_OK
 endif
+
+
+# Create the root cache as a public scratch directory, if not already created.
+set err_seen = 0
+if (-d $cache) then
+    if ("`$LS -ld $cache | grep '^.rw[xs]r.[xs]r.[xt]'`" != "") then
+	echo -n 'Checking cache permissions ...'
+	echo -n '					'
+    else
+	echo -n 'Setting mode for $cache to 0777			'
+	if ($exec == yes) then
+	    chmod 777 $cache
+	endif
+    endif
+else
+    echo -n "Creating root cache at $cache ...				"
+    if ($exec == yes) then
+	mkdir $cache; chmod 777 $cache
+    endif
+endif
+if ("$err_seen" == 0) then
+    DO_OK
+endif
+
 
 
 # Allow deletion of files in /tmp - needed for multiuser tape allocation.
@@ -2056,6 +2205,72 @@ endif
 
 
 #=============================================================================
+# Install the VOClient Daemon code.
+#=============================================================================
+
+NEWLINE
+BOLD_ON
+echo "                    Installing VOClient Code"
+echo "                    ------------------------"
+BOLD_OFF
+
+
+echo -n "Creating 'voclientd' symlink ...				"
+set file1 = $lbin/voclientd
+set file2 = $iraf/vo/java/voclientd
+
+set err_seen = 0
+if (-e $file1) then
+    if ("`$LS -l $file1 | grep $file2`" == "") then
+	if ($exec == yes) then
+	    RM $file1
+	endif
+	if ($exec == yes) then
+	    ln -s $file2 $file1
+	endif
+    endif
+else
+    if ($exec == yes) then
+	ln -s $file2 $file1
+    endif
+endif
+if (("$err_seen" == 0 && -e $file1) || $exec == "no") then
+    DO_OK
+else
+    DO_FAIL
+    set err_count = `expr $err_count + 1`
+endif
+
+
+echo -n "Creating 'voclient.jar' symlink ...				"
+set file1 = $lbin/voclient.jar
+set file2 = $iraf/vo/java/voclient.jar
+
+set err_seen = 0
+if (-e $file1) then
+    if ("`$LS -l $file1 | grep $file2`" == "") then
+	if ($exec == yes) then
+	    RM $file1
+	endif
+	if ($exec == yes) then
+	    ln -s $file2 $file1
+	endif
+    endif
+else
+    if ($exec == yes) then
+	ln -s $file2 $file1
+    endif
+endif
+if (("$err_seen" == 0 && -e $file1) || $exec == "no") then
+    DO_OK
+else
+    DO_FAIL
+    set err_count = `expr $err_count + 1`
+endif
+
+
+
+#=============================================================================
 # Common code for XGTERM/XIMTOOL installation.
 #=============================================================================
 
@@ -2065,7 +2280,7 @@ echo "                    Creating Graphics Device Files"
 echo "                    ------------------------------"
 BOLD_OFF
 
-if ($do_pipes == 0) then
+if ($do_pipes == 0 || $has_pipes == 0) then
     goto _no_pipes
 endif
 
@@ -3266,7 +3481,7 @@ cleanup_:
 # was issued.
 
 Usage:
-    echo "Usage:    install [-n] [-h] [-hl] [-r rootdir] [-i imdir]"
+    echo "Usage:    install [-n] [-h] [-hl] [-f] [-r rootdir] [-i imdir]"
     echo "              [-b localbindir] [-R oldroot] [-I oldimdir]"
     echo "              [-u username ] [-l locallibdir]  [-m mach ]"
     echo "              [-noedit]"
@@ -3275,7 +3490,9 @@ Usage:
     echo "          -h          # print this help summary"
     echo "          +hl         # enable highlighted text"
     echo "          -hl         # disable highlighted text"
+    echo "          -f          # create fifo pipes (if supported)"
     echo "          -r          # set iraf root directory"
+    echo "          -c          # set cache directory"
     echo "          -i          # set imdir directory"
     echo "          -b          # set local bin directory"
     echo "          -l          # set local lib directory"

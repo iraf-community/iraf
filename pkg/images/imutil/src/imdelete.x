@@ -13,7 +13,7 @@ int	list, nchars
 pointer	sp, tty, imname, im
 
 pointer	ttyodes(), immap()
-int	imtopenp(), imtgetim(), imaccess(), strlen()
+int	imtopenp(), imtgetim(), imaccess(), strlen(), strncmp()
 bool	clgetb()
 
 begin
@@ -26,6 +26,7 @@ begin
 	    tty = ttyodes ("terminal")
 
 	while (imtgetim (list, Memc[imname], SZ_FNAME) != EOF) {
+
 	    if (verify) {
 		# If image does not exist, warn user (since verify mode is
 		# in effect).
@@ -66,6 +67,7 @@ begin
 		if (! clgetb ("go_ahead"))
 		    next
 	    }
+
 	    iferr (call imdelete (Memc[imname]))
 		call erract (EA_WARN)
 	}

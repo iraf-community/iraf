@@ -78,7 +78,8 @@ begin
 	} else if (Memc[tform_lc+ip-1] == 'm') {	# complex double prec
 	    call error (1, "can't handle complex double precision")
 	} else if (Memc[tform_lc+ip-1] == 'p') {	# variable length
-	    call error (1, "can't handle variable length arrays")
+#	    call error (1, "can't handle variable length arrays")
+	    ;
 	} else if (Memc[tform_lc+ip-1] == 'x') {	# bit
 	    dtype = TBL_TY_SHORT
 	    len = nelem * SZ_SHORT

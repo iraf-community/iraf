@@ -126,7 +126,7 @@ begin
 
 	if (sym != NULL) {
 	    do num = nread + 1, nvars
-		vars[num] = Memr[sym+num-nread-1]
+		vars[num] = Memr[P2R(sym+num-nread-1)]
 	    nread = nvars
 	}
 

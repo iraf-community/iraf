@@ -5,7 +5,7 @@
 
 # Compiler Flags.
 
-RELEASE		= v2.15.1
+RELEASE		= v2.16
 CFLAGS 		=
 CDEBUGFLAGS 	= -O2 -Wall
 BOOTSTRAPCFLAGS = 
@@ -22,33 +22,52 @@ all:: update
 sysgen::
 	@echo "Building the IRAF $(RELEASE) software tree"
 	@echo "" ; date ; echo ""
-	@echo "" ; date ; echo ""
-	@echo ""
 	(util/mksysgen)
-	@echo ""
-	@echo "Done."
+	@echo "" ; date ; echo ""
 
-# Update recent changes.
+# Update (compile) recent changes.
 update::
 	@echo "Updating the IRAF $(RELEASE) software tree"
 	@echo "" ; date ; echo ""
-	@echo ""
 	(util/mkup)
 	@echo "" ; date ; echo ""
-	@echo "Done."
 
-# Update with debug libraries.
+# Update (compile) with debug libraries.
 updatex::
 	@echo "Updating the IRAF $(RELEASE) software tree"
 	@echo "" ; date ; echo ""
-	@echo ""
 	(util/mkupx)
 	@echo "" ; date ; echo ""
-	@echo "Done."
+
+# Update with cumulative patch of entire system
+latest::
+	@echo "Updating IRAF $(RELEASE) to latest release."
+	@echo "" ; date ; echo ""
+	(util/iraf_update -all)
+	@echo "" ; date ; echo ""
+
+# Check if system is the latest distributed version
+check_latest::
+	(util/iraf_update -list)
+
+# Update with cumulative patch of core system
+latest_src::
+	@echo "Updating IRAF $(RELEASE) to latest source release."
+	@echo "" ; date ; echo ""
+	(util/iraf_update -src)
+	@echo "" ; date ; echo ""
+
+# Update with cumulative patch of core system
+latest_core::
+	@echo "Updating IRAF $(RELEASE) to core release."
+	@echo "" ; date ; echo ""
+	(util/iraf_update -core)
+	@echo "" ; date ; echo ""
+
 
 # Update recent changes from the repository.
 self_update::
-	@util/pkgupdate -self
+	(util/self_update)
 
 
 

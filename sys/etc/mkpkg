@@ -108,6 +108,8 @@ libsys.a:
 	sysptime.x	<ctype.h>
 	tsleep.x	
 	ttopen.x	<fset.h>
+        urlget.x        <ctype.h> <fset.h> <mach.h>
+        votable.x
 	xalloc.x	<ctype.h> <knet.h> <xalloc.h>
 	xerfmt.x	<ctype.h>
 	xerpop.x	error.com <error.h>

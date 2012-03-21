@@ -30,6 +30,7 @@ define	TEXT_FILE	11		# file types
 define	BINARY_FILE	12
 define	DIRECTORY_FILE	13
 define	STATIC_FILE	14
+define	SYMLINK_FILE	15
 define	SPOOL_FILE	(-2)
 define	RANDOM		1		# advice for imagefiles
 define	SEQUENTIAL	2
@@ -55,7 +56,7 @@ define	SZ_COMPLEX	4
 define	SZ_POINTER	4
 define	SZ_STRUCT	4
 define	SZ_USHORT	1
-define	SZ_FNAME	255		# max chars in a file name
+define	SZ_FNAME	511		# max chars in a file name/URL
 define	SZ_PATHNAME	511		# OS dependent file names
 define	SZ_LINE		1023		# max chars in a line
 define	SZ_COMMAND	2047		# max size command block

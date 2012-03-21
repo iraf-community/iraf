@@ -48,7 +48,10 @@ libvops.a:
 
 	urand.x		<mach.h>
 	imul32.c			# added to support 64-bit
+	iscl32.c			# added to support 64-bit
+	iscl64.c			# added to support 64-bit
 	iand32.c			# added to support 64-bit
+	strsum.c			# added for VO integration support
 
 	# If a C compiler is not available for the following they will have
 	# to be written in assembler or some other low level language, and

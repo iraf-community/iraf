@@ -331,7 +331,7 @@ and ICRS systems.
 The equinox value is interpreted as a Besselian epoch for the FK4 and
 FK4-NO-E systems and as a Julian epoch for the FK5 and ICRS systems. Users are
 strongly urged to use the EQUINOX keyword in preference to the EPOCH
-keyword if they must enter their own values of the the equinox into
+keyword if they must enter their own values of the equinox into
 the image header. The FK4 and
 FK4-NO-E systems are not inertial and therefore also require the epoch of the 
 observation (the time when the mean place was correct) in addition to the
@@ -716,7 +716,7 @@ the output coordinates in hours and degrees to the output file.
 .fi
 
 Note that if the coordinate system, e.g. fk5, is not specified explicitly
-then equinoxes < 1984 must be be prefixed by J, or a Besselian rather than
+then equinoxes < 1984 must be prefixed by J, or a Besselian rather than
 a Julian epoch will be assumed.
 
 3. Repeat the previous example but replace the input coordinates with

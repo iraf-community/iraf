@@ -31,7 +31,7 @@ begin
 	    gki[GKI_REACTIVATEWS_F] = flags
 	    nchars = GKI_REACTIVATEWS_LEN * SZ_SHORT
 	    if (IS_FILE(fd) && (fd >= STDGRAPH && fd <= STDPLOT)) {
-		call write (PSIOCTRL, fd, SZ_INT)
+		call write (PSIOCTRL, fd, SZ_INT32)
 		call write (PSIOCTRL, gki, nchars)
 		call flush (PSIOCTRL)
 	    }

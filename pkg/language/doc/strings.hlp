@@ -6,7 +6,7 @@ strings -- string manipulation functions available in the CL
 USAGE
 .nf
 str     (x)
-substr  (str, start, end)
+substr  (str, first, last)
 stridx  (test, str)
 strldx  (test, str)
 strlen  (str)
@@ -25,9 +25,10 @@ Converts its argument into a string.  The argument may be
 boolean, integer or real.
 .le
 .ls substr (str, first, last)
-Extracts a substring from string \fIstr\fR.  The \fIlast\fR value may be
-larger than \fIfirst\fR, in which case the returned string is reversed.
-The first character in the string is at index 1.
+Extracts a substring from string \fIstr\fR from index \fIfirst\fR to 
+index \fIlast\fR.  The \fIfirst\fR value may be larger than \fIlast\fR, in 
+which case the returned string is reversed.  The first character in the 
+string is at index 1.
 .le
 .ls stridx (test, str)
 Finds the position of the first occurrence of any character found in \fItest\fR
@@ -47,11 +48,11 @@ Converts \fIstr\fR to all lower-case characters, returns a string value.
 .ls strupr (str)
 Converts \fIstr\fR to all upper-case characters, returns a string value.
 .le
-.ls strstr (str1, str1)
+.ls strstr (str1, str2)
 Finds the position of the first occurrence of \fIstr1\fR in \fIstr2\fR (an
 exact match is required), or 0 if the match fails.
 .le
-.ls strlstr (str1, str1)
+.ls strlstr (str1, str2)
 Finds the position of the last occurrence of \fIstr1\fR in \fIstr2\fR (an
 exact match is required), or 0 if the match fails.
 .le

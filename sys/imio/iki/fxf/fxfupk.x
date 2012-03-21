@@ -56,7 +56,7 @@ begin
 	    if (!fp_equald(bscale,1.0d0) || !fp_equald(bzero,0.0d0)) {
 		if (BYTE_SWAP4 == YES)
 		    call bswap4 (cbuf, 1, cbuf, 1, nbytes)
-		call fxf_altmr (cbuf, cbuf, npix, bscale, bzero)
+		call iscl32 (cbuf, cbuf, npix, bscale, bzero)
 	    } else
 		call ieevupkr (cbuf, cbuf, npix)
 	   
@@ -65,7 +65,7 @@ begin
 	    if (!fp_equald(bscale,1.0d0) || !fp_equald(bzero,0.0d0)) {
 		if (BYTE_SWAP4 == YES)
 		    call bswap4 (cbuf, 1, cbuf, 1, nbytes)
-		call fxf_altmd (cbuf, cbuf, npix, bscale, bzero)
+		call iscl64 (cbuf, cbuf, npix, bscale, bzero)
 	    } else
 		call ieevupkd (cbuf, cbuf, npix)
 	   

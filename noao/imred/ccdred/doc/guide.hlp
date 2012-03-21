@@ -268,7 +268,7 @@ operations are described in the following section.
      However, the first thing you might want to try before any
 processing is to get a listing of the CCD images showing the CCD image
 types, subsets, and processing flags.  The task for this is
-\fBccdlist\fR.  It has three types of of output; a short one line per
+\fBccdlist\fR.  It has three types of output; a short one line per
 image format, a longer format which shows the state of the processing,
 and a format which prints the image names only (used to create files
 containing lists of images of a particular CCD image type).  To get a

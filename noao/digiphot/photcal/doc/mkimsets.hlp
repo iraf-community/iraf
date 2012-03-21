@@ -165,7 +165,7 @@ the temporary image list file.
 If \fIedit\fR is "yes", the user enters the text editor and edits the
 temporary image list interactively.
 The image list must be arranged so that members of each image set are
-adjacent to each other in the the image list.
+adjacent to each other in the image list.
 Missing images may be represented by
 an INDEF in column 1, the appropriate filter id in column 2, and
 INDEF in any other columns.

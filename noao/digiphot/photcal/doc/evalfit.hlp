@@ -103,7 +103,7 @@ and standard star catalog directory.
 .ih
 DESCRIPTION
 
-EVALFIT evaluates the the transformation  equations
+EVALFIT evaluates the transformation  equations
 for the program and/or standard objects in \fIobservations\fR, using
 the transformation equations defined in \fIconfig\fR,
 the fitted parameter values in the file \fIparameters\fR produced by the

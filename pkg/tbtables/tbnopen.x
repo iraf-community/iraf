@@ -126,6 +126,7 @@ begin
 	}
 
 	Memc[op] = EOS
+
 	listp = fntopnb (Memc[fnt], sort)
 
 	call sfree (sp)

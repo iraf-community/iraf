@@ -553,7 +553,7 @@ fit has been achieved.
 .ih
 CURSOR COMMANDS
 
-In interactive mode the the following cursor commands are currently available.
+In interactive mode the following cursor commands are currently available.
 
 .nf
         Interactive Keystroke Commands
@@ -699,7 +699,7 @@ by P.T. Wallace, available from the Starlink archives.
 .ih
 EXAMPLES
 
-1. Register a radio image to an X-ray image of the same field field using
+1. Register a radio image to an X-ray image of the same field using
 a 100 point coordinate  grid and a simple linear transformation.  Both
 images have accurate sky projection world coordinate systems. Print the
 output world coordinates in the coords file in hh:mm:ss.ss and dd:mm:ss.s

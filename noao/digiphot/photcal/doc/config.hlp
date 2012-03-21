@@ -10,7 +10,7 @@ to the standard indices.
 
 The \fIcatalog\fR file contains the standard indices for a set of
 standard stars, referenced in the catalog by a name called the \fImatching
-name\fR.  The matching name must be be in the first column of the
+name\fR.  The matching name must be in the first column of the
 catalog and also must be unique, i.e. each catalog file
 entry is assumed to be unique. The standard indices may be in any column
 other than the first.

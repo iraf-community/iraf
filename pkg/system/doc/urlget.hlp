@@ -1,0 +1,84 @@
+.help urlget Sep2011 system
+.ih
+NAME
+urlget -- Get a (http) URL to the named file
+.ih
+USAGE
+urlget url fname
+.ih
+PARAMETERS
+.ls url
+The URL to download.
+.le
+.ls fname
+The name of the file to create containing the URL contents.  If not
+specified, the trailing part of the URL is used as the filename.
+.le
+.ls use_cache = yes
+Use the system file cache?  If 'yes' and the file already exists in the
+cache, the cached file will be copied to the output filename.
+If 'no' then the URL will be downloaded again.
+.le
+.ls extn = ""
+Optional filename extension to put on the cached filename.  This can be
+used to force files to be saved as a particular type in the cache.
+.le
+.ls verbose = no
+Print verbose output?
+.le
+.ls cache = "cache$"
+Logical cache directory name.
+.le
+
+.ih
+DESCRIPTION
+The \fIURLGET\fR task is used to download a URL (HTTP protocol only) to a 
+local file named by the \fIfname\fR parameter.  If no \fIfname\fR is given, 
+a filename is constructed from the last part of the URL (i.e.
+characters trailing any of the '?', '/', or '&' delimiters).  Because 
+the URL may not point to a static file, use of the \fIfname\fR parameter
+is recommended.
+
+If the \fIuse_cache\fR parameter is set, the URL will only be downloaded if
+it does not already exist in the file cache pointed to by the \fIcache\fR
+parameter, otherwise the cached file will be copied to the output filename.
+The \fIextn\fR parameter may be to used to force a specific file extension
+to be appended to the filename in the cache, this allows a URL to be passed
+to a task and treated as if it were a file of a specific type.
+
+.ih
+EXAMPLES
+
+1. Download a FITS image from a URL (these are equivalent):
+
+.nf
+    cl> urlget http://iraf.noao.edu/foo.fits 
+    cl> urlget http://iraf.noao.edu/foo.fits foo.fits
+.fi
+
+2. Force a URL to be downloaded again:
+.nf
+    cl> urlget http://iraf.noao.edu/foo.fits use_cache=no
+.fi
+
+3. Download a URL with special characters:
+.nf
+    cl> urlget http://iraf.noao.edu/scripts/tget?f=foo.fits
+or
+    cl> s1 = "http://iraf.noao.edu/scripts/tget?f=foo.fits"
+    cl> urlget(s1)
+or
+    cl> s1 = "http://iraf.noao.edu/scripts/tget?f=foo.fits&d=/iraf/web"
+    cl> urlget(s1,"foo.fits",verbose+)
+.fi
+
+Escaping special characters isn't required from the commandline since the
+URL is assumed to be whitespace or comma delimited.
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+
+.endhelp

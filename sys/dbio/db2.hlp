@@ -601,7 +601,7 @@ necessary.
 .ke
 
 
-All strings will will be stored in a fixed size string buffer in the header
+All strings will be stored in a fixed size string buffer in the header
 area; it is the index of the string which is stored in the domain and
 attribute lists.  This eliminates the need to place an upper limit on the
 size of domain names and enumerated value lists and makes it possible

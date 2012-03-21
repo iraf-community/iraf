@@ -66,6 +66,15 @@ ZFACSS (
 	    else
 		*status = NO;
 	    return (*status);
+
+	} else if (!accessible && *type == SYMLINK_FILE) {
+	    lstat ((char *)fname, &fi);
+	    if (fi.st_mode & S_IFLNK)
+		*status = YES;
+	    else
+		*status = NO;
+
+	    return (*status);
 	}
 
 	/* If we have to check the file type (text or binary), then we must

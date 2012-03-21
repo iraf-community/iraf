@@ -5,9 +5,9 @@ $exit
 
 update:					# make ecl.e and install in bin$
         $ifeq (MACH, sparc) then
-        $set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
+            $set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
         $else
-        $call   libs@readline
+            $call   libs@readline
         $endif
 	$call	relink
 	$call	install
@@ -52,9 +52,9 @@ relink:
 	$endif
 
 	$ifeq (MACH, sparc) then
-	$set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
+	    $set    XFLAGS          = "$(XFLAGS) -/DNO_READLINE"
 	$else
-	$call	libs@readline
+	    $call	libs@readline
 	$endif
 
 	$update libpkg.a

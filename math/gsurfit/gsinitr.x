@@ -31,7 +31,7 @@ begin
 	    call error (0, "GSINIT: ymax <= ymin.")
 
 	# allocate space for the gsurve descriptor
-	call malloc (sf, LEN_GSSTRUCT, TY_STRUCT)
+	call calloc (sf, LEN_GSSTRUCT, TY_STRUCT)
 
 	# specify the surface-type dependent parameters
 	switch (surface_type) {
@@ -79,6 +79,9 @@ begin
 
 	# set remaining parameters
 	GS_TYPE(sf) = surface_type
+	GS_XREF(sf) = INDEFR
+	GS_YREF(sf) = INDEFR
+	GS_ZREF(sf) = INDEFR
 	GS_XMIN(sf) = xmin
 	GS_XMAX(sf) = xmax
 	GS_YMAX(sf) = ymax

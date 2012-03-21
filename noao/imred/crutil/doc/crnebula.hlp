@@ -72,7 +72,7 @@ replaced by the median, a cosmic ray mask, the residual image used to
 detect the cosmic rays, and the residual image used to exclude cosmic rays
 in regions of nebular fine structure.  The cosmic ray mask may be used
 later with \fBcrgrow\fR and \fBcrfix\fR to grow and remove the cosmic rays
-from the the data by interpolation rather than the median.
+from the data by interpolation rather than the median.
 
 The algorithm is as follows.  The input image is median filtered using a
 box of size given by \fImbox\fR.  The residual image between the unfiltered

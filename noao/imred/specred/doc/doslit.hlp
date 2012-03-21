@@ -550,7 +550,7 @@ extracted.  The dispersion function is defined using the task
 the automatic identification.  Whether or not the automatic identification
 is successful you will be shown the result of the arc line identification.
 If the automatic identification is not successful identify a few arc lines
-with with 'm' and and use the 'l' line list identification command to
+with with 'm' and use the 'l' line list identification command to
 automatically add additional lines and fit the dispersion function.  Check
 the quality of the dispersion function fit with 'f'.  When satisfied exit
 with 'q'.

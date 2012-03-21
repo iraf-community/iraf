@@ -25,7 +25,7 @@ call to \fBzfsubd\fR to generate the name of a directory lower in the hierarchy.
 If \fIosdir\fR is null the current working directory is assumed.
 If \fIsubdir\fR is null or has the value "." \fIosdir\fR is either copied to
 the output or modified as necessary to return a concatenatable directory
-prefix string.  If \fIsubdir\fR has the value ".." the the name of the next
+prefix string.  If \fIsubdir\fR has the value ".." the name of the next
 \fIhigher\fR directory is returned, i.e., the directory in which \fIosdir\fR
 appears as a subdirectory.
 .ih

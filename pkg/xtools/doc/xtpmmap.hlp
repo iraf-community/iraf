@@ -89,7 +89,7 @@ ill-defined (all matrix elements are assumed zero).
 
 The matching consists of deriving a transformation between the
 logical pixels in the image and the mask by combining the two physical
-transformations.  This means that even if the the logical to physical
+transformations.  This means that even if the logical to physical
 transformations are complex, such as a rotation, if the two are the same
 a identity or a simple offset relative transformation may still exist
 between the two.  In this combined logical-to-logical transformation

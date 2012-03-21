@@ -2,7 +2,7 @@
 
 # set up the curve descriptor structure
 
-define	LEN_GSSTRUCT	30
+define	LEN_GSSTRUCT	64
 
 define	GS_TYPE		Memi[$1]	# Type of curve to be fitted
 define	GS_XORDER	Memi[$1+1]	# Order of the fit in x
@@ -11,23 +11,26 @@ define	GS_XTERMS	Memi[$1+3]	# Cross terms for polynomials
 define	GS_NXCOEFF	Memi[$1+4]	# Number of x coefficients
 define	GS_NYCOEFF	Memi[$1+5]	# Number of y coefficients
 define	GS_NCOEFF	Memi[$1+6]	# Total number of coefficients
-define	GS_XMAX		Memr[P2R($1+7)]	# Maximum x value
-define	GS_XMIN		Memr[P2R($1+8)]	# Minimum x value
-define	GS_YMAX		Memr[P2R($1+9)]	# Maximum y value
-define	GS_YMIN		Memr[P2R($1+10)]# Minimum y value		
-define	GS_XRANGE	Memr[P2R($1+11)]# 2. / (xmax - xmin), polynomials
-define	GS_XMAXMIN	Memr[P2R($1+12)]# - (xmax + xmin) / 2., polynomials
-define	GS_YRANGE	Memr[P2R($1+13)]# 2. / (ymax - ymin), polynomials
-define	GS_YMAXMIN	Memr[P2R($1+14)]# - (ymax + ymin) / 2., polynomials
-define	GS_NPTS		Memi[$1+15]	# Number of data points
+define	GS_XREF		Memr[P2R($1+7)]	# x reference value
+define	GS_YREF		Memr[P2R($1+8)]	# y reference value
+define	GS_ZREF		Memr[P2R($1+9)]	# z reference value
+define	GS_XMAX		Memr[P2R($1+10)]# Maximum x value
+define	GS_XMIN		Memr[P2R($1+11)]# Minimum x value
+define	GS_YMAX		Memr[P2R($1+12)]# Maximum y value
+define	GS_YMIN		Memr[P2R($1+13)]# Minimum y value		
+define	GS_XRANGE	Memr[P2R($1+14)]# 2. / (xmax - xmin), polynomials
+define	GS_XMAXMIN	Memr[P2R($1+15)]# - (xmax + xmin) / 2., polynomials
+define	GS_YRANGE	Memr[P2R($1+16)]# 2. / (ymax - ymin), polynomials
+define	GS_YMAXMIN	Memr[P2R($1+17)]# - (ymax + ymin) / 2., polynomials
+define	GS_NPTS		Memi[$1+18]	# Number of data points
 
-define	GS_MATRIX	Memi[$1+16]	# Pointer to original matrix
-define	GS_CHOFAC	Memi[$1+17]	# Pointer to Cholesky factorization
-define	GS_VECTOR	Memi[$1+18]	# Pointer to  vector
-define	GS_COEFF	Memi[$1+19]	# Pointer to coefficient vector
-define	GS_XBASIS	Memi[$1+20]	# Pointer to basis functions (all x)
-define	GS_YBASIS	Memi[$1+21]	# Pointer to basis functions (all y)
-define	GS_WZ		Memi[$1+22]	# Pointer to w * z (gsrefit)
+define	GS_MATRIX	Memi[$1+19]	# Pointer to original matrix
+define	GS_CHOFAC	Memi[$1+20]	# Pointer to Cholesky factorization
+define	GS_VECTOR	Memi[$1+21]	# Pointer to  vector
+define	GS_COEFF	Memi[$1+22]	# Pointer to coefficient vector
+define	GS_XBASIS	Memi[$1+23]	# Pointer to basis functions (all x)
+define	GS_YBASIS	Memi[$1+24]	# Pointer to basis functions (all y)
+define	GS_WZ		Memi[$1+25]	# Pointer to w * z (gsrefit)
 
 # matrix and vector element definitions
 

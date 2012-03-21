@@ -301,7 +301,7 @@ default sizes of increasing size.
 Label the tick marks?
 .le
 .ls title = ""				(cehjklrsv.)
-User title.  This is independent of the the standard banner title.
+User title.  This is independent of the standard banner title.
 .le
 .ls top_closed = no			(h)
 Include z2 in the top histogram bin?  Each bin of the histogram is a
@@ -614,7 +614,7 @@ This aperture photometry and FWHM tool is intended only for general image
 analysis and quick look measurements.  The background fitting, photometry,
 and FWHM techniques used are not intended for serious astronomical
 photometry; other packages, e.g., \fInoao.digiphot.apphot\fR, should be
-used if precise results are are desired.
+used if precise results are desired.
 .le
 .ls b
 The integer pixel coordinates defining a region of the image are printed.

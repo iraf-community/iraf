@@ -1,0 +1,8 @@
+
+	This directory contains the VOClient package applications built
+from this interface.  These include:
+
+    votcopy		Copy/Convert a VOTable to another format
+    votget		Get the files (or extract references) from a VOTable
+    vosesame		Resolve object name to positions
+    votinfo		Print information about a VOTable

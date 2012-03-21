@@ -35,10 +35,10 @@ libpkg.a:
 	curfit.x	curfit.h <fset.h> <imhdr.h> <pkg/gtools.h>\
 			<math/curfit.h>
 	decod_tablst.x	<ctype.h>
-	lcase.x	
+	t_lcase.x	
 	pfregres.f
 	pffctn.x
-	split.x		<mach.h>
+	t_split.x	<mach.h>
 	t_curfit.x	<ctype.h> <error.h> <fset.h> <imhdr.h> <pkg/gtools.h>\
 			<pkg/xtanswer.h>
 	t_detab.x	
@@ -46,6 +46,6 @@ libpkg.a:
 	t_polyfit.x	<fset.h>
 	t_surfit.x	<imhdr.h> <error.h> <math/gsurfit.h>
 	t_translit.x	<chars.h> <ctype.h> <pattern.h> <fset.h>
-	ucase.x	
-	urand.x	
+	t_ucase.x	
+	t_urand.x	
 	;

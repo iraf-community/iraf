@@ -15,8 +15,8 @@ EXAMPLES
 1. Sum the pixels in a two dimensional array.  Skip any negative valued pixels.
 
 .nf
-	for (i=1;  i < NCOLS;  i+=1) {
-	    for (j=1;  j < NLINES;  j+=1) {
+	for (i=1;  i <= NCOLS;  i+=1) {
+	    for (j=1;  j <= NLINES;  j+=1) {
 		if (pixel[i,j] < 0)
 		    next
 		total += pixel[i,j]

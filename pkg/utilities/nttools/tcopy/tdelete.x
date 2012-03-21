@@ -53,13 +53,20 @@ bool	doit
 pointer	sp, fname
 
 bool	clgetb(), is_wholetab()
-int	access(), tbtacc()
+int	access(), tbtacc(), strncmp()
 
 begin
 	call smark (sp)
 	call salloc (fname, SZ_FNAME, TY_CHAR)
 
 	# Check to make sure the deletion is OK
+
+	if (strncmp ("http:", file, 5) == 0) {
+	    call eprintf ("Cannot delete URL `%s'\n")
+	        call pargstr (file)
+	    call sfree (sp)
+	    return
+	}
 
 	if (verify) {
 	    if (tbtacc (file) == NO) {

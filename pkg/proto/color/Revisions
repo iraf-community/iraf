@@ -1,5 +1,9 @@
 .help revisions Aug92 color
 .nf
+
+src/rgb8bit.par		-
+    Delete unused file.  (10/24/11)
+
 =================================
 Archive 3/14/96:  Fourth release
 =================================

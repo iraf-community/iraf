@@ -4,8 +4,9 @@
 
 # The following definitions are site dependent. [SITEDEP]
 
-set	iraf	= "/iraf/iraf"
-set	imdir	= "/iraf/imdirs"
+set	iraf		= "/iraf/iraf"
+set	imdir		= "/iraf/imdirs"
+set	cachedir	= "/iraf/cache"
 set	ttymsg  =\
 "Terminal types: xgterm,xterm,gterm,vt640,vt100,etc."
 
@@ -83,21 +84,31 @@ endif
 if ($user_term == "none") then
     echo $ttymsg
     echo -n 'Enter terminal type: '
-    echo $<	| sed -e "s;.*;s+U_TERM+&+;"		>  _sed
+    echo $<	| sed -e "s;.*;s+U_TERM+&+;"			>  _sed
 else
-    echo $user_term | sed -e "s;.*;s+U_TERM+&+;"	>  _sed
+    echo $user_term | sed -e "s;.*;s+U_TERM+&+;"		>  _sed
 endif
 
-pwd	| sed -e "s;.*;s+U_HOME+&/+;"			>> _sed
-pwd	| sed -e "s;.*;s+U_UPARM+&/uparm/+;"		>> _sed
+pwd	| sed -e "s;.*;s+U_HOME+&/+;"				>> _sed
+pwd	| sed -e "s;.*;s+U_UPARM+&/uparm/+;"			>> _sed
+
 if (! (-e "$imdir" && -w "$imdir") ) then
     set imdir = HDR$
-    whoami	| sed -e "s;.*;s+U_IMDIR+${imdir}/+;"	>> _sed
+    whoami	| sed -e "s;.*;s+U_IMDIR+${imdir}/+;"		>> _sed
 else
-    whoami	| sed -e "s;.*;s+U_IMDIR+${imdir}/&/+;"	>> _sed
+    whoami	| sed -e "s;.*;s+U_IMDIR+${imdir}/&/+;"		>> _sed
     whoami	| sed -e "s;.*;mkdir $imdir/& 2> /dev/null;" | sh
 endif
-whoami	| sed -e "s;.*;s+U_USER+&+;"		>> _sed
+
+if (! (-e "$cachedir" && -w "$cachedir") ) then
+    set cachedir = /tmp/
+    whoami	| sed -e "s;.*;s+U_CACHEDIR+${cachedir}/+;"	>> _sed
+else
+    whoami	| sed -e "s;.*;s+U_CACHEDIR+${cachedir}/&/+;"	>> _sed
+    whoami	| sed -e "s;.*;mkdir $cachedir/& 2> /dev/null;" | sh
+endif
+
+whoami	| sed -e "s;.*;s+U_USER+&+;"				>> _sed
 
 sed -f _sed < $iraf/unix/hlib/login.cl > login.cl; rm _sed
 

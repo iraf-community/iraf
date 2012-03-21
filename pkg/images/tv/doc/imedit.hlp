@@ -124,7 +124,7 @@ provide a zoom feature.  See the examples for another possible command.
 .ls graphics = "stdgraph"
 Graphics device used for surface plots.  Normally this is the standard
 graphics device "stdgraph" though other possibilities are "stdplot"
-and "stdvdm".  Note the the standard graphics output may also be
+and "stdvdm".  Note the standard graphics output may also be
 redirected to a file with ">G file" where "file" is any file name.
 .le
 .ls default = "b"

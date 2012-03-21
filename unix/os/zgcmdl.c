@@ -4,7 +4,11 @@
 #define import_spp
 #include <iraf.h>
 
-extern	char **environ;
+extern	char *environ[];
+#ifdef	MACOSX
+extern  char ***_NSGetArgv();
+extern  int *_NSGetArgc();
+#endif
 
 #ifdef LINUXPPC
 #define xargc	f__xargc
@@ -34,10 +38,15 @@ ZGCMDL (
 {
 	register char	*ip, *op;
 	unsigned int	*ep;
-	register int	n;
+	register int	n, narg;
 	char	**argv;
 
+#ifdef	MACOSX
+	argv = *_NSGetArgv();
+	xargc = *_NSGetArgc();
+	xargv = argv;
 
+#else
 	if (!(argv = xargv)) {
 	    /* Locate the ARGV array.  This assumes that argc,argv are
 	     * stored in memory immediately preceeding the environment
@@ -56,10 +65,12 @@ ZGCMDL (
 	     * !! NOTE !! - This is very system dependent!
 	     */
 	    ep = ((unsigned int *) *environ) - 1;
-	    for (n=0;  *(ep-1) != (unsigned int)n;  n++)
+	    for (narg=0;  *(ep-1) != (unsigned int)narg;  narg++)
 		--ep;
+	    xargc = narg;
 	    argv = (char **)ep;
 	}
+#endif
 
 	/* Reconstruct the argument list.
 	 */

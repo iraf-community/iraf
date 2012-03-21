@@ -14,6 +14,7 @@ devices		hlp=dev$devices.hlp,	 src=devices.cl
 devstatus	hlp=doc$devstatus.hlp,	 src=hlib$devstatus.cl
 directory	hlp=doc$directory.hlp,	 src=directory.x
 diskspace	hlp=doc$diskspace.hlp,	 src=hlib$diskspace.cl
+fcache		hlp=doc$fcache.hlp,	 src=t_fcache.x
 files		hlp=doc$files.hlp,	 src=files.x
 gripes		hlp=doc$gripes.hlp,	 src=hlib$gripes.cl
 head		hlp=doc$head.hlp,	 src=head.x
@@ -35,9 +36,11 @@ revisions	hlp=doc$revisions.hlp,	 src=revisions.cl
 rewind		hlp=doc$rewind.hlp,	 src=rewind.x
 sleep		hlp=doc$sleep.hlp,	 src=sleep.x
 sort		hlp=doc$sort.hlp,	 src=sort.x
-spy		hlp=doc$spy.hlp,	 src=spy.cl
+spy		hlp=doc$spy.hlp,	 src=hlib$spy.cl
+system		hlp=doc$system.hlp,	 src=system.cl
 tail		hlp=doc$tail.hlp,	 src=tail.x
 tee		hlp=doc$tee.hlp,	 src=tee.x
 touch		hlp=doc$touch.hlp,	 src=touch.x
 type		hlp=doc$type.hlp,	 src=type.x
+urlget		hlp=doc$urlget.hlp,	 src=urlget.x
 unprotect	hlp=doc$unprotect.hlp,	 src=unprotect.x

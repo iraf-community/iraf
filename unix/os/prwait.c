@@ -29,6 +29,11 @@ struct proctable {
 	int	pr_exit_status;	/* process exit_status			*/
 } prtable[MAXPROCS];
 
+extern int errno;
+
+#ifdef MACOSX
+#define POSIX
+#endif
 
 
 /* PR_ENTER -- Make a new entry in the process table.  Something is very wrong
@@ -44,7 +49,7 @@ pr_enter (int pid, int inchan, int outchan)
 
 
 	if ((pr = pr_findpid (NULL)) == NULL)
-	    kernel_panic ("process table overflow");
+	    kernel_panic ("iraf process table overflow");
 	else {
 	    pr->pr_pid = pid;
 	    pr->pr_active = YES;
@@ -62,7 +67,8 @@ int
 pr_wait (int pid)
 {
 	register struct proctable *pr;
-	int	waitpid, error_code;
+	int	error_code;
+	pid_t	waitpid;
 	struct	proctable *pr_findpid();
 #ifdef POSIX
 	int	exit_status;
@@ -91,7 +97,7 @@ pr_wait (int pid)
 	     * when a killed bkg process terminates after its process slot
 	     * has been released.
 	     */
-	    while ((waitpid = wait (&exit_status)) != ERR)
+	    while ((waitpid = wait (&exit_status)) != ERR) {
 		if ((pr = pr_findpid (waitpid)) != NULL) {
 		    pr->pr_active = NO;
 
@@ -110,6 +116,7 @@ pr_wait (int pid)
 			return (pr->pr_exit_status);
 		    }
 		}
+	    }
 	    return (ERR);
 	}
 }
@@ -146,9 +153,10 @@ pr_findpid (int pid)
 	register int	pr;
 
 
-	for (pr=0;  pr < MAXPROCS;  pr++)
+	for (pr=0;  pr < MAXPROCS;  pr++) {
 	    if (prtable[pr].pr_pid == pid)
 		return (&prtable[pr]);
+	}
 	
 	return (NULL);
 }
@@ -161,7 +169,6 @@ void
 pr_release (int pid)
 {
 	register struct proctable *pr;
-
 
 	if ((pr = pr_findpid (pid)) != NULL)
 	    pr->pr_pid = (int) NULL;

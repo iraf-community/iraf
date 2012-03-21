@@ -30,7 +30,6 @@ libpkg.a:
 			<fset.h> <protect.h> <time.h>
 	files.x	
 	head.x		<error.h>
-	isdir.x		<ctype.h> <finfo.h>
 	lprint.x	<error.h> <finfo.h> <time.h> <ttyset.h>
 	match.x		<ctype.h> <pattern.h>
 	mkdir.x	
@@ -48,4 +47,6 @@ libpkg.a:
 	touch.x 	<error.h> <finfo.h> <time.h>
 	type.x		<error.h>
 	unprotect.x	<error.h> <protect.h>
+        t_fcache.x      <error.h>
+	t_urlget.x	<error.h> <imhdr.h> <imset.h> <mach.h>
 	;

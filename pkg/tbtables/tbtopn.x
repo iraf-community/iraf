@@ -1,6 +1,7 @@
 # This file contains tbtopn and tbtvfn.
 
 include	<error.h>
+include <syserr.h>
 include <tbset.h>
 include "tbtables.h"
 include "tblerr.h"
@@ -53,9 +54,15 @@ pointer rowselect, colselect	# for selector strings
 pointer tp		# pointer to table descriptor
 int	exists		# true if table file exists
 bool	crash
+
+int	lstart
+char	url[SZ_PATHNAME], tblname[SZ_PATHNAME]
+char	osfn[SZ_PATHNAME], cnvname[SZ_PATHNAME], cosfn[SZ_PATHNAME]
+
 long	tbtbod()
-int	tbnparse(), tbttyp()
-bool	streq()
+int	tbnparse(), tbttyp(), strncmp(), access(), vot_to_fits()
+bool	streq(), is_votable()
+
 errchk	malloc, tbuopn, tbsopn, tbctpe, tbnparse, tbttyp, vfn_expand_ldir
 
 begin
@@ -67,6 +74,77 @@ begin
 
 	crash = false			# initial value
 
+        # If we're given a URL to a file, cache it.
+	call aclrc (cnvname, SZ_PATHNAME)
+        if (strncmp ("http:", tablename, 5) == 0) {
+	    call strcpy (tablename, url, SZ_PATHNAME)
+            if (iomode == NEW_FILE)
+                call syserr (SYS_FNOWRITEPERM)
+
+	    call fcname ("cache$", url, "f", tblname, SZ_PATHNAME)
+	    call strcpy (tblname, cnvname, SZ_PATHNAME)
+	    call strcat (".fits", cnvname, SZ_PATHNAME)
+
+	    if (access (cnvname, 0, 0) == NO) {
+                #call fcadd ("cache$", url, "fits", tblname, SZ_PATHNAME)
+                call fcadd ("cache$", url, "", tblname, SZ_PATHNAME)
+		if (access (cnvname,0,0) == YES && is_votable (cnvname)) {
+	            if (vot_to_fits (tblname, tblname) != OK) {
+	                call error (ER_TBCONVERT, 
+			    "tbtopn: cannot convert table format")
+		    }
+		}
+	    } else
+                call strcpy (cnvname, tblname, SZ_PATHNAME)
+
+        } else if (strncmp ("file://", tablename, 7) == 0) {
+	    lstart = 8
+            if (strncmp ("file://localhost", tablename, 16) == 0) 
+		lstart = 17
+            else if (strncmp ("file:///localhost", tablename, 17) == 0) 
+		lstart = 18
+	
+	    # Strip file:// prefix from the URI.
+            call strcpy (tablename[lstart], tblname, SZ_PATHNAME)
+
+	    call fcname ("cache$", tablename[lstart], "f", tblname, SZ_PATHNAME)
+	    call strcpy (tblname, cnvname, SZ_PATHNAME)
+	    call strcat (".fits", cnvname, SZ_PATHNAME)
+
+	    if (access (cnvname, 0, 0) == NO) {
+                call fcadd ("cache$", tablename[lstart], "fits", tblname,
+		    SZ_PATHNAME)
+		if (access (cnvname,0,0) == YES && is_votable (cnvname)) {
+	            if (vot_to_fits (tblname, tblname) != OK) {
+	                call error (ER_TBCONVERT, 
+			    "tbtopn: cannot convert table format")
+		    }
+		}
+	    } else
+                call strcpy (cnvname, tblname, SZ_PATHNAME)
+
+	} else if (is_votable (tablename)) {
+	    call fcname ("cache$", tablename, "f", tblname, SZ_PATHNAME)
+	    call strcpy (tblname, cnvname, SZ_PATHNAME)
+	    call strcat (".fits", cnvname, SZ_PATHNAME)
+
+	    if (access (cnvname, 0, 0) == NO) {
+                call fcadd ("cache$", tablename, "fits", tblname, SZ_PATHNAME)
+		if (access (cnvname,0,0) == YES && is_votable (cnvname)) {
+                    if (vot_to_fits (tblname, cnvname) != OK) {
+                        call error (ER_TBCONVERT, 
+		            "tbtopn: cannot convert table format")
+	            }
+	        }
+	    } else
+                call strcpy (cnvname, tblname, SZ_PATHNAME)
+
+        } else {
+	    # Nothing to do, just use it and hope it's a format we know about.
+            call strcpy (tablename, tblname, SZ_PATHNAME)
+        }
+
+
 	# Allocate space for the table descriptor and for the table name.
 	# The TB_EXTNAME is the name of the table within a CDF file,
 	# or it can be the EXTNAME in a FITS file.
@@ -74,11 +152,15 @@ begin
 	call malloc (TB_NAME_PTR(tp), SZ_FNAME, TY_CHAR)
 	call malloc (TB_OS_FILENAME_PTR(tp), SZ_FNAME, TY_CHAR)
 	call malloc (TB_EXTNAME_PTR(tp), SZ_FNAME, TY_CHAR)
+	if (cnvname[1] != EOS) {
+	    call malloc (TB_SRC_PTR(tp), SZ_FNAME, TY_CHAR)
+	    call strcpy (tablename, TB_SRC(tp), SZ_FNAME)
+	}
 
 	# Parse the table name, copying the file name to TB_NAME and
 	# extracting information from the bracketed expression (if any)
 	# to get TB_EXTNAME, etc.
-	if (tbnparse (tablename, TB_NAME(tp), TB_EXTNAME(tp), Memc[brackets],
+	if (tbnparse (tblname, TB_NAME(tp), TB_EXTNAME(tp), Memc[brackets],
 		SZ_FNAME, TB_EXTVER(tp), TB_HDU(tp), TB_OVERWRITE(tp),
 		Memc[rowselect], Memc[colselect], SZ_LINE) < 1) {
 	    crash = true

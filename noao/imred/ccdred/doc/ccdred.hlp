@@ -33,7 +33,7 @@ is specified then no metacode plot file is kept.
 .le
 .ls backup = ""
 Backup prefix for backup images.  If no prefix is specified then no backup
-images are kept when processing.  If specified then the the backup image
+images are kept when processing.  If specified then the backup image
 has the specified prefix.
 .le
 .ls instrument = ""

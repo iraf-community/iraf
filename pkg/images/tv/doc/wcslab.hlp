@@ -319,7 +319,7 @@ since the image display graphics kernel writes directly into the display
 frame buffer. In this case the user must redisplay the image and rerun
 WCSLAB for each new plot.
 
-The parameters controlling the the detailed appearance of the plot
+The parameters controlling the detailed appearance of the plot
 are contained in the parameter set specified by \fIwlpars\fR.
 
 .ih

@@ -504,7 +504,7 @@ Because the scale and zero levels are adjusted only the relative
 values are important.
 
 If both an intensity scaling and zero point shift are selected the
-zero point is added first and the the scaling is done.  This is
+zero point is added first and the scaling is done.  This is
 important if the scale and offset values are specified by
 header keywords or from a file of values.  However,
 in the log output the zero values are given as the scale times

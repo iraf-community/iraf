@@ -80,7 +80,7 @@ int	status		# zero is OK
 int	hdu		# HDU number (zero is primary header)
 int	fd[2]		# unit number for FITS file; cfitsio pointer
 double	dfd		# to force alignment of fd
-equivalence (fd, dfd)	# to force alignment of fd
+#equivalence (fd, dfd)	# to force alignment of fd
 int	hdutype		# type of current HDU
 int	extver		# value of EXTVER from existing header, or -1
 int	ncols		# number of columns, but min of 1 (for allocating space)

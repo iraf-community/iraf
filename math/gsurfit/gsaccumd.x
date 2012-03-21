@@ -21,10 +21,11 @@ double	z		# z value
 double	w		# weight
 int	wtflag		# type of weighting
 
+bool	refsub
 int	ii, j, k, l
 int	maxorder, xorder, xxorder, xindex, yindex, ntimes
 pointer	sp, vzptr, mzptr, xbptr, ybptr
-double	byw, bw
+double	x1, y1, z1, byw, bw
 
 begin
 	# increment the number of points
@@ -57,30 +58,39 @@ begin
 
 	# allocate space for the basis functions
 	call smark (sp)
+	call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_DOUBLE)
+	call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_DOUBLE)
+
+	# subtract reference value
+	refsub = !(IS_INDEFD(GS_XREF(sf)) || IS_INDEFD(GS_YREF(sf)) ||
+	    IS_INDEFD(GS_ZREF(sf)))
+	if (refsub) {
+	    x1 = x - GS_XREF(sf)
+	    y1 = y - GS_YREF(sf)
+	    z1 = z - GS_ZREF(sf)
+	} else {
+	    x1 = x
+	    y1 = y
+	    z1 = z
+	}
 
 	# calculate the non-zero basis functions
 	switch (GS_TYPE(sf)) {
 	case GS_LEGENDRE:
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_DOUBLE)
-	    call dgs_b1leg (x, GS_XORDER(sf), GS_XMAXMIN(sf),
-	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
-	    call dgs_b1leg (y, GS_YORDER(sf), GS_YMAXMIN(sf),
-	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    call dgs_b1leg (x1, GS_XORDER(sf), GS_XMAXMIN(sf),
+		GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+	    call dgs_b1leg (y1, GS_YORDER(sf), GS_YMAXMIN(sf),
+		GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	case GS_CHEBYSHEV:
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_DOUBLE)
-	    call dgs_b1cheb (x, GS_XORDER(sf), GS_XMAXMIN(sf),
-	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
-	    call dgs_b1cheb (y, GS_YORDER(sf), GS_YMAXMIN(sf),
-	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    call dgs_b1cheb (x1, GS_XORDER(sf), GS_XMAXMIN(sf),
+		GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+	    call dgs_b1cheb (y1, GS_YORDER(sf), GS_YMAXMIN(sf),
+		GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	case GS_POLYNOMIAL:
-	    call salloc (GS_XBASIS(sf), GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), GS_YORDER(sf), TY_DOUBLE)
-	    call dgs_b1pol (x, GS_XORDER(sf), GS_XMAXMIN(sf),
-	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
-	    call dgs_b1pol (y, GS_YORDER(sf), GS_YMAXMIN(sf),
-	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    call dgs_b1pol (x1, GS_XORDER(sf), GS_XMAXMIN(sf),
+		GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+	    call dgs_b1pol (y1, GS_YORDER(sf), GS_YMAXMIN(sf),
+		GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
 	default:
 	    call error (0, "GSACCUM: Unkown surface type.")
 	}

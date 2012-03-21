@@ -184,7 +184,7 @@ cl> agetcat pars default filter+ fsort=mag1 fexpr="mag1 <= 16.0"
 cl> page reg001.cat.3
 .fi
 
-4. Repeat example 3 but but output a new field equal to mag2 - mag3.
+4. Repeat example 3 but output a new field equal to mag2 - mag3.
 
 .nf
 cl> agetcat pars default filter+ fsort=mag1 fexpr="mag1 <= 16.0" \

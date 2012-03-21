@@ -16,8 +16,9 @@ int	acmode			# image access mode
 int	hdr_arg			# length of user fields, or header pointer
 
 pointer	sp, imname, root, cluster, ksection, section, im
+char	inname[SZ_PATHNAME]
 int	min_lenuserarea, len_imhdr, cl_index, cl_size, i, val
-int	btoi(), ctoi(), envfind(), fnroot(), strlen(), envgeti()
+int	btoi(), ctoi(), envfind(), fnroot(), strlen(), envgeti(), strncmp()
 errchk	im_make_newcopy, im_init_newimage, malloc
 
 begin
@@ -38,8 +39,22 @@ begin
 	} else
 	    min_lenuserarea = MIN_LENUSERAREA
 
+
+	# If we're given a URL to an image, cache the file.
+	if (strncmp ("http://", imspec, 7) == 0)
+	    call fcadd ("cache$", imspec, "", inname, SZ_PATHNAME)
+	else if (strncmp ("file:///localhost", imspec, 17) == 0)
+	    call strcpy (imspec[18], inname, SZ_PATHNAME)
+	else if (strncmp ("file://localhost", imspec, 16) == 0)
+	    call strcpy (imspec[17], inname, SZ_PATHNAME)
+	else if (strncmp ("file://", imspec, 7) == 0)
+	    call strcpy (imspec[7], inname, SZ_PATHNAME)
+	else
+	    call strcpy (imspec, inname, SZ_PATHNAME)
+
+
 	# Parse the full image specification into its component parts.
-	call imparse (imspec, Memc[cluster],SZ_PATHNAME,
+	call imparse (inname, Memc[cluster],SZ_PATHNAME,
 	    Memc[ksection],SZ_FNAME, Memc[section],SZ_FNAME, cl_index,cl_size)
 
 	# Allocate buffer for image descriptor/image header.  Note the dual
@@ -93,7 +108,7 @@ begin
 IM_FAST(im) = NO
 
 	# Set the image name field, used by IMERR everywhere.
-	call strcpy (imspec, IM_NAME(im), SZ_IMNAME)
+	call strcpy (inname, IM_NAME(im), SZ_IMNAME)
 
 	# Initialize the mode dependent fields of the image header.
 	if (acmode == NEW_COPY)

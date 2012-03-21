@@ -16,19 +16,51 @@ int	type				# text or binary file
 
 int	fd
 pointer	sp, vfn
+char	url[SZ_PATHNAME], cache[SZ_PATHNAME], extn[SZ_PATHNAME]
+
 bool	nullfile, fnullfile()
 extern	zopnbf(), zopntx(), zardbf(), zgettx(), zopnsf(), zardsf()
 extern	zopnnu(), zardnu(), zgetnu()
-int	filopn(), fgetfd(), nowhite()
+int	filopn(), fgetfd(), nowhite(), strncmp()
+
 errchk	syserr, fgetfd, filopn, seek
 
 begin
 	call smark (sp)
 	call salloc (vfn, SZ_PATHNAME, TY_CHAR)
 
-	# Strip any whitespace at either end of the filename.
-	if (nowhite (fname, Memc[vfn], SZ_PATHNAME) == 0)
-	    call syserr (SYS_FNOFNAME)
+
+        # If we're given a URL to a file, cache it.
+	call aclrc (Memc[vfn], SZ_PATHNAME)
+	call strcpy ("cache$", cache, SZ_PATHNAME)
+	call strcpy ("", extn, SZ_PATHNAME)
+
+        if (strncmp ("http:", fname, 5) == 0) {
+	    call strcpy (fname, url, SZ_PATHNAME)
+	    if (mode == NEW_FILE)
+		call syserr (SYS_FNOWRITEPERM)
+            call fcadd (cache, url, extn, Memc[vfn], SZ_PATHNAME)
+
+        } else if (strncmp ("file:///localhost", fname, 17) == 0) {
+	    # Handle local 'file' URIs
+	    if (nowhite (fname[18], Memc[vfn], SZ_PATHNAME) == 0)
+	        call syserr (SYS_FNOFNAME)
+
+        } else if (strncmp ("file://localhost", fname, 16) == 0) {
+	    # Handle local 'file' URIs
+	    if (nowhite (fname[16], Memc[vfn], SZ_PATHNAME) == 0)
+	        call syserr (SYS_FNOFNAME)
+
+        } else if (strncmp ("file://", fname, 7) == 0) {
+	    # Handle local 'file' URIs
+	    if (nowhite (fname[7], Memc[vfn], SZ_PATHNAME) == 0)
+	        call syserr (SYS_FNOFNAME)
+
+        } else {
+	    # Strip any whitespace at either end of the filename.
+	    if (nowhite (fname, Memc[vfn], SZ_PATHNAME) == 0)
+	        call syserr (SYS_FNOFNAME)
+	}
 
 	# Check for the null file.
 	nullfile = fnullfile (Memc[vfn])

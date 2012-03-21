@@ -1,0 +1,603 @@
+\hypertarget{votParse__f77_8c}{
+\section{votParse\_\-f77.c File Reference}
+\label{votParse__f77_8c}\index{votParse\_\-f77.c@{votParse\_\-f77.c}}
+}
+Public interface for the libVOTable F77 wrapper.  
+
+
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$expat.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$ctype.h$>$}\par
+{\tt \#include $<$errno.h$>$}\par
+{\tt \#include \char`\"{}votParseP.h\char`\"{}}\par
+{\tt \#include \char`\"{}votParse.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{votParse__f77_8c_78285e3c80bbf6d0c13aeca43d4006d0}{
+\#define \textbf{VF\_\-OPENVOTABLE}~vf\_\-openvotable\_\-}
+\label{votParse__f77_8c_78285e3c80bbf6d0c13aeca43d4006d0}
+
+\item 
+\hypertarget{votParse__f77_8c_822eefbe5c85844de2623c17fba8ce56}{
+\#define \textbf{VF\_\-CLOSEVOTABLE}~vf\_\-closevotable\_\-}
+\label{votParse__f77_8c_822eefbe5c85844de2623c17fba8ce56}
+
+\item 
+\hypertarget{votParse__f77_8c_b48bb11b2cbddc5e761c58c53b045e09}{
+\#define \textbf{VF\_\-GETRESOURCE}~vf\_\-getresource\_\-}
+\label{votParse__f77_8c_b48bb11b2cbddc5e761c58c53b045e09}
+
+\item 
+\hypertarget{votParse__f77_8c_a916348eb29d2337336b5bcc9bedf3e6}{
+\#define \textbf{VF\_\-GETTABLE}~vf\_\-gettable\_\-}
+\label{votParse__f77_8c_a916348eb29d2337336b5bcc9bedf3e6}
+
+\item 
+\hypertarget{votParse__f77_8c_3794f4b7fd5f0889d19a12fdaa63b46b}{
+\#define \textbf{VF\_\-GETFIELD}~vf\_\-getfield\_\-}
+\label{votParse__f77_8c_3794f4b7fd5f0889d19a12fdaa63b46b}
+
+\item 
+\hypertarget{votParse__f77_8c_f9804cee1c4f1808f1bfcb98710d5517}{
+\#define \textbf{VF\_\-GETDATA}~vf\_\-getdata\_\-}
+\label{votParse__f77_8c_f9804cee1c4f1808f1bfcb98710d5517}
+
+\item 
+\hypertarget{votParse__f77_8c_6afd855dc7062c471a1619622f74e22e}{
+\#define \textbf{VF\_\-GETTABLEDATA}~vf\_\-gettabledata\_\-}
+\label{votParse__f77_8c_6afd855dc7062c471a1619622f74e22e}
+
+\item 
+\hypertarget{votParse__f77_8c_587c13820b5beb051de7fee887428826}{
+\#define \textbf{VF\_\-GETTR}~vf\_\-gettr\_\-}
+\label{votParse__f77_8c_587c13820b5beb051de7fee887428826}
+
+\item 
+\hypertarget{votParse__f77_8c_39f758d4700418977dca9d14971263fb}{
+\#define \textbf{VF\_\-GETTD}~vf\_\-gettd\_\-}
+\label{votParse__f77_8c_39f758d4700418977dca9d14971263fb}
+
+\item 
+\hypertarget{votParse__f77_8c_a80fe0725bae73f264dd604cd4f8dc6e}{
+\#define \textbf{VF\_\-GETBINARY}~vf\_\-getbinary\_\-}
+\label{votParse__f77_8c_a80fe0725bae73f264dd604cd4f8dc6e}
+
+\item 
+\hypertarget{votParse__f77_8c_5808cca59114d1748f1d0afb19dd1613}{
+\#define \textbf{VF\_\-GETFITS}~vf\_\-getfits\_\-}
+\label{votParse__f77_8c_5808cca59114d1748f1d0afb19dd1613}
+
+\item 
+\hypertarget{votParse__f77_8c_83185510fd9361b263330088c8827187}{
+\#define \textbf{VF\_\-GETGROUP}~vf\_\-getgroup\_\-}
+\label{votParse__f77_8c_83185510fd9361b263330088c8827187}
+
+\item 
+\hypertarget{votParse__f77_8c_5ff57b4f1ed80fffe9faa2006d81b7a7}{
+\#define \textbf{VF\_\-GETFIELDREF}~vf\_\-getfieldref\_\-}
+\label{votParse__f77_8c_5ff57b4f1ed80fffe9faa2006d81b7a7}
+
+\item 
+\hypertarget{votParse__f77_8c_1fc6d343686ec5ab7fa66a54c059458b}{
+\#define \textbf{VF\_\-GETPARAMREF}~vf\_\-getparamref\_\-}
+\label{votParse__f77_8c_1fc6d343686ec5ab7fa66a54c059458b}
+
+\item 
+\hypertarget{votParse__f77_8c_55d893bd9c6c77d16bcaee143e04fb60}{
+\#define \textbf{VF\_\-GETDESCRIPTION}~vf\_\-getdescription\_\-}
+\label{votParse__f77_8c_55d893bd9c6c77d16bcaee143e04fb60}
+
+\item 
+\hypertarget{votParse__f77_8c_11f2f2cfc27dfe1a81425f3542639ba4}{
+\#define \textbf{VF\_\-GETPARAM}~vf\_\-getparam\_\-}
+\label{votParse__f77_8c_11f2f2cfc27dfe1a81425f3542639ba4}
+
+\item 
+\hypertarget{votParse__f77_8c_c120782344fb3b1f0c20479aaa7ca6a3}{
+\#define \textbf{VF\_\-GETINFO}~vf\_\-getinfo\_\-}
+\label{votParse__f77_8c_c120782344fb3b1f0c20479aaa7ca6a3}
+
+\item 
+\hypertarget{votParse__f77_8c_0cde128b142986d6bd96354299d20cb8}{
+\#define \textbf{VF\_\-GETSTREAM}~vf\_\-getstream\_\-}
+\label{votParse__f77_8c_0cde128b142986d6bd96354299d20cb8}
+
+\item 
+\hypertarget{votParse__f77_8c_04ca4d0676d053bd5da14f053344498d}{
+\#define \textbf{VF\_\-GETVALUES}~vf\_\-getvalues\_\-}
+\label{votParse__f77_8c_04ca4d0676d053bd5da14f053344498d}
+
+\item 
+\hypertarget{votParse__f77_8c_71e828b88192c0c00a5d58ea9bba2b89}{
+\#define \textbf{VF\_\-GETMIN}~vf\_\-getmin\_\-}
+\label{votParse__f77_8c_71e828b88192c0c00a5d58ea9bba2b89}
+
+\item 
+\hypertarget{votParse__f77_8c_ef81d36b90b58efcd901eb683cebd571}{
+\#define \textbf{VF\_\-GETMAX}~vf\_\-getmax\_\-}
+\label{votParse__f77_8c_ef81d36b90b58efcd901eb683cebd571}
+
+\item 
+\hypertarget{votParse__f77_8c_0549732d89f7c2f0bfcea91aafc12992}{
+\#define \textbf{VF\_\-GETOPTION}~vf\_\-getoption\_\-}
+\label{votParse__f77_8c_0549732d89f7c2f0bfcea91aafc12992}
+
+\item 
+\hypertarget{votParse__f77_8c_de13f5e53e6c46c3300698832dba4a23}{
+\#define \textbf{VF\_\-GETLINK}~vf\_\-getlink\_\-}
+\label{votParse__f77_8c_de13f5e53e6c46c3300698832dba4a23}
+
+\item 
+\hypertarget{votParse__f77_8c_6ca93f9887bab98875e9988d51c69ca2}{
+\#define \textbf{VF\_\-GETCOOSYS}~vf\_\-getcoosys\_\-}
+\label{votParse__f77_8c_6ca93f9887bab98875e9988d51c69ca2}
+
+\item 
+\hypertarget{votParse__f77_8c_b1655d8a95f5485feecf516d63e330ba}{
+\#define \textbf{VF\_\-GETDATATYPE}~vf\_\-getdatatype\_\-}
+\label{votParse__f77_8c_b1655d8a95f5485feecf516d63e330ba}
+
+\item 
+\hypertarget{votParse__f77_8c_c82f0eaa800e349241cda7ed8f7d2c21}{
+\#define \textbf{VF\_\-GETDATATYPESTR}~vf\_\-getdatatypestr\_\-}
+\label{votParse__f77_8c_c82f0eaa800e349241cda7ed8f7d2c21}
+
+\item 
+\hypertarget{votParse__f77_8c_75b8df52cedaebc95e483f52428ac4e6}{
+\#define \textbf{VF\_\-NEWNODE}~vf\_\-newnode\_\-}
+\label{votParse__f77_8c_75b8df52cedaebc95e483f52428ac4e6}
+
+\item 
+\hypertarget{votParse__f77_8c_25bfa1e44dedf01ca1d6b545c7d56a55}{
+\#define \textbf{VF\_\-FREENODE}~vf\_\-freenode\_\-}
+\label{votParse__f77_8c_25bfa1e44dedf01ca1d6b545c7d56a55}
+
+\item 
+\hypertarget{votParse__f77_8c_26d88a062da48cf2c84b8f817785c8fb}{
+\#define \textbf{VF\_\-ATTACHNODE}~vf\_\-attachnode\_\-}
+\label{votParse__f77_8c_26d88a062da48cf2c84b8f817785c8fb}
+
+\item 
+\hypertarget{votParse__f77_8c_adcc3038417a34ba11955bd3b3bc80af}{
+\#define \textbf{VF\_\-DELETENODE}~vf\_\-deletenode\_\-}
+\label{votParse__f77_8c_adcc3038417a34ba11955bd3b3bc80af}
+
+\item 
+\hypertarget{votParse__f77_8c_b31b661211d9aa25601b205ea86c32fc}{
+\#define \textbf{VF\_\-COPYELEMENT}~vf\_\-copyelement\_\-}
+\label{votParse__f77_8c_b31b661211d9aa25601b205ea86c32fc}
+
+\item 
+\hypertarget{votParse__f77_8c_89fce6cbd3bf9cc75fd08951d5a86d31}{
+\#define \textbf{VF\_\-GETNCOLS}~vf\_\-getncols\_\-}
+\label{votParse__f77_8c_89fce6cbd3bf9cc75fd08951d5a86d31}
+
+\item 
+\hypertarget{votParse__f77_8c_82f51f2c7afe6d085ebf9234e544e97e}{
+\#define \textbf{VF\_\-GETNROWS}~vf\_\-getnrows\_\-}
+\label{votParse__f77_8c_82f51f2c7afe6d085ebf9234e544e97e}
+
+\item 
+\hypertarget{votParse__f77_8c_feba60ae75b84f55a669cef99ff9147d}{
+\#define \textbf{VF\_\-GETTABLECELL}~vf\_\-gettablecell\_\-}
+\label{votParse__f77_8c_feba60ae75b84f55a669cef99ff9147d}
+
+\item 
+\hypertarget{votParse__f77_8c_07b1fe8ad7ab598839029147d374ea90}{
+\#define \textbf{VF\_\-GETTABLEINT}~vf\_\-gettableint\_\-}
+\label{votParse__f77_8c_07b1fe8ad7ab598839029147d374ea90}
+
+\item 
+\hypertarget{votParse__f77_8c_bb056d8f43f54d704098c5d4ad9de0a3}{
+\#define \textbf{VF\_\-GETTABLEREAL}~vf\_\-gettablereal\_\-}
+\label{votParse__f77_8c_bb056d8f43f54d704098c5d4ad9de0a3}
+
+\item 
+\hypertarget{votParse__f77_8c_870f296b7b74e71fc68d3caa7e7b9556}{
+\#define \textbf{VF\_\-GETLENGTH}~vf\_\-getlength\_\-}
+\label{votParse__f77_8c_870f296b7b74e71fc68d3caa7e7b9556}
+
+\item 
+\hypertarget{votParse__f77_8c_7ec23551bdd60943396673256d6283cf}{
+\#define \textbf{VF\_\-GETNUMBEROF}~vf\_\-getnumberof\_\-}
+\label{votParse__f77_8c_7ec23551bdd60943396673256d6283cf}
+
+\item 
+\hypertarget{votParse__f77_8c_1395de6f45bf549913c20714f6802feb}{
+\#define \textbf{VF\_\-FINDBYATTR}~vf\_\-findbyattr\_\-}
+\label{votParse__f77_8c_1395de6f45bf549913c20714f6802feb}
+
+\item 
+\hypertarget{votParse__f77_8c_42f65b14129dd5b02271ae3700261004}{
+\#define \textbf{VF\_\-FINDINGROUP}~vf\_\-findingroup\_\-}
+\label{votParse__f77_8c_42f65b14129dd5b02271ae3700261004}
+
+\item 
+\hypertarget{votParse__f77_8c_3169a7c9cc21b6d4f0c95de07dffadae}{
+\#define \textbf{VF\_\-NEXTINGROUP}~vf\_\-nextingroup\_\-}
+\label{votParse__f77_8c_3169a7c9cc21b6d4f0c95de07dffadae}
+
+\item 
+\hypertarget{votParse__f77_8c_6f309e2c82d745ef5692ccc371209aea}{
+\#define \textbf{VF\_\-GETNEXT}~vf\_\-getnext\_\-}
+\label{votParse__f77_8c_6f309e2c82d745ef5692ccc371209aea}
+
+\item 
+\hypertarget{votParse__f77_8c_ea5cc31e6b92930f7eb92090441d0bf0}{
+\#define \textbf{VF\_\-GETSIBLING}~vf\_\-getsibling\_\-}
+\label{votParse__f77_8c_ea5cc31e6b92930f7eb92090441d0bf0}
+
+\item 
+\hypertarget{votParse__f77_8c_bec2413ca5390adb54d77fd5e0bc5d16}{
+\#define \textbf{VF\_\-GETCHILD}~vf\_\-getchild\_\-}
+\label{votParse__f77_8c_bec2413ca5390adb54d77fd5e0bc5d16}
+
+\item 
+\hypertarget{votParse__f77_8c_11dd22ddc538b4000b5d3c2a65c3e48f}{
+\#define \textbf{VF\_\-GETPARENT}~vf\_\-getparent\_\-}
+\label{votParse__f77_8c_11dd22ddc538b4000b5d3c2a65c3e48f}
+
+\item 
+\hypertarget{votParse__f77_8c_955f0aa69b467286152183fbd2a62229}{
+\#define \textbf{VF\_\-CHILDOFTYPE}~vf\_\-childoftype\_\-}
+\label{votParse__f77_8c_955f0aa69b467286152183fbd2a62229}
+
+\item 
+\hypertarget{votParse__f77_8c_3791b568833734bf965f14ee86279e9d}{
+\#define \textbf{VF\_\-VALUEOF}~vf\_\-valueof\_\-}
+\label{votParse__f77_8c_3791b568833734bf965f14ee86279e9d}
+
+\item 
+\hypertarget{votParse__f77_8c_4077e9ad667505a2c9128b0b68b34ec6}{
+\#define \textbf{VF\_\-TYPEOF}~vf\_\-typeof\_\-}
+\label{votParse__f77_8c_4077e9ad667505a2c9128b0b68b34ec6}
+
+\item 
+\hypertarget{votParse__f77_8c_4b1dd8581843eeb8fe6ca45b0e420576}{
+\#define \textbf{VF\_\-SETVALUE}~vf\_\-setvalue\_\-}
+\label{votParse__f77_8c_4b1dd8581843eeb8fe6ca45b0e420576}
+
+\item 
+\hypertarget{votParse__f77_8c_f7ce8126f9c7bed5156a71cdb58ecc1b}{
+\#define \textbf{VF\_\-GETVALUE}~vf\_\-getvalue\_\-}
+\label{votParse__f77_8c_f7ce8126f9c7bed5156a71cdb58ecc1b}
+
+\item 
+\hypertarget{votParse__f77_8c_f359387e42d474e41d4abcd3822cbffd}{
+\#define \textbf{VF\_\-GETINTVALUE}~vf\_\-getintvalue\_\-}
+\label{votParse__f77_8c_f359387e42d474e41d4abcd3822cbffd}
+
+\item 
+\hypertarget{votParse__f77_8c_e27a1248f6b018da8824cf6cfeea1701}{
+\#define \textbf{VF\_\-GETREALVALUE}~vf\_\-getrealvalue\_\-}
+\label{votParse__f77_8c_e27a1248f6b018da8824cf6cfeea1701}
+
+\item 
+\hypertarget{votParse__f77_8c_8b30cbd0fadaaf5134129e8ae7db0135}{
+\#define \textbf{VF\_\-SETATTR}~vf\_\-setattr\_\-}
+\label{votParse__f77_8c_8b30cbd0fadaaf5134129e8ae7db0135}
+
+\item 
+\hypertarget{votParse__f77_8c_58dd9297f213a9f616ee9cbcd48188a6}{
+\#define \textbf{VF\_\-GETATTR}~vf\_\-getattr\_\-}
+\label{votParse__f77_8c_58dd9297f213a9f616ee9cbcd48188a6}
+
+\item 
+\hypertarget{votParse__f77_8c_d830d21bf0bde3a7d0f1f718fcdd6a1d}{
+\#define \textbf{VF\_\-WRITEXML}~vf\_\-writexml\_\-}
+\label{votParse__f77_8c_d830d21bf0bde3a7d0f1f718fcdd6a1d}
+
+\item 
+\hypertarget{votParse__f77_8c_63230c715296813574c6fb93f7b0093e}{
+\#define \textbf{VF\_\-SETWARN}~vf\_\-setwarn\_\-}
+\label{votParse__f77_8c_63230c715296813574c6fb93f7b0093e}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+handle\_\-t \hyperlink{votParse__f77_8c_014909bf53fa04d7dda7c73fd9e75dac}{VF\_\-OPENVOTABLE} (char $\ast$arg, int alen)
+\item 
+\hypertarget{votParse__f77_8c_71cf1e1dca4a6741f3c35758cca7b59f}{
+void \textbf{VF\_\-CLOSEVOTABLE} (handle\_\-t $\ast$vot)}
+\label{votParse__f77_8c_71cf1e1dca4a6741f3c35758cca7b59f}
+
+\item 
+\hypertarget{votParse__f77_8c_f49befb8b8ac0aac34f432f3c3bb2b3e}{
+handle\_\-t \textbf{VF\_\-GETRESOURCE} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_f49befb8b8ac0aac34f432f3c3bb2b3e}
+
+\item 
+\hypertarget{votParse__f77_8c_aaaabd2d3ea9890544179d289fe0f173}{
+handle\_\-t \textbf{VF\_\-GETTABLE} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_aaaabd2d3ea9890544179d289fe0f173}
+
+\item 
+\hypertarget{votParse__f77_8c_87726255cea4cfd84cfc9c26a8d77580}{
+handle\_\-t \textbf{VF\_\-GETFIELD} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_87726255cea4cfd84cfc9c26a8d77580}
+
+\item 
+\hypertarget{votParse__f77_8c_f6162711d0580aea1573869e05e4b165}{
+handle\_\-t \textbf{VF\_\-GETDATA} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_f6162711d0580aea1573869e05e4b165}
+
+\item 
+\hypertarget{votParse__f77_8c_35a85e1094123b4389e84c5962f6707b}{
+handle\_\-t \textbf{VF\_\-GETTABLEDATA} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_35a85e1094123b4389e84c5962f6707b}
+
+\item 
+\hypertarget{votParse__f77_8c_965c3569fdcc13538e9b99317ce49193}{
+handle\_\-t \textbf{VF\_\-GETTR} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_965c3569fdcc13538e9b99317ce49193}
+
+\item 
+\hypertarget{votParse__f77_8c_da005e60a5f87c464c2862fb49e65187}{
+handle\_\-t \textbf{VF\_\-GETTD} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_da005e60a5f87c464c2862fb49e65187}
+
+\item 
+\hypertarget{votParse__f77_8c_a7eec6ec08d8b4752a9fd309a421fb3e}{
+handle\_\-t \textbf{VF\_\-GETBINARY} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_a7eec6ec08d8b4752a9fd309a421fb3e}
+
+\item 
+\hypertarget{votParse__f77_8c_f1051ce9e7d5e849faf5d383131b6daa}{
+handle\_\-t \textbf{VF\_\-GETFITS} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_f1051ce9e7d5e849faf5d383131b6daa}
+
+\item 
+\hypertarget{votParse__f77_8c_8bd4ef5fc1b66f797630121c26a87050}{
+handle\_\-t \textbf{VF\_\-GETGROUP} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_8bd4ef5fc1b66f797630121c26a87050}
+
+\item 
+\hypertarget{votParse__f77_8c_4679069214319265fff61a32a0733b64}{
+handle\_\-t \textbf{VF\_\-GETFIELDRef} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_4679069214319265fff61a32a0733b64}
+
+\item 
+\hypertarget{votParse__f77_8c_b10f897df932a8dcdc79306f202fa109}{
+handle\_\-t \textbf{VF\_\-GETPARAMREF} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_b10f897df932a8dcdc79306f202fa109}
+
+\item 
+\hypertarget{votParse__f77_8c_9e7e9f62d8ba4ef0b3143eaf7b85ebf2}{
+handle\_\-t \textbf{VF\_\-GETDESCRIPTION} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_9e7e9f62d8ba4ef0b3143eaf7b85ebf2}
+
+\item 
+\hypertarget{votParse__f77_8c_b702133ca9fb9900ffcb8b246bea63b6}{
+handle\_\-t \textbf{VF\_\-GETPARAM} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_b702133ca9fb9900ffcb8b246bea63b6}
+
+\item 
+\hypertarget{votParse__f77_8c_0a9f23a8824bdbeb7aba06b712733f4c}{
+handle\_\-t \textbf{VF\_\-GETINFO} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_0a9f23a8824bdbeb7aba06b712733f4c}
+
+\item 
+\hypertarget{votParse__f77_8c_20a8ffaca0535fee92a4c38c1e058393}{
+handle\_\-t \textbf{VF\_\-GETSTREAM} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_20a8ffaca0535fee92a4c38c1e058393}
+
+\item 
+\hypertarget{votParse__f77_8c_4d6dcc40c6105dd7b52d0f1b0dc73c30}{
+handle\_\-t \textbf{VF\_\-GETVALUES} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_4d6dcc40c6105dd7b52d0f1b0dc73c30}
+
+\item 
+\hypertarget{votParse__f77_8c_073e109bdce9195c0c01b37ad5b465c7}{
+handle\_\-t \textbf{VF\_\-GETMIN} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_073e109bdce9195c0c01b37ad5b465c7}
+
+\item 
+\hypertarget{votParse__f77_8c_4ca41e91a11fd900dd3362db2d3db5a2}{
+handle\_\-t \textbf{VF\_\-GETMAX} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_4ca41e91a11fd900dd3362db2d3db5a2}
+
+\item 
+\hypertarget{votParse__f77_8c_871a18c4bf49ff4410a1eaf7b56c6e74}{
+handle\_\-t \textbf{VF\_\-GETOPTION} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_871a18c4bf49ff4410a1eaf7b56c6e74}
+
+\item 
+\hypertarget{votParse__f77_8c_8d163df1ea7631e1327dab1f13a999ce}{
+handle\_\-t \textbf{VF\_\-GETLINK} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_8d163df1ea7631e1327dab1f13a999ce}
+
+\item 
+\hypertarget{votParse__f77_8c_ff679ef5d1e733d8e90254890218d753}{
+handle\_\-t \textbf{VF\_\-GETCOOSYS} (handle\_\-t $\ast$handle)}
+\label{votParse__f77_8c_ff679ef5d1e733d8e90254890218d753}
+
+\item 
+\hypertarget{votParse__f77_8c_947c02ac16fb7b30552e8aa1333c47d0}{
+int \textbf{VF\_\-GETDATAType} (handle\_\-t $\ast$data)}
+\label{votParse__f77_8c_947c02ac16fb7b30552e8aa1333c47d0}
+
+\item 
+\hypertarget{votParse__f77_8c_23a14dfbc4b89b04af83272ab9965333}{
+void \textbf{VF\_\-GETDATATYPESTR} (handle\_\-t $\ast$data, char $\ast$type, int $\ast$len, int tlen)}
+\label{votParse__f77_8c_23a14dfbc4b89b04af83272ab9965333}
+
+\item 
+\hypertarget{votParse__f77_8c_9dfc6e94525ea1ff23e5fda18ee0f156}{
+handle\_\-t \textbf{VF\_\-NEWNODE} (handle\_\-t $\ast$parent, int $\ast$type)}
+\label{votParse__f77_8c_9dfc6e94525ea1ff23e5fda18ee0f156}
+
+\item 
+\hypertarget{votParse__f77_8c_80ceeb97e18fe7163544a721b0dc754d}{
+void \textbf{VF\_\-ATTACHNODE} (handle\_\-t $\ast$parent, handle\_\-t $\ast$new)}
+\label{votParse__f77_8c_80ceeb97e18fe7163544a721b0dc754d}
+
+\item 
+\hypertarget{votParse__f77_8c_c1773ad0ae2e9e05ae1696e730f9d635}{
+void \textbf{VF\_\-FREENODE} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_c1773ad0ae2e9e05ae1696e730f9d635}
+
+\item 
+\hypertarget{votParse__f77_8c_b3c634b6496e2a641d9bf396d200285a}{
+void \textbf{VF\_\-DELETENODE} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_b3c634b6496e2a641d9bf396d200285a}
+
+\item 
+\hypertarget{votParse__f77_8c_f911dcb668d074f025420a16e67dd232}{
+handle\_\-t \textbf{VF\_\-COPYELEMENT} (handle\_\-t $\ast$src, handle\_\-t $\ast$parent)}
+\label{votParse__f77_8c_f911dcb668d074f025420a16e67dd232}
+
+\item 
+\hypertarget{votParse__f77_8c_e11d2b46dc0b924a252754887e66b459}{
+int \textbf{VF\_\-GETNCOLS} (handle\_\-t $\ast$tdata)}
+\label{votParse__f77_8c_e11d2b46dc0b924a252754887e66b459}
+
+\item 
+\hypertarget{votParse__f77_8c_d55bc09251608ff80b2e1d469221381b}{
+int \textbf{VF\_\-GETNROWS} (handle\_\-t $\ast$tdata)}
+\label{votParse__f77_8c_d55bc09251608ff80b2e1d469221381b}
+
+\item 
+\hypertarget{votParse__f77_8c_dabbaf5db71a9aac4591fe869982b607}{
+void \textbf{VF\_\-GETTABLECELL} (handle\_\-t $\ast$tdata, int $\ast$row, int $\ast$col, char $\ast$value, int $\ast$maxch)}
+\label{votParse__f77_8c_dabbaf5db71a9aac4591fe869982b607}
+
+\item 
+\hypertarget{votParse__f77_8c_407a19b1b1de8e784cfc12d8e971d2b1}{
+int \textbf{VF\_\-GETTABLEINT} (handle\_\-t $\ast$tdata, int $\ast$row, int $\ast$col)}
+\label{votParse__f77_8c_407a19b1b1de8e784cfc12d8e971d2b1}
+
+\item 
+\hypertarget{votParse__f77_8c_9dd183e2ed188f928ce20a1e61216364}{
+float \textbf{VF\_\-GETTABLEREAL} (handle\_\-t $\ast$tdata, int $\ast$row, int $\ast$col)}
+\label{votParse__f77_8c_9dd183e2ed188f928ce20a1e61216364}
+
+\item 
+\hypertarget{votParse__f77_8c_b813262dcdb6f6ee1e8e822447535ab2}{
+int \textbf{VF\_\-GETLENGTH} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_b813262dcdb6f6ee1e8e822447535ab2}
+
+\item 
+\hypertarget{votParse__f77_8c_928519042348ff2652ec289bb8db2d31}{
+int \textbf{VF\_\-GETNUMBEROF} (handle\_\-t $\ast$elem, int $\ast$type)}
+\label{votParse__f77_8c_928519042348ff2652ec289bb8db2d31}
+
+\item 
+\hypertarget{votParse__f77_8c_bec1d591334bba789ecb1086e8a47309}{
+handle\_\-t \textbf{VF\_\-FINDBYATTR} (handle\_\-t $\ast$parent, char $\ast$name, char $\ast$value, int nlen, int vlen)}
+\label{votParse__f77_8c_bec1d591334bba789ecb1086e8a47309}
+
+\item 
+\hypertarget{votParse__f77_8c_93017fd787ba9d6e978f3ac45afb0309}{
+handle\_\-t \textbf{VF\_\-FINDINGROUP} (handle\_\-t $\ast$group, int $\ast$type)}
+\label{votParse__f77_8c_93017fd787ba9d6e978f3ac45afb0309}
+
+\item 
+\hypertarget{votParse__f77_8c_c8da7f2bb838719ec1d1f460445d7589}{
+handle\_\-t \textbf{VF\_\-NEXTINGROUP} (void)}
+\label{votParse__f77_8c_c8da7f2bb838719ec1d1f460445d7589}
+
+\item 
+\hypertarget{votParse__f77_8c_129e55fc6aa87fbc1395f89e6cca4453}{
+handle\_\-t \textbf{VF\_\-GETNEXT} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_129e55fc6aa87fbc1395f89e6cca4453}
+
+\item 
+\hypertarget{votParse__f77_8c_554e4b280281d8348c4c7c5bb39873cb}{
+handle\_\-t \textbf{VF\_\-GETSIBLING} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_554e4b280281d8348c4c7c5bb39873cb}
+
+\item 
+\hypertarget{votParse__f77_8c_b9b03e08603cc53510e6e8d1ae8cfe4c}{
+handle\_\-t \textbf{VF\_\-GETCHILD} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_b9b03e08603cc53510e6e8d1ae8cfe4c}
+
+\item 
+\hypertarget{votParse__f77_8c_0d3fedf7d4fcc161fe4b14d388f7ac89}{
+handle\_\-t \textbf{VF\_\-GETPARENT} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_0d3fedf7d4fcc161fe4b14d388f7ac89}
+
+\item 
+\hypertarget{votParse__f77_8c_752f2e1180cac55f6091aa8c4d35f9bb}{
+handle\_\-t \textbf{VF\_\-CHILDOFTYPE} (handle\_\-t $\ast$elem, int $\ast$type)}
+\label{votParse__f77_8c_752f2e1180cac55f6091aa8c4d35f9bb}
+
+\item 
+\hypertarget{votParse__f77_8c_81e73fb1b5727209527c3d381324e99a}{
+int \textbf{VF\_\-VALUEOF} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_81e73fb1b5727209527c3d381324e99a}
+
+\item 
+\hypertarget{votParse__f77_8c_ef52219bea571443586e5c2e1089c7d6}{
+int \textbf{VF\_\-TYPEOF} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_ef52219bea571443586e5c2e1089c7d6}
+
+\item 
+\hypertarget{votParse__f77_8c_316fcdd32d25a3ad6b7deb7fc37291ee}{
+int \textbf{VF\_\-SETVALUE} (handle\_\-t $\ast$elem, char $\ast$value, int vlen)}
+\label{votParse__f77_8c_316fcdd32d25a3ad6b7deb7fc37291ee}
+
+\item 
+\hypertarget{votParse__f77_8c_f1869e65f26135baa8ada7b647eb7fdb}{
+void \textbf{VF\_\-GETVALUE} (handle\_\-t $\ast$elem, char $\ast$value, int $\ast$maxch, int vlen)}
+\label{votParse__f77_8c_f1869e65f26135baa8ada7b647eb7fdb}
+
+\item 
+\hypertarget{votParse__f77_8c_9a475a20e40ca5dfd328d3b740186073}{
+int \textbf{VF\_\-GETINTVALUE} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_9a475a20e40ca5dfd328d3b740186073}
+
+\item 
+\hypertarget{votParse__f77_8c_607ad7fb6aa384a0e080fe7c7a7bf2e6}{
+float \textbf{VF\_\-GETREALVALUE} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_607ad7fb6aa384a0e080fe7c7a7bf2e6}
+
+\item 
+\hypertarget{votParse__f77_8c_5ba5ca05879bbfdd8995ffd70242ea47}{
+void \textbf{VF\_\-GETATTR} (handle\_\-t $\ast$elem, char $\ast$name, char $\ast$val, int $\ast$len, int nlen, int vlen)}
+\label{votParse__f77_8c_5ba5ca05879bbfdd8995ffd70242ea47}
+
+\item 
+\hypertarget{votParse__f77_8c_ca3159ac8e3eecb70c30bea9cd41e9e5}{
+int \textbf{VF\_\-SETATTR} (handle\_\-t $\ast$elem, char $\ast$attr, char $\ast$value, int alen, int vlen)}
+\label{votParse__f77_8c_ca3159ac8e3eecb70c30bea9cd41e9e5}
+
+\item 
+\hypertarget{votParse__f77_8c_ae49a94845f2a23c09f20440a73ca081}{
+void \textbf{VF\_\-WRITEXML} (handle\_\-t $\ast$elem)}
+\label{votParse__f77_8c_ae49a94845f2a23c09f20440a73ca081}
+
+\item 
+\hypertarget{votParse__f77_8c_d5f5a389844f348318823f3c5aa88945}{
+void \textbf{VF\_\-SETWARN} (int $\ast$value)}
+\label{votParse__f77_8c_d5f5a389844f348318823f3c5aa88945}
+
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Public interface for the libVOTable F77 wrapper. 
+
+VOTPARSE\_\-F77.C -- Public interface for the libVOTable F77 wrapper
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick and Eric Timmermann \end{Desc}
+\begin{Desc}
+\item[Date:]8/03/09 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{votParse__f77_8c_014909bf53fa04d7dda7c73fd9e75dac}{
+\index{votParse\_\-f77.c@{votParse\_\-f77.c}!VF\_\-OPENVOTABLE@{VF\_\-OPENVOTABLE}}
+\index{VF\_\-OPENVOTABLE@{VF\_\-OPENVOTABLE}!votParse_f77.c@{votParse\_\-f77.c}}
+\subsubsection[{VF\_\-OPENVOTABLE}]{\setlength{\rightskip}{0pt plus 5cm}handle\_\-t VF\_\-OPENVOTABLE (char $\ast$ {\em arg}, \/  int {\em alen})}}
+\label{votParse__f77_8c_014909bf53fa04d7dda7c73fd9e75dac}
+
+
+Public function prototypes. 

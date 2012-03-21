@@ -214,8 +214,11 @@ int	opcode;
 	    } else
 		rresult = rval - (int) rval;
 	    break;
-	case OP_ISINDEF:
-	    iresult = opindef(&o);
+        case OP_ISINDEF:
+            if (in_type == OT_STRING)
+                iresult = (strcmp (o.o_val.v_s, "INDEF") == 0);
+            else
+                iresult = opindef(&o);
 	    break;
 	case OP_ENVGET:
 	    if ((sresult = envget (sval)) == NULL)

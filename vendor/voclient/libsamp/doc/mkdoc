@@ -1,0 +1,10 @@
+#!/bin/csh -f
+
+
+set m = "samp"
+
+foreach doc ( $m )
+    groff -man -T ps ${doc}.man > ${doc}.ps
+    ps2pdf ${doc}.ps
+    man2html ${doc}.man > ${doc}.html
+end

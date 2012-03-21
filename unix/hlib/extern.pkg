@@ -7,6 +7,9 @@ reset	extern		= iraf$extern/
 reset	noao		= iraf$noao/
 task	noao.pkg	= noao$noao.cl
 
+reset	vo		= iraf$vo/
+task	vo.pkg		= vo$vo.cl
+
 #reset	local		= iraf$local/
 #task	local.pkg	= local$local.cl
 
@@ -28,6 +31,7 @@ task	noao.pkg	= noao$noao.cl
 # loading packages when the next load the CLPACKAGE.
 reset	helpdb		= "lib$helpdb.mip\
 			  ,noao$lib/helpdb.mip\
+			  ,vo$lib/helpdb.mip\
 #			  ,example$lib/helpdb.mip\
 			  "
 

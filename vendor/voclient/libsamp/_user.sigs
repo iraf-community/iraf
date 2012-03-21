@@ -1,0 +1,28 @@
+
+
+samp.app.ping			func (sender)
+samp.app.status			func (sender)
+
+table.load.votable 		func (url, [table-id] [name])
+table.load.fits 		func (url, [table-id] [name])
+table.highlight.row		func (url, table-id row)
+table.select.rowList		func (url, table-id row-list[])
+image.load.fits			func (url, [image-id] [name])
+coord.pointAt.sky		func (ra, dec)
+bibcode.load			func (bibcode)
+
+client.env.get			func (name, value, maxch)
+client.env.set			func (name, value)
+
+client.param.get		func (name, value, maxch)
+client.param.set		func (name, value)
+
+/****************************/
+
+spectrum.load.ssa-generic  	func (url meta [spectrum-id] [name]
+voresource.loadlist		[name] ids  (map of ivoid -> URL)
+   voresource.loadlist.cone	  "     "
+   voresource.loadlist.siap	  "     "
+   voresource.loadlist.ssap	  "     "
+   voresource.loadlist.tap	  "     "
+   voresource.loadlist.vospace	  "     "

@@ -347,9 +347,13 @@ begin
 		call salloc (id[i], npts, TY_INT)
 	}
 
-        # Reduce header memory use.
-	do i = 1, nimages
-	    call xt_minhdr (i)
+# This idea turns out to has a problem with masks are used with wcs offsets.
+# the matching of masks to images based on WCS requires access to the WCS
+# of the images.  For now we drop this idea but maybe a way can be identified
+# to know when this is not going to be needed.
+#        # Reduce header memory use.
+#	do i = 1, nimages
+#	    call xt_minhdr (i)
 
 	while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 	    call ic_gdatas (in, out, dbuf, d, id, n, m, lflag, offsets,
@@ -885,9 +889,13 @@ begin
 		call salloc (id[i], npts, TY_INT)
 	}
 
-        # Reduce header memory use.
-	do i = 1, nimages
-	    call xt_minhdr (i)
+# This idea turns out to has a problem with masks are used with wcs offsets.
+# the matching of masks to images based on WCS requires access to the WCS
+# of the images.  For now we drop this idea but maybe a way can be identified
+# to know when this is not going to be needed.
+#        # Reduce header memory use.
+#	do i = 1, nimages
+#	    call xt_minhdr (i)
 
 	while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 	    call ic_gdatai (in, out, dbuf, d, id, n, m, lflag, offsets,
@@ -1423,9 +1431,13 @@ begin
 		call salloc (id[i], npts, TY_INT)
 	}
 
-        # Reduce header memory use.
-	do i = 1, nimages
-	    call xt_minhdr (i)
+# This idea turns out to has a problem with masks are used with wcs offsets.
+# the matching of masks to images based on WCS requires access to the WCS
+# of the images.  For now we drop this idea but maybe a way can be identified
+# to know when this is not going to be needed.
+#        # Reduce header memory use.
+#	do i = 1, nimages
+#	    call xt_minhdr (i)
 
 	while (impnlr (out[1], outdata, Meml[v1]) != EOF) {
 	    call ic_gdatar (in, out, dbuf, d, id, n, m, lflag, offsets,
@@ -1962,9 +1974,13 @@ begin
 		call salloc (id[i], npts, TY_INT)
 	}
 
-        # Reduce header memory use.
-	do i = 1, nimages
-	    call xt_minhdr (i)
+# This idea turns out to has a problem with masks are used with wcs offsets.
+# the matching of masks to images based on WCS requires access to the WCS
+# of the images.  For now we drop this idea but maybe a way can be identified
+# to know when this is not going to be needed.
+#        # Reduce header memory use.
+#	do i = 1, nimages
+#	    call xt_minhdr (i)
 
 	while (impnld (out[1], outdata, Meml[v1]) != EOF) {
 	    call ic_gdatad (in, out, dbuf, d, id, n, m, lflag, offsets,

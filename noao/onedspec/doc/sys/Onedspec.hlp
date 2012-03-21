@@ -1695,7 +1695,7 @@ If invoked as an interactive task from a graphics terminal, the
 resultant spectrum is displayed and the user may alter the
 solution parameters if the interact switch is set to yes.
 If invoked from a non-graphics terminal, sufficient information
-concerning the the fit is written to the terminal to allow
+concerning the fit is written to the terminal to allow
 the user to judge the quality of the fit and then alter the
 solution parameters.
 

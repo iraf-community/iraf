@@ -178,7 +178,7 @@ and "world" and the transformation from the input coordinate system to
 the internal "logical" system is defined by the image coordinate system.
 The simplest default is the "logical" pixel system. Users working on with
 image sections but importing pixel coordinate lists generated from the parent
-image must use use the "tv" or "physical" input coordinate systems.
+image must use the "tv" or "physical" input coordinate systems.
 Users importing coordinate lists in world coordinates, e.g. ra and dec,
 must use the "world" coordinate system and may need to convert their
 equatorial coordinate units from hours and degrees to degrees and degrees first.

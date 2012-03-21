@@ -9,6 +9,25 @@ set	pkglibs		= "hlib$libc/"
 
 #set	nomwcs		= yes
 
+# The following can be used to en/disable the VO modifications in the system.
+# The 'use_vo' variable can be used to globally disable features, finer 
+# grained controls might also be added.
+
+set	use_vo		= yes
+set	use_new_imt	= yes
+set	vo_prefetch	= yes
+set	vo_nthreads	= 4
+set	vo_runid	= "iraf2160"
+
+set	samp_auto	= yes
+set	samp_onstart	= no
+
+
+# Default cache directory.
+set	cache		= "tmp$cache/"
+set	cache_age	= 30
+
+
 # Local system defaults.
 
 set	clobber		= no
@@ -35,7 +54,7 @@ set	terminal	= xgterm
 set	ttybaud		= 9600
 set	ttyncols	= 80
 set	ttynlines	= 40
-set	version		= "NOAO/IRAF V2.15.1a"
+set	version		= "NOAO/IRAF V2.16"
 
 # System directories.
 
@@ -92,6 +111,7 @@ set	softools	= "pkg$softools/"
 set	system		= "pkg$system/"
 set	utilities	= "pkg$utilities/"
 set	xtools		= "pkg$xtools/"
+
 
 # Load definitions for any locally added external packages.
 

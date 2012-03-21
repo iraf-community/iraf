@@ -213,5 +213,5 @@ This task is new.
 .le
 .ih
 SEE ALSO
-specshift, proto.wcsreset, hedit, ranges, onedspec.package
+specshift, imcoords.wcsreset, hedit, ranges, onedspec.package
 .endhelp

@@ -30,10 +30,11 @@ PIXEL	w[npts]		# array of weights
 int	npts		# number of data points
 int	wtflag		# type of weighting
 
+bool	refsub
 int	i, ii, j, jj, k, l, ll
 int	maxorder, xorder, xxorder, ntimes
 pointer	sp, vzptr, vindex, mzptr, mindex, bxptr, bbxptr, byptr, bbyptr
-pointer	byw, bw
+pointer	x1, y1, z1, byw, bw
 
 PIXEL	adot$t()
 
@@ -107,49 +108,62 @@ begin
 
 	# allocate space for the basis functions
 	call smark (sp)
+	call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_PIXEL)
+	call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_PIXEL)
+
+	# subtract reference value
+	refsub = !(IS_INDEF(GS_XREF(sf)) || IS_INDEF(GS_YREF(sf)) ||
+	    IS_INDEF(GS_ZREF(sf)))
+	if (refsub) {
+	    call salloc (x1, npts, TY_PIXEL)
+	    call salloc (y1, npts, TY_PIXEL)
+	    call salloc (z1, npts, TY_PIXEL)
+	    call asubk$t (x, GS_XREF(sf), Mem$t[x1], npts)
+	    call asubk$t (y, GS_YREF(sf), Mem$t[y1], npts)
+	    call asubk$t (z, GS_ZREF(sf), Mem$t[z1], npts)
+	}
 
 	# calculate the non-zero basis functions
 	switch (GS_TYPE(sf)) {
 	case GS_LEGENDRE:
-	    $if (datatype == r)
-	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_REAL)
-	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_REAL)
-	    $else
-	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_DOUBLE)
-	    $endif
-	    call $tgs_bleg (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
-	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
-	    call $tgs_bleg (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
-	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    if (refsub) {
+		call $tgs_bleg (Mem$t[x1], npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call $tgs_bleg (Mem$t[y1], npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    } else {
+		call $tgs_bleg (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call $tgs_bleg (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    }
 	case GS_CHEBYSHEV:
-	    $if (datatype == r)
-	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_REAL)
-	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_REAL)
-	    $else
-	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_DOUBLE)
-	    $endif
-	    call $tgs_bcheb (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
-	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
-	    call $tgs_bcheb (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
-	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    if (refsub) {
+		call $tgs_bcheb (Mem$t[x1], npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call $tgs_bcheb (Mem$t[y1], npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    } else {
+		call $tgs_bcheb (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call $tgs_bcheb (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    }
 	case GS_POLYNOMIAL:
-	    $if (datatype == r)
-	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_REAL)
-	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_REAL)
-	    $else
-	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_DOUBLE)
-	    $endif
-	    call $tgs_bpol (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
-	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
-	    call $tgs_bpol (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
-	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    if (refsub) {
+		call $tgs_bpol (Mem$t[x1], npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call $tgs_bpol (Mem$t[y1], npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    } else {
+		call $tgs_bpol (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call $tgs_bpol (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    }
 	default:
 	    call error (0, "GSACCUM: Illegal curve type.")
 	}
-
 
 	# allocate temporary storage space for matrix accumulation
 	$if (datatype == r)

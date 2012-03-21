@@ -323,8 +323,9 @@ newscan_	if (fscan (fd) == EOF)
 	    npix = IM_LEN(out[1],1)
 	    do i = 2, outdim
 		npix = npix * IM_LEN(out[1],i)
-	    if (npix > 1000000000)
-		call error (1, "Output has more than 1 Gpixels (check offsets)")
+	    npix = npix / 1000000000
+            if (npix > 100)
+		call error (1, "Output has more than 100 Gpixels (check offsets)")
 	}
 
 	call sfree (sp)

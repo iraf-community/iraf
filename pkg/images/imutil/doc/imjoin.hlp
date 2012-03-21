@@ -38,7 +38,7 @@ can be used to create a single long 1-dimensional image from a list of shorter
 1-dimensional images, or to piece together a set of 3-dimensional images into
 larger 3-dimensional images along either the x, y, or z directions. The input
 images must all have the same number of dimensions and the same size along
-all dimensions by the the join dimension. The output image inherits the
+all dimensions by the join dimension. The output image inherits the
 world coordinates system if any of the first input image.
 
 .ih

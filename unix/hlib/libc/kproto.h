@@ -165,6 +165,8 @@ extern int zfpoll_(int *pfds, int *nfds, int *timeout, int *npoll, int *status);
 extern int zfprot_(shortint *fname, int *action, int *status);
 /* zfrnam.c */
 extern int zfrnam_(shortint *oldname, shortint *newname, int *status);
+/* zfrmdr.c */
+extern int zfrmdr_(shortint *dir, int *status);
 /* zfsubd.c */
 extern int zfsubd_(shortint *osdir, int *maxch, shortint *subdir, int *nchars);
 /* zfunc.c */

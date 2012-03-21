@@ -56,6 +56,7 @@ int	exists			# returned by tbttyp and ignored
 int	i
 bool	from_stdin		# is intable STDIN?
 bool	cat_extname		# should we append input name to use as EXTNAME?
+
 pointer tbtopn(), tbcnum()
 int	strlen()
 int	fnldir()
@@ -76,6 +77,11 @@ begin
 	junk = tbparse (intable, Memc[in], Memc[iextn], SZ_FNAME, ihdu)
 	if (tbparse (outtable, Memc[out], Memc[oextn], SZ_FNAME, ohdu) < 1)
 	    call error (1, "no output name specified")
+
+	# If the input table is a URL, do a dummy open to ensure we convert
+	# it before processing.
+#	itp = tbtopn (Memc[in], READ_ONLY, NULL)
+#	call tbtclo (itp)
 
 	# Get the table type (based on extension, if any, for output table).
 	itype = tbttyp (Memc[in], exists)

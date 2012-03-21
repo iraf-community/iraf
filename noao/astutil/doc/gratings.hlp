@@ -63,7 +63,7 @@ incidence of the incoming light to the grating (which is required to be in
 the plane perpendicular to the face of the grating), the diffraction order,
 and the blaze wavelength and dispersion at the blaze wavelength on the
 detector for that order.  There must be five of these parameters specified
-to compute the remaining two with the exceptions that that the combinations
+to compute the remaining two with the exceptions that the combinations
 of the grooves per millimeter and the order or the focal length and
 dispersion must not be simultaneously unspecified.  There are two cases in
 which the computation will not succeed, if not enough parameters are

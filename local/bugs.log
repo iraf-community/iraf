@@ -8405,3 +8405,78 @@ BUG:	The 64-bit port changes to smw.h improperly added a P2R() macro to
 STATUS:	Fixed for the next release.  A re-application of the v2.15.1a patch
 	file will replace the affected binaries on 'linux64' and 'macintel'
 	platforms.
+
+
+NUMBER: 579
+MODULE: onedspec.specplot
+SYSTEM: V2.15
+DATE:   Thu Mar 31 10:41:56 MST 2011
+FROM:   fitz
+
+BUG:    SPECPLOT can sometimes throw a segmentation violation or not
+        recognize valid input spectra due to an incorrect macro definition
+        on 64-bit platforms (linux64 and macintel only).
+
+STATUS: This has been fixed for the next release.  Patched x_onedspec.e
+        binaries can be installed from
+
+          ftp://iraf.noao.edu/iraf/v215/support/<arch>/x_onedspec.e
+
+        where the <arch> is either 'linux64' or 'macintel'.
+
+
+NUMBER:	580
+MODULE:	imcombine and variants
+SYSTEM:	-V2.15.1
+DATE:	Fri Apr  1 10:53:41 MST 2011
+FROM:	valdes
+
+BUG:	When the grow options is used with masks or partially overlapping
+	data a segmentation could occur.  This is because when data is
+	absent (because of non-overlap) or excluded (because of mask) an
+	identifier value was not initialized.  The only workaround is to
+	not use the grow options.
+
+STATUS:	Fixed for future patches and releases.
+
+NUMBER:	581
+MODULE:	splot
+SYSTEM:	V2.15-
+DATE:	Mon Jun  6 17:21:27 MST 2011
+FROM:	valdes
+
+BUG:	When using the deblending options a memory free error occurs with
+	64-bit versions.  This is caused by allocating an integer array and
+	freeing it as a real array.
+
+STATUS:	Fixed in future patches and releases.
+NUMBER: 582
+MODULE: utilities.curfit
+SYSTEM: -V2.15.1
+DATE:   Fri Jul 29 12:40:08 MST 2011
+FROM:   valdes
+
+BUG:    For input data with two or more values having the same x value
+        there is an arithmetic exception when setting the niterate parameter
+        greater than zero during interactive fitting.  This occurs because
+        a check for the distance between two points for the purpose of the
+        grow option divides by the distance.  This is done even if no growing
+        is requested (grow=0).  The workaround is to edit the input so that
+        the values are not exactly the same.
+
+STATUS: This condition has been eliminated for the next release.
+
+NUMBER: 583
+MODULE: apall,
+SYSTEM: V2.15
+DATE: Mon Mar 5 08:51:03 MST 2012
+FROM: valdes
+
+BUG:    The optimal extraction for significantly tilted spectra, the Marsh
+        algorithm, has bug which manifests only under 64-bit architectures.
+        The symptom is a crash, usually a memory or segmentation panic.
+        The only workarounds are 1) go to an 32-bit system or 2) don't
+        use the optimal extraction option.
+
+STATUS: Fixed for V2.16.
+

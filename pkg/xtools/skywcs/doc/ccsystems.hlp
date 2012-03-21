@@ -19,7 +19,7 @@ Considerable flexibility is permitted in how the coordinate systems are
 specified, e.g. J2000.0, j2000.0, 2000.0, fk5, fk5 J2000, and fk5 2000.0
 all specify the mean place post-IAU 1976 or FK5 system. Missing equinox and
 epoch fields assume reasonable defaults. In most cases the
-systems of most interest to users are are "icrs", "j2000", and "b1950"
+systems of most interest to users are "icrs", "j2000", and "b1950"
 which stand for the ICRS J2000.0, FK5 J2000.0 and FK4 B1950.0 celestial
 coordinate systems respectively. The full set of options are listed below:
 

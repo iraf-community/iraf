@@ -1,0 +1,179 @@
+\hypertarget{xrStruct_8c}{
+\section{xrStruct.c File Reference}
+\label{xrStruct_8c}\index{xrStruct.c@{xrStruct.c}}
+}
+Methods used to manage Struct objects.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$xmlrpc-c/base.h$>$}\par
+{\tt \#include $<$xmlrpc-c/client.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server\_\-abyss.h$>$}\par
+{\tt \#include \char`\"{}xrpcP.h\char`\"{}}\par
+\subsection*{Data Structures}
+\begin{CompactItemize}
+\item 
+struct \textbf{PStruct}
+\end{CompactItemize}
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrStruct_8c_6fc88d7dbc85d8d10379f58c910ce847}{
+\#define \textbf{SZ\_\-NAME}~64}
+\label{xrStruct_8c_6fc88d7dbc85d8d10379f58c910ce847}
+
+\end{CompactItemize}
+\subsection*{Typedefs}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrStruct_8c_91fbb460af0d98ff470d93e4bb3eb791}{
+typedef struct PStruct $\ast$ \textbf{PStructP}}
+\label{xrStruct_8c_91fbb460af0d98ff470d93e4bb3eb791}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+int \hyperlink{xrStruct_8c_d885ec7c8d80679888d8b3ed54cc8c39}{xr\_\-newStruct} ()
+\item 
+\hypertarget{xrStruct_8c_7517b138b88f98f2f48dc6da6de490b3}{
+void \textbf{xr\_\-freeStruct} (int snum)}
+\label{xrStruct_8c_7517b138b88f98f2f48dc6da6de490b3}
+
+\item 
+\hypertarget{xrStruct_8c_e8dec42a1da64c865aabea2caf32ac2e}{
+void \textbf{xr\_\-setIntInStruct} (int snum, char $\ast$key, int value)}
+\label{xrStruct_8c_e8dec42a1da64c865aabea2caf32ac2e}
+
+\item 
+\hypertarget{xrStruct_8c_ee4424eb9b9c6f2c551a7ca428b38f16}{
+void \textbf{xr\_\-setDoubleInStruct} (int snum, char $\ast$key, double value)}
+\label{xrStruct_8c_ee4424eb9b9c6f2c551a7ca428b38f16}
+
+\item 
+\hypertarget{xrStruct_8c_bbc9acd03e798e722e7c90806b7a3bfe}{
+void \textbf{xr\_\-setBoolInStruct} (int snum, char $\ast$key, int value)}
+\label{xrStruct_8c_bbc9acd03e798e722e7c90806b7a3bfe}
+
+\item 
+\hypertarget{xrStruct_8c_f506135cd044c0adc99d4efd887f2459}{
+void \textbf{xr\_\-setStringInStruct} (int snum, char $\ast$key, char $\ast$value)}
+\label{xrStruct_8c_f506135cd044c0adc99d4efd887f2459}
+
+\item 
+\hypertarget{xrStruct_8c_1ce46c9166fdd125f9099a6923495cd7}{
+void \textbf{xr\_\-setDatetimeInStruct} (int snum, char $\ast$key, char $\ast$value)}
+\label{xrStruct_8c_1ce46c9166fdd125f9099a6923495cd7}
+
+\item 
+\hypertarget{xrStruct_8c_d3f8c7f9798f01282efafc9a90f3b019}{
+void \textbf{xr\_\-setStructInStruct} (int snum, char $\ast$key, int value)}
+\label{xrStruct_8c_d3f8c7f9798f01282efafc9a90f3b019}
+
+\item 
+\hypertarget{xrStruct_8c_30e0c7669fdf5d6042487dc0768a548c}{
+void \textbf{xr\_\-setArrayInStruct} (int snum, char $\ast$key, int value)}
+\label{xrStruct_8c_30e0c7669fdf5d6042487dc0768a548c}
+
+\item 
+\hypertarget{xrStruct_8c_56f345121f83d1b48f9d78e41566ada9}{
+void \textbf{xr\_\-getIntFromStruct} (int snum, char $\ast$key, int $\ast$value)}
+\label{xrStruct_8c_56f345121f83d1b48f9d78e41566ada9}
+
+\item 
+\hypertarget{xrStruct_8c_97d2c227a114c98468b19e31117fff4a}{
+void \textbf{xr\_\-getDoubleFromStruct} (int snum, char $\ast$key, double $\ast$value)}
+\label{xrStruct_8c_97d2c227a114c98468b19e31117fff4a}
+
+\item 
+\hypertarget{xrStruct_8c_efe94d29d431fe1d6b24ee7805e57b39}{
+void \textbf{xr\_\-getBoolFromStruct} (int snum, char $\ast$key, int $\ast$value)}
+\label{xrStruct_8c_efe94d29d431fe1d6b24ee7805e57b39}
+
+\item 
+\hypertarget{xrStruct_8c_6a38e48ba49482bb04cd380d1f00c7c6}{
+void \textbf{xr\_\-getStringFromStruct} (int snum, char $\ast$key, char $\ast$$\ast$value)}
+\label{xrStruct_8c_6a38e48ba49482bb04cd380d1f00c7c6}
+
+\item 
+\hypertarget{xrStruct_8c_3e1c56bfff622dc0051a4f0e4a913906}{
+void \textbf{xr\_\-getDatetimeFromStruct} (int snum, char $\ast$key, char $\ast$$\ast$value)}
+\label{xrStruct_8c_3e1c56bfff622dc0051a4f0e4a913906}
+
+\item 
+\hypertarget{xrStruct_8c_760d7d9869250c90b38db32be79242d4}{
+void \textbf{xr\_\-getStructFromStruct} (int snum, char $\ast$key, int $\ast$value)}
+\label{xrStruct_8c_760d7d9869250c90b38db32be79242d4}
+
+\item 
+\hypertarget{xrStruct_8c_8b4725b91a53dfefb222422a247768d0}{
+void \textbf{xr\_\-getArrayFromStruct} (int snum, char $\ast$key, int $\ast$value)}
+\label{xrStruct_8c_8b4725b91a53dfefb222422a247768d0}
+
+\item 
+\hypertarget{xrStruct_8c_9cd6b1340f568e41eca63ea6cdc0f716}{
+xmlrpc\_\-value $\ast$ \textbf{xr\_\-getSParam} (int snum)}
+\label{xrStruct_8c_9cd6b1340f568e41eca63ea6cdc0f716}
+
+\item 
+\hypertarget{xrStruct_8c_254617f8efa058a648ff38eea41b5b7f}{
+void \textbf{xr\_\-setSParam} (int snum, xmlrpc\_\-value $\ast$v)}
+\label{xrStruct_8c_254617f8efa058a648ff38eea41b5b7f}
+
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrStruct_8c_553c31e8dbb2715d147f2102bd0e5358}{
+int \textbf{nstructs} = -1}
+\label{xrStruct_8c_553c31e8dbb2715d147f2102bd0e5358}
+
+\item 
+\hypertarget{xrStruct_8c_1d06bf9c21b48cc20dc9e4fb08ed2ba8}{
+PStruct \textbf{sParams} \mbox{[}MAX\_\-STRUCTS\mbox{]}}
+\label{xrStruct_8c_1d06bf9c21b48cc20dc9e4fb08ed2ba8}
+
+\item 
+\hypertarget{xrStruct_8c_a29b3bff99e236a458f9ca31cd106587}{
+xmlrpc\_\-env \textbf{env}}
+\label{xrStruct_8c_a29b3bff99e236a458f9ca31cd106587}
+
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Methods used to manage Struct objects. 
+
+XRSTRUCT.C
+
+Methods used to implement the Struct object.
+
+snum = xr\_\-newStruct () xr\_\-freeStruct (int snum)
+
+xr\_\-setIntInStruct (int snum, char $\ast$key, int value) xr\_\-setDoubleInStruct (int snum, char $\ast$key, double value) xr\_\-setBoolInStruct (int snum, char $\ast$key, int value) xr\_\-setStringInStruct (int snum, char $\ast$key, char $\ast$value) xr\_\-setDatetimeInStruct (int snum, char $\ast$key, char $\ast$value) xr\_\-setStructInStruct (int snum, char $\ast$key, int value) xr\_\-setArrayInStruct (int snum, char $\ast$key, int value)
+
+xr\_\-getIntFromStruct (int snum, char $\ast$key, int $\ast$value) xr\_\-getDoubleFromStruct (int snum, char $\ast$key, double $\ast$value) xr\_\-getBoolFromStruct (int snum, char $\ast$key, int $\ast$value) xr\_\-getStringFromStruct (int snum, char $\ast$key, char $\ast$$\ast$value) xr\_\-getDatetimeFromStruct (int snum, char $\ast$key, char $\ast$$\ast$value) xr\_\-getStructFromStruct (int snum, char $\ast$key, int $\ast$value) xr\_\-getArrayFromStruct (int snum, char $\ast$key, int $\ast$value)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]6/10/09 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{xrStruct_8c_d885ec7c8d80679888d8b3ed54cc8c39}{
+\index{xrStruct.c@{xrStruct.c}!xr\_\-newStruct@{xr\_\-newStruct}}
+\index{xr\_\-newStruct@{xr\_\-newStruct}!xrStruct.c@{xrStruct.c}}
+\subsubsection[{xr\_\-newStruct}]{\setlength{\rightskip}{0pt plus 5cm}int xr\_\-newStruct (void)}}
+\label{xrStruct_8c_d885ec7c8d80679888d8b3ed54cc8c39}
+
+
+XR\_\-NEWSTRUCT -- Create a new Struct type value. 
+
+Referenced by xr\_\-getStructFromArray().

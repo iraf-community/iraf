@@ -18,7 +18,9 @@ task	get	= t_get,
 	debug	= t_debug,
 	spawn	= t_spawn,
 	edit	= t_edit,
-	tty	= t_tty
+	tty	= t_tty,
+	urlget	= t_urlget
+
 
 # Strings may optionally be quoted in SET stmts with either ' or ".
 define	IS_QUOTE	($1 == '\'' || $1 == '"')
@@ -369,4 +371,34 @@ begin
 	    call close (out)
 	    call close (in)
 	}
+end
+
+
+# URL_GET -- Do an HTTP GET of a URL
+
+procedure t_urlget ()
+
+pointer	reply
+char	url[SZ_LINE], fname[SZ_FNAME]
+bool	hdr
+int	nread
+
+int	url_get()
+
+begin
+	call clgstr ("url", url, SZ_LINE) 		# get the parameters
+	call clgstr ("fname", fname, SZ_FNAME)
+	hdr = clgetb ("hdr")
+
+	call calloc (reply, SZ_LINE, TY_CHAR)
+
+	nread = url_get (url, fname, reply)
+
+	call eprintf ("File '%s', downloaded %d bytes.\n")
+	    call pargstr (fname)
+	    call pargi (nread)
+
+	if (hdr)
+	    call eprintf (Memc[reply])
+	call mfree (reply, TY_CHAR)
 end

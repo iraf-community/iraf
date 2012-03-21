@@ -1,4 +1,5 @@
 include	<time.h>
+include	<fset.h>
 include	<smw.h>
 
 # ANS_HDR -- Add answer header in answer file
@@ -20,10 +21,14 @@ data	key1/0/
 
 begin
 	# Check for valid file name
-	if (fd1 == NULL && fname1[1] != EOS)
+	if (fd1 == NULL && fname1[1] != EOS) {
 	    fd1 = open (fname1, APPEND, TEXT_FILE)
-	if (fd2 == NULL && fname2[1] != EOS)
+	    call fseti (fd1, F_FLUSHNL, YES)
+	}
+	if (fd2 == NULL && fname2[1] != EOS) {
 	    fd2 = open (fname2, APPEND, TEXT_FILE)
+	    call fseti (fd2, F_FLUSHNL, YES)
+	}
 
 	# Print image name.
 	if (newimage == YES) {
@@ -60,6 +65,7 @@ begin
 			call pargstr ("core")
 			call pargstr ("gfwhm")
 			call pargstr ("lfwhm")
+		    call flush (fd1)
 		}
 		if (fd2 != NULL) {
 		    call fprintf (fd2, "%10s%10s%10s%10s%10s%10s%10s\n")
@@ -70,6 +76,7 @@ begin
 			call pargstr ("core")
 			call pargstr ("gfwhm")
 			call pargstr ("lfwhm")
+		    call flush (fd2)
 		}
 	    }
 	    key1 = key

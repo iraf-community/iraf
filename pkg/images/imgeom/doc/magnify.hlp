@@ -156,7 +156,7 @@ EXAMPLES
 
 	cl> magnify imagein imageout 2.5 2.5
 
-2. To subsample the the lines of an image in steps of 3.5:
+2. To subsample the lines of an image in steps of 3.5:
 
 	cl> magnify imagein imageout dx=3.5 dy=1
 

@@ -14,7 +14,7 @@ double ilng, ilat	# the input sky coordinates in radians
 double ipmlng, ipmlat	# the input proper motions in radians  / year
 double	px		# the input parallax in arcsec
 double	rv		# the input radial velocity in km / sec (+ve receding)
-double olng, olat	# the output output sky coordinates in radians
+double olng, olat	# the output sky coordinates in radians
 .fi
 .ih
 ARGUMENTS

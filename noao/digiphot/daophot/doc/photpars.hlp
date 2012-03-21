@@ -41,7 +41,7 @@ DESCRIPTION
 The integral of the flux within the circular apertures specified by
 \fIapertures\fR is computed by summing pixels in the aperture with
 the specified weighting function \fIweighting\fR. The fraction of each pixel
-lying within the the aperture is computed by an approximation and all the
+lying within the aperture is computed by an approximation and all the
 approximations are summed.  The zero point of the magnitude
 scale is determined by \fIzmag\fR.
 

@@ -24,7 +24,9 @@ task	mpp	= t_mpp,
 	oclient	= t_old_client,
 	daytime = t_daytime,
 	http	= t_http,
-	utime	= t_utime
+	utime	= t_utime,
+	symlink	= t_symlink,
+	unlink	= t_unlink
 
 
 define 	SZ_BUF		2048
@@ -588,4 +590,36 @@ begin
 	call printf ("NULL test time: atime = %d  mtime = %d\n")
 	    call pargl (FI_ATIME(fi))
 	    call pargl (FI_MTIME(fi))
+end
+
+
+# SYMLINK -- Create a symlink.
+
+procedure t_symlink ()
+
+char	link[SZ_PATHNAME], target[SZ_PATHNAME]
+int 	status
+
+int	sum, i
+
+begin
+	call clgstr ("link", link, SZ_PATHNAME)
+	call clgstr ("target", target, SZ_PATHNAME)
+
+	call fsymlink (link, target)
+end
+
+
+# UNLINK -- Remove a symlink.
+
+procedure t_unlink ()
+
+char	link[SZ_PATHNAME], target[SZ_PATHNAME]
+int 	status
+
+int	sum, i
+
+begin
+	call clgstr ("link", link, SZ_PATHNAME)
+	call funlink (link)
 end

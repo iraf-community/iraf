@@ -1,0 +1,148 @@
+\hypertarget{structServer}{
+\section{Server Struct Reference}
+\label{structServer}\index{Server@{Server}}
+}
+{\tt \#include $<$xrpcP.h$>$}
+
+\subsection*{Data Fields}
+\begin{CompactItemize}
+\item 
+\hypertarget{structServer_926c9dae229a62b6d33fdbb41dca6d82}{
+int \textbf{port}}
+\label{structServer_926c9dae229a62b6d33fdbb41dca6d82}
+
+\item 
+char \hyperlink{structServer_3e5bdf6e881fe987617dbbe420ed39a7}{path} \mbox{[}SZ\_\-PATH\mbox{]}
+\item 
+char \hyperlink{structServer_732b4b0eb4208cc8618eeda41d35effa}{url} \mbox{[}SZ\_\-PATH\mbox{]}
+\item 
+char \hyperlink{structServer_25c424b3c00a12aefd80dd82dafa1f9f}{config} \mbox{[}SZ\_\-PATH\mbox{]}
+\item 
+char \hyperlink{structServer_520e88309f2f48106caa1fb6bacd9b3b}{logfile} \mbox{[}SZ\_\-PATH\mbox{]}
+\item 
+\hyperlink{structMethod}{Method} $\ast$ \hyperlink{structServer_0d3f35225f9d2bcb9350016948e77ada}{method\_\-head}
+\item 
+\hyperlink{structMethod}{Method} $\ast$ \hyperlink{structServer_baf5367f677cc45e2b46d08989a068e4}{method\_\-tail}
+\item 
+int \hyperlink{structServer_fd95ab28088415ee5900bd6bf70dc0a2}{num\_\-methods}
+\item 
+\hyperlink{structCaller}{Caller} \hyperlink{structServer_bac1edd9485d6c86e5d6273c9e7efe79}{caller}
+\item 
+pthread\_\-attr\_\-t \hyperlink{structServer_922879601b599ff38a9638a72da810fa}{attr}
+\item 
+pthread\_\-t \hyperlink{structServer_b30292985309c492e4ba0ebbf2a6934a}{thread}
+\item 
+xmlrpc\_\-default\_\-method \hyperlink{structServer_bafe10e20203238b2f957419066955be}{defMethod}
+\item 
+xmlrpc\_\-server\_\-abyss\_\-parms \hyperlink{structServer_62bc9dc3ae8328ac0781cc3c7cbe148c}{serverparm}
+\item 
+\hypertarget{structServer_039a46ab56a4118f4013ca22cf042e4a}{
+xmlrpc\_\-registry $\ast$ \textbf{registry}}
+\label{structServer_039a46ab56a4118f4013ca22cf042e4a}
+
+\item 
+\hypertarget{structServer_b50cdb19365000aa482374876aa55fec}{
+xmlrpc\_\-env \textbf{env}}
+\label{structServer_b50cdb19365000aa482374876aa55fec}
+
+\item 
+\hypertarget{structServer_16b8af9cb469718b3fdfd50fbe9fbc3a}{
+int \textbf{trace}}
+\label{structServer_16b8af9cb469718b3fdfd50fbe9fbc3a}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+XML-RPC server data struct. 
+
+\subsection{Field Documentation}
+\hypertarget{structServer_922879601b599ff38a9638a72da810fa}{
+\index{Server@{Server}!attr@{attr}}
+\index{attr@{attr}!Server@{Server}}
+\subsubsection[{attr}]{\setlength{\rightskip}{0pt plus 5cm}pthread\_\-attr\_\-t {\bf Server::attr}}}
+\label{structServer_922879601b599ff38a9638a72da810fa}
+
+
+method calling struct \hypertarget{structServer_bac1edd9485d6c86e5d6273c9e7efe79}{
+\index{Server@{Server}!caller@{caller}}
+\index{caller@{caller}!Server@{Server}}
+\subsubsection[{caller}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Caller} {\bf Server::caller}}}
+\label{structServer_bac1edd9485d6c86e5d6273c9e7efe79}
+
+
+number of methods \hypertarget{structServer_25c424b3c00a12aefd80dd82dafa1f9f}{
+\index{Server@{Server}!config@{config}}
+\index{config@{config}!Server@{Server}}
+\subsubsection[{config}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Server::config}\mbox{[}SZ\_\-PATH\mbox{]}}}
+\label{structServer_25c424b3c00a12aefd80dd82dafa1f9f}
+
+
+full server URL \hypertarget{structServer_bafe10e20203238b2f957419066955be}{
+\index{Server@{Server}!defMethod@{defMethod}}
+\index{defMethod@{defMethod}!Server@{Server}}
+\subsubsection[{defMethod}]{\setlength{\rightskip}{0pt plus 5cm}xmlrpc\_\-default\_\-method {\bf Server::defMethod}}}
+\label{structServer_bafe10e20203238b2f957419066955be}
+
+
+server thread \hypertarget{structServer_520e88309f2f48106caa1fb6bacd9b3b}{
+\index{Server@{Server}!logfile@{logfile}}
+\index{logfile@{logfile}!Server@{Server}}
+\subsubsection[{logfile}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Server::logfile}\mbox{[}SZ\_\-PATH\mbox{]}}}
+\label{structServer_520e88309f2f48106caa1fb6bacd9b3b}
+
+
+server config file \hypertarget{structServer_0d3f35225f9d2bcb9350016948e77ada}{
+\index{Server@{Server}!method\_\-head@{method\_\-head}}
+\index{method\_\-head@{method\_\-head}!Server@{Server}}
+\subsubsection[{method\_\-head}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Method}$\ast$ {\bf Server::method\_\-head}}}
+\label{structServer_0d3f35225f9d2bcb9350016948e77ada}
+
+
+server log file \hypertarget{structServer_baf5367f677cc45e2b46d08989a068e4}{
+\index{Server@{Server}!method\_\-tail@{method\_\-tail}}
+\index{method\_\-tail@{method\_\-tail}!Server@{Server}}
+\subsubsection[{method\_\-tail}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Method}$\ast$ {\bf Server::method\_\-tail}}}
+\label{structServer_baf5367f677cc45e2b46d08989a068e4}
+
+
+server method list \hypertarget{structServer_fd95ab28088415ee5900bd6bf70dc0a2}{
+\index{Server@{Server}!num\_\-methods@{num\_\-methods}}
+\index{num\_\-methods@{num\_\-methods}!Server@{Server}}
+\subsubsection[{num\_\-methods}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Server::num\_\-methods}}}
+\label{structServer_fd95ab28088415ee5900bd6bf70dc0a2}
+
+
+server method tail \hypertarget{structServer_3e5bdf6e881fe987617dbbe420ed39a7}{
+\index{Server@{Server}!path@{path}}
+\index{path@{path}!Server@{Server}}
+\subsubsection[{path}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Server::path}\mbox{[}SZ\_\-PATH\mbox{]}}}
+\label{structServer_3e5bdf6e881fe987617dbbe420ed39a7}
+
+
+server port numnber \hypertarget{structServer_62bc9dc3ae8328ac0781cc3c7cbe148c}{
+\index{Server@{Server}!serverparm@{serverparm}}
+\index{serverparm@{serverparm}!Server@{Server}}
+\subsubsection[{serverparm}]{\setlength{\rightskip}{0pt plus 5cm}xmlrpc\_\-server\_\-abyss\_\-parms {\bf Server::serverparm}}}
+\label{structServer_62bc9dc3ae8328ac0781cc3c7cbe148c}
+
+
+dispatcher method \hypertarget{structServer_b30292985309c492e4ba0ebbf2a6934a}{
+\index{Server@{Server}!thread@{thread}}
+\index{thread@{thread}!Server@{Server}}
+\subsubsection[{thread}]{\setlength{\rightskip}{0pt plus 5cm}pthread\_\-t {\bf Server::thread}}}
+\label{structServer_b30292985309c492e4ba0ebbf2a6934a}
+
+
+server thread attribute \hypertarget{structServer_732b4b0eb4208cc8618eeda41d35effa}{
+\index{Server@{Server}!url@{url}}
+\index{url@{url}!Server@{Server}}
+\subsubsection[{url}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Server::url}\mbox{[}SZ\_\-PATH\mbox{]}}}
+\label{structServer_732b4b0eb4208cc8618eeda41d35effa}
+
+
+path e.g. \char`\"{}/RPC2\char`\"{} 
+
+The documentation for this struct was generated from the following file:\begin{CompactItemize}
+\item 
+xrpcP.h\end{CompactItemize}

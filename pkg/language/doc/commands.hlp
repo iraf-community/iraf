@@ -10,7 +10,7 @@ In \fIcommand\fR mode (normal interactive commands):
 
 In \fIcompute\fR mode (algebraic mode, for expressions and procedures)
 
-	taskname (arg1, ... argN, par=val, ... par=val redir)
+	taskname (arg1, ... argN, par=val, ... par=val, redir)
 .ih
 ELEMENTS
 .ls taskname
@@ -39,7 +39,7 @@ A file redirection argument, e.g.:
 >& file		spool both error and regular output in a file
 >>& file	append both error and regular output to a file
 >[GIP]		redirect graphics output to a file, e.g, >G file
->>[GIP]		append graphics output to a file, e.g, >G file
+>>[GIP]		append graphics output to a file, e.g, >>G file
 .fi
 .ke
 .le
@@ -161,7 +161,7 @@ Once two commands have been joined by a pipe they function effectively
 as a single command, and the combined command may be joined by
 pipe to further commands.  The resulting "command block" is executed
 as a unit, and may be submitted as a background job by following the
-command block with an "&" or "& queuename".
+command block with an "&".
 .ih
 EXAMPLES
 1. Simple positional arguments only (command mode).

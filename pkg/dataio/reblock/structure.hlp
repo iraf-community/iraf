@@ -31,7 +31,7 @@ READ_FILE opens the input and output devices, allocates space for the input
 and output buffers and copies the data optionally skipping data
 and byteswapping and/or wordswapping the data.
 The routine terminates when an EOF is encountered on a read.
-READ_FILE calls SKIPOVER to find the the first data byte of interest and
+READ_FILE calls SKIPOVER to find the first data byte of interest and
 RECORD_PAD and BLOCK_PAD to pad records and blocks respectively.
 .ls skipover
 SKIPOVER seeks to the first char containing data of interest and calculates

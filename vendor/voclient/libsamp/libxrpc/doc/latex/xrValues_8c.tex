@@ -1,0 +1,154 @@
+\hypertarget{xrValues_8c}{
+\section{xrValues.c File Reference}
+\label{xrValues_8c}\index{xrValues.c@{xrValues.c}}
+}
+Methods to handle XML-RPC values.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$xmlrpc-c/base.h$>$}\par
+{\tt \#include $<$xmlrpc-c/client.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server\_\-abyss.h$>$}\par
+{\tt \#include \char`\"{}xrpcP.h\char`\"{}}\par
+\subsection*{Data Structures}
+\begin{CompactItemize}
+\item 
+struct \textbf{XValue}
+\end{CompactItemize}
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrValues_8c_aadb9e9a484b1332797df19ccfba9f08}{
+\#define \textbf{MAX\_\-XVALUES}~128}
+\label{xrValues_8c_aadb9e9a484b1332797df19ccfba9f08}
+
+\item 
+\hypertarget{xrValues_8c_1984e5f9934d6b7f550608f9d741868d}{
+\#define \textbf{V\_\-FIRST}~5}
+\label{xrValues_8c_1984e5f9934d6b7f550608f9d741868d}
+
+\item 
+\hypertarget{xrValues_8c_7a46029309006c9b77aa20bfb45d08ef}{
+\#define \textbf{V\_\-LAST}~MAX\_\-XVALUES}
+\label{xrValues_8c_7a46029309006c9b77aa20bfb45d08ef}
+
+\item 
+\hypertarget{xrValues_8c_30ca685471e8cae7b46d2611d17af98f}{
+\#define \textbf{V\_\-TMPVAL}~0}
+\label{xrValues_8c_30ca685471e8cae7b46d2611d17af98f}
+
+\item 
+\hypertarget{xrValues_8c_1b737608448c660e3bc45262a42a5288}{
+\#define \textbf{V\_\-CPARAM}~1}
+\label{xrValues_8c_1b737608448c660e3bc45262a42a5288}
+
+\item 
+\hypertarget{xrValues_8c_6805be9f30fe09a7266d54ef224c52ad}{
+\#define \textbf{V\_\-CRESULT}~2}
+\label{xrValues_8c_6805be9f30fe09a7266d54ef224c52ad}
+
+\item 
+\hypertarget{xrValues_8c_747cbec794956bd13d99162b0aa29655}{
+\#define \textbf{V\_\-MPARAM}~3}
+\label{xrValues_8c_747cbec794956bd13d99162b0aa29655}
+
+\item 
+\hypertarget{xrValues_8c_a77d55a0178d20cd5b9162b44af9581e}{
+\#define \textbf{V\_\-MRESULT}~4}
+\label{xrValues_8c_a77d55a0178d20cd5b9162b44af9581e}
+
+\end{CompactItemize}
+\subsection*{Typedefs}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrValues_8c_8a1ab6bb249857465d29e9d257c18a00}{
+typedef struct XValue $\ast$ \textbf{XValueP}}
+\label{xrValues_8c_8a1ab6bb249857465d29e9d257c18a00}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrValues_8c_bfd4212fa3b814c26c1597ede5bc0361}{
+void \textbf{xr\_\-initValues} ()}
+\label{xrValues_8c_bfd4212fa3b814c26c1597ede5bc0361}
+
+\item 
+\hypertarget{xrValues_8c_9cf219119e089d0667f3f00aeba1c230}{
+int \textbf{xr\_\-newValue} (int type, void $\ast$v)}
+\label{xrValues_8c_9cf219119e089d0667f3f00aeba1c230}
+
+\item 
+\hypertarget{xrValues_8c_cd6ae55f09dd44e9ee17dc88cd034227}{
+int \textbf{xr\_\-tmpValue} (int type, void $\ast$v)}
+\label{xrValues_8c_cd6ae55f09dd44e9ee17dc88cd034227}
+
+\item 
+\hypertarget{xrValues_8c_0f59e682128af6c2cbcc1dcda06ba18b}{
+void \textbf{xr\_\-freeValue} (int index)}
+\label{xrValues_8c_0f59e682128af6c2cbcc1dcda06ba18b}
+
+\item 
+\hypertarget{xrValues_8c_492e9a6f71b35b0530c48ef836a36b03}{
+int \textbf{xr\_\-appendStruct} (int snum, char $\ast$key, int value)}
+\label{xrValues_8c_492e9a6f71b35b0530c48ef836a36b03}
+
+\item 
+\hypertarget{xrValues_8c_0295ab372a214a107e0ba03b0a4c12b1}{
+int \textbf{xr\_\-appendArray} (int anum, char $\ast$key, int value)}
+\label{xrValues_8c_0295ab372a214a107e0ba03b0a4c12b1}
+
+\item 
+\hypertarget{xrValues_8c_0fcf8dafd7ec9c374ec4e025b3789d73}{
+void \textbf{xr\_\-getStructValue} (int snum, char $\ast$key, void $\ast$value)}
+\label{xrValues_8c_0fcf8dafd7ec9c374ec4e025b3789d73}
+
+\item 
+\hypertarget{xrValues_8c_2854eaa61bef405d856e74c3665d68d6}{
+void \textbf{xr\_\-getArrayValue} (int anum, int index, void $\ast$value)}
+\label{xrValues_8c_2854eaa61bef405d856e74c3665d68d6}
+
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrValues_8c_ac8cd52cd293c38ebd5e2f4e0b0f227c}{
+int \textbf{nx\_\-values} = -1}
+\label{xrValues_8c_ac8cd52cd293c38ebd5e2f4e0b0f227c}
+
+\item 
+\hypertarget{xrValues_8c_dde6ca2a3aa48e4ea502b5ca8013cd68}{
+XValue \textbf{xValues} \mbox{[}MAX\_\-XVALUES\mbox{]}}
+\label{xrValues_8c_dde6ca2a3aa48e4ea502b5ca8013cd68}
+
+\item 
+\hypertarget{xrValues_8c_a29b3bff99e236a458f9ca31cd106587}{
+xmlrpc\_\-env \textbf{env}}
+\label{xrValues_8c_a29b3bff99e236a458f9ca31cd106587}
+
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Methods to handle XML-RPC values. 
+
+XRVALUES.C
+
+Methods to handle XML-RPC values.
+
+xr\_\-initValues () v = xr\_\-newValue (int type, void $\ast$v) v = xr\_\-tmpValue (int type, void $\ast$v) xr\_\-freeValue (int index)
+
+snum = xr\_\-appendStruct (int snum, char $\ast$key, int value) anum = xr\_\-appendArray (int anum, char $\ast$key, int value)
+
+xr\_\-getStructValue (int snum, char $\ast$key, void $\ast$value) xr\_\-getArrayValue (int anum, int index, void $\ast$value)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]6/10/09 \end{Desc}

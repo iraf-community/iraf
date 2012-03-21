@@ -71,7 +71,7 @@ define	SMW_PL		32			# Physical to logical
 
 # SHDR - Spectrum header data structure
 
-define	LEN_SHDR	378
+define	LEN_SHDR	380
 define	LEN_SHDRS	79			# Length of strings
 
 define	IMNAME		Memc[P2C($1)]		# Spectrum image name
@@ -96,8 +96,8 @@ define	PINDEX		Memi[$1+$2+291]		# Physical image index [2]
 define	APINDEX		Memi[$1+294]		# Aperture index
 
 define	AP		Memi[$1+295]		# Aperture ID
-define	APLOW		Memr[P2R($1+$2+295)]	# Aperture lower limit [2]
-define	APHIGH		Memr[P2R($1+$2+297)]	# Aperture lower limit [2]
+define	APLOW		Memr[P2R($1+296)+$2-1]	# Aperture lower limit [2]
+define	APHIGH		Memr[P2R($1+298)+$2-1]	# Aperture upper limit [2]
 define	BEAM		Memi[$1+300]		# Beam ID
 define	OFLAG		Memi[$1+301]		# Spectrum object type flag
 define	IT		Memr[P2R($1+302)]	# Integ. time

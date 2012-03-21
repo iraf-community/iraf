@@ -1,6 +1,10 @@
 .help revisions May91 noao.digiphot.photcal
 .nf
 
+io/iocat.x
+io/ioobs.x
+    Added some necessary P2R macros for symtab usage (4/2/12, MJF)
+
 lib/lexer.h
 lib/prstruct.h
     Added necessary P2R macros for 64-bit systems (9/8/10, MJF)

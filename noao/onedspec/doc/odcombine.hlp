@@ -221,7 +221,7 @@ be matched in the order of the input images.  Note that if an image does
 not contain a specified aperture the ordering will be wrong.  If the
 grouping is by image then the file will be matched to the spectra in the
 order of the apertures in the image.  And if the grouping is "all" then the
-list is matched in the order of of the images and apertures within the
+list is matched in the order of the images and apertures within the
 images with the apertures in an image varying first.
 
 .ls scale = "none" (none|mode|median|mean|exposure|@<file>|!<keyword>)
@@ -387,7 +387,7 @@ or select all the spectra from the same input image.
 The output consists of one image for each combined group.  The output
 images and combined spectra inherit the header parameters from the first
 spectrum in the combined group.  There are a number of additional optional
-outputs provided.  The optional logfile lists parameters, the the spectra
+outputs provided.  The optional logfile lists parameters, the spectra
 combined for each group, scaling, weights, etc., and the output names.
 
 The spectral combining is done using pixels at common dispersion
@@ -422,7 +422,7 @@ wavelength endpoints divided by the number pixel intervals (the number of
 pixels minus one).
 
 This task is layered on top of the \fBimcombine\fR task.  What happens
-is that the spectra for each group to be be combined is extracted from
+is that the spectra for each group to be combined is extracted from
 the input, resampled to a common dispersion, and the resulting spectra
 written to temporary images, one per spectrum.  The temporary images
 are written to the current working directory with names begining with

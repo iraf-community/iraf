@@ -339,7 +339,7 @@ The following special variables are recognized within expressions:
 
 These builtin variables are especially useful for constructing context
 dependent expressions.  For example, the value of a field may be incremented
-by 100 by assigning it the the value "$ + 100".
+by 100 by assigning it the value "$ + 100".
 
 .ih
 EXAMPLES

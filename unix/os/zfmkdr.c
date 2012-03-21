@@ -34,8 +34,11 @@ ZFMKDR (
 
 	if (mkdir (osdir, _u_fmode(0777)) == ERR)
 	    *status = XERR;
-	else
+	else {
+	    if (strncmp (osdir, "/tmp", 4) == 0)
+	        chmod (osdir, _u_fmode(0777));
 	    *status = XOK;
+	}
 
 	return (*status);
 }

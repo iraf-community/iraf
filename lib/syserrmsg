@@ -49,23 +49,29 @@
 592 Unrecognized postscript font
 593 Unrecognized postscript special font
 
+594 URL Not Found
+595 URL Permission Denied
+596 URL Internal Error
+597 URL Bad Request
+598 URL Redirection
+
 # CLIO (600-649)
-598 Task has too many psets
-599 Out of space for pset name storage
-600 EOF while reading non list structured parameter
-601 Parameter not a legal boolean (try 'yes' or 'no')
-602 Parameter not a legal character constant
-603 Parameter not a legal number
+600 Task has too many psets
+601 Out of space for pset name storage
+602 EOF while reading non list structured parameter
+603 Parameter not a legal boolean (try 'yes' or 'no')
+604 Parameter not a legal character constant
+605 Parameter not a legal number
 606 Illegal argument to CLSTATUS
 607 CLSET: Attempt to set unknown option
 608 CLGWRD: No match, or ambiguous abbreviation
 609 Commands can only be sent to the CL from a connected subprocess
 
-610 Bad file name template descriptor
-611 Illegal file name template
-612 Too many concatenatable sublists in filename template
-613 Too many string replacements in filename template
-614 Cannot edit a string constant filename template
+620 Bad file name template descriptor
+621 Illegal file name template
+622 Too many concatenatable sublists in filename template
+623 Too many string replacements in filename template
+624 Cannot edit a string constant filename template
 
 # FIO (700-799)
 720 Cannot preallocate space for file
@@ -133,14 +139,17 @@
 782 Out of bounds or misaligned FREADP call
 783 Out of bounds or misaligned FWRITEP call
 784 Cannot make directory
-785 Directory name is too long
-786 Cannot access directory
-787 Cannot access template file or cannot make copy file
-788 Static files cannot be opened NEW_FILE - use falloc
-789 Illegal filename operand (null string)
-790 FSETI: The F_CLOSEFD option is not supported for text files
-791 FSETI: The F_CLOSEFD option cannot be used with files opened NEW_FILE
-792 FUTIME: Cannot reset file access/modify time
+785 Cannot remove directory
+786 Directory name is too long
+787 Cannot access directory
+788 Cannot access template file or cannot make copy file
+789 Static files cannot be opened NEW_FILE - use falloc
+790 Illegal filename operand (null string)
+791 FSETI: The F_CLOSEFD option is not supported for text files
+792 FSETI: The F_CLOSEFD option cannot be used with files opened NEW_FILE
+793 FUTIME: Cannot reset file access/modify time
+794 Cannot create symlink
+795 Cannot remove symlink
 
 # IMIO (800-899)
 800 Cannot read pixel storage file

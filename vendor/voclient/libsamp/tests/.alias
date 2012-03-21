@@ -1,0 +1,18 @@
+
+
+# XRPC command aliases
+
+alias z1  "./xrpc 8800 9900"
+alias z2  "./xrpc 9900 8800"
+alias z3  "./xrpc 9901 8800"
+
+alias vz1  "valgrind --leak-check=full ./xrpc 8800 9900"
+alias vz2  "valgrind --leak-check=full ./xrpc 9900 8800"
+
+alias zt0  "unsetenv XMLRPC_TRACE_XML"
+alias zt1  "setenv XMLRPC_TRACE_XML 1"
+
+alias mk   "make ; scp ps4 monsoon@newfirm-kp.kpno.noao.edu:zztest"
+
+# PSOCK commands
+

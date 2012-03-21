@@ -18,10 +18,10 @@ ZRALOC (
 {
 	register char *bufptr;
 	char  *ptr = (void *) NULL;
-
+	int   zstat;
 
         ptr = LOC_TO_ADDR(*buf,char);
-	bufptr = realloc (ptr, (int)*nbytes);
+	bufptr = realloc (ptr, (size_t)*nbytes);
 
 	if (bufptr != NULL) {
             *buf = ADDR_TO_LOC(bufptr);
@@ -32,5 +32,6 @@ ZRALOC (
 	} else
 	    *status = XERR;
 
-	return (*status);
+	zstat =  *status;
+	return (zstat);
 }

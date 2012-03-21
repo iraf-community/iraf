@@ -38,7 +38,7 @@ begin
 		    do j = 1, npts {
 			a = Memr[dp]
 			if (a < lthresh || a > hthresh) {
-			    Memi[m[i]+j-1] = 1
+			    Memr[m[i]+j-1] = 1
 			    lflag[i] = D_MIX
 			    dflag = D_MIX
 			}
@@ -47,10 +47,10 @@ begin
 		} else if (lflag[i] == D_MIX) {
 		    mp = m[i]
 		    do j = 1, npts {
-			if (Memi[mp] == 0) {
+			if (Memr[mp] == 0) {
 			    a = Memr[dp]
 			    if (a < lthresh || a > hthresh) {
-				Memi[m[i]+j-1] = 1
+				Memr[m[i]+j-1] = 1
 				dflag = D_MIX
 			    }
 			}
@@ -64,7 +64,7 @@ begin
 		    lflag[i] = D_NONE
 		    mp = m[i]
 		    do j = 1, npts {
-			if (Memi[mp] == 0) {
+			if (Memr[mp] == 0) {
 			    lflag[i] = D_MIX
 			    break
 			}
@@ -99,7 +99,7 @@ begin
 		    } else if (lflag[i] == D_MIX) {
 			mp = m[i]
 			do j = 1, npts {
-			    if (Memi[mp] == 0)
+			    if (Memr[mp] == 0)
 				Memr[dp] = Memr[dp] / a + b
 			    dp = dp + 1
 			    mp = mp + 1
@@ -147,7 +147,7 @@ begin
 		    ip = id[i]
 		    mp = m[i]
 		    do j = 1, npts {
-			if (Memi[mp] == 0) {
+			if (Memr[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
 			    if (k < i) {
@@ -172,7 +172,7 @@ begin
 		    dp = d[i]
 		    mp = m[i]
 		    do j = 1, npts {
-			if (Memi[mp] == 0) {
+			if (Memr[mp] == 0) {
 			    n[j] = n[j] + 1
 			    k = n[j]
 			    if (k < i)

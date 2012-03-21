@@ -464,7 +464,7 @@ begin
 	    goto home or lower-left, depending on which is closest to
 		desired position and on capabilities of terminal.
 
-	    # Now move the the desired position.
+	    # Now move to the desired position.
 	    step to desired line using ttyvert
 	    advance to desired column using ttyhorz
 

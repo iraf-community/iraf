@@ -1,0 +1,11 @@
+votget.input = "/tmp/sia.xml"
+votget.base = "junk"
+votget.extn = ""
+votget.format = "fits"
+votget.acref = "VOX:Image_AccessReference"
+votget.col = INDEF
+votget.sequential = yes
+votget.nthreads = 4
+votget.list = yes
+votget.mode = "al"
+

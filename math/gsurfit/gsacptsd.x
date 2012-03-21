@@ -22,10 +22,11 @@ double	w[npts]		# array of weights
 int	npts		# number of data points
 int	wtflag		# type of weighting
 
+bool	refsub
 int	i, ii, j, jj, k, l, ll
 int	maxorder, xorder, xxorder, ntimes
 pointer	sp, vzptr, vindex, mzptr, mindex, bxptr, bbxptr, byptr, bbyptr
-pointer	byw, bw
+pointer	x1, y1, z1, byw, bw
 
 double	adotd()
 
@@ -71,34 +72,62 @@ begin
 
 	# allocate space for the basis functions
 	call smark (sp)
+	call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_DOUBLE)
+	call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_DOUBLE)
+
+	# subtract reference value
+	refsub = !(IS_INDEFD(GS_XREF(sf)) || IS_INDEFD(GS_YREF(sf)) ||
+	    IS_INDEFD(GS_ZREF(sf)))
+	if (refsub) {
+	    call salloc (x1, npts, TY_DOUBLE)
+	    call salloc (y1, npts, TY_DOUBLE)
+	    call salloc (z1, npts, TY_DOUBLE)
+	    call asubkd (x, GS_XREF(sf), Memd[x1], npts)
+	    call asubkd (y, GS_YREF(sf), Memd[y1], npts)
+	    call asubkd (z, GS_ZREF(sf), Memd[z1], npts)
+	}
 
 	# calculate the non-zero basis functions
 	switch (GS_TYPE(sf)) {
 	case GS_LEGENDRE:
-	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_DOUBLE)
-	    call dgs_bleg (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
-	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
-	    call dgs_bleg (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
-	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    if (refsub) {
+		call dgs_bleg (Memd[x1], npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call dgs_bleg (Memd[y1], npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    } else {
+		call dgs_bleg (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call dgs_bleg (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    }
 	case GS_CHEBYSHEV:
-	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_DOUBLE)
-	    call dgs_bcheb (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
-	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
-	    call dgs_bcheb (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
-	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    if (refsub) {
+		call dgs_bcheb (Memd[x1], npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call dgs_bcheb (Memd[y1], npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    } else {
+		call dgs_bcheb (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call dgs_bcheb (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    }
 	case GS_POLYNOMIAL:
-	    call salloc (GS_XBASIS(sf), npts * GS_XORDER(sf), TY_DOUBLE)
-	    call salloc (GS_YBASIS(sf), npts * GS_YORDER(sf), TY_DOUBLE)
-	    call dgs_bpol (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
-	    		  GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
-	    call dgs_bpol (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
-	    		  GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    if (refsub) {
+		call dgs_bpol (Memd[x1], npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call dgs_bpol (Memd[y1], npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    } else {
+		call dgs_bpol (x, npts, GS_XORDER(sf), GS_XMAXMIN(sf),
+		    GS_XRANGE(sf), XBASIS(GS_XBASIS(sf)))
+		call dgs_bpol (y, npts, GS_YORDER(sf), GS_YMAXMIN(sf),
+		    GS_YRANGE(sf), YBASIS(GS_YBASIS(sf)))
+	    }
 	default:
 	    call error (0, "GSACCUM: Illegal curve type.")
 	}
-
 
 	# allocate temporary storage space for matrix accumulation
 	call salloc (byw, npts, TY_DOUBLE)

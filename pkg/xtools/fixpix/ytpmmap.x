@@ -743,11 +743,11 @@ pointer	im			#U Pixel mask image pointer
 pointer	refim			#I Reference image pointer
 int	maxmaskval		#I Maximum mask value
 
-int	i, j, k, l, nc, nl, ncpm, nlpm, step, nxmsi, nymsi
+int	i, j, k, l, nc, nl, ncpm, nlpm, cstep, lstep, buf, nxmsi, nymsi
 int	c_im, l_im, c_ref, l_ref, c1_ref, c2_ref, l1_ref, l2_ref
 int	xmin, xmax, ymin, ymax
-double	pix_im[2], pix_ref[2], pix_tmp[2], ra[2], dec[2]
-real	x, y, istep, d[2], der[2,2]
+double	pix_im[2], pix_ref[2], pix_tmp[2], w1[2], w2[2]
+real	x, y, icstep, ilstep, d[2], der[2,2]
 long	v[2]
 pointer	sp, bits, rl
 pointer	ba, mw_im, mw_ref, ct1, ct2, pm, xmsi, ymsi, xvec, yvec, ptr
@@ -790,50 +790,64 @@ begin
 	mw_ref = mw_openim (refim)
 
 	# First bound the reference image in world coordinates.
+	# The image is sampled and a small amount of buffer is used.
 
 	ct1 = mw_sctran (mw_ref, "logical", "world", 3)
-	ra[1] = 370.; ra[2]=-10; dec[1]=100; dec[2]=-100
-	for (pix_im[2]=0.5; pix_im[2]<=nl+0.5; pix_im[2]=pix_im[2]+nl/20.) {
-	    for (pix_im[1]=0.5; pix_im[1]<=nc+0.5; pix_im[1]=pix_im[1]+nc/20.) {
+	cstep = 20; lstep = 20
+	icstep = (nc - 1.) / (cstep - 1.); ilstep = (nl - 1.) / (lstep - 1.)
+	w1[1] = MAX_DOUBLE; w1[2] = -MAX_DOUBLE
+	w2[1] = MAX_DOUBLE; w2[2] = -MAX_DOUBLE
+	for (pix_im[2]=1-ilstep; pix_im[2]<=nl+1+ilstep;
+	    pix_im[2]=pix_im[2]+ilstep) {
+	    for (pix_im[1]=1-icstep; pix_im[1]<=nc+1+icstep;
+		pix_im[1]=pix_im[1]+icstep) {
 		call mw_ctrand (ct1, pix_im, pix_ref, 2)
-		ra[1] = min (ra[1], pix_ref[1])
-		ra[2] = max (ra[2], pix_ref[1])
-		dec[1] = min (dec[1], pix_ref[2])
-		dec[2] = max (dec[2], pix_ref[2])
+		w1[1] = min (w1[1], pix_ref[1])
+		w1[2] = max (w1[2], pix_ref[1])
+		w2[1] = min (w2[1], pix_ref[2])
+		w2[2] = max (w2[2], pix_ref[2])
 	    }
 	}
 	call mw_ctfree (ct1)
-	        
-	# Set up look up surfaces for the transformation.
+
+	# Fit coordinate surfaces for the mapping from the mask to the
+	# the reference image.  This is done because the WCS evaluations
+	# can be slow.  This is done on a subsample and then linear
+	# interpolation will be done.  Provide a buffer to avoid edge
+	# effects from the subsampling.  Bound the mask to what overlaps
+	# the reference image.
+
+	cstep = 10; lstep = 10; buf = 1
 
 	ct1 = mw_sctran (mw_im, "logical", "world", 3)
 	ct2 = mw_sctran (mw_ref, "world", "logical", 3)
 
 	call msiinit (xmsi, II_BILINEAR)
 	call msiinit (ymsi, II_BILINEAR)
-	step = 20; istep = 1. / step
-	nxmsi = (ncpm + step - 1) / step + 1
-	nymsi = (nlpm + step - 1) / step + 1
+	nxmsi = nint ((ncpm - 1.) / cstep + 2*buf + 1)
+	nymsi = nint ((nlpm - 1.) / lstep + 2*buf + 1)
+	icstep = (nxmsi - (2.*buf + 1)) / (ncpm - 1.)
+	ilstep = (nymsi - (2.*buf + 1)) / (nlpm - 1.)
 	call malloc (xvec, nxmsi*nymsi, TY_REAL)
 	call malloc (yvec, nxmsi*nymsi, TY_REAL)
 	xmin=ncpm+1; xmax=0; ymin=nlpm+1; ymax=0
 	k = -1
-	do j = 0, nymsi-1 {
-	    pix_im[2] = j  / istep + 1
-	    do i = 0, nxmsi-1 {
+	do j = 1, nymsi {
+	    pix_im[2] = (j - (2*buf))  / ilstep + 1
+	    do i = 1, nxmsi {
 		k = k + 1
-		pix_im[1] = i / istep + 1
+		pix_im[1] = (i - (2*buf)) / icstep + 1
 		call mw_ctrand (ct1, pix_im, pix_tmp, 2)
-		if (pix_tmp[1] < ra[1] || pix_tmp[1] > ra[2] ||
-		    pix_tmp[2] < dec[1] || pix_tmp[2] > dec[2]) {
+		if (pix_tmp[1] < w1[1] || pix_tmp[1] > w1[2] ||
+		    pix_tmp[2] < w2[1] || pix_tmp[2] > w2[2]) {
 		    Memr[xvec+k] = 0
 		    Memr[yvec+k] = 0
 		    next
 		}
 
 		call mw_ctrand (ct2, pix_tmp, pix_ref, 2)
-		x = max (0D0, min (double(nc+1), pix_ref[1]))
-		y = max (0D0, min (double(nl+1), pix_ref[2]))
+		x = pix_ref[1]
+		y = pix_ref[2]
 		if (x > 0.5 && x < nc+0.5 && y > 0.5 && y < nl+0.5) {
 		    l = max (1, min (ncpm, nint (pix_im[1])))
 		    xmin = min (xmin, l)
@@ -842,6 +856,7 @@ begin
 		    ymin = min (ymin, l)
 		    ymax = max (ymax, l)
 		}
+
 		Memr[xvec+k] = x
 		Memr[yvec+k] = y
 	    }
@@ -853,16 +868,30 @@ begin
 	call mw_close (mw_im)
 	call mw_close (mw_ref)
 
+	# Expand the mask bound to avoid missing the edge.
+	i = (xmin - 1) * icstep + (2*buf) - 1
+	xmin = (i - (2*buf)) / icstep + 1
+	xmin = max (1, min (ncpm, nint(xmin)))
+	i = (xmax - 1) * icstep + (2*buf) + 1.99
+	xmax = (i - (2*buf)) / icstep + 1
+	xmax = max (1, min (ncpm, nint(xmax)))
+	j = (ymin - 1) * ilstep + (2*buf) - 1
+	ymin = (j - (2*buf)) / ilstep + 1
+	ymin = max (1, min (nlpm, nint(ymin)))
+	j = (ymax - 1) * ilstep + (2*buf) + 1.99
+	ymax = (j - (2*buf)) / ilstep + 1
+	ymax = max (1, min (nlpm, nint(ymax)))
+
 	# Determine size of mask pixel in reference system.
 	# This is approximate because we don't take into account the
 	# shape of the transformed square mask pixels.
 
 	x = (xmax+xmin)/2; y = (ymax+ymin)/2
-	x = (x - 1) * istep + 1; y = (y - 1) * istep + 1
+	x = (x - 1) * icstep + (2*buf); y = (y - 1) * ilstep + (2*buf)
 	call msider (xmsi, x, y, der, 2, 2, 2)
-	d[1] = max (abs(der[2,1]), abs(der[1,2])) * istep
+	d[1] = max (abs(der[2,1]), abs(der[1,2])) * icstep
 	call msider (ymsi, x, y, der, 2, 2, 2)
-	d[2] = max (abs(der[2,1]), abs(der[1,2])) * istep
+	d[2] = max (abs(der[2,1]), abs(der[1,2])) * ilstep
 
 	# Go through each mask pixel and add to the new mask.
 	# This uses range lists to quickly skip good pixels.
@@ -871,7 +900,7 @@ begin
 	do l_im = ymin, ymax {
 	    v[2] = l_im
 	    call plglri (pm, v, Memi[rl], 0, ncpm, PIX_SRC)
-	    y = (l_im - 1) * istep + 1
+	    y = (l_im - 1) * ilstep + (2*buf)
 	    ptr = rl
 	    do k = RL_FIRST, RLI_LEN(rl) {
 		ptr = ptr + RL_LENELEM
@@ -880,9 +909,9 @@ begin
 		    next
 		if (c_im+Memi[ptr+RL_NOFF]-1 < xmin)
 		    next
-		x = (c_im - 1) * istep + 1 - istep
+		x = (c_im - 1) * icstep + (2*buf) - icstep
 		do c_im = 1, Memi[ptr+RL_NOFF] {
-		    x = x + istep
+		    x = x + icstep
 		    pix_ref[1] = msieval (xmsi, x, y)
 		    pix_ref[2] = msieval (ymsi, x, y)
 		    pix_tmp[1] = max (1D0, pix_ref[1] - 0.45 * d[1])

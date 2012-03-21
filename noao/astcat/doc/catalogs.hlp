@@ -283,7 +283,7 @@ coordinate conversions.
 
 .ls [10]
 Run the agetcat task using the new catalog record and catalog configuration 
-file. Examine the header of the the output astrometry file to make sure
+file. Examine the header of the output astrometry file to make sure
 the header and field descriptions have been transferred correctly. Apply a
 few filtering options, i.e. sort on a field, or select a subset of fields for
 output, to test the correctness of the field descriptions.

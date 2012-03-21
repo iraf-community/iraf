@@ -143,7 +143,7 @@ Order of the fitting function.  The order is the number of polynomial
 terms (coefficients) or the number of spline pieces.
 .le
 .ls sample = "*"
-Sample regions for fitting specified in in pixel coordinates.
+Sample regions for fitting specified in pixel coordinates.
 .le
 .ls niterate = 10
 Number of rejection iterations.

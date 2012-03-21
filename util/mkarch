@@ -10,8 +10,12 @@ if (-e $iraf/unix/bin.$aarch/mkpkg.e) then
     # Assume we've got a system with binaries and can use MKPKG.
     set use_mkpkg	= 1
 else
-    # Change the links manually, but strip all binaries first.
-    set use_mkpkg	= 0
+    if ($?IRAFARCH && -e $iraf/unix/bin.$IRAFARCH/mkpkg.e) then
+        set use_mkpkg	= 1
+    else
+        # Change the links manually, but strip all binaries first.
+        set use_mkpkg	= 0
+    endif
 endif
 
 
@@ -24,11 +28,13 @@ loop_:
     if ($use_mkpkg == 1) then
         mkpkg $arch
         (chdir noao ; mkpkg -p noao $arch)
+        (chdir vo   ; mkpkg -p vo $arch)
     else
 	$iraf/util/mkclean
         /bin/rm -rf bin noao/bin unix/bin unix/as
 
         ln -s bin.$arch bin
+        (chdir vo   ; ln -s bin.$arch bin)
         (chdir noao ; ln -s bin.$arch bin)
         (chdir unix ; ln -s bin.$arch bin)
         (chdir unix ; ln -s as.$arch as)

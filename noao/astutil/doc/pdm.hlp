@@ -122,7 +122,7 @@ The ICFIT keystrokes are described elsewhere. (see help for icfit)
 Phase Dispersion Minimization User Interface (keystrokes)
 
 When the program starts up it reads the data file(s) and displays
-the data on the the screen as a standard mark plot.  The user is
+the data on the screen as a standard mark plot.  The user is
 then placed in a graphics cursor loop with the following options
 available in addition to the standard graphics commands:
 

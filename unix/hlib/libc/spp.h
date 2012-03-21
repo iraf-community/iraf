@@ -127,6 +127,8 @@ struct cplx {
 #define	TEXT_FILE	11		/* file types			*/
 #define	BINARY_FILE	12
 #define	DIRECTORY_FILE	13
+#define	STATIC_FILE	14
+#define	SYMLINK_FILE	15
 #define SPOOL_FILE	(-2)
 
 #define	CLIN		1

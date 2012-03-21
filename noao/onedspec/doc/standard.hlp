@@ -459,7 +459,7 @@ magnitudes will be used.  For example if there is no information for a
 B3III star for a M-J color then the spectral type B3V might be used.
 
 In order for the program to determine the bands for each column in the data
-file there must a a comment before the data with the column names.  It must
+file there must be a comment before the data with the column names.  It must
 begin with "# Type Teff" and then be followed by the same band identifiers
 used in the blackbody calibration files and as specified by the
 \fImagband\fR parameter.  Any amount whitespace (space or tab) is used to

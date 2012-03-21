@@ -53,7 +53,7 @@ begin
 	    # Print the indices.
 	    do n = 1, nvars {
 		call fprintf (fd, "%g ")
-		    call pargr (Memr[sym + n - 1])
+		    call pargr (Memr[P2R(sym + n - 1)])
 	    }
 
 	    # Skip one line.

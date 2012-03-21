@@ -21,7 +21,7 @@ between the two lists will be correlated.
 List of apertures to be correlated in echelle and multispec format spectra.  
 This parameter is used for \fIboth\fR the object and reference spectra if both
 spectra are two dimensional, otherwise the aperture list applies to the object
-only if the the template is one-dimensional.  Individual apertures from a
+only if the template is one-dimensional.  Individual apertures from a
 two-dimensional template may be
 extracted to 1-D using the \fIonedspec.scopy\fR task, and these new images may
 then be used in the template list as separate images.  (See the examples for
@@ -537,7 +537,7 @@ SPECTRUM MODE DESCRIPTION
 Spectrum mode is entered from the main or fourier mode via the 's'
 keystroke.  The user may select plots of the original input spectra with the
 'i' keystroke, or the continuum subtracted spectra with the 'n' keystroke,
-If the data have been rebinned to a log scale, they will still be be plotted 
+If the data have been rebinned to a log scale, they will still be plotted 
 on a linear wavelength scale for clarity.  Pixel data are plotted identically
 to how they were read.  (NOTE: For rebinned spectra, a slight slope may be
 noticed in the 'original' data because of rebinning effects.)
@@ -1070,7 +1070,7 @@ EXAMPLES
 
 	... type 's' to enter spectrum mode
 
-	    The screen is cleared and the the input spectra displayed
+	    The screen is cleared and the input spectra displayed
 	... type 's' to mark the endpoints of sample regions for correl-
 	... ation.  The user can mark either the top or bottom plot to
 	... set sample regions for the object and template respectively.

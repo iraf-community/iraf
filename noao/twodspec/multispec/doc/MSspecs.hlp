@@ -32,7 +32,7 @@ steps of correcting digital detector images for dark current, bias, and
 pixel-to-pixel sensitivity variations must be performed before using
 the MULTISPEC tasks.
 
-     Because the the MULTISPEC package is being developed
+     Because the MULTISPEC package is being developed
 concurrently with the IRAF standard image processing
 tools this document specifies the requirements for the preliminary
 image processing needed to prepare digital detector images for the MULTISPEC

@@ -1868,7 +1868,7 @@ are expected to be of general interest to astronomers (and others) around
 the country and the world, and which should therefore be included in the
 general distribution.  In addition, other packages will be developed in
 the IRAF which will probably be used only at KPNO.  Example are the HOLES
-program and the the Vacumn Telescope reductions package; there are probably
+program and the Vacumn Telescope reductions package; there are probably
 other similar packages which I cannot remember at the moment.  I expect that
 many special purpose packages will ultimately be developed by the staff
 that do not make it into the general distribution.

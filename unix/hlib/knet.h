@@ -50,6 +50,7 @@ define	zfmkdr	kfmkdr
 define	zfpath	kfpath
 define	zfprot	kfprot
 define	zfrnam	kfrnam
+define	zfrmdr	kfrmdr
 define	zfsubd	kfsubd
 define	zfutim	kfutim
 define	zfxdir	kfxdir

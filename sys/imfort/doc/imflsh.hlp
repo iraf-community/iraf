@@ -23,7 +23,7 @@ possibility of a program abort or interrupt before the image is closed.
 Calling \fIimflsh\fR on an image opened for read-only access is harmless.
 .ih
 RETURN VALUE
-A zero status is returned if no image data has been modified and and update
+A zero status is returned if no image data has been modified and an update
 is not necessary, or if either the header or pixel data has been modified and
 the update was successful.  The most likely cause of an update failure is lack
 of write permission on the image.

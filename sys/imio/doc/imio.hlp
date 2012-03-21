@@ -223,7 +223,7 @@ end
 
 IMGGSC gets a general section from an imagefile into a buffer.  Upon
 exit, the buffer contains the requested section, with the pixels still
-in the same datatype they were in in the imagefile.  The buffer is made
+in the same datatype they were in the imagefile.  The buffer is made
 large enough to accommodate the pixels in either datatype.
 
 

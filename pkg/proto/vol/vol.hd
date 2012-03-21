@@ -6,5 +6,5 @@ $i2sun		= "vol$src/i2sun/"
 
 i2sun		hlp=doc$i2sun.hlp,		src=i2sun$t_i2sun.x
 im3dtran	hlp=doc$im3dtran.hlp,		src=im3dtran$t_im3dtran.x
-imjoin		hlp=doc$imjoin.hlp,		src=src$t_imjoin.x
-pvol		hlp=doc$pvol.hlp,		src=src$t_pvol.x
+imjoin		hlp=doc$imjoin.hlp,		src=vol$src/t_imjoin.x
+pvol		hlp=doc$pvol.hlp,		src=vol$src/t_pvol.x

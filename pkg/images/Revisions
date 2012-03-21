@@ -1,5 +1,95 @@
 .help revisions Jan97 images
 .nf
+
+imatch/src/imcombine/src/icombine.x
+    Removed TRAP debug message.  (5/11/12, Valdes)
+
+imatch/src/imcombine/src/icsetout.x
+    Changed 1 Gpixel limit (see 6/11/09) to 100 Gpixel.  (5/11/12, Valdes)
+
+immatch/src/geometry/t_geomap.gx
+lib/geofit.gx
+    The real path of t_geomap.gx code treated geomap.h floating parameters
+    as being of type PIXEL rather than double.  Also in the real path
+    of geofit.gx there was an attempt to coerce an INDEFD to a real value.
+    (5/10/12, Valdes)
+
+imcoords/src/t_ccmap.x
+imcoords/ccmap.par
+lib/geofit.x
+lib/geogmap.gx
+    Updates to the previous changes.  A new option "tweak" was added to
+    the values for the "refpoint" parameter to allow controlling whether
+    to tweak the input tangent point.  (3/16/12, Valdes)
+
+imcoords/src/t_ccmap.x
+imcoords/ccmap.par
+imcoords/doc/ccmap.hlp
+    Changes to allow constraining WCS solutions to specified tangent point
+    parameters (reference pixel and reference coordinate).
+
+    1. New parameters xref and yref can be set to a value or header keyword
+    in order to constrain the solution to the specified reference pixel.
+
+    This adds parameters so potentially requires users to update scripts.
+
+    (2/7/12, Valdes)
+
+lib/geoset.x +
+lib/mkpkg
+lib/geofit.x
+lib/geomap.h
+lib/geofit.gx
+    These changes are to allow calling gsurfit with the fit constrained
+    to a specific reference point and value.  This is used by ccmap to
+    constrain WCS solutions to specified CRVAL/CRPIX values.
+
+    1. Added geoset procedures to set some new parameters.
+    2. The new parameters are passed on to gsurfit.
+
+    These changes should be transparent to any existing usage.  These
+    chanages are coupled to changes in gsurfit.
+
+    (2/7/12, Valdes)
+
+
+=====
+v2.16
+=====
+
+immatch/imcombine.par
+    The enumerated values for the combine value had to be expanded to
+    agree with the help page and the task functionality.  (Valdes, 12-16-11)
+
+imgeom/doc/imlintran.hlp
+    Corrected the description of the image scaling to remove extra
+    terms (i.e. "xt = xt/xmag + yt/ymag" becomes "xt = xt/xmag") (12/16/11)
+
+imcoords/src/t_ccmap.x
+imcoords/doc/ccmap.hlp
+    Modifications to allow using multiple exposures to produce one
+    solution.  This was done in such a way that no new parameters are
+    needed.  (8/9/11, Valdes)
+
+immatch/src/imcombine/src/icgdata.gx
+    The image id data was not properly initialized when some data was
+    excluded causing a segmentation fault with the grow option is used
+    with masks or non-overlapping data.  (4/1/11, Valdes)
+
+immatch/src/imcombine/mkpkg
+    The "standalone" target was not correct for the imc library changes.
+    (4/1/11, Valdes)
+
+immatch/src/imcombine/src/icomb.gx
+    A feature to reduced memory requirments by removing the user area of
+    the image header structure is a problem when masks and wcs offsets are
+    used due to the need for the mask matching code to access the wcs.  For
+    now this feature is turned off.  (3/4/11, Valdes)
+
+========
+V2.15.1a
+========
+
 immatch/src/imcombine/src/icaclip.gx
 immatch/src/imcombine/src/iccclip.gx
 immatch/src/imcombine/src/icmm.gx

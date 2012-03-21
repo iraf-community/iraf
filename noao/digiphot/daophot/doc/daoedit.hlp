@@ -32,7 +32,7 @@ DESCRIPTION
 DAOEDIT is a general purpose tool for interactively examining and editing
 the DAOPHOT algorithm parameters located in the parameter sets DATAPARS,
 FINDPARS, CENTERPARS, FITSKYPARS, PHOTPARS, and DAOPARS. These five parameter
-sets can be be listed, edited, and/or unlearned as a group from within DAOEDIT
+sets can be listed, edited, and/or unlearned as a group from within DAOEDIT
 using the IRAF LPAR, EPAR and UNLEARN utilities.  Any parameter in each of
 these five parameter sets can be examined or edited individual using a simple 
 command.  Parameters which are defined in terms of radial distance from the

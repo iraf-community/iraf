@@ -389,23 +389,29 @@ int _u_fmode (int mode)
 #define USE_SIGACTION
 #endif
 
-#define	DEF_ACCESSVAL	1
-#define	ENV_VMPORT	"VMPORT"
-#define	ENV_VMCLIENT	"VMCLIENT"
-#define	DEF_VMTHRESH	(1024*1024*8)
-#define	DEF_DIOTHRESH	(1024*1024*8)
-#define	DEF_VMPORT	8677
-#define	SZ_CMDBUF	2048
-#define	SZ_CNAME	32
+#define	DEF_ACCESSVAL	  1
+#define	ENV_VMPORT	  "VMPORT"
+#define	ENV_VMCLIENT	  "VMCLIENT"
+#define	DEF_VMTHRESH	  (1024*1024*8)
+#define	DEF_DIOTHRESH	  (1024*1024*8)
+#define	DEF_VMPORT	  8677
+#define	SZ_CMDBUF	  2048
+#define	SZ_CNAME	  32
 
-static int vm_debug = 0;
-static int vm_dioenabled = 0;
-static int vm_enabled = 1;
+#ifdef MACOSX
+static int vm_enabled 	  = 0;
+static int vm_dioenabled  = 1;
+#else
+static int vm_enabled 	  = 1;
+static int vm_dioenabled  = 0;
+#endif
+
+static int vm_debug 	  = 0;
+static int vm_server 	  = 0;
 static int vm_initialized = 0;
-static int vm_server = 0;
-static int vm_threshold = DEF_VMTHRESH;
-static int dio_threshold = DEF_DIOTHRESH;
-static int vm_port = DEF_VMPORT;
+static int vm_threshold   = DEF_VMTHRESH;
+static int dio_threshold  = DEF_DIOTHRESH;
+static int vm_port 	  = DEF_VMPORT;
 static char vm_client[SZ_CNAME+1];
 
 extern char *getenv();
@@ -432,6 +438,7 @@ vm_access (char *fname, int mode)
 	char *modestr = NULL, buf[SZ_COMMAND];
 	char pathname[SZ_PATHNAME];
 	int status;
+
 
 	/* One-time process initialization. */
 	if (!vm_initialized)

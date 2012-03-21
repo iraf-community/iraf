@@ -3,9 +3,9 @@
 # define the permitted types of curves
 
 define	GS_FUNCTIONS	"|chebyshev|legendre|polynomial|"
-define	GS_CHEBYSHEV	1
-define	GS_LEGENDRE	2
-define	GS_POLYNOMIAL	3
+define	GS_CHEBYSHEV	1	# chebyshev polynomials
+define	GS_LEGENDRE	2	# legendre polynomials
+define	GS_POLYNOMIAL	3	# power series polynomials
 define	NTYPES		3
 
 # define the xterms flags
@@ -27,7 +27,7 @@ define	WTS_SPACING	3	# weight proportional to spacing of data points
 define	SINGULAR	1
 define	NO_DEG_FREEDOM	2
 
-# gsstat definitions
+# gsstat/gsset definitions
 
 define	GSTYPE		1
 define	GSXORDER	2
@@ -41,5 +41,8 @@ define	GSXMIN		9
 define	GSXMAX		10
 define	GSYMIN		11
 define	GSYMAX		12
+define	GSXREF		13
+define	GSYREF		14
+define	GSZREF		15
 
 define	GS_SAVECOEFF	8

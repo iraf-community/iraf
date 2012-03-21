@@ -274,7 +274,7 @@ estimates this number internally as described in the ALGORITHMS section,
 otherwise the \fIfluxratio\fR is set to the value supplied by the user.
 
 If \fIconvolution\fR is "kernel", PSFMATCH reads the psf matching function
-from the the images in \fIkernel\fR  which were either
+from the images in \fIkernel\fR  which were either
 created during a previous run of PSFMATCH or by a separate task.
 
 PSFMATCH provides several options for filtering out the ill-behaved
@@ -285,7 +285,7 @@ fourier transforms is taken.
 If \fIfilter\fR is set to "cosbell", a cosine bell function
 with a taper defined by \fIsx1\fR, \fIsx2\fR, \fIsy1\fR, and \fIsy2\fR and
 symmetry defined by \fRradsym\fR is applied to
-the the psf matching function in frequency space. This filter
+the psf matching function in frequency space. This filter
 sets all the frequency components greater than \fIsx2\fR and \fIsy2\fR
 to 0.0 and leaves all frequency components inside \fIsx1\fR and \fIsy1\fR
 unaltered. Users should exercise this option with caution as the effect
@@ -416,7 +416,7 @@ q	Exit
 .ih
 ALGORITHMS
 
-The problem of computing the the psf matching function can expressed
+The problem of computing the psf matching function can expressed
 via the convolution theorem as shown below.
 In the following expressions r is the reference
 image data or reference image psf, i is the input image data or input image

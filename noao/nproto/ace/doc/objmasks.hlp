@@ -336,7 +336,7 @@ The averages of the subblock <I> and <S> values which are not indeterminate
 in each block are computed.  If any of the full blocks are indeterminate
 when all the subblocks have been eliminated as contaminated, values are
 obtained for them by interpolation from nearby blocks.  The block values
-are then then linearly interpolated to get background values for every
+are then linearly interpolated to get background values for every
 pixel in the input image.
 
 Note that the background pixels used in the block algorithm before
@@ -473,7 +473,7 @@ background, it is identified as a candidate object pixel.  Candidate object
 pixels, with the same sense of deviation, are grouped into objects on
 the basis of being connected along the four or eight neighboring directions
 as specified by the \fIneighbor\fR parameter.  The candidate object is then
-accepted if it satisfies the the minimum number of pixels (\fIminpix\fR) in
+accepted if it satisfies the minimum number of pixels (\fIminpix\fR) in
 an object and the \fIhdetect\fR or \fIldetect\fR parameter selects that
 type of object.  The accepted objects are assigned sequential numbers
 beginning with 11.  The object numbers are used, as described in the

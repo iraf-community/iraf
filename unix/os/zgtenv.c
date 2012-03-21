@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #define import_spp
 #define	import_kernel

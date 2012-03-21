@@ -83,13 +83,15 @@ echo "		Done"
 echo -n "Clean src directories ...."
 foreach i (local math pkg sys noao)
   if ($exec == "yes") then
-    find $i -type f -name \*.a -exec /bin/rm -f {} \;		>& /dev/null
-    find $i -type f -name \*.e -exec /bin/rm -f {} \;		>& /dev/null
-    find $i -type f -name \*.o -exec /bin/rm -f {} \;		>& /dev/null
+    find $i -type f -name \*.a   -exec /bin/rm -f {} \;		>& /dev/null
+    find $i -type f -name \*.e   -exec /bin/rm -f {} \;		>& /dev/null
+    find $i -type f -name \*.o   -exec /bin/rm -f {} \;		>& /dev/null
+    find $i -type f -name OBJS\* -exec /bin/ls -l {} \;		>& /dev/null
   else
-    find $i -type f -name \*.a -exec /bin/ls -l {} \;
-    find $i -type f -name \*.e -exec /bin/ls -l {} \;
-    find $i -type f -name \*.o -exec /bin/ls -l {} \;
+    find $i -type f -name \*.a   -exec /bin/ls -l {} \;
+    find $i -type f -name \*.e   -exec /bin/ls -l {} \;
+    find $i -type f -name \*.o   -exec /bin/ls -l {} \;
+    find $i -type f -name OBJS\* -exec /bin/ls -l {} \;
   endif
 end
 echo "		Done"
@@ -97,9 +99,9 @@ echo "		Done"
 
 echo -n "Clean bin directories ...."
 if ($exec == "yes") then
-    /bin/rm -rf bin.*/*.[aeoZ] noao/bin.*/*.[aeoZ]  		>& /dev/null
+    /bin/rm -rf bin.*/*.[aeoZ] noao/bin.*/*.[aeoZ] OBJS*	>& /dev/null
 else
-    /bin/ls -l  bin.*/*.[aeoZ] noao/bin.*/*.[aeoZ] 
+    /bin/ls -l  bin.*/*.[aeoZ] noao/bin.*/*.[aeoZ] OBJS*
 endif
 echo "		Done"
 
@@ -108,6 +110,6 @@ echo -n "Cleaning spool files ...."
 if ($exec == "yes") then
     find . -name spool\* -print -exec /bin/rm -f {} \;		>& /dev/null
 else
-    find . -name spool\* -print 
+    find . -name spool\* -print
 endif
 echo "		Done"

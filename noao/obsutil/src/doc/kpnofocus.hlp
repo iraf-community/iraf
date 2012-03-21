@@ -11,7 +11,7 @@ PARAMETERS
 List of focus images.
 .le
 .ls frame = 1
-The image display is checked to see if the image is is already in one of
+The image display is checked to see if the image is already in one of
 the display frames.  If it is not the \fBdisplay\fR task is called to
 display the image in the frame specified by the \fBframe\fR parameter.  All
 other display parameters are taken from the current settings of the task.

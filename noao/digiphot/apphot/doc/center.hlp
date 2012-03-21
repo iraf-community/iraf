@@ -160,7 +160,7 @@ and "world" and the transformation from the input coordinate system to
 the internal "logical" system is defined by the image coordinate system.
 The simplest default is the "logical" pixel system. Users working on with
 image sections but importing pixel coordinate lists generated from the parent
-image must use use the "tv" or "physical" input coordinate systems.
+image must use the "tv" or "physical" input coordinate systems.
 Users importing coordinate lists in world coordinates, e.g. ra and dec,
 must use the "world" coordinate system and may need to convert their
 equatorial coordinate units from hours and degrees to degrees and degrees first.
@@ -169,7 +169,7 @@ The coordinates written to \fIoutput\fR are in the coordinate
 system defined by \fIwcsout\fR. The options are "logical", "tv",
 and "physical". The simplest default is the "logical" system. Users
 wishing to correlate the output coordinates of objects measured in
-image sections or mosaic mosaic pieces with coordinates in the parent
+image sections or mosaic pieces with coordinates in the parent
 image must use the "tv" or "physical" coordinate systems.
 
 If \fIcache\fR is yes and the host machine physical memory and working set size

@@ -24,7 +24,7 @@ ZMALOC (
 	register char *bufptr;
 	int      stat;
 
-	bufptr = malloc ((int)*nbytes);
+	bufptr = malloc ((size_t)*nbytes);
 	if (bufptr != NULL) {
 	    *buf = ADDR_TO_LOC(bufptr);
             if (*buf > 0)

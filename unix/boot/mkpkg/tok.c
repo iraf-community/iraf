@@ -430,7 +430,10 @@ char	*keyword;
 	     * is true.  If any of the listed files do not exist a warning
 	     * is printed and they are ignored.
 	     */
-	    if ((fdate = os_fdate(argv[0])) <= 0) {
+	    if (os_access (argv[1], 0,0) == NO) {
+		warns ("file `%s' not found", argv[1]);
+		bval = 1;
+	    } else if ((fdate = os_fdate(argv[0])) <= 0) {
 		warns ("file `%s' not found", argv[0]);
 		bval = 1;
 	    } else {
@@ -453,9 +456,13 @@ char	*keyword;
 	     * is false.  If any of the listed files do not exist a warning
 	     * is printed and they are ignored.
 	     */
-	    if ((fdate = os_fdate(argv[0])) <= 0)
+	    if (os_access (argv[1], 0,0) == NO) {
+		warns ("file `%s' not found", argv[1]);
+		bval = 1;
+	    } else if ((fdate = os_fdate(argv[0])) <= 0) {
 		warns ("file `%s' not found", argv[0]);
-	    else {
+		bval = 1;
+	    } else {
 		for (i=1;  i < argc;  i++) {
 		    altdate = m_fdate (argv[i]);
 		    if (altdate <= 0)

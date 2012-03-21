@@ -34,8 +34,8 @@ define	SP_PTYPE	Memc[P2C($1+120)]	# Plot type
 define	SP_ULABEL	Memc[P2C($1+125)]	# Label
 define	SP_LABEL	Memc[P2C($1+175)]	# Label
 
-define	SP_X		Memr[P2R(SP_PX($1))]	# Wavelengths
-define	SP_Y		Memr[P2R(SP_PY($1))]	# Intensities
+define	SP_X		Memr[SP_PX($1)]		# Wavelengths
+define	SP_Y		Memr[SP_PY($1)]		# Intensities
 
 define	LABELS		"|none|imname|imtitle|index|user|"
 define	LABEL_NONE	1	# No labels

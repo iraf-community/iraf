@@ -1,0 +1,101 @@
+
+
+SMAP Methods:
+=============
+
+  Hub
+  ---
+               map reg-info = register  ()
+
+                       declareMetadata  (map metadata)
+            map metadata = getMetadata  (string client-id)
+                  declareSubscriptions  (map subscriptions)
+  map subscriptions = getSubscriptions  (string client-id)
+list client-ids = getRegisteredClients  ()
+map client-subs = getSubscribedClients  (string mtype)
+
+                        notify  (string recip-id, map message)
+    list recip-ids = notifyAll  (map message)
+          string msg-id = call  (string recip-id, string msg-tag, map message)
+           map calls = callAll  (string msg-tag, map message)
+    map response = callAndWait  (string recip-id, map message, string timeout)
+                         reply  (string msg-id, map response)
+
+
+  Client
+  ------
+      receiveNotification  (string sender-id, map message)
+              receiveCall  (string sender-id, string msg-id, map message)
+          receiveResponse  (string responder-id, string msg-tag, map response)
+
+
+API
+===
+
+		  samp = sampInit  (appName, descr)
+                 samp_setMetadata  (samp, field, value)
+                 samp_setCallMode  (samp, sync|async)
+            samp_setReplyCallback  (samp, func)
+         samp_setResponseCallback  (samp, func)
+		        sampClose  (samp)
+
+         samp_defaultReplyHandler  (samp)
+      samp_deaultfResponseHandler  (samp)
+
+              list = samp_newList  (samp)
+              samp_listAddElement  (list, value, type)
+        ptr = samp_getListElement  (list, index)
+                    samp_freeList  (list)
+
+                map = samp_newMap  (samp)
+               samp_mapAddElement  (map, name, value, type)
+         ptr = samp_getMapElement  (map, name)
+                     samp_freeMap  (map)
+
+    Hi-Level Utilities:
+
+     list = samp_getAvailableHubs  (samp)
+          hub = samp_getActiveHub  (samp, hubName)
+              samp = samp_hubInit  (samp, appName, descr)
+
+	            samp_Register  (hub)
+	          samp_UnRegister  (hub)
+             samp_DeclareMetadata  (hub)
+  	                samp_Ping  (hub)
+           map = samp_GetMetadata  (hub)
+        samp_DeclareSubscriptions  (hub, subscripMap)
+      map = samp_GetSubscriptions  (hub)
+ list = samp_GetRegisteredClients  (hub, mtype)
+
+            samp_tableLoadVotable  (samp, recip, url, table-id, name)
+               samp_tableLoadFits  (samp, recip, url, table-id, name)
+           samp_tableHighlightRow  (samp, recip, table-id, url, row)
+          samp_tableSelectRowList  (samp, recip, table-id, url, row-list)
+
+               samp_imageLoadFits  (samp, recip, url, image-id, name)
+
+             samp_coordPointAtSky  (samp, recip, ra, dec)
+          samp_specLoadSSAGeneric  (samp, recip, url, meta, spectrum-id, name)
+
+
+    Lo-Level Messaging:
+               list = samp_notify  (samp, recipId, msgMap)
+            list = samp_notifyAll  (samp, msgMap)
+                msgId = samp_call  (samp, recipId, msgTag, msgMap)
+               map = samp_callAll  (samp, msgTag, msgMap)
+           map = samp_callAndWait  (samp, recipId, msgMap, timeout)
+ 	               samp_Reply  (samp, msgId, respMap)
+
+
+	- 'recip' can be reserved word 'all' to indicate broadcast
+
+Messages
+========
+
+          table.load.votable  (url, table-id*, name*)
+             table.load.fits  (url, table-id*, name*)
+         table.highlight.row  (table-id, url, (int)row)
+        table.select.rowList  (table-id, url, (List)row-list)
+             image.load.fits  (url, image-id*, name*)
+           coord.pointAt.sky  ((float)ra, (float)dec)
+   spectrum.load.ssa-generic  (url, (map)meta, spectrum-id*, name*)

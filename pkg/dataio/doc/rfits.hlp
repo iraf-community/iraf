@@ -209,7 +209,7 @@ disk files and restore the original IRAF name in the process.
 .fi
 
 11. Convert the second, third, and fourth FITS extensions in the fifth
-mag tape file and and try to restore the original IRAF name in the process.
+mag tape file and try to restore the original IRAF name in the process.
 
 .nf
 	cl> rfits mta[5] "2-4" images old+

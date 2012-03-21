@@ -83,7 +83,7 @@ begin
 	     j = j + 1
 	}
 
-	# Transform the descriptor set to a linear array.
+	# Call the kernel routine to poll on the descriptor set.
 	call zfpoll (pfds, nfds, timeout, npoll, status)
 	if (status == ERR)
 	    return (ERR)

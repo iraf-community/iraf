@@ -41,10 +41,10 @@ DESTDIR =
 SHELL = /bin/sh
 RM = rm -f
 
-INSTALL = /usr/bin//install -c
+INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 
-BUILD_DIR = /iraf/iraf.v215/iraf/pkg/ecl/readline
+BUILD_DIR = /iraf/iraf.v216/pkg/ecl/readline
 TEXINPUTDIR = $(srcdir)
 
 MAKEINFO    = LANGUAGE= makeinfo

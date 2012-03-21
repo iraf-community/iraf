@@ -454,8 +454,8 @@ begin
 	    # Update fitted parameter values into the equation symbol
 	    # substructure if the fit was succesfull.
 	    if (stat == DONE)
-		call amovr (Memr[params], Memr[pr_gsymp (sym, PTEQSPARVAL)],
-	            nparams)
+		call amovr (Memr[params], 
+		    Memr[P2R(pr_gsymp (sym, PTEQSPARVAL))], nparams)
 	}
 
 	# Debug ?

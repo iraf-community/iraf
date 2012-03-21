@@ -60,7 +60,7 @@ ZFMKCP (
 	prot = QUERY_PROTECTION;
 	ZFPROT (osfn, &prot, status);
 	if (*status == XYES) {
-	    prot = QUERY_PROTECTION;
+	    prot = SET_PROTECTION;
 	    ZFPROT (new_osfn, &prot, status);
 	}
 

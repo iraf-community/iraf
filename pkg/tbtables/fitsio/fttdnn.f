@@ -26,6 +26,7 @@ C       COMMON BLOCK DEFINITIONS:--------------------------------------------
 C       END OF COMMON BLOCK DEFINITIONS-----------------------------------
 
         integer word1,word2
+
 C       COMPID specifies what type of floating point word structure
 C       is used on this machine, and determines how to test for NaNs.
 
@@ -36,11 +37,14 @@ C           3        SUN workstation, or IBM mainframe
 C          -2305843009213693952   Cray (64-bit) machine
 
         fttdnn=.false.
+	return
+
         if (compid .eq. 1)then
 C           on the VAX we can assume that all NaNs will be set to all bits on
 C           (which is equivalent to an integer with a value of -1) because
 C           this is what the IEEE to VAX conversion MACRO program returns
             if (value(1) .eq. -1 .and. value(2) .eq. -1)fttdnn=.true.
+
         else if (compid .gt. 1)then
             if (compid .ge. 3)then
 C               this is for SUN-like machines, or IBM main frames

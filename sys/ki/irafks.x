@@ -447,6 +447,16 @@ begin
 		} else
 		    call zfrnam (osfn1, osfn2, status)
 
+	    case KI_ZFRMDR:
+		# Remove a directory.
+		iferr {
+		    call strcpy (p_sbuf[arg1], temp, SZ_PATHNAME)
+		    call ks_fmapfn (temp, osfn1, SZ_PATHNAME)
+		} then {
+		    status = ERR
+		} else
+		    call zfrmdr (osfn1, status)
+
 	    case KI_ZDVALL:
 		# Allocate or deallocate a device.
 		if (debug == YES) {
@@ -1505,6 +1515,7 @@ begin
 	case KI_ZFPATH:  call strcpy ("KI_ZFPATH", o_str, SZ_LINE)  
 	case KI_ZFPROT:  call strcpy ("KI_ZFPROT", o_str, SZ_LINE)  
 	case KI_ZFRNAM:  call strcpy ("KI_ZFRNAM", o_str, SZ_LINE)  
+	case KI_ZFRMDR:  call strcpy ("KI_ZFRMDR", o_str, SZ_LINE)  
 	case KI_ZFSUBD:  call strcpy ("KI_ZFSUBD", o_str, SZ_LINE)  
 	case KI_ZDVALL:  call strcpy ("KI_ZDVALL", o_str, SZ_LINE)  
 	case KI_ZDVOWN:  call strcpy ("KI_ZDVOWN", o_str, SZ_LINE)  

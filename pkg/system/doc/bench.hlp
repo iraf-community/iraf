@@ -1,0 +1,56 @@
+.help bench Dec2010 system
+.ih
+NAME
+bench -- simple benchmark tool
+.ih
+USAGE
+bench
+.ih
+DESCRIPTION
+The BENCH task provides a simple benchmark meant to simulate CCD processing
+of three images.  The tasks used exercise both disk- and CPU-intensive
+applications and offer a crude comparison of performance between machines, 
+but it is not intended to be a comprehensive benchmark.  There are no
+parameters.
+.ih
+EXAMPLES
+1. Run the benchmark:
+
+.nf
+    ecl> bench
+            
+    Bench started at 09:45:58
+                             
+    =====> Making images...  
+             Making zero...  
+             Making flat...  
+             Making 3 objs...
+                             
+    =====>   Normalizing flat...
+    	:
+    
+    =====>   Subtracting zero from 3 images...    
+    	:
+    
+    =====>   Dividing flat into 3 images...       
+    	:
+    
+    =====>   Combining 3 images...
+    	:
+    
+    =====>   Median filtering image...
+    	:
+    
+    =====>   Deleting all images...
+    
+    Bench started at 09:45:58
+    Bench  ended at  09:46:56
+    
+    Total execution time =    58.0 seconds
+     Total time  Make 5 imgs  Proc 3 imgs  Combine 3 imgs  Median 1 img
+         58.0         25.0        10.0          4.0           19.0
+.fi
+
+.ih
+SEE ALSO
+.endhelp

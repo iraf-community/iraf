@@ -209,7 +209,7 @@ means that automatic bad data rejection is turned off.
 Show or set the values of the bad data rejection limits.
 If both low_reject and high_reject are zero then automatic bad data
 rejection is turned off.
-If either of the high or low rejection rejection limits are greater than zero,
+If either of the high or low rejection limits are greater than zero,
 and nreject is greater than zero, the rms of the initial fit is computed.
 Points with residuals
 more than low_reject * rms below zero and high_reject * rms above zero

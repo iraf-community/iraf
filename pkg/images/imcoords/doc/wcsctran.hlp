@@ -64,7 +64,7 @@ image header or, 3) the "physical" coordinate system.
 The list of columns separated by whitespace or commas in the input coordinate
 file containing the coordinate values.
 The number of specified columns must be greater than or equal to the
-dimensionality of the input image. The coordinates are read in in the
+dimensionality of the input image. The coordinates are read in the
 order they are specified in the columns parameter.
 .le
 .ls units = ""
@@ -175,7 +175,7 @@ less than the number of input coordinates. This situation occurs
 if the input image has been dimensionally-reduced, i.e. is a section
 of a higher-dimensioned parent image, and the input coordinate system
 or the output coordinate system but not both is "logical" or "tv".
-For example, if the input image is a 1D line extracted from a a 2D parent
+For example, if the input image is a 1D line extracted from a 2D parent
 image with a sky projection world coordinate system, and the user
 specifies a transformation from the "logical" to "world" systems, 
 only one input coordinate (column number) is required, but two output

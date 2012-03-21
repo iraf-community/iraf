@@ -31,7 +31,7 @@ begin
 	# Request CL to send SETWCS instruction back to us.  The directive
 	# must be sent on the pseudofile control stream.
 
-	call write (PSIOCTRL, fd, SZ_INT)
+	call write (PSIOCTRL, fd, SZ_INT32)
 	call write (PSIOCTRL, gki, GKI_GETWCS_LEN * SZ_SHORT)
 	call flush (PSIOCTRL)
 

@@ -380,7 +380,7 @@ colors.  These are generally white and black respectively.  Values above 217
 are not defined and depend on the current state of the color table for the
 window system.
 
-The mapping between between mask values and overlay colors are specified
+The mapping between mask values and overlay colors are specified
 by the \fIbpcolors\fR and \fIocolors\fR parameters.  There are two mapping
 syntax, a list and an expression.
 
@@ -467,7 +467,7 @@ The "acenum" function handles \fBace\fR package object detection masks
 which include bit flags.  Each object in the mask has an object number
 with value greater than 10.  Values less than 10 are passed along during
 detection and generally identify detector or saturated bad pixels.
-Along with the the object number there may be zero or more bit flags
+Along with the object number there may be zero or more bit flags
 set.  This function removes the bit flags and returns the mask number.
 The optional second argument, arg2, is a string of letters which selects
 pixels with certain sets of bit flags.  The bit flags are:

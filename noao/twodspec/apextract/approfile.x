@@ -506,13 +506,14 @@ begin
 
 	# Allocate memory.  One index pointers.
 	call smark (sp)
-	call salloc (work, nadd+4*nside, TY_REAL)
+	call salloc (work, nadd+3*nside, TY_REAL)
+	call salloc (work4, nside, TY_INT)
 	call salloc (ysum, ny, TY_REAL)
 	work = work - 1
 	work1 = work + nadd
 	work2 = work1 + nside
 	work3 = work2 + nside
-	work4 = work3 + nside
+	work4 = work4 - 1
 	ysum=ysum-1
 	if (sbuf == NULL) {
 	    call salloc (sky, nx, TY_REAL)
@@ -520,7 +521,8 @@ begin
 	}
 
 	# Initialize.
-	call aclrr (Memr[work+1], nadd+4*nside)
+	call aclrr (Memr[work+1], nadd+3*nside)
+	call aclri (Memi[work4+1], nside)
 	if (rdnoise == 0.)
 	    vmin = 1.
 	else
@@ -712,7 +714,7 @@ begin
 	# normalized profile.  Coefficients are reordered for later speed.
 
 	call hfti (Memr[work+1], nside, nside, nside, Memr[work1+1], 1, 1,
-	    0.01, ip, p, Memr[work2+1], Memr[work3+1], Memr[work4+1])
+	    0.01, ip, p, Memr[work2+1], Memr[work3+1], Memi[work4+1])
 
 	do jl = 1, order {
 	    do il = 1, npols {

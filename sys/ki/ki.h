@@ -81,10 +81,11 @@ define	KI_ZFMKDR	17
 define	KI_ZFPATH	18
 define	KI_ZFPROT	19
 define	KI_ZFRNAM	20
-define	KI_ZFSUBD	21
-define	KI_ZDVALL	22
-define	KI_ZDVOWN	23
-define	KI_ZFUTIM	24
+define	KI_ZFRMDR	21
+define	KI_ZFSUBD	22
+define	KI_ZDVALL	23
+define	KI_ZDVOWN	24
+define	KI_ZFUTIM	25
 
 define	KI_ZOPDIR	30
 define	KI_ZCLDIR	31

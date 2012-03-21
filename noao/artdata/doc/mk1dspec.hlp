@@ -72,7 +72,7 @@ unit wavelength (F-lambda) if no.
 LINE PARAMETERS
 .ls lines = ""
 List of spectral line files.  Spectral line files contain lines of rest
-wavelength, peak, profile type, and widths (see the the DESCRIPTION
+wavelength, peak, profile type, and widths (see the DESCRIPTION
 section).  The latter parameters may be missing or INDEF in which case they
 default to the task \fIpeak\fR, \fIprofile\fR, \fIgfwhm\fR, and \fIlfwhm\fR
 parameters (note that the \fIpeak\fR parameter is not a constant but the

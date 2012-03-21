@@ -9,9 +9,10 @@ include <pkg/skywcs.h>
 include "../../lib/geomap.h"
 
 # Define the source of the reference point.
-define	CC_REFPOINTSTR		"|coords|user|"
+define	CC_REFPOINTSTR		"|coords|user|tweak|"
 define	CC_COORDS		1
 define	CC_USER			2
+define	CC_TWEAK		3
 
 # Define the possible pixel types.
 define  CC_PIXTYPESTR           "|logical|physical|"
@@ -27,16 +28,21 @@ define	CC_DEFBUFSIZE	1000		# the default buffer size
 
 # T_CCMAP -- Compute the linear portion of the transformation required
 # to convert image  x and y coordinates to ra / longitude and dec / latitude
-# coordinates.
+# coordinates.  This version allows combining multiple inputs with different
+# tangent points (as in a dither set) to create a single solution.
 
 procedure t_ccmap ()
 
-pointer	sp, infile, image, database, insystem, lngref, latref, refsystem, str
-pointer	graphics, coo, refcoo, tcoo, mw, fit, im, out, gd, projstr
-double	dlngref, dlatref, tdlngref, tdlatref, xmin, xmax, ymin, ymax, reject
-int	inlist, ninfiles, imlist, nimages, coostat, refstat, in, nchars, ip 
+pointer	in, im, tdxref, tdyref, tdlngref, tdlatref
+pointer	sp, infile, image, database, insystem, refsystem, str
+pointer	xref, yref, lngref, latref
+pointer	graphics, coo, refcoo, tcoo, mw, fit, out, gd, projstr
+double	dxref, dyref, dlngref, dlatref, xmin, xmax, ymin, ymax, reject
+int	i, inlist, ninfiles, nin, imlist, nimages, coostat, refstat, nchars, ip 
+int	xreflist, yreflist, lngreflist, latreflist
 int	xcolumn, ycolumn, lngcolumn, latcolumn, lngunits, latunits, res, pfd
-int	lngrefunits, latrefunits, refpoint_type, projection, reslist, nresfiles
+int	lngrefunits, latrefunits, refpoint_type, tweak, projection
+int	reslist, nresfiles
 int	geometry, function, xxorder, xyorder, xxterms, yxorder, yyorder, yxterms
 int	reclist, nrecords, pixsys, maxiter
 bool	verbose, update, interactive
@@ -56,6 +62,8 @@ begin
 	call salloc (image, SZ_FNAME, TY_CHAR)
 	call salloc (database, SZ_FNAME, TY_CHAR)
 	call salloc (insystem, SZ_FNAME, TY_CHAR)
+	call salloc (xref, SZ_FNAME, TY_CHAR)
+	call salloc (yref, SZ_FNAME, TY_CHAR)
 	call salloc (lngref, SZ_FNAME, TY_CHAR)
 	call salloc (latref, SZ_FNAME, TY_CHAR)
 	call salloc (refsystem, SZ_FNAME, TY_CHAR)
@@ -86,8 +94,8 @@ begin
             reclist = imtopen (Memc[str])
             nrecords = imtlen (reclist)
         }
-        if (nrecords > 0 && nrecords != ninfiles) {
-            call eprintf ("Error: The are too few records names\n")
+        if (nrecords > 1 && nrecords != ninfiles) {
+            call eprintf ("Error: List of record names does not match input\n")
             call clpcls (inlist)
             call dtunmap (out)
             if (reclist != NULL)
@@ -96,26 +104,25 @@ begin
             return
         }
 
-
 	# Get the input image list.
 	imlist = imtopenp ("images")
 	nimages = imtlen (imlist)
-	if (nimages > 0 && nimages != ninfiles) {
-	    call eprintf ("Error: The are too few input images\n")
+	if (nimages > 1 && nimages != ninfiles) {
+	    call eprintf ("Error: Coordinate files and images don't match\n")
 	    call imtclose (imlist)
 	    call clpcls (inlist)
-	    call dtunmap (out)
+            call dtunmap (out)
             if (reclist != NULL)
                 call imtclose (reclist)
-	    call sfree (sp)
-	    return
+            call sfree (sp)
+            return
 	}
 
 	# Get the output results lists.
 	reslist = clpopnu ("results")
 	nresfiles = clplen (reslist)
 	if (nresfiles > 1 && nresfiles != ninfiles) {
-	    call eprintf ("Error: The are too few results files\n")
+	    call eprintf ("Error: List of results files does not match input\n")
 	    call imtclose (imlist)
 	    call clpcls (inlist)
 	    call clpcls (reslist)
@@ -142,8 +149,11 @@ begin
 	# Get the reference point parameters.
 	refpoint_type = clgwrd ("refpoint", Memc[str], SZ_FNAME,
 	    CC_REFPOINTSTR)
-	call clgstr ("lngref", Memc[lngref], SZ_FNAME)
-	call clgstr ("latref", Memc[latref], SZ_FNAME)
+	tweak = refpoint_type
+	xreflist = clpopnu ("xref")
+	yreflist = clpopnu ("yref")
+	lngreflist = clpopnu ("lngref")
+	latreflist = clpopnu ("latref")
 	call clgstr ("refsystem", Memc[refsystem], SZ_FNAME)
 	if (strncmp (Memc[refsystem], "INDEF", 5) == 0)
 	    Memc[refsystem] = EOS
@@ -219,19 +229,11 @@ begin
 	call sk_seti (coo, S_NLATUNITS, latunits)
         call sk_seti (coo, S_PIXTYPE, pixsys)
 
-	# Determine the coordinates of the reference point if possible.
-	ip = 1
-	nchars = ctod (Memc[lngref], ip, dlngref)
-	if (nchars <= 0 || nchars != strlen (Memc[lngref]))
-	    dlngref = INDEFD
-	if (dlngref < 0.0d0 || dlngref > 360.0d0)
-	    dlngref = INDEFD
-	ip = 1
-	nchars = ctod (Memc[latref], ip, dlatref)
-	if (nchars <= 0 || nchars != strlen (Memc[latref]))
-	    dlatref = INDEFD
-	if (dlatref < -90.0d0 || dlatref > 90.0d0)
-	    dlatref = INDEFD
+	# Set default reference coordinate.
+	Memc[xref] = EOS
+	Memc[yref] = EOS
+	Memc[lngref] = EOS
+	Memc[latref] = EOS
 
 	# Open the reference coordinate system if possible.
 	refstat = sk_decwcs (Memc[refsystem], mw, refcoo, NULL)
@@ -243,7 +245,6 @@ begin
 	        lngrefunits = sk_stati (coo, S_NLNGUNITS)
 	    if (latrefunits <= 0)
 	        latrefunits = sk_stati (coo, S_NLATUNITS)
-	    #call strcpy (Memc[insystem], Memc[refsystem], SZ_FNAME)
 	} else {
 	    if (lngrefunits <= 0)
 	        lngrefunits = sk_stati (refcoo, S_NLNGUNITS)
@@ -265,181 +266,282 @@ begin
 	    xxterms, yxorder, yyorder, yxterms, maxiter, reject)
 	call strcpy (Memc[projstr], GM_PROJSTR(fit), SZ_LINE)
 
-	# Loop over the files.
-	while (clgfil (inlist, Memc[infile], SZ_FNAME) != EOF) {
+	# Process the input.
+	call calloc (in, ninfiles, TY_INT)
+	call calloc (im, ninfiles, TY_POINTER)
+	call calloc (tdxref, ninfiles, TY_DOUBLE)
+	call calloc (tdyref, ninfiles, TY_DOUBLE)
+	call calloc (tdlngref, ninfiles, TY_DOUBLE)
+	call calloc (tdlatref, ninfiles, TY_DOUBLE)
+	call amovkd (INDEFD, Memd[tdxref], ninfiles)
+	call amovkd (INDEFD, Memd[tdyref], ninfiles)
+	call amovkd (INDEFD, Memd[tdlngref], ninfiles)
+	call amovkd (INDEFD, Memd[tdlatref], ninfiles)
 
-	    # Open text file of coordinates.
-	    in = open (Memc[infile], READ_ONLY, TEXT_FILE)
+	# Loop over the files.  This is a little messy in order to allow
+	# both the case where all inputs are combined or separately done.
+	repeat {
 
-	    # Open the input image.
-	    if (nimages > 0) {
-		if (imtgetim (imlist, Memc[image], SZ_FNAME) == EOF) {
-		    im = NULL
-		} else if (update) {
-		    im = immap (Memc[image], READ_WRITE, 0)
-		} else {
-		    im = immap (Memc[image], READ_ONLY, 0)
-		}
-		if (im != NULL) {
-		    if (IM_NDIM(im) != 2) {
-		        call printf ("Skipping file: %s Image: %s is not 2D\n")
-			    call pargstr (Memc[infile])
-			    call pargstr (Memc[image])
-		        call imunmap (im)
-		        next
+	    nin = 0
+	    while (clgfil (inlist, Memc[infile], SZ_FNAME) != EOF) {
+
+		# Open text file of coordinates.
+		Memi[in+nin] = open (Memc[infile], READ_ONLY, TEXT_FILE)
+
+		# Open the input image.
+		if (nimages > 0) {
+		    if (imtgetim (imlist, Memc[image], SZ_FNAME) == EOF) {
+			Memi[im+nin] = NULL
+		    } else if (update) {
+			Memi[im+nin] = immap (Memc[image], READ_WRITE, 0)
+		    } else {
+			Memi[im+nin] = immap (Memc[image], READ_ONLY, 0)
 		    }
-		} else
+		    if (Memi[im+nin] != NULL) {
+			if (IM_NDIM(Memi[im+nin]) != 2) {
+			    call printf ("Skipping file: %s Image: %s is not 2D\n")
+				call pargstr (Memc[infile])
+				call pargstr (Memc[image])
+			    call imunmap (Memi[im+nin])
+			    next
+			}
+		    } else
+			Memc[image] = EOS
+		} else {
+		    Memi[im+nin] = NULL
 		    Memc[image] = EOS
-	    } else {
-		im = NULL
-		Memc[image] = EOS
+		}
+
+		if (nin == 0) {
+
+		    # Open the results file.
+		    if (nresfiles <= 0)
+			res = NULL
+		    else if (clgfil (reslist, Memc[str], SZ_FNAME) != EOF)
+			res = open (Memc[str], NEW_FILE, TEXT_FILE)
+		    else
+		        res = NULL
+
+		    # Set the output file record name.
+		    if (nrecords > 0) {
+			if (imtgetim (reclist, GM_RECORD(fit), SZ_FNAME) != EOF)
+			    ;
+		    } else if (Memi[im] == NULL) {
+			call strcpy (Memc[infile], GM_RECORD(fit), SZ_FNAME)
+		    } else {
+			#call imgimage (Memc[image], Memc[str], SZ_FNAME)
+			call strcpy (Memc[image], GM_RECORD(fit), SZ_FNAME)
+		    }
+		}
+
+		# Determine the coordinates of the reference point if possible.
+	    	if (clgfil (xreflist, Memc[xref], SZ_FNAME) == EOF)
+		    ;
+	    	if (clgfil (yreflist, Memc[yref], SZ_FNAME) == EOF)
+		    ;
+	    	if (clgfil (lngreflist, Memc[lngref], SZ_FNAME) == EOF)
+		    ;
+	    	if (clgfil (latreflist, Memc[latref], SZ_FNAME) == EOF)
+		    ;
+		ip = 1
+		nchars = ctod (Memc[xref], ip, dxref)
+		if (nchars <= 0 || nchars != strlen (Memc[xref]))
+		    dxref = INDEFD
+		ip = 1
+		nchars = ctod (Memc[yref], ip, dyref)
+		if (nchars <= 0 || nchars != strlen (Memc[yref]))
+		    dyref = INDEFD
+		ip = 1
+		nchars = ctod (Memc[lngref], ip, dlngref)
+		if (nchars <= 0 || nchars != strlen (Memc[lngref]))
+		    dlngref = INDEFD
+		if (dlngref < 0.0d0 || dlngref > 360.0d0)
+		    dlngref = INDEFD
+		ip = 1
+		nchars = ctod (Memc[latref], ip, dlatref)
+		if (nchars <= 0 || nchars != strlen (Memc[latref]))
+		    dlatref = INDEFD
+		if (dlatref < -90.0d0 || dlatref > 90.0d0)
+		    dlatref = INDEFD
+
+		Memd[tdxref+nin] = dxref
+		Memd[tdyref+nin] = dyref
+		Memd[tdlngref+nin] = dlngref
+		Memd[tdlatref+nin] = dlatref
+
+		# Determine the tangent points and convert them to the
+		# celestial coordinate system of the input data, 
+
+		# The tangent point will be determined directly from
+		# the input coordinates.
+		if (refpoint_type == CC_COORDS) {
+
+		    if (nin == 0) {
+			if (verbose && res != STDOUT)
+			    call sk_iiprint ("Refsystem", Memc[insystem],
+				NULL, coo)
+			if (res != NULL)
+			    call sk_iiwrite (res, "Refsystem", Memc[insystem],
+				NULL, coo)
+		    }
+		    Memd[tdxref+nin] = INDEFD
+		    Memd[tdyref+nin] = INDEFD
+		    Memd[tdlngref+nin] = INDEFD
+		    Memd[tdlatref+nin] = INDEFD
+
+		# The tangent point was set by the user and a tangent point
+		# reference system may or may not have been defined.
+		} else if (! IS_INDEFD(dlngref) && ! IS_INDEFD (dlatref)) {
+
+		    tcoo = cc_utan (refcoo, coo, dxref, dyref, dlngref, dlatref,
+		        Memd[tdlngref+nin], Memd[tdlatref+nin],
+			lngrefunits, latrefunits)
+		    call sk_stats (tcoo, S_COOSYSTEM, Memc[str], SZ_FNAME) 
+		    if (nin == 0) {
+			if (verbose && res != STDOUT)
+			    call sk_iiprint ("Refsystem", Memc[str], NULL, tcoo)
+			if (res != NULL)
+			    call sk_iiwrite (res, "Refsystem", Memc[str],
+				NULL, tcoo)
+			call sk_close (tcoo)
+		    }
+
+		} else if (Memi[im+nin] != NULL) {
+
+		    tcoo = cc_imtan (Memi[im+nin], Memc[xref], Memc[yref],
+			Memc[lngref], Memc[latref], Memc[refsystem],
+			refcoo, coo, Memd[tdxref+nin], Memd[tdyref+nin],
+			Memd[tdlngref+nin], Memd[tdlatref+nin],
+			lngrefunits, latrefunits)
+		    call sk_stats (tcoo, S_COOSYSTEM, Memc[str], SZ_FNAME) 
+		    if (nin == 0) {
+			if (verbose && res != STDOUT)
+			    call sk_iiprint ("Refsystem", Memc[str], NULL, tcoo)
+			if (res != NULL)
+			    call sk_iiwrite (res, "Refsystem", Memc[str],
+				NULL, tcoo)
+			call sk_close (tcoo)
+		    }
+
+		# The tangent point will be determined directly from
+		# the input coordinates.
+		} else {
+
+		    if (nin == 0) {
+			if (verbose && res != STDOUT)
+			    call sk_iiprint ("Refsystem", Memc[insystem],
+				NULL, coo)
+			if (res != NULL)
+			    call sk_iiwrite (res, "Refsystem", Memc[insystem],
+				NULL, coo)
+		    }
+		    Memd[tdxref+nin] = INDEFD
+		    Memd[tdyref+nin] = INDEFD
+		    Memd[tdlngref+nin] = INDEFD
+		    Memd[tdlatref+nin] = INDEFD
+
+		}
+
+		if (nin == 0) {
+		    # Print information about the input coordinate system.
+		    if (verbose && res != STDOUT)
+			call sk_iiprint ("Insystem", Memc[insystem], NULL, coo)
+		    if (res != NULL)
+			call sk_iiwrite (res, "Insystem", Memc[insystem],
+			    NULL, coo)
+		}
+
+		# Print the input and out file information.
+		if (verbose && res != STDOUT) {
+		    call printf ("\nCoords File: %s  Image: %s\n")
+			call pargstr (Memc[infile])
+			call pargstr (Memc[image])
+		    call printf ("    Database: %s  Solution: %s\n")
+			call pargstr (Memc[database])
+			call pargstr (GM_RECORD(fit))
+		}
+		if (res != NULL) {
+		    call fprintf (res, "\n# Coords File: %s  Image: %s\n")
+			call pargstr (Memc[infile])
+			call pargstr (Memc[image])
+		    call fprintf (res, "#     Database: %s  Solution: %s\n")
+			call pargstr (Memc[database])
+			call pargstr (GM_RECORD(fit))
+		}
+
+		nin = nin + 1
+		if (nrecords > 1 || nresfiles > 1)
+		    break
 	    }
-
-	    # Open the results files.
-	    if (nresfiles <= 0)
-		res = NULL
-	    else if (clgfil (reslist, Memc[str], SZ_FNAME) != EOF)
-		res = open (Memc[str], NEW_FILE, TEXT_FILE)
-	    else
-		res = NULL
-
-	    # Set the output file record name.
-            if (nrecords > 0) {
-                if (imtgetim (reclist, GM_RECORD(fit), SZ_FNAME) != EOF)
-                    ;
-	    } else if (im == NULL) {
-	        call strcpy (Memc[infile], GM_RECORD(fit), SZ_FNAME)
-	    } else {
-		#call imgimage (Memc[image], Memc[str], SZ_FNAME)
-	        call strcpy (Memc[image], GM_RECORD(fit), SZ_FNAME)
-	    }
-
-	    # Print the input and out file information.
-	    if (verbose && res != STDOUT) {
-		call printf ("\nCoords File: %s  Image: %s\n")
-		    call pargstr (Memc[infile])
-		    call pargstr (Memc[image])
-		call printf ("    Database: %s  Solution: %s\n")
-		    call pargstr (Memc[database])
-		    call pargstr (GM_RECORD(fit))
-	    }
-	    if (res != NULL) {
-		call fprintf (res, "\n# Coords File: %s  Image: %s\n")
-		    call pargstr (Memc[infile])
-		    call pargstr (Memc[image])
-		call fprintf (res, "#     Database: %s  Solution: %s\n")
-		    call pargstr (Memc[database])
-		    call pargstr (GM_RECORD(fit))
-	    }
-
-	    # Determine the tangent point and convert it to the celestial
-	    # coordinate system of the input data, 
-
-	    # The tangent point will be determind directly from the input
-	    # coordinates.
-	    if (refpoint_type == CC_COORDS) {
-
-		tdlngref = INDEFD
-		tdlatref = INDEFD
-	        if (verbose && res != STDOUT)
-		    call sk_iiprint ("Refsystem", Memc[insystem], NULL, coo)
-		if (res != NULL)
-		    call sk_iiwrite (res, "Refsystem", Memc[insystem], NULL,
-		    coo)
-
-	    # The tangent point was set by the user and a tangent point
-	    # reference system may or may not have been defined.
-	    } else if (! IS_INDEFD(dlngref) && ! IS_INDEFD (dlatref)) {
-
-		tcoo = cc_utan (refcoo, coo, dlngref, dlatref, tdlngref,
-		    tdlatref, lngrefunits, latrefunits)
-		call sk_stats (tcoo, S_COOSYSTEM, Memc[str], SZ_FNAME) 
-		if (verbose && res != STDOUT)
-		    call sk_iiprint ("Refsystem", Memc[str], NULL, tcoo)
-		if (res != NULL)
-		    call sk_iiwrite (res, "Refsystem", Memc[str], NULL, tcoo)
-		#call mfree (tcoo, TY_STRUCT)
-		call sk_close (tcoo)
-
-	    } else if (im != NULL) {
-
-		tcoo = cc_imtan (im, Memc[lngref], Memc[latref],
-		    Memc[refsystem], refcoo, coo, tdlngref, tdlatref,
-		    lngrefunits, latrefunits)
-		call sk_stats (tcoo, S_COOSYSTEM, Memc[str], SZ_FNAME) 
-		if (verbose && res != STDOUT)
-		    call sk_iiprint ("Refsystem", Memc[str], NULL, tcoo)
-		if (res != NULL)
-		    call sk_iiwrite (res, "Refsystem", Memc[str], NULL, tcoo)
-		#call mfree (tcoo, TY_STRUCT)
-		call sk_close (tcoo)
-
-	    # The tangent point will be determind directly from the input
-	    # coordinates.
-	    } else {
-
-		tdlngref = INDEFD
-		tdlatref = INDEFD
-	        if (verbose && res != STDOUT)
-		    call sk_iiprint ("Refsystem", Memc[insystem], NULL, coo)
-		if (res != NULL)
-		    call sk_iiwrite (res, "Refsystem", Memc[insystem], NULL,
-		        coo)
-
-	    }
-
-	    # Print information about the input coordinate system.
-	    if (verbose && res != STDOUT)
-		call sk_iiprint ("Insystem", Memc[insystem], NULL, coo)
-	    if (res != NULL)
-		call sk_iiwrite (res, "Insystem", Memc[insystem], NULL, coo)
+	    if (nin == 0)
+	        break
 
 	    iferr { 
 		if (interactive)
 	            gd = gopen (Memc[graphics], NEW_FILE, STDGRAPH)
 		else
 	            gd = NULL
-		call cc_map (gd, in, out, im, res, coo, fit, xcolumn, ycolumn,
-		    lngcolumn, latcolumn, tdlngref, tdlatref, xmin, xmax,
-		    ymin, ymax, update, verbose)
+		call cc_map (gd, nin, Memi[in], out, Memi[im], res, coo, fit,
+		    xcolumn, ycolumn, lngcolumn, latcolumn, tweak,
+		    Memd[tdxref], Memd[tdyref], Memd[tdlngref], Memd[tdlatref],
+		    xmin, xmax, ymin, ymax, update, verbose)
 		if (gd != NULL)
 	    	    call gclose (gd)
 	    } then {
 		if (verbose && res != STDOUT) {
-		    call printf ("Error fitting coordinate list: %s\n")
-		        call pargstr (Memc[infile])
+		    if (nin == 1) {
+			call printf ("Error fitting coordinate list: %s\n")
+			    call pargstr (Memc[infile])
+		    } else
+			call printf ("Error fitting coordinate lists\n")
 		    call flush (STDOUT)
 		    Memc[str] = EOS
 		    if (errget (Memc[str], SZ_LINE) == 0)
 			;
 		    call printf ("    %s\n")
-			call pargstr (Memc[str))
+			call pargstr (Memc[str])
 		}
 		if (res != NULL) {
-		    call fprintf (res, "# Error fitting coordinate list: %s\n")
-		        call pargstr (Memc[infile])
+		    if (nin == 1) {
+			call fprintf (res,
+			    "# Error fitting coordinate list: %s\n")
+			    call pargstr (Memc[infile])
+		    } else
+			call fprintf (res,
+			    "# Error fitting coordinate lists\n")
 		    call flush (STDOUT)
 		    if (errget (Memc[str], SZ_LINE) == 0)
 			;
 		    call fprintf (res, "#     %s\n")
-			call pargstr (Memc[str))
+			call pargstr (Memc[str])
 		}
 		if (gd != NULL)
 		    call gclose (gd)
 	    }
 
 
-	    call close (in)
 	    if (nresfiles == ninfiles)
 		call close (res)
-	    if (im != NULL)
-		call imunmap (im)
+	    do i = 1, nin {
+		call close (Memi[in+i-1])
+		if (Memi[im+i-1] != NULL)
+		    call imunmap (Memi[im+i-1])
+	    }
 	}
 
+	call mfree (in, TY_INT)
+	call mfree (im, TY_POINTER)
+	call mfree (tdxref, TY_DOUBLE)
+	call mfree (tdyref, TY_DOUBLE)
+	call mfree (tdlngref, TY_DOUBLE)
+	call mfree (tdlatref, TY_DOUBLE)
 
 	call geo_free (fit)
-	#call mfree (coo, TY_STRUCT)
 	call sk_close (coo)
+	call clpcls (xreflist)
+	call clpcls (yreflist)
+	call clpcls (latreflist)
+	call clpcls (lngreflist)
 	if (nresfiles < ninfiles)
 	    call close (res)
 	call dtunmap (out)
@@ -461,8 +563,12 @@ pointer	procedure cc_utan (refcoo, coo, idlngref, idlatref, odlngref, odlatref,
 
 pointer	refcoo			#I pointer to the reference point system
 pointer	coo			#I pointer to the input coordinate system
+double	idxref			#I the input x reference point
+double	idyref			#I the input y reference point
 double	idlngref		#I the input reference point ra / longitude
 double	idlatref		#I the input reference point dec / latitude
+double	odxref			#O the output x reference point
+double	odyref			#O the output y reference point
 double	odlngref		#O the output reference point ra / longitude
 double	odlatref		#O the output reference point dec / latitude
 int	lngrefunits		#I the input reference ra / longitude units
@@ -472,6 +578,8 @@ pointer	trefcoo
 pointer	sk_copy()
 
 begin
+	odxref = idxref
+	odyref = idyref
 	if (refcoo != NULL) {
 	    trefcoo = sk_copy (refcoo)
 	} else {
@@ -479,8 +587,7 @@ begin
 	    call sk_seti (trefcoo, S_NLNGUNITS, lngrefunits)
 	    call sk_seti (trefcoo, S_NLATUNITS, latrefunits)
 	}
-	call sk_ultran (trefcoo, coo, idlngref, idlatref, odlngref, odlatref,
-	    1) 
+	call sk_ultran (trefcoo, coo, idlngref, idlatref, odlngref, odlatref, 1)
 
 	return (trefcoo)
 end
@@ -490,21 +597,25 @@ end
 # reference point celestial coordinate system to the input coordinate celestial
 # coordinate system.
 
-pointer	procedure cc_imtan (im, lngref, latref, refsystem, refcoo, coo,
-	odlngref, odlatref, lngrefunits, latrefunits)
+pointer	procedure cc_imtan (im, xref, yref, lngref, latref, refsystem, refcoo,
+	coo, odxref, odyref, odlngref, odlatref, lngrefunits, latrefunits)
 
 pointer	im			#I pointer to the input image
+char	xref[ARB]		#I the x reference keyword
+char	yref[ARB]		#I the y reference keyword
 char	lngref[ARB]		#I the ra / longitude keyword
 char	latref[ARB]		#I the dec / latitude keyword
 char	refsystem[ARB]		#I the reference point coordinate system
 pointer	refcoo			#I pointer to the reference point system
 pointer	coo			#I pointer to the input coordinate system
+double	odxref			#O the output x reference point
+double	odyref			#O the output y reference point
 double	odlngref		#O the output reference point ra / longitude
 double	odlatref		#O the output reference point dec / latitude
 int	lngrefunits		#I the input reference ra / longitude units
 int	latrefunits		#I the input reference dec / latitude units
 
-double	idlngref, idlatref, idepoch
+double	idxref, idyref, idlngref, idlatref, idepoch
 pointer	sp, str, tcoo, mw
 double	imgetd()
 pointer	sk_copy()
@@ -514,6 +625,10 @@ begin
 	call smark (sp)
 	call salloc (str, SZ_FNAME, TY_CHAR)
 
+	iferr (idxref = imgetd (im, xref))
+	    idxref = INDEFD
+	iferr (idyref = imgetd (im, yref))
+	    idyref = INDEFD
 	iferr (idlngref = imgetd (im, lngref))
 	    idlngref = INDEFD
 	if (idlngref < 0.0d0 || idlngref > 360.0d0)
@@ -523,11 +638,14 @@ begin
 	if (idlatref < -90.0d0 || idlatref > 90.0d0)
 	    idlatref = INDEFD
 
-	if (IS_INDEFD(idlngref) || IS_INDEFD(idlatref)) {
-	    odlngref = INDEFD
-	    odlatref = INDEFD
+	if (!IS_INDEFD(idxref))
+	    odxref = idxref
+	if (!IS_INDEFD(idyref))
+	    odyref = idyref
+
+	if (IS_INDEFD(idlngref) || IS_INDEFD(idlatref))
 	    tcoo = sk_copy (coo)
-	} else if (refcoo != NULL) {
+	else if (refcoo != NULL) {
 	    tcoo = sk_copy (refcoo)
 	    call sk_ultran (tcoo, coo, idlngref, idlatref, odlngref,
 	        odlatref, 1) 
@@ -540,10 +658,11 @@ begin
 		call sprintf (Memc[str], SZ_FNAME, "fk4 b%g")
 		    call pargd (idepoch)
 		if (sk_decwcs (Memc[str], mw, tcoo, NULL) == ERR) {
-		    #call mfree (tcoo, TY_STRUCT)
 		    call sk_close (tcoo)
 		    tcoo = sk_copy (coo)
 		}
+		if (mw != NULL)
+		    call mw_close (mw)
 	    }
 	    call sk_seti (tcoo, S_NLNGUNITS, lngrefunits)
 	    call sk_seti (tcoo, S_NLATUNITS, latrefunits)
@@ -558,20 +677,27 @@ end
 
 
 # CC_MAP -- Compute the required coordinate transformation.
+#
+# This version uses the nin variable.
 
-procedure cc_map (gd, in, out, im, res, coo, fit, xcolumn, ycolumn, lngcolumn,
-	latcolumn, ratan, dectan, xmin, xmax, ymin, ymax, update, verbose)
+procedure cc_map (gd, nin, in, out, im, res, coo, fit,
+	xcolumn, ycolumn, lngcolumn, latcolumn, tweak,
+	xtan, ytan, ratan, dectan,
+	xmin, xmax, ymin, ymax, update, verbose)
 
 pointer	gd			#I graphics stream pointer
-int	in			#I the input file descriptor
+int	nin			#I number of input files
+int	in[ARB]			#I the input file descriptors
 pointer	out			#I the output file descriptor
-pointer	im			#I the input image pointer
+pointer	im[ARB]			#I the input image pointers
 int	res			#I the results file descriptor
 pointer	coo			# pointer to the input coordinate system
 pointer	fit			#I pointer to fit parameters
 int	xcolumn, ycolumn	#I the x and y column numbers
 int	lngcolumn, latcolumn	#I the longitude and latitude column numbers
-double	ratan, dectan		#I the input ra and dec of the tangent point
+int	tweak			#I tweak flag
+double	xtan[ARB], ytan[ARB]	#I the input x and y of the tangent point
+double	ratan[ARB], dectan[ARB]	#I the input ra and dec of the tangent point
 double	xmin, xmax		#I max and min xref values
 double	ymin, ymax		#I max and min yref values
 bool	update			#I update the image wcs
@@ -579,9 +705,10 @@ bool	verbose			#I verbose mode
 
 double	mintemp, maxtemp, lngrms, latrms, lngmean, latmean
 pointer	sp, str, projstr
-pointer	xref, yref, lngref, latref, xi, eta, xifit, etafit, lngfit, latfit, wts
+pointer	n, xref, yref, xifit, etafit, lngfit, latfit, wts
+pointer	lngref, latref, xi, eta, lngref1, latref1, xi1, eta1
 pointer	sx1, sy1, sx2, sy2, xerrmsg, yerrmsg
-int	npts
+int	i, npts, npts1
 double	asumd()
 int	cc_rdxyrd(), sk_stati(), rg_wrdstr()
 bool	streq()
@@ -610,38 +737,21 @@ begin
 	wts = NULL
 
 	# Read in data and check that it is in range.
-	npts = cc_rdxyrd (in, xcolumn, ycolumn, lngcolumn, latcolumn, xref,
-	    yref, lngref, latref, xmin, xmax, ymin, ymax)
-	if (npts == 0) {
-	    call fstats (in, F_FILENAME, Memc[str], SZ_FNAME)
-	    call printf ("Coordinate list: %s has no data in range.\n")
-		call pargstr (Memc[str])
-	    call sfree (sp)
+	if (gd != NULL)
+	    call gdeactivate (gd, 0)
+	npts = cc_rdxyrd (in, im, xtan, ytan, ratan, dectan, nin,
+	    coo, xcolumn, ycolumn, lngcolumn, latcolumn, tweak,
+	    n, xref, yref, lngref, latref, xmin, xmax, ymin, ymax)
+	if (gd != NULL)
+	    call greactivate (gd, 0)
+	if (npts == 0)
 	    return
-	}
 
 	# Compute the mean of the reference and input coordinates.
 	GM_XOREF(fit) = asumd (Memd[xref], npts) / npts
 	GM_YOREF(fit) = asumd (Memd[yref], npts) / npts
 	GM_XOIN(fit) = asumd (Memd[lngref], npts) / npts
 	GM_YOIN(fit) = asumd (Memd[latref], npts) / npts
-
-	# Compute the position of the reference point.
-	if (IS_INDEFD(ratan) || IS_INDEFD(dectan)) {
-	    call cc_refpt (coo, Memd[lngref], Memd[latref], npts, lngmean,
-		latmean)
-	    if (IS_INDEFD(ratan))
-	        GM_XREFPT(fit) = lngmean
-	    else
-	        GM_XREFPT(fit) = ratan
-	    if (IS_INDEFD(dectan))
-	        GM_YREFPT(fit) = latmean
-	    else
-	        GM_YREFPT(fit) = dectan
-	} else {
-	    GM_XREFPT(fit) = ratan
-	    GM_YREFPT(fit) = dectan
-	}
 
 	# Set the sky projection str.
 	if (rg_wrdstr (GM_PROJECTION(fit), Memc[projstr], SZ_LINE,
@@ -650,15 +760,22 @@ begin
 	else
 	    call strcpy (GM_PROJSTR(fit), Memc[projstr], SZ_LINE)
 
-	# Convert the ra / longitude and dec / latitude values to standard
-	# coordinates in arc seconds before fitting.
-	call malloc (xi, npts, TY_DOUBLE)
-	call malloc (eta, npts, TY_DOUBLE)
-	call rg_celtostd (Memc[projstr], Memd[lngref], Memd[latref], Memd[xi],
-	    Memd[eta], npts, GM_XREFPT(fit), GM_YREFPT(fit), sk_stati(coo,
-	    S_NLNGUNITS), sk_stati(coo, S_NLATUNITS))
-	call amulkd (Memd[xi], 3600.0d0, Memd[xi], npts)
-	call amulkd (Memd[eta], 3600.0d0, Memd[eta], npts)
+	# Compute the position of the reference point for the solution.
+	if (IS_INDEFD(ratan[1]) || IS_INDEFD(dectan[1])) {
+	    call cc_refpt (coo, Memd[lngref], Memd[latref], npts,
+	        lngmean, latmean)
+	    if (IS_INDEFD(ratan[1]))
+		GM_XREFPT(fit) = lngmean
+	    else
+		GM_XREFPT(fit) = ratan[1]
+	    if (IS_INDEFD(dectan[1]))
+		GM_YREFPT(fit) = latmean
+	    else
+		GM_YREFPT(fit) = dectan[1]
+	} else {
+	    GM_XREFPT(fit) = ratan[1]
+	    GM_YREFPT(fit) = dectan[1]
+	}
 
 	# Allocate space for and compute the weights.
 	call malloc (wts, npts, TY_DOUBLE)
@@ -696,6 +813,31 @@ begin
 	    GM_YMAX(fit) = ymax
 	}
 
+	# Convert the ra / longitude and dec / latitude values to standard
+	# coordinates in arc seconds before fitting.
+	call malloc (xi, npts, TY_DOUBLE)
+	call malloc (eta, npts, TY_DOUBLE)
+	lngref1 = lngref; latref1 = latref; xi1 = xi; eta1 = eta
+	do i = 1, nin {
+	    npts1 = Memi[n+i-1]
+	    if (npts1 == 0)
+	        next
+	    if (IS_INDEFD(ratan[i]) || IS_INDEFD(dectan[i]))
+		call rg_celtostd (Memc[projstr], Memd[lngref1], Memd[latref1],
+		    Memd[xi1], Memd[eta1], npts1, lngmean, latmean,
+		    sk_stati(coo, S_NLNGUNITS), sk_stati(coo, S_NLATUNITS))
+	    else
+		call rg_celtostd (Memc[projstr], Memd[lngref1], Memd[latref1],
+		    Memd[xi1], Memd[eta1], npts1, ratan[i], dectan[i],
+		    sk_stati(coo, S_NLNGUNITS), sk_stati(coo, S_NLATUNITS))
+	    lngref1 = lngref1 + npts1
+	    latref1 = latref1 + npts1
+	    xi1 = xi1 + npts1
+	    eta1 = eta1 + npts1
+	}
+	call amulkd (Memd[xi], 3600.0d0, Memd[xi], npts)
+	call amulkd (Memd[eta], 3600.0d0, Memd[eta], npts)
+
 	# Initalize surface pointers.
 	sx1 = NULL
 	sy1 = NULL
@@ -703,6 +845,12 @@ begin
 	sy2 = NULL
 
 	# Fit the data.
+	if (! (IS_INDEFD(xtan[1]) || IS_INDEFD(ytan[1]))) {
+	    call geo_setd (fit, GMXO, xtan[1])
+	    call geo_setd (fit, GMYO, ytan[1])
+	    call geo_setd (fit, GMXOREF, 0D0)
+	    call geo_setd (fit, GMYOREF, 0D0)
+	}
 	if (gd != NULL) {
 	    iferr {
 	        call geo_mgfitd (gd, fit, sx1, sy1, sx2, sy2, Memd[xref],
@@ -809,28 +957,39 @@ begin
 	}
 
 	# Update the image wcs.
-	if (im != NULL) {
-	    if (verbose && res != STDOUT) {
-		call printf ("Wcs mapping status\n")
-	    	call printf (
+	do i = 1, nin {
+	    if (im[i] != NULL) {
+		if (i == 1) {
+		    if (verbose && res != STDOUT) {
+			call printf ("Wcs mapping status\n")
+			call printf (
 	   "    Ra/Dec or Long/Lat wcs rms: %0.3g  %0.3g   (arcsec  arcsec)\n")
-		    call pargd (lngrms)
-		    call pargd (latrms)
-	    }
-	    if (res != NULL) {
-		call fprintf (res, "# Wcs mapping status\n")
-	    	call fprintf (res,
+			    call pargd (lngrms)
+			    call pargd (latrms)
+		    }
+		    if (res != NULL) {
+			call fprintf (res, "# Wcs mapping status\n")
+			call fprintf (res,
 	  "#     Ra/Dec or Long/Lat wcs rms: %0.3g  %0.3g   (arcsec  arcsec)\n")
-		    call pargd (lngrms)
-		    call pargd (latrms)
-	    }
-	    if (update) {
-	        call cc_nwcsim (im, coo, Memc[projstr], GM_XREFPT(fit),
-		    GM_YREFPT(fit), sx1, sy1, sx2, sy2, false)
-	        if (verbose && res != STDOUT)
-		    call printf ("Updating image header wcs\n\n")
-		if (res != NULL)
-		    call fprintf (res, "# Updating image header wcs\n\n")
+			    call pargd (lngrms)
+			    call pargd (latrms)
+		    }
+		}
+		if (update) {
+		    if (IS_INDEFD(ratan[i]) || IS_INDEFD(dectan[i]))
+			call cc_nwcsim (im[i], coo, Memc[projstr], lngmean,
+			    latmean, sx1, sy1, sx2, sy2, false)
+		    else
+			call cc_nwcsim (im[i], coo, Memc[projstr], ratan[i],
+			    dectan[i], sx1, sy1, sx2, sy2, false)
+		    if (i == 1) {
+			if (verbose && res != STDOUT)
+			    call printf ("Updating image header wcs\n\n")
+			if (res != NULL)
+			    call fprintf (res,
+			        "# Updating image header wcs\n\n")
+		    }
+		}
 	    }
 	}
 
@@ -846,6 +1005,8 @@ begin
 	# Free the space and close files.
 	call geo_mmfreed (sx1, sy1, sx2, sy2)
 
+	if (n != NULL)
+	    call mfree (n, TY_INT)
 	if (xref != NULL)
 	    call mfree (xref, TY_DOUBLE)
 	if (yref != NULL)
@@ -873,23 +1034,111 @@ begin
 end
 
 
-# CC_RDXYRD -- Read in the x, y, ra, and dec values from the input
-# file.
+# CC_RDXYRD -- Read in the x, y, ra, and dec values from the input file(s).
+#
+# Adjust the tangent points if there is an image WCS.
 
-int procedure cc_rdxyrd (in, xcolumn, ycolumn, lngcolumn, latcolumn, xref,
-	yref, lngref, latref, xmin, xmax, ymin, ymax)
+int procedure cc_rdxyrd (in, im, xtan, ytan, ratan, dectan, nin,
+        coo, xcolumn, ycolumn, lngcolumn, latcolumn, tweak,
+	n, xref, yref, lngref, latref, xmin, xmax, ymin, ymax)
 
-int	in			#I the input file file descriptor
+int	in[nin]			#I the input file file descriptors
+pointer	im[nin]			#I the input image pointers
+double	xtan[ARB], ytan[ARB]	#I the input x and y of the tangent point
+double	ratan[ARB], dectan[ARB]	#I the input ra and dec of the tangent point
+int	nin			#I number of input files
+pointer	coo			#I the input coordinate system
 int	xcolumn, ycolumn	#I the columns containing the x / y values
 int	lngcolumn, latcolumn	#I the columns containing the lng / lat values
+int	tweak			#I tweak flag
+pointer	n			#U pointer to the number of points
 pointer	xref, yref		#I pointers to the x / y value arrays
 pointer	lngref, latref		#I pointers to the lng / lat value arrays
-double	xmin, xmax		#I the min and max x values
-double	ymin, ymax		#I the min and max y values
+double	xmin, xmax		#U the min and max x values
+double	ymin, ymax		#U the min and max y values
 
-int	nline, ip, npts, bufsize, nfields, max_fields, nsig, offset
+int	i, npts, npts1
+pointer	xref1, yref1, lngref1, latref1
+
+int	cc_rdxyrd1()
+
+begin
+	call calloc (n, nin, TY_INT)
+
+	npts = 0
+	do i = 1, nin {
+	    npts1 = cc_rdxyrd1 (in[i], im[i], xtan[i], ytan[i], ratan[i],
+	        dectan[i], coo, xcolumn, ycolumn, lngcolumn, latcolumn, tweak,
+		xref1, yref1, lngref1, latref1, xmin, xmax, ymin, ymax)
+	    Memi[n+i-1] = npts1
+	    if (npts1 == 0)
+	        next
+	    if (npts == 0) {
+	        xref = xref1
+	        yref = yref1
+	        lngref = lngref1
+	        latref = latref1
+	    } else {
+		call realloc (xref, npts+npts1, TY_DOUBLE)
+		call realloc (yref, npts+npts1, TY_DOUBLE)
+		call realloc (lngref, npts+npts1, TY_DOUBLE)
+		call realloc (latref, npts+npts1, TY_DOUBLE)
+		call amovd (Memd[xref1], Memd[xref+npts], npts1)
+		call amovd (Memd[yref1], Memd[yref+npts], npts1)
+		call amovd (Memd[lngref1], Memd[lngref+npts], npts1)
+		call amovd (Memd[latref1], Memd[latref+npts], npts1)
+		call mfree (xref1, TY_DOUBLE)
+		call mfree (yref1, TY_DOUBLE)
+		call mfree (lngref1, TY_DOUBLE)
+		call mfree (latref1, TY_DOUBLE)
+	    }
+	    npts = npts + npts1
+	}
+
+	if (npts == 0) {
+	    call mfree (n, TY_INT)
+
+	    if (i > 1)
+		call printf ("Coordinate lists have no data in range.\n")
+	}
+
+	return (npts)
+end
+
+
+# CC_RDXYRD1 -- Read in the x, y, ra, and dec values from the input file.
+#
+# If a reference point (both pixel and value) and an image (with a
+# valid celestial WCS) are defined then the WCS is reset to the reference
+# point and the reference point value is then shifted to make the
+# the WCS coordinates evaluated at the input pixel coordinates agree
+# if the input celestial coordinates on average.
+
+int procedure cc_rdxyrd1 (in, im, xtan, ytan, ratan, dectan, icoo,
+	xcolumn, ycolumn, lngcolumn, latcolumn, tweak,
+	xref, yref, lngref, latref, xmin, xmax, ymin, ymax)
+
+int	in			#I the input file file descriptor
+pointer	im			#I the input image pointer
+double	xtan, ytan		#I the input x and y of the tangent point
+double	ratan, dectan		#I the input ra and dec of the tangent point
+pointer	icoo			#I the input coordinate system
+int	xcolumn, ycolumn	#I the columns containing the x / y values
+int	lngcolumn, latcolumn	#I the columns containing the lng / lat values
+int	tweak			#I tweak flag
+pointer	xref, yref		#I pointers to the input x / y values
+pointer	lngref, latref		#I pointers to the input lng / lat values
+double	xmin, xmax		#U the min and max x values
+double	ymin, ymax		#U the min and max y values
+
+int	nline, i, npts, bufsize, nfields, max_fields, nsig, offset
+double	lng1, lat1, lng2, lat2, x, y, z, sumx, sumy, sumz, r, pa, wterm[8]
 pointer	sp, inbuf, linebuf, field_pos
-int	getline(), li_get_numd()
+pointer	mw, ct, coo
+int	getline(), li_get_numd(), sk_decim()
+pointer	mw_ctrand(), mw_sctran()
+
+int	sk_stati()
 
 begin
 	call smark (sp)
@@ -903,18 +1152,40 @@ begin
 	call malloc (lngref, bufsize, TY_DOUBLE)
 	call malloc (latref, bufsize, TY_DOUBLE)
 
+	# Check whether to adjust the reference value based on the
+	# current image WCS.
+	mw = NULL; ct = NULL; coo = NULL
+	if (tweak == 3 && im != NULL && !IS_INDEFD(xtan) && !IS_INDEFD(ytan) &&
+	    !IS_INDEFD(ratan) && !IS_INDEFD(dectan)) {
+	    if (sk_decim (im, "logical", mw, coo) != ERR && mw != NULL) {
+	        call sk_seti (coo, S_NLNGUNITS, SKY_DEGREES)
+		call sk_ultran (icoo, coo, ratan, dectan, lng1, lat1, 1)
+		call mw_gwtermd (mw, wterm[1], wterm[3], wterm[5], 2)
+		wterm[1] = xtan; wterm[2] = ytan 
+		wterm[3] = lng1; wterm[4] = lat1
+		call mw_swtermd (mw, wterm[1], wterm[3], wterm[5], 2)
+	        ct = mw_sctran (mw, "logical", "world", 03B)
+		sumx = 0d0; sumy = 0d0; sumz = 0d0
+	    } else {
+	        if (mw != NULL) 
+		    call mw_close (mw)
+		call sk_close (coo)
+		mw = NULL; coo = NULL
+	    }
+	}
+
 	npts = 0
 	max_fields = MAX_FIELDS
 	for (nline = 1; getline (in, Memc[inbuf]) != EOF; nline = nline + 1) {
 
 	    # Skip over leading white space.
-            for (ip = inbuf; IS_WHITE(Memc[ip]); ip = ip + 1)
+            for (i = inbuf; IS_WHITE(Memc[i]); i = i + 1)
                 ;
 
             # Skip comment and blank lines.
-            if (Memc[ip] == '#')
+            if (Memc[i] == '#')
                 next
-            else if (Memc[ip] == '\n' || Memc[ip] == EOS)
+            else if (Memc[i] == '\n' || Memc[i] == EOS)
                 next
 
             # Expand tabs into blanks, determine field offsets.
@@ -954,6 +1225,20 @@ begin
 		nsig) == 0)
 		next
 
+	    # Accumulate cartisian shifts from image WCS coordinates.
+	    if (ct != NULL) {
+		call mw_c2trand (ct, Memd[xref+npts], Memd[yref+npts],
+		    lng1, lat1)
+		call sk_ultran (icoo, coo, Memd[lngref+npts], Memd[latref+npts],
+		    lng2, lat2, 1)
+		lng1 = DDEGTORAD(lng1); lat1 = DDEGTORAD(lat1)
+		lng2 = DDEGTORAD(lng2); lat2 = DDEGTORAD(lat2)
+		x = sin (lat2) - sin(lat1)
+		y = cos (lat2) * sin (lng2) - cos (lat1) * sin (lng1)
+		z = cos (lat2) * cos (lng2) - cos (lat1) * cos (lng1)
+		sumx = sumx + x; sumy = sumy + y; sumz = sumz + z
+	    }
+
 	    npts = npts + 1
 
 	    if (npts >= bufsize) {
@@ -965,11 +1250,64 @@ begin
 	    }
 	}
 
+	# Adjust the tangent point value.
+	if (npts > 0 && ct != NULL) {
+	    sumx = sumx / npts; sumy = sumy / npts; sumz = sumz / npts
+	    r = sqrt (sumx**2 + sumy**2 + sumz**2) / 2
+	    r = 2 * atan2 (r, sqrt(max(0d0,1d0-r)))
+	    r = 3600 * DRADTODEG (r)
+	    call eprintf ("Tangent point shift = %.2f\n")
+	        call pargd (r)
+
+	    call sk_ultran (icoo, coo, ratan, dectan, lng1, lat1, 1)
+	    lng2 = DDEGTORAD(lng1); lat2 = DDEGTORAD(lat1)
+	    x = sin (lat2) + sumx
+	    y = cos (lat2) * sin (lng2) + sumy
+	    z = cos (lat2) * cos (lng2) + sumz
+	    pa = atan2 (y, x)
+	    if (pa < 0d0)
+		pa = pa + DTWOPI
+	    if (pa >= DTWOPI)
+		pa = pa - DTWOPI
+	    r = z
+	    if (abs(r) > 0.99d0) {
+		if (r < 0d0)
+		   r = DPI - asin (sqrt (x * x + y * y))
+		else
+		   r = asin (sqrt (x * x + y * y))
+	    } else
+		r = acos (r)
+	    x = sin (r) * cos (pa)
+	    y = sin (r) * sin (pa)
+	    z = cos (r)
+	    lng2 = atan2 (y, z)
+	    if (lng2 < 0d0)
+		lng2 = lng2 + DTWOPI
+	    if (lng2 >= DTWOPI)
+		lng2 = lng2 - DTWOPI
+	    lat2 = x
+	    if (abs (lat2) > 0.99d0) {
+		if (lat2 < 0d0)
+		   lat2 = -acos (sqrt (y * y + z * z))
+		else
+		   lat2 = acos (sqrt (y * y + z * z))
+	    } else
+		lat2 = asin (lat2)
+	    lng2 = DRADTODEG (lng2); lat2 = DRADTODEG (lat2)
+	    call sk_ultran (coo, icoo, lng2, lat2, ratan, dectan, 1)
+	}
+	        
+	# Finish up.
+
 	if (npts <= 0) {
 	    call mfree (xref, TY_DOUBLE)
 	    call mfree (yref, TY_DOUBLE)
 	    call mfree (lngref, TY_DOUBLE)
 	    call mfree (latref, TY_DOUBLE)
+
+	    call fstats (in, F_FILENAME, Memc[linebuf], SZ_LINE)
+	    call printf ("Coordinate list: %s has no data in range.\n")
+		call pargstr (Memc[linebuf])
 	} else if (npts < bufsize) {
 	    call realloc (xref, npts, TY_DOUBLE)
 	    call realloc (yref, npts, TY_DOUBLE)
@@ -977,6 +1315,12 @@ begin
 	    call realloc (latref, npts, TY_DOUBLE)
 	}
 
+	if (ct != NULL)
+	    call mw_ctfree (ct)
+	if (mw != NULL)
+	    call mw_close (mw)
+	if (coo != NULL)
+	    call sk_close (coo)
 	call sfree (sp)
 
 	return (npts)
@@ -996,14 +1340,15 @@ int	npts			#I the number of input coordinates
 double	lngmean			#O the output mean longitude
 double	latmean			#O the output mean latitude
 
-double	sumx, sumy, sumz, tlng, tlat, tr, tpa
+double	sumx, sumy, sumz, sumdx, sumdy, sumdz
+double  tlng, tlat
+double	x, y, z, tr, tpa
 int	i
 int	sk_stati()
 
 begin
-	sumx = 0.0d0
-	sumy = 0.0d0
-	sumz = 0.0d0
+	sumx  = 0.0d0; sumy  = 0.0d0; sumz  = 0.0d0
+	sumdx = 0.0d0; sumdy = 0.0d0; sumdz = 0.0d0
 
 	# Loop over the data points.
 	do i = 1, npts {
@@ -1026,10 +1371,13 @@ begin
 		tlat = latref[i]
 	    }
 
-	    sumx = sumx + sin (tlat)
-	    sumy = sumy + cos (tlat) * sin (tlng)
-	    sumz = sumz + cos (tlat) * cos (tlng)
+	    x = sin (tlat)
+	    y = cos (tlat) * sin (tlng)
+	    z = cos (tlat) * cos (tlng)
 
+	    sumx = sumx + x
+	    sumy = sumy + y
+	    sumz = sumz + z
 	}
 
 	# Compute the average vector components.

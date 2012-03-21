@@ -187,7 +187,7 @@ scaling to the continuum level at blaze peak reference point.
 
 .ls lines = ""
 List of spectral line files.  Spectral line files contain lines of rest
-wavelength, peak, and widths (see the the DESCRIPTION section).
+wavelength, peak, and widths (see the DESCRIPTION section).
 The latter two parameters may be missing in which case they default to
 the task \fIpeak\fR and \fIsigma\fR parameters.  If no file or a new
 (nonexistent) file is specified then a number of random lines given by the
@@ -563,7 +563,7 @@ over the order profile but is added after the fact.
 	cl> mkechelle ex1.ec prof=extracted nrand=100 scat=100. \
 	gmm=INDEF blaze=INDEF theta=INDEF
 	Echelle grating: Using linear dispersion
-	Warning: Insufficient information to to resolve grating parameters
+	Warning: Insufficient information to resolve grating parameters
 	cl> mknoise ex1.ec gain=2 rdnoise=5 poisson+
 .fi
 

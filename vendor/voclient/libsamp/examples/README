@@ -1,0 +1,68 @@
+
+    This directory contains the example tasks for the LIBSAMP interface.
+Current examples include:
+
+
+      samp	    General SAMP commandline interface
+      snoop	    Print all messages available to a client application 
+      send 	    Send a message of a specific mtype to one or more apps
+
+
+Example Programs
+----------------
+
+    The interface distribution comes with a 'zztest.c' test application 
+meant to exercise various methods of the interface.  This is a largely
+undocumented unit test program intended only for development, users 
+should instead look at the programs in the 'examples' directory.
+Current examples include:
+
+
+      snoop         Print all messages available to a client application
+      send          Send a message of a specific mtype to one or more apps
+
+
+Examples:
+
+  1)  Print out messages received by a client application:
+
+        % snoop                             print all available messages
+        % snoop -m image.load.fits          print only the one mtype
+        % snoop -s topcat                   only message from 'TOPCAT'
+
+  2)  Print the usage of the 'send' (or 'snoop') application:
+
+	% send -h
+
+  3)  Broadcast a message to all clients subscribed to a mtype:
+
+	% send image.load.fits http://foo.edu/bar.fits testId testName
+
+  4)  Send a message to a specific app (c4) using synchronous message pattern:
+
+	% send -r c4 -p sync client.env.get HOME
+
+  5)  Send a client multiple messages from a single connection:
+
+	% cat msgs.txt
+	client.cmd.exec show noao
+	client.cmd.exec imstat dev$pix
+	client.cmd.exec imstat dev$pix[*,1:10]
+	client.cmd.exec imstat dev$pix[*,10:20]
+	client.cmd.exec imstat dev$pix[*,20:30]
+	% send -r iraf -f msgs.txt
+
+      The  message text file must containt the mtype as the first value, the
+      remainder of the line are the arguments specific to that mtype.
+
+
+Note that each of these examples assumes an already-running Hub.  A
+standalone hub is provided in the 'jsamp' directory included in the
+distribution.  To start a hub from the toplevel directory:
+
+	% java -jar jsamp/jsamp-1.3.jar hub
+
+This should be done before trying the above example.  Note that applications
+such as Topcat or Aladin have a builtin Hub that can also be used.
+
+

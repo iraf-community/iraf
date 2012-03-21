@@ -10,11 +10,14 @@ IPAK32 (void *a, void *b, XINT *nelems)
 	/* MACHDEP - Works only for little-endian systems (e.g. x86)
 	*/
 	XINT *ip = (XINT *) a;
-	int  *op = (int  *) b;
-	int   i = 0;
+	int  *op = (int  *) calloc (*nelems, sizeof (int));
+	int  *tmp, i;
 
-	for (i=0; i < *nelems; i++) {
-	    *op = (int) *ip;
-	    op++, ip++;
+	tmp = op;
+	for (i=0; i < *nelems; i++, ip++) {
+	    *tmp++ = (int) (*ip);
 	}
+	memmove (b, op, *nelems * sizeof (int));
+
+	free (op);
 }

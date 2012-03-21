@@ -141,6 +141,7 @@ extern	onentry()		# client onentry procedure
 bool	networking
 int	inchan, outchan, errchan, driver, devtype
 char	cmd[SZ_CMDBUF], taskname[SZ_TASKNAME], bkgfname[SZ_FNAME]
+char	irafinit[SZ_LINE]
 int	arglist_offset, timeit, junk, interactive, builtin_task, cmdin
 int	jumpbuf[LEN_JUMPBUF], status, errstat, state, interpret, i
 long	save_time[2]
@@ -149,7 +150,7 @@ pointer	sp
 bool	streq()
 extern	DUMMY()
 int	sys_getcommand(), sys_runtask(), oscmd()
-int	access(), envscan(), onentry(), stropen()
+int	access(), envscan(), onentry(), stropen(), envgets()
 errchk	xonerror, fio_cleanup
 common	/JUMPCOM/ jumpbuf
 string	nullfile "dev$null"
@@ -220,9 +221,23 @@ begin
 	    if (access ("zzsetenv.def",0,0) == YES) {
 		iferr (junk = envscan ("set @zzsetenv.def"))
 		    ;
+	    } else if (access ("hlib$zzsetenv.def",0,0) == YES) {
+		iferr (junk = envscan ("set @hlib$zzsetenv.def"))
+		    ;
 	    } else if (access ("host$hlib/zzsetenv.def",0,0) == YES) {
 		iferr (junk = envscan ("set @host$hlib/zzsetenv.def"))
 		    ;
+	    }
+
+	    # Allow the 'irafinit' environment variable to point to a file
+	    # that may partially override the system zzsetenv.def file.
+	    if (envgets ("irafinit", irafinit, SZ_LINE) > 0) {
+	        if (access (irafinit, 0, 0) == YES) {
+		    call sprintf (cmd, SZ_CMDBUF, "set @%s")
+			call pargstr (cmd)
+		    iferr (junk = envscan (cmd))
+		        ;
+		}
 	    }
 	}
 

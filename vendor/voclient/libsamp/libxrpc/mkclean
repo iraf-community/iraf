@@ -1,0 +1,42 @@
+#!/bin/csh -f
+
+set top = `(chdir .. ; pwd)`
+
+echo "Cleaning support libraries ...."
+
+/bin/rm -f bin/* lib/*.a lib/build/*.o share/*	>& /dev/null
+/bin/rm -f */_spool 				>& /dev/null
+
+
+echo -n "    Cleaning CURL libs ...."
+foreach i (curl-*)
+  (chdir $i ;  \
+    find . -name .libs -exec /bin/rm -rf {} \;  >& /dev/null ; \
+    find . -name .deps -exec /bin/rm -rf {} \;  >& /dev/null ; \
+    find . -name curl.list -exec rm -rf {} \;   >& /dev/null ; \
+    find . -name Makefile -exec rm -rf {} \;    >& /dev/null ; \
+    find . -name libcurl.la -exec rm -rf {} \;  >& /dev/null ; \
+    /bin/rm -f config.status curl-config libcurl.pc ;\
+    make clean maintainer-clean-am 		>>& _spool )
+end
+echo "done"
+
+echo -n "    Cleaning XMLRPC-C libs ...."
+foreach i (xmlrpc-c-1*)
+    (chdir $i ; make clean distclean		>>& _spool )
+end
+echo "done"
+
+# Real clean
+find . -name \*.a -print -exec /bin/rm -f {} \;		>& /dev/null
+find . -name \*.o -print -exec /bin/rm -f {} \;		>& /dev/null
+find . -name \*.so -print -exec /bin/rm -f {} \;	>& /dev/null
+find . -name \*.so.\* -print -exec /bin/rm -f {} \;	>& /dev/null
+find . -name \*.dylib -print -exec /bin/rm -f {} \;	>& /dev/null
+find . -name \*spool\* -print -exec /bin/rm -f {} \;	>& /dev/null
+find . -name \*.log -print -exec /bin/rm -f {} \;	>& /dev/null
+find . -name srcdir -exec /bin/rm -f {} \;		>& /dev/null
+find . -name blddir -exec /bin/rm -f {} \;		>& /dev/null
+
+
+exit 0

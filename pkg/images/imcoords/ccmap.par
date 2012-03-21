@@ -21,7 +21,9 @@ latunits,s,h,"",,,Input dec / latitude units
 insystem,s,h,"j2000",,,Input celestial coordinate system
 
 # The celestial coordinate system reference point parameters
-refpoint,s,h,"coords","|coords|user|",,Source of the reference point definition
+refpoint,s,h,"coords","|coords|user|tweak|",,Source of the reference point definition
+xref,s,h,"INDEF",,,Reference point in x
+yref,s,h,"INDEF",,,Reference point in y
 lngref,s,h,"INDEF",,,Reference point ra / longitude telescope coordinate
 latref,s,h,"INDEF",,,Reference point dec / latitude telescope coordinate
 refsystem,s,h,"INDEF",,,Reference point telescope coordinate system

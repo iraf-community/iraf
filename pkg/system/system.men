@@ -8,6 +8,7 @@
       devstatus - Print the status of a device (mta, mtb, ...)
       directory - List the files in a directory
       diskspace - Show how much diskspace is available
+	 fcache - List, clean or manipulate the file cache
 	  files - Expand a file template into a list of files
          gripes - Send suggestions, complaints, etc. to the system
 	   head - Print the first few lines of a text file
@@ -28,8 +29,10 @@
          rewind - Rewind a device (magtape)
 	   sort - Sort a text file
 	    spy - Show processor status
+	 system - Simple benchmarking tool
 	   tail - Print the last few lines of a file
 	    tee - Tee the standard output into a file
           touch - Change file access and modification times
 	   type - Type a text file on the standard output
+         urlget - Get a (http) URL to a named file
       unprotect - Remove delete protection from a file

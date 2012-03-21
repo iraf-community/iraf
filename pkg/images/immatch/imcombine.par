@@ -11,7 +11,7 @@ sigmas,s,h,"",,,List of sigma images (optional)
 imcmb,s,h,"$I",,,Keyword for IMCMB keywords
 logfile,s,h,"STDOUT",,,"Log file
 "
-combine,s,h,"average","average|median|sum",,Type of combine operation
+combine,s,h,"average","average|median|lmedian|sum|quadrature|nmodel",,Type of combine operation
 reject,s,h,"none","none|minmax|ccdclip|crreject|sigclip|avsigclip|pclip",,Type of rejection
 project,b,h,no,,,Project highest dimension of input images?
 outtype,s,h,"real","short|ushort|integer|long|real|double",,Output image pixel datatype

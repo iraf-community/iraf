@@ -78,6 +78,7 @@ bool	streq()
 
 pointer fname		# file name without trailing brackets
 int	extname, hdu, dummy	# returned by tbparse and ignored
+pointer	tbtopn(), tp
 int	tbparse()
 
 # These are used for checking for a FITS file.
@@ -90,10 +91,14 @@ string	naxis    "NAXIS   =                "
 
 # These are used for checking for an STSDAS binary table.
 int	i_sizinfo[LEN_SIZINFO]	# size information record
-char	c_sizinfo[SZ_SIZINFO]
-equivalence (i_sizinfo[1], c_sizinfo[1])
+char	c_sizinfo[SZ_SIZINFO * 8]
+char    cache[SZ_FNAME], src[SZ_FNAME], extn[SZ_FNAME]
+
+
+#equivalence (i_sizinfo[1], c_sizinfo[1])
 int	b_sizinfo[LEN_SIZINFO]	# byte-swapped size information record
 
+int     envgets()
 errchk	open, read, tbparse
 
 begin
@@ -122,8 +127,25 @@ begin
 	    call strcpy (tablename, Memc[fname], SZ_FNAME)
 	}
 
-	# From now on we'll use Memc[fname] as the file name.
+	# Make sure we've cached the file.
+        # Delete a cached version of the file.
+if (1<0) {
+	if (strncmp ("http://", Memc[fname], 7) == 0) {
+            if (envgets ("cache", cache, SZ_FNAME) > 0) {
+                call fclookup (cache, Memc[fname], src, extn, SZ_FNAME)
+                if (src[1] != EOS) {
+	    	    tp = tbtopn (Memc[fname], READ_ONLY, NULL)
+	    	    call tbtclo (tp)
 
+		    ttype = TBL_TYPE_FITS
+		    call sfree (sp)
+		    return (ttype)
+	        }
+	    }
+	}
+}
+
+	# From now on we'll use Memc[fname] as the file name.
 	iferr {
 	    fd = open (Memc[fname], READ_ONLY, BINARY_FILE)
 	} then {

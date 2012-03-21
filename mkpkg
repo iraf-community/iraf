@@ -2,8 +2,14 @@
 # subdirectory must be made before this can be run.
 
 $verbose
-$call	mkall			# make everything
+$call	mkall					# make everything
 $exit
+
+sysgen:
+	$call vendor
+	$call mkall
+	$call update
+	;
 
 mkall:
 	$ifeq (hostid, unix)  !(clear;date)  $endif
@@ -24,6 +30,13 @@ relink:
 update:
 	$call sysexe
 	$call packages
+	;
+
+vendor:
+	$echo "======================= VENDOR =========================="
+	$echo "+"
+	$call sysgen@vendor
+	$echo "+" $echo "+"
 	;
 
 syslibs:

@@ -1,0 +1,84 @@
+\hypertarget{xrServer_8c}{
+\section{xrServer.c File Reference}
+\label{xrServer_8c}\index{xrServer.c@{xrServer.c}}
+}
+Procedures used to implement an XML-RPC server.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$pthread.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$xmlrpc-c/base.h$>$}\par
+{\tt \#include $<$xmlrpc-c/client.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server\_\-abyss.h$>$}\par
+{\tt \#include \char`\"{}xrpcP.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrServer_8c_d72dbcf6d0153db1b8d8a58001feed83}{
+\#define \textbf{DEBUG}~0}
+\label{xrServer_8c_d72dbcf6d0153db1b8d8a58001feed83}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrServer_8c_34f22549d8008c08819534ffe46f3166}{
+int \textbf{xr\_\-createServer} (char $\ast$path, int port, char $\ast$logfile)}
+\label{xrServer_8c_34f22549d8008c08819534ffe46f3166}
+
+\item 
+\hypertarget{xrServer_8c_c819087f1170888bdfb593f3ac16f6da}{
+int \textbf{xr\_\-addServerMethod} (char $\ast$name, void $\ast$method, void $\ast$userData)}
+\label{xrServer_8c_c819087f1170888bdfb593f3ac16f6da}
+
+\item 
+\hypertarget{xrServer_8c_3e9bd94b6c2193efba9cebb23dfd90b1}{
+int \textbf{xr\_\-removeServerMethod} (char $\ast$name)}
+\label{xrServer_8c_3e9bd94b6c2193efba9cebb23dfd90b1}
+
+\item 
+\hypertarget{xrServer_8c_d21c3561b176ba1bda6052804157fc1a}{
+void \textbf{xr\_\-setServerParam} (char $\ast$param, void $\ast$value)}
+\label{xrServer_8c_d21c3561b176ba1bda6052804157fc1a}
+
+\item 
+\hypertarget{xrServer_8c_98196da5ba5e815b01b3edfb84b7eb66}{
+int \textbf{xr\_\-startServerThread} ()}
+\label{xrServer_8c_98196da5ba5e815b01b3edfb84b7eb66}
+
+\item 
+\hypertarget{xrServer_8c_8b60879ac9c7d42dd98fdcd04a78e172}{
+void \textbf{xr\_\-startServer} ()}
+\label{xrServer_8c_8b60879ac9c7d42dd98fdcd04a78e172}
+
+\item 
+\hypertarget{xrServer_8c_c46f24c2975ae33f54e6a64165065676}{
+int \textbf{xr\_\-shutdownServer} ()}
+\label{xrServer_8c_c46f24c2975ae33f54e6a64165065676}
+
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Procedures used to implement an XML-RPC server. 
+
+XRSERVER.C
+
+Procedures used to implement an XML-RPC server in an application. To do this, we keep a local registry of method names and functions and rely on a default method to invoke the procedure using a common function prototype.
+
+\hyperlink{structServer}{Server} methods:
+
+xr\_\-createServer (path, port, logfile) xr\_\-addServerMethod (name, $\ast$method, $\ast$userData) xr\_\-removeServerMethod (name) xr\_\-setServerParam (param, $\ast$value)
+
+xr\_\-startServerThread () // never returns xr\_\-shutdownServer ()
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]6/10/09 \end{Desc}

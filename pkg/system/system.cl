@@ -30,6 +30,8 @@ task	cmdstr,
 	type,
 	rewind,
 	unprotect,
+	fcache,
+	urlget,
 	help		= "system$x_system.e"
 
 task	mkscript	= "system$mkscript.cl"; hidetask cmdstr

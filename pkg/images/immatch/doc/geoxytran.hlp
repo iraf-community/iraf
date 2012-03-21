@@ -190,7 +190,7 @@ The default values of these parameters are.
 .fi
 
 If the GEOMAP database is undefined then GEOXYTRAN performs a linear
-transformation on the input coordinates using the the parameters
+transformation on the input coordinates using the parameters
 \fIxref\fR, \fIyref\fR, \fIxmag\fR, \fIymag\fR, \fIxrotation\fR,
 \fIyrotation\fR, \fIxout\fR, \fIyout\fR, \fIxshift\fR, and
 \fIyshift\fR as shown below. Note that in this case xrotation and

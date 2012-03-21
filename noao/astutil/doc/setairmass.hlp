@@ -120,7 +120,7 @@ and \fBoverride\fR parameters control the header keyword output.
 
 SETAIRMASS will also calculate the universal time of the middle of the exposure
 and place the value in the header keyword specified by the \fIutmiddle\fR
-parameter.  This assumes that the value for the UT is in the the date keyword
+parameter.  This assumes that the value for the UT is in the date keyword
 or ut keyword, with the same time stamp as the sidereal time. The
 mid-observation UT is useful for interpolating calibration arc dispersion
 solutions using REFSPECTRA, especially when the exposure time is

@@ -163,7 +163,7 @@ The coordinates written to \fIoutput\fR are in the coordinate
 system defined by \fIwcsout\fR. The options are "logical", "tv",
 and "physical". The simplest default is the "logical" system. Users
 wishing to correlate the output coordinates of objects measured in
-image sections or mosaic mosaic pieces with coordinates in the parent
+image sections or mosaic pieces with coordinates in the parent
 image must use the "tv" or "physical" coordinate systems.
 
 If \fIcache\fR is yes and the host machine physical memory and working set size

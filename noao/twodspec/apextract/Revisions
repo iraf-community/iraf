@@ -1,6 +1,10 @@
 .help revisions Jun88 noao.twodspec.apextract
 .nf
 
+approfile.x
+     Fixed a bug in the Marsh algorithm causing segfaults on 64-bit
+     platforms (Buglog 583)  (3/5/12, Valdes)
+
 apall.par
      Changed the default for maxsep from 1000 to 100000.  This is because
      the default is when the user doesn't want to skip apertures and it is

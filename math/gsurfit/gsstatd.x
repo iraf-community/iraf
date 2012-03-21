@@ -3,7 +3,7 @@
 include <math/gsurfit.h>
 include "dgsurfitdef.h"
 
-# GSGET -- Procedure to fetch a real gsurfit parameter
+# GSGET -- Procedure to fetch a gsurfit parameter
 double procedure dgsgetd (sf, parameter)
 
 pointer	sf		# pointer to the surface fit
@@ -19,6 +19,31 @@ begin
 	    return (GS_YMAX(sf))
 	case GSYMIN:
 	    return (GS_YMIN(sf))
+	case GSXREF:
+	    return (GS_XREF(sf))
+	case GSYREF:
+	    return (GS_YREF(sf))
+	case GSZREF:
+	    return (GS_ZREF(sf))
+	}
+end
+
+
+# GSSET -- Procedure to set a gsurfit parameter
+procedure dgsset (sf, parameter, val)
+
+pointer	sf		# pointer to the surface fit
+int	parameter	# parameter to be fetched
+double	val		# value to set
+
+begin
+	switch (parameter) {
+	case GSXREF:
+	    GS_XREF(sf) = val
+	case GSYREF:
+	    GS_YREF(sf) = val
+	case GSZREF:
+	    GS_ZREF(sf) = val
 	}
 end
 

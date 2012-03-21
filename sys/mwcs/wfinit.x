@@ -33,6 +33,7 @@ extern	wf_zea_init(), wf_zea_fwd(), wf_zea_inv()
 extern	wf_zpx_init(), wf_zpx_fwd(), wf_zpx_inv(), wf_zpx_destroy()
 extern	wf_zpn_init(), wf_zpn_fwd(), wf_zpn_inv(), wf_zpn_destroy()
 extern	wf_tnx_init(), wf_tnx_fwd(), wf_tnx_inv(), wf_tnx_destroy()
+extern	wf_tpv_init(), wf_tpv_fwd(), wf_tpv_inv(), wf_tpv_destroy()
 
 bool	first_time
 data	first_time /true/
@@ -103,6 +104,9 @@ begin
 	call wf_fnload ("tnx", F_RADEC,
 	    locpr(wf_tnx_init), locpr(wf_tnx_destroy), locpr(wf_tnx_fwd),
 	    locpr(wf_tnx_inv))
+	call wf_fnload ("tpv", F_RADEC,
+	    locpr(wf_tpv_init), locpr(wf_tpv_destroy), locpr(wf_tpv_fwd),
+	    locpr(wf_tpv_inv))
 end
 
 

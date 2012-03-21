@@ -1,0 +1,140 @@
+.help fcache Jun2011 system
+.ih
+NAME
+fcache -- list, clean or manipulate the file cache
+.ih
+USAGE
+fcache cmd
+.ih
+PARAMETERS
+.ls cmd
+Cache command to execute.  A description of each command is given below.
+.le
+.ls pattern = "*"
+Filename substring pattern to match when initializing the cache with
+the \fIinit\fR command.
+.le
+.ls src = ""
+Source string used to generate the cache filename.  This is typically
+the full path to a local file being cached or a URL.
+.le
+.ls fname = ""
+Name of the file in the cache.
+.le
+.ls extn = ""
+Cache filename extension.
+.le
+.ls age = -1
+Age of the file (in days) to be purged with the \fIpurge\fR command.  A value
+less than zero means that the \fIcache_age\fR environment variable should 
+is used to set the age, a value of zero means to delete all files in the 
+cache  (same as the \fIinit\fR command), a value greater than zero means 
+that files older than this age will be deleted.
+.le
+.ls verbose = no
+Print status information as the task processes the command.
+.le
+.ls wait = yes
+Block on operation?  If 'yes' then the task will block until the requested
+file becomes available in the cache.
+.le
+.ls cache = "cache$"
+Cache directory to be used.
+.le
+
+.ih
+DESCRIPTION
+The \fIFCACHE\fR command is used to list or manage the system file cache
+named by the \fIcache\fR parameter.  If the \fIcache\fR directory does not
+exist, it will be created when required.  The \fIcache_age\fR environment
+variable determines the default maximum age of files in the cache, older
+files are automatically removed by the login.cl as part of the startup
+process.
+
+The IRAF file cache is used primarily to cache local copies of URLs in the
+system to prevent repeated downloads when accessing URLs from tasks.  This
+allows a URL to be passed to multiple tasks without explicitly requiring
+the user to create a named (temporary) file themselves.
+
+The \fIcmd\fR parameter determines the action to take, other parameters are
+used as needed depending on the command according to the following table:
+
+.nf
+    Command	Input Pars	Output Pars	Action
+    -------	----------	-----------	------
+    init	pattern				Initialize the cache
+    purge	age				Purge old files
+    destroy					Destroy the cache
+    list					List cache contents
+    lookup	src		fname,extn	Lookup a file in the cache
+    access	src				Is file in cache?
+    add		src extn	fname		Add file to the cache
+    delete	src		fname		Delete file from cache
+    wait	src				Wait for access to file
+.fi
+
+The \fIlookup\fR command works in two ways:  If a \fIsrc\fR string is
+provided then the \fIfname\fR parameter will contain the matching cached
+file (and \fIextn\fR will contain the optional extension), if the \fIfanme\fR
+parameter is specified then on output \fIsrc\fR will contain the original
+filename/URL.
+
+.ih
+EXAMPLES
+
+1. Remove all "url" files from the cache.
+.nf
+    cl> fcache init pattern="url"
+.fi
+
+2. List the contents of the file cache.
+.nf
+    cl> fcache list
+.fi
+
+3. Destroy a cache directory (i.e. remove it entirely).
+.nf
+    cl> fcache destroy cache="/tmp/cache"
+.fi
+
+4. Purge all cache files older than 7 days:
+.nf
+    cl> fcache purge age=7
+.fi
+
+5. Determine if a URL is already in the cache:
+.nf
+    cl> fcache add src="/tmp/dpix.fits"
+    cl> fcache list
+         f1128531670  1  /tmp/dpix.fits
+          f789045894  1  http://iraf.noao.edu/vao/dpix.fits
+    cl> fcache access src="/tmp/dpix.fits"
+    yes
+    cl> fcache access src="http://iraf.noao.edu/vao/dpix.fits"
+    yes
+.fi
+
+6. Delete a cached URL:
+.nf
+    cl> fcache delete src="http://iraf.noao.edu/vao/dpix.fits"
+.fi
+
+7. Add a local file to the cache, then look it up:
+.nf
+    cl> fcache add src="/tmp/test.fits"
+    cl> fcache lookup src="/tmp/test.fits"
+    cl> =fcache.fname
+    f1295587026
+    cl> fcache lookup fname="f1295587026"
+    cl> =fcache.src
+    /tmp/test.fits
+.fi
+
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+head
+.endhelp

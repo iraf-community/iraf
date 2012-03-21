@@ -152,6 +152,17 @@ end
 # rdnoise in photons, dark rate in photons per second, pixel size in microns,
 # and the effective DQE for each filter.
 
+detector = "MOSAIC1_1"
+        rdnoise = 4.9
+        dark = 0.00102
+        pixsize = 15
+        U = 0.55
+        B = 0.84
+        V = 0.84
+        R = 0.84
+        I = 0.79
+	z = 0.77
+
 detector = "MOSAIC1"
         rdnoise = 5.0
         dark = 0.0015

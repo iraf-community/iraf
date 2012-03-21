@@ -52,7 +52,7 @@ begin
 
 	    nchars = (GKI_CLOSEWS_LEN + n) * SZ_SHORT
 	    if (IS_FILE(fd) && (fd >= STDGRAPH && fd <= STDPLOT)) {
-		call write (PSIOCTRL, fd, SZ_INT)
+		call write (PSIOCTRL, fd, SZ_INT32)
 		call write (PSIOCTRL, Mems[gki], nchars)
 		call flush (PSIOCTRL)
 	    }

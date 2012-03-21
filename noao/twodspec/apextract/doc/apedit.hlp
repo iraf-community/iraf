@@ -290,7 +290,7 @@ nearest aperture
 to the cursor is used.  This allows selective recentering, resizing,
 tracing and extracting.
 If the ALL flag is set then all apertures are traced or extracted.
-When extracting the the output rootname and profile name are queried.
+When extracting the output, rootname and profile name are queried.
 
 Some general purpose keys window the graph 'w' using the \fBgtools\fR
 commands, redraw the graph 'r', and quit 'q'.

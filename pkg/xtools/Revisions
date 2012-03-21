@@ -1,5 +1,24 @@
 .help revisions Jun88 pkg.xtools
 .nf
+
+rmsorted.x
+    A 64-bit problem was fixed.  (12/5/11, Valdes)
+
+catquery/cqdef.x
+catquery/cqquery.x
+catquery/cqimquery.x
+    Modified the URL access to use the new url_get() procedure as a
+    compile-time option.  This allows access to servers that may
+    redirect the URL or return some other http error. (10/5/11, MJF)
+
+fixpix/ytpmmap.x
+    The world matching was not right.  It may still have bugs but the
+    discovered problem has been fixed.  (3/3/11, Valdes)
+
+=======
+2.15.1a
+=======
+
 pkg/xtools/icfit/icdeviant.gx
     There were two bugs related to growing.  First, the logic was wrong.
     Second, in one place the grow parameter was treated as being in pixels

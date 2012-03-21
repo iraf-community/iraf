@@ -26,7 +26,7 @@ int	refit				# Refit the curve?
 int	nreject				# Number of points rejected
 int	newreject			# Number of new points rejected
 
-int	i, j, i_min, i_max, ilast, pixgrow
+int	i, j, i_min, i_max, pixgrow
 double	sigma, low_cut, high_cut, residual
 pointer	sp, residuals
 
@@ -80,11 +80,16 @@ begin
 	# A for loop is used instead of do because with region growing we
 	# want to modify the loop index.
 
-	do i = 1, npts-1 {
-	    if (i == 1)
-		pixgrow = grow / abs (x[i+1] - x[i])
-	    else
-		pixgrow = max (grow / abs (x[i+1] - x[i]), pixgrow)
+	pixgrow = 0
+        if (grow > 0.) {
+	    do i = 1, npts-1 {
+		if (abs (x[i+1] - x[i]) < 0.0001)
+		    next
+		if (i == 1)
+		    pixgrow = grow / abs (x[i+1] - x[i])
+		else
+		    pixgrow = max (grow / abs (x[i+1] - x[i]), pixgrow)
+	    }
 	}
 
 	newreject = 0

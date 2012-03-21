@@ -12,7 +12,7 @@ List of images to be plotted.  These may be one dimensional, multiaperture,
 long slit, or nonspectral images.
 .le
 .ls records (imred.irs and imred.iids only)
-List of records records to be appended to the input image root names when
+List of records to be appended to the input image root names when
 using record number extension format.  The syntax of this list is comma
 separated record numbers or ranges of record numbers.  A range consists of
 two numbers separated by a hyphen.  A null list may be used if no record

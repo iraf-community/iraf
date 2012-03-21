@@ -53,7 +53,7 @@ the weights are set to the difference between adjacent data points.
 The data must be sorted in x in order to use the WTS_SPACING mode.
 In WTS_UNIFORM mode the reduced chi-squared returned by CVERRORS 
 is the variance of the fit and the errors in the coefficients are scaled
-by the square root of this variance. Otherwise the the weights are
+by the square root of this variance. Otherwise the weights are
 interpreted as one over the variance of the data and the true reduced
 chi-squared is returned.
 

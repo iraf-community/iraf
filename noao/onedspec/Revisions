@@ -1,6 +1,50 @@
 .help revisions Jun88 noao.onedspec
 .nf
 
+splot/anshdr.x
+    Added a F_FLUSHNL flag to the logfile descriptors to flush the 
+    data as it is written (5/12/12, MJF)
+
+splot/spdeblend.x
+    Added overplotting of individual components.  (12/5/11, Valdes)
+
+====
+2.16
+====
+
+hireswcal.cl
+    A script I wrote for Simon Schuler to apply the wavelength calibrations
+    that he got for hires spectra from Geoff Marcy.  This is put here for
+    safe keeping.  (11/16/11, Valdes)
+
+t_deredden.x
+    There was a small error in coding the formulae of Cardelli, et al.
+    (6/28/11, Valdes)
+
+splot/spdeblend.x
+    An integer allocated array was being freed as a real array causing
+    an error with deblending on 64-bit systems.  (6/6/11, Valdes)
+
+=======
+2.15.1a
+=======
+
+======
+2.15.1
+======
+
+scombine/icgdata.x
+    This code uses the SX array to pass in mask values.  The code, taken from
+    an old version of imcombine, treats the mask array as integers.  All the
+    dereferencing of this mask array were changed to reals.
+
+scombine/t_scombine.x
+    The SX pointer (allocated as real) was being used in a Memi, causing
+    a segfault on some 64-bit systems (4/3/11/, MJF)
+
+specplot.h
+    Fixed improper use of P2R in macro. (3/31/11, MJF)
+
 continuum.par
 odcombine.par
 sfit.par

@@ -1,0 +1,281 @@
+\hypertarget{xrArray_8c}{
+\section{xrArray.c File Reference}
+\label{xrArray_8c}\index{xrArray.c@{xrArray.c}}
+}
+Methods used to manage Arrays.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$xmlrpc-c/base.h$>$}\par
+{\tt \#include $<$xmlrpc-c/client.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server\_\-abyss.h$>$}\par
+{\tt \#include \char`\"{}xrpcP.h\char`\"{}}\par
+\subsection*{Data Structures}
+\begin{CompactItemize}
+\item 
+struct \textbf{AElement}
+\end{CompactItemize}
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrArray_8c_6fc88d7dbc85d8d10379f58c910ce847}{
+\#define \textbf{SZ\_\-NAME}~64}
+\label{xrArray_8c_6fc88d7dbc85d8d10379f58c910ce847}
+
+\end{CompactItemize}
+\subsection*{Typedefs}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrArray_8c_17cdfd76e410b970e11b4ca489e631ee}{
+typedef struct AElement $\ast$ \textbf{AElementP}}
+\label{xrArray_8c_17cdfd76e410b970e11b4ca489e631ee}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+int \hyperlink{xrArray_8c_2c418450f94fa3fb862cc664d914e314}{xr\_\-newArray} ()
+\begin{CompactList}\small\item\em Create a new Array object. \item\end{CompactList}\item 
+void \hyperlink{xrArray_8c_27efc4b015a209ec9ccb06a0f7fa9239}{xr\_\-freeArray} (int anum)
+\begin{CompactList}\small\item\em Free an Array object. \item\end{CompactList}\item 
+int \hyperlink{xrArray_8c_207ebafc6c04babdc0dd8844e3bb6892}{xr\_\-arrayLen} (int anum)
+\begin{CompactList}\small\item\em Return the length of an array. \item\end{CompactList}\item 
+void \hyperlink{xrArray_8c_a22b80f7b59564d3e61415d27cb1a8dc}{xr\_\-setIntInArray} (int anum, int value)
+\item 
+void \hyperlink{xrArray_8c_6f091a8705c885d04512e434e9fcb720}{xr\_\-setDoubleInArray} (int anum, double value)
+\item 
+void \hyperlink{xrArray_8c_46e5f679a448e4959e7f3fa1fb40338d}{xr\_\-setBoolInArray} (int anum, int value)
+\item 
+void \hyperlink{xrArray_8c_03a9d0e426ad2718552186cfe1a72afb}{xr\_\-setStringInArray} (int anum, char $\ast$value)
+\item 
+void \hyperlink{xrArray_8c_45f32c4f7d23e008a4cf3ca19485dcf1}{xr\_\-setDatetimeInArray} (int anum, char $\ast$value)
+\item 
+void \hyperlink{xrArray_8c_d1d9fe40998dc5cd2505058089ca346a}{xr\_\-setStructInArray} (int anum, int value)
+\item 
+void \hyperlink{xrArray_8c_5090ce00233809cc6cb1ff7041baccf7}{xr\_\-setArrayInArray} (int anum, int value)
+\item 
+void \hyperlink{xrArray_8c_5a66f61afae1b861c384164b794aadb3}{xr\_\-getIntFromArray} (int anum, int index, int $\ast$ival)
+\item 
+void \hyperlink{xrArray_8c_95f132b89b646864b876c4bcf7f15b24}{xr\_\-getDoubleFromArray} (int anum, int index, double $\ast$dval)
+\item 
+void \hyperlink{xrArray_8c_dae6b81b748509ea94f907d21902eef1}{xr\_\-getBoolFromArray} (int anum, int index, int $\ast$bval)
+\item 
+void \hyperlink{xrArray_8c_0ea6ef3413363b2c85ede66dce766bb4}{xr\_\-getStringFromArray} (int anum, int index, char $\ast$$\ast$value)
+\item 
+void \hyperlink{xrArray_8c_333c0d859b0ce2a40506e778a0a2cde2}{xr\_\-getDatetimeFromArray} (int anum, int index, char $\ast$$\ast$value)
+\item 
+void \hyperlink{xrArray_8c_a91f866f1a5d195d2f82dcfb6e612671}{xr\_\-getStructFromArray} (int anum, int index, int $\ast$value)
+\item 
+void \hyperlink{xrArray_8c_358b34a2f4b6ee0362bca5b013d7e6e2}{xr\_\-getArrayFromArray} (int anum, int index, int $\ast$value)
+\item 
+\hypertarget{xrArray_8c_637bf951738009c607a30b1315f796e8}{
+xmlrpc\_\-value $\ast$ \textbf{xr\_\-getAElement} (int anum)}
+\label{xrArray_8c_637bf951738009c607a30b1315f796e8}
+
+\item 
+\hypertarget{xrArray_8c_f86f5cad537939e701f2eaf80cd0dd37}{
+void \textbf{xr\_\-setAElement} (int anum, xmlrpc\_\-value $\ast$v)}
+\label{xrArray_8c_f86f5cad537939e701f2eaf80cd0dd37}
+
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrArray_8c_ace0c04d503f8dda2284ae61a8344b8b}{
+int \textbf{narrays} = -1}
+\label{xrArray_8c_ace0c04d503f8dda2284ae61a8344b8b}
+
+\item 
+\hypertarget{xrArray_8c_fb9693c09dad975e0bf1a2d1a6969c7c}{
+AElement \textbf{aElements} \mbox{[}MAX\_\-ARRAYS\mbox{]}}
+\label{xrArray_8c_fb9693c09dad975e0bf1a2d1a6969c7c}
+
+\item 
+\hypertarget{xrArray_8c_a29b3bff99e236a458f9ca31cd106587}{
+xmlrpc\_\-env \textbf{env}}
+\label{xrArray_8c_a29b3bff99e236a458f9ca31cd106587}
+
+\item 
+\hypertarget{xrArray_8c_8cf4155643b866ef45abfed82e09539a}{
+int \textbf{client\_\-verbose}}
+\label{xrArray_8c_8cf4155643b866ef45abfed82e09539a}
+
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Methods used to manage Arrays. 
+
+XRARRAY.c -- Methods used to manage Arrays.
+
+Methods used to manage Arrays.
+
+anum = xr\_\-newArray () xr\_\-freeArray (int anum) len = xr\_\-arrayLen (int anum)
+
+xr\_\-setIntInArray (int anum, int value) xr\_\-setDoubleInArray (int anum, double value) xr\_\-setBoolInArray (int anum, int value) xr\_\-setStringInArray (int anum, char $\ast$value) xr\_\-setDatetimeInArray (int anum, char $\ast$value) xr\_\-setStructInArray (int anum, int svalue) xr\_\-setArrayInArray (int anum, int avalue)
+
+xr\_\-getIntFromArray (int anum, int index, int $\ast$value) xr\_\-getDoubleFromArray (int anum, int index, double $\ast$value) xr\_\-getBoolFromArray (int anum, int index, int $\ast$value) xr\_\-getStringFromArray (int anum, int index, char $\ast$$\ast$value) xr\_\-getDatetimeFromArray (int anum, int index, char $\ast$$\ast$value) xr\_\-getStructFromArray (int anum, int index, int $\ast$value) xr\_\-getArrayFromArray (int anum, int index, int $\ast$value)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]6/10/09 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{xrArray_8c_207ebafc6c04babdc0dd8844e3bb6892}{
+\index{xrArray.c@{xrArray.c}!xr\_\-arrayLen@{xr\_\-arrayLen}}
+\index{xr\_\-arrayLen@{xr\_\-arrayLen}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-arrayLen}]{\setlength{\rightskip}{0pt plus 5cm}len xr\_\-arrayLen (int {\em anum})}}
+\label{xrArray_8c_207ebafc6c04babdc0dd8844e3bb6892}
+
+
+Return the length of an array. 
+
+XR\_\-ARRAYLEN -- Return length of an array.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em anum}]array number \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]length of array \end{Desc}
+\hypertarget{xrArray_8c_27efc4b015a209ec9ccb06a0f7fa9239}{
+\index{xrArray.c@{xrArray.c}!xr\_\-freeArray@{xr\_\-freeArray}}
+\index{xr\_\-freeArray@{xr\_\-freeArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-freeArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-freeArray (int {\em anum})}}
+\label{xrArray_8c_27efc4b015a209ec9ccb06a0f7fa9239}
+
+
+Free an Array object. 
+
+XR\_\-FREEARRAY -- Free an a new Array object.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em anum}]array number \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+\hypertarget{xrArray_8c_358b34a2f4b6ee0362bca5b013d7e6e2}{
+\index{xrArray.c@{xrArray.c}!xr\_\-getArrayFromArray@{xr\_\-getArrayFromArray}}
+\index{xr\_\-getArrayFromArray@{xr\_\-getArrayFromArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-getArrayFromArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-getArrayFromArray (int {\em anum}, \/  int {\em index}, \/  int $\ast$ {\em value})}}
+\label{xrArray_8c_358b34a2f4b6ee0362bca5b013d7e6e2}
+
+
+XR\_\-GETARRAYFROMARRAY -- Get an Array from an Array. \hypertarget{xrArray_8c_dae6b81b748509ea94f907d21902eef1}{
+\index{xrArray.c@{xrArray.c}!xr\_\-getBoolFromArray@{xr\_\-getBoolFromArray}}
+\index{xr\_\-getBoolFromArray@{xr\_\-getBoolFromArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-getBoolFromArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-getBoolFromArray (int {\em anum}, \/  int {\em index}, \/  int $\ast$ {\em bval})}}
+\label{xrArray_8c_dae6b81b748509ea94f907d21902eef1}
+
+
+XR\_\-GETBOOLFROMARRAY -- Get a bool from an Array. \hypertarget{xrArray_8c_333c0d859b0ce2a40506e778a0a2cde2}{
+\index{xrArray.c@{xrArray.c}!xr\_\-getDatetimeFromArray@{xr\_\-getDatetimeFromArray}}
+\index{xr\_\-getDatetimeFromArray@{xr\_\-getDatetimeFromArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-getDatetimeFromArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-getDatetimeFromArray (int {\em anum}, \/  int {\em index}, \/  char $\ast$$\ast$ {\em value})}}
+\label{xrArray_8c_333c0d859b0ce2a40506e778a0a2cde2}
+
+
+XR\_\-GETDATETIMEFROMARRAY -- Get a Datetime from an Array. \hypertarget{xrArray_8c_95f132b89b646864b876c4bcf7f15b24}{
+\index{xrArray.c@{xrArray.c}!xr\_\-getDoubleFromArray@{xr\_\-getDoubleFromArray}}
+\index{xr\_\-getDoubleFromArray@{xr\_\-getDoubleFromArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-getDoubleFromArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-getDoubleFromArray (int {\em anum}, \/  int {\em index}, \/  double $\ast$ {\em dval})}}
+\label{xrArray_8c_95f132b89b646864b876c4bcf7f15b24}
+
+
+XR\_\-GETDOUBLEFROMARRAY -- Get a double from an array. \hypertarget{xrArray_8c_5a66f61afae1b861c384164b794aadb3}{
+\index{xrArray.c@{xrArray.c}!xr\_\-getIntFromArray@{xr\_\-getIntFromArray}}
+\index{xr\_\-getIntFromArray@{xr\_\-getIntFromArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-getIntFromArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-getIntFromArray (int {\em anum}, \/  int {\em index}, \/  int $\ast$ {\em value})}}
+\label{xrArray_8c_5a66f61afae1b861c384164b794aadb3}
+
+
+XR\_\-GETINTFROMARRAY -- Get an int from an array. \hypertarget{xrArray_8c_0ea6ef3413363b2c85ede66dce766bb4}{
+\index{xrArray.c@{xrArray.c}!xr\_\-getStringFromArray@{xr\_\-getStringFromArray}}
+\index{xr\_\-getStringFromArray@{xr\_\-getStringFromArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-getStringFromArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-getStringFromArray (int {\em anum}, \/  int {\em index}, \/  char $\ast$$\ast$ {\em value})}}
+\label{xrArray_8c_0ea6ef3413363b2c85ede66dce766bb4}
+
+
+XR\_\-GETSTRINGFROMARRAY -- Get a String from an Array. \hypertarget{xrArray_8c_a91f866f1a5d195d2f82dcfb6e612671}{
+\index{xrArray.c@{xrArray.c}!xr\_\-getStructFromArray@{xr\_\-getStructFromArray}}
+\index{xr\_\-getStructFromArray@{xr\_\-getStructFromArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-getStructFromArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-getStructFromArray (int {\em anum}, \/  int {\em index}, \/  int $\ast$ {\em value})}}
+\label{xrArray_8c_a91f866f1a5d195d2f82dcfb6e612671}
+
+
+XR\_\-GETSTRUCTFROMARRAY -- Get a Struct from an Array. 
+
+References xr\_\-newStruct().\hypertarget{xrArray_8c_2c418450f94fa3fb862cc664d914e314}{
+\index{xrArray.c@{xrArray.c}!xr\_\-newArray@{xr\_\-newArray}}
+\index{xr\_\-newArray@{xr\_\-newArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-newArray}]{\setlength{\rightskip}{0pt plus 5cm}int xr\_\-newArray (void)}}
+\label{xrArray_8c_2c418450f94fa3fb862cc664d914e314}
+
+
+Create a new Array object. 
+
+XR\_\-NEWARRAY -- Create a new Array object.
+
+\begin{Desc}
+\item[Returns:]status code (-1 on error) \end{Desc}
+\hypertarget{xrArray_8c_5090ce00233809cc6cb1ff7041baccf7}{
+\index{xrArray.c@{xrArray.c}!xr\_\-setArrayInArray@{xr\_\-setArrayInArray}}
+\index{xr\_\-setArrayInArray@{xr\_\-setArrayInArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-setArrayInArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-setArrayInArray (int {\em anum}, \/  int {\em value})}}
+\label{xrArray_8c_5090ce00233809cc6cb1ff7041baccf7}
+
+
+XR\_\-SETARRAYINARRAY -- Set an array in an array. \hypertarget{xrArray_8c_46e5f679a448e4959e7f3fa1fb40338d}{
+\index{xrArray.c@{xrArray.c}!xr\_\-setBoolInArray@{xr\_\-setBoolInArray}}
+\index{xr\_\-setBoolInArray@{xr\_\-setBoolInArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-setBoolInArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-setBoolInArray (int {\em anum}, \/  int {\em value})}}
+\label{xrArray_8c_46e5f679a448e4959e7f3fa1fb40338d}
+
+
+XR\_\-SETBOOLINARRAY -- Set a bool in an array. \hypertarget{xrArray_8c_45f32c4f7d23e008a4cf3ca19485dcf1}{
+\index{xrArray.c@{xrArray.c}!xr\_\-setDatetimeInArray@{xr\_\-setDatetimeInArray}}
+\index{xr\_\-setDatetimeInArray@{xr\_\-setDatetimeInArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-setDatetimeInArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-setDatetimeInArray (int {\em anum}, \/  char $\ast$ {\em value})}}
+\label{xrArray_8c_45f32c4f7d23e008a4cf3ca19485dcf1}
+
+
+XR\_\-SETDATETIMEaINARRAY -- Set a datetime in an array. \hypertarget{xrArray_8c_6f091a8705c885d04512e434e9fcb720}{
+\index{xrArray.c@{xrArray.c}!xr\_\-setDoubleInArray@{xr\_\-setDoubleInArray}}
+\index{xr\_\-setDoubleInArray@{xr\_\-setDoubleInArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-setDoubleInArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-setDoubleInArray (int {\em anum}, \/  double {\em value})}}
+\label{xrArray_8c_6f091a8705c885d04512e434e9fcb720}
+
+
+XR\_\-SETDOUBLEINARRAY -- Set a double in an array. \hypertarget{xrArray_8c_a22b80f7b59564d3e61415d27cb1a8dc}{
+\index{xrArray.c@{xrArray.c}!xr\_\-setIntInArray@{xr\_\-setIntInArray}}
+\index{xr\_\-setIntInArray@{xr\_\-setIntInArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-setIntInArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-setIntInArray (int {\em anum}, \/  int {\em value})}}
+\label{xrArray_8c_a22b80f7b59564d3e61415d27cb1a8dc}
+
+
+XR\_\-SETINTINARRAY -- Set an int in an array. \hypertarget{xrArray_8c_03a9d0e426ad2718552186cfe1a72afb}{
+\index{xrArray.c@{xrArray.c}!xr\_\-setStringInArray@{xr\_\-setStringInArray}}
+\index{xr\_\-setStringInArray@{xr\_\-setStringInArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-setStringInArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-setStringInArray (int {\em anum}, \/  char $\ast$ {\em value})}}
+\label{xrArray_8c_03a9d0e426ad2718552186cfe1a72afb}
+
+
+XR\_\-SETSTRINGINARRAY -- Set a string in an array. \hypertarget{xrArray_8c_d1d9fe40998dc5cd2505058089ca346a}{
+\index{xrArray.c@{xrArray.c}!xr\_\-setStructInArray@{xr\_\-setStructInArray}}
+\index{xr\_\-setStructInArray@{xr\_\-setStructInArray}!xrArray.c@{xrArray.c}}
+\subsubsection[{xr\_\-setStructInArray}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-setStructInArray (int {\em anum}, \/  int {\em value})}}
+\label{xrArray_8c_d1d9fe40998dc5cd2505058089ca346a}
+
+
+XR\_\-SETSTRUCTINARRAY -- Set a struct in an array. 

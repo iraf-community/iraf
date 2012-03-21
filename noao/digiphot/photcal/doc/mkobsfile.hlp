@@ -83,7 +83,7 @@ If \fIshifts\fR is the standard input "STDIN", MKOBSFILE prompts the
 user  for the correct x and y shift for each image in each image set.
 Otherwise the shifts are assumed to be listed in \fIshifts\fR,
 1 image per line, with
-the name of the image in column 1, followed by the the x and y shifts
+the name of the image in column 1, followed by the x and y shifts
 in columns 2 and 3 respectively. Image names must match those in \fIimsets\fR.
 Images for which no shift is supplied are assigned x and y shifts of zero.
 .le

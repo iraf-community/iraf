@@ -309,7 +309,7 @@ double	p[2]			#I output physical coordinates
 
 int	ira, idec, niter
 double	ra, dec, cosdec, sindec, cosra, sinra, x, y, phi, theta, s, r, dphi, z
-double	xm, ym, f, fx, fy, g, gx, gy, denom, dx, dy
+double	xm, ym, f, fx, fy, g, gx, gy, denom, dx, dy, dmax
 double	wf_gseval(), wf_gsder()
 
 begin
@@ -380,6 +380,7 @@ begin
 		x = xm
 		y = ym
 		niter = 0
+		dmax = 30. / 3600.
 		repeat {
 
 		    if (FC_LNGCOR(fc) != NULL) {
@@ -408,8 +409,8 @@ begin
 			break
 		    dx = (-f * gy + g * fy) / denom
 		    dy = (-g * fx + f * gx) / denom
-		    x = x + max (-1.0D0, min (1.0D0, dx))
-		    y = y + max (-1.0D0, min (1.0D0, dy))
+		    x = x + max (-dmax, min (dmax, dx))
+		    y = y + max (-dmax, min (dmax, dy))
 		    if (max (abs (dx), abs (dy), abs(f), abs(g)) < 2.80d-7)
 			break
 

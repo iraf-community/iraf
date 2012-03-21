@@ -240,7 +240,7 @@ which are fit during the PSF model generation process.
 .fi
 
 
-The predicted errors in the the DAOPHOT photometry are computed per
+The predicted errors in the DAOPHOT photometry are computed per
 pixel as follows, where terms 1, 2, 3, and 4 represent the readout
 noise, the poisson noise, the flat-fielding error, and the interpolation
 error respectively. The quantities readnoise, epadu, I, M, p1, and p2

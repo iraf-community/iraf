@@ -1,4 +1,5 @@
 include <fset.h>
+include <ctype.h>
 include "cqdef.h"
 include "cq.h"
 
@@ -50,10 +51,11 @@ pointer	cq			#I the catalog database descriptor
 char	imname[ARB]		#I the image name
 
 pointer	res, inbuf
-int	cc, fd, outfd, nchars
+char	url[SZ_PATHNAME], addr[SZ_LINE], query[SZ_LINE], buf[SZ_LINE]
+int	cc, fd, outfd, nchars, ip, op
 bool	done
 pointer	cq_irinit()
-int	ndopen(), strlen(), open(), read(), getline()
+int	ndopen(), strlen(), open(), read(), getline(), url_get()
 errchk	ndopen(), awriteb(), open(), read(), getline()
 
 begin
@@ -63,6 +65,46 @@ begin
         if (CQ_CATNO(cq) < 1 || CQ_CATNO(cq) > CQ_NRECS(cq))
             return (NULL)
 	cc = CQ_CAT(cq)
+
+
+	if (USE_URLGET) {
+	    # Initialize the image results structure.
+	    res = cq_irinit (cq)
+
+	    call strcpy (CQ_ADDRESS(cc), buf, SZ_LINE)
+	    for (ip=1; buf[ip] != ':'; ip=ip+1) ;	# skip 'inet:'
+	    ip = ip + 1
+	    for (    ; buf[ip] != ':'; ip=ip+1) ;	# skip '80:'
+	    ip = ip + 1
+	    for (op=1; buf[ip] != ':'; ip=ip+1) {
+		addr[op] = buf[ip]
+		op = op + 1
+	    }
+	    addr[op] = EOS
+
+	    call strcpy (CQ_IMQUERY(res), buf, SZ_LINE)
+	    for (op=1; !IS_WHITE(buf[op+4]); op=op+1)
+		query[op] = buf[op+4]
+	    query[op] = EOS
+
+	    call sprintf (url, SZ_LINE, "http://%s%s")
+		call pargstr (addr)
+		call pargstr (query)
+
+	    iferr {
+	        call malloc (inbuf, DEF_SZ_INBUF, TY_CHAR)
+		if (url_get (url, imname, inbuf) < 0)
+		    call error (0, "Cannot access url")
+		call mfree (inbuf, TY_CHAR)
+	    } then {
+	        if (res != NULL)
+	            call cq_imclose (res)
+		return (NULL)
+	    }
+
+	    return (res)
+	}
+
 
 	# Open the network connection.
 	iferr (fd = ndopen (CQ_ADDRESS(cc), READ_WRITE))

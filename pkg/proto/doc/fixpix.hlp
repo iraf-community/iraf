@@ -15,7 +15,7 @@ linear interpolation.
 .le
 .ls masks
 List of bad pixel masks, images, or files (collectively called masks)
-identifying the bad pixels.  The list of masks must either match the the
+identifying the bad pixels.  The list of masks must either match the
 list of input images in number or a single mask may be specified to apply
 to all images.  The special name "BPM" may be specified to select a mask
 specified by the header keyword "BPM" in the input image.  The possible
@@ -35,7 +35,7 @@ lines and 3 for pixels with narrow dimension along columns.
 .le
 .ls verbose = no
 If this parameter is set to yes a line identifying each image and
-associated mask is printed.  If the the \fIpixels\fR parameter is
+associated mask is printed.  If the \fIpixels\fR parameter is
 set then a list of the pixels modified is also printed.
 .le
 .ls pixels = no
@@ -91,7 +91,7 @@ with narrow dimension along columns.
 The \fIverbose\fR allows printing a line giving the task name, the
 image name, and the mask name.  In addition, if the \fIpixels\fR
 parameter is set the pixels modified are listed.  The list of pixels
-consists of the column and line of the the pixel, the original
+consists of the column and line of the pixel, the original
 and replaced pixel values, and the column and line of the one or two
 pixels used for the interpolation.  If the bad pixel region has no
 pixels at one end, that is there are bad pixels all the way to one edge

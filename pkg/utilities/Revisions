@@ -1,5 +1,17 @@
 .help revisions Jun88 pkg.utilities
 .nf
+
+mkpkg
+utilities.hd
+lcase.x	-> t_lcase.x
+luase.x	-> t_ucase.x
+split.x	-> t_split.x
+detab.x	-> t_detab.x
+entab.x	-> t_entab.x
+doc/bases.hlp			+
+    Renamed files, added help page for BASES task. (10/24/11)
+
+
 =======
 V2.12.2
 =======

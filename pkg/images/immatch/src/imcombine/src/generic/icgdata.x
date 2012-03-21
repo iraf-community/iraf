@@ -291,7 +291,8 @@ begin
 				Memi[mp] = Memi[m[k]+j-1]
 				Memi[m[k]+j-1] = 0
 			    }
-			}
+			} else
+			    Memi[ip] = 0
 			dp = dp + 1
 			ip = ip + 1
 			mp = mp + 1
@@ -299,7 +300,7 @@ begin
 		}
 		if (grow >= 1.) {
 		    do j = 1, npts {
-			do i = n[j]+1, nused
+			do i = n[j]+1, nimages
 			    Memi[id[i]+j-1] = 0
 		    }
 		}
@@ -671,7 +672,8 @@ begin
 				Memi[mp] = Memi[m[k]+j-1]
 				Memi[m[k]+j-1] = 0
 			    }
-			}
+			} else
+			    Memi[ip] = 0
 			dp = dp + 1
 			ip = ip + 1
 			mp = mp + 1
@@ -679,7 +681,7 @@ begin
 		}
 		if (grow >= 1.) {
 		    do j = 1, npts {
-			do i = n[j]+1, nused
+			do i = n[j]+1, nimages
 			    Memi[id[i]+j-1] = 0
 		    }
 		}
@@ -1051,7 +1053,8 @@ begin
 				Memi[mp] = Memi[m[k]+j-1]
 				Memi[m[k]+j-1] = 0
 			    }
-			}
+			} else
+			    Memi[ip] = 0
 			dp = dp + 1
 			ip = ip + 1
 			mp = mp + 1
@@ -1059,7 +1062,7 @@ begin
 		}
 		if (grow >= 1.) {
 		    do j = 1, npts {
-			do i = n[j]+1, nused
+			do i = n[j]+1, nimages
 			    Memi[id[i]+j-1] = 0
 		    }
 		}
@@ -1431,7 +1434,8 @@ begin
 				Memi[mp] = Memi[m[k]+j-1]
 				Memi[m[k]+j-1] = 0
 			    }
-			}
+			} else
+			    Memi[ip] = 0
 			dp = dp + 1
 			ip = ip + 1
 			mp = mp + 1
@@ -1439,7 +1443,7 @@ begin
 		}
 		if (grow >= 1.) {
 		    do j = 1, npts {
-			do i = n[j]+1, nused
+			do i = n[j]+1, nimages
 			    Memi[id[i]+j-1] = 0
 		    }
 		}

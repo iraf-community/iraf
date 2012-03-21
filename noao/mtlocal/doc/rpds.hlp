@@ -8,7 +8,7 @@ rpds pds_file file_list iraf_file
 .ih
 PARAMETERS
 .ls pds_file
-The PDS data source. The data data source may be a template specifying
+The PDS data source. The data source may be a template specifying
 a list of disk files, e.g. pds* or a mag tape file specification of
 the form mtl*[n], e.g. "mta1600" or "mtb800[1]". The mt specifies magtape,
 l specifies the drive, a,b,c etc, * specifies the density and [n]

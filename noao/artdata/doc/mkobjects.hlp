@@ -368,7 +368,7 @@ of subpixels to change as a function of distance from the
 profile center.  Since the profile center is where the intensity
 changes most rapidly with position, the greatest subsampling is needed for
 the pixel nearest the center.  Further from the object center the intensity
-changes more slowly and the the number of subpixels may be reduced.
+changes more slowly and the number of subpixels may be reduced.
 Thus, the number of subpixels in each dimension in each pixel is
 decreased linearly with distance from the profile center.  For example,
 a pixel which is 3.2 pixels from the profile center will have

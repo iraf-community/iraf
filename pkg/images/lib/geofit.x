@@ -48,6 +48,12 @@ begin
 	GM_REJECT(fit) = reject
 	GM_NREJECT(fit) = 0
 	GM_REJ(fit) = NULL
+
+	# Set origin parameters.
+	GM_XO(fit) = INDEFD
+	GM_YO(fit) = INDEFD
+	GM_XOREF(fit) = INDEFD
+	GM_YOREF(fit) = INDEFD
 end
 
 
@@ -115,8 +121,10 @@ begin
 		sx2 = NULL
 		sy2 = NULL
 	default:
+	    GM_ZO(fit) = GM_XOREF(fit)
 	    call geo_fxyr (fit, sx1, sx2, xref, yref, xin, wts,
 	        Memr[xresidual], npts, YES, xerrmsg, maxch)
+	    GM_ZO(fit) = GM_YOREF(fit)
 	    call geo_fxyr (fit, sy1, sy2, xref, yref, yin, wts,
 	        Memr[yresidual], npts, NO, yerrmsg, maxch)
 	}
@@ -945,6 +953,18 @@ begin
 	    default:
 	        call gsinit (sf1, GM_FUNCTION(fit), 2, 2, GS_XNONE, xmin, xmax,
 	            ymin, ymax)
+		if (IS_INDEFD(GM_XO(fit)))
+		    call gsset (sf1, GSXREF, INDEFR)
+		else
+		    call gsset (sf1, GSXREF, real (GM_XO(fit)))
+		if (IS_INDEFD(GM_YO(fit)))
+		    call gsset (sf1, GSYREF, INDEFR)
+		else
+		    call gsset (sf1, GSYREF, real (GM_YO(fit)))
+		if (IS_INDEFD(GM_ZO(fit)))
+		    call gsset (sf1, GSZREF, INDEFR)
+		else
+		    call gsset (sf1, GSZREF, real (GM_ZO(fit)))
 	        call gsfit (sf1, x, y, z, wts, npts, WTS_USER, ier)
 	        if (GM_XXORDER(fit) > 2 || GM_XYORDER(fit) > 2 ||
 		    GM_XXTERMS(fit) == GS_XFULL)
@@ -992,6 +1012,18 @@ begin
 	    default:
 	        call gsinit (sf1, GM_FUNCTION(fit), 2, 2, GS_XNONE, xmin,
 	            xmax, ymin, ymax)
+		if (IS_INDEFD(GM_XO(fit)))
+		    call gsset (sf1, GSXREF, INDEFR)
+		else
+		    call gsset (sf1, GSXREF, real (GM_XO(fit)))
+		if (IS_INDEFD(GM_YO(fit)))
+		    call gsset (sf1, GSYREF, INDEFR)
+		else
+		    call gsset (sf1, GSYREF, real (GM_YO(fit)))
+		if (IS_INDEFD(GM_ZO(fit)))
+		    call gsset (sf1, GSZREF, INDEFR)
+		else
+		    call gsset (sf1, GSZREF, real (GM_ZO(fit)))
 	        call gsfit (sf1, x, y, z, wts, npts, WTS_USER, ier)
 	        if (GM_YXORDER(fit) > 2 || GM_YYORDER(fit) > 2 ||
 	            GM_YXTERMS(fit) == GS_XFULL)
@@ -1236,8 +1268,10 @@ begin
 		    sx2 = NULL
 		    sy2 = NULL
 	    default:
+		GM_ZO(fit) = GM_XOREF(fit)
 	        call geo_fxyr (fit, sx1, sx2, xref, yref, xin, Memr[twts],
 	            xresid, npts, YES, xerrmsg, xmaxch)
+		GM_ZO(fit) = GM_YOREF(fit)
 	        call geo_fxyr (fit, sy1, sy2, xref, yref, yin, Memr[twts],
 	            yresid, npts, NO, yerrmsg, ymaxch)
 	    }
@@ -1329,8 +1363,10 @@ begin
 		sx2 = NULL
 		sy2 = NULL
 	default:
+	    GM_ZO(fit) = GM_XOREF(fit)
 	    call geo_fxyd (fit, sx1, sx2, xref, yref, xin, wts,
 	        Memd[xresidual], npts, YES, xerrmsg, maxch)
+	    GM_ZO(fit) = GM_YOREF(fit)
 	    call geo_fxyd (fit, sy1, sy2, xref, yref, yin, wts,
 	        Memd[yresidual], npts, NO, yerrmsg, maxch)
 	}
@@ -2159,6 +2195,9 @@ begin
 	    default:
 	        call dgsinit (sf1, GM_FUNCTION(fit), 2, 2, GS_XNONE, xmin, xmax,
 	            ymin, ymax)
+		call dgsset (sf1, GSXREF, GM_XO(fit))
+		call dgsset (sf1, GSYREF, GM_YO(fit))
+		call dgsset (sf1, GSZREF, GM_ZO(fit))
 	        call dgsfit (sf1, x, y, z, wts, npts, WTS_USER, ier)
 	        if (GM_XXORDER(fit) > 2 || GM_XYORDER(fit) > 2 ||
 		    GM_XXTERMS(fit) == GS_XFULL)
@@ -2206,6 +2245,9 @@ begin
 	    default:
 	        call dgsinit (sf1, GM_FUNCTION(fit), 2, 2, GS_XNONE, xmin, xmax,
 	            ymin, ymax)
+		call dgsset (sf1, GSXREF, GM_XO(fit))
+		call dgsset (sf1, GSYREF, GM_YO(fit))
+		call dgsset (sf1, GSZREF, GM_ZO(fit))
 	        call dgsfit (sf1, x, y, z, wts, npts, WTS_USER, ier)
 	        if (GM_YXORDER(fit) > 2 || GM_YYORDER(fit) > 2 ||
 	            GM_YXTERMS(fit) == GS_XFULL)
@@ -2448,8 +2490,10 @@ begin
 		    sx2 = NULL
 		    sy2 = NULL
 	    default:
+		GM_ZO(fit) = GM_XOREF(fit)
 	        call geo_fxyd (fit, sx1, sx2, xref, yref, xin, Memd[twts],
 	            xresid, npts, YES, xerrmsg, xmaxch)
+		GM_ZO(fit) = GM_YOREF(fit)
 	        call geo_fxyd (fit, sy1, sy2, xref, yref, yin, Memd[twts],
 	            yresid, npts, NO, yerrmsg, ymaxch)
 	    }

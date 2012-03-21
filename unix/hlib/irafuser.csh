@@ -97,10 +97,10 @@ case macintel:
     setenv CC 	cc
     setenv F2C 	$hbin/f2c.e
 
-    setenv HSI_CF "-O -DMACOSX -DMACINTEL -DMACH64 -w -Wunused -m64"
+    setenv HSI_CF "-O -DMACOSX -DMACINTEL -DMACH64 -w -Wunused -m64 -g"
     setenv HSI_XF "-Inolibc -/DMACOSX -/DMACINTEL -w -/Wunused -/DMACH64 -/m64"
     setenv HSI_FF "-O -m64 -DMACH64 -DBLD_KERNEL"
-    setenv HSI_LF "-m64 -DMACH64 "
+    setenv HSI_LF "-m64 -DMACH64"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS ""

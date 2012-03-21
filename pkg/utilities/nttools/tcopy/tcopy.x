@@ -40,18 +40,20 @@ pointer table2			# output table name
 pointer dir1			# input directory name
 pointer dir2			# output directory name
 
-pointer list1, list2
+pointer list1, list2, tp
 int	root_len		# number of char in input directory name
 int	numout			# number of names in output list
 bool	fitsout			# is the output just one FITS file?
 
+char	src[SZ_FNAME], extn[SZ_FNAME]
+
 int	nargs			# number of command-line arguments
 bool	in_redir, out_redir	# is input or output redirected?
 
-pointer tbnopen()
+pointer tbnopen(), tbtopn()
 int	tbnget(), tbnlen()
 int	fstati()
-int	fnldir(), isdirectory()
+int	fnldir(), isdirectory(), strncmp()
 int	junk, hdu, tbparse(), exists, tbttyp()
 int	clgeti()
 bool	clgetb(), streq()
@@ -154,6 +156,12 @@ begin
 
 	} else {
 
+	    # Dummy open of the old file in case it's a URL.
+	    if (strncmp (Memc[tablist1], "http://", 7) == 0) {
+	        tp = tbtopn (Memc[tablist1], READ_ONLY, NULL)
+	        call tbtclo (tp)
+	    }
+
 	    # Expand the input and output table lists.
 	    list1 = tbnopen (Memc[tablist1])
 	    list2 = tbnopen (Memc[tablist2])
@@ -179,7 +187,6 @@ begin
 	    }
 
 	    # Copy each table.
-
 	    while (tbnget (list1, Memc[table1], SZ_LINE) != EOF) {
 		if (!fitsout)
 		    junk = tbnget (list2, Memc[table2], SZ_LINE)
@@ -204,13 +211,14 @@ bool	verbose		# i: print informational message
 #--
 bool	done
 int	phu_copied	# set by tbfpri and ignored
-pointer	sp, oldname, newname
+pointer	sp, oldname, newname, tp
 
 bool	use_fcopy	# true if we should copy the file with fcopy
 
+pointer	tbtopn()
 bool	streq(), is_wholetab()
 int	tbtacc(), exists, tbttyp()	# exists is ignored
-errchk	tbfpri, tbtcpy
+errchk	tbfpri, tbtcpy, tbtopn
 
 begin
 	call smark (sp)
@@ -225,13 +233,6 @@ begin
 	    call eprintf ("Cannot copy table to itself:  %s\n")
 	    call pargstr (oldfile)
 
-	} else if (is_wholetab (oldfile) && is_wholetab (newfile) &&
-		   tbttyp (oldfile, exists) == tbttyp (newfile, exists)) {
-
-	    # Entire files of the same type are copied with the fio fcopy
-
-	    # This test was added to prevent tbtacc from being called
-	    # if oldfile is the standard input.
 	    if (streq (oldfile, "STDIN")) {
 		use_fcopy = true
 

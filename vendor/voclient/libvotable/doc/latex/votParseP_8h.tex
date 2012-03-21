@@ -1,0 +1,238 @@
+\hypertarget{votParseP_8h}{
+\section{votParseP.h File Reference}
+\label{votParseP_8h}\index{votParseP.h@{votParseP.h}}
+}
+Internal LIBVOTABLE definitions.  
+
+
+{\tt \#include $<$expat.h$>$}\par
+\subsection*{Data Structures}
+\begin{CompactItemize}
+\item 
+struct \hyperlink{structAttrList}{AttrList}
+\begin{CompactList}\small\item\em Information for an attribute. \item\end{CompactList}\item 
+struct \hyperlink{structAttrBlock}{AttrBlock}
+\begin{CompactList}\small\item\em Information for a block of attributes. \item\end{CompactList}\item 
+struct \textbf{elem\_\-t}
+\item 
+struct \textbf{node}
+\item 
+struct \hyperlink{structStack}{Stack}
+\begin{CompactList}\small\item\em This is a structure that holds the information for a stack. \item\end{CompactList}\end{CompactItemize}
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{votParseP_8h_9aed3a964b10f1c101be4aa024a28b65}{
+\#define \textbf{SZ\_\-ATTRNAME}~32}
+\label{votParseP_8h_9aed3a964b10f1c101be4aa024a28b65}
+
+\item 
+\hypertarget{votParseP_8h_0eb1d3a89b93c111785ef003b0b2cba8}{
+\#define \textbf{SZ\_\-FNAME}~255}
+\label{votParseP_8h_0eb1d3a89b93c111785ef003b0b2cba8}
+
+\item 
+\hypertarget{votParseP_8h_dd63f1bab1fc0ce36a85c6333d9fea1d}{
+\#define \textbf{SZ\_\-XMLTAG}~255}
+\label{votParseP_8h_dd63f1bab1fc0ce36a85c6333d9fea1d}
+
+\item 
+\hypertarget{votParseP_8h_32108415ff44b6f7537b9516f4a84be7}{
+\#define \textbf{SZ\_\-LINE}~4096}
+\label{votParseP_8h_32108415ff44b6f7537b9516f4a84be7}
+
+\item 
+\hypertarget{votParseP_8h_a2386e8d15f3745d278abcd17e5929d5}{
+\#define \textbf{MAX\_\-ATTR}~100}
+\label{votParseP_8h_a2386e8d15f3745d278abcd17e5929d5}
+
+\item 
+\hypertarget{votParseP_8h_6864c97be5f9c0d463c051efd2f6905b}{
+\#define \textbf{HANDLE\_\-INCREMENT}~8000}
+\label{votParseP_8h_6864c97be5f9c0d463c051efd2f6905b}
+
+\item 
+\hypertarget{votParseP_8h_ba51915c87d64af47fb1cc59348961c9}{
+\#define \textbf{OK}~0}
+\label{votParseP_8h_ba51915c87d64af47fb1cc59348961c9}
+
+\item 
+\hypertarget{votParseP_8h_735563036dced0b7d6cc98f97ea4978b}{
+\#define \textbf{ERR}~1}
+\label{votParseP_8h_735563036dced0b7d6cc98f97ea4978b}
+
+\item 
+\hypertarget{votParseP_8h_3b0e3f6e2463bfe3ab40dd8377272fb6}{
+\#define \hyperlink{votParseP_8h_3b0e3f6e2463bfe3ab40dd8377272fb6}{handle\_\-t}~int}
+\label{votParseP_8h_3b0e3f6e2463bfe3ab40dd8377272fb6}
+
+\begin{CompactList}\small\item\em Handle type definition. \item\end{CompactList}\end{CompactItemize}
+\subsection*{Typedefs}
+\begin{CompactItemize}
+\item 
+\hypertarget{votParseP_8h_afa552abcce44ab0a84df10bc7c07a49}{
+typedef struct elem\_\-t \textbf{Element}}
+\label{votParseP_8h_afa552abcce44ab0a84df10bc7c07a49}
+
+\item 
+\hypertarget{votParseP_8h_ba087cc5af103c72c4e5864cc5622196}{
+typedef struct node \textbf{Node}}
+\label{votParseP_8h_ba087cc5af103c72c4e5864cc5622196}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+int \hyperlink{votParseP_8h_0185a924192bc608ea06cf6bc74cf01d}{vot\_\-attrSet} (\hyperlink{structAttrBlock}{AttrBlock} $\ast$ablock, char $\ast$name, char $\ast$value)
+\item 
+\hypertarget{votParseP_8h_dd32ec5a691457266c3b68b80456c830}{
+char $\ast$ \textbf{vot\_\-attrGet} (\hyperlink{structAttrBlock}{AttrBlock} $\ast$ablock, char $\ast$name)}
+\label{votParseP_8h_dd32ec5a691457266c3b68b80456c830}
+
+\item 
+\hypertarget{votParseP_8h_b200705cac89b367783e737f6be3af88}{
+char $\ast$ \textbf{vot\_\-attrXML} (\hyperlink{structAttrBlock}{AttrBlock} $\ast$ablock)}
+\label{votParseP_8h_b200705cac89b367783e737f6be3af88}
+
+\item 
+\hypertarget{votParseP_8h_c247ed61c78db54860fbbf80385f3088}{
+int \textbf{vot\_\-eType} (char $\ast$name)}
+\label{votParseP_8h_c247ed61c78db54860fbbf80385f3088}
+
+\item 
+\hypertarget{votParseP_8h_c32b7c38a634b7f817d69d3720675c81}{
+char $\ast$ \textbf{vot\_\-elemName} (\hyperlink{structElement}{Element} $\ast$e)}
+\label{votParseP_8h_c32b7c38a634b7f817d69d3720675c81}
+
+\item 
+\hypertarget{votParseP_8h_c40e3a809b3865bd6d15bf368778e28e}{
+int \textbf{vot\_\-elemType} (\hyperlink{structElement}{Element} $\ast$e)}
+\label{votParseP_8h_c40e3a809b3865bd6d15bf368778e28e}
+
+\item 
+\hypertarget{votParseP_8h_5e6c398db76881727201f7504dc65444}{
+char $\ast$ \textbf{vot\_\-elemXML} (\hyperlink{structElement}{Element} $\ast$e)}
+\label{votParseP_8h_5e6c398db76881727201f7504dc65444}
+
+\item 
+\hypertarget{votParseP_8h_b07e2996f66828be5e799651835ff2bf}{
+char $\ast$ \textbf{vot\_\-elemXMLEnd} (\hyperlink{structElement}{Element} $\ast$e)}
+\label{votParseP_8h_b07e2996f66828be5e799651835ff2bf}
+
+\item 
+\hypertarget{votParseP_8h_9fb13a49fb2b20b98b58a042a648d2d1}{
+\hyperlink{structElement}{Element} $\ast$ \textbf{vot\_\-newElem} (unsigned int type)}
+\label{votParseP_8h_9fb13a49fb2b20b98b58a042a648d2d1}
+
+\item 
+\hypertarget{votParseP_8h_1832eb6023a34c8e9d00d22c57276c6c}{
+handle\_\-t \textbf{vot\_\-setHandle} (\hyperlink{structElement}{Element} $\ast$elem)}
+\label{votParseP_8h_1832eb6023a34c8e9d00d22c57276c6c}
+
+\item 
+\hypertarget{votParseP_8h_c29f604e3783afc6becd10d9f93ef600}{
+handle\_\-t \textbf{vot\_\-lookupHandle} (\hyperlink{structElement}{Element} $\ast$elem)}
+\label{votParseP_8h_c29f604e3783afc6becd10d9f93ef600}
+
+\item 
+\hypertarget{votParseP_8h_fa12a965b51cf8d933decb350281ab52}{
+void \textbf{vot\_\-freeHandle} (handle\_\-t handle)}
+\label{votParseP_8h_fa12a965b51cf8d933decb350281ab52}
+
+\item 
+\hypertarget{votParseP_8h_79eb418bc2410d1ce82024398f1bef17}{
+\hyperlink{structElement}{Element} $\ast$ \textbf{vot\_\-getElement} (handle\_\-t handle)}
+\label{votParseP_8h_79eb418bc2410d1ce82024398f1bef17}
+
+\item 
+\hypertarget{votParseP_8h_93e99ff82cfdb44a6f7fc9097e9fe02a}{
+void \textbf{vot\_\-newHandleTable} (void)}
+\label{votParseP_8h_93e99ff82cfdb44a6f7fc9097e9fe02a}
+
+\item 
+\hypertarget{votParseP_8h_b1b3d4aa9a83dcba308b0238dfa14b39}{
+int \textbf{vot\_\-handleCount} (void)}
+\label{votParseP_8h_b1b3d4aa9a83dcba308b0238dfa14b39}
+
+\item 
+\hypertarget{votParseP_8h_1b51992af0738bbbf6a101bbb12b2d17}{
+void \textbf{vot\_\-handleCleanup} (void)}
+\label{votParseP_8h_1b51992af0738bbbf6a101bbb12b2d17}
+
+\item 
+\hypertarget{votParseP_8h_85f03122a0f8cb6c5ee63e41e2157111}{
+void \textbf{vot\_\-endElement} (void $\ast$userData, const char $\ast$name)}
+\label{votParseP_8h_85f03122a0f8cb6c5ee63e41e2157111}
+
+\item 
+\hypertarget{votParseP_8h_50e82d05d9fa1bb2a4131c5643e10a3e}{
+void \textbf{vot\_\-startElement} (void $\ast$userData, const char $\ast$name, const char $\ast$$\ast$atts)}
+\label{votParseP_8h_50e82d05d9fa1bb2a4131c5643e10a3e}
+
+\item 
+\hypertarget{votParseP_8h_e218f30d910b83be36110493ba8ad145}{
+void \textbf{vot\_\-charData} (void $\ast$userData, const XML\_\-Char $\ast$s, int len)}
+\label{votParseP_8h_e218f30d910b83be36110493ba8ad145}
+
+\item 
+\hypertarget{votParseP_8h_fb95db917a89f2d55ae6522435929229}{
+void \textbf{votPush} (\hyperlink{structStack}{Stack} $\ast$st, \hyperlink{structElement}{Element} $\ast$elem)}
+\label{votParseP_8h_fb95db917a89f2d55ae6522435929229}
+
+\item 
+\hypertarget{votParseP_8h_9e1d4fd4b9c06ddbd95f4029b0f8d3a5}{
+\hyperlink{structElement}{Element} $\ast$ \textbf{votPop} (\hyperlink{structStack}{Stack} $\ast$st)}
+\label{votParseP_8h_9e1d4fd4b9c06ddbd95f4029b0f8d3a5}
+
+\item 
+\hypertarget{votParseP_8h_ded18f1ce833d773a50e2d1a4a2db2c8}{
+\hyperlink{structElement}{Element} $\ast$ \textbf{votPeek} (\hyperlink{structStack}{Stack} $\ast$st)}
+\label{votParseP_8h_ded18f1ce833d773a50e2d1a4a2db2c8}
+
+\item 
+\hypertarget{votParseP_8h_4a7f5a306e9f1c1cf35ec9605c92d42f}{
+\hyperlink{structStack}{Stack} $\ast$ \textbf{vot\_\-newStack} (void)}
+\label{votParseP_8h_4a7f5a306e9f1c1cf35ec9605c92d42f}
+
+\item 
+\hypertarget{votParseP_8h_11691bde61e5b2bbdea3649eb69d8253}{
+int \textbf{vot\_\-isEmpty} (\hyperlink{structStack}{Stack} $\ast$st)}
+\label{votParseP_8h_11691bde61e5b2bbdea3649eb69d8253}
+
+\item 
+\hypertarget{votParseP_8h_c5e777e900166c7c7a79eeb28f838f61}{
+void \textbf{vot\_\-clearStack} (\hyperlink{structStack}{Stack} $\ast$st)}
+\label{votParseP_8h_c5e777e900166c7c7a79eeb28f838f61}
+
+\item 
+\hypertarget{votParseP_8h_db67217b47d7871eee607df6754dfa88}{
+void \textbf{vot\_\-printStack} (\hyperlink{structStack}{Stack} $\ast$st)}
+\label{votParseP_8h_db67217b47d7871eee607df6754dfa88}
+
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Internal LIBVOTABLE definitions. 
+
+VOTPARSEP.H -- Internal LIBVOTABLE definitions.
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick and Eric Timmermann \end{Desc}
+\begin{Desc}
+\item[Date:]8/03/09 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{votParseP_8h_0185a924192bc608ea06cf6bc74cf01d}{
+\index{votParseP.h@{votParseP.h}!vot\_\-attrSet@{vot\_\-attrSet}}
+\index{vot\_\-attrSet@{vot\_\-attrSet}!votParseP.h@{votParseP.h}}
+\subsubsection[{vot\_\-attrSet}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-attrSet ({\bf AttrBlock} $\ast$ {\em ablock}, \/  char $\ast$ {\em name}, \/  char $\ast$ {\em value})}}
+\label{votParseP_8h_0185a924192bc608ea06cf6bc74cf01d}
+
+
+$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$$\ast$
+
+Public Internal Methods. The procedures are used to implement the library, however are not part of the public interface. 

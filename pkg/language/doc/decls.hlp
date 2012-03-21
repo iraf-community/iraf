@@ -76,7 +76,7 @@ file characteristics to be checked for when the file parameter is used.
 .ls
 .nf
 r	file exists and is readable
-w	file exists and is is writable
+w	file exists and is writable
 n	file does not exist
 b	file is a binary file
 t	file is a text file
@@ -140,5 +140,5 @@ The filetype options are recognized but are not implemented internally.
 .fi
 .ih
 SEE ALSO
-parameters, procedure, begin
+parameters, procedure
 .endhelp

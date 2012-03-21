@@ -9,6 +9,24 @@
 
 set  irafdir    = $cwd/../util
 
+set  clean	= 1
+
+
+# Process cmdline flags.
+while ("$1" != "")
+   switch ("$1")
+   case -noclean:                      # clean all package sources
+      set clean = 0
+      breaksw
+   default:
+      break
+   endsw
+
+   shift
+end
+
+
+
 echo "Initializing repository data ...."
 $irafdir/pkginit				# init repository information
 
@@ -29,7 +47,7 @@ all:: update
 
 # Update recent changes from the repository.
 update::
-	@./configure
+	@./configure -noclean
 	@../util/pkgupdate -all
 
 # List packages available on the repository.
@@ -55,7 +73,11 @@ check::
 # Update recent changes from the repository.
 self_update::
 	@../util/pkgupdate -self
-	@./configure
+	@./configure -noclean
+
+# Update recent changes from the repository.
+config_update::
+	@../util/pkgupdate -config
 
 
 MAKE_TEMP_END
@@ -77,11 +99,19 @@ foreach p (`cat .repo_pkgs`)
    echo ""						>> Makefile
 
    # Create the directory
-   if (-e $p ) then
-      /bin/rm -rf $p
+   if ( -e $p ) then
+	if ($clean == 1) then
+	    /bin/rm -rf $p
+	endif
+   else
+       mkdir $p
    endif
-   mkdir $p
 end
+
+if ($clean == 0) then
+    exit 0
+endif
+
 
 echo ""
 echo ""

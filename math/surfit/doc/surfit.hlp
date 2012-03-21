@@ -10,7 +10,7 @@ SYNOPSIS
 
 The surface is defined in the following way. The x and y values are
 assumed to be integers and lie in the range 0 <= x <= ncols + 1 and
-0 <= y <= nlines + 1. The package prefix is is for image surface fit.
+0 <= y <= nlines + 1. The package prefix is for image surface fit.
 Package routines with a prefix followed by l operate on individual
 image lines only.
 

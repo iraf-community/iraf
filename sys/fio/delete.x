@@ -50,14 +50,22 @@ begin
 	    nosuchfile = true
 	else {
 	    call zfacss (Memc[osfn], 0, 0, status)
-	    if (status == NO)
-		nosuchfile = true
+	    if (status == NO) {
+		#  If the file is a symlink pointing to a non-existent file,
+		#  we'll delete the link below.
+	        call zfacss (Memc[osfn], 0, SYMLINK_FILE, status)
+	        if (status == YES)
+		    nosuchfile = false
+	        else
+		    nosuchfile = true
+	    }
 	}
 
 	# It is an error to try to delete a nonexistent file.
-	if (nosuchfile)
+	if (nosuchfile) {
 	    iferr (call filerr (fname, SYS_FDELNXF))
 		goto close_
+	}
 
 	# Is the file protected?
 	call zfprot (Memc[osfn], QUERY_PROTECTION, status)

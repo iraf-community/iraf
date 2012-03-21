@@ -8,6 +8,8 @@ define CQ_SZFNAME    (1+SZ_FNAME) / 2   # The file name storage size in structs
 define CQ_SZLINE     (1+SZ_LINE) / 2    # The text storage size in structs
 define CQ_ALLOC       20		# The record allocation block size
 
+define USE_URLGET	TRUE
+
 
 # The catalog record map descriptor (borrowed from dttext interface). 
 

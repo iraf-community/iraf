@@ -301,6 +301,8 @@ extern int c_stgputline(int fd, char *buf);
 extern char *u_strcat(char *s1, char *s2);
 /* strcmp.c */
 extern int u_strcmp(char *s1, char *s2);
+/* strdup.c */
+extern char *u_strdup(char *str);
 /* strcpy.c */
 extern char *u_strcpy(char *s1, char *s2);
 /* strlen.c */

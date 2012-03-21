@@ -393,13 +393,13 @@ begin
 		lflag[i] = D_ALL
 
 	    call shdr_rebin (shin, shout)
-	    call aclri (Memi[SX(shin)], SN(shin))
+	    call aclrr (Memr[SX(shin)], SN(shin))
 	    j = a - 1
 	    if (j > 0)
-		call amovki (1, Memi[SX(shin)], j)
+		call amovkr (1.0, Memr[SX(shin)], j)
 	    j = SN(shin) - b
 	    if (j > 0)
-		call amovki (1, Memi[SX(shin)+SN(shin)-j], j)
+		call amovkr (1.0, Memr[SX(shin)+SN(shin)-j], j)
 	}
 
 	dflag = lflag[1]

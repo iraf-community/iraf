@@ -1272,7 +1272,7 @@ begin
 		if (prot)
 		    stat = protect (out, REMOVE_PROTECTION)
 		do i = 0, max(0,ntry) {
-#call eprintf ("rename (%s, %s)\n")
+#call eprintf ("1 rename (%s, %s)\n")
 #call pargstr (out)
 #call pargstr (tmp)
 		    ifnoerr (call rename (out, tmp)) {
@@ -1292,7 +1292,7 @@ begin
 
 	    # Now rename the input to the output.
 	    do i = 0, max(0,ntry) {
-#call eprintf ("rename (%s, %s)\n")
+#call eprintf ("2 rename (%s, %s)\n")
 #call pargstr (in)
 #call pargstr (out)
 		ifnoerr (call rename (in, out)) {

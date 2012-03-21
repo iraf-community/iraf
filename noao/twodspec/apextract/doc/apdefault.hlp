@@ -68,7 +68,7 @@ This task sets the values of the default aperture parameters for the
 tasks \fBapedit\fR and \fBapfind\fR which define new apertures.  For a
 description of the components of an aperture see the paper \fBThe
 APEXTRACT Package\fR.  In \fBapedit\fR the default aperture limits and
-background parameters parameters are only used if there are no other
+background parameters are only used if there are no other
 apertures defined.  The aperture identification table is used when
 reordering the apertures with the 'o' key.  When run the parameters are
 displayed and modified using the \fBeparam\fR task.

@@ -12,6 +12,9 @@ include "gsurfitdef.h"
 # The Cholesky factorization of MATRIX is calculated and stored in CHOFAC.
 # Finally the coefficients are calculated by forward and back substitution
 # and stored in COEFF.
+#
+# This version has two options: fit all the coefficients or fix the
+# the zeroth coefficient at a specified reference point.
 
 procedure gssolve (sf, ier)
 
@@ -21,28 +24,61 @@ int	ier		# ier = OK, everything OK
 			# coefficients are 0.
 			# ier = NO_DEG_FREEDOM, too few points to solve matrix
 
-int	nfree
+int	i, ncoeff
+pointer	sp, vector, matrix
+
+real	gseval()
 
 begin
+	if (IS_INDEFR(GS_XREF(sf)) || IS_INDEFR(GS_YREF(sf)) ||
+	    IS_INDEFR(GS_ZREF(sf)))
+	    ncoeff = GS_NCOEFF(sf)
+	else
+	    ncoeff = GS_NCOEFF(sf) - 1
+
 	# test for number of degrees of freedom
 	ier = OK
-	nfree = GS_NPTS(sf) - GS_NCOEFF(sf)
-	if (nfree < 0) {
+	i = GS_NPTS(sf) - ncoeff
+	if (i < 0) {
 	    ier = NO_DEG_FREEDOM
 	    return
 	}
 
+	if (ncoeff == GS_NCOEFF(sf)) {
+	    vector = GS_VECTOR(sf)
+	    matrix = GS_MATRIX(sf)
+	} else {
+	    # allocate working space for the reduced vector and matrix
+	    call smark (sp)
+	    call salloc (vector, ncoeff, TY_REAL)
+	    call salloc (matrix, ncoeff*ncoeff, TY_REAL)
+
+	    # eliminate the terms from the vector and matrix
+	    call amovr (VECTOR(GS_VECTOR(sf)+1), Memr[vector], ncoeff)
+	    do i = 0, ncoeff-1
+		call amovr (MATRIX(GS_MATRIX(sf)+(i+1)*GS_NCOEFF(sf)),
+		    Memr[matrix+i*ncoeff], ncoeff)
+	}
+
+	# solve for the coefficients.
 	switch (GS_TYPE(sf)) {
 	case GS_LEGENDRE, GS_CHEBYSHEV, GS_POLYNOMIAL:
 
 	    # calculate the Cholesky factorization of the data matrix
-	    call rgschofac (MATRIX(GS_MATRIX(sf)), GS_NCOEFF(sf),
-	        GS_NCOEFF(sf), CHOFAC(GS_CHOFAC(sf)), ier)
+	    call rgschofac (MATRIX(matrix), ncoeff, ncoeff,
+	        CHOFAC(GS_CHOFAC(sf)), ier)
 
 	    # solve for the coefficients by forward and back substitution
-	    call rgschoslv (CHOFAC(GS_CHOFAC(sf)), GS_NCOEFF(sf),
-	        GS_NCOEFF(sf), VECTOR(GS_VECTOR(sf)), COEFF(GS_COEFF(sf)))
+	    call rgschoslv (CHOFAC(GS_CHOFAC(sf)), ncoeff, ncoeff,
+	        VECTOR(vector), COEFF(GS_COEFF(sf)+GS_NCOEFF(sf)-ncoeff))
+
 	default:
 	    call error (0, "GSSOLVE: Illegal surface type.")
+	}
+
+	if (ncoeff != GS_NCOEFF(sf)) {
+	    COEFF(GS_COEFF(sf)) = GS_ZREF(sf) -
+	        gseval (sf, GS_XREF(sf), GS_YREF(sf))
+	    call sfree (sp)
 	}
 end

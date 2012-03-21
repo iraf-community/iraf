@@ -201,7 +201,7 @@ are CTYPEi, CRPIXi, CRVALi, and CDi_j where i and j are axis numbers.  As
 with the physical coordinate transformation the nondiagonal or rotation
 terms are not expected in the spectral WCS and may cause problems if they
 are not zero.  The CTYPEi keywords will have the value LINEAR to identify
-the type of of coordinate system.  The transformation between dispersion
+the type of coordinate system.  The transformation between dispersion
 coordinate, wi, and logical pixel coordinate, li, along axis i is given by
 
 .nf

@@ -112,6 +112,7 @@ libex.a:
 	wfstg.x		mwcs.h <math.h>
 	wftan.x		mwcs.h <math.h>
 	wftnx.x		mwcs.h <math.h>
+	wftpv.x		mwcs.h <math.h>
 	wftsc.x		mwcs.h <math.h>
 	wfzea.x		mwcs.h <math.h>
 	wfzpn.x		mwcs.h <math.h>

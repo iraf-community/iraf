@@ -41,7 +41,7 @@ define	S_TYPE			$1[9]		# Type (row or column ordered)
 define	S_VERSION		$1[10]		# Software version number
 
 # This is the size of the table-descriptor structure.
-define	LEN_TBLSTRUCT		(38)
+define	LEN_TBLSTRUCT		(39)
 
 # File descriptor for the table file, or pointer to CFITSIO descriptor for
 # FITS files.  Note that by including TB_FILE2 there's space for two words.
@@ -117,6 +117,10 @@ define	TB_COMMENT		Memi[$1+35]	# pointer to comment string
 define	TB_SZ_COMMENT		Memi[$1+36]	# size of comment string
 define	TB_KEYLIST_PTR		Memi[$1+37]	# pointer to list of keywords
 define	TB_KEYWORD		Memi[TB_KEYLIST_PTR($1)+$2-1]  # ptr to keyword
+
+# Table file name; this can be an IRAF virtual file name.
+define	TB_SRC_PTR		Memi[$1+38]	# pointer to source name string
+define	TB_SRC			Memc[TB_SRC_PTR($1)]
 
 
 # Array of pointers to column information.  This array can be reallocated

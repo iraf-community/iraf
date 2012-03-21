@@ -1,36 +1,58 @@
 # Header file for GEOMAP
 
-define	LEN_GEOMAP	(45 + SZ_FNAME + SZ_LINE + 2)
+define	LEN_GEOMAP	(54 + SZ_FNAME + SZ_LINE + 2)
 
-define	GM_XMIN		Memd[P2D($1)]		# Minimum x value
-define	GM_XMAX		Memd[P2D($1+2)]		# Maximum x value
-define	GM_YMIN		Memd[P2D($1+4)]		# Minimum y value
-define	GM_YMAX		Memd[P2D($1+6)]		# Maximum y value
-define	GM_XOREF	Memd[P2D($1+8)]		# Mean of xref coords
-define	GM_YOREF	Memd[P2D($1+10)]	# Mean of yref coords
-define	GM_XOIN		Memd[P2D($1+12)]	# Mean of x coords
-define	GM_YOIN		Memd[P2D($1+14)]	# Mean of y coords
-define	GM_XREFPT	Memd[P2D($1+16)]	# X reference point
-define	GM_YREFPT	Memd[P2D($1+18)]	# Y reference point
-define	GM_XRMS		Memd[P2D($1+20)]	# Rms of x fit
-define	GM_YRMS		Memd[P2D($1+22)]	# Rms of y fit
-define	GM_REJECT	Memd[P2D($1+24)]	# Sigma limit for rejection
-define	GM_PROJECTION	Memi[$1+26]		# Coordinate projection type
-define	GM_FIT		Memi[$1+27]		# Fit geometry type
-define	GM_FUNCTION	Memi[$1+28]		# Function type
-define	GM_XXORDER	Memi[$1+29]		# X fit X order
-define	GM_XYORDER	Memi[$1+30]		# X fit Y order
-define	GM_XXTERMS	Memi[$1+31]		# X fit cross-terms
-define	GM_YXORDER	Memi[$1+32]		# Y fit X order
-define	GM_YYORDER	Memi[$1+33]		# Y fit Y order
-define	GM_YXTERMS	Memi[$1+34]		# Y fit cross-terms
-define	GM_MAXITER	Memi[$1+35]		# maximum number of iterations
-define	GM_NPTS		Memi[$1+36]		# Number of data points
-define	GM_NREJECT	Memi[$1+37]		# Number of rejected pixels
-define	GM_NWTS0	Memi[$1+38]		# Number of pts with wts <= 0
-define	GM_REJ		Memi[$1+39]		# Pointer to rejected pixels
-define	GM_RECORD	Memc[P2C($1+40)]	# Record name
-define	GM_PROJSTR	Memc[P2C($1+40+SZ_FNAME+1)]	# Projection parameters
+define	GM_XO		Memd[P2D($1)]		# X origin
+define	GM_YO		Memd[P2D($1+2)]		# Y origin
+define	GM_ZO		Memd[P2D($1+4)]		# Z origin
+define	GM_XOREF	Memd[P2D($1+6)]		# X reference origin
+define	GM_YOREF	Memd[P2D($1+8)]		# Y reference origin
+define	GM_XMIN		Memd[P2D($1+10)]	# Minimum x value
+define	GM_XMAX		Memd[P2D($1+12)]	# Maximum x value
+define	GM_YMIN		Memd[P2D($1+14)]	# Minimum y value
+define	GM_YMAX		Memd[P2D($1+16)]	# Maximum y value
+define	GM_XOREF	Memd[P2D($1+18)]	# Mean of xref coords
+define	GM_YOREF	Memd[P2D($1+20)]	# Mean of yref coords
+define	GM_XOIN		Memd[P2D($1+22)]	# Mean of x coords
+define	GM_YOIN		Memd[P2D($1+24)]	# Mean of y coords
+define	GM_XREFPT	Memd[P2D($1+26)]	# Computed X reference point
+define	GM_YREFPT	Memd[P2D($1+28)]	# Computed Y reference point
+define	GM_XRMS		Memd[P2D($1+30)]	# Rms of x fit
+define	GM_YRMS		Memd[P2D($1+32)]	# Rms of y fit
+define	GM_REJECT	Memd[P2D($1+34)]	# Sigma limit for rejection
+define	GM_PROJECTION	Memi[$1+36]		# Coordinate projection type
+define	GM_FIT		Memi[$1+37]		# Fit geometry type
+define	GM_FUNCTION	Memi[$1+38]		# Function type
+define	GM_XXORDER	Memi[$1+39]		# X fit X order
+define	GM_XYORDER	Memi[$1+40]		# X fit Y order
+define	GM_XXTERMS	Memi[$1+41]		# X fit cross-terms
+define	GM_YXORDER	Memi[$1+42]		# Y fit X order
+define	GM_YYORDER	Memi[$1+43]		# Y fit Y order
+define	GM_YXTERMS	Memi[$1+44]		# Y fit cross-terms
+define	GM_MAXITER	Memi[$1+45]		# maximum number of iterations
+define	GM_NPTS		Memi[$1+46]		# Number of data points
+define	GM_NREJECT	Memi[$1+47]		# Number of rejected pixels
+define	GM_NWTS0	Memi[$1+48]		# Number of pts with wts <= 0
+define	GM_REJ		Memi[$1+49]		# Pointer to rejected pixels
+define	GM_RECORD	Memc[P2C($1+50)]	# Record name
+define	GM_PROJSTR	Memc[P2C($1+50+SZ_FNAME+1)]	# Projection parameters
+
+# geoset parameters
+define	GMXO		1
+define	GMYO		2
+define	GMXOREF		3
+define	GMYOREF		4
+define	GMPROJECTION	5
+define  GMFIT	  	6
+define  GMFUNCTION  	7
+define  GMXXORDER   	8
+define  GMXYORDER   	9
+define  GMYXORDER   	10
+define  GMYYORDER   	11
+define  GMXXTERMS   	12
+define  GMYXTERMS   	13
+define  GMREJECT    	14
+define  GMMAXITER    	15
 
 # define the permitted coordinate projections
 

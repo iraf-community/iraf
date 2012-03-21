@@ -771,7 +771,7 @@ interface is provided for this purpose.  Status line i/o makes it possible
 to interact directly with the user without interfering with the contents of
 the graphics frame, and without leaving graphics mode.
 
-What the status line actually is is determined by the graphcap entry for the
+What the status line actually is determined by the graphcap entry for the
 device and the characteristics or limitations of the actual device.
 On most devices, the status line is a single line at the bottom of the screen.
 This only works, however, if the device can dynamically erase the status line;

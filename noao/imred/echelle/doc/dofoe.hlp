@@ -90,7 +90,7 @@ checked interactively.
 .le
 
 .ls fitflat = yes (flat1d)
-Fit and divide the extracted flat field field orders by a smooth function
+Fit and divide the extracted flat field orders by a smooth function
 in order to normalize the wavelength response?  If not done the flat field
 spectral shape (which includes the blaze function) will be divided
 out of the object spectra, thus altering the object data values.
@@ -289,7 +289,7 @@ number of times the sigma of the residuals are rejected before refitting.
 .ls b_smooth = 10 (apsum)
 Box car smoothing length for background when using background
 subtraction.  Since the background noise is often the limiting factor
-for good extraction one may box car smooth the the background to improve the
+for good extraction one may box car smooth the background to improve the
 statistics.
 .le
 

@@ -152,6 +152,7 @@ libc.a:
 	stgio.c		<libc/libc.h> <libc/spp.h> <libc/xnames.h>
 	strcat.c	<libc/libc.h>
 	strcmp.c	<libc/libc.h>
+	strdup.c	<libc/libc.h>
 	strcpy.c	<libc/libc.h>
 	strlen.c	<libc/libc.h>
 	strncat.c	<libc/libc.h>

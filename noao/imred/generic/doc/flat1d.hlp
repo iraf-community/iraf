@@ -93,7 +93,7 @@ rest of the output image unmodified.  This ability is particularly useful
 when dealing with multi-aperture data.
 
 This task is very similar to \fBfit1d\fR with the addition of the
-parameter \fIminflat\fR and the deletion of the the parameter \fItype\fR
+parameter \fIminflat\fR and the deletion of the parameter \fItype\fR
 which is always "ratio".
 .ih
 EXAMPLES

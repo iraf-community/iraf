@@ -32,7 +32,7 @@ The type of binary file to write.  If the value is "raw" then the input
 images are converted directly to a raw binary raster using the task 
 parameters.  If the value is "list" the pixel values will be written
 to the standard output after evaluation of the \fIoutbands\fR parameter in
-the same format as would appear from the the \fILISTPIX\fR task.  Finally,
+the same format as would appear from the \fILISTPIX\fR task.  Finally,
 the value may include any of the currently supported specific builtin formats:
 
 .nf
@@ -197,7 +197,7 @@ may be converted to a single output file.  In the latter case the list
 pointers are updated automatically to keep track of the images.  For example,
 to convert six images to two output files, the \fIoutbands\fR expression
 should contain three images operands.  The first three images in the list
-will be used in evaluating the the expressions for the first output file,
+will be used in evaluating the expressions for the first output file,
 the last three for the second file.
 
 	The image tags may be reordered in the expression but still refer to 
@@ -391,7 +391,7 @@ Scale the pixels in a given range to a specified number of bins.  This
 function will map the input pixels within the range z1 to z2 to one of 
 'nbins' values.  Pixels less than z1 are mapped to the lowest output
 intensity value, pixels greater than z2 are mapped to the highest value.
-If no \fIz1\fR and and \fIz2\fR arguments are given appropriate values will
+If no \fIz1\fR and \fIz2\fR arguments are given appropriate values will
 be computed using the same algorithm and default parameters used by 
 the \fIDISPLAY\fR task (see the help page for more information).
 If no \fInbins\fR value is given 256 bins are assumed.
@@ -835,7 +835,7 @@ when changing a displayed image in IRAF with the mouse by moving the cursor
 left-right (changing the brightness) or up-down (changing the contrast).
 
 	An example use of this function would be if one wanted to convert an 
-IRAF image to a color rasterfile with the same colormap and and intensity 
+IRAF image to a color rasterfile with the same colormap and intensity 
 scaling as was displayed in XImtool.  After adjusting the display the 
 brightness/contrast values could be read from the control panel and the 
 rasterfile generated using

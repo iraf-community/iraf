@@ -3,6 +3,7 @@
 include <error.h>
 include <math.h>
 include <math/gsurfit.h>
+include	<gset.h>
 include "geomap.h"
 include "geogmap.h"
 

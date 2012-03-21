@@ -68,10 +68,10 @@ define	SKY_HOURS	3
 # Define the list of supported image sky projection types.
 
 define  WTYPE_LIST      "|lin|azp|tan|sin|stg|arc|zpn|zea|air|cyp|car|\
-mer|cea|cop|cod|coe|coo|bon|pco|gls|par|ait|mol|csc|qsc|tsc|tnx|zpx|"
+mer|cea|cop|cod|coe|coo|bon|pco|gls|par|ait|mol|csc|qsc|tsc|tnx|zpx|tpv|"
 
 define  PTYPE_LIST      "|z|z|z|z|z|z|z|z|z|c|c|c|c|n|n|n|n|c|c|c|c|c|c|c|c|c|\
-x|x|"
+x|x|z|"
 
 define  WTYPE_LIN       1
 define  WTYPE_AZP       2
@@ -101,6 +101,7 @@ define  WTYPE_QSC       25
 define  WTYPE_TSC       26
 define  WTYPE_TNX       27
 define  WTYPE_ZPX       28
+define  WTYPE_TPV       29
 
 define  PTYPE_NAMES     "|z|c|n|x|"
 

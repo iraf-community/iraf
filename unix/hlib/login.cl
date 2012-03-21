@@ -2,10 +2,11 @@
 
 # Identify login.cl version (checked in images.cl).
 if (defpar ("logver"))
-    logver = "IRAF V2.15.1a February 2011"
+    logver = "IRAF V2.16 March 2012"
 
 set	home		= "U_HOME"
 set	imdir		= "U_IMDIR"
+set	cache		= "U_CACHEDIR"
 set	uparm		= "home$uparm/"
 set	userid		= "U_USER"
 
@@ -87,6 +88,7 @@ if (deftask ("proto"))
 tv              # image display
 utilities       # miscellaneous utilities
 noao            # optical astronomy packages
+vo              # Virtual Observatory tools
 
 prcache directory
 cache   directory page type help
@@ -97,6 +99,24 @@ if (access (".hushiraf"))
 else {
     clear; type hlib$motd
 }
+
+
+# Uncomment to initialize the SAMP interface on startup.
+if (deftask ("samp") == yes) {
+  printf ("Initializing SAMP .... ")
+  if (sampHubAccess() == yes) {
+     # Enable SAMP messaaging.  Set default handlers that don't require 
+     # VO capabilities.
+     samp quiet
+     samp ("on",                                                >& "dev$null")
+#    samp ("handler", "table.load.votable", "tinfo $url",       >& "dev$null")
+#    samp ("handler", "image.load.fits", "imstat $url",         >& "dev$null")
+     samp noquiet
+     print ("on")
+  } else 
+     print ("No Hub Available\n")
+}
+
 
 # Delete any old MTIO lock (magtape position) files.
 if (deftask ("mtclean"))

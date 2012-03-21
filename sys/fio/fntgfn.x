@@ -103,12 +103,12 @@ char	template[ARB]		# filename template
 int	sort			# sort expanded patterns
 
 int	nedit[MAX_PATTERNS], junk, nchars
-bool	is_template[MAX_PATTERNS], is_edit[MAX_PATTERNS], sortlist
+bool	is_template[MAX_PATTERNS], is_edit[MAX_PATTERNS], sortlist, is_url
 pointer	sp, pbuf, fname, rname, extn, ebuf, sbuf, list, ip, op, ep, pp
 pointer	patp[MAX_PATTERNS], flist[MAX_PATTERNS], editp[MAX_EDIT]
 int	nlists, npat, nstr, maxstr, nextch, sz_sbuf, ix, first_string, ch, i
 int	fntopn(), fntgfn(), fnt_getpat(), gstrcpy(), fnt_edit(), stridx()
-int	patmake(), patmatch()
+int	patmake(), patmatch(), strncmp()
 errchk	fntopn, fntgfn, syserr, malloc, realloc
 
 begin
@@ -159,10 +159,16 @@ begin
 		# If the pattern contains edit substitution sequences it
 		# must be processed to remove the substitution strings.
 
+		is_url = false
 		for (ip=op;  Memc[ip] != EOS;  ip=ip+1) {
 		    ch = Memc[ip]
 
-		    if (stridx (Memc[ip], "@*?[%") > 0) {
+		    if (ch == ':' && strncmp (Memc[ip+1], "//", 2) == 0) {
+			# URL string.
+			is_template[i] = false
+			is_edit[i] = false
+			is_url = true
+		    } else if (!is_url && stridx (Memc[ip], "@*?[%") > 0) {
 			if (ip > patp[i] && Memc[ip-1] == '\\') {
 			    Memc[op-1] = ch
 			    ip = ip + 1
@@ -172,7 +178,8 @@ begin
 			} else {
 			    if (ch == '@' && op == ip)
 				sortlist = false
-			    is_template[i] = true
+			    if (!is_url)
+			        is_template[i] = true
 			}
 		    }
 
@@ -252,11 +259,11 @@ begin
 		    # file name from a file template, a constant file name from
 		    # a string edit expression, or a simple string constant.
 
-		    if (is_template[i] || is_edit[i]) {
+		    if (!is_url && (is_template[i] || is_edit[i])) {
 			ip = rname
 			pp = flist[i]
 			if (is_template[i]) {
-			    if (fntgfn (pp,Memc[rname],SZ_FNAME) == EOF) {
+			    if (fntgfn (pp, Memc[rname], SZ_FNAME) == EOF) {
 				op = fname
 				break
 
@@ -276,8 +283,9 @@ begin
 			op = op + fnt_edit (Memc[ip], Memc[op], editp[i],
 			    nedit[i], Memc[U_PATTERN(pp)])
 
-		    } else
+		    } else {
 			op = op + gstrcpy (Memc[patp[i]], Memc[op], ARB)
+		    }
 		}
 
 		# End of list if nothing returned.
@@ -583,8 +591,11 @@ int	npat			# receives number of PATP elements set
 pointer	sbuf			# used to store output strings
 int	maxch			# maxch chars out
 
-int	ch
+int	ch, peek
+bool	is_url
 pointer	op
+
+int	strncmp(), stridx()
 errchk	syserr
 
 begin
@@ -594,12 +605,28 @@ begin
 	patp[1] = sbuf
 	npat = 1
 	op = sbuf
+	is_url = false
 
-	for (ch=template[ix];  ch != EOS && ch != ',';  ch=template[ix]) {
+	#for (ch=template[ix];  ch != EOS && ch != ',';  ch=template[ix]) {
+	for (ch=template[ix];  ch != EOS;  ch=template[ix]) {
+	    peek = template[ix+1]
 	    if (IS_WHITE (ch)) {
 		# Ignore all whitespace.
 		ix = ix + 1
 		next
+
+	    } else if ((is_url && ch == ',')) {
+		if (stridx (peek, "+-.0123456789") == 0) {
+		    break
+		} else {
+		    # Keep a comma in a URL followed by a digit
+		    Memc[op] = ','
+		    op = op + 1
+		    ix = ix + 1
+		}
+
+	    } else if (!is_url && ch == ',') {
+		break
 
 	    } else if (ch == '\\' && template[ix+1] == ',') {
 		# Escape a comma.
@@ -607,7 +634,7 @@ begin
 		op = op + 1
 		ix = ix + 2
 
-	    } else if (ch == '/' && template[ix+1] == '/') {
+	    } else if (!is_url && (ch == '/' && template[ix+1] == '/')) {
 		# Concatenation operator: start a new sublist.
 		Memc[op] = EOS
 		op = op + 1
@@ -616,6 +643,13 @@ begin
 		if (npat > MAX_PATTERNS)
 		    call syserr (SYS_FNTMAXPAT)
 		patp[npat] = op
+
+	    } else if (ch == ':' && strncmp ("//", template[ix+1], 2) == 0) {
+		# Start of URL string, deposit in output list.
+		Memc[op] = ch
+		op = op + 1
+		ix = ix + 1
+		is_url = true
 
 	    } else {
 		# Ordinary character, deposit in output list.
@@ -752,12 +786,13 @@ int	token				#O token type code
 
 int	nseen, i
 pointer	ip, ip_start, op, cp
-int	stridx()
+int	stridx(), strncmp()
 
 begin
 	ip = U_TEMPLATE_INDEX(pp)			# retrieve pointer
 	while (IS_WHITE (Memc[ip]))
 	    ip = ip + 1
+
 
 	switch (Memc[ip]) {
 	case EOS:

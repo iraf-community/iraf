@@ -586,7 +586,11 @@ deposit_:
 		}
 
 		yytext[yyleng++] = ch;
-		if (ch == '\\')
+		if (ch == '[') {
+		    while ((ch = input()) != ']')
+		        yytext[yyleng++] = ch;
+		    yytext[yyleng++] = ch;
+		} else if (ch == '\\')
 		    yytext[yyleng++] = ch = input();
 		else if (!(isalnum(ch) || ch == '_' || ch == '$' || ch == '.'))
 		    identifier = 0;

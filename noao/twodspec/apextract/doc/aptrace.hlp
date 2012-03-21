@@ -144,7 +144,7 @@ tracing (see \fBapedit\fR).  Tracing is selected with the parameter
 \fItrace\fR.  If the tracing is done interactively (the
 \fIinteractive\fR parameter set to yes) then the user is queried
 whether or not to trace each image.  The responses are "yes", "no",
-"YES", or "NO", where the the upper case queries suppress this query
+"YES", or "NO", where the upper case queries suppress this query
 for the following images.
 
 The tracing begins with the specified dispersion line.  A dispersion
@@ -278,7 +278,7 @@ The polynomial can be expressed as the sum
 	y = sum from i=1 to order {c_i * z_i}
 .fi
 
-where the the c_i are the coefficients and the z_i are defined
+where the c_i are the coefficients and the z_i are defined
 interactively as:
 
 .nf
@@ -295,7 +295,7 @@ The polynomial can be expressed as the sum
 	y = sum from i=1 to order {c_i * z_i}
 .fi
 
-where the the c_i are the coefficients and the z_i are defined
+where the c_i are the coefficients and the z_i are defined
 interactively as:
 
 .nf

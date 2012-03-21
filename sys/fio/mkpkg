@@ -20,6 +20,7 @@ libsys.a:
 	diropen.x	<config.h> <diropen.h> <error.h> <fio.h> <fset.h>\
 			<knet.h>
 	falloc.x	<config.h> <error.h> <fio.com> <fio.h> <knet.h> <mach.h>
+        fcache.x        <ctype.h> <diropen.h> <finfo.h> <fset.h> <mach.h>
 	fcanpb.x	<config.h> <fio.com> <fio.h>
 	fchdir.x	<knet.h>
 	fclobber.x	<config.h> <fio.com> <fio.h>
@@ -54,6 +55,7 @@ libsys.a:
 	fnextn.x	
 	fnldir.x	
 	fnroot.x	
+	frmdir.x	<knet.h>
 	fntgfn.x	<chars.h> <ctype.h> <diropen.h> <pattern.h>
 	fnullfile.x	
 	fopnbf.x	
@@ -74,8 +76,10 @@ libsys.a:
 	fstats.x	<config.h> <fio.com> <fio.h> <fset.h>
 	fstdfile.x	
 	fstrfp.x	<config.h> <fio.com> <fio.h>
+	fsymlink.x	<knet.h>
 	fsvtfn.x	<error.h>
 	fswapfd.x	<config.h> <fio.com> <fio.h>
+	funlink.x	<knet.h>
 	futime.x	<config.h> <knet.h>
 	fwatio.x	<config.h> <fio.com> <fio.h>
 	fwritep.x	<fio.com> <config.h> <fio.h>
@@ -86,6 +90,7 @@ libsys.a:
 	getline.x	<config.h> <fio.com> <fio.h>
 	getlline.x	
 	glongline.x	
+	isdir.x		<ctype.h> <finfo.h>
 	mktemp.x	
 	ndopen.x	<fset.h>
 	note.x		<config.h> <fio.com> <fio.h>

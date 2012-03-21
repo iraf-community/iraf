@@ -25,4 +25,5 @@ C       written by Wm Pence, HEASARC/GSFC, June 1991
 
         call ftgcld(iunit,colnum,frow,felem,nelem,1,1,nulval,
      &      array,flgval,anynul,status)
+
         end        

@@ -129,8 +129,8 @@ image is described below.
 
     2. scale the image
 
-    xt = xt / xmag + yt / ymag
-    yt = xt / xmag + yt / ymag
+    xt = xt / xmag
+    yt = xt / xmag
 
     3. rotate the image
 
@@ -170,7 +170,7 @@ EXAMPLES
    cl> imlintran n1068 n1068r 45.0 225.0 1.0 1.0 xin=100. yin=100. \
    >>> xout=150. yout=150.
 
-3. Rotate an image by 45 degrees and reduce the the scale in x and y
+3. Rotate an image by 45 degrees and reduce the scale in x and y
    by a factor of 1.5
 
    cl> imlintran n7026 n7026rm 45.0 45.0 1.5 1.5

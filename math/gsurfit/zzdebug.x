@@ -1,11 +1,12 @@
 task test = t_test
 
-include <gsurfit.h>
+include <math/gsurfit.h>
 
 procedure t_test()
 
-int	i, j, k, maxorder, xorder, yorder, xterms, xincr, npts, stype, ier
-int	ncoeff
+int	i, j, k
+int	xorder, yorder, xterms, stype
+int	ncoeff, maxorder, xincr, npts, stype1, ier
 pointer	gs, ags, sgs
 double	dx, dy, const, accum, sum, rms1, rms2
 double	x[121], y[121], z[121], w[121], zfit[121], coeff[121], save[121]
@@ -38,57 +39,112 @@ begin
 	    call pargi (xterms)
 
 	# Generate data
-	switch (xterms) {
-	case GS_XNONE:
+	if (stype > 3) {
+	    switch (xterms) {
+	    case GS_XNONE:
 
-	    do i = 1, npts {
-	        sum = 0.0d0
-	        do j = 2, yorder
-		    sum = sum + j * y[i] ** (j - 1)
-		do j = 1, xorder
-		    sum = sum + j * x[i] ** (j - 1)
-		z[i] = sum
-	    }
-
-	case GS_XHALF:
-
-	    maxorder = max (xorder + 1, yorder + 1)
-	    do i = 1, npts {
-		sum = 0.0d0
-		xincr = xorder
-		do j = 1, yorder {
-		    const = j * y[i] ** (j - 1)
-		    accum= 0.0d0
-		    do k = 1, xincr {
-			accum = accum + k * x[i] ** (k - 1)
-		    }
-		    sum = sum + const * accum
-		    if ((j + xorder + 1) > maxorder)
-			xincr = xincr - 1
+		do i = 1, npts {
+		    sum = 0.0d0
+		    do j = 2, yorder
+			sum = sum + j * y[i] ** (j - 1)
+		    do j = 2, xorder
+			sum = sum + j * x[i] ** (j - 1)
+		    z[i] = sum
 		}
-		z[i] = sum
-	    }
 
-	case GS_XFULL:
+	    case GS_XHALF:
 
-	    do i = 1, npts {
-		sum = 0.0d0
-		do j = 1, yorder {
-		    const = j * y[i] ** (j - 1)
-		    accum = 0.0d0
-		    do k = 1, xorder {
-			accum = accum + k * x[i] ** (k - 1)
+		maxorder = max (xorder + 1, yorder + 1)
+		do i = 1, npts {
+		    sum = 0.0d0
+		    xincr = xorder
+		    do j = 1, yorder {
+			const = j * y[i] ** (j - 1)
+			accum= 0.0d0
+			do k = 1, xincr {
+			    if (j > 1 || k > 1)
+				accum = accum + k * x[i] ** (k - 1)
+			}
+			sum = sum + const * accum
+			if ((j + xorder + 1) > maxorder)
+			    xincr = xincr - 1
 		    }
-		    sum = sum + const * accum
+		    z[i] = sum
 		}
-		z[i] = sum
+
+	    case GS_XFULL:
+
+		do i = 1, npts {
+		    sum = 0.0d0
+		    do j = 1, yorder {
+			const = j * y[i] ** (j - 1)
+			accum = 0.0d0
+			do k = 1, xorder {
+			    if (j > 1 || k > 1)
+				accum = accum + k * x[i] ** (k - 1)
+			}
+			sum = sum + const * accum
+		    }
+		    z[i] = sum
+		}
 	    }
+
+	    stype1 = stype - 3
+	} else {
+	    switch (xterms) {
+	    case GS_XNONE:
+
+		do i = 1, npts {
+		    sum = 0.0d0
+		    do j = 2, yorder
+			sum = sum + j * y[i] ** (j - 1)
+		    do j = 1, xorder
+			sum = sum + j * x[i] ** (j - 1)
+		    z[i] = sum
+		}
+
+	    case GS_XHALF:
+
+		maxorder = max (xorder + 1, yorder + 1)
+		do i = 1, npts {
+		    sum = 0.0d0
+		    xincr = xorder
+		    do j = 1, yorder {
+			const = j * y[i] ** (j - 1)
+			accum= 0.0d0
+			do k = 1, xincr {
+			    accum = accum + k * x[i] ** (k - 1)
+			}
+			sum = sum + const * accum
+			if ((j + xorder + 1) > maxorder)
+			    xincr = xincr - 1
+		    }
+		    z[i] = sum
+		}
+
+	    case GS_XFULL:
+
+		do i = 1, npts {
+		    sum = 0.0d0
+		    do j = 1, yorder {
+			const = j * y[i] ** (j - 1)
+			accum = 0.0d0
+			do k = 1, xorder {
+			    accum = accum + k * x[i] ** (k - 1)
+			}
+			sum = sum + const * accum
+		    }
+		    z[i] = sum
+		}
+	    }
+
+	    stype1 = stype
 	}
 
 	# Print out the data.
 	call printf ("\nXIN:\n")
 	do i = 1, npts {
-	    call printf ("%0.7g ")
+	    call printf ("%6.3f ")
 		call pargd (x[i])
 	    if (mod (i, 9) == 0)
 		call printf ("\n")
@@ -97,7 +153,7 @@ begin
 
 	call printf ("\nYIN:\n")
 	do i = 1, npts {
-	    call printf ("%0.7g ")
+	    call printf ("%6.3f ")
 		call pargd (y[i])
 	    if (mod (i, 9) == 0)
 		call printf ("\n")
@@ -106,7 +162,7 @@ begin
 
 	call printf ("\nZIN:\n")
 	do i = 1, npts {
-	    call printf ("%0.7g ")
+	    call printf ("%6.3f ")
 		call pargd (z[i])
 	    if (mod (i, 9) == 0)
 		call printf ("\n")
@@ -114,8 +170,13 @@ begin
 	call printf ("\n")
 
 	# Fit surface.
-	call dgsinit (gs, stype, xorder, yorder, xterms, -1.0d0, 1.0d0,
-	    -1.0d0, 1.0)
+	call dgsinit (gs, stype1, xorder, yorder, xterms, -1.0d0, 1.0d0,
+	    -1.0d0, 1.0d0)
+	if (stype > 3) {
+	    call dgsset (gs, GSXREF, 0d0)
+	    call dgsset (gs, GSYREF, 0d0)
+	    call dgsset (gs, GSZREF, 0d0)
+	}
 	call dgsfit (gs, x, y, z, w, npts, WTS_UNIFORM, ier) 
 	call printf ("\nFIT ERROR CODE: %d\n")
 	    call pargi (ier)
@@ -124,7 +185,7 @@ begin
 	call dgsvector (gs, x, y, zfit, npts)
 	call printf ("\nZFIT:\n")
 	do i = 1, npts {
-	    call printf ("%0.7g ")
+	    call printf ("%6.3f ")
 		call pargd (zfit[i])
 	    if (mod (i, 9) == 0)
 		call printf ("\n")
@@ -138,9 +199,29 @@ begin
 	do i = 1, npts
 	    rms2 = rms2 + (z[i] - dgseval (gs, x[i], y[i])) ** 2
 	rms2 = sqrt (rms2 / (npts - 1))
-	call printf ("\nRMS: vector = %0.14g point = %0.14g\n\n")
+	#call printf ("\nRMS: vector = %0.14g point = %0.14g\n\n")
+	call printf ("\nRMS: vector = %0.4f point = %0.4f\n\n")
 	    call pargd (rms1)
 	    call pargd (rms2)
+
+	# Print the coefficients.
+	call dgscoeff (gs, coeff, ncoeff)
+	call printf ("GSFIT coeff:\n")
+	call printf ("first %0.14g %0.14g\n")
+	    call pargd (dgsgcoeff (gs, 1, 1))
+	    call pargd (dgsgcoeff (gs, xorder, 1))
+	do i = 1, ncoeff {
+	    call printf ("%d  %0.14g\n")
+		call pargi (i)
+		call pargd (coeff[i])
+	}
+	call printf ("last %0.14g %0.14g\n")
+	    call pargd (dgsgcoeff (gs, 1, yorder))
+	    call pargd (dgsgcoeff (gs, xorder, yorder))
+	call printf ("\n")
+
+	call dgsfree (gs)
+	return
 
 	# Evaluate the first derivatives.
 	call dgsder (gs, x, y, zfit, npts, 1, 0)
@@ -173,28 +254,15 @@ begin
 	}
 	call printf ("\n")
 
-	# Print the coefficients.
-	call dgscoeff (gs, coeff, ncoeff)
-	call printf ("GSFIT coeff:\n")
-	call printf ("first %0.14g %0.14g\n")
-	    call pargd (dgsgcoeff (gs, 1, 1))
-	    call pargd (dgsgcoeff (gs, xorder, 1))
-	do i = 1, ncoeff {
-	    call printf ("%d  %0.14g\n")
-		call pargi (i)
-		call pargd (coeff[i])
-	}
-	call printf ("last %0.14g %0.14g\n")
-	    call pargd (dgsgcoeff (gs, 1, yorder))
-	    call pargd (dgsgcoeff (gs, xorder, yorder))
-	call printf ("\n")
-
 	# Refit the surface point by point.
 	call dgszero (gs)
 	do i = 1, npts {
 	    call dgsaccum (gs, x[i], y[i], z[i], w[i], WTS_UNIFORM)
 	}
-	call dgssolve (gs, ier)
+	if (stype > 3)
+	    call dgssolve1 (gs, ier)
+	else
+	    call dgssolve (gs, ier)
 	call printf ("\nACCUM FIT ERROR CODE: %d\n")
 	    call pargi (ier)
 	call dgsrej (gs, x[1], y[1], z[1], w[1], WTS_UNIFORM)

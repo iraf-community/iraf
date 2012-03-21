@@ -467,18 +467,21 @@ binop (int opcode)
                     /* Search s2 for first_char, if found check for complete
                      * match of s1, else move on.
                      */
-                    for (ip=o2.o_val.v_s; !iresult && (ch = *ip) != EOS; ip++) {
+                    ch = o2.o_val.v_s;
+                    for (ip=o2.o_val.v_s; !iresult && (ch=*ip) != EOS; ip++) {
                         if (ch == delim) {
                             index++;
-                        } else if (ch == first_char) {
+                        } else if (*ip == first_char) {
                             fp = ip;
                             cp = o1.o_val.v_s;
-                            while (*cp != EOS && *cp == *ip && *cp != delim ) {
+                            while (*cp != EOS && *cp == *ip && *ip != delim ) {
                                 cp++; ip++;
                             }
-                            if (*cp == EOS || *cp == delim) {
+                            if (*cp == EOS) {
                                 iresult = index;
                                 break;
+                            } else if (*ip == delim) {
+                                index++;
                             }
                         }
                     }

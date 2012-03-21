@@ -635,7 +635,7 @@ closing files, deleting temporary files, and aborting the program.
 
 Language support includes the IFERR and IFNOERR statements and the ERRCHK
 declaration.  The IFERR and IFNOERR statements are grammatically equivalent
-to the IF statement.  The meaning of the IFERR statement is "if an an error
+to the IF statement.  The meaning of the IFERR statement is "if an error
 occurs during the processing of the enclosed code,...".  IFNOERR is equivalent,
 except that the sense of the test is reversed.  Note that the condition to
 be tested in an IFERR statement may a single or compound procedure call or

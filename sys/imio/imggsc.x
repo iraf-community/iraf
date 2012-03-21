@@ -34,7 +34,8 @@ include <szpixtype.inc>
 begin
 	#sz_pixel = sizeof(IM_PIXTYPE(im))
 	#sz_pixel = max ( sizeof(dtype), sizeof(IM_PIXTYPE(im)) )
-	sz_pixel = pix_size[IM_PIXTYPE(im)]
+	#sz_pixel = pix_size[IM_PIXTYPE(im)]
+	sz_pixel = sizeof(IM_PIXTYPE(im))
 	rlio = (and (IM_PLFLAGS(im), PL_RLIO+PL_FAST) == PL_RLIO)
 
 	# Check that the section does not extend out of bounds.

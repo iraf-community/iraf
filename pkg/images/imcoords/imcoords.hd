@@ -12,8 +12,8 @@ cctran		hlp=doc$cctran.hlp,		src=src$t_cctran.x
 ccxymatch	hlp=doc$ccxymatch.hlp,		src=src$t_ccxymatch.x
 hpctran		hlp=doc$hpctran.hlp,		src=src$t_hpctran.x
 imcctran	hlp=doc$imcctran.hlp,		src=src$t_imcctran.x
-mkcwcs		hlp=doc$mkcwcs.hlp,		src=src$t_mkcwcs.cl
-mkcwwcs		hlp=doc$mkcwwcs.hlp,		src=src$t_mkcwwcs.cl
+mkcwcs		hlp=doc$mkcwcs.hlp,		src=src$mkcwcs.cl
+mkcwwcs		hlp=doc$mkcwwcs.hlp,		src=src$mkcwwcs.cl
 skyctran        hlp=doc$skyctran.hlp,   	src=src$t_skyctran.x
 starfind        hlp=doc$starfind.hlp,   	src=src$t_starfind.x
 wcsctran	hlp=doc$wcsctran.hlp,	  	src=src$t_wcsctran.x

@@ -38,6 +38,8 @@ libex.a:
 	@db		# Update image database interface.
 	@dbc		# Update image database interface (enhanced).
 	@iki		# Update image kernel interface.
+	@imt		# Update the image template package.
+	#imt.x	
 
 	imaccess.x	
 	imaflp.x	
@@ -96,7 +98,6 @@ libex.a:
 	imstati.x	<imhdr.h> <imio.h> <imset.h>
 	imstatr.x	<imhdr.h> <imio.h> <imset.h>
 	imstats.x	<imhdr.h> <imio.h> <imset.h>
-	imt.x	
 	imunmap.x	<imhdr.h> <imio.h>
 	imwbpx.x	<imhdr.h> <imio.h> <imset.h> <szpixtype.inc>
 	imwrite.x	<fset.h> <imio.h>

@@ -112,7 +112,7 @@ an output image \fIoutput\fR in which all the subrasters are aligned
 with respect to a reference subraster.
 
 If \fIalignment\fR = "coords", IRALIGN accumulates the relative shifts
-between adjacent subrasters defined by the the data in \fIcoords\fR,
+between adjacent subrasters defined by the data in \fIcoords\fR,
 into a total shift for each subraster with respect to the reference subraster.
 Relative shifts defined for non-adjacent subrasters are ignored.
 For those subrasters which have no relative shift information,

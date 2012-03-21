@@ -197,7 +197,7 @@ suppressed when the parameter \fIsubtract\fR is no.  If the scattered
 light determination and fitting is done interactively (the
 \fIinteractive\fR parameter set to yes) then the user is queried
 whether or not to do the fitting and subtraction for each image.  The
-responses are "yes", "no", "YES", or "NO", where the the upper case
+responses are "yes", "no", "YES", or "NO", where the upper case
 queries suppress this query for the following images.  When the task is
 interactive there are further queries for each step of the operation
 which may also be answered both individually or collectively for all

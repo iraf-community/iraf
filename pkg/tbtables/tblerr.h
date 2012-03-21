@@ -27,3 +27,5 @@ define	ER_TBCOLBADTYP		82	# bad data type (memory corrupted?)
 define	ER_TBFILEMPTY		83	# table data file is empty
 define	ER_TBCINFMISSING	84	# EOF while reading column info
 define	ER_BYTESWAPPED  	85	# table appears to be byte-swapped
+
+define	ER_TBCONVERT  		91	# table cannot be converted

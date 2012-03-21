@@ -90,7 +90,7 @@ as in the examples.
 Image Template Procedures
 
     The image template package (IMT) is an existing package.  The calling
-sequences are identical to those of the the FNT (FIO filename template) package
+sequences are identical to those of the FNT (FIO filename template) package
 and have not been changed in this release of the package.  Extensive changes
 have however been made internally, and the new package has been installed
 in IMIO.  The old package has been removed from the XTOOLS library.  To use

@@ -13,16 +13,21 @@ The input text files containing the pixel and celestial coordinates of
 points in the input images. The coordinates are listed one per line with x, y,
 ra / longitude, and dec / latitude in the columns specified by the
 \fIxcolumn\fR, \fIycolumn\fR, \fIlngcolumn\fR, and \fIlatcolumn\fR parameters
-respectively.
+respectively.  Whether all files are combined to produce one solution or
+each file produces a separate solution depends on whether there is a
+matching list of output \fIsolutions\fR names or \fIresults\fR files.
 .le
 .ls database
 The text database file where the computed plate solutions are stored.
 .le
 .ls solutions = ""
-An optional list of plate solution names. If no names are supplied then
-the database records are assigned the names of the input
-images \fIimages\fR, or the names of the coordinate files
-\fIinput\fR.
+An optional list of plate solution names. If there are multiple input
+coordinate files and no name or a single name is specified then the
+input coordinates are combined to produce a single solution.  Otherwise
+the list must match the number of input coordinate files.  If no names are
+supplied then the database records are assigned the names of the input
+images \fIimages\fR, or the names of the coordinate files \fIinput\fR.
+In the case of multiple coordinate files the first image or input is used.
 .le
 .ls images = ""
 The images associated with the input coordinate files. The number of images
@@ -35,8 +40,10 @@ and written to the image header.
 Optional output files containing a summary of the results including a
 description of the plate geometry and a listing of the input coordinates,
 the fitted coordinates, and the fit residuals. The number of
-results files must be one or equal to the number of input files. If
+results files must be zero, one or equal to the number of input files. If
 results is "STDOUT" the results summary is printed on the standard output.
+If there are multiple input coordinate files and zero or one output is
+specified then the input coordinates are combined to produce a single solution.
 .le
 .ls xcolumn = 1, ycolumn = 2, lngcolumn = 3, latcolumn = 4
 The input coordinate file columns containing the x, y, ra / longitude and
@@ -195,12 +202,20 @@ The values of the keywords \fIlngref\fR, \fIlatref\fR, \fIrefsystem\fR,
 coordinates of the reference point.
 .le
 .le
+.ls xref = "INDEF", yref = "INDEF"
+The reference pixel may be specified as a value or image header keyword.
+In the latter case a reference image must be specified.  By specifying
+the reference pixel the solution will be constrained to putting the
+reference coordinate at that point.
+.le
 .ls lngref = "INDEF", latref = "INDEF"
-The ra / longitude and dec / latitude of the reference point. Lngref and latref
-may be numbers, e.g 13:20:42.3 and -33:41:26 or keywords for the
-appropriate parameters in the image header, e.g. RA and DEC for NOAO
-image data. If lngref and latref are undefined then the position 
-of the reference point defaults to the mean of the input coordinates.
+The ra / longitude and dec / latitude of the reference point(s).  Lngref
+and latref may be numbers, e.g 13:20:42.3 and -33:41:26 or keywords for the
+appropriate parameters in the image header, e.g. RA/DEC or CRVAL1/CRVAL2.
+Each parameter may be a list to apply different reference points to
+each input coordinate list.  If lngref and latref are undefined then
+the position of the reference point defaults to the mean of the input
+coordinates.
 .le
 .ls refsystem = "INDEF"
 The celestial coordinate system of the reference point. Refsystem may
@@ -361,14 +376,14 @@ The graphics cursor.
 .ih
 DESCRIPTION
 
-CCMAP computes the plate solution for an image using a list of matched pixel
-and celestial coordinates. The celestial coordinates are usually equatorial
-coordinates, but may also be ecliptic, galactic, or supergalactic coordinates.
-The input coordinate files \fIinput\fR must be text file tables whose columns
-are delimited by whitespace. The pixel and celestial coordinates are listed
-in input, one per line with  x, y, ra / longitude, and dec / latitude in
-columns \fIxcolumn\fR, \fIycolumn\fR, \fIlngcolumn\fR, and \fIlatcolumn\fR
-respectively.
+CCMAP computes the plate solution for an image or set of images using lists
+of matched pixel and celestial coordinates. The celestial coordinates
+are usually equatorial coordinates, but may also be ecliptic, galactic,
+or supergalactic coordinates.  The input coordinate files \fIinput\fR must
+be text file tables whose columns are delimited by whitespace. The pixel
+and celestial coordinates are listed in input, one per line with  x, y,
+ra / longitude, and dec / latitude in columns \fIxcolumn\fR, \fIycolumn\fR,
+\fIlngcolumn\fR, and \fIlatcolumn\fR respectively.
 
 The \fIxmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR parameters define
 the region of validity of the fit in the pixel coordinate system. They should
@@ -402,7 +417,7 @@ coordinates using the sky projection geometry \fIprojection\fR and
 the celestial coordinates of the projection reference point set by
 the user. The default projection is the tangent plane or gnomonic
 projection commonly used in optical astronomy. The projections most commonly
-used in astronomy are are "sin" (the orthographic projection, used in radio
+used in astronomy are "sin" (the orthographic projection, used in radio
 aperture synthesis), "arc" (the zenithal equidistant projection, widely
 used as an approximation for Schmidt telescopes), and "lin" (linear).
 Other supported projections are "ait", "car", "csc", "gls", "mer", "mol",
@@ -410,6 +425,51 @@ Other supported projections are "ait", "car", "csc", "gls", "mer", "mol",
 function "tnx" combines the "tan" projection with a polynomial fit
 to the residuals can be used to represent more complicated distortion
 functions.
+
+There are two modes in which this task works with multiple input
+coordinate lists.  In one case each input list and possible associated
+image is treated independently and produce separate solutions.  To
+select this option requires specifying a matching list of solution
+names or output results files.  Note that this can also be simply done
+by running the task multiple times with a single input list each time.
+
+In the second mode data from multiple input lists are combined to
+produce a single solution.  This is useful when multiple exposures are
+taken to define a higher quality astrometric solution.  This mode is
+selected when there are multiple input lists, and possibly associated
+images, and no solution name or a single solution name is specified.
+
+When combining input data each set of coordinates may have different
+reference points which can be specified either as a list or by
+reference to image header keywords.  The different reference points
+are used to convert each set of coordinates to the same coordinate
+frame.  Typically this occurs when a set of exposures, each with the
+same coordinate reference pixel, has slightly different pointing as
+defined by the coordinate reference value.  These different points
+result from a dither and can be useful to more completely sample the
+image pixel space.  In other words, astrometric reference stars can be
+moved around the images to produce many more fitting points than occur
+with a single exposure. The key point to this process is that the
+shifts are mapped by the reference points of the pointing and the
+standard coordinates are independent of the pointing.
+
+A particular feature primarily intending for combining multiple
+exposures, but applies to single exposures as well, is an adjustment to
+the specified tangent point value based on the image WCS.  When images,
+reference pixels, and reference coordinates are all defined and the
+images contain a celestial WCS the following computation is performed.
+The reference information replaces the WCS tangent point values, though
+typically the initial reference information is specified as the tangent
+point, and the updated WCS is used to evaluate celestial coordinates
+from the input pixel coordinates. The average difference between the WCS
+evaluated coordinates and the input celestial coordinates is computed.
+This difference is applied to the reference point prior to the standard
+coordinate plate solution calculation.  In other words, the reference
+point is tweaked in the initial image WCS to make it agree on average with
+the input reference coordinates.  If one updates the WCS of the images by
+the plate solution and the repeats the plate solution, particularly when
+using multiple exposures, an iterative convergence to a self-consistent
+WCS of both the tangent point and plate solution can be obtained.
 
 Several polynomial cross terms options are available. Options "none", 
 "half", and "full" are illustrated below for a quadratic polynomial in
@@ -464,6 +524,14 @@ parameters. Lngrefunits and latrefunits default to the values of the input
 coordinate units if undefined by either the user or the \fIrefsystem\fR
 parameter. ONCE DETERMINED THE REFERENCE POINT CANNOT BE RESET DURING
 THE FITTING PROCESS.
+
+The \fIxref\fR and \fIyref\fR parameters may be used to constrain the
+solution to putting the reference coordinate at the reference pixel.
+Effectively what this does is fix the zero-th order coefficient in the
+linear part of the solution.  If a reference pixel is not specified the
+solution will produce a point determined from the zero-th order
+constant coefficient.  This may not be what is expected based on
+the specified reference celestial coordinate.
 
 The fitting functions f and g are specified by the \fIfunction\fR parameter
 and may be power series polynomials, Legendre polynomials, or Chebyshev

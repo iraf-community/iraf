@@ -78,7 +78,8 @@ switch ($UNAME)
     case macosx:
     case macintel:
     case ipad:
-        set dlcmd 		= "/usr/bin/ftp -A"
+        #set dlcmd 		= "/usr/bin/ftp -A"
+        set dlcmd 		= "/usr/bin/ftp"
         breaksw
 
     # Other architectures to be added here
@@ -87,6 +88,11 @@ switch ($UNAME)
 	ERRMSG  "Unable to determine platform architecture."
 	exit 1
 endsw
+
+# If we don't have a download command installed, use our own .....
+if (! -e $dlcmd) then
+    set dlcmd = `dirname $0`/fget
+endif
 
 ##############################################################################
 # END OF MACHDEP DEFINITIONS.

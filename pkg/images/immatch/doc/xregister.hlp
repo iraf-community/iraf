@@ -462,7 +462,7 @@ middle of the observed range of shifts in x and y will remove this problem.
 In non-interactive mode the parameters are set at task startup
 and the input images are processed sequentially. If the \fIverbose\fR
 flag is set messages about the progress of the task are printed on the
-screen as the the task is running.
+screen as the task is running.
 
 In interactive mode the user can mark the regions to be used
 to compute the cross-correlation function on the image display,

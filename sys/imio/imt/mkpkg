@@ -1,0 +1,24 @@
+# Update the IMIO portion of the LIBEX library.
+
+$checkout libex.a ../
+$update   libex.a
+$checkin  libex.a ../
+$exit
+
+libex.a:
+        imt.x
+        imx.x   	imx.h <error.h>
+        imxbreakout.x
+        imxparse.x      imx.h <ctype.h>
+        imxescape.x     imx.h
+        imxexpand.x     imx.h <ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>
+	imxexpr.x	imx.h <ctype.h> <error.h> <evexpr.h> <lexnum.h>
+        imxftype.x      imx.h <error.h>
+        imxpreproc.x    imx.h
+	;
+
+test:
+	$call libpkg.a
+	$omake	zzdebug.x
+        $link	zzdebug.o libpkg.a
+	;

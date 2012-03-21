@@ -873,7 +873,7 @@ EXCEPTION HANDLING (fully implemented)
 
     A user handler procedure is posted by a call to XWHEN.  If and when the
 exception occurs, the handler is called with an integer argument identifying
-the exception (the same handler may be be posted for multiple exceptions).
+the exception (the same handler may be posted for multiple exceptions).
 The handler procedure should return as its second argument either X_IGNORE
 (resume normal execution) or the address of a procedure to be executed,
 normally the "old_hander" address returned by XWHEN.

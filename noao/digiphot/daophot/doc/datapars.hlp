@@ -140,8 +140,8 @@ the observations are to be compared to published aperture photometry
 measurements in the literature.
 
 The parameter \fIfwhmpsf\fR defines the full-width at half-maximum of the
-stellar point spread function. The DAOFIND task, he PHOT task centering
-algorithms "gauss" and "ofilt", the the PSF modeling task PSF all require
+stellar point spread function. The DAOFIND task, the PHOT task centering
+algorithms "gauss" and "ofilt", and the PSF modeling task PSF all require
 an accurate estimate for this parameter.
 
 By setting the \fIscale\fR and \fIfwhmpsf\fR appropriately the aperture

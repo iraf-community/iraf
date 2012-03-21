@@ -93,6 +93,7 @@ extern	char		MEMCOM[];
 #define	strcat		u_strcat
 #define	strchr		u_index
 #define	strcmp		u_strcmp
+#define	strdup		u_strdup
 #define	strcpy		u_strcpy
 #define	strlen		u_strlen
 #define	strncat		u_strnt			/* collision	*/
@@ -144,6 +145,7 @@ extern char    *realloc (char *buf, unsigned newsize);
 extern char    *rindex (char *str, int ch);
 extern char    *sprintf (char *str, char *format, ...);
 extern char    *strcat (char *s1, char *s2);
+extern char    *strdup (char *str);
 extern char    *strcpy (char *s1, char *s2);
 extern char    *strncat (char *s1, char *s2, int n);
 extern char    *strncpy (char *s1, char *s2, int n);

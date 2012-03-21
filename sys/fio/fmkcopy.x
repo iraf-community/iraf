@@ -19,9 +19,10 @@ procedure fmkcopy (oldfile, newfile)
 char	oldfile[ARB]		# file to be copied
 char	newfile[ARB]		# newfile
 
+char	url[SZ_PATHNAME], old[SZ_PATHNAME]
 int	status, file_exists, junk
 pointer	vp, sp, oldosfn, newosfn
-int	vfnadd()
+int	vfnadd(), strncmp(), nowhite()
 pointer	vfnopen()
 errchk	delete, filerr, fmapfn, fclobber
 include	<fio.com>
@@ -33,9 +34,22 @@ begin
 	call salloc (oldosfn, SZ_PATHNAME, TY_CHAR)
 	call salloc (newosfn, SZ_PATHNAME, TY_CHAR)
 
+
+        # If we're given a URL to a file, cache it.
+	call aclrc (old, SZ_PATHNAME)
+        if (strncmp ("http:", oldfile, 5) == 0)
+	    return
+        else if (strncmp ("file:", oldfile, 5) == 0)
+	    return
+        else {
+            # Strip any whitespace at either end of the filename.
+            if (nowhite (oldfile, old, SZ_PATHNAME) == 0)
+                call syserr (SYS_FNOFNAME)
+        }
+
 	# Get OSFN of old file and verify that the file exists.
 
-	call fmapfn (oldfile, Memc[oldosfn], SZ_PATHNAME)
+	call fmapfn (old, Memc[oldosfn], SZ_PATHNAME)
 	call zfacss (Memc[oldosfn], 0, 0, file_exists)
 	if (file_exists == NO)
 	    call filerr (oldfile, SYS_FOPEN)

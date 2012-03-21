@@ -116,6 +116,7 @@ begin
 	RMS_DATA(rm) = rm + RMS_OFFSET
 	RMS_IN(rm) = P2S(RMS_DATA(rm) + box)
 	RMS_OUT(rm) = RMS_IN(rm) + box
+	RMS_DATA(rm) = P2R(RMS_DATA(rm))
 
 	do i = 0, box-1 {
 	    DATA(rm,i) = data

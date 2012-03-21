@@ -118,7 +118,7 @@ cl> page reg001.cat.1
 cl> afiltcat reg001.cat.1 reg001.cat.2 fsort=mag1
 .fi
 
-2. Repeat example 1 but but only output records for which mag1 <= 16.0.
+2. Repeat example 1 but only output records for which mag1 <= 16.0.
 
 .nf
 cl> afiltcat reg001.cat.1 reg001.cat.3 fsort=mag1 fexpr="mag1 <= 16.0"

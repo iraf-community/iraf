@@ -25,7 +25,7 @@ Catalog server records names have the form "catalog@site",
 e.g. "usno2@noao". Adding support for a new catalog server or responding
 to changes in the behavior of an already supported server requires either adding
 a new record to the configuration file or changing an existing record in
-the configuration file. It does not require changing the the catalog
+the configuration file. It does not require changing the catalog
 access code.
 
 The catalog server network address tells the catalog access code where
@@ -177,7 +177,7 @@ t0 0. If undefined the recsize keyword defaults to 0 for variable record
 size.
 
 The \fIhskip\fR, \fItskip\fR, \fIltrim\fR, and \fItrim\fR define the number
-of leading and and trailing records in the query output to sky, and the
+of leading and trailing records in the query output to sky, and the
 number of leading and trailing characters in each record to trim, i.e.
 replace with blanks. If absent these keywords default to zero.
 

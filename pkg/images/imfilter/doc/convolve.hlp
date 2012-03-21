@@ -83,7 +83,7 @@ The kernel elements are separated by whitespace or commas and the kernel rows
 are delimited by the character \fIrow_delimiter\fR. 
 In string entry mode the elements are assumed to be in row order.
 In text file entry mode the \fIlast\fR row of the
-kernel is the the \fIfirst\fR row of the text file.
+kernel is the \fIfirst\fR row of the text file.
 
 The parameters \fIbilinear\fR and \fIradsym\fR can be used to greatly
 speed up the convolution task for convolution kernels which have
@@ -140,8 +140,8 @@ of xkernel and ykernel respectively.
 
 .fi
 
-3. Convolve an image with the full 2D kernel kernel and with the
-the equivalent 1D kernels xkernel and ykernel and compare the results.
+3. Convolve an image with the full 2D kernel and with the the equivalent 
+1D kernels xkernel and ykernel and compare the results.
 
 .nf
     cl> convolve m92 m92.1 kernel

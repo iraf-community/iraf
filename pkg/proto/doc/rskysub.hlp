@@ -82,7 +82,7 @@ The image header keyword containing the computed scaling factor.
 
 .ls statsec = ""
 The input image section used to compute the individual image scaling factors.
-Statsec is independent of of the input image section if any.
+Statsec is independent of the input image section if any.
 .le
 .ls lower = INDEF, upper = INDEF
 The minimum and maximum input image good data values.

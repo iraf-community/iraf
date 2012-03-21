@@ -15,7 +15,7 @@ The list of photometry files containing the x and y coordinates and magnitudes
 of the artificial stars to be added to \fIimage\fR. If photfile is undefined,
 then \fInstar\fR artificial stars uniformly distributed in position, and  in
 magnitude between \fIminmag\fR and \fImaxmag\fR are added to \fIimage\fR. If
-photfile is is defined, there must be one photometry file for every input image.
+photfile is defined, there must be one photometry file for every input image.
 Photfile may be a simple text file containing x, y, magnitude, and id number in
 columns 1, 2, 3, and 4 respectively (\fIsimple_text\fR = yes), an APPHOT/DAOPHOT
 text database file (\fIsimple_text\fR = no), or an STSDAS binary table file.

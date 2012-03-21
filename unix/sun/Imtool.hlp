@@ -58,7 +58,7 @@ display is in use.  Typical display sizes might be 512, 800, 1024, or 2048
 pixels square, or some rectangular size.  Sufficient physical memory should be
 available so that the internal frame buffers may be locked into memory.
 
-The image display will be be 7 bits deep with 1 bit of graphics
+The image display will be 7 bits deep with 1 bit of graphics
 overlay, leaving half of the color table entries for use by other
 graphics windows.  The image may be windowed without affecting the
 color table entries of the other windows on the screen.  If 7 bits

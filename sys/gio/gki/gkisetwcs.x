@@ -34,7 +34,7 @@ begin
 		# Send a copy of the WCS information to the PSIO control
 		# stream if the graphics output is a standard graphics stream.
 
-		call write (PSIOCTRL, fd, SZ_INT)
+		call write (PSIOCTRL, fd, SZ_INT32)
 		call write (PSIOCTRL, gki, GKI_SETWCS_LEN * SZ_SHORT)
 		call write (PSIOCTRL, wcs, nshorts * SZ_SHORT)
 		call flush (PSIOCTRL)
