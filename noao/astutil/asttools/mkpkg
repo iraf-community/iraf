@@ -1,0 +1,23 @@
+# NOAO astronomical toolslibasttools.a
+
+update:
+	$checkout libasttools.a noaolib$
+	$update   libasttools.a
+	$checkin  libasttools.a noaolib$
+	;
+
+libasttools.a:
+	astarcsep.x	<math.h>
+	astcoord.x	
+	astgalactic.x	<math.h> <mach.h>
+	astgaltoeq.x	<math.h>
+	asthjd.x	<math.h>
+	astlvac.x
+	astprecess.x	<math.h>
+	asttimes.x	
+	astvbary.x	<math.h>
+	astvorbit.x	<math.h>
+	astvr.x		<math.h>
+	astvrotate.x	<math.h>
+	astvsun.x	<math.h>
+	;

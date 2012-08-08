@@ -1,0 +1,62 @@
+# Make the NCAR AUTOGRAPH library.
+
+$checkout libncar.a lib$
+$update   libncar.a
+$checkin  libncar.a lib$
+$exit
+
+libncar.a:
+	agdflt.f  
+	agaxis.f
+	agback.f
+	agbnch.f
+	agchax.f
+	agchcu.f
+	agchil.f
+	agchnl.f
+	agctcs.f
+	agctko.f
+	agcurv.f
+	agdash.f
+	agdlch.f
+	agdshn.f
+	agexax.f
+	agexus.f
+	agezsu.f
+	agfpbn.f
+	agftol.f
+	aggetc.f
+	aggetf.f
+	aggeti.f
+	aggetp.f
+	aggtch.f
+	aginit.f
+	agkurv.f
+	aglbls.f
+	agmaxi.f
+	agmini.f
+	agnumb.f
+	agppid.f
+	agpwrt.f
+	agqurv.f
+	agrpch.f
+	agrstr.f
+	agsave.f
+	agscan.f
+	agsetc.f
+	agsetf.f
+	agseti.f
+	agsetp.f
+	agsrch.f
+	agstch.f
+	agstup.f
+	agutol.f
+	anotat.f
+	displa.f
+	ezmxy.f
+	ezmy.f
+	ezxy.f
+	ezy.f
+	idiot.f
+	pstr.x
+	;

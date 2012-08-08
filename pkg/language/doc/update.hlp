@@ -1,0 +1,34 @@
+.help update Feb86 language
+.ih
+NAME
+update -- update the parameters for a task on disk
+.ih
+USAGE
+update task [task ...]
+.ih
+PARAMETERS
+.ls task
+An IRAF task name.
+.le
+.ih
+DESCRIPTION
+Normally when a task terminates the values of the task parameters used
+are stored for the next invocation of the task in a disk file in the
+users UPARM directory.  However if the task parameters have been
+cached by the \fIcache\fR command, this will not be done until the
+CL terminates.  In the case of a background job, automatic updating of
+parameters is disabled.  The \fIupdate\fR command is used to force the
+parameters for a task to be updated on disk.
+.ih
+EXAMPLE
+1. Update the parameters for the \fIpage\fR task.
+
+	cl> update page
+.ih
+BUGS
+The parameter set is only updated on disk if a parameter has been modified
+since the last update.
+.ih
+SEE ALSO
+cache, unlearn
+.endhelp

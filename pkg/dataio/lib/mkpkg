@@ -1,0 +1,12 @@
+# These routines are used by more than one task in the dataio package:
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	addcards.x	
+	#getdatatype.x	
+	#ranges.x	<ctype.h> <mach.h>
+	;

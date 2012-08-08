@@ -1,0 +1,67 @@
+.help specshift Oct92 noao.onedspec
+.ih
+NAME
+specshift -- Shift dispersion coordinate systems
+.ih
+USAGE
+specshift spectra shift
+.ih
+PARAMETERS
+.ls spectra
+List of spectra to be modified.
+.le
+.ls shift
+Dispersion coordinate shift to be added to the current dispersion coordinate
+system.
+.le
+.ls apertures = ""
+List of apertures to be modified.  The null list
+selects all apertures.  A list consists of comma separated
+numbers and ranges of numbers.  A range is specified by a hyphen.  An
+optional step size may be given by using the 'x' followed by a number.
+See \fBxtools.ranges\fR for more information.  This parameter is ignored
+for N-dimensional spatial spectra such as long slit and Fabry-Perot.
+.le
+.ls verbose = no
+Print a record of each aperture modified?
+.le
+.ih
+DESCRIPTION
+This task applies a shift to the dispersion coordinate system of selected
+spectra.  The image data is not modified as with \fBimshift\fR but rather
+the coordinate system is shifted relative to the data.  The spectra to be
+modified are selected by specifying a list of images and apertures.  If no
+aperture list is specified then all apertures in the images are modified.
+For N-dimensional spatial spectra such as long slit and Fabry-Perot the
+aperture list is ignored.
+
+The specified shift is added to the existing world coordinates.  For linear
+coordinate systems this has the effect of modifying CRVAL1, for linear
+"multispec" coordinate systems this modifies the dispersion coordinate of
+the first physical pixel, and for nonlinear "multispec" coordinate systems
+this modifies the shift coefficient(s).
+
+It is also possible to shift the linearized coordinate systems (but not the
+nonlinear coordinate systems) with \fBsapertures\fR or possibly with
+\fBwcsedit\fR or \fBhedit\fR if the coordinate system is stored with a
+global linear system.
+
+The \fIverbose\fR parameter lists the images, the apertures, the shift, and
+the old and new values for the first physical pixel are printed.
+.ih
+EXAMPLES
+1.  To add 1.23 Angstroms to the coordinates of all apertures in the
+image "ngc456.ms":
+
+.nf
+	cl> specshift ngc456.ms 1.23
+.fi
+.ih
+REVISIONS
+.ls SPECSHIFT V2.10.3
+First version.
+.le
+.ih
+SEE ALSO
+sapertures, dopcor, imcoords.wcsreset, hedit, ranges, onedspec.package
+.endhelp

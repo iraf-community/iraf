@@ -1,0 +1,52 @@
+.help modellist Jul84 noao.twodspec.multispec
+.ih
+NAME
+modellist -- List data and model pixel values
+.ih
+USAGE
+modellist image lines
+.ih
+PARAMETERS
+.ls image
+Image whose model is to be listed.
+.le
+.ls lines
+Sample lines to be listed.
+.le
+.ls model = "gauss5"
+Profile model to be used to create the model line.
+The only model currently defined is \fIgauss5\fR.
+.le
+.ls columns = "*"
+Image columns to be listed.
+.le
+.ls naverage = 20
+The number of image lines to be averaged to form the data values.
+.le
+.ls lower = -10
+Lower limit of model profiles measured in pixels from the spectra centers.
+.le
+.ls upper = 10
+Upper limit of model profiles measured in pixels from the spectra centers.
+.le
+.ih
+DESCRIPTION
+The model of the image for the selected sample \fIlines\fR
+are used to generate model image lines.  Only the model \fIgauss5\fR is
+currently available.  The output format is column, sample line, image pixel
+value, and model pixel value.  The image pixel data are formed by averaging
+\fInaverage\fR lines about the sample lines.
+.ih
+EXAMPLES
+To list the image and model pixel values for the first sample line after
+fitting the \fIgauss5\fR model with \fBfitgauss5\fR:
+
+	cl> modellist image 1 >outputlist
+
+The list file \fIoutputlist\fR can be used with the \fBlists\fR and
+\fBplot\fR packages to graph the image and model lines or to compute
+and graph residuals.
+.ih
+SEE ALSO
+newimage
+.endhelp

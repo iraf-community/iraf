@@ -1,0 +1,132 @@
+.help revisions Sep01 noao.astcat
+.nf
+
+astcat$src/attools/atsort.x
+    A strcmp() should have been strncmp()  (7/12/09, MJF)
+
+astcat$src/agetcat/t_agetim.x
+    Some strcat() calls were missing a maxch arg (7/12/09, MJF)
+
+=======
+V2.14
+=======
+
+astcat$lib/catdb.dat
+    Added usnob1@usno, usnoa2@usno, nomad@usno and act@usno (12/3/08, MJF)
+
+astcat$src/attools/atcathdr.x
+     Fixed some procedure calls being closed with a ']' instead of a ')'
+     (2/17/08, MJF)
+
+=======
+V2.13
+=======
+
+astcat$lib/catdb.dat
+    Added twomass@noao and usnob1@noao using an scat interface.
+    (8/17/07, Valdes)
+
+astcat$lib/catdb.dat
+    Added twomass@irsa using their Gator interface.  (7/17/07, Valdes)
+
+astcat$lib/catdb.dat
+    Removed references to 2Mass catalog.  (9/27/04, Valdes)
+
+=======
+V2.12.2
+=======
+
+astcat$lib/catdb.dat
+    The usno?@cadc entries were extend to allow more than the default
+    number of records to be returned.  (11/6/03, Valdes)
+
+astcat$lib/astrom.h
+    The decoding of "hours" in awcs/dbwcs.x was not working because the
+    string match index values set when reading the units using AT_RAUNITS
+    from astrom.h are decoded using the index values from pkg/skywcs.h.
+    Since I could not find where "hms" and "dms" are used I made the
+    first three index values agree between the two include files.
+    (12/03/02, Valdes)
+
+=======
+V2.12.1
+=======
+
+astcat$src/attools/atinpars.x
+    Added a protection against entering illegal numbers in aregpars.
+    (04/11/02, Davis)
+
+astcat$src/agetcat.par
+astcat$src/afiltcat.par
+astcat$src/agetim.par
+astcat$src/ahedit.par
+astcat$src/aimfind.par
+astcat$doc/agetcat.hlp
+astcat$doc/afiltcat.hlp
+astcat$doc/agetim.hlp
+astcat$doc/ahedit.hlp
+astcat$doc/aimfind.hlp
+    Clarified the verbose and update parameter prompt string. Switched
+    the default values of the verbose parameter from no to yes.
+    (04/11/02, Davis)
+
+astcat$src/aclist.par
+astcat$src/aslist.par
+    Clarifed the verbose parameter prompt.
+    (04/11/02, Davis)
+
+astcat$src/agetcat/atfcat.x
+    Added a missing sfree statement to the at_srtcat routine.
+    (02/19/02, Davis)
+
+astcat$src/agetcat/atfcat.x
+    Fixed a bug in the output ra and dec conversion code that results in the
+    ra values not being properly converted. (01/29/02, Davis)
+
+astcat$lib/catdb.dat
+    Added a new entry gsc2@stsci which accesses the guide star catalog at
+    ST. Renamed the record  gsc@cadc to gsc1@cadc and fixed a type in its
+    query string. (01/29/02, Davis)
+
+astcat$astcat.cl
+astcat$astcat.men
+astcat$astcat.hd
+astcat$src/asttest.cl
+    Added a test script to the astcat package. (08/01/02, Davis)
+
+astcat$lib/catdb.dat
+    Added a missing protocol field to the dummy catalog record filename@noao.
+    (07/01/02, Davis)
+
+astcat$doc/afiltcat.hlp
+    Fixed a typo in the afiltcat task help page. (07/01/02, Davis)
+
+astcat$lib/catdb.dat
+    Update the astcat package catalog database file. (03/01/02, Davis)
+
+astcat$doc/aclist.hlp
+astcat$src/agetcat/t_aclist.x
+astcat$src/agetcat/t_aslist.x
+    Fixed a typo in the aclist help page. 
+    Fixed minor verbose mode bugs in the aclist and aslist tasks.
+    (03/01/02, Davis)
+
+astcat$src/agetget/mkpkg
+    Fixed various missing .h file dependencies in the mkpkg file.
+
+astcat$astcat.cl
+    Changed some incorrect astcatx variables to astcat. (11/14/01, Davis)
+
+astcat$src/agetcat/athedit.x
+astcat$src/agetcat/atfcat.x
+astcat$src/agetcat/atwcat.x
+astcat$src/attools/atdefpars.x
+astcat$doc/catalogs.hlp
+    Fixed various extra agument and subroutine/function mismatches found
+    by spplint. Also fixed a couple of formatting problems in the catalogs
+    help page. (19/09/01, Davis)
+
+astcat$
+    Installed the astcat package in noao. (08/29/01, Davis)
+
+.endhelp

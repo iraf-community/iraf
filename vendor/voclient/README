@@ -1,0 +1,17 @@
+
+
+    README		- This file
+    INSTALL		- Installation instructions
+    Makefile		- Top-level makefile
+    Notes		- Design notes
+
+    bin			- application binaries
+    doc			- documentation
+    include		- library include files
+    lib			- libraries
+
+    common		- shared dependency codes
+    libsamp		- SAMP interface
+    libvotable		- VOTable parser
+    libvoclient		- Client side service code
+

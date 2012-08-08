@@ -1,0 +1,94 @@
+.help rgcursor Dec87 lists
+.ih
+NAME
+rgcursor -- read the graphics cursor (makes a list)
+.ih
+USAGE
+gcursor
+.ih
+DESCRIPTION
+Task \fIrgcursor\fR iteratively reads the graphics cursor, writing the
+cursor values to the standard output.  The standard output is normally
+redirected into a text file to generate a coordinate list to be used as
+input to one or more other programs.  Any IRAF program which reads the
+graphics cursor may be run taking input from a list prepared in advance
+with \fIrgcursor\fR (as well as interactively, of course).
+
+A plot should be drawn on the graphics terminal before running \fIrgcursor\fR.
+When the program is run a loop is entered, reading the global graphics
+cursor until the end of file character (e.g., <ctrl/z>, <ctrl/d>) is typed.
+Each cursor read causes a line to be printed on the standard output, after
+which the cursor is again read.
+
+While the program is waiting for the cursor to be read, i.e., whenever
+the cursor crosshairs are displayed, the terminal is said to be in
+"cursor mode".  While in cursor mode, various commands may be entered,
+e.g., to zoom in a feature to get a more accurate cursor position, without
+terminating the current cursor read.  To read the cursor position, enter
+any key not recognized as a cursor mode command, i.e., any lower case or
+non-alphanumeric character.  The actual character one should type depends
+upon the program for which the list is intended.  If the program will use
+only the X and Y coordinates of the cursor any character may be typed,
+e.g., tap the space bar.  If the program uses the key to determine what
+action to take, then you must type a specific key.
+
+The X and Y coordinates of the cursor position and other information
+comprising the cursor value are printed on the standard output when the
+cursor is read.  The cursor position may optionally be marked whenever the
+cursor is read, by setting the ":.markcur" option when in cursor mode.
+This is useful when preparing long lists to keep track of the objects
+or features that have already been marked.
+
+For additional information on \fIcursor mode\fR and the format of a cursor
+value string, type "help cursor".  For information on the key and string values
+required by the applications program for which the cursor list is intended,
+consult the documentation for that program.
+.ih
+EXAMPLES
+1. Interactively generate a starlist (file "starlist") to be used as input
+to another program, e.g., for digital photometry.  In this case one would
+probably want to start with a contour plot labeled in image pixel coordinates.
+
+.nf
+	cl> contour m74			# make the plot
+	cl> rgcursor > starlist		# make the object list
+
+	At this point, the cursor loop is entered and the terminal
+	is placed into cursor mode.  Any of the following commands
+	might be appropriate:
+
+	\fBcommand\fR		\fBaction\fR
+
+	:.markcur+	enables marking of the cursor position
+			    when the cursor is read
+
+	:radius 7	set object radius in pixels
+	:annulus 10 15	set annulus radii to be used for sky
+	space_bar	mark the position of an object
+	space_bar	mark the position of an object
+				(etc.)
+	
+	Z		zoom in on a feature to get a more
+			    accurate cursor read
+	space_bar	mark the position of the object
+	space_bar	mark the position of another object
+	0		replot the original plot
+	
+	<crtl/z>	(EOF) terminates rgcursor
+.fi
+
+Given the above command sequence, the output file "starlist" might
+contain the following cursor values.
+
+.nf
+	234.435 78.9292 1 : radius 7
+	234.475 78.9243 1 : annulus 10 15
+	67.2822 282.319 1 \40
+	766.252 344.224 1 \40
+	822.918 311.748 1 \40
+	76.8272 822.139 1 \40
+.fi
+.ih
+SEE ALSO
+rimcursor, cursor
+.endhelp

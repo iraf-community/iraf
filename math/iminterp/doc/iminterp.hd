@@ -1,0 +1,37 @@
+# Help directory for the IMINTERP (image interpolator) package.
+
+$iminterp	= "math$iminterp/"
+
+arbpix		hlp = arbpix.hlp,	src = iminterp$arbpix.x
+arider		hlp = arider.hlp,	src = iminterp$arider.x
+arieval		hlp = arieval.hlp,	src = iminterp$arieval.x
+asider		hlp = asider.hlp,	src = iminterp$asider.x
+asieval		hlp = asieval.hlp,	src = iminterp$asieval.x
+asifit		hlp = asifit.hlp,	src = iminterp$asifit.x
+asifree		hlp = asifree.hlp,	src = iminterp$asifree.x
+asigeti		hlp = asigeti.hlp,	src = iminterp$asigeti.x
+asigetr		hlp = asigetr.hlp,	src = iminterp$asigetr.x
+asigrl		hlp = asigrl.hlp,	src = iminterp$asigrl.x
+asiinit		hlp = asiinit.hlp,	src = iminterp$asiinit.x
+asirestore	hlp = asirestore.hlp,	src = iminterp$asirestore.x
+asisave		hlp = asisave.hlp,	src = iminterp$asisave.x
+asisinit	hlp = asisinit.hlp,	src = iminterp$asisinit.x
+asivector	hlp = asivector.hlp,	src = iminterp$asivector.x
+asitype		hlp = asitype.hlp,	src = iminterp$asitype.x
+
+mrider		hlp = mrider.hlp,	src = iminterp$mrider.x
+mrieval		hlp = mrieval.hlp,	src = iminterp$mrieval.x
+msider		hlp = msider.hlp,	src = iminterp$msider.x
+msieval		hlp = msieval.hlp,	src = iminterp$msieval.x
+msifit		hlp = msifit.hlp,	src = iminterp$msifit.x
+msifree		hlp = msifree.hlp,	src = iminterp$msifree.x
+msigeti		hlp = msigeti.hlp,	src = iminterp$msigeti.x
+msigetr		hlp = msigetr.hlp,	src = iminterp$msigetr.x
+msigrid		hlp = msigrid.hlp,	src = iminterp$msigrid.x
+msigrl		hlp = msigrl.hlp,	src = iminterp$msigrl.x
+msiinit		hlp = msiinit.hlp,	src = iminterp$msiinit.x
+msirestore	hlp = msirestore.hlp,	src = iminterp$msirestore.x
+msisave		hlp = msisave.hlp,	src = iminterp$msisave.x
+msisinit	hlp = msisinit.hlp,	src = iminterp$msisinit.x
+msitype		hlp = msitype.hlp,	src = iminterp$msitype.x
+msivector	hlp = msivector.hlp,	src = iminterp$msivector.x

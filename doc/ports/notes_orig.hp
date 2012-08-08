@@ -1,0 +1,657 @@
+1 February 1988,  HP/UX port, HP 9000 Series 800 Model 850
+Steve Rooke, NOAO
+
+[read tape from NOAO/lyra; source tape cut 30 Jan 88.
+[at least the last file, probably the whole last block worth of the tape
+[was missing, including the root mkpkg file.  Have been unable to dial in
+[to NOAO to recover.
+[Had to do this several times, trying dd then tar; couldn't write with
+[tar xp due to existence of an account with same group, user id, so had
+[to read as root, then chown/chgrp afterwards, in order to preserve file
+[dates.
+
+local/.login
+	Set iraf root to /aura/iraf; commented out mail command (didn't
+	like $user); modified stty to get rid of a bunch of Berkeley stuff.
+	This works:
+	    stty	tabs intr ^C kill ^U susp ^X eof ^Z erase ^H
+	(2/1 SRo)
+
+unix/*
+	Spliced Sun HSI into lyra source system, on the theory that there
+	will be less editing A#pqthan for a VAX.  (2/1 SRo)
+
+hlib/libc/iraf.h
+hlib/mkiraf.csh
+	Reset iraf root.  (2/1 SRo)
+
+/usr/include/iraf.h
+	Copied in from libc/iraf.h; there are no symbolic links in HP/UX
+	V1.2.  They will arrive in HP/UX V2.0 in March '88.
+	**TODO** remember to remove copy in /usr/include and replace
+	with sym.link when available.  (2/1 SRo)
+
+vms/*
+	Removed vms directory.  (2/1 SRo)
+
+hlib/mkfloat.csh -
+hlib/cl.csh -
+	Removed these sun-specific files.  The 9000 800 series has only
+	one kind of floating point hardware.  (2/1 SRo)
+
+osb/zzeps.[fe]
+	Compiled and ran zzeps; machine single & double precision same as
+	on the Suns (IEEE standard works, apparently).  (2/1 SRo)
+
+hlib/libc/spp.h
+	Increased LEN_JUMPBUF from 16 to 51, as /usr/include/setjmp.h 
+	allocates 50.  (2/1 SRo)
+
+local/.login
+local/ranlib
+	Removed /usr/ucb, /local/bin, and /usr/local/bin from search path
+	(not present here), and added $iraf/local.  Created a dummy shell
+	script called RANLIB, to avoid having to edit out the ranlib command
+	all over the system.  In HP/UX, AR performs the ranlib function.  (2/1)
+
+unix/os/zdojmp.c
+unix/os/mkpkg
+	Added Doug's new zdojmp.c from tucana (hardcopy), which uses UNIX
+	longjmp call, replacing some assembler code formerly used in 
+	as$zsvjmp.s.  (2/1 SRo)
+
+hlib/libc/iraf.h
+/usr/include/iraf.h
+	Commented out BSD43 define; "hpux" automatically defined for all
+	C files.  (2/2 SRo)
+
+os/zxwhen.c
+	Included FAULT and TRAP hardware exception codes from 
+	/etc/conf/h/signal.h.  (2/2 SRo)
+
+hlib/libc/kernel.h
+	Set _NFILE to 60 for HP/UX, MAXPROCS to 25 (as per maxuprc in
+	/etc/conf/gen/S800).  (2/2 SRo)
+
+hlib/irafuser.csh
+	Set all HSI compiler flags to "-O", which is optimization level 2,
+	the highest of 0,1,2.  (2/2 SRo)
+
+[Begin first bootstrap attempt.  cd $host; sh -x mkpkg.sh]
+unix/mkpkg.sh
+	Commented out "test" command and symbolic link from as.MACH to
+	as; no "test" in HP/UX, currently no symbolic links.  (2/2 SRo)
+
+unix/os/mkpkg.sh
+unix/as/zsvjmp.c
+	Temporarily replaced as/zsvjmp.s with as/zsvjmp.c in order to
+	get past compiler error.  Apparently if an error occurs in one
+	of the source modules listed on a cc command line, none of the
+	objects is produced (also see next entry).  (2/2 SRo)
+
+os/zxwhen.c
+	Modified reference to fp->_bufsiz; (HP/UX no longer has _bufsiz as
+	structure element; rather it is defined in terms of an external
+	bufendtab[] and existing structure elements):  fp->_bufsiz becomes
+	_bufsiz(fp) as per #define in stdio.h.  (2/2 SRo)
+
+os/alloc.c
+	Moved the #include <sys/types.h> after the #include <utmp.h>, as
+	the time_t symbol is defined in the former in HP/UX.  (2/2 SRo)
+
+hlib/libc/iraf.h
+hlib/libc/hpux.h
+	Added an `if hpux, include hpux.h' directive, and created the
+	latter.  Without symlinks, difficult to keep modifying iraf.h.
+	Iraf.h seems to be the best place to include special redefinitions
+	of system calls and the like that are in the HSI but not present
+	in HP/UX (or SysV).  This seems safer for later updates than editing
+	a dozen files all over the HSI.  hpux.h now contains:
+
+	    #define MAX_IPATHLEN  127			/* max IRAF pathlen */
+	    #define getwd(a)	  getcwd(a,(MAX_IPATHLEN+2)) 
+
+unix/boot/spp/rpp/mkpkg.sh
+	Removed the "kludge for Sun-4" code which used the command "mach",
+	apparently a SunOS command.  (2/2 SRo)
+
+unix/boot/bootlib/mkpkg.sh
+unix/boot/bootlib/rename.c
+	Added routine to simulate BSD "rename" call; we tried this with
+	macros, but turned out to be too complicated with error checking.
+	Mkpkg.sh only compiles rename.c if test "`uname`" = "HP-UX".  (2/2 SRo)
+
+local/.login
+	Added /usr/local/bin to path.  (2/2 SRo)
+
+unix/os/zfiotx.c
+	Removed "struct sgttyb ttystat;" statement from ZCLSTX, where
+	it was declared but not used.  (2/2 SRo)
+
+unix/os/zfgcmd.c
+hlib/libc/hpux.h
+	Added ifdefs hpux around getwd(x), which is now getcwd(x,MAXPATHLEN).
+	Removed similar redefinitions from hpux.h, which now has nothing
+	in it, and should be removed later if nothing further is added.
+	**TODO** Remove hlib/libc/hpux.h and include for it in iraf.h??
+	(2/2 SRo)
+
+hlib/libc/kernel.h
+	SysV does not use the sgttyb structure, and ioctl flags are different.
+	added #ifdefs to redefine part of the FIODES structure if hpux.  Should
+	later modify for a more general way to determine whether SysV at
+	compile time.  (2/2 SRo)
+
+unix/os/zfgcwd.c
+	SysV uses getcwd(p,maxlen) rather than getwd(p).  Ifdef'd.  (2/2 SRo)
+
+unix/os/zfiotx.c
+	Extensive modifications to support SysV termio, using #ifdefs, so
+	should still work with BSD.  (Would not compile with any references
+	to the BSD sgttyb structure.)  (2/[23] SRo)
+
+unix/os/zfioks.c
+	Added ifdefs around ioctl call for no echo while getting password.
+	(2/3 SRo)
+
+unix/boot/bootlib/ossettime.c
+	Ifdefs for hpux; in SysV utimes becomes utime, and the tv_sec
+	structure element from timeval has become UNSIGNED long.  (2/3 SRo)
+
+unix/boot/mkpkg/host.c
+	Same for another utime[s] call, unsigned long tv_sec.  (2/3 SRo)
+
+hlib/libc/kernel.h
+	Added extra structure element initialization for hpux (SysV)
+	fiodes structure (zglobl.c wouldn't compile).  (2/3 SRo)
+
+boot/spp/rpp/ratlibc/ratdef.h
+	HP-UX does not tack on trailing underscores to fortran 
+	external identifiers.  Removed same from all identifiers
+	in this include file.  (2/3 SRo)
+
+hlib/libc/knames.h
+hlib/libc/xnames.h
+	Removed trailing underscores from fortran external identifiers.
+	(2/3 SRo)
+
+unix/boot/spp/xc.c
+	Replaced FORTLIB[1-3] values with "-lcl", "-lm", and "" for HP-UX.
+	Symptom was unresolved external symbols "$$lr_wa_[8-13]", or
+	hpux "millicode" routines; "cl" stands for "compiler library".
+	(2/3 SRo)
+
+unix/boot/spp/rpp/mkpkg.sh
+	Added explicit "-lcl" after user libraries on CC command line.
+	The CC compiler in HP-UX does not automatically pass this
+	flag on to the loader (not set up for arbitrary mixing of C
+	and F77).  (2/3 SRo)
+
+[Bootstrap finally completes error-free.]
+
+unix/os/mkpkg.sh
+unix/as/zsvjmp.s
+	Installed Jim Dillon's just-completed zsvjmp assembler routine
+	(had a stub in there before), and restored os/mkpkg.sh to its
+	initial state.  (2/3 SRo)
+
+[Ran rmbin on the HSI and performed another bootstrap.]
+
+unix/hlib/mkpkg.inc
+	Removed Sun stuff; the hppa has no special compiler flags for
+	floating point.  (2/3 SRo)
+
+[Began sysgen at 16:55.  Proceeding smoothly at 18:00 except for numerous ]
+[warnings:  WARNING: TEST MAY FAIL DUE TO FLOATING POINT IMPRECISION (781)]
+
+[Thursday Feb. 4.
+[Sysgen completed at 02:03 2/4; this was a 9-hour sysgen.  There were 1011
+[of the fp imprecision warnings, and about 2 dozen errors of various kinds.
+[The spoolfile summary contained 2569 lines!  There was one fatal compiler
+[error plus several compiler deaths due to my having forgotten to map the
+[intrinsics AND etc.
+[The fp imprecision warnings result from "if (variable .eq. CONST)" in
+[HP-UX f77, and there is nothing we can do about them except turn off all
+[f77 compiler warnings with "-w".
+
+unix/hlib/iraf.h
+	Defined and=iand, or=ior, xor=ixor for HP-UX.  (2/4 SRo)
+
+TODO:  Remember to search for and delete .BAK files in the HSI.
+
+unix/boot/spp/xc.c
+	Modified to compile C source files with CC rather than F77.  There
+	were several places in the sysgen where we attempted to compile C
+	source with f77 (mkpkg.inc: USE_CCOMPILER is YES), in addition to
+	the CL C source.  HP-UX f77 does not recognize C source.  Desinger
+	feels that it should, and suspects it never came up before.  (2/4 SRo)
+
+sys/imfort/imemsg.x
+	This file contained a half dozen "%	msg = '...'" statements, 
+	where the quoted string exceeded column 72 (assuming the leading
+	tab got expanded into 8spaces).  Abbreviated each offending
+	character string to fit into 72 columns.  Obviously, only these
+	"%" source statements that bypass the preprocessor could possibly
+	exceed 72 columns, however we would not have noticed any that would
+	not have ended in a missing quote, so TODO:  filter all spp source
+	files for ^% lines longer than 72 chars, after expanding tabs.
+	(2/4 SRo)
+
+sys/gio/ncarutil/conbdn.f
+	There was an uncommented DATA statement at line 342, following
+	assignment statements, and the f77 compiler complained.  (2/4 SRo)
+
+sys/gio/ncarutil/conbd.f
+	Had to move a "data	first" statement up into its proper position
+	(it followed some assignment statements).  This was lower case, so
+	it looked not to be a typo as in the previous case.  
+	Also had to add dummy variable in data statement as cannot init
+	variables or arrays via data statement in named common in HP-UX.
+	(2/4 SRo)
+
+sys/gio/ncarutil/gridal.f
+	Compiler warned about compile-time algrbraic expressions that can
+	be reduced; there are stmts at lines 1554,1566 subtracting 0. from
+	an expression (harmless, no mods made, just noting).  (2/4 SRo)
+
+sys/gio/ncarutil/srfabd.f
+	Compiler complained (error) about illegal initialization of "first",
+	which was in a data statement and also in common.  Added a dummy
+	variable in data stmt, and subsequent assignment to "first".  (2/4 SRo)
+
+sys/gio/nspp/portlib/gridal.f
+	"ifmt" was declared to be two-dimensional, but it appeared in an
+	equivalence statement at line 217 with only one subscript.  (2/4 SRo)
+
+sys/gio/nspp/portlib/z8zpbd.f
+	More arrays & variables in common initialized in data statement
+	(mfmt[xy]).  (2/4 SRo)
+
+noao/onedspec/dbx/dbmore.x
+	This routine initializes an array with DATA that is in common.
+	Hacked for now, leaving to Frank V for later.  (2/4 SRo)
+
+noao/imred/dtoi/hdicfit/hdicgdelete.x
+	The int procedure icg_deleted() did not return a function value,
+	causing a proper error message from f77, but generating a fatal
+	error and infinite loop in the optimizer.  Hacked for now to
+	return (0).  TODO:  investigate hdicgdelete.x to see what, if
+	any, return value should be generated.  (2/4 SRo)
+
+unix/boot/mkpkg/host.c
+	Finally noticed that the system libraries were disappearing instead
+	of being checked into lib$.  There is code in host.c that attempts
+	to copy the file if it cannot be moved any other way, but it must
+	never have been tested for moving a file to a directory, because the
+	creat() call took as its new file name just the host pathname of lib$,
+	lacking the name of the library.  Since u_fcopy() looked like it was
+	intended to be a general copy routine, I added a strcat in the calling
+	routine to append the library to the directory.  This ought to be
+	investigated (TODO), in case anything other than a file in the local
+	directory is the "old" file.
+	(2/4 SRo)
+
+[Began new sysgen at 17:21:22 PST 2/4/1988.  Still leaving in the compiler  ]
+[warnings; when all have been checked out, the flag "-w" ought to be added  ]
+[to mkpkg.inc; there is no way to ignore just the floating-compare warnings.]
+
+math/interp/arider.x
+	Compiler objected that real function did not return value.  Kludged
+	the three returns to "return (0.0)".  (2/4 SRo)
+
+unix/boot/spp/xc.c
+	XC was correctly compiling C source with "cc" rather than "f77" now,
+	but immediately afterwards was also trying to compile them with f77.
+	Fixed the subsequent filter that I hadn't noticed earlier.  This will
+	necessitate a followup sysgen (mostly a relink), as XC thought it
+	shouldn't try to link after getting run errors from UNIX.  (2/4 SRo)
+
+[This doesn't look so good... dates of object modules do not appear to
+[be in the object libraries, and mkpkg is recompiling all files regardless.
+[Getting too late to fix tonight.  Also, using cc to link (passed from XC)
+[results in a fatal /bin/ld error...
+
+unix/os/zawset.c
+	Finally (manually) got past enough loader problems to find the 
+	unresolved symbols... [gs]etrlimit() not implemented in SysV.
+	As this is not critical code for basic port purposes, merely
+	stubbed out for now.  TODO:  find some way to implement this in
+	SysV/HP-UX.  Investigate plock() for HP-UX only (real-time programming
+	manual)  (2/5 SRo)
+
+unix/os/zwmsec.c
+	In SysV, sigvec() is sigvector(), with no other changes.  Used ifdefs.
+	(2/5 SRo)
+
+unix/boot/spp/xc.c
+	Set FORTLIB3 to "-lbsdipc", the HP-UX library containing the likes
+	of rexec(); networking probably won't work anyway, but it might be
+	worth a try.  (2/5 SRo)
+
+unix/os/zfprot.c
+	Added #ifdef hpux to redefine rindex().  (2/5 SRo)
+
+[HIATUS -- Accidentally trashed this entire notes file last night with
+[a typo (redirecting some error output to the end of this notes file
+[with ">&" rather than ">>").  File recovered from Friday (2/5) noon backup
+[by Bob Desinger.  There were about 11 hours of time during which a moderate
+[number of notes file entries were made that were lost.  The following are
+[from memory but will have to be verified by diff'ing back in Tucson.
+
+unix/os/zawset.c
+	Could not immediately find a way to alter the working set size on this
+	system, so simply ifdef'd out the entire body of the routine to get
+	past unresolved symbol (getrlimit) at load time.
+	TODO: adjust workingset size in SysV?  (2/5 Sro)
+
+unix/os/zopdpr.c
+	No way to alter the timesharing (as opposed to HP-UX extended realtime)
+	priority of another process.  Ifdef'd around the [gs]etpriority calls.
+	(2/5 SRo)
+
+unix/boot/mkpkg/scanlib.c
+	In HP-UX, the object libraries have a different structure than under
+	BSD.  The symbol table is the first "module", immediately after the
+	8-byte magic header, then is followed by N modules.  When the space
+	allocated to the first symbol table entry is full, apparently, a symbol
+	table extension is tacked on.  Since module names are terminated with a
+	"/", and none of the symbol table entries has a module name, module
+	names beginning with "/" are always symbol table entries, so we check
+	each module to see if it is the latter, and skip file_size bytes if so.
+	Also, in exercising the code:
+	    while (fread (&arf, 1, sizeof(arf), fp) > 0) {
+	it was apparent that the structure was not being passed correctly.
+	Though the size and number of instances seemed to be reversed, that
+	should have been harmless, but the structure itself was not being
+	passed correctly to fread.  Solved with the following:
+	    while (fread (arf, sizeof(arf), 1, fp) > 0) {
+	(2/5 SRo)
+
+unix/os/zlocpr.c
+	The CL was dying at startup time, after trying to set an entry
+	point address in fseti().  Determined that the f77 EXTERN declaration
+	generates an address pointing to the address of the external function.
+	Modified zlocpr.c to use onenOxD extra level of indirection.  For some
+	reason, the typedef PFI declaration does not work; left the declaration
+	of proc as "int *proc" (something to do with how the compiler handles
+	"()" as part of a declaration??).  (2/5 SRo)
+
+unix/hlib/mkpkg.inc
+	Added "-w" flag to turn off all compiler warnings.  All such warnings
+	have already been investigated and accounted for, and the 1011 floating
+	compare warnings clutter up the spoolfiles unnecessarily.  (2/5 SRo)
+
+unix/boot/mkpkg/host.c
+	Cleaned up a bug I had introduced earlier in moving file to directory.
+	(2/6 SRo)
+
+sys/gio/nspp/sysint/ishift.x
+sys/gio/ncarutil/sysint/ishift.x
+	Both these files had their own "iand" and "ior" functions, generating a
+	compiler error, as "and" -> "iane:rtd" already, in hlib$iraf.h; as it
+	is the last day, I don't have time to recompile the whole system
+	by placing some redefinition in iraf.h; the procedure calls are
+	the same as those supplied by HP-UX, so just commented out the
+	ncar equivalents.  (2/6 Sro)
+
+noao/astutil/asttools/pdmstatistics.x
+noao/twodspec/apextract/t_apnormalize.x
+	Ha!  Just like the Masscomp, TAR will not write files that have
+	a "." in the 14th position, and reports no error message.  These
+	files are missing from the system.  (2/6 SRo)
+	
+noao/imred/dtoi/hdicfit/hdicebars.f
+unix/hlib/mkpkg.sf
+	This file generates a fatal internal error in the 2nd pass of the
+	optimizer, after staying in a loop for a very long time.  Left
+	f77 source with HP.  Added to special file list.  (2/6 SRo)
+
+noao/twodspec/multispec/fitclean.f
+noao/twodspec/multispec/fitsmooth.f
+unix/hlib/mkpkg.sf
+	These files generate fatal address compiler errors in 2nd pass
+	of optimizer.  Left with HP.  Added to special file list.  (2/6 SRo)
+
+noao/imred/dtoi/hdicgundelete.x
+noao/imred/ccdred/t_badpiximage.x
+noao/imred/ccdred/t_mkfringecor.x
+noao/imred/ccdred/t_mkillumflat.x
+	Files missing; "." in 14th column.  (2/6 SRo)
+
+[Several minor errors in new relink-sysgen; didn't compile newly-added
+[files in mkpkg.sf w/o pass2 optimization, irafks tried to call rename.
+[Still getting:
+    
+    dictionary starts at 1073968624 (010000672760)
+    pfileload, task cl
+    task `cl' has no param file
+    Fatal startup error.  CL dies.
+
+[irafks.e failed to link because our kludged "rename" routine is in
+[bootlib, not libos, of course.  TODO:  investigate better way to handle
+[rename(); getting late, so won't try anything now.
+
+[Continuation of notes file begin 2/1/88 for HP-UX port]
+
+unix/os/mkpkg.sh
+	Separate compilation of zsvjmp.s; pass 2 of the optimizer causes the
+	routine to fail!  (2/11 SRo)
+
+sys/fio/open.x
+sys/fio/filopn.x
+	After grubbing around for a while trying to figure out what was
+	wrong with file descriptors and/or os channels, tried compiling
+	these routines without optimization.  For the first time, this
+	permitted getting all the way to the "cl>" prompt, but with all
+	the CL debugging turned on.  I used ADB to turn off debugging
+	(cldebug/W 0), but it kept getting turned on automatically.
+	I was able to have the system task do a successful long directory
+	listing of hlib$motd, but was unable to type it out.  Everything
+	looked so badly garbled, that:
+
+unix/hlib/mkpkg.inc
+	Set optimization flag to "O1" rather than "O2".  If all works well
+	tomorrow morning, I'll at least know I'm looking at optimizer, not
+	system, bugs.  (2/11 SRo)
+
+[Ran RMBIN from the root; started new sysgen.]
+
+[5-hour sysgen, only minor incidents, mostly due to missing >14char filenames]
+[Same startup symptoms firing up CL:
+    
+    dictionary starts at 1073968624 (010000672760)
+    pfileload, task cl
+    task `cl' has no param file
+    Fatal startup error.  CL dies.
+
+[Recompiling fio$filopn.x with NO optimization (rest of system is now at
+[opt level 1 rather than 2 originally) gets past that problem but again
+[cldebugging is turned on automatically so at 1200 baud you have to wait
+[about 5 minutes for the prompt.  A lot of things are still screwed up --
+[can't access hlib$motd (can from system process run standalone); the
+[command "show iraf" generates an error with no return to the prompt;
+[^C then causes error recursion and the CL dies.
+
+unix/hlib/config.h
+	Finally realized there was another LEN_JUMPBUF after seeing the
+	global variable cldebug get trashed by setjmp after 16 words, same
+	as the old LEN_JUMPBUF in the Sun HSI.  Increased to 51, started 
+	another sysgen.  (2/12 SRO)
+
+[CL comes up fine now, and all the builtins I tested work fine.  "directory"
+[results in an eventual core dump, with possible error recursion.  Running
+[the system process standalone just generates a segmentation violation.
+[As I am working from home, without access to printouts or another terminal,
+[I decided to take advantage of another 48 hours before getting back to the
+[office by stripping all binaries and recompiling everything with NO
+[optimization (last sysgen was with -O1).  Since filopn.x generates a fatal
+[error even compiled with -O1, I consider it reasonable to gen the whole
+[system without opt, then fix all the non-opt bugs, then start increasing
+[the level of optimization to see just how bad it is.  (2/14 SRo)
+
+Best so far.  CL comes up fine, can do direN	|ctory listings etc. without
+system process dying.  IMDEBUG/MKIMAGE still coredumps with no warning to6\D5|
+the CL, and when "bye" is given, the CL warns about an error in the subprocess
+then hangs.  2 ^C's generate error recursion with CL death.  Apparently there
+are some routines causing fatal problems even with optimization level 1, but
+at least there are some other bugs to isolate first before tackling opt.
+(2/15 SRo)
+
+unix/hlib/iraf.h
+unix/hlib/libc/xnames.h
+	Defined getpid as xgetpd; with no trailing underscores in HP-UX,
+	SPP getpid collides with UNIX getpid.  (Symptom was infinite
+	recursion in getpid->zgtpid->getpid...)  (2/16 SRo)
+
+unix/hlib/motd
+	Updated banner page for HP-UX.  (2/16 SRo)
+
+unix/as/zsvjmp.s
+	Set value of "status" to zero, as this had been neglected originally.
+	Symptom was infinite error recursion in the CL for commands such as
+	"lpar junk" (not infinite stack accumulation, due to the nature of
+	setjmp/longjmp).  (2/18 SRo)
+
+[Another relink sysgen, as everything links with zsvjmp.s]
+
+[MKHELPDB got stuck; name collision between spp rename and faked UNIX 
+[routine.
+
+unix/hlib/iraf.h
+unix/hlib/libc/xnames.h
+unix/os/zfrnam.c
+unix/boot/bootlib/rename.c -
+	Defined RENAME as xfrnam to avoid name collision, removed earlier
+	rename.c, which didn't belong in bootlib in the first place, and
+	added u_rename() function to zfrnam.c.  (2/19 SRo)
+
+pkg/cl/main.c
+	Modified memneed() to add memory on 64-bit boundaries.  Otherwise,
+	there is a bus error whenever a double floating point word that
+	is not 64-bit aligned (in actual memory, not just relative to
+	some data structure) is loaded into a floating point register.
+	Must also have next fix as well.  (2/25 SRo)
+
+pkg/cl/pfiles.c
+	In one place, after a call to memneed(), there was verification
+	code to assure synchronization; this failed when memneed() was
+	modified to be 64-bit aligned.  Current fix is a shameless hack.
+	(2/25 SRo)
+
+[Success!!  I can load packages, stat images, get graphics in a gterm
+[window over the phone lines from "urand | graph", etc.  There will
+[doubtless be further bugs when more exhaustive testing is undertaken,
+[but things look far better than at any time up til now.
+
+dev/pix.imh
+dev/pix.pix
+	Due to tape problems when I originally prepared the source tape,
+	the standard dev$pix 512*512 short image was not on tape.  I brought
+	a separate tape with the binary image in FITS format, but forgot
+	to read it in before I had to dash off to the airport, so I built
+	the image from a Mandelbrot set test program I copied over the 
+	phone line into local/sr/mandel.x.  (2/29 SRo)
+
+unix/hlib/alloc.e
+	Had Jim Dillon change ownership to root.  (2/29 SRo)
+
+unix/hlib/iraf.h
+	Name collision with getuid(); defined as xgetud.  Symptom was
+	segmentation violations in wfits and in the CL when attempting
+	to allocate the drive.  (2/29 SRo)
+
+dev/devices
+	Cleaned up and added all relevant aliases.  SysV uses /dev/rmt/*
+	and /dev/mt/* for raw and block special device names respectively;
+	only the sysmgr is supposed to be able to use /dev/mt/* devices,
+	so these need not be added as aliases.  However, the standard
+	AT&T device installation leaves the tape head positioned after
+	the 2nd EOF mark during write/close; if special minor device
+	names are added, the interface is "berkeley style".  Convention
+	adopted here was a trailing "b" for those device names, for lack
+	of anything better.  The device bits are as follows for Berkeley:
+
+	    crw-rw-rw-   (...) 0x140000 Mar  1 17:39 /dev/rmt/0hb
+	    crw-rw-rw-   (...) 0x1c0000 Mar  1 17:39 /dev/rmt/0hnb
+	    crw-rw-rw-   (...) 0x120000 Mar  1 17:38 /dev/rmt/0mb
+	    crw-rw-rw-   (...) 0x1a0000 Mar  1 17:39 /dev/rmt/0mnb
+
+	IRAF entry for drive 0 on the "hpufoca" machine is as follows:
+
+	    mta		rmt/0hnb rmt/0hb rmt/0mnb rmt/0mb \
+			rmt/0hn rmt/0h rmt/0mn rmt/0m 
+	    mta.6250	rmt/0hnb rmt/0hb rmt/0mnb rmt/0mb \
+			rmt/0hn rmt/0h rmt/0mn rmt/0m
+	    mta.1600	rmt/0mnb rmt/0mb rmt/0hnb rmt/0hb \
+			rmt/0mn rmt/0hn rmt/0h
+
+	The numeral is the drive number, h=high, m=medium, and l=low
+	density, "n" is for no-rewind.  This does appear more rational
+	than BSD UNIX.  (3/1 SRo)
+
+noao/astutil/pdm/pdmstats.x
+noao/astutil/pdm/mkpkg
+	Transferred this file over the phone, formerly called
+	pdmstatistics.x, >14 chars; lost during 1st sysgen.  (3/1 SRo)
+
+noao/twodspec/apextract/t_apnorm.x
+noao/twodspec/apextract/mkpkg
+	Transferred from noao; >14 chars.  (3/1 SRo)
+
+noao/ccdred/src/t_badpixim.x
+noao/ccdred/src/mkpkg
+	Same.  (3/1 SRo)
+
+[Ran RMBIN and began a new sysgen to ensure recent changes to iraf.h
+[get picked up everywhere (just relinked a couple of executables by hand
+[after getuid() change).  (3/1 SRo)
+[Tue Mar  1 19:47:39 PST 1988 -->  Wed Mar  2 00:48:55 PST 1988
+[5-hour sysgen (full recompile & relink); roughly same as on Model 850.
+
+noao/imred/dtoi/hdicfit/hdicgundel.x
+noao/imred/dtoi/mkpkg
+	Re-transmitted this file (formerly named hdicgundelete.x), which
+	got deleted during one of the last sysgens, as it still had >14
+	chars, and the .o file replaced the .x file during compilation.
+	Although renamed back on lyra, it still was not returning function
+	values, so just added 2 "return(0)"'s.  (3/2 SRo)
+
+noao/imred/ccdred/src/t_mkfringe.x
+noao/imred/ccdred/src/t_mkillumft.x
+noao/imred/ccdred/src/mkpkg
+	Transferred these files with shortened names from Tucson; >14 char
+	files were trashed earlier.  (3/2 SRo)
+
+[Ran IRAF test procedures, including tape drive ones, and using the
+[dev$pix created from the Mandelbrot Set, as original one didn't make
+[it.  No problems encountered.  (3/2 SRo)
+
+[Ran benchmarks over dialin, excluding image display, networking, and
+[multiple-terminal graphics ones.  No software problems encountered.  (3/2 SRo)
+
+unix/os/zfrnam.c
+	Had neglected to unlink oldfile when implementing BSD rename()
+	with link/unlink.  (3/2 SRo)
+
+local/terminfo
+local/terminfo/s/sun
+local/terminfo/s/sun24
+local/terminfo/s/sun34
+local/terminfo/s/sun40
+	Created this directory to hold private terminfo descriptions.
+	A new description may be compiled by first using untic(1M) to 
+	decompile one of the existing entries in /usr/lib/terminfo/?/file,
+	editing the result, setting the environment variable TERMINFO
+	to a pathname, and running tic(1M) to compile the entry.  Tic
+	actually creates the single-letter subdirectory, and names the
+	resulting file from EACH alias in the untic'd file.  To use a
+	non-standard terminfo description, here sun40:
+
+	    % setenv TERMINFO $iraf/local/terminfo
+	    % setenv TERM sun40
+
+	(3/8 SRo)
+
+[ Tar tape cut for CFHT; no further work expected to be done on hpufoca
+[ system at Foster City.  HP-UX/IRAF maintenance & update will now be done
+[ on Model 825 at CFHT.  (3/8 SRo)

@@ -1,0 +1,92 @@
+---------------------------------------+--------------------------------------
+	     Revisions started with version 1.1 of the QUAD package
+				   19/Mar/93
+
+                  This package was written by Steve Heathcote!
+---------------------------------------+--------------------------------------
+
+quadgeom.x
+	Modified call to the ccd_section() routine (SH 19/Mar/93).
+
+ccdtypes.h
+ccdtypes.x
+ccdgetparam.x
+	Added routines to retrieve the image type from the image header,
+	and added special case to translate the image type to the
+	corresponding package name in ccdgetparam() (SH 19/May/93).
+
+quadproc.cl
+	Added check to see if image is of type to be processed (SH 24/May/93).
+
+mkpkg
+quad.cl
+quadscale.x
+x_quad.x
+	Installed QUADSCALE task (SH,PG 24/May/93).
+
+
+________________________________________________________________________________
+			Version 2.0 29 March 94
+
+________________________________________________________________________________
+
+quadproc.cl
+qproc.cl
+	Fitting parameters adjusted interactively where not being saved if
+	quadproc aborted at a later stage. In interactive mode these parameters
+	are now written in qproc after each image has been processed and are
+	updated on disk. (SRH 30/Mar/94)
+
+quadproc.cl
+	When running with noproc+, if the calibration images supplied in the
+	input list, and these have already been processed through [OT] task 
+	would complain that the calibration images where missing when the test
+	for second stage [ZF...] procesing was performed. Added calibration 
+	images to list to be considered.n this case.  This means that the 
+	calibration images may appear twice in the output list but ....
+	(SRH 30/Mar/94)
+
+quadproc.cl
+	complained about missing calibration images if the process flags
+	where set and no calibrations where specified, even when no images in
+	the list required the calibration step (e.g. all were zeros). Switched
+	off the check for existance in the qpcalimage call. This means the
+	task will not report the absence of required calibration images until
+	they come to be used but ccdproc does that too.  (SRH 30/Mar/94)
+
+ccddb/ctio/instruments.men
+	  /Xfccd_f1.dat
+	  /Xfccd_f2.dat
+	  /Xfccd_bith.dat
+	Added specific instrument files for the different filter subsets.
+	(SRH 30/Mar/94)
+
+qghdr2.x, quadsections.x
+	All quadrants in reduced images were being flagged as phantoms
+	causing quadsections to return no sections. (SRH 10/Jun/94)
+
+quad/ccdproc.par
+	Updated for V2.11.2.  This should be backwards compatible.
+	(10/8/99, Valdes)
+
+________________________________________________________________________________
+			Version 2.1 29 October 99
+
+________________________________________________________________________________
+
+qnoproc.cl
+qproc.cl
+	Removed explicit dependence on "imh".  The image extension is that
+	given by the imtype environment variable.  (FV 20/Oct/99)
+
+________________________________________________________________________________
+			Version 2.2 20 June 00
+
+________________________________________________________________________________
+
+qnoproc.cl
+qproc.cl
+	Changed "len" to "i" in the clause that is executed when
+	imtype contains a ','.  This caused the error
+	"Attempt to access undefined local variable `len'.
+	(6/20/00, Valdes)

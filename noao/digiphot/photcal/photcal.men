@@ -1,0 +1,16 @@
+       mkapfile - Prepare  aperture corrections file from apphot/daophot output
+      mkcatalog - Type in a standard star catalog or observations file
+       mkimsets - Prepare an image set file for input to (mk)(n)obsfile
+   mk(n)obsfile - Prepare an observations file from apphot/daophot output
+     mkphotcors - Prepare the photometric corrections files
+	 apfile - Prepare an aperture corrections file from a text file
+	obsfile - Prepare an observations file from a text file
+
+       mkconfig - Prepare a configuration file
+      chkconfig - Check the configuration file for grammar and syntax errors
+      fitparams - Compute the parameters of the transformation equations
+        evalfit - Compute the standard indices by evaluating the fit
+      invertfit - Compute the standard indices by inverting the fit
+
+    help config - Print description of the configuration file format
+   help pcintro - Print a short introduction to the photcal package

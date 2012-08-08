@@ -1,0 +1,56 @@
+.help zawrbf May84 "System Interface"
+.ih
+NAME
+zawrbf -- asynchronous write to a binary file
+.ih
+SYNOPSIS
+.nf
+zawrbf (chan, buf, nbytes, loffset)
+
+int	chan			# OS channel assigned to file
+char	buf[nbytes]		# buffer to be copied to file
+int	nbytes			# number of bytes to be written
+long	loffset			# file offset of first byte
+.fi
+.ih
+DESCRIPTION
+Initiate a write of exactly \fInbytes\fR bytes from the buffer \fIbuf\fR
+to the channel \fIchan\fR.  If the file associated with \fIchan\fR is a
+blocked file the transfer begins at the one-indexed file offset \fIloffset\fR,
+specified in units of bytes.  The file offset must be greater than or equal
+to 1 and less than or equal to the size of the file in bytes plus one.
+If the file is a streaming file the file offset argument is ignored.
+If the file is blocked \fIloffset\fR must be an integral multiple of the
+device block size, i.e., the transfer must be aligned on a device block
+boundary.  A request to write zero bytes is ignored.
+
+If writing entirely within the interior of the file \fInbytes\fR must be an
+integral multiple of the device block size.  If writing at EOF any number of
+bytes may be written (provided the maximum transfer size is not exceedd).
+A file may be extended by writing at EOF or by overwriting EOF in a large
+transfer.  If the last block in the file is a partial block the file must
+be extended by reading the partial block into memory, appending the new data,
+and then overwriting EOF with the larger block.  File offsets must be explicit
+byte offsets, i.e., the constants BOF and EOF are not recognized for binary
+file offsets.
+.ih
+RETURN VALUE
+The wait primitive \fBzawtbf\fR must be called after every asynchronous write
+to get the transfer status.  ERR is returned if a write error occurs or if the
+channel number or file offset is illegal.  If the write operation is successful
+the actual number of bytes written is returned.
+.ih
+NOTES
+The transfer is NOT guaranteed to be asynchronous and the calling program
+must not assume that \fBzawrbf\fR will return immediately.
+The \fBzawtbf\fR primitive must be called and the status checked before
+another i/o request is issued to the channel.  Only a single request may
+be pending on a channel at a time.
+
+This primitive is called by the FIO routine \fBawrite\fR which verifies that
+the transfer is aligned and in-bounds, that a transfer is not already in
+progress, and so on before calling \fBzawrbf\fR.
+.ih
+SEE ALSO
+zawtbf, zardbf, zfiobf
+.endhelp

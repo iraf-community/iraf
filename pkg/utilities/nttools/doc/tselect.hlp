@@ -1,0 +1,147 @@
+.help tselect Jul92 tables
+.ih
+NAME
+tselect -- Create a new table from selected rows of an old table.
+.ih
+USAGE
+tselect intable outtable expr
+.ih
+DESCRIPTION
+This task creates a new table from a subset of rows in an input table.  
+The rows are selected on the basis of a boolean expression whose
+variables are table column names.  If, after substituting the values associated
+with a particular row into the column name variables, the expression evaluates
+to yes, that row is included in the output table.  Boolean operators can be used
+in the expression in either their Fortran or SPP forms.  The following boolean
+operators can be used in the expression: 
+
+.nf
+equal		.eq.  ==	not equal		.ne.  !=
+less than	.lt.  <		less than or equal	.le.  <=
+greater than	.gt.  >		greater than or equal	.ge.  >=
+or		.or.  ||	and			.and. &&
+negation	.not. !		pattern match		      ?=
+.fi
+
+The pattern match operator (?=) has no corresponding Fortran form.  It takes a
+string expression as its first argument and a pattern as its second argument.
+The result is "yes" if the pattern is contained in the string expression.
+Patterns are strings which may contain meta-characters (i.e., wildcard 
+characters used in pattern matching).
+The meta-characters themselves can be matched by preceeding them with the escape
+character (\).
+The meta-characters are: 
+
+.nf
+beginning of string	^	end of string		$
+one character		?	zero or more characters	*
+white space		#	escape character	\
+begin ignoring case	{	end ignore case		}
+begin character class	[	end character class	]
+not, in char class	^	range, in char class	-
+.fi
+
+The expression may also include arithmetic operators and functions.
+Trigonometric functions use degrees, not radians.  The following arithmetic
+operators and functions can be used in the expression:
+
+.nf
+addition		+	subtraction		-
+multiplication		*	division		/
+negation		-	exponentiation		**
+concatenation		//	date difference		delta(x,y)
+absolute value		abs(x)	cosine			cos(x)
+sine			sin(x)	tangent			tan(x)
+arc cosine		acos(x)	arc sine		asin(x)
+arc tangent		atan(x)	arc tangent		atan2(x,y)
+exponential		exp(x)	square root		sqrt(x)
+natural log		log(x)	common log		log10(x)
+modulo			mod(x)	minimum			min(x,y)
+row number		row()	maximum			max(x,y)
+nearest integer		nint(x)	convert to integer	int(x)
+convert to real		real(x) convert to string	str(x)
+.fi
+
+The row number function returns an integer value corresponding to the
+row number in the table.  The date difference function returns a real
+value corresponding to the Julian date of the first argument minus the
+Julian date of the second argument; the arguments to the data function
+must be in CDBS date format:  i.e., character strings of the form
+YYYYMMDD:HHMMSSCC.  Any field after the colon is optional.  The last
+date field (CC) is hundreths of a second.
+
+One concept in most databases and in STSDAS tables is the concept of a
+null value: a value which indicates that the element is unknown or
+non-existent.  An element in an STSDAS table is null if it is INDEF in a
+numeric column or a zero length string in a text column. Evaluating
+expressions involving nulls requires a three valued logic:  true,
+false, and unknown. Any arithmetic operation on a null element should
+return another null and any comparison operation should return an
+unknown.  Unfortunately, tselect does not implement a true three
+valued logic correctly.  The code instead evaluates any expression
+containing a null element as unknown.  Since tselect only returns rows
+for which the expression is true, all such rows are excluded from the
+output of tselect.  This is usually right, but sometimes wrong, as in
+the case where two comparisons are joined by an or and one evaluates
+to true and the other evaluates to unknown.  It also sometimes returns
+nonintuitive results, as when checking that a column is not equal to
+INDEF.
+.ih
+PARAMETERS
+.ls intable [file name template]
+Table(s) from which rows are copied. If input is redirected, this
+parameter will ignored and input will be read from STDIN instead.
+.le
+.ls outtable [file name template]
+The new table(s) containing the copied rows.
+If more than one input table was used, then the number of output 
+tables must equal the number of input tables.
+.le
+.ls expr [string]
+The boolean expression which determines which rows are copied to the new
+table.  The expression may be placed in a list file and the name of the file
+passed to this parameter (preceded by the "@" character).
+.le
+.ih
+EXAMPLES
+1. Extract all binary stars brighter than fifth magnitude from a catalog:
+
+.nf
+tt> tselect starcat.tab binary.tab "binary && mag <= 5."
+.fi
+
+2. Create a new set of spectra where all measurements with errors greater
+than ten percent are excluded. Use file name editing to create new tables
+with the extension ".tbl" instead of ".tab":
+
+.nf
+tt> tselect  *.tab  *.%tab%tbl%  "ERROR / (FLUX + .001) < .1"
+.fi
+
+3. Create a table of engineering parameters whose names begin with a digit:
+
+.nf
+tt> tselect datalog.tab sublog.tab "name ?= '^[0-9]'"
+.fi
+
+4. Return all observations in a schedule for the day of Dec 31, 1989:
+
+.nf
+tt> tselect schedule.tab week.tab "abs(delta(date,'19891231:12'))<.5"
+.fi
+.ih
+BUGS
+Column names must be set off from operators by blanks in the
+expression so that they can be correctly parsed by the expression
+evaluator.  Expressions involving nulls may evaluate incorrectly, see
+above for a discussion.
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+tproject, tjoin, tproduct
+
+Type "help tables opt=sys" for a higher-level description of the 'tables' 
+package.
+.endhelp

@@ -1,0 +1,800 @@
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+configure: WARNING: you should use --build, --host, --target
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for sed... /usr/bin/sed
+checking for ar... ar
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for gawk... no
+checking for mawk... no
+checking for nawk... no
+checking for awk... awk
+checking whether make sets $(MAKE)... yes
+checking curl version... 7.18.2
+checking build system type... i386-apple-darwin10.8.0
+checking host system type... i386-apple-darwin10.8.0
+checking for style of include used by make... GNU
+checking for gcc... gcc
+checking for C compiler default output file name... a.out
+checking whether the C compiler works... yes
+checking whether we are cross compiling... no
+checking for suffix of executables... 
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking dependency style of gcc... gcc3
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for AIX... no
+checking for gcc... (cached) gcc
+checking whether we are using the GNU C compiler... (cached) yes
+checking whether gcc accepts -g... (cached) yes
+checking for gcc option to accept ISO C89... (cached) none needed
+checking dependency style of gcc... (cached) gcc3
+checking for special C compiler options needed for large files... no
+checking for _FILE_OFFSET_BITS value needed for large files... no
+checking if arch-OS host is AMD64-linux (to build static libraries with PIC)... no
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for ld used by gcc... /usr/libexec/gcc/i686-apple-darwin10/4.2.1/ld
+checking if the linker (/usr/libexec/gcc/i686-apple-darwin10/4.2.1/ld) is GNU ld... no
+checking for /usr/libexec/gcc/i686-apple-darwin10/4.2.1/ld option to reload object files... -r
+checking for BSD-compatible nm... /usr/bin/nm
+checking whether ln -s works... yes
+checking how to recognize dependent libraries... pass_all
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking dlfcn.h usability... yes
+checking dlfcn.h presence... yes
+checking for dlfcn.h... yes
+checking the maximum length of command line arguments... 196608
+checking command to parse /usr/bin/nm output from gcc object... rm: conftest.dSYM: is a directory
+ok
+checking for objdir... .libs
+checking for ar... (cached) ar
+checking for ranlib... ranlib
+checking for strip... strip
+checking for dsymutil... dsymutil
+checking for nmedit... nmedit
+checking for -single_module linker flag... yes
+checking for -exported_symbols_list linker flag... yes
+rm: conftest.dSYM: is a directory
+checking if gcc supports -fno-rtti -fno-exceptions... no
+checking for gcc option to produce PIC... -fno-common
+checking if gcc PIC flag -fno-common works... yes
+checking if gcc static flag -static works... no
+checking if gcc supports -c -o file.o... yes
+checking whether the gcc linker (/usr/libexec/gcc/i686-apple-darwin10/4.2.1/ld) supports shared libraries... yes
+checking dynamic linker characteristics... darwin10.8.0 dyld
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... no
+checking whether to build static libraries... yes
+configure: creating libtool
+checking if we need -no-undefined... no
+checking if we need -mimpure-text... no
+checking if we need BUILDING_LIBCURL... no
+checking whether make sets $(MAKE)... (cached) yes
+checking for inline... inline
+checking for windows.h... no
+checking whether build target is a native Windows one... no
+checking whether to support http... yes
+checking whether to support ftp... no
+checking whether to support file... no
+checking whether to support ldap... no
+checking whether to support ldaps... no
+checking whether to support dict... no
+checking whether to support telnet... no
+checking whether to support tftp... no
+checking whether to provide built-in manual... no
+checking for icc in use... no
+checking for gethostbyname... yes
+checking for strcasecmp... yes
+checking for connect... yes
+checking whether time.h and sys/time.h may both be included... yes
+checking for sys/types.h... (cached) yes
+checking sys/time.h usability... yes
+checking sys/time.h presence... yes
+checking for sys/time.h... yes
+checking time.h usability... yes
+checking time.h presence... yes
+checking for time.h... yes
+checking for monotonic clock_gettime... no
+checking whether to use libgcc... no
+checking whether to enable ipv6... no
+checking non-blocking sockets style... O_NONBLOCK
+checking if argv can be written to... yes
+checking if Kerberos4 support is requested... no
+checking if SPNEGO support is requested... no
+checking if GSSAPI support is requested... no
+configure: WARNING: zlib disabled
+configure: WARNING: SSL disabled, you will not be able to use HTTPS, FTPS, NTLM and more.
+configure: WARNING: Use --with-ssl, --with-gnutls or --with-nss to address this.
+checking default CA cert bundle/path... no
+checking whether to build with libidn... no
+checking AIX 4.3 or later... no
+checking for gethostbyname_r... no
+checking deeper for gethostbyname_r... but still no
+checking for inet_ntoa_r... no
+checking for localtime_r... yes
+checking whether localtime_r is declared... yes
+rm: conftest.dSYM: is a directory
+checking for strerror_r... yes
+checking whether strerror_r is declared... yes
+rm: conftest.dSYM: is a directory
+checking for a glibc strerror_r API... no
+checking for a POSIX strerror_r API... yes
+checking if gmtime_r exists and works... yes
+checking for ANSI C header files... (cached) yes
+checking for malloc.h... no
+checking for sys/types.h... (cached) yes
+checking for sys/time.h... (cached) yes
+checking for sys/select.h... yes
+checking for sys/socket.h... yes
+checking for sys/ioctl.h... yes
+checking for assert.h... yes
+checking for unistd.h... (cached) yes
+checking for stdlib.h... (cached) yes
+checking for limits.h... yes
+checking for arpa/inet.h... yes
+checking for net/if.h... yes
+checking for netinet/in.h... yes
+checking for sys/un.h... yes
+checking for netinet/tcp.h... yes
+checking for netdb.h... yes
+checking for sys/sockio.h... yes
+checking for sys/stat.h... (cached) yes
+checking for sys/param.h... yes
+checking for termios.h... yes
+checking for termio.h... no
+checking for sgtty.h... yes
+checking for fcntl.h... yes
+checking for alloca.h... yes
+checking for time.h... (cached) yes
+checking for io.h... no
+checking for pwd.h... yes
+checking for utime.h... yes
+checking for sys/utime.h... no
+checking for sys/poll.h... yes
+checking for poll.h... yes
+checking for sys/resource.h... yes
+checking for libgen.h... yes
+checking for locale.h... yes
+checking for errno.h... yes
+checking for stdbool.h... yes
+checking for arpa/tftp.h... yes
+checking for sys/filio.h... yes
+checking for setjmp.h... yes
+checking for an ANSI C-conforming const... yes
+checking for compiler support of C99 variadic macro style... yes
+checking for compiler support of old gcc variadic macro style... yes
+checking for size_t... yes
+checking whether time.h and sys/time.h may both be included... (cached) yes
+checking for sys/types.h... (cached) yes
+checking for sys/time.h... (cached) yes
+checking for time.h... (cached) yes
+checking for struct timeval... yes
+checking run-time libs availability... fine
+checking for curl_off_t... yes
+checking size of curl_off_t... 8
+checking for size_t... (cached) yes
+checking size of size_t... 8
+checking for long... yes
+checking size of long... 8
+checking for time_t... yes
+checking size of time_t... 8
+checking for off_t... yes
+checking size of off_t... 8
+checking for long long... yes
+checking if numberLL works... yes
+checking for ssize_t... yes
+checking for bool... yes
+checking for socklen_t... yes
+checking for in_addr_t... yes
+checking for struct sockaddr_storage... yes
+checking signal.h usability... yes
+checking signal.h presence... yes
+checking for signal.h... yes
+checking for sig_atomic_t... yes
+checking if sig_atomic_t is already defined as volatile... no
+checking return type of signal handlers... void
+checking for sys/select.h... (cached) yes
+checking for sys/socket.h... (cached) yes
+checking for select... yes
+checking types of args and return type for select... int,fd_set *,struct timeval *,int
+checking for sys/types.h... (cached) yes
+checking for sys/socket.h... (cached) yes
+checking for recv... yes
+checking types of args and return type for recv... int,void *,size_t,int,ssize_t
+checking for sys/types.h... (cached) yes
+checking for sys/socket.h... (cached) yes
+checking for send... yes
+checking types of args and return type for send... int,const void *,size_t,int,ssize_t
+checking for sys/types.h... (cached) yes
+checking for sys/socket.h... (cached) yes
+checking for MSG_NOSIGNAL... no
+checking for strtoll... yes
+checking for socket... yes
+checking for strdup... yes
+checking for strstr... yes
+checking for strcasestr... yes
+checking for strtok_r... yes
+checking for uname... yes
+checking for strcasecmp... (cached) yes
+checking for stricmp... no
+checking deeper for stricmp... but still no
+checking for strcmpi... no
+checking deeper for strcmpi... but still no
+checking for gethostbyaddr... yes
+checking for gettimeofday... yes
+checking for inet_addr... yes
+checking for inet_ntoa... yes
+checking for inet_pton... yes
+checking for perror... yes
+checking for closesocket... no
+checking deeper for closesocket... but still no
+checking for siginterrupt... yes
+checking for sigaction... yes
+checking for signal... yes
+checking for getpass_r... no
+checking deeper for getpass_r... but still no
+checking for strlcat... yes
+checking for getpwuid... yes
+checking for geteuid... yes
+checking for getppid... yes
+checking for utime... yes
+checking for sigsetjmp... yes
+checking for basename... yes
+checking for setlocale... yes
+checking for ftruncate... yes
+checking for pipe... yes
+checking for poll... yes
+checking for getprotobyname... yes
+checking for getrlimit... yes
+checking for setrlimit... yes
+checking for fork... yes
+checking for setmode... yes
+checking whether basename is declared... yes
+checking whether inet_pton is declared... yes
+checking for sys/types.h... (cached) yes
+checking for sys/socket.h... (cached) yes
+checking for netdb.h... (cached) yes
+checking for getnameinfo... yes
+checking types of arguments for getnameinfo... const struct sockaddr *,socklen_t,socklen_t,int
+checking if we are Mac OS X (to disable poll)... yes
+checking for perl... /usr/bin/perl
+checking for gnroff... no
+checking for nroff... /usr/bin/nroff
+checking how to use *nroff to get plain text from man pages... -man
+checking whether to enable c-ares... no
+checking whether to enable verbose strings... yes
+checking whether to enable SSPI support (Windows native builds only)... no
+checking whether to enable debug options... no
+checking whether to enable cryptographic authentication methods... no
+checking whether to enable support for cookies... yes
+checking whether to enable hidden symbols in the library... no
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating docs/Makefile
+config.status: creating docs/examples/Makefile
+config.status: creating docs/libcurl/Makefile
+config.status: creating include/Makefile
+config.status: creating include/curl/Makefile
+config.status: creating src/Makefile
+config.status: creating lib/Makefile
+config.status: creating tests/Makefile
+config.status: creating tests/data/Makefile
+config.status: creating tests/server/Makefile
+config.status: creating tests/libtest/Makefile
+config.status: creating packages/Makefile
+config.status: creating packages/Win32/Makefile
+config.status: creating packages/Win32/cygwin/Makefile
+config.status: creating packages/Linux/Makefile
+config.status: creating packages/Linux/RPM/Makefile
+config.status: creating packages/Linux/RPM/curl.spec
+config.status: creating packages/Linux/RPM/curl-ssl.spec
+config.status: creating packages/Solaris/Makefile
+config.status: creating packages/DOS/Makefile
+config.status: creating packages/EPM/curl.list
+config.status: creating packages/EPM/Makefile
+config.status: creating packages/vms/Makefile
+config.status: creating packages/AIX/Makefile
+config.status: creating packages/AIX/RPM/Makefile
+config.status: creating packages/AIX/RPM/curl.spec
+config.status: creating curl-config
+config.status: creating libcurl.pc
+config.status: creating lib/config.h
+config.status: lib/config.h is unchanged
+config.status: creating src/config.h
+config.status: src/config.h is unchanged
+config.status: executing depfiles commands
+configure: Configured to build curl/libcurl:
+
+  curl version:    7.18.2
+  Host setup:      i386-apple-darwin10.8.0
+  Install prefix:  /iraf/iraf/vendor/voclient/
+  Compiler:        gcc
+  SSL support:     no      (--with-ssl / --with-gnutls)
+  SSH support:     no      (--with-libssh2)
+  zlib support:    no      (--with-zlib)
+  krb4 support:    no      (--with-krb4*)
+  GSSAPI support:  no      (--with-gssapi)
+  SPNEGO support:  no      (--with-spnego)
+  c-ares support:  no      (--enable-ares)
+  ipv6 support:    no      (--enable-ipv6)
+  IDN support:     no      (--with-libidn)
+  Build libcurl:   Shared=no, Static=yes
+  Built-in manual: no      (--enable-manual)
+  Verbose errors:  enabled (--disable-verbose)
+  SSPI support:    no      (--enable-sspi)
+  ca cert bundle:  no
+  ca cert path:    no
+  LDAP support:    no      (--enable-ldap / --with-ldap-lib / --with-lber-lib)
+  LDAPS support:   no      (--enable-ldaps)
+
+Making clean in src
+ rm -f curl curl
+test -z "hugehelp.c" || rm -f hugehelp.c
+rm -rf .libs _libs
+rm -f *.o
+rm -f *.lo
+Making clean in lib
+test -z "curllib.dsp curllib.vcproj" || rm -f curllib.dsp curllib.vcproj
+test -z "libcurl.la" || rm -f libcurl.la
+rm -f "./so_locations"
+rm -rf .libs _libs
+rm -f *.o
+rm -f *.lo
+Making clean in .
+rm -rf .libs _libs
+rm -f *.lo
+Making all in lib
+make  all-am
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT file.lo -MD -MP -MF ".deps/file.Tpo" -c -o file.lo file.c; \
+	then mv -f ".deps/file.Tpo" ".deps/file.Plo"; else rm -f ".deps/file.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT file.lo -MD -MP -MF .deps/file.Tpo -c file.c -o file.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT timeval.lo -MD -MP -MF ".deps/timeval.Tpo" -c -o timeval.lo timeval.c; \
+	then mv -f ".deps/timeval.Tpo" ".deps/timeval.Plo"; else rm -f ".deps/timeval.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT timeval.lo -MD -MP -MF .deps/timeval.Tpo -c timeval.c -o timeval.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT base64.lo -MD -MP -MF ".deps/base64.Tpo" -c -o base64.lo base64.c; \
+	then mv -f ".deps/base64.Tpo" ".deps/base64.Plo"; else rm -f ".deps/base64.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT base64.lo -MD -MP -MF .deps/base64.Tpo -c base64.c -o base64.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT hostip.lo -MD -MP -MF ".deps/hostip.Tpo" -c -o hostip.lo hostip.c; \
+	then mv -f ".deps/hostip.Tpo" ".deps/hostip.Plo"; else rm -f ".deps/hostip.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT hostip.lo -MD -MP -MF .deps/hostip.Tpo -c hostip.c -o hostip.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT progress.lo -MD -MP -MF ".deps/progress.Tpo" -c -o progress.lo progress.c; \
+	then mv -f ".deps/progress.Tpo" ".deps/progress.Plo"; else rm -f ".deps/progress.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT progress.lo -MD -MP -MF .deps/progress.Tpo -c progress.c -o progress.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT formdata.lo -MD -MP -MF ".deps/formdata.Tpo" -c -o formdata.lo formdata.c; \
+	then mv -f ".deps/formdata.Tpo" ".deps/formdata.Plo"; else rm -f ".deps/formdata.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT formdata.lo -MD -MP -MF .deps/formdata.Tpo -c formdata.c -o formdata.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT cookie.lo -MD -MP -MF ".deps/cookie.Tpo" -c -o cookie.lo cookie.c; \
+	then mv -f ".deps/cookie.Tpo" ".deps/cookie.Plo"; else rm -f ".deps/cookie.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT cookie.lo -MD -MP -MF .deps/cookie.Tpo -c cookie.c -o cookie.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT http.lo -MD -MP -MF ".deps/http.Tpo" -c -o http.lo http.c; \
+	then mv -f ".deps/http.Tpo" ".deps/http.Plo"; else rm -f ".deps/http.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT http.lo -MD -MP -MF .deps/http.Tpo -c http.c -o http.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT sendf.lo -MD -MP -MF ".deps/sendf.Tpo" -c -o sendf.lo sendf.c; \
+	then mv -f ".deps/sendf.Tpo" ".deps/sendf.Plo"; else rm -f ".deps/sendf.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT sendf.lo -MD -MP -MF .deps/sendf.Tpo -c sendf.c -o sendf.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT ftp.lo -MD -MP -MF ".deps/ftp.Tpo" -c -o ftp.lo ftp.c; \
+	then mv -f ".deps/ftp.Tpo" ".deps/ftp.Plo"; else rm -f ".deps/ftp.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT ftp.lo -MD -MP -MF .deps/ftp.Tpo -c ftp.c -o ftp.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT url.lo -MD -MP -MF ".deps/url.Tpo" -c -o url.lo url.c; \
+	then mv -f ".deps/url.Tpo" ".deps/url.Plo"; else rm -f ".deps/url.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT url.lo -MD -MP -MF .deps/url.Tpo -c url.c -o url.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT dict.lo -MD -MP -MF ".deps/dict.Tpo" -c -o dict.lo dict.c; \
+	then mv -f ".deps/dict.Tpo" ".deps/dict.Plo"; else rm -f ".deps/dict.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT dict.lo -MD -MP -MF .deps/dict.Tpo -c dict.c -o dict.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT if2ip.lo -MD -MP -MF ".deps/if2ip.Tpo" -c -o if2ip.lo if2ip.c; \
+	then mv -f ".deps/if2ip.Tpo" ".deps/if2ip.Plo"; else rm -f ".deps/if2ip.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT if2ip.lo -MD -MP -MF .deps/if2ip.Tpo -c if2ip.c -o if2ip.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT speedcheck.lo -MD -MP -MF ".deps/speedcheck.Tpo" -c -o speedcheck.lo speedcheck.c; \
+	then mv -f ".deps/speedcheck.Tpo" ".deps/speedcheck.Plo"; else rm -f ".deps/speedcheck.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT speedcheck.lo -MD -MP -MF .deps/speedcheck.Tpo -c speedcheck.c -o speedcheck.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT ldap.lo -MD -MP -MF ".deps/ldap.Tpo" -c -o ldap.lo ldap.c; \
+	then mv -f ".deps/ldap.Tpo" ".deps/ldap.Plo"; else rm -f ".deps/ldap.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT ldap.lo -MD -MP -MF .deps/ldap.Tpo -c ldap.c -o ldap.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT ssluse.lo -MD -MP -MF ".deps/ssluse.Tpo" -c -o ssluse.lo ssluse.c; \
+	then mv -f ".deps/ssluse.Tpo" ".deps/ssluse.Plo"; else rm -f ".deps/ssluse.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT ssluse.lo -MD -MP -MF .deps/ssluse.Tpo -c ssluse.c -o ssluse.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT version.lo -MD -MP -MF ".deps/version.Tpo" -c -o version.lo version.c; \
+	then mv -f ".deps/version.Tpo" ".deps/version.Plo"; else rm -f ".deps/version.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT version.lo -MD -MP -MF .deps/version.Tpo -c version.c -o version.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT getenv.lo -MD -MP -MF ".deps/getenv.Tpo" -c -o getenv.lo getenv.c; \
+	then mv -f ".deps/getenv.Tpo" ".deps/getenv.Plo"; else rm -f ".deps/getenv.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT getenv.lo -MD -MP -MF .deps/getenv.Tpo -c getenv.c -o getenv.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT escape.lo -MD -MP -MF ".deps/escape.Tpo" -c -o escape.lo escape.c; \
+	then mv -f ".deps/escape.Tpo" ".deps/escape.Plo"; else rm -f ".deps/escape.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT escape.lo -MD -MP -MF .deps/escape.Tpo -c escape.c -o escape.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT mprintf.lo -MD -MP -MF ".deps/mprintf.Tpo" -c -o mprintf.lo mprintf.c; \
+	then mv -f ".deps/mprintf.Tpo" ".deps/mprintf.Plo"; else rm -f ".deps/mprintf.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT mprintf.lo -MD -MP -MF .deps/mprintf.Tpo -c mprintf.c -o mprintf.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT telnet.lo -MD -MP -MF ".deps/telnet.Tpo" -c -o telnet.lo telnet.c; \
+	then mv -f ".deps/telnet.Tpo" ".deps/telnet.Plo"; else rm -f ".deps/telnet.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT telnet.lo -MD -MP -MF .deps/telnet.Tpo -c telnet.c -o telnet.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT netrc.lo -MD -MP -MF ".deps/netrc.Tpo" -c -o netrc.lo netrc.c; \
+	then mv -f ".deps/netrc.Tpo" ".deps/netrc.Plo"; else rm -f ".deps/netrc.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT netrc.lo -MD -MP -MF .deps/netrc.Tpo -c netrc.c -o netrc.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT getinfo.lo -MD -MP -MF ".deps/getinfo.Tpo" -c -o getinfo.lo getinfo.c; \
+	then mv -f ".deps/getinfo.Tpo" ".deps/getinfo.Plo"; else rm -f ".deps/getinfo.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT getinfo.lo -MD -MP -MF .deps/getinfo.Tpo -c getinfo.c -o getinfo.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT transfer.lo -MD -MP -MF ".deps/transfer.Tpo" -c -o transfer.lo transfer.c; \
+	then mv -f ".deps/transfer.Tpo" ".deps/transfer.Plo"; else rm -f ".deps/transfer.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT transfer.lo -MD -MP -MF .deps/transfer.Tpo -c transfer.c -o transfer.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT strequal.lo -MD -MP -MF ".deps/strequal.Tpo" -c -o strequal.lo strequal.c; \
+	then mv -f ".deps/strequal.Tpo" ".deps/strequal.Plo"; else rm -f ".deps/strequal.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT strequal.lo -MD -MP -MF .deps/strequal.Tpo -c strequal.c -o strequal.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT easy.lo -MD -MP -MF ".deps/easy.Tpo" -c -o easy.lo easy.c; \
+	then mv -f ".deps/easy.Tpo" ".deps/easy.Plo"; else rm -f ".deps/easy.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT easy.lo -MD -MP -MF .deps/easy.Tpo -c easy.c -o easy.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT security.lo -MD -MP -MF ".deps/security.Tpo" -c -o security.lo security.c; \
+	then mv -f ".deps/security.Tpo" ".deps/security.Plo"; else rm -f ".deps/security.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT security.lo -MD -MP -MF .deps/security.Tpo -c security.c -o security.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT krb4.lo -MD -MP -MF ".deps/krb4.Tpo" -c -o krb4.lo krb4.c; \
+	then mv -f ".deps/krb4.Tpo" ".deps/krb4.Plo"; else rm -f ".deps/krb4.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT krb4.lo -MD -MP -MF .deps/krb4.Tpo -c krb4.c -o krb4.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT krb5.lo -MD -MP -MF ".deps/krb5.Tpo" -c -o krb5.lo krb5.c; \
+	then mv -f ".deps/krb5.Tpo" ".deps/krb5.Plo"; else rm -f ".deps/krb5.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT krb5.lo -MD -MP -MF .deps/krb5.Tpo -c krb5.c -o krb5.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT memdebug.lo -MD -MP -MF ".deps/memdebug.Tpo" -c -o memdebug.lo memdebug.c; \
+	then mv -f ".deps/memdebug.Tpo" ".deps/memdebug.Plo"; else rm -f ".deps/memdebug.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT memdebug.lo -MD -MP -MF .deps/memdebug.Tpo -c memdebug.c -o memdebug.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT http_chunks.lo -MD -MP -MF ".deps/http_chunks.Tpo" -c -o http_chunks.lo http_chunks.c; \
+	then mv -f ".deps/http_chunks.Tpo" ".deps/http_chunks.Plo"; else rm -f ".deps/http_chunks.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT http_chunks.lo -MD -MP -MF .deps/http_chunks.Tpo -c http_chunks.c -o http_chunks.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT strtok.lo -MD -MP -MF ".deps/strtok.Tpo" -c -o strtok.lo strtok.c; \
+	then mv -f ".deps/strtok.Tpo" ".deps/strtok.Plo"; else rm -f ".deps/strtok.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT strtok.lo -MD -MP -MF .deps/strtok.Tpo -c strtok.c -o strtok.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT connect.lo -MD -MP -MF ".deps/connect.Tpo" -c -o connect.lo connect.c; \
+	then mv -f ".deps/connect.Tpo" ".deps/connect.Plo"; else rm -f ".deps/connect.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT connect.lo -MD -MP -MF .deps/connect.Tpo -c connect.c -o connect.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT llist.lo -MD -MP -MF ".deps/llist.Tpo" -c -o llist.lo llist.c; \
+	then mv -f ".deps/llist.Tpo" ".deps/llist.Plo"; else rm -f ".deps/llist.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT llist.lo -MD -MP -MF .deps/llist.Tpo -c llist.c -o llist.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT hash.lo -MD -MP -MF ".deps/hash.Tpo" -c -o hash.lo hash.c; \
+	then mv -f ".deps/hash.Tpo" ".deps/hash.Plo"; else rm -f ".deps/hash.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT hash.lo -MD -MP -MF .deps/hash.Tpo -c hash.c -o hash.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT multi.lo -MD -MP -MF ".deps/multi.Tpo" -c -o multi.lo multi.c; \
+	then mv -f ".deps/multi.Tpo" ".deps/multi.Plo"; else rm -f ".deps/multi.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT multi.lo -MD -MP -MF .deps/multi.Tpo -c multi.c -o multi.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT content_encoding.lo -MD -MP -MF ".deps/content_encoding.Tpo" -c -o content_encoding.lo content_encoding.c; \
+	then mv -f ".deps/content_encoding.Tpo" ".deps/content_encoding.Plo"; else rm -f ".deps/content_encoding.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT content_encoding.lo -MD -MP -MF .deps/content_encoding.Tpo -c content_encoding.c -o content_encoding.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT share.lo -MD -MP -MF ".deps/share.Tpo" -c -o share.lo share.c; \
+	then mv -f ".deps/share.Tpo" ".deps/share.Plo"; else rm -f ".deps/share.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT share.lo -MD -MP -MF .deps/share.Tpo -c share.c -o share.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT http_digest.lo -MD -MP -MF ".deps/http_digest.Tpo" -c -o http_digest.lo http_digest.c; \
+	then mv -f ".deps/http_digest.Tpo" ".deps/http_digest.Plo"; else rm -f ".deps/http_digest.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT http_digest.lo -MD -MP -MF .deps/http_digest.Tpo -c http_digest.c -o http_digest.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT md5.lo -MD -MP -MF ".deps/md5.Tpo" -c -o md5.lo md5.c; \
+	then mv -f ".deps/md5.Tpo" ".deps/md5.Plo"; else rm -f ".deps/md5.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT md5.lo -MD -MP -MF .deps/md5.Tpo -c md5.c -o md5.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT http_negotiate.lo -MD -MP -MF ".deps/http_negotiate.Tpo" -c -o http_negotiate.lo http_negotiate.c; \
+	then mv -f ".deps/http_negotiate.Tpo" ".deps/http_negotiate.Plo"; else rm -f ".deps/http_negotiate.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT http_negotiate.lo -MD -MP -MF .deps/http_negotiate.Tpo -c http_negotiate.c -o http_negotiate.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT http_ntlm.lo -MD -MP -MF ".deps/http_ntlm.Tpo" -c -o http_ntlm.lo http_ntlm.c; \
+	then mv -f ".deps/http_ntlm.Tpo" ".deps/http_ntlm.Plo"; else rm -f ".deps/http_ntlm.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT http_ntlm.lo -MD -MP -MF .deps/http_ntlm.Tpo -c http_ntlm.c -o http_ntlm.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT inet_pton.lo -MD -MP -MF ".deps/inet_pton.Tpo" -c -o inet_pton.lo inet_pton.c; \
+	then mv -f ".deps/inet_pton.Tpo" ".deps/inet_pton.Plo"; else rm -f ".deps/inet_pton.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT inet_pton.lo -MD -MP -MF .deps/inet_pton.Tpo -c inet_pton.c -o inet_pton.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT strtoofft.lo -MD -MP -MF ".deps/strtoofft.Tpo" -c -o strtoofft.lo strtoofft.c; \
+	then mv -f ".deps/strtoofft.Tpo" ".deps/strtoofft.Plo"; else rm -f ".deps/strtoofft.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT strtoofft.lo -MD -MP -MF .deps/strtoofft.Tpo -c strtoofft.c -o strtoofft.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT strerror.lo -MD -MP -MF ".deps/strerror.Tpo" -c -o strerror.lo strerror.c; \
+	then mv -f ".deps/strerror.Tpo" ".deps/strerror.Plo"; else rm -f ".deps/strerror.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT strerror.lo -MD -MP -MF .deps/strerror.Tpo -c strerror.c -o strerror.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT hostares.lo -MD -MP -MF ".deps/hostares.Tpo" -c -o hostares.lo hostares.c; \
+	then mv -f ".deps/hostares.Tpo" ".deps/hostares.Plo"; else rm -f ".deps/hostares.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT hostares.lo -MD -MP -MF .deps/hostares.Tpo -c hostares.c -o hostares.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT hostasyn.lo -MD -MP -MF ".deps/hostasyn.Tpo" -c -o hostasyn.lo hostasyn.c; \
+	then mv -f ".deps/hostasyn.Tpo" ".deps/hostasyn.Plo"; else rm -f ".deps/hostasyn.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT hostasyn.lo -MD -MP -MF .deps/hostasyn.Tpo -c hostasyn.c -o hostasyn.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT hostip4.lo -MD -MP -MF ".deps/hostip4.Tpo" -c -o hostip4.lo hostip4.c; \
+	then mv -f ".deps/hostip4.Tpo" ".deps/hostip4.Plo"; else rm -f ".deps/hostip4.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT hostip4.lo -MD -MP -MF .deps/hostip4.Tpo -c hostip4.c -o hostip4.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT hostip6.lo -MD -MP -MF ".deps/hostip6.Tpo" -c -o hostip6.lo hostip6.c; \
+	then mv -f ".deps/hostip6.Tpo" ".deps/hostip6.Plo"; else rm -f ".deps/hostip6.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT hostip6.lo -MD -MP -MF .deps/hostip6.Tpo -c hostip6.c -o hostip6.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT hostsyn.lo -MD -MP -MF ".deps/hostsyn.Tpo" -c -o hostsyn.lo hostsyn.c; \
+	then mv -f ".deps/hostsyn.Tpo" ".deps/hostsyn.Plo"; else rm -f ".deps/hostsyn.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT hostsyn.lo -MD -MP -MF .deps/hostsyn.Tpo -c hostsyn.c -o hostsyn.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT hostthre.lo -MD -MP -MF ".deps/hostthre.Tpo" -c -o hostthre.lo hostthre.c; \
+	then mv -f ".deps/hostthre.Tpo" ".deps/hostthre.Plo"; else rm -f ".deps/hostthre.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT hostthre.lo -MD -MP -MF .deps/hostthre.Tpo -c hostthre.c -o hostthre.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT inet_ntop.lo -MD -MP -MF ".deps/inet_ntop.Tpo" -c -o inet_ntop.lo inet_ntop.c; \
+	then mv -f ".deps/inet_ntop.Tpo" ".deps/inet_ntop.Plo"; else rm -f ".deps/inet_ntop.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT inet_ntop.lo -MD -MP -MF .deps/inet_ntop.Tpo -c inet_ntop.c -o inet_ntop.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT parsedate.lo -MD -MP -MF ".deps/parsedate.Tpo" -c -o parsedate.lo parsedate.c; \
+	then mv -f ".deps/parsedate.Tpo" ".deps/parsedate.Plo"; else rm -f ".deps/parsedate.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT parsedate.lo -MD -MP -MF .deps/parsedate.Tpo -c parsedate.c -o parsedate.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT select.lo -MD -MP -MF ".deps/select.Tpo" -c -o select.lo select.c; \
+	then mv -f ".deps/select.Tpo" ".deps/select.Plo"; else rm -f ".deps/select.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT select.lo -MD -MP -MF .deps/select.Tpo -c select.c -o select.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT gtls.lo -MD -MP -MF ".deps/gtls.Tpo" -c -o gtls.lo gtls.c; \
+	then mv -f ".deps/gtls.Tpo" ".deps/gtls.Plo"; else rm -f ".deps/gtls.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT gtls.lo -MD -MP -MF .deps/gtls.Tpo -c gtls.c -o gtls.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT sslgen.lo -MD -MP -MF ".deps/sslgen.Tpo" -c -o sslgen.lo sslgen.c; \
+	then mv -f ".deps/sslgen.Tpo" ".deps/sslgen.Plo"; else rm -f ".deps/sslgen.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT sslgen.lo -MD -MP -MF .deps/sslgen.Tpo -c sslgen.c -o sslgen.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT tftp.lo -MD -MP -MF ".deps/tftp.Tpo" -c -o tftp.lo tftp.c; \
+	then mv -f ".deps/tftp.Tpo" ".deps/tftp.Plo"; else rm -f ".deps/tftp.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT tftp.lo -MD -MP -MF .deps/tftp.Tpo -c tftp.c -o tftp.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT splay.lo -MD -MP -MF ".deps/splay.Tpo" -c -o splay.lo splay.c; \
+	then mv -f ".deps/splay.Tpo" ".deps/splay.Plo"; else rm -f ".deps/splay.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT splay.lo -MD -MP -MF .deps/splay.Tpo -c splay.c -o splay.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT strdup.lo -MD -MP -MF ".deps/strdup.Tpo" -c -o strdup.lo strdup.c; \
+	then mv -f ".deps/strdup.Tpo" ".deps/strdup.Plo"; else rm -f ".deps/strdup.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT strdup.lo -MD -MP -MF .deps/strdup.Tpo -c strdup.c -o strdup.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT socks.lo -MD -MP -MF ".deps/socks.Tpo" -c -o socks.lo socks.c; \
+	then mv -f ".deps/socks.Tpo" ".deps/socks.Plo"; else rm -f ".deps/socks.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT socks.lo -MD -MP -MF .deps/socks.Tpo -c socks.c -o socks.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT ssh.lo -MD -MP -MF ".deps/ssh.Tpo" -c -o ssh.lo ssh.c; \
+	then mv -f ".deps/ssh.Tpo" ".deps/ssh.Plo"; else rm -f ".deps/ssh.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT ssh.lo -MD -MP -MF .deps/ssh.Tpo -c ssh.c -o ssh.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT nss.lo -MD -MP -MF ".deps/nss.Tpo" -c -o nss.lo nss.c; \
+	then mv -f ".deps/nss.Tpo" ".deps/nss.Plo"; else rm -f ".deps/nss.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT nss.lo -MD -MP -MF .deps/nss.Tpo -c nss.c -o nss.o
+if /bin/sh ../libtool --tag=CC --mode=compile gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../lib    -g -O2 -MT qssl.lo -MD -MP -MF ".deps/qssl.Tpo" -c -o qssl.lo qssl.c; \
+	then mv -f ".deps/qssl.Tpo" ".deps/qssl.Plo"; else rm -f ".deps/qssl.Tpo"; exit 1; fi
+ gcc -DHAVE_CONFIG_H -I../include -I../lib -I../lib -g -O2 -MT qssl.lo -MD -MP -MF .deps/qssl.Tpo -c qssl.c -o qssl.o
+/bin/sh ../libtool --tag=CC --mode=link gcc  -g -O2   -o libcurl.la -rpath /iraf/iraf/vendor/voclient//lib  -version-info 5:0:1   file.lo timeval.lo base64.lo hostip.lo progress.lo formdata.lo cookie.lo http.lo sendf.lo ftp.lo url.lo dict.lo if2ip.lo speedcheck.lo ldap.lo ssluse.lo version.lo getenv.lo escape.lo mprintf.lo telnet.lo netrc.lo getinfo.lo transfer.lo strequal.lo easy.lo security.lo krb4.lo krb5.lo memdebug.lo http_chunks.lo strtok.lo connect.lo llist.lo hash.lo multi.lo content_encoding.lo share.lo http_digest.lo md5.lo http_negotiate.lo http_ntlm.lo inet_pton.lo strtoofft.lo strerror.lo hostares.lo hostasyn.lo hostip4.lo hostip6.lo hostsyn.lo hostthre.lo inet_ntop.lo parsedate.lo select.lo gtls.lo sslgen.lo tftp.lo splay.lo strdup.lo socks.lo ssh.lo nss.lo qssl.lo   
+mkdir .libs
+ar cru .libs/libcurl.a  file.o timeval.o base64.o hostip.o progress.o formdata.o cookie.o http.o sendf.o ftp.o url.o dict.o if2ip.o speedcheck.o ldap.o ssluse.o version.o getenv.o escape.o mprintf.o telnet.o netrc.o getinfo.o transfer.o strequal.o easy.o security.o krb4.o krb5.o memdebug.o http_chunks.o strtok.o connect.o llist.o hash.o multi.o content_encoding.o share.o http_digest.o md5.o http_negotiate.o http_ntlm.o inet_pton.o strtoofft.o strerror.o hostares.o hostasyn.o hostip4.o hostip6.o hostsyn.o hostthre.o inet_ntop.o parsedate.o select.o gtls.o sslgen.o tftp.o splay.o strdup.o socks.o ssh.o nss.o qssl.o
+/usr/bin/ranlib: file: .libs/libcurl.a(file.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(ftp.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(dict.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(ldap.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(ssluse.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(telnet.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(security.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(krb4.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(krb5.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(strtok.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(content_encoding.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(http_digest.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(md5.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(http_negotiate.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(http_ntlm.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(inet_pton.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(strtoofft.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(hostares.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(hostasyn.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(hostip6.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(hostthre.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(gtls.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(tftp.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(strdup.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(ssh.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(nss.o) has no symbols
+/usr/bin/ranlib: file: .libs/libcurl.a(qssl.o) has no symbols
+ranlib .libs/libcurl.a
+ranlib: file: .libs/libcurl.a(file.o) has no symbols
+ranlib: file: .libs/libcurl.a(ftp.o) has no symbols
+ranlib: file: .libs/libcurl.a(dict.o) has no symbols
+ranlib: file: .libs/libcurl.a(ldap.o) has no symbols
+ranlib: file: .libs/libcurl.a(ssluse.o) has no symbols
+ranlib: file: .libs/libcurl.a(telnet.o) has no symbols
+ranlib: file: .libs/libcurl.a(security.o) has no symbols
+ranlib: file: .libs/libcurl.a(krb4.o) has no symbols
+ranlib: file: .libs/libcurl.a(krb5.o) has no symbols
+ranlib: file: .libs/libcurl.a(strtok.o) has no symbols
+ranlib: file: .libs/libcurl.a(content_encoding.o) has no symbols
+ranlib: file: .libs/libcurl.a(http_digest.o) has no symbols
+ranlib: file: .libs/libcurl.a(md5.o) has no symbols
+ranlib: file: .libs/libcurl.a(http_negotiate.o) has no symbols
+ranlib: file: .libs/libcurl.a(http_ntlm.o) has no symbols
+ranlib: file: .libs/libcurl.a(inet_pton.o) has no symbols
+ranlib: file: .libs/libcurl.a(strtoofft.o) has no symbols
+ranlib: file: .libs/libcurl.a(hostares.o) has no symbols
+ranlib: file: .libs/libcurl.a(hostasyn.o) has no symbols
+ranlib: file: .libs/libcurl.a(hostip6.o) has no symbols
+ranlib: file: .libs/libcurl.a(hostthre.o) has no symbols
+ranlib: file: .libs/libcurl.a(gtls.o) has no symbols
+ranlib: file: .libs/libcurl.a(tftp.o) has no symbols
+ranlib: file: .libs/libcurl.a(strdup.o) has no symbols
+ranlib: file: .libs/libcurl.a(ssh.o) has no symbols
+ranlib: file: .libs/libcurl.a(nss.o) has no symbols
+ranlib: file: .libs/libcurl.a(qssl.o) has no symbols
+creating libcurl.la
+(cd .libs && rm -f libcurl.la && ln -s ../libcurl.la libcurl.la)
+Making all in src
+echo "/* built-in manual is disabled, blank function */" > hugehelp.c
+echo '#include "hugehelp.h"' >> hugehelp.c
+echo "void hugehelp(void) {}" >>hugehelp.c
+make  all-am
+if gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../src -I../lib -I../src    -g -O2 -MT main.o -MD -MP -MF ".deps/main.Tpo" -c -o main.o main.c; \
+	then mv -f ".deps/main.Tpo" ".deps/main.Po"; else rm -f ".deps/main.Tpo"; exit 1; fi
+if gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../src -I../lib -I../src    -g -O2 -MT hugehelp.o -MD -MP -MF ".deps/hugehelp.Tpo" -c -o hugehelp.o hugehelp.c; \
+	then mv -f ".deps/hugehelp.Tpo" ".deps/hugehelp.Po"; else rm -f ".deps/hugehelp.Tpo"; exit 1; fi
+if gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../src -I../lib -I../src    -g -O2 -MT urlglob.o -MD -MP -MF ".deps/urlglob.Tpo" -c -o urlglob.o urlglob.c; \
+	then mv -f ".deps/urlglob.Tpo" ".deps/urlglob.Po"; else rm -f ".deps/urlglob.Tpo"; exit 1; fi
+if gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../src -I../lib -I../src    -g -O2 -MT writeout.o -MD -MP -MF ".deps/writeout.Tpo" -c -o writeout.o writeout.c; \
+	then mv -f ".deps/writeout.Tpo" ".deps/writeout.Po"; else rm -f ".deps/writeout.Tpo"; exit 1; fi
+if gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../src -I../lib -I../src    -g -O2 -MT writeenv.o -MD -MP -MF ".deps/writeenv.Tpo" -c -o writeenv.o writeenv.c; \
+	then mv -f ".deps/writeenv.Tpo" ".deps/writeenv.Po"; else rm -f ".deps/writeenv.Tpo"; exit 1; fi
+if gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../src -I../lib -I../src    -g -O2 -MT getpass.o -MD -MP -MF ".deps/getpass.Tpo" -c -o getpass.o getpass.c; \
+	then mv -f ".deps/getpass.Tpo" ".deps/getpass.Po"; else rm -f ".deps/getpass.Tpo"; exit 1; fi
+if gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../src -I../lib -I../src    -g -O2 -MT homedir.o -MD -MP -MF ".deps/homedir.Tpo" -c -o homedir.o homedir.c; \
+	then mv -f ".deps/homedir.Tpo" ".deps/homedir.Po"; else rm -f ".deps/homedir.Tpo"; exit 1; fi
+if gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../src -I../lib -I../src    -g -O2 -MT curlutil.o -MD -MP -MF ".deps/curlutil.Tpo" -c -o curlutil.o curlutil.c; \
+	then mv -f ".deps/curlutil.Tpo" ".deps/curlutil.Po"; else rm -f ".deps/curlutil.Tpo"; exit 1; fi
+if gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../src -I../lib -I../src    -g -O2 -MT strtoofft.o -MD -MP -MF ".deps/strtoofft.Tpo" -c -o strtoofft.o `test -f '../lib/strtoofft.c' || echo './'`../lib/strtoofft.c; \
+	then mv -f ".deps/strtoofft.Tpo" ".deps/strtoofft.Po"; else rm -f ".deps/strtoofft.Tpo"; exit 1; fi
+if gcc -DHAVE_CONFIG_H  -I../include -I../lib -I../src -I../lib -I../src    -g -O2 -MT strdup.o -MD -MP -MF ".deps/strdup.Tpo" -c -o strdup.o `test -f '../lib/strdup.c' || echo './'`../lib/strdup.c; \
+	then mv -f ".deps/strdup.Tpo" ".deps/strdup.Po"; else rm -f ".deps/strdup.Tpo"; exit 1; fi
+/bin/sh ../libtool --tag=CC --mode=link gcc  -g -O2   -o curl  main.o hugehelp.o urlglob.o writeout.o writeenv.o getpass.o homedir.o curlutil.o strtoofft.o strdup.o  ../lib/libcurl.la  
+mkdir .libs
+gcc -g -O2 -o curl main.o hugehelp.o urlglob.o writeout.o writeenv.o getpass.o homedir.o curlutil.o strtoofft.o strdup.o  ../lib/.libs/libcurl.a  
+make[3]: Nothing to be done for `all-am'.
+Making install in lib
+test -z "/iraf/iraf/vendor/voclient//lib" || /bin/sh ../mkinstalldirs "/iraf/iraf/vendor/voclient//lib"
+ /bin/sh ../libtool --mode=install /usr/bin/install -c  'libcurl.la' '/iraf/iraf/vendor/voclient//lib/libcurl.la'
+/usr/bin/install -c .libs/libcurl.lai /iraf/iraf/vendor/voclient//lib/libcurl.la
+/usr/bin/install -c .libs/libcurl.a /iraf/iraf/vendor/voclient//lib/libcurl.a
+chmod 644 /iraf/iraf/vendor/voclient//lib/libcurl.a
+ranlib /iraf/iraf/vendor/voclient//lib/libcurl.a
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(file.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(ftp.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(dict.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(ldap.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(ssluse.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(telnet.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(security.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(krb4.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(krb5.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(strtok.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(content_encoding.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(http_digest.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(md5.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(http_negotiate.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(http_ntlm.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(inet_pton.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(strtoofft.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(hostares.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(hostasyn.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(hostip6.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(hostthre.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(gtls.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(tftp.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(strdup.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(ssh.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(nss.o) has no symbols
+ranlib: file: /iraf/iraf/vendor/voclient//lib/libcurl.a(qssl.o) has no symbols
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /iraf/iraf/vendor/voclient//lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the `-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the `DYLD_LIBRARY_PATH' environment variable
+     during execution
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+make[4]: Nothing to be done for `install-data-am'.
+Making install in src
+make  install-am
+test -z "/iraf/iraf/vendor/voclient//bin" || /bin/sh ../mkinstalldirs "/iraf/iraf/vendor/voclient//bin"
+  /bin/sh ../libtool --mode=install /usr/bin/install -c 'curl' '/iraf/iraf/vendor/voclient//bin/curl'
+/usr/bin/install -c curl /iraf/iraf/vendor/voclient//bin/curl
+make[5]: Nothing to be done for `install-data-am'.
+test -z "/iraf/iraf/vendor/voclient//bin" || /bin/sh ./mkinstalldirs "/iraf/iraf/vendor/voclient//bin"
+ /usr/bin/install -c 'curl-config' '/iraf/iraf/vendor/voclient//bin/curl-config'
+test -z "/iraf/iraf/vendor/voclient//lib/pkgconfig" || /bin/sh ./mkinstalldirs "/iraf/iraf/vendor/voclient//lib/pkgconfig"
+ /usr/bin/install -c -m 644 'libcurl.pc' '/iraf/iraf/vendor/voclient//lib/pkgconfig/libcurl.pc'
+make  install-data-hook
+cd include && make install
+Making install in curl
+make[8]: Nothing to be done for `install-exec-am'.
+test -z "/iraf/iraf/vendor/voclient//include/curl" || /bin/sh ../../mkinstalldirs "/iraf/iraf/vendor/voclient//include/curl"
+ /usr/bin/install -c -m 644 'curl.h' '/iraf/iraf/vendor/voclient//include/curl/curl.h'
+ /usr/bin/install -c -m 644 'curlver.h' '/iraf/iraf/vendor/voclient//include/curl/curlver.h'
+ /usr/bin/install -c -m 644 'easy.h' '/iraf/iraf/vendor/voclient//include/curl/easy.h'
+ /usr/bin/install -c -m 644 'mprintf.h' '/iraf/iraf/vendor/voclient//include/curl/mprintf.h'
+ /usr/bin/install -c -m 644 'stdcheaders.h' '/iraf/iraf/vendor/voclient//include/curl/stdcheaders.h'
+ /usr/bin/install -c -m 644 'types.h' '/iraf/iraf/vendor/voclient//include/curl/types.h'
+ /usr/bin/install -c -m 644 'multi.h' '/iraf/iraf/vendor/voclient//include/curl/multi.h'
+ /usr/bin/install -c -m 644 'typecheck-gcc.h' '/iraf/iraf/vendor/voclient//include/curl/typecheck-gcc.h'
+make[8]: Nothing to be done for `install-exec-am'.
+make[8]: Nothing to be done for `install-data-am'.
+cd docs && make install
+Making install in examples
+make[8]: Nothing to be done for `install-exec-am'.
+make[8]: Nothing to be done for `install-data-am'.
+Making install in libcurl
+make[8]: Nothing to be done for `install-exec-am'.
+test -z "/iraf/iraf/vendor/voclient//share/man/man3" || /bin/sh ../../mkinstalldirs "/iraf/iraf/vendor/voclient//share/man/man3"
+mkdir -m0755 /iraf/iraf/vendor/voclient/share
+mkdir -m0755 /iraf/iraf/vendor/voclient/share/man
+mkdir -m0755 /iraf/iraf/vendor/voclient/share/man/man3
+ /usr/bin/install -c -m 644 './curl_easy_cleanup.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_cleanup.3'
+ /usr/bin/install -c -m 644 './curl_easy_getinfo.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_getinfo.3'
+ /usr/bin/install -c -m 644 './curl_easy_init.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_init.3'
+ /usr/bin/install -c -m 644 './curl_easy_perform.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_perform.3'
+ /usr/bin/install -c -m 644 './curl_easy_setopt.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_setopt.3'
+ /usr/bin/install -c -m 644 './curl_easy_duphandle.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_duphandle.3'
+ /usr/bin/install -c -m 644 './curl_formadd.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_formadd.3'
+ /usr/bin/install -c -m 644 './curl_formfree.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_formfree.3'
+ /usr/bin/install -c -m 644 './curl_getdate.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_getdate.3'
+ /usr/bin/install -c -m 644 './curl_getenv.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_getenv.3'
+ /usr/bin/install -c -m 644 './curl_slist_append.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_slist_append.3'
+ /usr/bin/install -c -m 644 './curl_slist_free_all.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_slist_free_all.3'
+ /usr/bin/install -c -m 644 './curl_version.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_version.3'
+ /usr/bin/install -c -m 644 './curl_version_info.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_version_info.3'
+ /usr/bin/install -c -m 644 './curl_escape.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_escape.3'
+ /usr/bin/install -c -m 644 './curl_unescape.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_unescape.3'
+ /usr/bin/install -c -m 644 './curl_free.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_free.3'
+ /usr/bin/install -c -m 644 './curl_strequal.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_strequal.3'
+ /usr/bin/install -c -m 644 './curl_mprintf.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_mprintf.3'
+ /usr/bin/install -c -m 644 './curl_global_init.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_global_init.3'
+ /usr/bin/install -c -m 644 './curl_global_cleanup.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_global_cleanup.3'
+ /usr/bin/install -c -m 644 './curl_multi_add_handle.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_add_handle.3'
+ /usr/bin/install -c -m 644 './curl_multi_cleanup.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_cleanup.3'
+ /usr/bin/install -c -m 644 './curl_multi_fdset.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_fdset.3'
+ /usr/bin/install -c -m 644 './curl_multi_info_read.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_info_read.3'
+ /usr/bin/install -c -m 644 './curl_multi_init.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_init.3'
+ /usr/bin/install -c -m 644 './curl_multi_perform.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_perform.3'
+ /usr/bin/install -c -m 644 './curl_multi_remove_handle.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_remove_handle.3'
+ /usr/bin/install -c -m 644 './curl_share_cleanup.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_share_cleanup.3'
+ /usr/bin/install -c -m 644 './curl_share_init.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_share_init.3'
+ /usr/bin/install -c -m 644 './curl_share_setopt.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_share_setopt.3'
+ /usr/bin/install -c -m 644 './libcurl.3' '/iraf/iraf/vendor/voclient//share/man/man3/libcurl.3'
+ /usr/bin/install -c -m 644 './libcurl-easy.3' '/iraf/iraf/vendor/voclient//share/man/man3/libcurl-easy.3'
+ /usr/bin/install -c -m 644 './libcurl-multi.3' '/iraf/iraf/vendor/voclient//share/man/man3/libcurl-multi.3'
+ /usr/bin/install -c -m 644 './libcurl-share.3' '/iraf/iraf/vendor/voclient//share/man/man3/libcurl-share.3'
+ /usr/bin/install -c -m 644 './libcurl-errors.3' '/iraf/iraf/vendor/voclient//share/man/man3/libcurl-errors.3'
+ /usr/bin/install -c -m 644 './curl_easy_strerror.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_strerror.3'
+ /usr/bin/install -c -m 644 './curl_multi_strerror.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_strerror.3'
+ /usr/bin/install -c -m 644 './curl_share_strerror.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_share_strerror.3'
+ /usr/bin/install -c -m 644 './curl_global_init_mem.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_global_init_mem.3'
+ /usr/bin/install -c -m 644 './libcurl-tutorial.3' '/iraf/iraf/vendor/voclient//share/man/man3/libcurl-tutorial.3'
+ /usr/bin/install -c -m 644 './curl_easy_reset.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_reset.3'
+ /usr/bin/install -c -m 644 './curl_easy_escape.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_escape.3'
+ /usr/bin/install -c -m 644 './curl_easy_unescape.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_unescape.3'
+ /usr/bin/install -c -m 644 './curl_multi_setopt.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_setopt.3'
+ /usr/bin/install -c -m 644 './curl_multi_socket.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_socket.3'
+ /usr/bin/install -c -m 644 './curl_multi_timeout.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_timeout.3'
+ /usr/bin/install -c -m 644 './curl_formget.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_formget.3'
+ /usr/bin/install -c -m 644 './curl_multi_assign.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_multi_assign.3'
+ /usr/bin/install -c -m 644 './curl_easy_pause.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_pause.3'
+ /usr/bin/install -c -m 644 './curl_easy_recv.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_recv.3'
+ /usr/bin/install -c -m 644 './curl_easy_send.3' '/iraf/iraf/vendor/voclient//share/man/man3/curl_easy_send.3'
+make[8]: Nothing to be done for `install-exec-am'.
+test -z "/iraf/iraf/vendor/voclient//share/man/man1" || /bin/sh ../mkinstalldirs "/iraf/iraf/vendor/voclient//share/man/man1"
+mkdir -m0755 /iraf/iraf/vendor/voclient/share/man/man1
+ /usr/bin/install -c -m 644 './curl.1' '/iraf/iraf/vendor/voclient//share/man/man1/curl.1'
+ /usr/bin/install -c -m 644 './curl-config.1' '/iraf/iraf/vendor/voclient//share/man/man1/curl-config.1'

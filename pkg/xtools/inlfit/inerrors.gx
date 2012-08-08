@@ -1,0 +1,66 @@
+include <math/nlfit.h>
+include	<pkg/inlfit.h>
+
+# IN_ERRORS -- Compute the reduced chi-square of the fit and the
+# parameter errors. This procedure must be used instead of nlerrors()
+# because the weigths are changed during the data rejection process.
+# If no data rejection is used, then both procedures are equivalent.
+
+procedure in_errors$t (in, nl, x, y, wts, npts, nvars, variance, chisqr,
+	scatter, rms, errors)
+
+pointer	in			# INLFIT pointer
+pointer	nl			# NLFIT pointer
+PIXEL	x[ARB]			# Ordinates (npts * nvars)
+PIXEL	y[npts]			# Data to be fit
+PIXEL	wts[npts]		# Weights
+int	npts			# Number of points
+int	nvars			# Number of variables
+PIXEL	variance		# variance of the fit (output)
+PIXEL	chisqr			# reduced chi-squared of fit (output)
+PIXEL	scatter			# additional scatter in equation
+PIXEL	rms			# RMS of the fit (output)
+PIXEL	errors[ARB]		# errors in coefficients (output)
+
+int	i
+PIXEL	in_rms$t(), nlstat$t
+pointer	sp, fit, wts1, rejpts
+
+int	in_geti()
+pointer	in_getp()
+
+begin
+#	# Debug.
+#	call eprintf ("in_errors: in=%d, nl=%d, npts=%d, nvars=%d\n")
+#	    call pargi (in)
+#	    call pargi (nl)
+#	    call pargi (npts)
+#	    call pargi (nvars)
+
+	# Allocate memory for fit and weights.
+	call smark (sp)
+	call salloc (fit, npts, TY_PIXEL)
+	call salloc (wts1, npts, TY_PIXEL)
+
+	# Set zero weight for rejeceted points.
+	call amov$t (wts, Mem$t[wts1], npts)
+	if (in_geti (in, INLNREJPTS) > 0) {
+	    rejpts = in_getp (in, INLREJPTS)
+	    do i = 1, npts {
+		if (Memi[rejpts+i-1] == YES)
+		    Mem$t[wts1+i-1] = PIXEL (0.0)
+	    }
+	}
+
+	# Evaluate the fit, and compute the rms, reduced chi
+	# squared and errors.
+
+	call nlvector$t (nl, x, Mem$t[fit], npts, nvars)
+	call nlerrors$t (nl, y, Mem$t[fit], Mem$t[wts1], npts,
+	    variance, chisqr, errors)
+	rms = in_rms$t (y, Mem$t[fit], Mem$t[wts1], npts)
+	scatter = nlstat$t (nl, NLSCATTER)
+
+	# Free memory.
+	call sfree (sp)
+end

@@ -1,0 +1,48 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	"icfit.h"
+
+# IC_VSHOW -- Show fit parameters in verbose mode.
+
+procedure ic_vshow$t (ic, file, cv, x, y, wts, npts, gt)
+
+pointer	ic		# ICFIT pointer
+char	file[ARB]	# Output file
+pointer	cv		# Curfit pointer
+PIXEL	x[ARB]		# Ordinates
+PIXEL	y[ARB]		# Abscissas
+PIXEL	wts[ARB]	# Weights
+int	npts		# Number of data points
+pointer	gt		# Graphics tools pointer
+
+int	fd, open()
+errchk	open, ic_fvshow$t
+
+begin
+	fd = open (file, APPEND, TEXT_FILE)
+	IC_GT(ic) = gt
+	call ic_fvshow$t (ic, cv, x, y, wts, npts, fd)
+	call close (fd)
+end
+
+
+# IC_XYSHOW -- List data as x, y, fit, weight lines on output.
+
+procedure ic_xyshow$t (ic, file, cv, x, y, w, npts)
+
+pointer	ic		# ICFIT pointer
+char	file[ARB]		# Output file
+pointer	cv			# Pointer to curfit structure
+PIXEL	x[npts]			# Array of x data values
+PIXEL	y[npts]			# Array of y data values
+PIXEL	w[npts]			# Array of weight data values
+int	npts			# Number of data values
+
+int	fd, open()
+errchk	open, ic_fxyshow$t
+
+begin
+	fd = open (file, APPEND, TEXT_FILE)
+	call ic_fxyshow$t (ic, cv, x, y, w, npts, fd)
+	call close (fd)
+end

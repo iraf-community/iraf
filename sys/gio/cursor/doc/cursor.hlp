@@ -1,0 +1,194 @@
+.help GIO Mar85 "Cursor Mode"
+.nh 3
+Cursor Mode
+
+    In cursor mode, i.e., after a call to \fBclgcur\fR or after typing "=gcur",
+a number of special keystrokes shall be recognized for interactive display
+control.  All graphics output to stdgraph and stdimage is routed through the
+CL on the way to the graphics kernel.  The CL will optionally spool in an
+internal buffer all graphics instructions output to an interactive device.
+This internal buffer is emptied whenever the device screen is cleared.
+In cursor mode, special keystrokes may be used to redraw all or any portion
+of the spooled graphics, e.g., one may zoom in on a portion of the plot and
+then roam about on the plot at high magnification.  Since the spooled graphics
+vectors typically contain more information than can be displayed at normal
+magnification, zooming in on a feature may bring out additional detail
+(the maximum resolution is 32768 points in either axis).  Increasing the
+magnification will increase the precision of the cursor by the same factor.
+
+Cursor mode is implemented by performing coordinate transformation and
+clipping on each GKI instruction in the frame buffer, passing the transformed
+and clipped instructions on to the graphics kernel.
+The cursor mode operations perform a simple geometric transformation on
+the spooled graphics frame, mapping a rectangular window of the spooled
+frame onto the device screen.  The graphics frame itself is not modified,
+hence zoom out or reset and redraw will restore the original display.
+
+If the graphics frame is a typical vector plot with drawn and labeled
+axes, magnifying a portion of the plot may cause the axes to be lost.
+If this is not what is desired a keystroke is provided to draw and label
+the axes of the displayed window.  The axes will be overplotted on the
+current display and will not be saved in the frame buffer, hence they
+will be lost when the frame is redrawn.  In cursor mode the viewport is
+the full display area of the output device, hence the tick mark labels
+of the drawn axes will be drawn inside the viewport.  This form of axes
+labeling is used because it is simple and because it is appropriate for
+both vector graphics and image display output devices (and cursor mode
+must serve both).
+
+The cursor mode keystrokes are all upper case letters, reserving lower case
+for applications programs.  The terminal shift lock key may be used to
+minimize typing.  The recognized cursor mode keystrokes are shown below.
+
+
+.ks
+.nf
+(*X* means not yet implemented)
+
+	?	print list of keystrokes
+       *A*	draw and label the axes of current viewport
+	C	print the cursor position as it moves
+       *D*	draw a line by marking the endpoints
+	E	expand plot by setting window corners
+	F	set fast cursor (for HJKL)
+	H	step cursor left
+	J	step cursor down
+	K	step cursor up
+	L	step cursor right
+	M	move point under cursor to center of screen
+	P	zoom out (restore previous expansion)
+       *S*	select WCS at current position of cursor
+       *T*	draw a text string
+       *U*	undo (delete) the last instruction in the frame buffer
+	V	set slow cursor (for HJKL)
+	X	zoom in, X only
+	Y	zoom in, Y only
+	Z	zoom in, both X and Y
+	<	set lower limit of plot to the cursor y value
+	>	set upper limit of plot to the cursor y value
+       *\*	escape next character
+	:	set cursor mode options
+	:!	send a command to the host system
+	0	reset and redraw
+       1-9	roam
+
+.fi
+.ce
+Figure 2. Cursor Mode Keystrokes
+.ke
+
+
+The numeric keypad of the terminal (if it has one) is used for directional
+roaming.  The directional significance of the numeric keys for roaming
+is obvious if the terminal has a keypad, and is illustrated below.
+
+
+.ks
+.nf
+	7   8   9	135 090 045
+
+	4   5   6	180 000 000
+
+	1   2   3	225 -90 -45
+.fi
+.ke
+
+
+If the character : is typed while in cursor mode the alpha cursor will appear
+at the bottom of the screen, allowing a command line to be entered.  If the
+command \fIbegins with a period it is interpreted as a cursor mode command\fR,
+otherwise the command is passed as a string to the applications program.
+Multiple commands may be entered on a line delimited by semicolons.
+The command set currently recognized is shown below.  Minimum match
+abbreviations are permitted.
+
+.ls 4
+.ls 15 help
+Print a list of the cursor mode commands.
+.le
+.ls case[+-]
+Ignore case when interpreting keystrokes.  If this option is selected the cursor
+mode keystrokes may conflict with those of the applications program.  
+.le
+.ls clear
+Clear the alpha screen (but not the graphics screen).  This is done by writing
+sufficient blank lines to scroll any text off the screen.  Does not work if
+terminal has only one memory.
+.le
+.ls markcur[+-]
+Draw a small graphics mark at the position of the cursor whenever the cursor
+is read, i.e., when cursor mode exits.  The default is to not mark.
+.le
+.ls off [keys]
+Disable all cursor mode keystrokes except : (colon).  If followed by a list
+of keys, e.g., ":.off 0-9IC", only the listed keys are disabled.
+.le
+.ls on [keys]
+Renable all cursor mode keystrokes, or just the listed keystrokes.
+.le
+.ls page[+-]
+Clear the screen when large blocks of text are to be printed, e.g., for '?',
+show, and so on.  If paging is disabled the text will overwrite the graphics
+display.
+.le
+.ls read <file>
+Load the graphics frame from the named metafile.
+The current graphics frame is discarded.
+.le
+.ls reset
+Disconnect any connected graphics kernels and free all file descriptors and
+memory used by the graphics system.  Exit cursor mode.
+.le
+.ls show
+Print the values of all cursor mode parameters, show the status of any
+connected graphics kernels, summarize memory utilization, etc.
+.le
+.ls snap [device]
+Dispose of the graphics frame to the standard plotter or to the named device.
+A magnified graph will be plotted as it appears on the screen.
+.le
+.ls txset [size] [up]
+Set the text drawing parameters (character size and character up vector).
+For example, ".tx 2 180" would set the character size to 2.0 and character
+up to 180 degrees for a vertical string drawn upwards.
+.le
+.ls write <file>
+Save the graphics frame in (or append to) the named metafile.
+If an exclamation is appended to the command (e.g., "w! file") the output
+file, if any, will be overwritten.  If a plus sign is appended the entire
+frame will be saved regardless of any plot expansion.
+.le
+.ls xres=N
+Set the (soft) device resolution in X.  A decrease in resolution will generally
+yield an increase in plotting speed.  Only plots generated on the graphics
+terminal are affected.
+.le
+.ls yres=N
+Set the (soft) device resolution in Y.
+.le
+.ls zero
+Equivalent to the numeric key 0, i.e., restore the unitary workstation
+transformation and redraw the screen.
+.le
+.le
+
+
+For example, to set the X and Y resolutions to 250 and 100, respectively,
+one could enter the following command (the computer will type the ':' at
+the bottom of the screen when the ':' key is pressed):
+
+	:.xres=250;yres=100
+
+Cursor mode may be initialized at login time by supplying a CL environment
+variable named "cminit".  For example,
+
+	cl> set cminit = off
+
+would disable cursor mode, and
+
+	cl> set cminit = "mark;case-;xres=100;yres=50"
+
+would enable marking, turn off case sensitivity, and set the plotting
+resolution to 100x50.  Initialization is performed only once, when cursor
+mode is first entered.
+.sh

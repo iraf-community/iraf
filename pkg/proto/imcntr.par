@@ -1,0 +1,4 @@
+input,s,a,,,,Image names
+x_init,r,a,,,,Approx x position of star
+y_init,r,a,,,,Approx y position of star
+cboxsize,i,h,5,3,,Size of extraction box

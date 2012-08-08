@@ -1,0 +1,40 @@
+input,s,a,,,,list of images or list files to be graphed
+wx1,r,h,0.,,,left  world x-coord if not autoscaling
+wx2,r,h,0.,,,right world x-coord if not autoscaling
+wy1,r,h,0.,,,lower world y-coord if not autoscaling
+wy2,r,h,0.,,,upper world y-coord if not autoscaling
+wcs,s,h,"logical",,,Coordinate system for images
+axis,i,h,1,1,7,axis along which projection is to be taken
+transpose,b,h,no,,,transpose the x and y axes of the plot
+pointmode,b,h,no,,,plot points instead of lines?
+marker,s,h,"box",,,point marker or line mode?
+szmarker,r,h,5E-3,,,marker size (0 for list input)
+ltypes,s,h,"",,,List of line types (1-4)
+colors,s,h,"",,,List of colors (1-9)
+logx,b,h,no,,,log scale x-axis
+logy,b,h,no,,,log scale y-axis
+box,b,h,yes,,,draw box around periphery of window
+ticklabels,b,h,yes,,,label tick marks
+xlabel,s,h,"wcslabel",,,x-axis label
+ylabel,s,h,"",,,y-axis label
+xformat,s,h,"wcsformat",,,x-axis coordinate format
+yformat,s,h,"",,,y-axis coordinate format
+title,s,h,"imtitle",,,title for plot
+lintran,b,h,no,,,perform linear transformation of x axis
+p1,r,h,0,,,start input pixel value for lintran
+p2,r,h,0,,,end input pixel value for lintran
+q1,r,h,0,,,start output pixel value for lintran
+q2,r,h,1,,,end output pixel value for lintran
+vx1,r,h,0.,,,left limit of device viewport (0.0:1.0)
+vx2,r,h,0.,,,right limit of device viewport (0.0:1.0)
+vy1,r,h,0.,,,bottom limit of device viewport (0.0:1.0)
+vy2,r,h,0.,,,upper limit of device viewport (0.0:1.0)
+majrx,i,h,5,,,number of major divisions along x grid
+minrx,i,h,5,,,number of minor divisions along x grid
+majry,i,h,5,,,number of major divisions along y grid
+minry,i,h,5,,,number of minor divisions along y grid
+overplot,b,h,no,,,overplot on existing plot?
+append,b,h,no,,,append to existing plot?
+device,s,h,"stdgraph",,,output device
+round,b,h,no,,,round axes to nice values?
+fill,b,h,yes,,,fill viewport vs enforce unity aspect ratio?

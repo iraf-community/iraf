@@ -1,0 +1,47 @@
+# Library for the IMAGES IMCOORDS Subpackage Tasks
+
+$checkout libpkg.a ../../
+$update   libpkg.a
+$checkin  libpkg.a ../../
+$exit
+
+generic:
+        $set    GEN = "$$generic -k"
+
+	$ifolder (rgstr.x, rgstr.gx)
+	    $(GEN) rgstr.gx -o rgstr.x $endif
+	;
+
+libpkg.a:
+        $ifeq (USE_GENERIC, yes) $call generic $endif
+
+        ccfunc.x        <imhdr.h> <math.h> <mwset.h> <pkg/skywcs.h> \
+			<math/gsurfit.h>
+        ccstd.x         <mach.h> <math.h> <math/gsurfit.h> <pkg/skywcs.h>
+        ccxytran.x      <math.h> <pkg/skywcs.h>
+	healpix.x	<math.h>
+	rgstr.x		<ctype.h>
+        sfconvolve.x    <imset.h> <math.h> starfind.h
+        sffind.x        <error.h> <mach.h> <imhdr.h> <imset.h> <fset.h> \
+                        <math.h> starfind.h
+        sftools.x       <mach.h> starfind.h
+        skyctran.x      <fset.h> <ctype.h> <math.h> <pkg/skywcs.h>
+	t_ccfind.x	<fset.h> <ctype.h> <imhdr.h> <pkg/skywcs.h>
+        t_ccget.x       <fset.h> <evvexpr.h> <math.h> <ctotok.h> <lexnum.h> \
+                        <ctype.h> <pkg/skywcs.h>
+        t_ccmap.x       <fset.h> <math/gsurfit.h> <ctype.h> <math.h> \
+                        <imhdr.h> "../../lib/geomap.h" <pkg/skywcs.h>
+        t_ccsetwcs.x    <imhdr.h> <math.h> <mwset.h> <pkg/skywcs.h>
+        t_ccstd.x       <fset.h> <ctype.h> <math.h> <pkg/skywcs.h>
+        t_cctran.x      <fset.h> <ctype.h> <math.h> <pkg/skywcs.h>
+	t_ccxymatch.x   <fset.h> <pkg/skywcs.h> "../../lib/xyxymatch.h"
+	t_hpctran.x	<math.h>
+        t_imcctran.x    <fset.h> <imhdr.h> <mwset.h> <math.h> <math/gsurfit.h> \
+			<pkg/skywcs.h>
+        t_skyctran.x    <fset.h> <pkg/skywcs.h>
+        t_starfind.x    <fset.h>
+        t_wcsctran.x    <imio.h> <fset.h> <ctype.h> <imhdr.h> <ctotok.h> \
+                        <mwset.h>
+	t_wcsedit.x	<fset.h> <imhdr.h> <mwset.h>
+	t_wcsreset.x	<error.h> <imhdr.h> <mwset.h>
+	;

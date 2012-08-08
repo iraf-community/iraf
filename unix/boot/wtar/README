@@ -1,0 +1,21 @@
+WTAR -- Write a tar format file or tape.  This is a portable, non-UNIX, non-
+	proprietary program for writing tar format files on a variety of
+	systems.  The TAR format is an excellent choice for transporting
+	files between different machines because of its simplicity, efficiency,
+	and machine independence.
+
+
+wtar [-tvdo] [-f tarfile] [files]
+
+	-t	print names of files as they are written
+	-v	verbose output
+	-d	debug mode
+	-o	omit binary files
+	-f fn	write to file FN (stdout, mt[ab..], binary file)
+	[files]	files or directories to be written to tar file
+
+
+Output may be to a disk file, a magtape device, or to the standard output
+(on some systems).  Text files may be padded with extra blanks at the end on
+some systems, due to lack of knowledge of the precise file length when the
+file header is written.

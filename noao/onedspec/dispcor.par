@@ -1,0 +1,19 @@
+input,s,a,,,,List of input spectra
+output,s,a,,,,List of output spectra
+linearize,b,h,yes,,,Linearize (interpolate) spectra?
+database,s,h,"database",,,Dispersion solution database
+table,s,h,"",,,Wavelength table for apertures
+w1,r,h,INDEF,,,Starting wavelength
+w2,r,h,INDEF,,,Ending wavelength
+dw,r,h,INDEF,,,Wavelength interval per pixel
+nw,i,h,INDEF,,,Number of output pixels
+log,b,h,no,,,Logarithmic wavelength scale?
+flux,b,h,yes,,,Conserve total flux?
+blank,r,h,0.,,,Output value of points not in input
+samedisp,b,h,no,,,Same dispersion in all apertures?
+global,b,h,no,,,Apply global defaults?
+ignoreaps,b,h,no,,,Ignore apertures?
+confirm,b,h,no,,,Confirm dispersion coordinates?
+listonly,b,h,no,,,List the dispersion coordinates only?
+verbose,b,h,yes,,,Print linear dispersion assignments?
+logfile,s,h,"",,,Log file

@@ -1,0 +1,25 @@
+# Parameter file for the WCSXYMATCH task
+
+input,f,a,,,,Input images
+reference,f,a,,,,Input reference images 
+output,f,a,,,,Output matched coordinate lists
+coords,f,h,"grid",,,Reference coordinate lists
+xmin,r,h,INDEF,,,Minimum logical x reference coordinate value
+xmax,r,h,INDEF,,,Maximum logical x reference coordinate value
+ymin,r,h,INDEF,,,Minimum logical y reference coordinate value
+ymax,r,h,INDEF,,,Maximum logical y reference coordinate value
+nx,i,h,10,1,,Number of grid points in x
+ny,i,h,10,1,,Number of grid points in y
+wcs,s,h,"world","|physical|world|",,Input coordinate system
+transpose,b,h,no,,,Force a world coordinate  transpose ?
+xcolumn,i,h,1,1,,Input column containing x coordinate
+ycolumn,i,h,2,1,,Input column containing y coordinate
+xunits,s,h,"",,,Input x coordinate units
+yunits,s,h,"",,,Input y coordinate units
+xformat,s,h,"%10.3f",,,Output logical x coordinate format
+yformat,s,h,"%10.3f",,,Output logical y coordinate format
+wxformat,s,h,"",,,Output world x coordinate format
+wyformat,s,h,"",,,Output world y coordinate format
+min_sigdigits,i,h,7,,,Minimum number of significant digits
+verbose,b,h,yes,,,Verbose mode ?
+mode,s,h,ql,,,

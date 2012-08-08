@@ -1,0 +1,83 @@
+.help obs Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slOBS (N, C, NAME, W, P, H)
+
+     - - - -
+      O B S
+     - - - -
+
+  Parameters of selected groundbased observing stations
+
+  Given:
+     N       int     number specifying observing station
+
+  Either given or returned
+     C       c*(*)   identifier specifying observing station
+
+  Returned:
+     NAME    c*(*)   name of specified observing station
+     W       dp      longitude (radians, West +ve)
+     P       dp      geodetic latitude (radians, North +ve)
+     H       dp      height above sea level (metres)
+
+  Notes:
+
+     Station identifiers C may be up to 10 characters long,
+     and station names NAME may be up to 40 characters long.
+
+     C and N are alternative ways of specifying the observing
+     station.  The C option, which is the most generally useful,
+     may be selected by specifying an N value of zero or less.
+     If N is 1 or more, the parameters of the Nth station
+     in the currently supported list are interrogated, and
+     the station identifier C is returned as well as NAME, W,
+     P and H.
+
+     If the station parameters are not available, either because
+     the station identifier C is not recognized, or because an
+     N value greater than the number of stations supported is
+     given, a name of '?' is returned and C, W, P and H are left
+     in their current states.
+
+     Programs can obtain a list of all currently supported
+     stations by calling the routine repeatedly, with N=1,2,3...
+     When NAME='?' is seen, the list of stations has been
+     exhausted.
+
+     Station numbers, identifiers, names and other details are
+     subject to change and should not be hardwired into
+     application programs.
+
+     All station identifiers C are uppercase only;  lowercase
+     characters must be converted to uppercase by the calling
+     program.  The station names returned may contain both upper-
+     and lowercase.  All characters up to the first space are
+     checked;  thus an abbreviated ID will return the parameters
+     for the first station in the list which matches the
+     abbreviation supplied, and no station in the list will ever
+     contain embedded spaces.  C must not have leading spaces.
+
+     IMPORTANT -- BEWARE OF THE LONGITUDE SIGN CONVENTION.  The
+     longitude returned by slOBS is west-positive in accordance
+     with astronomical usage.  However, this sign convention is
+     left-handed and is the opposite of the one used by geographers;
+     elsewhere in SLALIB the preferable east-positive convention is
+     used.  In particular, note that for use in slAOP, slAOPA
+     and slOAP the sign of the longitude must be reversed.
+
+     Users are urged to inform the author of any improvements
+     they would like to see made.  For example:
+
+         typographical corrections
+         more accurate parameters
+         better station identifiers or names
+         additional stations
+
+  P.T.Wallace   Starlink   21 April 1999
+
+  Copyright (C) 1999 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

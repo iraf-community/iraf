@@ -1,0 +1,70 @@
+.help zxwhen May84 "System Interface"
+.ih
+NAME
+zxwhen -- post an exception handler
+.ih
+SYNOPSIS
+.nf
+include <when.h>
+
+zxwhen (exception, new_handler, old_handler)
+
+int	exception		# virtual exception code
+int	new_handler		# EPA of new handler
+int	old_handler		# EPA of old handler
+.fi
+.ih
+DESCRIPTION
+The exception handler procedure \fInew_handler\fR is posted for the specified
+virutal exception, i.e., \fInew_handler\fR will be called if the indicated
+exception should occur.  The integer value of \fInew_handler\fR must be either
+the entry point address (EPA) of a procedure as returned by \fBzlocpr\fR, or the
+integer constant X_IGNORE (zero), used to disable exceptions.  The recognized
+virtual exceptions, defined in <when.h>, are as follows:
+
+.nf
+	X_ACV	    501		    # access violation
+	X_ARITH     502		    # arithmetic error
+	X_INT	    503		    # keyboard interrupt
+	X_IPC	    504		    # write to IPC with no reader
+.fi
+
+In general many host-specific exceptions may be mapped to a single virtual
+exception.  All host exceptions which are not caught internally by the kernel
+are mapped to one of the four virtual exceptions.  An exception handler
+remains posted after it has been called.  The user exception handler must
+have the following calling sequence:
+
+	user_handler (exception, next_handler)
+
+The kernel calls the user handler procedure with the integer code of the
+virtual exception which actually occurred as the first argument; thus a
+single handler may be posted to more than one exception.  The user handler
+may either directly or indirectly call \fBzdojmp\fR to initiate error
+recovery, in which case the procedure does not return.  If the handler
+procedure returns, \fInext_handler\fR must be set either to X_IGNORE or to the
+EPA of the next_handler, i.e., to the value of \fIold_handler\fR received
+when the current handler was posted.  If X_IGNORE is returned execution
+will continue normally.  If the EPA of another handler procedure is returned
+that handler will receive control, hence a chain of handlers may be called
+to handle an exception.
+.ih
+RETURN VALUE
+A panic exit occurs if an unknown \fIexception\fR is specified.  If the
+operation is successful \fIold_handler\fR will contain either X_IGNORE or
+the EPA of the previous handler.
+.ih
+NOTES
+The IRAF Main posts a default exception handler to all four exceptions upon
+process startup.  The default handler allows arithmetic exceptions to be
+caught by inline error handlers (i.e., \fBiferr\fR statements) in user code.
+Access violations and interrupts may only be caught by posting an exception
+handler.  If an exception is not caught program execution is aborted,
+error restart occurs, and any user procedures posted with \fBonerror\fR are
+callled.  See the System Interface reference manual and the SPP reference
+manual for a more detailed discussion of exception and error handling in
+the high level code.
+.ih
+SEE ALSO
+zxgmes, zintpr, zfiopr, onerror, SPP \fBiferr\fR and \fBerror\fR statements
+.endhelp

@@ -1,0 +1,43 @@
+.help nlvector Feb91 "Nlfit Package"
+.ih
+NAME
+nlvector -- evaluate the fitted curve at a set of points
+.ih
+SYNOPSIS
+nlvector[rd] (nl, x, zfit, npts, nvars)
+
+.nf
+pointer		nl		# curve descriptor
+real/double	x[nvars*npts]	# array of variables stored as x[nvars,npts]
+real/double	zfit[npts]	# array of fitted function values
+int		npts		# number of data points
+int		nvars		# number of variables
+.fi
+.ih
+ARGUMENTS
+.ls nl   
+Pointer to the curve descriptor structure.
+.le
+.ls x     
+Array of variable values for all the data points.
+.le
+.ls zfit   
+Array of fitted function values.
+.le
+.ls npts   
+The number of data points at which the curve is to be evaluated.
+.le
+.ls nvars
+The number of variables in the fitted function.
+.le
+.ih
+DESCRIPTION
+Fit the curve to an array of data points.
+.ih
+NOTES
+NLVECTOR uses the coefficient array stored in the curfit descriptor
+structure.
+.ih
+SEE ALSO
+nleval
+.endhelp

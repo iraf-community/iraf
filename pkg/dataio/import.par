@@ -1,0 +1,30 @@
+# IMPORT Task Parameter File
+binfiles,s,a,"",,,"The list of input binary files to be read"
+images,s,a,"",,,"The list of output IRAF images to be written"
+format,s,h,"sense",,,"The type of format to be processed
+
+		INPUT PARAMETERS
+"
+dims,s,h,"",,,"Input file dimension string"
+pixtype,s,h,"",,,"Input pixel type"
+interleave,i,h,0,,,"Pixel interleave type"
+bswap,s,h,"no","|no|yes|i2|i4||",,"Byte-swap flag"
+hskip,i,h,0,,,"Bytes preceeding pixel data to skip"
+tskip,i,h,0,,,"Bytes to skip at end of file"
+bskip,i,h,0,,,"Bytes between image bands to skip"
+lskip,i,h,0,,,"Bytes to skip at font of each line"
+lpad,i,h,0,,,"Bytes to skip at end of each line
+
+		OUTPUT PARAMETERS
+"
+output,s,h,"image","|none|image|list|info|",,"Type of output to generate"
+outtype,s,h,"s","|u|s|i|l|r|d||",,"The data type of the output image"
+outbands,s,h,"",,,"Output image band expressions"
+imheader,s,h,"",,,"File of FITS-like header info to add
+"
+database,s,h,"dataio$import/images.dat",,,"Format database"
+verbose,b,h,no,,,"Verbose output during conversion?"
+
+# Mode parameter
+buffer_size,i,h,64,,,"Number of image lines to buffer in memory"
+mode,s,h,"ql",,,"mode parameter"

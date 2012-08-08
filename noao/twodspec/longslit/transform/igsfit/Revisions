@@ -1,0 +1,42 @@
+.help revisions Jun88 noao.twodspec.longslit.transform.igsfit
+.nf
+ igsfit.x
+ igsnearest.x
+     GSCUR was being called with DOUBLE precision values. (12/22/87)
+
+ igsfit.x
+ igscolon.x
+ igsget.x
+     Added colon options to print fit at corners of surface. (8/10/87 Valdes)
+
+ ====
+ V2.5
+ ====
+
+noao$twodspec/longslit/transform/igsfit/*.x
+    Valdes, February 17, 1987
+    1.  GIO changes.
+
+noao$twodspec/longslit/transform/igsfit/igsfit.x
+noao$twodspec/longslit/transform/igsfit/igscolon.x
+    Valdes, January 16, 1987
+    1.  '?' now uses system page facility.
+    2.  Colon command dictionary and switch modified to use macro definitions.
+
+noao$twodspec/longslit/transform/igsfit/igsdelete.x
+noao$twodspec/longslit/transform/igsfit/igsundelete.x
+    Valdes, October 16, 1986
+    1.  Real line type specified in gseti call changed to integer.
+	This caused a crash on AOS/IRAF.
+
+========================================================
+
+From Valdes on Feb 7, 1986:
+
+1.  Bug fixed in deleting and undeleting points.
+------
+From Valdes on Jan 3, 1986:
+
+1.  Modified IGSFIT to allow zooming on constant x, constant y, constant z,
+and constant feature.
+.endhelp

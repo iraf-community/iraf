@@ -1,0 +1,287 @@
+.help fitcoords Apr00 noao.twodspec.longslit
+.ih
+NAME
+fitcoords -- Fit user coordinates to the image coordinates
+.ih
+USAGE
+fitcoords images fitname
+.ih
+PARAMETERS
+.ls images
+List of images containing the feature coordinates to be fit.  If the
+parameter \fIcombine\fR is yes then feature coordinates from all the images
+are combined and fit by a single function.  Otherwise the feature coordinates
+from each image are fit separately.
+.le
+.ls fitname = "" 
+If the input images are combined and fit by a single function then the fit
+is stored under this name.  If the images are not combined then the
+fit for each image is stored under the name formed by appending the image
+name to this name.  A null prefix is acceptable when not combining but it
+is an error if combining a list of images.
+.le
+.ls interactive = yes
+Determine coordinate fits interactively?
+.le
+.ls combine = no
+Combine the coordinates from all the input images and fit them by a single
+function?  If 'no' then fit the coordinates from each image separately.
+.le
+.ls database = "database"
+Database containing the feature coordinate information used in fitting the
+coordinates and in which the coordinate fit is recorded.
+.le
+.ls deletions = "deletions.db"
+Deletion list file.  If not null then points whose coordinates match those in
+this file (if it exists) are initially deleted from the fit.
+If the fitting is done interactively then the coordinates of
+any deleted points (after exiting from the interactive fitting) are recorded
+in this file.
+.le
+.ls function = "chebyshev"
+Type of two dimensional function to use in fitting the user coordinates.
+The choices are "chebyshev" polynomial and "legendre" polynomial.
+The function may be abbreviated.  If the task is interactive then
+the user may change the function later.
+.le
+.ls xorder = 6
+Order of the mapping function along the first image axis.
+The order is the number of polynomial terms.  If the task is interactive
+then the user may change the order later.
+.le
+.ls yorder = 6
+Order of the mapping function along the second image axis.
+The order is the number of polynomial terms.  If the task is interactive
+then the user may change the order later.
+.le
+.ls logfiles = "STDOUT,logfile"
+List of files in which to keep logs containing information about
+the coordinate fit.  If null then no log is kept.
+.le
+.ls plotfile = "plotfile"
+Name of file to contain metacode for log plots.  If null then no log plots
+are kept.  When the fitting is interactive the last graph is recorded in
+the plot file and when not interactive a default plot is recorded.
+.le
+.ls graphics = "stdgraph"
+Graphics output device.
+.le
+.ls cursor = ""
+Graphics cursor input.  If null the standard graphics cursor is used.
+.le
+.bp
+.ih
+CURSOR COMMANDS
+
+.nf
+?  List commands
+c  Print data values for point nearest the cursor
+d  Delete the point or set of points with constant x, y, or z
+	nearest the cursor (p, x, y, z,)
+f  Fit surface
+l  Graph the last set of points (in zoom mode)
+n  Graph the next set of points (in zoom mode)
+p  Graph all features
+q  Quit
+r  Redraw a graph
+u  Undelete the point or set of points with constant x, y, or z
+	nearest the cursor (p, x, y, z,)
+w  Window the graph.  Type '?' to the "window:" prompt for more help.
+x  Select data for the x axis (x, y, z, s, r)
+y  Select data for the y axis (x, y, z, s, r)
+z  Zoom on the set of points with constant x, y, or z (x, y, z)
+   Unzoom with p
+
+:corners	Show the fitted values for the corners of the image
+:function type	Set the function for the fitted surface
+		(chebyshev, legendre)
+:show		Show the fitting parameters
+:xorder value	Set the x order  for the fitted surface
+:yorder value	Set the y order  for the fitted surface
+.fi
+.ih
+DESCRIPTION
+A two dimensional function of the image coordinates is fitted to the user
+coordinates from the specified images;
+
+.nf
+	user coordinate = function (column, line)
+
+			or
+
+		      z = s (x, y)
+.fi
+
+The coordinates from all the input images may be combined in a single fit or
+the coordinates from each image may be fit separately.  If the
+coordinates from the input images are combined then the fitted function
+is recorded in the database under the specified name.  If
+the coordinates are fit separately the fitted function is recorded under
+a name formed by appending the image name to the specified root name.
+
+When the task is interactive the user is first queried whether to perform
+the fitting interactively.  The user may answer "yes", "no", "YES", or "NO"
+to the query.  The lowercase responses apply only to the current fit
+and the uppercase responses apply to all remaining fits.  When the
+fitting is done interactively the user may change the fitted function and
+orders iteratively, delete individual coordinates or entire features,
+and graph the fit and residuals in a number ways.
+The CURSOR COMMANDS section describes the graphics cursor keystrokes
+which are available.  When selecting data for the graph axes the
+follow definitions apply:
+
+.nf
+	x	Input image column positions
+	y	Input image line positions
+	z	Input user coordinates
+	s	Fitted user coordinates
+	r	Residuals (s - z)
+.fi
+
+A very useful feature is zooming, deleting, or undeleting a subset of data
+points.  The subsets
+are defined as points with the same x, y, or z value as the point indicated
+by the cursor when typing (z)oom, (d)elete, or (u)ndelete.
+
+When a satisfactory coordinate fit has been determined exit with the (q)uit
+key.  The user is asked if the fit is to be recorded in the database.
+
+If a deletion list file is specified then the coordinates of any
+points deleted interactively are recorded in this file.  This file then can
+be read by subsequent fits to initially delete points with matching
+coordinates.  This is generally used when fitting a series of images
+non-interactively.
+
+Information about the fitted function may be recorded.  Textual information
+is written to the specified log files (which may include the standard
+output STDOUT).  The last interactive plot or a default non-interactive
+plot is written the specified plot file which may be examined and spooled
+at a later time.
+
+
+FITCOORDS DATABASE
+
+The FITCOORDS fits are stored in text files in the subdirectory given by
+the "database" parameter.  The name of the file is fc<fitname> where
+<fitname> is the specified fit name.  The database text file contains
+blocks of lines beginning with a time stamp followed by line with the
+"begin" keyword.  The value following "begin" is the fit name, which is
+often the name of the image used for the fit.  If there is more than one
+block with the same fit name then the last one is used.
+
+The "task" keyword will has the value "fitcoords" and the "axis" keyword
+identifies the axis to which the surface fit applies.  An axis of 1 refers
+to the first or x axis (the first dimension of the image) and 2 refers to
+the second or y axis.
+
+The "surface" keyword specifies the number of coefficients for the surface
+fit given in the following lines .  The surface fit is produced by an IRAF
+math package called "gsurfit".  The coefficients recorded in the database
+are intented to be internal to that package.  However the following
+describes how to interpret the coefficients.
+
+The first 8 lines specify:
+
+.nf
+   function - Function type (1=chebyshev, 2=legendre)
+     xorder - X "order" (highest power of x)
+     yorder - Y "order" (highest power of y)
+     xterms - Cross-term type (always 1 for FITCOORDS)
+       xmin - Minimum x over which the fit is defined
+       xmax - Maximum x over which the fit is defined
+       ymin - Minimum y over which the fit is defined
+       ymax - Maximum y over which the fit is defined
+.fi
+
+The polynomial coefficients follow in array order with the x index
+varying fastest:
+
+.nf
+	C00
+	C10
+	C20
+	...
+	C<xorder-1>0
+	C01
+	C11
+	C21
+	...
+	C<xorder-1>1
+	...
+	C<xorder-1><yorder-1>
+.fi
+
+The surface fitting functions have the form
+
+.nf
+	fit(x,y) = Cmn * Pmn
+.fi
+
+where the Cmn are the coefficients of the polynomials terms Pmn, and the Pmn
+are defined as follows:
+
+.nf
+Chebyshev: Pmn = Pm(xnorm) * Pn(ynorm)
+
+	   xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+	   ynorm = (2 * y - (ymax + ymin)) / (ymax - ymin)
+
+	   P0(xnorm) = 1.0
+	   P1(xnorm) = xnorm
+	   Pm+1(xnorm) = 2.0 * xnorm * Pm(xnorm) - Pm-1(xnorm) 
+
+	   P0(ynorm) = 1.0
+	   P1(ynorm) = ynorm
+	   Pn+1(ynorm) = 2.0 * ynorm * Pn(ynorm) - Pn-1(ynorm) 
+
+Legendre:  Pmn = Pm(xnorm) * Pn(ynorm)
+
+	   xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+	   ynorm = (2 * y - (ymax + ymin)) / (ymax - ymin)
+
+	   P0(xnorm) = 1.0
+	   P1(xnorm) = xnorm
+	   Pm+1(xnorm) = ((2m+1)*xnorm*Pm(xnorm)-m*Pm-1(xnorm))/(m+1)   
+
+	   P0(ynorm) = 1.0
+	   P1(ynorm) = ynorm
+	   Pn+1(ynorm) = ((2n+1)*ynorm*Pn(ynorm)-n*Pn-1(ynorm))/(n+1)   
+.fi
+
+Notice that the x and y values are first normalized to the interval -1 to 1
+over the range of the surface as given by the xmin, xmax, ymin, and ymax
+elements of the database description.
+.ih
+EXAMPLES
+A number of strong arc lines are identified along one column of an arc
+calibration image "arc001".  The arc lines are then reidentified at every
+20th column.  A two dimensional dispersion solution is determined as follows:
+
+	cl> fitcoords arc001 fit.
+
+The fitting is done interactively and deleted points are recorded.
+The fit is recorded under the name fit.arc001.  A set of similar arc
+calibrations are fit non-interactively, with the same points deleted,
+as follows:
+
+	cl> fitcoords arc* interactive=no
+
+Several stellar spectra are identified at different positions along the slit
+and traced to other lines.  A fit to the geometric distortion is determined
+with the command:
+
+	cl> fitcoords star001,star003,star005 fitname=distortion combine=yes
+
+In this case the coordinates from all the tracings are combined in a single
+fit called distortion.
+
+The plots in the plot file are spooled to the standard plotting device as
+follows:
+
+	cl> gkimosaic plotfile
+
+\fBGkimosaic\fR is in the \fBplot\fR package.
+.ih
+SEE ALSO
+transform
+.endhelp

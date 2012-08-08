@@ -1,0 +1,26 @@
+         aptest - Run basic tests on the apphot package tasks
+	 center - Compute accurate centers for a list of objects
+     centerpars - Edit the centering parameters
+	daofind - Find stars in an image using the dao algorithm
+       datapars - Edit the data dependent parameters
+       findpars - Edit the star detection parameters
+	 fitpsf - Model the stellar psf with an analytic function
+         fitsky - Compute sky values in a list of annular or circular regions
+     fitskypars - Edit the sky fitting parameters
+	   phot - Measure magnitudes for a list of stars
+       photpars - Edit the photometry parameters
+       polymark - Create polygon lists for polyphot
+       polyphot - Measure magnitudes inside a list of polygonal regions
+       polypars - Edit the polyphot parameters
+	  qphot - Measure quick magnitudes for a list of stars
+        radprof - Compute the stellar radial profile of a list of stars
+	  wphot - Measure magnitudes for a list of stars with weighting
+
+        lintran - Linearly transform a coordinate list
+          pcalc - Do arithmetic operations on a list of apphot databases
+       pconvert - Convert a text database to a tables database
+          pdump - Print selected fields from a list of apphot databases
+       pexamine - Interactively examine and edit an apphot database
+      prenumber - Renumber stars in an apphot database
+        pselect - Select records from an apphot database
+          psort - Sort an apphot database

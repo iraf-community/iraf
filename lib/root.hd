@@ -1,0 +1,61 @@
+# IRAF root help directory.  Help packages are structured hierarchically and
+# (ideally) closely follow the actual package structure.  Each package in
+# the help database must appear as a subdirectory of this, the root help
+# directory.  Due to the way the datbase is indexed, package names must be
+# unique within the database despite the fact that the logical structure is
+# hierarchical.
+#
+# The declarations for the main branches of the help tree follow.  The help
+# tree will be searched by conducting a depth first search of the branches
+# shown, in the order shown (since sorting is disabled).  The root help
+# directory itself is not searched when looking for a help module as this
+# would negate the advantages of the depth first search.  The purpose of the
+# underscore prefixed packages is to make the real packages appear as modules
+# in a non-root package.  The package "_sys", for example, does nothing but
+# define the package "sys", all to make "sys" appear as a help module in
+# package "_sys".  Making both packages and programs appear as modules gives
+# maximum scope for resolving ambiguous help keyword templates.
+
+.nosort
+_clpackage	pkg = lib$clpackage.hd,		hlp = clpackage$clpackage.men
+_sys		pkg = sys$_sys.hd,		hlp = sys$sys.men
+_math		pkg = math$_math.hd,		hlp = math$math.men
+_doc		pkg = doc$_doc.hd,		hlp = doc$doc.men
+
+
+# SETTING UP HELP DIRECTORIES
+#
+# The format of a help directory is logical directory definitions followed
+# by decarations for the help modules within the package (clpackage, sys,
+# etc.).  The format of a module declaration is the module name followed by
+# a list of filenames.  Five types of help files may be associated with each
+# package:
+#
+#	men.men file (CL packages only)
+#	hlp	user help text for module
+#	sys	system (technical) help text for module
+#	src	source file (only one source file permitted at present)
+# 	pkg	if the module is a subpackage, the name of the .hd file
+#		    for the subpackage.
+#
+# The format of a file name is [ldir$]filename.  Logical directories may be
+# defined within the help directory file, but unlike CL environment declarations
+# recursion is not permitted.  The syntax is as follows:
+#
+#	$ldir = "irafdir$subdir/[subdir/...]"
+# or
+#	$ldir = "./subdir/[subdir/...]"
+#
+# where a leading "." refers to the directory in which the help directory file
+# is resident, and where "irafdir" refers to an IRAF logical directory defined
+# in the CL at LOGIN TIME, i.e., lib, pkg, sys, math, and so on.  Note that the
+# CL package directories are defined only when a package is loaded and hence
+# may not be used in a help directory.  If no ldir is given in a filename, the
+# default directory is the directory in which the help directory file is found.
+#
+# References to subpackages may not be recursive.  Recursion is however useful
+# as an alternative to the "_package" technique for making all packages appear
+# as modules too.  A package may contain itself as a module provided the "pkg"
+# file is ommitted.  This enters the package into the database as a module,
+# causing it to be found in ambiguous searches and making the associated help
+# files accessible.

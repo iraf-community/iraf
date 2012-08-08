@@ -1,0 +1,157 @@
+.help flat1d Mar93 noao.imred.generic
+.ih
+NAME
+flat1d -- Make flat fields by fitting a 1D function to the image
+.ih
+USAGE	
+flat1d input output
+.ih
+PARAMETERS
+.ls input
+Calibration images to be used to make the flat fields.  The images may
+contain image sections.  Only the region covered by the section will be
+modified in the output image.
+.le
+.ls output
+Flat field images to be created or modified.  The number of output images
+must match the number of input images.  If an output image does not exist
+it is first created and initialized to unit response.
+.le
+.ls axis = 1
+Axis along which the one dimensional fitting is done.  Axis 1 corresponds
+to fitting the image lines and axis 2 corresponds to fitting the columns.
+.le
+.ls interactive = yes
+Set the fitting parameters interactively?
+.le
+.ls sample = "*"
+Lines or columns to be used in the fits.
+.le
+.ls naverage = 1
+Number of sample points to combined to create a fitting point.
+A positive value specifies an average and a negative value specifies
+a median.
+.le
+.ls function = spline3
+Function to be fit to the image lines or columns.  The functions are
+"legendre" (legendre polynomial), "chebyshev" (chebyshev polynomial),
+"spline1" (linear spline), and "spline3" (cubic spline).  The functions
+may be abbreviated.
+.le
+.ls order = 1
+The order of the polynomials or the number of spline pieces.
+.le
+.ls low_reject = 2.5, high_reject = 2.5
+Low and high rejection limits in units of the residual sigma.
+.le
+.ls niterate = 1
+Number of rejection iterations.
+.le
+.ls grow = 1.
+When a pixel is rejected, pixels within this distance of the rejected pixel
+are also rejected.
+.le
+.ls minflat = 0.
+When the fitted value is less than the value of this parameter the flat
+field value is set to unity.
+.le
+.ls graphics = "stdgraph"
+Graphics device for interactive graphics output.
+.le
+.ls cursor = ""
+Graphics cursor input
+.le
+.ih
+DESCRIPTION
+Flat fields are created containing only the small scale variations in the
+calibration images.  The large scale variations in the images are modeled
+by fitting a function to each image line or column with deviant pixel rejection.
+The flat field values are obtained by taking the ratio of the image values
+to the function fit.  However, if the fitted value is less than the
+parameter \fIminflat\fR the flat field value is set to unity.
+
+The function fitting parameters may be set interactively when the interactive
+flag is set using the interactive curve fitting package \fBicfit\fR.
+The cursor mode commands for this package are described in a separate
+help entry under "icfit".  For two dimensional images the user is
+prompted for the sample line or column or a blank-separated range to be
+averaged and graphed.
+Note that the lines or columns are relative the input image section; for
+example line 1 is the first line of the image section and not the first
+line of the image.  Any number of lines or columns may be examined.
+When satisfied with the fit parameters the user
+responds with a carriage return to the line or column prompt.
+The function is then fit to all the lines or columns and the flat field
+ratios are determined.
+
+If the output image does not exist initially it is created with the same
+size as the input image \fIwithout\fR an image section and initialized
+to unit response.  Subsequently the flat field data modifies the pixel
+values in the output image.  Input image sections may be used to restrict
+the region in which the flat field response is determined leaving the
+rest of the output image unmodified.  This ability is particularly useful
+when dealing with multi-aperture data.
+
+This task is very similar to \fBfit1d\fR with the addition of the
+parameter \fIminflat\fR and the deletion of the parameter \fItype\fR
+which is always "ratio".
+.ih
+EXAMPLES
+1.  Create a flat field from the calibration image "quartz" with the
+spectrum running along the lines.  Exclude the first and last columns,
+use a spline fit of 25 pieces (a width of 32 pixels over 800 columns),
+and set grow to 4 pixels.
+
+.nf
+	cl> flat1d quartz flat order=25 sample="2:799" grow=4 \
+	>>> interactive=no
+
+			or
+
+	cl> flat1d quartz[2:799,*] flat order=25 grow=4 inter-
+.fi
+
+The fitting parameters may be set interactively in which case the fitting
+parameters need not be specified.  The command would be
+
+.nf
+	cl> flat1d quartz flat
+	quartz: Fit column = 1 10
+	quartz: Fit column =
+.fi
+
+The user selects sample columns to be fit interactively with the interactive
+curve fitting package.  When satisfied with the fit parameters
+respond with a carriage return to the prompt.  The function is then fit to
+all the columns and the flat field ratios are determined.
+
+2.  As an example for multi-slit spectra the locations of the slits are
+determined and a file containing the image sections is created.
+Since there must be the same number of output images another file
+containing the output images is also created.  For
+example the files might contain
+
+.nf
+	  File quartzs			File flats
+	_______________			__________
+	quartz[23:40,*]			   flat
+	quartz[55:61,*]			   flat
+	quartz[73:84,*]			   flat
+.fi
+
+A flat field for the slits is then obtained with the command
+
+	cl> flat1d @quartzs flats axis=2
+.ih
+REVISIONS
+.ls FLAT1D V2.10.3
+The image header keyword "CCDMEAN = 1." is now added or updated.
+.le
+.ih
+BUGS
+The creation of multi-slit files and the need for an equal number of
+repeated output files is annoying.  It will be worked on in the future.
+.ih
+SEE ALSO
+fit1d, icfit
+.endhelp

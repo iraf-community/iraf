@@ -1,0 +1,118 @@
+# OUTPUT PARAMETERS
+
+apertures,s,h,)apall.apertures,,,>apfit.apertures
+format,s,h,)apsum.format,,,>apsum.format
+extras,b,h,)apsum.extras,,,>apsum.extras
+dbwrite,s,h,yes,,,Write to database?
+initialize,b,h,yes,,,Initialize answers?
+verbose,b,h,)_.verbose,,,"Verbose output?
+
+# DEFAULT APERTURE PARAMETERS
+"
+lower,r,h,)apdefault.lower,,,>apdefault.lower
+upper,r,h,)apdefault.upper,,,>apdefault.upper
+apidtable,s,h,)apdefault.apidtable,,,">apdefault.apidtable
+
+# DEFAULT BACKGROUND PARAMETERS
+"
+b_function,s,h,)apdefault.b_function,,,>apdefault.b_function
+b_order,i,h,)apdefault.b_order,,,>apdefault.b_order
+b_sample,s,h,)apdefault.b_sample,,,>apdefault.b_sample
+b_naverage,i,h,)apdefault.b_naverage,,,>apdefault.b_naverage
+b_niterate,i,h,)apdefault.b_niterate,,,>apdefault.b_niterate
+b_low_reject,r,h,)apdefault.b_low_reject,,,>apdefault.b_low_reject
+b_high_reject,r,h,)apdefault.b_high_reject,,,>apdefault.b_high_reject
+b_grow,r,h,)apdefault.b_grow,,,">apdefault.b_grow
+
+# APERTURE CENTERING PARAMETERS
+"
+width,r,h,)apedit.width,,,>apedit.width
+radius,r,h,)apedit.radius,,,>apedit.radius
+threshold,r,h,)apedit.threshold,,,">apedit.threshold
+
+# AUTOMATIC FINDING AND ORDERING PARAMETERS
+"
+nfind,i,h,)apfind.nfind,,,>apfind.nfind
+minsep,r,h,)apfind.minsep,,,>apfind.minsep
+maxsep,r,h,)apfind.maxsep,,,>apfind.maxsep
+order,s,h,)apfind.order,,,">apfind.order
+
+# RECENTERING PARAMETERS
+"
+aprecenter,s,h,)aprecenter.aprecenter,,,>aprecenter.aprecenter
+npeaks,r,h,)aprecenter.npeaks,,,>aprecenter.npeaks
+shift,b,h,)aprecenter.shift,,,">aprecenter.shift
+
+# RESIZING PARAMETERS
+"
+llimit,r,h,)apresize.llimit,,,>apresize.llimit
+ulimit,r,h,)apresize.ulimit,,,>apresize.ulimit
+ylevel,r,h,)apresize.ylevel,,,>apresize.ylevel
+peak,b,h,)apresize.peak,,,>apresize.peak
+bkg,b,h,)apresize.bkg,,,>apresize.bkg
+r_grow,r,h,)apresize.r_grow,,,>apresize.r_grow
+avglimits,b,h,)apresize.avglimits,,,">apresize.avglimits
+
+# EDITING PARAMETERS
+"
+e_output,s,q,,,,Output spectra rootname
+e_profiles,s,q,,,,Profile reference image
+
+# TRACING PARAMETERS
+t_nsum,i,h,)aptrace.nsum,,,>aptrace.nsum
+t_step,i,h,)aptrace.step,,,>aptrace.step
+t_nlost,i,h,)aptrace.nlost,,,>aptrace.nlost
+t_width,r,h,)apedit.width,,,>apedit.width
+t_function,s,h,)aptrace.function,,,>aptrace.function
+t_order,i,h,)aptrace.order,,,>aptrace.order
+t_sample,s,h,)aptrace.sample,,,>aptrace.sample
+t_naverage,i,h,)aptrace.naverage,,,>aptrace.naverage
+t_niterate,i,h,)aptrace.niterate,,,>aptrace.niterate
+t_low_reject,r,h,)aptrace.low_reject,,,>aptrace.low_reject
+t_high_reject,r,h,)aptrace.high_reject,,,>aptrace.high_reject
+t_grow,r,h,)aptrace.grow,,,">aptrace.grow
+
+# EXTRACTION PARAMETERS
+"
+background,s,h,)apfit.background,,,>apfit.background
+skybox,i,h,)apfit.skybox,,,>apfit.skybox
+weights,s,h,"none",,,Extraction weights (none|variance)
+pfit,s,h,)apfit.pfit,,,>apfit.pfit
+clean,b,h,)apfit.clean,,,>apfit.clean
+nclean,r,h,0.5,,,Maximum number of pixels to clean
+niterate,i,h,5,0,,Number of profile fitting iterations
+saturation,r,h,)apfit.saturation,,,>apfit.saturation
+readnoise,s,h,)apfit.readnoise,,,>apfit.readnoise
+gain,s,h,)apfit.gain,,,>apfit.gain
+lsigma,r,h,)apfit.lsigma,,,>apfit.lsigma
+usigma,r,h,)apfit.usigma,,,>apfit.usigma
+polysep,r,h,0.90,0.1,0.95,Marsh algorithm polynomial spacing
+polyorder,i,h,10,1,,Marsh algorithm polynomial order
+nsubaps,i,h,1,,,"Number of subapertures per aperture
+
+# ANSWER PARAMETERS
+"
+ansclobber,s,h,"no",,," "
+ansclobber1,s,h,"no",,," "
+ansdbwrite,s,h,"yes",,," "
+ansdbwrite1,s,h,"yes",,," "
+ansedit,s,h,"yes",,," "
+ansextract,s,h,"yes",,," "
+ansfind,s,h,"yes",,," "
+ansfit,s,h,"yes",,," "
+ansfitscatter,s,h,"yes",,," "
+ansfitsmooth,s,h,"yes",,," "
+ansfitspec,s,h,"yes",,," "
+ansfitspec1,s,h,"yes",,," "
+ansfittrace,s,h,"yes",,," "
+ansfittrace1,s,h,"yes",,," "
+ansflat,s,h,"yes",,," "
+ansmask,s,h,"yes",,," "
+ansnorm,s,h,"yes",,," "
+ansrecenter,s,h,"yes",,," "
+ansresize,s,h,"yes",,," "
+ansreview,s,h,"yes",,," "
+ansreview1,s,h,"yes",,," "
+ansscat,s,h,"yes",,," "
+anssmooth,s,h,"yes",,," "
+anstrace,s,h,"yes",,," "

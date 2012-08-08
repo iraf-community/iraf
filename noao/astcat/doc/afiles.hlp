@@ -1,0 +1,106 @@
+.help afiles Mar00 astcat
+.ih
+NAME
+afiles -- describe the standard astrometry files
+.ih
+USAGE
+help files
+
+.ih
+ASTROMETRY FILES
+
+An astrometry file is any text file containing celestial coordinate information
+for a small region of the sky. A minimal astrometry file consists of a list
+of celestial coordinate pairs one pair per line. Most astrometry files also
+contain additional non- positional information, e.g. proper motions,
+magnitudes, colors, etc.
+
+A standard astrometry file as an astrometry file containing a standard header
+describing the contents and format of the file. The astcat tasks use the
+header to decode the file. Normally the astrometry file header is derived
+from the parent astrometric catalog description in the catalog configuration
+file. If the astrometry file header is missing one may be constructed
+after the fact by setting the standard field description parameter
+in the \fIacatpars\fR parameter set and running the \fIafiltcat\fR task.
+
+A set of standard field names is reserved for describing the format of 
+astrometry files. The current list of standard field names is:
+id, ra, dec, era, edec, pmra, pmdec, epmra, epmdec, catsystem, equinox,
+epoch, px, rv, epx, erv, mag, color, emag, ecolor, xp, yp, xc, yc, exc,
+eyc, imag, and eimag. For more information about these fields type
+"help acatpars".
+
+.ih
+SAMPLE STANDARD ASTROMETRY FILE
+
+A sample astrometry file in standard format is shown below.
+
+.nf
+# BEGIN CATALOG HEADER
+#    type stext
+#    nheader 1
+#        csystem J2000
+#    nfields 4
+#        ra 1 0 d hours %12.3h
+#       dec 2 0 d degrees %12.2h
+#      mag1 3 0 r INDEF %4.1f
+#      mag2 4 0 r INDEF %4.1f
+# END CATALOG HEADER
+
+ 00:00:01.443   -0:06:57.52  13.5  15.2
+ 00:00:01.574   -0:05:33.26  16.1  18.0
+ 00:00:01.904   -0:09:48.51  18.2  19.6
+ 00:00:02.529   -0:04:21.53  13.4  14.4
+ 00:00:04.154   -0:01:56.32  17.1  18.3
+ 00:00:04.438   -0:05:00.03  11.4  13.5
+ 00:00:04.697   -0:03:24.59  16.9  17.7
+ 00:00:05.989   -0:02:46.36  15.1  17.6
+ 00:00:07.118   -0:09:03.53  19.1  19.8
+ 00:00:07.260   -0:06:47.95  17.0  17.7
+ 00:00:07.314   -0:00:22.35  15.3  16.8
+ 00:00:07.818   -0:02:25.90  12.2  12.4
+.fi
+
+.ih
+SAMPLE ASTROMETRY FILE
+
+A sample headerless astrometry file is shown below where ra, dec, mag1
+and mag2 are stored in columns 1 through 4 respectively.
+
+.nf
+ 00:00:01.443   -0:06:57.52  13.5  15.2
+ 00:00:01.574   -0:05:33.26  16.1  18.0
+ 00:00:01.904   -0:09:48.51  18.2  19.6
+ 00:00:02.529   -0:04:21.53  13.4  14.4
+ 00:00:04.154   -0:01:56.32  17.1  18.3
+ 00:00:04.438   -0:05:00.03  11.4  13.5
+ 00:00:04.697   -0:03:24.59  16.9  17.7
+ 00:00:05.989   -0:02:46.36  15.1  17.6
+ 00:00:07.118   -0:09:03.53  19.1  19.8
+ 00:00:07.260   -0:06:47.95  17.0  17.7
+ 00:00:07.314   -0:00:22.35  15.3  16.8
+ 00:00:07.818   -0:02:25.90  12.2  12.4
+.fi
+
+This file can be converted to standard form with the afiltcat task as follows
+
+.nf
+cl> agetcat input output filter- ra="1 hours %12.3h" dec="2 degrees %12.2h" \
+mag="1-2 INDEF %4.1f"
+.fi
+
+or by editing in a header of the form shown in the previous section. The
+lines
+
+.nf
+# BEGIN CATALOG HEADER
+# END CATALOG HEADER
+.fi
+
+delimit the header. The header must contain the type, nheader, and
+nfields keyword value pairs and accurate descriptions of file the format.
+
+.ih
+SEE ALSO
+help catalogs, agetcat, afiltcat, acatpars
+.endhelp

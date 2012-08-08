@@ -1,0 +1,29 @@
+banner,b,h,yes,,,"Standard banner"
+title,s,h,"",,,"Title"
+xlabel,s,h,"wcslabel",,,"X-axis label"
+ylabel,s,h,"Pixel Value",,,"Y-axis label"
+
+naverage,i,h,5,1,,"Number of liness or columns to average"
+center,b,h,yes,,,"Solve for center?"
+background,b,h,yes,,,"Solve for background?"
+sigma,r,h,1.,0.1,,"Initial sigma (pixels)"
+width,r,h,10.,1.,,Background width (pixels)
+xorder,i,h,0,0,2,Background terms to fit (0=median)
+
+rplot,r,h,10.,1.,,"Plotting radius (pixels)"
+x1,r,h,INDEF,,,X-axis window limit
+x2,r,h,INDEF,,,X-axis window limit
+y1,r,h,INDEF,,,Y-axis window limit
+y2,r,h,INDEF,,,Y-axis window limit
+pointmode,b,h,yes,,,plot points instead of lines?
+marker,s,h,"plus",,,point marker character?
+szmarker,r,h,1.,,,marker size
+logx,b,h,no,,,log scale x-axis
+logy,b,h,no,,,log scale y-axis
+box,b,h,yes,,,draw box around periphery of window
+ticklabels,b,h,yes,,,label tick marks
+majrx,i,h,5,,,number of major divisions along x grid
+minrx,i,h,5,,,number of minor divisions along x grid
+majry,i,h,5,,,number of major divisions along y grid
+minry,i,h,5,,,number of minor divisions along y grid
+round,b,h,no,,,round axes to nice values?

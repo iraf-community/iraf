@@ -1,0 +1,45 @@
+.help ldumpf Jun87 noao.mtlocal
+.ih
+NAME
+ldumpf -- list the permanent files on a Cyber DUMPF tape.
+.ih
+USAGE
+ldumpf dumpf_file file_list
+.ih
+PARAMETERS
+.ls dumpf_file
+The DUMPF data source, i.e., the name of a magtape device or a DUMPF
+format disk file.   If reading from tape, the files to be listed are
+specified by the \fIfile_list\fR parameter.
+.le
+.ls file_list
+A string listing the DUMPF files to be listed from \fIdumpf_file\fR.
+.le
+.ih
+DESCRIPTION
+Cyber permanent files stored on DUMPF tapes are listed.  The permanent file
+name, cycle number, owner id, dates of last attach, last alteration and
+the creation date are printed.  Task \fBldumpf\fR lists the contents of a 
+DUMPF tape;
+to convert IPPS rasters stored on DUMPF tapes to IRAF images, use task
+\fBrdumpf\fR.
+.ih
+EXAMPLES
+List all permanent files on a DUMPF tape:
+
+	cl> ldumpf mta 1-999
+
+List information for the 4th permanent file on the tape:
+
+	cl> ldumpf mta 4
+.ih
+BUGS
+The Cyber format readers, including task \fIldumpf\fR, have not been 
+implemented on SUN/IRAF and AOS/IRAF.
+
+The current version of IRAF magtape I/O does not read beyond the first
+volume of a multivolume tape.
+.ih
+SEE ALSO
+rdumpf
+.endhelp

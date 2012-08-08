@@ -1,0 +1,90 @@
+.help mkfringecor Feb88 noao.imred.ccdred
+.ih
+NAME
+mkfringecor -- Make fringe correction images from sky images
+.ih
+USAGE
+mkfringecor input output
+.ih
+PARAMETERS
+.ls input
+List of input images for making fringe correction images.
+.le
+.ls output
+List of output fringe correction images.  If none is
+specified or if the name is the same as the input image then the output
+image replaces the input image.
+.le
+.ls ccdtype = ""
+CCD image type to select from the input images.  If none is specified
+then all types are used.
+.le
+.ls xboxmin = 5, xboxmax = 0.25, yboxmin = 5, yboxmax = 0.25
+Minimum and maximum smoothing box size along the x and y axes.  The
+minimum box size is used at the edges and grows to the maximum size in
+the middle of the image.  This allows the smoothed image to better
+represent gradients at the edge of the image.  If a size is less then 1
+then it is interpreted as a fraction of the image size.  If a size is
+greater than or equal to 1 then it is the box size in pixels.  A size
+greater than the size of image selects a box equal to the size of the
+image.
+.le
+.ls clip = yes
+Clean the input images of objects?  If yes then a clipping algorithm is
+used to detect and exclude objects from the smoothing.
+.le
+.ls lowsigma = 2.5, highsigma = 2.5
+Sigma clipping thresholds above and below the smoothed background.
+.le
+.ls ccdproc (parameter set)
+CCD processing parameters.
+.le
+.ih
+DESCRIPTION
+The input blank sky images are automatically processed up through the
+iillumination correction before computing the fringe correction images.
+The fringe corrections are subset dependent.
+The slowly varying background is determined and subtracted leaving only
+the fringe pattern caused by the sky emission lines.  These fringe images
+are then scaled and subtracted from the observations by \fBccdproc\fR.
+The background is determined by heavily smoothing the image using a
+moving "boxcar" average.  The effects of the objects and fringes in the
+image is minimized by using a sigma clipping algorithm to detect and
+exclude them from the average.  Note, however, that objects left in the
+fringe image will affect the fringe corrected observations.  Any objects
+in the sky image should be removed using \fBskyreplace\fR (not yet
+available).
+
+The smoothing algorithm is a moving average over a two dimensional
+box.  The algorithm is unconvential in that the box size is not fixed.
+The box size is increased from the specified minimum at the edges to
+the maximum in the middle of the image.  This permits a better estimate
+of the background at the edges, while retaining the very large scale
+smoothing in the center of the image.  Note that the sophisticated
+tools of the \fBimages\fR package may be used for smoothing but this
+requires more of the user and, for the more sophisticated smoothing
+algorithms such as surface fitting, more processing time.
+
+To minimize the effects of the fringes and any objects in the blank sky
+calibration images a sigma clipping algorithm is used to detect and
+exclude features from the background.  This is done by computing the
+rms of the image lines relative to the smoothed background and
+excluding points exceeding the specified threshold factors times the
+rms.  This is done before each image line is added to the moving
+average, except for the first few lines where an iterative process is
+used.
+.ih
+EXAMPLES
+1. The two examples below make an fringe correction image from a blank
+sky image, "sky017".  In the first example a separate fringe
+image is created and in the second the fringe image replaces the
+sky image.
+
+.nf
+    cl> mkskycor sky017 Fringe
+    cl> mkskycor sky017 frg017
+.fi
+.ih
+SEE ALSO
+ccdproc
+.endhelp

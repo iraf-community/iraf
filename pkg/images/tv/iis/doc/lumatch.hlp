@@ -1,0 +1,28 @@
+.help lumatch Jan86 images.tv.iis
+.ih
+NAME
+lumatch -- match lookup tables for two display frames
+.ih
+USAGE
+lumatch frame ref_frame
+.ih
+PARAMETERS
+.ls frame
+Frame whose lookup table is to be adjusted.
+.le
+.ls ref_frame
+Frame whose lookup table is to be matched.
+.le
+.ih
+DESCRIPTION
+The lookup tables mapping the display frame values to the grey levels
+on the display monitor are matched in one frame to a reference frame.
+.ih
+EXAMPLES
+To match the lookup tables in frame 3 to those in frame 1:
+
+	cl> lumatch 3 1
+.ih
+SEE ALSO
+cv
+.endhelp

@@ -1,0 +1,9 @@
+# DAOEDIT parameters
+
+image,f,a,,,,Input image
+icommands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+gcommands,*gcur,h,"",,,"Graphics cursor: [x y wcs] key [cmd]"
+cache,b,h,)_.cache,,,"Cache the image pixels?"
+graphics,s,h,)_.graphics,,,Graphics device
+display,s,h,)_.display,,,Display device
+mode,s,h,'ql'

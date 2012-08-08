@@ -1,0 +1,264 @@
+.help acatpars Mar00 astcat
+.ih
+NAME
+acatpars -- edit the default astrometry file format parameters
+.ih
+USAGE
+acatpars 
+.ih
+PARAMETERS
+.ls ftype = "stext"
+The astrometry file format. The current options are:
+.ls stext
+Simple text. Records are newline delimited and fields are whitespace delimited.
+.le
+.ls btext
+Blocked text. Records are newline delimited and fields are offset and
+size delimited.
+.le
+.le
+.ls ccsystem = "j2000"
+The default celestial coordinate system. The coordinate systems of most
+interest to users are "icrs", "j2000", and "b1950". For more detailed
+information on all the celestial coordinate system options type
+"help ccsystems".
+.le
+.ls standard astrometry file fields
+The following parameters define the standard astrometry file fields. The
+parameter names are the same as the standard field names. The parameter
+values are the standard field descriptions.
+.sp
+Every astrometry file returned by
+a catalog query or created by the user must contain the standard fields ra and
+dec. The remaining fields are optional and may or may not be present
+in either the original catalog or the astrometry file produced by a
+catalog query.
+.sp
+The format of the standard fields is "fieldno [units [format]]" for simple
+text files and "foffset fsize [units [format]]" for blocked text files
+where the quantities in "[]" are optional. Standard fields with "" valued
+field descriptions are assumed to be undefined.
+.sp
+.ls id = ""
+The standard id field. The data type is character. The default units and
+format values are "INDEF" and "%20s".
+.le
+.ls  ra = "1 hours"
+The standard right ascension / longitude field. The data type is double. The
+default units and format values are "hours"and "%11.2h".
+.le
+.ls  dec = "2 degrees"
+The standard declination / latitude field. The data type is double. The default
+units and format values are "degrees"and "%11.1h".
+.le
+.ls  era = ""
+The standard right ascension / longitude error field. The data type is double.
+The default units and format values are "asecs" and "%6.3f".
+.le
+.ls  edec = ""
+The standard declination / latitude error field. The data type is double.
+The default units and format values are "asecs" and "%6.3f".
+.le
+.ls  pmra = ""
+The standard right ascension / longitude proper motion field. The data type
+is double. The default units and format values are "masecs/yr" and "%7.3f".
+.le
+.ls  pmdec = ""
+The standard declination / latitude proper motion field. The data type
+is double. The default units and format values are "masecs/yr" and "%7.3f".
+.le
+.ls  epmra = ""
+The standard right ascension / longitude proper motion error field. The data
+type is double. The default units and format values are "masecs/yr" and "%7.3f".
+.le
+.ls  epmdec = ""
+The standard declination / latitude proper motion error field. The data
+type is double. The default units and format values are "masecs/yr" and "%7.3f".
+.le
+.ls catsystem = ""
+The standard celestial coordinate system field. The data type is character.
+The default units and format field values are "INDEF" and "%15s". If defined
+the value of this field overrides the coordinate system defined by the
+\fIcsystem\fR parameter. Supported values of catsystem are "icrs", "fk5",
+"fk4", "fk4-noe", "ecliptic", "galactic", and "supergalactic".
+.le
+.ls equinox = ""
+The standard celestial coordinate system equinox field. The data type is
+character. The default units and format field values are "INDEF" and
+"%15s". Equinoxes are typical expressed as Julian epochs e.g. "J2000.0",
+Besselian epochs e.g. "B1950.0", or years "2000.0".
+.le
+.ls epoch = ""
+The standard celestial coordinate system epoch field. The data type is
+character. The default units and format field values are "INDEF" and
+"%15s". Epochs are typical expressed as Julian epochs e.g. "J2000.0",
+Besselian epochs e.g. "B1950.0", years "2000.0", or Julian date if the
+epoch value > 3000.0.
+.le
+.ls px = ""
+The standard parallax field. The data type is double. The default units
+and format values are "msecs" and "%6.3f".
+.le
+.ls rv = ""
+The standard radial velocity field. The data type is double. The default units
+and format values are "km/sec" and "%6.3f".
+.le
+.ls epx = ""
+The standard parallax error field. The data type is double. The default units
+and format values are "msecs" and "%6.3f".
+.le
+.ls erv = ""
+The standard radial velocity error field. The data type is double. The default
+units and format values are "km/sec" and "%6.3f".
+.le
+.ls mag = ""
+The standard magnitude field. The  data type is real. The default units
+and format field values are "mags" and "%8.3f".
+.le
+.ls color = ""
+The standard color field. The  data type is real. The default units
+and format field values are "mags" and "%8.3f".
+.le
+.ls emag = ""
+The standard magnitude error field. The  data type is real. The default units
+and format field values are "mags" and "%8.3f".
+.le
+.ls ecolor = ""
+The standard color error field. The  data type is real. The default units
+and format field values are "mags" and "%8.3f".
+.le
+.ls xp = ""
+The predicted x coordinate field. The data type is double. The default units
+and format field values are "pixels" and "%9.3f".
+.le
+.ls yp = ""
+The predicted y coordinate field. The data type is double. The default units
+and format field values are "pixels" and "%9.3f".
+.le
+.ls xc = ""
+The centered x coordinate field. The data type is double. The default units
+and format field values are "pixels" and "%9.3f".
+.le
+.ls yc = ""
+The centered y coordinate field. The data type is double. The default units
+and format field values are "pixels" and "%9.3f".
+.le
+.ls exc = ""
+The centered x coordinate error field. The data type is double. The default
+units and format field values are "pixels" and "%9.3f".
+.le
+.ls eyc = ""
+The centered y coordinate error field. The data type is double. The default
+units and format field values are "pixels" and "%9.3f".
+.le
+.ls imag = ""
+The standard instrumental magnitude field. The data type is real. The default
+units and format values are "mags" and "8.3f".
+.le
+.ls eimag = ""
+The standard instrumental magnitude error field. The data type is real. The
+default units and format values are "mags" and "8.3f".
+.le
+.le
+
+.ih
+DESCRIPTION
+
+The acatpars parameters define the default astrometry file format. These
+parameters are used if the input astrometry file does not contain a standard
+header describing the file format. By default standard headers are written
+by all astcat package tasks which create astrometry files. If the
+astrometry file does not have a header the acatpars parameters
+are used to define one.
+
+By default acatpars assumes that the input astrometry file is a
+simple text file, \fIftype\fR = "stext", with newline delimited records
+and whitespace delimited fields. In this case users can define
+the fields by setting the appropriate standard file parameters
+to a string with the following format, e.g.
+
+.nf
+parname = "fieldno [units [format]]"
+
+     ra = "1 hours"
+    dec = "2 degrees"
+.fi
+
+where fieldno is the field or column number in the record. The
+units and format strings are optional and reasonable defaults are
+supplied if they are missing. Currently the units information is
+only used for decoding coordinate fields. For other fields the
+units should be left at their default values. The format information
+is used when an application has to decode a field into a numeric value
+modify it in some way and rewrite it.
+
+If \fIftype\fR is set to "btext" for blocked text the input astrometry file
+is assumed to be a text file with newline delimited records and fixed size
+fields. This format can be used to describe astrometry files with
+fields containing embedded blanks such as id fields. In this case users
+define the fields by setting the appropriate standard file parameters to
+a string with the following format, e.g.
+
+.nf
+parname = "foffset fsize [units [format]]"
+     ra = "1 15 hours"
+    dec = "16 15 degrees"
+.fi
+
+where foffset and fsize are the field offset and size in characters.
+Formats and units are treated in the same way as they for simple text files.
+
+The fundamental coordinate system of the astrometry file is set by
+the \fIcsystem\fR parameter. This is a global parameter applying to the
+entire astrometry file . Its value is overwritten if the "catsystem" standard
+field is defined, in which case the astrometry file may contain entries in
+many different fundamental coordinate systems.
+
+.ih
+EXAMPLES
+1. List the astrometry file format parameters.
+
+.nf
+cl> lpar acatpars
+.fi
+
+2. Edit the astrometry file format parameters.
+
+.nf
+cl> acatpars
+... edit the parameters in the usual way
+... type :wq to quit and save the edits
+.fi
+
+3. Edit the astrometry file format parameters from the afiltcat task.
+
+.nf
+cl> epar afiltcat
+... edit the afiltcat parameters
+... move to the acatpars parameter line and type :e
+... edit the acatpars parameters
+... type :wq to quit and save the acatpars edits
+... continue editing the remaining afiltcat parameters
+... type :go to execute the task
+.fi
+
+4. Save the current acatpars parameter values in a text file called
+acat1.par.  Use the saved parameter set in the next call to the afiltcat
+task.
+
+.nf
+cl> epar acatpars
+... edit some parameters in the usual way
+... type :w acat1.par
+... type :q to quit
+cl> afiltcat ... acatpars=afilt1.par ...
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+afiltcat
+.endhelp

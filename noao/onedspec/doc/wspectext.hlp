@@ -1,0 +1,96 @@
+.help wspectext Oct93 onedspec
+.ih
+NAME
+wspectext -- convert 1D image spectra to an ascii text spectra
+.ih
+USAGE
+wspectext input output
+.ih
+PARAMETERS
+.ls input
+Input list of 1D image spectra to be converted.  If the image is
+not one dimensional an warning will be given and the image will be skipped.
+.le
+.ls output
+Output list of ascii text spectra filenames.  The list must match the
+input list.
+.le
+.ls header = yes
+This parameter determines whether or not a descriptive header precedes the
+wavelength and flux values written to the text file.  When \fIheader =
+no\fR, only a two column list of wavelengths and fluxes is output.
+.le
+.ls wformat = ""
+The wavelength coordinate output format.  If it is undefined the formatting
+option stored with the WCS in the image header is used.  If the WCS
+formatting option is not defined then a free format is used.  See
+\fBlistpixels\fR for a description of the format syntax.
+.le
+.ih
+DESCRIPTION
+IRAF one dimensional spectra are converted to ascii text files.  The
+text files consist of an optional FITS type header followed by a two
+column list of wavelengths and flux values.  The format of the wavelengths
+can be set but the flux values are given in free format.  This task
+is a combination of \fBwtextimage\fR and \fBlistpixels\fR.  The output
+of this task may be converted back to an image spectrum with the
+task \fBrspectext\fR.
+
+Spectra which are not in 1D images such as multispec format or long slit
+may first be converted to 1D images using \fBscopy\fR with format="onedspec".
+.ih
+EXAMPLES
+1.  Write a text file with a header.
+
+.nf
+    cl> wspectext spec001 text001 header+ wformat="%0.2f"
+    cl> type text001
+    BITPIX  =                    8  /  8-bit ASCII characters
+    NAXIS   =                    1  /  Number of Image Dimensions
+    NAXIS1  =                  100  /  Length of axis
+    ORIGIN  = 'NOAO-IRAF: WTEXTIMAGE'  /
+    IRAF-MAX=                   0.  /  Max image pixel (out of date)
+    IRAF-MIN=                   0.  /  Min image pixel (out of date)
+    IRAF-B/P=                   32  /  Image bits per pixel
+    IRAFTYPE= 'REAL FLOATING     '  /  Image datatype
+    OBJECT  = 'TITLE             '  /
+    FILENAME= 'TEST              '  /  IRAF filename
+    FORMAT  = '5G14.7            '  /  Text line format
+    APNUM1  = '1 1     '
+    DC-FLAG =                    0
+    WCSDIM  =                    1
+    CTYPE1  = 'LINEAR  '
+    CRVAL1  =                4000.
+    CRPIX1  =                   1.
+    CDELT1  =     10.1010101010101
+    CD1_1   =     10.1010101010101
+    LTM1_1  =                   1.
+    WAT0_001= 'system=equispec                                 '
+    WAT1_001= 'wtype=linear label=Wavelength units=Angstroms   '
+    END
+										    
+    4000.00  1000.
+    4010.10  1005.54
+    4020.20  1011.05
+    ...
+.fi
+
+2.  Write a simple text file with two columns of wavelength and flux.
+
+.nf
+    cl> wspectext spec001 text002 header- wformat="%0.2f"
+    cl> type text002
+    4000.00  1000.
+    4010.10  1005.54
+    4020.20  1011.05
+    ...
+.fi
+.ih
+REVISIONS
+.ls WSPECTEXT V2.10.3
+This is a new task with this version.
+.le
+.ih
+SEE ALSO
+rspectext, wtextimage, listpixels, scopy, imspec
+.endhelp

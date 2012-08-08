@@ -1,0 +1,80 @@
+.help wcscopy Jun95 images.immatch
+.ih
+NAME
+wcscopy -- copy the wcs of a reference image to a list of images
+.ih
+USAGE
+wcscopy images refimages
+.ih
+PARAMETERS
+.ls images
+The list of input images which will inherit the wcs of the reference image.
+If the image does not exists a dataless image header is created.
+.le
+.ls reference
+The list of reference images containing the reference wcs. The number of
+reference images must be one or equal to the number of input images.
+.le
+.ls verbose = yes
+Print messages about the progress of the task?
+.le
+
+.ih
+DESCRIPTION
+
+WCSCOPY copies the world coordinate system information in the header of the
+reference image \fIreference\fR to the headers of the input images
+\fIimages\fR, replacing any existing world coordinate system information
+in the input image headers in the process. WCSCOPY assumes that the
+world coordinate system information in the header of the reference 
+image is accurate and that all the input images have write permission.
+If the input image does not exist a data-less image header is created.
+The WCS is treated as an independent object and
+there is no check made on the dimensionality and sizes of the images.
+
+
+.ih
+REFERENCES
+
+Information  on  IRAF  world  coordinate  systems including
+more detailed descriptions of the "logical", "physical", and "world"
+coordinate systems can be
+found  in  the  help  pages  for  the  WCSEDIT  and  WCRESET  tasks. 
+Detailed   documentation   for  the  IRAF  world  coordinate  system 
+interface MWCS can be found in  the  file  "iraf$sys/mwcs/MWCS.hlp".
+This  file  can  be  formatted  and  printed  with the command "help
+iraf$sys/mwcs/MWCS.hlp fi+ | lprint".  Information on the spectral
+coordinates systems and their suitability for use with WCSXYMATCH
+can be obtained by typing "help specwcs | lprint".
+Details of  the  FITS  header
+world  coordinate  system  interface  can  be  found in the document
+"World Coordinate Systems Representations Within  the  FITS  Format"
+by Hanisch and Wells, available from our anonymous ftp archive.
+    
+.ih
+EXAMPLES
+
+1. Make sure that the world coordinates systems of a list of input images
+that have been registered to a reference image with the xregister task
+are identical to the world coordinate system of the reference image.
+
+.nf
+	cl> xregister @inlist refimage [200:400,200:400] shifts \
+	    output=@outlist xwindow=21 ywindow=21
+	cl> wcscopy @outlist refimage
+.fi
+
+2.  Create a data-less WCS image by specifying a new image.
+
+.nf
+	cl> wcscopy new dev$wpix
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+tprecess,imalign,xregister,geomap,register,geotran,wcsmap,wregister,wcsedit
+.endhelp

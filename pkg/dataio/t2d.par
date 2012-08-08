@@ -1,0 +1,5 @@
+input,s,a,,,,Input file descriptor
+ofroot,s,a,,,,Output file root name
+files,s,a,,,,List of files
+verbose,b,h,yes,,,Print out progress reports
+errignore,b,h,yes,,,Assume an error record is zero bytes long

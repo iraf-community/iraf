@@ -1,0 +1,589 @@
+Notes on the port of IRAF V2.3+ to the Alliant FX vector workstation,
+beginning 25 August 1986 (dct).  This is a continuation of a port started
+by Dennis Crabtree on 12 August, with some of the problems found then being
+fixed before the bootstrap or sysgen in this port.
+---------------------------------------------------------------------------
+
+Read tape onto VAX 780 using IRAF `reblock' task.  Worked great, except
+	that I allocated the drive in vms before running IRAF: this caused
+	the IRAF allocate to fail, causing a read error on the first
+	attempt to run reblock (confusing).  (8/25)
+
+Copied archive to the Alliant via the ethernet which runs the Excelan
+	network software.  The first attempt to unpack the archive on the
+	Alliant failed with a checksum error message from tar; this turned
+	out to be due to not specifying a binary transfer in TELNET before
+	copying the file (a newline was being inserted after every 512
+	bytes).  After retransmission to fix this, unpacked everything
+	successfully at /u2/iraf. (8/25)
+
+Notes -
+	There is a bug in the Excelan network software that causes it to
+	hang up the terminal if too many characters are transmitted,
+	forcing one to login on another terminal and STOP the process.
+
+	The Alliant died on a kernel panic (mfree failure) during one
+	of these network crashes and had to be rebooted.  Another time
+	it hung up in a hard loop when tyring to delete the large archive
+	file (bad disk block?) and had to be rebooted.
+
+	DAO uses Plessey PT-100G graphics terminals.  These have an awful
+	keyboard with keybounce and keylost problems.  A screen redraw takes
+	3 seconds.  The screen color is orange - not as bright as amber,
+	green, or white.  Other than that they seem fine - have not tried out
+	the graphics yet.  (8/25)
+
+	Tried the graphics finally, on VMS/IRAF.  The graphics resolution is
+	good (480x1000?) and vector drawing is fast.  Hardware cursor setting
+	is better than on the vt640 (shift and ctrl as used as accelerators,
+	and 45 degree motions are supported), but unfortunately there is no
+	software write cursor function, so the HJKL and other cursor write
+	features (as in in a zoom) do not work.  The alpha and graphics
+	memories are separate and can be displayed together, as on the vt640.
+
+	The main problems of this terminal are the keyboard, slow screen
+	redraw, and lack of a software write cursor function (but it is
+	better than a vt240!).  (8/30)
+
+local/.login
+	Set up the .login for the new system.  (8/25)
+
+Notes -
+	Tried using the vms COPY to copy the tar file to disk, to see if
+	that would work.  COPY produced a variable length, 10240 byte max
+	record length, carriage control etc. file as output, i.e., a text
+	file.  This explains why the initial attempt to read the tar tape
+	failed.  Probably the best way to distribute tar archives to VMS
+	sites is by making a BACKUP tape of a disk tar file.  This avoids
+	this type of confusion, and also gains access to the error recovery
+	provided by BACKUP.  (8/26)
+
+/usr/include/iraf.h
+/usr/bin/cl,mkiraf,etc.
+	Changed to point to /u2/.  (8/26)
+
+unix/hlib/[dir]mach.f
+	Commented out pdp-11 entries and uncommented IEEE entries.  In two of
+	the files, commented out the call to ILIBER; I don't think we want
+	that (should be fixed on Lyra).  (8/26)
+
+unix/hlib/iraf.h
+unix/hlib/mach.h
+	Changed the values of epsilonr, epsilond to the IEEE values.  Set the
+	byte swap flags to NO.  (8/26)
+
+unix/hlib/iraf.h
+	Set defines for and,or,xor to iand,ior,ieor.  Not is not.  (8/26)
+
+unix/hlib/mkiraf.csh
+	Changed iraf root directory to /u2/iraf.  (8/26)
+
+unix/hlib/mkpkg.inc
+	Set siteid to `dao', turned off ncar, calcomp kernels.  XC flags will
+	probably also have to be changed, but leave that for later.  (8/26)
+
+unix/as/zsvjmp.s
+unix/hlib/config.h
+unix/hlib/libc/spp.h
+	Wrote the ZSVJMP/ZDOJMP for the Alliant (as$zsvjmp.s), and set the
+	jump buffer size parameters in config.h and spp.h.  The current routine
+	saves the exception mask and all the floating point and vector
+	registers as well as the 68000 registers, which is more than is really
+	necessary.  (8/26)
+
+unix/os/zgtime.c
+unix/os/gmttolst.c
+unix/boot/bootlib/ostime.c
+	From looking at Dennis's notes I see that time.h is in <sys/time.h>
+	rather than <time.h> on the Alliant.  In fact it is referenced both
+	ways in the VAX/UNIX kernel, so I changed all references to
+	<sys/time.h>, don't know what the official answer to this one is.
+	Removed the link (added by Dennis) in /usr/include.  (8/26)
+
+unix/hlib/libc/iraf.h
+unix/os/zxwhen.c
+	In iraf.h, added a #define ALLIANT for use in HSI code.  In zxwhen,
+	replaced the array of vax exceptions by an #ifdef-ed array of
+	alliant specific hardware exceptions (hwx_).  (8/26)
+
+unix/os/zxwhen.c
+	The Alliant C compiler produced a syntax error for the declaration
+	for the pointer to function `vector'.  Presumably this was due to
+	vector being a reserved keyword to the Alliant C compiler; changed
+	the name to `vvector' and it compiled.  (8/26)
+
+unix/boot/spp/xc.c
+	Replaced f77 by the Alliant task `fortran' (the Alliant Fortran
+	compiler) to compile Fortran files.  Modified to use cc rather
+	than f77 to compile all other files.  Modified to add the .f
+	files produced from .x sources to the Fortran file list, rather
+	than the general source file list input to the C compiler (formerly
+	these files were processed by f77, which can compile anything).
+	Parameterized the names of the fortran compiler, the C compiler,
+	and the linker.  Deleted the "-u" flag, which is not supported on
+	the Alliant.  Changed the Fortran library name from `-lF77' to
+	`-lfortran'.  (8/26)
+
+	In the long run, XC needs to be rewritten to be more portable,
+	like mkpkg.  This is still the original unix compiler, which was
+	never intended to be ported.
+
+unix/boot/spp/rpp/ratlibf/Makefile
+unix/boot/spp/rpp/rppfor/Makefile
+	Modified to call `fortran' rather than `f77'.  (8/26)
+
+---------------------------
+(first attempt to bootstrap)
+
+unix/os/zfiomt.c
+	C compiler error.  The declaration of the automatic array in
+	the skip record forward function, i.e.,
+
+		char	buf[32768];
+
+	caused the fatal error `too many local variables' from the
+	C compiler.  I reduced the size to [28800].  Recall that this
+	used to be a small buffer, but I had to make it larger than the
+	maximum tape block size to avoid i/o errors on the SUNs.  Use
+	of malloc is undesirable since skip record forward might be
+	called many times in a loop.  In any case, this is an indication
+	that the Alliant C compiler has limited symbol table storage and
+	may have problems with large programs or modules.  (8/27)
+
+Note on Alliant Fortran compiler (task `fortran').
+	The compiler cannot handle a "-cO" flag on the command line.
+	The "-O" must be given as a separate flag.  (8/27)
+
+unix/boot/spp/rpp/ratlibf/dsfree.f
+	On line 20, the hollerith string contained a tab instead of a space,
+	causing the line length to exceed 20 characters.  (8/27)
+
+unix/boot/bootlib/mkpkg.csh
+	The executable nature of this .csh is a nusiance; a different way
+	should be found to do this.  (8/27)
+
+unix/hlib/mkpkg.inc
+	Changed the default compile flags to "-c -Ovg -AS -OM" for the Alliant.
+	(8/27)
+
+---------------------------
+(bootstrap completed)
+
+unix/hlib/alloc.e
+	Changed owner to root.  (8/27)
+
+sys/gio/gki/gkigca.x
+	The min() instrinsic function was being called with operands of mixed
+	type, i.e., int and short.  Restructured so that both operands were of
+	type int.  (8/27)
+
+sys/gio/gki/gkigca.x
+	In this case, the Alliant compiler found a real bug in a module.
+	The warning message `subscript out of range' was being produced
+	because Mems[] was being referenced with a compile time constant
+	subscript, caused by omission of the pointer variable from the
+	expression.  The bug was harmless, however, since the affected
+	argument (the device name string) was not being used by the called
+	procedure (close workstation).  (8/27)
+
+sys/vops/lz/mkpkg
+	Added $checkout libvops.a, etc., to the file header.  (8/27)
+
+sys/vops/ak/*.x
+sys/vops/lz/*.x
+unix/boot/generic/generic.c
+	The Alliant fortran compiler complains about use of (0,0) as a
+	complex constant.  This string is generated by the generic
+	preprocessor when the sequence 0$f is encountered (actually,
+	any sequence NN$f is permitted).  Modified the generic preprocessor
+	to turn NN$f into (NN.0,NN.0) for the complex datatype, and
+	deleted all the complex files (and associated integer files) in ak
+	and lz containing the string (0,0).  These will be automatically
+	regenerated by the preprocessor in the sysgen provided the integer
+	family member is not found - the mkpkg only checks the date (and
+	existence) of the integer file.  (8/27)
+
+pkg/system/help/t_lroff.x
+	Added an extern declaration for `getline', since it is passed by name
+	to the lroff function.  (8/27)
+
+pkg/cl/task.h
+	In the #define next_task, deleted the (unsigned) coercion.  This should
+	not be necessary as a pointer is already an unsigned quantity, and the
+	Alliant C compiler would fail with the message
+
+		`expression causes compiler loop: try simplifying'
+
+	when trying to compile the file (although the same macro was used in
+	lots of other places without problems - maybe it was causing parser
+	stack overflow in the problem cases, due to a complex context).  (8/27)
+
+unix/hlib/mkpkg.inc
+sys/vops/mkpkg
+	As an experiment, added a new environment variable XVFLAGS to
+	mkpkg.inc; this is used when compiling vectorized code to get
+	whatever compiler options are desirable for such code.  Added
+	a $set to the vops mkpkg to redefine XFLAGS as XVFLAGS so that
+	the vops package will be compiled for vectorization.  At present,
+	the value of XVFLAGS is the same as XFLAGS, i.e., vectorization
+	is permitted in both cases, except that the vectorization warning
+	messages are not turned off by the XVFLAGS.  (8/27)
+
+---------------------------
+(started the first full system sysgen)
+
+sys/gio/gki/gkiopen.x
+sys/gio/gki/gkititle.x
+	More `subscript out of bounds' errors, caused by omission of the
+	pointer `gki' from gki instruction field references.  (8/27)
+
+sys/fio/osfnlock.x
+	The procedure osfn_initlock was declared as an integer function but
+	the return value was never set, causing the fortran compiler to
+	complain `FUNCTION return value is not defined in this program unit'.
+	It turns out that the procedure is called as a subroutine everywhere,
+	so evidently the function declaration was not intended.  Changed it
+	to a subroutine.  So far, the Alliant fortran compiler is finding
+	more bugs in IRAF than IRAF is finding bugs in the compiler, a pleasant
+	turn of affairs.  (8/27)
+
+sys/vops/amap.gx
+	Broke the min/max expression in the do loop up into two statements
+	to defeat a compiler warning message for case short; an integer
+	expression was being used as one of the min/max operands for case
+	short.  (8/27)
+
+unix/boot/generic/tok.l
+	The external string variable xtype_string[] was declared as (char *)
+	rather than (char []) in tok.l, causing a runtime bus error on the
+	Alliant.  This construct works on the VAX because the linker is smart
+	enough to figure out what is going on, but clearly the construct is
+	not portable and should be avoided.  Probably it is always safe to
+	use (char *) in argument lists since a pointer value is always pushed
+	on the stack, but in extern declarations the array notatio must be
+	used.  (8/27)
+
+sys/osb/mkpkg
+sys/osb/achtb.gc
+sys/osb/achtu.gc
+sys/osb/achtzb.gc
+sys/osb/achtzu.gc
+	A warning message from the C compiler led to the disovery of some
+	old complex ACHT procedures in OSB.  There was a bug in these files
+	which had been fixed in the source .gc files, but type X had been
+	removed from the call to generic in the mkpkg, hence the complex
+	files were never regenerated.  It appears that type complex was dropped
+	at some point from the mkpkg, but the complex files were never
+	deleted.  The other file are more permissive with type coercion,
+	hence the problem was never discovered.  I restored type complex to
+	the mkpkg and added a complex case (requires special processing) to
+	each of the .gc files.  (8/27)
+
+sys/gio/ncarutil/sysint/ishift.x
+	This file contains source for two procedures IAND and IOR.  This would
+	not compile since the Fortran compiler already has intrinsic functions
+	with the same names; commented the offending procedures out as a
+	workaround.  (8/27)
+
+sys/ki/irafks.x
+	The procedure `kserver' was declared as a function but the return
+	value was never set, and the function was being called as a
+	subroutine.  Changed to a subroutine.  (8/27)
+
+math/iminterp/arider.x
+	This file contained the three procedures ii_pcpoly3, ii_pcpoly5,
+	and ii_pcspline3.  These were all declared as functions had no
+	return values and were always called as subroutines, hence I changed
+	them to subroutines.  Also, the same external names were used with
+	a different argument list in the file `mrider.x', leading to a very
+	serious library conflict - surprised it has not caused noticeable
+	runtime problems to date.  As a temporary solution,  I changed the
+	names to ia_* in the file arider.x to avoid this library conflict.
+	(8/27)
+
+pkg/xtools/icfit/icgdelete.gx
+pkg/xtools/icfit/icgundelete.gx
+pkg/onedspec/identify/icfit/icgdelete.gx
+pkg/onedspec/identify/icfit/icgundelete.gx
+	Each file contained two procedures which were declared as functions
+	but which did not return function values and which were called as
+	subroutines, hence I changed them to subroutines.  (8/27)
+
+pkg/images/imdebug/immake.x
+	Subroutine immake2 declared as a function.  (8/27)
+
+pkg/images/tv/display/iiswnd.x
+	Contained constructs such as `max (0, lut[i])', where `lut' is a short
+	integer array.  This caused a min/max type mismatch error.  Also, a
+	statement had a nonfunctional C like ; at the end.  (8/27)
+
+pkg/images/tv/cv/iism70/iishisto.x
+	Same problem, short integer variable `offset'.  (8/27)
+
+pkg/images/geometry/blkav.gx
+	Main procedure blkav$t declared as a function but used as a subroutine
+	everywhere.  (8/27)
+
+pkg/plot/gkiextract.x
+	In gke_make_index, `nchars_max = min...', contained an integer constant
+	and a short integer array element, causing a min/max argument type
+	mismatch.  (8/27)
+
+noao/onedspec/t_dispcor.x
+	Procedure dcorrect declared as a function is really a subroutine.
+	Also, it has a ridiculously large number of arguments.  (8/27)
+
+---------------------------
+(All compile time bugs found in this pass fixed.  Stripped all non-HSI
+(binaries and started another full sysgen to run overnight).
+
+kernel problems
+	When I came in in the morning the sysgen had completed successfully,
+	but the machine seemed rather sluggish.  Trying to work, I immediately
+	found that processes which used to run would hang up on a pseudo-run
+	state, completely uninterruptable, sometimes unstoppable, unkillable,
+	and so on.  Clearly a problem with the unix kernel, so I rebooted and
+	the symptoms went away.  Most likely this was a bug in the Alliant
+	unix kernel, which is common with new unix ports.  (8/28)
+
+math/interp/arider.x [OBSOLETE]
+	Missed one: the three procedures iidr_poly[35] and iidr_spline3 were
+	declared as functions but were really subroutines.  (8/28)
+
+pkg/images/tv/cv/iism70/iisrange.x
+	Lots of problems mixing int and short in calls to AND, OR.  (8/28)
+
+pkg/images/tv/cv/iism70/zsnap.x
+	This module caused the fortran compiler to core dump with an internal
+	error; it was trying to resolve mixed int/short operands in expressions
+	and couldn't handle this code, evidently.  (I feel much the same way
+	trying to read it.)
+
+	Deleted `int min(), max()' intrinsic function declarations.  Added an
+	itemp temporary to fix a couple min/max statements which mixed int
+	and short operands.  (8/28)
+
+pkg/images/tv/cv/iism70/iishisto.x
+	Lots and lots of compile time problems with short variables - took
+	several iterations to find them all.  (8/28)
+
+pkg/images/imarith/imsum.x
+	In module MXMNSS, the Fortran compiler coredumps when run with
+	global optimization (-Og).  Returns `error code 138': examination
+	of the corefile for `fortran1' (the first pass I presume) with adb
+	gives the reason as `bus-error page violation'.  Saved the offending
+	segment of code in local$bugs for a bug report to Alliant, and compiled
+	the routine without optimization.  (8/28)
+
+noao/mtlocal/cyber/cy_rbits.x
+	This file also causes the Fortran compiler to coredump and return
+	error code 138 - bus error page violation.  Generated the minimum
+	Fortran module that would demonstrate the bug and installed it in
+	local$bugs.  Hand compiled routine without optimization.  (8/28)
+
+noao/mtlocal/cyber/cyber.h, *.x
+	The data structure for this package included a field named POINTER.
+	This is a reserved keyword, and is converted by the preprocessor
+	into `int', eventually causing a compile time error on the Alliant
+	(and a memory overwrite problem on the VAX).  Aside from being a
+	reserved keyword, POINTER is not a very illuminating name for a
+	field of a structure: pointer to what?  After a little investigation,
+	changed the name to COEFF, since it appears that the field contains
+	a pointer to some sort of coefficient array.  (8/28)
+
+---------------------------
+All compile time problems have now been dealt with and all executables linked
+and installed in bin.  I tried running a couple of the executables, and
+incredibly, they ran without apparent error on the first attempt!  Of course,
+that is too good to be true, the next step is runtime testing of the system.
+
+dev/graphcap
+dev/termcap
+	Installed the local DAO additions to termcap and graphcap.  Rather
+	than have a modified version of the vt640 entry for DAO, changed the
+	name of the new logical device to vt640d.  (8/28)
+
+unix/hlib/mkiraf.csh
+	Set the default image storage directory to /u2 since it will be
+	empty when iraf is moved back to /iraf, and since there does not
+	seem to be any dedicated scratch area.  Added a comment for the
+	pt100g graphics terminal.  (8/28)
+
+unix/hlib/zzsetenv.def
+	Changed the names of the stdgraph and terminal devices to `pt100g'.
+	Did not set stdplot, stdimage, printer, since no such devices are
+	currently available from the Alliant.  (8/28)
+
+local/login.cl
+	Ran `mkiraf' to set up a new CL login for IRAF.  Tried starting the
+	CL and it hung up in pseudo-run mode as above.  The problem is
+	definitely in the unix kernel, but it appears likely that the bug
+	occurs when an IRAF VOS (not HSI) process runs - possibly it is
+	related to the call to the internal Alliant `setcontext' routine
+	(which traps to the kernel), called from ZSVJMP.  The system slows
+	way down when this occurs, so evidently it is hung in some sort of
+	tight kernel loop.  (8/28)
+
+(rebooted)
+
+process spawn problem
+	This is turning out to be a hard problem to locate.  ZSVJMP turned
+	out not to be the problem, and in fact it works fine.  The difference
+	between the IRAF processes and the UNIX processes is that the IRAF
+	processes use the fancy vector compiler.  The Alliant process header
+	contains a flag bit word describing the attributes of the process to
+	be run; the standard UNIX processes do not use any of the fancy
+	Alliant vector stuff, and in fact do not even use 68020 instructions.
+	The IRAF processes use 68020 instructions, vector instructions,
+	and something called multiple stacks.  Once the kernel gets corrupted,
+	processes with these attributes enter the pseudo-run state when we try
+	to exec them.  (8/29)
+
+(rebooted countless times)
+
+unix/os/zfiopr.c
+	After a lengthy battle, finally determined that due to some bug in
+	the Alliant kernel, ONLY A NORMAL PROCESS CAN EXEC A VECTOR PROCESS.
+	A vector process can exec a normal process with no problem, and a
+	normal process can exec a normal process, but if a vector process
+	execs a vector process the exec hangs in a tight kernel loop.
+	The workaround is for the vector process to exec a normal process
+	and have it turn around and exec the desired vector process.
+	I tried this, and it works, although there appear to be other less
+	serious bugs with IPC to be faced tomorrow.  (8/29)
+
+	[8/30 - IPC bug was not a real bug, just caused by "-c" switch not
+	[being passed to connected subprocess by `execute'.]
+
+unix/os/exec.c +
+unix/hlib/exec.e +
+unix/os/zfiopr.c
+unix/os/mkpkg.csh
+unix/os/mkpkg
+	Resolved the process connect problem as follows: [1] added a new
+	file exec.c (source for hlib$exec.e), which compiles into a nonvector
+	process to be called by the CL to spawn vector subprocesses;
+	[2] replaced the execl call in zfiopr.c/ZOPCPR by a call to execve
+	to spawn hlib$exec.e, which in turn spawns the IRAF suprocess.
+	Added entries to the mkpkg files to make the new modules.  (8/30)
+
+--------------------------------------
+ALLIANT/IRAF is now up and ready for runtime testing, Saturday morning,
+30 August.  Spent two days on the port and one and a half days figuring
+out the process connect problem.
+
+unix/hlib/iraf.h
+unix/hlib/mach.h
+	In checking out some operations upon indefinites, discovered that
+	the values of INDEFR and INDEFD in <iraf.h> had accidentally been
+	set to the values of EPSILON[RD].  This was causing INDEF comparison
+	failures for files that included <mach.h> since INDEF is also defined
+	there.  INDEF should not be defined in <mach.h> if it is already
+	defined in <iraf.h>, so I deleted the entries in <mach.h> and restored
+	the old values to <iraf.h>.  (8/30)
+
+unix/as/zsvjmp.s
+	Discovered a minor problem with the new ZDOJMP routine.  The address
+	of the error code was being returned, rather than the value, causing
+	error messages to come out as ERROR (*****, "..").  (8/30)
+
+(full sysgen and relink due to <iraf.h> and zsvjmp edits)
+
+Fatal Alliant hardware problem
+	Right away when trying to test out the IRAF science software I
+	ran into serious problems with floating point operations.  A little
+	investigation showed that the Alliant floating point hardware is
+	faulty.  Simple test programs were written in both Fortran and C to
+	print out the numbers 1.0, 2.0, 3.0: both failed.  Testing of the
+	floating point instructions with ADB revealed that add and subtract
+	are ok, but 1.0 * 2.0 is 2.1375, and 1.0 / 2.0 is 0.53125.  A simple
+	board swap should fix the problem (in fact it is probably a single
+	chip), but unfortunately this will prevent further testing of the
+	science software during this visit; virtually all programs that use
+	floating point produce invalid results, including all graphics
+	programs.  Testing of the system software can continue, as can
+	execution of most benchmark programs.  (8/30)
+
+	IMPORTANT NOTE -- Once this problem is fixed it will be necessary to
+	recompile the entire system (and any other non-IRAF software as well),
+	since any floating point decode operations performed by the compilers
+	will likely have failed, causing invalid floating point numbers to be
+	compiled into programs.  Hence these programs will fail even after the
+	hardware is fixed.
+
+unix/os/zopdpr.c
+	Had to make the same change here as in zfiopr.c, i.e., add a call to
+	the intermediate `exec.e' process to exec the bkg cl.  Note that this
+	is not necessary for zoscmd, since zoscmd execs one of the unix
+	shells, both of which are nonvector processes.  (8/31)
+
+Note on FTP
+vms/boot/rtar
+	A binary file transfer via FTP to VMS resulted in creation of a file
+	with an undefined record type.  Trying to unpack this file with RTAR
+	would immediately crash the VAX due to an exexpected exception during
+	a system call in the ACP (RMS).  This should not happen, of course,
+	but the real question is why FTP created a file with an undefined
+	record type.  Sure would be nice to have the IRAF networking software
+	up...  (9/1)
+
+unix/os/zgtime.c
+unix/hlib/libc/kernel.h (HZ)
+sys/etc/sysptime.x
+	Rewrote the timer utility routines to use only integer arithmetic,
+	so that I could run some benchmarks of the vector hardware.  (9/1)
+
+(relink)
+
+--------------------
+Timing tests
+	The Alliant documentation claims that use of the vector hardware will
+	increase performance by about a factor of 4.  This is borne out by my
+	tests.  The factor of 4 is determined by the ratio of the startup
+	time for a vector segment versus the time required to execute a
+	vector segment, where the segment length (number of elements in a
+	vector register) is 32 for the Alliant.
+
+	aaddr, 512x512
+		vectorized:	0.184 cpu
+		nonvector:	0.617 cpu
+
+(Moved new system to /iraf; deleted old system, it should be archived
+(somewhere and probably won't be looked at again anyhow.  I saved a copy
+(of the original Alliant notes file as notes.den.  Modified the links in
+(/usr/include and /usr/bin to point to /iraf.  Modified the pathnames in
+(hlib and hlib/libc).  (9/1)
+
+cleanup
+	Ran (most of) the standard benchmarks.  Deleted the /u2 version of
+	iraf.  (9/2)
+
+------------------------------
+Back at NOAO.  Problems reading tar file on VMS backup tape brought back from
+DAO.  This is probably due to problems with the DAO software so I shall
+document it here (copied from noao/lyra notes file).
+
+doc/ports/alliant_86.doc
+	Installed the notes file from the Alliant port.  There was some
+	problem with the backup/tar file I made on the Alliant, hence it was
+	not easy to get the notes file off the tape.  I had to use the new
+	SPLIT task to split the 24 Mb archive into 49 512000 byte segments,
+	and eventually determined that the notes file was at line 11115 of
+	segment 39!  The problems with the tape are almost certainly not with
+	the tape itself, since I did a backup/compare at DAO, and backup did
+	not report any problems when the tape was read.
+
+	I think the most likely culprit is the FTP software, which had to be
+	used to move the archive to the VMS VAX, since the DAO Alliant did not
+	have a tape drive.  FTP (binary mode) insisted on making a file with
+	an undefined VMS record type; this would cause RTAR to crash the VAX
+	if I tried to look at the file on the VMS VAX at DAO.  The 24 Mb archive
+	file has one enormous section which is all zeroed, and then in the
+	remainder of the archive all ascii zeroes appear to have been deleted
+	from the archive, causing the 512 byte TAR file headers to be much
+	shorter.  I tried the exact same operation (with a smaller test file)
+	using our Eunice FTP and everything worked fine.  The DAO TELNET
+	also gave problems; it would hang up if fed too much data too fast,
+	and would occasionally crash with a stack trace.  Based on these
+	experiences, I would certainly have to recommend the Wollongong
+	networking software over the other vendor.  (9/6)

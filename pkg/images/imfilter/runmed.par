@@ -1,0 +1,16 @@
+input,s,a,,,,List of input images
+output,s,a,,,,List of output images
+window,i,a,3,3,,Running window
+masks,s,h,"",,,List of output masks
+inmaskkey,s,h,"",,,Keyword for input masks
+outmaskkey,s,h,"HOLES",,,Keyword for output masks
+outtype,s,h,"filter","filter|difference|ratio",,Type of output values
+exclude,b,h,no,,,Exclude input image from filter value?
+nclip,r,h,0.,0.,,Clipping factor
+navg,i,h,1,1,,Number of central values to average
+scale,s,h,"none",,,Scaling option
+normscale,b,h,yes,,,Normalize scales to first image?
+outscale,b,h,no,,,Scale output?
+blank,r,h,0.,,,Filter value when all pixels are excluded
+storetype,s,h,"real","real|short",,Internal storage type
+verbose,b,h,yes,,,Verbose?

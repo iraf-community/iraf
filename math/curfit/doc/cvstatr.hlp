@@ -1,0 +1,44 @@
+.help cvstatr May85 "Curfit Package"
+.ih
+NAME
+cvstatr -- get real parameter
+.ih
+SYNOPSIS
+include <math/curfit.h>
+
+rval = cvstatr (cv, parameter)
+
+.nf
+pointer	cv		# curve descriptor
+int	parameter	# parameter to be returned
+.fi
+.ih
+ARGUMENTS
+.ls cv     
+The pointer to the curve descriptor structure.
+.le
+.ls parameter
+Parameter to be return.  Definitions in curfit.h are:
+.nf
+	define	CVXMIN		5	# minimum ordinate
+	define	CVORDER		6	# maximum ordinate
+.fi
+.le
+.ih
+DESCRIPTION
+The values of real parameters are returned.  The parameters include
+the minimum and maximum ordinate values of the curve.
+.ih
+EXAMPLES
+.nf
+	include <curfit.h>
+
+	real	cvstatr()
+
+	xmin = cvstatr (cv, CVXMIN)
+	xmax = cvstatr (cv, CVXMAX)
+.fi
+.ih
+SEE ALSO
+cvstati
+.endhelp

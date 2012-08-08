@@ -1,0 +1,33 @@
+# Make the IMAGES package
+
+$call	relink
+$exit
+
+update:
+	@tv
+	@immatch/src/imcombine/src/mkpkg
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set LIBS1 = "-limc -lxtools -lcurfit -lsurfit -lgsurfit -liminterp"
+	$set LIBS2 = "-lnlfit -lslalib -lncar -lgks"
+	$update	libpkg.a
+	$omake	x_images.x
+	$link	x_images.o libpkg.a $(LIBS1) $(LIBS2) -o xx_images.e
+	;
+
+install:
+	$move	xx_images.e bin$x_images.e
+	;
+
+libpkg.a:
+	@imcoords
+	@imfilter
+	@imfit
+	@imgeom
+	@immatch
+	@imutil
+	@lib
+	;

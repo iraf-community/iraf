@@ -1,0 +1,2 @@
+device,f,a,mta,,,device to be rewound
+initcache,b,h,yes,,,discard cached information on tape contents

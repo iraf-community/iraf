@@ -1,0 +1,61 @@
+.help cqstati Mar00 "Catquery Package"
+.ih
+NAME
+cqstati -- get a catalog / survey integer parameter
+.ih
+SYNOPSIS
+include <cq.h>
+
+ival = cq_stati (cq, parameter)
+
+.nf
+pointer	cq		# the configuration file descriptor
+int	parameter	# the parameter to be returned
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ls parameter
+The parameter to be returned.  The currently supported parameters defined
+in cq.h are:
+.nf
+	CQNRECS		# the number of catalog / survey file records
+	CQSZRECLIST	# the length of the record name list in chars
+	CQCATNO		# the current catalog number
+.fi
+.le
+.ih
+DESCRIPTION
+Cq_stati returns the values of catalog / survey integer parameters.
+Cq_stati is an integer function which returns the value of the requested
+parameter as its function value.
+
+.ih
+NOTES
+The current catalog number CQCATNO is 0 if the current catalog has not been set
+by a call to cq_setcat or cq_setcatn.
+
+The length of the record list CQSZRECLIST can be used to preallocate the buffer
+required to fetch the text parameter CQRECLIST.
+
+.ih
+EXAMPLES
+.nf
+	include <cq.h>
+
+	int	cq_stati()
+
+	....
+
+	sz_buf = cq_stati (cq, CQSZRECLIST)
+	call malloc (buf, sz_buf, TY_CHAR)
+	nlines = cq_statt (cq, CQRECLIST, Memc[buf], sz_buf) 
+
+	...
+.fi
+.ih
+SEE ALSO
+cq_stats, cq_statt
+.endhelp

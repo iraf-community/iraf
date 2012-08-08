@@ -1,0 +1,16 @@
+input,s,a,,,,List of spectra
+apertures,s,h,"",,,List of apertures to change
+apidtable,s,h,"",,,Table of individual aperture values
+wcsreset,s,h,no,,,Reset WCS to pixels and ignore apidtable?
+verbose,b,h,no,,,"Print verbose information?
+
+# Defaults for apertures not in table
+# INDEF leaves value unchanged"
+beam,i,h,INDEF,,,Beam number
+dtype,i,h,INDEF,,,"Dispersion type (-1|0|1)"
+w1,r,h,INDEF,,,Coordinate of first physical pixel
+dw,r,h,INDEF,,,Coordinate step per physical pixel
+z,r,h,INDEF,,,Redshift factor
+aplow,r,h,INDEF,,,Lower extraction aperture position
+aphigh,r,h,INDEF,,,Upper extraction aperture position
+title,s,h,"INDEF",,,Spectrum title or ID

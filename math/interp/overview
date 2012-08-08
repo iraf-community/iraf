@@ -1,0 +1,43 @@
+Interpolation Package
+
+	The routines here are intended to allow programmers to interpolate
+one dimensional arrays and two dimensional
+images in the IRAF system.  The routines are
+mathematical in nature and are not heavily tied into the IRAF package.
+The advantages of having locally written interpolators include the
+ability to optimize for uniformly spaced data and the possibility of
+adding features that are useful for the final application.  The
+one major feature that has been implemented is the ability to change
+the kind of interpolator used at run time by carrying along a variable
+that gives the interpolator type in the higher level code.
+
+	The kinds of interpolators include:
+		1. Nearest neighbor
+		2. Linear
+		3. Interior polynomial order = 3
+		4  Interior polynomial order = 5
+		5  Spline order = 3
+
+	The package is divided into array interpolators and image
+interpolators.  Within the array interpolators, there is further
+division into sequential and random interpolators.  The sequential
+interpolators are optimized for returning many values as is the
+case when an array is shifted or when an array is oversampled
+at many points in order to produce a smooth plot.  The random interpolators
+allow the evaluation of a few interpolated points without the computing
+time and storage overhead required for setting up the sequential version.
+
+	The original specification called for the interpolator package
+to deal with indefinite valued pixels and references out of bounds.
+A version of the array sequential interpolators was written that handled
+both situations allowing some options to the user.  The extension of
+these features to the two dimensional case becomes more dependent on
+details within IRAF and less mathematical in nature.  It would also
+duplicate other code within IRAF that deals with out of bound references.
+Finally the need to test for the various situations slows down the operation.
+So all features referring to indefinite valued pixels and out of bound
+references have been removed.  The user is responsible for ensuring that
+"x" values land within the array.  The code does not test to see if x
+is in bounds.  A routine has been added that interpolates
+an array with indefinites and returns an array with all legitimate
+real numbers.

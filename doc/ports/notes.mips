@@ -1,0 +1,398 @@
+# MIPS/IRAF alpha port.
+# System arrived on thursday 17 May.
+
+-----------------
+Configure UNIX (RISC/os 4.10)
+
+/etc/passwd
+/etc/hosts
+/etc/group
+/etc/fstab
+/etc/local_hostname
+/tucana/	+
+/u2		+
+	1. Usual local configuration of passwd,hosts,group,fstab.  NFS
+	mounted a number of tucana disks.
+	2. local_hostname is a MIPS special, used to set hostname (columba
+	in this case) and network parameters (netmask, broadcast).  (4/17)
+
+	[didn't do anything more with the system for several days...]
+
+/usr/adm/periodic/daily/10.makehosts.system
+/usr/hosts
+	Sometime later I discovered that /usr was 99% full and the directory
+	/usr/hosts contained over 8000 files totalling about 9 Mb.  There
+	turned out to be a crontab file which makes a link to rsh in /usr/hosts
+	for every node alias in /etc/hosts.  We like to keep a very large
+	hosts file around for reference, so this would end up producing an
+	enormous /usr/hosts.  It is not clear if /usr/hosts is needed; the
+	node name entries can be executed to rsh to the node so perhaps that
+	is what it is for.  Rather than disable the facility entirely, I
+	edited the makehosts script to make entries only for the local hosts.
+	(4/26)
+
+login customization
+	The MIPS is a nearly pure SysV UNIX machine with the default login,
+	which provides the SysV ls, ps, etc., the old unix kill, erase, etc.
+	characters for the terminal driver, and so on.  A bit of hunting
+	turned up the following interesting items.
+
+	/bds43/bin
+	/usr/ucb
+	    Contains 200 or so BSD commands which are no where else to be
+	    found, e.g., nroff, troff, lpr, head, etc., as well as BSD
+	    versions of popular commands like ls, stty (in some cases there
+	    are merely front ends to the SysV versions, like stty).
+
+	/usr/new
+	    Contains some interesting utilities, including LESS and PATCH,
+	    and a couple of things I hadn't seen before, VSAR (a screen
+	    oriented version of the SysV SAR) and VMSBACKUP (claims to be
+	    able to read VMS BACKUP tapes).
+
+	man pages
+	    PAGER can be defined as "less -cqm" to use less to page man
+	    pages.  There are two man programs, /bsd43/bin/man or /usr/ucb/man,
+	    which prints the BSD man pages, and /usr/bin/man, which prints
+	    the SysV man pages followed by other entries for the named topic,
+	    prompting each time the pager is exited.  Given the default search
+	    path, you have to type /usr/bin/man explicitly to get the SysV
+	    version.  
+
+	If the SysV STTY is used one needs to use "winsize" to set the
+	screen size for programs like LESS and VI.  (4/26)
+
+/usr/lib/cmplrs
+	This directory contains the runtime files for the compilers.  It
+	appears that the system as delivered by MIPS does not have the
+	latest (2.10) versions of the compilers installed.  The installed
+	versions are all 2.0.  I sent mail off to MIPS to see if we can
+	get the 2.10 compiler tape (we already have the 2.10 Fortran tape,
+	but this is useless on the MIPS without the 2.10 compiler backend
+	programs).  (4/26)
+
+/etc/printcap		+
+/usr/spool/*		+
+/etc/rc2.d/S01noao	+
+	Configured LPR for the noao devices.  (4/26)
+
+/usr/lib/tmac/tmac.s
+/usr/local/bin/itroff*	+
+/usr/local/bin/vpr	+
+/usr/local/bin/qdplot	+
+	Configured nroff/troff and the local noao troff and printer queues.
+	(4/26)
+
+/usr/lib/aliases
+	Installed the noao mail aliases file.  (4/26)
+
+------------------------
+Begin IRAF port to the MIPS.
+Start with DECstation/IRAF sources, since these are already set up to
+use the MIPS compilers.
+Using MIPS BSD43 programming environment.  (5/27)
+
+local/.login
+unix/hlib/cl.csh
+unix/hlib/irafuser.csh
+unix/hlib/libc/iraf.h
+unix/hlib/mach.h
+unix/hlib/mkpkg.inc
+	1. Set new iraf root.
+	2. In mach.h, change the byte swap parameters to NO.
+	3. Checked size of setjmp buffer; DECstation value is larger
+	than needed for MIPS, so leave it as is.  (5/27)
+
+bin.mips			+
+noao/bin.mips			+
+mkpkg
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf.MIPS		+
+noao/mkpkg
+noao/lib/mkpkg.inc
+noao/lib/mkpkg.sf.MIPS		+
+unix/mkpkg.sh
+unix/setarch.sh			+
+unix/bin.mips			+
+unix/as.mips			+
+	Add support for architecture "mips".  (5/27)
+
+unix/os/irafpath.c
+unix/os/zgcmdl.c
+unix/os/zxwhen.c
+	1. irafpath.c and zgcmdl.c modified to discriminate between Ultrix
+	and RISC/os operating systems: #ifdef mips is true for both systems.
+	On a DECstation the architecture is known as "dsux", on a MIPS it
+	is "mips".
+	2. Modified zxwhen for the MIPS hardware exception codes.  (5/27)
+
+unix/boot/bootlib/osputenv.c
+	The MIPS does not have putenv, but it has setenv.  (5/27)
+
+unix/boot/mkpkg/host.c
+	The MIPS has COFF libraries, so disabled ranlib.  (5/27)
+
+unix/hlib/install
+	It turns out that when using the BSD version of CC, the include
+	files in /bsd43/usr/include are used rather than /usr/include.
+	Modified INSTALL to make an <iraf.h> link in both places (and
+	manually created the link in order to complete the bootstrap).  (5/27)
+
+-------------------
+Bootstrap successfully completed, except for alloc.c which failed to
+link.  Will take a look at that later.  (5/27)
+
+unix/boot/spp/xc.c
+	The MIPS is unusual in that it has two sets of compilers (or at
+	least compiler front-ends) and two sets of programming environments
+	for BSD and SysV.  For our purposes it is simplest to use the BSD
+	environment.  This necessitated a change to XC since we want to
+	use the versions of CC and F77 in /bsd43/bin rather than the SysV
+	versions in /usr/bin.
+
+	1. Modified "run" in XC to search /bsd43/bin before /usr/bin (we
+	should, of course, be using PATH instead).
+	2. Modified XC to link with F77 instead of CC.  Using CC is awkward
+	since the F77 libraries are hidden away in /bds43/usr/lib/cmplrs/...
+	(5/27)
+
+-------------------
+Begin sysgen.
+
+	The initial sysgen went well except for some problems with the F77
+	compiler, which was not installed properly when the system was set
+	up.  First I had to modify XC to use the /bsd43/bin versions of the
+	compilers (see above).  Even when this was done links would still
+	fail, due to the compiler being only partially installed.  I was
+	able to continue by faking a BSD F77 compiler by combining the 2.10
+	F77 front end and libraries with the cc2.0 back end.  The full compile
+	sysgen will have to be redone when the new compilers are properly
+	installed, and there is little point in pursuing any bugs until
+	this is done.  (5/27)
+
+math/deboor/mkpkg
+math/deboor/setdat.f		-
+math/deboor/setdat2.f		-
+math/deboor/setdat3.f		-
+	The DEBOORT math package turned out to have a set of files setdat.f,
+	setdat2.f, setdat3.f, all of which defined the same routine "setdat"
+	and which were being redundantly loaded into the library.  It turns
+	out that these routines are not part of the math library anyhow, and
+	are only used to generate test data for the test programs.  I moved
+	them to deboor/progs (the test programs source library) and deleted
+	the entries in the mkpkg file.  (5/27)
+
+sys/gio/gks/gcas.x
+	The MIPS librarian found another duplicate library entry here.  The
+	GKS emulation library has two files gca.x and gcas.x, both of which
+	define the same routine "gca".  Changed the gcas.x version to define
+	a subroutine "gcas" instead.  (These are integer and short versions
+	of the cell array routine - GCAS is a nonstandard IRAF extension to
+	GKS, which is not used anywhere to my knowledge).  (5/27)
+
+-------------------
+Sysgen complete.
+	
+	With these changes the first sysgen completed, except for x_images.e
+	which failed to link, probably due to the F77 compiler problems
+	discussed above.  Other than that the sysgen went remarkably well.
+	None of the problems we had with the MIPS compilers on the DECstation
+	were present on this system.  IRAF is up and running, minus IMAGES,
+	although from browsing the MIPS manuals I see that there are still
+	some subtle items to take care of.  (5/28)
+
+dev/hosts
+	Added an entry for node columba and tested iraf networking.  (5/28)
+
+unix/os/zmaloc.c
+	RISC/os uses the BSD 4.3 memory allocator, which allocates storage in
+	units that are a power of 2.  This can be very wasteful of space for
+	large buffers, so we don't want to use the default memory allocator.
+	MIPS provides a couple of other allocators as options, but I had
+	trouble using these with the BSD43 environment due to unresolved
+	symbols resulting from the SysV libraries not being searched.
+	The solution was to replace zmaloc.c by the version used on BSD 4.3
+	and Ultrix, which includes an older, simpler, and better behaved
+	memory allocator.  (5/28)
+
+unix/hlib/libc/iraf.h
+unix/os/zzstrt.c
+unix/os/zxwhen.c
+unix/os/zgcmdl.c
+unix/os/irafpath.c
+	Added a #define MIPS and a commented out #define DSUX.  This is more
+	direct than trying to use #ifdef mips (which is defined by the system)
+	since this is defined for both the MIPS and DECstation (at least) and
+	doesn't really tell us what system we are compiling for.  (5/28)
+
+MIPS bug
+	Running NM on a library with the output redirected causes a
+	segmentation fault when the process exits.  (cd /lib; nm *.a | ...).
+
+unix/os/zzstrt.c
+unix/os/zxwhen.c
+	Enabled the IEEE exceptions (overflow, divide by zero, and invalid
+	operand) for MIPS/IRAF processes.  Modified ZXWHEN to detect and
+	decode the floating point exceptions (this required doing bit tests
+	on the floating point control and status register).
+
+	To figure out how to do this I first did a "man -k ieee".  This
+	turned up a man page for fp[get|set][round|mask|sticky], which
+	looked like it would do the trick, except that evidently this routine
+	doesn't exist anywhere in the system (maybe it is a standard SysV
+	feature which MIPS doesn't support; the man page mentions the default
+	behavior on 3B systems).  By doing an "nm *.a | grep fp" on the system
+	libraries I eventually turned up set_fpc_csr/get_fpc_csr which is
+	what is actually implemented on the MIPS.  This seems to do the
+	trick; thus far, setting a nondefault FPCSR doesn't seem to introduce
+	any new problems.  (5/28)
+
+/etc/init.d/netdaemons
+/etc/rc2.d/S01noao
+/usr/local/bin/ntp		+
+/usr/spool/cron/crontabs/root
+	1. Had to add a command "route add default gateway 1" to allow network
+	access to the outside world.
+	2. Commented out the gated/routed daemons, which we don't need.
+	3. Installed a copy of NTP in local/bin, and set up cron to run it
+	once a day.  This sets the system clock from atomic clock at another
+	site, by requesting the time via the internet from a network time
+	daemon running on the remote node.  (Forgot to log it, but the timezone
+	had to be changed to MST a while back too).  (5/31)
+
+-----------------------
+New compilers (V2.10) installed and the system bootstrapped and fully
+recompiled from scratch.  Lacking a tape drive on the system, the compilers
+had to be installed manually from the raw distribution tape: I think I set
+up all the necessary links etc., but the installation was complex enough
+that it is difficult to be sure.  (6/19)
+
+Perusing the output of the sysgen, it appears that there were a number of
+problems with the V2.10 compile, whereas the sysgen with the V2.0 compilers
+went almost flawlessly.  At this point, from the nature of the errors I think
+they are real and not something induced by errors in the installation of the
+compilers.  Another problem was that the disk filled up during the sysgen,
+a dangerous problem which can cause errors such as zero length objects being
+inserted into libraries.
+
+At least one compiler bug was observed, this one harmless.  Some of the old
+NCAR and math library Fortran code contains statement functions.  The dummy
+variables in such statements functions result in "local variable X never used"
+warning messages.  (6/20)
+
+unix/hlib/mkpkg.inc
+	Added -Olimit 1024 to the default sysgen flags.  This sets the max
+	size in blocks of a procedure to be optimized.  With the default
+	value of 500 the compiler issued warnings for 7 files during the full
+	sysgen, and failed to optimize 9 procedures.  (6/20)
+
+math/deboor/core
+sys/gio/ncarutil/autograph/core
+sys/vops/core
+pkg/dataio/cardimage/core
+pkg/images/tv/cv/core
+pkg/images/geometry/core
+pkg/plot/core
+pkg/xtools/ranges/core
+pkg/xtools/core
+noao/imred/ccdred/src/generic/core
+noao/imred/vtel/core
+noao/onedspec/dispcor/core
+noao/twodspec/multispec/core
+	Discovered why the sysgen ran out of disk space - 12 Mb of core
+	files from compiler optimizer (uopt) crashes!   Deleted.  (6/20)
+
+----------------
+I tried recompiling a couple of the files that were associated with
+optimizer core dumps in the first sysgen, but could not duplicate the
+problem.  Started an incremental sysgen to compile the files skipped
+in the first sysgen, and this completed without any errors.  The system
+comes up and runs, ready for runtime testing.  (6/20)
+
+----------------
+/usr/local/bin/saoimage
+	Installed saoimage.  7.6 Mb left in /usr.  As there was so little
+	disk space, the RISC/os source for saoimage is currently in 
+	/tucana/tmp3/rooke/sao/riscos.  (6/21 SRo)
+
+/usr/man/manl/saoimage.man
+	Created /usr/man/manl, and placed saoimage manpage in it.  (6/21 SRo)
+
+----------------
+Resume testing on alpha port, 16 July 90.
+
+sys/vops/amov.gx
+	This routine could fail, corrupting the data array, in some cases
+	when the input and output arrays overlap.  The same problem exists
+	in standard V2.9 iraf except that in most iraf implementations,
+	a host optimized version of AMOV is used, hence the bug has not
+	been seen.  (7/16)
+
+unix/hlib/mkpkg.sf.MIPS
+	I added entries for the host optimized versions of AMOV, ACLR, etc.,
+	using the C versions in AS that use bcopy/bzero.  Unfortunately
+	it turned out that the MIPS version of bcopy also cannot be used
+	when the input and output arrays overlap in a certain way, hence
+	I had to copy out the entries for the AMOV and BYTMOV routines.
+	The optimized versions of the ACLR routines are still used.  (7/16)
+
+unix/as.mips/zsvjmp.o
+	I tried setting the address of MEM to zero and it worked on the MIPS.
+	The same code failed on the DECstation with a linker error.  (7/16)
+
+unix/os/zmain.c
+unix/os/zzsetk.c
+unix/os/zfiopr.c
+	Added a new facility to UNIX/IRAF for debugging interprocess
+	communication (IPC).  This feature will also be useful for debugging
+	tasks standalone, particularly in cases where a bug seen when the
+	task is run from the CL is difficult to reproduce when the task
+	is run standalone.  If LOGIPC is defined in the host environment,
+	the input and output IPC streams of each connected process with
+	process id PID are logged to the files PID.in and PID.out.  (7/18)
+
+unix/hlib/mkpkg.sf.MIPS
+	Added system/help/lroff/textout.x to the list of files requiring
+	compilation without optimization (actually it is the first such file
+	for this system).  Evidently the use of multiple entry points in
+	this procedure is running into an optimizer bug.  The argument "out",
+	which should be the address of "putline" was being transformed to
+	the address of "getline" somewhere in this routine, causing output
+	via textout to be discarded.  (7/18)
+
+sys/imfort/tasks/pcube.f
+	This file contained a subroutine containing the following sequence of
+	statements (irrelevant statements ommitted):
+
+		subroutine pcuber (pix, nx,ny,nz, i1,i2, j1,j2, k1,k2)
+		real	pix(nx,ny,nz)
+		integer	nx, ny, nz
+
+	On the MIPS, this produced a warning about nx/ny/nz already having
+	been declared.  Probably when the compiler processes the REAL
+	statement it assumes the parameters are type integer.  This seems
+	reasonable, so I moved the INTEGER card up before the REAL and the
+	warning went away.  (7/19)
+
+unix/os/zxwhen.c
+	While looking into a problem of a task aborting on a floating point
+	exception, I noticed that the IEEE exception being reported was
+	"floating inexact", which iraf does not enable.  It turned out that
+	both inexact and overflow were being signalled, but due to the way
+	the zxwhen code was written only the inexact was being reported.
+	Since we are not very interested in those exceptions which are not
+	enabled, I changed the code to check the exception bits for the
+	enabled exceptions before checking the others.
+
+	In this case the exception of interest was floating overflow, which
+	is occuring in the routine DET called by SPLOT.  It appears that
+	the matrix being input to this routine is garbage.  Since only the
+	one application is affected I will leave it to someone else to check
+	into it further.  (7/19)
+
+-------------
+Full system testing has been in progress for the past week or so.  Things
+looks pretty good.  One task is dying with an out of memory error; after
+hunting around a bit, I determined that the MIPS/SysV command used to
+monitor swap space usage is "swap l", which gives the free space in 512
+byte blocks.  (7/30).

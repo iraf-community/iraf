@@ -1,0 +1,6 @@
+input,s,a,,,,Input 3d image (datacube)
+output,s,a,,,,Output 3d image
+new_x,i,a,3,1,3,"New x axis = old axis (1=x, 2=y, 3=z)"
+new_y,i,a,2,1,3,"New y axis = old axis (1=x, 2=y, 3=z)"
+new_z,i,a,1,1,3,"New z axis = old axis (1=x, 2=y, 3=z)"
+len_blk,i,h,128,,,Size in pixels of internal subraster

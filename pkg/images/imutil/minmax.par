@@ -1,0 +1,10 @@
+images,s,a,,,,Images to be examined
+force,b,h,no,,,Force recomputation of extreme values?
+update,b,h,yes,,,Update the image header?
+verbose,b,h,yes,,,Print computed values?
+minval,r,h,INDEF,,,Minimum pixel value in image (real part)
+maxval,r,h,INDEF,,,Maximum pixel value in image (real part)
+iminval,r,h,INDEF,,,Minimum pixel value in image (imaginary part)
+imaxval,r,h,INDEF,,,Maximum pixel value in image (imaginary part)
+minpix,s,h,,,,Minimum pixel (section notation)
+maxpix,s,h,,,,Maximum pixel (section notation)

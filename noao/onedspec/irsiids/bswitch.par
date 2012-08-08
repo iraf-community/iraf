@@ -1,0 +1,15 @@
+# BSWITCH parameter file
+
+input,s,a,,,,Input spectra file root name
+records,s,a,,,,Ranges of spectral records
+output,s,a,,,,Output file root name for new spectra
+start_rec,i,a,1,0,9999,Next starting spectral record
+stats,s,a,"stats",,,File to contain statistics summary
+ids_mode,b,h,yes,,,Are data in quadruples
+extinct,b,h,yes,,,Apply de-extinction correction
+weighting,b,h,no,,,Apply statistical weights during addition
+subset,i,h,32767,1,,Generate sums at subset intervals
+wave1,r,h,0.0,,,Starting wavelength to accumulate stats
+wave2,r,h,0.0,,,Ending wavelength to accumulate stats
+observatory,s,h,"kpno",,,Observatory of data
+extinction,s,h,)_.extinction,,,Extinction file

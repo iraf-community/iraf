@@ -1,0 +1,104 @@
+.help msset Jul84 noao.twodspec.multispec
+.ih
+NAME
+msset -- Set entries in a MULTISPEC database
+.ih
+USAGE
+msset image keyword value
+.ih
+PARAMETERS
+.ls image
+Image in which the MULTISPEC database entries are to be modified or initialized.
+.le
+.ls keyword
+Keyword for the database entry to be set.  The keywords are:
+.ls nspectra
+Set the number of spectra in the header.
+.le
+.ls comments
+Add comments lines to the database comment block.
+.le
+.ls x0
+Set the spectra positions for the specified sample lines and spectra.
+.le
+.ls i0
+Set the model profile central intensities for the specified sample lines
+and spectra.
+.le
+.ls s0, s1, or s2
+Set the gauss5 model shape parameter s0, s1, or s2 for the specified sample
+lines and spectra.
+.le
+.le
+.ls value
+Value to be used for value input.
+.le
+.ls lines = "*"
+Sample lines to be affected by value input.
+.le
+.ls spectra = "*"
+Spectra to be affected by value input.
+.le
+.ls read_list = no
+If yes use list input and if no use value input.
+.le
+.ls list = ""
+List for list input.  See the description below for the appropriate format.
+.le
+.ih
+DESCRIPTION
+The entries in a MULTISPEC database associated with the image
+are modified or initialized.
+The parameters \fIimage\fR, \fIkeyword\fR, and \fIread_list\fR 
+determine the database to be operated upon, the database entry to
+be set, and the input type.  There are two forms of input;
+list input and value input.
+The input type is selected by the boolean parameter
+\fIread_list\fR.  For list input the parameter \fIlist\fR
+is used and for value input the parameter \fIvalue\fR and
+possibly the parameters \fIlines\fR and \fIspectra\fR are used.
+The required parameters and input formats for the different keywords
+are outlined below.
+.ls nspectra
+For list input the list format is the number of spectra and
+for value input the \fIvalue\fR parameter is the number of spectra.
+.le
+.ls comments
+For list input the list format is lines of comments and for value
+input \fIvalue\fR parameter is a comment string.
+.le
+.ls x0, i0, s0, s1, s2
+For list input the list format is sample line, spectrum number, and
+parameter value
+and for value input \fIlines\fR is a range string selecting the
+sample lines to be affected, \fIspectra\fR is a range string selecting
+the spectra to be affected, and \fIvalue\fR is the value to be set for all
+the selected lines and spectra.
+.le
+.ih
+EXAMPLES
+To add several comments to the database by query:
+
+.nf
+	cl> msset image "comments" read_list+
+	Input list> First comment here.
+	Input list> Second comment here.
+	Input list> <eof>
+.fi
+
+where <eof> is the end of file character terminating the list.
+To set the value of s0 to 1 for all the spectra in sample line 1:
+
+	cl> msset image "s0" 1
+
+To set the spectra positions from a list:
+
+	cl> msset image "x0" read_list+ list=positionlist
+
+To add a single comment such as in a script:
+
+	cl> msset image "comments" "Comment here."
+.ih
+SEE ALSO
+findspectra mslist
+.endhelp

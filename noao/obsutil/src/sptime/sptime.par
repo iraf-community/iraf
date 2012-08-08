@@ -1,0 +1,53 @@
+time,r,h,INDEF,,,Total exposure time (sec)
+sn,r,h,25.,,,"S/N per pixel if time is INDEF
+
+# Source and background parameters"
+spectrum,s,h,"blackbody",,,Source spectrum
+spectitle,s,h,"",,,Spectrum title
+E,r,h,0.,,,E(B-V)
+R,r,h,3.1,,,A(V)/E(B-V)
+sky,s,h,"",,,Sky spectrum
+skytitle,s,h,"",,,Sky title
+extinction,s,h,"",,,Extinction value or table
+exttitle,s,h,"",,,"Extinction title
+
+# Spectral distribution parameters"
+refwave,r,h,INDEF,,,Reference wavelength
+refflux,r,h,10,,,Source flux at reference wavelength
+funits,s,h,"AB","AB|F_lambda|F_nu|U|B|V|R|I|J|H|Ks|K|L|L'|M|",,Reference flux units
+temperature,r,h,6000.,,,Blackbody temperature (K)
+index,r,h,0.,,,"Power law index
+
+# Observation parameters"
+seeing,r,h,1.,,,Seeing (arcsec)
+airmass,r,h,1.,0.,,Airmass
+phase,r,h,0.,0.,14.,Moon phase (0-14)
+thermal,r,h,0.,,,Thermal background temperature (K)
+wave,r,h,INDEF,,,Central wavelength
+order,i,h,INDEF,,,Order for grating
+xorder,i,h,INDEF,,,Order for crossdisperser grating
+width,r,h,INDEF,,,Slit width (-=pixels +=arcsec)
+length,r,h,INDEF,,,Slit length (-=pixels +=arcsec)
+diameter,r,h,INDEF,,,Circular/fiber aperture diameter (-=pixels +=arcsec)
+xbin,i,h,1,1,,Detector binning (dispersion)
+ybin,i,h,1,1,,"Detector binning (spatial)
+
+# Calculation parameters"
+search,s,h,"spectimedb$",,,List of directories to search for tables
+minexp,r,h,0.01,,,Minimum time per exposure (sec)
+maxexp,r,h,3600.,,,Maximum time per exposure (sec)
+units,s,h,"Angstroms",,,Wavelength units
+skysub,s,h,"",,,Type of sky subtaction (none|longslit|multiap|shuffle)
+nskyaps,i,h,10,0,,Number of multiap sky apertures
+subpixels,i,h,INDEF,,,Number of subpixels in calculation
+sensfunc,s,h,"",,,"Sensitivity function value or table
+
+# Output parameters"
+output,s,h,"",,,List of output quantities
+nw,i,h,101,,,Number of output dispersion points
+list,s,h,"",,,Output list file
+graphics,s,h,"stdgraph",,,Graphics device
+interactive,b,h,yes,,,"Interactive pause after graphs?
+
+# Spectrograph parameters"
+specpars,pset,h,"",,,Spectrograph parameters

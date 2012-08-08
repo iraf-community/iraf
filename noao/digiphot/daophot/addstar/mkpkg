@@ -1,0 +1,17 @@
+# ADDSTAR task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	dpaddrd.x	../lib/apseldef.h
+	dpadconfirm.x
+	dpartstar.x	<tbset.h>               <imhdr.h>                 \
+			../lib/daophotdef.h     ../lib/apseldef.h
+	dpnaddstar.x	<tbset.h>		<time.h>                  \
+	                ../lib/daophotdef.h	../lib/apseldef.h 
+	t_addstar.x	<fset.h>		<imhdr.h>                 \
+			../lib/daophotdef.h
+	;

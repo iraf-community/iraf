@@ -1,0 +1,204 @@
+/**
+ *  VOTAPP_SPP.C -- SPP Interface routines to applications code.
+ *
+ *  @file       votApp_spp.c
+ *  @author     Mike Fitzpatrick
+ *  @date       6/03/11
+ *
+ *  @brief      SPP Interface routines to applications code.
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <ctype.h>
+#include <errno.h>
+
+#include "votParseP.h"
+#include "votParse.h"
+
+
+/* SPP Type definitions.
+*/
+#define XCHAR		short
+#define PKCHAR		char
+#define XINT		int
+#define XEOS		0
+
+
+/*  SPP Interface Definitions.
+ *
+ *  SPP compilers on various platforms may append one or more trailing
+ *  underscores to symbol names, we'll use macros for the interface names
+ *  and use defines to see what the symbol name is.
+ */
+#ifdef _NO_US_
+
+#define VX_VOGET   		vxvogt
+#define VX_VOCOPY   		vxvocy
+
+#else
+
+#define VX_VOGET   		vxvogt_
+#define VX_VOCOPY   		vxvocy_
+
+#endif
+
+
+/** 
+ *  Local interface declarations.
+ */
+static PKCHAR *spp2c (XCHAR *instr,  int maxch);
+static int     spplen (XCHAR *str);
+
+
+
+/*****************************************************************************
+ *  Application Interfaces
+ ****************************************************************************/
+
+#define	MAX_ARGS	64
+
+void  votget (int argc, char **argv);
+void  votcopy (int argc, char **argv);
+
+
+/** 
+ *  VX_VOGET -- Application interface to the VOGET task.
+ *
+ *  @brief		Application interface to the VOGET task.
+ *  @param[in] *arg 	Argument list
+ *  @return	 	Nothing
+ */
+void
+VX_VOGET (int *argc, XCHAR *firstArg, ...)
+{
+    int      i, _argc = *argc;
+    char   *_argv[MAX_ARGS];
+    XCHAR   *arg;
+    va_list  argp;
+
+
+    if (firstArg == NULL)		/* must pass in at least one arg      */
+	return;
+
+    /*  Process the argument list.
+     */
+    _argc    = *argc + 1;
+    _argv[0] = strdup ("votget");
+    _argv[1] = spp2c (firstArg, spplen (firstArg));
+
+    va_start (argp, firstArg);
+    for (i=2; i < _argc && (arg=(XCHAR *)va_arg(argp,XCHAR *)) != NULL; i++) {
+	if (arg)
+	    _argv[i] = spp2c (arg, spplen (arg));
+    }
+    va_end (argp);
+
+
+    /* Call the task.
+     */
+    votget (_argc, _argv);
+    sleep (1);				/* give downloads a chance to start   */
+
+
+    /*  Free the arg pointers.
+     */
+    for (i=0; i < *argc; i++)
+        if (_argv[i]) 
+	    free ((char *) _argv[i]);
+
+    return;
+}
+
+
+/** 
+ *  VX_VOCOPY -- Application interface to the VOCOPY task.
+ *
+ *  @brief		Application interface to the VOCOPY task.
+ *  @param[in] *arg 	Argument list
+ *  @return	 	Nothing
+ */
+void
+VX_VOCOPY (int *argc, XCHAR *firstArg, ...)
+{
+    int      i, _argc = *argc;
+    char   *_argv[MAX_ARGS];
+    XCHAR   *arg;
+    va_list  argp;
+
+
+    if (firstArg == NULL)		/* must pass in at least one arg      */
+	return;
+
+    /*  Process the argument list.
+     */
+    _argc    = *argc + 1;
+    _argv[0] = strdup ("votcopy");
+    _argv[1] = spp2c (firstArg, spplen (firstArg));
+
+    va_start (argp, firstArg);
+    for (i=2; i < _argc && (arg=(XCHAR *)va_arg(argp,XCHAR *)) != NULL; i++) {
+	if (arg)
+	    _argv[i] = spp2c (arg, spplen (arg));
+    }
+    va_end (argp);
+
+
+    /* Call the task.
+     */
+    votcopy (_argc, _argv);
+
+
+    /*  Free the arg pointers.
+     */
+    for (i=0; i < *argc; i++)
+        if (_argv[i]) 
+	    free ((char *) _argv[i]);
+
+    return;
+}
+
+
+
+/****************************************************************************
+ *  Private utility procedures
+ ****************************************************************************/
+
+
+/*  SPP Name mapping macros.  SPP procedure names are mappad as the first-5
+**  plus the last character of a name minus any underscores.  This should
+**  be done such that a unique 6-character name is produced for each SPP
+**  symbol.  In these definitions the SPP code may use the long form of the
+**  name in the code, the mapping is done automatically and so we need the
+**  macros here so the symbol entered in the library is actually the short
+**  name.
+*/
+
+static char *
+spp2c (XCHAR *instr, int maxch)
+{
+    XCHAR  *ip = instr;
+    char   *outstr = (char *) calloc (1, maxch+1);
+    char   *op = (char *) outstr;
+    int      n = maxch;
+
+    while ((*op++ = (char)*ip++) != (char)XEOS && --n >= 0)
+        ;
+    *--op = (char) XEOS;
+
+    return (outstr);
+}
+
+
+static int
+spplen (XCHAR *str)
+{
+    int len = 0;
+
+    for (len=0; str[len] != (XCHAR) XEOS; len++)
+	;
+    return (len);
+}

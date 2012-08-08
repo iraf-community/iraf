@@ -1,0 +1,6 @@
+files,s,a,,,,list of files to be deleted
+verify,b,h,no,,,verify operation before deleting each file?
+default_action,b,h,yes,,,default delete action for verify query
+allversions,b,h,yes,,,delete all versions of each file
+subfiles,b,h,yes,,,delete any subfiles of each file
+go_ahead,b,q,yes,,," ?"

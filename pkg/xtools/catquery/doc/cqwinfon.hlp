@@ -1,0 +1,75 @@
+.help cqwinfon Mar00 "Catquery Package"
+.ih
+NAME
+cqwinfon -- get the results wcs description by number
+.ih
+SYNOPSIS
+
+wcsno = cq_winfo (imres, wcsno, wname, max_wname, wkname, max_wkname, wkvalue,
+        max_wkvalue, wktype, wkunits, max_wkunits)
+
+.nf
+pointer	imres		# the image results descriptor
+int	wcsno		# the wcs parameter sequence number
+char	wname		# the wcs parameter name
+int	max_wname	# the maximum size of the wcs parameter name
+char	wkname		# the default wcs keyword name (INDEF if undefined)
+int	max_wkname	# the maximum size of the keyword name
+char	wkvalue		# the default wcs keyword value (INDEF if undefined)
+int	max_wkvalue	# the maximum size of the parameter value
+int	wktype		# the wcs parameter data type
+char	wkunits		# the wcs parameter units (INDEF if undefined)
+int	max_wkunits	# the maximum size of the wcs parameter units
+.fi
+.ih
+ARGUMENTS
+.ls imres    
+The image results descriptor.
+.le
+.ls wcsno
+The sequence number of the wcs parameter to be returned.
+.le
+.ls wname
+The returned wcs parameter name.
+.le
+.ls max_wname
+The maximum size of the returned wcs parameter name.
+.le
+.ls wkname
+The returned wcs parameter keyword name.
+.le
+.ls max_wkname
+The maximum size of the returned wcs parameter keyword name.
+.le
+.ls wkvalue
+The returned wcs parameter value.
+.le
+.ls max_wkvalue
+The maximum size of the returned wcs parameter value.
+.le
+.ls wktype
+The returned wcs parameter type. The options are TY_DOUBLE, TY_REAL, TY_LONG,
+TY_INT, TY_SHORT, and TY_CHAR.
+.le
+.ls wkunits
+The returned wcs parameter units.
+.le
+.ls max_wkunits
+The maximum size of the returned wcs parameter units.
+.le
+.ih
+DESCRIPTION
+Cq_winfon returns the parameter name, keyword name, default value, data type,
+and units of the requested wcs parameter. Cq_winfon is an integer function
+which returns the sequence number of the wcs parameter as its function
+value. Zero is returned if the wcs parameter is not found.
+
+.ih
+NOTES
+For more information about the wcs parameters and their relationship
+to the image surveys configuration file type "help surveys".
+
+.ih
+SEE ALSO
+cqwinfo
+.endhelp

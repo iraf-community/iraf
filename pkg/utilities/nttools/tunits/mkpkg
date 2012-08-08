@@ -1,0 +1,19 @@
+# Update the tunits task in the ttools package library
+# Author: Bernie Simon, 11-jan-99
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	abrev.x		<tbset.h>  "tunits.h"
+	convertcol.x	<tbset.h>
+	factor.x	"tunits.h"
+	parseunits.x	<ctype.h>  "parseunits.com"
+	tuniterr.x	
+	tunits.x	<tbset.h>  "tunits.h"
+	unhash.x	
+	units.x		<tbset.h>  "tunits.h"
+	unstr.x		"tunits.h"
+	;

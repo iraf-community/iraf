@@ -1,0 +1,409 @@
+DEC Alpha OSF/1 V2.0 port.  Begun 28 December 1994.
+Based in part on the preliminary port done by Nelson Zarate of STScI.
+Starting point is the Solaris/IRAF system at V2.10.3.
+This platform is BSD-oriented with only partial SYSV support so we
+will use the BSD code in the HSI.
+--------------------------------------------------------------------------
+
+unix/hlib/motd
+	Edited the motd to indicate that the system is DEC-ALPHA/IRAF,
+	alpha test version.  (12/28)
+
+unix/hlib/irafuser.csh
+	Edited this file sufficiently to allow it to be sourced during login.
+	1. Set MACH to "alpha" using `uname -m`.
+	2. Set HSI flags to define "OSF1" for compile time ifdefs.  For the
+	moment set all other HSI compile and link flags to null.
+	3. Added some code to try to automatically determine $iraf if not
+	defined in the user's environment when the script is run.  A list
+	of standard root directories are searched for; these can be links
+	to the actual location and it will still work.  (12/28)
+
+unix/hlib/libc/spp.h
+	1. Set LEN_JUMPBUF to 2*(84+1) for the Alpha (the 2 is because IRAF
+	uses type int for the array while OSF1 uses type long).  (See also
+	hlib/config.h below).
+	2. Set XLONG to int (=32 bits) for this 64 bit machine.
+	3. Compiled osb/zzeps2.f and verified that the IEEE epsilons work.
+	4. OSF1 f77 evidently uses trailing underscores so it should not
+	be necessary to modify the Fortran/C name mappings.  (12/28)
+
+unix/hlib/libc/kernel.h
+	1. SIGFUNC is a pointer to void for OSF1.
+	2. OSF1 has bcopy but the manpage does not say whether it can handle
+	overlapping arrays, so we will use memmove/memset instead.  (12/28)
+
+unix/hlib/libc/setjmp.h
+	Comment out the #pragma unknown_control_flow, not support for OSF1
+	and there doesn't appear to be anything comparable.  (12/28)
+
+unix/os/getproc.c
+	Added an #ifdef OSF1 to cause the nlist-based code to be used.  (12/28)
+
+unix/os/irafpath.c
+	Added a #ifdef __alpha for the alpha architecture.  (12/28)
+
+unis/os/zfioks.c
+	Changed a number of #ifdef SOLARIS conditionals to #ifdef OSF1
+	where appropriate.  (for example use the select macros, updated
+	typing for socket calls).  (12/28)
+
+unis/os/zfiond.c
+	Modified to use the socket macros as above.  (12/28)
+
+unix/os/zgcmdl.c
+	Modified similarly to the Ultrix version, using the external __Argv
+	to pick up the host argument list.  (12/28)
+
+unix/os/zopdir.c
+	1. Modified to use <dirent.h>.  (12/28)
+	2. zopdir would pass back a pointer coerced to an int as the "file
+	descriptor" but this would fail on 64 bit systems where pointers
+	don't fit in 32 bits.  Modified the routine to allocate a kernel
+	file descriptor for the directory and pass back a normal fd instead.
+	(12/29)
+
+unix/os/zxwhen.c
+	Modified for OSF.  OSF1 has sigaction, so this is used for handling
+	the floating point exceptions (as with Solaris).  (12/28)
+
+unix/os/zzstrt.c
+	Modified to call the OSF1 function ieee_set_fp_control to enable the
+	invalid, divide by zero, and overflow exceptions.  (12/28)
+
+unix/os/zdojmp.c
+	Had to modify to treat jmpbuf as pointer to long rather than to int,
+	in order to retrieve the quadword address of the status variable
+	from jmpbuf[0] and to correctly compute jmpbuf[1].  (12/28)
+
+unix/as.alpha			+
+unix/as.alpha/zsvjmp.s		+
+	Set up an AS directory for the alpha/osf HSI.  Wrote an Alpha version
+	of zsvjmp.  The trick with this one, which I missed at first, was
+	to set register 27 (pv) to the address of setjmp before branching
+	into it.  The alpha procedure calling sequence assumes that the caller
+	of a procedure does this and it is required to set the global pointer
+	correctly for the procedure being executed.
+
+	The STScI version of zsvjmp (produced by technical support at DEC)
+	could not be used as it was just setjmp with the name changed.
+	The status argument used by zsvjmp was being ignored, and setjmp
+	was being called with the wrong jump buffer address.  (12/28)
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf.OSF1		+
+	Set up a basic mkpkg.inc for OSF1.  (12/28)
+
+unix/.../mkpkg.sh
+	The OSF1 compilers refuses to produce a file with the extension ".e",
+	so all the HSI mkpkg.sh files were modified to use .E instead.  When
+	the executables are moved to $hbin the extension is changed to .e.
+	(12/28)
+
+unix/os/prwait.c
+	Like Solaris, OSF1 wait() wants an int exit_status argument.  (12/28)
+
+unix/os/zgtime.c
+	time() is of type time_t in OSF1.  (12/28)
+
+unix/os/gmttolst.c
+unix/boot/bootlib/ostime.c
+	These routines use ftime() which on OSF1 is only available in an
+	optional compatibility library.  Added a #ifdef OSF1 case which
+	uses localtime() instead of ftime to compute the timezone in
+	seconds west of GMT.  (12/28)
+
+unix/hlib/irafuser.csh
+	1. Set the default optimization level for Fortran files to -O3, to
+	disable inter-procedural optimization which causes a warning when
+	compiling files for a library.
+	2. Added a -lots reference to HSI_F77LIBS, this library is evidently
+	used internally by the Fortran compiler.  (12/28)
+
+unix/boot/wtar/wtar.c
+	Fixed a bug in WTAR involving coercion of a pointer to an integer
+	(line 536, bp = ...).  (12/28)
+
+unix/boot/spp/xc.c
+	Modified for OSF1.  The Solaris version pretty much works, about
+	all I had to modify was the list of Fortran libraries.  Also set
+	the default optimization to -O3 for f77 (-O1 for cc) and set up to
+	produce a .E output executable which is renamed to the .e version
+	internally.  (12/28)
+
+---------------------------
+Completed bootstrap.  (12/28)
+Attempted the first sysgen, numerous errors to be tracked down.
+
+unix/boot/spp/xc.c
+	Modified XC to call f77 with "-warn nounreachable" when compiling
+	SPP generated Fortran files.  Technically unreachable statements
+	occur naturally and harmlessly in some cases in SPP generated Fortran.
+	(for example in compile time conditionals).  (12/29)
+
+sys/gio/gks/gcas.x
+	Changed the procedure name from "gca" to "gcas".  There is already
+	another procedure in the same library called "gca".  "gcas" is
+	supposed to be the type short version.  (12/29)
+
+sys/gio/ncarutil/autograph/agrstr.f
+	Commented out statements number 901, 902: "no path to this statement".
+	These statements are never called as the code that calls them is also
+	commented out.  (12/29)
+
+sys/gio/ncarutil/autograph/agsave.f
+	Same thing, statement 901.  (12/29)
+
+sys/gio/ncarutil/conlib/consld.f
+	Commented out statement functions SCRTCH and IARVL.  These are never
+	called and result in a warning message.  (12/29)
+
+sys/gio/ncarutil/conrec.f
+	Commented out three lines around line 1226.  These lines were no
+	longer used because other code had been commented out, and were
+	resulting in a "Variable XX is used before it value has been
+	defined" warnings.  (12/29)
+
+sys/gio/nspp/sysint/encd.f
+	Commented out several lines that were no longer used and were causing
+	a "no path to this statement" warning.  (12/29)
+
+math/deboor/setdat2.f
+math/deboor/setdat3.f
+	This library contains three files setdat.f, setdat2.f, setdat3.f
+	all of which contain a procedure "setdat", causing library conflicts.
+	These routines are not really part of the library anyway and are
+	only used to generate data for examples in DeBoor's book, but to
+	avoid the library conflicts I changed the names of the second and
+	third procedures to setdt2, setdt3.  (12/29)
+
+pkg/xtools/icfit/icdosetupd.x
+	Problem with mixed type real and double arguments in calls to
+	the min and max intrinsic functions for xmin, xmax.  (12/29)
+
+pkg/cl/bkg.c
+pkg/cl/builtin.c
+pkg/cl/compile.c
+pkg/cl/config.h
+pkg/cl/debug.c
+pkg/cl/decl.c
+pkg/cl/errs.c
+pkg/cl/exec.c
+pkg/cl/gram.c
+pkg/cl/main.c
+pkg/cl/mem.h
+pkg/cl/modes.c
+pkg/cl/opcodes.c
+pkg/cl/opcodes.h
+pkg/cl/operand.c
+pkg/cl/param.c
+pkg/cl/prcache.c
+pkg/cl/scan.c
+pkg/cl/stack.c
+pkg/cl/task.c
+	The CL has long defined the dictionary and stack as arrays of
+	unsigned integer.  This causes problems on a 64 bit machine like
+	the Alpha where integer and pointer are not the same size. 
+	To avoid this problem a new type "memel" was defined in a typedef
+	in config.h.  The CL code was modified as necessary to declare
+	all dictionary and stack storage and references using this new
+	type.  (12/29)
+
+pkg/cl/scan.c
+	The varargs code in this routine failed to compile on the Alpha,
+	which defines va_list as a structure rather than a variable.
+	This caused a (va_list) cast to fail.  After studying this for
+	a while I couldn't find any way to safely and portably use varargs
+	to fake an argument list as an array.  The solution adopted was
+	to just make a normal call to sscanf, putting the variable number
+	of arguments on the argument list in the normal fashion as v[0],
+	v[1], v[2], and so on.  The current implementation imposes a
+	limit of at most 32 arguments for a CL scan operation.  (12/29-30)
+
+unix/as.alpha/ieee.gx
+unix/as.alpha/ieeed.x
+unix/as.alpha/ieeer.x
+	Installed the DEC little-endian versions of the IEEE conversion
+	routines.  (12/29)
+
+mkpkg
+noao/mkpkg
+	Added an entry for the "alpha" architecture.  (12/29)
+
+unix/hlib/mkfloat.csh
+	1. Modified to look for .E files as well as .e files.
+	2. The script was failing because tar -tf would output file names
+	with a trailing space after the filename (surely a bug in OSF1 tar).
+	Had to add a filter to trim the whitespace.
+	3. Modified the script to treat the "generic" architecture specially,
+	avoiding any attempt to restore any binaries etc.  (12/29)
+
+sys/libc/zzdebug.c -> zztest.c
+	Renamed zzdebug.c zztest.c to avoid a name conflict with the zzdebug.x
+	in the same directory.  (12/29)
+
+unix/hlib/libc/stdio.h
+	In struct _iobuf, changed the type declarations from long and int
+	to XLONG and XINT.  (12/29)
+
+unix/hlib/config.h
+	Also set LEN_JUMPBUF here (see above).  (12/29)
+
+dev/hosts
+	Added an entry for "lyra" to the hosts table.  (12/29)
+
+---------------------------
+Completed sysgen.  Core system runs now but a few bugs are evident and remain
+to be tracked down.  (12/29)
+
+dev/pix.imh
+dev/pix.pix
+dev/wpix.imh
+	Replaced these files with the little-endian versions from Ultrix/IRAF.
+	Having unreadable images was a major source of the "system" problems!
+	(12/30)
+
+lib/helpdb.mip
+noao/lib/helpdb.mip
+	The help system would not read these files...  Had to rebuild them
+	to get things to work.  Woops - I forgot to set the byte swap flags
+	in the HSI before building IRAF.  (12/30)
+
+unix/hlib/mach.h
+	Set all the SWAP variables to YES.  Did a sysgen update.  (12/30)
+
+unix/hlib/install
+	Modified the install script for OSF1.  (12/30)
+
+unix/boot/spp/xc.c
+unix/hlib/mkpkg.inc
+	Moved the "-taso" flag into XC.  This is needed to compile all
+	iraf programs on the Alpha, and users shouldn't have to type it
+	when running XC standalone outside of mkpkg.  (12/30)
+
+---------------------------
+Core system is up and running now with no serious bugs evident.
+Built bin.alpha for TABLES package.  The libraries built (all IRAF uses)
+but the compiler core dumped trying to link the executables.  Haven't
+looked into it yet.  Started a sysgen of NOAO.
+
+noao/artdata/t_mk1dspec.x
+	Fixed two cases of MAX called with arguments of different types,
+	in this case the real constants 1. and 0. were being compared to a
+	type double expression.  (12/30)
+
+noao/mtlocal/cyber/pow.inc
+noao/mtlocal/cyber/rrcopy/pow.inc -
+noao/mtlocal/cyber/rrcopy/rcrbits.x
+	The include file pow.inc contained some very small real constants
+	in the E-38 or E-39 range, which caused compile time evaluation errors.
+	The offending values in the table were replaced by the value 0.0.
+	Probably other platforms that don't report this problem have been
+	underflowing to zero when evaluationg the these values.  Deleted
+	the rrcopy of pow.inc and modified the include in rcrbits.x to
+	reference the version in the root directory instead.  (12/30)
+
+	This program is pretty much obsolete and should probably be retired,
+	but it is easier to fix the compile time problems for now.
+
+unix/hlib/mkpkg.sf.OSF1
+	Added cl$ytab.c to the list of special files for OSF1.  This file
+	needs to be compiled with -Olimit 2048 to have enough table space
+	to optimize such a large file.  (12/30)
+
+unix/hlib/fc.csh
+	Modified for OSF1.  The main change required was that the file
+	/usr/lib/cmplrs/fort/for_main.o must be explicitly included on the
+	link line in order to link the Fortran program.  (12/30 1994)
+
+---------------------------
+Merged in latest 2.10.3 revisions from tucana.  (2/16 1995)
+
+dev/tapecap
+	Modified the Ultrix/IRAF tapecap to add support for OSF/1.  Added
+	compressed and uncompressed DAT (TLZ06) unit 0, 1 entries.  These
+	worked on the first try, although I did have to add an ":se" to
+	make appending work after readting to EOT.  (3/01)
+
+unix/as.alpha/ieee.gx
+	I did not actually modify this file for the problem noted below,
+	but wanted to record this oddity of the Alpha architecture.  (3/01)
+
+	The inconsistency seen on the Alpha with the IEEE test files is not
+	due to the NaN values, which are handled correctly, but to the
+	special case negative zero (-0) value included in this test data.
+	For some reason the Alpha fp unit is generating an exception for an
+	operation comparing zero and negative zero.  Other platforms have
+	not had a problem with this (although one wonders what the correct
+	result should be in this case).  It does seem rather an odd problem
+	and it is not clear if it is worth worrying about.  If necessary we
+	can modify our IEEE i/o routines to map such values to positive zero
+	but I don't know if it is worth it, unless we find out that such
+	values can occur in real world data.
+
+---------------------------
+Merged in latest 2.10.4 revisions from tucana.  (4/20 1995)
+
+unix/os/mkpkg.sh
+	Modified the OS boot mkpkg.sh to use as$zshlib.s rather than
+	os$zshlib.c.  The mkpkg special file list was set up to do this, but
+	the wrong version was used when the system was bootstrapped.  (4/21)
+
+unix/hlib/mkpkg.sf.OSF1
+	Modified to compile as$zshlib.s without optimization, the default xc
+	flags produce a warning message when used to compile as$zshlib.s.
+	(4/21)
+
+unix/os/zxwhen.c
+	This code was modified to use signal instead of signal plus sigaction.
+	I was having problems with signals not being caught resulting in 
+	infinite loops.  See the comments in the code.  (5/03)
+
+unix/os/zawset.c
+	Installed new version from tucana.  (5/03)
+
+unix/hlib/libc/kernel.h
+	Modified values of SZ_DEFWORKSET and SZ_MAXWORKSET to 8 Mb and 256 Mb
+	as was done on tucana for ZAWSET above.  (5/03)
+
+unix/hlib/zzsetenv.def
+	Default printer changed to "lp".  (5/03)
+
+unix/os/mkpkg.sh
+	Fixed a couple minor problems found in redoing the bootstrap.
+	1. Changed HSI_LIBS to HSI_OSLIBS for building zalloc.e, which doesn't
+	use the IRAF libraries.
+	2. The "set zsrc = ..." was incorrect for the Bourne shell, changed
+	to BS syntax.  (5/03)
+
+unix/os/zawset.c
+	This routine would not work properly on OSF/1 even though it should
+	according to the docs (behavior should be the same as on other
+	systems).  Any attempt to set RLIMIT_RSS would fail, causing the
+	value 50 to be returned.  Modified the code to merely comment out
+	the setrlimit.  getrlimit still works and the routine will still
+	return an accurate indication of the physical memory available to a
+	process.  Probably this problem with setrlimit() explains why the
+	"limit" command in the cshell doesn't work either.  (5/09)
+
+unix/hlib/spy.cl
+	Updated to use ps -ef instead of px -axu.  (5/23)
+
+sys/fio/fioclean.x
+sys/fio/stropen.x
+	Two new internal routines str{set,get}mode were added to stropen.x.
+	These are used to set or query the file access mode as strored for
+	the string file, which represents these in a file-dependent way.
+	fio_cleanup was modified to force the access mode of a string file
+	to READ_ONLY before closing it during file cleanup, to prevent the
+	writing of the trailing EOS when closing a string file opened for
+	writing.  The latter could cause a segmentation violation if the
+	string buffer was no longer in a mapped region of memory, as is
+	possible if the string file is still open (i.e. not closed normally)
+	following task termination when fio_cleanup is called.  (6/06)
+
+---------------------------
+V2.10.4 release June 07 1995.
+
+unix/hlib/install
+	Changed /etc/mknod to /usr/sbin/mknod.   (6/21)

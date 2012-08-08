@@ -1,0 +1,29 @@
+input,s,a,,,,List of input images
+lines,s,h,"",,,List of lines/columns/apertures
+bands,s,h,"",,,Bands in 3D image
+dispaxis,i,h,)_.dispaxis,,,"Image axis for 2D images"
+nsum,s,h,)_.nsum,,,"Number of lines/columns to sum for 2D images
+"
+region,s,h,,,,Fitting region
+positions,f,h,,,,File of positions/sigmas
+background,s,h,"",,,Default background
+profile,s,h,"gaussian","gaussian|lorentzian|voigt",,Default profile type
+gfwhm,r,h,20.,,,Default Gaussian FWHM
+lfwhm,r,h,20.,,,Default Lorentzian FWHM
+fitbackground,b,h,yes,,,Fit background?
+fitpositions,s,h,"all","fixed|single|all",,Fit positions
+fitgfwhm,s,h,"all","fixed|single|all",,"Fit Gaussian FWHM"
+fitlfwhm,s,h,"all","fixed|single|all",,"Fit Lorentzian FWHM
+"
+nerrsample,i,h,0,0,,"Number of error samples (<10 for no errors)"
+sigma0,r,h,INDEF,,,"Constant gaussian noise term (INDEF for no errors)"
+invgain,r,h,INDEF,,,"Inverse gain term (INDEF for no errors)
+"
+components,s,h,"",,,Components to output
+verbose,b,h,yes,,,Standard output?
+logfile,f,h,"logfile",,,Logfile output
+plotfile,f,h,"",,,Plotfile output
+output,s,h,"",,,Image output (list)
+option,s,h,"fit","fit|difference",,Image output option
+clobber,b,h,no,,,Modify output images?
+merge,b,h,no,,,Merge with existing output images?

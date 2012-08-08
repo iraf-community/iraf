@@ -1,0 +1,107 @@
+.help tbselect Aug91 noao.digiphot.ptools
+.ih
+NAME
+tbselect -- create a new APPHOT/DAOPHOT table database from selected rows
+of an old APPHOT/DAOPHOT table database
+.ih
+USAGE
+tbselect intable outtable expr
+.ih
+PARAMETERS
+.ls intable 
+The list of APPHOT/DAOPHOT STSDAS table databases from which rows are
+copied.
+.le
+.ls outtable 
+The list of output APPHOT/DAOPHOT table databases to contain the copied rows.
+The number of output tables must equal the number of input tables.
+.le
+.ls expr
+The boolean expression which determines which rows are copied to the new
+table. \fIExpr\fR is evaluated once for each input row of data.
+If \fIexpr\fR is "yes" a copy is made of the old input table.
+.le
+.ih
+DESCRIPTION
+TSELECT creates a new APPHOT/DAOPHOT table database containing a subset of
+the rows in the old table database.
+The rows are selected on the basis of an input boolean expression whose
+variables are table column names.
+If after substituting the values associated
+with a particular row into the column name variables the expression evaluates
+to yes, that row is included in the output table.
+
+The supported
+operators and functions are briefly described below. A detailed description
+of the boolean expression evaluator and its syntax can be found
+in the manual page for the IMAGES package HEDIT task.
+
+The following logical operators can be used in the expression. 
+
+.nf
+	equal		  ==	not equal		!=
+	less than	  <	less than or equal	<=
+	greater than	  >	greater than or equal	>=
+	or		  ||	and			&&
+	negation	  !	pattern match		?=
+	concatenation	  //
+.fi
+
+The pattern match character ?=  takes a
+string expression as its first argument and a pattern as its second argument.
+The result is yes if the pattern is contained in the string expression.
+Patterns are strings which may contain pattern matching meta-characters.
+The meta-characters themselves can be matched by preceeding them with the escape
+character.  The meta-characters are listed below. 
+
+.nf
+	beginning of string	^	end of string		$
+	one character		?	zero or more characters	*
+	white space		#	escape character	\
+	ignore case		{	end ignore case		}
+	begin character class	[	end character class	]
+	not, in char class	^	range, in char class	-
+.fi
+
+The expression may also include arithmetic operators and functions.
+The following arithmetic operators and functions are supported.
+
+.nf
+addition		+		subtraction		-
+multiplication		*		division		/
+negation		-		exponentiation		**
+absolute value		abs(x)		cosine			cos(x)
+sine			sin(x)		tangent			tan(x)
+arc cosine		acos(x)		arc sine		asin(x)
+arc tangent		atan(x)		arc tangent		atan2(x,y)
+exponential		exp(x)		square root		sqrt(x)
+natural log		log(x)		common log		log10(x)
+minimum			min(x,y)	maximum			max(x,y)
+convert to integer	int(x)		convert to real		real(x)
+nearest integer		nint(x)		modulo			mod(x)
+.fi
+.ih
+EXAMPLES
+
+1. Extract all stars brighter than twentieth magnitude from an
+the output of the DAOPHOT ALLSTAR task and create a new database.
+
+.nf
+   pt> tbselect m92.al.1 m92out "MAG <= 20.0"
+.fi
+
+2. Create a new database from the output of the DAOPHOT NSTAR task by
+removing all INDEF valued magnitudes.
+
+.nf
+    pt> tbselect  n2264b.nst.1 n2264out  "MAG != INDEF"
+
+.fi
+.ih
+BUGS
+Column names must be set off from operators by blanks in the expression so
+that they can be correctly parsed by the expression evaluator.
+.ih
+SEE ALSO
+ptools.txselect,tables.tselect,ptools.tbselect
+.endhelp

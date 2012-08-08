@@ -1,0 +1,200 @@
+.help commands Apr87 language
+.ih
+NAME
+commands -- the CL command syntax
+.ih
+SYNTAX
+In \fIcommand\fR mode (normal interactive commands):
+
+	taskname arg1 ... argN par=val ... par=val redir
+
+In \fIcompute\fR mode (algebraic mode, for expressions and procedures)
+
+	taskname (arg1, ... argN, par=val, ... par=val, redir)
+.ih
+ELEMENTS
+.ls taskname
+The name of the task to be executed.
+.le
+.ls argN
+The positional arguments to the task.  An argument may be any expression;
+in command mode, a parameter name must be enclosed in parenthesis to avoid
+interpretation as a string constant (e.g., filename).
+.le
+.ls param=value
+Keyword equals value assignment.  The value of the parameter named on the
+left is set equal to the value of the expression on the right.
+Keyword equals value assignments must follow any positional arguments.
+To save typing, boolean (yes/no) parameters may be set with a trailing
++ or -, e.g., "verbose+" is the same as "verbose=yes".
+.le
+.ls redir
+A file redirection argument, e.g.:
+
+.ks
+.nf
+> file		spool output in a file
+< file		read input from a file (rather than the terminal)
+>> file		append the output to a file
+>& file		spool both error and regular output in a file
+>>& file	append both error and regular output to a file
+>[GIP]		redirect graphics output to a file, e.g, >G file
+>>[GIP]		append graphics output to a file, e.g, >>G file
+.fi
+.ke
+.le
+.ih
+DESCRIPTION
+A CL command is an invocation of a predefined CL task.
+A task may be one of the numerous builtin functions
+(e.g. time, lparam, ehistory),
+a task defined in a package supplied to the user automatically,
+(e.g., the \fIdirectory\fR task in the \fIsystem\fR package),
+or a task the user has defined himself, using the \fItask\fR directive.
+
+The entire argument list of a command, including file redirection arguments
+may be enclosed in parentheses.  This forces all arguments to be evaluated
+in compute mode.  In command mode arguments are delimited by spaces and
+most characters may be included in strings without need to quote the strings.
+In compute mode arguments are delimited by commas, all strings must be
+quoted, and all CL arithmetic and other operators are recognized.
+Command mode is the default everywhere, except within parenthesis, on the
+right hand side of a "= expr" (inspect statement), or within procedures.
+The sequence #{ <statements> #} may be used to force interpretation of a
+series of statements in compute mode.
+
+
+1. \fBArguments\fR
+
+    The task name may be followed by any number of positional arguments
+and/or keyword=value type arguments, switches, or i/o redirection arguments.
+The positional arguments must come first.  Arguments are most commonly simple
+numeric or string constants, but general expressions are allowed.
+Some examples of arguments follow.
+
+.ks
+.nf
+	"quoted string"
+	(cos(.5)**2 + sin(.5)**2)
+	"work" // 02
+	k + 2			# valid only in compute mode
+	i+3			# valid in both modes
+	(i+3)			# same answer in both modes
+.fi
+.ke
+
+Within an argument the treatment of unquoted strings depends upon
+the current mode.  In command mode the string is assumed to be
+a string constant, while in compute mode it is taken to be the
+name of a parameter.  For example, in command mode the expression
+
+	i+3
+
+is equivalent to the string "i+3", while in compute mode this would
+evaluate to the sum of the \fIvalue\fR of the parameter "i" plus 3.
+To force evaluation of a string like i+3 as a arithmetic expression,
+enclose it in parenthesis.
+
+Positional arguments are assigned to the parameters of the task to
+be executed.  The position of each task parameter is determined by the
+order of the arguments in the \fIprocedure\fR declaration of a
+procedure script task, or by the order of declaration of the parameters
+in a parameter file for other tasks.
+
+Hidden parameters cannot be assigned values positionally (one must use
+keywork assignment).  It is an error to have more positional arguments
+than there are corresponding parameters in the task, but omitting
+positional arguments is legal.  In compute mode, arguments
+may be skipped using commas to mark the skipped arguments, e.g. a,,b.
+
+Following the positional arguments the user may specify keyword
+arguments.  All parameters of a task, including hidden parameters
+may be assigned to using keyword arguments.  The form of a keyword
+argument is
+
+	param=expr
+
+where \fIparam\fR is the name of the task's parameter, and \fIexpr\fR is
+any legal CL expression.  If the parameter is boolean an alternative syntax
+called the "switch" syntax is available:
+
+.ks
+.nf
+	param+		# same as param=yes
+	param-		# same as param=no
+.fi
+.ke
+
+A given parameter may only be assigned to once in a command line.
+
+
+2. \fBI/O Redirection\fR
+
+    Following the argument list the user may specify one or more file
+redirection parameters.  This permits the altering of standard i/o streams
+for this command only.  Note that the file name specified is interpreted
+according to the current mode, i.e.
+
+	> file
+
+sends output to a file with the name "file" in command mode, but uses
+the \fIvalue\fR of the parameter "file" as the filename in compute mode.
+
+The output from one command may also be directed to the input of another
+using pipes.  The syntax is
+
+.ks
+.nf
+	command1 | command2
+    or
+	command1 |& command2
+.fi
+.ke
+
+Here command1 and command2 are full commands, including the taskname
+and all arguments.
+In the first example the standard output of command1 becomes
+the standard input of command2, while in the second the both the
+standard and error output are sent to command2.
+
+Once two commands have been joined by a pipe they function effectively
+as a single command, and the combined command may be joined by
+pipe to further commands.  The resulting "command block" is executed
+as a unit, and may be submitted as a background job by following the
+command block with an "&".
+.ih
+EXAMPLES
+1. Simple positional arguments only (command mode).
+
+	cl> copy file1 file2
+
+2. Simple positional arguments only (compute mode).
+
+	cl> copy ("file1", "file2")
+
+3. One positional argument, i.e., the string "file1,file", and one keyword=value
+type argument.  Note that string need not be quoted even though it contains
+the comma, provided there are no spaces in the string.
+
+	cl> lprint file1,file2 device=versatec
+
+4. Syntax for i/o redirection in compute mode, as in a script.
+
+	type ("*.x", > "spool")
+
+5. The same command in command mode.
+
+	cl> type *.x > spool
+
+6. Use of an arithmetic expression in command mode; the scalar value of the
+expression given as the third positional argument is added to the value
+of every pixel in image "pix1", writing a new image "pix2" as output.
+
+	cl> imarith pix1 + (log(4.2)+10) pix2
+
+Many additional examples may be found in the EXAMPLES section of the
+manual pages throughout the system.
+.ih
+SEE ALSO
+procedure, parameters
+.endhelp

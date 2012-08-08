@@ -1,0 +1,259 @@
+.help inlfit Aug91 noao.digiphot.inlfit
+.ih
+NAME
+inlfit -- The interactive non-linear least squares fitting package
+
+.ih
+SYNOPSIS
+
+The INLFIT package is a set of procedures, callable from any IRAF task,
+for interactively fitting an arbitrary function of n independent variables
+using non-linear least squares techniques.  The calling task
+must supply the function to be fit and its derivatives, initial values for
+various convergence and bad data rejection parameters, the data to be fit,
+and weights for all the data points. The INLFIT package is layered on the
+NLFIT package which does the actual fitting.
+
+.ih
+DESCRIPTION
+
+INLFIT fits an n-dimensional function to a set of data
+points iterating until the reduced chi-squared changes
+by less than \fItolerance\fR percent between successive iterations, or
+until machine precision is reached, or until
+the maximum number
+of iterations \fImaxiter\fR is reached.  If the maximum number
+of iterations is reached before convergence a status flag
+is set.
+
+After computing an initial fit, INLFIT presents the user with a plot of
+the fit and activates the graphics cursor.
+At this point the user may examine and/or interact with the fit by,
+for example, reprogramming the default graph keys,
+editing the default convergence or bad data rejection parameters,
+deleting and undeleting points, 
+altering which parameters in the fitting function are actually to be
+fit and which are to be held constant, and refitting the data.
+
+If \fInreject\fR is greater than zero the RMS of the residuals is computed
+and points whose residuals are less than \fIlow_reject\fR * RMS
+or greater than \fIhigh_reject\fR * RMS value are excluded from the fit.
+Points within
+a distance \fIgrow\fR of a rejected point are also excluded from
+the fit. The function is then refit without the rejected points.
+The rejection algorithm is executed until the number of rejection
+iterations reaches \fInreject\fR or no more points are rejected.
+
+.ih
+CURSOR COMMANDS
+
+The following interactive cursor keystroke commands are available from
+with the INLFIT package.
+.ls ?
+The terminal is cleared and a menu of cursor keystroke and colon commands
+is printed.
+.le
+.ls c
+The id, coordinates of the data point nearest the cursor, along with the
+function value, the fitted value and the residual, are printed on the status
+line.
+.le
+.ls d
+The data point nearest the cursor and not previously deleted is marked with an
+X. It will not be used in further fits until it is undeleted.
+.le
+.ls f
+The function is fit to the data and the fit is graphed using the default
+plot type.
+.le
+.ls g
+Redefine the graph keys "h-l" from their defaults. A prompt is issued for the
+graph key to be redefined. Another prompt is issued for the data to be
+plotted at which point the user must enter the x and y axis data to plot,
+delimited by a comma. The data types are the following (they can be
+abbreviated to up to three characters).
+.nf
+
+    function    Dependent variable or function
+    fit         Fitted value
+    residuals   Residuals (function - fit)
+    ratio       Ratio (function / fit)
+    nonlinear   Nonlinear component
+    identifier  Independent variable named "identifier" (if defined)
+    var n       Independent variable number "n"
+    user n      User defined plot equation "n"  (if defined)
+
+.fi
+The application program can define independent variable names and user plot 
+functions, aside from the standard options provided. If variable names are 
+supplied, the user can reference them by their names. Otherwise they can be 
+always referenced by "var n", where "n" is the variable number (the user has 
+to know the variable order in this case). The ":variables" command will
+list the currently defined variables by name and number.
+The application program may
+define any number of plot equations aside from the defaults provided. In this 
+case the user may reference them by "user n", where "n" is the plot function 
+number (the user must know the equation order in this case). 
+.le
+.ls h, i, j, k, l
+By default each key produces a different graph. The graphs are described by
+the data which is graphed along each axis as defined above. The default graph
+keys,
+which may be redefined by the application program or interactively by using 
+the 'g' key, are the following.
+.nf
+
+        h       function, fit
+        i       function, residuals
+        j       function, ratio
+        k       var 1, function
+        l       user 1, user 2 (default)
+
+.fi
+The initial graph key, if not redefined by the application program is 'h'.
+.le
+.ls o
+Overplot the next fit provided the graph format has not changed.
+.le
+.ls q
+Exit from the interactive curve fitting package.
+.le
+.ls r
+Redraw the current graph.
+.le
+.ls t
+Toggle fit overploting on and off. If this option is on the data
+and fitted values are overplotted. Otherwise only data points are plotted.
+The fitted values are marked using boxes.
+.le
+.ls u
+Undelete the data point nearest the cursor which has been previously deleted.
+This option does not work over points marked as deleted by the application
+program before calling inlfit.
+.le
+.ls w [key]
+Set the graph window or data range along each axis to be graphed.. This is a 
+\fBgtools\fR option which prints the prompt "window:". The available cursor
+keystroke commands are printed with '?' and on-line help is available by
+typing "help gtools".
+.le
+.ls I
+Interrupt the task immediately without saving the current fit.
+.le
+
+Colon commands are used to show or set the values of parameters.
+The application program calling \fBinlfit\fR can add more commands.
+Parameter names can be abbreviated. The following commands are supported. 
+.ls :show [file]
+Show the current values of the fitting parameters high_reject, 
+low_reject, niterate, grow, tol, itmax. The default output device
+is the terminal (STDOUT) and the screen is cleared before the information
+is output. If a file is specified then the information is appended
+to the named file.
+.le
+.ls :variables [file]
+List the currently loaded variables. The number, id, minimum value and maximum
+value of each variable is printed. The default output device is the terminal
+(STDOUT) and the screen is cleared before the information is output.
+If a file is specified then the information is appended to the named file.
+.le
+.ls :data [file]
+List the raw data. The value of each standard catalog and observations
+catalog variable  for each data point is printed. The default output device
+is the terminal (STDOUT) and the screen is cleared before the information
+is output.  If a file is specified then the information is appended to
+the named file.
+.le
+.ls :errors [file]
+Show the error analysis of the current fit.  The number of iterations,
+total number of points,
+the number of rejected and deleted points, the standard deviation,
+the reduced chi, the average error (always = 1.0 if weight=1.0, otherwise
+= 1.0 / <weight>), the average scatter (always 0.0 if no weights scatter term is
+fit),
+the reduce chi, and the rms are printed on the screen. The fitted parameters
+and their errors are also printed. The default output is the terminal
+(STDOUT) and the screen is cleared before the information is
+output. If a file is specified then the information is appended to
+the named file.
+.le
+.ls :results [file]
+List the results of the current fit. The function value, the fitted value,
+the residual, and the weight are printed for each data point. The default
+output device is the terminal (STDOUT) and the screen is cleared before
+the information is output. If a file is specified then the information is
+appended to the named file.
+.le
+.ls :vshow [file]
+A verbose version of ":show" which is equivalent to a ":show" plus a ":errors"
+plus a ":results". The default output device is the terminal (STDOUT)
+and the screen is cleared before the information is output.
+If a file is specified then the information is appended to the named file.
+.le
+.ls :page file
+Page through the named file.
+.le
+.ls :tolerance [value]
+Show or set the value of the fitting tolerance. Tolerance is the maximum
+fraction by which the reduced chi-squared can change from one iteration to the
+next for the fit to meet the convergence criteria.
+.le
+.ls :maxiter [value]
+Show or set the maximum number of fitting iterations.
+.le
+.ls :nreject [value]
+Show or set the maximum number of rejection iterations. A value of zero
+means that automatic bad data rejection is turned off. 
+.le
+.ls :low_reject [value], :high_reject [value]
+Show or set the values of the bad data rejection limits.
+If both low_reject and high_reject are zero then automatic bad data
+rejection is turned off.
+If either of the high or low rejection limits are greater than zero,
+and nreject is greater than zero, the rms of the initial fit is computed.
+Points with residuals
+more than low_reject * rms below zero and high_reject * rms above zero
+are removed before the final fit. Rejected points are marked on the 
+graphs with diamonds. 
+.le
+.ls :grow [value]
+Show or set the value of the rejection growing radius. Any points
+within this distance of a rejected point are also rejected. 
+.le
+.ls :fit [parameter] [value]
+Set the starting guess value for the named coefficient and allow the 
+parameter value to change (converge) during the fit.
+If the value is not specified inlfit will use the last starting guess.
+.le
+.ls :const [parameter] [value]
+Set the named parameter to be a constant with the specified value, i.e,
+its value won't change during the fit.
+If the value is not specified inlfit will use its last starting value.
+.le
+.ls :/help
+Print help for the graph formatting options.
+.le
+.ls :.help
+Print help for the general IRAF graphics options.
+.le
+
+.ih
+ALGORITHMS
+
+INLFIT uses the standard Levenberg-Marquardt non-linear least squares
+algorithm to fit the data. Detailed descriptions of the algorithm can
+be found in the following two references.
+.nf
+
+1. Bevington, P.R., 1969, Data Reduction and Error Analysis for the
+   Physical Sciences, Chapter 11, page 235.
+
+2. Press, W.H. et al., 1986, Numerical Recipes: The Art of Scientific
+   Computing, Chapter 14, page 523.
+
+.fi
+
+.ih
+SEE ALSO
+gtools
+.endhelp

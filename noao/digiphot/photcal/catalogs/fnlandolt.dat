@@ -1,0 +1,17 @@
+#  Declare the new Landolt UBVRI standards catalog variables
+
+catalog
+
+V	4		# the V magnitude
+BV	5		# the (B-V) color
+UB	6               # the (U-B) color
+VR	7		# the (V-R) color
+RI	8		# the (R-I) color
+VI	9		# the (V-I) color
+
+error(V)  12		# the V magnitude error
+error(BV) 13		# the (B-V) color error
+error(UB) 14		# the (U-B) color error
+error(VR) 15		# the (V-R) color error
+error(RI) 16		# the (R-I) color error
+error(VI) 17		# the (V-I) color error

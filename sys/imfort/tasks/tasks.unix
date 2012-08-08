@@ -1,0 +1,18 @@
+# Declare the IMFORT test/demo tasks as CL foreign tasks [MACHDEP].
+# Usage: uncomment the appropriate declarations, and type `cl < tasks.cl'.
+# NOTE - requires that "iraf" be defined in the host environment. 
+
+task $args = "$${iraf}sys/imfort/tasks/args.e $1 $2 $3 $4 $5"
+task $hello = "$${iraf}sys/imfort/tasks/hello.e"
+task $imcopy = "$${iraf}sys/imfort/tasks/imcopy.e $(*)"
+task $imdel = "$${iraf}sys/imfort/tasks/imdel.e $(*)"
+task $imren = "$${iraf}sys/imfort/tasks/imren.e $(*)"
+task $keyw = "$${iraf}sys/imfort/tasks/keyw.e"
+task $minmax = "$${iraf}sys/imfort/tasks/minmax.e $(*)"
+task $mkim = "$${iraf}sys/imfort/tasks/mkim.e $(1) $2 $3 $4 $(5)"
+task $pcube = "$${iraf}sys/imfort/tasks/pcube.e $(1) $2 $3 $4 $5 $6 $7"
+task $phead = "$${iraf}sys/imfort/tasks/phead.e $(1) $2"
+task $planck = "$${iraf}sys/imfort/tasks/planck.e"
+task $readim = "$${iraf}sys/imfort/tasks/readim.e $(*)"
+
+keep

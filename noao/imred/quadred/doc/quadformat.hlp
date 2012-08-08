@@ -1,0 +1,392 @@
+.help quadformat Aug01 imred.quadred
+.ih
+NAME
+quadformat - Description of the special multi-amplifier CCD format
+.ih
+DESCRIPTION
+CCDs may be readout from multiple amplifiers at the same time to increase
+the readout speed.  This produces multiple images of rectangular regions in
+the full CCD exposure.  The amplifier readout images may be recorded in
+various ways.  One way is as extensions in a multiextension FITS file.
+This type of format can be reduced using the MSCRED package.
+
+Another way is to paste the regions into a single two-dimensional image.
+This, along with specific keywords to describe the locations of the
+regions, constitutes the \fIquadformat\fR format described here and used by the
+QUADRED package.  The term "quad" originates from the possibility of using
+four amplifiers in quadrants but the format also includes any other
+number of amplifiers.
+
+It is important to realize that this is a special format only as long as
+the overscan or prescan data is included in the image data.  Once this
+information is used and removed as part of the processing the resulting
+image can be treated in the same way as a single amplifier CCD image.
+However, the image can still contain the format keywords allowing the
+regions from the different amplifiers to be identified and extracted as
+needed.
+
+The \fIquadformat\fR consists of a single 2D image for a single CCD
+exposure.  The image storage format may be any standard image type such
+as imh or fits.  Within the image are regions containing the CCD
+pixel data and regions containing overscan or prescan, which we will
+call bias regions, for each amplifier.  The \fIquadformat\fR requires
+the bias regions to be attached to the CCD regions such that a single
+rectangular region contains both.
+
+Generally the rectangular regions are of equal size in order to sequence
+the amplifiers simultaneously.  However, it is possible for the regions
+to be unequal in cases of subregion readouts with certain CCD controllers.
+The figure below illustrates a "dual" and "quad" readout with equal
+size regions.
+
+.nf
+        +-----+-+-+-----+   +-----+-+-+-----+   +----------+-+
+        |  D  !B|B!  D  |   |  D  !B|B!  D  |   |     D    !B|
+        |  3  !3|4!  4  |   |  1  !1|2!  2  |   |     2    !2|
+        |     ! | !     |   |     ! | !     |   |          ! |
+        +-----+-+-+-----+   |     ! | !     |   +----------+-+
+        |  D  !B|B!  D  |   |     ! | !     |   |     D    !B|
+        |  1  !1|2!  2  |   |     ! | !     |   |     1    !1|
+        |     ! | !     |   |     ! | !     |   |          ! |
+        +-----+-+-+-----+   +-----+-+-+-----+   +----------+-+
+.fi
+
+The areas labeled D are the data sections and those labeled B are the
+bias sections.  The data and biases are match by the amplifier labels
+which are 1-4 in these examples.  The combination of the data and
+bias sections are called the amplifier sections.
+
+The regions are identified in the header by various keywords.  There is
+a header translation facility which allows for alternative keyword names.
+Below we describe the default keyword names in the absence of a translation.
+The number of regions and the amplifier labels are described by the
+string keyword AMPLIST.  The value is a string of space separated
+amplifier labels.  For the above four amplifier example it would be
+
+.nf
+    AMPLIST = '1 2 3 4'
+.fi
+
+For CTIO data the labels are '11  12 21 22'.   Note that the labels
+are appended to rootnames so they should be relatively short. 
+
+The amplifier labels are appended to various root names.  The important
+ones define "section" keywords.  The values are image sections that
+describe regions in an raster such as the image or the CCD.  The format
+of a section follows the standard IRAF notation "[c1:c2,l1:l2]" where
+c1 and c2 are inclusive column endpoints and l1 and l2 are inclusive
+line endpoints.
+
+The various sections are defined below.  The labels again show the default
+untranslated keyword roots.
+
+.ls ASEC
+The section of the image containing the amplifier readout.  This is the
+combination of the data and bias regions as shown in the figures.
+.le
+.ls DSEC
+The section of the image containing the actual CCD data exclusive of
+bias data.  In the figures these are the D regions.
+.le
+.ls BSEC
+The section of the image containing the bias data.  In the figures these
+are the B regions.
+.le
+.ls TSEC
+The second of the image containing the useful CCD data.  This defines
+a "trimming" area and lies within the data section.  It may also be
+the same as the data region.  During trimming the final image will only
+include the regions in the trim sections.  Note that it generally does
+not make sense to trim between amplifier regions but does make sense to
+trim regions at the edges of the CCD.
+.le
+.ls CSEC
+The section of the CCD corresponding to the data section in the image.
+The CCD is considered an ideal raster (without bias regions) and a
+section corresponds to the pixels in the CCD.  The CCD section must be
+the same size as the data section.  It is the CCD sections that define
+how the amplifiers will be pieced together to form a single image
+after trimming the bias region.
+.le
+
+There may be other keyword root names for things such as gains which
+have the amplifier labels appended.  However, none of these are used
+by the current software.  Example image headers are given
+in the EXAMPLES section.
+
+There is a limitation in the current software that the regions be recorded
+without horizontal or vertical flips.  In other words, where amplifiers
+from opposite corners are used some of them must be flipped by the
+data acquisition system before recording then in this \fBquadformat\fR.
+
+.ih
+EXAMPLES
+
+1.  The following is an example of a full 2048x2048 CCD readout with
+four amplifiers at CTIO.
+
+.nf
+qu> imhad quad0020
+quad0020[2196,2048][ushort]: IC 1257 5290 180s
+No bad pixels, min=435., max=61973.
+Line storage mode, physdim [2304,2048], length of user area 3079 s.u.
+Created Thu 08:35:57 23-Aug-2001, Last modified Thu 08:35:57 23-Aug-2001
+Pixel file "HDR$pixels/quad0020.pix" [ok]
+'KPNO-IRAF'           /
+'06-07-99'            /
+IRAF-MAX=           6.197300E4  /  DATA MAX
+IRAF-MIN=           4.350000E2  /  DATA MIN
+IRAF-BPX=                   16  /  DATA BITS/PIXEL
+IRAFTYPE= 'USHORT  '            /  PIXEL TYPE
+OPICNUM =                  123 / Original picture number
+HDR_REV = '2.000  13Feb96     (add mode and group to hdrs)' /
+IMAGETYP= 'OBJECT  '           / Type of picture (object, dark, etc.)
+DETECTOR= 'Site2K_6'           / Detector (CCD type, photon counter, etc.)
+PREFLASH=             0.000000 / Preflash time in secs
+CCDSUM  = '1 1     '           / On chip summation (X,Y)
+DATE-OBS= '07/07/99'           / Date (dd/mm/yy) of observation
+UTSHUT  = '01:14:40.0'         / UT of shutter open
+UT      = ' 1:14:41.50'         /  UT of TCS coords
+OBSERVAT= 'CTIO    '           / Origin of data
+TELESCOP= 'CTIO 1.5 meter telescope' / Specific system
+NAMPSYX = '2 2     '           / Num amps in y & x (eg. '2 2'=quad)
+AMPLIST = '11 21 12 22'        / Readout order in y,x
+ASEC11  = '[1:1098,1:1024]'    / Section read with Amp11
+CSEC11  = '[1:1034,1:1024]'    / Section in full CCD for DSEC11
+DSEC11  = '[1:1034,1:1024]'    / Image area in raw frame for Amp11
+TSEC11  = '[11:1034,1:1024]'   / Trim section definition for Amp11
+BSEC11  = '[1045:1098,1:1024]' / Bias section definition for Amp11
+BSEC12  = '[1099:1152,1:1024]' / Bias section definition for Amp12
+ASEC12  = '[1099:2196,1:1024]' / Section read with Amp12
+CSEC12  = '[1035:2068,1:1024]' / Section in full CCD for DSEC12
+DSEC12  = '[1163:2196,1:1024]' / Image area in raw frame for Amp12
+TSEC12  = '[1163:2186,1:1024]' / Trim section definition for Amp12
+ASEC21  = '[1:1098,1025:2048]' / Section read with Amp21
+CSEC21  = '[1:1034,1025:2048]' / Section in full CCD for DSEC21
+DSEC21  = '[1:1034,1025:2048]' / Image area in raw frame for Amp21
+TSEC21  = '[11:1034,1025:2048]' / Trim section definition for Amp21
+BSEC21  = '[1045:1098,1025:2048]' / Bias section definition for Amp21
+BSEC22  = '[1099:1152,1025:2048]' / Bias section definition for Amp22
+ASEC22  = '[1099:2196,1025:2048]' / Section read with Amp22
+CSEC22  = '[1035:2068,1025:2048]' / Section in full CCD for DSEC22
+DSEC22  = '[1163:2196,1025:2048]' / Image area in raw frame for Amp22
+TSEC22  = '[1163:2186,1025:2048]' / Trim section definition for Amp22
+WAVEFILE= 'Obs Tue Jul  6 20:11:59 1999' /
+NOTE    = 'WARNING: Lower amps reaching full well before ADCs saturate' /
+WAVEMODE= 'MPP OverlapXmit EarlyReset' / Waveform mode switches on
+GTRON22 =                4.100 / (e-) predicted read noise, upper right
+GTRON21 =                3.900 / (e-) predicted read noise, upper left
+GTRON12 =                4.200 / (e-) predicted read noise, lower right
+GTRON11 =                4.200 / (e-) predicted read noise, lower left
+GTGAIN22=                2.800 / (e-/ADU), predicted gain, upper right
+GTGAIN21=                3.100 / (e-/ADU) predicted gain, upper left
+GTGAIN12=                2.900 / (e-/ADU) predicted gain, lower right
+GTGAIN11=                3.200 / (e-/ADU) predicted gain, lower left
+GTINDEX =                    2 / Gain selection (index into Gain Table)
+PIXELT  =                29520 / (ns) unbinned pixel read time
+DCS_TIME=                 7000 / (ns) Double Correlated Sample time
+RA      = '17:27:10.82'         /  right ascension (telescope)
+DEC     = '-7:06:35.40'         /  declination (telescope)
+EPOCH   =               2000.0 / epoch of RA & DEC
+ZD      =                 35.9 / zenith distance (degrees)
+HA      = '-01:57:23.7'        / hour angle (H:M:S)
+ST      = '15:29:46.00'         /  sidereal time
+AIRMASS =                1.234 / airmass
+EXPTIME =              180.000 / Exposure time in secs
+DARKTIME=              181.309 / Total elapsed time in secs
+OBSERVER= 'Jacoby'             / Observers
+PROPID  = '92'                 / Proposal Id
+COMMENT Globular PNe
+TELID   = 'ct60'               / CTIO 1.5-m Telescope
+ARCONVER= '17Oct97ver7_22'     / Arcon software version
+COMMENT INSTRUMENT PARAMETERS
+INSTRUME= 'cfccd'              / cassegrain direct imager
+FILTER1 = 'dia'                / Filter in wheel one
+FNAME1  = 'diaphragm'          / Full name of filter in  wheel1
+FILTER2 = 'ocon'               / Filter in wheel two
+FNAME2  = 'O cont'             / Full name of filter in  wheel2
+FILTERS = 'dia ocon'           / Filter positions
+TELFOCUS=                57550 / Telescope focus
+XPIXSIZE=                0.432 / Pixel size in X (arcsec/pix)
+YPIXSIZE=                0.432 / Pixel size in Y (arcsec/pix)
+RECID   = 'ct60.990707.011817' / NOAO Archive record ID
+.fi
+
+2.  The following is a more complex readout of a region where the
+full 2Kx2K CCD is not readout and where even the regions are not the
+same size.
+
+.nf
+qu> imhead quad0013
+quad0013[1686,1538][ushort]: R sky flat 7s
+No bad pixels, min=393., max=65535.
+Line storage mode, physdim [1792,1538], length of user area 3079 s.u.
+Created Thu 08:34:00 23-Aug-2001, Last modified Thu 08:34:00 23-Aug-2001
+Pixel file "HDR$pixels/quad0013.pix" [ok]
+'KPNO-IRAF'           /
+'06-07-99'            /
+IRAF-MAX=           6.553500E4  /  DATA MAX
+IRAF-MIN=           3.930000E2  /  DATA MIN
+IRAF-BPX=                   16  /  DATA BITS/PIXEL
+IRAFTYPE= 'USHORT  '            /  PIXEL TYPE
+OPICNUM =                   15 / Original picture number
+HDR_REV = '2.000  13Feb96     (add mode and group to hdrs)' /
+IMAGETYP= 'SKY FLAT'           / Type of picture (object, dark, etc.)
+DETECTOR= 'Site2K_6'           / Detector (CCD type, photon counter, etc.)
+PREFLASH=             0.000000 / Preflash time in secs
+CCDSUM  = '1 1     '           / On chip summation (X,Y)
+DATE-OBS= '06/07/99'           / Date (dd/mm/yy) of observation
+UTSHUT  = '22:25:22.0'         / UT of shutter open
+UT      = '22:25:34.00'         /  UT of TCS coords
+OBSERVAT= 'CTIO    '           / Origin of data
+TELESCOP= 'CTIO 1.5 meter telescope' / Specific system
+NAMPSYX = '2 2     '           / Num amps in y & x (eg. '2 2'=quad)
+AMPLIST = '11 21 12 22'        / Readout order in y,x
+ASEC11  = '[1:843,1:769]'      / Section read with Amp11
+CSEC11  = '[256:1034,256:1024]' / Section in full CCD for DSEC11
+DSEC11  = '[1:779,1:769]'      / Image area in raw frame for Amp11
+TSEC11  = '[11:779,1:769]'     / Trim section definition for Amp11
+BSEC11  = '[790:843,1:769]'    / Bias section definition for Amp11
+BSEC12  = '[844:897,1:769]'    / Bias section definition for Amp12
+ASEC12  = '[844:1686,1:769]'   / Section read with Amp12
+CSEC12  = '[1035:1813,256:1024]' / Section in full CCD for DSEC12
+DSEC12  = '[908:1686,1:769]'   / Image area in raw frame for Amp12
+TSEC12  = '[908:1418,1:769]'   / Trim section definition for Amp12
+ASEC21  = '[1:843,770:1538]'   / Section read with Amp21
+CSEC21  = '[256:1034,1025:1793]' / Section in full CCD for DSEC21
+DSEC21  = '[1:779,770:1538]'   / Image area in raw frame for Amp21
+TSEC21  = '[11:779,770:1280]'  / Trim section definition for Amp21
+BSEC21  = '[790:843,770:1538]' / Bias section definition for Amp21
+BSEC22  = '[844:897,770:1538]' / Bias section definition for Amp22
+ASEC22  = '[844:1686,770:1538]' / Section read with Amp22
+CSEC22  = '[1035:1813,1025:1793]' / Section in full CCD for DSEC22
+DSEC22  = '[908:1686,770:1538]' / Image area in raw frame for Amp22
+TSEC22  = '[908:1418,770:1280]' / Trim section definition for Amp22
+WAVEFILE= 'Obs Tue Jul  6 18:07:56 1999' /
+NOTE    = 'WARNING: Lower amps reaching full well before ADCs saturate' /
+WAVEMODE= 'MPP OverlapXmit EarlyReset' / Waveform mode switches on
+GTRON22 =                4.100 / (e-) predicted read noise, upper right
+GTRON21 =                3.900 / (e-) predicted read noise, upper left
+GTRON12 =                4.200 / (e-) predicted read noise, lower right
+GTRON11 =                4.200 / (e-) predicted read noise, lower left
+GTGAIN22=                2.800 / (e-/ADU), predicted gain, upper right
+GTGAIN21=                3.100 / (e-/ADU) predicted gain, upper left
+GTGAIN12=                2.900 / (e-/ADU) predicted gain, lower right
+GTGAIN11=                3.200 / (e-/ADU) predicted gain, lower left
+GTINDEX =                    2 / Gain selection (index into Gain Table)
+PIXELT  =                29520 / (ns) unbinned pixel read time
+DCS_TIME=                 7000 / (ns) Double Correlated Sample time
+RA      = '14:53:52.67'         /  right ascension (telescope)
+DEC     = '-19:20:10.70'        /  declination (telescope)
+EPOCH   =               2000.0 / epoch of RA & DEC
+ZD      =                 32.1 / zenith distance (degrees)
+HA      = '-02:13:40.3'        / hour angle (H:M:S)
+ST      = '12:40:10.80'         /  sidereal time
+AIRMASS =                1.180 / airmass
+EXPTIME =                7.000 / Exposure time in secs
+DARKTIME=                8.239 / Total elapsed time in secs
+OBSERVER= 'Jacoby'             / Observers
+PROPID  = '92'                 / Proposal Id
+COMMENT
+TELID   = 'ct60'               / CTIO 1.5-m Telescope
+ARCONVER= '17Oct97ver7_22'     / Arcon software version
+COMMENT INSTRUMENT PARAMETERS
+INSTRUME= 'cfccd'              / cassegrain direct imager
+FILTER1 = 'dia'                / Filter in wheel one
+FNAME1  = 'diaphragm'          / Full name of filter in  wheel1
+FILTER2 = 'r'                  / Filter in wheel two
+FNAME2  = 'R'                  / Full name of filter in  wheel2
+FILTERS = 'dia r'              / Filter positions
+TELFOCUS=                    0 / Telescope focus
+XPIXSIZE=                0.432 / Pixel size in X (arcsec/pix)
+YPIXSIZE=                0.432 / Pixel size in Y (arcsec/pix)
+RECID   = 'ct60.990706.222551' / NOAO Archive record ID
+.fi
+
+3.  The following is for the raw image of example 2 after it has been
+processed by CCDPROC.  Note that the various bias, trim, and CCD sections are
+removed.  The AMPLIST and ASEC keywords remain and may be used to split
+or evaluate the individual amplifier regions with tasks such as QUADSECTIONS,
+QUADSPLIT, and QSTATISTICS.
+
+.nf
+qu> imhead quad0013
+quad0013[1280,1280][real]: R sky flat 7s
+No bad pixels, min=unknown, max=unknown
+Line storage mode, physdim [1280,1280], length of user area 2795 s.u.
+Created Fri 13:29:40 24-Aug-2001, Last modified Fri 13:29:40 24-Aug-2001
+Pixel file "HDR$pixels/quad0013.pix" [ok]
+'KPNO-IRAF'           /
+'06-07-99'            /
+New copy of quad0013
+IRAF-MAX=           6.553500E4  /  DATA MAX
+IRAF-MIN=           3.930000E2  /  DATA MIN
+IRAF-BPX=                   16  /  DATA BITS/PIXEL
+IRAFTYPE= 'USHORT  '            /  PIXEL TYPE
+OPICNUM =                   15 / Original picture number
+HDR_REV = '2.000  13Feb96     (add mode and group to hdrs)' /
+IMAGETYP= 'SKY FLAT'           / Type of picture (object, dark, etc.)
+DETECTOR= 'Site2K_6'           / Detector (CCD type, photon counter, etc.)
+PREFLASH=             0.000000 / Preflash time in secs
+CCDSUM  = '1 1     '           / On chip summation (X,Y)
+DATE-OBS= '06/07/99'           / Date (dd/mm/yy) of observation
+UTSHUT  = '22:25:22.0'         / UT of shutter open
+UT      = '22:25:34.00'         /  UT of TCS coords
+OBSERVAT= 'CTIO    '           / Origin of data
+TELESCOP= 'CTIO 1.5 meter telescope' / Specific system
+NAMPSYX = '2 2     '           / Num amps in y & x (eg. '2 2'=quad)
+AMPLIST = '11 21 12 22'        / Readout order in y,x
+ASEC11  = '[1:769,1:769]'      / Section read with Amp11
+ASEC12  = '[770:1280,1:769]'   / Section read with Amp12
+ASEC21  = '[1:769,770:1280]'   / Section read with Amp21
+ASEC22  = '[770:1280,770:1280]' / Section read with Amp22
+WAVEFILE= 'Obs Tue Jul  6 18:07:56 1999' /
+NOTE    = 'WARNING: Lower amps reaching full well before ADCs saturate' /
+WAVEMODE= 'MPP OverlapXmit EarlyReset' / Waveform mode switches on
+GTRON22 =                4.100 / (e-) predicted read noise, upper right
+GTRON21 =                3.900 / (e-) predicted read noise, upper left
+GTRON12 =                4.200 / (e-) predicted read noise, lower right
+GTRON11 =                4.200 / (e-) predicted read noise, lower left
+GTGAIN22=                2.800 / (e-/ADU), predicted gain, upper right
+GTGAIN21=                3.100 / (e-/ADU) predicted gain, upper left
+GTGAIN12=                2.900 / (e-/ADU) predicted gain, lower right
+GTGAIN11=                3.200 / (e-/ADU) predicted gain, lower left
+GTINDEX =                    2 / Gain selection (index into Gain Table)
+PIXELT  =                29520 / (ns) unbinned pixel read time
+DCS_TIME=                 7000 / (ns) Double Correlated Sample time
+RA      = '14:53:52.67'         /  right ascension (telescope)
+DEC     = '-19:20:10.70'        /  declination (telescope)
+EPOCH   =               2000.0 / epoch of RA & DEC
+ZD      =                 32.1 / zenith distance (degrees)
+HA      = '-02:13:40.3'        / hour angle (H:M:S)
+ST      = '12:40:10.80'         /  sidereal time
+AIRMASS =                1.180 / airmass
+EXPTIME =                7.000 / Exposure time in secs
+DARKTIME=                8.239 / Total elapsed time in secs
+OBSERVER= 'Jacoby'             / Observers
+PROPID  = '92'                 / Proposal Id
+COMMENT
+TELID   = 'ct60'               / CTIO 1.5-m Telescope
+ARCONVER= '17Oct97ver7_22'     / Arcon software version
+COMMENT INSTRUMENT PARAMETERS
+INSTRUME= 'cfccd'              / cassegrain direct imager
+FILTER1 = 'dia'                / Filter in wheel one
+FNAME1  = 'diaphragm'          / Full name of filter in  wheel1
+FILTER2 = 'r'                  / Filter in wheel two
+FNAME2  = 'R'                  / Full name of filter in  wheel2
+FILTERS = 'dia r'              / Filter positions
+TELFOCUS=                    0 / Telescope focus
+XPIXSIZE=                0.432 / Pixel size in X (arcsec/pix)
+YPIXSIZE=                0.432 / Pixel size in Y (arcsec/pix)
+RECID   = 'ct60.990706.222551' / NOAO Archive record ID
+TRIM    = 'Aug 24 13:29 Trim multiple overscan sections'
+OVERSCAN= 'Aug 24 13:29 Overscan is [790:843,1:769] with mean=714.3438'
+OVRSCN2 = 'Aug 24 13:29 Overscan is [790:843,770:1538] with mean=554.01'
+OVRSCN3 = 'Aug 24 13:29 Overscan is [844:897,1:769] with mean=519.7755'
+OVRSCN4 = 'Aug 24 13:29 Overscan is [844:897,770:1538] with mean=531.69'
+CCDSEC  = '[266:1545,256:1535]'
+CCDMEAN =             9727.605
+CCDMEANT=            683126983
+CCDPROC = 'Aug 24 13:29 CCD processing done'
+.fi
+.endhelp

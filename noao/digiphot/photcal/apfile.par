@@ -1,0 +1,25 @@
+# Parameter file for APFILE
+
+photfiles,f,a,,,,The list of input text files
+incolumns,s,a,"",,,The format of the input text files
+naperts,i,a,,,,The number of apertures to extract from the input text files
+apercors,f,a,"",,,The output aperture corrections file 
+smallap,i,h,1,1,,The index of the smallest aperture
+largeap,i,h,0,1,,The index of the largest aperture
+magfile,f,h,"",,,The optional output best magnitudes file
+logfile,f,h,"",,,The optional output log file
+plotfile,f,h,"",,,The optional output plot file
+append,b,h,no,,,"Open the log and plot files in append mode ?"
+obsparams,f,h,"",,,The optional input observing parameters file
+obscolumns,s,h,"2 3 4 5",,,The format of the input airmass file
+maglim,s,h,0.10,,,The maximum permitted magnitude error 
+nparams,i,h,3,1,5,The number of cog model parameters to fit
+swings,r,h,1.2,1.0,,The power law slope of the stellar wings
+pwings,r,h,0.1,0.0,1.0,The fraction of the total power in the stellar wings
+pgauss,r,h,0.5,0.0,1.0,The fraction of the core power in the gaussian core
+rgescale,r,h,0.9,0.0,,"The exponential / gaussian core radial scales"
+xwings,r,h,0.0,,,The extinction coefficicent
+interactive,b,h,yes,,,Do the fit interactively ?
+verify,b,h,no,,,Verify interactive user input ?
+gcommands,*gcur,h,"",,,The graphics cursor
+graphics,s,h,stdgraph,,,The graphics device

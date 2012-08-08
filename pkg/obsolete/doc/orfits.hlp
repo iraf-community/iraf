@@ -1,0 +1,164 @@
+.help orfits Jan90 dataio
+.ih
+NAME
+orfits -- convert FITS data files to IRAF image files
+.ih
+USAGE
+orfits fits_file file_list iraf_file
+.ih
+PARAMETERS
+.ls fits_file
+The FITS data source.  This is either a template describing a list of disk files
+or a tape file
+specification of the form mt*[n], where mt indicates a mag tape device,
+* represents a density, and [n] is the tape file number.
+If the tape file number n is specified then only that file
+is converted.  If the general tape device name is given, i.e. mta, mtb800, etc,
+then the files specified by the file_list parameter will be read from the tape.
+.le
+.ls file_list
+The files to be read from a tape are specified by the file_list string.  The
+string can consist of any sequence of file numbers separated by
+at least one of comma, or dash.
+A dash specifies a range of files.  For example the string
+
+	"1,2,3-5,8-6"
+
+will convert the files 1 through 8.
+.le
+.ls iraf_file
+The IRAF file which will receive the FITS data if the make_image parameter
+switch is set.  Iraf_file can be a template of output image names or
+a root output image name. In the former case one output image name
+must be specified for every input file. In the latter case iraf_file is
+a root output image name to which the input file sequence number or tape
+file number is appended if the number of input files > 1. For example
+reading files 1 and 3 from a FITS tape with a value of iraf_file of "data"
+will produce the files data0001 and data0003, whereas reading the same
+two files with a value of iraf_file of "data1,data2" will produce the files
+data1 and data2.
+.le
+.ls make_image = yes
+This switch determines whether FITS image data is converted to an IRAF image
+file.  This switch is set to no to obtain just header information with the
+long_header or short_header switches.
+.le
+.ls long_header = no
+If this switch is set the full FITS header is printed on the standard output.
+.le
+.ls short_header = yes
+If this switch is set only the output filename,
+the title string, and the image dimensions are printed.
+.le
+.ls datatype
+The IRAF image file may be of a different data type than the FITS image data.
+The data type may be specified as s for short, u for unsigned short,
+i for integer, l for long,
+r for real, and d for double.  The user must beware of truncation problems if an
+inappropriate data type is specified.  If an incorrect data_type or a
+null string is given for this parameter then a default data type is used
+which is the appropriate minimum size for the input pixel values.
+If the bscale and bzero parameters in the FITS header are undefined or equal to 
+1.0 and 0.0 respectively, orfits
+selects datatype s or l depending on bitpix. If bscale and bzero are set to
+other than 1.0 and 0.0, orfits selects datatype r.
+.le
+.ls blank = 0.
+The IRAF image value of a blank pixel.
+.le
+.ls scale = yes
+If scale equals no the integers are read directly off the tape.
+Otherwise ORFITS checks the values of bscale and bzero. If these numbers
+are not 1. and 0. respectively, ORFITS scales the data before output.
+.le
+.ls oldirafname = no
+If the oldirafname switch is set ORFITS will attempt to restore the image to
+disk with the filename defined by the IRAFNAME parameter in the FITS header.
+.le
+.ls offset = 0
+Offset is an integer parameter specifying the offset to the current tape file
+number. For example if offset = 100, iraf_file = "fits" and file_list = "1-3"
+then the output file names will be "fits0101", "fits0102" and "fits0103"
+respectively rather than "fits0001", "fits0002" and "fits0003".
+.le
+.ih
+DESCRIPTION
+FITS data is read from the specified source; either disk or
+magnetic tape.  The FITS header may optionally be printed on the standard
+output as either a full listing or a short description.
+The FITS long blocks option is supported. 
+At present non-standard FITS files (SIMPLE = F) and files containing
+group data are skipped and a warning message is issued.
+A warning message will be issued if the default user area allocated in
+memory is too small
+to hold all the FITS parameter cards being read in by ORFITS.
+Since the default user area is 8000
+characters and a single card image is 81 characters long, the normal
+user area will hold 98 complete card images. ORFITS will not permit
+partial cards to be written. The user can override the default user area
+length by setting the environment variable min_lenuserarea (see example
+below).
+.ih
+EXAMPLES
+1. Convert a set of FITS files on tape to a set of IRAF image files, allowing
+orfits to select the output datatype. Blanks are set to zero.
+
+.nf
+	cl> orfits mtb1600 1-999 images
+.fi
+
+2. Convert a list of FITS files on disk to a set of IRAF images. In the first
+case the files specified by fits* are written to the images images0001,
+images0002, etc. In the second case the fits disk files listed one per
+line in the text file fitslist are written to the output images listed
+one per line in the file imlist.
+
+.nf
+	cl> orfits fits* * images
+
+	cl. orfits @fitslist * @imlist
+.fi
+
+3. List the contents of a FITS tape on the standard output without creating
+any image files.
+
+.nf
+	cl> orfits mtb1600 1-999 images ma-
+.fi
+
+4. Convert FITS files directly to IRAF images without scaling.
+
+.nf
+	cl> orfits mtb1600 1-999 images scal-
+.fi
+
+5. Convert the first three FITS files on tape to IRAF files setting blanks
+to -1.
+
+.nf
+	cl> orfits mta 1-3 images blan=-1
+.fi
+
+6. Read in a FITS file with a header roughly twice the usual IRAF length
+of 8000 characters.
+
+.nf
+	cl> set min_lenuserarea = 16300
+	cl> orfits mta 1 images
+.fi
+
+7. Read a FITS tape with 5 normal fits records (2880 bytes) to a tape record.
+Notice that no extra parameters are needed.
+
+.nf
+	cl> orfits mta 1-3 fits
+.fi
+
+.ih
+BUGS
+Blank pixels are counted and set to a user determined value,  but not flagged
+in the image header.
+.ih
+SEE ALSO
+owfits, reblock, t2d
+.endhelp

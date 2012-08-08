@@ -1,0 +1,698 @@
+.help wcslab Dec91 images.tv
+
+.ih
+NAME
+wcslab -- overlay a labeled world coordinate grid on an image
+
+.ih
+USAGE
+wcslab image
+
+.ih
+PARAMETERS
+
+.ls image 
+The name of the image to be labeled. If image is "", the parameters
+in wcspars will be used to draw a labeled coordinate grid.
+.le
+.ls frame
+The display frame buffer displaying the image to be labeled.
+.le
+.ls usewcs = no
+Use the world coordinate system specified by the parameters in the wcspars
+parameter set in place of the image world coordinate system  or if
+image is "" ?
+.le
+.ls wcspars = ""
+The name of the parameter set defining the world coordinate system
+to be used if image is "" or if usewcs = "yes".  The wcspars parameters
+are described in more detail below.
+.le
+.ls wlpars = "" 
+The name of the parameter set which controls the
+detailed appearance of the plot. The wlpars parameters are described
+in more detail below.
+.le
+.ls fill = yes
+If fill is no, wcslab tries to
+create a square viewport with a maximum size dictated by the viewport
+parameters.  If fill is yes, then wcslab
+uses the viewport exactly as specified.
+.le
+.ls vl = INDEF, vr = INDEF, vb = INDEF, vt = INDEF
+The left, right, bottom, and top edges of the viewport in NDC (0-1)
+coordinates. If any of vl, vr, vb, or vt are  INDEF,
+wcslab computes a default value. To overlay the plot
+with a displayed image, vl, vr, vb, and vt must use the same viewport used
+by the display task to load the image into the frame buffer.
+.le
+.ls overplot = no
+Overplot to an existing plot?  If yes, wcslab will not erase the
+current plot.  This differs from append in that a new viewport
+may be defined.  Append has priority if both
+append and overwrite are yes.
+.le
+.ls append = no
+Append to an existing plot?  If no, wcslab resets the
+graphics to a new viewport/wcs for each new plot.  Otherwise, it uses
+the scaling from a previous plot. If append=yes but no plot was drawn, it
+will behave as if append=no.   This differs from overplot in that
+the same viewport is used.  Append has priority if both
+append and overwrite are yes.
+.le
+.ls device = "imd"
+The graphics device. To create an overlay plot, device must be set
+to one of the imdkern devices listed in dev$graphcap. To create a 
+plot of the coordinate grid in the
+graphics window, device should be set to "stdgraph".
+.le
+
+.ih
+WCSPARS PARAMETERS
+
+.ls ctype1 = "linear", ctype2 = "linear"
+The coordinate system type of the first and second axes.
+Valid coordinate system types are:
+"linear", and "xxx--tan", "xxx-sin", and "xxx-arc", where "xxx" can be either
+"ra-" or "dec".
+.le
+.ls crpix1 = 0.0, crpix2 = 0.0
+The X and Y coordinates of the reference point in pixel space that
+correspond to the reference point in world space.
+.le
+.ls crval1 = 0.0, crval2 = 0.0
+The X and Y coordinate of the reference point in world space that
+corresponds to the reference point in pixel space.
+.le
+.ls cd1_1 = 1.0, cd1_2 = 0.0
+The FITS CD matrix elements [1,1] and [1,2] which describe the x-axis
+coordinate transformation.  These elements usually have the values
+<xscale * cos (angle)> and, <-yscale * sin (angle)>, or, for ra/dec systems
+<-xscale * cos (angle)> and <yscale * sin (angle)>.
+.le
+.ls cd2_1 = 0.0, cd2_2 = 1.0
+The FITS CD matrix elements [2,1] and [2,2] which describe the y-axis
+coordinate transformation. These elements usually have the values
+<xscale * sin (angle)> and <yscale * cos (angle)>.
+.le
+.ls log_x1 = 0.0, log_x2 = 1.0, log_y1 = 0.0, log_y2 = 1.0
+The extent in pixel space over which the transformation is valid.
+.le
+
+
+.ih
+WLPARS PARAMETERS
+
+.ls major_grid = yes
+Draw a grid instead of tick marks at the position of the major
+axes intervals?  If yes, lines of constant axis 1 and axis 2 values
+are drawn.  If no, tick marks are drawn instead.  Major grid
+lines / tick marks are labeled with the appropriate axis values.
+.le
+.ls minor_grid = no
+Draw a grid instead of tick marks at the position of the
+minor axes intervals?  If yes, lines of constant axis 1 and axis 2 values
+are drawn between the major grid lines / tick
+marks.  If no, tick marks are drawn instead. Minor grid lines / tick
+marks are not labeled.
+.le
+.ls dolabel = yes
+Label the major grid lines or tick marks?
+.le
+.ls remember = no
+Modify the wlpars parameter file when done?  If yes, parameters that have
+been calculated by the task are written back to the parameter file.
+If no, the default, the parameter file is left untouched by the task.
+This option is useful for fine-tuning the appearance of the graph.
+.le
+.ls axis1_beg = ""
+The lowest value of axis 1 in world coordinates units
+at which a major grid line / tick mark will be drawn.
+If axis1_beg = "", wcslab  will compute this quantity.
+Axis1_beg will be ignored if axis1_end and axis1_int are undefined.
+.le
+.ls axis1_end = ""
+The highest value of axis 1 in world coordinate
+units at which a major grid line / tick mark will be drawn.
+If axis1_end = "", wcslab will compute this quantity.
+Axis1_end will be ignored if axis1_beg and axis1_int are undefined.
+.le
+.ls axis1_int = ""
+The interval in world coordinate units at which
+major grid lines / tick marks will be drawn along axis 1.
+If axis1_int = "", wcslab will compute this quantity.
+Axis1_int will be ignored if axis1_beg and axis1_end are undefined.
+.le
+.ls axis2_beg = ""
+The lowest value of axis 2 in world coordinates units
+at which a major grid line / tick mark will be drawn.
+If axis2_beg = "", wcslab  will compute this quantity.
+Axis2_beg will be ignored if axis2_end and axis2_int are undefined.
+.le
+.ls axis2_end = ""
+The highest value of axis 2 in world coordinate
+units at which a major grid line / tick mark will be drawn.
+If axis2_end = "", wcslab will compute this quantity.
+Axis2_end will be ignored if axis2_beg and axis2_int are undefined.
+.le
+.ls axis2_int = ""
+The interval in world coordinate units at which
+major grid lines / tick marks will be drawn along axis 2.
+If axis2_int = "", wcslab will compute this quantity.
+Axis2_int will be ignored if axis1_beg and axis1_end are undefined.
+.le
+.ls major_line = "solid"
+The type of major grid lines to be plotted.
+The permitted values are "solid", "dotted", "dashed", and "dotdash".
+.le
+.ls major_tick = .03
+Size of major tick marks relative to the size of the viewport.
+By default the major tick marks are .03 times the size of the
+viewport.
+.le
+.ls axis1_minor = 5
+The number of minor grid lines / tick marks that will appear between major 
+grid lines / tick marks for axis 1.
+.le
+.ls axis2_minor = 5
+The number of minor grid lines / tick marks that will appear between major
+grid lines / tick marks for axis 2.
+.le
+.ls minor_line = "dotted"
+The type of minor grid lines to be plotted.
+The permitted values are "solid", "dotted", "dashed", and "dotdash".
+.le
+.ls minor_tick = .01
+Size of minor tick marks relative to the size of the viewport.
+BY default the minor tick marks are .01 times the size of the
+viewport.
+.le
+.ls tick_in = yes
+Do tick marks point into instead of away from the graph ?
+.le
+.ls axis1_side = "default"
+The list of viewport edges, separated by commas, on which to place the axis
+1 labels.  If axis1_side is "default", wcslab will choose a side.
+Axis1_side may contain any combination of "left", "right",
+"bottom", "top", or "default".
+.le
+.ls axis2_side = "default"
+The list of viewport edges, separated by commas, on which to place the axis
+2 labels.  If axis2_side is "default", wcslab will choose a side.
+Axis2_side may contain any combination of "left", "right",
+"bottom", "top", or "default".
+.le
+.ls axis2_dir = ""
+The axis 1 value at which the axis 2 labels will be written for polar graphs. 
+If axis2_dir is "", wcslab will compute this number.
+.le
+.ls justify = "default"
+The direction with respect to axis 2 along which the axis 2
+labels will be drawn from the point they are labeling on polar graphs.
+If justify = "", then wcslab will calculate this quantity.  The permitted
+values are "default", "left", "right", "top", and "bottom".
+.le
+.ls labout = yes
+Draw the labels outside the axes ?  If yes, the labels will be drawn
+outside the image viewport.  Otherwise, the axes labels will be drawn inside
+the image border.  The latter option is useful if the image fills the
+display frame buffer.
+.le
+.ls full_label = no
+Always draw all the labels in full format (h:m:s or d:m:s) if the world
+coordinate system of the image is in RA and DEC ?  If full_label = no, then
+only certain axes will be labeled in full format. The remainder will
+be labeled in minutes or seconds as appropriate.
+.le
+.ls rotate = yes
+Permit the labels to rotate ?
+If rotate = yes, then labels will be written
+at an angle to match that of the major grid lines that are being
+labeled.  If rotate = no, then labels are always written
+"normally", that is horizontally. If labout = no, then rotate is
+set to "no" by default.
+.le
+.ls label_size = 1.0
+The size of the characters used to draw the major grid line labels.
+.le
+.ls title = "imtitle"
+The graph title. If title = "imtitle", then a default title containing
+the image name and title is created.
+.le
+.ls axis1_title = ""
+The title for axis 1. By default no axis title is drawn.
+.le
+.ls axis2_title = ""
+The title for axis 2. By default no axis title is drawn.
+.le
+.ls title_side = "top"
+The side of the plot on which to place the title.
+The options are "left", "right", "bottom", and "top".
+.le
+.ls axis1_title_side = "default"
+The side of the plot on which to place the axis 1 title.
+If axis1_title_side = "default", wcslab will choose a side for the title.
+The permitted values are "default", "right", "left", "top", and
+"bottom".
+.le
+.ls axis2_title_side = "default"
+The side of the plot on which to place the axis 2 title.
+If axis2_title_side = "default", wcslab will choose a side for the title.
+The permitted values are "default", "right", "left", "top", and
+"bottom".
+.le
+.ls title_size = 1.0
+The size of characters used to draw the title.
+.le
+.ls axis_title_size = 1.0
+The size of the characters used to draw the axis titles.
+.le
+.ls graph_type = "default"
+The type of graph to be drawn.  If graph_type = "default", wcslab will
+choose an appropriate graph type.  The permitted values are "normal", "polar",
+and "near_polar".
+.le
+
+.ih
+DESCRIPTION
+
+WCSLAB draws a labeled world coordinate grid on the graphics device
+\fIdevice\fR using world coordinate system (WCS)
+information stored in the header of the IRAF image \fIimage\fR if
+\fIusewcs\fR is "no", or
+in \fIwcspars\fR if \fIusewcs\fR is "yes" or \fIimage\fR is "".
+WCSLAB currently supports the following coordinate system types 1)
+the tangent plane, sin, and arc sky projections in right ascension
+and declination and 2) any linear coordinate system.
+
+By default WCSLAB draws on the image display device, displacing
+the currently loaded image pixels with graphics pixels. Therefore in order
+to register the coordinate grid plot with the image, the image must
+loaded into the image display with the DISPLAY task, prior to
+running WCSLAB.
+
+If the viewport parameters \fIvl\fR, \fIvr\fR, \fIvb\fR, and
+\fIvt\fR are left undefined, WCSLAB will try to match the viewport
+of the coordinate grid plot with the viewport of the currently
+displayed image in the selected frame \fIframe\fR. 
+This scheme works well in the case where \fIimage\fR is smaller
+than the display frame buffer, and in the case where \fIimage\fR is
+actually a subsection of the image currently loaded into the display frame
+buffer.  In the case where \fIimage\fR
+fills or overflows the image display frame buffer, WCSLAB 
+draws the appropriate coordinate grid but is not able to draw the
+titles and labels which would normally appear outside the plot.
+In this case the user must, either adjust the DISPLAY parameters
+\fIxmag\fR, and \fIymag\fR so that the image will fit in the frame
+buffer,  or change the DISPLAY viewport parameters \fIxsize\fR and
+\fIysize\fR so as to display only a fraction of the image.
+
+WCSLAB can create a new plot each time it is run, \fIappend\fR = no
+and \fIoverplot\fR = no,  add a new graph to an existing plot
+if \fIoverplot\fR = yes and \fIappend\fR=no,
+or append to an existing plot if \fIappend\fR = yes. 
+For new or overplots WCSLAB computes the viewport and window, otherwise it
+uses the viewport and window of a previously existing plot. If \fIdevice\fR
+is "stdgraph", then WCSLAB will clear the screen between each new plot.
+This is not possible if \fIdevice\fR is one of the "imd" devices
+since the image display graphics kernel writes directly into the display
+frame buffer. In this case the user must redisplay the image and rerun
+WCSLAB for each new plot.
+
+The parameters controlling the detailed appearance of the plot
+are contained in the parameter set specified by \fIwlpars\fR.
+
+.ih
+THE USER-DEFINED WCS
+
+The parameters in WCSPARS are used to define the world
+coordinate system  only if,  1) the parameter \fIusewcs\fR is "yes"
+or, 2) the input image is undefined.
+This user-defined WCS specifies the transformation from the logical coordinate
+system, e.g.  pixel units, to a world system, e.g. ra and dec.
+
+Currently IRAF supports two types of world coordinate systems:
+1) linear, which provides a linear mapping from pixel units to
+the world coordinate system 2) and the sky projections which provide
+a mapping from pixel units to ra and dec.  The parameters
+\fIctype1\fR and \fIctype2\fR define which coordinate system will be in
+effect.  If a linear system is
+desired, both \fIctype1\fR and \fIctype2\fR must be "linear".
+If the tangent plane sky projection is desired,
+and the first axis is ra and the
+second axis is dec, then \fIcypte1\fR and \fIctype2\fR
+must be "ra---tan" and "dec--tan" respectively.
+To obtain the sin or arc projections "tan" is replaced with "sin" or
+"arc" respectively.
+
+The scale factor and rotation between the logical and world coordinate
+system is described by the CD matrix.  Using matrix
+multiplication, the logical coordinates are multiplied by the CD
+matrix to produce the world coordinates.  The CD matrix is represented in
+the parameters as follows:
+
+.nf
+
+                |---------------|
+                | cd1_1  cd1_2  |
+                |               |
+                | cd2_1  cd2_2  |
+                |---------------|
+
+.fi
+
+To construct a typical CD matrix, the following definitions of the
+individual matrix elements may be used:
+
+.nf
+
+        cd1_1 =  xscale * cos (ROT)
+        cd1_2 = -yscale * sin (ROT)
+        cd2_1 =  xscale * sin (ROT)
+        cd2_2 =  yscale * cos (ROT)
+
+.fi
+
+where xscale and yscale are the scale factors from the logical to world
+systems, e.g. degrees per pixel, and ROT is the angle of rotation between
+the two systems, where positive rotations are counter-clockwise.
+
+The ra/dec transformation is a special case.  Since by convention ra
+increases "to the left", opposite of standard convention, the first axis
+transformation needs to be multiplied by -1.  This results in the
+following formulas: 
+
+.nf
+
+        cd1_1 = -xscale * cos (ROT)
+        cd1_2 =  yscale * sin (ROT)
+        cd2_1 =  xscale * sin (ROT)
+        cd2_2 =  yscale * cos (ROT)
+
+.fi
+
+Finally, the origins of the logical and world systems must be defined.
+The parameters \fIcrpix1\fR and \fIcrpix2\fR define the coordinate in
+the logical space that corresponds to the coordinate in world space
+defined by the parameters \fIcrval1\fR and \fIcrval2\fR. The coordinates
+(crpix1, crpix2) in logical space, when transformed to world space,
+become (crval1, crval2).
+
+The last set of parameters, log_x1, log_x2, log_y1, log_y2, define the
+region in the logical space, e.g. in pixels,  over which the transformation
+is valid.
+
+.ih
+AXIS SPECIFICATION
+
+For all \fIlinear\fR transformations axis 1 and axis 2 specify which axis in
+the image is being referred to.
+For example in a 2-dimensional image, the FITS image header keywords
+CTYPE1, CRPIX1, CRVAL1, CDELT1,
+CD1_1, and CD1_2 define the world coordinate transformation for axis 1.
+Similarly the FITS image header keywords
+CTYPE2, CRPIX2, CRVAL2, CDELT2,
+CD2_1, CD2_2, define the world coordinate transformation for axis 2.
+
+THIS RULE DOES NOT APPLY TO THE TANGENT PLANE, SIN, and ARC SKY
+PROJECTION WCS'S.
+For this type of WCS axis 1 and axis 2 
+always refer to right ascension and declination respectively,
+and WCSLAB assumes that all axis 1 parameters refer to right
+ascension and all axis 2 parameters refer to declination, regardless of
+which axis in the image WCS actually specifies right ascension and declination.
+
+.ih
+GRID DRAWING 
+
+There are two types of grid lines / tick marks, "major" and
+"minor".  The major grid lines / tick marks are the lines / ticks
+that will be labeled.  The minor grid lines / tick marks are plotted
+between the major marks.  Whether lines or tick marks are drawn is
+determined by the boolean parameters \fImajor_grid\fR and \fIminor_grid\fR.
+If yes, lines are drawn; if no, tick marks are drawn.  How the lines
+appear is controlled by the parameters \fImajor_line\fR and \fIminor_line\fR.
+
+The spacing of minor marks is controlled by the parameters \fIaxis1_minor\fR
+and \fIaxis2_minor\fR. These parameters specify the number of minor marks
+that will appear between the major marks along the axis 1
+and axis 2 axes.
+
+Spacing of major marks is more complicated.  WCSLAB tries to
+present major marks only along "significant values" in the
+coordinate system.  For example, if the graph spans several hours of
+right ascension,  the interval between major marks will in general be an
+hour and the major marks will appear at whole hours within the graph.
+If what WCSLAB chooses is unacceptable, the interval and range can
+be modified by the parameters \fIaxis1_int\fR, \fIaxis1_beg\fR,
+\fIaxis1_end\fR for the axis 1, and \fIaxis2_int\fR, \fIaxis2_beg\fR,
+and \fIaxis2_end\fR for axis 2. All three parameters must be specified for
+each axis in order for the new values to take affect
+
+.ih
+GRAPH APPEARANCE
+
+WCSLAB supports three types of graph: normal, polar, and near_polar.
+
+A normal graph is the usual Cartesian graph where lines of constant
+axis 1 or 2 values cross at least two different sides of the graph.
+WCSLAB will by default plot a normal type graph for any image 1)
+which has no defined WCS 2) which has a linear WCS 3) where the sky
+projection WCS approximates a Cartesian system.
+
+A polar graph is one in which the north or south pole of the
+coordinate system actually appears on the graph.
+Lines of constant declination are no longer approximately
+straight lines, but are circles which may not intersect any
+of the edges of the graph. In this type of graph, axis 1 values
+are labeled all the way around the graph. 
+Axis 2 values are labeled within the graph
+next to each circle.  An attempt is made to label as many circles as
+possible.  However, if the WCSLAB's defaults are not agreeable,
+the parameters, \fIaxis2_dir\fR and \fIjustify\fR, can be modified
+to control how this labeling is done.
+\fIAxis2_dir\fR specifies along which axis 1 value the
+axis 2 labels should be written.  \fIJustify\fR specifies on which side of
+this value the label should appear.
+
+The near_polar graph is a cross between the normal graph and the polar
+graph.  In this case the pole is not on the graph, but is close enough
+to significantly affect the appearance of the plot.  The near_polar graph
+is handled like a polar graph.
+
+The parameter \fIgraph_type\fR can be used to force WCSLAB
+to plot a graph of the type specified, although in this case it
+may be necessary to modify the values of other WLPARS parameters to
+obtain pleasing results. For example trying to plot a polar graph as
+Cartesian may producing a strange appearing graph.
+
+.ih
+GRAPH LABELING
+
+Due to the variety of graph types that can be plotted (see above), and
+the arbitrary rotation that any WCS can have, the task of labeling
+the major grid lines in a coherent and pleasing manner is not trivial.
+
+The basic model used is the Cartesian or normal graph.  Labels
+normally appear on the left and bottom edges of the graph with a side
+devoted solely to one of the WCS coordinate axis.  For example, right
+ascension might be labeled only along the bottom edge of the graph
+and declination only along the left edge, or vice versa. 
+
+If the defaults chosen by WCSLAB are unacceptable, the
+parameters \fIaxis1_side\fR and \fIaxis2_side\fR, can be used to specify which
+side (or sides) the labels for axis 1 and axis 2 will appear.
+Either a single side or a list of sides can be specified for either
+axis.  If a list is specified, labels will appear on each side listed,
+even if the same side appears in both of the parameters.  In this way,
+labels can be made to appear on the same side of the graph.
+
+.ih
+LABEL APPEARANCE
+
+Due to coordinate rotations, lines of constant axis 1 or axis 2 value
+may not intersect the edges
+of the graph perpendicularly.  To help clarify which line belongs to
+which label, the labels will be drawn at an angle equal to that of the
+line which is being labeled.  If this is not desired, 
+the parameter \fIrotate\fR may be set to no, and labels will always appear
+"normal", i.e.  the text will not be rotated in any way.
+
+By default, all labels will be shortened to the smallest unit
+needed to indicate the value of the labeled line.  For example, if the
+graph spans about 30 seconds of declination, the interval between the
+labels will be approximately 5 or 10 seconds. The first label will contain the
+full specification, i.e. -22:32:20.  But the rest of the labels will
+only be the seconds, i.e. 30, 40, 50.  However, at the change in
+minutes, the full format would be used again, -22:33:00, but then
+again afterwards only seconds will be displayed, i.e. 10, 20, etc.
+If this shortening of labels is undesirable, it
+can be turned off by setting the parameter \fIfull_label\fR to yes.  This
+forces every label to use the full specification.
+
+Finally, the parameter \fIlabel_size\fR can be used to adjust the size of the
+characters used in the axis labels.
+
+.ih
+TITLES
+
+A graph title may specified using the parameter \fItitle\fR. If \fItitle\fR
+= "imtitle" a default title constructed from the image name and title
+is used. The location and size of the graph title are controlled by
+the parameters \fItitle_side\fR and \fItitle_size\fR.
+Similarly the content, placement and size of the axis titles are
+controlled by the parameters \fIaxis1_title\fR, \fIaxis2_title\fR,
+\fIaxis1_title_side\fR, \fIaxis2_title_side\fR,  and
+\fIaxis_title_size\fR.
+
+.ih
+OUTPUT FORMATS
+
+If \fIremember\fR = yes, the coordinates are output to the parameter set
+WLPARS in a form suitable for the type of system the coordinates
+represent.  For example right
+ascensions are output in HH:MM:SS (hours:minutes:seconds) and
+declinations are output in DD:MM:SS (degrees:minutes:seconds).
+If the input parameters are changed, for example axis1_int, their values
+must be input in the same format.
+If the WCS is linear, then the parameters will not be formatted in any special
+way; i.e. no assumptions are made about units, etc.
+
+.ih
+EXAMPLES
+
+1. Display the 512 pixel square IRAF test image dev$pix in an 800 square
+display window and overlay it with a labeled coordinate grid.  Since
+dev$pix  does not have a defined WCS a pixel coordinate grid will appear.
+
+.nf
+	cl> display  dev$pix 1
+
+	    ... display the image in frame 1
+
+	cl> wcslab dev$pix 1
+
+	    ... the coordinate grid in green will be plotted on the display
+.fi
+
+2. Redisplay the previous image and by overlay the labeled
+coordinate grid on the inner 100 by 400 pixels in x and y.
+
+.nf
+	cl> display dev$pix 1
+
+	    ... erase the graphics by redisplaying the image
+
+	cl> wcslab dev$pix[100:400,100:400] 1
+.fi
+
+3. Display an 800 square image which has a defined linear WCS in an 800 square
+display window and overlay it with the coordinate grid. Reduce
+the display viewport in order to leave space around the edge of the
+displayed image for the labels and titles.
+
+.nf
+	cl> display image 1 xsize=0.8 ysize=0.8 fill+
+	cl> wcslab image 1 vl=.1 vr=.9 vb=.1 vt=.9
+.fi
+
+4. Repeat the previous example using a different combination of display
+and wcslab parameters to achieve the same goal.
+
+.nf
+	cl> display image 1 xmag=0.8 ymag=0.8
+	cl> wcslab image 1
+.fi
+
+5. Display a section of the previous image and overlay it with a
+coordinate grid. Note that the same section should be specified in
+both cases.
+
+.nf
+	cl> display image[101:700,101:700] 1
+	cl> wcslab image[101:700,101:700] 1
+.fi
+
+6. Display a 512 square image with a defined tangent plane sky projection
+in an 800 square frame buffer and overlay the labeled coordinate grid. The 
+standard FITS keywords shown below define the WCS. This WCS is
+approximately correct for the IRAF test image dev$pix.
+
+.nf
+	# IRAF image header keywords which define the WCS
+
+	CRPIX1  =               257.75
+	CRPIX2  =               258.93
+	CRVAL1  =      201.94541667302		# RA is stored in degrees !
+	CRVAL2  =             47.45444
+	CTYPE1  = 'RA---TAN'
+	CTYPE2  = 'DEC--TAN'
+	CDELT1  =        -2.1277777E-4
+	CDELT2  =         2.1277777E-4
+
+
+	cl> display dev$pix 1
+
+	cl> wcslab dev$pix 1
+.fi
+
+7. Display a  512 square image with a defined tangent plane sky projection
+approximately centered on the north celestial pole in an 800 square frame
+buffer. The FITS keywords shown below define the WCS.
+
+
+.nf
+	# IRAF image header keywords which define the WCS
+
+	CRPIX1  =               257.75
+	CRPIX2  =               258.93
+	CRVAL1  =      201.94541667302	    # RA is stored in degrees !
+	CRVAL2  =             90.00000
+	CTYPE1  = 'RA---TAN'
+	CTYPE2  = 'DEC--TAN'
+	CDELT1  =        -2.1277777E-4
+	CDELT2  =         2.1277777E-4
+
+	cl> display northpole 1
+
+	cl> wcslab northpole 1
+.fi
+
+8.  Display and label a 512 square image which has no WCS information
+using the values of the parameters in wcspars. The center pixel (256.0, 256.0)
+is located at (9h 22m 30.5s, -15o 05m 42s), the pixels are .10 
+arcseconds in size, and are rotated 30.0 degrees counter-clockwise.
+
+.nf
+
+	cl> lpar wcspars
+
+	    ctype1 = 'ra---tan'
+	    ctype2 = 'dec--tan'
+	    crpix1 = 256.0
+	    crpix2 = 256.0
+	    crval1 = 140.62708
+	    crval2 = -15.09500
+	    cd1_1  = -2.405626e-5
+	    cd1_2  = 1.388889e-5
+	    cd2_1  = 1.388889e-5
+	    cd2_2  = 2.405626e-5
+            log_x1 = 1.
+            log_x2 = 512.
+            log_y1 = 1.
+            log_y2 = 512.
+
+	cl> display image 1
+
+	cl> wcslab image usewcs+
+
+.fi
+.ih
+AUTHORS
+The WCSLAB task was written by members of the STScI SDAS programming group
+and integrated into the IRAF DISPLAY package by members of the IRAF
+programming group for version 2.10 IRAF.
+.ih
+SEE ALSO
+display, gcur, imdkern
+.endhelp

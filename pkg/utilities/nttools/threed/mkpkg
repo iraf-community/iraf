@@ -1,0 +1,25 @@
+#   Make the threed package
+#       I.Busko, 21-Nov-1996
+#
+#   Special keywords recognized by IRAF mkpkg files:
+#
+#	mkpkg relink		update object library and link
+#	mkpkg linkonly		skip object library updates and just link
+#	mkpkg install		move executable to lib$
+#	mkpkg update		update object library, link, and move to lib$
+
+
+$call	libpkg.a
+$exit
+
+libpkg.a:
+	$call	generic@tiimage
+	$call	generic@titable
+	$call	generic@txtable
+
+	@tscopy
+	@txtable
+	@tximage
+	@titable
+	@tiimage
+	;

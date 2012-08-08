@@ -1,0 +1,13 @@
+# Help directory for the COLOR package
+
+$defdir		= "color$"
+$doc		= "color$doc/"
+$src		= "color$src/"
+
+package		hlp=doc$color.hlp
+rgbdisplay	hlp=doc$rgbdisplay.hlp,	src=src$rgbdisplay.cl
+rgbdither	hlp=doc$rgbdither.hlp,	src=src$t_rgbdither.x
+rgbsun		hlp=doc$rgbsun.hlp,	src=src$t_rgbsun.x
+rgbto8		hlp=doc$rgbto8.hlp,	src=src$t_rgbto8.x
+
+revisions       sys=Revisions

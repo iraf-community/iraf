@@ -1,0 +1,57 @@
+.help devstatus Jan86 system
+.ih
+NAME
+devstatus -- print status information for a device
+.ih
+USAGE
+devstatus device
+.ih
+PARAMETERS
+.ls device
+The device for which status information is requested.
+.le
+.ls verbose = no
+Print additional system dependent device information (may not be implemented
+on all systems).
+.le
+.ih
+DESCRIPTION
+\fBDevstatus\fR tells whether the named device has been allocated.
+In the case of a magtape drive allocated to the current user, additional
+information is printed noting the tape position and the type of operation
+last performed.  If the device is not currently allocated, i.e., available
+for allocation, or if the device has already been allocated by another user,
+one of the following messages is printed:
+
+.nf
+	device is not currently allocated
+	device is allocated to XXXX
+.fi
+
+A list of the allocatable devices, including the host system names for the
+devices, can be obtained by paging the file \fBdev$devices\fR providing
+that file has been properly configure by the Site Manager at installation
+time.  The dev$tapecap file is used to define the tape devices available
+on the system.
+.ih
+EXAMPLES
+
+1. Get status information for the logical tape drive "mta", which we have
+just allocated.  Note that the tape position is printed only if we are the
+owner of the drive.
+
+.nf
+	cl> dev mtb
+	# Magtape unit `mta' allocated to `smith' Fri 12:04:16 07-Jan-86
+	file = 1
+	record = 1
+	unit just allocated: no i/o has yet occurred
+.fi
+
+.ih
+BUGS
+Information can only be requested for a single device at a time.
+.ih
+SEE ALSO
+allocate, deallocate
+.endhelp

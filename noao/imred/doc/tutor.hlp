@@ -1,0 +1,64 @@
+.help tutor Aug86 noao.imred
+.ih
+NAME
+tutor -- Present tutorial help on a particular package
+.ih
+USAGE
+tutor topic
+.ih
+PARAMETERS
+.ls topic
+Topic for which help is desired.  If no topic is given then available
+topics are presented.  The topic "all" prints all the topics.
+.le
+.ls package = ""
+Package for which tutorial help is desired.  If null then the tutorial
+for the current package is presented.
+.le
+.ls tutordb = "helpdb"
+The filename of the tutorial database to be searched.  If the \fIvalue\fR of the
+parameter is the reserved string "helpdb", the actual filename is the value
+of the CL environment variable \fIhelpdb\fR.
+.le
+.ih
+DESCRIPTION
+This task provides a tutorial facility for some of the IRAF packages.
+The tutorial consists of a number of topics
+which are obtained by typing "tutor topic" where topic is one of the
+available topics.  If no topic is given then the available topics are
+presented.  The topic "all" presents all the topics.
+
+This task is implemented using the \fBhelp\fR task.  Therefore,
+modifying the \fBhelp\fR parameters dealing with the device and print
+format will also determine the output of \fBtutor\fR.  The tutorial
+topic material is contained in the file Tutorial.hlp for each package.
+The database containing the directory to the tutorial files may or may
+not be the same as the standard help database.
+.ih
+EXAMPLES
+To get started:
+
+	cl> tutor
+
+To get help on reading and writing data tapes:
+
+	cl> tutor dataio
+
+To read all the topics:
+
+	cl> tutor all
+.ih
+BUGS
+Piping the output of \fBtutor\fR to lprint does not work properly because
+\fBhelp\fR is contained in a script.
+.ih
+TUTORIALS
+Tutorials are currently available only for the \fBechelle\fR package.
+This tutorial is in the process of being developed.
+.ih
+SEE ALSO
+.nf
+help
+Individual help pages for all the tasks mentioned in the tutorial.
+.fi
+.endhelp

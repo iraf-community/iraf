@@ -1,0 +1,58 @@
+.help dmoon Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDMON (DATE, PV)
+
+     - - - - - -
+      D M O N
+     - - - - - -
+
+  Approximate geocentric position and velocity of the Moon
+  (double precision)
+
+  Given:
+     DATE       D       TDB (loosely ET) as a Modified Julian Date
+                                                    (JD-2400000.5)
+
+  Returned:
+     PV         D(6)    Moon x,y,z,xdot,ydot,zdot, mean equator and
+                                         equinox of date (AU, AU/s)
+
+  Notes:
+
+  1  This routine is a full implementation of the algorithm
+     published by Meeus (see reference).
+
+  2  Meeus quotes accuracies of 10 arcsec in longitude, 3 arcsec in
+     latitude and 0.2 arcsec in HP (equivalent to about 20 km in
+     distance).  Comparison with JPL DE200 over the interval
+     1960-2025 gives RMS errors of 3.7 arcsec and 83 mas/hour in
+     longitude, 2.3 arcsec and 48 mas/hour in latitude, 11 km
+     and 81 mm/s in distance.  The maximum errors over the same
+     interval are 18 arcsec and 0.50 arcsec/hour in longitude,
+     11 arcsec and 0.24 arcsec/hour in latitude, 40 km and 0.29 m/s
+     in distance. 
+
+  3  The original algorithm is expressed in terms of the obsolete
+     timescale Ephemeris Time.  Either TDB or TT can be used, but
+     not UT without incurring significant errors (30 arcsec at
+     the present time) due to the Moon's 0.5 arcsec/sec movement.
+
+  4  The algorithm is based on pre IAU 1976 standards.  However,
+     the result has been moved onto the new (FK5) equinox, an
+     adjustment which is in any case much smaller than the
+     intrinsic accuracy of the procedure.
+
+  5  Velocity is obtained by a complete analytical differentiation
+     of the Meeus model.
+
+  Reference:
+     Meeus, l'Astronomie, June 1984, p348.
+
+  P.T.Wallace   Starlink   22 January 1998
+
+  Copyright (C) 1998 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

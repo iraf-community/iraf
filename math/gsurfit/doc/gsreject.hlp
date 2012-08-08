@@ -1,0 +1,44 @@
+.help gsreject Aug85 "Gsurfit Package"
+.ih
+NAME
+gsreject -- reject a data point from the fit
+.ih
+SYNOPSIS
+gsreject (sf, x, y, z, weight)
+
+.nf
+pointer	sf		# surface descriptor
+real	x		# x value, xmin <= x <= xmax
+real	y		# y value, ymin <= y <= ymax
+real	z		# data value
+real	weight		# weight
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+Pointer to the surface descriptor structure.
+.le
+.ls x, y
+X and y values.
+.le
+.ls z      
+Data value.
+.le
+.ls weight
+Weight value.
+.le
+.ih
+DESCRIPTION
+GSREJECT removes a data point from the fit. The non-zero basis functions for
+each x and y are calculated, and the contribution of the point to the normal
+equations is computed and subtracted from the appropriate arrays and vectors.
+An array of points can be removed from the fit by repeated calls to GSREJECT
+followed by a single call to GSSOLVE to calculate a new set of coefficients.
+.ih
+NOTES
+Out of bounds x and y values and INDEF valued data values are the responsibility
+of the calling program.
+.ih
+SEE ALSO
+gsaccum, gsacpts
+.endhelp

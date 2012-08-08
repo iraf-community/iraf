@@ -1,0 +1,20 @@
+
+The IRAF math library provides a collection of general purpose numerical
+routines for use in scientific applications programs.  This library is
+continually growing as we collect numerical packages from around the country.
+
+At present the library is just a collection of untested routines from various
+sources.  As time goes on, these routines will be edited to conform to a
+standard which has not yet been developed.  The standard is expected to provide
+for different classes of routines, according to how well the routines have
+been integrated into the system and tested.  The standard for the math library
+will affect programming style, naming conventions, documentation, and the
+subset of Fortran which portable library routines are expected to comply with.
+
+A fundamental part of the standard is that math library routines should not do
+i/o.  Some of the otherwise numerical routines in these directories print
+error messages when an error occurs, using Fortran i/o.  This is bad because
+Fortran i/o is not used elsewhere in the IRAF system, and because it is
+preferable for a numerical routine to return an error code in the event of an
+error.  Before these codes are used in IRAF applications programs, this will
+have to be fixed.

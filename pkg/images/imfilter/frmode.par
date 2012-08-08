@@ -1,0 +1,19 @@
+# Parameters for the FRMODE task
+
+input,f,a,,,,Input images to be filtered
+output,f,a,,,,Output filtered images
+rinner,r,a,0.0,,, The inner radius of the elliptical ring filter
+router,r,a,,,,The outer radius of the elliptical ring filter
+ratio,r,h,1.0,0.0,1.0,Ratio of minor to major axes
+theta,r,h,0.0,0.0,180.0,Position angle of elliptical ring filter
+hmin,i,h,-32768,,,Minimum histogram bin
+hmax,i,h,32767,,,Maximum histogram bin
+zmin,r,h,INDEF,,,Pixel value corresponding to hmin
+zmax,r,h,INDEF,,,Pixel value corresponding to hmax
+zloreject,r,h,INDEF,,,Lowside pixel value cutoff
+zhireject,r,h,INDEF,,,High side pixel value cutoff
+unmap,b,h,yes,,,Unmap the digitized values ?
+boundary,s,h,'nearest',,,'Boundary (constant,nearest,reflect,wrap)'
+constant,r,h,0,,,Constant for boundary extension
+verbose,b,h,yes,,,Print messages about actions taken by the task
+mode,s,h,'ql'

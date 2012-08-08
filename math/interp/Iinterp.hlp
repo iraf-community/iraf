@@ -1,0 +1,293 @@
+
+.help INTERP Jan83 "Image Interpolation Package"
+.sh
+Introduction
+
+     One of the most common operations in image processing is interpolation.
+Due to the very large amount of data involved, efficiency is quite important,
+and the general purpose routines available from many sources cannot be used.
+
+
+The task of interpolating image data is simplified by the following
+considerations:
+.ls 4
+.ls o
+The pixels (data points) are equally spaced along a line or on a rectangular
+grid.
+.le
+.ls o
+There is no need for coordinate transformations.  The coordinates of a pixel
+or point to be interpolated are the same as the subscript of the pixel in the
+data array.  The coordinate of the first pixel in the array may be assumed
+to be 1.0, and the spacing between pixels is also 1.0.
+.le
+.le
+
+
+The task of interpolating image data is complicated by the following
+considerations:
+.ls
+.ls o
+We would like the "quality" of the interpolator to be something that can
+be set at run time by the user.  This is done by permitting the user to
+select the type of interpolator to be used, and the order of interpolation.
+The following interpolators will be provided:
+
+.nf
+    - nearest neighbor
+    - linear
+    - natural cubic spline
+    - divided differences, either 3rd or 5th order.
+.fi
+.le
+.ls o
+The interpolator must be able to deal with indefinite valued pixels.
+In the IRAF, an indefinite valued pixel has the special value INDEF.
+If the interpolator cannot return a meaningful interpolated value
+(due to the presence of indefinite pixels in the data, or because the
+coordinates of the point to be interpolated are out of bounds) the value
+INDEF should be returned instead.
+.le
+.le
+
+.sh
+Sequential Interpolation of One Dimensional Arrays
+
+     Ideally, we should be able to define a single set of procedures
+which can perform interpolation by any of the techniques mentioned above.
+The procedures for interpolating one dimensional arrays are optimized
+for the case where the entire array is to be sampled, probably in a sequential
+fashion.
+
+The following calls should suffice.  The package prefix is "asi", meaning
+array sequential interpolate, and the last three letters of each procedure
+name are used to describe the action performed by the procedure.  The
+interpolator is restricted to single precision real data, so there is no
+need for a type suffix.
+
+.ks
+.nf
+	asiset (coeff, interpolator_type, boundary_type)
+	asifit (data, npts, coeff)
+    y =	asival (x, coeff)			# evaluate y(x)
+	asider (x, derivs, nderiv, coeff)	# derivatives
+    v = asigrl (x1, x2, coeff)			# take integral
+.fi
+.ke
+
+Here, COEFF is a structure used to describe the interpolant, and 
+the interpolator type is chosen from the following set of options:
+
+.ks
+.nf
+	NEAREST		return value of nearest neighbor
+	LINEAR		linear interpolation
+	DIVDIF3		third order divided differences
+	DIVDIF5		fifth order divided differences
+	SPLINE3		cubic spline
+.fi
+.ke
+
+When the VAL procedure is called to evaluate the interpolant at a point X,
+the code must check to see if X is out of bounds.  If so, the type of value
+returned may be specified by the third and final argument to the SET procedure.
+
+.ks
+.nf
+	B_NEAREST	return nearest boundary (nb) value
+	B_INDEF		(default; return indefinite)
+	B_REFLECT	interpolate at abs(x)
+	B_WRAP		wrap around to opposite boundary
+	B_PROJECT	return y(nb) - (y(abs(x)) - y(nb))
+.fi
+.ke
+
+For example, the following subset preprocessor code fragment uses
+the array interpolation routines to shift a data array by a constant
+amount:
+
+
+.ks
+.nf
+	real	shift, coeff[NPIX+SZ_ASIHDR]
+	real	inrow[NPIX], outrow[NPIX], asival()
+	int	i, interpolator_type, boundary_type, clgeti()
+
+	begin
+		# get parameters from CL, setup interpolator
+		interpolator_type = clgeti ("interpolator")
+		boundary_type = clgeti ("boundary_type")
+		call asiset (coeff, interpolator_type, boundary_type)
+
+		[code to read pixels into inrow]
+		call asifit (inrow, NPIX, coeff)
+
+		do i = 1, NPIX			# do the interpolation
+		    outrow[i] = asival (i + shift, coeff)
+.fi
+.ke
+
+
+The array COEFF is actually a simple structure.  An initial call to ASISET
+is required to save the interpolator parameters in the COEFF structure.
+ASIFIT computes the coefficients of the interpolator curve, leaving the 
+coefficients in the appropriate part of the COEFF structure.  Thereafter,
+COEFF is read only.  ASIVAL evaluates the zeroth derivative of the curve
+at the given X coordinate.  ASIDER evaluates the first NDERIV derivatives
+at X, writing the values of these derivatives into the DERIVS output array.
+ASIGRL integrates the interpolant over the indicated range (returning INDEF
+if there are any indefinite pixels in that range).
+
+.ks
+.nf
+	    element			usage
+
+	       1		type of interpolator
+	       2		type of boundary condition
+	       3		number of pixels in x
+	       4		number of pixels in y
+	      5-9		reserved for future use
+	     10-N		coefficients
+
+		    The COEFF structure
+.fi
+.ke
+
+
+In the case of the nearest neighbor and linear interpolation algorithms,
+the coefficient array will contain the same data as the input data array.
+The cubic spline algorithm requires space for NPIX+2 b-spline coefficients.
+The space requirements of the divided differences algorithm are similar.
+The constant SZ_ASIHDR should allow enough space for the worst case.
+
+Note that both 3rd and 5th order divided differences interpolators are
+provided, but only the 3rd order (cubic) spline.  This is because the
+5th order spline is considerably harder than the cubic spline.  We can easily
+add a 5th order spline, or indeed a completely new algorithm such as the sinc
+function interpolator, without changing the calling sequences or data
+structures.
+
+.sh
+Random Interpolation of One Dimensional Arrays
+
+     If we wish only to interpolate a small region of an array, or a few
+points scattered along the array at random, or if memory space is more
+precious than execution speed, then a different sort of interpolator is
+desirable.  We can dispense with the coefficient array in this case, and
+operate directly on the data array.
+
+.ks
+.nf
+	ariset (interpolator_type, boundary_type)
+	arifit (data, npts)
+    y =	arival (x, data)
+	arider (x, derivs, nderiv, data)
+.fi
+.ke
+
+Since the number of points required to interpolate at a given X value
+is fixed, these routines are internally quite different than the sequential
+procedures.
+
+.sh
+Sequential Interpolation of Two Dimensional Arrays
+
+     None of the interpolation algorithms mentioned above are difficult
+to generalize to two dimensions.  The calling sequences should be kept as
+similar as possible.  The sequential two dimensional procedures are limited
+by the size of the two dimensional array which can be kept in memory, and 
+therefore are most useful for subrasters.  The COEFF array should be
+declared as a one dimensional array, even though it used to store a two
+dimensional array of coefficients.
+
+.ks
+.nf
+	msiset (coeff, interpolator_type), boundary_type)
+	msifit (data, nx, ny, coeff)
+    y =	msival (x, y, coeff)
+	msider (x, y, derivs, nderiv, coeff)
+.fi
+.ke
+
+Note that the coefficients of the bicubic spline are obtained by first
+doing a one dimensional spline fit to the rows of the data array, leaving
+the resultant coefficients in the rows of the coeff array, followed by
+a series of one dimensional fits to the coefficients in the coeff array.
+The row coefficients are overwritten by the coefficients of the tensor
+product spline.  Since all the work is done by the one dimensional spline
+fitting routine, little extra code is required to handle the two dimensional
+case.
+
+The bicubic spline is evaluated by summing the product C(i,j)*Bi(x)*Bj(y)
+at each of the sixteen coefficients contributing to the point (x,y).
+Once again, the one dimensional routines for evaluating the b-spline
+(the functions Bi(x) and Bj(y)) do most of the work.
+
+Although it is not required by very many applications, it would also
+be useful to be able to compute the surface integral of the interpolant
+over an arbitrary surface (this is useful for surface photometry
+applications).  Never having done this, I do not have any recommendations
+on how to set up the calling sequence.
+
+.sh
+Random Interpolation of Two Dimensional Arrays
+
+     The random interpolation procedures are particularly useful for two
+dimensional arrays due to the increased size of the arrays.  Also, if an
+application generally finds linear interpolation to be sufficient, and rarely
+uses a more expensive interpolator, the random routines will be more
+efficient overall.
+
+.ks
+.nf
+	mriset (interpolator_type, boundary_type)
+	msifit (data, nx, ny)
+    y = mrival (x, y, data)
+	mrider (x, y, derivs, nderiv, data)
+.fi
+.ke
+
+.sh
+Cardinal B-Splines
+
+     There are many different kinds of splines.  One of the best
+for the case where the data points are equally spaced is the cardinal spline.
+The so called "natural" end point conditions are probably the best one can
+do with noisy data.  Other end point conditions, such as not-a-knot, may be
+best for approximating analytic functions, but they are unreliable with
+noisy data.  The natural cubic cardinal spline is fitted by solving the
+following tridiagonal system of equations (Prenter, 1975).
+
+
+.ks
+.nf
+	/				  :		\
+	| 6  -12    6		          :	0	|
+	| 1    4    1		          :	y(1)	|
+	|      1    4    1		  :	y(2)	|
+	| 	     ...		  :		|
+	| 		1    4    1       :	y(n-1)	|
+	| 		     1    4    1  :	y(n)	|
+	| 		     6   -12   6  :	0	|
+	\				  :		/
+.fi
+.ke
+
+
+This matrix can most efficiently be solved by hardwiring the appropriate
+recursion relations into a procedure.  The problem of what to do when some
+of the Y(i) are indefinite has not yet been solved.
+
+The b-spline basis function used above is defined by
+
+.ks
+.nf
+	B(x) = (x-x1)**3				x:[x1,x2]
+	B(x) = 1 + 3(x-x2) + 3(x-x2)**2 - 3(x-x2)**3	x:[x2,x3]
+	B(x) = 1 + 3(x3-x) + 3(x3-x)**2 - 3(x3-x)**3	x:[x3,x4]
+	B(x) = (x4-x)**3				x:[x4,x5]
+.fi
+.ke
+
+where X1 through X4 are the X coordinates of the four b-spline
+coefficients contributing to the b-spline function at X.

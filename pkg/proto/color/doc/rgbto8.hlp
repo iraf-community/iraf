@@ -1,0 +1,93 @@
+.help rgbto8 Oct92 color
+.ih
+NAME
+rgbto8 -- make an RGB 8-bit image and associated color map
+.ih
+USAGE
+rgbto8 red green blue rgb
+.ih
+PARAMETERS
+.ls red, green, blue
+Input image names for the red, green, and blue components.  The images
+must all be two dimensional and of the same size.
+.le
+.ls rgb
+Output image name for the RGB 8-bit image.  A color map with the same
+image name but the extension ".sao" or ".imt" will also be created.
+.le
+.ls maptype = "saoimage" (saoimage|imtool|ximtool)
+This parameter selects the type of color map file to be produced.  The
+choices are "saoimage" to produce a map for SAOimage, "imtool" to produce a
+map for IMTOOL, and "ximtool" to produce a map for XIMTOOL.  The filenames
+are derived from the output image name with the extension ".sao", ".imt",
+or ".xim".
+.le
+.ls rz1, rz2, gz1, gz2, bz1, bz2
+Range of values in the input images to be mapped to the minimum and maximum
+intensity in each color.  Image pixel values outside the range are mapped
+to the nearest endpoint.  The values correspond to the input image
+intensities even when using logarithmic mapping.
+.le
+.ls logmap = no
+Use logarithmic intensity mapping?  The logarithm of the input pixel
+values, in the range given by the z1 and z2 parameters, is taken before
+dividing the range into the 85 display levels.  Logarithmic mapping allows
+a greater dynamic range.
+.le
+.ih
+DESCRIPTION
+\fBRgbto8\fR takes three input IRAF images and produces an 8-bit color map
+which samples the full range of RGB color values and an associated image
+with values indexing the color map.  The compression algorithm is called
+the Median Cut Algorithm and the image is dithered with this color map
+using the Floyd-Steinberg algorithm.  The resulting image is a short image
+with 199 values.  The color map is output in a format suitable for
+use with SAOimage, IMTOOL or XIMTOOL.  This method is recommended over the
+pixel dithering method.
+
+The RGB values are input as three IRAF images.  The images must each be
+scaled to an 8 bit range.  This is done by specifying a range of input
+values to be mapped to the 8 bit range.  In addition the range can be
+mapped logarithmically to allow a greater dynamic range.
+
+The output image is displayed with \fBrgbdisplay\fR and SAOimage, IMTOOL,
+or XIMTOOL.  Note that this requires V1.07 of SAOimage.  The color map
+produced by the \fBrgbto8\fR for a particular image must also be loaded
+into the display server manually.  With IMTOOL use the setup panel and set
+the file name in the user1 or user2 field and then select the appropriate
+map.  With SAOimage you select the "color" main menu function, and then the
+"cmap" submenu function, and then the "read" button.  Note that usually a
+full pathname is required since the server is usually started from the
+login directory.  For XIMTOOL the "XImtool*cmapDir1" resource must be
+set to the directory containing the color map and XIMTOOL must be
+restarted to cause the directory to be searched for color map files.
+
+The display server must be setup in it's default contrast mapping (with
+IMTOOL you can use the RESET option, with XIMTOOL the "normalize" option is
+used, and with SAOimage you must restart) and the contrast mapping must not
+be changed.  There are no adjustments that can be made in IMTOOL or XIMTOOL
+but with SAOimage you can adjust the colors using the "gamma" selections
+and the mouse.
+.ih
+EXAMPLES
+1.  Three 2048x2048 images of the Trifid nebula are obtained in
+the B, V, and R bandpasses.  These images are properly registered.
+Examination of the histograms leads to selecting the display ranges 1-500
+in each band.  A half size image is created by subsampling using image
+sections.
+
+.nf
+    cl> rgbto8 trifidr[*:2,*:2] trifidv[*:2,*:2] trifidb[*:2,*:2] \
+    >>> trifid8 maptype=saoimage rz1=1 rz2=500 gz1=1 gz2=500 \
+    >>> bz1=1 bz2=500
+.fi
+
+The file trifid8.sao will be created containing the color map for use
+with the image trifid8.
+.ih
+TIME REQUIREMENTS
+Example 1 takes 5 minutes on a SparcStation 2.
+.ih
+SEE ALSO
+rgbdisplay, rgbdither, rgbsun, color.package
+.endhelp

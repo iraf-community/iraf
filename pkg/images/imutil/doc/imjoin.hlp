@@ -1,0 +1,70 @@
+.help imjoin Jan97 images.imutil
+.ih
+NAME
+imjoin -- join images along a specified axis
+.ih
+USAGE
+imjoin input output join_dimension 
+.ih
+PARAMETERS
+.ls input
+The list of input images to be joined. The input images must have the
+same dimensionality and the same size along all dimensions but the join
+dimension.
+.le
+.ls output
+The output combined image.
+.le
+.ls join_dimension
+The image dimension along which the input images will be joined.
+.le
+.ls pixtype = ""
+The output image pixel type. The options are in order of increasing
+precedence "s" (short), "u" (unsigned short), "i" (integer),
+"l" (long integer), "r" (real), "d" (double), and "x" (complex).
+If the output image pixel type is not specified, it defaults to highest
+precedence input image datatype.
+.le
+.ls verbose = yes
+Print messages about actions taken by the task ?
+.le
+
+.ih
+DESCRIPTION
+
+IMJOIN creates a single output image \fIoutput\fR  by joining a list of input
+images \fIinput\fR along a specified dimension \fIjoin_dimension\fR. IMJOIN
+can be used to create a single long 1-dimensional image from a list of shorter
+1-dimensional images, or to piece together a set of 3-dimensional images into
+larger 3-dimensional images along either the x, y, or z directions. The input
+images must all have the same number of dimensions and the same size along
+all dimensions by the join dimension. The output image inherits the
+world coordinates system if any of the first input image.
+
+.ih
+EXAMPLES
+
+.nf
+1.  Join a list of 1-dimensional spectra into a single long output spectrum.
+
+    cl> imjoin @inlist output 1
+
+2.  Join three datacubes along the z direction.
+
+    cl> imjoin c1,c2,c3 c123 3
+
+.fi
+
+.ih
+TIMINGS
+
+.ih
+BUGS
+
+On some systems there are limitations on the number of input images that
+can be joined in a single execution of IMJOIN.
+
+.ih
+SEE ALSO
+imstack, imslice, imtile
+.endhelp

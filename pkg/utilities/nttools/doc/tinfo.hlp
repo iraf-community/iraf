@@ -1,0 +1,125 @@
+.help tinfo Jun1999 tables
+.nj
+.ih
+NAME
+tinfo -- Display information about a table.
+.ih
+USAGE
+tinfo table
+.ih
+DESCRIPTION
+This task is used to display information about a table.
+This information includes
+such things as the number of rows and columns.
+The output is written to STDOUT by default.
+The first line of output for each table in the input list is the table
+name preceded by a # sign.
+The values for the last table in the list are also put into parameters
+for the 'tinfo' task so that other tasks in a script may use the values.
+
+The parameters 'nrows', 'ncols', 'npar', 'rowlen', 'rowused', 'allrows',
+'maxpar', 'maxcols', 'tbltype', 'subtype' and 'tblversion'
+are output parameters.
+Since they are set rather than read by 'tinfo',
+any value assigned by the user will be overwritten.
+.ih
+PARAMETERS
+.ls table [file name template]
+A list of tables for which size information is to be produced.
+.le
+.ls (ttout = yes) [boolean]
+Display information on the terminal screen as it is being placed into
+parameters?  Setting 'ttout = no' will cause information to be placed
+only into task parameters.
+.le
+.ls (nrows) [integer]
+The number of rows written to the table.
+This and all subsequent parameters are output task parameters;
+that is, they are written by the 'tinfo' task.
+.le
+.ls (ncols) [integer]
+The number of columns in the table.
+.le
+.ls (npar) [integer]
+The number of header parameters in the table.
+.le
+.ls (rowlen) [real]
+For a row-ordered table,
+'rowlen' is the amount of space allocated for each row in the table file.
+The unit of 'rowlen' is the size of a single-precision real number.
+
+This is only relevant for row-ordered STSDAS format tables.
+.le
+.ls (rowused) [real]
+'rowused' is the amount of the row length ('rowlen')
+that has actually been used
+by the columns that have been defined,
+in units of the size of a real number.
+For example, if a table contains three columns
+with data types integer, real and double precision,
+then 'rowused' would be four.
+If the table contains only one column of data type short,
+then 'rowused' would be 0.5.
+
+This is only relevant for row-ordered STSDAS format tables.
+.le
+.ls (allrows) [integer]
+The number of allocated rows.
+This is relevant only for column-ordered STSDAS format tables.
+.le
+.ls (maxpar) [integer]
+The space allocated for header parameters.
+.le
+.ls (maxcols) [integer]
+The space allocated for column descriptors.
+.le
+.ls (tbltype) [string]
+The table type, currently either "stsdas", "fits" or "text".
+"stsdas" is a machine dependent binary format,
+the default .tab format.
+"fits" means that the table is a TABLE or BINTABLE extension
+in a FITS file.
+"text" is an ASCII file in tabular format.
+See also 'subtype'.
+.le
+.ls (subtype) [string]
+For FITS tables the subtype can be either
+"ascii" (a TABLE extension) or "binary" (a BINTABLE extension).
+For text tables the subtype can be either
+"simple" or "explicit column definitions".
+The latter subtype means there are column definition lines in the file,
+in the format:  "#c column_name datatype print_format units".
+A simple text table has column names c1, c2, etc., and no units.
+For STSDAS format tables
+the subtype will be either "row ordered" or "column ordered",
+which indicates the way the elements are stored in the table file.
+.le
+.ls (tblversion) [integer]
+The version code is an integer that identifies the version of
+the tables package that created or last modified the table.
+For STSDAS tables, the version code is stored in the table file;
+for other formats this parameter is just
+the current tables version code number.
+This number is zero for 'stsdas' and 'tables' versions 1.2.3 and earlier,
+the number is one for versions 1.3 through 1.3.3,
+the number is two beginning 1995 March 6,
+and the number is three beginning 1998 April 14.
+.le
+.ih
+EXAMPLES
+1. Get size information about the file 'm87pol.tab',
+but do not print the information to STDOUT,
+just put the values into parameters.
+
+.nf
+	tt> tinfo m87pol ttout=no
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+tlcol
+.endhelp

@@ -1,0 +1,5 @@
+RTAR -- Read tar format file or tape.  This is a portable, non-UNIX, non-
+	proprietary program for reading tar format files on a variety of
+	systems.  The TAR format is an excellent choice for transporting
+	files between different machines because of its simplicity, efficiency,
+	and machine independence.

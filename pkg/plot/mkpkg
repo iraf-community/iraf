@@ -1,0 +1,80 @@
+# Make the PLOT package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	linkplot
+	$call	linkncar
+	;
+
+install:
+	$move	xx_plot.e bin$x_plot.e
+	$move   xx_ncar.e bin$x_ncar.e
+	;
+
+ncar:
+	$update	libpkg.a
+	$call	linkncar
+	;
+linkncar:
+	$set	LIBS = "-lncar -lgks -lxtools"
+	$omake  x_ncar.x
+	$link	x_ncar.o libpkg.a $(LIBS) -o xx_ncar.e
+	;
+
+plot:
+	$update	libpkg.a
+	$call	linkplot
+	;
+linkplot:
+	$set	LIBS = "-lncar -lgks -lxtools -liminterp"
+	$omake	x_plot.x
+	$link	x_plot.o libpkg.a $(LIBS) -o xx_plot.e
+	;
+
+libpkg.a:
+	@crtpict
+
+	gdevices.x
+	getdata.x	<imhdr.h>
+	hgpline.x	<gset.h>
+	improject.x	<imhdr.h>
+	impprofile.x	<gset.h> <math/iminterp.h>
+	impstatus.x
+	initmarker.x	<gset.h>
+	perim.x		<gset.h> <mach.h>
+	phistogram.x	<mach.h> <imhdr.h> <gset.h>
+	phminmax.x	<imhdr.h>
+	pltwcs.x	<imhdr.h> <mwset.h>
+	t_contour.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\
+			<mach.h> <xwhen.h>
+	t_gkidir.x	<gki.h>
+	t_gkimos.x	<error.h> <fset.h> <gio.h> <gki.h> <gset.h> <mach.h>\
+			<math.h>
+	t_gkixt.x	<gki.h>
+	t_graph.x	<config.h> <ctype.h> <error.h> <fset.h> <gset.h>\
+			<imhdr.h> <mach.h> <xwhen.h> <mwset.h>
+	t_hafton.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\
+			<mach.h> <xwhen.h>
+	t_implot.x	<ctype.h> <error.h> <gset.h> <imhdr.h> <mach.h>\
+			<mwset.h>
+	t_pcol.x	<gset.h> <imhdr.h> <mach.h> <mwset.h>
+	t_pcols.x	<gset.h> <imhdr.h> <mach.h> <mwset.h>
+	t_pradprof.x	<gset.h> <imhdr.h>
+	t_prow.x	<gset.h> <imhdr.h> <mach.h> <mwset.h>
+	t_prows.x	<gset.h> <imhdr.h> <mach.h> <mwset.h>
+	t_pvector.x	<gset.h> <imhdr.h> <mach.h> <imset.h> <math.h>\
+			<math/iminterp.h>
+	t_surface.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\
+			<mach.h> <xwhen.h>
+	t_velvect.x	<config.h> <error.h> <fset.h> <gset.h> <imhdr.h>\
+			<mach.h> <xwhen.h>
+	vport.x		<gset.h>
+	;

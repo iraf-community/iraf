@@ -1,0 +1,4 @@
+input,s,a,"",,,Input image list
+output,s,h,"STDOUT",,,Output image list
+procflag,s,h,"",,,Processing flag for filter action
+ccdtype,s,h,"",,,CCD image type to be listed

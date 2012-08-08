@@ -1,0 +1,50 @@
+# Update the selector library.
+# Author: Bernie Simon, 18-Mar-96
+#
+# Modified: 11/21/96, to be part of threed package (I.Busko)
+# Modified: 103/17/97, added selrows function (I.Busko)
+# Modified: 04/22/97, incorporated into sgraph package (W. Hack)
+# 4 Dec 1997, added "$call generic" after "libtbtables.a" (Phil Hodge)
+# 26 Mar 1998, added tbcga.x and tbcnel.x (Phil Hodge).
+
+$checkout libtbtables.a ../
+$update libtbtables.a
+$checkin libtbtables.a ../
+$exit
+
+generic:
+        $ifnfile (generic/tcsrdaryi.x)
+        $generic -k -p generic/ -t bcsird tcsrdary.gx
+        $endif
+        $ifolder (generic/tcsrdaryi.x, tcsrdary.gx)
+        $generic -k -p generic/ -t bcsird tcsrdary.gx
+        $endif
+        ;
+
+libtbtables.a:
+        $call generic
+        @generic
+	omniread.x	<tbset.h>  <imhdr.h>  <imio.h>
+	rdselect.x	
+	rst.x		
+	selrows.x
+	tcsaddcol.x	
+	tcsclose.x	
+	tcscolumn.x	"tcs.h"
+	tcsintinfo.x	"tcs.h"
+	tcslinesize.x	"tcs.h"
+	tcsopen.x	<tbset.h>  "tcs.h"
+	tcsshape.x	"tcs.h"
+	tcstotsize.x	"tcs.h"
+	tcstxtinfo.x	"tcs.h"
+	tbcga.x		<tbset.h>
+	tbcnel.x	<tbset.h>
+	trsclose.x	"trs.h"
+	trseval.x	"trs.h"
+	trsgencode.x	<tbset.h>  "trs.h"
+	trsopen.x	"trs.h"  "trsopen.com" 
+	trsrows.x	"trs.h"
+	trstree.x	"trs.h"
+	trstrim.x	
+	whatfile.x	<imhdr.h>  "whatfile.h"
+	;

@@ -1,0 +1,90 @@
+NETwork interface.  08Oct85 dct
+------------------------------------
+
+This directory contains the network interface software required to support the
+ZFIOKS FIO driver (for the kernel interface) in a TCP/IP environment.  The only
+facilities required are those already provided by the IRAF kernel (i.e., to
+read the host name table, a text file), plus the standard TCP network functions
+provided by any system that supports TCP/IP.  The interface is self contained,
+requiring only the host TCP/IP facilities and the file "uhosts" in iraf$dev,
+used to map host names to network addresses (see gethostbyname).  The code
+supplied here is coded for Berkeley UNIX and works fine, but a much simpler
+Berkeley UNIX dependent version of ZFIOKS is what is actually used on a
+Berkeley host.
+
+The networking interface is not required to run IRAF and the contents of this
+directory may be ignored if the IRAF system is to be configured without
+networking.  On a system configured without networking the entry points of the
+ZFIOKS driver must be present but may be stubbed out.  Additional information
+on configuration details is given in the discussion of the kernel interface,
+e.g., in sys$ki.
+
+
+STRUCTURE
+
+    The structure of the network interface software is as follows:
+
+
+	 ZFIOKS		FIO device driver for the kernel server (in ..)
+	   |
+	 REXEC		remote execution of a shell command
+	   |
+	TCP_xxx		encapsulation of TCP interface
+	   |
+     (host TCP/IP)	host networking facilities
+
+
+This software is machine dependent but is designed to be reusable, i.e., the
+machine dependence has been isolated into simple procedures and definitions
+whenever possible.  On a Berkeley UNIX system the TCP procedures map directly
+into the system services of 4.2 Berkeley UNIX (and no doubt later versions as
+well).  On a VMS system running EUNICE the TCP procedures map easily into
+QIOW type device driver calls; EUNICE implements the TCP facilties in the
+network device driver.  Similar mappings should be possible on other systems
+with TCP/IP support.
+
+
+TCP INTERFACE
+
+    The TCP interface package consists of the following procedures.  On a
+Berkeley UNIX system these TCP functions map directly into calls to the UNIX
+system services.
+
+
+	tcp_gethostbyname	get internet code for a host by name
+	tcp_getsockname		get socket name
+
+	tcp_socket		create and bind a socket (client or server)
+	tcp_connect		connect to a socket (client)
+	tcp_listen		listen for connections on a socket (server)
+	tcp_accept		accept a connection (server)
+	tcp_read		read from a socket (synchronous)
+	tcp_write		write to a socket (synchronous)
+	tcp_close		close a socket (client or server)
+
+
+The usual sequence of calls used by a client process to connect to and
+communicate with a server process is the following.
+
+
+	gethostbyname;involves scan of hostname table
+
+	make a socket
+	connect to the socket
+		(connect returns when the server has accepted the connection)
+	read & write data packets
+		(etc.)
+	close the socket
+
+
+A server does much the same thing, except that the server will listen() for
+connections by client processes, accept() a connection when one occurs, and
+then begin exchanging packets with the client.
+
+------------------------------------
+NOTE -- This directory contains software which is adapted from the Berkeley UNIX
+networking software, hence a UNIX source license is required to use this
+software.  Nonetheless, about 90% of the source herein is new; at some point
+the remainder (only 100-200 lines) should be rewritten from scratch to eliminate
+the proprietary restrictions.  This was not done initially since the network
+interface is not expected to be included in the standard distribution.

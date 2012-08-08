@@ -1,0 +1,5 @@
+define	MAX_DTYPE	11
+
+short	pix_size[MAX_DTYPE]
+data	pix_size /SZ_BOOL, SZ_CHAR, SZ_SHORT, SZ_INT32, SZ_INT32, SZ_REAL,
+	         SZ_DOUBLE, SZ_COMPLEX, SZ_POINTER, SZ_STRUCT, SZ_USHORT/

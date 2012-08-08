@@ -1,0 +1,54 @@
+# Parameters for the CCMAP task
+
+# Input and output files and images
+input,f,a,,,,The input coordinate files
+database,f,a,,,,The output database file
+solutions,s,h,"",,,The database plate solution names
+images,f,h,"",,,The input images
+results,f,h,"",,,The optional results summary files
+
+# The input coordinate file format
+xcolumn,i,h,1,,,Column containing the x coordinate
+ycolumn,i,h,2,,,Column containing the y coordinate
+lngcolumn,i,h,3,,,Column containing the ra / longitude
+latcolumn,i,h,4,,,Column containing the dec / latitude 
+xmin,r,h,INDEF,,,Minimum logical x pixel value
+xmax,r,h,INDEF,,,Maximum logical x pixel value
+ymin,r,h,INDEF,,,Minimum logical y pixel value
+ymax,r,h,INDEF,,,Maximum logical y pixel value
+lngunits,s,h,"",,,Input ra / longitude units
+latunits,s,h,"",,,Input dec / latitude units
+insystem,s,h,"j2000",,,Input celestial coordinate system
+
+# The celestial coordinate system reference point parameters
+refpoint,s,h,"coords","|coords|user|tweak|",,Source of the reference point definition
+xref,s,h,"INDEF",,,Reference point in x
+yref,s,h,"INDEF",,,Reference point in y
+lngref,s,h,"INDEF",,,Reference point ra / longitude telescope coordinate
+latref,s,h,"INDEF",,,Reference point dec / latitude telescope coordinate
+refsystem,s,h,"INDEF",,,Reference point telescope coordinate system
+lngrefunits,s,h,"",,,Reference point ra / longitude units
+latrefunits,s,h,"",,,Reference point dec / latitude units
+
+# Coordinate map fitting parameters
+projection,s,h,"tan",,,Sky projection geometry
+fitgeometry,s,h,"general",|shift|xyscale|rotate|rscale|rxyscale|general|,,Fitting geometry
+function,s,h,"polynomial",|chebyshev|legendre|polynomial|,,Surface type
+xxorder,i,h,2,2,,Order of xi fit in x
+xyorder,i,h,2,2,,Order of xi fit in y
+xxterms,s,h,"half","|none|half|full|",,Xi fit cross terms type
+yxorder,i,h,2,2,,Order of eta fit in x
+yyorder,i,h,2,2,,Order of eta fit in y
+yxterms,s,h,"half","|none|half|full|",,Eta fit cross terms type
+maxiter,i,h,0,,,The maximum number of rejection iterations
+reject,r,h,3.0,,,Rejection limit in sigma units
+
+# Output and graphics mode parameters
+update,b,h,no,,,Update the image world coordinate system ?
+pixsystem,s,h,"logical",|logical|physical|",,Input pixel coordinate system
+verbose,b,h,yes,,,Print messages about progress of task ?
+interactive,b,h,yes,,,Fit the transformation interactively ?
+graphics,s,h,"stdgraph",,,Default graphics device
+cursor,*gcur,h,,,,Graphics cursor
+
+mode,s,h,'ql'

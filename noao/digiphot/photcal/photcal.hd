@@ -1,0 +1,28 @@
+# Help directory for the PHOTCAL package.
+
+$doc		= "./doc/"
+
+$evaluate	= "photcal$evaluate/"
+$fitparams	= "photcal$fitparams/"
+$mkobsfile	= "photcal$mkobsfile/"
+$mkconfig	= "photcal$mkconfig/"
+$mkimsets	= "photcal$mkimsets/"
+$parser		= "photcal$parser/"
+
+apfile		hlp = doc$apfile.hlp,      src = mkobsfile$t_apfile.x
+chkconfig	hlp = doc$chkconfig.hlp,   src = parser$t_chkconfig.x
+config		hlp = doc$config.hlp
+evalfit 	hlp = doc$evalfit.hlp,	   src = evaluate$t_evalfit.x
+fitparams	hlp = doc$fitparams.hlp,   src = fitparams$t_fitparams.x
+invertfit	hlp = doc$invertfit.hlp,   src = evaluate$t_invertfit.x
+mkapfile	hlp = doc$mkapfile.hlp,    src = photcal$mkapfile.cl
+mkconfig	hlp = doc$mkconfig.hlp,    src = mkconfig$t_config.x
+mkimsets	hlp = doc$mkimsets.hlp,    src = mkimsets$t_mkimsets.x
+mknobsfile	hlp = doc$mknobsfile.hlp,  src = photcal$mknobsfile.cl
+mkobsfile	hlp = doc$mkobsfile.hlp,   src = photcal$mkobsfile.cl
+mkcatalog	hlp = doc$mkcatalog.hlp,   src = photcal$mkcatalog.cl
+mkphotcors	hlp = doc$mkphotcors.hlp,  src = mkobsfile$t_mkphotcors.x  
+obsfile		hlp = doc$obsfile.hlp,	   src = mkobsfile$t_obsfile.x
+pcintro		hlp = doc$pcintro.hlp
+inlfit		hlp = doc$inlfit.hlp
+revisions	sys=Revisions

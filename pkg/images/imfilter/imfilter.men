@@ -1,0 +1,14 @@
+         boxcar - Boxcar smooth a list of 1 or 2-D images
+       convolve - Convolve a list of 1 or 2-D images with a rectangular filter
+        fmedian - Quantize and box median filter a list of 1D or 2D images
+          fmode - Quantize and box modal filter a list of 1D or 2D images
+       frmedian - Quantize and ring median filter a list of 1D or 2D images
+         frmode - Quantize and ring modal filter a list of 1D or 2D images
+          gauss - Convolve a list of 1 or 2-D images with an elliptical Gaussian
+       gradient - Convolve a list of 1 or 2-D images with a gradient operator
+        laplace - Laplacian filter a list of 1 or 2-D images
+         median - Median box filter a list of 1D or 2D images
+           mode - Modal box filter a list of 1D or 2D images
+        rmedian - Ring median filter a list of 1D or 2D images
+          rmode - Ring modal filter a list of 1D or 2D images
+	 runmed - Running median a list of images at each pixel position

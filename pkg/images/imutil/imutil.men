@@ -1,0 +1,25 @@
+      chpixtype - Change the pixel type of a list of images
+          hedit - Header editor
+         nhedit - Edit image header using a command file
+        hselect - Select a subset of images satisfying a boolean expression
+	imarith - Simple image arithmetic
+         imcopy - Copy an image
+       imdelete - Delete a list of images
+       imdivide - Image division with zero checking and rescaling
+         imexpr - Evaluate a general image expression
+     imfunction - Apply a single argument function to a list of images
+         imgets - Return the value of an image header parameter as a string
+       imheader - Print an image header
+    imhistogram - Compute and plot or print an image histogram
+	 imjoin - Join images along a given dimension
+       imrename - Rename one or more images
+      imreplace - Replace a range of pixel values with a constant
+        imslice - Slice images into images of lower dimension
+        imstack - Stack images into a single image of higher dimension
+	  imsum - Compute the sum, average, or median of a set of images
+	 imtile - Tile same sized 2D images into a 2D mosaic
+   imstatistics - Compute and print statistics for a list of images
+     listpixels - Convert an image section into a list of pixels
+         minmax - Compute the minimum and maximum pixel values in an image
+       sections - Expand an image template on the standard output
+

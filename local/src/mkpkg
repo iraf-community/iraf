@@ -1,0 +1,27 @@
+# Make the LOCAL package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lxtools"
+
+	$update	libpkg.a
+	$omake	x_local.x
+	$link	x_local.o libpkg.a $(LIBS) -o xx_local.e
+	;
+
+install:
+	$move	xx_local.e pkgbin$x_local.e
+	$purge	pkgbin$
+	;
+
+libpkg.a:
+	bswap.x		<mach.h>
+	pavg.x		<imhdr.h>
+	;

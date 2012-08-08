@@ -1,0 +1,49 @@
+.help cqistati Mar00 "Catquery Package"
+.ih
+NAME
+cqistati -- get an image survey results integer parameter
+.ih
+SYNOPSIS
+include <cq.h>
+
+ival = cq_istati (imres, parameter)
+
+.nf
+pointer	imres		# the survey results descriptor
+int	parameter	# the parameter to be returned
+.fi
+.ih
+ARGUMENTS
+.ls imres    
+The survey results descriptor.
+.le
+.ls parameter
+The survey parameter to be returned.  The currently supported survey
+parameters defined in cq.h are:
+.nf
+CQINQPARS	# the number of query params used to produce results
+CQIMTYPE	# the image results type, CQFITS
+CQIMRECSIZE	# the image record size, 0 if undefined 
+CQIMHSKIP	# the number of leading bytes to skip, 0 if undefined
+CQIMHREAD	# the number of leading dummy reads, 0 if undefined
+CQWCS		# the image wcs status, CQ_WFITS or CQ_WDSS or CQ_WNONE
+CQNWCS		# the number of wcs parameters, 0 if none defined
+CQNIMPARS	# the number of image parameters, 0 if none defined
+.fi
+.le
+.ih
+DESCRIPTION
+Cq_istati returns the values of image survey results integer parameters.
+Cq_istati is an integer function which returns the value of the requested
+parameter as its function value.
+
+.ih
+NOTES
+More information about the image survey results parameters and their
+relationship to the parent image survey is available by typing
+"help surveys".
+
+.ih
+SEE ALSO
+cq_istats, cq_istatt
+.endhelp

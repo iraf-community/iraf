@@ -1,0 +1,4 @@
+image,s,a,,,,"Image name"
+exptime,r,a,,,,"Exposure time"
+ccdtype,s,a,,,,"CCD type"
+filter,s,h,"",,,"Filter"

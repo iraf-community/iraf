@@ -1,0 +1,5 @@
+fixfile,f,a,,,,Bad pixel file
+template,f,a,,,,Template image
+image,f,a,,,,Bad pixel image to be created
+goodvalue,i,h,1,,,Value assigned to the good pixels
+badvalue,i,h,0,,,Value assigned to the bad pixels

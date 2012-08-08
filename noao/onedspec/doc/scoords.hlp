@@ -1,0 +1,83 @@
+.help scoords May97 onedspec
+.ih
+NAME
+scoords -- set spectrum coordinates from a pixel array (1D only)
+.ih
+USAGE
+scoords images coords
+.ih
+PARAMETERS
+.ls images
+List of one dimensional spectrum image names.
+.le
+.ls coords
+List of file names containing the coordinate values.  There may be
+one file which applies to all input images or a matching list
+of one coordinate file for each input image.  The coordinate files
+are a list of coordinate values with one coordinate per line.
+The coordinates must be ordered in increasing or decreasing value.
+The number of coordinates must match the number of pixels in the image.
+.le
+.ls label = ""
+Optional coordinate axis label.  A typical value is "Wavelength"
+for wavelength coordinates.
+.le
+.ls units = ""
+Optional coordinate axis units.  A typical value is "Angstroms".  In
+order to allow coordinate conversions by other IRAF spectra tasks
+the value should be specified as one of the known units
+(see units description in \fBonedspec.package\fR).
+.le
+.ls verbose = yes
+Print a line as each spectrum is processed?
+.le
+.ih
+DESCRIPTION
+\fBScoords\fR sets spectral coordinates in one dimensional spectral
+images as a list of coordinates in the image header.  The
+coordinate file(s) consists of coordinate values given one per line.
+Each coordinate value is assigned to an image pixel in the order given
+and so the number of coordinate values must match the number of pixels
+in the spectrum.  Also the coordinates must be monotonically increasing
+or decreasing.
+
+When multiple spectra are to be set a matching list of coordinates can
+be specified or a single coordinate file for all images may be used.
+
+The coordinate system set in the header is an example of the "multispec"
+world coordinate system.  This is understood by all the standard
+IRAF tasks.  It is described under the help topic "onedspec.specwcs".
+Once the coordinates are set one may resample the spectrum to a
+more compact linear description using the task \fBdispcor\fR.
+
+Since the coordinate values are stored in the header (double
+precision numbers) the header can become quite large if the spectrum
+is long.  Be sure the environment variable "min_lenuserarea" which
+defines the maximum size of the image header in number of characters
+is large enough to hold all the coordinates.
+.ih
+EXAMPLES
+1.  Set the coordinates for a spectrum.
+
+.nf
+    cl> type coords.dat
+    4000.
+    4010.123
+    4020.246
+    4031.7
+    <etc>
+    cl> scoords spec coords.dat label=Wavelength units=Angstroms
+    cl> listpix spec wcs=world
+    4000.  	124.
+    4010.123	543
+    <etc>
+.fi
+.ih
+REVISIONS
+.ls SCOORDS V2.11
+This is a new task with this version.
+.le
+.ih
+SEE ALSO
+rtextimage, dispcor, specwcs, onedspec.package
+.endhelp

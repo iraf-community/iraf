@@ -1,0 +1,90 @@
+.help widstape Mar85 noao.mtlocal
+.ih
+NAME
+widstape -- Write a Cyber style IDSOUT tape
+.ih
+USAGE
+widstape idsout input records
+.ih
+PARAMETERS
+.ls idsout
+The output file name to receive the card-image data. This may be a
+magtape specification (e.g. mta, mtb) or disk file name.
+.le
+.ls input
+The input root file name for the spectra to be written
+.le
+.ls records
+The record string to be appended to the root name to create the image
+names of the spectra to be written.
+.le
+.ls new_tape = no
+If set to yes, the tape is rewound and output begins at BOT. If no,
+output begins at EOT unless an explicit file specification is given
+as part of the magtape file name for parameter "idsout" (e.g. mta[2]).
+If idsout contains a file specification of [1], then writing begins
+at BOT regardless of the value for new_tape.
+.le
+.ls block_size = 3200
+The tape block size in bytes. This must be an integral factor of 80.
+.le
+.ls ebcdic = no
+The default character code is ASCII, but if this parameter is set to yes,
+the output character will be in EBCDIC.
+.le
+.ih
+DESCRIPTION
+The specified spectra are copied to the output file in a card-image format
+defined in the IPPS-IIDS/IRS Reduction Manual. Values from the extended
+image header are used to fill in the observational parameters.
+
+The basic format consists of 4 - 80 byte header cards, 128 data cards
+having 8 data elements per card in 1PE10.3 FORTRAN equivalent format,
+and a trailing blank card for a total of 133 cards. 
+Thus spectra up to 1024 points may be contained in the IDSOUT format. 
+The format is outlined below:
+
+.nf
+ Line	Column	Type
+    1	   1-5	Integer	  Record number within IDSOUT text file
+	  6-10	Integer	  Integration time
+	 11-25	Real	  Wavelength of first bin
+	 26-40	Real	  Dispersion
+	 41-45	Integer	  0 (Index of first pixel)
+	 46-50  Integer	  Line length - 1 (Index of last pixel)
+	 71-80	Integer	  UT time
+    2	  1-10	Real	  Siderial time
+	 11-25	Real	  Right Ascension
+	 26-40	Real	  Declination
+    3	 21-35	Real	  Hour Angle
+	 36-50	Real	  Air mass
+	 51-58	Integer	  UT date
+	 60-76	String	  Image title
+	 78-80	String	  END
+    4	  1-64	String	  Record label
+	 78-80	String	  END
+5-132		Real	  1024 pixel values, 8 per line
+  133			  Blank line
+.fi
+
+The data of type real are in exponent format; i.e FORTRAN 'E' format (1.234e3).
+
+There are no special marks between spectral images, 
+and when multiple spectra are written with a single command, the first card
+of a subsequent spectrum may be within the same physical tape block
+as the last card of the previous spectrum. This assures that all tape
+blocks (except the very last one in the tape file) are all the same
+length.  A double end-of-mark is written after the last spectrum.
+.ih
+EXAMPLES
+The following example writes an IDSOUT format tape starting at the
+beginning of the tape.
+
+	cl> widstape mta nite1 1001-1200 new_tape+
+.ih
+TIME REQUIREMENTS: UNIX/VAX 11/750
+Each spectrum of 1024 points requires about 2 second.
+.ih
+SEE ALSO
+rcardimage, ridsout
+.endhelp

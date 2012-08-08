@@ -1,0 +1,11 @@
+Ideas for additional tasks:
+
+o Given a list of (x,y) or (x,y,z) make/add a 1D or 2D image
+	o Fit using curfit/gsurfit?
+	o Some other way of fitting?
+
+o Script tasks to make certain classes of data.
+
+o Demo
+
+o Do stuff for making various PLIO masks

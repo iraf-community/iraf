@@ -1,0 +1,27 @@
+.help demo Oct87 noao.imred.ccdred.ccdtest
+.ih
+NAME
+demo -- Run a demonstration of the CCD reduction package
+.ih
+USAGE
+demo
+.ih
+PARAMETERS
+.ls demofile = "ccdtest$demo.dat"
+Demonstration playback file.
+.le
+.ih
+DESCRIPTION
+This script task runs a demonstration playback.  The playback file
+is specified by a hidden parameter.  Normally this default playback file
+is used.  The default demonstration will use the task \fBtv.display\fR if it
+is loaded to show you the CCD frames being processed.
+.ih
+EXAMPLES
+1. To run a demonstration of the \fBccdred\fR package:
+
+	cl> demo
+.ih
+SEE ALSO
+stty
+.endhelp

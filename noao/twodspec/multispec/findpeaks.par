@@ -1,0 +1,13 @@
+# FINDPEAKS
+
+image,f,a,,,,Image to be searched
+lines,s,a,,,,Images lines to be searched for peaks
+contrast,r,a,,,,Maximum contrast between peak values
+separation,i,h,5,,,Minimum separation between peaks
+edge,i,h,0,0,,Minimum separation from the image edge
+threshold,r,h,0.,,,Minimum peak threshold for selecting peaks
+min_npeaks,i,h,1,,,Minimum number of peaks to be found
+max_npeaks,i,h,1000,,,Maximum number of peaks to be found
+columns,s,h,"*",,,Image columns to be searched for peaks
+naverage,i,h,20,,,Number of image lines to average
+debug,b,h,no,,,Print debugging information?

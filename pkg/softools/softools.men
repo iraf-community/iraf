@@ -1,0 +1,15 @@
+	generic - Preprocess a generic source file
+     hdbexamine - Examine a help database
+	  lroff - Lroff (line-roff) text formatter
+	 memchk - Process a memdbg mem.log file for errors
+       mkhelpdb - Make (compile) a help database
+      mkmanpage - Make a manual page
+	  mkpkg - Make or update an object library or package
+	 mktags - Tag all procedure declarations in a set of files
+      mkttydata - Build cache for termcap/graphcap device entries
+	  rmbin - Find/delete binary files in subdirectories
+	rmfiles - Find/delete files in subdirectories
+	   rtar - Read a TAR format archive file
+	   wtar - Write a TAR format archive file
+             xc - Compile and/or link a program
+	  xyacc - Build an SPP language parser

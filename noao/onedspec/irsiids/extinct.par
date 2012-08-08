@@ -1,0 +1,11 @@
+# EXINCT
+
+root,s,a,,,,Root name for spectra file names
+records,s,a,,,,Record string to process
+output,s,a,,,,Root name for spectra to be created
+start_rec,i,a,1,0,9999,Next starting spectral record
+nr_aps,i,h,2
+strt,i,h
+rt,s,h
+out,s,h
+rec,s,h

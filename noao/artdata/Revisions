@@ -1,0 +1,537 @@
+.help revisions Jan90 noao.artdata
+.nf
+
+mktemplates.x
+doc/mkobjects.hlp
+    Added Sersic model profiles.  This was done using only the model
+    name to avoid any additional parameters.  (2/24/11, Valdes)
+
+=======
+V2.15.2
+=======
+
+=======
+V2.12.2
+=======
+
+mkheader.x
+    The routine was not putting an EOS for lines longer than IDB_RECLEN
+    resulting in cards longer than the FITS standard.
+    (1/29/04, Valdes)
+
+mktemplates.x
+    Pointer procedure mkt_object() could return w/out value (12/29/03, MJF)
+
+mkheader.x
+    Added checks and warning messages for overflowing the user header
+    area.  (11/10/03, Valdes)
+
+t_mknoise.x
+t_mkobjects.x
+t_mk1dspec.x
+t_mkechelle.x
+lists/t_starlist.x
+lists/t_gallist.x
+    The behavior of the random number seed used when specified as INDEF
+    was changed to avoid the 1 second grandularity.  See buglog 528.
+    (8/7/03, Valdes)
+
+t_mknoise.x
+    The string for the header file name was increased in length from
+    LEN_COMMENT to SZ_FNAME.  (6/27/03, Valdes)
+
+=======
+V2.12.1
+=======
+=====
+V2.12
+=====
+
+t_mkobjects.x
+doc/mkobjects.hlp
+    The star templates are now created only once when there is a list
+    of input images.  There was also a bug in matching the objects
+    list to the input list which didn't work and also did not agree with
+    the help.  Now there must be a matching list.  (12/14/01, Valdes)
+
+stdheader.dat
+    The DATE-OBS had a syntax error, a ':' instead of 'T' separating the
+    date and time.  (2/11/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+
+stdheader.dat
+mkexamples/archdr.dat
+mkexamples/objhdr.dat
+    Changed DATE-OBS to new FITS format.  (5/19/99, Valdes)
+    
+
+doc/mkobjects.hlp
+doc/mkpattern.hlp
+doc/mkechelle.hlp
+    Fixed minor formating problems.  (4/22/99, Valdes)
+
+doc/mkechelle.hlp
+    Modified to indicate the input list is not exactly the same as MK1DSPEC
+    since that task was modified to support different profile types.
+    (3/16/98, Valdes)
+
+=====
+V2.11
+=====
+
+t_mk1dspec.x
+t_mknoise.x
+t_mkobjects.x
+lists/t_starlist.x
+lists/t_gallist.x
+doc/mk1dspec.hlp
+doc/mknoise.hlp
+doc/mkobjects.hlp
+doc/starlist.hlp
+doc/gallist.hlp
+    If the random number seed is specified as INDEF then the task will
+    use the clock time (seconds since 1980) as the seed.  This allows
+    users to get different random numbers for each execution.
+    (9/23/97, Valdes)
+
+t_mk1dspec.x
+    If the dispersion was negative the task would fail to make the lines.
+    (6/2/97, Valdes)
+
+doc/mk1dspec.hlp
+    Fixed minor typo.  (6/2/97, Valdes)
+
+doc/mkpattern.hlp
+    Updated for changes.  (4/22/97, Valdes)
+
+artdata.par
+doc/mknoise.hlp
+doc/mkobjects.hlp
+    Changed the default for "ranbuf" to zero.  (1/29/97, Valdes)
+
+lists/stdbio.x
+    The parameter information in the output now begins with #.
+    (12/30/96, Valdes)
+
+t_mknoise.x
+t_mk1dspec.x
+t_mk2dspec.x
+t_mkechelle.x
+t_mkobjects.x
+t_mkpattern.x
+    Changed logic to work around the fact that IMACCESS does not always
+    work.  This became a problem with the FITS kernel.  (11/11/96, Valdes)
+
+t_mkpattern.x
+mkpattern.par
+doc/mkpattern.hlp
+    Added "ushort" and "complex" data types.  (11/8/96, Valdes)
+
+numrecipes.x
+    Modified the Poisson deviate routine to return zero for input
+    values less than or equal to zero.  (10/1/96, Valdes)
+
+lists/stdbio.x
+    Modified the list formatting code to print the x and y centers of
+    the objects to 3 decimal places of precision. (8/27/96, Davis)
+
+mkpattern.par
+    An ndim of zero is now allowed.  (8/15/96, Valdes)
+
+mkobjects.par
+doc/mkobjects.hlp
+    Modified the prompt for "background" and the help page to indicate
+    that the value is in data numbers.  (6/27/96, Valdes)
+
+t_mkechelle.x
+    The DC-FLAG was not being set correctly for raw extracted spectra.
+    (4/26/96, Valdes)
+
+doc/mk1dspec.hlp
+    Minor clarification of how the peak parameter is used if a line
+    list is given but there is not peak value.  (10/12/95, Valdes)
+
+gallist.par
+    Changed the "ar" parameter to a default value of 0.3 corresponding
+    to the range E0 to E7.  (10/10/95, Valdes)
+
+voigt.x			+
+mk1dspec.par
+t_mk1dspec.x
+mkpkg
+mkexamples/henear.cl
+mkexamples/heneardc.cl
+mkexamples/longslit.cl
+mkexamples/multifiber.cl
+mkexamples/spectrum.cl
+doc/mk1dspec.hlp
+    1.	MK1DSPEC now includes gaussian, lorentzian, and voigt line profiles.
+	There were parameter changes and changes to the input/output
+	line lists.
+    2.  The example scripts calling MK1DSPEC were modified for the changes
+	to task though they still use only gaussian lines.  The spectra
+	will not be exactly the same because the order of the random
+	numbers has changed.
+    (7/28/95, Valdes)
+
+=======
+V2.10.4
+=======
+
+artdata$t_mk1dspec.x
+    Fixed two type mismatches in min/max calls.  (12/31/94, Valdes)
+
+artdata$lists/stmix.x
+    The calculation of absorption in spiral models was not working and
+    so no absorption effect was being added as described in the help.
+    This has been fixed.  (10/29/94, Valdes)
+
+xtools$numrecipes.x
+    The POIDEV routine can still have a problem in that the tan function
+    can return a very large number triggering either an overflow in
+    the evaluation of em or in the int truncation of em as addressed
+    below.  A test is now made on the value of the tan function.
+    (9/14/94, Valdes)
+
+artdata$mknoise.par
+artdata$doc/mknoise.hlp
+    The help was inconsistent with the task in that any background specified
+    is added to both new and existing images.  The discussion of subtracting
+    the background in existing images was wrong.  The "background" parameter
+    was moved in the par file from the NEW IMAGE section.
+    (7/1/94, Valdes)
+
+artdata$mktemplates.x
+    The structure parameter MKT_SCALE was incorrectly defined as an
+    integer resulting in the output scales of the "expdisk" and "devauc"
+    objects to be incorrect (see bug log 226).  (9/17/93, Valdes)
+
+artdata$t_mkpattern.x
+    Fixed bug in indexing.  This bug was most noticible with the checkerboard
+    and a larger size which showed the first square was too small by 1.
+    (9/2/93, Valdes)
+
+artdata$mkexamples/longslit.cl
+artdata$mkexamples/lsgal.cl +
+artdata$twodspec.men
+     Added an example,lsgal, of an extended longslit galaxy spectrum.
+     (8/21/93, Valdes)
+
+artdata$numrecipes.x
+    The POIDEV routine from Numerical Recipes can try to coerce a large
+    floating point number to an integer which can cause an exception.
+    If the value is 100 or greater a Gaussian deviate is now returned.
+    (8/11/93, Valdes)
+
+=============
+V2.10.3. beta
+=============
+
+artdata$t_mkobjects.x
+artdata$t_mknoise.x
+    The min/max data values are computed and set in the output image.
+    (4/16/93, Valdes)
+
+artdata$mkexamples
+    1.  The MKEXAMPLES task now provides multiple menus.
+    2.  The spectrum examples have been organized by type.
+    3.  New spectrum examples have been added.
+    4.  The echelle and onedspec examples use the oseed to set the number
+	of orders/apertures.
+    (3/17/93, Valdes)
+
+artdata$t_mkechelle.x
+artdata$t_mk1dspec.x
+artdata$mk1dspec.par
+artdata$doc/t_mk1dspec.hlp
+mkpkg
+    1.  Modified to use SMW WCS routines.
+    2.  The mk1dspec.format parameter was eliminated.
+    (3/17/93, Valdes)
+
+artdata$mkheader.x
+    Added a double type to mkh_comment1.  (3/17/93, Valdes)
+
+artdata$mkobjects.x
+artdata$doc/mkobjects.hlp
+    Changed the behavior of xoffset and yoffset to be the offset after
+    distance scaling to allow having a fixed origin.  (3/16/93, Valdes)
+
+artdata$lists/stplot.x
+    When there is only one object or when all objects have the same value
+    then the symbol size scaling with amapr gave a floating operand error.
+    A check has been added for this.  (3/16/93, Valdes)
+
+artdata$t_mkechelle.x
+    The method of generating random lines was incorrect.  This showed up
+    when trying to make the same set of random lines with a different
+    velocity.  (3/1/93, Valdes)
+
+ardata$t_mkobjects.x
+ardata$t_mknoise.x
+ardata$t_mkechelle.x
+ardata$t_mk2dspec.x
+ardata$t_mk1dspec.x
+ardata$mkheader.x
+    Replaced use of '\t' in the comment with spaces. (11/12/92, Valdes)
+
+artdata$mktemplates.x
+    In mkt_binprof there was no check that the central subpixels were
+    within the profile.  For very small objects this could lead to
+    out of bounds references in the prof array.  A check on this was
+    added.  (10/30/92, Valdes)
+
+artdata$t_mk2dspec.x
+artdata$t_mkechelle.x
+    Add a limit check to prevent integration of a pixel outside the profile
+    interpolation function.   (8/14/92, Valdes)
+
+artdata$t_mkechelle.x
+    Changed a "** 1.5" to a combination of square root and an integer
+    third power.  (8/10/92, Valdes)
+
+=======
+V2.10.2
+=======
+=======
+=======
+V2.10.1
+=======
+=======
+V2.10.0
+=======
+
+artdata$t_mkechelle.x
+    "min (tt" --> "min (tt[i]" and  "max (tt" --> "max (tt[i]"
+    (6/23/92, Valdes)
+
+=====
+V2.10
+=====
+
+artdata$mkexamples/*
+artdata$doc/mkexamples.hlp
+    Added parameter to control whether comments are generated in the
+    examples.  (1/31/92, Valdes)
+
+artdata$mktemplate.x
+    Made substantial changes to how the user and analytic profiles are
+    handled.  Primarily, the prefered form for both user supplied and
+    analytic profiles is as intensity profiles rather than cumulative
+    flux profiles.  Cumulative profiles may still be input and they are
+    identified by having a zero initial element.  (12/13/91, Valdes)
+
+artdata$mktemplates.x
+    Very large gaussians showed an dip in the center due to problems with
+    mkt_fixprof.  A better algorithm was instituted.  (12/11/91, Valdes)
+
+artdata$lists/stmix.x
+    1.  The random component of the size distribution for the Schecter function
+    was incorrect.  It was giving a 100% random factor and was reducing
+    the size by 40%.  The fix is 0.2 + 0.4 * urand() ==> 0.8 + 0.4 * urand().
+    2.  The roundness distribution for ellipical galaxies was done incorrectly.
+    (11/26/91, Valdes)
+
+artdata$lists/stdbio.x
+    Instead of putting out beta in the log for the schecter function changed
+    to put out mstar.  (11/26/91, Valdes)
+
+artdata$t_mk1dspec.x
+artdata$t_mkechelle.x
+    Fixed minor bugs found by SPPLINT.  (11/21/91, Valdes)
+
+artdata$mktemplates2.x
+artdata$lists/stlumold.x
+    Delete old versions.  (11/21/91, Valdes)
+
+artdata$doc/t_mkpattern.x
+    Fixed an error in mkpattern:
+	max (1, (line-1))  -->  max (1, line)
+    (10/15/91, Valdes)
+
+artdata$doc/mk1dspec.hlp
+    Need to indicate that the blackbody flux is per unit wavelength.
+    (10/9/91, Valdes)
+
+artdata$t_mkpattern.x
+    For 1D images the pattern made corresponded to line 0 instead of line 1.
+    (7/26/91, Valdes)
+
+artdata$mktemplates.x
+    The PSF position angle was not being converted to radians from degrees
+    with the result that the input was interpreted as radians.  The
+    conversion with DEGTORAD was added.  (6/10/91, Valdes)
+
+artdata$t_mkechelle.x
+artdata$mkechelle.par
+artdata$doc/mkechelle.hlp
+artdata$t_mk1dspec.x
+artdata$x_artdata.x
+artdata$artdata.cl
+artdata$artdata.men
+artdata$artdata.hd
+artdata$mkpkg
+artdata$mkexamples/ecarc2d.cl
+artdata$mkexamples/ecobj2d.cl
+artdata$mkexamples/ecarc1d.cl
+artdata$mkexamples/ecarcdc.cl
+artdata$mkexamples/ecthorium.dat
+artdata$mkexamples/mkexamples.men
+    1.  Added new artificial echelle task.
+    2.  Added echelle examples.
+    3.  Fixed minor bug in MK1DSPEC concerning header format of wend parameter.
+    (3/20/91, Valdes)
+
+artdata$
+  mkheader.x +
+  mkpkg
+  t_mkobjects.x, mkobjects.par, doc/mkobjects.hlp
+  t_mkpattern.x, mkpattern.par, doc/mkpattern.hlp
+  t_mknoise.x,   mknoise.par,   doc/mknoise.hlp
+  t_mk2dspec.x,  mk2dspec.par,  doc/mk2dspec.hlp
+  t_mk1dspec.x,  mk1dspec.par,  doc/mk1dspec.hlp
+  t_mkheader.x,  mkheader.par,  doc/mkheader.hlp
+  artdata.men
+  stdheader.dat
+    1.  Separated out header stuff into separate file.
+    2.  Changed format of header keyword file to be FITS-like including
+	understanding the output of IMHEADER.  The default file
+	stdheader.dat was changed appropriately.
+    3.  Added capability to copy an image header when creating a new
+	image.
+    4.  MKHEADER can append or replace a header from an image or
+	a header keyword file.  The clobber parameter was changed
+	to append.  The verbose parameter now lists only the image
+	and source of header changes rather than individual keywords.
+    (1/16/91, Valdes)
+
+artdata$mktemplates.x
+    Fixed bug preventing template memory stored in the symbol table
+    from being freed.  (12/4/90, Valdes)
+
+artdata$mktemplates.x
+    Changed seeing sampling from 40% to 80% for image template psfs.
+    (11/13/90, Valdes)
+
+artdata$t_mk1dspec.x
+artdata$t_mk2dspec.x
+artdata$t_mkobjects.x
+artdata$t_mknoise.x
+artdata$mk1dspec.par
+artdata$mk2dspec.par
+artdata$mkobjects.par
+artdata$mknoise.par
+artdata$doc/mk1dspec.hlp
+artdata$doc/mk2dspec.hlp
+artdata$doc/mkobjects.hlp
+artdata$doc/mknoise.hlp
+artdata$mkexamples/
+    1. MK1DSPEC now can create multispec/echelle format images.
+    2. Added switch to turn off comments.
+    (11/7/90, Valdes)
+
+artdata$t_mkobjects.x
+    1. Added object list file name to the header comments.
+    2. Fixed bug which caused objects which went off the edge and were
+       exactly at a half pixel boundry (i.e. 32.5) to end up off by one
+       pixel.
+    (10/23/90, Valdes)
+
+artdata$mktemplates.x
+    Replaced use of i as the function value returned by immap and open
+    with im and fd respectively.  For unknown reasons the HPUX compiler
+    left the value of i at 0 after the function call.  (10/10/90, Valdes)
+
+artdata$artdata.cl
+artdata$artdata.hd
+artdata$artdata.men
+artdata$doc/mkexamples.hlp +
+artdata$mkexamples/	+
+artdata$mkexamples/mkexamples.cl +
+artdata$mkexamples/mkexamples.men +
+artdata$mkexamples/globular.cl +
+artdata$mkexamples/multifiber.cl +
+artdata$mkexamples/longslit.cl +
+artdata$mkexamples/galcluster.cl +
+artdata$mkexamples/galfield.cl +
+artdata$mkexamples/starfield.cl +
+    1.  A new task, MKEXAMPLES, has been added to make some standard examples
+	for demonstrations and task scripts in this and other packages.
+    2.  The task is driven by simple script files located in the logical
+	directory mkexamples$.
+
+artdata$artdata.cl
+artdata$artdata.hd
+artdata$artdata.men
+artdata$artdata.par
+artdata$x_artdata.x
+artdata$mkheader.par +
+artdata$mk1dspec.par
+artdata$mk2dspec.par
+artdata$mknoise.par
+artdata$mkobjects.par
+artdata$stdheader.dat +
+artdata$mkpkg
+artdata$t_mkheader.x +
+artdata$t_mk1dspec.x
+artdata$t_mk2dspec.x
+artdata$t_mknoise.x
+artdata$t_mkobjects.x
+artdata$doc/mkheader.hlp +
+artdata$doc/mkobjects.hlp
+artdata$doc/mknoise.hlp
+artdata$doc/mk1dspec.hlp
+artdata$doc/mk2dspec.hlp
+    1.  A new task, MKHEADER, has been added to add or modify image headers
+	using a header keyword data file.
+    2.  The tasks MKOBJECTS, MKNOISE, MK1DSPEC, and MK2DSPEC have a new
+	parameter, header, which allows specifying a header keyword data
+	file.  A standard header data file is used as the default.
+    3.  The tasks MKOBJECTS, MKNOISE, MK1DSPEC, and MK2DSPEC add some
+	some header parameters such as gain, rdnoise, and exptime as
+	well as extensively comment task and data file parameters.
+    4.  The package version number was incremented.
+
+artdata$mktemplates.x
+    1.  The logic for discriminating between an image template and profile
+	file doesn't work because IMACCESS does not check if the file is
+	an image.  Modified to use an error check on IMMAP.
+    2.  The ACCESS call to test for access to a profile file had a missing
+	third argument causing a segmentation error on at least Sun3.
+    3.  For the star profile input an initialization of nxm was missing
+	and a malloc used nxm instead of j resulting in an alloc of 0 length.
+    Basically the profile file input was not working.  (8/9/90, Valdes)
+
+artdata$mktemplates.x
+    The gaussian radius was being treated as a full width resulting in
+    stars which are half that expected.  (7/19/90, Valdes)
+
+artdata$t_mkobjects
+    A rounding error for objects which go off the
+    lower edges was causing the objects to appear one pixel offset to larger
+    numbers.  Replaced rounding done by adding 0.5 by nint.  (7/2/90, Valdes)
+
+artdata$t_mk1dspec.x
+artdata$mk1dspec.par
+artdata$doc/mk1dspec.hlp
+    Added redshifting capability.  (5/18/90, Valdes)
+
+====
+V2.9
+====
+
+artdata$t_mkpattern.x
+    The COORDINATES pattern was off by 1.  (3/12/90, Valdes)
+
+artdata$
+    Davis, Feb 19, 1990
+    1. The STARLIST and GALLIST tasks for making artificial star and
+    galaxies fields were added to the artdata package.
+
+artdata$* +
+    First version of the artificial data package installed.  (2/1/90, Valdes)
+
+.endhelp

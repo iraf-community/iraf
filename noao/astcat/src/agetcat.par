@@ -1,0 +1,28 @@
+# The AGETCAT parameter file.
+
+# The field center parameters.
+
+regions,s,a,"pars",,,"The regions list (pars,file,images)"
+output,s,a,"default",,,"The output astrometry file(s)"
+aregpars,pset,h,"",,,"The default field center parameters"
+
+# The astrometric catalog parameters.
+
+catalogs,s,h,)_.catalogs,,,"The astrometric catalog(s)"
+
+# The output catalog filtering parameters.
+
+standard,b,h,yes,,,Output a standard astrometry file ?
+filter,b,h,no,,,"Filter the output astrometry file ?"
+afiltpars,pset,h,"",,,The astrometry file filtering parameters
+
+# The task mode parameters
+
+update,b,h,no,,,"Update algorithm parameters at task termination ?"
+verbose,b,h,yes,,,"Print task messages ?"
+
+# The task configuration parameters.
+
+catdb,s,h,)_.catdb,,,"The astrometric catalog configuration file"
+
+mode,s,h,"ql",,,

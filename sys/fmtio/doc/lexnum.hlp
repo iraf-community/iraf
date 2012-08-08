@@ -1,0 +1,303 @@
+
+.help lexnum 2 "string utilities"
+.ih _________________________________________________________________________
+NAME
+lexnum -- Determine if string is a number
+.ih
+USAGE
+token_type = lexnum (str, ip, nchars)
+
+.ih
+PARAMETERS
+.ls str
+String to be scanned.
+.le
+.ls ip
+Index within the string as which scanning is to start.  Not modified.
+.le
+.ls nchars
+On output, the number of characters in the number, not including any
+leading whitespace.
+.le
+.ih
+DESCRIPTION
+The character string is scanned to determine if the next token is a
+legal number, and if so, the type of number.  The function value identifies
+the type of number.  The possible return values, defined in <lexnum.h>,
+as as follows:
+
+.nf
+	LEX_OCTAL	(+|-)?[0-7]+[bB]
+	LEX_DECIMAL	(+|-)?[0-9]+
+	LEX_HEX		(+|-)?[0-9a-fA-F]+[xX]
+	LEX_REAL	floating, exponential [eEdD], sexagesimal
+	LEX_NONNUM	not a number
+.fi
+.ih
+IMPLEMENTATION
+Numtype is implemented as a finite state automaton.  Additional documentation
+is provided with the source code.
+.ih
+SEE ALSO
+gctod(2), ctotok(2).
+.endhelp ___________________________________________________________________
+
+
+
+.help states 2 "States of the LEXNUM Finite State Automaton"
+.fi
+
+
+.ks
+.nf
+start:								(1)
+	+-		shift	unop_or_number
+	0-7		shift	odhr
+	8-9		shift	dhr
+	acf		reduce	not_a_number
+	ed		reduce	not_a_number
+	:		shift	maybe_real_number
+	.		shift	maybe_real_fraction
+	x		reduce	not_a_number
+	b		reduce	not_a_number
+	other		reduce	not_a_number
+.fi
+.ke
+
+
+.ks
+.nf
+unop_or_number:		(+|-)					(2)
+	+-		revert
+	0-7		shift	odhr
+	8-9		shift	dhr
+	acf		revert
+	ed		revert
+	:		revert
+	.		shift	maybe_real_fraction
+	x		revert
+	b		revert
+	other		revert
+.fi
+.ke
+
+
+.ks
+.nf
+odhr:			(+|-)?[0-7]				(3)
+	+-		reduce	decimal_number
+	0-7		accept
+	8-9		shift	dhr
+	acf		shift	h
+	ed		shift	maybe_hex_or_rexp
+	:		shift	maybe_real_number
+	.		shift	real_fraction
+	x		reduce	hex_number
+	b		shift	octal_or_hex_number
+	other		reduce	decimal_number
+.fi
+.ke
+
+
+.ks
+.nf
+dhr:			(+|-)?[0-9]+				(4)
+	+-		reduce	decimal_number
+	0-7		accept
+	8-9		accept
+	acf		shift	h
+	ed		shift	maybe_hex_or_rexp
+	:		shift	maybe_real_number
+	.		shift	real_fraction
+	x		reduce	hex_number
+	b		shift	h
+	other		reduce	decimal_number
+.fi
+.ke
+
+
+.ks
+.nf
+maybe_real_fraction:	(+|-)?"."				(5)
+	+-		revert
+	0-7		shift	real_fraction
+	8-9		shift	real_fraction
+	acf		revert
+	ed		revert
+	:		revert
+	.		revert
+	x		revert
+	b		revert
+	other		revert
+.fi
+.ke
+
+
+.ks
+.nf
+h:			(+|-)?[0-9]*[a-f]			(6)
+	+-		revert
+	0-7		accept
+	8-9		accept
+	acf		accept
+	ed		accept
+	:		revert
+	.		revert
+	x		reduce	hex_number
+	b		accept
+	other		revert
+.fi
+.ke
+
+
+.ks
+.nf
+maybe_hex_or_rexp:	(+|-)?[0-9]+[ed]			(7)
+	+-		shift	maybe_rexp
+	0-7		shift	hex_or_rexp
+	8-9		shift	hex_or_rexp
+	acf		shift	h
+	ed		shift	h
+	:		revert
+	.		revert
+	x		reduce	hex_number
+	b		shift	h
+	other		revert
+.fi
+.ke
+
+
+.ks
+.nf
+maybe_real_number:	(+|-)?[0-9]*":"				(8)
+	+-		revert
+	0-7		shift	r
+	8-9		shift	r
+	acf		revert
+	ed		revert
+	:		accept
+	.		revert
+	x		revert
+	b		revert
+	other		revert
+.fi
+.ke
+
+
+.ks
+.nf
+octal_or_hex_number:	(+|-)?[0-7]"b"				(9)
+	+-		reduce	octal_number
+	0-7		shift	h
+	8-9		shift	h
+	acf		shift	h
+	ed		shift	h
+	:		reduce	octal_number
+	.		reduce	octal_number
+	x		reduce	hex_number
+	b		shift	h
+	other		reduce	octal_number
+.fi
+.ke
+
+
+.ks
+.nf
+real_fraction:		(+|-)?"."[0-9]				(10)
+	+-		reduce	real_number
+	0-7		accept
+	8-9		accept
+	acf		reduce	real_number
+	ed		shift	rfr_or_rexp
+	:		reduce	real_number
+	.		reduce	real_number
+	x		reduce	real_number
+	b		reduce	real_number
+	other		reduce	real_number
+.fi
+.ke
+
+
+.ks
+.nf
+rfr_or_rexp:		(+|-)?"."[0-9]+[ed]			(11)
+	+-		shift	maybe_rexp
+	0-7		shift	rexp
+	8-9		shift	rexp
+	acf		revert
+	ed		revert
+	:		revert
+	.		revert
+	x		revert
+	b		revert
+	other		revert
+.fi
+.ke
+
+
+.ks
+.nf
+maybe_rexp:		(+|-)?[0-9]+[ed](+|-)			(12)
+	+-		revert
+	0-7		shift	rexp
+	8-9		shift	rexp
+	acf		revert
+	ed		revert
+	:		revert
+	.		revert
+	x		revert
+	b		revert
+	other		revert
+.fi
+.ke
+
+
+.ks
+.nf
+hex_or_rexp:		(+|-)?[0-9]+[ed][0-9]			(13)
+	+-		reduce	real_number
+	0-7		accept
+	8-9		accept
+	acf		shift	h
+	ed		shift	h
+	:		reduce	real_number
+	.		reduce	real_number
+	x		reduce	hex_number
+	b		reduce	real_number
+	other		reduce	real_number
+.fi
+.ke
+
+
+.ks
+.nf
+r:			(+|-)?[0-9]*":"[0-9]			(14)
+	+-		reduce	real_number
+	0-7		accept
+	8-9		accept
+	acf		reduce	real_number
+	ed		shift	maybe_rexp
+	:		accept
+	.		shift	maybe_real_fraction
+	x		reduce	real_number
+	b		reduce	real_number
+	other		reduce	real_number
+.fi
+.ke
+
+
+.ks
+.nf
+rexp:			(+|-)?[0-9]+[ed](+|-)[0-9]		(15)
+	+-		reduce	real_number
+	0-7		accept
+	8-9		accept
+	acf		reduce	real_number
+	ed		reduce	real_number
+	:		reduce	real_number
+	.		reduce	real_number
+	x		reduce	real_number
+	b		reduce	real_number
+	other		reduce	real_number
+.fi
+.ke

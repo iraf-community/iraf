@@ -1,0 +1,36 @@
+.help rvlg Jun99 "Slalib Package"
+.nf
+
+      REAL FUNCTION slRVLG (R2000, D2000)
+
+     - - - - -
+      R V L G
+     - - - - -
+
+  Velocity component in a given direction due to the combination
+  of the rotation of the Galaxy and the motion of the Galaxy
+  relative to the mean motion of the local group (single precision)
+
+  Given:
+     R2000,D2000   real    J2000.0 mean RA,Dec (radians)
+
+  Result:
+     Component of SOLAR motion in direction R2000,D2000 (km/s)
+
+  Sign convention:
+     The result is +ve when the Sun is receding from the
+     given point on the sky.
+
+  Reference:
+     IAU Trans 1976, 168, p201.
+
+  Called:
+     slCS2C, slVDV
+
+  P.T.Wallace   Starlink   June 1985
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

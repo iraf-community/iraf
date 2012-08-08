@@ -1,0 +1,109 @@
+.help hpctran Jul09 imcoords
+.ih
+NAME
+hpctran -- Convert between HEALPix row and spherical coordinate
+.ih
+USAGE
+hpctran lng=xxx lat=xxx
+.br
+hpctran row=xxx
+.ih
+PARAMETERS
+.ls row     
+HEALPix table row (1 indexed).
+This is used as input if the direction
+is "row2ang" or is used to store the value if the direction is
+"ang2row".
+.le
+.ls lng, lat
+Spherical coordinate consisting of a longitude and latitude.
+These are used as input if the direction
+is "ang2row" or is used to store the value if the direction is
+"row2ang".  The units are interpreted as selected by the \fIcunits\fR
+parameter.  The type of coordinates appropriate for a particular map
+is defined by the map provider.
+.le
+.ls nside = 512
+The number of pixels per face side.
+.le
+.ls cunits = "degrees" (degrees|hourdegree|radians)
+The units of the longitude and latitude.  The "hourdegree" is for
+longitude in hours and latitude in degrees.
+.le
+.ls maptype = "nest" (nest|ring)
+The map pixelization type which may be "nest" or "ring".
+.le
+.ls direction = "ang2row" (ang2row|row2ang)
+The conversion direction.  "ang2row" converts a spherical coordinate
+to a map row or pixel number.  "row2ang" converts a map row or pixel
+number to a spherical coordinate.
+.le
+.ih
+DESCRIPTION
+HEALPix is an acronym for Hierarchical Equal Area isoLatitude Pixelization
+of a sphere.  See the reference section for a technical description of the
+pixelization and mathematics.  As suggested in the name, this pixelization,
+or tiling, produces a subdivision of a spherical surface in which each
+"pixel" covers the same surface area as every other pixel.  A HEALPix FITS
+"map" is a table where each row contains "pixel" data for a region on the
+sphere.  It is a table because the pixels don't form a raster as in an
+image.
+
+The pixelization is defined by a resolution parameter which may be expressed
+in various ways.  This task uses the number of pixels along a side of one of
+the 12 basic faces.  The number of pixels/rows is 12 * nside * nside.  The
+pixelization has two forms supported by this task.  These are called
+"nested" and "ring".
+
+The HEALPix WCS task, \fBhpctran\fR, provides a translation between
+the table row number and a spherical coordinate.  It is up to the
+creator of the table to choose the spherical coordinate system.  This
+might be an equatorial, galactic, or super-galactic system.  There may
+be a keyword specifying the system.  This is the case with WMAP data.
+
+This task only provides the conversion.  Access to the "pixel" data
+requires other tools.  For binary tables the \fBtables\fR may be used.
+
+This task allows the spherical coordinates to be input and output in three
+forms, as hours and degrees (e.g. RA/DEC), as degrees (e.g.  l/b), and as
+radians.  On input one may use sexagesimal since IRAF automatically converts
+this to decimal.  On output the values are produced in decimal form.
+
+The output is provide in two ways to provide flexibility in scripting.  One
+is writing the results to the task parameters.  Note that it is recommended
+that tasks which write to there parameter be "cached" with the \fBcache\fR
+command to avoid problems with background submission or multiple scripts
+running in parallel.  The other output is printed to the standard output.
+Regardless of the direction of conversion the printed output is in the same
+order of row number, longitude, and latitude.
+
+.ih
+EXAMPLES
+A CMB WMAP file is obtained and one wants the temperature at a particular
+point on the sky.  Note that the WMAP format is "nested" and
+coordinate system is galactic.
+
+.nf
+cl> hpctran lng=50.12 lat=-33.45
+2298092 50.12 -33.45000000000001
+cl> = hpctran.row
+2298092
+cl> tdump wmap_iqusmap_r9_5yr_K1_v3.fits col=TEMPERATURE row=2298092
+cl> tdump ("wmap_iqusmap_r9_5yr_K1_v3.fits", col="TEMPERATURE",
+>>> row=hpctran.row)
+.fi
+
+.ih
+REFERENCE
+\fIHEALPIX - a Framework for High Resolution Discretization, and Fast
+Analysis of Data Distributed on the Sphere\fR,
+by K.M. Gorski, Eric Hivon, A.J. Banday, B.D. Wandelt, F.K. Hansen, M.
+Reinecke, M. Bartelmann, 2005, ApJ 622, 759.
+.ih
+CREDIT
+Some code from the HEALPix distribution at http://healpix.jpl.nasa.gov
+was translated to SPP for use in this routine.
+.ih
+SEE ALSO
+ttools
+.endhelp

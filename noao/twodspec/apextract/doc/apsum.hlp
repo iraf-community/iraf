@@ -1,0 +1,402 @@
+.help apsum Sep96 noao.twodspec.apextract
+.ih
+NAME
+apsum -- Extract one dimensional sums across the apertures
+.ih
+USAGE
+apsum input
+.ih
+PARAMETERS
+.ls input
+List of input images containing apertures to be extracted.
+.le
+.ls output = ""
+List of output rootnames for the extracted spectra.  If the null
+string is given or the end of the output list is reached before the end
+of the input list then the input image name is used as the output rootname.
+This will not conflict with the input image since an aperture number
+extension is added for onedspec format, the extension ".ms" for multispec
+format, or the extension ".ec" for echelle format.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and extract.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
+.le
+.ls format = "multispec" (onedspec|multispec|echelle|strip)
+Format for output extracted spectra.  "Onedspec" format extracts each
+aperture to a separate image while "multispec" and "echelle" extract
+multiple apertures for the same image to a single output image.
+The "multispec" and "echelle" format selections differ only in the
+extension added.  The "strip" format produces a separate 2D image in
+which each column or line along the dispersion axis is shifted to
+exactly align the aperture based on the trace information.
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supersedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+There are three special words which may be used in place of an image
+name.  The word "last" refers to the last set of apertures written to
+the database.  The word "OLD" requires that an entry exist
+and the word "NEW" requires that the entry not exist for each input image.
+.le
+.ls profiles = ""
+List of profile images for variance weighting or cleanning.   If variance
+weighting or cleanning a profile of each aperture is computed from the
+input image unless a profile image is specified, in which case the
+profile is computed from the profile image.  The profile image must
+have the same dimensions and dispersion and it is assumed that the
+spectra have the same position and profile shape as in the object
+spectra.  Use of a profile image is generally not required even for
+faint input spectra but the option is available for those who wish
+to use it.
+.le
+
+.ls interactive = yes
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing, trace
+fitting, and extraction review are disabled.
+.le
+.ls find = yes
+Find the spectra and define apertures automatically?  In order for
+spectra to be found automatically there must be no apertures for the
+input image or reference image defined in the database.
+.le
+.ls recenter = no
+Recenter the apertures?
+.le
+.ls resize = no
+Resize the apertures?
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls trace = yes
+Trace the apertures?
+.le
+.ls fittrace = yes
+Interactively fit the traced positions by a function?  The \fIinteractive\fR
+parameter must also be yes.
+.le
+.ls extract = yes
+Extract the one dimensional aperture sums?
+.le
+.ls extras = no
+Extract the raw spectrum (if variance weighting is used), the sky spectrum
+(if background subtraction is used), and variance spectrum (if variance
+weighting is used)?  This information is extracted to the third dimension
+of the output image.
+.le
+.ls review = yes
+Review the extracted spectra?  The \fIinteractive\fR parameter must also be
+yes.
+.le
+
+.ls line = INDEF, nsum = 10
+The dispersion line (line or column perpendicular to the dispersion
+axis) and number of adjacent lines (half before and half after unless
+at the end of the image) used in finding, recentering, resizing,
+and editing operations.  For tracing this is the starting line and
+the same number of lines are summed at each tracing point.  A line of
+INDEF selects the middle of the image along the dispersion axis.
+A positive nsum takes a sum while a negative value selects a median
+except that tracing always uses a sum.
+.le
+
+.ls background = "none" (none|average|median|minimum|fit)
+Type of background subtraction.  The choices are "none" for no background
+subtraction, "average" to average the background within the background
+regions, "median" to use the median in the background regions, "minimum" to
+use the minimum in the background regions, or "fit" to fit across the
+dispersion using the background within the background regions.  Note that
+the "average" option does not do any medianing or bad pixel checking,
+something which is recommended.  The fitting option is slower than the
+other options and requires additional fitting parameter.
+.le
+.ls weights = "none"
+Type of extraction weighting.  Note that if the \fIclean\fR parameter is
+set then the weights used are "variance" regardless of the weights
+specified by this parameter.  The choices are:
+.ls "none"
+The pixels are summed without weights except for partial pixels at the
+ends.
+.le
+.ls "variance"
+The extraction is weighted by the variance based on the data values
+and a poisson/ccd model using the \fIgain\fR and \fIreadnoise\fR
+parameters.
+.le
+.le
+.ls pfit = "fit1d" (fit1d|fit2d)
+Profile fitting algorithm to use with variance weighting or cleaning.
+When determining a profile the two dimensional spectrum is divided by
+an estimate of the one dimensional spectrum to form a normalized two
+dimensional spectrum profile.  This profile is then smoothed by fitting
+one dimensional functions, "fit1d", along the lines or columns most closely
+corresponding to the dispersion axis or a special two dimensional
+function, "fit2d", described by Marsh (see \fBapprofile\fR).
+.le
+.ls clean = no
+Detect and replace deviant pixels?
+.le
+.ls skybox = 1
+Box car smoothing length for sky background when using background
+subtraction.  Since the background noise is often the limiting factor
+for good extraction one may box car smooth the sky to improve the
+statistics in smooth background regions at the expense of distorting
+the subtraction near spectral features.  This is most appropriate when
+the sky regions are limited due to a small slit length.
+.le
+.ls saturation = INDEF
+Saturation or nonlinearity level in data units.  During variance weighted
+extractions wavelength points having any pixels above this value are
+excluded from the profile determination and the sigma spectrum extraction
+output, if selected by the \fIextras\fR parameter, flags wavelengths with
+saturated pixels with a negative sigma.
+.le
+.ls readnoise = 0.
+Read out noise in photons.  This parameter defines the minimum noise
+sigma.  It is defined in terms of photons (or electrons) and scales
+to the data values through the gain parameter.  A image header keyword
+(case insensitive) may be specified to get the value from the image.
+.le
+.ls gain = 1
+Detector gain or conversion factor between photons/electrons and
+data values.  It is specified as the number of photons per data value.
+A image header keyword (case insensitive) may be specified to get the value
+from the image.
+.le
+.ls lsigma = 4., usigma = 4.
+Lower and upper rejection thresholds, given as a number of times the
+estimated sigma of a pixel, for cleaning.
+.le
+.ls nsubaps = 1
+During extraction it is possible to equally divide the apertures into
+this number of subapertures.  For multispec format all subapertures will
+be in the same file with aperture numbers of 1000*(subap-1)+ap where
+subap is the subaperture (1 to nsubaps) and ap is the main aperture
+number.  For echelle format there will be a separate echelle format
+image containing the same subaperture from each order.  The name
+will have the subaperture number appended.  For onedspec format
+each subaperture will be in a separate file with extensions and
+aperture numbers as in the multispec format.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters and the default dispersion axis are taken from the
+package parameters, the default aperture parameters from
+\fBapdefault\fR, automatic aperture finding parameters from
+\fBapfind\fR, recentering parameters from \fBaprecenter\fR, resizing
+parameters from \fBapresize\fR, parameters used for centering and
+editing the apertures from \fBapedit\fR, and tracing parameters from
+\fBaptrace\fR.
+
+When this operation is performed from the task \fBapall\fR all
+parameters except the package parameters are included in that task.
+.ih
+DESCRIPTION
+For each image in the input image list, the two dimensional spectra are
+extracted to one dimensional spectra by summing the pixels across the
+dispersion axis at each wavelength along the dispersion axis within a
+set of defined apertures.  The extraction apertures consist of an
+aperture number, a beam number, a title, a center, limits relative to
+the center, a curve describing shifts of the aperture center across the
+dispersion axis as a function of the wavelength, and parameters for
+background fitting and subtraction.  See \fBapextract\fR for a more
+detailed discussion of the aperture structures.
+
+The extracted spectra are recorded in one, two, or three dimensional
+images depending on the \fIformat\fR and \fIextras\fR parameters.  The
+output image rootnames are specified by the \fIoutput\fR list. If the
+list is empty or shorter than the input list the missing names are
+taken to be the same as the input image names.  Because the rootnames
+have extensions added it is common to default to the input names in
+order to preserve a naming relation between the input two dimensional
+spectra and the extracted spectra.
+
+When the parameter \fIextras\fR=no only the extracted spectra are
+output.  If the format parameter \fIformat\fR="onedspec" the output
+aperture extractions are one dimensional images with names formed from
+the output rootname and a numeric extension given by the aperture
+number; i.e. root.0001 for aperture 1.  Note that there will be as many
+output images as there are apertures for each input image, all with the
+same output rootname but with different aperture extensions.  The
+aperture beam number associated with each aperture is recorded in the
+output image under the keyword BEAM-NUM.  The output image name format
+and the BEAM-NUM entry in the image are chosen to be compatible with
+the \fBonedspec\fR package.
+
+If the format parameter is "echelle" or "multispec" the output aperture
+extractions are put into a two dimensional image with a name formed from
+the output rootname and the extension ".ech" or ".ms".  Each line in
+the output image corresponds to one aperture.  Thus in this format
+there is one output image for each input image.  These are the preferred
+output formats for reasons of compactness and ease of handling.  These
+formats are compatible with the \fBonedspec\fR, \fBechelle\fR, and
+\fBmsred\fR packages.  The relation between the line and the aperture
+numbers is given by the header parameter APNUMn where n is the line and
+the value is the aperture number and other numeric information.
+
+If the \fIextras\fR parameter is set to yes then the above formats
+become three dimensional.  Each plane in the third dimension contains
+associated information for the spectra in the first plane.  If variance
+weighted extractions are done the unweighted spectra are recorded.  If
+background subtraction is done the background spectra are recorded.  If
+variance weighted extractions are done the sigma spectrum (the
+estimated sigma of each spectrum pixel based on the individual
+variances of the pixels summed) is recorded.  The order of the
+additional information is as given above.  For example, an unweighted
+extraction with background subtraction will have one additional plane
+containing the sky spectra while a variance weighted extraction with
+background subtractions will have the variance weighted spectra, the
+unweighted spectra, the background spectra, and the sigma spectra in
+consecutive planes.
+
+Aperture definitions may be inherited from those of other images by
+specifying a reference image with the \fBreferences\fR parameter.
+Images in the reference list are matched with those in the
+input list in order.  If the reference image list is shorter than the
+number of input images, the last reference image is used for all
+remaining input images.  Thus, a single reference image may be given
+for all the input images or different reference images may be given for
+each input image.  The special reference name "last" may be used to
+select the last set apertures used in any of the \fBapextract\fR tasks.
+
+If an aperture reference image is not specified or no apertures are
+found for the specified reference image, previously defined apertures
+for the input image are sought in the aperture database.  Note that
+reference apertures supersede apertures for the input image.  If no
+apertures are defined they may be created automatically, the \fIfind\fR
+option, or interactively in the aperture editor, if the
+\fIinteractive\fR and \fIedit\fR options are set.
+
+The functions performed by the task are selected by a set of flag
+parameters.  The functions are an automatic spectrum finding and
+aperture defining algorithm (see \fBapfind\fR) which is ignored if
+apertures are already defined, automatic recentering and resizing
+algorithms (see \fBaprecenter\fR and \fBapresize\fR), an interactive
+aperture editing function (see \fBapedit\fR), a spectrum position tracing
+and trace function fit (see \fBaptrace\fR), and the main function of
+this task, one dimensional spectrum extraction.
+
+Each function selection will produce a query for each input spectrum if
+the \fIinteractive\fR parameter is set.  The queries are answered by
+"yes", "no", "YES", or "NO", where the upper case responses suppress
+the query for following images.  There are other queries associated
+with tracing and extracted spectrum review which first ask whether the
+operation is to be done interactively and, if yes, lead to queries for
+each aperture.  The cursor keys available during spectrum review are
+minimal, only the CURSOR MODE keys for expanding and adjusting the
+graph are available and the quit key 'q'.  If the \fIinteractive\fR
+parameter is not set then aperture editing, interactive trace fitting,
+and spectrum review are ignored.
+
+Background sky subtraction is done during the extraction based on
+background regions and parameters defined by the default parameters or
+changed during the interactive setting of the apertures.  The background
+subtraction options are to do no background subtraction, subtract the
+average, median, or minimum of the pixels in the background regions, or to
+fit a function and subtract the function from under the extracted object
+pixels.  The background regions are specified in pixels from
+the aperture center and follow changes in center of the spectrum along the
+dispersion.  The syntax is colon separated ranges with multiple ranges
+separated by a comma or space.  The background fitting uses the \fBicfit\fR
+routines which include medians, iterative rejection of deviant points, and
+a choice of function types and orders.  Note that it is important to use a
+method which rejects cosmic rays such as using either medians over all the
+background regions (\fIbackground\fR = "median") or median samples during
+fitting (\fIb_naverage\fR < -1).  The background subtraction algorithm and
+options are described in greater detail in \fBapsum\fR and
+\fBapbackground\fR.
+
+Since the background noise is often the limiting factor for good
+extraction one may box car smooth the sky to improve the statistics in
+smooth background regions at the expense of distorting the subtraction
+near spectra features.  This is most appropriate when the sky region is
+limited due to small slit length.  The smoothing length is specified by
+the parameter \fIskybox\fR.
+
+For a more extended discussion about the background determination see
+\fBapbackground\fR.
+
+The aperture extractions consists of summing all the background
+subtracted pixel values at a given wavelength within the aperture
+limits.  The aperture limits form a fixed width aperture but the center
+varies smoothly to follow changes in the position of the spectrum
+across the dispersion axis.  At the ends of the aperture partial pixels
+are used.
+
+The pixels in the sum may be weighted as specified by the \fIweights\fR
+parameter.  If the weights parameter is "none" and the \fIclean\fR
+parameter is no then the simple sum of the pixels (with fractional
+endpoints) is extracted.  If the weights parameter is "variance" or if
+the \fBclean\fR parameter is yes the pixels are weighted by their
+estimated variance derived from a noise model based on the \fIgain\fR
+and \fIreadnoise\fR parameters and a smooth profile function.  Normally
+the profile function is determined from the data being extracted.
+However, one may substitute a "profile" image as specified by the
+\fIprofiles\fR parameter for computing the profile.  This requires that
+the profile image have spectra of identical position and profile as
+the image being extracted.  For example, this would likely be the case
+with fiber spectra and an off-telescope spectrograph and a strong flat
+field or object spectrum could be used for weak spectra.  Note that
+experience has shown that even for very weak spectra there is little
+improvement with using a separate profile image but the user is free
+to experiment.
+
+When the \fIclean\fR parameter is set pixels deviating by more than a
+specified number of sigma from the profile function are excluded from the
+variance weighted sum.  Note that the \fIclean\fR parameter always selects
+variance weights.  For a more complete discussion of the extraction sums,
+variance weighting, cleaning, the noise model, and profile function
+determination see \fBapvariance\fR and \fBapprofiles\fR.
+.ih
+EXAMPLES
+1.  To simply extract the spectra from a multislit observation:
+
+	cl> apsum multislit1
+
+The positions of the slits are defined using either automatic finding
+or with the aperture editor.  The positions of the slits are traced if
+necessary and then the apertures are extracted to the image
+"multslit1.ms".  The steps of defining the slit positions and tracing
+can be done as part of this command or previously using the other tasks
+in the \fBapextract\fR package.
+.ih
+REVISIONS
+.ls APSUM V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+
+The "nsubaps" parameter now allows onedspec and echelle output formats.
+The echelle format is appropriate for treating each subaperture as
+a full echelle extraction.
+
+The dispersion axis parameter was moved to purely a package parameter.
+
+As a final step when computing a weighted/cleaned spectrum the total
+fluxes from the weighted spectrum and the simple unweighted spectrum
+(excluding any deviant and saturated pixels) are computed and a
+"bias" factor of the ratio of the two fluxes is multiplied into
+the weighted spectrum and the sigma estimate.  This makes the total
+fluxes the same.  In this version the bias factor is recorded in the logfile
+if one is kept.  Also a check is made for unusual bias factors.
+If the two fluxes disagree by more than a factor of two a warning
+is given on the standard output and the logfile with the individual
+total fluxes as well as the bias factor.  If the bias factor is
+negative a warning is also given and no bias factor is applied.
+In the previous version a negative (inverted) spectrum would result.
+.le
+.ih
+SEE ALSO
+apbackground, apvariance, approfile,
+apdefault, apfind, aprecenter, apresize, apedit, aptrace, apall
+.endhelp

@@ -1,0 +1,54 @@
+# Make the GENERIC package.
+# Make the GENERIC package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	generic
+	;
+
+install:
+	$move	x_generic.e noaobin$
+	;
+
+generic:
+	$omake	x_generic.x
+	$link	x_generic.o libpkg.a -lxtools -lcurfit
+	;
+
+libpkg.a:
+	flat1d.x	<imhdr.h> <pkg/gtools.h>
+	;
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	generic
+	;
+
+install:
+	$move	x_generic.e noaobin$
+	;
+
+generic:
+	$omake	x_generic.x
+	$link	x_generic.o libpkg.a -lxtools -lcurfit
+	;
+
+libpkg.a:
+	flat1d.x	<imhdr.h> <pkg/gtools.h> <error.h>
+	;

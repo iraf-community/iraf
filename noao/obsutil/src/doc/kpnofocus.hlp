@@ -1,0 +1,214 @@
+.help kpnofocus Mar96 noao.obsutil
+.ih
+NAME
+kpnofocus -- Determine the best focus from KPNO focus images
+.ih
+USAGE
+kpnofocus images
+.ih
+PARAMETERS
+.ls images
+List of focus images.
+.le
+.ls frame = 1
+The image display is checked to see if the image is already in one of
+the display frames.  If it is not the \fBdisplay\fR task is called to
+display the image in the frame specified by the \fBframe\fR parameter.  All
+other display parameters are taken from the current settings of the task.
+This option requires that the image display be active.
+.le
+
+.ls level = 0.5
+The parameter used to quantify an object image size is the radius from the
+image center enclosing the fraction of the total flux given by this
+parameter.  If the value is greater than 1 it is treated as a percentage.
+.le
+.ls size = "FWHM" (Radius|FWHM|GFWHM|MFWHM)
+There are four ways the PSF size may be shown in graphs and given in
+the output.  These are:
+
+.nf
+    Radius - the radius enclosing the specified fraction of the flux
+    FWHM   - a direct FWHM from the measured radial profile
+    GFWHM  - the FWHM of the best fit Gaussian profile
+    MFWHM  - the FWHM of the best fit Moffat profile
+.fi
+
+The labels in the graphs and output will be the value of this parameter
+to distinguish the different types of size measurements.
+.le
+.ls beta = INDEF
+For the Moffat profile fit (size = MFWHM) the exponent parameter may
+be fixed at a specified value or left free to be determined from the
+fit.  The exponent parameter is determined by the fit if \fIbeta\fR
+task parameter is INDEF.
+.le
+.ls scale = 1.
+Pixel scale in user units per pixel.  Usually the value is 1 to measure
+sizes in pixels or the image pixel scale in arc seconds per pixel.
+.le
+.ls radius = 5., iterations = 2
+Measurement radius in pixels and number of iterations on the radius.  The
+enclosed flux profile is measured out to this radius.  This radius may be
+adjusted if the \fIiteration\fR parameter is greater than 1.  In that case
+after each iteration a new radius is computed from the previous FWHM
+estimate to be the radius the equivalent gaussian enclosing 99.5% of the
+light.  The purpose of this is so that if the initial PSF size of the image
+need not be known.  However, the radius should then be larger than true
+image size since the iterations best converge to smaller values.
+.le
+.ls sbuffer = 5., swidth = 5.
+Sky buffer and sky width in pixels.  The buffer is added to the specified
+measurement \fIradius\fR to define the inner radius for a circular sky
+aperture.  The sky width is the width of the circular sky aperture.
+.le
+.ls saturation=INDEF, ignore_sat=no
+Data values (prior to sky subtraction) to be considered saturated within
+measurement radius.  A value of INDEF treats all pixels as unsaturated.  If
+a measurement has saturated pixels there are two actions.  If
+\fIignore_sat\fR=no then a warning is given but the measurement is saved
+for use.  The object will also be indicated as saturated in the output
+log.  If \fIignore_sat\fR=yes then a warning is given and the object is
+discarded as if it was not measured.  In a focus sequence only the
+saturated objects are discarded and not the whole sequence.
+.le
+.ls logfile = "logfile"
+File in which to record the final results.  If no log file is desired a
+null string may be specified.
+.le
+.ih
+CURSOR COMMANDS
+When selecting objects with the image cursor the following commands are
+available.
+
+.nf
+?  Page cursor command summary
+g  Measure object and graph the results.
+m  Measure object.
+q  Quit object marking and go to next image.
+   At the end of all images go to analysis of all measurements.
+
+:show  Show current results.
+.fi
+
+When in the interactive graphics the following cursor commands are available.
+All plots may not be available depending on the number of focus values and
+the number of stars.
+
+.nf
+?  Page cursor command summary
+a  Spatial plot at a single focus
+b  Spatial plot of best focus values
+d  Delete star nearest to cursor
+e  Enclosed flux for stars at one focus and one star at all focus
+f  Size and ellipticity vs focus for all data
+i  Information about point nearest the cursor
+m  Size and ellipticity vs relative magnitude at one focus
+n  Normalize enclosed flux at x cursor position
+o  Offset enclosed flux to by adjusting background
+p  Radial profiles for stars at one focus and one star at all focus
+q  Quit
+r  Redraw
+s  Toggle magnitude symbols in spatial plots
+t  Size and ellipticity vs radius from field center at one focus
+u  Undelete all deleted points
+x  Delete nearest point, star, or focus (selected by query)
+z  Zoom to a single measurement
+<space> Step through different focus or stars in current plot type
+
+
+:beta <val>     Beta parameter for Moffat fits
+:level <val>	Level at which the size parameter is evaluated
+:overplot <y|n> Overplot the profiles from the narrowest profile?
+:radius <val>   Change profile radius
+:show <file>	Page all information for the current set of objects
+:size <type>	Size type (Radius|FWHM)
+:scale <val>	Pixel scale for size values
+:xcenter <val>	X field center for radius from field center plots
+:ycenter <val>	Y field center for radius from field center plots
+
+The profile radius may not exceed the initial value set by the task
+parameter.
+.fi
+.ih
+DESCRIPTION
+This task is a script based on the task \fBstarfocus\fR.  The details
+of the algorithms and display modes are given in the help for that
+task.  The purpose of \fBkpnofocus\fR is to provide a simpler task
+with fewer parameters because the format of the multiple exposure
+images is given by header keywords.
+
+As a summary of the algorithm, the center of each star image is
+found using centroids, a background is determined from the mode
+of a sky annulus, and the enclosed flux profile is measured.  The
+PSF width is then the radius enclose a specified fraction of the
+flux.  Alternatively a direct FWHM from the radial intensity profile,
+a FWHM for a Moffat profile fit to the enclosed flux profile, or
+a FWHM for a Gaussian profile fit to the enclosed flux profile may be
+used.
+
+If a saturation value is specified then all pixels within the specified
+measurement radius are checked for saturation.  If any saturated pixels are
+found a warning is given and \fIignore_sat\fR parameter may be used ot
+ignore the measurement.  If not ignored the object will still be indicated
+as saturated in the output log.  In a focus sequence only the saturated
+objects are discarded and not the whole sequence.
+
+To use this task consists of specifying a focus image name.  Multiple
+images could be analyzed together but this is uncommon.  The task
+will then display the image, using the current parameters of the
+\fBdisplay\fR task, if the image is not already in the display.
+The user then marks the first exposure (the top one) by pointing
+the image cursor and typing 'm'.  This may be done for more than
+one star if desired.  After all stars to be used are marked type
+'q' to go to the graphical analysis.
+
+A plot showing the variation of the PSF width and ellipticity with
+focus is shown along with a magnitude weighted, parabolic
+interpolated estimate for the best focus.  One may delete bad points
+with the cursor 'd' key.  To exit and record the results to
+a logfile use the 'q' key.  There are many graphical display
+options for more sophisticated analysis such as variations with
+position.  The best thing to do is to try the various keystroke
+commands given in the CURSOR section.  For details about
+the various plots see the \fBstarfocus\fR help.
+
+The other task parameters allow setting the enclosed flux level,
+the object and sky apertures, and the type and scale of the
+reported PSF size.  The log filename may also be specified.
+.ih
+EXAMPLES
+1.  A multiple exposure frame is taken with 7 exposures of a bright
+star, each exposure shifted by 30 pixels using the version of the
+ICE software which records the focus information in the keywords
+FOCSTART, FOCSTEP, FOCNEXPO, and FOCSHIFT.
+
+.nf
+cl> kpnofocus focus1
+<The image is displayed and the image cursor activated>
+<The bright star is marked with 'm'>
+<Marking is finished with 'q'>
+<A graph of FWHM vs focus is shown>
+<Exit with 'q'>
+NOAO/IRAF IRAFV2.10.3 valdes@puppis Fri 15:48:01 12-Nov-93
+
+   Image  Column    Line     Mag   Focus    FWHM   Ellip      PA SAT
+ 36inch1  536.63  804.03    0.07   4660.  13.878    0.06     -11
+	  535.94  753.28   -0.12   4680.   8.569    0.09      89
+	  535.38  703.96   -0.08   4700.   5.164    0.11     -88
+	  537.12  655.36   -0.02   4720.   3.050    0.08     -77
+	  534.20  604.59    0.00   4740.   4.336    0.11      74
+	  534.41  554.99   -0.00   4760.   9.769    0.09     -35
+	  534.83  456.08    0.16   4780.  12.569    0.13     -10
+
+  Best focus of 4722.44 with FWHM (at 50% level) of 3.02
+.fi
+
+The estimated best focus is between the 4th and 5th focus setting
+at a value of 4722.4 and the best focus FWHM is 3.02 pixels.
+.ih
+SEE ALSO
+.nf
+imexamine, implot, pprofile, pradprof, psfmeasure, radlist,
+radplt, radprof, ranges, specfocus, splot, starfocus
+.endhelp

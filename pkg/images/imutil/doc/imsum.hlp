@@ -1,0 +1,132 @@
+.help imsum Sep87 images.imutil
+.ih
+NAME
+imsum -- sum, average, or median images
+.ih
+USAGE	
+imsum input output
+.ih
+PARAMETERS
+.ls input
+Input images.
+.le
+.ls output
+Output image.
+.le
+.ls title = ""
+Image title for the output image.  If null ("") then the title of the
+first image is used.
+.le
+.ls hparams = ""
+List of image header parameters to be summed or averaged.  This feature
+is only used when summing or averaging and no correction is made for
+rejected pixels.  It is primarily used to sum exposure times.
+.le
+.ls pixtype = ""
+Pixel datatype for the output image.  The pixel datatypes are "double",
+"real", "long", "integer", "ushort", and "short" in order of precedence.
+If null ("") then the calculation type is used.
+The datatypes may be abbreviated to a single character.
+.le
+.ls calctype = ""
+Calculation type.  The calculation types are "double", "real", "long",
+"integer", and "short" in order of precedence.  If null ("") then the
+highest precedence datatype of the input images is used.
+If there is a mixture of "short" and "ushort" images then the highest
+precedence datatype will be "int".
+The calculation types may be abbreviated to a single character.
+.le
+.ls option = "sum"
+Output options are "sum", "average", or "median".  The "median" of an
+even number of images takes pixel nimages/2 + 1, where nimages is the
+number of images.
+.le
+.ls low_reject = 0
+If the option is sum or average then when this parameter
+is less than 1 reject this fraction of low pixels from the sum or average
+otherwise reject this number of low pixels from the sum or average.
+.le
+.ls high_reject = 0
+If the option is sum or average then when this parameter
+is less than 1 reject this fraction of high pixels from the sum or average
+otherwise reject this number of high pixels from the sum or average.
+.le
+.ls verbose = no
+Print a log of the operation?
+.le
+.ih
+DESCRIPTION
+The input images are summed, averaged, or medianed pixel by pixel and the
+result recorded in the output image.  All input images must be the same
+size but not necessarily of the same pixel datatype.  For the sum or average
+option a selected fraction or number of pixels may be rejected.  The output
+option "average" divides the sum by the number of pixels in the sum.  The
+pixel datatype of the output image may be selected or defaulted to the
+calculation datatype. The calculation type may be selected or defaulted
+to the highest precedence datatype of the input images.  Note that a
+mixture of "short" and "ushort" images has a highest precedence datatype
+of "int".  If all the image pixel datatypes are the same and agree with the
+calculation type then this operation is maximally efficient.  However,
+beware of integer overflows with images of datatype short or ushort.  A log
+of the task name, the input image names, the output image name, the output
+pixel datatype, the output option, and the pixel rejection parameters is
+printed when the verbose parameter is yes.
+
+In addition to summing the pixels the specified image header parameters may
+be summed or averaged.  This is primarily used for summing image exposure
+times.  No correction is made for rejected pixels.
+.ih
+EXAMPLES
+1. To sum three images:
+
+	im> imsum frame1,frame2,frame3 sum hparams="itime,exposure"
+
+2. To make a median image of a set of images:
+
+	im> imsum obs* median option=median
+
+where '*' is a template wildcard.
+
+3. To reject the lowest and highest 2 pixels and average the rest:
+
+	im> imsum obs* avg option=average low=2 high=2
+.ih
+REVISIONS
+.ls IMSUM V2.11
+Now allows "ushort" data types.
+.le
+.ih
+TIME REQUIREMENTS
+The following timings are for 512 x 512 short images in which the output
+image is also short and the calculation type is short.
+
+.nf
+	    OPERATION		      CPU(sec)
+	1. Sum of 3			 7.4
+	2. Average of 3			13.0
+	3. Median of 3			 9.9
+	4. Sum of 5			13.0
+	5. Median of 5			23.0
+	6. Sum of middle 3 of 5		45.5
+	7. Median of 7			77.8
+.fi
+.ih
+NOTES
+Any number of images may be used.  However, there is a maximum number of
+images which may be open at one time.  If the number of images
+(of dimension >= 2) exceeds this maximum and median or pixel rejection is
+used then the performance of this task will suffer due to the need to
+repeatedly open and close the excess images.  The maximum number is a
+configurable parameter in the include file "imsum.h".
+
+This task has been largely replaced by the task \fBimcombine\fR.  It is
+still available but may be removed in the future.  \fBImcombine\fR is
+specially designed to deal with the case of large numbers of images.
+.ih
+BUGS
+It is an error for the output image to have the same name as an
+existing image.  Beware of integer overflows when summing short images.
+.ih
+SEE ALSO
+imcombine
+.endhelp

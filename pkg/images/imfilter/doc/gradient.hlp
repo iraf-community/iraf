@@ -1,0 +1,170 @@
+.help gradient Nov85 images.imfilter
+.ih
+NAME
+gradient -- convolve a list of images with the gradient filter
+.ih
+USAGE
+gradient input output gradient
+.ih
+PARAMETERS
+.ls input
+List of images for which gradient images are to be calculated.
+.le
+.ls output
+List of output images. The number of output images must equal the number of
+input images. If the input image name equals the output image name the
+convolved image will replace the input image.
+.le
+.ls gradient
+The gradient filters are a set of 8 three by three kernels identified by the
+angle of maximum response as measured counter-clockwise to the x axis. The
+kernels approximate the gradient operator, which is defined as the slope of
+the intensity distribution in an image.  The eight supported gradient
+operators are listed below.
+.ls "0", "180"
+Calculate the gradient image along a 0 or 180 degree angle.
+These options approximate the d/dx operator.
+Option "0" produces a maximum response for pixel values which
+increase with increasing x, whereas option "180" produces a maximum
+response for pixel values which decrease with increasing x. 
+.le
+.ls "90", "270"
+Calculate the gradient image along a 90 or 270 degree angle.
+These options approximate the d/dy operator.
+Option "90" produces a maximum response for pixel values which
+increase with increasing y, whereas option "270" produces a maximum
+response for pixel values which decrease with increasing y.
+.le
+.ls "45", "225"
+Calculate the gradient image along a 45 or 225 degree angle.
+Option "45" produces a maximum response for pixel values which increase
+along a line at 45 degrees counter-clockwise to the x axis.
+Option "225" produces
+a maximum response for pixel values which increase along a line at 225
+degrees to the x axis.
+.le
+.ls "135", "315" 
+Calculate the gradient image along a 135 or 315 degree angle.
+Option "135" produces a maximum response for pixel values which increase
+along a line at 135 degrees counter-clockwise to the x axis.
+Option "315" produces
+a maximum response for pixel values which increase along a line at 315
+degrees to the x axis.
+.le
+.le
+.ls boundary = "nearest"
+The algorithm used to compute the values of out of bounds pixels. The 
+options are:
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Generate a value by reflecting around the boundary.
+.le
+.ls wrap
+Generate a value by wrapping around to the opposite side of the image.
+.le
+.le
+.ls constant = 0.
+The constant for constant-valued boundary extension.
+.le
+
+.ih
+DESCRIPTION
+
+GRADIENT convolves the list of images specified by \fIinput\fR with one of
+eight three by three gradient kernels specified by \fIgradient\fR 
+and places the output images in \fIoutput\fR.
+If the image names in \fIoutput\fR equal the image names in \fIinput\fR the
+gradient operation is performed in place and the original images are
+overwritten. Out of bounds pixels are computed using the algorithm
+specified by \fIboundary\fR.
+
+GRADIENT acts like a simple edge detector or high pass filter which is sensitive
+to both the magnitude and direction of changes in intensity in an image.
+For example, if an image's pixel values are specified by the sum of their
+x and y coordinates (z = x + y) and boundary extension effects are ignored,
+the "0", "45", "90", "135", "180", "225", "270", and "315" gradient kernels
+will each produce a constant image containing the numbers 1, sqrt (2), 1, 0,
+-1, -sqrt (2), -1, and 0 respectively. 
+
+The eight gradient filters are listed below. The I[*,*] are the elements of
+the input image and the O[*,*] are elements of the output image.
+
+.nf
+                         0
+
+	    - I[-1,1]          + 0*I[0,1]  + I[1,1]
+   O[0,0] = - I[-1,0]*sqrt(2)  + 0*I[0,0]  + I[1,0] * sqrt(2)  
+	    - I[-1,-1]         + 0*I[0,-1] + I[-1,-1]
+
+			45
+	     
+	    + I[-1,1]*0          + I[0,1]   + I[1,1]/2/sqrt(2)
+   O[0,0] = - I[-1,0]            + I[0,0]*0 + I[1,0] 
+            - I[-1,-1]/2/sqrt(2) - I[0,-1]  + I[1,-1]*0 
+
+			90
+	     
+	    + I[-1,1]    + I[0,1]*sqrt(2)  + I[1,1]
+   O[0,0] = + I[-1,0]*0  + I[0,0]*0        + I[1,0]
+	    - I[-1,-1]   - I[0,-1]*sqrt(2) - I[-1,-1]
+
+		       135
+
+	    + I[-1,1]/2/sqrt(2) + I[0,1]   + I[1,1]*0
+   O[0,0] = + I[-1,0]           + I[0,0]*0 - I[1,0]
+            + I[-1,-1]*0        - I[0,-1]  - I[1,-1]/2/sqrt(2) 
+
+			180
+
+	    + I[-1,1]          + 0*I[0,1]  - I[1,1]
+   O[0,0] = + I[-1,0]*sqrt(2)  + 0*I[0,0]  - I[1,0]*sqrt(2)
+	    + I[-1,-1]         + 0*I[0,-1] - I[-1,-1]
+
+		       225
+
+	    + I[-1,1]*0          - I[0,1]   - I[1,1]/2/sqrt(2)
+   O[0,0] = + I[-1,0]            + I[0,0]*0 - I[1,0]
+            + I[-1,-1]/2/sqrt(2) + I[0,-1]  + I[1,-1]*0 
+
+		       270
+
+	    - I[-1,1]    - I[0,1]*sqrt(2)  - I[1,1]
+   O[0,0] = + I[-1,0]*0  + I[0,0]*0        + I[1,0]*0
+	    + I[-1,-1]   + I[0,-1]*sqrt(2) + I[-1,-1]
+
+		      315
+
+	    - I[-1,1]/2/sqrt(2) - I[0,1]   + I[1,1]*0
+   O[0,0] = - I[-1,0]           + I[0,0]*0 + I[1,0]
+            + I[-1,-1]*0        + I[0,-1]  + I[1,-1]/2/sqrt(2) 
+
+.fi
+
+.ih
+EXAMPLES
+
+1. Calculate the gradient in the 180 degree direction using nearest neighbor
+   boundary extension.
+
+.nf
+    cl> gradient m83 m83.odeg 180
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+GRADIENT requires approximately 2.0 cpu seconds to convolve a
+512 square real image with a 3 by 3 gradient kernel on a Sparc Station 1.
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+convolve, gauss, laplace, boxcar
+.endhelp

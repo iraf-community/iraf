@@ -1,0 +1,77 @@
+.help syndico May89 noao.imred.vtel
+.ih
+NAME
+syndico -- Make dicomed plots of full disk images (18 centimeters in diameter)
+.ih
+USAGE
+syndico image
+.ih
+PARAMETERS
+.ls image
+Image to plot on the dicomed.
+.le
+.ls logofile = iraf$noao/imred/vtel/nsolcrypt.dat
+File containing the text encoded NSO logo image.
+.le
+.ls device = dicomed
+Device on which to plot the image.
+.le
+.ls sbthresh = 2
+Squibby brightness threshold used to determine the limb for trimming.
+.le
+.ls plotlogo = yes
+Flag indicating whether or not to plot the logo.
+.le
+.ls verbose = yes
+Flag indicating to the program that it should give progress reports.
+.le
+.ls forcetype = no
+Flag to override the wavelength designation from the image header.
+.le
+.ls magnetic = yes
+If 'forcetype' = 'yes' then this flag designates that we should force
+to magnetic (8688).  If set to 'no' the type is forced to 10830.
+The effect of forcing the type is to choose which lookup table to
+use when scaling the image.
+.le
+.ls month
+Month the observation was taken (January = 1,,,December = 12).
+.le
+.ls day
+Day of the month the observation was taken.
+.le
+.ls year
+Year the observation was taken (two digits only, ie. 89 for 1989).
+.le
+.ls hour
+Hour of the day the observation was taken (universal time, 1-24).
+.le
+.ls minute
+Minute the observation was taken (0-59).
+.le
+.ls second
+Second the observation was taken (0-59).
+.le
+.ih
+DESCRIPTION
+Syndico produces full disk plots on the Dicomed.  The ephemeris data
+is used to estimate the radius of the image and the center of the
+disk is gotten from the image header.  Using this data, an image is
+made that is as close to 18 centimeters in diameter as possible.
+There are two greyscale lookup tables corresponding to the two types
+of image normally used, the magnetogram and the spectroheliogram.
+If the wavelength is something other than 8688 or 10830, a linear
+greyscale is used.
+
+The National Solar Observatory (tentative) logo is read from an encoded
+text file and put on the plot if requested (default).
+.ih
+EXAMPLES
+
+.nf
+	vt> syndico image1
+.fi
+
+.ih
+SEE ALSO
+.endhelp

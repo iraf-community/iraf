@@ -1,0 +1,22 @@
+			        Process Control
+
+Connected Subprocesses
+
+	     pid = propen (process, in, out)
+	   stat = prclose (pid)
+	 stat = prgetline (in, lbuf)
+		  prredir (pid, stream, new_fd)
+		 prsignal (pid, signal)
+		 prupdate (message)
+
+	    pid = propcpr (process, in, out)
+	   stat = prclcpr (pid)
+
+
+
+Detached Processes
+
+	    job = propdpr (process, bkgfile)
+	   stat = prcldpr (job)
+	     y/n = prdone (job)
+		   prkill (job)

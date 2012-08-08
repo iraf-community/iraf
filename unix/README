@@ -1,0 +1,130 @@
+PC-IRAF HSI -- September 2001
+
+The old (1985) README for the Unix HSI is preserved unchanged below.
+We are not going to attempt to include updated, comprehensive documentation
+here now, but a few pointers follow.  See the Unix/IRAF or PC-IRAF system
+manager's guide for more complete documentation.
+
+    o	To build the HSI on first sets the architecture (via "mkpkg <arch>"
+	in the iraf root), then types "reboot" in this directory.  The
+	first time this is done on a platform there will be no system
+	libraries (libsys.a etc.) and the HSI will be compled with NOVOS
+	set.  This builds the HSI with certain routines stubbed-out.  It
+	is functional enough after a sucessful bootstrap to compile the
+	iraf system libraries ("mkpkg syslibs" at the iraf root).  One
+	can then do another "reboot" to re-bootstrap the HSI.  It will
+	be built this time using the iraf system libraries and will be
+	fully functional, and ready to sysgen the full iraf system.
+
+    o   The PC-IRAF HSI currently uses F2C for Fortran (SPP) to C
+	translation.  Although F2C is available as an option on many
+	platforms, we integrate it into the HSI to avoid versioning
+	problems and to avoid an external dependency.  The version of F2C
+	used is maintained in /local/src/f2c on Lepus.  The README in that
+	directory contains instructions for building f2c for a platform.
+	Once the runtime files have been generated they are copied to the
+	HBIN for the target platform.
+
+
+===============================================================================
+UNIX (a.k.a. host$) -- IRAF/UNIX System Interface (13Dec85 Dct)
+
+    These directories contain those portions of the IRAF software which are
+machine or host operating system dependent.  The major directories are as
+follows:
+
+	as		all assembler files (most of these are optional)
+	boot		bootstrap utilities (mkpkg, xc, etc.)
+	hlib		host library (config files, header files, etc.)
+	os		the UNIX/IRAF kernel (LIBOS.A)
+	gdev		ZFIOGD device driver (i/o to binary graphics devices)
+
+A graph of the IRAF/UNIX system interface directories is shown below.
+-------------------------------------------------------------------------------
+Thu Jan 16 16:37:52 MST 1986
+
+                |-as------------
+                |
+                |               |-bootlib-------
+                |               |-generic-------
+                |               |-mkpkg---------
+                |               |-rmbin---------
+                |               |-rtar----------
+                |               |               
+                |               |                               |-ratlibc-------
+                |-boot----------|                               |-ratlibf-------
+                |               |-spp-----------|-rpp-----------|-ratlibr-------
+|-unix----------|               |               |               |-rppfor--------
+                |               |               |               |-rpprat--------
+                |               |               |-xpp-----------
+                |               |-vfn-----------
+                |               |-wtar----------
+                |               |
+                |               |-xyacc---------|-debug---------
+                |
+                |-gdev----------|-iism70--------
+                |
+                |
+                |-hlib----------|-libc----------
+                |
+                |-os------------|-doc-----------
+                                |-net-----------
+
+
+
+SYSTEM GENERATION PROCEDURE
+
+    The bootstrap utilities must be built before the remainder of the IRAF
+system can be built.  The procedure for building the system from scratch given
+a text-only distribution is outlined below.  Those sites fortunate to receive
+a binary distribution can skip all this, and proceed to editing the device
+tables and other runtime files.
+
+
+    [1]	Edit the config files in HLIB.  The major files are iraf.h, config.h,
+	mach.h, libc/iraf.h, libc/libc.h, and libc/knames.h.  All files should
+	be reviewed.
+    
+    [2] If the AS assembler files will not work on your machine, rename the
+	directory as VAXAS or some such, create a new, empty AS directory,
+	and code the file ZSVJMP.S therein.  This is the only assembler file
+	required for the operation of IRAF; the autogeneration code will use
+	alternate (but less efficient) portable routines if any of the other
+	AS files are not found.  To code ZSVJMP on a UNIX system, it may help
+	to write a small C program which calls longjmp and setjmp and use ADB
+	to disassemble it.  Write a modified version which is callable from
+	Fortran and has the indicated calling sequence.
+
+    [3] The directory OS contains the IRAF kernel for 4.2BSD UNIX.  This will
+   	have to be modified somewhat if a different version of UNIX is in use.
+	Manual pages are given in os/doc and the package is described in the
+	"System Interface Reference Manual", which any IRAF implementor should
+	already have.  As of this writing the documentation is partially out
+	of date.
+
+    [4] Edit the pathnames in the file ./hlib/libc/iraf.h.  Make a symbolic
+	link /usr/include/iraf.h which points to this file (alternatively, copy
+	the file to /usr/include).  Edit the pathnames in ./hlib/irafuser.csh.
+	Add references to your CSHELL .login and .cshrc files to pick up the
+	environment definitions and aliases in this file (alternatively,
+	add the appropriate SET/EXPORT environment definitions to your Bourne
+	shell login file, and make symbolic links pointing to the aliased
+	commands in some public directory).
+
+    [5]	Use source or login to pick up the environment defs and aliases.  You
+	are now ready to compile the bootstrap utilities:
+
+		% sh -x mkpkg.csh >& spool &
+
+	This command should compile the libraries LIBOS.A and LIBBOOT.A and
+	install them in hlib, then compile and install all the bootstrap
+	utilities.
+
+Once this sequence has been successfully completed you should be able to
+compile the machine independent part of IRAF by the following sequence of
+commands:
+
+	% cd $iraf
+	% mkpkg >& spool &
+
+Generation of the full system will take many hours.

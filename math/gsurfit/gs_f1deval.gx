@@ -1,0 +1,189 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# GS_1DEVPOLY -- Procedure to evaulate a 1D polynomial
+
+procedure $tgs_1devpoly (coeff, x, yfit, npts, order, k1, k2)
+
+PIXEL	coeff[ARB]		# EV array of coefficients
+PIXEL	x[npts]			# x values of points to be evaluated
+PIXEL	yfit[npts]		# the fitted points
+int	npts			# number of points to be evaluated
+int	order			# order of the polynomial, 1 = constant
+PIXEL	k1, k2			# normalizing constants
+
+int	i
+pointer	sp, temp
+
+begin
+	# fit a constant
+	call amovk$t (coeff[1], yfit, npts)
+	if (order == 1)
+	    return
+
+	# fit a linear function
+	call altm$t (x, yfit, npts, coeff[2], coeff[1])
+	if (order == 2)
+	    return
+
+	call smark (sp)
+	$if (datatype == r)
+	call salloc (temp, npts, TY_REAL)
+	$else
+	call salloc (temp, npts, TY_DOUBLE)
+	$endif
+
+	# accumulate the output vector
+	call amov$t (x, Mem$t[temp], npts)
+	do i = 3, order {
+	    call amul$t (Mem$t[temp], x, Mem$t[temp], npts)
+	    $if (datatype == r)
+	    call awsur (yfit, Memr[temp], yfit, npts, 1.0, coeff[i])
+	    $else
+	    call awsud (yfit, Memd[temp], yfit, npts, 1.0d0, coeff[i])
+	    $endif
+	}
+
+	call sfree (sp)
+
+end
+
+# GS_1DEVCHEB -- Procedure to evaluate a Chebyshev polynomial assuming that
+# the coefficients have been calculated. 
+
+procedure $tgs_1devcheb (coeff, x, yfit, npts, order, k1, k2)
+
+PIXEL	coeff[ARB]		# EV array of coefficients
+PIXEL	x[npts]			# x values of points to be evaluated
+PIXEL	yfit[npts]		# the fitted points
+int	npts			# number of points to be evaluated
+int	order			# order of the polynomial, 1 = constant
+PIXEL	k1, k2			# normalizing constants
+
+int	i
+pointer	sx, pn, pnm1, pnm2
+pointer sp
+PIXEL	c1, c2
+
+begin
+	# fit a constant
+	call amovk$t (coeff[1], yfit, npts)
+	if (order == 1)
+	    return
+
+	# fit a linear function
+	c1 = k2 * coeff[2]
+	c2 = c1 * k1 + coeff[1]
+	call altm$t (x, yfit, npts, c1, c2)
+	if (order == 2)
+	    return
+
+	# allocate temporary space
+	call smark (sp)
+	$if (datatype == r)
+	call salloc (sx, npts, TY_REAL)
+	call salloc (pn, npts, TY_REAL)
+	call salloc (pnm1, npts, TY_REAL)
+	call salloc (pnm2, npts, TY_REAL)
+	$else
+	call salloc (sx, npts, TY_DOUBLE)
+	call salloc (pn, npts, TY_DOUBLE)
+	call salloc (pnm1, npts, TY_DOUBLE)
+	call salloc (pnm2, npts, TY_DOUBLE)
+	$endif
+
+	# a higher order polynomial
+	$if (datatype == r)
+	call amovkr (1., Memr[pnm2], npts)
+	$else
+	call amovkd (1.0d0, Memd[pnm2], npts)
+	$endif
+	call alta$t (x, Mem$t[sx], npts, k1, k2)
+	call amov$t (Mem$t[sx], Mem$t[pnm1], npts)
+	call amulk$t (Mem$t[sx], 2$f, Mem$t[sx], npts)
+	do i = 3, order {
+	    call amul$t (Mem$t[sx], Mem$t[pnm1], Mem$t[pn], npts)
+	    call asub$t (Mem$t[pn], Mem$t[pnm2], Mem$t[pn], npts)
+	    if (i < order) {
+	        call amov$t (Mem$t[pnm1], Mem$t[pnm2], npts)
+	        call amov$t (Mem$t[pn], Mem$t[pnm1], npts)
+	    }
+	    call amulk$t (Mem$t[pn], coeff[i], Mem$t[pn], npts)
+	    call aadd$t (yfit, Mem$t[pn], yfit, npts)
+	}
+
+	# free temporary space
+	call sfree (sp)
+
+end
+
+
+# GS_1DEVLEG -- Procedure to evaluate a Legendre polynomial assuming that
+# the coefficients have been calculated. 
+
+procedure $tgs_1devleg (coeff, x, yfit, npts, order, k1, k2)
+
+PIXEL	coeff[ARB]		# EV array of coefficients
+PIXEL	x[npts]			# x values of points to be evaluated
+PIXEL	yfit[npts]		# the fitted points
+int	npts			# number of data points
+int	order			# order of the polynomial, 1 = constant
+PIXEL	k1, k2			# normalizing constants
+
+int	i
+pointer	sx, pn, pnm1, pnm2
+pointer	sp
+PIXEL	ri, ri1, ri2
+
+begin
+	# fit a constant
+	call amovk$t (coeff[1], yfit, npts)
+	if (order == 1)
+	    return
+
+	# fit a linear function
+	ri1 = k2 * coeff[2]
+	ri2 = ri1 * k1 + coeff[1]
+	call altm$t (x, yfit, npts, ri1, ri2)
+	if (order == 2)
+	    return
+
+	# allocate temporary space
+	call smark (sp)
+	$if (datatype == r)
+	call salloc (sx, npts, TY_REAL)
+	call salloc (pn, npts, TY_REAL)
+	call salloc (pnm1, npts, TY_REAL)
+	call salloc (pnm2, npts, TY_REAL)
+	$else
+	call salloc (sx, npts, TY_DOUBLE)
+	call salloc (pn, npts, TY_DOUBLE)
+	call salloc (pnm1, npts, TY_DOUBLE)
+	call salloc (pnm2, npts, TY_DOUBLE)
+	$endif
+
+	# a higher order polynomial
+	$if (datatype == r)
+	call amovkr (1., Memr[pnm2], npts)
+	$else
+	call amovkd (1.0d0, Memd[pnm2], npts)
+	$endif
+	call alta$t (x, Mem$t[sx], npts, k1, k2)
+	call amov$t (Mem$t[sx], Mem$t[pnm1], npts)
+	do i = 3, order {
+	    ri = i
+	    ri1 = (2. * ri - 3.) / (ri - 1.)
+	    ri2 = - (ri - 2.) / (ri - 1.)
+	    call amul$t (Mem$t[sx], Mem$t[pnm1], Mem$t[pn], npts)
+	    call awsu$t (Mem$t[pn], Mem$t[pnm2], Mem$t[pn], npts, ri1, ri2)
+	    if (i < order) {
+	        call amov$t (Mem$t[pnm1], Mem$t[pnm2], npts)
+	        call amov$t (Mem$t[pn], Mem$t[pnm1], npts)
+	    }
+	    call amulk$t (Mem$t[pn], coeff[i], Mem$t[pn], npts)
+	    call aadd$t (yfit, Mem$t[pn], yfit, npts)
+	}
+
+	# free temporary space
+	call sfree (sp)
+
+end

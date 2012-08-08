@@ -1,0 +1,31 @@
+# Help directory for the IMUTIL package
+
+$doc		= "images$imutil/doc/"
+$src		= "images$imutil/src/"
+
+chpixtype       hlp=doc$chpix.hlp,      	src=src$t_chpix.x
+hedit           hlp=doc$hedit.hlp,      	src=src$hedit.x
+nhedit          hlp=doc$nhedit.hlp,      	src=src$nhedit.x
+hselect		hlp=doc$hselect.hlp,		src=src$hselect.x
+imarith         hlp=doc$imarith.hlp, 	        src=src$t_imarith.x
+imcopy          hlp=doc$imcopy.hlp,     	src=src$t_imcopy.x
+imdelete        hlp=doc$imdelete.hlp,   	src=src$imdelete.x
+imdivide        hlp=doc$imdivide.hlp,   	src=src$t_imdivide.x
+imexpr          hlp=doc$imexpr.hlp,     	src=src$imexpr.gx
+imfunction      hlp=doc$imfunction.hlp, 	src=src$imfunction.x
+imgets          hlp=doc$imgets.hlp,     	src=src$imgets.x
+imheader        hlp=doc$imheader.hlp,   	src=src$imheader.x
+imhistogram     hlp=doc$imhistogram.hlp,	src=src$imhistogram.x
+imjoin		hlp=doc$imjoin.hlp,		src=src$t_imjoin.x
+imrename        hlp=doc$imrename.hlp,   	src=src$t_imrename.x
+imreplace       hlp=doc$imreplace.hlp,   	src=src$t_imreplace.x
+imslice         hlp=doc$imslice.hlp,    	src=src$t_imslice.x
+imstack         hlp=doc$imstack.hlp,    	src=src$t_imstack.x
+imstatistics    hlp=doc$imstat.hlp,     	src=src$t_imstat.x
+imsum           hlp=doc$imsum.hlp,      	src=src$t_imsum.x
+imtile          hlp=doc$imtile.hlp,     	src=src$t_imtile.x
+listpixels      hlp=doc$listpixels.hlp,		src=src$listpixels.x
+minmax          hlp=doc$minmax.hlp,     	src=src$t_minmax.x
+sections        hlp=doc$sections.hlp,		src=src$t_sections.x
+revisions	sys=Revisions
+

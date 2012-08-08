@@ -1,0 +1,123 @@
+.help hafton Jun86 plot
+.ih
+NAME
+hafton -- draw a half tone picture of an image
+.ih
+USAGE
+hafton image
+.ih
+PARAMETERS
+.ls image
+Two dimensional image or image section to be plotted.
+.le
+.ls z1 = 0.0, z2 = 0.0
+The minimum (z1) and maximum (z2) intensities to be mapped.  If left at the
+default values of 0.0, the full intensity range will be mapped.
+.le
+.ls nlevels = 0
+The number of intensities levels to be shown.  If \fBnlevels = 0\fR or \fB1\fR,
+the maximum of 16 levels is used.
+.le
+.ls mapping_function = "linear"
+A string specifying the image intensity to half tone mapping function.
+The default is linear mapping between \fBz1\fR and \fBz2\fR.  For other
+choices, see the description section below.
+.le
+.ls contrast = 0.25
+Positive or negative contrast.  Negative contrast is indicated by setting
+\fBcontrast\fR to a negative number.  The magnitude of \fBcontrast\fR is
+not important unless \fBmapping_function = crtpict\fR.
+.le
+.ls perimeter = yes
+Should a \fBcrtpict\fR perimeter with labeled tickmarks be drawn around 
+the plot?
+.le
+.ls device="stdgraph"
+Output device for plot.
+.le
+.ls title = "imtitle"
+The title to be centered above the plot.  By default, the title string from
+the image header is used.
+.le
+.ls xres = 64, yres = 64
+The input image is block averaged or subsampled to this resolution.
+.le
+.ls preserve = yes
+If \fBpreserve\fR = yes, the aspect ratio of the image is preserved when
+achieving the resolution specified by \fBxres\fR and \fByres\fR.
+.le
+.ls subsample = no
+Should the image be subsampled (as opposed to block averaged) to achieve the
+specified resolution?
+.le
+.ls vx1 = 0.0, vx2 = 0.0, vy1 = 0.0, vy2 = 0.0
+The device viewport, in normalized device coordinates (from 0.0 to 1.0
+inclusive).  If not specified by the user, the plot is centered on the viewport.
+.le
+.ls fill = no
+Should the plot fill the viewport regardless of the device aspect ratio?
+.le
+.ls append = no
+Append to an existing plot?
+.le
+.ih
+DESCRIPTION
+Task \fIhafton\fR draws a half tone picture of an IRAF image, where varying
+intensities in the image are represented by areas of varying darkness on
+the plot.  Six different mapping functions are available; the desired 
+mapping function is selected with the \fBmapping_function\fR string.
+The types of mapping are:
+.nf
+
+   linear
+   exponential - emphasizes high intensity values.
+   logarithmic - emphasizes low intensity values.
+   sinusoidal  - emphasizes mid-range values.
+   arcsine     - extreme values emphasized at the expense of mid-range.
+   crtpict     - linear mapping centered on median intensity.  The slope of
+		 the function is modified by \fBcontrast\fR.
+.fi
+To speed up the plotting, the resolution of the input image can be 
+decreased to \fBxres\fR by \fByres\fR.  
+When \fBpreserve\fR = yes, \fBhafton\fR automatically reduces the 
+image in both directions by the same factor, which
+is the larger of [ncolumns / xres or nlines / yres].  If the
+aspect ratio is not being preserved, the x and y dimensions are independently
+reduced to the specified resolution.
+No reduction is done if
+\fBxres\fR and \fByres\fR = 0, if the input image is an image section, or
+if the image is smaller than \fBxres\fR by \fByres\fR.
+
+If the device viewport is not set by the user, \fIhafton\fR automatically
+sets a viewport centered on the output device.  The default value of
+\fBfill=no\fR means the viewport will be adjusted so that equal
+numbers of image pixels in x and y will occupy equal lengths when plotted.
+That is, when \fBfill=no\fR, a unity aspect
+ratio is enforced, and square images are represented as square plots
+regardless of the device aspect ratio.
+On devices with non square full device
+viewports (e.g., the vt640), a square image will appear extended when
+\fBfill=yes\fR.
+.ih
+EXAMPLES
+1. Image "crab.6563" is plotted in negative contrast, with linear mapping
+between the minimum and maximum image pixel.
+
+    cl> hafton crab.6563 contrast=-1
+
+2. The image is plotted in negative contrast using the same mapping
+function as used by the \fIcrtpict\fR task.  The resulting plot is
+in negative contrast.
+
+    cl> hafton crab.6563 mapping_fun=crt contrast =-0.25
+
+.ih
+TIME REQUIREMENTS
+To produce a \fIhafton\fR plot on the terminal takes just under 9 cpu
+minutes.  If the output device is the imagen or versatec (or another
+nspp device) the total cpu time is about an hour.  
+.ih
+BUGS
+A large number of plotter instructions ( > 100,000 polylines) is generated 
+per frame for square images.
+.endhelp

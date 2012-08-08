@@ -1,0 +1,9 @@
+# The AREGPARS parameter set file
+
+rcra,s,h,"00:00:00.0",,,"The region center ra / longitude"
+rcdec,s,h,"+00:00:00",,,"The region center dec / latitude"
+rrawidth,r,h,10.0,0.0,21600.0,"The ra / longitude region width in minutes"
+rdecwidth,r,h,10.0,0.0,10800.0,"The dec / latitude region width in minutes"
+rcsystem,s,h,"",,,"The region center celestial coordinate system"
+rcraunits,s,h,"",,,"The region center ra / longitude units"
+rcdecunits,s,h,"",,,"The region center dec / latitude units"

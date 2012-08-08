@@ -1,0 +1,72 @@
+Jun 19:	IRAF images may now be read and written from Fortran programs.
+	The interface is simple and efficient, but limited in capability.
+	If a more sophisticated interface is required one may call Fortran
+	subroutines from SPP main programs (templates are available for
+	accessing 1 and 2 dimensional images in this fashion), or program
+	directly in SPP.
+
+	1. Documentation from the source file
+
+	IMFORT -- Fortran interface to IRAF images.  This interface permits a
+	Fortran program to read or write an existing IRAF image.  There is
+	currently no provision for creating new images or deleting old images
+	from Fortran.  The interface routines are as follows:
+
+	      im = imopen (image, mode, ndim, len_axes)
+		   imclos (im)
+
+		imget[sr] (im, buf, x1, x2, linenum)
+		imput[sr] (im, buf, x1, x2, linenum)
+
+	where
+		input integer	im, x1, x2, linenum
+		input character	image, mode
+		output integer	ndim, len_axes(7)
+		pixel		buf(*)
+
+		imgets,imputs are for short integer (integer*2) pixels
+		imgetr,imputr are for real pixels
+
+	An image must be opened with IMOPEN before it can be accessed.  Legal
+	access modes are 'r', 'w', and 'rw'.  The number of dimensions and
+	the length of the axes are returned in ndim and len_axes; the latter
+	should be dimensioned for at least 7 dimensions.  All coordinates are
+	1-indexed.  The variable "im" is an integer.  The get and put routines
+	will perform datatype conversion if necessary.  The imget and imput
+	routines will abort program execution if there is an error.
+
+
+	2. Usage
+
+	Source files (minimal documentation in imfort.c header):
+
+		/iraf/sys/imio/mhdr.c.h
+		/iraf/sys/imio/imfort.c
+
+	Libraries:
+
+		/usr/lib/libiraf.a		-liraf on f77 cmd line
+		/usr/lib/libvops.a		-lvops on f77 cmd line
+
+	e.g.,
+		f77 myprog.f -liraf -lvops -o myprog
+
+	or if called in SPP
+
+		cl> xc myprog.x, lib=iraf
+
+
+	3. Example
+
+		integer	im
+		integer axlen(7), ndim
+		integer imopen
+		integer*2 pix(1024)
+
+		im = imopen ('/tmp2/iraf/images/m74', 'r', ndim, axlen)
+		write (*,*) ndim, axlen
+		call imgets (im, pix, 10,15, 5)
+		write (*,*) pix(1), pix(5)
+		stop
+		end
+

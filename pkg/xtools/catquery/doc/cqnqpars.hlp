@@ -1,0 +1,32 @@
+.help cqnqpars Mar00 "Catquery Package"
+.ih
+NAME
+cqnqpars -- Get the number of query parameters
+.ih
+SYNOPSIS
+
+nqpars = cq_nqpars (cq)
+
+.nf
+pointer	cq		# the configuration file descriptor
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ih
+DESCRIPTION
+Cq_nqpars returns the number of expected catalog / survey query parameters.
+Cq_nqpars is an integer function which returns the number of expected
+catalog / survey parameters as its function value. The number of query
+parameters may be zero if the query is non-programmable. Not all query
+parameters are programmable.
+.ih
+NOTES
+The routines cq_setcat or cq_setcatn must be called before the number of
+query parameters can be requested.
+.ih
+SEE ALSO
+cqgqpar, cqgqparn, cqsqpar, cqsqparn
+.endhelp

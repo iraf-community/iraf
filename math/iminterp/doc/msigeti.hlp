@@ -1,0 +1,35 @@
+.help msigeti Dec98 msigeti.hlp
+.ih
+NAME
+msigeti -- fetch an msi integer parameter
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+ivalue = msigeti (msi, param)
+
+.nf
+    pointer	msi		#I interpolant descriptor
+    int		param		#I parameter
+.fi
+.ih
+ARGUMENTS
+.ls msi      
+Pointer to the sequential interpolant descriptor structure.
+.le
+.ls param
+The parameter to be fetched. The choices are: II_MSITYPE, the interpolant
+type, II_MSINSAVE, the length of the saved coefficient array, and
+II_MSINSINC, the half-width of the sinc interpolant.
+.le
+.ih
+DESCRIPTION
+MSIGETI is used to determine the size of the coefficient array that
+must be allocated to save the sequential interpolant description structure,
+and to fetch selected sequential interpolant parameters.
+.ih
+NOTES
+.ih
+SEE ALSO
+msiinit, msisinit, msigetr
+.endhelp

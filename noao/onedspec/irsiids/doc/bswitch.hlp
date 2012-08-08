@@ -1,0 +1,228 @@
+.help bswitch Sep87 noao.imred.iids/noao.imred.irs
+.ih
+NAME
+bswitch - generate sky-subtracted accumulated spectra
+.ih
+USAGE
+bswitch input records
+.ih
+PARAMETERS
+.ls input
+The root name for the input spectra to be beam-switched.
+.le
+.ls records
+The range of spectra to be included in the beam-switch operation.
+Each range item will be appended to the root name to form an image
+name. For example, if "input" is "nite1" and records is "1011-1018",
+then spectra nite1.1011, nite.1012 ... nite1.1018 will be included.
+.le
+.ls output
+New spectra are created by the beam-switch operation. This parameter
+specifies the root name to be used for the created spectra.
+.le
+.ls start_rec = 1
+Each new spectrum created has "output" as its root name and a trailing
+number appended. The number begins with start_rec and is incremented
+for each new spectrum. For example, if "output" is given as "nite1b"
+and start_rec is given as 1001, then new spectra will be created as
+nite1b.1001, nite1b.1002 ...
+.le
+.ls stats = "stats"
+A file by this name will have statistical data appended to it, or created
+if necessary. If a null file name is given (""), no statistical output
+is given. For each aperture, a listing of countrates for each
+observation is given relative to the observation with the highest rate.
+.le
+.ls ids_mode = yes
+If the data are taken under the usual IIDS "beam-switch" mode, this
+parameter should be set to yes so that accumulations will be performed
+in pairs. But if the data are taken where there is no sky observation
+or different numbers of sky observations, ids_mode should be set to no.
+If weighting is in effect, ids_mode=yes implies weighting of the
+object-sky sum; if ids_mode=no, then weighting is applied to the
+object and sky independently because then there is no guarantee that
+an object and sky observation are related.
+.le
+.ls extinct = yes
+If set to yes, a correction for atmospheric extinction is applied.
+The image header must have either a valid entry for AIRMASS or
+for hour angle (or right ascension and sidereal time) and declination.
+.le
+.ls weighting = no
+If set to yes, the entire spectrum or a specified region will be used
+to obtain a countrate indicative of the statistical weight to be
+applied to the spectrum during the accumulations.
+.le
+.ls subset = 32767
+A subset value larger than the number of independent spectra to be
+added indicates that the operation is to produce a single spectrum
+for each aperture regardless of how many input spectra are entered.
+If subset is a smaller number, say 4, then the accumulations
+are written out after every 4 spectra and then re-initialized to zero
+for the next 4.
+.le
+.ls wave1 = 0.0
+If weighting=yes, this parameter indicates the starting point in the
+spectrum for the countrate to be assessed. For emission-line objects,
+this is particularly useful because the regime of information is then
+confined to a narrow spectral region rather than the entire spectrum.
+Defaults to the beginning of the spectrum.
+.le
+.ls wave2 = 0.0
+This provides the ending wavelength for the countrate determination.
+Defaults to the endpoint of the spectrum.
+.le
+.ls observatory = "observatory"
+Observatory at which the spectra were obtained if
+not specified in the image header by the keyword OBSERVAT.  The
+observatory may be one of the observatories in the observatory
+database, "observatory" to select the observatory defined by the
+environment variable "observatory" or the task \fBobservatory\fR, or
+"obspars" to select the current parameters set in the \fBobservatory\fR
+task.  See help for \fBobservatory\fR for additional information.
+.le
+.ls extinction = ")_.extinction"
+The the name of the file containing extinction values.
+Required if extinct=yes.
+.le
+.ih
+DESCRIPTION
+Data from multiaperture spectrographs are summed according to
+aperture number and sky subtracted if sky observations are available.
+Data for up to 50 apertures may be simultaneously accumulated.
+The accumulated spectra are written to new images. 
+
+The exposure times for each observation may be different. All
+internal computations are performed in terms of count rates,
+and converted back to counts (for statistical analysis) prior to writing
+the new image. Therefore, the time on the sky and object may
+be different as well. When these extensions to the normal
+mode are required, the flag ids_mode must be set to no.
+Then object and sky accumulations are performed totally
+independently and a difference is derived at the conclusion
+of the operation.
+
+If ids_mode is set to yes, then the usual IIDS/IRS "beam-switch"
+observing mode is assumed. This implies that an equal number of
+sky and object spectra are obtained through each aperture
+after 2N spectra have been accumulated, where N is the number
+of instrument apertures (2 for the IIDS/IRS). It is also assumed
+that the object and sky exposure times are equal for each aperture.
+Note that the "nebular" mode (where all instrument apertures
+point at an extended object simultaneously, and then all apertures
+point at sky simultaneously) is an acceptable form for
+beam-switched data in ids_mode.
+
+The accumulations are optionally weighted by the countrate
+over a region of the spectrum to improve the statistics during
+variable conditions. The user may specify the region of spectrum
+by wavelength. In ids_mode, the statistics are obtained from
+object-sky differences; otherwise, the statistics are performed
+on object+sky and sky spectra separately.
+
+The spectra may be extinction corrected if this has not already
+been performed.
+In order to perform either the extinction correction or the
+weighting process, the spectra must have been placed on a linear
+wavelength scale (or linear in the base 10 logarithm).
+
+Strings of spectra are  accumulated to produce a single
+summed spectrum for each observing aperture. But in some cases
+it is desirable to produce summed spectra from subsets of the
+entire string to evaluate the presence of variations either due
+to observing conditions or due to the physical nature of the
+object. A subset parameter may be set to the frequency at which
+spectra are to be summed.
+
+In order that the processing occur with minimal user interaction,
+elements from the extended image header are used to direct the
+flow of operation and to obtain key observing parameters.
+The required parameters are: object/sky flag (OFLAG=1/0), exposure
+time in seconds (ITM), beam (that is, aperture) number (BEAM-NUM), airmass (AIRMASS)
+or alternatively hour angle (HA) and declination (DEC), or
+right ascension (RA), sidereal time (ST), declination (DEC), and the
+observatory (OBSERVAT),
+starting wavelength (W0), and wavelength increment per channel (WPC),
+where the names in parenthesis are the expected keywords in the
+header.  If the observatory is not specified in the image the
+observatory parameter is used.  See \fBobservatory\fR for further
+details on the observatory database.
+
+The following header flags are used as well: DC_FLAG
+for dispersion corrected data (must=0), BS_FLAG for beam-switching
+(must not be 1 which indicates the operation was already done),
+EX_FLAG for extinction correction (if = 0 extinction is assumed already
+done).  
+
+The headers may be listed with the IMHEADER task, setting
+the parameter "long" = yes. The values for the parameters follow 
+the rules used for IIDS and IRS data.
+
+After the beam-switch operation, the newly created spectra will
+have header elements taken from the last object spectrum.
+A few parameters will be updated to reflect the operation
+(e.g. integration time, processing flags).
+
+.ih
+EXAMPLES
+The following example will accumulate a series of 16 spectra obtained
+in the normal beam-switched mode and create two new extinction corrected
+spectra having names nite1bs.1 and nite1bs.2:
+
+	cl> bswitch nite1 1011-1026 nite1bs 1
+
+The following example performs the same functions but accumulates the data
+to produce 8 new spectra representing the individual object-sky pairs:
+
+	cl> bswitch nite1 1011-1026 nite1bs 1 subset=4
+
+The following example produces an extinction corrected spectrum for every
+input spectrum. Note that ids_mode is set to off to generate separate object and
+sky sums, and subset is set to 2 so that every pair of spectra (one object and
+one sky) are written out as two new spectra:
+
+	cl> bswitch nite1 1011-1026 nite1bs 1 subset=2 ids_mode-
+
+The next example produces a pair of spectra for each of 3 independent
+objects observed, provided that each was observed for the same number
+of observations (16 in this case).
+
+.nf
+	cl> bswitch nite1 1011-1026,1051-1066,1081-1096 nite1bs 1 \
+	>>> subset=16
+.fi
+
+The next example shows how to use the weighting parameters where
+the indicative flux is derived from the region around the emission-line
+of 5007A.
+
+.nf
+	cl> bswitch nite1 1011-1026 nite1bs 1 weighting- \
+	>>> wave1=4990, wave2=5020
+.fi
+.ih
+TIME REQUIREMENTS
+The principle time expenditure goes toward extinction correcting the
+data. For IIDS type spectra (length=1024 pixels), approximately 30 cpu
+seconds are required to beam-switch a series of 16 spectra.
+.ih
+BUGS
+The number of apertures is restricted to 50 and must be labeled
+between 0 and 49 in the image header (the IIDS uses 0 and 1).
+
+Until an image header editor is available, BSWITCH 
+can be applied only to data with properly prepared headers
+such as IIDS/IRS data read by RIDSMTN, RIDSFILE and some data via RFITS.
+
+When used to perform the function of extinction correction only (the
+third example above), the statistics file fails to note the output
+image name for the sky spectrum.
+
+The data must be on a linear wavelength scale.
+The starting wavelength, W0, and a wavelength
+per channel, WPC, are required header information, and the DC_FLAG
+must be set to 0.
+.ih
+SEE ALSO
+observatory, sensfunc, imheader, lcalib, ridsmtn, ridsfile, rfits
+.endhelp

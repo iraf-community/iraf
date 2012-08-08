@@ -1,0 +1,16 @@
+input,s,a,,,,"List of input images"
+reference,s,a,"",,,"Reference image"
+coords,s,a,,,,"Reference coordinates file"
+shifts,s,h,"",,,"Initial shifts file"
+
+boxsize,i,h,7,1,,"Size of the fine centering box"
+bigbox,i,h,11,1,,"Size of the coarse centering box"
+
+negative,b,h,no,,,"Are the features negative ?"
+background,r,h,INDEF,,,"Reference background level"
+lower,r,h,INDEF,,,"Lower threshold for data"
+upper,r,h,INDEF,,,"Upper threshold for data"
+niterate,i,h,3,2,,"Maximum number of iterations"
+tolerance,i,h,0,0,,"Tolerance for convergence"
+maxshift,r,h,INDEF,,,"Maximum acceptable pixel shift"
+verbose,b,h,yes,,,"Print the centroids for every source ?"

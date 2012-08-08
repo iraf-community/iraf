@@ -1,0 +1,34 @@
+.help gseval Aug85 "Gsurfit Package"
+.ih
+NAME
+gseval -- evaluate the fitted surface at x and y
+.ih
+SYNOPSIS
+y = gseval (sf, x, y)
+
+.nf
+pointer	sf		# surface descriptor
+real	x		# x value, xmin <= x <= xmax
+real	y		# y value, ymin <= y <= ymax
+.fi
+.ih
+ARGUMENTS
+.ls sf      
+Pointer to the surface descriptor structure.
+.le
+.ls x, y
+X and y values at which the surface is to be evaluated.
+.le
+.ih
+DESCRIPTION
+Evaluate the surface at the specified value of x and y. GSEVAL is a real
+valued function which returns the fitted value.
+.ih
+NOTES
+GSEVAL uses the coefficient array stored in the surface descriptor structure.
+Checking for out of bounds x and y values is the responsibility of the calling
+program.
+.ih
+SEE ALSO
+gsvector, gsder
+.endhelp

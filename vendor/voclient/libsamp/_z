@@ -1,0 +1,38 @@
+
+
+
+    /*  Process the mtype.
+     */
+    if (MATCH ("samp.app.ping")) {
+
+    } else if (MATCH ("samp.app.status")) {
+
+    } else if (MATCH ("table.load.fits")) {
+
+    } else if (MATCH ("table.load.votable")) {
+
+    } else if (MATCH ("table.highlight.row")) {
+	
+    } else if (MATCH ("image.load.fits")) {
+
+    } else if (MATCH ("coord.pointAt.sky")) {
+
+    } else if (MATCH ("client.cmd.exec")) {
+
+    } else if (MATCH ("client.env.get")) {
+
+    } else if (MATCH ("client.env.set")) {
+
+    } else if (MATCH ("client.param.get")) {
+
+    } else if (MATCH ("client.param.set")) {
+
+    } else if (MATCH ("bibcode.load")) {
+
+    } else if (MATCH ("table.select.rowList")) {
+
+    } else if (MATCH ("spectrum.load.ssa-generic")) {
+
+    } else if (MATCH ("voresource.loadlist.*")) {
+
+    }

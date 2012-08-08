@@ -1,0 +1,9 @@
+# Help directory for the DOC package (general system documentation)
+
+expressions	hlp=expressions.hlp
+
+biblio84	hlp=biblio84.hlp
+crib83		hlp=crib83.hlp
+pkg84		hlp=pkg84.hlp
+pmmatch		hlp=pmmatch.hlp
+spp83		hlp=spp83.hlp

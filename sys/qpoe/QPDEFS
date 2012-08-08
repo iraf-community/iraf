@@ -1,0 +1,60 @@
+# QPDEFS -- SAMPLE global macro definition file for QPOE.  This should be
+# modified (and a copy placed somewhere outside the QPOE sources) to establish
+# the defaults for a given site.  Each user may also have their own private
+# copy of this file.  The environment variable `qmfiles' defines the list of
+# QPDEFS files to be read to define the runtime environment for QPOE.
+
+# Interface parameters (defaults shown).
+#set	bucketlen	1024
+#set	cachesize	8
+#set	indexlen	100
+#set	maxlfiles	128
+#set	pagesize	512
+#set	sbufsize	2048
+#set	stablen		2048
+#set	progbuflen	1024
+#set	databuflen	4096
+#set	maxfrlutlen	8192
+#set	maxrrlutlen	1024
+#set	lutminranges	5
+#set	lutscale	15
+#set	maxpushback	8192
+#set	blockfactor	8
+#set	optbufsize	524288
+#set	debuglevel	0
+
+set	lutscale	32
+set	blockfactor	4
+
+# The event structure used in qpoe$zzdebug.x for s/w testing.
+define	evfields	{s:x,s:y,s,s,d,s,s}
+define	x		s0
+define	y		s2
+define	pha		s4
+define	pi		s6
+define	time		d8
+define	dx		s16
+define	dy		s18
+
+# An alias.
+define	t		time
+
+# Some test filters.
+define	box		x=(400:800),y=(200:400)
+define	dbox		dx=(400:800),dy=(200:400)
+define	eventimes	(30:31,32:33,34:35,36:37,38:39,40:41,42:43)
+define	oddtimes	(31:32,33:34,35:36,37:38,39:40,41:42,43:44)
+define	alltimes	(eventimes,oddtimes)
+
+# The following is for integer LUT tests; a bitwise test would be more
+# suitable for testing for an even integer.
+
+define	even		(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30)
+
+# Test argument substitution in macros.
+define	eq		$1=($2)
+define	ne		$1=!($2)
+define	le		$1=(:$2)
+define	lt		$1=(!($2:))
+define	ge		$1=($2:)
+define	gt		$1=(!(:$2))

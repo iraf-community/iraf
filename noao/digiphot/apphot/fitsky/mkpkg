@@ -1,0 +1,59 @@
+# FITSKY Task Tools
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	apavsky.x	../lib/display.h	../lib/fitsky.h
+	apbsky.x	<fset.h>		../lib/apphot.h         \
+			../lib/display.h
+	apcentroid.x	<mach.h>		../lib/fitsky.h
+	apcrosscor.x	<mach.h>		../lib/fitsky.h
+	apfitsky.x	../lib/apphotdef.h	../lib/noisedef.h	\
+			../lib/fitskydef.h	../lib/fitsky.h         \
+			../lib/apphot.h
+	apgauss.x	<mach.h>		../lib/fitsky.h         \
+			<math/nlfit.h>
+	apgrowhist.x
+	apgspars.x	../lib/display.h	../lib/fitsky.h         \
+			../lib/noise.h
+	aphgmsub.x
+	aphistplot.x	<gset.h>		<pkg/gtools.h>		\
+			../lib/fitsky.h
+	aplgsky.x	<mach.h>		../lib/fitsky.h
+	apmean.x	<mach.h>		../lib/fitsky.h
+	apmedian.x	<mach.h>		../lib/fitsky.h
+	apmode.x	<mach.h>		../lib/fitsky.h
+	appsky.x	../lib/fitsky.h		../lib/apphot.h
+	apradplot.x	../lib/fitsky.h
+	apreadsky.x
+	aprefitsky.x	../lib/apphotdef.h	../lib/noisedef.h	\
+			../lib/fitskydef.h	../lib/fitsky.h         \
+			../lib/apphot.h
+	aprgrow.x
+	apsconfirm.x	../lib/apphot.h		../lib/noise.h          \
+			../lib/fitsky.h
+	apserrors.x	../lib/fitsky.h
+	apsfree.x	../lib/apphotdef.h	../lib/fitskydef.h
+	apsinit.x	../lib/apphotdef.h	../lib/fitskydef.h      \
+			../lib/fitsky.h
+	apsky.x		<ctype.h>		<gset.h>		\
+			../lib/apphot.h		../lib/display.h        \
+			../lib/fitsky.h         <imhdr.h>
+	apskybuf.x	<imhdr.h>		<math.h>                \
+			../lib/apphotdef.h	../lib/fitskydef.h	\
+			../lib/fitsky.h         <mach.h>
+	apskycolon.x	../lib/apphot.h		../lib/fitsky.h         \
+			../lib/display.h	../lib/noise.h
+	apsradsetup.x	../lib/display.h	../lib/fitsky.h
+	appspars.x	../lib/display.h
+	apsplot.x	<pkg/gtools.h>		<gset.h>		\
+			../lib/apphot.h		../lib/noise.h          \
+			../lib/fitsky.h		../lib/fitskydef.h	\
+			../lib/apphotdef.h
+	apsshow.x	../lib/display.h	../lib/fitsky.h
+	t_fitsky.x	<fset.h>		<gset.h>		\
+			../lib/apphot.h		<imhdr.h>
+	;

@@ -1,0 +1,47 @@
+MWCS Interface Summary
+
+
+		   mw = mw_open (bufptr|NULL, ndim)
+		 mw = mw_openim (im)
+		mw = mw_newcopy (mw)
+		       mw_close (mw)
+
+			mw_load (mw, bufptr)
+		  len = mw_save (mw, bufptr, buflen)
+	       mw_[load|save]im (mw, im)
+
+		 ct = mw_sctran (mw, system1, system2, axes)
+	  ndim = mw_gctran[r|d] (ct, ltm, ltv, axtype1, axtype2, maxdim)
+		      mw_ctfree (ct)
+
+	    x2 = mw_c1tran[r|d] (ct, x1)
+		 mw_v1tran[r|d] (ct, x1, x2, npts)
+		 mw_c2tran[r|d] (ct, x1,y1, x2,y2)
+		 mw_v2tran[r|d] (ct, x1,y1, x2,y2, npts)
+		  mw_ctran[r|d] (ct, p1, p2, ndim)
+		  mw_vtran[r|d] (ct, v1, v2, ndim, npts)
+
+	     mw_[s|g]lterm[r|d] (mw, ltm, ltv, ndim)
+	      mw_translate[r|d] (mw, ltv_1, ltm, ltv_2, ndim)
+		      mw_rotate (mw, theta, center, axes)
+		       mw_scale (mw, scale, axes)
+		       mw_shift (mw, shift, axes)
+
+		   mw_newsystem (mw, system, ndim)
+		 mw_[s|g]system (mw, system[, maxch])
+		  mw_[s|g]axmap (mw, axno, axval, ndim)
+		    mw_bindphys (mw)
+
+	     mw_[s|g]wterm[r|d] (mw, r, w, cd, ndim)
+		      mw_swtype (mw, axis, naxes, wtype, wattr)
+	     mw_[s|g]wsamp[r|d] (mw, axis, pv, wv, npts)
+		 mw_[s|g]wattrs (mw, axis, attribute, valstr[, maxch])
+
+		 mw_invert[r|d] (o_ltm, n_ltm, ndim)
+		   mw_mmul[r|d] (ltm_1, ltm_2, ltm_out, ndim)
+		   mw_vmul[r|d] (ltm, ltv_in, ltv_out, ndim)
+		    mw_glt[r|d] (v1, v2, ltm, ltv, ndim)
+
+			mw_seti (mw, what, ival)
+		ival = mw_stati (mw, what)
+			mw_show (mw, outfd, what)

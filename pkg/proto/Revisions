@@ -1,0 +1,926 @@
+.help revisions Jun88 proto
+.nf
+
+t_mkglbhdr.x		+
+mkglbhdr.par		+
+doc/mkglbhdr.hlp	+
+x_proto.x
+mkpkg
+proto.cl
+proto.hd
+proto.men
+    A new task that creates a global, dataless image header from keywords
+    which are in common in an input image list and an optional reference
+    image.  (2/6/09, Valdes)
+
+masks$t_mimstat.x
+    The clipping calculation was resetting the user supplied pixel limits.
+    Instead, any clipping limits need to remain bounded by the user
+    limits.
+    (7/15/08, Valdes)
+
+masks/t_mimstat.x
+    When creating an output mask the final mp_invert step doesn't work.  I'm
+    not sure if this ever worked right with the PIX_NOT(PIX_SRC) raster op.
+    Replaced this routine with yt_pminvert.  (3/14/08, Valdes)
+
+masks/t_mimstat.x
+doc/mimstat.hlp
+    The "pmmatch" facility now allows the masks to be matched in physical
+    and world coordinate systems.  (2/4/08, Valdes)
+
+t_bscale.x
+    Fixed a type declaration problem (1/21/08, MJF)
+
+t_fixpix.x
+    Changed from using xt_pmmap to yt_pmmap thus supporting world
+    coordinate pixel mask matching.  (1/16/08, Valdes)
+
+maskexpr/t_mskexpr.x
+    If both a reference image and a reference mask are specified the
+    reference mask will be matched to reference image using the features
+    of yt_mappm (see xtools$fixpix/ytpmmap.x).  The default is to match
+    in "logical" which basically trims or pads the mask.  The power of
+    this is that the user may set the environment variable "pmmatch" to
+    one of "physical", "world", or "offset".  The physical option is useful
+    for taking trims, subsections, or other linear changes into account.
+    The world option is useful for matching masks generated from transformed
+    images.  One application of this task is now to create the matched
+    mask as a file from the internal matching operation by using the
+    simple expression "m".
+    (1/10/08, Valdes)
+
+=====
+V2.14
+=====
+
+t_imext.x
+    Removed supporting procedures which are now in the xtools library
+    in the file xtextns.
+    (3/20/07, Valdes)
+
+=====
+V2.13
+=====
+
+========
+V2.12.2a
+========
+
+maskexpr/t_mskregions.x
+     The code to inherit the size of the reference image was incorrect
+     and is now fixed.  (7/8/04, Valdes)
+
+interp.x
+     Removed the limit on the size of the table.  The table is initially
+     allocated to 4096 pairs, and dynamically reallocated in 4096 chunks
+     as needed.  (5/6/04, MJF)
+
+=======
+V2.12.2
+=======
+
+maskexpr/peregfuncs.x
+     Fixed a size decl error in a salloc call in pe_lines() (9/29/03, MJF)
+
+maskexpr/meregfuncs.x
+     Fixed an type declaration/usage error for me_is_in_range() (9/29/03, MJF)
+
+ringavg.cl
+     Included help page in script in order to document for adass.iraf.sources.
+     (1/7/03, Valdes)
+
+ringavg.cl	+
+doc/ringavg.hlp	+
+proto.cl
+proto.men
+proto.hd
+    Added a script task to compute pixel averages in concentric rings.
+    (11/25/02, Valdes)
+
+doc/fixpix.hlp
+    Added an example for using a text file on a 1D image.
+    (9/20/02, Valdes)
+
+=======
+V2.12.1
+=======
+
+=====
+V2.12
+=====
+
+maskexpr/peregfuncs.x
+    Fixed various min / max data type mismatch problems. (06/19/02, Davis)
+
+masks/t_mimstat.x
+masks/rsstats.x
+    If nclip > 0 and the initial mean and standard deviation are INDEF (a very
+    unlikely occurence unless there is a mask) the ksigma limit computation in
+    the mimstatistics / rskysub task could overflow. This does not affect
+    released code. (05/01/02, Davis)
+
+maskexpr/gettok.x
+    Modified the fetch number token routine to decode decimal number with
+    negative exponents correctly. (01/23/02, Davis)
+
+t_suntoiraf.x
+    The read routine was being called as a subroutine instead of as a function.
+    (01/07/02, Davis)
+
+maskexpr/peregfuncs.x
+    Fixed a typo in the salloc call. (01/07/02, Davis)
+
+maskexpr/peregfuncs.x
+    Removed argument from the pe_polygon function that was no longer necessary
+    and was being used incorrectly.
+    (12/14/01, Davis)
+
+masks/mstcache.x
+masks/rsscache.x
+    Added a call setting IM_BUFFRAC to 0 to the memory caching code in the
+    mimstatistics and rskysub tasks in order to force the imio buffer to be
+    the size of the input image.
+    (12/10/01, Davis)
+
+proto.cl
+proto.men
+proto.hd
+x_proto.x
+mskexpr.par
+mskregions.par
+doc/mskexpr.hlp
+doc/mskregions.hlp
+maskexpr/t_mskexpr.x
+maskexpr/memkmask.x
+maskexpr/t_mskregions.x
+maskexpr/mesetreg.x
+maskexpr/mesetexpr.x
+maskexpr/meregmask.x
+maskexpr/peregfuncs.x
+maskexpr/megeom.x
+maskexpr/meregfuncs.x
+maskexpr/mskexpand.x
+maskexpr/gettok.x
+maskexpr/gettok.h
+    Installed the mskexpr and mskregions tasks in the proto package.
+    (12/06/01, Davis)
+
+t_suntoiraf.x
+t_binfil.x
+t_hfix.x
+t_joinlines.x
+doc/irafil.hlp
+    Fixed various extra/missing argument, function declaration, and
+    subroutine/function mismatchs. Also fixed an irafil task help page
+    formatting problem. (9/19/01, Davis)
+
+rskysub.par
+doc/rskysub.hlp
+masks/rskysub.h
+masks/t_rskysub.x
+masks/rsstats.x
+masks/rsmean.x
+masks/rsmmean.x
+masks/rscache.x
+masks/rsfnames.x
+masks/rsreject.x
+    Installed the new running mean or median sky subtraction task rskysub
+    in the proto package. (9/18/01, Davis)
+
+mimstatistics.par
+doc/mimstat.hlp
+masks/mimstat.h
+masks/t_mimstat.x
+masks/mstcache.x
+masks/mimstat.x
+masks/mptools.x
+    Installed the new statistics through a mask task mimstatistics in the
+    proto package. (09/17/01, Davis)
+
+t_imext.x
+    The change to use a temp file was not done right.  (1/9/01, Valdes)
+
+t_fixpix.x
+    Change to call xt_pmunmap to insure pixel masks memory is released.
+    (12/13/00, Valdes)
+
+t_imext.x
+    Added logic to recognize an input specifications which has an explict
+    extension as a single image.  Previously an infinite loop would
+    result.  (9/26/00, Valdes)
+
+t_imext.x
+    Instead of expanding into a string buffer the task now uses a temp
+    file.  (9/18/00, Valdes)
+
+fields.x
+    Added two close statements and a missing sfree statement to the fields
+    task to avoid a too many open files error when processing a long list
+    of files. (5/19/00, Davis)
+
+=====
+V2.11.3
+=====
+
+t_bscale.x
+    The imio input and output pointers for type double and complex images
+    were declared as type double and complex instead of integer causing
+    a hangup on sun systems. (12/11/99, Davis)
+
+=====
+V2.11.2
+=====
+
+mkpkg
+    Added missing file dependencies to the mkpkg file. (9/22/99, Davis)
+
+=====
+V2.11.2
+=====
+
+t_imext.x
+doc/imextensions.hlp
+    1.  Image template expansion is used intead of file template expansion.
+    2.  Image sections may now be in the input names.
+    (12/1/97, Valdes)
+
+=====
+V2.11
+=====
+
+t_imext.x
+    Included a private copy of the ranges package to allow having zero
+    be a legal value.  (8/22/97, Valdes)
+
+t_imext.x		+
+imextensions.par	+
+doc/imextensions.hlp	+
+x_proto.x
+mkpkg
+proto.cl
+proto.men
+proto.hd
+    Installed new task for making lists of image extensions.
+    (8/15/97, Valdes)
+
+=========
+V2.11BETA
+=========
+
+proto$
+    The tasks imalign, imcentroid, imfunction, imreplace, wcsedit, and
+    wcsreset have been moved to the images package. Imalign and imcentroid
+    are in immatch, imfunction and imreplace are in imutil, and wcsedit
+    and wcsreset are in imcoords. (3/31, Valdes)
+
+proto$t_wcsedit.x
+    The off-diagonal elements of the LTM matrix were being incorrectly edited
+    although correctly listed by the wcsedit task, in the sense that editing
+    ltm[2,1] was actually editing ltm[1,2]. On the other hand the off-diagonal
+    elements of th CD matrxi were being correctly edited, but incorrectly
+    displayed. (1/20/97, Valdes)
+
+proto$t_fixpix.x
+proto$fixpix.par
+proto$doc/fixpix.hlp
+proto$mkpkg
+    Improved final version of new FIXPIX.  This uses the routines in
+    xtools$fixpix.  (12/11/96, Valdes)
+
+proto$fields.par
+proto$doc/fields.hlp
+    Changed the default lines in FIELDS to an open upper limit.
+    (8/22/96, Valdes)
+
+proto$t_fixpix.x
+proto$fpfixpix.gx
+proto$fixpix.par
+proto$text2mask.par	+
+proto$t_text2mask.x	+
+proto$t_mask2text.x	+
+proto$doc/fixpix.hlp
+proto$doc/text2mask.hlp	+
+proto$mkpkg
+proto$x_proto.x
+proto$proto.cl
+proto$proto.hd
+proto$proto.men
+    Replace the old version of FIXPIX by a new version that works with
+    mask images.  Two new tasks have been added TEXT2MASK and MASK2TEXT that
+    convert from the old text file description to mask images and back.
+    The MASK2TEXT task is hidden to discourage continued use of the text
+    file description.
+    (6/14/96, Valdes)
+
+proto$generic/	+
+proto$imfunc.x -> generic/
+proto$imrep.x -> generic/
+    Added a generic directory for generic files.  The imfunc.x
+    and imrep.x are now in this directory.  (6/14/96, Valdes)
+
+proto$t_wcsreset.x
+    Added an error check to the mw_openim command so wcsreset can erase
+    the world coordinate systems of images with wcss that it cannot
+    read correctly. (1/8/95, Davis)
+
+proto$t_imcntr.x
+    Modified the format of the output to ensure a space between the x: and
+    y: and the x and y coordinate and increased the precision of the output
+    from %7.3f to %8.3f. (22/4/94, Davis)
+
+proto$t_bscale.x
+    Added a call to flush after the status printout so that the output will
+    appear after each images is processed. (29/11/93, Davis)
+
+proto$t_imcntr.x
+    Modified to imcntr task to use image templates instead of file templates.
+    (10/27/92, Davis)
+
+proto$t_imcntr.x
+    Added an error check for constant data. (10/26/92, Davis)
+
+proto$doc/suntoiraf.hlp
+    Replaced the help page with an updated one. (4/30/92, Davis)
+
+proto$wcsedit
+    Added the new task WCSEDIT to the PROTO package. (4/22/92, Davis)
+
+proto$wcsreset
+    Added the new task WCSRESET to the PROTO package. (4/21/92, Davis)
+
+proto$intrp.f
+    Updated to be the same as in the ONEDSPEC package so that the entry
+    statements are removed.  (2/10/92, Valdes)
+
+proto$
+proto$suntoiraf
+    The LOCAL package task SUNTOIRAF was added to PROTO.  (1/31/92, Davis)
+
+proto$hfix
+    The new task HFIX was added to the PROTO package. (1/24/92, Valdes)
+
+proto$*
+    1. New PROTO package created from the NOAO.PROTO package.
+
+    2. The IMEDIT, IMEXAMINE, and TVMARK tasks in NOAO.PROTO have been moved
+    to the IMAGES.TV package.
+
+    3. The IMTITLE, MKHISTOGRAM, and RADPLT tasks in NOAO.PROTO have been moved
+    to the OBSOLETE package. They are superseded by the HEDIT, PHISTOGRAM, and
+    PRADPROF tasks respectively.
+
+    4. The BINPAIRS, IRALIGN, IRMATCH1D, IRMATCH2D, IRMOSAIC, NDPREP, and
+    SLITPIC tasks have been moved to the new version of NOAO.PROTO called
+    NPROTO.
+
+    5. The JOIN task has been renamed JOINLINES.
+
+    (1/23/92, Valdes, Davis)
+
+
+====
+Package regorganization
+====
+
+noao$proto
+proto$imexamine/ievimexam.x
+    Corrected an error in the column limits computation in the routine
+    ie_get_vector that caused occasional glitches in vectors plotted
+    using the 'v' key. This bug may also explain occasional unrepeatable
+    bus errors which occurred after using the 'v' key. (12/11/91, Davis)
+
+proto$imedit/epcolon.x
+    Two calls to pargr changed to pargi.  (11/13/91, Valdes)
+
+proto$tvmark/t_tvmark.x
+proto$tvmark/mkcolon.x
+    Removed extra argument to mk_sets() calls. (11/13/91, Davis)
+
+proto$tvmark/mkppars.x
+    Changed two clputi calls to clputb calls. (11/13/91, Davis)
+
+
+proto$t_fixpix.x
+proto$doc/t_fixpix.x
+    Made the order of lower/upper columns/lines unimportant by internally
+    transposing the endpoints if not in increasing order.  (10/31/91, Valdes)
+
+proto$imfuncs.gx
+proto$imfuncs.x
+    The reference to the E macro in math.h was replaced with a reference to
+    the new macro BASE_E.
+    (9/17/91 LED)
+
+proto$jimexam.par
+proto$proto.cl
+proto$mkpkg
+proto$imexamine/iejimexam.x
+proto$imexamine/iecolon.x
+proto$imexamine/t_imexam.x
+proto$imexamine/iegcur.x
+proto$imexamine/mkpkg
+proto$doc/imexamine.hlp
+noao$lib/scr/imexamine.key
+    Added new options for fitting 1D gaussians to lines and columns.
+    (9/2/91, Valdes)
+
+proto$imfunction.par
+proto$imfunction.x
+proto$imfuncs.gx
+proto$imfuncs.x
+proto$doc/imfunction.hlp
+    A new version of the imfunction task was installed. This new version
+    supports many more functions as well the double precision images.
+    (8/29/91 LED)
+
+proto$bscale.par
+proto$t_bscale.x
+proto$mkpkg
+proto$doc/bscale.hlp
+    Installed a new version of the bscale task. The new task takes a list
+    of input images and produces a list of output images like most other
+    images tasks. The input images are overwritten if the output list equals
+    the input list, and the noact parameter was removed since it is no longer
+    required.  Two new parameters upper and lower can be used to remove
+    outliers from the statistics computation. The logfile parameter was
+    removed and replaced with the verbose parameter. Finally the code was
+    modified to only use the step parameter for sampling along a particular
+    axis, if no reference is made to that axis in the section parameter.
+    (8/26/91 LED)
+
+proto$fixline.gx
+    The call to awsud had an argument type mismatch.  (8/13/91, Valdes & Jacoby)
+
+proto$imexamine/iemw.x +
+proto$imexamine/iecimexam.x
+proto$imexamine/iecolon.x
+proto$imexamine/iegimage.x
+proto$imexamine/ielimexam.x
+proto$imexamine/iepos.x
+proto$imexamine/ierimexam.x
+proto$imexamine/imexam.h
+proto$imexamine/mkpkg
+proto$imexamine/t_imexam.x
+proto$imexamine.par
+proto$doc/imexamine.hlp
+    Modified IMEXAMINE to use WCS information in axis labels and coordinate
+    readback.  (8/13/91, Valdes)
+
+proto$tvmark/mkonemark.x
+    Moved the two salloc routines to the top of the mk_onemark routine
+    where they cannot be called more than once.
+    (7/22/91, Davis)
+
+proto$tvmark.par
+    Modified the description of the pointsize parameter.
+    (7/17/91, Davis)
+
+proto$imfit1d.par,linefit.par
+    Removed these defunct .par files from the PROTO package.
+    (10/25/90, Davis)
+
+proto$t_imreplace.x
+    Added support for pixel type USHORT to the IMREPLACE task.
+    (10/25/90, Davis)
+
+proto$imexamine/iesimexam.x
+    Add code for checking and warning if data is all constant, all above the
+    specified ceiling, or all below the specified floor when making surface
+    plots.  (10/3/90, Valdes)
+
+proto$imedit/epmask.x
+    Added some protective changes so that if a radius of zero with a circular
+    aperture is used then round off will be less likely to cause missing
+    the pixel.  (9/23/90, Valdes)
+
+proto$tvmark/tvmark.key
+proto$tvmark/mkmark.x
+proto$tvmark/doc/tvmark.hlp
+    At user request changed the 'd' keystroke command  which marks an object
+    with a dot to the '.' and the 'u' keystroke command which deletes a
+    point to 'd'. (9/14/90 Davis)
+
+proto$mkpkg
+proto$proto.cl
+proto$proto.hd
+proto$proto.men
+proto$x_proto.x
+proto$toonedspec.x -
+proto$toonedspec.par -
+proto$doc/toonedspec.hlp -
+    Removed TOONEDSPEC.  It's replacement is ONEDSPEC.SCOPY.  (8/23/90, Valdes)
+
+====
+V2.9
+====
+
+noao$proto
+    Davis, June 20, 1990
+    The prototype tasks IMSLICE and IMSTACK were removed from the PROTO
+    package. Their functionality is duplicated by tasks of the same
+    name in the IMAGES package. 
+
+noao$proto/imedit/epgcur.x
+    Valdes, June 6, 1990
+    The fixpix format input was selecting interpolation across the longer
+    dimension instead of the shorter.  This meant that complete columns
+    or lines did not work at all.
+
+noao$proto/t_fixpix.x
+    Davis, May 29, 1990
+    Modified fixpix so that it would work on unsigned short images.
+
+====
+V2.8
+====
+
+noao$proto/
+    Davis, April 6, 1990
+    Two new tasks IMALIGN and IMCENTROID written by Rob Seaman were added
+    to the proto package. IMCENTROID computes a set of relative shifts
+    required to register a set of images. IMALIGN both computes the
+    shifts and aligns the images.
+
+noao$proto/imexamine/t_imexam.x
+    Valdes, Mar 29, 1990
+    Even when use_display=no the task was trying to check the image display
+    for the name.  This was fixed by adding a check for this flag in the
+    relevant if statement.
+
+noao$proto/imexamine/ievimexam.x
+    Valdes, Mar 22, 1990
+    The pset was being closed without indicating this in the data structure.
+    The clcpset statement was removed.
+
+noao$proto/imedit/epgcur.x
+    Valdes, Mar 15, 1990
+    The EOF condition was being screwed up for two keystroke commands leading
+    to a possible infinite loop when using a cursor file input.  The fix
+    is to change the "nitems=nitems+clgcur" incrementing to simply
+    "nitems=clgcur".
+
+noao$proto/imedit/epbackground.x
+noao$proto/imedit/epgcur.x
+    Valdes, Mar 9, 1990
+    1. The surfit pointer was incorrectly declared as real in ep_bg causing the
+    'b' key to do nothing.  This appears to be SPARC dependent.
+    2. Fixed some more problems with cursor strings having missing coordinates
+    causing floating overflow errors.
+
+noao$proto/iralign.par,ir/t_iralign.x
+    Davis, Feb 27, 1990
+    Changed the iralign parameter align to alignment for consistency with
+    the other tasks.
+
+noao$proto/imexamine/iecolon.x
+    Valdes, Feb 16, 1990
+    Fixed a mistake in the the datatype of a parg call.
+
+noao$proto/ir/
+    Davis, Feb 16, 1990
+    Added a feature to the iralign code that permits the user to rerun
+    the iralign, irmatch1d, and irmatch2d  using the first runs output
+    as input. This permits the user to fine tune the intensity adjustments
+    and shifts.
+
+noao$proto/proto.cl
+noao$proto/proto.men
+noao$proto/mkpkg
+noao$proto/x_proto.x
+noao$proto/t_join.x	+
+noao$proto/join.par	+
+noao$proto/join.cl	-
+noao$proto/doc/join.hlp
+    Valdes, Feb 13, 1990
+    Added compiled version of the join task and updated the documentation.
+    Note that the parameters are now different.
+
+noao$proto/imedit.par
+noao$proto/imedit/epcolon.x
+noao$proto/imedit/epmask.x
+    Valdes, Jan 17, 1990
+    1. Fixed typo in prompt string for y background order.
+    2. Wrong datatype in clput for order parameters resulting in setting
+       the user parameter file value to 0.
+    3. Bug fix in epmask.  The following is the correct line:
+       line 130:    call amovi (Memi[line], Memi[ptr2+i*EP_NX(ep)], EP_NX(ep))
+
+noao$proto/imedit/epdisplay.x
+    Valdes, Jan 7, 1990
+    Added initialization to the zoom state.  Without the intialization
+    starting IMEDIT without display and then turning display on followed by
+    a 'r' would cause an error (very obscure but found in a demo).
+
+noao$proto/tvmark/t_tvmark.x
+noao$proto/tvmark/mkmark.x
+noao$proto/tvmark/tvmark.key
+noao$proto/doc/tvmark.hlp
+    Valdes, Jan 4, 1990
+    Added filled rectangle command 'f'.
+
+noao$proto/tvmark/t_tvmark.x
+noao$proto/tvmark/mktools.x
+noao$proto/tvmark/mkshow.x
+noao$proto/tvmark/mkcolon.x
+noao$proto/tvmark/mkfind.x
+noao$proto/tvmark/mkremove.x
+    Davis, Dec 12, 1989
+    1. Tvmark has been modified to permit deletion as well as addition of
+    objects to the coordinate file. Objects to be deleted are marked
+    with the cursor and must be within a given tolerance of an
+    object in the coordinate list to be deleted.
+    2. The help screen no longer comes up in the text window when the task
+    is invoked for the sake of uniformity with all other IRAF tasks.
+    3. The coordinate file is opened read_only in batch mode. In interactive
+    mode a warning message is issued if the user tries to append or delete
+    objects from a file which does not have write permission and no action
+    is taken.
+
+noao$proto/imexamine/t_imexam.x
+noao$proto/imexamine/iegimage.x
+    Valdes, Nov 30, 1989
+    The default display frame when not using an input list was changed from
+    0 to 1.
+
+noao$proto/ir/
+    Davis, Nov 28, 1989
+    New versions of the proto tasks IRMOSAIC, IRALIGN, IRMATCH1D and
+    IRMATCH2D have been installed in the PROTO package. The routine
+    have been modularised and now share code in preparation for a
+    future database approach to the registration problem. The image i/o
+    has been optimized so that all the tasks, but IRMOSAIC in particular,
+    will run much faster. A bug in the alignment code in which errors of
+    alignment of up to 0.5 pixels can occur has been fixed.
+    There is now an option to trim each section before insertion into
+    the output image. Finally the actions taken by the task can optionally
+    be printed on the terminal.
+
+noao$proto/imeidt/epgcur.x
+    Valdes, Oct 30, 1989
+    1. There was no check against INDEF cursor coordinates.  Such coordinates
+    will occur when reading a previous logfile output and cursor input
+    where the shorthand ":command" is used.  The actual error occured when
+    attempting to add 0.5 to INDEF.
+
+noao$proto/imedit/epstatistics.x
+noao$proto/imedit/epmove.x
+noao$proto/imedit/epgsfit.x
+noao$proto/imedit/epnoise.x
+noao$proto/imedit/epbackground.x
+noao$proto/imedit/t_imedit.x
+    Valdes, Aug 17, 1989
+    1. Added errchk to main cursor loop to try and prevent loss of the
+       user's changes if an error occurs.
+    2. If no background points are found an error message is now printed
+       instead of aborting.
+
+noao$proto/tvmark/mkbmark.x
+    Davis, Aug 4, 1989
+    Modified tvmark so that drawing to the frame buffer is more efficient
+    in batch mode. This involved removing a number of imflush calls
+    which were unnecessarily flushing the output buffer to disk and
+    recoding the basic routines which draw concentric circles and rectangles.
+
+noao$proto/imreplace.par
+    Valdes, July 20, 1989
+    Changed mode of imaginary component value to hidden.
+
+===========
+Version 2.8
+===========
+
+noao$proto/imexamine/* +
+noao$proto/imexamine.par +
+noao$proto/?imexam.par +
+noao$proto/doc/imexamine.hlp +
+noao$proto/proto.cl
+noao$proto/proto.men
+noao$proto/proto.hd
+noao$proto/x_proto.x
+noao$proto/mkpkg
+noao$lib/scr/imexamine.key
+    Valdes, June 13, 1989
+    New task IMEXAMINE added to the proto package.
+
+noao$proto/tvmark/
+    Davis, June 6, 1989
+    Fixed a bug in tvmark wherein circles were not being drawn if they
+    were partially off the image in the x dimension.
+
+noao$proto/tvmark/
+    Davis, June1, 1989
+    A labeling capability has been added to tvmark. If the label parameter
+    is turned on tvmark will label objects with the string in the third
+    column of the coordinate file.
+
+noao$proto/tvmark/
+    Davis,  May 25, 1989
+    The problem reported by phil wherein TVMARK would go into an infinite
+    loop if it encountered a blank line has been fixed.
+
+noao$proto/t_imreplace.x
+noao$proto/imrep.gx
+noao$proto/imreplace.par
+noao$proto/doc/imreplace.hlp
+    Valdes, May 23, 1989
+    Complex images are supported with the thresholds being the magnitude
+    of the complex values and the replacement value specified as real
+    and imaginary.
+
+noao$proto/tvmark
+    Davis,  May 22, 1989
+    The new task TVMARK was added to the proto package.
+
+noao$proto/imedit/
+    Davis,  May 22, 1989
+    The new task IMEDIT was added to the proto package.
+
+noao$proto/t_binfil.x
+    Rooke, Apr 28, 1989
+    After allocating temporary storage for header bytes in IRAFIL, the code
+    was then reading those bytes instead into pixel storage, resulting in
+    a segmentation violation if header > row of pixels (found by Jim
+    Klavetter).
+
+noao$proto/epix/epgdata.x
+    Valdes, Mar 20, 1989
+    Limit checking on the requested data region was wrong.  User would get
+    out of bounds message if the line desired was greater than the number
+    of columns.
+ 
+noao$proto/t_bscale.x
+    Davis, Feb 7, 1989
+    Fixed a memory corruption error in bscale. If a user specified a section
+    using the section parameter, the task was overflowing the data array
+    by trying to read beyond the boundary of the section. 
+
+    Fixed a floating divide by zero problem in the computation of
+    step sizes when a specified section was only one pixel
+    wide in a given dimension.
+
+noao$proto/
+    Davis, Jan 26, 1989
+    A "pixel out of bounds" error was fixed in the task IRMATCH2D. This
+    would occur if nxsub != nysub and for certain combination of corner
+    and order. This bug has been fixed.
+
+noao$proto/
+    Davis, Nov 8, 1988
+    The two prototype image intensity matching tasks IRMATCH1D and IRMATCH2D
+    have been added to the proto package. See the help pages for further
+    details.
+
+noao$proto/t_irmosaic.x
+    Davis, Jul 23, 1988
+    The number of columns and rows between adjacent subrasters in the output
+    image produced by IRMOSAIC was incorrect if nxoverlap or nyoverlap were
+    less than -1.
+
+noao$proto/t_imslice.x
+    Davis, Jul 8, 1988
+    A new task imslice has been added to the proto package. IMSLICE reduces
+    an n-dimensional image to a list of (n-1)-dimensional images.
+
+noao$proto/mkpkg
+noao$proto/imfunction.x
+noao$proto/imfuncs.gx +
+noao$proto/imdex.gx -
+noao$proto/imlog.gx -
+noao$proto/imsqr.gx -
+    Valdes, Apr 8, 1988
+    Added the absolute value function.  Combined the different functions
+    into one procedure.
+
+noao$proto/t_mkhistogram.x
+    Davis, Feb 5, 1988
+    A new task mkhistogram has been added to the proto package. Mkhistogram
+    will task a stream of data and list or plot the histogram of the data.
+
+noao$proto/t_irmosaic.x
+    Davis, Feb 3, 1988
+    1. A new parameter "subtract" has been added to the IRMOSAIC task. If
+    the "median" parameter is yes then IRMOSAIC will subtract the median
+    from each subraster before adding it to the output image mosaic.
+
+noao$proto
+    Davis, Dec 8, 1987
+    1. Two new tasks IRMOSAIC and IRALIGN have been added to the PROTO
+    package. IRMOSAIC takes an ordered list of input images and places them
+    on a grid in an output image. Options exist to order the input list
+    by row, column or in a raster pattern starting at any of the four
+    corners of the output image. Adjacent subrasters may be overlapped or
+    separated by a specified number of columns and rows. Positions of objects
+    which occur in adjacent subrasters can be marked using for example
+    the sun imtool facility and centered using the APPHOT center routine.
+    IRALIGN takes the mosaiced image and the coordinate list and produces an
+    output image where all the individual subrasters have been aligned with
+    respect to some reference subraster.  These two tasks are most useful for
+    images which already lie approximately on a grid.
+
+noao$proto/t_bscale.x +
+noao$proto/bscale.par +
+noao$proto/doc/bscale.hlp +
+    Valdes, October 7, 1988
+    A new task to compute to scale images by a zero point and scale factor
+    has been added.  The zero point and scale factor can be chosen as the
+    mean, median, or mode of the images.
+
+noao$proto/doc/replicate.hlp -
+    Valdes, June 4, 1987
+    1.  Deleted this obsolete file.
+
+noao$proto/toonedspec.x
+noao$proto/doc/toonedspec.hlp
+    Valdes, April 27, 1987
+    1.  The output spectra are now of type real regardless of the input
+	pixel type.  This change was made to avoid fix point exceptions
+	on AOS/VS IRAF when summing enough lines to overflow the input
+	pixel type.  On the other IRAF systems integer overflows only cause
+	erroneous output but no error.
+
+noao$proto/fixline.gx
+    Valdes, April 27, 1987
+    1.  The interpolation weights when interpolating across lines were
+	being truncated and producing approximately correct values
+	but not correct interpolation.  The weights are now not truncated.
+
+noao$proto/join.cl
+    Hammond, March 10, 1987
+    1. Added script task JOIN, which joins two lists line by line.
+
+noao$proto/t_imstack.x
+    Valdes, March 3, 1987
+    1.  The input images being stacked were not being closed after they
+	were added to the output image.
+
+noao$proto/imrep.gx
+    Valdes, February 5, 1987
+    1.  There was a problem in AOS iraf because of an attempt to convert
+	a real INDEF to a short value.  The routine was modified to attempt
+	the conversion only if the value is not INDEF.
+
+noao$proto/t_imstack.x
+noao$proto/doc/imstack.hlp
+    Valdes, October 8, 1986
+    1.  Modified IMSTACK to use image templates instead of file templates.
+	All image tasks should use the image template package for consistency.
+    2.  Modified the help page.  One of the examples was incorrect.
+
+noao$proto/imfunction.x
+    Valdes, October 8, 1986
+    1.  Doug Tody added the square root function.  I don't know the
+	details of the revision.
+
+noao$proto/imfunction.x
+noao$proto/imfunction.par
+noao$proto/imlog.gx
+noao$proto/imdex.gx +
+noao$proto/funcs.x -
+noao$proto/doc/imfunction.hlp
+    Valdes, September 9, 1986
+    1.  Added the "dex" function which is the inverse of the existing "log"
+	function.
+    2.  The help page was revised.
+
+proto$toonedspec:  Valdes, June 16, 1986
+    1.  Added new task TOONEDSPEC to convert columns or lines of 2D
+	spectra to 1D spectra.  A manual page was also added.  This
+	is a prototype.  The task or it's function will eventually
+	move to the TWODSPEC package.
+
+======================
+Package reorganization
+======================
+
+local$dsttoiraf:  Valdes, April 7, 1986
+    1.  The task resides now on NOAO/VMS SKD:[LOCAL.DAOP]
+
+local$t_imstack.x:  Valdes, April 6, 1986
+local$doc/imstack.hlp:  Valdes, April 6, 1986
+    1.  Removed warning message about mixed datatypes in IMSTACK.
+    2.  Updated help page for IMSTACK.
+
+local$dsttoiraf:  Valdes, April 3, 1986
+    1.  Added NOAO foreign task to convert DST (DAO) format images to
+	IRAF images.  This task is only available on the NOAO/VMS cluster.
+	Attempting to run this on any other system will fail.
+
+local$irafil:  Valdes, April 3, 1986
+    1.  George Jacoby added the task IRAFIL to convert integer byte
+	pixel data to an IRAF image.  It is an attempt to have a general
+	dataio conversion for foreign format images.
+
+===========
+Release 2.2
+===========
+
+From Valdes Jan. 24, 1986:
+
+1. Removed NOTES tasks which was not useful.
+------
+August 6, 1985:
+
+1. Imfunction modified to produce only real datatype output images.
+2. Revisions script added.
+.endhelp

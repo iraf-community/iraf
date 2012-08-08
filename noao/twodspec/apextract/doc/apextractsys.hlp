@@ -1,0 +1,415 @@
+.help apextract Aug90 noao.twodspec.apextract
+
+.ce
+APEXTRACT System Notes
+
+
+\fBIntroduction\fR
+
+The \fBapextract\fR package is a complex package with a simple
+purpose, the extraction of one dimensional spectra from two dimensional
+images.  The complexity arises from the many algorithms and parameters
+involved.  To manage the complexity of the algorithms, features, parameters,
+functionality, and documentation the package has been organized in terms
+of logical functions which may be invoked in a number of ways.  The
+logical functions are:
+.ls o
+Automatically find a specified number of spectra and assign default
+apertures.  Apertures may also be inherited from another image or
+defined using an interactive graphical interface called the \fIaperture
+editor\fR.
+.le
+.ls o
+Recenter apertures on the image spectrum profiles.
+.le
+.ls o
+Resize apertures based on spectrum profile width.
+.le
+.ls o
+Interactively define or adjust aperture definitions using a graphical
+interface called the \fIaperture editor\fR.  All function may also
+be performed from this editor and, so, provides an alternative
+method of processing and extracting spectra.
+.le
+.ls o
+Trace the positions of spectra profiles from a starting image line
+or column to other image lines or columns and fit a smooth function.
+The trace function is used to shift the center of the apertures
+at each dispersion point in the image.
+.le
+.ls o
+Extract the flux in the apertures into one dimensional spectra in various
+formats.  This includes possible background subtraction, variance
+weighting, and bad pixel rejection.
+.le
+
+The package is logically organized around these functions.  Each
+function has a task devoted to it.  The description of the parameters
+and algorithms for each function are organized according to these
+tasks; namely under the help topics \fBapdefault, apfind, aprecenter,
+apresize, apedit, aptrace\fR, and \fBapsum\fR.  However, each task has
+parameters to allow selecting some or all of the other functions, hence
+it is not necessary to use the individual tasks and often it is more
+convenient to use just the extraction task for all operations.  It is
+also possible to perform all the functions from within a graphical
+interface called the aperture editor.  This is usually only used to
+define and modify aperture definitions but it also has the capability
+to trace spectra and extract them.
+
+Each of the functions has many different options and parameters.  When
+broken down into individual tasks the parameters are also sorted by
+their function though there are then some mutual interdependencies.
+This parameter decomposition was what was available prior to the
+addition of the task \fBapall\fR.  This is the central task of the
+package which performs any and all of the functions required for the
+extraction of spectra and also collects all the parameters into one
+parameter set.  It is recommended that \fBapall\fR be used because it
+collects all the parameters in one place eliminating confusion over
+where a particular parameter is defined.
+
+In summary, the package consists of a number of logical functions which
+are documented by the individual tasks named for that function, but the
+functions are also integrated into each task and the aperture editor to
+providing many different ways for the user to choose to perform the
+functions.
+
+This document describes some of the implementation details and features
+which are hidden from the normal user.
+
+
+\fBParameters\fR
+
+The tasks actually use hidden parameter sets for almost all parameters.
+To see all the parameter sets type
+
+.nf
+	ap> ?_ apextract
+.fi
+
+The relation between the tasks and the hidden parameter sets is given below.
+
+.nf
+	PSET	   TASK
+	apparams - apdefault, apfind, aprecenter, apresize,
+		   apedit, aptrace, apsum, apmask, apscatter
+	apall1   - apall
+	apfit1   - apfit
+	apflat1  - apflatten
+	apnorm1  - apnormalize
+.fi
+
+The hidden parameter sets may be viewed in any of the normal ways
+\fBeparam\fR, \fBlparam\fR, or just by typing their name, except
+their names may not be abbreviated.  Their purpose is to redirect
+parameters to visible parameter sets, to hide some parameters which
+are not meant to be changed by the user, and to include parameters
+used for queries.
+
+Most of the redirected parameters go to a single visible parameter set
+or to package parameters.
+The interesting exception is \fBapparams\fR which provides the
+parameter linkage between the various functional tasks like
+\fBapfind\fR, \fBaptrace\fR, \fBapsum\fR, etc.  Below is a reproduction
+of this parameter set.
+
+.ce
+APPARAMS Hidden Parameter Set
+
+.nf
+				   I R A F  
+                    Image Reduction and Analysis Facility
+PACKAGE = apextract
+   TASK = apparams
+    
+(format =            )_.format) Extracted spectra format
+(extras =        )apsum.extras) Extract sky, sigma, etc.?
+(dbwrite=                  yes) Write to database?
+(initial=                  yes) Initialize answers?
+(verbose=           )_.verbose) Verbose output?
+                                
+                                # DEFAULT APERTURE PARAMETERS
+
+(upper  =     )apdefault.upper) Upper aperture limit relative to center
+(apidtab= )apdefault.apidtable) Aperture ID table (optional)
+                                
+                                # DEFAULT BACKGROUND PARAMETERS
+
+(b_funct= )apdefault.b_function) Background function
+(b_order=   )apdefault.b_order) Background function order
+(b_sampl=  )apdefault.b_sample) Background sample regions
+(b_naver= )apdefault.b_naverage) Background average or median
+(b_niter= )apdefault.b_niterate) Background rejection iterations
+(b_low_r= )apdefault.b_low_reject) Background lower rejection sigma
+(b_high_= )apdefault.b_high_reject) Background upper rejection sigma
+(b_grow =    )apdefault.b_grow) Background rejection growing radius
+                                
+                                # APERTURE CENTERING PARAMETERS
+
+(width  =        )apedit.width) Profile centering width
+(radius =       )apedit.radius) Profile centering radius
+(thresho=    )apedit.threshold) Detection threshold for profile centering
+                                
+                                # AUTOMATIC FINDING AND ORDERING PARAMETERS
+
+(nfind  =        )apfind.nfind) Number of apertures to be found automatically
+(minsep =       )apfind.minsep) Minimum separation between spectra
+(maxsep =       )apfind.maxsep) Maximum separation between spectra
+(order  =        )apfind.order) Order of apertures
+                                
+                                # RECENTERING PARAMETERS
+
+(apertur= )aprecenter.apertures) Select apertures
+(npeaks =   )aprecenter.npeaks) Select brightest peaks
+(shift  =    )aprecenter.shift) Use average shift instead of recentering?
+                                
+                                # RESIZING PARAMETERS
+
+(llimit =     )apresize.llimit) Lower aperture limit relative to center
+(ulimit =     )apresize.ulimit) Upper aperture limit relative to center
+(ylevel =     )apresize.ylevel) Fraction of peak or intensity for automatic widt(peak   =       )apresize.peak) Is ylevel a fraction of the peak?
+(bkg    =        )apresize.bkg) Subtract background in automatic width?
+(r_grow =     )apresize.r_grow) Grow limits by this factor
+(avglimi=  )apresize.avglimits) Average limits over all apertures?
+                                
+                                # EDITING PARAMETERS
+
+e_output=                       Output spectra rootname
+e_profil=                       Profile reference image
+(t_nsum =        )aptrace.nsum) Number of dispersion lines to sum
+(t_step =        )aptrace.step) Tracing step
+(t_width=        )apedit.width) Centering width for tracing
+(t_funct=    )aptrace.function) Trace fitting function
+(t_order=       )aptrace.order) Trace fitting function order
+(t_sampl=      )aptrace.sample) Trace sample regions
+(t_naver=    )aptrace.naverage) Trace average or median
+(t_niter=    )aptrace.niterate) Trace rejection iterations
+(t_low_r=  )aptrace.low_reject) Trace lower rejection sigma
+(t_high_= )aptrace.high_reject) Trace upper rejection sigma
+(t_grow =        )aptrace.grow) Trace rejection growing radius
+                                
+                                # EXTRACTION PARAMETERS
+
+(backgro=    )apsum.background) Background to subtract (none|average|fit)
+(skybox =        )apsum.skybox) Box car smoothing length for sky
+(weights=       )apsum.weights) Extraction weights (none|variance)
+(clean  =         )apsum.clean) Detect and replace bad pixels?
+(niterat=                    2) Number of profile fitting iterations
+(saturat=    )apsum.saturation) Saturation level
+(readnoi=     )apsum.readnoise) Read out noise sigma (photons)
+(gain   =          )apsum.gain) Photon gain (photons/data number)
+(lsigma =        )apsum.lsigma) Lower rejection threshold
+(usigma =        )apsum.usigma) Upper rejection threshold
+(maxtilt=                    3) Maximum excursion for line/column fitting
+(polysep=                 0.95) Marsh algorithm polynomial spacing
+(polyord=                   10) Marsh algorithm polynomial order
+(nsubaps=       )apsum.nsubaps) Number of subapertures per aperture
+                                
+                                # ANSWER PARAMETERS
+
+(ansclob=                   no)  
+(ansclob=                   no)  
+(ansdbwr=                  yes)  
+(ansdbwr=                  yes)  
+(ansedit=                  yes)  
+(ansextr=                  yes)
+(ansfind=                  yes)  
+(ansfit =                  yes)  
+(ansfits=                  yes)  
+(ansfits=                  yes)  
+(ansfits=                  yes)  
+(ansfits=                  yes)  
+(ansfitt=                  yes)  
+(ansfitt=                  yes)  
+(ansflat=                  yes)  
+(ansmask=                  yes)  
+(ansnorm=                  yes)  
+(ansrece=                  yes)  
+(ansresi=                  yes)  
+(ansrevi=                  yes)  
+(ansrevi=                  yes)  
+(ansscat=                  yes)  
+(anssmoo=                  yes)  
+(anstrac=                   no)  
+(mode   =                    q)
+.fi
+
+Note how the parameters are redirected to a variety of tasks.
+
+
+\fBInvisible Parameters\fR
+
+The following algorithm parameters are not visible to the normal user
+and are described only here.
+.ls dbwrite = yes
+Write to database?  Writing to the database is a function just like
+find, edit, extract, etc.  When the task is interactive a query is
+made whether to write to the database which may be answered with the
+usual four values.  When noninteractive the database writing is automatic.
+This parameter provides the possibility of turning off database writing.
+.le
+.ls initialize = yes
+Initialize default queries?  Normally each invocation of a task results
+in new queries independent of the last responses in a prior invocation
+and based only on the functions selected; NO for those not selected and
+yes for those selected.  By setting this to no either the prior values
+may be used or the response values may be set independently of the
+function flags.  This is used in scripts to tie together different
+invocations of the task and to finely control the queries.
+.le
+.ls e_output, e_profile
+These are query parameters used when extraction is invoked from the
+aperture editor.
+.le
+ 
+The following parameters are part of the variance weighted and cleaning
+extractions.  They are described further in \fBapprofiles\fR.
+.ls niterate = 2
+Number of rejection iterations in the profile determination when cleaning.
+Iteration of the profile is slow and the low order fitting function
+is not very sensitive to deviant points.
+.le
+.ls maxtilt = 3
+Maximum excursion separating the two profile fitting algorithms.
+.le
+.ls polysep = 0.95
+Marsh algorithm polynomial spacing.
+.le
+.ls polyorder = 10
+Marsh algorithm polynomial order.
+.le
+
+
+\fBQuery Mechanism and Invisible Query Parameters\fR
+
+The querying mechanism of the \fBapextract\fR package is a nice feature
+but has some complexities in implementation.  At the bottom of the
+mechanism are CL checks of the parameters described below.  The parameter
+is accessed first as a hidden parameter.  If the value is YES or NO
+then the appropriate function is performed or not.  If the value is
+lower case then the task supplies a prompt string, which varies by
+including the image and/or aperture involved, the mode of the
+parameter is changed to query, and the parameter is requested again
+leading to a CL query of the user with the current default value.
+Finally, the parameter is returned to hidden mode.
+
+If the \fIinitialize\fR parameter is no then the initial default
+query values are those set before the task is invoked.  This provides
+very fine control of the query mechanism and linking different
+invocations of the tasks to previous user responses.   It is intended
+only for complex scripts such as those in the spectroscopic \fBimred\fR
+packages.  Normally the initial values of the parameters are set
+during task startup  based on the function flags.  If a flag is no
+then the related query parameter is NO.  If the function flag is yes
+then when the task is interactive the initial value is yes otherwise
+it is YES.  The solely interactive functions, such as editing, are
+set to NO when the task is noninteractive regardless of the function
+selection.
+.ls ansclobber, ansclobber1
+Used to define the action to be taken if an output image would be clobbered.
+Normally the action is to query if interactive and not clobber if
+noninteractive.  The first parameter acts as the function switch and
+the second as the actual query.
+.le
+.ls ansdbwrite, ansdbwrite1
+The second parameter is used by the task to mark whether any changes have
+been made that might require a database update.  The first parameter is
+the actual query parameter for the \fIdbwrite\fR function flag.
+.le
+.ls ansedit
+Query parameter for the interactive editing function.
+.le
+.ls ansextract
+Query parameter for the extraction function.
+.le
+.ls ansfind
+Query parameter for the find function.
+.le
+.ls ansfit
+Query parameter for the fit function of \fBapfit\fR.
+.le
+.ls ansfitscatter
+Query parameter for the interactive fitscatter function of \fBapscatter\fR.
+.le
+.ls ansfitsmooth
+Query parameter for the interactive fitsmooth function of \fBapscatter\fR.
+.le
+.ls ansfitspec
+Query parameter for the interactive fitspec function of \fBapflatten\fR
+and \fBapnormalize\fR.  This applies to each image.
+.le
+.ls ansfitspec1
+Query parameter for the interactive fitspec function of \fBapflatten\fR
+and \fBapnormalize\fR.  This applies to each aperture in an image.
+.le
+.ls ansfittrace
+Query parameter for the interactive fittrace function.
+This applies to each image.
+.le
+.ls ansfittrace1
+Query parameter for the interactive fittrace function.
+This applies to each aperture in an image.
+.le
+.ls ansflat
+Query parameter for the flatten function of \fBapflatten\fR.
+.le
+.ls ansmask
+Query parameter for the mask function of \fBapmask\fR.
+.le
+.ls ansnorm
+Query parameter for the normalize function of \fBapnormalize\fR.
+.le
+.ls ansrecenter
+Query parameter for the recenter function.
+.le
+.ls ansresize
+Query parameter for the resize function.
+.le
+.ls ansreview
+Query parameter for the interactive extraction review function.
+This applies to each image.
+.le
+.ls ansreview1
+Query parameter for the interactive extraction review function.
+This applies to each aperture in an image.
+.le
+.ls ansscat
+Query parameter for the subtract function of \fBapscatter\fR.
+.le
+.ls anssmooth
+Query parameter for the smooth function of \fBapscatter\fR.
+.le
+.ls anstrace
+Query parameter for the trace function.
+.le
+
+
+\fBTask Entry Points\fR
+
+Logical tasks in IRAF are organized as multiple procedures in one physical
+task selected by the IRAF main.  The \fBapextract\fR package extends
+this concept to a lower level.  All of the package tasks go through
+one procedure, \fBapall\fR.  This procedure handles all of the
+startup details and breaks the logical task down into selected
+functions which are implemented as other procedures.  There are
+a couple of interesting and unusual features of this organization.
+
+IRAF physical tasks may map multiple logical task names to the same
+procedure.  However, the procedure will not know under what name it
+was called.  In this package we want to know the logical task name
+in order to select the appropriate hidden parameter set and to
+make minor adjustments in what the tasks do while maintaining the
+same basic logical flow and source code.  To do this dummy entry
+points are used whose only function is to call \fBapall\fR and
+pass an indication of the task name.
+
+Based on the task name a named parameter set is opened with \fBclopset\fR
+and then all CLIO calls use the returned pointer and can be blind to the
+actual parameter set used.
+
+In addition to the tasks defined in the package and their associated
+parameter sets there is one more task entry point called \fBapscript\fR
+with parameter set \fBapscript\fR.  It is intended for use in scripts
+as it's name implies.  For this reason it does not need an intermediate
+hidden parameter set.  For examples of it's use see the \fBimred\fR
+packages such as \fBnessie\fR.
+.endhelp

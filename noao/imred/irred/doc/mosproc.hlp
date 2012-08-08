@@ -1,0 +1,170 @@
+.help mosproc May89 irred
+.ih
+NAME
+mosproc -- Prepare images for quick look mosaicing
+.ih
+USAGE
+mosproc input output nxsub nysub
+.ih
+PARAMETERS
+.ls input
+The list of input images to be mosaiced. The images are assumed
+to be ordered either by row, column, or in a raster pattern. If
+the image list is not in order then the iraf \fBfiles\fR task plus
+the \fBeditor\fR must be used to construct an image list. The images
+in the input list are assumed to all be the same size.
+.le
+.ls output
+The name of the output mosaiced image.
+.le
+.ls nxsub
+The number of subrasters along a row of the output image.
+.le
+.ls nysub
+The number of subrasters along a column of the output image.
+.le
+.ls skysubtract = yes
+Subtract a sky image from all the input images. The sky image
+to be subtracted is either \fIsky\fR or a sky image computed
+by median filtering selected input images after weighting the images
+by the exposure time..
+.le
+.ls sky = ""
+The name of the sky image.
+.le
+.ls exclude = ""
+The input images to be excluded from the computation of the sky image.
+For example if \fIexclude\fR="1,3-5" then input images 1, 3, 4, 5 are
+not used for computing the sky frame.
+.le
+.ls expname = "exptime"
+The image header exposure time keyword. If the sky frame is computed
+internally by median filtering the input images, the individual images
+are weighted by the exposure time defined by the exposure time
+keyword \fIexpname\fR. Weights of 1 are assigned when no exposure time
+is given.
+.le
+.ls flatten = yes
+Divide all the images by a flat field image. Flat fielding is done
+after sky subtraction. If the name of a flat field image \fIflat\fR
+is supplied that image is divided directly into all the input images.
+Otherwise the skyframe computed above is normalized by the mode of the
+pixels and divided into all the input images.
+.le
+.ls flat = ""
+The name of the flat field image.
+.le
+.ls transpose = no
+Transpose the input images before inserting them into the mosaic.
+.le
+.ls trim_section = "[*,*]"
+The section of the input images to be mosaiced into the output
+image. Section can be used to flip and/or trim the individual
+subrasters before adding them to the mosaic. For example if we
+want to flip each subraster around the y axis before adding it
+to the mosaic, then \fItrim_section\fR = "[*,-*]".
+.le
+.ls corner = "lr"
+The starting position in the output image. The four options are "ll" for
+lower left corner, "lr" for lower right corner, "ul" for upper left
+corner and "ur" for upper right corner.
+.le
+.ls direction = "row"
+Add input images to the output image in row or column order. The options
+are "row" for row order and "column" for column order. The direction
+specified must agree with the order of the input list.
+.le
+.ls raster = no
+Add the columns or rows to the output image in a raster pattern or return
+to the start of a column or a row.
+.le
+.ls median_section = ""
+Compute the median of each input image inserted into the mosaic using the
+specified section.
+.le
+.ls subtract = no
+Subtract the computed median from each input image before inserting it
+into the mosaic.
+.le
+.ls oval = -1.0
+The value of border pixels.
+.le
+.ls delete = yes
+Delete sky subtracted, flat fielded and transposed images upon exit from
+the script.
+.le
+.ls logfile = STDOUT
+The name of the log file.
+.le
+
+.ih
+DESCRIPTION
+
+MOSPROC takes the list of input images \fIinput\fR of identical dimensions and
+inserts them into a single output image \fIoutput\fR. Before mosaicing the user
+can optionally sky subtract, flat field or transpose the input images.
+If \fIskysubtract\fR = yes, a single sky
+image is subtracted from all the input images. The sky image
+may be the externally derived image \fIsky\fR or calculated internally 
+by computing the exposure time weighted median of the input images, minus
+those input images specifically excluded by the \fIexclude\fR parameter.
+If \fIflatten\fR = yes, the input images are flat fielded using either
+the externally defined flat field image \fIflat\fR or the internally
+derived sky image normalized by its mode.
+If \fItranspose\fR is enabled all the input images are optionally transposed
+before mosaicing.
+
+MOSPROC takes the list of processed images and inserts them into the 
+output image in positions determined by their order in the input list,
+\fInxsub\fR, \fInysub\fR and the parameters  \fIcorner\fR, \fIdirection\fR
+and \fIraster\fR. 
+The orientation and size of each individual subraster in the output image
+may be altered by setting the parameter \fItrim_section\fR. The size
+of the output image is determined by nxsub and nysub and the size of
+the individual input images. A one column wide border is drawn between
+each of the output image subrasters with a pixel value of \fIoval\fR.
+The user may optionally  compute and subtract the median from each input
+image before inserting it into the mosaic.
+
+MOSPROC produces an output mosaiced image \fIoutput\fR and an accompanying
+database file \fIdboutput\fR. These two files plus an interactively
+generated coordinate list comprise the necessary input for the IRALIGN,
+IRMATCH1D and IRMATCH2D tasks.
+The temporary images generated (sky substracted, flat fielded, and
+transposed)
+can be deleted automatically if \fBdelete=yes\fR, before the task completes.
+Otherwise they will be left in the same directory of the input images.
+The temporary sky and flat field images if created are not deleted.
+
+The computation of the sky frame is done with IMAGES.IMCOMBINE and the
+subsequent sky subraction with IMAGES.IMARITH. The computation of
+the flat field is done with PROTO.BSCALE and the flat field division
+with FLATTEN. The task IMAGES.TRANSPOSE transpose the input.
+The mosaicing itself is done with PROTO.IRMOSAIC.
+
+.ih
+EXAMPLES
+
+1. Mosaic a list of 64 infrared images onto an 8 by 8 grid after sky 
+   subtraction and flat fielding. Use an externally derived sky and
+   flat field image
+ 
+    ir> mosproc @imlist mosaic 8 8 skysub+ sky=skyimage flatten+ \
+    >>>  flat=flatfield
+
+2. Mosaic a list of 64 infrared images onto an 8 by 8 grid after sky 
+   subtraction and flat fielding. Derive the sky and flat field frames
+   from the data excluding image number 5
+ 
+    ir> mosproc @imlist mosaic 8 8 skysub+ exclude="5" flatten+ 
+
+.ih
+TIME REQUIREMENTS
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+images.imcombine, images.imarith, proto.bscale, images.imtrans, proto.irmosaic
+.endhelp

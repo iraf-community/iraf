@@ -1,0 +1,26 @@
+.help cvzero Aug84 "Curfit Package"
+.ih
+NAME
+cvzero -- set up for a new curve fit
+.ih
+SYNOPSIS
+cvzero (cv)
+
+.nf
+pointer	cv	# curve descriptor
+.fi
+.ih
+ARGUMENTS
+.ls cv     
+Pointer to the curve descriptor structure.
+.le
+.ih
+DESCRIPTION
+CVZERO zeros the matrix and right side of the matrix equation.
+.ih
+NOTES
+CVZERO can be used to reinitialize the matrix and right side of the matrix
+equation to begin a new fit in accumulate mode.
+.ih
+SEE ALSO
+cvfit, cvinit

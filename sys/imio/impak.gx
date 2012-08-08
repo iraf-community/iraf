@@ -1,0 +1,46 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# IMPAK? -- Convert an array of pixels of a specific datatype to the 
+# datatype given as the final argument.
+
+procedure impak$t (a, b, npix, dtype)
+
+PIXEL	a[npix]
+int	b[npix], npix, dtype
+
+pointer	bp
+
+begin
+	switch (dtype) {
+	case TY_USHORT:
+	    call acht$tu (a, b, npix)
+	case TY_SHORT:
+	    call acht$ts (a, b, npix)
+	case TY_INT:
+	    if (SZ_INT == SZ_INT32)
+	        call acht$ti (a, b, npix)
+	    else {
+		call malloc (bp, npix, TY_INT)
+	        call acht$ti (a, Memi[bp], npix)
+		call ipak32 (Memi[bp], b, npix)
+		call mfree (bp, TY_INT)
+	    }
+	case TY_LONG:
+	    if (SZ_INT == SZ_INT32)
+	        call acht$tl (a, b, npix)
+	    else {
+		call malloc (bp, npix, TY_LONG)
+	        call acht$tl (a, Meml[bp], npix)
+		call ipak32 (Meml[bp], b, npix)
+		call mfree (bp, TY_LONG)
+	    }
+	case TY_REAL:
+	    call acht$tr (a, b, npix)
+	case TY_DOUBLE:
+	    call acht$td (a, b, npix)
+	case TY_COMPLEX:
+	    call acht$tx (a, b, npix)
+	default:
+	    call error (1, "Unknown datatype in imagefile")
+	}
+end

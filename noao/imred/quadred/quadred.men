@@ -1,0 +1,61 @@
+     SPECIAL VERSION OF CCDRED PACKAGE FOR MULTI-AMPLIFIER CCD IMAGES
+
+The package has a special quad version of CCDPROC that processes
+multi-amplifier CCD images in a particular format.  See help topic
+"quadformat" for a description of the format.  The task QUADPROC is
+largely obsoleted by the quad version of CCDPROC but may be used by
+those familiar with the ARED.QUAD package or to use features in the
+standard CCDPROC that are not in the quad version.  Those features
+include line-by-line overscan functions.
+
+
+	     		STANDARD CCDRED TASKS
+
+    badpiximage - Create a bad pixel mask image from a bad pixel file
+      ccdgroups - Group CCD images into image lists
+       ccdhedit - CCD image header editor
+  ccdinstrument - Review and edit instrument translation files
+        ccdlist - List CCD processing information
+	ccdmask - Make a bad pixel mask from CCD data
+        ccdproc - Process CCD images (including quadformat data)
+        combine - Combine CCD images
+    darkcombine - Combine and process dark count images
+    flatcombine - Combine and process flat field images
+    mkfringecor - Make fringe correction images from sky images
+     mkillumcor - Make flat field illumination correction images
+    mkillumflat - Make illumination corrected flat fields
+       mkskycor - Make sky illumination correction images
+      mkskyflat - Make sky corrected flat field images
+  setinstrument - Set instrument parameters
+    zerocombine - Combine and process zero level images
+
+	     SPECIAL TASKS FOR MULTI-AMPLIFIER CCD IMAGES IN QUADFORMAT
+
+    gainmeasure - Measure gains in quadformat images
+      quadscale - Scale sections by gain factors
+    qstatistics - Calculate image statistics for multi-amplifier CCD images
+   quadsections - Produce image section list for sections of quadformat images
+     qhistogram - Make histogram of multi-amplifier CCD image
+      quadsplit - Split quadformat data into individual single amplifier images
+       quadjoin - Rejoin single amplifier images produced by quadsplit
+
+		ALTERNATIVE TASKS
+
+       quadproc - Process multi-amplifier CCD images (see also ccdproc)
+   qdarkcombine - Combine and process dark count images using quadproc
+   qflatcombine - Combine and process flat field images using quadproc
+   qzerocombine - Combine and process zero level images using quadproc
+
+   There is no separate help for the quadproc versions of the combining
+   tasks.  See the help for the standard versions.
+
+    	      ADDITIONAL HELP TOPICS
+
+        package - Package parameters and overview
+     quadformat - Format for multi-amplifier CCD images
+    ccdgeometry - Discussion of CCD coordinate/geometry keywords
+       ccdtypes - Description of the CCD image types
+     flatfields - Discussion of CCD flat field calibrations
+          guide - Introductory guide to using the CCDRED package
+    instruments - Instrument specific data files
+        subsets - Description of CCD subsets

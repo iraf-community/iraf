@@ -1,0 +1,31 @@
+.help bfread Sep86 imfort.bfio
+.ih
+NAME
+bfread -- read from a binary file at the specified offset
+.ih
+SYNOPSIS
+.nf
+integer function bfread (fd, buf, nchars, offset)
+
+integer		fd		#I BFIO file descriptor of open file
+typeless	buf(*)		#O buffer to receive file data
+integer		nchars		#I number of SPP chars to read
+integer		offset		#I 1-indexed char offset into file
+.fi
+.ih
+DESCRIPTION
+The \fIbfread\fR procedure reads \fInchars\fR char units of storage from
+the file opened on file descriptor \fIfd\fR starting at the one-indexed
+char file offset \fIoffset\fR.  Any number of chars may be read starting
+at any char file offset.
+.ih
+RETURN VALUE
+The actual number of char units of storage read is returned as the function
+value; a read at end of file results in zero chars being read.  A negative
+function value indicates that the read failed for some reason, e.g., the
+file descriptor was invalid, the file offset was out of range, or an actual
+physical read error occurred.
+.ih
+SEE ALSO
+bfwrit
+.endhelp

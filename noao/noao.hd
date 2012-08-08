@@ -1,0 +1,91 @@
+# Help directory for the NOAO packages.
+
+$artdata	= "./artdata/"
+$astrometry	= "./astrometry/"
+$astcat		= "./astcat/"
+$astutil	= "./astutil/"
+$digiphot	= "./digiphot/"
+$focas		= "./focas/"
+$imred		= "./imred/"
+$mtlocal	= "./mtlocal/"
+$nobsolete	= "./nobsolete/"
+$nproto		= "./nproto/"
+$obsutil	= "./obsutil/"
+$onedspec	= "./onedspec/"
+$rv		= "./rv/"
+$surfphot	= "./surfphot/"
+$twodspec	= "./twodspec/"
+
+# Define help files for the packages.
+
+artdata		men = artdata$artdata.men,
+		hlp = ..,
+		sys = artdata$artdata.hlp,
+		pkg = artdata$artdata.hd,
+		src = artdata$artdata.cl
+
+astcat		men = astcat$astcat.men,
+		hlp = ..,
+		sys = astcat$astcat.hlp,
+		pkg = astcat$astcat.hd,
+		src = astcat$astcat.cl
+
+astutil		men = astutil$astutil.men,
+		hlp = ..,
+		sys = astutil$astutil.hlp,
+		pkg = astutil$astutil.hd,
+		src = astutil$astutil.cl
+
+digiphot	men = digiphot$digiphot.men,
+		hlp = ..,
+		sys = digiphot$digiphot.hlp,
+		pkg = digiphot$digiphot.hd,
+		src = digiphot$digiphot.cl
+
+imred		men = imred$imred.men,
+		hlp = ..,
+		sys = imred$imred.hlp,
+		pkg = imred$imred.hd,
+		src = imred$imred.cl
+
+mtlocal		men = mtlocal$mtlocal.men,
+		hlp = ..,
+		sys = mtlocal$mtlocal.hlp,
+		pkg = mtlocal$mtlocal.hd,
+		src = mtlocal$mtlocal.cl
+
+nobsolete	men = nobsolete$nobsolete.men,
+		hlp = ..,
+		sys = nobsolete$nobsolete.hlp,
+		pkg = nobsolete$nobsolete.hd,
+		src = nobsolete$nobsolete.cl
+
+nproto		men = nproto$nproto.men,
+		hlp = ..,
+		sys = nproto$nproto.hlp,
+		pkg = nproto$nproto.hd,
+		src = nproto$nproto.cl
+
+obsutil		men = obsutil$obsutil.men,
+		hlp = ..,
+		sys = obsutil$obsutil.hlp,
+		pkg = obsutil$obsutil.hd,
+		src = obsutil$obsutil.cl
+
+onedspec	men = onedspec$onedspec.men,
+		hlp = ..,
+		sys = onedspec$onedspec.hlp,
+		pkg = onedspec$onedspec.hd,
+		src = onedspec$onedspec.cl
+
+twodspec	men = twodspec$twodspec.men,
+		hlp = ..,
+		sys = twodspec$twodspec.hlp,
+		pkg = twodspec$twodspec.hd,
+		src = twodspec$twodspec.cl
+
+rv		men = rv$rv.men,
+		hlp = ..,
+		sys = rv$rv.hlp,
+		pkg = rv$rv.hd,
+		src = rv$rv.cl

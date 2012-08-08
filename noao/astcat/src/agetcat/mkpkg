@@ -1,0 +1,31 @@
+# AGETCAT task subdirectory
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	t_aclist.x
+	t_aslist.x
+	t_agetcat.x	"../../lib/astrom.h"
+	t_afiltcat.x	"../../lib/astrom.h"
+	t_agetim.x	"../../lib/astrom.h" <pkg/cq.h>
+	t_ahedit.x	"../../lib/astrom.h" <pkg/cq.h>
+	t_aimfind.x	"../../lib/astrom.h" <pkg/cq.h>
+	atrcquery.x	<math.h> <pkg/cq.h> <pkg/skywcs.h>                   \
+	                "../../lib/astrom.h" "../../lib/acatalog.h"
+	atrcrd.x	<fset.h> <imhdr.h> <mwset.h> <pkg/skywcs.h>          \
+	                "../../lib/astrom.h" "../../lib/acatalog.h"
+	attquery.x	<math.h> <pkg/cq.h> <pkg/skywcs.h> "../../lib/astrom.h"
+	atwcat.x	<pkg/cq.h>
+	atfcat.x	<imhdr.h> <ctotok.h> <evvexpr.h> "../../lib/astrom.h" \
+	                <ctype.h> "../../lib/acatalog.h" <pkg/cq.h>           \
+			<pkg/skywcs.h>
+	athedit.x	"../../lib/astrom.h" "../../lib/aimpars.h" <pkg/cq.h>
+	atwedit.x	<imhdr.h> <pkg/cq.h>
+	atcatinit.x
+	atincat.x
+	atoutcat.x
+	atrcsym.x	"../../lib/astrom.h"
+	;

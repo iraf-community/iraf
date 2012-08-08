@@ -1,0 +1,29 @@
+# Update the GTY portion of libsys.a.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+zzdebug:
+	$checkout libsys.a lib$
+	$update   libsys.a
+	$checkin  libsys.a lib$
+
+	#$set	XFLAGS = "$(XFLAGS) -qx"
+	$omake	zzdebug.x
+	$link	-z zzdebug.o
+	;
+
+libsys.a:
+	#$set	XFLAGS = "$(XFLAGS) -qx"
+
+	gtycaps.x	gty.h
+	gtyclose.x	
+	gtygetb.x	
+	gtygeti.x	
+	gtygetr.x	<mach.h>
+	gtygets.x	<chars.h>
+	gtyindex.x	gty.h <chars.h>
+	gtyopen.x	gty.h <chars.h> <ctype.h> <error.h>
+	;

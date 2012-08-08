@@ -1,0 +1,516 @@
+.help mknobsfile Apr94 noao.digiphot.photcal
+.ih
+NAME
+mknobsfile -- prepare an observations file from a list of APPHOT/DAOPHOT
+files containing observations of objects in one or more fields
+.ih
+USAGE
+mknobsfile photfiles idfilters imsets observations
+.ih
+PARAMETERS
+.ls photfiles
+The APPHOT or DAOPHOT output database(s) containing the  standard 
+and/or program object instrumental magnitudes. These databases
+are normally created by the
+APPHOT QPHOT and PHOT tasks or the DAOPHOT PHOT task, but may also
+have been written by the DAOPHOT PEAK, NSTAR or ALLSTAR tasks.
+.le
+.ls idfilters
+The list of filter ids separated by whitespace or
+commas which define a complete observation.
+.le
+.ls imsets
+The input image set file which lists the observations of
+each field, assigns a name to each
+field, and tells MKNOBSFILE which images belong to the same
+observation of that field.
+Only observations corresponding to the images specified in \fIimsets\fR
+will be extracted from \fIphotfiles\fR.
+Observations are listed in \fIimsets\fR, 1 observation
+per line with the field name in column 1, a colon in column 2,
+followed by the names of the
+images of that field which belong to that observation.
+The format of \fIimsets\fR is described in detail below.
+.le
+.ls observations
+The output observation file suitable for input to FITPARAMS or
+EVALFIT/INVERTFIT.
+.le
+.ls wrap = yes
+Format the output observations file for easy reading ? If wrap = yes then
+the observations for each filter are written to a separate line and the
+* character in column 1 is interpreted as a continuation character. Otherwise
+all the observations for a single object are written to a single line
+where the maximum size of a line is SZ_LINE characters.
+.le
+.ls obsparams = ""
+The name of an optional text file containing the correct filter ids,
+exposure times, airmasses, and times of observation for each image whose values are either
+not stored or incorrectly stored in \fIphotfiles\fR.
+The observing parameters for each image are listed in the file
+\fIobsparams\fR, 1 image per line with the image
+name in column 1 and the filter ids, exposure times, airmasses, and times of observation,
+in columns \fIobscolumns\fR.
+The image names must match those in
+\fIimsets\fR. Images which have no
+entries in \fIobsparams\fR are assigned the values stored in \fIphotfiles\fR.
+.le
+.ls obscolumns = "2 3 4 5"
+The list of numbers separated by commas or whitespace specifying which columns
+in the text file \fIobsparams\fR contain the correct filter ids, 
+exposure times, airmasses, and times ob observation respectively.
+The number 0 can be used as a place holder in the \fIobscolumns\fR string.
+For example, to correct only  the \fIphotfiles\fR airmass
+values, \fIobscolumns\fR should be set to "0 0 column 0", where column is
+the airmass column number.
+The default value of \fIobscolumns\fR corresponds to
+the format of the default \fIobsparams\fR file produced by MKIMSETS.
+.le
+.ls minmagerr = 0.001
+The error that will be assigned to a non-INDEF valued magnitude measurement
+if its recorded magnitude error is less than \fIminmagerr\fR.
+.le
+.ls shifts = ""
+The name of the text file specifying the x and y shifts to be ADDED
+to the x-y positions of all objects in an image before position matching (the
+original x's and y's are retained in the output). 
+Shifts are listed for each image, 1 image per line with
+the name of the image in column 1, followed by the x and y shifts
+in columns 2 and 3 respectively. Image names must match those in 
+\fIimsets\fR. Images for which
+no shift is supplied are assigned x and y shifts of zero.
+.le
+.ls apercors = ""
+The name of the text file specifying the aperture corrections 
+to be ADDED to the extracted magnitudes.
+Aperture corrections are listed for each image, 1 image per line with
+the name of the image in column 1, followed by the aperture correction in
+magnitudes in column 2.
+The image names must match those in
+\fIimsets\fR. Images for which
+no aperture correction is supplied are assigned a default value of 0.0.
+.le
+.ls aperture = 1
+The aperture number
+in \fIphotfiles\fR for which the magnitude is extracted, if the magnitudes
+were measured through more than one aperture.
+By default the magnitude through the first aperture is extracted.
+.le
+.ls tolerance = 5.0
+The tolerance in pixels for matching objects in the same observation,
+but different images.  MKNOBSFILE extracts
+the x and y coordinates of each object in each image of a given observation
+from \fIphotfiles\fR, adds the shift for that image in
+\fIshifts\fR to the extracted x-y coordinates,
+and matches the objects to within \fItolerance\fR pixels.
+Missing objects are assigned INDEF entries in \fIobservations\fR.
+If \fItolerance\fR is less
+than or equal to 0 no coordinate matching is done, and objects are
+matched in order of occurrence with missing objects being assigned
+INDEF values.
+.le
+.ls allfilters = no
+Output only objects which are successfully matched in all the filters
+specified by \fIidfilters\fR.
+.le
+.ls verify = no
+Verify any data entered interactively by the user ?
+.le
+.ls verbose = yes
+Print status, warning, and error messages ?
+.le
+
+.ih
+DESCRIPTION
+
+MKNOBSFILE takes a list of APPHOT or DAOPHOT database files \fIphotfiles\fR,
+where each file contains  observations of 1 or more objects taken through 1 or
+more filters, and the image set file \fIimsets\fR and prepares an observations
+file \fIobservations\fR.
+MKNOBSFILE is optimized for creating a single observations file from a large
+number of observations of fields containing only a single star, or observations
+of a large number of
+fields containing only a few stars per field.  MKNOBSFILE IS NORMALLY THE
+PREPROCESSOR OF CHOICE FOR PREPARING STANDARD STAR OBSERVATIONS FILES.
+
+MKNOBSFILE performs the following functions: 1) extracts the quantities
+image name, x and y position, exposure time, filter id,
+airmass, time of observation, magnitude and error from
+\fIphotfiles\fR, 2) corrects any erroneous or missing values of filter id,
+exposure time, and airmass in \fIphotfiles\fR,  3) associates each 
+field with 1 or more sets of images of that
+field taken through different filters 4) matches individual objects within
+a given observation by order of occurrence or x-y position,
+5) assigns a unique name to each object in each field.
+
+The image set file \fIimsets\fR assigns a name to each star field.
+For fields containing only a single standard star this name should match the
+name of the standard star in the standard star catalog. For fields 
+containing more than one star, MKNOBSFILE constructs a unique name for
+each object in the field by adding
+a sequence number to the field name in \fIimsets\fR, which if the star
+is a standard star, the user must
+later edit. For example the fourth star in the field "M92" will be assigned
+the name "M92-4" in \fIobservations\fR. If this star is a standard star and
+its true name is "IX-10" in the standard star catalog, then the user
+must change "M92-4" to "IX-10" in \fIobservations\fR. \fIImsets\fR also
+tells MKNOBSFILE which images
+in \fIphotfiles\fR are images of the same region of the sky belonging
+to the same observation.
+The format of \fIimsets\fR is described in detail below.
+If the number of observations is small the user may wish to simply type in
+\fIimsets\fR by hand. If the number of observations is large,
+a separate task MKIMSETS is available to assist users in preparing
+\fIimsets\fR.
+
+Values of the filter ids, exposure times, airmasses, and exposure times
+which are missing or incorrect in \fIphotfiles\fR,
+can be corrected by reading values listed in the columns \fIobscolumns\fR
+in the file \fIobsparams\fR. The format of \fIobsparams\fR is described
+in detail below.
+
+MKNOBSFILE matches the objects in different images within the same observation
+either
+by order of occurrence if \fItolerance\fR is less than or equal to 0.0,
+or by x-y position. Matching by position is done by identifying which objects
+in each of the
+images of a given field and observation set are within \fItolerance\fR
+pixels of each other.  The user may supply an optional file of x and y
+shifts \fIshifts\fR to be added to the object positions prior to
+matching. The format of \fIshifts\fR is described in detail below.
+If the parameter \fIallfilters\fR is "yes", only objects which are matched
+in all the filters \fIidfilters\fR are output to \fIobservations\fR.
+
+MNOBSFILE permits the user to supply 
+an optional file of aperture corrections \fIapercors\fR containing
+magnitude corrections which are added to the instrumental
+magnitudes in \fIphotfiles\fR.
+The format of \fIapercors\fR is described in detail below.
+
+Each new observations file created by MKNOBSFILE has an associated format
+description file listing the column names and numbers in
+\fIobservations\fR, of the fields extracted
+from \fIphotfiles\fR.
+This file, referenced by its parent observations file name, can be
+used as input to the MKCONFIG task.
+The actual name of the format description file on disk is constructed by
+prepending the observations file name \fIobservations\fR with the
+string "f" and
+appending the string ".dat". For example if a new observations file
+called "nite1stds" is created by MKNOBSFILE, a format description
+file called "fnite1stds.dat" will also be created. Any pre-existing format
+description file of that name, which does not have an associated observations 
+file, will be deleted.
+
+THE IMSETS FILE
+
+The \fIimsets\fR file lists the 
+observations of each field which are to be extracted from \fIphotfiles\fR,
+assigns a name to each
+field, and informs MKNOBSFILE which images belong to the same
+observation of that field.
+Observations are listed in \fIimsets\fR, 1 observation
+per line with the field name in column 1, a colon in column 2,
+followed by the names of the
+images of that field, for that observation, separated by whitespace.
+Only data for images in \fIimsets\fR which match those in
+\fIphotfiles\fR will be extracted. USERS SHOULD REALIZE THAT IF THE IMAGE
+NAMES IN THE PHOTOMETRY FILES INCLUDE THE EXTENSIONS ".imh" OR ".hhh",
+THEN THE IMAGE NAMES IN IMSETS MUST AS WELL.
+
+The field name is used to generate the object names in \fIobservations\fR.
+If there is only a single measured object in a field, then the
+name of that object in \fIobservations\fR will be the name of the field.
+If the single object is a standard star, the user should edit
+\fIimsets\fR so that the field name is the same as the name of the
+standard star in the standard star catalog.
+If a stellar field contains more than 
+one measured object, MKNOBSFILE generates names of the form "field-#"
+where "field" is the field name and "#" is a sequence number.
+For example the fourth star in the field "M92" will be assigned the
+name "M92-4" in \fIobservations\fR. If the star is a standard star,
+the user must edit the object names in \fIobservations\fR
+to match those in the standard star catalog.
+
+Any number of observations may have the same field name. This normally
+occurs, for example,  when multiple observations of a single standard
+star or standard star field are made at several airmasses.
+
+If there
+are no filter ids in \fIphotfiles\fR or \fIobsparams\fR then the images in
+each image set are assigned the filter ids in \fIidfilters\fR in order
+of occurrence.
+
+The \fIimsets\fR file for a  set of 50 UBV frames of fifteen standard star
+fields, some containing a single star and some containing several stars,
+is listed below. Column 1 contains the name of the standard field.
+Column 2 contains a ':'. The U, B and V
+images for each field are listed in columns 3, 4 and 5 respectively.
+The missing U image for field "STDFIELD7" is represented by the name "INDEF".
+The standard stars in "STDFIELD1" and "STDFIELD2" were observed twice in
+the same night at different airmasses.
+
+.nf
+	STDFIELD1 :	nite001   nite002  nite003
+	STDFIELD1 :	nite045   nite046  nite047
+	STDFIELD2 :	nite004   nite005  nite006
+	STDFIELD2 :	nite048   nite049  nite050
+	...
+	STDFIELD7 :	INDEF     nite019  nite020
+	...
+	STDFIELD14 :	nite039   nite040  nite041
+	STDFIELD15 :	nite042   nite043  nite044
+.fi
+
+THE OBSPARAMS FILE
+
+A sample corrections file \fIobsparams\fR for the previous set of
+UBV standards observations is shown below.
+The filter ids, exposure times, airmasses, and times of observation for all the images were
+correctly read
+from the image headers with the exception of the filter id, exposure time,
+airmass, and time of observation for the first "STDFIELD2" V frame.
+The correct filter id, exposure time, and airmass is supplied
+in \fIobsparams\fR  and \fIobscolumns\fR is set to "2 3 4 5"
+
+.nf
+	nite006    3 8 1.256 05:34:03.2
+.fi
+
+Zero can be used as a place holder in \fIobscolumns\fR,
+as in the following example where
+the user only wants to correct the exposure time and the airmass and
+leave the filter id alone. In this case \fIobscolumns\fR is "0 2 3 0"
+and \fIobsparams\fR looks as follows.
+
+.nf
+	nite006    8 1.256
+.fi
+
+Only images listed in \fIimsets\fR can have their observing parameters
+modified by \fIobsparams\fR.
+
+THE SHIFTS FILE
+
+The file \fIshifts\fR lists the shifts for each image, 1 shift per line,
+with the image name in column 1 and the x and y shifts in columns 2 and
+3 respectively.
+The image names in \fIshifts\fR must match those in \fIimsets\fR.
+
+A sample shifts file for the previous set of UBV standards
+observations is shown below. All the standards except for "STD14" are assumed
+to have no significant shifts from filter to filter. The B and V frames
+for "STDFIELD14" are shifted -10 pixels in x and -5 pixels
+in y with respect to the U frame. Therefore +10 and +5 pixels should be
+added to the "STDFIELD14" B and V frame positions respectively before
+position matching.
+
+.nf
+	nite040   10.0   5.0
+	nite041   10.0   5.0
+.fi
+
+An alternate way of listing the same observations would be the following.
+
+.nf
+	nite039   -10.0 -5.0
+.fi
+
+THE APERCORS FILE
+
+The file \fIapercors\fR lists the aperture corrections for each image,
+1 aperture correction per line,
+with the image name in column 1 and the aperture correction in magnitudes
+in column 2 respectively.
+The image names in \fIapercors\fR must match those in \fIimsets\fR.
+
+The \fIapercors\fR file for the previous set of UBV observations is shown
+below.
+The aperture corrections for all the standard stars are assumed to be
+zero except for "STDFIELD14".
+
+.nf
+	nite039    -0.150
+	nite040    -0.100
+	nite041    -0.090
+.fi
+
+.ih
+OUTPUT
+For the previous set of UBV observations the output file
+\fIobservations\fR produced by MKNOBSFILE will look like the following.
+The filter ids for the U,B,V filters are assumed to be 1,2,3.
+Note that the exposure times are assumed to have been normalized either prior
+to executing MKNOBSFILE or by using the contents of the \fIobsparams\fR
+file, and so are not included in \fIobservations\fR.
+
+.nf
+	# FIELD        FILTER  OTIME   AIRMASS  X     Y     MAG   MERR
+
+	  STDFIELD1-1  1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD1-2  1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD1-3  1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD1-1  1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD1-2  1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD1-3  1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD2-1  1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD2-2  1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD2-1  1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD2-2  1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  .............................................................
+	  STDFIELD7    INDEF   INDEF   INDEF    INDEF INDEF INDEF INDEF
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  .............................................................
+	  STDFIELD14   1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD15-1 1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+	  STDFIELD15-2 1       .       .        .     .     .     .
+	  *            2       .       .        .     .     .     .
+	  *            3       .       .        .     .     .     .
+.fi
+
+The accompanying format description file  has the following form.
+
+.nf
+# Declare the observations file variables
+
+observations
+
+T1            3              # time of observation in filter 1
+X1            4              # airmass in filter 1
+x1            5              # x coordinate in filter 1
+y1            6              # y coordinate in filter 1
+m1            7              # instrumental magnitude in filter 1
+error(m1)     8              # magnitude error in filter 1
+
+T2            10             # time of observation in filter 2
+X2            11             # airmass in filter 2
+x2            12             # x coordinate in filter 2
+y2            13             # y coordinate in filter 2
+m2            14             # instrumental magnitude in filter 2
+error(m2)     15             # magnitude error in filter 2
+
+T3            17             # time of observation in filter 3
+X3            15             # airmass in filter 3
+x3            16             # x coordinate in filter 3
+y3            17             # y coordinate in filter 3
+m3            18             # instrumental magnitude in filter 3
+error(m3)     19             # magnitude error in filter 3
+.fi
+
+.ih
+EXAMPLES
+
+1. Prepare an observations file, from a set of standard star observations
+computed by the APPHOT PHOT
+task, for input to FITPARAMS. There is one PHOT output file per standard star
+per filter and each file contains only a single measurement.
+Therefore position matching is not necessary. The magnitudes have been
+been normalized to unit exposure time by PHOT, and the filter ids
+and airmasses read from the image headers, and written to the PHOT database,
+files are correct.
+
+.nf
+	ph> mkimsets *.mag.* "1,2,3" jun11.stdim
+
+	    ... interactively create the image set file
+
+	ph> mknobsfile *.mag.* "1,2,3" jun11.stdim jun11.stobs tol=0.0
+
+	    ... create the observations file
+
+.fi
+
+2. Prepare an observations file from a set of standard star observations
+computed by the APPHOT PHOT
+task, for input to FITPARAMS.  The three PHOT files contain UBV measurements
+respectively of several bright stars in one of the selected areas.
+The stars in each image
+were detected automatically with the APPHOT DAOFIND task so some measurements
+of bright non-standard stars as well as standard stars are contained in the
+PHOT output files.  Position matching is therefore necessary but the x and
+y shifts between frames are less than 5 pixels. 
+
+.nf
+	ph> edit sa15.stdim
+
+	    ... since the imsets file will only have a single entry type
+		it in by hand, it will contain a single line and look
+		something like the following
+
+	        SA15 : obj215  obj216  obj217
+
+	ph> mknobsfile obj*.mag.* "1,2,3" sa15.stdim sa15.stdobs \
+	    tolerance=5.0
+
+	    ... make the observations file
+
+	ph> edit sa15.stdobs
+
+	    ... edit the observations file if necessary so that the names of
+	        the standard stars correspond to those in the standard
+		star catalog
+.fi
+
+3. Prepare an observations file from a set of standard star observations
+computed by the APPHOT PHOT task, for input to FITPARAMS.
+The single PHOT output file contains UBV
+measurements of 18 standard stars in the M92 field. No position matching is
+necessary, but the user forgot to define the exposure time keyword parameter
+in PHOT, so the PHOT magnitudes are not normalized for exposure time.
+The airmasses
+and filter ids are correct. Since the images are still on disk the user
+simply runs HSELECT in the images package to produce a list of the correct
+exposure times and then runs MKNOBSFILE.
+
+.nf
+	ph> mkimsets M92.imh.mag.1 "1,2,3" jun11.stdim
+
+	    ... interactively create the image set file
+
+	ph> hselect M92*.imh $I,exptime yes > exptimes
+
+	    ... create the obsparams file with the correct exposure times
+
+	ph> mknobsfile M92.mag.1 "1,2,3" jun11.stdim jun11.stdobs\
+	    obscolumns="0 2 0 0" obsparams="exptimes" tolerance=0.0
+
+	ph> edit jun11.stdobs
+
+	    ... edit the observations file if necessary so that the names of
+	        the standard stars correspond to those in the standard
+		star catalog
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+mkimsets,mkphotcors,mkobsfile
+.endhelp

@@ -1,0 +1,62 @@
+.help zzopmt May84 "System Interface"
+.ih
+NAME
+zzopmt -- open a magtape file
+.ih
+SYNOPSIS
+.nf
+zzopmt (drive, density, mode, oldrec, oldfile, newfile, chan)
+
+int	drive		# logical drive number (1, 2,...)
+int	density		# e.g. 0, 800, 1600, 6250
+int	mode		# access mode (RO or WO)
+int	oldrec		# current record number within file
+int	oldfile		# current file number on tape
+int	newfile		# requested/actual new file number
+int	chan		# OS channel assigned to file
+.fi
+.ih
+DESCRIPTION
+The magnetic tape on logical drive number \fIdrive\fR is opened positioned to
+record 1 (the first record) of file number \fInewfile\fR.  The logical drive
+numbers 1 through N, where N is the number of logical tape drives on the host
+system, are associated with the user interface logical drive names "mta",
+"mtb", etc.  by the high level code.
+The current position of the tape at open time is
+given by the arguments \fIoldrec\fR and \fIoldfile\fR.  When the tape is
+rewound it is positioned to record 1 of file 1.  The file number \fInewfile\fR
+is either the number of the desired file on the tape (newfile >= 1) or EOT
+(newfile <= 0).  There is no way to position beyond EOT.  The \fIdensity\fR
+is a magic number of significance only to the user and to the kernel.
+The tape is opened with a device dependent default density if \fIdensity\fR
+is zero.  The legal access modes for a magtape file are READ_ONLY and
+WRITE_ONLY.
+.ih
+RETURN VALUE
+ERR is returned in \fIchan\fR if there is no such drive, if the drive
+does not support the requested density, if the tape cannot be positioned,
+or if the drive cannot be physically opened.  It is not an error if the
+file number is out of range; the actual number of the file to which the tape
+was positioned is returned in \fInewfile\fR.  If the tape contains N files
+and \fBzzopmt\fR is called to open the tape positioned to EOT, \fInewfile\fR
+will have the value N+1 when the procedure exits.
+.ih
+NOTES
+The high level procedure \fBmtopen\fR verifies that the drive has been
+allocated and that the drive is not already open before calling \fBzzopmt\fR.  
+The \fIchan\fR argument should be set when the drive is physically opened,
+rather than upon exit from \fBzzopmt\fR, in case an exception occurs while
+the tape is being positioned (the high level error recovery code must have
+the channel number to close the device).  If the drive is to be opened
+WRITE_ONLY the kernel should open the drive READ_ONLY to position to the
+desired file, then close the drive and reopen for writing.  This prevents
+truncation of the tape from writing a tape mark if error recovery occurs while
+the tape is being positioned (error recovery will call \fBzzclmt\fR).
+.ih
+BUGS
+The tape may runaway if the density is incorrectly specified or if a blank
+tape is opened for reading or appending.
+.ih
+SEE ALSO
+zfiomt, mtopen, system.allocate, system.devstatus
+.endhelp

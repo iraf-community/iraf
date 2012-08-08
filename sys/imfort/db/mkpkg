@@ -1,0 +1,42 @@
+# Update the IMFORT image header database interface.
+
+$checkout libimfort.a lib$
+$update   libimfort.a
+$checkin  libimfort.a lib$
+$exit
+
+libimfort.a:
+	idbfind.x	../imfort.h idb.h <imhdr.h>
+	idbgstr.x	idb.h <ctype.h> <imhdr.h>
+	idbkwlu.x	idb.h <ctype.h> <imhdr.h>
+	idbnaxis.x	<ctype.h>
+	idbpstr.x	idb.h <ctype.h> <imhdr.h> <mach.h>
+	imaccf.x	
+	imaddb.x	
+	imaddd.x	
+	imaddf.x	../imfort.h idb.h <imhdr.h>
+	imaddi.x	
+	imaddl.x	
+	imaddr.x	
+	imadds.x	
+	imastr.x	
+	imdelf.x	idb.h <imhdr.h>
+	imgatr.x	idb.h <ctype.h>
+	imgetb.x	idb.h
+	imgetc.x	
+	imgetd.x	idb.h
+	imgeti.x	
+	imgetl.x	
+	imgetr.x	
+	imgets.x	
+	imgftype.x	idb.h <ctype.h>
+	imgnfn.x	../imfort.h idb.h <ctype.h> <imhdr.h>
+	imgstr.x	idb.h <ctype.h>
+	impstr.x	idb.h
+	imputb.x	
+	imputd.x	<mach.h>
+	imputi.x	
+	imputl.x	
+	imputr.x	
+	imputs.x	
+	;

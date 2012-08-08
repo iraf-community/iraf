@@ -1,0 +1,137 @@
+.help system May83 "General Aspects of the System Package"
+.sh
+Basic IRAF System Utilities
+
+    A number of standard utilities are available as part of the IRAF
+user interface.  These utilities, most of which operate on files, are
+summarized later in this document.  A general discussion of files in
+the IRAF system follows.  The reader is assumed to have some familiarity
+with the IRAF command language (CL).
+
+
+.sh
+Virtual File Names
+
+    File names may be specified in a machine independent fashion, or with
+OS dependent pathnames.  A Virtual File Name (VFN) has the following form:
+
+
+.nf
+	ldir$root.extn
+
+where
+
+	ldir		logical directory or device name
+	root		root or base file name
+	extn		extension denoting the type of file
+.fi
+
+
+The LDIR and EXTN fields are optional.  The ROOT and EXTN fields may contain
+up to 20 characters selected from the set [a-zA-Z0-9_.+-#].  The EXTN field
+may not exceed three characters.  The EXTN field is separated from the ROOT
+by the character "." (dot).  If the ROOT field contains one or more occurrences
+of the dot character, the final dot delimited field is understood to be
+the extension.
+
+Logical directories are defined in the CL, using the SET command to associate
+an OS dependent pathname with a keyword in the environment table.  Logical
+directory prefixes are recursively expanded.
+
+A number of standard logical directories and devices are defined by the CL
+at startup time.  Additional logical directories are defined by applications
+packages upon entry, and become undefined when dictionary space is reclaimed
+on exit from the package.  The user may override environment definitions at
+will, by issuing SET commands to redefine environment variables.
+
+
+.sh
+File List Templates
+
+    Whenever it makes sense, the IRAF utilities are set up to process a list
+of files, rather than a single file.  In the descriptions of the standard
+utilities in the next section, "files" is a template or pattern specifying
+a list of files to be processed in some way.  The template is a string type
+parameter to the CL, which is expanded by a procedure (CLGFIL) in the
+compiled systems or applications task into an EOF terminated list of files.
+
+A template may consist of one or more file names, directory names,
+list file names, or patterns.  List elements are delimited by commas.
+A list file is denoted by prepending the character "@" to the pathname
+of the list file.  A pattern may be applied to the contents of either
+a list file or a directory.  The pattern is separated from the list file
+or directory name by the character "$".  A pattern all by itself is
+applied to the current directory.  Either logical or OS dependent
+pathnames may be used.
+
+A list element may refer only to a single directory.  Thus, one cannot
+specify a pattern such as "*/*.x", as is possible in UNIX.
+
+Some examples of templates follow:
+
+.nf
+	file
+	"file1, file2"
+	"*.x"
+	"[A-Z]*, *.com, ../$, ../fio/$*.x, lib$*.h, file, @list$*.vs"
+	"sia1:[iraf.lib]$*.h, uparm$cl_*.par"
+.fi
+
+The magic filenames "STDIN", "STDOUT", and "STDERR" have a special
+meaning.  Passing one of these special filenames to a task causes
+the named stream to be "reopened", transparently to the applications
+program.  Thus, for example, one can reference "STDIN" in a template,
+and the applications program will read from the standard input when
+it opens the corresponding file in the template.
+
+For example,
+
+	cl> concat "file1, @STDIN, STDIN, file2", > ofile
+
+concatenates the file "file1", the contents of the files named in the
+standard input (until the first EOF), the contents of the standard input
+itself (until the second EOF), and the contents of the file "file2",
+placing the output in the file "ofile".
+
+
+.sh
+File Protection and Clobber
+
+    The IRAF file interface (FIO) provides file protection and synchronization
+facilities, under control of user definable environment variables.
+
+File "clobber" refers to the overwriting of an existing file when a new
+file of the same name is created as an output file.  If "clobber" is
+defined as "no" in the environment, an IRAF task will abort if a new file
+would clobber an existing file.  If file clobber is enabled, FIO will try
+to overwrite the old file, and will abort if it cannot do so.
+
+	cl> set clobber = "yes"
+
+More explicit file protection is provided by the CL commands PROTECT and
+UNPROTECT.  A protected file cannot be deleted, accidentally or otherwise,
+until the protection has been removed with the UNPROTECT command or system
+call.
+
+A final form of file protection is provided to prevent a file from being
+clobbered which is already open by a task.  Thus, "COPY file,file" will
+abort when FIO discovers that "file" is already opened for reading.  This
+holds even if file clobber is enabled.
+
+
+.sh
+File Synchronization
+
+    File synchronization is useful when a process requires exclusive access
+to a file which is already open for exclusive access by another process.  
+When this situation occurs, the second task may abort with a message stating
+that it cannot access the file, or the task may wait for the file to become
+available.  File waiting is especially important for batch processes.
+
+	cl> set file_wait = "yes"
+
+The file wait option is controlled by the "file_wait" variable in the
+environment.  If file waiting is enabled, and a process finds that it
+has to wait to access a file, a warning message will be printed on the
+standard error output before the affected process goes to sleep.
+.endhelp

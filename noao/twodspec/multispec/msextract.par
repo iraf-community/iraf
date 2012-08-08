@@ -1,0 +1,20 @@
+# MSEXTRACT
+
+image,f,a,,,,Image to be extracted
+output,f,a,,,,Output extraction image file
+lower,r,h,-10,,,Lower limit of extraction
+upper,r,h,10,,,Upper limit of extraction
+spectra,s,h,"*",,,Spectra to be extracted
+lines,s,h,"*",,,Image lines to be extracted
+ex_model,b,h,no,,,Extract model spectra?
+integrated,b,h,yes,,,Extract integrated spectra?
+unblend,b,h,no,,,Correct spectra for blending?
+clean,b,h,yes,,,Clean bad and discrepant pixels?
+nreplace,i,h,1000,0,,Maximum number of pixels to be cleaned
+sigma_cut,r,h,4.,,,Sigma cutoff for cleaning
+niterate,i,h,1,1,,Maximum number of cleaning iterations per line
+model,s,h,smooth,,,Model for cleaning and/or model extraction
+naverage,i,h,20,,,Number of image lines in average profile model
+fit_type,i,h,2,1,2,Model fitting type for model gauss5
+interpolator,s,h,"spline3",,,Type of image interpolation
+verbose,b,h,no,,,Verbose output?

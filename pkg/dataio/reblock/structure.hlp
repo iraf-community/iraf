@@ -1,0 +1,50 @@
+.help gcopy "Program Structure"
+.sh
+Program Structure
+.nf
+t_bincopy()
+# Returns when file list is finished or EOT reached.
+
+    read_file (in_fname, out_fname,  outparam)
+    Returns when an EOF is encountered on read.
+
+	skipover (fd, szb_outblock, nskip)
+	# Returns the offset of the first data byte in the first char
+	# to contain data of interest or EOF
+
+	record_pad (szb_outblock, szb_outrecord, padchar, buffer, op, rem_out)
+
+	block_pad (szb_outblock, szb_outrecord, padchar, buffer, op, rem_out,
+		    outparam)
+.fi
+.sh
+BINCOPY Structure Summary
+.ls t_bincopy
+The main program gets the input and output filenames, creates a list of
+files to be processed and gets the program parameters.
+For each file in the input list READFILE is called,
+and the input and output file names, blocks read and written and records read
+and written are printed.
+The program terminates when the input file list is exhausted or EOT is reached.
+.ls read_file
+READ_FILE opens the input and output devices, allocates space for the input
+and output buffers and copies the data optionally skipping data
+and byteswapping and/or wordswapping the data.
+The routine terminates when an EOF is encountered on a read.
+READ_FILE calls SKIPOVER to find the first data byte of interest and
+RECORD_PAD and BLOCK_PAD to pad records and blocks respectively.
+.ls skipover
+SKIPOVER seeks to the first char containing data of interest and calculates
+the offset in that char of the first byte of interest. Returns the offset
+or EOF if the requested position is past EOF.
+.le
+.ls record_pad
+Record_pad pads input records of szb_inrecord bytes long to output records
+szb_outrecord long.
+.le
+.ls block_pad
+Pads short blocks to size szb_outblock.
+.le
+.le
+.le
+.endhelp

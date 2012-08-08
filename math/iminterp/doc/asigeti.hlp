@@ -1,0 +1,36 @@
+.help asigeti Dec98 asigeti.hlp
+.ih
+NAME
+asigeti -- fetch an asi integer parameter
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+value = asigeti (asi, param)
+
+.nf
+    pointer	asi		#I interpolant descriptor
+    int		param		#I parameter
+.fi
+.ih
+ARGUMENTS
+.ls asi      
+Pointer to the sequential interpolant descriptor structure.
+.le
+.ls param
+The parameter to be fetched. The choices are: II_ASITYPE the interpolant
+type, II_ASINSAVE the length of the saved coefficient array, and
+II_ASINSINC the half-width of the sinc interpolant. The parameter
+definitions are contained in the package header file math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+ASIGETI is used to determine the size of the coefficient array that
+must be allocated to save the sequential interpolant description structure,
+and to fetch selected sequential interpolant parameters.
+.ih
+NOTES
+.ih
+SEE ALSO
+asiinit, asisinit, asigetr
+.endhelp

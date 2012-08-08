@@ -1,0 +1,28 @@
+scombine:
+    1.  Combine with weights:
+	    By signal level
+	    By sigma spectrum
+
+doc:
+    Install SENSFUNC memo in the doc directory. (8/14)
+
+calibrate:
+    Have calibrate apply neutral density filter function.  This may also
+    have to be included in STANDARD and SENSFUNC. (2/25/87)
+
+splot:
+    Add a deblend option for PCYGNI profiles. (Tyson, 3/19/87)
+
+Tim Heckman (U. Maryland) came by with questions and requests
+concerning deblending in SPLOT.  Tim's comments are indicated in
+quotations.
+
+2. "The deblending should allow additional constraints if known.
+Specifically fixing the ratios of lines based on atomic physics."
+
+3.  "The deblending should provide some uncertainty estimates."  I added
+that there has also been a request to use known statistics in the
+pixel data themselves to generate uncertainty estimates.
+
+4.  "It would be useful to provide other choices for the profile rather
+than just gaussians."

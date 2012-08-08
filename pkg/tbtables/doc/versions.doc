@@ -1,0 +1,29 @@
+                                                           1999 August 17
+
+This file describes changes in the STSDAS table format for the various
+software versions, from 0 to 3.  For an STSDAS table, the software version
+number can be found in the size-information record; see fileformat.doc.
+
+version = 0 (before stsdas and tables package version 1.3):
+This is the original version.  Data types supported were single and double
+precision real, integer, logical, and character strings.  Each table element
+was a multiple of four bytes in length (i.e. the size of single precision
+real, integer, or logical).  The row length was also a multiple of four
+bytes.  Data type short (integer*2) was not supported.
+
+version = 1 (1993 May 5, tables package version 1.3):
+Data type short is supported, and the length of a character string is rounded
+up to a multiple of two instead of four.  The row length (used or allocated)
+can be an odd multiple of SZ_CHAR (i.e. a multiple of two bytes instead of
+four bytes).
+
+version = 2 (1995 Oct 11, tables package version 1.3.4):
+Header parameters can have associated comments.  The value of a header
+parameter that is of type text may optionally be enclosed in single quotes;
+this is to allow a comment following the value.  Header parameters with
+keyword HISTORY, COMMENT or blank are not in quotes and may not have comments.
+
+version = 3 (1998 Apr 14, tables package version 2.0.2):
+The character strings in column definitions can have one more character
+than before.  This was done by not including the end-of-string character if
+the string fills the available space.

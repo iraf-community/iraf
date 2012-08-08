@@ -1,0 +1,117 @@
+TITABLE (Jan97)                  threed                  TITABLE (Jan97)
+
+
+
+NAME
+    titable -- Inserts 2-D tables into rows of a 3-D table.
+    
+    
+USAGE
+    titable intable outtable
+    
+    
+DESCRIPTION
+    This task  performs  the  inverse  operation  of  task  txtable:  it
+    inserts  one  or more 2-D tables into rows of a 3-D table  The input
+    may be a filename template, including wildcard  characters,  or  the
+    name  of a file (preceded by an @ sign) containing table names.  The
+    output is a single 3-D table name.   If  the  output  table  exists,
+    insertion  will  be  done  in  place.  If  the output table does not
+    exist, it will be created. The input and output tables must  not  be
+    the same.
+    
+    This  task  supports  row/column selectors in the input table names.
+    These may be used to select subsets of both rows  and  columns  from
+    the  input  table.   If  no selectors are used, all columns and rows
+    will be processed, Type 'help selectors' to  see  a  description  of
+    the selector syntax.
+    
+    When  creating  a  new  output table, the information describing its
+    columns can be taken from two sources. If parameter  'template'  has
+    the  name  of  an  existing  3-D  table,  the  column  descriptions, 
+    including maximum array sizes, will be taken  from  that  table.  If
+    'template'  has  an  invalid or null ("") value, the column-defining
+    information will be take from the first table  in  the  input  list,
+    where  its number of rows will define the maximum array size allowed
+    in the table being created. Column  selectors  are  allowed  in  the
+    template table.
+    
+    NOTE:  Both  the  output  and  template  table  names must always be
+    supplied complete, including their  extension.  Otherwise  the  task
+    may get confused on the existence of an already existing table.
+    
+    Insertion  is  performed  by first verifying if column names in both
+    input and output tables match. If a match  is  found,  values  taken
+    from  that column and all selected rows from the input table will be
+    stored  as  a  1-dimensional  array  in  a  single   cell   in   the 
+    corresponding  column  in  the  output  3-D  table.  The row in this
+    table where the insertion takes place is selected by the "row"  task
+    parameter.  It  points to the row where the first table in the input
+    list will be  inserted,  subsequent  tables  in  the  list  will  be
+    inserted  into  subsequent rows. This mechanism is superseded if the
+    "row" parameter is set  to  INDEF  or  a  negative  value,  and  the
+    keyword  "ORIG_ROW"  is found in the header of the input table. This
+    keyword is created by task txtable and its value supersedes the  row
+    counter in the task.
+    If  the  maximum  array  size  in  a target column in the output 3-D
+    table is larger than the number of selected input  rows,  the  array
+    will  be  filled  up  starting from its first element, and the empty
+    elements at the end will  be  set  to  INDEF  (or  ""  if  it  is  a
+    character  string column). If the maximum array size is smaller than
+    the number of selected rows, insertion begins by the first  selected
+    row  up  to  the  maximum  allowable  size, the remaining rows being
+    ignored.
+    
+    This task correctly handles scalars stored in the input table header
+    by  task  txtable.  Since  the selector mechanism does not work with
+    these scalars, the task will always  insert  them  into  the  output
+    table, provided there is a match in column names.
+    
+    
+PARAMETERS
+    
+    intable [file name list/template]
+        A  list  of  one  or  more  tables  to  be  inserted. Row/column
+        selectors are supported.
+    
+    outtable [table name]
+        Name of  3-D  output  table,  including  extension.  No  support
+        exists for "STDOUT" (ASCII output).
+    
+    (template = "") [table name]
+        Name  of  3-D  table  to be used as template when creating a new
+        output table.
+    
+    (row = INDEF) [int]
+        Row where insertion begins.  If  set  to  INDEF  or  a  negative
+        value,  the  row  number  will  be looked for in the input table
+        header.
+    
+    (verbose = yes) [boolean]
+        Display names of input and output tables as files are  processed
+        ?
+    
+    
+EXAMPLES
+    Insert  columns  named  FLUX and WAVELENGTH from input tables into a
+    3-D table:
+    
+    cl> titable itable*.tab[c:FLUX,WAVELENGTH] otable.tab
+    
+    
+    
+BUGS
+    The output and template  table  names  must  be  supplied  in  full,
+    including  the  extension (e.g. ".tab"). If the output table name is
+    not typed in full, the task will create a new table in place of  the
+    existing  one,  with  only the rows actually inserted. This behavior
+    relates to the way the underlying "access"  routine  in  IRAF's  fio
+    library works.
+    
+    
+REFERENCES
+    This task was written by I. Busko.
+    
+    
+SEE ALSO
+    txtable, selectors

@@ -1,0 +1,32 @@
+.help revisions Jun88 noao.imred.kpnoslit
+.nf
+
+=====
+V2.12
+=====
+
+imred$kpnoslit/standard.par
+    Added blackbody query parameters.  (5/2/02, Valdes)
+
+========
+V2.11.3b
+========
+
+imred$kpnoslit/demos/mkdoslit.cl
+    Made the ARTDATA package parameters explicit (4/15/97, Valdes)
+
+imred$kpnoslit/sparams.par
+    Changed match from 10 to -3.  (4/5/96, Valdes)
+
+imred$kpnoslit/kpnoslit.cl
+imred$kpnoslit/kpnoslit.men
+    Added background, illumination, response, apflatten, apnormalize.
+    (12/29/94, Valdes)
+
+imred$kpnoslit/demos/xdoslit.dat
+    Incorrectly used hz2 as a standard star instead of hz44.  (8/10/92, Valdes)
+
+=======
+V2.10.1
+=======
+.endhelp

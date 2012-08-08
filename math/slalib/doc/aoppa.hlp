@@ -1,0 +1,114 @@
+.help aoppa Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slAOPA (DATE, DUT, ELONGM, PHIM, HM,
+     :                      XP, YP, TDK, PMB, RH, WL, TLR, AOPRMS)
+
+     - - - - - -
+      A O P A
+     - - - - - -
+
+  Precompute apparent to observed place parameters required by
+  slAOPQ and slOAPQ.
+
+  Given:
+     DATE   d      UTC date/time (modified Julian Date, JD-2400000.5)
+     DUT    d      delta UT:  UT1-UTC (UTC seconds)
+     ELONGM d      mean longitude of the observer (radians, east +ve)
+     PHIM   d      mean geodetic latitude of the observer (radians)
+     HM     d      observer's height above sea level (metres)
+     XP     d      polar motion x-coordinate (radians)
+     YP     d      polar motion y-coordinate (radians)
+     TDK    d      local ambient temperature (DegK; std=273.155D0)
+     PMB    d      local atmospheric pressure (mB; std=1013.25D0)
+     RH     d      local relative humidity (in the range 0D0-1D0)
+     WL     d      effective wavelength (micron, e.g. 0.55D0)
+     TLR    d      tropospheric lapse rate (DegK/metre, e.g. 0.0065D0)
+
+  Returned:
+     AOPRMS d(14)  star-independent apparent-to-observed parameters:
+
+       (1)      geodetic latitude (radians)
+       (2,3)    sine and cosine of geodetic latitude
+       (4)      magnitude of diurnal aberration vector
+       (5)      height (HM)
+       (6)      ambient temperature (TDK)
+       (7)      pressure (PMB)
+       (8)      relative humidity (RH)
+       (9)      wavelength (WL)
+       (10)     lapse rate (TLR)
+       (11,12)  refraction constants A and B (radians)
+       (13)     longitude + eqn of equinoxes + sidereal DUT (radians)
+       (14)     local apparent sidereal time (radians)
+
+  Notes:
+
+   1)  It is advisable to take great care with units, as even
+       unlikely values of the input parameters are accepted and
+       processed in accordance with the models used.
+
+   2)  The DATE argument is UTC expressed as an MJD.  This is,
+       strictly speaking, improper, because of leap seconds.  However,
+       as long as the delta UT and the UTC are consistent there
+       are no difficulties, except during a leap second.  In this
+       case, the start of the 61st second of the final minute should
+       begin a new MJD day and the old pre-leap delta UT should
+       continue to be used.  As the 61st second completes, the MJD
+       should revert to the start of the day as, simultaneously,
+       the delta UTC changes by one second to its post-leap new value.
+
+   3)  The delta UT (UT1-UTC) is tabulated in IERS circulars and
+       elsewhere.  It increases by exactly one second at the end of
+       each UTC leap second, introduced in order to keep delta UT
+       within +/- 0.9 seconds.
+
+   4)  IMPORTANT -- TAKE CARE WITH THE LONGITUDE SIGN CONVENTION.
+       The longitude required by the present routine is east-positive,
+       in accordance with geographical convention (and right-handed).
+       In particular, note that the longitudes returned by the
+       slOBS routine are west-positive, following astronomical
+       usage, and must be reversed in sign before use in the present
+       routine.
+
+   5)  The polar coordinates XP,YP can be obtained from IERS
+       circulars and equivalent publications.  The maximum amplitude
+       is about 0.3 arcseconds.  If XP,YP values are unavailable,
+       use XP=YP=0D0.  See page B60 of the 1988 Astronomical Almanac
+       for a definition of the two angles.
+
+   6)  The height above sea level of the observing station, HM,
+       can be obtained from the Astronomical Almanac (Section J
+       in the 1988 edition), or via the routine slOBS.  If P,
+       the pressure in millibars, is available, an adequate
+       estimate of HM can be obtained from the expression
+
+             HM ~ -29.3D0*TSL*LOG(P/1013.25D0).
+
+       where TSL is the approximate sea-level air temperature in
+       deg K (see Astrophysical Quantities, C.W.Allen, 3rd edition,
+       section 52.)  Similarly, if the pressure P is not known,
+       it can be estimated from the height of the observing
+       station, HM as follows:
+
+             P ~ 1013.25D0*EXP(-HM/(29.3D0*TSL)).
+
+       Note, however, that the refraction is proportional to the
+       pressure and that an accurate P value is important for
+       precise work.
+
+   7)  Repeated, computationally-expensive, calls to slAOPA for
+       times that are very close together can be avoided by calling
+       slAOPA just once and then using slAOPT for the subsequent
+       times.  Fresh calls to slAOPA will be needed only when changes
+       in the precession have grown to unacceptable levels or when
+       anything affecting the refraction has changed.
+
+  Called:  slGEOC, slRFCO, slEQEX, slAOPT
+
+  P.T.Wallace   Starlink   9 June 1998
+
+  Copyright (C) 1998 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

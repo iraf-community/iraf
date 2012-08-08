@@ -1,0 +1,3 @@
+images,s,a,,,,List of images
+apertures,s,h,"",,,Apertures to list
+long_header,b,h,no,,,List in long format?

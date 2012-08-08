@@ -1,0 +1,28 @@
+.help txtbin Jun86 dataio
+.ih
+NAME
+txtbin -- convert text files to binary files
+.ih
+USAGE
+txtbin text_file binary_file
+.ih
+PARAMETERS
+.ls text_file
+Input file name or template, e.g. "abc" or "abc.*".
+.le
+.ls binary_file
+Output file name. If multiple input files the file_number will be
+added to the output file name.
+.le
+.ls verbose = "yes"
+Print messages about files processed?
+.le
+.ih
+EXAMPLES
+1. Convert a text file on disk to a binary file on disk.
+
+	cl> txtbin text_file binary_file
+.ih
+SEE ALSO
+bintxt
+.endhelp

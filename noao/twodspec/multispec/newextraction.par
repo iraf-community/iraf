@@ -1,0 +1,5 @@
+# NEWEXTRACTION
+
+image,f,a,,,,Image to be extracted
+template,f,a,"",,,Template image to use for initialization
+sample_lines,s,h,"10x50",,,Sample image lines

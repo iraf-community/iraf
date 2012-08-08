@@ -1,0 +1,109 @@
+\hypertarget{sampLog_8c}{
+\section{sampLog.c File Reference}
+\label{sampLog_8c}\index{sampLog.c@{sampLog.c}}
+}
+SAMP trace and logging interface.  
+
+
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$fcntl.h$>$}\par
+{\tt \#include $<$signal.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$stdarg.h$>$}\par
+{\tt \#include \char`\"{}samp.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{sampLog_8c_7ca95aa869dee3c8acc0b1e278ec08be}{
+\#define \textbf{SZ\_\-FMTSPEC}~25}
+\label{sampLog_8c_7ca95aa869dee3c8acc0b1e278ec08be}
+
+\item 
+\hypertarget{sampLog_8c_adbbc7b02d94a4c18646813ac8d7dec1}{
+\#define \textbf{EOS}~0}
+\label{sampLog_8c_adbbc7b02d94a4c18646813ac8d7dec1}
+
+\item 
+\hypertarget{sampLog_8c_4fa28a492427bc4af75248e22537e9b4}{
+\#define \textbf{T\_\-INT}~0}
+\label{sampLog_8c_4fa28a492427bc4af75248e22537e9b4}
+
+\item 
+\hypertarget{sampLog_8c_6e80924a839d0f80571bcd1d2b6ec084}{
+\#define \textbf{T\_\-DOUBLE}~1}
+\label{sampLog_8c_6e80924a839d0f80571bcd1d2b6ec084}
+
+\item 
+\hypertarget{sampLog_8c_e2381f297a8fbb736886d7d1b6b99b42}{
+\#define \textbf{T\_\-CHAR}~2}
+\label{sampLog_8c_e2381f297a8fbb736886d7d1b6b99b42}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+void \hyperlink{sampLog_8c_4919f892b6fccced4e6b9d777071b781}{sampLog} (handle\_\-t handle, char $\ast$format,...)
+\begin{CompactList}\small\item\em SAMP message logger. \item\end{CompactList}\item 
+void \hyperlink{sampLog_8c_2b3dd1662e61c83e29109126689b08b9}{sampTrace} (handle\_\-t handle, char $\ast$format,...)
+\begin{CompactList}\small\item\em SAMP tracer. \item\end{CompactList}\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+SAMP trace and logging interface. 
+
+SAMPLOG.C -- SAMP trace and logging interface.
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]6/10/09 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{sampLog_8c_4919f892b6fccced4e6b9d777071b781}{
+\index{sampLog.c@{sampLog.c}!sampLog@{sampLog}}
+\index{sampLog@{sampLog}!sampLog.c@{sampLog.c}}
+\subsubsection[{sampLog}]{\setlength{\rightskip}{0pt plus 5cm}void sampLog (handle\_\-t {\em handle}, \/  char $\ast$ {\em format}, \/   {\em ...})}}
+\label{sampLog_8c_4919f892b6fccced4e6b9d777071b781}
+
+
+SAMP message logger. 
+
+SAMPLOG -- SAMP message logger.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]SAMP handle \item[{\em format}]message format string \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::debug, and Samp::logfd.\hypertarget{sampLog_8c_2b3dd1662e61c83e29109126689b08b9}{
+\index{sampLog.c@{sampLog.c}!sampTrace@{sampTrace}}
+\index{sampTrace@{sampTrace}!sampLog.c@{sampLog.c}}
+\subsubsection[{sampTrace}]{\setlength{\rightskip}{0pt plus 5cm}void sampTrace (handle\_\-t {\em handle}, \/  char $\ast$ {\em format}, \/   {\em ...})}}
+\label{sampLog_8c_2b3dd1662e61c83e29109126689b08b9}
+
+
+SAMP tracer. 
+
+SAMPTRACE -- SAMP tracer.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em handle}]SAMP handle \item[{\em format}]message format string \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]nothing \end{Desc}
+
+
+References Samp::trace.
+
+Referenced by samp\_\-Metadata(), sampClose(), and sampInit().

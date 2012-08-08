@@ -1,0 +1,54 @@
+.help fk5hz Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slF5HZ (R5,D5,EPOCH,RH,DH)
+
+     - - - - - -
+      F 5 H Z
+     - - - - - -
+
+  Transform an FK5 (J2000) star position into the frame of the
+  Hipparcos catalogue, assuming zero Hipparcos proper motion.
+
+  (double precision)
+
+  This routine converts a star position from the FK5 system to
+  the Hipparcos system, in such a way that the Hipparcos proper
+  motion is zero.  Because such a star has, in general, a non-zero
+  proper motion in the FK5 system, the routine requires the epoch
+  at which the position in the FK5 system was determined.
+
+  Given:
+     R5        d      FK5 RA (radians), equinox J2000, epoch EPOCH
+     D5        d      FK5 Dec (radians), equinox J2000, epoch EPOCH
+     EPOCH     d      Julian epoch (TDB)
+
+  Returned (all Hipparcos):
+     RH        d      RA (radians)
+     DH        d      Dec (radians)
+
+  Called:  slDS2C, slDAVM, slDIMV, slDMXV, slDC2S
+
+  Notes:
+
+  1)  The FK5 to Hipparcos transformation consists of a pure
+      rotation and spin;  zonal errors in the FK5 catalogue are
+      not taken into account.
+
+  2)  The published orientation and spin components are interpreted
+      as "axial vectors".  An axial vector points at the pole of the
+      rotation and its length is the amount of rotation in radians.
+
+  3)  See also slFK5H, slHFK5, slHF5Z.
+
+  Reference:
+
+     M.Feissel & F.Mignard, Astron. Astrophys. 331, L33-L36 (1998).
+
+  P.T.Wallace   Starlink   7 October 1998
+
+  Copyright (C) 1998 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

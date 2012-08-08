@@ -1,0 +1,73 @@
+.help subsection Oct87 noao.imred.ccdred.ccdtest
+.ih
+NAME
+subsection -- Make a subsection readout CCD image
+.ih
+USAGE
+subsection subimage image
+.ih
+PARAMETERS
+.ls subimage
+Subsection image to be created.
+.le
+.ls image
+Full image from which to take the subsection readout.
+.le
+.ls ncols = 82, nlines = 50
+Number of image columns and lines in the full subsection image including
+bias regions.
+.le
+.ls ccdsec="[26:75,26:75]"
+CCD section of the subsection.  This is the image section of the full
+image to be used.
+.le
+.ls datasec = "[1:50,1:50]"
+Data section of the image.
+.le
+.ls trimsec = ""
+Trim section for later processing.
+.le
+.ls biassec="[51:82,1:50]"
+Prescan or overscan bias section.
+.le
+.ls overwrite = no
+Overwrite an existing image?  If no a new observation is not created.
+There is no warning message.
+.le
+.ih
+DESCRIPTION
+This script task generates artificial CCD subsection observations
+which include bad pixels, bias and zero levels, dark counts, flat
+field response variations and sky brightness levels.  It creates an
+subsection image which includes a bias section from a previously
+created image (created by the task \fBartobs\fR).  This task is
+designed to be used with the \fBccdred\fR package and includes
+appropriate image header information.
+
+First the task checks whether the requested image exists.  If it does
+exist and the overwrite flag is no then a new observations is not created.
+If the overwrite flag is set then the old image is deleted and a new
+observation is created.
+
+The image section give by the parameter \fIccdsec\fR of the reference
+image is copied to the new image.  It is assumed the reference image
+contains any desired zero level, bias, flat field, and dark count
+effects.  The bias section is then added with a bias value given by
+\fBartobs.biasval\fR with noise given by \fBartobs.sigma\fR.
+
+Also the image header parameters from the reference image are
+copied and the data, bias, trim, and ccd section parameters are
+updated.
+.ih
+EXAMPLES
+1. To create some test CCD images first create full frame observations with
+the task \fBartobs\fR.  Then set the subsection parameters
+for the size of the subsection observation, the data section, trim section,
+bias section, and the CCD section of the subsection observation.
+
+	cl> artobs obj 5 object filter=V
+	cl> subsection obj1 object
+.ih
+SEE ALSO
+mkimage, artobs, demo
+.endhelp

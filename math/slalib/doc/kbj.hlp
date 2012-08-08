@@ -1,0 +1,28 @@
+.help kbj Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slKBJ (JB, E, K, J)
+
+     - - - -
+      K B J
+     - - - -
+
+  Select epoch prefix 'B' or 'J'
+
+  Given:
+     JB     int     slDBJI prefix status:  0=none, 1='B', 2='J'
+     E      dp      epoch - Besselian or Julian
+
+  Returned:
+     K      char    'B' or 'J'
+     J      int     status:  0=OK
+
+  If JB=0, B is assumed for E < 1984D0, otherwise J.
+
+  P.T.Wallace   Starlink   31 July 1989
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

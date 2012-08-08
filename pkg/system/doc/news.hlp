@@ -1,0 +1,58 @@
+.help news Mar90 system
+.ih
+NAME
+news -- print the revisions summary for the current IRAF version
+.ih
+USAGE
+news
+.ih
+DESCRIPTION
+The \fInews\fR task uses the standard IRAF file pager to review a formatted
+summary of the system revisions for the version of IRAF being run.
+The revisions summaries for older versions of the system are also provided:
+use the \fIN\fR and \fIP\fR pager keys to display the next or previous
+system revisions summary.  The revisions summary is given in the file
+"doc$newsfile".
+
+For reasons of brevity, only the revisions summary is printed.  For detailed
+information on the revisions made to a particular science package, type
+
+    cl> help <pkg>.revisions op=sys
+
+where "pkg" is the name of the CL package for which revisions information
+is desired.  For detailed information on the revisions to the system
+software and programming interfaces, examine the system notes file,
+given in the file "notes.*" in the directory "iraf$local".  The system
+notes files for older versions of the system will be found in the "doc"
+directory.
+.ih
+BUGS
+The revisions summary is often lengthy and may be easier to read if a
+printed copy is made.
+
+Redirecting the output of \fInews\fR, e.g., to \fIlprint\fR, doesn't work
+at present.
+.ih
+EXAMPLES
+1. Page the revisions summary for the current IRAF release.
+
+    cl> news
+
+2. Print the revisions summary.
+
+    cl> lprint doc$newsfile
+
+3. Page the system notes file.  Anyone who develops software for IRAF
+should review this file with each new release, to see what has changed.
+Documentation for new system facilities is often given in the system
+notesfile.
+
+    cl> page iraf$local/notes.*
+
+4. Review the revisions summary for the IMAGES package.
+
+    cl> phelp images.revisions op=sys
+.ih
+SEE ALSO
+help, phelp, page
+.endhelp

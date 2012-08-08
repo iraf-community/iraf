@@ -1,0 +1,84 @@
+System Notes File for IRAF Version 2.16.
+Begun with V2.16 code freeze 22 March 2012.
+-------------------------------------------
+
+sys/imio/imt/imxftype.x
+    Use of MEF names without an explicit '.fits' weren't being interpreted
+    correctly by the expansion code, e.g. "imcopy mef[0]".  The problem was
+    that the code determining the type was trying to open the file to read
+    it, but of course without the extension would fail, but wasn't being
+    caught. (3/24/12)
+
+sys/imio/imt/imxexpand.x
+    A string buffer for expanding @files was not being properly increased
+    in size when using many files/extensions.  This showed up as a
+    truncation of the expanded extension string for DECam images when
+    used by MSCRED tasks (3/27/12)
+
+pkg/tbtables/tbtyb.x
+    Bypassed error message checking for variable length arrays to allow
+    tasks to open a .fits.fz file to access the headers. (4/3/12)
+
+sys/fio/frmdir.x
+    Clean up some comments (4/5/12)
+
+
+pkg/system/mkpkg
+pkg/system/isdir.x		-
+sys/fio/mkpkg
+sys/fio/isdir.x			+
+sys/fio/fcache.x
+    Moved the isdirectory() function from pkg$system to a general FIO
+    procedure.  This was essentially duplicated in the fcache.x file and
+    is useful elsewhere as well.  (4/9/12)
+
+sys/imio/imt/imx.x
+sys/imio/imt/imxftype.x
+sys/imio/imt/imxexpand.x
+sys/imio/imt/imxpreproc.x
+    Modified to allow directories to be lists, e.g. "@/path/dir" would
+    expand to all images in the directory, "@@/path/dir" would expand
+    the MEF files in the directory.  Expression selection works and
+    use of logical directories is also permitted.  (4/10/12)
+
+sys/imio/imt/imxbreakout.x
+    The new template code wasn't properly detecting e.g. "[-*,*]" as
+    an image section.  (4/11/12)
+
+pkg/images/imutil/src/imexpr.gx
+    Increased the default auto dimension line length to 32K from 8K to
+    avoid an implicit limit in the use of auto="dims"  (4/13/12)
+
+unix/hlib/install
+    Fixed some problems with mixed use of quotes. (4/16/12)
+
+sys/imio/imt/imx.x
+    Fixed a problem with @files containing sections not expanding properly.
+    The contents of the file become a comma-delimited list, however it
+    was preceeded by a 'CH_DELIM//' sequence that prevents further expansion
+    in the fntgfn code.  (4/18/12)
+
+math/gsurfit/gsurfitdef.h
+math/gsurfit/dgsurfitdef.h
+    Fixed a problem with structure alignment in the dgsurfit.h file in an
+    attempt to find a bug introduced with the recent 'tweak' change.  In
+    both files, increased the LEN_GSSTRUCT to a common value of 64 to 
+    provide some cargo-cult padding.  (5/9/12)
+
+pkg/cl/unop.c
+pkg/ecl/unop.c
+pkg/vocl/unop.c
+    Fixed a problem where the "INDEF" string operand was not being correctly
+    recognized in the isindef() function (5/24/12)
+
+sys/imio/imt/imt.x
+sys/imio/imt/imx.x
+sys/imio/imt/imx.h
+sys/imio/imt/imxexpr.x
+sys/imio/imt/imxparse.x
+sys/imio/imt/imxftype.x
+sys/imio/imt/imxescape.x
+sys/imio/imt/imxbreakout.x
+    Fixed multiple problems in correctly distinguishing sections from index
+    ranges, escaping string, etc.  Also added ability to use @ and @@ in
+    front of directories.  (5/24/12)

@@ -1,0 +1,56 @@
+.help for Feb86 language
+.ih
+NAME
+for -- FOR statement
+.ih
+SYNTAX
+for ([assign1] ; [bool_expr] ; [assign2]) statement
+.ih
+ELEMENTS
+.ls assign1
+An assignment used to initialize the \fIfor\fR loop.
+.le
+.ls bool_expr
+A boolean valued expression tested before each iteration.
+.le
+.ls assign2
+An assignment executed after each iteration of the loop.
+.le
+.ls statement
+A statement (possibly compound, i.e., enclosed in curly brackets)
+to be executed in each iteration of the loop.
+.le
+.ih
+DESCRIPTION
+The \fIfor\fR statement provides a looping mechanism similar to the C-language
+for loop.  \fIAssign1\fR and \fIassign2\fR are assignment statements using
+one of the operators '=', '+=', '-=', '/=', '*='.  Any of the elements of
+the \fIfor\fR loop may be omitted, except the parenthesis and colon field
+delimiters.
+.ih
+EXAMPLES
+1. For I equals zero to 10 in steps of 2, increment TOTAL by the value of
+array element I.
+
+.nf
+	for (i=0;  i <= 10;  i += 2)
+	    total += array[i]
+.fi
+
+2. Print the first eight powers of two.
+
+.nf
+	j = 1
+	for (i=1;  i <= 8;  i += 1) {
+	     print (i, j)
+	     j *= 2
+	}
+.fi
+.ih
+BUGS
+A simple assignment of the form i++ will not work.
+Only one assignment statement is permitted in the first and third fields.
+.ih
+SEE ALSO
+while, case, break, next
+.endhelp

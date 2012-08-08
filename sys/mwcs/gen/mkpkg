@@ -1,0 +1,29 @@
+# Make the generic portion of MWCS.
+
+$checkout libex.a lib$
+$udate    libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	mwc1trand.x	../mwcs.h
+	mwc1tranr.x	../mwcs.h
+	mwc2trand.x	../mwcs.h
+	mwc2tranr.x	../mwcs.h
+	mwctrand.x	../mwcs.h
+	mwctranr.x	../mwcs.h
+	mwgctrand.x	../mwcs.h
+	mwgctranr.x	../mwcs.h
+	mwltrand.x	
+	mwltranr.x	
+	mwmmuld.x	
+	mwmmulr.x	
+	mwv1trand.x	../mwcs.h
+	mwv1tranr.x	../mwcs.h
+	mwv2trand.x	../mwcs.h
+	mwv2tranr.x	../mwcs.h
+	mwvmuld.x	
+	mwvmulr.x	
+	mwvtrand.x	
+	mwvtranr.x	
+	;

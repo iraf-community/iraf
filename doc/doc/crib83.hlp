@@ -1,0 +1,1217 @@
+.help crib83 Sep83 "IRAF Program Interface Crib Sheet"
+.ih
+STANDARD PACKAGES comprising the IRAF Program Interface:
+
+.nf
+file i/o			FIO
+  (character i/o)
+formatted i/o			FMTIO
+cl i/o				CLIO
+database i/o			DBIO
+image i/o			IMIO
+graphics i/o			GIO
+terminal control		TTY
+magtape i/o			MTIO
+
+memory management		MEMIO
+date and time			SYS
+process control			SYS
+exception handling		SYS
+error handling			SYS
+boolean operators		OS
+
+string utilities		FMTIO
+vector operators		VOPS
+image operators			IMOPS
+.fi
+
+.sh
+FILE I/O (fully implemented)
+
+.nf
+
+    fd =       open (fname, mode, type)		# open a file
+NI  fd =     reopen (fd, mode, type)		# indep. fd, buffers
+ 	      close (fd)
+
+    stat =     read (fd, buffer, maxch)		# binary byte stream i/o
+    	      write (fd, buffer, maxch)
+	      flush (fd)
+	       seek (fd, loffset)		# move to abs offset
+    long =     note (fd)			# note posn for seek
+
+	      fseti (fd, param, value)		# set FIO options
+  value = fstat[il] (fd, param)			# file status (int, long)
+	     fstats (fd, param, outstr, maxch)	# file status (string)
+    stat =    finfo (file, ostruct)		# get info on file
+
+    y/n =    access (fname, mode, type)		# can file be accessed
+    	     delete (fname)
+    	     rename (old_fname, new_fname)
+ 	     mktemp (root, fname, maxchars)	# make temp file name 
+
+             falloc (fname, nchars)		# prealloc file space
+     stat = protect (fname, action)		# protect/unprotect
+	      fcopy (from_fname, to_fname)	# file copy
+	     fcopyo (from_fd, to_fd)		# file copy, open files
+.fi
+
+
+.ks
+.sh
+CHARACTER I/O (fully implemented, except for unget*, unread)
+
+.nf
+    stat =     getc (fd, char)			# get char from file
+ 	       putc (fd, char)			# put char to file
+ 	      putcc (fd, char)			# handles unprintables
+
+    stat =  getchar (char)			# get char from STDIN
+	    putchar (char)			# put char to STDOUT
+
+    stat =  getline (fd, linebuf)		# get a line of text
+	    putline (fd, linebuf)		# output string to fd
+
+NI	     ungetc (fd, char)			# push back a char
+NI	  ungetline (fd, string)		# push back a string
+NI	     unread (fd, buf, nchars)		# push back binary data
+.fi
+.ke
+
+.ks
+.sh
+NOTES on file i/o:
+
+    The standard streams STDIN, STDOUT, and STDERR are always open.  STDIN
+and STDOUT read from and write to the user terminal when working interactively
+and i/o has not been redirected.  STDERR is for warning or error messages.
+
+
+.nf
+Operand types and dimensions:
+
+	int     fd			# file descriptor
+	char    fname[SZ_FNAME]		# file name string
+	char    linebuf[SZ_LINE]	# line buffer (for getline)
+.fi
+.ke
+
+.ks
+.nf
+File access modes (no RW access for text files):
+
+	READ_ONLY, WRITE_ONLY, READ_WRITE, APPEND
+	NEW_FILE			# create new file
+	TEMP_FILE			# delete upon task completion
+.fi
+.ke
+
+.ks
+.nf
+File types:
+
+	TEXT_FILE			# file of lines of text
+	BINARY_FILE	 		# buffered binary byte stream
+.fi
+.ke
+
+
+.ks
+.nf
+Asynchronous block i/o primitives (binary files only):
+
+**	      aread (fd, buffer, maxchars, char_offset)	[also areadb ]
+**	     awrite (fd, buffer, nchars, char_offset)	[also awriteb]
+**  nchars =  await (fd)				[also awaitb ]
+.fi
+.ke
+
+Note:  "**" identifies routines which are low level, difficult to use in
+a machine independent fashion, and which should not be used in applications
+code.
+
+.tp 5
+.sh
+VIRTUAL FILE NAMES, DIRECTORY ACCESS (fully implemented)
+
+.nf
+    vfn :== [logical_directory_prefix"$"]root_name["."extension]
+    legal character set [a-zA-Z0-9._+-#], max 20 characters
+    e.g.,   "lib$iraf.h"
+
+
+   bool =  envgetb (env_var)			# yes/no --> boolean
+   int =   envgeti (env_var)			# convert to integer
+   nchar = envgets (env_var, os_name, maxch)	# get logical name
+
+  	    zmapfn (vfn, osname, maxch)		# vfn --> osfn
+   	 fpathname (vfn, osname, maxch)		# vfn --> full pathname
+   	  fdirname (vfn, osname, maxch)		# vfn --> directory name
+
+    nchar = fnldir (vfn, outstr, maxch)		# get logical directory
+    nchar = fnroot (vfn, outstr, maxch)		# get root name
+    nchar = fnextn (vfn, outstr, maxch)		# get extension
+
+
+Directory access (use GETLINE to read successive virtual file names)
+
+      fd = diropen (vfn)			# open directory
+.fi
+
+
+.ks
+.sh
+FORMATTED I/O
+
+    The SCAN procedures are used to decode lines of input from any of
+a number of sources (files, strings, CL parameters).  The PRINTF procedures
+provide elaborate facilities for encoding lines of output.  The "_to_"
+primitives provide a very general but low level numeric conversion capability.
+.ke
+
+.ks
+.sh
+FMTIO INPUT, full language  (not yet implemented):
+
+.nf
+    nscan =   scan (       arg, arg, ...)	# scan STDIN
+    nscan =  fscan (fd,    arg, arg, ...)	# scan file
+    nscan =  sscan (str,   arg, arg, ...)	# scan string
+    nscan = clscan (param, arg, arg, ...)	# scan cl param
+.fi
+.ke
+
+
+.ks
+.nf
+Example:  (FSCAN returns nscan or EOF)
+
+	while (fscan (fd, int_variable, real_variable) != EOF) {
+	    if (nscan() == 1)
+		[ action for deficient scan call ]
+		    ...
+.fi
+.ke
+
+
+.ks
+.nf
+FMTIO INPUT, Subset Preprocessor (fully implemented):
+
+    stat =    scan ()
+    stat =   fscan (fd)
+    stat =   sscan (str)
+    stat =  clscan (param)
+
+    garg[bcsilrdx] (value)			# get typed argument
+    gargstr (outstr, maxch)			# get rest of line
+    gargwrd (outstr, maxch)			# get next "word"
+    gargrad (lval, radix)			# non-decimal gargi
+    gargtok (tok, outstr, maxch)		# get next token
+    scanc (ch)					# get single char
+    reset_scan()				# rescan same input
+.fi
+.ke
+
+
+.ks
+.nf
+Example:  Scan lines from a file
+
+	while (fscan (fd) != EOF) {
+	    call gargi (int_variable)
+	    call gargr (real_variable)
+	    call gargstr (outstr, maxch)
+	    if (nscan() < 3) {
+		[ action for deficient scan call ]
+		    ...
+.fi
+.ke
+
+
+.ks
+.sh
+FMTIO OUTPUT Conversion (spp form fully implemented):
+
+    The full language version of PRINTF (not yet implemented) will permit
+a variable number of arguments of any datatype.
+
+.nf
+	    printf (        format, expr [, expr...])	(STDOUT)
+           eprintf (        format, expr [, expr...])	(STDERR)
+           fprintf (fd,     format, expr [, expr...])
+           sprintf (outstr, maxch, format, expr [, expr...])
+          clprintf (param,  format, expr [, expr...])
+.fi
+.ke
+
+
+A program written in the subset preprocessor language must pass the
+arguments explicitly in typed PARG_ calls.
+
+.ks
+.nf
+	    printf (format)			# to STDOUT
+	   eprintf (format)			# to STDERR
+           fprintf (fd, format)			# to file
+           sprintf (outstr, maxch, format)	# to string
+          clprintf (param, format)		# to cl param
+
+	parg[bcsilrdx], pargstr			# pass argument
+.fi
+.ke
+
+
+.ks
+A format specification has the form "%w.dCn", where W is the field width,
+D is the number of decimal places or the number of digits of precision,
+C is the format code, and N is radix character for format code "r" only.
+The W and D fields are optional.  The format codes C are as follows:
+
+
+.nf
+	b	boolean (YES or NO)
+	c	single character (c or '\c' or '\0nnn')
+	d	decimal integer
+	e	exponential format (D specifies the precision)
+	f	fixed format (D specifies the number of decimal places)
+	g	general format (D specifies the precision)
+	h	hms format (hh:mm:ss.ss, D = no. decimal places)
+	m	minutes, seconds (or hours, minutes) (mm:ss.ss)
+	o	octal integer
+	rN	convert integer in any radix N
+	s	string (D field specifies max chars to print)
+	t	advance To column given as field W
+	u	unsigned decimal integer 
+	w	output the number of spaces given by field W
+	x	hexadecimal integer
+	z	complex format (r,r) (D = precision)
+
+	*	deferred: get field from next pargi call
+
+
+Conventions for W (field width) specification:
+
+    W =  n	right justify in field of N characters, blank fill
+	-n	left justify in field of N characters, blank fill
+	0n	zero fill at left (only if right justified)
+    absent, 0	use as much space as needed (D field sets precision)
+
+
+Escape sequences (e.g. "\n" for newline):
+
+	\b	backspace
+	\f	formfeed
+	\n	newline (crlf)
+	\r	carriage return
+	\t	tab
+	\"	string delimiter character
+	\'	character constant delimiter character
+	\\	backslash character
+	\nnn	octal value of character
+.fi
+.ke
+
+Any combination of the fields W, D, C, and N may be specified as "*" in
+the format string, allowing the field to be passed at run time in a PARG_ call.
+
+In the absence of a format string (no PRINTF statement), the PARG_ routines
+will print their operands using reasonable default formats, adding a space
+after each operand.  A newline character can be output after the last operand to
+terminate the output line.
+.ks
+.sh
+Example (Subset Preprocessor):
+
+.nf
+	mean = 4027.123
+	sigma = 33.98423
+
+	call printf ("mean: %0.6g  sigma: %6.2f\n")
+	    call pargr (mean)
+	    call pargr (sigma)
+.fi
+.ke
+
+
+would produce the newline terminated output line
+
+	mean: 4027.12  sigma:  33.98
+	    
+.sh
+FMTIO Low Level Formatted I/O Primitives (do not do i/o):
+
+    The following procedures (excluding CTOTOK, which returns an integer
+code identifying the type of token) return the number of nonwhite input
+characters converted:
+
+.nf
+    nchar =    ctoi (str, ip, ival)		# char to integer
+    nchar =    ctol (str, ip, lval)		# char to long
+    nchar =    ctod (str, ip, dval)		# char to double
+    nchar =    ctox (str, ip, xval)		# char to complex
+    nchar =   cctoc (str, ip, char)		# charcon to char
+    nchar =   gctod (str, ip, dval)		# convert any number
+    nchar =   gctox (str, ip, xval)		# convert any number
+    nchar =   gctol (str, ip, lval, radix)	# variable radix
+    nchar =  ctowrd (str, ip, outstr, maxch)	# word or string
+    token =  ctotok (str, ip, outstr, maxch)	# extract token
+
+.fi
+The following procedures return the number of characters written into the output
+string (the DTOC "format" is one of the chars [efghm], i.e., 'f'):
+.nf
+
+    nchar =    itoc (ival, outstr, maxch)	# integer to char
+    nchar =    ltoc (lval, outstr, maxch)	# long to char
+    nchar =   ctocc (char, outstr, maxch)	# char to charcon
+    nchar =   gltoc (lval, outstr, maxch, radix)
+    nchar =    xtoc (xval, outstr, maxch, decpl, format, width)
+    nchar =    dtoc (dval, outstr, maxch, decpl, format, width)
+
+
+Get/Put a single character from/to a string:
+
+    cval =  chfetch (str, ip, cval)		# get character
+	  chdeposit (cval, outstr, maxch, op)	# put character
+.fi
+
+.ks
+.sh
+CL I/O	(see also "clscan", "clprintf", above)
+
+Get/put ordinary parameters (the generics are not implemented in the subset
+preprocessor; add type suffix as shown below):
+
+.nf
+NI  value =   clgpar (param)			# generic procedure
+NI	      clppar (param, string)		# generic procedure
+    	      clgstr (param, outstr, maxch)	# get string param
+	      clpstr (param, string)		# put string param
+
+    generic clgpar --> clget[bcsilrdx]		(implemented)
+    generic clppar --> clput[bcsilrdx]		(implemented)
+
+
+Get list structured parameters (return EOF at end of list):
+
+NI  stat =   clglpar (param)			# generic
+NI  stat =   clglcur (param, x, y, ch)		# get cursor param
+    stat =   clglstr (param, outstr, maxch)
+
+    generic clglpar --> clglp[bcsilrdx]		(implemented)
+
+
+.fi
+Expand file name template (string param in CL).  CLPOPNI expands and
+sorts a list of input files (contingent on whether or not the standard
+input is redirected); CLPOPNS expands and sorts any template; CLPONPU
+expands a template without sorting.
+.nf
+
+   list = clpopn[isu] (param)			# "open" template
+	      clpcls (list)			# "close" template
+   nfiles =   clplen (list)			# nfiles in list
+   stat =     clgfil (list, outstr, maxch)	# get file name(s)
+
+
+To send a general command to the CL (a newline is appended):
+
+**	       clcmd (command_string)		# send command to CL
+.fi
+.ke
+
+
+.tp 10
+.sh
+DATABASE I/O (not yet implemented)
+
+    Database i/o shall consist of a set of library procedures for accessing
+a flat "data dictionary" stored as a single binary random access file.
+Any number of independent dictionaries may exist as separate files in the
+files system.  A dictionary may contain any number of related or unrelated
+entries or records, keyed by a character string (the name of the entry).
+Each record will have the following attributes:
+
+
+.ks
+.nf
+	Name by which the record is externally known (string).
+	Aliases (other names pointing to the same physical record).
+	Datatype:
+	    one of the primitive types
+	    structure
+	Count of the number of objects of the indicated datatype
+	    in the record.
+	Offset in the file at which the physical record is stored.
+.fi
+.ke
+
+
+A structure type record shall consist of a set of fields, each of which shall
+have the following attributes: name, datatype (primitive only), count (i.e.,
+arrays), and relative offset in the structure.  A record may consist of an
+array of structures, but all structures must have the same format and size.
+Note that hierarchically structured records shall not be permitted.
+
+All access to a database shall be by means of the library procedures.
+The details of what is stored in the database, and of how and where
+it is stored, will in general not be known to the program which accesses
+the database.  It shall be possible to add records in any order,
+provided a new record does not redefine an old record.
+
+At a minimum, the following functions shall be provided for operating
+upon the database:
+.ls 4
+.ls (1)
+Create an empty database, open an existing database, close a database.
+.le
+.ls (2)
+Add a new record to the database.
+.le
+.ls (3)
+In the case of an array structured record, add a new element to the end of
+the array.
+.le
+.ls (4)
+Read a record, element of an array structured record, or field.
+.le
+.ls (5)
+Write a record, element of an array structured record, or field.
+.le
+.ls (6)
+Delete a record.
+.le
+.ls (7)
+Given a key, return the name of the next entry (alphabetically) in
+the dictionary.  This is the only way to access a database without
+knowing what it contains.
+.le
+.le
+
+DBIO will eventually be used to provide a more general and flexible image
+header than is currently available.  Other uses include program output,
+communication amongst the programs within a package, and most common
+database applications (i.e., the HELP database).  Conversion programs will
+be provided for transportation of database files between machines.
+
+.tp 10
+.sh
+IMAGE I/O (implemented, but changes are planned)
+
+    An image structure must be mapped before the image header structure
+or the data (pixels) can be accessed.
+
+
+.tp 6
+Language Support (not yet implemented):
+
+    The GETPIX and PUTPIX generic procedures will provide for general
+pixel i/o in the full language.  These procedures subscript a section
+of a mapped image, and return a pointer to the input buffer containing the
+pixels, or to the output buffer in which the pixels are to be put.
+For example,
+
+.ks
+.nf
+	bufptr = getpix (a[*,j])		# get line J
+	bufptr = putpix (b[x1:x2,y1:y2])	# put a subraster
+.fi
+.ke
+
+
+.tp 6
+Library support (fully implemented):
+
+    An image must be opened with IMMAP before it can be accessed.
+The image and buffers must be returned with IMUNMAP when done.  The
+IMGNL and IMPNL routines are used to perform sequential i/o on images
+of any dimension.  The GETPIX and PUTPIX routines (or the more specific
+procedures named according to the generating function shown below)
+are used to get or put specific lines or sections to images.
+
+
+.rj <imhdr.h>
+General routines:
+
+.nf
+     im = immap (image_file, mode, len_user_area | old_im)
+	imunmap (im)
+	 imseti (im, parameter, int_value)	# set options
+     imbln[123] (im, dim_1, ...)		# get buffer dims
+       imdelete (image_file)			# delete image
+
+where
+	mode = one of the file modes, NEW_IMAGE, or NEW_COPY
+
+
+Sequential i/o (images of any dimension):
+
+	stat = imgnl[silrdx] (im, bufptr, v)	# get next line
+	stat = impnl[silrdx] (im, bufptr, v)	# put next line
+
+
+General i/o (for images of a particular dimension):
+
+	generic getpix, putpix --> im[gp][pls][123][silrdx]
+
+i.e.,	bufptr = imgl2r (im, linenum)		# get line, type real
+	bufptr = impl2r (im, linenum)		# put line, type real
+	bufptr = imgs2r (im, x1, x2, y1, y2)	# get subraster
+
+
+.fi
+Here, [gp] implies get or put, [pls] specifies whether a pixel, line, or
+section is to be accessed, [123] specifies the dimensionality of the
+subscript (but not of the image itself), and [silrdx] specifies the datatype
+of the pixels in the program (but not in the image).  For example, "imgl2r"
+gets a line of REAL pixels, using a subscript for a two dimensional image.
+
+
+Frequently referenced fields of the image header (see <imhdr.h> for
+a full definition of the image header structure):
+
+.ks
+.nf
+	IM_NDIM(im)			# number of dimensions
+	IM_LEN(im,naxis)		# length of axis NAXIS
+	IM_PIXTYPE(im)			# datatype of the pixels
+.fi
+.ke
+
+When creating a new image, only the IM_LEN fields of the new header
+need be set.  IM_NDIM will be computed by counting the number of nonnull
+dimensions.  IM_PIXTYPE should be set if type REAL pixels (the default)
+are not desired.
+
+
+Example:  image C = image A + image B
+
+    The following example is for the SPP language, using only low level
+calls.  The generic functions GETPIX and PUTPIX have not yet been
+implemented.
+
+
+.nf
+include	<imhdr.h>
+
+# Add two 2 dimensional, equal sized images, using type
+# REAL arithmetic internally.
+
+
+procedure add_images (im_a, im_b, im_c)
+
+char	im_a[ARB], im_b[ARB], im_c[ARB]
+pointer	a, b, c
+int	line
+pointer	immap(), imgl2r(), impl2r()
+errchk	immap, imgl2r, imunmap
+
+begin
+	a = immap (im_a, READ_ONLY, 0)
+	b = immap (im_b, READ_ONLY, 0)
+	c = immap (im_c, NEW_COPY, a)
+
+	do line = 1, IM_LEN(a,2)
+	    call aaddr (Memr[imgl2r(a,line)], Memr[imgl2r(b,line)],
+			Memr[impl2r(c,line)], IM_LEN(a,1))
+
+	call imunmap (a)
+	call imunmap (b)
+	call imunmap (c)
+end
+.fi
+
+
+The input images IM_A and IM_B are first mapped for READ_ONLY access
+mode.  The new image IM_C is next mapped as a NEW_COPY of image A
+(the header of C is a copy of that of A, except that all fields describing
+the pixels are initialized).
+
+The images are then added line by line, using the vector operator AADDR.
+Note that IMPL2R returns a pointer to the output buffer which is filled,
+and later flushed (at the next IMPL2R call, or when the image is unmapped).
+
+.tp 10
+.sh
+TERMINAL CONTROL (fully implemented)
+
+    The TTY routines provide a device independent interface to video display
+(not graphics) terminals.  The following environment variables are defined
+to describe the type of terminal in use:
+
+
+.ks
+.nf
+	terminal	terminal name (i.e., "vt100", "tek4012")
+	ttybaud		baud rate, default 9600
+	ttyncols	number of characters per line
+	ttynlines	number of lines per screen
+.fi
+.ke
+
+
+For example, the sequence "envgeti ("ttyncols")" will conveniently return
+the ncols parameter for use in applications programs which format long
+output lines.  These variables are initialized upon startup to default
+values but will need to be changed by the user if an unusual terminal or
+baud rate is used.
+
+The following library procedures are provided for terminal control:
+
+
+.ks
+.nf
+	ttyclear (fd)		Output clear,home sequence to file fd.
+	 ttyhome (fd)		Home the alpha cursor (upper left).
+	   ttyso (fd, YES/NO)	Turn "standout" mode on/off.
+	   ttyup (fd, nlines)	Move cursor up nlines.
+	 ttydown (fd, nlines)	Move cursor down nlines.
+	 ttyleft (fd, ncols)	Move cursor left n columns.
+.fi
+.ke
+
+
+There is no "ttyright" function; repaint the screen to move right.
+A "ttymove" function may be provided in the future for absolute addressing
+but is not currently implemented.  Standout mode, if available, equates
+to reverse video, underline, or a similar enhancement.
+
+.ks
+.sh
+GRAPHICS I/O (partially implemented)
+
+
+GIO high level output procedures (subset system)
+
+.nf
+	    plot  (rdata, npix, x1, x2)		# (Implemented)
+
+
+GIO low level output procedures
+
+    fd =    gopen   (stream) 			# open graphics stream
+	    gclose  (fd) 			# close graphics stream
+	    gflush  (fd) 			# flush graphics output
+    	    gscan   (fd, file)			# take cmds from a file
+	    greset  (fd, screen, aspect_ratio)	# reset database, clear
+	    gerase  (fd, w)			# clear window or screen
+
+	  gset[irs] (fd, parameter, value)	# set GIO parameter
+            gswind  (fd, w, w_struct)		# set window
+	    gsmark  (fd, mark, array)		# define a mark pattern
+	    ginitw  (w_struct)			# initialize w_struct
+
+      gmov[ar][wpu] (fd, x, y)			# move pen
+      gdrw[ar][wpu] (fd, x, y)		 	# draw line
+      gpnt[ar][wpu] (fd, x, y)			# draw point
+      gdsh[ar][wpu] (fd, x, y, l)		# draw dashed line
+         gmark[wpu] (fd, mark_type, sx, sy) 	# draw mark
+	 gmovc[wpu] (fd, x, y)			# move cursor
+
+      gplt1[silrdx] (fd, pixels, npix, x)	# plot {x=x+i-1,y[i]}
+      gplt2[silrdx] (fd, pixels, nx, ny, x, y)	# plot 2d data
+      gpltw[silrdx] (fd, wx, wy, npts)		# plot {x,y}, window
+      gpltp[silrdx] (fd, px, py, npts)		# plot {x,y}, pixel
+      gpltu[silrdx] (fd, ux, uy, npts)		# plot {x,y}, user
+	    gpltim  (fd, image, section, x, y)	# plot from imagefile
+
+	    gprintf (fd, format, arg [,...])	# plot text string
+	    gptext  (fd, str, ang, cent, size)	# lower level plot text
+
+
+Access window descriptor structure, transform coords
+
+    stat =  ggetw   (stream, w, w_struct)	# get transformations
+      g[wpu]to[wpu] (w_struct, x,y, x,y)	# coord transformation
+.fi
+.ke
+
+
+.ks
+.nf
+Standard graphics devices:
+
+	    STDGRAPH		# interactive graphics device
+	    STDIMAGE		# image display device
+	    STDPLOTTER		# batch plot device
+
+Mark types:
+	    GM_CIRCLE, GM_BOX, GM_PLUS, GM_DIAMOND, GM_HLINE, GM_VLINE,
+	    GM_UPARROW, GM_DOWNARROW, ...
+.fi
+.ke
+
+.tp 10
+.sh
+MAGTAPE I/O (fully implemented)
+
+    A magtape device is opened with MTOPEN, then accessed like any other
+binary file via the FIO interface (sequential access only).  Buffering
+and record blocking and deblocking is normally handled transparently by
+FIO.  If a specific tape record size is required when writing, the buffer
+size (in chars) should be given when the tape file is opened with MTOPEN.
+If the tape is opened for reading, a suitably large buffer will be allocated
+to handle the largest permissible tape records.  All i/o transfers must be in
+units of chars.  Use SZB_CHAR (size of a CHAR in bytes) for size conversions.
+
+
+.nf
+    fd = mtopen (filename, mode, fio_bufsize)
+
+where
+	filename =	mt[ab][800|1600]'['tape_file_number']',
+			i.e., "mta1600[2]" == file 2 on drive a
+
+	mode   =	READ_ONLY, WRITE_ONLY, APPEND (a new file
+			to tape), NEW_TAPE (write file 1 on tape)
+
+	fio_bufsize =	FIO buffer size, chars (default used if 0)
+.fi
+
+
+If the filename does not begin with the characters "mt", MTOPEN assumes
+the file is a regular (disk resident) binary file and attempts to open
+it is as one.  If the tape file number subscript is omitted, MTOPEN
+opens the tape to the beginning of the file to which the tape is currently
+positioned.
+
+Like any other file, a magtape file is closed with CLOSE.  When a file
+opened for writing is closed, a new end of tape mark will be written.
+It is illegal to seek on a magtape.  A magtape may be opened for either
+reading or writing, but not for both at the same time.  If a read returns
+EOF, the next read will return the first record of the next file, or
+another EOF if at EOT.
+
+
+.tp 10
+.sh
+MEMORY MANAGEMENT (fully implemented)
+
+    Space may be dynamically allocated and freed on either the stack
+or the heap.  Buffers allocated by MALLOC, CALLOC, or SALLOC are aligned
+for all data types.  MALLOC and SALLOC allocate a buffer.  CALLOC
+is like MALLOC except that it also zeros the buffer.  BEGMEM tries to
+grab physical memory (increase the working set size), FIXMEM returns
+physical memory.
+
+
+.nf
+    nchars = begmem (maxch, oldsize)	# increase physical memory
+ 	     fixmem (oldsize)		# restore physical memory
+
+    	     malloc (ptr, nelem, type)	# allocate space on the heap
+    	     calloc (ptr, nelem, type)	# allocate and zero space
+    	    realloc (ptr, nelem, type)	# adjust size of buffer
+ 	      mfree (ptr, type)		# free space on the heap
+
+	      smark (sp)		# save stack pointer
+	     salloc (ptr, nelem, type)	# allocate space on stack
+	      sfree (sp)		# pop stack to old sp
+
+    addr =     zloc (datum)		# get absolute address
+    addr =    zlocc (datum)		# get address in char units
+.fi
+.ke
+
+
+.ks
+.nf
+relevant definitions (global language):
+
+	SZ_type		size of type (SHORT, INT, etc.) in CHARS
+	SZ_VMPAGE	size of page of virtual memory (1 if non-v)
+	SZB_CHAR	size of type CHAR in machine bytes
+	SZB_ADDR	size of a machine address increment, bytes
+.fi
+.ke
+
+
+.tp 10
+.sh
+DATE AND TIME (fully implemented)
+
+    CLKTIME and CPUTIME return the difference between the argument and the
+current clock or cpu time.  If CLKTIME is called with a zero argument,
+the local standard time in long integer seconds since 00:00:00 01-Jan-80
+is returned.  This may be broken down into the year, day, hour, etc. with
+BRKTIME (see <time.h>), or converted into a date/time string with CNVTIME
+or CNVDATE.  The maximum size of the output strings are given by the
+parameters SZ_TIME and SZ_DATE in <time.h>.
+
+.nf
+    long =  clktime (old_time)		# clock time, seconds
+    long =  cputime (old_time)		# cpu time used, millisec
+
+	    brktime (clktime, ostruct)		# get day, hour, etc.
+	    cnvtime (clktime, outstr, maxch)	# cvt to long string
+	    cnvdate (clktime, outstr, maxch)	# cvt to short string
+.fi
+.ke
+
+
+.ks
+.sh
+PROCESS CONTROL (partially implemented)
+
+.nf
+**  tid =   connect (task, fdin, fdout)	# exec and open pipes
+**	 disconnect (tid)		# close task
+
+**  code =    twait (tid)		# wait for completion
+**  int =   tstatus (tid, what)		# get task status
+**	      tkill (tid)		# kill that task
+
+**	   zrestart (code)		# error restart
+.fi
+.ke
+
+
+.tp 10
+.sh
+EXCEPTION HANDLING (fully implemented)
+
+    A user handler procedure is posted by a call to XWHEN.  If and when the
+exception occurs, the handler is called with an integer argument identifying
+the exception (the same handler may be posted for multiple exceptions).
+The handler procedure should return as its second argument either X_IGNORE
+(resume normal execution) or the address of a procedure to be executed,
+normally the "old_hander" address returned by XWHEN.
+
+ONEXIT is used to post a procedure to be executed upon process termination.
+The user supplied procedure is called upon abnormal or normal termination
+with an integer argument identifying the exit status (OK for a normal
+exit, the error code for an error exit).  Several procedures may be posted
+if desired.  An attempt to post a procedure which has already been posted
+is ignored.  ONERROR is similar, but is called during error restart.
+
+
+.nf
+	procedure user_handler (exception_code, next_handler)
+	procedure user_proc (exit_code)
+
+ 	     xwhen (exception, user_handler; old_handler)
+	    onexit (user_proc)
+	   onerror (user_proc)
+
+.fi
+.ke
+
+.rj <xwhen.h>
+exceptions:
+
+.nf
+	    X_INT		# keyboard interrupt
+	    X_ARITH		# arithmetic error
+	    X_ACV		# access violation
+
+
+built-in handlers:
+
+	    X_IGNORE		# ignore exception entirely
+.fi
+
+The user handler may call FATAL to force error restart, or ERROR
+to conditionally cause error restart (depends on whether or not an
+IFERR type error handler is posted).  Error actions should not occur
+during execution of an ONEXIT procedure, and ONEXIT procedures should
+return promptly.
+
+
+.sh
+ERROR HANDLING (fully implemented)
+
+    A recoverable error condition is asserted with ERROR.  An irrecoverable
+error condition is asserted with FATAL.  Error recovery is implemented
+using the IFERR and IFNOERR statements in the preprocessor language.
+ERRACT may be called in an IFERR statement to cause a warning to be issued,
+or to cause a particular error action to be taken.  ERRCODE returns either
+OK or the integer code of the posted error.
+
+Language support includes the IFERR and IFNOERR statements and the ERRCHK
+declaration.  The IFERR statement is grammatically equivalent to the IF
+statement.  Note that the condition to be tested in an IFERR statement may
+be a procedure call or assignment statement, while the IF statement tests
+a boolean expression.
+
+
+.nf
+	errchk	proc1, proc2, ...		# errchk declaration
+
+	iferr (procedure call or assignment statement)
+	    <error_action_statement>
+
+	iferr {
+	    <any statements, including IFERR>
+	} then
+	    <error_action_statement>
+
+
+Library procedures (ERROR and FATAL cause a RETURN):
+
+	  error (errcode, error_message)
+	  fatal (errcode, error_message)
+	 erract (severity)
+  val = errcode ()
+.fi
+
+
+.rj <error.h>
+ERRACT severity codes
+
+.nf
+	EA_WARN			# issue a warning message
+	EA_ERROR		# assert recoverable error
+	EA_FATAL		# assert fatal error
+.fi
+
+
+An arithmetic exception (X_ARITH) will be trapped by an IFERR statement,
+provided the posted handler(s) return without causing error restart.
+X_INT and X_ACV may only be caught by posting an exception handler with
+XWHEN.
+.ke
+
+.ks
+.sh
+BOOLEAN OPERATORS (fully implemented)
+
+.nf
+    int	=   and  (a, b)			# (ands, andl)
+    int =   or   (a, b)			# (ors, orl)
+    int	=   not  (a)			# (nots, notl)
+    int	=   xor  (a, b)			# (xors, xorl)
+    bool =  tbit (a, bit)		# test bit (tbits, tbitl)
+ 	    sbit (a, bit)		# set bit (sbits, sbitl)
+.fi
+.ke
+
+.ks
+.sh
+BYTE and CHARACTER conversion (fully implemented)
+
+.nf
+    	strpak (str, os_str, maxch)		# pack OS string
+    	strupk (os_str, str, maxch)		# unpack OS string
+
+ 	chrpak (a, a_off, b, b_off, nchars)	# pack chars
+ 	chrupk (a, a_off, b, b_off, nchars)	# unpack chars
+
+ 	bytmov (a, a_off, b, b_off, nbytes)	# move bytes
+ 	bswaps (a, b, nshorts)			# byte swap, short
+ 	bswapl (a, b, nlongs)			# byte swap, longs
+.fi
+.ke
+
+
+Chars are signed integers, whereas bytes as unsigned integers.  The BSWAP
+routines are used to swap bytes in short and long integer arrays, as is
+sometimes required when transporting data between machines.  The MII package
+is available for conversions between a machine independent integer format
+and the SPP datatypes (documented elsewhere).
+.fi
+.ke
+
+.ks
+.sp 2
+.rj <ctype.h>
+CHARACTER COMPARISONS (fully implemented)
+
+.nf
+	bool =  IS_UPPER (char)		# upper case?
+	bool =  IS_LOWER (char)		# lower case?
+	bool =  IS_DIGIT (char)		# numeral?
+	bool =  IS_PRINT (char)		# printable character?
+	bool =  IS_CNTRL (char)		# control character?
+	bool =  IS_ASCII (char)		# 7 bit ASCII character?
+	bool =  IS_ALPHA (char)		# letter (either case)?
+	bool =  IS_ALNUM (char)		# alphanumeric character?
+	bool =  IS_WHITE (char)		# whitespace character?
+	char =	TO_DIGIT (int)		# convert integer to char
+	int  =	TO_INTEG (char)		# convert digit to integer
+	char =  TO_UPPER (char)		# convert to upper case
+	char =  TO_LOWER (char)		# convert to lower case
+.fi
+.ke
+
+
+These definitions are defined in the include file <ctype.h>.
+These are macro definitions, not procedures (they produce inline code and
+need not be declared).  TO_UPPER and TO_LOWER must only be applied to
+letters of the proper case (use the procedures CHRUPR, CHRLWR otherwise).
+
+.ks
+.sh
+STRING UTILITIES (fully implemented)
+
+.nf
+    ch =    chrupr (ch)			  # char to upper case
+    ch =    chrlwr (ch)			  # char to lower case
+
+	    strlwr (str)		  # string to lower case
+	    strupr (str)		  # string to upper case
+    index = stridx (char, str)		  # first index of char in str
+    index = strldx (char, str)		  # last index of char in str
+	    strcpy (from, to, maxch)	  # copy EOS delim string
+	    strcat (str, outstr, maxch)	  # concatenate str to outstr
+    int =   strlen (str)		  # length of string (excl EOS)
+    int =  gstrcpy (from, to, maxch)	  # returns length of outstr
+    int =  gstrcat (str, outstr, maxch)	  # returns length of outstr
+
+            strtbl (fd,buf,strp,nstr; first_col,last_col,maxch,ncol)
+.fi
+.ke
+
+
+.ks
+.nf
+String Comparisons (str__ --> str(eq|ne|le|lt|ge|gt))
+
+      bool = str__  (s1, s2)		  # is s1 __ s2?
+   -1,0,1 = strncmp (s1, s2, n)		  # counted comparison
+ nextch = strsearch (str, patstr)	  # fast substring search
+  nextch = strmatch (str, patstr)	  # match strings (^$?#{})
+ nextch = gstrmatch (str, patstr, first_ch, last_ch)
+.fi
+.ke
+
+
+.tp 5
+PATTERN MATCHING (fully implemented)
+
+.nf
+  patsize = patmake (patstr, patbuf, maxch)	# prepare pattern
+  nextch = patmatch (str, patbuf)		# match pattern
+ nextch = gpatmatch (str, patbuf, first_ch, last_ch)
+
+
+	    Metacharacters  (note strmatch implements ^$?#{})
+
+    	^	beginning of line
+    	$	end of line
+    	*	zero or more occurrences
+	?	match any single character
+    	[xy]	match char if in the set "xy"
+    	[^xy]	match anything but chars in the set "xy"
+	[x-y]	match a range of chars
+	#	short for [ \t]* (whitespace)
+	{	begin matching either upper or lower case
+	}	restore case sensitivity
+.fi
+.ke
+
+
+.tp 8
+RANDOM NUMBERS
+
+    The URAND procedure (Uniform RANDom number generator) is available
+for random number generation.
+
+	real =	urand (seed)
+
+The long integer SEED should be set before the first call, and is controlled
+by URAND thereafter.  Random numbers are returned in the range [0-1].
+	
+.tp 8
+.sh
+SORTING
+
+    The general quicksort procedure may be used to sort objects of any
+type or size.  This generality is achieved by having the user program
+supply an integer index array (which is what gets sorted), and a comparison
+procedure.
+
+.nf
+	qsort (index, nelems, compare)
+where
+	int	index[nelems], nelems
+	extern	int compare()
+
+	-1,0,1 = compare (index_1, index_2)
+.fi
+
+The external integer function "compare" (of any name) should return -1 if the
+object indexed by "index_1" is less than the object indexed by "index_2",
+0 if they are equal, and 1 if the first is greater than the second.
+
+Data vectors of type INT, REAL, etc. may be most conveniently sorted using
+the ASRT_ vector operators, described in the next section.
+
+.tp 10
+.sh
+VECTOR OPERATORS (fully implemented, but may change)
+
+    Add a "k" to the three character instruction mnemonic if one of the
+vector operands is a constant rather than a vector.  Add one or two type
+suffix characters to specify the datatype(s) of the operands.
+
+
+.ks
+.nf
+Examples:
+		achtir (a, b, npix)		(int to real)
+		amovkr (5.0, b, npix)		(fill with 5.0s)
+		 asrtr (a, b, npix)		(sort a into b)
+		 aaddi (a, b, c, npix)		(c = a + b)
+.fi
+.ke
+
+
+.tp 5
+.nf
+     Instruction	    Operation		          Data Types
+
+	acht__		b = a (change datatype)		  UBcsilrdx
+	aclr_		fill a with zeros		  UBcsilrdx
+	amov_	(k)	b = a (copy vector)		  UBcsilrdx
+
+	asrt_		b = sort (a)			    csilrdx
+	aabs_		b = abs(a)			     silrdx
+	alog_		b = log10(a)			     silrdx
+	alln_		b = natural_log(a)		     silrdx
+	asqr_		b = sqrt(a)			     silrdx
+	aneg_		b = -a				     silrdx
+	amap_		b = (a + k1) * k2		     silrdx
+	altr_		b = a, map [a1:a2] -> [b1:b2]	     silrdx
+	amap_B		b = (a + k1) * k2		     silrdx
+	alutc		b = lookup[a], 1 <= a < 128	    c
+	alui_		b = interp (a, x, npix)		     silrd
+
+	aadd_	(k)	c = a + b			     silrdx
+	asub_	(k)	c = a - b			     silrdx
+	amul_	(k)	c = a * b			     silrdx
+	adiv_	(k)	c = a / b			     silrdx
+	amin_	(k)	c = min(a,b)			     silrd
+	amax_	(k)	c = max(a,b)			     silrd
+	amod_	(k)	c = mod(a,b)			     silrd
+	apow_	(k)	c = a ** int_pwr 		     silrdx
+	aexp_	(k)	c = a ** real_pwr		     silrdx
+	awsu_		c = a*k1 + b*k2			     silrdx
+
+	anot_		b = !a				     sil
+	aand_	(k)	c = and(a,b)			     sil
+	abor_	(k)	c = or(a,b)			     sil
+	axor_	(k)	c = xor(a,b)			     sil
+
+
+.tp 4
+Other vector primitives:
+
+	alim_	ngpix =	 lim_ (a, npix; minval, maxval)	     silrdx
+	awin_	nrej =	 win_ (a, npix, lcut, hcut)	     silrdx
+	aavg_	ngpix =	 avg_ (a, npix; mean, sigma)	     silrdx
+	arav_	ngpix =	 rav_ (a, npix; mean, sigma; ksig)   silrdx
+.fi
+
+
+Example:  Add 1 to each element of the integer vector A.
+
+	call aaddki (a, 1, a, npix)
+
+NOTE:  On a given system, some of the vector operators are likely to
+be hand optimized in machine code.  Other systems will interface the
+vector operators to an array processor.  A transportable version of
+each operator will always exist.  Use the standard vector operators
+whenever possible to gain maximum efficiency without compromising the
+machine/device independence (transportability) of your program.
+.endhelp

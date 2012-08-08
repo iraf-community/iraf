@@ -1,0 +1,10 @@
+# Parameter file for MKPHOTCORS
+
+imsets,f,a,"",,,The image set file
+idfilters,s,a,"",,,The list of filter ids
+obsparams,f,a,"",,,The input observing parameters files
+shifts,f,a,"",,,The x and y coordinate shifts file
+apercors,f,a,"",,,The aperture corrections file
+obscolumns,s,h,"2 3 4 5",,,The format of obsparams
+verify,b,h,no,,,Verify interactive user input ?
+verbose,b,h,yes,,,Print status warning and error messages

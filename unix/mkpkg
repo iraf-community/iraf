@@ -1,0 +1,17 @@
+# UNIX/IRAF HSI.
+
+summary:
+	$ifeq (HOSTID, unix)
+	    $ifeq (MACH, dsux)
+		! grep -v ':$$' spool | grep -v '^xc' | grep -v '^ar'\
+		    | grep -v '^check file' | grep -v 'never used$'
+	    $else
+		! grep -v ':$$' spool | grep -v '^xc' | grep -v '^ar'\
+		    | grep -v '^check file' | grep -v '^a - '\
+		    | grep -v '^+ [g]*cc' | grep -v '^+ ar ' | grep -v '^+ rm'\
+		    | grep -v '^+ f77'
+	    $endif
+	$else
+	    $echo "mkpkg summary only available on a UNIX system"
+	$endif
+	;

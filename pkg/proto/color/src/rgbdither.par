@@ -1,0 +1,13 @@
+red,f,a,,,,Red image
+green,f,a,,,,Green image
+blue,f,a,,,,Blue image
+rgb,f,a,,,,Output RGB image
+rz1,r,h,0.,,,Red z1
+rz2,r,h,255.,,,Red z2
+gz1,r,h,0.,,,Green z1
+gz2,r,h,255.,,,Green z2
+bz1,r,h,0.,,,Blue z1
+bz2,r,h,255.,,,Blue z2
+blkavg,i,h,3,1,,Block average factor
+logmap,b,h,no,,,Use logarithmic intensity mapping?
+pattern,s,h,"rgbgbrbrg",,,"Dither pattern (3x3)"

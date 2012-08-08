@@ -1,0 +1,49 @@
+.TH CURFIT 3M
+.SH NAME
+curfit
+.SH DESCRIPTION
+subroutine curfit.f 
+
+source
+  Bevington, pages 237-239.
+
+purpose
+  make least-squares fit to a non-linear function
+    with a linearization of the fitting function
+
+usage 
+  call curfit (x, y, sigmay, npts, nterms, mode, a, deltaa,
+    sigmaa, flamda, yfit, chisqr)
+
+description of parameters
+  x      - array of data points for independent variable
+  y      - array of data points for dependent variable
+  sigmay - array of standard deviations for y data points
+  npts   - number of pairs of data points
+  nterms - number of parameters
+  mode   - determines method of weighting least-squares fit
+           +1 (instrumental) weight(i) = 1./sigmay(i)**2
+            0 (no weighting) weight(i) = 1.
+           -1 (statistical)  weight(i) = 1./y(i)
+  a      - array of parameters
+  deltaa - array of increments for parameters a
+  sigmaa - array of standard deviations for parameters a
+  flamda - proportion of gradient search included
+  yfit   - array of calculated values of y
+  chisqr - reduced chi square for fit 
+
+subroutines and function subprograms required 
+  functn (x, i, a)
+    evaluates the fitting function for the ith term
+  fchisq (y, sigmay, npts, nfree, mode, yfit) 
+    evaluates reduced chi squared for fit to data
+  fderiv (x, i, a, deltaa, nterms, deriv)
+    evaluates the derivatives of the fitting function
+      for the ith term with respect to each parameter
+  matinv (array, nterms, det) 
+    inverts symmetric two-dimension matrix of degree nterms
+      and calculates its determinant
+
+comments
+  valid for nterms up to 10
+  set flamda = 0.001 at beginning of search

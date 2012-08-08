@@ -1,0 +1,390 @@
+.help observatory Jan92 noao
+.ih
+NAME
+observatory -- Examine and set observatory parameters
+.ih
+USAGE
+observatory command obsid [images]
+.ih
+PARAMETERS
+.ls command = "list" (set|list|images)
+Command option which is one of "set", "list", or "images".  The set command
+sets the default observatory task parameters for the specified
+observatory.  The list command lists the observatory parameters for the
+specified observatory but does not modify the task parameters.  The images
+command lists the observatory parameters for a list of images.  The list
+and images commands examine and verify the observatory parameters applied
+by other tasks using the observatory database facility.
+.le
+.ls obsid = "?"
+Observatory identification to be set, listed, or used as the default for
+images without the OBSERVAT keyword.  The observatory ID is one of those in
+the database (case ignored), the special string "observatory" to default to
+the environment variable "observatory" or the \fIobservatory.observatory\fR
+parameter, "obspars" to select the parameters in the \fBobservatory\fR
+task, or "?" to list the observatories defined in the database.
+.le
+.ls images
+List of images to be examined with the "images" command.  The images are
+checked for the OBSERVAT keyword to determine the observatory parameters
+to be listed, otherwise the observatory given by \fIobsid\fR is used.
+.le
+.ls verbose = no
+Verbose output?  Because there are a number of different ways in which
+observatory information is determine this option prints detailed
+information on how the observatory database and parameters are
+ultimately selected.
+.le
+
+.ls observatory
+The default observatory used by tasks which use the special
+observatory identification "observatory".  The value is one of the
+observatory names in the observatory database (case ignored)
+or the special value "obspars" to select the parameters defined in this
+task.  There is no default to force users to set it at least once.
+.le
+.ls name
+Observatory name.
+.le
+.ls longitude
+Observatory longitude given in degrees west.
+.le
+.ls latitude
+Observatory latitude in degrees.  Positive latitudes are north and negative
+latitudes are south.
+.le
+.ls altitude
+Observatory altitude in meters above sea level.
+.le
+.ls timezone
+Observatory time zone.  The time zone is the number of hours west of
+Greenwich or the number of hours to be added to local time to obtain
+Greenwich time.
+.le
+.ih
+ENVIRONMENT VARIABLES
+.ls obsdb
+This variable selects the observatory database.  If not defined it defaults
+to noao$lib/obsdb.dat.
+.le
+.ls observatory
+This variable selects the observatory entry whenever a task uses the
+observatory name "observatory".  If not defined the value of the task
+parameter \fIobservatory.observatory\fR is used.
+.le
+.ih
+IMAGE HEADER KEYWORDS
+The observatory identification for images is first sought under the
+image header keyword OBSERVAT.  This always takes precedence over any
+other means of defining the observatory.
+.ih
+DESCRIPTION
+
+OBSERVATORY PARAMETERS IN THE NOAO PACKAGE
+
+Some astronomical data reduction and analysis tasks perform
+computations requiring information about where the data was observed.
+For example a number of \fBnoao\fR tasks make corrections for the
+airmass.  Generally they look for an airmass in the image header and
+if it is not present they attempt to compute it from other image header
+parameters.  The information about time and telescope coordinates
+of the observation are often in the image header but the observatory
+latitude is not.  The task must get this information somehow.
+
+Prior to IRAF V2.10 tasks generally had explicit parameters, such as
+latitude, with default values pointing (using parameter redirection) to
+the parameter of the same name in the \fBobservatory\fR task.  The
+user was required to know the values of the observatory parameters and
+manually change them for data from different observatories.  In V2.10
+an observatory database has been implemented.  Observatory parameters
+are stored in a simple text file and tasks obtain observatory related
+parameters by specifying an observatory identification.
+
+In general the information about the observatory should be directly
+associated with the image data.  Unless stated otherwise in the
+description of a task,  tasks which require observatory information
+will first look for the image header keyword OBSERVAT.  The value of
+this keyword is the observatory identification used to index the
+observatory database.  The task will then look up any observatory
+parameters it needs in the observatory database.  Data from
+observatories that support this keyword will, therefore, always use the
+correct observatory parameters without user intervention.  All
+observatories which export FITS image data are urged to adopt the
+OBSERVAT keyword (a keyword recommended by the FITS standard).
+
+For image data which do not identify the observatory in this way
+and in tasks which do not operate on images (such as astronomical
+calculator tools), the observatory must be specified by the user.
+Most tasks provide an "observatory" parameter which either directly
+selects the observatory or use special values for defining the
+observatory with an environment variable or the parameters
+from the \fBobservatory\fR task.
+
+An observatory is specified by the identification name used in the
+observatory database.  The names in the database may be listed using
+the \fBobservatory\fR task as described below.  If the desired observatory
+is not in the database a user may copy/create their own database and
+select it with the environment variable "obsdb", modify the standard
+database if allowed (any changes to the distributed version should
+be forwarded to iraf$noao.edu), or use the special observatory name
+"obspars".  The last option directly uses the parameters in the
+\fBobservatory\fR task which can be set to any values using the normal
+parameter editing mechanism.
+
+The default value for the observatory parameter in a task is generally
+"observatory".  This special name directs the task to look first
+for the environment variable of the same name and then at the
+\fIobservatory\fR parameter of the \fBobservatory\fR task.  The environment
+variable allows users or sites to set the default observatory in their
+login files and site defaults.  Also it is simple to change the
+default observatory either with a \fBreset\fR command or the
+\fBobservatory\fR command.
+
+The observatory database is selected by the environment variable
+"obsdb".  The default when the variable is not defined is the
+\fBnoao\fR package library database file "noao$lib/obsdb.dat".  The use
+of an environment variable allows users to permanently change the
+default database in the OS environment (when IRAF has access to it such
+as in UNIX systems) or in the startup IRAF environment as set in the
+"login.cl" or "loginuser.cl" files.  One can, of course, change it
+during a session with the set or reset commands.  For sites which want
+to customize the observatory mechanism the environment variables can
+also be set and changed in the files "hlib$zzsetenv.def",
+"noao$lib/zzsetenv.def", and the template login file "hlib$login.cl".
+
+An observatory database file consist of a simple list of keyword=value
+pairs with arbitrary whitespace allowed.  An observatory entry begins
+with the observatory keyword and extends to the next observatory
+keyword or the end of the file.  The observatory identification should
+be the same as the string used in the OBSERVAT image header parameter
+for data from that observatory.  The default file noao$lib/obsdb.dat
+begins as follows:
+
+.nf
+# Observatory Parameters.  Taken from the Almanac.
+#
+# Observatories wishing to be added or make changes in the default
+# distributed database should send information to iraf@noao.edu.
+
+observatory = "kpno"
+	name = "Kitt Peak National Observatory"
+	longitude = 111:36.0
+	latitude = 31:58.8
+	altitude = 2120.
+	timezone = 7
+
+observatory = "ctio"
+	<etc>
+.fi
+
+In summary, access to observatory parameters is now done by referencing
+the image header keyword OBSERVAT and, if not defined, determine the
+observatory name from a task parameter.  The environment variables
+"observatory" and "obsdb" can be set by the user to select alternate
+observatories and observatory database files.  For data without an
+observatory entry the observatory can be set to "obspars" or the user
+may make their own observatory database.
+
+THE OBSERVATORY TASK
+
+The \fBobservatory\fR task serves a number of functions.  It may be used to
+examine the observatory database, verify the observatory parameters which
+will be used by other tasks, particularly those operating on images, set
+the default observatory if not defined by other means, set observatory
+parameters explicitly, especially when there is no observatory database
+entry, and as a parameter set for tasks which explicitly reference
+observatory parameters.  The \fBverbose\fR parameter also provides a
+detailed check of the steps used to determine the observatory database,
+observatory identification, and observatory parameters.
+
+The \fIcommand\fR parameter takes the values "set", "list", or "images".
+The \fIobsid\fR parameter supplies the observatory identification and the
+\fIimages\fR parameter is used to specify a list of images for the "images"
+command.  The parameters are query parameters and so may be either queried
+or simply typed on the command line.
+
+The "set" command prints the observatory parameters for the specified
+observatory and sets many of these in the \fBobservatory\fR task
+parameters.  This command is used to set the default observatory parameters
+for tasks where images are not used, the images do not contain the
+observatory id, or direct references to specific parameters with parameter
+redirection (for example ")observatory.latitude") are used.
+
+The "list" command is similar to the "set" command except the task parameters
+are not modified.  It is used to list observatory parameters.  It is also
+use with the special observatory identifications to list the entries in
+an observatory database and verify the observatory to be used by
+tasks which do not operate on images.  The special value "?" lists
+the entries in the database.  The special value "observatory" lists
+the observatory defined by the "observatory" environment variable or
+that given by the \fIobservatory.observatory\fR parameter.  The special
+value "obspars" simply lists the observatory task parameters.
+
+The "images" command lists the observatory information applicable to
+one or more images.  In particular, the observatory identification is
+first sought in OBSERVAT image header keyword and, if not found, the
+\fIobsid\fR parameter is used.  Often the default observatory is
+"observatory" to follow the same search path used by other tasks.
+
+The \fIverbose\fR parameter prints additional detailed information.  It
+prints the database used and whether it is selected by default
+(noao$lib/obsdb.dat) or by the "obsdb" environment variable.  When the
+observatory is defined as "observatory" it indicates whether the
+observatory is defined by the environment variable "observatory" or by the
+observatory task.  When listing images it prints the OBSERVAT keyword or
+the default observatory assigned.
+
+For observatories not in a database the name, latitude, longitude,
+altitude, and time zone parameters may be set using \fBeparam\fR.
+The observatory id must be set to "obspars" in this case.
+These parameters will then be referenced by other tasks in which
+the observatory is specified as "obspars".  This allows arbitrary
+observatory parameters to be set without creating or modifying
+an observatory database.  However, it is advisable to create a
+local database and also send the observatory information to the
+IRAF group at NOAO for inclusion in the default database.
+.ih
+EXAMPLES
+1.  List the observatory entries in the database:
+
+.nf
+	cl> observatory list ? v+
+	Using default observatory database: noao$lib/obsdb.dat
+
+	default: Kitt Peak National Observatory
+	kpno: Kitt Peak National Observatory
+	ctio: Cerro Tololo Interamerican Observatory
+	eso: European Southern Observatory
+	lick: Lick Observatory
+	mmt: Whipple Observatory
+	cfht: Canada-France-Hawaii Telescope
+	lapalma: Roque de los Mucachos, La Palma
+.fi
+
+2.  Set the observatory parameters for Cerro Tololo:
+
+.nf
+	cl> observatory set ctio
+	Observatory parameters for Cerro Tololo...
+		observatory = ctio
+		timezone = 5
+		altitude = 2215.
+		latitude = -30:09.9
+		longitude = 70:48.9
+	         name = 'Cerro Tololo Interamerican Observatory'
+	cl> lpar observatory
+	      command = "set"		Command (set|list|images)
+	     argument = ctio		Observatory or images
+	 (observatory = "ctio")         Observatory identification
+	        (name = "Cerro Tololo...") Observatory name
+	   (longitude = 70.815)         Observatory longitude (degrees)
+	    (latitude = -30.165)        Observatory latitude (degrees)
+	    (altitude = 2215.)          Observatory altitude (meters)
+	    (timezone = 4)              Observatory time zone
+	     (verbose = no)             Verbose output?
+	        (mode = "q")            
+.fi
+
+3.  Set the observatory parameters to use the environment variable
+"observatory" and verify it.
+
+.nf
+	cl> set observatory=cfht
+	cl> observatory list observatory
+	Observatory parameters for Canada-France-Hawaii Telescope
+		observatory = cfht
+		timezone = 10
+		altitude = 4215
+		latitude = 19:49.6
+		longitude = 155:28.3
+		name = 'Canada-France-Hawaii Telescope'
+.fi
+
+4.  Change the default observatory database and verify verbosely:
+
+.nf
+	cl> set observatory="sco"
+	cl> set obsdb="/local/iraf/obsdb.dat"
+	cl> type obsdb$
+	# Local Observatory Parameters.
+
+	observatory = "sco"
+		name = "Small College Observatory"
+		longitude = 100:20.0
+		latitude = 35:58.8
+		altitude = 212.
+		timezone = 6
+	cl> observ set observatory v+
+	Using database defined by 'obsdb' environment variable:
+		/tmp/test/obsdb.dat
+	Using obs... defined by 'obs...' environment variable: sco
+	Using observatory parameters for database entry: sco
+	Observatory parameters for Small College Observatory
+		observatory = sco
+		timezone = 6
+		altitude = 212.
+		latitude = 35:58.8
+		longitude = 100:20.0
+		name = 'Small College Observatory'
+.fi
+
+5.  List the observatory assigned to some images with a default observatory
+determined either by the "observatory" environment variable or that set
+in the observatory task.
+
+.nf
+	cl> observ images observatory dev$pix,demoobj1
+	Observatory parameters for Small College Observatory
+		observatory = sco
+		timezone = 6
+		altitude = 212.
+		latitude = 35:58.8
+		longitude = 100:20.0
+		name = 'Small College Observatory'
+		Images: dev$pix (default observatory)
+	Observatory parameters for Kitt Peak National Observatory
+		observatory = kpno
+		timezone = 7
+		altitude = 2120.
+		latitude = 31:58.8
+		longitude = 111:36.0
+		name = 'Kitt Peak National Observatory'
+		Images: demoobj1 (OBSERVAT keyword)
+
+.fi
+
+6.  Set explicit observatory parameters:
+
+.nf
+	cl> epar observatory
+	<set observatory parameters>
+	cl> observ list obspars
+	Observatory parameters for North Pole
+		observatory = obspars
+		timezone = 0
+		altitude = 0.
+		latitude = 90.
+		longitude = 0.
+		name = 'North Pole'
+.fi
+
+7.  Use observatory parameters in expressions:
+
+.nf
+	cl> observ set kpno
+	Observatory parameters for Kitt Peak National Observatory
+		observatory = kpno
+		timezone = 7
+		altitude = 2120.
+		latitude = 31:58.8
+		longitude = 111:36.0
+		name = 'Kitt Peak National Observatory'
+	cl> = observ.lat
+	31.98
+	cl> = sin (3.14159/180 * observ.lat)
+	0.52962280742153
+.fi
+.ih
+SEE ALSO
+Tasks in astutil, imred, onedspec, and twodspec.
+.endhelp

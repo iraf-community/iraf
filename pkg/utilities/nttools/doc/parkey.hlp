@@ -1,0 +1,73 @@
+.help parkey Dec90 tables
+.ih
+NAME
+parkey -- Write an IRAF parameter to a header keyword.
+.ih
+USAGE
+parkey value output keyword
+.ih
+DESCRIPTION
+This task changes the value of a header keyword in either a table or an
+image. If the value of the task parameter 'add' is "yes", the task will
+allow you to add a new keyword to the header, otherwise, adding a new
+keyword will cause an error. Type conversion is performed if the data type of
+the header keyword differs from the data type of the input parameter 'value'. 
+If a new
+keyword is added to the file, the type is determined 
+from the input value. The
+strings "yes", "y", "no", "n", "true", "t", "false", and "f", in either
+upper or lower case, are interpreted as boolean values.
+.ih
+PARAMETERS
+.ls value [string]
+Input value to be written to the header keyword. (Strings are case sensitive.)
+.le
+.ls output [file name]
+Name of the file whose header keyword is to be changed.
+.le
+.ls keyword [string]
+Name of the header keyword to be changed. (The name is not case sensitive.)
+.le
+.ls (add = no) [boolean]
+Allow new header keywords to be added?  
+
+If 'add = no', then existing keywords
+can take new values but no new keywords can be added to the file.
+.le
+.ih
+EXAMPLES
+1. Set the header keyword 'OVERSCAN' in the file 'image.hhh' to 5:
+
+.nf
+tt> parkey 5 image.hhh overscan
+.fi
+
+2. Set the group parameter 'CTYPE1' in the second group of the same
+file to "ANGSTROM":
+
+.nf
+tt> parkey ANGSTROM image.hhh[2] ctype1
+.fi
+
+3. Set the header keyword 'YSTEP' to the value stored 
+in the IRAF parameter 'x':
+
+.nf
+tt> parkey (x) image.hhh ystep
+.fi
+
+4. Add the keyword 'COMPNAME' to the table header and put the value "FILTER1"
+in it:
+
+.nf
+tt> parkey FILTER1 graph.tab compname add+
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+keypar, keytab, partab, tabkey, tabpar
+.endhelp

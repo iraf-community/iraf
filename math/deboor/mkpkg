@@ -1,0 +1,49 @@
+# Makelib for the single precision Deboor spline package.
+
+$checkout libdeboor.a lib$
+$update   libdeboor.a
+$checkin  libdeboor.a lib$
+$exit
+
+libdeboor.a:
+	banfac.f
+	banslv.f
+	bchfac.f
+	bchslv.f
+	bsplbv.f
+	bsplpp.f
+	bsplvd.f
+	bspp2d.f
+	bvalue.f
+	chol1d.f
+	cubspl.f
+	cwidth.f
+	dtblok.f
+	factrb.f
+	fcblok.f
+	fsplin.x	bspln.h
+	interv.f
+	knots.f
+	l2appr.f
+	l2knts.f
+	newnot_fake.f
+	ppvalu.f
+	round.f
+	sbblok.f
+	setdat.f
+	setdat2.f
+	setdat3.f
+	setupq.f
+	seval.x		bspln.h
+	shiftb.f
+	slvblk.f
+	smooth.f
+	spline.x	bspln.h
+	splint.f
+	spllsq.x	bspln.h
+	splsqv.x	bspln.h
+	subbak.f
+	subfor.f
+	tautsp.f
+	titand.f
+	;

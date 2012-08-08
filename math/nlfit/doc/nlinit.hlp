@@ -1,0 +1,86 @@
+.help nlinit Feb91 "Nlfit Package"
+.ih
+NAME
+nlinit -- initialise curve descriptor
+.ih
+SYNOPSIS
+include <math/nlfit.h>
+
+nlinit[rd] (nl, fnc, dfnc, params, dparams, nparams, plist, nfparams,
+                tol, itmax)
+
+.nf
+pointer		nl		# curve descriptor
+int		fnc		# address of first user-supplied function
+int		dfnc		# address of second user-supplied function
+real/double	params[nparams]	# list of initial parameter values
+real/double	dparams[nparams]# list of parameter increments
+int		nparams		# number of parameters
+int		plist[nparams]	# list of parameters to be fit
+int		nfparams	# number of parameters to be fit
+real/double	tol		# fitting tolerance
+int		itmax		# maximum number of iterations
+.fi
+.ih
+ARGUMENTS
+.ls nl             
+Pointer to the curve descriptor structure.
+.le
+.ls fnc       
+The address of the user-supplied subroutine fncname for evaluating the function
+to be fit. The calling sequence of fncname is the following.
+
+.nf
+fncname (x, nvars, params, nparams, zfit)
+.fi
+.le
+.ls dfnc       
+The address of the user-supplied subroutine dfncname for evaluating the
+function to be fit and its derivatives with respect to the parameters.
+The calling sequence of dfncname is the following.
+
+.nf
+dfncname (x, nvars, params, dparams, nparams, zfit, derivs)
+.fi
+.le
+.ls params
+An array containing initial values of all the parameters, including both
+those to be fit and those that are to be held constant.
+.le
+.ls dparams
+An array parameter increment values over which the derivatives are to be
+computed empirically. If equations are supplied for the derivatives
+inside dfnc, the dparams array is not used.
+.le
+.ls nparams
+The total number of parameters in the user-supplied function.
+.le
+.ls plist
+The list of parameters to be fit. Plist is an integer array containing
+the indices of those parameters in params to be fit.
+.le
+.ls nfparams
+The total number of parameters to be fit.
+.le
+.ls tol   
+The fitting tolerance. If the difference in the chi-squared
+from one iteration to the next is less than the fitting tolerance
+times the current chi-squared, the fit has converged.
+.le
+.ls itmax
+The maximum number of fitting iterations. Itmax must be greater than
+or equal to 3.
+.le
+.ih
+DESCRIPTION
+Allocate space for the curve descriptor structure and the arrays and
+vectors used by the numerical routines. Initialize all arrays and vectors
+to zero. Return the curve descriptor to the calling routine.
+.ih
+NOTES
+NLINIT must be the first NLFIT routine called. NLINIT returns a NULL pointer
+if it encounters an illegal parameter list.
+.ih
+SEE ALSO
+nlfree
+.endhelp

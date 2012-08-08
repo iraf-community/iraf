@@ -1,0 +1,770 @@
+.help ecidentify May88 noao.imred.echelle
+.ih
+NAME
+ecidentify -- Determine the dispersion relation in echelle spectra
+.ih
+USAGE
+ecidentify images
+.ih
+PARAMETERS
+.ls images
+List of echelle format spectra in which to identify lines and fit
+dispersion functions.
+.le
+.ls database = "database"
+Database in which the feature data and dispersion functions are recorded.
+.le
+.ls coordlist = "linelists$idhenear.dat"
+User coordinate list consisting of an ordered list of line coordinates.  A
+comment line of the form "# units <units>", where <units> is one of the
+understood units names, defines the units of the line list.  If no units
+are specified then Angstroms are assumed.  Some standard line lists are
+available in the directory "linelists$".  The standard line lists are
+described under the topic \fIlinelists\fR.
+.le
+.ls units = ""
+The units to use if no database entry exists.  The units are specified as
+described in
+
+.nf
+    cl> help onedspec.package section=units
+.fi
+
+If no units are specified and a coordinate list is used then the units of
+the coordinate list are selected.  If a database entry exists then the
+units defined there override both this parameter and the coordinate list.
+.le
+.ls match = 1.
+The maximum difference for a match between the feature coordinate function
+value and a coordinate in the coordinate list.  The unit of this parameter
+is that of the user coordinates.
+.le
+.ls maxfeatures = 100
+Maximum number of the strongest features to be selected automatically from
+the coordinate list (function 'l') or from the image data (function 'y').
+.le
+.ls zwidth = 10.
+Width of graphs, in user coordinates, when in zoom mode (function 'z').
+.le
+
+The following parameters are used in determining feature positions.
+.ls ftype = "emission"
+Type of features to be identified.  The possibly abbreviated choices are
+"emission" and "absorption".
+.le
+.ls fwidth = 4.
+Width in pixels of features to be identified.
+.le
+.ls cradius = 5.
+The maximum distance, in pixels, allowed between a feature position
+and the initial estimate when defining a new feature.
+.le
+.ls threshold = 10.
+In order for a feature center to be determined the range of pixel intensities
+around the feature must exceed this threshold.
+.le
+.ls minsep = 2.
+The minimum separation, in pixels, allowed between feature positions
+when defining a new feature.
+.le
+
+The following default parameters are used when fitting a function to
+the user coordinates.  If a previous solution is read from the database
+then the parameters from that solution override the defaults below.
+.ls function = "chebyshev"
+The function to be fit to the user coordinates as a function of the pixel
+coordinate and aperture number.  The choices are bi-dimensional
+"chebyshev" and "legendre" polynomials.
+.le
+.ls xorder = 2
+Order of the fitting function along each echelle order.
+The order is the number of polynomial terms; i.e. xorder = 2 is a linear
+function.
+.le
+.ls yorder = 2
+Order of the fitting function with respect to the aperture number.
+The order is the number of polynomial terms; i.e. yorder = 2 is a linear
+function.
+.le
+.ls niterate = 0, lowreject = 3, highreject = 3.
+Default number of rejection iterations and the sigma clipping thresholds.  If
+\fIniterate\fR is zero then no rejection is done.
+.le
+
+The following parameters control the graphics input and output.
+.ls graphics = "stdgraph"
+Graphics device.  The default is the standard graphics device which is
+generally a graphics terminal.
+.le
+.ls curosr = ""
+Cursor input file.  If a cursor file is not given then the standard graphics
+cursor is read.
+.le
+.ih
+CURSOR KEYS
+
+.nf
+           ECIDENTIFY CURSOR KEY AND COLON COMMAND SUMMARY
+
+?  Help                   a  Affect all features     c  Center feature(s)
+d  Delete feature(s)      f  Fit dispersion          g  Fit zero point shift
+i  Initialize             j  Go to previous order    k  Go to next order
+l  Match coordinate list  m  Mark feature            n  Next feature
+o  Go to specified order  p  Pan graph               q  Quit
+r  Redraw graph           s  Shift feature           t  Reset position
+u  Enter user coordinate  w  Window graph            x  Crosscorrelate peaks
+y  Find peaks             z  Zoom graph              .  Nearest feature
++  Next feature           -  Previous feature        I  Interrupt
+
+:show [file]              :features [file]           :coordlist [file]
+:cradius [value]          :threshold [value]         :database [file]
+:ftype [type]             :fwidth [value]            :image [image]
+:labels [type]            :match [value]             :maxfeatures [value]
+:minsep [value]           :read [image]              :write [image]
+:zwidth [value]
+
+
+       ECHELLE DISPERSION FUNCTION FITTING COMMAND SUMMARY
+
+?  Help             c  Print coordinates             d  Delete point
+f  Fit dispersion   o  Fit with fixed order offset   q  Quit
+r  Redraw graph     u  Undelete point                w  Window graph
+x  Set ordinate     y  Set abscissa                  I  Interrupt
+
+:show               :function [value]   :highreject [value]   :lowreject [value]
+:niterate [value]   :xorder [value]     :yorder [value]
+
+.fi
+
+            ECIDENTIFY CURSOR KEYS AND COLON COMMANDS
+.ls ?
+Clear the screen and print a menu of cursor and colon commands.
+.le
+.ls a
+Apply next (c)enter or (d)elete operation to (a)ll features
+.le
+.ls c
+(C)enter the feature nearest the cursor.  Used when changing the position
+finding parameters or when features are defined from a previous feature list.
+May be used in combination with the (a)ll key.
+.le
+.ls d
+(D)elete the feature nearest the cursor.  (D)elete all features when preceded
+by the (a)ll key.  This does not affect the dispersion function.
+.le
+.ls f
+(F)it a function of the pixel coordinates and aperture numbers to the user
+coordinates.  This enters an interactive function fitting package.
+.le
+.ls g
+Fit a zero point shift to the user coordinates by minimizing the difference
+between the user and fitted coordinates.  The coordinate dispersion function
+is not changed.
+.le
+.ls i
+(I)nitialize (delete features and dispersion function fit).
+.le
+.ls j
+Go to the next aperture in decreasing line number in the echelle format image.
+Wrap around to the last line from the first line.
+.le
+.ls k
+Go to the next aperture in increasing line number in the echelle format image.
+Wrap around to the first line from the last line.
+.le
+.ls l
+(L)ocate features in the coordinate list.  A coordinate function must be
+defined or at least four features in more than one aperture must have user
+coordinates from which a coordinate function can be determined by an
+initial automatic function fit.
+.le
+.ls m
+(M)ark a new feature using the cursor position as the initial position
+estimate.
+.le
+.ls n
+Move the cursor or zoom to the (n)ext feature (same as +).
+.le
+.ls o
+Go to a specific aperture (related to an echelle (o)rder).  The user
+is queried for the aperture number.
+.le
+.ls p
+(P)an to the original window after (z)ooming on a feature.
+.le
+.ls q
+(Q)uit and continue with next image.
+.le
+.ls r
+(R)edraw the graph.
+.le
+.ls s
+(S)hift the fit coordinates relative to the pixel coordinates.  The
+user specifies the desired coordinate at the position of the cursor
+and a zero point shift to the fit coordinates is applied.  If features
+are defined then they are recentered and the shift is the average shift.
+The shift in pixels, user coordinates, and z (fractional shift) is printed.
+The user shift is for the fundamental order and the shift for each order
+is then given by this shift divided by the order number.
+.le
+.ls t
+Reset the current feature to the position of the cursor.  The feature
+is \fInot\fR recentered.  This is used to mark an arbitrary position.
+.le
+.ls u
+Enter a new (u)ser coordinate for the current feature.
+When (m)arking a new feature the user coordinate is also requested.
+.le
+.ls w
+(W)indow the graph.  A window prompt is given and a number of windowing
+options may be given.  For more help type '?' to the window prompt or
+see help under \fIgtools\fR.
+.le
+.ls x
+Crosscorrelate features with the data peaks and reregister.  This is
+generally used with a feature list from a different image.
+The mean shift in user coordinates, mean shift in pixels, and the fractional
+shift in user coordinates is printed.  The user shift is scaled to the
+fundamental order.
+.le
+.ls y
+Up to \fImaxfeatures\fR emission peaks are found automatically (in order of
+peak intensity) and, if a dispersion solution is defined, the peaks are
+identified from the coordinate list.
+.le
+.ls z
+(Z)oom on the feature nearest the cursor.  The width of the zoom window
+is determined by the parameter \fIzwidth\fR.
+.le
+.ls .
+Move the cursor or zoom window to the feature nearest the cursor.
+.le
+.ls 4 +
+Move the cursor or zoom window to the (n)ext feature.
+This does not automatically move to the next aperture.
+.le
+.ls 4 -
+Move the cursor or zoom window to the previous feature.
+This does not automatically move to the next aperture.
+.le
+.ls I
+Interrupt the task immediately.  The database is not updated.
+.le
+
+Parameters are shown or set with the following "colon commands", which may be
+abbreviated.  To show the value of a parameter type the parameter name alone
+and to set a new value follow the parameter name by the value.
+.ls :show file
+Show the values of all the parameters.  If a file name is given then the
+output is appended to that file.  If no file is given then the terminal
+is cleared and the output is sent to the terminal.
+.le
+.ls :features file
+Print the feature list and the fit rms.  If a file name is given then the
+output is appended to that file.  If no file is given then the terminal
+is cleared and the output is sent to the terminal.
+.le
+.ls :coordlist file
+Set or show the coordinate list file.
+.le
+.ls :cradius value
+Set or show the centering radius in pixels.
+.le
+.ls :threshold value
+Set or show the detection threshold for centering.
+.le
+.ls :database name
+Set or show the database for recording feature records.
+.le
+.ls :ftype value
+Set or show the feature type (emission or absorption).
+.le
+.ls :fwidth value
+Set or show the feature width in pixels.
+.le
+.ls :image imagename
+Set a new image or show the current image.
+.le
+.ls :labels value
+Set or show the feature label type (none, index, pixel, or user).
+.le
+.ls :match value
+Set or show the coordinate list matching distance.
+.le
+.ls :maxfeatures value
+Set or show the maximum number of features automatically found.
+.le
+.ls :minsep value
+Set or show the minimum separation allowed between features.
+.le
+.ls :read name
+Read a record from the database.  The record name defaults to the image name.
+.le
+.ls :threshold value
+Set or show the centering threshold.
+.le
+.ls :write name
+Write a record to the database.  The record name defaults to the image name.
+.le
+.ls :zwidth value
+Set or show the zoom width in user units.
+.le
+
+
+              DISPERSION FUNCTION FITTING COMMANDS
+.ls ?
+Page help information.
+.le
+.ls c
+Print input and fitted coordinates of point nearest the cursor.
+.le
+.ls d
+Delete the nearest undeleted point to the cursor.
+.le
+.ls f
+Fit a dispersion function including determining the order offset.
+.le
+.ls o
+Fit a dispersion function with the order offset fixed.  The user is queried
+for the order offset.  This is faster than the interactive fit to also
+determine the order.
+.le
+.ls q
+Quit and return to the spectrum display.
+.le
+.ls r
+Redraw the graph.
+.le
+.ls u
+Undelete the nearest deleted point to the cursor (which may be outside the
+graph window).
+.le
+.ls w
+Window the graph (type ? to the window prompt for more help).
+.le
+.ls x
+Set the quantity plotted along the ordinate (x axis).
+.le
+.ls y
+Set the quantity plotted along the abscissa (y axis).
+.le
+.ls I
+Interrupt the task immediately.  No information is saved in the database.
+.le
+
+.ls :function [value]
+Print or set the function type (chebyshev|legendre).
+.le
+.ls :show
+Print current function and orders.
+.le
+.ls :niterate [value], :lowreject [value], :highreject [value]
+Print or set the iterative rejection parameters.
+.le
+.ls :xorder [value]
+Print or set the order for the dispersion dependence.
+.le
+.ls :yorder [value]
+Print or set the order for the echelle order dependence.
+.le
+.ih
+DESCRIPTION
+Emission and absorption features in echelle format spectra (see \fIapsum\fR)
+are identified interactively and from a line list and a dispersion
+function is determined.  The results of the line identifications and
+dispersion function are stored in a database for further reference and
+for use with the tasks \fBecreidentify\fR and \fBecdispcor\fR.  Also
+the reference spectrum keyword REFSPEC is added to the image header.
+This is used by \fBrefspectra\fR and \fBecdispcor\fR.
+
+Each spectrum in the input list is identified in turn.  Initially the
+order in the first image line is graphed.  The user may change the
+displayed order with the 'j', 'k', and 'o' keys.  The initial feature
+list and dispersion function are read from the database if an entry
+exists.  The features are marked on the graph.  The image coordinates
+are in pixels unless a dispersion function is defined, in which case
+they are in user coordinate units (usually wavelength in Angstroms).
+The aperture number, pixel coordinate, coordinate function value, and
+user coordinate for the current feature are displayed on the status
+line.
+
+For consistency the orders are always identified by their aperture
+numbers in this task and all other tasks.  These are the
+identifications assigned when extracting the orders using the task
+\fIapsum\fR.  If the user has assigned true order numbers as the
+aperture numbers then there is no distinction between aperture and
+order number.  However, it is often the case that the aperture numbers
+are simply assigned sequentially and the true order numbers may not
+even be known.  Initially the orders are the same as the apertures
+numbers but after fitting a dispersion function the true order numbers
+will be determined.  This information is also recorded in the database
+and indicated in the graph titles but selecting an order to be graphed
+with 'o' and the status line information is always in terms of the
+aperture number.
+
+The graphics cursor is used to select features and perform various
+functions.  A menu of the keystroke options and functions is printed
+with the key '?'.  The cursor keys and their functions are defined in
+the CURSOR KEYS sections and described further below.  The standard
+cursor mode keys are also available to window and redraw the graph and
+to produce hardcopy "snaps".
+
+There are two types of feature selection functions;  defining new
+features and selecting previously defined features.  The key 'm' marks
+a new feature nearest the cursor position.  The feature position is
+determined by the feature centering algorithm (see help for
+\fBcenter1d\fR).  The type of feature, emission or absorption, is set
+by the \fIftype\fR parameter.  If the new position is within a distance
+given by the parameter \fIminsep\fR of a previous feature it is
+considered to be the same feature and replaces the old feature
+(normally the position of the new feature will be exactly the same as
+the original feature).  The coordinate list is searched for a match
+between the coordinate function value (when defined) and a user
+coordinate in the list.  If a match is found it becomes the default
+user coordinate which the user may override.  The new feature is marked
+on the graph and it becomes the current feature.  The redefinition of a
+feature which is within the minimum separation may be used to set the
+user coordinate from the coordinate list.  The key 't' allows setting
+the position of a feature to other than that found by the centering
+algorithm.
+
+The 'y' key applies a peak finding algorithm and up to the maximum
+number of features (\fImaxfeatures\fR) are found.  If there are more
+peaks only the strongest are kept.  The peaks are then matched against
+the coordinate list to find user coordinate values.
+
+To select a different feature as the current feature the keys '.', 'n',
+'+', and '-' are used.  The '.' selects the feature nearest the cursor,
+the 'n' and '+' select the next feature, and the '-' selects the
+previous feature relative to the current feature in the feature list as
+ordered by pixel coordinate.  These keys are useful when redefining the
+user coordinate with the 'u' key and when examining features in zoom
+mode.  To change apertures (orders) the 'j', 'k', and 'o' keys are
+used.
+
+If four or more features are identified spanning the range of the data
+(in pixel coordinates and in order number) or if a coordinate function
+is defined then the 'l' key may be used to identify additional features
+from a coordinate list.  If a coordinate function is not defined the
+default function is fit to the user coordinates of the currently
+defined features.  Then for each coordinate value in the coordinate
+list the pixel coordinate is determined and a search for a feature at
+that point is made.  If a feature is found (based on the parameters
+\fIftype, fwidth\fR, \fIcradius\fR, and \fBthreshold\fR) its user
+coordinate value based on the coordinate function is determined.  If
+the coordinate function value matches the user coordinate from the
+coordinate list within the error limit set by the parameter \fImatch\fR
+then the new feature is entered in the feature list.  Up to a maximum
+number of features, set by the parameter \fImaxfeatures\fR, may be
+defined in this way.  A new user coordinate function is fit to all the
+located features.  Finally, the graph is redrawn in user coordinates
+with the additional features found from the coordinate list marked.
+
+The 'f' key fits a two dimensional function of the pixel coordinates
+and aperture number to the user coordinates.  The type of function and
+the orders are initially set with the parameters \fIfunction\fR,
+\fIxorder\fR, and \fIyorder\fR.  The value of the function for a
+particular pixel coordinate is called the function coordinate and each
+feature in the feature list has a function coordinate value.  The
+fitted function also is used to convert pixel coordinates to user
+coordinates in the graph.  Depending on the orders of the function
+four or more features are required covering at least two orders.
+A description of the dispersion function fitting is given the section
+ECHELLE DISPERSION FUNCTION FITTING.
+
+If a zero point shift is desired without changing the coordinate function
+the user may specify the coordinate of a point in the spectrum with
+the 's' key from which a shift is determined.  The 'g' key also
+determines a shift by minimizing the difference between the user
+coordinates and the fitted coordinates.  This is used when a previously
+determined coordinate function is applied to a new spectrum having
+fewer or poorer lines and only a zero point shift can reasonably be
+determined.  Note that the zero point shift is in user coordinates
+for the fundamental order.  The shift for any particular order is then
+the zero point shift divided by the order number.
+
+Features may be delete with the key 'd'.  All features are deleted when
+the 'a' key immediately precedes the delete key.  Deleting the features
+does not delete the coordinate function.  To delete both the features
+and the dispersion function the initialize key 'i' is used.  Note
+features deleted during dispersion function fitting also are removed
+from the feature list upon exiting the fitting package.
+
+It is common to transfer the feature identifications and coordinate
+function from one image to another.  When a new image without a
+database entry is examined, such as when going to the next image in the
+input list or selecting a new image with the ":image" command, the
+current feature list and coordinate function are kept.  Alternatively,
+a database record from a different image may be read with the ":read"
+command.  When transferring feature identifications between images the
+feature coordinates will not agree exactly with the new image feature
+positions and several options are available to reregister the feature
+positions.  The key 'c' centers the feature nearest the cursor using
+the current position as the starting point.  When preceded with the 'a'
+key all the features are recentered (the user must refit the coordinate
+function if desired).  As an aside, the recentering function is also
+useful when the parameters governing the feature centering algorithm
+are changed.
+
+The (c)entering function is applicable when the shift between the
+current and true feature positions is small.  Larger shifts may be
+determined automatically with the 'x' function which correlates
+features in the image with the feature list.  The features are then
+recentered.  A zero point shift may also be given interactively with
+the 's' key by using the cursor to indicate the coordinate of a point
+in the spectrum.  If there are no features then the shift is exactly as
+marked by the cursor but if there are features the approximate shift is
+applied and then the features are recentered.  The shift is then the
+mean shift of the features after recentering.  The shift is used as a
+zero point offset added to the dispersion function.  The shift is
+computed in user coordinates for the fundamental order.  Shifts for
+each order are given by scaling of this shift.
+
+In addition to the single keystroke commands there are commands
+initiated by the key ':' (colon commands).  As with the keystroke
+commands there are a number of standard graphics features available
+begining with ":." (type ":.help" for these commands).  The colon
+commands allow the task parameter values to be listed and to be reset
+within the task.  A parameter is listed by typing its name.  The colon
+command ":show" lists all the parameters.  A parameter value is reset
+by typing the parameter name followed by the new value; for example
+":match 10".  Other colon commands display the feature list
+(:features), control reading and writing records to the database (:read
+and :write), and set the graph display format.
+
+The feature identification process for an image is completed by typing
+'q' to quit.  Attempting to quit an image without explicitly recording
+changes in the feature database produces a warning message and an
+opportunity to record the information in the database.  As an immediate
+exit the 'I' interrupt key may be used.  This does not save the feature
+information.
+.ih
+ECHELLE DISPERSION FUNCTION FITTING
+If a minimum of four features over at least two orders, depending on
+the default function orders, have been identified a dispersion function
+relating the user coordinates to the extracted pixel coordinate and
+aperture number may be fit.  However, more features are preferable to
+determine changes in the dispersion as a function of position and
+order.
+
+The form of the function fit explicitly includes the basic order number
+dependence of echelle spectra; namely the wavelength of a particular
+point along the dispersion direction in different orders varies as the
+reciprocal of the order number.  Because of distortions, the differing
+extraction paths through the two dimensional image, and rotations of
+the spectra relative to the axis of constant dispersion (i.e. aligning
+the orders with the image columns or lines instead of aligning the
+emission and absorption features) there will be residual dependancies on
+the extracted pixel positions and orders.  These residual dependancies
+are fit by a two dimensional polynomial of arbitrary order including
+cross terms.  Because the basic order number dependence has been
+removed the orders should be relatively low.  Currently the functions
+are bi-dimensional chebyshev and legendre polynomials though other
+function may be added in the future.
+
+Since the true order number may not be known initially a linear
+relation between the aperture numbers and the order numbers is also
+determined which minimizes the residuals.  This relation allows an
+unknown offset and possible a reversed direction of increasing order.
+The fitted function is then represented as:
+
+.nf
+		y = offset +/- aperture
+
+		wavelength = f (x, y) / y
+.fi
+
+where y is the order number and x is the extracted pixel coordinate along the
+dispersion.
+ 
+If the order offset is known initially or as a result of previous the 'o'
+fit may be used.  The dispersion minimization for the order offset is
+then not done.  This will, therefore, be faster than using the full
+fit, key 'f', to also determine the order offset.
+
+The fitting is done interactively as a submode of \fBecidentify\fR with its
+own set of cursor commands.  It is entered using the 'f' key and exited using
+the 'q' key.  The list of commands is given the CURSOR KEY section and is
+available from the fitting mode with '?'.  The functionality of this fitting
+is fairly simple; the function and orders may be changed, points may be deleted
+and undeleted, and the results of the fit may be displayed in various formats
+by selecting quantities to be plotted along either axis.  Generally one
+changes plotting of the pixel coordinate, order number, and wavelength
+along the x axis and residuals or radial velocity errors along the y axis.
+One switches between increasing the x order and the y order while switching
+between plotting verses x positions and order number until the residuals
+have been reduced to remove all systematic trends.
+.ih
+DATABASE RECORDS
+The database specified by the parameter \fIdatabase\fR is a directory of
+simple text files.  The text files have names beginning with 'ec' followed
+by the entry name, usually the name of the image.  The database text files
+consist of a number of records.  A record begins with a line starting with the
+keyword "begin".  The rest of the line is the record identifier.  Records
+read and written by \fBecidentify\fR have "ecidentify" as the first word of the
+identifier.  Following this is a name which may be specified following the
+":read" or ":write" commands.  If no name is specified then the image name
+is used.  The lines following the record identifier contain
+the feature information and dispersion function coefficients.
+.ih
+ECHELLE DISPERSION FUNCTIONS
+The fitted echelle dispersion functions are evaluated as described in
+this section.  The basic equations are
+
+.nf
+    (1)  w = (f(x,o) + shift) / o
+    (2)  o = ap * slope + offset
+.fi
+
+where w is the wavelength, x is the pixel coordinate along the order, o is
+the order, and ap is the aperture number.  The database parameter "shift"
+provides a wavelength zero point shift and the parameters "slope" and
+"offset" provide the transformation between aperture number and order.
+Note that the function f(x,o) and the shift are in terms of first order
+wavelengths.
+
+The database entries contain "parameter value" pairs.  This includes the
+parameters "shift", "offset", and "slope" defined above.  The default
+values for these if they are absent are 0, 0, and 1 respectively.  The
+"coefficients" parameter specifies the number of coefficients that follow
+and define the first order wavelength dispersion function.  The
+coefficients and functions are described below.
+
+The numerical values following the "coefficients" parameter, shown in
+the order in which they appear, have the following meaning.
+
+.nf
+    type	Function type: 1=chebychev, 2=legendre
+    xpow	Highest power of x
+    opow	Highest power of o
+    xterms	Type of cross terms: Always 1 for echelle functions
+    xmin	Minimum x for normalization
+    xmax	Maximum x for normalization
+    omin	Minimum o for normalization
+    omax	Maximum o for normalization
+    Cmn		Coefficients: m=0-xpow, n=0-opow, m varies first
+.fi
+
+The functions are evaluated by a sum over m and n up to the specified
+highest powers.
+
+.nf
+    (3)  f(x,o) = sum {Cmn * Pm * Pn}	m=0-xpow, n=0-opow
+.fi
+
+The Cmn are the coefficients of the polynomial terms Pm and Pn which
+are defined as follows.
+
+.nf
+    Chebyshev:
+	xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+	P0 = 1.0
+	P1 = xnorm
+	Pm+1 = 2.0 * xnorm * Pm - Pm-1 
+
+	onorm = (2 * o - (omax + omin)) / (omax - omin)
+	P0 = 1.0
+	P1 = onorm
+	Pn+1 = 2.0 * onorm * Pn - Pn-1 
+
+    Legendre:
+	xnorm = (2 * x - (xmax + xmin)) / (xmax - xmin)
+	P0 = 1.0
+	P1 = xnorm
+	Pm+1 = ((2m + 1) * xnorm * Pm - m * Pm-1)/ (m + 1)   
+
+	onorm = (2 * o - (omax + omin)) / (omax - omin)
+	P0 = 1.0
+	P1 = onorm
+	Pn+1 = ((2n + 1) * onorm * Pn - n * Pn-1)/ (n + 1)   
+.fi
+
+Note that the polynomial terms are obtained by first normalizing the x and
+o values to the range -1 to 1 and then iteratively evaluating them.
+.ih
+EXAMPLES
+Because this task is interactive it is difficult to provide an actual
+example.  The following describes a typical usage on arc spectra.
+
+	cl> ecidentify arc1.ec,arc2.ec
+
+.ls (1)
+The database is searched for an entry for arc1.ec.  None is found and
+the first order is plotted as a function of pixel coordinate.
+.le
+.ls (2)
+Using a line identification chart or vast experience one of the
+emission lines is identified and marked with the 'm' key.  Using the
+cursor position a center is found by the centering algorithm.  The
+aperture number, pixel position, wavelength (which is currently the
+same as the pixel position), and a prompt for the true value with the
+default value INDEF is printed.  The true wavelength is typed in and the
+status line is redrawn with the information for the feature.
+.le
+.ls (3)
+The orders are changed with the 'j', 'k', or 'o' key and further lines are
+identified with the 'm' key.
+.le
+.ls (4)
+After a number of lines have been marked spanning the full range of the orders
+and pixel coordinates the key 'l' is typed.  The program now fits a preliminary
+dispersion solution using the current function and function orders.  Using this
+function it examines each line in the line list and checks to see if there is
+an emission line at that point.  With many orders and lots of lines this may
+take some time.  After additional lines have been identified (up to
+\fImaxfeatures\fR lines) the function is refit.  Finally the current order
+is regraphed in user coordinates.
+.le
+.ls (5)
+Again we look at some orders and see if the automatic line identifications
+make sense.
+.le
+.ls (6)
+We next enter the dispersion function fitting mode with 'f'.  A plot of the
+residuals vs. pixel position is drawn.  Some obvious misidentifications may
+be deleted with the 'd' key.  One way to proceed with determining the
+function orders is to start at the lowest orders (xorder = 2 for linear
+and yorder = 1 for no order dependence beyond the basic dependence).  We then
+increase each order one at a time.  The x axis is changed between order
+number and pixel position using the 'x' key to see the dependence on each
+dimension.  The orders are increased until there are no systematic trends
+apparent.  Normally the y order (for the aperture or order number dependence)
+is low such as 2 to 4 while the x order (for the dispersion direction) is
+whatever is needed to account for distortions.  Also one can prune deviant
+points with the 'd' key.  Note that the order offset derived from the
+aperture number is given in the title block along with the RMS.  When done
+we exit with 'q'.
+.le
+.ls (7)
+The new function fit is then evaluated for all orders and the current order
+is redrawn based on the new dispersion.  Note also that the status line
+information for the current feature has both the fitted wavelength and the
+user identified wavelength.  We can add or delete lines and iterate with the
+fitting until we are happy with the feature list and dispersion function.
+.le
+.ls (8)
+Typing 'q' exits the graph and prints a query about saving the information
+in the database.  We answer yes to this query.  Note that information can
+also be saved while still in the graphics loop using ":write".
+.le
+.ls (9)
+The next image in the list is then graphed but the last dispersion solution
+and feature list is maintained.  If the shift is small for the new arc we
+type 'a' 'c' to recenter all the features.  This does not refit the dispersion
+automatically so we then do 'f'.  Alternatively, we could use the 's' or 'x'
+keys to determine a large shift and do the recentering.
+.le
+.ls (10)
+Finally we can exit with 'q' or examine further images with the ":image"
+command.
+.le
+.ih
+REVISIONS
+.ls ECIDENTIFY V2.11
+The dispersion units are now determined from a user parameter,
+the coordinate list, or the database entry.
+.le
+.ih
+SEE ALSO
+apsum, center1d, gtools, ecreidentify, identify
+.endhelp

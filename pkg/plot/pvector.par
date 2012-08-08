@@ -1,0 +1,39 @@
+image,s,a,,,,image containing vector to be plotted
+x1,r,a,,1.,,x-coord of first point
+y1,r,a,,1.,,y-coord of first point
+x2,r,a,,1.,,x-coord of second point
+y2,r,a,,1.,,y-coord of second point
+xc,r,a,,,,x-coord of center point
+yc,r,a,,,,y-coord of center point
+width,i,h,1,1,,width of strip
+theta,r,h,INDEF,0.,360.,angle of vector (ccw from +x axis)
+length,r,h,INDEF,,,length of vector in theta mode
+boundary,s,h,constant,"constant|nearest|reflect|wrap|project",,type of boundary extension to use
+constant,r,h,0.,,,the constant for constant-valued boundary extension
+vec_output,s,h,"",,,file or image name if output vector is desired
+out_type,s,h,"text","text|image",,type of output format (image|text)
+wx1,r,h,0.,,,left user x-coord if not autoscaling
+wx2,r,h,0.,,,right user x-coord if not autoscaling
+wy1,r,h,0.,,,lower user y-coord if not autoscaling
+wy2,r,h,0.,,,upper user y-coord if not autoscaling
+pointmode,b,h,no,,,plot points instead of lines
+marker,s,h,"box",,,point marker or line mode 
+szmarker,r,h,5E-3,,,marker size (0 for list input)
+logx,b,h,no,,,log scale x-axis
+logy,b,h,no,,,log scale y-axis
+xlabel,s,h,"",,,x-axis label
+ylabel,s,h,"",,,y-axis label
+title,s,h,"imtitle",,,title for plot
+vx1,r,h,0.,,,left limit of device window (ndc coords)
+vx2,r,h,0.,,,right limit of device window (ndc coords)
+vy1,r,h,0.,,,bottom limit of device window (ndc coords)
+vy2,r,h,0.,,,upper limit of device window (ndc coords)
+majrx,i,h,5,,,number of major divisions along x grid
+minrx,i,h,5,,,number of minor divisions along x grid
+majry,i,h,5,,,number of major divisions along y grid
+minry,i,h,5,,,number of minor divisions along y grid
+round,b,h,no,,,round axes to nice values
+fill,b,h,yes,,,fill device viewport regardless of aspect ratio?
+append,b,h,no,,,append to existing plot
+device,s,h,"stdgraph",,,output device
+mode,s,h,'ql'

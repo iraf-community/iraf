@@ -1,0 +1,16 @@
+# Help directory for the IIS package
+
+$doc		= "images$tv/iis/doc/"
+$iis		= "images$tv/iis/"
+
+blink		hlp=doc$blink.hlp,		src=iis$blink.cl
+cv		hlp=doc$cv.hlp			src=iis$src/cv.x
+cvl		hlp=doc$cvl.hlp
+erase		hlp=doc$erase.hlp,		src=iis$erase.cl
+frame		hlp=doc$frame.hlp,		src=iis$frame.cl
+lumatch		hlp=doc$lumatch.hlp,		src=iis$lumatch.cl
+monochrome	hlp=doc$monochrome.hlp,		src=iis$monochrome.cl
+pseudocolor	hlp=doc$pseudocolor.hlp,	src=iis$pseudocolor.cl
+rgb		hlp=doc$rgb.hlp,		src=iis$rgb.cl
+window		hlp=doc$window.hlp,		src=iis$window.cl
+zoom		hlp=doc$zoom.hlp,		src=iis$zoom.cl

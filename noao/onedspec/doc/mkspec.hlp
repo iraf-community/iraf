@@ -1,0 +1,86 @@
+.help mkspec Mar92 noao.onedspec
+.ih
+NAME
+mkspec -- generate an artificial spectrum or image (obsolete)
+.ih
+USAGE
+mkspec image_name image_title ncols nlines function
+.ih
+PARAMETERS
+.ls image_name
+The name to be given to the image file
+.le
+.ls image_title
+A character string to be used to describe the image
+.le
+.ls ncols
+The number of pixels in the spectrum (the length of the image).
+.le
+.ls nlines
+The number or lines (rows) in the image.
+.le
+.ls function
+An indicator specifying the form of the spectrum: 1 - a constant,
+2 - a ramp running from start_level to end_level, 3 - a black body
+extending in wavelength (Angstroms) from start_wave to end_wave
+at a given temperature (in degrees K).
+.le
+.ls constant
+The value to be assigned to the spectrum if function=1 (constant).
+.le
+.ls start_level
+The starting value to be assigned to the spectrum at pixel 1 if
+function=2 (ramp).
+.le
+.ls end_level
+The ending value of the spectrum assigned at pixel=ncols if function=2.
+.le
+.ls start_wave
+The wavelength (Angstroms) assigned to pixel 1 if function=3 (Black Body).
+.le
+.ls end_wave
+The wavelength (Angstroms) assigned to the last pixel if function=3.
+.le
+.ls temperature
+The black body temperature (degrees K) for which the spectrum
+is to be created if function=3.
+.le
+.ih
+DESCRIPTION
+An artificial image is created with the specified name and length.
+The image may have a constant value (function=1), or may be a ramp
+with either positive or negative slope (function=2), or may be
+a black body curve (function=3).
+
+Only those parameters specific to the functional form of the image
+need be specified. In all cases the parameters image_name, image_title,
+ncols, nlines, and function are required. If function=1, parameter constant
+is required; if function=2, start_level and end_level are required;
+if function=3, start_wave, end_wave, and temperature are required.
+
+All black body functions are normalized to 1.0 at their peak
+intensity which may occur at a wavelength beyond the extent of
+the generated spectrum.
+
+NOTE THAT THIS TASK IS OBSOLETE AND ARTDATA.MK1DSPEC SHOULD BE USED.
+In particular this task does not set the header dispersion coordinate
+system.
+.ih
+EXAMPLES
+
+.nf
+	cl> mkspec allones "Spectrum of 1.0" 1024 1 1 constant=1.0
+	cl> mkspec ramp "From 100.0 to 0.0" 1024 64 2 start=100 \
+	>>> end=0.0
+	cl> mkspec bb5000 "5000 deg black body" 512 1 3 start=3000 \
+	>>> end=8000 temp=5000
+.fi
+.ih
+REVISIONS
+.ls MKSPEC V2.10
+This task is unchanged.
+.le
+.ih
+SEE ALSO
+artdata.mk1dspec, artdata.mk2dspec, artdata.mkechelle
+.endhelp

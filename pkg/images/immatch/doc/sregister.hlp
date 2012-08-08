@@ -1,0 +1,779 @@
+.help sregister Dec98 images.immatch
+.ih
+NAME
+sregister -- register a list of images to a reference image using celestial
+coordinate WCS information
+.ih
+USAGE
+sregister input reference output
+.ih
+PARAMETERS
+.ls input
+The list of input images containing the input celestial coordinate wcs.
+.le
+.ls reference
+The list of reference images containing the reference celestial coordinate wcs.
+The number of reference images must be one or equal to the number of
+input images.
+.le
+.ls output
+The list of output registered images. The number of output images must
+be equal to the number of input images.
+.le
+.ls xmin = INDEF, xmax = INDEF, ymin = INDEF, ymax = INDEF
+The minimum and maximum logical x and logical y coordinates used to, generate
+the grid of reference image control points, define the region of validity of
+the spatial transformation, and define the extent of the output image.
+Xmin, xmax, ymin, and
+ymax are assigned defaults of 1, the number of columns in the reference 
+image, 1, and the number of lines in the reference image, respectively.
+.le
+.ls nx = 10, ny = 10
+The number of points in x and y used to generate the coordinate grid.
+.le
+.ls wcs = "world"
+The world coordinate system of the coordinates.  The options are:
+.ls physical
+Physical coordinates are pixel coordinates which are invariant with
+respect to linear transformations of the physical image data.  For example,
+if the reference 
+image is a rotated section of a larger input image, the physical
+coordinates of an object in the reference image are equal to the physical
+coordinates of the same object in the input image, although the logical
+pixel coordinates are different.
+.le
+.ls world
+World coordinates are image coordinates which are invariant with
+respect to linear transformations of the physical image data and which
+are in decimal degrees for celestial coordinate systems. Obviously if the
+wcs is correct the ra and dec of an object
+should remain the same no matter how the image
+is linearly transformed. The default world coordinate
+system is either 1) the value of the environment variable "defwcs" if
+set in the user's IRAF environment (normally it is undefined) and present
+in the image header, 2) the value of the "system"
+attribute in the image header keyword WAT0_001 if present in the
+image header or, 3) the "physical" coordinate system.
+Care must be taken that the wcs of the input and
+reference images are compatible, e.g. it makes no sense to
+match the coordinates of a 2D sky projection and a 2D spectral wcs.
+.le
+.le
+.ls xformat = "%10.3f", yformat = "%10.3f"
+The format of the output logical x and y reference and input pixel
+coordinates in columns 1 and 2 and 3 and 4 respectively. By default the
+coordinates are output right justified in a field of ten spaces with
+3 digits following the decimal point. 
+.le
+.ls rwxformat = "", rwyformat = ""
+The format of the output world x and y reference image coordinates
+in columns 5 and 6 respectively. The internal default formats will give
+reasonable output formats and precision for celestial coordinate
+systems.
+.le
+.ls wxformat = "", wyformat = ""
+The format of the output world x and y input image coordinates
+in columns 7 and 8 respectively. The internal default formats will give
+reasonable output formats and precision for celestial coordinate
+systems.
+.le
+.ls fitgeometry = "general"
+The fitting geometry to be used. The options are the following.
+.ls shift
+X and y shifts only are fit.
+.le
+.ls xyscale
+X and y shifts and x and y magnification factors are fit. Axis flips are
+allowed for.
+.le
+.ls rotate
+X and y shifts and a rotation angle are fit. Axis flips are allowed for.
+.le
+.ls rscale
+X and y shifts, a magnification factor assumed to be the same in x and y, and a
+rotation angle are fit. Axis flips are allowed for.
+.le
+.ls rxyscale
+X and y shifts, x and y magnifications factors, and a rotation angle are fit.
+Axis flips are allowed for.
+.le
+.ls general
+A polynomial of arbitrary order in x and y is fit. A linear term and a
+distortion term are computed separately. The linear term includes an x and y
+shift, an x and y scale factor, a rotation and a skew.  Axis flips are also
+allowed for in the linear portion of the fit. The distortion term consists
+of a polynomial fit to the residuals of the linear term. By default the
+distortion terms is set to zero.
+.le
+
+For all the fitting geometries except "general" no distortion term is fit,
+i.e. the x and y polynomial orders are assumed to be 2 and the cross term
+switches are set to "none", regardless of the values of the \fIxxorder\fR,
+\fIxyorder\fR, \fIxxterms\fR, \fIyxorder\fR, \fIyyorder\fR and \fIyxterms\fR
+parameters set by the user.
+.le
+.ls function = "polynomial"
+The type of analytic coordinate surfaces to be fit. The options are the
+following:
+.ls legendre
+Legendre polynomials in x and y.
+.le
+.ls chebyshev
+Chebyshev polynomials in x and y.
+.le
+.ls polynomial
+Power series polynomials in x and y.
+.le
+.le
+.ls xxorder = 2, xyorder = 2, yxorder = 2, yyorder = 2
+The order of the polynomials in x and y for the x and y fits respectively.
+The default order and cross term settings define the linear term in x
+and y, where the 6 coefficients can be interpreted in terms of an x and y shift,
+an x and y scale change, and rotations of the x and y axes. The "shift",
+"xyscale", "rotation", "rscale", and "rxyscale", fitting geometries
+assume that the polynomial order parameters are 2 regardless of the values
+set by the user. If any of the order parameters are higher than 2 and
+\fIfitgeometry\fR is "general", then a distortion surface is fit to the
+residuals from the linear portion of the fit.
+.le
+.ls xxterms = "half", yxterms = "half"
+The options are:
+.ls none
+The individual polynomial terms contain powers of x or powers of y but not
+powers of both.
+.le
+.ls half
+The individual polynomial terms contain powers of x and powers of y, whose
+maximum combined power is MAX (xxorder - 1, xyorder - 1) for the x fit and
+MAX (yxorder - 1, yyorder - 1) for the y fit.
+.le
+.ls full
+The individual polynomial terms contain powers of x and powers of y, whose
+maximum combined power is MAX (xxorder - 1 + xyorder - 1) for the x fit and
+MAX (yxorder - 1 + yyorder - 1) for the y fit.
+.le
+
+The "shift", "xyscale", "rotation", "rscale", and "rxyscale" fitting
+geometries, assume that the cross term switches are set to "none"regardless
+of the values set by the user.  If either of the cross terms parameters is
+set to "half" or "full" and \fIfitgeometry\fR is "general" then a distortion
+surface is fit to the residuals from the linear portion of the fit.
+.le
+
+.ls reject = INDEF
+The rejection limit in units of sigma. The default is no rejection.
+.le
+.ls calctype = "real"
+The precision of coordinate transformation calculations. The options are "real"
+and "double".
+.le
+.ls geometry = "geometric"
+The type of geometric transformation.  The options are:
+.ls linear
+Perform only the linear part of the geometric transformation.
+.le
+.ls geometric
+Compute both the linear and distortion portions of the geometric correction.
+.le
+.le
+.ls xsample = 1.0, ysample = 1.0
+The coordinate surface subsampling factor. The coordinate surfaces are
+evaluated at every xsample-th pixel in x and every ysample-th pixel in y.
+Transformed coordinates  at intermediate pixel values are determined by
+bilinear interpolation in the coordinate surfaces. If the coordinate
+surface is of high order setting these numbers to some reasonably high
+value is recommended.
+.le
+.ls interpolant = "linear"
+The interpolant used for rebinning the image.  The choices are the following.
+.ls nearest
+Nearest neighbor.
+.le
+.ls linear
+Bilinear interpolation in x and y.
+.le
+.ls poly3
+Third order polynomial in x and y.
+.le
+.ls poly5
+Fifth order polynomial in x and y.
+.le
+.ls spline3
+Bicubic spline.
+.le
+.ls sinc
+2D sinc interpolation. Users can specify the sinc interpolant width by
+appending a width value to the interpolant string, e.g. sinc51 specifies
+a 51 by 51 pixel wide sinc interpolant. The sinc width will be rounded up to
+the nearest odd number.  The default sinc width is 31 by 31.
+.le
+.ls lsinc
+Look-up table sinc interpolation. Users can specify the look-up table sinc
+interpolant width by appending a width value to the interpolant string, e.g.
+lsinc51 specifies a 51 by 51 pixel wide look-up table sinc interpolant. The user
+supplied sinc width will be rounded up to the nearest odd number. The default
+sinc width is 31 by 31 pixels. Users can specify the resolution of the lookup
+table sinc by appending the look-up table size in square brackets to the
+interpolant string, e.g. lsinc51[20] specifies a 20 by 20 element sinc
+look-up table interpolant with a pixel resolution of 0.05 pixels in x and y.
+The default look-up table size and resolution are 20 by 20 and 0.05 pixels
+in x and y respectively.
+.le
+.ls drizzle
+2D drizzle resampling. Users can specify the drizzle pixel fraction in x and y
+by appending a value between 0.0 and 1.0 in square brackets to the
+interpolant string, e.g. drizzle[0.5]. The default value is 1.0.
+The value 0.0 is increased internally to 0.001. Drizzle resampling
+with a pixel fraction of 1.0 in x and y is equivalent to fractional pixel
+rotated block summing (fluxconserve = yes) or averaging (flux_conserve = no)  if
+xmag and ymag are > 1.0.
+.le
+.le
+.ls boundary = "nearest"
+The choices are:
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a user supplied constant value.
+.le
+.ls reflect
+Generate a value by reflecting about the boundary of the image.
+.le
+.ls wrap
+Generate a value by wrapping around to the opposite side of the image.
+.le
+.le
+.ls constant = 0.0
+The value of the constant for boundary extension.
+.le
+.ls fluxconserve = yes
+Preserve the total image flux? If flux conservation is turned on, the output
+pixel values are multiplied by the Jacobian of the coordinate transformation.
+.le
+.ls nxblock = 512, nyblock = 512
+If the size of the output image is less than nxblock by nyblock then
+the entire image is transformed at once. Otherwise the output image
+is computed in blocks nxblock by nyblock pixels.
+.le
+.ls wcsinherit = yes
+Inherit the wcs of the reference image?
+.le
+.ls verbose = yes
+Print messages about the progress of the task?
+.le
+.ls interactive = no
+Run the task interactively ?
+In interactive mode the user may interact with the fitting process, e.g.
+change the order of the fit, delete points, replot the data etc.
+.le
+.ls graphics = "stdgraph"
+The graphics device.
+.le
+.ls gcommands = ""
+The graphics cursor.
+.le
+
+.ih
+DESCRIPTION
+
+SREGISTER computes the spatial transformation function required to register
+the input image \fIinput\fR to the reference image \fIreference\fR,
+and writes the registered input image to the output image \fIoutput\fR. 
+The input and reference images may be 1D or 2D but must have
+the same dimensionality.  SREGISTER assumes that the world
+coordinate systems in the input and reference
+image headers are accurate and that both systems are compatible, e.g. both
+images have a celestial coordinate system WCS.
+
+SREGISTER computes the required spatial transformation by matching the logical
+x and y pixel coordinates of a grid of points 
+in the input image with the logical x and y pixels coordinates
+of the same grid of points in the reference image,
+using world coordinate information stored in the two image headers.
+The coordinate grid consists of \fInx * ny\fR points evenly distributed
+over the logical pixel space of interest in the reference image defined by the
+\fIxmin\fR, \fIxmax\fR, \fIymin\fR, \fIymax\fR parameters.
+The reference image celestial coordinates are transformed to
+input image celestial coordinates using world coordinate
+system information in both the reference and the input image headers.
+Finally the input image celestial coordinates are transformed to logical x and y
+input image pixel coordinates using world coordinate system information
+stored in the input image header. The transformation sequence looks
+like the following for an equatorial celestial coordinate system:
+
+.nf
+   (x,y) reference -> (ra,dec) reference  (reference image wcs)
+(ra,dec) reference -> (ra,dec) input      (reference and input image wcs)
+    (ra,dec) input -> (x,y) input         (input image wcs)
+.fi
+
+The computed reference and input logical coordinates and the
+celestial coordinates are written to a temporary output coordinates file
+which is deleted on task termination. The pixel and celestial coordinates
+are output using the \fIxformat\fR and \fIyformat\fR and the \fIrwxformat\fR,
+\fIrwyformat\fR, \fIwxformat\fR and \fIwxformat\fR
+parameters respectively. If these formats are undefined and, in the
+case of the celestial coordinates a format attribute cannot be
+read from either the reference or the input images, the coordinates are
+output in %g format with \fImin_sigdigits\fR digits of precision.
+If the reference and input images are 1D then all the output logical and
+world y coordinates are set to 1.
+
+SREGISTER computes a spatial transformation of the following form.
+
+.nf
+    xin = f (xref, yref)
+    yin = g (xref, yref)
+.fi
+
+The functions f and g are either a power series polynomial or a Legendre or
+Chebyshev polynomial surface of order
+\fIxxorder\fR and \fIxyorder\fR in x and \fIyxorder\fR and \fIyyorder\fR in y.
+
+Several polynomial cross terms options are available. Options "none",
+"half", and "full" are illustrated below for a quadratic polynomial in
+x and y.
+
+.nf
+xxterms = "none", xyterms = "none"
+xxorder = 3, xyorder = 3, yxorder = 3, yyorder = 3
+
+   xin = a11 + a21 * xref + a12 * yref +
+         a31 * xref ** 2 + a13 * yref ** 2
+   yin = a11' + a21' * xref + a12' * yref +
+         a31' * xref ** 2 + a13' * yref ** 2
+
+xxterms = "half", xyterms = "half"
+xxorder = 3, xyorder = 3, yxorder = 3, yyorder = 3
+
+   xin = a11 + a21 * xref + a12 * yref +
+         a31 * xref ** 2 + a22 * xref * yref + a13 * yref ** 2
+   yin = a11' + a21' * xref + a12' * yref +
+         a31' * xref ** 2 + a22' * xref * yref + a13' * yref ** 2
+
+xxterms = "full", xyterms = "full"
+xxorder = 3, xyorder = 3, yxorder = 3, yyorder = 3
+
+   xin = a11 + a21 * xref + a31 * xref ** 2 +
+         a12 * yref + a22 * xref * yref +  a32 * xref ** 2 * yref +
+         a13 * yref ** 2 + a23 * xref *  yref ** 2 +
+         a33 * xref ** 2 * yref ** 2
+   yin = a11' + a21' * xref + a31' * xref ** 2 +
+         a12' * yref + a22' * xref * yref +  a32' * xref ** 2 * yref +
+         a13' * yref ** 2 + a23' * xref *  yref ** 2 +
+         a33' * xref ** 2 * yref ** 2
+.fi
+
+
+The computation can be done in either real or
+double precision by setting the \fIcalctype\fR parameter.
+Automatic pixel rejection may be enabled by setting the \fIreject\fR
+parameter to some number > 0.0.
+
+The transformation computed by the "general" fitting geometry is arbitrary
+and does not correspond to a physically meaningful model. However the computed
+coefficients for the linear term can be given a simple geometrical geometric
+interpretation for all the fitting geometries as shown below.
+
+.nf
+        fitting geometry = general (linear term)
+            xin = a + b * xref + c * yref
+            yin = d + e * xref + f * yref
+
+        fitting geometry = shift
+            xin = a + xref
+            yin = d + yref
+
+        fitting geometry = xyscale
+            xin = a + b * xref
+            yin = d + f * yref
+
+        fitting geometry = rotate
+            xin = a + b * xref + c * yref
+            yin = d + e * xref + f * yref
+            b * f - c * e = +/-1
+            b = f, c = -e or b = -f, c = e
+
+        fitting geometry = rscale
+            xin = a + b * xref + c * yref
+            yin = d + e * xref + f * yref
+            b * f - c * e = +/- const
+            b = f, c = -e or b = -f, c = e
+
+        fitting geometry = rxyscale
+            xin = a + b * xref + c * yref
+            yin = d + e * xref + f * yref
+            b * f - c * e = +/- const
+.fi
+
+The coefficients can be interpreted as follows. Xref0, yref0, xin0, yin0
+are the origins in the reference and input frames respectively. Orientation
+and skew are the orientation of the x and y axes and their deviation from
+perpendicularity respectively. Xmag and ymag are the scaling factors in x and
+y and are assumed to be positive.
+
+.nf
+        general (linear term)
+            xrotation = rotation - skew / 2
+            yrotation = rotation + skew / 2
+            b = xmag * cos (xrotation)
+            c = ymag * sin (yrotation)
+            e = -xmag * sin (xrotation)
+            f = ymag * cos (yrotation)
+            a = xin0 - b * xref0 - c * yref0 = xshift
+            d = yin0 - e * xref0 - f * yref0 = yshift
+
+        shift
+            xrotation = 0.0,  yrotation = 0.0
+            xmag = ymag = 1.0
+            b = 1.0
+            c = 0.0
+            e = 0.0
+            f = 1.0
+            a = xin0 - xref0 = xshift
+            d = yin0 - yref0 = yshift
+
+        xyscale
+            xrotation 0.0 / 180.0 yrotation = 0.0
+            b = + /- xmag
+            c = 0.0
+            e = 0.0
+            f = ymag
+            a = xin0 - b * xref0 = xshift
+            d = yin0 - f * yref0 = yshift
+
+        rscale
+            xrotation = rotation + 0 / 180, yrotation = rotation
+            mag = xmag = ymag
+            const = mag * mag
+            b = mag * cos (xrotation)
+            c = mag * sin (yrotation)
+            e = -mag * sin (xrotation)
+            f = mag * cos (yrotation)
+            a = xin0 - b * xref0 - c * yref0 = xshift
+            d = yin0 - e * xref0 - f * yref0 = yshift
+
+        rxyscale
+            xrotation = rotation + 0 / 180, yrotation = rotation
+            const = xmag * ymag
+            b = xmag * cos (xrotation)
+            c = ymag * sin (yrotation)
+            e = -xmag * sin (xrotation)
+            f = ymag * cos (yrotation)
+            a = xin0 - b * xref0 - c * yref0 = xshift
+            d = yin0 - e * xref0 - f * yref0 = yshift
+.fi
+
+
+\fIXmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR define the region of
+validity of the transformation as well as the limits of the grid
+in the reference coordinate system.
+
+Each computed transformation is written to the a temporary output text database
+file which is deleted on task termination. Otherwise the
+database file is opened in append mode and new records are written
+to the end of the existing file. If more that one record of the same
+name is written to the database file, the last record written is the
+valid record.
+
+SREGISTER will terminate with an error if the reference and input images
+are not both either 1D or 2D.
+If the world coordinate system information cannot be read from either
+the reference or input image header, the requested transformations
+from the world <-> logical coordinate systems cannot be compiled for either
+or both images, or the world coordinate systems of the reference and input
+images are fundamentally incompatible in some way, the output logical
+reference and input image coordinates are both set to a grid of points
+spanning the logical pixel space of the input, not the reference image.
+This grid of points defines an identity transformation which results in
+an output image equal to the input image.
+
+SREGISTER computes the output image by evaluating the fitted coordinate
+surfaces and interpolating in the input image at position of the transformed
+coordinates. The scale of the output image is the same as the scale of the
+reference image. The extent and size of the output image are determined
+by the \fIxmin\fR, \fIxmax\fR, \fIymin\fR, and \fIymax\fR parameters
+as shown below
+
+.nf
+    xmin <= x <= xmax
+    ymin <= x <= ymax
+    ncols =  xmax - xmin + 1
+    nlines = xmax - xmin + 1
+.fi
+
+SREGISTER samples the coordinate surfaces at every \fIxsample\fR and 
+\fIysample\fR pixels in x and y.
+The transformed coordinates at intermediate pixel values are
+determined by bilinear interpolation in the coordinate surface. If
+\fIxsample\fR and \fIysample\fR = 1, the coordinate
+surface is evaluated at every pixel. Use of \fIxsample\fR and \fIysample\fR
+are strongly recommended for large images and high order coordinate
+surfaces in order to reduce the time required to compute the output image.
+
+The output image gray levels are determined by interpolating in the input
+image at the positions of the transformed output pixels using the
+interpolant specified by the \fIinterpolant\fR parameter. If the
+\fIfluxconserve\fR switch is set the output pixel values are multiplied by
+the Jacobian of the transformation, which preserves the flux of the entire
+image. Out-of-bounds pixels are evaluated using the \fIboundary\fR and
+\fIconstant\fR parameters.
+
+The output image is computed in \fInxblock\fR by \fInyblock\fR pixel sections.
+If possible users should set these number to values larger than the dimensions
+of the output image in order to minimize the number of disk reads and writes
+required to compute the output image. If this is not feasible and the image
+rotation is small, users should set nxblock to be greater than the number of
+columns in the output image, and nyblock to be as large as machine memory
+will permit.
+
+If \fIwcsinherit\fR = "yes", then the output image will inherit the world
+coordinate system of the reference image.
+Otherwise if the environment variable \fInomwcs\fR is "no" the world
+coordinate
+system of the input image is modified in the output image to reflect the
+effects of the \fIlinear\fR portion of the registration operation.
+Support does not yet exist in the IRAF world coordinate system interface
+for the higher order distortion corrections that SREGISTER is capable
+of performing.
+
+If \fIverbose\fR is "yes" then messages about the progress of the task
+as well as warning messages indicating potential problems
+are written to the standard output.
+
+SREGISTER may be run interactively by setting the \fIinteractive\fR
+parameter to "yes".
+In interactive mode the user has the option of viewing the fitted
+spatial transformation, changing the
+fit parameters, deleting and undeleting points, and replotting
+the data until a satisfactory
+fit has been achieved.
+
+.ih
+CURSOR COMMANDS
+
+In interactive mode the following cursor commands are currently available.
+
+.nf
+        Interactive Keystroke Commands
+
+?       Print options
+f       Fit the data and graph with the current graph type (g, x, r, y, s)
+g       Graph the data and the current fit
+x,r     Graph the x fit residuals versus x and y respectively
+y,s     Graph the y fit residuals versus x and y respectively
+d,u     Delete or undelete the data point nearest the cursor
+o       Overplot the next graph
+c       Toggle the constant x, y plotting option
+t       Plot a line of constant x, y through the nearest data point
+l       Print xshift, yshift, xmag, ymag, xrotate, yrotate
+q       Exit the interactive curve fitting
+.fi
+
+The parameters listed below can be changed interactively with simple colon
+commands. Typing the parameter name alone will list the current value.
+
+.nf
+	Colon Parameter Editing Commands
+
+:show                           List parameters
+:fitgeometry                    Fitting geometry (shift,xyscale,rotate,
+                                rscale,rxyscale,general)
+:function [value]               Fitting function (chebyshev,legendre,
+                                polynomial)
+:xxorder :xyorder [value]       X fitting function xorder, yorder
+:yxorder :yyorder [value]       Y fitting function xorder, yorder
+:xxterms :yxterms [n/h/f]       X, Y fit cross term types
+:reject [value]                 Rejection threshold
+.fi
+
+
+.ih
+FORMATS
+
+A  format  specification has the form "%w.dCn", where w is the field
+width, d is the number of decimal places or the number of digits  of
+precision,  C  is  the  format  code,  and  n is radix character for
+format code "r" only.  The w and d fields are optional.  The  format
+codes C are as follows:
+ 
+.nf
+b       boolean (YES or NO)
+c       single character (c or '\c' or '\0nnn')
+d       decimal integer
+e       exponential format (D specifies the precision)
+f       fixed format (D specifies the number of decimal places)
+g       general format (D specifies the precision)
+h       hms format (hh:mm:ss.ss, D = no. decimal places)
+m       minutes, seconds (or hours, minutes) (mm:ss.ss)
+o       octal integer
+rN      convert integer in any radix N
+s       string (D field specifies max chars to print)
+t       advance To column given as field W
+u       unsigned decimal integer
+w       output the number of spaces given by field W
+x       hexadecimal integer
+z       complex format (r,r) (D = precision)
+ 
+
+
+Conventions for w (field width) specification:
+ 
+    W =  n      right justify in field of N characters, blank fill
+        -n      left justify in field of N characters, blank fill
+        0n      zero fill at left (only if right justified)
+absent, 0       use as much space as needed (D field sets precision)
+ 
+Escape sequences (e.g. "\n" for newline):
+ 
+\b      backspace   (not implemented)
+\f      formfeed
+\n      newline (crlf)
+\r      carriage return
+\t      tab
+\"      string delimiter character
+\'      character constant delimiter character
+\\      backslash character
+\nnn    octal value of character
+ 
+Examples
+ 
+%s          format a string using as much space as required
+%-10s       left justify a string in a field of 10 characters
+%-10.10s    left justify and truncate a string in a field of 10 characters
+%10s        right justify a string in a field of 10 characters
+%10.10s     right justify and truncate a string in a field of 10 characters
+ 
+%7.3f       print a real number right justified in floating point format
+%-7.3f      same as above but left justified
+%15.7e      print a real number right justified in exponential format
+%-15.7e     same as above but left justified
+%12.5g      print a real number right justified in general format
+%-12.5g     same as above but left justified
+
+%h          format as nn:nn:nn.n
+%15h        right justify nn:nn:nn.n in field of 15 characters
+%-15h       left justify nn:nn:nn.n in a field of 15 characters
+%12.2h      right justify nn:nn:nn.nn
+%-12.2h     left justify nn:nn:nn.nn
+ 
+%H          / by 15 and format as nn:nn:nn.n
+%15H        / by 15 and right justify nn:nn:nn.n in field of 15 characters
+%-15H       / by 15 and left justify nn:nn:nn.n in field of 15 characters
+%12.2H      / by 15 and right justify nn:nn:nn.nn
+%-12.2H     / by 15 and left justify nn:nn:nn.nn
+
+\n          insert a newline
+.fi
+
+.ih
+REFERENCES
+
+Additional  information  on  IRAF  world  coordinate  systems including
+more detailed descriptions of the "logical", "physical", and "world"
+coordinate systems can be found  in  the  help  pages  for  the  WCSEDIT
+and  WCRESET  tasks. Detailed   documentation   for  the  IRAF  world
+coordinate  system interface MWCS can be found in  the  file
+"iraf$sys/mwcs/MWCS.hlp".  This  file  can  be  formatted  and  printed
+with the command "help iraf$sys/mwcs/MWCS.hlp fi+ | lprint".
+
+Details of the FITS header world coordinate system interface can
+be found in the draft paper "World Coordinate Systems Representations Within the
+FITS Format" by Hanisch and Wells, available from the iraf anonymous ftp
+archive and the draft paper which supersedes it "Representations of Celestial
+Coordinates in FITS" by Greisen and Calabretta available from the NRAO
+anonymous ftp archives.
+
+The spherical astronomy routines employed here are derived from the Starlink
+SLALIB library provided courtesy of Patrick Wallace. These routines
+are very well documented internally with extensive references provided
+where appropriate. Interested users are encouraged to examine the routines
+for this information. Type "help slalib" to get a listing of the SLALIB
+routines, "help slalib opt=sys" to get a concise summary of the library,
+and "help <routine>" to get a description of each routine's calling sequence,
+required input and output, etc. An overview of the library can be found in the
+paper "SLALIB - A Library of Subprograms", Starlink User Note 67.7
+by P.T. Wallace, available from the Starlink archives.
+
+.ih
+EXAMPLES
+
+1. Register a radio image to an X-ray image of the same field using
+a 100 point coordinate  grid and a simple linear transformation.  Both
+images have accurate sky projection world coordinate systems. Print the
+output world coordinates in the coords file in hh:mm:ss.ss and dd:mm:ss.s
+format. Display the input and output image and blink them.
+
+.nf
+	cl> sregister radio xray radio.tran rwxformat=%12.2H \
+	    rwyformat=%12.1h wxformat=%12.2H wyformat=%12.1h
+
+	cl> display radio 1 fi+
+
+	cl> display radio.tran 2 fi+
+.fi
+
+2. Repeat the previous command but begin with a higher order fit
+and run the task in interactive mode in order to examine the fit
+residuals.
+
+.nf
+	cl> sregister radio xray radio.tran rwxformat=%12.2H \
+	    rwyformat=%12.1h wxformat=%12.2H wyformat=%12.1h xxo=4 \
+	    xyo=4 xxt=half yxo=4 yyo=4 yxt=half  inter+
+
+            ... a plot of the fit appears
+
+	    ... type x and r to examine the residuals of the x
+                surface fit versus x and y
+
+	    ... type y and s to examine the residuals of the y
+                surface fit versus x and y
+
+	    ... delete 2 deviant points with the d key and
+                recompute the fit with the f key
+
+            ... type q to quit, save the fit, and compute the registered
+		image
+.fi
+
+
+3. Mosaic a set of 9 images covering a ~ 1 degree field into a single image
+centered at  12:32:53.1 +43:13:03. Set the output image scale to 0.5
+arc-seconds / pixel which is close the detector scale of 0.51 arc-seconds
+per pixel. Set the orientation to be north up and east to the left.
+The 9 images all have accurate world coordinate information in their headers.
+
+.nf
+        # Create a dummy reference image big enough to cover 1 square degree
+
+        cl> mkpattern refimage ncols=7200 nlines=7200 ...
+
+        # Give the dummy reference image the desired coordinate system
+
+        cl> ccsetwcs refimage "" xref=3600.5 yref=3600.5 xmag=-0.5 \ 
+        ymag=0.5 lngref=12:32:53.1 latref=43:13:03 ...
+
+        # Register the images using constant boundary extension and set
+	# uservalue to some reasonable value outside the good data range.
+        # It may be possible to improve performance by increasing nxblock 
+        # and nyblock.
+
+        cl> sregister @inlist refimage @outlist boundary=constant \
+        constant=<uservalue> nxblock=7200 nyblock=1024 ...
+
+        # Combine the images using imcombine
+
+        cl> imcombine @outlist mosaic lthreshold=<uservalue> ...
+
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+imalign,xregister,register,geotran,wregister
+.endhelp

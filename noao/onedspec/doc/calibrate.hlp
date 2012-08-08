@@ -1,0 +1,195 @@
+.help calibrate Mar93 noao.onedspec
+.ih
+NAME
+calibrate -- Apply extinction corrections and flux calibrations
+.ih
+USAGE
+calibrate input output [records]
+.ih
+PARAMETERS
+.ls input
+List of input spectra to be calibrated.  When using record format
+extensions the root names are specified, otherwise full image names
+are used.
+.le
+.ls output
+List of calibrated spectra.  If no output list is specified or if the
+output name is the same as the input name then the calibrated spectra
+replace the input spectra.  When using record format extensions the output
+names consist of root names to which the appropriate record number
+extension is added.  The record number extension will be the same as the
+input record number extension.  The output spectra are coerced to have
+real datatype pixels regardless of the  pixel type.
+.le
+.ls records (imred.irs and imred.iids only)
+The set of record number extensions to be applied to each input and output
+root name when using record number extension format.  The syntax consists
+of comma separated numbers or ranges of numbers.  A range consists of
+two numbers separated by a hyphen.  This parameter is not queried
+when record number formats are not used.
+.le
+.ls extinct = yes
+Apply extinction correction if a spectrum has not been previously
+corrected?  When applying an extinction correction, an extinction file
+is required.
+.le
+.ls flux = yes
+Apply a flux calibration if a spectrum has not been previously calibrated?
+When applying a flux calibration, sensitivity spectra are required.
+.le
+.ls extinction = <no default>
+Extinction file for the observation.  Standard extinction files
+are available in the "onedstds$" directory.
+.le
+.ls observatory = ")_.observatory"
+Observatory at which the spectra were obtained if not specified in the
+image header by the keyword OBSERVAT.  The default is a redirection to the
+package parameter of the same name.  The observatory may be one of the
+observatories in the observatory database, "observatory" to select the
+observatory defined by the environment variable "observatory" or the
+parameter \fBobservatory.observatory\fR, or "obspars" to select the current
+parameters in the \fBobservatory\fR task.  See \fBobservatory\fR for
+additional information.
+.le
+.ls ignoreaps = no
+Ignore aperture numbers and apply a single flux calibration to all
+apertures?  Normally multiaperture instruments have separate sensitivity
+functions for each aperture while long slit or Fabry-Perot data use a
+single sensitivity function where the apertures are to be ignored.  The
+sensitivity spectra are obtained by adding the aperture number as an
+extension to the sensitivity spectrum root name.  When apertures are
+ignored the specified sensitivity spectrum name is used without adding an
+extension and applied to all input apertures.
+.le
+.ls sensitivity = "sens"
+The root name for the sensitivity spectra produced by \fBsensfunc\fR.
+Normally with multiaperture instruments, \fBsensfunc\fR will produce a
+spectrum appropriate to each aperture with an aperture number extension.
+If the apertures are ignored (\fIignoreaps\fR = yes) then the sensitivity
+spectrum specified is used for all apertures and no aperture number is
+appended automatically.
+.le
+.ls fnu = no
+The default calibration is into units of flux per unit wavelength (F-lambda).
+If \fIfnu\fR = yes then the calibrated spectrum will be in units of
+flux per unit frequency (F-nu).
+.le
+.ls airmass, exptime
+If the airmass and exposure time are not in the header nor can they be
+determined from other keywords in the header then these query parameters
+are used to request the airmass and exposure time.  The values are updated
+in the input and output images.
+.le
+.ih
+DESCRIPTION
+The input spectra are corrected for extinction and calibrated to a flux
+scale using sensitivity spectra produced by the task \fBsensfunc\fR.
+One or both calibrations may be performed by selecting the appropriate
+parameter flags.  It is an error if no calibration is specified.  Normally
+the spectra should be extinction corrected if also flux calibrating.
+The image header keywords DC-FLAG (or the dispersion type field in the
+"multispec" world coordinate system), EX-FLAG, and CA-FLAG are checked for
+dispersion solution (required), previous extinction correction, and
+previous flux calibration.  If previously calibrated the spectrum is
+skipped and a new output image is not created.
+
+The input spectra are specified by a list of root names (when using record
+extension format) or full image names.  The output calibrated spectra may
+replace the input spectra if no output spectra list is specified or if the
+output name is the same as the input name.  When using record number
+extensions the output spectra will have the same extensions applied to the
+root names as those used for the input spectra.
+
+When applying an extinction correction the AIRMASS keyword is sought.
+If the keyword is not present then the airmass at the time defined
+by the other header keywords is computed using the
+latitude of the observatory and observation parameters in the image
+header.  The observatory is first determined from the image under the
+keyword OBSERVAT.  If absent the observatory specified by the task
+parameter "observatory" is used.  See \fBobservatory\fR for further
+details of the observatory database.  If the air mass cannot be
+determined an error results.  Currently a single airmass is used
+and no correction for changing extinction during the observation is
+made and adjustment to the middle of the exposure.  The task
+\fBsetairmass\fR provides a correction for the exposure time to compute
+an effective air mass.  Running this task before calibration is
+recommended.
+
+If the airmass is not in the header and cannot be computed then
+the user is queried for a value.  The value entered is then
+recorded in both the input and output image headers.  Also if
+the exposure time is not found then it is also queried and
+recorded in the image headers.
+
+The extinction correction is given by the factor
+
+		10. ** (0.4 * airmass * extinction)
+
+where the extinction is the value interpolated from the specified
+extinction file for the wavelength of each pixel.  After extinction
+correction the EX-FLAG is set to 0.
+
+When applying a flux calibration the spectra are divided by the
+aperture sensitivity which is represented by a spectrum produced by
+the task \fBsensfunc\fR.  The sensitivity spectrum is in units of:
+
+	2.5 * Log10 [counts/sec/Ang / ergs/cm2/sec/Ang].
+
+A new spectrum is created in "F-lambda" units - ergs/cm2/sec/Angstrom
+or "F-nu" units - ergs/cm2/sec/Hz.  The sensitivity must span the range of
+wavelengths in the spectrum and interpolation is used if the wavelength
+coordinates are not identical.  If some pixels in the spectrum being
+calibrated fall outside the wavelength range of the sensitivity function
+spectrum a warning message giving the number of pixels outside the
+range.  In this case the sensitivity value for the nearest wavelength
+in the sensitivity function is used.
+
+Multiaperture instruments typically have
+a separate aperture sensitivity function for each aperture.  The appropriate
+sensitivity function for each input spectrum is selected based on the
+spectrum's aperture by appending this number to the root sensitivity function
+spectrum name.  If the \fIignoreaps\fR flag is set, however, the aperture
+number relation is ignored and the single sensitivity spectrum (without
+extension) is applied.
+.ih
+EXAMPLES
+1.  To flux calibrates a series of spectra replacing the input spectra by
+the calibrated spectra:
+
+	cl> calibrate nite1 ""
+
+2.  To only extinction correct echelle spectra:
+
+	cl> calibrate ccd*.ec.imh new//ccd*.ec.imh flux-
+
+3. To flux calibrate a long slit spectrum:
+
+.nf
+	cl> dispaxis = 2
+	cl> calibrate obj.imh fcobj.imh
+.fi
+.ih
+REVISIONS
+.ls CALIBRATE V2.10.3
+This task was revised to operate on 2D and 3D spatial spectra; i.e. long
+slit and Fabry-Perot data cubes.  This task now includes the functionality
+previously found in \fBlongslit.extinction\fR and \fBlongslit.fluxcalib\fR.
+
+A query for the airmass and exposure time is now made if the information
+is not in the header and cannot be computed from other header keywords.
+.le
+.ls CALIBRATE V2.10
+This task was revised to operate on nonlinear dispersion corrected spectra
+and 3D images (the \fBapextract\fR "extras").  The aperture selection
+parameter was eliminated (since the header structure does not allow mixing
+calibrated and uncalibrated spectra) and the latitude parameter was
+replaced by the observatory parameter.  The observatory mechanism insures
+that if the observatory latitude is needed for computing an airmass and the
+observatory is specified in the image header the correct calibration will
+be applied.  The record format syntax is available in the \fBirs/iids\fR
+packages.  The output spectra are coerced to have real pixel datatype.
+.le
+.ih
+SEE ALSO
+setairmass, standard, sensfunc, observatory, continuum
+.endhelp

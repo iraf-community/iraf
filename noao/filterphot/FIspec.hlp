@@ -1,0 +1,3034 @@
+
+.help filterphot Oct83  "Filter Photometry Package"
+.sh
+1. Introduction
+
+The purpose of the FILTERPHOT package is to reduce photometric data
+measured with single-beam filter photometers.
+The input is a set of intensity measurements of program objects, standard
+objects, and sky background;
+the output is a set of magnitudes
+on a standard photometric system.
+Data from multi-channel instruments are incorporated into the package
+by treating each channel as a separate filter.
+
+NOTE: The document 'IRAF FILTERPHOT Package:
+Reductions Equations and Methods of Coefficient Calculation' is
+hereafter referred to as Paper I.
+
+.sh
+2. Requirements
+
+.sh
+2.1 Reduction Steps
+
+The following steps are required to reduce photometric data:
+.ls 4
+.ls o
+Read data.
+Data are initially read into the system by means of tasks supplied
+by the DATAIO package.
+Specialized tasks of the FILTERPHOT package are then used to
+convert the data from source dependent format
+into a uniform internal format.
+
+The initial release of the package supports the following
+KPNO instrument configurations:
+
+.nf
+    Telescope	    Instrument		Acquisition
+					Program
+
+    #4-0.4m 	    F13P		#4-0.4m
+    #2-0.9m	    AFP			PPIII
+    #2-0.9m	    2-channel H-beta	PPIII
+    #2-0.9m	    4-channel Danish	PPIII
+    1.3m	    Mk I or Mk II	PPIII
+    1.3m	    Mk I or Mk II	PHOTOM
+    2.1m	    Mk I or Mk II	PHOTOM
+    4m		    Mk II		PHOTOM
+.fi
+
+All photometers are single-channel instruments
+except for the 2-channel H-beta and 4-channel Danish photometers.
+For these instruments, each channel is interpreted as a separate filter.
+Data from additional sources can be incorporated into the package
+by writing new input tasks for each individual case.
+.le
+.ls o
+Calculate average count rates for each filter.
+The final count rate through a given filter is corrected for
+instrumental dead time and sky background.
+
+NOTE: Explicit routines for determining the dead time are
+not provided in the initial release of the package.
+However, the user may examine the reduced standard-star residuals
+as a function of magnitude and may adjust the instrumental dead time,
+as appropriate.
+.le
+.ls o
+Calculate all-sky magnitudes, colors, and/or indices
+for a specified photometric system,
+taking into account red leak measurements.
+Optionally,
+differential magnitudes of designated variable
+and check stars, relative to comparison stars, are calculated.
+
+The initial release of the package supports the following
+photometric systems:
+
+.nf
+    BVRI
+    UBV
+    UBVR
+    UBVRI
+    general (i.e. user defined)
+    H-beta
+    uvby
+    uvby plus H-beta
+.fi
+
+Additional photometric systems can be incorporated into the package
+by writing new tasks (i.e. to initialize a CF, see Sections 4 and 5)
+or by utilizing the GENERAL program.
+.le
+.ls o
+Calculate and apply extinction coefficients.
+See Paper I for details.
+The calculation of extinction coefficients
+is separated from application of the coefficients
+so that the user can explicitly specify their values.
+Tasks are provided to calculate mean coefficients from
+an arbitrary number of individual determinations.
+.le
+.ls o
+Calculate and apply transformation coefficients.
+There is only one common method
+to calculate transformation coefficients, but it may be applied
+to two subsets of data.
+See Paper I for details.
+The calculation of transformation coefficients
+is separated from application of the coefficients
+so that the user can explicitly specify their values.
+Tasks are provided to calculate mean coefficients from
+an arbitrary number of individual determinations.
+
+NOTE: Options for incorporating suggestions
+similar to those of Harris et al.
+(1981, PASP 93, 507)
+regarding the simultaneous solution of extinction
+and transformation coefficients
+may be included in future releases of the package.
+.le
+.ls o
+Tabulate reduced values.
+The data to be tabulated may come from a single observing run or from several
+observing runs (i.e. with archived data).
+.le
+.le
+
+.sh
+2.2 Error Estimates
+
+Inasmuch as possible, error estimates are calculated for
+all coefficients and magnitudes.
+
+.sh
+2.3 Special Processing
+
+A task is available to add object names
+and/or coordinate information to the input data during
+an early step of the reduction process.
+This process is necessary to process data from the #4-0.4m data acquisition
+program and is useful for data from PPIII.
+
+In future releases of the package,
+an additional task may be provided that automatically adds LST
+information to the input data, based on the UT of observation.
+This step is not required for KPNO data
+because LST is recorded with each integration.
+
+.sh
+2.4 Intermediate Files
+
+Intermediate files used by the package are text-oriented
+so as to facilitate user inspection and/or editing.
+
+.sh
+2.5 Program Constraints
+
+The program is available either in batch or interactive mode.
+All tasks in the package run under the IRAF command language,
+using standard conventions.
+Program code is written in the IRAF SSP language
+and is machine independent.
+
+.sh
+3. Limitations
+
+.sh
+3.1 Number of Filters
+
+The number of filters is limited to eight filters.
+Similarly, the number of independent photometric quantities
+is limited to eight quantities.
+
+.sh
+3.2 Linearity of Data
+
+Data are assumed to be recorded on a linear scale,
+with the exception of dead-time effects from pulse-counting electronics.
+Data from DC equipment can be incorporated into the package
+by means of sophisticated input readers
+that remove all gain-dependent information.
+
+.sh
+3.3 Multi-Beam Instruments
+
+Data from multi-beam instruments are not explicitly supported
+in the initial release of the package
+because of the complexities of data management.
+Such data can be incorporated into the package
+by means of sophisticated input readers
+that remove all beam-dependent information.
+
+.sh
+3.4 Aperture Photometry
+
+The package does not explicitly support
+aperture (e.g. 'galaxy') photometry.
+Aperture information is partially retained
+by package programs for documentation purposes only,
+
+.sh
+3.5 Reduction Equations
+
+The package is restricted to the reduction equations
+presented in Paper I.
+Additional tasks may be added to the FILTERPHOT package,
+but the form of the reduction equations is, at present, considered invariant.
+
+.sh
+3.6 Plotting Capabilities
+
+The initial release of the package
+does not explicitly provide any plotting programs.
+However, selected fields from the 'user-accessible' files
+(see Section 4)
+can be plotted by means of programs in the LISTS package.
+Additional filtering of the input is possible with the SELECT program.
+Undoubtly, package-supplied script tasks will be developed for this purpose.
+Without an additional program, however,
+plots involving residuals of standard values can not be produced.
+A program is needed that
+that matches reduced observations of standard stars with
+known standard values, generating the desired residuals.
+
+.sh
+3.7 Iteration of Standard Values
+
+A useful, but potentially hazardous, technique used during the
+development of new photometric systems is to 
+iterate the photometric solution while updating standard values
+between iterations.
+The initial release of the package doe not provide a convenient means
+of substituting reduced standard values back into the input
+(i.e. the SF as discussed in Section 4).
+A program could be written to facilitate this process.
+
+.sh
+3.8 Time Dependency of Coefficients
+
+The equations used by the FILTERPHOT package assume
+time-invariant coefficients.
+Although there is no intention of modifying the reduction
+equations to include time dependency,
+a pair of programs could be written to model and remove this effect.
+In particular, the first program could examine the residuals of
+standard stars (see discussion on plotting capabilities)
+as a function of time and produce a set of coefficients
+that describe the variation.
+The second program could remove this apparent variation from
+the entire set of reduced values.
+
+.sh
+4. File Specifications
+
+The data base of the FILTERPHOT package consists of five 'user-accessible'
+and two 'user-non-accessible' files.
+The later are non-accessible to the extent that the user is not
+permitted to access them directly.
+Instead, manipulation of these files is by means of package-supplied programs.
+The accessible files are text-oriented; their formats are described below.
+The user can edit and/or otherwise examine them
+using system-supplied text editors.
+
+NOTE: By definition, accessible files are divided into 'records.'
+Each record consists of a number of 'fields' that are delimited by
+white space (i.e. spaces, tabs, or new lines).
+Therefore, it is permissible for a record to span
+several lines of text.
+The first field of each record
+is a string that defines the
+type of data in the record (e.g. PRDF as described below).
+In order to accommodate variable length records (i.e. different
+number of fields), this initial string is required
+to be the first field on a line of text.
+Because each record is self-documenting,
+it is permissible (generally for archiving purposes)
+to concatenate the different type of records
+into a single file.
+It is the responsibility of each FILTERPHOT package program
+to filter out those records appropriate for that particular program.
+Note that the package-supplied program SELECT can also be used for this purpose.
+However, the output of any given program contains records of only one type,
+with the exception of intervening blank records.
+
+NOTE: A blank record is a line of text that contains,
+at most, only spaces and tabs.
+
+NOTE: By definition, a 'measurement' contains intensity information
+(in units of counts per unit time) and is formed from a combination of
+a individual integrations of a single object.
+Within a measurement, it is permissible to have sky and dark-count integrations.
+
+NOTE: By definition, an 'observation' contains magnitude information
+(unitless) and is formed from a combination of measurements.
+For all-sky photometry, there is one observation for each measurement.
+For differential photometry, however, there generally is one observation
+for each 'sequence' of measurements (i.e. comparison star, variable star,
+comparison star, etc.).
+
+.sh
+4.1 The Processed Raw Data File (PRDF)
+
+A PRDF is a text file containing raw data,
+i.e. data in the form of counts, integration times, etc.
+Each record of a PRDF contains 13 fields:
+
+.nf
+    field 1		keyword PRDF		string
+    field 2		object number *		integer
+    field 3		object name		string
+    field 4		apparent RA (hours)	real
+    field 5		apparent DEC (degrees)	real
+    field 6		LST **			real
+    field 7		UT date (yymmdd) **	integer
+    field 8		UT (hours) **		real
+    field 9		int. time (seconds)	real
+    field 10		flags (5-digit) ***	string
+    field 11		aperture ****		integer
+    field 12		filter			integer
+    field 13		counts			integer
+
+    *     see discussion of SF for definition
+    **    at start of integration
+    ***   a string of digits:
+            digit 1: 0 = accept, 1 = reject
+            digit 2: 0 = program, 1 = standard
+            digit 3: 0 = A or F star, 1 = B star (for H-beta photometry)
+            digit 4: 0 = unused, 1 = variable, 2 = comparison, 4 = check
+            digit 5: 0 = star plus sky, 1 = sky alone, 2 = dark
+            digits 6,7,... (to the right): ignored
+    ****  for documentation only
+.fi
+
+As a minimum, fields 1-2, 4-10, and 12-13
+must contain valid data.
+Fields 3 and 11 must be present although they
+can be filled with dummy or fictitious data.
+
+Each record contains the result of a single integration.
+Records are grouped into measurements by blank lines
+(e.g. consecutive new lines).
+Within a measurement, the object number, object name, and digits 2-4 of
+the flags field of all records must be consistent.
+
+.sh
+4.2 The Averaged Raw Data File (ARDF)
+
+An ARDF is a text file containing measurements,
+i.e. data which have been corrected for
+dead-time effects and converted into mean count rates.
+Each record of an ARDF contains as many as 25 fields:
+
+.nf
+    field 1		keyword ARDF		string
+    field 2		object number *		integer
+    field 3		object name		string
+    field 4		apparent RA (hours)	real
+    field 5		apparent DEC (degrees)	real
+    field 6		LST **			real
+    field 7		UT date (yymmdd) **	integer
+    field 8		UT (hours) **		real
+    field 9		flags ***		string
+    field 10		count rate (filter 1)	real
+    field 11		error (filter 1)	real
+    field 12		count rate (filter 2)	real
+    field 13		error (filter 2)	real
+    field 14		count rate (filter 3)	real
+    field 15		error (filter 3)	real
+    field 16		count rate (filter 4)	real
+    field 17		error (filter 4)	real
+    field 18		count rate (filter 5)	real
+    field 19		error (filter 5)	real
+    field 20		count rate (filter 6)	real
+    field 21		error (filter 6)	real
+    field 22		count rate (filter 7)	real
+    field 23		error (filter 7)	real
+    field 24		count rate (filter 8)	real
+    field 25		error (filter 8)	real
+
+    *     see discussion of SF for definition
+    **    at mid-observation
+    ***   a string of digits:
+            digit 1: 0 = accept, 1 = reject
+            digit 2: 0 = program, 1 = standard
+            digit 3: 0 = A or F star, 1 = B star (for H-beta photometry)
+            digit 4: 0 = unused, 1 = variable, 2 = comparison, 4 = check
+            digits 5,6,... (to the right): ignored
+.fi
+
+As a minimum, fields 1-2 and 4-11
+must contain valid data.
+Field 3 must be present although it
+can be filled with dummy or fictitious data.
+Fields 12-25 are optional
+depending on the photometric system.
+
+Each record contains the result of a single measurement.
+
+.sh
+4.3 The Instrumental Magnitude File (IMF)
+
+An IMF is a text file containing observations
+on an instrumental magnitude system.
+Each record of an IMF contains as many as 30 fields
+in the following format:
+
+.nf
+    field 1		keyword IMF		string
+    field 2		object number *		integer
+    field 3		object name		string
+    field 4		apparent RA (hours)	real
+    field 5		apparent DEC (degrees)	real
+    field 6		LST **			real
+    field 7		UT date (yymmdd) **	integer
+    field 8		UT (hours) **		real
+    field 9		JD **			real
+    field 10		flags ***		string
+    field 11		system name ****	string
+    field 12		air mass		real
+    field 13		delta air mass *****	real
+    field 14		hour angle (signed)	real
+    field 15		magnitude (#1)		real
+    field 16		error (#1)		real
+    field 17		magnitude (#2)		real
+    field 18		error (#2)		real
+    field 19		magnitude (#3)		real
+    field 20		error (#3)		real
+    field 21		magnitude (#4)		real
+    field 22		error (#4)		real
+    field 23		magnitude (#5)		real
+    field 24		error (#5)		real
+    field 25		magnitude (#6)		real
+    field 26		error (#6)		real
+    field 27		magnitude (#7)		real
+    field 28		error (#7)		real
+    field 29		magnitude (#8)		real
+    field 30		error (#8)		real
+
+    *     see discussion of SF for definition
+    **    at mid-observation
+    ***   a string of digits:
+            digit 1: 0 = accept, 1 = reject
+            digit 2: 0 = program, 1 = standard
+            digit 3: 0 = A or F star, 1 = B star (for H-beta photometry)
+            digit 4: 0 = unused, 1 = variable, 2 = comparison, 4 = check
+            digit 5: 0 = all-sky, 1 = differential
+            digits 6,7,... (to the right): ignored
+    ****  e.g. UBV (must match system name in CF)
+    ***** for differential photometry, otherwise 0
+.fi
+
+As a minimum, fields 1-2 and 4-16
+must contain valid data.
+Field 3 must be present although it
+can be filled with dummy or fictitious data.
+Fields 17-30 are optional
+depending on the photometric system.
+
+Each record contains the result of a single observation.
+
+.sh
+4.4 The Natural System Magnitude File (NMF)
+
+A NMF is a text file containing observations on a natural magnitude system
+(i.e. having removed atmospheric extinction effects).
+Each record of a NMF contains as many as 30 fields
+in the following format:
+
+.nf
+    field 1		keyword NMF		string
+    fields 2-30		same as IMF fields
+.fi
+
+As a minimum, fields 1-2 and 4-16
+must contain valid data.
+Field 3 must be present although it
+can be filled with dummy or fictitious data.
+Fields 17-30 are optional
+depending on the photometric system.
+
+Each record contains the result of a single observation.
+
+.sh
+4.5 The Standard System Magnitude File (SMF)
+
+A SMF is a text file containing observations on a standard magnitude system
+(i.e. having removed the instrumental signature).
+Each record of a SMF contains as many as 30 fields
+in the following format:
+
+.nf
+    field 1		keyword SMF		string
+    fields 2-30		same as IMF fields
+.fi
+
+As a minimum, fields 1-2 and 4-16
+must contain valid data.
+Field 3 must be present although it
+can be filled with dummy or fictitious data.
+Fields 17-30 are optional
+depending on the photometric system.
+
+Each record contains the result of a single observation.
+
+.sh
+4.6 The Star File (SF)
+
+A SF is a 'user-non-accessible' file containing object names, coordinates,
+and standard values.
+It is divided into 100 caches, numbered 00-99 (zero-indexed).
+Each cache may contain an arbitrary number of records (one-indexed).
+Each record contains information on one object.
+Individual fields of a given record are referenced by name,
+see program SF_SET.
+Several standard caches are provided that contain
+Landolt UBV (equatorial) standard stars,
+KPNO BVRI standard stars, etc.
+The division of the SF into caches is an
+adaptation of similar facilities available with
+the new KPNO data acquisition programs.
+
+NOTE: By definition, an object number is the 6-digit number formed by the
+concatenation of a 2-digit cache number and a 4-digit sequence number.
+A record in a SF can be referenced by this object number.
+
+.sh
+4.7 The Coefficient File (CF)
+
+A CF is a look-up table that contains coefficients and other
+parameters necessary for the reduction and documentation of photometric data.
+Each entry of a CF contains a value, either numeric or alphanumeric.
+In the case of an extinction and transformation coefficient,
+an entry also contains an error estimate for the coefficient and a usage flag.
+This flag is used, for example, to indicate the lack of a color
+term in the transformation of (B-V) magnitudes in the UBV system.
+An individual entry in a CF is referenced by name,
+see program CF_SET.
+
+.sh
+5. Program Specifications
+
+The CL callable portion of the FILTERPHOT package consists
+of the following tasks:
+
+.nf
+    BVRI         -- initialize a CF for BVRI system
+    UBV          -- initialize a CF for UBV system
+    UBVR         -- initialize a CF for UBVR system
+    UBVRI        -- initialize a CF for UBVRI system
+    auto_edit    -- automatically edit names and/or coordinates
+    average      -- average raw data (calculate count rates)
+    calc_1_ext   -- calculate first-order extinction coefficients
+    calc_2_ext   -- calculate second-order extinction coefficients
+    calc_trans   -- calculate transformation coefficients
+    cf_average   -- average coefficients in several CF's
+    cf_list      -- list a CF
+    cf_set       -- set values in a CF
+    general      -- initialize a CF for a general system
+    hbeta        -- initialize a CF for H-beta system
+    inst_to_nat  -- convert instrumental mags. to natural system mags.
+    n4_read      -- read a #4-0.4m data tape (via DATAIO package)
+    nat_to_std   -- convert natural system mags. to standard system mags.
+    p3_read      -- read a PPIII data tape (via DATAIO package)
+    ph_read      -- read a PHOTOM data tape (via DATAIO package)
+    rate_to_inst -- convert count rates to instrumental system mags.
+    select       -- select observations (used as a filter)
+    sf_init      -- initialize portions of a SF
+    sf_list      -- list portions of a SF
+    sf_read      -- read a STARFILE data tape (via DATAIO package)
+    sf_set       -- set values in a SF
+    sf_write     -- write a STARFILE data tape (via DATAIO package)
+    tabulate     -- tabulate magnitude data
+    uvby         -- initialize a CF for uvby system
+    uvbyhbeta    -- initialize a CF for uvby plus H-beta system
+.fi
+
+.sh
+5.1. The BVRI Program
+
+This program is used to initialize a CF
+for BVRI photometry.
+The user must supply the name of the CF as well as
+the position number of each filter.
+Values for second-order extinction coefficients,
+slope transformation coefficients, and color transformation coefficients
+are initialized to 0.0 or 1.0 as appropriate.
+Their error estimates are initialized to 0.0.
+Values for first-order extinction
+coefficients and zero-point transformation coefficients
+are initialized to INDEF.
+These values and their error estimates
+must be calculated (see programs CALC_1_EXT and
+CALC_TRANS) or explicitly set (see program SET_CF) by the user.
+
+The combined extinction and transformation reduction equations are:
+
+.nf
+    mag. #1:        V = Z + [V' - K * X - K1 * X * (B-V)'] + Y * (B-V)
+    mag. #2:    (B-V) = C + D * [(B-V)' - K2 * X - K3 * X * (B-V)']
+    mag. #3:    (V-R) = E + F * [(V-R)' - K4 * X - K5 * X * (V-R)']
+    mag. #4:    (R-I) = G + H * [(R-I)' - K6 * X - K7 * X * (R-I)']
+.fi
+
+where X is air mass,
+unprimed quantities (e.g. those left of the equals sign)
+are standard system magnitudes,
+and their primed counterparts are instrumental system magnitudes.
+The remaining symbols are the extinction and transformation coefficients.
+Natural system magnitudes are represented in the equations
+as values within the square brackets.
+The break-point quantity is set to magnitude #2, i.e. (B-V).
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    B_filter		integer
+    V_filter		integer
+    R_filter		integer
+    I_filter		integer
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF to be initialized.
+.le
+.ls 16 B_filter
+Position number of the B filter.
+Range 1-8.
+For KPNO filter bolts, B_filter is 4
+.le
+.ls 16 V_filter
+Position number of the V filter.
+Range 1-8.
+For KPNO filter bolts, V_filter is 3
+.le
+.ls 16 R_filter
+Position number of the R filter.
+Range 1-8.
+For KPNO filter bolts, R_filter is 2
+.le
+.ls 16 I_filter
+Position number of the I filter.
+Range 1-8.
+For KPNO filter bolts, I_filter is 1
+.le
+.le
+
+.sh
+5.2. The UBV Program
+
+This program is used to initialize a CF
+for UBV photometry.
+The user must supply the name of the CF as well as
+the position number of each filter.
+Values for second-order extinction coefficients,
+slope transformation coefficients, and color transformation coefficients
+are initialized to 0.0 or 1.0 as appropriate.
+Their error estimates are initialized to 0.0.
+Values for first-order extinction
+coefficients and zero-point transformation coefficients
+are initialized to INDEF.
+These values and their error estimates
+must be calculated (see programs CALC_1_EXT and
+CALC_TRANS) or explicitly set (see program SET_CF) by the user.
+
+The combined extinction and transformation reduction equations are:
+
+.nf
+    mag. #1:        V = Z + [V' - K * X - K1 * X * (B-V)'] + Y * (B-V)
+    mag. #2:    (U-B) = C + D * [(U-B)' - K2 * X - K3 * X * (U-B)']
+    mag. #3:    (B-V) = E + F * [(B-V)' - K4 * X - K5 * X * (B-V)']
+.fi
+
+where X is air mass,
+unprimed quantities (e.g. those left of the equals sign)
+are standard system magnitudes,
+and their primed counterparts are instrumental system magnitudes.
+The remaining symbols are the extinction and transformation coefficients.
+Natural system magnitudes are represented in the equations
+as values within the square brackets.
+The break-point quantity is set to magnitude #3, i.e. (B-V).
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    U_filter		integer
+    B_filter		integer
+    V_filter		integer
+    red_leak_filter	integer
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF file to be initialized.
+.le
+.ls 16 U_filter
+Position number of the U filter.
+Range 1-8.
+For KPNO filter bolts, U_filter is 3.
+.le
+.ls 16 B_filter
+Position number of the B filter.
+Range 1-8.
+For KPNO filter bolts, B_filter is 2.
+.le
+.ls 16 V_filter
+Position number of the V filter.
+Range 1-8.
+For KPNO filter bolts, V_filter is 1.
+.le
+.ls 16 red_leak_filter
+Position number of the red leak filter used to correct the U filter.
+Range 0-8.
+For KPNO filter bolts, red_leak_filter is 4.
+A value of 0 indicates no red leak filter is used.
+.le
+.le
+
+.sh
+5.3. The UBVR Program
+
+This program is used to initialize a CF
+for UBVR photometry.
+The user must supply the name of the CF as well as
+the position number of each filter.
+Values for second-order extinction coefficients,
+slope transformation coefficients, and color transformation coefficients
+are initialized to 0.0 or 1.0 as appropriate.
+Their error estimates are initialized to 0.0.
+Values for first-order extinction
+coefficients or zero-point transformation coefficients
+are initialized to INDEF.
+These values and their error estimates
+must be calculated (see programs CALC_1_EXT and
+CALC_TRANS) or explicitly set (see program SET_CF) by the user.
+
+The combined extinction and transformation reduction equations are:
+
+.nf
+    mag. #1:        V = Z + [V' - K * X - K1 * X * (B-V)'] + Y * (B-V)
+    mag. #2:    (U-B) = C + D * [(U-B)' - K2 * X - K3 * X * (U-B)']
+    mag. #3:    (B-V) = E + F * [(B-V)' - K4 * X - K5 * X * (B-V)']
+    mag. #4:    (V-R) = G + H * [(V-R)' - K6 * X - K7 * X * (V-R)']
+.fi
+
+where X is air mass,
+unprimed quantities (e.g. those left of the equals sign)
+are standard system magnitudes,
+and their primed counterparts are instrumental system magnitudes.
+The remaining symbols are the extinction and transformation coefficients.
+Natural system magnitudes are represented in the equations
+as values within the square brackets.
+The break-point quantity is set to magnitude #3, i.e. (B-V).
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    U_filter		integer
+    B_filter		integer
+    V_filter		integer
+    R_filter		integer
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF file to be initialized.
+.le
+.ls 16 U_filter
+Position number of the U filter.
+Range 1-8.
+For KPNO filter bolts, U_filter is 4.
+Note the lack of a red leak filter.
+For UBVR photometry, it is assumed that a blocked U filter is used.
+.le
+.ls 16 B_filter
+Position number of the B filter.
+Range 1-8.
+For KPNO filter bolts, B_filter is 3.
+.le
+.ls 16 V_filter
+Position number of the V filter.
+Range 1-8.
+For KPNO filter bolts, V_filter is 2.
+.le
+.ls 16 R_filter
+Position number of the R filter.
+Range 1-8.
+For KPNO filter bolts, R_filter is 1.
+.le
+.le
+
+.sh
+5.4. The UBVRI Program
+
+This program is used to initialize a CF
+for UBVRI photometry.
+The user must supply the name of the CF as well as
+the position number of each filter.
+Values for second-order extinction coefficients,
+slope transformation coefficients, and color transformation coefficients
+are initialized to 0.0 or 1.0 as appropriate.
+Their error estimates are initialized to 0.0.
+Values for first-order extinction
+coefficients or zero-point transformation coefficients
+are initialized to INDEF.
+These values and their error estimates
+must be calculated (see programs CALC_1_EXT and
+CALC_TRANS) or explicitly set (see program SET_CF) by the user.
+
+The combined extinction and transformation reduction equations are:
+
+.nf
+    mag. #1:        V = Z + [V' - K * X - K1 * X * (B-V)'] + Y * (B-V)
+    mag. #2:    (U-B) = C + D * [(U-B)' - K2 * X - K3 * X * (U-B)']
+    mag. #3:    (B-V) = E + F * [(B-V)' - K4 * X - K5 * X * (B-V)']
+    mag. #4:    (V-R) = G + H * [(V-R)' - K6 * X - K7 * X * (V-R)']
+    mag. #5:    (R-I) = I + J * [(R-I)' - K8 * X - K9 * X * (R-I)']
+.fi
+
+where X is air mass,
+unprimed quantities (e.g. those left of the equals sign)
+are standard system magnitudes,
+and their primed counterparts are instrumental system magnitudes.
+The remaining symbols are the extinction and transformation coefficients.
+Natural system magnitudes are represented in the equations
+as values within the square brackets.
+The break-point quantity is set to magnitude #3, i.e. (B-V).
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    U_filter		integer
+    B_filter		integer
+    V_filter		integer
+    R_filter		integer
+    I_filter		integer
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF file to be initialized.
+.le
+.ls 16 U_filter
+Position number of the U filter.
+Range 1-8.
+For KPNO filter bolts, U_filter is 5.
+Note the lack of a red leak filter.
+For UBVRI photometry, it is assumed that a blocked U filter is used.
+.le
+.ls 16 B_filter
+Position number of the B filter.
+Range 1-8.
+For KPNO filter bolts, B_filter is 4.
+.le
+.ls 16 V_filter
+Position number of the V filter.
+Range 1-8.
+For KPNO filter bolts, V_filter is 3.
+.le
+.ls 16 R_filter
+Position number of the R filter.
+Range 1-8.
+For KPNO filter bolts, R_filter is 2.
+.le
+.ls 16 I_filter
+Position number of the I filter.
+Range 1-8.
+For KPNO filter bolts, I_filter is 1.
+.le
+.le
+
+.sh
+5.5. The AUTO_EDIT Program
+
+This program is used to automatically edit the
+name and/or coordinate fields of PRDF records.
+The 6-digit object number of each input record is used to search
+a specified SF (by 2-digit cache number and 4-digit sequence number)
+for the desired object names and coordinates.
+The latter are then precessed and corrected for refraction,
+using specified values for the observer's longitude and latitude.
+Except for the insertion of name and/or coordinate fields,
+output PRDF records are identical to the (filtered) input records.
+Blank input records are passed unchanged.
+
+This program, or its equivalent in terms of manual editing,
+is required during the reduction of #4-0.4m telescope data,
+which lacks not only object names but also coordinates.
+Although it is not a necessity, this program is useful for PPIII data
+as a means of inserting object names.
+
+Input records are read from the standard input.
+They are filtered so that
+only PRDF and blank records are selected for the processing
+described above.
+Output records are written to the standard output in PRDF format,
+with the exception of intervening blank records.
+
+Positional or query mode parameters:
+
+.nf
+    SF_file		filename
+    add_names		boolean
+    add_coords		boolean
+    longitude		real
+    latitude		real
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 SF_file
+File name of the SF to be searched for names and/or coordinates.
+.le
+.ls 16 add_names
+Boolean parameter indicating whether or not to automatically
+insert names into output PRDF records.
+.le
+.ls 16 add_coords
+Boolean parameter indicating whether or not to automatically
+insert coordinates into output PRDF records.
+.le
+.ls 16 longitude
+Observer's longitude in hours (west of Greenwich is taken as positive).
+For the KPNO #2-0.9m telescope, longitude is 7:26:23.8.
+.le
+.ls 16 latitude
+Observer's latitude in degrees (north of equator is taken as positive).
+For the KPNO #2-0.9m telescope, latitude is 31:57:28.7.
+.le
+.le
+
+.sh
+5.6. The AVERAGE Program
+
+This program is used to calculate mean count rates
+from a set of input PRDF and intervening blank records.
+The blank records are used to delimit
+those portions of the input that are to be averaged,
+i.e. all PRDF records between blank lines form a single measurement.
+Following the first record of a measurement,
+all subsequent records must have identical
+object number and object name fields,
+although the latter can be null strings.
+In addition, digits 2-4 of the flags field must be identical.
+If these conditions are not met,
+the record is ignored, and the user is given a non-fatal error message.
+
+The processing algorithm is as follows:
+.ls 4
+.ls o
+Digit 1 (accept/reject indicator) of the flags field is checked.
+Only those records indicated as acceptable are processed.
+.le
+.ls o
+Digit 5 (star/sky/dark indicator) of the flags field is checked.
+Only those records indicated as star or sky are processed;
+dark-count records are ignored.
+.le
+.ls o
+The observed number of counts is corrected for instrumental dead time.
+The formula used is:
+
+.nf
+    N = n * (1 + (A / 10 ** 9) * n ** B),
+.fi
+
+where n is the observed count rate (in counts per second),
+N is the corrected count rate (in counts per second),
+A is the basic instrumental dead time (in nanoseconds),
+and B is an exponent (unitless) that is normally
+assumed to be 0.0.
+.le
+.ls o
+For each filter that is present in a measurement,
+the mean count rate of star plus sky
+is calculated by dividing the total (corrected)
+counts by the total integration time.
+.le
+.ls o
+For each filter that is present in a measurement,
+the mean count rate of sky alone
+is calculated in a similar manner.
+If sky records are not present,
+the mean sky rate from the previous
+measurement is adopted (initially set to 0.0).
+.le
+.ls o
+For each filter that is present in a measurement,
+the mean count rate of star alone
+is found by differencing the two rates defined above.
+.le
+.ls o
+The mean time of measurement (LST, UT, as well as the date)
+are calculated as a weighted average (by integration time)
+of those times contained in records having star plus sky integrations.
+.le
+.ls o
+Similarly, because the apparent RA and DEC may vary slightly in a measurement
+(e.g. the axis encoders are read at the start of each integration),
+the final RA and DEC are also calculated as a weighted average
+of those coordinates contained in records having star plus sky integrations.
+.le
+.ls o
+The output records contain only as many fields as necessary to
+specify the count rate of the largest filter position used.
+If some lower position filters are not present in a measurement,
+dummy values (i.e. 0.0) are inserted in the output record.
+.le
+.le
+
+Input records are read from the standard input.
+They are filtered so that
+only PRDF and blank records are selected for the processing
+described above.
+Output records are written to the standard output in ARDF format.
+
+Positional or query mode parameters:
+
+.nf
+    dead_time		real
+.fi
+
+Hidden parameters:
+
+.nf
+    exponent		real		    default = 0.0
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 dead_time
+Basic instrumental dead time in nanoseconds.
+For KPNO pulse-counting electronics, dead_time is in the range 40.0 to 50.0.
+.le
+.ls 16 exponent
+Exponent used in calculating dead-time corrections.
+.le
+.le
+
+.sh
+5.7. The CALC_1_EXT Program
+
+This program is used to calculate first-order extinction coefficients
+and their error estimates by one of 3 methods:
+weighted-average, standard-star, or global
+(as described in Paper I).
+Optionally, a simultaneous solution of second-order coefficients
+may be included, depending on the method of calculation.
+The calculated values are written to a specified (existing) CF.
+
+The processing algorithm is as follows:
+.ls 4
+.ls o
+Digit 1 (accept/reject indicator) of the flags field is checked.
+Only those records indicated as acceptable are processed.
+.le
+.ls o
+Digit 5 (all-sky/differential indicator) of the flags field is checked.
+Only those records indicated as all-sky observations are processed.
+.le
+.ls o
+If the standard-star method is selected,
+digit 2 (program/standard indicator) of the flags field
+is checked.
+Only those records indicated as standard stars are processed.
+The 6-digit object number is then used to search
+a specified SF (by 2-digit cache number and 4-digit sequence number).
+for standard values.
+If the SF does not contain a record for the given object number
+or if the SF flags
+indicate that the object is not a standard star,
+the input IMF record is ignored.
+.le
+.ls o
+The remaining calculations follow the description given in Paper I.
+.le
+.le
+
+Input records are read from the standard input.
+They are filtered so that
+only IMF records are selected for the processing
+described above.
+Output is written to a specified CF.
+In addition, values for all calculated coefficients are presented to the
+user via the standard error file.
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    SF_file		filename
+    method		string
+    calc_second		boolean
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF to receive the calculated coefficients
+and error estimates.
+The file must exist; it will not be created.
+.le
+.ls 16 SF_file
+File name of the SF to be searched for standard values.
+If either the weighted-average or global method is chosen,
+a dummy or fictitious file name may be given.
+.le
+.ls 16 method
+String used to specify the method of calculating
+first-order extinction coefficients.
+Valid strings are: "weighted-average",
+"standard-star", and "global".
+Strings may be in upper or lower case (or mixed)
+and may be abbreviated via truncation.
+.le
+.ls 16 calc_second
+A boolean parameter used to indicate whether or not
+to calculate second-order extinction coefficients.
+This option is most useful for the standard-star method.
+It is unclear that meaningful results can be obtained from
+the weighted-average method.
+Finally, it is not clear if these calculations can even be
+made using the global method.
+.le
+.le
+
+.sh
+5.8. The CALC_2_EXT Program
+
+This program is used to calculate second-order extinction coefficients,
+using observations of a blue-red pair of stars
+(as described in Paper I).
+The pair of stars is specified by two (6-digit) object numbers.
+The calculated values are written to a specified (existing) CF.
+
+The processing algorithm is as follows:
+.ls 4
+.ls o
+Digit 1 (accept/reject indicator) of the flags field is checked.
+Only those records indicated as acceptable are processed.
+.le
+.ls o
+If both object numbers are non-zero,
+digit 5 (all-sky/differential indicator) of the flags field is checked.
+Only those records indicated as all-sky observations are processed.
+The program then searches for consecutive records having the specified
+object numbers.
+Theses records are used to form differential magnitudes.
+.le
+.ls o
+If only one object number is non-zero,
+digit 5 of the flags field is checked.
+Only those records indicated as differential observations are processed.
+The program then searches
+for records having the specified (non-zero) object number.
+These records can be used without additional processing.
+.le
+.ls o
+Using all-sky differential magnitudes (as defined in the previous steps),
+the remaining calculations follow the description given in Paper I.
+.le
+.le
+
+Input records are read from the standard input.
+They are filtered so that
+only IMF records are selected for the processing
+described above.
+Output is written to a specified CF.
+In addition, values for all calculated coefficients are presented to the
+user via the standard error file.
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    blue_star		integer
+    red_star		integer
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF file to receive the calculated coefficients
+and error estimates.
+The file must exist; it will not be created.
+.le
+.ls 16 blue_star
+Object number (6-digit) used to specify one star of a blue-red pair.
+A value of zero may be used, as described above.
+.le
+.ls 16 red_star
+Object number (6-digit) used to specify the other star of a blue-red pair.
+A value of zero may be used, as described above.
+.le
+.le
+
+NOTE: There is no limitation regarding which star is actually 'blue'
+and which is 'red.'
+There is no difference in the calculated coefficients
+if the parameters are reversed.
+The parameter names are chosen for legibility and convenience.
+
+.sh
+5.9. The CALC_TRANS Program
+
+This program is used to calculate transformation coefficients
+and there error estimates (as described in Paper I).
+Although zero-point coefficients are always calculated, the calculation
+of slope and color coefficients is optional.
+With an additional option, the user can specify a value for the break-point,
+which splits the transformation solution into two parts based on the standard
+system magnitude of a particular
+(system-defined when the CF is initialized) quantity.
+The calculated values are written to a specified (existing) CF.
+
+The processing algorithm is as follows:
+.ls 4
+.ls o
+Digit 1 (accept/reject indicator) of the flags field is checked.
+Only those records indicated as acceptable are processed.
+.le
+.ls o
+Digit 2 (program/standard indicator) of the flags field is checked.
+Only those records indicated as standard stars are processed.
+.le
+.ls o
+The 6-digit object number is then used to search
+a specified SF (by 2-digit cache number and 4-digit sequence number)
+for standard values.
+If the SF does not contain a record for the given object number
+or if the SF standard star flag indicates
+that the object is not a standard star,
+the input NMF record is ignored.
+.le
+.ls o
+The remaining calculations follow the description given in Paper I.
+In particular, note that two sets of transformation coefficients
+can be calculated (based on the observed standard system magnitude
+of a particular quantity) if desired.
+.le
+.le
+
+Input records are read from the standard input.
+They are filtered so that
+only NMF records are selected for the processing
+described above.
+Output is written to a specified CF.
+In addition, values for all calculated coefficients are presented to the
+user via the standard error file.
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    SF_file		filename
+    calc_slope		boolean
+    calc_color		boolean
+    set_break_point	boolean
+    break_point		real
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF to receive the calculated coefficients
+and error estimates.
+The file must exist; it will not be created.
+.le
+.ls 16 SF_file
+File name of the SF to be searched for standard values.
+.le
+.ls 16 calc_slope
+Boolean parameter used to indicate whether or not to calculate
+the slope coefficients.
+.le
+.ls 16 calc_color
+Boolean parameter used to indicate whether or not to calculate
+the color coefficients.
+.le
+.ls 16 set_break_point
+Boolean parameter used to indicate whether or not to calculate
+two separate sets of transformation coefficients,
+based upon the observed standard system magnitude of a
+particular quantity.
+Use program CF_LIST to determine which quantity the break-point
+refers;
+use program CF_SET to change this quantity.
+.le
+.ls 16 break_point
+Value of the break-point that separates the two sets of
+transformation coefficients.
+A value need not be given if set_break_point is "no".
+.le
+.le
+
+.sh
+5.10. The CF_AVERAGE Program
+
+This program is used to average
+the extinction and transformation coefficients of an arbitrary
+number of CF's.
+Other parameters are checked for consistency,
+and the user is warned of any discrepancies.
+This program is useful for the calculation of mean
+coefficients from several nightly determinations.
+The input is a list of file names;
+a file name may be included in the list
+an arbitrary number of times,
+thereby providing a mechanism for weighting the individual determinations.
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+.fi
+
+List structured parameters (file name may be given on command line):
+
+.nf
+    files		*filename
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF to receive the averaged coefficient file.
+If the file does not exist, it will be created.
+If the file does exist, it will be over-written.
+.le
+.ls 16 files
+File name of a list file containing the names of the files to be averaged.
+If no list file is given, the user is prompted for the names of the files.
+.le
+.le
+
+.sh
+5.11. The CF_LIST Program
+
+This program is used to list the contents of a CF.
+For all relevant coefficients and parameters
+(i.e. those actually used, typically about 10),
+the display includes the coefficient name,
+current value, and (in the case of extinction and
+transformation coefficients) error estimate
+A complete listing of all coefficients is available.
+This program is useful not only to monitor current coefficient values
+but also to recall their names for use with program CF_SET.
+
+Input is read from a specified CF.
+Output is written to the standard output in an unspecified format
+(i.e. it is not, at present, part of the user interface).
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+.fi
+
+Hidden parameters:
+
+.nf
+    list_all		boolean		    default = "no"
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF to be listed.
+.le
+.ls 16 list_all
+Boolean parameter used to indicate whether or not to list
+the entire contents of the CF.
+If list_all is "no", only the relevant coefficients are listed.
+.le
+.le
+
+.sh
+5.12. The CF_SET Program
+
+This program is used to set (i.e. edit) individual coefficients
+(or other parameters such as filter position numbers) of a CF.
+As a minimum, the input consists of a coefficient name and value.
+If the coefficient is an extinction or transformation coefficient,
+the user is prompted for an error estimate and usage flag.
+Coefficient names can be obtained by means of program CF_LIST.
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    name		string
+    value		string
+    error		real
+    usage		boolean
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF containing the coefficient to be set.
+.le
+.ls 16 name
+String identifying the coefficient to be set.
+Valid strings can be found using program CF_LIST.
+.le
+.ls 16 value
+String giving the value to be inserted into the CF.
+
+If a string value is required,
+the value string itself is inserted into the CF.
+
+If a numeric value is required, the value string is first decoded.
+If it is a legal number, that value is inserted into the CF.
+If the value string cannot be decoded, the user is warned
+and the CF is not updated.
+.le
+.ls 16 error
+Value for the error estimate to be inserted into the CF.
+This parameter must be given if the coefficient being set is an extinction
+or transformation coefficient.
+.le
+.ls 16 usage
+Boolean parameter for the usage flag to be inserted into the CF.
+This parameter must be given if the coefficient being set is an extinction
+or transformation coefficient.
+.le
+.le
+
+.sh
+5.13. The GENERAL Program
+
+This program is used to initialize a CF
+for general photometry.
+
+At present, the parameters of this program are not defined.
+
+.sh
+5.14. The HBETA Program
+
+This program is used to initialize a CF
+for H-beta photometry.
+The user must supply the name of the CF as well as
+the position number of each filter.
+The value for the slope transformation coefficient
+is initialized to 1.0.
+Its error estimate is initialized to 0.0.
+The extinction coefficients and their error estimates
+are also initialized to 0.0.
+The value for the zero-point transformation coefficient
+is initialized to INDEF.
+This value and its error estimate
+must be calculated (see programs CALC_1_EXT and
+CALC_TRANS) or explicitly set (see program SET_CF) by the user.
+
+The combined extinction and transformation reduction equation is:
+
+.nf
+    mag. #1:    beta = Z + Y * [beta']
+.fi
+
+where beta is a standard system magnitude,
+and beta' is an instrumental system magnitudes.
+Symbols Z and Y are transformation coefficients.
+The natural system magnitude is represented in the equation
+as the value within the square brackets.
+In this case, it is identical to the instrumental system magnitude.
+The break-point quantity is set to magnitude #0, i.e. undefined.
+
+NOTE: Although H-beta photometry lacks extinction coefficients,
+program INST_TO_NAT must be used to create a file in NMF format
+to be used as input to program NAT_TO_STD.
+
+NOTE: Separate coefficient solutions for B stars
+and for A and F stars can readily
+be obtained by splitting the IMF into two parts using program SELECT.
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    narrow_filter	integer
+    wide_filter		integer
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF to be initialized.
+.le
+.ls 16 narrow_filter
+Position number of the narrow H-beta filter.
+Range 1-8.
+For KPNO filter bolts, narrow_filter is 1.
+.le
+.ls 16 wide_filter
+The position number of the wide H-beta filter.
+Range 1-8.
+For KPNO filter bolts, wide_filter is 2.
+.le
+.le
+
+.sh
+5.15. The INST_TO_NAT Program
+
+This program is used to convert instrumental system magnitudes to
+natural system magnitudes.
+The conversion is defined by the reduction equations
+in conjunction with extinction coefficients stored in a specified CF.
+
+Input records are read from the standard input.
+They are filtered so that
+only IMF records are selected for the processing
+described above.
+Output records are written to the standard output in NMF format.
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF containing the extinction coefficients.
+.le
+.le
+
+.sh
+5.16. The N4_READ Program
+
+This program is used to read a #4-0.4m telescope
+data tape (via the output of a DATAIO package program)
+and write a PRDF.
+The user must specify the data channel number to
+be decoded as well as the date of observation.
+All PRDF fields are filled with valid data except
+the object name, RA, and DEC fields.
+These fields can be automatically edited using program AUTO_EDIT.
+The RA and DEC fields are required for subsequent processing.
+
+Each record of a #4-0.4m data tape contains the following information:
+
+.nf
+    identification number (8-digit)
+    star/sky flag (star=0, sky=1)
+    program/standard star flag (program=0, standard=1)
+    filter number (1-7, 0=error)
+    UT (hours, minutes, and seconds) *
+    LST (hours, minutes, and seconds) *
+    integration time (seconds)
+    prescale/overflow flag (channel #1) **
+    counts (channel #1)
+    prescale/overflow flag (channel #2) **
+    counts (channel #2)
+
+    * refers to start of integration
+    ** = P for counts divided by 10
+       = V for counts overflowed
+       = B for both P and V
+       = blank for no error
+.fi
+
+The user is referred to the KPNO document
+'User's Manual: #4-0.4m Telescope Data Acquisition System'
+for additional details.
+
+The following convention is used to map an 8-digit
+identification number on tape into a 6-digit object number in the PRDF:
+.ls 4
+.ls o
+If the identification number is >= 1 and <= cache_size (a hidden parameter),
+the object number is taken to be the concatenation of "00" and
+the four least-significant digits of the identification number.
+.le
+.ls o
+If the identification number is > cache_size, >= 5001, and <= 5642,
+the object number is taken to be the concatenation of "050" and
+the three least-significant digits of the identification number.
+In this case, the object is assumed to be a Landolt (equatorial)
+UBV standard star.
+Note that a large cache_size overrides the assignment to a Landolt standard.
+.le
+.ls o
+For all other identification numbers, the input tape record is ignored, and
+a non-fatal error message is returned to the user.
+.le
+.le
+
+The following convention is used to process the prescale/overflow flags:
+.ls 4
+.ls o
+If the flag is blank, the counts are used as is.
+.le
+.ls o
+If the flag is P, the counts are multiplied by 10.
+.le
+.ls o
+If the flag is V or B, the record is ignored, but no message is given
+to the user.
+.le
+.le
+
+All other input fields map into output fields in a straightforward manner.
+
+There is a one-to-one correspondence between input and output
+records, subject to the following constraints and/or exceptions:
+.ls 4
+.ls o
+Input records with identification numbers consisting of all 9's
+are used to error-flag the PREVIOUS input record.
+The contents of the 9's record itself are not written to the output
+because all output records within a measurement must have the
+same (indeed, valid) object number.
+To this end, the program provides a means
+of buffering the input records.
+.le
+.ls o
+If there are two or more 9's records is succession,
+only the first one is honored.
+The remaining ones are ignored.
+.le
+.ls o
+Input records with identification numbers consisting of all 0's
+are used to separate the integrations of different stars
+(i.e. the record is a new star flag).
+A blank record is written to the output for this purpose.
+The contents of the 0's record itself are not written to the output
+because all output records within a measurement must have the
+same (indeed, valid) object number.
+.le
+.ls o
+If there are two or more 0's records in succession,
+only the first one is honored.
+The remaining ones are ignored.
+.le
+.ls o
+If a 9's record follows a 0's record,
+the 9's record is ignored.
+.le
+.ls o
+If the (valid) identification number of a given input record differs
+from the (again, valid) identification number of the next record,
+a missing 0's record is implied.
+Therefore, an extra blank record is written to the output.
+.le
+.ls o
+The first record written to the output must be a PRDF-format record.
+Conversely, the last record written must be a blank record.
+This convention is required so that PRDF's can be easily concatenated.
+Consecutive blank records are not permitted.
+.le
+
+Input is read from the standard input.
+Output records are written to the standard output in PRDF format,
+with intervening blank records.
+
+Positional or query mode parameters:
+
+.nf
+    chan		integer
+    date		integer
+.fi
+
+Hidden parameters:
+
+.nf
+    cache_size		integer		    default=1500
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 chan
+Channel number of data to be processed.
+Range 1-2.
+.le
+.ls 16 date
+UT date of observation (format yymmdd) corresponding
+to the first record on the data tape.
+Date roll-over at midnight is performed by the program.
+.le
+.ls 16 cache_size
+Maximum number of records in a cache (see description of SF).
+Chosen to match the size of STARFILE caches used with KPNO
+data acquisition programs.
+.le
+.le
+
+.sh
+5.17. The NAT_TO_STD Program
+
+This program is used to convert natural system magnitudes to
+standard system magnitudes.
+The conversion is defined by the reduction equations in conjunction with
+the transformation coefficients stored in a specified CF.
+
+Input records are read from the standard input.
+They are filtered so that
+only NMF records are selected for the processing
+described above.
+Output records are written to the standard output in SMF format.
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF containing the transformation coefficients.
+.le
+.le
+
+.sh
+5.18. The P3_READ Program
+
+This program is used to read a PPIII
+data tape (via the output of a DATAIO package program)
+and write a PRDF.
+The user must specify the number of data channels to
+be decoded as well as the date of observation.
+All PRDF fields are filled with valid data except
+the object name field.
+This field can be automatically edited using program AUTO_EDIT.
+
+Each record of a PPIII data tape contains the following information:
+
+.nf
+    identification number (7-digit)
+    various flags *
+    integration time (seconds)
+    LST (hours, minutes, and seconds) **
+    UT (hours, minutes, and seconds) **
+    apparent RA (hours, minutes, and seconds)
+    apparent DEC (degrees, minutes, and seconds) ***
+    counts (channel #1)
+    counts (channel #2) ****
+    counts (channel #3) ****
+    counts (channel #4) ****
+
+    * an integer where
+      ten thousands digit = AF/B star flag (AF=0, B=1)
+      thousands digit = aperture number (0-9)
+      hundreds digit = filter number (1-7, 0=error)
+      tens digit = star/sky flag (star=0, sky=1)
+      ones digit = program/standard star flag (program=0, standard=1)
+    ** refers to start of integration
+    *** declinations between 0 and -1 have degrees = -32768
+	minutes and seconds are unsigned
+    **** optional
+.fi
+
+The user is referred to the KPNO document
+'PPIII User's Manual' for additional details.
+
+The following convention is used to map a 7-digit
+identification number on tape into a 6-digit object number in the PRDF:
+.ls 4
+.ls o
+If the identification number is >= 1 and <= cache_size (a hidden parameter),
+the object number is taken as the concatenation of "00" and
+the four least-significant digits of the identification number.
+.le
+.ls o
+If the identification number is > cache_size, >= 5001, and <= 5642,
+the object number is taken to be th concatenation of "050" and
+the three least-significant digits of the identification number.
+In this case, the object is assumed to be a Landolt (equatorial)
+UBV standard star.
+Note that a large cache_size overrides the assignment to a Landolt standard.
+.le
+.ls o
+For all other identification numbers, the input tape record is ignored, and
+a non-fatal error message is returned to the user.
+.le
+.le
+
+All other input fields map into output fields in a straightforward manner.
+
+There is a one-to-one correspondence between input and output
+records, subject to the following constraints and/or exceptions:
+.ls 4
+.ls o
+Input records with identification numbers consisting of all 9's
+are used to error-flag the PREVIOUS input record.
+The contents of the 9's record itself are not written to the output
+because all output records within a measurement must have the
+same (indeed, valid) object number.
+To this end, the program provides a means
+of buffering the input records.
+.le
+.ls o
+If there are two or more 9's records is succession,
+only the first one is honored.
+The remaining ones are ignored.
+.le
+.ls o
+Input records with identification numbers consisting of all 0's
+are used to separate the integrations of different stars
+(i.e. the record is a new star flag).
+A blank record is written to the output for this purpose.
+The contents of the 9's record itself are not written to the output
+because all output records within a measurement must have the
+same (indeed, valid) object number.
+.le
+.ls o
+If there are two or more 0's records in succession,
+only the first one is honored.
+The remaining ones are ignored.
+.le
+.ls o
+If a 9's record follows a 0's record,
+the 9's record is ignored.
+.le
+.ls o
+If the (valid) identification number of a given input record differs
+from the (again, valid) identification number of the next record,
+a missing 0's record is implied.
+Therefore, an extra blank record is written to the output.
+.le
+.ls o
+The first record written to the output must be a PRDF-format record.
+Conversely, the last record written must be a blank record.
+This convention is required so that PRDF's can be easily concatenated.
+Consecutive blank records are not permitted.
+.le
+.le
+
+Input is read from the standard input.
+Output records are written to the standard output in PRDF format,
+with intervening blank records.
+
+Positional or query mode parameters:
+
+.nf
+    nchan		integer
+    date		integer
+.fi
+
+Hidden parameters:
+
+.nf
+    cache_size		integer		    default=1500
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 nchan
+Number of channels of data to be processed.
+Range 1-4.
+.le
+.ls 16 date
+UT date of observation (format yymmdd) corresponding
+to the first record on the data tape.
+Date roll-over at midnight is performed by the program.
+.le
+.ls 16 cache_size
+Maximum number of records in a cache (see description of SF).
+Chosen to match the size of STARFILE caches used with KPNO
+data acquisition programs.
+.le
+.le
+
+.sh
+5.19. The PH_READ Program
+
+This program is used to read a new PHOTOM
+data tape (via the output of a DATAIO package program)
+and write a PRDF.
+The input tape is self documenting;
+the user is not required to specify any parameters.
+All PRDF fields are filled with valid data.
+
+A PHOTOM data tape is written in ASCII text using blocked card-images.
+The tape is organized into 'records';
+each record consists of two card-images.
+The first record of (each file of) each tape
+is a header that contains the following information:
+
+.nf
+    card 1
+    
+    observer's name (16-character)
+    program title (16-character)
+    UT date (format mm/dd/yy)
+    UT (format hh:mm)
+    telescope (5-character)
+    photometer (5-character)
+    detector (7-character)
+    filter system (7-character)
+    number of channels
+
+    card 2
+
+    comment (80-character)
+.fi
+
+This header information is listed for the user
+via the standard error file.
+The UT date is decoded and used to fill appropriate PRDF fields.
+Date roll-over at midnight is performed by the program.
+The number of channels is also decoded and used by the program.
+The name of the filter system, however, is not decoded.
+Each succeeding record contains the following information:
+
+.nf
+    card 1
+    
+    cache number (2-digit)
+    identification number (4-digit)
+    object name (16-character)
+    old/new object flag (old=0, new=1)
+    star/sky/dark flag (star=0, sky=1, dark=2)
+    program/standard star flag (program=0, standard=1)
+    AF/B star flag (AF=0, B=1)
+    accept/reject flag (accept=0, reject=1)
+    variable/comparison/check star flag (=1,2,4, respectively) *
+    beam number (1-2) **
+    UT (hours, minutes, and seconds) ***
+    LST (hours, minutes, and seconds) ***
+    apparent RA (hours, minutes, and seconds)
+    apparent DEC (degrees, minutes, and seconds)
+    
+    card 2
+    
+    air mass **
+    X coordinate (seconds of arc, >0 implies east) **
+    Y coordinate (seconds of arc, >0 implies north) **
+    IR filter position **
+    IR PAR gain **
+    aperture size (mm times 100)
+    integration time (seconds)
+    filter number (1-7, 0=error)
+    counts
+
+    * otherwise = 0
+    ** ignored during processing
+    *** refers to start of integration
+.fi
+
+This is a recently defined tape format;
+no additional information is available.
+
+The following convention is used to map a 2-digit cache number and 4-digit
+identification number on tape into a 6-digit object number in the PRDF:
+.ls 4
+.ls o
+If the identification number is >= 1 and <= cache_size (a hidden parameter),
+the object number is taken to be the concatenation of the cache number
+and the identification number.
+.le
+.ls o
+For all other identification numbers, the input tape record is ignored, and
+a non-fatal error message is returned to the user.
+.le
+.le
+
+All other input fields map into output fields in a straightforward manner.
+
+There is a one-to-one correspondence between input and output records.
+subject to the following constraints and/or exceptions:
+.ls 4
+.ls o
+If the new star flag of an input record is set to 1,
+a blank record is written to the output before the remaining
+fields of the input record are decoded.
+.le
+.ls o
+If the (valid) identification number of a given input record differs
+from the (again, valid) identification number of the next record,
+a missing new star flag is implied.
+Therefore, an extra blank record is written to the output.
+.le
+.ls o
+The first record written to the output must be a PRDF-format record.
+Conversely, the last record written must be a blank record.
+This convention is required so that PRDF's can be easily concatenated.
+Consecutive blank records are not permitted.
+.le
+.le
+
+Input is read from the standard input.
+Output records are written to the standard output in PRDF format,
+with intervening blank records.
+
+Hidden parameters:
+
+.nf
+    cache_size		integer		    default=1500
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 cache_size
+Maximum number of records in a cache (see description of SF).
+Chosen to match the size of STARFILE caches used with KPNO
+data acquisition programs.
+.le
+.le
+
+.sh
+5.20. The RATE_TO_INST Program
+
+This program is used to convert count rates to
+instrumental system magnitudes.
+The conversion is defined by the reduction equations in conjunction with
+the filter position numbers stored in a specified CF.
+The program calculates all-sky as well as differential magnitudes.
+
+The processing algorithm is as follows:
+.ls 4
+.ls o
+Digit 1 (accept/reject indicator) of the flags field is checked.
+Only those records indicated as acceptable are processed.
+.le
+.ls o
+If the calc_diff parameter is "no", the count rates of each input record
+are converted into all-sky instrumental magnitudes (as described in Paper I).
+.le
+.ls o
+If the calc_diff parameter is "yes",
+the count rates of each input record are converted into either
+differential or all-sky magnitudes.
+The following convention is adopted:
+.le
+.le
+.ls 8
+.ls 4 o
+Digit 2 (program/standard star indicator) of the flags field is checked.
+Consecutive measurements of program stars are isolated
+and processed as described below.
+Measurements of standard stars, however, are converted to all-sky magnitudes
+and written to the output.
+.le
+.ls 4 o
+If the search_flags parameter is "yes",
+digit 4 (variable/comparison/check star indicator) of the flags field
+is checked.
+Consecutive program star records having the same pattern
+as a specified observing sequence (e.g. "CVCVCK")
+are then identified as a differential
+photometry sequence.
+Note that the matching is between a pattern of letters and a pattern
+of flags.
+This technique is used for data from a new PHOTOM tape.
+.le
+.ls 4 o
+If the search_flags parameter is "no",
+the object number is checked.
+Consecutive program star records having the same pattern as a specified
+observing sequence are then identified as a differential photometry sequence.
+Note that the matching is between a pattern of letters and a pattern
+of object numbers.
+This technique is used for data from a #4-0.4m and PPIII tapes.
+.le
+.ls 4 o
+Differential magnitudes are calculated and written to the output.
+Calculations are in the sense
+variable (or check) star measurement minus the mean of comparison star
+measurements.
+If the calc_multiple parameter is "yes",
+a differential magnitude observation is calculated for each
+variable (or check) star measurement in the observing sequence.
+If the calc_multiple parameter is "no",
+a differential magnitude observation is calculated for the mean of all
+variable (or check) star measurements in the sequence.
+.le
+.ls 4 o
+If the calc_extra parameter is "yes",
+additional all-sky magnitude observations
+are calculated and written to the output
+for each comparison (and check) star in the observing sequence.
+These values may be of use for extinction and/or transformation calculations.
+If the calc_extra parameter is "no",
+additional all-sky observations are not calculated.
+.le
+.ls 4 o
+Once a differential photometry sequence is located,
+search for the next sequence resumes at the record following
+the last record of the located sequence
+(i.e. sequences are not permitted to overlap).
+.le
+.ls 4 o
+Finally, all input records (program or standard star)
+must contribute to at least one output record.
+Therefore, any record that is ignored by the above processing is
+converted into all-sky magnitudes and written to the output.
+.le
+.le
+.ls 4
+.ls o
+The mean time (LST, UT, date, and JD) of observation,
+hour angle, and air mass are calculated.
+For differential observations,
+the differential air mass is also found.
+This value is the difference between the mean variable (or check) star
+air mass and the mean comparison star air mass.
+.le
+.ls o
+The photometric system name is extracted from a specified CF
+and inserted into each output record.
+.le
+.le
+
+Input records are read from the standard input.
+They are filtered so that
+only ARDF are selected for the processing
+described above.
+Output records are written to the standard output in IMF format.
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    calc_diff		boolean
+    sequence		string
+    search_flags	boolean
+    calc_multiple	boolean
+    calc_extra		boolean
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF containing the filter position numbers.
+.le
+.ls 16 calc_diff
+Boolean parameter used to indicate whether or not to calculate
+differential magnitudes.
+.le
+.ls 16 sequence
+String used to indicate the differential observing sequence.
+The only valid characters are 'v' or 'V' for variable star;
+'c' or 'C' for comparison star; and 'k' or 'K' for check star.
+A typical sequence is "CVCVCK".
+The maximum number of characters is 20.
+.le
+.ls 16 search_flags
+Boolean parameter used to indicate whether or not to search digit 4
+(variable/comparison/check indicator) of the flags field.
+If search_flags is "yes", the flags fields of consecutive
+program star measurements
+are searched for the specified observing sequence.
+If search_flags is "no", the object numbers of consecutive
+program star measurements are searched for a pattern
+similar to that of the sequence string.
+.le
+.ls 16 calc_multiple
+Boolean parameter used to indicate whether or not to calculate
+multiple differential magnitudes for the specified observing sequence.
+If calc_multiple is "yes", a differential magnitude is calculated for
+each variable (and each check) star measurement in the sequence.
+If calc_multiple is "no", a single variable star
+differential is calculated for the entire sequence.
+Similarly, a single check star differential is calculated.
+.le
+.ls 16 calc_extra
+Boolean parameter used to indicate whether or not to calculate
+extra all-sky magnitudes (in addition to any and all differential
+magnitudes) from measurements of comparison and check stars.
+Each measurement is treated individually.
+.le
+.le
+
+.sh
+5.21. The SELECT Program
+
+This program is used to select arbitrary FILTERPHOT package
+records for subsequent processing.
+The program is a filter that passes selected IMF, NMF, or SMF records
+from the input to the output.
+
+The selection criteria are:
+
+.nf
+    by a list of object numbers
+    by a list of object names
+    by type of record (i.e. IMF, NMF, or SMF)
+    by type of observation (i.e. all-sky or differential)
+    by name of photometric system (e.g. "UBV")
+    by program/standard star flag
+    by AF/B star flag
+.fi
+
+Input records are read from the standard input in IMF, NMF, or SMF format.
+Output records are written (i.e. selected input records are copied)
+to the standard output in IMF, NMF, or SMF format.
+
+Positional or query mode parameters:
+
+.nf
+    criteria		string
+.fi
+
+List structured parameters (file name may be given on command line):
+
+.nf
+    numbers		*string
+    names		*integer
+.fi
+
+The function and format of these parameters is explained in
+more detail below.
+.ls 4
+.ls 16 criteria
+String (maximum 40-characters) used to specify
+the characteristics that an input record
+must have in order to be selected.
+The string consists of comma or blank delimited substrings.
+In either case, the criteria string itself must be enclosed in quotes.
+The following substrings are recognized:
+
+Substring "numbers" is used to specify that input
+records are to be selected by object numbers.
+Parameter numbers must also be given,
+otherwise the user is prompted for the desired object numbers.
+
+Substring "names" is used to specify that input
+records are to be selected by object names.
+Parameter names must also be given,
+otherwise the user is prompted for the desired object names.
+
+Substring "IMF" is used to specify that only those records
+in IMF format are selected.
+
+Substring "NMF" is used to specify that only those records
+in NMF format are selected.
+
+Substring "SMF" is used to specify that only those records
+in SMF format are selected.
+
+Substring "all-sky" is used to specify that only those records
+containing all-sky magnitudes are selected.
+
+Substring "differential" is used to specify that only those records
+containing differential magnitudes are selected.
+
+Substring "program" is used to specify that only those records
+containing program star observations are selected.
+
+Substring "standard" is used to specify that only those records
+containing standard star observations are selected.
+
+Substring "AF" is used to specify that only those records
+containing A or F star observations are selected.
+
+Substring "B" is used to specify that only those records
+containing B star observations are selected.
+
+Any other substring is interpreted as a photometric system name.
+Only those records containing observations on this system are selected.
+
+The effect of these substrings is to restrict the selection of input records.
+A given record is rejected if it fails ANY of the specified selection criteria.
+The user should note that many of these criteria are mutually exclusive.
+For example, a record cannot satisfy "IMF" and "NMF" simultaneously.
+In this case, no records would be selected.
+The criteria are analyzed individually.
+No warning is given the user regarding mutually exclusive criteria.
+.le
+.ls 16 numbers
+File name of a list file containing the object numbers
+(6-digit, one per line)
+of the records to be selected.
+If no list file is given, the user is prompted for the object numbers.
+.le
+.ls 16 names
+File name of a list file containing the object names
+(16-character, one per line)
+of the records to be selected.
+If no list file is given, the user is prompted for the object names.
+.le
+.le
+
+.sh
+5.22. The SF_INIT Program
+
+This program is used to initialize the default caches of a SF.
+At present, cache 5 is destined to contain the Landolt (equatorial)
+UBV standard stars, and cache 0 is explicitly reserved for the user.
+All other caches are currently undefined.
+
+Positional or query mode parameters:
+
+.nf
+    SF_file		filename
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 SF_file
+File name of the SF to be initialized.
+If the file does not exist, it will be created.
+If the file does exist, it will be over-written.
+.le
+.le
+
+.sh
+5.23. The SF_LIST Program
+
+This program is used to list the contents of a specified cache
+of a specified SF.
+All records of the cache are listed.
+The list includes object number,
+object name, coordinates, epoch, standard star flag, and
+(if present) standard values (up to 8).
+
+Input is read from a specified cache of a specified SF.
+Output is written to the standard output in an unspecified format
+(i.e. it is not, at present, part of the user interface).
+
+Positional or query mode parameters:
+
+.nf
+    SF_file		filename
+    cache		integer
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 SF_file
+File name of the SF to be listed.
+.le
+.ls 16 cache
+Cache number of the SF to be listed.
+.le
+.le
+
+.sh
+5.24. The SF_READ Program
+
+This program is used to read a card-image equivalent of a STARFILE data tape
+(via the output of a DATAIO package program).
+
+The STARFILE format is defined as:
+
+.nf
+    card 1
+
+    columns  1-20	object name *		string
+    columns 22-23	RA (hours)		integer
+    columns 25-26	RA (minutes)		integer
+    columns 28-31	RA (seconds)		real
+    column     33	DEC (sign)		string
+    columns 34-35	DEC (degrees)		integer
+    columns 37-38	DEC (minutes)		integer
+    columns 40-41	DEC (seconds)		integer
+    columns 43-48	epoch **		real
+    columns 50-54	magnitude (#1) ***	real
+    columns 56-60	magnitude (#2) ***	real
+    columns 62-66	magnitude (#3) ***	real
+    columns 68-72	magnitude (#4) ***	real
+
+    card 2 ***
+
+    column     47	blank ****
+    columns 50-54	magnitude (#5) ***	real
+    columns 56-60	magnitude (#6) ***	real
+    columns 62-66	magnitude (#7) ***	real
+    columns 68-72	magnitude (#8) ***	real
+
+    *     only the first 16 characters are retained
+    **    column  47  must  contain a decimal point in order to indicate
+          a 'data' card-image.  This  nomenclature  is  consistent  with
+          the  KPNO  data  acquisition  programs.  If a decimal point is
+          present and columns 43-46 and  48  are  blank,  the  epoch  is
+          assumed to be 1950.0.
+    ***   optional
+    ****  a  blank  in column 47 indicates a 'comment' card-image.  This
+          nomenclature  is  consistent  with   KPNO   data   acquisition 
+          programs.    If   a   comment   immediately   follows  a  data 
+          card-image,  program  SF_READ   examines   the   comment   for 
+          numerical  values  in  columns  50-54,  56-60,  etc.   If only
+          numerical values (or blanks) are found, then  the  comment  is
+          assumed  to  be a continuation of the data card-image.  If any
+          non-numerical  value  is   found   in   those   columns,   the 
+          card-image is assumed to be a true comment.
+.fi
+
+NOTE: The order of magnitudes in the SF must match the order of
+magnitudes in the CF (e.g. see program UBV).
+This is required so that proper standard values can be extracted from the SF.
+
+For magnitudes, blank fields are given the value INDEF.
+If a second card is not present,
+magnitudes 5-8 are given the value INDEF.
+If all magnitudes are either 0.0 or INDEF,
+the standard/program star flag of the SF record is set to program.
+Otherwise, it is set to standard.
+The program reads input card-images until a (specified)
+maximum number of cache records has been processed.
+
+Input is read from the standard input.
+Output is written to a specified cache of a specified SF.
+
+Positional or query mode parameters:
+
+.nf
+    SF_file		filename
+    cache		integer
+.fi
+
+Hidden parameters:
+
+.nf
+    cache_size		integer		    default=1500
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 SF_file
+File name of the SF to be written.
+If the file does not exist, it will be created.
+If the file does exist, the specified cache will be over-written.
+.le
+.ls 16 cache
+Cache number of the SF to be written.
+.le
+.ls 16 cache_size
+Maximum number of records in a cache.
+Chosen to match the size of STARFILE caches used
+with KPNO data acquisition programs.
+.le
+.le
+
+.sh
+5.25. The SF_SET Program
+
+This program is used to set (i.e. edit) individual fields
+of specified records of a SF.
+The user may change only one field with each execution of the program.
+The record to be edited must exist,
+i.e. this program cannot be used to create a new record.
+
+Positional or query mode parameters:
+
+.nf
+    SF_file		filename
+    cache		integer
+    number		integer
+    name		string
+    value		string
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 SF_file
+File name of the SF to be edited.
+The file must exist, it will not be created.
+.le
+.ls 16 cache
+Cache number of the SF to be edited.
+.le
+.ls 16 number
+Sequence number (i.e. the last 4 digits of an object number)
+of the record to be edited.
+.le
+.ls 16 name
+String identifying the field of the record to be edited.
+Valid name strings are "name", "ra", "dec", "epoch",
+"flag", "mag1", "mag2", "mag3", "mag4", "mag5", "mag6", "mag7", and "mag8",
+corresponding to the fields of a STARFILE data tape (see program SF_READ).
+.le
+.ls 16 value
+String giving the value to be inserted into the SF.
+
+If the name string is "name", the value string is simply copied into the SF
+as the new object name (limit 16 characters).
+
+If the name string is "flag", the value string must be either "yes" or "no",
+indicating whether or not
+to use the object as a standard star.
+The appropriate flag is set in the SF.
+
+If the name string is any other valid string (e.g. "ra"),
+the value string is first decoded into a numeric value.
+If it is a legal number,
+that value is inserted into the SF.
+If the value string cannot be decoded, the user is warned and the SF
+is not updated.
+
+If the parm string is an invalid string, the user is also warned.
+.le
+.le
+
+.sh
+5.26. The SF_WRITE Program
+
+This program is used to write a card-image equivalent of a STARFILE data tape
+(via the input to a DATAIO package program).
+
+Input is read from a specified cache of a specified SF.
+Output is written to the standard output.
+
+Positional or query mode parameters:
+
+.nf
+    SF_file		filename
+    cache		integer
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 SF_file
+File name of the SF to be read.
+.le
+.ls 16 cache
+Cache number of the SF to be read.
+.le
+.le
+
+.sh
+5.27. The TABULATE Program
+
+This program is used to list and/or average observations
+(either instrumental, natural, or standard system magnitudes).
+The type of data tabulated depends on the first input record.
+That is, if the first record contains IMF-format all-sky magnitudes,
+only IMF-format all-sky magnitudes will be tabulated.
+Therefore, there are six possible combinations:
+
+.nf
+    IMF-format, all-sky observations
+    IMF-format, differential observations
+    NMF-format, all-sky observations
+    NMF-format, differential observations
+    SMF-format, all-sky observations
+    SMF-format, differential observations
+.fi
+
+The input is further restricted to only those records
+with a photometric system name that matches the system name in a specified CF.
+The most common use of this program is to process SMF-format data.
+The user can further restrict the input by means of program SELECT.
+
+The processing algorithm is as follows:
+.ls 4
+.ls o
+For each subsequent input record, the record format and type of observation
+are compared against the format and type of the first record
+(as described above).
+Only those that match are processed.
+.le
+.ls o
+All acceptable records are then sorted by object number.
+Because this sorting may take a considerable time,
+the user is encouraged to restrict the input by using program SELECT.
+.le
+.ls o
+For each different object in the input, a table header is written to the output.
+This header consists of the object number, object name,
+photometric system name, and type of observations.
+Additional headers (e.g. such as the names of individual magnitudes, etc.)
+are extracted from a specified CF.
+.le
+.ls o
+If the list_obs parameter is "yes",
+all observations of an object are first sorted by date and time
+and then listed in chronological order.
+The listing consists the date, time, air mass, and magnitudes.
+Again, because this sorting may take a considerable time,
+the user is encouraged to restrict the input by using program SELECT.
+.le
+.ls o
+If the list_avg parameter is "yes",
+average magnitudes of an object are calculated and listed.
+.le
+.le
+
+Input is read from the standard input.
+They are filtered so that only IMF, NMF, and SMF
+records are selected for the processing described above.
+Output is written to the standard output in an unspecified format
+(i.e. it is not, at present, part of the user interface).
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    list_obs		boolean
+    list_avg		boolean
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF containing magnitude names and other parameters
+(e.g. number of magnitudes).
+.le
+.ls 16 list_obs
+Boolean parameter used to specify whether or not to list all
+observations of each object.
+.le
+.ls 16 list_avg
+Boolean parameter used to specify whether or not to average all
+observations of each object.
+.le
+.le
+
+.sh
+5.28. The UVBY Program
+
+This program is used to initialize a CF
+for ubvy photometry.
+The user must supply the name of the CF as well as
+the position number of each filter.
+Values for second-order extinction coefficients,
+slope transformation coefficients, and color transformation coefficients
+are initialized to 0.0 or 1.0 as appropriate.
+Their error estimates are initialized to 0.0.
+Values for first-order extinction
+coefficients or zero-point transformation coefficients
+are initialized to INDEF.
+These values and their error estimates
+must be calculated (see programs CALC_1_EXT and
+CALC_TRANS) or explicitly set (see program SET_CF) by the user.
+
+The combined extinction and transformation reduction equations are:
+
+.nf
+    mag. #1:        y = A + [y' - K * X] + B * (b-y)
+    mag. #2:    (b-y) = C + D * [(b-y)' - K1 * X]
+    mag. #3:       m1 = E + F * [m1' - K2 * X] + J * (b-y)
+    mag. #4:       c1 = G + H * [c1' - K3 * X] + I * (b-y)
+.fi
+
+where X is air mass,
+unprimed quantities (e.g. those left of the equals sign)
+are standard system magnitudes,
+and their primed counterparts are instrumental system magnitudes.
+The remaining symbols are the extinction and transformation coefficients.
+Natural system magnitudes are represented in the equations
+as values within the square brackets.
+The break-point quantity is set to magnitude #2, i.e. (b-y).
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    u_filter		integer
+    v_filter		integer
+    b_filter		integer
+    y_filter		integer
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF to be initialized.
+.le
+.ls 16 u_filter
+Position number of the u filter.
+Range 1-8.
+For KPNO filter bolts, u_filter is 4.
+.le
+.ls 16 v_filter
+Position number of the v filter.
+Range 1-8.
+For KPNO filter bolts, v_filter is 3.
+.le
+.ls 16 b_filter
+The position number of the b filter.
+Range 1-8.
+For KPNO filter bolts, b_filter is 2.
+.le
+.ls 16 y_filter
+The position number of the y filter.
+Range 1-8.
+For KPNO filter bolts, y_filter is 1.
+.le
+.le
+
+.sh
+5.29. The UVBYHBETA Program
+
+This program is used to initialize a CF
+for combined uvby and H-beta photometry.
+The user must supply the name of the CF as well as
+the position number of each filter.
+Values for second-order extinction coefficients,
+slope transformation coefficients, and color transformation coefficients
+are initialized to 0.0 or 1.0 as appropriate.
+Their error estimates are initialized to 0.0.
+Values for first-order extinction
+coefficients or zero-point transformation coefficients
+are initialized to INDEF.
+These values and their error estimates
+must be calculated (see programs CALC_1_EXT and
+CALC_TRANS) or explicitly set (see program SET_CF) by the user.
+
+The combined extinction and transformation reduction equations are:
+
+.nf
+    mag. #1:        y = A + [y' - K * X] + B * (b-y)
+    mag. #2:    (b-y) = C + D * [(b-y)' - K1 * X]
+    mag. #3:       m1 = E + F * [m1' - K2 * X] + J * (b-y)
+    mag. #4:       c1 = G + H * [c1' - K3 * X] + I * (b-y)
+    mag. #5:     beta = Z + Y * [beta']
+.fi
+
+where X is air mass,
+unprimed quantities (e.g. those left of the equals sign)
+are standard system magnitudes,
+and their primed counterparts are instrumental system magnitudes.
+The remaining symbols are the extinction and transformation coefficients.
+Natural system magnitudes are represented in the equations
+as values within the square brackets.
+The break-point quantity is set to magnitude #2, i.e. (b-y).
+
+NOTE: Separate coefficient solutions for B stars
+and for A and F stars can readily
+be obtained by splitting the IMF into two parts using program SELECT.
+
+Positional or query mode parameters:
+
+.nf
+    CF_file		filename
+    u_filter		integer
+    v_filter		integer
+    b_filter		integer
+    y_filter		integer
+    narrow_filter	integer
+    wide_filter		integer
+.fi
+
+The function and format of these parameters is explained
+in more detail below.
+.ls 4
+.ls 16 CF_file
+File name of the CF to be initialized.
+.le
+.ls 16 u_filter
+Position number of the u filter.
+Range 1-8.
+For KPNO filter bolts, u_filter is 4.
+.le
+.ls 16 v_filter
+Position number of the v filter.
+Range 1-8.
+For KPNO filter bolts, v_filter is 3.
+.le
+.ls 16 b_filter
+The position number of the b filter.
+Range 1-8.
+For KPNO filter bolts, b_filter is 2.
+.le
+.ls 16 y_filter
+The position number of the y filter.
+Range 1-8.
+For KPNO filter bolts, y_filter is 1.
+.le
+.ls 16 narrow_filter
+Position number of the narrow H-beta filter.
+Range 1-8.
+For KPNO filter bolts, narrow_filter is 5.
+.le
+.ls 16 wide_filter
+The position number of the wide H-beta filter.
+Range 1-8.
+For KPNO filter bolts, wide_filter is 6.
+.le
+.le
+
+.sh
+6. Examples
+
+The FILTERPHOT package is one of the top level IRAF packages.
+It is located in the IRAF root menu under the name "filterphot".
+Before loading this package, the user ought to load package DATAIO.
+Upon loading the FILTERPHOT package, the user is presented
+with a menu similar to the following:
+
+.nf
+fi> ?
+    n4_read       p3_read       ph_read       sf_read       sf_write
+    sf_init       sf_list       sf_set        cf_list       cf_set
+    cf_average    auto_edit     average       select        tabulate
+    rate_to_inst  inst_to_nat   nat_to_std    calc_1_ext    calc_2_ext
+    calc_trans    BVRI          UBV           UBVR          UBVRI
+    hbeta         uvby          uvbyhbeta     general
+.fi
+
+Several examples are now given that illustrate various programs
+in the package.
+
+.sh
+6.1 Example 1
+
+The user has a new PHOTOM data tape containing all-sky photometry
+on the uvby photometric system.
+The user also has a STARFILE data tape containing not only coordinates
+of all objects but also magnitudes of standard stars.
+The following commands may be used to interactively reduce the data:
+
+fi> allocate,'mta'
+
+This command allocates tape drive 'mta'.
+Program ALLOCATE is in the DATAIO package.
+fi> sf_init,'uvby.stars'
+
+This command initializes the default caches of a SF named 'uvby.stars'.
+
+fi> ??? | sf_read,'uvby.stars',0
+
+The ??? represents a currently undefined program in the DATAIO package
+that physically reads a magnetic tape on a specified tape drive
+('mta' for this example) and performs all necessary
+unblocking of the data.
+It is used to read the STARFILE tape.
+The output of ??? is piped into program SF_READ
+which decodes the STARFILE information and stores it
+cache 0 of a SF named 'uvby.stars'.
+
+fi> ??? | ph_read,>uvby.raw
+
+Again, ??? represents a currently undefined program in the DATAIO package.
+It is used to read the PHOTOM tape.
+The output of ??? is piped into program PH_READ which
+decodes the data and creates a PRDF named 'uvby.raw'.
+
+NOTE: For informational use only,
+the first two card-images (i.e header)
+of the tape (actually the file)
+are presented to the user via the standard error file.
+
+fi> average,40.0,<uvby.raw,>uvby.rate
+
+This command averages raw data into individual measurements.
+A dead time of 40 nanoseconds is used in the calculations.
+The output is written to an ARDF named 'uvby.rate'.
+
+fi> uvby,'uvby.parms',4,3,2,1
+
+This command initializes a CF named 'uvby.parms' for uvby photometry.
+Filters u, v, b, and y are in positions 4, 3, 2, and 1, respectively.
+
+fi> rate_to_inst,'uvby.parms',no,<uvby.rate,>uvby.inst
+
+This command converts count rates into all-sky instrumental magnitudes,
+using the reduction defined in a CF named 'uvby.parms'.
+The output is written to a IMF named 'uvby.inst'.
+The argument "no" is associated with parameter calc_diff
+and is used to indicate that no differential magnitudes are desired.
+
+fi> calc_1_ext,'uvby.parms','dummy','weight',no
+
+This command is used to calculate first-order extinction coefficients
+using the weighted-average method.
+The calculated values are written to a CF named 'uvby.parms'.
+(They are also presented to the user via the standard error file.)
+The argument "no" is associated with parameter calc_second
+and indicates that a simultaneous solution for second-order
+coefficients is not desired.
+Indeed, there are no second-order extinction coefficients for uvby photometry.
+Note that a fictitious file named 'dummy' is specified as a SF.
+This argument can be used IN THIS CASE because the weighted-average method
+of calculation does not require a SF.
+
+fi> cf_list,'uvby.parms'
+
+This command displays the current coefficients and other parameters
+stored in the CF named 'uvby.parms'.
+For this example, assume that the user is satisfied with the calculated values.
+
+fi> inst_to_nat,'uvby.parms',<uvby.inst,>uvby.nat
+
+This command converts instrumental into natural system magnitudes,
+using the coefficients in a CF named 'uvby.parms'.
+The output is written to a NMF named 'uvby.nat'.
+
+fi> calc_trans,'uvby.parms','uvby.stars',yes,yes,no
+
+This command calculates transformation coefficients.
+The calculated values are written to a CF named 'uvby.parms'.
+(They are also presented to the user via the standard error file.)
+A SF named 'uvby.stars' is searched for necessary standard values.
+Arguments "yes", "yes", and "no" refer to parameters
+calc_slope, calc_zero, and set_break_point.
+These arguments indicate that a single solution for all transformation
+coefficients is requested.
+
+fi> cf_list,'uvby.parms'
+
+This command displays the current coefficients and other parameters
+stored in a CF named 'uvby.parms'.
+For this example, assume that the user is satisfied with the calculated values.
+
+fi> nat_to_std,'uvby.parms',<uvby.nat,>uvby.std
+
+This command converts natural into standard system magnitudes,
+using the coefficients in a CF named 'uvby.parms'.
+The output is written to a NMF named 'uvby.std'.
+
+.nf
+fi> select,'standard',<uvby.std | tabulate,'uvby.parms',yes,yes,>'table'
+.fi
+
+This command selects and tabulates observations of standard stars.
+The output is written to a file named 'table'.
+The arguments "yes" and "yes" refer to parameters list_obs
+and list_avg, respectively.
+They indicate that a listing of each observation as well as listing
+of the mean value is desired.
+
+fi> deallocate,'mta'
+
+This command deallocates tape drive 'mta'.
+
+.sh
+6.2 Example 2
+
+The user has a PPIII data tape containing interspersed all-sky and
+differential UBV photometry.
+The differential observing sequence is "KCVCVCVCK".
+All program stars are identified by their STARFILE number
+(i.e. they are in the range 1-1500),
+a few Landolt stars are used as standard stars;
+their identification numbers are in the range 5001-5642
+(as supplied by the KPNO data acquisition programs).
+From a previous night's reductions, 
+a SF named 'UBV.stars' and a CF named 'UBV.parms' are available.
+The latter contains mean coefficients that are adequate
+for differential photometry.
+The following commands may be used to reduce the data:
+
+fi> allocate,'mta'
+
+This command allocates tape drive 'mta'.
+
+.nf
+fi> ??? | \
+    p3_read,1,'831001' | \
+    auto_edit,'UBV.stars',yes,no | \
+    average,40. | \
+    raw_to_inst,'UBV.parms',yes,'KCVCVCVCK',no,no,no | \
+    select,'differential' | \
+    inst_to_nat,'UBV.parms' | \
+    nat_to_std,'UBV.parms,>UBV.831001
+.fi
+
+This command reads a PPIII data tape,
+performs many conversions on the data,
+and creates a file named 'UBV.831001'
+that contains reduced, differential UBV photometry.
+All-sky observations of standard stars are removed by program SELECT.
+This command makes extensive use of the pipe mechanism;
+the creation of a great number of intermediate files is avoided.
+In practice, this command should be executed as a script task,
+with appropriate parameter substitution.
+A line-by-line break-down of the command shows that:
+.ls 4
+.ls o
+Program ??? from the DATAIO package reads the data tape.
+.le
+.ls o
+Program P3_READ decodes the data.
+The date of observation (actually the UT date corresponding to
+the first record on tape) is 83-Oct-01.
+.le
+.ls o
+Program AUTO_EDIT inserts names into the data.
+.le
+.ls o
+Program AVERAGE corrects data for a 40. nanosecond dead time
+and averages data within each measurement.
+.le
+.ls o
+Program RAW_TO_INST calculates differential instrumental
+magnitudes by matching object numbers
+with the observing sequence "KCVCVCVCK".
+A single variable star observation is derived from the three
+variable star measurements within the sequence.
+Similarly, a single check star observation is derived
+for the two check star measurements.
+Note that all-sky observations are calculated for the Landolt
+star measurements as well as any program star measurements that do not
+fit into the specified observing sequence.
+.le
+.ls o
+Program SELECT filters out the extraneous all-sky observations.
+.le
+.ls o
+Program INST_TO_NAT converts instrumental into natural system magnitudes.
+.le
+.ls o
+Program NAT_TO_STD converts natural into standard system magnitudes.
+The output is written to a file named 'UBV.831001'.
+.le
+.le
+
+fi> deallocate,'mta'
+
+This command deallocates tape drive 'mta'.
+
+.endhelp
+

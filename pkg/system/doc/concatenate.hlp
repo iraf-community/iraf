@@ -1,0 +1,82 @@
+.help concatenate Nov84 system
+.ih
+NAME
+concatenate -- connect files together into one big file
+.ih
+USAGE
+concatenate files [output_file]
+.ih
+PARAMETERS
+.ls files
+The list of input files.  The standard input, STDIN, may be specified to
+interactively enter a few lines of text rather than read from a disk file.
+All input files should be of the same type (binary or text).
+.le
+.ls output_file
+The name of the output file.  If no file is explicitly specified the
+standard output (STDOUT) is used.
+.le
+.ls out_type = in_type
+The output file type is forced if this parameter is defined as "binary"
+or "text".  If "out_type" does not begin with a "b" (or "B"), or a
+"t" ("T"), then the output type is either "text", if the output file is
+the standard output, or is determined from the type of the first input file.
+.le
+.ls append = no
+If set to "yes", "files" are appended to "output_file".
+.le
+.ih
+DESCRIPTION
+Each file in the input file list is appended to the output file.
+If "output_file" is not the standard output, and if output redirection (">")
+was not specified on the command line, the resulting stream of data is placed
+in a file.  The input can be STDIN, which makes for an easy way to enter a
+few lines of text into a file (but \fItype\fR is usually more convenient).
+If entering data via the standard input, type the end of file character,
+e.g., <ctrl/z>, to terminate the input sequence.
+.ih
+EXAMPLES
+
+1. Write out file1, followed by file2, to the terminal screen.  Note that
+there must be no space after the comma.
+
+.nf
+	cl> concatenate file1,file2
+.fi
+
+2. Write out files file1 and file2 into the new file "outfile".
+
+.nf
+	cl> concatenate file1,file2 outfile
+.fi
+
+3. Copy what you type (up to the end-of-file character) into the file junk.
+
+.nf
+	cl> concatenate STDIN junk
+.fi
+
+4. Write out the contents of each of the files whose names are given in "list",
+one per line, and append this data to "junk".
+
+.nf
+	cl> concatenate @list junk append+
+.fi
+
+5. Concatenation is also possible using \fItype\fR, e.g., the following
+command will append the contents of "file" to the file "outfile", which will
+be created if it does not already exist.
+
+	cl> type file >> outfile
+
+The redirect-append operator ">>" may be used to append the output of any
+task to a file.
+
+.ih
+NOTES
+All input files should be of the same type, either all "text" or all
+"binary".
+.ih
+SEE ALSO
+copy, type
+.endhelp

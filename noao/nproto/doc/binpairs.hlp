@@ -1,0 +1,54 @@
+.help binpairs Oct84 noao.nproto
+.ih
+NAME
+binpairs -- Bin pairs of (x,y) points in log separation
+.ih
+USAGE	
+binpairs file1 file2 rmin rmax nbins
+.ih
+PARAMETERS
+.ls file1
+File containing (x,y) points to be paired.
+.le
+.ls file2
+File containing (x,y) points to be paired.  This file may be the same
+as file1.
+.le
+.ls rmin
+The minimum separation to be binned.
+.le
+.ls rmax
+The maximum separation to be binned.
+.le
+.ls nbins
+The number of log separation bins to be computed.
+.le
+.ls verbose = no
+Print progress information?
+.le
+.ih
+DESCRIPTION
+The (x,y) points in the specified files are paired and the number of pairs
+in each bin of log separation is computed and output.  The two files may
+be the same.  There are
+\fInbins\fR separation bins between the separations \fIrmin\fR and \fIrmax\fR.
+If the verbose parameter is yes then progress information is printed on the
+standard error output at intervals of 5% of the time.
+The output consists of the lower limit of the separation bin, the number of
+pairs in the bin, the number of pairs divided by the total number of pairs,
+and the annular area of the bin.
+
+This task is useful for computing two point correlation functions.
+.ih
+EXAMPLES
+
+.nf
+    cl> binpairs data1 data2 .01 1 20 >> result
+
+	    or
+
+    cl> binpairs data data .01 1 20 >> result
+.fi
+.ih
+SEE ALSO
+.endhelp

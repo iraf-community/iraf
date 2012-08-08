@@ -1,0 +1,78 @@
+.help refz Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slREFZ (ZU, REFA, REFB, ZR)
+
+     - - - - -
+      R E F Z
+     - - - - -
+
+  Adjust an unrefracted zenith distance to include the effect of
+  atmospheric refraction, using the simple A tan Z + B tan**3 Z
+  model (plus special handling for large ZDs).
+
+  Given:
+    ZU    dp    unrefracted zenith distance of the source (radian)
+    REFA  dp    tan Z coefficient (radian)
+    REFB  dp    tan**3 Z coefficient (radian)
+
+  Returned:
+    ZR    dp    refracted zenith distance (radian)
+
+  Notes:
+
+  1  This routine applies the adjustment for refraction in the
+     opposite sense to the usual one - it takes an unrefracted
+     (in vacuo) position and produces an observed (refracted)
+     position, whereas the A tan Z + B tan**3 Z model strictly
+     applies to the case where an observed position is to have the
+     refraction removed.  The unrefracted to refracted case is
+     harder, and requires an inverted form of the text-book
+     refraction models;  the formula used here is based on the
+     Newton-Raphson method.  For the utmost numerical consistency
+     with the refracted to unrefracted model, two iterations are
+     carried out, achieving agreement at the 1D-11 arcseconds level
+     for a ZD of 80 degrees.  The inherent accuracy of the model
+     is, of course, far worse than this - see the documentation for
+     slRFCO for more information.
+
+  2  At ZD 83 degrees, the rapidly-worsening A tan Z + B tan**3 Z
+     model is abandoned and an empirical formula takes over.  Over a
+     wide range of observer heights and corresponding temperatures and
+     pressures, the following levels of accuracy (arcsec) are
+     typically achieved, relative to numerical integration through a
+     model atmosphere:
+
+              ZR    error
+
+              80      0.4
+              81      0.8
+              82      1.5
+              83      3.2
+              84      4.9
+              85      5.8
+              86      6.1
+              87      7.1
+              88     10
+              89     20
+              90     40
+              91    100         } relevant only to
+              92    200         } high-elevation sites
+
+     The high-ZD model is scaled to match the normal model at the
+     transition point;  there is no glitch.
+
+  3  Beyond 93 deg zenith distance, the refraction is held at its
+     93 deg value.
+
+  4  See also the routine slREFV, which performs the adjustment in
+     Cartesian Az/El coordinates, and with the emphasis on speed
+     rather than numerical accuracy.
+
+  P.T.Wallace   Starlink   19 September 1995
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

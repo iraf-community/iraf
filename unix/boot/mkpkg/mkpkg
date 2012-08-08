@@ -1,0 +1,33 @@
+# Make the MKPKG utility [MACHDEP].
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "$(HSI_LIBS)"
+	$set	XFLAGS = "-c $(HSI_XF)"
+
+	$update	libpkg.a
+	$omake	main.c mkpkg.h <libc/error.h>
+	!$(CC)	$(HSI_LF) main.o libpkg.a $(LIBS) $(HSI_OSLIBS) -o mkpkg.e
+	;
+
+install:
+	$move	mkpkg.e $(hlib)
+	;
+
+libpkg.a:
+	char.c		extern.h mkpkg.h <libc/error.h> <libc/spp.h>
+	fdcache.c	
+	fncache.c	
+	host.c		<libc/error.h> <libc/spp.h> <libc/knames.h> <libc/spp.h>
+	pkg.c		extern.h mkpkg.h <libc/error.h> <libc/spp.h>
+	scanlib.c	<libc/spp.h>
+	sflist.c	<libc/error.h> <libc/spp.h> mkpkg.h extern.h
+	tok.c		extern.h mkpkg.h <libc/error.h> <libc/spp.h>
+	;

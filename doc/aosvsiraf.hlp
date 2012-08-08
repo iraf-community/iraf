@@ -1,0 +1,384 @@
+.help install Sep87 "AOSVS/IRAF Installation Guide"
+.sp 3
+.ce
+\fBAOSVS/IRAF Installation and Maintenance Guide\fR
+.ce
+(draft)
+
+.ce
+Skip Schaller
+.ce
+September 11, 1987
+
+.nh
+Introduction
+
+    This document is a collection of notes for the installation of IRAF
+under AOSVS.  It is not a complete guide, as is available for UNIX or VMS.
+Please refer to the UNIX or VMS guides for more information.  These notes
+basically describe things unique to the AOSVS installation.
+
+.nh
+System Installation
+
+    The following steps should be used to install the IRAF system under AOSVS.
+Since the AOSVS version is distributed as a Load and Go tape, there should be
+very little other configuration steps to do.  See the UNIX or VMS installation
+manuals for reference.
+
+.nh 2
+Create an IRAF Account
+
+    The first step is to set up an account for IRAF.  Become a superuser and
+use the PREDITOR to create a user profile called IRAF.  A sample profile
+appears in the appendix to this document.  Users who wish to use IRAF will
+need at least these privileges, too.  Note that 100MB of disk quota is given.
+About 70MB are necessary to hold the full system, including sources.  (This
+will be much less when a shared library version of AOSVS/IRAF is developed
+under AOSVS revision 7.)  If necessary, the system may be stripped down to
+only runtime files, which will take up about 24MB. To do this, see the UNIX
+installation manual.
+.ks
+.nf
+
+	cl> help doc$unixiraf.hlp fi+ | lpr
+
+.fi
+.ke
+
+.nh 2
+Choose a root directory for IRAF
+
+    The root directory for IRAF should be a subdirectory of an LDU.  This
+is done for two reasons.  First, the shortest pathname to the root
+directory will speed up pathname resolution.  Second, this will avoid
+the maximum directory depth limit of AOSVS with IRAF's deeply
+nested directory tree.  So, create a CPD called IRAF, with a 100MB limit.
+.ks
+.nf
+
+	*) defacl iraf,oware +,re
+	*) dir :ldu
+	*) create/dir/max=200000 iraf
+	*) dir iraf
+
+.fi
+.ke
+
+.nh 2
+Read the Distribution Tape
+
+    The system is distributed on one or more DUMP format tapes.
+The order in which the tapes are read is not important.  If you requested
+1600 BPI, you will get two tapes, and you should type the following to load
+each tape.
+.ks
+.nf
+
+	*) load_ii/density=1600/buffersize=8192 @mtb0:0
+
+.fi
+.ke
+If you requested 6250 BPI, you will get one tape, and you should type the
+following to load the tape.
+.ks
+.nf
+
+	*) load_ii/density=6250/buffersize=32768 @mtb0:0
+
+.fi
+.ke
+
+.nh 2
+Set up the Host System Environment
+
+    You now must install some links so that users may gain access to IRAF.
+To do this, run the following CLI script to install the links.  Examine
+the script carefully before you run it, so that you understand what it does
+and to make sure that it doesn't conflict with something locally installed.
+.ks
+.nf
+
+	*) dir aosvs:hlib
+	*) install_links :ldu :util
+
+.fi
+.ke
+The first argument to install_links should be the pathname of the directory
+or LDU containing the IRAF root directory "IRAF".  The second argument can be
+the pathname of any directory on the users' default searchlist.
+
+    Note that the filename, IRAFDIR, is a reserved symbol, and should not be
+used anywhere else in the AOSVS system.
+
+    If your system doesn't already have one, you will probably want to set
+up a scratch directory called :TMP.
+
+    Edit the following command into your system UP.CLI macro, near the end:
+.ks
+.nf
+
+	irafdir:aosvs:hlib:upiraf/nonet
+
+.fi
+.ke
+    This will setup the IRAF magtape allocation facility.  Edit the file
+:iraf:aosvs:os:util:remop.cli to set the ACL of the file @magtape.defacl
+according to your wishes.  An ACL of +,WARE will allow non-IRAF users
+to use the magtapes without allocation.  A null ACL will require non-IRAF
+users to use the macros ?MT, AMT, and DMT to access the tape drives.
+You should edit
+:iraf:aosvs:os:util:?mt.cli to reflect you own tape drive configuration.
+If you use the /noremop switch, the IRAF magtape allocation facility
+will not be setup.
+
+    If you do not use the /nonet switch, you will get the TCPIP networking
+facility for IRAF.  You must have previously configured TCPIP, of course.
+
+.nh 2
+Configure the IRAF Environment
+
+    You may now log in as user IRAF to check that certain configuration
+files reflect your site.  Edit them as necessary.  The first directory to
+check is :IRAF:DEV.  The most important file here is DEVICES.  Edit this
+file to reflect your local complement of magnetic tapes.  Check the other
+files in this directory.  See the UNIX installation manual for reference.
+Possible changes would be to edit TERMCAP and GRAPHCAP to support other
+terminals, to cache these entries for efficiency, to edit HOSTLOGIN, HOSTS,
+& UHOSTS for networking, or to link in your CALCOMP library.
+
+    Next check directory :IRAF:AOSVS:HLIB.  The most important files here are
+ZZSETENV.DEF and LOGIN.CL.  You may also want to look at DISKSPACE.CL,
+GRIPES.CL, and SPY.CL.  If you ever wish to rebuild any IRAF libraries, and
+you don't have MV/UX, IRAF will not be able to topologically sort the libraries
+and you will need to use the "-t" switch for LFLAGS in the file MKPKG.INC.
+You might also want to check the files IRAFCC.CLI, IRAFF77.CLI, IRAFLINK.CLI,
+IRAFMASM.CLI, and IRAFSPP.CLI to make sure that they are pointing to the
+correct directories for the compilers.  You may also want to check the batch
+queue definitions in IRAFQBBATCH.CLI, IRAFQBDEFER.CLI, IRAFQBFAST.CLI, and
+IRAFQBSLOW.CLI.  Finally check IRAF.CLI, MKIRAF.CLI, and UPIRAF.CLI.
+
+    Finally check the file, :IRAF:AOSVS:HLIB:LIBC:IRAF.H.  You may want to
+edit the values of IRAF, HOST, or TMP, but this is not necessary.  You can
+edit the pathnames of the include files, but this is also not necessary, as
+they all go through a symbolic link.
+
+.nh 2
+Log into IRAF
+
+    The system is now ready for users to log into the IRAF system.  Log in
+as a normal user and create an IRAF HOME directory.  I recommend that this
+be a control point directory immediately below your system home directory.
+Move to that directory and run MKIRAF.  Answer the questions.  Taking the
+default is recommended.  Note that you may redefine your "imdir" later.
+Make sure that the name of your terminal appears in dev$termcap.  You may
+now enter the IRAF system by typing "iraf".  After this initial setup,
+you may enter IRAF just by moving to this IRAF home directory and typing
+"iraf".  Note that you must start up IRAF from this same IRAF home directory.
+For example:
+.ks
+.nf
+
+	) dir :udd:skip
+	) create/dir/max=999999999 iraf
+	) dir iraf
+	) mkiraf
+	) iraf
+
+.fi
+.ke
+    Note that to use IRAF on a Visual 500, you must display BOTH alpha and
+graphics planes, use 3/4 graphics scaling, and graphics trailer code #001=013.
+Also note the following different definitions of keyboard keys as opposed
+to other IRAF systems.  The keyboard interrupt (abort) is either ^C^A or
+^C^B instead of just ^C.  The End Of File key is ^D, not ^Z.  Available
+editors are SED, VI, and EMACS.  The OS escapes are:
+.ks
+.nf
+
+	!   for CLI commands
+	!!  for sh  commands
+	!!! for csh commands
+
+.fi
+.ke
+    The following background options are available:
+.ks
+.nf
+
+	& (default) = child process at the same priority as your cl
+	&bkg        = child process at the same priority as the batch queues
+	&batch      = batch queued jobs
+
+.fi
+.ke
+Unlike other systems, if you logout of IRAF, you will kill your background
+child processes (first two options).  If you use a batch queued job, you may
+logout of IRAF, and even logout of AOSVS.  Due to restriction of AOSVS, IRAF
+will not work in CPU time limited batch streams.
+.nh
+System Maintenance
+
+    Extensive system maintenance should not be necessary at other sites.  The
+following is included just in case.  The procedures are similar to those for
+UNIX.  See the UNIX installation manual for further reference.
+.nh 2
+Bootstrapping
+
+    Bootstrapping the system recompiles and links the host system interface,
+the kernel libraries and bootstrap utilities.  To do this type the following:
+.ks
+.nf
+
+	) dir :iraf:aosvs
+	) mkboot
+
+.fi
+.ke
+.nh 2
+Sysgen
+
+    The sysgen procedure recompiles and links the portable part of the system.
+Certain files must be precompiled to avoid compiler optimization problems.
+Then you will probably want to go back and rebuild the bootstrap utilities
+with full filename mapping.  Type the following:
+.ks
+.nf
+
+	) dir :iraf
+	) :iraf:aosvs:precomp
+	) mkpkg
+	) dir :iraf:aosvs
+	) rmlib
+	) mkpkg
+
+.fi
+.ke
+.nh 2
+Relinking the System
+
+    A relink of the system is done to force all the executables to be
+relinked to incorporate any changes in the libraries.  Type the following:
+.ks
+.nf
+
+	) dir :iraf
+	) mkpkg update
+	) dir :iraf:aosvs
+	) mkpkg
+
+.fi
+.ke
+The last command may not be necessary if there are no changes to libos.a.
+.nh 2
+Bringing the system up to date after loading it from tape.
+
+    Since AOSVS does not properly restore the time last modified of the
+files you read from the distribution tape, you may wish to bring the
+IRAF libraries up to date without having to recompile everything.  To do
+this, follow the instructions for the -u option of mkpkg in the online help.
+.nh 2
+Multiple versions of IRAF on the same computer.
+
+    Multiple versions of IRAF may be maintained on the same computer system,
+and may be selected at will.  Simply load the entire new IRAF directory tree
+at any desired IRAF root directory, and change the link :IRAFX (or :IRAFO)
+to point to that new IRAF root directory.  To get the new version, you must
+type IRAFX (or IRAFO) before typing MKIRAF or IRAF.  Of course, this can be
+put into your login startup CLI script.  Any equivalent operation is OK, too.
+IRAFX is used for new (experimental) versions of IRAF.  IRAFO is used for
+older versions than the current default system.
+.nh
+New Graphics and Image Devices
+
+    New devices are usually very easy to add to the system.  See the UNIX
+installation manual for full details.
+.nh 2
+Graphics Terminals
+
+    A new graphics terminal can be interfaced by simply installing its
+entry into dev$graphcap.  See the GIO documentation.
+.ks
+.nf
+
+	cl> help gio$doc/gio.hlp fi+ | lprint
+
+.fi
+.ke
+.nh 2
+Hardcopy Graphics plotters
+
+    A new hardcopy graphics plotter can be interfaced most easily through
+the Simple Graphics Interface (SGI).  This requires designing a graphcap entry
+as above and writing a very simple metacode translator host program.  See
+the above mentioned documentation and the SGI manual.
+.nh 2
+Image Display Devices
+
+    See the UNIX installation manual.
+.ks
+.nf
+
+			APPENDIX
+
+A) Sample user profile for IRAF (owner of IRAF system files) and/or potential
+users of IRAF.
+
+INITIAL IPC FILE [:MACROS:USER_SIGNON.IPC]
+PROGRAM [:CLI.PR]
+CREATE WITHOUT BLOCK [YES]
+USE IPC [YES]
+USE CONSOLE [YES]
+USE BATCH [YES]
+USE VIRTUAL CONSOLE [YES]
+ACCESS LOCAL RESOURCES FROM REMOTE MACHINES [YES]
+CHANGE PASSWORD [YES]
+UNLIMITED SONS [YES]
+CHANGE PRIORITY [NO]
+CHANGE TYPE [NO]
+CHANGE USERNAME [NO]
+ACCESS DEVICES [NO]
+SUPERUSER [NO]
+SUPERPROCESS [NO]
+MODEM [YES]
+CHANGE ADDRESS SPACE TYPE [YES]
+CHANGE WORKING SET LIMIT [YES]
+PRIORITY [2]
+MAX QPRIORITY [0]
+DISK QUOTA [200000]
+LOGICAL ADDRESS SPACE    - BATCH     [-1 SYSTEM DEFAULT]
+LOGICAL ADDRESS SPACE    - NON-BATCH [-1 SYSTEM DEFAULT]
+MINIMUM WORKING SET SIZE - BATCH     [-1 SYSTEM DEFAULT]
+MAXIMUM WORKING SET SIZE - BATCH     [-1 SYSTEM DEFAULT]
+MINIMUM WORKING SET SIZE - NON-BATCH [-1 SYSTEM DEFAULT]
+MAXIMUM WORKING SET SIZE - NON-BATCH [-1 SYSTEM DEFAULT]
+USER COMMENT []
+
+.fi
+.ke
+.ks
+.nf
+
+B) AOSVS Bugs.
+
+.fi
+    The current DG release of C has a bug which hangs up IRAF if the file
+:ETC:PASSWD does not exist or is not setup properly.  This file comes
+with MV/UX.  If you are running MV/UX, and you keep the file up to date,
+you should have no problem.  Otherwise, you should create the file and
+enter the following as a minimum.  Ideally, you should add one line for
+each user in the system.
+.nf
+
+bin::2:2::/usr/bin:
+iraf::89:::/udd/iraf:
+lp::6:2::/usr/lib:
+mail::8:::/usr/spool/mqueue:
+op::0:::/udd/op:
+root::0:::/udd/root:
+uucp::5:1::/usr/spool/uucp:/usr/lib/uucp/uucico
+
+
+.fi
+.ke
+.endhelp

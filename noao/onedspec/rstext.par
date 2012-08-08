@@ -1,0 +1,4 @@
+input,f,a,,,,Input RSPECTEXT text file
+output1,f,a,,,,Output file for RTEXTIMAGE
+output2,f,a,,,,Output file for DISPCOR
+header,b,h,yes,,,Pass header?

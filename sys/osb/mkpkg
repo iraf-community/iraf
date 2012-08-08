@@ -1,0 +1,167 @@
+# Make the OSB (bit and byte primitives) portion of the VOPS library.
+
+$checkout libvops.a lib$
+$update   libvops.a
+$checkin  libvops.a lib$
+$exit
+
+generic:
+	# Convert the generic files into typed files.
+	$set GFLAGS = "-k -t UBcsilrdx"
+	$ifolder (achtiu.c, achtzu.gc)
+	    $generic $(GFLAGS) achtzu.gc -o acht\$$tu.c		$endif
+	$ifolder (achtib.c, achtzb.gc)
+	    $generic $(GFLAGS) achtzb.gc -o acht\$$tb.c		$endif
+	$ifolder (achtui.c, achtu.gc)
+	    $generic $(GFLAGS) achtu.gc				$endif
+	$ifolder (achtbi.c, achtb.gc)
+	    $generic $(GFLAGS) achtb.gc				$endif
+	$ifolder (ieeer.x, ieee.gx)
+	    $generic -k -t rd ieee.gx				$endif
+	;
+
+libvops.a:
+	# Generic preprocessing is normally done only on the development system,
+	# and need not be available on all systems.
+
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	# The following contain machine dependent constants.
+	hlib$i1mach.f
+	hlib$d1mach.f
+	hlib$r1mach.f
+
+	# The following should normally be optimized in assembler (see the
+	# special file list in "hlib$mkpkg.sf").
+
+	$ifeq (USE_CCOMPILER, yes)
+	    bytmov.c
+	$else
+	    bytmov.f
+	$end
+
+	bitfields.c
+	aclrb.c			# see also vops/ak/aclr*.x
+
+	# The operation of the following depends upon integer overflow, which
+	# may result in an exception on some hosts.
+
+	urand.x		<mach.h>
+	imul32.c			# added to support 64-bit
+	iscl32.c			# added to support 64-bit
+	iscl64.c			# added to support 64-bit
+	iand32.c			# added to support 64-bit
+	strsum.c			# added for VO integration support
+
+	# If a C compiler is not available for the following they will have
+	# to be written in assembler or some other low level language, and
+	# added to the special file list.
+
+	achtbb.c
+	achtbc.c
+	achtbd.c
+	achtbi.c
+	achtbl.c
+	achtbr.c
+	achtbs.c
+	achtbu.c
+	achtbx.c
+	achtcb.c
+	achtcu.c
+	achtdb.c
+	achtdu.c
+	achtib.c
+	achtiu.c
+	achtlb.c
+	achtlu.c
+	achtrb.c
+	achtru.c
+	achtsb.c
+	achtsu.c
+	achtub.c
+	achtuc.c
+	achtud.c
+	achtui.c
+	achtul.c
+	achtur.c
+	achtus.c
+	achtuu.c
+	achtux.c
+	achtxb.c
+	achtxu.c
+	and.c
+	not.c
+	or.c
+	shift.c
+	abs.c
+	i32to64.c
+	i64to32.c
+	ipak32.c
+	iupk32.c
+	ipak16.c
+	iupk16.c
+
+
+	# Both C and Fortran versions of the following are provided.
+	# The C versions are normally preferred and are the most portable.
+
+	$ifeq (USE_CCOMPILER, yes)
+	    bswap2.c
+	    bswap4.c
+	    bswap8.c
+	    chrpak.c
+	    chrupk.c
+	    strpak.c
+	    strupk.c
+	$else
+	    bswap2.f
+	    bswap4.f
+	    bswap8.f		# not written; wait until we need it
+	    chrpak.f
+	    chrupk.f
+	    strpak.f
+	    strupk.f
+	$endif
+
+	# The following are fairly portable, but potentially machine dependent.
+
+	ieeer.x		<mach.h>
+	ieeed.x		<mach.h>
+
+	miilen.x	<mach.h>
+	miinelem.x	<mach.h>
+	miipak.x	<mii.h>
+	miipak16.x	<mach.h>
+	miipak32.x	<mach.h>
+	miipak8.x	
+	miipakd.x	<mach.h>
+	miipakr.x	<mach.h>
+	miipksize.x	<mach.h>
+	miiupk.x	<mii.h>
+	miiupk16.x	<mach.h>
+	miiupk32.x	<mach.h>
+	miiupk8.x	
+	miiupkd.x	<mach.h>
+	miiupkr.x	<mach.h>
+
+	nmilen.x	<mach.h>
+	nminelem.x	<mach.h>
+	nmipak.x	<nmi.h>
+	nmipak16.x	<mach.h>
+	nmipak32.x	<mach.h>
+	nmipak8.x	
+	nmipakd.x	<mach.h>
+	nmipakr.x	<mach.h>
+	nmipksize.x	<mach.h>
+	nmiupk.x	<nmi.h>
+	nmiupk16.x	<mach.h>
+	nmiupk32.x	<mach.h>
+	nmiupk8.x	
+	nmiupkd.x	<mach.h>
+	nmiupkr.x	<mach.h>
+
+	f77pak.f
+	f77upk.f
+	bitmov.x	<mach.h>
+	xor.x
+	;

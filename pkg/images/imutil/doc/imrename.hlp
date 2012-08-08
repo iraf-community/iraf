@@ -1,0 +1,50 @@
+.help imrename Apr89 images.imutil
+.ih
+NAME
+imrename -- rename one or more images
+.ih
+USAGE
+imrename oldnames newnames
+.ih
+PARAMETERS
+.ls oldnames
+An image template specifying the names of the images to be renamed.
+.le
+.ls newnames
+Either an image template specifying the new names for the images,
+or the name of the directory to which the images are to be renamed (moved).
+.le
+.ls verbose = no
+If verbose output is enabled a message will be printed on the standard output
+recording each rename operation.
+.le
+.ih
+DESCRIPTION
+The \fBimrename\fR task renames one or more images.  The ordinary \fIrename\fR
+task cannot be used to rename images since an image may consist of more than
+one file.
+.ih
+EXAMPLES
+1. Rename the image "pix" to "wfpc.1".
+
+	cl> imrename pix wfpc.1
+
+2. Rename all the "nite1*" images as "nite1_c".
+
+	cl> imrename nite1.*.imh nite1%%_c%.*.imh
+
+3. Move the images in logical directory "dd" to the current directory.
+
+	cl> imrename dd$*.imh .
+
+4. Move the pixel files associated with the images in the current directory
+to a subdirectory "pix" of the current directory.
+
+.nf
+	cl> reset imdir = HDR$pix/
+	cl> imrename *.imh .
+.fi
+.ih
+SEE ALSO
+imcopy, imdelete, imheader
+.endhelp

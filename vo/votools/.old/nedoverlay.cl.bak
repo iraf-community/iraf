@@ -1,0 +1,81 @@
+#{  NEDOVERLAY -- Overlay NED catalog sources on an image display.
+
+procedure nedoverlay (image)
+
+string	image			{ prompt = "Input image"		}
+
+bool	append = yes		{ prompt = "Append display?"		}
+int	mkcolor = 208		{ prompt = "Marker color"	}
+bool	verbose = yes		{ prompt = "Verbose output?"		}
+int	status = 0		{ prompt = "Service status code"	}
+
+begin
+    string img, ned, coords, tvcoords
+    string fields, pos_all, pos_l, pos_w
+    real   ra, dec, size
+    bool   verb, app
+    int    mcol
+
+
+    img  = image		# Get params to local variables
+    verb = verbose
+    app  = append
+    mcol = mkcolor
+
+    if (imaccess (img)) {
+        iferr { wcsinfo (img) } then {
+            error (0, "Cannot determine image coords for `"//img//"'")
+        } else {
+            ra  = wcsinfo.midx
+            dec = wcsinfo.midy
+            size = max (wcsinfo.width, wcsinfo.height) / 60.0
+        }
+    } else 
+        error (0, "Image '"// img // "' not found.")
+    
+
+    # Create temp files for the output
+    coords = mktemp ("tmp$imsky")
+    tvcoords = mktemp ("tmp$imsky")
+    ned = mktemp ("tmp$imsky")
+    fields = mktemp ("tmp$imsky")
+    pos_all = mktemp ("tmp$imsky")
+    pos_l = mktemp ("tmp$imsky")
+    pos_w = mktemp ("tmp$imsky")
+
+
+    # Get NED sources
+    vocatalog ("NED", ra, dec, size, insystem="degrees",  >& ned)
+    
+    # Select the RA,Dec from the output NED table.
+    fields (ned, "3,4,5", >& pos_all)
+    
+    # Expand the list of object types we want to mark.
+    print ("G_Lens\nXray\nRadio\nQSO", > fields)
+
+    #  Mark the Galaxies on the display.
+    match (" G ", ned)  | fields("STDIN","3,4,5", >& pos_all)
+    wcsctran (pos_all, "c1", img, verb-,
+                inwcs="world", outwcs="logical", units="n n")
+    tvmark (frame=1, coords="c1", mark="circle", radii=10, color=mcol, 
+	txsize=1, nxoffset=5, nyoffset=-10)
+    delete ("c1", verify-, >& "dev$null")
+
+    #  Mark the requested objects on the display.
+    list = fields
+    while (fscan (list, s1) != EOF) {
+        match (s1, ned) | fields("STDIN", "3,4,5", >& pos_w)
+	wcsctran (pos_w, pos_l, img, "world", "logical", verb-, units="n n") | \
+	tvmark (frame=1, coords=pos_l, mark="circle", radii=10,
+	    color=mcol, txsize=1, lab+, nxoffset=5, nyoffset=-10)
+    }
+    
+    # Clean up.
+    delete (pos_all, verify-, >& "dev$null")
+    delete (pos_w, verify-, >& "dev$null")
+    delete (pos_l, verify-, >& "dev$null")
+    delete (fields, verify-, >& "dev$null")
+    delete (coords, verify-, >& "dev$null")
+    delete (tvcoords, verify-, >& "dev$null")
+    delete (ned, verify-, >& "dev$null")
+end

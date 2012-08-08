@@ -1,0 +1,6 @@
+May 29, 1987
+
+If a user accidentally leaves the user coordinate as INDEF in tracing
+the spatial distortion then FITCOORDS uses the fitted coordinate
+which is the same as the pixel coordinate.  This causes incorrect
+results.  Some thought should be given to this situation.

@@ -1,0 +1,24 @@
+# NSTAR task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	dpggroup.x	"../../lib/ptkeysdef.h"	../lib/daophotdef.h	  \
+			../lib/apseldef.h
+	dpmemnstar.x	../lib/daophotdef.h	../lib/nstardef.h
+	dpnconfirm.x	../lib/daophotdef.h
+	dpnstar.x	<imhdr.h>		<tbset.h>                 \
+			<mach.h>                ../lib/daophotdef.h       \
+			../lib/apseldef.h       ../lib/nstardef.h
+	dpnstarfit.x	<imhdr.h>		../lib/daophotdef.h       \
+			../lib/apseldef.h	../lib/nstardef.h         \
+			<mach.h>
+	dpntwrite.x	<tbset.h>		<time.h>		  \
+			../lib/daophotdef.h	../lib/apseldef.h         \
+			../lib/nstardef.h
+	t_nstar.x	<fset.h>		<imhdr.h>                 \
+	                ../lib/daophotdef.h
+	;

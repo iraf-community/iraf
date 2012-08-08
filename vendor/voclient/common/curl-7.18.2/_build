@@ -1,0 +1,18 @@
+make clean
+./configure \
+	    --without-ssl \
+	    --without-libssh2 \
+	    --without-krb4 \
+	    --without-gssapi \
+	    --without-spnego \
+	    --without-gnutls \
+	    --without-zlib \
+	    --without-ca-bundle \
+	    --without-libidn \
+	    --without-nss \
+	    --disable-ldap \
+	    --disable-ldaps \
+
+
+make
+cp lib/.libs/libcurl.a ..

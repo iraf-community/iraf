@@ -1,0 +1,517 @@
+			    NEW IRAF MAGTAPE DRIVER
+				 October 1991
+			        (design notes)
+
+
+1. User Interface
+
+1.1 Magtape Specification
+
+	Old format:
+	    
+	    mtX.density[file.record]
+
+	New format:
+
+	    mtX['['file[.record][:(param|param@|param=value):...]']']
+
+	e.g.,
+
+	    mtexb1[4:nb:se@:ts=1200:so=/dev/ttya8]
+
+	    mtX is used only as an index into the devices file, and is not
+	    parsed.  The tape density is no longer singled out as a special
+	    parameter.  If any parameters are specified, these parameters
+	    override those given in the tapecap file entry.
+
+
+1.2 TAPECAP file
+
+	Current Format:
+
+	    irafname [%NNNN] device aliases
+	    e.g.,	 mtb.9	nrst8	rst8 nrst0 rst0
+
+	Revised Format:
+
+	    name[|alias|...]:cap=value:...:[tc=name:]
+
+	Device parameters are specified in termcap file format.
+
+	    mta|mtexb1|Exabyte drive 1:\
+		:dv=nrst0:rd=rst0:\
+		:al=rst0,rst8,rst16,rst24,nrst0,nrst8,nrst16,nrst24:\
+		:tc=exb-sunst:
+	    exb-sunst|Exabyte via SunOS ST driver:\
+		:bs#0:dt=Exabyte:fs#2200:mr#65535:
+
+	This feature will use the new GTY interface.  Modifications are
+	required to 1) allow specification of parameters at open time which
+	will override those given in the file, and 2) make the use of a #
+	for numeric parameters optional (accept either # or =).
+
+
+1.3 I/O Monitoring
+
+	Device and tape type and capacity are given in tapecap.
+	Keep track of tape usage along with file position in lock file.
+	Lock file provides simple means to track usage.  A real time
+	display may optionally be provided by the driver writing to
+	a tape monitoring window via a file or socket, with the name
+	given in tapecap or on the command line.
+
+
+2. Code Changes
+
+	OS,KI
+	    zfiomt.c - all host versions are affected as calling sequence
+	    has changed.  Network interface is affected (new tape system
+	    and old iraf kernel servers are incompatible).
+
+	    The UNIX version of the new driver needs additional code to
+	    optionally log status information to a file or special file.
+	    Support for tcp/ip status logging as well?
+
+	ETC
+	    Device allocation code is affected by the devices file syntax
+	    changes.
+
+	MTIO
+	    Must be changed to reflect magtape specfication and devices file
+	    specification changes, i.e., the density parameter is omitted,
+	    the device name is not quite the same thing, and a general
+	    device parameter mechanism is added.
+
+	    The feature to keep track of the amount of tape used is device
+	    and host independent (given adequate parameterization in the
+	    devices file) hence can be implemented in MTIO.  Output to the
+	    user, and preservation of tape usage status over device closes,
+	    will be via the .lok file and DEVSTATUS.
+
+	    The MTIO driver Z routines seem largely unaffected, except for
+	    the status routine and the i/o routines, which need support added
+	    for blocked devices.
+
+
+3. Device Driver
+
+3.1. Device Classes
+
+	generic			generic device (open/close/read/write)
+	reel			800,1600,6250 bpi 1/2inch reel tape
+	cartridge		various QIC formats - fixed size blocks
+	exabyte			variable size blocks
+	dat			variable size blocks
+
+
+3.2. Device Parameters
+
+[[NOT KEPT UP TO DATE - refer to os$zfiomt.c for latest version. ]]]]
+
+	CODE  TYPE  DEFAULT	DESCRIPTION
+
+	bs    i     0		device block size (0 if variable)
+	dn    i     none	density (bpi)
+	dt    s     generic	drive type
+	fs    i     0		filemark size (Kb)
+	mr    i     65535	maximum record size
+	or    i     63360	optimum record size
+	rs    i     0		record gap size (bytes)
+	ts    i     0		tape capacity (Mb)
+	tt    s     unknown	tape type
+
+	al    s     none	device allocation info
+	dv    s     required	no-rewind device file
+	rd    s     none	rewind device file
+	so    s     none	status output device file or socket
+
+	bo    b     no		BSF positions to BOF
+	fc    b     no		device does a FSF on CLRO
+	ir    b     no		treat all read errors as EOF
+	nb    b     no		device cannot backspace
+        nf    b     no          rewind and space forward to backspace file
+	np    b     no		disable all positioning ioctls
+	ow    b     no		backspace and overwrite EOT at append
+	re    b     no		read at EOT returns ERR
+	rf    b     no		use BSR,FSR to space over filemarks
+	se    b     no		device will position past EOT in a read
+	sk    b     no		skip record forward after a read error
+	wc    b     no		OPWR-CLWR at EOF writes null file
+
+	bf    i     builtin	BSF ioctl code
+	br    i     builtin	BSR ioctl code
+	ct    i     builtin	MTIOCTOP code
+	ff    i     builtin	FSF ioctl code
+	fr    i     builtin	FSR ioctl code
+	ri    i     builtin	REW ioctl code
+
+
+3.3. Host Level Device Operations
+
+	open				(FILE I/O OPERATIONS)
+	close
+	read
+	write
+	wait		(not used)
+
+	FSR				(POSITIONING IOCTLS)
+	BSR
+	FSF
+	BSF
+	REW
+
+	WEOF		(not used)
+	EOM		(not used) (SunOS - space to end of media)
+
+
+3.4. Device Characteristics
+
+	open		No known system/device dependencies.
+
+	close		For a tape opened read-only, close positions to after
+			the filemark of the current file on some SysV systems.
+			This makes it impossible to rewind a device opened
+			no-rewind (after the open/rewind/close the tape is
+			left at the beginning of the second file).  On such
+			systems the tape can only be rewound (left rewound
+			at close) by opening and closing the rewind device.
+
+			It is assumed that when a tape opened for writing is
+			closed an EOT mark is written, and the tape is left
+			positioned after the filemark of the last file
+			written, ready to write the next file (true on all
+			known systems, with some variations in how the EOT
+			is represented).
+
+	read		A read where the record size exceeds the size of the
+			read request is assumed to be an error.
+
+			A read at end of file should return a zero byte
+			count and leave the file positioned after the file
+			mark.  Some devices may return ERR when a tape mark
+			is read.
+
+			If the device block size is zero it is assumed that
+			records can be any size up to the max record size,
+			and that successive records can vary in size.
+
+			If the device block size is nonzero it is assumed
+			that the byte count for read and write requests (the
+			record size) should be a multiple of the device
+			block size.  Multiple physical device blocks are
+			read or written to satisfy an i/o request.  On a
+			read, all notion of the record size is lost, i.e.,
+			a read of N blocks will return N blocks regardless
+			of the blocking factor used in a write.
+
+			A read at EOT may leave the tape positioned after
+			the file mark just read or may result in a zero byte
+			count being returned with no affect on the tape
+			position.
+
+			Following a read error when reading a data record the
+			tape may be left 1) before the bad record, 2) after
+			the bad record, 3) in an undefined position, e.g.,
+			partway through the record.
+
+	write		For variable record devices each write is assumed
+			to write a tape record the size of the output buffer.
+			For fixed block devices it is assumed that the size
+			of the write request must be an integral multiple of
+			the block size, and that multiple physical device
+			blocks will be written to satisfy the request.
+
+	wait		Wait (asynchronous i/o) is not currently used and
+			is emulated in the driver.  Some systems (Ultrix
+			and SunOS 4.1) provide facilities for multi-buffered
+			asynchronous i/o which the iraf driver may make use
+			of in the future.
+
+	FSR		Forward skip record.  Some systems permit a FSR over
+			a filemark and some do not.
+
+	BSR		Backward skip record.  Some systems permit a BSR over
+			a filemark and some do not.
+
+	FSF		Forward skip file.  The tape is assumed to be left
+			positioned after the filemark and before the first
+			record of the next file.
+
+	BSF		Backward skip file.  Some systems leave the tape
+			positioned on the BOT side of the filemark, others
+			leave the tape positioned to just before the first
+			record of the file following the filemark.  A BSF with
+			a zero count may or may not rewind the current file.
+
+	REW		Rewinds the tape, leaving the tape positioned to BOT.
+			No known system/device dependencies.  See the note
+			on the "close" operation, above.
+
+	WEOF		Not currently used.
+
+
+3.5. Driver Options
+
+	overwrite filemark (reel tapes only)
+	disable all backspace operations
+	skip record forward after a read error
+	i/o logging to specified output device
+
+
+3.6. Driver Functions
+
+	ZZOPMT - open and position to desired file
+	    zmtopen
+	    zmtclose
+	    zmtposition
+		zmtrew
+		zmtfsf
+		zmtbsf
+		zmtfsr
+		zmtbsr
+
+	ZZCLMT - close
+	    zmtclose
+
+	ZZRDMT - read next record
+	    read
+	    zmtbsf
+
+	ZZWRMT - write record
+	    write
+
+	ZZWTMT - wait for i/o and return byte count
+
+	ZZRWMT - rewind tape
+	    zmtopen
+	    zmtclose
+
+	ZZSTMT - return device parameters
+
+
+3.7. Notes on Specific Devices
+
+3.7.1 Device Characteristics
+
+3.7.2 Exabyte Drivers
+
+	SunOS 4.1 ST Driver
+	    BSF positions to BOT side of filemark (conventional behavior).
+	    Driver does not allow positioning to after EOT.
+	    Bug where driver loses track of file position is fixed.
+
+	SunOS 4.0.3 ST Driver
+	    BSF positions to first record of file following file mark.
+	    BSF 0 rewinds the current file.
+	    Driver does not allow positioning to after EOT, i.e., when
+		positioning to EOT, after two successive zero reads,
+		it is NOT necessary to backspace over the filemark.
+	    Driver tries to keep track of current file position but has
+		a bug which causes it to zero its counter when appending
+		a file to a tape within open/close.
+	    This bug has two ramifications:
+		o  Will not position to a file before where it thinks
+		   BOT is.
+		o  Will rewind to get to file it thinks is at BOT.
+
+	Earlier (SunOS 3.X) Sun drivers defaulted to fixed block mode, and
+	    probably had other significant differences from the current
+	    round of drivers.
+
+	Ciprico RT Driver
+	    Both fixed and variable block device entries.
+	    rfsd_pr_errlog can get set to 1|2|8 in driver (/dev/mem) to
+		turn on status messages.  Variable is commonly set to 2
+		to get tape position readouts, but this will interfere
+		with iraf networking.
+	    BSF positions to BOT side of filemark (conventional behavior).
+	    EOT is indicated by two file marks, and a read of the second mark
+		will leave the tape positioned to after the mark, requiring
+		a backspace to position to EOT (conventional behavior).
+	    Status (NOP) ioctl implemented, but file/record count always zero.
+
+	Sparcstation (4.1) ST driver
+	    BSR over a filemark confuses the driver - looks like it thinks
+		it saw the EOF when reading in the forward direction.
+		The next read returns EOF and then the real EOF is read,
+		so 2 EOFs in a row are seen (looks like EOT).  The file
+		count in the driver gets messed up.
+	    BSF causes all subsequent reads to return immediately with ERR.
+		One (sometimes two!) REW ioctls are required to clear.
+	    FSF and FSR work.
+
+	R-Squared driver for Exabyte (Sun-3 running 4.1)
+	    Opens drive in fixed block mode.
+	    Read at EOF returns IOERR (driver bug).
+	    Status (NOP) ioctl not implemented.
+
+
+3.8. Pseudocode for Driver Functions
+
+
+# ZZOPMT -- Open the magtape device and position to the given file.
+
+procedure zzopmt (device, acmode, oldrec, oldfile, newfile, chan)
+begin
+	# Open device for positioning.
+	open no-rewind raw device read-only
+
+	# Do not move the tape if opened newfile=0.
+	if (newfile != 0) {
+	    # Rewind to get to known position if position uncertain.
+	    if (current position unknown) {
+		rewind tape
+		oldrec = 1
+		oldfile = 1
+	    }
+
+	    # Position to given file.
+	    newfile = zmtfpos (chan, oldfile, oldrec, newfile)
+	}
+
+	# Reopen if necessary for i/o.
+	if (need write access)
+	    reopen device for writing
+end
+
+
+# ZZCLMT -- Close the magtape device.
+
+procedure zzclmt (chan, acmode, nrecords, nfiles, status)
+begin
+	close device
+
+	nfiles = 0
+	nrecords = 0
+
+	if (acmode == read && device: FSF on close read-only)
+	    nfiles = 1
+	else if (acmode == write && !(at BOF && device: no EOF if no write))
+	    nfiles = 1
+end
+
+
+# ZZRDMT -- Initiate a read of the next tape record into the user buffer.
+
+procedure zzrdmt (chan, buf, maxbytes)
+begin
+	physically read tape
+	save read status for zzwtmt
+end
+
+
+# ZZWRMT -- Initiate a write of the next tape record.
+
+procedure zzwrmt (chan, buf, nbytes)
+begin
+	physically write record
+	save write status for zzwtmt
+end
+
+
+# ZZWTMT -- Wait for i/o to complete and return the byte count and the
+# change to the tape position in files and records.
+
+procedure zzwtmt (chan, nrecords, nfiles, nbytes)
+begin
+	nrecords = 0
+	nfiles = 0
+
+	if (io error) {
+	    nbytes = ERR
+	} else if (read 0 bytes) {
+	    if (at BOF) {
+		# At EOT.
+		if (device: read at EOT will go past EOT)
+		    if (device: cannot backspace) {
+			zmtrew()
+			nfiles = -ARB
+			nrecords = -ARB
+		    } else
+			zmtbsf (1)
+	    } else
+		nfiles = 1
+	} else {
+	    nrecords = 1
+	    clear at BOF flag
+	}
+end
+
+
+# ZZRWMT -- Rewind the named device.
+
+procedure zzrwmt (device, status)
+begin
+	if (device: rewind device specified)
+	    close (open (rewind-at-close device read-only))
+	else {
+	    open no rewind device
+	    zmtrew
+	    close
+	}
+end
+
+
+# ZMTFPOS -- Position to the indicated file.
+
+int procedure zmtfpos (chan, oldfile, oldrec, newfile)
+begin
+	# Already positioned to desired file; don't do anything.
+	if (newfile == oldfile && oldrec == 1)
+	    return (newfile)
+
+	# Move the tape.
+	if (newfile == 1) {
+	    # Rewind.
+	    zzrwmt()
+	} else if (newfile <= oldfile && newfile != EOT) {
+	    # Backspace to desired file.
+	    if (device: cannot backspace) {
+		zmtrew()
+		oldfile = 1
+		oldrec = 1
+		goto fwd_
+	    } else if (device: BSF positions to BOF) {
+		zmtbsf (oldfile - newfile)
+	    } else {
+		zmtbsf (oldfile - newfile + 1)
+		zmtfsf (1)
+	    }
+	} else {
+	    # Space forward to desired file or EOT.
+fwd_	    while (oldfile < newfile || newfile == EOT) {
+		n = read (next record)
+		if (n == 0 && oldrec == 1) {
+		    # At EOT.
+		    if (device: read at EOT will go past EOT) {
+			if (device: cannot backspace) {
+			    newfile = oldfile
+			    zmtrew()
+			    oldfile = 1
+			    oldrec = 1
+			    goto fwd_
+			} else
+			    zmtbsf (1)
+		    }
+		    if (writing && device: overwrite EOF) {
+			if (!device: cannot backspace) {
+			    if (device: BSF positions to BOF)
+				zmtbsf (0)
+			    else {
+				zmtbsf (1)
+				zmtfsf (1)
+			    }
+			}
+		    }
+		    break
+		} else if (n > 0)
+		    zmtfsf (1)
+
+		oldfile++
+		oldrec = 1
+	    }
+	    newfile = oldfile
+	}
+
+	return (newfile)
+end

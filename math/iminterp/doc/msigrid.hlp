@@ -1,0 +1,51 @@
+.help msigrid Dec98 "Image Interpolation Package"
+.ih
+NAME
+msigrid -- evaluate the interpolant on a grid of points
+.ih
+SYNOPSIS
+msigrid (msi, x, y, zfit, nx, ny, len_zfit)
+
+.nf
+    pointer	msi			#I interpolant descriptor
+    real	x[2*nx]			#I x values, 1 <= x[i] <= nx
+    real	y[2*ny]  		#I y values, 1 <= y[i] <= ny
+    real	zfit[len_zfit,ARB]	#O grid of interpolated values
+    int		nx			#I number of x points
+    int		ny			#I number of y points
+    int		len_zfit		#I length zfit, len_zfit >= nx
+.fi
+.ih
+ARGUMENTS
+.ls msi     
+Pointer to the interpolant descriptor structure.
+.le
+.ls x, y
+The x and y arrays of points to be evaluated, or in the case of the drizzle
+interpolant the x and y ranges over which the points are to be evaluated.
+The x and y arrays must be ordered in increasing values of x and y respectively.
+.le
+.ls zfit
+The array of interpolated points.
+.le
+.ls nx, ny
+The number of points in the x and y directions respectively.
+.le
+.ls len_zfit
+The row length of the zfit array. Len_zfit >= nx.
+.le
+.ih
+DESCRIPTION
+MSIGRID evaluates the interpolant at a set of x and y values on a
+rectangular grid or in the case of the drizzle interpolant within
+rectangular regions. It is most efficient for evaluating the interpolant
+at many values which are closely spaced in x and y. For widely spaced
+points MSIVECTOR should be used.
+.ih
+NOTES
+Checking for out of bounds and INDEF valued pixels is the responsibility
+of the user.
+.ih
+SEE ALSO
+msieval, msivector, msider, mrieval, mrider
+.endhelp

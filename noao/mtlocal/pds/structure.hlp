@@ -1,0 +1,85 @@
+.help pdsread 2  "Program Structure"
+.sh
+PDSREAD Structure Chart
+
+.nf
+t_pdsread()
+# Returns when file list is satisfied or if EOT is encountered.
+
+    read_pds (pdsfile, iraffile)
+    # Returns OK or EOF
+	
+	read_header (pds_fd, im, parameters)
+	# Returns OK or EOF
+
+	read_image (pds_fd, im, parameters)
+
+	    set_image_header (im)
+
+	    init_read_scan (parameters)
+	    # Returns OK
+
+	    read_scan (fd, scanbuf)
+	    # Returns EOF or number of points in a scan
+.fi
+
+.sh
+PDSREAD Structure Summary
+
+.ls t_pdsread
+The main procedure reads the control parameters.
+The files to be read and converted are calculated from the specified source
+and file list.
+A loop through the files determines the specific input source names and
+output file names and calls READ_PDS for each conversion.
+.ls read_pds
+The input source is opened and the output image header file is created.
+If only the PDS header is to be listed then a temporary image header
+file is created. The PDS header is read and decoded into the IRAF
+image header bye READ_HEADER. If the image is to be read then
+READ_IMAGE is called. Finally all files are closed. If a temporary
+image file was created it is deleted.
+.ls read_header
+The 120 byte PDS header is read into an integer array. The ID string
+in the first 80 bytes is unpacked into a text string using the MIIUP routine
+and stored in the IRAF image header. The 12 bit PDP values are converted to
+SPP short data valuese using the routine APDP8S.
+The PDP 059 text code is converted to ASCII using the routine APDP059.
+The remaining header quantities are unpacked into short
+or long SPP integers using the MIIUP, APDP8S, UNPACKS and UNPACKL and
+the image dimensions are stored in the IRAF image header.
+Finally the PRINT_HEADER is called to print a long or short version of the
+header.
+.le
+.ls read_image
+The PDS image pixels are converted to an IRAF image file.
+The image file header is set.
+The lines of the image are converted one at a time.
+.ls set_image_header
+The pixel type for the IRAF image is set to the user specified type.
+If no type has been specified then the type is determined from the
+number of bits per pixel given in pds.h.
+.le
+.ls init_read_scan
+Initializes the scan parameters. Input is a long integer array containing
+the decoded header parameters. The procedure uses the number of data points
+per scan, the number of records per scan and the number of points per full
+records, calculates and allocates the buffer space required and determines
+the size of each record in chars. If the tape is an old 7 track tape the
+size of the record must be rounded up till it holds an integral number
+of Cyber words in length. For example a record containing 1001 real data
+points will actually be 1005 data points long with junk in the last 4 spaces.
+.le
+.ls read_scan
+Reads an entire PDS scan a record at a time looping over the number of
+records per scan. The procedure uses the MIIUP
+routine which is machine dependent. The bitpix must correspond to
+an MII type. READ_SCAN returns the number of data points per scan or EOF.
+READ_SCAN  calls APDP8S to convert the 10 or 12 bit data values to short
+integers and calls AFLIPS to flip every other scan if the PDS scan
+is a raster scan.
+.le
+.le
+.le
+.le
+.endhelp

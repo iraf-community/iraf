@@ -1,0 +1,13 @@
+# Mkpkg file for building the IMPORT task builtin formats. 
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	ipcmap.x	../import.h
+	ipgif.x		../import.h
+	ipras.x		../import.h <mach.h>
+	ipxwd.x		../import.h <mach.h>
+	;

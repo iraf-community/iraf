@@ -1,0 +1,11 @@
+# Help directory for the SPECRED package.
+ 
+$doc		=	"./doc/"
+$doslit		=	"noao$imred/src/doslit/"
+
+dofibers	hlp=doc$dofibers.hlp,	src=dofibers.cl
+doslit		hlp=doc$doslit.hlp,	src=doslit$doslit.cl
+msresp1d	hlp=doc$msresp1d.hlp,	src=msresp1d.cl
+skysub		hlp=doc$skysub.hlp,	src=srcfibers$skysub.cl
+ 
+revisions	sys=Revisions

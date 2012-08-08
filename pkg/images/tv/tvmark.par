@@ -1,0 +1,23 @@
+# TVMARK
+
+frame,i,a,1,,,Default frame number for display
+coords,f,a,,,,Input coordinate list
+logfile,f,h,"",,,Output log file
+autolog,b,h,no,,,Automatically log each marking command
+outimage,f,h,"",,,Output snapped image
+deletions,f,h,"",,,Output coordinate deletions list 
+commands,*imcur,h,"",,,"Image cursor: [x y wcs] key [cmd]"
+mark,s,h,"point","point|circle|rectangle|line|plus|cross|none",,The mark type
+radii,s,h,"0",,,Radii in image pixels of concentric circles
+lengths,s,h,"0",,,Lengths and width in image pixels of concentric rectangles
+font,s,h,"raster",,,Default font
+color,i,h,255,,,Gray level of marks to be drawn
+label,b,h,no,,,Label the marked coordinates
+number,b,h,no,,,Number the marked coordinates
+nxoffset,i,h,0,,,X offset in display pixels of number
+nyoffset,i,h,0,,,Y offset in display pixels of number
+pointsize,i,h,3,,,Size of mark type point in display pixels
+txsize,i,h,1,,,Size of text and numbers in font units
+tolerance,r,h,1.5,,,Tolerance for deleting coordinates in image pixels
+interactive,b,h,no,,,Mode of use
+mode,s,h,'ql'

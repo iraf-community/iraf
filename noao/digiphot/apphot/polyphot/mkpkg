@@ -1,0 +1,60 @@
+# POLYPHOT and POLYMARK routines
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin  libpkg.a ".."
+$exit
+
+libpkg.a:
+	# POLYPHOT routines
+
+	appyerrors.x	../lib/polyphot.h
+	apgypars.x	../lib/display.h	../lib/fitsky.h         \
+			../lib/noise.h          ../lib/polyphot.h	\
+			../lib/center.h
+	apycenter.x	../lib/center.h		../lib/polyphot.h
+	apyconfirm.x	../lib/apphot.h		../lib/noise.h		\
+			../lib/center.h		../lib/fitsky.h
+	apycoords.x	../lib/polyphot.h
+	apyfree.x	../lib/apphotdef.h	../lib/polyphotdef.h
+	apyinit.x	../lib/apphotdef.h	../lib/polyphotdef.h
+	apynextobj.x	<fset.h>		../lib/apphot.h         \
+	                ../lib/polyphot.h
+	apypars.x	
+	apyradsetup.x	../lib/fitsky.h		../lib/polyphot.h
+	apyshift.x	../lib/apphot.h         ../lib/polyphot.h
+	apycolon.x	../lib/polyphot.h	../lib/center.h         \
+			../lib/apphot.h		../lib/fitsky.h         \
+			../lib/noise.h		../lib/display.h	\
+			<gset.h>		<error.h>
+	apyfit.x	../lib/polyphot.h	../lib/noise.h          \
+			../lib/apphot.h		 <imhdr.h>              \
+			<mach.h>
+	apyget.x	<fset.h>		../lib/apphot.h         \
+			../lib/fitsky.h		../lib/polyphot.h
+	polyshow.x	../lib/display.h	../lib/polyphot.h
+	apybphot.x	<fset.h>		../lib/display.h        \
+			../lib/polyphot.h	../lib/fitsky.h         \
+			../lib/apphot.h
+	apyphot.x	<ctype.h>		<gset.h>                \
+			../lib/display.h	../lib/polyphot.h	\
+			../lib/fitsky.h		../lib/apphot.h         \
+			<imhdr.h>
+	apyprint.x	../lib/fitsky.h		../lib/center.h         \
+			../lib/apphot.h		../lib/polyphot.h
+	t_polyphot.x	<gset.h>		<fset.h>		\
+			../lib/apphot.h		../lib/polyphot.h       \
+			<imhdr.h>
+
+	# POLYMARK routines
+
+	t_polymark.x	<gset.h>		<fset.h>		\
+			"../lib/apphot.h"	"../lib/polyphot.h"     \
+			<imhdr.h>
+	apmkpylist.x	<gset.h>		<ctype.h>		\
+			"../lib/apphot.h"	"../lib/polyphot.h"
+	apydraw.x	"../lib/polyphot.h"
+	apymkinit.x	"../lib/apphotdef.h"    "../lib/noise.h"
+	apymkfree.x	"../lib/apphotdef.h"
+	apywrite.x	"../lib/apphot.h"	"../lib/polyphot.h"
+	;

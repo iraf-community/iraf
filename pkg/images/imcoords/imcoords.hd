@@ -1,0 +1,23 @@
+# Help directory for the IMCOORDS package
+
+$doc		= "images$imcoords/doc/"
+$src		= "images$imcoords/src/"
+
+ccfind		hlp=doc$ccfind.hlp,		src=src$t_ccfind.x
+ccget		hlp=doc$ccget.hlp,		src=src$t_ccget.x
+ccmap		hlp=doc$ccmap.hlp,		src=src$t_ccmap.x
+ccsetwcs	hlp=doc$ccsetwcs.hlp,		src=src$t_ccsetwcs.x
+ccstd		hlp=doc$ccstd.hlp,		src=src$t_ccstd.x
+cctran		hlp=doc$cctran.hlp,		src=src$t_cctran.x
+ccxymatch	hlp=doc$ccxymatch.hlp,		src=src$t_ccxymatch.x
+hpctran		hlp=doc$hpctran.hlp,		src=src$t_hpctran.x
+imcctran	hlp=doc$imcctran.hlp,		src=src$t_imcctran.x
+mkcwcs		hlp=doc$mkcwcs.hlp,		src=src$mkcwcs.cl
+mkcwwcs		hlp=doc$mkcwwcs.hlp,		src=src$mkcwwcs.cl
+skyctran        hlp=doc$skyctran.hlp,   	src=src$t_skyctran.x
+starfind        hlp=doc$starfind.hlp,   	src=src$t_starfind.x
+wcsctran	hlp=doc$wcsctran.hlp,	  	src=src$t_wcsctran.x
+wcsedit		hlp=doc$wcsedit.hlp,	  	src=src$t_wcsedit.x
+wcsreset	hlp=doc$wcsreset.hlp,	  	src=src$t_wcsreset.x
+revisions	sys=Revisions
+

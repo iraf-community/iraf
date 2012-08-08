@@ -1,0 +1,60 @@
+# Help directory for the IRAF system libraries.
+
+$clio		= "./clio/doc/"
+$dbio		= "./dbio/doc/"
+$debug		= "./debug/doc/"
+$fio		= "./fio/doc/"
+$fmtio		= "./fmtio/doc/"
+$gio		= "./gio/doc/"
+$imio		= "./imio/doc/"
+$imfort		= "./imfort/doc/"
+$memio		= "./memio/doc/"
+$mtio		= "./mtio/doc/"
+$os		= "host$os/doc/"
+$etc		= "./etc/doc/"
+$tty		= "./tty/doc/"
+$vops		= "./vops/doc/"
+
+Sysgen		hlp = Sysgen.hlp,		sys = ..
+
+clio		hlp = clio$clio.men,		sys = clio$clio.hlp,
+		pkg = clio$clio.hd
+
+dbio		hlp = dbio$dbio.men,		sys = dbio$dbio.hlp,
+		pkg = dbio$dbio.hd
+
+debug		hlp = debug$debug.men,		sys = debug$debug.hlp,
+		pkg = debug$debug.hd
+
+fio		hlp = fio$fio.men,		sys = fio$fio.hlp,
+		pkg = fio$fio.hd
+
+fmtio		hlp = fmtio$fmtio.men,		sys = fmtio$fmtio.hlp,
+		pkg = fmtio$fmtio.hd
+
+gio		hlp = gio$gio.men,		sys = gio$gio.hlp,
+		pkg = gio$gio.hd
+
+imio		hlp = imio$imio.men,		sys = imio$imio.hlp,
+		pkg = imio$imio.hd
+
+imfort		hlp = imfort$imfort.men,	sys = imfort$imfort.hlp,
+		pkg = imfort$imfort.hd
+
+memio		hlp = memio$memio.men,		sys = memio$memio.hlp,
+		pkg = memio$memio.hd
+
+mtio		hlp = mtio$mtio.men,		sys = mtio$mtio.hlp,
+		pkg = mtio$mtio.hd
+
+os		hlp = os$os.men,		sys = os$os.hlp,
+		pkg = os$os.hd
+
+etc		hlp = etc$etc.men,		sys = etc$etc.hlp,
+		pkg = etc$etc.hd
+
+tty		hlp = tty$tty.men,		sys = tty$tty.hlp,
+		pkg = tty$tty.hd
+
+vops		hlp = vops$vops.men,		sys = vops$vops.hlp,
+		pkg = vops$vops.hd

@@ -1,0 +1,357 @@
+.help afiltpars Mar00 astcat
+.ih
+NAME
+afiltpars -- edit the catalog filtering parameters
+.ih
+USAGE
+afiltpars
+.ih
+PARAMETERS
+.ls fsort = ""
+The field or field expression on which to sort the catalog / file records.
+The sort may be numeric or character. Sort fields may be expressed by name,
+e.g. "mag1" or field number, e.g. "f3". Sort expressions must be a combination
+of existing fields, e. g. "mag2 - mag1" or "f4 - f3". By default the records
+are not sorted.
+.le
+.ls freverse = no
+Sort in descending order ?
+.le
+.ls fexpr = yes
+The boolean record selection expression. By default all catalog / file records
+are selected, otherwise only records matching the selection expression
+are selected. Selection expressions must be combination of existing fields
+and field expressions, e.g. "mag1 < 16.0", or "(f4 - f3) < 1.5".
+.le
+.ls fields = "f[*]"
+The list of output fields and field expressions. By default the sorted and
+selected records are output as is. Output fields may be field names, e.g.
+"mag1", field numbers e.g. "f3", or field ranges e.g. "f[1-4]". Output field
+expressions must be a combination of existing fields, e.g. "mag2 - mag1",
+or "f4 - f3".
+.le
+.ls fnames = ""
+The list of new field names separated by commas. By default new fields, e.g.
+fields that are expressions of existing fields are assigned names of the form
+"f#" where # is the field sequence number. Field names must be valid tokens,
+i.e. they cannot be expressions or contain embedded blanks.
+.le
+.ls fntypes = ""
+The list of new field types separated by commas. By default new fields are
+assigned type real. Permitted field types are "s" for string, "i" for
+integer, "r" for real, or "d" for double".
+.le
+.ls fnunits = ""
+The list of new field units separated by commas. By default new fields are
+assigned units of INDEF. Units specifications may not contain embedded blanks.
+.le
+.ls fnformats = ""
+The list of new field formats. By default string, integer, and floating
+point fields are assigned formats of "%10s", "%10d", and "%10g" respectively.
+.le
+.ls fosystem = ""
+The output celestial coordinate system. If fosystem is undefined
+it defaults to the catalog celestial coordinate system. Popular options
+are "icrs", "j2000.0", "b1950.0". The full set of options can be examined
+by typing "help ccsystems".
+.le
+.ls fira = "ra"
+The name of the catalog field containing the right ascension / longitude
+of an object. Most users should leave fira set to "ra". If the user knows
+the number of the right ascension / longitude field the generic field name
+"f#", e.g. "f1" can be used.
+.le
+.ls fidec = "dec"
+The name of the catalog field containing the declination / latitude
+of an object. Most users should leave fidec set to "dec". If the user knows
+the number of the declination / latitude field the generic field name "f#",
+e.g. "f2" can be used.
+.le
+.ls foraunits = ""
+The units of fira. Permitted values are "hours", "degrees", and "radians". If
+foraunits is undefined it defaults to the preferred units of the
+output celestial coordinate system fosystem, e.g. hours for equatorial
+coordinate systems and degrees for ecliptic, galactic, and super-galactic
+coordinate systems.
+.le
+.ls fodecunits = ""
+The units of fidec. Permitted values are "degrees" and "radians". If 
+fodecunits is undefined it defaults to the preferred units of the
+output celestial coordinate system fosystem, e.g. degrees for all systems.
+.le
+.ls foraformat = ""
+The format of fira. If undefined foraformat defaults to the equivalent catalog
+format.
+.le
+.ls fodecformat = ""
+The format of fidec. If undefined fodecformat defaults to the equivalent
+catalog format.
+.le
+.ls fixp = "xp"
+The name of the catalog field containing the predicted x coordinate
+of an object. Most users should leave fixp set to "xp". If the user knows
+the number of the predicted x coordinate field the generic field name
+"f#", e.g. "f1" can be used.
+.le
+.ls fiyp = "yp"
+The name of the catalog field containing the predicted y coordinate
+of an object. Most users should leave fiyp set to "yp". If the user knows
+the number of the predicted y coordinate field the generic field name
+"f#", e.g. "f2" can be used.
+.le
+.ls fixc = "xc"
+The name of the catalog field containing the centered x coordinate
+of an object. Most users should leave fixc set to "xc". If the user knows
+the number of the centered x coordinate field the generic field name
+"f#", e.g. "f1" can be used.
+.le
+.ls fiyc = "yc"
+The name of the catalog field containing the centered y coordinate
+of an object. Most users should leave fiyc set to "yc". If the user knows
+the number of the centered y coordinate field the generic field name
+"f#", e.g. "f2" can be used.
+.le
+.ls foxformat = "%10.3f"
+The format of fixp and fixc. 
+.le
+.ls foyformat = "%10.3f"
+The format of fiyp and fiyc.
+.le
+
+.ih
+DESCRIPTION
+The catalog / file filtering parameters  are used to filter the results
+of a catalog query before writing the results to disk. Catalog / file filtering
+options include: sorting on a field or field expression,
+selecting and rejecting records by evaluating a boolean expression
+for each record, selecting a subset of the fields for output,
+transforming the coordinates from the catalog / file celestial coordinate
+system to a user specified celestial coordinate system, and computing new
+fields from existing fields.
+
+\fIfsort\fR and \fIfreverse\fR define the sort field or field expression and
+the sort order. Sort fields may be field names or field numbers, e.g.
+"mag1" or "f3". By default the sort order is ascending.
+
+Records are selected or rejected based on the value of the boolean expression
+\fIfexpr\fR. By default all catalog / file records are selected. The boolean 
+selection expression must be function of existing catalog fields, e.g.
+the expression "mag1 <= 16.0" will select all records for which the mag1
+field is <= 16.0, and the expression "(f4 - f3) >= 0.0 && (f4 - f3) <= 1.0"
+will select all records for which the difference between fields 4 and 3
+is >= 0.0 but <= 1.0.
+
+The \fIfields\fR parameter defines the list output fields and field 
+expressions. By default all the
+input fields are output. By setting \fIfields\fR appropriately the user
+can select a subset of the input fields for output, rearrange the order
+of the input fields, and compute new fields. For example setting
+fields to "f[2-5]" selects fields 2 to 5 for output; setting fields
+to "f[2-3],f5,f4" select fields 2 to 5 but reverses the order of fields
+4 and 5; setting fields to "f[2-5],f5-f4" selects fields 2 to 5 and
+adds a new field which is the difference between fields 5 and 4.
+
+By default new fields are assigned names of the form "f#" where # is the field
+number, a data type of real, units of INDEF, and formats of %10s, %10d, or
+%10g if they are character, integer, or real respectively. Users can define
+names, data types, units, and formats for the new fields by  setting
+the \fIfnames\fR, \fIfntypes\fR, \fIfnunits\fR, and \fIfnformats\fR
+parameters.
+
+The coordinate system, units, or format of the output coordinates may
+be changed by setting one or more of the \fIfosystem\fR, \fIforaunits\fR,
+\fIfodecunits\fR, \fIforaformat\fR, \fIfodecformat\fR. By default the
+filtering code expects the input coordinates to be located in fields
+called "ra" and "dec". If these fields do not have valid names then
+generic field names of the form "f#" can be substituted.
+
+The names and format of any newly computed pixel coordinate fields may
+be specified by setting one or more of the \fIfixp\fR, \fIfiyp\fR,
+\fIfixc\fR, \fIfiyc\fR, \fIfoxformat\fR, or \fIfoyformat\fR parameters.
+By default the filtering code expects the pixel coordinates to be located
+in fields called "xp", "yp", 'xc", and "yc". If these fields do not have
+standard names then generic field names of the form "f#" can be substituted.
+.ih
+EXPRESSIONS
+
+The output records are selected on the basis of the input boolean
+expression \fIfexpr\fR whose variables are the field names specified
+in the configuration file or the generic equivalents f#.  If after
+substituting the values associated with a particular record into the
+field name variables the expression evaluates to yes, that record is
+included in the output catalog. Numeric expressions can also be used
+to define the sort expression \fIfsort\fR or to define new fields in
+\fIfields\fR.
+
+The supported operators and functions are briefly described below. A detailed
+description of the boolean expression evaluator and its syntax can be found
+in the manual page for the images package hedit task.
+
+The following logical operators can be used in the boolean expression. 
+
+.nf
+        equal             ==    not equal               !=
+        less than         <     less than or equal      <=
+        greater than      >     greater than or equal   >=
+        or                ||    and                     &&
+        negation          !     pattern match           ?=
+        concatenation     //
+.fi
+
+The pattern match character ?=  takes a
+string expression as its first argument and a pattern as its second argument.
+The result is yes if the pattern is contained in the string expression.
+Patterns are strings which may contain pattern matching meta-characters.
+The meta-characters themselves can be matched by preceding them with the escape
+character.  The meta-characters listed below. 
+
+.nf
+        beginning of string     ^       end of string           $
+        one character           ?       zero or more characters *
+        white space             #       escape character        \
+        ignore case             {       end ignore case         }
+        begin character class   [       end character class     ]
+        not, in char class      ^       range, in char class    -
+.fi
+
+The expression may also include arithmetic operators and functions.
+The following arithmetic operators and functions are supported.
+
+.nf
+addition                +               subtraction             -
+multiplication          *               division                /
+negation                -               exponentiation          **
+absolute value          abs(x)          cosine                  cos(x)
+sine                    sin(x)          tangent                 tan(x)
+arc cosine              acos(x)         arc sine                asin(x)
+arc tangent             atan(x)         arc tangent             atan2(x,y)
+exponential             exp(x)          square root             sqrt(x)
+natural log             log(x)          common log              log10(x)
+minimum                 min(x,y)        maximum                 max(x,y)
+convert to integer      int(x)          convert to real         real(x)
+nearest integer         nint(x)         modulo                  mod(x)
+.fi
+
+.ih
+FORMATS
+
+A format  specification has the form "%w.dCn", where w is the field
+width, d is the number of decimal places or the number of digits  of
+precision,  C  is  the  format  code,  and  n is radix character for
+format code "r" only.  The w and d fields are optional.  The  format
+codes C are as follows:
+
+.nf
+b       boolean (YES or NO)
+c       single character (c or '\c' or '\0nnn')
+d       decimal integer
+e       exponential format (D specifies the precision)
+f       fixed format (D specifies the number of decimal places)
+g       general format (D specifies the precision)
+h       hms format (hh:mm:ss.ss, D = no. decimal places)
+m       minutes, seconds (or hours, minutes) (mm:ss.ss)
+o       octal integer
+rN      convert integer in any radix N
+s       string (D field specifies max chars to print)
+t       advance To column given as field W
+u       unsigned decimal integer
+w       output the number of spaces given by field W
+x       hexadecimal integer
+z       complex format (r,r) (D = precision)
+
+Conventions for w (field width) specification:
+
+    W =  n      right justify in field of N characters, blank fill
+	-n      left justify in field of N characters, blank fill
+	0n      zero fill at left (only if right justified)
+absent, 0       use as much space as needed (D field sets precision)
+
+Escape sequences (e.g. "\n" for newline):
+
+\b      backspace   (not implemented)
+\f      formfeed
+\n      newline (crlf)
+\r      carriage return
+\t      tab
+\"      string delimiter character
+\'      character constant delimiter character
+\\      backslash character
+\nnn    octal value of character
+
+Examples
+
+%s          format a string using as much space as required
+%-10s       left justify a string in a field of 10 characters
+%-10.10s    left justify and truncate a string in a field of 10 characters
+%10s        right justify a string in a field of 10 characters
+%10.10s     right justify and truncate a string in a field of 10 characters
+
+%7.3f       print a real number right justified in floating point format
+%-7.3f      same as above but left justified
+%15.7e      print a real number right justified in exponential format
+%-15.7e     same as above but left justified
+%12.5g      print a real number right justified in general format
+%-12.5g     same as above but left justified
+
+%h          format as nn:nn:nn.n
+%15h        right justify nn:nn:nn.n in field of 15 characters
+%-15h       left justify nn:nn:nn.n in a field of 15 characters
+%12.2h      right justify nn:nn:nn.nn
+%-12.2h     left justify nn:nn:nn.nn
+
+%H          / by 15 and format as nn:nn:nn.n
+%15H        / by 15 and right justify nn:nn:nn.n in field of 15 characters
+%-15H       / by 15 and left justify nn:nn:nn.n in field of 15 characters
+%12.2H      / by 15 and right justify nn:nn:nn.nn
+%-12.2H     / by 15 and left justify nn:nn:nn.nn
+
+\n          insert a newline
+.fi
+
+.ih
+EXAMPLES
+1. List the catalog / file filtering parameters.
+
+.nf
+cl> lpar afiltpars
+.fi
+
+2. Edit the catalog / file filtering parameters.
+
+.nf
+cl> afiltpars
+... edit the parameters in the usual way
+... type :wq to quit and save the edits
+.fi
+
+3. Edit the catalog filtering parameters from the agetcat task.
+
+.nf
+cl> epar agetcat
+... edit the agetcat parameters
+... move to the afiltpars parameter line and type :e
+... edit the afiltpars parameters
+... type :wq to quit and save the afiltpars edits
+... continue editing the remaining agetcat parameters
+... type :go to execute the task
+.fi
+
+4. Save the current afiltpars parameter values in a text file called
+afilt1.par.  Use the saved parameter set in the next call to the agetcat 
+task.
+
+.nf
+cl> epar afiltpars
+... edit some parameters in the usual way
+... type :w afilt1.par 
+... type :q to quit
+cl> agetcat ... afiltpars=afilt1.par ...
+.fi
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+agetcat, afiltcat
+.endhelp

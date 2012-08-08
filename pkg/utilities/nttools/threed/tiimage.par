@@ -1,0 +1,7 @@
+input,s,a,"",,,">Input images"
+outtable,s,a,"",,,">Output table"
+template,s,h,"",,,">Template table"
+row,i,h,INDEF,,,">Begin insertion in row"
+verbose,b,h,yes,,,">Print operations performed ?"
+version,s,h,"30Jan97",,,
+mode,s,h,"al",,,

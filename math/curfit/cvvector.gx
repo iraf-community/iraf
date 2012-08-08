@@ -1,0 +1,42 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include <math/curfit.h>
+
+$if (datatype == r)
+include "curfitdef.h"
+$else
+include "dcurfitdef.h"
+$endif
+
+# CVVECTOR -- Procedure to evaluate  a curve. The CV_NCOEFF(cv) coefficients
+# are assumed to be in COEFF.
+
+$if (datatype == r)
+procedure cvvector (cv, x, yfit, npts)
+$else
+procedure dcvvector (cv, x, yfit, npts)
+$endif
+
+pointer	cv		# curve descriptor
+PIXEL	x[npts]		# data x values
+PIXEL	yfit[npts]	# the fitted y values
+int	npts		# number of data points
+
+begin
+	switch (CV_TYPE(cv)) {
+	case LEGENDRE:
+	    call $tcv_evleg (COEFF(CV_COEFF(cv)), x, yfit, npts, CV_ORDER(cv), 
+		    CV_MAXMIN(cv), CV_RANGE(cv))
+	case CHEBYSHEV:
+	    call $tcv_evcheb (COEFF(CV_COEFF(cv)), x, yfit, npts, CV_ORDER(cv), 
+		    CV_MAXMIN(cv), CV_RANGE(cv))
+	case SPLINE3:
+	    call $tcv_evspline3 (COEFF(CV_COEFF(cv)), x, yfit, npts,
+	    			CV_NPIECES(cv), -CV_XMIN(cv), CV_SPACING(cv))
+	case SPLINE1:
+	    call $tcv_evspline1 (COEFF(CV_COEFF(cv)), x, yfit, npts,
+	    			CV_NPIECES(cv), -CV_XMIN(cv), CV_SPACING(cv))
+	case USERFNC:
+	    call $tcv_evuser (cv, x, yfit, npts)
+	}
+end

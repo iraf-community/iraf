@@ -1,0 +1,4 @@
+# Parameters for columns task
+filename,s,a,,,,Name of the input table file
+numcols,i,a,,,,Number of columns
+outroot,s,h,"col.",,,Root name of the output column files

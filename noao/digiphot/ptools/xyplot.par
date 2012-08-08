@@ -1,0 +1,20 @@
+# The PEXAMINE task x-y plot parameters
+
+x1,r,h,INDEF,,,Left  world x-coord if not autoscaling
+x2,r,h,INDEF,,,Right world x-coord if not autoscaling
+y1,r,h,INDEF,,,Lower world y-coord if not autoscaling
+y2,r,h,INDEF,,,Upper world y-coord if not autoscaling
+marker,s,h,"box","point|box|plus|cross|circle|diamond|hline|vline",,Marker type
+szmarker,r,h,1.0,0.0,,Marker size
+logx,b,h,no,,,Log scale the x axis?
+logy,b,h,no,,,Log scale the y axis?
+box,b,h,yes,,,Draw box around periphery of window?
+ticklabels,b,h,yes,,,Label tick marks?
+majrx,i,h,5,,,Number of major divisions along x axis
+minrx,i,h,5,,,Number of minor divisions along x axis
+majry,i,h,5,,,Number of major divisions along y axis
+minry,i,h,5,,,Number of minor divisions along y axis
+round,b,h,no,,,Round axes to nice values?
+fill,b,h,yes,,,Fill viewport vs enforce unity aspect ratio?
+grid,b,h,no,,,Draw grid lines at major tick marks? 
+banner,b,h,yes,,,Standard banner?

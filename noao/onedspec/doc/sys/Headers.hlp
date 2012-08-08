@@ -1,0 +1,189 @@
+.LP
+.SH
+Image Header Parameters
+.PP
+The ONEDSPEC package uses the extended image header to extract
+information required to direct processing of spectra. If the
+header information were to be ignored, the user would need to
+enter observing parameters to the program at the risk of
+typographical errors, and with the burden of supplying the
+data. For more than a few spectra this is a tedious job,
+and the image header information provides the means to eliminate
+almost all the effort and streamline the processing.
+.PP
+However, this requires that the header information be present,
+correct, and in a recognizable format. To meet the goal of
+providing a functional package in May 1985, the first iteration
+of the header format was to simply adopt the IIDS/IRS headers.
+This allowed for processing of the data which would be first
+used heavily on the system, but would need to be augmented at
+a later date. The header elements may be present in any order,
+but must be in a FITS-like format and have the following names
+and formats for the value fields:
+.sp 1
+.TS
+l c l
+l l l.
+Parameter	Value Type	Definition
+
+HA	SX	Hour angle (+ for west, - for east)
+RA	SX	Right Ascension
+DEC	SX	Declination
+UT	SX	Universal time
+ST	SX	Sidereal time
+AIRMASS	R	Observing airmass  (effective)
+W0	R	Wavelength at center of pixel 1
+WPC	R	Pixel-to-pixel wavelength difference
+NP1	I	Index to first pixel containing good data (actually first-1)
+NP2	I	Index to last pixel containing good data (last really)
+EXPOSURE	I	Exposure time in seconds (ITIME is an accepted alias)
+BEAM-NUM	I	Instrument aperture used for this data (0-49)
+SMODE	I	Number of apertures in instrument - 1 (IIDS only)
+OFLAG	I	Object or sky flag (0=sky, 1=object)
+DF-FLAG	I	Dispersion fit made on this spectrum (I=nr coefs in fit)
+SM-FLAG	I	Smoothing operation performed on this spectrum (I=box size)
+QF-FLAG	I	Flat field fit performed on this spectrum (0=yes)
+DC-FLAG	I	Spectrum has been dispersion corrected (0=linear, 1=logarithmic)
+QD-FLAG	I	Spectrum has been flat fielded (0=yes)
+EX-FLAG	I	Spectrum has been extinction corrected (0=yes)
+BS-FLAG	I	Spectrum is derived from a beam-switch operation (0=yes)
+CA-FLAG	I	Spectrum has been calibrated to a flux scale (0=yes)
+CO-FLAG	I	Spectrum has been coincidence corrected (0=yes)
+DF1	I	If DF-FLAG is set, then coefficients DF1-DFn (n <= 25) exist
+.TE
+.PP
+The values for the parameters follow the guidelines adopted for
+FITS format tapes. All keywords occupy 8 columns and contain
+trailing blanks. Column 9 is an "=" followed by a space. The value field
+begins in column 11. Comments to the parameter may follow a "/" after
+the value field.  The value type code is as follows:
+.RS
+.IP SX
+This is a sexagesimal string of the form '12:34:56   ' where the first
+quote appears in column 11 and the last in column 30.
+.IP R
+This is a floating point ("real") value beginning in column 11 and
+extending to column 30 with leading blanks.
+.IP I
+This is an integer value beginning in column 11 and extending to
+column 30 with leading blanks.
+.RE
+.sp 1
+.PP
+The parameters having FLAG designations all default to -1 to indicate
+that an operation has not been performed.
+The ONEDSPEC subroutines "load_ids_hdr" and "store_keywords" follow
+these rules when reading and writing spectral header fields.
+If not present in a header, load_ids_hdr will assume a value of zero
+except that all flags are set to -1, and the object flag parameter
+defaults to object.
+.PP
+When writing an image, only the above parameters are stored by store_keywords.
+Other header information is lost. This needs to be improved.
+.PP
+Not all programs need all the header elements. The following table
+indicates who needs what. Tasks not listed generally do not require
+any header information. Header elements not listed are not used.
+The task SLIST requires all the elements listed above.
+The task WIDTAPE requires almost all (except NP1 and NP2).
+The headings are abbreviated task names as follows:
+.sp 1
+.nr PS 8
+.ps 8
+.TS
+center;
+l l | l l | l l.
+ADD	addsets	COE	coefs	FIT	flatfit
+BSW	bswitch	COM	combine	REB	rebin
+CAL	calibrate	DIS	dispcor	SPL	splot
+COI	coincor	FDV	flatdiv	STA	standard
+.TE
+.sp 1
+.TS
+center, tab(/);
+l | l | l | l | l | l | l | l | l | l | l | l | l.
+Key/ADD/BSW/CAL/COI/COE/COM/DIS/FDV/FIT/REB/SPL/STA
+_
+HA// X////////// X/
+RA// X////////// X/
+DEC// X////////// X/
+ST// X////////// X/
+UT// X////////// X/
+AIRMASS// X////////// X/
+W0// X/ X/// X//// X/ X/ X/
+WPC// X/ X/// X//// X/ X/ X/
+NP1/////////// X///
+NP2/////////// X///
+EXPOSURE/ X/ X/// X/ X///// X///
+BEAM-NUM// X/ X//// X/ X/ X// X/ X//
+OFLAG// X////////// X/
+DF-FLAG//// X
+DC-FLAG// X//// X//// X/ X/ X/
+QD-FLAG//////// X/
+EX-FLAG// X/
+BS-FLAG// X/
+CA-FLAG/ X// X//////// X/
+CO-FLAG///// X//
+DFn//// X/
+.TE
+.nr PS 10
+.ps 10
+.bp
+.SH
+Headers From Other Instruments
+.PP
+The header elements listed above are currently created only when reading
+IIDS and IRS data from one of the specific readers: RIDSMTN and RIDSFILE.
+The time-like parameters, (RA, DEC, UT, ST, HA), are created in a
+compatible fashion by RCAMERA and RFITS (when the FITS tape is written
+by the KPNO CCD systems).
+.PP
+For any other header information, the ONEDSPEC package is at a loss
+unless the necessary information is edited into the headers with
+an editing task such as HEDIT. This is not an acceptable long term
+mode of operation, and the following suggestion is one approach to
+the header problem.
+.PP
+A translation table can be created as a text file which outlines
+the mapping of existing header elements to those required by the
+ONEDSPEC package. A mapping line is needed for each parameter
+and may take the form:
+.sp 1
+.RS
+.DC
+1D_param    default    hdr_param    key_start   value_start   type   conversion
+.DE
+.RE
+where the elements of an entry have the following definitions:
+.TS
+center;
+l l.
+1D_param	T{The name of the parameter expected by the ONEDSPEC package,
+such as EXPOSURE, OFLAG, BEAM-NUM.  T}
+
+default	T{A value to be used if no entry is found for this parameter.T}
+
+hdr_param	T{The string actually present in the existing image header to be
+associated with the ONEDSPEC parameter. T}
+
+key_start	T{The starting column number at which the string starts 
+in the header. T}
+
+value_start	T{The starting column number at which the string describing the
+value of the parameter starts in the header. T}
+
+type	T{The format type of the parameter: integer, real, string, boolean,
+sexagesimal. T}
+
+conversion	T{If the format type is string, a further conversion may 
+optionally be made to one of the formats listed under type. T}
+.TE
+.sp 1
+.PP
+A translation file can be built for each instrument and its
+peculiar header formats, and the file name associated with a
+package parameter. The two subroutines in ONEDSPEC dealing
+directly with the headers (load_ids_hdr and store_keywords)
+can be modified or replaced to access this file and
+translate the header elements.
+.endhelp

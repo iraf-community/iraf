@@ -1,0 +1,57 @@
+This file describes how to install a new version of CFITSIO in TABLES.
+
+CFITSIO can be obtained from the High Energy Astrophysics Archive Research
+Center, HEASARC:
+
+    http://heasarc.gsfc.nasa.gov/fitsio
+
+The directory containing CFITSIO in the TABLES package is:
+
+    tables$lib/tbtables/cfitsio/
+
+Before installing a new version, save the mkpkg file from the above
+directory, since a new distribution may include a file with the same
+name but with very different contents.
+
+After saving mkpkg, the files in the distribution can then be installed
+in tables$lib/tbtables/cfitsio/.  Copy the saved version of mkpkg into
+this directory, clobbering the version from the distribution.  This saved
+version of mkpkg may need to be modified to include new files, as described
+below.
+
+These are the files that may need to be modified (unless these changes
+have been incorporated into future versions of CFITSIO):
+
+    eval_l.c
+    fitsio2.h
+
+Changes to eval_l.c and fitsio2.h:
+
+On a VMS machine, if the linker gives an error about strcasecmp and
+strncasecmp being redefined, remove vms and __vms from this section
+(this is near the end of both files):
+
+#if defined(vms) || defined(__vms) || defined(WIN32) || defined(__WIN32__) || defined(macintosh)
+ 
+/* ================================================================== */
+/* A hack for nonunix machines, which lack strcasecmp and strncasecmp */
+/* ================================================================== */
+
+changing it to this:
+
+#if defined(WIN32) || defined(__WIN32__) || defined(macintosh)
+ 
+/* ================================================================== */
+/* A hack for nonunix machines, which lack strcasecmp and strncasecmp */
+/* ================================================================== */
+
+Changes to mkpkg:
+
+There will be files in the CFITSIO distribution that are not needed by
+the TABLES library, such as test programs; these should not be included
+in mkpkg.  However, there may be new source files that contain functions
+that are called by functions that are called by the table I/O routines.
+If the link fails for the ttools package, find the source files containing
+the missing modules, and add these files to the list of dependents in mkpkg
+for libtbtables.a.  It may require more than one iteration to find all the
+required source files.

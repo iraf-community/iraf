@@ -1,0 +1,31 @@
+# IN_RMS -- Compute rms of points which have a non-zero weight.
+
+PIXEL procedure in_rms$t (y, fit, wts, npts)
+
+PIXEL	y[npts]		# function
+PIXEL	fit[npts]	# fit
+PIXEL	wts[npts]	# weights
+int	npts		# number of points
+
+int	i, ndata
+PIXEL	resid, rms
+
+begin
+	rms = PIXEL (0.0)
+	ndata = 0
+
+	do i = 1, npts {
+	    if (wts[i] == PIXEL (0.0))
+		next
+	    resid = y[i] - fit[i]
+	    rms = rms + resid * resid
+	    ndata = ndata + 1
+	}
+
+	if (ndata > 0)
+	    rms = sqrt (rms / ndata)
+	else
+	    rms = PIXEL (0.0)
+
+	return (rms)
+end

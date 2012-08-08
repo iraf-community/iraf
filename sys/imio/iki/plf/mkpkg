@@ -1,0 +1,17 @@
+# Make the PLF image kernel (PLIO mask image kernel).
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	plfaccess.x	plf.h
+	plfclose.x	<imhdr.h> <imio.h> <plset.h>
+	plfcopy.x	plf.h <error.h>
+	plfdelete.x	<error.h>
+	plfnull.x	
+	plfopen.x	<imhdr.h> <imio.h> <plio.h> <pmset.h>
+	plfrename.x	plf.h <error.h>
+	plfupdhdr.x	<imhdr.h> <imio.h> <plset.h>
+	;

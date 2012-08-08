@@ -1,0 +1,119 @@
+.help sections Dec85 images.imutil
+.ih
+NAME
+sections -- expand an image template
+.ih
+USAGE
+sections images
+.ih
+PARAMETERS
+.ls images
+Image template or list of images.  There is no check that the names are
+images and any name may be used.  The thing which distinguishes an image
+template from a file template is that the special characters '[' and
+']' are interpreted as image sections rather than a character class
+wildcard unless preceded by the escape character '!'.  To explicitly
+limit a wildcard template to images one should use an appropriate
+extension such as ".imh".
+.le
+.ls option = "fullname"
+The options are:
+.ls "nolist"
+Do not print list.
+.le
+.ls "fullname"
+Print the full image name for each image in the template.
+.le
+.ls "root"
+Print the root name for each image in the template.
+.le
+.ls "section"
+Print the section for each image in the template.
+.le
+.le
+.ls nimages
+The number of images in the image template.
+.le
+.ih
+DESCRIPTION
+The image template list \fIimages\fR is expanded and the images are printed
+one per line on the standard output unless the "nolist" option is given.
+Other options allow selection of a portion of the image name.  The number
+of images in the list is determined and stored in the parameter \fInimages\fR.
+
+This task is used for several purposes:
+.ls (1)
+To verify that an image template is expanded as the user desires.
+.le
+.ls (2)
+To create a file of image names which include image sections.
+.le
+.ls (3)
+To create a file of new image names using the concatenation feature of the
+image templates.
+.le
+.ls (4)
+To determine the number of images specified by the user in a command language
+script.
+.le
+
+There is no check that the names are images and any name may be used.
+The thing which distinguishes an \fIimage template\fR from a \fIfile
+template\fR is that the special characters '[' and ']' are interpreted
+as image sections rather than a character class wildcard unless
+preceded by the escape character '!'.  To explicitly limit a wildcard
+template to images one should use an appropriate extension such as ".imh".
+.ih
+EXAMPLES
+1. Calculate and print the number of images in a template:
+
+.nf
+	cl> sections fits*.imh opti=no
+	cl> = sections.nimages
+	cl> 7
+.fi
+
+2. Expand an image template:
+
+.nf
+	cl> sections fits*![3-9].imh[1:10,*]
+	fits003.imh[1:10,*]
+	fits004.imh[1:10,*]
+	<etc.>
+.fi
+
+Note the use of the character class escape, image section appending,
+and explicit use of the .imh extension.
+
+3. Create a new list of image names by adding the suffix "new":
+
+.nf
+	cl> sections jan18???//new
+	jan18001new
+	jan18002new
+	<etc.>
+.fi
+
+Note the use of the append syntax.  Also there is no guarantee that the
+files are actually images.
+
+4. Subtract two sets of images:
+	
+.nf
+	cl> sections objs*.imh[100:200,300:400] > objslist
+	cl> sections skys*.imh[100:200,300:400] > skyslist
+	cl> sections %objs%bck%* > bcklist
+	cl> imarith @objslist - @skyslist @bcklist
+.fi
+
+Note the use of the substitution syntax.
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+The  image list is not sorted.           
+.ih
+SEE ALSO
+files
+.endhelp

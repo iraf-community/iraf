@@ -1,0 +1,120 @@
+.help tjoin Apr99 tables
+.ih
+NAME
+tjoin -- Combine two tables based on equal values in common columns
+.ih
+USAGE
+tjoin intable1 intable2 outtable column1 column2
+.ih
+DESCRIPTION
+This task combines two tables into a new table on the basis of one or
+more common columns.  Two rows from the input tables are combined to
+form a row of the output table whenever the values in the common
+columns are equal. If a row in one of the input tables matches several
+rows in the other input table, all combinations of the rows are placed
+in the output table. Null table elements are never matched.  Tables
+can be joined on row number as well as on column by setting the column
+name to "row".
+
+This task has three hidden parameters, 'extrarows', 'tolerance', and
+'casesens'.  By default, if a row in one of the input tables does not
+match any row in the other input table, it is not placed in the output
+table.  However, if the parameter 'extrarows' is set to 'first', rows
+in the first table that are unmatched are added to the output table
+and if 'extrarows' is set to 'both', unmatched rows from both input
+tables are added to the output table.
+
+The task parameter 'tolerance' is a comma separated list of
+values. The number of values should either equal to the number of join
+columns or one. If only one value is supplied and there are more than
+one join column, the value is used for all columns.  If the difference
+between two column values is less than or equal to the corresponding
+value of 'tolerance', the values are considered equal and their
+respective rows are placed in the output table.
+
+If 'casesens = no', the case of a string is ignored when testing for
+equality. 'tolerance' must be set to zero when comparing string or
+boolean columns.
+
+If a value of 'tolerance' is nonzero, the output table will contain the
+corresponding join columns from both tables. If a value of
+'tolerance' is zero, the output table will contain a single join column,
+as both values are identical. If a column name in the first input
+table is the same as a column name in the second input table, this
+task tries to create a unique name by appending "_1" to the first name
+and "_2" to the second name. If the task cannot create a unique name
+in this way, it stops with an error.
+.ih
+PARAMETERS
+.ls intable1 [file name]
+First input table. 
+.le
+.ls intable2 [file name]
+Second input table.
+.le
+.ls outtable [file name]
+Output table.  This is the join of the two input tables.
+.le
+.ls column1 [string]
+Names of the common columns in the first table. If there is more than
+one column name, the names should be separated by commas. If a column
+name is "row", the join is done on row number instead of the value of
+a column. This only works if there is not column named "row" in the
+table.
+.le
+.ls column2 [string]
+Comma separated list of names of the common columns in the second
+table. The number of names must match the number of names in column1.
+The name may be "row", in which case the join is done on row number.
+.le
+.ls (extrarows = "neither") [string, allowed values: neither|first|both]
+This parameter controls whether unmatched rows are added to the output 
+table. If it is set to 'neither', unmatched rows are not added. If it
+is set to 'first', unmatched rows from the first table are added. If
+it is set to 'both', unmatched rows from both tables are added. When
+unmatched rows are added to the output table columns in the output
+table derived from the other table have their values left undefined.
+.le
+.ls (tolerance = "0.0") [string]
+Tolerance used in testing for equality between common columns. The
+values must be greater than or equal to zero. If there is more than
+one common column, this parameter may be a comma separated list of
+values. In this case, the number of tolerance values must equal the
+number of common columns or be one. If there is only one tolerance
+value, the same value is used for all columns.
+.le
+.ls (casesens = yes) [boolean]
+Is case important in testing equality of strings?
+If set to "yes", the test for equality is case sensitive.
+.le
+.ih
+EXAMPLES
+1. Combine a table of star positions and a table of star magnitudes to create
+a star catalog. The star name is not case sensitive:
+
+.nf
+tt> tjoin starpos.tab starmag.tab starcat.tab name name case-
+.fi
+
+2. Create a table of all spectral lines that match a set of reference
+wavelengths within 10 angstroms:
+
+.nf
+tt> tjoin spectrum.tab reference.tab lines.tab WAVE WAVE tol=10.
+.fi
+
+3. Combine a phone list with an address list where the name is stored
+in two columns, "last" and "first". 
+
+.nf
+tt> tjoin phone.tab address.tab output.tab LAST,FIRST LAST,FIRST
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+tselect, tproject, tproduct
+.endhelp

@@ -1,0 +1,1330 @@
+.help quadman Sep93 Version-0.0
+.ce
+\fIV-ARCON. Reduction of CCD data obtained with Arcon\fR
+
+.nf
+     1. Introduction
+     2. Getting the Data
+     3. Reducing the Data
+          3.1   Introduction
+          3.2   Reading the Data from Tape
+          3.3   Setting Up the Translation File
+                3.3.1  Setinstrument for CCD Used
+                3.3.2  Setting the Subsets Parameter and Preparations 
+          3.4   Preparing Individual Calibration Frames
+	  3.5   Processing the calibration frames
+          3.6   Preparing a Final Flat Field
+          3.7   Processing the Images
+          3.8   Creating the Bad Pixel File
+          3.9   Writing the Data to Tape
+
+
+
+
+
+
+					A thinly disguised version of CCDMAN
+
+
+						     Lisa Wells
+
+                                                    Mario Hamuy
+
+						 September 30, 1993
+.fi
+.bp
+.ls \fI1. Introduction\fR
+
+CCDRED is a package in IRAF used for CCD data reduction. It is primarily used
+for CCD imaging although various aspects are also used for spectral reduction.
+This document is intended as a guideline to reducing direct CCD images using
+IRAF. If you are reducing spectra, see Section III or IV of
+this manual. If you do not have experience using IRAF we suggest that
+you start by
+reading "An Introduction to IRAF" which will give you a general idea of IRAF
+structure as well as a few fundamental tools. If you plan to use this package
+extensively, there is a demo on the computer as well which will run through
+the reduction process interactively. Once you login and enter IRAF
+type the following:
+
+.nf
+      cl> noao
+      no> imred
+      im> ccdred
+      cc> ccdtest
+      cc>
+.fi
+
+The cc> prompt indicates the package has been loaded. 'ccdtest' contains several
+tasks one of which is 'demo'. Now type 'demo' and follow the instructions. It
+will prompt you, from time to time, to continue to the next section.
+
+The examples shown here are just that, examples. The user must decide
+upon the reduction procedure, naming, convention, etc..., appropriate for
+his/her own data and use the cookbook and examples as guidelines only. The
+examples are shown with prompts, for the package containing the tasks (do not
+type the prompts, of course). It is strongly recommended that you perform an
+'lpar' on every task immediately before using it, unless you are familiar with
+all of its parameters. This is not always shown in the examples, but is normal
+practice even among seasoned IRAF users.
+
+IRAF uses two conventions that you should always keep in mind. 
+First, images consist of lines and columns (not rows and columns). Keep in mind
+that the mountain Forth systems for the CCDs are zero-indexed and use rows and
+lines. IRAF uses one-indexed coordinates for images (see figure 1). Second,
+the "order" of a function is the number of independent coefficients for a
+polynomial, or the number of intervals for a spline curve. For example, a cubic
+(third-degree) polynomial is described as "order=4" (four coefficients).
+
+If you require personal assistance in your reductions please contact
+either Mauricio Navarrete or Nelson Saavedra on Tololo (ex 422),
+or Mario Hamuy(ex 210) in La Serena.
+.le
+.bp
+.ls \fI2. Getting the Data\fR
+
+Many observers often get confused about the number and kind of calibration
+frames that must be taken to properly reduce their data. During a whole
+run you should get the following:
+
+1) Bias frames for each night are essential no matter what setup and chip
+you are using. 20-30 of these should be taken and combined.
+
+2) Dome flats should be taken for each filter you are using. Preferably
+this should be done every day, but you can get by with just one per run,
+as long as you take a sufficient number of them, say 20-30.
+
+3) Twilight sky flats are necessary if you want to do photometry to better
+than 2%-3%, if you are doing surface photometry of extended objects,
+or if sky subtraction is critical. We suggest that everyone take sky flats
+since it is a good check of your dome flat iillumination. For some CCDs it
+is better to use a sky flat to flatten your objects and this may depend
+upon the filters being used.
+It was found at the 0.9-m and 1.5-m telescopes that
+sky flats do better in flattening your
+images in the U and B filters. It is therefore
+suggested that you concentrate on getting many U and B sky flats (10 or more)
+since you will probably process your data using them.
+These will be combined in the first steps of the reduction.
+
+4) Darks are worth taking to check that things are working but dark correction
+is not necessary for any of the CCDs now used at CTIO. The dark current
+should be <10 e-/hour/pixel, if greater, then something is wrong and you
+should get it fixed.
+
+5) Photometric standard stars should be taken when needed and as many as
+necessary (>20) to properly calibrate your objects.
+
+You should refer to the instrument manual for more details. We
+suggest that you start taking your calibration frames early in the afternoon so
+that you have enough time left for supper. It is important to note on your
+calibration frames, the positions of bad pixels and then avoid observing
+your objects on these regions of the CCD, especially if you plan to do
+photometry. At the end of the reductions, you may wish to use a bad pixel map
+to correct the bad pixels. This will be discussed later (section 3.8)
+in more detail.
+.le
+.bp
+.ce
+\fI3. Reducing the Data\fR
+.ls \fI3.1 Introduction\fR
+
+A full reduction of CCD data requires the following operations (see the
+flow diagram on the next page):
+
+.nf
+      1) Combine the bias, flats and darks.
+      2) Fit and subtract a readout bias given by the overscan strip.
+      3) Trim the image of overscan strip and border rows and columns.
+      4) Subtract the dark, if appropriate.
+      5) Prepare a final flat.
+      6) Divide by the flat field.
+      7) Fix the bad pixels in all the images.
+      8) Fringing corrections may be done at the end.
+.fi
+
+The most general processing, described in this manual, consists of
+overscan subtracting, trimming, bias subtracting, dark subtracting,
+and flat fielding your data. Although dark subtraction is rarely used,
+it is included in this example for generality.
+
+Individual bias, darks, dome and sky flats must be properly combined to give
+good signal to noise calibration frames and to remove cosmic rays. The
+algorithm used to combine the images must have 10 or more frames to do a good
+job of cleaning the cosmic rays. IRAF offers several algorithms for combining
+the individual frames. You should always carefully inspect all the individual
+frames, and the final image to check
+for potential problems.
+
+Having obtained the combined calibration images you should flatten your sky flat
+using the dome flat and examine the result for any significant iillumination 
+variation. If these variations are significant they may be fit in order to
+correct your dome flat. 
+Fringing corrections may be
+applied. This should be done separately. This is only needed for the RCA
+chips at the 4 meter PF/CCD and the TI chips in the I band. We do not
+currently support this but direction can be given as to what might possibly
+work.
+
+At this level
+the images should be finished except for fixing any bad pixels that may not
+have been taken care of in the flat fielding. Once this is done you may
+do photometry. A photometry manual is available to do your analysis,
+see section VI of this manual, which describe the use of the
+aperture photometry routines in IRAF and the transformation from
+instrumental to standard magnitudes. There is also a manual which was
+written by the IRAF group in Tucson which is a good guide; "A User's
+Guide to Stellar CCD Photometry with IRAF".
+.bp
+.nf
+
+                   ==========================
+                   =      Set Instrument    =
+                   =  and Translation File  =
+                   ==========================
+                             *****
+                              ***
+                               *
+               ==================================
+               =  Combining Calibration Frames  =
+               =    and Removing Cosmic Rays    =
+               ==================================
+                             *****
+                              ***
+                               *
+		===============================
+		=          Processing         =
+		=      Calibration Frames     =
+		===============================
+			     *****
+			      ***
+			       *
+                ================================
+                =    Preparing a Flat Field    =
+                ================================
+                             *****
+                              ***
+                               *
+		   ==========================
+		   =  Processing the data   =
+		   ==========================
+			     *****
+			      ***
+			       *
+		   ==========================
+		   =   Fixing bad pixels    =
+		   ==========================
+			     *****
+			      ***
+			       *
+                   ==========================
+                   =   Fringe Corrections   =
+                   =       (optional)       =
+                   ==========================
+.fi
+.le
+.bp
+.ls \fI3.2 Reading the data from Tape\fR
+
+Load the 'dataio' package and allocate the appropriate tape drive:
+
+.nf
+      cl> dataio
+      da> alloc mta
+.fi
+
+If you wish to read fits files from an exabyte, use 'mtx' as the device
+designation. Now mount your tape on the tape drive and be sure you've
+removed the write ring. It is best to create a separate directory for
+each night. This is done using the command 'mkdir night1'. Now change
+to this directory by typing 'cd night1'. Read the data using the task
+'rfits'. You must specify the tape drive name, the list of files you wish
+to read and the "root" file name. If you transferred your data to the
+SUN using 'getpix' then you may wish to use the naming convention given
+to your files, in this case just set the parameter 'oldirafname' to yes.
+In choosing the root file name, it is usually a good idea to include a
+digit in the name to indicate the tape number (eg, "tape1" for the
+first tape; files would be called "tape10001, tape10002,.."); alternatively,
+an offset may be added (eg, offset=89 means the first files would be
+called "tape10090, tape10091,.." or 1+89, 2+89,..).
+
+.nf
+      da> epar rfits          (check the parameter list)
+      da> rfits mta 1-999 tape1
+.fi
+
+The file list "1-999" should more than cover the number of files on tape;
+the task will end gracefully at the end of the tape. When finished,
+rewind the tape and deallocate the drive,
+
+.nf
+      da> rew mta
+      da> dealloc mta
+.fi
+
+and remove your tape from the drive. We assume that you kept the old IRAF
+name given to your files throughout the rest of this manual.
+
+.nf
+                     \fIrfits\fR
+
+    fits_file = "mta"       FITS data source
+    file_list = "1-999"     File list
+    iraf_file = "tape1"     IRAF filename
+  (make_image = yes)        Create an IRAF image?
+ (long_header = no)         Print FITS header cards?
+(short_header = yes)        Print short header?
+    (datatype = "")         IRAF data type
+       (blank = 0.)         Blank value
+       (scale = yes)        Scale the data?
+ (oldirafname = no)         Use old IRAF name in place of iraf_file?
+      (offset = 0)          Tape file offset
+        (mode = "ql")           
+.fi
+.le
+.bp
+.ce
+\fI3.3 Setting Up the Translation File\fR
+.ls \fI3.3.1 Setinstrument for CCD Used\fR
+
+Start by loading the 'imred' and 'ccdred' packages.
+
+.nf
+      cl> noao
+      no> imred
+      im> ccdred
+      cc>
+.fi
+
+Because the 'ccdred' package was
+designed to work with data from many different observatories and instruments,
+an \fIinstrument translation file\fR is required to define a mapping
+between the package parameters and the particular image header format.
+An example of a translation file is shown on the next page.
+You must define a translation file using the task 'setinstrument'.
+Edit the parameters for the task 'setinstrument' according to the
+list given below and run it.
+The choices for instrument can be found in Appendix A. If the CCD you
+used is not listed, use the generic "ccd" or "cfccd" in the instrument
+parameter in the task.
+
+.nf
+      cc> epar setinstrument       (check the parameter list)
+      cc> setinstrument
+.fi
+
+The task will run and prompt you for the instrument ID (a "?" will list
+the possible choices). Answer 'cfccd' and the task will send you into 
+the parameter editing mode for
+the task 'ccdred'. It will automatically set the \fIinstrument\fR
+(translation) parameter
+so do not change it. It is a good idea while processing your calibration
+frames to save a copy of the unprocessed images. This will be done
+by the package 'ccdred' if you specify a prefix or subdirectory in the
+parameter 'backup'. In our example, the files will be saved with the prefix
+'B'. When you type 'ctrl-z' to exit you will then be sent to 'ccdproc'
+to edit its parameters. We will edit
+'ccdproc' later so don't worry about it for now.
+
+.nf
+               \fIsetinstrument parameters\fR
+
+   \fIinstrument\fR = "cfccd"     Instrument ID (type ? for a list)
+        (\fIsite\fR = "ctio")     Site ID
+   (\fIdirectory\fR = "ccddb$")   Instrument directory
+      (review = yes)        Review instrument parameters?
+        query = ""          Instrument ID (type q to quit)
+        (mode = "ql")           
+
+                 \fIccdred parameters\fR
+
+   (pixeltype = "real real") Output and calculation pixel datatypes
+     (verbose = no)         Print log information to the standard output?
+     (logfile = "ccdlog")   Text log file
+    (plotfile = "ccdplot")  Log metacode plot file
+      (\fIbackup\fR = "B")        Backup directory or prefix
+  (\fIinstrument\fR = "ccddb$ctio/cfccd.dat") CCD instrument file
+      (\fIssfile\fR = "subsets")  Subset translation file
+    (graphics = "stdgraph") Interactive graphics output device
+      (cursor = "")         Graphics cursor input
+     (version = "2: October 1987") 
+        (mode = "ql")           
+      ($nargs = 0)              
+
+.fi
+
+An example of the \fIinstrument translation file\fR follows.
+
+.nf
+
+          exptime exptime
+          darktime darktime
+          imagetyp imagetyp
+          subset filters
+          biassec biassec
+          datasec datasec
+	  trimsec trimsec
+          fixfile fixfile
+
+          fixpix                bp-flag 0
+          overscan              bt-flag 0
+          zerocor               bi-flag 0
+          darkcor               dk-flag 0
+          flatcor               ff-flag 0
+          fringcor              fr-flag 0
+
+          OBJECT		object
+          DARK			dark
+          "PROJECTOR FLAT"	flat
+          "SKY FLAT"		other
+          COMPARISON		other
+          BIAS			zero
+          "DOME FLAT"		flat
+          MASK			other
+.fi
+
+
+The instrument file consists of first, the IRAF parameter and its associated
+image header keyword from the objects. These header values may vary depending
+upon the instrument being used.
+The second section is the
+header flag section which is added to the object as it is being processed to
+mark that the operation has been done. Once an image is zero corrected, the
+keyword bi-flag parameter is added to the image header and set to '0' so that
+the process is not repeated later. The last section is the image-type 
+specification. This is used when the imagetyp parameter is read. The header
+value 'OBJECT' is translated to 'object', and a 'SKY FLAT' becomes 'other'.
+If you need to modify the translation file you may copy this file to your
+directory and change the appropriate parameters. If the name of the imagetype
+contains 2 words, then you must put quotes around the designation, for example,
+look at the 'SKY FLAT' line in the above file. Comparison arcs are not used
+in direct imaging and are not needed.
+
+Without the proper translation file, the task 'ccdlist' will give the following:
+
+.nf
+  cc> ccdlist *.imh
+
+  bias001.imh[400,420][short][unknown][]:median of 4 ave of 6 bias 
+  flat002.imh[400,420][short][unknown][]:median of 4 ave of 6 flat
+  flat003.imh[400,420][short][unknown][]:median of 4 ave of 6 flat
+  obj004.imh[400,420][short][unknown][]:IC 481  V-filter ........
+  obj005.imh[400,420][short][unknown][]:IC 481  B-filter.........
+         :	:	:	:	:	:	:	:
+  obj036.imh[400,420][short][unknown][]:Sky flat B-filter .......
+  obj037.imh[400,420][short][unknown][]:Sky flat V-filter .......
+         :	:	:	:	:	:	:	:
+.fi
+
+The [unknown] in the listing means that the frame type is unknown, ie, if
+it is a dark, flat, bias,... etc. The blank brackets should contain the
+filter type and will be taken care of in the next section.
+.le
+.bp
+.ls \fI3.3.2 Setting the Subsets Parameter and Preparing for Processing\fR
+
+The 'ccdred' package groups observations into subsets. The image header
+parameter used to identify the subsets is defined in the \fIinstrument
+translation file\fR. For example, to select subsets by the header parameter
+'filters' the instrument translation file would contain the line
+
+.nf
+     subset filters
+.fi
+
+Now do a 'ccdlist' and you should see the
+correct image type specified for each frame:
+
+.nf
+  cc> ccdlist *.imh
+
+  bias001.imh[400,420][short][zero][]:median of 4 ave of 6 bias
+  flat002.imh[400,420][short][flat][]:median of 4 ave of 6 flat
+  flat003.imh[400,420][short][flat][]:median of 4 ave of 6 flat
+  obj004.imh[400,420][short][object][]:IC 481  V-filter ......
+  obj005.imh[400,420][short][object][]:IC 481  B-filter.......
+	:          :        :        :        :    :       :
+	:          :        :        :        :    :       :
+  obj036.imh[400,420][short][object][]:Sky flat B-filter .....
+  obj037.imh[400,420][short][object][]:Sky flat V-filter .....
+	:          :        :        :        :    :       :
+.fi
+
+Doing this will create a file in your directory called 'subsets'. This is a
+file with a listing of the filter type read from the image header consisting
+of the combination of the upper and lower filter bolt positions. The flats
+were taken with a color balance filter so they have different values from the
+objects in the list. Therefore, you need to edit this file to set the filter
+types properly. The bias and dark were probably taken with a setting that
+corresponds to one of the filters, but it will be ignored. If however, the
+filter type set in the header corresponds to something other than a standard
+filter, set this to some arbitrary value, for example below it is assumed that
+the filter positions for the bias were '0 1', so this is set to '0'.
+
+.nf
+      cc> edit subsets
+.fi
+
+An example of the necessary changes is:
+
+.nf
+       \fISubsets Before     |        Subsets After\fR
+      '1 0'      1        |       '1 0'      U
+      '2 0'      2        |       '2 0'      B
+      '3 0'      3        |       '3 0'      V
+      '4 0'      4        |       '4 0'      R
+      '5 0'      5        |       '5 0'      I
+      '0 1'     01        |       '0 1'      0
+      '1 1'     11        |       '1 1'      U
+      '2 1'     21        |       '2 1'      B
+      '3 1'     31        |       '3 1'      V
+      '4 1'     41        |       '4 1'      R
+      '5 1'     51        |       '5 1'      I
+.fi
+
+If any of the parameters are not specified properly after doing 'ccdlist',
+then the translation file may be set up improperly. Consult
+Mauricio Navarrete, Nelson Saavedra, or Mario Hamuy.
+
+You must also specify the overscan and trim region.
+The overscan is the region to the far right of the image when plotting a line
+of the image (see figure 2a). The overscan region should be
+specified by the beginning and ending column followed by the beginning and
+ending line. This region should begin at least 5-10 pixels from the edge of
+the active region of the CCD. The correct position can be found by plotting
+several lines using ':l #1 #2' (#1 and #2 specify a range of lines to be
+averaged and plotted) in 'implot', and expanding the right side (see figure 2b).
+Notice the signal decays toward the right just the other side of the step with
+an e-folding distance of a few pixels. The overscan strip should begin in 3 to
+4 e-folding distances from the break. You want to fit this region all along
+the image so the range of lines should include everything. Be sure to write
+down these values so you don't forget them.
+
+The trim region is the section of the image to be kept after processing.
+Choose this area excluding the overscan region
+and any bad lines or columns at the edges of the image. Figures 2c and 2d show
+a plot of a line and column, respectively. They show the edges which should be
+trimmed from the image. Later (section 3.5)
+you will edit the parameters for 'ccdproc' and enter the overscan and trim
+section.
+
+The bad pixel file will be used after the images have been flattened. In many
+cases the flatfielding will correct the bad pixel regions also so it is best
+left until the end. If you specify the bad pixel file during the processing
+be aware that the corrections are done on the file first.
+.le
+.bp
+.ls \fI3.4 Preparing Individual Calibration Frames\fR
+
+If you have taken many calibration frames (bias, dome flats, darks
+and sky flats) that you wish to combine in order to remove cosmic
+rays, we suggest you to perform a combination of images separately for
+each night. In some cases, when the instrument response remains
+stable during your run, it is worth combining data from many nights,
+especially the darks and sky flats, to improve the signal-to-noise
+ratio. If you have already combined the data on the mountain skip
+over this section and go on to the next one.
+
+Most likely you used "getpix" to transfer your data from the LSI
+to the SUN so you have preserved the naming convention. This makes
+it very easy to combine your images.
+
+There are tasks which combine each type of object together. For the
+bias do an 'epar' on the 'zerocombine' task, and fill the parameters
+according to the list given below. We suggest selecting the 'avsigclip'
+rejection operation which applies a
+sigma clipping algorithm to each pixel to remove cosmic rays. This
+algorithm requires at least three input images (best with
+more than 10) to work effectively. According to your particular needs you may
+select other options to combine the data like minmax, ccdclip, etc.
+No scaling is performed on the biases.
+If your bias frames vary greatly, then there
+is something wrong with your setup. In this case, have someone check
+out the electronics.
+
+.nf
+      cc> epar zerocombine           (check the list given below)
+.fi
+
+Then combine the bias frames. Optionally you may add a '&' at the end
+of the command line to submit the task as a background job.
+
+.nf
+      cc> zerocombine bias*.imh output=zero1 &
+.fi
+
+Now, proceed with the combination of the darks.
+
+.nf
+      cc> epar darkcombine            (check the list given below)
+      cc> darkcombine dark*.imh output=dark1 &
+.fi
+
+Before combining the flat frames, you must
+find a region free of bad pixels to be used to scale the individual
+flat frames. The box should be chosen where there is signal.
+Once you have determined the position of the box, you
+should first run 'imstat' for all your images using this region.
+
+.nf
+      cc>  imstat flat*[200:250,300:330]
+
+      #          IMAGE             NPIX   MEAN   STDDEV  MIN   MAX
+      flat001.imh[200:250,300:330] 37901  5489.  1510.   678.  9020.
+      flat002.imh[200:250,300:330] 37901  5485.  1508.   694.  8484.
+      flat003.imh[200:250,300:330] 37901  5478.  1507.   691.  8472.
+      flat004.imh[200:250,300:330] 37901  5475.  1506.   671.  8397.
+      flat005.imh[200:250,300:330] 37901  5474.  1506.   659.  8540.
+      flat006.imh[200:250,300:330] 37901  5472.  1505.   663.  8422.
+      flat007.imh[200:250,300:330] 37901  5467.  1504.   655. 15513.
+      flat008.imh[200:250,300:330] 37901  5464.  1502.   673.  8471.
+      flat009.imh[200:250,300:330] 37901  5458.  1501.   684.  8503.
+.fi
+
+If the mean varies by a large amount, say greater than a few percent, then
+you should use the mode section for the scaling.
+In the example below the flats are combined with scaling.
+Enter this region in the 'statsec' parameter in the following format,
+
+.nf
+      [x1:x2,y1:y2]
+.fi
+      
+where the values x1 and x2 are the limits of the box in the x-axis, y1
+and y2 are the limits along the y-axis. This will only be
+used if 'median' is specified in the 'scale' parameter of the task
+'flatcombine'. In this example we have chosen to combine the individual
+flats using the 'ccdclip' option, which rejects pixels using the CCD noise
+parameters, namely the read-out-noise and the gain. You must enter these
+values in the parameters 'rdnoise' and 'gain' in 'flatcombine'. In this
+example we have entered a read-out-noise of 5 electrons, and a gain of
+2.5 electrons/ADU.
+
+.nf
+       cc> epar flatcombine          (check the list given below)
+.fi
+
+Proceed with the combination of the flats.
+
+.nf
+       cc> flatcombine flat.*imh output=flat1 &
+.fi
+
+If you have 3 or more sky flats, they may be combined in the same manner
+as the dome flats (change the 'ccdtype' parameter to 'other').
+
+.nf
+      cc> epar flatcombine        (check the list given below)
+      cc> flatcombine sky.*imh output=sky1 &
+.fi
+
+The output at this point is a set of images clean of cosmic rays called zero1,
+dark1, flat1, and sky1, where the 1 stands for the first night and the flats
+and skys end in their respective filter type ie, flat1U, flat1B,... Using the
+parameter subsets, the combination occurred for all the flats and skys of the
+same filter type (subset). We suggest that you examine these images, either by
+displaying, or imploting them. For example;
+
+.nf
+      cc> display zero1
+      cc> implot zero1
+.fi
+
+We suggest also to look at the logfile created by the package 'ccdred' in
+order to check that the images were properly combined by the same filter
+type.
+
+.nf
+      cc> page ccdlog
+.fi
+.bp
+
+.nf
+                         \fIzerocombine\fR
+
+        input = "bias*.imh"     List of zero level images to combine
+      (output = "zero1")        Output zero level name
+     (\fIcombine\fR = "average")      Type of combine operation
+      (\fIreject\fR = "avsigclip")    Type of rejection
+     (\fIccdtype\fR = "zero")         CCD image type to combine
+     (process = no)             Process images before combining?
+      (delete = no)             Delete input images after combining?
+     (clobber = no)             Clobber existing output image?
+       (\fIscale\fR = "none")         Image scaling
+     (statsec = "")             Image section for computing statistics
+        (nlow = 0)              minmax: Number of low pixels to reject
+       (nhigh = 1)              minmax: Number of high pixels to reject
+       (nkeep = 1)              Minimum to keep (pos) or maximum to reject
+       (mclip = yes)            Use median in sigma clipping algorithms?
+      (lsigma = 3.)             Lower sigma clipping factor
+      (hsigma = 3.)             Upper sigma clipping factor
+     (rdnoise = "0")            ccdclip: CCD readout noise (electrons)
+        (gain = "1")            ccdclip: CCD gain (electrons/DN)
+      (snoise = "0.")           ccdclip: Sensitivity noise (fraction)
+       (pclip = -0.5)           pclip: Percentile clipping parameter
+       (blank = 0.)             Value if there are no pixels
+        (mode = "ql")           
+
+                         \fIdarkcombine\fR
+
+        input = "dark.*imh"     List of dark images to combine
+      (output = "dark1")        Output flat field root name
+     (\fIcombine\fR = "average")      Type of combine operation
+      (\fIreject\fR = "avsigclip")    Type of rejection
+     (\fIccdtype\fR = "dark")         CCD image type to combine
+     (process = no)             Process images before combining?
+      (delete = no)             Delete input images after combining?
+     (clobber = no)             Clobber existing output image?
+       (\fIscale\fR = "exposure")     Image scaling
+     (statsec = "")             Image section for computing statistics
+        (nlow = 1)              minmax: Number of low pixels to reject
+       (nhigh = 1)              minmax: Number of high pixels to reject
+       (nkeep = 1)              Minimum to keep (pos) or maximum to reject
+       (mclip = yes)            Use median in sigma clipping algorithms?
+      (lsigma = 3.)             Lower sigma clipping factor
+      (hsigma = 3.)             Upper sigma clipping factor
+     (rdnoise = "0.")           ccdclip: CCD readout noise (electrons)
+        (gain = "1.")           ccdclip: CCD gain (electrons/DN)
+      (snoise = "0.")           ccdclip: Sensitivity noise (fraction)
+       (pclip = -0.5)           pclip: Percentile clipping parameter
+       (blank = 0.)             Value if there are no pixels
+        (mode = "ql")           
+
+                    \fIflatcombine for dome flats\fR
+
+        input = "flat.*imh"     List of flat field images to combine
+      (output = "flat1")        Output flat field root name
+     (combine = "median")       Type of combine operation
+      (reject = "ccdclip")      Type of rejection
+     (ccdtype = "flat")         CCD image type to combine
+     (process = no)             Process images before combining?
+     (subsets = yes)            Combine images by subset parameter?
+      (delete = no)             Delete input images after combining?
+     (clobber = no)             Clobber existing output image?
+       (scale = "median")       Image scaling
+     (statsec = "[m:n,p:q]")    Image section for computing statistics
+        (nlow = 1)              minmax: Number of low pixels to reject
+       (nhigh = 1)              minmax: Number of high pixels to reject
+       (nkeep = 1)              Minimum to keep (pos) or maximum to reject
+       (mclip = yes)            Use median in sigma clipping algorithms?
+      (lsigma = 3.)             Lower sigma clipping factor
+      (hsigma = 3.)             Upper sigma clipping factor
+     (rdnoise = "5")            ccdclip: CCD readout noise (electrons)
+        (gain = "2.5")          ccdclip: CCD gain (electrons/DN)
+      (snoise = "0.")           ccdclip: Sensitivity noise (fraction)
+       (pclip = -0.5)           pclip: Percentile clipping parameter
+       (blank = 1.)             Value if there are no pixels
+        (mode = "ql")           
+
+                   \fIflatcombine for sky flats\fR
+
+        input = "sky.*imh"      List of flat field images to combine
+      (output = "sky1")         Output flat field root name
+     (combine = "median")       Type of combine operation
+      (reject = "ccdclip")      Type of rejection
+     (ccdtype = "other")        CCD image type to combine
+     (process = no)             Process images before combining?
+     (subsets = yes)            Combine images by subset parameter?
+      (delete = no)             Delete input images after combining?
+     (clobber = no)             Clobber existing output image?
+       (scale = "median")       Image scaling
+     (statsec = "[m:n,p:q]")    Image section for computing statistics
+        (nlow = 1)              minmax: Number of low pixels to reject
+       (nhigh = 1)              minmax: Number of high pixels to reject
+       (nkeep = 1)              Minimum to keep (pos) or maximum to reject
+       (mclip = yes)            Use median in sigma clipping algorithms?
+      (lsigma = 3.)             Lower sigma clipping factor
+      (hsigma = 3.)             Upper sigma clipping factor
+     (rdnoise = "5")            ccdclip: CCD readout noise (electrons)
+        (gain = "2.5")          ccdclip: CCD gain (electrons/DN)
+      (snoise = "0.")           ccdclip: Sensitivity noise (fraction)
+       (pclip = -0.5)           pclip: Percentile clipping parameter
+       (blank = 1.)             Value if there are no pixels
+        (mode = "ql")           
+.fi
+.le
+.bp
+.ls \fI3.5 Processing the calibration frames\fR
+
+Although all the following steps may be done only in one step, our
+approach is to do them separately to allow you to start at any point in
+this section in case you have already started reducing the images on
+the mountain.
+
+You must start by overscan subtracting and trimming 'zero1'. Edit the
+parameters for the 'ccdproc' task according to the list given below.
+There is a series of parameters that are set to 'yes' and 'no'. You must set
+only 'overscan' and 'trim' to 'yes' and the rest to 'no'. Also
+'ccdtype' must be
+set to 'zero'. Be sure to properly specify the parameters 
+'biassec' and 'trimsec' which you determined while reading section 3.3.2.
+The range of columns comes first separated by a ':' and the range of lines
+is again separated by a ':', i.e., [29:425,21:402].
+
+\fIDo not change these parameters until having
+processed all your images\fR.
+
+.nf
+      cc> epar ccdproc        (check the list given below)
+      cc> ccdproc zero1
+.fi
+
+If the parameter 'interactive' was set to 'yes' you will be required to
+fit interactively the overscan region with a certain function. Once
+presented by the task with the plot of the overscan region (see figure 3)
+you may change the fitting function, for example, with ':function chebyshev'
+and its order with
+':order 4'. To try a new fit type 'f'.  We suggest a spline3 of order 2.
+You may also select the sample to be fit using the 's' command twice.
+If you are happy with
+the fit type 'q' to quit. The task will then process 'zero1' accordingly.
+
+Continue by overscan subtracting, trimming and bias subtracting 'dark1'.
+In this case you have to change in 'ccdproc' the 'ccdtype' parameter
+to 'dark' and the
+'zerocor' parameter to 'yes'.
+
+.nf
+      cc> epar ccdproc        (check the list given below)
+      cc> ccdproc dark1
+.fi
+
+The dark image must be examined before proceeding. \fIFor instance, if the
+dark level is low enough (<10 counts/hour/pixel)
+compared to the flats, you will
+probably disregard dark subtracting your images, to avoid
+introducing noise in your data.\fR
+However, if you notice some structure in the dark image, it would be
+worth trying to dark correct the data. In the following examples, for
+generality's sake, we consider dark subtraction as part of the overall
+processing.  If this is not your case, do not forget to set the 'darkcor'
+parameter in 'ccdproc' to 'no' and leave it alone.
+
+Then process the flats. Check that the 'ccdtype' parameter is set
+to 'flat', that 'overscan', 'trim', 'zerocor' and 'darkcor' are all set
+to 'yes' and execute the task.
+
+.nf
+      cc> epar ccdproc        (check the list given below)
+      cc> ccdproc flat1*imh
+.fi
+
+IRAF records all the reduction operations in the image headers.  You
+may check from the headers of 'zero1', 'dark1', 'sky1' and 'flat1' that
+BT-FLAG, BI-FLAG, DK-FLAG are properly set. For instance,
+
+.nf
+      cc> imheader flat1R l+
+.fi
+
+It is also possible to check this by using the 'ccdlist' task which will check
+the header automatically and list the operations which have been performed on
+the image.
+
+.nf
+      cc> ccdlist flat1R
+
+.fi
+You should get the following,
+
+.nf
+        flat1R[496,501][real][flat][R][OTZ]:dflat R
+
+.fi
+'ccdlist' should tell you the image name (flat1R), the image size [496,501]
+left after trimming, the pixel type [real] of the image (the processed
+images should normally have pixels in real format, as opposed to
+the raw images which generally have pixels in 'short' format),
+the image type [flat], the filter used in the observation
+[R], the level of processing of the image [OTZ], and the image title (dflat R).
+
+At this level you should have the flats processed up through [OTZ] which
+means that the image has been [O]verscan subtracted, [T]rimmed, and
+[Z]ero subtracted. Additional codes for other operations in 'ccdproc'
+are [F]lat correction, [B]ad pixel correction, [I]illumination correction.
+
+.nf
+			\fIccdproc for zero1\fR
+
+       images = "zero1"         List of CCD images to correct
+     (\fIccdtype\fR = "zero")         CCD image type to correct
+   (max_cache = 0)              Maximum image caching memory (in Mbytes)
+      (noproc = no)             List processing steps only?
+      (fixpix = no)             Fix bad CCD lines and columns?
+    (\fIoverscan\fR = yes)            Apply overscan strip correction?
+        (\fItrim\fR = yes)            Trim the image?
+     (\fIzerocor\fR = no)             Apply zero level correction?
+     (\fIdarkcor\fR = no)             Apply dark count correction?
+     (\fIflatcor\fR = no)             Apply flat field correction?
+    (illumcor = no)             Apply iillumination correction?
+   (fringecor = no)             Apply fringe correction?
+     (readcor = no)             Convert zero level image to readout cor?
+     (scancor = no)             Convert flat field image to scan correction?
+    (readaxis = "line")         Read out axis (column|line)
+     (fixfile = "")             File describing the bad lines and columns
+     (\fIbiassec\fR = "[m:n,*]")      Overscan strip image section
+     (\fItrimsec\fR = "[r:s,t:u]")    Trim data section
+        (\fIzero\fR = "zero1")        Zero level calibration image
+        (\fIdark\fR = "dark1")        Dark count calibration image
+        (\fIflat\fR = "")             Flat field images
+       (illum = "")             Iillumination correction images
+      (fringe = "")             Fringe correction images
+  (minreplace = 1.)             Minimum flat field value
+    (scantype = "shortscan")    Scan type (shortscan|longscan)
+       (nscan = 1)              Number of short scan lines\n
+ (interactive = yes)            Fit overscan interactively?
+    (function = "spline3")      Fitting function
+       (order = 2)              Number of polynomial terms or spline pieces
+      (sample = "*")            Sample points to fit
+    (naverage = 1)              Number of sample points to combine
+    (niterate = 1)              Number of rejection iterations
+  (low_reject = 3.)             Low sigma rejection factor
+ (high_reject = 3.)             High sigma rejection factor
+        (grow = 0.)             Rejection growing radius
+        (mode = "ql")           
+
+			\fIccdproc for dark1\fR
+
+       images = "dark1"         List of CCD images to correct
+     (\fIccdtype\fR = "dark")         CCD image type to correct
+   (max_cache = 0)              Maximum image caching memory (in Mbytes)
+      (noproc = no)             List processing steps only?
+      (fixpix = no)             Fix bad CCD lines and columns?
+    (\fIoverscan\fR = yes)            Apply overscan strip correction?
+        (\fItrim\fR = yes)            Trim the image?
+     (\fIzerocor\fR = yes)            Apply zero level correction?
+     (\fIdarkcor\fR = no)             Apply dark count correction?
+     (\fIflatcor\fR = no)             Apply flat field correction?
+    (illumcor = no)             Apply iillumination correction?
+   (fringecor = no)             Apply fringe correction?
+     (readcor = no)             Convert zero level image to readout corr?
+     (scancor = no)             Convert flat field image to scan correction?
+    (readaxis = "line")         Read out axis (column|line)
+     (fixfile = "")             File describing the bad lines and columns
+     (\fIbiassec\fR = "[m:n,*]")      Overscan strip image section
+     (\fItrimsec\fR = "[r:s,t:u]")    Trim data section
+        (\fIzero\fR = "zero1")        Zero level calibration image
+        (\fIdark\fR = "dark1")        Dark count calibration image
+        (\fIflat\fR = "")             Flat field images
+       (illum = "")             Iillumination correction images
+      (fringe = "")             Fringe correction images
+  (minreplace = 1.)             Minimum flat field value
+    (scantype = "shortscan")    Scan type (shortscan|longscan)
+       (nscan = 1)              Number of short scan lines\n
+ (interactive = yes)            Fit overscan interactively?
+    (function = "spline3")      Fitting function
+       (order = 2)              Number of polynomial terms or spline pieces
+      (sample = "*")            Sample points to fit
+    (naverage = 1)              Number of sample points to combine
+    (niterate = 1)              Number of rejection iterations
+  (low_reject = 3.)             Low sigma rejection factor
+ (high_reject = 3.)             High sigma rejection factor
+        (grow = 0.)             Rejection growing radius
+        (mode = "ql")           
+
+			\fIccdproc for flat1\fR
+
+       images = "flat1*imh"     List of CCD images to correct
+     (\fIccdtype\fR = "flat")         CCD image type to correct
+   (max_cache = 0)              Maximum image caching memory (in Mbytes)
+      (noproc = no)             List processing steps only?
+      (fixpix = no)             Fix bad CCD lines and columns?
+    (\fIoverscan\fR = yes)            Apply overscan strip correction?
+        (\fItrim\fR = yes)            Trim the image?
+     (\fIzerocor\fR = yes)            Apply zero level correction?
+     (\fIdarkcor\fR = yes)            Apply dark count correction?
+     (\fIflatcor\fR = no)             Apply flat field correction?
+    (illumcor = no)             Apply iillumination correction?
+   (fringecor = no)             Apply fringe correction?
+     (readcor = no)             Convert zero level image to readout corr?
+     (scancor = no)             Convert flat field image to scan correction?
+    (readaxis = "line")         Read out axis (column|line)
+     (fixfile = "")             File describing the bad lines and columns
+     (\fIbiassec\fR = "[m:n,*]")      Overscan strip image section
+     (\fItrimsec\fR = "[r:s,t:u]")    Trim data section
+        (\fIzero\fR = "zero1")        Zero level calibration image
+        (\fIdark\fR = "dark1")        Dark count calibration image
+        (\fIflat\fR = "")             Flat field images
+       (illum = "")             Iillumination correction images
+      (fringe = "")             Fringe correction images
+  (minreplace = 1.)             Minimum flat field value
+    (scantype = "shortscan")    Scan type (shortscan|longscan)
+       (nscan = 1)              Number of short scan lines\n
+ (interactive = yes)            Fit overscan interactively?
+    (function = "spline3")      Fitting function
+       (order = 2)              Number of polynomial terms or spline pieces
+      (sample = "*")            Sample points to fit
+    (naverage = 1)              Number of sample points to combine
+    (niterate = 1)              Number of rejection iterations
+  (low_reject = 3.)             Low sigma rejection factor
+ (high_reject = 3.)             High sigma rejection factor
+        (grow = 0.)             Rejection growing radius
+        (mode = "ql")           
+.fi
+.le
+.bp
+.ls \fI3.6 Preparing a Final Flat Field\fR
+
+Next we want to check the iillumination of the flat by applying it to the sky
+flat. Load the 'imred' and 'ccdred' packages if they are
+not already loaded.
+There is no tried and true method for testing the iillumination of
+the sky flats except for applying them on a long exposure taken in the same
+filter and implotting it or doing image statistics.
+
+We must use 'ccdproc' to overscan subtract, trim, bias subtract, dark subtract
+(if needed), and flat field the sky images. Again, we assume here
+that the dark is
+necessary for the reductions. Be sure that the images you are using for
+the flat field division have the proper filter identification.
+First edit the parameters for 'ccdproc', and then run
+this task to process your skys to see if the iillumination of the dome
+flat is uniform;
+
+.nf
+      cl> noao
+      im> imred
+      im> ccdred
+      cc> epar ccdproc        (check the parameter list)
+      cc> ccdproc sky1R
+.fi
+
+Now we must check the sky to see if it really is flat. This is done
+using 'implot' and plotting some lines or a group of lines,
+
+.nf
+      cc> implot sky1R
+            :l 150 200
+            :c 200 250
+	    q
+.fi
+
+Ideally if the iillumination was uniform, sky1R should not show any variation.
+In plotting several lines together, you may get a small slope (see figure 4).
+If you see any    
+variations, including a slope even near the edges of the image, then you must
+run the task 'mkskyflat'. Select a smoothing box size which preserves the large
+scale features while adequately suppressing the noise.  The scale of the
+largest features expected shouldn't be smaller than say 1/10 to 1/12 the
+image size.
+
+.nf
+      cc> epar mkskyflat      (check the parameter list)
+      cc> mkskyflat sky1R finalflat1R
+.fi
+
+The output image is the corrected flat image so call it "finalflat1R".
+We need to recopy the sky flat to process it again. Do an imcopy of the sky1R
+from the backup image after deleting the processed one.
+
+.nf
+      cc> imdel sky1R
+      cc> imcopy Bsky1R sky1R
+      cc> epar ccdproc        (change the parameter 'flat' from
+			       flat1R to finalflat1R)
+      cc> ccdproc sky1R
+.fi
+
+Again, check to see if the sky is really flat. If it is flat
+(see figure 5), then you are
+done and must process the flats for your other filters. If it is not flat,
+go back to the beginning and ask for help. It may be that you need to play
+with the smoothing parameters. Repeat these steps until you are satisfied.
+Now you can process your images.
+
+.nf
+
+			\fIccdproc for sky flats\fR
+
+       images = "sky1*imh"      List of CCD images to correct
+     (\fIccdtype\fR = "other")        CCD image type to correct
+   (max_cache = 0)              Maximum image caching memory (in Mbytes)
+      (noproc = no)             List processing steps only?
+      (fixpix = no)             Fix bad CCD lines and columns?
+    (\fIoverscan\fR = yes)            Apply overscan strip correction?
+        (\fItrim\fR = yes)            Trim the image?
+     (\fIzerocor\fR = yes)            Apply zero level correction?
+     (\fIdarkcor\fR = yes)            Apply dark count correction?
+     (\fIflatcor\fR = yes)            Apply flat field correction?
+    (illumcor = no)             Apply iillumination correction?
+   (fringecor = no)             Apply fringe correction?
+     (readcor = no)             Convert zero level image to readout corr?
+     (scancor = no)             Convert flat field image to scan correction?
+    (readaxis = "line")         Read out axis (column|line)
+     (fixfile = "")             File describing the bad lines and columns
+     (\fIbiassec\fR = "[m:n,*]")      Overscan strip image section
+     (\fItrimsec\fR = "[r:s,t:u]")    Trim data section
+        (\fIzero\fR = "zero1")        Zero level calibration image
+        (\fIdark\fR = "dark1")        Dark count calibration image
+        (\fIflat\fR = "flat1*imh")    Flat field images
+       (illum = "")             Iillumination correction images
+      (fringe = "")             Fringe correction images
+  (minreplace = 1.)             Minimum flat field value
+    (scantype = "shortscan")    Scan type (shortscan|longscan)
+       (nscan = 1)              Number of short scan lines\n
+ (interactive = yes)            Fit overscan interactively?
+    (function = "spline3")      Fitting function
+       (order = 2)              Number of polynomial terms or spline pieces
+      (sample = "*")            Sample points to fit
+    (naverage = 1)              Number of sample points to combine
+    (niterate = 1)              Number of rejection iterations
+  (low_reject = 3.)             Low sigma rejection factor
+ (high_reject = 3.)             High sigma rejection factor
+        (grow = 0.)             Rejection growing radius
+        (mode = "ql")           
+.fi
+.bp
+.nf
+                      \fImkskyflat\fR
+
+        input = "sky1R"     Input CCD images
+       output = "finalflat1R"     Output images (same as input if none)
+     (ccdtype = "")         CCD image type to select
+     (\fIxboxmin\fR = 0.1)        Minimum smoothing box size in x at edges
+     (\fIxboxmax\fR = 0.1)        Maximum smoothing box size in x
+     (\fIyboxmin\fR = 0.1)        Minimum smoothing box size in y at edges
+     (\fIyboxmax\fR = 0.1)        Maximum smoothing box size in y
+        (clip = yes)        Clip input pixels?
+    (lowsigma = 2.5)        Low clipping sigma
+   (highsigma = 2.5)        High clipping sigma
+     (ccdproc = "")         CCD processing parameters
+        (mode = "ql")
+.fi
+.le
+.bp
+.ls \fI3.7 Processing the Images\fR
+
+This can be setup to be done all at once. The final flat has been made so now
+we divide it into your objects.
+If the calibration frames themselves
+have not been processed it will do this as well. The program takes into
+account the differing filters. Be sure that you have deleted all the individual
+calibration frames that were combined. Edit the parameters for 'ccdproc' and run
+it. For tasks that take a long time, it is a good idea to set them going as a
+background job and send the output to a file which you can watch to keep track
+of the progress. You may wish to make a list of the objects to be processed
+to avoid reprocessing your sky flats.
+
+.nf
+      cc> epar ccdproc        (check the parameter list)
+      cc> ccdproc obj*.imh
+.fi
+
+To check the progress of the task, just type 
+
+.nf
+      cc> tail ccdlog
+.fi
+
+This will print out the last lines of the file named 'ccdlog'
+which is the latest 
+operation done by the task 'ccdproc'.
+Once this is done, check your images to see
+that they have been properly flat fielded. If you are satisfied, then you may
+now check your images for bad pixel regions, the structure of which may not have
+been processed out of your images.
+
+We suggest also to do a 'ccdlist' on the objects in order to
+check whether the frames have been duly processed, i.e.,
+
+.nf
+     cc> ccdlist obj*.imh
+.fi
+
+You should get a listing of your images in the format that follows,
+
+.nf
+
+      obj1010.imh[496,501][real][object][R][OTZF]:rubin 152 R
+      obj1011.imh[496,501][real][object][I][OTZF]:rubin 152 I
+      obj1012.imh[496,501][real][object][B][OTZF]:rubin 149 B
+      obj1013.imh[496,501][real][object][V][OTZF]:rubin 149 V
+      obj1014.imh[496,501][real][object][R][OTZF]:rubin 149 R
+      obj1015.imh[496,501][real][object][I][OTZF]:rubin 149 I
+      obj1016.imh[496,501][real][object][B][OTZF]:rubin 149 B
+      obj1017.imh[496,501][real][object][V][OTZF]:rubin 149 V
+      obj1018.imh[496,501][real][object][R][OTZF]:rubin 149 R
+      obj1019.imh[496,501][real][object][I][OTZF]:rubin 149 I
+.fi
+
+where the [OTZF] code reveals the degree of processing of the images.
+
+.nf
+                   \fIccdproc for objects\fR
+
+       images = "obj*imh)"      List of CCD images to correct
+     (\fIccdtype\fR = "object")       CCD image type to correct
+   (max_cache = 0)              Maximum image caching memory (in Mbytes)
+      (noproc = no)             List processing steps only?
+      (fixpix = no)             Fix bad CCD lines and columns?
+    (\fIoverscan\fR = yes)            Apply overscan strip correction?
+        (\fItrim\fR = yes)            Trim the image?
+     (\fIzerocor\fR = yes)            Apply zero level correction?
+     (\fIdarkcor\fR = yes)            Apply dark count correction?
+     (\fIflatcor\fR = yes)            Apply flat field correction?
+    (illumcor = no)             Apply iillumination correction?
+   (fringecor = no)             Apply fringe correction?
+     (readcor = no)             Convert zero level image to readout corr?
+     (scancor = no)             Convert flat field image to scan correction?
+    (readaxis = "line")         Read out axis (column|line)
+     (fixfile = "")             File describing the bad lines and columns
+     (\fIbiassec\fR = "[m:n,*]")      Overscan strip image section
+     (\fItrimsec\fR = "[r:s,t:u]")    Trim data section
+        (\fIzero\fR = "zero1")        Zero level calibration image
+        (\fIdark\fR = "dark1")        Dark count calibration image
+        (\fIflat\fR = "finalflat1*imh")    Flat field images
+       (illum = "")             Iillumination correction images
+      (fringe = "")             Fringe correction images
+  (minreplace = 1.)             Minimum flat field value
+    (scantype = "shortscan")    Scan type (shortscan|longscan)
+       (nscan = 1)              Number of short scan lines\n
+ (interactive = yes)            Fit overscan interactively?
+    (function = "spline3")      Fitting function
+       (order = 2)              Number of polynomial terms or spline pieces
+      (sample = "*")            Sample points to fit
+    (naverage = 1)              Number of sample points to combine
+    (niterate = 1)              Number of rejection iterations
+  (low_reject = 3.)             Low sigma rejection factor
+ (high_reject = 3.)             High sigma rejection factor
+        (grow = 0.)             Rejection growing radius
+        (mode = "ql")           
+
+.fi
+
+.le
+.bp
+.ls \fI3.8 Creating the Bad Pixel File\fR
+
+Now it is time to check your images to see if structure remains in the bad
+pixel regions. If you were careful to observe your objects far away from any
+obvious bad regions then you may only need to 'fix' pixels for cosmetic reasons.
+We suggest you to examine these files using the display window,
+imtool (this can only be done at one of the SUN consoles), and then plotting
+them using 'implot'. Start by loading the 'noao', 'images', 'tv', 'imred',
+and 'ccdred' packages. Display
+a processed image and plot it using 'implot',
+
+.nf
+      cl> noao
+      no> images
+      im> tv
+      tv> imred
+      im> ccdred
+      cc> display obj002 1
+      cc> implot obj002
+.fi
+
+Do not exit from implot, but move the cursor to the imtool window and press
+'F6'. The cursor coordinates are now visible at the bottom of the screen.
+Find the position of a bad pixel using this, return to the graph and
+plot it using 'implot' with the ':l #'(line) and ':c #'(column) commands.
+You can define them more precisely using 'implot' by overplotting lines and
+columns around the center of the bad regions. Do this by typing 'o' followed
+by ':c #' and ':l #'. Once you have these regions written down, check some of
+your images to see if the bad pixels are a problem, ie >1% in signal. If it is
+a problem then create a file called 'badpix' with the listing of
+the pixels you wish to fix;
+
+.nf
+      cc> edit badpix           (according to the following format)
+.fi
+
+The following example is to illustrate the format of a bad pixel file.
+
+.nf
+      84 87 1 450
+      87 90 105 109
+      87 89 110 111
+      124 126 112 116
+      206 206 80 80
+.fi
+
+Each line stands for a rectangular region of the image to be fixed. The regions
+are specified by four numbers giving the starting and ending columns followed
+by the starting and ending lines. The starting and ending points may be the
+same to specify a single column, line or pixel. Note that each region is
+"fixed" by interpolating across its shortest dimension and that regions are
+processed in the order that they appear in the bad pixel list. For bad regions
+of complex shape, some care may be required in specifying the regions in order
+to achieve an optimal result. \fIIt is strongly recommended that you test your
+bad pixel file by using it to correct a copy of one of your images before going
+into production\fR. This bad pixel file will be specified in the task 'ccdproc'
+in the parameter 'fixfile'. So now edit and run the task:
+
+.nf
+       cc> epar ccdproc
+       cc> ccdproc obj*.imh
+.fi
+
+Remember that 'ccdproc' already knows that the images
+have been processed so those
+operations will not be performed again. Now you have final images that are ready
+to be used. If you plan to do photometry in IRAF see section VI of this manual.
+
+.nf
+                             \fIccdproc\fR
+
+       images = "obj*imh)"      List of CCD images to correct
+     (\fIccdtype\fR = "object")       CCD image type to correct
+   (max_cache = 0)              Maximum image caching memory (in Mbytes)
+      (noproc = no)             List processing steps only?
+      (\fIfixpix\fR = yes)            Fix bad CCD lines and columns?
+    (\fIoverscan\fR = yes)            Apply overscan strip correction?
+        (\fItrim\fR = yes)            Trim the image?
+     (\fIzerocor\fR = yes)            Apply zero level correction?
+     (\fIdarkcor\fR = yes)            Apply dark count correction?
+     (\fIflatcor\fR = yes)            Apply flat field correction?
+    (illumcor = no)             Apply iillumination correction?
+   (fringecor = no)             Apply fringe correction?
+     (readcor = no)             Convert zero level image to readout corr?
+     (scancor = no)             Convert flat field image to scan correction?
+    (readaxis = "line")         Read out axis (column|line)
+     (\fIfixfile\fR = "badpix")       File describing the bad lines and columns
+     (\fIbiassec\fR = "[m:n,*]")      Overscan strip image section
+     (\fItrimsec\fR = "[r:s,t:u]")    Trim data section
+        (\fIzero\fR = "zero1")        Zero level calibration image
+        (\fIdark\fR = "dark1")        Dark count calibration image
+        (\fIflat\fR = "finalflat1*imh")    Flat field images
+       (illum = "")             Iillumination correction images
+      (fringe = "")             Fringe correction images
+  (minreplace = 1.)             Minimum flat field value
+    (scantype = "shortscan")    Scan type (shortscan|longscan)
+       (nscan = 1)              Number of short scan lines\n
+ (interactive = yes)            Fit overscan interactively?
+    (function = "spline3")      Fitting function
+       (order = 2)              Number of polynomial terms or spline pieces
+      (sample = "*")            Sample points to fit
+    (naverage = 1)              Number of sample points to combine
+    (niterate = 1)              Number of rejection iterations
+  (low_reject = 3.)             Low sigma rejection factor
+ (high_reject = 3.)             High sigma rejection factor
+        (grow = 0.)             Rejection growing radius
+        (mode = "ql")           
+
+.fi
+.le
+.bp
+.ls \fI3.9 Writing the Data to Tape\fR
+
+Allocate the device, for the SUNs it is "mta". Then mount your tape, don't
+forget to put in a write ring. If you wish to use the exabyte drive, use "mtx"
+for the device name. Load the package 'dataio' and do an epar on 'wfits'.
+
+.nf
+      cl> dataio
+      da> epar wfits
+      da> wfits *.imh mta.6250 new+ 
+.fi
+
+The parameter newtape should be "yes"
+if you are starting on a new tape. Otherwise you will not want to overwrite
+data which has already been placed on a tape, so use "no". 
+
+After writing all the desired files to tape, deallocate the drive and retrieve
+your tape.
+
+.nf
+      da> dealloc mta
+.fi
+.le
+.endhelp

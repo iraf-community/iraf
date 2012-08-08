@@ -1,0 +1,66 @@
+.help zfinfo May84 "System Interface"
+.ih
+NAME
+zfinfo -- get directory information for the named file
+.ih
+SYNOPSIS
+.nf
+include <finfo.h>
+
+zfinfo (osfn, out_struct, status)
+
+packed	char osfn[]			# host filename
+long	out_struct[LEN_FINFO]		# output structure
+int	status
+.fi
+.ih
+DESCRIPTION
+A binary structure is returned describing the named file.
+
+.nf
+	struct finfo {
+		long	fi_type		# file type
+		long	fi_size		# file size, bytes
+		long	fi_atime	# time of last access
+		long	fi_mtime	# time of last modify
+		long	fi_ctime	# time of file creation
+		long	fi_perm		# file permission bits
+		char	fi_owner[15]	# name of file owner
+	}
+
+File types:
+
+	FI_REGULAR	1		# ordinary file
+	FI_DIRECTORY	2		# directory file
+	FI_EXECUTABLE	3		# executable image
+	FI_SPECIAL	4		# terminals etc.
+.fi
+
+The file owner name is returned as a packed string.  Times are in long integer
+seconds since midnight Jan 1, 1980 LST.  File permissions are encoded in
+bits 1-6 of \fIfi_perm\fR as follows:
+
+.nf
+	bit 1,2		owner r,w
+	bit 3,4		group r,w
+	bit 5,6		world r,w
+.fi
+
+An ordinary file may be either a text file or a binary file.  A directory file
+is the entry for a subdirectory of the directory referenced by \fBzfinfo\fR.
+An executable file is a file marked executable by the host (the exact
+significance of an executable file is machine dependent).
+Everything else is a special file.
+.ih
+RETURN VALUE
+ERR is returned if the named file does not exist or cannot be accessed.
+OK is returned if the operation is successful.
+.ih
+NOTES
+\fBZfinfo\fR is not used to determine if a file is protected from deletion
+or to determine whether a file is a text or binary file.  \fBZfinfo\fR should
+not be called to obtain information on an open file.
+.ih
+SEE ALSO
+zfprot, zfacss
+.endhelp

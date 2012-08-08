@@ -1,0 +1,26 @@
+objects,s,a,"",,,"List of object spectra"
+arcs,s,h,"",,,"List of arc spectra"
+arctable,f,h,"",,,"Arc assignment table (optional)"
+standards,s,h,"",,,"List of standard star spectra
+"
+readnoise,s,h,"rdnoise",,,"Read out noise sigma (photons)"
+gain,s,h,"gain",,,"Photon gain (photons/data number)"
+datamax,r,h,INDEF,,,"Max data value / cosmic ray threshold"
+width,r,h,5.,,,"Width of profiles (pixels)"
+crval,s,h,"INDEF",,,"Approximate wavelength"
+cdelt,s,h,"INDEF",,,"Approximate dispersion
+"
+dispcor,b,h,yes,,,"Dispersion correct spectra?"
+extcor,b,h,no,,,"Extinction correct spectra?"
+fluxcal,b,h,no,,,"Flux calibrate spectra?"
+resize,b,h,no,,,"Automatically resize apertures?"
+clean,b,h,no,,,"Detect and replace bad pixels?"
+splot,b,h,no,,,"Plot the final spectrum?"
+redo,b,h,no,,,"Redo operations if previously done?"
+update,b,h,no,,,"Update spectra if cal data changes?"
+quicklook,b,h,no,,,"Minimally interactive quick-look?"
+batch,b,h,no,,,"Extract objects in batch?"
+listonly,b,h,no,,,"List steps but don\'t process?
+"
+sparams,pset,h,"",,,"Algorithm parameters"
+mode,s,h,"ql",,,

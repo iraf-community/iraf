@@ -1,0 +1,255 @@
+# KPNO Telescope, Filter, and Detector Database
+# Revised on the basis of drawings (true aperture size) and
+# improved count rates. Agrees with KPNO Direct Imaging Manual 
+# Revised to remove obsolete IR imagers IRIM and ONIS and to
+# include FLAMINGOS
+# 1 May 1997 --- plm
+# 22 Jul 1998 --- dj
+# 12 Aug 1998 --- gj
+# 15 Mar 2004 --- dj
+# 21 Sep 2006 --- fv: Mosaic z' based on estimated values from Arjun Dey.
+
+
+# Telescope data:
+# aperture diameter in meters, scale in arcsec/mm, and transmission.
+
+telescope = "0.9m"
+	aperture = 0.81
+	scale = 28.3
+	transmission = 1.0
+
+telescope = "0.9mf13"
+	aperture = 0.81
+	scale = 15.9
+	transmission = 1.0
+
+telescope = "4m"
+	aperture = 3.42
+	scale = 17.5
+	transmission = 1.0
+
+telescope = "4mf8"
+	aperture = 3.42
+	scale = 6.67
+	transmission = 1.0
+
+telescope = "4mf15"
+	aperture = 3.42
+	scale = 3.75
+	transmission = 1.0
+
+telescope = "2.1m"
+	aperture = 1.94
+	scale = 12.7
+	transmission = 1.0
+
+telescope = "2.1mf15"
+	aperture = 1.94
+	scale = 6.5
+	transmission = 1.0
+
+telescope = "Schmidt"
+	aperture = 0.61
+	scale = 96.4 
+	transmission = 0.7
+
+telescope = "WIYN"
+ 	aperture = 3.185
+	scale = 9.4
+	transmission = 1.0
+
+end
+
+# Filter data:
+# Magnitude corresponding to photon count rate. 
+# Photons/second/stellar-image for a 1-m telescope at 1 airmass.
+# Sky magnitudes per sq arc sec:
+# sky = sky0 + sky1 * phase + sky2 * phase**2 (phase=0-14)
+
+filter = "U"
+        extinction = 0.55
+	mag = 20
+	star = 8.0
+	sky0 = 22.0
+	sky1 = -0.2666
+ 	sky2 = -.00760
+
+filter = "B"
+        extinction = 0.25
+	mag = 20
+	star = 34.5
+	sky0 = 22.7 
+	sky1 = -0.0998
+	sky2 = -0.00953
+
+filter = "V"
+        extinction = 0.14
+	mag = 20
+	star = 36.2
+	sky0 = 21.8 
+	sky1 = -0.0153
+	sky2 = -0.00838
+
+filter = "R"
+        extinction = 0.10
+	mag = 20
+ 	star = 36.8
+ 	sky0 = 20.9 
+	sky1 = -0.0211
+ 	sky2 = -0.00364
+ 
+filter = "I"
+        extinction = 0.05
+	mag = 20
+	star = 26.7
+	sky0 = 19.9 
+	sky1 = -0.0086
+	sky2 = -0.00311
+ 
+filter = "z"
+        extinction = 0.03
+	mag = 20
+	star = 24.0
+	sky0 = 17.98
+	sky1 = 0.
+	sky2 = 0.
+
+filter = "J"
+        extinction = 0.08
+	mag = 20
+ 	star = 36.5
+ 	sky0 = 15.7
+ 	sky1 = 0.
+ 	sky2 = 0.
+
+filter = "H"
+        extinction = 0.04
+	mag = 20
+	star = 21.8
+	sky0 = 13.9
+	sky1 = 0.
+	sky2 = 0.
+
+filter = "K"
+        extinction = 0.07
+	mag = 20
+	star = 14.6
+	sky0 = 12.9
+	sky1 = 0.
+	sky2 = 0.
+
+filter = "Ks"
+        extinction = 0.05
+	mag = 20
+	star = 11.7
+	sky0 = 13.1
+	sky1 = 0.
+	sky2 = 0.
+
+end
+
+# Detector information:
+# rdnoise in photons, dark rate in photons per second, pixel size in microns,
+# and the effective DQE for each filter.
+
+detector = "MOSAIC1_1"
+        rdnoise = 4.9
+        dark = 0.00102
+        pixsize = 15
+        U = 0.55
+        B = 0.84
+        V = 0.84
+        R = 0.84
+        I = 0.79
+	z = 0.77
+
+detector = "MOSAIC1"
+        rdnoise = 5.0
+        dark = 0.0015
+        pixsize = 15
+        U = 0.48
+        B = 0.68
+        V = 0.81
+        R = 0.86
+        I = 0.63
+	z = 0.40
+
+detector = "T1KA"
+	rdnoise = 3.5
+	dark = 0.001
+	pixsize = 24
+	U = 0.24
+	B = 0.44
+	V = 0.70
+	R = 0.79
+	I = 0.59
+
+detector = "T2KA"
+	rdnoise = 4.0
+	dark = 0.001
+	pixsize = 24
+	U = 0.31
+	B = 0.53
+	V = 0.63
+	R = 0.67
+	I = 0.51
+
+detector = "T2KB"
+	rdnoise = 4.0
+	dark = 0.001
+	pixsize = 24
+	U = 0.42
+	B = 0.67
+	V = 0.78
+	R = 0.79
+	I = 0.56
+
+detector = "TI5"
+	rdnoise = 8.6
+	dark = 0.001
+	pixsize = 15
+	U = 0.51
+	B = 0.59
+	V = 0.69
+	R = 0.61
+	I = 0.39
+
+detector = "T5HA"
+	rdnoise = 13.5
+	dark = 0.001
+	pixsize = 27
+	U = 0.30
+	B = 0.51
+	V = 0.64
+	R = 0.69
+	I = 0.50
+
+detector = "S2KA"
+	rdnoise = 3.0
+	dark = 0.001
+	pixsize = 21
+	U = 0.30
+	B = 0.18
+	V = 0.34
+	R = 0.40
+	I = 0.60
+
+detector = "S2KB"
+	rdnoise = 7.0
+	dark = 0.001
+	pixsize = 21
+	U = 0.40
+	B = 0.70
+	V = 0.80
+	R = 0.82
+	I = 0.60
+
+detector = "FLMN"
+	rdnoise = 40
+	dark = 1
+	pixsize = 47.3
+	J = 0.082
+	H = 0.177
+	K = 0.26
+	Ks = 0.28
+

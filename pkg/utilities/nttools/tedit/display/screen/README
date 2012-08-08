@@ -1,0 +1,211 @@
+The procedures in this directory implement the lowest level of the
+screen handling routines in the display library. Procedures not
+described in this file are not part of the public interface and should
+not be called by user programs.  All the capabilities of the curses
+procedures are layered on top of the procedures in this directory.
+These procedures provide less functionality than the curses routines,
+but can be faster, at the expense of more complications in the user
+program. The procedures in this directory are portable. They are
+written in SPP and they do all their I/O through the IRAF VOS. They
+use the termcap and edcap files so that this library can be used with
+a variety of terminals and the editing commands can be tailored to the
+user's preferences.  There are two sets of subroutines in this
+directory.  The first set is the keyboard subroutines, prefixed by the
+letter "k", which read the keyboard and translate control key
+sequences to a single character.  The second set is the screen
+sunroutines, prefixed by the letters "ps", which write to the
+terminal.
+
+The keyboard subroutines read input from the keyboard, translating
+command key sequences into a single number.  The command key sequences
+are read from the edcap file.  This is a file located either in the
+user's home directory or the dev$ directory whose name is the value of
+the editor environment variable with an extension of ".ed".  See the
+files in the dev$ directory for an example of the file format.  The
+keyboard subroutines are initialized by a call to the following
+subroutine:
+
+procedure k_begin (cmdlist)
+
+char	cmdlist[ARB]	# i: List of editing commands
+
+This subroutine puts the terminal in raw mode, reads the edcap file,
+and sends the keyboard initialization sequence to the terminal. Its
+argument is a list of command names taken from the edcap file that you
+want your program to recognize. The first character in the string is a
+command separator, used to separate the commands in the string. The
+macro CMDSTR in <curses.h> defines the list of commands used by the
+curses routines. The screen initialization routine, ps_begin, must be
+called before k_begin is called. To terminate the keyboard interface,
+call the following subroutine:
+
+procedure k_end ()
+
+This procedure ends raw mode and sends the keyboard termination sequence
+to the terminal.  The screen termination routine, ps_end, should be
+called after this routine is called.  The following subroutine reads a
+single character from the terminal:
+
+int procedure k_get ()
+
+Command key sequences that were named in the command list passed to
+k_begin are returned as a single number.  The value returned by the
+first command key sequence in the command list is K_BASE, the value
+returned by the second sequence is K_BASE+1, and so on.  The macro
+K_BASE is defined in <curses.h>.  
+
+The next keyboard subroutine returns a pointer to a character string
+containing the help text for the keyboard commands:
+
+procedure k_help (text)
+
+pointer	text		# o: Help text
+
+The help text string is formatted as a series of command descriptions.
+Each description starts with the name of the edcap command , followed
+by an equals sign, followed by the ascii representation of the key
+sequence which executes the command, and terminated by a newline
+character.The string is formatted as a series of command descriptions.
+Each description starts with the name of the edcap command , followed
+by an equals sign, followed by the ascii representation of the key
+sequence which executes the command, and terminated by a newline
+character.
+
+The following routine copies one of the command descriptions from the
+help text to an output string:
+
+procedure k_eseq (name, eseq, maxch)
+
+char	name[ARB]	# i: Name bound to command sequence
+char	eseq[ARB]	# o: String representation of command sequence
+int	maxch		# i: Maximum length of command sequence
+
+The input parameters are the name of the command sequence and the
+length of the output string. The name of the sequence should be
+the name passed as part of the command string to k_begin(). The output
+is the ascii represntation of the escape sequence of that command.
+
+The screen subroutines are used to send output to the terminal.  They
+are based on the subroutines in Marc Rochkind's book, "Advanced C
+Programs for Displays".  Several conventions are followed by these
+subroutines.  The first is that while strings are passed as arrays of
+characters, individual characters are passed as integers.  The second is
+that screen coordinates are passed row first, column second and that the
+coordinates of the upper left corner of the screen are (1, 1).  The
+third is that areas on the screen are passed as rectangles, which are
+represented as arrays of four elements, where the four elements are the
+(top, left, bottom, right) corners of the rectangle.  The initialization
+and termination routines for the screen subroutines are:
+
+procedure ps_begin ()
+procedure ps_end ()
+
+The first subroutine opens the terminal for I/O and reads the termcap
+file, the second closes the terminal. The calling program get the size
+of the screen by calling the subroutines:
+
+int procedure ps_height ()
+int procedure ps_width ()
+
+These subroutines return the number of screen rows and columns,
+respectively. The following subroutine flushes the output buffer:
+
+procedure ps_synch ()
+
+The user will not see any output sent by these subroutine to the
+terminal until this subroutine is called. To ring the terminal's bell,
+call the following subroutine:
+
+procedure ps_beep ()
+
+To move the cursor on the screen call the following subroutine:
+
+procedure ps_setcur (row, col)
+
+int	row		# i: Cursor row
+int	col		# i: Cursor column
+
+To write a string to the screen call the following subroutine:
+
+procedure ps_write (row, col, ncols, str, att)
+
+int	row		# i: Starting row
+int	col		# i: Starting column
+int	ncols		# i: Number of columns to write
+char	str[ARB]	# i: String to write
+int	att		# i: Attribute
+
+The number of columns is an upper limit on the number of characters to
+write, if the string is shorter than this, the actual number of
+characters on the screen will be displayed. If the string does not lie
+entirely on the screen, the string will be clipped at the screen boundary.
+The attribute determines whether the string is printed normally or in
+standout mode. The value should be set to either A_NORM or A_STANDOUT,
+which is defined in display.h. To write a string where the screen
+attribute may change from character to characater call the following
+subroutine: 
+
+procedure ps_wrtcells (row, col, vector, ncols)
+
+int	row		# i: Starting row
+int	col		# i: Starting column
+char	vector[ARB]	# i: Vector to write
+int	ncols		# i: Number of columns to write
+
+The string to be written must be at least ncols long and each character
+to be displayed in standout mode should have A_STANDOUT added to its
+ascii code. This subroutine is used when the calling program keeps an
+array whose contents corresponds to the current screen display. To fill
+an area on the screen with a single character call the following
+subroutine: 
+
+procedure ps_fill (source, ch, att)
+
+int	source[RSIZE]	# i: Rectangle
+int	ch		# i: Fill character
+int	att		# i: Fill attribute
+
+This subroutine can be used to clear part or all of the screen by
+setting the fill character to blank and the fill attribute to A_NORM.
+The macro RSIZE is equal to 4 and is defined in display.h. To move an
+area of the screen in any of the four directions call the following
+subroutine: 
+
+bool procedure ps_slide (source, dir, dist)
+
+int	source[RSIZE]	# i: Rectangle
+int	dir		# i: Direction (from display.h)
+int	dist		# i: Distance (> 0)
+
+This subroutine can be used to scroll the screen up or down, delete one
+or more characters from a line, or move a line over so that a new
+character can be inserted. The direction is given as one of the four
+macros DIR_UP, DIR_DOWN, DIR_LEFT, and DIR_RIGHT, defined in <curses.h>.
+This subroutine may or may not be able to move the screen, depending on
+the capabilities defined in the terminal's termcap file. If the
+subroutine can move the area, it returns true and if it cannot, it
+returns false. In the latter case, it is the responsibility of the
+calling program to redraw the affected area of the screen in order to
+move the area.
+
+The include file display.h contains several macros the can be used to
+manipulate the rectangles passed to the screen subroutines. In order to
+access the elements of a rectangle the following macros can be used:
+
+RTOP(rect)	# Top row of a rectangle
+RLEFT(rect)	# Left column of a rectangle
+RBOT(rect)	# Bottom row of a rectangle
+RRIGHT(rect)	# Right column of a rectangle
+
+The dimensions of a rectangle can be computed by the following macros:
+
+RWIDTH(rect)	# Number of columns in a rectangle
+RHEIGHT(rect)	# Number of rows in a rectangle
+
+A program can set the elements in a rectangle with the following macros:
+
+RASG(newrect, top, left, bottom, right)
+RCPY(newrect, oldrect)
+
+The first macro assigns four scalars to the elements of a rectangle and
+the second macro copies the elements of one rectangle to another.

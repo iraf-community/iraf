@@ -1,0 +1,833 @@
+.help install Mar86 "UNIX/IRAF Installation Guide"
+.sp 3
+.ce
+\fBUNIX/IRAF Installation and Maintenance Guide\fR
+.ce
+(draft)
+
+.ce
+Doug Tody
+.ce
+March 13, 1986
+
+.nh
+Introduction
+
+    The procedure for installing IRAF on a UNIX host is complicated by the
+great variety of computers which run UNIX, by the many small differences in
+the operating system software on these machines, and by the hardware
+differences between the machines.  In general, the IRAF system can be ported
+with a modest effort to any UNIX host which has a reliable and reasonably bug
+free Fortran compiler (this cannot be taken for granted).  From the standpoint
+of ease of installation and reliability, the ideal case is a VAX running 4.2BSD
+Berkeley UNIX (or ULTRIX, which is the same thing), since that is the
+configuration we run on the IRAF software development machine.
+NOAO has also recently ported the system to a SUN workstation running the
+SUN version of 4.2BSD UNIX.  This is a new system which has not yet seen
+heavy use within NOAO and which cannot therefore be said to be as well
+tested as the VAX version, but it is already clear that it will be a good
+host (the initial port took only a few hours).
+
+Other ports, e.g., to other workstations or to System V UNIX, have been
+talked about and are certainly feasible, but NOAO cannot presently support
+such systems since we do not use them internally.  This should not discourage
+others from developing such systems, as other advantages may outweigh the
+expense of having to port and support IRAF locally.  To the extent that we
+are able, we will be glad to assist with such ports.  In the remainder of
+this document, we shall assume that the host operating system is some variant
+of 4.2BSD Berkeley UNIX.
+
+The ideal case of installing a "load and go" distribution tape containing
+a precompiled and prelinked system is easy, except possibly for the graphics
+interfaces.  There are various levels of installations beyond this, becoming
+progressively more involved, with a port of the system to a new version of
+UNIX being the most ambitious.  The possible levels of installations are
+summarized below.
+.ih
+Load and Go
+The system is read onto disk, several links are made in the UNIX system
+directories providing hooks into the system, and the device and network tables
+are tailored for the local system.
+.ih
+Load and Relink
+This is like load and go, except that the system was shipped without the
+executables to save space.  Relinking is necessary but the relinking procedure
+is fully automated and does not significantly increase the difficulty of the
+installation.
+.ih
+Full Sysgen
+In this case the system tables have already been configured for the host
+machine, but neither the executables nor object libraries can be used for
+some reason, e.g., because we are starting with a source only distribution.
+The sysgen procedure is fully automated and in principle should pose no more
+problems than a relink, but in practice it is unusual to get through a full
+sysgen on a new machine without encountering compilation errors, usually
+due to obscure errors in the Fortran optimizer.  This sounds bad, but one can
+usually hand compile the affected files with the optimizer turned off, and
+then restart the sysgen, which will automatically pick up where it left off.
+
+On the VAX we routinely perform full system sysgens without any problems
+whatsoever.  A full sysgen on a VAX 750 class machine requires about 45
+minutes for the bootstrap (building the host interface), plus another 20
+hours to compile and link the machine independent part of the system.
+.ih
+Port to a New System
+To port IRAF to a new version of UNIX requires some modifications to the
+files in the host interface directories, followed by a full sysgen and lots
+of testing.  Typically most of the code in the host interface can be used 
+without change, with only minor changes to the remaining code, since the
+different versions of UNIX are quite similar (as compared to, for example,
+a port to a completely different operating system like VMS or AOS/VS).
+
+Note that even when the target system is a "fully compatible" 4.2BSD UNIX
+system, some changes are likely to be necessary since all of these systems
+are slightly different.  For example, the SUN and ISI implementations of
+4.2BSD UNIX employ different assemblers, and the Fortran compilers on the
+two systems have diverged considerably.  A port to Bell System V or one of
+the UNIX look alikes would certainly require some changes to the IRAF kernel,
+particularly in the exception handling, process control, and network interface
+facilities.
+
+The changes required are likely to be minor for someone sufficiently familiar
+with both IRAF and UNIX, but should not be underestimated.  Every new port
+produces its share of compile time errors (due to differences in the Fortran
+compilers) and finds a few new bugs, both in the IRAF software and often in
+the host Fortran compiler as well.  A thorough understanding of both IRAF and
+the host system is required to rapidly isolate such bugs.
+.in -4
+
+Fortunately, a port only has to be done once and most of the sites receiving
+UNIX/IRAF will not need to do more than a relink or a sysgen, both of which
+are straightforward.  Many sites will not even need to relink, in which case
+the installation is trivial.
+
+Once the basic system is functioning, it is still necessary to edit the device
+and network tables to interface IRAF to the local terminals, printers, magtape
+devices, describe the nodes in the local network, and so on.
+Once that is done only the graphics device interfaces are left.
+Conventional graphics terminals, i.e., Tektronix
+compatibles with a serial interface, are not difficult.  The worst case is
+a new bit mapped display or image (greyscale) display device, which may
+require the implementation of a new IRAF GIO graphics kernel for the device.
+
+The IRAF system is organized in such a way that the machine and device
+dependent software is stored separately from the bulk of the software,
+which is machine and device independent.  This should make it relatively
+easy to install new revisions of the system, provided the host and device
+interfaces do not have to be modified.  The procedure for installing a
+minor revision is simply to read the revision tape into the system (containing
+the BIN, DOC, LIB, SYS, PKG, and MATH directories), and then possibly do a
+partial or full sysgen, depending upon whether the distribution included
+executables and objects.  The local device and network tables will not be
+affected since they are stored in different directories (HOST and DEV) than
+those on the tape.  Note that a "minor" revision actually updates virtually
+the entire system, since the host system interface is small compared to the
+rest of the system.
+
+When a major revision is received it will be necessary to reinstall the
+full system, but it is likely that the old device tables can be kept and
+used in the new system, in which case even a full installation should only
+take a couple of hours, excluding the time for a full sysgen if such is needed.
+Once the initial version of IRAF has been installed, the procedure for
+installing a minor revision is identical for all systems, including such
+systems as VMS and AOS/VS as well as UNIX.
+
+Sites which are actively using IRAF will probably want to keep their systems
+up to date, as the system is continually evolving and improving, and new
+software is continually being added.  To ensure that it will be easy to
+install future updates, it is wise to store locally added software outside
+the standard system, and to keep a log of all revisions, if any, made to
+the standard system.  The subdirectory LOCAL (off the IRAF root directory)
+is provided for this purpose.  NOAO should be informed of any local revisions
+or bug fixes so that we have the opportunity to incorporate them in the
+standard system.
+
+.nh
+Installing the System
+.nh 2
+Initial System Installation
+
+    This section documents the procedure for installing a binary distribution
+tape prepared on a compatible (VAX or SUN) system at NOAO.  The procedure
+outlined in this section is also used to install a source distribution, the
+difference being that when one is done it is still necessary to do a sysgen
+to compile and link the system.
+
+Few problems are expected when installing binary distributions for the VAX,
+since all VAX hardware and (UNIX) software is pretty much the same.
+For a system like the SUN this is not necessarily the case, e.g., a SUN-3
+distribution will have to be recompiled to run on a SUN-2, and a SUN-2
+distribution compiled with inline floating point instructions for the SKY
+floating point board will have to be recompiled if the SKY board is not present.
+Conversely, a system compiled with the SUN-2 portable floating point interface
+will run whether or not the SKY board is present, but it might be desirable
+to recompile the system with the inline code generation option, just for the
+added speed.  If you have received a binary SUN distribution, be sure to
+check the system (SUN-2/3), operating system version, and floating point
+compiler option used for compatibility with your system.
+
+.nh 3
+Create an IRAF Account
+
+    The first step is to set up an account for IRAF.  The pathname to the
+root directory does not matter, but it is wise to keep it short to speed up
+pathname resolution and to minimize the possibility of filename truncation.
+The account should be set up to use \fBcsh\fR as the shell.  The disk
+partition containing IRAF should have about 45 Mb of space available for
+the system; if necessary, the system can be stripped later to save space,
+but the full 45 Mb is required for the installation.
+
+In what follows, we shall refer to the IRAF root directory as "$iraf",
+as if it were a cshell \fBsetenv\fR variable.  It is not however necessary to 
+define such a variable at this point, provided you do not try to type it
+in as shown in the examples (type in the full pathname instead).
+
+.nh 3
+Read the Distribution Tape
+
+    The system is distributed on one or more TAR format tapes or cassettes.
+Login as IRAF, go to the IRAF root directory, and enter the \fBtar\fR command
+shown for each tape in the distribution kit.  The order in which the tapes
+are read is not important.
+
+.ks
+.nf
+	% cd $iraf
+	% tar -xpf /dev/XXXX
+.fi
+.ke
+
+The full system contains approximately 6000 files in over 200 directories;
+the  \fBtar\fR flags -tv are not recommended, as printing the filename can
+slow things down considerably.  It typically takes a half hour or so to read
+the tapes.
+
+.nh 3
+Set up the Host System Environment
+
+    Login as root (type \fIsu\fR) and modify the IRAF account to make
+$iraf/local the login directory for user IRAF (this is done by editing the
+/etc/passwd file - use \fIvipw\fR).  Enter the following commands to enable
+device allocation within IRAF.  This only works if you have a binary
+distribution; if not, it must be done later after the system has been
+bootstrapped.
+
+.ks
+.nf
+	% cd $iraf/unix/hlib
+	% /etc/chown 0 alloc.e		# (zero, not "oh")
+.fi
+.ke
+
+While still logged in as root, make the following symbolic links in the
+standard UNIX directories.  We assume here that local utility programs are
+installed in /usr/bin, but a different directory may be used for this
+purpose on your system (any public directory which is in the default \fIpath\fR
+for the average user will do).  Since these are symbolic links, this
+step may be performed even if a source distribution is being installed.
+
+Symbolic links are preferred to file copies because IRAF is a self contained
+system and is not set up to install executables, etc. in external host system
+directories.  Symbolic links also eliminate the possibility of the installed
+version of the file being obsolete.  Although we use links here, no links are
+used within the IRAF system itself.
+
+.ks
+.nf
+	% cd /usr/include
+	% ln -s $iraf/unix/hlib/libc/iraf.h .
+	% cd /usr/bin
+	% ln -s $iraf/bin/cl.e cl
+	% ln -s $iraf/unix/hlib/mkiraf.csh mkiraf
+	% ln -s $iraf/unix/hlib/mkpkg.e mkpkg
+.fi
+.ke
+
+The following additional links are optional but are desirable if any IRAF
+programming is anticipated.  An alternative is to "source" the file
+"$iraf/unix/hlib/irafuser.csh" in one's .login file (this only works for cshell
+users).
+
+.ks
+.nf
+	% ln -s $iraf/unix/hlib/generic.e generic
+	% ln -s $iraf/unix/hlib/rmbin.e rmbin
+	% ln -s $iraf/unix/hlib/rmfiles.e rmfiles
+	% ln -s $iraf/unix/hlib/rtar.e rtar
+	% ln -s $iraf/unix/hlib/wtar.e wtar
+	% ln -s $iraf/unix/hlib/xc.e xc
+.fi
+.ke
+
+Logout of root.  If this is done by exiting "su", type "rehash" to make the
+cshell aware of the new programs.
+
+.nh 3
+Configure the IRAF Environment
+
+    While once again logged in as IRAF, edit the .login file in the IRAF
+login directory $iraf/local.  The \fBsetenv iraf\fR definition must be
+changed to reflect the new IRAF root directory; everything else is optional
+and may be personalized if desired.  Note that IRAF assumes that all host
+directory pathnames may be concatenated with a filename to produce the
+pathname of the file, hence the directory pathname MUST end with a slash,
+contrary to normal UNIX convention.
+
+.ks
+.nf
+	% cd
+	% vi .login
+	% source .login
+.fi
+.ke
+
+After editing the .login file, "source" it to pick up the new environment
+definitions.  Hereafter we shall assume that the directories $iraf, $hlib,
+etc. have been defined in the cshell environment by the .login file.  At this
+point you may want to read the file $hlib/irafuser.csh to see what has been
+defined.
+
+There are several files in $hlib (the host system interface library) which
+must now be edited to reflect the host system.  Edit the following definitions
+in the file $hlib/mkiraf.csh (the trailing slashes are omitted in this case
+because this script is pure UNIX).  The \fBmkiraf\fR script is run by the user
+to autoconfigure the IRAF environment; see the CL User's Guide for additional
+information on the use of this task.
+
+.ks
+.nf
+	set iraf    = "/iraf"
+	set imdir   = "/tmp2/iraf"
+	set ttymsg  = "Terminal types: vt100=basic terminal, ..."
+.fi
+.ke
+
+Set the value of \fBimdir\fR to the pathname of a public scratch directory
+to be used for the storage of bulk image data.  The \fBmkiraf\fR script
+will create the default user image storage directories as subdirectories of
+this directory.  A scratch rather than user (login directory) file system is
+normally used for this purpose to avoid storing bulk data on a backed up
+user file system, and to facilitate the use of file deletion daemons to
+automatically delete old files.  Note that the user may override the default
+\fBimdir\fR pathname defined in the LOGIN.CL file created by \fBmkiraf\fR.
+
+The \fBttymsg\fR prompt string is printed by the script to help the user
+set the default terminal type for IRAF.  Each terminal must have an entry
+in the IRAF (not UNIX) \fBtermcap\fR file.
+
+Now descend to the subdirectory LIBC and edit the file "iraf.h", for which
+we earlier made a symbolic link.  This global C header file is required to
+compile any IRAF C sources, and is also used by the system at runtime to
+determine the IRAF root directory, as well as the pathnames of the HOST
+and TMP logical directories.  The definition of TMP defaults to the standard
+UNIX /tmp and should not have to be changed.  Make the obvious change to
+the definitions of HOST and IRAF; HOST is the unix pathname of $iraf/unix.
+This has to be defined at the system level because HOST might be, for example,
+$iraf/vms instead of $iraf/unix.  HOST is the root directory of the IRAF
+host system interface.  The remainder of the file contains many occurrences
+of the pathname to the IRAF root.  Use global replacement to change all
+these definitions to the new IRAF root.
+
+
+Assuming a full binary distribution, it should now be possible to return to
+the IRAF login directory, type \fBmkiraf\fR to configure the IRAF environment,
+and then \fBcl\fR to log into IRAF.  Indeed, any user should be able to do
+the same at this point.
+
+.ks
+.nf
+	% cd
+	% mkiraf
+	% cl
+.fi
+.ke
+
+.nh 2
+Relinking the System
+
+    Relinking the system is necessary if the system was shipped without
+the executables in the BIN directory.  In order to relink the system must
+first have been \fIbootstrapped\fR.  When the system is shipped without
+executables (to save space) it will already have been bootstrapped.
+If it is necessary to bootstrap the system, e.g., given a source only
+distribution, go read section 2.4 before trying to relink the system.
+
+The system is relinked by the bootstrap utility program \fBmkpkg\fR.
+The \fBmkpkg\fR program is driven by the MKPKG files found in all IRAF
+source directories.  Running \fBmkpkg\fR in a directory causes the
+contents of that directory, normally an applications package or library,
+to be updated, along with the contents of all subdirectories referenced
+by the root MKPKG file.
+
+Running \fBmkpkg\fR in the root IRAF directory causes the entire system to
+be updated.  If the system libraries are all up to date, the effect is to
+relink the system.  If the system has been modified and some library modules
+have to be recompiled and inserted into the system libraries, then the
+operation is a partial sysgen.  If there are no libraries or object libraries
+then we have a full sysgen, which is the topic of the next section.
+The \fBmkpkg\fR utility is documented in detail in the IRAF User's Guide,
+in the manual pages for the \fBsoftools\fR package.
+
+To relink all of IRAF, go to the root and run \fBmkpkg\fR, i.e.,
+
+.ks
+.nf
+	% cd $iraf
+	% mkpkg
+.fi
+.ke
+
+The program will inspect all source modules and verify that the system
+libraries are up to date, then relink the system executables, followed by
+all the applications executables, installing the executable files in the
+BIN directory.
+
+.nh 3
+Relinking Individual Packages
+
+    It is just as easy to relink the individual IRAF packages, e.g., after
+a bug has been fixed, or if an update of a package is received by electronic
+mail.  This would normally be done from within IRAF since the next step
+is to test the new package, so we will use the "cl>" prompt in the examples,
+but since \fBmkpkg\fR is a bootstrap utility (IRAF foreign task), usage is
+the same both in IRAF and in UNIX.
+
+To relink a package and install the new executable in BIN:
+
+	cl> mkpkg update
+
+To relink a package, leaving the executable in the package directory for
+testing or debugging prior to installation:
+
+	cl> mkpkg
+
+To install an already linked executable after testing:
+
+	cl> mkpkg install
+
+To update only the package library without relinking (this assumes that the
+name of the library is LIBPKG.A):
+
+	cl> mkpkg libpkg.a
+
+The "update", "install", and "libpkg.a" identifiers are entry points in the
+MKPKG file, which may be read to see what is going on.
+
+As an actual example of a package relink, suppose we wanted to increase the
+size of the stack area in the CL to 8000 elements, e.g., because the CL was
+running out of space at runtime.  We would go to the CL directory, edit
+the file CONFIG.H, change the value of STACKSIZ to 8000, and then run
+\fBmkpkg\fR:
+
+.ks
+.nf
+	cl> cd cl
+	cl> ed config.h
+	cl> mkpkg update
+.fi
+.ke
+
+Since CONFIG.H is included by nearly all the CL source files, the entire
+package would be recompiled unnecessarily, but it is safer that way.
+
+.nh 2
+Autogeneration of the System (SYSGEN)
+
+    A full system sysgen is necessary when installing a source only version
+of the system.  The system must first have been bootstrapped; see section
+2.4 if this has not yet been done.  A full sysgen may also be necessary if
+a binary distribution has been received but it is later discovered that it is
+necessary or desirable to recompile the system.  In this case the existing
+libraries and objects must be deleted before the sysgen, else the sysgen
+will be nothing more than a relink.  The \fBrmbin\fR utility is used to
+descend a directory tree, deleting all binary files therein.  Note that
+the ONLY case in which it is necessary to use \fBrmbin\fR is when we wish
+to force the entire system to be recompiled.  The \fBrmbin\fR task is yet
+another bootstrap utility, and is documented in the manual pages for the
+\fBsoftools\fR package.
+
+.ks
+.nf
+	% cd $iraf
+	% rmbin -vi bin lib pkg sys
+.fi
+.ke
+
+This will delete all binaries in the portable part of the system, excluding
+the HOST or UNIX directories (if you run \fBrmbin\fR on UNIX, you will have
+to bootstrap the system as well).
+
+Before starting the full system sysgen it may be desirable to review the
+switches in the file MKPKG.INC in the HLIB directory.
+This is the global include file for the \fBmkpkg\fR utility,
+and contains various switches controlling \fBmkpkg\fR, e.g., which packages
+will be compiled, and the default compiler and linker flags.
+
+Since a full sysgen takes a long time and generates a lot of output which
+later has to be reviewed, they are always run in batch with the output
+redirected, e.g.:
+
+.ks
+.nf
+	% cd $iraf
+	% mkpkg >& spool &
+.fi
+.ke
+
+To watch what is going on after this command has been submitted and while
+it is running, try
+
+	% tail -f spool
+
+Sysgens are restartable, so if the sysgen aborts for any reason, simply
+fix the problem and start it up again.
+
+A full sysgen generates a lot of output, too much to be safely reviewed for
+errors by simply paging the spool file.  Enter the following command to review
+the output (this assumes that the output has been saved in a file named
+SPOOL).
+
+	% mkpkg summary
+
+It is normal for a number of compiler messages warning about assigning
+character data to an integer variable to appear in the spooled output.
+These are harmless on most (but not all) machines, and are due to questionable
+coding practices in the old (pre-F77) NCAR graphics utilities.  Hopefully the
+problem will be fixed in an upcoming release by NCAR.
+
+The discussion up to now has centered on the full system sysgen.
+Partial sysgens are actually much more common.  For example, if an important
+bug is fixed in the VOS or in the IRAF kernel, a (partial) sysgen should be
+conducted to recompile the affected modules and relink the system.
+An example of this occurs when the \fBtermcap\fR or \fBgraphcap\fR entries
+for important local devices are cached by running the \fBttycompile\fR
+task (another \fBsoftools\fR utility).  A sysgen is required after regenerating
+the cache tables, since these must be compiled and linked into the affected
+programs to have any effect.
+
+.nh 2
+Bootstrapping the System
+
+    A bootstrap is like a full system sysgen, except that it is the host
+system interface (kernel and bootstrap utilities) which are compiled and
+linked, rather than IRAF itself.  The system must be bootstrapped before
+a sysgen is possible, since the bootstrap utilities are required to do a
+sysgen.  The two operations are distinct because only the bootstrap is
+machine dependent; everything else works the same on all IRAF systems.
+
+The bootstrap operation is necessary when installing the system from a
+source only distribution tape.  We assume that the files in the host system
+interface have already been configured for the host system.  If this is
+not the case, then we are doing a port, which is a lot more ambitious than
+a simple bootstrap.
+
+To bootstrap UNIX/IRAF, go to the UNIX directory and interpret the shell
+script MKPKG.CSH.  This takes about 45 minutes, so the output should be
+spooled in a file.  Note that (for no good reason) the files have a .CSH
+extension even though we have chosen to use the Bourne shell to execute
+the commands therein.
+
+.ks
+.nf
+	% cd $iraf/unix
+	% sh -x mkpkg.csh >& spool &
+.fi
+.ke
+
+A bootstrap recompiles everything whether it needs to or not, so it is
+usually not necessary to delete the binaries before doing a full bootstrap.
+
+.nh 2
+Configuring the IRAF Device Tables
+
+    The following files should now be edited to define the default terminal,
+printer, editor, and so on for your system.  Any part of this can be left
+until later if desired.
+
+.ls 4 \fB$hlib/zzsetenv.def\fR
+This file contains the name of the default editor, the default names of all
+the standard devices, and a number of other definitions which are not site
+dependent and which can therefore be ignored.  To be accessible by the IRAF
+system, each local device named must also have an entry in the TERMCAP file
+(terminals and printers) or GRAPHCAP file (graphics terminals and image
+displays) in DEV.  There must also be an "editor.ED" file in DEV
+for the named editor; EDT, EMACS, and VI are currently supported.
+Edit the string to the right of the equals sign for the following entries.
+Sample values are shown.
+
+.ks
+.nf
+	set editor	= "vi"
+	set printer	= "imagen"
+	set stdgraph	= "vt640"
+	set stdimage	= "iism70l"
+	set stdplot	= "versatec"
+	set terminal	= "vt640"
+.fi
+.ke
+
+For example, you may wish to change the default editor to "emacs" (heaven
+forbid), the default printer to "versatec", the default image display to
+"iism75", and the default terminal to "vt100".  Note that only the IIS model
+70 and 75 image displays are directly supported by the current system.
+Display code is also available for the DeAnza displays from STScI for VMS
+hosts, but nothing is currently available for UNIX hosts (NOAO will directly
+support the DeAnza sometime in 1986).  The complex issues of the graphics
+and display interfaces are discussed more fully in a later section.
+.le
+
+.ls 4 \fB$iraf/dev/devices\fR
+This file contains a list of the allocatable devices (primarily tape drives)
+for the local system.  It should be obvious how to change it by reading the
+comments in the file and studying the current values, which are for our system.
+.le
+
+.ls 4 \fB$iraf/dev/termcap\fR
+There must be entries in this file for all local terminal and printer
+devices you wish to access from IRAF (there is no \fBprintcap\fR file in IRAF).
+The entry for a printer contains one special (non-\fBtermcap\fR) entry,
+called DD.  This consists of three fields: node!device, the template for the
+temporary spoolfile, and the UNIX command to be used to dispose of the file to
+the printer.  On Berkeley UNIX it is rarely necessary to make use of the node
+name capability, since the UNIX \fBlpr\fR already provides this capability.
+
+If you have a new terminal which has no entry in the termcap file provided,
+you probably already have an entry in the UNIX termcap file.  Simply copy it
+into the IRAF file; both systems use the same termcap database format.
+.le
+
+.ls 4 \fB$iraf/dev/graphcap\fR
+There must be entries in this file for all graphics terminals, batch plotters,
+and image displays accessed by IRAF programs.  Weird graphics terminals will
+need a new entry.  The IRAF file "sys$gio/doc/gio.hlp" contains docs for
+graphcap.  A printed copy of this document is available upon request, however
+once IRAF is up you may find it easier to generate your own copy using HELP,
+as follows:
+
+.nf
+	cl> cd sys$gio/doc
+	cl> help gio.hlp fi+ | lprint
+.fi
+
+The manual page for the \fBshowcap\fR task should also be printed since this
+utility is useful for generating new graphcap entries.  More focused
+documentation will be available eventually.  Telephone consultation is
+available for those who need it.  We ask that new graphcap entries be sent
+back to us so that we may include them in the master graphcap file for other
+sites to use.
+.le
+
+.ls
+The DEV directory also contains a number of files (HOSTS, HOSTLOGIN, and UHOSTS)
+used by the IRAF network software.  We depend upon the networking capabilities
+of IRAF heavily at NOAO to access image displays, printers, files, etc. resident
+upon remote nodes (the IRAF network interface is also capable of spawning
+subprocess and background jobs on remote nodes, and works even when the nodes
+run different host operating systems, e.g., both UNIX and VMS).
+
+We expect that most sites will not need this capability initially, hence
+documentation of the networking software will be left for later.  For sites
+that want to try it out, all that is necessary to enable networking is to
+edit the three networking files in the DEV directory, and install IRAF on
+the other nodes.  It does not matter what native operating system runs on the
+remote nodes, so long as it runs IRAF as well.  The source for the network
+interface is in the sys$ki directory, and a discussion of the conceptual
+design of the interface is given in the README file in that directory.
+.le
+
+.nh 2
+Login to IRAF and Run the Test Procedure
+
+    Congratulations!  You should now have a fully functional IRAF system.
+At this point it would probably be wise to read the CL User's Guide,
+if you have not already done so.  Once the IRAF environment is configured
+with \fBmkiraf\fR (discussed earlier) one need only enter the CL command
+to start up the CL.  After a bit IRAF should print the message of the day
+and the root menu, and issue the "cl> " prompt.
+
+	% cl
+
+Once in the CL, you will probably have magtape and printer access, are likely
+to have graphics terminal access, and very possibly will not have either
+image display access or graphics plotter access.  If the graphics terminal
+capability is ready the next step is to run the IRAF test procedure to
+verify that all is working well, as well as try out a few of the many tasks
+in the system.  If the graphics terminal is not up yet, there is probably
+no point in running the test procedure.  To run the test procedure, read
+the documentation in volume 1A of the IRAF User's Guide and follow the
+instructions therein.
+
+.nh
+Tuning Considerations
+
+    There are two things that are commonly done to tune UNIX/IRAF for a
+particular host system:
+
+.nf
+	o  Precompile selected TERMCAP and GRAPHCAP entries
+	o  Strip the system to reduce disk consumption
+.fi
+
+.nh 2
+Precompiling TERMCAP and GRAPHCAP Entries
+
+    Precompilation of a termcap or graphcap entry is a technique used to
+speed runtime access of the entry for that device.  If the entry is not
+precompiled the termcap or graphcap file must be physically opened and
+scanned at runtime to read the desired entry.  This causes a noticeable
+delay of as much as a second when clearing the terminal screen or plotting
+a graph, hence it is usually worthwhile to cache the entries for commonly
+used video and graphics terminals.  It is not worthwhile for printers,
+plotters, and image displays.
+
+The system comes with selected termcap and graphcap entries already
+precompiled.  To see which devices are precompiled, page the cache data
+files, dev$cachet.dat (for termcap) and dev$cacheg.dat (for graphcap).
+To cache a different set of entries one must regenerate these files with the
+\fBmkttydata\fR task in the \fBsoftools\fR package, and then do a full
+sysgen with the \fBmkpkg\fR utility.  Detailed instructions are given in
+the manual page for \fBmkttydata\fR.
+
+.nh 2
+Stripping the System to Reduce Disk Consumption
+
+    If the system is to be installed on multiple cpus, or if a production
+version is to be installed on a workstation, it may be necessary or desirable
+to strip the system of all non-runtime files to save disk space.
+This equates to deleting all the sources and all the reference manuals and
+other documentation, excluding the online manual pages.  A special utility
+called \fBrmfiles\fR (in the \fBsoftools\fR package, of course) is provided
+for this purpose.  It is not necessary to run \fBrmfiles\fR directly to strip
+the system.  The preferred technique is to enter the commands given below.
+The example is for the cshell for consistency with the rest of this document,
+but this could be done from within the CL as well.
+
+.nf
+	% cd $iraf
+	% mkpkg strip
+.fi
+
+This will preserve all runtime files, permitting use of the standard system
+as well as user software development.  The size of the system is reduced
+from about 41 Mb (megabytes) to around 19 Mb.  One can optionally enter the
+command "mkpkg stripall" to delete the system libraries as well, but this
+saves only another couple of Mb and a full sysgen or a tape reload will be
+required to regain the capability to link user programs with the IRAF
+libraries, or relink the IRAF executables.
+
+.nh
+Interfacing to New Graphics Devices
+
+    There are three types of graphics devices that concern us here.
+These are the graphics terminals, graphics plotters, and image displays.
+The topic of interfacing to these devices has already been discussed in
+the letter which was sent out with the IRAF questionnaire, hence the
+discussion given here will be brief.
+
+.nh 2
+Graphics Terminals
+
+    The IRAF system as distributed is capable of talking to just about any
+conventional graphics terminal, using the \fBstdgraph\fR graphics kernel
+supplied with the system.  All one need do to interface to a new graphics
+terminal is add a new graphcap entry for the device.  This can take anywhere
+from a few hours to a few days, depending on one's level of expertise, and the
+perversity of the device in question.
+
+The fancy bit mapped, high resolution graphics displays common on "workstations"
+like the MicroVax and the SUN cannot be driven (very well) by the existing
+\fBstdgraph\fR graphics kernel.  We are actively developing new graphics kernels
+for these devices, and they should be available later this year.  These systems 
+often come with some graphics software, e.g., CORE, GKS, or CGI, but a good
+interface requires interaction with the window management software as well,
+hence each workstation will probably require a customized graphics kernel.
+
+.nh 2
+Graphics Plotters
+
+    The current IRAF system comes with three graphics kernels usable to drive
+graphics plotters.  Additional kernels are under development to interface the
+IRAF graphics subsystem to GKS, CGI, and CORE.
+
+The \fBstdgraph\fR kernel can in principle be used to make
+plots on many devices by using a Tek graphcap entry, redirecting the Tek
+drawing instructions into a file, and using the Tek emulation software that
+comes with most plotters to generate the plot.  A more streamlined interface
+is possible but is not yet available.
+
+The supplied \fBstdplot\fR kernel is used to generate NCAR metacode and can be
+interfaced to an NCAR metacode translator at the host system level to get
+excellent plots on the Versatec, Imagen, and other similar devices if NCAR
+metacode translators are available.  This is the kernel we currently depend
+upon most heavily at NOAO for plotter output.
+
+Unfortunately, the host level NCAR metacode translators are not included in
+the standard IRAF distribution but are required for a plot.  The necessary
+software is however in the public domain and is in use at NOAO, hence is
+available upon special request.
+
+The remaining possibility with the current system is the \fBcalcomp\fR kernel.
+Many sites will have a Calcomp or Versaplot library (or Calcomp compatible
+library) already available locally.  It should be possible to edit the name
+of the library in the hlib$mkpkg.inc file and relink the Calcomp graphics
+kernel to get output on any devices supported by the library.
+The following commands should suffice to relink and install the Calcomp
+graphics kernel, assuming a Calcomp library is available locally:
+
+.nf
+	% cd $iraf/sys/gio/calcomp
+	% mkpkg update
+.fi
+
+A graphcap entry may also be required.
+
+.nh 2
+Image Displays
+
+    The IRAF system as currently supported directly supports only the
+IIS model 70 and 75 image displays (a Peritek interface of sorts is
+also available for VAX/UNIX hosts).  The 8 bit color display for the SUN-3
+is on order and we expect to use it for image display.  We are expecting
+to take delivery of a MicroVax with bit mapped graphics display and DeAnza
+image display later this year.
+
+We cannot do much to help sites with other image displays until the new
+IRAF display interface (which will be based on the IDI standard) is completed.
+Work is scheduled to begin on this in the spring, hence the software should
+become available this summer or fall.  The new interface and associated TV
+package software will be a great improvement over what is currently available;
+the current interface is a prototype and is quite minimal, e.g., it does
+not support image cursor readback, although it is fine for image display.
+
+In the meantime, the simplest approach is to use the new IMFORT interface
+and whatever non-IRAF display software you currently have to construct
+an interim display program.  The IMFORT library provides host system Fortran
+or C programs with access to IRAF images.  The only documentation
+currently available for IMFORT is the README file in the directory
+$iraf/sys/imio/imfort.  Sample Fortran programs and a UNIX make script
+showing how to link are given in the same directory.
+
+.nh
+The IRAF Directory Structure
+
+    The current IRAF directory structure (new directories are constantly
+being added) is documented in the Appendix.  The main branches of the tree
+are the following.
+
+.nf
+	bin	- installed executables
+	dev	- device tables (termcap, graphcap, etc.)
+	doc	- assorted IRAF manuals
+	lib	- the system library; object libraries, global files
+	local	- your login directory
+	math	- sources for the mathematical libraries
+	pkg	- the IRAF applications packages
+	sys	- the virtual operating system (VOS)
+	unix	- the UNIX system interface (kernel + bootstrap utilities)
+	vms	- the VMS system interface (kernel + bootstrap utilities)
+.fi
+
+If you will be working with the system much at the system level, it will be
+well worthwhile to spend some time exploring these directories and gaining
+familiarity with the system.
+.endhelp

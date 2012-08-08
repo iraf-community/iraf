@@ -1,0 +1,633 @@
+.help fitparams Aug91 noao.digiphot.photcal
+.ih
+NAME
+fitparams -- solve for the parameters of the transformation equations
+.ih
+USAGE
+fitparams observations catalogs config parameters
+.ih
+PARAMETERS
+.ls observations
+The list of files containing the observational data.  Observations files are
+multi-column text files whose columns are delimited by whitespace, and
+whose first column is usually reserved for the object id.
+All observations files in the list must have the same format.
+The format of legal observations files is described in further detail in
+the description section.
+.le
+.ls catalogs
+The list of files containing the catalog data.  Catalog files are
+multi-column text files whose columns are delimited by whitespace,
+and whose first column is always reserved for the object id.
+If more than one entry with the same id exists in the list of catalogs,
+only the first entry is used.
+All catalog files in the list must have the same format.
+The format of legal catalog files is described in further detail in
+the description section.
+.le
+.ls config
+The name of the configuration file. The configuration file is a text file
+specifying the format of the input catalog and observations files, and the
+form of the transformation
+equations. A brief description of the syntax and grammar of this file
+is given in the configuration file section.
+.le
+.ls parameters
+The name of the output database file.
+Parameters is a text database file to which the error analysis of the fit
+and the parameter values and errors for each transformation equation are
+written. 
+The output of fitparams is appended to parameters as a set of new records,
+one for each of the transformation equations. 
+If more than one record exists with the same record name, the 
+last record written takes precedence.
+.le
+.ls weighting = "uniform"
+The following weighting schemes are supported.
+.ls uniform
+The data points are all assigned a weight of one.
+.le
+.ls photometric
+The total error squared for each data point is set to the total error in the
+catalog variables squared plus the total error in the observations variables
+squared and the weight for each data point is set to 1.0 / error ** 2.
+This option assumes that all the sources of error are in the photometric
+indices (magnitudes and colors), that error columns (see the description
+of the configuration file below) have been declared for at least one
+photometric index, and that the contribution of each catalog or observations
+variable to the total error is weighted by the number of times it occurs
+in the transformation equation.
+If \fIaddscatter\fR is "yes" then an additional "scatter" term is fit and
+added to the weights.
+.le
+.ls equations
+The weight equation (see the description of the configuration file below)
+is evaluated for each point and the weight for that point is set to that
+value.  If there is no weight equation the weights are all set to one.
+If \fIaddscatter\fR is "yes" then an additional "scatter" term is fit and
+added to the weights.
+.le
+.le
+.ls addscatter = yes
+Add an additional scatter term to the weights if the average error in the fit
+is much greater than the average error in the measurements? \fIAddscatter\fR
+has no effect if \fIweighting\fR is "uniform". \fIAddscatter\fR is recommended
+if \fIweighting\fR is "photometric" as the intrinsic error in the
+transformations is often much greater than the formal errors of
+measurement and the scatter term stabilizes the fit.
+Users of the \fIweighting\fR equals "equations" option
+may wish to turn off \fIaddscatter\fR.
+.le
+.ls tolerance = 3.0e-5
+The convergence tolerance for the non-linear least squares fit.
+The fit will stop iterating 
+when the fractional change in the reduced chi-square of the residuals from 
+iteration to iteration is less than \fItolerance\fR. 
+.le
+.ls maxiter = 15
+The maximum number of iterations for the non-linear least squares fit.
+When this number is reached the fitting process will terminate even
+if the fit has not converged.
+.le
+.ls nreject = 0
+The maximum number of bad data rejection iterations. If \fInreject\fR is
+greater than zero the initial fit is used
+to detect and reject deviant points before performing the final fit.
+No rejection is performed if \fInreject\fR is less than or equal
+to zero.
+.le
+.ls low_reject = 3.0, high_reject = 3.0
+The lower and upper rejection limits in units of the rms of the fit.
+Points deviating from the initial fit by more than this amount are rejected
+before performing the final fit.  No rejection is done if both limits
+are zero.
+.le
+.ls grow = 0.0
+The default rejection growing radius. Points within a distance given
+by this parameter of any rejected point are also rejected.
+.le
+.ls interactive = yes
+Fit equations interactively ? When this parameter is \fIyes\fR, the user will 
+be presented with plots of the data and can interact with the fitting 
+process.
+.le
+.ls logfile = "STDOUT"
+The name of the output text file to which selected detailed results of the
+fitting process are written.  By default logfile is the standard output.
+If logfile is "", logging is turned off altogether. Otherwise new
+output is appended to logfile which can therefor become quite large.
+.le
+.ls log_unmatched = yes
+Write the list of observations with no corresponding catalog entries to
+logfile? This option is useful for checking for errors in the observed
+object id names and for users who like to run fitparams in non-interactive
+mode.
+.le
+.ls log_fit = no
+Write the error analysis of the final fit in logfile? This option is
+useful for users who like to run fitparams in non-interactive mode.
+.le
+.ls log_results = no
+Write the results of the current fit to logfile? This option is
+useful for users who like to run fitparams in non-interactive mode.
+.le
+.ls catdir = ")_.catdir"
+The directory containing the supported standard star catalogs.
+The default parameter value  redirects \fIcatdir\fR
+to a package parameter of the same name. A list of standard
+catalogs may be obtained by printing the file "photcal$catalogs/README".
+Alternatively the user may create their own standard star catalogs 
+and standard star catalog directory.
+.le
+.ls graphics = "stdgraph"
+The default graphics device. 
+This parameter is used only if \fBinteractive=yes\fR.
+.le
+.ls cursor = ""
+Graphics cursor input. When null the standard graphics cursor is used.
+Otherwise the specified cursor command file is used.
+This parameter is used only if \fBinteractive=yes\fR.
+.le
+
+.ih
+DESCRIPTION
+
+FITPARAMS parses the configuration file \fIconfig\fR checking for
+grammar and syntax errors.  FITPARAMS attempts to recover from any
+errors and to finish parsing the configuration
+file, but it will not process the input data if errors are present.
+The configuration file is described briefly in the configuration file
+section and in detail in the help page for the configuration file.
+
+Once the configuration file is successfully parsed, FITPARAMS reads the list
+of catalog files and loads the values of the catalog variables
+declared in \fIconfig\fR into memory.
+If no catalog section is declared in \fIconfig\fR, if the catalog section
+is empty, or if catalogs is "", no catalog data is read
+and all the required input data is assumed to be in \fIobservations\fR.
+After the catalog data is read, FITPARAMS reads the observations files
+\fIobservations\fR, matches the object ids of the observations with the
+corresponding catalog object ids, and loads all the observations
+variables declared in \fIconfig\fR into memory. Id matching is disabled
+if no catalog
+data is read, otherwise only those observations which have a matching catalog
+entry will be used in the fit. If a catalog section declaration was made
+in \fIconfig\fR, even an empty one, FITPARAMS assumes that the object ids
+are in column 1 of \fIobservations\fR.
+
+Legal \fIcatalog\fR and \fIobservations\fR files are multi-column text
+files whose columns are delimited by whitespace.
+The first column of a catalog file is \fIalways\fR reserved for an object id.
+The first column of an observations file is \fIusually\fR reserved for an
+object id which can be
+used to match the observational data with the corresponding catalog data.
+All other columns may contain any quantity which can be
+expressed as an integer or real number.  Sexagesimal format numbers
+(hh:mm:ss) are interpreted internally as real numbers. The constant
+INDEF can be used to represent data that is missing or undefined.
+Double precision and complex data are
+not supported. Lines beginning with "#" are treated as comment lines.
+
+FITPARAMS solves the fit
+for each equation in the configuration file either interactively 
+or non-interactively depending on the value of \fIinteractive\fR,
+and writes the solution in the output file \fIparameters\fR for later
+use by the evaluation routines EVALFIT or INVERTFIT.
+Selected results can also be written to \fIlogfile\fR if
+any of the switches \fIlog_unmatched\fR, \fIlog_fit\fR, or \fIlog_results\fR
+are enabled.
+In interactive mode the user can use all the interactive capabilities
+of the interactive non-linear least squares package INLFIT.
+INLFIT is described more fully below. 
+
+.ih
+THE CONFIGURATION FILE
+
+The configuration file is a text file which specifies how the data is
+organized in the input files and how the transformation
+equations are to be fit.
+
+The input data are assumed to come from two different sources that may
+be either in the same input file or in different input files.
+These sources are known as the \fIcatalog\fR and the \fIobservations\fR
+respectively.
+
+The \fIcatalog\fR contains values indexed by a name called the
+matching name. This name must be in the first column of the
+catalog and is also assumed to be unique, i.e, each catalog
+entry is assumed to be unique.
+
+The \fIobservations\fR are values that may be either indexed by a matching
+name if a catalog section is specified in the configuration file, or a
+stream of input values in an ordinary text file.
+If a catalog section is specified and non-empty, each observation is
+matched against the
+catalog entries, and only observations whose matching names are found in the
+catalog are used to compute the transformation equations.
+Otherwise all values are used.
+
+The configuration file is divided in three sections: the \fIcatalog
+section\fR which describes the format of the catalog files, the
+\fIobservations section\fR which describes the format of the observation 
+files, and the \fItransformation section\fR which defines the
+transformation equations in that order.
+
+The catalog and observations sections permit the user to assign
+names to the input file 
+columns. These columns can later be referenced by name in the configuration
+file by using these assigned names
+as if they were variables in a programming language.
+
+The transformation section is used to define the equations to solve,
+and assign initial values to the fitting parameters.
+The user may also optionally define equations for the derivatives of
+the transformation equations with respect to the parameters,
+the weights to be used in the fit, 
+the errors of the fit and the default equations to be
+plotted in the interactive fitting process.
+It is possible to specify any number of transformation equations in
+this section.
+
+SAMPLE CONFIGURATION FILES
+
+Example 1. Configuration file for reducing UBV photoelectric photometry.
+
+.nf
+# Configuration file for reducing UBV photoelectric photometry.
+
+catalog
+
+V	2		# V magnitude
+BV	3		# B - V color
+UB	4		# U - B color
+
+observation
+
+v	2		# v instrumental magnitude
+b 	3		# b instrumental magnitude
+u 	4		# u instrumental magnitude
+ev	5		# error in v instrumental magnitude
+eb 	6		# error in b instrumental magnitude
+eu 	7		# error in u instrumental magnitude
+X       8		# airmass		
+
+transformation
+
+fit   v1 = 0.0, v2=0.16, v3=-0.043
+VFIT: V = v1 + v - v2 * X + v3 * (b - v)
+      weight(VFIT) = 1.0 / ev ** 2
+      plot(VFIT) = V, V - (v1 + v - v2 * X + v3 * (b - v))
+
+fit    b1 = 0.0, b2=0.09, b3=1.21
+BVFIT: BV = b1 - b2 * X + b3 * (b - v)
+       weight (BVFIT) = 1.0 / (eb ** 2 + ev ** 2)
+       plot(BVFIT) = BV, BV - (b1 - b2 * X + b3 * (b - v))
+
+fit    u1 = 0.0, u2=0.300, u3=0.861
+UBFIT: UB = u1 - u2 * X + u3 * (u - b)
+       weight (UBFIT) = 1.0 / (eu ** 2 + eb ** 2)
+       plot(UBFIT) = UB, UB - (u1 - u2 * X + u3 * (u - b))
+.fi
+
+Example 2. Configuration file for reducing UBV CCD photometry.
+
+.nf
+catalog
+
+V		2	# V magnitude
+BV		3	# B - V color
+UB		4	# U - B color
+error(V)	5	# error in V magnitude
+error(BV)	6	# error in B-V color
+error(UB)	7	# error in U-B color
+
+observation
+
+m1		2	# filter 1 instrumental magnitude
+error(m1)	3	# error in filter 1 instrumental magnitude
+Xm1		4	# airmass of filter 1  observation
+m2	 	6	# filter 2 instrumental magnitude
+error(m2) 	7	# error in filter 2 instrumental magnitude
+Xm2		8	# airmass of filter 2 observation
+m3	 	10	# filter 3 instrumental magnitude
+error(m3) 	11	# error in filter 3 instrumental magnitude
+Xm3	        12	# airmass of filter 3 observation		
+
+
+transformation
+
+fit   u1 = 27.0, u2=0.68, u3=0.05
+UFIT: m3 = u1 + V + BV + UB + u2 * Xm3 + u3 * UB
+
+fit   b1 = 26.0, b2=0.30, b3=0.18
+BFIT: m2 = b1 + V + BV + b2 * Xm2 + b3 * BV
+
+fit   v1 = 25.0, v2=0.17, v3=-0.02
+VFIT: m1 = v1 + V + v2 * Xm1 + v3 * BV
+.fi
+
+
+.ih
+THE NON-LINEAR INTERACTIVE FITTING PACKAGE
+
+DESCRIPTION
+
+INLFIT fits an n-dimensional function to a set data
+points, iterating until the reduced chi-squared changes
+by less than \fItolerance\fR percent between successive iterations, or
+machine precision is reached and the fit converges, or until the maximum number
+of iterations \fImaxiter\fR is reached.  If the maximum number
+of iterations is reached before convergence a status flag
+is set.
+
+After computing an initial fit, INLFIT presents the user with a plot of
+the fit and activates the graphics cursor.
+At this point the user may examine and/or interact with the fit by,
+for example, reprogramming the default graph keys,
+editing the default convergence or bad data rejection parameters,
+deleting and undeleting points, 
+altering which parameters in the fitting function are actually to be
+fit and which are to be held constant, and refitting the data.
+
+If \fInreject\fR is greater than zero the RMS of the residuals is computed
+and points whose residuals are less than \fIlow_reject\fR * RMS
+or \fIhigh_reject\fR * RMS value are excluded from the fit. Points within
+a distance \fIgrow\fR of a rejected point are also excluded from
+the fit. The function is then refit without the rejected points.
+The rejection algorithm is executed until the number of rejection
+iterations reaches \fInreject\fR or no more points are rejected.
+
+ALGORITHMS
+
+INLFIT uses the standard Levenberg-Marquardt non-linear least squares
+algorithm to fit the data. Detailed descriptions of the algorithm can
+be found in the following two references.
+.nf
+
+1. Bevington, P.R., 1969, Data Reduction and Error Analysis for the
+   Physical Sciences, Chapter 11, page 235.
+
+2. Press, W.H. et al., 1986, Numerical Recipes: The Art of Scientific
+   Computing, Chapter 14, page 523.
+
+.fi
+
+CURSOR COMMANDS
+
+The following interactive cursor keystroke commands are available from
+with the INLFIT package.
+.ls ?
+The terminal is cleared and a menu of cursor keystroke and colon commands
+is printed.
+.le
+.ls c
+The id, coordinates of the data point nearest the cursor, along with the
+function value, the fitted value and the residual, are printed on the status
+line.
+.le
+.ls d
+The data point nearest the cursor and not previously deleted is marked with an
+X. It will not be used in further fits until it is undeleted.
+.le
+.ls f
+The function is fit to the data and the fit is graphed using the default
+plot type.
+.le
+.ls g
+Redefine the graph keys "h-l" from their defaults. A prompt is issued for the
+graph key to be redefined. Another prompt is issued for the data to be
+plotted at which point the user must enter the x and y axis data to plot,
+delimited by a comma. The data types are the following (they can be
+abbreviated to up to three characters).
+.nf
+
+    function    Dependent variable or function
+    fit         Fitted value
+    residuals   Residuals (function - fit)
+    ratio       Ratio (function / fit)
+    nonlinear   Nonlinear component
+    identifier  Independent variable named "identifier" (if defined)
+    var n       Independent variable number "n"
+    user n      User defined plot equation "n"  (if defined)
+
+.fi
+The application program can define independent variable names and user plot 
+functions, aside from the standard options provided. If variable names are 
+supplied, the user can reference them by their names. Otherwise they can be 
+always referenced by "var n", where "n" is the variable number (the user has 
+to know the variable order in this case). The ":variables" command will
+list the currently defined variables by name and number.
+The application program may
+define any number of plot equations aside from the defaults provided. In this 
+case the user may reference them by "user n", where "n" is the plot function 
+number (the user must know the equation order in this case). 
+.le
+.ls h, i, j, k, l
+By default each key produces a different graph. The graphs are described by
+the data which is graphed along each axis as defined above. The default graph
+keys,
+which may be redefined by the application program or interactively by using 
+the 'g' key, are the following.
+.nf
+
+        h       function, fit
+        i       function, residuals
+        j       function, ratio
+        k       var 1, function
+        l       user 1, user 2 (default)
+
+.fi
+The initial graph key, if not redefined by the application program is 'h'.
+.le
+.ls o
+Overplot the next fit provided the graph format has not changed.
+.le
+.ls q
+Exit from the interactive curve fitting package.
+.le
+.ls r
+Redraw the current graph.
+.le
+.ls t
+Toggle fit overplotting on and off. If this option is on the data
+and fitted values are overplotted. Otherwise only data points are plotted.
+The fitted values are marked using boxes.
+.le
+.ls u
+Undelete the data point nearest the cursor which has been previously deleted.
+This option does not work over points marked as deleted by the application
+program before calling inlfit.
+.le
+.ls w [key]
+Set the graph window or data range along each axis to be graphed.. This is a 
+\fBgtools\fR option which prints the prompt "window:". The available cursor
+keystroke commands are printed with '?' and on-line help is available by
+typing "help gtools".
+.le
+.ls I
+Interrupt the task immediately without saving the current fit.
+.le
+
+Colon commands are used to show or set the values of parameters.
+The application program calling \fBinlfit\fR can add more commands.
+Parameter names can be abbreviated. The following commands are supported. 
+.ls :show [file]
+Show the current values of the fitting parameters high_reject, 
+low_reject, niterate, grow, tol, itmax. The default output device
+is the terminal (STDOUT) and the screen is cleared before the information
+is output. If a file is specified then the information is appended
+to the named file.
+.le
+.ls :variables [file]
+List the currently loaded variables. The number, id, minimum value and maximum
+value of each variable is printed. The default output device is the terminal
+(STDOUT) and the screen is cleared before the information is output.
+If a file is specified then the information is appended to the named file.
+.le
+.ls :data [file]
+List the raw data. The value of each standard catalog and observations
+catalog variable  for each data point is printed. The default output device
+is the terminal (STDOUT) and the screen is cleared before the information
+is output.  If a file is specified then the information is appended to
+the named file.
+.le
+.ls :errors [file]
+Show the error analysis of the current fit.  The number of iterations,
+total number of points, the number of rejected and deleted points,
+the standard deviation, the reduced chi, average error (always = 1.0 if
+weight = 1.0,  otherwise = 1.0 / <weight>),
+average scatter (always = 0.0 if no weights scatter term is fit) 
+and the rms value are
+printed on the screen.
+The fitted parameters and their errors are also printed. The default output is 
+the terminal (STDOUT) and the screen is cleared before the information is 
+output. If a file is specified then the information is appended to
+the named file.
+.le
+.ls :results [file]
+List the results of the current fit. The function value, the fitted value,
+the residual, and the weight are printed for each data point. The default
+output device is the terminal (STDOUT) and the screen is cleared before
+the information is output. If a file is specified then the information is
+appended to the named file.
+.le
+.ls :vshow [file]
+A verbose version of ":show" which is equivalent to a ":show" plus a ":errors"
+plus a ":results". The default output device is the terminal (STDOUT)
+and the screen is cleared before the information is output.
+If a file is specified then the information is appended to the named file.
+.le
+.ls :page file
+Page through the named file.
+.le
+.ls :tolerance [value]
+Show or set the value of the fitting tolerance. Tolerance is the maximum
+fraction by which the reduced chi-squared can change from one iteration to the
+next for the fit to meet the convergence criteria.
+.le
+.ls :maxiter [value]
+Show or set the maximum number of fitting iterations.
+.le
+.ls :nreject [value]
+Show or set the maximum number of rejection iterations. A value of zero
+means that automatic bad data rejection is turned off. 
+.le
+.ls :low_reject [value], :high_reject [value]
+Show or set the values of the bad data rejection limits.
+If both low_reject and high_reject are zero then automatic bad data
+rejection is turned off.
+If either of the high or low rejection limits are greater than zero,
+and nreject is greater than zero, the rms of the initial fit is computed.
+Points with residuals
+more than low_reject * rms below zero and high_reject * rms above zero
+are removed before the final fit. Rejected points are marked on the 
+graphs with diamonds. 
+.le
+.ls :grow [value]
+Show or set the value of the rejection growing radius. Any points
+within this distance of a rejected point are also rejected. 
+.le
+.ls :fit [parameter] [value]
+Set the starting guess value for the named coefficient and allow the 
+parameter value to change (converge) during the fit.
+If the value is not specified inlfit will use the last starting guess.
+.le
+.ls :const [parameter] [value]
+Set the named parameter to be a constant with the specified value, i.e,
+its value won't change during the fit.
+If the value is not specified inlfit will use its last starting value.
+.le
+.ls :/help
+Print help for the graph formatting options (the w key).
+.le
+.ls :.help
+Print help for the general IRAF graphics options.
+.le
+
+.ih
+EXAMPLES
+
+1. Fit a set of UBV standard star data non-interactively using the automatic
+bad data rejection algorithm and the configuration file shown in example
+2 under the configuration file section.
+
+.nf
+    ph> fitparams m92.obs m92.cat m92.config m92.fit nreject=10 inter-
+
+	... compute valued for the parameters in all the transformation
+	    equations
+
+    ph> page m92.fit
+
+	... check that the fitted parameter values are reasonable
+
+    ph> invertfit m92.obs m92.cat m92.config m92.fit m92.out
+
+	... evaluate the transformation equations for all the standard
+	    stars
+.fi
+
+2. Fit the same set of data interactively but deleting bad points by
+eye instead of using the automatic rejection algorithm.
+
+.nf
+    ph> fitparams m92.obs m92.cat m92.config m92.fit 
+
+	... a default plot of the UFIT equation comes up on the screen
+	    (the fit or right-hand side of the equation is plotted
+	    versus the function or left-hand side of the equation)
+
+	... type '?' to show the available commands
+
+	... type 'i' to plot the residuals versus the function (LHS of
+	    the equation)
+
+	... delete bad points with the 'd' key and refit using the 'f'
+	    key
+
+	... check for any dependencies of the residuals on the color
+	    term by reprogramming the graph key 'l' using the 'g' key 
+	    (type 'g' to enter the reprogramming menu, 'l' after the
+	    prompt to reprogram the 'l' key, and "UB, residuals" in
+	    response to the question of which axes to plot
+
+	... list the plot windowing menu by typing 'w' followed by '?'
+	    after the "window:" prompt
+
+	... type 'w' followed by 'z' after the ":window" prompt to zoom
+	    up on an interesting area in the plot, a 'w' followed by 'a'
+	    will return to normal scaling
+
+	... type 'q' to quit the fit for this equation 
+
+	... answer "yes" to the question about saving the fit
+
+	... proceed to the next fit by typing "next" in response to the
+	    prompt
+
+.fi
+
+.ih
+SEE ALSO
+chkconfig,mkconfig,gtools,inlfit
+.endhelp

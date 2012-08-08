@@ -1,0 +1,6 @@
+image,s,a,,,,image to be plotted
+line,i,a,,,,line to be plotted
+wcs,s,h,"logical",,,world coordinate system
+step,i,h,0,,,Step in pixels for j/k key
+coords,*gcur,h,,,,graphics cursor input
+device,s,h,"stdgraph",,,graphics device for plots

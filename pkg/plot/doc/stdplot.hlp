@@ -1,0 +1,56 @@
+.help stdplot Jan86 plot
+.ih
+NAME
+stdplot -- draw metacode on the standard plotter device
+.ih
+USAGE
+stdplot input
+.ih
+PARAMETERS
+.ls input
+The list of input metacode files.
+.le
+.ls device = "stdplot"
+The type of plotting device.
+.le
+.ls generic = no
+The remaining parameters are ignored when \fBgeneric\fR = yes.
+.le
+.ls debug = no
+If \fBdebug\fR = yes, the graphics instructions are decoded and printed
+during processing.
+.le
+.ls verbose = no
+If \fBverbose\fR = yes, the elements of polylines, cell arrays, etc. will
+be printed in debug mode.
+.le
+.ls gkiunits = no
+By default, coordinates are printed in NDC rather than GKI units.
+.le
+.ih
+DESCRIPTION
+Task \fIstdplot\fR translates metacode and draws it on a plotting
+device.
+Input is GKI metacode, which can be read from one or more binary
+files or redirected from the standard input.
+
+If \fBdebug\fR is set to yes, the plotting instructions are printed in
+readable form during processing.
+If \fBverbose\fR = yes, elements of polyline and cell array calls are
+printed in addition to the default debug output.
+Coordinates can be printed in either GKI (0 - 32767) or NDC (0.0 - 1.0)
+units.
+.ih
+EXAMPLES
+1. Extract the fourth frame from metacode file "oned.mc" and plot it.
+
+    cl> gkiextract oned.mc 4 | stdplot
+
+2. Plot metacode frame "contour.demo" in debug mode, so the plotting
+instructions can be read as they are processed.
+
+    cl> stdplot contour.demo debug+
+.ih
+SEE ALSO
+gkiextract stdgraph
+.endhelp

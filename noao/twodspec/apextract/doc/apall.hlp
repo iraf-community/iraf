@@ -1,0 +1,557 @@
+.help apall Sep96 noao.twodspec.apextract
+.ih
+NAME
+apall -- Extract one dimensional sums across the apertures
+.ih
+USAGE
+apall input
+.ih
+PARAMETERS
+.ls input
+List of input images.
+.le
+.ls output = ""
+List of output root names for extracted spectra.  If the null
+string is given or the end of the output list is reached before the end
+of the input list then the input image name is used as the output root name.
+This will not conflict with the input image since an aperture number
+extension is added for onedspec format, the extension ".ms" for multispec
+format, or the extension ".ec" for echelle format.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and extract.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
+.le
+.ls format = "multispec" (onedspec|multispec|echelle|strip)
+Format for output extracted spectra.  "Onedspec" format extracts each
+aperture to a separate image while "multispec" and "echelle" extract
+multiple apertures for the same image to a single output image.
+The "multispec" and "echelle" format selections differ only in the
+extension added.  The "strip" format produces a separate 2D image in
+which each column or line along the dispersion axis is shifted to
+exactly align the aperture based on the trace information.
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supersedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+There are three special words which may be used in place of an image
+name.  The word "last" refers to the last set of apertures written to
+the database.  The word "OLD" requires that an entry exist
+and the word "NEW" requires that the entry not exist for each input image.
+Input images without/with a database entry are skipped silently.
+.le
+.ls profiles = ""
+List of profile images for variance weighting or cleanning.   If variance
+weighting or cleanning a profile of each aperture is computed from the
+input image unless a profile image is specified, in which case the
+profile is computed from the profile image.  The profile image must
+have the same dimensions and dispersion and it is assumed that the
+spectra have the same position and profile shape as in the object
+spectra.  Use of a profile image is generally not required even for
+faint input spectra but the option is available for those who wish
+to use it.
+.le
+
+.ce
+PROCESSING PARAMETERS
+.ls interactive = yes
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing, trace
+fitting, and extraction review are disabled.
+.le
+.ls find = yes
+Find the spectra and define apertures automatically?  In order for
+spectra to be found automatically there must be no apertures for the
+input image or reference image defined in the database.
+.le
+.ls recenter = yes
+Recenter the apertures?
+.le
+.ls resize = yes
+Resize the apertures?
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+.ls trace = yes
+Trace the apertures?
+.le
+.ls fittrace = yes
+Interactively fit the traced positions by a function?  The \fIinteractive\fR
+parameter must also be yes.
+.le
+.ls extract = yes
+Extract the one dimensional aperture sums?
+.le
+.ls extras = yes
+Extract the raw spectrum (if variance weighting is used), the sky spectrum
+(if background subtraction is used), and sigma spectrum (if variance
+weighting is used)?  This information is extracted to the third dimension
+of the output image.
+.le
+.ls review = yes
+Review the extracted spectra?  The \fIinteractive\fR parameter must also be
+yes.
+.le
+
+.ls line = INDEF, nsum = 10
+The dispersion line (line or column perpendicular to the dispersion
+axis) and number of adjacent lines (half before and half after unless
+at the end of the image) used in finding, recentering, resizing,
+and editing operations.  A line of INDEF selects the middle of the
+image along the dispersion axis.  A positive nsum selects a sum of
+lines and a negative selects a median of lines.
+.le
+
+.ce
+DEFAULT APERTURE PARAMETERS
+.ls lower = -5., upper = 5.
+Default lower and upper aperture limits relative to the aperture center.
+These limits are used for apertures found with \fBapfind\fR and when
+defining the first aperture in \fBapedit\fR.
+.le
+.ls apidtable = ""
+Aperture identification table.  This may be either a text file or an
+image.  A text file consisting of lines with an aperture number, beam
+number, and aperture title or identification.  An image will contain the
+keywords SLFIBnnn with string value consisting of aperture number, beam
+number, optional right ascension and declination, and aperture title.  This
+information is used to assign aperture information automatically in
+\fBapfind\fR and \fBapedit\fR.
+.le
+
+.ce
+DEFAULT BACKGROUND PARAMETERS
+.ls b_function = "chebyshev"
+Default background fitting function.  The fitting function types are
+"chebyshev" polynomial, "legendre" polynomial, "spline1" linear spline, and
+"spline3" cubic spline.
+.le
+.ls b_order = 1
+Default background function order.  The order refers to the number of
+terms in the polynomial functions or the number of spline pieces in the spline
+functions.
+.le
+.ls b_sample = "-10:-6,6:10"
+Default background sample.  The sample is given by a set of colon separated
+ranges each separated by either whitespace or commas.  The string "*" refers
+to all points.  Note that the background coordinates are relative to the
+aperture center and not image pixel coordinates so the endpoints need not
+be integer.
+.le
+.ls b_naverage = -3
+Default number of points to average or median.  Positive numbers
+average that number of sequential points to form a fitting point.
+Negative numbers median that number, in absolute value, of sequential
+points.  A value of 1 does no averaging and each data point is used in the
+fit.
+.le
+.ls b_niterate = 0
+Default number of rejection iterations.  If greater than zero the fit is
+used to detect deviant fitting points and reject them before repeating the
+fit.  The number of iterations of this process is given by this parameter.
+.le
+.ls b_low_reject = 3., b_high_reject = 3.
+Default background lower and upper rejection sigmas.  If greater than zero
+points deviating from the fit below and above the fit by more than this
+number of times the sigma of the residuals are rejected before refitting.
+.le
+.ls b_grow = 0.
+Default reject growing radius.  Points within a distance given by this
+parameter of any rejected point are also rejected.
+.le
+
+.ce
+APERTURE CENTERING PARAMETERS
+.ls width = 5.
+Width of spectrum profiles.  This parameter is used for the profile
+centering algorithm in this and other tasks.
+.le
+.ls radius = 10.
+The profile centering error radius for the centering algorithm.
+.le
+.ls threshold = 0.
+Centering threshold for the centering algorithm.  The range of pixel intensities
+near the initial centering position must exceed this threshold.
+.le
+
+.ce
+AUTOMATIC FINDING AND ORDERING PARAMETERS
+.ls nfind
+Maximum number of apertures to be defined.  This is a query parameter
+so the user is queried for a value except when given explicitly on
+the command line.
+.le
+.ls minsep = 5.
+Minimum separation between spectra.  Weaker spectra or noise within this
+distance of a stronger spectrum are rejected.
+.le
+.ls maxsep = 1000.
+Maximum separation between adjacent spectra.  This parameter
+is used to identify missing spectra in uniformly spaced spectra produced
+by fiber spectrographs.  If two adjacent spectra exceed this separation
+then it is assumed that a spectrum is missing and the aperture identification
+assignments will be adjusted accordingly.
+.le
+.ls order = "increasing"
+When assigning aperture identifications order the spectra "increasing"
+or "decreasing" with increasing pixel position (left-to-right or
+right-to-left in a cross-section plot of the image).
+.le
+
+.ce
+RECENTERING PARAMETERS
+.ls aprecenter = ""
+List of apertures to be used in shift calculation.
+.le
+.ls npeaks = INDEF
+Select the specified number of apertures with the highest peak values
+to be recentered.  If the number is INDEF all apertures will be selected.
+If the value is less than 1 then the value is interpreted as a fraction
+of total number of apertures.
+.le
+.ls shift = yes
+Use the average shift from recentering the apertures selected by the
+\fIaprecenter\fR parameter to apply to the apertures selected by the
+\fIapertures\fR parameter.  The recentering is then a constant shift for
+all apertures.
+.le
+
+.ce
+RESIZING PARAMETERS
+.ls llimit = INDEF, ulimit = INDEF
+Lower and upper aperture size limits.  If the parameter \fIylevel\fR is
+INDEF then these limits are assigned to all apertures.  Otherwise
+these parameters are used as limits to the resizing operation.
+A value of INDEF places the aperture limits at the image edge (for the
+dispersion line used).
+.le
+.ls ylevel = 0.1
+Data level at which to set aperture limits.  If it is INDEF then the
+aperture limits are set at the values given by the parameters
+\fIllimit\fR and \fIulimit\fR.  If it is not INDEF then it is a
+fraction of the peak or an actual data level depending on the parameter
+\fIpeak\fR.  It may be relative to a local background or to zero
+depending on the parameter \fIbkg\fR.
+.le
+.ls peak = yes
+Is the data level specified by \fIylevel\fR a fraction of the peak?
+.le
+.ls bkg = yes
+Subtract a simple background when interpreting the \fBylevel\fR parameter.
+The background is a slope connecting the first inflection points
+away from the aperture center.
+.le
+.ls r_grow = 0.
+Change the lower and upper aperture limits by this fractional amount.
+The factor is multiplied by each limit and the result added to limit.
+.le
+.ls avglimits = no
+Apply the average lower and upper aperture limits to all apertures.
+.le
+
+.ce
+TRACING PARAMETERS
+.ls t_nsum = 10
+Number of dispersion lines to be summed at each step along the dispersion.
+.le
+.ls t_step = 10
+Step along the dispersion axis between determination of the spectrum
+positions.
+.le
+.ls t_nlost = 3
+Number of consecutive steps in which the profile is lost before quitting
+the tracing in one direction.  To force tracing to continue through
+regions of very low signal this parameter can be made large.  Note,
+however, that noise may drag the trace away before it recovers.
+.le
+.ls t_function = "legendre"
+Default trace fitting function.  The fitting function types are
+"chebyshev" polynomial, "legendre" polynomial, "spline1" linear spline, and
+"spline3" cubic spline.
+.le
+.ls t_order = 2
+Default trace function order.  The order refers to the number of
+terms in the polynomial functions or the number of spline pieces in the spline
+functions.
+.le
+.ls t_sample = "*"
+Default fitting sample.  The sample is given by a set of colon separated
+ranges each separated by either whitespace or commas.  The string "*" refers
+to all points.
+.le
+.ls t_naverage = 1
+Default number of points to average or median.  Positive numbers
+average that number of sequential points to form a fitting point.
+Negative numbers median that number, in absolute value, of sequential
+points.  A value of 1 does no averaging and each data point is used in the
+.le
+.ls t_niterate = 0
+Default number of rejection iterations.  If greater than zero the fit is
+used to detect deviant traced positions and reject them before repeating the
+fit.  The number of iterations of this process is given by this parameter.
+.le
+.ls t_low_reject = 3., t_high_reject = 3.
+Default lower and upper rejection sigma.  If greater than zero traced
+points deviating from the fit below and above the fit by more than this
+number of times the sigma of the residuals are rejected before refitting.
+.le
+.ls t_grow = 0.
+Default reject growing radius.  Traced points within a distance given by this
+parameter of any rejected point are also rejected.
+.le
+
+.ce
+EXTRACTION PARAMETERS
+.ls background = "none" (none|average|median|minimum|fit)
+Type of background subtraction.  The choices are "none" for no background
+subtraction, "average" to average the background within the background
+regions, "median" to use the median in the background regions, "minimum" to
+use the minimum in the background regions, or "fit" to fit across the
+dispersion using the background within the background regions.  Note that
+the "average" option does not do any medianing or bad pixel checking,
+something which is recommended.  The fitting option is slower than the
+other options and requires additional fitting parameter.
+.le
+.ls skybox = 1
+Box car smoothing length for sky background when using background
+subtraction.  Since the background noise is often the limiting factor
+for good extraction one may box car smooth the sky to improve the
+statistics in smooth background regions at the expense of distorting
+the subtraction near spectral features.  This is most appropriate when
+the sky regions are limited due to a small slit length.
+.le
+.ls weights = "none" (none|variance)
+Type of extraction weighting.  Note that if the \fIclean\fR parameter is
+set then the weights used are "variance" regardless of the weights
+specified by this parameter.  The choices are:
+.ls "none"
+The pixels are summed without weights except for partial pixels at the
+ends.
+.le
+.ls "variance"
+The extraction is weighted by the variance based on the data values
+and a poisson/ccd model using the \fIgain\fR and \fIreadnoise\fR
+parameters.
+.le
+.le
+.ls pfit = "fit1d" (fit1d|fit2d)
+Profile fitting algorithm to use with variance weighting or cleaning.
+When determining a profile the two dimensional spectrum is divided by
+an estimate of the one dimensional spectrum to form a normalized two
+dimensional spectrum profile.  This profile is then smoothed by fitting
+one dimensional functions, "fit1d", along the lines or columns most closely
+corresponding to the dispersion axis or a special two dimensional
+function, "fit2d", described by Marsh (see \fBapprofile\fR).
+.le
+.ls clean = no
+Detect and replace deviant pixels?
+.le
+.ls saturation = INDEF
+Saturation or nonlinearity level in data units.  During variance weighted
+extractions wavelength points having any pixels above this value are
+excluded from the profile determination and the sigma spectrum extraction
+output, if selected by the \fIextras\fR parameter, flags wavelengths with
+saturated pixels with a negative sigma.
+.le
+.ls readnoise = 0.
+Read out noise in photons.  This parameter defines the minimum noise
+sigma.  It is defined in terms of photons (or electrons) and scales
+to the data values through the gain parameter.  A image header keyword
+(case insensitive) may be specified to get the value from the image.
+.le
+.ls gain = 1
+Detector gain or conversion factor between photons/electrons and
+data values.  It is specified as the number of photons per data value.
+A image header keyword (case insensitive) may be specified to get the value
+from the image.
+.le
+.ls lsigma = 4., usigma = 4.
+Lower and upper rejection thresholds, given as a number of times the
+estimated sigma of a pixel, for cleaning.
+.le
+.ls nsubaps = 1
+During extraction it is possible to equally divide the apertures into
+this number of subapertures.  For multispec format all subapertures will
+be in the same file with aperture numbers of 1000*(subap-1)+ap where
+subap is the subaperture (1 to nsubaps) and ap is the main aperture
+number.  For echelle format there will be a separate echelle format
+image containing the same subaperture from each order.  The name
+will have the subaperture number appended.  For onedspec format
+each subaperture will be in a separate file with extensions and
+aperture numbers as in the multispec format.
+.le
+.ih
+ADDITIONAL PARAMETERS
+Dispersion axis and I/O parameters are taken from the package parameters.
+.ih
+DESCRIPTION
+This task provides functions for defining, modifying, tracing, and
+extracting apertures from two dimensional spectra.  The functions
+desired are selected using switch parameters.  When the task is
+run interactively queries are made at each step allowing additional
+control of the operations performed on each input image.
+
+The functions, in the order in which they are generally performed, are
+summarized below.
+.ls o
+Automatically find a specified number of spectra and assign default
+apertures.  Apertures may also be inherited from another image or
+defined using an interactive graphical interface called the \fIaperture
+editor\fR.
+.le
+.ls o
+Recenter selected reference apertures on the image spectrum profiles.
+.le
+.ls o
+Resize the selected reference apertures based on spectrum profile width.
+.le
+.ls o
+Interactively define or adjust aperture definitions using a graphical
+interface called the \fIaperture editor\fR.  All function may also
+be performed from this editor and, so, provides an alternative
+method of processing and extracting spectra.
+.le
+.ls o
+Trace the positions of the selected spectra profiles from a starting image line
+or column to other image lines or columns and fit a smooth function.
+The trace function is used to shift the center of the apertures
+at each dispersion point in the image.
+.le
+.ls o
+Extract the flux in the selected apertures into one dimensional spectra in
+various formats.  This includes possible background subtraction, variance
+weighting, and bad pixel rejection.
+.le
+
+Each of these functions has different options and parameters.  In
+addition to selecting any of these functions in this task, they may
+also be selected using the aperture editor and as individual
+commands (which themselves allow selection of other functions).  When
+broken down into individual tasks the parameters are also sorted by
+their function though there are then some mutual parameter
+interdependencies.  This functional decomposition is what was available
+prior to the addition of the \fBapall\fR task.  It is recommended that
+this task be used because it collects all the parameters in one
+place eliminating confusion over where a particular parameter
+is defined.  However, documenting the various functions
+is better organized in terms of the separate descriptions given for
+each of the functions; namely under the help topics
+\fBapdefault, apfind, aprecenter, apresize, apedit,
+aptrace\fR, and \fBapsum\fR.
+.ih
+EXAMPLES
+1.  This example may be executed if desired.  First we create an artificial
+spectrum with four spectra and a background.  After it is created you
+can display or plot it.  Next we define the dispersion axis and set the
+verbose flag to better illustrate what is happening.  The task APALL
+is run with the default parameters except for background fitting and
+subtracting added.  The text beginning with # are comments of things to
+try and do.
+
+.nf
+  ap> artdata
+  ar> unlearn artdata
+  ar> mk1dspec apdemo1d nl=50
+  ar> mk2dspec apdemo2d model=STDIN
+  apdemo1d 1. gauss 3 0 20 .01
+  apdemo1d .8 gauss 3 0 40 .01
+  apdemo1d .6 gauss 3 0 60 .01
+  apdemo1d .4 gauss 3 0 80 .01
+  [EOF=Control D or Control Z]
+  ar> mknoise apdemo2d background=100. rdnoise=3. poisson+
+  ar> bye
+  # Display or plot the spectrum
+  ap> dispaxis=2; verbose=yes
+  ap> unlearn apall
+  ap> apall apdemo2d back=fit
+  Searching aperture database ...
+  Find apertures for apdemo2d?  (yes): 
+  Finding apertures ...
+  Number of apertures to be found automatically (1): 4
+  Jul 31 16:55: FIND - 4 apertures found for apdemo2d.
+  Resize apertures for apdemo2d?  (yes): 
+  Resizing apertures ...
+  Jul 31 16:55: RESIZE - 4 apertures resized for apdemo2d.
+  Edit apertures for apdemo2d?  (yes):
+  # Get a list of commands with '?'
+  # See all the parameters settings with :par
+  # Try deleting and marking a spectrum with 'd' and 'm'
+  # Look at the background fitting parameters with 'b' (exit with 'q')
+  # Exit with 'q'
+  Trace apertures for apdemo2d?  (yes): 
+  Fit traced positions for apdemo2d interactively?  (yes):
+  Tracing apertures ...
+  Fit curve to aperture 1 of apdemo2d interactively  (yes):
+  # You can use ICFIT commands to adjust the fit.
+  Fit curve to aperture 2 of apdemo2d interactively  (yes): n 
+  Fit curve to aperture 3 of apdemo2d interactively  (no): 
+  Fit curve to aperture 4 of apdemo2d interactively  (no): y 
+  Jul 31 16:56: TRACE - 4 apertures traced in apdemo2d.
+  Write apertures for apdemo2d to apdemosdb  (yes): 
+  Jul 31 16:56: DATABASE - 4 apertures for apdemo2d written to database.
+  Extract aperture spectra for apdemo2d?  (yes): 
+  Review extracted spectra from apdemo2d?  (yes):
+  Extracting apertures ...
+  Review extracted spectrum for aperture 1 from apdemo2d?  (yes):
+  # Type 'q' to quit
+  Jul 31 16:56: EXTRACT - Aperture 1 from apdemo2d --> apdemo2d.ms
+  Review extracted spectrum for aperture 2 from apdemo2d?  (yes): N
+  Jul 31 16:56: EXTRACT - Aperture 2 from apdemo2d --> apdemo2d.ms
+  Jul 31 16:56: EXTRACT - Aperture 3 from apdemo2d --> apdemo2d.ms
+  Jul 31 16:57: EXTRACT - Aperture 4 from apdemo2d --> apdemo2d.ms
+.fi
+
+2. To extract a series of similar spectra noninteractively using a
+reference for the aperture definitions, then recentering and resizing
+but not retracing:
+
+.nf
+  ap> apall fib*.imh ref=flat inter- trace-
+.fi
+
+Note that the interactive flag automatically turns off the edit, fittrace,
+and review options and the reference image eliminates the find
+(find only occurs if there are no initial apertures).
+.ih
+REVISIONS
+.ls APALL V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+
+The aperture ID table information may now be contained in the
+image header under the keywords SLFIBnnn.
+
+The "nsubaps" parameter now allows onedspec and echelle output formats.
+The echelle format is appropriate for treating each subaperture as
+a full echelle extraction.
+.le
+.ls APALL V2.10.3
+The dispersion axis parameter was moved to purely a package parameter.
+
+As a final step when computing a weighted/cleaned spectrum the total
+fluxes from the weighted spectrum and the simple unweighted spectrum
+(excluding any deviant and saturated pixels) are computed and a
+"bias" factor of the ratio of the two fluxes is multiplied into
+the weighted spectrum and the sigma estimate.  This makes the total
+fluxes the same.  In this version the bias factor is recorded in the logfile
+if one is kept.  Also a check is made for unusual bias factors.
+If the two fluxes disagree by more than a factor of two a warning
+is given on the standard output and the logfile with the individual
+total fluxes as well as the bias factor.  If the bias factor is
+negative a warning is also given and no bias factor is applied.
+In the previous version a negative (inverted) spectrum would result.
+.le
+.ih
+SEE ALSO
+apdefault, apfind, aprecenter, apresize, apedit, aptrace, apsum
+.endhelp

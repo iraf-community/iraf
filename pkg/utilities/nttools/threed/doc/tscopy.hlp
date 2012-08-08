@@ -1,0 +1,94 @@
+.help tscopy Nov96 tables
+.ih
+NAME
+tscopy -- Copy tables.
+.ih
+USAGE
+tscopy intable outtable
+.ih
+DESCRIPTION
+This task is used to copy tables.  The input may be a filename
+template, including wildcard characters or the name of a file (preceded
+by an @ sign) containing table names.  The output may be either a directory
+specification or a list of table names.  If the output is a list of tables
+then there must be the same number of names in the input and output lists,
+and the names are taken in pairs, one from input and one from output.
+The input and output tables must not be the same.
+
+This task supports row/column selectors in the input table name. These
+may be used to select subsets of both rows and columns from the input table.
+Type 'help selectors' to see a description of the selector syntax. 
+
+NOTE: Be careful when using a wildcard for the extension.
+If you have the files 'table.tab' and 'table.lis' in the current directory,
+for example, then the command "tscopy tab* test/" would copy both files to the subdirectory
+'test'.
+.ih
+PARAMETERS
+.ls intable [file name template]
+A list of one or more tables to be copied. Row/column selectors are supported.
+.le
+.ls outtable [file name template]
+Either a directory name or a list of output table names. The standard
+value "STDOUT" generates ASCII output that can be redirected to a file.
+.le
+.ls (verbose = yes) [boolean]
+Display names of input and output tables as files are copied?
+.le
+.ih
+EXAMPLES
+1. To simply copy a table:
+
+.nf
+      cl> tscopy table tablecopy
+.fi
+
+2. To copy a table into an ASCII table:
+
+.nf
+      cl> tscopy table STDOUT > table.txt
+.fi
+
+3. To copy several tables:
+
+.nf
+      cl> tscopy table1,table2,tab67 a,b,c
+      cl> tscopy tab*.tab a,b,c
+.fi
+In the latter case the extension is given explicitly in case there
+are other files beginning with "tab" that are not tables; there must
+be exactly three tables beginning with "tab" because the output list
+has three names.
+
+4. To copy a set of tables to a new directory:
+
+.nf
+      cl> tscopy table*.tab directory
+			or
+      cl> tscopy table*.tab directory$
+			or
+      cl> tscopy table*.tab osdirectory
+.fi
+
+where "directory" is an IRAF environment variable for a directory name,
+and "osdirectory" is an operating system directory name
+(e.g., "/user/me/" in UNIX).
+
+5. To copy a subset of rows and columns:
+
+.nf
+      cl> tscopy "table.tab[c:wave,flux][r:wave=(4000:5000)]" tableout
+.fi
+
+This command will copy only columns named "wave" and "flux" from the input
+table to the output. It will also select and copy only the rows in which
+the "wave" value lies between 4000 and 5000.
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+selectors
+.endhelp

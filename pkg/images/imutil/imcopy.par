@@ -1,0 +1,6 @@
+# Task parameters for IMCOPY.
+
+input,s,a,,,,Input images
+output,s,a,,,,Output images or directory
+verbose,b,h,yes,,,Print operations performed?
+mode,s,h,ql

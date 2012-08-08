@@ -1,0 +1,52 @@
+# Library for the 3DTRANSPOSE task.
+
+$checkout libpkg.a /u2/rooke/vol/
+$update   libpkg.a
+$checkin  libpkg.a /u2/rooke/vol/
+$exit
+
+tfiles:
+	$ifolder (txyz3.x, txyz3.gx)
+	    $generic -k txyz3.gx -o txyz3.x		$endif
+	$ifolder (txzy3.x, txzy3.gx)
+	    $generic -k txzy3.gx -o txzy3.x		$endif
+	$ifolder (tyxz3.x, tyxz3.gx)
+	    $generic -k tyxz3.gx -o tyxz3.x		$endif
+	$ifolder (tyzx3.x, tyzx3.gx)
+	    $generic -k tyzx3.gx -o tyzx3.x		$endif
+	$ifolder (tzxy3.x, tzxy3.gx)
+	    $generic -k tzxy3.gx -o tzxy3.x		$endif
+	$ifolder (tzyx3.x, tzyx3.gx)
+	    $generic -k tzyx3.gx -o tzyx3.x		$endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+
+	t_im3dtran.x	<imhdr.h>
+	txyz3.x
+	txzy3.x
+	tyxz3.x
+	tyzx3.x
+	tzxy3.x
+	tzyx3.x
+	;
+
+dbx:
+	$set	XFLAGS = "-c -g -F -q"
+	$set	LFLAGS = "-g -q"
+	$set	LIBS = "-lxtools"
+
+	$ifeq (USE_GENERIC, yes) $call tfiles $endif
+
+	$omake	x_im3dtran.x
+	$omake	t_im3dtran.x
+	$omake	txyz3.x
+	$omake	txzy3.x
+	$omake	tyxz3.x
+	$omake	tyzx3.x
+	$omake	tzxy3.x
+	$omake	tzyx3.x
+	$link	x_im3dtran.o t_im3dtran.o txyz3.o txzy3.o tyxz3.o tyzx3.o \
+		tzxy3.o tzyx3.o $(LIBS) -o xx_im3dtran.e
+	;

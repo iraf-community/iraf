@@ -1,0 +1,46 @@
+# Help directory for the PROTO package.
+
+$doc		= "pkg$proto/doc/"
+$masks		= "pkg$proto/masks/"
+$maskexpr	= "pkg$proto/maskexpr/"
+
+$color          = "pkg$proto/color/"
+$vol            = "pkg$proto/vol/"
+
+
+color           men=color$color.men,
+                hlp=..,
+                sys=color$color.hlp,
+                pkg=color$color.hd,
+                src=color$color.cl
+
+vol             men=vol$vol.men,
+                hlp=..,
+                sys=vol$vol.hlp,
+                pkg=vol$vol.hd,
+                src=vol$vol.cl
+
+
+binfil		hlp =doc$binfil.hlp,	src = x_binfil.x
+bscale		hlp =doc$bscale.hlp,	src = t_bscale.x
+epix		hlp =doc$epix.hlp,	src = epix.x
+fields		hlp =doc$fields.hlp,	src = fields.x
+hfix		hlp =doc$hfix.hlp,	src = t_hfix.x
+imcntr		hlp =doc$imcntr.hlp,	src = t_imcntr.x
+fixpix		hlp =doc$fixpix.hlp,	src = t_fixpix.x
+imextensions	hlp =doc$imextensions.hlp, src = t_imext.x
+imscale		hlp =doc$imscale.hlp,	src = t_imscale.x
+interp		hlp =doc$interp.hlp,	src = interp.x
+irafil		hlp =doc$irafil.hlp,	src = x_binfil.x
+joinlines	hlp =doc$joinlines.hlp,	src = t_joinlines.x
+mkglbhdr	hlp =doc$mkglbhdr.hlp, src = t_mkglbhdr.x
+mskregions	hlp =doc$mskregions.hlp, src = t_mskregions.x
+mskexpr		hlp =doc$mskexpr.hlp,   src = t_mskexpr.x
+mskregions	hlp =doc$mskregions.hlp, src = t_mskregions.x
+mimstatistics	hlp =doc$mimstat.hlp,	src = masks$t_mimstat.x
+ringavg		hlp =doc$ringavg.hlp,	src = ringavg.cl
+rskysub		hlp =doc$rskysub.hlp,	src = masks$t_rskysub.x
+suntoiraf	hlp =doc$suntoiraf.hlp, src = t_suntoiraf.x
+text2mask	hlp =doc$text2mask.hlp, src = t_text2mask.x
+
+revisions	sys =Revisions

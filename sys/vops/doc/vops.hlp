@@ -1,0 +1,260 @@
+
+.help VOPS Feb83 "Vector Primitives"
+.sh
+Introduction
+
+    The vector primitives are abstract machine instructions which
+operate on vectors.  The "a" prefixed operators are for one dimensional
+arrays, and the "m" prefixed operators are for two dimensional
+arrays (matrices).  Each generic instruction is implemented as a
+set of operators, one for each data type.
+
+There are no vector primitives for the type BOOL.  If a "b" suffix is given,
+the vector primitive is understood to operate on unsigned machine bytes.
+The "u" suffix is used for the special type unsigned short integer.
+
+The binary operators ("c = a op b") come in two forms.  If the regular
+three character instruction mnemonic is used, the B operand must be vector.
+If the letter "k" is added to the mnemonic, the B operand must be a constant.
+These dual mode operators are flagged (with "(k)") in the table below.
+
+
+.nf
+     Instruction	    Operation		          Data Types
+
+	cht__		b = a (change datatype)		  UBcsilrdx
+	clr_		fill a with zeros		    csilrdx
+	mov_	(k)	b = a (copy vector)		    csilrdx
+
+	abs_		b = abs(a)			     silrdx
+	log_		b = log10(a)			     silrdx
+	lln_		b = natural_log(a)		     silrdx
+	sqr_		b = sqrt(a)			     silrdx
+	srt_		b = sort(a)			    csilrdx
+	neg_		b = -a				     silrdx
+	map_		b = (a + k1) * k2		     silrdx
+	map_B		b = (a + k1) * k2		     silrdx
+	lut_		b = lut[a] (lookup table)	    csil
+	lui_		b = interp (a, x)		     silrd
+	rep_		a = newval if (low<=a<=high)	    csilrdx
+
+	add_	(k)	c = a + b			     silrdx
+	sub_	(k)	c = a - b			     silrdx
+	mul_	(k)	c = a * b			     silrdx
+	div_	(k)	c = a / b			     silrdx
+	min_	(k)	c = min(a,b)			     silrd
+	max_	(k)	c = max(a,b)			     silrd
+	mod_	(k)	c = mod(a,b)			     silrd
+	pow_	(k)	c = a ** int_pwr 		     silrdx
+	exp_	(k)	c = a ** real_pwr		     silrdx
+
+	not_		b = !a				     sil
+	and_	(k)	c = and(a,b)			     sil
+	bor_	(k)	c = or(a,b)			     sil
+	xor_	(k)	c = xor(a,b)			     sil
+
+
+.tp 4
+other vector primitives:
+
+	lim_	ngpix =	 lim_ (a, npix; minval, maxval)	     silrdx
+	win_	nrej =	 win_ (a, npix, lcut, hcut)	     silrdx
+	avg_	ngpix =	 avg_ (a, npix; mean, sigma)	     silrdx
+	rav_	ngpix =	 rav_ (a, npix; mean, sigma; ksig)   silrdx
+?	med_	ngpix =	 med_ (a, ia, npix; median) 	     silrd
+.fi
+
+
+For example, "aaddr(a,b,c,npix)" would add the two REAL vectors A and B,
+of length NPIX, placing the sum in the vector C.  To add a constant K to
+the vector A, "aaddkr(a,k,c,npix)" would be used.
+The sequence "aclrb(a,nbytes)" would zero NBYTES machine bytes,
+starting at location A.
+
+.sh
+Preprocessing Generic Operators
+
+    A preprocessor is provided to convert a generic operator into a set
+of type specific operators.  By coding only generic operators, the programmer
+only has to maintain a single piece of code, reducing the possibility of
+an error, and greatly reducing the amount of work.
+
+The GENERIC preprocessor takes as input files written in either the IRAF
+preprocessor language or C (or any other language which provides macro
+definitions), with embedded preprocessor directives and keywords.
+.sh
+Usage
+
+    The calling sequence for the preprocessor (on the UNIX system)
+is as follows:
+
+	generic [-t types] [-p prefix] [-o outfile] file [file...]
+
+Any number of files may be processed.
+.sh
+Flags
+
+    The following (optional) flags are provided to control the types
+and names of the generated files:
+.ls 8
+.ls 8 -t
+Used to specify the datatypes of the files to be produced.  The default
+value is "silrdx", meaning types SHORT through COMPLEX.  Other possible
+types are "BU", i.e., unsigned byte and unsigned short.  The generic
+preprocessor does not support type boolean.
+.le
+.ls -p
+An optional prefix string to be added to each file name generated.  Provided
+to make it convenient to place all generated files in a subdirectory.
+If the name of the file(s) being preprocessed is "aadd.x", and the prefix
+is "d/", the names of the generated files will be "d/aadds.x", "d/aaddi.x",
+"d/aaddl.x", and so on.
+.le
+.ls -o
+If an output filename is specified with the -o flag, only a single input file
+may be processed.  Any "$t" sequences embedded in the output file name
+will be replaced by the type "suffix" character to generate the filenames
+of the type specific files in the generic family.  If no $t sequence is given,
+the type suffix is appended to the filename.  If no -o output filename is
+given, the names of the output files are formed by concatenating the type
+suffix to the root of the input filename.
+.le
+.le
+.sh
+Directives
+
+    The action of the preprocessor is directed by placing "$xxx" directives
+in the text to be processed.  The identifiers INDEF and PIXEL are also
+known to the preprocessor, and will be replaced by their type specific
+equivalents (INDEF --> INDEFS, INDEFI, etc., PIXEL --> short, int, real, etc.)
+in the generated text.  Comments (#... and /* ... */), quoted strings (".."),
+and escaped lines (^%) are passed on unchanged.  
+
+.ls 4
+.ls 20 $/text/
+The text enclosed by the matching slashes is passed through unchanged.
+.le
+.ls $t
+The lowercase value of the current type suffix character (one of [bucsilrdx]).
+.le
+.ls $T
+The uppercase value of the current type suffix character (one of [BUCSILRDX]).
+.le
+.ls digits$f
+Replaced by "digits.0" if the current type is REAL, by "digits.0D0" if the
+current type is DOUBLE, by "(digits,digits)" if the type is complex, or by
+"digits" for all other datatypes.
+.le
+.ls $if
+Conditional compilation.  Two forms of the $if statment are implemented:
+
+.nf
+	$if (datatype == <chars>)
+	$if (datatype != <chars>)
+
+or
+	$if (sizeof(<t1>) <relop> sizeof(<t2>))
+.fi
+
+where <chars>, <t1>, and <t2> are type suffix characters ("silrd", etc.),
+and where <relop> is one of the relational operators
+
+	==  !=  <=  <   >=  >
+
+Nesting is permitted.  Conditional statements need not be left justified,
+i.e., whitespace may be placed between BOL and a $xx preprocessor directive.
+.le
+.ls $$if
+Replaced by "$if".  Not evaluated until the second time the file is
+processed.
+.le
+.ls $else, $$else
+Begins a section of code which gets processed if the $if condition was
+false.
+.le
+.ls $endif, $$endif
+Terminates a $if or $else construct.
+.le
+.ls TY_PIXEL
+Replaced by TY_INT, TY_REAL, and so on.
+.le
+.ls SZ_PIXEL
+Replaced by SZ_INT, SZ_REAL, and so on.
+.le
+.ls PIXEL
+Replaced by the datatype keyword of the file currently being generated
+(int, real, etc.).
+.le
+.ls XPIXEL
+Replaced by the defined type (XCHAR, XINT, ect.).  Used in generic C
+programs which will be called from the subset preprocessor, and which
+must manipulate the subset pp datatypes.
+.le
+.ls $PIXEL
+Replaced by the string "PIXEL" (used to postpone substitution until the
+next pass).
+.le
+.ls INDEF
+Replaced by the INDEF parameter for the current datatype (INDEFS, INDEFI,
+INDEFL, INDEF, or INDEFX).
+.le
+.ls $INDEF
+Replaced by the string "INDEF".
+.le
+.le
+
+.sh
+Example
+
+    The following generic operator computes the square root of a vector.
+The members of the generic family would be called "asqrs", "asqri",
+and so on.
+
+.ks
+.nf
+	# ASQR -- Compute the square root of a vector (generic)
+
+	procedure asqr$t (a, b, npix)
+
+	PIXEL	a[npix], b[npix]
+	int	npix, i
+
+	begin
+		do i = 1, npix {
+		    if (a[i] < 0$f || a[i] == INDEF)
+			b[i] = INDEF
+		    else {
+			$if (datatype != rdx)
+			    b[i] = sqrt(double(a[i]))
+			$else
+			    b[i] = sqrt(a[i])
+			$endif
+		    }
+		}
+	end
+.fi
+.ke
+
+.sh
+Doubly Generic Operators
+
+    The preprocessor can also be used to generate doubly generic operators
+(operators which have two type suffixes).  A good example is the type
+conversion operator ACHTxy, which converts a vector of type X to a vector
+of type Y.  If there are seven datatypes (csilrdx), this generic family will
+consist of 49 members.
+
+Doubly generic programs are preprocessed once to expand the first suffix,
+then each file generated by the first pass is processed to expand the
+second suffix.  On the UNIX sytstem, this might be done by a command
+such as
+
+.nf
+	generic acht.x; generic -p dir/ acht[silrd].x
+	rm acht[silrd].x
+.fi
+
+This would expand "acht" in the current directory (generating 5 files),
+then expand each of the "acht$t" files in the subdirectory "dir/",
+creating a total of 25 files in the subdirectory.  The final command
+removes the 5 intermediate files.

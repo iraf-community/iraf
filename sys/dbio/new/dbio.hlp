@@ -1,0 +1,3202 @@
+.help dbss Sep85 "Design of the IRAF Database Subsystem"
+.ce
+\fBDesign of the IRAF Database Subsystem\fR
+.ce
+Doug Tody
+.ce
+September 1985
+.sp 2
+
+.nh
+Preface
+
+    The primary purpose of this document is to define the interfaces comprising
+the IRAF database i/o subsystem to the point where they can be built rapidly
+and efficiently, with confidence that major changes will not be required after
+implementation begins.  The document also serves to inform all interested
+parties of what is planned while there is still time to change the design.
+A change which can easily be made to the design prior to implementation may
+become prohibitively expensive as implementation proceeds.  After implementation
+is completed and the new subsystem has been in use for several months the basic
+interfaces will be frozen and the opportunity for change will have passed.
+
+The description of the database subsystem presented in this document should
+be considered to be no more than a close approximation to the system which
+will actually be built.  The specifications of the interface can be expected
+to change in detail as the implementation proceeds.  Any code which is written
+according to the interface specifications presented in this document may have
+to modified slightly before system testing with the final interfaces can
+proceed.
+
+.nh 2
+Scope of this Document
+
+    The scope of this document is the conceptual design and specification of
+all IRAF packages and i/o interfaces directly involved with either user or
+program access to binary data maintained in mass storage.  Versions of some
+of the interfaces described are already in use; when this is the case it will
+be noted in the text.
+
+This document is neither a user's guide nor a reference manual.  The reader
+is assumed to be familiar with both database technology and with the IRAF
+system.  In particular, the reader should be familiar with the concept of the
+IRAF VOS (virtual operating system), with the features of the IMIO (image i/o),
+FIO (file i/o), and OS (host system interface) interfaces, as well as with the
+architecture of the network interface.
+
+.nh 2
+Relationship to Previous Documents
+
+    This document supercedes the document "IRAF Database I/O", November 1984.
+Most of the concepts presented in that document are still valid but have been
+expanded upon greatly in the present document.  The scope of the original
+document was limited to the DBIO interface alone, whereas the scope of the
+present document has been expanded to encompass all subsystems or packages
+directly involved with binary data access.  This expansion in the scope of
+the project was necessary to meet our primary goal of completing and freezing
+the program interface, of which DBIO is only a small part.  Furthermore, it
+is difficult to have confidence in the design of a single subsystem without
+working out the details of all closely related or dependent subsystems.
+
+In addition to expanding the scope of the database design project to cover
+more interfaces, the requirements which the database subsystem must meet have
+been expanded since the original conceptual design was done.  In particular
+it has become clear that data format conversions are prohibitively expensive
+for our increasingly large datasets.  Conversions such as those between FITS
+and internal format (for an image), or between FITS table and internal format
+(for a database) are too expensive to be performed routinely.  Data which is
+archived in a machine independent format should not have to be reformatted
+to be accessed by the online system.  The archival format may vary from site
+to site and it should be possible to read the different formats without
+reformatting the data.  Large datasets should not have to be reformatted to
+be moved between machines with incompatible binary data formats.
+
+A change such as this in the requirements for an interface can have a major
+impact on the design of the final interface.  It is essential that all such
+requirements be identified and dealt with in the design before implementation
+begins.
+
+.nh
+Introduction
+
+    In this section we introduce the database subsystem and summarize the
+reasons why we need such a system.  We then introduce the major components
+of the database subsystem and briefly mention some related subsystems.
+
+.nh 2
+The Database Subsystem
+
+    The database subsystem (DBSS) is conceived as a single comprehensive system
+to be used to manage and access all binary (non textfile) data accessed by IRAF
+programs.  Simple applications are perhaps most easily and flexibly dealt with
+using text files for the storage of data, descriptors, and control information.
+As the amount of data to be processed grows or as the data structures to be
+accessed grow in complexity, however, the text file approach becomes seriously
+inefficient and cumbersome.  Converting the text files to binary files makes
+processing more efficient but does little to address the problems of complex
+data structures.  Efficient access to complex data structures requires complex
+and expensive software.  Developing such software specially for each and every
+application is prohibitively expensive in a large system; hence the need for
+a general purpose database system becomes clear.
+
+Use of a single central database system has significant additional advantages.
+A standard user interface can be used to examine, edit, list, copy, etc., all
+data maintained under the database system.  Many technical problems may be
+addressed in a general purpose system that would be too expensive to address
+in a particular application, e.g., the problems of storing variable size data
+elements, of dynamically and randomly updating a dataset, of byte packing to
+conserve storage, of maintaining indexes so that a record may be found
+efficiently in a large dataset, of providing data independence so that storage
+formats may be changed without need to change the program accessing the data,
+and of transport of binary datasets between incompatible machines.  All of
+these are examples of problems which are \fInot\fR adequately addressed by the
+current IRAF i/o interfaces nor by the applications programs which use them.
+
+.nh 2
+Major Subsystems
+
+    The major subsystems comprising the IRAF DBSS are depicted in Figure 1.
+At the highest level are the CL (command language) packages, each of which
+consists of a set of user callable tasks.  The IMAGES package (consisting
+of general image processing operators) is shown for completeness but since
+there are many such packages in the system they are not considered part of
+the DBSS and will not be discussed further here.
+The DBMS (database management) package is the user interface to the DBSS,
+and some day will possibly be the largest part of the DBSS in terms of number
+of lines of code.
+
+In the center of the figure we see the VOS (virtual operating system) packages
+IMIO, DBIO and FIO.  FIO (file i/o) is the standard IRAF file interface and
+will not be discussed further here.  IMIO (image i/o) and DBIO (database i/o)
+are the two major i/o interfaces in the DBSS and are the topic of much of the
+rest of this document.  IMIO and DBIO are the two parts of the DBSS of interest
+to applications programmers; these interfaces are implemented as libraries of
+subroutines to be called directly by the applications program.  IMIO and FIO
+are existing interfaces.
+
+At the bottom of the figure is the DB Kernel.  The DB Kernel is the component
+of the DBSS which physically accesses the data in mass storage (via FIO).
+The DB Kernel is called only by DBIO and hence is invisible to both the user
+and the applications programmer.  There is a lot more to the DB Kernel than
+is evident from the figure, and indeed the DB Kernel will be the subject of
+another figure when we discuss the system architecture in section 4.2.
+
+
+.ks
+.nf
+                 DBMS          IMAGES(etc)            (CL)
+                   \             /
+                    \           /                   ---------
+                     \         /
+                      \     IMIO                     
+                       \    /  \       
+                        \  /    \                                  
+                         \/      \                    (VOS)
+                        DBIO     FIO
+                         | 
+                         |
+                         |                          ---------
+                         |
+                         |
+                    (DB Kernel)                (VOS or Host System)
+
+.fi
+.ce
+Figure 1.  Major Components of the Database Subsystem
+.ke
+
+
+With the exception of certain optional subsystems to be outlined later,
+the entire DBSS is machine independent and portable.  The IRAF system may
+be ported to a new machine without any knowledge whatsoever of the
+architecture or functioning of the DBSS.
+
+.nh 2
+Related Subsystems
+
+    Several additional IRAF subsystems or packages are of interest from the
+standpoint of the DBSS.  These are the PLOT package, the graphics interface
+GIO, and the LISTS package.
+
+The PLOT package is a CL level package consisting of general plotting
+utilities.  In general PLOT tasks can accept input in a number of standard
+formats, e.g., \fBlist\fR (text file) format and \fBimagefile\fR format.
+The DBSS will provide an additional standard format which should perhaps be
+directly accessible by the PLOT tasks.  Even if this is not done a very
+general plotting capability will automatically be provided by "piping" the
+list format output of a DBMS task to a PLOT task.  Additional graphics
+capabilities will be provided as built in functions in the DBMS
+\fBquery language\fR, which will access GIO directly to make plots.
+The query language graphics facilities will be faster and more convenient
+to use but less extensive and less sophisticated than those provided by PLOT.
+
+The LISTS package is interesting because the facilities provided and operations
+performed resemble those provided by the DBMS package in many respects.
+The principle difference between the two packages is that the LISTS package
+operates on arbitrary text files whereas the DBMS package operates only
+upon DBIO format binary files.  The textual output of \fIany\fR IRAF or
+non-IRAF program may serve as input to a LISTS operator, as may any ordinary
+text file, e.g., the source files for a program or package.  A typical LISTS
+database is a directory full of source files or documentation; LISTS can also
+operate on tables of numbers but the former application is perhaps more
+common.  Using LISTS it is possible to conveniently and rapidly perform
+operations (evaluate queries) which would be cumbersome or impossible to
+perform with a conventional database system such as DBMS.  On the other hand,
+the LISTS operators would be hopelessly inefficient for the types of
+applications for which DBMS is designed.
+
+.nh
+Requirements
+
+    Requirements define the problem to be solved by a software system.
+There are two types of requirements, non-functional requirements, i.e.,
+restrictions or constraints, and functional requirements, i.e., the functions
+which the system must perform.  Since nearly all IRAF science software will
+be heavily dependent on the DBSS, the requirements for this subsystem are as
+strict as those for any subsystem in IRAF.
+
+.nh 2
+General Requirements
+
+    The general requirements which the DBSS must satisfy primarily take the
+form of constraints or restrictions.  These requirements are common to
+all mainline IRAF system software.  Note that these requirements are \fInot\fR
+automatically enforced for all system software.  If a particular subsystem is
+prototype or optional (not required for the normal functioning of IRAF) then
+these requirements can be relaxed.  In particular, certain parts of the DBSS
+(e.g, the host database interface) are optional and are not subject
+to the same constraints as the mainline software.  The primary functional
+requirements discussed in section 3.2, however, must be met by software which
+satisfies all of the general requirements discussed here.
+
+.nh 3
+Portability
+
+    All software in the DBMS, IMIO, and DBIO interfaces and in the DB kernel
+must be fully portable under IRAF.  To meet this requirement the software
+must be written in the IRAF SPP language using only the facilities provided
+by the IRAF VOS.  In particular, this rules out complicated record locking
+schemes in the DB kernel, as well as any type of centralized database server
+which relies on process control, IPC, or signal handling facilities not
+provided by the IRAF VOS.  For most processes the requirement is even more
+strict, i.e., ordinary IRAF processes are not permitted to rely upon the VOS
+process control or IPC facilities for their normal functioning (the IPC
+connection to the CL is an exception since it is not required to run an
+IRAF process standalone).
+
+.nh 3
+Efficiency
+
+    The database interface must be efficient, particularly when used for
+image access and intermodule communication.  There are as many ways to
+measure the efficiency of an interface as there are applications for the
+interface, and we cannot address them all here.  The dimensions of the
+efficiency matrix we are concerned with here are the cpu time consumed
+during execution, the clock time consumed during execution, e.g, the number
+of file opens and disk seeks or required, and the disk space consumed for
+table storage.  Where necessary efficient cpu utilization will be achieved
+at the expense of memory requirements for code and buffers.
+
+A simple and well defined efficiency requirement is that the cpu and clock
+time required to access the pixels of an image stored in the database from
+a "cold start" (no open files) must not noticeably exceed that required
+by the old IMIO interface.  The efficiency of the new interface for the
+case when many images are to be accessed is expected to be a major improvement
+over that provided by the old IMIO interface, since the old interface
+stores each image in two separate files, whereas the new interface will
+be capable of storing the entire contents of many (small) images in a single
+file.  The amount of disk space required for image header storage is also
+expected to decrease by a large factor when multiple images are stored
+in a single physical file.
+
+.nh 3
+Code Size
+
+    We have already established that a process must directly access the
+database in mass storage to meet our portability and efficiency requirements.
+This type of access requires that the necessary IMIO, DBIO and DB Kernel
+routines be linked into each process requiring database access.  Minimizing
+the amount of text space used by the database code is desirable to minimize
+disk and memory requirements and process spawn time, but is not critical
+since memory is cheap and plentiful and is likely to become even cheaper
+and more plentiful in the future.  Furthermore, the multitask nature of
+IRAF processes allows the text segment used by the database code to be shared
+by many tasks, saving both disk and memory.
+
+The main problem remaining today with large text segments seems to be the
+process spawn time; loading the text segment by demand paging in a virtual
+memory environment can be quite slow.  The fault here seems to lie more with
+the operating system than with IRAF, and probably the solution will require
+tuning either the IRAF system interface or the operating system itself.
+
+Taking all these factors into account it would seem that typical memory
+requirements for the executable database code (not including data buffers)
+in the range 50 to 100 Kb would be acceptable, with 50 Kb being a reasonable
+goal.  This would make the database interface the largest i/o interface in
+IRAF but that seems inevitable considering the complexity of the problem to
+be solved.
+
+.nh 3
+Use of Proprietary Software
+
+    A mainline IRAF interface, i.e., any interface required for the normal
+operation of the system, must belong to IRAF and must be distributed with
+the IRAF system at no additional charge and with no licensing restrictions.
+The source code must be part of the system and is subject to strict
+configuration control by the IRAF group, i.e., the IRAF group is responsible
+for the software and must control it.  This rules out the use of a commercial
+database system for any essential part of the DBSS, but does not rule out
+IRAF access to a commercial database system provided such access is optional,
+i.e., not required for the operation of the standard applications packages.
+The host database interface provided by the DB kernel is an example of such
+an interface.
+
+.nh 2
+Special Requirements
+
+    In this section we present the functional requirements of the DBSS.
+The major applications for which the DBSS in intended are described and
+the desirable characteristics of the DBSS for each application are outlined.
+The major applications thus far identified are catalog storage, image storage,
+intermodule communication, and data archiving.
+
+.nh 3
+Catalog Storage
+
+    The catalog storage application is probably the closest thing in IRAF to a
+conventional database application.  A catalog is a set of records, each of
+which describes a single object.  Each record consists of a set of fields
+of various datatypes describing the attributes of the object.  A record is
+produced by numerical analysis of the object represented as a region of a
+digital array.  All records have the same structure, i.e., set of fields;
+often the records are all the same size (but not necessarily).  A large catalog
+might contain several hundred thousand records.  Examples of such catalogs are
+the SAO star catalog, the IRAS point source catalog, and the catalogs produced
+by analysis programs such as FOCAS (a faint object detection and classification
+program) and RICHFLD (a digital stellar photometry program).  Many similar
+examples can be identified.
+
+Generation of such a catalog by an analysis program is typically a cpu bound
+batch operation requiring many hours of computer time for a large catalog.
+Once the catalog has been generated there are typically numerous questions of
+scientific interest which can be answered using the data in the catalog.
+It is highly desirable that this phase of the analysis be interactive and
+spontaneous, as one question will often lead to another in an unpredictable
+fashion.  A general purpose analysis capability is required which will permit
+the scientist to pose arbitrary queries of arbitrary complexity, to be answered
+by the system in a few seconds (or minutes for large problems), with the answer
+taking the form of a number or name, set or table of numbers or names, plot,
+subcatalog, etc.
+
+Examples of such queries are given below.  Clearly, the set of all possible
+queries of this type is infinite, even assuming a limited number of operators
+operating on a single catalog.  The set of potentially interesting queries
+is equally large.
+.ls 4
+.ls [1]
+Find all objects of type "pqr" for which X is in the range A to B and
+Z is less than 10.
+.le
+.ls [2]
+Compute the mean and standard deviation of attribute X for all objects
+in the set [1].
+.le
+.ls [3]
+Compute and plot (X-Y) for all objects in set [1].
+.le
+.ls [4]
+Plot a circle of size (log2(Z-3.2) * 100) at the position (X,Y) of all objects
+in set [1].
+.le
+.ls [5]
+Print the values of the attributes OBJ, X, Y, and Z of all objects for which
+X is in the range A to B and Y is greater than 30.
+.le
+.le
+
+
+In the past queries such as these have all too often been answered by writing
+a program to answer each query, or worse, by wading though a listing of the
+program output and manually computing the result or manually plotting points
+on a graph.
+
+Given the preceding description of the catalog storage application, we can
+make the following observations about the application of the DBSS to catalog
+storage.
+.ls
+.ls o
+A catalog is typically written once and then read many times.
+.le
+.ls o
+Both public and private catalogs are common.
+.le
+.ls o
+Catalog records are infrequently updated or are not updated at all once the
+original entry has been made in the catalog.
+.le
+.ls o
+Catalog records are rarely if ever deleted.
+.le
+.ls o
+Catalogs can be very large, making efficient storage structures important
+in order to minimize disk storage requirements.
+.le
+.ls o
+Since catalogs can be very large, indexing facilities are required for
+efficient record retrieval and for the efficient evaluation of queries.
+.le
+.ls o
+A general purpose interactive query capability is required for the user to
+effectively make use of the data in a catalog.
+.le
+.le
+
+
+In DBSS terminology a user catalog will often be referred to as a \fBtable\fR
+to avoid confusion with the use of the DBSS term \fBcatalog\fR which refers
+to the system table which lists the contents of a database.
+
+.nh 3
+Image Storage
+
+    A primary requirement for the DBSS, if not \fIthe\fR primary requirement,
+is that the DBSS be suitable for the storage of bulk data or \fBimages\fR.
+An image consists of two parts: an \fIimage header\fR describing the image,
+and a multidimensional array of \fBpixels\fR.  The pixel array is sometimes
+small and sometimes very large indeed.  For efficiency and other reasons the
+actual pixel array is not required to be stored in the database.  Even if the
+pixels are stored directly in the database they are not expected to be used
+in queries.
+
+We can make the following observations about the use of the DBSS for image
+storage.  The reader concerned about how all this might map into the storage
+structures provided by a relational database should assume that the image
+header is stored as a single large, variable size record (tuple), whereas
+a group of images is stored as one or more tables (relations).  If the images
+are large assume the pixels are be stored outside the DBSS in a file, storing
+only the name of the file in the header record.
+.ls
+.ls o
+Images tend to be grouped into sets that have some logical meaning to the user,
+e.g., "nite1", "nite2", "raw", "reduced", etc.  Each group typically contains
+dozens or hundreds of images (enough to require use of an index for efficient
+retrieval).
+.le
+.ls o
+Within a group the individual images are often referred to by a unique ordinal
+number which is automatically assigned by some program (e.g., "nite1.10",
+"nite1.11", etc).
+.le
+.ls o
+Image databases tend to be private databases, created and accessed by a
+single user.
+.le
+.ls o
+The size of the pixel segment of an image varies enormously, e.g., from
+1 kilobyte to 8 megabytes, even 40 megabytes in some cases.
+.le
+.ls o
+Small pixel segments are most efficiently stored directly in the image header
+to minimize the number of file opens and disk seeks required to access the
+pixels once the header has been accessed (as well as to minimize file clutter).
+.le
+.ls o
+Large pixel segments are most efficiently stored separately from the image
+headers to increase clustering and speed sequential searches of a group of
+headers.
+.le
+.ls o
+It is occasionally desirable to store either the image header or the pixel
+segment on a special, non file-structured device.
+.le
+.ls o
+The image header logically consists of a closed set of standard attributes
+common to all images, plus an open set of attributes peculiar to the data
+or to the type of analysis being performed on the data.
+.le
+.ls o
+The operations performed on images are often functions which produce a
+modified version of the input image(s) as a new output image.  It is desirable
+for most header information to be automatically preserved in such a mapping.
+For this to happen automatically without the DBSS requiring knowledge of
+the contents of a header, it is necessary that the header be a single object
+to the DBSS, i.e., a single record in some table, rather than a set of
+related records in several tables.
+.le
+.ls o
+Since the image header needs to be maintained as a single record and since
+the header may contain an unpredictable number of application or data specific
+attributes, image headers can be quite large.
+.le
+.ls o
+Not all image header attributes are simple scalar values or even fixed size
+arrays.  Variable size attributes, i.e., arrays, are common in image headers.
+Examples of such attributes are the bad pixel list, history text, and world
+coordinate system (more on this in a later section).
+.le
+.ls o
+Image header attributes often form logical groupings, e.g., several logically
+related attributes may be required to define the bad pixel list or the world
+coordinate system.
+.le
+.ls o
+The image header structure is often dynamically updated and may change in
+size when updated.
+.le
+.ls o
+It is often necessary to add new attributes to an existing image header.
+.le
+.ls o
+Images are often selectively deleted.  Any subordinate files logically
+associated with the image should be automatically deleted when the image
+header is deleted.  If this is not possible under the DBSS then the DBSS
+should forbid deletion of the image header unless special action is taken
+to remove delete protection.
+.le
+.ls o
+For historical or other reasons, a given site will often maintain images
+in several different and completely incompatible formats.  It is desirable
+for the DBSS to be capable of directly accessing images maintained in a foreign
+format without a format conversion, even if only limited (e.g., read only)
+access is possible.
+.le
+.le
+
+
+In summary, images are characterized by a header with a highly variable set
+of fields, some of which may vary in size during the lifetime of the image.
+New fields may be added to the image header at any time.  Array valued fields
+are common and fields tend to form logical groupings.  The image header is
+best maintained as a single structure under the DBSS.  Image headers can be
+quite large.  The pixel segment of an image can be extremely large and may
+be best maintained outside the DBSS.  Since many existing image archives exist,
+each with its own unique format, it is desirable for the DBSS to be capable
+of accessing multiple storage formats.
+
+Storage of the pixel segment or any other portion of an image in a separate
+file outside the DBSS causes problems which must be dealt with at some level
+in the system, if not by the DBSS.  In particular, problems occur if the user
+tries to backup, restore, copy, rename, or delete any portion of an image using
+a host system utility.  These problems are minimized if all logically related
+data is kept in a single data directory, allowing the database as a whole to
+be moved or backed up with host system utilities.  All pathnames should be
+defined relative to the data directory to permit relocation of the database
+to a different directory.  Ideally all binary datafiles in the database should
+be maintained in a machine independent format to permit movement of the
+database between different machines without reformatting the entire database.
+
+.nh 3
+Intermodule Communication
+
+    A large applications package consists of many separate tasks or programs.
+These tasks are best defined and understood in terms of their operation on a
+central package database.  For example, one task might fit some function to
+an image, leaving a record describing the fit in the database.  A second task
+might take this record as input and use it to control a transformation on
+the original image.  Additional operators implementing a range of algorithms
+or optimized for a discrete set of cases are easily added, each relying upon
+the central database for intermodule communication.
+
+This application of the DBSS is a fairly conventional database application
+except that array valued attributes and logical groupings of attributes are
+common.  For example, assume that a polynomial has been fitted to a data
+vector and we wish to record the fit in the database.  A typical set of
+attributes describing a polynomial fit are shown below.
+
+
+.ks
+.nf
+	image_name	char*30		# name of source image
+	nfeatures	int		# number of features fitted
+	features.x	real*4[*]	# x values of the features
+	features.y	real*4[*]	# y values of the features
+	curve.type	char*10		# curve type
+	curve.ncoeff	int		# number of coefficients
+	curve.coeff	real*4[*]	# coefficients
+.fi
+.ke
+
+
+The data structure shown records the positions (X) and world coordinates (Y)
+of the data features to which the curve was fitted, plus the coefficients of
+the fitted curve itself.  There is no way of predicting the number of features
+hence the X and Y arrays are variable length.  Since the fitted curve might
+be a spline or some other piecewise function rather than a simple polynomial,
+there is likewise no reasonable way to place an upper limit on the amount of
+storage required to store the fitted curve.  This type of record is common in
+scientific applications.
+
+We can now make the following observations regarding the use of the DBSS for
+intermodule communication.
+.ls
+.ls o
+The number of fields in a record tends to be small, but array valued fields
+of variable size are common hence the physical size of a record may be large.
+.le
+.ls o
+A large table might contain several hundred records in typical applications,
+requiring the use of an index for efficient retrieval.
+.le
+.ls o
+Record access is usually random rather than sequential.
+.le
+.ls o
+Random record updates will be rare in some applications, but common in others.
+.le
+.ls o
+Records will often change in size when updated.
+.le
+.ls o
+Selective record deletion is rare, occurring mostly during cleanup following
+an error.
+.le
+.ls o
+New fields are rarely, if ever, added to existing records.  The record structure
+is usually determined by the programmer rather than by the user and tends to
+be well defined.
+.le
+.ls o
+This type of database is typically a private database created and used by a
+single user to process a specific dataset with a specific applications package.
+.le
+.le
+
+
+Application specific information may sometimes be stored directly in the header
+of the image being analyzed, but more often will be stored in one or more
+separate tables, recording the name of the image analyzed in the new record
+as a backpointer, as in the example.  Hence a typical scientific database
+might consist of several tables containing the input images, several tables
+containing intermodule records of various types, and one or more tables
+containing either reduced images or catalog records, depending on whether a
+reduction or analysis operation was performed.
+
+.nh 3
+Data Archiving
+
+    Data archiving refers to the long term storage of raw or reduced data.
+Data archiving is important for the following reasons.
+.ls
+.ls o
+Archiving is currently necessary just to \fItransport\fR data from the
+telescope to the site where reduction and analysis takes place.
+.le
+.ls o
+Permanently archiving the raw (or pre-reduced) data is necessary in case
+an error in the reduction process is later discovered, making it necessary
+for the observer to repeat the reductions.
+.le
+.ls o
+Archiving of the reduced data is desirable to save computer and human time
+in case the analysis phase has to be repeated, or in case additional analysis
+is later discovered to be necessary.
+.le
+.ls o
+Archived data could conceivably be of considerable value to future researchers
+who, given access to such data, might not have to make observations of their
+own, or who might be able to use the archived data to augment or plan their
+own observations.
+.le
+.ls o
+Archived data could be invaluable for future projects studying the variability
+of an object or objects over a period of years.
+.le
+.le
+
+
+Ideally data should be archived as it is taken at the telescope, possibly
+performing some simple pipeline reductions before archiving takes place.
+Subsequent reduction and analysis using the archived data should be possible
+without the format conversion (e.g., FITS to IRAF) currently required.
+This conversion wastes cpu time and disk space as well as user time.
+The problem is already serious and is expected to grow by an order of
+magnitude in the next several years as digital detectors grow in size and
+are used more frequently.
+
+Archival data consists of the digital data itself (the pixels) plus information
+describing the object, the observer, how the data was taken, when and where
+the data was taken, and so on.  This is just the type of information assumed
+to be present in an IRAF image.  In addition one would expect the archive to
+contain one or more \fBmaster catalogs\fR containing exhaustive information
+describing the observations but no data.
+
+Since a permanent digital data archive can be expected to be around for many
+years and to be read on many types of machines, data images should be archived
+in a machine independent format; this format would almost certainly be FITS.
+It is also desirable, though not essential, that the master catalogs be
+readable on a variety of machines and hence be maintained and distributed in
+a machine independent format.  The ideal storage medium for archiving and
+transporting large amounts of digital data appears to be the optical disk.
+
+Archival data and catalog access via the DBSS differs from conventional image
+and catalog access only in the storage format, which is assumed to be machine
+independent, and in the storage medium, which is assumed to be an archival
+medium such as the optical disk.  Direct access to a database on optical
+disk requires that the DBSS be able to read the machine independent format
+directly.
+
+To achieve acceptable performance for direct access it is necessary that
+the storage medium be randomly accessible (unlike, say, a magnetic or optical
+tape) and that the hardware seek time and transfer rate be comparable to those
+provided by magnetic disk technology.  Note that current optical disk readers
+often do not have fast seek times, and that those that do have fast seek times
+generally have a lower storage density than sequential devices due to the gaps
+between sectors.  Even if a device is not fast enough to be used directly it
+is still possible to eliminate the expensive format conversion and do only a
+disk to disk copy, accessing the machine independent format on magnetic disk.
+
+There is no requirement that the IRAF DBSS be used to support data archiving,
+but the DBSS \fIis\fR required to be able to access the data in an archive.
+Accessing the master catalogs as well seems reasonable since such a catalog
+is no different than those described in sections 3.2.1. and 3.2.3; IRAF will
+have the capability to maintain, access, and query such a catalog without
+developing any additional software.
+
+The main obstacle likely to limit the success of data archiving may well be
+the difficulty involved in gaining access to the archive.  If the master
+catalogs were maintained on magnetic disk but released periodically in
+optical disk format for astronomers to refer to at their home institutions,
+access would be much easier (and probably more frequent) than if all the
+astronomers in the country were required to access a single distant computer
+via modem.  Telephone access by sites not on the continent would probably
+be too expensive or problematic to be feasible.
+
+.nh 2
+Other Requirements
+
+    In earlier sections we have discussed the principle constraints and
+primary requirements for the DBSS.  Several other requirements or
+non-requirements deserve mention.
+
+.nh 3
+Concurrency
+
+    All of the applications identified thus far require either read-only access
+to a public database or read-write access to a private database.
+The DBSS is therefore not required to support simultaneous updating by many
+users of a single centralized database, with all the overhead and complication
+associated with record locking, deadlock avoidance and detection, and so on.
+The only exception occurs when a single user has several concurrent processes
+requiring simultaneous update access to the user's private database.  It appears
+that this case can be addressed adequately by distributing the database in
+several datasets and using host system file locking to lock the datasets,
+a technique discussed further in a later section.
+
+.nh 3
+Recovery
+
+    If a database update is aborted for some reason a dataset can be corrupted,
+possibly preventing further access to the dataset.  The DBSS should of course
+protect datasets from corruption in normal circumstances, but it is always
+possible for a hardware or software error (e.g., disk overflow or reboot) to
+cause a dataset to be corrupted.  Some mechanism is required for recovering a
+database that has been corrupted.  The minimum requirement is that the DBSS,
+when asked to access a corrupted dataset, detect that the dataset has been
+corrupted and abort, after which the user runs a recovery task to rebuild the
+dataset minus the corrupted records.
+
+.nh 3
+Data Independence
+
+    Data independence is a fundamental property inherent in virtually all
+database systems.  One of the major reasons one uses a database system is to
+provide data independence.  Data independence is so fundamental that we will
+not discuss it further here.  Suffice it so say that the DBSS must provide
+a high degree of data independence, allowing applications programs to function
+without detailed knowledge of the structure or contents of the database they
+are accessing, and allowing databases to change significantly without
+affecting the programs which access them.
+
+.nh 3
+Host Database Interface
+
+    The host database interface (HDBI) makes it possible for the DBSS to
+interface to a host database system.  The ability to interface to a host
+database system is not a primary requirement for the DBSS but is a highly
+desirable one for many of the same reasons that direct access to archival data
+is important.  The problems of accessing a HDB and of accessing an archive
+maintained in non-DBSS format are similar and might perhaps be addressed
+by a single interface.
+
+.nh
+Conceptual Design
+
+    In this section we develop the design of the various subsystems comprising
+the DBSS at the conceptual level, without bothering with the details of specific
+language bindings or with the details of implementation.  We start by defining
+some important terms and then describe the system architecture.  Lastly we
+describe each of the major subsystems in turn, starting at the highest level
+and working down.
+
+.nh 2
+Terminology
+
+    The DBSS is an implementation of a \fBrelational database\fR.  A relational
+database views data as a collection of \fBtables\fR.  Each table has a fixed
+set of named columns and may contain any number of rows of data.  The rows
+of a table are often referred to as \fBrecords\fR.  A record consists of a set
+of named \fBfields\fR.  The fields of a record are the columns of the table
+containing the record.
+
+We shall use this informal terminology when discussing the contents of a
+physical database.  When discussing the \fIstructure\fR of a database we shall
+use the formal relational terms relation, tuple, attribute, and so on.
+The correspondence between the formal relational terms and their informal
+equivalents is given in the table below.
+
+
+.ks
+.nf
+	\fBformal relational term\fR		    \fBinformal equivalents\fR
+
+		relation			table
+		tuple				record, row
+		attribute			field, column
+		primary key			unique identifier
+		domain				pool of legal values
+.fi
+.ke
+
+
+A \fBrelation\fR is a set of like tuples.  A \fBtuple\fR is a set of
+\fBattributes\fR, each of which is defined upon a specific domain.
+A \fBdomain\fR is an abstract type which defines the legal values an
+attribute may take on (e.g., "posint" or "color").  The tuples of a relation
+must be unique within the containing relation.  The \fBprimary key\fR is
+a subset of the attributes of a relation which is sufficient to uniquely
+identify any tuple in the relation (often a single attribute serves as
+the primary key).
+
+The relational data model was chosen for the DBSS because it is the simplest
+conceptual data model which meets our requirements.  Other possibilites
+considered were the \fBhierarchical\fR model, in which data is organized in
+a tree structure, and the \fBnetwork\fR model, in which data is organized in
+a potentially recursive graph structure.  Virtually all new database systems
+implemented since the mid-seventies have been based on the relational model
+and most database research today is in support of the relational model (the
+remainder goes to the new fifth-generation technology, not to the old data
+models).
+
+The term "relational" in "relational database" comes from the \fBrelational
+algebra\fR, a branch of mathematics based on set theory which defines a
+fundamental and mathematically complete set of operations upon relations
+(tables).  The relational algebra is fundamental to the DBMS query language
+(section 4.3) but can be safely ignored in the rest of the DBSS.  The reader
+is referred to any introductory database text for a discussion of the relational
+algebra and other database technotrivia.  The classic introductory database
+text is \fI"An Introduction to Database Systems"\fR, Volume 1 (Fourth Edition,
+1986) by C. J. Date.
+
+.nh 2
+System Architecture
+
+    The system architecture of the DBSS is depicted in Figure 2.  The parts
+of the figure above the "DBKI" have already been discussed in section 2.2.
+The remainder of the figure is what has been referred to previously as the
+DB kernel.
+
+The primary function of DBIO is record access (retrieval, update, insertion,
+and deletion) based on evaluation of a \fBselect\fR statement input as a string.
+DBIO can also process symbolic definitions of relations and other database
+objects so that new tables may be created.  DBIO does not implement any
+relational operators more complex than select; the more complex relational
+operations are left to the DBMS query language to minimize the size and
+complexity of DBIO.
+
+The basic concept underlying the design of the lower level portions of the DBSS
+is that the DB kernel provides the \fBaccess method\fR for efficiently accessing
+records in mass storage, while DBIO takes care of all higher level functions.
+In particular, DBIO implements all functions required to access the contents
+of a record, while the DB kernel is responsible for storage allocation and for
+the maintenance and use of indexes, but has no knowledge of the actual contents
+of a record (the HDBI is an exception to this rule as we shall see later).
+
+The database kernel interface (DBKI) provides a layer of indirection between
+DBIO and the underlying database kernel (DBK).  The DBKI can support a number
+of different kernels, much the way FIO can support a number of different device
+drivers.  The DBKI also provides network access to a remote database, using
+the existing IRAF kernel interface (KI) to communicate with a DBKI on the
+remote node.  Two standard database kernels are provided.
+
+The primary DBK (at the right in the figure) maintains and accesses DBSS
+binary datasets; this is the most efficient kernel and probably the only
+kernel which will fully implement the semantic actions of the DBKI.
+The second DBK (at the left in the figure) supports the host database
+interface (HDBI) and is used to access archival data, any foreign image
+formats, and the host database system (HDB), if any.  Specialized HDBI
+drivers are required to access foreign image formats or to interface to
+an HDB.
+
+
+.ks
+.nf
+		 DBMS          IMAGES(etc)            (CL)
+                   \             /
+                    \           /                   ---------
+                     \         /
+                      \     IMIO                     
+                       \    /  \       
+                        \  /    \                                  
+                         \/      \  
+                        DBIO     FIO                  (VOS)
+                         | 
+                         |
+                         |
+                        DBKI
+                         |
+                  +------+------+-------+
+                  |             |       |
+                 DBK           DBK    (KI)
+                  |             |       |
+                  |             |       |
+                 HDBI           |       |
+                  |             |       |
+             +----+----+        |       |           ---------
+             |         |        |       |
+             |         |        |       |
+         [archive]   [HDB]  [dataset]   |
+                                        |
+                                        |         (host system)
+                                        -
+				      (LAN)
+					-
+                                        |
+                                        |           ---------
+                                        |
+                                 (Kernel-Server)
+                                        |
+                                        |
+                                       DBKI           (VOS)
+                                        |
+                                    +---+---+
+                                    |       |
+                                   DBK     DBK
+
+
+.fi
+.ce
+Figure 2. \fBDatabase Subsystem Architecture\fR
+.ke
+
+
+.nh 2
+The DBMS Package
+.nh 3
+Overview
+
+    The user interfaces with a database in either of two ways.  The first way
+is via the tasks in an applications package, which perform highly specialized
+operations upon objects stored in the database, e.g., to reduce a certain kind
+of data.  The second way is via the database management package (DBMS), which
+gives the user direct access to any dataset (but not to large pixel arrays
+stored outside the DBSS).  The DBMS provides an assortment of general purpose
+operators which may be used regardless of the type of data stored in the
+database and regardless of the applications program which originally created
+the structures stored in the database.
+
+The DBMS package consists of an assortment of simple procedural operators
+(conventional CL callable parameter driven tasks), a screen editor for tables,
+and the query language, a large program which talks directly to the terminal
+and which has its own special syntax.  Lastly there is a subpackage containing
+tasks useful only for datasets maintained by the primary DBK, i.e., a package
+of relatively low level tasks for things like crash recovery and examining
+the contents of physical datasets.
+
+.nh 3
+Procedural Interface
+
+    The DBMS procedural interface provides a number of the most commonly
+performed database operations in the form of CL callable tasks, allowing
+these simple operations to be performed without the overhead involved in
+entering the query language.  Extensive database manipulations are best
+performed from within the query language, but if the primary concern of
+the user is data reduction in some package other than DBMS the procedural
+operators will be more convenient and less obtrusive.
+
+.nh 4
+General Operators
+
+    DBMS tasks are required to implement the following general database
+management operations.  Detailed specifications for the actual tasks are
+given later.
+.ls
+.ls \fBchdb\fR newdb
+Change the default database.  To minimize typing the DBSS provides a
+"default database" paradigm analogous to the default directory of FIO.
+Note that there need be no obvious connection between database objects
+and files since multiple tables may be stored in a single physical file,
+and the physical database may reside on an optical disk or worse may be
+an HDB.  Therefore the FIO "directory" cannot be used to examine the
+contents of a database.  The default database may be set independently
+of the current directory.
+.le
+.ls \fBpcatalog\fR [database]
+Print the catalog of the named database.  The catalog is a system table
+containing one entry for every table in the database; it is analogous
+to a FIO directory.  Since the catalog is a table it can be examined like
+any other table, but a special task is provided since the print catalog
+operation is so common.  If no argument is given the catalog of the default
+database is printed.
+.le
+.ls \fBptable\fR spe
+Print the contents of the specified relation in list form on the standard
+output.  The operand \fIspe\fR is a general select expression defining
+a new table as a projection of some subset of the records in a set of one or
+more named tables.  The simplest select expression is the name of a single
+table, in which case all fields of all records in the table will be printed.
+More generally, one might print all fields of a single table, selected fields
+of a single table (projection), all fields of selected records of a single
+table (selection), or selected fields of selected records from one or more
+tables (selection plus projection).
+.le
+.ls \fBrcopy\fR spe output_table
+Copy (insert) the records specified by the general select expression
+\fIspe\fR into the named \fIoutput_table\fR.  If the named output table
+does not exist a new one will be created.  If the attributes of the output
+table are different than those of the input table the proper action of
+this operator is not obvious and has not yet been defined.
+.le
+.ls \fBrmove\fR spe output_table
+Move (insert) the relation specified by the general select expression
+\fIspe\fR into the named \fIoutput_table\fR.  If the named output table
+does not exist a new one will be created.  The original records are deleted.
+This operator is used to generate the union of two or more tables.
+.le
+.ls \fBrdelete\fR spe
+Delete the records specified by the general select expression \fIspe\fR.
+Note that this operator deletes records from tables, not the tables themselves.
+.le
+.ls \fBmkdb\fR newdb [ddl_file]
+Create a new, empty database \fInewdb\fR.  If a data definition file
+\fIddl_file\fR is named it will be scanned and any domain, relation, etc.
+definitions therein entered into the new database.
+.le
+.ls \fBmktable\fR table relation
+Create a new, empty table \fItable\fR of type \fIrelation\fR.  The parameter
+\fIrelation\fR may be the name of a DDL file, the name of an existing base
+table, or any general record select/project expression.
+.le
+.ls \fBmkview\fR table relation
+Create a new virtual table (view) defined in terms of one or more existing
+base tables by the operand \fIrelation\fR, which is the same as for the
+task \fImktable\fR.  Operationally, \fBmkview\fR is much like \fBrcopy\fR,
+except that it is considerably faster and the new table does not physically
+store any data.  The new view-table behaves like any other table in most
+operations (except some types of updates).  Note that the new table may
+reference tuples in several different base tables.  A view-table may
+subsequently be converted into a base table with \fBrcopy\fR.  Views are
+discussed in more detail in section 4.5.
+.le
+.ls \fBmkindex\fR table fields
+Make a new index on the named base table over the listed fields.
+.le
+.ls \fBrmtable\fR table
+Drop (delete, remove) the named base table (or view) and any indexes defined
+on the table.
+.le
+.ls \fBrmindex\fR table fields
+Drop (delete, remove) the index defined over the listed fields on the named
+base table.
+.le
+.ls \fBrmdb\fR [database]
+Destroy the named database.  Unless explicitly overridden \fBrmdb\fR will
+refuse to delete a database until all tables therein have been dropped.
+.le
+.le
+
+
+Several terms were introduced in the discussion above which have not yet been
+defined.  A \fBbase table\fR is a physical table (instance of a defined
+relation), unlike a \fBview\fR which is a virtual table defined via selection
+and projection over one or more base tables or other views.  Both types of
+objects behave equivalently in most operations.
+A \fBdata definition language\fR (DDL) is a language syntax used to define
+database objects.
+
+.nh 4
+Forms Based Data Entry and Retrieval
+
+    Many of the records typically stored in a database are too large to be
+printed in list format on a single line.  Some form of multiline output is
+necessary; this multiline representation is called a \fBform\fR.  The full
+terminal screen is used to display a form, e.g. with the fields labeled
+in reverse video and the field values in normal video.  Records are viewed
+one at a time.
+
+Data entry via a form is an interactive process similar to editing a file with
+a screen editor.  The form is displayed, possibly with default values for the
+fields, and the user types in new values for the fields.  Editor commands are
+provided for positioning the cursor to the field to be edited and for editing
+within a field.  The DBSS verifies each value as it is entered using the range
+information supplied with the domain definition for that field.
+Additional checks may be made before the new record is inserted into the
+output table, e.g., the DBSS may verify that values have been entered for
+all fields which do not permit null values.
+.ls
+.ls \fBetable\fR spe
+Call up the forms editor to edit a set of records.  The operand \fIspe\fR
+may be any general select expression.
+.le
+.ls \fBpform\fR spe
+Print a set of records on the standard output, using the forms generator to
+generate a nice self documenting format.
+.le
+.le
+
+
+The \fBforms editor\fR (etable) may be used to display or edit existing records
+as well as to enter new ones.  It is desirable for the forms editor to be able
+to move backward as well as forward in a table, as well as to move randomly
+to a record satisfying a predicate, i.e., search through the table for a
+record.  This makes the forms editor a powerful tool for browsing through a
+database.  If the predicate for a search is specified by entering values or
+boolean expressions into the fields contributing to the predicate then we have
+a query-by-form utility, which has been reported in the literature to be very
+popular with users (since one does not have to remember a syntax and typing
+is minimized).
+
+A variation on the forms editor is \fBpform\fR, used to output records in
+"forms" format.  This will be most useful for large records or for cases where
+one is more interested in studying individual records than in comparing
+different records.  The alternative to forms output is list or tabular format
+output.  This form of output is more concise and can be used as input to the
+\fBlists\fR operators, but may be harder to read and may overflow the output
+line.  List format output is discussed further in the next section.
+
+By default the format of a form is determined automatically by a
+\fBforms generator\fR using information given in the DDL when the database
+was created.  The domain definition capability of the DDL includes provisions
+for specifying the default output format for a field as well as the field label.
+In most cases this will be sufficient information for the forms generator to
+generate an esthetically acceptable form.  If desired the user or programmer can
+modify this form or create a new form from scratch, and the forms generator
+will use the customized form rather than create one of its own.
+
+The CL \fBeparam\fR parameter file editor is an example of a simple forms
+editor.  The main differences between \fBeparam\fR and \fBetable\fR are the
+forms generator and the browsing capability.
+
+.nh 4
+List Interface
+
+    The \fBlist\fR is one of the standard IRAF data structures.  A list is
+an ascii table wherein the standard record delimiter is the newline and the
+standard field delimiter is whitespace.  Comment lines and blank lines are
+ignored within lists; double comment lines ("## ...") may optionally be used
+to label the columns of a list.  By default, non-DBMS lists are free format;
+strings must be quoted if they contain one of the field delimiter characters.
+The field and record delimiter characters may be changed if necessary, e.g.,
+to permit multiline records.  Fixed format lists are available as an option
+and are often required to interface to external (non-IRAF) programs.
+
+The primary advantages of the list or tabular format for printed tables are
+the following.
+.ls
+.ls [1]
+The list or tabular format is the most concise form of printed output.
+The eye can rapidly scan up and down a column to compare the values of
+the same field in a set of records.
+.le
+.ls [2]
+DBMS list output may be used as input to the tasks in the \fBlists\fR,
+\fBplot\fR, and other packages.  Using the pipe syntax, tasks which
+communicate via lists may be connected together to perform arbitrarily
+complex operations.
+.le
+.ls [3]
+List format output is the defacto standard format for the interchange of
+tabular data (e.g., DBSS tables) amongst different computers and programs.
+A list (usually the fixed format variety) may be written onto a cardimage
+tape for export, and conversely, a list read from a cardimage tape may be
+used to enter a table into a DBSS database.
+.le
+.le
+
+
+The most common use for list format output will probably be to print tables.
+When a table is too wide to fit on a line the user will learn to use
+\fBprojection\fR to print only the fields of interest.  The default format
+for DBMS lists will be fixed format, using the format information provided
+in the DDL specification to set the default output format.  Fixed format
+is best for DBMS lists since it forces the field values to line up in nice
+orderly columns, which are easier for a human to read (fixed format is easier
+and more efficient for a computer to read as well, if not to write).
+The type of format used will be recorded in the list header and a
+\fBlist interface\fR will be provided so that all list processing programs
+can access lists equivalently regardless of their format.
+
+As mentioned above, the list interface can be used to import and export tables.
+In particular, an astronomical catalog distributed on card image tape can be
+read directly into a DBSS table once a format descriptor has been prepared
+and the DDL for the new table has been written and used to create an empty
+table ready to receive the data.  After only a few minutes of setup a user can
+have a catalog entered into the database and be getting final results using
+the query language interface!
+.ls
+.ls \fBrtable\fR listfile output_table
+The list \fIlistfile\fR is scanned, inserting successive records from the
+list into the named output table.  A new output table is created if one does
+not already exist.  The format of the list is taken from the list header
+if there is one, otherwise the format specification is provided by the user
+in a separate file.
+.le
+.ls \fBptable\fR spe
+Print the contents of the relation \fIspe\fR in list form on the standard
+output.  The operand \fIspe\fR may be any general select/project expression.
+.le
+.le
+
+
+The \fBptable\fR operator (introduced in section 4.3.2.1) is used to generate
+list output.  The inverse operation is provided by \fBrtable\fR.
+
+.nh 4
+FITS Table Interface
+
+    The FITS table format is a standard format for the transport of tabular
+data.  The idea is very similar to the cardimage format discussed in the last
+section except that the FITS table standard includes a table header used to
+define the format of the encoded table, hence the user does not have to
+prepare a format descriptor to read a FITS table.  The FITS reader and writer
+programs are part of the \fBdataio\fR package.
+
+.nh 4
+Graphics Interface
+
+    All of the \fBplot\fR package graphics facilities are available for plotting
+DBMS data via the \fBlist\fR interface discussed in section 4.3.2.3.  List
+format output may also be used to generate output to drive external (non-IRAF)
+graphics packages.  Plotting facilities are also available via a direct
+interface within the query language; this latter interface is the most efficient
+and will be the most suitable for most graphics applications.  See section
+2.3 for additional comments on the graphics interface.
+
+.nh 3
+Command Language Interface
+
+    All of the DBMS tasks are CL callable and hence part of the command language
+interface to the DBSS.  For example, a CL script task may implement arbitrary
+relational operators using \fBptable\fR to copy a table into a list, \fBfscan\fR
+and \fBprint\fR to read the list and format the modified list, and finally
+\fBrtable\fR to insert the output list into a table.  The query language may
+also be called from within a CL script to process commands passed on the
+command line, via the standard input, or via a temporary file.
+
+Additional operators are required for randomly accessing records without the
+use of a list; suitable operators are shown below.
+.ls
+.ls \fBdbgets\fR record fields
+The named fields of the indicated record are returned as a free format string
+suitable for decoding into individual fields with \fBfscan\fR.
+.le
+.ls \fBdbputs\fR record fields values
+The named fields of the indicated record are set to the values given in the
+free format value string.
+.le
+.le
+
+
+More sophisticated table and record access facilities are conceivable but
+cannot profitably be implemented until an enhanced CL becomes available.
+
+.nh 3
+Record Selection Syntax
+
+    As we have seen, many of the DBMS operators employ a general record
+selection syntax to specify the set of records to be operated upon.
+The selection syntax will include a list of tables and optionally a
+predicate (boolean expression) to be evaluated for each record in the
+listed tables to determine if the record is to be included in the final
+selection set.  In the simplest case a single table is named with no
+predicate in which case the selection set consists of all records in the
+named table.  Parsing and evaluation of the record selection expression
+is performed entirely by the DBIO interface hence we defer detailed
+discussion of selection syntax to the sections describing DBIO.
+
+.nh 3
+Query Language
+
+    In most database systems the \fBquery language\fR is the primary user
+interface, both for the end-user interactively entering adhoc queries, and for
+the programmer entering queries via the host language interface.  The major
+reasons for this are outlined below.
+.ls
+.ls [1]
+A query language interface is much more powerful than a "task" or subroutine
+based interface such as that described in section 4.3.2.  A query language
+can evaluate queries much more complex than the simple "select" operation
+implemented by DBIO and made available to the user in tasks such as
+\fBptable\fR and \fBrcopy\fR.
+.le
+.ls [2]
+A query language is much more efficient than a task interface for repeated
+queries.  Information about a database may be cached between queries and
+files may remain open between queries.  Complex queries may be executed as
+a series of simpler queries, cacheing the intermediate results in memory.
+Graphs may be generated directly from the data without encoding, writing,
+reading, decoding, and deleting an intermediate list.
+.le
+.ls [3]
+A query language can perform many functions via a single interface, reducing
+the amount of code to be written and supported, as well as simplifying the
+user interface.  For example, a query language can be used to globally
+update (edit) tables, as well as to evaluate queries on the database.
+Lacking a query language, such an editing operation would have to be
+implemented with a separate task which would no doubt have its own special
+syntax for the user to remember (e.g, the \fBhedit\fR task in the \fBimages\fR
+package).
+.le
+.le
+
+
+Unlike most commercial database systems, the DBSS is not built around the
+query language.  The heart of the IRAF DBSS is the DBIO interface, which is
+little more than a glorified record access interface.  The query language
+is a high level applications task built upon DBIO, GIO, and the other interfaces
+constituting the IRAF VOS.  This permits us to delay implementation of the
+query language until after the DBSS is in use and our primary requirements have
+been met, and then implement the query language as an experimental prototype.
+Like all data analysis software, the query language is not required to meet
+our primary requirements (data acquisition and reduction), rather it is needed
+to do interesting things with our data once it has been reduced.
+
+.nh 4
+Query Language Functions
+
+    The query language is a prominent part of the user interface and is
+often used interactively directly by the user, but may also be called
+noninteractively from within CL scripts and by SPP programs.  The major
+functions performed by the query language are as follows.
+.ls
+.ls [1]
+The database management operations, i.e., create/destroy database,
+create/drop table or index, sort table, alter table (add new attribute),
+and so on.
+.le
+.ls [2]
+The relational operations, i.e., select, project, join, and divide
+(the latter is rarely implemented).  These are the operations most used
+to evaluate queries on the database.
+.le
+.ls [3]
+The traditional set operations, i.e., union, intersection, difference,
+and cartesian product.
+.le
+.ls [4]
+The editing operations, i.e, selective record update and delete.
+.le
+.ls [5]
+Operations on the columns of tables.  Compute the sum, average, minimum,
+maximum, etc. of the values in a column of a table.  These operations
+are also required for queries.
+.le
+.ls [6]
+Tabular and graphical output.  The result of any query may be printed or
+plotted in a variety of ways, without need to repeat the query.
+.le
+.le
+
+
+The most important function performed by the query language is of course the
+interactive evaluation of queries, i.e., questions about the data in the
+database.  It is beyond the scope of this document to try to give the reader
+a detailed understanding of how a query language is used to evaluate queries.
+
+.nh 4
+Language Syntax
+
+    The great flexibility of a query language derives from the fact that it is
+syntax rather than parameter driven.  The syntax of the DBMS query language
+has not yet been defined.  In choosing a language syntax there are a several
+possible courses of action: [1] implement a standard syntax, [2] extend a
+standard syntax, or [3] develop a new syntax, e.g., as a variation on some
+existing syntax.
+
+The problem with rigorously implementing a standard syntax is that all query
+languages currently in wide use were developed for commercial applications,
+e.g., for banking, inventory, accounting, customer mailing lists, etc.
+Experimental query languages are currently under development for CAD
+applications, analysis of Landsat imagery, and other applications similar
+to ours, but these are all research projects at the present time.
+The basic characteristics desirable in a query language intended for scientific
+data reduction and analysis seem little different than those provided by a query
+language intended for commercial applications, hence the most practical
+approach is probably to start with some existing query language syntax and
+modify or extend it as necessary for our type of data.
+
+There is no standard query language for relational databases.
+The closest thing to a standard is SQL, a language originally developed by
+IBM for System-R (one of the first relational database systems, actually an
+experimental prototype), and still in use in the latest IBM product, DB2.
+This language has since been used in many relational products by many companies.
+SQL is the latest in a series of relational query languages from IBM; earlier
+languages include SQUARE and SEQUEL.  The second most widely used relational
+query language appears to be QUEL, the query language used in both educational
+and commercial INGRES.
+
+Both SQL and QUEL are examples of the so-called "calculus" query languages.
+The other major type of query language is the "algebraic" query language
+(excluding the forms and menu based query languages which are not syntax
+driven).  Examples of algebraic languages are ISBL (PRTV, Todd 1976),
+TABLET (U. Mass.), ASTRID (Gray 1979), and ML (Li 1984).
+These algebraic languages have all been implemented and used, but nowhere
+near as widely as SQL and QUEL.
+
+It is interesting to note that ASTRID and ML were developed by researchers
+active in the area of logic languages.  In particular, the ML (Mathematics-Like)
+query language was implemented in Prolog and some of the character of Prolog
+shows through in the syntax of the language.  There is a close connection
+between the relational algebra and the predicate calculus (upon which the
+logic languages are based) which is currently being actively explored.
+One of the most promising areas of application for the logic languages
+(upon which the so-called "fifth generation" technology is based) is in
+database applications and query languages in particular.
+
+There appears to be no compelling reason for the current dominance of the
+calculus type query language, other than the fact that is what IBM decided
+to use in System-R.  Anything that can be done in a calculus language can
+also be done in an algebraic language and vice versa.
+
+The primary difference between the two languages is that the calculus languages
+want the user to express a complex query as a single large statement,
+whereas the algebraic languages encourage the user to execute a complex
+query as a series of simpler queries, storing the intermediate results as
+snapshots or views (either language can be used either way, but the orientation
+of the two languages is as stated).  For simple queries there is little
+difference between the two languages, although the calculus languages are
+perhaps more readable (more English-like) while the algebraic languages are
+more concise and have a more mathematical character.
+
+The orientation of the calculus languages towards doing everything in a single
+statement provides more scope for optimization than if the equivalent query is
+executed as a series of simpler queries; this is often cited as one of the
+major advantages of the calculus languages.  The procedural nature of the
+algebraic languages does not permit the type of global optimizations employed
+in the calculus languages, but this approach is perhaps more user-friendly
+since the individual steps are easy to understand, and one gets to examine
+the intermediate results to figure out what to do next.  Since a complex query
+is executed incrementally, intermediate results can be recomputed without
+starting over from scratch.  It is possible that, taking user error and lack
+of forethought into account, the less efficient algebraic languages might end
+up using less computer time than the super efficient calculus languages for
+comparable queries.
+
+A further advantage of the algebraic language in a scientific environment is
+that there is more of a distinction between executing a query and printing
+the results of the query than in a calculus language.  The intermediate results
+of a complex query in an algebraic language are named relations (snapshots
+or views); an extra print command must be entered to examine the intermediate
+result.  This is an advantage if the query language provides a variety of ways
+to examine the result of a query, e.g., as a printed table or as some type
+of plot.
+
+.nh 4
+Sample Queries
+
+    At this point several examples of actual queries, however simple they may
+be, should help us to visualize what a query language is like.  Several
+examples of typical scientific queries were given (in English) in section 3.2.1.
+For the convenience of the reader these are duplicated here, followed by actual
+examples in the query languages SQL, QUEL, ASTRID, and ML.  It should be noted
+that these are all examples of very simple queries and these examples do little
+to demonstrate the power of a fully relational query language.
+.ls
+.ls [1]
+Find all objects of type "pqr" for which X is in the range A to B and
+Z is less than 10.
+.le
+.ls [2]
+Compute the mean and standard deviation of attribute X for all objects
+in the set [1].
+.le
+.ls [3]
+Compute and plot (X-Y) for all objects in set [1].
+.le
+.ls [4]
+Plot a circle of size (log2(Z-3.2) * 100) at the position (X,Y) of all objects
+in set [1].
+.le
+.ls [5]
+Print the values of the attributes OBJ, X, Y, and Z of all objects of type
+"pqr" for which X is in the range A to B and Y is greater than 30.
+.le
+.le
+
+
+It should not be difficult for the imaginative reader to make up similar
+queries for a particular astronomical catalog or data archive.
+For example (I can't resist), "find all objects for which B-V exceeds X",
+"find all recorded observations of object X", "find all observing runs on
+telescope X in which astronomer Y participated during the years 1975 to
+1985", "compute the number of cloudy nights in August during the years
+1985 to 1990", and so on.  The possibilities are endless.
+
+Query [5] is an example of a simple select/project query.  This query is
+shown below in the different query languages.  Note that whitespace may be
+redistributed in each query as desired; in particular, the entire query may
+be entered on a single line if desired.  Keywords are shown in upper case
+and data names or values in lower case.  The object "table" is the table
+from which records are to be selected, "pqr" is the desired value of the
+field "type" of table "table", and "x", "y", and "z" are numeric fields of
+the table.
+
+
+.ks
+.nf
+SQL:
+
+	SELECT	obj, x, y, z
+	FROM	table
+	WHERE	type = 'pqr'
+	AND	x >= 10
+	AND	x <= 20
+	AND	z >  30;
+.fi
+.ke
+
+
+.ks
+.nf
+QUEL:
+
+	RANGE OF t IS table
+	RETRIEVE (t.obj, t.x, t.y, t.z)
+	WHERE	t.type = 'pqr'
+	AND	t.x >= 10
+	AND	t.y <= 20
+	AND	t.z >  30
+.fi
+.ke
+
+
+.ks
+.nf
+ASTRID (mnemonic form):
+
+	table
+	SELECTED_ON [
+		type = 'pqr'
+		AND x >= 10
+		AND x <= 20
+		AND z >  30
+	] PROJECTED_TO
+		obj, x, y, z
+.fi
+.ke
+
+
+.ks
+.nf
+ASTRID (mathematical form):
+
+	table ;[ type = 'pqr' AND x >= 10 AND x <= 20 AND z < 10 ] %
+		obj, x, y, z
+.fi
+.ke
+
+
+.ks
+.nf
+ASTRID (alternate query showing use of intermediates):
+
+	a := table ;[ type = 'pqr' AND z > 30 ]
+	b := a ;[ x >= 10 AND x <= 20 ]
+	b % obj,x,y,z
+.fi
+.ke
+
+
+.ks
+.nf
+ML (Li/Prolog):
+
+	table : type=pqr, x >= 10, x <= 20, z < 10 [obj,x,y,z]
+.fi
+.ke
+
+
+Note that in ASTRID and ML selection and projection are implemented as
+operators or qualifiers modifying the relation on the left.  To print all
+fields of all records of a table one need only enter the name of the table.
+The logic language nature of such queries is evident if one thinks of the
+query as a predicate or true/false assertion.  Given such an assertion (query),
+the query processor tries to prove the assertion true by finding all tuples
+satisfying the predicate, using the set of rules given (the database).
+
+For simple queries such as these it makes little difference what query language
+is used; many users would probably prefer the SQL or QUEL syntax for these
+simple queries because of the English like syntax.  To seriously evaluate the
+differences between the different languages more complex queries must be tried,
+but such an exercise is beyond the scope of the present document.
+
+As a final example we present, without supporting explanation, an example
+of a more complex query in SQL (from Date, 1986).  This example is based
+upon a "suppliers-parts-projects" database, consisting of four tables:
+suppliers (S), parts (P), projects (J), and number of parts supplied to
+a specified project by a specified supplier (SPJ), with fields 'supplier
+number' (S#), 'part number' (P#) and 'project number' (J#).  The names
+SPJX and SPJY are aliases for SPJ.  This example is rather contrived and
+the data is not interesting, but it should serve to illustrate the use of
+SQL for complex queries.
+
+
+.ks
+.nf
+Query: Get part numbers for parts supplied to all projects in London.
+
+	SELECT	DISTINCT p#
+	FROM	spj spjx
+	WHERE	NOT EXISTS
+	      ( SELECT	*
+		FROM	j
+		WHERE	city = 'london'
+		AND	NOT EXISTS
+		      ( SELECT	*
+			FROM	spj spjy
+			WHERE	spjy.p# = spjx.p#
+			AND	spjy.j# = j.j# ));
+.fi
+.ke
+
+
+The nesting shown in this example is characteristic of the calculus languages
+when used to evaluate complex queries.  Each SELECT implicitly returns an
+intermediate relation used as input to the next higher level subquery.
+
+.nh 3
+DB Kernel Operators
+
+    All DBMS operators described up to this point have been general purpose
+operators with no knowledge of the form in which data is stored internally.
+Additional operators are required in support of the standard IRAF DB kernels.
+These will be implemented as CL callable tasks in a subpackage off DBMS.
+
+.nh 4
+Dataset Copy and Load
+
+    Since our intention is to store the database in a machine independent
+format, special operators are not required to backup, reload, or copy dataset
+files.  The binary file copy facilities provided by IRAF or the host system
+may be used to backup, reload, or copy dataset files.
+
+.nh 4
+Rebuild Dataset
+
+    Over a period of time a dataset which is subjected to heavy updating
+may become disordered internally, reducing the efficiency of a most record
+access operations.  A utility task is required to efficiently rebuild such
+datasets.  The same result can probably be achieved by an \fIrcopy\fR
+operation but a lower level operator may be more efficient.
+
+.nh 4
+Mount Foreign Dataset
+
+    Before a foreign dataset (archive or local format imagefile) can be
+accessed it must be \fImounted\fR, i.e., the DBSS must be informed of the
+existence and type of the dataset.  The details of the mount operation are
+kernel dependent; ideally the mount operation will consist of little more
+than examining the structure of the foreign dataset and making appropriate
+entries in the system catalog.
+
+.nh 4
+Crash Recovery
+
+    A utility is required for recovering datasets which have been corrupted
+as a result of a hardware or software failure.  There should be sufficient
+redundancy in the internal data structures of a dataset to permit automated
+recovery.  The recover operation is similar to a rebuild so perhaps the
+same task can be used for both operations.
+
+.nh 2
+The IMIO Interface
+.nh 3
+Overview
+
+    The Image I/O (IMIO) interface is an existing subroutine interface used
+to maintain and access bulk data arrays (images).  The IMIO interface is built
+upon the DBIO interface, using DBIO to maintain and access the image headers
+and sometimes to access the stored data (the pixels) as well.  For reasons of
+efficiency IMIO directly accesses the bulk data array when large images are
+involved.
+
+Most of the material presented in this section on the image header is new.
+The pixel access facilities provided by the existing IMIO interface will
+remain essentially unchanged, but the image header facilities provided by
+the current interface are quite limited and badly need to be extended.
+The existing header facilities provide support for the major physical image
+attributes (dimensionality, length of each axis, pixel datatype, etc.) plus
+a limited facility for storing user defined attributes.  The main changes
+in the new interface will be excellent support for history records, world
+coordinates, histograms, a bad pixel list, and image masks.  In addition
+the new interface will provide improved support for user defined attributes,
+and greatly improved efficiency when accessing large groups of images.
+The storage structures will be more localized, hopefully causing less
+confusion for the user.
+
+In this section we first discuss the components of an image, concentrating
+primarily on the different parts of the image header, which is quite a
+complex structure.  We then discuss briefly the (mostly existing) facilities
+for header and pixel access.  Lastly we discuss the storage structures
+normally used to maintain images in mass storage.
+
+.nh 3
+Logical Schema
+
+    Images are stored as records in one or more tables in a database.  More
+precisely, the main part of an image header is a record (row) in some table
+in a database.  In general some of the other tables in a database will contain
+auxiliary information describing the image.  Some of these auxiliary tables
+are maintained by IMIO and will be discussed in this section.  Other tables
+will be created by the applications programs used to reduce the image data.
+
+As far as the DBSS is concerned, the pixel segment of an image is a pretty
+minor item, a single array type attribute in the image header.  Since the
+size of this array can vary enormously from one image to the next some
+strategic questions arise concerning where to store the data.  In general,
+small pixel segments will be stored directly in the image header, while large
+pixel segments will be stored in a separate file from that used to store
+the header records.
+
+The major components of an image (as far as IMIO is concerned) are summarized
+below.  More detailed information on each component is given in the following
+sections.
+.ls
+.ls Standard Header Fields
+An image header is a record in a relation initially of type "image".
+The standard header fields include all attributes necessary to describe
+the physical characteristics of the image, i.e., all attributes necessary
+to access the pixels.
+.le
+.ls History
+History records for all images in a database are stored in a separate history
+relation in time sequence.
+.le
+.ls World Coordinates
+An image may have any number of world coordinate systems associated with it.
+These are stored in a separate world coordinate system relation.
+.le
+.ls Histogram
+An image may have any number of histograms associated with it.
+Histograms for all images in a database are stored in a separate histogram
+relation in time sequence.
+.le
+.ls Pixel Segment
+The pixel segment is stored in the image header, at least from the point of
+view of the logical schema.
+.le
+.ls Bad Pixel List
+The bad pixel list, a variable length integer array, is required to physically
+describe the image hence is stored in the image header.
+.le
+.ls Region Mask
+An image may have any number of region masks associated with it.  Region masks
+for all images in a database are stored in a separate mask relation.  A given
+region mask may be associated with any number of different images.
+.le
+.le
+
+
+In summary, the \fBimage header\fR contains the standard header fields,
+the pixels, the bad pixel list, and any user defined fields the user wishes
+to store directly in the header.  All other information describing an image
+is stored in external non-image relations, of which there may be any number.
+Note that the auxiliary tables (world coordinates, histograms, etc.) are not
+considered part of the image header.
+
+.nh 4
+Standard Header Fields
+
+    The standard header fields are those fields required to describe the
+physical attributes of the image, plus those fields required to physically
+access the image pixels.  The standard header fields are summarized below.
+These fields necessarily reflect the current capabilities of IMIO.  Since
+the DBSS provides data independence, however, new fields may be added in
+the future to support future versions of IMIO without rendering old images
+unreadable.
+.ls
+.ls 12 image
+An integer value automatically assigned by IMIO when the image is created
+which uniquely identifies the image within the containing table.  This field
+is used as the primary key in \fIimage\fR type relations.
+.le
+.ls naxis
+Number of axes, i.e., the dimensionality of the image.
+.le
+.ls naxis[1-4]
+A group of 4 attributes, i.e., \fInaxis1\fR through \fInaxis4\fR,
+each specifying the length of the associated image axis in pixels.
+Axis 1 is an image line, 2 is a column, 3 is a band, and so on.
+If \fInaxis\fR is greater than four additional axis length attributes
+are required.  If \fInaxis\fR is less than four the extra fields are
+set to one.  Distinct attributes are used rather than an array so that
+the image dimensions will appear in printed output, to simplify the use
+of the dimension attributes in queries, and to make the image header
+more FITS-like.
+.le
+.ls linelen
+The physical length of axis one (a line of the image) in pixels.  Image lines
+are often aligned on disk block boundaries (stored in an integral number of
+disk blocks) for greater i/o efficiency.  If \fIlinelen\fR is the same as
+\fInaxis1\fR the image is said to be stored in compressed format.
+.le
+.ls pixtype
+A string valued attribute identifying the datatype of the pixels as stored
+on disk.  The possible values of this attribute are discussed in detail below.
+.le
+.ls bitpix
+The number of bits per pixel.
+.le
+.ls pixels
+The pixel segment.
+.le
+.ls nbadpix
+The number of bad pixels in the image.
+.le
+.ls badpix
+The bad pixel list.  This is effectively a boolean image stored in compressed
+form as a variable length integer array.  The bad pixel list is maintained by
+the pixel list package, a subpackage of IMIO, also used to maintain region
+masks.
+.le
+.ls datamin
+The minimum pixel value.  This field is automatically invalidated (set to a
+value greater than \fIdatamax\fR) whenever the image is modified, unless
+explicitly updated by the caller.
+.le
+.ls datamax
+The maximum pixel value.  This field is automatically invalidated (set to a
+value less than \fIdatamin\fR) whenever the image is modified, unless
+explicitly updated by the caller.
+.le
+.ls title
+The image title, a one line character string identifying the image,
+for annotating plots and other forms of output.
+.le
+.le
+
+
+The possible values of the \fIpixtype\fR field are shown below.  The format
+of the value string is "type.host", where \fItype\fR is the logical datatype
+and \fIhost\fR is the host machine encoding used to represent that datatype.
+
+
+.ks
+.nf
+	  TYPE                DESCRIPTION                MAPS TO
+
+	byte.m		unsigned byte ( 8 bits)		short.spp
+	ushort.m	unsigned word (16 bits)		long.spp
+
+	short.m		short integer, signed		short.spp
+	long.m		long integer, signed		long.spp
+	real.m		single precision floating	real.spp
+	double.m	double precision floating	double.spp
+	complex.m	(real,real)			complex.spp
+.fi
+.ke
+
+
+Note that the first character of each keyword is sufficient to uniquely
+identify the datatype.  The ".m" suffix identifies the "machine" to which
+the datatype refers.  When new images are written \fIm\fR will usually be
+the name of the host machine.  When images written on a different machine
+are read on the local host there is no guarantee that the i/o system will
+recognize the formats for the named machine, but at least the format will
+be uniquely defined.  Some possible values for \fIm\fR are shown below.
+
+
+.ks
+.nf
+	dbk		DBK (database kernel) mip-format
+	mip		machine independent (MII integer,
+			    IEEE floating)
+	sun		SUN formats (same as mip?)
+	vax		DEC Vax data formats
+	mvs		DG MV-series data formats
+.fi
+.ke
+
+
+The DBK format is used when the pixels are stored directly in the image header,
+since only the DBK binary formats are supported in DBK binary datafiles.
+The standard i/o system will be support at least the MIP, DBK, SUN (=MIP),
+and VAX formats.  If the storage format is not the host system format
+conversion to and from the corresponding SPP (host) format will occur at the
+level of the FIO interface to avoid an N-squared type conversion matrix in
+IMIO, i.e., IMIO will see only the SPP datatypes.
+
+Examples of possible \fIpixtype\fR values are "short.vax", i.e., a 16 bit signed
+twos-complement byte-swapped integer format, and "real.mip", the 32 bit IEEE
+single precision floating point format.
+
+.nh 4
+History Text
+
+    The intent of the \fIhistory\fR relation is to record all events which
+modify the image data in a dataset, i.e., all operations which create, delete,
+or modify images.  The attributes of the history relation are shown below.
+Records are added to the history table in time sequence.  Each record logically
+contains one line of history text.
+.ls 4
+.ls 12 time
+The date and time of the event.  This value of this field is automatically
+set by IMIO when the history record is inserted.
+.le
+.ls parent
+The name of the parent image in the case of an image creation event,
+or the name of the affected image in the case of an image modification
+event affecting a single image.
+.le
+.ls child
+The name of the child or newly created image in the case of an image creation
+event.  This field is not used if only a single image is involved in an event.
+.le
+.ls event
+The history text, i.e., a one line description of the event.  The suggested
+format is a task or procedure call naming the task or procedure which modified
+the image and listing its arguments.
+.le
+.le
+
+
+.ks
+.nf
+Example:
+
+            TIME         PARENT       CHILD             EVENT
+
+	Sep 23 20:24    nite1[12]       --       imshift (1.5, -3.4)
+	Sep 23 20:30    nite1[10]    nite1[15]
+	Sep 23 20:30    nite1[11]    nite1[15]
+	Sep 23 20:30    nite1[15]       --       nite1[10] - nite1[11]
+.fi
+.ke
+
+
+The principal reason for collecting all history text together in a single
+relation rather than storing it scattered about in string attributes in the
+image headers is to permit use of the DBMS facilities to pose queries on the
+history of the dataset.  Secondary reasons are the completeness of the history
+record thus provided for the dataset as a whole, and increased efficiency,
+both in the amount of storage required and in the time required to record an
+event (in particular, the time required to create a new image).  Note also that
+the history relation may be used to record events affecting dataset objects
+other than images.
+
+The history of any particular image is easily recovered by printing the values
+of the \fItext\fR field of all records with a particular value of the
+\fIimage\fR key.  The parents or children of any image are easily traced
+using the information in the history relation.  The history of the dataset
+as a whole is given by printing all history records in time sequence.
+History information is not lost when intermediate images are deleted unless
+deletes are explicitly performed upon the history relation.
+
+.nh 4
+World Coordinates
+
+    In general, an image may simultaneously have any number of world coordinate
+systems (WCS) associated with it.  It would be quite awkward to try to store an
+arbitrary number of WCS descriptors in the image header, so a separate WCS
+relation is used instead.  If world coordinates are not used no overhead is
+incurred.
+
+Maintenance of the WCS descriptor, transformation of the WCS itself (e.g.,
+when an image changes spatially), and coordinate transformations using the WCS
+are all managed by a dedicated package, also called WCS.  The WCS package
+is a general purpose package usable not only in IMIO but also in GIO and
+other places.  IMIO will be responsible for copying the WCS records for an
+image when a new image is created, as well as for correcting the WCS for the
+effects of subsampling, coordinate flip, etc. when a section of an image is
+mapped.
+
+A general solution to the WCS problem requires that the WCS package support
+both linear and nonlinear coordinate systems.  The problem is further
+complicated by the variable number of dimensions in an image.  In general
+the number of possible types of nonlinear coordinate systems is unlimited.
+Our solution to this difficult problem is as follows.
+.ls 4
+.ls o
+Each image axis is associated with a one or two dimensional mapping function.
+.le
+.ls o
+Each mapping function consists of a general linear transformation followed
+by a general nonlinear transformation.  Either transformation may be unitary
+(may be omitted) if desired.
+.le
+.ls o
+The linear transformation for an axis consists of some combination of a shift,
+scale change, rotation, and axis flip.
+.le
+.ls o
+The nonlinear transformation for an axis consists of a numerical approximation
+to the underlying nonlinear analytic function.  A one dimensional function is
+approximated by a curve x=f(a) and a two dimensional function is approximated
+by a surface x=f(a,b), where X, A, and B may be any of the image axes.
+A choice of approximating functions is provided, e.g., chebyshev or legendre
+polynomial, piecewise cubic spline, or piecewise linear.
+.le
+.ls o
+The polynomial functions will often provide the simplest solution for well
+behaved coordinate transformations.  The piecewise functions (spline and linear)
+may be used to model any slowly varying analytic function represented in
+cartesian coordinates.  The piecewise functions \fIinterpolate\fR the original
+analytic function on a regular grid, approximating the function between grid
+points with a first or third order polynomial.  The approximation may be made
+arbitrarily good by sampling on a finer grid, trading table space for increased
+precision.
+.le
+.ls o
+For many nonlinear functions, especially those defined in terms of the
+transcendental functions, the fitted curve or surface will be quicker to
+evaluate than the original function, i.e., the approximation will be more
+efficient (evaluation of a bicubic spline is not cheap, however, requiring
+computation of a linear combination of sixteen coefficients for each output
+point).
+.le
+.ls o
+The nonlinear transformation will define the mapping from pixel coordinates
+to world coordinates.  The inverse transformation will be computed by numerical
+inversion (iterative search).  This technique may be too inefficient for some
+applications.
+.le
+.le
+
+
+For example, the WCS for a three dimensional image might consist of a bivariate
+Nth order chebyshev polynomial mapping X and Y to RA and DEC via gnomic
+projection, plus a univariate piecewise linear function mapping each discrete
+image band (Z) to a wavelength value.  If the image were subsequently shifted,
+rotated, magnified, block averaged, etc., or sampled via an image section,
+a linear term would be added to the WCS record of each axis affected by the
+transformation.
+
+A WCS is represented by a \fIset\fR of records in the WCS relation.  One record
+is required for each axis mapped by the transformation.  The attributes of the
+WCS relation are described below.  The records forming a given WCS all share
+the same value of the \fIwcs\fR field.
+.ls
+.ls 12 wcs
+The world coordinate system number, a unique integer code assigned by the WCS
+package when the WCS is added to the database.
+.le
+.ls image
+The name of the image with which the WCS is associated.
+If a WCS is to be associated with more
+than one image retrieval must be via the \fIwcs\fR number rather than the
+\fIimage\fR name field.
+.le
+.ls type
+A keyword supplied by the application identifying the type of coordinate
+system defined by the WCS.  This attribute is used in combination with the
+\fIimage\fR attribute for keyword based retrieval in cases where an image
+may have multiple world coordinate systems.
+.le
+.ls axis
+The image axis mapped by the transformation stored in this record.  The X
+axis is number 1, Y is number 2, and so on.
+.le
+.ls axin1
+The first input axis (independent variable in the transformation).
+.le
+.ls axin2
+The second input axis, set to zero in the case of a univariate transformation.
+.le
+.ls axout
+The number of the input axis (1 or 2) to be used for world coordinate output,
+in the case where there is only the linear term but there are two input axes
+(in which case the linear term produces a pair of world coordinate values).
+.le
+.ls linflg
+A flag indicating whether the linear term is present in the transformation.
+.le
+.ls nlnflg
+A flag indicating whether the nonlinear term is present in the transformation.
+.le
+.ls p1,p2
+Linear transformation: origin in pixel space for input axes 1, 2.
+.le
+.ls w1,w2
+Linear transformation: origin in world space for input axes 1, 2.
+.le
+.ls s1,s2
+Linear transformation: Scale factor DW/DP for input axes 1, 2.
+.le
+.ls rot
+Linear transformation: Rotation angle in degrees counterclockwise from the
+X axis.
+.le
+.ls cvdat
+The curve or surface descriptor for the nonlinear term.  The internal format
+of this descriptor is controlled by the relevant math package.
+This is a variable length array of type real.
+.le
+.ls label
+Axis label for plots.
+.le
+.ls format
+Tick label format for plots, e.g., "0.2h" specifies HMS format in a variable
+field width with two decimal places in the seconds field.
+.le
+.le
+
+
+As noted earlier, the full transformation for an axis involves a linear
+transformation followed by a nonlinear transformation.  The linear term
+is defined in terms of the WCS attributes \fIp1, p2\fR, etc. as shown below.
+The variables X and Y are the input values of the axes \fIaxin1\fR and
+\fIaxin2\fR, which need not correspond to the X and Y axes of the image.
+
+
+.ks
+.nf
+	x' = (x - p1) * s1
+	y' = (y - p2) * s2
+
+	x" = x' * cos(rot) + y' * sin(rot)
+	y" = y' * cos(rot) - x' * sin(rot)
+
+	u  = x" + w1
+	v  = y" + w2
+.fi
+.ke
+
+
+The output variables U and V are then used as input to the nonlinear mapping,
+producing the world coordinate value W for the specified image axis \fIaxis\fR
+as output.
+
+	w  = eval (cvdat, u, v)
+
+The mappings for the special cases [1] no linear transformation,
+[2] no nonlinear transformation, and [3] univariate rather than bivariate
+transformation, are easily derived from the full transformation shown above.
+Note that if there is no nonlinear term the linear term produces world
+coordinates as output, otherwise the intermediate values (U,V) are in
+pixel coordinates.  Note also that if there is no nonlinear term but there
+are two input axes (as in the case of a rotation), attribute \fIaxout\fR
+must be set to indicate whether U or V is to be returned as the output world
+coordinate.
+
+.nh 4
+Image Histogram
+
+    Histogram records are stored in a separate histogram relation outside
+the image header.  An image may have any number of histograms associated
+with it, each defined for a different section of the image.  A given image
+section may have multiple associated histogram records differing in time,
+number of sampling bins, etc., although normally recomputation of the
+histogram for a given section will result in a record update rather than an
+insertion.  A subpackage within IMIO is responsible for the computation of
+histogram records.  Histogram records are not propagated when an image is
+copied.  Modifications to an image made subsequent to computation of a
+histogram record may invalidate or obsolete the histogram.
+.ls 4
+.ls 12 image
+The name of the image or image section to which the histogram record
+applies.
+.le
+.ls time
+The date and time when the histogram was computed.
+.le
+.ls z1
+The pixel value associated with the first bin of the histogram.
+.le
+.ls z2
+The pixel value associated with the last bin of the histogram.
+.le
+.ls npix
+The total number of pixels used to compute the histogram.
+.le
+.ls nbins
+The number of bins in the histogram.
+.le
+.ls bins
+The histogram itself, i.e., an array giving the number of pixels in each
+intensity range.
+.le
+.le
+
+
+The histogram limits Z1 and Z2 will normally correspond to the minimum and
+maximum pixel values in the image section to which the histogram applies.
+
+.nh 4
+Bad Pixel List
+
+    The bad pixel list records the positions of all bad pixels in an image.
+A "bad" pixel is a pixel which has an invalid value and which therefore should
+not be used for image analysis.  As far as IMIO is concerned a pixel is either
+good or bad; if an application wishes to assign a fractional weight to
+individual pixels then a second weight image must be associated with the
+data image by the applications program.
+
+Images tend to have few or no bad pixels.  When bad pixels are present they
+are often grouped into bad regions.  This makes it possible to use data
+compression techniques to efficiently represent the set of bad pixels,
+which is conceptually a simple boolean mask image.
+
+The bad pixel list is represented in the image header as a variable length
+integer array (the runtime structure is slightly more complex).
+This integer array consists of a set of lists.  Each list in the set lists
+the bad pixels in a particular image line.  Each linelist consists of a record
+length field and a line number field, followed by the bad pixel list for that
+line.  The bad pixel list is a series of either column numbers or ranges of
+column numbers.  Single columns are represented in the list as positive
+integers; ranges are indicated by a negative second value.
+
+
+.ks
+.nf
+	15   2 512 512
+	 6  23   4   8   15 -18  44
+	 4  72  23 -29   35
+.fi
+.ke
+
+
+An example of a bad pixel list describing a total of 15 bad pixels is shown
+above.  The first line is the pixel list header which records the total list
+length (15 ints), the number of dimensions (2), and the sizes of each dimension
+(512, 512).  There follow a set of variable length line list records.
+Two such lists are shown in the example, one for line 23 and one for line 72.
+On line 23 columns 4, 8, 15 though 18, and 44 are all bad.  Note that each
+linelist contains only a line number since the list is two dimensional;
+in general an N dimensional image requires N-1 subscripts after the record
+length field, starting with the line number and proceeding to higher dimensions
+to the right.
+
+Even though IMIO provides a bad pixel list capability, many applications will
+not want to bother to check for bad pixels.  In general, pointwise image
+operators which produce a new image as output will not need to check for bad
+pixels.  Non-pointwise image operators, e.g., filtering opertors, may or may
+not wish to check for bad pixels (in principle they should use kernel collapse
+to ignore bad pixels).  Analysis programs, i.e., programs which produce
+database records as output rather than create new images, will usually check
+for and ignore bad pixels.
+
+To avoid machine traps when running the pointwise image operators, all bad
+pixels must have reasonable values, even if these values have to be set
+artificially when the data is archived.  IMAGES SHOULD NOT BE ARCHIVED WITH
+MAGIC IN-PLACE VALUES FOR THE BAD PIXELS (as in FITS) since this forces the
+system to conditionally test the value of every pixel when the image is read,
+an unnecessary operation which is quite expensive for large images.
+The simplicity of the reserved value scheme does not warrant such an expense.
+Note that the reverse operation, i.e., flagging the bad pixels by setting
+them to a magic value, can be carried out very efficiently by the reader
+program given a bad pixel list.
+
+For maximum efficiency those operators which have to deal with bad pixels may
+provide two separate data paths internally, one for data which contains no
+bad pixels and one for data containing some bad pixels.  The path to be taken
+would be chosen dynamically as each image line is input, using the bad pixel
+list to determine which lines contain bad pixels.  Alternatively a program
+may elect to have the bad pixels flagged upon input by assignment of a magic
+value.  The two-path approach is the most desirable one for simple operators.
+The magic value approach is often simplest for the more complex applications
+where duplicating the code to provide two data paths would be costly and the
+operation is already so expensive that the conditional test is not important.
+
+All operations and queries on bad pixel lists are via a general pixel list
+package which is used by IMIO for the bad pixel list but which may be used
+for any other type of pixel list as well.  The pixel list package provides
+operators for creating new lists, adding and deleting pixels and ranges of
+pixels from a list, merging lists, and so on.
+
+.nh 4
+Region Mask
+
+    A region mask is a pixel list which defines some subset of the pixels in
+an image.  Region masks are used to define the region or regions of an image
+to be operated upon.  Region masks are stored in a separate mask relation.
+A mask is a type of pixel list and the standard pixel list package is used
+to maintain and access the mask.  Any number of different region masks may be
+associated with an image, and a given region mask may be used in operations
+upon any number of different images.
+.ls 4
+.ls 12 mask
+The mask number, a unique integer code assigned by the pixel list package
+when the mask is added to the database.
+.le
+.ls image
+The image or image section associated with the mask, if any.
+.le
+.ls type
+The logical type of the mask, a keyword supplied by the applications program
+when the mask is created.
+.le
+.ls naxis
+The number of axes in the mask image.
+.le
+.ls naxis[1-4]
+The length of each image axis in pixels.  If \fInaxis\fR is greater than 4
+additional axis length attributes must be provided.
+.le
+.ls npix
+The total number of pixels in the subset defined by the mask.
+.le
+.ls pixels
+The mask itself, a variable length integer array.
+.le
+.le
+
+
+Examples of the use of region masks include specifying the regions to be
+used in a surface fit to a two dimensional image, or specifying the regions
+to be used to correlate two or more images for image registration.
+A variety of utility tasks will be provided in the \fIimages\fR package for
+creating mask images, interactively and otherwise.  For example, it will
+be possible to display an image and use the image cursor to mark the regions
+interactively.
+
+.nh 3
+Group Data
+
+    The group data format associates a set of keyword = value type
+\fBgroup header\fR parameters with a group of images.  All of the images in
+a group should have the same size, number of dimensions, and datatype;
+this is required for images to be in group format even though it is not
+physically required by the database system.  All of the images in a group
+share the parameters in the group header.  In addition, each image in a
+group has its own private set of parameters (attributes), stored in the
+image header for that image.
+
+The images forming a group are stored in the database as a named base table
+of type \fIimage\fR.  The name of the base table must be the same as the name
+of the group.  Each group is stored in a separate table.  The group headers
+for all groups in the database are stored in a separate \fIgroups\fR table.
+The attributes of the \fIgroups\fR relation are described below.
+.ls 4
+.ls 12 group
+The name of the group (\fIimage\fR table) to which this record belongs.
+.le
+.ls keyword
+The name of the group parameter represented by the current record.
+The keyword name should be FITS compatible, i.e., the name must not exceed
+eight characters in length.
+.le
+.ls value
+The value of the group parameter represented by the current record, encoded
+FITS style as a character string not to exceed 20 characters in length.
+.le
+.ls comment
+An optional comment string, not to exceed 49 characters in length.
+.le
+.le
+
+
+Group format is provided primarily for the STScI/SDAS applications, which
+require data to be in group format.  The format is however useful for any
+application which must associate an arbitrary set of \fIglobal\fR parameters
+with a group of images.  Note that the member images in a group may be
+accessed independently like any other IRAF image since each image has a
+standard image header.  The primary physical attributes will be identical
+in all images in the group, but these attributes must still be present in
+each image header.  For the SDAS group format the \fInaxis\fR, \fInaxisN\fR,
+and \fIbitpix\fR parameters are duplicated in the group header.
+
+.nh 3
+Image I/O
+
+    In this section we describe the facilities available for accessing
+image headers and image data.  The discussion will be limited to those
+aspects of IMIO relevant to a discussion of the DBSS.  The image i/o (IMIO)
+interface and the image database interface (IDBI) are existing interfaces
+which are more properly described in detail elsewhere.
+
+.nh 4
+Image Templates
+    
+    Most IRAF image operators are set up to operate on a group of images,
+rather than a single image.  Membership in such a group is determined at
+runtime by a so-called \fIimage template\fR which may select any subset
+of the images in the database, i.e., and subset of images from any subset
+of \fIimage\fR type base tables.  This type of group should not be confused
+with the \fIgroup format\fR discussed in the last section.  The image template
+is normally entered by the user on the command line and is dynamically
+converted into a list of images by expansion of the template on the current
+contents of the database.
+
+Given an image template the IRAF applications program calls an IMIO routine
+to "open" the template.  Successive calls to a get image name routine are made
+to operate upon the individual images in the group.  When all images have been
+processed the template is closed.
+
+The images in a group defined by an image template must exist by definition
+when the template is expanded, hence the named images must either be input
+images or the operation must update or delete the named images.  If an
+output image is to be produced for each input image the user must supply the
+name of the table into which the new images are to be inserted.  This is
+exactly the same type of operation performed by the DBMS operators, and in
+fact most image operators are relational operators, i.e., they take a
+relation as input and produce a new relation as output.  Note that the user
+is required to supply only the name of the output table, not the names of
+the individual images.  The output table may be one of the input tables if
+desired.
+
+An image template is syntactically equivalent to a DBIO record selection
+expression with one exception: each image name may optionally be modified
+by appending an \fIimage section\fR to specify the subset of the pixels in
+the image to be operated upon.  An example of an image section string is
+"[*,100]"; this references column 100 of the associated image.  The image
+section syntax is discussed in detail in the \fICL User's Guide\fR.
+
+Since the image template syntax is nearly identical to the general DBIO record
+selection syntax the reader is referred to the discussion of the latter syntax
+presented in section 4.5.6 for further details.  The new DBIO syntax is largely
+upwards compatible with the image template syntax currently in use.
+
+.nh 4
+Image Pixel Access
+
+    IMIO provides quite sophisticated pixel access facilities which it is
+beyond the scope of the present document to discuss in detail.  Complete
+data independence is provided, i.e., the applications program in general
+need not know the actual dimensionality, size, datatype, or storage mode
+of the image, what format the image is stored in, or even what device or
+machine the image resides on.  This is not to say that the application is
+forbidden from knowing these things, since more efficient i/o is possible
+if there is a match between the logical and physical views of the data.
+
+Pixel access via IMIO is via the FIO interface.  The DBSS is charged with
+management of the pixel storage file (if any) and with setting up the
+FIO interface so that IMIO can access the pixels.  Both buffered and virtual
+memory mapped access is supported; which is actually used is transparent to
+the user.  The types of i/o operations provided are "get", "put", and "update".
+The objects upon which i/o may be performed are image lines, image columns,
+N-dimensional subrasters, and pixel lists.
+
+New in the DBIO based version of IMIO are update mode and column and pixel
+list i/o, plus direct access via virtual memory mapping using the static file
+driver.
+
+.nh 4
+Image Database Interface (IDBI)
+
+    The image database interface is a simple keyword based interface to the
+(non array valued) fields of the standard image header.  The IDBI isolates
+the image oriented applications program from the method used to store the
+header, i.e., programs which access the header via the IDBI don't care whether
+the header is implemented upon DBIO or some other record i/o interface.
+In particular, the IDBI is an existing interface which is \fInot\fR currently
+implemented upon DBIO, but which will be converted to use DBIO when it becomes
+available.  Programs which currently use the IDBI should require few if any
+changes when DBIO is installed.
+
+The philosophy of isolating the applications program using IMIO from the
+underlying interfaces is followed in all the subpackages forming the IMIO
+interface.  Additional IMIO subpackages are provided for appending history
+records, creating and reading histograms, and so on.
+
+.nh 3
+Summary of IMIO Data Structures
+
+    As we have seen, an image is represented as a record in a table in some
+database.  The image record consists of a set of standard fields, a set of
+user defined fields, and the pixel segment, or at least sufficient information
+to locate and access the pixel segment if it is stored externally.
+An image database may contain a number of other tables; these are summarized
+below.
+
+
+.ks
+.nf
+	<images>	Image storage (a set of tables named by the user)
+	groups		Header records for group format data
+	histograms	Histograms of images or image sections
+	history		Image history records
+	masks		Region masks
+	wcs		World coordinate systems
+.fi
+.ke
+
+
+Any number of additional application specific tables may be present in an
+actual database.  The names of the application and user defined tables must
+not conflict with the reserved table names shown above (or with the names of
+the DBIO system tables discussed in the next section).  The pixel segment of
+an image and possibly the image header may be stored in a non-DBSS format
+accessed via the HDBI.  All the other tables are stored in the standard DBSS
+format.
+
+.nh 2
+The DBIO Interface
+.nh 3
+Overview
+
+    The database i/o (DBIO) interface is the interface by which all compiled
+programs directly or indirectly access data maintained by the DBSS.  DBIO is
+primarily a high level record manager interface.  DBIO defines the logical
+structure of a database and directly implements most of the operations
+possible upon the objects in a database.
+
+The major functions of DBIO are to translate a record select/project expression
+into a series of physical record accesses, and to provide the applications
+program with access to the contents of the specified records.  DBIO hides the
+the physical structure and contents of the stored records from the applications
+program; providing data independence is one of the major concerns of DBIO.
+DBIO is not directly concerned with the physical storage of tables and records
+in mass storage, nor with the methods used to physically access such objects.
+The latter operations, i.e., the \fIaccess method\fR, are provided by a database
+kernel (DBK).
+
+We first review the philosophy underlying the design of DBIO, and discuss
+how DBIO differs from most commercial database systems.  Next we describe
+the logical structure of a database and introduce the objects making up a
+database.  The method used to define an actual database is described,
+followed by a description of the methods used to access the contents of a
+database.  Lastly we describe the mapping of a DBIO database into physical
+files.
+
+.nh 3
+Comparision of DBIO and Commercial Databases
+
+    The design of the DBIO interface is based on a thorough study of existing
+database systems (most especially System-R, DB2 and INGRES).  It was clear from
+the beginning that these systems were not ideally suited to our application,
+even if the proprietary and portability issues were ignored.  Eventually the
+differences between these commercial database systems and the system we need
+became clear.  The differences are due to a change in focus and emphasis as
+much as to the obvious differences between scientific and commercial
+applications, and are summarized below.
+.ls 4
+.ls o
+The commercial systems are not sufficiently flexible in the types of data that
+can be stored.  In particular these systems do not in general support variable
+length arrays of arbitrary datatype; most do not support even static arrays.
+Only a few systems allow new attributes to be added to existing tables.
+Most systems talk about domains but few implement them.  We need both array
+storage and the ability to dynamically add new attributes, and it appears that
+domains will be quite useful as well.
+.le
+.ls o
+Most commercial systems emphasize the query language, which forms the basis
+for the host language interface as well as the user interface.  The query
+language is the focus of these systems.  In our case the DBSS is embedded
+within IRAF as one of many subsystems.  While we do need query language
+facilities at the user level, we do not need such sophisticated facilities
+at the DBIO level and would rather do without the attendant complexity and
+overhead.
+.le
+.ls o
+Commercial database systems are designed for use in a multiuser transaction
+processing environment.  Many users may simultaneously be performing update
+and revtrieval operations upon a single centralized database.  The financial
+success of the company may well depend upon the integrity of the database.
+Downtime can be very expensive.
+
+In contrast we anticipate having many independent databases.  These will be
+of two kinds: public and private.  The public databases will virtually always be
+accessed read only and the entire database can be locked for exclusive access
+if it should ever need updating.  Only the private databases are subject to
+heavy updating; concurrent access is required for background jobs but the
+granularity of locking can be fairly coarse.  If a database should become
+corrupted it can be fixed at leisure or even regenerated from scratch without
+causing great hardship.  Concurrency, integrity, and recovery are therefore
+less important for our applications than in a commercial environment.
+.le
+.ls o
+Most commercial database systems (with the exception of the UNIX based INGRES)
+are quite machine, device, and host system dependent.  In our case portability
+of both the software and the data is a primary concern.  The requirement that
+we be able to archive data in a machine independent format and read it on a
+variety of machines seems to be an unusual one.
+.le
+.le
+
+
+In summary, we need a simple interface which provides flexibility in the way
+in which data can be stored, and which supports complex, dynamic data structures
+containing variable length arrays of any datatype and size.  The commercial
+database systems do not provide enough flexibility in the types of data
+structures they can support, nor do they provide enough flexibility in storage
+formats.  On the other hand, the commercial systems provide a more sophisticated
+host language interface than we need.  DBIO should therefore emphasize flexible
+data structures but avoid a complex syntax and all the problems that come with
+such.  Concurrency and integrity are important but are not the major concerns
+they would be in a commercial system.
+
+.nh 3
+Query Language Interface
+
+    We noted in the last section that DBIO should be a simple record manager
+type interface rather than an embedded query language type interface.  This
+approach should yield the simplest interface meeting our primary requirements.
+Nonetheless a host language interface to the query language is possible and
+can be added in the future without compromising the present DBIO interface
+design.
+
+The query language will be implemented as a conventional CL callable task in
+the DBMS package.  Command input to the query language will be interactively
+via the terminal (the usual case), or noninteractively via a string type
+command line argument or via a file.  Any compiled program can send commands
+to the query language (or to any CL task) using the CLIO \fBclcmd\fR procedure.
+Hence a crude but usable HLI query language interface will exist as soon as
+a query language becomes available.  A true high level embedded query language
+interface could be built using the same interface internally, but this should
+be left to some future compiled version of SPP rather than attempted with the
+current preprocessor.  We have no immediate plans to build such an embedded
+query language interface but there is nothing in the current design to hinder
+such a project should it someday prove worthwhile.
+
+.nh 3
+Logical Schema
+
+    In this section we present the logical schema of a DBIO database.
+A DBIO database consists of a set of \fBsystem tables\fR and a set of
+\fBuser tables\fR.  The system tables define the structure of the database
+and its contents; the user tables contain user data.  All tables are instances
+of named \fBrelations\fR or \fBviews\fR.  Relations and views are ordered
+collections of \fBattributes\fR or \fBgroups\fR of attributes.  Each attribute
+is defined upon some particular \fBdomain\fR.  The structure of the objects
+in a database is defined at runtime by processing a specification written in
+the \fBdata definition language\fR.
+
+.nh 4
+Databases
+
+    A DBIO database is a collection of named tables.  All databases include
+a standard set of \fBsystem tables\fR defining the structure and contents
+of the database.  Any number of user or application defined tables may also
+be present in the database.  The most important system table is the database
+\fIcatalog\fR which includes a record describing each user or system table
+in the database.
+
+Conceptually a database is similar to a directory containing files.  The catalog
+corresponds to the directory and the tables correspond to the files.
+A database is however a different type of object; there need be no obvious
+connection between the objects in a database and the physical directories and
+files used to store a database, e.g., several tables might be stored in one
+file, one table might be stored in many files, the tables might be stored on
+a special device and not in files at all, and so on.
+
+In general the mapping of tables into physical objects is hidden from the user
+and is not important.  The only exception to this is the association of a
+database with a specific FIO directory.  The mapping between databases and
+directories is one to one, i.e., a directory may contain only one database,
+and a database is contained in a single directory.  An entire database can
+be physically moved, copied, backed up, or restored by merely performing a
+binary copy of the contents of the directory.  DBIO dynamically generates all
+file names relative to the database directory, hence moving a database to
+a different directory is harmless.
+
+To hide the database directory from the user DBIO supports the concept of a
+\fBcurrent database\fR in much the way that FIO supports the concept of a
+current directory.  Tables are normally referenced by name, e.g., "ptable masks"
+without explicitly naming the database (i.e., directory) in which the table
+resides.  The current database is maintained independently of the current
+directory, allowing the user to change directories without affecting the
+current database.  This is particularly useful when accessing public databases
+(maintained in a write protected directory) or when accessing databases which
+reside on a remote node.  To list the contents of the current database the
+user must type "pcat" rather than "dir".  The current database defaults to
+the current directory until the user explicitly sets the current database
+with the \fBchdb\fR command.
+
+Databases are referred to by the filename of the database directory.
+The IRAF system will provide a "master catalog" of public databases,
+consisting of little more than a set of CL environment definitions assigning
+logical names to the database directories.  Whenever possible logical names
+should be used rather than pathnames to hide the pathname of the database.
+
+.nh 4
+System Tables
+
+    The structure and contents of a DBIO database are described by the same
+table mechanism used to maintain user data.  DBIO automatically maintains
+the system tables, which are normally protected from writing by the user
+(the system tables can be manually updated like any other table in a desperate
+situation).  Since the system tables are ordinary tables, they can be
+inspected, queried, etc., using the same utilities used to access the user
+data tables.  The system tables are summarized below.
+.ls 4
+.ls 12 syscat
+The database catalog.
+Contains an entry (record) for every table or view in the database.
+.le
+.ls sysatt
+The attribute list table.
+Contains an entry for every attribute in every table in the database.
+.le
+.ls sysddt
+The domain descriptor table.
+Contains an entry for every defined domain in the database.  Any number of
+attributes may share the same domain.
+.le
+.ls sysidt
+The index descriptor table.
+Contains an entry for every primary or secondary index in the database.
+.le
+.le
+
+
+The system tables are visible to the user, i.e., they appear in the database
+catalog.  Like the user tables, the system tables are themselves described by
+entries in the database catalog, attribute list table, and domain descriptor
+table.
+
+.nh 4
+The System Catalog
+
+    The \fBsystem catalog\fR is effectively a "table of contents" for the
+database.  The fields of the catalog relation \fBsyscat\fR are as follows.
+.ls 4
+.ls 12 table
+The name of the user or system table described by the current record.
+Table names may contain any combination of the alphanumeric characters,
+underscore, or period and must not exceed 32 characters in length.
+.le
+.ls relid
+The table identifier.  A unique integer code by which the table is referred
+to internally.
+.le
+.ls type
+Identifies the type of table, e.g., base table or view.
+.le
+.ls ncols
+The number of columns (attributes) in the table.
+.le
+.ls nrows
+The number of rows (records, tuples) in the table.
+.le
+.ls rsize
+The size of a record in bytes, not including array storage.
+.le
+.ls tsize
+An estimate of the total number of bytes of storage currently in use by the
+table, including array storage.
+.le
+.ls ctime
+The date and time when the table was created.
+.le
+.ls mtime
+The date and time when the table was last modified.
+.le
+.ls flags
+A small integer containing flag bits used internally by DBIO.
+These include the protection bits for the table.  Initially only write
+protection and delete protection will be supported (for everyone).
+Additional protections are of course provided by the file system.
+A flag bit is also used to indicate that the table has one or more
+indexes, to avoid an unnecessary search of the \fBsysidx\fR table when
+accessing an unindexed table.
+.le
+.le
+
+
+Only a subset of these fields will be of interest to the user in ordinary
+catalog listings.  The \fBpcatalog\fR task will by default print only the
+most interesting fields.  Any of the other DBMS output tasks may be used
+to inspect the catalog in detail.
+
+.nh 4
+Relations
+
+    A \fBrelation\fR is an ordered set of named attributes, each of which is
+defined upon some specific domain.  A \fBbase table\fR is a named instance
+of some relation.  A base table is a real object like a file; a base table
+appears in the catalog and consumes storage on disk.  The term "table" is
+more general, and is normally used to refer to any object which can be
+accessed like a base table.
+
+A DBIO relation is defined by a set of records describing the attributes
+of the relation.  The attribute lists of all relations are stored in the
+\fBsysatt\fR table, described in the next section.
+
+.nh 4
+Attributes
+
+    An \fBattribute\fR of a relation is a datum which describes some aspect
+of the object described by the relation.  Each attribute is defined by a
+record in the \fBsysatt\fR table, the fields of which are described below.
+The attribute descriptor table, while visible to the user if they wish to
+examine the structure of the database in detail, is primarily an internal
+table used by DBIO to define the structure of a record.
+.ls 4
+.ls 12 name
+The name of the attribute described by the current record.
+Attribute names may contain any combination of the alphanumeric characters
+or underscore and must not exceed 16 characters in length.
+.le
+.ls attid
+The attribute identifier.  A unique integer code by which the attribute is
+referred to internally.  The \fIattid\fR is unique within the relation to
+which the attribute belongs, and defines the ordering of attributes within
+the relation.
+.le
+.ls relid
+The relation identifier of the table to which this attribute belongs.
+.le
+.ls domid
+The domain identifier of the domain to which this attribute belongs.
+.le
+.ls dtype
+A single character identifying the atomic datatype of this attribute.
+Note that domain information is not used for most runtime record accesses.
+.le
+.ls prec
+The precision of the atomic datatype of this attribute, i.e., the number
+of bytes of storage per element.
+.le
+.ls count
+The number of elements of type \fIdtype\fR in the attribute.  If this value
+is one the attribute is a scalar.  Zero implies a variable length array
+and N denotes a static array of N elements.
+.le
+.ls offset
+The offset of the field in bytes from the start of the record.
+.le
+.ls width
+The width of the field in bytes.  All fields occupy a fixed amount of space
+in a record.  In the case of variable length arrays fields \fBoffset\fR and
+\fBwidth\fR refer to the array descriptor.
+.le
+.le
+
+
+In summary, the attribute list defines the physical structure of a record
+as stored in mass storage.  DBIO is responsible for encoding and decoding
+records as well as for all access to the fields of records.  A record is
+encoded as a byte stream in a machine independent format.  The physical
+representation of a record is discussed further in a later section describing
+the DBIO storage structures.
+
+.nh 4
+Domains
+
+    A domain is a restricted implementation of an abstract datatype.
+Simple examples are the atomic datatypes char, integer, real, etc.; no doubt
+these will be the most commonly used domains.  A more interesting example is
+the \fItime\fR domain.  Times are stored in DBIO as attributes defined upon
+the \fItime\fR domain.  The atomic datatype of a time attribute is a four byte
+integer; the value is the long integer value returned by the IRAF system
+procedure \fBclktime\fR.  Integer time values are convenient for time domain
+arithmetic, but are not good for printed output.  The definition of the
+\fItime\fR domain therefore includes a specification for the output format
+which will cause time attributes to be printed as a formatted date/time string.
+
+Domains are used to verify input and to format output, hence there is no
+domain related overhead during record retrieval.  The only exception to
+this rule occurs when returning the value of an uninitialized attribute,
+in which case the default value must be fetched from the domain descriptor.
+
+Domains may be defined either globally for the entire database or locally for
+a specific table.  Attributes in any table may be defined upon a global domain.
+The system table \fBsysddt\fR defines all global and local domains.
+The attributes of this table are outlined below.
+.ls 4
+.ls 12 name
+The name of the domain described by the current record.
+Domain names may contain any combination of the alphanumeric characters
+or underscore and must not exceed 16 characters in length.
+.le
+.ls domid
+The domain identifier.  A unique integer code by which the domain is referred
+to internally.  The \fIdomid\fR is unique within the table for which the domain
+is defined.
+.le
+.ls relid
+The relation identifier of the table to which this domain belongs.
+This is set to zero if the domain is defined globally.
+.le
+.ls grpid
+The group identifier of the group to which this domain belongs.
+This is set to zero if the domain does not belong to a special group.
+A negative value indicates that the named domain is itself a group
+(groups are discussed in the next section).
+.le
+.ls dtype
+A single character identifying the atomic datatype upon which the domain
+is defined.
+.le
+.ls prec
+The precision of the atomic datatype of this domain, i.e., the number
+of bytes of storage per element.
+.le
+.ls defval
+The default value for attributes defined upon this domain (a byte string of
+length \fIprec\fR bytes).  If no default value is specified DBIO will assume
+that null values are not permitted for attributes defined upon this domain.
+.le
+.ls minval
+The minimum value permitted.  This attribute is used only for integer or real
+valued domains.
+.le
+.ls maxval
+The maximum value permitted.  This attribute is used only for integer or real
+valued domains.
+.le
+.ls enumval
+If the domain is string valued with a fixed number of permissible value strings,
+the legal values may be enumerated in this string valued field.
+.le
+.ls units
+The units label for attributes defined upon this domain.
+.le
+.ls format
+The default output format for printed output.  All SPP formats are supported
+(e.g., including HMS, HM, octal, etc.) plus some special DBMS formats, e.g.,
+the time format.
+.le
+.ls width
+The field width in characters for printed output.
+.le
+.le
+
+
+Note that the \fIunits\fR and \fIformat\fR fields and the four "*val" fields
+are stored as variable length character arrays, hence there is no fixed limit
+on the sizes of these strings.  Use of a variable length field also minimizes
+storage requirements and makes it easy to test for an uninitialized value.
+Only fixed length string fields and scalar valued numeric fields may be used
+in indexes and selection predicates, however.
+
+A number of global domains are predefined by DBIO.  These are summarized
+in the table below.
+
+
+.ks
+.nf
+	NAME	DTYPE	PREC	DEFVAL
+
+	byte	  u	 1	  0
+	char	  c	arb	nullstr
+	short	  i	 2	INDEFS
+	int	  i	 4	INDEFI
+	long	  i	 4	INDEFL
+	real	  r	 4	INDEFR
+	double    r	 8	INDEFD
+	time      i	 4	  0
+.fi
+.ke
+
+
+The predefined global domains, as well as all user defined domains, are defined
+in terms of the four DBK variable precision atomic datatypes.  These are the
+following:
+
+
+.ks
+.nf
+	NAME	DTYPE	PREC	  DESCRIPTION
+
+	char	  c	>=1	character
+	uint	  u	1-4	unsigned integer
+	int	  i	1-4	signed integer
+	real	  r	2-8	floating point
+.fi
+.ke
+
+
+DBIO stores records with the field values encoded in the machine independent
+variable precision DBK data format.  The precision of an atomic datatype is
+specified by an integer N, the number of bytes of storage to be reserved for
+the value.  The permissible precisions for each DBK datatype are shown in
+the preceding table.  The actual encoding used is designed to simplify the
+semantics of the DBK and is not any standard format.  The DBK binary encoding
+will be described in a later section.
+
+.nh 4
+Groups
+
+    A \fBgroup\fR is a logical grouping of several related attributes.
+A group is much like a relation except that a group is a type of domain
+and may be used as such to define the attributes of relations.  Since groups
+are similar to relations groups are defined in the \fBsysatt\fR table
+(groups do not however appear in the system catalog).  Each member of a
+group is an attribute defined upon some domain; nesting of groups is permitted.
+
+Groups are expanded when a relation is defined, hence the runtime system
+need not be aware of groups.  Expansion of a group produces a set of ordinary
+attributes wherein each attribute name consists of the group name glued
+to the member name with a period, e.g., the resolved attributes "cv.ncoeff"
+and "cv.type" are the result of expansion of a two-member group attribute
+named "cv".
+
+The main purposes of the group construct are to simplify data definition and
+to give the forms generator additional information for structuring formatted
+output.  Groups provide a simple capability for structuring data within a table.
+Whenever the same grouping of attributes occurs in several tables the group
+mechanism should be used to ensure that all instances of the group are
+defined equivalently.
+
+.nh 4
+Views
+
+    A \fBview\fR is a virtual table defined in terms of one or more base
+tables or other views via a record select/project expression.  Views provide
+different ways of looking at the same data; the view mechanism can be very
+useful when working with large, complex base tables (it saves typing).
+Views allow the user to focus on just the data that interests them and ignore
+the rest.  The view mechansism also significantly increases the amount of data
+independence provided by DBIO, since a base table can be made to look
+differently to different applications programs without physically modifying
+the table or producing several copies of the same table.  This capability can
+be invaluable when the tables involved are very large or cannot be modified
+for some reason.
+
+A view provides a "window" into one or more base tables.  The window is
+dynamic in the sense that changes to the underlying base tables are immediately
+visible through the window.  This is because a view does not contain any data
+itself, but is rather a \fIdefinition\fR via record selection and projection
+of a new table in terms of existing tables.  For example, consider the
+following imaginary select/project expression (SPE):
+
+	data1 [x >= 10 and x <= 20] % obj, x, y
+
+This defines a new table with attributes \fIobj\fR, \fIx\fR, and \fIy\fR
+consisting of all records of table \fIdata1\fR for which X is in the range
+10 to 20.  We could use the SPE shown to copy the named fields of the
+selected records to produce a new base table, e.g. \fId1x\fR.
+The view mechanism allows us to define table \fId1x\fR as a view-table,
+storing only the SPE shown.  When the view-table \fId1x\fR is subsequently
+queried DBIO will \fImerge\fR the SPE supplied in the new query with that
+stored in the view, returning only records which satisfy both selection
+expressions.  This works because the output of an SPE is a table and can
+therefore be used as input to another SPE, i.e., two or more selection
+expressions can be combined to form a more complex expression.
+
+A view appears to the user (or to a program) as a table, behaving equivalently
+to a base table in most operations.  View-tables appear in the catalog and
+can be created and deleted much like ordinary tables.
+
+.nh 4
+Null Values
+
+    Null valued attributes are possible in any database system; they are
+guaranteed to occur when the system permits new attributes to be dynamically
+added to existing, nonempty base tables.  DBIO deals with null values by
+the default value mechanism mentioned earlier in the discussion of domains.
+When the value of an uninitialized attribute is referenced DBIO automatically
+supplies the user specified default value of the attribute.  The defaulting
+mechanism supports three cases; these are summarized below.
+.ls 4
+.ls o
+If null values are not permitted for the referenced attribute DBIO will
+return an error condition.  This case is indicated by the absence of a
+default value.
+.le
+.ls o
+Indefinite (or any special value) may be returned as the default value if
+desired, allowing the calling program to test for a null value.
+.le
+.ls o
+A valid default value may be returned, with no checking for null values
+occurring in the calling program.
+.le
+.le
+
+
+Testing for null values in predicates is possible only if the default value
+is something recognizable like INDEF, and is handled by the conventional
+equality operator.  Indefinites are propagated in expressions by the usual
+rules, i.e., the result of any arithmetic expression containing an indefinite
+is indefinite, order comparison where an operand is indefinite is illegal,
+and equality or inequality comparison is legal and is well defined.
+
+.nh 3
+Data Definition Language
+
+    The data definition language (DDL) is used to define the objects in a
+database, e.g., during table creation.  The function of the DBIO table
+creation procedure is to add tuples to the system tables to define a new
+table and all attributes, groups, and domains used in the table.  The data
+definition tuples can come from either of two sources: [1] they can be
+copied in compiled form from an existing table, or [2] they can be
+generated by compilation of a DDL source specification.
+
+In appearance DDL looks much like a series of structure declarations such
+as one finds in most modern compiled languages.  DDL text may be entered
+either via a string buffer in the argument list (no file access required)
+or via a text file named in the argument list to the table creation procedure.
+
+The DDL syntax has not yet been defined.  An example of what a DDL declaration
+for the IMIO \fImasks\fR relation might look like is shown below.  The syntax
+shown is a generalization of the SPP+ syntax for a structure declaration with
+a touch of the CL thrown in.  If a relation is defined only in terms of the
+predefined domains or atomic datatypes and has no primary key, etc., then the
+declaration would look very much like an SPP+ (or C) structure declaration.
+
+
+.ks
+.nf
+	relation masks {
+		u2	mask	{ width=6 }
+		c64	image	{ defval="", format="%20.20s", width=21 }
+		c15	type	{ defval="generic" }
+		byte	naxis
+		long	naxis1, naxis2, naxis3, naxis4
+		long	npix
+		i2	pixels[]
+	} where {
+		key	= mask+image+type
+		comment	= "image region masks"
+	}
+.fi
+.ke
+
+
+The declaration shown identifies the primary key for the relation and gives
+a comment describing the relation, then declares the attributes of the
+relation.  In this example all domains are either local and are declared
+implicitly, or they are global and are predefined.  For example, DBIO will
+automatically create a domain named "type" belonging to the relation "masks"
+for the attribute named "type".  DBIO is assumed to provide default values
+for the attributes of each domain (e.g., "format", "width", etc.) not
+specified explicitly in the declaration.  It should be possible to keep
+the DDL syntax simple enough that a LALR parser does not have to be used,
+reducing text memory requirements and the time required to process the DDL,
+and improving error diagnostics.
+
+.nh 3
+Record Select/Project Expressions
+
+    Most programs using DBIO will be relational operators, taking a table
+as input, performing some operation or transformation upon the table, and
+either updating the table or producing a new table as output.  DBIO record
+select/project expressions (SPE) are used to define the input table.
+By using an SPE one can define the input table to be any subset of the
+fields (projection) of any subset of the records (selection) of any set of
+base tables or views (set union).
+
+The general form of a select/project expression is shown below.  The syntax
+is patterned after the algebraic languages and even happens to be upward
+compatible with the existing IMIO image template syntax.
+
+
+.ks
+.nf
+	tables [pred] [upred] % fields
+
+where
+
+	tables		Is a comma delimited list of tables.
+
+	,		Is the set union operator (in the tables and
+			    fields lists).
+
+	[		Is the selection operator.
+
+	pred		Is a predicate, i.e., a boolean condition.
+			    The simplest predicate is a constant or
+			    list of constants, specifying a set of
+			    possible values for the primary key.
+
+	upred		Is a user predicate, passed back to the
+			    calling program appended to the record
+			    name but not used by DBIO.  This feature
+			    is used to implement image sections.
+
+	%		Is the projection operator.
+
+	fields		Is a comma delimited list of \fIexpressions\fR
+			    defined upon the attributes of the input
+			    relation, defining the attributes of the
+			    output relation.
+.fi
+.ke
+
+
+All components of an SPE are optional except \fItables\fR; the simplest
+SPE is the name of a single table.  Some simple examples follow.
+
+.nh 4
+Examples
+
+    Print all fields of table \fInite1\fR.  The table \fInite1\fR is an image
+table containing several images with primary keys 1, 2, 3, and so on.
+
+	cl> ptable nite1
+
+Print selected fields of table \fInite1\fR.
+
+	cl> ptable nite1%image,title
+
+Plot line 200 of image 2 in table \fInite1\fR.
+
+	cl> graph nite1[2][*,200]
+
+Print image statistics on the indicated images in table \fInite1\fR.
+The example shows a predicate specifying images 1, 3, and 5 through 12,
+not an image section.
+
+	cl> imstat nite1[1,3,5:12]
+
+Print the names and number of bad pixels in tables \fInite1\fR and \fIm87\fR
+for all images that have any bad pixels.
+
+	cl> ptable "nite1,m87 [nbadpix > 0] % image, nbadpix"
+
+
+The tables in an SPE may be general select/project expressions, not just the
+names of base tables or views as in the examples.  In other words, SPEs
+may be nested, using parenthesis around the inner SPE if necessary to indicate
+the order of evaluation.  As noted earlier in the discussion of views,
+the ability of SPEs to nest is used to implement views.  Nesting may also
+be used to perform selection or projection upon the individual input tables.
+For example, the SPE used in the following command specifies the union of
+selected records from tables \fInite1\fR and \fInite2\fR.
+
+	cl> imstat nite1[1,8,21:23],nite2[9]
+
+.nh 3
+Operators

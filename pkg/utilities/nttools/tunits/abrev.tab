@@ -1,0 +1,62 @@
+# Abbreviation table for tunits task
+#
+# Many units have more than one name or abbreviation. This table lists
+# the standard abbreviation for each set of units. The abbreviation is 
+# used internally when computing the conversion factor. Case is not 
+# significant in names and regular plurals (made by adding an  "s") are 
+# converted to the singular. Names should contain only alphabetic characters. 
+# Blanks, underscores and digits are not allowed.
+# 
+# name		abbreviation
+#----------------------------
+meter		m
+centimeter	cm
+kilometer	km
+millimeter	mm
+micrometer	um
+micron		um
+nanometer	nm
+metre		m
+centimetre	cm
+kilometre	km
+millimetre	mm
+micrometre	um
+nanometre	nm
+kilogram	kg
+gram		g
+gm		g
+milligram	mg
+second		s
+sec		s
+minute		min
+hour		hr
+year		yr
+radian		rad
+degree		deg
+arcminute	amin
+arcmin		amin
+arcsecond	asec
+arcsec		asec
+angstrom	a
+parsec		pc
+kiloparsec	kpc
+megaparsec	mpc
+hertz		hz
+kilohertz	khz
+megahertz	mhz
+gigahertz	ghz
+lightyear	ly
+newton		n
+joule		j
+watt		w
+calorie		c
+kilocalorie	kc
+inch		in
+inches		in
+foot		ft
+feet		ft
+ounce		oz
+pound		lb
+liter		l
+jansky		jy
+millijansky	mjy

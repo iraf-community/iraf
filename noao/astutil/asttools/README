@@ -1,0 +1,137 @@
+Astronomical Tools:
+
+Precession:  These routines probably have some history even before the
+    authors quoted as original sources.  They have been collected and
+    some rewritten into SPP by F. Valdes (NOAO), March 1986.  PRECES.F
+    was used originally in V2.3-V2.5 IRAF by George Jacoby.  It has
+    been replaced by ASTPRECESS.X which is the only procedure in the
+    library.
+
+    astprecess.x -- Precession written by F. Valdes based on Astronomical
+	Almanac using new IAU system.
+    precessmgb.x -- Precession + aberration + nutation based on the work of
+	Manchester, Gordon, and Ball
+    precessgj.x -- Originally written by G. Jacoby in Fortran and distributed
+	with V2.3-V2.5 IRAF.  Transcribed to SPP by F. Valdes
+
+    Notes:
+	1. The differences between ASTPRECESS.X and PRECESSGJ.X (
+	   and a routine written by D. Wells for the Cyber and later
+	   used in other NOAO software) are on the order of a few
+	   tenths of a second of arc.  I believe the differences are
+	   due to using 1984 almanac methods in the former and much
+	   earlier methods for the latter.
+	3. PRECESSMGB.X differs considerably from the others to the order
+	   of many seconds of arc.  It does include other effects not
+	   present in the other routines.  It totally fails at DEC=+-90.
+	   It is based on roughly 1970 almanac methods.
+	4. See PRECESS.DOC for comparison.
+
+Radial Velocity:  These formulas for these routines were partly obtained
+    by inspection of the code for the subroutine DOP in the program DOPSET
+    written by R. N. Manchester and M. A. Gordon of NRAO dated January 1970.
+    They have been restructured, revised, and coded in SPP by F. Valdes.
+
+    astvr.x -- Project a velocity vector in radial velocity along line of sight.
+    astvbary.x -- Radial velocity component of center of the Earth relative to
+	to the barycenter of the Earth-Moon system.
+    astvrotate.x -- Radial velocity component of the observer relative to
+	the center of the Earth due to the Earth's rotation.
+    astvorbit.x -- Radial velocity component of the observer relative to
+	the center of the Earth due to the Earth's rotation.
+    astvsun.x -- Projection of the sun's velocity along the given direction.
+
+Coordinates:
+
+    astarcsep.x -- Arc distance (arcsec) between two spherical coordinates
+	(hours, degrees).
+    astcoord.x -- This procedure converts the longitude-latitude coordinates
+	(a1, b1) of a point on a sphere into corresponding coordinates
+	(a2, b2) in a different coordinate system that is specified by
+	the coordinates of its origin (ao, bo) and its north pole (ap,
+	bp) in the original coordinate system.  The range of a2 will be
+	from -pi to pi.
+    astgalactic.x -- Convert equatorial coordinates (1950) to galactic
+	coordinates.
+    astgaltoeq.x -- Convert galactic coordinates to equitorial (1950).
+
+Dates and times:
+
+    asttimes.x:
+	AST_DATE_TO_EPOCH -- Convert Gregorian date and solar mean time to
+	    a Julian epoch.  A Julian epoch has 365.25 days per year and 24
+	    hours per day.
+	AST_EPOCH_TO_DATE -- Convert a Julian epoch to year, month, day, and
+	    time.
+	AST_DAY_OF_YEAR -- The day number for the given year is returned.
+	AST_DAY_OF_WEEK -- Return the day of the week for the given Julian day.
+	    The integer day of the week is 0=Sunday - 6=Saturday.  The
+	    character string is the three character abbreviation for the day
+	    of the week.  Note that the day of the week is for Greenwich
+	    if the standard UT is used.
+	AST_JULDAY -- Convert epoch to Julian day.
+	AST_DATE_TO_JULDAY -- Convert date to Julian day.
+	AST_JULDAY_TO_DATE -- Convert Julian day to date.
+	AST_MST -- Mean sidereal time of the epoch at the given longitude.
+	    This procedure may be used to optain Greenwich Mean Sidereal Time
+	    (GMST) by setting the longitude to 0.
+    asthjd.x:
+	AST_HJD -- Helocentic Julian Day for a direction of observation.
+	AST_JD_TO_HJD -- Helocentic Julian Day for a direction of observation.
+
+Helocentric Parameters:
+
+    astdsun.x:
+	AST_DSUN - Distance to Sun in AU.
+
+Misc:
+
+    astlvac.x:
+	AST_LVAC - Convert air wavelengths to vacuum wavelengths (Angstroms)
+
+Y2K:
+    Most routines work in Julian days or epochs.  If they have an input
+    year it is converted to one of these forms by calling
+    ast_date_to_julday.  This is the only routine that has a Y2K
+    connection.  It assumes two digit years are 20th century.  These
+    routines are Y2K correct.
+
+
+The following are the comments and references from the DOPSET program
+noted above.  The HJD routine was also derived from this code.
+
+C     MODIFIED FOR IBM 360 BY R.N.MANCHESTER AND M.A.GORDON
+C     JANUARY 1970
+C
+C
+C  DOP CALCULATES THE VELOCITY COMPONENT OF THE OBSERVER WITH RESPECT
+C  TO THE LOCAL STANDARD OF REST AS PROJECTED ONTO A LINE SPECIFIED BY T
+C  ASCENSION AND DECLINATION (RAHRS, RAMIN, RASEC, DDEG, DMIN, DSEC) EPO
+C  DATE, FOR A TIME SPECIFIED AS FOLLOWS:  NYR = LAST TWO DIGITS OF THE
+C  (FOR 19XX A.D.), NDAY = DAY NUMBER (GMT), NHUT, NMUT, NSUT = HRS, MIN
+C  (GMT).  THE LOCATION OF THE OBSERVER IS SPECIFIED BY THE LATITUDE (AL
+C  LONGITUDE (OLONG) (GEODETIC) (IN DEGREES) AND ELEVATION (ELEV) (IN ME
+C  ABOVE MEAN SEA LEVEL.  THE SUBROUTINE OUTPUTS THE LOCAL MEAN SIDEREAL
+C  (XLST IN DAYS), THE COMPONENT OF THE SUN*S MOTION WITH RESPECT TO THE
+C  STANDARD OF REST AS PROJECTED ONTO THE LINE OF SIGHT TO THE SOURCE (V
+C  KM/SEC) AS WELL AS THE TOTAL VELOCITY COMPONENT V1 (KM/SEC).  POSITIV
+C  VELOCITY CORRESPONDS TO INCREASING DISTANCE BETWEEN SOURCE AND OBSERV
+C
+C  THIS VERSION OF DOP TAKES INTO ACCOUNT COMPONENTS OF THE OBSERVER*S
+C  MOTION DUE TO THE ROTATION OF THE EARTH, THE REVOLUTION OF THE EARTH-
+C  BARYCENTER ABOUT THE SUN, AND THE MOTION OF THE EARTH*S CENTER ABOUT
+C  EARTH-MOON BARYCENTER.  THE PERTURBATIONS OF THE EARTH*S ORBIT DUE TO
+C  PLANETS ARE NEGLECTED.  THE ABSOLUTE PRECISION OF THIS VERSION OF DOP
+C  ABOUT 0.004 KM/SEC, BUT SINCE THE DOMINANT ERROR TERM IS SLOWLY VARYI
+C  RELATIVE ERROR WILL BE CONSIDERABLY LESS FOR TIMES UP TO A WEEK OR SO
+C
+C  REFERENCES:  MCRAE, D. A., WESTERHOUT, G., TABLE FOR THE REDUCTION OF
+C                  VELOCITIES TO THE LOCAL STANDARD OF REST, THE OBSERVAY=2.
+C                  LUND, SWEDEN, 1956.
+C               SMART, W. M., TEXT-BOOK ON SPHERICAL ASTRONOMY, CAMBRIDG
+C                  UNIV. PRESS, 1962.
+C               THE AMERICAN EPHEMERIS AND NAUTICAL ALMANAC
+C               THE SUPPLEMENT TO THE ABOVE
+C
+C     VERSION OF JUNE 1969
+

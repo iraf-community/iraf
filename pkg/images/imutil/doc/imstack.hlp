@@ -1,0 +1,56 @@
+.help imstack Apr92 images.imutil
+.ih
+NAME
+imstack -- stack images into an image of higher dimension
+.ih
+USAGE	
+imstack images output
+.ih
+PARAMETERS
+.ls images
+List of images to be stacked.
+.le
+.ls output
+Name of output image created.
+.le
+.ls title = "*"
+Title of output image.  If "*" then the title defaults to that of
+the first input image.
+.le
+.ls pixtype = "*"
+Pixel datatype of output image.  If "*" then the pixel datatype defaults to
+that of the first input image.
+.le
+.ih
+DESCRIPTION
+
+The input \fIimages\fR are stacked to form an \fIoutput\fR image having one
+higher dimension than the input images, and a length of that dimension equal
+to the number of input images.  The input images must all be of the same
+dimension and size.
+
+The output image inherits the world coordinate system (WCS) of the first
+input image. If the dimension of the input image WCS is greater than or
+equal to the dimension of the output image, the input WCS is copied to the
+output image WCS without modification. Otherwise the input image WCS
+dimension is incremented by 1 and copied to the output image WCS, the input
+WCS coordinate transformations for each input image axis are copied to the
+output image WCS without modification, and the new output image axis is
+assigned a WCS type of 'linear' and the identity transformation.
+
+.ih
+EXAMPLES
+
+1. Stack a set of four two dimensional images:
+
+	cl> imstack image* image.3d
+
+2. To stack a section of images:
+
+	cl> imstack image*[1:10,1:10] newimage
+.ih
+BUGS
+.ih
+SEE ALSO
+imslice
+.endhelp

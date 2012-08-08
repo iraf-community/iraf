@@ -1,0 +1,47 @@
+.help cvstati May85 "Curfit Package"
+.ih
+NAME
+cvstati -- get integer parameter
+.ih
+SYNOPSIS
+include <math/curfit.h>
+
+ival = cvstati (cv, parameter)
+
+.nf
+pointer	cv		# curve descriptor
+int	parameter	# parameter to be returned
+.fi
+.ih
+ARGUMENTS
+.ls cv     
+The pointer to the curve descriptor structure.
+.le
+.ls parameter
+Parameter to be return.  Definitions in curfit.h are:
+.nf
+	define	CVTYPE		1	# curve type
+	define	CVORDER		2	# order
+	define	CVNCOEFF	3	# number of coefficients
+	define	CVNSAVE		4	# length of save buffer
+.fi
+.le
+.ih
+DESCRIPTION
+The values of integer parameters are returned.  The parameters include
+the curve type, the order, the number of coefficients, and the length
+of the buffer required by CVSAVE (which is of TY_REAL).
+.ih
+EXAMPLES
+.nf
+	include <curfit.h>
+
+	int	cvstati()
+
+	call malloc (buf, cvstati (cv, CVNSAVE), TY_REAL)
+	call cvsave (cv, Memr[buf])
+.fi
+.ih
+SEE ALSO
+cvstatr
+.endhelp

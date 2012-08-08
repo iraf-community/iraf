@@ -1,0 +1,229 @@
+.help icfit Sep91 xtools.icfit
+.ih
+NAME
+icfit -- Interactive curve fitting
+.ih
+SYNOPSIS
+A number of application tasks use the interactive curve fitting tools based
+on the \fBcurfit\fR package for fitting curves to data.  Interactive graphical
+curve fitting begins by graphing the data points and the current fit in one of
+five formats.  When the cursor appears the user may modify the graphs and the
+fit in a number of ways with cursor mode keystrokes and colon commands.
+These are described below.
+.ih
+CURSOR MODE
+.ls ?
+The terminal is cleared and a menu of cursor keys and colon commands is printed.
+.le
+.ls a
+Add points to contrain the fit.  When adding points a query is made to set
+the weights.  A large weight will force the fit to go near the added point.
+The added points are  internal to the fitting routine and are not returned
+or otherwise available to the particular task using the ICFIT capability.
+.le
+.ls c
+The coordinates of the data point nearest the cursor and the fitted value
+are printed on the status line.
+.le
+.ls d
+The data point nearest the cursor and not previously deleted is marked with an
+X.  It will not be used in futher fits unless it is undeleted.
+.le
+.ls f
+A curve is fit to the data and the fit is graphed in the current format.
+.le
+.ls g
+Redefine the graph keys "h-l" from their defaults.  A prompt is given for the
+graph key which is to be redefined and then for the graph desired.
+A '?' to either prompt prints help information.  A graph
+is given by a pair of comma separated data types.  The first data type defines
+the horizontal axis and the second defines the vertical axis.  Any of the
+data types may be graphed along either axis.  The data types are
+.nf
+    x  Independent variable		y  Dependent variable
+    f  Fitted value			r  Residual (y - f)
+    d  Ratio (y / f)			n  Nonlinear part of y
+.fi
+.le
+.ls h, i, j, k, l
+Each key produces a different graph.  The graphs are described by the data
+which is graphed along each axis as defined above.  The default graph keys
+(which may be redefined with the 'g' key) are h=(x,y), i=(y,x), j=(x,r),
+k=(x,d), l=(x,n).
+.le
+.ls o
+Overplot the next fit provided the graph format is not changed.
+.le
+.ls q
+Exit from the interactive curve fitting.  Two consecutive carriage returns
+(cursor end-of-file) may also be used.
+.le
+.ls r
+Redraw the current graph.
+.le
+.ls s
+Select a sample range.  Set the cursor at one end point of the sample before
+typing 's' and then set the cursor to the other endpoint and type any key
+in response to the prompt "again:".  Sample ranges are intersected unless
+the sample ranges have been initialized to all the points with the key 't'.
+.le
+.ls t
+Initialize the sample to include all data points.
+.le
+.ls u
+Undelete the data point nearest the cursor which was previously deleted.
+.le
+.ls v
+Change the fitting weight of the point nearest the cursor.
+.le
+.ls w
+Set the graph window (range along each axis to be graphed).  This is a
+\fBgtools\fR option which prints the prompt "window:".  The set of cursor
+keys is printed with '?' and help is available under the keyword \fBgtools\fR.
+.le
+.ls x
+Change the x value of the point nearest the cursor.
+.le
+.ls y
+Change the y value of the point nearest the cursor.
+.le
+.ls z
+Delete the nearest sample region to the cursor.
+.le
+.ih
+COLON COMMANDS
+Colon commands are show or set the values of parameters.  The parameter names
+may be abbreviated as may the function type.
+
+.ls :show [file]
+Show the current values of all the fitting parameters.  The default output
+is the terminal (STDOUT) and the screen is cleared before the information
+is output.  If a file is specified then the information is appended to the
+named file.
+.le
+.ls :vshow [file]
+A verbose version of "show" which includes the fitted coefficients and their
+errors.
+.le
+.ls :evaluate <value>
+Evaluate the fit at the specified value and print the result on the status
+line.
+.le
+.ls :xyshow [file]
+List the independent (X), dependent (y), fitted (Y fit), and weight values.
+The output may be listed on the screen or to a file.  Note that if the
+original input is combined into composit points (\fInaverage\fR not 1)
+then the values are for the composite points.  Deleted points will have
+a weight of zero.
+.le
+.ls :errors [file]
+Show the fitted function and square root of the chi square of the fit.
+The default output
+is the terminal (STDOUT) and the screen is cleared before the information
+is output.  If a file is specified then the information is appended to the
+named file.
+.le
+.ls :function [value]
+Show the current value or set the function type.  The functions types are
+"chebyshev", "legendre", "spline1", or "spline3" for chebyshev or legendre
+polynomial or linear or cubic spline.
+.le
+.ls :grow [value]
+Show the current value or set the rejection growing radius.  Any points within
+this distance of rejected points are also rejected.
+.le
+.ls :color [value=0-9]
+Color of fit where 0=background (invisible), 1=foreground, and higher
+numbers depend on the graphics device.  Note that this applies to the
+fit and to change the color of the data use ":/color".
+.le
+.ls :markrej [value]
+Mark rejected points?  If there are many rejected points then it might be
+desired not to mark the points.
+.le
+.ls :naverage [value]
+Show the current value or set the number of points to average or median to form
+fitting points.  A positive value select an mean and negative values select
+a median.  The averaged points are also shown in the graphs.
+.le
+.ls :order [value]
+Show the current value or set the order of the function.  For legendre or
+chebyshev polynomials the order is the number of terms (i.e. an order of 2
+has two terms and is a linear function).  For the splines the order is the
+number of spline pieces.
+.le
+.ls :low_reject [value], :high_reject [value]
+Show the current values or set the rejection limits.  When a fit is made
+if the rejection threshold is greater than zero then the sigma of the
+residuals about the fit is computed.  Points with residuals more than
+this number of times the sigma are removed from the final fit.  These
+points are marked on the graphs with diamonds.
+.le
+.ls :niterate [value]
+Show the current value or set a new value for the number of rejection
+iterations.
+.le
+.ls :sample [value]
+Show the current value or set the sample points to use in the fits.  This
+parameter is a string consisting of single points, colon separated ranges,
+or "*" to indicate all points.  A file containing sample strings may also
+be specified by prefixing the file name with the character '@'.
+Note that sample ranges may also be set with the cursor mode key 's'.
+.le
+.ih
+DESCRIPTION
+A one dimensional function is fit to a set of x and y data points.
+The function may be a legendre polynomial, chebyshev polynomial,
+linear spline, or cubic spline of a given order or number of spline pieces.
+
+The points fit are determined by selecting a sample of data specified by
+the parameter \fIsample\fR and taking either the average or median of
+the number of points specified by the parameter \fInaverage\fR.
+The type of averaging is selected by the sign of the parameter and the number
+of points is selected by the absolute value of the parameter.
+
+If \fIniterate\fR is greater than zero the sigma
+of the residuals between the fitted points and the fitted function is computed
+and those points whose residuals are less than \fI-low_reject\fR * sigma
+or \fIhigh_reject\fR * sigma value are excluded from the fit.  Points within
+a distance of \fIgrow\fR pixels of a rejected pixel are also excluded from
+the fit.  The function is then refit without the rejected points.
+The rejection can be iterated the number of times specified by the parameter
+\fIniterate\fR.  Note a rejection value of zero is the same as no rejection.
+The rejected points may be marked with diamonds.  The marking of rejected
+points is controlled by the :markrej command.
+
+There are five types or formats of graphs selected by the keys 'h', 'i', 'j',
+'k', and 'l'.  The graphs are defined by what is plotted on each axis of the
+graph.  There are six data types, any of which may be plotted on either axis.
+These data types are the independent data points (x), the dependent data
+points (y), the fitted values (f), the residuals (r=y-f), the
+ratio of the data to the fit (d=y/f), and the data with the linear term
+of the fit (determined by the endpoints of the fit) subtracted.  The
+default graph keys are shown in the cursor key section though the definitions
+may be modified by the application.  The user may also redefine the graph
+keys using the 'g' key.  This gives a choice of 36 different graph types.
+
+It is important to remember that changing the value of a fitting
+parameter does not change the fit until 'f' is typed.
+.ih
+NOTES
+The sample region is stored internally as a string of length 1024 characters.
+This is greatly increased over versions prior to V2.10.  However, due
+to the fixed default size of string parameters in parameter files (160
+characters), initial sample regions input with a CL parameter are limited
+to this smaller length string.  The limitation may be escaped by using
+the new capability of specifying a file containing ranges.  Also sample
+regions initialize by a task parameter may be extended interactively.
+.ih
+REVISIONS
+.ls ICFIT V2.11
+The :xyshow output was modified to 1) not include colon labels,
+2) print (X, Y, Y fit, Weight) instead of (X, Y fit, Y), and 3)
+the printed values are those actually used in the fit when using
+composite points (naverage not 1).
+.le
+.ih
+SEE ALSO
+gtools
+.endhelp

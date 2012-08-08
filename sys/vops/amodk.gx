@@ -1,0 +1,15 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# AMODK -- Compute the modulus of a vector by a constant (generic).
+
+procedure amodk$t (a, b, c, npix)
+
+PIXEL	a[ARB]
+PIXEL	b
+PIXEL	c[ARB]
+int	npix, i
+
+begin
+	do i = 1, npix
+	    c[i] = mod (a[i], b)
+end

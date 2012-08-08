@@ -1,0 +1,152 @@
+.\" @(#)samp.1 1.0 Oct-2011 MJF
+.TH SAMP 1 "October 2011" "VOClient Project"
+.SH NAME
+samp \- commandline SAMP interface tool
+.SH SYNOPSIS
+\fBsamp\fP [\fI<flags>\fP] [ <\fIresource\fP> [[ <\fIobjname\fP> [ <\fIsr\fP> ]]] ]
+
+\fBvodata\fP [\fI<flags>\fP] [ <\fIresource\fP> [[ <\fIra\fP> <\fIdec\fP> [ <\fIsr\fP> ]]] ]
+
+\fBvodata\fP [\fI<flags>\fP] [ <\fIurl\fP> ]
+
+.SH OPTIONS
+The \fIsamp\fP task accepts the following options:
+.TP 8
+.B \-h
+Print a help summary to the terminal and exit.
+.TP 8
+.B \-d
+Debug output.
+.TP 8
+.B \-v
+Verbose output.
+
+.TP 0
+The following flags control the major behavior of the task:
+of output to present.
+.TP 8
+.B \-m
+Handle multiple messages.  If not set, the task will exit after receipt 
+of the first message.
+.TP 8
+.B \-s \fI<sender>\fR
+Handle messages only from the specified \fI<sender>\fR application.  The
+application name may optionally be the public ID of the application.
+
+.TP 8
+.B \-t \fI<to>\fR
+Send the message to the specified application.  If not set, a message is
+broadcast to all clients subscribed to that particular message.
+.TP 8
+.B \-p \fI<pattern>\fR
+Send the message using the specified messaging pattern.  Allowed values
+are '\fIsynch\dR', '\fIasynch\fR', or '\fInotify\fR'.  Asynchronous messages
+will ignore the reponse message.
+
+.TP 8
+.B \-i
+Process in interactive mode.  The application will register with the 
+Hub once and then process commands typed in at the "samp>" prompt.
+.TP 8
+.B \-f \fI<file>\fR
+Process all commands in the named \fI<file\f>.
+
+
+
+.SH DESCRIPTION
+The \fIsamp\fR application .....
+
+
+
+.SH COMMAND SUMMARY
+.nf
+   Commands:
+
+     snoop                                 print all received messages
+     send <mtype> [<args> ...]             generalized <mtype> message send
+
+     status                                print Hub availability
+     list                                  list all registered clients
+     access <appName>                      print <appName> availability
+     handle <mtype>                        wait for <mtype> message
+
+     exec <cmd>                            execute a client command
+     setenv  <name> <value>                set an environment value
+     getenv  <name>                        get an environment value
+     setparam <name> <value>               set a parameter value
+     getparam <name>                       get a parameter value
+
+     loadImage <url>                       load the named image
+     loadVOTable <url>                     load the named VOTable
+     loadFITS <url>                        load the named FITS bintable
+     loadSpec <url>                        load the named spectrum
+     loadResource <ivorn>                  load the named VO Resource
+ 
+     pointAt <ra> <dec>                    point at given coords
+     showRow [<tblId>] [<url>] <row>       highlight specified row
+     selectRows [<tblId>] [<url>] <rows>   select specified rows
+     bibcode <bibcode>                     load the bibcode
+.fi
+
+
+.SH EXAMPLES
+
+.TP 4
+1) Print SAMP application status information:
+.nf
+
+	% samp status			is Hub available?
+	% samp access topcat		is 'topcat' connected?
+	% samp list			list all available applications
+.fi
+
+.TP 4
+2) Send a message containing the mtype \fIfoo.bar\fR and the 
+parameter \fIfoo\fR with a value of \fItrue\fR to all applications 
+subscribed to this mtype.
+.nf
+
+ 	% samp send foo.bar foo=true
+ 	% samp -t topcat send foo.bar foo=true
+.fi 
+The second example sends the message specifically to 'topcat'.
+
+.TP 4
+3) Start the application an wait for a 'foo.bar' message to arrive.  In
+the second example, we'll continue running to receive multiple messages.
+In the third example, wait for a message only from another 'samp'
+application.
+.nf
+
+ 	% samp handle foo.bar			(1)
+ 	% samp -m handle foo.bar		(2)
+ 	% samp -s samp handle foo.bar		(3)
+.fi 
+
+.TP 4
+4) Process multiple commands from a file:
+.nf
+	% type cmds
+	loadImage http://foo.bar/sif.fits
+	loadVOTable http://foo.bar/sif.fits
+	% samp -f cmds
+    or
+	% cat cmds | samp -f -
+.fi 
+
+
+.SH BUGS
+.PP
+
+
+.SH TODO
+.PP
+
+
+.SH Revision History
+October 2011 - This task is new.
+.SH Author
+Michael Fitzpatrick (fitz@noao.edu), October 2011
+.SH "SEE ALSO"
+
+

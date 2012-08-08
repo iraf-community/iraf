@@ -1,0 +1,4 @@
+# Parameter file for CHKCONFIG
+
+config,f,a,,,,Input configuration file
+verbose,b,h,no,,,Verbose output ?

@@ -1,0 +1,95 @@
+.help apdefault Jul95 noao.twodspec.apextract
+.ih
+NAME
+apdefault -- Set default aperture parameters for the package
+.ih
+USAGE
+apdefault
+.ih
+PARAMETERS
+.ls lower = -5., upper = 5.
+Default lower and upper aperture limits relative to the aperture center.
+These limits are used for apertures found with \fBapfind\fR and when
+defining the first aperture in \fBapedit\fR.
+.le
+.ls apidtable = ""
+Aperture identification table.  This may be either a text file or an
+image.  A text file consisting of lines with an aperture number, beam
+number, and aperture title or identification.  An image will contain the
+keywords SLFIBnnn with string value consisting of aperture number, beam
+number, optional right ascension and declination, and aperture title.  This
+information is used to assign aperture information automatically in
+\fBapfind\fR and \fBapedit\fR.
+.le
+
+.ce
+Default Background Subtraction Parameters
+.ls b_function = "chebyshev"
+Default background fitting function.  The fitting function types are
+"chebyshev" polynomial, "legendre" polynomial, "spline1" linear spline, and
+"spline3" cubic spline.
+.le
+.ls b_order = 1
+Default background function order.  The order refers to the number of
+terms in the polynomial functions or the number of spline pieces in the spline
+functions.
+.le
+.ls b_sample = "-10:-6,6:10"
+Default background sample.  The sample is given by a set of colon separated
+ranges each separated by either whitespace or commas.  The string "*" refers
+to all points.  Note that the background coordinates are relative to the
+aperture center and not image pixel coordinates so the endpoints need not
+be integer.
+.le
+.ls b_naverage = -3
+Default number of points to average or median.  Positive numbers
+average that number of sequential points to form a fitting point.
+Negative numbers median that number, in absolute value, of sequential
+points.  A value of 1 does no averaging and each data point is used in the
+fit.
+.le
+.ls b_niterate = 0
+Default number of rejection iterations.  If greater than zero the fit is
+used to detect deviant fitting points and reject them before repeating the
+fit.  The number of iterations of this process is given by this parameter.
+.le
+.ls b_low_reject = 3., b_high_reject = 3.
+Default background lower and upper rejection sigmas.  If greater than zero
+points deviating from the fit below and above the fit by more than this
+number of times the sigma of the residuals are rejected before refitting.
+.le
+.ls b_grow = 0.
+Default reject growing radius.  Points within a distance given by this
+parameter of any rejected point are also rejected.
+.le
+.ih
+DESCRIPTION
+This task sets the values of the default aperture parameters for the
+tasks \fBapedit\fR and \fBapfind\fR which define new apertures.  For a
+description of the components of an aperture see the paper \fBThe
+APEXTRACT Package\fR.  In \fBapedit\fR the default aperture limits and
+background parameters are only used if there are no other
+apertures defined.  The aperture identification table is used when
+reordering the apertures with the 'o' key.  When run the parameters are
+displayed and modified using the \fBeparam\fR task.
+
+The aperture limits and background fitting sample regions are defined
+relative to the center of the aperture.  The background fitting parameters
+are those used by the ICFIT package.  They may be modified interactively
+with the 'b' key in the task \fBapedit\fR.  For more on background fitting
+and subtracting see \fBapbackground\fR.
+.ih
+EXAMPLES
+To review and modify the default aperture parameters:
+
+	cl> apdefault
+.ih
+.ih
+REVISIONS
+.ls APDEFAULT V2.11
+The aperture ID table information may now be contained in the
+image header under the keywords SLFIBnnn.
+.le
+SEE ALSO
+apbackground, apedit, apfind, icfit
+.endhelp

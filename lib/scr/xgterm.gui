@@ -1,0 +1,14 @@
+# XGTERM.GUI -- Default GUI for Xgterm, providing a standard graphics terminal
+# emulation.
+
+reset-server
+appInitialize irafterm IRAFterm {
+    IRAFterm.objects:   toplevel Gterm gterm
+    *allowShellResize:  true
+    *gterm.warpCursor:  true
+    *gterm.raiseWindow:  true
+    *gterm.deiconifyWindow:  true
+}
+createObjects
+send gterm setGterm
+activate

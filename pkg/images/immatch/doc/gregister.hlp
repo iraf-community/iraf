@@ -1,0 +1,265 @@
+.help gregister Dec98 images.immatch
+.ih
+NAME
+gregister -- transform a list of images from one coordinate system to another
+.ih
+USAGE
+gregister input output database transforms
+.ih
+PARAMETERS
+.ls input
+List of images to be transformed.
+.le
+.ls output
+List of output images.
+.le
+.ls database
+The name of the text file database produced by GEOMAP containing the coordinate
+transformation(s).
+.le
+.ls transforms
+The list of the database record(s) containing the transformations. 
+The number of transforms must be 1 or the same as the number of input
+images.  Transforms is usually the name of the
+text file input to GEOMAP which lists the reference and input
+coordinates of the control points.
+.le
+.ls geometry = "geometric"
+The type of geometry to be applied: The choices are:
+.ls linear
+The linear part, shifts, scales and rotations are computed.
+.le
+.ls geometric
+The full transformation is computed.
+.le
+.le
+.ls xmin = INDEF, xmax = INDEF, ymin = INDEF, ymax = INDEF
+The minimum and maximum x and y reference values of the output image.
+Xmin, xmax, ymin and ymax default to minimum and maximum values set in GEOMAP,
+and may not extend beyond the bounds of those parameters.
+.le
+.ls xscale = 1.0, yscale = 1.0
+The output x and y scales in units of reference x and y
+units per pixel, e.g "/ pixel or Angstroms / pixel if the reference
+coordinates
+are arc-seconds or Angstroms. If the reference coordinates are in pixels
+then xscale and yscale should be 1.0 to preserve the scale of the reference
+image. The default is set for pixel coordinates.
+If xscale and yscale are undefined (INDEF), xscale and yscale default to the
+range of the reference coordinates over the range in pixels.
+Xscale and yscale override the values of ncols and nlines.
+.le
+.ls ncols = INDEF, nlines = INDEF
+The number of columns and lines in the output image. Ncols and nlines default
+to the size of the input image. If xscale or yscale are defined ncols or nlines
+are overridden.
+.le
+.ls xsample = 1.0, ysample = 1.0
+The coordinate surface subsampling factor. The coordinate surfaces are
+evaluated at every xsample-th pixel in x and every ysample-th pixel in y.
+Transformed coordinates  at intermediate pixel values are determined by
+bilinear interpolation in the coordinate surfaces.
+.le
+.ls interpolant = "linear"
+The choices are the following.
+.ls nearest
+Nearest neighbor.
+.le
+.ls linear
+Bilinear interpolation in x and y.
+.le
+.ls poly3
+Third order polynomial in x and y.
+.le
+.ls poly5
+Fifth order polynomial in x and y.
+.le
+.ls spline3
+Bicubic spline.
+.le
+.ls sinc
+2D sinc interpolation. Users can specify the sinc interpolant width by
+appending a width value to the interpolant string, e.g. sinc51 specifies
+a 51 by 51 pixel wide sinc interpolant. The sinc width will be rounded up to
+the nearest odd number.  The default sinc width is 31 by 31.
+.le
+.ls lsinc
+Look-up table sinc interpolation. Users can specify the look-up table sinc
+interpolant width by appending a width value to the interpolant string, e.g.
+lsinc51 specifies a 51 by 51 pixel wide look-up table sinc interpolant. The user
+supplied sinc width will be rounded up to the nearest odd number. The default
+sinc width is 31 by 31 pixels. Users can specify the resolution of the lookup
+table sinc by appending the look-up table size in square brackets to the
+interpolant string, e.g. lsinc51[20] specifies a 20 by 20 element sinc
+look-up table interpolant with a pixel resolution of 0.05 pixels in x and y.
+The default look-up table size and resolution are 20 by 20 and 0.05 pixels
+in x and y respectively.
+.le
+.ls drizzle
+2D drizzle resampling. Users can specify the drizzle pixel fraction in x and y
+by appending a value between 0.0 and 1.0 in square brackets to the
+interpolant string, e.g. drizzle[0.5]. The default value is 1.0.
+The value 0.0 is increased internally to 0.001. Drizzle resampling
+with a pixel fraction of 1.0 in x and y is equivalent to fractional pixel
+rotated block summing (fluxconserve = yes) or averaging (flux_conserve = no)  if
+xmag and ymag are > 1.0.
+.le
+.le
+.ls boundary = "nearest"
+The boundary extension choices are:
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Generate value by reflecting about the boundary.
+.le
+.ls wrap
+Generate a value by wrapping around to the opposite side of the image.
+.le
+.le
+.ls constant = 0.
+The value of the constant for boundary extension.
+.le
+.ls fluxconserve = yes
+Preserve the total image flux. The output pixel values are multiplied by
+the Jacobian of the coordinate transformation.
+.le
+.ls nxblock = 512, nyblock = 512
+If the dimensions of the output image are less than nxblock and nyblock
+then the entire image is transformed at once. Otherwise blocks of size
+nxblock by nyblock are transformed one at a time.
+.le
+.ls verbose = yes
+Print messages about the progress of the task ?
+.le
+.ih
+DESCRIPTION
+
+GREGISTER corrects an image for geometric distortion using the coordinate
+transformation computed by GEOMAP. The transformation is stored as the
+coefficients of a polynomial surface in record \fItransforms\fR,
+in the text file \fIdatabase\fR.
+The coordinate surface is sampled at every \fIxsample\fR and \fIysample\fR
+pixel in x and y.
+The transformed coordinates at intermediate pixel values are
+determined by bilinear interpolation in the coordinate surface. If
+\fIxsample\fR and \fIysample\fR = 1, the coordinate
+surface is evaluated at every pixel. Use of \fIxsample\fR and \fIysample\fR
+are strongly recommended for large images and high order coordinate
+surfaces in order to reduce the execution time.
+
+\fIXmin\fR, \fIxmax\fR, \fIymin\fR and \fIymax\fR define the range of
+reference coordinates represented in the output picture. These numbers
+default to the minimum and maximum x and y reference values used by GEOMAP,
+and may not exceed these values.
+The scale and size of the output picture is determined as follows.
+
+.nf
+	ncols = ncols(input)
+	if (xscale == INDEF)
+	    xscale = (xmax - xmin ) / (ncols - 1)
+	else
+	    ncols = (xmax - xmin) / xscale + 1
+
+	nlines = nlines(input)
+	if (yscale == INDEF)
+	    yscale = (ymax - ymin ) / (nlines - 1)
+	else
+	    nlines = (ymax - ymin) / yscale + 1
+.fi
+
+The output image gray levels are determined by interpolating in the input
+image at the positions of the transformed output pixels. If the
+\fIfluxconserve\fR switch is set the output pixel values are multiplied by
+the Jacobian of the transformation.  GREGISTER uses the routines in the
+2-D interpolation package.
+
+The output image is computed in \fInxblock\fR by \fInyblock\fR pixel sections.
+If possible users should set these numbers to values larger than the dimensions
+of the output image, in order to minimize the number of disk reads and writes
+required to compute the output image.  If this is not feasible and the image
+rotation is small users should set nxblock to be greater than the number of
+columns in the output image, and nyblock to be as large as machine memory
+will permit.
+
+If the environment variable \fInomwcs\fR is "no" then the world coordinate
+system of the input image is modified in the output image to reflect the
+effects of the \fIlinear\fR portion of the registration operation.
+Support does not yet exist in the IRAF world coordinate system interface
+for the higher order distortion corrections that GREGISTER is capable
+of performing.
+
+.ih
+TIMINGS
+It requires approximately 70 and 290 cpu seconds to correct a 512 by 512
+square image for geometric distortion using a low order coordinate surface
+and bilinear and biquintic interpolation respectively (Vax 11/750 far).
+
+.ih
+EXAMPLES
+.ls 4 1.
+Transform an image to the reference coordinate system of a 512 by 512 pixel
+square image. The output image will have the same scale and size as the
+reference image if the reference coordinates are in pixels.
+
+.nf
+cl> geomap coords database 1.0 512.0 1.0 512.0
+cl> gregister input output database coords
+.fi
+.le
+.ls 4 2.
+Repeat the previous example but rescale the output image. The scale of the
+output image will be 2.5 reference units per pixel and its size will be
+determined by the xmin, xmax, ymin, ymax parameters (1.0, 512.0, 1.0, 512.0).
+
+.nf
+cl> geomap coords database 1.0 512.0 1.0 512.0
+cl> gregister input output database coords xscale=2.5 yscale=2.5
+.fi
+.le
+.ls 4 3.
+Correct an image for 3rd order geometric distortion using an output scale of 2
+reference units per pixel unit and bicubic spline interpolation with no flux
+correction. 
+
+.nf
+cl> geomap coords database 1.0 512.0 1.0 512.0 xxorder=4 xyorder=4 \
+xxterms=yes yxorder=4 yyorder=4 yxterms=yes
+cl> gregister input output database coords xscale=2. yscale=2. \
+>>> inter=spline3 flux-
+.fi
+.le
+.ls 4 4.
+Transform three images using 3 different transformation records stored
+in the database file.
+
+.nf
+cl> geomap coord1,coord2,coord3 database 1. 512. 1. 512.
+cl> gregister im1,im2,im3 imout1,imout2,imout3 database \
+>>> coord1,coord2,coords3
+.fi
+.le
+.ls 4 5.
+Repeat the above example using the textfiles inlist, outlist, reclist which
+contain the list of input images, list of output images and list of coordinate
+files respectively.
+
+.nf
+cl> geomap @reclist database 1. 512. 1. 512.
+cl> gregister @inlist @outlist database @reclist
+.fi
+.le
+
+.ih
+BUGS
+Support does yet exist in the IRAF world coordinate system interface
+for the higher order distortion corrections that GREGISTER is capable
+of performing.
+
+.ih
+SEE ALSO
+imshift, magnify, rotate, imlintran, geomap, geotran, geoxytran
+.endhelp

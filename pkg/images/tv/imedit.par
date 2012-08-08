@@ -1,0 +1,24 @@
+input,s,a,,,,Images to be edited
+output,s,a,,,,Output images
+cursor,*imcur,h,"",,,Cursor input
+logfile,s,h,"",,,Logfile for record of cursor commands
+display,b,h,yes,,,Display images?
+autodisplay,b,h,yes,,,Automatic image display?
+autosurface,b,h,no,,,Automatic surface plots?
+aperture,s,h,"circular","|circular|square|",,Aperture type
+radius,r,h,2.,,,Substitution radius
+search,r,h,2.,,,Search radius
+minvalue,r,h,INDEF,,,Minimum value to modify
+maxvalue,r,h,INDEF,,,Maximum value to modify 
+buffer,r,h,1.,0.,,Background buffer width
+width,r,h,2.,1.,,Background width
+xorder,i,h,2,0,,Background x order
+yorder,i,h,2,0,,Background y order
+value,r,h,0.,,,Constant value substitution
+sigma,r,h,INDEF,,,Added noise sigma
+angh,r,h, -33.,,,Horizontal viewing angle (degrees)
+angv,r,h,25.,,,Vertical viewing angle (degrees)
+command,s,h,"display $image 1 erase=$erase fill=yes order=0 >& dev$null",,,Display command
+graphics,s,h,"stdgraph",,,Graphics device
+default,s,h,"b",,,Default option for x-y input
+fixpix,b,h,no,,,Fixpix style input?

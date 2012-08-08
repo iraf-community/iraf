@@ -1,0 +1,602 @@
+System Notes File for IRAF Version 2.15.
+Begun with V2.15 code freeze 22 Nov 2010.
+-------------------------------------------
+
+unix/hlib/install
+    Fixed an old bug when creating the imtoolrc link in cases where the
+    system doesn't already have a /usr/local directory (11/23/10)
+
+unix/hlib/extpkg.cl
+    Changed the test used to define an external package to check for
+    either a ".installed" file (e.g. when using the makefile) or a
+    package .cl script (e.g. when pointing a symlink) (11/23/10)
+
+New distribution files cut.....
+-------------------------------
+
+unix/hlib/irafuser.csh
+unix/hlib/irafarch.csh
+    On 32-bit mac systems the arch wasn't being properly detected (11/24/10)
+
+New distribution files cut.....
+-------------------------------
+
+util/pkginst
+util/pkginit
+util/pkgclean
+util/pkgupdate
+    Updates to allow IRAFARCH to specify the architecture to be installed.
+    Also modified to update script to automatically update all currently
+    installed architectures regardless of IRAFARCH (11/30/10)
+
+unix/hlib/install
+    Added a fix to the '-m' flag
+
+sys/libc/cimdrcur.c
+    The 'wcs' field was not properly converted from int to/from XINT in
+    the interface, causing the value to always be returned as 0 on 64-bit
+    platforms (12/6/10)
+
+pkg/ecl/mkpkg
+    Changed the -ltermcap to -lncurses to use the newer form of this library
+    and eliminate problems with users having to manually created links to
+    satisfy the shared libs (12/6/10)
+
+pkg/ecl/mkpkg
+    Added changes needed for FreeBSD port. (12/23/10)
+
+unix/boot/spp/xc.c
+    Added changes needed for FreeBSD port. (12/23/10)
+    
+unix/hlib/mkpkg.inc
+unix/hlib/irafuser.csh
+    Added changes needed for FreeBSD port. (12/23/10)
+
+util/pkgget
+util/mksrc
+util/mkclean
+util/mkbindist
+    An ERRMSG alias was being used but not defined (12/30/10) 
+
+unix/hlib/irafarch.csh
+    Added 'power macintosh' as a valid uname value for 10.4 PPC systems.
+    (12/31/10)
+
+unix/hlib/irafarch.csh
+    The uname cmd for Solaris had an extra '|' pipe definition (1/3/11)
+
+unix/boot/spp/xc.c
+    The fork() procedure was declared as type int instead of pid_t (1/3/11)
+
+lib/libimc.a -> ../bin/libimc.a +
+pkg/images/immatch/src/imcombine/src/generic/mkpkg
+pkg/images/immatch/src/imcombine/src/mkpkg
+pkg/images/immatch/src/imcombine/mkpkg
+pkg/images/mkpkg
+    Converted the generic combining code into a core library so that
+    other versions of combine (such as in ccdred, mscred, nfextern)
+    will share the same code rather than have copies.  (1/4/11, Valdes)
+
+pkg/tbtables/Revisions+
+tbhanp.x
+tbhpnp.x
+tbttyp.x
+    A couple of trivial changes (see the Revisions file) and:
+    1.  Changes to better control the types and extensions.  The accepted
+        extensions are |tab|fits|fit|fxb|txt|dat|cat|tmp|.
+    2.  If no extensions is given the default is now text instead of STSDAS
+        table.
+    (1/7/11, Valdes)
+
+unix/hlib/extpkg.cl
+    Fixed a typo where 'dp' was defined instead of 'dpkg' (1/14/11)
+
+sys/vops/mkpkg
+    Forced the generation of the ACHT code when compiling the VOPS lib.
+    These routines are doubly-generic but allow for in-place conversion,
+    however there is a difference in the relative datatype size on 32-
+    and 64-bit system (e.g. real and int are the same on 32-bit, int is
+    larger on 64-bit) which causes the loop indexing to be different.
+    By forcing the regeneration of the code on each system we ensure that
+    during a sysgen the code appropriate for the platform will be used.
+    (1/18/11)
+
+unix/os/zzdbg.c			+
+unix/os/zzstrt.c
+    Moved all the (undocumented) debug print functions from the zzstrt.c
+    code into a separate zzdbg.c simply to collect them.  These routines
+    can be used to debug low-level VOS routines but aren't generally used
+    outside of a port situation (1/18/11)
+
+sys/osb/mkpkg
+sys/osb/ieee.gx
+sys/osb/iand32.c		+
+    IEEE NaN masking was being done using only a 32-bit mask.  On 64-bit 
+    systems this would lead to the interpretation of a double-precision
+    exponent as always being zero.  This meant that all TY_DOUBLE FITS
+    files on 64-bit systems would appear to contain only zero pixels. (1/18/11)
+
+sys/imio/imfls.gx
+    Data types needed to be converted on 64-bit systems even when the types
+    are the same due to the need to pack/unpack int pixels (assumed to be
+    32-bit values)  (1/18/11)
+
+sys/imio/impak.gx
+sys/imio/imupk.gx
+    Earlier 64-bit mods to these routines were attempts to work around the
+    in-place conversion bug discovered above.  In impak.gx it is still nec-
+    essary to pack int/long into 32-bit values written to the file  (1/18/11)
+
+pkg/images/imutil/src/nhedit.x
+    The comfile parameter check was modified to allow the "NULL" string as
+    an option to indicate no comfile was present (standard use is the null
+    string "", as was done when the task was first imported to the core
+    system).  More time has been spent whining about this supposed
+    'incompatability' than would have taken to resolve it but this change
+    should work for users even if the external package version of the
+    task is not available.  I don't expect the whining will ever stop, 
+    though.  (1/18/11)
+
+unix/os/zgcmdl.c
+    Changed declaration of 'environ' to quiet warning messages. (1/19/11)
+
+pkg/ecl/readline/mkpkg
+    Changed the execution of the configure cmd to explicityly use "./" (1/20/11)
+
+sys/fmtio/evexpr.y
+sys/fmtio/evvexpr.gy
+    A typo meant that the GT token precedence was set twice (1/24/11)
+
+Makefile
+    Added a 'self_update' target to allow future updates (1/25/11)
+
+.version
+    Added a file with a simple version string for use in scripts (1/25/11)
+
+util/pkgget
+util/pkginit
+util/pkgclean
+util/pkgconfig
+    Minor error-code checks (1/25/11)
+
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/motd
+unix/hlib/install
+unix/hlib/login.cl
+unix/hlib/irafarch.csh
+unix/hlib/zzsetenv.def
+    Updated to v2.15.1 (1/25/11)
+
+pkg/utilities/nttools/stxtools/vexcompile.y
+    Added declaration of vex_gettok() to source grammar. (1/25/11)
+
+sys/fmtio/evexpr.y
+sys/fmtio/evvexpr.gy
+pkg/tbtables/selector/trsopen.y
+noao/digiphot/photcal/parser/parser.y
+pkg/utilities/nttools/tunits/parseunits.y
+pkg/utilities/nttools/stxtools/vexcompile.y
+    Touched the file mod time to force regeneration of parsers. (1/25/11)
+
+unix/boot/xyacc/files		-
+unix/boot/xyacc/dextern		-
+unix/boot/xyacc/yaccnews	-
+unix/boot/xyacc/yaccdiffs	-
+unix/boot/xyacc/dextern.h	+
+unix/boot/xyacc/y[1234].c	+
+unix/boot/xyacc/cddllicense.txt         +
+unix/boot/xyacc/README
+    Replaced XYACC code with a version built from the OpenSolaris project
+    and distributed under the free 'Common Development and Distribution
+    License' (CDDL).  Except for minor line number changes in the generated
+    parser, the production tables and variables used are identical to the
+    earlier XYACC.  This version of XYACC is now free of license restrictions
+    other than those required by the CDDL.  The README file has been updated
+    to reflect these changes. Total effort for the project was 1 day. (1/25/11)
+
+pkg/images/imutil/src/imexpr.gx
+    A use of Memr in the struct was not declared with P2R in the generic code.
+    (1/25/11)
+
+pkg/images/imutil/src/imexpr.gx
+    Modified the behavior of the task so that when a scalar expression is
+    used, all pixels are set to that value.  Previously, only the first pixel
+    was set with the remainder of the image undefined. (1/25/11)
+
+
+------------------------------------------------------
+System Frozen for V2.15.1 Patch         (1/25/11)
+------------------------------------------------------
+
+unix/gdev/sgidev/sgi2uapl.c
+unix/gdev/sgidev/sgi2ueps.c
+    Declaration of the timestamp variable was failing on 64-bit system (2/4/11)
+
+sys/mwcs/wftnx.x
+sys/mwcs/wfzpx.x
+sys/mwcs/wfzpn.x
+    The interative inversion method could runaway leading to an arithmetic
+    exception.  Added a maximum change to each iteration to avoid this.
+    (2/18/11, Valdes)
+
+sys/osb/ieee.gx
+sys/osb/ieeed.x
+unix/osb/ieeer.x
+unix/as.linux64/ieee.gx
+unix/as.linux64/ieeed.x
+unix/as.linux64/ieeer.x
+unix/as.macintel/ieee.gx
+unix/as.macintel/ieeed.x
+unix/as.macintel/ieeer.x
+     The earlier update to fix the double-precision problem left a debug
+     value in the generic code that was never updated in the patch build.
+     This meant that zero pixels in FITS files were being interpreted as
+     128 (the debug value).  (2/17/11)
+
+pkg/dataio/fits/fits_rpixels.x
+pkg/dataio/fits/fits_wpixels.x
+    Buffer sizes were being computed using SZ_INT instead of SZ_INT32 (2/18/11)
+
+sys/fmtio/evexpr.y
+sys/fmtio/evexpr.x
+sys/fmtio/evvexpr.gy
+sys/fmtio/evvexpr.y
+sys/fmtio/evvexpr.x
+    An earlier change to the token declarations had the strange effect of
+    changing the processing of string comparison.  This effectively broke
+    tasks like HSELECT.  Fell back to the earlier (and original) code until
+    this is better understood, however it doesn't appear to be releated to
+    the XYACC changes.  (2/18/11)
+
+pkg/images/tv/imexamine/imexam.h
+    The coordinates arrays in the main structure were improperly indexed
+    with the P2R macro (2/10/11)
+
+.version
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/motd
+unix/hlib/install
+unix/hlib/login.cl
+unix/hlib/irafarch.csh
+unix/hlib/zzsetenv.def
+    Updated to v2.15.1a (2/21/11)
+
+------------------------------------------------------
+System Frozen for V2.15.1a Patch         (2/21/11)
+------------------------------------------------------
+ 
+pkg/tbtables/fitsio/fttrnn.f
+    Disabled NaN checking for this function.  It doesn't work properly on
+    64-bit systems and NaN is seldom used anyway (2/22/11)
+
+sys/imio/imggsc.x
+    The pixels size indexing was incorrect in the case of e.g. 32-bit int
+    pixels and access as a real array.  This was causing access to image
+    columns and higher dimensional data to get bogus values.  (4/4/11)
+
+util/mkup
+    Added extra step to do the core "mkpkg update" (5/2/11)
+
+sys/etc/urlget.x		+
+sys/etc/zzdebug.x
+sys/etc/mkpkg
+    Added a new url_get() procedure for downloading URLs to a named file.
+    Method signature is
+
+	nread = url_get (char url[], char outname[], pointer reply)
+
+    If a 'reply' pointer is supplied, the HTTP reply header is returned
+    as a string which must be allocated to at least SZ_LINE. (5/30/11)
+
+sys/imio/imt/			+
+    Added enhanced IMT expansion interface.  See details in the
+    imio$imt/README file. (6/7/11)
+
+unix/hlib/libc/knames.h
+    Added definitions for imul32() and strsum() (6/17/11)
+
+sys/osb/imul32.c
+    Added code comments forgotten from the initial 64-bit port (6/17/11)
+
+sys/osb/mkpkg
+sys/osb/strsum.c
+    Added a new strsum() procedure to return the 32-bit checksum of an
+    SPP string.  This is used in e.g. generating the filenames for the
+    URL cache.  (6/17/11)
+
+sys/fio/mkpkg
+sys/fio/fcache.x
+    Implemented a proper URL cache mechanism for IRAF that provides
+    programmatic and application interfaces and can be shared with VOClient.
+    Cache names are generated from the filename/URI string (its checksum)
+    to map a URL to a local file resource, access is blocked until the
+    local resource becomes available for use.  Names aren't guaranteed to
+    be unique but collisions should be rare and the mechanism allows URLs
+    to be dealt with easily at the application level. (6/21/11)
+
+unix/os/mkpkg
+unix/os/zfrmdr.c		+
+unix/hlib/libc/knames.h
+unix/hlib/libc/kproto.h
+    Added a new kernel routine to delete directories (6/21/11)
+
+sys/ki/mkpkg
+sys/ki/ki.x
+sys/ki/ki.h
+sys/ki/kfrmdr.x			+
+unix/hlib/knet.h
+    Added KI routines to delete directories (6/21/11)
+
+lib/syserr.h
+lib/syserrmsg
+    Added error messages for rmdir function (6/21/11)
+
+sys/fio/mkpkg
+sys/fio/frmdir.x
+    Added VOS routine to delete directories. (6/21/11)
+
+sys/fio/open.x
+sys/imio/immapz.x
+pkg/tbtables/tbtopn.x
+    Modified file open to handle URLs.  If the filename begins with "http"
+    the file is downloaded to the cache and the cached file is opened. (6/24/11)
+
+unix/hlib/login.cl
+unix/hlib/mkiraf.csh
+unix/hlib/install
+    Added user-specific cache directory name. (6/26/11)
+
+.version
+pkg/cl/cl.par
+pkg/ecl/cl.par
+unix/hlib/motd
+unix/hlib/install
+unix/hlib/login.cl
+unix/hlib/irafarch.csh
+unix/hlib/zzsetenv.def
+    Updated to v2.16DEV (6/30/11)
+
+unix/os/zmaloc.c
+unix/os/zraloc.c
+    Number of bytes was being cast as (int) meaning allocations > 2GB were
+    not being handled properly (6/30/11)
+
+unix/os/zgcmdl.c
+    On OSX systems apps can no longer reliably get the environ pointer,
+    meaning we can't get the argv vector of arguments using the old method.
+    Ifdef'd the code to use the _NSGetArgv() and _NSGetArgc() methods to
+    get pointers to these values from the dynamic libs.  Fixes a problem
+    with cmdline args from IMFORT programs.  (7/15/11)
+
+sys/etc/votable.x
+    Added a new file of VOTable utility procedures. (7/15/11)
+
+unix/os/zfacss.c
+    Modified to check if non-existent file is a symlink, if so, return the
+    access status of the link itself (9/6/11)
+
+unix/hlib/iraf32.h
+unix/hlib/iraf64.h
+unix/hlib/libc/spp.h
+    Added definitions for SYMLINK_FILE type (9/6/11)
+
+sys/fio/delete.x
+    Modified to allow deletion of zombie symlinks (9/6/11)
+
+sys/fio/open.x
+sys/imio/immapz.x
+pkg/tbtables/tbtopn.x
+    Modified to handle file:// URIs (9/6/11)
+
+sys/imio/imt/imxpreproc.x
+    Allowed file:// URIs, no longer confused with concatenation (9/6/11)
+
+sys/libc/strdup.c		+
+sys/libc/proto.h
+unix/hlib/libc/libc.h
+    Added a binding for a strdup() function (9/14/11)
+
+*.hlp
+    Minor modifications to MANY help files to remove duplicate words (9/19/11)
+
+unix/hlib/login.cl
+    Added some (commented out) code to allow user control of SAMP startup
+    on login.  The system-wide method is to turn on the 'samp_onstart'
+    variable in hlib$zzsetenv.def  (9/21/11)
+
+ys/mwcs/wftnx.x
+sys/mwcs/wfzpx.x
+sys/mwcs/wfzpn.x
+    The maximum change revision (2/18/11) did not think through the units.
+    So the value was 1 degree which is probably too large.  This was changed
+    to 30 arcsec.
+    (9/28/11, Valdes)
+
+sys/mwcs/mkpkg
+sys/mwcs/wfinit.x
+sys/mwcs/wftpv.x +
+    Added a new function driver for a WCS called TPV; tangent plane with
+    PV distortion coefficients as described by Calabretta & Greisen in 2000
+    (http://www.astromatic.net/forum/showthread.php?tid=271).
+    (9/28/11, Valdes)
+
+lib/syserr.h
+lib/syserrmsg
+sys/etc/urlget.x
+    Added support for URL redirection (code 300) to access (10/5/11)
+
+system/system.hd
+system/system.men
+system/doc/bench.hlp
+    Added help page for the BENCH task, fixed src entry for SPY task. (10/24/11)
+
+util/fget
+    Added wrapper script around URLGET task that can be used as a backup
+    when there is no WGET command on the machine (11/19/11)
+
+pkg/tbtables/tbbnll.x 
+pkg/tbtables/tbfnew.x 
+pkg/tbtables/tbfopn.x
+pkg/tbtables/tbfpri.x 
+pkg/tbtables/tbttyp.x
+    Commented out the equivalence statements being used to force alignment
+    of local variables.  Was causing 64-bit problems.  (12/1/11)
+
+pkg/tbtables/fitsio/fttdnn.f
+    Disabled NaN checking for this function.  This was done previously for
+    the real-value function but missed for doubles.  Will need to be
+    revisited once there is more time.  (12/2/11)
+
+sys/imio/imrbpx.x
+    Fixed a problem with getting 'nearest' boundary extension values from
+    int images on 64-bit systems (12/14/11)
+
+sys/imio/iki/fxf/fxfupk.x
+    Fixed a problem on 64-bit systems where BITPIX=32 data with bscale/bzero
+    values was garbage values.  Needed to unpack int array before scaling
+    (12/20/11)
+
+local/cache		+
+local/login.cl
+    Updated the login.cl file for the iraf user, added a 'cache' directory
+    to be used for the account (1/4/12)
+
+unix/hlib/install
+    Turned off the installation of the /dev fifo pipes as a default since
+    these are rarely used any more.  If needed, "install -f" will create
+    them on platforms that support FIFOs (1/15/12)
+
+unix/hlib/install
+    Added code to install the voclientd/voclient.jar files in the local
+    bindir as a symlink.  (1/15/12)
+
+unix/hlib/iraf.h
+    Increased the size of SZ_FNAME to 511 to accomodate lengthy URLs.  The
+    max HTTP URL size is typically 1024, but this seemed escessive (1/15/12)
+
+sys/etc/main.x
+    Added checks for a "hlib$zzsetenv.def" file or a file pointed to by an
+    'irafinit' environment variable to set or override the system
+    zzsetenv.def file.  The first case allows for an alternate 'hlib'
+    definition (as is used in the pipeline), the second for a file that
+    may only partially override the environment (1/17/12)
+
+sys/etc/prpsio.x
+sys/gio/gki/gkiopen.x
+sys/gio/gki/gkiclose.x
+sys/gio/gki/gkideact.x
+sys/gio/gki/gkireact.x
+sys/gio/gki/gkisetwcs.x
+sys/gio/gki/gkigetwcs.x
+    The pseudofile i/o to the graphics stream has been broken all this time.
+    When opening the GKI stream, set/get wcs etc the xmit packet is preceeded
+    with the file descriptor number, written as SZ_INT in the GKI code and
+    read as SZ_INT in the prpsio.x code.  In cases where a 32-bit task binary 
+    is being used on a 64-bit system, the CL is trying to read a 64-bit int
+    from a stream written with a 32-bit value, leading to a corrupted 
+    descriptor number and usually a segfault.  Modified so the descriptor is
+    written/read as SZ_INT32 to be compatible.  (2/2/12)
+
+local/COPYRIGHTS
+local/LICENSES			+
+    Modified the COPYRIGHTS statement and included the text for the CDDL
+    and UCAR licenses.  As far as we now know, IRAF is now "free". (2/17/12)
+
+sys/imio/imflsh.x
+    Fixed a bug in which TY_INT images weren't being handled properly by
+    the system (2/24/12)
+
+sys/etc/urlget.x
+    Added support for Content-Length header values to avoid a socket 
+    timeout behavior from some web servers (3/2/12)
+
+.version
+pkg/cl/cl.par
+pkg/ecl/cl.par
+pkg/vocl/cl.par
+unix/hlib/motd
+unix/hlib/install
+unix/hlib/login.cl
+unix/hlib/irafarch.csh
+unix/hlib/zzsetenv.def
+    Updated version strings to final export (3/5/12)
+
+unix/boot/mkpkg/tok.c
+    Modified the $ifnewer behavior to return a 'true' value if the 
+    second argument doesn't yet exist.  (3/6/12)
+
+sys/osb/mkpkg
+sys/osb/iscl32.c
+sys/osb/iscl64.c
+unix/hlib/libc/knames.h
+sys/imio/iki/fxf/fxfupk.x
+    Added a new OSB routine ISCL32/ISCL64 that applies the FITS bscale/bzero
+    to pixel data.  This is required in the FITS kernel where the buffer
+    is a XCHAR array but there are alignment issues on linux systems when
+    passing arrays between spp/C codes.  (3/7/12)
+
+sys/imio/imt/imxexpand.x
+sys/imio/imt/imxpreproc.x
+    The use of "@file" and the contents of the file contained extns or
+    sections on the images, was broken.  The file was being read correctly,
+    however the square brackets weren't being properly escaped when 
+    passed to the fntgfn code to create the list.  (3/9/12)
+
+Makefile
+util/iraf_update	+
+util/iraf_latest	+
+util/self_update
+    Added stub routines to permit simple updates of the system.  New Makefile
+    targets include:
+
+	latest			Update entire system
+	check_latest		Check system update status
+	latest_src		Update source code only
+	latest_core		Update core system only
+	latest_noao		Update NOAO package only
+	latest_vo		Update VO package only
+
+    The 'iraf_latest' script is the workhorse for the update, but the details
+    of how the patches will be built or packaged are still TBD.  Because the
+    first thing done is to update the build/util scripts, we can defer this
+    until the first release.  (3/11/12)
+
+sys/imio/imrbpx.x
+    There was still a problem with boundary extension using constant values.
+    For int data, the IM_OOBPIX value was being converted to int in impakr()
+    but was packed as a 32-bit value.  However, it was not then being
+    unpacked to a 64-bit INT in imrbpx() as was done for the nearest pixel
+    values.  (3/12/12)
+
+------------------------------------------------------
+System Frozen for V2.16.0 Release         (3/12/12)
+------------------------------------------------------
+
+sys/imio/imrbpx.x
+    Use of constant boundary extension wasn't being properly unpacked on
+    64-bit systems (3/12/12)
+
+sys/imt/imt.x
+sys/imt/imxexpand.x
+sys/imt/imxpreproc.x
+    Fixed a bug in which @files containing files with section/extension 
+    info weren't being properly expanded.  (3/14/12)
+
+imcoords/src/t_ccmap.x
+imcoords/ccmap.par
+lib/geofit.x
+lib/geogmap.gx
+    Updates to the previous changes.  A new option "tweak" was added to
+    the values for the "refpoint" parameter to allow controlling whether
+    to tweak the input tangent point.  (3/16/12, Valdes)
+
+noao/lib/obsdb.dat
+    Added an entry for the Langkawi National Observatory (Malaysia) submitted
+    by user.  (3/18/12)
+
+------------------------------------------------------
+System Frozen for V2.16.0 Release         (3/18/12)
+------------------------------------------------------
+

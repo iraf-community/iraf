@@ -1,0 +1,50 @@
+.help imakw Sep86 imfort
+.ih
+NAME
+imakw -- add or set the value of an image header keyword
+.ih
+SYNOPSIS
+.nf
+subroutine imakwb (im, keyw, bval, comm, ier)
+subroutine imakwc (im, keyw, cval, comm, ier)
+subroutine imakwi (im, keyw, ival, comm, ier)
+subroutine imakwr (im, keyw, rval, comm, ier)
+subroutine imakwd (im, keyw, dval, comm, ier)
+
+integer		im		#I image descriptor of open image
+character*(*)	keyw		#I name of the keyword to be set
+character*(*)	comm		#I comment string describing keyword
+integer		ier		#O status return
+
+logical		bval		#I logical (boolean) keyword value
+character*(*)	cval		#I character string keyword value
+integer		ival		#I integer keyword value
+real		rval		#I real keyword value
+doubleprecision	dval		#I double precision keyword value
+.fi
+.ih
+DESCRIPTION
+The \fIimakw\fR procedures are used to set the values of image header keywords.
+If the named keyword does not already exist, a new keyword of the indicated
+datatype is first added and then the value of the new keyword is set,
+otherwise the value of the existing keyword is updated.
+The comment string is used only if a new keyword is created.
+Automatic datatype conversion is provided when updating the value of
+an existing keyword, i.e., if the keyword already exists there is some
+flexibility in the choice of the datatype of the \fIimakw\fR procedure
+to be used.
+.ih
+RETURN VALUE
+A zero status is returned if the named keyword exists, is writable, and if
+the datatype coercion implied is permissible, or if the named keyword is
+not found but can be added.
+
+.nf
+SYS_IDBOVFL:	out of space in image header
+SYS_IDBREDEF:	attempt to redefine an image header keyword
+SYS_IDBTYPE:	illegal header parameter data type conversion
+.fi
+.ih
+SEE ALSO
+imaddk, imacck, impkw, imgkw
+.endhelp

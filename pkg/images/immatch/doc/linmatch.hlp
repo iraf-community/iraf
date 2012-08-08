@@ -1,0 +1,699 @@
+.help linmatch Apr95 images.immatch
+.ih
+NAME
+linmatch -- linearly match the intensity scales of 1 and 2D images
+.ih
+USAGE
+linmatch input reference regions lintransform
+.ih
+PARAMETERS
+.ls input
+The list of input images to be matched.
+.le
+.ls reference
+The list of reference images to which the input images are to be matched
+if \fIscaling\fR  is one of the "mean", "median", "mode", or "fit"
+algorithms, or the list of reference photometry files if \fIscaling\fR
+specifies the "photometry" algorithm. The number of reference images or
+reference photometry files must be one or equal to the number of input
+images.
+.le
+.ls regions
+The list of image regions used to compute the intensity 
+matching function if \fIscaling\fR is one of the "mean", "median", "mode",
+or "fit" algorithms, or a list of the input photometry files if
+\fIscaling\fR specifies the "photometry" algorithm. In the former
+case \fIregions\fR may be: 1) a string of the form "grid nx ny" defining
+a grid of nx by ny equally spaced and sized image regions spanning the
+entire image, 2) a list of object coordinates separated by commas e.g.
+"303 401, 131 202", 3) a list of image sections separated by whitespace
+e.g "[101:200,101:200] [301:400,301:400]",
+4) the name of a text file containing a list of object coordinates separated
+by newlines, and 5) the name of a text file containing a list of image
+sections separated by whitespace and/or newlines.
+.le
+.ls lintransform
+The name of the text file where the computed scaling factors are written.
+If \fIdatabasefmt\fR is "yes", a single record containing the computed
+bscale and bzero factors for each image region or object, and the
+average bscale and bzero, is written to the text database
+file for each input image. If \fIdatabasefmt\fR = "no", a single line
+containing the input image name, bscale factor, bzero factor, error
+in bscale, and error in bzero is written to a simple text file for
+each image.
+.le
+.ls output = ""
+The list of output matched images. If \fIoutput\fR is the NULL string
+then bscale  and bzero are computed for each input image and written to
+\fIlintransform\fR, but no output images are written. If \fIoutput\fR
+is not NULL then the number of output images must equal the number of
+input images.
+.le
+.ls databasefmt = yes
+If \fIdatabasefmt\fR is "yes" the computed bscale and bzero factors
+are written to a text database file, otherwise they are written to a
+simple text file.
+.le
+.ls records = ""
+The list of records to be written to or read from \fIlintransform\fR one
+input image. If \fIrecords\fR is NULL then the output or input record names
+are assumed to be the names of the input images. If \fIrecords\fR is not NULL
+then the record names in \fIrecords\fR are used to write / read the
+database records. This parameter is useful for users
+who, wish to compute the bscale and bzero factors using images that have
+been processed
+in some manner (e.g. smoothed), but apply the computed bscale and bzero
+factors to the original unprocessed images. If more than one record
+with the same name exists in \fIlintransform\fR then the most recently written
+record takes precedence. The records parameter is ignored if
+\fIdatabasefmt\fR is "no".
+.le
+.ls append = yes
+Append new records to an existing \fIlintransform\fR file or start a new 
+file for each execution of LINMATCH? The append parameter is
+ignored if \fIdatabasefmt\fR is "no".
+.le
+.ls shifts = ""
+An optional list of shifts files containing the x and y shifts to be applied
+to the reference regions to determine their positions in
+the input images. The number of shifts files must equal the number of
+reference images. The shifts are listed in the shifts file, 1 shift per line,
+with the x and y shifts in
+columns 1 and 2 respectively. If there are fewer x and y shifts defined
+in the shifts file than there are input images, the extra input
+images will be assigned x and y shifts of \fIxshift\fR and \fIyshift\fR
+respectively. The shifts parameter is ignored if the \fIscaling\fR
+parameter is set to "photometry".
+.le
+.ls xshift = 0.0 yshift = 0.0
+The default x and y shifts to be applied to the reference image regions
+or objects to compute their positions in the input image.
+Values in \fIshifts\fR take precedence over the values of \fIxshift\fR and
+\fIyshift\fR. xshift and yshift are ignored if the \fIscaling\fR parameter
+is set to "photometry".
+.le
+.ls dnx = 31 dny = 31
+The default size of a single image region used to compute the bscale
+and bzero factors if \fIscaling\fR is one of the "mean", "median", "mode",
+or "fit" algorithms and \fIregions\fR is a coordinate list rather than
+a sections list.  dnx and dny are ignored if the \fIscaling\fR parameter
+is set to "photometry".
+.le
+.ls maxnregions = 100
+The maximum number of image regions or objects with measured photometry
+that can be used to compute the bscale and bzero factors.
+.le
+.ls scaling = "mean mean"
+The algorithms used to compute the bscale and bzero factors respectively.
+The options are:
+.ls mean median mode
+Bscale or bzero are computed using the "mean", "median", or "mode" statistic
+for each input and reference region individually. If one of the bscale or
+bzero fitting
+algorithms is set to "mean", "median", or "mode", the remaining factor
+must be set to "mean", "median" or "mode" or  a numerical constant,
+e.g. "mean mean", "mean -100.0" or "2.63 mode".
+If both algorithms are set to "mean", "median", or "mode" bscale will be
+computed using the specified statistic and bzero will be set to 0.0
+If more than one input region is defined then a weighted least squares
+fit of the reference statistics to the input image statistics  
+is performed and used to compute the final bscale and bzero factors.
+.le
+.ls fit    
+Bscale and bzero are computed for each input image region individually
+by performing a least squares fit of the reference image pixels to
+the input image pixels. If more than one input image region is defined
+the final bscale and bzero factors are computed by averaging,
+weighted by their signal-to-noise ratios, the individual bscale and bzero
+values.  If one of the bscale or bzero fitting
+algorithms is set to "fit", the remaining factor must either also
+be computed with the "fit" algorithm  or set to a numerical constant,
+e.g. "fit fit", "fit -100.0", or "2.63 fit".
+.le
+.ls photometry
+Bscale and/or bzero are computed for each input object individually
+using photometry computed for a set of objects common to the reference
+and input images.  If more than one input object is defined
+the final bscale and bzero factors are computed by averaging,
+weighted by their signal-to-noise ratios, the individual bscale and bzero
+values.  If one of the bscale or bzero fitting
+algorithms is set to "photometry", the remaining factor must either also
+be computed with the "photometry" algorithm or set to a numerical
+constant, e.g. "photometry photometry", "photometry -100.0", or
+"2.63 photometry".
+.le
+.ls number
+Bscale and/or bzero are set to user defined numerical constants,
+e.g. "2.62 -55.0" or  "2.62 median". If both bscale and bzero are numerical
+constants, LINMATCH must be run in non-interactive mode. If only one of bscale
+or bzero is a numerical constant, any of the "mean", "median", "mode", "fit",
+or "photometry" algorithms may be used to compute the remaining factor.
+.le
+.ls file
+Bscale and bzero are not computed but instead read from record \fIrecord\fR in
+the text database file \fIlintransform\fR if \fIdatabasefmt\fR is "yes",
+or the next line of a simple text file if \fIdatabasefmt\fR is "no".
+.le
+
+Further description of the matching algorithms can be found in the ALGORITHMS
+section.
+.le
+.ls datamin = INDEF datamax = INDEF
+The minimum and maximum good data values. Datamin and datamax are used by
+the "mean", "median", and "mode" scaling algorithms to reject entire
+image regions from the final fit, and by the "fit" algorithm to reject
+individual bad pixels from the least squares fits for the individual
+regions.
+.le
+.ls maxiter = 10
+The maximum number of iterations performed by the least squares fitting
+algorithm.
+.le
+.ls nreject = 0
+The maximum number of rejection cycles used to detect and reject bad pixels
+from the fit if the scaling algorithm is "fit" or bad regions / objects
+from the fit if the scaling algorithm is "mean", "median", "mode", "fit",
+or "photometry".
+.le
+.ls loreject = INDEF hireject = INDEF
+The high- and low-side bad data rejection limits used to detect and reject
+deviant pixels from the fit if the scaling algorithm is "fit" or bad
+regions / objects from the fit if the scaling algorithm is "mean", "median",
+"mode", "fit", or "photometry".
+.le
+.ls gain = "1.0 1.0" readnoise = "0.0 0.0"
+The reference and input image gain and readout noise in e-/ADU and
+e- respectively. Gain and readout may be numerical constants or the
+image header keyword containing the actual gain and/or readout noise
+value. Gain and readnoise are used by the "mean", "median", "mode",
+and "fit" algorithms to estimate the expected errors in the computed
+"mean", "median", or "mode" statistics,  and by the "fit" algorithm
+to compute the per pixel errors values.
+.le
+.ls interactive = no
+Compute the bscale and bzero scaling factors for each image interactively
+using graphics cursor and optionally image cursor input.
+.le
+.ls verbose = yes
+Print messages about the progress of the task during task execution in
+non-interactive mode.
+.le
+.ls graphics = "stdgraph"
+The default graphics device.
+.le
+.ls display = "stdimage"
+The default image display device.
+.le
+.ls gcommands = ""
+The default graphics cursor.
+.le
+.ls icommands = ""
+The default image cursor.
+.le
+
+.ih
+DESCRIPTION
+
+LINMATCH computes the bscale and bzero factors required to match
+the intensity scales of a list of input
+images \fIinput\fR to the intensity scales of a list of reference
+images \fIreference\fR using the following definition of
+bscale and bzero and a variety of techniques.
+
+.nf
+	reference = bscale * input + bzero
+.fi
+
+The computed bscale and bzero factors are stored
+in the text file \fIlintransform\fR, in the record \fIrecords\fR if
+\fIdatabasefmt\fR is "yes", or a single line of a simple text file
+if \fIdatabasefmt\fR is "no". One record is written to the output file
+file for each input image. If a non NULL list of output images
+\fIoutput\fR is supplied, a scaled output image is written for
+each input image. LINMATCH is intended to solve 1D and 2D image intensity
+matching problems where the input and reference images: 1) have the same
+pixel scale and orientation, 2) differ in intensity by at most a scale
+factor and a zero point, and 3) contain one or more regions or objects in
+common that can be used to compute the scaling factors. Some of the scaling
+algorithms also require that the images registered and have identical
+point spread functions. LINMATCH cannot be used to compute or apply non-linear
+intensity matching functions.
+
+If \fIscaling\fR = "mean", "median", "mode", or "fit" bscale and bzero
+are computed directly from the input and reference image data using the
+image sections specified in the \fIregions\fR and one of the above fitting
+techniques as described in the ALGORITHMS section. All four algorithms
+require accurate knowledge of the measurement errors which in turn
+require accurate knowledge of the input and reference image gain and
+readout noise values. Gain and readout noise values can be entered by
+setting the \fIgain\fR and \fIreadnouse\fR parameters to the appropriate
+numerical values or image header keyword.
+
+\fIRegions\fR is interpreted as either: 1) a string of
+the form "grid nx ny" specifying a list of nx by ny image sections
+spanning the entire image, 2) a string defining the coordinates of a list
+of objects separated by commas e.g.
+"103.3 189.2, 204.4 389.7", 3) a string containing a list of image
+sections separated by whitespace, e.g "[100:203,200:300] [400:500,400:500]"
+4) the name of a text file containing the coordinates of one or
+more objects, one object per line, with the x and y coordinates
+in columns 1 and 2 respectively, 5) the name of a text
+file containing a list of image sections separated by whitespace and/or
+newlines.  The image sections specifications, or alternatively
+the object coordinates and the parameters \fIdnx\fR and \fIdny\fR,
+determine the size of the input and reference image data regions to be
+extracted and used to compute the bscale and bzero factors.
+These image regions should be selected with care. Ideal regions
+span a range of intensity values and contain both object and background
+data. 
+
+If \fIscaling\fR = "photometry", the bscale and bzero factors
+are computed directly from data in the input and reference image photometry
+files using the technique described in the ALGORITHMS section.
+In this case \fIregions\fR is a list of the input image photometry
+files and \fIreference\fR are the corresponding reference image
+photometry files written by a separate photometry task.
+These photometry files are simple text files with the object
+sky values, errors in the sky values, magnitudes, and errors in the
+magnitudes in columns 1, 2, 3, and 4 respectively.
+
+An image region is rejected from the fit if it contains data outside the
+limits specified by the \fIdatamin\fR and \fIdatamax\fR parameters
+and \fIscaling\fR =
+"mean", "median", or "mode". A pixel is rejected from the fit for an
+individual region if the pixel value is outside the limits specified
+by datamin and datamax, and the scaling algorithm is "fit". The datamin
+and datamax parameters are not used by the "photometry" scaling algorithm .
+
+Deviant pixels can be rejected from the fits to individual image regions
+if \fIscaling\fR = "fit", and \fInreject\fR, \fIloreject\fR, and
+\fIhireject\fR are set appropriately. Nreject, loreject and reject
+are also be used by all the scaling algorithms  to reject image regions
+which contribute deviant bscale and bzero values.
+
+The computed bscale and bzero value for each region and the final bscale 
+and bzero value for each input image are written to the linear
+transformation file \fIlintransform\fR.
+If \fIdatabasefmt\fR is "yes" each result is written to a record whose name
+is either identical to the name of the input
+image or supplied by the user via the \fIrecords\fR parameter .
+If \fIdatabasefmt\fR is "no", then a single line containing the input image
+name and the computed bscale and bzero values and their errors
+is written to the output shifts file.
+
+If a list of output image names have been supplied then the bscale and
+bzero values will be applied to the input images to compute the output images.
+
+If the \fIscaling\fR parameter is set to "file" then the shifts
+computed in a previous run of LINMATCH will be read from the \fIlintransform\fR
+file and applied to the input images to compute the output images.
+If no record list is supplied by the user LINMATCH will
+search for a record whose name is the same as the input image name. If more than
+one record of the same name is found then the most recently written
+record will be used.
+
+In non-interactive mode the task parameters are set at task startup time
+and the input images are processed sequentially. If the \fIverbose\fR
+flag is set, messages about the progress of the task are printed on the
+screen as the task is running.
+
+In interactive mode the user can mark the regions to be used
+to compute the matching function on the image display, show/set the data
+and algorithm parameters, compute, recompute,  and plot 
+matching function, and interactively delete and undelete
+bad data from the fits using the plots and graphics cursor. A summary
+of the available interactive commands is given in the CURSOR COMMANDS
+section.
+
+.ih
+CURSOR COMMANDS
+
+.nf
+The following graphics cursor commands are currently available in LINMATCH.
+
+		Interactive Keystroke Commands
+
+?	Print help 
+:	Colon commands
+
+g	Draw a plot of the current fit
+i	Draw the residuals plot for the current fit
+p	Draw a plot of current photometry
+s	Draw histograms for the image region nearest the cursor
+l	Draw the least squares fit for the image region nearest the cursor 
+h	Draw histogram plot of each image region in turn
+l	Draw least squares fits plot of each image region in turn
+r	Redraw the current plot
+d	Delete the image region nearest the cursor
+u	Undelete the image region nearest the cursor
+f	Recompute the intensity matching function
+w	Update the task parameters
+q	Exit
+
+
+		Colon Commands
+
+:markcoords	    Mark objects on the display
+:marksections	    Mark image sections on the display
+:show	            Show current values of all the parameters
+
+		Show/set Parameters
+
+:input		[string]    Show/set the current input image
+:reference	[string]    Show/set the current reference image / phot file 
+:regions	[string]    Show/set the current image regions
+:photfile	[string]    Show/set the current input photometry file
+:lintransform	[string]    Show/set the linear transform database file name
+:dnx		[value]	    Show/set the default x size of an image region
+:dny		[value]	    Show/set the default y size of an image region
+:shifts		[string]    Show/set the current shifts file
+:xshift		[value]     Show/set the input image x shift
+:yshift		[value]     Show/set the input image y shift
+:output		[string]    Show/set the current output image name
+:maxnregions		    Show the maximum number of objects / regions
+:gain		[string]    Show/set the gain value / image header keyword
+:readnoise	[string]    Show/set the readout noise value / image header
+                            keyword
+
+:scaling		    Show the current scaling algorithm
+:datamin	[value]     Show/set the minimum good data value
+:datamax	[value]     Show/set the maximum good data value
+:nreject	[value]	    Show/set the maximum number of rejection cycles
+:loreject	[value]     Show/set low side k-sigma rejection parameter
+:hireject	[value]     Show/set high side k-sigma rejection parameter
+.fi
+
+.ih
+ALGORITHMS
+
+MEAN, MEDIAN, AND MODE
+
+For each input and reference image region the mean, median, mode, statistic
+and an error estimate for that statistic are computed as shown below,
+mstat is for mean, median, or mode statistic, emstat stands for the error
+estimate, stdev for the measured standard deviation, and npix for the
+number of points.
+
+.nf
+       mstat = mean, median, or mode 
+      emstat = min (sqrt (mean / gain + readnoise ** 2 / gain ** 2),
+               stdev / sqrt(npix))
+.fi
+
+If only a single image region is specified then mstat is used to compute
+one of bscale or bzero but not both as shown below.  Bscale is computed by
+default.
+
+.nf
+         bscale = mstat[ref] / mstat[input]
+    err[bscale] = abs (bscale) * sqrt (emstat[ref] ** 2 / mstat[ref] ** 2 +
+	          emstat[input] ** 2 / mstat[input] ** 2)
+	  bzero = constant
+     err[bzero] = 0.0
+
+	  bzero = mstat[ref] - mstat[input]
+     err[bzero] = sqrt (emstat[ref] ** 2 + emstat[input] ** 2)
+	 bscale = constant
+    err[bscale] = 0.0
+.fi
+
+If more than one image region is defined then the computed mean, median,
+or mode values for the input and reference image regions are used as
+shown below to compute the bscale and bzero factors and their errors
+using a weighted least squares fit.
+
+.nf
+	mstat[ref] = bscale * mstat[input] + bzero
+.fi
+
+If an image region contains data outside the limits defined
+by \fIdatamin\fR and \fIdatamax\fR that image region is eliminated
+entirely from the fit.
+
+The parameters \fInreject\fR, \fIloreject\fR,
+and \fIhireject\fR are used to detect and automatically eliminate
+deviant data points from the final least squares fit. If for some reason
+bscale or bzero cannot be fit, default values of 1.0 and 0.0 are
+assigned.
+
+The mean, median, and mode algorithms depend on the global properties of
+the image regions. These algorithms do require the reference and
+input images to have the same pixel scale and orientation,
+but do not automatically require the reference and input images
+to have the same point spread function. Small shifts between the reference
+and input images can be removed using the \fIshifts\fR, \fIxshift\fR, and
+\fIyshift\fR parameters.
+
+If the image regions contain stars, then either regions should be large
+enough to include all the flux of the stars in which case the images
+do not have to have the same psf, or the psfs should be the same so
+that same portion of the psf is sampled. The best image regions for
+matching will contain object and background information.
+
+FIT
+
+For each input and reference image the bscale and bzero factors are
+computed by doing a pixel to pixel weighted least squares fit of the reference
+image counts to the input image counts as shown below.
+
+.nf
+    counts[ref] = bscale * counts[input] + bzero
+         weight = 1.0 / (err[ref] ** 2 + bscale ** 2 * err[input] ** 2)
+       err[ref] = sqrt (counts[ref] / gain[ref] + readnoise[ref] ** 2 /
+                  gain[ref] ** 2)
+     err[input] = sqrt (counts[input] / gain[input] +
+     		  readnoise[input] ** 2 / gain[input] ** 2)
+.fi
+
+The fitting technique takes into account errors in both the reference and
+input image counts and provides an error estimate for the computed bscale
+and bzero factors. Bad data are rejected
+automatically from the fit by setting the \fIdatamin\fR and \fIdatamax\fR
+parameters. Deviant pixels are rejected from the fit by setting the
+\fInreject\fR, \fIloreject\fR, and \fIhireject\fR parameters appropriately.
+
+The final bscale and bzero for the input image are computed by calculating
+the average weighted by their errors  of the individual bscale and bzero
+values. The parameters \fInreject\fR, \fIloreject\fR, and \fIhirject\fR
+can be used to automatically detect and reject deviant points.
+
+The fit algorithm depends on the results of pixel to pixel fits in 
+each reference and input image region. The technique requires that the
+images be spatially registered and psfmatched before it is employed.
+Each input and reference image should contain a range of pixel intensities
+so that both bscale and bzero can be accurately determined.
+
+PHOTOMETRY
+
+For each object common to the reference and input photometry files
+the input sky values sky, errors in the sky values serr,
+magnitudes mag, and magnitude errors merr are used to compute the 
+bscale and bzero factors and estimate their errors as shown
+below.
+
+.nf
+	 bscale = 10.0 ** ((mag[ref] - mag[input]) / 2.5)
+	  bzero = sky[ref] - bscale * sky[input]
+    err[bscale] = 0.4 * log(10.0) * bscale * sqrt (merr[ref] ** 2 +
+		  magerr[input] ** 2)) 
+     err[bzero] = sqrt (serr[ref] ** 2 + err[bscale] ** 2 *
+                  sky[input] ** 2 + bscale ** 2 * sky[input] ** 2)
+.fi
+
+The final bscale and bzero for the input image are computed by calculation
+the average of the individual bscale and bzero values weighted by their
+errors. The parameters \fInreject\fR, \fIloreject\fR, and \fIhirject\fR can
+be used to automatically detect and reject deviant points.
+
+THE LEAST SQUARES FITTING TECHNIQUE
+
+The least squares fitting code performs a double linear regression on
+the x and y points,  taking into account the errors in both x and y.
+
+The best fitting line is the defined below.
+
+.nf
+		y = a * x + b
+.fi
+
+The error ellipses  are 
+
+.nf
+	S = (x - xfit) ** 2 / err[x] ** 2 + (y - yfit) ** 2 /
+	    err[y] ** 2   
+.fi
+
+where S is the quantity to be minimized. Initial values of a and b are
+estimated by  fitting the data to a straight line assuming uniform
+weighting.  The best fit values of a and b are then
+determined by iterating on the relationship
+
+.nf
+	dy = x' * da + db
+.fi
+
+where da and db are corrections to the previously determined values of a and
+b and dy and x' are defined as.
+
+.nf
+	dy = y - (ax + b)
+	x' = x + a * err[x] ** 2 * dy / (a ** 2 * err[x] ** 2 +
+	     err[y] ** 2) 
+.fi
+
+The new values of the a and b then become.
+
+.nf
+        a = a + da
+	b = b + db
+.fi
+
+.ih
+REFERENCES
+
+A review of doubly weighted linear regression problems in
+astronomy can be found in the paper "Linear Regression in Astronomy. II"
+by (Feigelson and Babu (1992 Ap.J. 397, 55). A detailed derivation of the
+particular solution used by LINMATCH can be found in the article
+"The Techniques of Least Squares and Stellar Photometry with CCDs"
+by Stetson (1989 Proceeding of the V Advanced School of Astrophysics,
+p 51).
+
+.ih
+EXAMPLES
+
+1. Match the intensity scales of a list of images to a reference
+image using a list of stars on the displayed reference image with
+the image cursor and the "mean" scaling algorithm. Assume that none
+of the stars are saturated and that a radius of 31 pixels is sufficient
+to include all the flux from the stars plus some background flux.
+Make sure that the correct gain and readout noise values are in the
+image headers.
+
+.nf
+	cl> display refimage 1 
+
+	cl> rimcursor > objlist
+	    ... mark several candidate stars by moving the cursor to the
+	        star of interest and hitting the space bar key
+	    ... type EOF to terminate the list
+
+	cl> linmatch @imlist refimage objlist lintran.db \
+	    out=@outlist dnx=31 dny=31 scaling="mean mean" gain=gain \
+	    readnoise=readnoise
+.fi
+
+2. Repeat the previous command but force the bzero factor to be -100.0
+instead of using the fitted value.
+
+.nf
+	cl> linmatch @imlist refimage objlist lintran.db \
+	    out=@outlist dnx=31 dny=31 scaling="mean -100.0" \
+	    gain=gain readnoise=rdnoise
+.fi
+
+3. Repeat the first example but compute bscale and bzero 
+the bscale and bzero values using boxcar smoothed versions of 
+the input images. Make sure the gain and readout noise are
+adjusted appropriately.
+
+.nf
+	cl> linmatch @bimlist brefimage objlist lintran.db \
+	    dnx=31 dny=31 scaling="mean mean" gain=gain \
+	    readnoise=rdnoise
+
+	cl> linmatch @imlist refimage objlist lintran.db \
+	    out=@outimlist records=@bimlist scaling="file file"
+.fi
+
+4. Match the intensity of an input image which has been spatially
+registered and psfmatched to the reference image using the "fit" algorithm
+and a single reference image region. Remove the effects of saturated
+pixels by setting datamax to 28000 counts, and the effects of any deviant pixels
+by setting nreject, loreject, and hireject to appropriate values.
+
+.nf
+	cl> linmatch image refimage [50:150,50:150] lintran.db \
+	    out=outimage scaling="fit fit" datamax=28000 nreject=3 \
+	    loreject=3 hireject=3 gain=gain readnoise=rdnoise
+.fi
+
+5. Repeat the previous example but use several image sections to compute
+the bscale and bzero values.
+
+.nf
+	cl> linmatch image refimage sections lintran.db \
+	    out=outimage scaling="fit fit" datamax=28000 nreject=3 \
+	    loreject=3 hireject=3 gain=gain readnoise=rdnoise
+.fi
+
+6. Match the intensity scales of two images using photometry 
+computed with the apphot package qphot task. The two images are
+spatially registered, psfmatched, and the photometry aperture is sufficient to
+include all the light from the stars. The filecalc task used to compute
+the error in the mean sky is in the addon ctio package.
+
+.nf
+	cl> display refimage 1 fi+
+	cl> rimcursor > objlist
+	    ... mark several candidate stars by moving the cursor to the
+	        star of interest and hitting the space bar key
+	    ... type EOF to terminate the list
+	cl> qphot refimage coords=objlist inter-
+	cl> qphot image coords=objlist inter-
+	cl> pdump refimage.mag.1 msky,stdev,nsky,mag,merr yes | filecalc \
+	    STDIN "$1;$2/sqrt($3);$4;$5" > refimage.phot
+	cl> pdump image.mag.1 msky,stdev,nsky,mag,merr yes | filecalc \
+	    STDIN "$1;$2/sqrt($3);$4;$5" > image.phot
+	cl> linmatch image refimage.phot image.phot lintran.db \
+	    out=outimage scaling="phot phot" nreject=3 loreject=3\
+	    hireject=3
+.fi
+
+7. Register two images interactively using the fit algorithms and
+five non-overlapping image regions in the sections file.
+
+.nf
+	cl> linmatch image refimage sections lintran.db \
+	    out=outimage scaling="fit fit" datamax=28000 nreject=3 \
+	    loreject=3 hireject=3 gain=gain readnoise=rdnoise \
+	    interactive +
+
+	    ... a plot of bscale and bzero versus region number
+		appears
+
+	    ... type ? to get a list of the keystroke and : commands
+
+	    ... type i to see a plot of the bscale and bzero residuals
+		versus region
+
+	    ... type g to return to the default bscale and bzero versus
+		region plot
+
+	    ... type l to examine plot of the fits and residuals for the
+		individual regions
+		... step forward and back in the regions list with the
+		space bar and -keys
+		... flip back and forth between the fit and residuals
+		keys with l and i keys
+		... return to the main plot by typing q
+
+	    ... return to the residuals plot by typing i and delete a
+		region with a large residual by moving to the
+		bad point and typing d
+
+	    ... type f to recompute the fit
+
+	    ... type q to quit the interactive loop, n to go to the
+		next image or q to quit the task
+		
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+imexpr, imcombine, ctio.filecalc, apphot.qphot, apphot.phot
+.endhelp

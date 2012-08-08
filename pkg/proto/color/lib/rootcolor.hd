@@ -1,0 +1,7 @@
+# Root task entry for the COLOR package help tree.
+
+color		men  = color$color.men,
+		hlp  = color$color.men,
+		sys  = color$color.hlp,
+		pkg  = color$color.hd,
+		src  = color$color.cl

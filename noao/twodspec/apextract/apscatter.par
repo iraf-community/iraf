@@ -1,0 +1,25 @@
+# APSCATTER
+
+input,s,a,,,,List of input images to subtract scattered light
+output,s,a,,,,List of output corrected images
+apertures,s,h,"",,,Apertures
+scatter,s,h,"",,,List of scattered light images (optional)
+references,s,h,"",,,"List of aperture reference images
+"
+interactive,b,h,yes,,,Run task interactively?
+find,b,h,yes,,,Find apertures?
+recenter,b,h,yes,,,Recenter apertures?
+resize,b,h,yes,,,Resize apertures?
+edit,b,h,yes,,,Edit apertures?
+trace,b,h,yes,,,Trace apertures?
+fittrace,b,h,yes,,,Fit the traced points interactively?
+subtract,b,h,yes,,,Subtract scattered light?
+smooth,b,h,yes,,,Smooth scattered light along the dispersion?
+fitscatter,b,h,yes,,,Fit scattered light interactively?
+fitsmooth,b,h,yes,,,"Smooth the scattered light interactively?
+"
+line,i,h,INDEF,1,,Dispersion line
+nsum,i,h,10,,,Number of dispersion lines to sum or median
+buffer,r,h,1.,0.,,Buffer distance from apertures
+apscat1,pset,h,"",,,Fitting parameters across the dispersion
+apscat2,pset,h,"",,,Fitting parameters along the dispersion

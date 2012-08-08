@@ -1,0 +1,21 @@
+# The mkpkg file for the PEXAMINE task.
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	ptahgmr.x	<mach.h> pexamine.h
+	ptalimr.x	<mach.h>
+	ptcolon.x	<gset.h> pexamine.h
+	ptdelete.x	<gset.h> <mach.h> pexamine.h
+	ptgetphot.x	<tbset.h> ../../lib/ptkeysdef.h pexamine.h
+	ptimplot.x	<imhdr.h> <math.h> <gset.h> <mach.h>
+	ptplot.x	<error.h> <fset.h> <tbset.h> <gset.h> <mach.h>       \
+			<ctype.h> ../../lib/ptkeysdef.h  pexamine.h
+	ptrddata.x	../../lib/ptkeysdef.h pexamine.h
+	ptsetup.x	<error.h> pexamine.h <ctotok.h>
+	ptwtfile.x	../../lib/ptkeysdef.h pexamine.h
+	t_pexamine.x	<error.h>  <fset.h> pexamine.h
+	;

@@ -1,0 +1,87 @@
+From rooke Thu Feb 27 11:35:41 1986
+Received: by lyra.noao.UUCP (4.12/4.7)
+	id AA06429; Thu, 27 Feb 86 11:35:35 mst
+Date: Thu, 27 Feb 86 11:35:35 mst
+From: rooke (Steve Rooke)
+Message-Id: <8602271835.AA06429@lyra.noao.UUCP>
+To: tody
+Subject: Ebert's mail
+Status: R
+
+>From ipac3!rick Wed Feb 26 19:35:54 1986
+Received: from noao.UUCP (carina) by lyra.noao.UUCP (4.12/4.7)
+	id AA03007; Wed, 26 Feb 86 19:35:50 mst
+Received: by noao.UUCP (4.12/4.7)
+	id AA27537; Wed, 26 Feb 86 19:36:52 mst
+Received: by ipac3.ARPA (4.12/4.7)
+	id AA10161; Wed, 26 Feb 86 18:32:49 pst
+Date: Wed, 26 Feb 86 18:32:49 pst
+From: ipac3!rick (Rick Ebert)
+Message-Id: <8602270232.AA10161@ipac3.ARPA>
+To: rooke@noao
+Subject: IRAF @ IPAC    [up]
+Cc: noao\!tody
+Status: RO
+
+Steve,
+
+The news is mostly good:  IRAF is up at IPAC!  The blessed event
+occurred at 11:44:46 PST on 26 Feb.  The new addition weighed in at
+a little over 46Mb.
+
+All of our trouble seems to have been related to an obstinate fortran
+optimizer.  Once I figured out how to turn off that -O flag everywhere
+in IRAF's mkpkg, it all fell into place. (As promised, a list of
+files that gave our optimizer indigestion follows, but I'm convinced
+the problem is with some northern California compiler writers and not
+with IRAF.)
+
+I did run into a problem quite quickly though.  I managed to make the
+help data base by doing this:
+
+cl> softools
+so> mkhelpdb
+
+IRAF proceeded to produce lots of stuff.
+With many of the "help" requests that I tried the formatted manual
+page printed on the screen as expected, followed by a listing of
+what appeared to an unformatted copy of the same help file (there
+were lots of .xx commands at the beginning of lines).  Once this
+starts to print out, a response of "n" to "More?" causes the whole
+of iraf to crash.  If I coax it with an interupt I receive the message,
+
+ERROR: subprocess is hung: process should be killed
+
+wait several seconds and interupt again, then I'm back in the csh
+(this is probably our unix doing houskeeping).
+
+Not a very well documented bug, but I wanted to get it to you
+right away.  The "help" is all I have to learn IRAF! (Sob, poor me).
+
+Rick Ebert, Infrared Processing and Analysis Center (IPAC)
+Cal Tech   MS 100/22, Pasadena, CA 91125
+
+Ma Bell: 818-584-2963 (MWF)
+UUCP: ipac3!rick
+
+"Problem" files:
+
+./sys/fio/fwtacc.x
+./pkg/system/help/helpdb.x
+./pkg/system/help/prfile.x
+./pkg/system/directory.x
+./pkg/system/isdir.x
+./pkg/onedspec/identify/isdir.x
+./pkg/system/lprint.x
+./pkg/system/page.x
+./pkg/xtools/isdirectory.x
+./pkg/dataio/imtext/rt_rwpix.x
+./pkg/dataio/cyber/rrcopy/rc_rheader.x
+./pkg/dataio/cyber/rrcopy/read_rcopy.x
+./pkg/dataio/cyber/t_ridsfile.x
+./pkg/dataio/cyber/read_dumpf.x
+./pkg/dataio/cyber/read_pft.x
+./pkg/images/geometry/geogmap.x
+------that-is-all---------------------
+
+

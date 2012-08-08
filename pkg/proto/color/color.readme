@@ -1,0 +1,139 @@
+A new color map output type was added for XIMTOOL and the documentation
+was updated.
+
+=================================
+Archive 3/8/93:  Third release
+=================================
+
+On VMS the sao lookup table was coming out incorrect due to datatype problems.
+
+=================================
+Archive 10/12/92:  Second release
+=================================
+
+A new task, RGBTO8, was added which compresses 24-bit RGB data from IRAF
+images to an 8-bit IRAF image and a outputs a color map suitable for display
+with (V1.07) SAOimage or IMTOOL.  Also the names of the other tasks from the
+first release have been changes.  The 3x3 pixel dithering task, now called
+RGBDITHER, was modified to allow the user to specify a dither pattern.
+
+Note that to use the output from the new RGBTO8 with SAOimage you must
+obtain a revised version of SAOimage (V1.07) which expands the size of
+the color maps allowed from 30 to the full 200 used by the task.
+
+=================================
+Archive 8/26/92:  First release
+=================================
+
+       Installation Instructions for the COLOR Package
+
+A prototype IRAF color image display package, COLOR, is now available.
+Currently this package provides conversion of 3 bandpass IRAF images to a
+Sun 24-bit RGB rasterfile format, a 24-bit to 8-bit compression algorithm
+and Floyd-Steinberg dithering, and an RGB 8-bit pixel dithering algorithm.
+The Sun rasterfiles are displayed using non-IRAF tools and the others use
+only IRAF images and SAOimage or IMTOOL.  These tasks are usable with the
+currently common 8-bit color workstations and are provided for those users
+which don't have more capable hardware such as 24-bit workstations, IIS
+displays, and 24-bit addon cards.  Addtional functionality will be added to
+the COLOR package in time.
+
+The installation instructions that follow assume that you have copied the
+tar format COLOR archive onto your host machine.  The method you use to
+copy the file (or remotely access the tar file) is OS dependent and is not
+discussed in this document.  If you have any questions, please contact the
+IRAF group at iraf$noao.edu,  NOAO::IRAF (5355::IRAF) or call the IRAF
+HOTLINE at 602-323-4160.
+
+[1] The package is distributed as a tar archive; IRAF is distributed
+    with a tar reader.  The tar archive may be obtained by magnetic
+    tape or anonymous ftp.  For magnetic tape go to step [2] and when
+    reading the tar archive simply mount the tape and use the tape
+    device name for the archive name in step [4].  To obtain the package
+    via ftp (assuming a UNIX computer):
+
+	% ftp 192.31.165.1
+	login: anonymous
+	password: [your email address]
+	ftp> cd iraf.old
+	ftp> get readme.color
+	ftp> binary
+	ftp> get color.tar.Z
+	ftp> quit
+	% uncompress color.tar
+
+    The readme.color file contains these instructions.  Special arrangements 
+    can be made for sites that don't have access to internet but could copy 
+    the uncompressed archive over SPAN.
+
+[2] Create a directory to contain the COLOR external package files.  This
+    directory should be outside the IRAF directory tree and must be owned
+    by the IRAF account.  In the following examples, this root directory is
+    named usr1:[color] (VMS) or  /local/color/ (UNIX).  Make the
+    appropriate file name substitutions for your site.
+
+[3] Log in as IRAF and edit the extern.pkg file in the hlib$ directory to
+    define the package to the CL.  From the IRAF account, outside the CL,
+    you can move to this directory with the commands:
+
+	$ set def irafhlib	# VMS example
+	% cd $hlib		# UNIX example
+
+    Define the environment variable color to be the pathname to the
+    color root directory.  The '$' character must be escaped in the VMS
+    pathname; UNIX pathnames must be terminated with a '/'.  Edit
+    extern.pkg to include:
+
+	reset color	= usr\$1:[color]   	# VMS example
+	reset color  = /local/color/		# UNIX example
+	task  $color.pkg = color$color.cl
+
+    Near the end of the hlib$extern.pkg file, update the definition of helpdb
+    so it includes the color help database, copying the syntax already used
+    in the string.  Add this line before the line containing a closing quote:
+        
+                ,color$lib/helpdb.mip\
+
+    NOTE: In IRAF V2.8 the length of the helpdb string cannot exceede 160 
+    characters.  A helpdb string longer than 160 characters will cause the
+    CL startup process to fail.
+
+[4] Log into the CL from the IRAF account and unpack the archive file.  Change
+    directories to the COLOR root directory created above and use 'rtar':
+
+	cl> cd color
+	cl> softools
+	cl> rtar -xrf <archive>  where <archive> is the host name of the
+				 archive file or the IRAF tape
+				 device for tape distributions.
+
+   On VMS systems, an error message will appear ("Copy 'bin.generic' to
+   './bin fails") which can be ignored.  Also on VMS systems, the four
+   bin.'mach' directories created by rtar under [color.bin] can be
+   deleted.  UNIX sites should leave the symbolic link 'bin' in the COLOR
+   root directory pointing to 'bin.generic' but can delete any of the 
+   bin.`mach' directories that won't be used.  The archive file can be
+   deleted once the package has been successfully installed.
+
+[5] When the archive has been unpacked, build the COLOR package executable.  
+    The compilation and linking of the COLOR package is done using the
+    following command:
+
+	cl> mkpkg -p color update >& color.spool &
+
+    NOTE: On systems that concurrently support different architectures
+    (e.g., Suns, Convex), you must configure the system for the desired
+    architecture before issuing the above command.  SUN/IRAF sites must
+    execute a pair of 'mkpkg' commands for each supported architecture type.
+    The Unix environment variable IRAFARCH must be set as well before
+    compiling.  For example:
+
+	# Assuming IRAFARCH is set to ffpa
+	cl> mkpkg -p color ffpa
+	cl> mkpkg -p color update >& color.ffpa &
+	cl> mkpkg -p color f68881
+	# Now reset IRAFARCH to f68881 before continuing
+	cl> mkpkg -p color update >& color.f68881 &
+
+    The spool file(s) should be reviewed upon completion to make sure there
+    were no errors.  

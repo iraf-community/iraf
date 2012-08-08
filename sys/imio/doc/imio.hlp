@@ -1,0 +1,1185 @@
+.help imio May83 "Image I/O Routines"
+.sh
+The Image Header
+
+    The major difference between the prototype IMIO interface, and the final
+interface, concerns the way in which the image header is implemented and
+accessed.  In the prototype version, we will simply read the entire header
+into core and access it as an ordinary (dynamically allocated) structure.
+
+
+.nf
+	ptr =	immap (fname, mode, hdrsize/hdrptr)
+	      imunmap (hdrptr)
+.fi
+
+
+The final resolution of how image headers are implemented depends on how
+we decide to implement virtual structures in the spp language.  The immap
+calls, and the techniques used to access the fields of the image header,
+can be expected to change.
+
+.sh
+Pixel I/O
+
+    The calling sequences for the i/o routines, described below, hopefully will
+not have to be changed.  We will eventually add GETPIX and PUTPIX statements
+to the subset preprocessor language, to automatically generate the appropriate
+low level calls.
+
+A generic, polymorphic GETPIX or PUTPIX statement is translated into a
+reference to a low level Fortran function.  The transformation is governed
+by the following subprogram name generating function:
+
+
+.rj (108 total)
+GETPIX, PUTPIX -->  im[gp][pls][123][silrdx]
+
+
+.ks
+.nf
+For example (get, type real):
+
+	ptr =	imgp1r (hdrptr, x, npix)		# get pixels
+	ptr =	imgp2r (hdrptr, x, y, npix)
+	ptr =	imgp3r (hdrptr, x, y, z, npix)
+
+	ptr =	imgl1r (hdrptr)				# get line
+	ptr =	imgl2r (hdrptr, y)
+	ptr =	imgl3r (hdrptr, y, z)
+
+	ptr =	imgs1r (hdrptr, x1, x2)			# get section
+	ptr =	imgs2r (hdrptr, x1, x2, y1, y2)
+	ptr =	imgs3r (hdrptr, x1, x2, y1, y2, z1, z2)
+.fi
+.ke
+
+
+The IM?P?? procedures access a list of pixels, the coordinates of which
+are given by the X, Y, Z, etc. arrays given as arguments.  Note that random
+access of individual pixels is provided as a special case (npix=1).
+
+The IM?L?? routines access the lines of an image, and the IM?S?? routines
+operate on general, but connected, subsections of images.
+
+
+.sh
+Restrictions Imposed by the Initial Prototype:
+
+    IMMAP, IMMAPNC, IMUNMAP will be implemented for image headers that are
+simple binary structures (not self describing), subject to the restriction
+that a file may contain only a single header.  An arbitrary selection of user
+defined fields will follow the standard header.  The entire header will
+be read into core and accessed as a simple incore structure.
+
+The pixels, and other variable size image substructures, will be stored
+in separate files, as in the general plan.  All of the standard data types
+will be implemented in the disk space.  The initial implementation will
+support only type REAL pixels in program space.
+
+The following i/o routines will be implemented in the first release of
+the prototype:
+
+.rj (12 total)
+	im[gp][sc][123][r]
+
+In words, we will be able to read and write lines and sections, with the
+applications program manipulating type REAL pixels internally.  The full
+range of data types will be permitted in the image file as stored on disk.
+Up to three dimensional images are permitted.
+
+.sh
+IMSET Options
+
+    The prototype need not provide multiple buffering and boundary extension
+initially.
+
+.sh
+Implementation
+
+    Little effort should be made to make the prototype optimal.  All
+buffering will be locally allocated, and data will be copied to and from
+the FIO buffers (the FIO buffers will not be directly accessed).  Special
+cases will not be optimized.  The most general entry points are IMGGSR
+and IMPGSR (get/put general section).  Initially, all of the other entry
+points can be defined in terms of these.
+
+
+.ks
+.nf
+Structure of the input procedures (type REAL): 
+
+	imgl1r
+	imgl2r
+	imgl3r
+	imgs1r
+	imgs2r
+	imgs3r
+		imggsr
+			imggsc
+				imgibf
+					imopsf
+					calloc
+					imcssz
+					realloc
+					malloc
+					mfree
+				imsslv
+				imrdpx
+					imsoob
+					imnote
+					seek
+					read
+				imflip
+			imupkr
+
+  (datatype dependent) | (datatype independent)
+.fi
+.ke
+
+
+
+The output procedures are structured somewhat differently, because the
+transfer of a section occurs sometime after a "put section" returns,
+rather than immediately as in the input procedures.  Since the output
+is buffered for a delayed write, we must have an IMFLUSH entry point, and
+IMUNMAP must flush the output buffer before unmapping an image.
+
+
+.ks
+.nf
+Structure of the output procedures (type REAL): 
+
+	impl1r
+	impl2r
+	impl3r
+	imps1r		imunmap
+	imps2r		   |
+	imps3r		   |
+		impgsr     |
+			imflush
+				imflsr
+					imflsh
+						imflip
+						imwrpx
+							imsoob
+							imnote
+							imwrite
+								fstatus
+								seek
+								write
+					impakr
+
+			imgobf
+				imopsf
+				calloc
+				imcssz
+				realloc
+				malloc
+				mfree
+
+          (datatype dependent) | (datatype independent)
+.fi
+.ke
+
+
+.sh
+Semicode for the Basic I/O Routines
+
+    The IMGGS? and IMPGS? procedures get and put general N-dimensional
+image sections of a specific datatype.  There is no intrinsic limit on
+the maximum number of dimensions, and the full range (8) of disk datatypes
+are easily supported.  The subscript for a particular dimension may run
+either forward or backward.  The semicode is written generically, allowing
+code to be machine generated for all program space datatypes (6).
+
+We do not address the problems of boundary extension and multiple buffering
+here, but these features can be easily added in the future.  This version
+of IMIO assumes that pixels are stored on disk in line storage mode, with
+no interlacing of bands.
+
+
+IMGGS? gets a general section, and converts it to the datatype indicated
+by the type suffix.
+
+
+.ks
+.nf
+pointer procedure imggs$t (imdes, vs, ve)
+
+imdes	pointer to image descriptor structure
+vs,ve	coordinates of starting and ending points
+
+begin
+	bp = imggsc (imdes, vs, ve, TY_PIXEL, totpix)
+	if (imdes.pixtype != TY_PIXEL)
+	    call imupk$t (*bp, *bp, totpix, imdes.pixtype)
+	return (coerce (bp, TY_CHAR, TY_PIXEL))
+end
+.fi
+.ke
+
+
+
+IMGGSC gets a general section from an imagefile into a buffer.  Upon
+exit, the buffer contains the requested section, with the pixels still
+in the same datatype they were in the imagefile.  The buffer is made
+large enough to accommodate the pixels in either datatype.
+
+
+.ks
+.nf
+pointer procedure imggsc (imdes, vs, ve, dtype, totpix)
+
+imdes	pointer to image descriptor structure
+vs,ve	coordinates of starting and ending points
+dtype	datatype of pixels required by calling program
+bp	pointer to CHAR buffer to hold pixels
+
+begin
+	# Get an (input) buffer to put the pixels into.   Prepare the
+	# section descriptor vectors V, VINC.
+
+	bp = imgibf (imdes, vs, ve, dtype)
+	call imsslv (imdes, vs, ve, v, vinc, npix)
+
+	# Extract the pixels.  IMRPIX reads a contiguous array of
+	# pixels into the buffer at the specified offset, incrementing
+	# the offset when done.  The pixels are type converted if
+	# necessary.
+
+	offset = 0
+
+	repeat {
+	    call imrdpx (imdes, *(bp+offset), v, npix)
+	    if (vinc[1] < 0)
+		call imflip (*(bp+offset), npix, sizeof(imdes.pixtype))
+	    offset = offset + npix
+
+	    for (d=2;  d <= imdes.ndim;  d=d+1) {
+		v[d] += vinc[d]
+		if ((v[d] - ve[d] == vinc[d]) && d < imdes.ndim)
+		    v[d] = vs[d]
+		else {
+		    d = 0
+		    break
+		}
+	    }
+	} until (d >= imdes.ndim)
+
+	totpix = offset
+	return (bp)
+end
+.fi
+.ke
+
+
+
+
+
+Prepare the section descriptor vectors V and VINC.  V is a vector specifying
+the coordinates at which the next i/o transfer will take place.  VINC is
+a vector specifying the loop step size.
+
+
+.ks
+.nf
+procedure imsslv (imdes, vs, ve, v, vinc, npix)
+
+begin
+	# Determine the direction in which each dimension is to be
+	# traversed.
+
+	do i = 1, imdes.ndim
+	    if (vs[i] <= ve[i])
+		vinc[i] = 1
+	    else
+		vinc[i] = -1
+
+	# Initialize the extraction vector (passed to IMRDS? to read a
+	# contiguous array of pixels).  Compute length of a line.
+
+	do i = 1, imdes.ndim
+	    v[i] = vs[i]
+
+	if (vs[1] > ve[1]) {
+	    v[1] = ve[1]
+	    npix = vs[1] - ve[1] + 1
+	} else
+	    npix = ve[1] - vs[1] + 1
+end
+.fi
+.ke
+
+
+
+
+
+The put-section procedure must write the contents of the output buffer
+to the image, using the section parameters saved during the previous call.
+The new section parameters are then saved, and the buffer pointer is
+returned to the calling program.  The calling program subsequently fills
+the buffer, and the sequence repeats.
+
+
+.ks
+.nf
+pointer procedure impgs$t (imdes, vs, ve)
+
+imdes	pointer to image descriptor structure
+vs,ve	coordinates of starting and ending points
+
+begin
+	# Flush the output buffer, if appropriate.  IMFLUSH calls
+	# one of the IMFLS? routines, which write out the section.
+
+	call imflush (imhdr)
+
+	# Get an (output) buffer to put the pixels into.  Save the
+	# section parameters in the image descriptor.  Save the epa
+	# of the typed flush procedure in the image descriptor.
+
+	bp = imgobf (imdes, vs, ve, TY_PIXEL)
+	imdes.flush_epa = loc (imfls$t)
+
+	return (bp)
+end
+.fi
+.ke
+
+
+
+Flush the output buffer, if a put procedure has been called, and the
+buffer has not yet been flushed.  The output buffer is flushed automatically
+whenever a put procedure is called, when an image is unmapped, or when
+the applications program calls IMFLUSH.
+
+
+.ks
+.nf
+procedure imfls$t (imdes)
+
+begin
+	# Ignore the flush request if the output buffer has already been
+	# flushed.
+
+	if (imdes.flush == YES) {
+	    bdes = imdes.obdes
+	    bp = bdes.bufptr
+
+	    # Convert datatype of pixels, if necessary, and flush buffer.
+	    if (imdes.pixtype != TY_PIXEL)
+		call impak$t (*bp, *bp, bdes.npix, imdes.pixtype)
+	    call imflsh (imdes)
+
+	    imdes.flush = NO
+	}
+end
+.fi
+.ke
+
+
+.ks
+.nf
+procedure imflsh (imdes)
+
+begin
+	# Determine the direction in which each dimension is to be
+	# traversed.
+
+	bdes = imdes.obdes
+	call imsslv (imdes, bdes.vs, bdes.ve, v, vinc, npix)
+
+	# Write out the pixels.  IMWRPX writes a contiguous array of
+	# pixels at the specified offset.
+
+	offset = 0
+
+	repeat {
+	    if (vinc[1] < 0)
+		call imflip (*(bp+offset), npix, sizeof(imdes.pixtype))
+	    call imwrpx (imdes, *(bp+offset), v, npix)
+	    offset = offset + npix
+
+	    for (d=2;  d <= imdes.ndim;  d=d+1) {
+		v[d] += vinc[d]
+		if ((v[d] - ve[d] == vinc[d]) && d < imdes.ndim)
+		    v[d] = vs[d]
+		else {
+		    d = 0
+		    break
+		}
+	    }
+	} until (d >= imdes.ndim)
+end
+.fi
+.ke
+
+
+
+
+Read a contiguous array of NPIX pixels, starting at the point defined by
+the vector V, into the callers buffer.
+
+
+.ks
+.nf
+procedure imrdpx (imdes, buf, v, npix)
+
+begin
+	# Check that the access does not reference out of bounds.
+
+	if (imsoob (imdes, v, npix))
+	    call imerr (imname, subscript_out_of_range)
+
+	# Seek to the point V in the pixel storage file.  Compute size
+	# of transfer.
+
+	call seek (imdes.pfd, imnote (imdes, v))
+	nchars = npix * sizeof (imdes.pixtype)
+
+	# Read in the data.
+	if (read (imdes.pfd, buf, nchars, junk) != nchars)
+	    call imerr (imname, missing_pixels)
+end
+.fi
+.ke
+
+
+
+Write a contiguous array of NPIX pixels, starting at the point defined by
+the vector V, into the pixel storage file.
+
+
+.ks
+.nf
+procedure imwrpx (imdes, buf, v, npix)
+
+begin
+	# Check that the access does not reference out of bounds.
+
+	if (imsoob (imdes, v, npix))
+	    call imerr (imname, subscript_out_of_range)
+
+	# Seek to the point V in the pixel storage file.  Note that
+	# when writing to a new image, the next transfer may occur
+	# at a point beyond the current end of file.  If so, write
+	# out zeros until the desired offset (which is in bounds)
+	# is reached.
+
+	file_offset = imnote (imdes, v)
+	if (file_offset > imdes.file_size)
+	    [write zeros until the desired offset is reached]
+	else
+	    call seek (imdes.pfd, file_offset)
+
+	# Compute size of transfer.  If transferring an entire line,
+	# increase size of transfer to the physical line length,
+	# to avoid having to enblock the data.  NOTE: buffer must
+	# be large enough to guarantee no memory violation.
+
+	if (v[1] == 1 && npix == imdes.len[1])
+	    nchars = imdes.physlen[1] * sizeof (imdes.pixtype)
+	else
+	    nchars = npix * sizeof (imdes.pixtype)
+
+	call write (imdes.pfd, buf, nchars)
+	imdes.file_size = max (imdes.file_size, file_offset+nchars)
+end
+.fi
+.ke
+
+
+
+
+IMNOTE computes the physical offset of a particular pixel in the
+pixel storage file.  If the disk datatype is UBYTE, this is the offset
+of the char containing the subscripted byte.
+
+
+.ks
+.nf
+long procedure imnote (imdes, v)
+
+begin
+	pixel_offset = v[1]
+	for (i=2;  i <= imdes.ndim;  i=i+1)
+	    pixel_offset += (v[i]-1) * imdes.physlen[i]
+
+	char_offset0 = (pixel_offset-1) * sizeof (imdes.pixtype)
+	return (imdes.pixoff + char_offset0)
+end
+.fi
+.ke
+
+
+
+Convert a vector of any datatype to type PIXEL ($t).  The input and
+output vectors may be the same, without loss of data.  The input and
+output datatypes may be the same, in which case no conversion is
+performed.
+
+
+.ks
+.nf
+procedure imupk$t (a, b, npix, dtype)
+
+begin
+	switch (dtype) {
+	case TY_USHORT:
+	    call achtu$t (a, b, npix)
+	case TY_SHORT:
+	    call achts$t (a, b, npix)
+	case TY_INT:
+	    call achti$t (a, b, npix)
+	case TY_LONG:
+	    call achtl$t (a, b, npix)
+	case TY_REAL:
+	    call achtr$t (a, b, npix)
+	case TY_DOUBLE:
+	    call achtd$t (a, b, npix)
+	case TY_COMPLEX:
+	    call achtx$t (a, b, npix)
+	default:
+	    call syserr (unknown_datatype_in_imagefile)
+	}
+end
+.fi
+.ke
+
+
+
+Convert a vector of type PIXEL ($t) to any datatype.  The input and
+output vectors may be the same, without loss of data.  The input and
+output datatypes may be the same, in which case no conversion is
+performed.
+
+
+.ks
+.nf
+procedure impak$t (a, b, npix, dtype)
+
+begin
+	switch (dtype) {
+	case TY_USHORT:
+	    call acht$tu (a, b, npix)
+	case TY_SHORT:
+	    call acht$ts (a, b, npix)
+	case TY_INT:
+	    call acht$ti (a, b, npix)
+	case TY_LONG:
+	    call acht$tl (a, b, npix)
+	case TY_REAL:
+	    call acht$tr (a, b, npix)
+	case TY_DOUBLE:
+	    call acht$td (a, b, npix)
+	case TY_COMPLEX:
+	    call acht$tx (a, b, npix)
+	default:
+	    call syserr (unknown_datatype_in_imagefile)
+	}
+end
+.fi
+.ke
+
+
+.sh
+Data Structure Management
+
+    When an image is mapped, buffer space is allocated for a copy of
+the image header, and for the image descriptor (used by IMIO while an
+image is mapped).  When the first i/o transfer is done on an image,
+either an input or an output data buffer will be created.  The size of
+this buffer is governed by the size of the transfer, and by the datatypes
+of the pixels on disk and in program space.
+
+If a new image is being written, the pixel storage file is created at
+the time of the first PUTPIX operation.  The physical characteristics
+of the new image, defined by the image header of the new image, are
+unalterable once the first i/o operation has occurred.  Accordingly,
+the number of dimensions, length of the dimensions, datatype of the
+pixels on disk, and so on must be set (in the image header structure)
+before writing to the new image.
+
+The only exception to this rule may be the addition of new lines to a
+two dimensional image stored in line storage mode, or the addition of
+new bands to a multiband image stored in band sequential (noninterlaced)
+mode.  It is not always possible to modify the dimensions or size of
+an existing image.
+
+It is possible to preallocate space for an image (using FALOC).  This
+may result in a more nearly contiguous file, and may make writing a
+new image slightly more efficient, since it will not be necessary
+to write blocks of zeros in IMPGS?.  Preallocation will occur
+automatically in systems where it is desirable.
+
+.sh
+Pixel Buffer Management
+
+    There may be any number of input buffers per image, but only a single
+output buffer.  By default there is only a single input buffer.  The input
+and output buffers are distinct: the same buffer is never used for both
+input and output (unlike FIO).
+
+The size of a buffer may range from one pixel, to the entire image (or
+larger if boundary extension is in use).  If multiple buffers are in use,
+all buffers do not have to be the same size.  The size of a buffer may
+vary from one GETPIX or PUTPIX call to the next.
+
+If multiple input buffers are in use, buffers are allocated in a strictly
+round robin fashion, one per GETPIX call.  Several buffers may contain
+data from the same part of the image.  Once the desired number of buffers
+have been filled, a buffer "goes away" with each subsequent GETPIX call.
+
+
+IMGIBF gets an input buffer.  When called to get a line or section,
+the vectors VS and VE specify the subsection to be extracted.
+This information is saved in the buffer descriptor, along with the
+datatype of the pixels and the dimension of the section.
+
+When IMGIBF is called to get a list of pixels, VS and VE would have to be
+replaced by a set of NPIX such vectors, to fully specify the section.
+It is impractical to save this much information in the buffer descriptor,
+so when creating a buffer to contain a list of pixels, VS and VE are faked
+to indicate a one dimensional section of the appropriate size.
+
+
+
+
+.ks
+.nf
+pointer procedure imgibf (imdes, vs, ve, dtype)
+
+imdes	image descriptor
+vs,ve	define the number of pixels to be buffered
+dtype	the datatype of the pixels in the program
+
+begin
+	# If first input transfer, allocate and initialize array of
+	# input buffer descriptors.
+
+	if (imdes.ibdes == NULL) {
+	    call imopsf (imdes)
+	    call calloc (imdes.ibdes, LEN_BDES * imdes.nbufs, TY_STRUCT)
+	}
+
+	# Compute pointer to the next input buffer descriptor.
+	# Increment NGET, the count of the number of GETPIX calls.
+
+	bdes = &imdes.ibdes [mod (imdes.nget, imdes.nbuf) + 1]
+	imdes.nget += 1
+
+	# Compute the size of the buffer needed.  Check buffer
+	# descriptor to see if the old buffer is the right size.
+	# If so, use it, otherwise make a new one.
+
+	nchars = imcssz (imdes, vs, ve, dtype)
+
+	if (nchars < bdes.bufsize)
+	    call realloc (bdes.bufptr, nchars, TY_CHAR)
+	else if (nchars > bdes.bufsize) {
+	    call mfree (bdes.bufptr, TY_CHAR)
+	    call malloc (bdes.bufptr, nchars, TY_CHAR)
+	}
+
+	# Save section coordinates, datatype in buffer descriptor, and
+	# return buffer pointer to calling program.
+
+	bdes.bufsize = nchars
+	bdes.dtype = dtype
+	bdes.npix = totpix
+
+	do i = 1, imdes.ndim {
+	    bdes.vs[i] = vs[i]
+	    bdes.ve[i] = ve[i]
+	}
+
+	return (coerce (bdes.bufptr, TY_CHAR, dtype)
+end
+.fi
+.ke
+
+
+
+
+.ks
+.nf
+pointer procedure imgobf (imdes, vs, ve, dtype)
+
+imdes	image descriptor
+vs,ve	define the number of pixels to be buffered
+dtype	the datatype of the pixels in the program
+
+begin
+	# If first write, and if new image, create pixel storage file,
+	# otherwise open pixel storage file.  Allocate and initialize
+	# output buffer descriptor.
+
+	if (imdes.obdes == NULL) {
+	    call imopsf (imdes)
+	    call calloc (imdes.obdes, LEN_BDES, TY_STRUCT)
+	}
+
+	bdes = imdes.obdes
+
+	# Compute the size of buffer needed.  Add a few extra chars
+	# to guarantee that there won't be a memory violation when
+	# writing a full physical length line.
+
+	nchars = imcssz (imdes, vs, ve, dtype) +
+	(imdes.physlen[1] - imdes.len[1]) * sizeof (imdes.pixtype)
+
+	if (nchars < bdes.bufsize)
+	    call realloc (bdes.bufptr, nchars, TY_CHAR)
+	else if (nchars > bdes.bufsize) {
+	    call mfree (bdes.bufptr, TY_CHAR)
+	    call malloc (bdes.bufptr, nchars, TY_CHAR)
+	}
+
+	# Save section coordinates, datatype of pixels in buffer
+	# descriptor, and return buffer pointer to calling program.
+
+	bdes.bufsize = nchars
+	bdes.dtype = dtype
+	bdes.npix = totpix
+
+	do i = 1, imdes.ndim {
+	    bdes.vs[i] = vs[i]
+	    bdes.ve[i] = ve[i]
+	}
+
+	return (coerce (bdes.bufptr, TY_CHAR, dtype)
+end
+.fi
+.ke
+
+
+
+Given two vectors describing the starting and ending coordinates
+of an image section, compute and return the amount of storage needed
+to contain the section.  Sufficient storage must be allocated to
+hold the largest datatype pixels which will occupy the buffer.
+
+
+
+.ks
+.nf
+long procedure imcssz (imdes, vs, ve, dtype)
+
+begin
+	pix_size = max (sizeof(imdes.pixtype), sizeof(dtype))
+	npix = 0
+
+	do i = 1, imdes.ndim
+	    if (vs[i] <= ve[i])
+		npix *= ve[i] - vs[i] + 1
+	    else
+		npix *= vs[i] - ve[i] + 1
+
+	return (npix * pix_size)
+end
+.fi
+.ke
+
+
+.sh
+Mapping and unmapping Image Structures
+
+    An imagefile must be "mapped" to an image structure before the
+structure can be accessed.  The map operation associates a file with
+a defined structure.
+
+The IMMAP procedure must allocate a buffer for the image header
+structure, and for the image descriptor structure.  If an existing
+imagefile is being mapped, the header is copied into memory from
+the imagefile.  If a new image is being mapped, the header structure
+is allocated and initialized.
+
+If an image is being mapped as a "new copy", a new header
+structure is created which is a copy of the header of an image which
+has already been mapped.  The entire image header, including any
+application specific fields, is copied.
+
+After copying an image header for a NEW_COPY image, the header field
+containing the name of the pixel storage file is cleared.  A "new copy"
+image structure does not inherit any pixels.  Any similar substructures
+which describe the attributes of the pixels (i.e., the blank pixel
+list, the histogram) must also be initialized.
+
+Note that the "image descriptor" buffer allocated below actually 
+contains the image descriptor, followed by the standard image header
+(at offset IMHDR_OFF), followed by any user fields.  If an existing
+image structure is being mapped, the caller supplies the length of
+the user area of the header as the third argument to IMMAP.
+
+IMMAP returns a pointer to the first field of the standard header
+as the function value.  The image descriptor is invisible to the
+calling program.
+
+
+
+.ks
+.nf
+pointer procedure immap (fname, mode, hdr_arg)
+
+begin
+	# Add code here to handle section suffixes in imagefile
+	# name strings (e.g. "image[*,5]").
+
+	# Open image header file.
+	hfd = open (fname, mmap[mode], BINARY_FILE)
+
+	# Allocate buffer for image descriptor/image header.  Note
+	# the dual use of the HDR_ARG argument.
+
+	if (mode == NEW_COPY)
+	    sz_imhdr = hdr_arg.sz_imhdr
+	else
+	    sz_imhdr = (LEN_IMHDR + int(hdr_arg)) * SZ_STRUCT
+
+	call calloc (imdes, SZ_IMDES + sz_imhdr, TY_STRUCT)
+	imhdr = imdes + IMHDR_OFF
+
+	[initialize the image descriptor, including the default
+	image section (optionally set by user with suffix above).]
+
+	# Initialize the mode dependent fields of the image header.
+	switch (mode) {
+	case NEW_COPY:
+	    call im_init_newcopy (imdes, hdr_arg)
+	case NEW_IMAGE:
+	    [initialize the image header]
+	default:
+	    call seek (hfd, BOFL)
+	    n = read (hfd, Memi[imhdr], sz_imhdr)
+	    if (n < SZ_IMHDR || strne (IM_MAGIC(imhdr), "imhdr")) {
+		call mfree (imdes)
+		call imerr (fname, file_not_an_imagefile)
+	    } else if (mode == READ_ONLY)
+		call close (hfd)
+	}
+
+	[initialize those fields of the image header which are not
+	dependent on the mode of access.]
+
+	return (imhdr_pointer)
+end
+.fi
+.ke
+
+
+
+
+.ks
+.nf
+procedure imunmap (imhdr)
+
+begin
+	imdes = imhdr - IMHDR_OFF
+
+	# Flush the output buffer, if necessary.
+	call imflush (imhdr)
+
+	# Append the bad pixel list.
+	if (the bad pixel list has been modified) {
+	    if (file_size < blist_offset)
+		[write out zeros until the offset of the bad pixel
+		list is reached]
+	    [append the bad pixel list]
+	    [free buffer space used by bad pixel list]
+	}
+
+	call close (imdes.pfd)
+
+	# Update the image header, if necessary (count of bad pixels,
+	# minimum and maximum pixel values, etc.).
+
+	if (imdes.update == YES) {
+	    if (no write permission on image)
+		call imerr (imname, cannot_update_imhdr)
+	    call imuphdr (imdes)
+	    call close (imdes.hfd)
+	}
+
+	# Free buffer space.
+	for (i=1;  i <= imdes.nbufs;  i=i+1)
+	    call mfree (imdes.ibdes[i].bufptr, TY_CHAR)
+	call mfree (imdes.obdes.bufptr, TY_CHAR)
+	call mfree (imdes, TY_STRUCT)
+end
+.fi
+.ke
+
+
+IMFLUSH indirectly references a typed flush procedure, the entry point
+address of which was saved in the image descriptor at the time of the
+last IMPGS? call.  The problem here is that IMFLUSH must work properly
+regardless of the data type of the pixels in the output buffer.  To
+ensure this, and to avoid having to link in the full matrix of 48 type
+conversion routines, we call LOC in the put-section procedure to reference
+the appropriate typed flush routine.
+
+
+
+.ks
+.nf
+procedure imflush (imhdr)
+
+begin
+	if (imdes.flush == YES)
+	    call zcall1 (imdes.flush_epa, imdes)
+end
+.fi
+.ke
+
+
+
+The following procedure is called by the IMGOBF and IMGIBF routines
+to open the pixel storage file, during the first PUTPIX operation on
+a file.
+
+
+.ks
+.nf
+procedure imopsf (imdes)
+
+begin
+	switch (imdes.mode) {
+	case READ_ONLY, READ_WRITE, WRITE_ONLY, APPEND:
+	    imdes.pfd = open (imdes.pixfile, imdes.mode, BINARY_FILE)
+	    if (read (imdes.pfd, pix_hdr, SZ_PIXHDR) < SZ_IMMAGIC)
+		call imerr (imname, cannot_read_pixel_storage_file)
+	    else if (strne (pix_hdr.im_magic, "impix"))
+		call imerr (imname, not_a_pixel_storage_file)
+
+	case NEW_COPY, NEW_FILE, TEMP_FILE:
+	    # Get the block size for device "imdir$", and initialize
+	    # the physical dimensions of the image, and the absolute
+	    # file offsets of the major components of the pixel storage
+	    # file.
+
+	    dev_block_size = fdevblk ("imdir$")
+	    [initialize im_physlen, im_pixels, im_hgmoff fields
+	    in image header structure]
+
+	    # Open the new pixel storage file (preallocate space if
+	    # enabled on local system).  Call FADDLN to tell FIO that
+	    # the pixfile is subordinate to the header file (for delete,
+	    # copy, etc.).  Save the physical pathname of the pixfile
+	    # in the image header, in case "imdir$" changes.
+
+	    call mktemp ("imdir$im", temp, SZ_FNAME)
+	    call fpathname (temp, imhdr.pixfile, SZ_PATHNAME)
+
+	    if (preallocation of imagefiles is enabled)
+		call falloc (imhdr.pixfile, sz_pixfile)
+	    imdes.pfd = open (imdes.pixfile, NEW_FILE, BINARY_FILE)
+	    call faddln (imdes.imname, imdes.pixfile)
+
+	    # Write small header into pixel storage file.  Allows
+	    # detection of headerless pixfiles, and reconstruction
+	    # of header if it gets lost.
+
+	    [write pix_hdr header structure to pixel storage file]
+
+	default:
+	    call imerr (imname, illegal_access_mode)
+	}
+end
+.fi
+.ke
+
+
+.sh
+Data Structures
+
+    An imagefile consists of two separate files.  The first file contains
+the image header.  In the prototype, there may be only a single header per
+header file.  The header consists of the standard image header, followed
+by an arbitrary number of user defined fields.
+
+The standard part of the image header has a fixed structure.  All the variable
+size components of an image are stored in the pixel storage file.  The
+name of the pixel storage file, and the offsets to the various components
+of the image, are stored in the image header.  The name of the image header
+file is in turn stored in the header area of the pixel storage file,
+making it possible to detect headerless images.
+
+The pixel storage file contains a small header, followed by the pixels
+(aligned on a block boundary), optionally followed by a fixed size
+histogram, and a variable size bad pixel list.
+
+
+.ks
+.nf
+		   Structure of an Imagefile
+
+		---------            ---------
+		    |       <----        |
+		 standard  ---->       header 
+		  image                  |
+		  header               PIXELS
+		    |                    |
+		   user              histogram      (optional)
+		  fields                 |
+		    |                   bad
+		   \|/                 pixel        (optional)
+		----------              list
+		                         |
+		                        \|/
+				     ---------
+.fi
+.ke
+
+
+The image header file, which is small, will reside in the users own
+directory.  The pixel storage file is generated and manipulated 
+transparently to the applications program and the user, and resides
+in the temporary files system, in the logical directory "imdir$".
+
+Storing the parts of an image in two separate files does cause problems.
+The standard file operators, like DELETE, COPY, RENAME, and so on,
+either cannot be used to manipulate imagefiles, or must know about
+imagefiles.
+
+To solve this problem, without requiring FIO to know anything about IMIO
+or VSIO data structures, two operators will be added to FIO.  The first
+will tell FIO that file 'A' has a subordinate file 'B' associated with
+it.  Any number of subordinate files may be associated with a file.
+The information will be maintained as a list of file names in an invisible
+text file in the same directory as file 'A'.
+
+The second operator will delete the link to a subordinate file.  The FIO
+procedures DELETE and RENAME will check for subordinate files, as will CL
+utilities like COPY.
+
+.sh
+The Standard Image Header
+
+    The standard fields of an image header describe the physical
+characteristics of the image (required to access the pixels), plus
+a few derived or historic attributes, which are commonly associated
+with images as used in scientific applications.
+
+
+.ks
+.nf
+struct imhdr {
+	char	im_magic[5]		# contains the string "imhdr"
+	long	im_hdrlen		# length of image header
+	int	im_pixtype		# datatype of the pixels
+	int	im_ndim			# number of dimensions
+	long	im_len[MAXDIM]		# length of the dimensions
+	long	im_physlen[MAXDIM]	# physical length (as stored)
+	long	im_pixels		# offset of the pixels
+	long	im_hgmoff		# offset of hgm pixels
+	long	im_blist		# offset of bad pixel list
+	long	im_szblist		# size of bad pixel list
+	long	im_nbpix		# number of bad pixels
+	long	im_cdate		# date of image creation
+	long	im_mdate		# date of last modify
+	real	im_max			# max pixel value
+	real	im_min			# min pixel value
+	struct	histogram im_hgm	# histogram descriptor
+	struct	coord_tran im_coord	# coordinate transformations
+	char	im_pixfile[SZ_PATHNAME]	# name of pixel storage file
+	char	im_name[SZ_IMNAME]	# image name string
+	char	im_history[SZ_IMHIST]	# history comment string
+}
+.fi
+.ke
+
+
+
+The histogram structure, if valid, tells where in the pixel storage file
+the histogram is stored, and in addition summarizes the principal
+attributes of the histogram.  All of these quantities are directly
+calculable, except for the last three.  The modal value is determined
+by centering on the (major) peak of the histogram.  LCUT and HCUT define
+an area, centered on the modal value, which contains a certain fraction
+of the total integral.
+
+
+.ks
+.nf
+struct histogram {
+	int	hgm_valid		# YES if histogram is valid
+	int	hgm_len			# number of bins in hgm
+	long	hgm_npix		# npix used to compute hgm
+	real	hgm_min			# min hgm value
+	real	hgm_max			# max hgm value
+	real	hgm_integral		# integral of hgm
+	real	hgm_mean		# mean value
+	real	hgm_variance		# variance about mean
+	real	hgm_skewness		# skewness of hgm
+	real	hgm_mode		# modal value of hgm
+	real	hgm_lcut		# low cutoff value
+	real	hgm_hcut		# high cutoff value
+}
+.fi
+.ke
+
+
+
+The coordinate transformation descriptor is used to map pixel coordinates
+to some user defined virtual coordinate system, (useful when displaying the
+contents of an image).  For lack of a significantly better scheme, we have
+simply adopted the descriptor defined by the FITS standard.
+
+
+.ks
+.nf
+struct coord_tran {
+	real	im_bscale		# pixval scale factor
+	real	im_bzero		# pixval offset
+	real	im_crval[MAXDIM]	# value at pixel
+	real	im_crpix[MAXDIM]	# index of pixel
+	real	im_cdelt[MAXDIM]	# increment along axis
+	real	im_crota[MAXDIM]	# rotation angle
+	char	im_bunit[SZ_BUNIT]	# pixval ("brightness") units
+	char	im_ctype[SZ_IMCTYPE,MAXDIM]	# coord units
+}
+.fi
+.ke
+
+
+
+The image and buffer descriptors are used internally by IMIO while
+doing i/o on a mapped image.  The image descriptor structure is
+allocated immediately before the image header, is transparent to the
+applications program, and is used to maintain runtime data, which
+does not belong in the image header.
+
+
+.ks
+.nf
+struct image_descriptor {
+	long	file_size			# size of pixfile
+	long	nget				# number getpix calls
+	int	nbufs				# number of in buffers
+	int	flush				# flush outbuf?
+	int	update				# update header?
+	int	pfd				# pixfile fd
+	int	hfd				# header file fd
+	int	flush_epa			# epa of imfls? routine
+	struct	buffer_descriptor *ibdes	# input bufdes
+	struct	buffer_descriptor *obdes	# output bufdes
+	char	imname[SZ_FNAME]		# imagefile name
+}
+.fi
+.ke
+
+
+
+.ks
+.nf
+struct buffer_descriptor {
+	char	*bufptr			# buffer pointer
+	int	dtype			# datatype of pixels
+	long	npix			# number of pixels in buf
+	long	bufsize			# buffer size, chars
+	long	vs[MAXDIM]		# section start vector
+	long	ve[MAXDIM]		# section end vector
+}
+.fi
+.ke

@@ -1,0 +1,34 @@
+# APSUM
+
+input,s,a,,,,List of input images
+output,s,h,"",,,List of output spectra
+apertures,s,h,"",,,Apertures
+format,s,h,"multispec","onedspec|multispec|echelle|strip",,Extracted spectra format
+references,s,h,"",,,List of aperture reference images
+profiles,s,h,"",,,"List of aperture profile images
+"
+interactive,b,h,yes,,,Run task interactively?
+find,b,h,yes,,,Find apertures?
+recenter,b,h,no,,,Recenter apertures?
+resize,b,h,no,,,Resize apertures?
+edit,b,h,yes,,,Edit apertures?
+trace,b,h,yes,,,Trace apertures?
+fittrace,b,h,yes,,,Fit the traced points interactively?
+extract,b,h,yes,,,Extract apertures?
+extras,b,h,no,,,"Extract sky, sigma, etc.?"
+review,b,h,yes,,,"Review extractions?
+"
+line,i,h,INDEF,1,,Dispersion line
+nsum,i,h,10,,,"Number of dispersion lines to sum or median
+"
+background,s,h,"none",,,Background to subtract (none|average|fit)
+weights,s,h,"none","none|variance",,Extraction weights (none|variance)
+pfit,s,h,"fit1d","fit1d|fit2d",,Profile fitting type (fit1d|fit2d)
+clean,b,h,no,,,Detect and replace bad pixels?
+skybox,i,h,1,1,,Box car smoothing length for sky
+saturation,r,h,INDEF,,,Saturation level
+readnoise,s,h,"0.",,,Read out noise sigma (photons)
+gain,s,h,"1.",,,Photon gain (photons/data number)
+lsigma,r,h,4.,0.,,Lower rejection threshold
+usigma,r,h,4.,0.,,Upper rejection threshold
+nsubaps,i,h,1,1,,Number of subapertures per aperture

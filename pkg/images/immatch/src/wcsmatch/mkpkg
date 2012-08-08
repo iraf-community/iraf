@@ -1,0 +1,14 @@
+# Make the SKYXYMATCH / WCSXYMATCH / WCSCOPY tasks
+
+$checkout libpkg.a ../../../
+$update   libpkg.a
+$checkin  libpkg.a ../../../
+$exit
+
+libpkg.a:
+	rgmatchio.x	wcsxymatch.h
+	t_skyxymatch.x  <fset.h> <imhdr.h> <mwset.h> <math.h> \
+			<pkg/skywcs.h> wcsxymatch.h
+	t_wcscopy.x	<imhdr.h> <mwset.h>
+	t_wcsxymatch.x	<fset.h> <imhdr.h> <mwset.h> wcsxymatch.h
+	;

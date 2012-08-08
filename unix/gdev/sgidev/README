@@ -1,0 +1,24 @@
+SGIDEV -- This directory contains the UNIX dependent sources for the metacode
+or bitmap translation programs for all devices supported by the SGI graphics
+kernel.  See gio$sgikern or `help sgikern' for further information on SGI.
+
+To add a new SGI device:
+
+	[1] Add source file for translator to this directory.
+	[2] Add references to mkpkg.csh and mkpkg.
+	[3] Run `mkpkg update' in this directory to install new translator.
+
+	[4] Add entry to graphcap file, including DD command string
+		containing host command to dispose of the output.
+
+	[5] Test new device interface.
+
+Alternatively, you might wish to install the source for the translator in
+local somewhere, to avoid a merge operation when a new version of the VMS
+host system interface is installed.
+                       
+Note that some example graphcap entries for SGI devices might require non-
+standard tasks residing outside of IRAF, for example the `impress300'
+command to ship Impress output from a UNIX node to a VMS node running
+Eunice in order to execute the VMS IMPRINT command.  These are considered
+so unusual that support is not included in the standard system.

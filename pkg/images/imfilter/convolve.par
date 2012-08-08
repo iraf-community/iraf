@@ -1,0 +1,13 @@
+# CONVOLUTION FILTER
+
+input,f,a,,,,Input images to be fit
+output,f,a,,,,Output images
+kernel,s,a,,,,Kernel file
+xkernel,s,a,,,,X dimension kernel file for bilinear kernels
+ykernel,s,a,,,,Y dimension kernel file for bilinear kernels
+bilinear,b,h,no,,,Is the kernel bilinear?
+radsym,b,h,no,,,Is the kernel radially symmetric?
+boundary,s,h,'nearest',,,'Boundary (constant,nearest,reflect,wrap)'
+constant,r,h,0,,,Constant for boundary extension
+row_delimiter,s,h,";",,,Kernel row delimiter
+mode,s,h,'ql'

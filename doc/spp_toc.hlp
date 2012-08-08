@@ -1,0 +1,119 @@
+.help spp Jan83 "IRAF Subset Preprocessor Language"
+.ce
+Contents
+
+.rj 1
+1. Introduction
+
+.rj 1
+2. Getting Started
+
+.rj 2
+3. Fundamentals of the Language
+.in 5
+.rj 2
+3.1 Lexical Form
+.in 5
+.rj 2
+3.1.1 comments
+.rj 2
+3.1.2 continuation
+.rj 2
+3.1.3 integer constants
+.rj 3
+3.1.4 floating point constants
+.rj 3
+3.1.5 character constants
+.rj 4
+3.1.6 string constants
+.rj 4
+3.1.7 identifiers
+.in -5
+.rj 4
+3.2 Data Types
+.rj 5
+3.3 Declarations
+.in 5
+.rj 5
+3.3.1 variable, array, and procedure declarations
+.rj 6
+3.3.2 array declarations
+.rj 6
+3.3.3 string declarations
+.rj 7
+3.3.4 global common declarations
+.rj 7
+3.3.5 procedure declarations
+.in 5
+.rj 8
+example 1: the sinc function
+.in -5
+.rj 8
+3.3.6 multiple entry points
+.in 5
+.rj 9
+example 2: multiple entry points
+.in -5
+.in -5
+.rj 9
+3.4 Initialization
+.rj 9
+3.5 Control Flow Constructs
+.in 5
+.rj 10
+3.5.1 conditional execution
+.rj 11
+3.5.2 error handling
+.rj 13
+3.5.3 repetitive execution
+.in -5
+.rj 15
+3.6 Expressions
+.in 5
+.rj 16
+3.6.1 mixed mode expressions
+.rj 16
+3.6.2 type coercion
+.in -5
+.rj 16
+3.7 The Assignment Statement
+.rj 16
+3.8 Some Examples
+.in 5
+.rj 17
+example 3: length of a string
+.rj 17
+example 4: min and max of a real array
+.in -5
+.rj 18
+3.9 Program Structure
+.in 5
+.rj 19
+3.9.1 include files
+.rj 19
+3.9.2 macro definitions
+.rj 20
+3.9.3 the task statement, and tasks
+.rj 22
+3.9.4 help text
+
+.in -5
+.in -5
+.rj 22
+4. Anachronisms
+
+.rj 23
+5. Notes on Topics not Discussed
+
+.rj 24
+APPENDIX A:  Predefined Constants
+.rj 25
+APPENDIX B:  Detailed Examples
+.in 5
+.rj 25
+Example 5: Matrix Inversion
+.rj 28
+Example 6: Pattern Matching
+.rj 31
+Example 7: Error Handling
+.endhelp

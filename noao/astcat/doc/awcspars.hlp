@@ -1,0 +1,113 @@
+.help awcspars Mar00 astcat
+.ih
+NAME
+awcspars -- edit the default world coordinate system parameters
+.ih
+USAGE
+awcspars 
+.ih
+PARAMETERS
+.ls wxref = "INDEF", wyref = "INDEF"
+The image header keyword names or the numerical values of the x and y reference
+point in pixels. If wxref = "INDEF" and wyref = "INDEF" the reference
+point defaults to the center of the image.
+.le
+.ls wxmag = "INDEF", wymag = "INDEF"
+The image header keyword names or the numerical values of the x and y scale
+factors in arcseconds per pixel. If wxmag  or wymag = are undefined a new
+wcs cannot be created.
+.le
+.ls wxrot = "180.0", wyrot = "0.0"
+The image header keyword names or the numerical values of the x and y rotation
+angles in degrees measured counter-clockwise to the positive x and y image
+axes. The default orientation is east=left, north=up. Wxrot values of 0.0,
+90.0, 180.0, and 270.0 correspond to east=right, up, left, and down
+respectively. Wyrot values of 0.0, 90.0, 180.0, and 270.0 correspond to
+north=up, left, down, and right respectively.
+.le
+.ls wraref = "RA", wdecref = "DEC"
+The image header keyword names or the numerical values of the reference
+point in celestial coordinates. If wraref and wdecref are undefined
+a new wcs cannot be created.
+.le
+.ls wraunits = "", wdecunits = ""
+The units of the reference point celestial coordinates. The options are
+"hours", "degrees", and "radians" for the ra coordinate and "degrees"
+and "radians" for the dec coordinate. If wraunits and wdecunits are undefined
+they default to the preferred units of the reference system.
+.le
+.ls wproj = "tan"
+The sky projection geometry. The most commonly used projections are "tan",
+"arc", "sin", and "lin". Other supported projections are "ait","car", "csc",
+"gls", "mer", "mol", "par", "pco", "qsc", "stg", "tsc", and "zea".
+.le
+.ls wsystem = "EQUINOX"
+The image header keyword name or string defining the celestial coordinate
+system of the reference point. The most common values for wsystem are
+"2000.0", "1950.0", "J2000.0", and "B1950.0". Type "help ccssytems" to get
+a full list of options.
+.le
+.ih
+DESCRIPTION
+The default wcs parameters are used to create an approximate  FITS wcs for
+an images which do not have one. Creating an approximate header
+from the telescope pointing position and the known scale and orientation
+of the detector can make later steps like locating the catalog stars
+for computing an accurate plate solution simpler.
+
+In coordinates of the reference point in pixels and celestial coordinates
+\fIwxref\fR, \fIwyref\fR, \fIwraref\fR, \fIwdecref\fR, the scale factors
+\fIwxmag\fR and \fIwymag\fR, and the orientation \fIwxrot\fR and \fIwyrot\fR
+can be read from the image header or set by value. The coordinate system
+and units of the celestial coordinates of the reference point \fIwsystem\fR
+and \fIwraunits\fR and \fIwdecunits\fR must be set explicitly. The image
+projection function \fIwproj\fR must also be set separately.
+
+.ih
+EXAMPLES
+1. List the default wcs parameters.
+
+.nf
+cl> lpar awcspars
+.fi
+
+2. Edit the default wcs parameters.
+
+.nf
+cl> awcspars
+... edit the parameters in the usual way
+... type :wq to quit and save the edits
+.fi
+
+3. Edit the default wcs parameters from the agetim task.
+
+.nf
+cl> epar agetim
+... edit the agetim parameters
+... move to the agetim parameter line and type :e
+... edit the awcspars parameters
+... type :wq to quit and save the awcspars edits
+... continue editing the remaining awcspars parameters
+... type :go to execute the task
+.fi
+
+4. Save the current awcspars parameter values in a text file called
+awcs1.par.  Use the saved parameter set in the next call to the agetim
+task.
+
+.nf
+cl> epar awcspars
+... edit some parameters in the usual way
+... type :w awcs1.par
+... type :q to quit
+cl> agetim ... awcspars=awcs1.par ...
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+agetim, ahedit
+.endhelp

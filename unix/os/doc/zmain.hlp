@@ -1,0 +1,62 @@
+.help zmain May84 "System Interface"
+.ih
+NAME
+zmain -- process main
+.ih
+SYNOPSIS
+.nf
+not applicable
+.fi
+.ih
+DESCRIPTION
+The process main is the procedure or code segment which first gains control
+when a process is executed by the host system.  The process main must determine
+whether the process was called as a connected subprocess, as a detached process,
+or by the host system.  If spawned as a connected subprocess the standard input
+and output of the process are connected to IPC channels leading to the parent
+process, otherwise the devices to which the process channels are connected are
+machine dependent.
+
+After connecting the process standard input, standard output, and standard
+error output \fBzmain\fR calls the IRAF Main, an SPP procedure.
+The calling sequence of the IRAF Main is as follows:
+
+.nf
+	main (inchan, outchan, driver, prtype, bkgfile, jobcode)
+
+	int	inchan		# standard input channel
+	int	outchan		# standard output channel
+	int	driver		# EPA of device driver for channels
+	int	prtype		# process type code
+	packed	char bkgfile[]	# name of bkgfile, if detached process
+	int	jobcode		# bkg jobcode, if detached process
+.fi
+
+The IPC driver, text file driver, and binary file driver are resident in
+every process.  The \fBdriver\fR argument is the entry point address of
+the read primitive of the appropriate driver, as returned by \fBzlocpr\fR.
+The process type code is selected from the following:
+
+.nf
+	PR_CONNECTED	1	# connected subprocess
+	PR_DETACHED	2	# detached subprocess
+	PR_HOST		3	# process run from host
+.fi
+
+The process type determines the type of protocol to be used by the IRAF Main.
+The background file and jobcode are used only if the process was spawned as
+a detached process.
+.ih
+RETURN VALUE
+None.
+.ih
+NOTES
+Currently only the CL may be run as a detached process, and only ordinary
+SPP processes may be run as connected subprocesses.  Either may be run directly
+by the host system.  The CL uses a nonstandard Main.  Error recovery is
+handled entirely by the IRAF Main.
+.ih
+SEE ALSO
+zfiopr, zfiotx, and the discussion of the process and IRAF mains in the
+reference manual.
+.endhelp

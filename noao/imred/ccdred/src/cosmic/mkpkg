@@ -1,0 +1,16 @@
+# COSMIC RAY CLEANING
+
+$checkout libpkg.a ../..
+$update   libpkg.a
+$checkin  libpkg.a ../..
+$exit
+
+libpkg.a:
+	crexamine.x	crlist.h <error.h> <gset.h> <mach.h> <pkg/gtools.h>\
+			<imhdr.h> <syserr.h>
+	crfind.x	<math/gsurfit.h>
+	crlist.x	crlist.h <error.h> <gset.h> <syserr.h>
+	crsurface.x	
+	t_cosmicrays.x	crlist.h <error.h> <gset.h> <math/gsurfit.h>\
+			<pkg/gtools.h> <imhdr.h> <imset.h>
+	;

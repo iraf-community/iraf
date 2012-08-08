@@ -1,0 +1,295 @@
+.help catalogs Mar00 astcat
+.ih
+NAME
+catalogs -- describe the catalog configuration file
+.ih
+USAGE
+help catalogs
+.ih
+ASTROMETRIC CATALOGS
+
+An astrometric catalog is a remote or local catalog containing accurate
+positional data for a large region of the sky, from which accurate positional
+data for a small region of the sky may be extracted by specifying an extraction
+region.
+
+Astrometric catalogs may be installed locally or accessed remotely. Each
+supported catalog must have a record in the catalog configuration file
+specifying the catalog network address, the catalog query format,
+and the query output format. The default configuration file is
+"astcat$lib/catdb.dat". A list of the supported catalogs can be obtained
+by running the aclist task.
+
+.ih
+THE CATALOG CONFIGURATION FILE
+
+The catalog configuration file specifies the network address, the query
+format, and the output format for each supported catalog server. Each catalog
+server record is accessed via a record name of the form catalog@site,
+e.g. "usno2@noao". Adding support for a new catalog server requires adding
+a new record to the configuration file. Responding to changes in the behavior
+of a supported catalog server requires editing the existing record.  In 
+either case no modification of the compiled code should be required.
+
+The server network address tells the catalog access code where and how to
+connect to the network. Each network address has the syntax
+domain:port:address:flags e.g. "inet:80:www.noao.edu:text".
+
+The query format specifies the form of the query server command, and the
+names, default values, units, and formats of the query parameters. A set of
+query parameter names are reserved for accessing astrometric catalogs
+including "ra", "dec", "radius", "hwidth", "width", "xwidth", and "ywidth". The
+astcat package recognizes the reserved query parameter names,
+replaces the default query parameter values with the user supplied ones,
+and sends the query to the catalog server. "ra" and "dec" always refer
+to the center of the region to be extracted. The size parameter is
+always input by the user as a width in ra and dec in arcminutes. This quantity
+is translated into a radius like parameter or a width  like parameter
+depending on whether the query parameter is defined as "radius", "hwidth",
+"width", "xwidth", "ywidth", "xhwidth", "yhwidth", "rawidth", "decwidth",
+"rahwidth", "dechwidth", etc. Most catalogs use "radius", "hwidth", or
+"width" in their queries.
+
+The server output format specifies the form of the expected server output:
+the data stream type, the record size, and the name, location,
+size, data type, units and format of each field in a record. A set of
+standard field names is reserved for accessing the output of astrometric
+catalog servers including "id", "ra", "dec", and "mag[1-n]". The astcat
+package tasks recognize the reserved field names and use the query output
+description to decode the catalog records.
+
+.ih
+SAMPLE CATALOG RECORD
+
+The following two examples illustrate the main features of the catalog
+configuration file record. Both records describe the same catalog server
+but define the output query format in different ways.
+
+.nf
+begin susno2@noao
+address inet:80:www.noao.edu:text
+query GET /cgi-bin/usno/usnoextract?search=yes&ra=%-s&dec=%-s&width=%-s HTTP/1.0
+\n\n
+nquery 4
+    ra 00:00:00.00 hours %0.2h
+    dec 00:00:00.0 degrees %0.1h
+    radius 5.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+type stext
+    hskip 10
+    tskip  6
+    recsize 0
+    triml 0
+    trimr 4
+nheader 1
+    csystem J2000.0
+nfields 4
+    ra 1 0 d hours %12.3h
+    dec 2 0 d degrees %12.2h
+    mag1 3 0 r INDEF %4.1f
+    mag2 4 0 r INDEF %4.1f
+.fi
+
+.nf
+begin busno2@noao
+address inet:80:www.noao.edu:text
+query GET /cgi-bin/usno/usnoextract?search=yes&ra=%-s&dec=%-s&width=%-s HTTP/1.0
+\n\n
+nquery   4
+    ra 00:00:00.00 hours %0.2h
+    dec 00:00:00.0 degrees %0.1h
+    radius 5.0 minutes %0.1f
+    qsystem J2000.0 INDEF %s
+type btext
+    hskip 10
+    tskip 6
+    recsize 44
+    triml 0
+    trimr 4
+nheader 1
+    csystem J2000.0
+nfields 4
+    ra  1 13 d hours %12.3h
+    dec 14 14 d degrees %12.2h
+    mag1 28  6 r INDEF %4.1f
+    mag2 34  6 r INDEF %4.1f
+.fi
+
+The beginning of a new catalog record is marked by a line which looks like
+"begin catname" where catname is a unique name of the form catalog@site.
+More than one name can access the same catalog server. Multiple entries for
+the same catalog are used to define a different query format or to interpret
+the query output in different ways. For example if the catalog server supports
+output record selection by magnitude then the query can be defined to make use
+this feature. In other cases it can be advantageous to interpret the server
+output as blocked text rather than simple text.
+
+The \fIaddress\fR, \fIquery\fR and \fInquery\fR keywords are required and
+define the network address, query command format and query parameters for
+the catalog server.
+
+The \fIaddress\fR keyword  "domain", "port", and "flags" fields are almost
+always "inet", "80", and "text" respectively. The remaining field
+is the address field "www.noao.edu" in this case.
+
+The \fIquery\fR keyword defines the query command. The form of the query command
+is server dependent. Note the %-s formatting strings in the above examples.
+These strings are replaced by the query parameter values supplied
+by the user or by the default query parameter values.
+
+The number of query parameters is defined by the \fInquery\fR parameter. The
+number of query parameters must be greater than or equal to the number of "-%s"
+strings in the query keyword value. The name,  default value, units,
+and format of each query parameter is listed below the nquery keyword and value,
+one query parameter description per line. Alert users will notice that in the
+above examples the number of query parameters is 4, but there are only 3 "%-s"
+strings in the query keyword value. In these examples the qsystem query
+parameter, which defines the coordinate system of the ra and dec query
+parameters, is fixed at J2000. For some servers qsystem may be a true query
+parameter, i.e.  the server may accept coordinates in B1950 or J2000
+or some other system.
+
+Users must use the standard query parameter names "ra", "dec", and "qsystem"
+to define the extraction region center and its coordinate system, and one or
+more of "radius", "hwidth", "xhwidth", "yhwidth", "width", "xwidth", and
+"ywidth" to define the extraction
+region size. Currently the units of "ra" may be "hours", "degrees", or
+"radians", the units of dec may be "degrees" or "radians", and units of the
+size query parameter may be "degrees" or "arcmin".
+The qsystem parameter may be any one of the supported celestial coordinate
+systems. The most popular values are "icrs", "J2000", and "B1950".
+For more information on coordinate systems type "help ccsystems". The
+query parameter formats are used to convert
+the numerical values supplied by the user to string arguments that
+can be passed to the query command.
+
+The \fItype\fR keyword defines the query output type. The current options
+are "stext" for simple text and "btext" for blocked text. Simple text 
+contains newline delimited records and whitespace delimited fields.
+Blocked text contains newline delimited records and fixed position and size
+fields. If the type keyword is missing "stext" is assumed.
+
+The \fIrecsize\fR keyword is the maximum length of the record in characters
+including the newline character. Records greater in length than recsize are
+skipped.  If undefined the recsize keyword defaults to 0 meaning the record
+size may not be fixed.
+
+The \fIhskip\fR, \fItskip\fR, \fIltrim\fR, and \fItrim\fR keywords define
+the number of header and trailer records in the server output to skip, and
+the number of header and trailer characters in each record to skip. The
+latter 2 keywords can be used to trim (actually replace with blanks) leading
+and trailing characters in each record. If absent all 4 keywords default to
+zero.
+
+The \fInheader\fR keyword defines the number of header keywords. Header
+keywords are global keywords which apply to all the output records.
+There may be any number of header keywords or none. The header keyword
+and value pairs are copied to the headers of the astrometry files created
+by astcat. For most astrometry catalog the only header parameter is
+\fIcsystem\fR which specifies the coordinate system of the query output
+coordinates.
+
+The \fInfields\fR keyword specifies the number of fields in each output record.
+The name, offset, size, datatype, units, and format of each field follow
+the nfields keyword and value pair,
+one field description per line. For simple text files the offset is the field
+or column number and the field size is 0. For blocked text files the
+offset is the 1-indexed position of the first character in the field and
+size is the field size in characters. Using a blocked text description can
+be useful for dealing with fields containing embedded blanks.
+
+Users should use the reserved standard fields names "id", "ra", "dec", "mag#"
+etc to define the standard field names.  The current list of standard field
+names is \fIid\fR, \fIra\fR, \fIdec\fR, \fIera\fR, \fIedec\fR, \fIpmra\fR,
+\fIpmdec\fR, \fIepmra\fR, \fIepmdec\fR, \fIcatsystem\fR, \fIequinox\fR,
+\fIepoch\fR, \fIpx\fR, \fIrv\fR, \fIepx\fR, \fIerv\fR, \fImag\fR, \fIcolor\fR,
+\fIemag\fR, \fIecolor\fR, \fIxp\fR, \fIyp\fR, \fIxc\fR, \fIyc\fR, \fIexc\fR,
+\fIeyc\fR, \fIimag\fR, and \fIeimag\fR.
+
+.ih
+INSTALLING A NEW CATALOG RECORD
+
+Some users may wish to install a local version of a standard catalog, 
+or add support for a new catalog server. The procedure for doing this
+is outlined below. 
+
+To install a new catalog record.
+
+.ls [1]
+Create a new configuration file by making a copy of the existing one.
+.le
+
+.ls [2]
+Determine a unique name for the catalog server. This name should be short and
+have the form catalog@site, e.g. "usno2@noao". Existing names can be
+reviewed with the aclist task.
+.le
+
+.ls [3]
+Determine the appropriate values for the address, query, and nquery
+keywords and enter these quantities in the catalog record. Determine the name,
+default value, units and format for each query parameter and enter these
+quantities in the catalog record in the order they are requested by
+the query parameter string. Make sure that all the query keyword value
+parameter format strings are -%s, that the value of the nquery keyword
+is greater than or equal to the number of %-s strings in the query keyword
+value, and that standard query parameter names are used where possible.
+.le
+
+.ls [4]
+Determine the query output type. If the query output type is unknown set
+type to "stext". Leave the recsize, hskip, tskip, ltrim, and rtrim parameters
+undefined.
+.le
+
+.ls [5]
+Set the nheader keyword value to 1 and determine the appropriate value for
+the csystem header keyword.
+.le
+
+.ls [6]
+Set the nfields keyword to 0.
+.le
+
+.ls [7]
+Run the adumpcat task. Adumpcat tests the address and query parts of the
+catalog record but dumps the query results directly to a text file without
+modification. If adumpcat fails either the network connection is bad
+or the address and / or query format is incorrect.
+.le
+
+.ls [8]
+Examine the adumpcat results. Determine whether the output is simple text
+or blocked text. Simple text is usually the best choice.  However if the
+record fields contain embedded blanks it may be necessary to set type
+to blocked text. Are there fixed numbers of leading and trailing junk records ?
+If so set hskip and tskip appropriately. Are there fixed numbers of leading and
+trailing junk record characters ? If so set ltrim and rtrim
+appropriately. If the record size in characters fixed or does it
+have a maximum size ? If so set recsize appropriately but remember to
+include the newline character in the record size.
+.le
+
+.ls [9]
+Use the adumpcat task results to determine the value of the nfields parameter
+and the required field descriptions. 
+Determine the name, position, size, data type, units, and format for
+each field in the output records. Use the standard field names 
+and the standard field data types if possible.  It is
+a good idea to set the data type of coordinate fields to double. Check that
+the units of the coordinate fields are correct as these are used to do
+coordinate conversions.
+.le
+
+.ls [10]
+Run the agetcat task using the new catalog record and catalog configuration 
+file. Examine the header of the output astrometry file to make sure
+the header and field descriptions have been transferred correctly. Apply a
+few filtering options, i.e. sort on a field, or select a subset of fields for
+output, to test the correctness of the field descriptions.
+.le
+
+.ih
+SEE ALSO
+aclist, files
+.endhelp

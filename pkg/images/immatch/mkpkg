@@ -1,0 +1,5 @@
+# MKPKG for the IMMATCH Package
+
+libpkg.a:
+	@src
+	;

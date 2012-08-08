@@ -1,0 +1,101 @@
+.help mkillumflat Oct88 noao.imred.ccdred
+.ih
+NAME
+mkillumflat -- Make illumination corrected flat fields
+.ih
+USAGE
+mkillumflat input output
+.ih
+PARAMETERS
+.ls input
+List of input flat field images to be illumination corrected.
+.le
+.ls output
+List of output illumination corrected flat field images.
+If none is specified or if the name is the same as the
+input image then the output image replaces the input image.
+.le
+.ls ccdtype = "flat"
+CCD image type to select from the input images.
+.le
+.ls xboxmin = 5, xboxmax = 0.25, yboxmin = 5, yboxmax = 0.25
+Minimum and maximum smoothing box size along the x and y axes.  The
+minimum box size is used at the edges and grows to the maximum size in
+the middle of the image.  This allows the smoothed image to better
+represent gradients at the edge of the image.  If a size is less then 1
+then it is interpreted as a fraction of the image size.  If a size is
+greater than or equal to 1 then it is the box size in pixels.  A size
+greater than the size of image selects a box equal to the size of the
+image.
+.le
+.ls clip = yes
+Clean the input images of objects?  If yes then a clipping algorithm is
+used to detect and exclude objects from the smoothing.
+.le
+.ls lowsigma = 2.5, highsigma = 2.5
+Sigma clipping thresholds above and below the smoothed illumination.
+.le
+.ls divbyzero = 1.
+The illumination flat field is the ratio of the flat field to a
+smoothed flat field.  This may produce division by zero.  A warning is
+given if division by zero takes place and the result (the illumination
+corrected flat field value) is replaced by the value of this
+parameter.
+.le
+.ls ccdproc (parameter set)
+CCD processing parameters.
+.le
+.ih
+DESCRIPTION
+First, the input flat field images are processed as needed.  Then the
+large scale illumination pattern of the images is removed.  The
+illumination pattern is determined by heavily smoothing the image using
+a moving "boxcar" average.  The output image is the ratio of the input
+image to the illumination pattern.  The illumination pattern is
+normalized by its mean to preserve the mean level of the input image.
+
+When this task is applied to flat field images only the small scale
+response effects are retained.  This is appropriate if the flat field
+images have illumination effects which differ from the astronomical
+images and blank sky images are not available for creating sky
+corrected flat fields.  When a high quality blank sky image is
+available the related task \fBmkskyflat\fR should be used.  Note that
+the illumination correction, whether from the flat field or a sky
+image, may be applied as a separate step by using the task
+\fBmkillumcor\fR or \fBmkskycor\fR and applying the illumination
+correction as a separate operation in \fBccdproc\fR.  However, creating
+an illumination corrected flat field image before processing is more
+efficient since one less operation per image processed is needed.  For
+more discussion about flat fields and illumination corrections see
+\fBflatfields\fR.
+
+The smoothing algorithm is a moving average over a two dimensional
+box.  The algorithm is unconvential in that the box size is not fixed.
+The box size is increased from the specified minimum at the edges to
+the maximum in the middle of the image.  This permits a better estimate
+of the background at the edges, while retaining the very large scale
+smoothing in the center of the image.  Note that the sophisticated
+tools of the \fBimages\fR package may be used for smoothing but this
+requires more of the user and, for the more sophisticated smoothing
+algorithms such as surface fitting, more processing time.
+
+To minimize the effects of bad pixels a sigma clipping algorithm is
+used to detect and reject these pixels from the illumination.  This is
+done by computing the rms of the image lines relative to the smoothed
+illumination and excluding points exceeding the specified threshold
+factors times the rms.  This is done before each image line is added to
+the moving average, except for the first few lines where an iterative
+process is used.
+.ih
+EXAMPLES
+1. Two examples in which a new image is created and in which the
+input flat fields are corrected in place are:
+
+.nf
+    cl> mkllumflat flat004 FlatV
+    cl> mkillumflat flat* ""
+.fi
+.ih
+SEE ALSO
+ccdproc, flatfields, mkfringecor, mkillumcor, mkskycor, mkskyflat
+.endhelp

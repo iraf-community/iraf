@@ -1,0 +1,36 @@
+.help prebn Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slPRBN (BEP0, BEP1, RMATP)
+
+     - - - - - -
+      P R B N
+     - - - - - -
+
+  Generate the matrix of precession between two epochs,
+  using the old, pre-IAU1976, Bessel-Newcomb model, using
+  Kinoshita's formulation (double precision)
+
+  Given:
+     BEP0    dp         beginning Besselian epoch
+     BEP1    dp         ending Besselian epoch
+
+  Returned:
+     RMATP  dp(3,3)    precession matrix
+
+  The matrix is in the sense   V(BEP1)  =  RMATP * V(BEP0)
+
+  Reference:
+     Kinoshita, H. (1975) 'Formulas for precession', SAO Special
+     Report No. 364, Smithsonian Institution Astrophysical
+     Observatory, Cambridge, Massachusetts.
+
+  Called:  slDEUL
+
+  P.T.Wallace   Starlink   23 August 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

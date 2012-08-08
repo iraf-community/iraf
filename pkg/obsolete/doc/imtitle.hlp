@@ -1,0 +1,26 @@
+.help imtitle Aug84 obsolete
+.ih
+NAME
+imtitle -- Change the title of an image
+.ih
+USAGE	
+imtitle image title
+.ih
+PARAMETERS
+.ls image
+Image to be modified.
+.le
+.ls title
+New image title.
+.le
+.ih
+DESCRIPTION
+The title in \fIimage\fR is changed to \fItitle\fR.
+.ih
+EXAMPLES
+
+    cl> imtitle m1 "M1 U Band"
+.ih
+USE INSTEAD
+images.hedit
+.endhelp

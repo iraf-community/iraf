@@ -1,0 +1,85 @@
+.help xt_maskname Mar07 xtools
+.ih
+NAME
+.nf
+xt_maskname -- create mask name 
+.fi
+.ih
+SYNOPSIS
+.nf
+procedure xt_maskname (fname, extname, mode, mname, maxchar)
+
+char	fname[ARB]			#I File name
+char	extname[ARB]			#I Default pixel mask extension name
+int	mode				#I Mode
+char	mname[maxchar]			#O Output mask name
+int	maxchar				#I Maximum characters in mask name
+.fi
+.ih
+DESCRIPTION
+This routine encapsulates creating a mask name from a user specified
+name, an optional extension name, and an optional environment variable.
+It checks if an explicit format is desired based on the presence of a
+".pl" extension for a pixel list file or the FITS kernel parameter
+"type=mask" (with the equal sign possibly escaped) for a FITS extension.
+If neither is specified then the default is a FITS extension unless the
+environment variable "masktype" is set to "pl".  If the application
+does not specify an extension name for FITS format the name "pl" is used.
+
+If the "masktype" environment variable is "pl" and the application requests
+an extension name then a directory with the specified filename is used (and
+created for a new mask) and the pixel list filename is the extension name.
+For example, if the filename is "obj1234" and the extension name is "im1"
+then the mask name is "obj1234/im1.pl".  As a fallback if a directory
+cannot be accessed the filename will have the form <fname>_<extname>.pl.
+
+Typically an application that specifically was designed to handle
+multi-extension FITS (MEF) files will use the same extension name for
+a mask as for the image extension to which it applies.
+.ih
+EXAMPLES
+1. When "masktype" is undefined and creating a new mask:
+
+.nf
+               fname extname		mname
+  --------------------------------------------------------
+                 abc ""         -->     abc[pl,type=mask]
+                 abc "def"      -->     abc[def,type=mask]
+  abc[def,type=mask] ""         -->     abc[def,type=mask]
+            abc[def] "ghi"      -->     abc[def,type=mask]
+              abc.pl ""         -->     abc.pl
+              abc.pl "def"      -->     abc.pl
+.fi
+
+2. When "masktype=pl" and creating a new mask:
+
+.nf
+               fname extname		mname
+  --------------------------------------------------------
+                 abc ""         -->     abc.pl
+                 abc "def"      -->     abc/def.pl
+  abc[def,type=mask] ""         -->     abc/def.pl
+            abc[def] "ghi"      -->     abc/def.pl
+              abc.pl ""         -->     abc.pl
+              abc.pl "def"      -->     abc.pl
+.fi
+
+3. When reading a mask it looks for either format unless an explicit
+".pl" extension is included.
+
+.nf
+               fname extname		mname
+  --------------------------------------------------------
+                 abc ""         -->     abc[pl]
+                 abc "def"      -->     abc[def]
+  abc[def,type=mask] ""         -->     abc[def,type=mask]
+            abc[def] "ghi"      -->     abc[def]
+              abc.pl ""         -->     abc.pl
+              abc.pl "def"      -->     abc.pl
+                 abc ""         -->     abc.pl
+                 abc "def"      -->     abc/def.pl
+            abc[def] ""         -->     abc/def.pl
+            abc[def] "ghi"      -->     abc/def.pl
+            abc[def] ""         -->     abc_def.pl
+.fi
+.endhelp

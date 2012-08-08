@@ -1,0 +1,107 @@
+
+	Installation Instructions for the VOL Addon Package
+
+The volume-images package, VOL, is being distributed separately
+from the IRAF V2.8 distribution.  This package is being made available for
+user testing on a user-beware basis. The installation instructions
+that follow assume that you have copied the tar format VOL archive onto
+your host machine.  The method you use to copy the file (or remotely access
+the tar file) is OS dependent and is not discussed in this document.  If your
+IRAF system has been stripped of the IRAF libraries ('mkpkg stripall') you
+will not be able to build the VOL executable as described here.  You must 
+either reload the required libraries or request a binary distribution
+of VOL for your operating system.  If you have any questions, please send
+electronic mail to the IRAF project at 
+
+Internet (ARPAnet, MILnet, NSFnet, etc.)  iraf@noao.edu
+BITnet					  iraf@noao.edu *
+SPAN/HEPnet (DECnet)			  noao::iraf or 5355::iraf
+UUCP/Usenet				  {arizona,decvax,ncar}!noao!iraf
+					  uunet!noao.edu!iraf
+* = through a user-specified gateway
+
+					  [IRAF Hotline:  (602) 323-4160]
+
+For discussion of algorithms or ongoing bug fixes etc., contact the author,
+Steve Rooke, at 602-325-9399 (or rooke@noao.edu or 5355::rooke).
+
+This package is being distributed as an external package making use of the
+layered software enhancements in IRAF V2.8.
+
+[1] This discussion assumes you intend to install VOL as an independent
+    external layered package.  You may choose to merge it into your custom
+    "local" package instead, but would need to edit several files not
+    discussed herein.
+
+[2] Log into the CL from the IRAF installation account.  This insures you
+    have the proper permissions and the files will have the proper owner.
+
+    Create a directory for vol, preferably external to the IRAF directory
+    tree to simplify future IRAF updates, then set an IRAF environment
+    variable to point to it.
+
+    UNIX example:
+	cl> reset vol /local/iraftest/vol/
+    VMS example:
+	cl> reset vol usr\$1:[localiraf.vol]
+
+[3] Change directory to vol and unpack the tar archive.  You must
+    load the softools package before executing rtar.  Note that the <ARCHIVE>
+    name must be given with the appropriate path name at the host OS level,
+    or may be specified as a tape device if that is how you received the
+    package.
+
+	cl> cd vol
+	cl> softools
+	so> rtar -xrf <ARCHIVE>		# Read the archive
+	so> cd vol			# Change to VOL subdirectory
+
+[4] When the archive has been unpacked, build the VOL package executable:
+
+	1) Delete any bin directory symbolic links you find
+	2) Create a directory called bin.ARCH where ARCH is something
+	   like "f68881", "ffpa", "sparc", or "vax"; see your IRAF
+	   installation guide.
+	3) Then issue the following commands:
+
+		so> mkpkg ARCH
+		so> mkpkg -p vol update >& spool &
+
+    The first command sets the bin directory to be properly configured
+    and the second recompiles the package.  For Sun multiple architecture
+    support, please refer to the "Sun/IRAF Site Manager's Guide".
+
+[5] The spool file(s) should be reviewed upon completion to make sure 
+    there were no errors.  When you are confident the installation was
+    successful, delete the spool file (and the archive file if you wish).
+
+[6] Still logged in as iraf, edit the one file in the core iraf system 
+    that is necessary to install an external layered package:
+
+	so> cd hlib
+	so> edit extern.pkg
+
+	UNIX example, leaving out other external packages:
+	    reset	vol		= /local/iraftest/vol/
+	    task	vol.pkg		= vol$vol.cl
+
+	    reset	helpdb		= "lib$helpdb.mip\
+					  [ ... other packages ... ]
+					  ,vol$lib/helpdb.mip\
+				      "
+	VMS example, leaving out other external packages:
+	    reset	vol		= usr\$2:[localiraf.vol]
+	    task	vol.pkg		= vol$vol.cl
+
+	    reset	helpdb		= "lib$helpdb.mip\
+					  ,vol$lib/helpdb.mip\
+				      "
+
+[7] Finally, build the help database.  Still logged in as iraf:
+
+	so> mkhelpdb vol$lib/root.hd vol$lib/helpdb.mip
+
+That's it ... you should be ready to go.  If you have any questions or
+problems, please do not hesitate to send email to iraf@noao.edu or call the
+IRAF HOTLINE at 602-323-4160 or the author at 602-325-9399.
+

@@ -1,0 +1,85 @@
+.help cqfinfo Mar00 "Catquery Package"
+.ih
+NAME
+cqfinfo -- get the requested description by name
+.ih
+SYNOPSIS
+
+fieldno = cq_finfo (res, name, fname, max_fname, foffset, fsize, ftype, funits,
+		    max_funits, format, max_format)
+
+.nf
+pointer	res		# the results descriptor
+char	name		# the input field name
+char	fname		# the returned field name
+int	max_fname	# the maximum size of the field name
+int	foffset		# the returned field offset 
+int	fsize		# the returned field size
+int	ftype		# the returned field type
+char	funits		# the returned field units
+int	max_funits	# the maximum size of the field units
+char	format		# the returned field format
+int	max_format	# the maximum size of the field format
+.fi
+.ih
+ARGUMENTS
+.ls res    
+The results descriptor.
+.le
+.ls name
+The name of the requested field.
+.le
+.ls fname
+The returned field name.
+.le
+.ls max_fname
+The maximum size of the returned field name.
+.le
+.ls foffset
+The returned field offset. Foffset is the field or column number if the
+results are in simple text format, or the one-indexed field offset in chars
+if the results are in blocked text format.
+.le
+.ls fsize
+The returned field size. Fsize is zero if the results are in simple text format,
+the field width in characters if the results are in blocked file format.
+.le
+.ls ftype
+The returned field data type. The options are TY_DOUBLE, TY_REAL, TY_LONG,
+TY_INT, TY_SHORT, and TY_CHAR.
+.le
+.ls funits
+The returned field units.
+.le
+.ls max_funits
+The maximum size of the returned field units.
+.le
+.ls format
+The returned field format.
+.le
+.ls max_format
+The maximum size of the returned field format.
+.le
+.ih
+DESCRIPTION
+Cq_finfo returns the name, offset, size, data type, units, and format of
+the requested field. Cq_finfo is an integer function which returns
+the field number of the requested field as its function value.
+
+.ih
+NOTES
+
+Related routines of interest are:
+
+.nf
+fieldno = cq_fnumber (res, fname)
+foffset = cq_foffset (res, fname)
+  fsize = cq_fsize (res, fname)
+  ftype = cq_ftype (res, fname)
+     call cq_funits (res, fname, units, max_units)
+     call cq_ffmts (res, fname, format, max_format)
+.fi
+.ih
+SEE ALSO
+cqfinfon
+.endhelp

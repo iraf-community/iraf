@@ -1,0 +1,44 @@
+.help count Nov84 system
+.ih
+NAME
+count -- determine number of lines, words and characters in a file
+.ih
+USAGE
+count files
+.ih
+PARAMETERS
+.ls files
+A template specifying the files to be examined.
+.le
+.ih
+DESCRIPTION
+For each file, count determines the number of lines, words, and
+characters in the file.  A word is defined as a sequence of characters
+delimited by one or more blanks or tabs, or by the end of a line.
+If \fIcount\fR is run on more than one file, each output line is identified
+by the file name, and a final output line gives the total number
+of lines, words, and characters in all files.
+.ih
+EXAMPLES
+
+1. Count the number of lines, words and characters in all files in the
+current directory with the extensions ".x" and ".h".
+
+	cl> count *.[xh]
+
+2. Count the number of .x files in the current directory.
+
+	cl> dir *.x op=1 | count
+
+3. Count the number of \fIset\fR environment definitions.
+
+	cl> set | count
+
+4. Count the number of references to the READ function in all .x files in
+the current directory.
+
+	cl> match "read#(" *.x | count
+.ih
+SEE ALSO
+directory
+.endhelp

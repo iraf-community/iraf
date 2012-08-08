@@ -1,0 +1,199 @@
+.help news Jul86 "Ancient News"
+.nf
+30 July 86	IMIO Modifications
+-------------------------------------------------------------------------------
+
+    The new IMIO interface, used by all IRAF tasks to access bulk image data
+on disk, is now capable of operating upon both the old IRAF format (OIF)
+images as well as STScI SDAS/GEIS format images.  The default image type is
+the OIF format.  Any existing OIF format images are readable by the new system
+without change.  Although IRAF can read either OIF or STF format images,
+SDAS can read only STF format images, so serious SDAS users should configure
+IRAF to work with STF format images as the default.  All other users should
+continue to use the OIF format images as image access is more efficient,
+and the IRAF software has been extensively tested only for OIF format images.
+Users of the OIF format should note that they can read a VMS BACKUP tape
+(or UNIX TAR tape) containing STF format images directly to disk and immediately
+access the images, without changing the default configuration of IRAF.
+
+    The image type is specified by a filename extension; extensions for the
+OIF format images are new in this release of the system.  The recognized
+extensions are shown below.
+
+	image type	header file extensions
+
+	    OIF			.imh
+	    STF			.??h	(? stands for any character)
+
+In most cases when operating upon an image with an IRAF task the extension
+can be omitted.  The most important exception occurs in image templates.
+THE PATTERN GIVEN IN AN IMAGE TEMPLATE MUST FULLY MATCH THE IMAGE HEADER
+FILE NAMES AS THEY APPEAR IN A DIRECTORY LISTING, i.e., the header filename
+extension must be matched by the image template.  The image type extension
+must also be specified to access an image which is not of the default image
+type (OIF or STF), or when changing the type of an image.  For example,
+
+	cl> imcopy dev$pix.imh pix.hhh
+
+will make an STF format copy in the current directory of the OIF format image
+"dev$pix".
+
+The default image type is controlled by the new environment variable IMTYPE.
+The string value of IMTYPE is the desired image header file extension, e.g.,
+"imh" (omit the dot) for an OIF format image.  If IMTYPE is not defined the
+default image type is "imh".  For STF format images there are many possible
+image header extensions, and IMTYPE specifies the default type IMIO should
+look for when the extension is not explicitly given, or the default extension
+to use when a completely new image is to be created.  When making a new copy
+of some existing image, IMIO will make a new image of the same type as the
+existing input image unless an extension is given to force some other type
+of image to be created.
+
+   environment variable			description
+
+	IMTYPE			the default image type (extension)
+	IMDIR			pixel storage directory for OIF images
+
+The IMDIR environment variable defines the directory in which the pixel file
+is to be placed when creating a new OIF format image.  In V2.2 and older
+versions of IRAF, IMDIR could only be a logical or machine dependent directory
+pathname.  The new system also recognizes the special "builtin" logical
+directory name "HDR$" (must be upper case).  If the value of IMDIR is "HDR$",
+IMIO will create the pixel file in the SAME directory as the header file,
+rather than in some other directory.  It is also possible to place the pixel
+file in some subdirectory of the header directory, e.g., "HDR$pixels/" will
+cause the pixel files to go into the subdirectory "pixels".
+
+	set imdir = "/tmp/user/"	# pixel files -> specified directory
+	set imdir = "HDR$"		# pixel files -> header file directory
+	set imdir = "HDR$pixels/"	# pixel files -> subdirectory of HDR$
+
+The root filename of OIF pixel files is now the same as that of the header
+file, rather than a computer generated name.  The filename extension of an
+OIF pixel file is ".pix".
+
+The STF format images support group format, a format very similar to that
+used for group format FITS tapes.  IRAF users accessing an STF group format
+image can specify the `group' (subimage) to be accessed by appending a
+subscript to the image name, e.g.,
+
+	cl> imstat pix.aah[3]		# access group 3
+or
+	cl> imstat pix.aah[3][*,100]	# line 100 of group 3
+
+A new group format image can be created in a similar fashion, specifying the
+number of groups to preallocate space for, e.g.,
+
+	cl> imcopy dev$pix testimage[1/10]
+
+would create a new group format image "testimage" with space for 10 groups
+(subimages), and initialize group 1.  The remaining groups would then be
+initialized by specifying only the group subscript "[N]".  Note that all
+groups must be the same size, new groups cannot be allocated, old groups
+cannot be deleted, the set of possible group parameters is fixed at creation
+time, and all groups share the same FITS header.
+
+
+15 June 86	System Tasks
+-------------------------------------------------------------------------------
+
+    The DIRECTORY, HELP, and PAGE system tasks have all undergone important
+revisions.  The directory task has been completely rewritten and now handles
+directory pathnames, etc., correctly, and in addition it has a more concise
+syntax.  The HELP and PAGE tasks have been modified to replace the old "more"
+boolean query mechanism (used to pause between pages of output) with a nicer
+keystroke driven mechanism which offers more options and is faster.  Read the
+manual pages for additional details.  The old parameter files should be
+unlearned.
+
+
+28 April 86	Package Reorganization
+-------------------------------------------------------------------------------
+
+    The basic package structure of IRAF has been modified to make a distinction
+between the system packages and the NOAO optical astronomy packages.  The basic
+directory structure of the system was also changed to reflect the new package
+organization, and the printed documentation will be changed as well when time
+permits.  These changes were necessary to better isolate science software such
+as the NOAO and STScI/SDAS packages from the system software, for a more logical
+package structure, and to make it easier to install and maintain the science
+packages.
+
+The new root menu of IRAF is as follows:
+
+    dataio      images      lists       noao        sdas        system
+    dbms        language    local       plot        softools    utilities
+
+The NOAO menu is as follows:
+
+    artdata     astutil     focas       mtlocal     proto       twodspec
+    astrometry  digiphot    imred       onedspec    surfphot
+
+Three new packages were added and three old packages were extensively revised.
+The NOAO mountain tape readers were moved from the DATAIO package into the new
+MTLOCAL package.  The astronomically oriented utility tasks were moved from
+the UTILITIES package to the new ASTUTIL package.  The old LOCAL package was
+renamed PROTO, and a new LOCAL package was added in the directory
+"iraf$local/tasks".
+
+The concept of the new PROTO package is appropriate for what the old LOCAL
+package was used for, i.e., prototype, temporary, or contributed tasks which
+are part of the NOAO package and which are exported with the system, but which
+are expected to eventually disappear or be replaced by planned system
+facilities.  The new LOCAL package is a place to put tasks of strictly local
+interest, or tasks which are not portable, e.g., foreign tasks and the Peritek
+package.  The LOCAL package should be particularly useful for outside sites
+as it gives them a place to put locally added tasks which will not be affected
+by future updates of the system.  Also, the framework (mkpkg, local.cl, etc.)
+is all set up, making it easier for outside sites to add their own software
+without having to figure out how to set up an IRAF package.
+
+
+20 Feb 85	Recovery from Interrupts
+-------------------------------------------------------------------------------
+
+    Tests today (unfortunately only shortly before the first IRAF release)
+have shown that VMS/IRAF has higher failure rate than expected for recovery
+from a ctrl/c interrupt of a running subprocess, especially if the process
+is actively doing i/o.  It is probably much safer to interrupt a compute
+bound process than a process which is doing heavy i/o, e.g., reading a tape
+or doing many file opens, or probably large numbers of any type of system
+calls.  The failure rate for i/o intensive processes was as high as 1 failure
+to recover in 4 interrupts in some of the cases tested.  Testing of UNIX/IRAF
+turned up some of the same problems, but the failure rate was considerably
+lower, probably because the kernel and i/o system are so much simpler.
+
+Interrupting a process at the wrong time can cause many problems, e.g.,
+[1] subprocess memory can be corrupted, resulting in unpredictable behavior
+and possibly deadlock when the CL later tries to talk to the process,
+[2] a VMS forced exit of the process can occur, e.g., when trying to deliver
+an AST to an invalid address, [3] corruption of the CL/subprocess communications
+protocol can occur, resulting in deadlock or the loss of sync (the output of
+a task will come out when the next command is entered), and various other
+problems as well.
+
+Tests on the old version of VMS/IRAF, which dates back to last fall, show
+that the problem has existed all along.  The fact that we did not fully
+appreciate the problem until now indicates that the problem is not a serious
+hindrance provided one is conservative about the use of interrupts.  It also
+appears that this will not be an easy problem to solve, hence it is likely
+to be with us for a while.  Probably nothing at all will be done about it
+for some months since other projects are likely to have a higher priority
+if this problem is understood and can be worked around.
+
+In summary, try to minimize the use of interrupts, and in particular, avoid
+interrupting processes which are doing heavy i/o.  When in doubt, type
+"flpr" after interrupting a process to force it to be restarted.  If a
+subprocess becomes hung it may be necessary to restart the CL itself.
+
+
+20 Feb 85	Process connect failure during ":.snap" in cursor mode
+----------------------------------------------------------------------------
+
+    We are still occasionally having problems when trying to spawn a graphics
+subkernel in response to a ":.snap" command in cursor mode.  This happens
+infrequently (which is why it is so hard to find the bug), and will usually
+go away after exiting and reentering cursor mode and trying again.  It might
+also help to do a ":.gflush" while in cursor mode.
+.fi
+.endhelp

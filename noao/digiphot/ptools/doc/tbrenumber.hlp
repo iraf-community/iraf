@@ -1,0 +1,54 @@
+.help tbrenumber May93 noao.digiphot.ptools
+.ih
+NAME
+tbrenumber -- renumber a list of APPHOT/DAOPHOT STSDAS table database(s)
+.ih
+USAGE
+tbrenumber tables
+.ih
+PARAMETERS
+.ls tables
+The list of APPHOT/DAOPHOT STSDAS table databases to be renumbered.
+.le
+.ls idoffset = 0
+An integer offset  to be added to the id numbers of the stars in
+the output renumbered photometry file. If idoffset is > 0, the output
+id numbers will run from 1 + idoffset to N + idoffset instead of from 1 to N.
+.le
+.ls id = "ID"
+The name of the keyword whose value is the sequence number of the object
+in the database.
+.le
+.ih
+DESCRIPTION
+TBRENUMBER is a simple script task which accepts an APPHOT/DAOPHOT STSDAS
+table database and renumbers the objects from 1 + idoffset to N + idoffset,
+where N is the number
+of objects in the database. TBRENUMBER calls the TABLES package TCALC task
+to actually do the work.
+
+.ih
+EXAMPLES
+
+1. Renumber a concatenated NSTAR photometry file that has been written with
+TBCONCAT.
+
+.nf
+   pt> tbrenumber m92r.nst
+.fi
+
+2. Renumber a PHOT photometry file of extra stars so as to ensure the
+stars' id numbers are  greater than 4000.
+
+.nf
+    pt> tbrenumber m92r.mag.extra idoffset=4000
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+ptools.txrenumber,ptools.prenumber,tables.tcalc
+.endhelp

@@ -1,0 +1,110 @@
+.help mkttydata Jun90 softools
+.ih
+NAME
+mkttydata -- build a cache for graphcap/termcap device entries
+.ih
+USAGE
+mkttydata devices termcap_file output_file
+.ih
+PARAMETERS
+.ls devlist
+A comma delimited list of the devices whose termcap or graphcap entries
+are to be compiled.
+.le
+.ls termcap_file
+The name of the termcap or graphcap file be searched, e.g., "dev$termcap",
+or "dev$graphcap".
+.le
+.ls output_file
+The name of the output file to be written, an SPP include file containing
+a number of declarations and data initialization statements.
+This should be "dev$cachet.dat" if the standard termcap is being compiled,
+and "dev$cacheg.dat" if the standard graphcap is being compiled.
+.le
+.ls verbose = yes
+Causes a message to be printed for each device entry compiled.
+.le
+.ih
+DESCRIPTION
+The \fImkttydata\fR task is used by the IRAF system manager to precompile
+the \fItermcap\fR or \fIgraphcap\fR entries for commonly used video or
+graphics terminals.  This can be advantageous on slow systems since otherwise
+the termcap or graphcap file must be searched at runtime every time the
+screen is cleared or a graph is plotted, reducing the performance and
+interactive response of the system.  Since each IRAF site will commonly use
+a different set of devices, entries can only be cached by the local system
+manager after the system is installed.  [NOTE, Jun 1990: the above is
+still true, but with the addition of features such as shared libraries and
+multiple architecture support to some versions of IRAF, relinking IRAF is
+more difficult and it is easier to make mistakes.  Furthermore, modern
+systems are getting very fast.  For most sites it will be easier, and safer,
+to merely copy frequently referenced device entries to the head of the
+termcap or graphcap file and skip the sysgen.]
+
+The input to \fImkttydata\fR consists of a list of devices and a reference
+to either the termcap or graphcap file.  The output is an SPP include file
+which is referenced by the procedures in the TTY package.  After updating
+the cache files, a full system sysgen is required to recompile the affected
+modules, update them in the system libraries, and relink all executables.
+
+Enter the following values for the \fItermcap_file\fR and \fIoutput_file\fR
+parameters to build the termcap and graphcap cache files.  Note that for
+caching to work the value of \fItermcap_file\fR must match that of
+the \fItermcap\fR or \fIgraphcap\fR environment variable, hence do not
+enter "graphcap" rather than "dev$graphcap", just because you happen to
+be in the dev directory.
+
+
+.ks
+.nf
+			\fItermcap_file\fR	\fIoutput_file\fR
+	
+	termcap		dev$termcap	dev$cachet.dat
+	graphcap	dev$graphcap	dev$cacheg.dat
+.fi
+.ke
+
+
+After updating these files, perform a sysgen-relink to update the
+system libraries and relink all executables (this takes a while, and
+requires IRAF permissions and full sources).  Instructions for performing
+the sysgen-relink are given in the \fISite Manager's Guide\fR for your
+IRAF system.  The exact procedure for performing a sysgen-relink depends
+upon the host system.  In particular, if the system support multiple
+architectures, each architecture must be restored and relinked separately.
+Note that systems configured for multiple architecture support are
+shipped configured "generic", and you must restore an architecture before
+relinking or the entire IRAF system will be recompiled (which is time
+consuming, and inadvisable due to the possibility of system or compiler
+differences introducing bugs into IRAF).
+
+After this finishes, log out and back in and you should notice the
+difference when running tasks like \fIpage\fR, \fIclear\fR, and \fIimplot\fR.
+
+Note that once a device entry is cached it cannot be modified without
+going through this all over again, while if the entry is not cached it
+can be edited and the new entry used immediately.  It is therefore not
+desirable to cache new termcap or graphcap entries until they have stopped
+changing.  Even after a device entry has been cached, however, it is possible
+to test new entries by changing the entry name, or by changing the value
+of the \fItermcap\fR or \fIgraphcap\fR environment variable.  If these
+values are different than they were when the entries were cached, the cached
+entries will not be used, even if the device name matches that of a cached
+entry.
+
+For additional information on graphcap see the "GIO Design" document.
+For additional information on termcap see the Berkeley UNIX "Programmer's
+Guide: Reference Manual", section 5.  IRAF uses a standard UNIX termcap.
+.ih
+EXAMPLES
+1. Update the graphcap cache.
+
+    cl> mktty vt640,vt240,4012,cit414a dev$graphcap dev$cacheg.dat
+.ih
+BUGS
+There is a fixed limit on the amount of data that can be cached.
+If the limit is exceedd the affected TTY modules will fail to compile.
+.ih
+SEE ALSO
+showcap, IRAF Site Manager's Guide
+.endhelp

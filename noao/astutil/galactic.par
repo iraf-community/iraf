@@ -1,0 +1,3 @@
+input,f,a,STDIN,,,input files
+in_coords,s,h,"equatorial","equatorial|galactic",,Input coordinates
+print_coords,b,h,yes,,,Print input coords on output?

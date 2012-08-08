@@ -1,0 +1,8 @@
+input,s,a,"",,,Input list of spectra 
+output,s,a,"",,,Output file name
+bands,s,a,"",,,Bandpass file
+apertures,s,h,"",,,Apertures
+normalize,b,h,yes,,,Normalize the bandpass response?
+mag,b,h,no,,,Output results in magnitudes?
+magzero,r,h,0.,,,Magnitude zero point
+verbose,b,h,yes,,,Verbose header?

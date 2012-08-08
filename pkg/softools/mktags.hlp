@@ -1,0 +1,54 @@
+.help mktags Sep85 softools
+.ih
+NAME
+mktags -- tag all procedure declarations in a set of files
+.ih
+USAGE
+mktags
+.ih
+PARAMETERS
+.ls files = "*.x"
+The files to be tagged, e.g., "*.x".
+.le
+.ls listing = no
+If this switch is enabled a sorted list of all procedures declared in the
+set of files will be printed on the standard output, giving the procedure
+name, line and file number, and procedure declaration on each output line.
+.le
+.ls tags = yes
+If this switch is enabled a "tags" file will be written in the current
+directory for use with the VI editor.
+.le
+.ih
+DESCRIPTION
+The named files are scanned for procedure declarations.  Each such declaration
+found is buffered internally.  When all files have been scanned the internal
+tag database is sorted and the output files are generated.  Two types of
+output are provided:
+.ls
+.ls [1]
+A summary of all procedures defined in the given set of files may be printed
+on the standard output.  This output may be used as a printed index to manually
+find procedures in the given file set.
+.le
+.ls [2]
+A "tags" format database file (a text file) may be written.  This file is
+read by the VI editor when a command of the form ":ta tag" is entered.
+This command is used to edit procedures regardless of the file in which they
+reside.  For example, to edit procedure "maxmin", enter command ":ta maxmin"
+when in VI.
+.le
+.le
+
+
+By default the operation of \fImktags\fR is to silently update the tags
+database.  If a printed listing is desired the \fIlisting\fR switch must
+be enabled.
+.ih
+BUGS
+A fixed amount of storage is allocated internally and overflow will occur if
+there are too many tags (procedures) or if there is too much text (the string
+buffer will overflow).
+.ih
+SEE ALSO
+.endhelp

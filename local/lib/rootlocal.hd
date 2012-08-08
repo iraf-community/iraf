@@ -1,0 +1,8 @@
+# Root task entry for the LOCAL package help tree.  Defines `local' as both a
+# task and a package in the local help database.
+
+local		men  = local$src/local.men,
+		hlp  = local$src/local.men,
+		sys  = local$src/local.hlp,
+		pkg  = local$src/local.hd,
+		src  = local$src/local.cl

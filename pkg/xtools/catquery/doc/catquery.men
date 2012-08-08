@@ -1,0 +1,28 @@
+         cqmap - Map the catalog / survey configuration file
+   cqstat[ist] - Get an integer, string, or text catalog / survey parameter
+   cqlocate[n] - Locate a catalog / survey by name or number
+   cqsetcat[n] - Set the current catalog / survey  by name or number
+         cqget - Read catalog / survey configuration file keywords directly
+
+      cqnqpars - Get the number of query parameters
+    cqgqpar[n] - Get query parameter info by name or number
+    cqsqpar[n] - Set query parameter value by name or number
+
+       cqquery - Query a catalog and return the results
+      cqfquery - Query a catalog file and return the results
+  cqrstat[ist] - Get catalog results integer, string, or text parameter
+    cqhinfo[n] - Get catalog results header value by name or number
+     cqgrecord - Get catalog results record
+    cqgnrecord - Get next catalog results record
+    cqfinfo[n] - Get catalog results field info by name or number
+cqgval[csilrd] - Get field value from record
+      cqrclose - Close the catalog results
+
+     cqimquery - Query an image survey and return the results
+    cqfimquery - Query an image file and return the results
+  cqistat[ist] - Get survey results integer, string, or text parameter
+    cqwinfo[n] - Get survey results wcs parameter info by name or number
+    cqkinfo[n] - Get survey results image parameter info by name or number
+     cqimclose - Close the survey results
+
+       cqunmap - Unmap the configuration file

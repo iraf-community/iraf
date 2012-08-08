@@ -1,0 +1,165 @@
+.help rtar Oct92 softools
+.IH
+NAME
+rtar -- read TAR format archive file
+.IH
+USAGE
+rtar [ flags ] [ archive ] [ after ] [ files ]
+.IH
+PARAMETERS
+.ls 4 -a
+Advance to the archive file named by the \fIafter\fR argument before
+performing the main operation.  The extract or list operation will begin with
+the file \fIafter\fR and continue to the end of the archive.
+.le
+.ls 4 -b
+Output only binary byte stream files.  By default, \fIrtar\fR outputs text
+files in the host system textfile format.  The conversion from the byte stream
+\fItar\fR format to host textfile format may involve modification of the
+file, e.g., conversion from ASCII to EBCDIC.  A binary extraction copies
+the file to disk without modification.
+.le
+.ls 4 -d
+Print detailed information about what \fIrtar\fR is doing.
+.le
+.ls 4 -e
+Extract the entire contents of the tape \fIexcluding\fR the files or directories
+listed in \fIfiles\fR.
+.le
+.ls 4 -f filename
+\fIRtar\fR uses the first filename argument as the host filename of the
+archive instead of reading from \fIstdin\fR.   Magtape devices should be
+specified using the host device name, e.g., "/dev/nrmt8" or "MSA0".
+Since \fIrtar\fR is a host level program and does not read the IRAF tapecap
+file, IRAF device names such as "mta" cannot be used.
+.le
+.ls 4 -l
+Do not try to resolve file links by a disk to disk file copy.  By default,
+if file A appears in the archive as a link to file B,
+\fIrtar\fR trys to resolve the link by performing a disk to disk copy of
+file B to A.  This is valid providing file B was present in the archive and
+has already been extracted.  If the \fBl\fR flag is present linked files
+will not be extracted.
+.le
+.ls 4 -m
+Do not restore the file modify time.
+.le
+.ls 4 -n
+Do not strip trailing blank lines from text files read from the tape.
+The default is to strip any blank lines at the ends of files.
+This is necessary when the file was written by \fIwtar\fR on a system
+like VMS, where the size of the file is not known before it has been
+read.  The \fIwtar\fR utility must guess at the final size and pad the
+file at the end with spaces to ensure that the size of the file actually
+written agrees with the file header.
+.le
+.ls 4 -o
+Omit binary files when performing the extraction.  A binary file is any
+file containing ASCII values other than 040 through 0176 (the printable
+ASCII characters), tab, or newline in the first 512 byte block of the file.
+.le
+.ls 4 -p pathprefix
+When creating directories and files from the pathnames recorded in the archive,
+omit the given path prefix if it matches the pathname given in the archive.
+This feature is used to relocate directories, or to read tar archives
+containing absolute pathnames.  For example, given "-p /usr/", the archive
+pathname "/usr/me/file" would be written to the file "me/file".
+.le
+.ls 4 -r
+The extracted file replaces any existing file of the same name, i.e.,
+\fIrtar\fR performs a delete before creating the extracted file.
+.le
+.ls 4 -t
+The names of the specified files are listed each time they occur on
+the tape.  If no \fIfiles\fR argument is given, all of the names on the tape
+are listed.
+.le
+.ls 4 -u
+Do not attempt to restore the owner and group identification of each file.
+.le
+.ls 4 -v
+Print more information about the tape entries than just their names.
+The verbose file list format gives the file permissions, the link flag
+(zero if there were no links to the file), the owner and group identification
+numbers of the file on the system that wrote the archive, the file size in
+bytes, the date of last modification of the file, and the file name.
+.le
+.ls 4 -x
+The named files are extracted from the tape.  If the named file
+matches a directory whose contents had been written onto the tape, this
+directory is (recursively) extracted.  The owner, modification time, and mode
+are restored (if possible).  If no file argument is given, the entire content
+of the tape is extracted.  Note that if multiple entries specifying the same
+file are on the tape, the last one overwrites all earlier.
+.le
+.IH
+DESCRIPTION
+\fIRtar\fR reads multiple files from a UNIX \fItar\fR format file,
+restoring the files to disk on the local host machine.
+Output filenames are mapped according to the IRAF filenaming conventions
+of the local host operating system.
+
+\fIRtar\fR's actions are controlled by the \fIflags\fR argument. 
+\fIFlags\fR consists of a minus sign followed by a string of characters
+containing any combination of the function flags described below.
+Other arguments to \fIrtar\fR are the name of the archive file to be read,
+the name of the file on the archive at which reading is to begin,
+and the names of the files or directories to be read or to be excluded
+from the read.  In all cases, appearance of a directory name refers to
+the files and (recursively) subdirectories of that directory.
+
+All \fIrtar\fR filename arguments are IRAF virtual filenames (or host
+filenames), except the prefix strings, which pertain to the tape format and
+hence are UNIX pathnames.  Magtape devices must be specified using a host
+physical or logical device name (i.e., IRAF device names like "mta" will not
+work).
+
+If the input archive file is a tape the blocksize must be a multiple
+of 512 bytes, with a maximum blocksize of 10240 bytes.  Each archived file
+occupies an integral number of 512 byte blocks in the archive (this is
+required by the \fItar\fR format).
+
+Filenames appearing in the file list are interpreted as prefix strings,
+i.e., a match occurs if the given string is a prefix of an actual filename
+in the archive.  If the last character in the \fIfiles\fR filename is
+a \fB$\fR then an exact match is required (excluding the $ meta-character).
+.IH
+DIAGNOSTICS
+A file read error occurring while reading the archive file is fatal unless
+caught and corrected by the host system.
+File header checksum errors result in skipping of the archive file
+currently being read, with execution continuing with the next archive
+file if possible.
+File write errors on the output file are reported but do not cause
+termination of \fIrtar\fR.  The output file being written will be corrupted.
+.ih
+EXAMPLES
+Since \fIrtar\fR is a bootstrap utility implemented as a foreign task in
+the CL, it may be called either from within the CL (as in the examples),
+or at the host system level.  The command syntax is identical on both cases.
+
+1. List the contents of the disk archive file "foo.tar".
+
+	cl> rtar -tvf foo.tar
+
+2. Unpack the tape archive on unix device /dev/nrmt8 in the current
+directory.
+
+	cl> rtar -xf /dev/nrmt8
+
+3. Unpack the tape archive on the VMS device MSA0: in the current
+directory.
+
+	cl> rtar -xf msa0
+
+When working within the CL, commands such as \fIrewind\fR may be used
+with \fIrtar\fR, but switching between IRAF and host device names may be
+confusing.
+.IH
+BUGS
+The current limit on file name length is 100 characters (this restriction
+is imposed by the standard UNIX \fItar\fR format).
+File links are not recreated.
+.ih
+SEE ALSO
+wtar, rmbin

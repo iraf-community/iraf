@@ -1,0 +1,13 @@
+This directory cotnains the original Fortran source for the Bevington
+routines, as copied from his book.
+
+Jun85	Removed the nonstandard & in col 1 UNIX style continuation and
+	replaced it with standard Fortran (col 6) continuation.
+
+Oct85   Added an extran continuation statement to chifit.f to avoid ambiguous
+	transfer of control to statement 70
+
+Nov85   It was possible to get a floating point divide by zero in regres.f
+	when rmul=1 in the calculation in statement 135 of ftest.  The value
+	of rmul (the correlation) is now tested before the division and a 
+	value of ftest = -99999.  is returned when rmul=1.

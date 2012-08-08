@@ -1,0 +1,119 @@
+# Help directory for the IMRED package.
+
+$doc		= "./doc/"
+
+$argus		= "noao$imred/argus/"
+$bias		= "noao$imred/bias/"
+$ccdred		= "noao$imred/ccdred/"
+$crutil		= "noao$imred/crutil/"
+$ctioslit	= "noao$imred/ctioslit/"
+$dtoi		= "noao$imred/dtoi/"
+$echelle	= "noao$imred/echelle/"
+$generic	= "noao$imred/generic/"
+$hydra		= "noao$imred/hydra/"
+$iids		= "noao$imred/iids/"
+$irred		= "noao$imred/irred/"
+$irs		= "noao$imred/irs/"
+$kpnocoude	= "noao$imred/kpnocoude/"
+$kpnoslit	= "noao$imred/kpnoslit/"
+$quadred	= "noao$imred/quadred/"
+$specred	= "noao$imred/specred/"
+$vtel		= "noao$imred/vtel/"
+
+demos		hlp=doc$demos.hlp
+#tutor		hlp=doc$tutor.hlp,		src=tutor.cl
+
+argus		men=argus$argus.men,
+		hlp=..,
+		pkg=argus$argus.hd,
+		src=argus$argus.cl
+
+bias		men=bias$bias.men,
+		hlp=..,
+		pkg=bias$bias.hd,
+		src=bias$bias.cl
+
+ccdred		men=ccdred$ccdred.men,
+		hlp=..,
+		sys=ccdred$ccdred.hlp,
+		pkg=ccdred$ccdred.hd,
+		src=ccdred$ccdred.cl
+
+crutil		men=crutil$crutil.men,
+		hlp=..,
+		sys=crutil$crutil.hlp,
+		pkg=crutil$crutil.hd,
+		src=crutil$crutil.cl
+
+ctioslit	men=ctioslit$ctioslit.men,
+		hlp=..,
+		pkg=ctioslit$ctioslit.hd,
+		src=ctioslit$ctioslit.cl
+
+dtoi		men=dtoi$dtoi.men,
+		hlp=..,
+		pkg=dtoi$dtoi.hd,
+		src=dtoi$dtoi.cl
+
+echelle		men=echelle$echelle.men,
+		hlp=..,
+		sys=echelle$echelle.hlp,
+		pkg=echelle$echelle.hd,
+		src=echelle$echelle.cl
+
+generic		men=generic$generic.men,
+		hlp=..,
+		sys=generic$generic.hlp,
+		pkg=generic$generic.hd,
+		src=generic$generic.cl
+
+hydra		men=hydra$hydra.men,
+		hlp=..,
+		pkg=hydra$hydra.hd,
+		src=hydra$hydra.cl
+
+iids		men=iids$iids.men,
+		hlp=..,
+		sys=iids$iids.hlp,
+		pkg=iids$iids.hd,
+		src=iids$iids.cl
+
+irred		men=irred$irred.men,
+		hlp=..,
+		sys=irred$irred.hlp,
+		pkg=irred$irred.hd,
+		src=irred$irred.cl
+
+irs		men=irs$irs.men,
+		hlp=..,
+		sys=irs$irs.hlp,
+		pkg=irs$irs.hd,
+		src=irs$irs.cl
+
+kpnocoude	men=kpnocoude$kpnocoude.men,
+		hlp=..,
+		pkg=kpnocoude$kpnocoude.hd,
+		src=kpnocoude$kpnocoude.cl
+
+kpnoslit	men=kpnoslit$kpnoslit.men,
+		hlp=..,
+		pkg=kpnoslit$kpnoslit.hd,
+		src=kpnoslit$kpnoslit.cl
+
+quadred		men=quadred$quadred.men,
+		hlp=..,
+		sys=quadred$quadred.hlp,
+		pkg=quadred$quadred.hd,
+		src=quadred$quadred.cl
+
+specred		men=specred$specred.men,
+		hlp=..,
+		sys=specred$specred.hlp,
+		pkg=specred$specred.hd,
+		src=specred$specred.cl
+
+vtel		men=vtel$vtel.men,
+		hlp=..,
+		sys=vtel$vtel.hlp,
+		pkg=vtel$vtel.hd,
+		src=vtel$vtel.cl

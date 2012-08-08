@@ -1,0 +1,165 @@
+.help fmedian May95 images.imfilter
+.ih
+NAME
+fmedian -- quantize and box median filter a list of images
+.ih
+USAGE
+fmedian input output xwindow ywindow
+.ih
+PARAMETERS
+.ls input
+List of input images.
+.le
+.ls output
+List of output filtered images. The number of input images must be the
+same as the number of output images. If the input image name equals the output
+image name the filtered image replaces the original image.
+.le
+.ls xwindow, ywindow
+The size of the box median filter. Xwindow and ywindow must be odd.
+Even values for xwindow or ywindow will be rounded up to the
+nearest odd integer.
+.le
+.ls hmin = -32768, hmax = 32767
+The histogram quantization parameters. Hmin and hmax define the minimum
+and maximum permitted values for the integer representation of the input image.
+The default values are appropriate for the 16 bit twos complement data values
+produced by current CCDs. Hmin and hmax should be chosen so as to
+minimize the space required to store the image histogram.
+.le
+.ls zmin = INDEF, zmax = INDEF
+The data quantization parameters. Zmin and zmax default to the minimum and
+maximum pixel values in the input image. Pixel values from zmin to zmax are
+linearly mapped to integer values from hmin to hmax. If zmin = hmin and
+zmax = hmax, the image pixels are converted directly to integers.
+Image values less than or greater than
+zmin or zmax will default to hmin and hmax respectively.
+.le
+.ls zloreject = INDEF, zhireject = INDEF
+The minimum and maximum good pixel values. Zloreject and zhireject default
+to zmin and zmax in the input data or equivalently to hmin and hmax in the
+integer representation of the input image.
+.le
+.ls unmap = yes
+Fmedian rescales the integer values to numbers between zmin and zmax
+by default. If the user wishes to preserve the median of the quantized
+images the unmap parameter should be set to no.
+.le
+.ls boundary = "nearest"
+The type of boundary extension. The options are:
+.ls nearest
+Use the value of the nearest pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Reflect pixel values around the boundary.
+.le
+.ls wrap
+Wrap pixel values around the boundary.
+.le
+.le
+.ls constant = 0.
+The value for constant valued boundary extension.
+.le
+.ls verbose = yes
+Print messages about actions taken by the task ?
+.le
+.ih
+DESCRIPTION
+
+FMEDIAN takes a list of input images \fIinput\fR and produces a set of filtered
+output images \fIoutput\fR. The filter consists of a sliding rectangular
+\fIxwindow\fR by \fIywindow\fR window whose function is to replace the 
+center pixel in the window with the median of the pixels in the
+window.  The median of a sequence of numbers is defined to be
+the value of the (n + 1) / 2 pixel in the ordered sequence.
+Out-of-bounds pixel references are handled by setting the parameter
+\fIboundary\fR.
+
+If \fIzmin\fR = \fIhmin\fR and \fIzmax\fR = \fIhmax\fR,
+FMEDIAN converts the image pixels directly to
+integers.  This operation may result in truncation of the pixel values
+if the input image is not an integer image. Otherwise the
+input pixel values from zmin to zmax are linearly mapped to integer
+values from hmin to hmax. The histogram, median, and number of pixels less
+than the median, are computed for the first window position. These
+quantities are updated as the median filter moves one position.
+The \fIunmap\fR parameter is normally set so as to restore the output
+pixel values to the range defined by zmin and zmax, but may be turned off
+if the user wishes to examine the quantized pixels. The precision of the
+median in integer space and pixel space is 1.0 and  
+(zmax - zmin) / (hmax - hmin) respectively.
+
+The \fIzloreject\fR and \fIzhireject\fR parameters may be used to
+reject bad data from the median filtering box. If no good 
+data is left in a give filtering box, then the median is set to zloreject
+if the majority of the pixels are less than zloreject, or to zhireject
+if the majority of pixels are greater than zhireject.
+
+.ih
+REFERENCES
+
+A description of the fast median algorithm used here can be found in
+"Topics in Applied Physics: Two-Dimensional Digital Signal Processing II:
+Transforms and Median Filters", Volume 43, 1981, Springer-Verlag,
+edited by T.S. Huang, p 209.
+
+.ih
+EXAMPLES
+
+1. Median filter a 16 bit CCD image using a 5 by 5 window.
+
+.nf
+   im> fmedian input output 5 5 hmin=-32768 hmax=32767 \
+   >>> zmin=-32768.  zmax=32767.
+.fi
+
+2. Median filter a KPNO PDS image using a 3 by 3 window.
+
+.nf
+   im> fmedian input output 3 3 hmin=0 hmax=4095 zmin=0. zmax=4095.
+.fi
+
+3. Median filter an 8 bit image using a 3 by 3 window.
+
+.nf
+   im> fmedian input output 3 3 hmin=0 hmax=255 zmin=0. zmax=255.
+.fi
+
+4. Median filter an image with real values from 0.0 to 1.0 with a precision
+of .003 and leave the output pixels in integer format.
+
+.nf
+   im> fmedian input output 5 5 unmap- hmin=0 hmax=1000 zmin=0. \
+   >>> zmax=1.
+.fi
+
+5. Median filter the test image dev$pix rejecting any pixels < 5 or
+greater than 19935 from the medianing process.
+
+.nf
+    im> fmedian dev$pix output 5 5 hmin=-1 hmax=20000 zmin=-1.0 \
+    >>> zmax=20000 zloreject=5 zhireject=20000
+.fi
+
+.ih
+TIME REQUIREMENTS
+It requires approximately 4.5 and 5.8 CPU seconds to median filter an
+512 by 512 square integer image with a 5 by 5 and 7 by 7 window respectively.
+(SPARCStation2).
+
+.ih
+BUGS
+This technique is most suitable for integer data or data which has not
+been calibrated. For non-integer data the calculated median may be an
+approximation, not an exact pixel value.
+
+If the  dynamic range of the data defined by hmin and hmax is large the
+memory requirements can become very large.
+
+.ih
+SEE ALSO
+median, frmedian
+.endhelp

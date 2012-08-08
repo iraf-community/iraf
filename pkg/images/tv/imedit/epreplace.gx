@@ -1,0 +1,167 @@
+include	<mach.h>
+include	<imhdr.h>
+include	"epix.h"
+
+
+# EP_REPLACE -- Replace all pixels that are ==, <=, or >= to the value at the
+# reference pixel.  Since this allocates and gets sections this may result in
+# the entire image being put into memory with potential memory problems.  It
+# is intended for use with masks that have regions of constant values.
+#
+# Note that this version assumes the pixel values may be ACE object masks.
+
+$for (ir)
+procedure ep_replace$t (ep, x, y, key)
+
+pointer	ep			#I EPIX pointer
+int	x, y			#I Reference pixel
+int	key			#I Key
+
+int	i, j, nc, nl, x1, x2, y1, y2
+real	minv, maxv
+PIXEL	val, ival, oval
+pointer	im, buf
+
+$if (datatype == i)
+int	andi()
+$endif
+pointer	imgs2$t(), imps2$t()
+errchk	imgs2$t, imps2$t
+
+begin
+	im = EP_IM(ep)
+	nc = IM_LEN(im,1)
+	nl = IM_LEN(im,2)
+
+	EP_INDATA(ep) = NULL
+	EP_OUTDATA(ep) = NULL
+	if (x < 1 || x > nc || y < 1 || y > nl) {
+	    call eprintf ("Pixel out of bounds\n")
+	    return
+	}
+
+	# Get reference pixel value and replacement value.
+	buf = imgs2$t (im, x, x, y, y)
+	$if (datatype == i)
+	ival = andi (Mem$t[buf], 0777777B)
+	$else
+	ival = Mem$t[buf]
+	$endif
+	oval = EP_VALUE(ep)
+	minv = EP_MINVALUE(ep)
+	maxv = EP_MAXVALUE(ep)
+	if (IS_INDEFR(minv))
+	    minv = -MAX_REAL
+	if (IS_INDEFR(maxv))
+	    minv = MAX_REAL
+
+	# This requires two passes to fit into the subraster model.
+	# First pass finds the limits of the change and the second
+	# makes the change.
+
+	x1 = x+1; x2 = x-1; y1 = y+1; y2 = y-1
+	do j = 1, nl {
+	    buf = imgs2$t (im, 1, nc, j, j)
+	    switch (key) {
+	    case '=':
+		do i = 1, nc {
+		    $if (datatype == i)
+		    val = andi (Mem$t[buf+i-1], 0777777B)
+		    $else
+		    val = Mem$t[buf+i-1]
+		    $endif
+		    if (val != ival || val == oval || val < minv || val > maxv)
+		        next
+		    x1 = min (x1, i)
+		    x2 = max (x2, i)
+		    y1 = min (y1, j)
+		    y2 = max (y2, j)
+		}
+	    case '<':
+		do i = 1, nc {
+		    $if (datatype == i)
+		    val = andi (Mem$t[buf+i-1], 0777777B)
+		    $else
+		    val = Mem$t[buf+i-1]
+		    $endif
+		    if (val > ival || val == oval || val < minv || val > maxv)
+		        next
+		    x1 = min (x1, i)
+		    x2 = max (x2, i)
+		    y1 = min (y1, j)
+		    y2 = max (y2, j)
+		}
+	    case '>':
+		do i = 1, nc {
+		    $if (datatype == i)
+		    val = andi (Mem$t[buf+i-1], 0777777B)
+		    $else
+		    val = Mem$t[buf+i-1]
+		    $endif
+		    if (val < ival || val == oval || val < minv || val > maxv)
+		        next
+		    x1 = min (x1, i)
+		    x2 = max (x2, i)
+		    y1 = min (y1, j)
+		    y2 = max (y2, j)
+		}
+	    }
+	}
+
+	# No pixels to change.
+	if (x2 < x1 || y2 < y1)
+	    return
+
+	# Set the rasters and change the pixels.
+	EP_X1(ep) = x1
+	EP_X2(ep) = x2
+	EP_Y1(ep) = y1
+	EP_Y2(ep) = y2
+	EP_NX(ep) = EP_X2(ep) - EP_X1(ep) + 1
+	EP_NY(ep) = EP_Y2(ep) - EP_Y1(ep) + 1
+	EP_NPTS(ep) = EP_NX(ep) * EP_NY(ep)
+
+	EP_OUTDATA(ep) = imps2$t (im, EP_X1(ep), EP_X2(ep), EP_Y1(ep),
+	    EP_Y2(ep))
+	EP_INDATA(ep) = imgs2$t (im, EP_X1(ep), EP_X2(ep), EP_Y1(ep),
+	    EP_Y2(ep))
+
+	buf = EP_OUTDATA(ep)
+	call amov$t (Mem$t[EP_INDATA(ep)], Mem$t[buf], EP_NPTS(ep))
+	switch (key) {
+	case '=':
+	    do i = 1, EP_NPTS(ep) {
+		$if (datatype == i)
+		val = andi (Mem$t[buf], 0777777B)
+		$else
+		val = Mem$t[buf]
+		$endif
+		if (val == ival && val >= minv && val <= maxv)
+		    Mem$t[buf] = oval
+		buf = buf + 1
+	    }
+	case '<':
+	    do i = 1, EP_NPTS(ep) {
+		$if (datatype == i)
+		val = andi (Mem$t[buf], 0777777B)
+		$else
+		val = Mem$t[buf]
+		$endif
+		if (val <= ival && val >= minv && val <= maxv)
+		    Mem$t[buf] = oval
+		buf = buf + 1
+	    }
+	case '>':
+	    do i = 1, EP_NPTS(ep) {
+		$if (datatype == i)
+		val = andi (Mem$t[buf], 0777777B)
+		$else
+		val = Mem$t[buf]
+		$endif
+		if (val >= ival && val >= minv && val <= maxv)
+		    Mem$t[buf] = oval
+		buf = buf + 1
+	    }
+	}
+end
+$endfor

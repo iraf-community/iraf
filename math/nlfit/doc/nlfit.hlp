@@ -1,0 +1,81 @@
+.help nlfit Feb91 "Nlfit Package"
+.ih
+NAME
+nlfit -- fit a curve to a set of data values
+.ih
+SYNOPSIS
+nlfit (nl, x, z, w, npts, nvars, wtflag, ier)
+
+.nf
+pointer		nl		# curve descriptor
+real/double	x[npts*nvars]	# variable values (stored as x[nvars,npts])
+real/double	z[npts]		# array of z values
+real/double	w[npts]		# array of weights
+int		npts		# number of data points
+int		wtflag		# type of weighting
+int		ier		# error code
+.fi
+.ih
+ARGUMENTS
+.ls nl    
+Pointer to the curve descriptor structure.
+.le
+.ls x    
+Array of x values.
+.le
+.ls z
+Array of function values.
+.le
+.ls w
+Array of weights.
+.le
+.ls npts
+The number of data points.
+.le
+.ls wtflag
+Type of weighting. The options are WTS_USER, WTS_UNIFORM, WTS_CHISQ and
+WTS_SCATTER. If wtflag = WTS_USER individual weights for each data point
+are supplied by the calling program and points with zero-valued weights are
+not included in the fit. If wtflag = WTS_UNIFORM, all weights are assigned
+values of 1. If wtflag = WTS_CHISQ the weights are set equal to the
+reciprocal of the function value. If wtflag = WTS_SCATTER the fitting
+routine adds a scatter term to the weights if the reduced chi-squared of
+the fit is significantly greater than 1.
+.le
+.ls ier
+Error code for the fit. The options are DONE, SINGULAR,
+NO_DEG_FREEDOM and NOT_DONE. If ier = SINGULAR, the numerical routines
+will compute a
+solution but one or more of the coefficients will be
+zero. If ier = NO_DEG_FREEDOM, there were too few data points to solve the
+matrix equations and the routine returns without fitting the data.
+If ier = NOT_DONE, the fit could not achieve the desired tolerance with
+the given input data in the specified maximum number of iterations.
+.le
+.ih
+DESCRIPTION
+NLFIT accumulate the data into the appropriate internal matrices and vectors
+and does the fit.
+.ih
+NOTES
+The permitted values of the input wtflag argument to nlfit[rd] are the
+following.
+
+.nf
+define	WTS_USER			# User enters weights
+define	WTS_UNIFORM			# Equal weights
+define	WTS_CHISQ 			# Chi-squared weights
+define	WTS_SCATTER			# Weights include scatter term
+.fi
+
+The permitted error values returned from nlfit[rd] are the following.
+
+.nf
+define	DONE			0	# Solution converged
+define	SINGULAR		1	# Singular matrix
+define	NO_DEG_FREEDOM		2	# Too few points
+define	NOT_DONE		3	# Solution did not converge
+.fi
+.ih
+SEE ALSO
+.endhelp

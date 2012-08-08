@@ -1,0 +1,234 @@
+.help rskysub Sep01 proto
+.ih
+NAME
+rskysub -- sky subtract images using running mean or median
+.ih
+USAGE
+rskysub input output
+.ih
+PARAMETERS
+.ls input
+The list of input images to be sky subtracted in time of observation order.
+.le
+.ls output
+The list of output sky subtracted images. The number of output images must
+equal the number of input images.  If output is "default", "dir$default", or
+"dir$" then for every input image an output image called "dir$image.sub.?"
+is created, where "dir$" is the optional directory specification, "image" is
+the root input image name, and "?" is the next available version number.
+.le
+.ls imasks = ""
+The optional list of input image masks. The input image masks are assumed to
+consist of 0's in good pixel regions and > 0 integer values elsewhere. The
+number of input images masks must be 0, 1, or equal to the number of input
+images. If imasks is "default", "dir$default", or "dir$" then for every input
+image a default input image mask called "dir$image.obm.?" is searched for,
+where "dir$" is the optional directory specification, "image" is the root
+input image name, and "?" is the highest available version number.
+.le
+.ls omasks = ""
+The optional list of output masks. If output masks are defined they are
+used to created the sky image in place of the input masks. The output masks
+are a combination of the original input mask and pixels masked during the
+input image scale factor computation and consist of 0's in good data regions
+and 1's elsewhere. Output masks are only computed if \fIscale\fR = "median".
+The number of output masks must be 0 or equal to the number of input images.
+If imasks is "default", "dir$default", or "dir$" then for every input image
+an output mask image called "dir$image.skm.?" is created, where "dir$" is
+the optional directory specification, "image" is the root input image name,
+and "?" is the next available version number.
+.le
+.ls hmasks = ""
+The list of output holes masks.  The holes masks defined bad pixels in the
+output images, i.e. those for which the underlying sky image was undefined.
+Holes masks are created only if \fIhmasks\fR is defined and there is at least
+1 undefined sky image pixel in the output image.  Holes masks contain 0's in
+undefined sky regions and 1's elsewhere.  If hmasks is "default", "dir$default",
+or "dir$" then for every input image an output mask image called
+"dir$image.hom.?" is created, where "dir$" is the optional directory
+specification, "image" is the root input image name, and "?" is the next
+available version number.
+.le
+
+.ls rescale = yes
+Force recomputation of the individual input image scale factors  even though
+they have been previously computed and stored in the keyword \fIskyscale\fR?
+.le
+.ls scale = "median"
+The method used to compute the individual image scale factors. The options
+are:
+.ls none
+The individual scale factors are all set to 1.0.
+.le
+.ls !<keyword>
+The individual scale factors are all set to the value of the input image header
+keyword \fIkeyword\fR.
+.le
+.ls median
+The individual scale factors are set to 1 / median. The medians are estimated
+using the input masks \fIimasks\fR, input image section \fIstatsec\fR,
+the minimum and maximum good data values \fIlower\fR and \fIupper\R, the
+clipping factors \fImaxiter\fR, \fIlnsigrej\fR, and \fIunsigrej\fR and the
+histogram binning parameter \fIbinwidth\fR.
+.le
+.ls @<file>
+The individual image scale factors are read from the file \fIfile\fR. 
+.le
+.le
+.ls skyscale = "SKYSCALE"
+The image header keyword containing the computed scaling factor.
+\fISkyscale\fR is written to both the input and output images.
+.le
+
+.ls statsec = ""
+The input image section used to compute the individual image scaling factors.
+Statsec is independent of the input image section if any.
+.le
+.ls lower = INDEF, upper = INDEF
+The minimum and maximum input image good data values.
+.le
+.ls maxiter = 20
+The maximum number of clipping iterations.
+.le
+.ls lnsigrej = 3.0, unsigrej = 3.0
+The lower and upper side sigma clipping factors.
+.le
+.ls binwidth = 0.1
+The histogram bin width in sigma used in estimating the median value.
+.le
+
+.ls resubtract = yes
+Force recomputation and subtraction of the sky image even though it exists
+already ?
+.le
+.ls combine = "average"
+The method used to create the sky images. The options are "average" and
+"median".
+.le
+.ls ncombine = 6
+The default number of images used to create the sky images.
+.le
+.ls nmin = 3
+The minimum number of images used to create the sky images.
+.le
+.ls nlorej = 0, nhirej = 0
+The number of high and low side pixels to reject if \fIcombine\fR is "average".
+.le
+.ls blank = 0.0
+The value assigned to undefined output image pixels, i.e. those for
+which the corresponding sky image pixel is undefined.
+.le
+.ls skysub = "SKYSUB"
+The sky subtraction processing keyword which is written to the output
+image when processing is complete.
+.le
+.ls holes = "HOLES"
+The homes mask name keyword which is written to the output image if an output
+holes mask is created.
+.le
+
+.ls cache = yes
+Cache the input images in memory if possible ?
+.le
+.ls verbose = yes
+Print messages about the progress of the task ?
+.le
+
+.ih
+DESCRIPTION
+
+RSKYSUB computes the average sky image for each image in the input image
+list \fIinlist\fR using a running mean or median technique and subtracts
+it from the input image to create the output sky subtracted images
+\fIoutlist\fR. The input image list is assumed to be ordered by time of
+observation. If the input image masks list \fIimasks\fR is defined then the
+input image pixels in the bad pixel regions are removed from the sky statistics
+and sky image computation. RSKYSUB optionally creates a list of output pixel
+masks \fIomasks\fR and a list of holes masks \fIhmasks\fR.
+
+The input masks \fIimasks\fR can be specified in a variety of ways as
+shown below.
+
+.nf
+               "" - empty mask, use all the pixels
+            EMPTY - empty mask, use all the pixels
+         !KEYWORD - use mask specified by  header keyword KEYWORD
+        !^KEYWORD - use inverse of mask specified by  header keyword KEYWORD
+             mask - use specified mask
+            ^mask - use inverse of specified mask
+.fi
+
+In all cases the mask values are assumed to be 0 in good data regions and
+non-zero in rejected data regions. The input masks may in pixel list, e.g.
+".pl" format, or any supported integer image format, e.g. ".imh", ".fits", etc.
+
+The optional output pixel masks \fIomasks\fR are a combination of the
+input image masks and the scaling factor computation masks. They consist
+entirely of 0's and 1's with 0's defining the good data regions.
+
+The optional output holes masks \fIhmasks\fR which specify those pixels
+in the output images which are undefined consist entirely of 1's and 0's
+with 0's defining the holes.
+
+Before beginning the sky subtraction step RSKYSUB computes a scaling factor for
+each individual input image in \fIinlist\fR and stores it in the input image
+header keyword \fIskyscale\fR. If \fIscale\fR is "median" then the median of
+the input image pixels is computed using the input image masks \fIimasks\fR,
+the good data limits \fIlower\fR and \fIupper\fR, the clipping factors
+\fImaxiter\fR, \fIlnsigrej\fR, and \fIunisgrej\fR, and the histogram
+resolution parameter \fIbinwidth\fR. The scaling factor is set to 1 / median.
+If \fIscale\fR is "none", "!<keyword>", or "@<file>" the individual
+scale factors are set to 1, read from the input image header keyword
+\fI<keyword>\fR, or from a file \fI@<file>\fR respectively. If \fIrescale\fR is
+yes and \fIscale\fR is "median" then the scaling computation is  redone
+regardless of whether or not the \fIskyscale\fR keyword is present in the
+input image header.
+
+RSKYSUB computes the sky image for each input image by multiplying each
+input image by the value of its scaling factor  and then computing the
+combination of \fIncombine\fR neighbor images using the algorithm
+specified by \fIcombine\fR. If \fIcombine\fR is average then the
+\fInlorej\fR and \fInhirej\fR lowest and highest pixels are rejected from
+the stack to be combined. For example if the number of input images is 25 and
+ncombine is 6 then images 2-4 are used to compute the sky image for image 1,
+images 10-12 and 14-16 are used to compute the sky for image 13, and images
+22-24 are used to compute the sky image for image 25. There must be a minimum
+of \fInmin\fR neighbor images or the sky image will not be computed. If the
+input masks are defined then pixels in bad regions are also rejected
+from the final sky image computation. Undefined output image pixels,
+i.e. those for which the corresponding sky image pixel is undefined, are
+assigned the value \fIblank\fR. The sky subtraction processing keyword
+\fIskysub\fR is written to the output image when sky subtraction is complete.
+
+If \fIcache\fR is "yes" then RSKYSUB will attempt to buffer the active images
+in memory and will run significantly faster. If \fIverbose\fR = yes then
+the task prints messages about its actions as it goes along.
+
+.ih
+EXAMPLES
+
+1. Sky subtract a list of 25 images without masking.
+
+.nf
+cl> rskysub @inlist @outlist maxiter=10 lnsigrej=5.0 unsigrej=5.0
+.fi
+
+
+2. Sky subtract the same list of 25 images with masking where the masks
+are assumed to be stored in the BPM keyword.
+
+.nf
+cl> rskysub @inlist @outlist imasks="!BPM" maxiter=10 lnsigrej=5.0 \
+unsigrej=5.0
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+imcombine, imexpr
+.endhelp

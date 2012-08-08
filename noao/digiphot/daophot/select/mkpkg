@@ -1,0 +1,15 @@
+# GRPSELECT and PFMERGE tasks
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	dppfmerge.x	<tbset.h>		../lib/apseldef.h
+	dpsgroup.x	<tbset.h>		../lib/daophotdef.h       \
+			../lib/apseldef.h
+	dpgwselect.x	../lib/apseldef.h	../lib/daophotdef.h
+	t_grpselect.x	<fset.h> 		../lib/daophotdef.h
+	t_pfmerge.x	<fset.h>
+	;

@@ -1,0 +1,55 @@
+.help edit Apr87 language
+.ih
+NAME
+edit -- edit a text file
+.ih
+USAGE
+edit files [files...]
+.ih
+PARAMETERS
+.ls files
+The file or files to be edited.
+.le
+.ih
+DESCRIPTION
+The \fIedit\fR task invokes a host system editor to edit the named file or
+files.  The editor to be used is determined by the value of the CL environment
+variable \fIeditor\fR.  Filename mapping is applied to the \fIfiles\fR
+argument strings to convert virtual filenames into host system filenames.
+File templates are not supported, unless the host system editor supports them.
+
+The EDT, EMACS, and VI editors are currently supported.  Each editor interface
+is controlled by an \fIedcap\fR table file in the logical directory "dev$";
+these files are also used by the \fIehistory\fR and \fIeparam\fR screen
+editors.  For example, the file "dev$edt.ed" is required to run the EDT
+editor.  The EDITOR_CMD field of the \fIedcap\fR file defines the command
+to be send to the host system to run the editor; this is not necessarily the
+same as the name of the editor.  Support for additional editors is easily added
+by adding new \fIedcap\fR files.
+.ih
+EXAMPLES
+1. Edit the login.cl file.
+
+	cl> edit home$login.cl
+
+2. Edit the file "temp" in the current directory.
+
+	cl> edit temp
+
+3. On a UNIX system, edit all the ".x" files in the current directory.
+Filename templates cannot be used with the editor unless the editor itself,
+or the host system, expands the filename template.
+
+	cl> edit *.x
+.ih
+BUGS
+The EOF control character is set in the edcap file for the editor language in
+use, e.g., "dev$vi.ed" for the VI editor.  The value in this file may differ
+from that used on the local system; if this is the case, the system installer
+should edit the file and change the value of the parameter EXIT_UPDATE.
+
+The control sequences for the keyboard arrow keys are also defined in the
+".ed" edcap file; TERMCAP should be used instead.
+.ih
+SEE ALSO
+ehistory, eparam

@@ -1,0 +1,392 @@
+\hypertarget{votElement_8c}{
+\section{votElement.c File Reference}
+\label{votElement_8c}\index{votElement.c@{votElement.c}}
+}
+(Internal) Methods to manage XML elements.  
+
+
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include \char`\"{}votParseP.h\char`\"{}}\par
+{\tt \#include \char`\"{}votParse.h\char`\"{}}\par
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\#define \hyperlink{votElement_8c_3fc3e6a2ec23f3c09096a3acc51c58a4}{VOTABLE\_\-REQ}~\char`\"{}\char`\"{}
+\item 
+\hypertarget{votElement_8c_4b64828b3a69b9e940c0015061730524}{
+\#define \textbf{VOTABLE\_\-OPT}~\char`\"{}ID$|$VERSION\char`\"{}}
+\label{votElement_8c_4b64828b3a69b9e940c0015061730524}
+
+\item 
+\hypertarget{votElement_8c_1a339cf25c4fbf4d362499e6f3ebf72e}{
+\#define \textbf{RESOURCE\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_1a339cf25c4fbf4d362499e6f3ebf72e}
+
+\item 
+\hypertarget{votElement_8c_01410aa39b3d16ac22c3c50833c8f450}{
+\#define \textbf{RESOURCE\_\-OPT}~\char`\"{}ID$|$NAME$|$TYPE$|$UTYPE\char`\"{}}
+\label{votElement_8c_01410aa39b3d16ac22c3c50833c8f450}
+
+\item 
+\hypertarget{votElement_8c_96b567c83dbd01255a819e0acfe55d52}{
+\#define \textbf{TABLE\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_96b567c83dbd01255a819e0acfe55d52}
+
+\item 
+\hypertarget{votElement_8c_d62f8353067e384192242f7f37e623ba}{
+\#define \textbf{TABLE\_\-OPT}~\char`\"{}ID$|$NAME$|$UCD$|$UTYPE$|$REF$|$NROWS$|$NCOLS\char`\"{}}
+\label{votElement_8c_d62f8353067e384192242f7f37e623ba}
+
+\item 
+\hypertarget{votElement_8c_8c6432e9e4a717ff358d94336eaeeb3b}{
+\#define \textbf{INFO\_\-REQ}~\char`\"{}NAME$|$VALUE\char`\"{}}
+\label{votElement_8c_8c6432e9e4a717ff358d94336eaeeb3b}
+
+\item 
+\hypertarget{votElement_8c_b541e0026ec9ac076cd066f615a8d9b4}{
+\#define \textbf{INFO\_\-OPT}~\char`\"{}ID$|$UNIT$|$UCD$|$UTYPE$|$REF\char`\"{}}
+\label{votElement_8c_b541e0026ec9ac076cd066f615a8d9b4}
+
+\item 
+\hypertarget{votElement_8c_f735ff581bc455307df0fb72b6125126}{
+\#define \textbf{STREAM\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_f735ff581bc455307df0fb72b6125126}
+
+\item 
+\hypertarget{votElement_8c_feed85a53efdbc3186a4911a9f6881a8}{
+\#define \textbf{STREAM\_\-OPT}~\char`\"{}TYPE$|$HREF$|$ACTUATE$|$ENCODING$|$EXPIRES$|$RIGHTS\char`\"{}}
+\label{votElement_8c_feed85a53efdbc3186a4911a9f6881a8}
+
+\item 
+\hypertarget{votElement_8c_73b43d54f6372de2e14c898fa6492ac1}{
+\#define \textbf{FITS\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_73b43d54f6372de2e14c898fa6492ac1}
+
+\item 
+\hypertarget{votElement_8c_6107a6f6bbee91ab71677644c2433279}{
+\#define \textbf{FITS\_\-OPT}~\char`\"{}EXTNUM\char`\"{}}
+\label{votElement_8c_6107a6f6bbee91ab71677644c2433279}
+
+\item 
+\hypertarget{votElement_8c_c4afa561a3d6a0689478041ec6e937f4}{
+\#define \textbf{TD\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_c4afa561a3d6a0689478041ec6e937f4}
+
+\item 
+\hypertarget{votElement_8c_6e000b266690a1122a62ae43ad194511}{
+\#define \textbf{TD\_\-OPT}~\char`\"{}ENCODING\char`\"{}}
+\label{votElement_8c_6e000b266690a1122a62ae43ad194511}
+
+\item 
+\hypertarget{votElement_8c_6376952a5c358486e50e922e6792ca28}{
+\#define \textbf{TR\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_6376952a5c358486e50e922e6792ca28}
+
+\item 
+\hypertarget{votElement_8c_426edb0e6088eb73894d0b4a32e8b4ce}{
+\#define \textbf{TR\_\-OPT}~\char`\"{}\char`\"{}}
+\label{votElement_8c_426edb0e6088eb73894d0b4a32e8b4ce}
+
+\item 
+\hypertarget{votElement_8c_8856f345c1ca6fe1e70143c2d237e3ad}{
+\#define \textbf{COOSYS\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_8856f345c1ca6fe1e70143c2d237e3ad}
+
+\item 
+\hypertarget{votElement_8c_725ba50fe12fc71ae097475311bb8993}{
+\#define \textbf{COOSYS\_\-OPT}~\char`\"{}ID$|$EQUINOX$|$EPOCH$|$SYSTEM$|$\char`\"{}}
+\label{votElement_8c_725ba50fe12fc71ae097475311bb8993}
+
+\item 
+\hypertarget{votElement_8c_6337db49300bf7b9a3a082a2cc97e2ed}{
+\#define \textbf{DESCRIPTION\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_6337db49300bf7b9a3a082a2cc97e2ed}
+
+\item 
+\hypertarget{votElement_8c_fd9b598821b879386a4b932aee71fb02}{
+\#define \textbf{DESCRIPTION\_\-OPT}~\char`\"{}\char`\"{}}
+\label{votElement_8c_fd9b598821b879386a4b932aee71fb02}
+
+\item 
+\hypertarget{votElement_8c_ab43887af25e3bec8b2069de96626062}{
+\#define \textbf{DEFINITIONS\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_ab43887af25e3bec8b2069de96626062}
+
+\item 
+\hypertarget{votElement_8c_86d5bc9ec0f4871e823ba8a559138cf3}{
+\#define \textbf{DEFINITIONS\_\-OPT}~\char`\"{}\char`\"{}}
+\label{votElement_8c_86d5bc9ec0f4871e823ba8a559138cf3}
+
+\item 
+\hypertarget{votElement_8c_eda9a427295849c7ec20406af3f375e0}{
+\#define \textbf{DATA\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_eda9a427295849c7ec20406af3f375e0}
+
+\item 
+\hypertarget{votElement_8c_b92e18c48ce94b764cce7bb6265760c3}{
+\#define \textbf{DATA\_\-OPT}~\char`\"{}\char`\"{}}
+\label{votElement_8c_b92e18c48ce94b764cce7bb6265760c3}
+
+\item 
+\hypertarget{votElement_8c_000db826e45d4a780c781b5504182dcf}{
+\#define \textbf{TABLEDATA\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_000db826e45d4a780c781b5504182dcf}
+
+\item 
+\hypertarget{votElement_8c_b5408e0c279128dbcdaf60a0e18b2a4f}{
+\#define \textbf{TABLEDATA\_\-OPT}~\char`\"{}\char`\"{}}
+\label{votElement_8c_b5408e0c279128dbcdaf60a0e18b2a4f}
+
+\item 
+\hypertarget{votElement_8c_6a792d8d96b3e19161c50cc9d59878a5}{
+\#define \textbf{GROUP\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_6a792d8d96b3e19161c50cc9d59878a5}
+
+\item 
+\hypertarget{votElement_8c_9e88a9057a91e35e2d93e3404a09a519}{
+\#define \textbf{GROUP\_\-OPT}~\char`\"{}ID$|$NAME$|$UCD$|$UTYPE$|$REF\char`\"{}}
+\label{votElement_8c_9e88a9057a91e35e2d93e3404a09a519}
+
+\item 
+\hypertarget{votElement_8c_b08fc183af82a8052d4199476688a6f4}{
+\#define \textbf{PARAM\_\-REQ}~\char`\"{}DATATYPE$|$NAME$|$VALUE\char`\"{}}
+\label{votElement_8c_b08fc183af82a8052d4199476688a6f4}
+
+\item 
+\hypertarget{votElement_8c_49ca5a4fc7f0433411bdd5c70637a1f4}{
+\#define \textbf{PARAM\_\-OPT}~\char`\"{}ID$|$UNIT$|$UCD$|$UTYPE$|$REF$|$PRECISION$|$WIDTH$|$ARRAYSIZE\char`\"{}}
+\label{votElement_8c_49ca5a4fc7f0433411bdd5c70637a1f4}
+
+\item 
+\hypertarget{votElement_8c_813b320e4c152322486ab3dbd77faecc}{
+\#define \textbf{FIELD\_\-REQ}~\char`\"{}DATATYPE$|$NAME$|$TYPE\char`\"{}}
+\label{votElement_8c_813b320e4c152322486ab3dbd77faecc}
+
+\item 
+\hypertarget{votElement_8c_f6e1c9e67e529d492c30f6b6d1209e40}{
+\#define \textbf{FIELD\_\-OPT}~\char`\"{}ID$|$UNIT$|$UCD$|$UTYPE$|$REF$|$PRECISION$|$WIDTH$|$ARRAYSIZE\char`\"{}}
+\label{votElement_8c_f6e1c9e67e529d492c30f6b6d1209e40}
+
+\item 
+\hypertarget{votElement_8c_b64b32b3399ba7bbc935fde85628fdde}{
+\#define \textbf{FIELDREF\_\-REQ}~\char`\"{}REF$|$\char`\"{}}
+\label{votElement_8c_b64b32b3399ba7bbc935fde85628fdde}
+
+\item 
+\hypertarget{votElement_8c_4021496a92bc9efc95f2e048a1d385eb}{
+\#define \textbf{FIELDREF\_\-OPT}~\char`\"{}\char`\"{}}
+\label{votElement_8c_4021496a92bc9efc95f2e048a1d385eb}
+
+\item 
+\hypertarget{votElement_8c_efff65b7c6130c38dcdd01bf690a0742}{
+\#define \textbf{PARAMREF\_\-REQ}~\char`\"{}REF$|$\char`\"{}}
+\label{votElement_8c_efff65b7c6130c38dcdd01bf690a0742}
+
+\item 
+\hypertarget{votElement_8c_6e39455523ab08355f1349dcba4a4fd2}{
+\#define \textbf{PARAMREF\_\-OPT}~\char`\"{}\char`\"{}}
+\label{votElement_8c_6e39455523ab08355f1349dcba4a4fd2}
+
+\item 
+\hypertarget{votElement_8c_24e1835a4bae77867febaf8927cd8dc2}{
+\#define \textbf{MIN\_\-REQ}~\char`\"{}VALUE$|$\char`\"{}}
+\label{votElement_8c_24e1835a4bae77867febaf8927cd8dc2}
+
+\item 
+\hypertarget{votElement_8c_34861b6ce3781833eb23a33c40d82033}{
+\#define \textbf{MIN\_\-OPT}~\char`\"{}INCLUSIVE$|$\char`\"{}}
+\label{votElement_8c_34861b6ce3781833eb23a33c40d82033}
+
+\item 
+\hypertarget{votElement_8c_60d6a5ff7d7c74135c525acb9e8ee7a1}{
+\#define \textbf{MAX\_\-REQ}~\char`\"{}VALUE$|$\char`\"{}}
+\label{votElement_8c_60d6a5ff7d7c74135c525acb9e8ee7a1}
+
+\item 
+\hypertarget{votElement_8c_12a611725c0ea7d183a89b0dcc865e11}{
+\#define \textbf{MAX\_\-OPT}~\char`\"{}INCLUSIVE$|$\char`\"{}}
+\label{votElement_8c_12a611725c0ea7d183a89b0dcc865e11}
+
+\item 
+\hypertarget{votElement_8c_32ca389d39e8caf865028d457d23f1af}{
+\#define \textbf{OPTION\_\-REQ}~\char`\"{}VALUE$|$\char`\"{}}
+\label{votElement_8c_32ca389d39e8caf865028d457d23f1af}
+
+\item 
+\hypertarget{votElement_8c_5c4129200a2b593ba215ad2dd6980695}{
+\#define \textbf{OPTION\_\-OPT}~\char`\"{}NAME$|$\char`\"{}}
+\label{votElement_8c_5c4129200a2b593ba215ad2dd6980695}
+
+\item 
+\hypertarget{votElement_8c_ca6dfeb357c318508ac1c0b5b18c3278}{
+\#define \textbf{VALUES\_\-REQ}~\char`\"{}\char`\"{}}
+\label{votElement_8c_ca6dfeb357c318508ac1c0b5b18c3278}
+
+\item 
+\hypertarget{votElement_8c_39e0f66a33a8a6805162539612e1285f}{
+\#define \textbf{VALUES\_\-OPT}~\char`\"{}ID$|$TYPE$|$NULL$|$REF\char`\"{}}
+\label{votElement_8c_39e0f66a33a8a6805162539612e1285f}
+
+\item 
+\hypertarget{votElement_8c_e9a11f92cf698fbd1e14dd66802d9e56}{
+\#define \textbf{LINK\_\-REQ}~\char`\"{}ACTION$|$\char`\"{}}
+\label{votElement_8c_e9a11f92cf698fbd1e14dd66802d9e56}
+
+\item 
+\hypertarget{votElement_8c_4ed5dd5382fdc767268f10d5a7b4b6d6}{
+\#define \textbf{LINK\_\-OPT}~\char`\"{}ID$|$CONTENT-ROLE$|$CONTENT-TYPE$|$TITLE$|$VALUE$|$HREF\char`\"{}}
+\label{votElement_8c_4ed5dd5382fdc767268f10d5a7b4b6d6}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+int \hyperlink{votElement_8c_c40e3a809b3865bd6d15bf368778e28e}{vot\_\-elemType} (Element $\ast$e)
+\begin{CompactList}\small\item\em Get the integer value (ID) of the Element (internal method). \item\end{CompactList}\item 
+char $\ast$ \hyperlink{votElement_8c_73381f6c3509c61194a8f23ada4cac2a}{vot\_\-elemName} (Element $\ast$e)
+\begin{CompactList}\small\item\em Get the name of the Element (internal method). \item\end{CompactList}\item 
+int \hyperlink{votElement_8c_c247ed61c78db54860fbbf80385f3088}{vot\_\-eType} (char $\ast$name)
+\begin{CompactList}\small\item\em Get the integer value (ID) of the name (internal method). \item\end{CompactList}\item 
+char $\ast$ \hyperlink{votElement_8c_bb085dd4a9d1237b43a7db3cb2a192d2}{vot\_\-elemXMLEnd} (Element $\ast$e)
+\begin{CompactList}\small\item\em Build a string of the ending XML Tag (internal method). \item\end{CompactList}\item 
+char $\ast$ \hyperlink{votElement_8c_478f5d941afc5695c98627cdbdfd6844}{vot\_\-elemXML} (Element $\ast$e)
+\begin{CompactList}\small\item\em Builds a string of the opening XML Tag (internal method). \item\end{CompactList}\item 
+Element $\ast$ \hyperlink{votElement_8c_744db49ce83f6ed1d76b7aa4eacd9dd9}{vot\_\-newElem} (unsigned int type)
+\begin{CompactList}\small\item\em Allocate a new structure of the given type (internal method). \item\end{CompactList}\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+(Internal) Methods to manage XML elements. 
+
+VOTELEMENT.C -- (Internal) Method to manage XML elements.
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick and Eric Timmermann \end{Desc}
+\begin{Desc}
+\item[Date:]8/03/09 \end{Desc}
+
+
+\subsection{Define Documentation}
+\hypertarget{votElement_8c_3fc3e6a2ec23f3c09096a3acc51c58a4}{
+\index{votElement.c@{votElement.c}!VOTABLE\_\-REQ@{VOTABLE\_\-REQ}}
+\index{VOTABLE\_\-REQ@{VOTABLE\_\-REQ}!votElement.c@{votElement.c}}
+\subsubsection[{VOTABLE\_\-REQ}]{\setlength{\rightskip}{0pt plus 5cm}\#define VOTABLE\_\-REQ~\char`\"{}\char`\"{}}}
+\label{votElement_8c_3fc3e6a2ec23f3c09096a3acc51c58a4}
+
+
+Definition of Required and Optional attributes of VOTable elements. 
+
+\subsection{Function Documentation}
+\hypertarget{votElement_8c_73381f6c3509c61194a8f23ada4cac2a}{
+\index{votElement.c@{votElement.c}!vot\_\-elemName@{vot\_\-elemName}}
+\index{vot\_\-elemName@{vot\_\-elemName}!votElement.c@{votElement.c}}
+\subsubsection[{vot\_\-elemName}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ vot\_\-elemName (Element $\ast$ {\em e})}}
+\label{votElement_8c_73381f6c3509c61194a8f23ada4cac2a}
+
+
+Get the name of the Element (internal method). 
+
+vot\_\-elemName -- Get the name of the Element (internal method).
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em $\ast$e}]A pointer to the Element that you want the name of \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A string pointer to the name of the element \end{Desc}
+\hypertarget{votElement_8c_c40e3a809b3865bd6d15bf368778e28e}{
+\index{votElement.c@{votElement.c}!vot\_\-elemType@{vot\_\-elemType}}
+\index{vot\_\-elemType@{vot\_\-elemType}!votElement.c@{votElement.c}}
+\subsubsection[{vot\_\-elemType}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-elemType (Element $\ast$ {\em e})}}
+\label{votElement_8c_c40e3a809b3865bd6d15bf368778e28e}
+
+
+Get the integer value (ID) of the Element (internal method). 
+
+vot\_\-elemType -- Get the integer value (ID) of the Element (internal method)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em e}]A pointer to the Element that you want the type of \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]An integer corresponding to the type of the element \end{Desc}
+\hypertarget{votElement_8c_478f5d941afc5695c98627cdbdfd6844}{
+\index{votElement.c@{votElement.c}!vot\_\-elemXML@{vot\_\-elemXML}}
+\index{vot\_\-elemXML@{vot\_\-elemXML}!votElement.c@{votElement.c}}
+\subsubsection[{vot\_\-elemXML}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ vot\_\-elemXML (Element $\ast$ {\em e})}}
+\label{votElement_8c_478f5d941afc5695c98627cdbdfd6844}
+
+
+Builds a string of the opening XML Tag (internal method). 
+
+vot\_\-elemXML -- Builds a string of the opening XML Tag (internal method)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em $\ast$e}]A pointer to an Element \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A string that contains the opening XML tag for e \end{Desc}
+\hypertarget{votElement_8c_bb085dd4a9d1237b43a7db3cb2a192d2}{
+\index{votElement.c@{votElement.c}!vot\_\-elemXMLEnd@{vot\_\-elemXMLEnd}}
+\index{vot\_\-elemXMLEnd@{vot\_\-elemXMLEnd}!votElement.c@{votElement.c}}
+\subsubsection[{vot\_\-elemXMLEnd}]{\setlength{\rightskip}{0pt plus 5cm}char $\ast$ vot\_\-elemXMLEnd (Element $\ast$ {\em e})}}
+\label{votElement_8c_bb085dd4a9d1237b43a7db3cb2a192d2}
+
+
+Build a string of the ending XML Tag (internal method). 
+
+vot\_\-elemXMLEnd -- Build a string of the ending XML Tag (internal method)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em $\ast$e}]A pointer to an Element \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]A string that contains the ending XML tag for e \end{Desc}
+\hypertarget{votElement_8c_c247ed61c78db54860fbbf80385f3088}{
+\index{votElement.c@{votElement.c}!vot\_\-eType@{vot\_\-eType}}
+\index{vot\_\-eType@{vot\_\-eType}!votElement.c@{votElement.c}}
+\subsubsection[{vot\_\-eType}]{\setlength{\rightskip}{0pt plus 5cm}int vot\_\-eType (char $\ast$ {\em name})}}
+\label{votElement_8c_c247ed61c78db54860fbbf80385f3088}
+
+
+Get the integer value (ID) of the name (internal method). 
+
+vot\_\-eType -- Get the integer value (ID) of the name (internal method).
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em name}]Name of the desired type \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]An integer corresponding to the type of the element \end{Desc}
+\hypertarget{votElement_8c_744db49ce83f6ed1d76b7aa4eacd9dd9}{
+\index{votElement.c@{votElement.c}!vot\_\-newElem@{vot\_\-newElem}}
+\index{vot\_\-newElem@{vot\_\-newElem}!votElement.c@{votElement.c}}
+\subsubsection[{vot\_\-newElem}]{\setlength{\rightskip}{0pt plus 5cm}Element $\ast$ vot\_\-newElem (unsigned int {\em type})}}
+\label{votElement_8c_744db49ce83f6ed1d76b7aa4eacd9dd9}
+
+
+Allocate a new structure of the given type (internal method). 
+
+vot\_\-newElem -- Allocate a new structure of the given type (internal method)
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em type}]An integer that defines the type of Element \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]An new Element structure \end{Desc}

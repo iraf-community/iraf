@@ -1,0 +1,80 @@
+.help tchcol Jan92 tables
+.nj
+.ih
+NAME
+tchcol -- Change column description.
+.ih
+USAGE
+tchcol table oldname newname newfmt newunits
+.ih
+DESCRIPTION
+This task may be used to change the name of a column, the display
+format, or the units.
+To change more than one column the task must be called more than once.
+Only those items (name, units, format) that are not null will be changed.
+The word "default" may be used to set 
+the print format or the units to their default values.
+.ih
+PARAMETERS
+.ls table [file name template]
+Names of tables to be modified.
+The same change(s) will be made to all tables.
+
+Note that the tables are modified in-place.
+.le
+.ls oldname = "" [string]
+Name of column to be changed.
+If the column is not found,
+a message will be printed,
+and the current table will not be changed.
+.le
+.ls newname = "" [string]
+New column name or a null string ("").
+
+If this is null or blank, the column name will not be changed.
+.le
+.ls newfmt = "" [string]
+New value for print format, or "default" or "".
+
+If this is null or blank, the display format will not be changed.
+If 'newfmt = "default"' the print format will be set to the default
+for the column data type.
+Type "help ttools opt=sysdoc" for more information about print formats.
+.le
+.ls newunits = "" [string]
+New value for units, or "default" or "".
+
+If this is null or blank the units will not be changed.
+If newunits = "default" the units will be set to null.
+There is no way (with this task) to set the units to the value "default"!
+.le
+.ls (verbose = yes) [boolean]
+Print the names of tables as the task progresses?
+
+If 'verbose=yes' then the table names are printed,
+and for each item that is changed, a message is printed
+giving the old and new values.
+.le
+.ih
+EXAMPLES
+In table 'm87pol.tab', change column name "chi" to "CHI" and set the units
+to degrees.  The display format is not changed.
+
+.nf
+tt> tchcol m87pol chi CHI "" degrees
+.fi
+
+In the same table, set the units of column "P" to null.
+The name and format are not changed.
+
+.nf
+tt> tchcol m87pol P "" "" default
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by J.C. Hsu and was modified by Phil Hodge.
+.ih
+SEE ALSO
+.endhelp

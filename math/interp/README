@@ -1,0 +1,7 @@
+Image interpolation package.  Contains interpolator routines specially
+designed to interpolate image data.  This interpolator task is characterized
+by data arrays in which the data points are equally spaced.  Data points
+and interpolation points are referenced simply by array index.  Indefinite
+valued pixels may be present in the data.  Since the interpolation routines
+will be applied to very large data arrays, efficiency is emphasized in these
+routines.

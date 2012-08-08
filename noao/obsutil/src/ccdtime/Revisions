@@ -1,0 +1,79 @@
+.help revisions Jun88 noao.obsutil
+.nf
+
+=======
+V2.12.2
+=======
+
+ccdtime.par
+t_ccdtime.x
+    1.	The minimum seeing is now 0.001.
+    2.  The formating of the seeing was changed in case the seeing is set
+	less than 0.1.
+    (4/24/03, Valdes)
+
+=======
+V2.12.1
+=======
+
+=====
+V2.12
+=====
+
+t_ccdtime.x
+../doc/ccdtime.hlp
+    It is now an error if time<0, time>10-000, abs(mag)>40, snr<0 or
+    snr>100000.  (8/24/00, Valdes)
+
+../doc/ccdtime.hlp
+    In the formula for r(sky) was pixel area term was in the wrong place.
+    (3/9/99, Valdes)
+
+t_ccdtime.x
+    For the case where SNR is very large and a time is specified the
+    iteration on the magnitude might not complete.  The iteration is now
+    capped at 100 and the test for convergence is now normalized.
+    (11/6/98, Valdes)
+
+t_ccdtime.x
+../doc/ccdtime.hlp
+    1.  The calculation of exposure time given a SNR was changed from an
+	interative solution to an analytic solution.
+    2.  The times are printed to 0.01s.
+    3.  The photometry aperture is now the rounded-up integer with a minimum
+	of 9 pixels.
+    (9/8/98, Valdes)
+
+t_ccdtime.x
+ccddb.x
+../doc/ccdtime.hlp
+    1.	The database keywords can now be index by reference to the telescope,
+	filter, and/or telescope.
+    2.  A new filter keyword, "extinction", was added to specify the
+	extinction.
+    3.	The extinction is now used to fixe the previous incorrect behavior
+	that used 1 mag/airmass extinction.  The old results are preserved
+	by making the default extinction be 1 if missing.  However the
+	database files should be updated to have correct extinctions.
+    (8/19/98, Valdes)
+
+ccddb.x
+../doc/ccdtime.hlp
+    1.	The code would not work with database entries containing whitespace.
+    2.	The help was not correct in describing how the number of pixels used
+	in the photometry is calculated from the seeing FWHM.
+    (4/5/94, Valdes)
+
+t_ccdtime.x
+    Modified CCDTIME to use a plate scale instead of the f/ratio and to
+    include an airmass term.  (10/23/93, Valdes)
+
+t_ccdtime.x	+
+ccddb.x		+
+ccdtime.x	-
+ccdtime.par
+doc/ccdtime.hlp
+    Revised CCDTIME to use a telescope/filter/detector database and to
+    compute and print additional information.  (8/16/93, Valdes)
+
+.endhelp

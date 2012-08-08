@@ -1,0 +1,59 @@
+.help arider Dec98 "Image Interpolator Package"
+.ih
+NAME
+arider -- calculate the interpolant derivatives at x
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+arider (x, datain, npix, der, nder, interp_type)
+
+.nf
+    real	x[2]		#I x value, 1 <= x[1-2] <= npts 
+    real	datain[npix]	#I array of data points
+    int		npix		#I number of data points
+    real	der[nder]	#O derivatives, der[1] = function value
+    int		nder		#I number of derivatives, 1 + max order
+    int		interp_type	#I interpolant type
+.fi
+.ih
+ARGUMENTS
+.ls x     
+Single X value, or pair of X values defining a range in the case of the
+drizzle interpolant.
+.le
+.ls datain
+Array of data values.
+.le
+.ls npix  
+Number of data points.
+.le
+.ls der     
+Array of derivatives. Der[1] contains the function value, der[2] the
+first derivative, and so on.
+.le
+.ls nder
+Number of derivatives. ARIDER checks that the requested number of derivatives
+is sensible.  The sinc interpolant returns the function value and the first
+two derivatives. The drizzle interpolant returns the function and the first
+derivative.
+.le
+.ls interp_type
+Interpolant type. The options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5,
+II_SPLINE3, II_SINC / II_LSINC, and II_DRIZZLE. The look-up table sinc
+is not supported and defaults to sinc. The sinc interpolant width is 31 pixels.
+The drizzle pixel fraction is 1.0. The interpolant type definitions are found
+in the package header file math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+ARIDER permits the evaluation of the interpolant at a few randomly spaced
+points within datain without the storage requirements of the sequential
+version.
+.ih
+NOTES
+Checking for INDEF valued or out of bounds pixels is the responsibility
+of the user.
+.ih
+SEE ALSO
+asider

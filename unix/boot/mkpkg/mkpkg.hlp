@@ -1,0 +1,626 @@
+.help mkpkg Mar90 "softools"
+.ih
+NAME
+mkpkg - make or update a package or library
+.ih
+USAGE
+mkpkg [switches] [module ...] [name=value ...]
+.ih
+ARGUMENTS
+.ls 10 \fB-d[ddd]\fR
+Debug mode.  Print detailed messages describing what \fImkpkg\fR is doing.
+There are four levels of debug messages, selected by repeating the "d"
+character in the switch, e.g., "-d" is level one, "-dd" is level two, and
+so on.  The debug messages get progressively more detailed as the debug level
+increases.  Debug mode automatically enables the verbose mode messages.
+.le
+.ls 10 \fB-f file\fR
+Set the name of the file to be interpreted (default: "mkpkg").
+The special value "stdin" (lower case) allows commands to be entered
+interactively from the standard input, e.g., for debugging \fImkpkg\fR.
+.le
+.ls 10 \fB-i\fR
+Ignore errors.  Execution continues even if an error occurs.  In most cases
+it does anyhow, so this switch has little effect at present.
+.le
+.ls 10 \fB-n\fR
+No execute.  Go through the motions, but do not touch any files.
+No execute mode automatically enables verbose mode (flag "-v").
+This switch should be used to verify new mkpkg files before execution.
+.le
+.ls 10 \fB-p \fIpkgname\fR
+Load the package environment for the named external package, e.g.,
+"mkpkg -p noao update".  If the same package is always specified
+the environment variable or logical name PKGENV may be defined at the
+host level to accomplish the same thing.  The package name \fImust\fR
+be specified when doing software development in an external or layered
+package.
+.le
+.ls 10 \fB-u\fR    [AOSVS/IRAF only]
+Forcibly update the dates of improperly dated library modules.  This option
+is used when a binary archive is restored on a machine which cannot restore
+the file modify dates.  In this case, all source file dates would appear to
+have been modified since the libraries were updated, causing all sources to
+be recompiled.  By running \fImkpkg\fR with the \fI-u\fR flag, one can update
+the library module dates without recompiling the associated files.  This is
+done by setting the date of each library module to be no older than the
+file \fIhlib$iraf.h\fR, which should be "touched" after the system has fully
+been restored to disk to mark the installation time.  Note that files which
+have been modified \fIsince\fR the system was restored to disk will still
+cause the affected library modules to be updated, even when the \fI-u\fR flag
+is specfied.
+.le
+.ls 10 \fB-v\fR
+Verbose mode.  A message is printed whenever a file is touched.
+Recommended when running large mkpkg jobs in batch mode.
+.le
+.ls 10 \fBmodule\fR
+The names of the module or modules (named entries in the "mkpkg" file) to be
+executed.  If no module is named the first module encountered is executed,
+unless a \fImkpkg\fR macro preprocessor directive at the beginning of the file
+specifies a different default action.
+.le
+.ls 10 \fBname=value [name=value...]\fR
+Enter the named symbol/value pair into the symbol table of the \fImkpkg\fR
+macro preprocessor.  The symbols \fIXFLAGS\fR (for the XC compiler) and
+\fILFLAGS\fR (for the linker) are predefined but may be redefined on the
+command line.  Case is ignored in symbol names for portability reasons.
+.le
+.ih
+DESCRIPTION
+The \fImkpkg\fR utility is used to make or update IRAF packages or libraries.
+\fIMkpkg\fR is used to bootstrap the IRAF system hence is implemented as
+a foreign task, callable either from within the IRAF environment or from the
+host system.  Usage is identical in either case (except that the details of
+when a particular argument may need to be quoted will vary depending on the
+command language used).  \fIMkpkg\fR is upwards compatible with the old
+\fImklib\fR utility.
+
+
+.tp 4
+1. \fBIntroduction\fR
+
+    \fIMkpkg\fR provides two major facilities: a library update capability and
+a macro preprocessor.  The macro preprocessor provides symbol definition and
+replacement, conditional execution, and a number of builtin commands.
+The usefulness of these facilities is enhanced by the ability of \fImkpkg\fR
+to update entire directory trees, or to enter the hierarchy of \fImkpkg\fR
+descriptors at any level.  For example, typing "mkpkg" in the root directory
+of IRAF will make or update the entire system, whereas in the "iraf$sys"
+directory \fImkpkg\fR will update only the system libraries, and in the
+"iraf$sys/fio" directory \fImkpkg\fR will update only the FIO portion of the
+system library "libsys.a".
+
+The \fImkpkg\fR utility is quite simple to use to maintain small packages
+or libraries, despite the complexity of the discussion which follows.
+The reader is encouraged to study several examples of working mkpkg-files
+before reading further; examples will be found throughout the IRAF system.
+The mkpkg files for applications packages tend to be very similar to one
+another, and it is quite possible to successfully copy and modify the
+mkpkg-file from another package without studying the reference information
+given here.
+
+
+.tp 4
+2. \fBLexical Conventions\fR
+
+    The lexical conventions employed in \fImkpkg\fR are those used throughout
+IRAF.  Comments may occur anywhere, begin with the character #, and extend
+to the end of the current line.  Blank lines are ignored virtually everywhere.
+Newline may be escaped with backslash to continue on the next line.
+All filenames are IRAF virtual filenames with the following extensions.
+
+
+.ks
+.nf
+	.a		object library
+	.c		C source
+	.e		executable (e.g., "x_package.e")
+	.f		Fortran source
+	.gc		generic C source
+	.gx		generic SPP source
+	.h		C or SPP header file
+	.inc		include file
+	.l		Lex source
+	.o		object file
+	.r		Ratfor source
+	.s		assembler source
+	.y		Yacc source
+.fi
+.ke
+
+
+Since \fImkpkg\fR is an IRAF utility it recognizes the major IRAF logical
+directories; these are summarized in the list below.  The IRAF (or UNIX)
+pathname convention is used to specify pathnames rooted in the current
+directory or a logical directory.
+
+
+.ks
+.nf
+	as$		where .s files go		host$as/
+	bin$		installed executables		iraf$bin/
+	dev$		device tables			iraf$dev/
+	hlib$		machdep header files		host$hlib/
+	host$		host system interface		[MACHDEP]
+	iraf$		the root directory of IRAF	[MACHDEP]
+	lib$		system library			iraf$lib/
+	math$		math sources			iraf$math/
+	pkg$		applications packages		iraf$pkg/
+	sys$		the VOS, system libraries	iraf$sys/
+	tmp$		where temporary files go	[MACHDEP]
+.fi
+.ke
+
+
+All other directories should be referenced by giving the path from either the
+current directory or from one of the system logical directories shown above.
+For example, "pkg$system/" is the root directory of the SYSTEM package,
+and ".." is the directory one level up from the current directory.
+
+
+.tp 4
+3. \fBMaintaining Libraries with MKPKG\fR
+
+    Libraries are described by a \fBmember list\fR module in the "mkpkg" file.
+The syntax of a library member list module is shown below.  Note that the
+\fBmkpkg\fR module name for a library member list module is the same as the
+name of the actual library, hence must end with the extension ".a".
+
+
+.ks
+.nf
+	libname.a:
+		member1		dep1 dep2 ... depN
+		member2		dep1 dep2 ... depN
+		  ...
+		memberN		dep1 dep2 ... depN
+		;
+.fi
+.ke
+
+
+Here, "libname.a" is the IRAF virtual filename of the library (regardless of
+what directory it resides in), "memberN" is the name of a source file which
+may contain any number of actual library object modules, and "depN" is the
+name of a file upon which the named member depends.  If any of the named
+dependency files is newer than the corresponding member source file, or if
+the member source file is newer than the compiled library object module,
+the source file is recompiled and replaced in the library.  Both source
+files and dependency files may reside in remote directories.  The names of
+dependency files in system libraries should be enclosed in <> delimiters,
+e.g., "<fset.h>".  Each member must be described on a separate line.
+
+If the library being updated does not reside in the current directory
+(directory from which the "mkpkg" command was entered) then the library must
+be "checked out" of the remote directory before it can be updated, and checked
+back in when updating is complete.  These operations are performed by macro
+preprocessor directives, e.g.:
+
+
+.ks
+.nf
+	$checkout libsys.a lib$
+	$update   libsys.a
+	$checkin  libsys.a lib$
+	$exit
+
+	libsys.a:
+		@symtab		# update libsys.a in ./symtab
+		brktime.x	<time.h>
+		environ.x	environ.com environ.h <ctype.h>\
+				<fset.h> <knet.h>
+		main.x		<clset.h> <config.h> <ctype.h>\
+				<error.h> <fset.h> <knet.h>\
+				<printf.h> <xwhen.h>
+		onentry.x	<clset.h> <fset.h> <knet.h>
+		spline.x	<math.h> <math/interp.h>
+		;
+.fi
+.ke
+
+
+Note that the checkout operation is required only in the directory from which
+the "mkpkg" command was entered, since the library has already been checked
+out when the mkpkg-file in a subdirectory is called to update its portion
+of the library (as in the "@symtab" in the example above).  The checkout
+commands should however be included in each mkpkg-file in a hierarchy in such
+a way that the library will be automatically checked out and back in if
+\fImkpkg\fR is run from that directory.  The checkout commands are ignored
+if the mkpkg-file is entered when updating the library from a higher level,
+because in that case \fImkpkg\fR will search for the named entry for the
+library being updated, ignoring the remainder of the mkpkg-file.
+
+Sometimes it is necessary or desirable to break the library member list up
+into separate modules within the same mkpkg-file, e.g., to temporarily
+change the value of the symbol XFLAGS when compiling certain modules.
+To do this use the "@" indirection operator in the primary module list to
+reference a named sublist, as in the example below.  Normal indirection
+cannot be used unless the sublist resides in a subdirectory or in a different
+file in the current directory, e.g., "@./mki2", since a single mkpkg-file
+cannot contain two modules with the same name.  The same restrictions apply
+to the \fI$update\fR operator.
+
+
+.ks
+.nf
+	libpkg.a:
+		@(i2)
+		alpha.x
+		beta.x
+		zeta.f
+		;
+	i2:
+		$set	XFLAGS = "-cO -i2"
+		gamma.f
+		delta.f
+		;
+.fi
+.ke
+
+
+In the example above five object modules are to be updated in the library
+"libpkg.a".  The files listed in module "i2", if out of date, will be compiled
+with the nonstandard XFLAGS (compiler flags) specified by the \fI$set\fR
+statement shown.
+
+
+.tp 4
+4. \fBThe MKPKG Macro Preprocessor\fR
+
+    The \fImkpkg\fR macro preprocessor provides a simple recursive symbol
+definition and replacement facility, an include file facility, conditional
+execution facilities, an OS escape facility, and a number of builtin directives.
+The names of the preprocessor directives always begin with a dollar sign;
+whitespace is not permitted between the dollar sign and the remainder of the
+name.  Several preprocessor directives may be given on one line if desired.
+Preprocessor directives are executed as they are encountered, and may appear
+anywhere, even in the member list for a library.
+
+
+.tp 4
+4.1 Symbol Replacement
+
+    Symbol substitution in the \fImkpkg\fR macro preprocessor is carried out
+at the character level rather than at the token level, allowing macro expansion
+within tokens, quoted strings, or OS escape commands.  Macros are recursively
+expanded but may not have arguments.
+
+Macros may be defined on the \fBmkpkg\fR command line, in the argument list
+to a \fB$call\fR or \fB$update\fR directive (see below), in an include file
+referenced with the \fB$include\fR directive, or in a \fB$set\fR directive.
+All symbols are global and hence available to all lower level modules,
+but symbols are automatically discarded whenever a module exits, hence cannot
+affect higher level modules.  A local symbol may redefine a previously
+defined symbol.  The IRAF and host system environment is treated as an
+extension of the \fBmkpkg\fR symbol table, i.e., a logical directory such
+as "iraf" may be referenced like a locally defined symbol.
+
+Macro replacement occurs only when explicitly indicated in the input text,
+as in the following example, which prints the pathname of the
+\fBdev$graphcap\fR file on the \fBmkpkg\fR standard output.  The sequence
+"$(" triggers macro substitution.  The value of a symbol may be obtained
+interactively from the standard input by adding a question mark after the
+left parenthesis, i.e., "$(?terminal)" (this does not work with the -f stdin
+flag).  The contents of a file may be included using the notation
+"$(@\fIfile\fR)".   Note that case is ignored in macro names; by convention,
+logical directories are normally given in lower case, and locally defined
+symbols in upper case.
+
+
+.ks
+.nf
+	$echo $(dev)graphcap
+	!xc $(XFLAGS) filea.x fileb.x
+.fi
+.ke
+
+
+Symbols are most commonly defined locally with the \fB$set\fR directive.
+The \fB$include\fR directive is useful for sharing symbols amongst different
+modules, or for isolating any machine dependent definitions in a separate
+file.  The IRAF \fBmkpkg\fR system include file \fBhlib$mkpkg.inc\fR is
+automatically included whenever \fImkpkg\fR is run.
+.ls 4
+.ls \fB$set\fR symbol = value
+Enter the named symbol into the symbol table with the given string value.
+Any existing symbol will be silently redefined.  Symbols defined within a
+module are discarded when the module exits.
+.le
+.ls \fB$include\fR filename
+Read commands (e.g., \fB$set\fR directives) from the named include file.
+The include filename may be any legal virtual filename, but only the
+major logical directories are recognized, e.g., "iraf$", "host$", "hlib$",
+"lib$", "pkg$", and so on.
+.le
+.le
+
+
+The use of the \fB$set\fR directive is illustrated in the example below.
+Note the doubling of the preprocessor meta-character to avoid macro expansion
+when entering the value of the GEN macro into the symbol table.  The sequence
+"$$" is replaced by a single "$" whenever it is encountered in the input
+stream.
+
+
+.ks
+.nf
+	$set GFLAGS = "-k -t silrdx -p ak/"
+	$set GEN    = "$generic $$(GFLAGS)"
+
+	ifolder (amulr.x, amul.x) $(GEN) amul.x $endif
+.fi
+.ke
+
+
+.tp 4
+4.2 Conditional Execution
+
+    Conditional control flow is implemented by the \fB$if\fR directives
+introduced in the last example and described below.  The character "n" may
+be inserted after the "$if" prefix of any directive to negate the sense of
+the test, e.g., "$ifndef" tests whether the named symbol does not exist.
+Nesting is permitted.
+.ls 4
+.ls \fB$ifdef\fR (symbol [, symbol, ...])
+.sp
+Test for the existence of one of the named symbols.
+.le
+.ls \fB$ifeq\fR (symbol, value [, value,...])
+.sp
+Test if the value of the named symbol matches one of the listed value strings.
+.le
+.ls \fB$iferr\fR
+.sp
+Test for an error return from the last directive executed which touched
+a file.
+.le
+.ls \fB$iffile\fR (file [, file,...])
+.sp
+Test for the existence of any of the named files.
+.le
+.ls \fB$ifnewer\fR (file, filea)
+.in -4
+\fB$ifnewer\fR (file: filea [, fileb, ...])
+.in 4
+.sp
+Test if the named file is newer (has been modified more recently) than
+any of the named files to the right.  The colon syntax may be used for
+clarity when comparing one file to many, but a comma will do.
+.le
+.ls \fB$ifolder\fR (file, filea)
+.in -4
+\fB$ifolder\fR (file: filea [, fileb, ...])
+.in 4
+.sp
+Test if the named file is older than any of the named files.
+.le
+.ls \fB$else\fR
+.sp
+Marks the \fIelse\fR clause of an \fIif\fR statement.  The \fIelse-if\fR
+construct is implemented as "$else $if", i.e., as a combination of the two
+more primitive constructs.
+.le
+.ls \fB$endif\fR
+.sp
+Terminates a $if or $if-$else statement.
+.le
+.ls \fB$end\fR
+.sp
+Terminates an arbitrary number of $if or $if-$else statements.  This is most
+useful for terminating a long list of $if-$else clauses, where the alternative
+would be a long string of $endif directives.
+.le
+.ls \fB$exit\fR
+Terminate the current program; equivalent to a semicolon, but the latter
+is normally used only at the end of the program to match the colon at the
+beginning, whereas \fB$exit\fR is used in conditionals.
+.le
+.le
+
+
+.tp 4
+4.3 Calling Modules
+
+    The following preprocessor directives are available for calling \fImkpkg\fR
+modules or altering the normal flow of control.
+.ls
+.ls \fB$call\fR module[@subdir[/file]] [name=value] [name=value...]
+.sp
+Call the named mkpkg-file module as a subroutine.  In most cases the called
+module will be in the current mkpkg-file, but the full module name syntax
+permits the module to be in any file of any subdirectory ("./file" references
+a different file in the current directory).  Arguments may be passed to
+the called module using the symbol definition facility; any symbols
+defined in this fashion are available to any modules called in turn by
+the called module, but the symbols are discarded when the called module returns.
+.le
+.ls \fB$update\fR module[@subdir[/file]] [name=value] [name=value...]
+.sp
+Identical to \fB$call\fR except that the named module is understood to
+be a library member list.  The current value of the symbol XFLAGS is used
+if XC is called to compile any files.  If the named library does not exist
+one will be created (a warning message is issued).
+.le
+.ls \fB$goto\fR label
+.sp
+Causes execution to resume at the line following the indicated label.
+The syntax of a goto label is identical to that of a mkpkg-file module name,
+i.e., a line starting with the given name followed by a colon.
+The \fI$goto\fR statement automatically cancels any \fI$if\fR nesting.
+.le
+.le
+
+
+.tp 4
+4.4 Preprocessor Directives
+
+    The remaining preprocessor directives are described below in alphabetical
+order.  Additional capability is available via OS escapes, provided the
+resultant machine dependence is acceptable.
+.ls
+.ls \fB$echo\fR message
+.sp
+Print the given message string on the standard output.  The string must be
+quoted if it contains any spaces.
+.le
+.ls \fB$checkout\fR file directory
+.sp
+Check the named file out of the indicated directory.  The checkout operation
+makes the file accessible as if it were in the current directory; checkout
+is implemented either as a symbolic link or as a physical file copy depending
+upon the host system.  The referenced directory may be a logical directory,
+e.g., "lib$", or a path, e.g, "pkg$images/".  Checkout is not disabled by
+the "-n" flag.
+.le
+.ls \fB$checkin\fR file directory
+.sp
+Check the named file back into the indicated directory.  The checkin operation
+is implemented either as a remove link or copy and delete depending upon the
+host system.  Checkin is not disabled by the "-n" flag.
+.le
+.ls \fB$copy\fR filea fileb
+.sp
+Make a copy \fIfileb\fR of the existing file \fIfilea\fR.  On a UNIX host
+the copy operation will preserve the file modify date if the file is a library
+(to avoid the "symbol table out of date" syndrome).
+.le
+.ls \fB$delete\fR file [file ...]
+.sp
+Delete the named file or files.
+.le
+.ls \fB$generic\fR [-k] [-p prefix] [-t types] [-o root] files
+.sp
+Run the generic preprocessor on the named files.  The generic preprocessor
+is an IRAF bootstrap utility and may not be available on non-UNIX hosts.
+.le
+.ls \fB$link\fR [switches] file1 file2 ... fileN [-o file.e]
+.sp
+Call XC with the given argument list to link the indicated files and libraries.
+The value of the symbol LFLAGS (default value the null string) is automatically
+inserted at the beginning of the command line.  This is equivalent to
+"!xc $(LFLAGS) ...".
+.le
+.ls \fB$move\fR file destination
+.sp
+Move the named file to the indicated directory, or rename the file in the
+current directory.
+.le
+.ls \fB$omake\fR file [dep1] [dep2 ...]
+.sp
+Compile the named source file if it does not have a corresponding object file
+in the current directory, if the object file is older, or if any of the
+listed dependency files are newer (or not found).  The current value of the
+symbol XFLAGS is used if XC is called to compile the file.
+.le
+.ls \fB$purge\fR directory
+.sp
+Delete all old versions of all files in the named directory.  Nothing is done
+if the system does not support multiple file versions.
+.le
+.ls \fB$special\fR directory : filelist ;
+.sp
+Add one or more files to the special file list for the host system.  This is
+a system facility, not intended for use in applications \fImkpkg\fR files.
+The special file list is a list of all source files needing special processing
+for the local host system.  Examples of special files are files which are
+optimized in assembler (or some other nonstandard language), or files which
+must be compiled in a special way to get around bugs in a host compiler.
+The special file list makes it possible to flag arbitrary files for special
+processing, without having to modify the standard software distribution.
+In the IRAF system, the special file list is defined in the file
+"hlib$mkpkg.sf" which is included automatically by "hlib$mkpkg.inc" whenever
+\fImkpkg\fR is run.
+
+The syntax of a \fIfilelist\fR entry is as follows:
+
+	modname source_file mkobj_command
+
+where \fImodname\fR is the filename of a library module as it appears in a
+library module list for the named directory, \fIsource_file\fR is the virtual
+pathname of the source file to be used in lieu of the standard portable
+source file \fImodname\fR, and \fImkobj_command\fR is the \fImkpkg\fR command
+(e.g., $xc or an OS escape) to be executed to compile the named module.
+The character "&" appearing in either the source file name or mkobj command
+is replaced by \fImodname\fR.  If the \fImkobj_command\fR is omitted the
+specified source file will be compiled with $XC using the current value of
+XFLAGS.
+.le
+.ls \fB$xc\fR [switches] file1 file2 ... fileN
+.sp
+Call the XC compiler to compile the named files.  Note that the value of
+the symbol XFLAGS is \fInot\fR used when XC is explicitly called in this
+fashion (XFLAGS is used by \fB$update\fR and \fB$omake\fR).
+.le
+.ls \fB$debug\fR [on|off]
+.sp
+Turn debug mode on or off.  If no argument is supplied debug mode is turned
+on.  Turning on debug mode automatically enables verbose mode.
+.le
+.ls \fB$verbose\fR [on|off]
+.sp
+Turn verbose mode on or off.  If no argument is supplied verbose mode is turned
+on.
+.le
+.le
+
+
+.tp 4
+5. Error Recovery
+
+    \fBMkpkg\fR is implemented in such a way that it is restartable.  If a mkpkg
+operation terminates prematurely for some reason, e.g., because of a compile
+error, execution error (such as cannot find the mkpkgfile in a subdirectory),
+interrupt, etc., then the mkpkg command can be repeated after correcting
+the error, without repeating the operations already completed.  If \fBmkpkg\fR
+is interrupted it may leave checked out files, objects compiled but not yet
+updated in a library, etc. lying about, but this is harmless and the
+intermediate files will be cleaned up when the errors have been corrected
+and the run successfully completes.
+
+.ih
+EXAMPLES
+Update the current package.
+
+	cl> mkpkg
+
+Update the package library but do not relink.
+
+	cl> mkpkg libpkg.a
+
+Make a listing of the package.
+
+	cl> mkpkg listing
+
+
+.ks
+.nf
+Sample mkpkg-file for the above commands:
+
+
+	# Make my package.
+
+	$call relink
+	$exit
+
+	relink:
+		$update	libpkg.a
+		$omake	x_mypkg.x
+		$link   x_mypkg.o -lxtools
+		;
+
+	libpkg.a:
+		task1.x		pkg.h
+		task2.x
+		filea.x		pkg.com pkg.h <fset.h>
+		fileb.x		pkg.com
+		;
+
+	listing:
+		!pr task1.x task2.x file[ab].x | vpr -Pvup
+		;
+.fi
+.ke
+.ih
+SEE ALSO
+xc, generic, softools package

@@ -1,0 +1,16 @@
+input,s,a,"",,,"Input spectra to sky subtract"
+output,s,h,"",,,"Output sky subtracted spectra"
+objaps,s,h,"",,,"Object apertures"
+skyaps,s,h,"",,,"Sky apertures"
+objbeams,s,h,"",,,"Object beam numbers"
+skybeams,s,h,"",,,"Sky beam numbers"
+skyedit,b,h,yes,,,"Edit the sky spectra?"
+combine,s,h,"average",average|median|sum,,"Combining option"
+reject,s,h,"avsigclip",none|minmax|avsigclip,,"Sky rejection option"
+scale,s,h,"none",none|mode|median|mean,,"Sky scaling option"
+saveskys,b,h,yes,,,"Save sky spectra?"
+logfile,f,h,"",,,"Logfile"
+fd1,*struct,h,"",,,
+fd2,*struct,h,"",,,
+fd3,*struct,h,"",,,
+mode,s,h,"ql",,,

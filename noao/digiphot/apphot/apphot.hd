@@ -1,0 +1,34 @@
+# Help directory for the APPHOT package
+
+$doc		= "./doc/"
+
+$aptest		= "apphot$aptest/"
+$center		= "apphot$center/"
+$daofind	= "apphot$daofind/"
+$fitpsf		= "apphot$fitpsf/"
+$fitsky		= "apphot$fitsky/"
+$phot		= "apphot$phot/"
+$polyphot	= "apphot$polyphot/"
+$pexamine	= "ptools$pexamine/"
+$radprof	= "apphot$radprof/"
+$wphot		= "apphot$wphot/"
+
+aptest		hlp=doc$aptest.hlp
+center		hlp=doc$center.hlp,		src=center$t_center.x
+centerpars	hlp=doc$centerpars.hlp,		src=apphot$centerpars.par
+daofind		hlp=doc$daofind.hlp,		src=daofind$t_daofind.x
+datapars	hlp=doc$datapars.hlp,		src=apphot$datapars.par
+findpars	hlp=doc$findpars.hlp,		src=apphot$findpars.par
+fitpsf		hlp=doc$fitpsf.hlp,		src=fitpsf$t_fitpsf.x
+fitsky		hlp=doc$fitsky.hlp,		src=fitsky$t_fitsky.x
+fitskypars	hlp=doc$fitskypars.hlp,		src=apphot$fitskypars.par
+pexamine	hlp=doc$pexamine.hlp,		src=pexamine$t_pexamine.x
+phot		hlp=doc$phot.hlp,		src=phot$t_phot.x
+photpars	hlp=doc$photpars.hlp,		src=apphot$photpars.par
+polymark	hlp=doc$polymark.hlp,		src=polyphot$t_polymark.x
+polyphot	hlp=doc$polyphot.hlp,		src=polyphot$t_polyphot.x
+polypars	hlp=doc$polypars.hlp,		src=apphot$polypars.par
+qphot		hlp=doc$qphot.hlp,		src=phot$t_qphot.x
+radprof		hlp=doc$radprof.hlp,		src=radprof$t_radprof.x
+wphot		hlp=doc$wphot.hlp,		src=wphot$t_wphot.x
+revisions	sys=Revisions

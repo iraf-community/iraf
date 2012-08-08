@@ -1,0 +1,9 @@
+# Parameter file for the IMCCTRAN task
+
+image,f,a,,,,"List of input images"
+outsystem,s,a,,,,"The new image coordinate system"
+nx,i,h,10,,,"The coordinate grid size in x"
+ny,i,h,10,,,"The coordinate grid size in y"
+longpole,b,h,no,,,"Update longpole rather than the cd matrix where appropriate ?"
+verbose,b,h,yes,,,"Print messages about actions taken ?"
+update,b,h,yes,,,"Update the image header ?"

@@ -1,0 +1,344 @@
+.help biblio84 Feb84 "Bibliography of IRAF Documentation"
+.ce
+\fBBibliography of IRAF Documentation\fR
+.ce
+February 25, 1984
+
+
+    The IRAF system is still under development and has not yet been released
+for use outside KPNO.  The amount of top-level, end user documentation
+available is therefore minimal at this point.  Most of the documentation
+currently available is either design documentation or programmer documentation.
+We have collected all of the documentation that we thought might be
+interesting together in one place, accessible from both the terminal and
+from UUCP, so that people would have easy access to the docs.  This bibliography
+introduces each document.  The source directory is "~uucp/IRAF" or
+equivalently, "/usr/spool/uucppublic/IRAF".
+
+    Each document entry consists of a list of one or files, one file per line,
+followed by a brief description of the document.  The file list entries are
+taken directly from the output of the directory lister to eliminate the
+possibility of an error.  Each entry includes the size of the source file in
+bytes (100K is roughly 35 pages for a .ms file and 45 pages for a .doc file),
+the date when the file was last updated in the bibliography, and the name of
+the file.  Sometimes a single document consists of several files.
+
+    The ".ms" extension files contain Troff source text using the MS macros and
+occasionally Tbl; the KPNO version of the "tmac" MS macro file is included in
+the bibliography so that you can reproduce the Troff documents exactly as
+they would appear at KPNO.  The ".doc" extension files are preformatted 72
+columns by 60 lines with formfeed characters inserted between pages, suitable
+for printing on most line printers without further processing.
+
+
+
+.ce
+\fBGeneral & Miscellaneous\fR
+
+
+-rw-r--r-- 1 tody      13292 Feb 26 12:57 BIBLIO
+
+    A possibly newer version of what you are looking at.
+
+
+-rw-r--r-- 1 iraf       3550 Feb 25 11:39 CvsF77
+
+    Discusses the relative merits of C versus Fortran for scientific
+programming.  Attempts to answer the questions (1) why not just use
+Fortran like everyone else?, and (2) why not just use C if you are
+already using UNIX?
+
+
+-rw-r--r-- 1 iraf      10637 Feb 25 11:57 cover.ms
+
+    A letter introducing the IRAF system, where its all coming from,
+what we are trying to achieve, etc.  This is the cover letter for
+mailed IRAF documentation sets.  The bulk of the letter is similar
+to the announcement sent out over UNET.
+
+
+-rw-r--r-- 1 iraf       4518 Feb 25 11:51 history.doc
+
+    Summarizes what the IRAF system provides, and outlines the history
+of the project (through the fall of 83 when the doc was written).
+This is just a short outline; no discussion is given.
+
+
+-rw-r--r-- 1 iraf      51295 Feb 25 12:00 irafplan.ms
+
+    A Feb84 document presenting the detailed IRAF program implementation
+plan for 84 and 85.  Hard to follow unless you know the system well.
+
+
+-rw-r--r-- 1 iraf      24451 Feb 25 12:34 irafdirs
+
+    A recursive listing of all the directories and file names on our UNIX
+based IRAF software development system, for those of you are curious
+about how the sources are structured, or who want more information
+about what the system currently contains.
+
+
+-rw-rw-rw- 1 iraf       8491 Feb 25 13:14 newsfile
+
+The "news" from the IRAF software development system.  Will be
+updated periodically.
+
+
+-rw-rw-r-- 1 iraf      25759 Feb 25 13:13 revsfile
+
+    All revisions to released software, and all releases of new programs
+or packages are recorded in the revisions file.  This is a snapshot
+of the revsfile on our software development system; it will be updated
+periodically.  When eventually the system is released for use outside
+KPNO, the revsfile will be distributed with each successive release
+to document all changes and additions to the system.
+
+
+-rw-r--r-- 1 kpno      23131 Feb 26 11:29 tmac
+
+    The KPNO MS-macro file for text processing Troff files.  This has nothing
+to do with IRAF, but is included so that the ".ms" suffixed documents can be
+reproduced exactly by non-KPNO sites.
+
+
+.ce
+\fBProgrammer and User documentation\fR
+
+
+.nf
+-rw-r--r-- 1 iraf       2959 Feb 25 11:57 clman_toc.ms
+-rw-r--r-- 1 iraf      56362 Feb 25 11:57 clman.ms
+.fi
+
+    The "CL Programmers Guide", rev Sept83.  This is currently the most up
+to date documentation available for the CL (command language), though
+the CL went through a major revision in the fall of 83, adding many
+features which have not yet been documented (these CL mods predate
+the use of the revsfile).
+
+
+.nf
+-rw-r--r-- 1 iraf       1234 Feb 25 11:58 crib_title.ms
+-rw-r--r-- 1 iraf      43315 Feb 25 11:58 crib.doc
+.fi
+
+    The "Programmer's Crib Sheet for the IRAF Program Interface". 
+Summarizes the packages and library procedures comprising the program
+interface, i.e., the interface between an IRAF applications program
+and the world (file i/o, CL i/o, image i/o, etc.).  This is currently
+the only comprehensive documentation available for the program
+interface; the "Programmer's Reference Manual" and "Programmer's
+Guide" have not yet been written.  Additional information is however
+available in the technical specifications for the various packages
+(see "design documentation" below).
+
+
+-rw-r--r-- 1 iraf      32552 Feb 25 11:59 imexpr.ms
+
+    Describes a planned extension to the IRAF Command Language to permit
+image or image section operands in general CL expressions
+(CL expressions, assignment statements, procedure arguments, etc.
+involving whole images or image sections).  This topic is related
+to the "image calculator" described in the "Packages" document, and
+is fundamental to the general image processing capabilities of IRAF.
+
+
+-rw-r--r-- 1 iraf      12285 Feb 25 11:59 imio.ms
+
+    An introduction to the IRAF image i/o package, used to access images
+in applications packages.  Summarizes the features of the current
+interface and planned future enhancements.
+
+
+.nf
+-rw-r--r-- 1 iraf        926 Feb 25 12:01 pac_title.ms
+-rw-r--r-- 1 iraf       2676 Feb 25 12:01 pac_toc.doc
+-rw-r--r-- 1 iraf      78891 Feb 25 12:01 packages.doc
+.fi
+
+    This is the top-level design document for the IRAF system, showing
+the breakdown of all the top level, user callable software into
+"packages", and presenting the requirements for each package.
+Emphasizes the scientific requirements for the IRAF system.
+
+
+.nf
+-rw-r--r-- 1 iraf      64895 Feb 25 12:04 spp.doc
+-rw-r--r-- 1 iraf        637 Feb 25 12:02 spp_title.ms
+-rw-r--r-- 1 iraf       3408 Feb 25 12:04 spp_toc.doc
+.fi
+
+    The "Reference Manual for the IRAF Subset Preprocessor Language".
+The SPP language is a preprocessor language producing essentially
+ANSI-66 Fortran as output, which was developed as part of the IRAF
+project.  The language is reminiscent of Ratfor, but unlike most
+preprocessor languages, SPP is a fully defined language.  SPP will
+eventually be replaced by a full scientific language with enhanced
+high level language support, implemented with a true compiler (as
+opposed to preprocessor).
+
+
+.nf
+-rw-r--r-- 1 iraf      93910 Feb 25 12:05 std.ms
+-rw-r--r-- 1 iraf       4099 Feb 25 12:05 std_toc.ms
+-rw-r--r-- 1 iraf      21749 Feb 25 12:05 std_gl.ms
+.fi
+
+    The "IRAF Standards and Conventions" document.  Standards and
+standard programming practices for all IRAF system and applications
+software and documentation.
+
+
+-rw-r--r-- 1 iraf      15245 Feb 25 12:02 pdr.ms
+
+    This document outlines the steps to be taken in designing and
+implementing an IRAF package, i.e., requirements, specifications,
+preliminary design review, detailed design, implementation, testing,
+and so on.
+
+
+
+.ce
+\fBHistorical Documents\fR
+
+
+-rw-r--r-- 1 iraf      47655 Feb 18  1983 iraf_ui.ms
+
+    The original IRAF paper, presenting the global design of the system.
+Concentrates primarily on the user interface (command language).
+
+
+-rw-r--r-- 1 iraf      34754 Feb 18  1983 iraf_cap.ms
+
+    An early document presenting a simple scientific applications program,
+showing how the program would appear and be used at the CL level,
+as well as roughly what the source would look like internally.
+Pretty dated, but the basic ideas have not changed significantly.
+
+
+-rw-r--r-- 1 iraf     142264 Feb 18  1983 iraf_pp.ms
+
+    The original design document/justification for the IRAF preprocessor
+language.  Many of the ideas and arguments presented are still valid,
+though the language pointed to by this document will differ
+significantly in detail when it is finally implemented.  Despite its
+age, this paper indicates the direction in which the SPP language
+will most likely evolve.
+
+
+
+.ce
+\fBScientific Packages\fR
+
+
+-rw-r--r-- 1 iraf      43049 Feb 25 12:20 Apphot.doc
+
+    Requirements, technical specifications, and algorithms for the Apphot
+digital aperture photometry package.  Apphot will be capable of
+performing background fitting and fractional pixel aperture integration,
+interactively or non-interactively, in uncrowded or moderately crowded
+fields.  Used primarily for digital stellar photometry.
+
+
+.nf
+-rw-r--r-- 1 iraf      50203 Feb 25 12:28 MSalgo.ms
+-rw-r--r-- 1 iraf      23406 Feb 25 12:30 MSalgo_c.doc
+-rw-r--r-- 1 iraf      26531 Feb 25 12:33 MSspecs.doc
+-rw-r--r-- 1 iraf      12697 Feb 25 12:30 MSspecs_c.doc
+.fi
+
+    Requirements, technical specifications, and algorithms for the
+Multispec multispectral extraction package.  This package takes
+two dimensional multiaperture spectra as input and produces one
+dimensional spectra as output, suitable for analysis in Onedspec
+or for export on cardimage tapes.  This package addresses the
+difficult problem of deconvolving blended spectra, and can also
+be used to extract the orders on an Echelle spectrogram.  This
+package is nearing completion and additional (real) documentation
+will be available soon.
+
+
+-rw-r--r-- 1 iraf      98564 Feb 25 15:53 Onedspec.doc
+
+    This is a preview of the technical specifications for the one
+dimensional spectral analysis package; the preliminary design
+of the package is still in progress and the specs document is
+incomplete.
+
+
+
+.nf
+-rw-r--r-- 1 iraf      21328 Feb 25 15:47 FIeqn.ms
+-rw-r--r-- 1 iraf     116531 Feb 25 15:47 FIspec.doc
+.fi
+
+    Reduction equations and technical specifications for the Filter
+Photometry package, used to correct photometric data for extinction,
+transform to a standard system, etc.  This package will not be built
+in the form specified in the FIspec document (the specs did not pass
+the preliminary design review), but nonetheless there is valuable
+information in these documents, and they will be used as a starting
+point when the package is redesigned.
+
+
+.ce
+\fBDesign Documentation\fR
+
+    Reader beware: These docs were written primarily as part of the detailed
+design process, and only secondarily as technical documentation for the
+interfaces.  The FIO and IMIO design documentation is particularly obscure,
+consisting mostly of semicode; the docs for the other packages are reasonably
+readable, though highly technical.
+
+
+-rw-r--r-- 1 iraf     196291 Feb 25 13:10 clspecs.doc
+
+    The original technical specifications of the IRAF command language.
+This document is somewhat dated now (it was written in 82), but there
+is still a lot of information about the inner workings of the CL
+given here that is not written down anywhere else.
+
+
+-rw-r--r-- 1 iraf      61609 Feb 25 12:12 Fio.doc
+
+    Design strategies, structure, semicode etc. for the file i/o
+interface.  Provides a valuable but highly technical overview of
+the capabilities of the device independent, asynchronous, multiple
+buffering, etc. IRAF file i/o interface.
+
+
+-rw-r--r-- 1 iraf      41323 Feb 25 12:13 Imio.doc
+
+    Preliminary specifications and detailed design of the image i/o
+interface.  See also "imio.ms" under "programmer documentation" above;
+this latter document is more up to date and less technical.
+
+
+.nf
+-rw-r--r-- 1 iraf      14577 Feb 25 12:16 Mtio.doc
+-rw-r--r-- 1 iraf      20274 Feb 25 12:16 Zmtio.doc
+.fi
+
+    Technical specifications, design strategies, detailed design, etc.
+of the magtape i/o interface.  The Zmtio document describes the
+design of the machine interface, and how the machine dependence of
+the interface is minimized.
+
+
+-rw-r--r-- 1 iraf      17366 Feb 25 12:18 TTY.doc
+
+    Terminal control interface.  The TTY interface is used to send
+control functions to the terminal, inquire about the capabilities
+of the terminal, and so on.  Uses the UNIX termcap database.
+
+
+-rw-r--r-- 1 iraf      11450 Feb 25 12:18 Vops.doc
+
+    Documentation for the generic preprocessor and the vector operators package.
+
+
+-rw-r--r-- 1 iraf      20326 Feb 25 12:11 dbio.doc
+
+    Technical specifications for the database interface, used for image
+headers, output datafiles, general database applications, and so on.
+.endhelp

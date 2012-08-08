@@ -1,0 +1,251 @@
+The onedstds$ directory contains standard calibration data for extinction and
+sensitivity calibration as used in the ONEDSPEC, TWODSPEC, and the various
+IMRED packages.
+
+
+                            EXTINCTION TABLES
+                (eg extinction = onedstds$kpnoextinct.dat)
+
+ctioextinct.dat -  CTIO extinction table for ONEDSPEC (in Angstroms)
+    The CTIO extinction curve distributed with IRAF comes from the work of
+    Stone & Baldwin (1983 MN 204, 347) and Baldwin & Stone (1984 MN 206,
+    241).  The first of these papers lists the points from 3200-8370A while
+    the second extended the flux calibration from 6056 to 10870A but the
+    derived extinction curve was not given in the paper.  The IRAF table
+    follows SB83 out to 6436, the redder points presumably come from BS84
+    with averages used in the overlap region.
+
+    More recent CTIO extinction curves are shown as Figures in Hamuy 
+    et al (92, PASP 104, 533 ; 94 PASP 106, 566).
+
+    Steve Heathcote, Mon, 19 Jul 1999
+
+
+kpnoextinct.dat -  KPNO extinction table for ONEDSPEC (in Angstroms)
+
+                              MISCELLANEOUS
+
+           ctio -  Directory containing CTIO decker comb positions and
+                   neutral density filter curves (used with NDPREP).
+
+                           FLUX STANDARD DIRECTORIES
+                        (eg caldir = onedstds$iidscal/)
+
+      blackbody -  Directory for using blackbody flux distributions in
+		   various magnitude bands.
+       bstdscal -  Directory of the brighter KPNO IRS standards (i.e. those 
+                   with HR numbers) at 29 bandpasses, data from various
+                   sources transformed to the Hayes and Latham system,
+                   unpublished.
+        ctiocal -  Directory containing fluxes for the southern tertiary
+                   standards as published by Baldwin & Stone, 1984, MNRAS,
+                   206, 241 and Stone and Baldwin, 1983, MNRAS, 204, 347.
+     ctionewcal -  Directory containing fluxes at 50A steps in the blue range
+                   3300-7550A for the tertiary standards of Baldwin and
+                   Stone derived from the revised calibration of Hamuy et
+                   al., 1992, PASP, 104, 533.  This directory also contains
+                   the fluxes of the tertiaries in the red (6050-10000A) at
+                   50A steps as will be published in PASP (Hamuy et al
+                   1994).  The combined fluxes are obtained by gray
+                   shifting the blue fluxes to match the red fluxes in the
+                   overlap region of 6500A-7500A and averaging the red and
+                   blue fluxes in the overlap.  The separate red and blue
+                   fluxes may be selected by following the star name with
+                   "red" or "blue"; i.e. CD 32 blue.
+        iidscal -  Directory of the KPNO IIDS standards at 29 bandpasses,
+                   data from various sources transformed to the Hayes and 
+                   Latham system, unpublished.
+         irscal -  Directory of the KPNO IRS standards at 78 bandpasses,
+                   data from various sources transformed to the Hayes and  
+                   Latham system, unpublished (note that in this directory the 
+                   brighter standards have no values - the `bstdscal' directory
+                   must be used for these standards at this time).
+        oke1990 -  Directory of spectrophotometric standards observed for use 
+                   with the HST, Table VII, Oke 1990, AJ, 99. 1621 (no 
+                   correction was applied).  An arbitrary 1A bandpass
+                   is specified for these smoothed and interpolated
+                   flux "points".  Users may copy and modify these files
+                   for other bandpasses.
+         redcal -  Directory of standard stars with flux data beyond 8370A.
+                   These stars are from the IRS or the IIDS directory but
+                   have data extending as far out into the red as the
+                   literature permits.  Data from various sources.   
+   spechayescal -  The KPNO spectrophotometric standards at the Hayes flux
+                   points, Table IV, Spectrophotometric Standards, Massey
+                   et al., 1988, ApJ 328, p. 315.
+      spec16cal -  Directory containing fluxes at 16A steps in the blue
+                   range 3300-7550A for the secondary standards, published
+                   in Hamuy et al., 1992, PASP, 104, 533.  This directory
+                   also contains the fluxes of the secondaries in the red
+                   (6020-10300A) at 16A steps as will be published in PASP
+                   (Hamuy et al 1994).  The combined fluxes are obtained by
+                   gray shifting the blue fluxes to match the red fluxes in
+                   the overlap region of 6500A-7500A and averaging the blue
+                   and red fluxes in the overlap.  The separate red and
+                   blue fluxes may be selected by following the star name
+                   with "red" or "blue"; i.e. HR 1544 blue.
+      spec50cal -  The KPNO spectrophotometric standards at 50 A intervals.
+                   The data are from (1) Table V, Spectrophotometric Standards,
+                   Massey et al., 1988, ApJ 328, p. 315 and (2) Table 3, The
+                   Kitt Peak Spectrophotometric Standards: Extension to 1
+                   micron, Massey and Gronwall, 1990, ApJ 358, p. 344.
+
+
+                       STANDARD STAR MENUS
+
+--------------------------------------------------------------------------------
+Blackbody calibrations in onedstds$blackbody/
+
+U    B    V    R    I   J   H   K   L   Lprime    M
+
+Magnitude conversions are available between V, J, H, K, L, Lprime, and M
+but for U, B, R, and I the star magnitudes must be in the same bandpass.
+--------------------------------------------------------------------------------
+Standard stars in onedstds$bstdscal/
+
+hr718        hr3454       hr3982       hr4468       hr4534
+hr5191       hr5511       hr7001       hr7596       hr7950
+hr8634       hr9087       hd15318      hd74280      hd100889
+hd188350     hd198001     hd214923     hd224926
+
+--------------------------------------------------------------------------------
+Standard stars in onedstds$ctiocal/
+
+bd25            eg139           feige56         l2415           l93080
+bd73632         eg149           feige98         l2511           l97030
+bd8             eg158           g16350          l3218           lds235
+cd32            eg248           g2631           l3864           lds749
+eg11            eg274           g9937           l4364           ltt4099
+eg21            f15             h600            l4816           ltt8702
+eg26            f25             hz2             l6248           ross627
+eg31            f56             hz4             l7379           w1346
+eg54            f98             hz15            l7987           w485a
+eg63            f110            kopf27          l8702           wolf1346
+eg76            feige110        l377            l9239           wolf485a
+eg79            feige15         l1020           l9491
+eg99            feige25         l1788           l74546
+
+--------------------------------------------------------------------------------
+Standard stars in onedstds$ctionewcal/:
+
+Combined red and blue 3300A-10000A:
+
+cd32            f56             l2415           l4364           l7987    
+eg21            h600            l3218           l4816           l9239    
+eg274           l1020           l377            l6248           l9491    
+f110            l1788           l3864           l7379           l745    
+
+Blue 3300A-7550A:
+
+cd32blue        f56blue         l2415blue       l4364blue       l7987blue    
+eg21blue        h600blue        l3218blue       l4816blue       l9239blue    
+eg274blue       l1020blue       l377blue        l6248blue       l9491blue    
+f110blue        l1788blue       l3864blue       l7379blue    
+
+Red 6050A-10000A:
+
+cd32red         f56red          l2415red        l4364red        l7987red    
+eg21red         h600red         l3218red        l4816red        l9239red    
+eg274red        l1020red        l377red         l6248red        l9491red    
+f110red         l1788red        l3864red        l7379red        l745red    
+
+--------------------------------------------------------------------------------
+Standard stars in onedstds$iidscal/
+
+40erib       eg50         eg149        g16350       hz4          lds235b
+amcvn        eg54         eg158        g191b2b      hz7          lds749b
+bd253941     eg63         eg162        g2610        hz14         lft1655
+bd284211     eg67         eg182        g2631        hz15         lp414101
+bd332642     eg71         eg184        g4718        hz29         ltt13002
+bd404032     eg76         eg193        g88          hz43         ltt16294
+bd73632      eg77         eg247        g9937        hz44         ltt4099
+bd7781       eg79         eg248        gd128        kopff27      ltt8702
+bd82015      eg91         feige15      gd140        l13633       ross627
+eg11         eg98         feige24      gd190        l140349      ross640
+eg20         eg99         feige25      gh7112       l14094       sa29130
+eg26         eg102        feige34      grw705824    l151234b     sao131065
+eg28         eg119        feige56      grw708247    l74546a      ton573
+eg29         eg129        feige92      grw738031    l8702        wolf1346
+eg31         eg139        feige98      he3          l93080       wolf485a
+eg33         eg144        feige110     hiltner102   l97030       
+eg39         eg145        g12627       hiltner600   lb1240       
+eg42         eg148        g14563       hz2          lb227        
+
+--------------------------------------------------------------------------------
+Standard stars in onedstds$irscal/
+
+bd082015     eg50         feige34      hd117880     hd60778      hr7001
+bd174708     eg71         feige56      hd161817     hd74721      hz44
+bd253941     eg139        feige92      hd17520      hd84937      kopff27
+bd262606     eg158        feige98      hd192281     hd86986      wolf1346
+bd284211     eg247        feige110     hd19445      he3          
+bd332642     feige15      g191b2b      hd217086     hiltner102   
+bd404032     feige25      hd109995     hd2857       hiltner600   
+
+--------------------------------------------------------------------------------
+Standard stars in onedstds$oke1990/
+
+bd284211  feige110  feige67   g191b2b   g249      gd248     ltt9491   eg71
+bd75325   feige34   g13831    g19374    gd108     hz21      eg158     eg247
+
+--------------------------------------------------------------------------------
+Standard stars in onedstds$redcal/
+
+40erib     eg63       eg139      eg248      gd140      hz44       ltt16294
+amcvn      eg67       eg144      feige24    gd190      l13633     ltt4099
+bd7781     eg76       eg145      g12627     grw705824  l14094     ltt8702
+bd73632    eg79       eg148      g14563     grw708247  l151234b   ross627
+bd174708   eg91       eg149      g16350     grw738031  l74546a    ross640
+bd262606   eg98       eg162      g191b2b    hd19445    l93080     sa29130
+eg20       eg99       eg182      g2610      hd84937    l97030     sao131065
+eg33       eg102      eg184      g2631      he3        lds235b    wolf1346
+eg50       eg119      eg193      g4718      hz29       lds749b    wolf485a
+eg54       eg129      eg247      g9937      hz43       lft1655    
+
+--------------------------------------------------------------------------------
+Standard stars in onedstds$spec16cal/:
+
+Combined red and blue 3300A-10300A:
+
+hd15318      hd74280      hd114330     hd188350     hd214923
+hd30739      hd100889     hd129956     hd198001     hd224926
+hr1544       hr4468       hr5501       hr7596       hr8634       
+hr3454       hr4963       hr718        hr7950       hr9087    
+
+Blue 3300A-7550A:
+
+hd15318blue     hd74280blue     hd114330blue    hd188350blue    hd214923blue
+hd30739blue     hd100889blue    hd129956blue    hd198001blue    hd224926blue
+hr1544blue      hr4468blue      hr5501blue      hr7596blue      hr8634blue    
+hr3454blue      hr4963blue      hr718blue       hr7950blue      hr9087blue    
+
+Red 6020A-10300A:
+
+hd15318red      hd74280red      hd114330red     hd188350red     hd214923red
+hd30739red      hd100889red     hd129956red     hd198001red     hd224926red
+hr1544red       hr4468red       hr5501red       hr7596red       hr8634red    
+hr3454red       hr4963red       hr718red        hr7950red       hr9087red    
+
+--------------------------------------------------------------------------------
+Standard stars in onedstds$spec50cal/  (3200A - 8100 A)
+
+bd284211   eg247      feige34    hd192281   pg0205134  pg0934554  wolf1346
+cygob2no9  eg42       feige66    hd217086   pg0216032  pg0939262  
+eg139      eg71       feige67    hilt600    pg0310149  pg1121145  
+eg158      eg81       g191b2b    hz14       pg0823546  pg1545035  
+eg20       feige110   gd140      hz44       pg0846249  pg1708602  
+
+Standard stars in onedstds$spec50cal/  (3200A - 10200A)
+
+bd284211   eg247      feige34    g191b2b    hz44       
+eg139      eg71       feige66    gd140      pg0823546  
+eg158      feige110   feige67    hilt600    wolf1346   
+
+--------------------------------------------------------------------------------
+Standard stars in onedstds$spechayescal/
+
+bd284211     eg139        feige67      hd217086     pg0216032    pg0939262
+cygob2no9    eg158        feige110     hiltner600   pg0310149    pg1121145
+eg42         eg247        g191b2b      hz14         pg0823546    pg1545035
+eg71         feige34      gd140        hz44         pg0846249    pg1708602
+eg81         feige66      hd192281     pg0205134    pg0934554    wolf1346

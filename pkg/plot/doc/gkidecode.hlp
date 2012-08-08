@@ -1,0 +1,51 @@
+.help gkidecode Jan85 plot
+.ih
+NAME
+gkidecode -- decode one or more GKI metacode files
+.ih
+USAGE
+gkidecode input
+.ih
+PARAMETERS
+.ls input
+The input metacode, which can be read from a list of files or
+redirected from the standard input.
+.le
+.ls generic = no
+The remaining parameters are ignored when \fBgeneric\fR = yes.
+.le
+.ls verbose = no
+If \fBverbose\fR = yes, the elements of polylines, cell arrays, etc. will
+be printed.
+.le
+.ls gkiunits = no
+By default, coordinates are printed in NDC rather than GKI units.
+.le
+.ih
+DESCRIPTION
+Task \fBgkidecode\fR is a debugging tool used to decode GKI metacode
+files.  The plotting instructions are decoded and printed in readable 
+form on the standard output.  The input metacode can be read from one
+or more files or redirected from the standard input.
+
+If \fBverbose\fR = yes, elements of polyline and cell array calls are
+printed in addition to the default output.
+Coordinates can be printed in either GKI (0 - 32767) or NDC (0.0 - 1.0)
+units.
+.ih
+EXAMPLES
+1. Decode the metacode instructions in file crtpict.mc in verbose mode.
+
+    cl> gkidecode crtpict.mc verbose+
+
+2. Print a shorter listing of the same file on the versatec.
+
+    cl> gkidecode crtpict.mc | lprint dev=ver
+
+3. Decode the third frame in metacode file "oned.mc".
+
+    cl> gkiextract oned.mc 3 | gkidecode
+.ih
+SEE ALSO
+stdgraph stdplot 
+.endhelp

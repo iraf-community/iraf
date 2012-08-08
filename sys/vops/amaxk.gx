@@ -1,0 +1,29 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# AMAXK -- Compute the maximum of a constant and a vector (generic).
+
+procedure amaxk$t (a, b, c, npix)
+
+PIXEL	a[ARB]
+PIXEL	b
+PIXEL	c[ARB]
+int	npix, i
+$if (datatype == x)
+real	abs_b
+$endif
+
+begin
+	$if (datatype == x)
+	abs_b = abs (b)
+	$endif
+
+	do i = 1, npix
+	    $if (datatype == x)
+		if (abs(a[i]) >= abs_b)
+		    c[i] = a[i]
+		else
+		    c[i] = b
+	    $else
+		c[i] = max (a[i], b)
+	    $endif
+end

@@ -1,0 +1,71 @@
+rm -f readline.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 readline.c
+rm -f vi_mode.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 vi_mode.c
+rm -f funmap.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 funmap.c
+rm -f keymaps.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 keymaps.c
+rm -f parens.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 parens.c
+rm -f search.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 search.c
+rm -f rltty.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 rltty.c
+rm -f complete.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 complete.c
+complete.c: In function `compute_lcd_of_matches':
+complete.c:1154: warning: passing arg 1 of pointer to function discards qualifiers from pointer target type
+rm -f bind.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 bind.c
+bind.c: In function `rl_function_of_keyseq':
+bind.c:672: warning: comparison is always true due to limited range of data type
+rm -f isearch.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 isearch.c
+rm -f display.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 display.c
+display.c: In function `rl_character_len':
+display.c:1755: warning: comparison is always true due to limited range of data type
+rm -f signals.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 signals.c
+rm -f util.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 util.c
+rm -f kill.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 kill.c
+rm -f undo.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 undo.c
+rm -f macro.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 macro.c
+rm -f input.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 input.c
+rm -f callback.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 callback.c
+rm -f terminal.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 terminal.c
+rm -f text.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 text.c
+rm -f nls.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 nls.c
+rm -f misc.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 misc.c
+rm -f compat.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 compat.c
+rm -f xmalloc.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 xmalloc.c
+rm -f history.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 history.c
+rm -f histexpand.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 histexpand.c
+rm -f histfile.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 histfile.c
+rm -f histsearch.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 histsearch.c
+rm -f shell.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 shell.c
+rm -f mbutil.o
+gcc -c -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 mbutil.c
+rm -f tilde.o
+gcc -DHAVE_CONFIG_H   -I. -I. -DRL_LIBRARY_VERSION='"5.0"' -m32 -DREADLINE_LIBRARY -c ./tilde.c
+rm -f libreadline.a
+ar cr libreadline.a readline.o vi_mode.o funmap.o keymaps.o parens.o search.o rltty.o complete.o bind.o isearch.o display.o signals.o util.o kill.o undo.o macro.o input.o callback.o terminal.o text.o nls.o misc.o compat.o xmalloc.o history.o histexpand.o histfile.o histsearch.o shell.o mbutil.o tilde.o
+test -n "ranlib" && ranlib libreadline.a

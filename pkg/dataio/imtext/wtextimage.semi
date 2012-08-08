@@ -1,0 +1,91 @@
+# Semicode for the IRAF image to text file converter.
+
+procedure t_wtextimage (input, output)
+
+begin
+	input = expand template of input image file names
+	if (output hasn't been redirected)
+	    get name of output file from cl
+
+	# Get hidden parameters from cl
+	header = is header to be written?
+	maxlinelen = max number of characters per line of text
+	if (format not user specified)
+	    format = NOT_SET
+
+	for (each file name in input) {
+	    im = open image file
+	    generate output file name
+	    text = open text file
+	    call convert_image (im, text, header, maxlinelen, format)
+	    close image file
+	    close text file
+	}
+end
+
+
+# CONVERT_IMAGE -- called once for each image to be converted.  Directs
+# the processing depending on user request.
+
+procedure convert_image (im, text, header, maxlinelen, format)
+
+begin
+	if (format = NOT_SET)
+	    format = appropriate value for data type of image
+
+	# Calculate number of pixels per line of text
+	npix_line = maxlinelen / (field width of pixel output format)
+	output_format = "npix_line.pixel_format"
+
+	if (header is to be written)
+	    call write_header (im, text, output_format, maxlinelen)
+
+	call convert_pixels (im, text, output_format)
+end
+
+
+# WRITE_HEADER -- write information from IRAF image header in
+# "keyword = value" format, one keyword per line of text.
+
+procedure convert_header (image, text, output_format, maxlinelen)
+
+begin
+	# Write header information to text file
+	SIMPLE  = T
+	BITPIX  = 8
+	NAXIS   = 0
+	ORIGIN  = NOAO
+	IRAF-MAX= IM_MAX
+	IRAF-MIN= IM_MIN
+	IRAF-B/P= 
+	IRAFTYPE=
+	OBJECT  = IM_TITLE
+	NDIM    = IM_NDIM
+	LEN1    = IM_LEN(1)
+	FILENAME= IM_HDRFILE
+	FORMAT  = output_format
+
+	# Write any information stored in image user area
+	if (user area contains information) {
+	    COMMENT = "Copying user area"
+	    KEYWORD = copy user area to text file
+	}
+
+	# Final header line is END
+	END = last line of header
+
+	Pad with blank lines until multiple of 36 lines is output
+end
+
+
+# CONVERT_IMAGE -- write pixel values from IRAF image into text file.  The
+# pixels are output in "leftmost subscript varying most rapidly" order.
+
+procedure convert_image (image, text, format)
+
+begin
+	get next line of image
+	for each pixel in line 
+	    convert pixel to character
+	put out line to text file according to format
+end

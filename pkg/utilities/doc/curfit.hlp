@@ -1,0 +1,168 @@
+.help curfit Jun88 utilities
+.ih
+NAME
+curfit -- fit a curve to a list or an image section
+.ih
+USAGE
+curfit input 
+.ih
+PARAMETERS
+.ls input
+The data to be fit.  May be an image section, STDIN or a list of file names.
+.le
+.ls function = legendre
+The type of function with which to fit the data.  Choices are 
+legendre, chebyshev, spline1 (linear spline) or spline3 (cubic spline).
+.le
+.ls order = 4
+The order of the fit or number of spline pieces. 
+.le
+.ls weighting = uniform
+The type of weighting for the fit. The options are:
+.ls uniform
+The weight w = 1.0.  This option may be used for both list input and image
+input.
+.le
+.ls user
+The weights are supplied by the user. This option may be used for list input
+only.
+.le
+.ls statistical
+The weight w = 1.0 / y. This option can be used for both list and image data.
+.le
+.ls instrumental
+The user supplies the sigmay for each point and w = 1.0 / sigmay ** 2.
+This option may be used for list input only.
+.le
+.le
+.ls interactive = yes
+If \fBinteractive\fR is set to yes, a plot of the fit is drawn and the
+cursor is available for interactively examining and adjusting the fit.
+.le
+.ls axis = 1
+If \fBinput\fR names an image or image section, this parameter specifies
+the axis along which the image is projected for fitting.
+.le
+.ls listdata = no
+If \fBlistdata\fR is set to yes, the only printed output will be the calculated 
+values for the X,Y pairs. This is useful as input to \fIgraph\fR or some
+other list oriented program.
+.le
+.ls verbose = no
+If \fBverbose\fR is set to yes, the fitted (X,Y) pairs are listed in addition 
+to the default output of filename, function type, order, rejection parameters, 
+coefficients and their errors.
+.le
+.ls power = no
+If \fBpower\fR is set to yes, the coefficients of the legendre or
+chebyshev polynomials will be converted to power series coefficients.
+.le
+.ls calctype = "double"
+Calculation datatype.  The two datatypes are "real" (single precision) and
+"double" (double precision).
+.le
+.ls device = "stdgraph"
+The output device for interactive graphics.
+.le
+.ls cursor = "stdgcur"
+The source of graphics cursor input.
+.le
+.ih
+DESCRIPTION
+A curve is fit to data read from either an image section or a list.
+The type of curve is set by the \fBfunction\fR parameter as either
+a legendre polynomial, chebyshev polynomial, linear spline or cubic
+spline, with the order of the fit (or number of spline pieces) set by
+\fBorder\fR.  If data is read from an image, the \fBaxis\fR parameter
+is used to reduce the dimensionality of the image; it specifies the
+axis along which the image is projected.  For example, when \fBaxis\fR
+= 1, the image is compressed to a column.  \fBAxis\fR = 2 would project
+the image along a line; \fBaxis\fR = 3 indicates projection in the z
+direction, etc.
+
+The input data must be ordered in x because of a restriction in the
+interactive plotting package.  If the input is from a list, the data
+are sorted prior to fitting; image input data are assumed to be ordered
+in x and are not explicitly sorted by \fIcurfit\fR.
+
+If the input is from a list the user may specify a set of weights,
+\fBweighting\fR = user or a set of errors, \fBweighting\fR =
+instrumental. An additional weighting option \fBweighting\fR = statistical
+can be used for both list and image data. The default is \fBweighting\fR =
+uniform.
+
+When \fBinteractive\fR = yes, the curve is plotted and cursor commands allow
+for interactive examining and adjustment of the fit. 
+The full range of interactive cursor commands is available
+including those for changing the function type, order, and rejection criteria,
+and examining the residuals.
+
+The final fit parameters are written to STDOUT with the
+format controlled by parameters \fBverbose\fR and \fBlistdata\fR.
+By default, the function type, order, and resulting chi-square are 
+printed as well as the coefficients and their standard deviations.  
+If \fBverbose\fR is set to yes, a list of X, Y_calculated, Y_input,
+and W_input is also printed.
+If \fBlistdata\fR is set to yes, the only printed output will
+be a listing of X, Yc, Y and W. This provides a list suitable as input to
+\fBgraph\fR or any other list oriented utility.  Setting \fBlistdata\fR 
+to yes overrides the verbose option.
+
+When \fBpower\fR = yes, the coefficients are converted to power series
+coefficients of the form a0 + a1*X + a2*X**2 +a3*X**3 ....
+Only legendre and chebyshev coefficients are converted; a conversion
+of spline coefficients is meaningless.  Also, errors in the coefficients
+are not converted.
+
+The user has a choice of single or double precision calculations.  Generally
+double precisions is used since the calculation time is only slightly
+longer.  The single precision calculation is used in many other tasks
+which do many fits.  This task provides a test tool to compare the
+results between the two levels of precision.
+.ih
+EXAMPLES
+
+1.  The x,y pairs in file test.data are interactively fit with a fourth 
+order legendre polynomial.  The printed output is shown.
+
+	cl> curfit test.data 
+
+.nf
+	NOAO/IRAF V2.0 Hammond@lyra Fri 11:45:41 13-Dec-85
+	file = test.data
+	function = legendre
+	grow = 0.
+	naverage = 1
+	order = 4
+	low_reject = 0., high_reject = 0.
+	niterate = 1
+	sample = *
+	total points = 8
+	sample points = 8
+	nrejected = 0
+	deleted = 0
+	square root of reduced chi square = 3.008706E-6
+		coefficient	  error
+ 	1	   2.633E1	  1.098E-6
+ 	2	   3.150E1	  1.820E-6
+ 	3	   8.167E0	  1.896E-6
+ 	4	 -1.621E-6	  2.117E-6
+
+.fi
+2.  Fit a cubic spline to the last 12 columns of image "m74".
+
+   cl> curfit m74[501:512,1:512] axis=2 func=spline3 order=5
+
+3. Use \fIcurfit\fR as a filter to overplot a smoothed curve to an existing
+plot of the data points.  The command line for \fBgraph\fR is shown as
+well as the \fBcurfit\fR command.  Note the interactive flag for 
+\fBcurfit\fR is turned off.
+
+   cl> graph points.list point+ mark=box wx1=.13 xlab="X VALUES"\
+   >>> ylab="Y VALUES" title="Legendre fit to points.list"
+
+   cl> type points.list | curfit list+ inter- | graph append+
+.ih
+SEE ALSO
+icfit,  polyfit
+.endhelp

@@ -1,0 +1,43 @@
+# The MKPKG file for the PARSER subdirectory.
+
+$checkout	libpkg.a ".."
+$update		libpkg.a
+$checkin	libpkg.a ".."
+$exit
+
+libpkg.a:
+	$ifnewer (preval.gx, preval.x)
+	    $generic -k -o preval.x preval.gx
+	$endif
+
+	$ifnewer (parser.y, parser.x)
+	    $ifeq (HOSTID, unix)
+	        $echo "parser.x is out of date; rebuilding with XYACC:"
+	        !xyacc -d parser.y
+		$move ytab.x parser.x
+		$move ytab.h ../lib/prtoken.h
+	    $else
+	        $echo "parser.x is out of date; rebuild with XYACC"
+	    $endif
+	$endif
+
+	parser.x	"../lib/lexer.h" "../lib/parser.h" "../lib/prdefs.h"\
+			<ctype.h> <lexnum.h>
+	pralloc.x	"../lib/parser.h" "../lib/prstruct.h" "parser.com"
+	prcat.x	
+	prcode.x	"../lib/lexer.h" "../lib/parser.h" "../lib/preval.h"\
+			"../lib/prtoken.h" "prcode.com"
+	prconv.x	"../lib/parser.h"
+	prerror.x	"../lib/parser.h" "../lib/prdefs.h" "lexer.com"
+	preval.x	"../lib/parser.h" "../lib/preval.h"
+	prexit.x	"../lib/parser.h" "../lib/prdefs.h" <mach.h>
+	prget.x		"../lib/parser.h" "../lib/prstruct.h" "parser.com"
+	prlexer.x	"../lib/lexer.h" "../lib/prtoken.h" "lexer.com"\
+			<ctype.h> <lexnum.h>
+	prmap.x		"../lib/parser.h" "../lib/prdefs.h"
+	prparse.x	"../lib/parser.h" "../lib/prdefs.h" "lexer.com"
+	prput.x		"../lib/parser.h" "../lib/prstruct.h" "parser.com"
+	prtable.x	"../lib/parser.h" "../lib/prdefs.h" <mach.h>
+	prvtran.x
+	t_chkconfig.x	"../lib/parser.h"
+	;

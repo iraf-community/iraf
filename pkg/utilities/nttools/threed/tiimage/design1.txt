@@ -1,0 +1,353 @@
+
+
+          Design of 3-D table translator for image insertion
+          --------------------------------------------------
+
+
+ Author: I. Busko
+
+
+ Revision history:
+ 01/16/97  -  First version.
+
+
+
+1. Specifications / requirements:
+
+This task will perform the inverse operation performed by task tximage.
+It will insert (in the tainsert task sense) one or more 1-D images into 
+rows of an existing 3-D table. Alternatively, it will create a 3-D table 
+from information taken either from a template 3-D table, or, if this table 
+is not supplied, from the input images themselves. Each image in the input 
+list is inserted as an array into a single cell at the specified row in the output table. 
+
+Actions necessary to process the most complicated cases (e.g. when the
+image length does not match the table array size) will be similar to the 
+ones described for task titable.
+
+If the output table does exist, insertion may take place in two ways. If the
+output table name contains a column selector that selects a single column
+in the table, all input images will be inserted in that column, starting
+at the row pointed by task parameter "row". In a similar way as in task
+titable, if "row" is negative or INDEF the task will look for the ORIG_ROW
+keyword in the image header and use that keyword value for row number.
+The second mode of insertion in an existing table is used if no matching
+column selector is found in the output table name. In this case the task
+will look for the columnar information written in the input image header by 
+task tximage, and use that information to place the image in the proper 
+column. If no columnar information exists in the header, or if the column 
+name in there does not match any column in the output table, the image is 
+skipped and the user warned. The "row" parameter processing works the same 
+way in this second mode.
+
+If the output table does not exist, the task will look for a template table
+where to take column information from. If the template exists, the insertion
+operation will be performed in an analogous way as above. Notice that the
+result may be a single-column table if the template has a valid (matching)
+column selector in its name, or a sparse table if not, because only the 
+actual input images will be stored in an otherwise empty table (the template 
+data is not copied into the output, only the column descriptors).
+
+If the template is missing, the task will attempt to retrieve columnar
+information from the input image headers and build the output table with
+enough columns and rows to fit all images in the list. Only images that
+have columnar information in their headers can be processed, though. If
+no images are found with the proper header keywords, no output takes place.
+Notice that this task will not be able to handle the most generic case in
+which a number of unspecified 1-D images with no proper header keywords 
+are input to create a 3-D table from scratch (without a template).
+
+The basic matching criterion is based on the column name. An error results 
+when datatypes in input image and output column do not agree.
+
+The task will be named "tiimage" following a former proposal for naming
+the 3-D table utilities.
+
+
+
+2. Language:
+
+SPP, to allow the use of the generic datatype compiling facility, and to
+reuse significant amounts of code already developed for other tasks in this
+suite.
+
+
+
+3. Task parameters:
+
+Name     Type                  What
+
+input    image list/template   list of 1D image names
+outtable file name             3-D table name with optional column selector
+                               (modified in place or created from scratch).
+template file name             template 3-D table name with optional column 
+                               selector
+row      int                   row in output table where to begin insertion.
+
+
+
+4. Data structures:
+
+The main data structure is a pointer-type column descriptor array. This 
+array is filled by information taken from the several possible sources
+described above, and used by the tbtables routines to create and fill up
+the output.
+
+
+
+5. Code structure:
+
+MAIN PROCEDURE:
+- Read task parameters (clget).
+- Decide which mode to use: mode = TMMODE (output name, template name)
+- SWITCH mode
+- CASE 1, 2: Output table exists.
+   - Break output table name into bracketed selectors (rdselect).
+   - Open output table (tbtopn with root name, READ_WRITE).
+   - Create array with either the single selected column pointer or all
+     column pointers (malloc, tcs_open).
+   - Alloc array of column pointers for output table.
+   - LOOP over all matched columns in tcs_ column array
+      - Translate pointer from tcs_ format to tbtables format (tcs_column)
+   - ENDLOOP
+   - TMLOOP (table pointer, column pointer array, rowpar, image list, mode).
+   - Close output table (tbtclo)
+   - Free array (mfree)
+- END CASE 
+- CASE 3, 4: Output table does not exist but template table does exist.
+   - Break output table name into bracketed selectors (rdselect).
+   - Open output table (tbtopn with root name, NEW_FILE).
+   - Break template table name into bracketed selectors (rdselect).
+   - Open template table (tbtopn with root name, READ_ONLY).
+   - Create array with either the single selected column pointer or all
+     column pointers from template table (malloc, tcs_open).
+   - Alloc array of column pointers for output table.
+   - LOOP over all matched columns in template tcs_ column array
+      - Create column in output table (tcs_column, tbcinf, tbcdef)
+   - ENDLOOP
+   - Create output table (tbtcre).
+   - TMLOOP (table pointer, column pointer array, rowpar, image list, mode)
+   - Close template table (tbtclo)
+   - Close output table (tbtclo)
+   - Free arrays (mfree)
+- CASE 5: Neither output nor template table exist.
+   - Alloc memory for strings.
+   - Alloc memory for column pointer array, assuming the worst case of each
+     input image in the list belonging to a separate, independent column.
+   - Open output table (tbtopn with root name, NEW_FILE).
+   - IFNOTERROR TMSCAN (table pointer, column pointer array, image list)
+      - Set mode = 2 to force TMLOOP to read column data from headers.
+      - Create output table (tbtcre).
+      - TMLOOP (table pointer, column pointer array, rowpar, image list, mode)
+   - ENDIF
+   - Close output table (tbtclo)
+   - Free arrays (mfree)
+- END CASE 
+- CASE -1
+   - Print error msg.
+   - Abort.
+- END SWITCH
+END MAIN
+
+
+
+PROCEDURE TMMODE: Detect mode of operation.
+    Input parameters: file name, template name (in full)
+    Return value: mode
+
+   - IF output exists (access)
+      - mode = TMM1 (output file name, output type)
+      - IF mode == -1
+         - Print error msg.
+         - return mode = -1 (error)
+      - ENDIF
+   - ELSE IF template does exist (access)
+      - mode = TMM1 (template file name, template type)
+      - IF mode == -1
+         - Print error msg.
+         - return mode = -1 (error)
+      - ENDIF
+   - ELSE
+      mode = 5
+   - ENDIF
+   return mode
+END PROCEDURE
+
+
+
+PROCEDURE TMM1: Verify status of file and column selector.
+    Input parameters: file name, file type (output or template)
+    Return value: mode
+
+   - IF file is not a table (whatfile). 
+      - return mode = -1 (error)
+   - ENDIF
+   - Get bracket selector from file name (rdselect).
+   - Open  table (tbtopn with root name, READ_ONLY).
+   - Get its total number of columns (tbpsta).
+   - Create array of column pointers from column selector (malloc, tcs_open).
+   - Close output table (tbtclo)
+   - Free array (mfree)
+   - IF output file type
+      - IF one column matched
+         - return mode = 1
+      - ELSE
+         - return mode = 2
+      - ENDIF
+   - ELSE IF template file type
+      - IF one column matched
+         - return mode = 3
+      - ELSE
+         - return mode = 4
+      - ENDIF
+   - ENDIF
+      return mode = -1 (error)
+END PROCEDURE
+
+
+
+PROCEDURE TMLOOP: Scan input list and insert each image in turn.
+    Input parameters: table pointer, column pointer array,row, image list,mode
+
+   - Initialize row counter.
+   - Initialize successful image counter.
+   - Open input list (imtopen)
+   - LOOP over input list (imtlen).
+      - Get image name (imtgetim).
+      - IFERROR Open input image (immap).
+         - Warn user.
+         - Skip image.
+      - ENDIF
+      - IF mode == 2 or mode == 4, look into image header for columnar info 
+           and do the copy.
+         - IFERROR TMHC (table pointer, column pointer array, row, rowpar, 
+                         imio pointer)
+            - Close and skip image.
+         - ENDIF
+         - bump row and image counters.
+      - ELSE IF mode == 1 or mode == 3, just copy into single, fixed column.
+         - IFERROR TMCOPY (table pointer, column pointer, row, rowpar, 
+                           imio pointer)
+            - Warn user.
+            - Close and skip image.
+         - ENDIF
+         - bump row and image counters.
+      - ENDIF
+      - Close image (imunmap)
+   - ENDLOOP
+   - IF successful image counter == 0
+      - Print error msg.
+   - ENDIF
+   - Close input list (imtclose)
+END PROCEDURE
+
+
+
+PROCEDURE TMSCAN: Scan input list and create column pointer array from
+                  information stored in image headers.
+    Input parameters: table pointer, column pointer array, its size, image list
+    Output parameter: actual number of matched columns.
+
+   - Initialize column counter.
+   - Open input list (imtopen)
+   - LOOP over input list (imtlen).
+      - Get image name (imtgetim).
+      - IFERROR Open input image (immap).
+         - Warn user.
+         - Skip image.
+      - ENDIF
+      - IFERROR TMHEADER (imio pointer, column name, units, fmt, datatype, 
+                          lendata
+         - Warn user.
+         - Skip image.
+      - ENDIF
+      - IF there are defined columns (column counter > 0):
+         - match = false
+         - LOOP over defined columns
+            - Get column name (tbcinf)
+            - IF column name from table matches column name from header:
+               - match = true
+               - break
+            - ENDIF
+         - ENDLOOP
+         - IF no match, this is a new column:
+            - Define new column in array (tbcdef)
+            - Bump column counter
+         - ENDIF
+      - ELSE
+         - Define first new column in array (tbcdef)
+         - Bump column counter
+      - ENDIF
+   - ENDLOOP
+   - Close input list (imtclose)
+   - IF column counter == 0
+      - Error.
+   - Create output table (tbtcre).
+END PROCEDURE
+
+
+
+PROCEDURE TMHC: Get column name from image header and copy image into table.
+    Input parameters: table pointer, column pointer array, row, rowpar, 
+                      imio pointer
+
+   - salloc space for column name.
+   - IFERROR TMHEADER (imio pointer, column name, etc.)
+      - Warn, return
+   - ENDIF
+   - match = false
+   - LOOP over table columns.
+      - IF column names match:
+         - IFERROR TMCOPY (table pointer, column pointer, row, rowpar, 
+                           imio pointer)
+            - Warn, return.
+         - ENDIF
+         - match = true
+      - ENDIF
+   - ENDLOOP
+   - IF no match
+      - Warn, return.
+   - ENDIF
+   - sfree
+END PROCEDURE
+
+
+
+PROCEDURE TMCOPY: Copy image into designated row/column.
+    Input parameters: table pointer, column pointer, row, rowpar, imio pointer
+
+   - Get table (tbcigi) and image (IM_PIXTYPE) pixel type.
+   - IF pixel type mismatch:
+      - Warn, return
+   - ENDIF
+   - Look for ORIG_ROW keyword (imaccf, imgeti). If found, and if "row" 
+     parameter is negative or INDEF, supersede row counter. 
+   - Get column array size (tbcinf) and image size (IM_NDIM, IM_LEN).
+   - Choose the minimum of these as the array size to be written to table.
+   - Read pixels in buffer (imgl1$t).                     ^
+   - Write buffer into designated row/column (tbapt$t).   |
+   - IF image is larger than array:                       |  This goes into
+      - Warn user.                                        |  a generic data
+   - ELSE IF image is smaller than array:                 |  type procedure
+      - Set remaining elements to INDEF (tbapt$t).        |
+      - Warn user.                                        |
+   - ENDIF                                                v
+END PROCEDURE
+
+
+
+PROCEDURE TMHEADER: Decode column info in image header. 
+    Input parameter: imio pointer
+    Output parameter: column name, units, fmt, datatype, lendata
+
+   - Look for COLDATA keyword (imaccf, imgstr).
+   - IF not found:
+      return error.
+   - ENDIF
+   - Parse and get parameters (sscan, gargwrd, gargi)
+   - IF error in nscan value:
+      return error.
+   - ENDIF
+END PROCEDURE
+
+

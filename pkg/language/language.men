@@ -1,0 +1,89 @@
+Language package.
+
+Note: To get help on a keyword enclose it in quotes.  Keywords are starred.
+
+	  intro - A brief introduction to IRAF
+
+Language components:
+
+          break * Break out of a loop
+	   case * One setting of a switch
+       commands - A discussion of the syntax of IRAF commands
+	cursors - Graphics and image display cursors
+   declarations - Parameter/variable declarations
+        default * The default clause of a switch
+           else * Else clause of IF statement
+            for * C-style for loop construct
+             if * If statement 
+           goto * Goto statement
+        logging - Discussion of CL logging
+           next * Start next iteration of a loop
+     parameters - Discussion of parameter attributes
+      procedure * Start a procedure script
+         return * Return from script with an optional value
+         switch * Multiway branch construct
+          while * While loop
+
+
+Builtin Commands and Functions:
+
+	 access - Test if a file exists
+	   back - Return to the previous directory (after a chdir)
+	   beep - Send a beep to the terminal
+	    bye - Exit a task or package
+	  cache - Cache parameter files, or print the current cache list
+	     cd - Change directory
+	  chdir - Change directory
+	     cl - Execute commands from the standard input
+	  clbye - A cl followed by a bye (used to save file descriptors)
+          clear - Clear the terminal screen
+	 defpac - Test if a package is defined
+	 defpar - Test if a parameter is defined
+        deftask - Test if a task is defined
+	 defvar - Test if an environment variable is defined
+	 dparam - Dump a pset as a series of task.param=value assignments
+	   edit - Edit a text file
+       ehistory - Edit history file to re-execute commands
+	 envget - Get the string value of an environment variable
+         eparam - Edit parameters of a task
+	  error - Print error code and message and abort
+      flprcache - Flush the process cache
+	 fprint * Print a line into a parameter
+	  fscan * Scan a list
+	 fscanf * Formatted read from a file, or another parameter
+	 gflush - Flush any buffered graphics output
+       hidetask - Make a task invisible to the user
+        history - Display  commands previously executed
+       imaccess - Test if an image exists
+           jobs - Display status of background jobs
+	   keep - Make recent set, task, etc. declarations permanent
+	   kill - Kill a background job
+	 logout - Log out of the CL
+	 lparam - List the parameters of a task
+       mathfcns - Mathematical routines
+	 mktemp - Make a temporary (unique) file name
+	   osfn - Return the host system equivalent of an IRAF filename
+        package - Define a new package, or print the current package names
+        prcache - Show process cache, or lock a process into the cache
+	  print - Print a line on the standard output
+	 printf - Formatted print to the standard output
+         putlog - Put a message to the logfile
+	  radix - Encode a number in the specified radix
+       redefine - Redefine a task
+	  reset - Reset the value of an environment variable
+	   scan * Scan the standard input
+	  scanf * Formatted read from the standard input
+        service - Service a query from a background job
+	    set - Set an environment variable
+           show - Show an environment variable
+          sleep - Hibernate for a specified time
+        strings - String manipulation routines
+	   stty - Set/show terminal characteristics
+	   task - Define a new task
+           time - Print the current time
+        unlearn - Restore the default parameters for a task or package
+	 update - Update a task's parameters (flush to disk)
+	   wait - Wait for all background jobs to complete
+        whereis - locate all occurences of a task in the package list
+          which - locate a task in the package list
+

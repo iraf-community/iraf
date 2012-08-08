@@ -1,0 +1,35 @@
+.help revisions Dec91 ccddb$kpno
+.nf
+hydra.dat	+
+hydra.cl	+
+direct.cl	+
+coude.cl
+cryocam.cl
+default.cl
+echelle.cl
+fibers.cl
+foe.cl
+specphot.cl
+sunlink.cl
+instruments.men
+    1.  Added hydra entry.
+    2.  Linked all the entries to the new "default.cl" so that each
+	setup script only contains the differences from the default.
+    (9/8/97, Valdes)
+
+*.cl
+    1.	(all) ccdred.plotfile = "".
+    2.	(all) ccdred.pixeltype = "real real".
+    3.  (direct,fibers) ccdproc.interactive = yes
+    4.  (coude, specphot) ccdproc.ccdtype = ""
+			  ccdproc.flatcor = no
+			  ccdproc.trimsec = ""
+    (12/12/91, Valdes)
+
+instruments.men
+    Removed sunlink from the instrument menu.  (12/12/91, Valdes)
+
+coude.dat
+    Changed the subset parameter from FILTER to GRATPOS.  (12/11/91, Valdes)
+
+.endhelp

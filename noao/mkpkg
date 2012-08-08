@@ -1,0 +1,304 @@
+# Make the NOAO optical astronomy packages.
+
+$ifeq (hostid, unix)  !(clear;date)  $endif
+$call update
+$ifeq (hostid, unix)  !(date)  $endif
+$exit
+
+update:
+	$call noaolib
+	$call artdata
+	$call astutil
+	$call astcat
+	$call digiphot
+	$call mtlocal
+	$call nobsolete
+	$call nproto
+	$call obsutil
+	$call onedspec
+	$call rv
+	$call twodspec
+	$call imred
+
+	$ifeq (HOSTID, vms) $purge [...] $endif
+	$purge noaobin$
+	;
+
+noaolib:
+	$echo "--------------------- NOAOLIB ---------------------"
+	$call asttools@astutil
+	$call smw@onedspec
+	;
+artdata:
+	$echo "--------------------- ARTDATA ---------------------"
+	$call update@artdata
+	;
+astcat:
+	$echo "--------------------- ASTCAT ----------------------"
+	$call update@astcat
+	;
+astutil:
+	$echo "--------------------- ASTUTIL ---------------------"
+	$call update@astutil
+	;
+mtlocal:
+	$echo "--------------------- MTLOCAL ---------------------"
+	$call update@mtlocal
+	;
+digiphot:
+	$echo "--------------------- DIGIPHOT --------------------"
+	$call update@digiphot
+	;
+nobsolete:
+	$echo "------------------- NOBSOLETE ---------------------"
+	$call update@nobsolete
+	;
+nproto:
+	$echo "--------------------- NPROTO ----------------------"
+	$call update@nproto
+	;
+obsutil:
+	$echo "--------------------- OBSUTIL ---------------------"
+	$call update@obsutil
+	;
+onedspec:
+	$echo "--------------------- ONEDSPEC --------------------"
+	$call update@onedspec
+	;
+twodspec:
+	$echo "--------------------- TWODSPEC --------------------"
+	$call update@twodspec
+	;
+rv:
+	$echo "--------------------- RV --------------------------"
+	$call update@rv
+	;
+imred:
+	$echo "--------------------- IMRED -----------------------"
+	$call update@imred
+	;
+
+# STRIP -- Strip the NOAO directories of all sources and other files not
+# required to run the system, or for user programming.
+
+strip:
+	!rmfiles -f lib/strip.noao
+	;
+
+# SUMMARY -- [UNIX] mkpkg summary: output a summary of the spooled mkpkg
+# output, omitting most of the mundane chatter.  Used to scan large spool
+# files for errors.
+
+summary:
+	$ifeq (HOSTID, unix)
+	    $ifndef (spool)
+		$set spool = spool
+	    $endif
+	    ! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
+	    | grep -v '^check file'
+	$else
+	    $echo "mkpkg summary only available on a UNIX system"
+	$endif
+	;
+
+# SUN/IRAF multiple architecture support.
+# ----------------------------------------
+
+arch:
+showfloat:				# show current float option
+	$verbose off
+	!$(hlib)/mkfloat.csh
+	;
+generic:				# make architecture indep. (no bins)
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh generic -d $(DIRS)
+	;
+sparc:					# install sparc binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh sparc -d $(DIRS)
+	;
+ssun:					# install ssun binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh ssun -d $(DIRS)
+	;
+sf2c:					# install sf2c binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh sf2c -d $(DIRS)
+	;
+i386:					# install i386 binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh i386 -d $(DIRS)
+	;
+f68881:					# install f68881 binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh f68881 -d $(DIRS)
+	;
+ffpa:					# install ffpa binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh ffpa -d $(DIRS)
+	;
+fswitch:				# install fswitch binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh fswitch -d $(DIRS)
+	;
+fsoft:					# install fsoft binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh fsoft -d $(DIRS)
+	;
+pg:					# install -pg -f68881 binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh pg -d $(DIRS)
+	;
+f2c:					# install Macintosh A/UX f2c binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh f2c -d $(DIRS)
+	;
+alpha:					# install DEC Alpha/OSF binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh alpha -d $(DIRS)
+	;
+ddec:					# install DECstation DEC-Fortran bins
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh ddec -d $(DIRS)
+	;
+dmip:					# install DECstation MIPS-Fortran bins
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh dmip -d $(DIRS)
+	;
+irix:					# install SGI IRIX binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh irix -d $(DIRS)
+	;
+rs6000:					# install IBM AIX binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh rs6000 -d $(DIRS)
+	;
+mips:					# install MIPS workstation binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh mips -d $(DIRS)
+	;
+hp300:                                  # install HPUX series 300 binaries
+        $verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+        !$(hlib)/mkfloat.csh hp300 -d $(DIRS)
+        ;
+hp700:                                  # install HPUX series 700 binaries
+hp800:					# install HPUX series 800/700 binaries
+        $verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+        !$(hlib)/mkfloat.csh hp700 -d $(DIRS)
+        ;
+freebsd:				# install FREEBSD binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh freebsd -d $(DIRS)
+	;
+macosx:					# install MACOSX (PPC) binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh macosx -d $(DIRS)
+	;
+macintel:				# install MACOSX (x86) binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh macintel -d $(DIRS)
+	;
+ipad:					# install Mac iPad  binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh ipad -d $(DIRS)
+	;
+cygwin:					# install WinXP/Cygwin binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh cygwin -d $(DIRS)
+	;
+linux:					# install Linux binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh linux -d $(DIRS)
+	;
+linux64:				# install Linux x86_64 binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh linux64 -d $(DIRS)
+	;
+redhat:					# install Redhat Linux binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh redhat -d $(DIRS)
+	;
+suse:					# install SUSE Linux binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+		     nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh suse -d $(DIRS)
+	;
+linuz:					# install LINUZ binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh linuz -d $(DIRS)
+	;
+sunos:					# install SUNOS (Solaris x86) binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh sunos -d $(DIRS)
+	;
+linuxppc:				# install Linux (PPC) binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh linuxppc -d $(DIRS)
+	;
+linux64:				# install Linux (64-bit) binaries
+	$verbose off
+	$set DIRS = "lib artdata astcat astutil digiphot imred mtlocal onedspec\
+	             nproto nobsolete rv surfphot twodspec obsutil"
+	!$(hlib)/mkfloat.csh linux64 -d $(DIRS)
+	;

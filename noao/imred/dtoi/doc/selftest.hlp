@@ -1,0 +1,81 @@
+.help selftest Feb87 imred.dtoi
+.ih
+NAME
+selftest -- test routine to verify \fIdtoi\fR transformation
+.ih
+USAGE
+selftest nbits
+.ih
+PARAMETERS
+.ls nbits = 12
+Dymanic range of data to test.
+.le
+.ls device = "stdgraph" 
+Plotting device for graphical output.
+.le
+.ls verbose = no
+A table of density, intensity values is printed if \fBverbose\fR = yes.
+.le
+.ls ceiling = 30000.
+Maximum intensity to output.
+.le
+.ls max_raw = 0
+The maximum raw data value.  Needed only if \fInbits\fR equals something
+other than 12, 15 or 0.
+.le
+.ls scale = 0.0
+The raw data value to density scale value.  Needed only if \fInbits\fR
+equals something other than 12, 15, or 0.
+.le
+
+.ih
+DESCRIPTION
+Task \fIselftest\fR is a test program for the \fIdtoi\fR package.  Its 
+output can be examined to see if numerical errors are introduced during
+the density to intensity transformation.  It also evaluates truncation
+errors produced when an output image with integer pixels is written.  
+
+Many different PDS setups can be investigated with task \fBselftest\fR.
+Setting parameter \fInbits\fR = 12
+indicates PDS format data, with data range 0 to 3071.  Setting \fInbits\fR = 15 
+indicates FITS format data, with data range 0 to 24575.  The special value of
+\fInbits\fR = 0 means a small test data range from 1 to 144 is investigated.
+If any other value of \fInbits\fR is entered, the user is queried for the
+max raw data values and the raw data to density scaling factor.
+
+An intensity vector is generated from a density vector in two different ways.  
+The first method uses the density vector and known coefficients to compute
+the intensity.  The second method uses the curfit package to generate a
+look up table of intensities as done in task \fBHDTOI\fR.  The residual
+of the two intensity vectors is plotted.  Ideally, the difference between
+the 'known' intensities and 'calculated' intensities is zero.
+
+The second plot output by \fBselftest\fR shows intensity as a function
+of density.  Two lines are overplotted; integer intensity versus density
+and real intensity versus density.  Because truncation errors are most
+pronounced at low density values, the plot covers only the lowest 5%
+of the density range.  The user should investigate the plot with the
+cursor zoom and expand capabilities to determine if truncation errors
+are significant.
+
+In verbose mode, \fBselftest\fR produced a three column table of raw
+data value, density and calculated intensity. 
+
+.ih
+EXAMPLES
+
+.nf
+Run task selftest for 12 bit data with plots appearing on the terminal.
+
+	cl> selftest
+
+.fi
+Run selftest in verbose mode, spooling the output to file 'ditable'.  This
+file is then run through the 'fields' task to extract the density and intensity
+columns which are piped to plot.  The results in a plot of the look up table.
+.nf
+
+	cl> selftest ver+ > ditable
+	cl> fields ditable 2,3 | graph xlab=Density ylab=Intensity
+.fi
+.endhelp

@@ -1,0 +1,46 @@
+# Help directory for the IMAGES package.
+
+$imcoords	= "./imcoords/"
+$imfilter	= "./imfilter/"
+$imfit		= "./imfit/"
+$imgeom		= "./imgeom/"
+$immatch	= "./immatch/"
+$imutil		= "./imutil/"
+$tv		= "./tv/"
+
+revisions	sys=Revisions
+
+imcoords	men=imcoords$imcoords.men,
+		hlp=..,
+		src=imcoords$imcoords.cl,
+		pkg=imcoords$imcoords.hd
+
+imfilter	men=imfilter$imfilter.men,
+		hlp=..,
+		src=imfilter$imfilter.cl,
+		pkg=imfilter$imfilter.hd
+
+imfit		men=imfit$imfit.men,
+		hlp=..,
+		src=imfit$imfit.cl,
+		pkg=imfit$imfit.hd
+
+imgeom		men=imgeom$imgeom.men,
+		hlp=..,
+		src=imgeom$imgeom.cl,
+		pkg=imgeom$imgeom.hd
+
+immatch		men=immatch$immatch.men,
+		hlp=..,
+		src=immatch$immatch.cl,
+		pkg=immatch$immatch.hd
+
+imutil		men=imutil$imutil.men,
+		hlp=..,
+		src=imutil$imutil.cl,
+		pkg=imutil$imutil.hd
+
+tv		men=tv$tv.men,
+		hlp=..,
+		src=tv$tv.cl,
+		pkg=tv$tv.hd

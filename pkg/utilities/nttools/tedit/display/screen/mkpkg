@@ -1,0 +1,32 @@
+# Update the display library.
+# Author: B.Simon 01-APR-91
+
+$checkout libpkg.a ../../
+$update   libpkg.a
+$checkin  libpkg.a ../../
+$exit
+
+libpkg.a:
+	kbegin.x	<fset.h>  "../curses.h"  "screen.com"
+	kcompile.x	<ctype.h>  "../curses.h"  "screen.com"
+	kconvert.x	<ctype.h>
+	kdoline.x	<ctype.h>
+	kend.x		<fset.h>  "screen.com"
+	kget.x		<ctype.h>  "screen.com"
+	khelp.x		"screen.com"
+	kpushbk.x	"screen.com"
+	psbegin.x	<ttyset.h>  "screen.com"
+	psbeep.x
+	psend.x		"screen.com"
+	psfill.x	<ctype.h>  "../curses.h"  "screen.com"
+	psheight.x	"screen.com"
+	psintersect.x	"../curses.h"
+	psscreen.x	"screen.com"
+	pssendcap.x	"screen.com"
+	pssetcur.x	"screen.com"
+	psslide.x	"../curses.h"  "screen.com"
+	pssynch.x	"screen.com"
+	pswidth.x	"screen.com"
+	pswrite.x	<ctype.h>  "../curses.h"  "screen.com"
+	pswrtcells.x	<ctype.h>  "../curses.h"  "screen.com"
+	;

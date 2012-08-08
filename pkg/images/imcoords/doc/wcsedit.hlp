@@ -1,0 +1,429 @@
+.help wcsedit Apr92 images.imcoords
+.ih
+NAME
+wcsedit -- edit an image world coordinate system parameter 
+.ih
+USAGE
+wcsedit image parameter value axes1
+.ih
+PARAMETERS
+.ls image
+The list of images for which the WCS is to be edited.  Image sections are
+ignored.  If the image does not exist a data-less image header is first
+created with the default WCS of dimensionality given by the "wcsdim"
+parameter.
+.le
+.ls parameter
+The WCS parameter to be edited. The WCS parameters recognized by
+WCSEDIT are: 1) the FITS WCS
+parameters crpix, crval, cd  and, 2) the IRAF WCS parameters ltv, ltm, wtype,
+axtype, units, label, and format.  Only one WCS parameter may be edited at a
+time.
+.le
+.ls value
+The new parameter value. The numerical parameters crpix, crval, cd, ltv, and
+ltm will not be updated if WCSEDIT is unable to decode the parameter value
+into a legal floating point number.
+.le
+.ls axes1
+The list of principal axes for which \fIparameter\fR is to be edited.
+Axes1 can
+be entered as a list of numbers separated by commas, e.g. "1,2" or as a
+range, e.g. "1-2".
+.le
+.ls axes2
+The list of dependent axes for which \fIparameter\fR is to be edited.
+Axes2 can
+be entered as a list of numbers separated by commas, e.g. "1,2" or as a
+range, e.g. "1-2". The axes2 parameter is only required if
+\fIparameter\fR is "cd" or "ltm".
+.le
+.ls wcs = "world"
+The WCS to be edited.  The options are: the builtin systems "world" or
+"physical", or a named system, e.g. "image" or "multispec". The builtin system
+"logical" may not be edited.
+.ls world
+If \fIwcs\fR is "world" the default WCS is edited. The default WCS
+is either 1) the value of the environment variable "defwcs" if
+set in the user's IRAF environment (normally it is undefined) and present
+in the image header,
+2) the value of the "system"
+attribute in the image header keyword WAT0_001 if present in the
+image header or, 3) the "physical" coordinate system.
+.le
+.ls physical
+If \fIwcs\fR is "physical", WCS is the pixel coordinate system of
+the original image, which may be different from the pixel coordinate system
+of the current image, if the current image is the result of an
+imcopy or other geometric transformation operation. In the "physical"
+coordinate system the ltv, ltm and the axis attribute
+parameters wtype, axtype, units, label, and format may be edited, but the FITS
+parameters crval, crpix, and cd cannot.
+.le
+.ls name
+A user supplied wcs name.
+If the named WCS does not exist in the image, a new one of that
+name initialized to the identity transform, will be opened for editing, and
+the old WCS will be destroyed. This option should only be used for creating
+a totally new FITS WCS.
+.le
+.le
+.ls wcsdim = 2
+WCS dimensionality when creating a new data-less image header.
+.le
+.ls interactive = no
+Edit the WCS interactively?
+.le
+.ls commands = ""
+The interactive editing command prompt.
+.le
+.ls verbose = yes
+Print messages about actions taken in interactive or non-interactive mode?
+.le
+.ls update = yes
+Update the image header in non-interactive mode? A specific command  exists
+to do this in interactive mode.
+.le
+
+.ih
+DESCRIPTION
+WCSEDIT modifies the WCS of an existing image or creates a data-less image
+header of the dimensionality given by the \fIwcsdim\fR parameter.
+
+In non-interactive mode WCSEDIT replaces the current value of the WCS
+parameter \fIparameter\fR with the new value \fIvalue\fR in the headers of
+\fIimages\fR and prints a summary of the new WCS on the terminal.  If
+\fIverbose\fR is "no" the summary is not printed.  If \fIverbose\fR is
+"yes" and \fIupdate\fR is "no", the result of the editing operation
+is printed on the terminal but the header is not modified.
+
+The WCS parameter \fIparameter\fR may be one of: crval, crpix, cd, ltv, ltm,
+wtype, axtype, units, label, or format in either upper or lower case.
+The WCS array parameters crpix, crval, ltv, wtype, axtype, units, label,
+and format
+may be edited for more than one axis at a time by setting \fIaxes1\fR to a
+range of axes values. The WCS matrix parameters cd and ltm may be edited for
+more than one axis at a time by setting both \fIaxes1\fR and \fIaxes2\fR to
+a range of values. In this case, if no \fIaxes2\fR values are entered,
+\fIaxes2\fR = "", the
+diagonal elements of the cd and ltm matrices specified by \fIaxes1\fR are
+edited. A single non-diagonal element of the cd or ltm matrices can be
+edited by setting \fIaxis1\fR and \fIaxis2\fR to a single number.
+
+The user can create a new WCS from scratch by setting
+\fIwcs\fR to a name different from the name of the WCS in the image header.
+A new WCS with the same dimension as the image and initialized
+to the identity transformation  is presented to the user for editing.
+IF THE USER UPDATES THE IMAGE HEADER AFTER EDITING THE NEW WCS, ALL
+PREVIOUS WCS INFORMATION IS LOST.
+
+In interactive mode, WCSEDIT displays the current WCS
+on the terminal if \fIverbose\fR = "yes", and prompts the user for 
+an editing command.  The supported editing commands are shown below.
+
+.nf
+	              BASIC  COMMANDS
+
+?		Print the WCSEDIT commands
+show		Print out the current WCS
+update		Quit WCSEDIT and update the image WCS
+quit		Quit WCSEDIT without updating the image WCS
+
+
+	      PARAMETER DISPLAY AND EDITING COMMANDS
+
+crval  [value axes1]		Show/set the FITS crval parameter(s)
+crpix  [value axes1]		Show/set the FITS crpix parameter(s)
+cd     [value axes1 [axes2]]	Show/set the FITS cd parameter(s)
+ltv    [value axes1]		Show/set the IRAF ltv parameter(s)
+ltm    [value axes1 [axes2]]	Show/set the IRAF ltm parameter(s)
+wtype  [value axes1]		Show/set the FITS/IRAF axes transform(s)
+axtype [value axes1]		Show/set the FITS/IRAF axis type(s)
+units  [value axes1]		Show/set the IRAF units(s)
+label  [value axes1]		Show/set the IRAF axes label(s)
+format [value axes1]		Show/set the IRAF axes coordinate format(s)
+.fi
+
+.ih
+THE WCS PARAMETERS
+
+Below is a list of the WCS parameters as they appear encoded in the in the
+IRAF image header. Parameters marked with E can be edited directly with
+WCSEDIT. Parameters marked with U should be updated automatically by WCSEDIT
+if the proper conditions are met. The remaining parameters cannot be edited
+with WCSEDIT. A brief description of the listed parameters is given below.
+For a detailed description of the meaning of these parameters, the user
+should consult the two documents listed in the REFERENCES section.
+
+.nf
+WCSDIM          WCS dimension (may differ from image)
+
+CTYPEn   U      coordinate type 
+CRPIXn   E      reference pixel
+CRVALn   E      world coords of reference pixel
+CDi_j    E      CD matrix
+
+CDELTn   U      CDi_i if CD matrix not used (input only)
+CROTA2   U      rotation angle if CD matrix not used
+
+LTVi     E      Lterm translation vector
+LTMi_j   E      Lterm rotation matrix
+
+WATi_jjj U      WCS attributes for axis I (wtype,axtype,units,label,format)
+WAXMAPii        WCS axis map 
+.fi
+
+The WCSDIM and WAXMAP parameters cannot be edited by WCSEDIT, unless a
+new WCS is created in which case WCSDIM is set to
+the dimension of the input image and the axis map is deleted.
+The FITS parameters CRPIX, CRVAL, and CD
+define the transformation between the world coordinate system and the pixel
+coordinate system of the image and may be edited directly.  The more general
+FITS CD matrix notation supersedes the FITS CDELT/CROTA notation if both are
+present on input, and is used by preference on output.  The FITS parameter
+CTYPE cannot be edited directly by WCSEDIT but is correctly updated on
+output using the current values of the WCS parameters wtype and axtype
+parameters, if there was a pre-existing FITS header in the image.  On input
+IRAF currently recognizes the following values of the FITS parameter CTYPE:
+RA---TAN and DEC--TAN (the tangent plane sky projection), RA---SIN and
+DEC--SIN (the sin sky projection), RA---ARC and DEC--ARC (the arc sky
+projection), LINEAR, and MULTISPEC, from which it derives the correct values
+for wtype and axtype.
+
+The LTV and LTM are IRAF parameters which define the transformation between
+the
+current image pixel coordinate system and the original pixel coordinate system,
+if the current image was derived from a previous
+image by a geometric transformation, e.g. IMCOPY or IMSHIFT.
+Both parameters may be edited directly by WCSEDIT, but with the exception
+of resetting the LTV vector to 0 and the LTM matrix to the identity
+matrix it is not usually desirable to do so. The task WCSRESET can also
+be used for this purpose.
+
+The WATi_jjj parameters are not directly accessible by WCSEDIT but the five
+axis attributes which are encoded under these keywords (wtype, axtype,
+units, label, and format) may be edited.
+The IRAF WCS code currently
+recognizes the following values for "wtype": "linear", "tan", "sin",
+"arc", and "multispec".  If "wtype" is not defined or cannot
+be decoded by the WCS code "linear" is assumed.
+Axtype should be "ra" or "dec" if wtype is one of the sky projections
+"tan", "sin" or "arc", otherwise it should be undefined.
+WCSEDIT will combine the values of "wtype" and "axtype" on output to
+produce the correct value of the FITS keyword CTYPE.
+The "label" and "units" parameter may be set to any string constant.
+Format must be set to a legal IRAF format as described in the section
+below.
+
+.ih
+FORMATS
+A  format  specification has the form "%w.dCn", where w is the field
+width, d is the number of decimal places or the number of digits  of
+precision,  C  is  the  format  code,  and  n is radix character for
+format code "r" only.  The w and d fields are optional.  The  format
+codes C are as follows:
+    
+.nf
+b       boolean (YES or NO)
+c       single character (c or '\c' or '\0nnn')
+d       decimal integer
+e       exponential format (D specifies the precision)
+f       fixed format (D specifies the number of decimal places)
+g       general format (D specifies the precision)
+h       hms format (hh:mm:ss.ss, D = no. decimal places)
+m       minutes, seconds (or hours, minutes) (mm:ss.ss)
+o       octal integer
+rN      convert integer in any radix N
+s       string (D field specifies max chars to print)
+t       advance To column given as field W
+u       unsigned decimal integer 
+w       output the number of spaces given by field W
+x       hexadecimal integer
+z       complex format (r,r) (D = precision)
+    
+    
+Conventions for w (field width) specification:
+    
+    W =  n      right justify in field of N characters, blank fill
+        -n      left justify in field of N characters, blank fill
+        0n      zero fill at left (only if right justified)
+absent, 0       use as much space as needed (D field sets precision)
+    
+    
+Escape sequences (e.g. "\n" for newline):
+    
+\b      backspace   (not implemented)
+\f      formfeed
+\n      newline (crlf)
+\r      carriage return
+\t      tab
+\"      string delimiter character
+\'      character constant delimiter character
+\\      backslash character
+\nnn    octal value of character
+    
+Examples
+    
+%s          format a string using as much space as required
+%-10s       left justify a string in a field of 10 characters
+%-10.10s    left justify and truncate a string in a field of 10 characters
+%10s        right justify a string in a field of 10 characters
+%10.10s     right justify and truncate a string in a field of 10 characters
+    
+%7.3f       print a real number right justified in floating point format
+%-7.3f      same as above but left justified
+%15.7e      print a real number right justified in exponential format
+%-15.7e     same as above but left justified
+%12.5g      print a real number right justified in general format
+%-12.5g     same as above but left justified
+
+%h	    format as nn:nn:nn.n
+%15h	    right justify nn:nn:nn.n in field of 15 characters
+%-15h	    left justify nn:nn:nn.n in a field of 15 characters
+%12.2h	    right justify nn:nn:nn.nn
+%-12.2h	    left justify nn:nn:nn.nn
+    
+%H	    / by 15 and format as nn:nn:nn.n
+%15H	    / by 15 and right justify nn:nn:nn.n in field of 15 characters
+%-15H	    / by 15 and left justify nn:nn:nn.n in field of 15 characters
+%12.2H	    / by 15 and right justify nn:nn:nn.nn
+%-12.2H	    / by 15 and left justify nn:nn:nn.nn
+
+\n          insert a newline
+.fi
+
+.ih
+REFERENCES
+
+Detailed documentation for the IRAF world coordinate system interface MWCS
+can be found in the file "iraf$sys/mwcs/MWCS.hlp". This file can be
+formatted and printed with the command "help iraf$sys/mwcs/MWCS.hlp fi+ |
+lprint".  Details of the FITS header world coordinate system interface can
+be found in the document "World Coordinate Systems Representations Within the
+FITS Format" by Hanisch and Wells, available from our anonymous ftp
+archive.
+
+.ih
+EXAMPLES
+
+1. Change the default output coordinate formats for an image with a defined
+FITS tangent plane projection in its header, for the RA axis (axis 1), and the
+DEC axis (axis 2) to %H and %h respectively. Then display the image and use
+rimcursor to produce a coordinate list of objects whose coordinates are
+printed as hh:mm:ss.s and dd:mm:ss.s respectively.
+
+.nf
+	cl> wcsedit image format %H 1
+	cl> wcsedit image format %h 2
+	cl> display image 1
+	cl> rimcursor wcs=world > coordlist
+	    ... mark the coordinates
+.fi
+
+2. Change the default sky projection for an image with a defined tangent
+plane projection to one with a sin projection.  Note that wtype for both
+axis1 and axis2 must be changed to "sin". Check the results first before
+doing the actual update.
+
+.nf
+	cl> wcsedit image wtype sin 1-2 update-
+	cl> wcsedit image wtype sin 1-2
+.fi
+
+
+3. Change the diagonal elements of the FITS cd matrix to 2.0. The off
+diagonal elements are 0.0. This is equivalent to resetting the image scale.
+
+.nf
+	cl> wcsedit image cd 2.0 1-2 ""
+.fi
+
+4. Set the value of the FITS cd matrix elements, cd[2,1] and cd[1,2] to 0.0. 
+This removes any rotation/skew from the WCS definition.
+
+.nf
+	cl> wcsedit image cd 0.0 2 1
+	cl> wcsedit image cd 0.0 1 2
+.fi
+
+5. Change the FITS crval value for axis 2.
+
+.nf
+	cl> wcsedit image crval 47.85 2
+.fi
+
+6. Create a totally new WCS for an image, deleting the previous WCS
+and set the diagonal elements of the cd matrix to 0.68. 0.68 is the
+scale of the 36 inch telescope at KPNO.
+
+.nf
+	cl> wcsedit image cd 1.5 1-2 wcs="kpno9m"
+.fi
+
+7. Interactively edit the WCS of an image. with an existing FITS header.
+
+.nf
+	cl> wcsedit image interactive+
+
+	    ... summary of current WCS is printed on terminal
+
+	    wcsedit: ?
+
+	    ... user types in ? to see list of wcsedit commands
+
+            wcsedit: cd 2.0 1-2
+
+	    ... user changes the scale of the WCS
+
+	    wcsedit: format %0.3f 1-2
+
+	    ... user changes format so the coordinates will be printed
+		out with 3 decimals of precision by any tasks which
+		can read the WCS format parameter such as rimcursor
+		and listpixels
+
+	    wcsedit: show
+
+	    ... user checks the new wcs
+
+	    wcsedit: update
+
+	    ... user quits editor and updates the image header
+.fi
+
+8. Open and edit a new WCS for an image. Any pre-existing WCS will
+be destroyed, assuming that the default wcs is not "newwcs".
+
+.nf
+	cl> wcsedit image wcs=newwcs intera+
+
+	    wcsedit: ....
+	    wcsedit: ....
+
+	    ... edit in the desired values
+
+	    wcsedit: update
+
+	    ... update the image header.
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+The IRAF WCS code supports the dimensional reduction of images,
+for example creating an image with smaller dimensions than its parent, but
+may not be fully compatible with FITS when this occurs.
+In this case user may need to fix up an illegal or
+incorrect WCS with HEDIT or HFIX bypassing the WCS code used by WCSEDIT.
+
+WCSEDIT does not permit the user to edit any parameters encoded in the
+WATi_jjj keywords other than the five listed: wtype, axtype, units, label,
+and format. For example WCSEDIT cannot be used to edit the "speci" parameters
+used by the IRAF spectral reductions code "multispec" format. The spectral
+reduction code itself should be used to do this, although hfix can
+be used to fix a serious problem should it arise.
+.ih
+SEE ALSO
+wcsreset,hedit,hfix
+.endhelp

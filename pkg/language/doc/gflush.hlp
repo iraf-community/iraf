@@ -1,0 +1,32 @@
+.help gflush Feb86 language
+.ih
+NAME
+gflush -- flush any buffered graphics output
+.ih
+USAGE
+gflush
+.ih
+PARAMETERS
+None.
+.ih
+DESCRIPTION
+Output to graphics plotter devices is normally buffered and then disposed
+of to the plotter as a larger job, to increase the efficiency of the
+graphics system.  The \fIgflush\fR task disposes of any buffered graphics
+output and also initializes the graphics subsystem.  The cursor mode frame
+buffer is cleared, any connected graphics subkernels are disconnected,
+and the memory and file descriptors used by the graphics subsystem are
+freed.  A \fIgflush\fR occurs automatically upon logout from the CL.
+
+The number of frames (plots) the graphics system will buffer for a device
+is controlled by the MF (multi-frame) parameter in the \fIgraphcap\fR entry
+for the device.  When the multi-frame count is reached the buffered output
+is automatically disposed of to the device.
+.ih
+EXAMPLES
+1. Flush any graphics output and initialize the graphics system.
+
+	cl> gflush
+.ih
+SEE ALSO
+cursor, stdplot

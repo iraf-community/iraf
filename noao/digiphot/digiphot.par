@@ -1,0 +1,4 @@
+# DIGIPHOT package parameter file.
+
+version,s,h,"Aug91"
+mode,s,h,ql

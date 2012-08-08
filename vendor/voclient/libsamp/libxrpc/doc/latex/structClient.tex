@@ -1,0 +1,85 @@
+\hypertarget{structClient}{
+\section{Client Struct Reference}
+\label{structClient}\index{Client@{Client}}
+}
+{\tt \#include $<$xrpcP.h$>$}
+
+\subsection*{Data Fields}
+\begin{CompactItemize}
+\item 
+\hypertarget{structClient_7cdcbddf76da1adb9f73e8bdbb1684aa}{
+char \textbf{url} \mbox{[}SZ\_\-PATH\mbox{]}}
+\label{structClient_7cdcbddf76da1adb9f73e8bdbb1684aa}
+
+\item 
+xmlrpc\_\-client $\ast$ \hyperlink{structClient_d4a6025c88f880e4bf4060f2018c5695}{rpc\_\-client}
+\item 
+xmlrpc\_\-env \hyperlink{structClient_396227b4ec4cce6d7d62d252030a7541}{env}
+\item 
+int \hyperlink{structClient_5869e4fdb3a1a88b14faa4f2dda27c66}{in\_\-use}
+\item 
+int($\ast$ \hyperlink{structClient_883a4aa7cd951660a7835ca5242bdfc7}{handlerFunc} )(void $\ast$p)
+\item 
+xmlrpc\_\-value $\ast$ \hyperlink{structClient_e4d1bc206122b68b2def984a105ed189}{param}
+\item 
+xmlrpc\_\-value $\ast$ \hyperlink{structClient_5985ff24d5b811f1c96b8a083d6e0e31}{result}
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+XML-RPC client data struct. 
+
+\subsection{Field Documentation}
+\hypertarget{structClient_396227b4ec4cce6d7d62d252030a7541}{
+\index{Client@{Client}!env@{env}}
+\index{env@{env}!Client@{Client}}
+\subsubsection[{env}]{\setlength{\rightskip}{0pt plus 5cm}xmlrpc\_\-env {\bf Client::env}}}
+\label{structClient_396227b4ec4cce6d7d62d252030a7541}
+
+
+client struct 
+
+Referenced by xr\_\-clientCleanup(), xr\_\-envClean(), xr\_\-getErrCode(), and xr\_\-getErrMsg().\hypertarget{structClient_883a4aa7cd951660a7835ca5242bdfc7}{
+\index{Client@{Client}!handlerFunc@{handlerFunc}}
+\index{handlerFunc@{handlerFunc}!Client@{Client}}
+\subsubsection[{handlerFunc}]{\setlength{\rightskip}{0pt plus 5cm}int($\ast$ {\bf Client::handlerFunc})(void $\ast$p)}}
+\label{structClient_883a4aa7cd951660a7835ca5242bdfc7}
+
+
+struct in use? \hypertarget{structClient_5869e4fdb3a1a88b14faa4f2dda27c66}{
+\index{Client@{Client}!in\_\-use@{in\_\-use}}
+\index{in\_\-use@{in\_\-use}!Client@{Client}}
+\subsubsection[{in\_\-use}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Client::in\_\-use}}}
+\label{structClient_5869e4fdb3a1a88b14faa4f2dda27c66}
+
+
+env context \hypertarget{structClient_e4d1bc206122b68b2def984a105ed189}{
+\index{Client@{Client}!param@{param}}
+\index{param@{param}!Client@{Client}}
+\subsubsection[{param}]{\setlength{\rightskip}{0pt plus 5cm}xmlrpc\_\-value$\ast$ {\bf Client::param}}}
+\label{structClient_e4d1bc206122b68b2def984a105ed189}
+
+
+asynch handler function 
+
+Referenced by xr\_\-freeParam().\hypertarget{structClient_5985ff24d5b811f1c96b8a083d6e0e31}{
+\index{Client@{Client}!result@{result}}
+\index{result@{result}!Client@{Client}}
+\subsubsection[{result}]{\setlength{\rightskip}{0pt plus 5cm}xmlrpc\_\-value$\ast$ {\bf Client::result}}}
+\label{structClient_5985ff24d5b811f1c96b8a083d6e0e31}
+
+
+method parameters 
+
+Referenced by xr\_\-freeResult().\hypertarget{structClient_d4a6025c88f880e4bf4060f2018c5695}{
+\index{Client@{Client}!rpc\_\-client@{rpc\_\-client}}
+\index{rpc\_\-client@{rpc\_\-client}!Client@{Client}}
+\subsubsection[{rpc\_\-client}]{\setlength{\rightskip}{0pt plus 5cm}xmlrpc\_\-client$\ast$ {\bf Client::rpc\_\-client}}}
+\label{structClient_d4a6025c88f880e4bf4060f2018c5695}
+
+
+URL to service 
+
+The documentation for this struct was generated from the following file:\begin{CompactItemize}
+\item 
+xrpcP.h\end{CompactItemize}

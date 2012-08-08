@@ -1,0 +1,26 @@
+# Global environment definitions for the NOAO packages.
+
+set	pkglibs		= "noao$bin(arch)/,noao$lib/"
+set	noaobin		= "noao$bin(arch)/"
+set	noaolib		= "noao$lib/"
+set	ccdtime		= "noaolib$ccdtime/"
+set	onedstds	= "noaolib$onedstds/"
+set	linelists	= "noaolib$linelists/"
+
+set	artdata		= noao$artdata/
+set	astrometry	= noao$astrometry/
+set	astcat		= noao$astcat/
+set	astutil		= noao$astutil/
+set	digiphot	= noao$digiphot/
+set	focas		= noao$focas/
+set	imred		= noao$imred/
+set	mtlocal		= noao$mtlocal/
+set	nobsolete	= noao$nobsolete/
+set	nproto		= noao$nproto/
+set	obsutil		= noao$obsutil/
+set	onedspec	= noao$onedspec/
+set	rv		= noao$rv/
+set	surfphot	= noao$surfphot/
+set	twodspec	= noao$twodspec/
+
+keep

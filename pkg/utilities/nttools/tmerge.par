@@ -1,0 +1,9 @@
+# par file for the tmerge task
+intable,s,a,"",,,"list of tables"
+outtable,s,a,"",,,"name of output table"
+option,s,a,"merge","merge|append",,"merge or append?"
+allcols,b,h,yes,,,"columns from all input tables?"
+tbltype,s,h,"default","row|column|text|default",,"type of output table"
+allrows,i,h,100,1,,"number of rows to allocate"
+extracol,i,h,0,0,,"number of extra columns to allocate"
+mode,s,h,"al",,,

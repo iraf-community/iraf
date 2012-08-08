@@ -1,0 +1,87 @@
+.help ue2pv Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slUEPV (DATE, U, PV, JSTAT)
+
+     - - - - - -
+      U E P V
+     - - - - - -
+
+  Heliocentric position and velocity of a planet, asteroid or comet,
+  starting from orbital elements in the "universal variables" form.
+
+  Given:
+     DATE     d       date, Modified Julian Date (JD-2400000.5)
+
+  Given and returned:
+     U        d(13)   universal orbital elements (updated; Note 1)
+
+       given    (1)   combined mass (M+m)
+         "      (2)   total energy of the orbit (alpha)
+         "      (3)   reference (osculating) epoch (t0)
+         "    (4-6)   position at reference epoch (r0)
+         "    (7-9)   velocity at reference epoch (v0)
+         "     (10)   heliocentric distance at reference epoch
+         "     (11)   r0.v0
+     returned  (12)   date (t)
+         "     (13)   universal eccentric anomaly (psi) of date
+
+  Returned:
+     PV       d(6)    position (AU) and velocity (AU/s)
+     JSTAT    i       status:  0 = OK
+                              -1 = radius vector zero
+                              -2 = failed to converge
+
+  Notes
+
+  1  The "universal" elements are those which define the orbit for the
+     purposes of the method of universal variables (see reference).
+     They consist of the combined mass of the two bodies, an epoch,
+     and the position and velocity vectors (arbitrary reference frame)
+     at that epoch.  The parameter set used here includes also various
+     quantities that can, in fact, be derived from the other
+     information.  This approach is taken to avoiding unnecessary
+     computation and loss of accuracy.  The supplementary quantities
+     are (i) alpha, which is proportional to the total energy of the
+     orbit, (ii) the heliocentric distance at epoch, (iii) the
+     outwards component of the velocity at the given epoch, (iv) an
+     estimate of psi, the "universal eccentric anomaly" at a given
+     date and (v) that date.
+
+  2  The companion routine is slELUE.  This takes the conventional
+     orbital elements and transforms them into the set of numbers
+     needed by the present routine.  A single prediction requires one
+     one call to slELUE followed by one call to the present routine;
+     for convenience, the two calls are packaged as the routine
+     slPLNE.  Multiple predictions may be made by again
+     calling slELUE once, but then calling the present routine
+     multiple times, which is faster than multiple calls to slPLNE.
+
+     It is not obligatory to use slELUE to obtain the parameters.
+     However, it should be noted that because slELUE performs its
+     own validation, no checks on the contents of the array U are made
+     by the present routine.
+
+  3  DATE is the instant for which the prediction is required.  It is
+     in the TT timescale (formerly Ephemeris Time, ET) and is a
+     Modified Julian Date (JD-2400000.5).
+
+  4  The universal elements supplied in the array U are in canonical
+     units (solar masses, AU and canonical days).  The position and
+     velocity are not sensitive to the choice of reference frame.  The
+     slELUE routine in fact produces coordinates with respect to the
+     J2000 equator and equinox.
+
+  5  The algorithm was originally adapted from the EPHSLA program of
+     D.H.P.Jones (private communication, 1996).  The method is based
+     on Stumpff's Universal Variables.
+
+  Reference:  Everhart, E. & Pitkin, E.T., Am.J.Phys. 51, 712, 1983.
+
+  P.T.Wallace   Starlink   19 March 1999
+
+  Copyright (C) 1999 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

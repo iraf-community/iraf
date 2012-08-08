@@ -1,0 +1,43 @@
+.help quadjoin Aug01 noao.imred.quadred
+.ih
+NAME
+quadjoin -- Split quadformat data into single amplifier images
+.ih
+USAGE
+quadjoin input
+.ih
+PARAMETERS
+.ls input
+Root name of images to be joined.  Extensions based on the AMPLIST
+keyword are applied to the root name.  This task does not
+allow a list of input root names.
+.le
+.ls output = ""
+Output image name.  If one is not given then the input root name is used.
+.le
+.ls delete = no
+Delete subimages on completion?
+.le
+.ih
+DESCRIPTION
+Images in split "quadformat" (see help topic \fBquadformat\fR and
+\fBquadsplit\fR) are rejoined into "quadformat".  The input images
+have a common root name and then an extension given by the amplifier
+labels in the AMPLIST keyword are added.  The output name may be specified
+or the input root name may be used.
+.ih
+EXAMPLES
+1. To join a split set of images:
+
+.nf
+    qu> dir quad0072*
+    quad0072.11.imh     quad0072.21.imh
+    quad0072.12.imh     quad0072.22.imh     
+    qu> quadjoin quad0072 delete+
+    qu> dir quad0072*
+    quad0072.imh
+.fi
+.ih
+SEE ALSO
+quadformat, quadsplit
+.endhelp

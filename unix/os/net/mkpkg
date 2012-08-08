@@ -1,0 +1,25 @@
+# Make the ZFIOKS-REXEC-TCP/IP network interface package.
+
+$set	XFLAGS	= "-c $(HSI_XF)"
+
+libos.a:
+	accept.c	types.h
+	connect.c	types.h
+	ghostbynm.c	netdb.h
+	ghostent.c	types.h netdb.h socket.h
+	gsocknm.c	types.h
+	hostdb.c	
+	htonl.c	
+	htons.c	
+	inetaddr.c	ctype.h in.h types.h
+	kutil.c	
+	listen.c	types.h
+	ntohl.c	
+	ntohs.c	
+	rexec.c		in.h netdb.h socket.h types.h
+	socket.c	types.h
+	tcpclose.c	types.h
+	tcpread.c	types.h
+	tcpwrite.c	types.h
+	zfioks.c	ctype.h types.h in.h
+	;

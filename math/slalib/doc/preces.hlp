@@ -1,0 +1,47 @@
+.help preces Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slPRCE (SYSTEM, EP0, EP1, RA, DC)
+
+     - - - - - - -
+      P R C E
+     - - - - - - -
+
+  Precession - either FK4 (Bessel-Newcomb, pre IAU 1976) or
+  FK5 (Fricke, post IAU 1976) as required.
+
+  Given:
+     SYSTEM     char   precession to be applied: 'FK4' or 'FK5'
+     EP0,EP1    dp     starting and ending epoch
+     RA,DC      dp     RA,Dec, mean equator & equinox of epoch EP0
+
+  Returned:
+     RA,DC      dp     RA,Dec, mean equator & equinox of epoch EP1
+
+  Called:    slDA2P, slPRBN, slPREC, slDS2C,
+             slDMXV, slDC2S
+
+  Notes:
+
+     1)  Lowercase characters in SYSTEM are acceptable.
+
+     2)  The epochs are Besselian if SYSTEM='FK4' and Julian if 'FK5'.
+         For example, to precess coordinates in the old system from
+         equinox 1900.0 to 1950.0 the call would be:
+             CALL slPRCE ('FK4', 1900D0, 1950D0, RA, DC)
+
+     3)  This routine will NOT correctly convert between the old and
+         the new systems - for example conversion from B1950 to J2000.
+         For these purposes see slFK45, slFK54, slF45Z and
+         slF54Z.
+
+     4)  If an invalid SYSTEM is supplied, values of -99D0,-99D0 will
+         be returned for both RA and DC.
+
+  P.T.Wallace   Starlink   20 April 1990
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

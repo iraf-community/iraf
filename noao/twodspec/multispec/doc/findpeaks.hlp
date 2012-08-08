@@ -1,0 +1,88 @@
+.help findpeaks Jul84 noao.twodspec.multispec
+.ih
+NAME
+findpeaks -- Find peaks in a multi-spectra image
+.ih
+USAGE
+findpeaks image lines contrast
+.ih
+PARAMETERS
+.ls image
+Image to be searched.
+.le
+.ls lines
+Sample image lines in which the peaks are to be found.
+.le
+.ls contrast
+Maximum contrast between the highest peak and the lowest peak.
+.le
+.ls separation = 5
+Minimum separation in pixels between acceptable peaks.
+.le
+.ls edge = 0
+Minimum distance in pixels to the edge of the image for acceptable peaks.
+.le
+.ls threshold = 0.
+The minimum acceptable peak pixel value.
+.le
+.ls min_npeaks = 1
+Minimum number of peaks to be found.  It is an error for fewer than
+this number of peaks to be found.
+.le
+.ls max_npeaks = 1000
+Maximum number of peaks to be found.  If more than this number of peaks
+is found then only the those with the highest peak values are accepted.
+.le
+.ls columns = '*'
+Columns to be searched.
+.le
+.ls naverage = 20
+Number of image lines around the sample line to be averaged before
+finding the peaks.
+.le
+.ls debug = no
+Print detailed information on the progress of the peak finding algorithm.
+.le
+.ih
+DESCRIPTION
+For each specified sample image line the number of peaks and their column
+positions in the image are determined.
+The number of peaks and their positions are assumed to correspond to points
+along the spectra.  This information is entered in the MULTISPEC database.
+
+The \fInaverage\fR image lines about the specified sample line are first
+averaged.  The local maxima in the average line are then located
+in the specified columns more than the minimum distance from the edge of the
+image.  A minimum peak pixel value cutoff is determined as the maximum of
+the specified \fIthreshold\fR and \fIcontrast\fR times the largest peak pixel
+value.  All local maxima with pixel values below the cutoff are rejected.
+Next all peaks with separations less than \fIseparation\fR from a stronger
+peak are rejected.  Finally, if there are more than \fImax_npeaks\fR remaining
+only the \fImax_npeaks\fR strongest peaks are accepted.  If fewer
+than \fImin_npeaks\fR are found then the task quits with an error.
+
+If the number of spectra has been previously determined, such as by an earlier
+use of \fBfindpeaks\fR, then it is an error if a different number of
+peaks is found.
+.ih
+EXAMPLES
+The parameters of this task provide a great deal of flexibility in
+automatically determining the number and positions of the peaks.  
+The most automatic method just uses the contrast to limit the acceptable
+peaks:
+
+	cl> findpeaks image.db 1 .1
+
+However, if the number of spectra in the image is known:
+
+	cl> findpeaks image.db 1 0 min=10 max=10
+
+or if a threshold is known:
+
+	cl> findpeaks image.db 1 0 threshold = 1000
+
+For a noisy image the separation parameter can be set to eliminate spurious
+noise peaks near the peaks to be found:
+
+	cl> findpeaks image.db 1 .1 sep=20
+.endhelp

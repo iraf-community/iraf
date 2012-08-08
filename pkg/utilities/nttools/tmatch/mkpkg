@@ -1,0 +1,20 @@
+# Update the tmatch application code in the ttools package library
+# Author: B.Simon, 30-Aug-94
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	getmatch.x	
+	getnorm.x	<math.h>
+	getweight.x	<math.h>  <tbset.h>
+	infomatch.x	<tbset.h>
+	putmatch.x	<tbset.h>
+	rowname.x	
+	setindex.x	
+	sortclose.x	
+	sortdist.x	
+	tmatch.x	<tbset.h>
+	;

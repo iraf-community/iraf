@@ -1,0 +1,70 @@
+# PSF task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	dpaddstar.x	<imhdr.h>		<mach.h>                    \
+	                ../lib/daophotdef.h	../lib/psfdef.h
+	dpcontpsf.x	<error.h>		<mach.h>                    \
+			<gset.h>		<config.h>                  \
+			<xwhen.h>		<fset.h>                    \
+			../lib/daophotdef.h	../lib/psfdef.h
+	dpdelstar.x	<imhdr.h>		../lib/daophotdef.h         \
+			../lib/psfdef.h         <mach.h>
+	dpfitpsf.x	<mach.h>                <imhdr.h>                   \
+			../lib/daophotdef.h	../lib/apseldef.h           \
+			../lib/psfdef.h		../lib/peakdef.h
+	dplocstar.x	<mach.h>		<imhdr.h>                   \
+			../lib/daophotdef.h	../lib/apseldef.h           \
+			../lib/psfdef.h
+	dpispstars.x	<fset.h>		<ctype.h>		    \
+			<gset.h>                ../lib/daophotdef.h	    \
+			../lib/apseldef.h	../lib/psfdef.h
+	dppcolon.x	../lib/daophotdef.h	../lib/psfdef.h
+	dpqverify.x	<fset.h>
+	dpmempsf.x	../lib/daophotdef.h	../lib/psfdef.h
+	dpmkpsf.x	<imhdr.h>               <ctype.h>                   \
+			<gset.h>                ../lib/daophotdef.h	    \
+			../lib/apseldef.h       ../lib/psfdef.h
+	dppconfirm.x
+	dppsfutil.x	../lib/daophotdef.h     ../lib/apseldef.h           \
+			../lib/psfdef.h
+	dpplotpsf.x	../lib/daophotdef.h	../lib/psfdef.h
+	dppset.x	../lib/daophotdef.h     ../lib/psfdef.h
+	dppstat.x	../lib/daophotdef.h	../lib/psfdef.h
+	dppsubrast.x	<mach.h>		<imhdr.h>		    \
+			../lib/daophotdef.h	../lib/psfdef.h
+	dpptconfirm.x
+	dppwrtgrp.x	<time.h>		<tbset.h>                   \
+			../lib/daophotdef.h	../lib/apseldef.h           \
+			../lib/psfdef.h
+	dppwselmer.x	<tbset.h>		../lib/apseldef.h
+	dpradpsf.x	<gset.h>		../lib/daophotdef.h	    \
+			../lib/psfdef.h
+	dprmpsf.x	<fset.h>		<imhdr.h>                   \
+			../lib/daophotdef.h	../lib/psfdef.h
+	dprstars.x	<gset.h>                <tbset.h>		    \
+	                ../lib/apseldef.h       ../lib/psfdef.h
+	dpshowpsf.x	<mach.h>		<ctype.h>                   \
+			../lib/daophotdef.h     ../lib/psfdef.h
+	dpspstars.x	<mach.h>		../lib/daophotdef.h	    \
+			../lib/apseldef.h	../lib/psfdef.h
+	dpsubpsf.x	<mach.h>		<imhdr.h>                   \
+			../lib/daophotdef.h     ../lib/psfdef.h
+	dpsurfpsf.x	<error.h>		<mach.h>                    \
+			<gset.h>		<config.h>                  \
+			<xwhen.h>		<fset.h>                    \
+			../lib/daophotdef.h	../lib/psfdef.h
+	dpwritepsf.x	<time.h>		<imhdr.h>                   \
+			../lib/daophotdef.h	../lib/apseldef.h           \
+			../lib/psfdef.h
+	t_psf.x		<fset.h>		<gset.h>                    \
+			<imhdr.h>               ../lib/daophotdef.h	    \
+			../lib/apseldef.h	../lib/psfdef.h
+	t_pstselect.x	<fset.h>		<gset.h>		    \
+			<imhdr.h>               ../lib/daophotdef.h	    \
+			../lib/apseldef.h       ../lib/psfdef.h
+	;

@@ -1,0 +1,5 @@
+# Root help directory for the LOCAL packages.  This dummy package is necessary
+# in order to have `local' appear as a module in some package, so that the user
+# can type "help local" (with the `local' given as a task).
+
+_local		pkg = local$lib/rootlocal.hd

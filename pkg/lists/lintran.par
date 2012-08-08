@@ -1,0 +1,12 @@
+files,s,a,,,,
+xfield,i,h,1,1,100,field containing x coordinate
+yfield,i,h,2,1,100,field containing y coordinate
+min_sigdigits,i,h,3,,,minimum significant digits to be output
+x1,r,h,0.0,,,current x origin
+y1,r,h,0.0,,,current y origin
+xscale,r,h,1.0,,,scale factor relative to current origin
+yscale,r,h,1.0,,,scale factor relative to current origin
+angle,r,h,0.0,,,rotation angle 
+x2,r,h,0.0,,,new x origin
+y2,r,h,0.0,,,new y origin
+radians,b,h,no,,,angle in radians?

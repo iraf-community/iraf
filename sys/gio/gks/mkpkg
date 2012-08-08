@@ -1,0 +1,58 @@
+# Make the GKS emulator.
+
+$checkout libgks.a lib$
+$update	  libgks.a
+$checkin  libgks.a lib$
+$exit
+
+libgks.a:
+	gacwk.x		gks.com gks.h
+	gca.x		gks.com gks.h <gset.h>
+	gcas.x		gks.com gks.h <gset.h>
+	gclks.x
+	gclrwk.x	gks.com gks.h
+	gclwk.x		gks.com gks.h
+	gdawk.x		gks.com gks.h
+	gfa.x		gks.h <gset.h> gks.com
+	gopks.x		gks.com gks.h
+	gopwk.x		gks.com gks.h
+	gpl.x		gks.com gks.h
+	gpm.x		gks.com gks.h <gset.h>
+	gqasf.x		gks.com gks.h
+	gqchh.x		gks.com gks.h <gset.h>
+	gqchup.x	gks.com gks.h <gset.h>
+	gqclip.x 	gks.com gks.h <gset.h> 
+	gqcntn.x	gks.com gks.h <gset.h>
+	gqmk.x		gks.com gks.h <gset.h>
+	gqnt.x		gks.com gks.h <gset.h>
+	gqopwk.x	gks.com gks.h
+	gqplci.x	gks.com gks.h <gset.h>
+	gqpmci.x	gks.com gks.h <gset.h>
+	gqpmi.x		gks.com gks.h <gset.h>
+	gqtxal.x	gks.com gks.h <gset.h>
+	gqtxci.x	gks.com gks.h <gset.h>
+	gqtxp.x		gks.com gks.h <gset.h>
+	gqwks.x		gks.com gks.h
+	gsasf.x		gks.com gks.h
+	gsaw.x		gks.com gks.h <gset.h>
+	gschh.x		gks.com gks.h <gset.h>
+	gschup.x	<gset.h>
+	gsclip.x	<gset.h>
+	gscr.x		gks.com gks.h <gset.h>
+	gselnt.x	<gset.h>
+	gsfaci.x	gks.com gks.h <gset.h>
+	gsfais.x	gks.com gks.h <gset.h>
+	gslwsc.x	gks.com gks.h <gset.h>
+	gsmk.x		gks.com gks.h <gset.h>
+	gsmksc.x	gks.com gks.h <gset.h>
+	gsplci.x	<gset.h>
+	gspmci.x	<gset.h>
+	gspmi.x		<gset.h>
+	gstxal.x	gks.h <gset.h>
+	gstxci.x	<gset.h>
+	gstxp.x		gks.h <gset.h>
+	gsvp.x		gks.com gks.h <gset.h>
+	gswn.x		gks.com gks.h <gset.h>
+	gtx.f
+	gxgtx.x		gks.com gks.h <gset.h>
+	;

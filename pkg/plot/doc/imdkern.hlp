@@ -1,0 +1,105 @@
+.help imdkern Mar90 plot
+.ih
+NAME
+imdkern -- image display device graphics kernel
+.ih
+USAGE
+imdkern input
+.ih
+PARAMETERS
+.ls input
+The list of input metacode files.
+.le
+.ls device = "stdimage"
+The output device.
+.le
+.ls generic = no
+The remaining parameters are ignored when \fBgeneric\fR = yes (as when
+the kernel is called automatically by the system during plotting).
+.le
+.ls frame = 0
+The display frame to be drawn into.  If the value given is less than or
+equal to zero, the plot is drawn into the frame currently being displayed.
+.le
+.ls color = 205
+The pixel value to be used for graphics.  The value required to generate
+a given color is device dependent.  For IMTOOL and compatible display servers
+(such as SAOIMAGE) black=202, white=203, red=204, green=205, blue=206,
+yellow=207, and so on through 217.  (The \fItvmark\fR help page contains
+a full listing of the available colors).
+.le
+.ls debug = no
+If \fBdebug\fR = yes, the graphics instructions are decoded and printed
+during processing.
+.le
+.ls verbose = no
+If \fBverbose\fR = yes, the elements of polylines, cell arrays, etc. will
+be printed in debug mode.
+.le
+.ls gkiunits = no
+By default, coordinates are printed in NDC rather than GKI units.
+.le
+.ih
+DESCRIPTION
+The \fIimdkern\fR graphics kernel is used to draw graphics into the image
+display.  To overlay a plot on a displayed image, one first displays the
+image, then runs \fIimdkern\fR to overlay the graphics on the displayed image.
+\fIimdkern\fR always overlays a plot on whatever is currently in the display
+frame buffer.  To erase the graphics drawn by \fIimdkern\fR, one must
+redisplay the frame using \fIdisplay\fR or a similar program, or erase the
+frame entirely using \fItv.erase\fR.
+
+Like all IRAF graphics kernels, \fIimdkern\fR may be called either explicitly
+as a task, to plot a graphics metacode file, or implicitly when the output
+of a graphics task is directed to a device which uses the IMD kernel.
+The standard IRAF \fIgraphcap\fR file defines the following logical IMD
+graphics devices:
+
+.nf
+	imd|imdkern	same as imdg
+	imdw		output to stdimage, frame=0, color=white
+	imdr		output to stdimage, frame=0, color=red
+	imdg		output to stdimage, frame=0, color=green
+	imdb		output to stdimage, frame=0, color=blue
+	imdy		output to stdimage, frame=0, color=yellow
+.fi
+
+As noted earlier, \fIframe=0\fR causes the graph to be plotted in the
+currently displayed image display frame.
+.ih
+EXAMPLES
+1. Capture the output of the \fIprow\fR task in a metacode file and
+plot in image display frame 2.
+
+.nf
+    cl> prow dev$pix 101 >G mc
+    cl> imdkern mc frame=2
+.fi
+
+2. Display dev$pix in image display frame 1 and overlay a contour plot,
+drawing the contour plot overlaid on the image in green.
+
+.nf
+    cl> display dev$pix 1
+    cl> contour dev$pix \
+    >>> xres=256 yres=256 perim- fill+ label- ceil=500 dev=imdg
+.fi
+
+Note that a higher than normal resolution contour plot is generated to
+avoid the contour placement errors that occur when a large block averaging
+factor is used to generate the contour map (this can make contours drawn
+around objects such as stars appear to not be centered on the object).
+.ih
+BUGS
+The IMD interface, used by this task to draw the graphics, requires that the
+display frame buffer be read and edited in the client address space, hence
+drawing is slow compared to having the display server draw the graphics.
+This effect is especially noticeable when the display is accessed remotely
+over the network.  Also, because the graph is drawn in the client
+(i.e., in \fIimdkern\fR) the GIO fonts must be used for character drawing,
+so characters will not be as well formed as when display server character
+generation is used.
+.ih
+SEE ALSO
+tvmark, display
+.endhelp

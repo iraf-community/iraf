@@ -1,0 +1,55 @@
+.help cvepower Jun95 "Curfit Package"
+.ih
+NAME
+cvepower -- compute the errors of the equivalent power series
+.ih
+SYNOPSIS
+cvepower (cv, y, weight, yfit, npts, chisqr, errors)
+
+.nf
+pointer	cv		# curve descriptor
+real	y[]		# array of y data points
+weight	weight[]	# array of weights
+real	yfit[]		# array of fitted data points
+int	npts		# number of points
+real	chisqr		# the standard deviation of the fit
+real	errors[]	# standard deviations of the power series coefficients
+.fi
+.ih
+ARGUMENTS
+.ls cv     
+Pointer to the curve descriptor structure
+.le
+.ls y   
+Array of y data points
+.le
+.ls yfit  
+Array of fitted y values
+.le
+.ls npts
+The number of points
+.le
+.ls chisqr
+Reduced chi-squared of the fit.
+.le
+.ls errors
+Array of standard deviations of the equivalent power series coefficients.
+.le
+.ih
+DESCRIPTION
+Calculate the reduced chi-squared of the fit and the standard deviation
+of the equivalent power series coefficients for fitted Legendre and
+Chebyshev polynomials. The errors are rescaled to the equivalent power 
+series and to the original data range.
+.ih
+NOTES
+The standard deviation of the fit is the square root of the sum of the
+weighted squares of the residuals divided by the number of degrees of freedom.
+If the weights are equal, then the reduced chi-squared is the
+variance of the fit
+The error of the j-th coefficient is the square root of the j-th diagonal
+element of the inverse of the data matrix. If the weights are equal to one,
+then the errors are scaled by the square root of the variance of the data.
+.ih
+SEE ALSO
+.endhelp

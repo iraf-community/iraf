@@ -1,0 +1,79 @@
+.help hdfit Mar88 imred.dtoi
+.ih
+NAME
+hdfit -- fit characteristic curve to density, exposure data
+.ih
+USAGE
+hdfit database 
+.ih
+PARAMETERS
+.ls database
+Database[s] containing the density, log exposure information.
+.le
+.ls function = "power"
+Type of curve to fit; chosen from "power", "legendre", "chebyshev", 
+"spline1" or "spline3".  Abbreviations are permitted.
+.le
+.ls transform = "logopacitance"
+Transformation performed on the density prior to fitting.  Chosen from
+"none", "logopacitance", "k50" or "k75". 
+.le
+.ls weighting = "none"
+Weights can be assigned to the independent variable for fitting a curve.
+Choices are "none", "user" and "calculated".
+.le
+.ls order = 4
+Order of the fit.
+.le
+.ls interactive = yes
+Fit the data interactively?
+.le
+.ls device = "stdgraph"
+Interactive graphics device.
+.le
+.ls cursor = "stdgcur"
+Source of cursor input.
+.le
+.ih
+DESCRIPTION
+Task \fIhdfit\fR is used to fit a curve to density and log exposure
+values in preparation for transforming an image from density to intensity.
+The log exposure and density are read from \fBdatabase\fR.
+More than one database can be input,
+in which case one curve is fit to the combined data and the results
+written to each database in the list.
+
+Weights can be applied to the independent variable of the fit.
+Weights can be changed interactively, and are originally chosen from
+"none", "user" and "calculated".  A weights value can
+be calculated from the standard deviations, read from \fBdatabase\fR,
+as weight = (normalized density) / sdev.  If user weights are to be
+used, they are read from \fBdatabase\fR record "weights" as "wts_vals"
+entries.  
+
+When \fBinteractive\fR = yes, the HD curve is plotted and the cursor
+made available for interactively examining and altering the fit.
+The fitting function, transformation and order can be modified; data
+points can be added, deleted or edited.  Four choices of independent
+variable are available in \fBhdfit\fR by means of the parameter 
+\fBtransform\fR.  No transformation can take place, in which case
+the independent variable is the density.  Other choices are the log
+opacitance or a Kaiser transform with alpha = 0.50 or 0.75.  The
+default choice is to fit log exposure as a function of the log opacitance; 
+this is traditionally known as the Baker-Seidel function.
+.ih
+EXAMPLES
+.nf
+Using the defaults as starting parameters, interactively fit a curve to
+the data points in db1.
+
+	cl> hdfit db1 
+
+A sixth order power series function is fit in batch mode to the db1 data.
+
+	cl> hdfit db1 order=6 interactive-
+.fi
+.ih
+SEE ALSO
+spotlist, dematch, hdtoi
+.endhelp

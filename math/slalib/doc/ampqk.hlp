@@ -1,0 +1,65 @@
+.help ampqk Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slAMPQ (RA, DA, AMPRMS, RM, DM)
+
+     - - - - - -
+      A M P Q
+     - - - - - -
+
+  Convert star RA,Dec from geocentric apparent to mean place
+
+  The mean coordinate system is the post IAU 1976 system,
+  loosely called FK5.
+
+  Use of this routine is appropriate when efficiency is important
+  and where many star positions are all to be transformed for
+  one epoch and equinox.  The star-independent parameters can be
+  obtained by calling the slMAPA routine.
+
+  Given:
+     RA       d      apparent RA (radians)
+     DA       d      apparent Dec (radians)
+
+     AMPRMS   d(21)  star-independent mean-to-apparent parameters:
+
+       (1)      time interval for proper motion (Julian years)
+       (2-4)    barycentric position of the Earth (AU)
+       (5-7)    heliocentric direction of the Earth (unit vector)
+       (8)      (grav rad Sun)*2/(Sun-Earth distance)
+       (9-11)   ABV: barycentric Earth velocity in units of c
+       (12)     sqrt(1-v**2) where v=modulus(ABV)
+       (13-21)  precession/nutation (3,3) matrix
+
+  Returned:
+     RM       d      mean RA (radians)
+     DM       d      mean Dec (radians)
+
+  References:
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+
+  Notes:
+
+  1)  The accuracy is limited by the routine slEVP, called
+      by slMAPA, which computes the Earth position and
+      velocity using the methods of Stumpff.  The maximum
+      error is about 0.3 milliarcsecond.
+
+  2)  Iterative techniques are used for the aberration and
+      light deflection corrections so that the routines
+      slAMP (or slAMPQ) and slMAP (or slMAPQ) are
+      accurate inverses;  even at the edge of the Sun's disc
+      the discrepancy is only about 1 nanoarcsecond.
+
+  Called:  slDS2C, slDIMV, slDVDV, slDVN, slDC2S,
+           slDA2P
+
+  P.T.Wallace   Starlink   21 June 1993
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

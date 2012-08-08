@@ -1,0 +1,19 @@
+# The image to text file conversion program WTEXTIMAGE makes the following
+# contributions to the dataio package library:
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	putcplx.x		 <imhdr.h> <mach.h>
+	putint.x	         <imhdr.h> <mach.h> <ctype.h>
+	putreal.x	         <imhdr.h> <mach.h>
+	wti_wheader.x	imtext.h <imhdr.h> <mach.h> <imio.h>
+	t_wtextimage.x	imtext.h <imhdr.h> <mach.h> <ctype.h> <fset.h> <error.h>
+	rt_rheader.x	imtext.h <imhdr.h> <imio.h>
+	rt_cvtpix.x     imtext.h <imhdr.h>
+	rt_rwpix.x	imtext.h <imhdr.h> <ctype.h>
+	t_rtextimage.x  imtext.h <imhdr.h> <error.h>
+	;

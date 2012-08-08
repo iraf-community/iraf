@@ -1,0 +1,32 @@
+# ACEEVALUATE
+
+images,f,a,,,,"List of images"
+incatalogs,s,a,"",,,"List of input catalogs"
+outcatalogs,s,a,"",,,"List of output catalogs"
+objmasks,s,h,"",,,"List of object masks"
+catdefs,s,h,"",,,"List of catalog definitions"
+skys,s,h,"",,,"List of sky maps"
+sigmas,s,h,"",,,"List of sigma maps"
+exps,s,h,"",,,"List of exposure maps"
+gains,s,h,"",,,"List of gain maps"
+logfiles,s,h,"STDOUT",,,"List of log files
+
+# Sky"
+skytype,s,h,"block","fit|block",,"Type of sky estimation
+
+# Sky Fitting"
+fitstep,i,h,100,1,,"Line step for sky sampling"
+fitblk1d,i,h,10,,,"Block average for line fitting"
+fithclip,r,h,2.,,,"High sky clipping during 1D sky estimation"
+fitlclip,r,h,3.,,,"Low sky clippling during 1D sky estimation"
+fitxorder,i,h,1,1,,"Sky fitting x order"
+fityorder,i,h,1,1,,"Sky fitting y order"
+fitxterms,s,h,"half","none|full|half",,"Sky fitting cross terms
+
+# Sky Blocks"
+blkstep,i,h,10,1,,"Line step for sky sampling"
+blksize,i,h,2,,,"Block size (+=pixels, -=blocks)"
+blknsubblks,i,h,3,1,,"Number of subblocks per axis
+
+# Evaluate"
+magzero,s,h,"INDEF",,,"Magnitude zero point"

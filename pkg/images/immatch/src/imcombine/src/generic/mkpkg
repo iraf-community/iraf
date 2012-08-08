@@ -1,0 +1,27 @@
+# Make IMCOMBINE.
+
+$checkout libimc.a lib$
+$update   libimc.a
+$checkin  libimc.a lib$
+$exit
+
+libimc.a:
+	icaclip.x	../icombine.com ../icombine.h
+	icaverage.x	../icombine.com ../icombine.h <imhdr.h>
+	iccclip.x	../icombine.com ../icombine.h
+	icgdata.x	../icombine.com ../icombine.h <imhdr.h> <mach.h>
+	icgrow.x	../icombine.com ../icombine.h <imhdr.h> <pmset.h>
+	icmedian.x	../icombine.com ../icombine.h
+	icmm.x		../icombine.com ../icombine.h
+	icnmodel.x	../icombine.com ../icombine.h <imhdr.h>
+	icomb.x		../icombine.com ../icombine.h <error.h> <imhdr.h>\
+			<imset.h> <mach.h> <pmset.h> <syserr.h>
+	icpclip.x	../icombine.com ../icombine.h
+	icquad.x	../icombine.com ../icombine.h <imhdr.h>
+	icsclip.x	../icombine.com ../icombine.h
+	icsigma.x	../icombine.com ../icombine.h <imhdr.h>
+	icsort.x	
+	icstat.x	../icombine.com ../icombine.h <imhdr.h>
+
+	xtimmap.x	xtimmap.com <config.h> <error.h> <imhdr.h> <imset.h>
+	;

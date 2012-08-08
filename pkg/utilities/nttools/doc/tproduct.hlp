@@ -1,0 +1,48 @@
+.help tproduct Dec90 tables
+.ih
+NAME
+tproduct -- Form the Cartesian product of two tables.
+.ih
+USAGE
+tproduct intable1 intable2 outtable
+.ih
+DESCRIPTION
+This task creates an output table which is the Cartesian product of two input
+tables. This Cartesian product consists of every possible combination of the
+rows of the two input tables. Therefore, the number of rows in the output table
+is the product of the number of rows in the two input tables. The output table
+will contain all the columns from both input tables. If a column name in the
+first input table is the same as a column name in the second input table, this
+task tries to create a unique name by appending "_1" to the first name and "_2"
+to the second name. If the task cannot create a unique name in this way, it
+stops with an error. 
+.ih
+PARAMETERS
+.ls intable1 [file name]
+First input table.
+.le
+.ls intable2 [file name]
+Second input table.
+.le
+.ls outtable [file name]
+Output table containing the possible Cartesian products.
+.le
+.ih
+EXAMPLES
+1. Find all persons sharing a phone from a phone list:
+
+.nf
+tt> tproduct phone.tab phone.tab phone.tmp
+tt> tselect phone.tmp share.tmp "phone_1 == phone_2 && name_1 < name_2"
+tt> tproject share.tmp share.tab phone_2 inc-
+tt> delete *.tmp
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+tselect, tproject, tjoin
+.endhelp

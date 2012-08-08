@@ -1,0 +1,10 @@
+input,s,a,,,,Input images
+output,s,a,,,,Output image
+title,s,h,"",,,Title for output image
+hparams,s,h,"",,,List of header parameters
+pixtype,s,h,"",,,Pixel datatype of output image
+calctype,s,h,"",,,Calculation type
+option,s,h,"sum","sum|average|median",,Output option
+low_reject,r,h,0,,,Fraction or number of low pixels to reject
+high_reject,r,h,0,,,Fraction or number of high pixels to reject
+verbose,b,h,no,,,Print log of operation?

@@ -1,0 +1,21 @@
+# Make IMUTIL.
+
+$checkout libpkg.a ../../../
+$update   libpkg.a
+$checkin  libpkg.a ../../../
+$exit
+
+libpkg.a:
+        imaadd.x        <imhdr.h>
+        imadiv.x        <imhdr.h>
+        imamax.x        <imhdr.h>
+        imamin.x        <imhdr.h>
+        imamul.x        <imhdr.h>
+        imanl.x         <imhdr.h>
+        imasub.x        <imhdr.h>
+        imfuncs.x       <imhdr.h> <mach.h> <math.h>
+	imjoin.x	<imhdr.h>
+	imrep.x		<imhdr.h> <mach.h>
+        imsum.x         ../imsum.h <imhdr.h>
+        ;
+

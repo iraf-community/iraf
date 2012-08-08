@@ -1,0 +1,26 @@
+.TH PCHISQ 3M
+.SH NAME
+pchisq
+.SH DESCRIPTION
+function pchisq.f
+
+source
+  Bevington, pages 192-193.
+
+purpose
+  evaluate probability for exceeding chi square
+
+usage
+  result = pchisq (chisqr, nfree)
+
+description of parameters
+  chisqr - comparison value of reduced chi square
+  nfree  - number of degrees of freedom
+
+subroutines and function subprograms required
+  gamma (x)
+    calculates gamma function for integers and 1/2-integers
+
+comments
+  calculation is approximate for nfree odd and
+    chi square greater than 50

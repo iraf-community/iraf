@@ -1,0 +1,284 @@
+.help voimage Aug06 nvo
+.ih
+NAME
+voimage -- Call a VO image (Simple Image Access) service
+.ih
+USAGE
+voimage service ra dec ra_size dec_size
+.ih
+PARAMETERS
+.ls service
+Base service-URL of the requested SIAP service, or the \fIShortName\fR
+or \fIIdentifier\fR field of the resource that can be resolved to the
+service-URL using the \fIregResolver()\fR VO-CL built-in function.
+.le
+.ls ra, dec
+Right Ascension and Declination (or Longitude/Latitude) of the query in
+decimal degrees.  Note that the CL permits the use of sexagesimal numbers,
+however RA values should be explicity multiplied by 15 to get the proper
+units.
+.le
+.ls ra_size, dec_size
+Search box size in RA and Dec in decimal degrees.
+.le
+.ls insystem = "icrs"
+The input celestial coordinate system. The \fIinsystem\fR parameter
+sets the preferred units for the input celestial coordinates, and
+tells VOCATALOG how to transform the input celestial coordinates
+to the ICRS decimal degrees required for the query.  The systems of most
+interest to users are "icrs", "j2000", and "b1950".  The full set
+of options are the following:
+
+.ls degrees
+The input coordinates are assumed to be in equatorial decimal degrees
+and will not be transformed.
+.le
+.ls equinox [epoch]
+The equatorial mean place post-IAU 1976 (FK5) system if equinox is a
+Julian epoch, e.g. J2000.0 or 2000.0, or the equatorial mean place
+pre-IAU 1976 system (FK4) if equinox is a Besselian epoch, e.g. B1950.0
+or 1950.0. Julian equinoxes are prefixed by a J or j, Besselian equinoxes
+by a B or b. Equinoxes without the J / j or B / b prefix are treated as
+Besselian epochs if they are < 1984.0, Julian epochs if they are >= 1984.0.
+Epoch is the epoch of the observation and may be a Julian
+epoch, a Besselian epoch, or a Julian date. Julian epochs
+are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to the epoch type of
+equinox if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls icrs [equinox] [epoch]
+The Internaltion Celestial Refernce System (ICRS) where equinox is
+a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
+Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
+The default value of equinox is J2000.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls fk5 [equinox] [epoch]
+The equatorial mean place post-IAU 1976 (FK5) system where equinox is
+a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
+Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
+The default value of equinox is J2000.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls fk4 [equinox] [epoch]
+The equatorial mean place pre-IAU 1976 (FK4) system where equinox is a
+Besselian or Julian epoch e.g. B1950.0  or J2000.0,
+and epoch is the Besselian epoch, the Julian epoch, or the Julian date of the
+observation.
+Equinoxes without the J / j or B / b prefix are treated
+as Besselian epochs. The default value of equinox is B1950.0. Epoch
+is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls noefk4 [equinox] [epoch]
+The equatorial mean place pre-IAU 1976 (FK4) system but without the E-terms
+where equinox is a Besselian or Julian epoch e.g. B1950.0 or J2000.0,
+and epoch is the Besselian epoch, the Julian epoch, or the Julian date of the
+observation.
+Equinoxes without the J / j or B / b prefix are treated
+as Besselian epochs. The default value of equinox is B1950.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian day.  If undefined epoch defaults to equinox.
+.le
+.ls apparent epoch
+The equatorial geocentric apparent place post-IAU 1976 system where
+epoch is the epoch of observation.
+Epoch is a Besselian epoch, a Julian epoch or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian
+epochs if the epoch value < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.
+.le
+.ls ecliptic epoch
+The ecliptic coordinate system where epoch is the epoch of observation.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch values < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian day.
+.le
+.ls galactic [epoch]
+The IAU 1958 galactic coordinate system.
+Epoch is a Besselian epoch, a Julian epoch or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian
+epochs if the epoch value < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date. The default value of epoch is B1950.0.
+.le
+.ls supergalactic [epoch]
+The deVaucouleurs supergalactic coordinate system.
+Epoch is a Besselian epoch, a Julian epoch or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian
+epochs if the epoch value < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date. The default value of epoch is B1950.0.
+.le
+
+In all the above cases fields in [] are optional with the defaults as
+described. The epoch field for the icrs, fk5, galactic, and supergalactic
+coordinate systems is only used if the input coordinates are in the
+equatorial fk4, noefk4, fk5, or icrs systems and proper motions are supplied.
+Since VOIMAGE does not support proper motions these fields are
+not required.
+.le
+.ls image = ""
+Name of image used to supply search parameters.  If set, and if the image
+contains a valid WCS, the \fBra\fR, \fBdec\fR, and \fBra_size\fB/\fBdec_size\fR
+will be determined from the image center and size.
+.le
+.ls output = "STDOUT"
+Output filename.  If something other than 'STDOUT' the results of the search 
+will be written to this file in the format specified by the \fBotype\fR 
+parameter.
+.le
+.ls otype = "ascii"
+Output catalog type.  The default return from a Cone service is a standard
+VOTable (xml format).  This table may be automatically converted to some
+other format for use by other tasks by resetting this parameter.  Allowed
+output table types include:
+.ls ascii
+Simple space-separated ASCII file format.  Note that string values in the
+original VOTable will be quoted.
+.le
+.ls csv
+Comma-Separated Value format. The first line is a header which contains 
+the column names.
+.le
+.ls fits
+Convert VOTable to FITS binary table.  Primary HDU is data-less, first
+extension contains a FITS binary table.
+.le
+.ls votable
+Do not process returned VOTable and output it directly.
+.le
+
+For a full description of the supported STILTS output formats see
+.nf
+
+  http://www.star.bris.ac.uk/~mbt/stilts/sun256/outFormats.html
+.fi
+.le
+.ls verbose = yes
+Verbose output?
+.le
+.ls status = ""
+Status return code of the web service (output).
+.le
+
+.ih
+DESCRIPTION
+
+The \fBSIAPCALLER\fR task invokes the SIAP (Simple Image Access Protocol)
+service at the \fBservice\fR
+base URL.  This service URL may be explicitly defined by the user, or else
+can be determined from the Registry entry for a known service.  If the
+\fBimage\fR parameter is specified, the search center and size is determined
+from the image WCS and are assumed to be J2000 equatorial coordinates. 
+Otherwise the \fBra\fR, \fBdec\fR, and \fBra_size\fR/\fBdec_size\fR
+parameters are used as
+parameters for the search.  In this case, the \fBinsystem\fR parameter defines
+the input coordinate system and values are converted to the required units
+automatically.
+
+A SIAP search returns the IVOA standard \fBVOTable\fR format XML file.  This
+file may be converted automatically to another type by setting the \fBotype\fR 
+parameter to one of the output formats supported by the STILTS tools.  Results
+are written to the STDOUT unless the \fBoutput\fR  parameter is set.
+
+.ih
+EXAMPLES
+1. Count the number of available HST Preview images within 0.25 degrees 
+of M31:
+
+.nf
+  nvo> sesame m31
+  nvo> voimage regResolver("hst previews","siap") \
+  >>>     sesame.ra sesame.dec 0.25 0.25 | count STDIN
+      682   24103  408831  STDIN
+.fi
+
+Note we invoke the VO-CL regResolver() builtin function to automatically
+find the ServiceUrl for a HST Previews SIAP service from the VO Registry.
+
+2. Repear the above query but save the results to a FITS file for further
+inspection
+
+.nf
+  nvo> sesame m31
+  nvo> voimage regResolver("hst previews","siap") \
+  >>>     sesame.ra sesame.dec 0.25 0.25 otype=fits output=hst.fits
+      682   24103  408831  STDIN
+.fi
+
+Now inspect the table for the returned columns (since the SIA standard
+requires only a few columns, but services are free to return extra metadata):
+
+.nf
+  nvo> tables
+  tables> ttools
+  ttools> tlcol hst.fits
+  # hst.fits[1]
+  filename         CH*36       %-36s ""              
+  id               CH*15       %-15s ""              
+  ra_j2000         D         %25.16g degrees         
+  dec_j2000        D         %25.16g degrees         
+  url              CH*77       %-77s seconds         
+  filesize         I            %11d bytes           
+  mjdmean          D         %25.16g days            
+  naxes            I            %11d ""              
+  naxis            I[2]         %11d pixels          
+  scale            D[2]      %25.16g degrees/pixel   
+  cd               D[4]      %25.16g ""              
+  format           CH*10       %-10s ""              
+  ref_frame        CH*3         %-3s ""              
+  equinox          R          %15.7g ""              
+  coord_projection CH*3         %-3s ""              
+  crpix            D[2]      %25.16g pixels          
+  crval            D[2]      %25.16g pixels          
+  ctype            CH*17       %-17s ""              
+  bandpass_id      CH*25       %-25s ""              
+  bandpass_refvalue D         %25.16g meters          
+  bandpass_unit    CH*6         %-6s meters          
+  bandpass_hilimit D         %25.16g meters          
+  bandpass_lolimit D         %25.16g meters          
+  processing       CH*1         %-1s ""              
+  project          CH*10       %-10s ""              
+  preview          CH*1         %-1s ""              
+  representative   CH*1         %-1s ""              
+  object_id        CH*25       %-25s ""     
+.fi
+
+Given the large number of observations, plot a histogram of the observation
+dates on a monthly binning to see when these were taken:
+
+.nf
+  ttools> thistogram hst.fits STDOUT col=mjdmean low=48200 \
+  >>>         high=5200 dx=30 | graph
+.fi
+  
+.ih
+REVISIONS
+.le
+.ih
+SEE ALSO
+voclient, vocatalog, stilts
+.endhelp

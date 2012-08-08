@@ -1,0 +1,11 @@
+Filename               Total   Blanks   Comments   Help    Execute   Nonexec
+============================================================================
+  titable.x               81       18         16       0         23       24
+  tiupdate.x              42       13         11       0          7       11
+  tinew.x                 96       24         21       0         30       21
+  tinsert.x              104       23         17       0         41       23
+  tisetc.x                70       17         14       0         20       19
+  ticopy.x               107       23         16       0         45       23
+  ticc.x                  53       11          7       0         22       13
+  tiheader.x             189       57         27       0         62       43
+TOTAL                    742      186        129       0        250      177

@@ -1,0 +1,20 @@
+input,s,a,,,,Input images
+output,s,a,,,,Output images
+minput,s,h,"",,,Input masks
+moutput,s,h,"",,,Output masks
+fitnames,s,a,,,,Names of coordinate fits in the database
+database,f,h,database,,,Identify database
+interptype,s,h,spline3,"nearest|linear|poly3|poly5|spline3",,Interpolation type
+x1,r,h,INDEF,,,Output starting x coordinate
+x2,r,h,INDEF,,,Output ending x coordinate
+dx,r,h,INDEF,,,Output X pixel interval
+nx,r,h,INDEF,,,Number of output x pixels
+xlog,b,h,no,,,Logarithmic x coordinate?
+y1,r,h,INDEF,,,Output starting y coordinate
+y2,r,h,INDEF,,,Output ending y coordinate
+dy,r,h,INDEF,,,Output Y pixel interval
+ny,r,h,INDEF,,,Number of output y pixels
+ylog,b,h,no,,,Logarithmic y coordinate?
+flux,b,h,yes,,,Conserve flux per pixel?
+blank,r,h,INDEF,,,Value for out of range pixels
+logfiles,s,h,"STDOUT,logfile",,,List of log files

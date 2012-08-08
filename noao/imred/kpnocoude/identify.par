@@ -1,0 +1,33 @@
+# Parameters for identify task.
+
+images,s,a,,,,Images containing features to be identified
+section,s,h,"middle line",,,Section to apply to two dimensional images
+database,f,h,database,,,Database in which to record feature data
+coordlist,f,h,linelists$thar.dat,,,User coordinate list
+units,s,h,"",,,Coordinate units
+nsum,s,h,"1",,,Number of lines/columns/bands to sum in 2D images
+match,r,h,0.2.,,,Coordinate list matching limit
+maxfeatures,i,h,100,,,Maximum number of features for automatic identification
+zwidth,r,h,100.,,,Zoom graph width in user units
+
+ftype,s,h,"emission","emission|absorption",,Feature type
+fwidth,r,h,3.5,,,Feature width in pixels
+cradius,r,h,4.,,,Centering radius in pixels
+threshold,r,h,10.,0.,,Feature threshold for centering
+minsep,r,h,4.,0.,,Minimum pixel separation
+
+function,s,h,"legendre","legendre|chebyshev|spline1|spline3",,Coordinate function
+order,i,h,3,1,,Order of coordinate function
+sample,s,h,"*",,,Coordinate sample regions
+niterate,i,h,3,0,,Rejection iterations
+low_reject,r,h,3.,0.,,Lower rejection sigma
+high_reject,r,h,3.,0.,,Upper rejection sigma
+grow,r,h,0.,0.,,Rejection growing radius
+
+autowrite,b,h,no,,,"Automatically write to database"
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input
+
+crval,s,q,,,,"Approximate coordinate (at reference pixel)"
+cdelt,s,q,,,,"Approximate dispersion"
+aidpars,pset,h,,,,"Automatic identification algorithm parameters"

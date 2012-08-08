@@ -1,0 +1,979 @@
+\documentstyle{article}
+\topmargin	-30mm
+\textheight	250mm
+\oddsidemargin   -5mm
+\evensidemargin  -5mm
+\textwidth      170mm
+
+\begin{document}
+
+\tableofcontents
+
+\newpage
+
+\addcontentsline{toc}{section}{help.txt}
+\begin{verbatim}
+
+TITABLE (Jan97)                  threed                  TITABLE (Jan97)
+
+
+
+NAME
+    titable -- Inserts 2-D tables into rows of a 3-D table.
+    
+    
+USAGE
+    titable intable outtable
+    
+    
+DESCRIPTION
+    This task  performs  the  inverse  operation  of  task  txtable:  it
+    inserts  one  or more 2-D tables into rows of a 3-D table  The input
+    may be a filename template, including wildcard  characters,  or  the
+    name  of a file (preceded by an @ sign) containing table names.  The
+    output is a single 3-D table name.   If  the  output  table  exists,
+    insertion  will  be  done  in  place.  If  the output table does not
+    exist, it will be created. The input and output tables must  not  be
+    the same.
+    
+    This  task  supports  row/column selectors in the input table names.
+    These may be used to select subsets of both rows  and  columns  from
+    the  input  table.   If  no selectors are used, all columns and rows
+    will be processed, Type 'help selectors' to  see  a  description  of
+    the selector syntax.
+    
+    When  creating  a  new  output table, the information describing its
+    columns can be taken from two sources. If parameter  'template'  has
+    the  name  of  an  existing  3-D  table,  the  column  descriptions, 
+    including maximum array sizes, will be taken  from  that  table.  If
+    'template'  has  an  invalid or null ("") value, the column-defining
+    information will be take from the first table  in  the  input  list,
+    where  its number of rows will define the maximum array size allowed
+    in the table being created. Column  selectors  are  allowed  in  the
+    template table.
+    
+    NOTE:  Both  the  output  and  template  table  names must always be
+    supplied complete, including their  extension.  Otherwise  the  task
+    may get confused on the existence of an already existing table.
+    
+    Insertion  is  performed  by first verifying if column names in both
+    input and output tables match. If a match  is  found,  values  taken
+    from  that column and all selected rows from the input table will be
+    stored  as  a  1-dimensional  array  in  a  single   cell   in   the 
+    corresponding  column  in  the  output  3-D  table.  The row in this
+    table where the insertion takes place is selected by the "row"  task
+    parameter.  It  points to the row where the first table in the input
+    list will be  inserted,  subsequent  tables  in  the  list  will  be
+    inserted  into  subsequent rows. This mechanism is superseded if the
+    "row" parameter is set  to  INDEF  or  a  negative  value,  and  the
+    keyword  "ORIG_ROW"  is found in the header of the input table. This
+    keyword is created by task txtable and its value supersedes the  row
+    counter in the task.
+    If  the  maximum  array  size  in  a target column in the output 3-D
+    table is larger than the number of selected input  rows,  the  array
+    will  be  filled  up  starting from its first element, and the empty
+    elements at the end will  be  set  to  INDEF  (or  ""  if  it  is  a
+    character  string column). If the maximum array size is smaller than
+    the number of selected rows, insertion begins by the first  selected
+    row  up  to  the  maximum  allowable  size, the remaining rows being
+    ignored.
+    
+    This task correctly handles scalars stored in the input table header
+    by  task  txtable.  Since  the selector mechanism does not work with
+    these scalars, the task will always  insert  them  into  the  output
+    table, provided there is a match in column names.
+    
+    
+PARAMETERS
+    
+    intable [file name list/template]
+        A  list  of  one  or  more  tables  to  be  inserted. Row/column
+        selectors are supported.
+    
+    outtable [table name]
+        Name of  3-D  output  table,  including  extension.  No  support
+        exists for "STDOUT" (ASCII output).
+    
+    (template = "") [table name]
+        Name  of  3-D  table  to be used as template when creating a new
+        output table.
+    
+    (row = INDEF) [int]
+        Row where insertion begins.  If  set  to  INDEF  or  a  negative
+        value,  the  row  number  will  be looked for in the input table
+        header.
+    
+    (verbose = yes) [boolean]
+        Display names of input and output tables as files are  processed
+        ?
+    
+    
+EXAMPLES
+    Insert  columns  named  FLUX and WAVELENGTH from input tables into a
+    3-D table:
+    
+    cl> titable itable*.tab[c:FLUX,WAVELENGTH] otable.tab
+    
+    
+    
+BUGS
+    The output and template  table  names  must  be  supplied  in  full,
+    including  the  extension (e.g. ".tab"). If the output table name is
+    not typed in full, the task will create a new table in place of  the
+    existing  one,  with  only the rows actually inserted. This behavior
+    relates to the way the underlying "access"  routine  in  IRAF's  fio
+    library works.
+    
+    
+REFERENCES
+    This task was written by I. Busko.
+    
+    
+SEE ALSO
+    txtable, selectors
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{loc.txt}
+\begin{verbatim}
+
+Filename               Total   Blanks   Comments   Help    Execute   Nonexec
+============================================================================
+  titable.x               81       18         16       0         23       24
+  tiupdate.x              42       13         11       0          7       11
+  tinew.x                 96       24         21       0         30       21
+  tinsert.x              104       23         17       0         41       23
+  tisetc.x                70       17         14       0         20       19
+  ticopy.x               107       23         16       0         45       23
+  ticc.x                  53       11          7       0         22       13
+  tiheader.x             189       57         27       0         62       43
+TOTAL                    742      186        129       0        250      177
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{titable.x}
+\begin{verbatim}
+
+include <tbset.h>
+
+#  TITABLE  --  Insert 2D tables into 3D table rows.
+#
+#  Input tables are given by a filename template list. All row/column 
+#  selection on input tables is performed by bracket-enclosed selectors
+#  appended to the file name. The output is a 3-D table with no row/column
+#  selectors. 
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  20-Jan-97  -  Task created (I.Busko)
+
+
+procedure t_titable()
+
+char        tablist[SZ_LINE]                # Input table list
+char        output[SZ_PATHNAME]                # Output table name
+char        template[SZ_PATHNAME]                # Template table name
+int        row                                # Row where to begin insertion
+bool        verbose                                # Print operations ?
+#--
+char        root[SZ_FNAME]
+char        rowselect[SZ_FNAME]
+char        colselect[SZ_FNAME]
+char        colname[SZ_COLNAME]
+char        colunits[SZ_COLUNITS]
+char        colfmt[SZ_COLFMT]
+pointer        cpo
+pointer        otp, list
+int        ncpo, rowc
+bool        rflag
+
+string        nocols  "Column name not found (%s)"
+string        nofile  "Input file is not a table (%s)"
+
+pointer        imtopen()
+int        clgeti(), access()
+bool        clgetb(), streq()
+
+begin
+        # Get task parameters.
+
+        call clgstr ("intable", tablist, SZ_LINE)
+        call clgstr ("outtable", output, SZ_PATHNAME)
+        call clgstr ("template", template, SZ_PATHNAME)
+        row     = clgeti ("row")
+        verbose = clgetb ("verbose")
+
+        # Abort if invalid output name..
+        if (streq (output, "STDOUT"))
+            call error (1, "Invalid output file name.")
+        call rdselect (output, root, rowselect, colselect, SZ_FNAME)
+        if (rowselect[1] != EOS || colselect[1] != EOS)
+            call error (1, "Sections not permitted on output table name.")
+
+        # Open input list.
+        list = imtopen (tablist)        
+
+        # Open/create the output table.
+        if (access (output, READ_WRITE, 0) == YES)
+            call tiupdate (root, otp, cpo, ncpo)
+        else
+            call tinew (template, list, root, rowselect, colselect, colname, 
+                       colunits, colfmt, otp, cpo, ncpo)
+
+        # Initialize row counter.
+        rowc  = row
+        rflag = false
+        if (rowc <= 0 || IS_INDEF(rowc)) rflag = true
+
+        # Do the insertion.
+        call tinsert (list, output, otp, cpo, ncpo, rowc, rflag, verbose, 
+                      rowselect, colselect, colname, colunits, colfmt)
+
+        # Cleanup. The cpo array was allocated by tiupdate/tinew.
+        call tcs_close (Memi[cpo], ncpo)
+        call mfree (cpo, TY_INT)
+        call tbtclo (otp)
+        call imtclose (list)
+end
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tiupdate.x}
+\begin{verbatim}
+
+include        <tbset.h>
+
+#  TIUPDATE  --  Opens an already existing output table for update.
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  20-Jan-97  -  Task created (I.Busko)
+
+
+procedure tiupdate (output, otp, cpo, ncpo)
+
+char        output[ARB]        # i: table name
+pointer        otp                # o: table descriptor
+pointer        cpo                # o: column descriptor
+int        ncpo                # o: number of columns
+#--
+int        i, dummy
+
+errchk        tbtopn
+
+pointer        tbtopn(), tcs_column()
+int        tbpsta()
+
+begin
+        # Open table and get its size.
+        otp  = tbtopn (output, READ_WRITE, NULL)
+        ncpo = tbpsta (otp, TBL_NCOLS)
+
+        # Alloc column descriptor array. This
+        # must be freed by caller.
+        call malloc (cpo, ncpo, TY_INT)
+
+        # Fill array with column info. The empty string
+        # forces the opening of all columns.
+        call tcs_open (otp, "", Memi[cpo], dummy, ncpo)
+
+        # Get column pointers from tcs structure.
+        do i = 1, ncpo
+            Memi[cpo+i-1] = tcs_column (Memi[cpo+i-1])
+end
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tinew.x}
+\begin{verbatim}
+
+include        <tbset.h>
+include "../whatfile.h"
+
+#  TINEW  --  Opens and creates a new output table.
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  20-Jan-97  -  Task created (I.Busko)
+
+
+procedure tinew (template, list, output, rowsel, colsel, colname, colunits, 
+                 colfmt, otp, cpo, ncpo)
+
+char        template[ARB]        # i: template table name
+pointer        list                # i: input list
+char        output[ARB]        # i: output table name
+char        rowsel[ARB]        # i: work array for row selectors
+char        colsel[ARB]        # i: work array for column selectors
+char        colname[ARB]        # i: work array for column names
+char        colunits[ARB]        # i: work array for column units
+char        colfmt[ARB]        # i: work array for column format
+pointer        otp                # o: table descriptor
+pointer        cpo                # o: column descriptor
+int        ncpo                # o: number of columns
+#--
+pointer        sp, itp, newcpo, root
+int        nrows, ncols, nscalar
+bool        is_temp
+
+errchk        tbtopen, tisetc
+
+pointer        tbtopn()
+int        tbpsta(), whatfile(), imtgetim(), tihnsc(), access()
+
+begin
+        call smark (sp)
+        call salloc (root,  SZ_PATHNAME, TY_CHAR)
+
+        # See if there is a template table.
+        is_temp = true
+        if (access (template, READ_ONLY, 0) == NO) {
+
+            # Get first table in input list as the template.
+            if (imtgetim (list, template, SZ_PATHNAME) == EOF)
+                call error (1, "Input list is empty.")
+            call imtrew (list)
+            is_temp = false
+        }
+
+        if (whatfile (template) != IS_TABLE)
+            call error (1, "Template/input file is not a table.")
+
+        # Break template file name into bracketed selectors.
+        call rdselect (template, Memc[root], rowsel, colsel, SZ_FNAME)
+
+        # Open template table and get some info.
+        itp   = tbtopn (Memc[root], READ_ONLY, NULL)
+        nrows = tbpsta (itp, TBL_NROWS)
+        ncols = tbpsta (itp, TBL_NCOLS)
+
+        # There might be header-stored scalars that don't show up
+        # with tbpsta, if the template is coming from the input list.
+        # Examine the header to find how many of them there are and 
+        # increment number of output columns.
+        nscalar = tihnsc (itp)
+        ncols = ncols + nscalar
+
+        # Create arrays with colum info. Must be freed by caller.
+        call malloc (cpo,    ncols, TY_INT)
+        call malloc (newcpo, ncols, TY_INT)
+        call tcs_open (itp, colsel, Memi[cpo], ncpo, ncols)
+
+        # Exit if no column matches and no scalars.
+        if (ncpo == 0 && nscalar == 0)
+                call error (1, "No columns selected.")
+
+        # Open output table.
+        otp = tbtopn (output, NEW_FILE, 0)
+
+        # Copy column information from input to output.
+        call tisetc (cpo, newcpo, ncpo, nscalar, itp, otp, colname, colunits, 
+                     colfmt, nrows, is_temp)
+
+        # Point to new column array.
+        call mfree (cpo, TY_INT)
+        cpo = newcpo
+
+        # Number of columns now is (selected columns from input) + scalars.
+        ncpo = ncpo + nscalar
+
+        # Create output table.
+        call tbtcre (otp)
+
+        # Cleanup.
+        call tbtclo (itp)
+        call sfree (sp)
+end
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tinsert.x}
+\begin{verbatim}
+
+include        <tbset.h>
+include "../whatfile.h"
+
+#  TINSERT  --  Perform the actual insertion.
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  20-Jan-97  -  Task created (I.Busko)
+
+
+procedure tinsert (list, output, otp, cpo, ncpo, row, rflag, verbose, 
+                   rowsel, colsel, colname, colunits, colfmt)
+
+pointer        list                # i: input list
+char        output[ARB]        # i: output table name
+pointer        otp                # i: output table descriptor
+pointer        cpo                # i: output column descriptors
+int        ncpo                # i: output number of columns
+int        row                # i: row where to begin insertion
+bool        rflag                # i: read row from header ?
+bool        verbose                # i: print info ?
+char        rowsel[ARB]        # i: work string for row selector
+char        colsel[ARB]        # i: work string for column selector
+char        colname[ARB]        # i: work string for column names
+char        colunits[ARB]        # i: work string for column units
+char        colfmt[ARB]        # i: work string for column formats
+#--
+pointer        sp, itp, fname, root, pcode, cpi
+int        i, file, hrow, numrow, numcol, nrows, ncpi
+
+errchk        ticopy
+
+pointer        trsopen(), tbtopn()
+int        imtgetim(), imtlen(), whatfile(), tihrow(), tbpsta()
+bool        trseval()
+
+begin
+        call smark (sp)
+        call salloc (fname, SZ_PATHNAME, TY_CHAR)
+        call salloc (root,  SZ_FNAME,    TY_CHAR)
+
+        # Loop over input list.
+        do file = 1, imtlen(list) {
+
+            # Get input table name and validate file type.
+            i = imtgetim (list, Memc[fname], SZ_PATHNAME)
+            if (whatfile (Memc[fname]) != IS_TABLE) {
+                call eprintf ("Input file is not a table (%s)\n")
+                    call pargstr (Memc[fname])
+                call flush (STDERR)
+                break
+            }
+
+            # Break input file name into bracketed selectors.
+            call rdselect (Memc[fname], Memc[root], rowsel, colsel, SZ_FNAME)
+
+            # Open input table and get some info.
+            itp = tbtopn (Memc[fname], READ_ONLY, NULL)
+            numrow = tbpsta (itp, TBL_NROWS)
+            numcol = tbpsta (itp, TBL_NCOLS)
+
+            # See if original row information is stored in header.
+            # If so, and user asked for, use it.
+            hrow = tihrow (itp)
+            if (rflag) {
+                if (hrow > 0)
+                    row = hrow
+                else
+                    call error (1, "No valid row.")
+            }
+
+            # Find how many rows were requested by row selector.
+            nrows = 0
+            pcode = trsopen (itp, rowsel)
+            do i = 1, numrow {
+                if (trseval (itp, i, pcode))
+                    nrows = nrows + 1
+            }
+            call trsclose (pcode)
+
+            # Create array of column pointers from column selector. 
+            call malloc (cpi, numcol, TY_INT)
+            call tcs_open (itp, colsel, Memi[cpi], ncpi, numcol)
+
+            if (verbose) {
+                call printf ("%s -> %s row=%d  \n")
+                call pargstr (Memc[fname])
+                call pargstr (output)
+                call pargi (row)
+                call flush (STDOUT)
+            }
+
+            # Copy current input table into current row of output table.
+            call ticopy (itp, cpi, ncpi, otp, cpo, ncpo, rowsel, row, nrows,
+                         colname, colunits, colfmt)
+
+            # Free input table's array of column pointers.
+            call tcs_close (Memi[cpi], ncpi)
+            call mfree (cpi, TY_INT)
+
+            # Close input table.
+            call tbtclo (itp)
+
+            # Bump row counter.
+            row = row + 1
+        }
+
+        call sfree (sp)
+end
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tisetc.x}
+\begin{verbatim}
+
+
+#  TISETC  --  Set column info in new output table.
+#
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  20-Jan-97  -  Task created (I.Busko)
+
+
+procedure tisetc (cpo, newcpo, ncpo, nscalar, itp, otp, colname, colunits, 
+                  colfmt, csize, template)
+
+pointer        cpo                # i:  array of column descriptors 
+pointer        newcpo                # io: new array of column descriptors 
+int        ncpo                # i:  number of columns matched by selector
+int        nscalar                # i:  number of scalar columns
+char        colname[ARB]        # i:  work array for column names
+char        colunits[ARB]        # i:  work array for column units
+char        colfmt[ARB]        # i:  work array for column format
+pointer        itp,otp                # io: template and output table descriptors
+int        csize                # i:  cell size in output table
+bool        template        # i:  is there a template ?
+#--
+pointer        ocp
+int        i, j, colnum, ntot
+int        datatype, lendata, lenfmt
+
+errchk        tihdec
+
+pointer        tcs_column()
+int        tihmax()
+bool        tihdec()
+
+begin
+        # First copy column information from template/input 
+        # table into output table.
+        if (ncpo > 0) {
+            do i = 1, ncpo {
+                ocp = tcs_column (Memi[cpo+i-1])
+                if (!template) {
+
+                    # Template wasn't supplied; copy column info from 2-D 
+                    # input table into 3-D output table, taking care of 
+                    # resetting the array size. 
+                    call tbcinf (ocp, colnum, colname, colunits, colfmt, 
+                                 datatype, lendata, lenfmt)
+                    if (lendata > 1)
+                        call error (1, "Input table has array element !")
+                    call tbcdef (otp, ocp, colname, colunits, colfmt, 
+                                 datatype, csize, 1)
+                } else {
+
+                    # Copy with same array  size configuration, since
+                    # template is supposedly a 3-D table.
+                    call tbcinf (ocp, colnum, colname, colunits, colfmt, 
+                                 datatype, lendata, lenfmt)
+                    call tbcdef (otp, ocp, colname, colunits, colfmt, 
+                                 datatype, lendata, 1)
+                }
+
+                # Save column pointer.
+                Memi[newcpo+i-1] = ocp
+            }
+        }
+
+        # If header-stored scalars exist, define new columns for them.
+        if (nscalar > 0) {
+            ntot = tihmax (itp)
+            i = ncpo
+            do j = 1, ntot {
+                if (tihdec (itp, j, colname, colunits, colfmt, datatype,
+                            lenfmt)) {
+                    call tbcdef (otp, ocp, colname, colunits, colfmt,
+                                datatype, 1, 1)
+                    Memi[newcpo+i] = ocp
+                    i = i + 1
+                }
+            }
+        }
+end
+
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{ticopy.x}
+\begin{verbatim}
+
+include        <tbset.h>
+
+#  TICOPY  --  Copy input table into row of output table
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  20-Jan-97  -  Task created (I.Busko)
+
+
+procedure ticopy (itp, cpi, ncpi, otp, cpo, ncpo, rowsel, row, nrows,
+                  coln, colu, colf)
+
+pointer        itp                # i: input table descriptor
+pointer        cpi                # i: input column descriptor array
+int        ncpi                # i: input number of columns
+pointer        otp                # i: output table descriptor
+pointer        cpo                # i: output column descriptor array
+int        ncpo                # i: output number of columns
+char        rowsel[ARB]        # i: work string for row selector
+int        row                # i: row where to begin insertion
+int        nrows                # i: number of selected rows
+char        coln[ARB]        # i: work string for column names
+char        colu[ARB]        # i: work string for column units
+char        colf[ARB]        # i: work string for column formats
+#--
+pointer        sp, coln2, colu2, colf2, icp, ocp
+int        icpi, icpo, dum, dtypi, dtypo, maxlen
+int        ihc, maxhc
+bool        found
+
+errchk        ticc
+
+pointer        tcs_column()
+int        tbalen(), tihmax()
+bool        streq(), tihdec()
+
+begin
+        call smark (sp)
+        call salloc (coln2, SZ_COLNAME,  TY_CHAR)
+        call salloc (colu2, SZ_COLUNITS, TY_CHAR)
+        call salloc (colf2, SZ_COLFMT,   TY_CHAR)
+
+        # Loop over output table column pointers.
+        do icpo = 1, ncpo {
+
+            # Get column name and data type from output table.
+            ocp = Memi[cpo+icpo-1]
+            call tbcinf (ocp, dum, coln, colu, colf, dtypo, dum, dum)
+
+            # Array length must be the minimum in between table array 
+            # size and the number of rows selected from input table. 
+            maxlen = min (tbalen(ocp), nrows)
+
+            # If there are matched columns, loop over 
+            # input table column pointers.
+            found = false
+            if (ncpi > 0) {
+                do icpi = 1, ncpi {
+
+                    # Get column name and data type from input table.
+                    icp = tcs_column (Memi[cpi+icpi-1])
+                    call tbcinf (icp,dum,Memc[coln2],colu,colf,dtypi,dum,dum)
+
+                    # If column names match, copy from table to table.
+                    if (streq (coln, Memc[coln2])) {
+                        # For now, abort if datatypes do not match.
+                        if (dtypo != dtypi)
+                            call error (1, "Data types do not match.")
+                        call ticc (itp,icp,otp,ocp,dtypo,maxlen,rowsel,row)
+                        found = true
+                    }
+                }
+            }
+
+            # If column was not found, look into header.
+            if (!found) {
+                maxhc = tihmax (itp)
+                if (maxhc > 0) {
+                    do ihc = 1, maxhc {
+                        if (tihdec (itp, ihc, Memc[coln2], Memc[colu2], 
+                                    Memc[colf2], dtypi, dum)) {
+                            if (streq (coln, Memc[coln2])) {
+
+                                # For now, abort if datatypes do not match.
+                                if (dtypo != dtypi)
+                                    call error (1, "Data types do not match.")
+                                if (dtypo < 0)
+                                    dtypo = TY_CHAR
+
+                                switch (dtypo) {
+                                case TY_CHAR:
+                                    call ticht (itp, ihc, otp, ocp, row, -dtypi)
+                                case TY_BOOL:
+                                    call tichb (itp, ihc, otp, ocp, row)
+                                case TY_SHORT:
+                                    call tichs (itp, ihc, otp, ocp, row)
+                                case TY_INT,TY_LONG:
+                                    call tichi (itp, ihc, otp, ocp, row)
+                                case TY_REAL:
+                                    call tichr (itp, ihc, otp, ocp, row)
+                                case TY_DOUBLE:
+                                    call tichd (itp, ihc, otp, ocp, row)
+                                default:
+                                    call error (1, "Non-supported data type.")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        call sfree (sp)
+end
+
+
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{ticc.x}
+\begin{verbatim}
+
+
+#  TICC  --  Copy data from column in input to cell array in output.
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  20-Jan-97  -  Task created (I.Busko)
+
+
+procedure ticc (itp, icp, otp, ocp, dtype, maxlen, rowsel, row)
+
+pointer        itp                # i: input table descriptor
+pointer        icp                # i: input column descriptor
+pointer        otp                # i: output table descriptor
+pointer        ocp                # i: output column descriptor
+int        dtype                # i: data type of both input and output columns
+int        maxlen                # i: array length
+char        rowsel[ARB]        # i: work string for row selector
+int        row                # i: row where to insert
+#--
+pointer        sp, buf
+int        maxch
+
+begin
+        # Alloc buffer of apropriate length and type. 
+        maxch = 1
+        if (dtype < 0) {
+            maxch = - dtype
+            dtype = TY_CHAR
+        }
+        call smark (sp)
+        call salloc (buf, maxlen*(maxch + 1), dtype)
+
+        # Copy.
+        switch (dtype) {
+        case TY_CHAR:
+            call tirowst (itp, icp, otp, ocp, rowsel, row, maxch, maxlen, 
+                          Memc[buf])
+        case TY_BOOL:
+            call tirowsb (itp, icp, otp, ocp, rowsel, row, maxlen, Memb[buf])
+        case TY_SHORT:
+            call tirowss (itp, icp, otp, ocp, rowsel, row, maxlen, Mems[buf])
+        case TY_INT, TY_LONG:
+            call tirowsi (itp, icp, otp, ocp, rowsel, row, maxlen, Memi[buf])
+        case TY_REAL:
+            call tirowsr (itp, icp, otp, ocp, rowsel, row, maxlen, Memr[buf])
+        case TY_DOUBLE:
+            call tirowsd (itp, icp, otp, ocp, rowsel, row, maxlen, Memd[buf])
+        default:
+            call error (1, "Non-supported data type.")
+        }
+
+        call sfree (sp)
+end
+\end{verbatim}
+\newpage
+\addcontentsline{toc}{section}{tiheader.x}
+\begin{verbatim}
+
+include        <tbset.h>
+
+#  TIHEADER  --  Routines for retrieving header-stored scalars.
+#
+#  Details such as keyword names and encoding are defined by the
+#  way task txtable creates the same keywords.
+#
+#
+#
+#  TIHKI   --  Look for keyword and return integer value, or 0 if not found.
+#  TIHMAX  --  Return maximum number of header-stored scalars.
+#  TIHNSC  --  Return actual number of scalars in header.
+#  TIHROW  --  Return original row value stored by txtable task.
+#  TIHDEC  --  Decode column description in header keyword.
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  20-Jan-97  -  Task created (I.Busko)
+
+
+
+#  TIHMAX  --  Return maximum number of header-stored scalars.
+
+int procedure tihmax (tp)
+
+pointer        tp                # table pointer
+
+int        tihki()
+
+begin
+        return (tihki (tp, "TCTOTAL"))
+end
+
+
+
+
+#  TIHROW  --  Return original row value (stored by txtable task).
+
+int procedure tihrow (tp)
+
+pointer        tp                # table pointer
+
+int        tihki()
+
+begin
+        return (tihki (tp, "ORIG_ROW"))
+end
+
+
+
+
+#  TIHNSC  --  Return actual number of scalars in header.
+
+int procedure tihnsc (tp)
+
+pointer        tp                # table pointer
+#--
+pointer        sp, kwname, kwval
+int        dtype, parnum
+int        i, ntot, nscalar
+
+int        tihmax()
+
+begin
+        call smark (sp)
+        call salloc (kwval,  SZ_PARREC, TY_CHAR)
+        call salloc (kwname, SZ_LINE,   TY_CHAR)
+        nscalar = 0
+
+        ntot = tihmax (tp)
+        if (ntot > 0) {
+            do i = 1, ntot {
+                call sprintf (kwname, SZ_LINE, "TCD_%03d")
+                    call pargi (i)
+                call tbhfkr (tp, kwname, dtype, kwval, parnum)
+                if (parnum > 0)
+                    nscalar = nscalar + 1
+            }
+        }
+
+        call sfree (sp)
+        return (nscalar)
+end
+
+
+
+
+
+#  TIHDEC  --  Decode column description in header keyword. The detailed
+#              format depends on how task txtable does the encoding.
+
+bool procedure tihdec (tp, kn, colname, colunits, colfmt, datatype, lenfmt)
+
+pointer        tp                        # i: table pointer
+int        kn                        # i: keyword number
+char        colname[ARB]                # o: column name
+char        colunits[ARB]                # o: column units
+char        colfmt[ARB]                # o: column print format
+int        datatype                # o: column data type
+int        lenfmt                        # o: format lenght
+#--
+pointer        sp, kwname, kwval, dtype
+int        parnum
+bool        found
+
+string        corrupt  "Corrupted header in input table."
+
+int        nscan(), strncmp()
+bool        streq()
+
+begin
+        call smark (sp)
+        call salloc (kwval,  SZ_PARREC, TY_CHAR)
+        call salloc (kwname, SZ_LINE,   TY_CHAR)
+        call salloc (dtype,  SZ_LINE,   TY_CHAR)
+
+        # Build column description keyword name.
+        call sprintf (Memc[kwname], SZ_LINE, "TCD_%03d")
+            call pargi (kn)
+
+        # Look for it.
+        call tbhfkr (tp, Memc[kwname], datatype, Memc[kwval], parnum)
+
+        if (parnum > 0) {
+
+            # Found; parse the 5 fields.
+            call sscan (Memc[kwval])
+            call gargwrd (colname, SZ_COLNAME) 
+            if (nscan() < 1) call error (1, corrupt)
+            call gargwrd (colunits, SZ_COLUNITS)
+            if (nscan() < 1) call error (1, corrupt)
+            call gargwrd (colfmt, SZ_COLFMT)
+            if (nscan() < 1) call error (1, corrupt)
+            call gargwrd (Memc[dtype], SZ_LINE)
+            if (nscan() < 1) call error (1, corrupt)
+            call gargi (lenfmt)
+            if (nscan() < 1) call error (1, corrupt)
+
+            # Translate from human-readable encoding to sdas table encoding.
+            if (streq (colunits, "default")) 
+                call strcpy ("", colunits, SZ_COLUNITS)
+            if (streq (colfmt, "default")) 
+                call strcpy ("", colfmt, SZ_COLFMT)
+            if (streq (Memc[dtype], "boolean")) datatype = TY_BOOL
+            if (streq (Memc[dtype], "short"))   datatype = TY_SHORT
+            if (streq (Memc[dtype], "integer")) datatype = TY_INT
+            if (streq (Memc[dtype], "long"))    datatype = TY_LONG
+            if (streq (Memc[dtype], "real"))    datatype = TY_REAL
+            if (streq (Memc[dtype], "double"))  datatype = TY_DOUBLE
+            if (strncmp (Memc[dtype], "character_", 10) == 0) { 
+                call sscan (Memc[dtype+10])
+                    call gargi (datatype)
+                datatype = -datatype
+            }
+            found = true
+        } else 
+            found = false
+
+        call sfree (sp)
+        return (found)
+end
+
+
+
+
+#  TIHKI  --  Look for keyword and return integer value, or 0 if not found.
+#             Zero is never expected as a valid result because this routine
+#             is used to retrieve either the maximum number of header-stored
+#             scalars (zero means no scalars) or the original table row number.
+
+int procedure tihki (tp, keyword)
+
+pointer        tp                # table pointer
+char        keyword[ARB]        # keyword
+#--
+pointer        sp, kwval
+int        dtype, parnum, par
+
+int        tbhgti()
+
+begin
+        call smark (sp)
+        call salloc (kwval, SZ_PARREC, TY_CHAR)
+        call tbhfkr (tp, keyword, dtype, kwval, parnum)
+        if (parnum > 0)
+            par = tbhgti (tp, keyword)
+        else
+            par = 0
+        call sfree (sp)
+        return (par)
+end
+\end{verbatim}
+\newpage
+\end{document}

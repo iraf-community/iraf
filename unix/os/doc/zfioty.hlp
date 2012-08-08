@@ -1,0 +1,75 @@
+.help zfioty May84 "System Interface"
+.ih
+NAME
+zfioty -- terminal driver
+.ih
+SYNOPSIS
+.nf
+zopnty (osfn, mode, chan)		# open terminal
+zclsty (chan, status)			# close terminal
+zgetty (chan, text, maxch,  status)	# get next record
+zputty (chan, text, nchars, status)	# put record
+zflsty (chan, status)			# flush output
+znotty (chan, loffset)			# note offset
+zsekty (chan, loffset, status)		# seek to offset
+zsttty (chan, param, lvalue)		# get file status
+
+packed	char osfn[]
+char	text[]
+int	mode, chan, maxch, nchars, status, param
+long	loffset, lvalue
+.fi
+.ih
+DESCRIPTION
+Except where noted herein, the terminal driver is functionally equivalent to
+the text file driver \fBzfiotx\fR.  Terminal data is normally quite volatile,
+hence the \fBznotty\fR and \fBzsekty\fR functions are generally not usable with
+terminals.  If seeking is not supported on a terminal \fBznotty\fR may return
+anything, and \fBzsekty\fR will return ERR.
+
+Terminal input is normally accumulated in the host system terminal driver
+and returned by \fBzgetty\fR a line at a time.  If \fImaxch\fR is greater than
+one but less than the length of the line typed at the terminal, the line is
+buffered by the kernel and substrings are returned in successive calls to
+\fBzgetty\fR until the line is exhausted, just as for any other text file.
+Control characters may be intercepted by the host driver and interpreted
+as line editing commands, commands to change the driver state, and so on.
+
+If \fBzgetty\fR is called with \fImaxch=1\fR the terminal is put into raw
+character mode.  In this mode \fBzgetty\fR returns each character as it is
+typed, control characters have no special significance (as far as possible),
+and characters are not echoed to the terminal.  The switch to character mode
+will only occur at the beginning of a line, i.e., any character data buffered
+internally in \fBzgetty\fR will be exhausted before switching to character
+mode.  A subsequent call with \fImaxch\fR greater than one causes a switch
+back to line mode.
+
+There is nothing corresponding to character mode for \fBzputty\fR.  To write
+to the terminal a character at a time one need only call \fBzflsty\fR after
+each character is written with \fBzputty\fR.  All control characters except
+tab and newline (linefeed) may be sent to the terminal without modification.
+Tab characters may be expanded by the driver, and newline is converted into
+carriage return linefeed upon output.
+.ih
+NOTES
+Separate channels are used for reading and writing to simplify buffering
+and to provide device independence.  The access modes READ_WRITE and NEW_FILE
+are not supported for terminals.  A terminal file, unlike most other files,
+may be simultaneously opened on two different channels if both read and write
+access is desired.
+
+The mode switch on \fImaxch\fR seems like a potentially unwanted side effect
+but this is not the case since \fBzgetty\fR is called only by FIO.
+In normal use FIO will always call \fBzgetty\fR with \fImaxch\fR equal to
+the size of the FIO line buffer, i.e., SZ_LINE.  This is the case even if the
+calling program calls \fBgetc\fR to read a character at a time.  At the FIO
+level the switch to and from character mode is possible only by an explicit
+call to \fBfset\fR to change the default behavior of FIO for the file.
+When character mode is in effect on a text file opened for reading (be it a
+terminal or not) FIO merely fakes itself into thinking the size of the FIO
+buffer is 1 char, forcing a call to \fBzgetty\fR for each character read from
+the file.
+.ih
+SEE ALSO
+zfiotx, manual pages for the text file driver.
+.endhelp

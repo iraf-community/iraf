@@ -1,0 +1,36 @@
+# Make the HELP and LROFF library modules.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	@lroff
+	@xhelp
+
+	filetemp.x	help.h <ctype.h>
+	getoption.x	help.h <ctype.h>
+	hbgetblk.x	help.h <ctype.h>
+	helpdb.x	help.h helpdir.h <error.h> <finfo.h> <fset.h> <mach.h>\
+			<time.h>
+	helpdir.x	help.h helpdir.h <ctype.h> <error.h>
+	hinput.x	help.h <ctype.h>
+	houtput.x	help.h <ttyset.h> <chars.h> <fset.h>
+	manout.x	help.h <chars.h> <ctype.h>
+	modlist.x	help.h helpdir.h <ctype.h> <error.h>
+	modtemp.x	help.h <ctype.h>
+	prblkhdr.x	help.h
+	prdir.x		help.h <error.h> <ttyset.h>
+	prfile.x	help.h <finfo.h> <time.h> <ctype.h>
+	prfnames.x	help.h helpdir.h
+	prhelp.x	help.h helpdir.h <error.h>
+	prhlpblk.x	help.h <error.h>
+	prmodname.x	help.h
+	prsummary.x	help.h
+	t_hdbexamine.x	help.h <error.h>
+	t_help.x	help.h <error.h> <fset.h> <finfo.h>
+	t_lroff.x	
+	t_mkhelpdb.x	<error.h>
+	tlist.x		help.h <ctype.h>
+	;

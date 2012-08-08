@@ -1,0 +1,3 @@
+          fit1d - Fit a function to image lines or columns
+       imsurfit - Fit a surface to a 2-D image
+      lineclean - Replace deviant pixels in image lines

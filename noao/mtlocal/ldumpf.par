@@ -1,0 +1,4 @@
+#LDUMPF parameters
+dumpf_file,f,a,mta,,,DUMPF data source
+file_list,s,a,,,,file list
+mode, s,h,ql,,,

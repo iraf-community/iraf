@@ -1,0 +1,24 @@
+# Make the  RFITS / WFITS Tasks
+
+$checkout	libpkg.a ../
+$update		libpkg.a
+$checkin	libpkg.a ../
+$exit
+
+libpkg.a:
+	fits_cards.x	wfits.com wfits.h <imhdr.h>
+	fits_params.x	wfits.h <time.h>
+	fits_read.x	rfits.com rfits.h <error.h> <fset.h> <imhdr.h>\
+			<mach.h> <plset.h>
+	fits_rheader.x	rfits.com rfits.h <ctype.h> <imhdr.h> <imio.h>\
+			<mach.h>
+	fits_rimage.x	rfits.com rfits.h <imhdr.h> <fset.h> <mach.h>
+	fits_rpixels.x	<fset.h> <mach.h> <mii.h>
+	fits_wheader.x	wfits.com wfits.h <fset.h> <imhdr.h> <mach.h>
+	fits_wimage.x	wfits.com wfits.h <error.h> <imhdr.h>
+	fits_wpixels.x	wfits.h <fset.h> <mach.h>
+	fits_write.x	<error.h> wfits.com wfits.h <fset.h> <imhdr.h> <mach.h>
+	fits_files.x	<ctype.h> <plset.h>
+	t_rfits.x	rfits.com rfits.h <error.h> <fset.h>
+	t_wfits.x	wfits.com wfits.h <error.h> <fset.h> <mach.h>
+	;

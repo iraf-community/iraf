@@ -1,0 +1,34 @@
+.help ecmat Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slECMA (DATE, RMAT)
+
+     - - - - - -
+      E C M A
+     - - - - - -
+
+  Form the equatorial to ecliptic rotation matrix - IAU 1980 theory
+  (double precision)
+
+  Given:
+     DATE     dp         TDB (loosely ET) as Modified Julian Date
+                                            (JD-2400000.5)
+  Returned:
+     RMAT     dp(3,3)    matrix
+
+  Reference:
+     Murray,C.A., Vectorial Astrometry, section 4.3.
+
+  Note:
+    The matrix is in the sense   V(ecl)  =  RMAT * V(equ);  the
+    equator, equinox and ecliptic are mean of date.
+
+  Called:  slDEUL
+
+  P.T.Wallace   Starlink   23 August 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

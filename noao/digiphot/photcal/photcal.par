@@ -1,0 +1,5 @@
+# PHOTCAL package parameter file.
+
+catdir,s,h,"photcal$catalogs/",,,Directory containing standard star catalogs
+version,s,h,"Aug91"
+mode,s,h,ql

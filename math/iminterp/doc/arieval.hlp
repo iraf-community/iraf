@@ -1,0 +1,48 @@
+.help arieval Dec98 "Image Interpolator Package"
+.ih
+NAME
+arieval -- evaluate the interpolant at x
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+y = arieval (x, datain, npix, interp_type)
+
+.nf
+    real	x[2]		#I x value, 1 <= x[1-2] <= npix
+    real	datain[npix]	#I data values
+    int		npix		#I number of data values
+    int		interp_type	#I interpolant type
+.fi
+.ih
+ARGUMENTS
+.ls x      
+Single X value, or a pair of X values specifying a range in the case
+of the drizzle interpolant.
+.le
+.ls datain  
+Array of input data.
+.le
+.ls npix
+Number of data points.
+.le
+.ls interp_type
+Interpolant type. Options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5,
+II_SPLINE3, II_SINC / II_LSINC, and II_DRIZZLE, for nearest neighbor,
+linear, 3rd and fifth order polynomials, cubic spline, sinc, look-up
+table sinc, and drizzle interpolants respectively. The look-up table sinc
+interpolant is not supported and defaults to the sinc interpolant. The sinc
+width is 31 pixels. The drizzle pixel fraction is 1.0. The interpolant
+type definitions are contained in the package header file math/iminterp.h
+.le
+.ih
+DESCRIPTION
+ARIEVAL allows the evaluation of a few interpolated points without the
+storage required for the sequential interpolant.
+.ih
+NOTES
+Checking for out of bounds and INDEF valued pixels is the responsibility of
+the user.
+.ih
+SEE ALSO
+arider, asieval, asivector

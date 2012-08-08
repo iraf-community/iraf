@@ -1,0 +1,31 @@
+.help zoom Jan86 images.tv.iis
+.ih
+NAME
+zoom - zoom in on the image (change magnification)
+.ih
+USAGE
+zoom
+.ls zoom_factor
+Zoom factor by the display is to be expanded.  The factors are powers
+of 2; 1 = no zoom, 2 = factor of 2, 3 = factor of 4, and 4 = factor of 8.
+.le
+.ls window = no
+Window the enlarged image?
+.le
+.ih
+DESCRIPTION
+The display is zoomed by the specified factor.  A zoom factor of 1 is no
+magnification and higher factors correspond to factors of 2.  The zoom
+replicates pixels on the monitor and only a part of the display frame
+centered on the display cursor is visible.  The window option allows
+the user to adjust interactively with the cursor the part of the zoomed
+frame.
+.ih
+EXAMPLES
+To magnify the displayed frame by a factor of 2:
+
+	cl> zoom 2
+.ih
+SEE ALSO
+cv
+.endhelp

@@ -1,0 +1,7 @@
+# Help directory for the LOCAL package.
+
+$defdir		= "local$src/"
+$doc		= "local$src/doc/"
+
+bswap		hlp=doc$bswap.hlp,	src=bswap.x
+pavg		hlp=doc$pavg.hlp,	src=pavg.x

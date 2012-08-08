@@ -1,0 +1,177 @@
+Routines for conversion between pixel coordinates and world coordinates.
+
+     This package contains the following high-level routines for converting
+between world coordinates and pixel coordinates:
+
+xt_wcs_init             initialize structure for world coordinate system
+xt_wcs_init_c           initialize from input cdelt, crota, etc
+xt_wcs_init_cd          initialize from input CD matrix, etc
+xt_wc_pix               convert from world coordinates to pixel coordinates
+xt_pix_wc               convert from pixel coordinates to world coordinates
+xt_wcs_free             deallocate wcs struct
+
+After calling any one of the three initialization routines, either or both
+of the conversion routines (xt_wc_pix, xt_pix_wc) may be called any number
+of times.  When finished, xt_wcs_free should be called to deallocate memory
+that was allocated by the initialization routine.
+
+     Eight different projection geometries are currently implemented for
+spherical coordinates.  The projection type is obtained from the CTYPE
+parameter, or the type defaults to gnomonic if nothing is specified in
+CTYPE.  Here is a list of CTYPE values for the right ascension axis with
+the various projection types.  For Aitoff and Mercator projections the
+reference pixel is assumed to be on the equator.  In addition, for Aitoff
+projection the difference between right ascension and RA at the reference
+pixel is limited to 180 degrees.
+
+         CTYPE          projection type
+         -----          ---------------
+        RA---TAN        gnomonic (tangent)
+        RA---SIN        radial distance proportional to sine of angle
+        RA---ARC        radial distance proportional to angle
+        RA---NCP        north celestial pole
+        RA---GBS        global sine (equal area)
+        RA---STG        stereographic
+        RA---AIT        Aitoff equal area
+        RA---MER        Mercator
+
+
+     To use the following sample program, extract into a file "ttt.x"
+and compile and link with:
+
+	xc -p tables ttt.x -lstxtools
+
+task    ttt
+
+include <imhdr.h>
+
+procedure ttt()
+
+pointer im, wcs
+double  phys[IM_MAXDIM]
+real    pix[IM_MAXDIM], opix[IM_MAXDIM]
+int     naxis, k
+char    input[SZ_FNAME]
+pointer immap()
+int     scan()
+
+begin
+        call clgstr ("input", input, SZ_FNAME)
+        im = immap (input, READ_ONLY, NULL)
+        naxis = IM_NDIM(im)
+        call xt_wcs_init (im, wcs)                      # initialize
+        call imunmap (im)
+
+        call printf ("naxis = %d\n")
+            call pargi (naxis)
+        call printf ("enter pixel coordinates\n")
+
+        while (scan() != EOF) {
+            do k = 1, naxis
+                call gargr (pix[k])
+            call xt_pix_wc (wcs, pix, phys, naxis)      # to world coords
+            call xt_wc_pix (wcs, phys, opix, naxis)     # to pixel coords
+            # Print the input pixel coordinates, the world coordinates,
+            # and the output pixel coordinates (which should be the same
+            # as the input).
+            do k = 1, naxis {
+                call printf ("%.3f  %18.10g  %.3f\n")
+                    call pargr (pix[k])
+                    call pargd (phys[k])
+                    call pargr (opix[k])
+            }
+        }
+        call xt_wcs_free (wcs)                          # free memory
+end
+
+
+
+# xt_wcs_init -- initialize wcs struct
+# This routine allocates space for a structure describing the world
+# coordinate system for an image, fills in the values or defaults, and
+# returns a pointer to that structure.
+
+call xt_wcs_init (im, wcs)
+
+pointer im                      # i: pointer to image descriptor
+pointer wcs                     # o: pointer to world coord system struct
+
+
+# xt_wcs_init_c -- initialize wcs struct
+# xt_wcs_init_c and xt_wcs_init_cd allocate space for a structure
+# describing the world coordinate system for an image, fill in the values
+# or defaults, and return a pointer to that structure.  They differ from
+# xt_wcs_init in that these take the coordinate parameters as arguments
+# rather than getting them from the image.
+# xt_wcs_init_c takes cdelt & crota, and xt_wcs_init_cd takes the CD matrix.
+
+call xt_wcs_init_c (crval, crpix, cdelt, crota, ctype, naxis, wcs)
+
+double  crval[naxis]            # i: coordinate values at reference pixel
+real    crpix[naxis]            # i: reference pixel
+real    cdelt[naxis]            # i: pixel spacing
+real    crota                   # i: rotation angle (if 2-D)
+char    ctype[SZ_CTYPE,naxis]   # i: e.g. "RA---TAN"
+int     naxis                   # i: size of arrays
+pointer wcs                     # o: pointer to world coord system struct
+
+
+call xt_wcs_init_cd (crval, crpix, cd, ctype, naxis, wcs)
+
+double  crval[naxis]            # i: coordinate values at reference pixel
+real    crpix[naxis]            # i: reference pixel
+real    cd[naxis,naxis]         # i: CD matrix
+char    ctype[SZ_CTYPE,naxis]   # i: e.g. "RA---TAN"
+int     naxis                   # i: size of arrays
+pointer wcs                     # o: pointer to world coord system struct
+
+
+# xt_wcs_free -- deallocate wcs struct
+# This routine deallocates space for a wcs structure.
+
+call xt_wcs_free (wcs)
+
+pointer wcs             # io: pointer to world coord system struct
+
+
+
+# xt_wc_pix -- wcs to pixels
+# This routine converts world coordinates to pixel coordinates.
+#
+# In the 1-D case, CRVAL is subtracted from the coordinate, the
+# result is divided by CDELT (same as CD1_1), and CRPIX is added.
+#
+# For 2-D or higher dimension, if two of the axes are like RA and Dec,
+# the input coordinates are converted to standard coordinates Xi
+# and Eta.  The (Xi, Eta) vector is then multiplied on the left by
+# the inverse of the CD matrix, and CRPIX is added.
+# The units for axes like Ra & Dec are degrees, not hours or radians.
+# For linear axes the conversion is the same as for 1-D.
+
+call xt_wc_pix (wcs, phys, pix, naxis)
+
+pointer wcs             # i: pointer to world coord system struct
+double  phys[naxis]     # i: physical (world) coordinates (e.g. degrees)
+real    pix[naxis]      # o: pixel coordinates
+int     naxis           # i: size of arrays
+
+
+
+# xt_pix_wc -- pixels to wcs
+# This routine converts pixel coordinates to world coordinates.
+#
+# In the 1-D case, CRPIX is subtracted from the pixel coordinate,
+# the result is multiplied by CDELT (same as CD1_1), and CRVAL is added.
+#
+# For 2-D or higher dimension, CRPIX is subtracted, and the result is
+# multiplied on the left by the CD matrix.  If two of the axes are like
+# RA and Dec, the pixel coordinates are converted to standard coordinates
+# Xi and Eta.  The (Xi, Eta) vector is then converted to differences
+# between RA and Dec and CRVAL, and then CRVAL is added to each coordinate.
+
+call xt_pix_wc (wcs, pix, phys, naxis)
+
+pointer wcs             # i: pointer to world coord system struct
+real    pix[naxis]      # i: pixel coordinates
+double  phys[naxis]     # o: physical (world) coordinates (e.g. degrees)
+int     naxis           # i: size of arrays

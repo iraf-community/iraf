@@ -1,0 +1,33 @@
+.help cc2s Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slCC2S (V, A, B)
+
+     - - - - -
+      C C 2 S
+     - - - - -
+
+  Direction cosines to spherical coordinates (single precision)
+
+  Given:
+     V     r(3)   x,y,z vector
+
+  Returned:
+     A,B   r      spherical coordinates in radians
+
+  The spherical coordinates are longitude (+ve anticlockwise
+  looking from the +ve latitude pole) and latitude.  The
+  Cartesian coordinates are right handed, with the x axis
+  at zero longitude and latitude, and the z axis at the
+  +ve latitude pole.
+
+  If V is null, zero A and B are returned.
+  At either pole, zero A is returned.
+
+  P.T.Wallace   Starlink   July 1989
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

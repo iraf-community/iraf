@@ -1,0 +1,9 @@
+# STRIP.COLOR -- Rmfiles command script, used to strip the COLOR directory
+# of all files not required for ordinary runtime use of the system.
+
+color		-allbut .hlp .hd .men .cl .par .key .dat .mip .lut
+
+# Sun/IRAF only.
+# ---------------
+-file bin.68881/OBJS.arc
+-file bin.ffpa/OBJS.arc

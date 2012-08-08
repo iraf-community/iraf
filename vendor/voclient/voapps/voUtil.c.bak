@@ -1,0 +1,101 @@
+/**
+ *  VOUTIL.C -- Utility procedures for the VO-CLI tasks.
+ * 
+ *  M. Fitzpatrick, NOAO, June 2007
+ */
+
+#include <stdio.h>
+#include <sys/types.h>
+#include <ctype.h>
+#include <string.h>
+
+#define	SZ_LINE			1024
+
+
+int
+isSexagesimal (char *str)
+{
+    register int  i;
+
+    /* Allow only numbers, colons, decimal point, whitespace, and sign.  */
+    for (i=(strlen(str)-1); i >= 0; i--)
+	if (!isdigit(str[i]) && strchr(":+- .\t,", (int)str[i]) == (char *)NULL)
+	    return (0);
+
+    return (1);
+}
+
+int
+isDecimal (char *str)
+{
+    register int  i;
+
+    /* Allow only numbers, decimal point, whitespace, and sign.  */
+    for (i=(strlen(str)-1); i >= 0; i--)
+	if (!isdigit(str[i]) && strchr("+- .\t,", (int)str[i]) == (char *)NULL)
+	    return (0);
+
+    return (1);
+}
+
+float
+sexa (char *s)
+{
+    int     n, sign;
+    int     hr, minutes;
+    float   sec, val;
+    extern double atof();
+
+    while (isspace (*s)) 		/* skip leading whitespace	*/
+	s++;
+    sign = (*s == '-') ? (s++, -1) : 1; /* get the sign			*/
+
+    minutes = 0;
+    sec = 0.;
+    n = sscanf (s, "%d:%d:%f", &hr, &minutes, &sec);
+    if (n < 1 || minutes < 0 || sec < 0)
+        val = -999.0;
+    else
+        /*  Beware: Evaluation here can produce roundoff errors! 
+	*/
+        val = sign * (hr + ((float)minutes)/60. + sec/3600.);
+
+    return (val);
+}
+
+
+char *
+toSexa (double pos)
+{
+    static char str[SZ_LINE];
+    int   d, m;
+    float s, frac;
+    char sign = (pos < 0.0 ? '-' : ' ');
+
+
+    pos = (pos < 0.0 ? -pos : pos);
+
+    d = (int) pos;
+    frac = (pos - d);
+    m = frac * 60.0;
+    s = ((frac * 60.0) - m) * 60.0;
+
+    sprintf (str, "%c%02d:%02d:%04.1f", sign, d, m, s);
+
+    return (str);
+}
+
+
+char *
+toSexaTime (int nsec)
+{
+    char  tstr[SZ_LINE];
+    int   m, s;
+
+    m = nsec / 60;
+    s = nsec % 60;
+
+    sprintf (tstr, "%02d:%02d", m, s);
+
+    return (strdup (tstr));		/* note potential memory leak!	*/
+}

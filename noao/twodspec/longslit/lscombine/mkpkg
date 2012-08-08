@@ -1,0 +1,14 @@
+# Make the LSCOMBINE Task.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	@src
+
+	t_lscombine.x	<error.h> <imhdr.h> <mach.h> <math/iminterp.h>\
+			src/icombine.com src/icombine.h\
+			../transform/transform.com
+	;

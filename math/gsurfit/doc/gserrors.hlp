@@ -1,0 +1,61 @@
+.help gserrors Aug85 "Gsurfit Package"
+.ih
+NAME
+.nf
+gserrors -- calculate errors of the coefficients and the chi-square
+	    of the fit
+.fi
+.ih
+SYNOPSIS
+gserrors (sf, y, weight, yfit, chi_square, errors)
+
+.nf
+pointer	sf		# surface descriptor
+real	y[ARB]		# array of data values
+real	weight[ARB]	# array of weights
+real	yfit[ARB]	# array of fitted values
+real	chi_square	# chi_square of fit
+real	errors[ARB]	# array of errors
+.fi
+.ih
+ARGUMENTS
+.ls sf
+Pointer to the surface descriptor structure.
+.le
+.ls y
+Array of data values.
+.le
+.ls weight
+Array of weights.
+.le
+.ls yfit
+Array of fitted values.
+.le
+.ls chi_square
+The reduced chi-square of the fit.
+.le
+.ls errors
+The array of errors of the coefficients. The number of coefficients
+can be obtained by a call to gsstati.
+.le
+
+.nf
+	    nerrors = gsstati (sf, GSNCOEFF)
+.fi
+.ih
+DESCRIPTION
+GSCOEFF calculates the reduced chi-square of the fit and the standard
+deviation of the coefficients.
+The chi-square of the fit is the square root of the sum of the
+weighted squares of the residuals divided by the number of degrees
+of freedom. If the weights are equal, then the reduced chi-square is
+the variance of the fit. The error of the j-th coefficient is the
+square root of the j-th diagonal element of the inverse of the data
+matrix. If the weights are equal to one, then the errors are scaled
+by the square root of the variance of the data.
+.ih
+NOTES
+.ih
+SEE ALSO
+gscoeff
+.endhelp

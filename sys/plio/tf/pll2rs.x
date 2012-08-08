@@ -1,0 +1,117 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	<plset.h>
+include	<plio.h>
+
+# PL_L2R -- Convert a line list to a range list.  The length of the output
+# range list is returned as the function value.
+
+int procedure pl_l2rs (ll_src, xs, rl, npix)
+
+short	ll_src[ARB]		#I input line list
+int	xs			#I starting index in ll_src
+short	rl[3,ARB] 		#O output range list
+int	npix			#I number of pixels to convert
+
+int	pv, hi
+bool	skipword
+int	opcode, data, ll_len, ll_first
+int	x1, x2, i1, i2, xe, np, rn, ip
+define	range_ 91
+define	putrange_ 92
+ 
+begin
+	# Support old format line lists.
+	if (LL_OLDFORMAT(ll_src)) {
+	    ll_len = OLL_LEN(ll_src)
+	    ll_first = OLL_FIRST
+	} else {
+	    ll_len = LL_LEN(ll_src)
+	    ll_first = LL_FIRST(ll_src)
+	}
+
+	# No pixels?
+	if (npix <= 0 || ll_len <= 0)
+	    return (0)
+ 
+	rn = RL_FIRST
+	xe = xs + npix - 1
+	skipword = false
+	x1 = 1
+	hi = 1
+
+	do ip = ll_first, ll_len {
+	    if (skipword) {
+		skipword = false
+		next
+	    }
+
+	    opcode = I_OPCODE(ll_src[ip])
+	    data   = I_DATA(ll_src[ip])
+
+	    switch (opcode) {
+	    case I_ZN:
+		pv = 0
+		goto range_
+	    case I_HN:
+		pv = hi
+range_
+		# Determine inbounds region of segment.
+		x2 = x1 + data - 1
+		i1 = max (x1, xs)
+		i2 = min (x2, xe)
+		np = i2 - i1 + 1
+		x1 = x2 + 1
+
+	    case I_PN:
+		pv = hi
+		x2 = x1 + data - 1
+		if (x2 < xs || x2 > xe)
+		    np = 0
+		else {
+		    i1 = x2
+		    np = 1
+		}
+		x1 = x2 + 1
+
+	    case I_SH:
+		hi = (int(ll_src[ip+1]) * I_SHIFT) + data
+		skipword = true
+		next
+	    case I_IH:
+		hi = hi + data
+		next
+	    case I_DH:
+		hi = hi - data
+		next
+
+	    case I_IS, I_DS:
+		if (opcode == I_IS)
+		    hi = hi + data
+		else
+		    hi = hi - data
+
+		i1 = max (x1, xs)
+		i2 = min (x1, xe)
+		np = i2 - i1 + 1
+		x1 = x1 + 1
+		pv = hi
+	    }
+
+	    # Output a range entry?
+	    if (np > 0 && pv > 0) {
+		rl[1,rn] = i1
+		rl[2,rn] = np
+		rl[3,rn] = pv
+		rn = rn + 1
+	    }
+
+	    if (x1 > xe)
+		break
+	}
+
+	RL_LEN(rl) = rn - 1
+	RL_AXLEN(rl) = npix
+
+	return (rn - 1)
+end

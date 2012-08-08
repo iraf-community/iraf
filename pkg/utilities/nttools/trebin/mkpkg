@@ -1,0 +1,27 @@
+# Update the trebin application code in the ttools package library
+# Author: Phil Hodge, 2-DEC-1988
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	tnamcls.x
+	tnamgio.x
+	tnaminit.x
+	trebin.x		<error.h> <tbset.h>
+	tucspl.f
+	tudcol.x		<tbset.h>
+	tugcol.x		<error.h> <tbset.h>
+	tugetput.x		<tbset.h>
+	tuhunt.f
+	tuiep3.f
+	tuifit.x		trebin.h
+	tuinterp.x		<error.h> <tbset.h>
+	tuiset.x		trebin.h
+	tuispl.f
+	tuival.x		trebin.h
+	tutrim.x
+	tuxget.x		<tbset.h>
+	;

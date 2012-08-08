@@ -1,0 +1,349 @@
+.help utilities Oct83 "IRAF System Utilities"
+.sh
+Description of the Standard Utility Routines
+
+    Most of the system utilities are set up to read from either the
+standard input or a list of files.  If not reading from the standard
+input, and the input file template is not given on the command line,
+a prompt will be issued for the input file list.  If the output is a
+single file or directory, and output is not redirected, a prompt will
+be issued for the output file.
+
+.ks
+.ls 4 ALLOCATE device
+
+Allocate a device (i.e., a tape drive).  Some devices must be allocated
+before they can be accessed for i/o.  Deallocation occurs automatically
+upon logoff, or upon execution of DEALLOCATE.  The following devices may
+be allocated:
+
+.nf
+Devices:
+	mta	Magtape unit A.
+	mtb	Magtape unit B.
+	ima	Image display unit A.
+	imb	Image display unit B.
+.fi
+.le
+.ke
+
+.ks
+.ls BEEP
+Beep the terminal bell.  Used as in "> munch;beep" to signal when a
+lengthy command has finished.  Otherwise, an IRAF program will only
+ring the terminal bell when an error has occurred.
+.le
+.ke
+
+.ks
+.ls CLEAR
+
+Clear the terminal screen.
+.le
+.ke
+
+.ks
+.ls CONCATENATE files [,output_file]
+
+Concatenate the named input files to the standard output or to the named
+output file if given.  All input files should be of the same type (text or
+binary).  The default type of the output file is the same as that of the
+first input file; this may be overridden by setting the hidden parameter
+"out_type".  The standard input is assumed to be a text file unless overridden
+by setting out_type.  If no output file is given on the command line, the
+standard output is assumed.
+
+.nf
+Hidden Parameters:
+    out_type	string = "in_type"	Output file type (text|binary)
+    append	bool = no		Append to output file
+.fi
+.le
+.ke
+
+.ks
+.ls COPY file|files, output_file|directory
+
+Copy the input file to the output file, or copy each file in the input list
+to the directory given as the second argument.
+.le
+.ke
+
+.ks
+.ls COUNT files
+
+Count the number of lines, words, and characters in each file
+in the input list.  Print the totals for each file and for all files.
+.le
+.ke
+
+.ks
+.ls DEALLOCATE device
+
+Deallocate a previously allocated device (e.g., a tape drive).  Devices
+are automatically deallocated upon logoff if not explicitly deallocated
+with the deallocate command.
+.le
+.ke
+
+.ks
+.ls DELETE files
+
+Delete the named files.  A warning message is printed if a file
+cannot be deleted.  It is not considered an error to attempt to
+delete a file which does not exist.  Protected files cannot be
+deleted without first removing their protection.
+
+.nf
+Hidden Parameters:
+    verify	bool = no	Generate query to verify that each
+				  file should indeed be deleted.
+.fi
+.le
+.ke
+
+.ks
+.ls DEVSTATUS device
+
+Print status information (i.e., is the device allocated, to whom, etc.)
+for the named device.
+.le
+.ke
+
+.ks
+.ls DIRECTORY [files] [,op=string]
+
+Tabulate information on all files matching the template given as the
+first argument on the standard output.  If no template is given, the
+contents of the current directory are displayed.  The "long" format
+gives file protection status, type (text, binary, directory, or executable),
+access modes (owner, group, world), owner name, size in bytes, date of
+last modify, and the file name.
+
+.nf
+Hidden Parameters:
+    option	string = "m"	    1	one-column format
+				    a	use time of last access
+				    c	use time of creation
+				    l	long format
+				    m	multicolumn format (default)
+				    s	add size in Kb
+				    t	time sort
+				    r	reverse sort
+
+e.g.: > dir op=l	(show current directory, long form)
+      > dir "*.x",op=lt	(all ".x" files in current directory, long form)
+.fi
+.le
+.ke
+
+.ks
+.ls DISKSPACE
+
+Summarize the amount of disk space available on the local system.
+This command and its output are machine dependent.  This command
+may not be available on all systems.
+.le
+.ke
+
+.ks
+.ls HEAD files
+
+Print the first few lines of each of the named files on the standard
+output.  If more than one file is printed, a brief header is printed to
+identify each file.
+
+.nf
+hidden params:
+    nlines	int = 12	number of lines to print
+.fi
+.le
+.ke
+
+.ks
+.ls LPRINT files
+
+The named text files (or the standard input) are printed on the standard
+line printer device.  If several files are to be printed, each file is
+printed starting on a new page, and file pages are broken and printed
+with numbered headers.  If reading from the standard input, the input
+stream is copied to the printer without pagination, though pages may still
+be broken by embedding formfeed characters in the text.  The map_cc
+option may be used to turn off all control character mapping, if binary
+data is to be sent to the printer.
+
+.nf
+Hidden Parameters:
+    map_cc	bool = yes	Map control characters into a printable
+				  sequence (^L, etc.)
+.fi
+.le
+.ke
+
+.ks
+.ls MATCH pattern, files
+
+Search each text file for the given pattern.  Copy a line to the standard
+output if the pattern can be matched.  Match against the standard input
+if no files are named.
+
+.nf
+Hidden Parameters:
+    stop	bool = no	Stop matched lines and pass unmatched
+				  lines to the output instead.
+.fi
+.le
+.ke
+
+.ks
+.ls NEWS
+
+Page through the system news file, starting with the most recent entries.
+The system news file is a sort of electronic bulletin board, used to
+post announcements and notes of general interest.
+.le
+.ke
+
+.ks
+.ls PAGE files
+
+The named text files (or the standard input) are displayed a page at a
+time on the standard output.  If there is more than one input file,
+a brief header is printed at the beginning of each file.
+
+.nf
+Hidden Parameters:
+    map_cc	bool = yes	Map control characters into a printable
+				  sequence (^L, etc.)
+.fi
+.le
+.ke
+
+.ks
+.ls PROTECT files
+
+Protect the named files from deletion or clobber, accidental or otherwise.
+It is not considered an error to attempt to protect a file which is already
+protected.  Protecting a file prevents only deletion or clobber of the entire
+file: the contents of the file may still be overwritten.
+.le
+.ke
+
+.ks
+.ls RENAME file|files, output_file|directory
+
+Rename a file, or move each file in the input list to the directory
+given as the second argument.
+.le
+.ke
+
+.ks
+.ls SORT files
+
+Sort and/or merge the text files named in the list, or sort the standard
+input if no list.  Sorting is by line or column, alphabetically or
+numerically, in forward or reverse order.
+
+.nf
+Hidden Parameters:
+    numeric_sort	bool = no	Sort numerically instead of
+					  alphabetically, if datum is
+					  a number.
+    reverse_sort	bool = no	Reverse the sense of the sort.
+    column		int = 0		If 0, sort the entire line, else
+					  sort the indicated column.
+    ignore_whitespace	bool = yes	Ignore leading whitespace if
+					  sorting full lines.
+    merge		bool = no	Merge the input files, which are
+					  assumed to already have been
+					  sorted.
+.fi
+.le
+.ke
+
+.ks
+.ls SPY
+
+Get information on who is using the system, what they are up to, how
+much cpu time, etc., they have used, and so on.  This command, and the
+information it gives, are machine dependent.  This command may not be
+available on all systems.
+
+.nf
+Hidden Parameters:
+    verbose	bool = no	Give more detailed information.
+.fi
+.le
+.ke
+
+.ks
+.ls STTY [terminal]
+
+Identify the type of terminal being used, if different than the system
+default.  This is necessary to tell the system the control sequence to
+be used to clear the screen, the dimensions of the screen, etc.  If no
+arguments are given, the current terminal status is given.
+
+.nf
+Hidden Parameters:
+    baud	int = 0		If nonzero, the system takes the
+				  argument as the new baud rate.
+    ncols	int = 0		If nonzero, the argument becomes
+				  the number of columns per screen.
+    nlines	int = 0		If nonzero, the argument becomes
+				  the number of lines per screen.
+.fi
+.le
+.ke
+
+.ks
+.ls TAIL files
+
+Print the last few lines of each of the named text files on the
+standard output.
+
+.nf
+Hidden Parameters:
+    nlines	int = 12	Number of lines to print.
+.fi
+.le
+.ke
+
+.ks
+.ls TEE file
+
+Copy the standard input to the standard output, as well as to the named
+output file.
+
+.nf
+Hidden Parameters:
+    out_type	string = "text"	Type of output file (text|binary).
+    append	bool = no	Append to the output file.
+.fi
+.le
+.ke
+
+.ks
+.ls TIME
+
+Print the current time and date.
+.le
+.ke
+
+.ks
+.ls TYPE files
+
+Copy the named text files to the standard output.  If more than one file is
+to be typed, a brief header is printed at the beginning of each file,
+identifying the file.
+.le
+.ke
+
+.ks
+.ls UNPROTECT files
+
+Remove delete protection from the named files.  It is not considered
+an error to attempt to remove protection from a file which is not protected.
+.le
+.ke
+.endhelp

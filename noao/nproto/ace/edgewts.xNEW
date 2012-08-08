@@ -1,0 +1,56 @@
+task	test
+
+procedure test ()
+
+double	dx, dy, r[11], w[11], clgetd()
+int	i, nr
+
+begin
+	dx = clgetd ("dx")
+	dy = clgetd ("dy")
+	nr = 11
+
+	call edgewts (dx, dy, r, w, nr)
+	do i = 1, nr {
+	    call eprintf ("%.2f %.4g\n")
+		call pargd (r[i])
+		call pargd (w[i])
+	}
+end
+
+procedure edgewts (dx, dy, r, w, nr)
+
+double	dx			#I Distance from aperture center to pixel center
+double	dy			#I Distance from aperture center to pixel center
+double	r[nr]			#O Aperture radii
+double	w[nr]			#O Weights
+int	nr			#O Number of aperture radius points
+
+int	i, j, k, n
+double	r2, rmin, rmax, dr, a, d, rap2, y2
+
+begin
+	rmin = sqrt ((max(0.,dx-0.6))**2+(max(0.,dy-0.6))**2)
+	rmax = sqrt ((dx+0.6)**2+(dy+0.6)**2)
+	dr = (rmax - rmin) / nr
+	rmin = rmin + dr / 2
+
+	n = 100
+	d = 1.0D0 / (2 * n + 1)
+	a = d * d
+
+	do k = 1, nr {
+	    rap2 = (rmin + (k - 1) * dr) ** 2
+	    r[k] = sqrt (rap2)
+	    w[k] = 0.0D0
+	    do j = -n, n {
+		y2 = (dy + j * d) ** 2
+		do i = -n, n {
+		    r2 = y2 + (dx + i * d) ** 2
+		    if (r2 > rap2)
+			break
+		    w[k] = w[k] + a
+		}
+	    }
+	}
+end

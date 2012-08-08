@@ -1,0 +1,31 @@
+#  Parameter file for the HELP task
+
+template,s,a,"",,,"Module name or package.module style template"
+
+file_template,b,h,no,,,"Template is a filename matching template"
+option,s,h,"help",,,"Type of help (help,source,sysdoc,files,summary,etc)"
+device,s,h,"terminal","terminal|gui|text|html|postscript|ps",,"output device"
+
+# Output parameters.
+all,b,h,no,,,"print help for all modules matching template"
+parameter,s,h,"all",,,"parameter for which help is desired"
+section,s,h,"all",,,"section for which help is desired"
+
+# Terminal display parameters.
+page,b,h,yes,,,"paginate output"
+nlpp,i,h,59,1,,"number of lines per page if output redirected"
+lmargin,i,h,1,1,,"left margin"
+rmargin,i,h,72,2,,"right margin"
+
+# GUI parameters
+search,b,h,no,,,"Search database for help topic?"
+home,s,h,"",,,"Homepage to be used"
+printer,s,h,"printer",,,"Printer name"
+showtype,b,h,no,,,"Indicate packages in list?"
+quickref,s,h,"uparm$quick.ref",,,"Quick-reference file"
+uifname,s,h,"lib$scr/help.gui",,,"User interface filename"
+coords,*gcur,h,"",,,"Cursor"
+
+# Help Parameters.
+helpdb,s,h,"helpdb",,,"Help database to be used"
+curpack,s,h,"AskCL",,,"current package"

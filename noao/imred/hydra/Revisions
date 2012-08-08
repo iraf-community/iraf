@@ -1,0 +1,61 @@
+.help revisions Jul91 noao.imred.hydra
+.nf
+imred$hydra/doc/dohydra.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+=======
+V2.11.1
+=======
+
+imred$hydra/doc/dohdydra.hlp
+imred$hydra/doc/dohdydra.ms
+    Updated for change where if both crval and cdelt are INDEF then the
+    automatic identification is not done.  (5/2/96, Valdes)
+
+imred$hydra/doc/dohydra.hlp
+    Fixed typo.  (4/22/97, Valdes)
+
+imred$hydra/demos/mkbig.cl
+imred$hydra/demos/mkdohydra.cl
+imred$hydra/demos/mkdonessie.cl
+    Made the ARTDATA package parameters explicit (4/15/97, Valdes)
+
+imred$hydra/hydra.cl
+    Increased the minimum min_lenuserarea from 40000 to 100000.
+    (7/31/96, Valdes)
+
+imred$hydra/dohydra.cl
+imred$hydra/dohydra.par
+imred$hydra/params.par
+imred$hydra/doc/dohydra.hlp
+imred$hydra/doc/dohydra.ms
+    Added crval/cdelt parameters used in new version with automatic arc
+    line identification.  (4/5/96, Valdes)
+
+imred$hydra/doc/dohydra.hlp
+imred$hydra/doc/dohydra.ms
+    Describes the new header option for the aperture identification table.
+    (7/25/95, Valdes)
+
+imred$hydra/hydra.cl
+imred$hydra/dohydra.cl
+imred$hydra/dohydra.par
+imred$hydra/doc/dohydra.hlp
+imred$hydra/doc/dohydra.ms
+imred$hydra/demos/xgdohydra.dat
+imred$hydra/demos/xgbig.dat
+imred$hydra/demos/xgdohydra1.dat
+imred$hydra/demos/xgdohydranl.dat
+imred$hydra/demos/xgdonessie.dat
+    Added sky alignment option.  (7/19/95, Valdes)
+
+=======
+V2.10.4
+=======
+
+imred$hydra/hydra.cl
+    Renamed "response" to "fibresponse". (12/31/94, Valdes)
+
+imred/hydra/*
+    Installed (7/24/91, Valdes)
+.endhelp

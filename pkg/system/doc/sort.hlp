@@ -1,0 +1,62 @@
+.help sort Mar87 system
+.ih
+NAME
+sort -- sort a file or the standard input
+.ih
+USAGE
+sort input_file
+.ih
+PARAMETERS
+.ls input_file
+The text file to be sorted.  If the standard input is redirected the standard
+input is sorted.
+.le
+.ls column = 0
+If 0, sort entire text lines, else sort based on data/text starting
+in the specified column.  Columns are delimited by whitespace.  Thus,
+.nf
+	12   abc   34   56
+.fi
+has four columns, "abc" being in the second.
+.le
+.ls ignore_whitespace = no
+Ignore leading whitespace.  Useful only when column = 0 and the sort is
+non-numeric.
+.le
+.ls numeric_sort = no
+If set, make numerical (rather than ASCII text) comparisons.
+.le
+.ls reverse_sort = no
+If set, sort in reverse text/numeric order.
+.le
+.ih
+DESCRIPTION
+\fISort\fR sorts the contents of the given text file, or the
+standard input, either on a textual (based on the ASCII collating
+sequence), or on a numeric basis.  If a numeric sort is requested,
+and either field in any comparison is non-numeric, a string (ASCII)
+comparison will be made instead.
+.ih
+EXAMPLES
+
+1. Sort the output of the set command into alphabetic (ASCII collating)
+order.
+
+	cl> set | sort
+
+2. Sort the contents of "file", in reverse ASCII order, ignoring the
+contents of columns 1 through 4.
+
+	cl> sort file rev+ col=5
+
+3. Print a long form directory listing with the files sorted by size,
+largest files first.
+
+	cl> dir | sort num+ rev+ col=3
+.ih
+BUGS
+Only one file can be sorted per call, and only one column or all columns can
+be used for the sort.  The current program is inefficient for large numeric
+sorting tasks because the same numeric field may be decoded into its
+corresponding binary value many times.
+.endhelp

@@ -1,0 +1,19 @@
+# Help directory for the OBSUTIL package.
+
+$src		= "./src/"
+$doc		= "./src/doc/"
+
+bitcount	hlp=doc$bitcount.hlp,		src=src$t_bitcount.x
+ccdtime		hlp=doc$ccdtime.hlp,		src=src$t_ccdtime.x
+cgiparse	hlp=doc$cgiparse.hlp,		src=src$sptime/t_cgiparse.x
+findgain	hlp=doc$findgain.hlp,		src=src$findgain.cl
+pairmass	hlp=doc$pairmass.hlp
+psfmeasure	hlp=doc$psfmeasure.hlp
+shutcor		hlp=doc$shutcor.hlp,		src=src$shutcor.cl
+specfocus	hlp=doc$specfocus.hlp
+sptime		hlp=doc$sptime.hlp
+starfocus	hlp=doc$starfocus.hlp
+
+kpnofocus	hlp=doc$kpnofocus.hlp
+
+revisions	sys=src$Revisions

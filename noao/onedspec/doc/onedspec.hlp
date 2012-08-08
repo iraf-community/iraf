@@ -1,0 +1,293 @@
+.help package Nov94 noao.onedspec
+.ih
+NAME
+onedspec -- generic 1D spectral reduction and analysis package
+.ih
+USAGE
+onedspec
+.ih
+PARAMETERS
+.ls observatory = "observatory"
+Observatory at which the spectra were obtained if not specified in the
+image header by the keyword OBSERVAT.  This parameter is used by several
+tasks in the package through parameter redirection so this parameter may be
+used to affect all these tasks at the same time.  The observatory may be
+one of the observatories in the observatory database, "observatory" to
+select the observatory defined by the environment variable "observatory" or
+the parameter \fBobservatory.observatory\fR, or "obspars" to select the
+current parameters set in the \fBobservatory\fR task.  See help for
+\fBobservatory\fR for additional information.
+.le
+.ls caldir = ""
+Calibration directory containing standard star data.  This parameter
+is used by several tasks in the package through redirection.  A list of
+standard calibration directories may be obtained by listing the file
+"onedstds$README"; for example:
+
+	cl> page onedstds$README
+
+The user may copy or create their own calibration files and specify
+the directory.  The directory "" refers to the current working directory.
+.le
+.ls interp = "poly5" (nearest|linear|poly3|poly5|spline3|sinc)
+Spectrum interpolation type used when spectra are resampled.  The choices are:
+
+.nf
+	nearest - nearest neighbor
+	 linear - linear
+	  poly3 - 3rd order polynomial
+	  poly5 - 5th order polynomial
+	spline3 - cubic spline
+	   sinc - sinc function
+.fi
+.le
+
+The following parameters apply to two and three dimensional images
+such as long slit or Fabry-Perot spectra.  They allow selection of
+a line or column as the spectrum "aperture" and summing of neighboring
+elements to form a one dimensional spectrum as the tasks in the
+ONEDSPEC package expect.
+
+.ls dispaxis = 1
+The image axis corresponding to the dispersion.  If there is an image
+header keyword DISPAXIS then the value of the keyword will be used
+otherwise this package parameter is used.  The dispersion coordinates
+are a function of column, line, or band when this parameter is 1, 2
+or 3.
+.le
+.ls nsum = "1"
+The number of neighboring elements to sum.  This is a string parameter
+that can have one or two numbers.  For two dimensional images only
+one number is needed and specifies the number of lines or columns
+to sum depending on the dispersion axis.  For three dimensional
+images two numbers may be given (if only one is given it defaults
+to the same value for both spatial axes) to specify the summing of
+the two spatial axes.  The order is the lower dimensional spatial
+axis first.
+
+For an even value the elements summed are the central specified
+"aperture", nsum / 2 - 1 below, and nsum /2 above; i.e the
+central value is closer to the lower element than the upper.
+For example, for nsum=4 and an aperture of 10 for a dispersion
+axis of 1 in a two dimensional image the spectrum used will be
+the sum of lines 9 to 12.
+.le
+
+.ls records = ""
+This is a dummy parameter.  It is applicable only in the \fBimred.irs\fR
+and \fBimred.iids\fR packages.
+.le
+.ls version = "ONEDSPEC V3: November 1991"
+Package version identification.
+.le
+.ih
+DESCRIPTION
+The \fBonedspec\fR package contains generic tasks for the reduction,
+analysis, and display of one dimensional spectra.  The specifics of
+individual tasks may be found in their IRAF "help" pages.  This document
+describes the general and common features of the tasks.
+
+The functions provided in the \fBonedspec\fR package with applicable tasks
+are summarized in Table 1.
+
+.ce
+Table 1:  Functions provided in the \fBonedspec\fR package
+
+.nf
+1.  Graphical display of spectra
+          bplot - Batch plots of spectra
+       identify - Identify features and fit dispersion functions
+       specplot - Stack and plot multiple spectra
+          splot - Interactive spectral plot/analysis
+
+2.  Determining and applying dispersion calibrations
+        dispcor - Dispersion correct spectra
+         dopcor - Apply doppler corrections
+       identify - Identify features and fit dispersion functions
+     refspectra - Assign reference spectra to other spectra
+     reidentify - Automatically identify features in spectra
+      specshift - Shift spectral dispersion coordinate system
+
+3.  Determining and applying flux calibrations
+      calibrate - Apply extinction and flux calibrations to spectra
+       deredden - Apply interstellar extinction correction
+         dopcor - Apply doppler corrections
+         lcalib - List calibration file data
+       sensfunc - Create sensitivity function
+       standard - Tabulate standard star data
+
+4.  Fitting spectral features and continua
+      continuum - Fit the continuum in spectra
+       fitprofs - Fit gaussian profiles
+           sfit - Fit spectra and output fit, ratio, or difference
+          splot - Interactive spectral plot/analysis
+
+5.  Arithmetic and combining of spectra
+         sarith - Spectrum arithmetic
+       scombine - Combine spectra
+          splot - Interactive spectral plot/analysis
+
+6.  Miscellaneous functions
+         mkspec - Generate an artificial spectrum
+          names - Generate a list of image names from a string
+     sapertures - Set or change aperture header information
+          scopy - Select and copy spectra
+        sinterp - Interpolate a table of x,y to create a spectrum
+          slist - List spectrum header parameters
+          splot - Interactive spectral plot/analysis
+.fi
+
+There are other packages which provide additional functions or specialized
+tasks for spectra.  Radial velocity measurements are available in the
+\fBnoao.rv\fR package.  The \fBnoao.imred\fR package contains a number
+of packages for specific types of data or instruments.  These packages
+are listed in Table 2.
+
+.ce
+Table 2:  \fBImred\fR spectroscopy packages
+
+.nf
+ 	  argus - CTIO ARGUS reduction package
+       ctioslit - CTIO spectrophotometric reduction package
+	echelle - Echelle spectral reductions (slit and FOE)
+ 	  hydra - KPNO HYDRA (and NESSIE) reduction package
+	   iids - KPNO IIDS spectral reductions
+	    irs - KPNO IRS spectral reductions
+      kpnocoude - KPNO coude reduction package (slit and 3 fiber)
+       kpnoslit - KPNO low/moderate dispersion slits (Goldcam, RCspec, Whitecam)
+        specred - Generic slit and fiber spectral reduction package
+.fi
+
+Finally, there are non-NOAO packages which may contain generally useful
+software for spectra.  Currently available packages are \fBstsdas\fR
+and \fBxray\fR.
+.ih
+SPECTRUM IMAGE FORMATS AND COORDINATE SYSTEMS
+See the separate help topic \fIspecwcs\fR.
+.ih
+INTERPOLATION
+Changing the dispersion sampling of spectra, such as when converting to a
+constant sampling interval per pixel or a common sampling for combining or
+doing arithmetic on spectra, requires interpolation.  The tasks which
+reinterpolate spectra, if needed, are \fBdispcor, sarith, scombine,\fR and
+\fBsplot\fR.
+
+The interpolation type is set by the package parameter \fIinterp\fR.
+The available interpolation types are:
+
+.nf
+	nearest - nearest neighbor
+	 linear - linear
+	  poly3 - 3rd order polynomial
+	  poly5 - 5th order polynomial
+	spline3 - cubic spline
+	   sinc - sinc function
+.fi
+
+The default interpolation type is a 5th order polynomial.
+
+The choice of interpolation type depends on the type of data, smooth
+verses strong, sharp, undersampled features, and the requirements of
+the user.  The "nearest" and "linear" interpolation are somewhat
+crude and simple but they avoid "ringing" near sharp features.  The
+polynomial interpolations are smoother but have noticible ringing
+near sharp features.  They are, unlike the sinc function described
+below, localized.
+
+In V2.10 a "sinc" interpolation option is available.  This function
+has advantages and disadvantages.  It is important to realize that
+there are disadvantages!  Sinc interpolation approximates applying a phase
+shift to the fourier transform of the spectrum.  Thus, repeated
+interpolations do not accumulate errors (or nearly so) and, in particular,
+a forward and reverse interpolation will recover the original spectrum
+much more closely than other interpolation types.  However, for
+undersampled, strong features, such as cosmic rays or narrow emission or
+absorption lines, the ringing can be more severe than the polynomial
+interpolations.  The ringing is especially a concern because it extends
+a long way from the feature causing the ringing; 30 pixels with the
+truncated algorithm used.  Note that it is not the truncation of the
+interpolation function which is at fault!
+
+Because of the problems seen with sinc interpolation it should be used with
+care.  Specifically, if there are no undersampled, narrow features it is a
+good choice but when there are such features the contamination of the
+spectrum by ringing is much more severe than with other interpolation
+types.
+.ih
+UNITS
+In versions of the NOAO spectroscopy packages prior to V2.10 the dispersion
+units used were restricted to Angstroms.  In V2.10 the first,
+experimental, step of generalizing to other units was taken by
+allowing the two principle spectral plotting tasks, \fBsplot\fR and
+\fBspecplot\fR, to plot in various units.  Dispersion functions are still
+assumed to be in Angstroms but in the future the generalization will be
+completed to all the NOAO spectroscopy tasks.
+
+The dispersion units capability of the plotting tasks allows specifying
+the units with the "units" task parameter and interactively changing the
+units with the ":units" command.  In addition the 'v' key allows plotting
+in velocity units with the zero point velocity defined by the cursor
+position.
+
+The units are specified by strings having a unit type from the list below
+along with the possible preceding modifiers, "inverse", to select the
+inverse of the unit and "log" to select logarithmic units. For example "log
+angstroms" to plot the logarithm of wavelength in Angstroms and "inv
+microns" to plot inverse microns.  The various identifiers may be
+abbreviated as words but the syntax is not sophisticated enough to
+recognized standard scientific abbreviations except as noted below.
+
+.nf
+		Table 1:  Unit Types
+
+	   angstroms - Wavelength in Angstroms
+	  nanometers - Wavelength in nanometers
+	millimicrons - Wavelength in millimicrons
+	     microns - Wavelength in microns
+	 millimeters - Wavelength in millimeters
+	  centimeter - Wavelength in centimeters
+	      meters - Wavelength in meters
+	       hertz - Frequency in hertz (cycles per second)
+	   kilohertz - Frequency in kilohertz
+	   megahertz - Frequency in megahertz
+	   gigahertz - Frequency in gigahertz
+	         m/s - Velocity in meters per second
+	        km/s - Velocity in kilometers per second
+	          ev - Energy in electron volts
+	         kev - Energy in kilo electron volts
+	         mev - Energy in mega electron volts
+		   z - Redshift
+
+	          nm - Wavelength in nanometers
+	          mm - Wavelength in millimeters
+	          cm - Wavelength in centimeters
+	           m - Wavelength in meters
+	          Hz - Frequency in hertz (cycles per second)
+	         KHz - Frequency in kilohertz
+	         MHz - Frequency in megahertz
+	         GHz - Frequency in gigahertz
+		  wn - Wave number (inverse centimeters)
+.fi
+
+The velocity and redshift units require a trailing value and unit defining the
+velocity zero point.  For example to plot velocity relative to
+a wavelength of 1 micron the unit string would be:
+
+.nf
+	km/s 1 micron
+.fi
+
+Some additional examples of units strings are:
+
+.nf
+	milliang
+	megahertz
+	inv mic
+	log hertz
+	m/s 3 inv mic
+	z 5015 ang
+.fi
+.ih
+SEE ALSO
+apextract, longslit, rv, imred, specwcs
+.endhelp

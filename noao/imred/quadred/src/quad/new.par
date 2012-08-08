@@ -1,0 +1,8 @@
+input,s,a,"",,,Input image name
+instrument,s,a,"",,,Instrument file
+xtrim1,i,h,0,0,,
+xtrim2,i,h,0,0,,
+ytrim1,i,h,0,0,,
+ytrim2,i,h,0,0,,
+xskip1,i,h,0,0,,
+xskip2,i,h,0,0,,

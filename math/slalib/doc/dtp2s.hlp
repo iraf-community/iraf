@@ -1,0 +1,28 @@
+.help dtp2s Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDTPS (XI, ETA, RAZ, DECZ, RA, DEC)
+
+     - - - - - -
+      D T P S
+     - - - - - -
+
+  Transform tangent plane coordinates into spherical
+  (double precision)
+
+  Given:
+     XI,ETA      dp   tangent plane rectangular coordinates
+     RAZ,DECZ    dp   spherical coordinates of tangent point
+
+  Returned:
+     RA,DEC      dp   spherical coordinates (0-2pi,+/-pi/2)
+
+  Called:        slDA2P
+
+  P.T.Wallace   Starlink   24 July 1995
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

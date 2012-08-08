@@ -1,0 +1,59 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include <math/curfit.h>
+
+$if (datatype == r)
+include "curfitdef.h"
+$else
+include "dcurfitdef.h"
+$endif
+
+# CVEVAL -- Procedure to evaluate curve at a given x. The CV_NCOEFF(cv)
+# coefficients are assumed to be in COEFF.
+
+$if (datatype == r)
+PIXEL procedure cveval (cv, x)
+$else
+PIXEL procedure dcveval (cv, x)
+$endif
+
+pointer	cv		# curve descriptor
+PIXEL	x		# x value
+
+int	left
+pointer	cptr, xptr
+PIXEL	yfit
+
+PIXEL	adot$t()
+
+begin
+
+	# calculate the non-zero basis functions
+	switch (CV_TYPE(cv)) {
+	case CHEBYSHEV:
+	    left = 0
+	    call $tcv_b1cheb (x, CV_ORDER(cv), CV_MAXMIN(cv), CV_RANGE(cv),
+			   XBASIS(CV_XBASIS(cv)))
+	case LEGENDRE:
+	    left = 0
+	    call $tcv_b1leg (x, CV_ORDER(cv), CV_MAXMIN(cv), CV_RANGE(cv),
+			   XBASIS(CV_XBASIS(cv)))
+	case SPLINE3:
+	    call $tcv_b1spline3 (x, CV_NPIECES(cv), -CV_XMIN(cv),
+	    		      CV_SPACING(cv), XBASIS(CV_XBASIS(cv)), left)
+	case SPLINE1:
+	    call $tcv_b1spline1 (x, CV_NPIECES(cv), -CV_XMIN(cv),
+	    		      CV_SPACING(cv), XBASIS(CV_XBASIS(cv)), left)
+	case USERFNC:
+	    left = 0
+	    call $tcv_b1user (cv, x)
+	}
+
+
+	# accumulate the fitted value
+	cptr = CV_COEFF(cv) + left
+	xptr = CV_XBASIS(cv)
+	yfit = adot$t (XBASIS(xptr), COEFF(cptr), CV_ORDER(cv))
+
+	return (yfit)
+end

@@ -1,0 +1,439 @@
+.help peak May00 noao.digiphot.daophot
+.ih
+NAME
+peak -- fit the PSF model to single stars
+.ih
+USAGE
+peak image photfile psfimage peakfile rejfile
+.ih
+PARAMETERS
+.ls image
+The list of images containing the stars to be fit.
+.le
+.ls photfile
+The list of input photometry files containing initial estimates of the
+positions and magnitudes of the stars to be fit. The number of photometry
+files must be equal to the number of input images. If photfile is "default",
+"dir$default", or a directory specification  PSF searches for a file called
+dir$image.mag.# where # is the highest available version number for the file.
+Photfile is usually the output of the DAOPHOT PHOT task, but may also be the
+ output of PEAK itself, or of the DAOPHOT package GROUP, NSTAR,  ALLSTAR or
+PSF tasks. Photfile may be an APPHOT/DAOPHOT text database or an STSDAS table.
+.le
+.ls psfimage
+The list of images containing the PSF models computed by the DAOPHOT PSF task.
+The number of PSF images must be equal to the number of input images.  If
+psfimage is "default", "dir$default", or a directory specification,
+then PEAK will look for an image with the name image.psf.?, where
+? is the highest existing version number.
+.le
+.ls peakfile
+The list of output photometry files. There must be one output photometry
+file for every input image.  If peakfile is "default", "dir$default", or a
+directory specification, then PEAK will write an output file with the name
+image.pk.? where ? is the next available version number. Peakfile is a text
+database if the DAOPHOT package parameter text is "yes", an STSDAS table
+database if it is "no".
+.le
+.ls rejfile
+The list of output rejected photometry files containing the positions and sky
+values of stars that could not be fit. If rejfile is undefined, results for all
+the stars in photfile are written to \fIpeakfile\fR, otherwise only the stars
+which were successfully fit are written to \fIpeakfile\fR and the remainder are
+written to rejfile. If rejfile is "default", "dir$default", or a directory
+specification PEAK writes an output file with the name image.prj.? where ? is
+the next available version number. Otherwise rejfile must specify one output
+photometry file for every input image. Rejfile is a text database if the
+DAOPHOT package parameter \fItext\fR is "yes", an STSDAS binary table database
+if it is "no".
+.le
+.ls datapars = ""
+The name of the file containing the data dependent parameters. The parameters
+\fIscale\fR, \fIdatamin\fR, and \fIdatamax\fR are located here. If datapars
+is undefined then the default parameter set in uparm directory is used.
+.le
+.ls daopars = ""
+The name of the file containing the daophot fitting parameters. The parameters
+\fIpsfrad\fR and \fIfitrad\fR are located here. If \fIdaopars\fR is undefined
+then the default parameter set in uparm directory is used.
+.le
+.ls wcsin = ")_.wcsin", wcsout = ")_.wcsout", wcspsf = ")_.wcspsf"
+The coordinate system of the input coordinates read from \fIphotfile\fR, of the
+psf model \fIpsfimage\fR, and of the output coordinates written to
+\fIpeakfile\fR and \fIrejfile\fR respectively. The image header coordinate
+system is used to transform from the input coordinate system to the "logical"
+pixel coordinate system used internally, from the internal logical system to
+the PSF model system, and from the internal "logical" pixel coordinate system
+to the output coordinate system. The input coordinate system options are
+"logical", "tv", "physical", and "world". The PSF model and output coordinate
+system options are "logical", "tv", and "physical". The image cursor coordinate
+system is assumed to be the "tv" system.
+.ls logical
+Logical coordinates are pixel coordinates relative to the current image.
+The  logical coordinate system is the coordinate system used by the image
+input/output routines to access the image data on disk. In the logical
+coordinate system the coordinates of the first pixel of a  2D image, e.g.
+dev$ypix  and a 2D image section, e.g. dev$ypix[200:300,200:300] are
+always (1,1).
+.le
+.ls tv
+Tv coordinates are the pixel coordinates used by the display servers. Tv
+coordinates  include  the effects of any input image section, but do not
+include the effects of previous linear transformations. If the input
+image name does not include an image section, then tv coordinates are
+identical to logical coordinates.  If the input image name does include a
+section, and the input image has not been linearly transformed or copied from
+a parent image, tv coordinates are identical to physical coordinates.
+In the tv coordinate system the coordinates of the first pixel of a
+2D image, e.g. dev$ypix and a 2D image section, e.g. dev$ypix[200:300,200:300]
+are (1,1) and (200,200) respectively.
+.le
+.ls physical
+Physical coordinates are pixel coordinates invariant  with respect to linear
+transformations of the physical image data.  For example, if the current image
+was created by extracting a section of another image,  the  physical
+coordinates of an object in the current image will be equal to the physical
+coordinates of the same object in the parent image,  although the logical
+coordinates will be different.  In the physical coordinate system the
+coordinates of the first pixel of a 2D image, e.g. dev$ypix and a 2D
+image section, e.g. dev$ypix[200:300,200:300] are (1,1) and (200,200)
+respectively.
+.le
+.ls world
+World coordinates are image coordinates in any units which are invariant
+with respect to linear transformations of the physical image data. For
+example, the ra and dec of an object will always be the same no matter
+how the image is linearly transformed. The units of input world coordinates
+must be the same as those expected by the image header wcs, e. g.
+degrees and degrees for celestial coordinate systems.
+.le
+The wcsin, wcspsf, and wcsout parameters default to the values of the package
+parameters of the same name. The default values of the package parameters
+wcsin, wcspsf,  and wcsout are "logical", "physical" and "logical" respectively.
+.le
+.ls cache = ")_.cache"
+Cache the image pixels in memory. Cache may be set to the value of the apphot
+package parameter (the default), "yes", or "no". By default caching is
+disabled.
+.le
+.ls verify = ")_.verify"
+Verify the critical PEAK task parameters? Verify can be set to the DAOPHOT
+package parameter value (the default), "yes", or "no".
+.le
+.ls update = ")_.update"
+Update the PEAK task parameters if \fIverify\fR is "yes"? Update can be
+set to the default daophot package parameter value, "yes", or "no".
+.le
+.ls verbose = ")_.verbose"
+Print messages about the progress of the task ? Verbose can be set to the
+DAOPHOT package parameter value (the default), "yes", or "no".
+.le
+.ih
+DESCRIPTION
+PEAK computes x and y centers, sky values  and magnitudes for all the stars in
+\fIphotfile\fR by fitting the PSF model in \fIpsfimage\fR to single stars in
+\fIimage\fR. PEAK reads initial estimates of the centers and magnitudes along
+with the sky values from the photometry file \fIphotfile\fR. \fIPhotfile\fR is
+usually the output of the DAOPHOT PHOT task but may also be the output of PEAK
+itself, NSTAR, ALLSTAR, GROUP or PSF. The computed centers, sky values, and
+magnitudes are written to \fIpeakfile\fR along with the number of iterations
+it took to fit the star, the goodness of fit statistic chi, and the image
+sharpness statistic sharp.  If \fIrejfile\fR is defined only stars that are
+successfully fit are written to \fIpeakfile\fR. The remainder are written to
+\fIrejfile\fR. Otherwise all the stars are written to \fIpeakfile\fR.
+\fIPeakfile\fR and \fIrejfile\fR are APPHOT/DAOPHOT text databases if the
+DAOPHOT package parameter \fItext\fR is "yes", STSDAS binary table databases
+if it is "no".
+
+The coordinates read from \fIphotfile\fR are assumed to be in coordinate
+system defined by \fIwcsin\fR. The options are "logical", "tv", "physical",
+and "world" and the transformation from the input coordinate system to the
+internal "logical" system is defined by the image coordinate system. The
+simplest default is the "logical" pixel system. Users working on with image
+sections but importing pixel coordinate lists generated from the parent image
+must use the "tv" or "physical" input coordinate systems.
+
+The coordinate system of the PSF model is the coordinate system defined by the
+\fIwcspsf\fR parameter. Normally the PSF model was derived from the input image
+and this parameter default to "logical". However if the PSF model was derived
+from a larger image which is a "parent" of the input image, then wcspsf should
+be set to "tv" or "physical" depending on the circumstances.
+
+The coordinates written to \fIpeakfile\fR and \fIrejfile\fR are in the
+coordinate system defined by \fIwcsout\fR. The options are "logical", "tv",
+and "physical". The simplest default is the "logical" system. Users wishing to
+correlate the output coordinates of objects measured in image sections or
+mosaic pieces with coordinates in the parent image must use the "tv" or
+"physical" coordinate systems.
+
+If \fIcache\fR is yes and the host machine physical memory and working set size
+are large enough, the input image pixels are cached in memory. If caching
+is enabled and the first measurement will appear to take a long time as the
+entire image must be read in before the measurement is actually made. All
+subsequent measurements will be very fast because PEAK is accessing memory not
+disk. The point of caching is to speed up random image access by making the
+internal image i/o buffers the same size as the image itself. However if the
+input object lists are sorted in row order and sparse caching may actually
+worsen not improve the execution time. Also at present there is no point in
+enabling caching for images that are less than or equal to 524288 bytes, i.e.
+the size of the test image dev$ypix, as the default image i/o buffer is exactly
+that size. However if the size of dev$ypix is doubled by converting it to a
+real image with the chpixtype task then the effect of caching in interactive
+is can be quite noticeable if measurements of objects in the top and bottom
+halves of the image are alternated.
+
+By default PEAK computes new centers for all the stars in \fIphotfile\fR.
+However if the DAOPARS parameter \fIrecenter\fR is "no", PEAK assumes that the
+x and y centers in \fIphotfile\fR are the true centers and does not refit them.
+This option can be quite useful in cases where accurate center values have been
+derived from an image that has been through some non-linear image restoration
+algorithm, but the photometry must be derived from the original unrestored
+image.
+
+By default PEAK uses the sky value in \fIphotfile\fR. However if the DAOPARS
+parameter \fIfitsky\fR is "yes", then PEAK computes a new sky value as part of
+the non-linear least-squares fit. Recomputing the sky can significantly reduce
+the scatter in the magnitudes in regions where the sky background is varying
+rapidly, but users may need to increase the \fIfitrad\fR parameter to include
+more sky pixels in the fit. Users should experiment cautiously with this option.
+
+Only pixels within the good data range delimited by the DATAPARS task parameters
+\fIdatamin\fR and \fIdatamax\fR are included in the fit.  Most users set
+\fIdatamin\fR and \fIdatamax\fR  to exclude pixels outside the linearity
+regime of the detector. By default all the data is fit.  Users are advised to
+determine the values of these parameters for their detector and set the values
+in DATAPARS before beginning DAOPHOT reductions.
+
+Only pixels within the fitting radius set by the DAOPARS task parameter
+\fIfitrad\fR divided by the DATAPARS parameter \fIscale\fR are included in the
+fit. Since the non-linear least-squares fits determine three unknowns, the x
+and y position of the star's centroid and its brightness, the value of
+\fIfitrad\fR must be sufficiently large to include at least three pixels in
+the fit.  To accelerate the convergence of the non-linear least-squares fitting
+algorithm, pixels within \fIfitrad\fR are assigned weights which are inversely
+proportional to the radial distance of the pixel from the x and y centroid of
+the star, falling from a maximum at the centroid to zero at the fitting radius.
+\fIFitrad\fR must be sufficiently large to include at least three pixels with
+non-zero weights in the fit. Values of \fIfitrad\fR close to the full-width at
+half-maxima of the PSF are recommended.
+
+PEAK performs a weighted fit to the PSF. The weight of each pixel is computed
+by combining the radial weighting function described above with weights derived
+from the expected random errors computed using the values of the DATAPARS
+parameters \fIreadnoise\fR and \fIepadu\fR specified by the user. Both to
+obtain optimal fits, and because PEAK employs a conservative formula, dependent
+on \fIreadnoise\fR and \fIepadu\fR, for reducing the weights of deviant pixels
+which do not approach the model as the fit proceeds, users are strongly
+advised to determine the values of these parameters accurately, and to enter
+these values in DATAPARS before beginning any DAOPHOT reductions.
+
+For each star to be fit, PEAK extracts a subraster from \fIimage\fR which is N
+by N pixels square where N is approximately 2 * \fIpsfrad\fR / \fIscale\fR  + 1
+pixels wide. \fIPsfrad\fR is the PSF radius specified in the DAOPARS task and
+\fIscale\fR is the scale factor specified in the DATAPARS task. \fIPsfrad\fR may
+be less than or equal to, but can never exceed the value of the image header
+parameter "PSFRAD" in \fIpsfimage\fR. \fIPsfrad\fR should be set to a value
+several pixels larger than \fIfitrad\fR in order to permit the x and y
+centroids to wander during the fitting process.
+
+Along with the computed x and y centers and magnitudes, PEAK outputs the number
+of times the PSF fit had to be iterated to reach convergence for each star. The
+minimum number of iterations is three. The maximum number of iteration permitted
+is specified by the \fImaxiter\fR parameter in the DAOPARS task.  Obviously the
+results for stars which have reached the maximum iteration count should be
+viewed with suspicion. However since the convergence criteria are quite strict,
+(the computed magnitude must change  by less than .001 magnitudes or 0.05 sigma
+whichever is larger and the x and y centroids must change by less than 0.01
+pixels from one iteration to the next), even these stars may be reasonably well
+measured.
+
+PEAK computes a goodness of fit statistic chi which is essentially the ratio of
+the observed pixel-to-pixel scatter in the fit residuals to the expected
+scatter. Since the expected scatter is dependent on the DATAPARS task parameters
+\fIreadnoise\fR and \fIepadu\fR, it is important for these values to be set
+correctly. A plot of chi versus magnitude should scatter around unity with
+little or no trend in chi with magnitude, except at the bright end where
+saturation effects may be present.
+
+Finally PEAK computes the statistic sharp which estimates the intrinsic angular
+size of the measured object outside the atmosphere. Sharp is roughly defined as
+the difference between the square of the width of the object and the square of
+the width of PSF. Sharp has values close to zero for single stars, large
+positive values for blended doubles and partially resolved galaxies, and large
+negative values for cosmic rays and blemishes.
+
+Because PEAK cannot fit stars in crowded fields with overlapped images like the
+NSTAR and ALLSTAR  tasks do, and for sparsely populated frames aperture
+photometry produced by PHOT is often just as good and faster to compute, PEAK
+has few unique functions. PEAK is often useful however for fitting and removing
+single stars in images where the stars are interfering with the real object of
+interest such as a galaxy. In that case the PEAK results can be input to SUBSTAR
+which will then remove the interfering stars. Another potential use of PEAK
+is the removal of stars from sparsely populated sky flats in preparation
+for smoothing.
+
+.ih
+OUTPUT
+
+If \fIverbose\fR = yes, a single line is output to the terminal for each star
+fit or rejected. Full output is written to \fIallstarfile\fR and \fIrejfile\fR.
+At the beginning of these two files a header listing the current values of the
+parameters is written. For each star fit/rejected the following quantities are
+written to the output file.
+
+.nf
+	id  xcenter  ycenter  mag  merr  msky  niter  sharpness  chi
+	    pier  perr
+.fi
+
+Id is the id number of the star. Xcenter and ycenter are the fitted coordinates
+in pixels. Mag and merr are the fitted magnitude and magnitude error
+respectively. Msky is the individual sky value for the star. Niter is the
+number of iterations it took to fit the star and sharpness and chi are the
+sharpness and goodness of fit statistic respectively. Pier and perror are the
+photometry error code and accompanying error message respectively.
+
+.ih
+ERRORS
+
+If no errors occur during the fitting process then pier is 0. Non-zero
+values of pier flag the following error conditions.
+
+.nf
+	0		# No error
+	1		# The sky is undefined
+	2		# There are too few good pixels to fit the star
+	3		# The fit is singular
+	4		# The star is too faint
+.fi
+
+.ih
+EXAMPLES
+
+
+1. Compute the PSF model for the test image dev$ypix. Good stars for making the
+PSF model can be found at (442,410), (348,189), and (379,67).
+
+
+.nf
+   da> datapars.epadu = 14.0
+   da> datapars.readnoise = 75.0
+
+       ... set the gain and readout noise for the detector
+
+   da> daofind dev$ypix default fwhmpsf=2.5 sigma=5.0 threshold=20.0
+
+        ... answer verify prompts
+
+        ... find stars in the image
+
+        ... answer will appear in ypix.coo.1
+
+    da> phot dev$ypix default default annulus=10. dannulus=5.       \
+        apertures = 3.0
+
+        ... answer verify prompts
+
+        ... do aperture photometry on the detected stars
+
+        ... answer will appear in ypix.mag.1
+
+    da> display dev$ypix 1
+
+    da> psf dev$ypix default "" default default default psfrad=11.0 \
+        fitrad=3.0 mkstars=yes display=imdr
+
+        ... verify the critical parameters
+
+        ... move the image cursor to a candidate star and hit the a key,
+            a plot of the stellar data appears
+
+        ... type ? for a listing of the graphics cursor menu
+
+        ... type a to accept the star, d to reject it
+
+        ... move to the next candidate stars and repeat the previous
+            steps
+
+        ... type l to list all the psf stars
+
+        ... type f to fit the psf
+
+        ... move cursor to first psf star and type s to see residuals,
+            repeat for all the psf stars
+
+        ... type w to save the PSF model
+
+        ... type q to quit, and q again to confirm
+
+        ... the output will appear in ypix.psf.1.imh, ypix.pst.1 and
+            ypix.psg.1
+
+    da> peak dev$ypix default default default default 
+
+	... the results will appear in ypix.pk.1 and ypix.prj.1
+
+    da> pdump ypix.pk.1 sharpness,chi yes | graph
+
+	... plot chi versus sharpness, the stars should cluster around
+	    sharpness = 0.0 and chi = 1.0, note that the frame does
+	    not have a lot of stars
+
+    da> substar dev$ypix ypix.pk.1 "" default default
+
+	... subtract the fitted stars
+
+    da> display ypix.sub.1 2 
+
+	... note that the psf stars subtract reasonably well but other
+	    objects which are not stars don't
+.fi
+
+
+2. Run peak on a section of the input image using the photometry file and PSF
+model derived in example 1 for the parent image and writing the results
+in the coordinate system of the parent image.
+
+.nf
+    da> peak dev$ypix[150:450,150:450] default default default default \
+        wcsin=tv wcspsf=tv wcsout=tv 
+
+	... answer the verify prompts
+
+	... fit the stars
+
+	... the results will appear in ypix.pk.2 and ypix.prj.2
+
+    da> display dev$ypix[150:450,150:450] 1
+
+	... display the image
+
+    da> pdump ypix.pk.2 xc,yc yes | tvmark 1 STDIN col=204
+
+	... mark the stars
+
+    da> substar dev$ypix ypix.pk.2 "" default default 
+
+	... subtract stars from parent image
+
+	... the output images is ypix.sub.2
+
+
+    da> substar dev$ypix[150:450,150:450] ypix.pk.2 "" default default  \
+	wcsin=tv wcspsf=tv wcsout=tv
+
+	... subtract stars from the peak input image
+
+	... the output images is ypix.sub.3
+
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+.ih
+BUGS
+.ih
+SEE ALSO
+datapars,daopars,nstar,allstar
+.endhelp

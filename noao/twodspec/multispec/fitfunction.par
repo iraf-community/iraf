@@ -1,0 +1,8 @@
+# FITFUNCTION
+
+image,f,a,,,,Image
+parameter,s,h,x0,,,Database parameter to be fitted
+lines,s,h,"*",,,Images lines in function fit
+spectra,s,h,"*",,,Spectra to be fit
+function,s,h,"spline3",,,Fitting function
+order,i,h,INDEF,,,Order of spline

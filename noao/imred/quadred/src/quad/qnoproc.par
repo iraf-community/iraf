@@ -1,0 +1,15 @@
+image_list,s,a,"",,,List of CCD images to correct
+fixpix,b,h,yes,,,Fix bad CCD lines and columns?
+overscan,b,h,yes,,,Apply overscan strip correction?
+trim,b,h,yes,,,Trim the image?
+fixfile,s,h,"",,,"File describing the bad lines and columns
+
+# TRIM AND OVERSCAN MARGINS (overide header values)"
+xskip1,i,h,INDEF,0,,X pixels to skip at start of overscan
+xskip2,i,h,INDEF,0,,X pixels to skip at end of overscan
+xtrim1,i,h,INDEF,0,,X pixels to trim at start of data
+xtrim2,i,h,INDEF,0,,X pixels to trim at end   of data
+ytrim1,i,h,INDEF,0,,Y pixels to trim at start of data
+ytrim2,i,h,INDEF,0,,"Y pixels to trim at end   of data
+"
+fd,*s,h,,,,Internal use only

@@ -1,0 +1,314 @@
+.help wcsxymatch Jun95 images.immatch
+.ih
+NAME
+wcsxymatch -- match input and reference image x-y coordinates using the WCS
+.ih
+USAGE
+wcsxymatch input reference output
+.ih
+PARAMETERS
+.ls input
+The list of input images containing the input wcs.
+.le
+.ls reference
+The list of reference images containing the reference wcs. The number of
+reference images must be one or equal to the number of input images.
+.le
+.ls output
+The output matched coordinate lists containing:
+1) the logical x-y pixel coordinates of a point
+in the reference image in columns 1 and 2, 2) the logical x-y pixel
+coordinates of the same point in the input image in columns 3 and 4,
+3) the world coordinates of the point in the reference and input
+image in columns 5 and 6. The output coordinate list can be
+input directly to the geomap task. The number of output files must be 
+equal to the number of input images or be the standard output STDOUT.
+.le
+.ls coords = "grid"
+The source of the coordinate list. The options are:
+.ls grid    
+Generate a list of \fInx * ny\fR coordinates, evenly spaced over
+the reference image, and beginning and ending at logical coordinates
+\fIxmin\fR and \fIxmax\fR in x and \fIymin\fR and \fIymax\fR in y.
+.le
+.ls <filename>
+The name of the text file containing the world coordinates of a set of
+points in the reference image.
+.le
+.le
+.ls xmin = INDEF, xmax = INDEF, ymin = INDEF, ymax = INDEF
+The minimum and maximum logical x and logical y coordinates used to generate
+the grid of control points if \fIcoords\fR = "grid". Xmin, xmax, ymin, and
+ymax default to 1, the number of columns in the reference image, 1, and the
+number of lines in the reference image, respectively.
+.le
+.ls nx = 10, ny = 10
+The number of points in x and y used to generate the coordinate grid
+if \fIcoords\fR = "grid".
+.le
+.ls wcs = "world"
+The world coordinate system of the coordinates.  The options are:
+.ls physical
+Physical coordinates are pixel coordinates which are invariant with
+respect to linear transformations of the physical image data.  For example,
+if the reference 
+image is a rotated section of a larger input image, the physical
+coordinates of an object in the reference image are equal to the physical
+coordinates of the same object in the input image, although the logical
+pixel coordinates are different.
+.le
+.ls world
+World coordinates are image coordinates which are invariant with
+respect to linear transformations of the physical image data and which
+are in world units, normally decimal degrees for sky projection coordinate
+systems and angstroms for spectral coordinate systems. Obviously if the
+wcs is correct the ra and dec or wavelength and position of an object
+should remain the same not matter how the image
+is linearly transformed. The default world coordinate
+system is either 1) the value of the environment variable "defwcs" if
+set in the user's IRAF environment (normally it is undefined) and present
+in the image header, 2) the value of the "system"
+attribute in the image header keyword WAT0_001 if present in the
+image header or, 3) the "physical" coordinate system.
+Care must be taken that the wcs of the input and
+reference images are compatible, e.g. it makes no sense to
+match the coordinates of a 2D sky projection and a 2D spectral wcs.
+.le
+.le
+.ls transpose = no
+Force a transpose of the reference image world coordinates before evaluating
+the world to logical coordinate transformation for the input image ? This
+option is useful if there is not enough information in the reference and
+input image headers to tell whether or not the images are transposed with
+respect to each other.
+.le
+.ls xcolumn = 1, ycolumn = 2
+The columns in the input coordinate list containing the x and y coordinate
+values if \fIcoords\fR = <filename>.
+.le
+.ls xunits = "", ls yunits = ""
+The units of the x and y coordinates in the input coordinate list 
+if \fIcoords\fR = <filename>, by default decimal degrees for sky projection 
+coordinate systems, otherwise any units.
+The options are:
+.ls hours
+Input coordinates specified in hours are converted to decimal degrees by
+multiplying by 15.0.
+.le
+.ls native
+The internal units of the wcs. No conversions on the input coordinates
+are performed.
+.le
+
+If the units are not specified the default is "native".
+.le
+.ls xformat = "%10.3f", yformat = "%10.3f"
+The format of the output logical x and y reference and input pixel
+coordinates in columns 1 and 2 and 3 and 4 respectively. By default the
+coordinates are output right justified in a field of ten spaces with
+3 digits following the decimal point. 
+.le
+.ls wxformat = "", wyformat = ""
+The format of the output world x and y reference and input image coordinates
+in columns 5 and 6 respectively. The internal default formats will give
+reasonable output formats and precision for both sky projection coordinates
+and other types, e.g. spectral coordinates.
+.le
+.ls min_sigdigits = 7
+The minimum precision of the output coordinates if, the formatting parameters
+are undefined, or the output world coordinate system is "world" and the wcs
+format attribute is undefined.
+.le
+.ls verbose = yes
+Print messages about the progress of the task.
+.le
+
+.ih
+DESCRIPTION
+
+WCSXYMATCH matches the logical x and y pixel coordinates of a set of points 
+in the input image \fIinput\fR with the logical x and y pixels coordinates
+of the same points in the reference image \fIreference\fR
+using world coordinate information
+in the respective image headers, and writes the results to a coordinate file
+\fIoutput\fR  suitable for input to the GEOMAP task.
+The input and reference images may be 1D or 2D but must both have
+the same dimensionality.
+
+If \fIcoords\fR = "grid", WCSXYMATCH computes a grid of \fInx * ny\fR 
+logical x and y pixel coordinates evenly distributed over the 
+logical pixel space of the reference image as defined by the
+\fIxmin\fR, \fIxmax\fR, \fIymin\fR, \fIymax\fR parameters.
+The logical x and y pixel reference image coordinates are transformed to the
+world coordinate system defined by \fIwcs\fR using
+world coordinate information stored in the reference image header.
+The world coordinates are then transformed back to the logical x and y pixel
+input image coordinates, using world coordinate system information stored in
+the input image header. 
+
+If \fIcoords\fR is a file name, WCSXYMATCH reads a list of x and y 
+reference image world coordinates from columns \fIxcolumn\fR and \fIycolumn\fR
+in the input coordinates file,  and transforms these coordinates to
+"native" coordinate units using the \fIxunits\fR and \fIyunits\fR parameters.
+The reference image world coordinates are
+transformed to logical reference and input image coordinates
+using the value of the \fIwcs\fR parameter and world coordinate
+information in the reference and input image headers.
+
+WCSXYMATCH will terminate with an error if the reference and input images
+are not both either 1D or 2D.
+If the world coordinate system information cannot be read from either
+the reference or input image header, the requested transformations
+from the world <-> logical coordinate systems cannot be compiled for either
+or both images, or the world coordinate systems of the reference and input
+images are fundamentally incompatible in some way, the output logical
+reference and input image coordinates are both set to a grid of points
+spanning the logical pixel space of the input, not the reference image,
+and defining an identify transformation, is written to the output file.
+
+The computed reference and input logical coordinates and the
+world coordinates are written to the output file using
+the \fIxformat\fR and \fIyformat\fR, and the \fIwxformat\fR and \fIwxformat\fR
+parameters respectively. If these formats are undefined and, in the
+case of the world coordinates, a format attribute cannot be
+read from either the reference or the input images, the coordinates are
+output with the %g format and \fImin_sigdigits\fR of precision.
+
+If the reference and input images are 1D then the 
+output logical and world y coordinates are
+set to 1.
+
+If \fIverbose\fR is "yes" then a title section is written to the output
+file for each set of computed coordinates, along with messages about
+what if anything went wrong with the computation.
+
+.ih
+FORMATS
+
+A  format  specification has the form "%w.dCn", where w is the field
+width, d is the number of decimal places or the number of digits  of
+precision,  C  is  the  format  code,  and  n is radix character for
+format code "r" only.  The w and d fields are optional.  The  format
+codes C are as follows:
+ 
+.nf
+b       boolean (YES or NO)
+c       single character (c or '\c' or '\0nnn')
+d       decimal integer
+e       exponential format (D specifies the precision)
+f       fixed format (D specifies the number of decimal places)
+g       general format (D specifies the precision)
+h       hms format (hh:mm:ss.ss, D = no. decimal places)
+m       minutes, seconds (or hours, minutes) (mm:ss.ss)
+o       octal integer
+rN      convert integer in any radix N
+s       string (D field specifies max chars to print)
+t       advance To column given as field W
+u       unsigned decimal integer
+w       output the number of spaces given by field W
+x       hexadecimal integer
+z       complex format (r,r) (D = precision)
+ 
+
+
+Conventions for w (field width) specification:
+ 
+    W =  n      right justify in field of N characters, blank fill
+        -n      left justify in field of N characters, blank fill
+        0n      zero fill at left (only if right justified)
+absent, 0       use as much space as needed (D field sets precision)
+ 
+Escape sequences (e.g. "\n" for newline):
+ 
+\b      backspace   (not implemented)
+\f      formfeed
+\n      newline (crlf)
+\r      carriage return
+\t      tab
+\"      string delimiter character
+\'      character constant delimiter character
+\\      backslash character
+\nnn    octal value of character
+ 
+Examples
+ 
+%s          format a string using as much space as required
+%-10s       left justify a string in a field of 10 characters
+%-10.10s    left justify and truncate a string in a field of 10 characters
+%10s        right justify a string in a field of 10 characters
+%10.10s     right justify and truncate a string in a field of 10 characters
+ 
+%7.3f       print a real number right justified in floating point format
+%-7.3f      same as above but left justified
+%15.7e      print a real number right justified in exponential format
+%-15.7e     same as above but left justified
+%12.5g      print a real number right justified in general format
+%-12.5g     same as above but left justified
+
+%h          format as nn:nn:nn.n
+%15h        right justify nn:nn:nn.n in field of 15 characters
+%-15h       left justify nn:nn:nn.n in a field of 15 characters
+%12.2h      right justify nn:nn:nn.nn
+%-12.2h     left justify nn:nn:nn.nn
+ 
+%H          / by 15 and format as nn:nn:nn.n
+%15H        / by 15 and right justify nn:nn:nn.n in field of 15 characters
+%-15H       / by 15 and left justify nn:nn:nn.n in field of 15 characters
+%12.2H      / by 15 and right justify nn:nn:nn.nn
+%-12.2H     / by 15 and left justify nn:nn:nn.nn
+
+\n          insert a newline
+.fi
+
+.ih
+REFERENCES
+
+Additional  information  on  IRAF  world  coordinate  systems including
+more detailed descriptions of the "logical", "physical", and "world"
+coordinate systems can be
+found  in  the  help  pages  for  the  WCSEDIT  and  WCRESET  tasks. 
+Detailed   documentation   for  the  IRAF  world  coordinate  system 
+interface MWCS can be found in  the  file  "iraf$sys/mwcs/MWCS.hlp".
+This  file  can  be  formatted  and  printed  with the command "help
+iraf$sys/mwcs/MWCS.hlp fi+ | lprint".  Information on the spectral
+coordinates systems and their suitability for use with WCSXYMATCH
+can be obtained by typing "help specwcs | lprint".
+Details of  the  FITS  header
+world  coordinate  system  interface  can  be  found in the document
+"World Coordinate Systems Representations Within  the  FITS  Format"
+by Hanisch and Wells, available from our anonymous ftp archive.
+    
+.ih
+EXAMPLES
+
+1. Compute a matched list of 100 logical x and y coordinates for an X-ray 
+and radio image of the same field, both of which have accurate sky
+projection world coordinate systems. Print the output world coordinates
+in hh:mm:ss.ss and dd:mm:ss.s format
+
+.nf
+	cl> wcsxymatch image refimage coords wxformat=%12.2H \
+	    wyformat=%12.1h
+.fi
+
+2. Given a list of ras and decs of objects in the reference image,
+compute a list of matched logical x and y coordinates for the two images,
+both of which have a accurate sky projection wcss. The ras and decs are in
+columns 3 and 4 of the input coordinate file and are in hh:mm:ss.ss and
+dd:mm:ss.s format respectively. Print the output world coordinates
+in the same units as the input.
+
+.nf
+	cl> wcsxymatch image refimage coords coords=radecs \
+	    xcolumn=3 ycolumn=4 xunits=hours wxformat=%12.2H \
+	    wyformat=%12.1h
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+tprecess,wcstran,geomap,register,geotran,wcsmap,wregister
+.endhelp

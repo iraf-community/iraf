@@ -1,0 +1,539 @@
+.help lcalc Apr84 "List Calculator"
+.nh
+Introduction
+
+    The list calculator performs general arithmetic, string, and
+conditional operations upon lists.  Examples of such operations include
+.ls 4
+.ls o
+General filtering of lists, i.e., conditionally pass or stop records
+within a list.
+.le
+.ls o
+Rearranging the fields of a list.
+.le
+.ls o
+Extracting fields from a list.
+.le
+.ls o
+Merging lists.
+.le
+.ls o
+Arithmetic or string operations upon lists.
+.le
+.le
+
+A \fBlist\fR is a text file consisting of a sequence of \fBrecords\fR.
+Whitespace normally delimits the fields of a record; newline normally
+delimits a record.  There may be an arbitrary number of fields within a
+record, and records within a list.  A record may span several lines of
+text if a special delimiter is used.  Blank lines and comment lines are
+passed on to the output but are otherwise ignored.
+
+The input language of the list calculator is optimized to provide a
+concise notation for expressing the types of operations most commonly
+performed upon lists.  Operations which cannot be specified by this
+somewhat specialized language can easily be programmed as CL scripts.
+
+.nh
+Lists
+
+    Input may consist of one or more logical input lists.  Multiple input
+lists are by default read simultaneously as discreet lists; they may 
+optionally be concatenated into a single logical list.
+A single list is always generated as output.  Multiple input lists
+are referred to in expressions as "lN", i.e., "l1", "l2", etc.
+If multiple discreet input lists are used, the output list will be
+truncated to the length of the shortest input list.
+
+.nh
+Records
+
+    The list calculator breaks each list into a sequence of records.
+Each record has the following attributes:
+
+.nf
+	record number
+	record length
+	number of fields
+.fi
+
+If the record delimiter is other than newline, newline is treated as
+whitespace.  Records are numbered starting at 1.  Record number BOL may
+be used to conditionally execute code before processing a list.  Record
+number EOL is matched only at the end of the list.
+
+.nh
+Fields
+
+    The list calculator breaks each record into a sequence of fields.
+Each field has the following attributes:
+
+.nf
+	field number
+	field width (nchars in input record)
+	datatype
+	number of significant digits, if a number
+.fi
+
+The "current record" may be thought of as an array F of fields.
+The individual fields may be referenced in expressions in either of two
+ways.  If a single field is to be referenced, the field may be referred
+to as the variable fN, e.g., "f1", "f2", and so on.  If multiple
+input lists are in use, the notation "li.fj" must be used instead.
+Sets of fields may be referenced as sections of the array F;
+a \fBsection\fR is an operand of type string, and may not be used
+in arithmetic expressions.  The entire record is most simply referred
+to as the string R.  The section notation may also be used to refer
+to substrings of string type operands, and is discussed in a later section.
+
+.nh
+Calling Sequence
+
+    The principal operands to \fBlcalc\fR are the list template and
+the program to be executed.  An additional set of positional arguments
+may be given; these are passed on to the program and are not used by
+\fBlcalc\fR itself.  A number of hidden parameters are available to
+modify the behavior of the program.
+
+	lcalc (list, program [, p1,...,p9])
+
+.nh
+Parameters
+.ls 4
+.ls lists
+A filename template specifying the list files to be processed.  Not used
+if the standard input is redirected.
+.le
+.ls program
+Either the explicit \fBlcalc\fR program to be run, or if the first character
+is an @, the name of a file containing the program.
+.le
+.ls p1 - p9
+Optional program parameters, referred to in the program as "$1", "$2", etc.
+.le
+.ls concatenate = no
+Treat multiple input lists independently (concatenate = no) or concatenate
+all input lists to form a single list.
+.le
+.ls field_delim = " \t"
+A set of characters, any \fIone\fR of which will delimit the fields of an input
+record.  The default field delimiters are blank and tab (denoted \t).
+.le
+.ls record_delim = "$"
+The \fIpattern\fR which delimits input records.  All of the usual pattern
+matching meta-characters are recognized.  The default is "$", meaning that
+end of line delimits input records (each record is a line of the input list).
+Special record delimiters may be used to process multiline records.
+.le
+.ls ofield_delim = "in_field_delim"
+The output field delimiter, inserted by the list calculator in output records
+to delimit fields.  The string "in_field_delim" signals that the first input
+field delimiter character is to be used.
+.le
+.ls orecord_delim = "in_record_delim"
+The output record delimiter, used to delimit output records.  The default
+action is to use the string (not pattern) which delimited the input record.
+.le
+.ls comments = yes
+Pass comment lines and blank lines on to the output list.
+.le
+.le
+
+.nh
+Statements
+
+    A list transformation is specified by a program consisting of a
+sequence of statements.  The program may be input either directly on
+the command line as a string, or in a file.  Statements may be delimited
+by either semicolon or newline.
+
+.nf
+	prog	:	stmt
+		|	prog stmt
+		;
+
+	stmt	:	assign eost
+		|	print eost
+		;
+
+	eost	:	'\n'
+		|	';'
+		;
+.fi
+
+There are two types of statements, assignment statements and print
+statements.  The \fBassignment\fR statements may be used to set or modify
+the contents of an internal register.  Registers are created and initialized
+to zero or to the null string when first referenced in an assignment statement.
+The usual modify and replace assignment statements "+=", "//=", etc. are
+recognized.
+
+.nf
+	assign	:	IDENT '=' expr
+		|	IDENT OPEQ expr
+		;
+
+	print	:	expr
+		|	expr '?'
+		|	expr '?' expr
+		;
+.fi
+
+The \fBprint\fR statement is used to generate output.  In its simplest
+form the print statement is an expression (e.g., "f5"); the value of the
+expression is computed and output as the next field of the output record.
+
+As a simple example, suppose we wish to swap fields 2 and 3 of a three field
+list, dropping field 1 (any additional fields will be discarded):
+
+	lcalc list, "f3,f2"
+
+.nh
+Expressions
+
+    The power of the list calculator derives principally from its ability
+to evaluate complex expressions.  The operands of an expression may be
+fields, registers, command line arguments, functions, constants, or
+expressions.  The datatype of an expression may be boolean, integer, real,
+or string.  Conditional expressions may be used to select or reject entire
+records, or to conditionally format the fields of output records.
+
+The standard set of operators are supported.  Expressions are evaluated
+using the standard operator precedences and associativities.  The following
+operators are recognized:
+
+
+.nf
+binary operators:
+
+	+   -    *   /   **			arithmetic
+	<   <=   >   >=  ==  !=	  @		comparison
+	&&  ||					boolean and, or
+	//					string concatenation
+
+
+unary operators:
+
+	!   -    @
+.fi
+
+The only unconventional operator is the string matching operator @,
+used to determine if a string matches a pattern.  Usage is as follows:
+
+.nf
+	string @ pattern
+or
+	@ pattern
+.fi
+	
+The expression evaluates to true if the pattern can be matched.  If no
+string is given, the entire record is searched.
+
+The expression syntax recognized by the list calculator is defined in
+the figure below.
+
+
+.nf
+	expr	:	primary
+		|	expr ',' opnl expr
+		|	'(' expr ')'
+		;
+
+	primary	:	IDENT
+		|	CONSTANT
+		|	primary BINOP opnl primary
+		|	UNOP primary
+		|	primary '?' primary ':' primary
+		|	IDENT '(' arglist ')'
+		|	section
+		|	'(' primary ')'
+		;
+
+	section	:	IDENT '[' flist ']'
+		;
+
+	flist	:	# Empty
+		|	fields
+		|	flist ',' fields
+		;
+
+	fields	:	primary
+		|	primary ':'
+		|	primary ':' ':' primary
+		|	primary ':' primary
+		|	primary ':' primary ':' primary
+		|	'*'
+		|	'-' '*'
+		|	'-' '*' ':' primary
+		;	
+.fi
+
+.nh
+Sections
+
+    The section notation is used to extract substrings from string type
+variables.  If the variable referenced is F, an array of strings, then
+the section indexes the fields of the record; the specified fields are
+concatenated to produce the output string.  If the variable is a string
+variable, an array of characters, then the section specifies a set of
+substrings to be concatenated.
+
+For example, to extract the first three characters of the string
+variable "s":
+
+	s[1:3]
+
+To extract characters 4 through the end of the string:
+
+	s[4:]
+
+To reverse the order of the characters in the string:
+
+	s[-*]
+
+To extract the first field of the record:
+
+	f[1]
+
+To extract all fields, any of the following would do (F is the array of
+field strings, whereas R is the entire record as a string):
+
+	r, r[*], r[1:], f, f[*], f[1:]
+
+To refer to all fields in reverse order:
+
+	f[-*]
+
+To specify fields 3 through 5:
+
+	f[3:5]
+
+To specify fields 3, 5, and 7 through 10:
+
+	f[3,5,7:10]
+
+If multiple input lists are in use, the notation "r1", "r2", etc. should
+be used instead.
+
+.nh
+Intrinsic Functions
+
+    All of the standard intrinsic functions are recognized, plus a few
+special intrinsic functions.
+
+.nf
+      abs     exp     log     min     real    str
+      atan2   int     log10   mod     sin     tan
+      cos     len     max     nint    sqrt    type
+.fi
+
+Certain of these functions deserve further mention:
+.ls 4
+.ls len (expr)
+Returns the length of an array or string, e.g., "len(f)" is the number
+of fields in the current record, and "len(f2)" is the number of chars in
+field 2.
+.le
+.ls str (expr)
+Converts the argument into an operand of type string.
+.le
+.ls type (expr)
+Returns the datatype of the argument.  Legal values are "b", "i", "r",
+and "s".  The string type is the catchall.
+.le
+.le
+
+.nh
+Variables
+
+    The types of variables implemented in the list calculator are
+the field variables ("f1", "f2", etc.), user variables, parameters,
+and various builtin variables.  All such variables may be used equivalently
+within expressions.  Only the builtin variables are writable by the
+program.
+.nh 2
+User Variables
+
+    User variables are named by the user program; only the first 8 characters
+of the variable name are significant.  A user variable is created when it
+is first used in an assignment statement.  If the first reference is in a
+modify and replace assignment, integer and real variables are initialized
+to 0 and string variables are initialized to the null string, before the
+modify operation takes place.  It is an error if a user variable is first
+referenced in an expression.
+.nh 2
+Program Parameters
+
+    The parameter variables are optional positional arguments to the
+\fBlcalc\fR procedure.  There are nine such parameters, "$1" through "$9".
+The special parameter "$nargs" specifies the number of these parameters
+set on the \fBlcalc\fR command line (the \fBlist\fR and \fBprogram\fR
+arguments to \fBlcalc\fR are not counted).  Parameters are read only.
+.nh 2
+Builtin Variables
+
+    The list calculator manages a number of variables internally.  These
+variables describe the list and record currently being processed, and are
+read only to the user program (with one exception).  The internal variables
+are used primarily for conditional statements to be executed only at certain
+times.
+
+.ls
+.ls nfiles
+The number of files in the input list (file template).
+.le
+.ls rnum
+The record number within the list \fBfile\fR currently being processed.
+The first record is number 1.
+.le
+.ls arnum
+The absolute record number.
+.le
+.ls nfields
+The number of fields in the current record.
+.le
+.ls nchars
+The number of characters in the current record.
+.le
+.ls nlines
+The number of input lines of text in the current record.
+.le
+.ls fname
+The name of the input file currently being processed.
+.le
+.ls outfile
+The name of the output file.  This parameter is writable by the program.
+If modified by the program, the current output file is closed and the
+new output file is created for writing.
+.le
+.ls atbol
+Set when processing the first record of the first file.
+.le
+.ls ateol
+Set once the last record of the last file has been processed.
+.le
+.ls atbof
+Set when processing the first record of a file.
+.le
+.ls ateof
+Set once the last record of a file has been processed, before reading
+the next file.
+.le
+.le
+
+.nh
+Examples
+
+    The list calculator is a very powerful tool and it is difficult to 
+present enough examples to illustrate all of the possible applications.
+Furthermore, in many applications the list calculator is often used in
+combination with other tools such as \fBsort\fR and \fBgraph\fR; we
+will not use such programs in our examples here.
+
+.nh 2
+Simple bandpass filter
+
+Given a three column list {x,y,string}, pass only those lines for which
+y is greater than 100 and less than or equal to 140:
+
+	lcalc list, "f2 > 100 && f2 <= 140 ?"
+
+Pass only records in list1 wherein the third field has the same value
+as the fifth field of list2:
+
+	lcalc "list1,list2", "l1.f3 == l2.f5 ? r1"
+
+.nh 2
+Simple bandstop filter
+
+Pass only those records which do \fInot\fR contain the substrings
+"obj1, "obj2", or "obj3":
+
+	lcalc list, "!(@obj1 || @obj2 || @obj3) ?"
+
+.nh 2
+Rearranging and extracting fields
+
+Move fields 8 and 9 to the beginning of the list:
+
+	lcalc list, "f8,f9,f[1:7],f[10:]"
+
+Reverse the order of all fields in each record:
+
+	lcalc list, "f[-*]"
+
+Reverse the text of each record:
+
+	lcalc list, "r[-*]"
+
+Extract fields 2 and 3 from a list:
+
+	lcalc list, "f2,f3"
+
+.nh 2
+Merging lists
+
+Simple merge of two lists:
+
+	lcalc "list1,list2", "r1 r2"
+
+.nh 2
+Arithmetic operations upon lists
+
+Scale the third field of each record of a list by the factor 5e3
+(if there is a third field):
+
+	lcalc list, "f1, f2, nfields >= 3 ? f3 * 1e3, f[4:]"
+
+Print the log of the sum of the first three fields of each record:
+
+	lcalc list, "log(f1+f2+f3)"
+
+Print the sum of the second field of \fIall\fR records in the list:
+
+	lcalc list, "s+=f2; ateof ? 'sum is ' s"
+
+.nh 2
+Miscellaneous examples
+
+Execute the program in file "prog" on a list, passing two arguments:
+
+	lcalc list, "@prog", 33, "circle"
+
+Process a list according to a complex program entered via the standard input:
+
+	lcalc list, "@STDIN"
+
+Print record 55 of a list:
+
+	lcalc list, "rnum == 55 ?"
+
+Edit a list, replacing the third field in each record with the string
+"circle" if the input value of the field is "box":
+
+	lcalc list, "f1,f2, f3 == box ? circle : f3, f[4:]"
+
+.nh 2
+Possible looping examples
+
+    A concise notation for repeating the same operation on a set of fields
+would be useful.  Use of a very general construct such as the \fBfor\fR
+loop is probably not justified, because such operations can already be
+performed in a CL script.  For the list calculator it would be preferable
+to have a very concise notation, even if it is not as flexible.  One possible
+notation is shown in the example below.  The loop variable "fi" is automatically
+assigned, and represents field "i" of the record, where i takes on the values
+specified by the section.  If more than a single statement is to be looped
+on, braces must be used to group statements.  If loops are nested, the
+outer (leftmost) loop is assigned the loop variable fi, the next fj, and so on.
+
+Print the sum of all fields in each record:
+
+	lcalc list, "s=0; [*] s += fi; s"
+
+Reverse the characters in each field, without changing the ordering
+of the fields:
+
+	lcalc list, "[*] fi[-*]"
+.endhelp

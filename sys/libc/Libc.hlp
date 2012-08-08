@@ -1,0 +1,559 @@
+.help LIBC Sep84 "C Runtime Library"
+.sp 2
+.ce
+\fBIRAF Runtime Library for the C Language\fR
+.ce
+CL Interface to IRAF
+.sp 3
+.nh
+Introduction
+
+    The IRAF runtime library for the C language was developed to port the
+IRAF command language (CL) from UNIX to IRAF.  The C runtime library (LIBC)
+consists of two parts: an emulation of the standard i/o library provided
+for the C language on an UNIX host, and a library of "system calls", i.e.,
+the C interface to the IRAF virtual operating system.
+
+.nh
+Naming Conventions
+
+    Providing familiar and predictable procedure names in C is complicated
+by the possibility of name collisions with external names in the program
+interface libraries.  To solve this problem while maintaining compatibility
+with UNIX the external names of all UNIX emulation procedures are assigned
+in C \fIdefine\fR statements.  The external name is simply the UNIX name
+preceded by the prefix "u_", e.g.,
+
+	fopen()
+
+compiles as
+
+	u_fopen()
+
+The names of the "system calls" are not compatible with those of the UNIX
+system calls.  Each system call maps directly to an IRAF program interface
+procedure.  The name of the C version is the IRAF name preceded by the
+prefix "c_", e.g.,
+
+	open()
+
+is called in C as
+
+	c_open()
+
+The "c_" names are not redefined except where necessary to produce an
+external identifier unique in the first seven characters.  When an external
+name is redefined to make it unique in the first seven characters this
+is done by application of the 4+1 rule, leaving the "c_" prefix as is.
+The calling sequences of the C system calls have been kept as compatible
+with the "crib sheet" versions as possible, even when a more convenient
+syntax could have been used for C.
+
+.nh
+Include Files
+
+    C style global include files pose a problem in a portable system since
+machine dependent filenames cannot be used.  This problem is sidestepped
+for LIBC by using the C language preprocessor to indirectly reference the
+global include files via a single master include file installed in the
+C system include file directory.  The master include file is referenced
+as <iraf.h>.  The actual include files reside in the IRAF directory system
+(as does a copy of <iraf.h>) and hence are automatically ported with the
+system.  The pathname to the LIBC global include files is arbitrary, but
+currently these files are stored in lib$libc.
+
+The technique used to access LIBC global include files in perhaps best
+explained by use of a simple example from the CL:
+
+
+.ks
+.nf
+	#define import_spp			global includes
+	#define import_libc
+	#define import_stdio
+	#include <iraf.h>
+
+	#include "config.h"			local includes
+	#include "operand.h"
+	#include "param.h"
+	#include "task.h"
+.fi
+.ke
+
+
+The include file <iraf.h> contains preprocessor control lines which load
+the include files referenced by "#define import_packagename" statements.
+In addition to being portable, this technique has the benefits of ensuring
+that the include files are loaded in the correct order and are not loaded
+more than once.
+
+The include file referenced by \fIimport_libc\fR should be included in
+every C source file which uses LIBC.  In addition to loading the referenced
+include files, <iraf.h> also includes definitions for the IRAF root
+directory IRAFDIR, the default image storage directory IMAGEDIR, and the
+name of the host operating system (e.g. "UNIX" or "VMS").
+
+.nh
+UNIX Emulation
+
+    All procedures in the UNIX standard i/o (stdio) package are emulated
+in libc.  A listing of the calling sequences of all currently implemented
+procedures is given as an appendix.  The syntax and semantics of these
+procedures have been kept as close to those of the V7 UNIX procedures as
+possible.
+
+.nh
+IRAF Program Interface Routines
+
+    All i/o in the CL is implemented ultimately by calls to procedures in
+the IRAF program interface libraries.  The UNIX emulation procedures
+discussed in the previous sections, for example, are reasonably portable
+C language packages which call C versions of the IRAF program interface
+routines.  With few exceptions the C version of each procedure maps trivially
+to the corresponding program interface procedure.  The main complication
+arises from the need to pack and unpack character strings when calling an
+SPP (Fortran) procedure from C.  Read only arguments are passed by value
+for the convenience of the C language progammer.
+
+The full program interface contains on the order of a thousand procedures
+(including generics) and it would be prohibitively difficult to make them
+all available in C.  We have therefore included only the packages actually
+used by the CL in the interface, and then only the most commonly used
+procedures in each package.  All files which directly reference program
+interface procedures should include a reference to the C language include
+file \fBirafio.h\fR.
+
+.nh 2
+File I/O (FIO)
+
+    The fundamental unit of storage in both C and SPP is the \fBchar\fR,
+but unfortunately a char is not necessarily the same size in both languages.
+In the C version of FIO data is referenced in units of C chars (bytes),
+subject to the restriction that only an \fIintegral\fR number of SPP chars
+can be read and written at a time, and seeks must be aligned on a char
+boundary.  If a nonintegral number of SPP chars are read or written,
+the interface will silently move the extra bytes necessary to fill out
+an SPP char, possibly writing beyond the end of the input buffer on a read.
+These problems are less serious than it might seem, however, since CL level
+i/o is predominantly text only (binary file i/o is not currently used in
+the CL).
+
+In keeping with the C language tradition, all FIO offsets are \fIzero\fR
+indexed, and all integer valued procedures return ERR as the function value
+in the event of an error.  Pointer valued functions return NULL in the
+event of an error.  Although only "significant" function values are shown in the
+calling sequences below, all procedures return a function value.
+
+
+.ks
+.nf
+High Level FIO:
+
+	fd =	   c_open (vfn, mode, type)
+		  c_close (fd)
+		  c_flush (fd)
+
+		  c_fseti (fd, param, value)
+	int =	 c_fstati (fd, param)
+
+	stat =    c_finfo (vfn, &fi)
+	y/n =	 c_access (vfn, mode, type)
+		 c_delete (vfn)
+		 c_rename (old_vfn, new_vfn)
+		 c_mktemp (root, &fname, maxch)
+.fi
+.ke
+
+
+The "low level" FIO procedures perform binary file i/o and fill and flush
+the internal FIO file buffer.  These procedures are called by the STDIO
+package and are not intended to be called directly by general CL code.
+Seeking is not implemented in STDIO due to the difficulty of implementing
+\fBfseek\fR in a portable system, but is not currently required anywhere
+in the CL.  STDIO directly accesses the internal FIO buffer pointers
+via a data structure defined in \fBirafio.h\fR.
+
+
+.ks
+.nf
+Low Level FIO:
+
+	  nchars = c_read (fd, &buf, maxch)
+	 	  c_write (fd, &buf, nchars)
+		   c_seek (fd, loffset)
+	 loffset = c_note (fd)
+
+	    ch = c_filbuf (fd)
+	    ch = c_flsbuf (fd, ch)
+	  FILE = c_fioptr (fd)
+.fi
+.ke
+
+
+The file access modes and types are specified as in SPP, i.e., via predefined
+integer constants defined in \fIirafio.h\fR (READ_ONLY, NEW_FILE, etc.).
+Only a few \fBfset\fR options are implemented; these are likewise defined
+in \fIirafio.h\fR.  The integer constants STDIN, STDOUT, etc. refer to
+FIO file descriptors, and should not be confused with \fBstdin\fR,
+\fBstdout\fR, etc., which reference STDIO file pointers.
+
+.nh 2
+Environment Facilities
+
+    The environment list is managed entirely by the program interface via
+the ENV package.  The CL calls ENV procedures to create, modify, and access
+the environment list.  The \fBc_propen\fR procedure in the program interface
+passes the environment list on to a connected child process at process
+creation time.
+
+
+.ks
+.nf
+       nchars = c_envgets (name, &value, maxch)
+	redef =	c_envputs (name, &value)
+		c_envmark (&sp)
+      nredefs = c_envfree (sp)
+
+	 bool = c_envgetb (name)
+	  int = c_envgeti (name)
+		c_envlist (out_fd, prefix, show_redefs)
+	nscan =	c_envscan (input_source)
+.fi
+.ke
+
+The following (non program interface) procedure is defined and used internally
+by the CL to lookup names in the environment list:
+
+	    strp = envget (name)
+
+.nh 3
+Implementation Notes
+
+    The environment list is maintained as a multi-threaded linked list.  This
+provides the searching efficiency of a hash table plus stack like semantics
+for redefinitions and for freeing blocks of variables.  There are two primary
+data structures internally, an array of pointers to the heads of the threads,
+and a buffer containing the list elements.  These data structures are
+dynamically allocated and will be automatically reallocated at runtime if
+overflow occurs.  The number of threads determines the hashing efficiency and
+is a compile time parameter.
+
+The \fBenvmark\fR and \fBenvfree\fR procedures
+mark and free storage on the environment list stack.
+All environment variables defined or redefined after a call to \fBenvmark\fR
+will be deleted and storage freed by a call to \fBenvfree\fR.  If a redef
+is freed the next most recent definition becomes current.  \fBEnvfree\fR returns
+as its function value the number of redefined variables uncovered by the free
+operation.  The calling program must mark and free in the correct order or the
+environment list may be trashed.
+
+The \fBenvlist\fR procedure prints the environment list on a file.
+Redefined values will be printed only if so indicated.
+The environment list is printed as a list of
+\fBset\fR statements in most recent first order, i.e.,
+
+
+.ks
+.nf
+	set nameN=valueN
+	set nameM=valueM
+	    ...
+	set name1=value1
+.fi
+.ke
+
+
+The \fBenvlist\fR function is used both to inspect the environment list
+and to pass the list on to a child process.
+Redefined variables are omitted when passing
+the list on to a child process, hence the order of definition does not matter.
+The output format is "prefix name=value", where the prefix string is supplied
+by the user.
+
+The \fBenvscan\fR function parses one or more \fBset\fR statements,
+calling \fBenvputs\fR to enter the SET declarations into the environment list.
+The argument is either a \fBset\fR declaration or a string of the form
+"set @filename", where "filename" is the name of a file containing \fBset\fR
+declarations.
+
+.nh 2
+Process Control
+
+    Separate facilities are provided for \fBconnected\fR and \fBdetached\fR
+processes.  Virtually all process control is concerned with connected
+subprocesses, i.e., subprocesses running synchronously with the CL and
+communicating with the CL via bidirectional IPC channels.  The only detached
+process in the system is the CL itself, when spawned as a background job
+by another (usually interactive) CL process.
+
+.nh 3
+Connected Subprocesses
+
+    A connected subprocess is connected with \fBpropen\fR and disconnected
+with \fBprclose\fR.  The \fBpropen\fR procedure spawns the named process,
+connects the IPC channels to FIO file descriptors, then sends commands to
+the child process to initialize the environment and current working directory.
+Once connected the \fIin\fR and \fIout\fR file descriptors may be reopened
+with \fBfdopen\fR for UNIX style i/o to the subprocess.  The \fBprclose\fR
+procedure sends the "bye" (shutdown) command to the child, waits for the
+child to terminate, and then returns the process termination status as the
+function value.  Normal exit status is OK, otherwise a positive integer
+error code is returned.
+
+
+.ks
+.nf
+	     pid = c_propen (process, in, out)
+	   stat = c_prclose (pid)
+		 c_prsignal (pid, signal)
+		  c_prredir (pid, stream, new_fd)
+		 c_prupdate (message)
+.fi
+.ke
+
+
+To execute a task in a connected child process the CL writes a command to
+the \fIout\fR channel with a conventional \fBfputs\fR or other STDIO call.
+After starting the task the CL redirects its command input to the \fIin\fR
+channel of the task; conventional \fBfgets\fR or \fBgetc\fR calls are made
+to read commands from the task, until "bye" is received, signaling task
+termination.
+
+New \fBset\fR or \fBchdir\fR statements may be broadcast to all connected
+subprocesses at any time (except while actually executing a task resident
+in a connected subprocess) by a call to \fBprupdate\fR.  While there is no
+way the CL can free space on the environment stack in a child process, it is
+possible to broadcast new redefinitions to all child processes if redefinitions
+should be uncovered by an \fBenvfree\fR call in the CL.
+
+The \fBprsignal\fR procedure is used to raise the interrupt exception X_INT
+in a connected child process.  When the user types interrupt (e.g. ctrl/c)
+at the CL level, the CL interrupt exception handler signals the child
+process containing the external task currently in execution (if any),
+and then resumes processing of commands from the child.  If a special exception
+handler is not posted in the child it will go through error restart,
+eventually sending the \fBerror\fR statement to the CL indicating abnormal
+termination of the task.  Note that it is permissible for a child process
+to ignore the interrupt exception, or take special recovery actions if
+interrupt occurs.
+
+.nh 4
+I/O Redirection
+
+    Pseudofile i/o (\fBxmit\fR and \fBxfer\fR directives for the task's STDIN,
+STDOUT, etc.) is handled by the program interface transparently to the CL.
+By default the standard i/o streams of the child are connected to the
+identical streams of the parent (the CL).  If redirection of a stream
+is desired the stream may be redirected in either of two ways:
+.ls
+.ls [1]
+A stdio stream may be redirected directly at the task level in the child
+process by including redirection information on the command line sent to
+the child to execute the task.  This is the most efficient technique, and
+it should be used when appropriate, e.g., for pipes or whenever an output
+stream of an external task is explicitly redirected on the CL command line.
+The syntax of the task statement recognized by the IRAF Main is documented
+in the \fISystem Interface Reference Manual\fR.  For example, to run a task
+with the standard output redirected to a pipe file:
+
+.ks
+.nf
+	fprintf (out_fp, "%s %d > %s\n",
+	    taskname, STDOUT, pipefilename);
+.fi
+.ke
+
+Pipe files, by the way, are implemented as binary files for maximum flexibility
+and efficiency.  This is acceptable since they are read and written only by
+the system.  Very high i/o bandwidths are possible using direct i/o to a binary
+file.
+.le
+
+.ls [2]
+A stdio stream may be redirected at the CL level to any previously opened
+FIO file, e.g., to one of the CL's standard streams, to a text or binary
+file opened explicitly by the CL, or to another child process (e.g. redirection
+of the standard graphics output of the child to a graphics subprocess).
+This type of redirection requires the following steps by the CL:
+.ls
+.ls o
+Open local stream to which child's stream is to be redirected.
+.le
+.ls o
+Call \fBprredir\fR to map the child's stream to the local stream.
+.le
+.ls o
+When the task is run, include an argument of the form "N >" on the task
+command line, indicating that stream N has been redirected by the parent
+process (the file name is omitted).
+.le
+.ls o
+When the task terminates, or when the next task is run in the same process,
+restore the original i/o connection with another call to \fBprredir\fR.
+The default connection is established by the system only at \fBpropen\fR time.
+.le
+.le
+.le
+.le
+
+
+The I/O redirection mechanism permits messages to be shuffled from a child
+process deep in the process tree to a device owned by the CL, or from a child
+process in one branch of the process tree to a process in another branch of
+the tree.  If raw mode is set on the STDIN stream in the child it will
+automatically be passed on to the process which physically reads the raw mode
+device.  Asynchronous execution is possible so long as messages pass only
+one way.  Synchronization occurs whenever a process waits on a read.  The most
+complex example of the IPC i/o redirection mechanism in the current system
+occurs when a science or utility task sends graphics commands via the CL to a
+separate graphics task.  Ignoring GKS inquires, this process is fully
+asynchronous and should be acceptably efficient provided the IPC buffer size
+is reasonable (1-4 Kb) and large amounts of bulk data do not have to be passed.
+
+.nh 3
+Detached Processes
+
+    The CL executes commands in the background, i.e., asynchronously, by
+dumping the entire run time context of the CL into a binary background
+file, then spawning a detached CL process to execute the already compiled
+command in the context of the parent.  The run time context consists of
+the dictionary and stack areas, the environment list, and various other
+internal state parameters which are copied into the header area of the
+bkgfile.  This is a potential problem area if dynamic memory is used,
+since it may not be possible to duplicate the virtual addresses of the
+parent's data area in the child.
+
+
+.ks
+.nf
+	    job = c_propdpr (process, bkgfile)
+	   stat = c_prcldpr (job)
+	     y/n = c_prdone (job)
+		   c_prkill (job)
+
+	   exit = c_onentry (prytpe, bkgfile)
+		   c_onexit (epa)
+.fi
+.ke
+
+
+The CL process uses the same IRAF Main as a normal IRAF process, except that
+a special \fBonentry\fR procedure is linked which serves as the CL main.
+The \fBonentry\fR procedure is called by the IRAF Main during
+process startup with the arguments shown; the function value returned by
+\fBonentry\fR determines whether or not the interpreter in the IRAF Main
+is entered.  Since we do not want IRAF Main prompts from the CL process
+the CL version of \fBonentry\fR always returns CL_EXIT, causing process
+shutdown following execution of any procedures posted with \fBonexit\fR
+during execution of \fBonentry\fR.
+
+A detached process opened with \fBpropdpr\fR should always be closed with
+\fBprcldpr\fR if it terminates while the parent is still executing.
+The \fBprdone\fR procedure may be called to determine if a background job
+has terminated.  A background job may be aborted with \fBprkill\fR.
+
+.nh 2
+Terminal Control
+
+    The TTY interface is provided at the CL level to support screen editing.
+TTY is the IRAF interface to the \fBtermcap\fR terminal capability database,
+originally developed at Berkeley for UNIX by Bill Joy.
+
+
+.ks
+.nf
+	     tty = c_ttyodes (ttyname)
+		   c_ttycdes (tty)
+		   c_ttyseti (tty, parameter, value)
+	    int = c_ttystati (tty, parameter)
+
+	    bool = c_ttygetb (tty, cap)
+	     int = c_ttygeti (tty, cap)
+	   float = c_ttygetr (tty, cap)
+	  nchars = c_ttygets (tty, cap, &outstr, maxch)
+		   c_ttyctrl (fd, tty, cap, afflncnt)
+		   c_ttyputs (fd, tty, ctrlstr, afflncnt)
+
+		  c_ttyclear (fd, tty)
+		c_ttyclearln (fd, tty)
+		   c_ttygoto (fd, tty, col, line)
+		   c_ttyinit (fd, tty)
+		c_ttyputline (fd, tty, text, map_cc)
+		     c_ttyso (fd, tty, onflag)
+.fi
+.ke
+
+
+Complete descriptions of TTY and \fBtermcap\fR are given elsewhere.
+Briefly, the device descriptor for a particular terminal is opened
+with \fBttyodes\fR, which returns a IRAF pointer (C integer) to the
+binary TTY descriptor.
+The terminal name may be given as "terminal", in which case \fBttyodes\fR
+will look up the name of the default terminal in the environment and search
+the termcap database for the entry for the named device.
+
+The \fBttyget\fR functions are used to read the capabilities.
+Capabilities are specified by two character mnemonics (character strings),
+shown as the \fIcap\fR arguments in the calling sequences above.
+Control sequences may be output with \fBttyctrl\fR or with \fBttyputs\fR,
+depending on whether you are willing to do a binary search for a
+particular capability at run time.
+The remaining high level functions make it easy to perform the more common
+control functions.
+
+Raw mode output to a terminal device is provided by the system interface
+(the newline and tab characters are exceptions).  Raw mode input is
+provided as an \fBfseti\fR option in FIO.  To set raw mode on STDIN:
+
+	c_fseti (STDIN, F_RAW, YES);
+
+While raw mode is in effect input characters are read as they are typed,
+few or no control characters are recognized, and no echoing is performed.
+
+.nh 2
+Memory Management
+
+    Both heap and stack storage facilities are available in the program
+interface, and we have made both types of facilities available in the CL.
+Note, however, that the CL does not currently use dynamic memory allocation
+directly due to the difficulties such use would cause when passing the
+context of the CL to a background CL (used to execute commands in the
+background).  The CL currently makes heavy use of pointers in the dictionary
+data structures, and since the dictionary is passed to the background CL
+as a binary array, it must be restored to the same base memory address or
+the pointers will be meaningless.  This led to the implementation of the
+dictionary and stack areas as fixed size, statically allocated arrays.
+
+The use of a fixed size dictionary is restrictive and wasteful of storage;
+a future implementation based on \fBsalloc\fR (the stack facilities) is
+desirable provided the context passing problem can be solved.  Note that
+the environment facilities do use dynamic storage and that it is nonetheless
+possible to pass the environment to a background CL, despite the internal
+use of pointers in the environment management package.
+
+
+.ks
+.nf
+Heap Storage (UNIX compatible):
+
+	    buf = malloc (nchars)		u_malloc
+	    buf = calloc (nchars)		u_calloc
+		   mfree (buf)			u_mfree
+
+
+Stack Storage:
+
+		 c_smark (&sp)
+	  buf = c_salloc (nchars)
+		 c_sfree (sp)
+.fi
+.ke
+
+
+Note that the C callable versions of \fBmalloc\fR, \fBcalloc\fR, and
+\fBmfree\fR emulate the comparable UNIX procedures.  The storage units
+are C chars, i.e., bytes.  Promotion to an integral number of SPP chars
+is automatic.  The \fIbuf\fR argument is a C pointer.  The \fIsp\fR
+argument, used to mark the position of the stack pointer, is an integer.
+The stack is implemented in segments allocated on the heap, hence there
+is no builtin limit on the size of the stack.

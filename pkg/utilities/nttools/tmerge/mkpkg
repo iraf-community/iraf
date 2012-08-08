@@ -1,0 +1,20 @@
+#   MKPKG file for the tmerge task
+#   Author: P.E. Hodge, 14-Sep-87
+#
+#   Special keywords recognized by standard SDAS mkpkg files:
+#
+#	mkpkg debug=yes		link ttools executable with the debugger
+#	mkpkg linkonly		skip ttools library update and just link
+
+$checkout libpkg.a ../
+$update	libpkg.a
+$checkin libpkg.a ../
+$exit
+
+linkonly:
+	$call	linkonly@..
+	;
+
+libpkg.a:
+	tmerge.x		<tbset.h> 
+	;

@@ -1,0 +1,15 @@
+objects,s,a,"",,,"List of object spectra"
+apidtable,f,a,"",,,"Aperture ID table"
+apref,f,a,"",,,"Aperture reference spectrum"
+flat,f,a,"",,,"Flat field spectrum"
+throughput,f,a,"",,,"Throughput file or image"
+arcs1,s,a,"",,,"List of arc spectra"
+arcs2,s,a,"",,,"List of shift arc spectra"
+scattered,b,a,,,,"Subtract scattered light?"
+dispcor,b,a,,,,"Dispersion correct spectra?"
+skysubtract,b,a,,,,"Subtract sky?"
+redo,b,a,no,,,"Redo operations if previously done?"
+update,b,a,yes,,,"Update spectra if cal data changes?"
+fd1,*struct,h,"",,,
+fd2,*struct,h,"",,,
+mode,s,h,"ql",,,

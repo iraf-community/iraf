@@ -1,0 +1,32 @@
+.help bfopen Sep86 imfort.bfio
+.ih
+NAME
+bfopen -- open a file for binary file i/o
+.ih
+SYNOPSIS
+.nf
+integer function bfopen (fname, acmode, advice)
+
+character*(*)	fname		#I host name of file to be opened
+integer		acmode		#I file access mode (1=RO,3=RW,5=NF)
+integer		advice		#I type of access (1=random,2=seq.)
+.fi
+.ih
+DESCRIPTION
+The \fIbfopen\fR procedure either opens an existing file for binary
+file i/o (\fIacmode\fR 1=read-only or 3=read-write), or creates a new,
+zero length file and opens it for binary file i/o with read-write
+access mode (\fIacmode\fR 5=new-file).  The \fIadvice\fR parameter
+controls the size of the internal file buffer allocated at open time.
+The possible values are 1 (random access, small buffer), or 2 (sequential
+access, large buffer); anything larger is taken to be the actual size
+of the buffer.  Note that the size of the buffer must be an integral
+multiple of the size of a disk block.
+.ih
+RETURN VALUE
+The BFIO file descriptor (\fIfd\fR) is returned as the function value if
+the file is successfully opened, otherwise a negative value is returned.
+.ih
+SEE ALSO
+bfaloc, bfclos
+.endhelp

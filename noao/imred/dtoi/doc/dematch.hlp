@@ -1,0 +1,51 @@
+.help dematch Feb87 imred.dtoi
+.ih
+NAME
+dematch -- match density to log exposure values
+.ih
+USAGE
+dematch database 
+.ih
+PARAMETERS
+.ls database
+Database containing density list, probably from \fIspotlist\fR.
+.le
+.ls wedge = "", filter = "", emulsion = ""
+Information used to retrieve log exposure values from \fBwedgefile\fR.
+.le
+.ls wedgefile = "noao$lib/hdwedge.dat"
+Name of file containing wedge intensity information.
+.le
+.ls nskip = 0
+Number of faint spots skipped, used as an offset into the list of
+log exposure values.
+.le
+.ls verbose = yes
+Print the log exposure information to STDOUT as well as to \fBdatabase\fR.
+.le
+.ih
+DESCRIPTION
+Task \fIdematch\fR matches density values to log exposure values.  A database
+of density values is input, as well as information needed to 
+retrieve log exposure values from a reference file.  The two sources of 
+information are matched, and the matching log exposure values are added 
+as a record in the database.
+
+Parameter \fBnskip\fR tells how many faint spots were not
+included in the density \fBdatabase\fR.  This information is
+used to align the density, exposure values.  It doesn't matter if the 
+densities are listed in a monotonically increasing or decreasing
+order, as long as no spots were omitted between the first and last
+measured.
+.ih
+EXAMPLES
+Match densities in db1 to log exposure values for wedge#117
+with a IIIAJ emulsion and a GG385 filter.
+.nf
+
+	cl> dematch db1 wedge=117 filt=gg385 emulsion=IIIAJ
+.fi
+.ih
+SEE ALSO
+spotlist, hdfit, hdtoi
+.endhelp

@@ -1,0 +1,26 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ABORK -- Compute the bitwise boolean or of a vector and a constant
+# (generic).
+
+procedure abork$t (a, b, c, npix)
+
+PIXEL	a[ARB]
+PIXEL	b
+PIXEL	c[ARB]
+int	npix, i
+$if (datatype == i)
+int	or()
+$else
+PIXEL	or$t()
+$endif
+
+begin
+	do i = 1, npix {
+	    $if (datatype == i)
+		c[i] = or (a[i], b)
+	    $else
+		c[i] = or$t (a[i], b)
+	    $endif
+	}
+end

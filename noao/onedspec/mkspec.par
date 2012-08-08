@@ -1,0 +1,11 @@
+image_name,s,a,,,,Name of image file to be created
+image_title,s,a,,,,Title of image
+ncols,i,a,,,,Length of image
+nlines,i,a,,,,Number of lines (rows) in the image
+function,i,a,1,1,3,Function type (1=flat;2=ramp;3=Black body)
+constant,r,a,0.0,,,Flat image level
+start_level,r,a,,,,Ramp image first value
+end_level,r,a,,,,Ramp image last value
+start_wave,r,a,,0.0,,Starting wavelength for BB - Angstroms
+end_wave,r,a,,0.0,,Ending wavelength
+temperature,r,a,,0.0,,Black body temperature - Deg.K

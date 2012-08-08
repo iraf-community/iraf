@@ -1,0 +1,48 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# AGLT -- Given a list of ranges, replace the value of each input pixel
+# which falls within a given range by applying the corresponding linear
+# transformation (b = a * kmul + kadd).  If KMUL is identically zero,
+# B is replaced by the constant KADD.
+
+procedure aglt$t (a, b, npix, low, high, kmul, kadd, nrange)
+
+PIXEL	a[ARB], b[ARB], pixval
+int	npix, i
+PIXEL	low[nrange], high[nrange]	# range limits
+$if (datatype == dl)
+double	kmul[nrange], kadd[nrange]	# linear transformation
+$else
+real	kmul[nrange], kadd[nrange]
+$endif
+$if (datatype == x)
+real	abs_pixval
+$endif
+int	nrange, nr
+
+begin
+	do i = 1, npix {
+	    pixval = a[i]
+	    b[i] = pixval
+	    $if (datatype == x)
+		abs_pixval = abs (pixval)
+	    $endif
+	    do nr = 1, nrange
+	    $if (datatype == x)
+		if (abs_pixval >= abs (low[nr]) &&
+		abs_pixval <= abs (high[nr])) {
+	    $else
+		if (pixval >= low[nr] && pixval <= high[nr]) {
+	    $endif
+		    $if (datatype == dl)
+			if (kmul[nr] == 0.0D0)
+		    $else
+			if (kmul[nr] == 0.0)
+		    $endif
+			    b[i] = kadd[nr]
+			else
+			    b[i] = (pixval * kmul[nr]) + kadd[nr]
+			break
+		}
+	}
+end

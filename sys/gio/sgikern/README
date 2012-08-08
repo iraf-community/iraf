@@ -1,0 +1,12 @@
+SGIKERN -
+
+This directory contains the source for the simple GIO kernel, used to write
+a metacode file using only the simplest possible drawing instructions.  This
+makes it relatively easy to implement functional (but probably suboptimal)
+translators for new devices.
+
+Special graphcap entries used by this kernel:
+
+	MF		maximum frame count per metafile
+	FS		frame advance req'd at start of metafile
+	FE		frame advance req'd at end of metafile

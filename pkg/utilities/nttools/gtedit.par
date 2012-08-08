@@ -1,0 +1,11 @@
+input,s,a,,,,"Name of the input table"
+xcolumn,s,a,,,,"Name of column in input to use as X axis"
+ycolumn,s,a,,,,"Name of column in input to use as Y axis"
+device,s,h,"stdgraph",,,output device
+commands,*gcur,h,"",,,graphics commands
+inplace,b,h,no,,,"Edit the table in place?"
+output,s,h,"",,,"Name of output table to contain edited output"
+reject,s,h,"",,,"Name of output table for deleted entries"
+columns,s,h,"",,,"Columns to edit in text mode"
+insert,b,h,yes,,,"Begin editing in insert mode (text mode)"
+gtpar,pset,h,,,,"Plot attributes"

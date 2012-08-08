@@ -1,0 +1,21 @@
+# Help directory for the MTLOCAL package.
+
+$doc		= "noao$mtlocal/doc/"
+$camera		= "noao$mtlocal/camera/"
+$pds		= "noao$mtlocal/pds/"
+$cyber		= "noao$mtlocal/cyber/"
+$rrcopy		= "noao$mtlocal/cyber/rrcopy/"
+$idsmtn		= "noao$mtlocal/idsmtn/"
+$r2df		= "noao$mtlocal/r2df/"
+
+ldumpf		hlp=doc$ldumpf.hlp,		src=cyber$t_ldumpf.x
+r2df		hlp=doc$r2df.hlp,		src=r2df$t_r2df.x
+rcamera		hlp=doc$rcamera.hlp,		src=camera$t_rcamera.x
+rdumpf		hlp=doc$rdumpf.hlp,		src=cyber$t_rdumpf.x
+ridsfile	hlp=doc$ridsfile.hlp,		src=cyber$t_ridsfile.x
+ridsmtn		hlp=doc$ridsmtn.hlp,		src=idsmtn$t_ridsmtn.x
+ridsout		hlp=doc$ridsout.hlp,		src=cyber$t_ridsout.x
+rpds		hlp=doc$rpds.hlp,		src=pds$t_rpds.x
+rrcopy		hlp=doc$rrcopy.hlp,		src=rrcopy$t_rrcopy.x
+widstape	hlp=doc$widstape.hlp,		src=onedspec$t_widstape.x
+revisions	sys=Revisions

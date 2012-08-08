@@ -1,0 +1,51 @@
+.help dtpv2c Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDPVC (XI, ETA, V, V01, V02, N)
+
+     - - - - - - -
+      D P V C
+     - - - - - - -
+
+  Given the tangent-plane coordinates of a star and its direction
+  cosines, determine the direction cosines of the tangent-point.
+
+  (double precision)
+
+  Given:
+     XI,ETA    d       tangent plane coordinates of star
+     V         d(3)    direction cosines of star
+
+  Returned:
+     V01       d(3)    direction cosines of tangent point, solution 1
+     V02       d(3)    direction cosines of tangent point, solution 2
+     N         i       number of solutions:
+                         0 = no solutions returned (note 2)
+                         1 = only the first solution is useful (note 3)
+                         2 = both solutions are useful (note 3)
+
+  Notes:
+
+  1  The vector V must be of unit length or the result will be wrong.
+
+  2  Cases where there is no solution can only arise near the poles.
+     For example, it is clearly impossible for a star at the pole
+     itself to have a non-zero XI value, and hence it is meaningless
+     to ask where the tangent point would have to be.
+
+  3  Also near the poles, cases can arise where there are two useful
+     solutions.  The argument N indicates whether the second of the
+     two solutions returned is useful.  N=1 indicates only one useful
+     solution, the usual case;  under these circumstances, the second
+     solution can be regarded as valid if the vector V02 is interpreted
+     as the "over-the-pole" case.
+
+  4  This routine is the Cartesian equivalent of the routine slDPSC.
+
+  P.T.Wallace   Starlink   5 June 1995
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

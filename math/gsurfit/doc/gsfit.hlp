@@ -1,0 +1,64 @@
+.help gsfit Aug85 "Gsurfit Package"
+.ih
+NAME
+gsfit -- fit a surface to a set of data values
+.ih
+SYNOPSIS
+include <math/gsurfit.h>
+
+gsfit (sf, x, y, z, weight, npts, wtflag, ier)
+
+.nf
+pointer	sf		# surface descriptor
+real	x[npts]		# x array, xmin <= x[i] <= xmax
+real	y[npts]		# y array, ymin <= y[i] <= ymax
+real	z[npts]		# data values
+real	weight[npts]	# weight array
+int	npts		# number of data points
+int	wtflag		# type of weighting
+int	ier		# error coded
+.fi
+.ih
+ARGUMENTS
+.ls sf    
+Pointer to the surface descriptor structure.
+.le
+.ls x, y
+X and y value arrays.
+.le
+.ls z      
+Array of data values.
+.le
+.ls weight
+Array of weights.
+.le
+.ls npts
+Number of data points
+.le
+.ls wtflag
+Type of weighting. The options are WTS_USER and WTS_UNIFORM. If wtflag =
+WTS_USER individual weights for each data point are supplied by the calling
+program and points with zero-valued weights are not included in the fit.
+If wtflag = WTS_UNIFORM, all weights are assigned values of 1.
+.le
+.ls ier     
+Error code for the fit. The options are OK, SINGULAR and NO_DEG_FREEDOM.
+If ier = SINGULAR, the numerical routines will compute a solution but one
+or more of the coefficients will be zero. If ier = NO_DEG_FREEDOM there
+were too few data points to solve the matrix equations and the routine
+returns without fitting the data.
+.le
+.ih
+DESCRIPTION
+GSFIT zeroes the matrix and vectors, calculates the non-zero basis functions,
+computes the contribution of each data point to the normal equations
+and accumulates it into the appropriate array and vector elements. The
+Cholesky factorization of the coefficient array is computed and the coefficients
+of the fitting function are calculated.
+.ih
+NOTES
+Checking for out of bounds x and y values is the responsibility of the user.
+.ih
+SEE ALSO
+gsrefit, gsaccum, gsacpts, gssolve, gszero
+.endhelp

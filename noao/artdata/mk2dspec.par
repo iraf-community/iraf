@@ -1,0 +1,10 @@
+input,f,a,"",,,"Input image list"
+output,f,h,"",,,"Input image list"
+models,f,h,"",,,"List of model parameter files"
+comments,b,h,yes,,,"Add comments to image?
+
+IF NEW IMAGE"
+title,s,h,"",,,"Title of spectrum"
+ncols,i,h,100,1,,"Number of columns"
+nlines,i,h,512,1,,"Number of lines"
+header,f,h,"artdata$stdheader.dat",,,"Image or header keyword file"

@@ -1,0 +1,40 @@
+.help asigrl Dec98 "Image Interpolator Package"
+.ih
+NAME
+asigrl -- integrate interpolant from a to b
+.ih
+SYNOPSIS
+integral = asigrl (asi, a, b)
+
+.nf
+    pointer	asi	#I interpolant descriptor
+    real	a	#I lower limit for integral, 1 <= a <= npix
+    real	b	#I upper limit for integral, 1 <= b <= npix
+.fi
+.ih
+ARGUMENTS
+.ls asi  
+Pointer to the sequential interpolant descriptor structure.
+.le
+.ls a
+Lower limit to the integral, where 1 <= a <= npix.
+.le
+.ls b
+Upper limit to the integral, where 1 <= b <= npix.
+.le
+.ih
+DESCRIPTION
+The integral is calculated assuming that the interior polynomial, sinc, and
+drizzle interpolants are stored as the data points, and that the spline
+interpolant is stored as an array of B-spline coefficients.
+
+The integral of the sinc interpolant is computed by dividing the integration
+interval into a number of equal size subintervals which are at most one pixel
+wide. The integral of each subinterval is the central value times the interval
+width. The look-up table sinc interpolant is not supported and defaults to
+the sinc interpolant.
+.ih
+NOTES
+ASIINIT or ASISINIT and ASIFIT must be called before using ASIGRL.
+.ih
+SEE ALSO

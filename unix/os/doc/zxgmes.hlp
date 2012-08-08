@@ -1,0 +1,35 @@
+.help zxgmes May84 "System Interface"
+.ih
+NAME
+zxgmes -- get info on most recent exception
+.ih
+SYNOPSIS
+.nf
+zxgmes (os_exception, errmsg, maxch)
+
+int	os_exception		# machine dependent exception code
+packed	char errmsg[maxch]	# machine dependent error message
+.fi
+.ih
+DESCRIPTION
+A description of the most recent hardware or software exception is returned.
+The integer code \fIos_exception\fR is the machine dependent code for the
+exception, and \fIerrmsg\fR is a specific, machine dependent string
+describing the exception.  A program which merely calls \fBzxgmes\fR
+to fetch and print the error message can be informative without compromising
+portability (e.g., the default exception handlers do this).
+.ih
+RETURN VALUE
+OK is returned for \fIos_exception\fR if no exception has occurred since
+process startup or since the last call to \fBzxgmes\fR.  If \fBzxgmes\fR
+is called repeatedly following a single exception all calls after the first
+will return OK.
+.ih
+NOTES
+Any program which uses machine dependent exception codes is machine dependent.
+The usage should be parameterized and documented in one of the system config
+files.
+.ih
+SEE ALSO
+zxwhen, zintpr
+.endhelp

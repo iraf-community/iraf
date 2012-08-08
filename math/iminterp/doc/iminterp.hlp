@@ -1,0 +1,234 @@
+.help iminterp Dec98 "Math Package"
+.ih
+NAME
+iminterp -- image interpolator package
+.ih
+SYNOPSIS
+
+.nf
+	 asitype (interpstr, interp_type, nsinc, nincr, rparam)
+         asiinit (asi, interp_type)
+        asisinit (asi, interp_type, nsinc, nincr, rparam)
+          asifit (asi, datain, npix)
+ivalue = asigeti (asi, param)
+rvalue = asigetr (asi, param)
+     y = asieval (asi, x)
+       asivector (asi, x, yfit, npix)
+          asider (asi, x, der, nder)
+      v = asigrl (asi, a, b)
+         asisave (asi, interpolant)
+      asirestore (asi, interpolant)
+         asifree (asi)
+
+     y = arieval (x, datain, npix, interp_type)
+	  arider (x, datain, npix, der, nder, interp_type)
+
+          arbpix (datain, dataout, npix, interp_type, boundary_type)
+.fi
+
+.nf
+         msitype (interpstr, interp_type, nsinc, nincr, rparam)
+        msisinit (msi, interp_type, nsinc, nxincr, nyincr, rparam1, rparam2)
+         msiinit (msi, interp_type)
+          msifit (msi, datain, nxpix, nypix, len_datain)
+ivalue = msigeti (msi, param)
+rvalue = msigetr (msi, param)
+     y = msieval (msi, x, y)
+       msivector (msi, x, y, zfit, npts)
+          msider (msi, x, y, der, nxder, nyder, len_der)
+      v = msigrl (msi, x, y, npts)
+    v = msisqgrl (msi, x1, x2, y1, y2)
+         msisave (msi, interpolant)
+      msirestore (msi, interpolant)
+         msifree (msi)
+
+      y = mrieval (x, y, datain, nxpix, nypix, len_dataina, interp_type)
+           mrider (x, y, datain, nxpix, nypix, len_datain, der, nxder, nyder,
+	           len_der, interp_type)
+.fi
+
+.ih
+DESCRIPTION
+The iminterp package provides a set of routines for interpolating uniformly
+spaced data assuming that the spacing between data points is 1.0. The
+package is divided into 1D and 2D array sequential interpolants,
+prefixes asi and msi, and 1D and 2D
+array random interpolants, prefixes ari and mri.
+The sequential interpolants have
+been optimized for returning many values as is the case when an array is
+shifted. The random interpolants allow evaluation of a few interpolated
+points without the computing time and storage overhead required for
+setting up the sequential version.
+.ih
+NOTES
+The interpolant is chosen at run time from the following list.
+
+.nf
+    II_NEAREST		# nearest neighbour in x
+    II_LINEAR		# linear interpolation in x
+    II_POLY3		# 3rd order interior polynomial in x
+    II_POLY5		# fifth order interior polynomial in x
+    II_SPLINE3		# cubic spline in x
+    II_SINC		# sinc interpolation in x
+    II_LSINC		# look-up table sinc interpolation in x
+    II_DRIZZLE		# drizzle interpolation in x
+
+    II_BINEAREST	# nearest neighbour in x and y
+    II_BILINEAR		# bilinear interpolation
+    II_BIPOLY3		# 3rd order interior polynomial in x and y
+    II_BIPOLY5		# 5th order interior polynomial in x and y
+    II_BISPLINE3	# bicubic spline
+    II_BISINC		# sinc interpolation in x and y
+    II_BILSINC		# look-up table sinc interpolation in x and y
+    II_BIDRIZZLE	# drizzle interpolation in x and y
+.fi
+
+The routines assume that all x (1D, 2D) and  y (2D) values of interest lie in
+the region 1 <= x <= nxpix, 1 <= y <= nypix.
+Checking for out of bounds x and/or y values is the responsibility
+of the calling program. The asi, ari, msi, and mri routines assume that INDEF
+valued pixels have been removed from the data prior to entering the
+package. The routine ARBPIX has been added to the package to facilitate
+INDEF valued pixel removal.
+
+In order to make the package definitions available to the calling program
+an include <math/iminterp.h> statement must appear in the calling program.
+Either ASIINIT, ASISINIT or ASIRESTORE  must be called before using the
+asi routines. ASIFREE frees the space used by the asi routines. For the
+msi routines the corresponding examples are MSIINIT, MSISINIT, MSIRESTORE
+and MSIFREE.
+.ih
+EXAMPLES
+.nf
+Example 1: Shift a 1D data array by a constant amount using a 5th order
+polynomial interpolant and the drizzle routine respectively. Note that
+in this example the drizzle interpolant is equivalent to the linear
+interpolant since the default drizzle pixel fraction is 1.0 and there
+is no scale change. Out-of-bounds pixels are set to 0.0
+
+    include <math/iminterp.h>
+    ...
+    call asiinit (asi, II_POLY5)
+    call asifit (asi, inrow, npix)
+
+    do i = 1, npix
+	if (i + xshift < 1.0 || i + xshift > npix)
+	    outrow[i] = 0.0
+	else
+	    outrow[i] = asieval (asi, i + xshift)
+
+    call asifree (asi)
+    ...
+
+
+    include <math/iminterp.h>
+
+    real tmpx[2]
+    ...
+    call asiinit (asi, II_DRIZZLE)
+    call asifit (asi, inrow, npix)
+
+    do i = 1, npix
+	tmpx[1] = i + xshift - 0.5
+	tmpx[2] = i + xshift + 0.5
+	if (tmpx[1] < 1 || tmpx[2] > npix)
+	    outrow[i] = 0.0
+	else
+	    outrow[i] = asieval (asi, tmpx)
+
+    call asifree (asi)
+    ...
+
+
+Example 2: Shift a 2D array by a constant amount using a 3rd order polynomial
+interpolant and the drizzle interpolant respectively. Note that
+in this example the drizzle interpolant is equivalent to the linear
+interpolant since the default drizzle pixel fraction is 1.0 and there
+is no scale change. Out-of-bounds pixels are set to 0.0.
+
+    include <math/iminterp.h>
+    ...
+    call msiinit (msi, II_BIPOLY3)
+    call msifit (msi, insection, nxpix, nypix, nxpix)
+
+    do j = 1, nypix
+	if (j + yshift < 1 || j + yshift > nypix)
+	    do i = 1, nxpix
+		outsection[i,j] = 0.0
+	else
+	    do i = 1, nxpix
+		if (i + xshift < 1 || i + xshift > nxpix)
+	            outsection[i,j] = 0.0
+		else
+	            outsection[i,j] = msieval (msi, i + xshift, j + yshift)
+
+    call msifree (msi)
+    ...
+
+
+    include <math/iminterp.h>
+    ...
+    real tmpx[4], tmpy[4]
+    ...
+    call msiinit (msi, II_BIDRIZZLE)
+    call msifit (msi, insection, nxpix, nypix, nxpix)
+
+    do j = 1, nypix {
+	tmpy[1] = j + yshift - 0.5
+	tmpy[2] = j + yshift - 0.5
+	tmpy[3] = j + yshift + 0.5
+	tmpy[4] = j + yshift + 0.5
+	if (tmpy[1] < 1 || tmpy[4] > nypix)
+	    do i = 1, nxpix
+		outsection[i,j] = 0.0
+	else
+	    do i = 1, nxpix
+	        tmpx[1] = i + xshift - 0.5
+	        tmpx[2] = i + xshift + 0.5
+	        tmpx[3] = i + xshift + 0.5
+	        tmpx[4] = i + xshift - 0.5
+		if (tmpx[1] < 1 || tmpx[2] > nxpix)
+		    outsection[i,j] = 0.0
+		else
+	            outsection[i,j] = msieval (msi, tmpx, tmpy)
+    }
+
+    call msifree (msi)
+    ...
+
+
+Example 3: Calculate the integral under a 1D data array
+
+    include <math/iminterp.h>
+    ...
+    call asiinit (asi, II_POLY5)
+    call asifit (asi, datain, npix)
+
+    integral =  asigrl (asi, 1. real (npix))
+
+    call asifree (asi)
+    ...
+
+Example 4: Store a 1D interpolant for later use by ASIEVAL
+
+    include <math/iminterp.h>
+
+    ...
+    call asiinit (asi, II_POLY3)
+    call asifit (asi, datain, npix)
+
+    len_interpolant = asigeti (asi, ASINSAVE)
+    call salloc (interpolant, len_interpolant, TY_REAL)
+    call asisave (asi, Memr[interpolant])
+
+    call asifree (asi)
+    ...
+    call asirestore (asi, Memr[interpolant])
+
+    do i = 1, npts
+	yfit[i] = asieval (asi, x[i])
+
+    call asifree (asi)
+    ...
+.fi
+.endhelp

@@ -1,0 +1,23 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ANOT -- Compute the bitwise boolean complement of a vector (generic).
+
+procedure anot$t (a, b, npix)
+
+PIXEL	a[ARB], b[ARB]
+int	npix, i
+$if (datatype == i)
+int	not()
+$else
+PIXEL	not$t()
+$endif
+
+begin
+	do i = 1, npix {
+	    $if (datatype == i)
+		b[i] = not (a[i])
+	    $else
+		b[i] = not$t (a[i])
+	    $endif
+	}
+end

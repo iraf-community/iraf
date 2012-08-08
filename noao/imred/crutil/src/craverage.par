@@ -1,0 +1,23 @@
+input,f,a,,,,List of input images
+output,f,a,,,,List of output images
+crmask,f,h,,,,List of output cosmic ray and object masks
+average,f,h,,,,List of output block average filtered images
+sigma,f,h,,,,"List of output sigma images
+"
+navg,i,h,5,3,,Block average box size
+nrej,i,h,0,0,,Number of high pixels to reject from the average
+nbkg,i,h,5,1,,Background annulus width
+nsig,i,h,25,10,,Box size for sigma calculation
+var0,r,h,0.,0.,,Variance coefficient for DN^0 term
+var1,r,h,0.,0.,,Variance coefficient for DN^1 term
+var2,r,h,0.,0.,,"Variance coefficient for DN^2 term
+"
+crval,i,h,1,0,,Mask value for cosmic rays
+lcrsig,r,h,10.,,,Low cosmic ray sigma outside object
+hcrsig,r,h,5.,,,High cosmic ray sigma outside object
+crgrow,r,h,0.,0.,,"Cosmic ray grow radius
+"
+objval,i,h,0,0,,Mask value for objects
+lobjsig,r,h,10.,,,Low object detection sigma
+hobjsig,r,h,5.,,,High object detection sigma
+objgrow,r,h,0.,0.,,Object grow radius

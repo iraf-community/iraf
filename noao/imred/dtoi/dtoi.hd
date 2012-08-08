@@ -1,0 +1,11 @@
+# Help directory for the dtoi package.
+
+$doc		= "iraf$noao/imred/dtoi/doc/"
+
+dematch		hlp=doc$dematch.hlp,		src=dematch.x
+hdfit		hlp=doc$hdfit.hlp,		src=hdfit.x
+hdtoi		hlp=doc$hdtoi.hlp,		src=hdtoi.x
+hdshift		hlp=doc$hdshift.hlp,		src=hdshift.x
+spotlist	hlp=doc$spotlist.hlp,		src=spotlist.x
+selftest	hlp=doc$selftest.hlp,		src=selftest.x
+revisions	sys=Revisions

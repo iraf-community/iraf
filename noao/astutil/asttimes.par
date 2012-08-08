@@ -1,0 +1,15 @@
+files,s,h,"",,,List of files containing dates and times
+header,b,h,yes,,,Print header?
+observatory,s,h,)_.observatory,,,"Observatory
+"
+
+year,i,h,,,,Year
+month,i,h,,1,12,Month
+day,i,h,,1,31,Day
+time,r,h,,0.,24.,"Local zone time
+"
+
+ut,r,h,,,,Universal time (output)
+epoch,r,h,,,,Epoch (output)
+jd,r,h,,,,Julian date (output)
+lmst,r,h,,,,Local mean siderial time (output)

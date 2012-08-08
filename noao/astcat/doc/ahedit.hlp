@@ -1,0 +1,181 @@
+.help ahedit Mar00 astcat
+.ih
+NAME
+ahedit -- Add wcs and / or standard keywords to the image header
+.ih
+USAGE
+ahedit images imsurveys
+.ih
+PARAMETERS
+.ls images
+The list of input images to be edited.
+.le
+.ls imsurveys 
+The input image survey that is the source of the input images. If imsurveys
+is defined then the wcs status and the wcs and standard keyword parameter names
+and values are read from the image survey configuration file \fIimdb\fR. If
+imsurveys is undefined these quantities are read from the \fIwcs\fR parameter
+and the default \fIawcspars\fR and \fIaimpars\fR parameter sets.
+.le
+.ls hupdate = yes
+Update the image headers ? If hupdate = no the image header edits are
+listed but the headers are not updated.
+.le
+.ls wcsedit = no
+Convert a DSS WCS to a FITS WCS or add an approximate FITS style WCS to the
+input image headers ?  If \fIimsurveys\fR is defined the WCS status of the
+survey images plus approximate image center coordinates, scale, orientation,
+and projection information are read from the image surveys configuration file
+\fIimdb\fR. If \fIimsurveys\fR is undefined these quantities are read
+from the \fIwcs\fR parameter and \fIawcspars\fR parameter set.
+.le
+.ls wcs = "none"
+The default wcs status of the input images if \fIimsurveys\fR is undefined.
+The options are:
+.ls fits
+The input image is assumed to have a FITS WCS. No new FITS WCS is written.
+.le
+.ls dss
+The input image is assumed to have a DSS WCS. The equivalent FITS WCS
+is added, but the DSS WCS is left unchanged.
+.le
+.ls none
+The input image is assumed to have no WCS. The parameters in \fIawcspars\fR
+are used to create an approximate FITS WCS.
+.le
+.le
+.ls awcspars = ""
+The default WCS parameter set. If \fIwcsedit\fR = yes and \fIimsurveys\fR
+is undefined then the awcspars parameters are used to create an approximate
+FITS WCS. For more information about the awcspars parameters type
+"help awcspars".
+.le
+.ls hdredit = no
+Add a set of standard keywords to the image header which may be required or
+useful in the later astrometric analysis steps ?  These parameters divide
+into two groups, those concerned with locating objects in an image and
+those required to transform from mean place to observed coordinates.
+If \fIimsurveys\fR is undefined the standard keyword names and values
+are read from the images surveys configuration file \fIimdb\fR. If
+\fIimsurveys\fR is defined they are read from the \fIaimpars\fR parameter set.
+.le
+.ls aimpars = ""
+The default standard image header keywords parameter set. If \fIhdredit\fR =
+yes and \fIimsurveys\fR is undefined the parameter names and values
+in \fIaimpars\fR are used to write the standard image header keywords. For more
+information about these parameters type "help aimpars".
+.le
+.ls update = no
+Update the default values of the algorithm parameter sets, e.g. aregpars,
+\fIawcspars\fR, and \fIaimpars\fR on task termination ?
+.le
+.ls verbose = yes
+Print status messages on the terminal as the task proceeds ?
+.le
+.ls imdb = ")_.imdb)
+The image surveys configuration file. Imdb defaults to the value of the
+package parameter imdb. The default image surveys configuration file is
+"astcat$lib/imdb.dat".
+.le
+
+.ih
+DESCRIPTION
+
+Ahedit adds an approximate FITS WCS and / or a standard set of keyword value
+pair to the list of images \fIimages\fR extracted from the image survey
+\fIimsurveys\fR. If hupdate = no the image edits are listed but not
+implemented.
+
+If \fIwcsedit\fR = yes then either an existing DSS WCS is converted to
+a FITS WCS or an approximate FITS WCS is added to the input image.  If
+\fIimsurveys\fR is undefined the current WCS status and WCS information
+is read from the image surveys configuration file \fIimdb\fR. If
+\fIimsurveys\fR is undefined the WCS status and coordinate information
+are read from \fIwcs\fR parameter and the default WCS  parameter set
+\fIawcspars\fR.  In both cases the quantities of interest are the values,
+units, and coordinates system of the reference point \fIwxref\fR, \fIwyref\fR,
+\fIwraref\fR, \fIwdecref\fR, \fIwraunits\fR, \fIwdecunits\fR, and
+\fIwsystem\fR, and the image scale, orientation, and projection information
+\fIwxmag\fR, \fIwymag\fR, \fIwxrot\fR, \fIwyrot\fR, and \fIwproj\fR. For
+more information on how these quantities are defined in the image surveys
+configuration file or the awcspars parameter set type "help imsurveys" and / or
+"help awcspars".
+
+If \fIhdredit\fR = yes then a standard set of keyword equal value
+pairs are added to the image headers. If \fIimsurveys\fR is defined
+the standard keyword  name and value pairs are read from the image surveys
+configuration file. If \fIimsurveys\fR is undefined they are read from
+the standard image keywords  parameter set \fIaimpars\fR. In both cases the
+parameters divide into two groups,
+those concerned with locating stars in the image and computing accurate
+pixel centers \fIedatamin\fR, \fIedatamax\fR, \fIegain\fR, and \fIerdnoise\fR,
+and those required for transforming mean place coordinates to observed
+plate coordinates,
+\fIobservat\fR, \fIesitelng\fR, \fIesitelat\fR, \fIesitealt\fR, \fIesitetz\fR,
+\fIemjdobs\fR, \fIewavlen\fR, \fIetemp\fR, and \fIepress\fR. New keyword
+values are only added to the header if keywords of the same name do not
+already exist, and if appropriate values for the keywords exists, i.e.
+"INDEF" valued parameters will not be added to the header.
+
+If \fIupdate\fR = yes then the fIawcspars\fR,
+and \fIaimpars\fR parameter sets are updated at task termination. If
+\fIverbose\fR = yes then detailed status reports are issued as the task
+executes.
+
+.ih
+EXAMPLES
+
+1. List the header edits required to create a FITS WCS from a DSS WCS
+for a set of images extracted from the dss1@cadc.
+
+.nf
+cl> ahedit @imlist dss1@cadc hupdate- wcsedit+ hdredit-
+.fi
+
+2. Repeat the previous example but actually do the edits.
+
+.nf
+cl> ahedit @imlist dss2@cadc hupdate+ wcsedit+ hdredit-
+.fi
+
+3. Repeat the previous example but get the current WCS stats from the user
+rather than from the image survey configuration file.
+
+.nf
+cl> ahedit @imlist "" hupdate+ wcsedit+ wcs=dss hdredit-
+.fi
+
+4. Add an approximate FITS WCS to an image for which the coordinates
+of the image center in hours and degrees are stored in the keywords
+RA and DEC, the epoch of the image center coordinates is stored in EQUINOX,
+the image scale is 0.261" per pixel and east is left and north is down.
+
+.nf
+cl> ahedit image "" wcsedit+ wcs="none" wraref="RA" wdecref="DEC" \
+wxmag=0.26 wymag=0.26 wxrot=270 wyrot=90 wsystem="EQUINOX" hdredit-
+
+.fi
+
+5. Add the standard keyword name and values pairs for a list
+of images extracted from the dss1@cadc.
+
+.nf
+cl> ahedit @imlist dss1@cadc hupdate+ wcsedit- hdredit+ 
+.fi
+
+6. Store the CCD saturation limit in the image header in the EDATAMAX
+keyword. Set the minimum good data limit at the same time.
+
+.nf
+cl> ahedit image "" hupdate+ wcsedit- hdredit+ edatamin=-100.0 \
+edatamax=32000
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+aslist, adumpim, aregpars, awcspars, aimpars
+.endhelp

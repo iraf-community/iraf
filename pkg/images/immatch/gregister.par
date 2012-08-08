@@ -1,0 +1,33 @@
+# GREGISTER Parameters
+
+# required parameters
+input,f,a,,,,Input data
+output,f,a,,,,Output data
+database,f,a,,,,Name of GEOMAP database file
+transforms,s,a,,,,Names of coordinate transforms in database file
+geometry,s,h,'geometric',,,'Geometry (linear,distortion,geometric)'
+
+# output picture format parameters
+xmin,r,h,INDEF,,,Minimum reference x value of output picture
+xmax,r,h,INDEF,,,Maximum reference x value of output picture
+ymin,r,h,INDEF,,,Minimum reference y value of output picture
+ymax,r,h,INDEF,,,Maximum reference y value of output picture
+xscale,r,h,1.0,0.,,X scale of output picture in reference units per pixel
+yscale,r,h,1.0,0.,,Y scale of output picture in reference units per pixel
+ncols,i,h,INDEF,1,,Number of columns in the output picture
+nlines,i,h,INDEF,1,,Number of lines in the output picture
+
+# coordinate surface and image interpolation parameters
+xsample,r,h,1.0,1.0,,Coordinate surface sampling area in x
+ysample,r,h,1.0,1.0,,Coordinate surface sampling area in y
+interpolant,s,h,'linear',,,'Interpolant (nearest,linear,poly3,poly5,spline3)'
+boundary,s,h,'nearest',|nearest|constant|reflect|wrap|,,'Boundary extension (nearest,constant,reflect,wrap)'
+constant,r,h,0.,,,Constant for constant boundary extension 
+fluxconserve,b,h,yes,,,Preserve image flux ?
+
+# blocking factors
+nxblock,i,h,512,,,X dimension of working block size in pixels
+nyblock,i,h,512,,,Y dimension of working block size in pixels
+verbose,b,h,yes,,,Print messages about the progress of the task ?
+
+mode,s,h,'ql'

@@ -1,0 +1,384 @@
+.help
+\fBSpecifications for IRAF Calcomp kernel -- (CCP package)\fR
+
+
+The Calcomp kernel (package prefix "ccp") will implement selected GKI 
+instructions, using only calls to the Calcomp routines \fBplots\fR, 
+\fBplot\fR, \fBnewpen\fR and \fBsymbol\fR.
+
+
+There are two sub-components of the CCP package:  1) the kernel driver
+task allowing a user to send a specified graphics metafile to the plotter, and
+2) the low-level kernel routines which implement specific GKI instructions,
+and which make the only calls to the Calcomp library.
+
+
+.nh
+\fBCL interface -- task CALCOMP\fR
+
+
+The driver task, \fBcalcomp\fR, allows a user to direct an existing GKI metacode
+file to a particular Calcomp plotter under control of a set of CL parameters.
+The task is loaded either by being run directly from the CL as a task, or by
+being invoked through inter-process control following a write-to-pseudofile
+containing the GKI_OPENWS metacode instruction.  The task may 
+optionally control certain kinds of debug output.
+
+.nf
+CL parameters to the kernel driver task \fBcalcomp\fR:
+
+input,s,a,,,,"input metacode file"
+device,s,h,"calcomp",,,"output device"
+generic,b,h,no,,,"ignore remaining kernel dependent parameters"
+debug,b,h,no,,,"print decoded graphics instructions during processing"
+verbose,b,h,no,,,"print elements of polylines, etc. in debug mode"
+gkiunits,b,h,no,,,"print coordinates in GKI rather than NDC units"
+xscale,r,h,INDEF,0.0,,"plotter x = GKI_NDC_X * xscale"
+yscale,r,h,INDEF,0.0,,"plotter y = GKI_NDC_Y * yscale"
+txquality,s,h,"normal","normal|low|high",,"character quality; n=from metacode"
+lwtype,s,h,"ntracing","ntracing|penchange",,"bold line/text implementation"
+ltover,b,h,no,,,"override line type simulation"
+lwover,b,h,no,,,"override line width simulation"
+lcover,b,h,no,,,"override line color implementation by penchange"
+dashlen,r,h,INDEF,0.0,,"dashed line dash length, pltr units; 0.5 reasonable"
+gaplen,r,h,INDEF,0.0,,"dashed line gap length, pltr units; 0.1 reasonable"
+plwsep,r,hl,INDEF,0.,,"polyline width separation for ntracing; 0.005 reasonable"
+
+.fi
+
+
+.nh
+\fBSuggested GRAPHCAP entry for calcomp plotter\fR
+
+.nf
+
+    p5|calcomp|calcomp pen plotter:\
+	    :kf=xcalcomp.e:tn=calcomp:co#132:li#66:xr#32767:yr#5375:\
+	    :ch#.0294:cw#.0125:xs#1.664564:ys#0.27305:\
+	    :PU=inches:MP#.0254:DL#.50:GL#.10:PW#.005:\
+	    :DD=plot!calcomp,/tmp/gcaXXXXXX,\
+	    !{ cd /tmp; nice /local/bin/plotX -Tcalcomp -W=1 $F |\
+	    nice /usr/bin/plot  -Tcalcomp; rm $F; }&:
+
+    #xs	1.664564	# maximum x in meters; max at .002 inches step size
+    #ys	.27305000	# maximum y in meters; 10.75 inch paper
+    #xr	32767		# max resolution in x; limited by GKI short int coords
+    #yr	5375		# max resolution in y; 10.75 inches at .002 inches step
+    #PU	inches		# plotter units
+    #MP	0.0254		# meters per plotter unit 
+    #DL	0.5000		# dash length in plotter units
+    #GL	0.1000		# gap length in plotter units
+    #PW	0.0050		# n-tracing (bold line simul.) width sep. in pltr units
+    #if yscale not set by kernel, g_yndcto_p = GKI_MAXNDC/(MP*yr); 32767/10.75"
+    #if xscale not set by kernel, g_xndcto_p = g_yndcto_p; square aspect ratio
+
+.fi
+
+
+.nh
+\fBInterface between CALCOMP task and lower-level kernel routines\fR
+
+
+Two kernel routines will normally be called from outside the GKI
+instruction-stream decoding facility (as from the driver task):
+
+.nf
+     ccp_open (devname, dd)
+
+          devname:    device name of desired Calcomp plotter (must have 
+                      entry in graphcap file)
+
+          dd:         array of entry point addresses to lower-level kernel 
+                      routines 
+
+          discussion: linking to multiple Calcomp plotters is a 
+		      site-dependent function.  Ordinarily devname is 
+		      ignored; if this kernel is called, output will go 
+		      to the device initialized by the Calcomp library.  
+		      See ccp_openws.
+
+
+     ccp_close ()
+
+	  discussion: causes a Calcomp "newframe" -- resets origin to 
+		      right of last previously-plotted point.
+
+
+.fi
+.nh
+\fBLow-level kernel routines\fR
+
+
+All remaining kernel routines will normally be called either by ccp_open or
+by gki_execute, or by each other.  Following are descriptions of the 
+implementation of GKI instructions:
+.nf
+
+     GKI_EOF
+
+          Not implemented; it should be trapped outside the kernel, as in
+          \fBgki_execute\fR.
+
+     GKI_OPENWS
+
+          ccp_openws (devname, len_devname, mode)
+
+               devname; len_devname:
+
+                    name of plotter, name length, if not present in metafile
+
+               mode:
+
+                    file access mode for gki metafile; if NEWFILE, a Calcomp
+		    "newframe" (reorigin to right of previous plot) will
+		    occur; if APPEND mode, no newframe.
+
+               discussion:
+
+                    There is no output metafile; device connection and any 
+		    site-specific spooling is handled below this level.  
+		    Note that there must be a graphcap entry for devname.
+
+     GKI_CLOSEWS
+
+          ccp_closews ()
+
+               discussion:
+
+                    As there is no output metafile, this is a noop.
+
+     GKI_REACTIVATEWS
+
+          Not implemented.
+
+     GKI_DEACTIVATEWS
+
+          Not implemented.
+
+     GKI_MFTITLE
+
+          Not implemented.
+
+     GKI_CLEARWS
+
+          ccp_clear ()
+
+               discussion:
+
+                    Implemented only by a Calcomp "newframe"; there is no 
+		    output metacode file for spooling at this level.
+
+     GKI_CANCEL
+
+          Not implemented, since there is no buffered output.
+
+     GKI_FLUSH
+
+          Not implemented.
+
+     GKI_POLYLINE
+
+          ccp_polyline (p, npts)
+
+               p:          array of points (x1, y1, x2, y2, ...)
+
+               npts:       number of pairs
+
+               discussion: 
+
+		    To GKI, ccp_polyline will appear pretty normal; due to 
+		    the lack of settable parameters like dashed-line in 
+		    Calcomp, such features are implemented in further layers
+		    between ccp_polyline and the actual Calcomp vector-draw 
+		    routine.  See kernel task parameters lwtype, lwover, and
+		    ltover for line width and type control.
+
+     GKI_POLYMARKER
+
+          ccp_polymarker (p, npts)
+
+               arguments:  same as above
+
+               discussion: 
+
+		    Ccp_polymarker will merely dot the location at the
+		    coordinate passed in; more complicated marker 
+		    symbols will be assumed to have been handled above, for 
+		    purposes of clipping, and will be drawn with ccp_polyline 
+		    at this level.
+
+     GKI_TEXT
+
+          ccp_text (x, y, text, nchar)
+
+               x, y:
+
+                    NDC coordinates of text stream; note that the JUSTIFY 
+		    parameters in GSET determine where these coordinates are 
+		    relative to the text characters.
+
+               text: array of type short characters
+
+               nchar: number of chars in text
+
+               discussion:
+
+		    The same levels of text quality will be supported as in
+		    the stdgraph kernel; normal is taken from the metacode
+		    request, medium and high fonts are stroke text, while low 
+		    quality is Calcomp hardware text.  Depending on the
+		    particular plotter controller at each site, low quality
+		    text may or may not be significantly faster than stroke
+		    text.
+		    
+		    The special Calcomp symbols numbered 0 - 15 in the 
+		    Calcomp symbol library are invoked by characters with 
+		    ASCII values 0 - 15.  When using hardware text generation,
+		    the ASCII symbol requested will be mapped to the Calcomp 
+		    set if possible; otherwise, a default "indefinite" character
+		    will appear.
+
+     GKI_FILLAREA
+
+          ccp_fillarea (p, npts)
+
+               p, npts: same as above for ccp_polyline
+
+               discussion:
+
+                    With Calcomp, fillarea could only be implemented by 
+		    simulating with hatching patterns, a time-consuming 
+		    process for a pen plotter.  We may or may not choose 
+		    to do this, depending upon users' needs.  For the 
+		    very similar Versaplot kernel which may follow, it 
+		    should definitely be implemented, using Versaplot's 
+		    \fBtone\fR call.  Initially, it will only be implemented
+		    here with a call to ccp_polyline for the border.
+
+     GKI_PUTCELLARRAY
+
+	  Not implemented.
+
+     GKI_SETCURSOR
+
+          Not implemented.
+
+     GKI_PLSET
+
+          ccp_plset (gki)
+
+               gki: attribute structure decoded by gki
+
+               discussion:
+
+		    Line types documented in the GIO manual will be 
+		    implemented in software except for "erase", unless the 
+		    CL parameter to the CALCOMP task "ltover" is on, in 
+		    which case all lines drawn will be solid.  See task 
+		    parameters dash and gap.  In the future, line types
+		    numbered higher than 4 may be implemented using various
+		    combinations of dashes and dots as in Morse code.  Line
+		    width and color may be similarly implemented or overridden;
+		    if not overridden, line width will be done by default using
+		    n-tracing (n = nearest integer value of line width) or by a
+		    penchange, under control of task parameter "lwtype".
+
+     GKI_PMSET
+
+          ccp_pmset (gki)
+
+               gki, discussion: Same as for ccp_plset.
+
+     GKI_TXSET
+
+          ccp_txset (gki)
+
+               gki, discussion:
+
+                    Internal flags are set from structure gki controlling 
+		    text up vector, path relative to up vector, horizontal 
+		    and vertical justification, font, quality, color, 
+		    spacing, and size.  For high-quality text, all flags are
+		    implemented (color by a pen change, with optional 
+                    override); see GKI_TEXT discussion.
+
+     GKI_FASET
+
+          ccp_faset (gki)
+
+               gki, discussion:
+
+                    Internal flags are set for fill area style and color.  
+		    If we decide to implement fill area in software (the only
+		    way for Calcomp), we will use GKS conventions wherever
+		    possible.
+
+     GKI_GETCURSOR
+
+	  Not implemented.  The Calcomp \fBwhere\fR routine would only 
+	  duplicate GCURPOS in GIO.
+
+     GKI_CURSORVALUE
+
+          Not implemented; not an interactive device.
+
+     GKI_GETCELLARRAY
+
+          Not implemented; not a storage device.
+
+     GKI_CELLARRAY
+
+          Not implemented.
+
+     GKI_ESCAPE
+
+          ccp_escape (fn, instruction, nwords)
+
+               fn: escape function code
+
+               instruction, nwords:
+
+                    Nwords-long array of short integers containing the 
+		    instruction sequence.
+
+               discussion:
+
+		    A high-level task may pass the NDC-to-plotter units
+		    coordinate scaling factor down into the kernel to 
+		    permit exact scaling.  The scale factors will be 
+		    set in common to allow fast access by the ccp_draw 
+		    routine.
+                    
+		    GKI_ESCAPE = BOI 25 L FN N DC
+			
+			L(i)	5 + N
+			FN(i)	escape function code
+			N(i)	number of escape data words
+			DC(i)	escape data words
+
+			1) xndc_to_plotter:
+
+			   FN = ESC_XNDCTO_P (currently = 1 in ccp.h)
+			   N  = number of characters in the scale specification
+			   DC = array of N short integers containing character-
+				packed scale (must be achtsc'd then ctod'd to 
+				get x scale)
+
+			2) yndc_to_plotter:
+
+			   FN = ESC_YNDCTO_P (currently = 2 in ccp.h)
+			   N  = same as in (1)
+			   DC = same as in (1)
+
+		    The macros ESC_*NDCTO_P, currently defined in ccp.h, should
+		    probably be defined in a gki-public place like gki.h.
+
+
+     GKI_SETWCS
+
+          Not implemented.
+
+     GKI_GETWCS
+
+          Not implemented.
+.fi

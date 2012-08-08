@@ -1,0 +1,126 @@
+#{ REGDB -- Registry DB utility.
+
+procedure regdb (cmd)
+
+string	cmd				{ prompt = "Command"		}
+
+string	alias   = ""			{ prompt = "Resource alias"	}
+string	type    = ""			{ prompt = "Resource type"	}
+string	bpass   = ""			{ prompt = "Bandpass"	      	}
+string	ivorn   = ""			{ prompt = "Ivorn string"	}
+string	sname   = ""			{ prompt = "Short Name"	      	}
+string	url     = ""			{ prompt = "Service URL"	}
+string	desc    = ""			{ prompt = "Description"	}
+
+bool	verbose = no			{ prompt = "Print result?"	}
+string	db      = "vao$lib/registry.db" { prompt = "Database file"	}
+int	status  = 0			{ prompt = "status code"	}
+
+begin
+    string  tf, t, a, b, i, s, u, d, term
+    string  lcmd, lalias, ltype, lbpass, livorn, lsname, ldesc
+    bool    verb, found
+
+    lcmd   = strlwr (cmd)
+    lalias = strlwr (alias)
+    ltype  = strlwr (type)
+    lbpass = strlwr (bpass)
+    lsname = strlwr (sname)
+    livorn = strlwr (ivorn)
+    verb   = verbose
+
+    tf = mktemp ("tmp$tf")
+    translit (db, ",", " ") | fields ("STDIN", "1-", > tf)
+    list = tf
+
+    term = ""
+    if (lcmd != "list") {
+        if (lalias != "") { term = lalias ; lsname = ""	}
+        if (lsname != "") { term = lsname ; lalias = ""	}
+    }
+
+    # Resolve the search term.
+    if (lcmd != "list" && term != "") {
+	found = no
+	delete ("uparm$url", verify-, >& "dev$null")
+        while (fscan (list, t, a, b, i, s, u, d) != EOF) {
+	    if ((lalias != "" && strlwr(term) == a) || 
+	        (lalias != "" && strlwr(term) == i) || 
+	        (lsname != "" && strlwr(term) == a) || 
+		(lsname != "" && strlwr(term) == i)) {
+	    	    printf ("%s\n", d) | \
+			translit ("STDIN", ":", " ", collapse+) | scan (ldesc)
+	            type  = t ; alias = a ; bpass = b ; ivorn = i
+	            sname = s ; url   = u ; desc  = ldesc
+		    print (u, > "uparm$url")
+		    found = yes
+		    break;
+	    }
+        }
+	if (found == no) {
+	    printf ("Resource '%s' not found\n", term)
+	    #
+	    # FIXME -- Should we call the Registry here for a search????
+	    #
+	    type  = "" ; bpass = "" ; ivorn = "" ; desc  = "" #; url   = ""
+	    if (lalias != "") alias = term
+	    if (lsname != "") sname = term
+	    status = 1
+	    return
+	}
+	;
+    }
+
+    if (lcmd == "list") {				# LIST
+	while (fscan (list, t, a, b, i, s, u, d) != EOF) {
+
+### FIXME ##########################################
+#	    if ( (ltype  != "" && t != ltype ) ||
+#	         (lbpass != "" && b != lbpass))
+#		     next
+ltype = ""
+lbpass = ""
+### FIXME ##########################################
+
+	    printf ("%-10s  ", a)
+	    if (ltype  == "") printf ("%s  ", t)
+	    if (lbpass == "") printf ("%-8s  ", b)
+	    printf ("%s\n", d) | translit ("STDIN", ":", " ", collapse+)
+	}
+
+    } else if (lcmd == "type") {			# TYPE
+	if (verb) print (t)
+    } else if (lcmd == "alias") {			# ALIAS
+	if (verb) print (a)
+    } else if (lcmd == "bpass") {			# BPASS
+	if (verb) print (b)
+    } else if (lcmd == "ivorn") {			# IVORN
+	if (verb) print (i)
+    } else if (lcmd == "sname") {			# SNAME
+	if (verb) print (s)
+    } else if (lcmd == "url") {				# URL
+	if (verb) print (u)
+    } else if (lcmd == "desc") {			# SNAME
+	if (verb) print (d)
+
+
+    } else if (lcmd == "resolve") {			# RESOLVE
+        del (tf, verify-)
+	return
+
+    } else if (lcmd == "add") {				# ADD TO DB
+
+    } else if (lcmd == "del") {				# DELETE FROM DN
+
+    } else if (lcmd == "update") {			# UPDATE DB
+
+    } else if (lcmd == "rename") {			# RENAME ALIAS
+
+    } else {
+	printf ("Command '%s' not found\n", lcmd)
+	status = 1
+    }
+    list = ""
+
+    del (tf, verify-)
+end

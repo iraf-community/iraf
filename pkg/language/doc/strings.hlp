@@ -1,0 +1,78 @@
+.help "strings,substr,stridx,str" Jun86 language
+.ih
+NAME
+strings -- string manipulation functions available in the CL
+.ih
+USAGE
+.nf
+str     (x)
+substr  (str, first, last)
+stridx  (test, str)
+strldx  (test, str)
+strlen  (str)
+strlwr  (str)
+strupr  (str)
+strstr  (str1, str2)
+strlstr (str1, str2)
+.fi
+.ih
+DESCRIPTION
+The following functions are available for the manipulation of strings
+within the CL.  All string positions are returned as 1-indexed values.
+
+.ls str (x)
+Converts its argument into a string.  The argument may be
+boolean, integer or real.
+.le
+.ls substr (str, first, last)
+Extracts a substring from string \fIstr\fR from index \fIfirst\fR to 
+index \fIlast\fR.  The \fIfirst\fR value may be larger than \fIlast\fR, in 
+which case the returned string is reversed.  The first character in the 
+string is at index 1.
+.le
+.ls stridx (test, str)
+Finds the position of the first occurrence of any character found in \fItest\fR
+in the string \fIstr\fR, returning 0 if the match fails.
+.le
+.ls strldx (test, str)
+Finds the position of the last occurrence of any character found in \fItest\fR
+in the string \fIstr\fR, returning 0 if the match fails.
+.le
+.ls strlen (str)
+Returns the current length of a string.  Note that the maximum length may be
+obtained as the value of the expression `param.p_length'.
+.le
+.ls strlwr (str)
+Converts \fIstr\fR to all lower-case characters, returns a string value.
+.le
+.ls strupr (str)
+Converts \fIstr\fR to all upper-case characters, returns a string value.
+.le
+.ls strstr (str1, str2)
+Finds the position of the first occurrence of \fIstr1\fR in \fIstr2\fR (an
+exact match is required), or 0 if the match fails.
+.le
+.ls strlstr (str1, str2)
+Finds the position of the last occurrence of \fIstr1\fR in \fIstr2\fR (an
+exact match is required), or 0 if the match fails.
+.le
+.ih
+EXAMPLES
+1. Simple function calls.
+
+.nf
+	s = str(y)			     # convert y to a string.
+	s = substr  ("abcdefg", 2, 4)	     # s = "bcd"
+	s = substr  ("abcdefg", 4, 2)	     # s = "dcb"
+	i = stridx  ("abc", " eeboq")	     # i = 4
+	i = strldx  ("/", "/path/image.imh") # i = 6
+	i = strlen  ("abc")		     # i = 3
+	s = strlwr  ("ABC")		     # s = "abc"
+	s = strupr  ("abc")		     # s = "ABC"
+	i = strstr  ("imh","imhead.imh")     # i = 1
+	i = strlstr ("imh","imhead.imh")     # i = 8
+.fi
+.ih
+SEE ALSO
+scan, radix
+.endhelp

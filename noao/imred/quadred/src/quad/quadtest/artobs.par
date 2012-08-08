@@ -1,0 +1,5 @@
+# observe parameter file
+obspars,pset,h,,,,Observing parameters
+detpars,pset,h,,,,Detector parameters
+instrpars,pset,h,,,,Instrument parameters
+telpars,pset,h,,,,Telescope parameters

@@ -1,0 +1,45 @@
+.help gkiextract Jan86 plot
+.ih
+NAME
+gkiextract -- extract individual frames from a GKI metacode file
+.ih
+USAGE
+gkiextract input frames
+.ih
+PARAMETERS
+.ls input
+The metacode source file or files.
+.le
+.ls frames
+List of frames to be extracted from each metacode file.
+.le
+.ls verify = no
+Verify each frame before extraction?
+.le
+.ih
+DESCRIPTION
+Task \fBgkiextract\fR will extract individual frames from a metacode file, 
+writing a binary metacode output stream which can be piped to a kernel
+for plotting or redirected to produce a new metacode file.  
+Parameter \fIframes\fR specifies a list of frames to be
+extracted from each input file.  If \fIverify\fR  = yes,
+a \fBgkidir\fR style line will be printed for each specified frame 
+and the user will be queried whether or not to extract the frame.
+.ih
+EXAMPLES
+1. Extract frames 1, 3 and 5 from metacode file "mc_file" and
+plot them on the device "vup":
+
+    cl> gkiextract mc_file 1,3,5 | stdplot dev=vup
+
+2. Print a directory of the first 99 frames in "mc_file", extract
+those files requested by the user and write them to file "new_mc_file".
+
+    cl> gkiextract mc_file 1-99 ver+ > new_mc_file
+.ih
+BUGS
+A maximum of 8192 plots in a single metacode file may be processed.
+.ih
+SEE ALSO
+gkidir
+.endhelp

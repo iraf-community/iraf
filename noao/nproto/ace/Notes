@@ -1,0 +1,12 @@
+o Evaluate centroid in detection phase so that evaluation can
+  include quantities based on distance from centroid.
+o Kron magnitudes
+o Add partial pixel
+o What to do about contaminating objects in the apertures.
+
+TODO
+
+o MapIO - match coordinates for sky fit
+o match object mask as part of aceall when outobjmask is given
+o reorganize to remove xap,yap,etc from detection phase
+o errors in ra/dec and mags

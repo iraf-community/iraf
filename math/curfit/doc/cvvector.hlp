@@ -1,0 +1,41 @@
+.help cvvector Jun84 "Curfit Package"
+.ih
+NAME
+cvvector -- evaluate the fitted curve at a set of points
+.ih
+SYNOPSIS
+cvvector (cv, x, yfit, npts)
+
+.nf
+pointer	cv		# curve descriptor
+real	x[]		# x array
+real	yfit[]		# array of fitted y values
+int	npts		# number of x values
+.fi
+.ih
+ARGUMENTS
+.ls cv   
+Pointer to the curve descriptor structure.
+.le
+.ls x     
+Array of x values
+.le
+.ls yfit   
+Array of fitted y values
+.le
+.ls npts   
+The number of x values at which the curve is to be evaluated.
+.le
+.ih
+DESCRIPTION
+Fit the curve to an array of data points. CVVECTOR uses the coefficients
+stored in the curve descriptor structure.
+.ih
+NOTES
+The x values are assumed to lie
+in the region xmin <= x <= xmax. Checking for out of bounds x values is the
+responsibility of the user.
+.ih
+SEE ALSO
+cveval
+.endhelp

@@ -1,0 +1,82 @@
+.help "switch,case,default" Feb86 language
+.ih
+NAME
+switch -- switch case statement
+.ih
+SYNTAX
+.nf
+switch (expr) {
+case val1 [, val1,...]:
+    statements
+case val3 [, val3,...]:
+    statements
+	(etc.)
+default:
+    statements
+}
+.fi
+.ih
+ELEMENTS
+.ls expr
+An integer-valued expression tested before entry into the switch block.
+.le
+.ls valN
+Integer valued constants used to match expression.
+.le
+.ls statements
+Simple or compound statements to be executed when the appropriate case or
+default block is selected.
+.le
+.ih
+DESCRIPTION
+The \fIswitch\fR statement provides a multiway branch capability.
+The switch expression is evaluated and control branches to the matching
+\fIcase\fR block.  If there is no match the \fIdefault\fR block, if present,
+receives control.  If no \fIdefault\fR block is present, the switch is skipped.
+
+Each \fIcase\fR statement consists of a list of values defining the case,
+and an executable statement (possibly compound) to be executed if the case
+is selected by the switch.  Execution will continue until the next case is
+reached, at which time a branch out of the \fIswitch\fR statement occurs.
+Note this difference from the C switch case, where an explicit \fIbreak\fR
+statement is required to exit a switch.  If a \fIbreak\fR is used in a CL
+switch, it will act upon the loop statement containing the switch, not the
+switch itself.
+
+Note that both the switch expression and the case constants may
+be integers, or single characters which are evaluated to their
+ASCII equivalents.
+
+The \fIdefault\fR statement must be the last statement in the switch block.
+.ih
+EXAMPLES
+1. Multiple cases, no default case.
+
+.nf
+	switch (opcode) {
+	case 1:
+	    task1 (args)
+	case 2:
+	    task2 (args)
+	case 5:
+	    task5 (args)
+	}
+.fi
+
+2. Multiple values in a case.
+
+.nf
+	switch (digit) {
+	case '1','2','3','4','5','6','7':
+	    n = n * 8 + digit - '0'
+	default:
+	    error (1, "invalid number")
+	}
+.fi
+.ih
+BUGS
+Only integer values are allowed (no strings).
+The case values must be constants; ranges are not permitted.
+.ih
+SEE ALSO
+if else, goto

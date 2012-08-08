@@ -1,0 +1,17 @@
+# APEDIT
+
+input,s,a,,,,List of input images to edit
+apertures,s,h,"",,,Apertures
+references,s,h,"",,,"Reference images
+"
+interactive,b,h,yes,,,Run task interactively?
+find,b,h,no,,,Find apertures?
+recenter,b,h,no,,,Recenter apertures?
+resize,b,h,no,,,Resize apertures?
+edit,b,h,yes,,,"Edit apertures?
+"
+line,i,h,INDEF,1,,Dispersion line
+nsum,i,h,10,,,Number of dispersion lines to sum or median
+width,r,h,5.,0.,,Profile centering width
+radius,r,h,10.,,,Profile centering radius
+threshold,r,h,0.,0.,,Detection threshold for profile centering

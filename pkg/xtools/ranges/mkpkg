@@ -1,0 +1,49 @@
+# Library for the RANGES procedures.
+
+$checkout libxtools.a lib$
+$update	  libxtools.a
+$checkin  libxtools.a lib$
+$exit
+
+generic:
+	$set	GEN = "$$generic -k -t rd"
+	$ifolder (rgbinr.x, rgbin.gx)		$(GEN) rgbin.gx $endif
+	$ifolder (rgexcluder.x, rgexclude.gx)	$(GEN) rgexclude.gx $endif
+	$ifolder (rggxmarkr.x, rggxmark.gx)	$(GEN) rggxmark.gx $endif
+	$ifolder (rgpackr.x, rgpack.gx)		$(GEN) rgpack.gx $endif
+	$ifolder (rgunpackr.x, rgunpack.gx)	$(GEN) rgunpack.gx $endif
+	$ifolder (rgwtbinr.x, rgwtbin.gx)	$(GEN) rgwtbin.gx $endif
+	$ifolder (rgxrangesr.x, rgxranges.gx)	$(GEN) rgxranges.gx $endif
+	;
+
+libxtools.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	rgbind.x	<pkg/rg.h>
+	rgbinr.x	<pkg/rg.h>
+	rgdump.x	<pkg/rg.h>
+	rgencode.x	<pkg/rg.h>
+	rgexcluded.x	<pkg/rg.h>
+	rgexcluder.x	<pkg/rg.h>
+	rgfree.x	
+	rggxmarkd.x	<gset.h> <pkg/rg.h>
+	rggxmarkr.x	<gset.h> <pkg/rg.h>
+	rgindices.x	<pkg/rg.h>
+	rginrange.x	<pkg/rg.h>
+	rgintersect.x	<pkg/rg.h>
+	rginverse.x	<pkg/rg.h>
+	rgmerge.x	<pkg/rg.h>
+	rgnext.x	<mach.h> <pkg/rg.h>
+	rgorder.x	<pkg/rg.h>
+	rgpackd.x	<pkg/rg.h>
+	rgpackr.x	<pkg/rg.h>
+	rgranges.x	<ctype.h> <error.h> <pkg/rg.h>
+	rgunion.x	<pkg/rg.h>
+	rgunpackd.x	<pkg/rg.h>
+	rgunpackr.x	<pkg/rg.h>
+	rgwindow.x	<pkg/rg.h>
+	rgwtbind.x	<pkg/rg.h>
+	rgwtbinr.x	<pkg/rg.h>
+	rgxrangesd.x	<ctype.h> <error.h> <pkg/rg.h>
+	rgxrangesr.x	<ctype.h> <error.h> <pkg/rg.h>
+	;

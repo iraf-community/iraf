@@ -1,0 +1,201 @@
+.help bplot Mar92 noao.onedspec
+.ih
+NAME
+bplot -- Plot spectra noninteractively using SPLOT
+.ih
+USAGE
+bplot images [records]
+.ih
+PARAMETERS
+.ls images
+List of images to be plotted.  These may be one dimensional, multiaperture,
+long slit, or nonspectral images.
+.le
+.ls records (imred.irs and imred.iids only)
+List of records to be appended to the input image root names when
+using record number extension format.  The syntax of this list is comma
+separated record numbers or ranges of record numbers.  A range consists of
+two numbers separated by a hyphen.  A null list may be used if no record
+number extensions are desired.
+.le
+.ls apertures = ""
+List of apertures/lines/columns to be plotted in each image.  If
+\fIapertures\fR is null all of the apertures/lines/columns will be plotted.
+.le
+.ls band = 1
+The band or plane of a three dimensional image to be plotted in each image.
+.le
+.ls graphics = "stdgraph"
+Output graphics device.  This may be one of "stdgraph", "stdplot",
+"stdvdm", or the actual device name.
+.le
+.ls cursor = "onedspec$gcurval.dat"
+File(s) containing cursor commands for the SPLOT task.
+The files will be cycled sequentially.  If there is more than one file
+usually the number of files will agree with the number of apertures
+for each image since otherwise different cursor/aperture pairings will
+occur.  The default is a file containing only the (q)uit command.
+.le
+
+The following parameters are used in response to particular keystrokes.
+In \fBsplot\fR they are query parameters but in \fBbplot\fR they are hidden
+parameters.
+.ls next_image = ""
+In response to 'g' (get next image) this parameter specifies the image.
+.le
+.ls new_image = ""
+In response to 'i' (write current spectrum) this parameter specifies the
+name of a new image to create or existing image to overwrite.
+.le
+.ls overwrite = yes
+Overwrite an existing output image?  If set to yes it is possible to write
+back into the input spectrum or to some other existing image.  Otherwise
+the user is queried again for a new image name.
+.le
+.ls spec2 = ""
+When adding, subtracting, multiplying, or dividing by a second spectrum
+('+', '-', '*', '/' keys in the 'f' mode) this parameter is used to get
+the name of the second spectrum.
+.le
+.ls constant = 0.
+When adding or multiplying by a constant ('p' or 'm' keys in the 'f' mode)
+the parameter is used to get the constant.
+.le
+.ls wavelength = 0.
+This parameter is used to get a dispersion coordinate value during deblending or
+when changing the dispersion coordinates with 'u'.
+.le
+.ls linelist = ""
+During deblending this parameter is used to get a list of line positions
+and widths.
+.le
+.ls wstart = 0., wend = 0., dw = 0.
+In response to 'p' (convert to a linear wavelength scale) these parameter
+specify the starting wavelength, ending wavelength, and wavelength per pixel.
+.le
+.ls boxsize = 2
+In response to 's' (smooth) this parameter specifies the box size in pixels
+to be used for the boxcar smooth
+.le
+.ih
+DESCRIPTION
+The spectra in the input image list are successively processed by the task
+\fBsplot\fR with input supplied by the cursor parameter and the output sent
+to the specified graphics device.  The range of apertures and bands
+specified by \fIapertures\fR and \fIbands\fR will be processed for each
+image.  In the \fBiids/irs\fR packages the record extension syntax is used
+with input root names and a record number list.  The hidden parameters from
+\fBsplot\fR apply to this task.
+
+The cursor file(s) consists of line(s) of the form:
+
+	[x y 1] key [command]
+
+where x and y are the position of the cursor (may be zero or absent if the
+cursor position is irrelevant) and key is one of the keystrokes understood
+by \fBsplot\fR.  If the key is ":" then the \fIcolon\fR command string follows.
+The default cursor file consists of the single line:
+
+	0 0 1 q
+
+If more than one cursor file is specified they are sequentially assigned to
+each aperture and the list is repeated as needed.  This allows the aperture
+to be manipulated in differing ways.
+.ih
+EXAMPLES
+1. To plot all of apertures of the multiaperture spectra indicated by the file
+"nite1.lst" on the default plotter and run in the background:
+
+.nf
+    cl> bplot @nite1.lst graphics=stdplot &
+.fi
+
+2. To preview the plots:
+
+.nf
+    cl> bplot @nite1.lst graphics=stdgraph
+.fi
+
+3.  To produce a histogram type plot about Balmer alpha for aperture 5 of
+each spectrum with the IRAF banner suppressed:
+
+.nf
+    cl> type curfile
+    6555 0 1 a
+    6570 0 1 a
+    q
+    cl> splot.options="auto hist nosysid"
+    cl> splot.xmin=6555
+    cl> splot.xmax=6570
+    cl> bplot @nite1.lst apertures=5 cursor=curfile
+.fi
+
+4. To produce plots with four spectra per page:
+
+.nf
+    cl> bplot @nite1.lst ... >G nite1.mc
+    cl> gkimosaic nite1.mc dev=stdplot
+.fi
+
+The first command redirects the output of the graphics to the metacode
+file nite1.mc.  The task \fBgkimosaic\fR is used to make multiple plots
+per page.  Other tasks in the \fBplot\fR package may be used to
+manipulate and redisplay the contents of the metacode file.
+
+5. To plot a list of apertures with a different cursor file for each aperture:
+
+.nf
+    cl> bplot @nite1.lst apertures=3,9,14 cursor=@nite1.cur
+.fi
+
+In this case the file "nite1.cur" is assumed to be a list of
+individual cursor file names, for instance:
+
+.nf
+	cur.03
+	cur.09
+	cur.14
+.fi
+
+that are in one to one correspondence with the range of apertures.
+.ih
+REVISIONS
+.ls BPLOT V2.10.3
+The query parameters from SPLOT were added as hidden parameters in BPLOT
+to allow use of those keys in a batch way.
+.le
+.ls BPLOT V2.10
+The \fIapertures\fR and \fIband\fR parameters been added to select
+apertures from multiple spectra and long slit images, and bands from 3D
+images.  Since the task is a script calling \fBsplot\fR, the many revisions
+to that task also apply.  The version in the \fBirs/iids\fR packages
+selects spectra using the record number extension syntax.
+.le
+.ih
+BUGS
+The cursor file command keystrokes cannot include any of the cursor
+mode (CAPITALIZED) keys.  This results from the implementation of
+the cursor mode commands as external to both BPLOT and SPLOT.
+
+When first entered, SPLOT will always display an initial plot.  BPLOT
+calls SPLOT once for each aperture in each image and thus produces
+N(apertures)*N(images) initial plots.  The plots are not optional because
+of the possible confusion a blank screen might cause an inexperienced
+user.  If the initial plots are unwanted they must be edited out of the
+graphics stream.  This can be done as follows, by directing the
+graphics output of BPLOT to a metacode file and then using GKIEXTRACT
+to remove only the desired plots from the metacode file:
+
+.nf
+    cl> bplot @nite1.lst cursor=curfile >G nite1.mc
+    cl> gkiextract nite1.mc 2x2 | gkimosaic dev=stdplot
+.fi
+
+This assumes that curfile is designed to produce only one plot in
+addition to the non-optional initial plot.  In this case there will be
+two plots per aperture per image and we extract every other plot starting
+with the second (as encoded in the range string:  "2x2").
+.ih
+SEE ALSO
+splot, specplot, slist, gkiextract, gkimosaic, implot, graph, ranges
+.endhelp

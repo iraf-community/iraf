@@ -1,0 +1,361 @@
+# CTIO Telescope, Filter, and Detector Database 	14 Aug 1998 SRH.
+#
+#   Telescope data:
+#	aperture  	- From drawings in CTIO facilities manual
+#       scale     	- From drawings in CTIO facilities manual and updates
+#       transmission 	- Corrects for central obstruction based on drawings
+#
+# OPTICAL
+# -------
+#   Filter data:
+#	These were just copied from kpno.dat for consistancy
+#
+#   Detector data:
+#
+#     CTIO ccds
+#	readnoise	- from PFCCD manual by ARW
+#	dark		- from PFCCD manual by ARW
+#	pixel size	- from PFCCD manual by ARW
+#	DQE		- adjusted to give the counts for U=B=V=R=I=20 star
+#			  at the 4.0-m PF tabulated in the PFCCD manual by ARW
+#
+#     BTC 		- from BTC web page
+#
+#     YaleO		- inspired guess based on QE curve on web page
+#
+# IR
+# --
+#
+#   Filter data:
+#	There is a descrepancy between the count rates in the CIRIM manual
+#	and the values given for the 4m f/14 tip-tilt system such that
+#	values scaled by aperture from the 1.5-m OVERESTIMATE object counts
+#	with the 4m f/14 by a large factor.   There is a smaller descrepancy
+#	scaling counts between the 1.5-m f/8 and 4.0-m f/8. Rob Probst is
+#       investigating.  For the time being I have made two seperate sets of
+#	filter data. 
+#
+#       J,H,Ks,K:          for 1.5m f/8. roughtly OK for other non T-T
+#       Jtt,Htt,Kstt,Ktt:  for 4.0m f/14 
+#
+#   Detector data:
+#     CIRIM 
+#	readnoise	- from CIRIM manual
+#	dark		- from CIRIM manual
+#       pixel size 	- Adjusted to give correct "/pix on 4.0-m f/14
+#	DQE		- used IRIM values from kpno.dat (per D. Joyce)
+#
+#     CCOB 
+#	readnoise	- from CCOB manual
+#	dark		- from CCOB manual
+#       pixel size 	- Adjusted to give correct "/pix on 4.0-m f/14 
+#	DQE		- tweaked to give "correct" counts with 4m f/14
+#			  using Jtt,Htt,Kstt & Ktt
+#
+# Revised 03 Sept 1998	SRH
+#
+# 1) New measuremenst by Probst/Blum suggest that the standard filter
+#    entries do reproduce observed count rates with the 4mf14 tip-tilt
+#    Apparently the numbers in the manual where wrong. Commented out 
+#    special tt entries pending final confirmation
+#
+# 2) Revised DQE for CTIO CCD's to reproduce new (lower) 4mpf count rates
+#    provided by ARW for BVRI.  Apparently Moses wrote the wrong numbers on his
+#    stone tablets. Also adjusted andicam_opt entry since this is just based
+#    on scaling by the relative QE's of the chips.
+#  
+# 3) For U adjusted to give correct numbers at 0.9-m (no corrector) and
+#    added transmission(u) entry to 4mpf to correct for PF corrector
+#    transmission.
+#
+# 4) inserted transmission(andycam_opt) for 1.0-m to "do this right"
+#
+# 3) Included extinction for IR filters per Dick Joyce's numbers for KPNO
+#    With the idea that we should try to be consistant.
+#
+# Revised 21 Sept 2006 FV
+#
+# Added Mosaic z' based on estimated values from Arjun Dey.
+#
+#------------------------------------------------------------------------------
+#
+# Telescope data:
+# aperture diameter in meters, scale in arcsec/mm, and transmission.
+
+telescope = "4mpf"
+	aperture =  3.960
+	scale = 18.0
+	transmission =  0.841
+	transmission(U) = 0.497
+
+telescope = "4mf8"
+	aperture =  3.960
+	scale = 6.56
+	transmission =  0.841
+
+telescope = "4mf14"
+	aperture =  3.960
+	scale = 3.4052
+	transmission =  0.841
+# 	transmission =  0.5172	
+
+telescope = "1.5mf8"
+	aperture =  1.570
+	scale = 18.1
+	transmission =  0.766
+
+telescope = "1.5mf13.5"
+	aperture =  1.570
+	scale = 10.0
+	transmission =  0.766
+
+telescope = "1m"
+	aperture =  1.020
+	scale = 19.6
+	transmission = 0.727
+        transmission(andicam_opt) = 0.65
+	
+
+telescope = "0.9m"
+	aperture =  0.910
+	scale = 16.5
+	transmission =  0.872
+
+telescope = "Schmidt"
+	aperture =  0.600
+	scale = 96.6
+	transmission =  0.870
+
+telescope = "1.3m"
+        aperture = 1.3
+        scale = 11.8
+        transmission = 0.727
+        transmission(andicam_opt) = 0.65
+        transmission(andicam_ir) = 0.80
+
+end
+
+# Filter data:
+# Magnitude corresponding to photon count rate. 
+# Photons/second/stellar-image for a 1-m telescope at 1 airmass.
+# Sky magnitudes per sq arc sec:
+# sky = sky0 + sky1 * phase + sky2 * phase**2 (phase=0-14)
+
+filter = "U"
+        extinction = 0.55
+	mag = 20
+	star = 8.0
+	sky0 = 22.0
+	sky1 = -0.2666
+	sky2 = -.00760
+
+filter = "B"
+        extinction = 0.25
+	mag = 20
+	star = 34.5
+	sky0 = 22.7
+	sky1 = -0.0998
+	sky2 = -0.00953
+
+filter = "V"
+        extinction = 0.14
+	mag = 20
+	star = 36.2
+	sky0 = 21.8
+	sky1 = -0.0153
+	sky2 = -0.00838
+
+filter = "R"
+        extinction = 0.10
+	mag = 20
+	star = 36.8
+	sky0 = 20.9
+	sky1 = -0.0211
+	sky2 = -0.00364
+
+filter = "I"
+        extinction = 0.05
+	mag = 20
+	star = 26.7
+	sky0 = 19.9
+	sky1 = -0.0086
+	sky2 = -0.00311
+ 
+filter = "z"
+        extinction = 0.03
+	mag = 20
+	star = 24.0
+	sky0 = 17.98
+	sky1 = 0.
+	sky2 = 0.
+
+filter = "J"
+        extinction = 0.08
+        mag = 20
+        star = 28.093
+        sky0 = 16.4053
+        sky1 = 0.
+        sky2 = 0.
+
+filter = "H"
+        extinction = 0.04
+        mag = 20
+        star = 19.58
+        sky0 = 14.4598
+        sky1 = 0.
+        sky2 = 0.
+
+filter = "K"
+        extinction = 0.07
+        mag = 20
+        star = 14.487
+        sky0 = 12.7576
+        sky1 = 0.
+        sky2 = 0.
+
+filter = "Ks"
+        extinction = 0.05
+        mag = 20
+        star = 10.843
+        sky0 = 13.4167
+        sky1 = 0.
+        sky2 = 0.
+
+# No longer needed ? 3 sept 98 SRH
+#
+#filter = "Jtt"
+#        extinction = 0.0
+#        mag = 20
+#        star = 16.1541
+#        sky0 = 14.7273
+#        sky1 = 0.
+#        sky2 = 0.
+#
+#filter = "Htt"
+#        extinction = 0.0
+#        mag = 20
+#        star = 12.6375
+#        sky0 = 13.6591
+#        sky1 = 0.
+#        sky2 = 0.
+#
+#filter = "Ktt"
+#        extinction = 0.0
+#        mag = 20
+#        star = 9.05010
+#        sky0 = 11.8522
+#        sky1 = 0.
+#        sky2 = 0.
+#
+#filter = "Kstt"
+#        extinction = 0.0
+#        mag = 20
+#        star = 6.77367
+#        sky0 = 12.5113
+#        sky1 = 0.
+#        sky2 = 0.
+
+end
+
+# Detector information:
+# rdnoise in photons, dark rate in photons per second, pixel size in microns,
+# and the effective DQE for each filter.
+
+detector = "MOSAIC2"
+        rdnoise = 5.0
+        dark = 0.0015
+        pixsize = 15
+        U = 0.48
+        B = 0.68
+        V = 0.81
+        R = 0.86
+        I = 0.63
+        I = 0.40
+
+detector = "site2k"
+	rdnoise = 4.0
+	dark = 0.0008
+	pixsize = 24
+	U = 0.48047
+	B = 0.52528
+	V = 0.72891
+	R = 0.78299
+	I = 0.58227
+
+detector = "stis2k"
+        rdnoise = 4.0
+        dark = 0.0008
+        pixsize = 21
+        U = 0.18927
+        B = 0.1978
+        V = 0.31423
+        R = 0.4121
+        I = 0.36914
+
+
+detector = "tek1k"
+	rdnoise = 4.0
+	dark = 0.0008
+	pixsize = 24
+	U = 0.16590
+	B = 0.39561
+	V = 0.7331
+	R = 0.78299
+	I = 0.56801
+
+detector = "btc"
+# Values for Chip 3, 
+# Chip 1 has ~1.16x, Chip 2 0.72x and Chip 4 1.08x this sensitivity at B
+# with similar factors for all wavelengths
+	rdnoise = 5.5
+	dark = 0.0008
+	pixsize = 24
+	U = 0.3150
+	B = 0.3956
+	V = 0.6305
+	R = 0.6285
+	I = 0.4550
+
+detector = "andicam_opt"
+	rdnoise = 4.0
+	dark = 0.0008
+	pixsize = 15
+	U = 0.12189
+	B = 0.60109
+	V = 0.87467
+	R = 0.8874
+	I = 0.7166
+
+detector = "andicam_ir"
+        rdnoise = 11
+        dark = 0.5
+        pixsize = 18.5
+        J = 0.23
+        H = 0.33
+        K = 0.31
+
+detector = "cirim"
+        rdnoise = 37
+        dark = 0.3
+        pixsize = 64.09
+        J = 0.23
+        H = 0.33
+        K = 0.31
+        Ks = 0.38
+#        Jtt = 0.23
+#        Htt = 0.33
+#        Ktt = 0.31
+#        Kstt = 0.38
+
+detector = "ccob"
+        rdnoise = 70
+        dark = 0.2
+        pixsize = 27
+        J = 0.21
+        H = 0.31
+        K = 0.24
+        Ks = 0.23
+#        Jtt = 0.16898
+#        Htt = 0.228
+#        Ktt = 0.2429
+#        Kstt = 0.27985

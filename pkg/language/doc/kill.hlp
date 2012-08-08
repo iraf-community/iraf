@@ -1,0 +1,28 @@
+.help kill Feb86 language
+.ih
+NAME
+kill -- kill a background job
+.ih
+USAGE
+kill job [job ...]
+.ih
+PARAMETERS
+.ls job
+A background job number, as returned by \fIjobs\fR, or as printed when
+the job is submitted.
+.le
+.ih
+DESCRIPTION
+\fIKill\fR is used to forcibly terminate a background job.
+The user must specify the job number of the task to be killed.
+The job number is displayed when the job is started, and may also
+be seen using the \fIjobs\fR command.
+.ih
+EXAMPLE
+1. Kill job number 4.
+
+	cl> kill 4
+.ih
+SEE ALSO
+jobs, service
+.endhelp

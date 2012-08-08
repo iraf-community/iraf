@@ -1,0 +1,11 @@
+# Task parameters for slitpic are as follows:
+
+serial_numbers,s,a,"",,,Range of serial numbers to process
+output_root,s,a,"mask",,,Root name of output image 
+tape1,s,h,"slitsave",,,Name of file containing slit solutions
+site,s,h,"kpno",,,Observing site - kpno/ctio
+slit_width,r,h,2.5,,,Width of slit
+pixel_scale,r,h,0.4157,,,Scale of image in arcsec/pixel
+pix_date,s,h,"14feb84",,,Date on which pixel_scale (above) was valid
+crtpict,b,h,no,,,Generate command file for crtpict input?
+cmd_file,s,h,"cmd",,,Root name of output command file for crtpict

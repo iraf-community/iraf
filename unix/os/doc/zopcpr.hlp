@@ -1,0 +1,33 @@
+.help zopcpr May84 "System Interface"
+.ih
+NAME
+zopcpr -- open a connected subprocess
+.ih
+SYNOPSIS
+.nf
+zopcpr (process_file, inchan, outchan, pid)
+
+packed	char process_file[]		# executable file
+int	inchan				# input from child
+int	outchan				# output to child
+int	pid				# pid of child
+.fi
+.ih
+DESCRIPTION
+The executable file \fIprocess_file\fR is spawned as a child process and
+connected to the parent via the IPC (inter-process communication) channels
+\fIinchan\fR and \fIoutchan\fR.
+.ih
+RETURN VALUE
+ERR is returned if the named subprocess cannot be connected.  If the connection
+succeeds the process-id of the child is returned in \fIpid\fR.
+.ih
+NOTES
+Only the IPC driver may be used to read and write the IPC channels.
+A process spawned with \fBzopcpr\fR must be closed with \fBzclcpr\fR.
+On a multi-processor system the OSFN \fIprocess_file\fR may be used to
+specify the processor on which the child process is to be spawned.
+.ih
+SEE ALSO
+zclcpr, zintpr, zopdpr
+.endhelp

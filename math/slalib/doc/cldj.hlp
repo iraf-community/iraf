@@ -1,0 +1,34 @@
+.help cldj Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slCLDJ (IY, IM, ID, DJM, J)
+
+     - - - - -
+      C L D J
+     - - - - -
+
+  Gregorian Calendar to Modified Julian Date
+
+  Given:
+     IY,IM,ID     int    year, month, day in Gregorian calendar
+
+  Returned:
+     DJM          dp     modified Julian Date (JD-2400000.5) for 0 hrs
+     J            int    status:
+                           0 = OK
+                           1 = bad year   (MJD not computed)
+                           2 = bad month  (MJD not computed)
+                           3 = bad day    (MJD computed)
+
+  The year must be -4699 (i.e. 4700BC) or later.
+
+  The algorithm is derived from that of Hatcher 1984
+  (QJRAS 25, 53-55).
+
+  P.T.Wallace   Starlink   11 March 1998
+
+  Copyright (C) 1998 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

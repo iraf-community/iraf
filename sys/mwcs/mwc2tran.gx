@@ -1,0 +1,38 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	"../mwcs.h"
+
+# MW_C2TRAN -- Optimized 2D coordinate transformation.
+
+procedure mw_c2tran$t (a_ct, x1,y1, x2,y2)
+
+pointer	a_ct			#I pointer to CTRAN descriptor
+PIXEL	x1,y1			#I coordinates in input system
+PIXEL	x2,y2			#O coordinates in output system
+
+pointer	ct, ltm, ltv
+PIXEL	p1[2], p2[2]
+
+begin
+	# Get real or double version of descriptor.
+	ct = CT_$T(a_ct)
+
+	ltm = CT_LTM(ct)
+	ltv = CT_LTV(ct)
+
+	if (CT_TYPE(ct) == LNR) {
+	    # Simple linear, nonrotated transformation.
+	    x2 = Mem$t[ltm  ] * x1 + Mem$t[ltv  ]
+	    y2 = Mem$t[ltm+3] * y1 + Mem$t[ltv+1]
+	} else if (CT_TYPE(ct) == LRO) {
+	    # Linear, rotated transformation.
+	    p1[1] = x1;  p1[2] = y1
+	    x2 = Mem$t[ltm  ] * p1[1] + Mem$t[ltm+1] * p1[2] + Mem$t[ltv  ]
+	    y2 = Mem$t[ltm+2] * p1[1] + Mem$t[ltm+3] * p1[2] + Mem$t[ltv+1]
+	} else {
+	    # General case involving one or more functional terms.
+	    p1[1] = x1;  p1[2] = y1
+	    call mw_ctran$t (a_ct, p1, p2, 2)
+	    x2 = p2[1];  y2 = p2[2]
+	}
+end

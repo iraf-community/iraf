@@ -1,0 +1,4 @@
+getinput,s,a,,,,Root input filename for the 5 images 
+getoutput,s,a,,,,Root output filename for the 5 images 
+inim,s,h
+outim,s,h

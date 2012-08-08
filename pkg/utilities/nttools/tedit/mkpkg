@@ -1,0 +1,27 @@
+# Update the tedit application code in the ttools package library.
+# Author: BSIMON, 1-APR-91
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	@display
+
+	bell.x
+	command.x	"command.com"  "command.h"  "field.h"  "paste.h" \
+		        "table.h"  "screen.h"  <tbset.h>
+	edit.x		"command.h"
+	field.x		"field.h"  "table.h"  "screen.h"  "display/curses.h" \
+			<ctype.h>  <mach.h>  <lexnum.h>  <tbset.h>
+	paste.x		"paste.h"  "table.h"  "screen.h"  <tbset.h>
+	prompt.x	"screen.h"  "display/curses.h"
+	screen.x	"field.h"  "table.h"  "screen.h"  \
+			"display/curses.h"  <tbset.h>
+	substitute.x	<ctype.h>
+	table.x		"field.h"  "table.h"  "screen.h"  <tbset.h>
+	tedit.x
+	tread.x
+	window.x	"window.com"  "screen.h"  "display/curses.h"
+	;

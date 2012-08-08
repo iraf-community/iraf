@@ -1,0 +1,178 @@
+.help response Aug86 noao.twodspec.longslit
+.ih
+NAME
+response -- Determine response calibrations
+.ih
+USAGE
+response calibration normalization response
+.ih
+PARAMETERS
+.ls calibration
+Images to use in determining response calibrations.  These are
+generally quartz continuum spectra.  An image section may be used to select
+only a portion of the image.
+.le
+.ls normalization
+Images to use determining the normalization spectrum.  In almost all cases
+the normalization images are the same as the calibration images or a
+subsection of the calibration images.
+.le
+.ls responses
+Response calibration images to be created.  Each response image is paired
+with a calibration image.  If the image exists then it will be modified
+otherwise it is created.
+.le
+.ls interactive = yes
+Graph the average calibration spectrum and fit the normalization spectrum
+interactively?
+.le
+.ls threshold = INDEF
+Set the response to 1 when the normalization spectrum or input image data
+fall below this value.  If INDEF then no threshold is applied.
+.le
+.ls sample = "*"
+Sample of points to use in fitting the average calibration spectrum.
+The sample is selected with a range string.
+.le
+.ls naverage = 1
+Number of sample points to average or median before fitting the function.
+If the number is positive the average of each set of naverage sample
+points is formed while if the number is negative then the median of each set
+of points (in absolute value) is formed.  This subsample of points is
+used in fitting the normalization spectrum.
+.le
+.ls function = "spline3"
+Function to fit to the average image spectrum to form the normalization
+spectrum.  The options are "spline1", "spline3", "legendre", and "chebyshev".
+.le
+.ls order = 1
+Order of the fitting function or the number of spline pieces.
+.le
+.ls low_reject = 0., high_reject = 0.
+Rejection limits below and above the fit in units of the residual sigma.
+.le
+.ls niterate = 1
+Number of rejection iterations.
+.le
+.ls grow = 0
+Reject additional points within this distance of points exceeding the
+rejection threshold.
+.le
+.ih
+CURSOR KEYS
+The interactive curve fitting package \fBicfit\fR is used to fit a function
+to the average calibration spectrum.  Help for this package is found
+under the name "icfit".
+.ih
+DESCRIPTION
+A response calibration, in the form of an image, is created for each input
+image, normally a quartz spectrum.  The response calibration is formed by
+dividing the calibration image by a normalization spectrum which is the
+same at all points along the spatial axis.  The normalization spectrum is
+obtained by averaging the normalization image across the dispersion to form
+a one dimensional spectrum and smoothing the spectrum by fitting a
+function.  The threshold value does not apply to creating or fitting of
+the normalization spectrum but only the final creation of the response
+values.  When normalizing (that is dividing the data values by the
+fit to the normalization spectrum) only pixels in which both the fitted
+normalization value and the data value are above the threshold are
+computed.  If either the normalization value or the data value is below
+the threshold the output response value is one.
+
+The image header keyword DISPAXIS must be present with a value of 1 for
+dispersion parallel to the lines (varying with the column coordinate) or 2
+for dispersion parallel to the columns (varying with line coordinate).
+This parameter may be added using \fBhedit\fR.  Note that if the image has
+been transposed (\fBimtranspose\fR) the dispersion axis should still refer
+to the original dispersion axis unless the physical world coordinate system
+is first reset (see \fBwcsreset\fR).  This is done in order to allow images
+which have DISPAXIS defined prior to transposing to still work correctly
+without requiring this keyword to be changed.
+
+If the output image does not exist it is first created with unit response
+everywhere.  Subsequently the response is only modified in those regions
+occupied by the input calibration image.  Thus, image sections may be used
+to select regions in which the response is desired.  This ability is
+particularly useful when dealing with multiple slits within an image or to
+exclude regions outside the slit.
+
+Normally the normalization images are the same as the calibration images.
+In other words the calibration image is normalized by the average spectrum
+of the calibration image itself.  Sometimes, however, the normalization
+image may be a smaller image section of the calibration image to avoid
+contaminating the normalization spectrum by effects at the edge of the
+slit.  Again, this may be quite useful in multi-slit images.
+
+The normalization spectrum is smoothed by fitting a function
+using the interactive curve fitting package (\fBicfit\fR).  The
+parameters determining the fitted normalization spectrum are the sample
+points, the averaging bin size, the fitting function, the order of the
+function, the rejection sigmas, the number of rejection iterations, and
+the rejection width.  The sample points for the average spectrum are
+selected by a range string.  Points in the normalization spectrum not in the
+sample are not used in determining the fitted function.  The selected
+sample points may be binned into a set of averages or medians which are
+used in the function fit instead of the sample points with the
+averaging bin size parameter \fInaverage\fR.  This parameter selects
+the number of sample points to be averaged if its value is positive or
+the number of points to be medianed if its value is negative
+(naturally, the absolute value is used for the number of points).  A
+value of one uses all sample points without binning.  The fitted
+function may be used to reject points from the fit using the parameters
+\fIlow_reject, high_reject, niterate\fR and \fIgrow\fR.  If one or both
+of the rejection limits are greater than zero then the sigma of the
+residuals is computed and points with residuals less than
+\fI-low_reject\fR times the sigma and greater than \fIhigh_reject\fR
+times the sigma are removed and the function fitted again.  In addition
+points within a distance given by the parameter \fIgrow\fR of the a
+rejected point are also rejected.  A value of zero for this parameter
+rejects only the points exceeding the rejection threshold.  Finally,
+the rejection procedure may be iterated the number of times given by
+the parameter \fIniterate\fR.
+
+The fitted function may be examined and modified interactively when the
+parameter \fIinteractive\fR is set.  In this case the normalization spectrum
+and the fitted function or the residuals of the fit are graphed.
+Deleted points are marked with an x and rejected points by a diamond.
+The sample regions are indicated along the bottom of the graph.
+The cursor keys and colon commands are used to change the values
+of the fitting parameters, delete points, and window and expand the
+graph.  When the fitted function is satisfactory exit with a carriage
+return or 'q' and the calibration image will be created.  Changes in
+the fitted parameters are remembered from image to image within the
+task but not outside the task.
+
+When the task finishes creating a response image the fitting parameters
+are updated in the parameter file.
+.ih
+EXAMPLES
+1. To create a response image non-interactively:
+
+	cl> response quartz quartz response order=20 interactive=no
+
+2. To determine independent responses for a multislit image determine the
+image sections defining each slit.  Then the responses are computed as
+follows:
+
+.nf
+	cl> response quartz[10:20,*],quartz[35:45,*] \
+	>>> quartz[12:18,*],quartz[12:18,*] resp,resp
+.fi
+
+Generally the slit image sections are prepared in a file which is then
+used to define the lists of input images and response.
+
+.nf
+	cl> response @slits @slits @responses
+.fi
+
+3.  If the DISPAXIS keyword is missing and the dispersion is running
+vertically (varying with the image lines):
+
+.nf
+	cl> hedit *.imh dispaxis 2 add+
+.fi
+.ih
+SEE ALSO
+icfit, iillumination
+.endhelp

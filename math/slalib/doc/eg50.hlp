@@ -1,0 +1,38 @@
+.help eg50 Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slEG50 (DR, DD, DL, DB)
+
+     - - - - -
+      E G 5 0
+     - - - - -
+
+  Transformation from B1950.0 'FK4' equatorial coordinates to
+  IAU 1958 galactic coordinates (double precision)
+
+  Given:
+     DR,DD       dp       B1950.0 'FK4' RA,Dec
+
+  Returned:
+     DL,DB       dp       galactic longitude and latitude L2,B2
+
+  (all arguments are radians)
+
+  Called:
+     slDS2C, slDMXV, slDC2S, slSUET, slDA2P, slDA1P
+
+  Note:
+     The equatorial coordinates are B1950.0 'FK4'.  Use the
+     routine slEQGA if conversion from J2000.0 coordinates
+     is required.
+
+  Reference:
+     Blaauw et al, Mon.Not.R.Astron.Soc.,121,123 (1960)
+
+  P.T.Wallace   Starlink   5 September 1993
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

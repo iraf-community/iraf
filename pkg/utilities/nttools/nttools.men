@@ -1,0 +1,61 @@
+Menu for the package tables.ttools
+
+       keypar - Copy an image or table header keyword to an IRAF parameter.
+       keytab - Copy an image or table header keyword to a table element.
+       parkey - Put an IRAF parameter into an image or table header keyword.
+       partab - Transfer an IRAF parameter to a table element.
+       tabkey - Copy a table element to an image or table header keyword.
+       tabpar - Transfer a table element to an IRAF parameter.
+
+       gtedit - Graphically edit a table.
+        gtpar - Pset to specify graph parameters for 'gtedit' task.
+
+        imtab - Copy an image to a table column.
+        tabim - Copy a table column to an image.
+
+    taextract - Copy an array entry to a column of scalars in another table.
+     tainsert - Copy a column of scalars to an array entry in another table.
+
+        tcalc - Perform arithmetic operations on table columns.
+       tchcol - Change column name, print format, or units.
+       tcheck - Check STSDAS table element values.
+      tchsize - Change allocated sizes of various sections of a table.
+        tcopy - Copy tables.
+      tcreate - Create a STSDAS table from an ASCII descriptor table.
+      tdelete - Delete tables.
+      tdiffer - Form a table which is the difference of two tables.
+        tdump - Dump the contents of a table to an ASCII file.
+        tedit - Edit a table.
+      texpand - Expand tables according to a set of rules.
+       thedit - Edit or print table header keywords.
+   thistogram - Make a histogram of a column in a table.
+     thselect - Select tables satisfying an expression; print keywords.
+        tinfo - Display table size information.
+   tintegrate - Numerically integrate one column with respect to another.
+        tjoin - Perform a relational join of two tables.
+        tlcol - List column information for a table.
+      tlinear - Use linear regression to fit one or two table columns.
+       tmatch - Find closest match between rows in two tables
+       tmerge - Either merge or append tables.
+       tprint - Print tables--both headers and data.
+     tproduct - Form the Cartesian product of two tables.
+     tproject - Create new table from selected columns in a table.
+       tquery - Create a new table from selected rows and columns in a table.
+        tread - Browse through a table.
+       trebin - Resample a table to uniform spacing.
+      tselect - Create a new table from selected rows of a table.
+        tsort - Sort a table.
+        tstat - Get mean, standard deviation, min, and max for a column.
+   ttranspose - Transpose or flip a table.
+       tunits - Convert table column from one set of units to another
+        tupar - Edit table header keywords.
+
+		       3-D table functions
+      tiimage - Insert images into rows of a 3-D table.
+      titable - Insert 2-D tables into rows of a 3-D table.
+      tximage - Extract images from rows of 3-D tables.
+      txtable - Extract 2-D tables from rows of 3-D tables.
+       tscopy - Copy row/column subsets of tables using selectors.
+
+Type "help selectors" for information about row and column selector syntax.
+

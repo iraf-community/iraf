@@ -1,0 +1,4 @@
+This directory ("dataio$cyber/") contains code for four Cyber tape readers:
+LDUMPF, RDUMPF, RIDSOUT, RIDSFILE.  The executable file is x_cyber; the
+definition file cyber.h is common to all four readers.
+The subdirectory "rrcopy" contains code for the RRCOPY reader.  

@@ -1,0 +1,56 @@
+# Help directory for the CATQUERY library
+
+$doc		= "./"
+$source		= "../"
+
+cqmap		hlp=doc$cqmap.hlp,		src=source$cqmap.x
+cqstati		hlp=doc$cqstati.hlp,		src=source$cqstat.x
+cqstats		hlp=doc$cqstats.hlp,		src=source$cqstat.x
+cqstatt		hlp=doc$cqstatt.hlp,		src=source$cqstat.x
+cqlocate	hlp=doc$cqlocate.hlp,		src=source$cqlocate.x
+cqlocaten	hlp=doc$cqlocaten.hlp,		src=source$cqlocate.x
+cqsetcat	hlp=doc$cqsetcat.hlp,		src=source$cqsetcat.x
+cqsetcatn	hlp=doc$cqsetcatn.hlp,		src=source$cqsetcat.x
+cqget		hlp=doc$cqget.hlp,		src=source$cqget.x
+
+cqnqpars	hlp=doc$cqnqpars.hlp,		src=source$cqnqpars.x
+cqgqpar		hlp=doc$cqgqpar.hlp,		src=source$cqgqpar.x
+cqgqparn	hlp=doc$cqgqparn.hlp,		src=source$cqgqpar.x
+cqsqpar		hlp=doc$cqsqpar.hlp,		src=source$cqsqpar.x
+cqsqparn	hlp=doc$cqsqparn.hlp,		src=source$cqsqpar.x
+
+cqquery		hlp=doc$cqquery.hlp,		src=source$cqquery.x
+cqfquery	hlp=doc$cqfquery.hlp,		src=source$cqquery.x
+cqrstati	hlp=doc$cqrstati.hlp,		src=source$cqrstat.x
+cqrstats	hlp=doc$cqrstats.hlp,		src=source$cqrstat.x
+cqrstatt	hlp=doc$cqrstatt.hlp,		src=source$cqrstat.x
+cqhinfo		hlp=doc$cqhinfo.hlp,		src=source$cqrinfo.x
+cqhinfon	hlp=doc$cqhinfon.hlp,		src=source$cqrinfo.x
+cqfinfo		hlp=doc$cqfinfo.hlp,		src=source$cqrinfo.x
+cqfinfon	hlp=doc$cqfinfon.hlp,		src=source$cqrinfo.x
+cqgrecord	hlp=doc$cqgrecord.hlp,		src=source$cqrecords.x
+cqgnrecord	hlp=doc$cqgnrecord.hlp,		src=source$cqrecords.x
+cqgvalc		hlp=doc$cqgvalc.hlp,		src=source$cqgfields.x
+cqgvals		hlp=doc$cqgvals.hlp,		src=source$cqgfields.x
+cqgvali		hlp=doc$cqgvali.hlp,		src=source$cqgfields.x
+cqgvall		hlp=doc$cqgvall.hlp,		src=source$cqgfields.x
+cqgvalr		hlp=doc$cqgvalr.hlp,		src=source$cqgfields.x
+cqgvald		hlp=doc$cqgvald.hlp,		src=source$cqgfields.x
+cqrclose	hlp=doc$cqrclose.hlp,		src=source$cqquery.x
+
+cqimquery	hlp=doc$cqimquery.hlp,		src=source$cqimquery.x
+cqfimquery	hlp=doc$cqfimquery.hlp,		src=source$cqimquery.x
+cqistati	hlp=doc$cqistati.hlp,		src=source$cqistat.x
+cqistats	hlp=doc$cqistats.hlp,		src=source$cqistat.x
+cqistatt	hlp=doc$cqistatt.hlp,		src=source$cqistat.x
+cqwinfo		hlp=doc$cqwinfo.hlp,		src=source$cqiminfo.x
+cqwinfon	hlp=doc$cqwinfon.hlp,		src=source$cqiminfo.x
+cqkinfo		hlp=doc$cqkinfo.hlp,		src=source$cqiminfo.x
+cqkinfon	hlp=doc$cqkinfon.hlp,		src=source$cqiminfo.x
+cqimclose	hlp=doc$cqimclose.hlp,		src=source$cqimquery.x
+
+cqunmap		hlp=doc$cqunmap.hlp,		src=source$cqmap.x
+
+ccsystems	hlp=doc$ccsystems.hlp
+catalogs	hlp=doc$catalogs.hlp
+surveys		hlp=doc$surveys.hlp

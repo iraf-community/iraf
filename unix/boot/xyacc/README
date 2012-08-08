@@ -1,0 +1,117 @@
+.help xyacc
+.nf
+This directory contains the source for the Yacc compiler compiler as modified
+to produce SPP language parsers.  This version of XYACC is based on code
+obtained from the OpenSolaris project and distributed under the Common
+Development and Distribution License (CDDL), considered to be a 'free'
+license.  All parsers in the system will be regenerated using this new
+version of XYACC, all vestiges of the original XYACC code have been
+removed.
+
+Notes regarding the changes required for SPP from the original README
+file are included below.
+
+Mike Fitzpatrick 
+1/25/2011
+
+
+------------------------------------------------------------------------------
+
+    For the most part, the operation of SPP/Yacc is as described in the 
+Yacc reference manual, with the important differences noted below.  A 
+complete working example of a desk calculator program may be found in 
+the subdirectory debug, file dc.y.
+
+Notes on SPP Yacc
+
+    (1)	The Yacc input syntax is unmodified, except that the comment convention
+	is now as in SPP, rather than C (i.e., use #, rather than /*..*/).
+	All defines, actions, etc. are of course given in the SPP language.
+
+    (2)	The Yacc output file is "ytab.x", rather than "y.tab.c".  The token
+	defs file "y.tab.h" now contains SPP defines, rather than C #defines.
+	The states file "y.output" is completely unmodified.
+
+    (3)	The global declarations section %{ .. %} had to be changed somewhat
+	because SPP does not have global variables.  The section is now
+	divided into two subsections.  The first is for global defines,
+	includes, etc. which go into the header area of the ytab.x file.
+	Then follows a %L, telling Yacc that the local declarations for
+	the parser procedure follow.  This second section should contain
+	variable and function declarations required for the user supplied
+	actions (code fragments to be executed when a rule of the grammar
+	is recognized) in the yyparse procedure.
+
+    (4)	The global declarations section MUST contain the following two
+	defines:
+
+		YYMAXDEPTH	Depth of the parser stacks; determines
+				the maximum complexity of a language
+				construct which can be parsed.  A typical
+				value is 150.
+
+		YYOPLEN		The length, in struct units, of a token
+				operand value structure.  You define the
+				operand structure to be whatever you wish;
+				all the parser needs to know is how big an
+				element is.  The lexical analyzer and the
+				actions, both of which are supplied by the
+				user, use the operand structure for
+				communications.  Operand structures are
+				always referred to by a Mem pointer.
+
+    (5)	The calling sequence for the parser is as follows
+
+		status = yyparse (fd, debug, yylex)
+
+	where
+		status is OK, EOF, or ERR (syntax error)
+		fd is the text stream to be parsed
+		debug is a boolean, true to print debugging info
+		yylex is the user supplied lexical analysis procedure.
+
+	The calling sequence for the lexical analysis procedure is as
+	follows (the name "yylex" may be anything):
+
+		token = yylex (fd, yylval)
+
+	where
+		Token is the integer code for the token.  The tokens are
+		    named in the Yacc grammar, and are defined either by
+		    the user or by Yacc in the header area of ytab.x.
+		    If Yacc is permitted to assign codes to tokens, the
+		    token defininitions file ytab.h is written out.
+		fd is the file to be read
+		yylval is a POINTER to the token value structure to be
+		    returned by yylex.
+
+    (6)	The SPP version of Yacc, unlike the C version, does not use any
+	external or global variables for communication between routines,
+	and hence it is possible for several distinct parsers to coexist
+	in the same image.  If this is done, the user supplied yylex
+	procedures should be named something else, and the name of the
+	parser procedure (yyparse) should be changed.  This can be done
+	by putting a "define yyparse" in the global definitions area.
+
+    (7)	Token values (i.e., $$, $1, $2, yyval, yylval, etc.) are always
+	pointers to structures in the SPP version, as opposed to structures
+	in the C version.  Thus actions like
+
+		{ $$ = $1; }
+
+	which are common in the C version, are programmed like this in SPP:
+
+		{ YYMOVE ($1, $$) }
+	
+	where YYMOVE is a Yacc supplied macro which copies an operand
+	structure.
+
+    (8)	The source for the language independent part of the parser is given
+	in "lib$yaccpar.x".
+
+Doug Tody, 21 Feb 84.
+20Jan85:
+	y.tab.x -> ytab.x (etc), added EOF token
+20Apr85:
+	lib$yaccpar.x, deleted entry points for examining parser stack and
+	other context state variables.

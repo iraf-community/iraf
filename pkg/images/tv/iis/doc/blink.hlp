@@ -1,0 +1,46 @@
+.help blink Jan86 images.tv.iis
+.ih
+NAME
+blink -- Blink frames in the image display
+.ih
+USAGE
+blink frame1 frame2 [frame3 [frame4]]
+.ih
+PARAMETERS
+.ls frame1
+First frame in blink sequence.
+.le
+.ls frame2
+Second frame in blink sequence.
+.le
+.ls frame3
+Third frame in blink sequence.
+.le
+.ls frame4
+Fourth frame in blink sequence.
+.le
+.ls rate = 1.
+Blink rate in seconds per frame.  May be any fraction of a second.
+.le
+.ih
+DESCRIPTION
+Two or more frames are alternately displayed on the image display monitor
+("stdimage") at a specified rate per frame.
+.ih
+EXAMPLES
+To blink two frames:
+
+	cl> blink 1 2
+
+To blink three frames at a rate of 2 seconds per frame:
+
+	cl> blink 3 1 2 rate=2
+.ih
+BUGS
+The blink rate is measured in
+software and, therefore, will not be exactly even in a time sharing
+environment.
+.ih
+SEE ALSO
+cv
+.endhelp

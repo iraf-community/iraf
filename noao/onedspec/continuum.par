@@ -1,0 +1,25 @@
+input,s,a,,,,Input images
+output,s,a,,,,Output images
+lines,s,h,"*",,,Image lines to be fit
+bands,s,h,"1",,,Image bands to be fit
+type,s,h,"ratio","data|fit|difference|ratio",,Type of output
+replace,b,h,no,,,Replace rejected points by fit?
+wavescale,b,h,yes,,,Scale the X axis with wavelength?
+logscale,b,h,no,,,Take the log (base 10) of both axes?
+override,b,h,no,,,Override previously fit lines?
+listonly,b,h,no,,,List fit but don't modify any images?
+logfiles,s,h,"logfile",,,List of log files
+interactive,b,h,yes,,,Set fitting parameters interactively?
+sample,s,h,"*",,,Sample points to use in fit
+naverage,i,h,1,,,Number of points in sample averaging
+function,s,h,"spline3","spline3|legendre|chebyshev|spline1",,Fitting function
+order,i,h,1,1,,Order of fitting function
+low_reject,r,h,2.,0.,,Low rejection in sigma of fit
+high_reject,r,h,0.,0.,,High rejection in sigma of fit
+niterate,i,h,10,0,,Number of rejection iterations
+grow,r,h,1.,0.,,Rejection growing radius
+markrej,b,h,yes,,,Mark rejected points?
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input
+ask,s,q,"yes","yes|no|skip|YES|NO|SKIP",,"                                     "
+mode,s,h,"ql"

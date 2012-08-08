@@ -1,0 +1,43 @@
+.help msigrl Dec98 "Image Interpolation Package"
+.ih
+NAME
+msigrl -- integrate the interpolant inside a polygon 
+.ih
+SYNOPSIS
+y = msigrl (msi, x, y, npts)
+
+.nf
+    pointer	msi		#I interpolant descriptor
+    real	x[npts]		#I x values, 1 <= x <= npts, x[1] = x[npts]
+    real	y[npts]		#I y values, 1 <= y <= npts, y[1] = y[npts]
+    int		npts		#I number of points
+.fi
+.ih
+ARGUMENTS
+.ls msi    
+Pointer to the sequential interpolant descriptor structure.
+.le
+.ls x, y
+An array of x and y values describing a polygon, where x[1] = x[npts] and
+y[1] = y[npts]. X and y describe a closed curve where any horizontal line
+segment intersects the domain of integration at at most one point.
+.le
+.ls npts
+The number of points describing the polygon. Npts must >= 4 (triangle).
+.le
+.ih
+DESCRIPTION
+MSIGRL integrates the interpolant exactly for rectangular domains
+of integration. For more irregular regions of integration MSIGRL
+returns an approximation whose accuracy depends on the size of the
+integration region and the shape of the polygon.
+.ih
+NOTES
+Checking for out of bound integration regimes is the responsibility of
+the user. Non-rectangular partial pixel domains of integration default
+to rectangular regions.  MSIINIT or MSISINIT and MSIFIT must be called
+before using MSIGRL.
+.ih
+SEE ALSO
+msisqrgl
+.endhelp

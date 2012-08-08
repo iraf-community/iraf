@@ -1,0 +1,10 @@
+# Mtexamine library
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	t_mtexamine.x	<error.h> <fset.h> <printf.h> <mach.h> mtexamine.com
+	;

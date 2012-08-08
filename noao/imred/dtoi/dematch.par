@@ -1,0 +1,8 @@
+# Cl parameters are:
+database,f,a,,,,Database of density information
+wedge,f,a,"",,,Wedge number used for calibration
+filter,f,a,"",,,Filter used for calibration
+emulsion,f,a,"",,,Emulsion used for calibration
+wedgefile,f,h,"noao$lib/hdwedge.dat",,,File containing exposure information
+nskip,i,h,0,,,Number of faint spots skipped
+verbose,b,h,yes,,,Print exposure record from wedgefile

@@ -1,0 +1,6 @@
+input,s,a,"",,,list of image names
+output,s,a,"",,,output table name
+cols,s,a,"",,,list of keyword and table column names
+expr,s,h," ",,,boolean expression used to select images
+cdfile,s,h," ",,,column description file name
+mode,s,h,"al"

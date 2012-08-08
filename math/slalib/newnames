@@ -1,0 +1,205 @@
+sla_ADDET	slADET   
+sla_AFIN	slAFIN   
+sla_AIRMAS	slARMS   
+sla_ALTAZ	slALAZ   
+sla_AMP		slAMP   
+sla_AMPQK	slAMPQ   
+sla_AOP		slAOP   
+sla_AOPPA	slAOPA   
+sla_AOPPAT	slAOPT   
+sla_AOPQK	slAOPQ   
+sla__ATMS	slATMS   
+sla__ATMT	slATMT   
+sla_ATMDSP	slATMD   
+sla_AV2M	slAV2M   
+	
+sla_BEAR	slBEAR   
+	
+sla_CAF2R	slCAFR   
+sla_CALDJ	slCADJ   
+sla_CALYD	slCAYD   
+sla_CC2S	slCC2S   
+sla_CC62S	slC62S   
+sla_CD2TF	slCDTF   
+sla_CLDJ	slCLDJ   
+sla_CLYD	slCLYD   
+sla_CR2AF	slCRAF   
+sla_CR2TF	slCRTF   
+sla_CS2C	slCS2C   
+sla_CS2C6	slS2C6   
+sla_CTF2D	slCTFD   
+sla_CTF2R	slCTFR   
+	
+sla_DAF2R	slDAFR   
+sla_DAFIN	slDAFN   
+sla_DAT		slDAT   
+sla_DAV2M	slDAVM   
+sla_DBEAR	slDBER   
+sla_DBJIN	slDBJI   
+sla_DC62S	slDC6S   
+sla_DCC2S	slDC2S   
+sla_DCMPF	slDCMF   
+sla_DCS2C	slDS2C   
+sla_DD2TF	slDDTF   
+sla_DE2H	slDE2H   
+sla_DEULER	slDEUL   
+sla_DFLTIN	slDFLI   
+sla_DH2E	slDH2E   
+sla_DIMXV	slDIMV   
+sla_DJCAL	slDJCA   
+sla_DJCL	slDJCL   
+sla_DM2AV	slDMAV   
+sla_DMAT	slDMAT   
+sla_DMOON	slDMON   
+sla_DMXM	slDMXM   
+sla_DMXV	slDMXV   
+sla_DPAV	slDPAV   
+sla_DR2AF	slDRAF   
+sla_DR2TF	slDRTF   
+sla_DRANGE	slDA1P   
+sla_DRANRM	slDA2P   
+sla_DS2C6	slDSC6   
+sla_DS2TP	slDSTP   
+sla_DSEP	slDSEP   
+sla_DT		slDT   
+sla_DTF2D	slDTFD   
+sla_DTF2R	slDTFR   
+sla_DTP2S	slDTPS   
+sla_DTP2V	slDTPV   
+sla_DTPS2C	slDPSC   
+sla_DTPV2C	slDPVC   
+sla_DTT		slDTT   
+sla_DV2TP	slDVTP   
+sla_DVDV	slDVDV   
+sla_DVN		slDVN   
+sla_DVXV	slDVXV   
+	
+sla_E2H		slE2H   
+sla_EARTH	slERTH   
+sla_ECLEQ	slECEQ   
+sla_ECMAT	slECMA   
+sla_ECOR	slECOR   
+sla_EG50	slEG50   
+sla_EL2UE       slELUE   
+sla_EPB		slEPB   
+sla_EPB2D	slEB2D   
+sla_EPCO	slEPCO   
+sla_EPJ		slEPJ   
+sla_EPJ2D	slEJ2D   
+sla_EQECL	slEQEC   
+sla_EQEQX	slEQEX   
+sla_EQGAL	slEQGA   
+sla_ETRMS	slETRM   
+sla_EULER	slEULR   
+sla_EVP		slEVP   
+	
+sla_FITXY	slFTXY   
+sla_FK425	slFK45   
+sla_FK45Z	slF45Z   
+sla_FK524	slFK54   
+sla_FK52H	slFK5H   
+sla_FK54Z	slF54Z   
+sla_FK5HZ	slF5HZ   
+sla_FLOTIN	slRFLI   
+	
+sla_GALEQ	slGAEQ   
+sla_GALSUP	slGASU   
+sla_GE50	slGE50   
+sla_GEOC	slGEOC   
+sla_GMST	slGMST   
+sla_GMSTA	slGMSA   
+sla_GRESID	slGRES   
+	
+sla_H2E		slH2E   
+sla_H2FK5       slHFK5   
+sla_HFK5Z       slHF5Z      
+	
+sla__IDCHI	slICHI   
+sla__IDCHF	slICHF   
+sla_IMXV	slIMXV   
+sla_INTIN	slINTI   
+sla_INVF	slINVF   
+	
+sla_KBJ		slKBJ   
+	
+sla_M2AV	slM2AV   
+sla_MAP		slMAP   
+sla_MAPPA	slMAPA   
+sla_MAPQK	slMAPQ   
+sla_MAPQKZ	slMAPZ   
+sla_MOON	slMOON   
+sla_MXM		slMXM   
+sla_MXV		slMXV   
+	
+sla_NUT		slNUT   
+sla_NUTC	slNUTC   
+	
+sla_OBS		slOBS   
+sla_OAP		slOAP   
+sla_OAPQK	slOAPQ   
+	
+sla_PA		slPA   
+sla_PAV		slPAV   
+sla_PCD		slPCD   
+sla_PDA2H	slPDAH   
+sla_PDQ2H	slPDQH   
+sla_PERTEL      slPRTL   
+sla_PERTUE      slPRTE   
+sla_PLANEL      slPLNE   
+sla_PLANET	slPLNT   
+sla_PLANTE      slPLTE   
+sla_PM		slPM   
+sla_POLMO       slPLMO
+sla_PREBN	slPRBN   
+sla_PREC	slPREC   
+sla_PRECES	slPRCE   
+sla_PRECL	slPREL   
+sla_PRENUT	slPRNU   
+sla_PV2EL       slPVEL   
+sla_PV2UE       slPVUE   
+sla_PVOBS	slPVOB   
+sla_PXY		slPXY   
+	
+sla_RANDOM	slRNDM   
+sla_RANGE	slRA1P   
+sla_RANORM	slRA2P   
+sla_RCC		slRCC   
+sla_RDPLAN	slRDPL   
+sla_REFCO	slRFCO   
+sla_REFCOQ	slRFCQ   
+sla_REFRO	slRFRO   
+sla_REFV	slREFV   
+sla_REFZ	slREFZ   
+sla_RVEROT	slRVER   
+sla_RVGALC	slRVGA   
+sla_RVLG	slRVLG   
+sla_RVLSRD	slRVLD   
+sla_RVLSRK	slRVLK   
+	
+sla_S2TP	slS2TP   
+sla_SEP		slSEP   
+sla_SMAT	slSMAT   
+sla_SUBET	slSUET   
+sla_SUPGAL	slSUGA   
+sla_SVD		slSVD   
+sla_SVDCOV	slSVDC   
+sla_SVDSOL	slSVDS   
+	
+sla_TP2S	slTP2S   
+sla_TP2V	slTP2V   
+sla_TPS2C	slTPSC   
+sla_TPV2C	slTPVC   
+	
+sla_UE2EL       slUEEL   
+sla_UE2PV       slUEPV   
+sla_UNPCD	slUPCD   
+	
+sla_V2TP	slV2TP   
+sla_VDV		slVDV   
+sla_VN		slVN   
+sla_VXV		slVXV   
+	
+sla_WAIT	slWAIT   
+	
+sla_XY2XY	slXYXY   
+sla_ZD		slZD   

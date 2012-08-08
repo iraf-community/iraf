@@ -1,0 +1,36 @@
+# Update the titable application code in the threed package library.
+# Author: I.Busko, 14-Jan-1997
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+# This module is called from the threed mkpkg.
+generic:
+	$ifnfile (generic/tirowsi.x)
+	$generic -k -p generic/ -t bcsird tirows.gx
+	$endif
+	$ifolder (generic/tirowsi.x, tirows.gx)
+	$generic -k -p generic/ -t bcsird tirows.gx
+	$endif
+	$ifnfile (generic/tichi.x)
+	$generic -k -p generic/ -t bcsird tich.gx
+	$endif
+	$ifolder (generic/tichi.x, tich.gx)
+	$generic -k -p generic/ -t bcsird tich.gx
+	$endif
+	;
+
+libpkg.a:
+	@generic
+	ticc.x
+	ticopy.x	<tbset.h>
+	tiheader.x	<tbset.h>
+	tinew.x		<tbset.h>
+	tinsert.x	<tbset.h>
+	tisetc.x
+	titable.x	<tbset.h>
+	tiupdate.x	<tbset.h>
+	;
+

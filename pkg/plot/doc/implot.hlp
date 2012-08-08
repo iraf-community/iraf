@@ -1,0 +1,231 @@
+.help implot Feb94 plot
+.ih
+NAME
+implot -- plot lines and columns of images
+.ih
+USAGE
+implot image [line]
+.ih
+PARAMETERS
+.ls image
+List of images to be plotted.  If more than one image is in the list then
+the 'm' and 'n' keys are used proceed to the previous and next image.
+.le
+.ls line
+If given, the number of the image line to be plotted, otherwise the central
+line is plotted.
+.le
+.ls wcs = "logical"
+The world coordinate system (\fIwcs\fR) to be used for axis labeling.
+The following standard world systems are predefined.
+.ls logical
+Logical coordinates are image pixel coordinates relative to the image currently
+being displayed.
+.le
+.ls physical
+The physical coordinate system is invariant with respect to linear
+transformations of the physical image matrix.  For example, if the reference
+image was created by extracting a section of another image, the physical
+coordinates of an object in the reference image will be the pixel coordinates
+of the same object in the original image.  The physical coordinate system
+thus provides a consistent coordinate system (a given object always has the
+same coordinates) for all images, regardless of whether any user world
+coordinate systems have been defined.
+.le
+.ls world
+The "world" coordinate system is the \fIcurrent default WCS\fR.
+The default world system is the system named by the environment variable
+\fIdefwcs\fR if defined in the user environment and present in the reference
+image WCS description, else it is the first user WCS defined for the image
+(if any), else physical coordinates are returned.
+.le
+
+In addition to these three reserved WCS names, the name of any user WCS
+defined for the reference image may be given.  A user world coordinate system
+may be any linear or nonlinear world system.
+.le
+.ls step = 0
+Step size for stepping through lines or columns in an image with the
+'j' and 'k' keys.  If zero or INDEF the step defaults to ~10% of the
+image axis length.  This parameter may be changed interactively with
+a colon command.
+.le
+.ih
+DESCRIPTION
+Implot is an interactive, cursor driven task for examining images by plotting
+the lines and columns or the averages of lines and columns.  An image
+line is plotted when the task is first run, then cursor mode is entered and
+keystrokes may be used to generate additional line and column plots.  'q'
+is typed to exit cursor mode and implot and 'n' is typed to proceed to
+the next image in the input image list.
+
+The following single character keystrokes are recognized by Implot.  Note that
+numerous additional keystrokes are provided by "cursor mode" itself, i.e.,
+by the graphics system.  These additional keystrokes provide such standard
+facilities as stepwise cursor motion, plot expansion, movies, disposal to a
+batch plotter or metafile, and plot annotation facilities.  Cursor mode is
+documented elsewhere.
+
+
+.ks
+.nf
+	?		print help and other info
+	a		plot the average of a range of lines or columns
+	c		plot a column
+	e		expand plot by marking corners of viewport
+	j		move down within image (moving section)
+	k		move up within image (moving section)
+	l		plot a line
+	m		proceed to the previous image in the list
+	n		proceed to the next image in the list
+	o		overplot next vector
+	p		measure profile (mark region and bkg with 2 pos)
+	q		quit
+	s		print statistics on a region
+	w		change world coordinate system
+	/		scroll status line
+	<space>		print coordinates and pixel value
+.fi
+.ke
+
+
+The single character keystroke commands use the position to the cursor to
+determine what region of the image to plot.  If the plot is examined carefully
+one will note an extra scale on the right hand edge.  This scale gives the
+"other" axis of the image in units of pixels.  For example, if the current
+plot is a line plot (rather than a column plot), the X axis of the plot
+will correspond to the X axis of the image, and the right Y axis of the plot
+will correspond to the Y axis of the image.  Both axes will be scaled
+linearly in units of pixels.  The left Y axis is scaled in either linear or
+logarithmic pixel intensity units.  In the case of a column plot the bottom
+axis will correspond to image Y and the right axis to image X.
+
+The 'l' and 'c' keystrokes, used to plot lines and columns, take image
+coordinates from the bottom and right axes of the plot.  In the case of a
+lineplot, the cursor would be positioned in Y and the key 'l' typed to
+plot a new line.  Extrapolation of this convention to the other cases and
+keystrokes is self evident.  The 'a' keystroke is used to mark an X or Y
+region to be averaged and plotted.  This mode of averaging is independent
+of the ':a' command discussed below.
+
+Successive vectors may be overplotted by typing an 'o' and then any other
+command.  A range of linetypes are used if the device supports them to
+make the curves easier to distinguish.  The position of each line is marked
+on the right axis with a small tick to document the coordinates of the
+curves.
+
+The 'j' and 'k' commands are used to step through an image in either the
+upward (k) or downward (j) directions, relative to the current line or
+column plot.  Each new vector is plotted in place of the previous one
+without clearing the screen, making it easy to compare successive vectors.
+The step between vectors may be defined by a task parameter and
+changed by a colon command.
+
+The 'm' and 'n' commands are used to step through the input image list.
+This is the same as using the 'i' key to switch images and the 'l' key
+to plot the same line or column as the previous image.
+
+There are three keys which print various quantities of interest.
+The space bar key will read the cursor position, find the nearest pixel,
+and report the image line and column, the coordinate along the current
+axis, and the pixel value.  The line and column are in logical pixels
+(that is the coordinates in the current image section) and the
+coordinates are in the selected world coordinate system and printed
+in the current coordinate format.  If the selected world coordinate
+system is "logical" then the coordinate will be the same as the line
+or column.
+
+The 's' key requires two cursor positions and then computes statistics of
+the region.  The values are the median, mean, sigma, sum, and number of
+pixels.  The 'p' key also requires two cursor positions with the x
+positions defining a region and the y positions defining a linear
+background.  Within the defined region the peak departure from the
+background (either above or below the background) is found and the full
+width at half maximum of this peak is measured.  The linear background, the
+peak position and distance from the background and the widths at half the
+peak value are overplotted on the data.  In addition to the profile
+quantities the moments of the background subtracted data are measured.  The
+moments computed are the centroid, the integral (or flux), the width, and
+the normalized asymmetry.  The width reported is the square root of the
+second central moment multiplied by 2.35482.  For a gaussian profile this
+corresponds to the full width at half maximum which can be compared with
+the direct measure of the profile width.  The normalized asymmetry is the
+third central moment divided by the 3/2 power of the second central
+moment.  The various measurements are printed on the status line.  There
+are multiple lines of results which are scrolled using the '/' key.
+
+In addition to the single keystroke commands, the following : escape
+commands are provided:
+
+
+.ks
+.nf
+	:a N		set number of lines or columns to average
+	:c N [M]	plot column N [average of columns N to M]
+	:f format	set the x coordinate numerical format
+	:i imagename	open a new image for input
+	:l N [M]	plot line N [average of lines N to M]
+	:o		overplot
+	:log+		log scale in Y
+	:log-		turn off log scale in Y
+	:step N		set step size for j,k
+	:solid		overplot with solid, not dashed, lines
+	:w wcsname	change world coordinate systems
+	:x x1 x2	fix range in X (call with no args to unfix)
+	:y y1 y2	fix range in Y (call with no args to unfix)
+.fi
+.ke
+
+
+The 'c' and 'l' commands are identical to the keystroke commands except
+that the column or line position is explicitly entered rather than taken
+from the cursor.  An averaging factor entered with 'a' will apply to all
+subsequent line and column plots, as well as plots generated by 'j' and 'k'.
+The input image may be changed at any time using the 'i' command; only one
+image may be open at a time.  Log scaling on the Y axis may be turned on
+and off with the 'log' commands.  The default step size of 1/10 the height
+of the image may be changed with the 'step' command.  Finally, the 'solid'
+command may be used to draw all overplotted curves using solid, rather than
+dashed, line segments.
+
+The 'x' and 'y' commands may be used to fix the plotting scale in either
+X or Y, i.e., to disable autoscaling.  Once the scale is fixed on an axis
+it remains fixed until either the fix scale command is repeated without
+any arguments, or the 'e' option is used to expand the plot (this causes
+the fixed scale to be lost).  Plotting different lines or columns or even
+changing images does not cause loss of fixed scaling.  If the X scale is
+fixed to a range less than an entire line or column Y autoscaling, if enabled,
+will only pertain to the displayed range in X.
+
+The numerical format for the coordinate labels are set with the 'f'
+command.  The values may be "" (an empty string), %f for decimal format, %h
+and %H for xx:xx:xx format, and %m and %M for xx:xx.x format.  The upper
+case %H and %M convert degrees to hours.  Some images have a recommended x
+coordinate format defined as a WCS attribute.  If the format value is ""
+(the default) the WCS attribute format will be used.  Any other value will
+override the image attribute.
+.ih
+EXAMPLES
+1. Enter cursor mode, plotting line 240 of the 300x480 image 'crab':
+
+.nf
+	cl> implot crab
+	(plot appears)
+.fi
+
+Type '?' to get the list of recognized keystrokes.  Move the cursor and
+type 'l' to plot the line at the Y position of the cursor.  Try typing 'c'
+to plot a column (note that a column plot will take longer than a line
+plot since the entire image must be read).  Go back to a line plot and
+try several 'k' keystrokes to step up through the image.  Try a cursor
+mode 'E' to playback a movie of a small region, then type 0 (zero) to
+restore the original plot.
+.ih
+BUGS
+It should be possible to use the image display cursor to mark the lines or
+columns to be plotted.  This capability will be added when the image display
+is interfaced to GIO (the IRAF graphics subsystem).
+.ih
+SEE ALSO
+imexamine, cursor
+.endhelp

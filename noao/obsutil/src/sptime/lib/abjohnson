@@ -1,0 +1,17 @@
+# AB zeropoints.
+# Values are from Astrophysical Quantities converted from
+# log f (in W/cm^2/micron) to AB = -2.5 * log (F_lambda) - 5 log (lambda) - 2.4
+# where lambda is in Angstroms and F_lambda is in ergs/s/cm^2/A.  The
+# values are for U, B, V, R, I, J, H, Ks, K, L, L', M.
+
+ 3650  0.714
+ 4400 -0.167
+ 5500 -0.052
+ 7000  0.275
+ 9000  0.529
+12150  0.878
+16540  1.356
+21570  1.857
+35470  2.803
+37610  2.921
+47690  3.397

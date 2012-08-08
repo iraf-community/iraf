@@ -1,0 +1,138 @@
+.help eparam Apr87 language
+.ih
+NAME
+eparam -- edit a task's parameters
+.ih
+USAGE
+eparam task [task ...]
+.ih
+PARAMETERS
+.ls task
+The name of the task whose parameter set is to be edited.
+.le
+.ih
+DESCRIPTION
+The \fIeparam\fR command calls up an interactive screen editor
+to edit the parameters of the named task or tasks.  The syntax of the
+page editor is controlled by the environment variable `editor' which
+may have the values "edt", "emacs", or "vi".  The user may also customize
+the editor by copying the associated "dev$*.ed" file to their home
+directory, and editing the file.
+
+The CL parameter "epinit" may be used to set the following options:
+.ls [no]standout
+Enables or disables use of standout mode (reverse video) in the display.
+.le
+.ls [no]showall
+Controls whether or not hidden parameters are displayed and edited.
+.le
+
+The \fIeparam\fR task may be used to edit either ordinary task parameter
+sets, or named parameter files.
+The presence or absence of a \fB.par\fR filename extension is used to
+determine whether an operand is a taskname or a filename.  For example,
+
+	cl> eparam skypars.par
+
+will edit the parameter \fIfile\fR \fBskypars.par\fR in the current directory,
+whereas
+
+	cl> eparam skypars
+
+will edit the parameter set for the pset-task \fIskypars\fR.
+Lastly, since \fIspypars\fR is a pset-task, we could just type
+
+	cl> skypars
+
+to edit or review the contents of the pset.
+
+The parameter file \fBskypars.par\fR in the above example would probably be
+created using the new colon-command extensions to eparam.  The original
+eparam supported only single keystroke editing commands.  The new colon
+commands are used to enter command lines of arbitrary length to be processed
+by eparam.
+
+A colon command is entered by typing the colon character (`\fB:\fR') while
+the cursor is positioned to the starting column of any value field of the
+parameter set being edited.  The colon character is not recognized as a
+special character beyond column one, e.g., when entering the string value
+of a parameter.  When colon command mode is entered, the colon character
+will be echoed at the start of the bottom line on the screen, and the cursor
+will move to the character following the colon, waiting for the command to
+be entered.  The command is read in raw mode, but the usual delete,
+<ctrl/c>, <ctrl/u>, etc. sequences are recognized.
+
+The following eparam colon commands are currently supported.  All commands
+are carefully error checked before being executed to avoid having eparam
+abort with a stack trace.  An illegal operation causes colon command entry
+mode to be exited, leaving an error message on the command entry line.
+All commands which cause editing of the current pset to terminate may include
+the \fB!\fR character to avoid updating the current pset before reading in
+the new one or exiting eparam.  The default is to update the current pset.
+In all cases, \fIpset\fR may be either the name of a task or the name of a
+parameter file.  Parameter files are always indicated by a \fB.par\fR
+extension, even though the actual file may be a \fB.cl\fR file:
+only \fB.par\fR files will be written, although either type of file may be
+read.
+
+.ls :e[!] [pset]
+Edit a new pset.  If \fIpset\fR is omitted and the cursor was positioned to
+a pset parameter when the colon command was entered then eparam descends into
+the referenced pset; when editing of the sub-pset is complete eparam returns
+to editing the higher level pset at the point at which the '\fB:e\fR'
+command was entered.  If a pset is named the editor context is switched to
+the new pset, updating the current pset first unless the '\fB:e!\fR' command
+was given.
+.le
+.ls :q[!]
+Exit eparam for the current pset; equivalent to a <ctrl/z>.  The variant
+'\fB:q!\fR' causes eparam to be exited without updating the current pset.  
+Entering this command when editing a sub-pset causes an exit to the higher
+level pset.  To abort eparam entirely without updating anything, <ctrl/c>
+should be used.
+.le
+.ls :r[!] [pset]
+Read in a new pset.  If the command is '\fB:r\fR', an error message is
+printed.  If the command is '\fB:r!\fR' the pset currently being edited
+is reread, canceling any modifications made since the last update.
+If a pset is specified the contents of the named pset are merged into the
+current pset, i.e., the named pset is loaded into the current pset,
+overwriting the contents of the current pset.
+The command '\fB:r pfile.par\fR' is commonly used to load a pset formerly
+saved in a user file with '\fB:w pfile.par\fR' into the UPARM version of
+the parameter set for a task.
+.le
+.ls :w[!] pset
+Write or update a pset.  If \fIpset\fR is omitted the pset currently being
+edited is updated on disk.  If \fIpset\fR is given it should normally be the
+name of a parameter file to be written.  If the file exists an error message
+will be printed unless the command '\fB:w! pfile.par\fR' is given to force
+the file to be overwritten.
+.le
+.ls :g[o][!]
+Run the task.  Eparam exits, updating the pset and running the task whose pset
+was being edited.  This is implemented by pushing a command back into the input
+stream of the task which called eparam, hence if eparam was called in a script
+or with other commands on the same line, execution may be delayed until these
+other commands have been edited.  The feature works as expected when used
+interactively.  Since the run command is pushed back into the command input 
+stream it will appear in the history record and in any log files.
+.le
+
+To get out of colon command mode without doing anything, simply type delete
+until the colon prompt is deleted and the cursor returns to the parameter
+it was positioned to when colon command entry mode was entered.
+.ih
+EXAMPLES
+1. Set standout mode and disable the editing of hidden parameters (leaving
+only the positional parameters).
+
+	cl> epinit = "standout noshowall"
+
+2. Edit the parameters for the \fIdelete\fR task.
+
+	cl> ep delete
+.ih
+SEE ALSO
+lparam, ehistory
+.endhelp

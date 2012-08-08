@@ -1,0 +1,162 @@
+\hypertarget{structHub}{
+\section{Hub Struct Reference}
+\label{structHub}\index{Hub@{Hub}}
+}
+{\tt \#include $<$samp.h$>$}
+
+\subsection*{Data Fields}
+\begin{CompactItemize}
+\item 
+\hypertarget{structHub_7fef4c5bc9ee07499a3d7fb238f7d3b0}{
+char \textbf{appName} \mbox{[}SZ\_\-LINE\mbox{]}}
+\label{structHub_7fef4c5bc9ee07499a3d7fb238f7d3b0}
+
+\item 
+char \hyperlink{structHub_8d174b2376fff67044694077b5f44a0c}{appVer} \mbox{[}SZ\_\-LINE\mbox{]}
+\item 
+char \hyperlink{structHub_0c01a576aab3a38c7003635c21ffb6f6}{description} \mbox{[}SZ\_\-LINE\mbox{]}
+\item 
+\hyperlink{structappMD}{appMD} \hyperlink{structHub_cfe9051f3f0d6fd908ddf394283d1262}{meta}
+\item 
+char \hyperlink{structHub_00e09b2ce458d0e43d91e33164025974}{secret} \mbox{[}SZ\_\-SECRET\mbox{]}
+\item 
+char \hyperlink{structHub_809a3f03e2e80609de4ad7ecd8b3ce19}{url} \mbox{[}SZ\_\-URL\mbox{]}
+\item 
+char \hyperlink{structHub_6781579d63b6e392837fecc18b481e02}{version} \mbox{[}SZ\_\-NAME\mbox{]}
+\item 
+int \hyperlink{structHub_3546ac45740591096b9bdc4c37b8d5f5}{id}
+\item 
+char \hyperlink{structHub_8a3f77e49a9c33a20d272958b4c65c60}{appId} \mbox{[}SZ\_\-NAME\mbox{]}
+\item 
+char \hyperlink{structHub_a7155581e81f30c08103bdcb55b8630a}{privateKey} \mbox{[}SZ\_\-LINE\mbox{]}
+\item 
+char \hyperlink{structHub_757e35902156611284f4190e6025639c}{hubId} \mbox{[}SZ\_\-LINE\mbox{]}
+\item 
+char \hyperlink{structHub_bddf272976fef652a3726c53043c2422}{selfId} \mbox{[}SZ\_\-LINE\mbox{]}
+\item 
+char \hyperlink{structHub_0489ccea4de8979acba98cfe73662a5a}{timeout} \mbox{[}SZ\_\-NAME\mbox{]}
+\item 
+void $\ast$ \hyperlink{structHub_8c5492d9cee801c7846d4a3012aea92a}{samp}
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{structHub}{Hub} description. Our application connects to this hub by default, but the structure will be valid for any \hyperlink{structHub}{Hub}. 
+
+\subsection{Field Documentation}
+\hypertarget{structHub_8a3f77e49a9c33a20d272958b4c65c60}{
+\index{Hub@{Hub}!appId@{appId}}
+\index{appId@{appId}!Hub@{Hub}}
+\subsubsection[{appId}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Hub::appId}\mbox{[}SZ\_\-NAME\mbox{]}}}
+\label{structHub_8a3f77e49a9c33a20d272958b4c65c60}
+
+
+\hyperlink{structHub}{Hub} XML-RPC connection \hypertarget{structHub_8d174b2376fff67044694077b5f44a0c}{
+\index{Hub@{Hub}!appVer@{appVer}}
+\index{appVer@{appVer}!Hub@{Hub}}
+\subsubsection[{appVer}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Hub::appVer}\mbox{[}SZ\_\-LINE\mbox{]}}}
+\label{structHub_8d174b2376fff67044694077b5f44a0c}
+
+
+application name 
+
+Referenced by samp\_\-setAppVersion().\hypertarget{structHub_0c01a576aab3a38c7003635c21ffb6f6}{
+\index{Hub@{Hub}!description@{description}}
+\index{description@{description}!Hub@{Hub}}
+\subsubsection[{description}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Hub::description}\mbox{[}SZ\_\-LINE\mbox{]}}}
+\label{structHub_0c01a576aab3a38c7003635c21ffb6f6}
+
+
+application version 
+
+Referenced by samp\_\-hubDeclareMetadata().\hypertarget{structHub_757e35902156611284f4190e6025639c}{
+\index{Hub@{Hub}!hubId@{hubId}}
+\index{hubId@{hubId}!Hub@{Hub}}
+\subsubsection[{hubId}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Hub::hubId}\mbox{[}SZ\_\-LINE\mbox{]}}}
+\label{structHub_757e35902156611284f4190e6025639c}
+
+
+client key value 
+
+Referenced by samp\_\-hubRegister(), and samp\_\-Register().\hypertarget{structHub_3546ac45740591096b9bdc4c37b8d5f5}{
+\index{Hub@{Hub}!id@{id}}
+\index{id@{id}!Hub@{Hub}}
+\subsubsection[{id}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf Hub::id}}}
+\label{structHub_3546ac45740591096b9bdc4c37b8d5f5}
+
+
+\hyperlink{structHub}{Hub} version string 
+
+Referenced by samp\_\-call(), samp\_\-callAll(), samp\_\-callAndWait(), samp\_\-envGet(), samp\_\-GetMetadata(), samp\_\-GetRegisteredClients(), samp\_\-GetSubscribedClients(), samp\_\-hubDeclareMetadata(), samp\_\-hubDeclareSubscriptions(), samp\_\-hubPing(), samp\_\-hubRegister(), samp\_\-hubSendShutdown(), samp\_\-hubSetXmlrpcCallback(), samp\_\-hubUnRegister(), samp\_\-notify(), samp\_\-notifyAll(), samp\_\-paramGet(), samp\_\-Register(), samp\_\-Reply(), and sampStartup().\hypertarget{structHub_cfe9051f3f0d6fd908ddf394283d1262}{
+\index{Hub@{Hub}!meta@{meta}}
+\index{meta@{meta}!Hub@{Hub}}
+\subsubsection[{meta}]{\setlength{\rightskip}{0pt plus 5cm}{\bf appMD} {\bf Hub::meta}}}
+\label{structHub_cfe9051f3f0d6fd908ddf394283d1262}
+
+
+descriptive text 
+
+Referenced by samp\_\-hubDeclareMetadata().\hypertarget{structHub_a7155581e81f30c08103bdcb55b8630a}{
+\index{Hub@{Hub}!privateKey@{privateKey}}
+\index{privateKey@{privateKey}!Hub@{Hub}}
+\subsubsection[{privateKey}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Hub::privateKey}\mbox{[}SZ\_\-LINE\mbox{]}}}
+\label{structHub_a7155581e81f30c08103bdcb55b8630a}
+
+
+client key 
+
+Referenced by samp\_\-call(), samp\_\-callAll(), samp\_\-callAndWait(), samp\_\-envGet(), samp\_\-GetMetadata(), samp\_\-GetRegisteredClients(), samp\_\-GetSubscribedClients(), samp\_\-hubDeclareMetadata(), samp\_\-hubDeclareSubscriptions(), samp\_\-hubPing(), samp\_\-hubRegister(), samp\_\-hubSendShutdown(), samp\_\-hubSetXmlrpcCallback(), samp\_\-hubUnRegister(), samp\_\-notify(), samp\_\-notifyAll(), samp\_\-paramGet(), samp\_\-Register(), and samp\_\-Reply().\hypertarget{structHub_8c5492d9cee801c7846d4a3012aea92a}{
+\index{Hub@{Hub}!samp@{samp}}
+\index{samp@{samp}!Hub@{Hub}}
+\subsubsection[{samp}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ {\bf Hub::samp}}}
+\label{structHub_8c5492d9cee801c7846d4a3012aea92a}
+
+
+Sync msg timeout (str) 
+
+Referenced by samp\_\-hubDeclareSubscriptions().\hypertarget{structHub_00e09b2ce458d0e43d91e33164025974}{
+\index{Hub@{Hub}!secret@{secret}}
+\index{secret@{secret}!Hub@{Hub}}
+\subsubsection[{secret}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Hub::secret}\mbox{[}SZ\_\-SECRET\mbox{]}}}
+\label{structHub_00e09b2ce458d0e43d91e33164025974}
+
+
+metadata 
+
+Referenced by samp\_\-hubRegister(), and samp\_\-Register().\hypertarget{structHub_bddf272976fef652a3726c53043c2422}{
+\index{Hub@{Hub}!selfId@{selfId}}
+\index{selfId@{selfId}!Hub@{Hub}}
+\subsubsection[{selfId}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Hub::selfId}\mbox{[}SZ\_\-LINE\mbox{]}}}
+\label{structHub_bddf272976fef652a3726c53043c2422}
+
+
+\hyperlink{structHub}{Hub} id value 
+
+Referenced by samp\_\-hubRegister(), and samp\_\-Register().\hypertarget{structHub_0489ccea4de8979acba98cfe73662a5a}{
+\index{Hub@{Hub}!timeout@{timeout}}
+\index{timeout@{timeout}!Hub@{Hub}}
+\subsubsection[{timeout}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Hub::timeout}\mbox{[}SZ\_\-NAME\mbox{]}}}
+\label{structHub_0489ccea4de8979acba98cfe73662a5a}
+
+
+\hyperlink{structClient}{Client} id value 
+
+Referenced by samp\_\-callAndWait(), samp\_\-envGet(), samp\_\-paramGet(), and samp\_\-setTimeout().\hypertarget{structHub_809a3f03e2e80609de4ad7ecd8b3ce19}{
+\index{Hub@{Hub}!url@{url}}
+\index{url@{url}!Hub@{Hub}}
+\subsubsection[{url}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Hub::url}\mbox{[}SZ\_\-URL\mbox{]}}}
+\label{structHub_809a3f03e2e80609de4ad7ecd8b3ce19}
+
+
+registration string \hypertarget{structHub_6781579d63b6e392837fecc18b481e02}{
+\index{Hub@{Hub}!version@{version}}
+\index{version@{version}!Hub@{Hub}}
+\subsubsection[{version}]{\setlength{\rightskip}{0pt plus 5cm}char {\bf Hub::version}\mbox{[}SZ\_\-NAME\mbox{]}}}
+\label{structHub_6781579d63b6e392837fecc18b481e02}
+
+
+\hyperlink{structHub}{Hub} service endpoint 
+
+The documentation for this struct was generated from the following file:\begin{CompactItemize}
+\item 
+\hyperlink{samp_8h}{samp.h}\end{CompactItemize}

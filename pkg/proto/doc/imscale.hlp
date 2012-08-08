@@ -1,0 +1,43 @@
+.help imscale Aug84 proto
+.ih
+NAME
+imscale -- Scale an image to a specified windowed mean
+.ih
+USAGE	
+imscale input output mean
+.ih
+PARAMETERS
+.ls input
+Input image to be scaled.
+.le
+.ls output
+Output scaled image.
+.le
+.ls mean
+Scale the output image to this mean value.
+.le
+.ls lower = INDEF
+Lower limit of window for calculating the input image mean.  INDEF corresponds
+to the minimum possible pixel value.
+.le
+.ls upper = INDEF
+Upper limit of window for calculating the input image mean.  INDEF corresponds
+to the maximum possible pixel value.
+.le
+.ls verbose = no
+Print the calculated input and output image means.
+.le
+.ih
+DESCRIPTION
+The mean of the \fIinput\fR image between the limits \fIlower\fR
+and \fIupper\fR is computed.  The image is then scaled to the
+specified output \fImean\fR.
+.ih
+EXAMPLES
+To scale an image to a unit mean excluding deviant points below
+1000 and above 5000.
+
+.nf
+    cl> imscale calib flat 1 lower=1000 upper=5000
+.fi
+.endhelp

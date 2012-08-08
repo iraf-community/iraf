@@ -1,0 +1,5 @@
+image,s,a,,,,image to which coordinates should refer
+wcs,s,h,logical,,,output world coordinate system name
+wxformat,s,h,"",,,x coordinate output format
+wyformat,s,h,"",,,y coordinate output format
+cursor,*imcur,h,,,,image cursor

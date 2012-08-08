@@ -1,0 +1,65 @@
+# ACEDETECT
+
+images,f,a,,,,"List of images"
+masks,s,h,"!BPM",,,"List of bad pixel masks"
+skys,s,h,"",,,"List of sky maps"
+sigmas,s,h,"",,,"List of sigma maps"
+exps,s,h,"",,,"List of exposure maps"
+gains,s,h,"",,,"List of gain maps"
+objmasks,s,h,"",,,"List of object masks"
+omtype,s,h,"all","boolean|numbers|colors|all",,"Object mask type"
+catalogs,s,h,"",,,"List of catalogs"
+extnames,s,h,"",,,"Extension names"
+catdefs,s,h,"ace$lib/catdef.dat",,,"List of catalog definitions"
+logfiles,s,h,"STDOUT",,,"List of log files
+
+# Steps"
+dodetect,b,h,yes,,,"Detect objects?"
+dosplit,b,h,yes,,,"Split merged objects?"
+dogrow,b,h,yes,,,"Grow object regions?"
+doevaluate,b,h,yes,,,"Evaluate objects?
+
+# Sky"
+skytype,s,h,"block","fit|block",,"Type of sky estimation
+
+# Sky Fitting"
+fitstep,i,h,100,1,,"Line step for sky sampling"
+fitblk1d,i,h,10,,,"Block average for line fitting"
+fithclip,r,h,2.,,,"High sky clipping during 1D sky estimation"
+fitlclip,r,h,3.,,,"Low sky clippling during 1D sky estimation"
+fitxorder,i,h,1,1,,"Sky fitting x order"
+fityorder,i,h,1,1,,"Sky fitting y order"
+fitxterms,s,h,"half","none|full|half",,"Sky fitting cross terms
+
+# Sky Blocks"
+blkstep,i,h,1,1,,"Line step for sky sampling"
+blksize,i,h,-10,,,"Block size (+=pixels, -=blocks)"
+blknsubblks,i,h,2,1,,"Number of subblocks per axis
+
+# Detection"
+updatesky,b,h,yes,,,"Update sky during detection?"
+convolve,s,h,"block 3 3",,,"Convolution kernel"
+hsigma,r,h,3.,.1,,"Sigma threshold above sky"
+lsigma,r,h,10.,.1,,"Sigma threshold below sky"
+hdetect,b,h,yes,,,"Detect objects above sky?"
+ldetect,b,h,no,,,"Detect objects below sky?"
+neighbors,s,h,"8","4|8",,Neighbor type
+minpix,i,h,6,1,,"Minimum number of pixels in detected objects"
+sigavg,r,h,4.,0.,,"Sigma of mean flux cutoff"
+sigmax,r,h,4.,0.,,"Sigma of maximum pixel"
+bpval,i,h,INDEF,,,"Output bad pixel value
+
+# Splitting"
+splitmax,r,h,INDEF,,,"Maximum sigma above sky for splitting"
+splitstep,r,h,0.4,,,"Splitting steps in convolved sigma"
+splitthresh,r,h,5.,,,"Splitting threshold in sigma"
+sminpix,i,h,8,1,,"Minimum number of pixels in split objects"
+ssigavg,r,h,10.,0.,,"Sigma of mean flux cutoff"
+ssigmax,r,h,5.,0.,,"Sigma of maximum pixel
+
+# Growing"
+ngrow,i,h,2,0,,"Number of grow rings"
+agrow,r,h,2.,0,,"Area grow factor
+
+# Evaluate"
+magzero,s,h,"INDEF",,,"Magnitude zero point"

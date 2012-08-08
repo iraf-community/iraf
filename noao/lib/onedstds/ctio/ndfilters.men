@@ -1,0 +1,17 @@
+	CTIO Neutral Density Filter Curves
+
+	Directory = onedstds$ctio/
+
+	 nd1m.100mag.dat = 1.00 mag ND filter CTIO 1.0M
+	 nd1m.125mag.dat = 1.25 mag ND filter CTIO 1.0M
+	 nd1m.250mag.dat = 2.50 mag ND filter CTIO 1.0M
+	 nd1m.500mag.dat = 5.00 mag ND filter CTIO 1.0M
+
+	nd4m.l000mag.dat = lower clear filter CTIO 4.0M
+	nd4m.u000mag.dat = upper clear filter CTIO 4.0M
+	nd4m.u025mag.dat = 0.25 mag ND filter CTIO 4.0M
+	nd4m.u075mag.dat = 0.75 mag ND filter CTIO 4.0M
+	nd4m.u150mag.dat = 1.50 mag ND filter CTIO 4.0M
+	nd4m.u225mag.dat = 2.25 mag ND filter CTIO 4.0M
+	nd4m.l250mag.dat = 2.50 mag ND filter CTIO 4.0M
+

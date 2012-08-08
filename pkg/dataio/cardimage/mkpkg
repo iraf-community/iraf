@@ -1,0 +1,13 @@
+# Cardimage library
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	t_rcardimage.x	rcardimage.com <error.h> <ctype.h> <mach.h> <fset.h> 
+	t_wcardimage.x	wcardimage.com <fset.h>  <error.h> <mach.h>
+	conversion.x
+	tabs.x
+	;

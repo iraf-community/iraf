@@ -1,0 +1,93 @@
+.help revisions Dec94 noao.imred.src.doecslit
+.nf
+
+=======
+V2.12.3
+=======
+
+doecslit$sdoarcs.cl
+    The sparams.refit parameter was being ignored and the ecreidentify
+    step has refit=yes hardwired.  The parameter reference is now used.
+    (11/14/05, Valdes)
+
+doecslit$sbatch.cl
+doecslit$sproc.cl
+doecslit$fibresponse.cl
+    Error messages now hint to check imtype setting.
+    (4/15/05, Valdes)
+
+========
+V2.12.2b
+========
+
+doecslit$sproc.cl
+    Modified code to eliminate goto.  This is for use with pyraf.
+    (11/21/00, Valdes)
+
+========
+V2.11.3a
+========
+
+doecslit$sproc.cl
+    The arcref and arcrefs variables were not initialized if dispcor=no
+    and if the user goes directly to batch mode there is an undefined
+    local variable error.  Added initialization.  (1/27/98, Valdes)
+
+=======
+V2.11.1
+=======
+
+doecslit$sarcrefs.cl
+doecslit$sbatch.cl
+doecslit$sfluxcal.cl
+doecslit$sgetspec.cl
+doecslit$slistonly.cl
+doecslit$sproc.cl
+doecslit$sdoarcs.cl
+    Any additional qualifiers in the imtype string are stripped.
+    (8/14/97, Valdes)
+
+doecslit$sgetspec.cl
+    Added the field parameter to the RENAME call.  (8/12/97, Valdes)
+
+=========
+V2.11Beta
+=========
+
+doecslit$sbatch.cl
+    Fixed typo bugs in this script.  (10/3/96, Valdes)
+
+doecslit$apslitproc.par
+    Made changes for the new aperture selection option.  (9/5/96, Valdes)
+
+=======
+V2.10.4
+=======
+
+doecslit$sgetspec.cl
+doecslit$doecslit.cl
+    The arc table will now be checked for arc spectra. (5/1/95, Valdes)
+
+doecslit$sparams.par
+doecslit$sdoarcs.cl
+doecslit$sarcrefs.cl
+    Added "threshold" as a user parameter.  (1/16/95, Valdes)
+
+doecslit$sproc.cl
+doecslit$sbatch.cl
+doecslit$sfluxcal.cl
+doecslit$sproc.par
+doecslit$sbatch.par
+doecslit$sfluxcal.par
+    SETAIRMASS and SETJD are only called if the required keywords are
+    present.  Errors from missing airmass or JD are then reported from
+    the task that actually uses them.  (12/31/94, Valdes)
+
+doecslit$sgetspec.cl
+doecslit$sgetspec.par
+    Added warning and query for missing CCDPROC keyword.  (12/31/94, Valdes)
+
+=======
+V2.10.3
+=======
+.endhelp

@@ -1,0 +1,679 @@
+.help config Aug91 noao.digiphot.photcal
+.ih
+INTRODUCTION
+
+The \fIconfiguration file\fR is a text file which describes how the input data
+is organized in the input standard star \fIcatalog\fR and the 
+\fIobservations\fR files, and defines the form of the transformation
+equations required to convert from the observed or instrumental indices
+to the standard indices.
+
+The \fIcatalog\fR file contains the standard indices for a set of
+standard stars, referenced in the catalog by a name called the \fImatching
+name\fR.  The matching name must be in the first column of the
+catalog and also must be unique, i.e. each catalog file
+entry is assumed to be unique. The standard indices may be in any column
+other than the first.
+
+The \fIobservations\fR files contain the observed indices for a
+subset of the standard stars and/or program stars, referenced in the
+file by a matching name, which must be in the first column of the
+observations file. The observed indices may be in any column other than
+the first. The names of the standard stars must match those
+in the catalog file.
+Only standard star observations whose matching names are found in the
+catalog file are used to compute the transformation equations.
+
+The configuration file is divided into three sections: the \fIcatalog
+section\fR which describes the format of the catalog file, the
+\fIobservations section\fR which describes the format of the observations 
+file, and the \fItransformation section\fR which defines the form of
+the transformation equations. The catalog section must occur before the
+observation section in the configuration file, and the observation
+section must occur before the transformation section.
+
+The \fIcatalog\fR and \fIobservations sections\fR are used to assign
+names to the columns in the input file. 
+The named columns can later be referenced in the transformation equations,
+by using the names
+as though they were variables in a programming language.
+
+The \fItransformation section\fR is used to define the equations to be solved,
+to specify which parameters are to be varied and which are to
+be held constant during the fitting process, and to assign initial values
+to all of the parameters.
+Any number of transformation equations may be defined in the
+transformation section.
+
+The transformation section may also be used, OPTIONALLY, to
+define temporary variables (\fIthe set equations\fR),
+define the derivatives of the transformation equations
+to be fit with respect to the parameters (\fIthe derivative equations or
+delta declarations\fR),
+define expressions for weights and errors (\fIthe weight and error
+equations\fR), and define the default expressions to be plotted
+during the interactive fitting process (\fIthe plot equation\fR).
+
+.ih
+THE CATALOG SECTION
+
+The catalog section is used to assign names to columns in the
+standard star catalog, and optionally, to associate error columns with
+the named columns.
+
+The catalog  section begins with the keyword \fIcatalog\fR, followed by
+any number of name and error(name), column associations.
+
+.ls Syntax
+.nf
+catalog
+
+name number
+
+error(name) number
+.fi
+.le
+
+The first declaration creates a name column number association.
+It consists of a name followed
+by a column number. The name becomes the variable name
+for that column.
+
+The second declaration creates an error (name) column number association.
+It begins with the keyword \fIerror\fR, followed by a name in parentheses
+and a column number.
+The name must be the name of an input column previously declared in the
+catalog section.  The error declarations are optional.
+
+The column number must be a decimal integer greater than two, since
+catalog files always reserve the first column for a matching name.
+This name is used to match objects in the catalog file with objects in the
+observations file.
+
+.ls Example
+.nf
+# Sample catalog section for the UBV system.
+
+catalog
+
+V       	2
+error(V)	3
+BV       	4
+error(BV)	5
+UB       	6
+error(UB)	7
+.fi
+.le
+
+.ih
+THE OBSERVATION SECTION
+
+The observation section is used to assign names to columns in the
+observations files, and to optionally, associate error columns with the
+named columns.
+
+The observations section begins with the keyword \fIobservation\fR, followed by
+any number of name and error (name) column associations.
+
+.ls Syntax
+.nf
+observation
+
+name number
+
+error (name)  number
+.fi
+.le
+
+The first declaration creates a name column number association.
+It consists of a name followed
+by a column number. The name becomes the variable name
+for that column.
+
+The second declaration creates an error (name) column number association.
+It starts with the keyword \fIerror\fR, followed by a name
+in parentheses, and a column number.
+The name must be the name of an input column previously declared in the
+observation section.  The error declarations are optional.
+
+The column number must be a decimal integer greater two,
+since the first column of the observations file is reserved for a matching name.
+This name is used to match objects in the observations file with
+objects in the catalog file.
+
+.ls Example
+.nf
+# Sample observation section for the UBV system.
+
+observation
+
+u           2
+error(u)    3
+b           4
+error(b)    5
+v           6
+error(v)    7
+x           8
+.fi
+.le
+
+.ih
+THE TRANSFORMATION SECTION
+
+The transformation section is used to define the transformation equations,
+to specify which parameters are to be altered and which are to be
+held constant during the fitting process, and to assign initial values
+to the parameters.
+
+The transformation section begins with the keyword \fItransformation\fR,
+followed by the list of parameter declarations,
+followed by the transformation equation.
+	
+.ls Syntax
+.nf
+transformation
+
+fit  parameter = value, parameter = value, ...
+
+constant  parameter = value, parameter = value, ...
+
+label : expression  =  expression
+        (function)    (fit)
+.fi
+.le
+
+The \fIfit\fR keyword begins a list of the parameters to be fit.
+The named parameters will be fit if they are present
+in a transformation equation. 
+The fit parameter values are used as the initial guesses for the
+parameters.
+
+The \fIconstant\fR keyword begins a list of the parameters to be held
+constant.
+The named parameters will not be fit. Instead the values are regarded
+as constant values in any transformation equation in which they appear.
+Constant parameter declarations are  used to fix
+values if they are known, or to restrict the degrees
+of freedom of the fit. 
+
+All parameters, both fit and constant, must be declared before the first
+equations in which they appear.
+There may be any number of fit and constant parameter declaration statements.
+Redefinitions are allowed, i.e., it is possible to declare a parameter with
+the fit keyword, and redefine it later with the constant keyword.
+The inverse is also true.
+
+The \fItransformation\fR equations are composed of three elements: the equation 
+label, the function expression, and the fit expression.
+
+The \fIlabel\fR is used to assign a name to the equation and  fit expression.
+The label can be any name not already in use. The ":" after the label is
+necessary to delimit it from the rest of the transformation equation
+definition. Labels are used primarily to associate the optional error,
+weight and plot equations with the appropriate transformation equations.
+However these labels can also be used in expressions belonging
+to subsequent equations, an action equivalent to replacing them with the
+fit expression they reference, before performing the actual evaluation.
+
+The \fIfunction\fR expression (left hand side of the "=" sign) is used as a 
+reference expression, i.e. an expression that has no fitting or 
+constant parameters in it. The function expression contains only values 
+computed from the input data which are known before the fit starts.
+
+The \fIfit\fR expression (right hand side of the "=" sign) is an expression
+which contains the parameters, both those to be fit and those that are
+fixed.
+If this expression contains names defined 
+in the catalog section , it will be possible to perform the fit, 
+but will not be possible to apply the transformations in the forward
+sense to program observations that don't have matching catalog values.
+If the number of transformations equations is greater than or equal to
+the total number of catalog variables used in the transformation equations,
+it MAY be possible to invert the system of equations and so evaluate
+the catalog variables for program objects.
+
+.ls Example
+.nf
+
+# Sample transformation section for the UBV system
+
+transform
+
+# V equation
+
+fit	v1 = 25.0, v2=0.03, v3=-0.17
+VFIT :  V = v1 + v + v2 * (b - v) + v3 * x
+
+# B - V equation
+
+fit	b1 = 2.10, b2 = 1.15, b3=-0.12
+const   b4 = 0.0
+BVFIT : BV = b1 + b2 * (b - v) + b3 * x + b4 * (b - v) * x
+
+# U - B equation
+
+fit	u1 = 3.45, u2 = 1.063, u3=-0.30
+const	u4=0.0
+UBFIT : UB = u1 + u2 * (u - b) + u3 * x + u4 * (u - b) * x
+.fi
+.le
+
+.ih
+OPTIONAL TRANSFORMATION SECTION FEATURES
+
+The transformation section may also be used, OPTIONALLY, to define
+temporary variables (\fIthe set equations\fR), define explicitly the
+derivatives of the transformation equations to be fit with respect to the
+fit and constant parameters (\fIthe derivative equations or delta
+declarations\fR), define
+expressions for the weights and/or errors (\fIthe weight and error
+equations\fR), and define an equation to be plotted (\fIthe plot equation\fR).
+
+.ls The Set Equation
+.le
+
+The \fIset equations\fR are used to assign names to expressions. They are
+primarily intended for computing quantities not listed explicitly
+in the catalog or observation files, but that may be derived from them.
+
+.ls
+.nf
+syntax
+
+set name = expression
+.fi
+.le
+
+A set equation declaration begins with the \fIset\fR keyword,
+followed by 
+a name, followed by an equal sign, followed by an expression.
+The expression may contain any name defined in the catalog and
+observation sections, or any names defined in a previous
+set equation.
+
+In the example below the variables
+V, BV and UB were declared in the catalog section, but the user wished
+to define a new variable U to simplify the form of one of the
+transformation equations. 
+
+.ls
+.nf
+example 
+
+set U = V + BV + UB
+.fi
+.le
+
+.ls The Delta Declaration and the Derivative Equations
+.le
+
+The \fIdelta\fR declaration statement or the \fIderivative\fR equation
+are used to tell
+the non-linear least squares routines how to compute the derivatives
+of the transformation equations with respect to the parameters to be fit.
+If the user does
+not specify how the derivatives are to be computed, a
+default value for delta (see below) is used and the  fit proceeds. For most
+simple photometric transformations the default delta is entirely adequate,
+and no delta statements or derivative expressions are required.
+
+However the user can elect to specify the derivatives implicitly using
+the \fIdelta\fR
+declaration syntax, or to supply explicit expressions for the derivatives
+with respect to the parameters, using the \fIderivative\fR equation
+syntax. For transformation equations which are linearly dependent on
+their parameters, or in cases where the derivative expressions are
+very complex the delta statement syntax is preferred over the more
+correct derivative equation syntax. For non-analytic expressions the
+delta syntax is required.
+
+.ls
+.nf
+syntax
+
+delta  parameter = value, parameter = value
+
+	or
+
+derivative (label, parameter) = expression
+.fi
+.le
+
+A \fIdelta\fR declaration begins with the \fIdelta\fR keyword, 
+followed by a list of parameter value associations, where each value
+is the region over which the derivative with respect to that parameter
+will be computed empirically. All the delta values must be greater than zero.
+
+A \fIderivative\fR equation begins with the keyword \fIderivative\fR,
+followed by 
+the label of the equation whose derivative is being computed and 
+the name of the parameter 
+with respect to which the derivative is being taken in parentheses, finally
+followed by the derivative 
+expression itself.
+
+If both a derivative equation and a delta statement are given for the same
+parameter, the parser will issue a warning message, and the derivative
+equation will take precedence over the delta declaration.
+
+The following example shows how the derivatives for an equation can be
+specified in each of the two ways.
+
+.ls
+.nf
+example
+
+VFIT: V = v + v1 + v2 * x + v3 * (b - v)
+      delta v1=.1, v2=.05, v3=.02
+
+or
+
+VFIT: V = v + v1 - v2 * x + v3 * (b - v)
+      deriv (VFIT,v1) = 1.0
+      deriv (VFIT,v2) = x
+      deriv (VFIT,v3) = (b - v)
+.fi
+.le
+
+.ls Weight equation
+.le
+
+The weight equation can be used to specify the way the weights will be
+computed for each data point,
+for each transformation equation. The weight equation is optional, and
+whether or not the weight expression is actually used by the fitting procedure
+depends on the application. The minimum and maximum weight expressions
+are also optional.
+
+.ls
+.nf
+weight (label) = expression
+    min = expression max = expression
+
+.fi
+.le
+
+The \fIweight\fR equation begins with the \fIweight\fR keyword, followed by 
+the label of the equation in parentheses, followed by an equal sign,
+followed by the weight expression.  Optionally,
+the weight expression can be immediately followed by the \fImin\fR and
+\fImax\fR keywords
+each of which may be followed by an expression.
+The expressions may contain any names declared in the catalog or
+observations sections, names defined by a set equation, or parameters declared
+in a fit or constant statement. Users should be extremely cautious about
+the latter as weights are evaluated before the fit, i.e. before the
+fit parameters have assumed their final values.
+
+In the following example weights are set to 1 over the standard deviation
+of the v measurement, sigmav, where sigmav was declared in the observation
+section.
+
+.ls
+.nf
+example
+
+VFIT: V = v + v1 + v2 * x + v3 * (b - v)
+      weight (VFIT) = 1.0 / sigmav ** 2
+.fi
+.le
+
+.ls The Plot Equation
+.le
+
+The plot equation is used to specify the default expressions for the x and y
+axes respectively, to be plotted when the transformation equations are fit
+interactively. The plot
+defined by the plot equation will be in the graphics window
+after the initial fit, instead of the default residuals versus function plot.
+
+.ls
+.nf
+syntax
+
+plot (label) = expression, expression
+               (x axis)    (y axis)
+.fi
+.le
+
+A \fIplot\fR equation begins with the \fIplot\fR keyword, followed by 
+the label of the associated transformation equation in parentheses,
+followed by an equals
+sign, and finally followed by the plot expressions for the x and y axis
+separated
+by a comma.
+
+In the following example the user has decided he/she wants the default plot
+for the VFIT equation to be a plot of the residuals versus the
+observed (b - v) color.
+It should be emphasized that the user could also produce the same graph
+inside the interactive fitting routines by reprogramming one of the graph
+keys.
+
+.ls
+.nf
+example
+
+VFIT: V = v + v1 + v2 * x + v3 * (b - v)
+      plot (VFIT) = b - v, V - (v + v1 + v2 * x + v3 * (b - v))
+.fi
+.le
+
+.ls Error equation
+.le
+
+The error equation is used to specify the way the error will be computed for
+each data point for each transformation. The error equation is optional, and
+whether or not it is used by the fitting or evaluation procedures
+depends on the application. The minimum and maximum error expressions
+are also optional.
+
+.ls
+.nf
+syntax
+
+error (label) = expression
+      min = expression max = expression
+.fi
+.le
+
+An \fIerror\fR  equation begins with the \fIerror\fR keyword, followed by 
+the label of the associated transformation equation in brackets,
+followed by an equal sign,
+followed by the error expression. Optionally,
+the error expression can be followed by the \fImin\fR and \fImax\fR keywords
+each of which must be followed by an expression.
+The expressions may contain any names declared in the catalog or
+observations sections, names defined by a set equation, or parameters declared
+in a fit or constant statement.
+
+In the following example the error for each data point is set equal to the
+standard deviation of the v measurement, sigmav, which was declared earlier
+in the observation section.
+
+.ls
+.nf
+example
+
+VFIT: V = v + v1 - v2 * x + v3 * (b - v)
+      error (VFIT) = sigmav
+.fi
+.le
+
+.ih
+THE PHOTCAL LANGUAGE GLOSSARY
+
+The configuration file consists of a series of instructions, written by
+the user in a mini-language understood by the PHOTCAL parser, which tell
+the various PHOTCAL routines
+what to do. The basic elements of the language are numerical constants,
+identifiers, arithmetic operators, arithmetic expressions, and comment
+statements.
+
+Numerical \fIconstants\fR may be decimal integers or floating point numbers. 
+Double precision and complex numbers are not supported. The INDEF constant 
+is not supported, although it is permitted in the input data.
+
+An \fIidentifier\fR (keyword, name, label, function) is an upper or
+lowercase letter, followed by zero or more upper or lowercase letters or
+digits.
+Identifiers can be of any length up to the maximum text file line length.
+
+A \fIkeyword\fR is an identifier with special meaning to the PHOTCAL routines.
+For example the three identifiers "catalog", "observations", and
+"transformation" are used to declare the beginning of the catalog,
+observations, and transformation sections of the configuration file.
+
+A \fIname\fR is a user variable that has either been declared in the
+catalog or observation sections of the configuration file, declared as
+a parameter using the fit or const declaration statements in the
+transformation section of the configuration file, or
+defined by a set equation in the transformation section.
+
+A \fIlabel\fR is an identifier which is assigned to an equation. It is used
+to tell the parser which transformation equation, the optional derivative,
+weight, error or plot equations are associated with. 
+
+A \fIfunction\fR is a built-in mathematical function that can be
+used in expressions.
+
+The following identifiers are reserved by the program to name
+\fIkeywords\fR and \fIfunctions\fR.  These reserved identifiers
+cannot be used to name user variables or label equations. 
+
+.nf
+# keywords
+
+catalog		constant	delta		derivative
+error		*extinction	fit		observations
+plot		*print		set		transformation
+weight
+
+*reserved keywords not currently used
+
+# functions
+
+abs		acos		asin		atan
+cos		exp		log		log10
+sin		sqrt		tan
+.fi
+
+Keywords may be abbreviated to up to three characters but names, labels,
+and functions may not be abbreviated.
+
+The following arithmetic \fIoperators\fR are recognized by PHOTCAL:
+"+" (addition), "-" (subtraction), "*" (multiplication), "/" (division),
+"**" (exponentiation), "-" (minus sign), and "+" (plus sign).
+The arithmetic operators follow normal FORTRAN rules of precedence
+
+\fIExpressions\fR can be any legal arithmetic FORTRAN expression, using the
+legal names, operators, functions, or constants defined above.
+Parenthesis "(" and ")" may be used as well.
+
+\fIComments\fR may be placed anywhere in the configuration file, as long
+as they are preceded by a "#" sign.
+All input succeeding this character to the end of the line is skipped.
+
+Every physical \fIline\fR in the configuration file must be shorter than the
+IRAF text file line limit, currently
+161 characters, but long constructs, for example a long transformation
+equation may span more than one physical line.
+
+.ih
+EXAMPLES
+
+Example 1. A sample configuration file for reducing UBV photoelectric
+photometry. Note the optional use of the delta declaration statement
+and the weight equations.
+
+.nf
+# Configuration file for reducing UBV photoelectric photometry.
+
+catalog
+
+V	2		# V magnitude
+BV	3		# B - V color
+UB	4		# U - B color
+
+observation
+
+v	2		# v instrumental magnitude
+b 	3		# b instrumental magnitude
+u 	4		# u instrumental magnitude
+ev	5		# error in v instrumental magnitude
+eb 	6		# error in b instrumental magnitude
+eu 	7		# error in u instrumental magnitude
+X       8		# airmass		
+
+transformation
+
+fit	v1 = 25.0, v2=0.16, v3=-0.043
+VFIT:   V = v1 + v - v2 * X + v3 * (b - v)
+        delta v1=0.10, v2=0.02, v3=0.02
+	weight (VFIT) = 1. / ev ** 2
+
+fit	b1 = 1.0, b2=0.09, b3=1.06
+BVFIT:  BV = b1 - b2 * X + b3 * (b - v)
+        delta b1=0.10, b2=0.02, b3=0.02
+	weight (BFIT) =  1.0 / (ev ** 2 + eb ** 2)
+
+fit	u1 = 2.0, u2=0.300, u3=0.95
+UBFIT:  UB = u1 - u2 * x + u3 * (u - b)
+        delta u1=0.10, u2=0.02, u3=0.02
+	weight (UFIT) = 1. / (eb ** 2 + eu ** 2)
+.fi
+
+Example 2. A sample configuration file for reducing UBV CCD photometry.
+Note the optional use of the error column declarations in the catalog and
+observations sections. The error columns can be used to compute
+the weights by the FITPARAMS task. Also note how the set equations are
+used to simplify the transformation equations.
+
+.nf
+catalog
+
+V		2	# V magnitude
+BV		3	# B-V color
+UB		4	# U-B color
+error(V)	5	# error in V magnitude
+error(BV)	6	# error in B-V color
+error(UB)	7	# error in U-B color
+
+observation
+
+ut1             3       # ut time of filter 1 observation
+X1              4       # airmass of filter 1 observation
+m1              7       # filter 1 instrumental magnitude
+error(m1)       8       # error in filter 1 instrumental magnitude
+ut2             10      # ut time of filter 2 observation
+X2              11      # airmass of filter 2 observation
+m2              14      # filter 2 instrumental magnitude
+error(m2)       15      # error in filter 2 instrumental magnitude
+ut3             17      # ut time of filter 3 observation
+X3              18      # airmass of filter 3 observation
+m3              19      # filter 3 instrumental magnitude
+error(m3)       20      # error in filter 3 instrumental magnitude
+
+
+transformation
+
+set B = V + BV
+set U = V + BV + UB
+
+fit   u1 = 0.0, u2=0.68, u3=-0.05
+const u4 = 0.0
+UFIT: u = u1 + U + u2 * Xu + u3 * UB + u4 * Xu * UB
+      delta u1=.1, u2=.02, u3=0.02
+
+fit   b1 = 0.0, b2=0.30, b3=-0.08
+const b4 = 0.0
+BFIT: b = u1 + B + b2 * Xb + b3 * BV + b4 * Xb * BV
+      delta b1=.1, b2=.02, b3=0.02
+
+fit   v1 = 0.0, v2=0.15, v3=0.03
+const v4 = 0.0
+VFIT: v = v1 + V + v2 * Xv + v3 * BV + v4 * Xv * BV
+      delta v1=.1, v2=.02, v3=0.02
+.fi
+
+.endhelp

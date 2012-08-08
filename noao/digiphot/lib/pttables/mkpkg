@@ -1,0 +1,19 @@
+# Pttables library
+
+$checkout libpttables.a ".."
+$update libpttables.a
+$checkin libpttables.a ".."
+$exit
+
+libpttables.a:
+	ptchoose.x	../ptkeysdef.h
+	ptfmkrec.x	../ptkeysdef.h
+	ptgetop.x	../ptkeysdef.h    <evexpr.h>
+	ptgnfn.x	../ptkeysdef.h    <ctype.h>   <syserr.h>
+	pthdrs.x	../ptkeysdef.h
+	ptkeywords.x	../ptkeysdef.h
+	ptkid.x
+	ptkstat.x	../ptkeysdef.h
+	ptmkrec.x	../ptkeysdef.h
+	ptranges.x
+	;

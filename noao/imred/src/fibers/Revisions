@@ -1,0 +1,223 @@
+.help revisions Nov90 noao.imred.src.fibers
+.nf
+
+srcfibers$proc.cl
+srcfibers$listonly.cl
+    For reasons that are now lost in the mists of time, the shortening of
+    filenames can cause problems.  This has been removed.
+    (2/11/11, Valdes) (See bug log 577)
+
+=======
+V2.15.1
+=======
+
+=======
+V2.12.3
+=======
+
+srcfibers$batch.cl
+srcfibers$proc.cl
+srcfibers$fibresponse.cl
+    Error messages now hint to check imtype setting.
+    (4/15/05, Valdes)
+
+
+=======
+V2.12.2
+=======
+
+srcfibers$proc.cl
+srcfibers$batch.cl
+    Because dispcor.samedisp=yes when doing the objects any dispersion change
+    applied to the reference arc was not being applied to the objects.
+    (5/21/03, Valdes)
+
+=======
+V2.12.1
+=======
+
+srcfibers$skysub.cl
+    Added a flpr to workaround a FITS kernel caching problem.
+    (6/21/02, Valdes)
+
+=====
+V2.12
+=====
+
+srcfibers$proc.cl
+    Modified code to eliminate goto.  This is for use with pyraf.
+    (11/21/00, Valdes)
+
+========
+V2.11.3a
+========
+
+srcfibers$arcrefs.cl
+    The test for crval/cdelt both INDEF was not working.  (9/24/99, Valdes)
+
+srcfibers$mkfibers.cl
+     Had to define a dummy variable 'ar' to get rid of ambiguous parameter
+     error.  (9/14/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+doslit$arcrefs.cl
+    The test on CRVAL and CDELT would not work with header keywords.
+    (9/22/98, Valdes)
+
+srcfibers$arcrefs.cl
+srcfibers$batch.cl
+srcfibers$doarcs.cl
+srcfibers$fibresponse.cl
+srcfibers$getspec.cl
+srcfibers$listonly.cl
+srcfibers$mkfibers.cl
+srcfibers$skysub.cl
+srcfibers$proc.cl
+    Any additional qualifiers in the imtype string are stripped.
+    (8/14/97, Valdes)
+
+=========
+V2.11BETA
+=========
+
+arcrefs.cl
+    If both crval and cdelt are INDEF then the autoidentify option is
+    not used.  (5/2/97, Valdes)
+
+apsript.par
+    Made changes for the new aperture selection option.  (9/5/96, Valdes)
+
+skysub.cl
+    Added package name to calls of "match", "sort", "uniq" to avoid
+    possible conflicts.  (5/6/96, Valdes)
+
+proc.cl
+proc.par
+arcrefs.cl
+arcrefs.par
+params.par
+    Modified to use autoidentify.  (4/5/96, Valdes)
+
+srcfibers$proc.cl
+srcfibers$batch.cl
+    When using subapertures the subapertures were not wavelength
+    calibrated correctly because the reference arc spectrum which
+    provides the wavelength scale does not contain the subapertures
+    and DISPCOR does not use samedisp=yes.  Changed the value of
+    samedisp to yes.  (10/27/95, Valdes)
+
+srcfibers$mkfibers.cl
+    The calls to mk1dspec did not specify the header file which would
+    then default to the task parameter which might be invalid.
+    (10/17/95, Valdes)
+
+srcfibers$proc.cl
+    Needed to initialize arcref2 in order work in batch when no dispersion
+    correction is requested.  (10/16/95, Valdes)
+
+srcfibers$mkfibers.cl
+    The calls to MK1DSPEC were changed in accordance with parameter changes
+    to that task.
+    (7/28/95, Valdes)
+
+srcfibers$proc.cl
+    Any image extension is stripped from the apidtable parameter.
+    (7/24/95, Valdes)
+
+srcfibers$doalign.cl +
+srcfibers$doalign.par +
+srcfibers$proc.cl
+srcfibers$batch.cl
+    Added the sky alignment option.  (7/19/95, Valdes)
+
+srcfibers$proc.cl
+srcfibers$batch.cl
+srcfibers$arcrefs.cl
+    The wrong range syntax is used with subapertures in SARITH/SCOPY.
+    Changed all -999 to 1-999.  (6/14/95, Valdes)
+
+=======
+V2.10.4
+=======
+
+srcfibers$proc.cl
+srcfibers$fibresponse.cl
+    1.  Need to add check for the throughput being a file rather than
+	an image when checking whether to apply a scattered light
+	correction.
+    2.	Removed a warning message when using a throughput file containing
+    	fiber values which are not in the flat field (for example, if a fiber
+    	is broken).
+    (1/25/95, Valdes)
+
+srcfibers$params.par
+srcfibers$doarcs.cl
+srcfibers$arcrefs.cl
+    Added "threshold" as a user parameter.  (1/16/95, Valdes)
+
+srcfibers$response.cl -> imred$src/fibers/fibresponse.cl
+srcfibers$response.par -> imred$src/fibers/fibresponse.par
+srcfibers$proc.par
+    Changed the fiber response task name from "response" to "fibresponse"
+    to avoid conflict with longslit.response.  (12/31/94, Valdes)
+
+srcfibers$proc.cl
+    The check for arcs2 = " " was done incorrectly.  (9/12/94, Valdes)
+
+srcfibers$proc.cl
+srcfibers$batch.cl
+srcfibers$doarcs.cl
+    A check was needed on whether the arc spectra were extracted during
+    the current execution to avoid reextracting the same arc multiple
+    times during a "redo" or the initial time.  In both those cases
+    the rextract flag is set causing spectra to be reextracted if they
+    exist.  Previously doarcs could not tell if the arc exists because
+    of a previous run or during the current run with the same arc
+    used multiple times.  (5/18/94, Valdes)
+
+===========
+V2.10.3beta
+===========
+
+srcfibers$skysub.cl
+imred$specred/doc/skysub.hlp
+    1.  The combine option was being ignored.
+    2.  The help did not mention the reject option and was otherwised
+	out of date.
+    (3/31/94, Valdes)
+
+srcfibers$proc.cl
+    The scattered light correction is now queried for all images and may
+    be turned off with NO.  (9/1/93, Valdes)
+
+===========
+V2.10.3beta
+===========
+
+srcfibers$arcrefs.cl
+     MOdified to use shift=INDEF in REIDENTIFY.
+     (2/18/93, Valdes)
+
+srcfibers$*.cl
+     Modified to use the "imtype" environment variable to define the
+     extension type.
+     (2/18/93, Valdes)
+
+=======
+V2.10.2
+=======
+
+srcfibers$proc.cl
+     The aperture reference is redone when a new aperture ID file is seen.
+     (1/11/93, Valdes)
+
+srcfibers$*
+     Updated for new ONEDSPEC.  (7/24/91, Valdes)
+
+srcfibers$*
+     All occurrences of latitude replaced by observatory as required by
+     recent changes to setairmass, etc.  (11/20/90, Valdes)
+.endhelp

@@ -1,0 +1,15 @@
+# parameter file for tinfo
+table,s,a,"",,,"name of table"
+ttout,b,h,y,,,"display values on terminal?"
+nrows,i,h,0,,,"number of rows written to table"
+ncols,i,h,0,,,"number of columns defined"
+npar,i,h,0,,,"number of header parameters written to table"
+rowlen,r,h,0,,,"row length in units of SZ_REAL"
+rowused,r,h,0,,,"amount of row length used in units of SZ_REAL"
+allrows,i,h,0,,,"number of allocated rows"
+maxpar,i,h,0,,,"space allocated for header parameters"
+maxcols,i,h,0,,,"space allocated for column descriptors"
+tbltype,s,h,"",,,"table type"
+subtype,s,h,"",,,"table subtype"
+tblversion,i,h,0,,,"version of software that created the table"
+mode,s,h,"al",,,

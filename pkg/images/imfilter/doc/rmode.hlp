@@ -1,0 +1,133 @@
+.help rmode May95 images.imfilter
+.ih
+NAME
+rmode -- ring modal filter a list of images
+.ih
+USAGE
+rmode input output rinner router
+.ih
+PARAMETERS
+.ls input
+List of input images.
+.le
+.ls output
+List of filtered images. The number of input images must be the same as the
+number of output images. If the input image name equals the output image name
+the filtered image replaces the original image.
+.le
+.ls rinner, router
+The inner and outer semi-major axes of the ring filter in pixels. If rinner
+is set to 0.0 then the ring filter becomes a circular filter.
+.le
+.ls ratio = 1.0
+The ratio of the semi-minor axis to the semi-major axis of the ring filter.
+If ratio is 1.0 the ring filter is circularly symmetric.
+.le
+.ls theta = 0.0
+The position angle of the major axis of the ring filter. Theta is measured
+counter-clockwise in degrees from the x axis and must be between 0 and
+180 degrees.
+.le
+.ls zloreject = INDEF, zhireject = INDEF
+The minimum and maximum good pixel values. Zloreject and zhireject default
+to  -MAX_REAL and MAX_REAL respectively.
+.le
+.ls boundary = "nearest"
+The type of boundary extension. The options are:
+.ls nearest
+Use the value of the nearest pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Reflect pixel values around the boundary.
+.le
+.ls wrap
+Wrap pixel values around the boundary.
+.le
+.le
+.ls constant = 0.
+The value for constant valued boundary extension.
+.le
+
+.ih
+DESCRIPTION
+
+RMODE takes a list of input images \fIinput\fR and produces a list of
+filtered
+images \fIoutput\fR. The filter consists of a sliding circular / elliptical or
+annular circular / elliptical window whose size and orientation is determined
+by the \fIrinner\fR, \fIrouter\fR, \fIratio\fR, and \fItheta\fR parameters.
+The center pixel in the window is replaced by the mode of the pixel
+distribution where mode is defined below.
+
+.nf
+	mode = 3. * median - 2. * mean
+.fi
+
+The median is defined as the value of the (n + 1) / 2 number in an ordered
+sequence of numbers.
+Out of bounds pixel references are handled by setting the parameter
+\fIboundary\fR. The principal function of the circular / elliptical filter
+is to smooth and image using a circularly / elliptically symmetric filter.
+The principal function of the circular / elliptical ring filter is to
+remove objects from the image which have a scale length of rinner and
+replace them with an estimate of the local background value.
+
+The \fIzloreject\fR and \fIzhireject\fR parameters may be used to reject
+bad data from the modal filtering box.  If no good
+data is left in a given filtering box, then the mode is set to zloreject
+if the majority of the pixels are less than zloreject, or to zhireject
+if the majority of pixels are greater than zhireject.
+
+.ih
+REFERENCES
+
+The properties of the ring median filter and its application to
+astronomical analysis problems is summarized in the
+article "A Ring Median Filter  for Digital Images" (Secker, J., 1995,
+PASP, 107, 496-501) and references therein.
+
+A derivation of the expression for the mode used here can be found in
+"Statistics in Theory and Practice", Robert Lupton, 1993, Princeton
+University Press, problem 2.
+
+.ih
+EXAMPLES
+
+1. Modal filter an image using a circular ring filter with an inner radius
+of 4 pixels and a width of 1 pixel.
+
+.nf
+   cl> rmode input output 4.0 5.0
+.fi
+
+2. Modal filter an image using a circular filter of outer radius 3.0.
+
+.nf
+   cl> rmode input output 0.0 3.0
+.fi
+
+3. Modal filter the test image dev$pix rejecting any pixels < 5 or
+greater than 19935 from the modal filter using a circular
+filter of outer radius 5.0.
+
+.nf
+    im> rmode dev$pix output 0.0 5.0 zloreject=5 zhireject=19935
+.fi
+
+.ih
+TIME REQUIREMENTS
+It requires approximately 59 and 35 CPU seconds to modal filter a
+512 by 512 square integer image with a circular filter of radius 5 pixels
+and a ring filter of inner and outer radii of 4.0 and 5.0 pixels respectively.
+(SPARCStation2).
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+mode,fmode,rmode
+.endhelp

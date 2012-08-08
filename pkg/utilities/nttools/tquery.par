@@ -1,0 +1,9 @@
+intable,s,a,,,,"Input tables"
+outtable,s,a,,,,"Output tables"
+expr,s,a," ",,,"Expression used for selection"
+columns,s,a," ",,,"Column names"
+sort,s,a," ",,,"Columns to sort on"
+uniq,b,h,no,,,"Unique rows?"
+ascend,b,h,yes,,,"Ascending order?"
+casesens,b,h,yes,,,"Case sensitive sort?"
+mode,s,h,"a",,,

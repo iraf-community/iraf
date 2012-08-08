@@ -1,0 +1,83 @@
+.help keypar Dec94 tables
+.ih
+NAME
+keypar -- Copy a header keyword to an IRAF parameter.
+.ih
+USAGE
+keypar input keyword
+.ih
+DESCRIPTION
+This task reads a header keyword from an image or table file. The
+keyword is written to the IRAF parameter 'value' as a character
+string. If the header keyword is boolean, the value of 'value' will
+either be "yes" or "no".  If the header keyword is not found, 'value'
+will be set to a null string.  String parameters, such as 'value', can
+be converted to numeric data types with the built in functions real()
+and int().
+.ih
+PARAMETERS
+.ls input [file name]
+Name of the file containing the header keyword.
+.le
+.ls keyword [string]
+Name of the header keyword to be retrieved. (The keyword 
+name is not case sensitive.)
+.le
+.ls (silent = no) [bool]
+If this parameter is set to no (the default) a warning message will be
+printed if the keyword is not found in the header. If it is set to
+yes, the warning message is suppressed.
+.le
+.ls (value) [string]
+An output  parameter that will contain the value passed from the header
+keyword.
+.le
+.ls (found) [bool]
+An output parameter that will be set to yes if the keyword is found in
+the header and no if it is not.
+.le
+.ih
+EXAMPLES
+1. Print the number of groups (i.e., the 'GCOUNT' keyword)
+in the image file 'image.hhh':
+
+.nf
+tt> keypar image.hhh gcount
+tt> print(keypar.value)
+.fi
+
+2. Print the range of the data in the second group of the same image by 
+reading the values of the 'DATAMIN' and 'DATAMAX' keywords:
+
+.nf
+tt> keypar image.hhh[2] datamin
+tt> x = real(keypar.value)
+tt> keypar image.hhh[2] datamax
+tt> y = real(keypar.value)
+tt> print(y-x)
+.fi
+
+3. Print the component name (i.e., the 'COMPNAME' header keyword)
+for the table 'thruput.tab':
+
+.nf
+tt> keypar thruput.tab compname
+tt> print(keypar.value)
+.fi
+
+4. Check for the existence of the exposure time in an image header:
+
+.nf
+tt> keypar image.hhh exptime silent+
+tt> if (keypar.found) {
+>>> print keypar.value
+>>> } else {
+>>> print INDEF
+>>> }
+.fi
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+SEE ALSO
+keytab, parkey, partab, tabkey, tabpar
+.endhelp

@@ -1,0 +1,395 @@
+.help revisions Jan90 noao.digiphot.ptools
+.nf
+
+ptools$pconvert/ptdeftable.x
+    pt_kstati() was being declared pointer instead of int (7/13/09, MJF)
+
+ptools$pexamine/ptsetup.x
+    pt_getnames() was declared a pointer instead of int (7/12/09, MJF)
+
+ptools$pconvert/ptconvert.x
+ptools$pconvert/txtools/ptxcalc.x
+ptools$pconvert/txtools/ptxdump.x
+ptools$pconvert/txtools/ptxselect.x
+    Added missing xev_freeop calls to the pconvert, txcalc, txdump, and
+    txselect tasks so that memory is released if any of the input operands
+    are strings.
+
+    (Davis, March 6, 2002)
+
+
+ptools$mkpkg
+    Modified the mkpkg procedures to pick up user compile and link flags.
+
+    (Davis, June 17, 1999)
+
+ptools$ptools.cl
+    Modified the package cl script to check and see if the tables package is
+    already loaded before checking to see if it exists and then loading it.
+
+    (Davis, August 1, 1998)
+
+ptools$pdump.cl
+    Modified the way the pdump script handles the tdump pwidth parameter
+    to work around a change made to the tables.ttools.tdump task. The solution
+    is not ideal because it leaves the value of tdump.pwidth.p_max
+    modified but the parameter value is not changed.
+
+    (Davis, August 15, 1997)
+
+ptools$pconcat.cl
+    Added a missing "cache ("istable")" statement that could cause trouble
+    if the pconcat script was called from a backgroound job.
+
+    (Davis, July 28, 1997)
+
+ptools$txtools/t_txselect.x
+    Changed the maximimum size of the expression to be evaluated from
+    SZ_FNAME to SZ_LINE which is what it was supposed to be.
+
+    (Davis, May 25, 1996)
+
+ptools$tbdump.cl
+    If the input file was an ST binary table file and the expression parameter
+    was not equal to "yes", the intermediate tables file was not being deleted
+    when the tbdump and pdump tasks terminated. The problem was due to the
+    ".tab" extension that was added to the tables name but not sensed by
+    the delete command. I switched the delete command to a tdelete command
+    and everything worked fine.
+
+    (Davis, Nov 2, 1995)
+
+ptools/pexamine/pexmine.h
+ptools/pexamine/ptcolon.x
+    The rinner and router colon commands were incorrectly coded as rin and
+    rout colon commands in the pexamine.h file. The :router command was also
+    incorrectly writing back its results into the rinner parameter.
+
+    (Davis, May 1, 1995)
+
+ptools/ptutils/t_tbcrename.x
+ptools/ptutils/t_tbkeycol.x
+    Add several new checks for input text files to avoid a problem with
+    a text file being opened as a binary table. This problem prably appeared
+    when tables was modified to support simple text files (tables 1.3.3 for
+    sure, proably 1.3.2 as well, not sure before that).
+
+    (Davis, March 21, 1995)
+
+
+ptools/tbconcat.cl
+    Add a test for the existence of the ttools.keypar.silent parameter
+    for backwards compatability between tables 1.3.3 and 1.3.2.
+
+    (Davis, Feb 25, 1995)
+
+ptools/pexamine/ptplot.x
+    An off the end of the array computation error in the routine pt_hplot
+    was causing an invalid floating point operation on the Dec Alpha when
+    the user tried to plot the histogram of an array,
+
+    (Davis, Feb 23, 1995)
+
+ptools/pconvert/ptdeftable.x
+    Modified the pconvert task so that header space is preallocated rather
+    than added as needed. This significantly speeds up the task performance
+    by decreasing the number of disk writes required. This change was
+    made in response to a suggestion from PHil Hodge at ST.
+
+    (Davis, Feb 2, 1995)
+
+ptools/txtools/t_txcalc.x
+ptools/txtools/ptxcalc.x
+ptools/tbcalc.cl
+ptools/pcalc.cl
+ptools/doc/pcalc.hlp
+ptools/doc/tbcalc.hlp
+ptools/doc/txcalc.hlp
+    Added the tasks txcalc, tbcalc, and pcalc to the ptools package.
+    This tasks perform arithmetic operations on the fields or columns
+    of photometry files written with apphot or daophot tasks.
+
+    (Davis, May 31 1993)
+
+ptools/pexamine
+    Fixed numerous small bugs in the pexamine task including: 1)
+    unclear error messages if the default x-y or histogram plot columns could
+    not be found on task startup 2) initialization bug that could cause
+    the output edited catalog to be written incorrectly on the
+    second or higher run of pexamine, 3) added a 5% buffer around all
+    the plots so the user can see the plotted data better, 4) added
+    the standard deviation of the sky to the standard apphot columns, 5)
+    a misleading error message in the colon command to change the
+    default histogram column.
+
+    (Davis, May 22 1993)
+
+ptools/ptutils/t_istable.x
+    Modified the istable task, which is called by the pconcat, pdump,
+    prenumber, pselect, and psort script tasks so that it could deal
+    correctly with the fact that legal tables files might be text files.
+
+    (Davis, May 12 1993)
+
+ptools/pdump.cl
+ptools/pttest.cl
+ptools/tbdump.cl
+ptools/tbrenumber.cl
+    Added an expression parameter to the pdump task.
+
+    (Davis, Feb 25, 1993)
+
+ptools/tbrenumber.cl
+ptools/prenumber.cl
+    Modified the tbrenumber and prenumber scripts so they can use 
+    the tables 1.2.1 version of tcalc as well as the 1.2 version.
+    The parameters verbose and harmless present in the 1.2 version
+    were removed from the 1.2.1 version.
+
+    (Davis, June 1, 1992)
+
+ptools$pexamine/ptplot.x
+    1. The error message "Star not found" would persist after a star
+    was successfully found because no status line message was printed
+    out after a succesful find operation.
+
+    (Davis, April 7, 1992)
+
+ptools$tbdump.cl
+ptools$tbrenumber.cl
+ptools$prenumber.cl
+    1. Changed the name of the pagwidth parameter to pwidth the call to the
+    ttools package task tdump because the parameter was renamed in the 
+    version 1.2 of tables.
+
+    2. Changed the value of the tcalc equals parameter from ":ROWNUM" 
+    to "rownum" in calls to tcalc made by the tbrenumber and prenumber
+    tasks.
+
+    (Davis, February 28, 1992)
+
+ptools$ptools.cl
+ptools$ptools.hd
+ptools$ptools.men
+ptools$x_ptools.x
+ptools$pappend.cl
+ptools$pdump.cl
+ptools$prenumber.cl
+ptools$pselect.cl
+ptools$psort.cl
+ptools$pconvert/t_pconvert.x
+ptools$doc/pappend.hlp
+ptools$doc/pdump.hlp
+ptools$doc/prenumber.hlp
+ptools$doc/pselect.hlp
+ptools$doc/psort.hlp
+ptools$doc/pconvert.hlp
+    Changed the name of the append task to pappend.
+    Changed the name of the dump task to pdump.
+    Changed the name of the renumber task to prenumber.
+    Changed the name of the select task to pselect.
+    Changed the name of the sort task to psort.
+    Changed the name of the convert task to pconvert.
+
+    (Davis, October 8, 1991)
+
+ptools$pttest.cl
+ptools$doc/pttest.hlp
+    Added the new task pttest to the ptools package. Pttest runs basic tests
+    on the ptools package.
+
+    (Davis, October 8, 1991)
+
+ptools$pexamine/ptplot.x
+    Changed the status line message so that it is printed only when the
+    first plot is made or new data is read in.
+
+    (Davis, October 7, 1991) 
+
+    *** Applied the results of spplint to the ptools package.
+
+ptools$convert/t_convert.x
+    Removed 2 extra arguments from the strupr call.
+    This could be a problem in the old testphot.
+
+ptools$convert/ptconvert.x
+    Changed an illegal logical NOT construct to an integer == NO construct.
+    This was not a problem in the old testphot.
+     
+    Removed unused variable record form the pt_convert routine.
+
+ptools$convert/ptdeftable.x
+    Removed an extra argument from the pt_gnfn call. This routine has
+    changed and this bug was not a problem in the old testphot..
+
+ptools$pexamine/ptgetphot.x
+    Removed an extra argument from the pt_gnfn call. This routine has
+    changed. Pexamine did not exist in the old testphot so this was not
+    a problem.
+
+ptools$pexamine/ptplot.x
+    Removed an extra argument from the pt_gnfn call. This routine has
+    changed. Pexamine did not exist in the old testphot so this was not
+    a problem.
+
+    Removed an extra argument from pt_rxydata. This routine has changed.
+    Pexamine did not exist in the old testphot so this was not a problem.
+
+    Removed unused variables x1, y1 from the pt_gcur routine.
+
+ptools$pexamine/ptcolon.x
+    Removed an extra argument for a clgetr command.
+    Pexamine did not exist in the old testphot so this was not a problem.
+
+ptools$txtools/t_txdump.x
+    Removed two extra arguments from the call to strupr. This could have
+    been a problem in the old testphot.
+
+ptools$txtools/ptxdump.x
+    Changed an illegal logical NOT construct to an integer == NO construct.
+    This was not a problem in the old testphot.
+
+ptools$txtools/ptxselect.x
+    Changed an illegal logical NOT construct to an integer == NO construct.
+    This was not a problem in the old testphot.
+
+ptools$txtools/ptsortnum.x
+    Removed unused argument colwidth from the pt_colsort routine.
+
+    Davis, October 3, 1991
+
+
+ptools$renumber.cl
+ptools$tbrenumber.cl
+    Changed the calls to the tables tcalc task to include all the hidden
+    parameters.
+
+    Davis, October 1, 1991
+
+ptools$
+    1. Deleted the append, dump, renumber, select and sort sub-directories
+    and consolidated then into the txtools sub-directory.
+
+    2. Several small files were eliminated by  concantenating them into other
+    existing files in txtools, pexamine, and convert.
+
+    3. Changed the way selected keywords are stored in the text database
+    data structures. The index, instead of the pointer is stored. This removes
+    potential problems with reallocating the record structures, when the
+    test database files contain variable-sized records. All the text database
+    tools were affected, as  were a couple of files in daophot.
+
+    4. Modified txdump, txrenumber, txselect, txsort and pexamine so that they
+    could correctly deal with variable-sized records instead of crashing,
+    if a given record was larger than the first record in the file.
+
+    5. Completely rewrote convert.
+
+    6. Added an offset parameter to pexamine so that the user can elect
+    to read portions of an input photometry catalog into memory for plotting
+    and examining.
+
+    Davis, August 13, 1991
+
+ptools$
+    1. Renamed the hidden tcolrename task need for the photcal preprocessors to
+    tbcrename in conformance with the new standards.
+
+    2. Added a help page for tbcrename.
+
+    Davis, May 24, 1991
+
+ptools$
+    1. Renamed the hidden tkeycol task need for the photcal preprocessors to
+    tbkeycol in conformance with the new standards.
+
+    Davis, May 24, 1991
+
+ptools$renumber/t_txrenumber.x
+    1. The txrenumber task will now accept a list of images.
+
+    Davis, May 24, 1991
+
+ptools$
+    1. The ptools package now loads the tables package on startup.
+
+    2. The tasks tappend, tdump, trenumber, tselect, and tsort have now become
+    tbappend, tbdump, tbrenumber, tbselect and tbsort. These tasks work
+    on binary tables files. All are now scripts which call a tables
+    package task. All 5 tasks now operate on lists of tables files.
+
+    Davis, May 24, 1991
+
+ptools$pttables/ptkeywords.x
+ptools$pttables/ptconvert.x
+    1. Fixed a problem with embedded blanks in string parameters in the
+    apphot/daophot database files. The format and units string were not being
+    correctly read because the second part of the value string was being read
+    into the units string, the units string was being read into the filter
+    string etc. This was only a problem for keywords (#K) because they
+    are read in free format. It was not a problem for columns (#N).
+    The format will now default to %-20s if it can not be decoded
+    and only the first part of the string will be kept. The units string
+    will be incorrect. There may be a more elegant solution
+    later but this fix will work for now.
+
+    Davis, Apr 2, 1991
+
+ptools$pttables/ptmkrec.x
+    1. All of the ptools tasks which operate on text files convert, txappend, 
+    txdump, txrenumber, txselect, txsort and pexamine have been modfied
+    to be more efficient. Calls to strmatch have been replaced by calls
+    to strncmp. Convert, txdump and txselect no longer call the expression
+    evaluator if the expression is a simple "yes" string.
+
+    2. Ptmkrec has been modified to be more efficient for the simple case
+    where there is only a single aperture.
+
+    Davis, Mar 29, 1991
+
+ptools$
+    1. Added the new hidden task tkeycol to the ptools package. Tkeycol
+    converts ST table header keywords into new ST table columns. It is not
+    intended to be seen directly by the user but will be used in some
+    of the preprocessing scripts in the photcal package.
+
+    2. Added the new hidden task tcolrename to the ptools package. Tcolrename
+    renames selected columns in a list of ST tables. It is not intended to
+    be seen directly by the user but will be used in some of the preprocessing
+    scripts in the ptools package.
+
+    Davis, Mar 2, 1991
+
+ptools$convert/ptconvert.x
+    Convert was preallocating space for 150 columns in the output table. In
+    rare cases where the user had a large number of apertures (20 or so)
+    in a phot text file convert could overwrite memory and crash the task.
+
+    Davis, Oct 4, 1990
+
+ptools$tvmark/
+    Removed tvmark from ptools since it is duplicated in proto.
+
+    Davis, Jul 9, 1990
+
+ptools$convert/ptdeftable.x
+    Corrected a bug in the convert task wherein the code was trying to
+    load a string quantity into a boolean parameter. This caused the
+    code to crash on Orion was worked ok on the sparc station.
+
+    Davis, Jun 7, 1990
+
+ptools$pttables/tappend.cl
+    Removed two harmless debugging statements from the tappend.cl script.
+
+    Davis, Jan 8, 1989
+
+ptools$pttables/pthdrs.x
+    An off the end of the array access error was occurring for the format and
+    units string in the case where the header was duplicated in an input
+    text database file. This bug sometimes caused meomory corruption errors
+    in several of the daophot tasks and in the ptools tasks txsort, txdump,
+    txrenumber and txselect.
+
+    Davis, Jan 5, 1989
+.endhelp

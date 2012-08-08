@@ -1,0 +1,36 @@
+.help daf2r Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDAFR (IDEG, IAMIN, ASEC, RAD, J)
+
+     - - - - - -
+      D A F R
+     - - - - - -
+
+  Convert degrees, arcminutes, arcseconds to radians
+  (double precision)
+
+  Given:
+     IDEG        int       degrees
+     IAMIN       int       arcminutes
+     ASEC        dp        arcseconds
+
+  Returned:
+     RAD         dp        angle in radians
+     J           int       status:  0 = OK
+                                    1 = IDEG outside range 0-359
+                                    2 = IAMIN outside range 0-59
+                                    3 = ASEC outside range 0-59.999...
+
+  Notes:
+     1)  The result is computed even if any of the range checks
+         fail.
+     2)  The sign must be dealt with outside this routine.
+
+  P.T.Wallace   Starlink   23 August 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

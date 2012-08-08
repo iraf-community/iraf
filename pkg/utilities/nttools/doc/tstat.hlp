@@ -1,0 +1,225 @@
+.help tstat Jan2001 tables
+.nj
+.ih
+NAME
+tstat -- Get statistics for a table column.
+.ih
+USAGE
+tstat intable column
+.ih
+DESCRIPTION
+This task gets the mean, standard deviation, median, minimum and maximum
+values for a table column.
+The output will be written to cl parameters and may also be written either
+to the standard output (STDOUT) or to a table.
+When more than one table is specified as 'intable', the statistics are
+determined for each table separately, not cumulatively.  The values
+in the cl parameters therefore refer to the last table in the list.
+
+If an input table contains only one column
+(either in fact or due to the use of a column selector with the table name),
+then the 'column' parameter is ignored,
+and statistics are computed for that one column.
+If 'intable' includes more than one table,
+the 'column' parameter may be required for some tables
+(those with more than one column) but not for others.
+
+The range of rows to use for statistics
+may be restricted either by the 'rows' parameter
+or by use of a row selector with the table name.
+Both may be used, in which case 'rows'
+is interpreted to mean selected row numbers,
+rather than rows in the underlying table.
+That is, the row selector with the table name is applied first,
+then the 'rows' parameter is used to further restrict the rows.
+
+For a column that contains arrays,
+this task reads all elements of all selected rows
+and computes statistics on all those elements together.
+Typical usage for array columns would be to specify just one row,
+but any number of rows may be included,
+limited only by memory.
+
+Lower and upper limits may be set using the parameters 'lowlim' and 'highlim'
+such that table values outside that range are not used when computing
+the statistics.
+Either the lower or upper limit may be set individually.
+If there are no values within the range specified
+and within the range of rows given by the 'rows' parameter,
+then the average, etc, will be printed as INDEF.
+
+For some tables, one can get statistics on the data in a row
+by using 'tdump' and piping the output to 'tstat'.
+See the examples for more information.
+.ih
+PARAMETERS
+.ls intable [file name template]
+A list of input tables.
+Statistics will be obtained for one column, the same name in every table.
+If the input is redirected,
+this parameter need not be specified;
+that is, if there's only one command-line argument,
+it will be taken to be the column name.
+.le
+.ls column [string]
+Column in input tables.
+The statistics are gotten for the values in the column with this name.
+If an input table contains only one column,
+this parameter will be ignored,
+and you will not even be prompted for a value.
+If 'intable' includes more than one table with only one column,
+the column name does not need to be the same in each of these tables.
+For tables containing more than one column,
+this parameter is required,
+and the same column name will be used for each table in the list
+that contains more than one column.
+.le
+.ls (outtable = "STDOUT") [string]
+Output table, STDOUT, or null.
+If 'outtable' is null ("") then the results will only be written to cl
+parameters (see 'nrows', 'mean', 'stddev', 'vmin', 'vmax').
+If 'outtable' is "STDOUT" then the results will be written to
+the standard output preceded by a header line (beginning with #)
+that gives the name of the table and the name of the column.
+If 'outtable' is not "STDOUT" and is not null then it is interpreted as
+a table name (just one name), and the statistics for the input tables
+will be written to separate rows of the output table.
+If the table already exists,
+the rows will be appended to what is already there.
+The output column names are given by
+the parameters 'n_tab', 'n_nam', 'n_nrows', etc.
+.le
+.ls (lowlim = INDEF) [real]
+Values below this are ignored.
+.le
+.ls (highlim = INDEF) [real]
+Values above this are ignored.
+.le
+.ls (rows = -) [string]
+Range of rows to use for statistics.
+The default "-" means that all rows are used.
+See the help for RANGES in XTOOLS for a description of the syntax.
+.le
+.ls (n_tab = table) [string]
+Column name for name of input table.
+This and other parameters that begin with "n_" are only used if the output values are
+written to a table.
+.le
+.ls (n_nam = column) [string]
+Column name for name of input column.
+This and other parameters that begin with "n_" are only used if the output values are
+written to a table.
+.le
+.ls (n_nrows = nrows) [string]
+Column name for number of good rows.
+.le
+.ls (n_mean = mean) [string]
+Column name for mean.
+.le
+.ls (n_stddev = stddev) [string]
+Column name for standard deviation.
+.le
+.ls (n_median = value) [string]
+Column name for median.
+.le
+.ls (n_min = min) [string]
+Column name for minimum.
+.le
+.ls (n_max = max) [string]
+Column name for maximum.
+.le
+.ls (nrows) [integer]
+The number of rows for which the column value was not INDEF and was
+within the range 'lowlim' to 'highlim'.
+This is a task output parameter.
+.le
+.ls (mean) [real]
+Mean value (of the last table in the input list 'intable').
+This is a task output parameter.
+.le
+.ls (stddev) [real]
+Standard deviation of the values (not of the mean).
+This is a task output parameter.
+.le
+.ls (median) [real]
+Median value.
+This is a task output parameter.
+.le
+.ls (vmin) [real]
+Minimum.
+This is a task output parameter.
+.le
+.ls (vmax) [real]
+Maximum.
+This is a task output parameter.
+.le
+.ih
+EXAMPLES
+1.  Get statistics on column "flux" in all tables, putting the output
+(assuming outtable="STDOUT") in the ASCII file 'flux.lis':
+.nf
+
+    tt> tstat *.tab flux > flux.lis
+.fi
+
+2.  In order to get statistics on the data
+in a row rather than a column,
+you can use 'tdump' for one row
+and specify pwidth to be so small that
+each value will be printed on a separate line.
+The output of 'tdump' will then be a one-column table
+containing the row from the input table,
+and 'tstat' can be run on that one-column table.
+Since the input is redirected, we don't specify the table name.
+Note also that in this case the input contains only one column,
+so we don't specify the column name either.
+In this example, we get statistics on row 17 of "bs.fits":
+.nf
+
+    tt> tdump bs.fits cdfile="" pfile="" \
+    >>> row=17 pwidth=15 | tstat
+.fi
+
+3.  When the input is redirected and has multiple columns,
+the command-line argument should be the column name to use,
+not the table name.
+The table name in this case will internally be set to "STDIN".
+.nf
+
+    tt> dir l+ | tstat c3
+.fi
+
+4.  The statistics on column "flux" in 'hr465.tab' are put in parameters
+'tstat.nrows', 'tstat.mean', etc.,
+and are not written to STDOUT or to a table.
+We only include rows for which column V is no larger than 12.
+.nf
+
+    tt> tstat "hr465.tab[r:v=:12][c:flux]" outtable=""
+.fi
+
+5.  The output statistics are written to a table.  The default column name
+for the mean value is overridden:
+.nf
+
+    tt> tstat hr465.tab flux outtable=hr465s.tab n_mean="mean_flux"
+.fi
+
+6.  Get statistics on column "flux" in table 'hr465.tab', but only for
+rows 17 through 116, row 271, and row 952:
+.nf
+
+    tt> tstat hr465.tab[c:flux] outtable="STDOUT" row="17-116,271,952"
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+thistogram, ranges
+
+Type "help tables opt=sys" for a higher-level description of the 'tables' 
+package.
+.endhelp

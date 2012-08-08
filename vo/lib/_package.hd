@@ -1,0 +1,7 @@
+# Help definitions for the VO package.
+
+vo		men = vo.men,
+		hlp = ..,
+		sys = vopkg.hlp,
+		pkg = vo.hd,
+		src = vo.cl

@@ -1,0 +1,59 @@
+.help slist1d Jan92 noao.imred.irs/iids
+.ih
+NAME
+slist1d -- List spectral header information
+.ih
+USAGE
+slist1d input records
+.ih
+PARAMETERS
+.ls input
+The image root name for the spectra to be listed.
+.le
+.ls records
+The record string for the spectra to be listed. The records will be appended
+to the root name to form image names of the type "root.xxxx".
+.le
+.ls long_header = no
+If set to yes, then a complete listing of the header elements
+is given. If set to no, then a single line per spectrum is given which lists
+in the following order: the image name, object or sky spectrum, exposure
+time, spectrum length, and image title.
+.le
+.ih
+DESCRIPTION
+Each spectrum in the list implied by the root name and the record string
+is opened and the header is read. The pixel file is not accessed in order
+to save time. The header listing is directed to STDOUT and may be
+redirected for printing.
+
+A warning message is issued if
+a requested image is not found, but otherwise proceeds.
+.ih
+EXAMPLES
+The following example lists 8 spectral headers in long form on the printer:
+
+.nf
+	cl> slist1d nite1 1001-1008 | lprint
+.fi
+
+The next example lists the same spectral headers but in short form
+on the terminal
+
+.nf
+	cl> slist1d nite1 1001-1008 long-
+.fi
+.ih
+REVISIONS
+.ls SLIST1D V2.10
+This task is the same as V2.9 \fBslist\fR and applies only to the older
+IRS/IIDS record extension spectra.  In V2.10 \fBslist\fR
+has been revised for multiaperture spectra.
+.le
+.ih
+BUGS
+SLIST1D does not inform the user if the pixel file can or cannot be read.
+.ih
+SEE ALSO
+slist, imheader
+.endhelp

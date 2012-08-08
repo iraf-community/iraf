@@ -1,0 +1,85 @@
+# ICFIT package.
+
+$checkout libxtools.a lib$
+$update	  libxtools.a
+$checkin  libxtools.a lib$
+$exit
+
+generic:
+	$set	GEN = "$$generic -k -t rd"
+	$ifolder (iccleanr.x, icclean.gx)	$(GEN) icclean.gx $endif
+	$ifolder (icdeviantr.x, icdeviant.gx)	$(GEN) icdeviant.gx $endif
+	$ifolder (icerrorsr.x, icerrors.gx)	$(GEN) icerrors.gx $endif
+	$ifolder (icferrorsr.x, icferrors.gx)	$(GEN) icferrors.gx $endif
+	$ifolder (icfitr.x, icfit.gx)		$(GEN) icfit.gx $endif
+	$ifolder (icgaddr.x, icgadd.gx)		$(GEN) icgadd.gx $endif
+	$ifolder (icgcolonr.x, icgcolon.gx)	$(GEN) icgcolon.gx $endif
+	$ifolder (icgdeleter.x, icgdelete.gx)	$(GEN) icgdelete.gx $endif
+	$ifolder (icgfitr.x, icgfit.gx)		$(GEN) icgfit.gx $endif
+	$ifolder (icgaxesr.x, icgaxes.gx)	$(GEN) icgaxes.gx $endif
+	$ifolder (icggraphr.x, icggraph.gx)	$(GEN) icggraph.gx $endif
+	$ifolder (icgnearestr.x, icgnearest.gx)	$(GEN) icgnearest.gx $endif
+	$ifolder (icgparamsr.x, icgparams.gx)	$(GEN) icgparams.gx $endif
+	$ifolder (icgsampler.x, icgsample.gx)	$(GEN) icgsample.gx $endif
+	$ifolder (icgundeleter.x, icgundelete.gx) $(GEN) icgundelete.gx $endif
+	$ifolder (icguaxesr.x, icguaxes.gx)	$(GEN) icguaxes.gx $endif
+	$ifolder (icguishowr.x, icguishow.gx)	$(GEN) icguishow.gx $endif
+	$ifolder (icrejectr.x, icreject.gx)	$(GEN) icreject.gx $endif
+	$ifolder (icdosetupr.x, icdosetup.gx)	$(GEN) icdosetup.gx $endif
+	$ifolder (icvshowr.x, icvshow.gx)	$(GEN) icvshow.gx $endif
+	$ifolder (icfvshowr.x, icfvshow.gx)	$(GEN) icfvshow.gx $endif
+	;
+
+libxtools.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	iccleand.x	icfit.h names.h <pkg/rg.h>
+	iccleanr.x	icfit.h names.h <pkg/rg.h>
+	icdeviantd.x	names.h <mach.h> <math/curfit.h>
+	icdeviantr.x	names.h <mach.h> <math/curfit.h>
+	icdosetupd.x	icfit.h names.h <math/curfit.h>
+	icdosetupr.x	icfit.h names.h <math/curfit.h>
+	icerrorsd.x	names.h
+	icerrorsr.x	names.h
+	icferrorsd.x	icfit.h names.h <math/curfit.h>
+	icferrorsr.x	icfit.h names.h <math/curfit.h>
+	icfitd.x	icfit.h names.h <error.h> <math/curfit.h>
+	icfitr.x	icfit.h names.h <error.h> <math/curfit.h>
+	icfshow.x	icfit.h <pkg/gtools.h>
+	icfvshowd.x	icfit.h names.h <math/curfit.h>
+	icfvshowr.x	icfit.h names.h <math/curfit.h>
+	icgaddd.x	<gset.h>
+	icgaddr.x	<gset.h>
+	icgaxesd.x	icfit.h names.h <pkg/gtools.h>
+	icgaxesr.x	icfit.h names.h <pkg/gtools.h>
+	icgcolond.x	icfit.h names.h <error.h> <pkg/gtools.h>
+	icgcolonr.x	icfit.h names.h <error.h> <pkg/gtools.h>
+	icgdeleted.x	icfit.h <gset.h> <mach.h> <pkg/gtools.h>
+	icgdeleter.x	icfit.h <gset.h> <mach.h> <pkg/gtools.h>
+	icgfitd.x	icfit.h names.h <error.h> <pkg/gtools.h>
+	icgfitr.x	icfit.h names.h <error.h> <pkg/gtools.h>
+	icggraphd.x	icfit.h names.h <gset.h> <pkg/gtools.h>
+	icggraphr.x	icfit.h names.h <gset.h> <pkg/gtools.h>
+	icgnearestd.x	icfit.h <mach.h> <pkg/gtools.h>
+	icgnearestr.x	icfit.h <mach.h> <pkg/gtools.h>
+	icgparamsd.x	icfit.h names.h <pkg/gtools.h>
+	icgparamsr.x	icfit.h names.h <pkg/gtools.h>
+	icgsampled.x	icfit.h <gset.h> <mach.h> <pkg/gtools.h> <pkg/rg.h>
+	icgsampler.x	icfit.h <gset.h> <mach.h> <pkg/gtools.h> <pkg/rg.h>
+	icguaxesd.x	
+	icguaxesr.x	
+	icgui.x		icfit.h <gio.h> <gset.h>
+	icguishowd.x	icfit.h names.h <error.h> <gio.h> <gset.h>
+	icguishowr.x	icfit.h names.h <error.h> <gio.h> <gset.h>
+	icgundeleted.x	icfit.h <gset.h> <mach.h> <pkg/gtools.h>
+	icgundeleter.x	icfit.h <gset.h> <mach.h> <pkg/gtools.h>
+	icguser.x	
+	iclistd.x	icfit.h names.h
+	iclistr.x	icfit.h names.h
+	icparams.x	icfit.h
+	icrejectd.x	names.h <math/curfit.h>
+	icrejectr.x	names.h <math/curfit.h>
+	icshow.x	icfit.h
+	icvshowd.x	icfit.h
+	icvshowr.x	icfit.h
+	;

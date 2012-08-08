@@ -1,0 +1,38 @@
+objects,s,h,,,,"Object spectra"
+datamax,r,h,,,,"Max data value / cosmic ray threshold"
+response,f,h,"",,,"Response spectrum"
+arcs1,s,h,,,,"List of arc spectra"
+arcs2,s,h,,,,"List of shift arc spectra"
+arcref1,f,h,"",,,"Arc reference for dispersion solution"
+arcref2,f,h,"",,,"Arc reference for dispersion solution"
+arcreplace,f,h,"",,,"Special aperture replacements"
+arcrefs,s,h,,,,"Arc references"
+extn,s,h,,,,"Extraction extension"
+apidtable,f,h,"",,,"Aperture identifications"
+objaps,s,h,,,,"Object apertures"
+skyaps,s,h,,,,"Sky apertures"
+arcaps,s,h,,,,"Arc apertures"
+objbeams,s,h,,,,"Object beam numbers"
+skybeams,s,h,,,,"Sky beam numbers"
+arcbeams,s,h,,,,"Arc beam numbers
+"
+done,f,h,"",,,"File of spectra already done"
+logfile,f,h,"",,,"Logfile"
+redo,b,h,,,,"Redo operations?"
+update,b,h,,,,"Update spectra?"
+scattered,b,h,,,,"Subtracted scattered light?"
+arcap,b,h,,,,"Use object apertures for arcs?"
+dispcor,b,h,,,,"Dispersion correct spectra?"
+savearcs,b,h,,,,"Save internal arcs?"
+skyalign,b,h,,,,"Align sky lines?"
+skysubtract,b,h,,,,"Subtract sky?"
+saveskys,b,h,,,,"Save sky spectra?
+"
+newaps,b,h,,,,
+newresp,b,h,,,,
+newdisp,b,h,,,,
+newarcs,b,h,,,,
+fd1,*struct,h,"",,,
+fd2,*struct,h,"",,,
+fd3,*struct,h,"",,,
+mode,s,h,"ql",,,

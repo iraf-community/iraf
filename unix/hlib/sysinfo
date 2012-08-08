@@ -1,0 +1,2503 @@
+#!/bin/csh -f
+#
+#  SYSINFO --  Display IRAF system diagnostic and configuration information.
+#
+#  The intent of this program is to provide a means for IRAF site managers
+#  to troubleshoot their IRAF installations by running numerous verification
+#  tests on the iraf directory structure, networking setup, external package
+#  installations, tape configurations, etc.  Failed tests are not always
+#  fatal but may indicate a problem in the way something was installed or
+#  configured.
+#
+#  Usage:   sysinfo [ -G | -V | -N | -P | -D | -T | -h ]
+#	
+#	where:	-G		Print General Info only"
+#		-V		Do Verification tests only"
+#		-N		Do Networking tests only"
+#		-P		Do Extern Package tests only"
+#		-D		Do Display tests only"
+#		-T		Do Tape Device tests only"
+#		-h		Print this message"
+#
+# ----------------------------------------------------------------------------
+
+unset	noclobber
+unalias cd cp cmp echo ln mv rm sed set grep ls chmod chown pwd touch sort 
+unalias uniq head sed tr which
+set	path	= ($path /sbin /usr/sbin /bin /usr/bin /usr/ucb /etc /usr/etc /usr/openwin/bin /usr/X11R6/bin /usr/X11/bin)
+onintr	sysinfo_cleanup
+
+
+##############################################################################
+# START OF MACHDEP DEFINITIONS.
+##############################################################################
+
+# MACHDEP definitions which may be reset below.
+
+set hmach               = "INDEF"
+set pciraf              = 0
+set suniraf             = 0
+set do_tapecaps         = 0
+set hilite              = 0
+
+# Utility aliases.
+alias BOLD_ON   "(if ($hilite) tput bold)"
+alias BOLD_OFF  "(if ($hilite) tput sgr0)"
+alias SO_ON     "(if ($hilite) tput smso)"
+alias SO_OFF    "(if ($hilite) tput rms0)"
+
+alias DO_OK    "(echo -n '[ '; BOLD_ON; echo -n ' OK '; BOLD_OFF; echo ' ]')"
+alias DO_WARN  "(echo -n '[ '; BOLD_ON; echo -n 'WARN'; BOLD_OFF; echo ' ]')"
+alias DO_FAIL  "(echo -n '[ ';   SO_ON; echo -n 'FAIL';   SO_OFF; echo ' ]')"
+
+alias MSG      "(echo -n '   ';BOLD_ON;echo -n '***  ';BOLD_OFF; echo \!*)"
+alias MSGN     "(echo -n '   ';BOLD_ON;echo -n '***  ';BOLD_OFF; echo -n \!*)"
+alias MSGB     "(echo -n '   ';BOLD_ON;echo -n '***  ';echo \!*; BOLD_OFF)"
+alias MSGBN    "(echo -n '   ';BOLD_ON;echo -n '***  ';echo -n \!*;BOLD_OFF)"
+alias ERRMSG   "(echo -n '   ';BOLD_ON;echo -n 'ERROR: ';BOLD_OFF; echo \!*)"
+alias WARNING  "(echo -n '   ';BOLD_ON;echo -n 'WARNING: ';BOLD_OFF; echo \!*)"
+alias NEWLINE  "(echo '')"
+
+alias RM 	"rm -rf"
+
+
+
+
+# Determine platform architecture.
+set UNAME=""
+if (-e /usr/bin/uname) then
+    set uname_cmd = /usr/bin/uname
+    set UNAME=`/usr/bin/uname | tr '[A-Z]' '[a-z]'`
+else if (-e /bin/uname) then
+    set uname_cmd = /bin/uname
+    set UNAME=`/bin/uname | tr '[A-Z]' '[a-z]'`
+else
+    WARNING "No 'uname' command found to determine architecture."
+    exit 1
+endif
+
+set pciraf = 0
+set hmach  = "INDEF"
+switch ($UNAME) 
+    case sunos:
+        if (`$uname_cmd -m | cut -c2-` != "86pc") then
+            setenv OSVERSION `uname -r | cut -c1`
+            if ($OSVERSION == 5) then			# Sparc Solaris
+                set mach  	= "ssun"
+                set hmach 	= "ssol"
+		set TAPES	= "/dev/rmt/[0-9]*"
+		set shlib	= "no"
+		set LIBFILES    = ""
+		set LS		= "/usr/ucb/ls -s"
+		set LSDF	= "-lLtg"
+            else			   		# Sparc SunOS 4.x
+                set mach  	= "sparc"
+                set hmach 	= "sparc"
+		set TAPES	= "/dev/*st[0-7]*"
+		set shlib	= "no"
+		set LIBFILES    = ""
+		set LS		= "/bin/ls -s"
+		set LSDF	= "-lLtg"
+            endif
+        else
+            set mach 		= "sunos"	    	# Intel Solaris
+            set hmach 		= "sunos"
+	    set TAPES		= "/dev/*st[0-7]*"
+	    set shlib		= "no"
+	    set LIBFILES    	= ""
+	    set LS		= "/bin/ls -s"
+	    set LSDF		= "-lLt"
+	    set pciraf 		= 1
+        endif
+        breaksw
+    case linux:
+        if (`$uname_cmd -m` == "x86_64") then		# Linux64
+            set mach 		= "linux64"
+            set hmach 		= "linux64"
+	    set TAPES		= "/dev/*st[0-7]"
+	    set shlib		= "no"
+	    set LIBFILES    	= ""
+	    set LS		= "/bin/ls -s"
+	    set LSDF		= "-lLt"
+
+        else if (`$uname_cmd -m` == "ppc") then		# LinuxPPC
+            set mach 		= "linuxppc"
+            set hmach 		= "linuxppc"
+	    set TAPES		= "/dev/*st[0-7]"
+	    set shlib		= "no"
+	    set LIBFILES    	= ""
+	    set LS		= "/bin/ls -s"
+	    set LSDF		= "-lLt"
+        else
+            if (-f /etc/redhat-release) then		# RedHat Linux
+                set mach 	= "redhat"
+                set hmach 	= "redhat"
+		set TAPES	= "/dev/*st[0-7]"
+		set shlib	= "no"
+		set LIBFILES    = ""
+		set LS		= "/bin/ls -s"
+		set LSDF	= "-lLtg"
+            else					# Other Linux
+                set mach 	= "linux"
+                set hmach 	= "linux"
+		set TAPES	= "/dev/*st[0-7]"
+		set shlib	= "no"
+		set LIBFILES    = ""
+		set LS		= "/bin/ls -s"
+		set LSDF	= "-lLtg"
+            endif
+        endif
+	set pciraf 		= 1
+        breaksw
+    case darwin: 					# Mac OS X
+    case macosx:
+    case macintel:
+        if (`$uname_cmd -m` == "x86_64") then		# 64-bit
+            set mach 		= "macintel"
+            set hmach 		= "macintel"
+	else
+            set mach 		= "macosx"		# 32-bit
+            set hmach 		= "macosx"
+	endif
+	set TAPES		= "/dev/*sa[0-7]"
+	set shlib		= "no"
+	set LIBFILES    	= ""
+	set LS			= "/bin/ls -s"
+	set LSDF		= "-lLtg"
+	set pciraf 		= 1
+        breaksw
+    case freebsd: 					# FreeBSD
+        set mach 		= "freebsd"
+        set hmach 		= "freebsd"
+	set TAPES		= "/dev/*sa[0-7]"
+	set shlib		= "no"
+	set LIBFILES    	= ""
+	set LS			= "/bin/ls -s"
+	set LSDF		= "-lLtg"
+	set pciraf 		= 1
+        breaksw
+    case hp-ux:						# HP/UX 10.20
+        set mach 		= "hp700"
+        set hmach 		= "hp700"
+	set TAPES		= "/dev/rmt/[0-7]*"
+	set shlib		= "no"
+	set LIBFILES    	= ""
+	set LS			= "/bin/ls -s"
+	set LSDF		= "-lLt"
+        breaksw
+    case irix:    					# SGI IRIX 6.5
+    case irix64:  
+        set mach 		= "irix"
+        set hmach 		= "irix"
+	set TAPES		= "/dev/tps[0-7]*"
+	set shlib		= "no"
+	set LIBFILES    	= ""
+	set LS			= "/bin/ls -s"
+	set LSDF		= "-lLt"
+        breaksw
+    case aix:     					# IBM AIX V4
+        set mach 		= "rs6000"
+        set hmach 		= "rs6000"
+	set TAPES		= "/dev/rmt[0-7]*"
+	set shlib		= "no"
+	set LIBFILES    	= ""
+	set LS			= "/bin/ls -s"
+	set LSDF		= "-lLtg"
+        breaksw
+    case osf1:    					# Alpha Tru64
+        set mach 		= "alpha"
+        set hmach 		= "alpha"
+	set TAPES		= "/dev/nrmt[0-7]* /dev/rmt[0-7]*"
+	set shlib		= "yes"
+	set LIBFILES    	= "libiraf.so"
+	set LS			= "/bin/ls -s"
+	set LSDF		= "-lLtg"
+        breaksw
+    case ultrix:    					# DEC Ultrix
+        set mach 		= "ultrix"
+        set hmach 		= "ultrix"
+	set TAPES		= "/dev/[n]rmt[0-7]*"
+	set shlib		= "no"
+	set LIBFILES    	= ""
+	set LS			= "/bin/ls -s"
+	set LSDF		= "-lLtg"
+        breaksw
+
+    default:      
+        # We don't want to be limited by the CYGWIN version numbering so
+        # look for a truncated match here before punting.
+        set os_mach = `echo $UNAME | cut -c1-6`
+        if ("$os_mach" == "cygwin") then
+            set mach            = "cygwin"
+            set hmach           = "cygwin"
+            set shlib           = "no"
+            set LIBFILES        = ""
+            set TAPES           = ""            # no tape support
+            set do_tapecaps     = 0
+            set do_tapes        = 0
+            set do_pipes        = 0
+            breaksw
+
+        else
+	    ERRMSG  "Unable to determine platform architecture.  Please"
+	    ERRMSG  "contact the forums at http://forums.iraf.net"
+	    NEWLINE
+	    exit 1
+        else
+endsw
+
+###################### END OF MACHDEP DEFINITIONS. ########################
+
+
+#=============================================================================
+# Initializations.
+#=============================================================================
+set errstat	= 0				# initialize status counters
+set ok_count 	= 0
+set err_count 	= 0
+set warn_count 	= 0
+set defstat 	= " OK "
+
+
+#=============================================================================
+# Process any command line arguments.
+#=============================================================================
+
+set early_exit	= 0
+set general 	= 0
+set severe 	= 0
+
+while ("$1" != "")
+    switch ("$1")
+    case -G:				# Output General Info only
+	set general     = 1
+	set early_exit	= 1
+	goto General
+	breaksw
+    case -V:				# Verification Test Only
+	set early_exit	= 1
+	breaksw
+    case -N:				# Test Networking Only
+	set early_exit	= 1
+	goto Networking
+	breaksw
+    case -P:				# Test Packages Only
+	set early_exit	= 1
+	goto External_Packages
+	breaksw
+    case -D:				# Test Display Only
+	set early_exit	= 1
+	goto Image_Display
+	breaksw
+    case -T:				# Test Tapes Only
+	set early_exit	= 1
+	goto Tape_Device
+	breaksw
+
+    case -hl:                           # disable highlighting
+	NEWLINE
+        echo "WARNING: Highlighting is not permitted by this script, ignoring."
+	NEWLINE
+        breaksw
+    case +hl:                           # enable highlighting
+	NEWLINE
+        echo "WARNING: Highlighting is not permitted by this script, ignoring."
+	NEWLINE
+        breaksw
+
+    case -help:
+    case -h:
+	goto Usage
+    default:
+	ERRMSG  "SYSINFO: unknown argument $1"
+	goto Usage
+    endsw
+
+    if ("$2" == "") then
+	break
+    else
+	shift
+    endif
+end
+
+
+
+#=============================================================================
+#  General Information
+#=============================================================================
+
+General:
+
+NEWLINE
+BOLD_ON
+echo "			General Information"
+echo "			==================="
+BOLD_OFF
+NEWLINE
+
+#  Document the system information.
+echo "Host name:	    "`hostname`
+echo "Operating System:   "`uname -a`
+echo "Architecture:	    "$mach
+echo "HSI architecture:   "$hmach
+
+if ($pciraf && -e /etc/issue) then
+    set issue = `cat /etc/issue`
+    NEWLINE
+    echo "PC Issue:	" $issue
+endif
+
+NEWLINE
+
+# Check the iraf root directory stuff
+echo -n "IRAF environment path:	    "
+if ($?iraf == 1) then
+    set env_iraf = $iraf
+    echo "$iraf"
+else
+    set env_iraf = ""
+    echo "<undefined>"
+endif
+
+echo -n "Checking for <iraf.h> 	"
+if (-e /usr/include/iraf.h) then
+    NEWLINE
+    echo -n "	IRAF path:	    "
+    set ip = `grep "^#define	IRAF" /usr/include/iraf.h | sed -e 's/\"//g'`
+    if ("$ip" != "") then
+        echo $ip[3]
+        set irafh_iraf = $ip[3]
+    else
+	echo "not found"
+    endif
+
+    echo -n "	HOST path:	    "
+    set ip = `grep "^#define	HOST" /usr/include/iraf.h | sed -e 's/\"//g'`
+    if ("$ip" != "") then
+        echo $ip[3]
+    else
+	echo "not found"
+    endif
+
+    echo -n "	TMP path:	    "
+    set ip = `grep "^#define	TMP" /usr/include/iraf.h | sed -e 's/\"//g'`
+    if ("$ip" != "") then
+        echo $ip[3]
+    else
+	echo "not found"
+    endif
+else
+    echo "    not found"
+    NEWLINE
+    echo "	*** The file /usr/include/iraf.h was not found on this system"
+    echo "	*** which means the install script was not run on this machine."
+    if ("$env_iraf" != "") then
+        echo "	*** Using environment definition: $env_iraf"
+    endif
+    NEWLINE
+    set irafh_iraf = ""
+endif
+
+if ("$env_iraf" != "" && "$irafh_iraf" != "") then
+  if ("$env_iraf" != "$irafh_iraf") then
+    NEWLINE
+    echo "WARNING: iraf environment and <iraf.h> root directories differ."
+
+    # First make sure we have a valid path.
+    if ( !(-e $env_iraf/unix/hlib/zzsetenv.def)) then
+	MSG  "Environment definition looks incorrect."
+        MSG  "Using <iraf.h> definition '$irafh_iraf'"
+
+	# Strip off any trailing '/'.
+    	set iraf  = `echo $irafh_iraf  | sed -e 's+/\(["]*\)$+\1+'`
+
+    else if ( !(-e $irafh_iraf/unix/hlib/zzsetenv.def)) then
+	MSG  "<iraf.h> definition looks incorrect."
+        MSG  "Using environment definition '$env_iraf'"
+
+	# Strip off any trailing '/'.
+    	set iraf  = `echo $env_iraf  | sed -e 's+/\(["]*\)$+\1+'`
+    endif
+
+    NEWLINE
+
+  else
+     if ("$env_iraf" != "") then
+       set iraf  = `echo $env_iraf  | sed -e 's+/\(["]*\)$+\1+'`
+     else
+       set iraf  = `echo $irafh_iraf  | sed -e 's+/\(["]*\)$+\1+'`
+     endif
+  endif
+
+else if ("$env_iraf" == "" && "$irafh_iraf" == "") then
+  NEWLINE
+      MSG  "No 'iraf' defined in the environment and there is no <iraf.h>"
+      MSG  "file on this machine.  Please specify an iraf path in the"
+      MSG  "environment or run the install script to proceed."
+  NEWLINE
+  exit 1
+
+else if ("$env_iraf" == "") then
+    # Strip off any trailing '/'.
+    set iraf  = `echo $irafh_iraf  | sed -e 's+/\(["]*\)$+\1+'`
+
+else if ("$irafh_iraf" == "") then
+    # Strip off any trailing '/'.
+    set iraf  = `echo $env_iraf  | sed -e 's+/\(["]*\)$+\1+'`
+endif
+
+
+NEWLINE
+echo "Using iraf root path:       $iraf"
+NEWLINE
+
+# Initialize for files we'll be checking later.
+set tapecap_file  = "$iraf/dev/tapecap"
+set termcap_file  = "$iraf/dev/termcap"
+set graphcap_file = "$iraf/dev/graphcap"
+
+
+
+# Get the motd header string.
+echo -n 'IRAF version:	    	    '
+if (-e $iraf/unix/hlib/motd) then
+    set motd = "$iraf/unix/hlib/motd"
+    set ver = `head -1 $motd | sed -e 's/NOAO//g' -e 's/EXPORT//g'`
+    echo $ver
+else 
+    echo "<unknown>"
+endif
+NEWLINE
+
+
+# Get the last time the hlib$utime (install) was updated.
+echo -n "Install script last run:    "
+if (-e $iraf/unix/hlib/utime) then
+    set dat = `$LS $LSDF $iraf/unix/hlib/utime | head -2 | tail -1`
+    set utime = `echo -n $dat | awk '{printf ("%3s %2s %-5s\t", $7, $8, $9)}'`
+    echo $utime
+else 
+    echo "<unknown>"
+endif
+
+# Look around for the local iraf commands directory.
+echo -n "IRAF command directories:   "
+set clpath = `which cl`
+set lbins = ""
+if ("`echo $clpath | grep 'Command not found'`" == "") then
+    set d_lbin = $clpath:h
+
+    foreach p ($path)
+        if (-d $p && -e $p/cl) then
+            set lbin = $p
+            set lbins = `echo $lbins $p`
+	    if ("$lbins" == "$lbin") then
+    		echo $p
+	    else
+    		echo "			    $p"
+	    endif
+	endif
+    end
+
+    if ("$lbin" == "") then
+        echo "not found"
+    endif
+else
+    echo "not found"
+endif
+
+
+# If we use a shared library see if it's in the path someplace.
+if ("$shlib" == "yes") then
+    echo -n "IRAF shared lib directory:  "
+    set llib = ""
+    set llibs = ""
+
+    # Look around and come up with a likely candidate directory.
+    set sysp  = "/usr/local/lib /local/lib /usr/lib /var/shlib /lib"
+    if ($?LD_LIBRARY_PATH) then
+        set userp = `echo $LD_LIBRARY_PATH | sed -e 's/:/ /g'`
+    else
+        set userp = ""
+    endif
+    foreach p ($sysp $userp)
+        if (-d $p) then
+	    foreach l ($LIBFILES) 
+        	if (-e $p/$l) then
+        	    set llib = $p
+                    set llibs = `echo $llibs $p`
+
+		    if ("$llibs" == "$llib") then
+    		        echo $p
+		    else
+    		        echo "			    $p"
+		    endif
+		endif
+	    end
+	endif
+    end
+
+    if ("$llib" == "") then
+        echo "not found"
+    endif
+endif
+
+
+# Get the default imdir from the mkiraf.csh
+echo -n "Default image storage dir:  "
+set hlib = $iraf/unix/hlib/
+if (-e $hlib/mkiraf.csh) then
+    set p = `grep "^set	imdir" $hlib/mkiraf.csh | sed -e 's/\"//g'`
+    if ("$p" != "") then
+        echo $p[4]
+        set imdir = $p[4]
+    else
+	echo "not found"
+    endif
+else 
+    echo "<unknown>"
+endif
+
+
+# Print some interesting default system settings from hlib$zzsetenv.def.
+set WS	= '[ 	]'
+set ZZDEFS = "printer stdplot editor imtype stdimage cmbuflen min_lenuserarea graphcap termcap tapecap"
+
+NEWLINE
+echo 'Default settings in the hlib$zzsetenv.def file:'
+
+if (-e $hlib/zzsetenv.def) then
+    foreach i ($ZZDEFS)
+        set p = `grep "^set$WS$i" $hlib/zzsetenv.def | sed -e 's/\"//g'`
+        if ("$p" != "") then
+	    set $i = '$p[4]'
+            echo ${i}: $p[4] | awk '{ printf ("    %-12s\t    %s\n", $1, $2)}'
+
+	    # Save the *cap file for later use.
+	    if ("$i" == "termcap" && "$p[4]" != 'dev$termcap') then
+		set termcap_file = $p[4]
+	    else if ("$i" == "graphcap" && "$p[4]" != 'dev$graphcap') then
+		set graphcap_file = $p[4]
+	    else if ("$i" == "tapecap" && "$p[4]" != 'dev$tapecap') then
+		set tapecap_file = $p[4]
+	    endif
+        else
+            echo ${i}: | awk '{ printf ("    %-12s\tnot found\n", $1, $2)}'
+        endif
+    end
+else
+    MSG  'hlib$zzsetenv.def file not found'
+    set severe = 1
+endif
+NEWLINE
+
+
+if ($pciraf) then
+    NEWLINE
+    echo "X Server Version information:"
+    echo "    "`X -version |& egrep "^XFree86"`
+    echo "    "`X -version |& egrep "^Release"`
+    echo "    "`X -version |& egrep "Operating"`
+endif
+
+
+NEWLINE
+echo "Compilers and Development Tools Available:"
+echo "    (NOTE: duplicates are possible due to the search path"
+echo "           used and symbolic links for commands.)"
+NEWLINE
+set found = 0
+foreach d ($path)
+    foreach i (cc gcc acc c89 f77 g77 f90 fort f2c yacc bison lex flex)
+        if (-e $d/$i) then
+            echo "	"$d/$i
+	    set found = 1
+        endif
+    end
+end
+if ($found == 0) then
+  echo "        None Found"
+  NEWLINE
+endif
+
+
+if ($severe == 1) then
+  NEWLINE
+  NEWLINE
+  BOLD_ON
+  echo "======================================================================"
+  echo "SYSINFO:  Aborting due to severe errors."
+  echo "======================================================================"
+  BOLD_OFF
+  NEWLINE
+  exit 1
+
+else if ($general == 1) then
+    goto exit_early
+endif
+
+
+
+
+
+#=============================================================================
+#  Installation Verification
+#=============================================================================
+
+Verification:
+
+echo; NEWLINE
+echo "======================= Verifying Installation ======================="
+NEWLINE
+
+##############################################################################
+#
+#  Step 1: VERIFICATION
+#
+#  	Run some simple checks to be sure the system was unpacked correctly 
+#  and the settings used are correct.  Verification tests include:
+#
+#       o  Verify the machine type and document settings.
+#       o  Check iraf root directory looks correct.
+#       o  Check iraf root and imdir aren't the same
+#       o  Check iraf user exists in passwd file.
+#       o  Check iraf user login path in passwd file is iraf$local.
+#       o  Check iraf tree for proper structure.
+#       o  Check iraf tree is owned by 'iraf'
+#       o  Check binary dirs are both populated correctly.
+#       o  Check that the local bin directory exists.
+#       o  Check that the local lib directory exists.
+#
+#  An error at this stage will cause the script to exit so we can reset and
+#  try again.  
+#
+##############################################################################
+
+
+# ============================================
+# The following is partially system dependent.
+# ============================================
+
+# Set the BINDIRS pathnames - directories where the HSI executables go.
+set host        = "$iraf/unix"
+set hbin        = "$iraf/unix/bin.$hmach"
+set hlib        = "$iraf/unix/hlib"
+set fbin        = "$iraf/bin"
+
+# Replace any // by /.
+set host        = `echo $host | sed -e "s+//+/+g"`
+set hbin        = `echo $hbin | sed -e "s+//+/+g"`
+set fbin        = `echo $fbin | sed -e "s+//+/+g"`
+set hlib        = `echo $hlib | sed -e "s+//+/+g"`
+
+# Strip any trailing /.
+set host        = `echo $host | sed -e 's+/\(["]*\)$+\1+'`
+set hbin        = `echo $hbin | sed -e 's+/\(["]*\)$+\1+'`
+set fbin        = `echo $fbin | sed -e 's+/\(["]*\)$+\1+'`
+set hlib        = `echo $hlib | sed -e 's+/\(["]*\)$+\1+'`
+set BINDIRS     = "$hbin $hlib $fbin $host"
+
+# The following file lists are partially system dependent.
+set PATHFILES   = "mkiraf.csh libc/iraf.h cl.csh ../../local/.login"
+set MODEFILES   = "cl.csh fc.csh mkiraf.csh mkfloat.csh mkmlist.csh $host/reboot generic.e mkpkg.e rmbin.e rmfiles.e rpp.e rtar.e wtar.e xc.e xpp.e xyacc.e sgidispatch.e $hbin/sgi2*.e"
+set LINKFILES   = "cl.e mkiraf.csh mkmlist.csh generic.e mkpkg.e rmbin.e rmfiles.e rtar.e sgidispatch.e wtar.e rpp.e xpp.e xyacc.e xc.e"
+set CMDLINKS    = "cl mkiraf mkmlist generic mkpkg rmbin rmfiles rtar sgidispatch wtar rpp xpp xyacc xc"
+# ------------------------------------------
+
+
+# Check for <iraf.h> file.
+echo -n "Checking for <iraf.h> file ...					"
+if (! (-e /usr/include/iraf.h)) then
+  DO_FAIL ; set errstat = 1 ; set iraf_root_ok = 0
+  NEWLINE
+      MSG  "The file /usr/include/iraf.h was not found which means"
+      MSG  "the install script was not run on this machine."
+  NEWLINE
+  set err_count = `expr $err_count + 1`
+else
+  DO_OK ; set iraf_root_ok = 1
+  set ok_count = `expr $ok_count + 1`
+endif
+
+
+# Check $iraf path in PATHFILES
+echo -n "Checking iraf path in system files ...				"
+
+set err_seen = 0
+foreach i ($PATHFILES)
+    if (-e $iraf/unix/hlib/$i) then
+        grep $iraf $iraf/unix/hlib/$i >& /dev/null
+    endif
+    if ($status == 1 || (! (-e $iraf/unix/hlib/$i))) then
+        if ("$err_seen" == 0) then
+            DO_FAIL
+            set err_seen = 1 ; set err_count = `expr $err_count + 1`
+        endif
+	if (! -e $i) then
+            MSG  "File $i not found."
+	else
+            MSG  "File $i contains the wrong iraf path"
+	endif
+    endif
+end
+if ("$err_seen" == 0) then
+    BOLD_ON
+    echo "[ $defstat ]"
+    BOLD_OFF
+endif
+
+
+
+# Check that the specified local bin directory exists.
+echo -n "Checking that local command bin directory exists ...		"
+if ("$lbin" == "") then
+  DO_FAIL ; set errstat = 1
+  NEWLINE
+      MSG  "No local bin directory found on this machine which"
+      MSG  "implies that either your path does not include the"
+      MSG  "local bin dir or else the install script was not run"
+      MSG  "on this machine."
+  NEWLINE
+  set err_count = `expr $err_count + 1`
+else
+  if (-d "$lbin") then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+  else
+    DO_FAIL ; set errstat = 1
+    NEWLINE
+        MSG  "The specified local bin directory does not exist.  This"
+        MSG  "directory should be a common local bin directory which "
+        MSG  "is found in all user's paths, e.g. /usr/local/bin."
+        MSG  "Please create the directory or else reset and try again."
+    NEWLINE
+    set err_count = `expr $err_count + 1`
+  endif
+endif
+
+
+# Check that the specified local lib directory exists.
+if ("$shlib" == "yes") then
+  echo -n "Checking that local lib directory exists ...			"
+  if (-d "$llib") then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+  else
+    DO_FAIL ; set errstat = 1
+    NEWLINE
+        MSG  "The specified local lib directory does not exist.  This"
+        MSG  "directory should be a common local lib directory which "
+        MSG  "is found in all user's paths, e.g. /usr/local/lib."
+        MSG  "This directory is required for the iraf shared library."
+        MSG  "Please create the directory or else reset and try again."
+    NEWLINE
+    set err_count = `expr $err_count + 1`
+  endif
+endif
+
+
+# Check mode on MODEFILES
+echo -n "Checking iraf file permissions ...				"
+set err_seen = 0
+foreach i ($MODEFILES)
+    set file = $i
+    if (! -e $file) then
+        foreach j ($BINDIRS)
+            if (-e $j/$i) then
+                set file = $j/$i
+                break
+            endif
+        end
+    endif
+        
+    if (-e $file) then
+        if ("`$LS -l $file | grep '.rwxr.xr.x'`" == "") then
+            if ("$err_seen" == 0) then
+                DO_WARN
+                set err_seen = 1 ; set err_count = `expr $err_count + 1`
+            endif
+            MSG  "File $file:t not mode 0755."
+        endif
+    else
+        if ("$err_seen" == 0) then
+            DO_FAIL
+            set err_seen = 1 ; set err_count = `expr $err_count + 1`
+        endif
+        MSG  "File $file:t not found."
+    endif
+end
+if ("$err_seen" == 0) then
+    BOLD_ON
+    echo "[ $defstat ]"
+    BOLD_OFF
+endif
+
+
+# Check valid links on CMDLINKS
+echo "Checking iraf command links ..."
+set err_seen = 0
+foreach p ($lbins)
+    echo -n "    Checking command dir $p ...			"
+
+    foreach cmd ($CMDLINKS)
+
+        # Locate the file to be linked to.
+        set file1 = $cmd:r
+        foreach j ($BINDIRS)
+            set file2 = $j/$file1.csh
+            if (-e $file2) then
+                break
+            endif
+            set file2 = $j/$cmd.e
+            if (-e $file2) then
+                break
+            endif
+        end
+
+	# See first if it exists directly, or as a link to some other
+	# valid file.
+	if (! (-e $p/$cmd) && ! (-e $file2) ) then
+            if ("$err_seen" == 0) then
+                DO_FAIL
+                set err_seen = 1 ; set err_count = `expr $err_count + 1`
+            endif
+            echo -n "	" ; MSG  "File $p/$cmd not found."
+
+	# Then check that the link is correct
+	else if ("`$LS -l $p/$file1 | grep $file2`" == "") then
+            if ("$err_seen" == 0) then
+                DO_FAIL
+                set err_seen = 1 ; set err_count = `expr $err_count + 1`
+            endif
+            echo -n "	" ; MSG  "Link $p/$cmd is invalid."
+	endif
+    end
+    if ("$err_seen" == 0) then
+        BOLD_ON
+        echo "[ $defstat ]"
+        BOLD_OFF
+    endif
+end
+if ($err_seen == 1) then
+  NEWLINE
+      MSG  "1) A 'not found' error means that one or more of the commands"
+      MSG  "   normally installed by the install script was not found."
+      MSG  "   This may indicate a non-standard installation."
+      MSG  "2) A 'link is invalid' message means that the command link"
+      MSG  "   was found but either points to a nonexistent file or to"
+      MSG  "   the wrong file for this platform (e.g. the HSI bin.sparc"
+      MSG  "   directory instead of bin.ssol)."
+      MSG  "3) Multiple local bin directories are not strictly an error"
+      MSG  "   but may confuse users.  Unneeded links should be removed."
+      MSG  ""
+      MSG  "The command links should be checked in either cases and the"
+      MSG  "install script rerun to clear the error."
+  NEWLINE
+endif
+
+
+# Check iraf root directory looks correct.
+NEWLINE
+echo -n "Checking contents of iraf root directory ...			"
+if (! ((-d $iraf/dev) && (-d $iraf/pkg) && (-d $iraf/noao))) then
+  DO_FAIL ; set errstat = 1 ; set iraf_root_ok = 0
+  NEWLINE
+      MSG  "The definition of '$iraf' looks incorrect.  The iraf root"
+      MSG  "directory is the place where the AS distribution was unpacked,"
+      MSG  "it contains subdirectories such as 'dev', 'local', 'noao', and"
+      MSG  "'pkg' and the binary directory links."
+  NEWLINE
+  set err_count = `expr $err_count + 1`
+else
+  DO_OK ; set iraf_root_ok = 1
+  set ok_count = `expr $ok_count + 1`
+endif
+
+
+# Cannot have iraf and imdir the same.
+echo -n "Checking iraf root and imdir directory ...			"
+if ($iraf == $imdir) then
+  DO_FAIL ; set errstat = 1
+  NEWLINE
+      MSG  "'imdir' should not be the same as the iraf root directory."
+  NEWLINE
+  set err_count = `expr $err_count + 1`
+else
+  DO_OK
+  set ok_count = `expr $ok_count + 1`
+endif
+
+# Check iraf user.
+echo -n "Checking for iraf user account ...    				"
+
+set pass = ""
+if ($pciraf && ($mach == "macosx" || $mach == "macintel")) then
+  # Special-case user info check for OS X and systems where the /etc/passwd
+  # file may not contain the user info.
+
+  if (`id iraf |& grep -i 'no such user'` != "") then
+    DO_FAIL ; set errstat = 1
+    NEWLINE
+        MSG  "No 'iraf' user was found on the system.  The iraf user should"
+        MSG  "be created before installing the system to ensure all files"
+        MSG  "are owned by the iraf user, and the have the proper environment"
+        MSG  "defined for installation and maintanence."
+    NEWLINE
+
+  else
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+
+    # Check iraf user login path and shell
+    echo -n "Checking iraf user login directory ...				"
+
+    set v = `finger iraf |& egrep "^Directory"`
+    set ihome = `echo $v[2] | sed -e 's+/\(["]*\)$+\1+'`
+    set shel  = `echo $v[4] | sed -e 's+/\(["]*\)$+\1+' | grep csh` 
+    if ("$ihome" != "$iraf/local" || $shel == "") then
+      DO_FAIL ; set errstat = 1
+      NEWLINE
+          MSG  "The iraf user login info appears to be incorrect.  For the"
+          MSG  "given iraf root this path should be '$iraf/local',"
+          MSG  "please run the 'chpass' command to change this.  The iraf"
+          MSG  "user account should also be defined to use a C-shell."
+      if ("$iraf_root_ok" == 0) then
+          MSG  "(This error may be related to the incorrect definition of"
+          MSG  "the iraf root directory seen above.)"
+      endif
+      NEWLINE
+    else
+      DO_OK
+      set ok_count = `expr $ok_count + 1`
+    endif
+
+  endif
+
+else if (!(-r /etc/passwd)) then
+  DO_FAIL ; set errstat = 1
+  NEWLINE
+      MSG  "The /etc/passwd file is not readable so I can't check for"
+      MSG  "and iraf user.  This may also cause problems with IRAF
+      MSG  "networking when connecting to this machine."
+  NEWLINE
+else
+  set pass = `grep ^iraf: /etc/passwd`
+  if ("$pass" == "") then
+    DO_FAIL ; set errstat = 1
+    NEWLINE
+        MSG  "No 'iraf' user was found in the /etc/passwd file.  The iraf"
+        MSG  "user should be created before installing the system to ensure"
+        MSG  "all files are owned by the iraf user, and the have the proper"
+        MSG  "environment defined for installation and maintanence."
+    NEWLINE
+  else
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+
+    # Check iraf user login path in passwd file is iraf$local.
+    echo -n "Checking iraf user login directory ...				"
+    set pass = `grep ^iraf: /etc/passwd | sed -e 's/[ \*]/_/g'|sed -e 's/:/ /g'`
+
+    set c = `echo $pass | wc -w`
+    set indx = `expr $c - 1`
+
+    set ihome = `echo $pass[$indx] | sed -e 's+/\(["]*\)$+\1+'`
+    set shel =  `echo $pass[$c] | sed -e 's+/\(["]*\)$+\1+' | grep csh`
+    if ("$ihome" != "$iraf/local" || $shel == "") then
+      DO_FAIL ; set errstat = 1
+      NEWLINE
+          MSG  "The iraf user login directory appears to be incorrect."
+          MSG  "For the given iraf root this path should be '$iraf/local',"
+          MSG  "please edit the /etc/passwd file to change this.  The iraf"
+          MSG  "user account should also be defined to use a C-shell."
+      if ("$iraf_root_ok" == 0) then
+          MSG  "(This error may be related to the incorrect definition of"
+          MSG  "the iraf root directory seen above.)"
+      endif
+      NEWLINE
+    else
+      DO_OK
+      set ok_count = `expr $ok_count + 1`
+    endif
+  endif
+endif
+
+
+# Check iraf tree for proper structure.
+set iraf_r  = $iraf			# iraf root directory
+set iraf_p  = $iraf_r:h			# iraf parent directory
+set iraf_b  = $iraf_p/irafbin		# irafbin directory
+set iraf_ib = $iraf_b/bin.$mach		# irafbin IB directory
+set iraf_nb = $iraf_b/noao.bin.$mach	# irafbin NB directory
+set iraf_tree_ok = 1
+
+echo "Checking for proper iraf tree structure in $iraf_p ..."
+
+echo -n "    Checking for 'iraf' subdir ...				"
+if (-d "$iraf_p/iraf") then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+else
+    DO_FAIL ; set errstat = 1 ; set iraf_tree_ok = 0
+    set err_count = `expr $err_count + 1`
+endif
+
+echo -n "    Checking for 'irafbin' subdir ...				"
+if (-d "$iraf_p/irafbin") then
+    DO_OK ; set ok_count = `expr $ok_count + 1`
+else
+    set zztemp = $iraf_tree_ok
+    echo "        " ; set errstat = 1 ; set iraf_tree_ok = 0
+
+    # Look for a fallback to recover ...
+    echo -n "        Checking for fallback tree structure ...		"
+    set iraf_p = $iraf/../
+    set iraf_b  = $iraf_p/irafbin		# irafbin directory
+    set iraf_ib = $iraf_b/bin.$mach		# irafbin IB directory
+    set iraf_nb = $iraf_b/noao.bin.$mach	# irafbin NB directory
+    if (-d "$iraf_p/irafbin") then
+        DO_OK ; set errstat = 0 ; set iraf_tree_ok = $zztemp
+        set ok_count = `expr $ok_count + 1`
+    else
+        DO_FAIL ; set errstat = 1 ; set iraf_tree_ok = 0
+        set err_count = `expr $err_count + 1`
+    endif
+endif
+
+echo -n "    Checking for 'irafbin/bin.$mach' subdir ...     		"
+if (-d "$iraf_p/irafbin/bin.$mach") then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+else
+    DO_FAIL ; set errstat = 1 ; set iraf_tree_ok = 0
+    set err_count = `expr $err_count + 1`
+endif
+
+echo -n "    Checking for 'irafbin/noao.bin.$mach' subdir ...		"
+if (-d "$iraf_p/irafbin/noao.bin.$mach") then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+else
+    DO_FAIL ; set errstat = 1 ; set iraf_tree_ok = 0
+    set err_count = `expr $err_count + 1`
+endif
+
+
+if ("$iraf_tree_ok" == 0) then
+  set back = $cwd ; chdir $iraf_p ; set iraf_p = $cwd; chdir $back
+  NEWLINE
+      MSG  "  An error was detected in the structure of the iraf tree."
+      MSG  "  Your directory tree should look something like:"
+      MSG  ""
+      MSG  "            	$iraf_p"
+      MSG  "            	  /  \"
+      MSG  "    	(AS) /iraf  /irafbin"
+      MSG  "                     /  \"
+      MSG  "    	(IB) bin.$mach  noao.bin.$mach (NB)"
+      MSG  ""
+      MSG  "  The AS, IB, and NB distribution files are shown where they"
+      MSG  "  should be unpacked."
+  NEWLINE
+endif
+
+
+echo -n "    Checking file ownerships ... 				"
+
+if ($mach == "hp700" || $mach == "rs6000" || $mach == "irix") then
+    set downr = `$LS -lLd $iraf_p/iraf | awk '{print ($5)}'`
+    set fownr = `$LS -lLd $iraf_p/iraf/mkpkg | awk '{print ($5)}'`
+else
+    set downr = `$LS -lLd $iraf_p/iraf | awk '{print ($4)}'`
+    set fownr = `$LS -lLd $iraf_p/iraf/mkpkg | awk '{print ($4)}'`
+endif
+
+if ("$downr" == "iraf" && "$fownr" == "iraf") then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+else if ("$downr" == "tody" && "$fownr" == "tody") then
+    # Special exemption for NOAO installations.
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+else
+    DO_FAIL
+    NEWLINE
+        MSG  "(root dir owned by $downr, iraf files owned by $fownr)"
+        MSG  "The iraf tree should be owned by the iraf user so it can"
+        MSG  "be updated and maintained properly."
+        MSG  ""
+        MSG  'To fix this, login as root, set the iraf environment, and'
+        MSG  'issue the commands:'
+        MSG  ""
+        MSG  "   cd " `echo $iraf_p`
+        MSG  '   chown -R iraf .         # change dir owner'
+        MSG  '   cd $hbin                # go to HSI bin dir'
+        MSG  '   chown 0 alloc.e         # fix alloc.e ownership'
+        MSG  '   chmod 4755 alloc.e      # fix permissions'
+    NEWLINE
+    set errstat = 1 ; set err_count = `expr $err_count + 1`
+endif
+
+
+# Check that binary dirs are populated correctly.
+set  archs = ""
+set back = $cwd ; chdir $iraf_p ; set iraf_p = $cwd; chdir $back
+
+NEWLINE ; NEWLINE
+echo "======================================================================"
+NEWLINE
+echo "Checking Core system binaries in $iraf_p/irafbin ..."
+
+# Do a special check that we have a bin directory for the current arch.
+echo -n "    Checking for current platform arch...			"
+if (! -e $iraf_ib) then
+    DO_FAIL ; set errstat = 1
+    NEWLINE
+        MSG  "The core system binary directory, $iraf_ib, does"
+        MSG  "not exist for this platform."
+    NEWLINE
+    set err_count = `expr $err_count + 1`
+else
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+endif
+
+NEWLINE
+echo "			 Size	Date"
+echo "			 ----	----"
+
+#  Check all of the bin directories in case we have a multi-arch system
+foreach i ($iraf_p/irafbin/bin.*)
+  set dir = $i:t
+  if ($dir:r == "bin") then
+    set sz = `(chdir $i ; du -s | awk '{printf ("%d", $1)}')`
+    echo -n $dir $sz | awk '{printf ("%18s\t%5d\t", $1, $2)}'
+
+    if (`$LS -lL $i | wc -l` > 1) then
+      set dat = `$LS $LSDF $i/* | head -2 | tail -1`
+      echo -n $dat | awk '{printf ("%3s %2s %-5s\t\t\t", $7, $8, $9)}'
+
+      if (! (-e "$i/cl.e" && -e "$i/x_system.e")) then
+        DO_FAIL ; set errstat = 1
+        NEWLINE
+            MSG  "The core system binary directory, $i:t, does"
+            MSG  "not appear to contain the proper binaries.  The IB dist-"
+            MSG  "ribution files should be unpacked in this directory."
+        NEWLINE
+        set err_count = `expr $err_count + 1`
+      else
+        DO_OK ; set ok_count = `expr $ok_count + 1`
+
+	# Save the list of installed binaries, allow for changes between
+	# the binary arch and HSI arch here (e.g. ssun->ssol).
+	if ("$dir:e" == "ssun") then
+            set archs = `echo $archs ssol`
+	else
+            set archs = `echo $archs $dir:e`
+	endif
+      endif
+
+    else
+	echo "< empty >			[ FAIL ]" ; set errstat = 1
+        NEWLINE
+            MSG  "bin directory is empty or does not contain IRAF binaries."
+        NEWLINE
+    endif
+  endif
+end
+
+
+NEWLINE
+NEWLINE
+echo "Checking NOAO Package binaries in $iraf_p/irafbin ..."
+
+# Do a special check that we have a bin directory for the current arch.
+echo -n "    Checking for current platform arch...			"
+if (! -e $iraf_nb) then
+    DO_FAIL ; set errstat = 1
+    NEWLINE
+        MSG  "The NOAO package binary directory, $iraf_nb, does"
+        MSG  "not exist for this platform."
+    NEWLINE
+    set err_count = `expr $err_count + 1`
+else
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+endif
+
+NEWLINE
+NEWLINE
+echo "			 Size	Date"
+echo "			 ----	----"
+foreach i ($iraf_p/irafbin/noao.bin.*)
+  set dir = $i:t
+  if ($dir:r == "noao.bin") then
+    set sz = `(chdir $i ; du -s | awk '{printf ("%d", $1)}')`
+    echo -n $dir $sz | awk '{printf ("%18s\t%5d\t", $1, $2)}'
+
+    if (`$LS -lL $i | wc -l` > 1) then
+      set dat = `$LS $LSDF $i/* | head -2 | tail -1`
+      echo -n $dat | awk '{printf ("%3s %2s %-5s\t\t\t", $7, $8, $9)}'
+
+      if (! (-e "$i/x_apphot.e" && -e "$i/x_rv.e")) then
+        DO_FAIL ; set errstat = 1
+        NEWLINE
+        if (-e "$iraf_ib/x_apphot.e" && -e "$iraf_ib/x_rv.e") then
+         NEWLINE
+             MSG  "The NOAO package binary directory, $iraf_nb, is"
+             MSG  "empty but the binaries appear to have been unpacked in"
+             MSG  "the core system directory, $iraf_ib.  These will need to"
+             MSG  "be moved, please delete the binaries and start again, be"
+             MSG  "sure to unpack the NB distribution files in the $iraf_nb"
+             MSG  "directory and the core system file in the $iraf_ib"
+	     MSG  "directory."
+        else
+         NEWLINE
+             MSG  "The NOAO package binary directory, $iraf_nb, does"
+             MSG  "not appear to contain the proper files.  The NB dist-"
+             MSG  "ribution files should be unpacked in this directory."
+        endif
+        NEWLINE
+        set err_count = `expr $err_count + 1`
+      else
+        DO_OK ; set ok_count = `expr $ok_count + 1`
+      endif
+
+    else
+	echo "< empty >			[ FAIL ]" ; set errstat = 1
+        NEWLINE
+            MSG  "bin directory is empty or does not contain NOAO binaries."
+        NEWLINE
+    endif
+
+  else
+    continue
+  endif
+end
+
+
+# Check the HSI binaries.
+NEWLINE
+NEWLINE
+echo "Checking HSI system binaries in $iraf/unix ..."
+
+# Do a special check that we have a bin directory for the current arch.
+echo -n "    Checking for current platform arch...			"
+if (! -e $iraf/unix/bin.$hmach) then
+    DO_FAIL ; set errstat = 1
+    NEWLINE
+        MSG  "The HSI binary directory, $iraf/unix/bin.$hmach, does"
+        MSG  "not exist for this platform."
+    NEWLINE
+    set err_count = `expr $err_count + 1`
+
+else if (! (-e "$iraf/unix/bin.$hmach/alloc.e")) then
+    DO_FAIL ; set errstat = 1
+    NEWLINE
+        MSG  "The HSI binary directory, $iraf/unix/bin.$hmach, appears"
+        MSG  "to be empty."
+    NEWLINE
+    set err_count = `expr $err_count + 1`
+else
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+endif
+
+NEWLINE
+NEWLINE
+echo "			 Size	Date"
+echo "			 ----	----"
+
+set  delete_bin = ""
+set  empty_bin  = ""
+foreach i ($iraf_p/iraf/unix/bin.*)
+  set dir = $i:t
+  if ($dir:r == "bin") then
+    set sz = `(chdir $i ; du -s | awk '{printf ("%d", $1)}')`
+    echo -n $dir $sz | awk '{printf ("%18s\t%5d\t", $1, $2)}'
+
+    if (`$LS -lL $i | wc -l` > 1) then
+      set d = `$LS $LSDF $i/* | head -2 | tail -1`
+      echo -n $dat | awk '{printf ("%3s %2s %-5s\t\t\t", $7, $8, $9)}'
+
+      if (! (-e "$i/alloc.e" && -e "$i/xc.e")) then
+        DO_FAIL ; set errstat = 1
+      else
+        DO_OK ; set ok_count = `expr $ok_count + 1`
+      endif
+      if ("`echo $archs | grep $dir:e`" == "") then
+	set delete_bin = `echo $delete_bin $dir`
+      endif
+
+    else
+	if ($sz < 8 && "`echo $archs | grep $dir:e`" == "") then
+	    BOLD_ON
+	    echo "< unused >			[  OK  ]"
+	    BOLD_OFF
+	else
+	    BOLD_ON
+	    echo "< empty >			[ WARNING ]" ; set errstat = 1
+	    BOLD_OFF
+            set warn_count = `expr $warn_count + 1`
+	    set empty_bin = `echo $empty_bin $dir`
+	endif
+	if ($sz > 8 && "`echo $archs | grep $dir:e`" == "") then
+	    set delete_bin = `echo $delete_bin $dir`
+	endif
+    endif
+
+  else
+    continue
+  endif
+end
+NEWLINE
+
+if ("$delete_bin" != "") then
+  NEWLINE
+      MSG  "The following bin directories were found to be"
+      MSG  "unneeded for this installation.  If disk usage is a"
+      MSG  "concern the contents may be deleted to reclaim space:"
+      MSG  ""
+  foreach i ($delete_bin)
+      MSG  "	  $iraf/unix/$i"
+  end
+endif
+NEWLINE
+
+if ($early_exit == 1) then
+    goto exit_early
+endif
+
+#=============================================================================
+#  Networking Information
+#=============================================================================
+
+Networking:
+
+set net_errstat = 0			# initialize error status
+
+NEWLINE
+echo "======================= Networking Information ======================="
+NEWLINE
+
+set hname	= `hostname`
+set lhost_abbr	= `hostname | awk '{printf ("%16.16s\n", $1 ) }'`
+set ihosts 	= $iraf/dev/hosts
+set nhost_files	= `$LS -1 $iraf/dev/hosts* | wc -l`
+
+echo 'Local host name:           '$hname
+echo 'Truncated host name:       '$lhost_abbr
+if (`echo $hname | grep "\."` != "") then
+    # When using FQDN lnode may not be set....
+    set is_fqdn	= yes
+    set domain  = `hostname | sed -e 's/^[a-zA-Z0-9_\-]*\.//g'`
+    set lhost = `hostname | sed -e 's/\.[a-zA-Z0-9]*//g'`
+else
+    set is_fqdn	= no
+    set domain  = "<unknown>"
+    set lhost = $hname
+endif
+echo 'Domain name:               '$domain
+echo 'No. of dev$host* files:    '$nhost_files
+echo 'Using IRAF hosts file:     '$ihosts
+
+
+NEWLINE
+echo -n 'Checking for iraf hosts file ...				'
+if (-e $ihosts) then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+
+    set nhosts	= `grep irafks.e $ihosts | wc -l`
+    set lnode	= `grep irafks.e $ihosts | sort | grep $lhost | head -1`
+
+    # The following madness is required to workaround shortcomings in the
+    # GNU versions of the sed command (i.e. Linux/FreeBSD).  Working sed 
+    # commands for Sun here.
+    #
+    #  set n      = `cat $ihosts | sort | grep $lhost | head -1`
+    #  set irafks = `echo $n | sed -e 's/^[a-zA-Z0-9 	_\!\/\-\.:]*//g'`
+    #  set nalias = `echo $n | sed -e 's/:[a-zA-Z0-9 	_\!\/\-\.]*//g'`
+    #  set rhs	  = `echo $n | sed -e 's/^[a-zA-Z0-9 	_\!\-\.]*://g'`
+    #  set nnode  = `echo $rhs | sed -e 's/\![a-zA-Z0-9 	_\!\/\-\.]*//g'`
+
+    set TEMP = "/tmp/_$$"
+    echo $lnode | sed -e 's/\!/ /g'  > $TEMP
+    set line = `cat $TEMP`
+    RM $TEMP
+
+    set nalias	= ""
+    set irafks	= ""
+    set nnode	= ""
+    if ("$line" != "") then
+        while ("$line[1]" != "")
+	    if ("$line[1]" == ":") then
+	        break
+	    else
+	        set nalias = `echo $nalias $line[1]`
+	    endif
+	    shift line
+        end
+        shift line
+        set nnode  = $line[1] ; shift line
+        set irafks = $line[1] ; shift line
+    endif
+
+    # Print out the entry information found.
+    echo '    No. nodes in hosts file:   '$nhosts
+    echo '    irafks.e pathname:         '$irafks
+    echo '    Node aliases:              '$nalias
+    echo '    Network node name:         '$nnode
+    NEWLINE
+
+    # Make sure the node is in the file.
+    echo -n '    Checking for local node in hosts file ...			'
+    if ("`grep $lhost $ihosts | head -1`" != "") then
+        DO_OK
+        set ok_count = `expr $ok_count + 1`
+    else
+        DO_FAIL ; set net_errstat = 1
+        NEWLINE
+            MSG  "The local host, $lhost, was not found in the iraf hosts"
+	    MSG  "file $iraf/dev/hosts.  This means that IRAF networking"
+	    MSG  "will not be available from this machine to others in the"
+	    MSG  "iraf network."
+        NEWLINE
+        set err_count = `expr $err_count + 1`
+    endif
+
+    # See if the irafks.e path is correct on this machine.
+    if ("$irafks" != "") then
+      echo -n '    Checking for irafks.e binary ...				'
+      if (-e $irafks) then
+        DO_OK
+        set ok_count = `expr $ok_count + 1`
+      else
+        DO_FAIL ; set net_errstat = 1
+        NEWLINE
+            MSG  "The named irafks.e binary was not found on this system."
+        NEWLINE
+        set err_count = `expr $err_count + 1`
+      endif
+    endif
+
+    # Look for duplicate host names which may trigger a CL bug.
+    echo -n '    Checking for duplicate hosts in dev$hosts file ...		'
+    set dup_hosts = `grep irafks.e $ihosts | sort | awk '{print $1}' | uniq -d`
+    if ("$#dup_hosts" == 0) then
+        DO_OK
+        set ok_count = `expr $ok_count + 1`
+    else
+        DO_WARN ; set net_errstat = 1
+        NEWLINE
+            MSG  'Duplicate hosts found in dev$hosts file:'
+	    grep irafks.e $ihosts | \
+	        sort | \
+	        awk '{print $1}' | \
+	        uniq -d | \
+	        awk '{printf("   ***\t\t%s\n", $1)}'
+            MSG  ""
+            MSG  "Duplicate node names should be removed to ensure"
+            MSG  "networking and the CL operate properly."
+        NEWLINE
+        set warn_count = `expr $warn_count + 1`
+    endif
+
+else
+    DO_FAIL ; set net_errstat = 1
+    NEWLINE
+        MSG  "The IRAF hosts file, $ihosts, was not found."
+    NEWLINE
+    set err_count = `expr $err_count + 1`
+endif
+
+
+# See what NETSTATUS says about this setup.
+NEWLINE
+echo -n 'Verify NETSTATUS says iraf networking is enabled ...		'
+set system = $iraf/bin.$mach/x_system.e
+if (-e $system) then
+    set net = `$system netstatus | grep -i "interface disabled"`
+    if ("$net" == "") then
+        DO_OK
+        set ok_count = `expr $ok_count + 1`
+    else
+        DO_FAIL ; set net_errstat = 1
+        NEWLINE
+            MSG  "The NETSTATUS task claims that networking is disabled."
+        NEWLINE
+        set err_count = `expr $err_count + 1`
+    endif
+else
+    DO_FAIL ; set net_errstat = 1
+    NEWLINE
+        MSG  "The NETSTATUS task binary could not be executed."
+    NEWLINE
+    set err_count = `expr $err_count + 1`
+endif
+
+
+# See if we're in the trusted hosts file for rsh access.
+NEWLINE
+echo -n 'Checking for host in /etc/hosts.equiv ...			'
+set equiv = /etc/hosts.equiv
+if (-e $equiv) then
+    if ("`grep $lhost $equiv | head -1`" != "") then
+      DO_OK
+      set ok_count = `expr $ok_count + 1`
+    else
+      DO_WARN ; set net_errstat = 1
+      NEWLINE
+          MSG  "The local host, '$lhost', is not present in the $equiv"
+          MSG  "file."
+          MSG  ""
+          MSG  "By default IRAF networking will try to use the 'rsh'"
+          MSG  "protocol for connecting to a remote machine.  Without a"
+          MSG  "$equiv entry a networking attempt will fail and"
+          MSG  "a password prompt will be required since an rexec protocol"
+          MSG  "is the fallback.  Some systems are not configured for rsh"
+          MSG  "access even with a $equiv file, or rsh is not a valid"
+          MSG  "command, and so some other protocol will be required."
+          MSG  ""
+          MSG  "A KSRSH unix environment variable may be defined to specify"
+          MSG  "a different command or protocol (e.g. remsh or ssh).  This"
+          MSG  "is not a fatal error and will not prevent IRAF networking"
+          MSG  "from working, but can be used to avoid to password prompt."
+      NEWLINE
+      set warn_count = `expr $warn_count + 1`
+    endif
+else
+    DO_WARN ; set net_errstat = 1
+    NEWLINE
+        MSG  "The trusted hosts file, '$equiv', is not present on this"
+        MSG  "system.  This may mean that the 'rsh' connection protocol"
+        MSG  "is not available and IRAF networking will require password" 
+        MSG  "prompts."
+        MSG  ""
+        MSG  "By default IRAF networking will try to use the 'rsh'"
+        MSG  "protocol for connecting to a remote machine.  Without a"
+        MSG  "$equiv entry a networking attempt will fail and"
+        MSG  "a password prompt will be required since an 'rexec' protocol"
+        MSG  "is the fallback.  Some systems are not configured for rsh"
+        MSG  "access even with a $equiv file, or 'rsh' is not a valid"
+        MSG  "command, and so some other protocol will be required."
+        MSG  ""
+        MSG  "A 'KSRSH' unix environment variable may be defined to specify"
+        MSG  "a different command or protocol (e.g. 'remsh' or 'ssh').  This"
+        MSG  "is not a fatal error and will not prevent IRAF networking from"
+        MSG  "operating, but can be used to avoid to password prompt."
+    NEWLINE
+    set warn_count = `expr $warn_count + 1`
+endif
+
+
+# Print out the recommended dev$hosts entry for this machine.
+NEWLINE
+echo "----------------------------------------------------------------------"
+NEWLINE
+echo "Recommended $ihosts file entry for this machine: "
+NEWLINE
+echo -n "  "
+if ("$is_fqdn" == "no") then
+    echo $lhost "	: "$hname"\!"$iraf/bin.$mach/irafks.e
+else
+    echo $lhost $lhost_abbr " : " $nnode"\!"$iraf/bin.$mach/irafks.e
+endif
+NEWLINE
+
+
+if ($early_exit == 1) then
+    goto exit_early
+endif
+
+#=============================================================================
+#  Image Display Device Information
+#=============================================================================
+
+Image_Display:
+
+NEWLINE
+echo "===================== Image Display Device Info ======================"
+NEWLINE
+
+set  DISPLAY_SERVERS	= "ximtool ximtool-alt saoimage ds9 saotng"
+set  GRAPHICS_TERMS	= "xgterm xterm"
+set  IMTOOLRC	  	= /usr/local/lib/imtoolrc
+
+
+if (! ($?termcap_file)) then
+    set termcap_file  = "$iraf/dev/termcap"
+endif
+if (! ($?graphcap_file)) then
+    set graphcap_file = "$iraf/dev/graphcap"
+endif
+
+
+echo -n "Display Servers Available:					"
+set found = 0
+set have_sockets  = 0
+set have_saoimage = 0
+set have_ximtool  = 0
+foreach i ($DISPLAY_SERVERS)
+    set p = `which $i |& grep -i "^\/"`
+    if ($status == 0) then
+	if ("$found" == 0) then
+	    DO_OK
+            set ok_count = `expr $ok_count + 1`
+	endif
+	set d = `$LS $LSDF $p | head -2 | tail -1`
+	echo $d | awk '{printf ("    ( Date: %3s %2s %-5s )\t", $7, $8, $9) }'
+	echo "    "$p
+        set found = 1
+	if ("$i" == "saoimage") set have_saoimage = 1
+	if ("$i" == "ximtool")  set have_ximtool = 1
+	if ("$i" != "saoimage") set have_sockets = 1
+    endif
+end
+
+if ($found == 0) then
+  DO_FAIL ; set errstat = 1
+  echo "	None Found"
+  NEWLINE
+      MSG  "No display servers were found on this machine or in the user"
+      MSG  "path.  A display server such as XImtool/SAOimage/SAOtng/DS9"
+      MSG  "is required to be running on the local machine before an iraf"
+      MSG  "display command (e.g. DISPLAY/TVMARK/IMEXAMINE) will work."
+      MSG  ""
+      MSG  "Remote displays (i.e. the server on one machine and IRAF on"
+      MSG  "another) require either iraf networking be enabled or the X"
+      MSG  "'DISPLAY' variable be set so the server appears on the remote"
+      MSG  "machine."
+      MSG  ""
+      MSG  "XImtool can be downloaded from"
+      MSG  ""
+      MSG  "        http://iraf.net/ftp/iraf/x11iraf"
+      MSG  ""
+      MSG  "or it's mirror sites.  Contact http://iraf.net with questions."
+  NEWLINE
+  set err_count = `expr $err_count + 1`
+endif
+NEWLINE
+
+
+echo -n "Graphics Terminals Available:					"
+set found = 0
+foreach i ($GRAPHICS_TERMS)
+    set p = `which $i |& grep "^\/"`
+    if ($status == 0) then
+	if ("$found" == 0) then
+	    DO_OK
+            set ok_count = `expr $ok_count + 1`
+	endif
+	set d = `$LS $LSDF $p | head -2 | tail -1`
+	echo $d | awk '{printf ("    ( Date: %3s %2s %-5s )\t", $7, $8, $9) }'
+	echo "    "`which $i`
+        set found = 1
+    endif
+end
+if ($found == 0) then
+  DO_FAIL ; set errstat = 1
+  echo "	None Found"
+  NEWLINE
+      MSG  "No 'xterm' or 'xgterm' binary was found on this systen or"
+      MSG  "in the user path.  IRAF graphics require some form of "
+      MSG  "graphics-enabled terminal window to be running or else"
+      MSG  "garbarge characters will appear on the screen.  Windows"
+      MSG  "such as 'cmdtool', 'rxvt', 'aixterm', 'hpterm', 'decterm'"
+      MSG  "do not support graphics and should not be used for IRAF."
+      MSG  ""
+      MSG  "The default terminal type is set in the login.cl when"
+      MSG  "a user runs MKIRAF, this is the type of window they should"
+      MSG  "be running when starting IRAF.  Users can use the 'show"
+      MSG  "terminal' command to see the current setting, or 'stty"
+      MSG  "xterm' or 'stty xgterm' command (or rerun MKIRAF and reset"
+      MSG  "the default terminal type) to change the default iraf terminal."
+      MSG  ""
+      MSG  "XGterm can be downloaded from"
+      MSG  ""
+      MSG  "        http://iraf.net/ftp/iraf/x11iraf"
+      MSG  ""
+      MSG  "or it's mirror sites.  Contact site support with questions."
+  set err_count = `expr $err_count + 1`
+endif
+NEWLINE
+
+
+# Check for imtoolrc file and /usr/local/lib dir.
+set errstat = 0
+NEWLINE
+echo -n "Checking for /usr/local/lib directory ...			"
+if (-d /usr/local/lib) then
+  DO_OK
+  set ok_count = `expr $ok_count + 1`
+
+  # Check for imtoolrc file...
+  echo -n "Checking for imtoolrc file ...					"
+  if (-e $IMTOOLRC) then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+
+    set islink = `$LS -l $IMTOOLRC | grep "^l"`
+    set file = $iraf/dev/imtoolrc
+    if ("$islink" != "" && -e $file) then
+
+      # Check for valid link
+      echo -n "Checking for valid imtoolrc link ...				"
+      set tmp = `diff $IMTOOLRC $file | wc -l`
+      if ("$tmp" == 0) then
+        DO_OK
+        set ok_count = `expr $ok_count + 1`
+      else
+        DO_FAIL ; set errstat = 1
+        NEWLINE
+            MSG  "The /usr/local/lib/imtoolrc link is invalid"
+        NEWLINE
+        set err_count = `expr $err_count + 1`
+      endif
+    endif
+
+  else
+    DO_FAIL ; set errstat = 1
+    NEWLINE
+        MSG  "The /usr/local/lib/imtoolrc file is missing."
+        MSG  "This normally gets created by the iraf install script"
+        MSG  "but only if /usr/local/lib already exists.  Without"
+        MSG  "this file you won't be able to use ximtool with a buffer"
+        MSG  "larger than 512x512, to fix this just create the"
+        MSG  "/usr/local/lib dir and rerun the install script or"
+        MSG  "make the link by hand as the root user."
+    NEWLINE
+    set err_count = `expr $err_count + 1`
+  endif
+
+
+  # Check for imtoolcmap directory...
+  if ($have_ximtool == 1) then
+    echo -n "Checking for imtoolcmap directory ...				"
+    if (-d /usr/local/lib/imtoolcmap) then
+      DO_OK
+      set ok_count = `expr $ok_count + 1`
+
+    else
+      DO_WARN
+      NEWLINE
+          MSG  "The /usr/local/lib/imtoolcmap directory is missing."
+          MSG  "This directory is not required but provides extra"
+          MSG  "colormap options for XImtool.  The colormaps may be"
+          MSG  "be obtained from "
+          MSG  ""
+          MSG  "	http://iraf.net/ftp/iraf/x11iraf/imtoolcmap.tar"
+          MSG  ""
+          MSG  "This should be unpacked as the /usr/local/lib/imtoolcmap"
+          MSG  "directory.  This is not a fatal error."
+      NEWLINE
+      set warn_count = `expr $warn_count + 1`
+    endif
+  endif
+
+
+else
+  DO_FAIL ; set errstat = 1
+  NEWLINE
+      MSG  "The /usr/local/lib directory does not exist."
+  NEWLINE
+  set err_count = `expr $err_count + 1`
+endif
+if ($errstat == 1) then
+    MSG  "The imtoolrc file is used by the display servers (XImtool,"
+    MSG  "SAOimage, etc) to set various frame buffer sizes.  Without"
+    MSG  "this file the server can only use a 512x512 frame buffer,"
+    MSG  "and displays to larger buffers will result in the message"
+    MSG  "'attempt to write out of bounds on framebuf'.  Sites can"
+    MSG  "rerun the install script or make the link by hand, users"
+    MSG  'can copy the dev$imtoolrc file to their $HOME directory as'
+    MSG  "'.imtoolrc' as a workaround."
+endif
+
+if ($have_saoimage == 1) then
+  echo -n "Checking file descriptor limits:				"
+  set ds = `limit descriptors | awk '{print ($2)}'`
+  if ("$ds" != "64") then
+    DO_WARN
+    NEWLINE
+        MSG  "SAOimage has a hardwired restriction of 64 file descriptors,"
+        MSG  "however this user shell allows more.  When there are many"
+        MSG  "windws open SAOimage may fail, this warning applies only"
+        MSG  "to users of SAOimage.  A 'limit descriptors 64' command"  
+        MSG  "can be used to reset the limit."
+    NEWLINE
+    set warn_count = `expr $warn_count + 1`
+  else
+    DO_OK
+  endif
+endif
+
+
+# See whether we have fifo pipes installed.
+set errstat = 0
+if ( !($pciraf && ($mach == "macosx" || $mach == "macintel")) ) then
+  foreach p (/dev/imt1i /dev/imt1o)
+    echo -n "Checking for $p fifo pipe ...				"
+    if (-e $p) then
+        if ("`$LS -l $p | grep '.rw.rw.rw.'`" == "") then
+	    if ($have_sockets == 1) then
+                DO_WARN ; set errstat = 1 
+	        set warn_count = `expr $warn_count + 1`
+	    else
+                DO_FAIL ; set errstat = 1 
+	        set err_count = `expr $err_count + 1`
+	    endif
+              MSG  "File $p not mode 666."
+        else 
+            DO_OK
+            set ok_count = `expr $ok_count + 1`
+        endif
+    else
+	if ($have_sockets == 1) then
+            DO_WARN ; set errstat = 1
+            set warn_count = `expr $warn_count + 1`
+	else
+            DO_FAIL ; set errstat = 1
+            set err_count = `expr $err_count + 1`
+	endif
+          MSG  "The $p fifo pipe is missing."
+    endif
+  end
+
+  echo -n "Checking for /dev/imt1 fifo pipe link ...			"
+  if (-e /dev/imt1) then
+    if ("`$LS -l /dev/imt1 | grep imt1o`" != "") then
+        DO_OK
+        set ok_count = `expr $ok_count + 1`
+    else
+	if ($have_sockets == 1) then
+            DO_WARN ; set errstat = 1
+            set warn_count = `expr $warn_count + 1`
+	else
+            DO_FAIL ; set errstat = 1
+            set err_count = `expr $err_count + 1`
+	endif
+          MSG  "The /dev/imt1 fifo pipe link is invalid."
+    endif
+  else
+    if ($have_sockets == 1) then
+        DO_WARN ; set errstat = 1
+        set warn_count = `expr $warn_count + 1`
+    else
+        DO_FAIL ; set errstat = 1
+        set err_count = `expr $err_count + 1`
+    endif
+      MSG  "The /dev/imt1 fifo pipe link is missing (but is not"
+      MSG  "strictly required for proper display).  If it exists it"
+      MSG  "should be a symlink pointing to /dev/imt1o."
+  endif
+  if ($errstat == 1 && $have_sockets == 0) then
+    NEWLINE
+      MSG  "The /dev fifo pipes are used only by SAOimage as a default"
+      MSG  "communication with IRAF or as a fallback for other display"
+      MSG  "servers such as XImtool.  Except for SAOimage or in the case"
+      MSG  "of some other mechanism such as a private graphcap file or"
+      MSG  "IMTDEV environment variable, missing /dev pipes should not be"
+      MSG  "fatal for image display.  A 'Cannot open device' message may"
+      MSG  "simply mean there is no display server running, or the 'node'"
+      MSG  "CL environment variable has been set to an invalid node or"
+      MSG  "iraf networking is not enabled on the host.  The pipes are"
+      MSG  "created by the install script (which can be run on this host)"
+      MSG  "or they can be created by hand as root with the 'mknod' or"
+      MSG  "'mkfifo' command."
+    NEWLINE
+  endif
+endif
+
+
+# Make sure there are entries in the the termcap and graphcap files for xgterm
+# and imtool.
+
+echo -n "Checking termcap file for an XGterm entry ...			"
+set temp = `grep -l xgterm $termcap_file | grep -v "^#"`
+if ("$temp" == "") then
+    DO_FAIL ; set errstat = 1
+    set err_count = `expr $err_count + 1`
+else
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+endif
+
+echo -n "Checking graphcap file for XGterm/imtool entries ...		"
+set gcok = yes
+foreach i (xgterm imtool)
+    set temp = `grep -l $i $graphcap_file | grep -v "^#"`
+    if ("$temp" == "" && "$gcok" == "yes") then
+        DO_FAIL ; set errstat = 1
+  	set err_count = `expr $err_count + 1`
+        set gcok = no
+    endif
+end
+if ($gcok == yes) then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+endif
+
+if ($early_exit == 1) then
+    goto exit_early
+endif
+
+#=============================================================================
+#  Tape Device Information
+#=============================================================================
+
+Tape_Device:
+
+NEWLINE
+echo "====================== Tape Device Information ======================="
+NEWLINE
+
+set errstat = 0
+
+if (! ($?tapecap_file)) then
+    set tapecap_file  = "$iraf/dev/tapecap"
+endif
+
+# Check the alloc.e binary.
+NEWLINE
+set file = "$iraf/unix/bin.$hmach/alloc.e"
+echo -n 'Checking for hbin$alloc.e binary ...				'
+if (-e $file) then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+
+    echo -n 'Checking hbin$alloc.e ownership ...				'
+    if (-e $file) then
+        if ("`$LS -l $file | grep 'root'`" == "") then
+            DO_FAIL
+            set errstat = 1 ; set err_count = `expr $err_count + 1`
+            echo "    ***  File $file:t not owned by root."
+        else 
+	    DO_OK
+            set ok_count = `expr $ok_count + 1`
+        endif
+    endif
+
+    echo -n 'Checking hbin$alloc.e binary permissions ...			'
+    if (-e $file) then
+        if ("`$LS -l $file | grep '.rwsr.xr.x'`" == "") then
+            DO_FAIL
+            set errstat = 1 ; set err_count = `expr $err_count + 1`
+            echo "    ***  File $file:t not mode 4755."
+        else 
+	    DO_OK
+            set ok_count = `expr $ok_count + 1`
+        endif
+    endif
+
+    if ($errstat == 1) then
+      NEWLINE
+          MSG  "The alloc.e binary is used to allocate tape devices"
+          MSG  "for exclusive access by the user.  It does this by"
+          MSG  "changing the ownership and permissions on the /dev"
+          MSG  "files associated with each device.  For this reason"
+          MSG  "it must be owned by root with setuid permissions so"
+          MSG  "it can execute properly.  Tape devices are not required"
+          MSG  "to be allocated before they are used but executing the"
+          MSG  "ALLOC command w/in iraf will result in an error."
+          MSG  "This error can be cleared by running the IRAF install"
+          MSG  "script as root, or issuing the commands:"
+          MSG  ""
+          MSG  "        # cd $hbin"
+          MSG  "        # chown 0 alloc.e ; chmod 4755 alloc.e"
+      NEWLINE
+    endif
+
+else
+    DO_FAIL ; set errstat = 1 
+    set err_count = `expr $err_count + 1`
+    MSG  "File $file not found."
+endif
+
+
+# Check for a tapecap file.
+set errstat = 0
+NEWLINE
+echo -n 'Checking for tapecap file ...					'
+if (-e $iraf/dev/tapecap.`hostname`) then
+  DO_OK
+  set ok_count = `expr $ok_count + 1`
+  echo "     Using file: $iraf/dev/tapecap.`hostname`"
+else
+  if (-e $tapecap_file) then
+    DO_OK
+    set ok_count = `expr $ok_count + 1`
+    echo "    Using tapecap file: $tapecap_file"
+  else
+    DO_FAIL ; set errstat = 1 
+    set err_count = `expr $err_count + 1`
+  endif
+endif
+if ($errstat == 1) then
+  NEWLINE
+      MSG  'No tapecap file found on this system.'
+  NEWLINE
+      MSG  'IRAF will first attempt to find a file in the iraf$dev'
+      MSG  'directory called "tapecap.\<node\>", if that fails it will'
+      MSG  'fallback to use the dev$tapecap file (or whichever file is'
+      MSG  'named by the 'tapecap' variable in the hlib$zzsetenv.def file).'
+      MSG  ''
+      MSG  'Not all IRAF distributions come with a default tapecap file'
+      MSG  'appropriate for the given machine.  For example, the default'
+      MSG  'dev$tapecap for Sun/IRAF is for SunOS and will not generally'
+      MSG  'work for Solaris.  The PC-IRAF distribution comes with generic'
+      MSG  'tapecap.linux, tapecap.freebsd, etc files which must be renamed'
+      MSG  '"tapecap" to be used.  Generic device entries are provided with'
+      MSG  'each tapecap file (e.g. mtp for a DAT on unit 0) but in most'
+      MSG  'cases the tapecap file must be installed and/or configured'
+      MSG  'before devices will be accessible.'
+      MSG  ''
+      MSG  'Further information on configuring tapecaps can be found in'
+      MSG  'the last IRAF Newsletter at:'
+      MSG  ''
+      MSG  '     http://iraf.noao.edu/irafnews/apr98/irafnews.1f.html'
+      MSG  ''
+      MSG  'or by contacting http://iraf.net'
+  NEWLINE
+endif
+
+
+
+NEWLINE
+echo "Tape Device Template:		$TAPES"
+
+set nloks = `$LS -lL /tmp/*.lok |& grep -v -i "no match" | wc -l`
+if ($nloks == 0) then
+    set nloks = "<none>"
+endif
+echo "Lok Files on this machine:	$nloks"
+if ("$nloks" != '<none>') then
+    $LS -lL /tmp/*.lok
+endif
+
+NEWLINE
+
+set ntapes = `$LS -lL $TAPES |& grep -v -i "no match" | wc -l`
+if ($ntapes == 0) then
+    set ntapes = "<none>"
+endif
+echo "Tape Devices Available:		$ntapes"
+NEWLINE
+
+if ("$ntapes" != '<none>') then
+
+NEWLINE
+echo "    ******************************************************************"
+echo "    ** More tape devices files may be defined than there are actual **"
+echo "    ** devices on the machine.  For those file  which correspond to **"
+echo "    ** a physical device the file should have mode 666 and be owned **"
+echo "    ** by root.                                                     **"
+echo "    ******************************************************************"
+NEWLINE
+
+    ls -lL $TAPES
+endif
+
+if ($early_exit == 1) then
+    goto exit_early
+endif
+
+
+#=============================================================================
+#  External Package Information
+#=============================================================================
+
+External_Packages:
+
+NEWLINE
+echo "=================== External Package Information ====================="
+NEWLINE
+
+# Check the iraf root directory stuff
+if ($?iraf == 1) then
+    set hlib = $iraf/unix/hlib
+else
+    if (-e /usr/include/iraf.h) then
+        set ip = `grep "^#define    IRAF" /usr/include/iraf.h |sed -e 's/\"//g'`
+        if ("$ip" != "") then
+            set iraf = $ip[3]
+        endif
+        set hlib = $iraf/unix/hlib
+
+    else
+	MSG  "No 'iraf' defined in your environment and no <iraf.h>"
+	MSG  "file found on this system."
+	MSG  ""
+	MSG  "Aborting..."
+    endif
+endif
+
+# Strip off any trailing '/'.
+set iraf  = `echo $iraf  | sed -e 's+/\(["]*\)$+\1+'`
+
+set epkg = $hlib/extern.pkg
+
+
+# Get the helpdb string.
+set helpdb = `cat $epkg | grep -v "^#" | grep helpdb`
+
+
+# Get the list of tasks defined in the extern.pkg file.
+set t = `cat $epkg | grep -v "^#" | grep task | sed -e 's/task//g' -e 's/=//g' -e 's/\.pkg//g' -e 's/\$//g'`
+
+set tasks = ""
+while ("$t[1]" != "")
+    set tasks = `echo $tasks $t[1]`
+    shift t ; shift t
+    if ("$#t" == "0") then
+	break
+    endif
+end
+
+# Get the variables and paths declared, includes data directories.
+
+cat $epkg | grep -v "^#" | grep -v helpdb | grep ^set   >  /tmp/_ext$$
+cat $epkg | grep -v "^#" | grep -v helpdb | grep ^reset >> /tmp/_ext$$
+
+set l = `cat /tmp/_ext$$ | sed -e 's/reset//g' -e 's/set//g' -e 's/=//g'`
+
+set pkg   = ""
+set ppath = ""
+while ("$l[1]" != "")
+    set pkg   = `echo $pkg $l[1]`
+    set ppath = `echo $ppath $l[2]`
+    shift l; shift l
+
+    if ("$#l" == "0") then
+	break
+    endif
+end
+RM /tmp/_ext$$
+
+
+NEWLINE
+echo "  1)  The 'Path' check verifies that the extern.pkg path exists and is"
+echo "      not located in the iraf root directory (NOAO excepted)."
+echo "  2)  The 'Helpdb' check verifies that the package is declared in the"
+echo "      helpdb string.  A warning here indicates the helpdb.mip file is"
+echo "      out of date w.r.t the package .hd files.  Help database files may"
+echo "      be updated using the SOFTOOLS.MKHELPDB task."
+echo "  3)  The 'Binaries' check prints the most recent file date for the"
+echo "      installed binaries.  A failed test indicates no binaries for"
+echo "      the current architecture."
+echo "  4)  The date given is the date of the most recent file in the named"
+echo "      bin directory.  Dates before 12/99 indicate binaries which should"
+echo "      be recompiled for Y2K compliance (assuming IRAF V2.11.3 or later"
+echo "      is available on the machine)."
+NEWLINE
+NEWLINE
+echo "Number of declared packages:	" $#tasks
+echo "Number of logical directories:	" $#ppath
+NEWLINE
+echo "Checking packages ..."
+NEWLINE
+echo "     Package	Path	 Helpdb	    Binaries	Date"
+echo "     -------	----	 ------	    --------	----"
+#NEWLINE
+
+
+set  CL	 = $iraf/bin.$mach/cl.e
+if (! -e $CL) then
+    echo "ERROR: CL executable not found, skipping package checks..."
+    set err_count = `expr $err_count + 1`
+    goto exit_early
+endif
+
+
+set lp = ""
+set lpath = ""
+set delpak = ()
+set delpak_p = ()
+foreach p ($pkg)
+    set decl = `cat $epkg | grep task | grep $p`
+    set pat = $ppath[1]
+    if ("$decl" != "") then
+
+	# See if this is an iraf logical path and resolve it.
+	echo $pat | egrep '\$' >& /dev/null
+	if ($status == 0) then
+	   set cmd = `echo $pat | awk '{printf("=osfn(\"%s\");logout\n", $1)}'`
+	   echo "#\!$CL -f"	> /tmp/_cmd$$
+	   echo $cmd 		>> /tmp/_cmd$$
+	   chmod 755 /tmp/_cmd$$
+
+	   set pat = `/tmp/_cmd$$`
+	   rm -rf /tmp/_cmd$$
+	endif
+
+	# Check that the path exists.
+	if (-d $pat) then
+	    echo $p | awk '{printf ("%12.12s", $1 ) }'
+	    if ("$p" == "noao") then
+		BOLD_ON
+	        echo -n "	[ OK ]"
+		BOLD_OFF
+                set ok_count = `expr $ok_count + 1`
+	    else
+	        if (`echo $pat | grep $iraf` == "") then
+		    BOLD_ON
+	            echo -n "	[ OK ]"
+		    BOLD_OFF
+                    set ok_count = `expr $ok_count + 1`
+	        else if (`echo $pat | grep $iraf | grep "/\.\."` != "") then
+		    BOLD_ON
+	            echo -n "	[ OK ]"
+		    BOLD_OFF
+                    set ok_count = `expr $ok_count + 1`
+	        else
+		    BOLD_ON
+	            echo "	[FAIL] " ; set errstat = 1
+		    BOLD_OFF
+	    	    echo "	    *** invalid path: $p = $pat"
+	    	    echo "	    *** package should not be in iraf root dir"
+  	            set err_count = `expr $err_count + 1`
+		    set delpak = ($delpak $p)
+	    	    set delpak_p = ($delpak_p $pat)
+		    goto pkg_err
+	        endif
+	    endif
+ 	else
+	    set delpak = ($delpak $p)
+	    set delpak_p = ($delpak_p $pat)
+  	    set err_count = `expr $err_count + 1`
+	    goto pkg_err
+ 	endif
+
+
+	# See if the package was declared with help.
+	echo $helpdb | grep $p >& /dev/null
+	if ($status == 0) then
+
+	    # The package has help but we'll assume the standard help
+	    # database name and look to see if the helpdb itself is current.
+	    # The helpdb.mip file should be newer than any <foo>.hd files in
+	    # the package tree.
+	    if (-e $pat/lib/helpdb.mip) then
+        	set pkgp    = `echo $pat | sed -e 's+/\(["]*\)$+\1+'`
+	        set hdbfile = "$pkgp/lib/helpdb.mip"
+	        set hdfiles = `find $pkgp -name \*.hd -a -newer $hdbfile -print`
+	        if ("$hdfiles" != "") then
+	            echo -n "	 [WARN]	    "
+                    set warn_count = `expr $warn_count + 1`
+		else
+	            echo -n "	 [ OK ]	    "
+                    set ok_count = `expr $ok_count + 1`
+		endif
+	    else
+	        echo -n "	 [ OK ]	    "
+                set ok_count = `expr $ok_count + 1`
+	    endif
+
+	else
+	    echo -n "	 [FAIL]     " ; set errstat = 1
+  	    set err_count = `expr $err_count + 1`
+	endif
+
+	# See if binaries exist for this platform.
+	set dir = $pat/bin.$mach
+	if (-d $dir) then
+	    if (`$LS -lL $dir | wc -l` > 1) then
+	        set d = `$LS $LSDF $pat/bin.$mach/* | head -2 | tail -1`
+	        set dat = `echo $d |awk '{printf("%s %s %s",$7,$8,$9)}'`
+
+	        #echo -n "[ OK ]"
+		if ("`echo $dat | grep 199 | grep Dec`" == "") then
+		    if ("`echo $dat | grep 200`" == "" && "`echo $dat | grep ':'`" == "") then
+		        echo -n "[WARN]"
+                        set warn_count = `expr $warn_count + 1`
+		    else
+		        echo -n "[ OK ]"
+                        set ok_count = `expr $ok_count + 1`
+		    endif
+		else
+		    echo -n "[ OK ]"
+                    set ok_count = `expr $ok_count + 1`
+		endif
+
+	        echo $d | awk '{printf ("\t%3s %2s %-5s", $7, $8, $9) }'
+	        echo  "   "bin.$mach
+	    else
+	        echo -n "[FAIL]      " ; set errstat = 1
+  	        set err_count = `expr $err_count + 1`
+	        echo "<not found>    "bin.$mach
+	        #goto pkg_err
+	    endif
+ 	else
+	    echo -n "[FAIL]      " ; set errstat = 1
+	    echo "<not found>    "bin.$mach
+  	    set err_count = `expr $err_count + 1`
+ 	endif
+
+	# Check for other architectures installed
+	if (-e $pat/bin) then
+	  if (-e $pat/bin.$mach) then
+	    foreach dir ($pat/bin.*)
+	       set b = $dir:t
+	       if ("$b" != "bin.generic" && "$b" != "bin.$mach") then
+		    if (`$LS -l $dir | wc -l` > 1) then
+	              	set d = `$LS $LSDF $pat/$b/* | head -2 | tail -1`
+	              	set dat = `echo $d |awk '{printf("%s %s %s",$7,$8,$9)}'`
+			echo -n "			"
+			if ("`echo $dat | grep 199 | grep Dec`" == "") then
+		            if ("`echo $dat | grep 200`" == "" && "`echo $dat | grep ':'`" == "") then
+			        echo -n "	    [WARN]	"
+                        	set warn_count = `expr $warn_count + 1`
+			    else
+			        echo -n "	    [ OK ]	"
+                        	set ok_count = `expr $ok_count + 1`
+			    endif
+			else
+			    echo -n "	    [ OK ]	"
+                            set ok_count = `expr $ok_count + 1`
+			endif
+	              	echo $d |awk '{printf ("%3s %2s %-5s", $7, $8, $9)}'
+	              	echo "   "$b
+		    endif
+	       endif
+	    end
+	  endif
+	endif
+        #NEWLINE
+
+    else
+	set lp = `echo $lp $p`
+	set lpath = `echo $lpath $pat`
+    endif 
+
+pkg_err:
+    shift ppath
+end
+
+# Report unnecessary packages or logical dirs.
+set npack = $#delpak
+if ($npack != 0) then 
+  NEWLINE
+  NEWLINE
+      MSG  "The folowing packages were declared but do not exist on the"
+      MSG  'current platform and can be removed from the hlib$extern.pkg'
+      MSG  "file:"
+      MSG  ""
+
+  set i = 1
+  while ($i <= $npack) 
+      echo $delpak[$i] $delpak_p[$i] | \
+	  awk '{printf ("   ***\t%16s = %s\n", $1, $2)}'
+      set i = `expr $i + 1`
+  end
+  MSG ""
+endif
+
+
+# Now check logical directories defined in the file.
+set dellog = ()
+set dellog_p = ()
+if ("$lp" != "") then
+    NEWLINE
+    NEWLINE
+    echo "Checking logical directories ..."
+    NEWLINE
+    echo "   Logical Directory	Path"
+    echo "   -----------------	----"
+
+    foreach p ($lp)
+        set pat = $lpath[1]
+	echo $p | awk '{printf ("%20.20s", $1 ) }'
+
+        # See if this is an iraf logical path and resolve it.
+        echo $pat | egrep '\$' >& /dev/null
+        if ($status == 0) then
+           set cmd = `echo $pat | awk '{printf("=osfn(\"%s\");logout\n", $1)}'`
+           echo "#\!$CL -f"     > /tmp/_cmd$$
+           echo $cmd            >> /tmp/_cmd$$
+           chmod 755 /tmp/_cmd$$
+
+           set pat = `/tmp/_cmd$$`
+           rm -rf /tmp/_cmd$$
+        endif
+
+	if (-d $pat) then
+	    echo "	[ OK ]"
+            set ok_count = `expr $ok_count + 1`
+ 	else
+	    echo -n "	[ FAIL ]" ; set errstat = 1
+	    echo "  *** invalid path"
+	    set dellog = ($dellog $p)
+	    set dellog_p = ($dellog_p $pat)
+  	    set err_count = `expr $err_count + 1`
+ 	endif
+
+        shift lpath
+    end
+endif
+
+
+set nlog = $#dellog
+if ($nlog != 0) then 
+  NEWLINE
+  NEWLINE
+      MSG  "The folowing logical directories were found to be invalid for"
+      MSG  'current platform and can be removed from the hlib$extern.pkg'
+      MSG  "file:"
+      MSG  ""
+
+  set i = 1
+  while ($i <= $nlog) 
+      echo $dellog[$i] $dellog_p[$i] | \
+	  awk '{printf ("   ***\t%16s = %s\n", $1, $2)}'
+      set i = `expr $i + 1`
+  end
+  MSG ""
+endif
+
+
+exit_early:
+
+  NEWLINE
+  NEWLINE
+  echo "======================================================================"
+  NEWLINE
+  echo "SYSINFO completed with:	    Tests Passed:  $ok_count"
+  echo "			        Warnings:  $warn_count"
+  echo "			          Errors:  $err_count"
+  if ($err_count > 0) then
+    NEWLINE
+    echo "    Not all errors listed here will be fatal but may indicate a"
+    echo "    problem with some aspect of the system, or will  reveal the"
+    echo "    likely cause of a problem currently being seen."
+    NEWLINE
+    echo "    Users should contact  http://iraf.net  if help is needed with"
+    echo "    correcting any problems, or with  suggestions/comments  for"
+    echo "    future versions of this diagnostic script."
+  endif
+  NEWLINE
+  echo "======================================================================"
+  NEWLINE
+
+sysinfo_cleanup:
+  RM /tmp/_cmd$$
+  RM /tmp/_ext$$
+
+exit 0
+
+
+#  Print usage information.  We will not get here unless the "-help" flag
+#  was issued.
+
+Usage:
+
+    NEWLINE
+    echo "Usage:	sysinfo [ -G | -V | -N | -P | -D | -T | -help ]"
+    NEWLINE
+    echo "	where:	-G		Print General Info only"
+    echo "		-V		Do Verification tests only"
+    echo "		-N		Do Networking tests only"
+    echo "		-P		Do Extern Package tests only"
+    echo "		-D		Do Display tests only"
+    echo "		-T		Do Tape Device tests only"
+    echo "		-h		Print this message"
+    NEWLINE
+

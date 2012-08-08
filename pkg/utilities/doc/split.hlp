@@ -1,0 +1,59 @@
+.help split Sep86 utilities
+.ih
+NAME
+split -- split a large file into smaller segments
+.ih
+USAGE
+split input output
+.ih
+PARAMETERS
+.ls input
+The name of the input file (only a single file can be processed).
+.le
+.ls output
+The root name of the output files.
+.le
+.ls nlines = 1000
+The maximum number of lines per output segment file, if the input file
+is a text file.
+.le
+.ls nbytes = 16384
+The maximum number of bytes per output segment file, if the input file
+is a binary file.
+.le
+.ls maxfiles = 999
+Maximum number of output files.  Used to determine the amount of zero
+padding needed for the filename extensions.
+.le
+.ls verbose = yes
+Print the name and size of each output file as it is generated.
+.le
+.ih
+DESCRIPTION
+The \fIsplit\fR task is used to break large files up into smaller segments,
+e.g., when it is necessary to deal with an unmanageably large file.
+Lacking any knowledge of the file structure, the segments are broken on
+arbitrarily located but equally spaced boundaries.  The segments may
+subsequently be reassembled into larger segments of the original file with
+\fIconcatenate\fR or \fIcopy\fR (with output redirection), or \fIsplit\fR may
+be applied again to break a large segment up into smaller segments without
+losing any information.
+.ih
+EXAMPLES
+1. Split a large text file into segments, each of which is the default size.
+
+	cl> split textfile seg
+
+2. Split a large \fItar\fR format archive file (10240 byte records) up into
+a series of smaller files, each of which contains 10 records from the input
+tar file.
+
+	cl> split big.arc seg nb=(10240*10)
+
+.ih
+TIME REQUIREMENTS
+very fast
+.ih
+SEE ALSO
+concatenate, copy
+.endhelp

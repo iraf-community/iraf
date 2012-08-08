@@ -1,0 +1,241 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# GS_DPOL -- Procedure to evaluate the polynomial derivative basis functions.
+
+procedure $tgs_dpol (x, npts, order, nder, k1, k2, basis)
+
+PIXEL	x[npts]		# array of data points
+int	npts		# number of points
+int	order		# order of new polynomial, order = 1, constant
+int	nder		# order of derivative, order = 0, no derivative
+PIXEL	k1, k2		# normalizing constants
+PIXEL	basis[ARB]	# basis functions
+
+int	bptr, k, kk
+PIXEL	fac
+
+begin
+	# Optimize for oth and first derivatives.
+	if (nder == 0) {
+	    call $tgs_bpol (x, npts, order, k1, k2, basis)
+	    return
+	} else if (nder == 1) {
+	    call $tgs_bpol (x, npts, order, k1, k2, basis)
+	    do k = 1, order {
+		call amulk$t(basis[1+(k-1)*npts], PIXEL (k),
+		    basis[1+(k-1)*npts], npts)
+	    }
+	    return
+	}
+
+	# Compute the polynomials.
+	bptr = 1
+	do k = 1, order {
+	    if (k == 1)
+		call amovk$t (PIXEL(1.0), basis, npts)
+	    else if (k == 2)
+		call amov$t (x, basis[bptr], npts)
+	    else 
+		call amul$t (basis[bptr-npts], x, basis[bptr], npts)
+	    bptr = bptr + npts
+	}
+
+	# Apply the derivative factor.
+	bptr = 1
+	do k = 1, order {
+	    if (k == 1) {
+	        fac = PIXEL(1.0)
+		do kk = 2, nder
+		    fac = fac * PIXEL (kk)
+	    } else {
+	        fac = PIXEL(1.0)
+		do kk = k +  nder - 1, k, -1 
+	            fac = fac * PIXEL(kk)
+	    }
+	    call amulk$t (basis[bptr], fac, basis[bptr], npts)
+	    bptr = bptr + npts
+	}
+end
+
+
+# GS_DCHEB -- Procedure to evaluate the chebyshev polynomial derivative
+# basis functions using the usual recursion relation.
+
+procedure $tgs_dcheb (x, npts, order, nder, k1, k2, basis)
+
+PIXEL	x[npts]		# array of data points
+int	npts		# number of points
+int	order		# order of polynomial, order = 1, constant
+int	nder		# order of derivative, order = 0, no derivative
+PIXEL	k1, k2		# normalizing constants
+PIXEL	basis[ARB]	# basis functions
+
+int	i, k
+pointer	fn, dfn, xnorm, bptr, fptr
+PIXEL	fac
+
+begin
+	# Optimze the no derivatives case.
+	if (nder == 0) {
+	    call $tgs_bcheb (x, npts, order, k1, k2, basis)
+	    return
+	}
+
+	# Allocate working space for the basis functions and derivatives.
+	call calloc (fn, npts * (order + nder), TY_PIXEL)
+	call calloc (dfn, npts * (order + nder), TY_PIXEL)
+
+	# Compute the normalized x values.
+	call malloc (xnorm, npts, TY_PIXEL)
+        call alta$t (x, Mem$t[xnorm], npts, k1, k2)
+
+	# Compute the current solution.
+        bptr = fn
+        do k = 1, order + nder {
+	    if (k == 1)
+	        call amovk$t (PIXEL(1.0), Mem$t[bptr], npts)
+	    else if (k == 2)
+	        call amov$t (Mem$t[xnorm], Mem$t[bptr], npts)
+	    else {
+	        call amul$t (Mem$t[xnorm], Mem$t[bptr-npts], Mem$t[bptr], npts)
+	        call amulk$t (Mem$t[bptr], PIXEL(2.0), Mem$t[bptr], npts)
+		call asub$t (Mem$t[bptr], Mem$t[bptr-2*npts], Mem$t[bptr], npts)
+	    }
+	    bptr = bptr + npts
+        }
+
+	# Compute the derivative basis functions.
+	do i = 1, nder {
+
+	    # Compute the derivatives.
+	    bptr = fn
+	    fptr = dfn
+	    do k = 1, order + nder {
+		if (k == 1)
+		    call amovk$t (PIXEL(0.0), Mem$t[fptr], npts)
+		else if (k == 2) {
+		    if (i == 1)
+		        call amovk$t (PIXEL(1.0), Mem$t[fptr], npts)
+		    else
+		        call amovk$t (PIXEL(0.0), Mem$t[fptr], npts)
+		} else {
+	            call amul$t (Mem$t[xnorm], Mem$t[fptr-npts], Mem$t[fptr],
+		        npts)
+	            call amulk$t (Mem$t[fptr], PIXEL(2.0), Mem$t[fptr], npts)
+		    call asub$t (Mem$t[fptr], Mem$t[fptr-2*npts], Mem$t[fptr],
+		        npts)
+		    fac = PIXEL (2.0) * PIXEL (i)
+		    call awsu$t (Mem$t[bptr-npts], Mem$t[fptr], Mem$t[fptr],
+			npts, fac, PIXEL(1.0))
+		    
+		}
+	        bptr = bptr + npts
+	        fptr = fptr + npts
+	    }
+
+	    # Make the derivatives the old solution
+	    if (i < nder)
+		call amov$t (Mem$t[dfn], Mem$t[fn], npts * (order + nder))
+	}
+
+	# Copy the solution into the basis functions.
+	call amov$t (Mem$t[dfn+nder*npts], basis[1], order * npts)
+
+	call mfree (xnorm, TY_PIXEL)
+	call mfree (fn, TY_PIXEL)
+	call mfree (dfn, TY_PIXEL)
+end
+
+
+# GS_DLEG -- Procedure to evaluate the Legendre polynomial derivative basis
+# functions using the usual recursion relation.
+
+procedure $tgs_dleg (x, npts, order, nder, k1, k2, basis)
+
+PIXEL	x[npts]		# number of data points
+int	npts		# number of points
+int	order		# order of new polynomial, 1 is a constant
+int	nder		# order of derivate, 0 is no derivative
+PIXEL	k1, k2		# normalizing constants
+PIXEL	basis[ARB]	# array of basis functions
+
+int	i, k
+pointer	fn, dfn, xnorm, bptr, fptr
+PIXEL	ri, ri1, ri2, fac
+
+begin
+	# Optimze the no derivatives case.
+	if (nder == 0) {
+	    call $tgs_bleg (x, npts, order, k1, k2, basis)
+	    return
+	}
+
+	# Allocate working space for the basis functions and derivatives.
+	call calloc (fn, npts * (order + nder), TY_PIXEL)
+	call calloc (dfn, npts * (order + nder), TY_PIXEL)
+
+	# Compute the normalized x values.
+	call malloc (xnorm, npts, TY_PIXEL)
+        call alta$t (x, Mem$t[xnorm], npts, k1, k2)
+
+	# Compute the basis functions.
+	bptr = fn
+	do k = 1, order + nder {
+	    if (k == 1)
+		call amovk$t (PIXEL(1.0), Mem$t[bptr], npts)
+	    else if (k == 2)
+		call amov$t (Mem$t[xnorm], Mem$t[bptr], npts)
+	    else {
+		ri = k
+		ri1 = (PIXEL(2.0) * ri - PIXEL(3.0)) / (ri - PIXEL(1.0))
+		ri2 = - (ri - PIXEL(2.0)) / (ri - PIXEL(1.0))
+		call amul$t (Mem$t[xnorm], Mem$t[bptr-npts], Mem$t[bptr], npts)
+		call awsu$t (Mem$t[bptr], Mem$t[bptr-2*npts], Mem$t[bptr],
+		    npts, ri1, ri2)
+	    }
+	    bptr = bptr + npts
+	}
+
+	# Compute the derivative basis functions.
+	do i = 1, nder {
+
+	    # Compute the derivatives.
+	    bptr = fn
+	    fptr = dfn
+	    do k = 1, order + nder {
+		if (k == 1)
+		    call amovk$t (PIXEL(0.0), Mem$t[fptr], npts)
+		else if (k == 2) {
+		    if (i == 1)
+		        call amovk$t (PIXEL(1.0), Mem$t[fptr], npts)
+		    else
+		        call amovk$t (PIXEL(0.0), Mem$t[fptr], npts)
+		} else {
+		    ri = k
+		    ri1 = (PIXEL(2.0) * ri - PIXEL(3.0)) / (ri - PIXEL(1.0))
+		    ri2 = - (ri - PIXEL(2.0)) / (ri - PIXEL(1.0))
+		    call amul$t (Mem$t[xnorm], Mem$t[fptr-npts], Mem$t[fptr],
+		        npts)
+		    call awsu$t (Mem$t[fptr], Mem$t[fptr-2*npts], Mem$t[fptr],
+		        npts, ri1, ri2)
+		    fac = ri1 * PIXEL (i)
+		    call awsu$t (Mem$t[bptr-npts], Mem$t[fptr], Mem$t[fptr],
+			npts, fac, PIXEL(1.0))
+		    
+		}
+	        bptr = bptr + npts
+	        fptr = fptr + npts
+	    }
+
+	    # Make the derivatives the old solution
+	    if (i < nder)
+		call amov$t (Mem$t[dfn], Mem$t[fn], npts * (order + nder))
+	}
+
+	# Copy the solution into the basis functions.
+	call amov$t (Mem$t[dfn+nder*npts], basis[1], order * npts)
+
+	call mfree (xnorm, TY_PIXEL)
+	call mfree (fn, TY_PIXEL)
+	call mfree (dfn, TY_PIXEL)
+end

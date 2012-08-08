@@ -1,0 +1,21 @@
+
+
+There is a bug in the iraf/daophot ii daofind centering code which results in
+incorrect fractional pixel corrections being computed for the detected objects.
+This error can most easily be detected by plotting the histogram of the
+fractional pixel corrections for an image with a large number of detected
+objects. The histogram will be modulated at around the 20% level with "peaks"
+around the 0.33 and 0.66 fractional pixel values.
+
+This bug is fixed for the next release of iraf and in the external addon
+package digiphotx version of daofind. There is no workaround although it
+should be emphasized that this bug does not affect the centers computed by
+the psf fitting code in the peak, nstar, and allstar tasks. Users concerned
+with precision in the daofind results should upgrade their software, or
+recenter the objects with the phot "centroid" (fast) or "gauss" (more precise)
+routines.
+
+This bug is also present in the standalone version of daophot ii. I have
+reported this problem to Peter Stetson and he has fixed it.  Users concerned
+about this bug in the standalone version of daophot ii should obtain a fix
+from Peter Stetson.

@@ -1,0 +1,372 @@
+.help pdm May87 noao.astutil
+.ih
+NAME
+pdm -- Find periods in lightcurve data.
+.ih
+USAGE
+pdm infile
+.ih
+PARAMETERS
+
+.ls infiles
+Input file template.  If more than one file matches the template, data
+from all the files will be concatenated to produce the working data set.
+.le
+.ls metafile = "pdmmeta"
+File in which to store metacode when running in batch mode.  All of the
+plots saved will be put here with formfeeds between them.
+.le
+.ls batchfile = "pdmbatch"
+File in which to store information about the period, amplitude, epoch
+and fit function when running in batch mode.
+.le
+.ls device = "stdgraph"
+The output device for interactive graphics.
+.le
+.ls interactive = yes
+Interactive flag.  If set to no, the analysis is done in batch mode with output
+to a file and no interactive graphics.  Metacode will be saved for the data
+plot, the theta plot, and the phase plot.  If set to yes, various types of
+plots can be made on the user's terminal and cursor commands are available.
+.le
+.ls flip = no
+Flag to tell the program to flip the y-axis.  This is useful when the y-scale
+is in magnitudes (decreasing numbers mean increasing brightness).
+.le
+.ls minp = 0
+Minimum period to be searched.  This parameter, if set, tells the program
+the bottom end of the period window to be searched.   If not set, the
+program uses as a value the smallest chronological distance between
+any two adjacent data points.  When the program is run, it writes a value
+into this parameter as stored in the uparm directory.  This means the
+next time the program is run, the default minp will be the value assigned
+or calculated the last time the program was run by this user.  We say the
+program 'remembers' the last value used.
+.le
+.ls maxp = 0
+Maximum period to be searched.  This parameter, if set, tells the program
+the top end of the period window to be searched.  If not set, the program
+uses as a value 4 times the distance between the first and last data
+point.  This parameter is remembered as minp is.
+.le
+.ls ntheta = 200
+Resolution of the theta plot.  This parameter tells how many points in
+the period window should have their theta statistic calculated.  The points
+are spaced equidistant from one another in frequency space.
+.le
+.ls pluspoint = 50
+Maximum number of data points for which to use plus symbols.  If there
+are more data points then points are plotted.
+.le
+.ls autoranges = no
+This flag, when set, instructs the program to look for gaps in
+the data and, if large gaps are found, divide the data up into ranges
+discarding the gaps and doing the analysis only on the ranges.  This
+helps remove side lobes from the spectra.
+.le
+.ls nsigma = 3
+Number of standard deviations for autorange break.  If ranges are to 
+be automatically calculated, this parameter tells how large a gap in
+the data should constitute a division between ranges.  The mean
+and standard deviation of the distribution of chronological spacing
+of input points are calculated.  Then the points are scanned in
+increasing order and if an inter-data gap bigger than nsigma
+standard deviations is found, a new range is started.
+.le
+.ls cursor = "stdgcur"
+The source of graphics cursor input.
+.le
+.ih
+DESCRIPTION
+Pdm applies a phase dispersion minimization algorithm (R. F. Stellingwerf,
+"Period Determination by Phase Dispersion Minimization", ApJ 224, 1978,
+953) to lightcurve data to determine periodicities in the data.  It also
+calculates amplitude and epoch information.
+
+Pdm can be used in batch or interactive mode.  In batch
+mode the
+output is period, amplitude, and epoch for the minimum found within
+the period window.  Metacode will be produced for the data plot,
+the theta statistic plot, and the phasecurve plot.
+The metacode will be saved in the metafile.  In interactive mode the user
+can plot the data at different stages in the analysis, fit and remove
+curves from the data, reject points, set data ranges, plot and fit
+phasecurves, etc.
+
+Pdm guesses at the period/frequency window to be searched unless
+the minimum
+and maximum period for the window are specified using minp and maxp.  The
+minimum period is taken as twice the chronological distance between the closest
+two points in the data.  The maximum period is taken as 4 times the distance
+between the first and last data points.
+
+Pdm will work on one object at a time and the input data may
+be contained in multiple input files if desired.  The program will
+concatenate data in all the files which match the input template.
+The input files are text files containing one (x,y) pair per line or
+just a (y) value per line.  If only one value per line is found the
+program will number x sequentially (1,2,3,4,...).  If a third value
+is included on each line it will be read as the error in that
+measurement.   (The 'e' key is used to toggle error bars on the phase
+plot.)
+
+At startup, if the interactive flag is set, the user will be presented
+with a plot of the data and the cursor will be turned on.
+
+When the user plots a phasecurve, points that are deleted or undeleted from
+the phasecurve plot will be deleted or undeleted from the working data set.
+
+The ICFIT keystrokes are described elsewhere. (see help for icfit)
+
+
+Phase Dispersion Minimization User Interface (keystrokes)
+
+When the program starts up it reads the data file(s) and displays
+the data on the screen as a standard mark plot.  The user is
+then placed in a graphics cursor loop with the following options
+available in addition to the standard graphics commands:
+
+Note:
+The remembered period is for the last minimum found.  This
+minimum calculation is done whenever a new theta plot is graphed
+and whenever the "m" key is used.
+
+.ls ? -- list options
+
+Print out the menu.
+.le
+.ls h -- graph data
+
+Make a plot on the screen, using marks, of observation time vs observed
+value. If there are more than 50 points, use dots, else use pluses.  If
+points have been deleted, draw an x through them on the plot.  If ranges
+are in effect, draw range bars along the abscissa of the plot marking
+the ranges.
+.le
+.ls e -- toggle error bars on or off
+
+When the phase plot is on the screen and error data has been supplied,
+this key will toggle the drawing of error bars on the phase plot so that
+the user can determine how well the period found works with the data
+including this error information.
+.le
+.ls i,k -- graph frequency or period respectively versus theta
+
+Calculate the theta statistic in the period/frequency range specified
+previously.  If no period/frequency range has been specified,
+pdm guesses one.  The minimum period is taken as twice the chronological
+distance between the closest two points in the data.  The maximum
+period is taken as 4 times the distance between the first and last
+data points.  The number of theta points in this range is also a
+parameter which can be specified.
+
+Next, plot theta on the screen using line drawing mode.  Plot
+either period vs theta or frequency vs theta.  Calculate the minimum
+value of theta displayed, turn the cursor back on (clgcur) and put
+the cursor x position at that minimum.
+.le
+.ls p -- graph phase curve for period/frequency at cursor position
+
+Calculate the phase curve for the period/frequency under the
+cursor.  This assumes the user has a theta plot on the screen and
+an error message will be given otherwise.
+
+The phase curve will be plotted in mark mode with two copies displayed
+and placed end to end to clarify the plot by providing continuity at
+all phases.  The amplitude and epoch values for this period are calculated
+and the phases are plotted relative to this epoch.
+.le
+.ls d,u -- delete/undelete respectively point nearest the cursor
+
+Points deleted will have an x drawn through them.  The x will be
+erased when the point is undeleted.
+.le
+.ls f -- call ICFIT on displayed data
+
+ICFIT is used for interactive curve fitting.
+It is called with either the data values or the phase values,
+depending on which type of plot is on the screen at the time.
+Any point deleted in ICFIT will be removed from consideration in
+all subsequent calculations until restored.
+
+The fit curve is retained by PDM after the return from ICFIT and
+may be subsequently subtracted from the data using the j command.
+
+Note: The user must exit ICFIT using the q key before he is placed
+back into PDM.
+.le
+.ls j -- subtract fit from data, use residuals
+
+Just as it says. The original data is retained and can be reinstated
+with the :origdata command.  This command only applies to the data.
+The user cannot subtract a fit from the phase plot.
+.le
+.ls s -- set sample range for calculations
+
+This command is used to set ranges of data to be used.  The cursor is
+first positioned to the beginning of the range of interest, an s is
+struck, the program prints the prompt again:, the cursor is
+repositioned to the end of the range and a second s is struck
+completing the command.  Multiple ranges may be set and all the data
+inside the union of the ranges will be used.  Data points outside the
+ranges will be ignored until the data is reset with an :alldata
+or an :origdata command.
+
+This also forces the boolean flag segments to be set true.
+.le
+.ls ,, -- Set minp or minf to cursor x position
+
+When the theta plot is on the screen, this keystroke can be used
+to set the minimum period (frequency) to the current cursor position.
+.le
+.ls . -- Set maxp or maxf to cursor x position
+
+When the theta plot is on the screen, this keystroke can be used
+to set the maximum period (frequency) to the current cursor position.
+.le
+.ls g -- significance of theta at cursor x position
+
+The statistical significance of the period/frequency under the
+cursor is calculated by Fisher's method of randomization.
+This value is printed at the bottom of the screen.
+
+This assumes that a theta plot is on the screen.
+.le
+.ls a -- amplitude and epoch at cursor x position
+
+For the period/frequency under the cursor or of the plot, the amplitude
+and epoch are calculated and returned to the user.
+
+This assumes that a theta plot is on the screen.
+.le
+.ls m -- mark range and find minimum in this range
+
+This command is used exactly like the s command but has a different
+effect.  After the user has positioned the cursor and struck the m
+key twice, defining the range, the minimum value of theta is found
+in this range and its associated period/frequency is returned.
+.le
+.ls r -- replot
+
+Redraw the plot on the screen.
+.le
+.ls x -- remove a trend from the data by removing a bestfit line
+
+This command calls the curfit package to fit a straight line to the
+data and then subtracts it point by point from the data.
+.le
+.ls z -- flip the y-axis scale
+
+This command toggles a y-axis flip for the plots.  This is useful when
+the user is plotting magnitudes where the smaller the ordinate value the
+larger the intensity.
+.le
+.ls q -- quit
+
+Exit PDM.
+
+.le
+The following commands may be abbreviated.  If entered without an
+argument; :minp, :maxp, :minf, :maxf, and :ntheta will display the named
+parameter; :show, :vshow will print to STDOUT; :signif, :ampep, and :phase,
+will do the calculation at the remembered period.
+
+.ls :show [file]		show parameter settings
+
+Print on the screen the min/max period, the remembered minimum,
+the range if it is in effect, the start and end of the ranges
+if they are defined, the mean and variance of the data in each
+range. If file is specified, the output will go there.
+.le
+.ls :vshow [file]		show verbose information
+
+This command will display all the information displayed by the :show
+command plus curfit information if the any curves have been fit.  Also,
+the residual data will be shown if residuals have been calculated. If
+file is specified, the output will go there.
+.le
+.nf
+
+:minp :maxp [period]		set min/max search period
+:minf :maxf [frequency]		set min/max search frequency
+.fi
+.ls
+These commands are self explanatory.  Whichever value is set,
+period or frequency, the corresponding frequency or period is
+automatically calculated and remembered.
+.le
+.ls :ntheta [num]		set number of points for theta
+
+Set the number of equally spaced points in the period window for
+which theta should be calculated.  This is really a setting of
+the resolution of the theta plot and defaults to 200 since
+the calculation time for 200 points is only a few seconds.  Very
+large numbers entered here will cause the program to warn the user
+that the theta calculation may take some time.
+.le
+.ls :sample [value]		set/show the sample ranges
+
+The start and end values for the ranges will be printed on the screen.
+If value is present, it has the form begin:end where begin
+and end are real numbers specifying a new range.
+.le
+.ls :signif [period]		find theta significance
+
+Same as the g key.  The colon command allows the user to 
+set the period exactly, instead of using the cursor.  If no period
+is entered, the calculation will be done using the remembered period.
+.le
+.ls :ampep [period]		amplitude and epoch
+
+Same as the e key.  Without an argument, use remembered minima.
+.le
+.ls :phase [period]		graph phase curve
+
+Same as the h key.  Without an argument, use remembered minima.
+.le
+.ls :unreject			unreject all points
+
+This tells the program to use all of the data points. If a fit
+has been subtracted from a subset of the data points then this command
+causes the original data set to be restored since, otherwise, we would
+restore a mixture of data and residuals.
+.le
+.ls :alldata			reset range to entire dataset
+
+The effect of this command is to turn off the range settings.  All
+of the data will be used if the ranges settings are off.  Rejected
+points remain rejected though.  Again, if these data are residuals,
+the original data are restored.
+.le
+.ls :origdata			reset data to original dataset
+
+Copy the original data vector into the working data vector.
+.le
+.ih
+EXAMPLES
+1. To find the main period in the data contained in the file 'vstar645',
+whose period is within the bounds (200., 800.) interactively
+the command might be:
+
+	cl> pdm vstar645 minp=200. maxp=800.
+
+2. To do the same thing in batch mode, allowing the program to guess the 
+period window, with no lightcurve analysis, and saving the metacode
+in vstar645.m, the command might be:
+
+	cl> pdm vstar645 inter=no meta="vstar645.m"
+
+.ih
+BUGS
+Pdm has some problems with data sets containing a small number (<20)
+points.  Generally, it will do fairly well but the theta curve may look
+strange.
+
+The amplitude and epoch calculation might be improved by fitting a parabola
+to the phase curve near the minimum and near the maximum and using points
+on these parabolas for the min and max points instead of actual data points.
+
+.ih
+SEE ALSO
+icfit
+.endhelp

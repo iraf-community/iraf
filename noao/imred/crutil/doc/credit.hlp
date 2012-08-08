@@ -1,0 +1,39 @@
+.help credit Apr98 noao.imred.crutil
+.ih
+NAME
+credit -- interactively edit cosmic rays using an image display
+.ih
+USAGE	
+.nf
+credit input output
+.fi
+.ih
+PARAMETERS
+See parameters for \fBimedit\fR.
+.ih
+DESCRIPTION
+This task is a version of \fBimedit\fR.  See the help for that task
+for a description of the parameters and algorithms.
+
+For the purpose of editing cosmic rays the most useful editing option
+is 'b' to replace cosmic rays in a circular annulus using local sky
+values.  This can be done interactively or using a list of positions
+along with the \fIdefault\fR parameter value.
+.ih
+EXAMPLES
+1.  To replace cosmic rays interactively.
+
+.nf
+    cl> credit obj012 crobj012 crmask012
+.fi
+
+2.  To use a two column list of positions and remove the cosmic rays using
+the 'b' key algorithm.
+
+.nf
+    cl> credit obj012 crobj012 cursor=crlist.dat display-
+.fi
+.ih
+SEE ALSO
+imedit, epix
+.endhelp

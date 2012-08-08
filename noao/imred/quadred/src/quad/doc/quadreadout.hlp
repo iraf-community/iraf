@@ -1,0 +1,19 @@
+With Arcon it is possible to read out a CCD using more than one amplifier in
+parallel, leading to a substantial reduction in readout time.  Once properly
+reduced, such data is indistinguishable from that obtained when reading out
+through only a single amplifier.  However, the raw images are rather different
+and consequently must be processed somewhat differently. Firstly, each readout
+will typically have a slightly different, zero level, gain, and readout noise,
+and may differ slightly in its departures from perfect linearity. As a result
+both zero frames and uniformly illuminated exposures will show a characteristic
+chequer board pattern, the sections of the data read through each amplifier
+having different levels.  Secondly, there will be a separate overscan strip,
+used to monitor the zero level, for each readout. The location of these overscan
+strips in the raw frame depends on which amplifiers are used. When all four 
+amplifiers are used the four overscan regions form a vertical stripe down the
+centre of the raw image. A CCD read out through two amplifiers can have its
+two overscan strips, running side by side down the center of the picture; or 
+they may be one above the other, on the same side of the picture; or the strip
+for the upper and lower halves of the CCD can be at opposited sides of the
+image (in which case there will also be a horizontal displacement of the data
+in the two sections).

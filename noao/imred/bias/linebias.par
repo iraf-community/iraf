@@ -1,0 +1,16 @@
+# LINEBIAS -- Subtract a line bias
+
+input,s,a,,,,Input images
+output,s,a,,,,Output images
+bias,s,h,"[]",,,Bias section
+trim,s,h,"[]",,,Trim section
+median,b,h,no,,,Use median instead of average in line bias?
+interactive,b,h,yes,,,Interactive?
+function,s,h,"spline3","spline3|legendre|chebyshev|spline1",,Fitting function
+order,i,h,1,1,,Order of fitting function
+low_reject,r,h,3.0,,,Low sigma rejection factor
+high_reject,r,h,3.0,,,High sigma rejection factor
+niterate,i,h,1,,,Number of rejection iterations
+logfiles,s,h,"",,,Log files
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Graphics cursor input

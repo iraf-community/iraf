@@ -1,0 +1,50 @@
+.help hidetask Feb86 language
+.ih
+NAME
+hidetask -- hide a task from the user
+.ih
+USAGE
+hidetask task,[task,...]
+.ih
+PARAMETERS
+.ls task
+The name of a task to be made hidden.
+.le
+.ih
+DESCRIPTION
+If a task is only to be called from other tasks, and is not normally
+invoked directly by the user, then it may be useful to `hide' the task,
+i.e., omit it from the list of tasks listed in the "?" and "??" commands.
+The \fIhidetask\fR command performs this function.
+.ih
+EXAMPLES
+1. Define the task "_rew" and hide it from the user.  The purpose of the
+leading underscore (not required) is to ensure that the user does not
+accidentally run the task.
+
+.nf
+cl> task $_rew = "home$rew.e"
+cl> hide _rew
+.fi
+
+2. Display the contents of the \fIlanguage\fR package, including all
+hidden tasks (the _ does the trick).
+
+.nf
+cl> ?_ lan
+    language:
+      ?             chdir         defpar        history       radix
+      ??            cl            deftask       jobs          redefine
+      _allocate     clbye         edit          keep          scan
+      _curpack      clear         ehistory      kill          service
+      _deallocate   clpackage     envget        language      set
+      _devstatus    d_f           eparam        logout        show
+      access        d_l           error         lparam        sleep
+      back          d_off         flprcache     mktemp        task
+      beep          d_on          fprint        osfn          time
+      bye           d_p           fscan         package       unlearn
+      cache         d_t           gflush        prcache       update
+      cd            defpac        hidetask      print         wait
+.fi
+.ih
+SEE ALSO

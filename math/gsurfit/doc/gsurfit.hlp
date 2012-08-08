@@ -1,0 +1,169 @@
+.help gsurfit Aug85 "Math Package"
+.ih
+NAME
+gsurfit -- surface fitting package
+.ih
+SYNOPSIS
+
+.nf
+        gsinit (sf, surf_type, xorder, yorder, xterms, xmin, xmax, ymin, ymax)
+       gsaccum (sf, x, y, z, w, wtflag)
+       gsacpts (sf, x, y, z, w, npts, wtflag)
+      gsreject (sf, x, y, z, w)
+       gssolve (sf, ier)
+         gsfit (sf, x, y, z, w, npts, wtflag, ier)
+       gsrefit (sf, x, y, z, w, ier)
+    y = gseval (sf, x, y)
+      gsvector (sf, x, y, zfit, npts)
+         gsder (sf, x, y, zfit, npts, nxder, nyder)
+       gscoeff (sf, coeff, ncoeff)
+      gserrors (sf, z, w, zfit, rms, errors)
+        gssave (sf, fit)
+     gsrestore (sf, fit)
+ival = gsstati (sf, param)
+rval = gsstatr (sf, param)
+         gsadd (sf1, sf2, sf3)
+         gssub (sf1, sf2, sf3)
+        gscopy (sf1, sf2)
+        gsfree (sf)
+.fi
+.ih
+DESCRIPTION
+The gsurfit package provides a set of routines for fitting data to functions
+of two variables, linear in their coefficients, using least squares
+techniques. The numerical technique employed is the solution of the normal
+equations by the Cholesky method.
+.ih
+NOTES
+The fitting function is chosen at run time from the following list.
+
+.nf
+	GS_LEGENDRE		# Lengendre polynomials in x and y
+	GS_CHEBYSHEV		# Chebyshev polynomials in x and y
+.fi
+
+The gsurfit package performs a weighted fit. The weighting options are
+WTS_USER and WTS_UNIFORM. The user must supply a weight array. In the
+WTS_UNIFORM mode the gsurfit routines set the weights to 1. In WTS_USER
+mode the user must supply an array of weight values.
+
+In WTS_UNIFORM mode the reduced chi-square returned by GSERRORS is the
+variance of the fit and the errors in the coefficients are scaled
+by the square root of this variance. Otherwise the weights are
+interpreted as one over the variance of the data and the true reduced
+chi-square is returned.
+
+The routines assume that all the x and y values of interest lie in the
+region xmin <= x <= xmax and ymin <= y <= ymax. Checking for out of
+bounds x and y values is the responsibility of the calling program.
+The package routines assume that INDEF valued data points have been removed
+from the data set prior to entering the package routines.
+
+In order to make the package definitions available to the calling program
+an include <math/gsurfit.h> statement must be inserted in the calling program.
+GSINIT must be called before each fit. GSFREE frees the space used by
+the GSURFIT package.
+.ih
+EXAMPLES
+.nf
+Example 1: Fit surface to data, uniform weighting
+
+include <math/gsurfit.h>
+
+...
+
+call gsinit (sf, GS_CHEBYSHEV, 4, 4, NO, 1., 512., 1., 512.)
+
+call gsfit (sf, x, y, z, w, npts, WTS_UNIFORM, ier)
+if (ier != OK)
+    call error (...)
+
+do i = 1, 512 {
+    call printf ("x = %g y = %g z = %g zfit = %g\n")
+	call pargr (x[i])
+	call pargr (y[i])
+	call pargr (z[i])
+	call pargr (gseval (sf, x[i], y[i]))
+}
+
+call gsfree (sf)
+
+...
+
+Example 2: Fit a surface using accumulate mode, uniform weighting
+
+include <math/gsurfit.h>
+
+...
+
+do i = 1, 512 {
+    if (y[i] != INDEF)
+	call gsaccum (sf, x[i], y[i], z[i], weight[i], WTS_UNIFORM)
+}
+
+call gssolve (sf, ier)
+if (ier != OK)
+    call error (...)
+
+...
+
+call gsfree (sf)
+
+...
+
+Example 3: Fit and subtract a smooth surface from image lines
+
+include <math/gsurfit.h>
+
+...
+
+call gsinit (gs, GS_CHEBYSHEV, xorder, yorder, YES, 1., 512., 1., 512.)
+
+call gsfit (sf, xpts, ypts, zpts, w, WTS_UNIFORM, ier)
+if (ier != OK)
+    call error (...)
+
+do i = 1, 512
+    Memr[x+i-1] = i
+
+do line = 1, 512 {
+
+    inpix = imgl2r (im, line)
+    outpix = imgl2r (im, line)
+
+    yval = line
+    call amovkr (yval, Memr[y], 512)
+    call gsvector (sf, Memr[x], Memr[y], Memr[outpix], 512)
+    call asubr (Memr[inpix], Memr[outpix], Memr[outpix, 512) 
+}
+
+call gsfree (sf)
+
+...
+
+Example 4: Fit curve, save fit for later use for GSEVAL
+
+include <math/gsurfit.h>
+
+call gsinit (sf, GS_LEGENDRE, xorder, yorder, YES, xmin, xmax, ymin, ymax)
+
+call gsfit (sf, x, y, z, w, npts, WTS_UNIFORM, ier)
+if (ier != OK)
+    ...
+
+nsave = gsstati (sf, GSNSAVE)
+call salloc (fit, nsave, TY_REAL)
+call gssave (sf, Memr[fit])
+call gsfree (sf)
+
+...
+
+call gsrestore (sf, Memr[fit])
+do i = 1, npts
+    zfit[i] = gseval (sf, x[i], y[i])
+
+call gsfree (sf)
+
+...
+.fi
+.endhelp

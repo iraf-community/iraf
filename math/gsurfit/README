@@ -1,0 +1,6 @@
+Linear least squares surface fitting package.
+Contains routines to fit Legendre and Chebyshev polynomials
+in the least squares sense to 2-dimensional data.
+The normal equations are accumulated and solved using Cholesky factorization.
+The package contains separate entry points for accumulating points,
+solving the matrix equations, rejecting points and evaluating the surface.

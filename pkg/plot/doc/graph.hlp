@@ -1,0 +1,247 @@
+.help graph Aug91 plot
+.ih
+NAME
+graph -- graph one or more lists or image sections
+.ih
+USAGE
+graph input
+.ih
+PARAMETERS
+.ls input
+List of operands to be graphed.  May be STDIN, or one or more image sections 
+or lists.
+.le
+.ls wx1=0., wx2=0., wy1=0., wy2=0.
+The range of user coordinates spanned by the plot.  If the range of values
+in x or y = 0, the plot is automatically scaled from the minimum to
+maximum data value along the degenerate dimension.
+.le
+.ls wcs = "logical"
+The world coordinate system (\fIwcs\fR) to be used for axis labeling when
+input is f rom images.
+The following standard world systems are predefined.
+.ls logical
+Logical coordinates are image pixel coordinates relative to the image currently
+being displayed.
+.le
+.ls physical
+The physical coordinate system is invariant with respect to linear
+transformations of the physical image matrix.  For example, if the reference
+image was created by extracting a section of another image, the physical
+coordinates of an object in the reference image will be the pixel coordinates
+of the same object in the original image.  The physical coordinate system
+thus provides a consistent coordinate system (a given object always has the
+same coordinates) for all images, regardless of whether any user world
+coordinate systems have been defined.
+.le
+.ls world
+The "world" coordinate system is the \fIcurrent default WCS\fR.
+The default world system is the system named by the environment variable
+\fIdefwcs\fR if defined in the user environment and present in the reference
+image WCS description, else it is the first user WCS defined for the image
+(if any), else physical coordinates are returned.
+.le
+
+In addition to these three reserved WCS names, the name of any user WCS
+defined for the reference image may be given.  A user world coordinate system
+may be any linear or nonlinear world system.
+.le
+.ls vx1=0., vx2=0., vy1=0., vy2=0.
+NDC coordinates (0-1) of the device plotting viewport.  If not set by 
+the user, a suitable viewport which allows sufficient room for all labels 
+is used.
+.le
+.ls pointmode = no
+If \fBpointmode\fR = yes, plot points or markers at data values, rather than 
+connected lines.
+.le
+.ls marker = "box"
+Marker or line type to be drawn.  If \fBpointmode\fR = yes the markers are
+"point", "box", "cross", "plus", "circle", "hebar", "vebar", "hline",
+"vline" or "diamond".  Any other value defaults to "box".  If drawing lines,
+\fBpointmode\fR = no, the values are "line", "lhist", "bhist".  Any other
+value defaults to "line".  "bhist" (box histogram) draws lines to the
+bottom of the graph while "lhist" does not.  In both cases the
+horizontal histogram lines run between the half way points (reflected
+at the ends).
+.le
+.ls szmarker = 0.005
+The size of a marker in NDC coordinates (0 to 1 spans the screen).
+If zero and the input operand is a list, marker sizes are taken individually
+from the third column of each list element.  If positive, all markers are
+of size \fBszmarker\fR.  If negative and the input operand is a list,
+the size of a marker is the third column of each list element times the
+absolute value of \fBszmarker\fR.
+.le
+.ls ltypes = "", colors = ""
+List of line types and colors to use when graphing multiple data sets.
+The lists are comma or space separate integer numbers.  If no list is
+given the line types and colors will cycle through the range of
+values.  If a list is given then the values are used in order and if
+the list is exhausted before the data the last value is used for all
+remaining data sets.
+
+The line types have values between 1 and 4:
+
+.nf
+    1 - solid line
+    2 - dashed line
+    3 - dotted line
+    4 - dot-dash line
+.fi
+
+The colors have values between 1 and 9.  The colors associated with each
+number depend on the graphics device.  For example "xgterm" colors are
+assigned by X resources.
+.le
+.ls xlabel = "wcslabel", ylabel = ""
+Label for the X-axis or Y-axis.  if \fBxlabel\fR = "wcslabel" and the first
+operand in the \fBinput\fR is an image, the world coordinate system label
+if defined is used.
+.le
+.ls title = "imtitle"
+Plot title.  If \fBtitle\fR  = "imtitle"
+and the first operand in \fBinput\fR is an image, the image title is used
+as the plot title.
+.le
+.ls xformat = "wcsformat", yformat = ""
+The numerical format for the coordinate labels.  The values may be ""
+(an empty string), %f for decimal format, %h and %H for xx:xx:xx format, and
+%m and %M for xx:xx.x format.  The upper case %H and %M convert degrees
+to hours.  For images a recommended x coordinate format may be defined as
+a WCS attribute.  If the xformat value is "wcsformat" the WCS attribute
+format will be used.  Any other value will override the image attribute.
+.le
+.ls box = yes
+Draw axes at the perimeter of the plotting window.
+.le
+.ls fill = yes
+Fill the output viewport regardless of the device aspect ratio?
+.le
+.ls axis = 1
+Axis along which the projection is to be computed, if an input operand is
+an image section of dimension 2 or higher.  Axis 1 is X (line average),
+2 is Y (column average), and so on.
+.le
+.ls transpose = no
+Swap the X and Y axes of the plot.  If enabled, the axes are transposed 
+after the optional linear transformation of the X-axis.
+.le
+.ls logx = no, logy = no
+Log scale the X or Y axis.  Zero or negative values are indefinite and
+will not be plotted, but are tolerated.
+.le
+.ls ticklabels = yes
+Label the tick marks.
+.le
+.ls majrx=5, minrx=5, majry=5, minry=5
+Number of major tick marks on each axis; number of minor tick marks between
+major tick marks.  Ignored if log scaling is in effect for an axis.
+.le
+.ls lintran = no
+Perform a linear transformation of the X-axis upon input.  Used to assign
+logical coordinates to the indices of pixel data arrays (image sections).
+.le
+.ls p1=0, p2=0, q1=0, q2=1
+If \fBlintran\fR is enabled, pixel index P1 is mapped to Q1, and P2 to Q2.
+If P1 and P2 are zero, P1 is set to 1 and P2 to the number of pixels in
+the input array.
+.le
+.ls round = no
+Extend the axes up to "nice" values.
+.le
+.ls overplot = no
+Overplot on an existing plot.  All axis scaling and labeling parameters
+apply.
+.le
+.ls append = no
+Append to an existing plot.  The previous axis is used and the axis
+scaling and labeling parameters are ignored.
+.le
+.ls device = "stdgraph"
+The output device.
+.le
+.ih
+DESCRIPTION
+\fBGraph\fR graphs one or more lists or image sections; lists and image
+sections may be mixed in the input list at will.  If the curves are not
+all the same length the plot will be scaled to the longest curve and all
+curves will be plotted left justified.  If an image section operand has
+more than one dimension the projection (average) along a designated axis
+will be computed and plotted.  By default, a unique dash pattern is used
+for each curve, up to a maximum of 4.
+
+List input may be taken from the standard input or from a file,
+and consists of a sequence of Y values, X and Y values, or X, Y,
+and marker size values, one pair of coordinates per line in the list.
+If the third column of a list contains positive numbers, they are
+interpreted as NDC marker sizes, optionally scaled by the absolute
+value of \fIszmarker\fR.  If you want the third column of a list to
+be interpreted as WCS coordinates, indicating errors for example, the
+marker sizes should be entered as negative numbers.
+Blank lines, comment lines, and extra columns are ignored.
+The first element in the list determines whether the list is a Y list
+or and X,Y list; it is an error if an X,Y list has fewer than two
+coordinates in any element.  INDEF valued elements appear as gaps
+in the plot.
+
+If \fBappend\fR is enabled, previous values for \fBbox\fR,
+\fBfill\fR, \fBround\fR, the plotting viewport (\fBvx1\fR, \fBvx2\fR, 
+\fBvy1\fR, \fBvy2\fR), and the plotting window (\fBwx1\fR, \fBwx2\fR, 
+\fBwy1\fR, \fBwy2\fR) are used.  The \fBoverplot\fR parameter overplots
+a new plot including any new axis scaling and labeling.
+
+By default, the plot drawn will fill the device viewport, if the viewport
+was either specified by the user or automatically calculated by 
+\fIgraph\fR.  Setting
+the value of \fBfill\fR  to "no" means the viewport will be adjusted so 
+that equal numbers of data values in x and y will occupy equal lengths 
+when plotted.  That is, when \fBfill = no\fR, a unity aspect ratio is 
+enforced, and plots
+appear square regardless of the device aspect ratio.  On devices with non 
+square full device viewports (e.g., the vt640), a plot drawn by \fIgraph\fR
+appears extended in the x direction unless \fBfill\fR = no.
+
+.ih
+EXAMPLES
+1. Plot the output of a list processing filter:
+
+    cl> ... list_filter | graph
+
+2. Plot a graph entered interactively from the terminal:
+
+    cl> graph STDIN
+
+3. Overplot two lists:
+
+    cl> graph list1,list2
+
+4. Graph line 128 of image "pix":
+
+    cl> graph pix[*,128]
+
+5. Graph the average of columns 50 through 100:
+
+    cl> graph pix[50:100,*] axis=2
+
+6. Graph a list in point plot mode:
+
+    cl> graph list po+
+
+7. Annotate a graph:
+
+.nf
+    cl> graph pix[*,10],pix[*,20] xlabel=column\
+    >>> ylabel=intensity title="lines 10 and 20 of pix"
+.fi
+
+8. Direct the graph to the standard plotter device:
+
+    cl> graph list device=stdplot
+.ih
+BUGS
+Indefinites are not recognized when computing image projections.
+.ih
+SEE ALSO
+pcol, pcols, prow, prows
+.endhelp

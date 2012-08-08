@@ -1,0 +1,95 @@
+.help tabpar May2002 tables
+.ih
+NAME
+tabpar -- Copy a table element to an IRAF parameter.
+.ih
+USAGE
+tabpar table column row
+.ih
+DESCRIPTION
+This task reads a table element specified by a table name, column name,
+and row number. The element is written to the task parameter 'value' as
+a character string. If the table element is boolean, then 'value' will
+be either "yes" or "no". If the element is undefined, the task parameter
+'undef' will be set to "yes". String parameters, such as 'value', can be
+converted to numeric types with the built in functions real() and int().
+.ih
+PARAMETERS
+.ls table [file name]
+Name of the table from which this task is to read a value.
+.le
+.ls column [string]
+Column name. (The column name is not case sensitive.)
+.le
+.ls row [integer, min=1, max=INDEF]
+Row number.
+.le
+.ls (format=yes) [boolean]
+Format the value using table print format?
+
+The value from the table is returned to this task as a string parameter
+(see 'value').
+The default is to use the print format for 'column' to format the value,
+because this preserves the behavior of the task
+prior to the addition of the 'format' parameter.
+This behavior may be desirable when using h or m format, for example,
+or perhaps when using x or o format.
+On the other hand,
+it will often be the case that what you want is
+the actual value in the table,
+and using the print format
+could significantly limit the accuracy of the result.
+In this case, use format=no.
+.le
+.ls (value) [string]
+This parameter is used to store the value read in from 'table'.
+.le
+.ls (undef) [boolean]
+Is the value read in from 'table' undefined?
+.le
+.ih
+EXAMPLES
+1. Print the interval between the first 2 wavelengths (i.e., rows 1 and 2
+in the column 'WAVELENGTH') in the table 'spectrum.tab':
+
+.nf
+tt> tabpar spectrum.tab WAVELENGTH 1
+tt> x = real(tabpar.value)
+tt> tabpar spectrum.tab WAVELENGTH 2
+tt> y = real(tabpar.value)
+tt> print(y-x)
+.fi
+
+2. Print the twelfth component name (i.e., row 12 of the column 'COMPNAME',
+after checking to see if it is undefined.  If the value is undefined, then
+print a message instead:
+
+.nf
+tt> tabpar graph.tab COMPNAME 12
+tt> if (tabpar.undef) {
+>>>	print ("Component name undefined")
+>>> } else {
+>>>	print ("Component name = ",tabpar.value)
+>>> }
+.fi
+
+3. Here is an example illustrating the difference between
+format=yes and format=no for an integer column with x (hexadecimal) format:
+
+.nf
+tt> tabpar g.tab counts 4 format=yes
+tt> =tabpar.value
+31
+tt> tabpar g.tab counts 4 format=no
+tt> =tabpar.value
+49
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+keypar, keytab, parkey, partab, tabkey
+.endhelp

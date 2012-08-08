@@ -1,0 +1,47 @@
+.help precl Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slPREL (EP0, EP1, RMATP)
+
+     - - - - - -
+      P R E L
+     - - - - - -
+
+  Form the matrix of precession between two epochs, using the
+  model of Simon et al (1994), which is suitable for long
+  periods of time.
+
+  (double precision)
+
+  Given:
+     EP0    dp         beginning epoch
+     EP1    dp         ending epoch
+
+  Returned:
+     RMATP  dp(3,3)    precession matrix
+
+  Notes:
+
+     1)  The epochs are TDB Julian epochs.
+
+     2)  The matrix is in the sense   V(EP1)  =  RMATP * V(EP0)
+
+     3)  The absolute accuracy of the model is limited by the
+         uncertainty in the general precession, about 0.3 arcsec per
+         1000 years.  The remainder of the formulation provides a
+         precision of 1 mas over the interval from 1000AD to 3000AD,
+         0.1 arcsec from 1000BC to 5000AD and 1 arcsec from
+         4000BC to 8000AD.
+
+  Reference:
+     Simon, J.L. et al., 1994. Astron.Astrophys., 282, 663-683.
+
+  Called:  slDEUL
+
+  P.T.Wallace   Starlink   23 August 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

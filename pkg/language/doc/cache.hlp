@@ -1,0 +1,48 @@
+.help cache Feb86 language
+.ih
+NAME
+cache -- cache the parameters for a task in fast memory
+.ih
+USAGE
+cache task [task ...]
+.ih
+PARAMETERS
+.ls task
+The name of a task whose parameter set is to be cached in fast memory.
+.le
+.ih
+DESCRIPTION
+The \fIcache\fR command loads the parameters of a task in memory.
+The CL normally reads the parameters for a task from disk whenever the
+task is executed.  Cacheing the parameters for frequently executed tasks
+can speed up execution significantly.  This is particularly important when
+the tasks are called from within a loop.
+
+If the \fIcache\fR command is entered without any arguments a list of the
+currently "cached" tasks is printed.
+.ih
+EXAMPLES
+1. Cache the parameters for the tasks \fIdirectory\fR and \fIpage\fR.
+
+	cl> cache dir page
+
+2. Cache the parameters for the tasks called in a loop within the body of
+a procedure script.  Note the use of command mode in the script.
+
+.nf
+	begin
+		cache ("alpha", "beta")
+		for (i=1;  i <= 10;  i+=1) {
+		    alpha (i)
+		    beta (i)
+		}
+	end
+.fi
+.ih
+BUGS
+The parameter cache should not be confused with the process cache associated
+with the \fIprcache\fR and \fIflprcache\fR commands.
+.ih
+SEE ALSO
+unlearn, update, lparam, eparam
+.endhelp

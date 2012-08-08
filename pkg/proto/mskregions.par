@@ -1,0 +1,12 @@
+# MSKREGIONS parameters
+
+regions,s,a,,,,The list of region specifications
+masks,f,a,,,,The list of output mask images
+refimages,f,a,,,,The list of input reference images
+dims,s,h,"512,512",,,The default output mask dimensions
+depth,i,h,0,,,The default output mask depth in bits
+regnumber,s,h,"constant", "|constant|number|",,The region numbering scheme
+regval,i,h,1,,,The default starting mask region value
+exprdb,s,h,"none",,,The optional expression database
+append,b,h,no,,,Append new regions to an existing mask ?
+verbose,b,h,yes,,,Print task status messages ?

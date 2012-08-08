@@ -1,0 +1,52 @@
+# Make the SYSTEM system utilities package (including HELP)
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_system.x
+	$link	x_system.o libpkg.a -o xx_system.e
+	;
+
+install:
+	$move	xx_system.e bin$x_system.e
+	;
+
+libpkg.a:
+	@help
+
+	cmdstr.x	<ctype.h>
+	concatenate.x	
+	copy.x		<error.h>
+	count.x		<chars.h> <ctype.h> <error.h>
+	delete.x	<error.h>
+	directory.x	<chars.h> <ctype.h> <diropen.h> <finfo.h>\
+			<fset.h> <protect.h> <time.h>
+	files.x	
+	head.x		<error.h>
+	lprint.x	<error.h> <finfo.h> <time.h> <ttyset.h>
+	match.x		<ctype.h> <pattern.h>
+	mkdir.x	
+	movefiles.x	<error.h>
+	mtclean.x	
+	netstatus.x	
+	page.x		<fset.h>
+	pathnames.x	
+	protect.x	<error.h> <protect.h>
+	rename.x	<error.h>
+	rewind.x	
+	sort.x		sort.com <ctype.h>
+	tail.x		<error.h>
+	tee.x		<fset.h>
+	touch.x 	<error.h> <finfo.h> <time.h>
+	type.x		<error.h>
+	unprotect.x	<error.h> <protect.h>
+        t_fcache.x      <error.h>
+	t_urlget.x	<error.h> <imhdr.h> <imset.h> <mach.h>
+	;

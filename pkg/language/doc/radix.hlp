@@ -1,0 +1,45 @@
+.help radix Feb86 language
+.ih
+NAME
+radix -- encode a number in any radix
+.ih
+USAGE
+string = radix (number, newradix)
+.ih
+PARAMETERS
+.ls number
+The integer number to be encoded.
+.le
+.ls newradix
+The radix or base in which the number is to be printed,
+e.g., 2 (binary), 8 (octal), 10 (decimal), 16 (hex), and so on.
+.le
+.ih
+DESCRIPTION
+\fIRadix\fR is a string valued intrinsic function which formats an integer
+number in the indicated radix, return the encoded string as the function
+value.  Note that the CL permits numbers to be input in octal or hex format
+(trailing B or X suffix respectively), allowing common numeric conversions
+to decimal to be done directly.  The \fIradix\fR function is however the
+only CL function currently available for printing numbers in bases other
+than 10.  \fIRadix\fR can only be called as a function.
+.ih
+EXAMPLES
+1. Print the hex number 7cde in binary.
+
+	cl> = radix (7cdex, 2)
+
+2. Print the hex number 7cde in decimal.
+
+	cl> = 7cdex
+
+3. Print the number in variable I in decimal, octal, and hex.
+
+	cl> print (i, radix(i,8), " ", radix(i,16))
+.ih
+BUGS
+Very large bases produce strange results.
+.ih
+SEE ALSO
+print
+.endhelp

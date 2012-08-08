@@ -1,0 +1,447 @@
+.help imexpr Dec01 images.imutil
+.ih
+NAME
+imexpr -- General image expression evaluator
+.ih
+USAGE
+imexpr expr output [a b c ...]
+.ih
+PARAMETERS
+.ls expr
+The expression to be evaluated.  This may be the actual expression, or the
+string "@file" in which case the expression is taken from the named file.
+The input operands (i.e., numeric constants, images, or image header
+parameters) are referred to in the expression symbolically using the letters
+"a" through "z".
+.le
+.ls output
+The output image.  A section may be given to write into a section of an
+existing image.
+.le
+.ls a - z
+The input operands referenced by the expression.  The value of an operand
+may be an image name or section, a numeric constant, or a reference to an
+image header parameter of the form \fIoperand.param\fR, where \fIoperand\fR
+is one of the other input operands "a" through "z", corresponding to an input
+image (for example, "a.itime" is the parameter "itime" from the image
+assigned to operand "a").  An example of an input image operand is
+"a=dev$pix".
+.le
+.ls dims = "auto"
+The dimensions of the output image.  If the special value \fIauto\fR is
+given the output image dimensions are computed based on the input operands
+and the expression being evaluated.  Otherwise the value is a list of axis
+lengths, e.g., "512,512".
+.le
+.ls intype = "int"
+The minimum datatype for an input image operand.  If the special value
+\fIauto\fR is given the operand type will be the same as the pixel type of
+the image.  Otherwise one of the values "short", "int", "long", "real",
+or "double" should be given.  The program will promote the type of the
+input operand to the type specified if the actual type is less precise
+than the value of \fIintype\fR, otherwise the type of the input operand
+is not changed.  For example, if \fIintype\fR is "int" (the default),
+short integer input operands will be promoted to integer but int, long,
+real or double operands will be unaffected.  Setting \fIintype\fR to real
+will force the expression to be evaluated in floating point.
+.le
+.ls outtype = "auto"
+The pixel type of the output image.  If set to the special value \fIauto\fR
+the output image will be the same type as the expression being evaluated.
+If set to \fIref\fR the output image will have the same type as the
+"reference" input image (see below), regardless of the expression type.
+If an explicit type is specified such as "short", "ushort", "int", "real",
+an image of the indicated type will be created.
+.le
+.ls refim = "auto"
+The reference image to be used to pass the WCS and other image header
+attributes to the output image.  If set to \fIauto\fR the program will
+compute the best reference image, which is the first input image
+with the highest number of dimensions.  To force a particular input image
+to be the reference image the value should be set to the name of an input
+operand ("a", "b", etc.).  The named operand must refer to an image.
+.le
+.ls bwidth = 0
+The boundary width in pixels for boundary extension.  Boundary extension
+is enabled by setting this value to a positive nonzero value.  Boundary
+extension is needed when an input image section references out of bounds.
+.le
+.ls btype = "nearest"
+The type of boundary extension, chosen from the list "constant", "nearest",
+"reflect", "wrap", or "project".
+.le
+.ls bpixval = 0.
+The boundary pixel value if \fIbtype\fR="constant".
+.le
+.ls rangecheck = yes
+If range checking is enabled then the program will check for illegal
+operations such as divide by zero or the square root or logarithm of a
+negative value, substituting a constant value (zero) if such an operation
+is detected.  This may be necessary to avoid aborting the entire operation
+because of a few bad pixels in an image.  A conditional expression may be
+used to detect such pixels and perform any special processing.
+.le
+.ls verbose = yes
+Enable or disable informative messages.  If enabled, the program will echo
+the expression to be evaluated after all expansions have been performed,
+and percent-done messages will be printed as the expression is evaluated.
+.le
+.ls exprdb = ""
+The file name of an optional expression database.  An expression database
+may be used to define symbolic constants or a library of custom function
+macros.
+.le
+.ih
+DESCRIPTION
+\fIimexpr\fR evaluates an image expression and writes the result to the
+output image.  Images may be any dimension or size and any datatype except
+complex (complex images may be read but only the real part will be used).
+
+If the input images are not all the same size the computation will be
+performed over the largest area which is common to all images.  If the
+images are not all the same dimension the lesser dimension operands will be
+iteratively combined with the higher dimension ones.  For example, when
+both a one and two dimensional image are used in the same expression,
+the vector (one dimensional image) will be applied to all lines of the
+two dimensional image.
+
+Evaluation of the image expression is carried out one line at a time.  This
+is efficient and permits operations on arbitrarily large images without
+using excessive memory, but does not allow 2D or higher operations to be
+performed within the expression (e.g., transpose).  The entire expression is
+evaluated once for each line of the output image.
+
+
+\fBOperands\fR
+
+Input operands are represented symbolically in the input expression using
+the symbols "a" through "z", corresponding to \fIimexpr\fR task parameters.
+Use of symbolic operands allows the same expression to be used with different
+data sets, simplifies the expression syntax, and allows a single input image
+to be used several places in the same expression.
+
+Three classes of input operands are recognized: images, image parameters, and
+numeric constants.
+
+.nf
+	dev$pix[*,55]		image operand
+	a.itime			image parameter
+	1.2345			numeric constant
+.fi
+
+Since the input operands are CL parameters they may be set on the command
+line, or entered in response to parameter prompts when the task executes and
+evaluates the input expression.  For example,
+
+.nf
+	cl> imexpr "a - a/b" pix
+	operand a: dev$pix[*,55]
+	operand b: a.itime
+.fi
+
+would evaluate the expression shown, storing the result in the output image
+"pix".
+
+Operands may also be specified directly in the expression, with the
+exception of image operands.  For example,
+
+	cl> imexpr "a - a / a.itime"
+
+is equivalent to the earlier example.
+
+If the input operand is not a simple identifier (a simple name like "itime"
+containing only alphanumeric characters, underscore, ".", or "$") then it
+is necessary to quote the operand name and precede it with an "@", e.g.,
+
+	cl> imexpr 'a - a / @"a.i-time"'
+
+Finally, there is a special builtin type of operand used to represent the
+image pixel coordinates in an image expression.  These operands have the
+special reserved names "I", "J", "K", etc., up to the dimensions of the
+output image.  The names must be upper case to avoid confusion to with the
+input operands "i", "j", "k" and so on.
+
+.nf
+	I			X coordinate of pixel (column)
+	J			Y coordinate of pixel (line)
+	K			Z coordinate of pixel (band)
+.fi
+
+An example of the use of the pixel coordinate operands is the generation of
+multidimensional analytic functions.
+
+
+\fBOperators\fR
+
+The expression syntax implemented by \fIimexpr\fR provides the following
+set of operators:
+
+.nf
+	( expr )		grouping
+	+ - * /			arithmetic
+	**			exponentiation
+	//			concatenate
+	expr ? expr1 : expr2	conditional expression
+	@ "name"		get operand
+
+	&&			logical and
+	||			logical or
+	! 			logical not
+	<			less than
+	<=			less than or equal
+	>			greater than
+	>=			greater than or equal
+	==			equals
+	!=			not equals
+	?=			substring equals
+
+	&			bitwise and
+	|			bitwise or
+	^			bitwise exclusive or
+	~			bitwise not (complement)
+.fi
+
+The conditional expression has the value \fIexpr1\fR if \fIexpr\fR is true,
+and \fIexpr2\fR otherwise.  Since the expression is evaluated at every pixel
+this permits pixel-dependent operations such as checking for special pixel
+values, or selection of elements from either of two vectors.  For example,
+the command
+
+	(a < 0) ? 555 : b / a
+
+has the constant value 555 if "a" is less than zero, and "b / a" otherwise.
+Conditional expressions are general expressions and may be nested or used
+anywhere an expression is permitted.
+
+The concatenation operator applies to all types of data, not just strings.
+Concatenating two vectors results in a vector the combined length of the
+two input vectors.
+
+The substring equals operator "?=", used for string comparisons,  is like 
+"==" but checks for the presence of a substring, rather than exact equality
+of the two strings.
+
+
+\fBFunctions\fR
+
+Where it makes sense all intrinsic functions support all datatypes, with
+some restrictions on \fIbool\fR and \fIchar\fR.  Arguments may be scalars or
+vectors and scalar and vector arguments may be mixed in the same function
+call.  Arguments are automatically type converted upon input as necessary.
+Some functions support a variable number of arguments and the details of
+the the operation to be performed may depend upon how many arguments are
+given.
+
+Functions which operate upon vectors are applied to the \fIlines\fR of an
+image.  When applied to an image of dimension two or greater, these
+functions are evaluated separately for every line of the multidimensional
+image.
+
+Standard Intrinsic Functions
+
+.nf
+	abs (a)				absolute value
+	max (a, b, ...)			maximum value
+	min (a, b, ...)			minimum value
+	mod (a, b)			modulus
+       sqrt (a)				square root
+.fi
+
+Mathematical or trigonometric functions
+
+.nf
+       acos (a)				arc cosine
+       asin (a)				arc sine
+       atan (a [,b])			arc tangent
+      atan2 (a [,b])			arc tangent
+	cos (a)				cosine
+       cosh (a)				hyperbolic cosine
+	exp (a)				exponential
+	log (a)				natural logarithm
+      log10 (a)				logarithm base 10
+	sin (a)				sine
+       sinh (a)				hyperbolic sine
+	tan (a) 			tangent
+       tanh (a) 			hyperbolic tangent
+.fi
+
+The trigonometric functions operate in units of radians.  The \fIdeg\fR and
+\fIrad\fR intrinsic functions (see below) can be used to convert to and from
+degrees if desired.
+
+Type conversion functions
+
+.nf
+       bool (a)				coerce to boolean
+      short (a)				coerce to short
+	int (a)				truncate to integer
+       nint (a)				nearest integer
+       long (a)				coerce to long (same as int)
+       real (a)				coerce to real
+     double (a)				coerce to double
+	str (a)				coerce to string
+.fi
+
+The numeric type conversion functions will convert a string to a number if
+called with a character argument.  The \fIstr\fR function will convert any
+number to a string.
+
+Projection functions
+
+.nf
+	len (a)				length of a vector
+	hiv (a)				high value of a vector
+	lov (a)				low value of a vector
+       mean (a [, ksigma])		mean of a vector
+     median (a)				median of a vector
+     stddev (a [, ksigma])		standard deviation
+	sum (a)				sum of a vector
+.fi
+
+The projection functions take a vector as input and return a scalar value as
+output.  The functions \fImean\fR and \fIstddev\fR, used to compute the mean
+and standard deviation of a vector, allow an optional second argument which
+if given causes a K-sigma rejection to be performed.
+
+Miscellaneous functions
+
+.nf
+	deg (a)				radians to degrees
+	rad (a)				degrees to radians
+     median (a, b, c [, d [, e]])	vector median of 3-5 vectors
+       repl (a, n)			replicate
+       sort (a)				sort a vector
+      shift (a, npix)			shift a vector
+.fi
+
+The \fImedian\fR function shown here computes the vector median of several
+input vectors, unlike the projection median which computes the median value
+of a vector sample.  \fIsort\fR sorts a vector, returning the sorted vector
+as output (this can be useful for studying the statistics of a sample).
+\fIshift\fR applies an integral pixel shift to a vector, wrapping around at
+the endpoints.  A positive shift shifts data features to the right (higher
+indices).
+
+The \fIrepl\fR (replicate) function replicates a data element, returning a
+vector of length (n * len(a)) as output.  For example, this can be used to
+create a dummy data array or image by replicating a constant value.
+
+
+\fBThe Expression Database\fR
+
+The \fIimexpr\fR expression database provides a macro facility which can be
+used to create custom libraries of functions for specific applications. A
+simple example follows.
+
+.nf
+	# Sample IMEXPR expression database file.
+
+	# Constants.
+	SQRTOF2=	1.4142135623730950488
+	BASE_E=		2.7182818284590452353
+	PI=		3.1415926535897932385
+	GAMMA=		.57721566490153286061	# Euler's constant
+
+	# Functions.
+	div10(a)	((a) / 10)
+	divz(a,b)	((abs(b) < .000001) ? 0 : a / b)
+
+	div(a,b)	(div10(b) / a)
+	sinx		(cos(I / 30.0))
+	sinxy(a,b)	(cos (I / a) + cos (J / b))
+.fi
+
+The complete syntax of a macro entry is as follows:
+
+	<symbol>['(' arg-list ')'][':'|'=']     replacement-text
+
+The replacement text may appear on the same line as the macro name or may
+start on the next line, and may extend over multiple input lines if
+necessary.  If so, continuation lines must be indented.  The first line
+with no whitespace at the beginning of the line terminates the macro.
+Macro functions may be nested.  Macro functions are indistinguishable from
+intrinsic functions in expressions.
+
+
+\fBIMEXPR and Pixel Masks\fR
+
+Although \fIimexpr\fR has no special support for pixel masks, it was
+designed to work with masks and it is important to realize how these can be
+used.  IRAF image i/o includes support for a special type of image, the
+pixel mask or ".pl" type image.  Pixel masks are used for things such as
+region identification in images - any arbitrary region of an image can be
+assigned a constant value in a mask to mark the region.  Masks can then be
+used during image analysis to identify the subset of image pixels to be
+used.  An image mask stored as a ".pl" file is stored in compressed form and
+is typically only a few kilobytes in size.
+
+There are many ways to create masks, but in some cases \fIimexpr\fR itself
+can be used for this purpose.  For example, to create a boolean mask with
+\fIimexpr\fR merely evaluate a boolean expression and specify a ".pl" file
+as the output image.  For example,
+
+    cl> imexpr "a > 800" mask.pl
+
+will create a boolean mask "mask.pl" which identifies all the pixels in an
+image with a value greater than 800.
+
+An example of the use of masks is the problem of combining portions of two
+images to form a new image.
+
+    cl> imexpr "c ? a : b"  c=mask.pl
+
+This example will select pixels from either image A or B to form the output
+image, using the mask assigned to operand C to control the selection.
+.ih
+EXAMPLES
+1. Copy an image, changing the datatype to real (there are better ways to
+do this of course).
+
+    cl> imexpr a pix2 a=pix outtype=real
+
+2. Create a new, empty image with all the pixels set to 0.
+
+    cl> imexpr "repl(0,512)" pix dim=512,512
+
+3. Create a 1D image containing the sinc function.
+
+    cl> imexpr "I == 10 ? 1.0 : sin(I-10.0)/(I-10)" sinc dim=20
+
+4. Create a new image containing a simple test pattern consisting of a 5
+element vector repeated 100 times across each image line.
+
+    cl> imexpr "repl((9 // 3 // 3 // 11 // 11), 100)" patt dim=500,500
+
+5. Subtract the median value from each line of an image.
+
+    cl> imexpr "a - median(a)" medimage
+
+6. Compute the HIV (low value) projection of an image.  The result is a
+transposed 1D image.
+
+    cl> imexpr "hiv(a)" hvector
+
+7. Swap the left and right halves of an image.
+
+.nf
+    cl> imexpr "a // b" pix swapimage
+    operand a: dev$pix[256:512,*]
+    operand b: dev$pix[1:255,*]
+.fi
+
+8. Create a circular mask of a given radius about a user-defined center.
+
+.nf
+    cl> type expr
+    (sqrt((I-b)**2 + (J-c)**2) <= d)
+    cl> imexpr @expr mask.pl b=256 c=256 d=100 dims=512,512
+.fi
+
+.ih
+BUGS
+The input and output images cannot be the same.
+No support for type complex yet, or operations like the fourier transform.
+.ih
+SEE ALSO
+imarith, imfunction, imcombine
+.endhelp

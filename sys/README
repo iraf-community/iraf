@@ -1,0 +1,27 @@
+These directories contain the source and libraries for the IRAF system, i.e.,
+the system interface or "virtual operating system" (VOS) and the machine
+independent i/o libraries comprising the program interface.  To rebuild the
+VOS merely run "mkpkg" after bringing up the bootstrap utilities and libraries
+in host$.  To relink the system executables after an important modification
+to the VOS, type "mkpkg update".
+
+    clio	command language i/o
+    dbio	database i/o
+    etc		miscellanous system modules
+    fio		file i/o
+    flib	contains nop.x, used to list modules for libmain.o
+    fmtio	formatted i/o
+    gio		graphics i/o
+    imio	image i/o
+    ki		kernel inteface (networking)
+    memio	memory i/o
+    mkpkg	descriptor file for the MKPKG utility
+    mtio	magnetic tape i/o
+    osb		bit and byte primitives
+    spool	record of the last sysgen
+    vops	vector operators
+
+For example:
+
+	mkpkg >& spool &		make or update the VOS libraries
+	mkpkg update			update the system executables

@@ -1,0 +1,8 @@
+# LAPLACE FILTER
+
+input,f,a,,,,Input images to be fit
+output,f,a,,,,Output images
+laplace,s,h,xycent,,,'Laplacian filter (xycentral,diagonals,xyall,xydiagonals)'
+boundary,s,h,'nearest',,,'Boundary (constant,nearest,reflect,wrap)'
+constant,r,h,0,,,Constant for boundary extension
+mode,s,h,'ql'

@@ -1,0 +1,79 @@
+.help altaz Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slALAZ (HA, DEC, PHI,
+     :                      AZ, AZD, AZDD, EL, ELD, ELDD, PA, PAD, PADD)
+
+     - - - - - -
+      A L A Z
+     - - - - - -
+
+  Positions, velocities and accelerations for an altazimuth
+  telescope mount.
+
+  (double precision)
+
+  Given:
+     HA      d     hour angle
+     DEC     d     declination
+     PHI     d     observatory latitude
+
+  Returned:
+     AZ      d     azimuth
+     AZD     d        "    velocity
+     AZDD    d        "    acceleration
+     EL      d     elevation
+     ELD     d         "     velocity
+     ELDD    d         "     acceleration
+     PA      d     parallactic angle
+     PAD     d         "      "   velocity
+     PADD    d         "      "   acceleration
+
+  Notes:
+
+  1)  Natural units are used throughout.  HA, DEC, PHI, AZ, EL
+      and ZD are in radians.  The velocities and accelerations
+      assume constant declination and constant rate of change of
+      hour angle (as for tracking a star);  the units of AZD, ELD
+      and PAD are radians per radian of HA, while the units of AZDD,
+      ELDD and PADD are radians per radian of HA squared.  To
+      convert into practical degree- and second-based units:
+
+        angles * 360/2pi -> degrees
+        velocities * (2pi/86400)*(360/2pi) -> degree/sec
+        accelerations * ((2pi/86400)**2)*(360/2pi) -> degree/sec/sec
+
+      Note that the seconds here are sidereal rather than SI.  One
+      sidereal second is about 0.99727 SI seconds.
+
+      The velocity and acceleration factors assume the sidereal
+      tracking case.  Their respective numerical values are (exactly)
+      1/240 and (approximately) 1/3300236.9.
+
+  2)  Azimuth is returned in the range 0-2pi;  north is zero,
+      and east is +pi/2.  Elevation and parallactic angle are
+      returned in the range +/-pi/2.  Position angle is +ve
+      for a star west of the meridian and is the angle NP-star-zenith.
+
+  3)  The latitude is geodetic as opposed to geocentric.  The
+      hour angle and declination are topocentric.  Refraction and
+      deficiencies in the telescope mounting are ignored.  The
+      purpose of the routine is to give the general form of the
+      quantities.  The details of a real telescope could profoundly
+      change the results, especially close to the zenith.
+
+  4)  No range checking of arguments is carried out.
+
+  5)  In applications which involve many such calculations, rather
+      than calling the present routine it will be more efficient to
+      use inline code, having previously computed fixed terms such
+      as sine and cosine of latitude, and (for tracking a star)
+      sine and cosine of declination.
+
+  P.T.Wallace   Starlink   14 March 1997
+
+  Copyright (C) 1997 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

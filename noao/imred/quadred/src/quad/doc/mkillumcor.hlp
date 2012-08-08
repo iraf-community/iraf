@@ -1,0 +1,92 @@
+.help mkillumcor Oct88 noao.imred.ccdred
+.ih
+NAME
+mkillumcor -- Make flat field iillumination correction images
+.ih
+USAGE
+mkillumcor input output
+.ih
+PARAMETERS
+.ls input
+List of input images for making flat field iillumination correction images.
+.le
+.ls output
+List of output flat field iillumination correction images.  If none is
+specified or if the name is the same as the input image then the output
+image replaces the input image.
+.le
+.ls ccdtype = "flat"
+CCD image type to select from the input images.  If none is specified
+then all types are used.
+.le
+.ls xboxmin = 5, xboxmax = 0.25, yboxmin = 5, yboxmax = 0.25
+Minimum and maximum smoothing box size along the x and y axes.  The
+minimum box size is used at the edges and grows to the maximum size in
+the middle of the image.  This allows the smoothed image to better
+represent gradients at the edge of the image.  If a size is less then 1
+then it is interpreted as a fraction of the image size.  If a size is
+greater than or equal to 1 then it is the box size in pixels.  A size
+greater than the size of image selects a box equal to the size of the
+image.
+.le
+.ls clip = yes
+Clean the input images of objects?  If yes then a clipping algorithm is
+used to detect and exclude deviant points from the smoothing.
+.le
+.ls lowsigma = 2.5, highsigma = 2.5
+Sigma clipping thresholds above and below the smoothed iillumination.
+.le
+.ls divbyzero = 1.
+The iillumination correction is the inverse of the smoothed flat field.
+This may produce division by zero.  A warning is given if division
+by zero takes place and the result (the iillumination correction value)
+is replaced by the value of this parameter.
+.le
+.ls ccdproc (parameter set)
+CCD processing parameters.
+.le
+.ih
+DESCRIPTION
+First, the input flat field images are automatically processed if
+needed.  Then, the large scale iillumination pattern of the images is
+determined by heavily smoothing them using a moving "boxcar" average.
+The iillumination correction, the inverse of the iillumination pattern,
+is applied by \fBccdproc\fR to CCD images to remove the iillumination
+pattern introduced by the flat field.  The combination of the flat
+field calibration and the iillumination correction based on the flat
+field is equivalent to removing the iillumination from the flat field
+(see \fBmkillumflat\fR).  This two step calibration is generally used
+when the observations have been previously flat field calibrated.  This
+task is closely related to \fBmkskycor\fR which determines the
+iillumination correction from a blank sky image; this is preferable to
+using the iillumination from the flat field as it corrects for the
+residual iillumination error.  For a general discussion of the options
+for flat fields and iillumination corrections see \fBflatfields\fR.
+
+The smoothing algorithm is a moving average over a two dimensional
+box.  The algorithm is unconvential in that the box size is not fixed.
+The box size is increased from the specified minimum at the edges to
+the maximum in the middle of the image.  This permits a better estimate
+of the background at the edges, while retaining the very large scale
+smoothing in the center of the image.  Note that the sophisticated
+tools of the \fBimages\fR package may be used for smoothing but this
+requires more of the user and, for the more sophisticated smoothing
+algorithms such as surface fitting, more processing time.
+
+To minimize the effects of bad pixels a sigma clipping algorithm is
+used to detect and reject these pixels from the iillumination.  This is
+done by computing the rms of the image lines relative to the smoothed
+iillumination and excluding points exceeding the specified threshold
+factors times the rms.  This is done before each image line is added to
+the moving average, except for the first few lines where an iterative
+process is used.
+.ih
+EXAMPLES
+1. The example below makes an iillumination correction image from the
+flat field image, "flat017".
+
+    cl> mkillumcor flat017 Illum
+.ih
+SEE ALSO
+ccdproc, flatfields, mkillumflat, mkskycor, mkskyflat
+.endhelp

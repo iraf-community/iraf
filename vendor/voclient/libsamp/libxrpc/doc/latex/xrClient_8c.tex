@@ -1,0 +1,287 @@
+\hypertarget{xrClient_8c}{
+\section{xrClient.c File Reference}
+\label{xrClient_8c}\index{xrClient.c@{xrClient.c}}
+}
+Client-side procedures.  
+
+
+{\tt \#include $<$stdlib.h$>$}\par
+{\tt \#include $<$stdio.h$>$}\par
+{\tt \#include $<$unistd.h$>$}\par
+{\tt \#include $<$pthread.h$>$}\par
+{\tt \#include $<$stdarg.h$>$}\par
+{\tt \#include $<$string.h$>$}\par
+{\tt \#include $<$xmlrpc-c/base.h$>$}\par
+{\tt \#include $<$xmlrpc-c/client.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server.h$>$}\par
+{\tt \#include $<$xmlrpc-c/server\_\-abyss.h$>$}\par
+{\tt \#include \char`\"{}xrpcP.h\char`\"{}}\par
+\subsection*{Data Structures}
+\begin{CompactItemize}
+\item 
+struct \textbf{ASynch}
+\end{CompactItemize}
+\subsection*{Defines}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrClient_8c_d72dbcf6d0153db1b8d8a58001feed83}{
+\#define \textbf{DEBUG}~0}
+\label{xrClient_8c_d72dbcf6d0153db1b8d8a58001feed83}
+
+\end{CompactItemize}
+\subsection*{Typedefs}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrClient_8c_be3ec70b101edd7062574eb1583d4a49}{
+typedef struct ASynch $\ast$ \textbf{ASynchP}}
+\label{xrClient_8c_be3ec70b101edd7062574eb1583d4a49}
+
+\end{CompactItemize}
+\subsection*{Functions}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrClient_8c_8d8223aabca8dc3180ccaab61b75ed71}{
+int \textbf{xr\_\-newASync} (int cnum)}
+\label{xrClient_8c_8d8223aabca8dc3180ccaab61b75ed71}
+
+\item 
+\hypertarget{xrClient_8c_5b320e2ef3252ebff7cb0f7922f642c9}{
+int \textbf{xr\_\-initClient} (char $\ast$url, char $\ast$name, char $\ast$version)}
+\label{xrClient_8c_5b320e2ef3252ebff7cb0f7922f642c9}
+
+\item 
+\hypertarget{xrClient_8c_e129d5ad36a363775cbcb3786d5448f7}{
+int \textbf{xr\_\-closeClient} (int cnum)}
+\label{xrClient_8c_e129d5ad36a363775cbcb3786d5448f7}
+
+\item 
+\hypertarget{xrClient_8c_98a255420d76ce981e5e64b67b3f6c7d}{
+int \textbf{xr\_\-callSync} (int cnum, char $\ast$name)}
+\label{xrClient_8c_98a255420d76ce981e5e64b67b3f6c7d}
+
+\item 
+\hypertarget{xrClient_8c_cdf119b6d1aa27440f308243f44bd78e}{
+int \textbf{xr\_\-callASync} (int cnum, char $\ast$name, void $\ast$ret\_\-handler)}
+\label{xrClient_8c_cdf119b6d1aa27440f308243f44bd78e}
+
+\item 
+\hypertarget{xrClient_8c_e68d52f3cf840c05d4c3a4950a2c047a}{
+int \textbf{xr\_\-asyncWait} ()}
+\label{xrClient_8c_e68d52f3cf840c05d4c3a4950a2c047a}
+
+\item 
+\hypertarget{xrClient_8c_c9a7ed0ecdf25c0ad9c221a80408e2b1}{
+void \textbf{xr\_\-initParam} (int cnum)}
+\label{xrClient_8c_c9a7ed0ecdf25c0ad9c221a80408e2b1}
+
+\item 
+\hypertarget{xrClient_8c_e94150fb308a96386476794ef848b910}{
+void \textbf{xr\_\-setVerbose} (int verbose)}
+\label{xrClient_8c_e94150fb308a96386476794ef848b910}
+
+\item 
+\hypertarget{xrClient_8c_b5e2b8389e8c2e60c4525ace7bea6335}{
+void \textbf{xr\_\-setDebug} (int debug)}
+\label{xrClient_8c_b5e2b8389e8c2e60c4525ace7bea6335}
+
+\item 
+\hypertarget{xrClient_8c_89bbbcf205eb13196057d39a6a196932}{
+void \textbf{xr\_\-setIntInParam} (int cnum, int value)}
+\label{xrClient_8c_89bbbcf205eb13196057d39a6a196932}
+
+\item 
+\hypertarget{xrClient_8c_ecba91392cb979d897d8712bdf58b12b}{
+void \textbf{xr\_\-setDoubleInParam} (int cnum, double value)}
+\label{xrClient_8c_ecba91392cb979d897d8712bdf58b12b}
+
+\item 
+\hypertarget{xrClient_8c_dda9992545ee7c801b6cd763e59784a7}{
+void \textbf{xr\_\-setBoolInParam} (int cnum, int value)}
+\label{xrClient_8c_dda9992545ee7c801b6cd763e59784a7}
+
+\item 
+\hypertarget{xrClient_8c_c282b7c20bfa7856142e7f88f0579a53}{
+void \textbf{xr\_\-setStringInParam} (int cnum, char $\ast$str)}
+\label{xrClient_8c_c282b7c20bfa7856142e7f88f0579a53}
+
+\item 
+\hypertarget{xrClient_8c_91c7555b63a5a08c0aeeeddc3ad42165}{
+void \textbf{xr\_\-setDatetimeInParam} (int cnum, char $\ast$str)}
+\label{xrClient_8c_91c7555b63a5a08c0aeeeddc3ad42165}
+
+\item 
+\hypertarget{xrClient_8c_fa2cc0855cf5c3631471050a6ba09207}{
+void \textbf{xr\_\-setStructInParam} (int cnum, int snum)}
+\label{xrClient_8c_fa2cc0855cf5c3631471050a6ba09207}
+
+\item 
+\hypertarget{xrClient_8c_78563a4e8fd46ff0557d03374cbf1946}{
+void \textbf{xr\_\-setArrayInParam} (int cnum, int anum)}
+\label{xrClient_8c_78563a4e8fd46ff0557d03374cbf1946}
+
+\item 
+\hypertarget{xrClient_8c_cb6b5989e8f47062cd343499fee75d0b}{
+int \textbf{xr\_\-getIntFromResult} (int cnum, int $\ast$value)}
+\label{xrClient_8c_cb6b5989e8f47062cd343499fee75d0b}
+
+\item 
+\hypertarget{xrClient_8c_b8474f338f85c852103f8a49830aa10c}{
+int \textbf{xr\_\-getDoubleFromResult} (int cnum, double $\ast$value)}
+\label{xrClient_8c_b8474f338f85c852103f8a49830aa10c}
+
+\item 
+\hypertarget{xrClient_8c_fa93ec5ea52ebbdb40abeb4698a25df2}{
+int \textbf{xr\_\-getBoolFromResult} (int cnum, int $\ast$value)}
+\label{xrClient_8c_fa93ec5ea52ebbdb40abeb4698a25df2}
+
+\item 
+\hypertarget{xrClient_8c_5eca822535c28f773981c0bc75cae2a0}{
+int \textbf{xr\_\-getStringFromResult} (int cnum, char $\ast$$\ast$value)}
+\label{xrClient_8c_5eca822535c28f773981c0bc75cae2a0}
+
+\item 
+\hypertarget{xrClient_8c_ab526df445f4ca5872bdd6ab6532bbf0}{
+int \textbf{xr\_\-getDatetimeFromResult} (int cnum, char $\ast$$\ast$date)}
+\label{xrClient_8c_ab526df445f4ca5872bdd6ab6532bbf0}
+
+\item 
+\hypertarget{xrClient_8c_20fd5187249711e989e267bb37c4aedc}{
+int \textbf{xr\_\-getStructFromResult} (int cnum, int $\ast$snum)}
+\label{xrClient_8c_20fd5187249711e989e267bb37c4aedc}
+
+\item 
+\hypertarget{xrClient_8c_e4246f96a447db4f094312184616b43a}{
+int \textbf{xr\_\-getArrayFromResult} (int cnum, int $\ast$anum)}
+\label{xrClient_8c_e4246f96a447db4f094312184616b43a}
+
+\item 
+char $\ast$ \hyperlink{xrClient_8c_6e3ba711d6a45a322fc1198e59e48db7}{xr\_\-getErrMsg} (int cnum)
+\item 
+int \hyperlink{xrClient_8c_1476ebc6543c4720e1f57f1e43c029ee}{xr\_\-getErrCode} (int cnum)
+\item 
+void \hyperlink{xrClient_8c_5fbc5caae01b38e0286b0278c4500582}{xr\_\-envClean} (int cnum)
+\item 
+void \hyperlink{xrClient_8c_a57d551b00ba6407fd932c999a284007}{xr\_\-freeParam} (int cnum)
+\item 
+void \hyperlink{xrClient_8c_2ec7d4a7b6ab5ed2ea325ec8194ece3d}{xr\_\-freeResult} (int cnum)
+\item 
+void \hyperlink{xrClient_8c_03dada9111080c072069e8f3ffae19f0}{xr\_\-clientCleanup} (int cnum)
+\item 
+\hypertarget{xrClient_8c_946a26fa50613a4eb9ac10a931d2172d}{
+void \textbf{printClient} (int cnum)}
+\label{xrClient_8c_946a26fa50613a4eb9ac10a931d2172d}
+
+\end{CompactItemize}
+\subsection*{Variables}
+\begin{CompactItemize}
+\item 
+\hypertarget{xrClient_8c_24a5a2acb2b19e47d9df50be8a7956a2}{
+int \textbf{client\_\-errstat} = OK}
+\label{xrClient_8c_24a5a2acb2b19e47d9df50be8a7956a2}
+
+\item 
+\hypertarget{xrClient_8c_e2df9af04c6ab77e11dde055e60b9296}{
+int \textbf{num\_\-asynch\_\-threads} = 0}
+\label{xrClient_8c_e2df9af04c6ab77e11dde055e60b9296}
+
+\item 
+\hypertarget{xrClient_8c_7ac758b4046fa9edb1a9a737ca4ba328}{
+int \textbf{client\_\-debug} = 0}
+\label{xrClient_8c_7ac758b4046fa9edb1a9a737ca4ba328}
+
+\item 
+\hypertarget{xrClient_8c_8cf4155643b866ef45abfed82e09539a}{
+int \textbf{client\_\-verbose} = 0}
+\label{xrClient_8c_8cf4155643b866ef45abfed82e09539a}
+
+\item 
+\hypertarget{xrClient_8c_e2966ba84800c3d9074204e09a48c577}{
+pthread\_\-mutex\_\-t \textbf{async\_\-mutex} = PTHREAD\_\-MUTEX\_\-INITIALIZER}
+\label{xrClient_8c_e2966ba84800c3d9074204e09a48c577}
+
+\end{CompactItemize}
+
+
+\label{_details}
+\hypertarget{_details}{}
+\subsection{Detailed Description}
+Client-side procedures. 
+
+XRCLIENT.C
+
+Client-side procedures used by an application to make a call to a remote service. In this interface, the calling application must first initialize a client context for a specific service, then create a parameter array of arguments before invoking the function either synchronously or asynchronously. Once the call completes, API procedures are used to extract the result values.
+
+\hyperlink{structClient}{Client} methods: // call services cnum = xr\_\-initClient (char $\ast$url, char $\ast$name, char $\ast$version) xr\_\-callSync (cnum, char $\ast$name) xr\_\-callASync (cnum, char $\ast$name, void $\ast$func, .....) xr\_\-closeClient (cnum)
+
+xr\_\-initParam (cnum) // init params xr\_\-setVerbose (verbose) // verbose flag xr\_\-setDebug (debug) // debug flag
+
+xr\_\-setIntInParam (cnum, int ival) // scalar param xr\_\-setpDoubleInParam (cnum, double dval) xr\_\-setpBoolInParam (cnum, int bval) xr\_\-setpStringInParam (cnum, char $\ast$str) xr\_\-setpDatetimeInParam (cnum, char $\ast$date) xr\_\-setpStructInParam (cnum, int snum) xr\_\-setpArrayInParam (cnum, int anum)
+
+stat = xr\_\-getIntFromResult (cnum, int $\ast$ival) // get results stat = xr\_\-getDoubleFromResult (cnum, double $\ast$dval) stat = xr\_\-getBoolFromResult (cnum, int $\ast$bval) stat = xr\_\-getStringFromResult (cnum, char $\ast$$\ast$value) stat = xr\_\-getDatetimeFromResult (cnum, char $\ast$$\ast$date) stat = xr\_\-getStructFromResult (cnum) stat = xr\_\-getArrayFromResult (cnum)
+
+xr\_\-envClean (cnum) // cleanup xr\_\-freeParam (cnum) xr\_\-freeResult (cnum) xr\_\-clientCleanup (cnum)
+
+stat = xr\_\-resultArrayInt (int anum, int index, int $\ast$value) stat = xr\_\-resultArrayDouble (int anum, int index, int $\ast$value) stat = xr\_\-resultArrayBool (int anum, int index, int $\ast$value) stat = xr\_\-resultArrayString (int anum, int index, char $\ast$$\ast$value) stat = xr\_\-resultArrayDatetime (int anum, int index, char $\ast$$\ast$value) stat = xr\_\-resultArrayStruct (int anum, int index, int $\ast$value)
+
+\begin{Desc}
+\item[Author:]Mike Fitzpatrick \end{Desc}
+\begin{Desc}
+\item[Date:]6/10/09 \end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{xrClient_8c_03dada9111080c072069e8f3ffae19f0}{
+\index{xrClient.c@{xrClient.c}!xr\_\-clientCleanup@{xr\_\-clientCleanup}}
+\index{xr\_\-clientCleanup@{xr\_\-clientCleanup}!xrClient.c@{xrClient.c}}
+\subsubsection[{xr\_\-clientCleanup}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-clientCleanup (int {\em cnum})}}
+\label{xrClient_8c_03dada9111080c072069e8f3ffae19f0}
+
+
+Shutdown our XML-RPC client library. 
+
+References Client::env.\hypertarget{xrClient_8c_5fbc5caae01b38e0286b0278c4500582}{
+\index{xrClient.c@{xrClient.c}!xr\_\-envClean@{xr\_\-envClean}}
+\index{xr\_\-envClean@{xr\_\-envClean}!xrClient.c@{xrClient.c}}
+\subsubsection[{xr\_\-envClean}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-envClean (int {\em cnum})}}
+\label{xrClient_8c_5fbc5caae01b38e0286b0278c4500582}
+
+
+XR\_\-ENVCLEAN -- Clean the environment of the specified client. 
+
+References Client::env.\hypertarget{xrClient_8c_a57d551b00ba6407fd932c999a284007}{
+\index{xrClient.c@{xrClient.c}!xr\_\-freeParam@{xr\_\-freeParam}}
+\index{xr\_\-freeParam@{xr\_\-freeParam}!xrClient.c@{xrClient.c}}
+\subsubsection[{xr\_\-freeParam}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-freeParam (int {\em cnum})}}
+\label{xrClient_8c_a57d551b00ba6407fd932c999a284007}
+
+
+XR\_\-FREEPARAM -- Free the \hyperlink{structClient}{Client} parameter xmlrpc\_\-value. 
+
+References Client::param.\hypertarget{xrClient_8c_2ec7d4a7b6ab5ed2ea325ec8194ece3d}{
+\index{xrClient.c@{xrClient.c}!xr\_\-freeResult@{xr\_\-freeResult}}
+\index{xr\_\-freeResult@{xr\_\-freeResult}!xrClient.c@{xrClient.c}}
+\subsubsection[{xr\_\-freeResult}]{\setlength{\rightskip}{0pt plus 5cm}void xr\_\-freeResult (int {\em cnum})}}
+\label{xrClient_8c_2ec7d4a7b6ab5ed2ea325ec8194ece3d}
+
+
+Free the \hyperlink{structClient}{Client} result xmlrpc\_\-value. 
+
+References Client::result.\hypertarget{xrClient_8c_1476ebc6543c4720e1f57f1e43c029ee}{
+\index{xrClient.c@{xrClient.c}!xr\_\-getErrCode@{xr\_\-getErrCode}}
+\index{xr\_\-getErrCode@{xr\_\-getErrCode}!xrClient.c@{xrClient.c}}
+\subsubsection[{xr\_\-getErrCode}]{\setlength{\rightskip}{0pt plus 5cm}int xr\_\-getErrCode (int {\em cnum})}}
+\label{xrClient_8c_1476ebc6543c4720e1f57f1e43c029ee}
+
+
+XR\_\-GETERRCODE -- Get the error code from the last call. 
+
+References Client::env.\hypertarget{xrClient_8c_6e3ba711d6a45a322fc1198e59e48db7}{
+\index{xrClient.c@{xrClient.c}!xr\_\-getErrMsg@{xr\_\-getErrMsg}}
+\index{xr\_\-getErrMsg@{xr\_\-getErrMsg}!xrClient.c@{xrClient.c}}
+\subsubsection[{xr\_\-getErrMsg}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ xr\_\-getErrMsg (int {\em cnum})}}
+\label{xrClient_8c_6e3ba711d6a45a322fc1198e59e48db7}
+
+
+XR\_\-GETERRMSG -- Get the error message from the last call. 
+
+References Client::env.

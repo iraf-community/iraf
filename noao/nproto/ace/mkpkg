@@ -1,0 +1,60 @@
+# Make ACE.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_ace.x
+	$link	x_ace.o libpkg.a -lds -lgsurfit -lcurfit -lxtools -liminterp\
+	    -ltbtables -o xx_ace.e
+	;
+
+install:
+	$move	xx_ace.e acebin$x_ace.e
+	;
+
+libpkg.a:
+	aceoverlay.x	ace.h <error.h> <imhdr.h> <imset.h> <pmset.h>
+	bndry.x		ace.h <pmset.h>
+	catdefine.x	ace.h cat.h objs.h
+	catio.x		ace.h cat.h <imset.h> <math.h> objs.h
+	convolve.x	<ctype.h> <imhdr.h>
+	detect.x	ace.h cat.h detect.h <imhdr.h> <mach.h> objs.h\
+			<pmset.h> skyblock.h split.h
+	evaluate.x	ace.h cat.h <error.h> evaluate.h <imhdr.h> objs.h\
+			<pmset.h>
+	filter.x	ace.h <evvexpr.h> filter.h objs.h
+	grow.x		ace.h cat.h grow.h objs.h <pmset.h>
+	mapio.x		<error.h> <imhdr.h>
+	maskcolor.x	
+	mgs.x		<error.h> <imhdr.h> <imio.h> <math/gsurfit.h>
+	mim.x		<error.h> <imhdr.h> <imset.h> <math/iminterp.h>
+	noisemodel.x	
+	omwrite.x	<imhdr.h> <pmset.h> ace.h
+	pars.x		<ctype.h> detect.h evaluate.h grow.h <math/curfit.h>\
+			<math/gsurfit.h> skyblock.h skyfit.h sky.h split.h
+	skyblock.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>\
+			skyblock.h
+	skyfit.x	<imhdr.h> <math/curfit.h> <math/gsurfit.h> skyfit.h
+	skyimages.x	<error.h> <imhdr.h>
+	sky.x		<error.h> sky.h
+	split.x		ace.h cat.h <mach.h> objs.h <pmset.h> split.h
+	tables.x
+	t_acedetect.x	ace.h acedetect.h cat.h <error.h> <fset.h> <imhdr.h>\
+			<imset.h> <pmset.h>
+	t_acedisplay.x	<ctype.h> display.h <error.h> gwindow.h <imhdr.h>\
+			<imhdr.h> <imset.h> <imset.h> <mach.h> <mach.h>\
+			<pmset.h>
+	t_imext.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>
+	t_mscext.x	<error.h> <imhdr.h> <imset.h>
+	x_ace.x	
+	xtmaskname.x	
+	xtpmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>\
+			<mwset.h> <pmset.h>
+	;

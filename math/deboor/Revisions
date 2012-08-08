@@ -1,0 +1,7 @@
+.help revisions Sep99 math.deboor
+.nf
+From Davis, September 20, 1999
+
+Added some missing file dependices to the mkpkg file.
+pkg/math/deboor/mkpkg
+.endhelp

@@ -1,0 +1,201 @@
+.help apresize Sep96 noao.twodspec.apextract
+.ih
+NAME
+apresize -- Resize apertures automatically
+.ih
+USAGE
+apresize input
+.ih
+PARAMETERS
+.ls input
+List of input images in which apertures are to be resized.
+.le
+.ls apertures = ""
+Apertures to recenter, resize, trace, and extract.  This only applies
+to apertures read from the input or reference database.  Any new
+apertures defined with the automatic finding algorithm or interactively
+are always selected.  The syntax is a list comma separated ranges
+where a range can be a single aperture number, a hyphen separated
+range of aperture numbers, or a range with a step specified by "x<step>";
+for example, "1,3-5,9-12x2".
+.le
+.ls references = ""
+List of reference images to be used to define apertures for the input
+images.  When a reference image is given it supersedes apertures
+previously defined for the input image. The list may be null, "", or
+any number of images less than or equal to the list of input images.
+There are three special words which may be used in place of an image
+name.  The word "last" refers to the last set of apertures written to
+the database.  The word "OLD" requires that an entry exist
+and the word "NEW" requires that the entry not exist for each input image.
+.le
+
+.ls interactive = no
+Run this task interactively?  If the task is not run interactively then
+all user queries are suppressed and interactive aperture editing is
+disabled.
+.le
+.ls find = yes
+Find the spectra and define apertures automatically?  In order for
+spectra to be found automatically there must be no apertures for the
+input image or reference image defined in the database.
+.le
+.ls recenter = no
+Recenter the apertures?
+.le
+.ls resize = yes
+Resize the apertures?
+.le
+.ls edit = yes
+Edit the apertures?  The \fIinteractive\fR parameter must also be yes.
+.le
+
+.ls line = INDEF
+The dispersion line (line or column perpendicular to the dispersion axis) to
+be used in resizing the spectra.  A value of INDEF selects the middle of the
+image.
+.le
+.ls nsum = 1
+Number of dispersion lines to be summed or medianed.  The lines are taken
+around the specified dispersion line.  A positive value takes a
+sum and a negative value selects a median.
+.le
+.ls llimit = INDEF, ulimit = INDEF
+Lower and upper aperture size limits.  If the parameter \fIylevel\fR is
+INDEF then these limits are assigned to all apertures.  Otherwise
+these parameters are used as limits to the resizing operation.
+A value of INDEF places the aperture limits at the image edge (for the
+dispersion line used).
+.le
+.ls ylevel = 0.1
+Data level at which to set aperture limits.  If it is INDEF then the
+aperture limits are set at the values given by the parameters
+\fIllimit\fR and \fIulimit\fR.  If it is not INDEF then it is a
+fraction of the peak or an actual data level depending on the parameter
+\fIpeak\fR.  It may be relative to a local background or to zero
+depending on the parameter \fIbkg\fR.
+.le
+.ls peak = yes
+Is the data level specified by \fIylevel\fR a fraction of the peak?
+.le
+.ls bkg = yes
+Subtract a simple background when interpreting the \fBylevel\fR parameter.
+The background is a slope connecting the first minima
+away from the aperture center.
+.le
+.ls r_grow = 0.
+Change the lower and upper aperture limits by this fractional amount.
+The factor is multiplied by each limit and the result added to limit.
+.le
+.ls avglimits = no
+Apply the average lower and upper aperture limits to all apertures.
+.le
+.ih
+ADDITIONAL PARAMETERS
+I/O parameters and the default dispersion axis are taken from the
+package parameters, the default aperture parameters are taken from the
+task \fBapdefault\fR, automatic aperture finding parameters are taken
+from \fBapfind\fR, and parameters used for centering and editing the
+apertures are taken from \fBapedit\fR.
+
+When this operation is performed from the task \fBapall\fR all parameters
+except the package parameters are included in that task.
+.ih
+DESCRIPTION
+For each image in the input image list, the aperture limits are
+redefined to be either specified values or by finding the points at
+which the spectrum profile, linearly interpolated, first crosses a
+specified value moving away from the aperture center at the specified
+dispersion line.  In the latter case the limits may then be increased
+or decreased by a specified percentage, a maximum lower and upper limit,
+may be imposed, and the independent limits may be averaged and the
+single values applied to all the apertures.
+
+The simplest resizing choice is to reset all the aperture limits to
+the values specified by \fIllimit\fR and \fIulimit\fR.  This option
+is selected if the parameter \fIylevel\fR is INDEF.
+
+There are several options for specifying a data level at which an
+aperture is sized.  The most common method (the default) is to specify
+a fraction of the peak value since this is data independent and physically
+reasonable.  This is done by setting the fraction with the parameter
+\fIylevel\fR and the parameter \fIpeak\fR to yes.  If the peak parameter
+is no then the level is a data value.
+
+The levels may be relative to zero, as might be used with fibers or
+high dispersion / high signal-to-noise data, or relative to a local
+linear background, as would be appropriate for slit data having a
+significant background.  A background is found and used if the
+parameter \fIbkg\fR is set.  The background determination is very
+simple.  Starting at the peak two background points are found, one in
+each direction, which are inflection points; i.e. the first pixels
+which are less than their two neighbors.  A linear slope is fit and
+subtracted for the purposes of measuring the peak and setting the
+aperture limits.  Note that if the slope is significant the actual
+limits may not correspond to the intercepts of a line at constant data
+value.
+
+Once aperture limits, a distance relative to the center, are determined
+they are increased or decreased by a percentage, expressed as a fraction,
+given by the parameter \fIr_grow\fR.  To illustrate the operation,
+if xlow is the initial lower limit then the final lower limit will be:
+
+	xlow final = xlow * (1 + r_grow)
+
+A value of zero leaves the aperture limits unchanged.
+
+After the aperture limits are found, based on the above steps, a fixed lower
+limit, given by the parameter \fIllimit\fR, is applied to the lower
+aperture points and, similarly, a fixed upper limit is applied to the
+upper aperture points.  This feature protects against absurdly wide apertures.
+
+Finally, if the parameter \fIavglimits\fR is set the individual aperture
+limits are averaged to form an average aperture.  This average aperture
+is then assigned to all apertures.  This option allows keeping common
+aperture sizes but allowing variation due to seeing changes.
+
+The resizing algorithm is available in the interactive aperture editor.
+Here one may select individual apertures or all apertures using the
+'a' switch.  The resizing algorithm described above is selected using
+the 'z' key.  An simple alternative is the 'y' key which resizes
+apertures to the y level marked by the cursor.
+
+If the task is interactive the user is queried whether to perform
+various steps on each image.  The queries may be answered with one of
+the four values "yes", "no", "YES" and "NO", where an upper case
+response suppresses all further queries to this question.
+
+The aperture resizing algorithm may be selected from nearly every task
+in the package with the \fIresize\fR parameter.
+.ih
+EXAMPLES
+1.  To resize all apertures to the range -4 to 4:
+
+	cl> apresize image llimit=-4 ulimit=4 ylevel=INDEF
+
+2.  To resize all aperture to a point which is 5% of the peak relative
+to a local background:
+
+	cl> apresize image ylevel=.05 peak+ bkg+
+
+3.  To resize all apertures to the point where the data exceeds 100
+data units:
+
+	cl> apresize image ylevel=100 peak- bkg-
+
+4.  To resize all apertures to default values of the task except
+averaging all the results at the end:
+
+	cl> apresize image avg+
+.ih
+REVISIONS
+.ls APRESIZE V2.11
+The "apertures" parameter can be used to select apertures for resizing,
+recentering, tracing, and extraction.  This parameter name was previously
+used for selecting apertures in the recentering algorithm.  The new
+parameter name for this is now "aprecenter".
+.le
+.ih
+SEE ALSO
+center1d, ranges, apfind, aprecenter, apedit, apall
+.endhelp

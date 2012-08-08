@@ -1,0 +1,36 @@
+SLALIB_Version_2.3-0                                  Expiry 30 September 1999
+
+The latest releases of SLALIB include the following changes:
+
+*  The 1999 January 1 UTC leap second has been added to the DAT routine.
+
+*  Four new routines have been introduced which transform between the
+   FK5 system and the ICRS (Hipparcos) system.  FK52H and H2FK5 transform
+   star positions and proper motions from FK5 coordinates to Hipparcos
+   coordinates and vice versa.  FK5HZ and HFK5Z do the same but for the
+   case where the Hipparcos proper motions are zero.
+
+*  Six new routines have been introduced for dealing with orbital elements.
+   Four of them (sla_EL2UE, sla_PV2UE, sla_UE2EL and sla_UE2PV) provide
+   applications with direct access to the "universal variables" method
+   that was already being used internally.  Compared with using conventional
+   (angular) elements and solving Kepler's equation, the universal variables
+   approach has a number of advantages, including better handling of near-
+   parabolic orbits and greater efficiency.  The remaining two routines
+   (sla_PERTEL and sla_PERTUE) generate updated elements by applying
+   major-planet perturbations.  The new elements can then be used to
+   predict positions that are much more accurate.  For minor planets,
+   sub-arcsecond accuracy over a decade is achievable.
+
+*  Several observatory sites have been added to the OBS routine:  CFHT,
+   Keck 2, Gemini North, FCRAO, IRTF and CSO.  The coordinates for all
+   the Mauna Kea sites have been updated in accordance with recent aerial
+   photography results made available by the Institute for Astronomy,
+   University of Hawaii.
+ 
+ P.T.Wallace
+ 21 April 1999
+
+ ptw@star.rl.ac.uk
+ +44-1235-44-5372
+--------------------------------------------------------------------------

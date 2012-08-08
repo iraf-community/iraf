@@ -1,0 +1,4 @@
+elevation,r,a,90,0,90,elevation above horizon in degrees
+scale,r,h,750.0,,,scale factor of Earth's atmosphere
+radians,b,h,no,,,input elevation in radians instead of degrees
+airmass,r,h

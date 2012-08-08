@@ -1,0 +1,408 @@
+#
+# VODATA -- Query and Access VO Data Services
+
+include <ctype.h>
+include	<error.h>
+include <imhdr.h>
+include <mwset.h>
+include <tbset.h>
+
+
+define 	DEF_BASE   	"res"
+
+define  BP_NAMES 	"|radio|millimete|infrared|optical|uv|x-ray|gamma-ray|"
+define	BP_RADIO	1
+define	BP_MILLIMETER	2
+define	BP_INFRARED	3
+define	BP_OPTICAL	4
+define	BP_UV		5
+define	BP_XRAY		6
+define	BP_GAMMARAY	7
+
+define  TYP_NAMES	"|catalog|image|spectral|"
+define  TYP_CATALOG	1
+define  TYP_IMAGE	2
+define  TYP_SPECTRAL	3
+
+define	OUT_FMTS	"|ascii|csv|tsv|html|raw|fits|"
+define	FMT_ASCII	1
+define	FMT_CSV		2
+define	FMT_TSV		3
+define	FMT_HTML	4
+define	FMT_RAW		5
+define	FMT_FITS	6
+
+
+#    resource	list of Resources to query (or "" or ServiceURL)
+#    objects	list of Object names/images to query (or VOTable of positions)
+#    ra		RA of query position
+#    dec	Dec of query position
+#    sr		Search radius (degrees, or min or sec)
+#
+#    header	list result column headers only
+#    bandpass	bandpass constraint (radio|infrared|optical|uv|xray|gamma)
+#    type	service type to query (catalog|image)
+#
+#    format	output format (|fits|ascii|csv|tsv|html|raw)
+#    output	output filename (or 'samp' to broadcast table)
+#
+#    base	base output filename
+#    sequential	use sequential file numbers (or object name)
+#
+#    verbose	verbose output?
+#    nthreads	Number of simultaneous downloads
+#
+
+
+procedure t_vodata ()
+
+char	resources[SZ_LINE], objects[SZ_FNAME], output[SZ_FNAME]
+char	base[SZ_LINE], format[SZ_FNAME], verb[SZ_FNAME]
+char	bandpass[SZ_FNAME], svctype[SZ_FNAME], rad[SZ_FNAME], qflag[SZ_FNAME]
+char	bpass[SZ_FNAME], stype[SZ_FNAME], fmt[SZ_FNAME], sr[SZ_FNAME]
+char	resdb[SZ_FNAME], resfile[SZ_FNAME], objfile[SZ_FNAME]
+
+double  r[IM_MAXDIM], w[IM_MAXDIM], cd[2,2]
+double	xrot, yrot, rot, scale
+
+pointer	sp, im, name, mw, ctw, co
+int	fd, nthreads, len, verbose
+int	objlist, reslist, stat
+bool	sequential, header, quiet, do_samp, do_collect
+double	llx, lly, urx, ury, cx, cy
+double	ra0, dec0, ra1, dec1, ra2, dec2
+
+pointer	immap()
+int	clgeti(), strdic(), strlen(), open(), sk_decim()
+int	access(), fntopnb(), fntgfnb(), imaccess(), mw_stati()
+pointer	mw_sctran()
+real	clgetr()
+bool	clgetb(), streq()
+
+begin
+	call smark (sp)
+	call salloc (name, SZ_FNAME, TY_CHAR)
+
+
+	# Get the task parameters.
+	call clgstr ("resource", resources, SZ_LINE)	# query params
+	call clgstr ("objects", objects, SZ_LINE)
+	call clgstr ("size", sr, SZ_FNAME)
+
+	nthreads   = clgeti ("nthreads")		# output params
+	verbose    = clgeti ("verbose")
+	header     = clgetb ("header")
+	quiet      = clgetb ("quiet")
+	sequential = clgetb ("sequential")
+
+	call clgstr ("output", output, SZ_FNAME)	# output params
+	call clgstr ("base", base, SZ_LINE)
+	call clgstr ("format", format, SZ_FNAME)
+	call clgstr ("bandpass", bandpass, SZ_FNAME)	# constraints
+	call clgstr ("type", svctype, SZ_FNAME)
+	call clgstr ("resdb", resdb, SZ_FNAME)
+
+
+	################################
+	# Build up arguments
+	################################
+
+	# Get the resources to query.
+	call mktemp ("/tmp/res", resfile, SZ_FNAME)
+	fd = open (resfile, NEW_FILE, TEXT_FILE)
+
+	if (resources[1] == EOS) {
+	    call fprintf (fd, "any\n")
+	} else {
+	    reslist = fntopnb (resources, NO)
+            while (fntgfnb (reslist, Memc[name], SZ_FNAME) != EOF) {
+		# FIXME -- resolve in the resdb
+	        call fprintf (fd, "%s\n")
+		    call pargstr (Memc[name])
+	    }
+	    call fntclsb (reslist)
+	}
+	call close (fd)
+
+
+	# Get the object names to query.
+	call mktemp ("/tmp/obj", objfile, SZ_FNAME)
+	fd = open (objfile, NEW_FILE, TEXT_FILE)
+
+	if (objects[1] != EOS) {
+	    objlist = fntopnb (objects, NO)
+            while (fntgfnb (objlist, Memc[name], SZ_FNAME) != EOF) {
+		if (imaccess (Memc[name], READ_ONLY) == YES) {
+
+	            im = immap (Memc[name], READ_ONLY, 0)
+
+        	    iferr {
+            		stat = sk_decim (im, "world", mw, co)
+            		if (stat == ERR || mw == NULL) {
+            		    # Unable to decode image WCS
+			    call eprintf ("Error: No image WCS present.\n")
+			    return
+
+            		} else if (mw != NULL) {
+                	    ctw = mw_sctran (mw, "logical", "world", 03B)
+			    llx = 1.0		   ; lly = 1.0
+			    urx = IM_LEN(im,1)	   ; ury = IM_LEN(im,2)
+			    cx  = IM_LEN(im,1) / 2 ; cy  = IM_LEN(im,2) / 2
+
+        		    call mw_c2trand (ctw, cx,  cy,  ra0, dec0)
+        		    call mw_c2trand (ctw, llx, lly, ra1, dec1)
+        		    call mw_c2trand (ctw, urx, ury, ra2, dec2)
+
+			    # Get the CD matrix for scale and rotation
+           		    call vod_gfterm (mw, r, w, cd,
+				mw_stati (mw, MW_NPHYSDIM))
+        		    scale = 3600. * sqrt ((cd[1,1]**2 + cd[2,1]**2 +
+				cd[1,2]**2 + cd[2,2]**2)/2.)
+        		    xrot  = abs (atan2 ( cd[2,1], cd[1,1]))
+        		    yrot  = abs (atan2 (-cd[1,2], cd[2,2]))
+        		    rot   = (xrot + yrot) / 2.0		# NOT USED
+
+			    call sprintf (sr, SZ_FNAME, "%.4g")
+				call pargd (
+				    max (((scale * IM_LEN(im,1)) / 3600.),
+	      			          (scale * IM_LEN(im,2)) / 3600.))
+	    		    call fprintf (fd, "%g %g\n")
+				call pargr (ra0)
+				call pargr (dec0)
+	    		    
+call printf ("%g %g  %s\n")
+	call pargd (ra0); call pargd (dec0); call pargstr (sr)
+	    		}
+
+		    } then {
+            		# Unable to decode image WCS
+			call eprintf ("Error: Unable to decode WCS.\n")
+			return
+		    }
+
+		    call imunmap (im)
+
+		} else {
+		    # Object name, let the task resolve it.
+	            call fprintf (fd, "%s\n")
+			call pargstr (Memc[name])
+		}
+            }
+	    call fntclsb (objlist)
+
+	} else {
+	    # No names given, use the explicit position in the parameters.
+	    call fprintf (fd, "%g %g\n")
+		call pargr (clgetr ("ra"))
+		call pargr (clgetr ("dec"))
+	}
+	call close (fd)
+
+
+	# Check constraints.
+	if (strdic (bandpass, bpass, SZ_FNAME, BP_NAMES) == 0) 
+	    call strcpy ("any", bpass, SZ_FNAME)
+	else {
+	    call eprintf ("Invalid bandpass constraint '%s', ignoring.")
+		call pargstr (bpass)
+	    call aclrc (bpass, SZ_FNAME)
+	}
+	if (strdic (svctype, stype, SZ_FNAME, TYP_NAMES) == 0) 
+	    call strcpy ("any", stype, SZ_FNAME)
+	else {
+	    call eprintf ("Invalid service type constraint '%s', ignoring.")
+		call pargstr (stype)
+	    call aclrc (stype, SZ_FNAME)
+	}
+
+
+	len = strlen (sr) 				# search radius
+	if (! IS_DIGIT(sr[len]) && sr[len] != '.') {
+	    if (sr[len] == 'm')
+		call strcpy ("-rm", rad, SZ_FNAME)
+	    else if (sr[len] == 's')
+		call strcpy ("-rs", rad, SZ_FNAME)
+	    else
+		call strcpy ("-rd", rad, SZ_FNAME)
+	    sr[len] = EOS
+	} else
+	    call strcpy ("-rd", rad, SZ_FNAME)
+					
+							# output format
+	switch (strdic (format, fmt, SZ_FNAME, OUT_FMTS)) {
+	case FMT_ASCII:
+	    call strcpy ("-A", fmt, SZ_FNAME)
+	case FMT_CSV:
+	    call strcpy ("-C", fmt, SZ_FNAME)
+	case FMT_TSV:
+	    call strcpy ("-T", fmt, SZ_FNAME)
+	case FMT_HTML:
+	    call strcpy ("-H", fmt, SZ_FNAME)
+	case FMT_RAW:
+	    call strcpy ("-R", fmt, SZ_FNAME)
+	case FMT_FITS:
+	    call strcpy ("-F", fmt, SZ_FNAME)
+	default:
+	    call strcpy ("-R", fmt, SZ_FNAME)
+	}
+
+	# Get output processing options.
+	do_samp = true
+	if (output[1] != EOS) {
+	    if (streq ("samp", output)) {
+		do_samp = true
+
+		# Force the output format to 'raw'.
+	        call strcpy ("-R", fmt, SZ_FNAME)
+	    }
+	    ;
+	}
+	#  base
+	#  sequential
+
+	call strcpy ("+n", verb, SZ_FNAME)		# query verbosity
+	if (verbose > 1)
+	    call strcpy ("-v", verb, SZ_FNAME)
+	if (verbose > 2)
+	    call strcpy ("-vv", verb, SZ_FNAME)
+
+	if (quiet)					# task output?
+	    call strcpy ("-q", qflag, SZ_FNAME)
+	else
+	    call strcpy ("+q", qflag, SZ_FNAME)
+
+
+	######################################
+	# Call the VODATA task interface.
+	######################################
+	call vx_vodata (13,  				# argc
+			"-t", stype,			# type constraint
+	        	"-b", bpass, 			# bandpass constraint
+			verb,				# query verbosity
+			qflag,				# suppress output?
+			fmt,				# output format
+			"-S",				# simple output name
+			"-rd", sr,			# search radius
+			resfile,			# resources to query
+			"-o", objfile)			# objects to query
+
+
+	# Process the output files as needed.
+	if (do_samp) {
+	    # foreach (output file)
+	    #     broadcast table as table.load.votable
+	    #     delete the table
+	} else if (do_collect) {
+	    ;
+	}
+
+	# Clean up the temporary resource and object/position files.
+	if (access (resfile, 0, 0) == YES)
+	    call delete (resfile)
+	if (access (objfile, 0, 0) == YES)
+	    call delete (objfile)
+end
+
+
+# VOD_TBL_COPY -- Copy a single table to a new file.  If the file exists, append
+# as a new extension.
+
+procedure vod_tbl_copy (oldfile, newfile)
+
+char	oldfile[ARB]	# i: current file name
+char	newfile[ARB]	# i: new file name
+
+int	phu_copied	# set by tbfpri and ignored
+pointer	sp, oldname, newname
+
+bool	use_fcopy	# true if we should copy the file with fcopy
+
+bool	streq()
+int	tbtacc()
+errchk	tbfpri, tbtcpy
+
+begin
+	call smark (sp)
+	call salloc (oldname, SZ_FNAME, TY_CHAR)
+	call salloc (newname, SZ_FNAME, TY_CHAR)
+
+	# Check to make sure the copy is legal
+
+	use_fcopy = false
+	if (streq (oldfile, newfile)) {
+	    call eprintf ("Cannot copy table to itself:  %s\n")
+	    call pargstr (oldfile)
+
+	    if (tbtacc (oldfile) == YES)
+		use_fcopy = true
+
+	    if (use_fcopy) {
+		call tbtext (oldfile, Memc[oldname], SZ_FNAME)
+		call tbtext (newfile, Memc[newname], SZ_FNAME)
+
+		iferr (call fcopy (Memc[oldname], Memc[newname])) {
+		    call erract (EA_WARN)
+		}
+	    }
+
+	} else {
+	    # Table extensions are copied by the table
+	    # library function tbtcpy
+	    iferr {
+		call tbfpri (oldfile, newfile, phu_copied)
+		call tbtcpy (oldfile, newfile)
+	    } then {
+		call erract (EA_WARN)
+	    }
+	}
+
+	call sfree (sp)
+	return
+end
+
+
+# VOD_GFTERM -- Compute the output FITS CRPIX, CRVAL, and CD arrays from the
+# MWCS LTERM and WTERM. Note that the CD matrix terms are still transposed
+# from the usual Fortran order.
+
+procedure vod_gfterm (mw, crpix, crval, cd, ndim)
+
+pointer mw              			#i the input mwcs pointer
+double  crpix[ndim]     			#o the output FITS CRPIX array
+double  crval[ndim]     			#o the output FITS CRVAL array
+double  cd[ndim,ndim]   			#o the output FITS CD matrix
+int     ndim            			#i the dimensionality of the wcs
+
+pointer sp, r, wcd, ltv, ltm, iltm
+int	i, errcode
+
+errchk	mw_gwtermd, mw_gltermd
+
+begin
+	call smark (sp)
+	call salloc (r, ndim, TY_DOUBLE)
+	call salloc (wcd, ndim * ndim, TY_DOUBLE)
+	call salloc (ltv, ndim, TY_DOUBLE)
+	call salloc (ltm, ndim * ndim, TY_DOUBLE)
+	call salloc (iltm, ndim * ndim, TY_DOUBLE)
+
+	iferr {
+	    call mw_gwtermd (mw, Memd[r], crval, Memd[wcd], ndim)
+	    call mw_gltermd (mw, Memd[ltm], Memd[ltv], ndim)
+	    call mwvmuld (Memd[ltm], Memd[r], crpix, ndim)
+	    call aaddd (crpix, Memd[ltv], crpix, ndim)
+	    call mwinvertd (Memd[ltm], Memd[iltm], ndim)
+	    call mwmmuld (Memd[wcd], Memd[iltm], cd, ndim)
+
+	} then {
+	    # Set up a default value.
+	    call aclrd (cd, ndim*ndim)
+	    for (i=1; i <= ndim; i=i+1) {
+	        crpix[i] = 1.0d0
+	        crval[i] = 1.0d0
+	        cd[i,i] = 1.0d0
+	    }
+	}
+
+	call sfree (sp)
+end

@@ -1,0 +1,105 @@
+.help ranges Jan84 xtools
+.ih
+PURPOSE
+These tools
+parse a string using a syntax to represent integer values, ranges, and
+steps.   The parsed string is used to generate a list of integers for various
+purposes such as specifying lines or columns in an image or tape file numbers.
+.ih
+SYNTAX
+The syntax for the range string consists of non-negative integers, '-' (minus),
+'x', ',' (comma), and whitespace.  The commas and whitespace are ignored
+and may be freely used for clarity.  The remainder of the string consists
+of sequences of five fields.  The first field is the beginning of a range,
+the second is a '-', the third is the end of the range, the fourth is
+a 'x', and the fifth is a step size.  Any of the five fields may be
+missing causing various default actions.  The defaults are illustrated in
+the following table.
+
+.nf
+-3x1	A missing starting value defaults to 1.
+2-x1	A missing ending value defaults to MAX_INT.
+2x1	A missing ending value defaults to MAX_INT.
+2-4	A missing step defaults to 1.
+4	A missing ending value and step defaults to an ending
+	value equal to the starting value and a step of 1.
+x2	Missing starting and ending values defaults to
+	the range 1 to MAX_INT with the specified step.
+""	The null string is equivalent to "1 - MAX_INT x 1",
+	i.e all positive integers.
+.fi
+
+The specification of several ranges yields the union of the ranges.
+Note that the default starting value is 1 though one may specify zero
+as a range limit.
+.ih
+EXAMPLES
+The following examples further illustrate the range syntax.
+
+.nf
+-	All positive integers.
+1,5,9	A list of integers equivalent to 1-1x1,5-5x1,9-9x1.
+x2	Every second positive integer starting with 1.
+2x3	Every third positive integer starting with 2.
+-10	All integers between 1 and 10.
+5-	All integers greater than or equal to 5.
+9-3x1	The integers 3,6,9.
+.fi
+.ih
+PROCEDURES
+
+.ls 4 decode_ranges
+
+.nf
+int procedure decode_ranges (range_string, ranges, max_ranges, nvalues)
+
+char	range_string[ARB]	# Range string to be decoded
+int	ranges[3, max_ranges]	# Range array
+int	max_ranges		# Maximum number of ranges
+int	nvalues			# The number of values in the ranges
+.fi
+
+The range string is decoded into an integer array of maximum dimension
+3 * max_ranges.  Each range consists of three consecutive integers
+corresponding to the starting and ending points of the range and the
+step size.  The number of integers covered by the ranges is returned
+as nvalue.  The end of the set of ranges is marked by a NULL.
+The returned status is either ERR or OK.
+.le
+.ls 4 get_next_number, get_last_number
+
+.nf
+int procedure get_next_number (ranges, number)
+int procedure get_previous_number (ranges, number)
+
+int	ranges[ARB]		# Range array
+int	number			# Both input and output parameter
+.fi
+
+Given a value for number the procedures find the next (previous) number in
+increasing (decreasing)
+value within the set of ranges.  The next (previous) number is returned in
+the number argument.  A returned status is either OK or EOF.
+EOF indicates that there are no greater values.  The usual usage would
+be in a loop of the form:
+
+.nf
+	number = 0
+	while (get_next_number (ranges, number) != EOF) {
+	    <Statements using number>
+	}
+.fi
+.le
+.ls 4 is_in_range
+
+.nf
+bool procedure is_in_range (ranges, number)
+
+int	ranges[ARB]		# Ranges array
+int	number			# Number to check against ranges
+.fi
+
+A boolean value is returned indicating whether number is covered by
+the ranges.
+.le
+.endhelp

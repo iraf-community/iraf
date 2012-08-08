@@ -1,0 +1,1523 @@
+# XGTERM.GUI -- Default XGterm GUI with message panel for trapping debug
+# output, or executing Tcl commands.
+
+# Reset the Widget Server.  Must be the first command so we restart correctly.
+reset-server
+
+# Set the widgets and resources to be used in the base GUI.
+set UIObjects(Xgterm) { 	\
+	toplevel	Layout		xgLayout\
+	xgLayout	Frame		xgUBFrame\
+	xgUBFrame	Layout		ugUserbar\
+	xgLayout	Group		gtermGroup\
+	xgLayout	Layout		xgConfigBar\
+	gtermGroup	Gterm		gterm\
+\
+        xgConfigBar     TextToggle	xgAltGraph\
+        xgConfigBar     Toggle	        cfgGcur\
+        xgConfigBar     Toggle	        cfgTask0\
+        xgConfigBar     Toggle	        cfgTask1\
+        xgConfigBar     Toggle	        cfgTask2\
+        xgConfigBar     Toggle	        cfgTask3\
+        xgConfigBar     Toggle	        cfgTask4\
+        xgConfigBar     Toggle	        cfgTask5\
+        xgConfigBar     Toggle	        cfgTask6\
+        xgConfigBar     Toggle	        cfgTask7\
+        xgConfigBar     Toggle	        cfgTask8\
+        xgConfigBar     Toggle	        cfgTask9\
+        xgConfigBar     Command	        cfgClose\
+\
+        toplevel        TopLevelShell   altGraph\
+        altGraph        Layout          agLayout\
+	agLayout	Layout		agUserbar\
+        agLayout        Group           agGraphGroup\
+        agGraphGroup    Gterm           agGterm\
+\
+	toplevel	Parameter	xgterm\
+	xgterm		Parameter	configure\
+	xgterm		Parameter	textout\
+}
+
+
+set UIResources(Xgterm) { \
+
+    !#######################################################
+    ! Define some global resources for the main menu panels.
+    !#######################################################
+    *beNiceToColormap:				false
+    *allowShellResize:				true
+
+    *background:				gray80
+    *Text*background:				gray75
+    *Command.background:			gray80
+    *Label.background:				gray80
+    *MenuButton.background:			gray80
+    *Toggle.background:				gray80
+
+    *Command.foreground:			black
+    *Label.foreground:				black
+    *MenuButton.foreground:			black
+    *Toggle.foreground:				black
+    *SimpleMenu*foreground:			black
+
+    *Gterm.width:				640
+    *Gterm.height:				480
+
+    *Command.highlightThickness:		2
+    *Label.highlightThickness:			0
+    *MenuButton.highlightThickness:		2
+    *Toggle.highlightThickness:			2
+
+    *Label.borderWidth:				0
+    *Label.shadowWidth:				0
+    *Command.shadowWidth:			1
+    *Toggle.shadowWidth:			1
+    *MenuButton.shadowWidth:			1
+
+    *Arrow.width:				16
+    *Arrow.height:				25
+    *Arrow.foreground:				gray70
+    *Arrow.background:				gray80
+
+    *TextToggle.frameType:   			chiseled
+    *TextToggle.frameWidth:   			2
+    *TextToggle.onIcon:   			square1s
+    *TextToggle.offIcon:   			square0s
+
+    *SmeBSB.leftMargin:				10
+
+    *Group.shrinkToFit:				True
+
+    !------------------------------------------------------------
+    ! Define resources to take advantage of the 3D scrollbar look
+    !------------------------------------------------------------
+    *Scrollbar*background:			gray80
+    *Scrollbar*width:				15
+    *Scrollbar*height:				15
+    *Scrollbar*shadowWidth:			2
+    *Scrollbar*cursorName:			top_left_arrow
+    *Scrollbar*pushThumb:			true
+
+    !-------------------------------------
+    ! Define new fonts to use for the GUI.
+    !-------------------------------------
+    *font:					7x13bold
+    *Command.font:      			7x13bold
+    *MenuButton.font:   			7x13bold
+    *Toggle.font:       			7x13bold
+    *Label.font:        			7x13bold
+    *TextToggle.font:   			7x13bold
+    *SimpleMenu*font:				7x13bold
+
+
+    !###############################
+    ! Define the main Xgterm window. 
+    !###############################
+    *Xgterm.title:                              XGterm UberGUI
+    *Xgterm.geometry:                           +0+0
+    *Xgterm.width:                              640
+    *Xgterm.height:                             525
+
+    *xgUBFrame.height:				35
+    *xgUBFrame.outerOffset:			0
+    *xgUBFrame.innerOffset:			3
+    *xgUBFrame.frameType:			raised
+    *xgUBFrame.frameWidth:			2
+    *xgLayout*borderWidth:			0
+    *xgLayout.layout:	vertical { \
+        -1 \
+        vertical { \
+	    horizontal { \
+		-1 \
+                xgUBFrame < +inf -inf * > \
+		-1 \
+	    } \
+            gtermGroup < +inf -inf * +inf -inf > \
+	    horizontal { \
+	        5 \
+                xgConfigBar < +inf -inf * > \
+	        5 \
+	    } \
+	    4 \
+        } \
+        -1 \
+    }
+
+    *gtermGroup.outerOffset:			2
+    *gtermGroup.innerOffset:			0
+    *gtermGroup.frameType:			sunken
+    *gtermGroup.frameWidth:			2
+    *gtermGroup.label:		
+    *gtermGroup.layout:	horizontal { \
+        2 < +0 -2 > \
+        vertical { \
+            2 < +0 -2 > \
+            gterm < +inf -inf * +inf -inf > \
+            2 < +0 -2 > \
+        } \
+        2 < +0 -2 > \
+    }
+    *gterm.width:                      		640
+    *gterm.height:                     		480
+    *gterm.borderColor:                		black
+    *gterm.resizable:                  		True
+    *gterm.copyOnResize:               		False
+    *gterm.dialogBgColor:              		cyan
+    *gterm.dialogFgColor:              		black
+    *gterm.crosshairCursorColor:       		cyan
+    *gterm.translations: \
+	  !Ctrl <Key>c: call(openDialog,command)		\n\
+	  !Ctrl <Key>l: call(openDialog,load)			\n\
+	  !Ctrl <Key>n: call(altGraphToggle)			\n\
+	  !Ctrl <Key>p: call(openDialog,print)			\n\
+	  !Ctrl <Key>s: call(logOpen)				\n\
+	  !Ctrl <Key>t: call(tclToggle)				\n\
+	  !Ctrl <Key>w: call(openDialog,save)			\n\
+	 <EnterWindow>: enter-window()          		\n\
+	 <LeaveWindow>: leave-window()          		\n\
+	    <KeyPress>: graphics-input()        		\n\
+       !Ctrl<Btn2Down>: call(trackEnable) 			\n\
+     !Ctrl<Btn2Motion>: track-cursor() call(wcsUpdate,$x,$y)	\n\
+         !Ctrl<Btn2Up>: call(trackDisable)			\n\
+      !Shift<Btn1Down>: popup(fileMenu)				\n\
+        !Shift<Btn1Up>: popdown(fileMenu)			\n\
+      !Shift<Btn2Down>: popup(cmMenu) 				\n\
+        !Shift<Btn2Up>: popdown(cmMenu) call(trackDisable)	\n\
+      !Shift<Btn3Down>: popup(configMenu)			\n\
+        !Shift<Btn3Up>: popdown(configMenu)			\n\
+              <Motion>: track-cursor()
+
+    !-----------------------------------------------------
+    !  Menu resources giving a shadow effect on dividers.
+    !-----------------------------------------------------
+    *gterm*SimpleMenu*background:		gray75
+    *gterm*SimpleMenu*foreground:		black
+    *gterm*SimpleMenu.borderWidth:		1
+    *gterm*SimpleMenu.menuLabel.foreground:	black
+    *gterm*SimpleMenu.line1.foreground:		gray61
+    *gterm*SimpleMenu.line2.foreground:		gray91
+    *gterm*SimpleMenu.line3.foreground:		gray61
+    *gterm*SimpleMenu.line4.foreground:		gray91
+    *gterm*SimpleMenu.line5.foreground:		gray61
+    *gterm*SimpleMenu.line6.foreground:		gray91
+    *gterm*SimpleMenu.line7.foreground:		gray61
+    *gterm*SimpleMenu.line8.foreground:		gray91
+    *gterm*SimpleMenu.line9.foreground:		gray61
+    *gterm*SimpleMenu.line10.foreground:	gray91
+    *gterm*SimpleMenu.line11.foreground:	gray61
+    *gterm*SimpleMenu.line12.foreground:	gray91
+    *gterm*SimpleMenu.line13.foreground:	gray61
+    *gterm*SimpleMenu.line14.foreground:	gray91
+    *gterm*SimpleMenu.line15.foreground:	gray61
+
+    *xgConfigBar*Toggle.font:   		-*-times-bold-r-normal-*-10-*
+    *xgConfigBar*Toggle.font:   		6x10
+    *xgConfigBar.layout: horizontal { \
+        xgAltGraph \
+        10 < +inf -inf > \
+        cfgGcur \
+        cfgTask0 cfgTask1 cfgTask2 cfgTask3 cfgTask4 \
+	cfgTask5 cfgTask6 cfgTask7 cfgTask8 cfgTask9 \
+        cfgClose \
+    }
+    *xgAltGraph.label:				Alt Graph
+    *xgAltGraph.location:			0 0 90 21
+    *xgAltGraph.frameType:			chiseled
+    *xgAltGraph.frameWidth:			2
+    *xgAltGraph.innerOffset:			0
+    *xgAltGraph.outerOffset:			0
+    *xgAltGraph*font:   			6x10
+    *xgAltGraph.highlightColor:			green
+    *xgAltGraph.onIcon:				diamond1s
+    *xgAltGraph.offIcon:			diamond0s
+    *cfgClose.label:
+    *cfgClose.shadowWidth:			0
+    *cfgGcur.label:				GCursor
+
+
+    !#################################
+    ! Define a alternate graph window.
+    !#################################
+    *altGraph.title:
+    *altGraph.width:				640
+
+    *agLayout*borderWidth:			0
+    *agLayout.layout:	vertical { \
+        -1 \
+        vertical { \
+	    horizontal { \
+	        5 \
+                agUserbar < +inf -inf * > \
+	        5 \
+	    } \
+	    2 \
+            agGraphGroup < +inf -inf * +inf -inf > \
+	    2 \
+        } \
+        -1 \
+    }
+
+    *agGraphGroup.outerOffset:			2
+    *agGraphGroup.innerOffset:			0
+    *agGraphGroup.frameType:			sunken
+    *agGraphGroup.frameWidth:			2
+    *agGraphGroup.label:			
+    *agGraphLayout.layout: horizontal { \
+        2 < +0 -2 > \
+        vertical { \
+            2 < +0 -2 > \
+            agGterm < +inf -inf * +inf -inf > \
+            2 < +0 -2 > \
+        } \
+        2 < +0 -2 > \
+    }
+    *agGterm.translations: \
+	       !<Key>q: call(altGraphClose)			\n\
+	  !Ctrl <Key>c: call(openDialog,command)		\n\
+	  !Ctrl <Key>l: call(openDialog,load)			\n\
+	  !Ctrl <Key>n: call(altGraphToggle)			\n\
+	  !Ctrl <Key>p: call(openDialog,print)			\n\
+	  !Ctrl <Key>s: call(logOpen)				\n\
+	  !Ctrl <Key>t: call(tclToggle)				\n\
+	  !Ctrl <Key>w: call(openDialog,save)			\n\
+	 <EnterWindow>: enter-window()          		\n\
+	 <LeaveWindow>: leave-window()          		\n\
+	    <KeyPress>: graphics-input()        		\n\
+       !Ctrl<Btn2Down>: call(trackEnable) 			\n\
+     !Ctrl<Btn2Motion>: track-cursor() call(wcsUpdate,$x,$y)	\n\
+         !Ctrl<Btn2Up>: call(trackDisable)			\n\
+      !Shift<Btn1Down>: popup(fileMenu)				\n\
+        !Shift<Btn1Up>: popdown(fileMenu)			\n\
+      !Shift<Btn2Down>: popup(cmMenu) 				\n\
+        !Shift<Btn2Up>: popdown(cmMenu) call(trackDisable)	\n\
+      !Shift<Btn3Down>: popup(configMenu)			\n\
+        !Shift<Btn3Up>: popdown(configMenu)			\n\
+              <Motion>: track-cursor()
+}
+
+set UIActCallbacks(Xgterm)   { }
+set UIDeactCallbacks(Xgterm) { }
+
+
+################################################################################
+# Global Variables.
+################################################################################
+
+set track_coords 	0		;# track cursor coords in marker
+set agMapped 		0		;# alt graph window is mapped
+set ubMapped 		1		;# user config menubar is mapped
+set curConfig 		none		;# current user config
+
+set xgtermrc	 	"~/.xgtermrc"	;# startup config file
+set winClose		False		;# close window on shutdown
+set configPath		"./"		;# config file path
+set defaultConfig	none		;# startup default configuration
+set cfgGcur  		GCursor
+set cfgTask0  		none
+set cfgTask1  		none
+set cfgTask2  		none
+set cfgTask3  		none
+set cfgTask4  		none
+set cfgTask5  		none
+set cfgTask6  		none
+set cfgTask7  		none
+set cfgTask8  		none
+set cfgTask9  		none
+
+set Module(arg)		    	{}	;# user configuration files
+set config(task)	    	{}	;# task configuration array
+set config(task,widget)	    	{}	;# widget configuration array
+set config(task,Realized)   	{}	;# module has been realized
+set config(task,Activated)  	{}	;# module has been activated
+
+set gvar(var)		    	{}	;# user-procedure global variables
+set Arrow(task,N,dir)	    	{}	;# Arrow widget configurations 
+set MenuButton(task,N,opt)  	{}	;# Menu widget configurations
+set MenuItem(task,M,N,opt)  	{}	;# Menu widget configurations
+set ToggleAction(task,M,N,opt)  {}	;# Toggle widget configurations
+set Toggle(task,N,opt)	    	{}	;# Toggle widget configurations
+set TextToggle(task,N,opt)	{}	;# TextToggle widget configurations
+set Command(task,N,opt)	    	{}	;# Command widget configurations
+set Label(task,N)	    	{}	;# Label widget configurations
+set ULayout(task)	    	{}	;# userbar layout
+set Hght(task)		    	{}	;# userbar height
+
+set debug 		    	0	;# it ain't the same w/out a debug flag
+set err_msgs		    	""
+
+
+#------------
+# Constants
+#------------
+
+set UbarHeight		    30		;# user menubar height
+
+set NWidgets(Arrow)	    0		;# num of available Arrow widgets
+set NWidgets(AsciiText)     1		;# num of available Arrow widgets
+set NWidgets(Label)	    4		;# num of available Label widgets
+set NWidgets(MenuButton)    5		;# num of available Menu widgets
+set NWidgets(Toggle)	    5		;# num of available Toggle widgets
+set NWidgets(TextToggle)    1		;# num of available TextToggle widgets
+set NWidgets(Command)	    10		;# num of available Command widgets
+
+
+################################################################################
+# Bootstrap procedures used during the startup process.
+################################################################################
+
+# Given the max number of widgets we'll be using create the object definition
+# for the GUI we can append to the UIObjects string before startup.
+
+proc BuildObjects args {
+    global NWidgets UIObjects UIResources
+
+    set widgets ""
+    set u_layout ""
+    set a_layout ""
+    foreach B { u a } {
+	foreach W [ array names NWidgets ] {
+	    for {set i 1} {$i <= $NWidgets($W) } {incr i} {
+	        append widgets \
+		    [format "%sgUserbar\t%s\t%s%s%d\t" $B $W $B $W $i]
+		append ${B}_layout [format "%s%s%d " $B $W $i]
+	    }
+	}
+    }
+
+    # Append the objects to the xgterm object list.
+    append UIObjects(Xgterm) $widgets
+
+    # Now add a dummy Layout for each userbar
+    append UIResources(Xgterm) \
+	[format "*ugUserbar.layout: horizontal { %s }\n" $u_layout]
+    append UIResources(Xgterm) \
+	[format "*agUserbar.layout: horizontal { %s }\n" $a_layout]
+
+    # Add dummy menuName resources for each of the MenuButton widgets.
+    for {set i 1} {$i <= $NWidgets(MenuButton) } {incr i} {
+        append UIResources(Xgterm) \
+	    [format "*uMenuButton%d.menuName: menu%d\n" $i $i]
+        append UIResources(Xgterm) \
+	    [format "*aMenuButton%d.menuName: menu%d\n" $i $i]
+    }
+}
+
+
+# Load the .xgtermrc config file.
+proc LoadXgtermrcFile args {
+    global xgtermrc defaultConfig configPath err_msgs
+    global cfgTask0 cfgTask1 cfgTask2 cfgTask3 cfgTask4
+    global cfgTask5 cfgTask6 cfgTask7 cfgTask8 cfgTask9
+
+    # If we have a .xgtermrc file use it for the startup.
+    # the GUI resource values
+    set file $xgtermrc
+    if { [file exists $file] } {
+	if { [ catch {source $file} err] } {
+	    print ".xgtermrc file read error\n$err"
+	    append err_msgs ".xgtermrc file read error\n$err"
+	}
+    }
+}
+
+# Read the named UI configuration file.
+proc ReadConfigFile { fname args } {
+   
+    set fd [ open $fname r ]
+
+    # Read the config file a line at a time so we can strip comments and
+    # blank lines to make the parsing easier.
+    set uidef ""
+    while { ! [ eof $fd ] } {
+	gets $fd line
+
+	# Strip any comments and blank lines.
+	if { [ string first "#" $line ] >= 0 } {
+	    set line [ string range $line 0 [ expr [string first "#" $line]-1] ]
+	    set line [ string trimright $line ]
+	}
+	if { $line == "" } { continue } 
+
+	# Append the line to the output description.
+	set uidef [ format "%s\n%s" $uidef $line ]
+    }
+
+    close $fd
+    return $uidef
+}
+
+# Scan the config directories getting a list of User-UI files.
+proc ScanConfigDirs args {
+    global Module configPath UIObjects UIResources UIActCallbacks
+    global gvar err_msgs
+
+    set path [ format "./:%s" $configPath ]
+    foreach dir	[ split $path : ] { 
+	set ui_files [ glob -nocomplain [ format "%s/*.ui" $dir ] ]
+	foreach fil $ui_files {
+	    set task [ file tail [ file rootname $fil ] ]
+	    if { ! [info exists Module($task) ] } {
+	        set Module($task) [ format "%s" $fil ]
+
+		# Open the UI file to set any objects/resources defined.
+		# This will also pick up any callback procedures declared.
+		set text [ ReadConfigFile $fil ]
+
+		if {[catch { eval $text } err] } {
+		    print "'${task}.ui' file bootstrap error\n'$err'"
+	    	    append err_msgs ".xgtermrc file read error\n$err"
+		} else {
+		    if {[info exists Objects]} {
+			set UIObjects($task) $Objects
+			unset Objects
+		    }
+		    if {[info exists Resources]} {
+			set UIResources($task) $Resources
+			unset Resources
+		    }
+		    if {[info exists ActivateCallbacks]} {
+			set UIActCallbacks($task) $ActivateCallbacks
+			unset ActivateCallbacks
+		    }
+		    if {[info exists DeactivateCallbacks]} {
+			set UIDeactCallbacks($task) $DeactivateCallbacks
+			unset DeactivateCallbacks
+		    }
+		}
+	    }
+	}
+	set ui_files ""
+    }
+}
+
+# Initialize the widget tree.
+proc InitWidgetTree args {
+    global UIObjects UIResources
+
+    # Initialize the string with the base GUI objects/resources.
+    set guiResources \
+        [format "Xgterm*objects:%s\n%s" $UIObjects(Xgterm) $UIResources(Xgterm)]
+
+    # Add a new objects description for each of the plugins found so we can
+    # create them by name later rather that with the defaults.
+    foreach task [array names UIObjects] {
+	if {$task != "Xgterm"} {
+	    set guiResources \
+	        [ format "%s\n\n*%s_objects:%s\n%s" \
+		    $guiResources $task \
+		    $UIObjects($task) $UIResources($task) ]
+	}
+    }
+
+    # Define all of the UI objects and resources.
+    appInitialize xgterm Xgterm $guiResources
+}
+
+# Realize a plugin module, i.e. create it's objects and attach callbacks.
+# We only do this once and set a flag to indicate the objects have been 
+# created so we don't do it on subsequent realizations.
+proc Realize { module args } {
+    global config UIActCallbacks UIObjects
+
+    if { [info exists config($module,Realized)] } {
+	return
+    }
+
+    # Create any widgets for the module.  We only do this once and set a
+    # flag to indicate the objects have been created so we don't do it on
+    # subsequent realizations.
+    if { [info exists UIObjects($module)] } {
+        createObjects [format "%s_objects" $module]
+        reset-server
+    }
+
+    # Add any callback that are defined for procedures in the module.
+    if { [info exists UIActCallbacks($module)] } {
+	foreach cb $UIActCallbacks($module) {
+	    eval $cb
+	}
+    }
+
+    set config($module,Realized) 1
+}
+
+
+# Increase the maximum number of userbar widgets to create.  This procedure
+# is essentially called from a UI file during the scanning and is a no-op if
+# the value set is below the current max.
+
+proc SetMaxWidgets { type num args } {
+    global NWidgets
+
+    if { [info exists NWidgets($type)]} {
+        if { $NWidgets($type) < $num } {
+	    set NWidgets($type) $num
+	}
+    } else {
+	set NWidgets($type) $num
+    }
+}
+
+
+
+################################################################################
+# Bootstrap the GUI.
+################################################################################
+
+# Load the .xgtermrc config file.
+LoadXgtermrcFile
+
+# Scan the config directories getting a list of User-UI files.
+ScanConfigDirs
+
+# Create the userbar widgets based on the number of widgets defined.
+BuildObjects
+
+# Initialize the widget tree.
+InitWidgetTree
+
+# Realize the plugins with widgets needed for the base GUI.  All other 
+# modules have already loaded their procedures so we can automatically
+# access e.g. debug print routines at this point.
+Realize tclShell
+Realize warning
+Realize filename
+Realize log
+
+
+################################################################################
+# Crank it up...
+################################################################################
+
+# Create the objects and initialize the Gterm widgets in the main XGterm GUI.
+# We will create the objects for plugin modules when they are realized to
+# speed startup times.
+
+createObjects
+send agGterm setGterm ; send agGterm activate
+send gterm   setGterm ; send gterm   activate
+
+
+# Setup the close-window button
+createBitmap CloseBM 16 16 {
+    0x00,0x00,0xfc,0x3f,0x02,0x60,0x02,0x50,0xf2,0x6f,0xf2,0x5f,0xf2,0x6f,0xf2,
+    0x5f,0xf2,0x6f,0xf2,0x5f,0xf2,0x6f,0xf2,0x5f,0xaa,0x6a,0x54,0x55,0xfc,0x3f,
+    0x00,0x00}
+
+send cfgClose "set bitmap CloseBM ; set foreground red4"
+send cfgClose addCallback { GKey q ; deactivate unmap }
+
+
+################################################################################
+# Menu Definitions
+################################################################################
+
+set fileMenuDescription {
+    {"File Options" 		f.title     }
+    {				f.dblline   }
+    {"New Gterm window"		f.exec  { altGraphOpen		} 
+		    sensitive {($agMapped==1) ? "false" : "true"} }
+    {				f.dblline			  }
+    {"Print..."  		f.exec  { Print			} }
+    {"Print to device..."	f.exec  { openDialog print 	} }
+    {				f.dblline			  }
+    {"Show message log"		f.exec  { send log map          } }
+    {"Exec host command..."  	f.exec  { openDialog command	} }
+    {"Debug Tcl Shell"		f.exec  { tclOpen 		} }
+    {				f.dblline			  }
+    {"Redraw"  			f.exec  { GKey r		} }
+    {"Help"  			f.exec  { GKey ?		} }
+    {"Quit"  			f.exec  { Quit 			} }
+}
+
+set cmMenuDescription {
+    {"Cursor Mode Commands" 		f.title     }
+    {					f.dblline   }
+    {"Flush graphics output"  	     	f.exec { GCmd .gflush  	} }
+    {"Reset and Redraw"  		f.exec { GKey 0	   	} }
+    {"Draw/Label axes of viewport"  	f.exec { GKey A        	} }
+    {					f.dblline		  }
+    {"Load metacode file" 		f.exec { openDialog load} }
+    {"Save to metacode file"  		f.exec { openDialog save} }
+    {					f.dblline		  }
+    {"Backup over last instr in buffer" f.exec { GKey B 	} }
+    {"Undo last buffer edit"  	     	f.exec { GKey U 	} }
+    {					f.dblline		}
+    {"Mark cursor after read"       	f.exec { GCmd .markcur+	} }
+    {"Don't mark cursor after read" 	f.exec { GCmd .markcur-	} }
+    {					f.dblline		  }
+    {"Draw axes at redraw"       	f.exec { GCmd .axes+   	} }
+    {"Don't draw axes at redraw" 	f.exec { GCmd .axes-   	} }
+    {					f.dblline		  }
+    {"Show cursor mode help"   		f.exec { GCmd .?    	} }
+}
+
+set configMenuDescription {
+    {"GUI Configuration Options"	f.title     }
+    {					f.dblline   }
+    {"Add current config to menubar" 	f.exec  { } }
+    {"Rescan .xgtermrc file" 		f.exec  { } }
+    {"Save to .xgtermrc file" 		f.exec  { } }
+    {"Load UI config file" 		f.exec  { } }
+}
+
+createMenu fileMenu   gterm   $fileMenuDescription
+createMenu fileMenu   agGterm $fileMenuDescription
+createMenu cmMenu     gterm   $cmMenuDescription
+createMenu cmMenu     agGterm $cmMenuDescription
+createMenu configMenu gterm   $configMenuDescription
+createMenu configMenu agGterm $configMenuDescription
+
+
+
+################################################################################
+# Utility Callbacks
+################################################################################
+
+# Procedures for sending client cursor commands.
+proc GKey { key args } { send client gkey $key   }
+proc GCmd args         { send client gcmd $args  }
+
+# Wrapper routine to execute a callback command while ignoring the extra
+# arguments from the widget such as widget name, mode, etc.
+proc Exec { cmd args } { eval $cmd		 }
+
+# Procedures to test True/False strings in resources.
+proc true  { v } \
+   { expr { $v=="true"  || $v=="True"  || $v=="TRUE"  || $v==1 || $v=="yes" }
+}
+proc false { v } \
+   { expr { $v=="false" || $v=="False" || $v=="FALSE" || $v==0 || $v=="no"  }
+}
+
+# No-op procedure for text widgets with no callbacks to swallow newline.
+proc noop args { }
+
+# Common functions.
+proc min { a b } { expr {($a < $b) ? $a : $b} }
+proc max { a b } { expr {($a > $b) ? $a : $b} }
+
+# Dereference a variable.  E.g. in we define vars x[1-5] and want to use them
+# in a loop later we can't simply access "$x$i" to get the value of '$x1',
+# instead we use "[GetVal x$i]" to return the value of '$x1'. 'GV' is the
+# shorthand version.
+
+proc GetVal { in } { upvar $in out ; return $out }
+proc GV     { in } { upvar #0 $in out ; return $out }
+
+
+
+################################################################################
+# Generic Menubar Widget Callbacks
+################################################################################
+
+proc CommandCB { widget args } {
+    global Command curConfig
+
+    scan $widget "%1sCommand%d" bar num
+    set task [GV $curConfig]
+    eval $Command($task,$num,cmd)
+}
+
+proc ToggleCB { widget type state args } {
+    global ToggleAction curConfig
+
+    scan $widget "%1sToggle%d" bar num
+    set task [GV $curConfig]
+    if {$state == 1} {
+        eval $ToggleAction($task,Toggle$num,on,cmd)
+    } else {
+        eval $ToggleAction($task,Toggle$num,off,cmd)
+    }
+}
+
+proc ArrowCB { widget args } {
+    global Arrow curConfig
+
+    scan $widget "%1sArrow%d" bar num
+    set task [GV $curConfig]
+    eval $Arrow($task,$num,cmd)
+}
+
+proc AsciiTextCB { widget mode text args } {
+print $args
+}
+
+proc TextToggleCB { widget type state args } {
+    global ToggleAction curConfig
+
+    scan $widget "%1sToggle%d" bar num
+    set task [GV $curConfig]
+    if {$state == 1} {
+        eval $ToggleAction($task,Toggle$num,on,cmd)
+    } else {
+        eval $ToggleAction($task,Toggle$num,off,cmd)
+    }
+}
+
+	
+# Now attach all the callbacks.
+foreach w [ array names NWidgets ] {
+    for {set i 1} {$i <= $NWidgets($w)} {incr i} { 
+	if {$w != "MenuButton"} {
+      	    send u$w$i addCallback ${w}CB ; send a$w$i addCallback ${w}CB
+	}
+    }
+}
+
+
+
+################################################################################
+# Standard Keystroke Procedures
+################################################################################
+
+proc Print args  { GKey = ; GCmd .gflush }
+proc Redraw args { GKey r 		 }
+proc Help args   { GKey ?  		 }
+proc Quit args   { 
+    global winClose
+    GKey q 
+    if {$winClose == 1} { deactivate unmap }
+}
+
+
+
+################################################################################
+# Initialize the XGterm GUI.
+################################################################################
+
+proc Initialize args {
+    global ubMapped UbarHeight
+    global xgtermrc defaultConfig configPath
+    global cfgTask0 cfgTask1 cfgTask2 cfgTask3 cfgTask4
+    global cfgTask5 cfgTask6 cfgTask7 cfgTask8 cfgTask9
+
+
+    # Edit the configuration menu.
+    editConfigMenu
+
+    # If we're not starting up with a configuration unmap the userbar.  The
+    # alt graph userbar is always unmapped at the start.
+    if { $defaultConfig == "none" } {
+	set h [ send toplevel get height ]
+	send toplevel set height [ expr {$h - $UbarHeight} ]
+	send xgUBFrame "unmap ; set height 0"
+	set ubMapped 0
+    }
+    set h [ send altGraph get height ]
+    send altGraph set height [ expr {$h - $UbarHeight} ]
+    send agUserbar "unmap ; set height 0"
+
+    # Initialize the rest of the GUI.
+    initConfigBar
+}
+
+
+# Save the .xgtermrc config file.
+proc saveXgtermrcFile { cfname args } {
+    global defaultConfig configPath
+    global cfgTask0 cfgTask1 cfgTask2 cfgTask3 cfgTask4
+    global cfgTask5 cfgTask6 cfgTask7 cfgTask8 cfgTask9
+
+    set fd [open $cfname w]
+
+    puts fd "# .xgtermrc -- XGterm Uber-GUI configuration file."
+    puts fd ""
+    puts fd "# Set the config directory paths.  This will always include the"
+    puts fd "# current directory by default, other directories are specified"
+    puts fd "# as a colon-delimited list of directories to be searched.  "
+    puts fd "# Environment variables may be used in the specification of each"
+    puts fd "# path (e.g. $HOME/.xgterm)"
+    puts fd ""
+    puts fd "set configPath\t\t"$configPath
+    puts fd "set defaultConfig\t"$defaultConfig
+    puts fd ""
+    puts fd "# Define the tasks to be installed on the configuration bar.  "
+    puts fd "# Up to 10 tasks may be specified in variables "cfgTask[0-9]","
+    puts fd "# a value of "none" means that no task is configured on that"
+    puts fd "# widget and it will not be shown."
+    puts fd ""
+    for {set i 0} {$i < 10} {incr i} {
+        puts fd "set cfgTask$i\t" [send cfgTask$i get label]
+    }
+    close fd
+}
+
+
+################################################################################
+# Configure bar procedures.
+################################################################################
+
+# Initialize the config bar widgets.
+proc initConfigBar args {
+    global cfgTask0 cfgTask1 cfgTask2 cfgTask3 cfgTask4
+    global cfgTask5 cfgTask6 cfgTask7 cfgTask8 cfgTask9
+
+    for {set i 0} {$i < 10} {incr i} {
+	cfgButtonMap cfgTask$i [GetVal cfgTask$i]
+    }
+}
+
+proc cfgButtonMap { w v args } {
+    global Module
+
+    if { $v == "none" } { 
+	send $w "unmap ; set width 0"
+    } else {                     
+        if { [info exists Module($v)] } {
+	    send $w set label $v
+        } else {
+	    send $w { set label "     " ; setSensitive false }
+        }
+    }
+}
+
+# Edit the user-GUI configuration menu.
+proc editConfigMenu args {
+    global Module configMenuDescription
+
+    set desc $configMenuDescription
+
+    if { [ llength [ array names Module ] ] > 1 } {
+        lappend desc " f.dblline "
+        lappend desc " f.dblline "
+        lappend desc " \"Task        UI File\" f.exec \{ \}"
+        lappend desc " f.dblline "
+        lappend desc " \"GCursor     <builtin>\" f.exec \{ loadModule Gcur \}"
+    }
+
+    foreach n [ lsort [ array names Module ] ] {
+	if { $n != "arg" } {
+	    set lab [ format "%-10s  %s" $n $Module($n) ]
+            lappend desc " \"$lab\" f.exec \{ loadModule $Module($n) \}"
+	}
+    }
+    editMenu configMenu gterm $desc
+    editMenu configMenu agGterm $desc
+}
+
+
+#-----------------------
+# User-GUI command bar.
+#-----------------------
+
+set configWidgets {
+    cfgGcur
+    cfgTask0 cfgTask1 cfgTask2 cfgTask3 cfgTask4 
+    cfgTask5 cfgTask6 cfgTask7 cfgTask8 cfgTask9
+}
+
+proc userbarCB { widget type state args } {
+    userbarToggle $widget $state
+} ; foreach w $configWidgets { send $w addCallback userbarCB }
+
+proc userbarToggle { widget state args } {
+    global Module ubMapped curConfig UbarHeight
+
+    set st $state
+    set task [GV $widget]
+
+    # If state is 2 we're being called to toggle a specific widget and not
+    # as a callback for the toggle itself.
+    if { $state == 2 } {
+	if { ! [send $widget get sensitive] } {
+	    return
+	}
+	if { $ubMapped == 1 } { 
+	    set st 0
+            send $curConfig set state 0
+	    send $curConfig set background gray80
+	    send $curConfig set foreground black
+	    set config($curConfig,Activated) 0
+	} else { 		
+	    set st 1
+	    send $widget set state on
+	}
+    }
+
+    # We're switching toggles, so first turn off the existing button.
+    if { $curConfig != "none" && $curConfig != $widget} {
+        send $curConfig set state 0
+	send $curConfig set background gray80
+	send $curConfig set foreground black
+	set config($curConfig,Activated) 0
+    }
+
+    # If we're turning on a toggle configure the userbar and display it,
+    # otherwise close the userbar.
+    if { $st == 1 } {
+        if { $ubMapped == 0 } {
+	    set h [ send toplevel get height ]
+	    send toplevel set height [ expr {$h + $UbarHeight} ]
+	    send xgUBFrame "map ; set height $UbarHeight"
+	}
+
+	# Load the configuration file.
+	set task [ send $widget get label ]
+	if { [info exists Module($task)] } {
+	    # Configure the uBFrame with the GUI.
+	    Config $task ugUserbar
+	} else {
+            send $widget set state 0
+	    Wexec warning [ format "'%s' not defined" $task ]
+	}
+
+	send $widget set background black
+	send $widget set foreground gray90
+	set ubMapped 1
+
+    } elseif { $st == 0 } {
+	send xgUBFrame "unmap ; set height 0"
+	set h [ send toplevel get height ]
+	send toplevel set height [ expr {$h - $UbarHeight} ]
+	send $widget set background gray80
+	send $widget set foreground black
+	set ubMapped 0
+    }
+    set curConfig $widget
+}
+
+
+
+################################################################################
+# Userbar Button Procedures.
+################################################################################
+
+# Callback for a GUI Parameter to automatically set the configuration from
+# the client when available.
+
+proc setConfiguration { param old new } {
+    Config $new xgUserbar
+} ; send configure addCallback setConfiguration
+
+
+# Configure the user menubar for a particular UI definition.
+
+proc Config { task menubar args } {
+    global debug config curConfig
+    global Hght ULayout
+
+    # If we haven't already loaded this configuration read it now and store
+    # it in the config struct.
+    if { ! [ info exists config($task) ] } {
+	ParseTaskConfig $task
+    }
+
+    # Now map all of the widgets We will be using for this configuration,
+    # unmap the rest.
+    MapUserbarWidgets $task $menubar
+    
+    # Edit the Layout with the widget names
+    set layout [ EditLayout $task $menubar ]
+    send $menubar set layout $layout
+
+    # Set all the callbacks associated with this menubar, and Realize
+    # any objects defined for the module.
+    BuildConfigMenus $task ugUserbar
+    Realize $task
+
+    # Set the userbar Height.
+    send $menubar set height $Hght($task)
+
+    # Finally, map the userbar to see what we get.
+    send $menubar map
+
+    # Keep track that we're active.
+    set config($task,Activated) 1
+}
+
+
+# Map all of the widgets for the given menubar.  We also set any resources
+# that were specified such as bg/fg colors, frame type/width, etc.
+
+proc MapUserbarWidgets { task bar args } {
+    global NWidgets config
+
+    if {[catch {
+	if { $bar == "ugUserbar" } { set b u } else { set b a }
+
+	foreach widget [ array names NWidgets ] {
+	    global $widget
+
+	    for {set i 1} {$i <= $NWidgets($widget)} {incr i} {
+	    	if { [info exists config($task,${widget}${i})] } {
+		    send ${b}${widget}${i} map
+		    if { $widget != "Arrow" } {
+                        send ${b}${widget}${i} \
+			    set label [GV ${widget}($task,$i,label)]
+		    }
+		    if { $widget == "TextToggle" } {
+			if {[info exists TextToggle($task,$i,ftype)]} {
+                            send ${b}${widget}${i} \
+			        set frameType [GV ${widget}($task,$i,ftype)]
+			}
+			if {[info exists TextToggle($task,$i,fwidth)]} {
+                            send ${b}${widget}${i} \
+			        set frameWidth [GV ${widget}($task,$i,fwidth)]
+			}
+			if {[info exists TextToggle($task,$i,icon)]} {
+                            send ${b}${widget}${i} \
+			        set onIcon \
+				[format "%s1s" [GV ${widget}($task,$i,icon)] ]
+                            send ${b}${widget}${i} \
+			        set offIcon \
+				[format "%s0s" [GV ${widget}($task,$i,icon)] ]
+			}
+			if {[info exists TextToggle($task,$i,width)]} {
+                            send ${b}${widget}${i} \
+			        set width [GV ${widget}($task,$i,width)]
+			} else {
+			    set width \
+				[string length [GV ${widget}($task,$i,label)]]
+			    set width [expr { 7 * $width + 35} ]
+                            send ${b}${widget}${i} set width $width
+			}
+		    }
+		    if {[info exists ${widget}($task,$i,bg)]} {
+                        send ${b}${widget}${i} \
+			    set background [GV ${widget}($task,$i,bg)]
+		    }
+		    if {[info exists ${widget}($task,$i,fg)]} {
+                        send ${b}${widget}${i} \
+			    set foreground [GV ${widget}($task,$i,fg)]
+		    }
+		    if {[info exists ${widget}($task,$i,width)]} {
+                        send ${b}${widget}${i} \
+			    set width [GV ${widget}($task,$i,width)]
+		    }
+		    if {[info exists ${widget}($task,$i,height)]} {
+                        send ${b}${widget}${i} \
+			    set height [GV ${widget}($task,$i,height)]
+		    }
+	    	} else {
+		    send ${b}${widget}${i} unmap
+	    	}
+	    }
+	}
+    } err]} {
+	print "MapUserbarWidgets: '$err'"
+    }
+}
+
+
+# Activate all callbacks associated with a particular userbar configuration.
+proc BuildConfigMenus { task bar args } {
+    global NWidgets config debug
+
+    if {[catch {
+      	if { $bar == "ugUserbar" } { set b u } else { set b a }
+
+	global MenuButton
+
+	 for {set i 1} {$i <= $NWidgets(MenuButton)} {incr i} {
+	     if {[info exists MenuButton($task,$i,label)]} {
+		 BuildUIMenu $b $i $task
+	     }
+         }
+    } err]} {
+ 	 print "BuildConfigmenus($task): '$err'"
+    }
+}
+
+
+# Build the menu for a particular widget from the UI configuration.
+proc BuildUIMenu { bar N task args } {
+    global MenuButton MenuItem
+
+    # Set the parent menu widget
+    set w MenuButton$N
+
+    if {[info exists $MenuButton($task,$N,label)]} {
+        set label [GV $MenuButton($task,$N,label)]
+	send $bar$w set label $label
+    }
+
+    set menu_items {}
+    for {set i 1} {[info exists MenuItem($task,$w,$i,label)]} {incr i} {
+	set line ""
+        set label $MenuItem($task,$w,$i,label)
+        set cmd   $MenuItem($task,$w,$i,cmd)
+	if {[info exists MenuItem($task,$w,$i,sensitive)]} {
+            set sensitive   $MenuItem($task,$w,$i,sensitive)
+	}
+	if {[info exists MenuItem($task,$w,$i,bitmap)]} {
+            set bitmap   $MenuItem($task,$w,$i,bitmap)
+	}
+
+	switch $cmd {
+	    f.line    { lappend menu_items " f.line "    }
+	    f.dblline { lappend menu_items " f.dblline " }
+	    f.title   { set title [ format " \"%s\"  f.title " $label ]
+			lappend menu_items " f.dblline " }
+	    default   { lappend menu_items " \"$label\" f.exec \{ $cmd \}"
+		      }
+	}
+
+	# Reset so we don't keep a sensitive/bitmap on the next item.
+	catch { unset $label $cmd $sentive $bitmap }
+    }
+
+    # Finally, attach the menu to the widget.
+    editMenu menu$N $bar$w $menu_items
+}
+
+
+# Edit the Layout for the configuration with the actual widget names to be used.
+proc EditLayout { task bar args } {
+    global ULayout NWidgets
+
+    if {[catch {
+	if { $bar == "ugUserbar" } { set b u } else { set b a }
+
+	set layout $ULayout($task)
+	foreach widget [ array names NWidgets ] {
+	    regsub -all $widget $layout ${b}${widget} layout
+	}
+
+        # Kludge around the TextToggle which may have been changed because 
+        # of editing Toggle.
+        regsub -all Text${b} $layout ${b}Text layout
+
+    } err]} {
+	print "EditLayout: '$err'"
+    }
+
+    return $layout
+}
+
+
+# Given the task name, read in the UI configuration and store it in the
+# global structures.  The 'config' struct defines which task/widgets are
+# available but because of the need to access a global array by a known
+# name the config values are stored according to widget type, indexed by
+# the task.
+
+proc ParseTaskConfig { task args } {
+    global debug Module config UbarHeight NWidgets
+    global Hght ULayout gvar
+
+    # Read in the UI configuration file and eval-uate it to define local
+    # variables for the widgets.  We'll look through the list of variables
+    # defined and send those off to be parsed for the given configuration.
+    # The UI file may also contain user-defined procedures that will
+    # persist for the rest of the GUI and may be called as callbacks for
+    # the widgets.
+
+    set err ""
+    if {[catch { eval [ ReadConfigFile $Module($task) ] } err] } {
+	Wexec warning "file '$Module($task)':\n$err'"
+    }
+
+
+    # We now have defined as local variables the Menu/Toggle/etc widgets.
+    # For each of these convert to an element in the config structs, trap
+    # any errors.
+
+    if {[catch { 
+
+	foreach widget [ array names NWidgets ] {
+	    for { set i 1 } { $i <= $NWidgets($widget) } { incr i } {
+	        if { [ info exists $widget$i ] } {
+		    setWidgetSpec $task $widget $i [GetVal $widget$i]
+	        }
+	    }
+	}
+
+	# Lastly, get the userbar Layout and Height if specified.  It is an
+	# error to not specify the Layout, Height will default to a one-row 
+	# widget height.
+
+	if { [ info exists Layout ] } {
+	    set ULayout($task) $Layout
+	} else {
+	    Wexec warning "Config Error:\n'$task': No Layout specified"
+	}
+
+	if { [ info exists Height ] } {
+	    set Hght($task) $Height
+	} else {
+	    set Hght($task) $UbarHeight
+	}
+
+	if { $debug == 1 } {				;# debug print
+	    puts "${task}.Layout"
+	    puts "	$ULayout($task)"
+	    puts "${task}.Height"
+	    puts "	$Hght($task)"
+	}
+
+    } err] } {
+	Wexec warning "file '$Module($task)':\n$err'"
+    }
+
+    set config($task) 1
+}
+
+
+# Parse a widget definition.
+proc setWidgetSpec { task widget indx args } {
+    global config
+
+    # Let us know which button was defined.
+    set config($task,$widget$indx) 1
+
+    # Assume the command is the first string.
+    regsub -all "=" $args " " new
+    set entry [lindex $new 0]
+
+    set w      $widget				;# shorthad variables
+    set t      $task
+    set nitems 0				;# number of menu items
+    global     $w
+
+    # Loop through each of the items in the list which will be ordered as
+    # either a keyword or a value.  The outer loop should reach only known
+    # keywords, within the case we pick up the optional value, otherwise
+    # we ignore it.  For now we don't check that the keyword is correct for
+    # the widget, the space used should be negligible and won't be referenced
+    # anyway.
+
+    for { set i 0 } { $i < [llength $entry] } { incr i } {
+	switch [lindex $entry $i] {
+	     lab	-
+	     label	{ set ${w}($t,$indx,label) [lindex $entry [incr i] ]
+			}
+	     cmd	-
+	     command	{ set ${w}($t,$indx,cmd) [lindex $entry [incr i] ]
+			}
+	     alt	-
+	     altgraph	{ set ${w}($t,$indx,altgraph) 1
+			}
+	     close	-
+	     closeKeys	{ set ${w}($t,$indx,closeKeys) [lindex $entry $i ]
+			}
+	     config	{ set ${w}($t,$indx,config) [lindex $entry [incr i] ]
+			}
+	     prompt	{ set ${w}($t,$indx,prompt) [lindex $entry [incr i] ]
+			}
+	     dir	-
+	     direction	{ set ${w}($t,$indx,dir) [lindex $entry [incr i] ]
+			}
+	     item	{ set wn ${w}${indx}
+	     		  setActionSpec $t $wn \
+				[incr nitems] [lindex $entry [incr i] ]
+			}
+	     onAct	-
+	     onAction	{ set wn ${w}${indx}
+	     		  setActionSpec $t $wn on [lindex $entry [incr i] ]
+			}
+	     offAct	-
+	     offAction	{ set wn ${w}${indx}
+	     		  setActionSpec $t $wn off [lindex $entry [incr i] ]
+			}
+	     ftype	-
+	     frameType	{ set ${w}($t,$indx,ftype) [lindex $entry [incr i] ]
+			}
+	     fwidth	-
+	     frameWidth	{ set ${w}($t,$indx,fwidth) [lindex $entry [incr i] ]
+			}
+	     bg		-
+	     background { set ${w}($t,$indx,bg) [lindex $entry [incr i] ]
+			}
+	     fg		-
+	     foreground { set ${w}($t,$indx,fg) [lindex $entry [incr i] ]
+			}
+	     width	{ set ${w}($t,$indx,width) [lindex $entry [incr i] ]
+			}
+	     height	{ set ${w}($t,$indx,height) [lindex $entry [incr i] ]
+			}
+	     icon	{ set ${w}($t,$indx,icon) [lindex $entry [incr i] ]
+			}
+	     default    { print "unknown entry: " [lindex $entry $i ]
+		        }
+	}
+    }
+    printWidgetSpec $task $widget $indx 	;# Debug print (temporary).
+}
+
+# Parse a MenuItem or ToggleAction definition.
+proc setActionSpec { task widget item args } {
+    global config
+
+    # Let us know which button was defined.
+    set config($task,$widget$item) 1
+
+    # Assume the command is the first string.
+    regsub -all "=" $args " " new
+    set entry [lindex $new 0]
+
+    set w      $widget				;# shorthand variables
+    set t      $task
+    if { [ string match Menu* $widget ] } {
+        set W      MenuItem
+    } else {
+        set W      ToggleAction
+    }
+    global $W
+
+    for { set i 0 } { $i < [llength $entry] } { incr i } {
+	switch [lindex $entry $i] {
+	    alt	      -
+	    altgraph  { set ${W}($t,$w,$item,altgraph) 1
+		      }
+	    close     -
+	    closeKeys { set ${W}($t,$w,$item,closeKeys) [lindex $entry $i]
+		      }
+	    cmd       -
+	    command   { set ${W}($t,$w,$item,cmd) [lindex $entry [incr i] ]
+		      }
+	    config    { set ${W}($t,$w,$item,config) [lindex $entry [incr i] ]
+		      }
+	    lab	      -
+	    label     { set ${W}($t,$w,$item,label) [lindex $entry [incr i] ]
+		      }
+	    prompt    { set ${W}($t,$w,$item,prompt) [lindex $entry [incr i] ]
+		      }
+	    sens      -
+	    sensitive { set ${W}($t,$w,$item,sensitive) [lindex $entry [incr i]]
+		      }
+	    bitmap    { set ${W}($t,$w,$item,bitmap) [lindex $entry [incr i] ]
+		      }
+	    f.line    -
+	    f.dblline { set ${W}($t,$w,$item,label) ""
+			set ${W}($t,$w,$item,cmd) [lindex $entry $i]
+		      }
+	    f.title   { set ${W}($t,$w,$item,cmd) [lindex $entry $i]
+		      }
+	    default   { print "unknown item entry: " [lindex $entry $i]
+		      }
+	}
+    }
+    printItemSpec $task $W $w $item 		;# Debug print (temporary).
+}
+
+
+
+################################################################################
+# Define a WCS box to track coords
+################################################################################
+
+proc trackEnable args {
+    global  track_coords agMapped
+    set track_coords 1
+    set parentGterm [ expr { ($agMapped == 1) ? "agGterm" : "gterm" } ]
+
+    send $parentGterm set dialogBgColor black
+    send $parentGterm set dialogFgColor black
+    makeWCSMarker $parentGterm
+}
+
+proc trackDisable args {
+    global  track_coords agMapped
+    set track_coords 0
+    set parentGterm [ expr { ($agMapped == 1) ? "agGterm" : "gterm" } ]
+
+    send wcsbox destroy
+    send tclCoords set label ""
+
+    send $parentGterm set dialogBgColor yellow
+    send $parentGterm set dialogFgColor black
+}
+
+proc trackCoords { param old new } {
+    global  track_coords
+
+    if {$track_coords == 1} {
+        scan $new "%f %f" nx ny
+        set text [ format "x = %-7.2f y = %-7.2f " $nx $ny ]
+        send wcsbox "set text \{$text\}; redraw noerase"
+    }
+} ; send textout addCallback trackCoords
+
+proc makeWCSMarker { parent args } {
+    send $parent createMarker wcsbox {
+        type                text
+        createMode          noninteractive
+        width               25ch
+        height              1ch
+        lineWidth           0
+        imageText           true
+        textBgColor         black
+        textColor           yellow
+        visible             false
+    }
+
+    set box_width [send wcsbox get width]
+    set box_height [send wcsbox get height]
+    set defGeom [format "%sx%s-5-5" $box_width $box_height]
+    send $parent parseGeometry "-5-5" $defGeom x y width height
+
+    send wcsbox setAttributes \
+        x                   $x \
+        y                   $y \
+        activated           true \
+        visible             true \
+        sensitive           true
+}
+
+# Update the wcsbox marker with the current window position.
+proc wcsUpdate {x y} \
+{
+    global track_coords
+
+    # Update Tcl coords box.
+    send tclCoords set label \
+    	[ format "Screen Cursor: x = %-7.2f y = %-7.2f " $x $y ]
+
+    if {$track_coords == 1} { GKey C }
+}
+
+
+################################################################################
+#  Procedures used by the alternate graph window.
+################################################################################
+
+proc altGraphOpen args {
+    global agMapped fileMenuDescription
+
+    send gterm setSensitive false
+    send gterm setCursorType idle
+    send agGterm setCursorType ginMode
+    send agGterm setGterm
+    GKey 0
+    send altGraph map
+    set  agMapped 1
+
+    editMenu fileMenu gterm     $fileMenuDescription
+    editMenu agFileMenu agGterm $fileMenuDescription
+}
+
+proc altGraphClose args {
+    global agMapped fileMenuDescription
+
+    send altGraph unmap
+    send gterm setSensitive true
+    send gterm setCursorType ginMode
+    send gterm setGterm
+    GKey 0
+    set  agMapped 0
+
+    editMenu fileMenu gterm     $fileMenuDescription
+    editMenu agFileMenu agGterm $fileMenuDescription
+}
+
+proc altGraphToggle args {
+    global agMapped
+
+    if { $agMapped == 1 } { altGraphClose
+    } else { 		    altGraphOpen }
+} 
+
+proc altGraphCB { widget type state args } {
+    global agMapped
+    
+    if { $state == 1 } { altGraphOpen
+    } else { 		 altGraphClose }
+} ; send xgAltGraph addCallback altGraphCB 
+
+
+################################################################################
+#  Now that we've done it all, Initialize and start up the GUI.
+################################################################################
+activate
+Initialize

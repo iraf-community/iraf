@@ -1,0 +1,52 @@
+.help allocate Jan86 system
+.ih
+NAME
+allocate -- allocate a device
+.ih
+USAGE
+allocate device
+.ih
+PARAMETERS
+.ls device
+The device to be allocated.
+.le
+.ih
+DESCRIPTION
+\fBAllocate\fR allocates a device for exclusive access by one user, and
+readies the device for i/o by some other program.  A list of the devices
+available on the local system is maintained in the file \fBdev$tapecap\fR
+which needs to be configured by the site manager before it can be used.
+The status of given device may be obtained by calling \fIdevstatus\fR.
+.ih
+EXAMPLES
+
+1. Print a list of the allocatable devices.  The logical device names are
+given at the left in the output text; ignore the information to the right.
+\fBNote\fR: The dev$devices file should be configured by the site manager
+when new tape devices are installed.  Beginning with V2.9 it is used for
+informational purposes only.
+.ks
+.nf
+	cl> type dev$devices
+	mta ...
+	mtb ...
+	mtc ...
+	iis ...
+.fi
+.ke
+
+
+2. Allocate a tape drive after checking its status.
+
+.ks
+.nf
+	cl> devstatus mtb
+	device mtb is not currently allocated
+	cl>
+	cl> allocate mtb
+.fi
+.ke
+.ih
+SEE ALSO
+deallocate, devstatus
+.endhelp

@@ -1,0 +1,97 @@
+.help revisions Jun88 noao.imred.bias
+.nf
+noao$imred/bias/colbias.x
+noao$imred/bias/linebias.x
+noao$imred/bias/doc/colbias.hlp
+noao$imred/bias/doc/linebias.hlp
+    The output pixel type is now changed to real rather than preserving
+    the input pixel type.  (3/2/93, Valdes)
+
+=======
+V2.10.2
+=======
+
+noao$imred/bias/colbias.x
+    Valdes, January 6, 1990
+    The graphics device parameter was being ignored and "stdgraph" always
+    opened.
+
+===
+V2.8
+====
+
+noao$imred/bias/colbias.x,linebias.x,colbias.par,linebias.par
+    Davis, October 4, 1988
+    1. The parameters low_reject, high_reject and niterate have been added
+    to the linebias and colbias tasks which then pass them to the icfit
+    package.
+
+noao$imred/bias/linebias.x
+    Valdes, May, 1, 1987
+    1.  The fix of December 3 was slightly wrong.
+	296: ...Memr[buf2+(k-1)*n+i-1] ==> ...Memr[buf2+k*n+i-j]
+    2.  Increased the maximum buffer MAXPIX from 10000 to 100000.
+
+noao$imred/bias/colbias.x
+noao$imred/bias/linebias.x
+    Valdes, January 15, 1986
+    1.  When the bias section consists of just one column or line the
+	dimensionality of the mapped bias decreases.  The code had to be
+	modified to recognize and work properly in this case.
+
+noao$imred/bias/linebias.x
+    Valdes, December, 3, 1986
+    1.  There was a bug in using the median option which gave incorrect
+	results for the bias vector.
+	291: n = min (nx - j - 1, maxn)	==> n = min (nx - j + 1, maxn)
+	296: ...Memr[buf2+(k-1)*n+i-1]	==> ...Memr[buf2+(k-1)*n+i-j]
+
+noao$imred/bias/linebias.x
+    Valdes, October 29, 1986
+    1.  The log information for LINEBIAS identified itself as COLBIAS.
+
+====================================
+Version 2.3 Release, August 18, 1986
+====================================
+
+noao$imred/bias/colbias.x
+noao$imred/bias/linebias.x
+    Valdes, July 3, 1986
+    1.  COLBIAS and LINEBIAS modified to use new ICFIT package.
+
+=========================================
+STScI Pre-release and 1st SUN 2.3 Release
+=========================================
+
+===========
+Release 2.2
+===========
+
+From Valdes Dec 12, 1985:
+
+1.  COLBIAS and LINEBIAS changes to allow taking a median instead of an
+average when generating the 1D bias data.
+------
+From Valdes Dec 11, 1985:
+
+1.  COLBIAS and LINEBIAS changed to use image templates instead of filename
+templates.  This allows use of the concatenation function even though the
+images should not have images sections.
+
+2.  REVS task removed.
+------
+From Valdes Oct 4, 1985:
+
+1.  Colbais and linebias recompiled because of the change in the icfit package
+for low and high rejection and rejection iteration.
+------
+From Valdes Aug 7, 1985:
+
+1.  The task revisions has been added to page package revisions.
+To get the system revisions type system.revisions.
+
+2.  The parameters to linebias and colbias now include control over
+the graphics output device, the graphics input cursor, and multiple logfiles.
+
+3.  Changes have been made to use the "improved" icfit and gtools packages.
+.endhelp

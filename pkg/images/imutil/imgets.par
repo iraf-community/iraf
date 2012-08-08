@@ -1,0 +1,3 @@
+image,s,a,,,,image name
+param,s,a,,,,image parameter to be returned
+value,s,h,,,,output value of image parameter

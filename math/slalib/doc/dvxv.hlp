@@ -1,0 +1,25 @@
+.help dvxv Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slDVXV (VA, VB, VC)
+
+     - - - - -
+      D V X V
+     - - - - -
+
+  Vector product of two 3-vectors  (double precision)
+
+  Given:
+      VA      dp(3)     first vector
+      VB      dp(3)     second vector
+
+  Returned:
+      VC      dp(3)     vector result
+
+  P.T.Wallace   Starlink   March 1986
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

@@ -1,0 +1,5 @@
+# SECTIONS -- Expand an image template.
+
+images,s,a,,,,Image template
+option,s,h,"fullname",,,"Option (nolist, fullname, root, section)"
+nimages,i,h,,,,Number of images in template

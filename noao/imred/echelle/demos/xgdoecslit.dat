@@ -1,0 +1,105 @@
+\O=NOAO/IRAF IRAFX valdes@puppis Mon 14:58:37 15-Nov-93
+\T=xgterm
+\G=xgterm
+epar\sechel\n
+\r
+onedstds$spechayescal/\r
+\r
+\r
+\r
+\r
+\r
+y\r
+demologfile\r
+demoplotfile\r
+^Z
+epar\sdoecslit\n
+demoobj1,demoobj2\r
+demostd\r
+demoarc\r
+\r
+demostd\r
+rdnoise\r
+gain\r
+\r
+3\r
+\r
+\r
+y\r
+y\r
+y\r
+\r
+\r
+scat\r
+y\r
+^Z
+doecslit\sredo+\n
+\n
+\n
+b/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+\r
+\r
+q/<-5\s\s\s\s/=(.\s=\r
+N\r
+\n
+q/<-5\s\s\s\s/=(.\s=\r
+\r
+N\r
+n\n
+n\n
+\n
+\n
+\n
+\n
+:/<-5\s\s\s\s/=(.\s=\r sample\s9:92\r
+f/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+q\r
+q/<-5\s\s\s\s/=(.\s=\r
+q\r
+i/<-5\s\s\s\s/=(.\s=\r
+m200.\s\s\s\s20=*,.\r 4965\r
+m3+0*\s\s\s\s3,&*1)\r 4966\r
+k/<-5\s\s\s\s/=(.\s=\r
+m(?3"\s\s\s\s(?+&<:\r 5002\r
+m+\s3$\s\s\s\s+\s:&:-\r 5003.6\r
+m2*3$\s\s\s\s2+.&:-\r 5009.3\r
+k/<-5\s\s\s\s/=(.\s=\r
+m%937\s\s\s\s%90&"$\r 5044.7\r
+m,,3&\s\s\s\s,,/&7?\r 5049.8\r
+m9,4'\s\s\s\s9,?%,)\r 5059.8\r
+m3-4"\s\s\s\s3.\s%32\r 5055.3\r
+f/<-5\s\s\s\s/=(.\s=\r
+:/<-5\s\s\s\s/=(.\s=\r xo\s4\r
+o/<-5\s\s\s\s/=(.\s=\r 114\r
+q/<-5\s\s\s\s/=(.\s=\r
+l/<-5\s\s\s\s/=(.\s=\r
+f/<-5\s\s\s\s/=(.\s=\r
+o/<-5\s\s\s\s/=(.\s=\r 114\r
+q/<-5\s\s\s\s/=(.\s=\r
+q/<-5\s\s\s\s/=(.\s=\r
+hz14\n
+y\n
+q/<-5\s\s\s\s/=(.\s=\r
+NO!\r
+y\n
+q/<-5\s\s\s\s/=(.\s=\r
+N\r
+\n
+1\n
+q/<-5\s\s\s\s/=(.\s=\r
+\n
+2\n
+q/<-5\s\s\s\s/=(.\s=\r
+\n
+2\n
+q/<-5\s\s\s\s/=(.\s=\r
+imdel\sdemoobj1.ec\n
+del\sdatabase/apdemoobj1\n
+doecslit\squick+\n
+\n
+imdel\sdemoobj1.ec\n
+doecslit\sbatch+\ssplot-\n
+\n

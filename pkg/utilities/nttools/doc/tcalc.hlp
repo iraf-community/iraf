@@ -1,0 +1,153 @@
+.help tcalc Jan92 ttools
+.ih
+NAME
+tcalc -- Perform arithmetic operations on table columns.
+.ih
+USAGE
+tcalc table outcol equals
+.ih
+DESCRIPTION
+This task evaluates an arbitrary expression that includes column names,
+constants, and operators, and creates a specified column in the 
+table---or overwrites an existing column if the specified name already exists.
+Variables in the expression are column names in either case. 
+
+Columns
+may be of any type except string. If the column name contains
+non-alphanumeric characters, it should be preceded by a dollar sign
+and followed by a blank. For example, the expression "date-obs+1."
+contains the column "date-obs", but the task thinks that it contains
+two column names, "date" and "obs".  To ensure that the expression is
+evaluated correctly, rewrite it as "$date-obs +1.". The variable
+"rownum" may also be used in an expression if there is no column in
+the table of the same name. Its value is the current row number. The
+expression will be evaluated using the data types of the columns and
+constants in the expression, with the usual rules of type promotion used in
+Fortran.  Please remember that integer division truncates.
+
+The output value in any row will be set to INDEF if one or more column
+values used in the calculation is equal to INDEF. The result will be
+INDEF if either of the clauses in an if expression contains a row with
+an INDEF value. If the result of an operation is undefined (such as
+division by zero) the output column will also be set to INDEF.
+
+The following Fortran-type arithmetic operators are supported.  If the
+second argument of the exponentiation is not an integer, the result
+will be undefined if the first argument is not positive.  Again, 
+remember that integer division truncates.
+ 
+.nf
++	addition		-	subtraction
+*	multiplication		/	division
+-	negation		**	exponentiation
+.fi
+
+The following logical operators are supported. Logical operators will
+return a value of 1 if true or 0 if false. Logical operators are
+supported in both their Fortran and SPP form.
+
+.nf
+.or. ||		logical or	.and. 	&&	logical and
+.eq. ==		equality	.ne. 	!=	inequality
+.lt. <		less than	.gt. 	>	greater than
+.le. <=		less or equal	.ge. 	>=	greater or equal
+.not. !		not
+.fi
+
+The following functions are supported. These functions all take a
+single argument, which may be an expression. The argument or result of
+trigonometric functions are in radians.
+
+.nf
+abs 	absolute value		acos 	arc cosine
+asin 	arc sine		atan 	arc tangent
+cos 	arc cosine		cosh 	hyperbolic cosine
+cube 	third power		double	convert to double
+exp 	E raised to power	int 	convert to integer
+log 	natural logarithm	log10 	common logarithm
+nint 	nearest integer		real	convert to real
+sin 	sine			sinh 	hyperbolic sine
+sqr 	second power		sqrt 	square root
+tan 	tangent			tanh	hyperbolic tangent
+.fi
+
+The following functions take two arguments.
+
+.nf
+atan2 	arc tangent		dim 	positive difference
+max 	maximum			min 	minimum
+mod 	modulus			sign	sign transfer
+.fi
+
+Conditional expressions of the form "if expr then expr else expr" are
+supported. The expression after the else may be another conditional
+expression.  The words "if", "then", and "else" must be surrounded by
+blanks.
+.ih
+PARAMETERS
+.ls table  [file name template]
+The input table, or tables; these files are modified in-place.
+Results will be written to a new column in the table unless an
+existing column name is specified, in which case the existing values
+will be overwritten.
+.le
+.ls outcol [string]
+Output column name.  This is the column where results are written.
+Caution: if this column already exists, then it will be overwritten
+with the results of the calculation.  Note that column names are not
+case sensitive.
+.le
+.ls equals [string]
+The arithmetic expression to evaluate. If the expression is too long
+to pass as a parameter, place the expression in a file and set the
+value of this parameter to the file name preceded by an "@", for
+example, "@filename".
+.le
+.ls (datatype = real) [string, allowed values: real | double | int ]
+
+Type of data stored in the output column, if it is a new column.
+.le
+.ls (colunits) [string]
+Units for the output column, if it is a new column.  This parameter
+may be blank.
+.le
+.ls (colfmt) [string]
+Print format for the output column, if it is a new column.  If this
+parameter is left blank then a default will be used.  Type "help
+ttools opt=sysdoc" for more information about print formats.
+.le
+.ih
+EXAMPLES 
+1.  Create a column called 'FLUX', which will contain a value equal to
+10.0**(-x/2.5) where x is the value in the column 'MAG'.  The new
+column will contain single precision data.
+
+.nf
+tt> tcalc "intab" "FLUX" "10.0**(-mag/2.5)"
+.fi
+
+2.  Create a column called 'POLY', which will contain a value equal to
+x+x**2 where x is the row number in the table.
+
+.nf
+tt> tcalc "test" "POLY" "rownum+sqr(rownum)"
+.fi
+
+3.  Set quotient to zero where divison by zero would otherwise occur:
+
+.nf
+tt> tcalc "test" "QUOT" "if y != 0 then x / y else 0."
+.fi
+
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih
+SEE ALSO
+imcalc
+
+Type "help ttools opt=sys" for a higher-level description of the 'tables' 
+package.
+.endhelp

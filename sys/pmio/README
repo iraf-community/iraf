@@ -1,0 +1,284 @@
+PMIO -- The Pixel Mask I/O package (PLIO for image masks).
+PLIO -- The Pixel List I/O package (no ties to IMIO)
+
+    A PIXEL LIST is a compressed, region oriented data structure used to store
+an image matrix.  The pixel list package is used to create, manage, and access
+this data structure.  Although the PLIO package can stand alone and is useful
+in its own right, one of the main uses of the pixel list package is in the IMIO
+interface, which can access a pixel list as if it were a MASK IMAGE.
+See PLIO.hlp for further information on the PLIO package and image masks.
+
+The pixel list package itself does not support any fancy image coordinate
+transformations.  If an image has an associated pixel mask, the pixel mask
+refers to the physical image matrix.  An application written at the IMIO level
+where an image section transformation may be defined for an image should
+normally use the PMIO (pixel mask) package in preference to PLIO.  PMIO is
+equivalent to PLIO, except that coordinates are input in image section
+coordinates, and a reference image is used to map such coordinates onto the
+physical image matrix.
+
+
+1. IMIO Mask Image Interface
+
+		  im = im_pmmap (maskname, mode, ref_im|NULL)
+		 im = im_pmmapo (pm, ref_im)
+
+		         imseti (im, IM_RLIO, YES|NO)	# enable range list i/o
+		         imseti (im, IM_PMDES, pm)	# inquire PM descriptor
+		   pm = imstati (im, IM_PMDES)
+
+	   bool = im_pmlne[123] (im[, lineno[, bandno]])
+	   bool = im_pmsne[123] (im, x1, x2[, y1, y2[, z1, z2]])
+	       bool = im_pmlnev (im, v)
+	       bool = im_pmsnev (im, vs, ve, ndim)
+
+		  mp = mio_open (maskname, flags, im)	# Masked Image I/O
+		 mp = mio_openo (pm, im)
+	      value = mio_stati (mp, param)
+		       mio_seti (mp, param, value)
+		   mio_setrange (mp, vs, ve, ndim)
+   n|EOF = mio_[gp]lseg[silrdx] (mp, ptr, mval, v, npix)
+		      mio_close (mp)
+
+
+2. Pixel Mask Interface (uses reference image for section transformation)
+
+		pm = pm_newmask (ref_im, depth)
+
+		   pm = pm_open (bufptr|NULL)
+		 pm = pm_create (naxes, axlen, depth)
+		pm = pm_newcopy (pm)
+		       pm_close (pm)
+
+		    pm_[sg]size (pm, naxes, alxen, depth)
+		        pm_seti (pm, param, value)
+	       value = pm_stati (pm, param)
+		       pm_debug (pm, outfd, maxcol, flags)
+		bool = pm_empty (pm)
+		    pm_compress (pm)
+		       pm_clear (pm)
+
+			pm_load (pm, bufptr)
+	       nwords = pm_save (pm, bufptr, buflen, save_flags)
+		       pm_loadf (pm, fname, title, maxch)
+		       pm_savef (pm, fname, title, save_flags)
+	       pm_[load|save]im (pm, imname[, save_flags])
+
+		ptr = pm_access (pm, v)
+         bool = pm_linenotempty (pm, v)
+         bool = pm_sectnotempty (pm, vs, ve, ndim)
+	      pm[gp]l[lrp][sil] (pm, v, buf, b_depth, npix, rop)
+
+	      pm_[set|get]plane (pm, v)
+		       pm_point (pm, x, y, rop)
+		      pm_circle (pm, x, y, r, rop)
+			 pm_box (pm, x1,y1, x2,y2, rop)
+			pm_line (pm, x1,y1, x2,y2, width, rop)
+		     pm_polygon (pm, x, y, npts, rop)
+
+			 pm_rop (pm_src, vs, pm_dst, vs, vn, rop)
+		     pm_stencil (pm_src, vs, pm_dst, vs, pm_stl, vs, vn, rop)
+
+
+2.1 Random Access to a Pixel Mask
+
+		 pmr = pmr_open (pm, plane, buflimit)
+		    pmr_setrect (pmr, x1,y1, x2,y2)
+	      mval = pmr_getpix (pmr, i, j)
+		      pmr_close (pmr)
+
+
+3. Pixel List Interface (stands alone; independent of IMIO; no coord xforms)
+
+		   pl = pl_open (bufptr|NULL)
+		 pl = pl_create (naxes, axlen, depth)
+		pl = pl_newcopy (pl)
+		       pl_close (pl)
+
+		    pl_[sg]size (pl, naxes, axlen, depth)
+		        pl_seti (pl, param, value)
+	       value = pl_stati (pl, param)
+		       pl_debug (pl, outfd, maxcol, flags)
+		bool = pl_empty (pl)
+		    pl_compress (pl)
+		       pl_clear (pl)
+
+			pl_load (pl, bufptr)
+	       nwords = pl_save (pl, bufptr, buflen, save_flags)
+		       pl_loadf (pl, fname, title, maxch)
+		       pl_savef (pl, fname, title, save_flags)
+	       pl_[load|save]im (pl, imname[, save_flags])
+
+		ptr = pl_access (pl, v)
+         bool = pl_linenotempty (pl, v)
+         bool = pl_sectnotempty (pl, vs, ve, ndim)
+	      pl[gp]l[lrp][sil] (pl, v, buf, b_depth, npix, rop)
+
+	      pl_[set|get]plane (pl, v)
+		       pl_point (pl, x, y, rop)
+		      pl_circle (pl, x, y, r, rop)
+			 pl_box (pl, x1,y1, x2,y2, rop)
+			pl_line (pl, x1,y1, x2,y2, width, rop)
+		     pl_polygon (pl, x, y, npts, rop)
+
+			 pl_rop (pl_src, vs, pl_dst, vs, vn, rop)
+		     pl_stencil (pl_src, vs, pl_dst, vs, pl_stl, vs, vn, rop)
+
+
+3.1 Random Access to a Pixel List
+
+		 plr = plr_open (pl, plane, buflimit)
+		    plr_setrect (plr, x1,y1, x2,y2)
+	      mval = plr_getpix (plr, i, j)
+		     plr_getlut (plr, bufp, xsize,ysize, xblock,yblock)
+		      plr_close (plr)
+
+
+3.2 Pixel, Line, and Range List Routines
+
+		      pl_pixrop (px_src, xs, src_maxval,
+				 px_dst, ds, dst_maxval, npix, rop)
+		     pl_linerop (ll_src, xs, src_maxval,
+				 ll_dst, ds, dst_maxval, ll_out, npix, rop)
+		    pl_rangerop (rl_src, xs, src_maxval,
+				 rl_dst, ds, dst_maxval, rl_out, npix, rop)
+		 pl_linestencil (ll_src, xs, src_maxval, ll_dst, ds, dst_maxval,
+				 ll_stn, xs, ll_out, npix, rop)
+
+	n = pl_[lrp]2[lrp][sil] (op_src, xs, op_dst, npix)
+
+
+4. EXAMPLE
+
+4.1 Sample Mask (pl_draw output)
+
+ 40 .1111111..............................................................22222
+ 39 .1111111..............................................................22222
+ 38 .1111111...............................................................2222
+ 37 .1111111...............................................................2222
+ 36 .1111111............................................................4......
+ 35 .1111111.....................11111111111111111111111111...........4444.....
+ 34 .1111111.....................11111111111111111111111111........44444444....
+ 33 .1111111......................1111111111111111111111111......44444444......
+ 32 .1111111......................1111111111111111111111111...44444444.........
+ 31 .1111111......................1111111111111111111111111.44444444...........
+ 30 .1111111...........4..........1111111111111111111111115444444..............
+ 29 .1111111...........4..........11111111111111111111155554444................
+ 28 .1111111...........4..........111111111111111111155555544..................
+ 27 .1111111...........4..........1111111111111111555555551....................
+ 26 .1111111.....................11111111111111155555555111....................
+ 25 .1111111.....................11111111111115555555111111....................
+ 24 ............................1111111111155444444.1111111....................
+ 23 ...........................111111111155544444....111111....................
+ 22 ..............1...........1111111155555444........11111....................
+ 21 ........................1111111155555554..........11111....................
+ 20 ........................111111555555511...........11111....................
+ 19 ........................111555555551111...........11111....................
+ 18 ........................155555555111111...........11111....................
+ 17 ......................445555551111111111.........111111....................
+ 16 ....................444455551111111111111.......1111111....................
+ 15 ..................4444445111111111111111111111111111111....................
+ 14 ...............44444444.1111111111111111111111111111111....................
+ 13 .............44444444......................................................
+ 12 ..........44444444.........................................................
+ 11 ........44444444...........................................................
+ 10 .........4444........................22222.................................
+  9 ..........4.........................2222222..............22222.............
+  8 ....................................2222222.............2222222............
+  7 ....................................2222222.............2222222............
+  6 .....................................22222..............2222222............
+  5 11111111111111111111.....................................22222.............
+  4 11111111111111111111.......................................................
+  3 11111111111111111111.......................................................
+  2 11111111111111111111.......................................................
+  1 11111111111111111111.......................................................
+    123456789012345678901234567890123456789012345678901234567890123456789012345
+             1         2         3         4         5         6         7     
+
+
+4.2 Sample Debug Output (for above mask)
+
+Mask 1EECD naxes=2 [75,40] maxval=177 plane=[75,40]
+max buffered line size 1024, max actual line size 16
+40 lines total, 40 are nonempty, mask is nonempty
+llbp=42AF5, len=1190, op=583, free=189, nupdates=35
+Index at 1EFF1 containing 40 lines:
+     4      4      4      4     17     26     35     35    166    177    187
+   194    201    208    218    228    241    254    266    554    292    568
+   319    333    347    360    492    507    523    539    423    435    447
+   459    471    483    148    148    157    157
+Line list containing 40 lines:
+[1:4]      IH48(49) H20 Z55 (75,49)
+[5]        IH48(49) H20 IH1(50) Z37 H5 Z13 (75,50)
+[6]        IH49(50) Z37 H5 Z14 H7 Z12 (75,50)
+[7:8]      IH49(50) Z36 H7 Z13 H7 Z12 (75,50)
+[9]        IH51(52) P11 DH2(50) Z25 H7 Z14 H5 Z13 (75,50)
+[10]       IH51(52) Z9 H4 DH2(50) Z24 H5 Z33 (75,50)
+[11]       IH51(52) Z8 H8 Z59 (75,52)
+[12]       IH51(52) Z10 H8 Z57 (75,52)
+[13]       IH51(52) Z13 H8 Z54 (75,52)
+[14]       IH51(52) Z15 H8 DH3(49) Z1 H31 Z20 (75,49)
+[15]       IH51(52) Z18 H6 IS1(53) DH4(49) H30 Z20 (75,49)
+[16]       IH51(52) Z20 H4 IH1(53) H4 DH4(49) H13 Z7 H7 Z20 (75,49)
+[17]       IH51(52) Z22 H2 IH1(53) H6 DH4(49) H10 Z9 H6 Z20 (75,49)
+[18]       IH48(49) P25 IH4(53) H8 DH4(49) H6 Z11 H5 Z20 (75,49)
+[19]       IH48(49) Z24 H3 IH4(53) H8 DH4(49) H4 Z11 H5 Z20 (75,49)
+[20]       IH48(49) Z24 H6 IH4(53) H7 DH4(49) H2 Z11 H5 Z20 (75,49)
+[21]       IH48(49) Z24 H8 IH4(53) H7 DS1(52) DH3(49) Z10 H5 Z20 (75,49)
+[22]       IH48(49) P15 Z11 H8 IH4(53) H5 DH1(52) H3 DH3(49) Z8 H5 Z20 (75,49)
+[23]       IH48(49) Z27 H10 IH4(53) H3 DH1(52) H5 DH3(49) Z4 H6 Z20 (75,49)
+[24]       IH48(49) Z28 H11 IH4(53) H2 DH1(52) H6 DH3(49) Z1 H7 Z20 (75,49)
+[25]       IH48(49) Z1 H7 Z21 H13 IH4(53) H7 DH4(49) H6 Z20 (75,49)
+[26]       IH48(49) Z1 H7 Z21 H15 IH4(53) H8 DH4(49) H3 Z20 (75,49)
+[27]       IH48(49) Z1 H7 IH3(52) P12 DH3(49) Z10 H16 IH4(53) H8 DS4(49) Z20
+           (75,49)
+[28]       IH48(49) Z1 H7 IH3(52) P12 DH3(49) Z10 H19 IH4(53) H6 DH1(52) H2 Z18
+           (75,52)
+[29]       IH48(49) Z1 H7 IH3(52) P12 DH3(49) Z10 H21 IH4(53) H4 DH1(52) H4 Z16
+           (75,52)
+[30]       IH48(49) Z1 H7 IH3(52) P12 DH3(49) Z10 H24 IS4(53) DH1(52) H6 Z14
+           (75,52)
+[31]       IH48(49) Z1 H7 Z22 H25 IH3(52) Z1 H8 Z11 (75,52)
+[32]       IH48(49) Z1 H7 Z22 H25 IH3(52) Z3 H8 Z9 (75,52)
+[33]       IH48(49) Z1 H7 Z22 H25 IH3(52) Z6 H8 Z6 (75,52)
+[34]       IH48(49) Z1 H7 Z21 H26 IH3(52) Z8 H8 Z4 (75,52)
+[35]       IH48(49) Z1 H7 Z21 H26 IH3(52) Z11 H4 Z5 (75,52)
+[36]       IH48(49) Z1 H7 IH3(52) P61 Z6 (75,52)
+[37:38]    IH48(49) Z1 H7 IH1(50) Z63 H4 (75,50)
+[39:40]    IH48(49) Z1 H7 IH1(50) Z62 H5 (75,50)
+
+Line list containing 40 lines:
+[1:4]      1-20(49)
+[5]        1-20(49) 58-62(50)
+[6]        38-42(50) 57-63(50)
+[7:8]      37-43(50) 57-63(50)
+[9]        11(52) 37-43(50) 58-62(50)
+[10]       10-13(52) 38-42(50)
+[11]       9-16(52)
+[12]       11-18(52)
+[13]       14-21(52)
+[14]       16-23(52) 25-55(49)
+[15]       19-24(52) 25(53) 26-55(49)
+[16]       21-24(52) 25-28(53) 29-41(49) 49-55(49)
+[17]       23-24(52) 25-30(53) 31-40(49) 50-55(49)
+[18]       25(49) 26-33(53) 34-39(49) 51-55(49)
+[19]       25-27(49) 28-35(53) 36-39(49) 51-55(49)
+[20]       25-30(49) 31-37(53) 38-39(49) 51-55(49)
+[21]       25-32(49) 33-39(53) 40(52) 51-55(49)
+[22]       15(49) 27-34(49) 35-39(53) 40-42(52) 51-55(49)
+[23]       28-37(49) 38-40(53) 41-45(52) 50-55(49)
+[24]       29-39(49) 40-41(53) 42-47(52) 49-55(49)
+[25]       2-8(49) 30-42(49) 43-49(53) 50-55(49)
+[26]       2-8(49) 30-44(49) 45-52(53) 53-55(49)
+[27]       2-8(49) 20(52) 31-46(49) 47-54(53) 55(49)
+[28]       2-8(49) 20(52) 31-49(49) 50-55(53) 56-57(52)
+[29]       2-8(49) 20(52) 31-51(49) 52-55(53) 56-59(52)
+[30]       2-8(49) 20(52) 31-54(49) 55(53) 56-61(52)
+[31]       2-8(49) 31-55(49) 57-64(52)
+[32]       2-8(49) 31-55(49) 59-66(52)
+[33]       2-8(49) 31-55(49) 62-69(52)
+[34]       2-8(49) 30-55(49) 64-71(52)
+[35]       2-8(49) 30-55(49) 67-70(52)
+[36]       2-8(49) 69(52)
+[37:38]    2-8(49) 72-75(50)
+[39:40]    2-8(49) 71-75(50)

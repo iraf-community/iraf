@@ -1,0 +1,30 @@
+# IMLINTRAN Parameters
+
+# Required parameters.
+input,f,a,,,,Input data
+output,f,a,,,,Output data
+xrotation,r,a,,,,X rotation angle in degrees
+yrotation,r,a,,,,Y rotation angle in degrees
+xmag,r,a,1.0,0.0,,X output pixels per input pixel
+ymag,r,a,1.0,0.0,,Y output pixels per input pixel
+
+# Change transformation parameters.
+xin,r,h,INDEF,1.,,X origin of input image in pixels
+yin,r,h,INDEF,1.,,Y origin of input image in pixels
+xout,r,h,INDEF,1.,,X origin of output image in pixels
+yout,r,h,INDEF,1.,,Y origin of output image in pixels
+ncols,r,h,INDEF,,,Number of columns in the output image
+nlines,r,h,INDEF,,,Number of lines in the output image
+
+# Coordinate surface and image interpolation parameters.
+interpolant,s,h,'linear',,,'Interpolant (nearest,linear,poly3,poly5,spline3,sinc,lsinc,drizzle)'
+boundary,s,h,'nearest',|nearest|constant|reflect|wrap|,,'Boundary extension (nearest,constant,reflect,wrap)'
+constant,r,h,0.,,,Constant for constant boundary extension 
+fluxconserve,b,h,yes,,,Preserve image flux ?
+
+# Transformation blocking factors.
+nxblock,i,h,512,,,X dimension of working block size in pixels
+nyblock,i,h,512,,,Y dimension of working block size in pixels
+verbose,b,h,yes,,,Print messages about the progress of the task ?
+
+mode,s,h,'ql'

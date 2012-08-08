@@ -1,0 +1,44 @@
+.help earth Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slERTH (IY, ID, FD, PV)
+
+     - - - - - -
+      E R T H
+     - - - - - -
+
+  Approximate heliocentric position and velocity of the Earth
+
+  Given:
+     IY       I       year
+     ID       I       day in year (1 = Jan 1st)
+     FD       R       fraction of day
+
+  Returned:
+     PV       R(6)    Earth position & velocity vector
+
+  Notes:
+
+  1  The date and time is TDB (loosely ET) in a Julian calendar
+     which has been aligned to the ordinary Gregorian
+     calendar for the interval 1900 March 1 to 2100 February 28.
+     The year and day can be obtained by calling slCAYD or
+     slCLYD.
+
+  2  The Earth heliocentric 6-vector is mean equator and equinox
+     of date.  Position part, PV(1-3), is in AU;  velocity part,
+     PV(4-6), is in AU/sec.
+
+  3  Max/RMS errors 1950-2050:
+       13/5 E-5 AU = 19200/7600 km in position
+       47/26 E-10 AU/s = 0.0070/0.0039 km/s in speed
+
+  4  More precise results are obtainable with the routine slEVP.
+
+  P.T.Wallace   Starlink   23 November 1994
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

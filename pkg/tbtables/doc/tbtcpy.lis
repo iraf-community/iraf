@@ -1,0 +1,30 @@
+Here is the algorithm for determining the type of output table that
+will be created when calling tbtcpy:
+
+	if output == STDOUT then
+
+	    type = text
+
+	else if extension of output file is .fits (or .fit or .??f) then
+
+	    type = fits
+
+	else if extension of output file is .qp
+
+	    type = row			# but in a qpoe file
+
+	else if input is text file or STDIN then
+
+	    # text --> text, except for extensions .tab, .fits, .qp
+
+	    if extension of output file is .tab
+		type = row
+	    else			# .fits & .qp taken care of above
+		type = text
+	    end if
+
+	else
+
+	    type = row
+
+	end if

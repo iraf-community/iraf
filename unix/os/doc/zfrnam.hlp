@@ -1,0 +1,40 @@
+.help zfrnam May84 "System Interface"
+.ih
+NAME
+zfrnam -- rename a file
+.ih
+SYNOPSIS
+.nf
+zfrnam (old_osfn, new_osfn, status)
+
+packed	char old_osfn[]		# OS name of existing file
+packed	char new_osfn[]		# new OS name of file
+int	status
+.fi
+.ih
+DESCRIPTION
+The name of file \fIold_osfn\fR is changed to \fInew_osfn\fR.
+All file attributes are preserved by the rename operation.
+.ih
+RETURN VALUE
+ERR is returned if the old file does not exist or if the rename operation
+cannot be performed.  OK is returned if the operation is successful.
+If the operation is unsuccessful the original file is not affected in any
+way.
+.ih
+NOTES
+Ideally the rename operation should be successful even if the new filename
+does not reference the same directory as the old filename, allowing a file
+to be moved from one directory to another without physically copying the
+file.  If this is not possible ERR should be returned and the high level
+code (e.g., \fBsystem.movefiles\fR) must physically copy the file.
+
+FIO ensures that a file will not already exist named \fInew_osfn\fR when
+\fBzfrnam\fR is called.  If such a file exists and file clobber is enabled,
+FIO will delete the file before calling \fBzfrnam\fR.  If file clobber
+is disabled and a file already exists with the new name, FIO will take an
+error action.  File protection does not prevent renaming a file.
+.ih
+SEE ALSO
+zfprot, zfdele
+.endhelp

@@ -1,0 +1,98 @@
+			    The IMFORT Interface
+			 Doug Tody, September 1986
+
+
+1. INTRODUCTION
+
+    The IMFORT interface is a host level Fortran programming environment for
+IRAF.  Fortran programs (or C programs) may be written at the host level
+with full access to the facilities of the host environment, plus limited
+access to the IRAF environment via the IMFORT interface.  Such host level
+programs may be interfaced to the IRAF CL as foreign tasks and called with
+arguments on the command line, like ordinary IRAF tasks.
+
+The chief advantage of the IMFORT interface is that it allows existing host
+Fortran programs to be interfaced to IRAF with minimum effort.  The IMFORT
+interface also provides a way for the scientist-user to extend the IRAF
+environment with their own programs, without need to learn to use the much
+more complex IRAF VOS programming environment.  Of course, the VOS is a much
+more powerful environment and VOS programs tend to be much more portable than
+host Fortran programs, so the VOS environment should be used for large
+programming projects.
+
+The IMFORT interface is described in detail in the document "A User's Guide
+to Fortran Programming in the IRAF Environment".  A summary of the interface
+procedures follows.  The IMFORT routines make use of the IRAF kernel for all
+i/o, and of the FMTIO and VOPS packages for miscellaneous functions, hence
+programs using IMFORT must be linked with LIBSYS, LIBVOPS, and LIBOS.
+
+
+2. INTERFACE PROCEDURES
+
+2.1 COMMAND LINE ACCESS
+
+		clnarg (nargs)
+		clrawc (outstr, ier)
+           clarg[cird] (argno, [cird]val, ier)
+
+
+2.2 IMAGE ACCESS
+
+2.2.1 General
+
+		imopen (f77nam, acmode, im, ier)
+		imopnc (nimage, o_im, n_im, ier)
+		imcrea (f77nam, axlen, naxis, pixtype, ier)
+		imclos (im, ier)
+
+		imflsh (im, ier)
+		imgsiz (im, axlen, naxis, pixtype, ier)
+		imhcpy (o_im, n_im, ier)
+		impixf (im, pixfd, pixfil, pixoff, szline, ier)
+
+		imemsg (ier, errmsg)
+
+
+2.2.2 Image Header Keyword Access
+
+		imacck (im, keyw)
+		imaddk (im, keyw, dtype, comm, ier)
+		imdelk (im, keyw, ier)
+		imtypk (im, keyw, dtype, comm, ier)
+
+	  imakw[bcdir] (im, keyw, [bcdir]val, comm, ier)
+	  imgkw[bcdir] (im, keyw, [bcdir]val, ier)
+	  impkw[bcdir] (im, keyw, [bcdir]val, ier)
+
+		imokwl (im, patstr, sortit, kwl, ier)
+		imgnkw (kwl, outstr, ier)
+		imckwl (kwl, ier)
+
+
+2.2.3 Image Pixel Access
+
+	     imgl1[rs] (im, buf, ier)
+	     imgl2[rs] (im, buf, lineno, ier)
+	     imgl3[rs] (im, buf, lineno, bandno, ier)
+	     imgs1[rs] (im, buf, i1, i2, ier)
+	     imgs2[rs] (im, buf, i1, i2, j1, j2, ier)
+	     imgs3[rs] (im, buf, i1, i2, j1, j2, k1, k2, ier)
+
+	     impl1[rs] (im, buf, ier)
+	     impl2[rs] (im, buf, lineno, ier)
+	     impl3[rs] (im, buf, lineno, bandno, ier)
+	     imps1[rs] (im, buf, i1, i2, ier)
+	     imps2[rs] (im, buf, i1, i2, j1, j2, ier)
+	     imps2[rs] (im, buf, i1, i2, j1, j2, k1, k2, ier)
+
+
+2.3. BINARY FILE I/O (low level)
+
+		bfaloc (fname, nchars, status)
+	   fd = bfopen (fname, acmode, advice)
+		bfclos (fd, status)
+       nchars = bfbsiz (fd)
+	 chan = bfchan (fd)
+       nchars = bfread (fd, buf, nchars, offset)
+       nchars = bfwrit (fd, buf, nchars, offset)
+	 stat = bfflsh (fd)

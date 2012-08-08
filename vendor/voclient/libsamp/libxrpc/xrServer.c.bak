@@ -1,0 +1,650 @@
+/**
+ *  XRSERVER.C
+ *
+ *  Procedures used to implement an XML-RPC server in an application.  To 
+ *  do this, we keep a local registry of method names and functions and 
+ *  rely on a default method to invoke the procedure using a common function 
+ *  prototype.
+ * 
+ *  Server methods:
+ * 
+ *                   xr_createServer  (path, port, logfile)
+ *                xr_addServerMethod  (name, *method, *userData)
+ *             xr_removeServerMethod  (name)
+ *                 xr_setServerParam  (param, *value)
+ * 
+ *              xr_startServerThread  ()		    // never returns
+ *                 xr_shutdownServer  ()
+ *
+ *
+ *  @brief      Procedures used to implement an XML-RPC server.
+ *
+ *  @file       xrServer.c
+ *  @author     Mike Fitzpatrick
+ *  @date       6/10/09
+ */
+
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <signal.h>
+#include <string.h>
+
+#include <xmlrpc-c/base.h>
+#include <xmlrpc-c/client.h>
+#include <xmlrpc-c/server.h>
+#include <xmlrpc-c/server_abyss.h>
+
+#include "xrpcP.h"
+
+#define	 DEBUG			0
+
+#define SZ_CALL_RING		256
+
+int  	res_anum = -1;			/* result array num		*/
+int	res_snum = -1;			/* result struct num		*/
+    
+	    
+static Caller cs[SZ_CALL_RING];
+static int cindex = 0;
+
+static pthread_mutex_t svr_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+#ifdef DEBUG_PROCS
+static void  xr_dbgPrintParams (xmlrpc_server_abyss_parms s);
+static xmlrpc_server_shutdown_fn xr_requestShutdown;
+static void  xr_requestShutdown(xmlrpc_env *envP, void *context, char *comment);
+#endif
+
+static void *xr_rpcListener (Server *svr);
+
+
+static xmlrpc_value *xr_defaultMethod (xmlrpc_env *envP, char *host, 
+			    char *methodName,
+               		    xmlrpc_value *paramArrayP, 
+			    void *serverInfo);
+
+static ServerP  svr = (Server *) NULL;
+
+
+
+/*************************************************************************
+** CREATESERVER - Create an instance of the RPC server.
+*************************************************************************/
+
+int
+xr_createServer (char *path, int port, char *logfile)
+{
+	
+    if (svr) {
+	perror ("createServer:  Server already allocated");
+	return (ERR);
+    }
+    if (! (svr = (ServerP) calloc ((size_t) 1, sizeof (Server)))) {
+	perror ("createServer:  Cannot allocate server");
+	return (ERR);
+    }
+
+
+    /* Initialize the structure.
+    */
+    strcpy (svr->path, (path ? path : ""));
+    strcpy (svr->logfile, (logfile ? logfile : ""));
+    svr->port = port;
+
+
+    /* Initialize XML-RPC interface.
+    */
+    xmlrpc_env_init (&svr->env);             
+    bzero (svr->url, SZ_PATH);
+    sprintf (svr->url, "http://localhost:%d/RPC2", port);
+
+
+    /* Create the service registry and initialize server params.
+    */
+    svr->registry = xmlrpc_registry_new (&svr->env);
+
+
+    /* Set the default shutdown method.
+    xmlrpc_registry_set_shutdown (svr->registry, &xr_requestShutdown,
+	&shutdown);
+    */
+
+
+    /* In the "modern" form of the Abyss API, we supply parameters in memory
+    ** like a normal API.  We select the modern form by setting
+    ** config_file_name to NULL: 
+    */
+    svr->serverparm.config_file_name 	= NULL;
+    svr->serverparm.registryP        	= svr->registry;
+    svr->serverparm.port_number      	= svr->port;
+    if (svr->logfile[0])
+        svr->serverparm.log_file_name	= svr->logfile;
+
+    svr->trace = 0;
+
+
+    return (OK);
+}
+
+
+
+/*************************************************************************
+** ADDSERVERMETHOD - Add a callback method to the RPC server.
+*************************************************************************/
+
+int
+xr_addServerMethod (char *name, void *method, void *userData)
+{
+    char *arg_signature, *ret_signature;
+
+
+    if (DEBUG)
+	fprintf (stderr, "addMethod: '%s'\n", name);
+
+    /* Create a method in the server.  We also use this to let the 
+    ** user set the default and shutdown methods.
+    */
+    if (strcmp (name, "default") == 0) {
+
+	/* Set the default method.
+	*/
+	xmlrpc_registry_set_default_method (&svr->env, svr->registry, 
+	    (xmlrpc_default_method) &method, NULL);
+
+    } else if (strcmp (name, "shutdown") == 0) {
+	int shutdown;
+
+        xmlrpc_registry_set_shutdown (svr->registry, method, &shutdown);
+
+    } else {
+
+	/*  All we really do at this stage is register the method with
+	**  the interface registry.  When a method is called, the default
+	**  method is responsible for parsing the arguments and invoking
+	**  the client code using the standard prototype.
+	*/ 
+	MethodP	m = calloc (1, sizeof (Method));
+
+	if (svr->method_head == (MethodP) NULL) {
+	    /* Initialize the list of methods;
+	    */
+	    svr->method_head = svr->method_tail = m;
+
+	} else {
+	    /* Add the mthod to the tail of the list.
+	    */
+	    svr->method_tail->next = svr->method_tail = m;
+	}
+
+	/* Save information about the method.  We force the argument 
+	** signature to always be an array to simply the process of getting
+	** the parameters in the method.  On return, we use the signature
+	** provided by the user and rely on the implementation to extract
+	** the results appropriately.
+	**
+	*/
+	arg_signature = ret_signature = "not_currently_used";
+	strcpy (m->name, name);
+	strcpy (m->ret_signature, ret_signature);
+        if (arg_signature[0] != '(') {
+            sprintf (m->arg_signature, "(%s)", arg_signature);
+        } else 
+            strcpy (m->arg_signature, arg_signature);
+
+
+	m->methodFunc = method;
+	m->serverInfo = userData;
+
+	svr->num_methods++;
+    }
+
+    return (OK);
+}
+
+
+/*************************************************************************
+** REMOVESERVERMETHOD - Delete a callback method to the RPC server.
+*************************************************************************/
+
+int
+xr_removeServerMethod (char *name)
+{
+    MethodP last = (MethodP) NULL;
+    MethodP m = svr->method_head;
+
+    while (m) {
+	if (strcmp (m->name, name) == 0) {
+	    if (last) 				/* drop method from the list  */
+		last->next = m->next;
+	    else
+		svr->method_head = m->next;
+
+	    free ((void *) m);			/* free the struct	*/
+	    if (svr->num_methods > 0)
+	        svr->num_methods--;
+
+	    return (OK);
+	}
+	last = m;
+	m = m->next;
+    }
+
+    return (ERR);
+}
+
+
+/*************************************************************************
+** SETSERVERPARAM - Set a parameter for the RPC server.
+*************************************************************************/
+
+void
+xr_setServerParam (char *param, void *value)
+{
+    if (strcmp (param, "port") == 0)
+	svr->serverparm.port_number = (xmlrpc_int) value;
+
+    else if (strcmp (param, "logfile") == 0)
+	svr->serverparm.log_file_name = (char *) value;
+
+    else if (strcmp (param, "keepalive_timeout") == 0)
+	svr->serverparm.keepalive_timeout = (unsigned int) value;
+
+    else if (strcmp (param, "keepalive_max_conn") == 0)
+	svr->serverparm.keepalive_max_conn = (unsigned int) value;
+
+    else if (strcmp (param, "timeout") == 0)
+	svr->serverparm.timeout = (unsigned int) value;
+
+    /*
+    else if (strcmp (param, "shutdown") == 0)
+	svr->serverparm.enable_shutdown = (xmlrpc_bool) value;
+    */
+
+    else if (strcmp (param, "trace") == 0)
+	svr->trace = (unsigned int) value;
+}
+
+
+/*************************************************************************
+** STARTSERVERTHREAD -- Start the server.  Never returns.
+*************************************************************************/
+
+int
+xr_startServerThread ()
+{
+    /* Create a detatched thread in which to run.
+    */
+    pthread_attr_init (&svr->attr);
+    pthread_attr_setdetachstate (&svr->attr, PTHREAD_CREATE_DETACHED);
+
+
+    if (svr->trace)
+        fprintf (stderr, "Starting server thread on port %d....\n", svr->port);
+
+    /* Start the listener thread, i.e. the XML-RPC "server".
+    */
+    if (pthread_create (&svr->thread, NULL, (void *)xr_rpcListener,
+	(void *) svr)) {
+            perror ("Cannot start listener thread");
+            exit (-1);
+    }
+
+    return (OK);
+}
+
+void
+xr_startServer ()
+{
+    xr_rpcListener (svr);
+}
+
+
+/* ***********************************************************************
+** SHUTDOWNSERVER -- Stop the RPC server.
+*************************************************************************/
+
+int
+xr_shutdownServer ()
+{
+    /* Not yet implemented.  */
+    if (! svr) {
+	perror ("destroyServer:  Server already allocated");
+	return (ERR);
+    }
+
+    free ((void *) svr);		/* free the server struct	*/
+    svr = (ServerP) NULL;
+
+    return (OK);
+}
+
+
+
+
+/************************************************************************ */
+/*  PRIVATE METHODS							  */
+/************************************************************************ */
+
+
+/* The method to be called in the server.
+*/
+
+static xmlrpc_value *
+xr_defaultMethod (xmlrpc_env *envP, char *host, char *methodName,
+               xmlrpc_value *paramArrayP, void *serverInfo)
+{
+    int      status;
+    ServerP  svr = (Server *) serverInfo; 
+    MethodP  m   = (Method *) NULL;
+
+    extern int  xr_errstat;
+
+
+
+fprintf (stderr, "DEFAULT:  method='%s' index= %d\n", methodName, cindex++);
+return xmlrpc_build_value(envP, "i", OK);
+
+    if (DEBUG)
+        fprintf (stderr, "DEFAULT:  method='%s' data= 0x%x\n",
+	    methodName, (int) serverInfo);
+
+
+    /* Now look for the method in the interface registry.
+    */
+    for (m=svr->method_head; m; m = m->next) {
+
+	if (strcmp (m->name, methodName) == 0) {
+
+	    Caller *c = (Caller *) NULL;
+	    xmlrpc_value *result = (xmlrpc_value *) NULL;
+
+
+	    (void) pthread_mutex_lock (&svr_mutex);
+	    c = &cs[(cindex = (cindex + 1) % SZ_CALL_RING)];
+	    (void) pthread_mutex_unlock (&svr_mutex);
+
+	    /*  Free old result values.
+	    if (res_anum >= 0) {
+		xr_freeArray (res_anum);
+		res_anum = -1;
+	    }
+	    if (res_snum >= 0) {
+		xr_freeStruct (res_snum);
+		res_snum = -1;
+	    }
+	     */
+
+fprintf (stderr, "DEFAULT: c=0x%x method='%s' data=0x%x cindex=%d\n",
+    (int)c,methodName,(int)serverInfo, cindex);
+
+	    memset (c, 0, sizeof(Caller));
+	    c->env   = envP; 		/* setup the calling parameters */
+	    c->host  = host;
+	    c->name  = methodName;
+	    c->param = paramArrayP;
+	    c->info  = serverInfo;
+
+	    /* Call the function.
+	    */
+	    if ( (status = (*(PFI)(*m->methodFunc))((void *)c)) ) {
+		fprintf (stderr, "Matched failed '%s'...\n", m->name);
+		xr_errstat = ERR;
+	    } else {
+	        xr_errstat = OK;
+
+		xmlrpc_DECREF(paramArrayP);
+	        result = c->result;
+	    }
+fprintf (stderr, "DONE:    c=0x%x method='%s'\n",(int) c, methodName);
+    	    return ( result ); 			/* return our result	*/
+	}
+    }
+
+
+    if (!m) {
+	char  msg[256];
+
+	memset (msg, 0, 256);
+	sprintf (msg, "No such method '%s'", methodName);
+	xmlrpc_value *result = xmlrpc_string_new (envP, msg);
+
+        return ( result );
+
+    } else
+        return ((xmlrpc_value *) NULL);		/* should never happen	*/
+}
+
+
+#ifdef GLOBAL_SERVER
+
+/**
+ * Thread process created to run a  listener for the methods being
+ * called.
+ */
+static void *
+xr_rpcListener (Server *svr)
+{
+    xmlrpc_server_abyss_parms serverparm;
+    
+
+fprintf (stderr, "Starting old rpcListener ....svr = 0x%x \n", (int) svr);
+    /*  Initialize the environment and install the default dispatcher method.
+    */
+    xmlrpc_env_init (&svr->env);	/* initialize XML-RPC interface */
+
+    svr->registry = xmlrpc_registry_new (&svr->env);
+    xmlrpc_registry_set_default_method (&svr->env, 
+	(svr->serverparm.registryP = svr->registry), 
+        (xmlrpc_default_method) &xr_defaultMethod, svr);
+
+    serverparm.config_file_name   = NULL;
+    serverparm.registryP          = svr->serverparm.registryP;
+    serverparm.port_number        = svr->serverparm.port_number;
+    serverparm.log_file_name      = svr->serverparm.log_file_name;
+    serverparm.keepalive_timeout  = 0;
+    serverparm.keepalive_max_conn = 0;
+    /*
+    serverparm.keepalive_timeout  = 30;
+    serverparm.keepalive_max_conn = 128;
+    */
+
+
+    /*  Never returns .....
+    */
+    xmlrpc_server_abyss (&svr->env, &serverparm, XMLRPC_APSIZE(log_file_name));
+
+
+    /*  Should never get here.
+     */
+    if (svr->env.fault_occurred) {
+        fprintf (stderr, "xmlrpc_server_abyss terminates.....\n");
+        exit (1);
+    } else
+	return ((void *) OK);
+}
+
+#else
+
+
+/*****************************************************************************
+ *  For XMLRPC-C v1.14 or newer 
+ ****************************************************************************/
+
+#define NEW_ABYSS	1
+
+#ifdef NEW_ABYSS
+
+static xmlrpc_server_abyss_t *serverToTerminateP;
+
+static void xr_dieIfFailed (char *description, xmlrpc_env env);
+static void xr_svrSigtermHandler (int signalClass);
+static void xr_setupSigtermHandler (xmlrpc_server_abyss_t *serverP);
+static void xr_restoreSigtermHandler (void);
+
+
+/**
+ *
+ */
+static void
+xr_dieIfFailed (char *description, xmlrpc_env env) 
+{
+    if (env.fault_occurred) {
+        fprintf (stderr, "%s failed. %s\n", description, env.fault_string);
+        exit (1);
+    }
+}
+
+
+/**
+ *
+ */
+static void
+xr_svrSigtermHandler (int signalClass) 
+{
+    xmlrpc_env env;
+
+    xmlrpc_env_init (&env);
+    xmlrpc_server_abyss_terminate (&env, serverToTerminateP);
+    xr_dieIfFailed ("xmlrpc_server_abyss_terminate", env);
+
+    xmlrpc_env_clean (&env);
+}
+
+static void
+xr_setupSigtermHandler (xmlrpc_server_abyss_t *serverP)
+{
+    struct sigaction mysigaction;
+
+    serverToTerminateP = serverP;
+
+    sigemptyset (&mysigaction.sa_mask);
+    mysigaction.sa_flags = 0;
+    mysigaction.sa_handler = xr_svrSigtermHandler;
+    sigaction (SIGTERM, &mysigaction, NULL);
+}
+
+
+static void
+xr_restoreSigtermHandler (void)
+{
+    struct sigaction mysigaction;
+
+    sigemptyset (&mysigaction.sa_mask);
+    mysigaction.sa_flags = 0;
+    mysigaction.sa_handler = SIG_DFL;
+    sigaction (SIGTERM, &mysigaction, NULL);
+}
+
+
+/**
+ * Thread process created to run a  listener for the methods being
+ * called.
+ */
+static void *
+xr_rpcListener (Server *svr)
+{
+    xmlrpc_server_abyss_parms serverparm;
+    xmlrpc_server_abyss_t    *serverP;
+    xmlrpc_server_abyss_sig  *oldHandlersP;
+
+
+fprintf (stderr, "Starting new rpcListener ....svr = 0x%x \n", (int) svr);
+    xmlrpc_env_init (&svr->env);
+
+    xmlrpc_server_abyss_global_init (&svr->env);
+    xr_dieIfFailed ("xmlrpc_server_abyss_global_init", svr->env);
+    
+    svr->registry = xmlrpc_registry_new (&svr->env);
+    xr_dieIfFailed ("xmlrpc_registry_new", svr->env);
+
+    xmlrpc_registry_set_default_method (&svr->env, 
+        (svr->serverparm.registryP = svr->registry), 
+        (xmlrpc_default_method) &xr_defaultMethod, svr);
+
+    serverparm.config_file_name   = NULL;
+    serverparm.registryP          = svr->serverparm.registryP;
+    serverparm.port_number        = svr->serverparm.port_number;
+    serverparm.log_file_name      = svr->serverparm.log_file_name;
+/*
+    serverparm.keepalive_timeout  = 15;
+    serverparm.keepalive_max_conn = 4;
+*/
+    serverparm.keepalive_timeout  = 0;
+    serverparm.keepalive_max_conn = 0;
+
+
+    xmlrpc_server_abyss_create (&svr->env, 
+				&serverparm, 
+				XMLRPC_APSIZE(keepalive_max_conn),
+                                &serverP);
+    xr_dieIfFailed ("xmlrpc_server_abyss_create", svr->env);
+    
+    xmlrpc_server_abyss_setup_sig (&svr->env, serverP, &oldHandlersP);
+    xr_dieIfFailed ("xmlrpc_server_abyss_setup_sig", svr->env);
+
+    xr_setupSigtermHandler (serverP);
+
+    /*  Launch the server.
+     */  
+    xmlrpc_server_abyss_run_server (&svr->env, serverP);
+    xr_dieIfFailed ("xmlrpc_server_abyss_run_server", svr->env);
+
+
+    /*  We should never get here ....
+     */  
+    fprintf (stderr, "Server has terminated\n");
+
+    xr_restoreSigtermHandler ();
+    xmlrpc_server_abyss_restore_sig (oldHandlersP);
+    xmlrpc_server_abyss_destroy (serverP);
+    xmlrpc_registry_free (svr->registry);
+    xmlrpc_server_abyss_global_term ();
+    xmlrpc_env_clean (&svr->env);
+
+    return ((void *) ERR);;
+}
+
+#endif		/* NEW_ABYSS */
+
+#endif		/* GLOBAL_SERVER */
+
+
+
+
+
+#ifdef DEBUG_PROCS
+
+static void
+xr_requestShutdown(xmlrpc_env * const envP,
+                void *       const context,
+                const char * const comment) 
+{
+    /* You make this run by executing the system method
+    ** 'system.shutdown'.  This function is registered in the method
+    ** registry as the thing to call for that.
+    */
+    int * const terminationRequestedP = context;
+
+    xmlrpc_env_init (envP);
+
+    fprintf (stderr, "Termination requested: %s\n", comment);
+    
+    *terminationRequestedP = 1;
+}
+
+
+static void
+xr_dbgPrintParams ( xmlrpc_server_abyss_parms s )
+{
+    fprintf (stderr, "Server Params:\n");
+    fprintf (stderr, "\tport = %d\n", s.port_number);
+    fprintf (stderr, "\tlogfile = %s\n", s.log_file_name);
+    fprintf (stderr, "\tkeepalive_timeout = %d\n", s.keepalive_timeout);
+    fprintf (stderr, "\tkeepalive_max_conn = %d\n", s.keepalive_max_conn);
+    fprintf (stderr, "\ttimeout = %d\n", s.timeout);
+}
+
+#endif

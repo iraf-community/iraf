@@ -1,0 +1,5 @@
+files,s,a,,,,list of files to be converted into a stream of tokens
+ignore_comments,b,h,yes,,,ignore comments in the input stream?
+begin_comment,s,h,"#",,,string marking start of a comment
+end_comment,s,h,"eol",,,"string marking end of a comment ('eol' if end of line)"
+newlines,b,h,yes,,,is newline a legal token?

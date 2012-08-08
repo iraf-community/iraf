@@ -1,0 +1,171 @@
+.help crtpict Aug87 plot
+.ih
+NAME
+crtpict -- make a hardcopy of an IRAF image
+.ih
+USAGE
+crtpict input 
+.ih
+PARAMETERS
+.ls input
+Input images to be processed.
+.le
+.ls device = "dicomed"
+The output device.
+.le
+.ls auto_fill = yes
+If set to yes, the image will be scaled to fit the device viewport.
+The aspect ratio is always preserved when \fIauto_fill\fR = yes.
+.le
+.ls xmag = 1.0, ymag = 1.0
+When \fIauto_fill\fR = no, the x and y magnification ratios are specified
+by these parameters.
+.le
+.ls replicate = yes
+The image pixels are block replicated to fit the device viewport when
+\fIreplicate\fR = yes.  Otherwise, the pixels are linearly interpolated
+to match the device pixels.
+.le
+.ls x_block_avg = 1, y_block_avg = 1
+These parameters are used when \fIreplicate\fR = no to decrease the
+effective output device resolution, and speed up the interpolation.  The
+pixels are interpolated to the block averaged output device, then
+block replicated to fill the device viewport.
+.le
+.ls ztrans = "auto"
+This parameter specifies how the image intensities are mapped into the 
+greyscale values of the output device.  Intensity z1 maps to black, z2 to white.
+The 4 choices for \fIztrans\fR are:
+.nf
+
+	"auto"		- z1 and z2 centered on median of image
+	"min_max"	- set z1 and z2 to specified intensities
+	"none" 		- truncate intensities to fit output range
+	"user"		- user supplies look up table of values
+.fi
+.le
+.ls lutfile = ""
+Name of text file containing the look up table when \fIztrans\fR = user. 
+The table should contain two columns per line; column 1 contains the 
+intensity, column 2 the desired greyscale output.  
+.le
+.ls contrast = 0.25
+Used when automatically determining z1 and z2.  The slope of the transfer
+function is divided by \fIcontrast\fR, so negative values of \fIcontrast\fR
+result in a negative transfer function.
+.le
+.ls nsample_lines = 25
+Used when automatically determining z1 and z2, this parameter sets the number 
+of image lines to be sampled when determining the median.
+.le
+.ls z1 = 0.0, z2 = 0.0
+These parameters are used when \fIztrans\fR = "min_max", to specify which
+pixel values map to black and white.  
+.le
+.ls perimeter = yes
+Draw annotated axes around the plot perimeter?
+.le
+.ls image_fraction = 0.70
+The fraction of the vertical device viewport reserved for the image.
+.le
+.ls graphics_fraction = 0.20
+The fraction of the vertical device viewport reserved for histogram
+plots and id information. 
+.le
+.ls greyscale_fraction = 0.05
+The fraction of the vertical device viewport reserved for the greyscale
+step wedge.  
+.le
+.ls output = ""
+Output metacode is appended to this file.
+By naming an output file, the metacode can be "trapped", and the normal
+spooling process intercepted.
+.le
+.ih
+DESCRIPTION
+Procedure \fBcrtpict\fR makes a photographic hardcopy plot of IRAF images.
+
+The image can be automatically scaled to fill the output plotting window, with 
+the aspect ratio preserved, by setting \fBauto_fill\fR = yes.  When 
+\fBauto_fill\fR = no, magnification factors for the axes are entered as 
+\fBxmag\fR and \fBymag\fR, where negative values (as well as fractional 
+values < 1.0), indicate that the image is to be reduced.  By default, the
+imaged is enlarged by block replication.  By setting \fBreplicate\fR = no,
+the image will be linearly interpolated to fit the device area.  (In this
+case, to speed things up, the \fBblock_avg\fR parameters can be set to
+reduce the effective output resolution.)  In either case, if an image needs
+to be reduced in size, it will be decimated.   
+
+Four methods of determining the greyscale transformation are available.
+When \fIztrans\fR = "none", no transformation between intensity and 
+greyscale level occurs, the intensities are simply copied, which will most
+likely result in truncation.  With this method, the lowest bits of each pixel, 
+the lowest level variations, are always shown, regardless of the dynamic 
+range of the image.
+
+When \fIztrans\fR = "auto",
+the greyscale levels are automatically centered on the median of the image 
+pixels.  The window of intensities spanned by the greyscale is controlled 
+by parameter \fIcontrast\fR, which is divided into the calculated slope of 
+the transfer function. The larger the absolute value of \fIcontrast\fR, the 
+higher the contrast in the output image.  A subset of the image pixels are 
+used to determine the median; the number of lines sampled is 
+\fInsample_lines\fR.
+
+When \fBztrans\fR = "min_max", intensity \fBz1\fR maps to the minimum
+greyscale level (black), \fBz2\fR maps to the maximum greyscale level
+(white) and the transfer function is linear in between these two endpoints.
+If \fIz1\fR = \fIz2\fR, the image min and max map to black and white, modified
+by \fBcontrast\fR.  (NOTE:  When running \fIcrtpict\fR on an image created with 
+\fIsnap\fR, \fBztrans\fR should be set to "min_max", with \fBz1\fR = 0 and
+\fBz2\fR = 1023, the maximum output value possible from the IIS.)
+
+When \fBztrans\fR = "user", a look up table of intensity values and their
+corresponding greyscale levels is read from the file specified by the
+\fBlutfile\fR parameter.  From this information, 
+\fIcrtpict\fR constructs a piecewise linear look up table containing
+4096 discrete values.  
+The text format table contains two columns per line; 
+column 1 contains the intensity, column 2 the desired greyscale output.  
+The greyscale values specified by the user must match those available on
+the output device.  Task \fBshowcap\fR can be used to determine the range
+of acceptable greyscale levels.
+.ih
+EXAMPLES
+1.  To subsample every 4th pixel of a large image, fill the output area and use
+previously determined values of z1 and z2 for the greyscale transformation
+the command would be:
+
+    cl> crtpict sunpic[*:4,*:4] ztrans=min z1=0 z2=800
+
+2.  To process every image with the root name ccdpic, using default values of
+all parameters, the command would be:
+
+    cl> crtpict ccdpic*
+
+3.  To process images created with \fBsnap\fR, ztrans and z2 must be changed
+from their default values:
+
+    cl> crtpict iis.snap ztrans=min z2=1023
+
+4.  Image `mypic' is processed using the look up table in file `mylut',
+
+    cl> crtpict mypic ztrans=user lutfile=mylut
+
+Where file `mylut' contains this information:
+.nf
+		10	40
+		1500	100
+		2500	100
+		3500	200
+		7500	255
+.fi
+.ih
+TIMING
+For a 512 x 512 real image, \fBcrtpict\fR takes about 40 cpu seconds with
+\fBauto_fill\fR and \fBreplicate\fR = yes.  When \fBauto_fill\fR = yes
+but \fBreplicate\fR = no, \fBcrtpict\fR requires almost 400 cpu seconds.
+.ih
+SEE ALSO
+display, showcap
+.endhelp

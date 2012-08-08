@@ -1,0 +1,85 @@
+spectrograph,s,h,"",,,Spectrograph transmission or table
+title,s,h,"",,,Spectrograph title
+apmagdisp,r,h,INDEF,,,Aperture magnification along dispersion
+apmagxdisp,r,h,INDEF,,,Aperture magnification across dispersion
+inoutangle,r,h,INDEF,,,Incident to diffracted angle (deg)
+xinoutangle,r,h,INDEF,,,"Incident to diffracted cross disperser angle (deg)
+
+# Telescope"
+telescope,s,h,"",,,Telescope transmission or table
+teltitle,s,h,"",,,Telescope title
+area,r,h,INDEF,,,Telescope effective area (m^2)
+scale,r,h,INDEF,,,Telescope scale at entrance aperture (arcsec/mm)
+emissivity,s,h,"",,,Emissivity value or table
+emistitle,s,h,"",,,"Emissivity title
+
+# Correctors"
+corrector,s,h,"",,,Corrector transmission or table
+cortitle,s,h,"",,,Corrector title
+adc,s,h,"",,,ADC transmission or table
+adctitle,s,h,"",,,"ADC title
+
+# Disperser"
+disperser,s,h,"",,,Disperser efficiency or table
+disptitle,s,h,"",,,Disperser title
+disptype,s,h,"",,,Disperser type (grating|grism|generic)
+gmm,r,h,INDEF,,,Grating (grooves/mm)
+blaze,r,h,INDEF,,,Blaze or prism angle (deg)
+oref,r,h,INDEF,,,Reference order
+wavelength,r,h,INDEF,,,Central wavelength in ref order (A)
+dispersion,r,h,INDEF,,,Dispersion at central wavelength in ref order (A/mm)
+indexref,r,h,INDEF,,,Index of refraction at first order
+eff,r,h,INDEF,,,"Peak efficiency
+
+# Crossdisperser"
+xdisperser,s,h,"",,,Crossdisperser efficiency or table
+xdisptitle,s,h,"",,,Crossdisperser title
+xdisptype,s,h,"",,,Disperser type (grating|grism|generic)
+xgmm,r,h,INDEF,,,Grating (grooves/mm)
+xblaze,r,h,INDEF,,,Blaze or prism angle (deg)
+xoref,r,h,INDEF,,,Reference order
+xwavelength,r,h,INDEF,,,Central wavelength in ref order (A)
+xindexref,r,h,INDEF,,,Index of refraction at first order
+xdispersion,r,h,INDEF,,,Dispersion at central wavelength in ref order (A/mm)
+xeff,r,h,INDEF,,,"Peak efficiency
+
+# Aperture"
+aperture,s,h,"",,,Aperture transmission or table
+aptitle,s,h,"",,,Aperture title
+aptype,s,h,"",,,"Aperture type (rectanglular|circular)
+
+# Fiber"
+fiber,s,h,"",,,Fiber transmission or table
+fibtitle,s,h,"",,,"Fiber title
+
+# Filters"
+filter,s,h,"",,,Filter transmission or table
+ftitle,s,h,"",,,Filter title
+filter2,s,h,"",,,Filter transmission or table
+f2title,s,h,"",,,Filter title
+block,s,h,"",,,"Assume other orders are blocked (yes|no)
+
+# Collimator"
+collimator,s,h,"",,,Collimator transmission or table
+coltitle,s,h,"",,,Collimator title
+colfl,r,h,INDEF,,,"Collimator focal length (m)
+
+# Camera"
+camera,s,h,"",,,Camera transmission or table
+camtitle,s,h,"",,,Camera title
+camfl,r,h,INDEF,,,Camera focal length (m)
+resolution,r,h,INDEF,,,Camera resolution (mm)
+vignetting,s,h,"",,,"Vignetting table
+
+# Detector"
+detector,s,h,"",,,Detector DQE or table
+dettitle,s,h,"",,,Detector title
+ndisp,r,h,INDEF,,,Detector pixels along dispersion
+pixsize,r,h,INDEF,,,Detector pixel size (mm)
+gain,r,h,INDEF,,,Detector gain (photons/ADU)
+rdnoise,r,h,INDEF,,,Detector read noise (photons)
+dark,r,h,INDEF,,,Detector dark count rate (photons/s)
+saturation,r,h,INDEF,,,Detector saturation (photons)
+dnmax,r,h,INDEF,,,Detector maximum counts (ADU)
+xbin,i,h,1,1,,Detector binning (dispersion)
+ybin,i,h,1,1,,Detector binning (spatial)

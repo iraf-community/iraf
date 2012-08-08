@@ -1,0 +1,11 @@
+# Cl parameters are:
+input,f,a,,,,List of images to be transformed
+output,f,a,,,,List of output image names
+database,f,a,,,,Database containing fit parameters
+fog,s,h,"",,,Value of fog - read from database if unspecified
+sigma,r,h,3.0,,,Rejection criteria for determining mean fog
+floor,r,h,0.0,,,Value assigned to levels below fog
+ceiling,r,h,30000.,,,Scale highest density to this intensity value
+datatype,s,h,r,,,Pixel type of output image
+option,s,h,mean,"mean|median",,Choice of fog algorithm (mean or median)
+verbose,b,h,yes,,,Print log of processing to STDOUT

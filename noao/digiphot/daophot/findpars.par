@@ -1,0 +1,12 @@
+# FINDPARS
+
+threshold,r,h,4.0,,,Threshold in sigma for feature detection
+nsigma,r,h,1.5,,,Width of convolution kernel in sigma
+ratio,r,h,1.0,0.0,1.0,Ratio of minor to major axis of Gaussian kernel
+theta,r,h,0.0,0.0,180.0,Position angle of major axis of Gaussian kernel
+sharplo,r,h,.2,,,Lower bound on sharpness for feature detection 
+sharphi,r,h,1.0,,,Upper bound on sharpness for  feature detection
+roundlo,r,h,-1.0,,,Lower bound on roundness for feature detection
+roundhi,r,h,1.0,,,Upper bound on roundness for feature detection
+mkdetections,b,h,no,,,Mark detections on the image display?
+mode,s,h,'ql'

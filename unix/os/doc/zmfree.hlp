@@ -1,0 +1,36 @@
+.help zmfree May84 "System Interface"
+.ih
+NAME
+zmfree -- free memory
+.ih
+SYNOPSIS
+.nf
+zmfree (buffer, status)
+
+int	buffer			# buffer address
+int	status
+.fi
+.ih
+DESCRIPTION
+Free a buffer previously allocated with \fBzmaloc\fR or \fBzraloc\fR,
+i.e., return the space so that it may be reused by the same process or by
+another process.  The integer argument \fIbuffer\fR must be the buffer
+address returned by the primitive which originally allocated the buffer.
+.ih
+RETURN VALUE
+ERR is returned if there is something wrong with \fIbuffer\fR.  OK is returned
+if the operation is successful.
+.ih
+NOTES
+When a buffer is deallocated memory space may or may not be returned to the
+host operating system depending upon the address of the buffer and upon the
+characteristics of the host system.  If physical memory space can be
+efficiently allocated to a process at runtime it is desirable to immediately
+return deallocated space to the host so that it may be reused by another
+process.  Otherwise the space will remain physically allocated to the process
+but will be placed on the memory allocator free list so that it may be
+reallocated in a subsequent call to \fBmalloc\fR.
+.ih
+SEE ALSO
+zmaloc, zraloc, zlocva
+.endhelp

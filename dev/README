@@ -1,0 +1,66 @@
+IRAF$DEV - The DEV Directory (Aug 1986)
+Fri Mar 21 20:36:00 MST 1997
+
+This directory contains device descriptor tables and host system interface
+information for the various devices accessed by IRAF.  With the exception of
+the cache[gt].dat files, all these files are read at runtime hence new
+devices can be interfaced without a sysgen in most cases.
+
+    cacheg.dat, cachet.dat
+	SPP include files, referenced in TTY, used to cache graphcap and
+	termcap device entries for fast access.  [These are rarely touched
+	any more although they are still functional - Mar97]
+
+    devices
+	Maps the logical (IRAF) device names of any allocatable devices to
+	host system names.  Primary use is for magtape devices.  [Not used
+	any more except in VMS/IRAF]
+
+    edt.ed, emacs.ed, vi.ed
+	Read by EDIT, EPARAM, and EHISTORY to determine the editor language
+	and the host command to be used to call the host editor.
+
+    graphcap
+	Device information for all graphics terminals, plotters, and image
+	displays.  If an entry is also in the cache file `cacheg.dat', the
+	cache must be rebuilt before changes will take effect.
+
+    help.db
+	The compiled HELP database.  Tells HELP what packages and modules help
+	is available for, and the names of the associaated help files.
+
+    hostlogin, hosts, uhosts
+	Network interface files.  Describe the nodes on the local network
+	and how to talk to them.
+
+    null
+	The dev$null file.  I am not sure an actual file entry is still
+	required for this special file, but it was in the beginning.
+
+    pix.hhh, pix.imh, pix.pix
+	The standard test image, dev$pix.imh, and the STF template header
+	file, dev$pix.hhh, required to propagate the special VMS file type
+	required by the STF format to new image header files.
+
+    tapecap
+    tapecap.<node>
+	Magtape device capabilities file.  See os$zfiomt.c for a summary
+	of device capabilities.  os$tape.c can be used as a standalone
+	Unix task to exercise a tape drive to determine its capabilities.
+	Tapecap files can be named either "tapecap.<node>" where <node> is
+	the hostname of the server the tapecap file describes, or simply
+	"tapecap" to provide a fallback for all servers.  The <node> form
+	allows a single IRAF installation to be shared by multiple servers
+	while still having distinct tapecap files for each.  The tapecap file
+	for a server is located in the IRAF dev$ directory *on the server*.
+
+    termcap
+	Device information for all terminals and printers.  The printer
+	info should be moved out into a PRINTCAP file at some point.
+	If an entry is also in the cache file `cachet.dat', the cache must
+	be rebuilt before changes will take effect.
+
+    vdmfile.gki, vdmplot.gki
+	Standard test GKI metacode files.  VDMFILE contains several test
+	frames, VDMPLOT contains a single, more complicated plot, used to
+	test and compare the resolution of different graphics devices.

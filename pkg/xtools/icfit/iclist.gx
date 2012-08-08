@@ -1,0 +1,45 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include	"icfit.h"
+include	"names.h"
+
+# IC_LIST -- List X, Y, FIT, W.
+
+procedure ic_list$t (ic, cv, x, y, wts, npts, file)
+
+pointer	ic		# ICFIT pointer
+pointer	cv		# Curfit pointer
+PIXEL	x[ARB]		# Ordinates
+PIXEL	y[ARB]		# Abscissas
+PIXEL	wts[ARB]	# Weights
+int	npts		# Number of data points
+char	file[ARB]	# Output file
+
+int	i, fd, open()
+PIXEL	$tcveval()
+errchk	open()
+
+begin
+	# Open the output file.
+	fd = open (file, APPEND, TEXT_FILE)
+
+	if (npts == IC_NFIT(ic)) {
+	    do i = 1, npts {
+		call fprintf (fd, "%8g %8g %8g %8g\n")
+		    call parg$t (x[i])
+		    call parg$t (y[i])
+		    call parg$t ($tcveval (cv, x[i]))
+		    call parg$t (wts[i])
+	    }
+	} else {
+	    do i = 1, IC_NFIT(ic) {
+		call fprintf (fd, "%8g %8g %8g %8g\n")
+		    call parg$t (Mem$t[IC_XFIT(ic)+i-1])
+		    call parg$t (Mem$t[IC_YFIT(ic)+i-1])
+		    call parg$t ($tcveval (cv, Mem$t[IC_XFIT(ic)+i-1]))
+		    call parg$t (Mem$t[IC_WTSFIT(ic)+i-1])
+	    }
+	}
+
+	call close (fd)
+end

@@ -1,0 +1,4 @@
+This directory contains miscellaneous parts of the IRAF system code.
+These include the error handling facilities, the IRAF Main and associated
+routines (the default exception handler, and ONEXIT), environment access
+facilities, and time conversion facilities.

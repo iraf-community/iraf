@@ -1,0 +1,40 @@
+.help sgidecode Jun86 plot
+.ih
+NAME
+sgidecode -- decode simple graphics interface (SGI) metacode files
+.ih
+USAGE
+sgidecode input
+.ih
+PARAMETERS
+.ls input
+The input SGI metacode files.
+.le
+.ls generic = no
+Ignore remaining parameters?
+.le
+.ls verbose = no
+Print metacode in a verbose format?
+.le 
+.ls gkiunits = no
+By default, coordinates are printed in NDC rather than GKI units.
+.le
+.ih
+DESCRIPTION
+Task \fIsgidecode\fR is a debugging tool used to decode SGI metacode
+files.  The plotting instructions are decoded and printed in readable
+form on the standard output.  The input metacode can be read from one
+or more files or redirected from the standard input.
+
+Coordinates are printed in NDC units (0-1) by default.  When \fBgkiunits\fR
+= yes, coordinates are printed in gki units (0-32767).  Parameter
+\fBverbose\fR is currently not implemented.
+.ih
+EXAMPLES
+1. Decode the metacode in file "home$vdm.sgi".
+
+    cl> sgidecode home$vdm.sgi
+.ih
+SEE ALSO
+gkidecode sgikern
+.endhelp

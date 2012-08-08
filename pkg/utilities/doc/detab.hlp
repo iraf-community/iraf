@@ -1,0 +1,28 @@
+.help detab Mar84 utilities
+.ih
+NAME
+detab -- remove tab characters from a file or files
+.ih
+USAGE
+detab files
+.ih
+PARAMETERS
+.ls files
+Template specifying files to be processed e.g. "file1" or "file*".
+.le
+.ls tablist = "9 +8"
+String containing a list of tabstops separated by blanks or commas.
+Alternatively a two element string of the form m +n will set
+tabstops every n columns beginning in column m.  A null string will
+default to "9 +8".
+.le
+.ih
+EXAMPLE
+Remove the tabs from file "cubspl.f", using the default tab stops.
+
+.nf
+	cl> detab cubspl.f > temp
+	cl> delete cubspl.f
+	cl> rename temp cubspl.f
+.fi
+.endhelp

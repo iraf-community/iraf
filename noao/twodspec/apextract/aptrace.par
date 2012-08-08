@@ -1,0 +1,27 @@
+# APTRACE
+
+input,s,a,,,,List of input images to trace
+apertures,s,h,"",,,Apertures
+references,s,h,"",,,List of reference images
+
+interactive,b,h,yes,,,Run task interactively?
+find,b,h,yes,,,Find apertures?
+recenter,b,h,no,,,Recenter apertures?
+resize,b,h,no,,,Resize apertures?
+edit,b,h,no,,,Edit apertures?
+trace,b,h,yes,,,Trace apertures?
+fittrace,b,h,yes,,,"Fit the traced points interactively?
+"
+line,i,h,INDEF,1,,Starting dispersion line
+nsum,i,h,10,,,Number of dispersion lines to sum
+step,i,h,10,1,,Tracing step
+nlost,i,h,3,1,,"Number of consecutive times profile is lost before quitting
+"
+function,s,h,"legendre","chebyshev|legendre|spline1|spline3",,Trace fitting function
+order,i,h,2,1,,Trace fitting function order
+sample,s,h,"*",,,Trace sample regions
+naverage,i,h,1,,,Trace average or median
+niterate,i,h,0,0,,Trace rejection iterations
+low_reject,r,h,3.,0.,,Trace lower rejection sigma
+high_reject,r,h,3.,0.,,Trace upper rejection sigma
+grow,r,h,0.,0.,,Trace rejection growing radius

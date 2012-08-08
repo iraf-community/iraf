@@ -1,0 +1,74 @@
+include	<tbset.h>
+
+#  TICH  --  Copy data from input header into scalar cell in output.
+#
+#
+#
+#
+#  Revision history:
+#  ----------------
+#  20-Jan-97  -  Task created (I.Busko)
+
+
+$if (datatype == c)
+procedure ticht  (itp, ihc, otp, ocp, orow, maxch)
+$else
+procedure tich$t (itp, ihc, otp, ocp, orow)
+$endif
+
+pointer	itp		# i: input table descriptor
+int	ihc		# i: header keyword index
+pointer	otp		# i: output table descriptor
+pointer	ocp		# i: output column descriptor
+int	orow		# i: row where to insert
+$if (datatype == c)
+int	maxch
+$endif
+#--
+$if (datatype == c)
+pointer	buf
+$else
+PIXEL	buf
+$endif
+pointer	sp, kwname, kwval
+int	datatype, parnum
+
+string	corrupt  "Corrupted header in input table."
+
+int	nscan()
+
+begin
+	call smark (sp)
+	$if (datatype == c)
+	call salloc (buf, maxch + 1, TY_CHAR)
+	$endif
+	call salloc (kwname, SZ_LINE, TY_CHAR)
+	call salloc (kwval,  SZ_PARREC, TY_CHAR)
+
+	# Build keyword name and look for it.
+	call sprintf (Memc[kwname], SZ_LINE, "TCV_%03d")
+	    call pargi (ihc)
+	call tbhfkr (itp, Memc[kwname], datatype, Memc[kwval], parnum)
+
+	# Parse and read value. We assume that the keyword existence 
+	# was confirmed by previously finding the paired TCD_ keyword.
+	if (parnum > 0) {
+	    call sscan (Memc[kwval])
+	    $if (datatype == c)
+	    call gargwrd (buf, maxch) 
+	    $else
+	    call garg$t (buf)
+	    $endif
+	    if (nscan() < 1) call error (1, corrupt)
+	} else
+	    call error (1, corrupt)
+
+	# Write value into scalar cell.
+	$if (datatype == c)
+	call tbcptt  (otp, ocp, buf, maxch, orow, orow)
+	$else
+	call tbcpt$t (otp, ocp, buf, orow, orow)
+	$endif
+
+	call sfree (sp)
+end

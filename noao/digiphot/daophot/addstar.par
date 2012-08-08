@@ -1,0 +1,23 @@
+# Parameters for the ADDSTAR task
+
+image,f,a,,,,"Image to which stars are to be added"
+photfile,f,a,,,,"Input photometry file"
+psfimage,f,a,default,,,"Input PSF image (default: image.psf.?)"
+addimage,f,a,"default",,,"Output artificial image (default: image.add.?)"
+minmag,r,a,,,,Minimum magnitude of artificial stars to add
+maxmag,r,a,,,,Maximum magnitude of artificial stars to add
+nstar,i,a,100,1,,Number of artifical stars to add
+datapars,pset,h,"",,,Data dependent parameters
+daopars,pset,h,"",,,Psf fitting parameters
+simple_text,b,h,no,,,"Input is in simple text format?"
+seed,r,h,0.0,,,Seed for the random number generator
+nimage,i,h,1,1,,Number of new images per input image
+idoffset,i,h,0,,,Id numbering offset
+wcsin,s,h,)_.wcsin,,,"The input coordinate system (logical,tv,physical,world)"
+wcsout,s,h,)_.wcsout,,,"The output coordinate system (logical,tv,physical)"
+wcspsf,s,h,)_.wcspsf,,,"The psf coordinate system (logical,tv,physical)"
+cache,b,h,)_.cache,,,"Cache the output image pixels in memory?"
+verify,b,h,)_.verify,,,Verify critical addstar parameters?
+update,b,h,)_.update,,,Update critical addstar parameters?
+verbose,b,h,)_.verbose,,,Print addstar messages?
+mode,s,h,'ql'

@@ -1,0 +1,45 @@
+# WLPARS pset containing plotting parameters for WCSLAB
+
+major_grid,b,h,yes,,,"Plot major grid lines instead of tick marks ?"
+minor_grid,b,h,no,,,"Plot minor grid lines instead of tick marks ?"
+dolabel,b,h,yes,,,"Label major grid lines / tick marks?"
+remember,b,h,no,,,"Update wlpars after the plot ?"
+
+axis1_beg,s,h,"",,,"First major axis 1 value to plot"
+axis1_end,s,h,"",,,"Final major axis 1 value to plot"
+axis1_int,s,h,"",,,"Axis 1 interval to plot"
+axis2_beg,s,h,"",,,"First major axis 2 value to plot"
+axis2_end,s,h,"",,,"Final major axis 2 value to plot"
+axis2_int,s,h,"",,,"Axis 2 interval to plot"
+major_line,s,h,"solid","solid|dotted|dashed|dotdash",,"Major grid line type"
+major_tick,r,h,.03,0.,1.,"Major tick size in percent of screen"
+
+axis1_minor,i,h,5,,,"Number of minor ticks for axis 1"
+axis2_minor,i,h,5,,,"Number of minor ticks for axis 2"
+minor_line,s,h,"dotted","solid|dotted|dashed|dotdash",,\
+	"Line type (solid|dotted|dashed|dotdash)"
+minor_tick,r,h,.01,0.,1.,"Minor tick size (percent of screen)"
+tick_in,b,h,yes,,,"Should tick marks point into the graph ?"
+
+axis1_side,s,h,"default",,,"Axis 1 label side"
+axis2_side,s,h,"default",,,"Axis 2 label side"
+axis2_dir,s,h,"",,,"Axis 1 value at which to label axis 2 (polar)"
+justify,s,h,"default","top|bottom|left|right|default",,\
+	"Axis 2 side at which to label axis 2 (polar)"
+labout,b,h,yes,,,"Draw labels outside axes ?"
+rotate,b,h,yes,,,"Allow labels to rotate ?"
+full_label,b,h,no,,,"Draw full format labels ?"
+label_size,r,h,1.,0.,,"Axis label size"
+
+title,s,h,"imtitle",,,"Graph title"
+axis1_title,s,h,"",,,"Axis 1 title"
+axis2_title,s,h,"",,,"Axis 2 title"
+title_side,s,h,"top","top|bottom|left|right",,"Title side"
+axis1_title_side,s,h,"default","top|bottom|left|right|default",,\
+	"Axis 1 title side"
+axis2_title_side,s,h,"default","top|bottom|left|right|default",,\
+	"Axis 2 title side"
+title_size,r,h,1.,0.,,"Title size"
+axis_title_size,r,h,1.0,0.,,"Size of the axes titles"
+
+graph_type,s,h,"default","normal|polar|near_polar|default",,"Graph type"

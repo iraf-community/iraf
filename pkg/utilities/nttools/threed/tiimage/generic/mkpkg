@@ -1,0 +1,14 @@
+# Update the generic routines.
+
+default:
+	$checkout libpkg.a ../../
+	$update   libpkg.a
+	$checkin  libpkg.a ../../
+$exit
+
+libpkg.a:
+	tmcp1s.x
+	tmcp1i.x
+	tmcp1r.x
+	tmcp1d.x
+	;

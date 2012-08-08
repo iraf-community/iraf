@@ -1,0 +1,64 @@
+.help skysep Feb06 noao.nproto
+.ih
+NAME
+skysep -- Compute arc separation of two RA/Dec values
+.ih
+SYNOPSIS
+Given two RA/Dec value pairs the spherical separation is computed.  This
+task can be used in scripts and has both text and parameter output.
+.ih
+USAGE	
+skysep ra1 dec1 ra2 dec2
+.ih
+PARAMETERS
+.ls ra1, dec1, ra2, dec2
+The RA and Dec of two points on the sky for which a separation is to be
+computed.  The RA may be in hours or degrees and the Dec is in degrees.
+The values may be in decimal or sexagesimal format.
+.le
+.ls raunit = "hr"
+Units for right ascension.  The value "hr" selects hours and "deg"
+selects degrees.
+.le
+.ls verbose = no
+Print a verbose output to the standard output?
+.le
+.ls sep
+This output parameter will contain the separation in arc seconds after
+the task is run.  It may then be referenced as the variable skysep.sep.
+.le
+.ih
+DESCRIPTION
+This simple script task computes the separation between two celestial
+coordinates given as RA and Dec.  The RA units may be hours or degrees,
+as selected by a parameter, and the Dec units must be degrees.  The result
+may be printed to the standard output (in restricted precision) and is
+also record in a task parameter for later use.
+.ih
+EXAMPLES
+1. The verbose output appears as follows:
+
+.nf
+    cl> skysep 12:12:12 32:32:32 12:12:24 32:32:52 verb+
+    153.05 arcsec = (12:12:12.00, 32:32:32.0) - (12:12:24.00, 32:32:52.0)
+    cl> = skysep.sep
+    153.04686934468
+.fi
+
+2. To use in a script:
+
+.nf
+    cache skysep   # Cache to avoid problems with updating par files
+    
+    # To use scan to get the value.
+    skysep (r1, d1, r2, d2, raunit="deg", verbose+) | scan (sep)
+    printf ("The separation is %f\n", sep)
+
+    # To use the saved value.
+    skysep (r1, d1, r2, d2, raunit="deg", verbose-)
+    printf ("The separation is %.5f\n", skysep.sep)
+.fi
+.ih
+SEE ALSO
+astcalc, asthedit
+.endhelp

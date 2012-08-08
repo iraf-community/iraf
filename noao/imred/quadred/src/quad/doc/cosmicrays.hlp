@@ -1,0 +1,220 @@
+.help cosmicrays Dec87 noao.imred.ccdred
+.ih
+NAME
+cosmicrays -- Detect and replace cosmic rays
+.ih
+USAGE
+cosmicrays input output
+.ih
+PARAMETERS
+.ls input
+List of input images in which to detect cosmic rays.
+.le
+.ls output
+List of output images in which the detected cosmic rays will be replaced
+by an average of neighboring pixels.  If the output image name differs
+from the input image name then a copy of the input image is made with
+the detected cosmic rays replaced.  If no output images are specified
+then the input images are modified in place.  In place modification of
+an input image also occurs when the output image name is the same as
+the input image name.
+.le
+.ls badpix = ""
+List of bad pixel files to be created, one for each input image.  If no
+file names are given then no bad pixel file is created.  The bad pixel 
+file is a simple list of pixel coordinates for each replaced cosmic ray.
+This file may be used in conjunction with \fBbadpixelimage\fR to create
+a mask image.
+.le
+.ls ccdtype = ""
+If specified only the input images of the desired CCD image type will be
+selected.
+.le
+.ls threshold = 25.
+Detection threshold above the mean of the surrounding pixels for cosmic
+rays.  The threshold will depend on the noise characteristics of the
+image and how weak the cosmic rays may be for detection.  A typical value
+is 5 or more times the sigma of the background.
+.le
+.ls fluxratio = 2.
+The ratio (as a percent) of the mean neighboring pixel flux to the candidate
+cosmic ray pixel for rejection.  The value depends on the seeing and the
+characteristics of the cosmic rays.  Typical values are in the range
+2 to 10 percent.
+.le
+.ls npasses = 5
+Number of cosmic ray detection passes.  Since only the locally strongest
+pixel is considered a cosmic ray, multiple detection passes are needed to
+detect and replace multiple pixel cosmic ray events.
+.le
+.ls window = 5
+Size of cosmic ray detection window.  A square window of either 5 by 5 or
+7 by 7 is used to detect cosmic rays.  The smaller window allows detection
+in the presence of greater background gradients but is less sensitive at
+discriminating multiple event cosmic rays from stars.  It is also marginally
+faster.
+.le
+.ls interactive = yes
+Examine parameters interactively?  A plot of the mean flux within the
+detection window (x100) vs the flux ratio (x100) is plotted and the user may
+set the flux ratio threshold, delete and undelete specific events, and
+examine specific events.  This is useful for new data in which one is
+uncertain of an appropriate flux ratio threshold.  Once determined the
+task need not be used interactively.
+.le
+.ls answer
+This parameter is used for interactive queries when processing a list of
+images.  The responses may be "no", "yes", "NO", or "YES".  The upper case
+responses permanently enable or disable the interactive review while
+the lower case reponses allow selective examination of certain input
+images.
+.le
+.ih
+OTHER PARAMETERS
+There are other parameters which may be defined by the package, as is the
+case with \fBccdred\fR, or as part of the task, as is the case with
+standalone version in the \fBgeneric\fR package.
+
+.ls verbose
+If yes then a time stamped log of the operation is printed on the standard
+output.
+.le
+.ls logfile
+If a log file is specified then a time stamped log of the operation is
+recorded.
+.le
+.ls plotfile
+If a plot file is specified then the graph of the flux ratio (x100) vs
+the mean flux (x100) is recorded as metacode.  This may be spooled or examined
+later.
+.le
+.ls graphics = "stdgraph"
+Interactive graphic output device for interactive examination of the
+detection parameters.
+.le
+.ls cursor = ""
+Interactive graphics cursor input.  If null the graphics display cursor
+is used, otherwise a file containing cursor input may be specified.
+.le
+.ls instrument
+The \fBccdred\fR instrument file is used for mapping header keywords and
+CCD image types.
+.le
+.ih
+CURSOR COMMANDS
+
+.nf
+d	Mark candidate for replacement (applys to '+' points)
+q	Quit and replace the selected pixels
+r	Redraw the graph
+s	Make a surface plot for the candidate nearest the cursor
+t	Set the flux ratio threshold at the y cursor position
+u	Mark candidate to not be replaced (applys to 'x' points)
+w	Adjust the graph window (see \fBgtools\fR)
+.fi
+
+There are no colon commands except those for the windowing options (type
+:\help or see \fBgtools\fR).
+.ih
+DESCRIPTION
+Cosmic ray events in each input image are detected and replaced by the
+average of the four neighbors.  The replacement may be performed
+directly on the input image if no output image is specified or if the
+output image name is the same as the input image name.  If a new image
+is created it is a copy of the input image except for the replaced
+pixels.  The processing keyword CRCOR is added to the output image
+header.  Optional output includes a log file to which a processing log
+is appended, a verbose log output to the standard output (the same as
+that in the log file), a plot file showing the parameters of the
+detected cosmic ray candidates and the flux ratio threshold used, and a
+bad pixel file containing the coordinates of the replaced pixels.  The
+bad pixel file may be used for plotting purposes or to create a mask
+image for display and analysis using the task \fBbadpiximage\fR.  This
+bad pixel file will be replaced by the IRAF bad pixel facility when it
+becomes available.  If one wants more than a simple mask image then by
+creating a different output image a difference image between the
+original and the modified image may be made using \fBimarith\fR.
+
+This task may be applied to an image previously processed to detect
+additional cosmic rays.  A warning will be given (because of the
+CRCOR header parameter) and the previous processing header keyword will
+be overwritten.
+
+The cosmic ray detection algorithm consists of the following steps.
+First a pixel must be the brightest pixel within the specified
+detection window (either 5x5 or 7x7).  The mean flux in the surrounding
+pixels with the second brightest pixel excluded (which may also be a
+cosmic ray event) is computed and the candidate pixel must exceed this
+mean by the amount specified by the parameter \fIthreshold\fR.  A plane
+is fit to the border pixels of the window and the fitted background is
+subtracted.  The mean flux (now background subtracted) and the ratio of
+this mean to the cosmic ray candidate (the brightest pixel) are
+computed.  The mean flux (x100) and the ratio (x100) are recorded for
+interactive examination if desired.
+
+Once the list of cosmic ray candidates has been created and a threshold
+for the flux ratio established (either by the parameter \fIfluxratio\fR
+or modified interactively) the pixels with ratios below the threshold
+are replaced in the output by the average of the four neighboring pixels
+(with the second strongest pixel in the detection window excluded if it is
+one of these pixels).  Additonal pixels may then be detected and replaced
+in further passes as specified by the parameter \fInpasses\fR.  Note that
+only pixels in the vicinity of replaced pixels need be considered in
+further passes.
+
+The division between the peaks of real objects and cosmic rays is made
+based on the flux ratio between the mean flux (excluding the center
+pixel and the second strongest pixel) and the candidate pixel.  This
+threshold depends on the point spread function and the distribution of
+multiple cosmic ray events and any additional neighboring light caused
+by the events.  This threshold is not strongly coupled to small changes
+in the data so that once it is set for a new type of image data it may
+be used for similar images.  To set it initially one may examine the
+scatter plot of the flux ratio as a function of the mean flux.  This
+may be done interactively or from the optional plot file produced.
+
+When the interactive flag is set the user is queried for each image.
+Responses may be made for specific images or for all images by using
+lower or upper case answers respectively.  When the parameters are
+examined interactively the user may change the flux ratio threshold
+('t' key).  Changes made are stored in the parameter file and, thus,
+learned for further images.  Pixels to be deleted are marked by crosses
+and pixels which are peaks of objects are marked by pluses.  The user
+may explicitly delete or undelete any point if desired but this is only
+for special cases near the threshold.  In the future keys for
+interactive display of the specific detections will be added.
+Currently a surface plot of any candidate may be displayed graphically
+in four 90 degree rotated views using the 's' key.  Note that the
+initial graph does not show all the points some of which are clearly
+cosmic rays because they have negative mean flux or flux ratio.  To
+view all data one must rewindow the graph with the 'w' key or ":/"
+commands (see \fBgtools\fR).
+.ih
+EXAMPLES
+1. To replace cosmic rays in a set of images ccd*:
+
+.nf
+	cl> cosmicrays ccd* new//ccd*
+	ccd001: Examine parameters interactively? (yes):
+	[A scatter plot graph is made.  One can adjust the threshold.]
+	[Looking at a few points using the 's' key can be instructive.]
+	[When done type 'q'.]
+	ccd002: Examine parameters interactively? (yes): NO
+	[No further interactive examination is done.]
+.fi
+
+After cleaning one typically displays the images and  possibly blinks them.
+A difference image or mask image may also be created.
+
+2.  To create a mask image a bad pixel file must be specified.  In the
+following we replace the cosmic rays in place and create a bad pixel
+file and mask image:
+
+.nf
+	cl> cosmicrays ccd001 ccd001 badpix=ccd001.bp
+	cl> badpiximage ccd001.bp ccd001 ccd001bp
+.fi
+.ih
+SEE ALSO
+badpixelimage gtools
+.endhelp

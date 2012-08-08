@@ -1,0 +1,7 @@
+# CRGROW
+
+input,s,a,,,,Input cosmic ray masks
+output,s,a,,,,Output cosmic ray masks
+radius,r,h,1.,,,Grow radius
+inval,i,h,INDEF,,,Input mask value to grow (INDEF for any)
+outval,i,h,INDEF,,,Output grown mask value (INDEF for any)

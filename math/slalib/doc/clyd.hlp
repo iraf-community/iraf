@@ -1,0 +1,50 @@
+.help clyd Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slCLYD (IY, IM, ID, NY, ND, JSTAT)
+
+     - - - - -
+      C L Y D
+     - - - - -
+
+  Gregorian calendar to year and day in year (in a Julian calendar
+  aligned to the 20th/21st century Gregorian calendar).
+
+  Given:
+     IY,IM,ID   i    year, month, day in Gregorian calendar
+
+  Returned:
+     NY         i    year (re-aligned Julian calendar)
+     ND         i    day in year (1 = January 1st)
+     JSTAT      i    status:
+                       0 = OK
+                       1 = bad year (before -4711)
+                       2 = bad month
+                       3 = bad day (but conversion performed)
+
+  Notes:
+
+  1  This routine exists to support the low-precision routines
+     slERTH, slMOON and slECOR.
+
+  2  Between 1900 March 1 and 2100 February 28 it returns answers
+     which are consistent with the ordinary Gregorian calendar.
+     Outside this range there will be a discrepancy which increases
+     by one day for every non-leap century year.
+
+  3  The essence of the algorithm is first to express the Gregorian
+     date as a Julian Day Number and then to convert this back to
+     a Julian calendar date, with day-in-year instead of month and
+     day.  See 12.92-1 and 12.95-1 in the reference.
+
+  Reference:  Explanatory Supplement to the Astronomical Almanac,
+              ed P.K.Seidelmann, University Science Books (1992),
+              p604-606.
+
+  P.T.Wallace   Starlink   26 November 1994
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

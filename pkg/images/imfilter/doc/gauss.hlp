@@ -1,0 +1,162 @@
+.help gauss Jan91 images.imfilter
+.ih
+NAME
+gauss -- convolve a list of images with an elliptical Gaussian function
+.ih
+USAGE
+gauss input output sigma
+.ih
+PARAMETERS
+.ls input
+List of images to be convolved with the elliptical Gaussian function.
+.le
+.ls output
+List of output images. The number of output images must equal the number of
+input images. If the input image name equals the output image name, the
+convolved image will replace the input image.
+.le
+.ls sigma
+The sigma of the Gaussian function in pixels along the direction \fItheta\fR
+of the major axis of the Gaussian function.
+.le
+.ls ratio = 1.
+The ratio of the sigma in the minor axis direction to the sigma in the major
+axis direction of the Gaussian function.
+If \fIratio\fR is 1 the Gaussian function is circular.
+.le
+.ls theta = 0.
+The position of the major axis of the elliptical Gaussian function.
+\fITheta\fR is measured counter-clockwise from the x axis and must be between
+0 and 180 degrees.
+.le
+.ls nsigma = 4.0
+The distance along the major axis of the Gaussian function at which
+the kernel is truncated in \fIsigma\fR pixels.
+.le
+.ls bilinear = yes
+Use the fact that the Gaussian function is separable (bilinear) in x and y if
+\fItheta\fR = 0, 90, or 180, to compute the 2D convolution more efficiently?
+\fIBilinear\fR is always set to "no" internally, if the position angle of
+the major axis of the Gaussian is other than 0, 90 or 180 degrees.
+.le
+.ls boundary = "nearest"
+The algorithm used to compute the values of the out of bounds pixels. The
+options are:
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Generate a value by reflecting around the boundary.
+.le
+.ls wrap
+Generate a value by wrapping around to the opposite side of the image.
+.le
+.le
+.ls constant = 0.
+The constant for constant-valued boundary extension.
+.le
+
+.ih
+DESCRIPTION
+
+GAUSS convolves the list of images in \fIinput\fR with the
+Gaussian kernel specified by \fIsigma\fR, \fIratio\fR, \fItheta\fR and
+\fInsigma\fR and places the convolved images in \fIoutput\fR.
+If the image names in \fIinput\fR equal the image names in \fIoutput\fR
+the convolution is performed in place and the original images are
+overwritten. Out of bounds pixels are computed using the algorithm
+specified by \fIboundary\fR.
+
+If \fIbilinear\fR is "yes" and the major axis of the Gaussian kernel
+is aligned along either the x or y axis, GAUSS uses the fact that
+the Gaussian function is mathematically separable (bilinear) in x and y
+to speed up the convolution process. A bilinear 2D convolution kernel
+in x and y is one which can be separated into two equivalent 1D
+convolution kernels in x and y respectively. 
+
+Although the bilinear approximation and the full 2D convolution are
+mathematically equivalent, the user will actually see SMALL differences
+between an image convolved with the full 2D kernel and the same image
+convolved with the equivalent bilinear kernel.
+These differences are the result of the finite size of the convolution kernel
+(the integration does not extend to infinity in either direction),
+and the fact that off-axis kernel elements outside the \fInsigma\fR limit
+cannot be set to 0 in the bilinear case as they are in the full 2D
+case. Therefore the bilinear kernel is less radially symmetric than
+the full 2D kernel.  In most cases the differences are small and more
+than made up for by the greatly decreased execution time.
+
+The Gaussian kernel has an elliptical cross-section and Gaussian
+profile and is defined mathematically as follows.
+
+.nf
+1. Circularly Symmetric Gaussian Function
+
+    ratio = 1   theta = 0.0   N = normalization factor
+
+    G = N * exp (-0.5 * (r / sigma) ** 2)
+
+2. Elliptical Gaussian Function (Theta = 0, 90 or 180)
+
+    sigmax = sigma   sigmay = ratio * sigmax   N = normalization factor
+
+    A = cos (theta) ** 2 / sigmax ** 2 + sin (theta) ** 2 / sigmay ** 2
+
+    B = 0.0
+
+    C = sin (theta) ** 2 / sigmax ** 2 + cos (theta) ** 2 / sigmay ** 2
+
+    z = A * x ** 2 + B * x * y + C * y ** 2 
+
+    G = N * exp (-0.5 * z)
+
+3. Elliptical Gaussian  Function (Arbitrary Theta)
+
+    sigmax = sigma   sigmay = ratio * sigmax   N=normalization factor
+
+    A = cos (theta) ** 2 / sigmax ** 2 + sin (theta) ** 2 / sigmay ** 2
+
+    B = 2 * (1 / sigmax ** 2 - 1 / sigmay ** 2) * sin (theta) * cos (theta)
+
+    C = sin (theta) ** 2 / sigmax ** 2 + cos (theta) ** 2 / sigmay ** 2
+
+    z = A * x ** 2 + B * x * y + C * y ** 2 
+
+    G = N * exp (-0.5 * z)
+.fi
+
+.ih
+EXAMPLES
+
+1. Convolve an image with a circular Gaussian function of sigma 2.0, and
+size 4.0 sigma using nearest neighbor boundary extension and the bilinear
+kernel.
+
+    cl> gauss m83 m83.gau 2.0
+
+2. Do the same convolution using the full 2D kernel.
+
+    cl> gauss m83 m83.gau.2D 2.0 bilinear-
+
+3. Convolve an image with an elliptical Gaussian function whose sigma in the
+major and minor axis direction is 2.0 and 1.5 respectively, and whose position
+angle is 45 degrees, using wrap around boundary extension. In this case the
+full 2D kernel is used by default.
+
+    cl> gauss m84 m84.gau 2.0 ratio=.75 theta=45. bound=wrap
+
+.ih
+TIME REQUIREMENTS
+GAUSS requires approximately 30 and 8 cpu seconds to
+convolve a 512 square real image with circularly symmetric Gaussian function
+of sigma 2 pixels, using the full 2D kernel and the bilinear
+kernel respectively, on a Sparc Station 1.
+.ih
+BUGS
+.ih
+SEE ALSO
+convolve, gradient, laplace, boxcar
+.endhelp

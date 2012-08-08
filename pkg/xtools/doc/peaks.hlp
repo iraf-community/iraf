@@ -1,0 +1,28 @@
+.help peaks Jan84 xtools
+.ih
+NAME
+peaks -- find the peaks in an array of x and y points
+.ih
+SYNOPSIS
+.nf
+npeaks = peaks (x, y, background, npts, dx)
+
+real	x[npts], y[npts]	# Input data points and output peaks
+real	background[npts]	# Background estimate
+int	npts			# Number of input data points
+real	dx			# Precision of peak positions
+.fi
+.ih
+DESCRIPTION
+The extrema in the input data points are found using extrema(xtools).
+The extrema are located to a precision of dx.
+The extrema with negative curvature (peaks) are selected and returned
+in the x array.  The spline value is returned in the y array.  The
+background is estimated by linear interpolation of the neighboring
+minima (extrema of positive curvature) to the position of the peak.
+The background is returned in the background array.  The number of
+peaks found is returned as the function value.
+.ih
+SEE ALSO
+xtools.extrema
+.endhelp

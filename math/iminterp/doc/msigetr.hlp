@@ -1,0 +1,37 @@
+.help msigetr Dec98 msigetr.hlp
+.ih
+NAME
+msigetr -- fetch an msi real parameter
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+rvalue = msigetr (msi, param)
+
+.nf
+    pointer	msi		#I interpolant descriptor
+    int		param		#I parameter
+.fi
+.ih
+ARGUMENTS
+.ls msi      
+Pointer to the sequential interpolant descriptor structure.
+.le
+.ls param
+The parameter to be fetched. The choices are: II_MSIBADVAL, the undefined
+pixel value for the drizzle interpolant. The parameter definitions are
+contained in the package header file math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+MSIGETR is used to set the value of undefined drizzle interpolant pixels.
+Undefined pixels are those for which the interpolation coordinates do not
+overlap the input coordinates, but are still, within the boundaries of the input
+image, a situation which may occur when the pixel fraction is < 1.0.
+.ih
+.ih
+NOTES
+.ih
+SEE ALSO
+msiinit, msisinit, msigeti
+.endhelp

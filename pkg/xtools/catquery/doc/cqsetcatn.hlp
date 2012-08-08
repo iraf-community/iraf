@@ -1,0 +1,35 @@
+.help cqsetcatn Mar00 "Catquery Package"
+.ih
+NAME
+cqsetcatn -- set the current catalog / survey  by number
+.ih
+SYNOPSIS
+
+catno = cq_setcatn (cq, catno)
+
+.nf
+pointer	cq		# the configuration file descriptor
+int	catno		# the sequence number of the catalog / survey to be set
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ls catno
+The sequence number of the catalog / survey to be set.
+.le
+.ih
+DESCRIPTION
+Cq_setcatn sets the current catalog / survey by number. Cq_setcatn is an
+integer function which returns the catalog / survey
+record sequence number as its function value. Zero is returned if the catalog
+record is not set.
+.ih
+NOTES
+Cq_setcat or cq_setcatn must be called before any catalog or image
+survey query can be made.
+.ih
+SEE ALSO
+cqlocate, cqlocaten, cqsetcat
+.endhelp

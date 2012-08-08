@@ -1,0 +1,5 @@
+images,s,a,,,,List of images
+instrument,s,h,)_.instrument,,,CCD instrument file
+ssfile,s,h,)_.ssfile,,,Subset translation file
+edit,b,h,yes,,,Edit instrument translation file?
+parameters,s,h,"basic","basic|common|all",,Parameters to be displayed

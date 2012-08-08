@@ -1,0 +1,20 @@
+# QUADTEST -- package parameter file
+imdata,f,h,"",,,"Image data"
+skyrate,r,h,0.,,,"Sky count rate
+"
+zeroslope,r,h,0.,,,"Slope of zero value"
+flatslope,r,h,0.,,,"Flat field slope
+"
+badpix,f,h,"",,,"Bad pixel regions"
+badval,r,h,0.,,,"Bad pixel value
+"
+flashval,r,h,0.,,,"Preflash level value"
+flashslope,r,h,0.,,,"Slope of preflash level
+"
+darkrate,r,h,0.,,,"Dark count rate"
+darkslope,r,h,0.,,,"Slope of dark count rate
+"
+poisson,b,h,yes,,,"Add Poisson noise"
+seed,i,h,0,,,"Random number seed
+"
+version,s,h,"Version 1.0 - Oct 93","Version 1.0 - Oct 93"  

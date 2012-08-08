@@ -1,0 +1,83 @@
+# Make the IRAF system packages.
+
+$ifeq (hostid, unix)  !(clear;date)  $endif
+$call update
+$ifeq (hostid, unix)  !(date)  $endif
+$exit
+
+update:
+	$call cl
+	$call ecl
+	$call vocl
+	$call system
+	$call softools
+	$call xtools
+	$call tbtables
+	$call dataio
+	$call images
+	$call lists
+	$call obsolete
+	$call plot
+	$call proto
+	$call utilities
+
+	$ifeq (HOSTID, vms) $purge [...] $endif
+	$purge bin$
+	;
+
+cl:
+	$echo "--------------------- CL --------------------------"
+	$call update@cl
+	;
+ecl:
+	$echo "--------------------- ECL -------------------------"
+	$call update@ecl
+	;
+vocl:
+	$echo "--------------------- VOCL ------------------------"
+	$call update@vocl
+	;
+system:
+	$echo "--------------------- SYSTEM ----------------------"
+	$call update@system
+	;
+softools:
+	$echo "--------------------- SOFTOOLS --------------------"
+	$call update@softools
+	;
+dataio:
+	$echo "--------------------- DATAIO ----------------------"
+	$call update@dataio
+	;
+images:
+	$echo "--------------------- IMAGES ----------------------"
+	$call update@images
+	;
+lists:
+	$echo "--------------------- LISTS -----------------------"
+	$call update@lists
+	;
+obsolete:
+	$echo "--------------------- OBSOLETE --------------------"
+	$call update@obsolete
+	;
+plot:
+	$echo "--------------------- PLOT ------------------------"
+	$call update@plot
+	;
+proto:
+	$echo "--------------------- PROTO -----------------------"
+	$call update@proto
+	;
+utilities:
+	$echo "--------------------- UTILITIES -------------------"
+	$call update@utilities
+	;
+xtools:
+	$echo "--------------------- XTOOLS ----------------------"
+	$call update@xtools
+	;
+tbtables:
+	$echo "--------------------- TBTABLES --------------------"
+	$call update@tbtables
+	;

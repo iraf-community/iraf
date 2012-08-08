@@ -1,0 +1,48 @@
+# IMEXAMINE
+ 
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+standalone:
+	$set   LIBS1 = "-lds -liminterp -lncar -lgks -lxtools"
+	$set   LIBS2 = "-lgsurfit -lnlfit -lcurfit -lllsq"
+	$update libpkg.a
+	$omake	x_imexam.x
+	$link	x_imexam.o libpkg.a $(LIBS1) $(LIBS2) -o xx_imexam.e
+	;
+ 
+libpkg.a:
+	iecimexam.x	imexam.h <error.h> <imhdr.h>
+	iecolon.x	imexam.h <error.h> <imhdr.h>
+	iedisplay.x     <error.h>	
+	ieeimexam.x	imexam.h <config.h> <error.h> <fset.h> <gset.h>\
+			<imhdr.h> <mach.h> <xwhen.h>
+	iegcur.x	imexam.h <imhdr.h> <ctype.h> <mach.h>
+	iegdata.x	<imhdr.h>
+	iegimage.x	imexam.h <error.h> <imhdr.h>
+	iegnfr.x	imexam.h <imhdr.h>
+	iegraph.x	imexam.h <gset.h>
+	iehimexam.x	imexam.h <error.h> <imhdr.h>
+	ieimname.x
+	iejimexam.x	imexam.h <error.h> <imhdr.h> <gset.h> <mach.h>
+	ielimexam.x	imexam.h <error.h> <imhdr.h>
+	iemw.x		imexam.h <imhdr.h> <mwset.h>
+	ieopenlog.x	imexam.h <error.h> <imhdr.h>
+	iepos.x		imexam.h <error.h> <math.h>
+	ieprint.x	imexam.h <error.h>
+	ieqrimexam.x	imexam.h <error.h> <imhdr.h> <gset.h> <math.h>\
+			<math/gsurfit.h> <math/nlfit.h>
+	ierimexam.x	imexam.h <error.h> <gset.h> <imhdr.h> <math.h>\
+			<math/gsurfit.h> <math/nlfit.h>
+	iesimexam.x	imexam.h <error.h> <gset.h> <imhdr.h> <mach.h>
+	iestatistics.x	imexam.h <error.h>
+	ietimexam.x	imexam.h <error.h> <imhdr.h>
+	ievimexam.x	imexam.h <error.h> <gset.h> <imhdr.h> <mach.h>\
+			<imset.h> <math.h> <math/iminterp.h>
+	stfmeasure.x	starfocus.h <error.h> <imhdr.h> <imset.h> <math/nlfit.h>
+	stfprofile.x	starfocus.h <imhdr.h> <mach.h>\
+			<math.h> <math/nlfit.h> <math/iminterp.h>
+	t_imexam.x	imexam.h <error.h> <gset.h> <imhdr.h>
+	;

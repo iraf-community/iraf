@@ -1,0 +1,40 @@
+# Make the DTOI package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$call update@hdicfit
+	$update	libpkg.a
+	$call	dtoi
+	;
+
+install:
+	$move	xx_dtoi.e noaobin$x_dtoi.e
+	;
+
+dtoi:
+	$omake  x_dtoi.x
+	$link	x_dtoi.o libpkg.a hdicfit/libhdic.a -lxtools -lcurfit\
+		-o xx_dtoi.e
+	;
+
+libpkg.a:
+	database.x	<ctotok.h> <ctype.h> <finfo.h> <time.h>
+	dematch.x	<error.h>
+	hd_aravr.x	<mach.h>
+	hdfit.x		hdicfit/hdicfit.h <ctype.h> <error.h> <fset.h>\
+			<imhdr.h> <mach.h> <math/curfit.h> <pkg/gtools.h>\
+			<pkg/xtanswer.h>
+	hdshift.x	<math/curfit.h>
+	hdtoi.x		hdicfit/hdicfit.h <error.h> <imhdr.h> <mach.h>\
+			<math/curfit.h>
+	minmax.x	<imhdr.h>
+	selftest.x	<gio.h> <gset.h> <mach.h>
+	spotlist.x	<error.h> <fset.h> <imhdr.h> <mach.h>
+	;

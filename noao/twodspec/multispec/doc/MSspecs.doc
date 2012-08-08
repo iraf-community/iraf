@@ -1,0 +1,698 @@
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+   Detailed Specifications for the Multi-Spectra Extraction Package
+                              F. Valdes
+                           December 8, 1983
+
+
+1.  Introduction
+
+     The  multi-spectra  extraction  package  (MULTISPEC)  provides  the 
+basic tools for modeling, cleaning, and extracting spectra  from  images
+containing  multiple  aperture  spectra running roughly parallel.  These
+tools will generally be combined  in  reduction  script  tasks  but  may
+also be used directly for non-standard analysis.
+
+     This  design  presents  the requirements and specifications for the
+MULTISPEC package.  Details concerning the algorithms  are  given  in  a
+separate document, Algorithms for the Multi-Spectra Extraction Package.
+
+
+2.  Input Data Requirements
+
+    The  input  data  for  the MULTISPEC package consists of image files
+containing one or more aperture spectra.  The spectra  are  required  to
+run   roughly  parallel  to  each  other  and  parallel  to  the  second 
+digitization  axis.   The  latter  requirement  may  require  a  general 
+rotation  and  interpolation  image operator.  The images are assumed to
+be  corrected  to  linear  relative  intensity.   Thus,  the  steps   of 
+correcting   digital   detector  images  for  dark  current,  bias,  and 
+pixel-to-pixel sensitivity variations must  be  performed  before  using
+the MULTISPEC tasks.
+
+     Because  the  the MULTISPEC package is being developed concurrently
+with the IRAF standard image processing tools  this  document  specifies
+the   requirements  for  the  preliminary  image  processing  needed  to 
+prepare digital detector images for the MULTISPEC package.
+
+
+2.1  Basic Digital Detector Reduction Tasks
+
+     The prelimary reduction of multi-spectra  images  uses  CL  scripts
+based  on  general  image  operators.   Some  of  the  scripts  are  for 
+specific instruments or specific reduction  applications  and  some  are
+generally   useful  image  processing  tasks.   The  scripts  allow  the 
+specification  of  many  images  for  which  the  operations   will   be 
+repetitively applied.
+
+     The  following  CL  scripts  are  required  to reduce multi-spectra
+images from digital detectors.
+
+
+        debias          multispec_flat          flat_divide
+
+
+
+
+
+                                  -1-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+debias
+    The files in a list of  filenames  are  automatically  debiased  and
+    trimmed.   This  routine  will  be  instrument  specific but used by
+    other reduction tasks beyond MULTISPEC.
+
+multispec_flat
+    The files in a list of quartz  multi-spectra  filenames  are  added,
+    the  result  is  smoothed  along  the dispersion dimension, and then
+    the original image is divided by the smoothed  image  to  produce  a
+    flat  field  image.   The  unsmoothed  to smoothed ratio is computed
+    only  if  the  value  of  the  smoothed  pixel  is  greater  than  a 
+    specified  amount.   Otherwise,  the  ratio  is  set to unity.  This
+    routine is not instrument specific but is used  only  for  MULTISPEC
+    reductions.
+
+flat_divide
+    The  files  in  a  list of filenames are each divided by a specified
+    flat field image.  This routine is  not  instrument  or  application
+    specific.
+
+    The  required  general image processing programs needed to implement
+these scripts are specified below.
+
+
+(1) A routine to compute the average value from a specified area of  the
+    image.  Used to determine the average bias value from a bias strip.
+
+(2) A  routine  to  trim  a specified portion of an image.  Used to trim
+    the bias strip.
+
+(3) Routines to multiply and subtract images by  a  constant.   Used  to
+    scale  images  such as dark exposures and to remove the average bias
+    value as obtained by (1) above.
+
+(4) Routines to subtract, add, and  divide  images.   Used  to  subtract
+    dark  current  and  bias  exposures,  to  add  several  exposures to
+    increase the signal-to-noise, and to divide by a flat  field  image.
+    The  divide  routine  must  give the user the option to substitute a
+    constant or ignore any divisions in which the  denominator  is  less
+    than a specified value.
+
+(5) A  routine  to  rotate  or  transpose  an  image.  Used to align the
+    spectra along lines or columns.
+
+(6) A  routine  to  apply  a  filter  to  lines  of  the   image.    For 
+    multi-spectra  images  a  smooth  quartz  is  produced  by  using  a 
+    running  quadratic  filter  along  each  line  of   the   dispersion 
+    dimension.   The  filter  must  be  able  to  recognize  bad  pixels 
+    (specified by a user defined threshold) and  remove  them  from  the
+    filtering operation.
+
+
+
+
+
+                                  -2-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+3.  Requirements for the MULTSPEC Package
+
+     The MULTISPEC package shall satisfy the following requirements.
+
+(1) The component programs shall be CL callable.
+
+(2) The  programs  shall interact only through image files and MULTISPEC
+    data files.
+
+(3) It shall be possible to extract spectra without modeling.
+
+(4) The entire image shall be extracted and not limited by  failures  in
+    the algorithms.
+
+(5) It  shall  be  possible  to  specify specific lines or swaths in the
+    image on which to operate.
+
+(6) CL scripts shall be provided for the  common  data  sources.   These
+    scripts will work automatically.
+
+The follow functions shall be provided:
+
+o   Make  an  initial  rough but automated identification of the spectra
+    locations.
+
+o   Provide for a user identification list for  the  spectra  locations.
+    This  list  shall  be  of  the  standard  image cursor type to allow
+    generation of the list with the standard image cursor programs.
+
+o   Determine and correct for a slowly varying background.
+
+o   Reliably and accurately trace spectra in the presence  of  geometric
+    distortions (pincushion, s, shear, etc.).
+
+o   Extract spectra by one of:
+
+    a.  Strips  of  constant width about the located spectra.  The width
+        may be specified to fractions of  a  pixel  and  the  extraction
+        will use fractional pixel interpolation.  l
+
+    b.  Strips of width proportional to a Gaussian width parameter.
+
+    c.  Modeling  to  obtain  estimates  of  the  total luminosity.  The
+        estimate will be the integral of the model.
+
+    d.  Summation   of   the   data   pixel   values   with   fractional  
+        contributions  of  the  pixel  value  to  the  spectra  based on
+        modeling.
+
+o   An option shall be available to  specify  whether  to  ignore  blank
+    pixels or use interpolated values.
+
+    o   Programs  shall  be  provided to produce data files which can be
+
+
+                                  -3-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+        accessed by one dimensional  spectroscopic  reduction  routines.
+        At a minimum these formats shall include:
+
+        a.  Reduction  to  an  image  file  consisting  of  one line per
+            extracted spectrum
+
+        b.  The  standard  IIDS  format   available   with   the   CYBER 
+            Multi-Aperture Plate programs
+
+
+3.2  Modeling Requirements
+
+     The  modeling  of multi-spectra images, particularly in the case of
+blended spectra, shall:
+
+(1) Model blended spectra with  sufficient  reliability  and  robustness
+    that  a  reasonable  solution is always obtained, though of possibly
+    limited usefulness.
+
+(2) The modeling shall provide estimates for the  uncertainties  in  the
+    fitted parameters as a function of position along the spectrum.
+
+(3) Remove  cosmic  rays  and other defective pixels by reference to the
+    model.
+
+(4) Allow the transfer of a model solution  for  one  image  to  another
+    image.
+
+(5) Display  numerically and graphically the data, the fitted model, and
+    the residuals.
+
+
+4.  Program Specifications
+
+
+4.1  Basic Programs
+
+     The basic programs of the package are general purpose  tools  which
+initialize  a  MULTISPEC  data  file  and  perform  a single fundamental
+operation on the data in the MULTISPEC data file.   There  is  one  data
+file  associated  with  each  image.   The  data file is hidden from the
+user and so the user need not be aware  of  the  data  file.   The  data
+files  are  referenced  only the image filename specified in the program
+parameters.  The data files contain such  information  as  a  processing
+history,  the  spectra  positions  and extracted luminosities, the model
+parameters (one set for each spectra for each modelled  image  line  (or
+swath),  etc.   The  programs  generally are allowed to specify specific
+lines, columns, and/or spectra on which to operate.   The  line,  column
+and  spectra  specifications  are given as strings which contain numbers
+separated by whitespace, commas,  and  the  range  indicator  "-".   The
+script  tasks  of  section  4.2  will  combine  these  basic programs to
+perform a general multi-spectra extraction.
+
+
+
+                                  -4-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+    ap_plate            copy_params     find_spectra    convolve
+    fit_bckgrnd         find_bckgrnd    line_list       model_extrac
+    model_fit           model_image     model_list      sigma_extract
+    strip_extract       to_iids         to_image        to_onedspec
+
+ap_plate
+    The information from an on-line data  file  containing  descriptions
+    of  all  the aperture plates prepared at Kitt Peak is read to find a
+    specified  aperture  plate.   The  drilled  aperture  positions  are 
+    correlated  with  the  spectra  in  the  image  to  deduce  relative 
+    wavelength offsets.  The identifications for  the  spectra  as  well
+    as  other  auxiliary  information  is recorded in the data file.  If
+    no  image  file  is  specified  then   only   the   aperture   plate 
+    information   is   printed.    This   program   is   used   in   the  
+    MULTIAP_EXTRACT program.  This  program  is  not  essential  to  the
+    operation of the MULTISPEC package.
+
+                    Multi-Spectra image  image = 
+                         Aperture plate  plate = 
+                                        (mode = ql)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                  -5-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+The Background
+    The  are  two possibilities for dealing with the background.  In the
+    first  case,  FIT_BCKGRND,  the  background  will   be   fitted   by 
+    polynomials  and  the  coefficients  stored  in  the  MULTISPEC data
+    file.  These coefficients are then used by  the  other  programs  to
+    estimate   the  background  at  the  spectra.   The  second  option, 
+    FIND_BCKGRND, generates a background  image  in  which  the  spectra
+    and  other  selected  areas are set to blank pixels.  Then a general
+    image interpolator is used fill in the blank pixels with  background
+    estimates.   The  other  MULTISPEC  programs  will  then access this
+    background frame.  The background frame image name  will  be  stored
+    in the MULTISPEC data file and the image header.
+
+
+    fit_bckgrnd
+        Fit  a  background  in  a  MULTISPEC image by a polynomial using
+        pixels not near the spectra and in  the  user  specified  swaths
+        and  columns.   The buffer distance is in pixels and refers to a
+        minimum distance from the center of any  spectrum  beyond  which
+        the  background  pixels  are found.  Blank pixels are ignored in
+        the background fit.  Deviant pixels will be rejected.
+
+                        Multi-Spectra image  image = 
+                        Buffer from spectra  buffer = 12
+                           Polynomial order  order = 3
+                            Lines per swath (lines_per_swath = 32)
+                              Swaths to fit (swaths = 1-1000)
+                             Columns to fit (columns = 1-1000)
+                        Rejection threshold (threshold = 5)
+                  Print general diagnostics (verbose = no)
+                                            (mode = ql)
+
+    find_bckgrnd
+        The spectra within a buffer distance  and  specified  areas  are
+        set  to  blank  pixels  and  the  remaining  pixels  copied to a
+        background image file.
+
+                        Multi-Spectra image  image = 
+                           Background image  background =
+                        Buffer from spectra  buffer = 12
+                            Lines to ignore (lines = )
+                          Columns to ignore (columns = )
+                                            (mode = ql)
+
+convolve
+    A program will be provided to reduce either the  extracted  spectrum
+    or the modeled image to a common point-spread function.
+
+
+
+
+
+
+
+
+                                  -6-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+copy_params
+    Create  a  MULTISPEC  data  file  for  a new image using appropriate
+    MULTISPEC parameters from an old image.  The  old  image  must  have
+    been  processed  to find the spectra using FIND_SPECTRA and possibly
+    model fit.
+
+                Old Multi-Spectra image  old_image = 
+                New Multi-Spectra image  new_image = 
+                                        (mode = ql)
+
+find_spectra
+    Initially locate the spectra in a MULTISPEC  image.   The  positions
+    of  the  spectra  within the range of columns are determined for the
+    starting line and then the spectra are tracked within the  range  of
+    lines.   The  minimum  separation  and minimum width would generally
+    be set for a particular instrument.   If  the  automatic  search  is
+    not  used  then a list of cursor positions is read from the standard
+    input.
+
+                    Multi-Spectra image  image = 
+                       Automatic search  auto = yes
+                          Starting line  start_line =
+                     Minimum separation (min_sep = 1)
+                          Minimum width (min_width = 1)
+                        Averaging width (average = 32)
+                        Lines to search (lines = 1-1000)
+                      Columns to search (columns = 1-1000)
+              Print general diagnostics (verbose = no)
+                                        (mode = ql)
+
+line_list
+    For the  specified  lines  in  the  image  print  the  image  column
+    number,  data  value  (possibly as a swath average), the model value
+    at that point (i.e. the sum of  the  model  contributions  from  all
+    the  spectra),  the  background  value,  and the residual.  Plotting
+    scripts may be written using this routine to show the quality  of  a
+    model fit.
+
+                    Multi-Spectra image  image = 
+                          Lines to list (lines = 1-1000)
+                                        (mode = ql)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                  -7-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+model_extract
+    A  previously  fitted  model  is  used  to extract the spectra total
+    luminosity by apportioning the data values to spectra in  the  ratio
+    indicated  by  the model.  If the clean option is specified then the
+    model is used to detect pixels which deviate from  the  model  by  a
+    specified  amount.   The  model  value replaces the deviant pixel in
+    the extraction and, if specified, also in the image file.
+
+                    Multi-Spectra image  image = 
+                       Lines to extract (lines = 1-1000)
+                          Clean spectra (clean = yes)
+                     Cleaning threshold (threshold = 5)
+                           Modify image (modify = yes)
+              Print general diagnostics (verbose = no)
+                                        (mode = ql)
+
+model_fit
+    A specified model is iteratively fitted to the data in each  of  the
+    specified  lines  (or  swaths)  until  the  RMS  residual  fails  to 
+    decrease.  The models  are  selected  by  a  string.   The  possible
+    values are
+
+        (null string) - initialize the model
+        i - fit only the intensity scale
+        ip - fit the intensity scale and the position
+        ips1 - fit the intensity scale, position, and one parameter shape
+        ips2 - fit the intensity scale, position, and two parameter shape
+        ips3 - fit the intensity scale, position, and three parameter shape
+        ips4 - fit the intensity scale, position, and four parameter shape
+    These  models  will  be  combined in a script to search for the best
+    fit.
+
+    The initial shape parameters will generally be set by scripts for  a
+    particular data reduction.
+
+                    Multi-Spectra image  image = 
+                             Model type  model = 
+                        Lines per swath (lines_per_swath = 32)
+                        Swaths to model (swaths = 1-1000)
+                         Initial shape1 (shape1 = .1 )
+                         Initial shape2 (shape2 = 0 )
+                         Initial shape3 (shape3 = 0 )
+                         Initial shape4 (shape4 = 5 )
+              Print general diagnostics (verbose = no)
+                                        (mode = ql)
+
+
+
+
+
+
+
+
+
+
+                                  -8-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+model_image
+    An  image  file of the fitted model is created.  This image may then
+    be displayed or a residual image may be calculated and displayed.
+
+                    Multi-Spectra image  image = 
+                            Model image  model =
+                                        (mode = ql)
+    .nf
+    .le
+    .ls model_list
+    For the specified lines and spectra the model is listed.
+    The listing gives, for each spectra,
+    the spectrum number, the line number, the fitted position,
+    the estimated wavelength, the
+    extracted luminosity, the intensity scale, model width parameters, and
+    the background polynomial coefficients.  This routine can be used in scripts
+    to plot the extracted spectra, the trend of width with wavelength, and so
+    forth.
+    
+    .nf
+                    Multi-Spectra image  image = 
+                          Lines to list (lines = 1-1000)
+                        Spectra to list (spectra = 1-1000)
+                                        (mode = ql)
+
+sigma_extract
+    A previously fitted model is used to extract the spectra  luminosity
+    within  a  specified  sigma  of  the peak.  Because the model is not
+    necessarily a Gaussian the sigma is used to  compute  the  intensity
+    ratio  of  the  cutoff to the peak assumining a Gaussian profile and
+    then the data is extracted to the point the  model  intensity  falls
+    below  that  cutoff.   If  the  clean  option  is specified then the
+    model is used to detect pixels which deviate from  the  model  by  a
+    specified  amount.   The  model  value replaces the deviant pixel in
+    the extraction and, if specified, also in the image file.
+
+                    Multi-Spectra image  image = 
+                 Sigma extraction width  width = 1.
+                       Lines to extract (lines = 1-1000)
+                          Clean spectra (clean = yes)
+                     Cleaning threshold (threshold = 5)
+                           Modify image (modify = yes)
+              Print general diagnostics (verbose = no)
+                                        (mode = ql)
+
+
+
+
+
+
+
+
+
+
+
+                                  -9-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+strip_extract
+    A strip of constant width about the spectra positions is  extracted.
+    If  cleanning  is  desired  a  smoothed  estimate  of the profile is
+    obtained by averaging a  number  of  lines  about  the  line  to  be
+    cleaned.   After  fitting  for  the intensity scale pixels are found
+    which deviate from the profile by a specified amount.   The  profile
+    value   replaces  the  deviant  pixel  in  the  extraction  and,  if 
+    specified, also in the image file.  No prior  modeling  is  required
+    to use this extraction routine.
+
+                    Multi-Spectra image  image = 
+                 Strip extraction width  width = 1.
+                       Lines to extract (lines = 1-1000)
+                          Clean spectra (clean = yes)
+                     Cleaning threshold (threshold = 5)
+              Lines per profile average (averge_lines = 32)
+                           Modify image (modify = yes)
+              Print general diagnostics (verbose = no)
+                                        (mode = ql)
+
+to_iids
+    For  a  specified prefix, files of the form prefix.nn, where nn is a
+    specified spectra  number,  are  created  containing  the  extracted
+    spectra  for  all  the  specified  image  files.   The format of the
+    files is the IIDS format  developed  for  the  CYBER  Multi-Aperture
+    Plate Extractions.
+
+                    Multi-Spectra image  images = 
+                   IIDS filename prefix  iids_file = 
+                      Spectra to format (spectra = 1-1000)
+                                        (mode = ql)
+
+to_image
+    An  image  file  containing  one  line of the extracted luminosities
+    for each specified spectra in the specified MULTISPEC image.
+
+                    Multi-Spectra image  in_image = 
+                Extracted spectra image  out_image = 
+                                Spectra (spectra = 1-1000)
+                                        (mode = ql)
+
+to_onedspec
+    The extractions are converted to an as yet to  be  specified  format
+    for use in the ONEDSPEC reduction package.
+
+                   Multi-Spectra images  images = 
+                     ONEDSPEC data file  onedspec_file = 
+                                Spectra (spectra = 1-1000)
+                                        (mode = ql)
+
+
+
+
+
+
+                                 -10-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+4.2  General MULTISPEC CL Scripts
+
+     The  general  MULTISPEC CL scripts perform a series of steps needed
+to extract the spectra from a specified  list  of  image  files.   These
+steps  have  been found to generally perform the desired extraction task
+fully.
+
+
+        multiap_extract         echelle_extract
+
+multiap_extract
+    The specified multi-aperture plate  images  are  extracted.   If  no
+    starting  solution  image,  one which has previously been extracted,
+    is specified then the script performs an automatic  search  for  the
+    specified  number  of  spectra.   Otherwise  the  solution  from the
+    starting image is used as the  initial  model.   The  background  is
+    then  determined.   This is followed by a series of fitting steps on
+    swaths of data.  (For further details on the fitting steps  see  the
+    Algorithms   paper).    A   MODEL_EXTRACT   and   cleaning  follows. 
+    Finally, the extraction is correlated with  the  specified  aperture
+    plate  using  AP_PLATE.   If  there  was no starting image then this
+    extraction becomes the initial solution  image.   Subsequent  images
+    are extracted starting from the initial solution image.
+
+                  Multi-Aperture images  images = 
+                 Initial solution image  initial = 
+                  Aperture plate number  plate = 
+                      Number of spectra  nspectra = 
+                                        (mode = ql)
+
+echelle_extract
+    The   specified  echelle  images  are  extracted.   If  no  starting 
+    solution  image,  one  which  has  previously  been  extracted,   is 
+    specified  then  the  script  performs  an  automatic search for the
+    specified  number  of  orders.   Otherwise  the  solution  from  the 
+    starting   image  is  used  as  the  initial  starting  point.   The 
+    background  is  then  determined.   Finally  a   STRIP_EXTRACT   and 
+    cleaning  is  performed.   If  there was no starting image then this
+    extraction becomes the initial solution  image.   Subsequent  images
+    are extracted starting from the initial solution image.
+
+                         Echelle images  images = 
+                 Initial solution image  initial = 
+                       Number of orders  norders = 
+                       Extraction width  width =
+                                        (mode = ql)
+
+
+5.  Outline of a MULTISPEC Reduction
+
+     The  following  outline  is for the reduction of a cryogenic camera
+multi-aperture plate.  All the programmer supplied  default  values  are
+used.
+
+
+                                 -11-
+MULTISPEC (Oct83)  Multi-Spectra Extraction Package    MULTISPEC (Oct83)
+
+
+
+        (1)  rcamera mtb, "ap165.", "s", "3-9"
+        (2)  debias "ap165.*"
+        (3)  multispec_flat "ap165.[36]", "ap165.flat"
+        (4)  flat_divide "ap165.*", "ap165.flat"
+        (5)  multiap_extract "ap165.*", "", 165, 50
+        (6)  to_onedspec "ap165.*", oned165
+
+
+(1) The  data  is  read  from  the observing tape(s) using RCAMERA.  The
+    image files created are ap165.3, ap165.4,  ...,  ap165.9.   This  is
+    easily  accomplished  by  using  the filename prefix "ap165." in the
+    RCAMERA program.  The raw images may be examined at  this  point  on
+    a display.
+
+(2) The  images  are  debiased  using DEBIAS with all the "ap165." files
+    specified.  The debias program  knows  about  the  location  of  the
+    bias strip for the cryogenic camera.
+
+(3) A  a  flat  field  is  created  using  MULTISPEC_FLAT  in  which the
+    desired  quartz  frames  are  specified  and  a  flat  field   image 
+    filename  is  defined.  The created flat field image may be examined
+    on an image display if desired.
+
+(4) All the  debiased  images  are  divided  by  the  flat  field  using
+    FLAT_DIVIDE.
+
+(5) The  script  MULTIAP_EXTRACT  is  run  in  which  the aperture plate
+    number, the number of spectra, and the image files to  be  extracted
+    are  specified.   The  number  of  spectra  is found by examining an
+    image on an image display or by plotting a cut  across  the  spectra
+    using a general image profile program.
+
+(6) Finally,  the  extracted  spectra  are  formatted  for  the ONEDSPEC
+    package using TO_ONEDSPEC with the extracted images specified.

@@ -1,0 +1,59 @@
+.help moon Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slMOON (IY, ID, FD, PV)
+
+     - - - - -
+      M O O N
+     - - - - -
+
+  Approximate geocentric position and velocity of the Moon
+  (single precision).
+
+  Given:
+     IY       i       year
+     ID       i       day in year (1 = Jan 1st)
+     FD       r       fraction of day
+
+  Returned:
+     PV       r(6)    Moon position & velocity vector
+
+  Notes:
+
+  1  The date and time is TDB (loosely ET) in a Julian calendar
+     which has been aligned to the ordinary Gregorian
+     calendar for the interval 1900 March 1 to 2100 February 28.
+     The year and day can be obtained by calling slCAYD or
+     slCLYD.
+
+  2  The Moon 6-vector is Moon centre relative to Earth centre,
+     mean equator and equinox of date.  Position part, PV(1-3),
+     is in AU;  velocity part, PV(4-6), is in AU/sec.
+
+  3  The position is accurate to better than 0.5 arcminute
+     in direction and 1000 km in distance.  The velocity
+     is accurate to better than 0.5"/hour in direction and
+     4 m/s in distance.  (RMS figures with respect to JPL DE200
+     for the interval 1960-2025 are 14 arcsec and 0.2 arcsec/hour in
+     longitude, 9 arcsec and 0.2 arcsec/hour in latitude, 350 km and
+     2 m/s in distance.)  Note that the distance accuracy is
+     comparatively poor because this routine is principally intended
+     for computing topocentric direction.
+
+  4  This routine is only a partial implementation of the original
+     Meeus algorithm (reference below), which offers 4 times the
+     accuracy in direction and 30 times the accuracy in distance
+     when fully implemented (as it is in slDMON).
+
+  Reference:
+     Meeus, l'Astronomie, June 1984, p348.
+
+  Called:  slS2C6
+
+  P.T.Wallace   Starlink   8 December 1994
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

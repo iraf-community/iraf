@@ -1,0 +1,58 @@
+.help fitslogr Dec85 noao.imred.vtel
+.ih
+NAME
+fitslogr -- Make a log of header information from a fits tape
+.ih
+USAGE
+fitslogr input_dev out_file startfnum endfnum
+.ih
+PARAMETERS
+.ls input_dev
+Tape drive, e.g. "mta1600" or just "mta"
+.le
+.ls out_file
+Name of output file to store information. Information is appended to this
+file to allow one to update a previously created file.
+.le
+.ls startfnum
+Tape file to start logging.
+.le
+.ls endfnum
+Tape file to stop logging.
+.le
+.ih
+DESCRIPTION
+Fitslogr reads FITS headers from successive tape files and compiles
+certain information into a single line of output for each file.
+Currently, the information output for each file includes:
+
+        Tape file number, IRAF image name, date, time, and the
+	Carrington longitude for each image.
+
+If all of these header parameters are not present, only the ones found
+will be printed out and garbage will come out for the empty parameters.
+The date is stored in a header parameter called OBS_DATE, the time is
+stored as 'seconds since midnight' in OBS_TIME and the Carrington
+longitude is stored in L_ZERO.
+To use this script, both the DATAIO package and the VTEL package must
+be loaded.
+.ih
+EXAMPLES
+1. To log all of the FITS images on a tape mounted on 'mta' and store the
+information in a file called 'CX052' the command would be:
+
+.nf
+	vt> fitslogr mta CX052 1 999
+.fi
+
+2. To log just the 40th through 60th files on mtb and see the output on
+your terminal, the command would be:
+
+.nf
+	vt> fitslogr mtb STDOUT 40 60
+.fi
+
+.ih
+SEE ALSO
+rfits
+.endhelp

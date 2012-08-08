@@ -1,0 +1,39 @@
+.help asiinit Dec98 "Image Interpolator Package"
+.ih
+NAME
+asiinit -- initialize the sequential interpolant descriptor using default parameters
+.ih
+SYNOPSIS
+include <math/iminterp.h>
+
+asiinit (asi, interp_type)
+
+.nf
+    pointer	asi		#O interpolant descriptor
+    int		interp_type	#I interpolant type
+.fi
+
+.ih
+ARGUMENTS
+.ls asi   
+Pointer to sequential interpolant descriptor.
+.le
+.ls interp_type
+Interpolant type. The options are II_NEAREST, II_LINEAR, II_POLY3, II_POLY5,
+II_SPLINE3, II_SINC, II_LSINC, and II_DRIZZLE for nearest neighbor, linear,
+3rd order polynomial, 5th order polynomial, cubic spline, sinc, look-up
+table sinc, and drizzle respectively. The interpolant type definitions are
+found in the package header file math/iminterp.h.
+.le
+.ih
+DESCRIPTION
+The interpolant descriptor is allocated and initialized. The pointer asi is
+returned by ASIINIT. The sinc interpolant width defaults to 31 pixels. The
+look-up table sinc interpolant resolution defaults to 20 intervals or
+0.05 pixels. The drizzle pixel fraction defaults to 1.0.
+.ih
+NOTES
+ASIINIT or ASISINIT must be called before using any other ASI routines.
+.ih
+SEE ALSO
+asisinit, asifree

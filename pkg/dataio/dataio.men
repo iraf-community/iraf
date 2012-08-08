@@ -1,0 +1,13 @@
+	 bintxt - Convert a binary file to an IRAF text file
+         export - Convert IRAF images to some other format
+         import - Convert some other format to an IRAF image
+      mtexamine - Examine the structure of a magnetic tape
+     rcardimage - Convert a cardimage file into a text file
+        reblock - Copy a binary file, optionally reblocking
+          rfits - Convert FITS image data into a list of IRAF images
+     rtextimage - Convert text files to IRAF images
+	    t2d - Fast tape to disk copy 
+	 txtbin - Convert an IRAF text file to a binary file
+     wcardimage - Convert text files to cardimage files
+	  wfits - Convert a list of IRAF images into FITS image data
+     wtextimage - Convert an IRAF image to a text file

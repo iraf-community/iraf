@@ -1,0 +1,27 @@
+	calcomp - Plot metacode on a Calcomp pen plotter
+	contour - Make a contour plot of an image
+	crtpict - Generate greyscale plots of IRAF images
+       gdevices - List available imaging or other graphics devices
+      gkidecode - Decode metacode on the standard output
+	 gkidir - Directory listing of metacode file
+     gkiextract - Extract individual frames from metacode file
+      gkimosaic - Condense metacode frames to fit on one page
+	  graph - Graph one or more image sections or lists
+	 hafton - Generate half-tone plots of an image
+	imdkern - Image display device (IMD) graphics kernel
+	 implot - Plot lines and columns of images using cursors
+       nsppkern - Plot metacode on a NSPP (NCAR) plotter device
+	   pcol - Plot a column of an image
+	  pcols - Plot the average of a range of image columns
+     phistogram - Plot or print the histogram of an image or list
+       pradprof - Plot or list the radial profile of a stellar object
+	   prow - Plot a line (row) of an image
+	  prows - Plot the average of a range of image lines
+	pvector - Plot an arbitrary vector in a 2D image
+      sgidecode - Decode an SGI format metacode file
+	sgikern - Simple graphics interface (SGI) graphics kernel
+        showcap - Show and decode graphcap entries
+       stdgraph - Plot metacode on the standard graphics device
+        stdplot - Plot metacode on the standard plotter device
+	surface - Make a surface plot of an image
+	velvect - Plot representation of a velocity field

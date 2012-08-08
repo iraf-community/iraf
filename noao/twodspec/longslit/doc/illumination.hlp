@@ -1,0 +1,220 @@
+.help iillumination Jul86 noao.twodspec.longslit
+.ih
+NAME
+iillumination -- Determine iillumination calibrations
+.ih
+USAGE
+iillumination images iilluminations
+.ih
+PARAMETERS
+.ls images
+Images to use in determining iillumination calibrations.  These are
+generally sky spectra.  An image section may be used to select only a
+portion of the image.
+.le
+.ls iilluminations
+Iillumination calibration images to be created.  Each iillumination image is
+paired with a calibration image.  If the image exists then it will be modified
+otherwise it is created.
+.le
+.ls interactive = yes
+Graph the average spectrum and select the dispersion bins
+and graph and fit the slit profile for each dispersion bin interactively?
+.le
+.ls bins = ""
+Range string defining the dispersions bins within which the slit profiles
+are determined.  If the range string is null then the dispersion
+bins are determined by the parameter \fInbins\fR.
+.le
+.ls nbins = 5
+If the dispersion bins are not specified explicitly by the parameter
+\fIbins\fR then the dispersion range is divided into this number of
+nearly equal bins.
+.le
+.ls sample = "*"
+Sample of points to use in fitting each slit profile.
+The sample is selected with a range string.
+.le
+.ls naverage = 1
+Number of sample points to average or median before fitting a function.
+If the number is positive the average of each set of naverage sample
+points is formed while if the number is negative then the median of each set
+of points (in absolute value) is formed.  This subsample of points is
+used in fitting the slit profile.
+.le
+.ls function = "spline3"
+Function to fit to each dispersion bin to form the iillumination function.
+The options are "spline1", "spline3", "legendre", and "chebyshev".
+.le
+.ls order = 1
+Order of the fitting function or the number of spline pieces.
+.le
+.ls low_reject = 0., high_reject = 0.
+Rejection limits below and above the fit in units of the residual sigma.
+.le
+.ls niterate = 1
+Number of rejection iterations.
+.le
+.ls grow = 0
+Reject additional points within this distance of points exceeding the
+rejection threshold.
+.le
+.ls interpolator = "poly3"
+Interpolation type.  One of "nearest", "linear", "poly3", "poly5", or
+"spline3".
+.le
+.ls graphics = "stdgraph"
+Graphics output device.  May be one of the standard devices "stdgraph",
+"stdplot", or "stdvdm" or an explicit device.
+.le
+.ls cursor = ""
+Graphics input device.  May be either null for the standard graphics cursor
+or a file containing cursor commands.
+.le
+.ih
+CURSOR KEYS
+The interactive curve fitting package \fBicfit\fR is used to fit a function
+to the average calibration spectrum.  Additional help on using this package
+and the cursor keys is available under the name "icfit".
+
+When the dispersion bins are set graphically the following cursor keys are
+defined.
+
+.ls ?
+Clear the screen and print a menu of the cursor options.
+.le
+.ls i
+Initialize the sample ranges.
+.le
+.ls q
+Exit interactive dispersion bin selection.
+.le
+.ls s
+Set a bin with the cursor.  This may be repeated any number of times.
+Two keystrokes are required to mark the two ends of the bin.
+.le
+
+The parameters are listed or set with the following commands which may be
+abbreviated.  To list the value of a parameter type the command alone.
+
+.nf
+:bins value		Iillumination bins
+:show			Show the values of all the parameters
+.fi
+.ih
+DESCRIPTION
+An iillumination calibration, in the form of an image, is created for each
+longslit calibration image, normally a sky spectrum.  The iillumination
+calibration is determined by fitting functions across the slit (the slit
+profiles) at a number of points along the dispersion, normalizing each fitted
+function to unity at the center of the slit, and interpolating the iillumination
+between the dispersion points.  The fitted data is formed by dividing the
+dispersion points into a set of bins and averaging the slit profiles within
+each bin.  The interpolation type is a user parameter.
+
+The image header keyword DISPAXIS must be present with a value of 1 for
+dispersion parallel to the lines (varying with the column coordinate) or 2
+for dispersion parallel to the columns (varying with line coordinate).
+This parameter may be added using \fBhedit\fR.  Note that if the image has
+been transposed (\fBimtranspose\fR) the dispersion axis should still refer
+to the original dispersion axis unless the physical world coordinate system
+is first reset (see \fBwcsreset\fR).  This is done in order to allow images
+which have DISPAXIS defined prior to transposing to still work correctly
+without requiring this keyword to be changed.
+
+If the output image does not exist it is first created with unit iillumination
+everywhere.  Subsequently the iillumination is only modified in those regions
+occupied by the input image.  Thus, an image section in the input image may
+be used to select the data to be used and for which an iillumination calibration
+will be determined.  This ability is particularly userful when dealing with
+multiple slits or to exclude regions outside the slit.
+
+The dispersion bins may be selected by a range string (\fIbins\fR) or,
+if no range string is given, by the number of bins into which the dispersion
+range is to be divided (\fInbins\fR).  When the interactive parameter
+is set (\fIinteractive\fR) then the average spectrum is graphed and the
+bins may be set using the cursor or with a colon command.  Once the bins
+have been selected exit with (q)uit to continue to the slit profile fitting.
+
+Fitting of the slit profiles is done using the interactive curve fitting
+package (\fBicfit\fR).  The parameters determining the fit are the
+sample points, the averaging bin size, the fitting function,
+the order of the function, the rejection sigmas, the number of
+rejection iterations, and the rejection width.
+The sample points for the average slit profile are selected by a range string.  
+Points in the slit profile not in the sample are not used in determining
+the fitted function.  The selected sample points may be binned into a
+set of averages or medians which are used in the function fit instead of the
+sample points with the averaging bin size parameter
+\fInaverage\fR.  This parameter selects the number of sample points to be
+averaged if its value is positive or the number of points to be medianed
+if its value is negative (naturally, the absolute value is used for the
+number of points).  A value of one uses all sample points without binning.
+The fitted function may be used to reject points from the fit using the
+parameters \fIlow_reject, high_reject, niterate\fR and \fIgrow\fR.  If
+one or both of the rejection limits are greater than zero then the sigma
+of the residuals is computed and points with residuals less than
+\fI-low_reject\fR times the sigma and greater than \fIhigh_reject\fR times
+the sigma are removed and the function fitted again.  In addition points
+within a distance given by the parameter \fIgrow\fR of the a rejected point
+are also rejected.  A value of zero for this parameter rejects only the
+points exceeding the rejection threshold.  Finally, the rejection procedure
+may be iterated the number of times given by the parameter \fIniterate\fR.
+
+The fitted functions may be examined and modified interactively when the
+parameter \fIinteractive\fR is set.  The user is asked before each dispersion
+bin whether to perform the fit interactively.  The possible response are
+"no", "yes", "NO", and "YES".  The lower case responses only affect the
+specified dispersion bin while the upper case responses affect all following
+dispersion bins for the current image.  Thus, if the response is "NO" then
+no further prompts or interactive curve fitting need be performed while if
+the response is "YES" there are no further prompts but the slit profile
+for each dispersion bin must be graphed and exited with (q)uit.
+Changes to the fitting parameters remain in effect until they are next
+changed.  This allows the fitting parameters to be selected from only the first
+dispersion bin without requiring each dispersion bin to be graphed and
+confirmed.
+
+When a dispersion bin is to be fitted interactively the average slit profile
+and the fitted function or the residuals of the fit are graphed.
+Deleted points are marked with an x and rejected points by a diamond.
+The sample regions are indicated along the bottom of the graph.
+The cursor keys and colon commands are used to change the values
+of the fitting parameters, delete points, and window and expand the
+graph.  When the fitted function is satisfactory exit with
+with a carriage return or 'q'.  The prompt for the next dispersion bin will
+then be given until the last dispersion bin has been fit.  The iillumination
+calibration image is then created.
+.ih
+EXAMPLES
+1. To create an iillumination image non-interactively:
+
+.nf
+	cl> iillumination sky illum nbins=8 order=20 interactive=no
+.fi
+
+2. To determine independent iilluminations for a multislit image determine the
+image sections defining each slit.  Then the iillumination functions are
+computed as follows:
+
+.nf
+	cl> iillumination sky[10:20,*],sky[35:45,*] illum,illum
+.fi
+
+3. Generally the slit image sections are prepared in a file which is then
+used to define the lists of input images and iilluminations.
+
+.nf
+	cl> iillumination @slits @illums
+.fi
+
+3.  If the DISPAXIS keyword is missing and the dispersion is running
+vertically (varying with the image lines):
+
+.nf
+	cl> hedit *.imh dispaxis 2 add+
+.fi
+.ih
+SEE ALSO
+icfit, response
+.endhelp

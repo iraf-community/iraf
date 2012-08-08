@@ -1,0 +1,33 @@
+.help pda2h Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slPDAH (P, D, A, H1, J1, H2, J2)
+
+     - - - - - -
+      P D A H
+     - - - - - -
+
+  Hour Angle corresponding to a given azimuth
+
+  (double precision)
+
+  Given:
+     P       d        latitude
+     D       d        declination
+     A       d        azimuth
+
+  Returned:
+     H1      d        hour angle:  first solution if any
+     J1      i        flag: 0 = solution 1 is valid
+     H2      d        hour angle:  second solution if any
+     J2      i        flag: 0 = solution 2 is valid
+
+  Called:  slDA1P
+
+  P.T.Wallace   Starlink   6 October 1994
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

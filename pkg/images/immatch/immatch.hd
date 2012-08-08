@@ -1,0 +1,32 @@
+# Help directory for the IMMATCH package
+
+$immatch	= "images$immatch/"
+$doc		= "images$immatch/doc/"
+$geometry	= "images$immatch/src/geometry/"
+$imcombine	= "images$immatch/src/imcombine/"
+$linmatch	= "images$immatch/src/linmatch/"
+$listmatch	= "images$immatch/src/listmatch/"
+$psfmatch	= "images$immatch/src/psfmatch/"
+$wcsmatch	= "images$immatch/src/wcsmatch/"
+$xregister	= "images$immatch/src/xregister/"
+
+geomap          hlp=doc$geomap.hlp,     src=geometry$t_geomap.x
+geotran         hlp=doc$geotran.hlp,    src=geometry$t_geotran.x
+geoxytran       hlp=doc$geoxytran.hlp,  src=geometry$t_geoxytran.x
+gregister       hlp=doc$gregister.hlp,  src=immatch$gregister.cl
+imalign		hlp=doc$imalign.hlp,	src=immatch$imalign.cl
+imcentroid	hlp=doc$imcentroid.hlp,	src=listmatch$t_imctroid.x
+imcombine       hlp=doc$imcombine.hlp,  src=imcombine$t_imcombine.x
+linmatch	hlp=doc$linmatch.hlp,	src=linmatch$t_linmatch.x
+psfmatch	hlp=doc$psfmatch.hlp,	src=psfmatch$t_psfmatch.x
+skymap		hlp=doc$skymap.hlp,	src=immatch$skymap.cl
+skyxymatch	hlp=doc$skyxymatch.hlp,	src=wcsmatch$t_skyxymatch.x
+sregister       hlp=doc$sregister.hlp,  src=immatch$sregister.cl
+wcscopy		hlp=doc$wcscopy.hlp,	src=wcsmatch$t_wcscopy.x
+wcsmap		hlp=doc$wcsmap.hlp,	src=immatch$wcsmap.cl
+wcsxymatch	hlp=doc$wcsxymatch.hlp,	src=wcsmatch$t_wcsxymatch.x
+wregister       hlp=doc$wregister.hlp,  src=immatch$wregister.cl
+xregister       hlp=doc$xregister.hlp,  src=xregister$t_xregister.x
+xyxymatch       hlp=doc$xyxymatch.hlp,  src=listmatch$t_xyxymatch.x
+revisions	sys=Revisions
+

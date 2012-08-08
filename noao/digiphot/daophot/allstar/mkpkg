@@ -1,0 +1,32 @@
+# ALLSTAR task
+
+$checkout libpkg.a ".."
+$update libpkg.a
+$checkin libpkg.a ".."
+$exit
+
+libpkg.a:
+	dpabuf.x	<imhdr.h>		../lib/daophotdef.h       \
+			../lib/allstardef.h
+	dpaconfirm.x	../lib/daophotdef.h
+	dpcache.x  	 <imhdr.h>		<mach.h>                  \
+			 ../lib/daophotdef.h	../lib/allstardef.h
+	dpregroup.x
+	dprectify.x
+	dpalwrite.x	<tbset.h>               <time.h>                  \
+			../lib/daophotdef.h     ../lib/apseldef.h         \
+			../lib/allstardef.h
+	dpastar.x	<mach.h>                <imhdr.h>                 \
+			../lib/daophotdef.h	../lib/allstardef.h       \
+			../lib/apseldef.h
+	dpalphot.x	<mach.h>		<imhdr.h>		  \
+			../lib/daophotdef.h     ../lib/apseldef.h         \
+			../lib/allstardef.h
+	dpalinit.x 	<imhdr.h>		<mach.h>                  \
+			<math.h>                ../lib/daophotdef.h       \
+			../lib/allstardef.h
+	dpglim.x
+	dpalmemstar.x	../lib/daophotdef.h	../lib/allstardef.h
+	t_allstar.x  	<fset.h>		../lib/daophotdef.h       \
+			<imhdr.h>
+	;

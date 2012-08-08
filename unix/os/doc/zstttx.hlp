@@ -1,0 +1,50 @@
+.help zstttx May84 "System Interface"
+.ih
+NAME
+zstttx -- get file status for a text file
+.ih
+SYNOPSIS
+.nf
+zstttx (chan, param, lvalue)
+
+int	chan			# OS channel assigned to file
+int	param			# magic code for parameter
+long	lvalue			# return value of parameter
+.fi
+.ih
+DESCRIPTION
+The \fBzstttx\fR primitive is used to obtain file, device, and machine
+dependent information for the text file (and device) connected to the
+channel \fIchan\fR.  The magic integer \fIparam\fR selects the parameter
+to be returned; a separate call is required to access each parameter.
+.ls
+.ls FSTT_BLKSIZE        (=1)
+Not used for text files; return value is undefined (but must be >= 0).
+.le
+.ls FSTT_FILSIZE        (=2)
+The current file size in machine bytes, possibly including space for record
+headers.  This parameter is purely informative and must not be used to
+direct the flow of control, since the current file size is not a well defined
+quantity for a text file.
+.le
+.ls FSTT_OPTBUFSIZE     (=3)
+The optimum, i.e. default, buffer size for a FIO text file line buffer.
+Normally the same as SZ_LINE.
+.le
+.ls FSTT_MAXBUFSIZE     (=4)
+The maximum buffer size for a FIO text file line buffer.
+Normally the maximum record size for the output device.
+If there is no maximum value zero is returned.
+.le
+.le
+.ih
+RETURN VALUE
+ERR is returned (coerced into a long integer) if \fIchan\fR or \fIparam\fR
+is illegal.  The legal \fIlvalues\fR are all nonnegative integer values.
+.ih
+NOTES
+The file size is meaningless if the file is a terminal.
+.ih
+SEE ALSO
+zfiotx
+.endhelp

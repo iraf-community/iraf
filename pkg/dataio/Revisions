@@ -1,0 +1,887 @@
+.help revisions Jun88 pkg.dataio
+.nf
+
+dataio$lib/mkpkg
+    The getdatatype.x and ranges.x files were duplicates of those in the
+    XTOOLS library which is linked in dataio.  These files should be the
+    versions actually linked in the binary, making XTOOLS unnecessary, but
+    I think the intent was to use XTOOLS.  The getdatatype.x is identical
+    but there are slight changes in ranges.x.  These files were left in
+    place in case there are problems found but the binary should now be
+    using the XTOOLS versions.  (12/5/08, MJF)
+
+dataio$import/ipproc.gx
+    Fixed a type flag being used to determine byte-swapping. (12/5/08, MJF)
+
+dataio$import/t_import.x
+    Fixed a type declaration (1/21/08, MJF)
+
+dataio$export/exraster.gx
+    Fixed a bug in computing the number of output pixels (1/5/04, MJF)
+
+dataio$import/ipproc.gx
+    An operand point was possibly being freed twice, once in the ip_wrline()
+    procedure and again in the evvfree() call when processing completed.  
+    This could cause a segfault on some system (9/27/02, MJF)
+
+dataio$export/exraster.gx
+dataio$export/bltins/exppm.x
+    There was a bug in the generation of PPM files when using images with
+    and odd number of columns causing the line to be too long by one byte.
+    The output image will now truncate the last column to avoid this since
+    we cannot write byte data. (8/9/02, MJF)
+
+dataio$export/export.h
+    Changed the zscale sampling parameters to use more points spread out
+    over more of the image.  The old values would sometimes find an
+    innappropriate z1/z2 range causing problems when doing many images in
+    batch mode.  (3/20/02, MJF)
+
+dataio$fits/t_rfits.x
+dataio$imtext/t_rtextimage.x
+    Changed the clgetc calls to to clgstr calls for the datatype parameter
+    in rfits and the otype parameter in rtextimage. This change is required
+    to avoid an "ERROR: Parameter not a legal character constant (parname)"
+    error introduced by recent changes to the CL. Basically "" is no longer
+    a legal argument for clgetc. (6/15/01 LED)
+
+dataio$fits/fits_rheader.x
+    Fixed a bug in the MEF file reading error recovery code that can cause
+    a segvio due to a too many open file descriptors condition. (5/1/01 LED)
+
+dataio$export/bltins/expgm.x
+dataio$export/bltins/exppm.x
+    Fixed a bug in writing the header for these formats on PCIX.  (6/23/00 MJF)
+
+dataio$export.par
+    Made the 'format' parameter automatic mode (5/16/00 MJF)
+
+dataio$export/expreproc.x
+    Modified so that the 'overlay' colors are not scaled.  (5/16/00 MJF)
+
+dataio$reblock/t_reblock.x
+dataio$reblock/reblock_file.x
+    Fixed a bug in the output block writing code caused by a failure to
+    check the status return of the awaitb call. At the same time worked
+    around a longstanding  problem in tape to tape copies caused by
+    trying to open and close a magtape file for writing when there is
+    no data and fixed an initialization bug in the record trimming and
+    padding code that has been there a long time. (2/9/00 LED)
+
+dataio$import/ipdb.gx
+    Fixed a string overflow bug causing segvios on PCs (12/13/99 MJF)
+
+dataio$import.par
+dataio$export.par
+    Changed query param modes to auto to avoid prompt from epar :go 
+    command. (11/4/99 MJF)
+
+dataio$export/bltins/exeps.x
+    Fixed an array overrun when writing EPS trailer comments. (10/25/99 MJF)
+
+dataio$export/mkpkg
+dataio$export/*/mkpkg
+dataio$import/mkpkg
+dataio$import/*/mkpkg
+    Fixed missing/extra file dependencies  (9/20/99, MJF)
+
+dataio$export/exrgb8.x
+    Fixed a bug causing the cmap() function to write a garbage line at the
+    top or bottom of the output image. (8/20/99 MJF)
+
+dataio$export/exzscale.x
+dataio$import/t_import.x
+dataio$import/bltins/ipgif.x
+    Cleaned up some missing sfree() calls.  (7/28/99 MJF)
+
+dataio$fits/wfits.h
+dataio$fits/fits_cards.x
+dataio$fits/fits_params.x
+    Modified wfits to write the DATE keyword value in the new format (including
+    a time field) and in units of GMT. (5/8/99 LED)
+
+dataio$export/bltins/exhdr.x
+    Changed the binary file header to use a 4-digit year (5/5/99, er..1999 MJF))
+
+dataio$export/bltins/exras.x
+dataio$export/bltins/exxwd.x
+    Fixed a bug in which rasterfiles and XWD file aren't swapped on LSB
+    machines when requested by the user. (12/14/98 MJF)
+
+dataio$import/t_import.x
+dataio$import/ipproc.gx
+    Fixed a bug preventing 1-D data from being converted.  (12/10/98 MJF))
+
+dataio$import/t_import.x
+    Modified to initialize the 'use_cmap' flag to on by default so 8-bit
+    colormap images will be converted correctly.  (7/14/98 MJF)
+
+dataio$fits/fits_cards.x
+    Added a check for pre-existing IRAFNAME keywords to the wfits task
+    (6/18/98 LED)
+
+dataio$export/exzscale.x
+dataio$export/t_export.x
+dataio$export/exobands.gx
+dataio$export/bltins/exeps.x
+dataio$export/bltins/exgif.x
+dataio$export/bltins/exrgb.x
+dataio$export/bltins/exxwd.x
+    Removed some unused variable and fixed type clashes (3/28/98  MJF)
+
+dataio$export/expreproc.x
+    Fixed a bug where the setcmap function was finding the colormap name
+    incorrectly when '@' params were used in a zscale function (2/2/98  MJF)
+
+dataio$import/t_import.x
+dataio$import/ipobands.gx
+    Fixed a bug in which use of the red()/green()/blue() functions caused
+    the size of the output image to be computed incorrectly. (12/12/97 MJF)
+
+dataio$fits/fits_read.x
+    Fixed a bug in the header listing code which resulted in rfits reading
+    through the whole image after listing the data when EXTENSION = N.
+    (11/3/97 LED)
+
+dataio$fits/fits_read.x
+    Fixed a bug in the global header handling code that could result a
+    the global image header being left in the tmp$ directory.
+    (8/6/97 LED)
+
+dataio$wfits.par
+dataio$fits/t_wfits.x
+dataio$doc/wfits.hlp
+    Added a new parameter call fextn whose default value is "fits" to the
+    wfits task. A ".fextn" suffix is appended to the output disk file names
+    to ensure that they are compatable with the fits kernel.
+    (6/20/97 LED)
+
+dataio$rfits.par
+dataio$wfits.par
+dataio$doc/rfits.hlp
+dataio$doc/wfits.hlp
+dataio$fits/fits_cards.x
+dataio$fits/fits_files.x
+dataio$fits/fits_params.x
+dataio$fits/fits_read.x
+dataio$fits/fits_rheader.x
+dataio$fits/fits_rimage.x
+dataio$fits/fits_rpixels.x
+dataio$fits/fits_wheader.x
+dataio$fits/fits_wimage.x
+dataio$fits/fits_wpixels.x
+dataio$fits/fits_write.x
+dataio$fits/mkpkg
+dataio$fits/rfits.com
+dataio$fits/rfits.h
+dataio$fits/t_rfits.x
+dataio$fits/t_wfits.x
+dataio$fits/wfits.com
+dataio$fits/wfits.h
+    Installed new versions of rfits and wfits. The new rfits and wfits
+    include support for: 1) reading and writing multi-extension fits files,
+    2) reading and writing global header, 3) reading and writing ushort
+    images by default when appropriate.
+    (6/9/97 LED)
+
+
+dataio$doc/export.hlp
+dataio$export/excmap.x
+dataio$export/cmaps.inc
+    Added the 'overlay' cmap as a builtin cmap. (6/6/97)
+
+dataio$export/expreproc.x
+    Removed a call to scale the colormaps when using the default values.
+    Cmaps are now only scaled when a brightness/contrast value is set in
+    the setcmap() function.  (6/6/97  MJF)
+
+dataio$export/bltins/exgif.x
+    Fixed a small error in the output of GIF files causing some display
+    programs to complain.  GIF images which would now be an odd number of
+    bytes have an extra trailing ';' delimiter.  This should be harmless
+    as all processing is supposed to stop once that char is found. (6/6/97 MJF)
+
+dataio$mkpkg
+dataio$dataio.cl
+dataio$dataio.hd
+dataio$dataio.men
+dataio$x_dataio.x
+dataio$import/			+
+dataio$import.par		+
+dataio$export/			+
+dataio$export.par		+
+dataio$doc/import.hlp		+
+dataio$doc/export.hlp		+
+    Installed the IMPORT/EXPORT task for general use.  The images database
+    used by the IMPORT task is currently defined to be dataio$import/images.dat.
+    (3/31/97 MJF)
+
+
+dataio$fits/fits_rheader.x
+    Explictly set SIMPLE(fits) to YES the first time this card is encountered
+    so that duplicate fits SIMPLE cards are properly filtered out. Duplicate
+    SIMPLE cards are illegal fits so this should never happen but ...
+    (6/28/96 Davis).
+
+dataio$fits/fits_cards.x
+    Added some wfits code to filter any "END     " keywords out of the image
+    header userarea.
+    (3/17/95 Davis)
+
+dataio$fits/t_wfits.x
+    Wfits was using the name of the @file instead of the first file  as the
+    root output fits file name if the number of output files was 1.
+    (1/18/95 Davis)
+
+dataio$fits/fits_wheader.x
+    The autoscaling code was failing  in the case bitpix=16 and pixtype=ushort.
+    Bscale and bzero values were being set to 1.0 and 0.0 respectively,
+    resulting in truncation of data values. The code has been modified to
+    set bscale and bzero to 1.0 and 32768 instead.(10/18/94 Davis)
+
+dataio$imtext/t_rtextimage.x
+dataio$imtext/t_wtextimage.x
+dataio$imtext/rt_cvtpix.x
+dataio$rtextimage.par
+dataio$wtextimage.par
+dataio$doc/rtextimage.hlp
+dataio$doc/wtextimage.hlp
+    A parameter "pixels" was added to select whether to read or write
+    the pixel values.  This is complementary to rfits/wfits and allows
+    use of these tasks to store and restore image headers.  (10/22/93, Valdes)
+
+dataio$reblock/t_reblock.x: Davis, Jan 20, 1993
+    Added support for multiple disk file input and output to the reblock
+    task.
+
+dataio$fits/fits_read: Davis, Apr 27, 1992
+    Modified rfits to use the fe parameter to skip to EOF for devices
+    e.g. cartridge tapes which seem to be having problems with file
+    skips.
+
+dataio$fits/t_rfits.x: Davis, Mar 25, 1992
+    Rfits was using the name of the @file instead of the first file  as the
+    root output image name if the number of output files was 1.
+
+dataio$fits/fits_read: Davis, Feb 27, 1992
+    Changed the interpreation of the fe parameter as read from dev$tapecap
+    from MB to KB.
+
+dataio$fits/fits_write: Davis, Feb 18, 1992
+    Replaced a call to imgimage with one to imgcluster to extract the root
+    image name minus cluster and section.
+
+dataio$fits/t_rfits.x: Davis, Feb 18, 1992
+dataio$fits/t_wfits.x: Davis, Feb 18, 1992
+    Changed the maximum sequence number that can be appended to an output
+    root image of fits file name from 999 to 9999.
+
+dataio$fits/rfits.com: Davis, Feb 18, 1992
+dataio$fits/t_rfits.x: Davis, Feb 18, 1992
+dataio$fits/fits_read.x: Davis, Feb 18, 1992
+    Implemented a scan mode in rfits so that devices which have a slow
+    single-file file skip function (e.g. dat drives) can be used more
+    efficiently with the rfits make_image=no option.
+
+dataio$fits/fits_params.x: Davis, Feb 17, 1992
+    Modified wfits so that string parameters that are 1) written explictly
+    by wfits, and 2) <= 20 characters long including quotes, will have the /
+    in column 33 instead of 2 spaces past the end of the string. The
+    affected keywords are OBJECT, ORIGIN, DATE, IRAFNAME, IRAF-BPX, and
+    IRAFTYPE.
+
+dataio$fits/fits_wheader.x: Davis, Feb 17, 1992
+    Modified the short_header=yes option in wfits so that the image pixel
+    type, fits bitpix, and the scaling parameters are printed on the
+    standard output.
+
+dataio$fits/fits_rimage.x: Davis, Feb 17, 1992
+dataio$fits/fits_wimage.x: Davis, Feb 17, 1992
+    Modified rfits so that the ieee +/-NaNs, and +/-Infs are correctly
+    mapped to a user specified native floating point number. Underflow values
+    are automatically converted to 0.0. A warning message is printed on
+    the terminal if any bad pixels were replaced.  A warning message is
+    also printed if valid floating point pixel values > MAX_REAL or <
+    -MAX_REAL were detected. Imreplace can be used to replace these
+    explicitly.
+
+dataio$fits/fits_rheader.x: Davis, Feb 14, 1992
+    Modified rfits to replace control characters decimal 0 (00X) to
+    31 (1FX) and decimal 127 (7FX) with the blank character. The
+    new fits standard now explicitly defines these illegal in fits
+    headers.
+
+dataio$wfits.par: From, Davis, Feb 13, 1992
+dataio$doc/wfits.hlp: From, Davis, Feb 13, 1992
+dataio$fits/wfits.h: From, Davis, Feb 13, 1992
+dataio$fits/t_wfits.x: From, Davis, Feb 13, 1992
+dataio$fits/fits_write.x: From, Davis, Feb 13, 1992
+dataio$fits/fits_wheader.x: From, Davis, Feb 13, 1992
+dataio$fits/fits_wimage.x: From, Davis, Feb 13, 1992
+dataio$fits/fits_wpixels.x: From, Davis, Feb 13, 1992
+    1. Modified wfits to fetch the default fits blocking factor for a device
+    from the dev$tapecap file. The user can still overrride this value
+    (which is usually set to 10) for variable blocked devices, but is no
+    longer required to know or set the block size for fixed block devices
+    like cartridge tapes.
+
+dataio$mtexamine/t_mtexamine.x: From, Davis, Jan 6, 1992
+dataio$cardimage/t_rcardimage.x: From, Davis, Jan 6, 1992
+dataio$cardimage/t_wcardimage.x: From, Davis, Jan 6, 1992
+dataio$reblock/t_reblock.x: From, Davis, Jan 6, 1992
+dataio$fits/t_rfits.x: From, Davis, Jan 6, 1992
+dataio$fits/t_wfits.x: From, Davis, Jan 6, 1992
+    1. Modified the mtexamine, rcardimage, wcardimage, reblock, rfits, and
+    wfits tasks to accept the new magtape file name syntax.
+
+dataio$reblock/t_reblock.x: From, Davis, Dec 11, 1991
+    1. Modified reblock so that character constants like '\n' can be
+    used as record padding characters.
+
+dataio$t2d/mkpkg: From Davis, Dec 3, 1991
+    1. Removed the printf.h file dependency from the mkpkg.
+
+dataio$imtext/mkpkg: From Davis, Dec 3, 1991
+    1. Added missing files dependencies for the files rt_rheader.x
+    (imio.h) and wti_wheader.x (imio.h).
+    
+dataio$fits/mkpkg: From Davis, Dec 3, 1991
+dataio$fits/fits_read.x
+    1. Added missing files dependencies for the files fits_rheader.x
+    (ctype.h) and fits_wimage.x (error.h).
+    2. Removed unused "include <imset.h>" statement from fits_read.x
+
+dataio$cardimage/mkpkg: From Davis, Dec 3, 1991
+    1. The entries for t_rcardimage.x and t_wcardimage.x were missing
+    several file dependencies.
+
+dataio$fits/fits_cards.x: From Davis, Oct 15, 1991
+    1. Changed the name of the IRAF-B/P keyword to IRAF-BPX to conform to the
+    new FITS standard.
+
+dataio$fits/fits_rpixels.x: From Davis, Oct 9, 1991
+    1. The rfits task has been modified to permit a short last record, i.e.
+    a last record that has not been padded out to 2880 bytes, without
+    generating any warning messages.
+
+dataio$fits/wfits.h: From Davis, Jun 11, 1991
+dataio$fits/t_wfits.x: From Davis, Jun 11, 1991
+dataio$fits/fits_write.x: From Davis, Jun 11, 1991
+dataio$fits/fits_wheader.x: From Davis, Jun 11, 1991
+    1. The wfits task has been modified to write IEEE format FITS files
+    (fits bitpix = -32 and -64), instead of scaled integers if the input
+    image pixel type is real or double respectively and if the wfits parameter
+    bitpix is left at the default. If the user overrides the default and
+    elects to scale the data, a warning message with an estimate of the
+    precision loss is provided.
+
+dataio$fits/fits_write.x: From Davis, Jun 10, 1991
+dataio$fits/fits_read.x: From Davis, Jun 10, 1991
+    1. Modified the fits writer and reader so that the IRAFNAME parameter
+    can deal with image sections. The fits writer will now record image
+    sections in the IRAFNAME parameter instead of inserting a blank.
+    The directory specification is still stripped. The fits reader will
+    now strip off any section notation before attempting to rename
+    the output image.
+
+dataio$fits/fits_rimage.x: From Davis, Jan 17, 1991
+dataio$fits/fits_wimage.x: From Davis, Jan 17, 1991
+    1. Modified the scaling routines in rfits and wfits to minimize
+    the precision lost when converting from real pixels to fits integers
+    and vice versa. 
+
+dataio$cardimage/t_rcardimage.x: From Davis, Jan 3, 1991
+dataio$doc/rcardimage.hlp: From Davis, Jan 3, 1991
+    1. Modified rcardimage so that the error message encountered
+    when an odd-blocked rcardimage tape is encountered is less obscure.
+    2. Modified the rcardimage help page to include an example of how to
+    reformat and odd-blocked cardimage tape with reblock.
+
+dataio$fits/t_rfits.x: From Davis, Dec 6, 1990
+    1. Modified rfits so that it will supply a temporary root output file
+    name if old_irafname="yes" and quit with a clear error message if
+    old_irafname="no", in the case where the user sets the output file
+    to the null string "".
+
+dataio$fits/fits_rheader.x: From Davis, Sept 11, 1990
+    1. Changed rfits so that history cards know go into the user area
+    instead of the history area where they get truncated.
+
+dataio$fits/wfits.h: From Davis, August 15, 1990
+dataio$fits/t_wfits.x: From Davis, August 15, 1990
+dataio$fits/fits_write.x: From Davis, August 15, 1990
+dataio$fits/fits_wimage.x: From Davis, August 15, 1990
+dataio$fits/fits_wpixels.x: From Davis, August 15, 1990
+dataio$fits/fits_rpixels.x: From Davis, August 15, 1990
+    1. Wfits will now permit FITS blocking factors up to and including
+    22 although a warning message will be issued if a blocking factor
+    > 10 is requested.
+
+    2. Wfits occasionally crashed with a segmentation violation if a
+    non-standard fits blocking factor was selected. This error was
+    triggered if the unused portion of the output block to be blank
+    filled was greater than 2880 bytes. This bug has been fixed in
+    2.10
+
+    3. Rfits was not reading FITS data with a block size < 2880 on
+    the 9-track drives correctly. This bug has been fixed in 2.10.
+
+    4. Wfits.rfits now sets the length of the user area to the maximum of
+    the default of 28800 chars and the value of the environment variable
+    "min_lenuserarea".
+
+dataio$fits/fits_wheader.x: From Davis, July 3, 1990
+dataio$fits/fits_cards.x: From Davis, July 3, 1990
+dataio$fits/fits_rheader.x: From Davis, July 3, 1990
+    Fixed a problem in the way bscale and bzero were computed that was
+    causing floating point errors for some double precision images,
+    basically because the precision was worse than I thought.
+    The really problem is that the min and max of a double precision
+    image are  stored as reals in the image header do they do not
+    quite correspond to what is in the image. The solution was to extend
+    the values of the min and max to slightly lower and higher values
+    respectively. These problems will go away when ieee becomes more
+    accepted. (See messages below for history of this problem)
+
+    Wfits now checks for the presence of the FITS keywords SIMPLE, BITPIX,
+    NAXIS and NAXISn in the user area and filters them out before writing
+    the FITS header.
+
+    Rfits will now ignore FITS keywords that are duplicates of SIMPLE,
+    BITPIX, NAXIS and NAXISn. A warning message is issued if any of
+    these keywords are duplicated.
+
+dataio$fits/fits_wheader.x: From Davis, April 21
+dataio$fits/fits_write.x: From Davis, April 21
+dataio$fits/fits_read.x: From Davis, April 21
+    The original scaling algorithm was restored due to problems encountered
+    with the new one. This will be looked into more fully in version 2.10.
+    These means that a problem with double precision images may remain.
+
+    Since I had to make the above change at the last minute I added some
+    code to flush the STDOUT  after in input and output file names
+    are computed and written to STDOUT. This avoids a problem with
+    output not being flushed when an error condition occurs and output
+    is being redirected causing confusion for the user who may not be able
+    to tell where the error occured in that case.
+
+dataio$fits/fits_wheader.x: From Davis, Mar 24, 1990
+    Fixed a problem with the scaling routines in wfits. Images with a
+    minimum which was negative and distant from the majority of the
+    data values could cause a problem in the scaling.
+
+dataio$fits/fits_rimage.x: From Davis, Mar 10, 1990
+    Recoded the routine that computes the mins and maxs of an image
+    slightly to remove a problem with the STF kernel. The mins and maxs
+    of the image were being reset to 0 when the first data was written
+    over-riding the program initialization of MAX_REAL and -MAX_REAL
+    and defeating the minimum calculation for all positive data.
+
+dataio$fits/fits_wheader.x: From Davis, Mar 9, 1990
+    Fixed a problem in the way bscale and bzero were computed that was
+    causing floating point errors for some double precision images,
+    basically because the precision was worse than I thought.
+    The really problem is that the min and max of a double precision
+    image are  stored as reals in the image header do they do not
+    quite correspond to what is in the image. The solution was to extend
+    the values of the min and max to slightly lower and higher values
+    respectively. These problems will go away when ieee becomes more
+    accepted.
+
+dataio$fits/fits_cards: From Davis, Jan 20, 1990
+    Added a filter to remove duplicate IRAF-MIN, IRAF-MAX, IRAFTYPE,
+    and IRAF-B/P keywords from the user area. 
+
+dataio$fits: From Davis, Jan 19, 1990
+    1. Support was added for the IEEE floating point format to both
+    the rfits and wfits tasks. Rfits now recognizes -32 and -64 to
+    be legal values of bitpix representing respectively real and
+    double IEEE floating point format. Values of bscale and bzero
+    are applied if present in the header. By default wfits still
+    writes integer format FITS tapes with autoscaling. However if
+    the users selects a bitpix of -32 or -64 the appropriate floating
+    point format is written. In this case scaling is disabled.
+
+    2. Rfits was modified to take a list of output images names or
+    an output image root name.
+
+    3. Wfits was modified to take a list of output fits file names
+    or an output fits file root name.
+
+dataio$fits/fits_wheader.x: From Davis, Nov 20, 1989
+    1. Fixed wfits so it would write out type "ushort" images correctly
+    with the default parameters. The chosen bitpix is 32 instead of
+    16.
+
+dataio$fits/t_rfits.x,t_wfits.x: From Davis, May 29, 1989
+    1. Changed both these tasks so the STDOUT is only flushed on a newline
+    if has not been redirected. Changed the remaining eprintf statements
+    to printf statements.
+
+dataio$fits/fits_rheader.x: From Davis, May 9, 1989
+    1. Fixed abug in the code which decodes hms format numbers. The
+    problem was caused by leading blanks and the fact that the ctoi
+    routine does not recognize the plus character.
+
+dataio$fits/t_wfits.x: From Davis, Mar 31, 1989
+dataio$fits/wft_wimage.x: From Davis, Mar 31, 1989
+dataio$fits/wft_wpixels.x: From Davis, Mar 31, 1989
+    1. Changed wfits so that a warning message is printed if the fits
+    long blocks option is used. The previous version only warned the
+    user if an illegal fits block size was used.
+    2. Changed wfits so that the record structure written is printed
+    out on the standard output if short_header = yes as well as if
+    long_header = yes.
+    3. Changed the error trapping code so that the number of records
+    actually written is printed out when wfits terminates prematurely
+    with an error condition.
+
+
+dataio$fits/t_wfits.x: From Davis, Mar 14, 1989
+dataio$fits/fits_rpixels: From Davis, Mar 14, 1989
+    1. Changed wfits so that warning messages are printed if the user
+    overrides the default value of bitpix or turns of autoscaling.
+    These messages will be printed to the standard output along with
+    the output log.
+    2. I have fixed a problem in the error checking code in rfits.
+    Too many reads were being done after an error recovery resulting
+    in the data in the output image being skewed. This needs to be
+    rechecked on DRACO where the original error recovery was done.
+
+dataio$reblock: From Davis, Jan 27, 1989
+    1. Fixed a problem in reblock for tape to tape copies. The copyn parameter
+    was being ignored if no reblocking was occurring. This problem has been
+    fixed. A minor problem with the record counter was also fixed.
+
+dataio$fits: From Davis, Apr 14, 1988
+    1. Added an option in wfits to write a non-standard physical block size
+    of blocking_factor > 10. This permits users with restricted block
+    size devices to read and write fits tapes.
+
+    2. Changed the cl file name template commands inside wfits to images
+    name template commands.
+
+dataio$fits: From Davis, Mar23, 1988
+    1. Fixed a bug in the fits string parameter trimming routine in which
+    the newline was being overwritten if the string was exactly 80
+    characters long.
+
+dataio$rfits: From Davis, December 11, 1987
+    1. Fixed a small bug in the rfits disk handling code. If a user
+    successfully read a fits disk file, for example fitsdat, and then
+    tried to read a list of files using a template which did not match
+    any of the disk files, rfits would try to reread fitsdat. Rfits was
+    not handling the 0 length disk file list condition correctly.
+
+dataio$rfits: From Davis, December 3, 1987
+    1. Rfits now checks for valid bscale and bzero values. If it cannot
+    decode bscale or bzero it sets them to 1.0 and 0.0 respectively.
+    2. Rfits and wfits no longer flushes STDOUT on a newline if the output
+    has been redirected to a file. This greatly improves the speed of rfits
+    and wfits when the long_header parameter is set to yes especially for
+    VMS systems.
+
+dataio$rfits: From Davis, September 3, 1987
+    Rfits will now print out the ol irafname if short_header = yes, make_image
+    = no and old_name = yes. This makes it easier for users to list their
+    IRAF fits tapes.
+    
+dataio$reblock/t_reblock.x: From Davis, August 12, 1987
+    The offset parameter in reblock was not being queried for by
+    the code.
+	
+dataio$imtext/rt_rheader.x,wti_wheader.x: From SJacoby, June 10, 1987:
+    Tasks RTEXTIMAGE and WTEXTIMAGE no longer limit the image user area
+    being written to or read from to 2880 chars.  The size of the
+    user area to be created or accessed by these tasks is controlled 
+    by the IRAF environment variable `min_lenuserarea', and is not
+    limited by the code.
+
+dataio$fits/fits_rheader.x: From Davis, June 4, 1987:
+    The code for reading fits cards into the user area has been changed.
+    Rfits opens a new image with the default min_lenuserarea and
+    reads cards into it  until it is filled. If the user area is
+    completely filled rfits issues a warning message along with the
+    number of fits parameters it was not able to completely store.
+
+dataio$fits/fits_write.x,fits_read.x,fits_rpixels.x: From Davis, May 15, 1987:
+    1. I changed the error checking code so that it would work correctly
+    with the fits long blocks option. Wfits now does a call to fstat
+    to find out the number of bytes in the last read and uses this number
+    to validate the buffer if a read error occurs. There is no way to
+    recover from a read error in the tape record containing the header info.
+    2. I added a check for the maximum permitted buffer size in wfits.
+    The program will abort if the device cannot suuport the length of
+    the output record requested.
+
+dataio$mtexamine/t_mtexamine.x: From Davis, May 15, 1987:
+    Error checking code has been added to MTEXAMINE. The task will now
+    print out a warning message for each bad record encountered and
+    continue reading the file instead of skipping to the next file.
+    The correct record count is preserved.
+
+dataio$imtext/wti_wheader.x, dataio$imtext/rt_rheader.x:  Hammond, Mar 24, l987.
+    The FITS format header written by task WTEXTIMAGE has been changed.  It
+    no longer contains the keywords SIMPLE=T and NAXIS=0.  The output of
+    WTEXTIMAGE is a simple text file which makes no attempt to conform to
+    FITS standards.  Task RTEXTIMAGE was modified to read both the old and 
+    new format headers.
+
+dataio$t2d/t_t2d.x: From Lytle, Mar 20, 1987:
+    1. T2D now deletes the zero length file left over when the program
+    encounters the end-of-tape and opens and closes an empty file.
+    2. I also changed the verbose output format somewhat to make it
+    more logical.
+
+dataio$t_wcardimage: From Davis, Mar 19, 1987:
+    1. WCARDIMAGE now checks that the input files are not binary
+    files before trying to write them to tape.
+
+dataio$fits: From Davis, Mar 19, 1987:
+    1. More extensive error checking has been added to the FITS code.
+    Rfits attempts to recover from a read error in the data matrix.
+    Instead of terminating with a partially written image RFITS will
+    try to skip over the bad data. The resulting output image will
+    have the correct number of rows and columns but may contain one
+    or more records of bad data. The results of the error checking
+    may be tape drive dependent.
+    2. RFITS now prints a warning message if no pixel file is
+    written (NAXIS = 0).
+    3. RFITS now checks the first 6 characters of the first header record
+    to see if they are equal to SIMPLE.
+
+dataio$fits_wheader.x: From Davis, Jan 28, 1987:
+    1. The scaling routine for determining bscale and bzero
+    introduced by Skip for the MV10000 was found to have problems
+    with some low dynamic range data. The symptom was that
+    the min value of an image restored from a FITS data would
+    have larger than expected roundoff errors. I have changed it back
+    to my original scaling algorithm.
+
+dataio$cardimage/: From Davis, Jan 20, 1987:
+    1. Rcardimage has been modified to accept a list of disk files as
+    input as well as a list of tape files.
+
+dataio$fits/: From Davis, Jan 20, 1987
+    1. The FITS longblocks option has been added to the FITS readers and
+    writers. RFITS will read long-blocked FITS data. The redundant
+    len_record parameter has been removed. IRAF mtio handles the tape
+    record buffering transparently.
+    2. The len_record parameter has been removed from WFITS and
+    replaced with a blocking parameter factor, which specifies the number
+    of 2880 byte FITS records can be written in a single tape block.
+    The maximum legal FITS blocking factor is 10.
+    3. RFITS has been modified to accept a list of disk files as well as
+    a list of tape files. This should facilitate file transfers over
+    the ethernet.
+
+dataio$reblock/reb_reblock_file.x: From Davis, Dec 12, 1986
+    1. A bug in the seek option on disk binary files has been fixed.
+    This bug would cause the number of bytes read to be incorrectly
+    computed.
+
+dataio$lib/addcards.x: From Hammond, Oct 27, 1986
+    Header cards containing real values are now written with a %g rather 
+    than %f format.  This change affects task wtextimage.
+
+dataio$fits/fits_wheader.x: From Davis, Oct2
+    1. The way the scaling routine wft_set_scale computes the data range
+    has been changed. Instead of adjusting maxdata and mindata individually
+    for machine precision; the data range is first computed and then adjusted
+    for the machine precision. This change was made in response to precision
+    problems encountered on the MV10000.
+
+dataio$fits/wfits.h: From Davis, Sep12, 1986
+    1. The integer constants BYTE_MIN, BYTE_MAX, BYTE_BLANK etc have been
+    changed to type double to avoid compiler generated integer overflows.
+    The data type of TAPEMIN and TAPEMAX in the WFITS structure has also
+    been changed to double. This change was made in response to compiler
+    errors encountered on the MV10000 and should be transparent to the users.
+
+dataio$imtext/rt_cvtpix.x: From Hammond, Sep2, 1986
+    A typographical error was corrected in a call to patmake.  The
+    pattern "[DdEd]" has been replaced with the correct pattern "[DdEe]".
+    This means numbers written with a lower case 'e' in the exponent field 
+    are recognized as floating point numbers when read from the text file.  
+    This procedure is called by task RTEXTIMAGE.
+
+dataio$mtexamine/t_mtexamine.x: From Davis, Aug20, 1986
+    1. MTEXAMINE on the SUN  was outputting an array of zeroes when asked to
+    dump records with output_type = c. The problem was that a long integer
+    was being passed to the routine ctocc instead of a char. This error
+    was not being detected on the VAXES.
+
+dataio$fits/fits_params.x: From Davis, Aug20, 1986
+    1. The boolean parameter param in routine wft_encodeb was changed to type
+    integer. Wft_encodeb was being called with param = YES which caused
+    portability problems on the MV10000.
+
+From Davis July 16, 1986:
+
+1. RFITS has been modified so that imbedded blanks in the UT, ZD, ST, RA and
+DEC keywords are replaced by zeros. For example the mountain fits writers
+produce hms numbers of the form 20: 6: 3. RFITS will convert this to 20:06:03.
+
+-----------------------------------------------------------------------------
+
+From Davis June 13, 1986:
+
+1. TXTBIN and BINTXT have been modified so that the file number is
+appended to the output file name. Previous versions appended the extensions
+".txt" and ".bin" to the input file name.
+
+------------------------------------------------------------------------------
+
+From Davis June 12, 1986:
+
+1. WCARDIMAGE and WFITS now append a file number to the output file name
+if multiple disk files are being written. In the old writers a suffix
+was appended to the input file name (.fit for WFITS and .crd for
+WCARDIMAGE) and the output images were being copied to the input
+directory.
+
+------------------------------------------------------------------------------
+
+From Davis June 8, 1986:
+
+1. WFITS has been modified to store only the root of the image name. All
+pathname information has been stripped off.
+
+------------------------------------------------------------------------------
+
+From Davis May 28, 1986:
+
+1. The output of WFITS has been changed to print the file number, input file
+name, output file name, title and dimensions if long_header = no and
+short_header = yes.
+
+-------------------------------------------------------------------------------
+
+From Davis May 22, 1986:
+
+1. RFITS now writes 80 character records into the user area instead of
+trimming trailing whitespace from each record. This was changed to facilitate
+the image database interface.  This change was also made to WTEXTIMAGE.
+
+-------------------------------------------------------------------------------
+
+From Davis May 21, 1986:
+
+A bug in the record trimming code of REBLOCK has been fixed. REBLOCK was
+computing the offset in the input block of data incorrectly.
+
+--------------------------------------------------------------------------------
+
+From Davis May 13, 1986:
+
+A bug in the error checking code in MTEXAMINE has been fixed. If there is an
+error on mtopen the program will abort instead of trying to open the next file.
+
+--------------------------------------------------------------------------------
+
+From Davis May 1, 1986:
+
+A problem with the autoscaling option in WFITS has been fixed. In order
+to avoid wrap around problems WFITS now assumes that the number of digits
+of machine precision is 1 less than the number in mach.h. In the case of
+the Vax the number is actually 6.? not 7 as quoted.
+
+-----------------------------------------------------------------------------
+
+From Davis Apr 17, 1986:
+
+Changed boolean == false constructs in files t_wcardimage.x and t_reblock.x
+to ! boolean.
+
+----------------------------------------------------------------------------
+
+From Davis Apr 4, 1986:
+
+The format of the RCAMERA DATE-OBS parameter has been changed form
+dd-mm-yyyy to dd/mm/yyyy to bring it into conformity with FITS standard.
+
+---------------------------------------------------------------------------
+
+From Hammond Mar 25, 1986:
+
+Task RTEXTIMAGE has been fixed so it properly skips over non standard fits
+headers, the number of lines being specified by the parameter nskip.
+
+___________________________________________________________________________
+
+From Davis Mar 9, 1986:
+
+The order of the REBLOCK parameters  outfiles and file_list has been switched
+in order to preserve the correct command line sequence
+
+----------------------------------------------------------------------------
+
+From Davis Mar 3, 1986:
+
+The error checking in WFITS has been corrected so that WFITS terminates if
+it encounters a file write error instead of continuing to the next file
+as done previously.
+
+----------------------------------------------------------------------------
+
+From Davis Feb 19, 1986:
+
+1. Rfits and rpds have been fixed so that attempting to delete the last
+empty image does not generate a cannot delete protected file message.
+
+----------------------------------------------------------------------------
+
+From Davis Feb 3, 1986:
+
+1. A mysterious bug in which the date of observation card would sometimes
+not appear in the header has been fixed. A newline was missing from the
+proceeding header card.
+
+----------------------------------------------------------------------------
+
+From Davis Jan 16, 1986:
+
+1. Wfits no longer needs write permission to work. However as a consequence
+wfits no longer updates the image min and max.
+
+2. The scaling routines in rfits and wfits fits have been replaced by
+appropriate vector operators.
+
+3. The coordinate transformation parameters are now stored in the user
+area and are available to hedit, imgets etc.
+
+4. Scaled data is now read into real images regardless of the value of
+bitpix. 
+
+-----------------------------------------------------------------------------
+
+From Davis Jan. 5, 1986:
+
+1. Rfits, rpds and rcamera now open dev$null instead of a temporary disk
+file for option make_image = no. This eliminates a lot od disk access overhead
+and should speed up these readers considerably.
+
+2. The default parameter options are now long_header=no and short_header=yes.
+Setting the long_header parameter to yes will over-ride the short header
+parameter.
+
+---------------------------------------------------------------------------
+
+From Davis Dec. 3, 1985:
+
+1. Rcamera will now print and store the header parameters ccdpicno and airmass
+if defined.
+
+2. A bug in the fringe scaling parameter calculation in rcamera was fixed.
+Currently the mountain programs store this number in floating point format.
+This will be changed in future necessitating a corresponding change in
+rcamera.
+
+-----------------------------------------------------------------------
+From Valdes Oct. 10, 1985:
+
+1.  Defined widstape from ONEDSPEC package in the DATAIO package.  The
+source and executable, however, still reside in ONEDSPEC (x_onedutil.e).
+Widstape and widsout should be combined and the source put in DATAIO
+at some point.
+.endhelp

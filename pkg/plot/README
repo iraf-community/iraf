@@ -1,0 +1,3 @@
+The PLOT package contains all general purpose routines used for vector
+graphics.  All routines will eventually be able to take input in either
+list or image form.

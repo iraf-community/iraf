@@ -1,0 +1,44 @@
+EDITOR_ID	\0		Vi
+EDITOR_CMD	vi		vi
+EDIT_INIT	\0		enable_keypad
+EDIT_TERM	\0		disable_keypad
+
+MOVE_UP		^K		^K
+MOVE_DOWN	^J		^J
+MOVE_RIGHT	^L		^L
+MOVE_LEFT	^H		^H
+
+MOVE_UP		\e[A		UP_ARROW
+MOVE_DOWN	\e[B		DOWN_ARROW  
+MOVE_RIGHT   	\e[C		RIGHT_ARROW
+MOVE_LEFT	\e[D		LEFT_ARROW
+
+NEXT_WORD	^W		^W
+PREV_WORD	^B		^B
+PREV_PAGE	^P		^P
+NEXT_PAGE	^N		^N
+
+MOVE_EOL	^E		^E
+MOVE_BOL	^A		^A
+MOVE_START	^T^S		^T^S
+MOVE_END	^T^E		^T^E
+
+SET_FWD		\0		undefined		
+SET_AFT		\0		undefined	
+TOGGLE_DIR	\0		undefined
+
+DEL_LEFT	\177		DEL	
+DEL_CHAR	^F		^FBS
+DEL_WORD	^I^W		^I^W
+DEL_LINE	^I^D		^I^D
+UNDEL_CHAR	^U^C		^U^C
+UNDEL_WORD	^U^W		^U^W
+UNDEL_LINE	^U^L		^U^L
+
+GET_HELP	\e?		ESC-?
+REPAINT		^R		^R	
+EXIT_UPDATE	^D		^D
+EXIT_UPDATE	^Z		^Z
+EXIT_NOUPDATE	^C		^C		
+
+NOMORE_COMMANDS  \0     	none

@@ -1,0 +1,19 @@
+image,s,a,,,,image or image section to be plotted
+z1,r,h,0,,,minimum intensity to be mapped (0 if zmin)
+z2,r,h,0,,,maximum intensity to be mapped (0 if zmax)
+nlevels,i,h,0,,,number of levels to be drawn (0 for default)
+mapping_function,s,h,"linear",,,type of mapping 
+contrast,r,h,0.25,,,positive or negative contrast [+/-1]?
+perimeter,b,h,yes,,,draw perimeter around plot?
+device,s,h,stdgraph,,,output device
+title,s,h,"imtitle",,,optional title
+preserve,b,h,yes,,,preserve aspect ratio when decreasing resolution?
+xres,i,h,64,,,x resolution in pixels
+yres,i,h,64,,,y resolution in pixels
+vx1,r,h,0.,,,NDC viewport x1
+vx2,r,h,0.,,,NDC viewport x2
+vy1,r,h,0.,,,NDC viewport y1
+vy2,r,h,0.,,,NDC viewport y2
+fill,b,h,no,,,fill viewport regardless of device aspect ratio?
+subsample,b,h,no,,,subsample (vs block average) to reduce resolution?
+append,b,h,no,,,append to an old plot?

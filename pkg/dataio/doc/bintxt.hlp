@@ -1,0 +1,28 @@
+.help bintxt Jun86 dataio
+.ih
+NAME
+bintxt -- Convert binary files containing only text to text files
+.ih
+USAGE
+bintxt binary_file text_file
+.ih
+PARAMETERS
+.ls binary_file
+Input file name or template,  e.g. "file1" or "file*".
+.le
+.ls text_file
+The output file name.  If multiple input files the filenumber will
+be concatenated onto the output file name.
+.le
+.ls verbose = yes
+Print messages of actions performed?
+.le
+.ih
+EXAMPLES
+1. Convert a binary file on disk to a text file on disk.
+
+	cl> bintxt binary_file text_file
+.ih
+SEE ALSO
+txtbin
+.endhelp

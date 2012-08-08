@@ -1,0 +1,303 @@
+.help revisions Jun88 noao.mtlocal
+.nf
+noao$mtlocal/cyber/t_ridsfile.x
+    Fixed minor error in calling procedures. (7/11/09, MJF)
+
+noao$mtlocal/camera/t_rcamera.x
+noao$mtlocal/camera/cam_rheader.x.x
+noao$mtlocal/r2df/t_r2df.x
+noao$mtlocal/cyber/t_ldumpf.x
+noao$mtlocal/cyber/t_rdumpf.x
+noao$mtlocal/cyber/t_ridsfile.x
+noao$mtlocal/cyber/rrcopy/t_rrcopy.x
+    Davis, January 7, 1992
+    Modified the rcamera, r2df, rpds, ldumpsf, dumpf, ridsfile, and rrcopy
+    tasks to accept the new mag tape name syntax.
+
+noao$mtlocal/lib/mkpkg
+noao$pds/lib/mkpkg
+    Davis, December 3, 1991
+    Added some missing file dependencies for the ranges.x entry (ctype.h
+    and mach.h).
+    Added some missing file dependencies for the pds_rimage.x entry (mach.h).
+
+noao$mtlocal/camera/rcamera.h,cam_keywords.x
+    Davis, October 11, 1988
+    Some minor modifications were made to the camera header reader to
+    suport the infrared array header parameters. Additional images types
+    (numbers 32 to 44) were added to the image type list, a new parameter
+    IRBSCALE as added to the iraf header and a switch to allow for
+    millisecond integration times was added.
+
+noao$mtlocal/cyber/t_ridsout.x
+    Two bugs were fixed in the ridsout task.  Double precision values of 
+    airmass, starting lambda and delta lambda were being printed to stdout 
+    as reals, with a pargr.  This was noticed on the SUN.  These values 
+    were however, being written to the header correctly.  The second bug 
+    was that negative pixel values were being read incorrectly.  The
+    leading minus sign caused them to fill the 10 character field width
+    without whitespace separating them from the next value.  Ridsout was
+    using 'gargr' to parse the text string into pixel values, which requires
+    whitespace.  Both the negative pixel and the pixel that followed were 
+    being read incorrectly.                             (ShJ 29/12/87)
+
+noao$mtlocal/camera/cam_keywords.x,cam_rheader.x
+    Davis, Dec 17, 1987
+    Fixed a bug in the call to bitpak for the fringe scaling parameter.
+    The first argument n bitpak was expecting an integer and was receiving
+    a short. This had so far only caused problems on the sun 4.
+
+noao$mtlocal/camera/cam_keywords.x,cam_rheader.x
+    Davis, May 21, 1987
+    There was a bug in computing -ve decs which only showed up on SUN
+    iraf. A char constant (integer) was being passed to a char array,
+    so that the -ve sign was not being printed out. While fixing this
+    bug I noticed a potential problem for decs in the 0 to -1 degree
+    range and fixed that.
+
+noao$mtlocal/camera/cam_rheader.x
+    Davis, May 7, 1987
+    Rcamera has been modified to print an error message if the header record
+    is not 1026 bytes long. This modification will only work on tape input.
+
+noao$mtlocal/r2df/r2dfrhdr.x
+noao$mtlocal/r2df/r2df.h
+    Davis, April 2, 1987
+    An integer overflow was occuring in r2dfrhdr on the Steward mv10000.
+    Two shorts were being multiplied together with the result being greater
+    than MAX_SHORT.  This was implicit in the definition of NRECS. I removed
+    the NRECS definition from the task .h file and forced the computation
+    of NRECS to be integer. This error would only occur when the lo+
+    option was used.
+
+noao$mtlocal/cyber/cy_keywords.x
+noao$mtlocal/idsmtn/wkeywords.x
+    Hammond, March 28, 1987
+    Tasks RIDSMTN and RIDSFILE were writing real values to the image header
+    user area with only 3 digits of precision.  These files had not been
+    updated since mtlocal$lib/addcards.x was changed to output real values
+    with a %g rather than a %f format.  (See Oct 27 note below.)  An argument
+    passed to addcard_r that was previously interpreted as the number of
+    decimal places was now being interpreted as the number of digits of
+    precision.  Keywords WPC, W0 and the COEFF array written by RIDSMTN
+    were affected by this error; keywords WPC, W0 and AIRMASS written by 
+    RIDSFILE were also.
+
+noao$mtlocal/pds/pds_rpixels
+    Davis, March 5, 1987
+    A minor change was made to pds_rpixels to overcome an apparent compiler
+    (not optimizer) error on the Sun. A do loop limit parameter was being
+    overwritten.
+
+noao$mtlocal/cyber/rrcopy/rc_rbits.x
+    Hammond, March 2, 1987
+    An error in the RCOPY task has been fixed.  The error was seen when 
+    reading IPPS rasters with 12 or 20 bit integer pixels.  30 bit pixels
+    were not affected.
+
+noao$mtlocal/widsout -
+noao$mtlocal/widsout.par -
+noao$mtlocal/mkpkg
+noao$mtlocal/x_mtlocal.x
+noao$mtlocal/mtlocal.cl
+noao$mtlocal/mtlocal.men
+noao$mtlocal/mtlocal.hd
+    Valdes, Feb 27, 1987
+    The WIDSOUT task has been archived (Tape 2977 - J. Barnes) and removed
+    as obsolete.  The package was modified to remove this task.
+
+noao$mtlocal/camera/t_rcamera.x: Davis, Jan 20, 1987:
+    The rcamera task has been modified to accept input from a list
+    of disk files as well as a list of tape files. This should facilitate
+    transfers over the ethernet.
+
+noao$mtlcoal/pds/t_pdsread.x: Davis, Jan 20, 1987
+    The rpds task has been modified to  accept input from a list of
+    disk files as well as a list of tape files. This should facilitate
+    transfers over the ethernet.
+
+noao$mtlocal/camera/cam_keywords.x: Davis, Jan 12, 1987
+    I changed the pargc calls inside the cam_hmscard procedure to pargstr
+    calls. A character constant which was stored as an integer was being
+    passed to a routine which expected a char. This bug only showed up on the
+    SUN and would cause extra 0's and slashes to be encoded in the dec, ra etc
+    strings.
+
+noao$mtlocal/pds/t_pdsread.x: Davis, Dec 2, 1986
+    The file list parameters was being set to the NULL string when a pds
+    file was read from disk. The decode_ranges procedure did not detect
+    this as an error causing the program to loop over the same file
+    indefinitely.
+
+noao$mtlocal/camera/cam_keywords.x: Davis, Oct 27, 1986
+    I changed the defined constant CENTURY in cam_ymdcard to 100 from 1900.
+    The current year was being computed as mod (year, CENTURY) and would
+    have been inaccurate after year 2000. Also removed the mod declaration.
+    These changes were found in the AOS port.
+
+noao$mtlocal/pds/pds_rheader.x: Davis, Oct 27, 1986
+    The intrinsic function mod was being called with mismatched type
+    arguments one octal constant and one short. The octal constant was
+    being converted to an integer. Changed both to type short.
+    Detected in the AOS port.
+
+noao$mtlocal/lib/addcards.x: Hammond, Oct 27, 1986
+    Header cards containing real values are now written with a %g format
+    rather than %f.
+
+noao$mtlocal/cyber/cyber.h, t_ridsfile.x, cy_keywords.x: Hammond, Sep2, 1986
+    A field in the RIDSFILE data structure was named POINTER, which
+    is a reserved keyword that gets translated to 'int'.  It has been
+    renamed POINT.  The bug was discovered in Doug's port of IRAF to
+    DAO's Alliant; it was apparently not a problem on the Vax's.
+
+noao$mtlocal/r2df/r2dfrhdr.x: Davis, Aug19, 1986
+    R2DF was not decoding the header record correctly on the SUN
+    machines. The header parameters were not being byte-swapped
+    correctly when BYTE_SWAP2 == NO.
+
+noao$mtlocal/cyber/t_ridsfile.x, cy_keywords.x:  Hammond, Jul23, 1986
+    To accomodate the following mod to WIDSTAPE, task RIDSOUT 
+    has been changed to deal with INDEF's in the UT and ST fields.  
+
+onedspec$t_widstape.x: Hammond, Jul23, 1986
+    Task WIDSTAPE was generating an overflow error in images that
+    did't have header entries for ST and UT.  These entries were
+    not being changed from their preset value of INDEFR and then 
+    were multiplied by 3600, causing the overflow.
+
+__________________________________________________________________________
+
+
+From Davis July 7, 1986:
+
+1. A byte-swapping error in the header reading code of RCAMERA was fixed.
+The bytes of the 256 header parameters were not being swapped correctly
+on the SUN. 
+
+----------------------------------------------------------------------------
+
+From Davis June 23, 1986:
+
+1. A new task R2DF has been added to the MTLOCAL package. R2DF was
+written at CTIO to read 2D-frutti data tapes. A few modification were
+made in the CTIO code: 1) the header now prints out correctly 2) the
+CCD picture number is printed out as a short integer 3) a lot of
+extraneous code dealing with image lists was removed.
+
+---------------------------------------------------------------------------
+
+From Davis May 22, 1986:
+
+1. All records written to the image user area will now be blocked to 80
+characters instead of being of variable length. This change was made to
+facilitate the implementation of the image database facilities.
+The affected tasks are RCAMERA, RIDSFILE, RIDSMTN, and RIDSOUT.
+
+---------------------------------------------------------------------------
+
+From Hammond Apr 21, 1986:
+
+Task RIDSMTN can now add an offset to the output filename, so a continuous
+sequence of filenames can be generated over more than one night's data.
+This was not previously being done correctly.
+
+-----------------------------------------------------------------------------
+
+From Davis Apr 17, 1986:
+
+Changed boolean == false constructs in files t_wcardimage.x and t_reblock.x
+to ! boolean.
+
+----------------------------------------------------------------------------
+
+From Davis Apr 4, 1986:
+
+The format of the RCAMERA DATE-OBS parameter has been changed form
+dd-mm-yyyy to dd/mm/yyyy to bring it into conformity with FITS standard.
+
+___________________________________________________________________________
+
+From Davis Mar 9, 1986:
+
+The order of the REBLOCK parameters  outfiles and file_list has been switched
+in order to preserve the correct command line sequence
+
+----------------------------------------------------------------------------
+
+From Davis Mar 3, 1986:
+
+The error checking in WFITS has been corrected so that WFITS terminates if
+it encounters a file write error instead of continuing to the next file
+as done previously.
+
+----------------------------------------------------------------------------
+
+From Davis Feb 19, 1986:
+
+1. Rfits and rpds have been fixed so that attempting to delete the last
+empty image does not generate a cannot delete protected file message.
+
+----------------------------------------------------------------------------
+
+From Davis Feb 3, 1986:
+
+1. A mysterious bug in which the date of observation card would sometimes
+not appear in the header has been fixed. A newline was missing from the
+proceeding header card.
+
+----------------------------------------------------------------------------
+
+From Davis Jan 16, 1986:
+
+1. Wfits no longer needs write permission to work. However as a consequence
+wfits no longer updates the image min and max.
+
+2. The scaling routines in rfits and wfits fits have been replaced by
+appropriate vector operators.
+
+3. The coordinate transformation parameters are now stored in the user
+area and are available to hedit, imgets etc.
+
+4. Scaled data is now read into real images regardless of the value of
+bitpix. 
+
+-----------------------------------------------------------------------------
+
+From Davis Jan. 5, 1986:
+
+1. Rfits, rpds and rcamera now open dev$null instead of a temporary disk
+file for option make_image = no. This eliminates a lot od disk access overhead
+and should speed up these readers considerably.
+
+2. The default parameter options are now long_header=no and short_header=yes.
+Setting the long_header parameter to yes will over-ride the short header
+parameter.
+
+---------------------------------------------------------------------------
+
+From Davis Dec. 3, 1985:
+
+1. Rcamera will now print and store the header parameters ccdpicno and airmass
+if defined.
+
+2. A bug in the fringe scaling parameter calculation in rcamera was fixed.
+Currently the mountain programs store this number in floating point format.
+This will be changed in future necessitating a corresponding change in
+rcamera.
+
+---------------------------------------------------------------------------
+
+From Hammond Oct. 29, 1985:
+
+1. Installed task rtextimage.  The source code shares subdirectory 
+imtext with wtextimage. 
+
+-----------------------------------------------------------------------
+From Valdes Oct. 10, 1985:
+
+1.  Defined widstape from ONEDSPEC package in the DATAIO package.  The
+source and executable, however, still reside in ONEDSPEC (x_onedutil.e).
+Widstape and widsout should be combined and the source put in DATAIO
+at some point.
+.endhelp

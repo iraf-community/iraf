@@ -1,0 +1,307 @@
+.help vocatalog Mar12 votools
+.ih
+NAME
+vocatalog -- Call a VO catalog (Cone Search) service
+.ih
+USAGE
+vocatalog service ra dec sr
+.ih
+PARAMETERS
+.ls service
+Base service-URL of the requested Cone service, or the \fIShortName\fR
+or \fIIdentifier\fR field of the resource that can be resolved to the
+service-URL using the \fIregResolver()\fR VO-CL built-in function.
+.le
+.ls ra, dec
+Right Ascension and Declination of the query position in ICRS J2000
+equatorial coordinates (RA in hours and Dec in degrees).  The RA/Dec or
+Latitude/Longitude may be specified in other systems by setting the 
+\fIinsystem\fR parameter to define the alternate coordinate system. 
+.le
+.ls sr
+Search radius in decimal degrees.
+.le
+.ls insystem = "icrs"
+The input celestial coordinate system. The \fIinsystem\fR parameter
+sets the preferred units for the input celestial coordinates, and
+tells VOCATALOG how to transform the input celestial coordinates 
+to the ICRS decimal degrees required for the query.  The systems of most
+interest to users are "icrs", "j2000", and "b1950".  The full set
+of options are the following:
+
+.ls degrees
+The input coordinates are assumed to be in equatorial decimal degrees
+and will not be transformed.
+.le
+.ls equinox [epoch]
+The equatorial mean place post-IAU 1976 (FK5) system if equinox is a
+Julian epoch, e.g. J2000.0 or 2000.0, or the equatorial mean place
+pre-IAU 1976 system (FK4) if equinox is a Besselian epoch, e.g. B1950.0
+or 1950.0. Julian equinoxes are prefixed by a J or j, Besselian equinoxes
+by a B or b. Equinoxes without the J / j or B / b prefix are treated as
+Besselian epochs if they are < 1984.0, Julian epochs if they are >= 1984.0.
+Epoch is the epoch of the observation and may be a Julian
+epoch, a Besselian epoch, or a Julian date. Julian epochs
+are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to the epoch type of
+equinox if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls icrs [equinox] [epoch]
+The Internaltion Celestial Refernce System (ICRS) where equinox is
+a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
+Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
+The default value of equinox is J2000.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls fk5 [equinox] [epoch]
+The equatorial mean place post-IAU 1976 (FK5) system where equinox is
+a Julian or Besselian epoch e.g. J2000.0  or B1980.0.
+Equinoxes without the J / j or B / b prefix are treated as Julian epochs.
+The default value of equinox is J2000.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls fk4 [equinox] [epoch]
+The equatorial mean place pre-IAU 1976 (FK4) system where equinox is a
+Besselian or Julian epoch e.g. B1950.0  or J2000.0,
+and epoch is the Besselian epoch, the Julian epoch, or the Julian date of the
+observation.
+Equinoxes without the J / j or B / b prefix are treated
+as Besselian epochs. The default value of equinox is B1950.0. Epoch
+is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls noefk4 [equinox] [epoch]
+The equatorial mean place pre-IAU 1976 (FK4) system but without the E-terms
+where equinox is a Besselian or Julian epoch e.g. B1950.0 or J2000.0,
+and epoch is the Besselian epoch, the Julian epoch, or the Julian date of the
+observation.
+Equinoxes without the J / j or B / b prefix are treated
+as Besselian epochs. The default value of equinox is B1950.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian day.  If undefined epoch defaults to equinox.
+.le
+.ls apparent epoch
+The equatorial geocentric apparent place post-IAU 1976 system where
+epoch is the epoch of observation.
+Epoch is a Besselian epoch, a Julian epoch or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian
+epochs if the epoch value < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.
+.le
+.ls ecliptic epoch
+The ecliptic coordinate system where epoch is the epoch of observation.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch values < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian day.
+.le
+.ls fk4 [equinox] [epoch]
+The equatorial mean place pre-IAU 1976 (FK4) system where equinox is a
+Besselian or Julian epoch e.g. B1950.0  or J2000.0,
+and epoch is the Besselian epoch, the Julian epoch, or the Julian date of the
+observation.
+Equinoxes without the J / j or B / b prefix are treated
+as Besselian epochs. The default value of equinox is B1950.0. Epoch
+is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.  If undefined epoch defaults to equinox.
+.le
+.ls noefk4 [equinox] [epoch]
+The equatorial mean place pre-IAU 1976 (FK4) system but without the E-terms
+where equinox is a Besselian or Julian epoch e.g. B1950.0 or J2000.0,
+and epoch is the Besselian epoch, the Julian epoch, or the Julian date of the
+observation.
+Equinoxes without the J / j or B / b prefix are treated
+as Besselian epochs. The default value of equinox is B1950.0.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian day.  If undefined epoch defaults to equinox.
+.le
+.ls apparent epoch
+The equatorial geocentric apparent place post-IAU 1976 system where
+epoch is the epoch of observation.
+Epoch is a Besselian epoch, a Julian epoch or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian
+epochs if the epoch value < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date.
+.le
+.ls ecliptic epoch
+The ecliptic coordinate system where epoch is the epoch of observation.
+Epoch is a Besselian epoch, a Julian epoch, or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian epochs
+if the epoch values < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian day.
+.le
+.ls galactic [epoch]
+The IAU 1958 galactic coordinate system.
+Epoch is a Besselian epoch, a Julian epoch or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian
+epochs if the epoch value < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date. The default value of epoch is B1950.0.
+.le
+.ls supergalactic [epoch]
+The deVaucouleurs supergalactic coordinate system.
+Epoch is a Besselian epoch, a Julian epoch or a Julian date.
+Julian epochs are prefixed by a J or j, Besselian epochs by a B or b.
+Epochs without the J / j or B / b prefix default to Besselian
+epochs if the epoch value < 1984.0, Julian epochs
+if the epoch value <= 3000.0, otherwise epoch is interpreted as
+a Julian date. The default value of epoch is B1950.0.
+.le
+
+In all the above cases fields in [] are optional with the defaults as
+described. The epoch field for the icrs, fk5, galactic, and supergalactic
+coordinate systems is only used if the input coordinates are in the
+equatorial fk4, noefk4, fk5, or icrs systems and proper motions are supplied.
+Since VOCATALOG does not currently support proper motions these fields are
+not required.
+.le
+.ls image = ""
+Name of image used to supply search parameters.  If set, and if the image
+contains a valid WCS, the \fBra\fR, \fBdec\fR, and \fBsr\fR will be determined
+from the image center and size.
+.le
+.ls output = "STDOUT"
+Output filename.  If something other than 'STDOUT' the results of the search 
+will be written to this file in the format specified by the \fBotype\fR 
+parameter.
+.le
+.ls otype = "ascii"
+Output catalog type.  The default return from a Cone service is a standard
+VOTable (xml format).  This table may be automatically converted to some
+other format for use by other tasks by resetting this parameter.  Allowed
+output table types include:
+.ls ascii
+Simple space-separated ASCII file format.  Note that string values in the
+original VOTable will be quoted.
+.le
+.ls csv
+Comma-Separated Value format. The first line is a header which contains 
+the column names.
+.le
+.ls fits
+Convert VOTable to FITS binary table.  Primary HDU is data-less, first
+extension contains a FITS binary table.
+.le
+.ls votable
+Do not process returned VOTable and output it directly.
+.le
+
+For a full description of the supported STILTS output formats see
+.nf
+
+  http://www.star.bris.ac.uk/~mbt/stilts/sun256/outFormats.html
+.fi
+.le
+.ls verbose = yes
+Verbose output?
+.le
+.ls status = ""
+Status return code of the web service (output).
+.le
+
+.ih
+DESCRIPTION
+
+The \fBCONECALLER\fR task invokes the Cone service at the \fBservice\fR
+base URL.  This service URL may be explicitly defined by the user, or else
+can be determined from the Registry entry for a known service.  If the
+\fBimage\fR parameter is specified, the search center and size is determined
+from the image WCS and are assumed to be J2000 equatorial coordinates. 
+Otherwise the \fBra\fR, \fBdec\fR, and \fBsr\fR parameters are used as
+parameters for the search.  In this case, the \fBinsystem\fR parameter defines
+the input coordinate system and values are converted to the required units
+automatically.
+
+A Cone search returns the IVOA standard \fBVOTable\fR format XML file.  This
+file may be converted automatically to another type by setting the \fBotype\fR 
+parameter to one of the output formats supported by the STILTS tools.  Results
+are written to the STDOUT unless the \fBoutput\fR  parameter is set.
+
+.ih
+EXAMPLES
+1. Call the USNO-A2 Cone service to get the catalog stars within 0.2 
+degrees of M51:
+
+.nf
+  votools> sesame m51
+  votools> vocatalog regResolver("USNO-A2","catalog") sesame.ra sesame.dec 0.2
+  # USNO-A2.0      RA(ICRS)    DE(ICRS)   ACTflag Mflag Bmag Rmag Epoch     
+    1350-08284535  202.200817  47.202762  " "     " "   19.2 19.2 1956.267  
+    1350-08284562  202.204206  47.284287  " "     " "   18.5 18.3 1956.267  
+    1350-08284576  202.205445  47.223775  " "     " "   19.4 18.7 1956.
+	:		:	  :	   :       :      :    :    :
+.fi
+
+Note we invoke the VO-CL regResolver() builtin function to automatically
+find the ServiceUrl for a USNO-A2 Cone service from the VO Registry.
+
+2. Find all HST observations that overlap an image footprint:
+
+.nf
+  votools> vocatalog regResolver("HST","catalog") image=myimage.fits
+.fi
+
+3. Find all 2MASS point sources within 2 degrees of the Galactic North Pole:
+
+.nf
+  votools> vocatalog regResolver("2mass-psc","catalog") 0.0 90.0 2.0 insys=galactic
+  #
+  #   Input coords: (0.,90.) (galactic)
+  #  Output coords: (192.85948091528,27.128252236959) (ICRS)
+  #
+  # RAJ2000      DEJ2000     Jmag     e_Jmag   Hmag     e_Hmag .....
+    192.395402   25.184534   16.167   0.123    15.454   0.135  .....
+    192.456803   25.177759   16.27    0.139    15.431   0.133  .....
+    192.487615   25.176947   15.797   0.087    15.716   0.171  .....
+    192.546785   25.154104   14.792   0.043    14.121   0.052  .....
+      :		  :	      :       :        :        :
+.fi
+
+4. Test a locally-developed catalog service before deploying it.  Query on
+position RA=13:27:46  Dec=12:34:56, remembering to convert the RA to
+degrees.
+
+.nf
+  votools> vocatalog "http://localhost/mycat.php?" (13:27:46 * 15) 12:34:56 0.2
+.fi
+
+Note that explicit URLs need to be quoted to properly pass special
+and wildcard characters such as '?', '&', and '*'.
+
+.ih
+REVISIONS
+.le
+.ih
+SEE ALSO
+voclient, voimage, stilts
+.endhelp

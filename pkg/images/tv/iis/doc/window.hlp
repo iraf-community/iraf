@@ -1,0 +1,38 @@
+.help window Jan86 images.tv.iis
+.ih
+NAME
+window -- adjust the contrast and dc offset of the current frame
+.ih
+USAGE
+window
+.ih
+DESCRIPTION
+The lookup table between the display frame values and the values sent
+to the display monitor is adjusted interactively to enhance the display.
+The mapping is linear with two adjustable parameters; the intercept
+and the slope.  The two values are set with the image display cursor
+in the two dimensional plane of the display.  The horizontal position
+of the cursor sets the intercept or zero point of the transformation.
+Moving the cursor to the left lowers the zero point while moving the cursor to
+the right increases the zero point.  The vertical position of the cursor
+sets the slope of the transformation.  The middle of the display is zero
+slope (all frame values map into the same output value) while points above
+the middle have negative slope and points below the middle have positive
+slope.  Positions near the middle have low contrast while positions near
+the top and bottom have very high contrast.  By changing the slope from
+positive to negative the image may be displayed as positive or negative.
+
+The interactive loop is exited by pressing any button on the cursor control.
+.ih
+EXAMPLES
+.nf
+	cl> window
+	Window the display and push any button to exit:
+.fi
+.ih
+BUGS
+It may be necessary to execute FRAME before windowing.
+.ih
+SEE ALSO
+cv
+.endhelp

@@ -1,0 +1,1986 @@
+.help packages Aug83 "IRAF Package Structure"
+.sh
+1. Introduction
+
+    This document is a first attempt to fully define the decomposition of
+the IRAF system and applications software into packages.  The functions
+to be supplied by each package are summarized.  The names of some of the
+individual packages are likely to change.  Given the package structure
+detailed below, the IRAF root menu would appear as follows:
+
+.nf
+cl> ?
+    artdata       digiphot      help          lists         system
+    astrometry    dtoi          images        nsurfbrt      twodspec
+    database      filterphot    imred         onedspec      utilities
+    dataio        focas         language      softools      
+.fi
+
+.sh
+2. Top Level Packages
+
+    If the command HELP is typed without any arguments, the default action
+is to print out a summary of the contents of the current package, giving
+a one line description of the function of each package.  The nonspecific
+HELP documentation for the root package, i.e., the package "clpackage",
+might appear as follows:
+
+.nf
+    artdata	artificial data generation
+    astrometry	astrometric routines
+    database	database management utilities
+    dataio	data format conversions (FITS, card image, etc.)
+    digiphot	digital stellar photometry
+    dtoi	density to intensity transformations
+    filterphot	filter photometry reductions
+    focas	faint object classification and analysis
+    help	online help utility (not a package)
+    images	general image processing and display
+    imred	image reductions
+    language	language stuff (task, kill, set, etc.)
+    lists	list processing utilities
+    onedspec	one dimensional spectra
+    softools	software tools
+    nsurfbrt	new surface brightness package
+    system	system utilities (files etc.)
+    twodspec	two dimensional spectra
+    utilities	miscellaneous utilities
+.fi
+
+.sh
+3. Notes on Individual Packages
+
+    Each top level package may contain any number of tasks or second level
+packages.  As we proceed lower into the hierarchy, the tasks and packages
+become more specific in the type of data they deal with.  An individual
+task should not be duplicated in several packages; a task which is needed
+in more than one package should be defined at a higher level in the hierarchy.
+Examples of such general purpose tasks include HELP, and the tasks in the
+LISTS and SYSTEM packages.
+
+.sh
+3.1 Package ARTDATA
+
+    The ARTDATA package shall provide routines for the generation of
+artificial data.  The principal use of artificial data is for testing
+reduction and analysis software, making objective comparison of algorithms
+and packages possible, and quantifying the non-systematic errors of such
+software.  The package shall meet the following requirements:
+.ls 4
+.ls (1)
+It shall be possible to model the noise functions of various detectors.
+.le
+.ls (2)
+It shall be possible to add noise to an image, by randomly sampling
+a gaussian or poisson distribution, the width of which is some function
+of pixel intensity (this is determined by the noise model).
+.le
+.ls (3)
+It shall be possible to analytically model line and point spread functions.
+.le
+.ls (4)
+It shall be possible to model the characteristic curve of photographic
+plates (and possibly other nonlinear detectors).
+.le
+.ls (5)
+It shall be possible to generate diagnostic rasters, including constant
+rasters, gaussian or poisson noise rasters with a constant noise function,
+multidimensional smooth distributions (i.e., two dimensional gaussians, 
+ellipses, and legendre surfaces), stepwedge, stairstep, ramps, and so on.
+.le
+.ls (6)
+It shall be possible to generate artificial starfields, optionally including
+scaled galaxy images randomly selected from an digital library, wherein
+the noise function, luminosity function, point spread function, spatial
+distribution, and non-linearity are all modeled.
+.le
+.ls (7)
+It shall be possible to generate artificial one and two dimensional spectra,
+wherein the noise function, line spread function, line list, dispersion,
+and geometric distortions (pincushion, s, and tilt) are all modeled.
+.le
+.ls (8)
+All model parameters used to generate an artificial image shall be saved
+in such a form that they can be compared with the parameters derived by
+reduction and analysis software to compute errors.  It shall be possible
+to export model parameters on a FITS or cardimage tape, along with the
+artificial image.
+.le
+.le
+
+.ks
+.nf
+Subpackages:
+
+    artstars		artificial starfield generation
+    artspec		artificial 1&2 dim spectra generation
+.fi
+.ke
+
+.sh
+3.2 Package ASTROMETRY
+
+    A collection of routines for performing astrometry.  Coordinate
+input generally comes from other packages; the astrometry routines
+determine the image coordinate system and transform object coordinates
+in pixels into other coordinate systems.  The following functions shall
+be provided:
+.ls
+.ls (1)
+It shall be possible to determine the coordinates of an object or objects
+within an image by fitting gaussians or discrete psf marginal profiles to
+the marginal profiles of the image.
+.le
+.ls (2)
+It shall be possible to determine the transformation from pixel to user
+coordinates for an image given the pixel and user coordinates of 1, 2,
+or 3 or more stars in the image.  The computation of the coordinate
+transformation shall be decoupled from the generation of object coordinates.
+It may be desirable to provide several types of transformations to model
+the geometric distortions of various detectors.
+.le
+.ls (3)
+The transformation parameters shall be saved in such a form that they
+can be edited by the user or supplied by external programs.
+.le
+.ls (4)
+It shall be possible to apply the coordinate transformation to convert
+a list of coordinates from one coordinate system to another,
+given the input list, the names of the input and output coordinate systems,
+and the transformation descriptor.
+.le
+.le
+
+.sh
+3.3 Package DATABASE
+
+    The IRAF database management utilities.  Routines shall be included for
+inspecting, editing, copying, and otherwise manipulating the contents
+of datafiles.  The IRAF system does not yet have a database capability;
+the requirements for the DATABASE package will be defined when the
+form of the IRAF database facilities have been worked out.
+
+.sh
+3.4 Package DATAIO
+
+    Routines for data format conversion.  The essential thing here is
+format conversion; although files will often be read or written to magtape,
+we should not build conversion routines so that they work only on magtape
+devices.  As networking becomes more widely used on our systems, we will
+wish to use the same conversion routines to read and write data transmitted
+electronically between machines.  DATAIO shall provide the following
+capabilities:
+.ls
+.ls (1)
+It shall be possible to convert a FITS file into an IRAF imagefile,
+and vice versa.
+.le
+.ls (2)
+It shall be possible to convert a PDS file into an IRAF imagefile.
+.le
+.ls (3)
+It shall be possible to convert a CAMERA file into an IRAF imagefile.
+.le
+.ls (4)
+It shall be possible to convert a card image file into a text file,
+and vice versa.
+.le
+.ls (5)
+It shall be possible to convert a binary file containing only text into
+a text file, and vice versa.
+.le
+.ls (6)
+It shall be possible to copy a binary file, changing only the blocking
+factor.
+.le
+.ls (7)
+Each conversion routine shall be able to operate on either magtape
+resident or disk resident files (this capability is already provided
+by the IRAF magtape i/o interface).
+.le
+.le
+
+Note that function (6) in combination with requirement (7) provides a
+means of copying a file from magtape to disk or vice versa, or from one
+tape drive to another.  In the process the tape record size and density
+may be changed if desired.
+
+The conversion routines for FITS, PDS, and CAMERA formats may involve
+some loss of information, at least initially.  The problem is that these
+are different image formats, with different image headers, and it is
+not always possible to preserve all fields of the header across a
+transformation.  The following additional requirements should be
+met eventually, but need not be addressed in the first implementation:
+.ls
+.ls (8)
+The image format conversion routines shall permit a user defined mapping
+of fields in the input header to fields in the output header.  In the case
+of the FITS and IRAF imagefile image headers, it shall be possible for the
+user to define additional fields beyond those in the standard header.
+The name and datatype of the two fields in a mapping need not be unique.
+.le
+.ls (9)
+When converting from an external image format into the IRAF imagefile
+format, blank or indefinite pixels shall be replaced by values which
+approximate the underlying distribution.  These values may be artificially
+generated if necessary (i.e., by interpolation).  The coordinates of each
+bad pixel shall be added to the bad pixel list for the image.
+.le
+.le
+
+Most IRAF applications code will work only on the standard IRAF data
+structures.  The user is expected to use the DATAIO routines to get data
+into the system, and to convert data for export.  Applications which
+reduce data from instruments with unique data formats may need to provide
+special conversion routines.  DATAIO will provide conversion routines only
+for data formats which provide data for more than one package.
+
+.sh
+3.5 Package DIGIPHOT
+
+    A package of routines for digital stellar photometry, in both crowded
+and uncrowded fields.  A range of routines shall be provided, ranging from
+simple aperture photometry of sparse or moderately crowded fields, though
+single star psf-fitting techniques, to simultaneous surface fits of
+blended images.
+.ls
+.ls (1)
+It shall be possible to perform aperture photometry on linearized images
+via fractional pixel techniques, using circular apertures and annuli.  
+It is desirable to be able to perform aperture photometry using elliptical
+apertures and annuli, but this is not a requirement.
+.le
+.ls (2)
+It shall be possible to perform photometry on linearized images using
+single star psf-fitting techniques.
+.le
+.ls (3)
+It shall be possible to subtract the fitted psf from the data.
+.le
+.ls (4)
+All photometry routines shall be usable either interactively or in a
+batch mode, to process an arbitrarily long list of objects on a single image.
+.le
+.ls (5)
+All photometry routines shall produce accurate estimates of the uncertainties
+in object centers and magnitudes.
+.le
+.ls (6)
+A routine shall be provided to automatically locate all objects in an image
+which are sufficiently bright and well resolved (unblended) to be measured
+by aperture or single star fitting techniques.
+.le
+.ls (7)
+Routines shall be provided to determine the PSF of an image by either
+empirical or analytical techniques.  It shall be possible to accurately
+determine the PSF even if the data is undersampled (up to the limit defined
+by the sampling theorem).
+.le
+.ls (8)
+Given a set of images, each of which has a different PSF, it shall be
+possible to compute and apply a transformation to each image which
+will result in all output images having the same PSF.
+.le
+.le
+
+.ks
+.nf
+Subpackages:
+
+    apphot		aperture photometry
+    new_richfld		single star psf-fitting techniques
+    nstar		deconvolution of blended images
+    psf			psf generation and modification
+.fi
+.ke
+
+The requirements and specifications of the APPHOT package have already
+been written and are available as a separate document.  The "new richfld"
+package will be similar in operation to APPHOT, but centering and scaling
+will be done by psf-fitting techniques, providing more precise centers
+and magnitudes, the ability to work in slightly more crowded fields
+than is possible with APPHOT, and the ability to fit partial images.
+The new richfld program will be a considerable improvement over the existing
+IPPS version, providing a better background fitting algorithm, greater
+efficiency, better error estimates, an improved user interface, and
+probably the ability to perform accurate photometry on undersampled data.
+
+The NSTAR problem is still a research project, and it is unlikely that
+we will have the manpower to address this problem for quite some time yet.
+
+.sh
+3.6 Package DTOI
+
+    A collection of routines for computing and applying the density to
+intensity transformation for photographic data, and for linearizing other
+types of data as well.  The requirements are as follows:
+.ls
+.ls (1)
+It shall be possible to determine the H-D curve for photographic data,
+by any of the following techniques:
+.ls o
+By fitting a set of data points (the calibration "spots"), each of which
+is described by a modal value and a standard deviation or weight,
+and where the upper bound on the number of data points is arbitrary.
+The data points shall be input in the form of a list file or list structured
+parameter.
+.le
+.ls o
+By analysis of a single image containing many star images.  Since stellar
+images must scale linearly if the data is linear, the H-D curve of an
+image can be derived from an analysis of the data itself.
+.le
+.ls o
+By use of an external program, or by direct entry of the transformation
+by the user.
+.le
+.le
+.ls (2)
+A convenient routine shall be provided for generating the spot list file
+from the calibration spots in digital form.
+.le
+.ls (3)
+It shall be possible to determine the departure from linearity of
+digital detectors by analysis of a set of images of the same field,
+where successive images differ only in the total exposure time.
+Each image is in effect a calibration "spot".
+.le
+.ls (4)
+A function shall be provided to apply the transformation, linearizing an image
+or images.
+.le
+.ls (5)
+A function shall be provided to apply the reverse transformation, producing a
+nonlinear image or images for test purposes.
+.le
+.le
+
+.sh
+3.7 Package FILTERPHOT
+
+    A package of routines to reduce data from single or multichannel
+photometers.  The function of the package is to read raw data from
+a photometer, average multiple observations of an object to produce
+a single record, then determine and apply extinction and transformation
+corrections.
+.ls
+.ls (1)
+Functions shall be provided to read data from all optical photometry
+acquisition programs currently in use at KPNO (#4-16, PPIII, Photom).
+.le
+.ls (2)
+The internal data format shall be independent of the raw data
+format, making it straightforward to add additional data format
+conversion routines to read data produced by non-KPNO instruments.
+.le
+.ls (3)
+Once data has been read and converted into the internal form,
+the primary functions of the package shall be to:
+.ls o
+Average multiple observations of a single object, producing a single
+sky subtracted record.
+.le
+.ls o
+Compute the instrumental magnitudes or colors.
+.le
+.ls o
+Compute and the first and second order extinction coefficients.
+.le
+.ls o
+Compute the transformation coefficients.
+.le
+.ls o
+Apply the extinction corrections, transforming instrumental magnitudes
+or colors into natural system magnitudes or colors.
+.le
+.ls o
+Apply the transformation corrections, transforming natural system
+magnitudes or colors into standard system magnitudes or colors.
+.le
+.le
+.ls (4)
+The package shall be able to reduce data for the BVRI, HBETA, UBV,
+UBVR, UBVRI, UVBY, and UVBYHBETA photometric systems.
+.le
+.ls (5)
+It shall be straightforward to extend the package to reduce data in
+other photometric systems, provided they are reasonably similar to the
+standard systems.
+.le
+.le
+
+.sh
+3.8 Package FOCAS
+
+    A more or less direct conversion of the existing FOCAS package to
+IRAF, excluding those routines which duplicate functions already provided
+by the IRAF system, such as data i/o, image reductions, image display load
+and control, etc.  The package shall provide the following functions:
+.ls
+.ls (1)
+Automatic detection of faint objects, producing a catalog of objects
+as output.
+.le
+.ls (2)
+Measurement of various position, shape, and photometric parameters for
+each object.
+.le
+.ls (3)
+Automatic classification of objects (i.e., as stars or galaxies),
+based on the information determined in steps (1) and (2).
+.le
+.ls (4)
+Display and analysis of the various parameters in the catalogs.
+.le
+.le
+
+.sh
+3.9 The HELP Utility
+
+    The HELP utility shall be used to retrieve and display documentation
+on-line, i.e., while at the terminal using the system.  Documentation shall
+be organized by package; "manual pages" shall be available for both CL and
+library level packages.  A manual page shall be available on-line for each
+item appearing in a CL menu.
+.ls
+.ls (1)
+The command "help" with no arguments shall cause a one line description of
+each routine in the current package to be printed.
+.le
+.ls (2)
+A command of the form "help task" shall cause the manual page for the
+named task to be printed.  The task must be defined in the dictionary at
+the time HELP is executed to be recognized.
+.le
+.ls (3)
+A command of the form "help package.task" shall retrieve the manual page
+for the named task regardless of whether the associated package is loaded.
+This form must be used to get help on library procedures.
+.le
+.ls (4)
+It shall be possible, as an option, to print only the calling sequence for
+the task, to print only detailed information for a particular parameter,
+or to print the source for the task.
+.le
+.le
+.le
+
+.sh
+3.10 Package IMAGES
+
+    General image processing.  Included are routines for displaying and
+plotting images and image sections, for image arithmetic, editing, and
+filtering, and for performing geometric and other transformations.
+.ls
+.ls (1)
+A routine shall be provided for mapping an image or image section into
+the user specified frame of the default image display device.  The mapping
+or display routine shall have the following features:
+.ls (a)
+The function of the display routine shall be to map an image or image section
+into the specified frame of the default image display device.
+The following simple calling sequence shall suffice to display an image
+or image section:
+
+	display (image, frame)
+
+where "image" is the name of an image or image section, and "frame" is
+the frame to be used, numbered 1, 2, 3, etc.  For example, if "cube"
+is a three dimensional image cube, the command
+
+	display ("cube[*,-*,5]", 1)
+
+would map the entire fifth band of the cube into frame number 1, with the
+y-axis flipped (the IMIO interface transparently processes image sections).
+Default transformations would be used to map image coordinates into
+display coordinates, and image pixel values into display pixel values.
+.le
+.ls (b)
+The following options shall be available, under control of hidden
+parameters with default values:
+.ls o
+Erase frame before displaying image.
+.le
+.ls o
+Scale the x,y dimensions of the image to fit the physical frame of the
+display device (autoscale in x,y).  The aspect ratio should be maintained
+at unity, unless an option is added to permit independent scaling of
+the two axes.
+.le
+.ls o
+Do not autoscale in x,y, i.e., map the image 1 to 1 in x,y (into center
+of window).
+.le
+.ls o
+Enter explicit x,y scaling factors (magnification).  Map image into
+center of frame using these fixed scaling ratios.
+.le
+.ls o
+Enter Z1 and Z2, the range of intensities to be mapped into the
+8 bits (or whatever) available on the physical device.
+.le
+.ls o
+Reuse the spatial and greyscale transformations used the last time
+the display routine was called.
+.le
+.ls o
+Autoscale, using the minimum and maximum pixel values.
+.le
+.ls o
+Autoscale, by computing a full or partial histogram for the image,
+and then automatically computing the values of Z1 and Z2 which straddle
+the main peak of the histogram (if there is a single peak).
+It may be desirable to subsample the image for the sake of efficiency.
+.le
+.ls o
+Both logarithmic and linear grayscale transformations shall be
+available.
+.le
+.le
+.ls (c)
+Though the implementation of the display routine will necessarily be
+device dependent at some level, the functions provided by the routine
+shall be reasonably device independent.
+.le
+.ls (d)
+The default image display device shall be specified in the
+CL environment table (normally set when the CL starts up).
+.le
+.le
+
+.ls (2)
+A routine shall be provided to control and adjust the image display
+device.  The following functions shall be provided:
+.ls
+.ls o
+Select frame to be displayed.
+.le
+.ls o
+Erase graphics frame.
+.le
+.ls o
+Erase image frame.
+.le
+.ls o
+Adjust windowing (frame lookup table).
+.le
+.ls o
+Zoom and roam.
+.le
+.ls o
+Blink frames.
+.le
+.le
+
+The display control routine will provide rudimentary control of the image
+display device, but will not exercise any of the advanced features commonly
+found on sophisticated modern display devices.  This routine will eventually
+be supplanted by a control program driven by a dedicated terminal with a
+touch screen overlay.  The latter interface will exercise the advanced
+features of the display, but will necessarily be more device dependent
+and therefore less transportable.
+
+In the long run we will wish to keep both interfaces, using the simple
+interface for simple display devices, for workstations which do not have
+a dedicated display control terminal, and to provide rudimentary control
+at installations which cannot afford to implement the more sophisticated
+interface.
+.le
+
+.ls (3)
+Routines shall be provided for plotting image data in a variety of ways,
+on a variety of devices.
+.ls (a)
+The following types of plots shall be provided:
+.ls o
+Vector plots along a single dimension, optionally performing a boxcar
+average over the other image dimensions.
+.le
+.ls o
+Vector plots of the histogram of an image or image section.
+.le
+.ls o
+Mark, vector, and text drawing on an existing plot, where the position,
+size, orientation, etc., of a mark or text string are specified by the user.
+.le
+.ls o
+Two dimensional contour plots of an image or image section.
+.le
+.ls o
+Two dimensional hidden line plots of an image or image section.
+.le
+.ls o
+Three dimensional hidden line plots of an image or image section.
+.le
+.ls o
+Grayscale or simulated grayscale plots of a two dimensional image or
+image section (depending on the output device).
+.le
+.le
+.ls (b)
+The following types of graphics output devices shall be supported:
+.ls o
+Graphics terminals (e.g., VT100, Tek 4012).
+.le
+.ls o
+Raster plotters (e.g., Versatec).
+.le
+.ls o
+Pen plotters (e.g., Calcomp, Imagen).
+.le
+.ls o
+Grayscale devices (e.g., Dicomed, IIS).
+.le
+.ls o
+Files (for spooling graphics).
+.le
+.le
+.ls (c)
+The following options shall be available to control the form of
+a vector plot:
+.ls o
+Overplot without changing the scale.
+.le
+.ls o
+Plot to a user specified scale.
+.le
+.ls o
+Plot vector points as dots.
+.le
+.ls o
+Plot vector points as marks, where the type and size of a mark
+is specified by the user.
+.le
+.ls o
+Connect the points of a plotted vector with line segments.
+.le
+.ls o
+Connect the points of a plotted vector with dashed line segments,
+where the dash pattern is specified by the user.
+.le
+.ls o
+Set the plotting window, i.e., the position and size of the rectangle
+in which the plot will be drawn on the output device.
+.le
+.ls o
+Specify whether or not data may be plotted outside of the plotting window.
+.le
+.ls o
+Enter labels for the axes.
+.le
+.ls o
+Specify whether or not a box with ticks is to be drawn to define the
+plotting window.
+.le
+.ls o
+Specify whether the axes are to be labeled in pixel or user coordinates
+(user coordinates might be right ascension and declination, wavelength
+versus flux, or whatever).
+.le
+.ls o
+Select linear or log scaling in either axis (with appropriately labeled
+ticks).
+.le
+.ls o
+Other options, such as line color, line brightness or width, depending
+on the characteristics of the final graphics interface (GIO).
+.le
+.le
+.ls (d)
+Due to the complexity of the vector plotting options, the vector plot
+task shall be command driven.  A simple language shall be defined for
+specifying vector plots and for drawing mark and text strings, and a
+plot shall be generated by entering a sequence of commands which are
+interpreted by the plotting task.
+
+All plotting options shall have default values.  These default values
+may be set by having the plot task read a user specified initialization
+file (containing normal plot commands) upon startup.  The simplest
+plot command will have the form
+
+	plot image_section
+
+i.e., the command
+
+	plot "cube[5,*,9]"
+
+would plot column 5 of band 9 of the image "cube".  If only a single
+command is needed to generate a plot, it shall be possible to pass the
+command as a string argument to the vector plot task when the task is
+invoked from the CL.  Otherwise, commands shall be read from the
+standard input.
+.le
+.ls (e)
+The two tasks PLINE and PCOLUMN shall be provided for making simple line and
+column plots of images, without the extra overhead associated with the
+vector plot task.  Thus, a command such as
+
+	pline image,10
+
+would suffice to plot line 10 of the image "image".
+.le
+.ls (f)
+It shall be possible to specify the default graphics device in the
+CL environment table (normally set when the CL starts up).
+.le
+.ls (g)
+It shall be possible to redirect the plot to a device other than the
+default graphics device by means of command line redirection.
+.le
+.ls (h)
+It shall be possible to select an output "device" which spools the low
+level plotting instructions in a disk file.
+.le
+.le
+
+.ls (4)
+Simple pointwise image operations, i.e. picture arithmetic, functions,
+line and column flipping, subraster extraction, and so on, shall be
+performed by the image calculator task.  The image calculator approach
+has two major advantages: (1) a great deal of function is provided
+via an interface which is simple and easy to remember, and (2) the
+image calculator is efficient, since it eliminates may intermediate
+images which would otherwise have to be written, read, and deleted.
+For all but the most trivial expressions the image calculator will be 
+cpu bound, an ideal candidate for optimization with a bit-mapped array
+processor.
+.ls (a)
+The image calculator task shall be command driven.  If only a single
+command is to be executed, it shall be possible to pass the
+command as a string argument to the image calculator task when the task is
+invoked from the CL.  Otherwise, commands shall be read from the
+standard input.
+.le
+.ls (b)
+The function of the image calculator task shall be to execute commands
+of the form
+
+	output_image = expression
+
+where "output_image" is either a new image which will be created by the
+image calculator or a section of an existing image, and where "expression"
+is an algebraic expression wherein the operands may be any of the following:
+.ls
+.ls o
+Images or image sections of any dimension or datatype.
+.le
+.ls o
+Numeric constants.
+.le
+.ls o
+Calls to intrinsic functions.
+.le
+.le
+
+For example, the command
+
+    cl> imcalc "subras = image[40:50,33:43]"
+
+would extract a subraster from the image "image" into the new image
+"subras".  The command
+
+    cl> imcalc "image = image[*,-*]"
+
+would flip the columns of the two-dimensional input image.  The command
+
+    cl> imcalc "avg = (a + max(b,0) + c) / 3"
+
+where "a", "b", and "c" are the names of images,
+would produce the new image "avg" which is the average of the images
+"a", "c", and the image "b" with all negative pixels set to zero.
+Finally,
+
+.nf
+    cl> imcalc "image[50,*] = (image[49,*] + image[51,*]) / 2"
+.fi
+
+would replace column 50 of the named image by interpolation over the
+neighboring columns.  Many other examples could be given,
+but this should suffice to demonstrate the range of operations the
+image calculator will be able to perform.
+Common operations, or repetitive operations on large data sets,
+can be performed by writing CL scripts to generate sequences of commands
+to drive the image calculator.
+.le
+.ls (c)
+The operation of the image calculator when evaluating "mixed mode"
+expressions involving images which differ in size, number of dimensions,
+datatype, or which involve out of bounds references, has not yet been
+fully defined.
+.le
+.ls (d)
+The function of the image calculator shall be limited to pointwise
+image operations (no interpolation, filtering, etc.).
+.le
+.ls (e)
+The syntax of an expression in the image calculator shall be the same
+as for the SPP language (and Fortran 77).
+The image calculator shall recognize the following operators:
+
+.ks
+.nf
+    +			addition
+    -			subtraction
+    *			multiplication
+    /			division
+    **			exponentiation
+    -			unary negation
+    < <= > >= == !=	boolean comparison
+    !			boolean negation
+.fi
+.ke
+.le
+
+The result of a boolean expression shall be of type short integer, 
+where zero corresponds to false and one to true.  Boolean expressions
+are useful for thresholding and mask generation.
+
+.ls (f)
+The image calculator shall implement the following intrinsic functions:
+
+.ks
+.nf
+    abs      atan2    cos      int      min      sin       
+    acos     ceil     cosh     log      mod      sinh      
+    aimag    char     double   log10    nint     sqrt      
+    asin     complex  exp      long     real     tan       
+    atan     conjug   floor    max      short    tanh      
+.fi
+.ke
+.le
+.ls (g)
+The image calculator shall merge the bad pixel lists of the input images
+to produce the bad pixel list of the output image.
+.le
+.ls (h)
+A set of CL callable subroutine-like tasks shall also be provided for
+performing simple arithmetic operations on images (two images in, one out),
+without incurring the overhead associated with the image calculator.
+.le
+.ls (i)
+A specialized routine shall be provided for averaging a set of registered
+images.
+.le
+.le
+
+.ls (5)
+General pointwise operations are required to modify the intensity scale
+of an image in ways that are difficult or impossible to perform with the
+image calculator.  The following operators are required:
+.ls
+.ls o
+General pointwise mapping operator.  The mapping of input intensity to
+output intensity shall be defined by a user supplied transformation curve.
+The transformation curve shall consist of a list of data points giving
+output intensity versus input intensity.
+.le
+.ls o
+Histogram equalization operator.
+.le
+.ls o
+Histogram matching operator.
+.le
+.le
+.le
+
+.ls (6)
+Operators are required to perform various geometric transformations.
+These transformations move pixels about, but do not change the values
+of the pixels.  The geometric transformations shall be implemented as
+separate tasks.
+.ls (a)
+Operators shall be provided for the following transformations:
+.ls o
+Transpose.  Note that 90 degree clockwise and counterclockwise
+rotations may be effected by combining the transpose operator
+with an image section subscript as follows:
+
+.ks
+.nf
+    transpose ("in[*,-*]", out)		(cw rotation)
+    transpose ("in[-*,*]", out)		(ccw rotation)
+.fi
+.ke
+.le
+.ls o
+Fractional pixel shift along any dimension or dimensions.
+.le
+.ls o
+Expand or contract by any factor along any dimension or dimensions.
+.le
+.ls o
+Expansion by pixel replication.
+.le
+.ls o
+Contraction by block averaging.
+.le
+.ls o
+General linear transformation; a fraction pixel shift followed by a
+rotation though an arbitrary angle about an arbitrary center.
+.le
+.ls o
+General geometric distortion, or "rubber sheet", where the transformation
+is defined by means of an externally generated lookup table.
+The transformation shall be described by giving the coordinates of a set
+of grid points in the input image, and the corresponding coordinates of
+the same grid points in the output image.  The distortion routine shall
+compute the mapping for non-grid points by interpolation.
+Note that this operator may be used to implement rotations or translations,
+to register images, to remove or induce geometric distortions,
+to convert from Cartesian to polar representation and vice versa, and so on.
+.le
+.ls o
+Distortion table generation.  Given the coordinates of a set of grid points in
+the input image, and the corresponding coordinates of the same grid
+points in the output image, an analytic surface is fitted, and a new set
+of grid points are generated by sampling the analytic surface.
+This step is necessary when too few grid points are available to span
+the image, or when a smooth or constrained transformation is desired.
+Note that this operator is very similar to that used for astrometry.
+.le
+.ls o
+Image registration: given a list of images, compute the unique transformation
+required to register the images with minimum loss of data.
+The linear transformation routine may subsequently be used to perform the
+actual registration.  Operation shall be restricted to linear transformations
+(translation and/or rotation).  It shall be possible to restrict the
+transformation to a simple translation if desired.
+.le
+.le
+.ls (b)
+All operations which involve interpolation shall offer the following
+choice of interpolators:
+.ls o
+Nearest neighbor.
+.le
+.ls o
+Linear interpolation.
+.le
+.ls o
+Third order interior polynomial.
+.le
+.ls o
+Fifth order interior polynomial.
+.le
+.ls o
+Cubic spline.
+.le
+.ls o
+Sinc function.
+.le
+.le
+.ls (c)
+All operations which involve out of bounds references (i.e., a rotation
+or a geometric distortion) shall offer the following options for out of
+bounds references:
+.ls o
+Add the pixel to the bad pixel list.
+.le
+.ls o
+Return the value of the nearest boundary pixel.
+.le
+.ls o
+Return a constant value.
+.le
+.ls o
+Generate value by reflection about the boundary. 
+.le
+.ls o
+Generate value by projection about the boundary. 
+.le
+.ls o
+Generate value by wrapping around to the opposite side of the image.
+.le
+.ls o
+Apodize (for fourier analysis).
+.le
+.le
+.ls (d)
+Operations which change the spatial scale of the data (i.e., expand, contract,
+or distort) shall by default scale the value of the output pixels so as
+to conserve the volume integral.
+.le
+.ls (e)
+All linear transformation operators shall also transform the axes descriptor
+in the image header, so that the user coordinate system associated with
+the image remains accurate.
+.le
+.le
+
+.ls (7)
+Operators are required to perform various filtering operations on images.
+These transformations change the values of the pixels, but do not move
+pixels about or change the spatial scale of the image.  The filtering
+operators shall be implemented as separate tasks.
+.ls (a)
+The following filter operators are required:
+.ls o
+Gradient (first derivative).
+.le
+.ls o
+Laplacian (second derivative).
+.le
+.ls o
+Circular median filter.
+.le
+.ls o
+Rectangular median filter.  May be used for median filtering of lines
+and columns.
+.le
+.ls o
+Circular modal filter.
+.le
+.ls o
+Rectangular modal filter.
+.le
+.ls o
+Convolution via a gaussian kernel of arbitrary size.
+.le
+.ls o
+Convolution via a flat topped rectangular kernel of arbitrary size
+(boxcar smoothing).
+.le
+.ls o
+Convolution via a user specified kernel of arbitrary size.
+.le
+.ls o
+Lucy smoothing using boxcar smoothing or a user supplied convolution
+kernel.
+.le
+.ls o
+General lowpass filter operator.
+.le
+.ls o
+General highpass filter operator.
+.le
+.ls o
+General bandpass filter operator.
+.le
+.ls o
+General bandstop filter operator.
+.le
+.ls o
+A routine which converts a transfer function in the frequency domain into the
+corresponding convolution kernel in the spatial domain.
+.le
+.ls o
+Forward fourier transform.
+.le
+.ls o
+Inverse fourier transform.
+.le
+.ls o
+Power spectrum.
+.le
+.le
+.ls (b)
+The choices for dealing with out of bounds pixel references shall be
+the same as given in section 6(c).
+.le
+.le
+.ls (8)
+Special operators are required for background or bias fitting and removal.
+The following fitting operators are required:
+.ls (a)
+Line polynomial fit to a user defined set of regions.  This operator shall
+perform the following operations for each line in the image:
+.ls o
+Compute the median, mode, or mean of each region in the line,
+optionally with automatic pixel rejection and region growing.
+.le
+.ls o
+Fit a polynomial to the resulting set of points, where the order of the
+polynomial is greater than or equal to zero and is specified by the user.
+.le
+.ls o
+Evaluate the fitted polynomial to produce the output line.
+.le
+.le
+.ls (b)
+Surface polynomial fit to a user defined set of regions in a two
+dimensional image.  As above, but regions are defined along the columns
+as well.
+.ls o
+Compute the median, mode, or mean of each subraster,
+optionally with automatic pixel rejection and region growing.
+.le
+.ls o
+Fit a two dimensional polynomial to the resulting set of points,
+where the order of the polynomial in each dimension is greater than
+or equal to zero and is specified by the user.
+.le
+.ls o
+Evaluate the fitted surface to produce the output image.
+.le
+.le
+.ls (c)
+One or two dimensional surface fit to the pixel data directly,
+without computation of the mode, median, or whatever.
+A number of regions may be defined as in the other routines,
+or the entire raster may be fit.  A two dimensional Legendre polynomial
+is fitted, pixel rejection with region growing is performed if enabled,
+and the process iterates until convergence (two or three passes through
+the image are required).  The fitted surface is evaluated to produce
+the output image.
+.le
+.le
+
+.ls (9)
+A range of operators are required for editing rasters.  Raster editing
+may be used to remove artifacts or blemishes, to salvage calibration frames
+containing contaminating objects, to implement nonlinear filtering in the
+fourier domain, and so on.  The image calculator provides a rudimentary
+but powerful raster editing capability, allowing lines, columns, subrasters,
+and pixels to be copied or directly modified.  The filtering operators may
+also be used for a certain class of editing operations.  Additional special
+purpose operators are required for detecting and removing extended artifacts.
+.ls (a)
+The following operators are required:
+.ls o
+An operator is required to automatically detect and remove spikes.
+Pixels which exceed the median of a circular or rectangular region by
+more than a certain amount, and optionally all neighboring pixels out
+to a given radius, shall be replaced by artificial values.
+.le
+.ls o
+An operator is required to automatically detect and remove extended
+objects.  Region growing should be available as an option to insure
+that all contaminated pixels are replaced.
+.le
+.ls o
+An operator is required to automatically detect and remove transient defects,
+given a series of exposures of the same field taken at different times.
+.le
+.ls o
+An interactive editing routine is required, wherein the user interactively
+marks the region to be edited with a cursor.
+.le
+.le
+.ls (b)
+It shall be possible to replace pixels by any of the following
+techniques:
+.ls o
+By the median of the neighboring pixels, out to a user specified
+radius, with optional additive noise.
+.le
+.ls o
+By interpolation (linear or spline), with optional additive noise.
+.le
+.ls o
+By adding the pixels to the bad pixel list for the image.
+.le
+.ls o
+By substituting a user defined value, with optional additive noise.
+.le
+.le
+.le
+
+.sh
+3.11 Package IMRED
+
+    The Image Reductions package (IMRED) will provide streamlined or
+"canned" procedures for reducing the data from specific KPNO digital
+imaging detectors.  As far as possible, the IMRED procedures shall be
+written as CL scripts calling compiled procedures in other packages.
+Most of the functionality needed to reduce direct and spectroscopic
+imaging data will be provided by the general purpose routines in the
+IMAGES package.
+
+The advantages of writing IMRED procedures as CL scripts are the following:
+(1) the high level IMAGES tasks, such as the image calculator, can be used
+directly instead of calling lower level library procedures, 
+(2) staff and users can modify CL scripts more easily than compiled
+procedures, and (3) we can provide specialized routines for common reduction
+tasks, without sacrificing generality.  The principal disadvantage is that
+it is harder to access data dependent fields in the image header,
+such as the filter number or IPS parameter for Video Camera images.
+
+Canned procedures shall be provided to reduce data from the following
+KPNO instruments:
+.ls
+.ls (1)
+CCD direct.  Bias determination is via the polynomial fitting routines
+in the IMAGES package; trim, bias subtraction and flat field division is
+via the image calculator, cleaning is via the image editing routines,
+and so on.  A special routine will probably be required for defringing.
+.le
+.ls (2)
+Echelle CCD.  Reductions are much the same as for the CCD direct.
+A different defringing algorithm is required.  Cleaning and order
+extraction is via the MULTISPEC procedures.
+.le
+.ls (3)
+HGVS (High Gain Video Spectrometer).  The basic operations are the
+same as for the CCD's.  An additional call to a polynomial fitting routine
+is required to compute the slit profile.  Distortion mapping is via the
+LONGSLIT procedures.
+.le
+.ls (4)
+Cryogenic Camera.  Reductions are the same as for the HGVS,
+except than an additional rotation or transposition step is required.
+.le
+.ls (5)
+Video Camera.  Reductions are very similar to those for the CCD direct,
+except that there is no defringing problem.  The reduction procedures should
+be able to make use of the filter number and IPS parameter for each frame.
+Distortion mapping need be done only once for a given image tube,
+and hence is not part of the normal reduction sequence.
+Distortion removal is via the geometric distortion routine in IMAGES.
+.le
+.ls (6)
+Coude CCD.  Standard CCD reductions, followed by compression to one
+dimensional spectra for subsequent analysis in ONEDSPEC.
+.le
+.le
+
+Although canned procedures will not be provided (at least initially) for
+reducing data from non-KPNO digital detectors, it should not be difficult
+for users to modify the standard scripts to reduce data from other
+detectors.
+
+.sh
+3.12 Package LANGUAGE
+
+    The command language itself.  Not a normal package, in that the tasks
+are built into the CL process, rather than into separate processes.
+The contents of this package are always "loaded".  The purpose of the
+LANGUAGE package is to summarize the language facilities, and to prompt
+the user with the names of the language "tasks", so that HELP may be
+called to obtain additional information.
+
+.sh
+3.13 Package LISTS
+
+    Routines for operating upon lists.  A list is a text file wherein
+each line is a record consisting of one or more columns.  Lists may be
+produced by output redirection, editing, and many other means.  Examples
+of lists are lists of object coordinates, lists of images, lists of
+regions, lists of transformation points, the graphics and image cursors,
+and so on.  Lists are used throughout the system.
+.ls
+.ls (1)
+For maximum flexibility, all list operators shall be implemented as filters.
+.le
+.ls (2)
+Operators shall be provided to perform the following functions:
+.ls o
+Copy selected columns from the input list to the output list.
+.le
+.ls o
+Concatenate lines from a list of input files (merge records from several
+lists).
+.le
+.ls o
+Sort a list, alphabetically or numerically, in increasing or decreasing
+order, by the contents of any column.
+.le
+.ls o
+Merge several sorted lists, alphabetically or numerically,
+in increasing or decreasing order, by the contents of any column.
+.le
+.ls o
+Filter a list, passing or stopping only those lines which are within
+the specified numeric or alphabetic range.
+.le
+.ls o
+Filter a coordinate list, passing or stopping only those coordinates
+which are within a certain radius of a certain origin.
+.le
+.ls o
+Filter a list, passing or stopping only those lines which contain a
+substring matching a user defined pattern.
+.le
+.ls o
+Break the input list up into a stream of words.
+.le
+.ls o
+Organize a stream of words into a neatly formatted table.
+.le
+.ls o
+Copy the special list GCUR (the graphics cursor) to the output list.
+.le
+.ls o
+Copy the special list IMCUR (the image cursor) to the output list.
+.le
+.ls o
+Graph the contents of one or more lists, producing a plot on the
+standard graphics device.  If more than one list is input, the individual
+curves (lists) shall be overplotted.
+.le
+.ls o
+Perform arithmetic upon the columns of lists (e.g., OPSTRM).  The output
+columns are functions of the input columns.
+.le
+.ls o
+Average a list of numbers, each of which may have an associated weight.
+.le
+.ls o
+Average a list of coordinates, each of which may have an associated weight.
+.le
+.ls o
+Convert a list to upper case.
+.le
+.ls o
+Convert a list to lower case.
+.le
+.ls o
+Perform a user specified mapping of the characters within a list.
+.le
+.ls o
+Count the number of lines, words, and characters in a list or in a
+list of files.
+.le
+.le
+.ls (3)
+When appropriate, the list operators should be set up to operate either
+upon a list of input files, or upon the standard input.
+.le
+.le
+.le
+
+.sh
+3.14 Package ONEDSPEC
+
+    The one dimensional spectral reduction and analysis package.
+A general purpose package or packages, with a separate set of higher level
+"canned" procedures for reducing data from specific KPNO instruments.
+The basic requirements are as follows:
+.ls
+.ls (1)
+Spectra shall be stored as one dimensional images with an extended header
+containing special fields used by ONEDSPEC.  This will permit use of the
+standard image calculator and graphics utilities to manipulate and plot
+spectra.
+.le
+.ls (2)
+An assortment of routines are needed for data input.  Routines are required
+to convert data from the following formats into ONEDSPEC images:
+.ls o
+FITS.  The standard FITS reader should be sufficient, provided it can
+handle mapping of nonstandard keywords into the application specific
+part of the image header.
+.le
+.ls o
+IIDS, IRS.
+.le
+.ls o
+REDUCER.
+.le
+.ls o
+Text files.  The standard DATAIO card image reader will suffice to convert
+card image files into text files, but a special routine will be needed
+to convert a text file spectrum (format yet to be defined) into an image.
+.le
+.le
+.ls (3)
+Only the standard FITS and text file (hence card image) formats will be
+supported for output of spectra.
+.le
+.ls (4)
+The image calculator shall be used for arithmetic and other operations upon
+spectra, unless special handling of the extra fields in the image header
+is required.
+.le
+.ls (5)
+The standard IMAGES graphics utilities shall be used for plotting spectra,
+except within interactive analysis procedures.  The user coordinate systems
+in the image header (x, y, and flux) must be initialized by ONEDSPEC if user
+coordinates are desired on graphics output.  The standard graphics utilities
+(the image header) support only linear coordinate transformations.  
+.le
+.ls (6)
+A routine shall be provided for editing the special fields of the ONEDSPEC
+image header.
+.le
+.ls (7)
+Operators shall be provided for the following standard reduction 
+operations:
+.ls o
+Line identification.
+.le
+.ls o
+Dispersion solution.
+.le
+.ls o
+Dispersion correction.  The data is interpolated and rewritten to
+a user defined dispersion scale (linear, log lambda, etc., in units of
+angstroms, wave number, inverse cm., etc.).
+.le
+.ls o
+Flux calibration.
+.le
+.ls o
+Coincidence correction.
+.le
+.ls o
+Atmospheric extinction correction.
+.le
+.ls o
+Merging of spectra (i.e., Echelle orders), to form a single
+spectrum.
+.le
+.le
+.ls (8)
+Analysis functions shall include at least the following:
+.ls o
+Velocity measurement of individual lines.
+.le
+.ls o
+Velocity measurement by cross-correlation.
+.le
+.ls o
+Continuum estimator.
+.le
+.ls o
+Intensity measurement.  Equivalent width via aperture integration,
+profile fitting, pseudo-filter.
+.le
+.ls o
+Analytical and empirical generation of line profiles.  Modeling of
+line profiles.
+.le
+.ls o
+Deconvolution of blended lines.
+.le
+.ls o
+Fourier transforms, power spectrum, filtering, etc., mostly via the standard
+routines in the IMAGES package.
+.le
+.le
+.ls (9)
+The package shall be able to handle spectra up to several million
+pixels in length.
+.le
+.ls -5 (10)
+Canned reduction procedures shall be provided for the following
+KPNO instruments:
+.ls o
+IIDS, IRS
+.le
+.ls o
+McMath FTS
+.le
+.ls o
+4-Meter FTS
+.le
+.le
+
+The ONEDSPEC package will be one of the most heavily used packages in
+the system, and should be sufficiently general to handle the reduction
+and analysis of one dimensional spectra from a variety of instruments.
+.le
+
+.sh
+3.15 Package SOFTOOLS
+
+    Software tools.  A collection of tools used to develop and maintain
+software systems.
+.ls
+.ls (1)
+The following tools shall be provided:
+.ls o
+A compiler for the SPP language.
+.le
+.ls o
+A portable, general purpose editor (probably the "tools" editor,
+converted as required for IRAF).
+.le
+.ls o
+Tools for making, updating, and accessing archives.
+.le
+.ls o
+A simplified IRAF version of the MAKE utility (required to automatically
+generate packages on non-UNIX systems).
+.le
+.ls o
+The SYSGEN utility, used to maintain the IRAF system.
+.le
+.ls o
+A utility which lists the names of all procedures and commons
+defined in a set of SPP source files on the standard output.
+.le
+.ls o
+A utility which compares a list of external identifiers with those used
+in the IRAF libraries, and passes the names of only those identifiers which
+redefine library routines (if any).
+.le
+.ls o
+A utility which produces a cross reference list for the SPP source
+files in a package.
+.le
+.le
+.ls (2)
+All tools shall be written in the SPP language as standard CL callable
+IRAF tasks, and shall be as transportable as possible.
+.le
+.le
+
+.sh
+3.16 Package NSURFBRT (to be renamed)
+
+    Digital surface brightness analysis of extended objects, such as
+galaxies.
+.ls
+.ls (1)
+The main function of the package shall be to fit ellipses to the isophotes
+of extended objects (galaxies), without artificially constraining the 
+center, position angle, or ellipticity of the fitted curves.
+.le
+.ls (2)
+Output shall consist of a set of isophotes, defining the shape, orientation,
+magnitude, and position of the object as a function of major and minor
+axis radius.
+.le
+.ls (3)
+The fitting routine shall optionally be able to detect contaminating
+objects such as stars, and exclude them from the fit.
+.le
+.ls (4)
+All analysis routines shall be usable either interactively or in batch
+mode, processing an indefinitely large list of objects.
+.le
+.ls (5)
+All analysis procedures shall exclude bad pixels from the fit.
+.le
+.ls (6)
+Accurate estimates of the uncertainties of all calculated parameters
+shall be computed.
+.le
+.ls (7)
+Graphics utilities shall be provided for producing contour like plots
+of the fitted isophotes, for plotting radial profiles, ellipticity
+gradients, migration of the major axis, and so on.
+.le
+.ls (8)
+Output from the main analysis routine shall be in the form of a
+table printed on the standard output, permitting use of the standard
+list processing utilities for general analysis, and of the card image
+utilities for data export.
+.le
+.le
+    
+.sh
+3.17 Package SYSTEM
+
+    The SYSTEM package shall provide general purpose routines for file
+manipulation and status, directory listing, device allocation and
+deallocation, time and date, and so on.
+.ls 
+.ls (1)
+The following functions shall be provided:
+.ls o
+Allocate a device (i.e., magtape).
+.le
+.ls o
+Deallocate a previously allocated device.
+.le
+.ls o
+Print status information for an allocatable device.
+.le
+.ls o
+Clear the terminal screen.
+.le
+.ls o
+Beep the terminal (useful for wakeup after a long command or command
+sequence).
+.le
+.ls o
+Concatenate a list of files.
+.le
+.ls o
+Copy a file, copy a list of files to a directory.
+.le
+.ls o
+Delete a file or files.
+.le
+.ls o
+List the names of the files in the current directory, in one or more named
+directories, or just give information about one or more named files.
+A short form shall be provided, wherein only the name of the file is given.
+A long form shall also be provided, giving the name, access and delete
+permissions, file type (text or binary), file size, date of last modify,
+and so on for each file in the list.
+.le
+.ls o
+Summarize the amount of disk space currently available.
+.le
+.ls o
+Echo command line arguments on the standard output (which can be redirected
+to do useful things).
+.le
+.ls o
+Print the first few lines of a file or files.
+.le
+.ls o
+Print the last few lines of a file or files.
+.le
+.ls o
+Page through a file or files, pausing at the end of each screen of text.
+.le
+.ls o
+Print a file or files on the standard line printer device.
+.le
+.ls o
+Protect a file or files from deletion, accidental or otherwise.
+.le
+.ls o
+Remove protection from a file or files.
+.le
+.ls o
+Rename a file, or move a list of files to a different directory.
+.le
+.ls o
+Print information on who is using the system, what they are doing,
+how much cpu time, etc., they have used, and so on.
+.le
+.ls o
+Tee the standard output.
+.le
+.ls o
+Print the time and date on the standard output.
+.le
+.ls o
+Type the contents of a text file or files on the standard output.
+.le
+.ls o
+Change the current directory.
+.le
+.le
+.ls (2)
+Some of these routines will necessarily be machine dependent.
+.le
+.ls (3)
+Whenever possible, a routine will be set up to operate either on a list
+of files specified by pattern matching, or to read from the standard
+input if so directed on the command line.
+.le
+.ls (4)
+All routines which operate on files shall accept either virtual file
+names, which are machine independent, or operating system dependent
+pathnames.
+.le
+.ls (5)
+It shall be possible, at the discretion of the user, for a newly created
+file to silently clobber an existing file of the same name; otherwise,
+the system will refuse to clobber an existing file (the routine will
+abort and an explicit delete will be required).
+.le
+.le
+
+.sh
+3.18 Package TWODSPEC
+
+    Two dimensional spectral reduction and analysis.  A set of general purpose
+packages, with separate canned procedures for reducing the data from standard
+KPNO two dimensional spectrographic instruments.  Two main subpackages
+shall be provided: (1) MULTISPEC, which fits and extracts one dimensional
+spectra from two dimensional images, and (2) LONGSLIT, which reduces
+true two dimensional spectra (the names of these packages may change).
+.ls
+.ls (1)
+The main function of the MULTISPEC package shall be to extract flattened
+one dimensional spectra from two dimensional images.  The following
+functions shall be provided:
+.ls o
+Production of flat field frames by fitting quartz calibration images.
+.le
+.ls o
+Flat field correction of multispectral data.
+.le
+.ls o
+Cleaning of the spectra.
+.le
+.ls o
+Extraction of the individual object spectra for further processing in
+ONEDSPEC.
+.le
+.le
+.ls (2)
+It shall be possible to extract blended spectra via deconvolution
+techniques.
+.le
+.ls (3)
+It shall be possible to extract spectra superimposed on a slowly varying
+background.
+.le
+.ls (4)
+It shall be possible to accurately fit spectra even though the PSF
+varies slowly over the image.
+.le
+.ls (5)
+It shall be possible to reliably and accurately trace spectra
+in the presence of geometric distortions (pincushion, s, shear, etc.).
+.le
+.ls (6)
+It shall be possible to compute the residual of the data image minus
+the fitted image, to evaluate the quality of the fit.
+.le
+.ls (7)
+The program shall compute accurate estimates of the uncertainties in the
+fitted parameters.
+.le
+.ls (8)
+The routines in the MULTISPEC package shall be general purpose, i.e.,
+not tied to the data from any particular instrument.
+.le
+.ls (9)
+Canned procedures which are instrument specific shall be provided for
+the reduction of data from the following KPNO instruments:
+.ls o
+Multiaperture CRYOCAM.
+.le
+.ls o
+Multiaperture HGVS.
+.le
+.ls o
+Echelle.
+.le
+.le
+.le
+
+The LONGSLIT package shall reduce true two dimensional spectrographic
+data.  The primary input is a flattened two dimensional spectrum
+(wavelength versus arcseconds on the sky), and various spectral and flux
+calibration images.  The primary output is a distortion corrected,
+sky subtracted one or two dimensional spectrum.  The LONGSLIT package
+shall also provide a two dimensional spectral analysis capability.
+
+The LONGSLIT package shall provide the following reduction functions:
+.ls
+.ls (1)
+Geometric distortion mapping.  The basic procedure is as follows:
+.ls o
+A stellar-like object frame or (fully resolved) multislit frame is traced
+to determine the distortion in the cross dispersion direction.
+.le
+.ls o
+A full slit arc frame is traced to determine the distortion along the
+direction of the dispersion.
+.le
+.le
+.ls (2)
+Line identification.  Given an arc frame to be used to perform the
+dispersion solution, identify the individual arc lines, assign wavelengths,
+and generate a line list to be used for the dispersion solution.
+.le
+.ls (3)
+Dispersion solution.  It shall be possible to determine the two dimensional
+dispersion for the image (wavelength versus x,y) by fitting a full slit
+arc frame, or by analysis of selected regions of an arc frame.
+.le
+.ls (4)
+Remove geometric distortions and correct the dispersion.  A transformation
+table shall be prepared and used to drive the geometric distortion routine
+provided by the IMAGES package.
+.le
+.ls (5)
+It shall be possible to remove only the geometric distortions, or to both
+remove geometric distortions and correct the dispersion scale.  The user
+shall be able to specify the following parameters for the output dispersion:
+.ls o
+Starting and ending wavelength.
+.le
+.ls o
+Dimensions of the output spectrum in pixels.
+.le
+.ls o
+Type of output dispersion curve desired (same dispersion, linear,
+log lambda, etc.).
+.le
+.le
+.ls (6)
+Slit correction.  The slit function is determined by fitting a polynomial
+to an arc line or lines, and used to produce a calibration frame.
+The slit function is then removed by an arithmetic operation (this can
+all be done with standard IMAGES procedures).
+.le
+.ls (7)
+Sky subtraction.  A smooth sky image is prepared and subtracted from the
+data (this can all be done with standard IMAGES procedures).
+.le
+.ls (8)
+Flux calibration.  A standard star spectrum is reduced to a one dimensional
+spectrum, flux calibrated by ONEDSPEC, and the result is used to calibrate
+one or more two dimensional spectra.  This requires the following
+operators:
+.ls o
+Convert a two dimensional spectrum into a one dimensional spectrum in
+ONEDSPEC format.
+.le
+.ls o
+Generate a dummy one dimensional ONEDSPEC spectrum which is subsequently
+calibrated by ONEDSPEC.
+.le
+.ls o
+Use the calibrated dummy spectrum to flux calibrate one or more two dimensional
+spectra.
+.le
+
+The two-to-one conversion routine may also be used if one dimensional output
+spectra are desired.
+.le
+.ls (9)
+Canned procedures are required to perform the above reductions for the
+following KPNO instruments:
+.ls o
+Multislit (final output is normally one-dimensional dispersion corrected,
+sky subtracted spectra).
+.le
+.ls o
+Long slit spectrographs (output is usually true two dimensional,
+dispersion and distortion corrected, sky subtracted spectra).
+.le
+.le
+.le
+
+In addition to the LONGSLIT reduction procedures, the following two dimensional
+spectral analysis procedures are required:
+.ls
+.ls (1)
+A two dimensional continuum estimator.
+.le
+.ls (2)
+A routine to trace emission or absorption lines, computing line center,
+radial velocity, and equivalent width across the dispersion.
+.le
+.ls (3)
+The line tracing procedure shall be able to trace faint lines out into
+the sky, and shall be able to deconvolve blended lines.
+.le
+.ls (4)
+A frequency domain cross-correlation routine is required to compute
+radial velocity across the dispersion, using all spectral information
+within a user specified range of wavelengths.
+.le
+.le
+
+.sh
+3.19 Package UTILITIES
+
+    Miscellaneous utilities.  Includes routines for precession, computing
+airmass, making finding charts, and so on.
+
+.sh
+3.20 Special Packages
+
+    The discussion has thus far been limited to those IRAF packages which
+are expected to be of general interest to astronomers (and others) around
+the country and the world, and which should therefore be included in the
+general distribution.  In addition, other packages will be developed in
+the IRAF which will probably be used only at KPNO.  Example are the HOLES
+program and the Vacumn Telescope reductions package; there are probably
+other similar packages which I cannot remember at the moment.  I expect that
+many special purpose packages will ultimately be developed by the staff
+that do not make it into the general distribution.
+
+.sh
+4. Correspondence of existing KPNO software to IRAF Packages
+
+    In this section we go through Harvey and Jeannettes memo of July 1, 1983,
+and describe how the functionality provided by each existing KPNO program or
+system is provided by the IRAF package structure outlined above.
+
+.nf
+        Index     Old Program             IRAF Package
+
+		4M PF photography
+
+	I.A.1	PDSLIB			dataio
+	I.A.2	DTOI			dtoi
+	I.B.1	ASTRO			astrometry
+	I.B.2	IPPS			IRAF
+	I.B.3	RICHFLD			digiphot
+	I.B.4	AUTOPHOT		digiphot
+	I.B.5	SURFBRT			nsurfbrt
+	I.B.6	GRASP			nsurfbrt
+	I.B.7	FOCAS			focas
+	I.B.8	MPC			digiphot
+
+		4M PF / 1-0.9 CCD
+
+	II.A.1	DEBIAS,FPS,FGEN,MEDIAN	imred
+	II.A.2	CCDPROC			imred
+	II.B.*	(analysis)		(all image packages)
+
+		Video Camera
+
+	III.A.1	VIDCAM			imred
+	III.A.2	PROCESS			imred
+	III.A.4	DIODE,DISTORT		imred
+	III.B	(analysis)		(all image packages)
+
+		IIDS/IRS
+
+	IV.A.1	IDS(IPPS)		onedspec
+	IV.A.2	REDUCE(varian)		onedspec
+	IV.B.1	IDS(analysis)		onedspec
+	IV.B.2	TV			onedspec
+
+		RC / White Spectrograph, Long Slit
+
+	V.A.1	PDSLIB			dataio
+	V.A.2	RV			twodspec.longslit
+	V.B.1	RV			twodspec.longslit
+	V.B.2	FOURIER			twodspec.longslit
+
+		ICCD, Long Slit
+
+	VI.A.1	HGVS			imred
+	VI.B.1	RV			twodspec.longslit
+	VI.B.2	FOURIER			twodspec.longslit
+
+		Cryo Cam, Long Slit
+
+	(same as ICCD)
+
+		Cryo Cam, Multi-Aperture Data
+
+       VIII.A.1	HOLES			twodspec
+       VIII.A.2	MAP			twodspec.multispec
+       VIII.A.3	TV			onedspec
+       VIII.B.1	TV			onedspec
+
+		Echelle, Photographic
+
+	IX.A.1	PDSLIB, DTOI		dataio, dtoi
+	IX.A.2	FASTSCAN		twodspec.multispec
+	IX.A.3	ECHORD,TRACE		twodspec.multispec
+	IX.B.1	ATLAS,WIDTH		(no plans at present)
+	IX.B.2	MOOG			(no plans at present)
+	IX.B.3	DECOMP			onedspec (perhaps)
+
+		Echelle, CCD
+
+	X.A.1	ECH			imred
+	X.B.1	TV			onedspec
+
+		FTS instruments
+
+	XI.A.1	GRAMMY			onedpsec
+	XI.A.2	FTSER			onedpsec
+	XI.A.3	REDUCER			onedspec
+	XI.A.4	ATLAS			(no plans at present)
+
+		IR and Visible Photometers
+
+	XII.A.1	Hbeta, 4COLOR, etc.	filterphot
+
+		Coude, photographic
+
+       XII.A.1	PDSLIB			dataio
+       XII.A.2	SPEC1,2,5		onedspec
+       XII.A.3	DISP,DISP5		onedspec
+       XII.B.1	(analysis)		onedspec
+
+		Coude, CCD
+        XIV.A.1	SPECRED			imred
+        XIV.A.2	fourier fitting		imred
+        XIV.B	(analysis)		onedspec
+
+		McMath Spectrograph
+
+	XV.A.1	REDUCER			onedspec
+	XV.A.2	DECOMP			onedspec, maybe
+        XIV.B	(analysis)		onedspec
+.fi
+.endhelp

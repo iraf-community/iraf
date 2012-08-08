@@ -1,0 +1,25 @@
+.help vxv Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slVXV (VA, VB, VC)
+
+     - - - -
+      V X V
+     - - - -
+
+  Vector product of two 3-vectors (single precision)
+
+  Given:
+      VA      real(3)     first vector
+      VB      real(3)     second vector
+
+  Returned:
+      VC      real(3)     vector result
+
+  P.T.Wallace   Starlink   March 1986
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

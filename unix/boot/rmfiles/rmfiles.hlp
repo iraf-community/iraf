@@ -1,0 +1,95 @@
+.help rmfiles Jul86 "softools"
+.ih
+NAME
+rmfiles -- find/remove files in subdirectories
+.ih
+USAGE
+rmfiles [-dnv] [-f progfile] rootdir action extns
+.ih
+PARAMETERS
+.ls 4 -d
+Print debug messages.
+.le
+.ls 4 -n
+No execute; do not delete files.  This option may be used to generate
+a list of binary files for some purpose other than deletion, or to verify
+the delete operation before destroying the files.
+.le
+.ls 4 -v
+Print names of files as they are deleted.
+.le
+.ls 4 -f progfile
+Take delete commands from the named file.  If this option is specified
+the remaining arguments are normally omitted.
+.le
+.ls 4 rootdir
+The root directory of the directory tree to be pruned.  This must be a
+path from the current directory or from a logical directory.
+.le
+.ls 4 action
+The possible actions are listed below.  This is a required parameter.
+.ls
+.ls 8 -all
+Delete all files.
+.le
+.ls 8 -allbut
+Delete all files except those with the listed extensions.
+.le
+.ls 8 -only
+Delete only those files with the listed extensions.
+.le
+.le
+.le
+.ls 4 extns
+A list of filename extensions delimited by spaces, e.g., ".a .o .e .hlp".
+.le
+.ih
+DESCRIPTION
+The \fIrmfiles\fR utility is used to delete (or list) files in one or more
+directory trees.  If only one directory tree is to be pruned the necessary
+instructions can be entered on the command line, otherwise a program file
+must be used.  When developing a program file, a dry run using the "-n"
+switch is recommended to see what files will be deleted.
+
+If a program file is used each line in the file has one of two possible
+formats.  If a directory is to be pruned the syntax is the same as is
+used when a one line program is entered on the command line, i.e.:
+
+	rootdir action extns
+
+The significance of each field is as described in the ARGUMENTS section
+above.  The program file may also contain lines of the form
+
+	-file filename
+
+to delete one or more files by name.  This is useful for removing files
+which do not fit into any recognizable class.
+
+Comments and blank lines are permitted anywhere in the program file.
+All filenames are IRAF virtual filenames (or host filenames).
+
+\fIRmfiles\fR is a bootstrap utility implemented as a foreign task, hence
+it may be called either from within IRAF or from the host system.
+.ih
+EXAMPLES
+1. Delete all .o, .e, .a, and .hd files in the directory "iraf$pkg".
+Print the names of the files as they are deleted.  Note that one must
+move to the directory containing the directory to be pruned before running
+\fIrmfiles\fR.
+
+.nf
+	cl> cd iraf
+	cl> rmfiles -v pkg .o .e .a .hd
+.fi
+
+2. Strip the entire IRAF system, using the program in file "hlib$stripper".
+The use of the $ in the filename here could cause problems on some systems
+since \fIrmfiles\fR is a foreign task.
+
+.nf
+	cl> cd iraf
+	cl> rmfiles -vf hlib$stripper
+.fi
+.ih
+SEE ALSO
+rmbin, rtar, wtar

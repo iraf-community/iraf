@@ -1,0 +1,113 @@
+.help tcopy Jan2001 tables
+.nj
+.ih
+NAME
+tcopy -- Copy tables.
+.ih
+USAGE
+tcopy intable outtable
+.ih
+DESCRIPTION
+This task is used to copy tables.  The input may be a general filename
+template, including wildcard characters or the name of a file (preceded
+by an @ sign) containing table names.  The output may be either a directory
+specification or a list of table names.  If the output is a list of tables
+then there must be the same number of names in the input and output lists,
+and the names are taken in pairs, one from input and one from output.
+The input and output tables must not be the same.
+This task will convert the format of the table
+if the output filename extension indicates it.
+For example, if the output filename extension is ".fits",
+the output table will be a fits file.
+If the output is redirected or piped,
+it will be written to a text table.
+
+NOTE: Be careful when using a wildcard for the extension.
+If you have the files "table.tab" and "table.lis" in the current directory,
+for example, then the command "tcopy tab* test/" would copy both files
+to the subdirectory "test".
+.ih
+PARAMETERS
+.ls intable [file name template]
+A list of one or more tables to be copied.
+.le
+.ls outtable [file name template]
+Either a directory name or a list of output table names.
+
+If 'outtable' is not a directory,
+the number of input tables and output tables must be the same.
+An exception to this rule is that if 'outtable' is a FITS file
+(i.e. an existing FITS file, or the name ends in ".fits")
+then multiple input tables can be copied to one output file.
+.le
+.ls (verbose = yes) [boolean]
+Display names of input and output tables as they are copied?
+.le
+.ih
+EXAMPLES
+1.  To simply copy a table:
+
+.nf
+    tt> tcopy table.tab tablecopy.tab
+.fi
+
+2.  To copy one or more tables, possibly changing table type:
+
+.nf
+    tt> tcopy table1.tab,table2.tab a.fits,b.tab
+    tt> tcopy a.fits,b.tab a.tab,b.fits
+    tt> tcopy a.fits > a.txt
+.fi
+
+The number of input and output tables must be the same.
+In the third case,
+"a.txt" will be a text file because
+the output table name was "STDOUT"
+(the name was implicitly set, in this case,
+because the output was redirected.)
+
+3.  To copy a set of tables to a new directory:
+
+.nf
+    tt> tcopy table*.tab directory
+    		or
+    tt> tcopy table*.tab directory$
+    		or
+    tt> tcopy table*.tab osdirectory
+.fi
+
+where "directory" is an IRAF environment variable for a directory name,
+and "osdirectory" is an operating system directory name
+(e.g., "/user/me/" in UNIX).
+
+4.  To copy only specified extensions of a FITS file:
+
+.nf
+    tt> tcopy xyz.fits[3],xyz.fits[5] b.fits
+.fi
+
+If "b.fits" did not already exist,
+it would be created and would then contain two table extensions.
+If it did already exist,
+the two extensions would be appended.
+Note that the number of input and output files are not the same;
+this is OK because the output is a FITS file
+and can therefore contain multiple table extensions.
+
+5.  The input and/or output may be redirected:
+
+.nf
+    tt> dir l+ | tproject columns=c7,c3 | tcopy dir.tab > verbose.lis
+.fi
+
+"verbose.lis" contains just the one line "# STDIN -> dir.tab",
+and "dir.tab" has the output of 'tproject', the file names and sizes.
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Phil Hodge.
+.ih
+SEE ALSO
+tdelete
+.endhelp

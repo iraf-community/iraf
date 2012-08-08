@@ -1,0 +1,5 @@
+textfile,f,a,"",,,"Input astrometry text file"
+record,s,a,"text",,,"Database record name"
+database,s,h,")_.catdb",,,"The catalog database"
+acatpars,pset,h,,,,"The catalog description parameter set" 
+mode,s,h,"ql",,,

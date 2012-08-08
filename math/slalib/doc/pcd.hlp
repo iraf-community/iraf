@@ -1,0 +1,51 @@
+.help pcd Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slPCD (DISCO,X,Y)
+
+     - - - -
+      P C D
+     - - - -
+
+  Apply pincushion/barrel distortion to a tangent-plane [x,y].
+
+  Given:
+     DISCO    d      pincushion/barrel distortion coefficient
+     X,Y      d      tangent-plane coordinates
+
+  Returned:
+     X,Y      d      distorted coordinates
+
+  Notes:
+
+  1)  The distortion is of the form RP = R*(1 + C*R**2), where R is
+      the radial distance from the tangent point, C is the DISCO
+      argument, and RP is the radial distance in the presence of
+      the distortion.
+
+  2)  For pincushion distortion, C is +ve;  for barrel distortion,
+      C is -ve.
+
+  3)  For X,Y in units of one projection radius (in the case of
+      a photographic plate, the focal length), the following
+      DISCO values apply:
+
+          Geometry          DISCO
+
+          astrograph         0.0
+          Schmidt           -0.3333
+          AAT PF doublet  +147.069
+          AAT PF triplet  +178.585
+          AAT f/8          +21.20
+          JKT f/8          +13.32
+
+  4)  There is a companion routine, slUPCD, which performs
+      an approximately inverse operation.
+
+  P.T.Wallace   Starlink   31 December 1992
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

@@ -1,0 +1,5 @@
+cmd,s,a,"on",,,"Command"
+bkg,b,h,yes,,,"Run in background?"
+gui,b,h,yes,,,"Run a GUI window?"
+verbose,b,h,no,,,"Verbose output?"
+mode,s,h,"ql",,,

@@ -1,0 +1,76 @@
+.help mapqk Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slMAPQ (RM, DM, PR, PD, PX, RV, AMPRMS, RA, DA)
+
+     - - - - - -
+      M A P Q
+     - - - - - -
+
+  Quick mean to apparent place:  transform a star RA,Dec from
+  mean place to geocentric apparent place, given the
+  star-independent parameters.
+
+  Use of this routine is appropriate when efficiency is important
+  and where many star positions, all referred to the same equator
+  and equinox, are to be transformed for one epoch.  The
+  star-independent parameters can be obtained by calling the
+  slMAPA routine.
+
+  If the parallax and proper motions are zero the slMAPZ
+  routine can be used instead.
+
+  The reference frames and timescales used are post IAU 1976.
+
+  Given:
+     RM,DM    d      mean RA,Dec (rad)
+     PR,PD    d      proper motions:  RA,Dec changes per Julian year
+     PX       d      parallax (arcsec)
+     RV       d      radial velocity (km/sec, +ve if receding)
+
+     AMPRMS   d(21)  star-independent mean-to-apparent parameters:
+
+       (1)      time interval for proper motion (Julian years)
+       (2-4)    barycentric position of the Earth (AU)
+       (5-7)    heliocentric direction of the Earth (unit vector)
+       (8)      (grav rad Sun)*2/(Sun-Earth distance)
+       (9-11)   barycentric Earth velocity in units of c
+       (12)     sqrt(1-v**2) where v=modulus(ABV)
+       (13-21)  precession/nutation (3,3) matrix
+
+  Returned:
+     RA,DA    d      apparent RA,Dec (rad)
+
+  References:
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+
+  Notes:
+
+  1)  The vectors AMPRMS(2-4) and AMPRMS(5-7) are referred to
+      the mean equinox and equator of epoch EQ.
+
+  2)  Strictly speaking, the routine is not valid for solar-system
+      sources, though the error will usually be extremely small.
+      However, to prevent gross errors in the case where the
+      position of the Sun is specified, the gravitational
+      deflection term is restrained within about 920 arcsec of the
+      centre of the Sun's disc.  The term has a maximum value of
+      about 1.85 arcsec at this radius, and decreases to zero as
+      the centre of the disc is approached.
+
+  Called:
+     slDS2C       spherical to Cartesian
+     slDVDV        dot product
+     slDMXV        matrix x vector
+     slDC2S       Cartesian to spherical
+     slDA2P      normalize angle 0-2Pi
+
+  P.T.Wallace   Starlink   23 August 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

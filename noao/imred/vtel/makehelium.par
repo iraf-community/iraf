@@ -1,0 +1,4 @@
+getinroot,s,a,,,,Input root file name
+getoutroot,s,a,,,,Root filename for output images
+inroot,s,h
+outroot,s,h

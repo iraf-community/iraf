@@ -1,0 +1,37 @@
+.help zfacss May84 "System Interface"
+.ih
+NAME
+zfacss -- determine the accessibility and type of a file
+.ih
+SYNOPSIS
+.nf
+zfacss (osfn, mode, type, status)
+
+packed	char osfn[]		# host filename
+int	mode			# access mode to be checked
+int	type			# file type to be tested
+int	status			# is file accessible as specified
+.fi
+.ih
+DESCRIPTION
+Determine if a file is accessible with the indicated access modes and whether
+or not the file is of the indicated type.  If either \fImode\fR or \fItype\fR is
+zero it is not checked; if both are zero, only the existence of the file
+is checked.  Legal access modes are 0, READ_ONLY, READ_WRITE, WRITE_ONLY, and
+APPEND.  Legal file types are 0, TEXT_FILE, and BINARY_FILE.
+.ih
+RETURN VALUE
+YES is returned if the file is accessible with the indicated mode and type;
+NO is returned otherwise.
+.ih
+NOTES
+On some systems (e.g. UNIX) it is necessary to actually read part of the file
+to test whether or not it is a text file, since the OS does not discriminate
+between text and binary files.  Hence use of \fBzfacss\fR to check the file
+type is an expensive operation on some systems.
+There is no guarantee that the accessibility of a file will not change between
+the time \fBzfacss\fR is called and before the file is opened.
+.ih
+SEE ALSO
+zfinfo, zfprot
+.endhelp

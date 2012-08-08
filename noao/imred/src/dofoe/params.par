@@ -1,0 +1,69 @@
+line,i,h,INDEF,,,"Default dispersion line"
+nsum,i,h,10,,,"Number of dispersion lines to sum or median"
+extras,b,h,no,,,"Extract sky, sigma, etc.?
+
+-- DEFAULT APERTURE LIMITS --"
+lower,r,h,-3.,,,"Lower aperture limit relative to center"
+upper,r,h,3.,,,"Upper aperture limit relative to center
+
+-- AUTOMATIC APERTURE RESIZING PARAMETERS --"
+ylevel,r,h,0.05,,,"Fraction of peak or intensity for resizing
+
+-- TRACE PARAMETERS --"
+t_step,i,h,10,,,"Tracing step"
+t_function,s,h,"spline3","chebyshev|legendre|spline1|spline3",,"Trace fitting function"
+t_order,i,h,2,,,"Trace fitting function order"
+t_niterate,i,h,1,0,,"Trace rejection iterations"
+t_low,r,h,3.,0.,,"Trace lower rejection sigma"
+t_high,r,h,3.,0.,,"Trace upper rejection sigma
+
+-- DEFAULT BACKGROUND PARAMETERS --"
+buffer,r,h,1.,0.,,Buffer distance from apertures
+apscat1,pset,h,"",,,Fitting parameters across the dispersion
+apscat2,pset,h,"",,,Fitting parameters along the dispersion
+b_function,s,h,"legendre","chebyshev|legendre|spline1|spline3",,Background function
+b_order,i,h,2,,,Background function order
+b_sample,s,h,"-10:-6,6:10",,,Background sample regions
+b_naverage,i,h,-3,,,Background average or median
+b_niterate,i,h,0,0,,Background rejection iterations
+b_low,r,h,3.,0.,,Background lower rejection sigma
+b_high,r,h,3.,0.,,Background upper rejection sigma
+b_grow,r,h,0.,0.,,Background rejection growing radius
+b_smooth,i,h,10,,,"Background smoothing length
+
+-- APERTURE EXTRACTION PARAMETERS --"
+weights,s,h,"none","none|variance",,Extraction weights (none|variance)
+pfit,s,h,"fit1d","fit1d|fit2d",,Profile fitting algorithm (fit1d|fit2d)
+lsigma,r,h,3.,,,Lower rejection threshold
+usigma,r,h,3.,,,"Upper rejection threshold
+
+-- FLAT FIELD FUNCTION FITTING PARAMETERS --"
+f_interactive,b,h,no,,,"Fit flat field interactively?"
+f_function,s,h,"spline3",spline3|legendre|chebyshev|spline1,,"Fitting function"
+f_order,i,h,20,1,,"Fitting function order
+
+-- ARC DISPERSION FUNCTION PARAMETERS --"
+threshold,r,h,10.,0.,,"Minimum line contrast threshold"
+coordlist,f,h,linelists$thar.dat,,,"Line list"
+match,r,h,1.,,,"Line list matching limit in Angstroms"
+fwidth,r,h,4.,,,"Arc line widths in pixels"
+cradius,r,h,4.,,,Centering radius in pixels
+i_function,s,h,"chebyshev","legendre|chebyshev",,"Echelle coordinate function"
+i_xorder,i,h,3,1,,Order of coordinate function along dispersion
+i_yorder,i,h,3,1,,Order of coordinate function across dispersion
+i_niterate,i,h,3,0,,"Rejection iterations"
+i_low,r,h,3.,0.,,"Lower rejection sigma"
+i_high,r,h,3.,0.,,"Upper rejection sigma"
+refit,b,h,yes,,,"Refit coordinate function when reidentifying?
+
+-- AUTOMATIC ARC ASSIGNMENT PARAMETERS --"
+select,s,h,"interp",,,"Selection method for reference spectra"
+sort,s,h,"jd",,,"Sort key"
+group,s,h,"ljd",,,"Group key"
+time,b,h,no,,,"Is sort key a time?"
+timewrap,r,h,17.,0.,24.,"Time wrap point for time sorting
+
+-- DISPERSION CORRECTION PARAMETERS --"
+linearize,b,h,yes,,,Linearize (interpolate) spectra?
+log,b,h,no,,,"Logarithmic wavelength scale?"
+flux,b,h,yes,,,"Conserve flux?"

@@ -1,0 +1,22 @@
+.help words Jan86 lists
+.ih
+NAME
+words -- break the input into a series of words
+.ih
+USAGE
+words files
+.ih
+PARAMETERS
+.ls files
+List of files to be processed.
+.le
+.ih
+DESCRIPTION
+Task \fBwords\fR is used to break the input up into a series of words
+or strings.  A word is a sequence of characters delimited by whitespace
+or newline.  A string is delimited by single or double quotes, and may not
+span more than a single line.
+.ih
+SEE ALSO
+tokens, table
+.endhelp

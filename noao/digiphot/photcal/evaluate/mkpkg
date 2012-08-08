@@ -1,0 +1,18 @@
+#  The MKPKG file for the INVEVALUATE and PHOTPROC task.
+
+$checkout	libpkg.a ".."
+$update		libpkg.a
+$checkin	libpkg.a ".."
+$exit
+
+libpkg.a:
+	t_invertfit.x   "../lib/io.h" "../lib/parser.h" <math/nlfit.h>  \
+			<error.h>     "../lib/preval.h"
+	t_evalfit.x	"../lib/io.h" "../lib/parser.h" <math/nlfit.h>  \
+			<error.h>
+	phinvert.x	<mach.h> "invert.com" "../lib/parser.h"
+	pherrors.x	"../lib/parser.h" "invert.com"
+	phprint.x	"../lib/parser.h"
+	phcheck.x	"../lib/parser.h"  "../lib/preval.h"
+	phminv.f
+	;

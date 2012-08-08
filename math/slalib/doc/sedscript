@@ -1,0 +1,35 @@
+#!/bin/csh
+
+# EZSEDSCRIPT -- Script for automatically creating simple help for the
+# SLALIB FORTRAN routines.
+# 
+# First argument $1 is the month and year combined, e.g. Jun84
+
+foreach file (../*.f)
+    set rootfile = `basename $file .f`
+    set package = '"Slalib Package"'
+    set outfile = $rootfile.hlp
+    set d = `echo \$d`
+    set s = `echo \$s`
+    echo $outfile
+    echo "1i\\
+.help $rootfile $1 $package\\
+.nf\\
+\
+/^\*-/a\\
+\\
+.fi\\
+.endhelp\
+/^\*-/,$d\
+1,$s/^*+//\
+1,$s/^*//" > tmpfile
+    sed -f tmpfile $file > $outfile
+    rm tmpfile
+end
+
+rm atms.hlp
+rm atmt.hlp
+rm idchf.hlp
+rm idchi.hlp
+rm sla_test.hlp
+cp slalib.hlp.sav slalib.hlp

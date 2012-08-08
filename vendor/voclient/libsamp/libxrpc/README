@@ -1,0 +1,34 @@
+
+	This directory contains the XMLRPC-C and CURL library sources
+needed to build a self-contained library that doesn't require applications
+to link to the multiple libraries individually.  This is an acknowledged
+hack, but simpler than requiring users to manage the libraries.
+
+	To do this we use the standard sources for each of the packages
+and build them with certain options disabled.  The resulting libXXX.a files
+are unpacked and repacked into a new 'librpc.a' containing all the needed
+components.  The build is accomplished using the 'mklibs' script that may
+be called from a Makefile for convenience.
+
+Note:
+-----
+	There are several filename conflicts in the source tree that keep
+this from being as easy as it should be.  When updating to a new version
+of either library, the following changes will likely need to be made:
+
+   In the XMLRPC-C source tree:
+
+	mv lib/abyss/src/file.c		lib/abyss/src/abyss_file.c
+	mv lib/abyss/src/http.c		lib/abyss/src/abyss_http.c
+	mv lib/abyss/src/trace.c	lib/abyss/src/abyss_trace.c
+	mv lib/abyss/src/file.lo	lib/abyss/src/abyss_file.lo
+	mv lib/abyss/src/http.lo	lib/abyss/src/abyss_http.lo
+	mv lib/abyss/src/trace.lo	lib/abyss/src/abyss_trace.lo
+
+	mv lib/util/casprintf.c		lib/util/ucasprintf.c
+	mv lib/libutil/select.c		lib/libutil/uselect.c
+
+	And edit the Makefile in the appropriate directory with the change.
+
+
+3/16/09  MJF

@@ -1,0 +1,47 @@
+.help zzclmt May84 "System Interface"
+.ih
+NAME
+zzclmt -- close a magtape file
+.ih
+SYNOPSIS
+.nf
+zzclmt (chan, mode, nrecords, nfiles, status)
+
+int	chan			# OS channel of magtape file
+int	mode			# access mode of file
+int	nrecords		# number of records skipped
+int	nfiles			# number of filemarks skipped
+int	status
+.fi
+.ih
+DESCRIPTION
+The magtape file associated with the channel \fIchan\fR is closed, i.e., the
+magtape device is freed for use by another process and the channel is freed
+for use with another file.  Closing a magtape file does not free the magtape
+device for use by another user; the drive must also be \fBdeallocated\fR
+before it can be accessed by another user.  If \fImode\fR is WRITE_ONLY an
+end of tape (EOT) mark is written at the current position of the tape.
+.ih
+RETURN VALUE
+ERR is returned in \fIstatus\fR if \fIchan\fR is invalid or if the tapemark
+could not be written.
+The number of file records skipped when the tape was closed in returned
+in \fInfiles\fR.
+The number of filemarks skipped when the tape was closed in returned
+in \fInfiles\fR.
+A negative value is returned if the tape was backspaced.
+.ih
+NOTES
+If error recovery occurs while positioning the tape, i.e., during a call
+to \fBzzopmt\fR, \fBzzclmt\fR will be called with \fImode\fR set to READ_ONLY.
+Otherwise the mode given is that given when the tape was opened.
+
+If a magtape file is opened for writing and immediately closed without writing
+anything a zero length file may be written, i.e., an EOT mark.  If another
+file is then appended the new file will be unreachable once the tape is
+rewound.  To avoid this problem the high level code writes a short record
+containing the ASCII string "NULLFILE" before closing the tape.
+.ih
+SEE ALSO
+zzopmt, zfiomt, system.deallocate
+.endhelp

@@ -1,0 +1,53 @@
+.help zopnbf May84 "System Interface"
+.ih
+NAME
+zopnbf -- open a binary file
+.ih
+SYNOPSIS
+.nf
+zopnbf (osfn, mode, chan)
+
+packed	char osfn[]		# OS filename
+int	mode			# access mode
+int	chan			# OS channel assigned to file
+.fi
+.ih
+DESCRIPTION
+File \fIosfn\fR is opened with access mode \fImode\fR and connected to
+channel \fIchan\fR for binary file i/o.  The legal access modes for a
+binary file are as follows:
+
+.nf
+	READ_ONLY	1	open existing file for reading
+	READ_WRITE	2	open existing file for both r&w
+	WRITE_ONLY	3	open existing file for writing
+	APPEND		4	open or create file for appending
+	NEW_FILE	5	create a new file for both r&w
+.fi
+
+APPEND mode is the same as WRITE_ONLY for most devices, except that in APPEND
+mode a new file will be created if none already exists.
+.ih
+RETURN VALUE
+ERR is returned if the named file does not exist or cannot be created,
+if insufficient permission is available for the access mode requested,
+or if an unknown access mode is specified.  If the operation is successful
+the magic integer channel number assigned to the channel is returned
+in \fIchan\fR (a nonnegative integer value).
+.ih
+NOTES
+FIO will not call \fBzopnbf\fR to open a new file if a file with the same
+name already exists.  FIO will instead either delete the file (if file clobber
+is enabled) or take an error action.
+
+The file access permissions (owner, group, world permissions) of a new file
+are initialized by the kernel to either host system default values or to user
+definable values when the file is created.
+The technique by which this is done is machine dependent.
+Many systems provide an automatic system default set of permissions,
+e.g., read permission for everyone but write permission only
+for the owner, but give the user the option of globally overriding the default.
+.ih
+SEE ALSO
+zclsbf, zfiobf, zopntx
+.endhelp

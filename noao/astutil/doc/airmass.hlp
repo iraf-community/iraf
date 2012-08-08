@@ -1,0 +1,31 @@
+.help airmass Mar84 noao.astutil
+.ih
+NAME
+airmass -- compute the airmass at a given elevation above horizon
+.ih
+USAGE
+airmass elevation
+.ih
+PARAMETERS
+.ls elevation
+Elevation above horizon in either degrees or radians.
+.le
+.ls scale = 750.0
+Scale factor of the Earth's atmosphere.
+.le
+.ls radians = no
+Input elevation in radians instead of degrees.
+.le
+.ls airmass
+On output, contains the computed airmass.
+.le
+.ih
+EXAMPLE
+Compute the airmass at an elevation of 30 degrees above the horizon
+
+.nf
+	cl> airmass 30
+	airmass 1.996 at an elevation of 30. degrees (0.5236 radians)
+	above horizon
+.fi
+.endhelp

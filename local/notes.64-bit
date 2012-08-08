@@ -1,0 +1,565 @@
+
+mkpkg
+noao/mkpkg
+local/.login
+bin.linux64                      +
+bin.linux64/IB.LNUX.X86_64       +
+noao/bin.linux64                 +
+noao/bin.linux64/NB.LNUX.X86_64  +
+unix/as.linux64                  +
+unix/bin.linux64                 +
+unix/hlib/cl.csh 
+unix/hlib/fc.csh 
+unix/hlib/install 
+unix/hlib/irafuser.csh 
+unix/hlib/mkpkg.inc 
+unix/hlib/mkpkg.sf.LNUX64	 +
+unix/hlib/strip.iraf 
+unix/hlib/sysinfo
+unix/os/irafpath.c
+    Set up 'linux64' architecture dirs/paths for port, added a '-DLINUX64'
+    to HSI_CF.  (4/20/09, MJF))
+
+
+bin.redhat	-> bin.linux
+noao/bin.redhat	-> bin.linux
+unix/as.redhat	-> as.linux
+unix/bin.redhat	-> bin.linux
+unix/hlib/irafuser.csh 
+    Removed the 'redhat' directories and consolidated into a single 'linux'
+    architecture.  In order to maintain compatability with external packages
+    we retain the 'redhat' architecture in paths, the idea being that an
+    extpkg can still use redhat, but in the core system the links resolve to
+    the linux directory to saisfy the path.  (4/20/09, MJF)
+
+sys/libc/scanf.c
+sys/libc/printf.c
+sys/libc/eprintf.c
+sys/libc/sprintf.c
+pkg/cl/errs.c
+pkg/cl/clprintf.c
+pkg/ecl/errs.c
+pkg/ecl/clprintf.c
+unix/hlib/libc/stdarg.h
+    Removed the ifdef'd USE_STDARG code.  The <varargs.h> is no longer
+    routinely used and support it problematic.  (7/13/09, MJF)
+
+unix/hlib/libc/libc.h
+    Declared XERPSH/XERPOP for use in all procedures. (7/13/09, MJF)
+
+unix/hlib/libc/ctype.h
+    Cast the subscripts to (int) to avoid -Wall warnings. (7/13/09, MJF)
+
+sys/libc
+    Major changes to make ANSI C and clean compile. (7/13/09, MJF)
+
+unix/hlib/libc.h
+    Added prototype declarations for libc procedure. (7/13/09, MJF)
+
+pkg/cl/clprintf.c
+pkg/ecl/clprintf.c
+    Declared eprintf() void to match libc prototype. (7/13/09, MJF)
+
+pkg/libc/stgio.c
+    Added a maxch arg to c_stggetline().  This is only used in cl$modes.c
+    (and ecl$modes.c) and a 3rd arg is supplied.  (7/13/09, MJF)
+
+unix/hlib/libc/kernel.h
+    Added <stdlib.h>, <unistd.h>, <sys/types.h> and <string.h> definition to
+    get system prototypes (e.g. for the glibc strcmp()) (8/14/09, MJF)
+
+unix/hlib/libc/iraf.h
+unix/hlib/libc/varargs.h                -
+unix/hlib/libc/varargs-bsd.h            -
+unix/hlib/libc/varargs-linuxppc.h       -
+    Removed use of <varargs.h> from the system.  (8/14/09, MJF)
+
+unix/bin.redhat/f2c.h
+unix/hlib/libc/kproto.h
+unix/hlib/libc/vosproto.h
+    System prototypes ....... (8/24/09, MJF)
+
+unix/hlib/f77.sh
+    Added a '-P' flag to allow F2C to produce function prototypes in
+    files with '.P' extensions.  We'll use this in building the system
+    library prototype files which have changed since the last time they
+    were generated and are in need of automation (8/24/09, MJF)
+
+unix/os/zgtime.c
+    Modified to use more modern CLOCKS_PER_SEC vs CLK_TCK (9/23/09, MJF)
+
+sys/nmemio			+
+    New version of MEMIO interface supporting pointer bounds checking.
+
+lib/syserr.h
+lib/syserrmsg
+    Added new codes for pointer under and overflow. ()
+
+unix/boot/xyacc/debug/ytab.x
+noao/obsutil/src/sptime/tabinterp.x
+noao/obsutil/src/sptime/grating.x
+noao/imred/vtel/destreak.x
+noao/artdata/t_mk2dspec.x
+noao/artdata/mktemplates.x
+noao/onedspec/t_sapertures.x
+noao/onedspec/t_tweak.x
+noao/onedspec/dispcor/dcio.x
+pkg/lists/lintran.x
+pkg/images/imutil/src/imexpr.x
+pkg/images/tv/display/imdwcs.x
+pkg/images/tv/wcslab/wlutil.x
+pkg/images/tv/wcslab/wllabel.x
+pkg/images/tv/wcslab/wlwcslab.x
+pkg/images/immatch/src/listmatch/t_imctroid.x
+pkg/xtools/rmmed.x
+pkg/xtools/rmturlach.x
+pkg/xtools/rngranges.x
+pkg/bench/xctest/lintran.x
+sys/nmemio/zzfoo.x
+sys/qpoe/zzdebug.x
+sys/qpoe/gen/qpexcoder.x
+sys/qpoe/gen/qpexparser.x
+sys/qpoe/qpmacro.x
+math/curfit/cverrorsr.x
+math/nlfit/nlerrorsr.x
+math/iminterp/asifit.x
+math/gsurfit/gserrorsr.x
+    Modified to add P2R/P2P macros on Memr as neded.
+
+tables/lib/stxtools/xtwcs.x
+tables/lib/stxtools/sp_util/sprote.x
+tables/lib/stxtools/wcslab/wllabel.x
+tables/lib/stxtools/wcslab/wlwcslab.x
+tables/pkg/tbplot/igi/igi.h
+tables/pkg/fitsio/stwfits/wfits.h
+tables/pkg/fitsio/strfits/rfits.h
+tables/pkg/tobsolete/r49fits/rfits.h
+tables/lib/stxtools/wcslab/wcs_desc.h
+tables/lib/gilib/gi.h
+    Modified to add P2R/P2P macros on Memr as neded.
+
+./noao/mtlocal/cyber/rrcopy/rrcopy.h
+./noao/mtlocal/cyber/cyber.h
+./noao/obsutil/src/starfocus/starfocus.h
+./noao/obsutil/src/sptime/sptime.h
+./noao/obsutil/src/specfocus/specfocus.h
+./noao/imred/ccdred/src/ccdred.h
+./noao/imred/ccdred/src/generic/ccdred.h
+./noao/imred/quadred/src/ccdproc/ccdred.h
+./noao/imred/quadred/src/ccdproc/generic/ccdred.h
+./noao/imred/vtel/numeric.h
+./noao/imred/dtoi/hdicfit/hdicfit.h
+./noao/artdata/lists/starlist.h
+./noao/digiphot/photcal/lib/obsfile.h
+./noao/digiphot/photcal/lib/prstruct.h
+./noao/digiphot/photcal/lib/lexer.h
+./noao/digiphot/photcal/lib/apfile.h
+./noao/digiphot/daophot/lib/psfdef.h
+./noao/digiphot/daophot/lib/daophotdef.h
+./noao/digiphot/apphot/lib/radprofdef.h
+./noao/digiphot/apphot/lib/fitpsfdef.h
+./noao/digiphot/apphot/lib/finddef.h
+./noao/digiphot/apphot/lib/polyphotdef.h
+./noao/digiphot/apphot/lib/noisedef.h
+./noao/digiphot/apphot/lib/centerdef.h
+./noao/digiphot/apphot/lib/photdef.h
+./noao/digiphot/apphot/lib/fitskydef.h
+./noao/digiphot/apphot/lib/apphotdef.h
+./noao/rv/rvplots.h
+./noao/rv/rvidlines/identify.h
+./noao/rv/rvsample.h
+./noao/rv/rvpackage.h
+./noao/rv/rvcont.h
+./noao/astcat/lib/aimparsdef.h
+./noao/astutil/pdm/pdm.h
+./noao/nproto/ace/acesky.h
+./noao/nproto/ace/cat.h
+./noao/nproto/ace/gwindow.h
+./noao/nproto/ace/ace.h
+./noao/nproto/ace/skyfit.h
+./noao/nproto/ace/grow.h
+./noao/nproto/ace/split.h
+./noao/nproto/ace/detect.h
+./noao/nproto/ace/objs.h
+./noao/nproto/ace/skyblock.h
+./noao/nproto/ir/iralign.h
+./noao/onedspec/specplot.h
+./noao/onedspec/irsiids/idsmtn.h
+./noao/onedspec/ecidentify/ecidentify.h
+./noao/onedspec/identify/autoid/autoid.h
+./noao/onedspec/identify/identify.h
+./noao/onedspec/sensfunc/sensfunc.h
+./noao/onedspec/dispcor/dispcor.h
+./noao/lib/smw.h
+./noao/lib/units.h
+./noao/lib/funits.h
+./noao/twodspec/multispec/ms.h
+./noao/twodspec/apextract/apertures.h
+./pkg/obsolete/oimstat.h
+./pkg/obsolete/fits/wfits.h
+./pkg/images/imutil/src/imtile.h
+./pkg/images/imutil/src/imstat.h
+./pkg/images/imfit/src/imsurfit.h
+./pkg/images/imcoords/src/starfind.h
+./pkg/images/tv/tvmark/tvmark.h
+./pkg/images/tv/imexamine/imexam.h
+./pkg/images/tv/imexamine/starfocus.h
+./pkg/images/tv/iis/src/gwindow.h
+./pkg/images/tv/iis/lib/ids.h
+./pkg/images/tv/imedit/epix.h
+./pkg/images/tv/display/gwindow.h
+./pkg/images/tv/wcslab/wcs_desc.h
+./pkg/images/imfilter/src/median.h
+./pkg/images/imfilter/src/fmedian.h
+./pkg/images/imfilter/src/frmode.h
+./pkg/images/imfilter/src/fmode.h
+./pkg/images/imfilter/src/frmedian.h
+./pkg/images/imfilter/src/mode.h
+./pkg/images/imfilter/src/rmode.h
+./pkg/images/imfilter/src/rmedian.h
+./pkg/images/immatch/src/xregister/xregister.h
+./pkg/images/immatch/src/psfmatch/psfmatch.h
+./pkg/images/immatch/src/geometry/geotran.h
+./pkg/images/immatch/src/linmatch/linmatch.h
+./pkg/xtools/icfit/icfit.h
+./pkg/xtools/inlfit/inlfitdef.h
+./pkg/xtools/gtools/gtools.h
+./pkg/plot/crtpict/wdes.h
+./pkg/plot/crtpict/crtpict.h
+./pkg/proto/maskexpr/peregfuncs.h
+./pkg/proto/masks/mimstat.h
+./pkg/proto/masks/rskysub.h
+./pkg/dataio/fits/wfits.h
+./pkg/dataio/export/export.h
+./sys/psio/psio.h
+./sys/mwcs/imwcs.h
+./sys/imio/iki/oif/imhv1.h
+./sys/imio/iki/oif/imhv2.h
+./sys/imio/iki/fxf/fxf.h
+./sys/imio/iki/qpf/qpf.h
+./sys/plio/plcircle.h
+./sys/imfort/imhv1.h
+./sys/imfort/imhv2.h
+./sys/gio/sgikern/sgi.h
+./sys/gio/imdkern/imd.h
+./sys/gio/calcomp/ccp.h
+./sys/gio/stdgraph/stdgraph.h
+./sys/gio/glabax/glabax.h
+./sys/gio/nsppkern/gkt.h
+./sys/qpoe/qpoe.h
+./sys/qpoe/qpex.h
+./sys/qpoe/qpio.h
+./math/surfit/surfitdef.h
+./math/curfit/curfitdef.h
+./math/nlfit/nlfitdefr.h
+./math/iminterp/im1interpdef.h
+./math/iminterp/im2interpdef.h
+./math/gsurfit/gsurfitdef.h
+./lib/imio.h
+./lib/evexpr.h
+./lib/imhdr.h
+./lib/gio.h
+./lib/evvexpr.h
+./lib/pkg/rmsorted.h
+    Modified to add P2R/P2P macros on Memr as neded.
+
+unix/boot/xyacc/debug/ytab.x
+noao/obsutil/src/sptime/tabinterp.x
+noao/obsutil/src/sptime/grating.x
+noao/artdata/t_mk2dspec.x
+noao/artdata/mktemplates.x
+noao/onedspec/t_sapertures.x
+noao/onedspec/t_tweak.x
+noao/onedspec/dispcor/dcio.x
+pkg/lists/lintran.x
+pkg/images/imutil/src/imexpr.x
+pkg/images/tv/display/imdwcs.x
+pkg/images/tv/wcslab/wlwcslab.x
+pkg/images/immatch/src/listmatch/t_imctroid.x
+pkg/bench/xctest/lintran.x
+sys/qpoe/qpmacro.x
+math/curfit/cverrorsr.gx
+math/nlfit/nlerrorsr.gx
+math/iminterp/asifit.x
+math/gsurfit/gserrorsr.gx
+    Added P2R macros where needed (11/23/09)
+
+lib/gio.h
+lib/imio.h
+lib/imhdr.h
+    Added P2R macros where needed (11/23/09)
+
+unix/gdev/sgidev/mkpkg.sh
+unix/gdev/sgidev/sgi2svg.c
+    Added SVG translator.
+
+sys/plio/plload.x
+sys/plio/plsave.x
+sys/imfort/imioff.x
+sys/imfort/imopnx.x
+sys/imfort/imrdhdr.x
+sys/imfort/imwrhdr.x
+sys/imio/iki/oif/oifopen.x
+sys/imio/iki/oif/oifopix.x
+sys/imio/iki/oif/oifrdhdr.x
+sys/imio/iki/oif/oifwrhdr.x
+sys/imio/iki/stf/stfrdhdr.x
+sys/imio/iki/stf/stfreblk.x
+sys/imio/iki/fxf/fxf.h
+sys/imio/iki/fxf/fxfopen.x
+sys/imio/iki/fxf/fxfrfits.x
+    Uses of SZ_STRUCT in computing sizes were converted to SZ_MII_INT
+
+sys/libc/fgets.c
+    Modified to ignore '\r' used in DOS-style text files.  Also now handles a
+    missing '\n' at the EOF as can sometimes happen with emacs-edited files.
+
+
+noao/onedspec/odcombine/src/xtimmap.gx
+noao/onedspec/odcombine/srcwt/xtimmap.gx
+noao/twodspec/longslit/lscombine/src/xtimmap.gx
+pkg/images/immatch/src/imcombine/src/xtimmap.gx
+    A pointer (Memi[ims+index-1]) wasn't being reset to NULL when 
+    freed, leading to a segfault when run a second time from the cache.
+
+osb/bitfields.c
+    Added masks to accomodate 64-bit int sizes.  Fixed a FDV problem
+    seen in NCAR tasks (e.g. contour)
+
+pkg/plot/t_implot.x
+    The impcom common block was being confused in the linker with the
+    impcom.o object (imio$dbc) in libex.a.  Fixed implot bus error.
+
+lib/gio.h
+    Modified GP_WCSPTR to be properly aligned.
+
+lib/szpixtype.inc		+
+    Added an equivalent to szdtype.inc for use with pixel-based applications.
+    The idea is that pixels will continue to be 32-bit ints regardless of
+    the platform.
+
+imcssz.x
+imflsh.x
+imggsc.x
+imgnln.x
+imgobf.x
+imnote.x
+impnln.x
+imrbpx.x
+imrdpx.x
+imwbpx.x
+imwrpx.x
+    Changed use of ty_size[] to pix_size[]
+
+imioff.x
+imsetbuf.x
+iki/fxf/fxfopix.x
+iki/fxf/fxfpak.x
+iki/fxf/fxfupk.x
+iki/fxf/zfiofxf.x
+iki/qpf/zfioqp.x
+iki/stf/stfnewim.x
+iki/stf/stfopix.x
+iki/stf/stfrdhdr.x
+    Changed use of sizeof(IM_PIXTYPE(im)) to pix_size[IM_PIXTYPE(im)]
+
+lib/nmi.h
+sys/etc/nmiread.gx
+sys/etc/nmireadb.x
+sys/etc/nmireadc.x
+sys/etc/nmiwrite.gx
+sys/etc/nmiwriteb.x
+sys/etc/nmiwritec.x
+    Added a new Native Machine Integer (NMI) interface.  This is similar to
+    the MII interface but is meant for use with external binary files that
+    don't require a (possible) byte-swap.  The main point of this is to 
+    provide a means to write native 32-bit ints distinguished from 64-bit
+    long.
+
+sys/osb/nmilen.x
+sys/osb/nminelem.x
+sys/osb/nmipak.x
+sys/osb/nmipak16.x
+sys/osb/nmipak32.x
+sys/osb/nmipak8.x
+sys/osb/nmipakd.x
+sys/osb/nmipakr.x
+sys/osb/nmipksize.x
+sys/osb/nmiupk.x
+sys/osb/nmiupk16.x
+sys/osb/nmiupk32.x
+sys/osb/nmiupk8.x
+sys/osb/nmiupkd.x
+sys/osb/nmiupkr.x
+    Support routines for the NMI interface.
+
+sys/fmtio/evexpr.gy
+sys/fmtio/evvexpr.gy
+sys/fmtio/xevgettok.x
+sys/fmtio/xvvgettok.x
+    Broke out the xev_gettok() procedure into a new file.  Newer GCC
+    compilers were complainint about the data type.
+
+sys/imio/dbc/imdcom.x		-
+sys/imio/dbc/imdrmcom.x		+
+    Renamed the file containing the imdrmcom() procedure.  This was causing
+    confusion with the 'imdcom' common block in the linker.
+
+unix/os/mkproto
+    Added utility script to generate IRAF kernel prototypes.
+
+unix/gdev/sgidev/sgi2svg.x	+
+    Added new SGI driver for SVG graphics.
+
+unix/boot/spp/rpp/test.r	+
+    Added new test file for RPP driver.
+
+unix/boot/spp/xpp/xpp.l
+unix/boot/spp/xpp/xppcode.c
+    Attempt to try to manage new use of Memr[] macros, but one known to
+    break backward compatibility.  A use such as "Memr[$1+N]" is obviously
+    part of a structure definition, so we automatically add a P2R() macro
+    so it reads "Memr[P2R($1+N)]" when being passed to RPP.  This properly
+    aligns the struct on 64-bit platforms and is a no-op on 32-bit.  
+	The complication is a simple case of "Memr[$1]" which may be either 
+    the first element of a structure or a utility macro for a TY_REAL array.
+    In this case, we output an error indicating that a P2P or P2R macro is
+    required to resolve any ambiguity.
+    	There are similar examples for 2-D arrays that aren't as easily parsed,
+    but since we can't trap them generally we can't do much to automatically
+    'fix' the macro.
+	The overall utility of this change is questionable and may be pulled
+    from a later release.
+
+sys/osb/abs.c
+    Added an abs() function to avoid type conflicts between int/long.
+
+sys/osb/i32to64.c
+sys/osb/i64to32.c
+    Imported int 32/64 pack/unpack from IRAF64 code.  Note these are 
+    MACHDEP on Intel byte order!
+
+sys/osb/urand.c
+sys/osb/imul32.c
+    The urand() algorithm relies on 32-bit overflow to work properly.  Needed
+    to add an 'imul32' function to do the multiplication with overflow.
+
+sys/osb/ipak32.c
+sys/osb/iupk32.c
+    Added pak/unpak for 32-bit integers. 
+
+pkg/images/imutil/src/t_chpix.x
+    Added an imflush() to the output image.
+
+pkg/plot/t_implot.x
+    Renamed the 'impcom' to 'implcom' to avoid a symbol name clash in the
+    linker.
+
+lib/gio.h
+sys/gio/cursor/gtr.h
+    Increased the size of the WCS buffer.  The size was previously calculated
+    as being 17 structure elements by assuming the SZ_INT was 2.  Increased
+    to accomodate 64-bit sizes and will live with the wasted space.
+
+local/iraf_test.tar.gz
+    Added the "images test scripts" to the main distribution.  These require
+    stty playback and so require the old CL to run.  To use these, unpack
+    in a clean directory and begin with "stty playback=test.images", 
+    successive tests will be run automatically.
+
+pkg/system/bench.cl
+    Added benchmark script to core distribution.
+
+pkg/cl/proto.h
+pkg/ecl/proto.h
+    Function prototypes for the CL code.
+
+unix/hlib/libc/kproto32.h
+unix/hlib/libc/kproto64.h
+unix/hlib/libc/vosproto.h
+    Kernel prototype files.  These are somewhat massaged by hand to remove
+    duplicate symbol names that cause errors but provide 98% coverage until
+    this can be addressed.
+
+unix/hlib/iraf.h ->
+unix/hlib/mach.h ->
+unix/hlib/iraf32.h
+unix/hlib/mach32.h
+unix/hlib/iraf64.h
+unix/hlib/mach64.h
+    Added 32 and 64-bit definitions of the files defining primary data types.
+    Compilation is actually done using symlinks to the appropriate version in
+    hbin$ directory.  The hlib$ versions are likewise a symlink that points to
+    the correct version when the architecture is set.
+
+/util				+
+/Makefile			+
+    Top-level makefle and utility scripts for building the system.  Makefile
+    targets are
+
+		all		alias for 'update'
+		sysgen		do a complete sysgen
+		update		update system since last sysgen
+		updatex		update with debugging flags enabled
+		src		clean system of current binaries
+		clean		clean system of current binaries
+		pristine	clean system of all binaries
+		tables		compile the TABLES package
+		noao		compile the NOAO package
+		summary		print core/noao/tables spool file summaries
+		showarch	show currently configure arch
+		<arch>		reconfigure for named architecture
+
+unix/hlib/mkpkg.sf.LNUX64
+    Special files list for new arch.
+
+unix/hlib/irafarch.csh
+    Utility script to determine proper platform architecture name.
+
+sys/osb/bitfieds.c
+    Added extra masks to accomodate 64-bit integers.
+
+pkg/xtools/ranges/rgfree.x
+    Added a check for a null pointer around the mfree.  There were cases in
+    the ICFIT code that this was being called with a NULL pointer and would
+    trigger an error on newer libc, it seemed safest to allow the previous
+    behavior but just protect against it.
+
+sys/pmio/zzinterp.x
+    pm_create() was being called with too many arguments.
+
+unix/hlib/libc/libc.h
+    Added libc prototype definitions for automatic checking.  This is also
+    where we look at the vosproto.h
+
+
+
+------------------------------------------------------
+V2.15-ALPHA release			(3/2/10)
+------------------------------------------------------
+
+math/nlfit.gh
+     A leftover definition of P2R was causing problems.
+
+sys/nmemio/minit.x
+     Calls to fmkbfs() to create initialize the I/O buffers were not taking
+     into account that subsequent calls to the task in the prcache would
+     already have an i/o buffer.  This was causing leading nulls to appear
+     in the stdout stream (e.g. redirection or scan-from-pipe) as well as
+     just output to appear in the CL stdout.  Commented out the code until
+     it is better understood.  The intent was to ensure that when reporting
+     memory usage we wouldn't see some arbitrary base value but could ensure
+     that memory allocated by an app was accounted for completely.
+
+noao/imred/ccdred/src/cosmic/crsurface.x
+noao/imred/crutil/src/crsurface.x
+pkg/images/tv/imedit/epsurface.x
+pkg/images/tv/imexamine/iesimexam.x
+pkg/plot/t_surface.x
+    There is apparenty a bug in the NCAR ezsrfc() routine that reaches beyond
+    the defined 'work' area (said to be twice the size of the data raster).
+    This was originally increased to be 4*data in the SURFACE task, but the
+    routine is called elsewhere and was failing in e.g. IMEXAM.  Increased
+    the size for all instances but will need to track this down.
+    Pragmatically this can be ignored on modern systems as a minor waste of
+    space, it is much harder to debug the login of the NCAR code.

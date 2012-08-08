@@ -1,0 +1,3 @@
+files,s,a,,,,list of files to be moved
+newdir,f,a,,,,name of destination directory
+verbose,b,h,no,,,print names of files as they are moved

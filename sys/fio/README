@@ -1,0 +1,10 @@
+This directory contains the IRAF File I/O (FIO) routines.  This version of
+FIO fully implements revision 5 of the FIO interface as described in Fio.hlp.
+Internally, however, the buffer management code has been simplified by
+restricting the number of buffers to one per file, and omitting global buffers.
+These features will be added in an upcoming revision of FIO.  No modifications
+to the external specifications of the FIO interface should be necessary.
+D. Tody, 04-Apr-83.
+
+Jul84	Added filename mapping, filename locking, extensive modifications to
+	make use of the new kernel.

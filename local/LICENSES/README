@@ -1,0 +1,8 @@
+
+	This directory contains text of the license files that apply
+to third-party sources in the IRAF system:
+
+    OpenSolaris_License-CDDL.pdf	For the XYACC parser (boot$xyacc)
+    UCAR				For NCAR graphics
+
+

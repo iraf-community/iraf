@@ -1,0 +1,35 @@
+.help cqquery Mar00 "Catquery Package"
+.ih
+NAME
+cqquery -- query a catalog and return the results
+.ih
+SYNOPSIS
+
+res = cq_query (cq)
+
+.nf
+pointer	cq		# the configuration file descriptor
+.fi
+.ih
+ARGUMENTS
+.ls cq     
+The configuration file descriptor.
+.le
+.ih
+DESCRIPTION
+Cq_query is a pointer function which returns the catalog results descriptor
+as its function value. NULL is returned if an error occurs in the catalog
+query.
+.ih
+NOTES
+Cq_setcat or cq_setcatn must be called before any catalog query can be made.
+
+Cq_nqpars and either cq_gqpar or cq_gqparn must be called to determine the
+number of query parameters and get each query parameter description.
+
+Cq_sqpar or cq_sqparn must be called to replace the default query parameter
+values with the calling program values.
+.ih
+SEE ALSO
+cqfquery, cqrclose
+.endhelp

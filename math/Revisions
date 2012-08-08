@@ -1,0 +1,406 @@
+.help revisions Jun88 math
+.nf
+
+gsurfit/gs_deval.gx
+iminterp/mrider.x
+iminterp/mrieval.x
+	Fixed some procedure calls being closed with a ']' insted of
+	a ')'  (2/17/08, MJF)
+
+gsurfit/gs_chomat.gx
+	The test for singularity would fail with certain kinds of problems
+	because the test used EPSILON (should have been EPSILOND for the
+	double precision) but this is for distinguishing numbers small
+	numbers from 1 and not from each other.  The test is now done
+	with a comparison against the smallest real or double difference.
+	The place where this was found to be a problem was with CCSETWCS.
+	(8/31/04, Valdes)
+
+========
+V2.12.2a
+========
+
+curfit/cvinit.gx
+	If one of the error checks caused an error return the cv pointer
+	would have been allocated (cv != NULL) but some of the pointer
+	fields could have garbage values since a malloc was used instead
+	of a calloc.  A later call to cvfree could result in a segmentation
+	error.  This was changed so that 1) a null cv pointer is returned
+	in the initial error checks cause an error return and 2) the
+	cv pointer is initially allocated with calloc so that no pointer
+	fields will be non-NULL until explicitly set.
+	(11/18/02, Valdes)
+
+=======
+V2.12.1
+=======
+
+gsurfit/gsder.gx
+gsurfit/gsderr.x
+gsurfit/gsderd.x
+gsurfit/gs_fder.gx
+gsurfit/gs_fderr.x
+gsurfit/gs_fderd.x
+gsurfit/gs_deval.gx
+gsurfit/gs_devalr.x
+gsurfit/gs_devald.x
+	Rewrote the routines which compute the derivatives of the polynomial
+	surfaces. There were some renormalization problems in this code
+	for non-linear chebyshev and legendre polynomial surfaces.  The new
+	code uses recursion relations for computation the derivatives which
+	could cause small errors if they are used to do flux conservation.
+	(27/10/99 LED)
+
+curfit/mkpkg
+deboor/mkpkg
+iminterp/mkpkg
+	Added some missing file dependencies to the above mkpkg files.
+	(20/9/99 LED)
+
+slalib
+	Upgraded slalib from Version 1.6.3 to Version 2.3.0. Seventeen
+	new routines were added including 4 dealing with FK5 to ICRS
+	coordinate conversions (17/6/99 LED).
+
+arbpix.x
+arider.x
+arieval.x
+asider.x
+asieval.x
+asifit.x
+asifree.x
+asigeti.x
+asigetr.x
+asigrl.x
+asiinit.x
+asirestore.x
+asisave.x
+asisinit.x
+asitype.x
+asivector.x
+ii_1dinteg.x
+ii_bieval.x
+ii_cubspl.f
+ii_eval.x
+ii_greval.x
+ii_pc1deval.x
+ii_pc2deval.x
+ii_polterp.x
+ii_sinctable.x
+ii_spline.x
+ii_spline2d.x
+im1interpdef.h
+im2interpdef.h
+mkpkg
+mrider.x
+mrieval.x
+msider.x
+msieval.x
+msifit.x
+msifree.x
+msigeti.x
+msigetr.x
+msigrid.x
+msigrl.x
+msiinit.x
+msirestore.x
+msisave.x
+msisinit.x
+msisqgrl.x
+msitype.x
+msivector.x
+	The 1D interpolation routines were replaced with new versions which
+	support look-up table since and drizzle interpolation. Minor
+	modifications were also made to the existing 1D sinc routines. The 2D
+	image interpolation routines were replaced with new versions modified
+	which support sinc, look-up table sinc and drizzle interpolation.
+	(12/28/98 Davis)
+
+iminterp.hd
+iminterp.men
+iminterp.spc
+arbpix.hlp
+arider.hlp
+arieval.hlp
+asider.hlp
+asieval.hlp
+asifit.hlp
+asifree.hlp
+asigeti.hlp
+asigetr.hlp
+asigrl.hlp
+asiinit.hlp
+asirestore.hlp
+asisave.hlp
+asisinit.hlp
+asitype.hlp
+asivector.hlp
+iminterp.hlp
+mrider.hlp
+mrieval.hlp
+msider.hlp
+msieval.hlp
+msifit.hlp
+msifree.hlp
+msigeti.hlp
+msigetr.hlp
+msigrid.hlp
+msigrl.hlp
+msiinit.hlp
+msirestore.hlp
+msisave.hlp
+msisinit.hlp
+msisqgrl.hlp
+msitype.hlp
+msivector.hlp
+	The 1D and 2D image interpolation routines help pages were updated
+	to reflect the changes in both packages. (12/28/98 Davis)
+
+math$nlfit/nlchomat.gx
+math$nlfit/nlchomatr.x
+math$nlfit/nlchomatd.x
+	Modified the singular matrix test to make a comparison against
+	EPSILON instead of 0.0 to avoid floating point problems.
+
+	(8/1/98 Davis)
+
+math$gsurfit/
+	Installed a completely new version of gsurfit which support "half"
+	or "diagonal" cross terms. All the .gx and .x files were replaced.
+
+	(4/30/97 Davis)
+
+math$gsurfit/gsrestore.gx
+math$gsurfit/gsrestorer.x
+math$gsurfit/gsrestored.x
+	Changed the type declaration of the xmin, xmax, ymin, ymax variables
+	from real to PIXEL to avoid machine precision problems.
+
+	(3/21/96 Davis)
+
+math$nlfit/nlfit.gx
+math$nlfit/nlfitr.x
+math$nlfit/nlfitd.x
+	Fixed a divide by zero error in the nlscatter routine which occurs
+	if the fit has no degrees of freedom and the weighting type is
+	WTS_SCATTER.
+
+	(6/13/94 Davis)
+
+math/gsurfit/gssub.gx
+math/gsurfit/gssubd.x
+	The gsurfit double precision routine gssubd was incorrectly calling
+	the real precision routine gsgeti instead of the double precision
+	routine dgsgeti due to an error in the gssub.gx file. This bug
+	results in the wrong value of the parameter GSNSAVE being returned to
+	the calling routine gssubd in the double precision case.
+
+	(1/17/94 Davis)
+
+math/iminterp/arbpix.x
+math/interp/arbpix.x
+        Changed all if (x == INDEF) constructs to IS_INDEF(x) constructs.
+
+	(1/15/93 Davis)
+
+math/surfit/iseval.x
+	Two indices were not being initialized before being used in a pointer
+	offset computation in the spline1 and spline3 single input point code
+	producing incorrect results.
+
+	(12/17/92 Davis)
+
+math/nlfit/nlfit.gx
+math/nlfit/nlfitr.x
+math/nlfit/nlfitd.x
+math/nlfit/nliter.gx
+math/nlfit/nliterr.x
+math/nlfit/nliterd.x
+	Added a test for lambda<=0.0 in the nlfit loop and in the iteration
+	loop. Precision problems could cause the code to go into an infinite
+	loop in some circumstances. The code returns a NOT_DONE status
+	message if the convergence criteria have not been met in this
+	circumstance. Made some other minor changes to the convergence
+	criteria.
+
+	(7/20/92 Davis)
+
+math/nlfit/nlacpts.gx
+math/nlfit/nlerrors.gx
+	Fixed a bug in the routine nlacpts where the variable sum was
+	not being initialized properly for each iteration. This could
+	cause a slow drift in repeated fits. Also fixed a related problem
+	in the error computation. Note this was not a problem
+	with the version of nlfit in apphot in versions 2.9 or in 
+	testphot.
+
+	(1/9/92 Davis)
+
+math/nlfit/nlfit.gx
+math/nlfit/nlfitr.x
+math/nlfit/nlfitd.x
+	Added some code to force the nlfit package to do at least MINITER
+	iterations whether or not the solution actually converged; MINITER
+	+ 1 if the weighting type is WTS_SCATTER.
+	(1/3/91 Davis)
+
+math/nlfit/nliter.gx
+math/nlfit/nliterr.x
+math/nlfit/nliterd.x
+	Simplied the test for determining whether the lambda factor needs
+	to be increased or decreased.
+	(1/3/91 Davis)
+
+math/nlfit/nlzero.gx
+math/nlfit/nlfitdefr.h
+math/nlfit/nlfitdefd.h
+	Removed an extra argument from two aclr$t routines. Also these routines
+	were being called with the pointer instead of the array as the 
+	argument. (10/3/91 Davis)
+
+lib/math/iminterp.h
+math/iminterp/arbpix.x
+math/iminterp/arider.x
+math/iminterp/arieval.x
+math/iminterp/asider.x
+math/iminterp/asieval.x
+math/iminterp/asifit.x
+math/iminterp/asiffree.x
+math/iminterp/asigrl.x
+math/iminterp/asiinit.x
+math/iminterp/asirestore.x
+math/iminterp/asisave.x
+math/iminterp/asivector.x
+math/iminterp/ii_1dinteg.x
+math/iminterp/ii_eval.x
+math/iminterp/ii_pc1deval.x
+math/iminterp/im1interpdef.h
+math/iminterp/doc/arbpix.hlp
+math/iminterp/doc/arider.hlp
+math/iminterp/doc/arieval.hlp
+math/iminterp/doc/asider.hlp
+math/iminterp/doc/asieval.hlp
+math/iminterp/doc/asifit.hlp
+math/iminterp/doc/asigrl.hlp
+math/iminterp/doc/asiinit.hlp
+math/iminterp/doc/asivector.hlp
+	The 1D image interpolation routines were replaced with new versions
+	modified by Frank Valdes to support sinc interpolation. (7/26/91 Davis)
+
+lib/math/curfit.h
+lib/math/gsurfit.h
+lib/math/iminterp.h
+lib/math/interp.h
+lib/math/surfit.h
+	Added dictionary string definitions for the interpolator types and
+	weights.  Use of these strings insures that strdic/clgwrd will
+	return the correct type code.  Currently one has to assume the code
+	definitions will not change or put a lookup table with a data
+	statement containing the macro definitions.  The code would also
+	have to be modified to add new types.  The dates were restored to
+	their original values to avoid recompilation.  (5/9, Valdes)
+
+math$curfit/cverrors.gx: Davis, May 6, 1991
+math$curfit/cvpower.gx
+math$curfit/cvrefit.gx
+math$curfit/cvrestore.gx
+    Finished cleanup of curfit package .gx files.
+
+math$gsurfit/gs_f1deval.gx: Davis, May 6, 1991
+    Changed the line "call amulk$t (,,,2.,,,)" to "call amulk$t (,,,2$f,,,)
+    to remove a type dependence problem found by ftoc on the Mac.
+
+math$curfit/cvpower.gx: Davis, May 6, 1991
+    Changed the constant from INDEFR to INDEF in the amov$t call in cvpower.gx.
+    This was causing a problem for the Mac compiler.
+
+math$curfit/cv_b1eval.gx: Davis, April 23, 1991
+math$curfit/cv_beval.gx
+math$curfit/cv_feval.gx
+math$curfit/cvaccum.gx
+math$curfit/cvacpts.gx
+math$curfit/cvchomat.gx
+math$curfit/cvfree.gx
+math$curfit/cvinit.gx
+    Did some cleaning up in the following .gx files to make the code easier
+    to read.
+
+math$nlfit/: Davis, Jan 31, 1991
+    Added the nlfit package to the math package. 
+
+math$surfit/isreplace.x: Davis, September 18, 1990
+    1. Changed the int calls in isreplace.x to nint calls. This is a totally
+    safe way to do the conversion from floating point to integer
+    quantities in the surfit package and removes any potential precision
+    problems for task which must read the surfit structure back from a
+    text database file.
+
+math$gsurfit/gsrestore.gx,gsrestorer.x,gsrestored.x: Davis, September 18, 1990
+    1. Changed the int calls in gsrestore.gx to nint calls. This is a totally
+    safe way to do the conversion from floating point to integer
+    quantities in the gsurfit package and removes any potential precision
+    problems for task which must read the gsurfit structure back from a
+    text database file.
+
+math$curfit/cvrestore.gx,cvrestorer.x,cvrestored.x: Davis, September 18, 1990
+    1. Changed the int calls in cvrestore.gx to nint calls. This is a totally
+    safe way to do the conversion from floating point to integer
+    quantities in the curfit package and removes any potential precision
+    problems for task which must read the curfit structure back from a
+    text database file.
+
+math$gsurfit/gsder.gx,gsderd.x: Davis, August 1, 1990
+    1. Fixed a typo in the routine which computes the double precision
+    derivatives of a surface. Due to this type the salloc routine was being
+    passed a pointer instead of size. When the value of this pointer
+    got very large this could cause an out of memory allocation error.
+
+math$iminterp/msigrl.x: Davis, Feb 8, 1989
+    1. There was a bug in the shift and wrap routines in the 2D routine
+    which integrates in polygonal apertures. If the vertices of the
+    polygon  were listed in certain orders the routine would produce
+    wrong results. The routine has been totally rewritten to use
+    the polygon clipping code in polyphot.
+
+math$interp/asigrl.x: Davis, Jan 27, 1988
+    1. The routine ii_getpcoeff was duplicated in the files asigrl.x and
+    ii_1dinteg.x. I removed the copy in asigrl.x and rebuilt the library.
+
+math$interp/arider.x: Davis, February 10, 1988
+    1. The routines iidr_poly3, iidr_poly5 and iidr_spine3 were declared
+    as functions but called everywhere as subroutines. I removed the
+    function declarations.
+
+math$gsurfit/gsder.gx: Davis, October 16, 1987
+    1. changed a real type conversion call to double in the gsder routine.
+    This error was causing the derivative evaluations to fail on the sun.
+
+math$gsurfit/gsder.gx: Davis, August 11, 1987
+    1. A call in gsder to gscoeff was not being set to double precision.
+
+math$gsurfit: Davis, January 22, 1986
+    1. A new version of the gsurfit package was installed. A double precision
+    gsurfit has  been added. The double precision calls are the same as
+    the single precision calls but prefixed by a d. Some of the evaluation
+    routines were vectorized and run significantly faster than the old version.
+    A power series polynomial function was added to the package for convenience
+    in evaluating the simple rotation transformation functions.
+
+math$iminterp/arider.x: Davis, September 7, 1986
+    1. The routines ii_pcpoly3, ii_pcpoly5 and ii_pcspline3 were declared
+    as functions but called everywhere as subroutines. Removed the function
+    declaration. I also moved these routines into a file of their own
+    ii_pc1deval.x and changed the prefix to ia_ from ii_ to avoid conflict
+    with the 2D equivalents.
+
+math$interp/arider.x: Davis, September 7, 1986
+    1. The routines ii_pcpoly3, ii_pcpoly5 and ii_pcspline3 were declared
+    as functions but called everywhere as subroutines. Removed the function
+    declaration.
+
+From Davis Jan 8, 1986
+
+1. Added documentation for surfit package.
+
+----------------------------------------------------------------------------
+.endhelp

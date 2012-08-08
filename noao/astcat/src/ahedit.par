@@ -1,0 +1,29 @@
+# The AHEDIT parameter file.
+
+# The images parameters.
+
+images,s,a,"",,,"The images to be edited"
+
+# The image survey parameters.
+
+imsurveys,s,a,"",,,"The image survey"
+
+# The image editing parameters.
+
+hupdate,b,h,yes,,,"Update the header keywords ?"
+wcsedit,b,h,no,,,"Add a new FITS wcs to each image ?"
+wcs,s,h,"none","|fits|dss|none|",,"The default input image wcs type"
+awcspars,pset,h,"",,,"The default wcs parameters"
+hdredit,b,h,yes,,,"Standardize the non-wcs image header parameters ?"
+aimpars,pset,h,"",,,"The default image header keyword parameters"
+
+# The task parameters
+
+update,b,h,no,,,"Update algorithm parameters at task termination ?"
+verbose,b,h,yes,,,"Print task status messages ?"
+
+# The task configuration parameters.
+
+imdb,s,h,)_.imdb,,,"The image survey configuration file"
+
+mode,s,h,"ql",,,

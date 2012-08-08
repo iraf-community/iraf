@@ -1,0 +1,6 @@
+# The ACLIST parameter file.
+
+catalogs,s,a,"*",,,"The astrometric catalog(s)"
+verbose,b,h,no,,,"Print verbose messages ?"
+catdb,s,h,)_.catdb,,,"The astrometric catalog configuration file"
+mode,s,h,"ql",,,

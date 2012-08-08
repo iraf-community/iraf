@@ -1,0 +1,21 @@
+# Make the IKI/OIF interface (Old IRAF Format images)
+
+$checkout libex.a lib$
+$update   libex.a
+$checkin  libex.a lib$
+$exit
+
+libex.a:
+	oifaccess.x	oif.h
+	oifclose.x	<error.h> <imhdr.h> <imio.h> <protect.h>
+	oifcopy.x	oif.h
+	oifdelete.x	<error.h> <imhdr.h> <protect.h>
+	oifgpfn.x	oif.h <knet.h>
+	oifmkpfn.x	oif.h <imhdr.h> <imio.h> <knet.h>
+	oifopen.x	oif.h <imhdr.h> <imio.h> <fio.h> <error.h>
+	oifopix.x	oif.h <config.h> <imhdr.h> <imio.h>
+	oifrdhdr.x	imhv1.h imhv2.h oif.h <imhdr.h> <imio.h> <mach.h>
+	oifrename.x	oif.h <error.h> <imhdr.h> <imio.h>
+	oifupdhdr.x	oif.h <error.h> <imhdr.h> <imio.h>
+	oifwrhdr.x	imhv1.h imhv2.h oif.h <imhdr.h> <imio.h> <mach.h>
+	;

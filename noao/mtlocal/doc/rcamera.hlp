@@ -1,0 +1,109 @@
+.help rcamera Jan87 noao.mtlocal
+.ih
+NAME
+rcamera -- Convert Kitt Peak CAMERA image files to IRAF image files
+.ih
+USAGE
+rcamera camera_file file_list iraf_file
+.ih
+PARAMETERS
+.ls 4 camera_file
+The CAMERA data source.  If the data source is a list of disk files or an
+explicit tape file
+specification of the form mt*[n] where n is a file number. If the file
+number is specified then only that file
+is converted.  If the general tape device name is given, i.e. mta, mtb800, etc,
+then the files specified by the file_list parameter will be read from the tape.
+.le
+.ls file_list
+The files to be read from a tape are specified by the file_list string.  The
+string can consist of any sequence of file numbers separated by
+at least one of comma, or dash.
+A dash specifies a range of files.  For example the string
+
+	"1,2,3-5,8-6"
+
+will convert the files 1 through 8.
+.le
+.ls iraf_file
+The IRAF file which will receive the CAMERA data if the make_image parameter
+switch is set.  For multiple disk or tape files the filename
+will be used as a prefix and the tape file number or disk sequence number
+will be appended.   Otherwise,
+the file will be named as specified.  Thus,
+reading files 1 and 3 from a CAMERA tape with a iraf_file set to data will
+produce the files data001 and data003.
+.le
+.ls image_list = "1"
+The list of CAMERA images to extract from a single tape file. For all recent
+tapes image_list = "1". Old tapes were however contained multiple images
+per file.
+.le
+.ls make_image = yes
+This switch determines whether CAMERA image data is converted to an IRAF image
+file.  This switch is set to no to obtain just header information with the
+long_header or short_header switches.
+.le
+.ls long_header = no
+If this switch is set the full CAMERA header is printed on the standard output.
+.le
+.ls short_header = yes
+If this switch is set only the output filename,
+the title string, and the image dimensions are printed.
+.le
+.ls standard_format = yes
+The CAMERA standard format has the least significant byte first.  Some CAMERA
+data, however, does not follow this byte order convention.  Thus, to read
+the non-standard CAMERA data this parameter is set to no.
+.le
+.ls datatype = "s"
+The IRAF image file may be of a different data type than the CAMERA image data.
+The data type may be specified as s for short, l for long, r for real, and
+d for double.  The user must beware of truncation problems if an
+inappropriate data type is specified.  If an incorrect data_type or a
+null string is given for this parameter then a default data type is used
+which is the appropriate minimum size for the input pixel values.
+.le
+.ls offset = 0
+Offset is an integer parameter specifying the offset to the tape file number
+appended to iraf_file. For example if the user specifies offset = 100,
+iraf_file = "cam" and file_list = "1-3", the output file names produced
+will be "cam101", "cam102" and "cam103" respectively, instead of "cam001",
+"cam002" and "cam003".
+.le
+.ih
+DESCRIPTION
+
+Kitt Peak CAMERA format image data is read from the specified source;
+either a disk or magnetic tape.
+The CAMERA header may optionally be printed on the standard
+output as either a full listing or a short description.  Image data may
+optionally be converted to an IRAF image of specified data type.
+.ih
+EXAMPLES
+
+Convert a camera image tape to a set of IRAF images.
+
+.nf
+	cl> rcamera mtb1600 1-999 images
+.fi
+
+Convert a list of camera disk files to IRAF images.
+
+.nf
+	cl> rcamera cam* 1 images
+.fi
+
+List the contents of a camera tape on the standard output without
+creating an image file.
+
+.nf
+	cl> rcamera mtb1600 1-999 images ma-
+.fi
+
+Read images 1-3 and 6-8 from an old CAMERA tape with many images per file.
+
+.nf
+	cl> rcam mtb1600[1] image image_list=1-3,6-8
+.fi
+.endhelp

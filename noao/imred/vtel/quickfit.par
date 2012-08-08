@@ -1,0 +1,8 @@
+image,s,q,,,,Image file descriptor
+threshold,i,h,4,,,Squibby brightness threshold 
+verbose,b,h,no,,,Print out in verbose mode?
+xguess,i,h,1024,,,X coordinate of center of guess circle
+yguess,i,h,1024,,,Y coordinate of center of guess circle
+halfwidth,i,h,50,,,Halfwidth of limbfinding window
+rowspace,i,h,20,,,# of rows to skip near center in limbfind
+rejectcoeff,r,h,.02,,,Least squares rejection coefficient

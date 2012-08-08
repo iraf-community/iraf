@@ -1,0 +1,172 @@
+.help msextract Jul84 noao.twodspec.multispec
+.ih
+NAME
+msextract -- Extract spectra from a multi-spectra image
+.ih
+USAGE
+msextract image output
+.ih
+PARAMETERS
+.ls image
+Image to be extracted.
+.le
+.ls output
+Filename for the three dimensional image to be created containing the
+extracted spectra.
+.le
+.ls lower = -10
+Lower limit of the integral for integrated spectra or the first column of the
+strip spectra.  It is measured in pixels from the spectrum center
+defined by the position function in the MULTISPEC database.
+.le
+.ls upper = 10
+Upper limit of the integral for integrated spectra or (approximately) the
+last column of the strip spectra.  It is measured in pixels from the
+spectrum center defined by the position function in the MULTISPEC database.
+.le
+.ls spectra = "*"
+Spectra to be extracted.
+.le
+.ls lines = "*"
+Image lines to be extracted.
+.le
+.ls ex_model = no
+Extract model spectra fit to the image spectra?
+.le
+.ls integrated = yes
+Extract integrated spectra?
+.le
+.ls unblend = no
+Correct for blending in the extracted spectra?
+.le
+.ls clean = yes
+Replace bad pixels with model values?  The following parameters are used:
+.ls  nreplace = 1000.
+Maximum number of pixels to be replaced per image line when cleaning with
+model \fIgauss5\fR or maximum number of pixels to be replaced per spectrum when
+cleaning with model \fIsmooth\fR.
+.le
+.ls sigma_cut = 4.
+Cleaning threshold in terms of sigma of the fit.
+.le
+.ls niterate = 1
+Maximum number of cleaning iterations per line when cleaning with model
+\fIgauss5\fR.
+.le
+.le
+.ls model = "smooth"
+Choice of \fIgauss5\fR or \fIsmooth\fR.  Minimum match abbreviation is
+allowed.  This parameter is required only if \fIex_model\fR = yes
+or \fIclean\fR = yes.
+.le
+.ls naverage = 20
+Number of lines to be averaged in model \fIsmooth\fR.
+.le
+.ls fit_type = 2
+Model fitting algorithm for model \fIgauss5\fR.
+.le
+.ls interpolator = "spline3"
+Type of image interpolation function to be used.
+The choices are "nearest", "linear", "poly3", "poly5", and "spline3".
+Minimum match abbreviation is allowed.
+.le
+.ls verbose = no
+Print verbose output?
+.le
+.ih
+DESCRIPTION
+The MULTISPEC database describing the spectra positions and shapes
+is used to guide the extraction of the spectra in the multi-spectra image.
+The user selects the \fIspectra\fR and image
+\fIlines\fR to be extracted and whether to extract integrated or strip spectra.
+In addition options are available to extract model spectra, replace bad
+pixels by model spectra values, and correct for blending of the spectra.
+The \fIoutput_file\fR three dimensional
+image consists of one band (the third dimension) per extracted spectrum,
+the extracted lines (the second dimension) and either one column for
+the integrated luminosity or the number of columns in the extracted strip.
+
+Integrated spectra (\fIintegrated\fR = yes) are extracted by summing
+the pixel or model values over the specified limits \fIlower\fR and \fIupper\fR
+measured relative to the spectra centers defined by the position functions in
+the database.  Partial pixel sums are used at the endpoints.
+
+Strip spectra (\fIintegrated\fR = no) are extracted by image interpolation
+of the image line or model profiles to obtain a line of values for
+each spectrum and for each image line.  The length of the strip is the
+smallest integer containing the interval between \fIlower\fR and \fIupper\fR.
+The strips for each spectrum are aligned so that the first column is a distance
+\fIlower\fR from the spectrum center as given by the position function in the
+database.
+
+If \fIex_model\fR = yes, \fIunblend\fR = yes, or \fIclean\fR = yes model
+spectra are fit to the spectra in the image.  There are two models:
+a five parameter Gaussian profile called \fIgauss5\fR and profiles obtained
+by averaging \fInaverage\fR image lines surrounding the image line being
+modeled called \fIsmooth\fR.  The model is selected either when the parameter
+\fIunblend\fR = yes or with the parameter \fImodel\fR.  If \fIunblend\fR = yes
+then the model is \fIgauss5\fR regardless of the value of \fImodel\fR.
+
+When \fIex_model\fR = yes the effect is to substitute model spectra for the
+image spectra in the output extraction image.
+
+When \fIclean\fR = yes pixels with large residuals from the model are
+detected and removed from the model fit.  The selected model is
+fit to the pixels which are not in the bad pixel list (not yet implemented)
+and which have not been removed from the model fit.  The sigma of the fit
+is computed.  Deviant pixels are detected by comparing them to the model
+to determine if they differ by more than \fIsigma_cut\fR times the sigma.
+The model fit is iterated, removing deviant pixels at each iteration, until
+no more pixels are found deviant or \fInreplace\fR pixels have been found.
+The pixels removed or in the bad pixel list are then replaced with
+model values.  (To clean an image with this algorithm see \fBnewimage\fR.)
+
+There are some technical differences in the model fitting and cleaning
+algorithms for the two models.  In model \fIsmooth\fR
+the fit for the profile scale factors is done independently for each spectrum
+and automatically corrected when a bad pixel is detected.  This fitting process
+is fast and rigorous.  The parameter \fInreplace\fR in this model refers to
+the maximum number of pixels replaced \fIper spectrum\fR.
+
+In model \fIgauss5\fR, however, the profile scale factors are fit
+to the entire image line (hence its ability to fit blended spectra).
+There are two fitting algorithms; a rigorous simultaneous fit
+and an approximate method.  The simultaneous fit is selected when
+\fIfit_type\fR = 1.  This step is relatively slow. The
+alternative method of \fIfit_type\fR = 2 sets the scale factor for each
+spectrum by taking the median scale, where scale = data / model profile,
+for the three pixels nearest the center of the profile.  The median
+minimizes the chance of a large error due to a single bad pixel.  This
+scale may be greatly in error in the case of extreme blending but is also
+quite fast; the extraction time is reduced by at least 40%.
+The steps of profile fitting and deviant pixel detection are alternated
+and the maximum number of iterations through these two steps is
+set by \fIniterate\fR.  The default of 1 means that the model fitting is not
+repeated after detecting deviant pixels.
+
+When \fIunblend\fR = yes the \fIgauss5\fR model
+is fitted to the image spectra (including possible cleaning).
+The relative contributions to the total image pixel value from each of the
+blended spectra are determined from the model and applied toward either the
+integrated or strip spectra.  If \fIex_model\fR = yes then this option has
+no effect other than to force the selection of model \fIgauss5\fR.
+
+The option \fIverbose\fR is used to print the image lines being extracted
+and the number of pixels replaced by the cleaning process.
+.ih
+EXAMPLES
+To extract all the integrated spectra from all the image lines:
+
+	cl> msextract image image.ms
+
+To extract model strip spectra:
+
+	cl> msextract image image.ms ex_model=yes int=no
+
+To extract integrated spectra without any modeling:
+
+	cl> msextract image image.ms clean=no
+.ih
+SEE ALSO
+newimage
+.endhelp

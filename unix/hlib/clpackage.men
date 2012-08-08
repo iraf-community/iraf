@@ -1,0 +1,13 @@
+         dataio - Data format conversion package (RFITS, etc.)
+           dbms - Database management package (not yet implemented)
+         images - General image processing package
+       language - The command language itself
+          lists - List processing package
+	  local - The template local package
+       obsolete - Obsolete tasks
+	   noao - The NOAO optical astronomy packages
+	   plot - Plot package
+	  proto - Prototype or interim tasks
+       softools - Software tools package
+         system - System utilities package
+      utilities - Miscellaneous utilities package

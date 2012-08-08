@@ -1,0 +1,47 @@
+.help zlocva May84 "System Interface"
+.ih
+NAME
+zlocva -- get the memory address of a variable
+.ih
+SYNOPSIS
+.nf
+zlocva (object, address)
+
+arb	object			# reference to variable
+int	address			# value of the reference
+.fi
+.ih
+DESCRIPTION
+The memory address of \fIobject\fR in char storage units is returned as
+the value of the integer variable \fIaddress\fR.  The referenced object
+may be a variable or array element of actual datatype \fBcsilrdx\fR.
+The referenced object may \fInot\fR be a procedure or a Fortran character
+variable.
+.ih
+RETURN VALUE
+The memory address returned references the process logical address space
+\fIin units of SPP chars\fR.  No zero point is assumed.
+.ih
+NOTES
+We assume that the maximum address in char units will fit into a signed
+integer variable.  The high level code assumes that it can do signed integer
+comparisons and arithmetic operations (additions and subtractions) upon the
+addresses returned by \fBzlocva\fR to check arrays for equality and overlap
+and to compute offsets when generating pointers into Mem.
+Negative addresses are permitted provided the signed arithmetic and
+comparison operations work properly, i.e., provided the negative addresses
+are assigned to the first half of the process logical address space.
+The following relationship must hold:
+
+.nf
+	call locva (Memc[1], addr1)
+	call locva (Memc[2], addr2)
+	if (addr2 - addr1 == 1 for all possible locations of Memc)
+	    locva conforms to the standard
+.fi
+
+\fBMemc\fR is an SPP char array in the global common \fBMem\fR.
+.ih
+SEE ALSO
+zmaloc, zlocpr
+.endhelp

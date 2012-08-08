@@ -1,0 +1,126 @@
+SYMTAB -- General package for managing symbol tables.  The logical view of a 
+symbol table is a collection of symbol structures.  The contents of a symbol
+description structure are user defined, but the size of the structure is fixed.
+The symbol name is a character string of arbitrary size, all characters of
+which are significant.  The storage semantics of the symbol table are those
+of a lifo stack, i.e., those symbols most recently defined must be the first
+deleted.  There is no fixed limit on the size of a symbol table; additional
+space will be dynamically allocated at run time if necessary.
+
+
+       stp =     stopen (name, len_index, len_stab, sz_sbuf)
+                stclose (stp)
+                 stmark (stp, marker)           # mark storage
+                 stfree (stp, marker)           # free to marked state
+      nsym = stnsymbols (stp, marker)		# number of symbols in table
+                 stinfo (stp, outfd)            # print info about symbol table
+
+       sym =    stenter (stp, key, symlen)      # enter new symbol in table
+       sym =     stfind (stp, key)              # search table for symbol
+      nsym =  stfindall (stp, key, sym, maxsym) # find all occurrences of symbol
+       sym =     sthead (stp)                   # last symbol entered into table
+       sym =     stnext (stp, sym)              # next symbol on global list
+     charp =     stname (stp, sym)              # access key name string
+
+    offset =     stpstr (stp, str, minchars)    # put string in string buffer
+    offset =    stalloc (stp, nints)            # alloc space in STAB
+     charp =  strefsbuf (stp, offset)           # convert sbuf offset into charp
+      intp =  strefstab (stp, offset)           # convert stab offset into intp
+
+                 stsave (stp, fd)               # save symbol table in a file
+       stp =  strestore (fd)                    # restore symbol table from file
+              stsqueeze (stp)                   # return unused storage
+     chars =     stsize (stp)			# chars req'd to store table
+
+
+The symbol table is maintained as a multi-threaded linked list.  This provides
+the efficiency of a hash table plus stack like semantics for redefinitions and
+for freeing blocks of variables.  There are three primary data structures
+internally, an array of pointers to the heads of the threads (the index),
+a buffer containing the list elements (the symbol table), and a string buffer.
+These data structures are dynamically allocated and will be automatically
+reallocated at runtime if overflow occurs.  The number of threads is fixed at
+table open time and determines the efficiency of table lookup.  The expected
+running time is O(1) for well conditioned tables, i.e., tables with a sparse
+index.  The worst case running time is O(N), i.e., the same as a linear search,
+but of course the worst case is very unlikely to occur.  Symbol entry and
+storage reclamation are especially efficient due to the use of a stack rather
+than a heap for symbol storage.
+
+	symtab descriptor
+		index (integer array, size fixed at open time)
+		sbuf  (char array, dynamic)
+		stab  (list of symstructs, dynamic)
+
+Each symbol consists of a variable size structure (symstruct) in STAB containing
+references to one or more associated strings in SBUF.  A symstruct consists of
+a fixed size SYMTAB header followed by a user defined structure, the size of
+which is fixed at STENTER time.  Each symstruct is linked on two lists,
+a global list and a hash list.  All symstructs are linked on the global list
+which is ordered with the most recently entered symbol at the head of the list.
+For a well conditioned table each hash list will typically contain zero or one
+symbols, more when there are redefinitions or when identifiers happen to hash
+to the same thread.  Often it is useful to store different types of entries
+in the same symbol table; since symstructs may vary in size this may be done
+efficiently.
+
+The STOPEN procedure is used to create a new symbol table.  The 'name' argument
+may be any string and is used for documentation purposes only.  The index
+length argument sets the size of the hash index which is fixed for the
+lifetime of the table.  The remaining two arguments specify the amount of
+symbol table space and string storage space to be initially allocated for the
+table.  The actual table may grow larger at runtime, but reallocation can be
+expensive hence it is desirable to preallocate a large space if it is known
+that the table will be large.
+
+The STMARK and STFREE procedures mark and free storage on the symbol table
+stack.  All symbols defined or redefined after a call to STMARK will be deleted
+and storage freed by a call to STFREE.  If a redef is freed the next most
+recent definition becomes current.  STFREE returns as its function value the
+number of redefined variables uncovered by the free operation.  The calling
+program must mark and free in the correct order or the symbol table may be
+trashed.  The argument to STMARK is a magic integer which currently references
+a marker record in the STAB containing the information necessary to mark and
+free storage (an integer is not large enough to hold all of the necessary
+information).
+
+STENTER is used to enter a new symbol into the symbol table.  If the named
+symbol is already present the new entry will nondestructively supercede the
+old, which may be recovered by a subsequent STFREE (this is especially useful
+for defining local contexts, e.g., when parsing a block structured language).
+STENTER returns a pointer to the newly allocated symbol structure.  This pointer
+may be invalidated if the symbol table buffer has to be reallocated in a
+subsequent call to STENTER.  STFIND searches the symbol table for the named
+key (symbol), returning a pointer to the most recently defined entry or NULL.
+Once again, this pointer may be invalidated by a subsquent call which adds
+to or removes symbols from the table.  STFINDALL finds all occurrences (or
+some maximum number of occurrences), returning an array of symstruct pointers
+ordered with the most recently defined symbols at the left.  STHEAD and STNEXT
+are used to scan symbols in the reverse of the order in which they were
+entered, e.g., for unkeyed symbol table searches.
+
+The symbol table uses an associated string buffer for string storage.  Keys
+(symbol names) are automatically added to the string buffer by STENTER.
+The string buffer is maintained as a stack, with STMARK and STFREE marking
+and freeing storage in the string buffer as well as in the symbol table buffer.
+The user may store data in either the string buffer or the symbol table
+provided the stack semantics are observed when marking and freeing storage.
+To permit dynamic reallocation, storage is referenced by offset rather than
+by pointer.  Only offsets into SBUF or STAB should be stored in symbol table
+entries.  String storage is allocated in SBUF with STPSTR (which also deposits
+the string).  Integer aligned storage is allocated in STAB with STALLOC.
+The offset of a string stored in SBUF may be converted to a char pointer
+with STREFSBUF.  The offset of a storage area in STAB may be converted into
+an integer pointer with STREFSTAB.  Pointer conversions such as these should
+not be done in the calling program since doing so requires knowledge of the
+internal SYMTAB data structures (in particular, that symbol table storage
+is contiguous).
+
+A symbol table may be saved in a binary file using STSAVE.  The space which
+will be required to store the symbol table may be queried in advance with
+STSIZE.  The internal SYMTAB data structures are simply appended to the file.
+The symbol table itself is not affected.  A saved symbol table may be restored
+to memory with STRESTORE, which is used in place of STOPEN.  The file must be
+opened and positioned to the correct offset before STRESTORE is called.
+It may be desirable to call STSQUEEZE before calling STSAVE or STSIZE,
+to minimize the file storage required to store the symbol table.

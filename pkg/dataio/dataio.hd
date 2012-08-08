@@ -1,0 +1,27 @@
+# Help directory for the DATAIO package.
+
+$doc		= "pkg$dataio/doc/"
+$fits		= "pkg$dataio/fits/"
+$reblock	= "pkg$dataio/reblock/"
+$imtext		= "pkg$dataio/imtext/"
+$mtexamine	= "pkg$dataio/mtexamine/"
+$cardimage	= "pkg$dataio/cardimage/"
+$bintext	= "pkg$dataio/bintext/"
+$t2d		= "pkg$dataio/t2d/"
+$import		= "pkg$dataio/import/"
+$export		= "pkg$dataio/export/"
+
+bintxt		hlp=doc$bintxt.hlp,		src=bintext$t_bintxt.x
+mtexamine	hlp=doc$mtexamine.hlp,		src=mtexamine$t_mtexamine.x
+rcardimage	hlp=doc$rcardimage.hlp,		src=cardimage$t_rcardimage.x
+reblock		hlp=doc$reblock.hlp,		src=reblock$t_reblock.x
+rfits		hlp=doc$rfits.hlp,		src=fits$t_rfits.x
+rtextimage	hlp=doc$rtextimage.hlp,		src=imtext$t_rtextimage.x
+txtbin		hlp=doc$txtbin.hlp,		src=bintext$t_txtbin.x
+wcardimage	hlp=doc$wcardimage.hlp,		src=cardimage$t_wcardimage.x
+wfits		hlp=doc$wfits.hlp,		src=fits$t_wfits.x
+wtextimage	hlp=doc$wtextimage.hlp,		src=imtext$t_wtextimage.x
+t2d		hlp=doc$t2d.hlp,		src=t2d$t_t2d.x
+import          hlp=doc$import.hlp,     	src=import$t_import.x
+export          hlp=doc$export.hlp,     	src=export$t_export.x
+revisions	sys=Revisions

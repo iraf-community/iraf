@@ -1,0 +1,405 @@
+.help revisions Jun88 pkg.xtools.icfit
+.nf
+icdeviant.gx
+    There were two bugs related to growing.  First, the logic was wrong.
+    Second, in one place the grow parameter was treated as being in pixels
+    and in another as being in user coordinate units.
+    (6/28/10, Valdes)
+
+icdosetup.gx
+    When there is only one sample range that is binned to a single point
+    this would result in the fitting limits (introduced 8/11/00) being
+    equal.  This causes cvinit to return an error and the cv pointer
+    is invald.   The change is if the number of binned fitting points
+    is 1 then the full range of the unbinned data is used.  Note that
+    a change was also made on this date to have cvinit return a null
+    pointer rather than a partially initialized pointer.  (11/18/02, Valdes)
+
+=======
+V2.12.1
+=======
+
+=====
+V2.12
+=====
+
+icdosetup.gx
+    The change made previously is now restricted to the polynomial functions
+    which make sense to extrapolate.  The spline functions define the
+    fitting region to be the region set by the calling program.
+    (11/21/00, Valdes)
+
+icfshow.gx
+    Will now work if the GT pointer is NULL.  (8/19/00, Valdes)
+
+icdosetup.gx
+    When using sample ranges the fitting region is now limited to the
+    minimum and maximum of the fitted region.  (8/11/00, Valdes)
+
+=========
+V2.11.3p1
+=========
+=======
+V2.11.3
+=======
+
+icgui.x
+    Eliminated gmsg calls when there is no GUI.  (2/1/99, Valdes)
+
+icshow.x
+icvshow.gx
+    The gt pointer was not being used when called by CURFIT noninteractively.
+    The IC_GT structure is now set in these routines.  (9/14/99, Valdes)
+
+=======
+V2.11.2
+=======
+
+icggraph.gx
+    Moved smark to after an initial return.  (7/11/99, Valdes)
+
+icgfit.x
+    This routine is called with a graphics descriptor for interactive
+    fitting.  The descriptor is set in an internal structure.  Other
+    procedures, which may be called both for interactive and
+    non-interactive fitting, check if the descriptor is not NULL
+    before sending GUI messages.  The problem occurs if this procedure is
+    first called interactively and then the non-interactive fitting
+    routine is called later (maybe after a deactivate workstation or
+    closing the descriptor) resulting in GUI messages being sent
+    when not in interactive mode.  The solution is to return the
+    internal descriptor value to NULL after finishing the interactive
+    fitting and returning from this procedure. (7/22/99, Valdes)
+
+icgui.x
+    Fixed bug in behavior when there is no gui.  (4/2/99, Valdes)
+
+icfit.h
+names.h
+icgfit.gx
+icparams.x
+icggraph.gx
+icgcolon.gx
+icgui.x
+icferrors.gx
+icshow.x
+icerrors.gx
+icvshow.gx
+icguishow.gx
+icfvshow.gx
+mkpkg
+    Added support for GUIs.  (12/7/98, Valdes)
+
+=======
+V2.11.1
+=======
+
+=======
+V2.11.0
+=======
+
+pkg$xtools/icfit/icfit.hlp
+    Changed the order of the task name and version number in the revisions
+    section.  (4/22/97, Valdes)
+
+pkg$xtools/icgcolon.gx
+pkg$xtools/icfit/icfit.hlp
+    Changed the "fitvalue" colon command to "evaluate" to avoid abbreviation
+    conflict with "function".  (4/16/97, Valdes)
+
+pkg$xtools/icfit/icshow.x
+    The commenting of the title string needed to be modified since the
+    title string could include new lines and we want each line to be
+    commented.  (3/27/97, Valdes)
+
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icfit.hlp
+    Added a "fitvalue" colon command to evaluate the fit at an arbitrary value.
+    (1/28/97, Valdes)
+
+pkg$xtools/icfit/icvshow.gx
+pkg$xtools/icfit/icshow.x
+pkg$xtools/icfit/icerrors.gx
+    All output except the tabular part of :xyshow now begins with
+    the comment character.  Comment column labels were added back.
+    (2/29/96, Valdes)
+
+pkg$xtools/icfit/icvshow.gx
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icfit.help
+    Enhanced the :xyshow command to include the weights and not print
+    column labels.  (11/20/95, Valdes)
+
+pkg$xtools/icfit/icparams.x
+    Added an ic_geti paramter "nmin" to return the minimum number of
+    points that can be fit.  (9/8/95, Valdes)
+
+pkg$xtools/icfit/icgfit.h
+    The prototype capability of adding points was supposed to return to
+    the calling program as if only the original data was used however
+    the structure element giving the number of points fit was the number
+    after adding the points.  This causes other routines to think the
+    data was sampled in some way which then leads to attempting to
+    reference a NULL array.  The routine now sets the number of points
+    fit back to the input value upon completion.  (7/12/95, Valdes)
+
+pkg$xtools/icfit/icfit.h
+pkg$xtools/icfit/icparams.x
+pkg$xtools/icfit/icggraph.gx
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icfit.hlp
+    Added a color option for the fit.  Users may set it with :color and
+    applications with ic_puti.  (6/30/95, Valdes)
+
+=======
+V2.10.4
+=======
+
+pkg$xtools/icfit/icdosetup.gx
+    Fixed two type mismatches in min/max calls.  (12/30/94, Valdes)
+
+pkg$xtools/icfit/icgfit.gx
+pkg$xtools/icfit/icfit.hlp
+    Added 'v' key to change fitting weight.  (12/29/94, Valdes)
+
+pkg$xtools/icparams.gx
+    Make it legal to call ic_closed with a null pointer.  (8/11/93, Valdes)
+
+============
+V2.10.3 beta
+============
+
+pkg$xtools/icfit.gx
+    This procedure now sets the IC_FITERROR structure element so that
+    a program using only the noninteractive ic_fit will have this element
+    defined.  The procedure will still return with an error condition
+    if an error occurs as was true previously.  (6/29/93, Valdes)
+
+pkg$xtools/icdosetup.gx
+    The fitting min and max given to cvinit is now calculated from the data
+    avoiding errors in setting it by calling programs.  This was especially
+    dangerous because fitting data outside this range can cause memory
+    corruption errors by the CURFIT routines.  (7/29/92, Valdes)
+
+=======
+V2.10.1
+=======
+
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icggraph.gx
+pkg$xtools/icfit/icparams.x
+pkg$xtools/icfit/icfit.h
+pkg$xtools/icfit/icfit.hlp
+noao$lib/src/icgfit.key
+noao$lib/src/idicgfit.key
+    Added a new user parameter called "markrej" to toggle whether to mark
+    rejected points or not.  (1/21/92, Valdes)
+
+pkg$xtools/icfit/icfit.hlp
+pkg$xtools/icfit/icgsample.gx
+pkg$xtools/icfit/icgfit.gx
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icparams.x
+pkg$xtools/icfit/icfit.h
+pkg$xtools/icfit/icfit.hlp
+    1.  Added 'z' key to delete individual sample regions.
+    2.  Increased the internal sample string to 1024 characters.
+    (9/4/91, Valdes)
+
+pkg$xtools/icfit/icfit.hlp
+pkg$xtools/icfit/icgfit.gx
+pkg$xtools/icfit/icgadd.gx
+pkg$xtools/icfit/ mkpkg
+    Added 'a' key to allow adding points for constraining the fit.
+    (9/3/91, Valdes)
+
+pkg$xtools/icfit/icfit.hlp
+    Fixed typo for :errors description.  (11/20/90, Valdes)
+
+pkg$xtools/icfit/icgcolon.gx
+    1. Unrecognized or ambiguous colon commands are now noted.
+    (10/2/90, Valdes)
+
+pkg$xtools/icfit/icvshow.gx
+pkg$xtools/icfit/icgcolon.gx
+pkg$xtools/icfit/icfit.hlp
+noaolib$scr/icgfit.key
+    1. The :vshow command now does not print the (x, y fit, y) values.
+    2. A new user command, :xyshow, prints the (x, y fit, y) values.
+    (5/16/90, Valdes)
+
+====
+V2.9
+====
+
+pkg$xtools/icfit/icparams.x
+pkg$xtools/icfit/icgcolon.x
+    1. ic_puti uses max (1, order) for setting the order.
+    2. icg_colon prints error if attempting to set order < 1.
+    (3/6/90, Valdes)
+
+pkg$xtools/icfit/icparams.x
+    Added ability to get information about the number of fit points and the
+    rejected points to the ic_geti procedure.  (5/4/89, Valdes)
+
+pkg$xtools/icfit/icggraph.gx
+    Scaled the symbol used for marking average points to the appropriate
+    coordinate system.  This is still only approximately correct.
+    Based on a report by Ivo Busko.  (3/1/89, Valdes)
+ 
+pkg$xtools/icfit/icvshow.gx
+
+    Changed output format of 3 values so 7 digits of precision are printed.
+    This was in response to a user request for the utilities.curfit task,
+    but all programs calling icvshow will be affected.  (ShJ 3-NOV-88)
+
+< 	call fprintf (fd, "RMS = %10.7g\n")
+> 	call fprintf (fd, "RMS = %7.4g\n")
+
+< 	call fprintf (fd, "square root of reduced chi square = %10.7g\n")
+> 	call fprintf (fd, "square root of reduced chi square = %7.4g\n")
+
+<       call fprintf (fd, "\t%14.7e\t%14.7e\n")
+>       call fprintf (fd, "\t%10.4e\t%10.4e\n")
+
+pkg$xtools/icfit/icgfit.gx
+pkg$xtools/icfit/icgaddfit.gx
+noao$lib/scr/icgfit.key
+    Added 'I' interrupt key.  (4/20/88 Valdes)
+
+pkg$xtools/icfit/icgfit.gx
+pkg$xtools/icfit/icgparams.gx
+    Valdes, Jan. 5, 1988
+    Added checks for an error in fitting the curve.
+
+pkg$xtools/icfit/icgfit.gx
+    Valdes, Oct. 2, 1987
+    1.  When doing sample regions there was a round off problem with
+    negative numbers.  Replaced int(x+.5) with nint(x).
+
+pkg$xtools/icfit/icfit.h
+pkg$xtools/icfit/icparams.x
+pkg$xtools/icfit/icguaxes.gx
+    Valdes, February 20,1987
+    1.  Made the cursor help file a setable parameter since the graph
+	keys are definable by the application.
+    2.  Added the radial velocity axis type explicitly to the package
+	to remove the need for onedspec.identify to have it's own copy
+	of the package.
+
+pkg$xtools/icfit/*x
+    Valdes, February 17, 1987
+    1.  Required GIO changes.
+
+pkg$xtools/icfit/icgcolon.gx
+    Valdes, January 16, 1987
+    1.  Colon command dictionary and switch modified to use macro definitions.
+
+pkg$xtools/icfit/icgfit.gx
+noao$lib/scr/icgfit.key
+noao$lib/scr/icgaxes.key	-
+    Valdes, January 13, 1987
+    1.  When setting sample ranges with the cursor the range limits are now
+	rounded to the nearest integer only if the x values are integers.
+	Previously it always rounded even if the data were not integers.
+    2.  Modified to use system page procedure for printing help.
+    3.  Revised the help file and included the graph axes help in the same
+	file since it is now paged.  The separate axes help file was deleted.
+
+pkg$xtools/icfit/icgcolon.gx
+    Valdes, October 7, 1986
+    1.  It is no longer possible to set naverage to 0 which causes ICFIT
+	to crash.  A message is now printed telling the user that 0 is
+	not a legal value.  This error is present in V2.3 and earlier.
+
+pkg$xtools/icfit/icgdelete.gx
+pkg$xtools/icfit/icgundelete.gx
+    Valdes, September 8, 1986
+    1.  Procedures were defined as function but used as subroutines.  The
+	function declarations were removed.  Found during the Alliant port.
+
+pkg$xtools/icfit/icgfit.gx
+noao$onedspec/identify/icfit/icgfit.gx
+    Valdes, August 21, 1986
+    1.  When defining sample ranges interactively with the cursor the
+	new sample string was appended to the previous string without
+	a leading space and with a trailing space.  This was fine if
+	the sample was defined only interactively or only explicitly
+	as a string.  However, appending an interactive sample to one
+	the user types in (without a trailing blank) is an error.
+	Changed the interactive appending to put a leading blank and
+	no trailing blank.
+
+noao$lib/src/icgfit.key
+    Valdes, August 20, 1986
+    1.  The key file listed :lowreject and :highreject instead of the
+	correct :low_reject and :high_reject.  The key file was fixed.
+
+====================================
+Version 2.3 Release, August 18, 1986
+====================================
+
+icfit$:  Valdes, August 11, 1986
+    1.  Reorganized package to have separate objects for each procedure.
+	This allows loading only the procedures of the desired datatype.
+
+icfit$icgfit.gx:  Valdes, August 7, 1986
+    1.  The 'c' key was using a fixed format inappropriate for some types
+	of data.  The formats where changed to general %g format.
+
+icfit$icgfit.gx:  Valdes, August 7, 1986
+    1.  A bug in the generic code was causing a double to be
+	passed to gt_setr which caused the windowing to be wrong.
+	This bug appeared only in the SUN.
+    2.  A bug in writing the current key definition with the 'g' key was
+	fixed.  This bug appeared only in the SUN.
+
+icfit:  Valdes, July 3, 1986
+    1.  New ICFIT package.
+
+icfit$icggraph.gx:  Valdes, April 28, 1986
+    1.  Fixed bug in icggraph.gx:
+	    real $tcveval  --->  PIXEL $tcveval
+
+icfit$icgfit.gx,icgfit2.x,icgcolon.x:  Valdes, April 7, 1986
+    1.  Fixed use of STRIDX with a character constant to STRIDXS.
+    2.  Fixed problem with colon usage for ":sample" and ":function"
+
+icfit: Valdes, Mar 13, 1986:
+    1.  ICFIT package converted to generic form.  The package now has entries
+	for both single precision and double precision data.  It uses the new
+	curfit math library which now has double precision entries as well.
+	The external names of the single precision procedures are unchanged.
+======
+Release 2.2
+======
+From Valdes Dec 30 , 1985
+
+1.  Setting of sample ranges by cursor was integer truncating giving the
+funny result that if the cursor was set at 4.99 the sample limit was 4.
+This has been changed so that the sample limit is rounded to the nearest
+integer.
+------
+From Valdes Nov 20 , 1985
+
+1.  New procedure ICG_FIT2 added.  This procedure does all graphics
+open and closes and has cl parameters "graphics", "plots", and "cursor".
+This will eventually phase out ICG_FIT.
+
+2.  Procedures modified to use an array of GTOOLS pointers instead of
+keeping them in separate variables.  This allows easy expansion to add
+additional graph formats.
+------
+From Valdes Oct 17 , 1985
+
+1.  Graphing the zero line was removed from icggraph.x because the line
+interfered with fitting data near zero.
+------
+From Valdes Oct 4, 1985
+
+1.  The package was modified to add high and low rejection and to iterate
+the rejection algorithm.
+
+2.  Procedure icg_params was add to label the graphs with the fitting
+parameters.
+.endhelp

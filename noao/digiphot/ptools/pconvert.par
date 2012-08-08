@@ -1,0 +1,8 @@
+# CONVERT Parameters
+
+textfile,s,a,,,,Input apphot/daophot text database
+table,s,a,,,,Output apphot/daophot table database
+fields,s,a,"*",,,Fields to be extracted
+expr,s,h,yes,,,Boolean expression used for record selection
+append,b,h,no,,,Append to existing table ?
+mode,s,h,"ql",,,Mode of task

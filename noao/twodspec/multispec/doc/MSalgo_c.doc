@@ -1,0 +1,522 @@
+MULTISPEC (Dec83)        Multispec Algorithms          MULTISPEC (Dec83)
+
+
+
+         Algorithms for the Multi-Spectra Extraction Package
+                       Analysis and Discussion
+                           December 2, 1983
+
+
+
+1. Disclaimer
+
+    This  should  not  be  taken as a statement of how the algorithms of
+the final package should  function;  this  is  merely  an  analysis  and
+discussion  of  the  algorithms,  and  should  be  followed  by  further 
+discussion  before  we  decide  what  course  to  follow  in  the  final 
+package.   We  may very well decide that the level of effort required to
+implement  rigorously  correct  nonlinear  fitting  algorithms  is   not 
+justified  by  the  expected scientific usage of the package.  Before we
+can decide that, though, we need an accurate estimate of  the  level  of
+effort required.
+
+In  attacking  nonlinear  surface  fitting  problems  it is important to
+recognize that almost any techniques can  be  made  to  yield  a  result
+without  the  program crashing.  Production of a result (extraction of a
+spectrum)  does  not  mean  that  the  algorithm  converged,  that   the 
+solution   is   unique,   that  the  model  is  accurate,  or  that  the 
+uncertainties in the computed coefficients have been minimized.
+
+
+
+2. Multispec Flat (pg. 4)
+
+    This sounds like a classical high pass  filter  and  might  be  best
+implemented  via  convolution.   Using  a  convolution  operator  with a
+numerical kernel has  the  advantage  that  the  filter  can  be  easily
+modifed  by  resampling  the  kernel  or  by  changing  the  size of the
+kernel.  It is also quite efficient.   The  boundary  extension  feature
+of  IMIO  makes  it  easy  to  deal  with  the  problem  of  the  kernel 
+overlapping  the  edge  of  the  image  in  a  convolution.   Since  the 
+convolution  is  one-dimensional  (the  image is only filtered in Y), it
+will always be desirable to transpose the image.
+
+The method used to detect and reject bad pixels (eqn 1) is not  correct.
+The  rejection  criteria  should  be invariant with respect to a scaling
+of  the  pixel  values.   If  the  data  has  gone  through  very   much 
+processing  (i.e.,  dtoi  on  photographic  data),  the relation between
+photon  counts  and  pixel  value  may  be  linear,  but  the  scale  is 
+unknown.   Rejection  by  comparison  of  a  data  value to a "smoothed"
+value is more commonly done as follows:
+
+        reject if:  abs (observed - smoothed) > (K * sigma)
+
+where sigma is the noise sigma of the  data,  generally  a  function  of
+the signal.
+
+It  is  often  desirable  in rejection algorithms to be able to specify,
+
+
+                                  -1-
+MULTISPEC (Dec83)        Multispec Algorithms          MULTISPEC (Dec83)
+
+
+
+as an option, that all pixels within a specified radius of a  bad  pixel
+be  rejected,  rather  than  just the pixel which was detected.  This is
+only  unnecessary  if  the  bad  pixels  are  single  pixel  events  (no 
+wings).   Region  rejection makes an iterative rejection scheme converge
+faster, as well  as  rejecting  the  faint  wings  of  the  contaminated
+region.
+
+
+
+2.1 Dividing by the Flat (pg. 5)
+
+    There  is  no  mention of any need for registering the flat with the
+data field.  Is it safe  to  assume  that  the  quartz  and  the  object
+frames  are  precisely  registered?   What  if  the  user  does  in fact
+average several quartz frames taken  over  a  period  of  time?   (Image
+registration  is  a  general  problem  that  is probably best left until
+solved in IMAGES).
+
+
+
+3. Multiap Extraction (pg. 5-6, 8-13)
+
+    The thing that bothers me most about  the  modeling  and  extraction
+process  is  that  the  high  signal  to noize quartz information is not
+used  to  full  advantage,  and  the  background  is  not  fitted   very 
+accurately.   The  present  algorithms will work well for high signal to
+noise data, but will result  in  large  (percentage)  errors  for  faint
+spectra.
+
+Basically,  it  seems to me that the high signal to noise quartz spectra
+should, in many cases, be used to determine the position  and  shape  of
+the  spectral  lines.   This  is  especially attractive since the quartz
+and spectra appear  to  be  closely  registered.   Furthermore,  if  the
+position-shape   solution   and   extraction   procedures  are  separate 
+procedures, there is nothing to prevent one from applying  both  to  the
+object  spectum  if  necessary for some reason (i.e., poor registration,
+better signal  to  noise  in  the  object  spectrum  in  the  region  of
+interest,  signal  dependent  distortions, lack of a quartz image, etc.,
+would all justify use of the object frame).  It should  be  possible  to
+model  either  the  quartz or the object frame, and to reuse a model for
+more than one extraction.
+
+Let  us  divide  the  process  up  into  two  steps,   "modeling",   and 
+"extraction"  (as  it  is  now).   The  "calibration  frame"  may be the
+quartz, an averaged quartz, or the object frame.  Ideally it  will  have
+a  high  signal  to  noise ratio and any errors in the background should
+be negligible compared to the signal.
+
+We do not solve  for  the  background  while  modeling  the  calibration
+frame;  we  assume  that  the  background  has  been  fitted by any of a
+variety  of  techniques  and  a  background  frame  written  before  the 
+calibration  frame  is  modeled.   A  "swath"  is the average of several
+image lines, where an image line  runs  across  the  dispersion,  and  a
+
+
+                                  -2-
+MULTISPEC (Dec83)        Multispec Algorithms          MULTISPEC (Dec83)
+
+
+
+column along the dispersion.
+
+
+
+3.1 Modeling
+
+    I  would  set  the thing up to start fitting at any arbitrary swath,
+rather than the first swath, because it not much harder,  and  there  is
+no  guarantee  that  the  calibration frame will have adequate signal to
+noise in the first swath (indeed often the lowest signal to  noise  will
+be  found  there).   We  define the "center" swath as the first swath to
+be fitted, corresponding to the highest signal to noise  region  of  the
+calibration  frame.   By  default  the  center swath should be the swath
+used by find_spectra, especially if there is  significant  curvature  in
+the spectra.
+
+algorithm model_calibration_frame
+
+begin
+        extract center swath
+        initialize coeff using centers from find_spectra
+        model center swath (nonlinear)
+
+        for (successive swaths upward to top of frame) {
+            extract swath
+            initialize coeff to values from last fit
+            model swath (nonlinear)
+            save coeff in datafile
+        }
+
+        set last-fit coeff to values for center swath
+        for (successive swaths downward to bottom of frame) {
+            extract swath
+            initialize coeff to values from last fit
+            model swath (nonlinear)
+            save coeff in datafile
+        }
+
+        smooth model coeff (excluding intensity) along the dispersion 
+            [high freq variations in spectra center and shape from line]
+            [to line are nonphysical]
+        variance of a coeff at line-Y from the smoothed model value is
+            a measure of the uncertainty in that coeff.
+end
+
+
+I   would  have  the  background  fitting  routine  write  as  output  a 
+background frame, the name of which would  be  saved  in  the  datafile,
+rather  than  saving  the  coeff  of  the  bkg fit in the datafile.  The
+background  frame  may  then  be  produced  by  any  of  a   number   of 
+techniques;  storing  the  coefficients  of  the bkg fit in the datafile
+limits the technique used to a particular model.  For  similar  reasons,
+the  standard  bkg  fitting  routine  should  be broken up into a module
+
+
+                                  -3-
+MULTISPEC (Dec83)        Multispec Algorithms          MULTISPEC (Dec83)
+
+
+
+which determines the region to be fitted, and a module  which  fits  the
+bkg pixels and writes the bkg image.
+
+For  example,  if  the  default  background fitting routine is a line by
+line  routine,  the  output  frame  could  be  smoothed  to  remove  the 
+(nonphysical)  fluctuations  in  the  background  from  line to line.  A
+true two dimensional background  fitting  routine  may  be  added  later
+without   requiring   modifications   to  the  datafile.   Second  order 
+corrections could be made to the background by  repeating  the  solution
+using the background fitted by the extraction procedure.
+
+
+procedure extract_swath
+
+begin
+        extract raw swath from calibration frame
+        extract raw swath from background frame
+        return (calib swath minus bkg swath)
+end
+
+
+The  algorithm  used to simultaneously model all spectra in a swath from
+across the dispersion is probably the most difficult and time  consuming
+part  of  the  problem.   The problem is nonlinear in all but one of the
+four or more parameters for each spectra.   You  have  spent  a  lot  of
+time  on  this  and  we  are probably not going to be able to improve on
+your algorithms significantly, though the generation of  the  matrix  in
+each step can probably be optimized significantly.
+
+The  analytic  line-profile  model  is  the most general and should work
+for  most  instruments  with  small  circular  apertures,  even  in  the 
+presence  of  severe  distortions.   It  should be possible, however, to
+fit a simpler model given by  a  lookup  table,  solving  only  for  the
+position  and  height  of  each spectra.  This model may be adequate for
+many instruments, should be must faster to fit,  and  may  produce  more
+accurate  results  since  there  are  fewer  parameters in the fit.  The
+disadvantage of an  empirical  model  is  that  it  must  be  accurately
+interpolated  (including  the  derivatives),  requiring  use  of  spline 
+interpolation or a similar technique (I have  tried  linear  and  it  is
+not  good  enough).  Vesa has implemented procedures for fitting splines
+and evaluating their derivatives.
+
+Fitting the empirical model simultaneously  to  any  number  of  spectra
+should  be  straightforward  provided the signal to noise is reasonable,
+since there are few parameters in the  fit  and  the  matrix  is  banded
+(the  Marquardt  algorithm  would work fine).  However, if you ever have
+to deal with data where a very faint or nonexistent spectra is  next  to
+a  bright  one,  it  may  be difficult to constrain the fit.  I doubt if
+the present approach of smoothing the coeff across  the  dispersion  and
+iterating  would  work  in  such  a case.  The best approach might be to
+fix the center of the faint spectra relative  to  the  bright  one  once
+the  signal  drops  below  a  certain  level, or to drop it from the fit
+entirely.  This requires that the matrix be able to change  size  during
+
+
+                                  -4-
+MULTISPEC (Dec83)        Multispec Algorithms          MULTISPEC (Dec83)
+
+
+
+the fit.
+
+algorithm fit_empirical_model
+
+begin
+        [upon entry, we already have an initial estimate of the coeff]
+
+        # Marquardt (gradient expansion) algorithm.  Make 2nd order
+        # Taylor's expansion to chisquare near minimum and solve for
+        # correction vector which puts us at minimum (subject to
+        # Taylor's approx).  Taylor's approximation rapidly becomes
+        # better as we near the minimum of the multidimensional
+        # chisquare, hence convergence is extremely rapid given a good
+        # starting estimate.
+
+        repeat {
+            evaluate curvature matrix using current coeff.
+            solve banded curvature matrix 
+
+            compute error matrix
+            for (each spectra)
+                if (uncertainty in center coeff > tol) {
+                    fix center by estimation given relative spacing
+                        in higher signal region
+                    remove spectra center from solution
+                }
+
+            if (no center coeff were rejected)
+                tweak correction vector to accelerate convergence
+            new coeff vector = old coeff vector + correction vector
+            compute norm of correction vector
+        } until (no more center coeff rejected and norm < tolerance)
+
+        compute final uncertainties
+end
+
+
+The  following  is  close  to what is currently done to fit the analytic
+model, as far as  I  can  remember  (I  have  modified  it  slightly  to
+stimulate  discussion).   The  solution  is  broken up into two parts to
+reduce the number of free parameters and  increase  stability.   If  the
+uncertainty  in  a  free  parameter  becomes large it is best to fix the
+parameter (it is particularly easy for this data  to  estimate  all  but
+the  intensity  parameter).   A fixed parameter is used in the model and
+affects the solution but is not solved for (i.e., like the background).
+
+The analytic fit will  be  rather  slow,  even  if  the  outer  loop  is
+constrained  to  one  iteration.   If it takes (very rough estimates) .5
+sec to set up the banded matrix and .3 sec to  solve  it,  3  iterations
+to  convergence,  we  have  5  sec  per  swath.  If we have an 800 lines
+broken into swaths of 32 lines, the total  is  125  sec  per  image  (to
+within a factor of 5).
+
+
+
+                                  -5-
+MULTISPEC (Dec83)        Multispec Algorithms          MULTISPEC (Dec83)
+
+
+
+algorithm fit_analytic_model
+
+begin
+        [upon entry, we already have an initial estimate of the coeff]
+
+        repeat {
+            save coeff
+            solve for center,height,width of each line with second
+                order terms fixed (but not necessarily zero)
+            apply constraints on line centers and widths
+            repeat solution adding second order coeff (shape terms)
+
+            compute error matrix
+            for (each coeff)
+                if (uncertainty in coeff > tol) {
+                    fix coeff value to reasonable estimate
+                    remove coeff from solution
+                }
+
+            compute total correction vector given saved coeff
+            if (no coeff were rejected)
+                tweak correction vector to accelerate convergence
+            compute norm of correction vector
+        } until (no additional coeff rejected and norm < tolerance)
+
+        compute final uncertainties
+end
+
+
+
+3.2 Extraction
+
+    The  purpose of extraction is to compute the integral of the spectra
+across the dispersion, producing I(y) for each spectra.  An estimate  of
+the  uncertainty  U(y)  should  also  be produced.  The basic extraction
+techniques  are  summarized  below.   The  number  of  spectra,  spectra 
+centers,  spectra  width  and  shape parameters are taken from the model
+fitted  to  the  calibration  frame  as  outlined  above.   We  make   a 
+simultaneous  solution  for  the  profile  heights and the background (a
+linear problem), repeating the solution independently for each  line  in
+the  image.   For  a  faint  spectrum,  it is essential to determine the
+background accurately, and we can do that safely here since  the  matrix
+will be very well behaved.
+
+    (1) Aperture  sum.   All  of the pixels within a specified radius of
+        the spectra  are  summed  to  produce  the  raw  integral.   The
+        background  image  is  also  summed  and subtracted to yield the
+        final integral.  The radius may be a constant or a  function  of
+        the  width  of  the profile.  Fractional pixel techniques should
+        be used to minimize sampling effects at the  boundaries  of  the
+        aperture.   Pixel  rejection  is  not possible since there is no
+        fitted surface.  The model is  used  only  to  get  the  spectra
+        center  and  width.   This  technique is fastest and may be best
+
+
+                                  -6-
+MULTISPEC (Dec83)        Multispec Algorithms          MULTISPEC (Dec83)
+
+
+
+        if the profile is difficult to model, provided the  spectra  are
+        not crowded.
+
+    (2) Weighted  aperture  sum.   Like  (1),  except  that  a weighting
+        function is applied to correct  for  the  effects  of  crowding.
+        The  model  is  fitted  to  each  object  line,  solving  for  I 
+        (height) and B (background) with  all  other  parameters  fixed.
+        This  is  a  linear  solution  of  a banded matrix and should be
+        quite fast provided the model  can  be  sampled  efficiently  to
+        produce  the  matrix.   It  is possible to iterate to reject bad
+        pixels.  The weight for  a  spectra  at  a  data  pixel  is  the
+        fractional  contribution  of that spectra to the integral of the
+        contributions of all spectra.
+
+    (3) Fit and integrate the model.  The model is fitted as in  (2)  to
+        the   data   pixels  but  the  final  integral  is  produced  by 
+        integrating  the  model.   This   technique   should   be   more 
+        resistant  to  noise  in  the  data  than is (2), because we are
+        using the high signal to  noise  information  in  the  model  to
+        constrain  the  integral.   More  accurate  photometric  results 
+        should therefore be possible.
+
+
+Method (2) has  the  advantage  that  the  integral  is  invariant  with
+respect  to  scale  errors in the fitted models, provided the same error
+is made in each model.  Of course, the same  error  is  unlikely  to  be
+made  in  all  models contributing to a point; it is more likely that an
+error will put more energy into  one  spectra  at  the  expense  of  its
+neighbors.   In  the  limit as the spectra become less crowded, however,
+the effects of errors  in  neighboring  spectra  become  small  and  the
+weighted  average  technique looks good; it becomes quite insensitive to
+errors in the model and in the fit.  For  crowded  spectra  there  seems
+no  alternative  to a good multiparameter fit.  For faint spectra method
+(3) is probably best, and  fitting  the  background  accurately  becomes
+crucial.
+
+In  both (2) and (3), subtraction of the scaled models yields a residual
+image which can be used to evaluate at a glance the quality of the  fit.
+Since  most  all  of  the  effort in (2) and (3) is in the least squares
+solution and the pixel rejection, it might be desirable to  produce  two
+integrals  (output  spectra),  one  for  each  algorithm, as well as the
+uncertainty  vector  (computed  from  the  covariance  matrix,  not  the 
+residual).
+
+
+
+3.3 Smoothing Coefficient Arrays
+
+    In  several  places  we have seen the need for smoothing coefficient
+arrays.  The use of polynomials for  smoothing  is  questionable  unless
+the   order   of  the  polynomial  is  low  (3  or  less).   High  order 
+polynomials are  notoriously  bad  near  the  endpoints  of  the  fitted
+array,   unless  the  data  curve  happens  to  be  a  noisy  low  order 
+
+
+                                  -7-
+MULTISPEC (Dec83)        Multispec Algorithms          MULTISPEC (Dec83)
+
+
+
+polynomial  (rare,  to  say  the  least).   Convolution   or   piecewise 
+polynomial  functions  (i.e., the natural cubic smoothing spline) should
+be considered if there is any reason to  believe  that  the  coefficient
+array  being  smoothed  may  have  high  frequency  components which are
+physical and must be followed (i.e., a bend or kink).
+
+
+
+3.4 Weighting (pg. 11)
+
+    The first weighting scheme (1 / sqrt (data)) seems inverted  to  me.
+The  noise  goes  up  as  with the signal, to be sure, but the signal to
+noise usually goes up faster.  Seems to me the  weight  estimate  should
+be  sqrt(data).   It  also  make  more sense to weight the least blended
+(peak) areas most.
+
+
+
+3.5 Rejection criteria (pg. 13)
+
+    The same comments apply to this rejection criterium  as  in  section
+2.   I  assume  that  "(data  -  model)"  is supposed to be "abs (data -
+model").
+
+
+
+3.6 Uncertainties and Convergence Criteria
+
+    I got the impression that you were using the residual  of  the  data
+minus  the  fitted  surface  both  as the convergence criterium and as a
+measure of the errors in the fit.  It is  neither;  assuming  a  perfect
+model, the residual gives only a measure of the noise in the data.
+
+Using   the   residual   to  establish  a  convergence  criterium  seems 
+reasonable except that it is hard to reliably  say  what  the  criterium
+should  be.   Assuming  that  the  algorithm converges, the value of the
+residual when convergence is acheived is in  general  hard  to  predict,
+so   it  seems  to  me  to  be  difficult  to  establish  a  convergence 
+criterium.  The conventional way  to  establish  when  a  nonlinear  fit
+converges  is  by measuring the norm of the correction vector.  When the
+norm becomes less than some small number the algorithm is said  to  have
+converged.   The  multidimensional  chisquare  surface is parabolic near
+the minimum and a good nonlinear algorithm will  converge  very  rapidly
+once it gets near the minimum.
+
+The  residual  is a measure of the overall goodness of fit, but tells us
+nothing about the uncertainties in the individual  coefficients  of  the
+model.    The  uncertainties  in  the  coefficients  are  given  by  the 
+covariance or error matrix (see Bevington pg. 242).  It is  ok  to  push
+forward  and  produce  an extraction if the algorithm fails to converge,
+but  ONLY  provided  the  code  gives  a  reliable   estimate   of   the 
+uncertainty.
+
+
+
+                                  -8-
+MULTISPEC (Dec83)        Multispec Algorithms          MULTISPEC (Dec83)
+
+
+
+3.6 Evaluating the Curvature Matrix Efficiently
+
+    The  most  expensive  part  of  the  reduction  process  is probably
+evaluating the model to form the curvature matrix at each  iteration  in
+the  nonlinear  solution.   The  most efficient way to do this is to use
+lookup tables.  If the profile shape does not change,  the  profile  can
+be  sampled,  fitted  with a spline, and the spline evaluated to get the
+zero through second derivatives for the curvature matrix.  This  can  be
+done  even  if  the  width  of  the  profile  changes by adding a linear
+term.  If the shape of the profile has to change, it is  still  possible
+to  sample  either  the  gaussian or the exponential function with major
+savings in computation time.
+
+
+
+3.7 Efficient Extraction (pg. 12)
+
+    The reported time of 3 cpu hours to  extract  the  spectra  from  an
+800  line  image  is  excessive for a linear solution.  I would estimate
+the time required for the 800 linear  banded  matrix  solutions  at  4-8
+minutes,  with  a  comparable  time  required  for matrix setup if it is
+done efficiently.  I suspect that the present code  is  not  setting  up
+the   linear   banded   matrix   efficiently  (not  sampling  the  model 
+efficiently).  Pixel rejection should not seriously affect  the  timings
+assuming that bad pixels are not detected in most image lines.
+
+
+
+4. Correcting for Variations in the PSF
+
+    For  all  low  signal  to  noise data it is desirable to correct for
+variations in the point  spread  function,  caused  by  variable  focus,
+scattering,  or  whatever.   This does not seem such a difficult problem
+since the width of the line profile  is  directly  correlated  with  the
+width  of  the  PSF and the information is provided by the current model
+at each point in each extracted spectrum.   The  extracted  spectra  can
+be  corrected  for the variation in the PSF by convolution with a spread
+function the width of which varies along the spectrum.

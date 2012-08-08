@@ -1,0 +1,187 @@
+# Root MKPKG for IRAF.  The bootstrap utilities and libraries in the HOST
+# subdirectory must be made before this can be run.
+
+$verbose
+$call	mkall					# make everything
+$exit
+
+sysgen:
+	$call vendor
+	$call mkall
+	$call update
+	;
+
+mkall:
+	$ifeq (hostid, unix)  !(clear;date)  $endif
+	$echo "==================== MAKE IRAF! ========================="
+	$echo "+"
+	$call syslibs
+	$call mathlibs
+	$ifeq (USE_SHLIB, yes) $call shlib $endif
+	# (fall through)
+relink:
+	$call sysexe
+	$call packages
+	$ifeq (hostid, unix)  !(touch unix/hlib/utime)  $endif
+	$echo "====================== (done) ==========================="
+	$ifeq (hostid, unix)  !(date)  $endif
+	;
+
+update:
+	$call sysexe
+	$call packages
+	;
+
+vendor:
+	$echo "======================= VENDOR =========================="
+	$echo "+"
+	$call sysgen@vendor
+	$echo "+" $echo "+"
+	;
+
+syslibs:
+	$echo "====================== SYSLIBS =========================="
+	$echo "+"
+	$call sysgen@sys
+	$echo "+" $echo "+"
+	;
+
+sysexe:
+	$echo "====================== SYSEXE ==========================="
+	$echo "+" $echo "+"
+	$call update@sys
+	$echo "+" $echo "+"
+	;
+
+mathlibs:
+	$echo "====================== MATHLIBS ========================="
+	$echo "+" $echo "+"
+	$call mathgen@math
+	$echo "+" $echo "+"
+	;
+
+packages:
+	$echo "====================== PACKAGES ========================="
+	$echo "+" $echo "+"
+
+	# On the UNIX distribution, the BIN directory is excluded from the
+	# tar tape in a "you relink" distribution.  Lets make sure we have
+	# the directory before proceeding to relink all the packages.
+
+	$ifeq (hostid, unix)  !(mkdir $(iraf)bin >& /dev/null)  $endif
+
+	$call update@pkg
+	$echo "+" $echo "+"
+	;
+
+shlib:
+	$echo "====================== SHLIB ============================"
+	$echo "+" $echo "+"
+	$call update@host$shlib/
+	$echo "+" $echo "+"
+	;
+
+# SUMMARY -- [UNIX] mkpkg summary: output a summary of the spooled mkpkg
+# output, omitting most of the mundane chatter.  Used to scan large spool
+# files for errors.
+
+summary:
+	$ifeq (HOSTID, unix)
+	    $ifndef (spool)
+		$set spool = spool
+	    $endif
+	    ! grep -v ':$$' $(spool) | grep -v '^xc' | grep -v '^ar'\
+	        | grep -v '^check file'
+	$else
+	    $echo "mkpkg summary only available on a UNIX system"
+	$endif
+	;
+
+
+# STRIP -- Strip the system of all sources and other files not required to
+# run the system, or for user programming.
+
+strip:
+	$echo "Ignore any messages about cannot delete a file."
+	$echo "Be sure to do a `cd noao; mkpkg strip' as well."
+	$echo "Stripping non-runtime files from IRAF source tree..."
+	!rmfiles -f $(hlib)strip.iraf
+	;
+
+# SRCARC -- Make a source archive (TAR format) of the system.
+
+srcarc:
+	!wtar -of $(?tarfile) README mkpkg lib sys math pkg doc
+	;
+
+
+# UNIX/IRAF stuff (multiple architecture support).
+# ---------------------------------------------------
+
+arch:
+showfloat:				# show current float option
+	$verbose off
+	!$(hlib)/mkfloat.csh
+	;
+generic:				# make architecture indep. (no bins)
+	$verbose off
+	!$(hlib)/mkfloat.csh generic
+	!(cd ./unix; setenv MACH generic; sh setarch.sh)
+	;
+
+cygwin:					# install WinXP/Cygwin binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh cygwin
+        !(cd ./unix; setenv MACH cygwin; sh setarch.sh)
+        ;
+freebsd:				# install freebsd binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh freebsd
+        !(cd ./unix; setenv MACH freebsd; sh setarch.sh)
+        ;
+        ;
+linux:					# install linux (32-bit) binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh linux
+        !(cd ./unix; setenv MACH linux; sh setarch.sh)
+        ;
+linux64:				# install linux (64-bit) binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh linux64
+        !(cd ./unix; setenv MACH linux64; sh setarch.sh)
+        ;
+macintel:				# install MacOS X (x86_64) binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh macintel
+        !(cd ./unix; setenv MACH macintel; sh setarch.sh)
+        ;
+macosx:					# install MacOS X (Unix 32-bit) binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh macosx
+        !(cd ./unix; setenv MACH macosx; sh setarch.sh)
+        ;
+ipad:					# install Mac iPad binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh ipad
+        !(cd ./unix; setenv MACH ipad; sh setarch.sh)
+        ;
+redhat:					# install redhat binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh redhat
+        !(cd ./unix; setenv MACH redhat; sh setarch.sh)
+        ;
+sparc:					# install sparc binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh sparc
+	!(cd ./unix; setenv MACH sparc; sh setarch.sh)
+	;
+sunos:					# install sunos binaries
+        $verbose off
+        !$(hlib)/mkfloat.csh sunos
+        !(cd ./unix; setenv MACH sunos; sh setarch.sh)
+        ;
+ssun:					# install ssun binaries
+	$verbose off
+	!$(hlib)/mkfloat.csh ssun
+	!(cd ./unix; setenv MACH ssol; sh setarch.sh)
+	;

@@ -1,0 +1,118 @@
+	Using the Sequential One Dimensional Interpolation Routines
+	A Quick Note for Programmers 
+
+
+I. GENERAL NOTES:
+
+	1. Defines are found in file interpdef.h.  The routines
+	   are in library interplib.a.
+
+	2. All pixels are assumed to be good. Except for routine
+	   arbpix.
+
+	3. This is for uniformly spaced data -- thus for the i-th
+	   data value, y[i], the corresponding x[i] = i by assumption.
+
+	4. All x references are assumed to land in the closed interval
+	   1 <= x <= NPTS, where NPTS is the number of points in the
+	   data array.  If x is outside this range, the result is
+	   not specified.
+
+	5. A storage area and work space array must be provided.
+	   It is of type real and the size is 2 * NPTS + SZ_ASI
+
+	
+
+II. PROCEDURES:
+
+
+  **** Subroutine to select the interpolator type
+  *
+  *	interpolator_type = clginterp (param)
+  *
+  *	char	param[ARB]
+  *
+  *	     The parameter prompt string is sent to the CL and the
+  *	routine evaluates the returned string to select one of the
+  *	interpolator types given in interpdef.h.  The input string
+  *	may be one of the following with possible abbreviations:
+  *		nearest
+  *		linear
+  *		3rd order poly
+  *		5th order poly
+  ****		cubic spline
+
+
+  **** Subroutine to replace INDEF's with interpolated values.
+  *
+  *	arbpix (datain, n, dataout, interpolator_type)
+  *
+  *	real	datain[ARB]		# data_in array
+  *	int	n			# number of points in data_in
+  *	real	dataout[ARB]		# array out, may not be same as
+  *					# data_in
+  *	int	interpolator_type
+  *
+  *	    The interpolator type can be set to:
+  *
+  *		IT_NEAREST		nearest neighbor
+  *		IT_LINEAR		linear interpolation
+  *		IT_POLY3		interior polynomial 3rd order
+  *		IT_POLY5		interior polynomial 5th order
+  ****		IT_SPLINE3		cubic natural spline
+
+
+  **** Subroutine to set interpolator type.
+  *
+  *	asiset(coeff,interpolator_type)
+  *
+  *	real	coeff[ARB]		# work + storage array, dimension
+  *					# 2 * NPTS + SZ_ASI
+  ****	int	interpolator_type	# see above
+
+
+  **** Subroutine to fit interpolator to data.
+  *
+  *	asifit (datain, npts, coeff)
+  *
+  *	real	datain[ARB]	# data array 
+  *	int	npts		# number of points in data array
+  ****	real	coeff[ARB]	# work+storage area dim 2*npts + SZ_ASI
+  
+  
+  **** Subroutine to return interpolated value after fitting.  
+  *
+  *	real asival (x, coeff)
+  *	
+  *	real	x
+  ****	real	coeff[ARB]
+  
+  
+  **** Subroutine to evaluate an ordered sequence of values.
+  *
+  *	asieva (x, y, n, coeff)
+  *
+  *	real	x[ARB]		# input array of x values
+  *	real	y[ARB]		# output array of interpolated values
+  *	int	n		# number of x values
+  ****	real	coeff[ARB]
+  
+  
+  **** Subroutine to evaluate derivatives at a point.
+  *
+  *	asider (x, derivs, nder, coeff)
+  *
+  *	real	x
+  *	real	derivs[ARB]	# output array containing derivatives
+  *				# derivs[1] is function value
+  *	int	nder		# input:  nder - 1 derivatives are evaluated
+  ****	real	coeff[ARB]
+  
+      
+  **** Subroutine to integrate the interpolated data.
+  *
+  *	real asigrl (a, b, coeff)
+  *
+  *	real	a		# lower limit
+  *	real	b		# upper limit
+  ****	real	coeff[ARB]

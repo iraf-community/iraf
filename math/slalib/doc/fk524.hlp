@@ -1,0 +1,81 @@
+.help fk524 Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slFK54 (R2000,D2000,DR2000,DD2000,P2000,V2000,
+     :                      R1950,D1950,DR1950,DD1950,P1950,V1950)
+
+     - - - - - -
+      F K 5 4
+     - - - - - -
+
+  Convert J2000.0 FK5 star data to B1950.0 FK4 (double precision)
+
+  This routine converts stars from the new, IAU 1976, FK5, Fricke
+  system, to the old, Bessel-Newcomb, FK4 system.  The precepts
+  of Smith et al (Ref 1) are followed, using the implementation
+  by Yallop et al (Ref 2) of a matrix method due to Standish.
+  Kinoshita's development of Andoyer's post-Newcomb precession is
+  used.  The numerical constants from Seidelmann et al (Ref 3) are
+  used canonically.
+
+  Given:  (all J2000.0,FK5)
+     R2000,D2000     dp    J2000.0 RA,Dec (rad)
+     DR2000,DD2000   dp    J2000.0 proper motions (rad/Jul.yr)
+     P2000           dp    parallax (arcsec)
+     V2000           dp    radial velocity (km/s, +ve = moving away)
+
+  Returned:  (all B1950.0,FK4)
+     R1950,D1950     dp    B1950.0 RA,Dec (rad)
+     DR1950,DD1950   dp    B1950.0 proper motions (rad/trop.yr)
+     P1950           dp    parallax (arcsec)
+     V1950           dp    radial velocity (km/s, +ve = moving away)
+
+  Notes:
+
+  1)  The proper motions in RA are dRA/dt rather than
+      cos(Dec)*dRA/dt, and are per year rather than per century.
+
+  2)  Note that conversion from Julian epoch 2000.0 to Besselian
+      epoch 1950.0 only is provided for.  Conversions involving
+      other epochs will require use of the appropriate precession,
+      proper motion, and E-terms routines before and/or after
+      FK524 is called.
+
+  3)  In the FK4 catalogue the proper motions of stars within
+      10 degrees of the poles do not embody the differential
+      E-term effect and should, strictly speaking, be handled
+      in a different manner from stars outside these regions.
+      However, given the general lack of homogeneity of the star
+      data available for routine astrometry, the difficulties of
+      handling positions that may have been determined from
+      astrometric fields spanning the polar and non-polar regions,
+      the likelihood that the differential E-terms effect was not
+      taken into account when allowing for proper motion in past
+      astrometry, and the undesirability of a discontinuity in
+      the algorithm, the decision has been made in this routine to
+      include the effect of differential E-terms on the proper
+      motions for all stars, whether polar or not.  At epoch 2000,
+      and measuring on the sky rather than in terms of dRA, the
+      errors resulting from this simplification are less than
+      1 milliarcsecond in position and 1 milliarcsecond per
+      century in proper motion.
+
+  References:
+
+     1  Smith, C.A. et al, 1989.  "The transformation of astrometric
+        catalog systems to the equinox J2000.0".  Astron.J. 97, 265.
+
+     2  Yallop, B.D. et al, 1989.  "Transformation of mean star places
+        from FK4 B1950.0 to FK5 J2000.0 using matrices in 6-space".
+        Astron.J. 97, 274.
+
+     3  Seidelmann, P.K. (ed), 1992.  "Explanatory Supplement to
+        the Astronomical Almanac", ISBN 0-935702-68-7.
+
+  P.T.Wallace   Starlink   19 December 1993
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

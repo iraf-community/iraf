@@ -1,0 +1,12 @@
+The HELP package -- online documentation utilties.  This directory contains
+the source and documtation for the HELP utility.  The subdirectory lroff
+contains the source for the Lroff text formatter, called by HELP to format
+help blocks.
+
+Jul84	Added the help database facility, i.e., pre-compilation of the help
+	directories to produce a binary database.  Numerous other improvements.
+	See the revs file for additional details.
+
+Note:	The TASK declaration for HELP is in pkg$system/system.cl.
+	The TASK declarations for MKHELPDB and HDBEXAMINE are in the softools
+	    package, file pkg$softools/softools.cl.

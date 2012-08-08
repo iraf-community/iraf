@@ -1,0 +1,54 @@
+.help zfiolp May84 "System Interface"
+.ih
+NAME
+zfiolp -- line printer driver
+.ih
+SYNOPSIS
+.nf
+zopnlp (osfn, mode, chan)		# open line printer
+zclslp (chan, status)			# close line printer
+zardlp (chan, buf, maxbytes, loffset)	# asynchronous read
+zawrlp (chan, buf,   nbytes, loffset)	# asynchronous write
+zawtlp (chan, status)			# wait for transfer
+zsttlp (chan, param, lvalue)		# get file/device status
+
+packed	char osfn[]
+char	buf[]
+int	mode, chan, maxbytes, nbytes, param, status
+long	loffset, lvalue
+.fi
+.ih
+DESCRIPTION
+The line printer devices are interfaced as binary files.  Except where noted
+herein, the line printer driver is functionally equivalent to the driver for
+an ordinary streaming binary file.
+
+A line printer device is opened with \fBzopnlp\fR and closed with \fBzclslp\fR.
+The name of the device to be opened is given by \fIosfn\fR and is host system
+dependent.  The names of the printer devices recognized by \fBzopnlp\fR must
+agree with those in the CL environment list and in the printer capability file
+\fBdev$printcap\fR.  Only the APPEND and WRITE_ONLY modes are supported by
+most printer devices.  Depending on the location and characteristics of the
+device, \fBzopnlp\fR may or may not open the device directly.  Often a
+binary spoolfile is opened instead, and the spoolfile is (asynchronously)
+disposed of to the physical device when \fBzclspr\fR is called.
+
+Binary data is copied to the printer device without modification, hence all
+control functions (including newline) must have been fully translated into
+device dependent control sequences by the time \fBzawrlp\fR is called to
+output the data to the device.  Either character data or binary bitmap data
+(graphics) may be transmitted to a printer device.
+.ih
+NOTES
+If the printer device is very fast it will not be desirable to spool printer
+output when printing large text files due to the additional expense of writing
+a large spoolfile.  A better approach is to write directly to the device if
+it is available, spooling only if the device is already in use at \fBzopnlp\fR
+time.  A second virtual device can be defined which writes to the same
+physical device but which always spools the output.  If the line printer
+device is shared in a local area network it may be necessary to spool the
+output and copy the spoolfile to a remote host for disposal to the printer.
+.ih
+SEE ALSO
+zfiobf, lpopen, dev$printcap, manual pages for the binary file driver
+.endhelp

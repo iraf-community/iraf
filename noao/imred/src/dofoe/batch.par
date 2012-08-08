@@ -1,0 +1,25 @@
+objects,s,h,,,,"Object spectra"
+datamax,r,h,,,,"Max data value / cosmic ray threshold"
+response,f,h,"",,,"Response spectrum"
+arcs,s,h,,,,"List of arc spectra"
+arcref,f,h,"",,,"Arc reference for dispersion solution"
+arcrefs,s,h,,,,"Arc references"
+objaps,s,h,,,,"Object apertures"
+arcaps,s,h,,,,"Arc apertures"
+objbeams,s,h,,,,"Object beam numbers"
+arcbeams,s,h,,,,"Arc beam numbers
+"
+done,f,h,"",,,"File of spectra already done"
+logfile,f,h,"",,,"Logfile"
+redo,b,h,,,,"Redo operations?"
+update,b,h,,,,"Update spectra?"
+scattered,b,h,,,,"Subtract scattered light?"
+arcap,b,h,,,,"Use object apertures for arcs?"
+dispcor,b,h,,,,"Dispersion correct spectra?"
+newaps,b,h,,,,
+newresp,b,h,,,,
+newdisp,b,h,,,,
+newarcs,b,h,,,,
+fd1,*struct,h,"",,,
+fd2,*struct,h,"",,,
+mode,s,h,"ql",,,

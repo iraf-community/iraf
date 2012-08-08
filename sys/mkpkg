@@ -1,0 +1,274 @@
+# Make the IRAF Virtual Operating System (VOS).  (07-May-83 Dct). 
+# Revised to use the new MKPKG facilities (12Dec85 Dct).
+
+$ifeq (hostid, unix) !(clear;date) $endif
+$call sysgen
+$echo "-------------- (done) ----------------"
+$ifeq (hostid, unix) !(date) $endif
+$exit
+
+# UPDATE -- Update the system executables in lib$
+
+update:	
+	$echo "-------------- GIO ----------------"
+	@gio
+	$echo "-------------- KI  ----------------"
+	@ki
+	$echo "-------------- TTY ----------------"
+	@tty
+	;
+
+# SUMMARY -- [UNIX] mkpkg summary: output a summary of the spooled mkpkg
+# output, omitting most of the mundane chatter.  Used to scan large spool
+# files for errors.
+
+summary:
+	$ifeq (HOSTID, unix)
+	    ! grep -v ':$$' spool | grep -v '^xc' | grep -v '^ar'\
+	    | grep -v '^check file'
+	$else
+	    $echo "mkpkg summary only available on a UNIX system"
+	$endif
+	;
+
+# SYSGEN -- Update the system libraries (VOS).  Note that the system library
+# for the iraf kernel (libos.a) is maintained in host$.
+
+sysgen:
+	$call sys
+	$call ex
+	$call vops
+	$call cur
+	$call stg
+	$ifeq (USE_LIBMAIN, yes)  $call libmain  $endif
+	$call libc
+	$call imfort
+	$call gks
+	$call ncar
+	$call sgi
+	$call imd
+
+	# Not all systems want the NCAR/NSPP and CALCOMP graphics kernels.
+	$ifeq (USE_NSPP, yes)
+	    $call nspp
+	    $call gkt
+	$endif
+	$ifeq (USE_CALCOMP, yes)
+	    $call ccp
+	$endif
+
+	# DS is required for cursor readback by the CL.
+	$call ds
+
+	# MEMIO debug library.
+	$call memdbg
+
+	$purge lib$
+	;
+
+sys:
+	$echo "-------------- LIBSYS ----------------"
+	$checkout libsys.a  lib$
+	$update   libsys.a
+	$checkin  libsys.a  lib$
+	;
+ex:
+	$echo "-------------- LIBEX -----------------"
+	$checkout libex.a   lib$
+	$update   libex.a
+	$checkin  libex.a   lib$
+	;
+vops:
+	$echo "-------------- LIBVOPS ---------------"
+	$checkout libvops.a lib$
+	$update   libvops.a
+	$checkin  libvops.a lib$
+	;
+cur:
+	$echo "-------------- LIBCUR ----------------" 
+	$checkout libcur.a  lib$
+	$update   libcur.a
+	$checkin  libcur.a  lib$
+	;
+stg:
+	$echo "-------------- LIBSTG ----------------" 
+	$checkout libstg.a  lib$
+	$update   libstg.a
+	$checkin  libstg.a  lib$
+	;
+libmain:
+	$echo "-------------- LIBMAIN.O -------------" 
+	$ifolder (bin$libmain.o, host$os/zmain.c)
+	    $call libmain.o
+	$else
+	    $echo "Libmain.o is up to date"
+	$endif
+	;
+libc:
+	$echo "-------------- LIBC ------------------" 
+	$checkout libc.a lib$
+	$update   libc.a
+	$checkin  libc.a lib$
+	;
+imfort:
+	$echo "-------------- IMFORT ----------------" 
+	$checkout libimfort.a lib$
+	$update   libimfort.a
+	$checkin  libimfort.a lib$
+	;
+gks:
+	$echo "-------------- LIBGKS ----------------" 
+	$checkout libgks.a  lib$
+	$update   libgks.a
+	$checkin  libgks.a  lib$
+	;
+sgi:
+	$echo "-------------- LIBSGI ----------------" 
+	$checkout libsgi.a  lib$
+	$update   libsgi.a
+	$checkin  libsgi.a  lib$
+	;
+imd:
+	$echo "-------------- LIBIMD ----------------" 
+	$checkout libimd.a  lib$
+	$update   libimd.a
+	$checkin  libimd.a  lib$
+	;
+ds:
+	$echo "-------------- LIBDS ----------------" 
+	$checkout libds.a  lib$
+	$update   libds.a
+	$checkin  libds.a  lib$
+	;
+ncar:
+	$echo "-------------- LIBNCAR ---------------" 
+	$checkout libncar.a lib$
+	$update   libncar.a
+	$checkin  libncar.a lib$
+	;
+nspp:
+	$echo "-------------- LIBNSPP ---------------" 
+	$checkout libnspp.a lib$
+	$update   libnspp.a
+	$checkin  libnspp.a lib$
+	;
+gkt:
+	$echo "-------------- LIBGKT ----------------" 
+	$checkout libgkt.a  lib$
+	$update   libgkt.a
+	$checkin  libgkt.a  lib$
+	;
+ccp:
+	$echo "-------------- LIBCCP ----------------" 
+	$checkout libccp.a  lib$
+	$update   libccp.a
+	$checkin  libccp.a  lib$
+	;
+ds:
+	$echo "-------------- LIBDS  ----------------" 
+	$checkout libds.a  lib$
+	$update   libds.a
+	$checkin  libds.a  lib$
+	;
+memdbg:
+	$echo "-------------- LIBMEMDBG  ------------" 
+	$checkout libmemdbg.a  lib$
+	$update   libmemdbg.a
+	$checkin  libmemdbg.a  lib$
+	;
+
+libsys.a:				# Core system
+	@fio	
+	@fmio
+	@fmtio
+	@clio
+	@etc
+	@gty
+	#@memio
+	@nmemio
+	@mtio
+	@symtab
+	@tty
+	@ki
+	@psio
+
+	@host$gdev/			# HSI graphics device drivers
+	;
+
+libex.a:				# High level system stuff
+	@gio
+	@imio
+	@plio
+	@pmio
+	@qpoe
+	@mwcs
+	;
+
+libvops.a:
+	@vops				# Vector operators
+	@osb				# Bit and byte primitives
+	;
+
+libcur.a:
+	@gio				# Cursor mode
+	;
+
+libmain.o:				# The root object module
+	$set XFLAGS = "-c $(HSI_XF)"
+	$checkout zmain.c host$os/
+	$omake	  zmain.c
+	$iffile (bin$libsys.a)		# store all binaries in BIN?
+	    $move zmain.o bin$libmain.o
+	$else
+	    $move zmain.o lib$libmain.o
+	$endif
+	$delete	  zmain.c
+	;
+
+libc.a:
+	@libc
+	;
+
+libimfort.a:
+	@imfort
+	;
+
+libgks.a:				# GKS emulator
+	@gio
+	;
+
+libncar.a:				# NCAR graphics utilities
+	@gio
+	;
+
+libnspp.a:				# Old NCAR System Plot Package (NSPP)
+	@gio
+	;
+
+libstg.a:				# The STDGRAPH graphics kernel
+	@gio
+	;
+
+libsgi.a:				# The SGI (simple graphics) kernel
+	@gio
+	;
+
+libimd.a:				# The IMD (image device) kernel
+	@gio
+	;
+
+libgkt.a:				# The NSPP graphics kernel
+	@gio
+	;
+
+libccp.a:				# The CALCOMP graphics kernel
+	@gio
+	;
+
+libds.a:				# The DS display interface library
+	@pkg$images/tv/display/mkpkg
+	;
+
+libmemdbg.a:				# The MEMIO debug library
+	@memdbg
+	;

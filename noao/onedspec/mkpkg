@@ -1,0 +1,72 @@
+# ONEDSPEC package.
+
+$call	relink
+$exit
+
+update:
+	$call	update@scombine
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$omake	x_onedspec.x
+	$link	x_onedspec.o libpkg.a -lsmw\
+		-lxtools -lcurfit -lgsurfit -liminterp -lllsq -o xx_onedspec.e
+	;
+
+install:
+	$move	xx_onedspec.e noaobin$x_onedspec.e
+	;
+
+smw:
+	$checkout libsmw.a noaolib$
+	$update libsmw.a
+	$checkin libsmw.a noaolib$
+	;
+
+libsmw.a:
+	@smw
+	;
+
+libpkg.a:
+	@dispcor
+	@ecidentify
+	@fortran
+	@identify
+	@irsiids
+	@odcombine
+	@sensfunc
+	@splot
+
+	getairm.x	
+	getcalib.x	<error.h> <ctype.h> <mach.h>
+	getextn.x	<error.h>
+	odropenp.x	<ctype.h>
+	t_calibrate.x	<error.h> <imhdr.h> <imset.h> <math/iminterp.h> <smw.h>
+	t_deredden.x	<error.h> <imhdr.h> <smw.h>
+	t_dopcor.x	<error.h> <imhdr.h> <smw.h>
+	t_fitprofs.x	<ctotok.h> <error.h> <gset.h> <imhdr.h> <smw.h> <time.h>
+	t_lcalib.x	<ctype.h>
+	t_mkspec.x	<imhdr.h>
+	t_names.x	
+	t_rstext.x	
+	t_sapertures.x	<error.h> <imhdr.h> <smw.h>
+	t_sarith.x	<error.h> <imhdr.h> <mach.h> <smw.h>
+	t_sbands.x	<error.h> <smw.h>
+	t_scoords.x	<error.h> <imhdr.h>
+	t_sfit.x	<error.h> <imhdr.h> <smw.h> <math/curfit.h>\
+			<pkg/gtools.h> <pkg/rg.h>
+	t_sflip.x	<error.h> <imhdr.h> <smw.h>
+	t_sinterp.x	<imhdr.h> <math/curfit.h>
+	t_slist.x	<error.h> <fset.h> <imhdr.h> <smw.h>
+	t_specplot.x	specplot.h <ctype.h> <error.h> <gset.h> <imhdr.h>\
+			<mach.h> <pkg/gtools.h> <smw.h> <units.h>
+	t_specshift.x	<error.h> <smw.h>
+	t_standard.x	<error.h> <gset.h> <imhdr.h> <imset.h> <mach.h>\
+			<pkg/gtools.h> <smw.h>
+	t_tweak.x	<error.h> <gset.h> <imhdr.h> <imset.h> <math.h>\
+			<math/iminterp.h> <pkg/gtools.h> <pkg/xtanswer.h>\
+			<smw.h> <units.h>
+	;

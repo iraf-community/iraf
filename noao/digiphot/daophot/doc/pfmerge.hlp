@@ -1,0 +1,65 @@
+.help pfmerge May00 noao.digiphot.daophot
+.ih
+NAME
+pfmerge -- merge a list of photometry files
+.ih
+USAGE
+pfmerge inphotfiles outphotfile
+.ih
+PARAMETERS
+.ls inphotfiles
+The list of photometry files to be merged. Inphotfiles may be the output of the
+DAOPHOT tasks PHOT, PSTSELECT, PSF, PEAK, GROUP, GRPSELECT, NSTAR, or ALLSTAR.
+Inphotfiles may be either a list of APPHOT/DAOPHOT text databases or a list of
+STSDAS binary tables.
+.le
+.ls outphotfile
+The output photometry file. Outphotfile consists of the header of the first
+input photometry file, followed by a list of records, one per input file
+record, each consisting of five fields: ID, XCENTER, YCENTER, MAG, and MSKY.
+Outphotfile is a an APPHOT/DAOPHOT text database if the first photometry file
+is a text database, an STSDAS binary table if the first photometry file is an
+ST table.
+.le
+.ls verbose
+Print messages about the progress of the task ?
+.le
+.ih
+DESCRIPTION
+PFMERGE creates a new photometry file suitable for input to PSF, PEAK, GROUP,
+or ALLSTAR by extracting the header of the first input photometry file and the
+values of the five fields: ID, XCENTER, YCENTER, MAG, and MSKY from each
+photometry record in each input file, and writing them to \fIoutphotfile\fR.
+\fIInphotfiles\fR may be either APPHOT/DAOPHOT text databases or STSDAS binary
+tables, but \fIoutphotfile\fR inherits the type of the first input photometry
+file.
+
+The principal application of PFMERGE is to combine the results of one of the
+DAOPHOT fitting tasks, e.g. ALLSTAR, with the results of the aperture photometry
+task PHOT, to create a new photometry file suitable for input to the fitting
+task. e.g. ALLSTAR, since it if often the case that the user wishes to combine
+preliminary results for a few additional stars with the best fit results to
+date on the original star list. 
+
+PFMERGE is intended to combine photometry files from different DAOPHOT tasks.
+The task PCONCAT can be used to combine photometry files produced by the same
+task.
+
+.ih
+EXAMPLES
+
+1. Combine the results of the first allstar run with phot task results
+on a small list of stars detected after the first list of stars was
+subtracted from the original image.
+
+.nf
+	cl> pfmerge m92.als.1,m92.mag.5 m92.als.2
+.fi
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+pconcat
+.endhelp

@@ -1,0 +1,116 @@
+.help gtedit Aug93 tables
+.ih
+NAME
+gtedit -- Graphically edit an STSDAS table.
+.ih
+USAGE
+gtedit input xcolumn ycolumn
+.ih
+DESCRIPTION
+The 'gtedit' task lets you graphically edit 
+an STSDAS table.
+You can use the editor to delete rows. You can
+also choose whether to overwrite the existing
+file (by setting 'inplace=yes') or you
+can create a new output table. You can also
+save deleted points in a separate file by
+setting the 'reject' parameter to an output
+file name.
+
+The rows that are plotted can be selected using the :x and :y
+commands to specify columns for the X and Y axes. Points that
+are to be deleted will be marked with an "x" (this information
+is retained if columns change).
+
+To mark a point for deletion you can:
+.nf
+1) Specify the points individually
+2) Define a box in which all points will be deleted
+3) Delete all points on one side of the cursor or line segment
+.fi
+
+You can also toggle between "delete mode" and "undelete mode". When
+you are in undelete mode, any previously-deleted points that you
+selected will be unmarked.
+
+If you don't like using 'gtedit', you can switch to the 'tedit'
+task and edit the table in the usual manner.
+.ih
+CURSOR COMMANDS
+
+.nf
+	GTEDIT Interactive Cursor Commands
+
+?	Print options
+:	Colon commands
+a	print out the complete row for the data point nearest the cursor
+b	delete all points with Y values less than the cursor Y position
+c	mark the corner of a box
+d	delete the point nearest the cursor
+e	exit and save changes in the output table
+f	make all the marked deletions and replot remaining data
+h	print out the column names of the input table
+l	delete all points with X values less than the cursor X position
+p	replot the graph possibly using new data columns
+q	quit and do not save changes made since the last 'f'
+r	delete all points with X values greater than the cursor X position
+s	mark one end of a line segment
+t	delete all points with Y values greater than the cursor Y position
+u	toggle between delete and undelete mode
+v	change from gtedit to tedit mode
+z	display current status (delete or undelete)
+
+:x(-) xcolumn	set the table column for the X axis and possibly replot
+:y(-) ycolumn	set the table column for the Y axis and possibly replot
+- do not automatically replot after reading in new column
+
+.fi
+.ih
+PARAMETERS
+.ls input [file name]
+The input table to be edited.
+.le
+.ls xcolumn
+The name of the column in the input table to use for the X-axis of the plot.
+.le
+.ls ycolumn
+The name of the column in the input table to use for the Y-axis of the plot.
+.le
+.ls (device = "stdgraph")
+The standard graphics device.
+.le
+.ls (commands = "")
+The graphics cursor.
+.le
+.ls (inplace = no)
+Edit the table inplace. No new output table is created and the original
+table is overwritten.
+.le
+.ls (output = "")
+The name of the output table if the input table is not edited inplace. If
+inplace = no then output should be a valid filename.
+.le
+.ls (reject = "")
+If this parameter contains a valid filename then this table will contain
+the points which were deleted using this task.
+.le
+.ls (gtpar = "") [pset]
+The name of the pset containing the parameters which describe the plot
+attributes.
+.ih
+EXAMPLES
+1. Edit a table containing the output photometry from DAOPHOT. 
+Initially plot the magnitude (MAG) versus the error in the magnitude (MAGERR)
+to decide which points to delete.
+
+.nf
+     st> gtedit m31.mag MAG MERR
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Dennis Crabtree.
+.ih
+SEE ALSO
+.endhelp

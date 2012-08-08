@@ -1,0 +1,357 @@
+.helpsys dcontrol Feb84 "Image Display Control"
+.ce
+\fBImage Display Control Software\fR
+.ce
+Technical Specifications
+.ce
+February 17, 1984
+
+
+.nh
+Virtual Display Characteristics
+
+    The display device is assumed to have N image memories or frames,
+where N is at least one.  All frames are assumed to be the same size and depth.
+The frame size and depth (number of bits per pixel) are constant for a device.
+There should be at least one graphics frame.  The virtual interface associates
+one graphics frame with each image frame, but at the device level the graphics
+may be or-ed together and displayed on a single plane, if necessary.
+A lookup table is associated with each image frame buffer and with each
+color gun.  The input of a color gun is the sum of the outputs of zero
+or more frame buffers.  There must be at least one cursor.
+
+.nh 2
+Basic Functions
+
+    The virtual display device is assumed to provide the following
+minimal set of basic functions.
+.ls 4
+.ls [1]
+Read or write an image frame buffer.  Random addressability of pixels
+is not assumed; writes may be aligned on image lines if necessary.
+The ability to write more than one image line in a single transfer is assumed.
+.le
+.ls [2]
+Erase an entire image frame buffer.
+.le
+.ls [3]
+Read or write an image frame lookup table.
+.le
+.ls [4]
+Read or write the pseudocolor lookup table.
+.le
+.ls [5]
+Connect the output of one or more image frame lookup tables to a
+color gun (used to select the frame to be displayed, etc.).
+.le
+.ls [6]
+Read or write the position of a cursor.
+.le
+.ls [7]
+Read, write, or "or into" a graphics overlay bit plane.  A one bit
+graphics plane is associated with each image frame.  Graphics planes
+may be erased and turned on and off independently of each other and
+the image planes.  A read or write operation may reference any combination
+of graphics planes simultaneously, permitting multicolor vector graphics.
+A single lookup table is used to assign a color to each graphics plane.
+.le
+.le
+
+
+The following functions are supported but are not required.
+.ls
+.ls [8]
+Zoom and pan.
+.le
+.ls [9]
+Split screen: simultaneous display of any two frames, horizontal or vertical
+split through the center of the display.
+.le
+.le
+
+
+Blinking of two or more image frames is provided in software.  Character and
+vector generation in the graphics overlays is only provided in software in the
+current interface.
+
+.nh 2
+Lookup Tables
+
+    A monochrome lookup table is associated with each image frame and with
+each of the three color guns (red, green, and blue).  A lookup table may be
+read and written independently of any other lookup table or image frame.
+The image frame lookup tables are used principally for window stretch
+enhancement (contrast and dc offset), and the color lookup tables are used
+for pseudocolor.
+
+Our model assumes that the input of each color gun may be connected to the
+sum of the lookup table outputs of zero or more image frames.  Furthermore,
+each color gun assignment may be specified independently of that for any
+other color gun.  The more common display modes are shown below.  The table
+illustrates the assignment of image frames to color guns.  If only one image
+frame combination appears in the list, that one combination is taken to be
+assigned to each gun.  Thus, "RGB = 123" indicates that the \fIsum\fR of the
+outputs of frames 1, 2, and 3 is assigned to \fIeach\fR of the three color guns.
+
+.nf
+	RGB = 1		single frame monochrome, pseudocolor, etc.
+	RGB = 1,2,3	true color (R=1, G=2, B=3)
+	RGB = 123	multi frame monochrome, pseudocolor, etc.
+.fi
+
+On many displays, there will be restrictions on the ways in which frames
+may be assigned to guns.  For example, many displays will not permit a gun
+to be assigned to more than one frame.
+
+Our model also associates a single monochrome lookup table with each of
+the three color guns.  By feeding the same input into each of the guns,
+but loading a different lookup table into each gun, many types of
+pseudocolor enhancement are possible.  If monochrome enhancement or
+true color is desired, the color lookup tables are normally all set to
+provide a one to one mapping, effectively taking them out of the circuit.
+
+.nh 2
+Cursors
+
+    Each image display device is assumed to have at least one cursor,
+with the following associated control functions:
+.ls 4
+.ls [1]
+Read cursor position.  The one-indexed coordinates of the center of the
+visible cursor are returned.  The origin is assumed to be consistent
+with that used for reading and writing image data, but is otherwise
+undefined.  A read should return immediately (sample mode), rather than
+wait for some external event to occur (event mode).
+.le
+.ls [2]
+Write cursor position.  A read followed by a write does not move the
+cursor.  Cursor motions do not affect image data in any way.
+.le
+.ls [3]
+Disable cursor (invisible cursor).
+.le
+.ls [4]
+Enable cursor.
+.le
+.ls [5]
+Blink cursor.
+.le
+.le
+
+.nh
+Display Control Software
+
+    A single executable process contains all display control functions.
+A separate process (executable image) is provided for each display device.
+All display control processes behave identically at the CL level.  The STDIMAGE
+environment variable is used to select the particular display control process
+to be run.
+
+
+.ks
+.nf
+		user interface
+			display control process
+				virtual device interface
+					physical device
+.fi
+
+.ce
+Structure of the Display Control Software
+.ke
+
+
+The display control process consists of a device independent part and a
+device dependent part.  The device dependent part provides the virtual
+device control and data functions identified in section 1.
+The specifications of the virtual device interface have not yet been written,
+though a prototype interface has been implemented for the IIS model 70.
+In the long run, the virtual device interface may be provided by an
+extension to GKS (the Graphical Kernel System).
+
+.nh 2
+User Interfaces
+
+    At least two user interfaces are planned for display control.  The first,
+and most transportable, interface will be a conventional CL level command
+interface.  Separate commands will be provided for frame selection,
+enhancement selection, frame erase, windowing, blinking, etc.  The second
+interface will be a menu driven interface run on a dedicated terminal
+with touch screen overlay for input.  This latter interface will run
+asynchronously with the user terminal, and will therefore provide access
+to the display at all times, as well as increased functionality and
+interactiveness.  Both user interfaces will use the same virtual device
+interface.
+
+.nh 3
+The Display Control Package
+
+    The command oriented image display control interface will be implemented
+as a set of CL callable tasks in the package \fBimages.dcontrol\fR.
+The new \fBdcontrol\fR package will include the \fBdisplay\fR program,
+used to load images into the image display device, and any other programs
+specifically concerned with the image display device.
+The specifications for the package are given below (excluding the \fBdisplay\fR
+program, which is documented elsewhere).  All control functions operate
+independently of each other, i.e., without side effects, unless otherwise noted.
+
+
+.ks
+.nf
+      blink         dsave         initdisplay   rgb           
+      contour       frame         lumatch       splitscreen   
+      display       grclear       monochrome    window        
+      drestore      imclear       pseudocolor   zoom          
+.fi
+
+.ce
+The \fBDcontrol\fR Package
+.ke
+
+
+The basic \fBdcontrol\fR package is shown above, and further documentation
+is given below.  Additional routines will be added in the future.
+These will include:
+.ls
+.ls [1]
+An display routine wherein the image histogram is computed and plotted,
+then the user interactively marks the intensity region to be mapped into
+the display, using the graphics cursor.
+.le
+.ls [2]
+A routine for reading out a monochrome display into an imagefile,
+which is then plotted on a hardcopy device (i.e., the Dicomed).
+.le
+.ls [3]
+A routine for drawing vectors, marks, and text strings into a graphics
+overlay.
+.le
+.le
+
+The display status should not be modified upon entry to the package, i.e.,
+the display should not change except under control of the user.
+For example, if a new user logs on and a previous user's image is still
+loaded and being displayed in pseudocolor, the control software should not
+suddenly change the display mode to RGB, merely because the new user left
+the display in RGB mode when they last logged off.  The physical display
+device is the important reference frame. 
+[N.B.: See also \fBdsave\fR and \fBdrestore\fR].
+
+.ls
+.ls \fBblink\fR (frame1, frame2 [, ... frameN] [, rate=1])
+The indicated frames are blinked at a rate given by the hidden parameter
+\fIrate\fR.  The positional arguments are the frame numbers;
+a variable number of arguments are permitted.  The order of the arguments
+determines the order in which the frames are displayed.  The same frame
+may appear any number of times in the list, permitting different frames
+to be displayed for various lengths of time.
+.le
+.ls \fBcontour\fR ([frame])
+The operation of this routine is very similar to that of \fBwindow\fR.
+A cursor device is interactively used to control the spacing and width
+of black contour lines, written with equal spacing into the image
+lookup table.  The window transfer function is not changed, other than
+to black out the regions where the contour bands fall.  Since only the
+image frame lookup table is affected, this routine may be used with any
+form of enhancement (i.e., pseudocolor).
+.le
+.ls \fBdsave\fR (save_file [, image=1234, graphics=1234])
+The full control status of the display, and optionally the image and
+graphics memories, are saved in the named savefile for later restoration by
+\fBdrestore\fR.  By default all image and graphics memories are saved;
+the hidden parameters \fBimage\fR and \fBgraphics\fR may be used to
+indicate the specific image frames or graphics planes to be saved,
+if desired.
+.le
+.ls \fBdrestore\fR (savefile)
+The display device is restored to a previously saved state from the named
+savefile.
+.le
+.ls \fBframe\fR (frame_number)
+Select single frame mode and display the indicated frame.  Frame enhancement
+is not affected.  This command will clear any multiple frame modes
+(rgb, blink, split screen, etc.) previously in effect.
+.le
+.ls \fBgrclear\fR (frame)
+The specified graphics frame is cleared.  If the frame number is zero,
+all graphics frames are cleared.
+.le
+.ls \fBimclear\fR (frame)
+The specified image frame is cleared.  If the frame number is zero,
+all image frames are cleared.
+.le
+.ls \fBinitdisplay\fR
+Initializes the image display to a default (device dependent) state.
+All image and graphics memories are cleared, all lookup tables are
+set to a default mapping (usually one-to-one), the cursor is centered
+and enabled, single frame monochrome enhancement is selected, zoom,
+blink, etc. are disabled, and frame one is selected for display.
+.le
+.ls \fBmonochrome\fR
+Select monochrome enhancement (black and white).
+.le
+.ls \fBlumatch\fR (frame, reference_frame)
+The image frame lookup table of the first frame is matched to that of
+the reference frame.
+.le
+.ls \fBpseudocolor\fR (type_of_pseudocolor [, ncolors=64])
+Select one of the many possible pseudocolor enhancement modes.  A single
+string type argument selects the type of enhancement to be displayed.
+The hidden parameter \fBncolors\fR controls the maximum number of
+colors to be displayed; permissible values are limited to powers of
+two.  Pseudocolor is a contrast enhancement technique, and is most useful for
+smooth images.  The types of pseudocolor enhancement currently implemented
+are the following:
+.ls
+.ls linear
+The full range of greylevels are uniformly mapped into a spectrum of colors
+ranging from blue through red.
+.le
+.ls random
+A randomly selected color is assigned to each output greylevel.
+This mode provides maximum discrimination between successive greylevels.
+.le
+.le
+.sp
+Selecting a pseudocolor or monochrome enhancement mode does not change the
+windowing.  After selecting an enhancement mode, \fBwindow\fR may be used
+to control the number and range of color or grey levels in the image.
+The number of greylevels or colors actually displayed will depend on the
+smoothness of the input frames, and on how the input frames are windowed.
+.le
+.ls \fBrgb\fR [red=1, green=2, blue=3]
+True color mode is selected, i.e., the specified red frames are mapped
+to the red gun, the green frames are mapped to the green gun, and so on.
+The hidden parameters \fIred\fR, \fIgreen\fR, and \fIblue\fR define
+the mapping of image frames to guns.  On some displays, it may be possible
+to additively assign more than one frame to a single gun, i.e., "red=123"
+would assign the sum of frames 1 through 3 to the red gun.
+If pseudocolor enhancement was previously in effect it may or may not
+be cleared, depending on the display characteristics.
+.le
+.ls \fBsplitscreen\fR (frame, frame [, vertical=yes])
+Two images are displayed simultaneously, one on either half of the image.
+The two images may be split either horizontally or vertically.
+.le
+.ls \fBwindow\fR [frame] [, ...frame]
+This command causes a linear mapping function to be repetitively loaded
+into the lookup table for one or more image frames.  If no frame
+arguments are given, the frame or frames currently displayed are windowed.
+In RGB mode, for example, all frames are simultaneously windowed by
+default.  The \fBhjklHJKL\fR keys on the terminal, the trackball,
+or some other analog input device associated with the display, may be used
+to interactively adjust the mapping.  As the mapping is changed, the cursor
+will be seen to move on the display.  Vertical motions control the contrast
+and whether or not a positive or negative image is displayed; the highest
+contrast lies furthest from the center.  Horizontal motions adjust the dc
+offset. [N.B.: Initialize the cursor position to reflect the current mapping
+before entering the loop, to avoid any abrupt changes in the windowing.]
+.le
+.ls \fBzoom\fR (scale_factor)
+The current display is magnified by the indicated scale factor, which
+is normally limited to small powers of two (i.e., 1, 2, 4, and 8).
+While in zoom mode, the cursor controls the position of the viewport window 
+on the full image.
+.le
+.le
+.endhelp

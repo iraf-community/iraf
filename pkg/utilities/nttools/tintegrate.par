@@ -1,0 +1,6 @@
+table,f,a,,,,"input table"
+integrand,s,a,"",,,"integrand"
+independent,s,a,"",,,"independent variable - integrate col1 wrt col2"
+integral,r,h,0.0,,,"Result of integration"
+ptsused,i,h,0,,,"Number of data points used"
+mode,s,h,al

@@ -1,0 +1,42 @@
+.help cqgvalc Mar00 "Catquery Package"
+.ih
+NAME
+cqgvalc -- get a catalog results field as a string value
+.ih
+SYNOPSIS
+nchars = cq_gvalc (res, recno, fname, str, maxch)
+
+.nf
+pointer	res		# the results descriptor
+int	recno		# the record number
+char	fname		# the field name
+char	str		# the returned string value
+int	maxch		# the maximum size of the returned string value
+.fi
+.ih
+ARGUMENTS
+.ls res     
+The results descriptor.
+.le
+.ls recno
+The record number.
+.le
+.ls fname
+The field name.
+.le
+.ls str
+Array containing returned string value.
+.le
+.ls maxch
+The maximum size in characters of the returned string value.
+.le
+.ih
+DESCRIPTION
+Cq_gvalc returns the requested field value as a string. Cq_gvalc is an
+integer function which returns the number of decoded characters as its
+function value. Zero is returned if the field could not be decoded.
+
+.ih
+SEE ALSO
+cqgval[silrd]
+.endhelp

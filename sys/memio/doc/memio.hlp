@@ -1,0 +1,308 @@
+.help memio Feb83 "Dynamic Memory Management Routines"
+.sh
+Introduction
+
+    The memory management routines manage both a stack and a heap.
+Storage for the stack may be fragmented, and chunks of stack storage are
+allocated dynamically from the heap as needed.  Programs may allocate
+heap storage directly if desired, for large or semipermanent buffers.
+Stack storage is intended for use with small buffers, where the overhead
+of allocating and deallocating space must be kept to a minimum.
+
+
+.ks
+.nf
+heap routines:
+
+	malloc  (ptr, number_of_elements, data_type)
+	calloc  (ptr, number_of_elements, data_type)
+	realloc (ptr, number_of_elements, data_type)
+	mfree   (ptr, data_type)
+
+
+stack routines:
+
+	salloc  (ptr, number_of_elements, data_type)
+	smark   (ptr)
+	sfree   (ptr)
+.fi
+.ke
+
+
+MALLOC allocates space on the heap.  CALLOC does the same, and fills the buffer
+with zeroes.  REALLOC is used to change the size of a previously allocated
+buffer, copying the contents of the buffer if necessary.  MFREE frees space
+allocated by a prior call to MALLOC, CALLOC, or REALLOC.
+
+Space is allocated on the stack with SALLOC.  SMARK should be called before
+SALLOC, to mark the position of the stack pointer.  SFREE returns all space
+allocated on the stack since the matching call to SMARK.
+
+
+.KS
+Example:
+.nf
+	pointer	buf, sp
+
+	begin
+		call smark (sp)
+		call salloc (buf, SZ_BUF, TY_CHAR)
+		while (getline (fd, Memc[buf]) != EOF) {
+		    (code to use buffer ...)
+		}
+		call sfree (sp)
+.fi
+.KE
+
+
+These routines will generate an error abort if memory cannot be allocated
+for some reason.
+
+.sh
+Heap Management
+
+    Since many operating systems provide heap management facilities,
+MALLOC and MFREE consist of little more than calls to Z routines to
+allocate and free blocks of memory.  The main function of MALLOC is
+to convert the physical buffer address returned by the Z routine into
+a pointer of the requested type.
+
+The pointer returned to the calling routine does not point at the beginning
+of the physical buffer, but at a location a few bytes into the buffer.
+The physical address of the buffer is stored in the buffer, immediately
+before the cell pointed to by the pointer returned by MALLOC.  The
+stored address must be intact when MFREE is later called to deallocate
+the buffer, or a "Memory corrupted" error diagnostic will result.
+
+The Z routines required to manage the heap are the following:
+
+.KS
+.nf
+	 zmget (bufadr, nbytes)
+	zmrget (bufadr, nbytes)
+	zmfree (buf_addr)
+.fi
+.KE
+
+The "get" routines should return NULL as the buffer address if space
+cannot be allocated for some reason.
+
+.sh
+Stack Management
+
+    The heap management routines have quite a bit of overhead associated
+with them, which precludes their use in certain applications.  In addition,
+the heap can be most efficiently managed when it contains few buffers.
+The stack provides an efficient mechanism for parceling out small amounts
+of storage, which can later all be freed with a single call.
+
+The main use of the stack is to provide automatic storage for local 
+arrays in procedures.  The preprocessor compiles code which makes calls
+to the stack management routines whenever an array is declared with the
+storage calls AUTO, or whenever the ALLOC statement is used in a procedure.
+
+
+.KS
+.nf
+	auto	char lbuf[SZ_LINE]
+	real	x[n], y[n]
+	int	n
+
+	begin
+		alloc (x[npix], y[npix])
+
+		while (getline (fd, lbuf) != EOF) {
+		    ...
+.fi
+.KE
+
+
+The AUTO storage class and the ALLOC statement are provided in the full
+preprocessor, but not in the subset preprocessor.  The following subset
+preprocessor code is functionally equivalent to the code show above:
+
+
+.KS
+.nf
+	pointer	lbuf, x, y, sp
+	int	n, getline()
+
+	begin
+		call smark (sp)
+		call salloc (lbuf, SZ_LINE, TY_CHAR)
+		n = npix
+		call salloc (x, n, TY_REAL)
+		call salloc (y, n, TY_REAL)
+
+		while (getline (fd, Memc[lbuf]) != EOF) {
+		    ...
+
+		call sfree (sp)
+.fi
+.KE
+
+.sh
+Semicode for Stack Management
+
+    At any given time, the "stack" is a contiguous buffer of a certain size.
+Stack overflow is handled by calling MALLOC to allocate another stack segment.
+A pointer to the previous stack segment is kept in each new stack segment,
+to permit reclamation of stack space.
+
+
+
+
+.KS
+.nf
+		salloc             smark              sfree
+
+
+
+	    stack_overflow 
+
+
+	
+		malloc            realloc             mfree
+
+
+
+		zmget              zmrget             zmfree
+
+
+
+		Structure of the Memory Management Routines
+.fi
+.KE
+
+
+
+
+.tp 5
+.nf
+procedure salloc (bufptr, nelements, data_type)
+
+bufptr:		upon output, contains pointer to the allocated space
+nelements:	number of elements of space to be allocated
+data_type:	data type of the elements and of the buffer pointer
+
+begin
+	# align stack pointer for the specified data type,
+	# compute amount of storage to be allocated
+
+	if (data_type == TY_CHAR)
+	    nchars = nelements
+	else {
+	    sp = sp + mod (sp-1, sizeof(data_type))
+	    nchars = nelements * sizeof(data_type)
+	}
+
+	if (sp + nchars > stack_top)		# see if room
+	    call stack_overflow (nchars)
+
+	if (data_type == TY_CHAR)		# return pointer
+	    bufptr = sp
+	else
+	    bufptr = (sp-1) / sizeof(data_type) + 1
+
+	sp = sp + nchars			# bump stack ptr
+	return
+end
+
+
+
+
+.tp 5
+procedure sfree (old_sp)			# pop the stack
+
+begin
+	# return entire segments until segment containing the old
+	# stack pointer is reached
+
+	while (old_sp < stack_base || old_sp > stack_top) {
+	    if (this is the first stack segment)
+		fatal error, invalid value for old_sp
+	    stack_base = old_segment.stack_base
+	    stack_top = old_segment.stack_top
+	    mfree (segment_pointer, TY_CHAR)
+	    segment_pointer = old_segment
+	}
+
+	sp = old_sp
+end
+
+
+
+
+.tp 5
+procedure smark (old_sp)			# save stack pointer
+
+begin
+	old_sp = sp
+end
+
+
+
+
+.tp 5
+procedure stack_overflow (nchars_needed)	# increase stk size
+
+begin
+	# allocate storage for new segment
+	segment_size = max (SZ_STACK, nchars_needed + SZ_STKHDR)
+	malloc (new_segment, segment_size, TY_CHAR)
+
+	# initialize header for the new segment
+	new_segment.old_segment = segment_pointer
+	new_segment.stack_base = new_segment + SZ_STKHDR
+	new_segment.stack_top = new_segment + segment_size
+
+	# make new segment the current segment
+	segment_pointer = new_segment
+	stack_base = new_segment.stack_base
+	stack_top = new_segment.stack_top
+	sp = stack_base
+end
+
+
+.fi
+The segment header contains fields describing the location and size of
+the segment, plus a link pointer to the previous segment in the list.
+
+
+.KS
+.nf
+	struct stack_header {
+		char	*stack_base
+		char	*stack_top
+		struct	stack_header *old_segment
+	}
+.fi
+.KE
+
+.sh
+Pointers and Addresses
+
+    Pointers are indices into (one indexed) Fortran arrays.  A pointer to
+an object of one datatype will in general have a different value than a
+pointer to an object of a different datatype, even if the objects are stored
+at the same physical address.  Pointers have strict alignment requirements,
+and it is not always possible to coerce the type of a pointer.  For this
+reason, the pointers returned by MALLOC and SALLOC are always aligned for
+all data types, regardless of the data type requested.
+
+The IRAF system code must occasionally manipulate and store true physical
+addresses, obtained with the function LOC.  The problem with physical
+addresses is that they are unsigned integers, but Fortran does not provide
+any unsigned data types.  Thus, comparisons of addresses are difficult
+in Fortran.
+
+A second LOC primitive is provided for use in routines which must compare
+addresses.  LOCC returns the address of the object passed as argument,
+right shifted to the size of a CHAR.  Thus, the difference between LOCC(a[1])
+and LOCC(a[n]) is the size of the N element array A in chars.
+
+The relationship between chars, bytes, and machine addresses is machine
+dependent.  Bytes seem to be the smallest units.  Some machines are byte
+addressable, others are word addressable.  The size of a CHAR in machine
+bytes is given by the constant SZB_CHAR.  The size of a machine word in
+machine bytes is given by the constant SZB_WORD.

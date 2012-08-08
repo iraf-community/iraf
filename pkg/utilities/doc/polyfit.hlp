@@ -1,0 +1,91 @@
+.help polyfit Nov87 utilities
+.ih
+NAME
+polyfit -- fit a polynomial to sets of data
+.ih
+USAGE
+polyfit filelist order
+.ih
+PARAMETERS
+.ls \fBfilelist\fR
+File containing X,Y, SIGMAY triples to be fit. May be STDIN, or a list
+of file names. Note that the third list quantity is only required if
+\fIweighting\fR = instrumental.
+.le
+.ls \fBorder\fR
+The order of the polynomial fit. (e.g. a parabolic fit has order 2)
+.le
+.ls weighting = uniform
+The type of weighting for the fit. The choices are:
+.ls uniform
+No weighting.
+.le
+.ls instrumental
+The weight of each point is equal to 1. / SIGMAY ** 2.
+.le
+.ls statistical
+The weight of each point is equal to 1. / Y.
+.le
+.le
+.ls \fBverbose\fR = no
+If \fBverbose\fR = yes, additional information about the fit is printed on
+the standard output.
+.le
+.ls \fBlistdata\fR = no
+If \fBlistdata\fR = yes, the only output will be the calculated values for the
+X,Y pairs. This is useful as input to \fIgraph\fR.
+.le
+.ih
+DESCRIPTION
+A polynomial weighted fit of specified order is fit to the X,Y, SIGMAY data
+triples
+read from the input file, files, or STDIN. The resulting coefficients
+of the polynomial are printed on the first line of the standard output.
+The uncertainty in each coefficient is printed on the next line.
+These are listed as:
+
+.br
+a0 a1 a2 a3 ...
+.br
+s0 s1 s2 s3 ...
+
+.br
+where the polynomial has the form:
+
+.br
+y = a0 + a1*x + a2*x**2 + a3*x**3 + ...
+
+.br
+and the coefficients have uncertainties ("sigmas") s0 - sN.
+
+If verbose is set to yes, the following additional information is
+listed: the resulting reduced chi-square, f-test, correlation coefficient,
+standard deviation of residuals, and number of items in the list.
+Also a tabular listing of each data element, X,Y, SIGMAY and the independent
+variable, Yc, as calculated according to the fit, is printed.
+
+If listdata is set to yes, the only output which will appear will
+be the listing of X,Yc,Y, SIGMAY. This provides a list suitable as input to
+GRAPH or any other list oriented utility. Setting listdata to yes
+overrides the verbose option.
+
+The routine REGRES from the library of routines written by Bevington is used 
+for the fit; see \fBData Reduction and Error Analysis\fR, by Bevington.
+.ih
+EXAMPLES
+	cl> polyfit STDIN 2
+.br
+	cl> polyfit datafile 4 verbose+
+.ih
+BUGS
+The maximum number of data elements is currently limited to 1000
+X,Y,SIGMAY triples.  Also the system must be overdetermined.  That is, the
+number of data elements must exceed the order by at least 2.
+
+Beware of data elements having large dynamic range.  The limitation
+of the machine exponent range can produce overflow and underflow
+arithmetic exceptions.
+.ih
+SEE ALSO
+curfit
+.endhelp

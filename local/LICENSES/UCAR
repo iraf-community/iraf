@@ -1,0 +1,94 @@
+
+
+From: "Meg McClellan" <mmcclell@ucar.edu>
+Date: May 23, 2011 09:37:48 AM MST
+To: David Silva <dsilva@noao.edu>
+Cc: "Roger M. Wakimoto" <wakimoto@ucar.edu>, Betty Stobie <bstobie@noao.edu>,
+Verne Smith <vsmith@email.noao.edu>, Mary Haley <haley@ucar.edu>
+Subject: Re: UCAR/NCAR copyright notice
+
+David:
+
+I am responding to the letter that you sent Roger Wakimoto with regard to
+NOAO's continued use of NCAR Graphics, V.1.   You can continue your use of
+version 1 under the terms set forth at the following link.  This allows for
+your use of source code, and is not under the GPL.  Let me know if you have
+any further questions.
+
+http://www.ncl.ucar.edu/Download/NCL_source_license.shtml
+
+Regards,
+Meg McClellan
+
+
+
+
+-----------------------------------------------------------------------------
+http://www.ncl.ucar.edu/Download/NCL_source_license.shtml
+
+
+NCL Source Code License
+
+PLEASE READ THIS SOFTWARE LICENSE ("LICENSE") CAREFULLY. INDICATE YOUR
+ACCEPTANCE OF THESE TERMS BY CHECKING THE "I have read and hereby accept the
+NCL Source Code License Agreement" ON THE REGISTRATION PAGE. IF YOU DO NOT
+AGREE TO ALL OF THE TERMS OF THIS LICENSE AND YOU DO NOT CHECK THE "I ACCEPT"
+BOX, THE INSTALLATION PROCESS WILL NOT CONTINUE.
+Copyright © 2007-2011 University Corporation for Atmospheric Research (UCAR).
+All rights reserved. Developed by NCAR's Computational and Information
+Systems Laboratory, UCAR, www.cisl.ucar.edu, with the following
+contributions:
+
+
+Contribution	Copyright		  Source Link for Additional Terms
+
+dcdflib		The Univ. of Texas, 	  http://www.netlib.org/random/
+		M.D. Anderson Cancer 
+		Center
+FFTPACK5	Copyright © 1995-2011     http://www2.cisl.ucar.edu/resources/legacy/fftpack5
+		UCAR	
+GRIBEX		Copyright © 1981-2007 	  http://www.ecmwf.int/products/data/software/grib.html
+		European Centre for 
+		Medium-Range Weather 
+		Forecast
+LAPACK		Copyright © 1999 	  http://www.netlib.org/lapack/lug/lapack_lug.html
+	 	Society for Industrial 
+		and Applied Mathematics
+random		The Univ. of Texas, 	  http://www.netlib.org/random/
+		M.D. Anderson Cancer 
+		Center
+RANGS / GSHHS	Dr. Rainer Feistel 	  http://www.io-warnemuende.de/homepages/rfeistel/
+		Baltic Sea Research 
+		Institute Warnemunde
+Spherepack	Copyright © 2004-2011 	  http://www2.cisl.ucar.edu/resources/legacy/spherepack/
+		UCAR	
+UDUNITS-2	Copyright © 2008, 2009 	  http://www.unidata.ucar.edu/software/udunits/udunits-2/udunits2.html
+		Univ, Corporation for 
+		Atmospheric Research
+		UCAR/Unidata
+Udunits 	David Pierce, UCSD 	  http://meteora.ucsd.edu/~pierce/ncview_home_page.html
+extensions 
+from ncview	
+
+
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+Neither the names of NCAR's Computational and Information Systems Laboratory,
+the University Corporation for Atmospheric Research, nor the names of its
+contributors may be used to endorse or promote products derived from this
+Software without specific prior written permission.
+Redistributions of source code must retain the above copyright notices, this
+list of conditions, and the disclaimer below.
+Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions, and the disclaimer below in the documentation and/or
+other materials provided with the distribution.
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING, BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
+SOFTWARE.

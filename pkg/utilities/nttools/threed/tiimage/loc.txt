@@ -1,0 +1,12 @@
+Filename               Total   Blanks   Comments   Help    Execute   Nonexec
+============================================================================
+  tiimage.h                9        1          0       0          0        8
+  tiimage.x              141       36         31       0         53       21
+  tmloop.x                96       23         15       0         40       18
+  tmmode.x               108       24         24       0         30       30
+  tmscan.x                92       21         15       0         38       18
+  tmheader.x              59       19          8       0         19       13
+  tmhc.x                  54       16          9       0         15       14
+  tmcopy.x                63       18          9       0         23       13
+  tmcp1.gx                53       17         11       0         10       15
+TOTAL                    834      226        155       0        258      195

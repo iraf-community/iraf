@@ -1,0 +1,103 @@
+.help mkskycor Feb88 noao.imred.ccdred
+.ih
+NAME
+mkskycor -- Make sky iillumination correction images
+.ih
+USAGE
+mkskycor input output
+.ih
+PARAMETERS
+.ls input
+List of input images for making sky iillumination correction images.
+.le
+.ls output
+List of output flat field iillumination correction images.  If none is
+specified or if the name is the same as the input image then the output
+image replaces the input image.
+.le
+.ls ccdtype = ""
+CCD image type to select from the input images.  If none is specified
+then all types are used.
+.le
+.ls xboxmin = 5, xboxmax = 0.25, yboxmin = 5, yboxmax = 0.25
+Minimum and maximum smoothing box size along the x and y axes.  The
+minimum box size is used at the edges and grows to the maximum size in
+the middle of the image.  This allows the smoothed image to better
+represent gradients at the edge of the image.  If a size is less then 1
+then it is interpreted as a fraction of the image size.  If a size is
+greater than or equal to 1 then it is the box size in pixels.  A size
+greater than the size of image selects a box equal to the size of the
+image.
+.le
+.ls clip = yes
+Clean the input images of objects?  If yes then a clipping algorithm is
+used to detect and exclude objects from the smoothing.
+.le
+.ls lowsigma = 2.5, highsigma = 2.5
+Sigma clipping thresholds above and below the smoothed iillumination.
+.le
+.ls ccdproc (parameter set)
+CCD processing parameters.
+.le
+.ih
+DESCRIPTION
+The large scale iillumination pattern of the input images, generally
+blank sky calibration images, is determined by heavily smoothing
+the image using a moving "boxcar" average.  The effects of objects in
+the image may be minimized by using a sigma clipping algorithm to
+detect and exclude the objects from the average.  This
+iillumination image is applied by \fBccdproc\fR to CCD images to remove
+the iillumination pattern.
+
+The input images are automatically processed up through flat field
+calibration before computing the iillumination.  The iillumination
+correction is that needed to make the processed images flat
+over large scales.  The input images are generally blank sky calibration
+images which have the same iillumination and instrumental effects
+as the object observations.  Object images may be used but removal
+of the objects may not be very good; particularly large, bright objects.
+For further discussion of flat fields and iillumination corrections
+see \fBflatfields\fR.
+
+You will notice that when you process images with an iillumination
+correction you are dividing each image by a flat field calibration and
+an iillumination correction.  If the iillumination corrections are not
+done as a later step but at the same time as the rest of the processing
+one will get the same calibration by multiplying the flat field by the
+iillumination correction and using this product alone as the flat
+field.  This approach has the advantage of one less calibration image
+and two less computations (scaling and dividing the iillumination
+correction).  Such an image, called a \fIsky flat\fR, may be created by
+\fBmkskyflat\fR as an alternative to this task.
+
+The smoothing algorithm is a moving average over a two dimensional
+box.  The algorithm is unconvential in that the box size is not fixed.
+The box size is increased from the specified minimum at the edges to
+the maximum in the middle of the image.  This permits a better estimate
+of the background at the edges, while retaining the very large scale
+smoothing in the center of the image.  Note that the sophisticated
+tools of the \fBimages\fR package may be used for smoothing but this
+requires more of the user and, for the more sophisticated smoothing
+algorithms such as surface fitting, more processing time.
+
+Blank sky images may not be completely blank so a sigma clipping
+algorithm may be used to detect and exclude objects from the
+iillumination pattern.  This is done by computing the rms of the image
+lines relative to the smoothed background and excluding points
+exceeding the specified threshold factors times the rms.  This is done
+before each image line is added to the moving average, except for the
+first few lines where an iterative process is used.
+.ih
+EXAMPLES
+1. The two examples below make an iillumination image from a blank sky image,
+"sky017".  In the first example a separate iillumination image is created
+and in the second the iillumination image replaces the sky image.
+
+.nf
+    cl> mkskycor sky017 Illum
+    cl> mkskycor sky017 sky017
+.fi
+.ih
+SEE ALSO
+ccdproc, flatfields, mkillumcor, mkillumflat, mkskyflat
+.endhelp

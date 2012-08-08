@@ -1,0 +1,15 @@
+# These routines are part of the FITSIO library and are designed to run in
+# the IRAF/SPP environment.
+#------------------------------------------------------------------------------
+#   This software was prepared by High Energy Astrophysics Science Archive
+#   Research Center (HEASARC) at the NASA Goddard Space Flight Center. Users
+#   shall not, without prior written permission of the U.S. Government,
+#   establish a claim to statutory copyright.  The Government and others acting
+#   on its behalf shall have a royalty-free, non-exclusive, irrevocable,
+#   worldwide license for Government purposes to publish, distribute,
+#   translate, copy, exhibit, and perform such material.
+#------------------------------------------------------------------------------
+#
+# The two files ftgcbf.x and ftpcbf.x were extracted from [-]fitsspp.x
+# into this directory because they are system dependent.  There is
+# another version in the [-.unix] directory.

@@ -1,0 +1,71 @@
+.help binfil Jul86 proto
+.ih
+NAME
+binfil -- create a 16 bit binary raster file from an IRAF image 
+.ih
+USAGE
+binfil input
+.ih
+PARAMETERS
+.ls input
+The list of input images to be converted.
+.le
+.ls scale_fact = 1.0
+A multiplicative scale factor to be applied to each pixel during the
+conversion process.  This parameter provides the means to minimize loss
+of precision when converting from the dynamic range of the IRAF image
+pixels to the dynamic range of the output 16-bit signed integer,
+-32768 to 32767.
+.le
+.ls header = no
+Prepend a short descriptive header to the output binary raster file?
+.le
+.ih
+DESCRIPTION
+BINFIL generates a simple signed 16-bit binary raster file
+from IRAF images. BINFIL can be useful when programs other than IRAF
+applications are to be used to examine the data. The format of the resulting
+file is a simple string of pixels, with the exception that the first
+90 bytes or 45 words may optionally form a minimal header. 
+
+The header elements are stored as follows:
+
+.nj
+.nf
+	word 1    : nrows
+	word 2    : ncols
+	word 3    : IRAF pixel type flag 
+	word 4-13 : reserved space
+	word 14-45: image title (ASCII 64 bytes)
+.fi
+.ju
+
+Pixels from the input images are converted to short integers after scaling
+by the scale_fact parameter. The resultant pixel values are limited to the
+maximum range of a short integer and then written to the binary file.
+
+The output binary file assumes the name of the input image with an appended
+".b" to indicate binary.
+.ih
+EXAMPLES
+
+Convert the IRAF image irafimage to the binary file irafimage.b.
+
+.nj
+.nf
+cl> binfil irafimage scale=0.01
+.fi
+.ju
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+Only the first 64 characters of the image title are placed in the binary file
+header.
+
+There is no way to specify the output binary file names.
+.ih
+SEE ALSO
+irafil
+.endhelp

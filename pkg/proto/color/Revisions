@@ -1,0 +1,81 @@
+.help revisions Aug92 color
+.nf
+
+src/rgb8bit.par		-
+    Delete unused file.  (10/24/11)
+
+=================================
+Archive 3/14/96:  Fourth release
+=================================
+
+src/t_rgbto8.x
+    Removed an extra argument in a call to xv_getline.  (10/30/94, Valdes)
+
+src/t_rgbto8.x
+src/rgbto8.par
+doc/rgbto8.hlp
+doc/color.hlp
+    A new color map output type was added for XIMTOOL and the documentation
+    was updated.  (5/23/94, Valdes)
+
+=================================
+Archive 3/8/93:  Third release
+=================================
+
+src/t_rgbto8.x
+    The converting the colormap to SAO output format failed on VMS.  A
+    type coercion from short to int was added in the parg statements.
+    (10/29/92, Valdes)
+
+================================
+Archive 10/12/92: Second release
+================================
+src/t_rgbto8.x	+
+src/rgbto8.par	+
+src/mkpkg
+src/rgb8bit.par
+src/rgbdisplay.cl
+src/rgbdisplay.par
+src/rgbdither.par
+src/rgbsun.par
+src/t_rgbdither.x
+src/t_rgbsun.x
+src/x_color.x
+src/mkpkg
+color.cl
+color.hd
+color.men
+color.par
+doc/color.hlp
+doc/rgbdisplay.hlp
+doc/rgbdither.hlp
+doc/rgbsun.hlp
+doc/rgbto8.hlp	+
+    1.  Added new task, RGBTO8, which implements a 24bit to 8bit algorithm
+     	and Floyd-Steinberg dithering to produce an 8bit IRAF image and
+	a color map for use with SAOimage and IMTOOL.
+    2.	The names of the various tasks were changed.
+
+t_rgb8bit.x
+t_sunrgb.x
+    Changed the way the log scaling is done to shift the user specified
+    range to the range 1 to 10 before taking the log and then shifting the
+    resultant range to required display range.  This allows ranges that
+    include negative values.  (8/28/92, Valdes)
+
+t_rgb8bit.x
+mkrgb8bit.par
+rgb8bit.par
+mkrgb8bit.hlp
+rgb8bit.hlp
+    Made the dither pattern be user defineable.  (8/28/92, Valdes)
+    
+    
+===============================
+Archive 8/26/92:  First release
+===============================
+
+color$* +
+    Created first version of the color package with a Sun 24-bit RGB
+    rasterfile task and 8-bit pixel dithering tasks.  (8/25/92, Valdes)
+.endhelp

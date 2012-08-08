@@ -1,0 +1,4 @@
+input,s,a,,,,"Input images or @file"
+output,s,a,,,,"Output joined image"
+joindim,i,h,1,1,7,"Splice dimension (1=x, 2=y, 3=z, ...)"
+outtype,s,h,"",,,"Output datatype (defaults to highest intype)"

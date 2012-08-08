@@ -1,0 +1,45 @@
+.help pm Jun99 "Slalib Package"
+.nf
+
+      SUBROUTINE slPM (R0, D0, PR, PD, PX, RV, EP0, EP1, R1, D1)
+
+     - - -
+      P M
+     - - -
+
+  Apply corrections for proper motion to a star RA,Dec
+  (double precision)
+
+  References:
+     1984 Astronomical Almanac, pp B39-B41.
+     (also Lederle & Schwan, Astron. Astrophys. 134,
+      1-6, 1984)
+
+  Given:
+     R0,D0    dp     RA,Dec at epoch EP0 (rad)
+     PR,PD    dp     proper motions:  RA,Dec changes per year of epoch
+     PX       dp     parallax (arcsec)
+     RV       dp     radial velocity (km/sec, +ve if receding)
+     EP0      dp     start epoch in years (e.g. Julian epoch)
+     EP1      dp     end epoch in years (same system as EP0)
+
+  Returned:
+     R1,D1    dp     RA,Dec at epoch EP1 (rad)
+
+  Called:
+     slDS2C       spherical to Cartesian
+     slDC2S       Cartesian to spherical
+     slDA2P      normalize angle 0-2Pi
+
+  Note:
+     The proper motions in RA are dRA/dt rather than
+     cos(Dec)*dRA/dt, and are in the same coordinate
+     system as R0,D0.
+
+  P.T.Wallace   Starlink   23 August 1996
+
+  Copyright (C) 1996 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

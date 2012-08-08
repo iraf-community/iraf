@@ -1,0 +1,512 @@
+.help onedspec Sep84 "Spectral Reductions"
+.ce
+\fBOne Dimensional Spectral Reductions\fR
+.ce
+Analysis and Discussion
+.ce
+September 4, 1984
+.sp 3
+.nh
+Introduction
+
+    The \fBonedspec\fR package is a collection of programs for the reduction
+and analysis of one dimensional spectral data.  The more general problem of
+operations upon one dimensional images or vectors shall be dealt with elsewhere,
+primarily in the \fBimages\fR and \fBplot\fR packages.  The problems of getting
+data in and out of the system are handled by the \fBdataio\fR package, at least
+for the standard data formats such as FITS.
+
+The operators provided in \fBonedspec\fR shall be general purpose and, as far
+as possible, independent of the instrument which produced the data.  Instrument
+dependent reductions tailored for specific instruments will be implemented as
+subpackages of the \fBimred\fR (image reductions) package.  For example,
+the subpackages \fBiids\fR and \fBirs\fR will be provided in \fBimred\fR for
+reducing data from the KPNO instruments of the same name.  The \fBimred\fR
+packages shall call upon the basic operators in \fBonedspec\fR, \fBimages\fR,
+and other packages to reduce the data for a specific instrument.
+
+
+.ks
+.nf
+	iids(etc)
+		imred
+		imredtools
+		onedspec
+			plot
+			tv
+				dataio
+				images
+					dbms
+					lists
+					system
+					language
+
+.fi
+.ce
+Relationship of \fBOnedspec\fR to other IRAF Packages
+.ke
+
+
+The relationship of the \fBonedspec\fR packages to other related packages in
+the IRAF system is shown above.  A program (CL script) in a package at one
+level in the hierarchy may only call programs in packages at lower levels.
+The system will load packages as necessary if not already loaded by the
+user.  The user is expected to be familiar with the standard system packages.
+
+.nh
+Basic Functions Required for One-Dimensional Spectral Reductions
+
+    The following classes of functions have been identified (in the preliminary
+specifications document for \fBonedspec\fR) as necessary to perform basic one
+dimensional spectral reductions.  Only a fraction of the functionality
+required is specific to the reduction of spectral data and is therefore
+provided by the \fBonedspec\fR package itself.
+
+.ls Transport
+Provided by the \fBdataio\fR package, although we do not currently have a
+reader for REDUCER format data tapes.  Readers for all standard format
+tapes are either available or planned.
+.le
+.ls Mathematical
+Standard system functions provided by \fBimages\fR (arithmetic, forward and
+inverse FFT, filtering, etc.).
+.le
+.ls Reduction Operators
+The heart of \fBonedspec\fR.  Operators are required (at a minimum) for
+coincidence correction, dispersion determination and correction, flat
+fielding, sky subtraction, extinction correction, and flux calibration.
+Operators for flat fielding and sky subtraction are already available elsewhere
+in IRAF.  Basic continuum fitting and subtraction is possible with existing
+software but additional algorithms designed for spectral data are desirable.
+.le
+.ls Plotting
+Standard system functions provided by the \fBplot\fR package.
+.le
+.ls Utilities
+Standard system functions provided by the \fBdbms\fR package.
+.le
+.ls Artificial Spectra
+These functions belong in the \fBartdata\fR package, but it is expected that
+prototype operators will be built as part of the initial \fBonedspec\fR
+development.
+.le
+
+.nh
+Data Structures
+
+    Spectra will be stored as one or two dimensional IRAF images embedded in
+database format files.  A free format header is associated with each image.
+Spectra may be grouped together as lines of a two dimensional image provided
+all can share the same header, but more commonly each image will contain a
+single spectrum.  The second image dimension, if used, will contain vectors
+directly associated with the images, such as a signal to noise vector.
+If the image is two dimensional the spectrum must be the first image line.
+The database facilities will allow images to be grouped together in a single
+file if desired.
+
+While most or all \fBonedspec\fR operators will expect a one dimensional
+image as input, image sections may be used to operate on vector subsections
+of higher dimensioned images if desired.  The datatype of an image is
+arbitrary, but all pixel data will be single precision real within
+\fBonedspec\fR.  While the IRAF image format does not impose any restrictions on
+the size of an image or image line, not all spectral operators may be usable
+on very large images.  In general, pointwise and local operations may easily
+be performed on images of any size with modest memory requirements, and
+most of the \fBonedspec\fR operations appear to fall into this class.
+
+.nh 2
+The IRAF Database Faciltities
+
+    An understanding of the IRAF database facilities is necessary to visualize
+how data will be treated by operators in \fBonedspec\fR and other packages.
+The database facilities will be used not just for image storage but also for
+program intercommunication, program output, and the storage of large
+astronomical catalogs (e.g. the SAO catalog).  Access to both small and
+large databases will be quite efficient; achieving this requires little
+innovation since database technology is already highly developed.  We begin by
+defining some important terms.
+
+.ls
+.ls DBIO
+The database i/o package, used by compiled programs to access a database.
+.le
+.ls DBMS
+The database management package, a CL level package used by the user to
+inspect, analyze, and manipulate the contents of a database.
+.le
+.ls database
+A set of one or more "relations" or tables (DBIO is a conventional relational
+database).  A convenient way to think of an IRAF database is as a directory.
+The relations appear as distinct files in the directory.
+.le
+.ls relation
+A relation is a set of \fBrecords\fR.  Each record consists of a set of
+\fBfields\fR, each characterized by a name and a datatype.  All the records
+in a relation have the same set of fields.  Perhaps the easiest way to
+visualize a relation is as a \fBtable\fR.  The rows and columns of the table
+correspond to the records and fields of the relation.
+.le
+.ls field
+A field of a record is characterized by an alphanumeric name, datatype, and
+size.  Fields may be one dimensional arrays of variable size.  Fields may be
+added to a relation dynamically at run time.  When a new field is added to
+a relation it is added to all records in the relation, but the value of the
+field in a particular record is undefined (and consumes no storage) until
+explicitly written into.
+.le
+.ls key
+.br
+A function of the values of one or more fields, used to select a subset of
+rows from a table.  Technically, a valid key will permit selection of any
+single row from a table, but we often use the term is a less strict sense.
+.le
+.le
+
+
+An \fBimage\fR appears in the database as a record.  The record is really
+just the image header; the pixels are stored external to the database in a
+separate file, storing only the name of the pixel storage file in the record
+itself (for very small images we are considering storing the pixels directly
+in the database file).  Note that the record is a simple flat structure;
+this simple structure places restrictions on the complexity of objects which
+can be stored in the database.
+
+The records in a relation form a set, not an array.  Records are referred to
+by a user-defined key.  A simple key might be a single field containing a
+unique number (like an array index), or a unique name.  More complex keys
+might involve pattern matching over one or more fields, selection of records
+with fields within a certain range of values, and so on.
+
+From the viewpoint of \fBonedspec\fR, a relation can be considered a
+\fBdata group\fR, consisting of a set of \fBspectra\fR.
+
+.nh 2
+Image Templates
+
+    The user specifies the set of spectra to be operated upon by means of an
+image template.  Image templates are much like the filename templates commonly
+used in operating systems.  The most simple template is the filename of
+a single data group; this template matches all spectra in the group.  If there
+is only one spectrum in a file, then only one spectrum is operated upon.
+A slightly more complex template is a list of filenames of data groups.
+More complex templates will permit use of expressions referencing the values
+of specific fields to select a subset of the spectra in a group.  The syntax
+of such expressions has not yet been defined (examples are given below
+nonetheless), but the function performed by an image template will be the same
+regardless of the syntax.  In all cases the image template will be a single
+string valued parameter at the CL level.
+
+.nh 2
+Standard Calling Sequence
+
+    The standard calling sequence for a unary image operator is shown below
+The calling sequence for a binary operator would be the same with a second input
+parameter added as the second argument.  In general, any data dependent
+control parameters should be implemented as positional arguments following
+the primary operands, and data independent or optional (rarely used) parameters
+should be implemented as hidden parameters.
+
+
+.ks
+.nf
+	imop (input, output, data_dependent_control_params)
+
+	imop	image operator name
+	input	image template specifying set of input images
+	output	filename of output datagroup
+
+	data_dependent_control_parameters
+	(hidden parameters)
+
+for example,
+
+	coincor (spectra, newgroup, dead_time)
+.fi
+.ke
+
+
+If a series of spectra are to be processed it seems reasonable to add the
+processed spectra to a new or existing data group (possibly the same as an
+input datagroup).  If the operation is to be performed in place a special
+notation (e.g. the null string) can be given as the output filename.
+At the \fBonedspec\fR level output filenames will not be defaulted.
+
+.nh 2
+Examples
+
+    Some examples of image templates might be useful to give a more concrete
+idea of the functionality which will be available.  Bear in mind that what we
+are describing here is really the usage of one of the fundamental IRAF system
+interfaces, the DBMS database management subsystem, albeit from the point of
+view of \fBonedspec\fR.  The same facilities will be available in any program
+which operates upon images, and in some non-image applications as well (e.g.
+the new \fBfinder\fR).  Our philosopy, as always, is to make standard usage
+simple, with considerable sophistication available for those with time to
+learn more about the system.
+
+The simplest case occurs when there is one spectrum per data group (file).
+For example, assuming that the file "a" contains a single spectrum, the
+command
+
+	cl> coincor a, b, .2
+
+would perform coincidence correction for spectrum A, placing the result in
+B, using a dead time parameter of .2.  For a more complex example, consider
+the following command:
+
+	cl> coincor "a.type=obj&coincor=no,b", a, .2
+
+This would perform coincidence correction for all spectra in group B plus all
+object spectra in group A which have not already been coincidence corrected,
+adding the corrected spectra to group A (notation approximate only).  If the
+user does not trust the database explicit record numbers may be used and
+referenced via range list expressions, e.g.,
+
+	cl> coincor "a.recnum=(1,5,7:11),b", a, .2
+
+would select records 1, 5, and 7 through 11 from data group A.  Alternatively
+the database utilities could be used to list the spectra matching the selection
+criteria prior to the operation if desired.  For example,
+
+	cl> db.select "a.type=obj"
+
+would write a table on the standard output (the terminal) wherein each spectrum
+in data group A is shown as a row of field values.  If one wanted to generate
+an explicit list of records to be processed with help from the database
+utilities, a set of records could be selected from a data group and selected
+fields from each record written into a text file:
+
+	cl> db.select "a.type=obj", "recnum, history" > reclistfile
+
+The output file "reclistfile" produced by this command would contain the
+fields "recnum" (record number) and "history" (description of processing
+performed to generate the record).  The editor could be used to delete
+unwanted records, producing a list of record numbers suitable for use as
+an image template:
+
+	cl> coincor "a.recnum=@reclistfile", a, .2
+
+.nh
+Reduction Operators
+
+.nh 2
+Line List Preparation
+
+    I suggest maintaining the line lists as text files so that the user can
+edit them with the text editor, or process them with the \fBlists\fR operators.
+A master line list might be maintained in a database and the DBMS \fBselect\fR
+operator used to extract ASCII linelists in the wavelength region of interest,
+but this would only be necessary if the linelist is quite large or if a linelist
+record contains many fields.  I don't think we need the \fBline_list\fR task.
+
+.nh 2
+Dispersion Solution
+
+    The problem with selecting a line list and doing the dispersion solution
+in separate operations is that the dispersion solution is invaluable as an aid
+for identifying lines and for rejecting lines.  Having a routine which merely
+tweaks up the positions of lines in an existing lineset (e.g., \fBalinid\fR)
+is not all that useful.  I would like to suggest the following alternate
+procedure for performing the dispersion solution for a set of calibration
+spectra which have roughly the same dispersion.
+
+.ls
+.ls [1] Generate Lineset [and fit dispersion]
+.sp
+Interactively determine the lineset to be used, i.e., wavelength (or whatever)
+and approximate line position in pixel units for N lines.  Input is one or more
+comparison spectra and optionally a list of candidate lines in the region
+of interest.  Output is the order for the dispersion curve and a linelist of
+the following (basic) form:
+
+	L#  X  Wavelength [Weight]
+
+It would be very useful if the program, given a rough guess at the dispersion,
+could match the standard linelist with the spectra and attempt to automatically
+identify the lines thus detected.  The user would then interactively edit the
+resultant line set using plots of the fitted dispersion curve to reject
+misidentified or blended lines and to adjust weights until a final lineset
+is produced.
+.le
+
+.ls [2] Fit Dispersion
+.sp
+Given the order and functional type of the curve to be fitted and a lineset
+determined in step [1] (or a lineset produced some any other means, e.g. with
+the editor), for each spectrum in the input data group tweak the center of
+each line in the lineset via an automatic centering algorithm, fit the
+dispersion curve, and save the coefficients of the fitted curve in the
+image header.  The approximate line positions would be used to find and measure
+the positions of the actual lines, and the dispersion curve would be fitted and
+saved in the image header of each calibration spectrum.
+
+While this operator would be intended to be used noninteractively, the default
+textual and graphics output devices could be the terminal.  To use the program
+in batch mode the user would redirect both the standard output and the graphics
+output (if any), e.g.,
+
+.nf
+	cl> dispsol "night1.type=comp", linelistfile, order,
+	>>> device=stdplot, > dispsol.spool &
+.fi
+
+Line shifts, correlation functions, statistical errors, the computed residuals
+in the fitted dispersion curves, plots of various terms of the dispersion
+curves, etc. may be generated to provide a means for later checking for
+erroneous solutions to the individual spectra.  There is considerable room for
+innovation in this area.
+.le
+
+.ls [3] Second Order Correction
+.sp
+If it is desired to interpolate the dispersion curve in some additional
+dimension such as time or hour angle, fit the individual dispersion solutions
+produced by [1] or [2] as a group to one or more additional dimensions,
+generating a dispersion solution of one, two or more dimensions as output.
+If the output is another one dimensional dispersion solution, the input
+solutions are simply averaged with optional weights.  This "second order"
+correction to a group of dispersion solutions is probably best performed by
+a separate program, rather than building it into \fBalineid\fR, \fBdispsol\fR,
+etc.  This makes the other programs simpler and makes it possible to exclude
+spectra from the higher dimensional fit without repeating the dispersion
+solutions.
+.le
+.le
+
+If the batch run [2] fails for selected spectra the dispersion solution for
+those spectra can be repeated interactively with operator [1].
+The curve fitting package should be used to fit the dispersion curve (we can
+extend the package to support \fBonedspec\fR if necessary).
+
+.nh 2
+Dispersion Correction
+
+    This function of this procedure is to change the dispersion of a
+spectrum or group of spectra from one functional form to another.
+At a mimimum it must be possible to produce spectra linear in wavelength or
+log wavelength (as specified), but it might also be useful to be able
+to match the dispersion of a spectrum to that of a second spectrum, e.g., to
+minimize the amount of interpolation required to register spectra, or
+to introduce a nonlinear dispersion for testing purposes.  This might be
+implemented at the CL parameter level by having a string parameter which
+takes on the values "linear" (default), "log", or the name of a record
+defining the dispersion solution to be matched.
+
+It should be possible for the output spectrum to be a different size than
+the input spectrum, e.g., since we are already interpolating the data,
+it might be nice to produce an output spectrum of length 2**N if fourier
+analysis is to be performed subsequently.  It should be possible to
+extract only a portion of a spectrum (perform subraster extraction) in the
+process of correcting the dispersion, producing an output spectrum of a
+user-definable size.  It should be possible for an output pixel to lie at
+a point outside the bounds of the input spectrum, setting the value of the
+output pixel to INDEF or to an artificially generated value.  Note that
+this kind of generality can be implemented at the \fBonedspec\fR level
+without compromising the simplicity of dispersion correction for a particular
+instrument at the \fBimred\fR level.
+
+.nh 3
+Line Centering Algorithms
+
+    For most data, the best algorithm in the set described is probably the
+parabola algorithm.  To reject nearby lines and avoid degradation of the
+signal to noise the centering should be performed within a small aperture,
+but the aperture should be allowed to move several pixels in either direction
+to find the peak of the line.
+
+The parabola algorithm described has these features,
+but as described it finds the extrema within a window about the
+initial position.  It might be preferable to simply walk up the peak nearest
+to the initial center.  This has the advantage that it is possible to center
+on a line which has a nearby, stronger neighbor which cannot itself be used
+for some reason, but which might fall within \fBparextent\fR pixels of the
+starting center.  The parabola algorithm as described also finds a local extrema
+rather than a local maximum; probably not what is desired for a dispersion
+solution.  The restriction to 3 pixels in the final center determination is
+bad; the width of the centering function must be a variable to accommodate
+the wide range of samplings expected.
+
+The parabola algorithm described is basically a grid search over
+2*\fIparextent\fR pixels for the local extrema.  What I am suggesting is
+an iterative gradient search for the local maximum.  The properties of the
+two algorithms are probably sufficiently different to warrant implementation
+of both as an option (the running times are comparable).  I suspect that
+everyone else who has done this will have their own favorite algorithm as
+well; probably we should study half a dozen but implement only one or two.
+
+.nh 2
+Field Flattening
+
+    It is not clear that we need special flat fielding operators for
+\fBonedspec\fR.  We have a two-dimensional operator which fits image lines
+independently which might already do the job.  Probably we should experiment
+with both the smoothing spline and possibly fourier filtering for removing
+the difficult medium frequency fluctuations.  The current \fBimred\fR flat field
+operator implements the cubic smoothing spline (along with the Chebyshev and
+Legendre polynomials), and is available for experimentation.
+
+Building interactive graphics into the operator which fits a smooth curve to
+the continuum is probably not necessary.  If a noninteractive \fBimred\fR or
+\fBimages\fR operator is used to fit the continuum the interactive graphics
+can still be available, but might better reside in a higher level CL script.
+The basic operator should behave like a subroutine and not write any output
+to the terminal unless enabled by a hidden parameter (we have been calling
+this parameter \fIverbose\fR in other programs).
+
+.nh 3
+Extinction Correction and Flux Calibration
+
+    I did not have time to review any of this.
+
+.nh
+Standard Library Packages
+
+    The following standard IRAF math library packages should be used in
+\fBonedspec\fR.  The packages are very briefly described here but are
+fully documented under \fBhelp\fR on the online (kpnob:xcl) system.
+
+.nh 2
+Curve Fitting
+
+    The curve fitting package (\fBcurfit\fR) is currently capable of fitting
+the Chebyshev and Legendre polynomials and the cubic smoothing spline.
+Weighting is supported as an option.
+We need to add a piecewise linear function to support the
+dispersion curves for the high resolution FTS spectra.  We may have to add a
+double precision version of the package to provide the 8-10 digits of
+precision needed for typical comparison line wavelength values, but
+normalization of the wavelength values may make this unnecessary for moderate
+resolution spectra.
+
+Ordinary polynomials are not supported because their numerical properties are
+very much inferior to those of orthogonal polynomials (the ls matrix can have
+a disastrously high condition number, and lacking normalization the function
+begin fitted is not invariant with respect to scale changes and translations
+in the input data).  For low order fits the Chebyshev polynomials are
+considered to have the best properties from an approximation theoretic point
+of view, and for high order fits the smoothing spline is probably best because
+it can follow arbitrary trends in the data.
+
+.nh 2
+Interpolation
+
+    The image interpolation package (\fBiminterp\fR) currently supports the
+nearest neighbor, linear, third and fifth order divided differences,
+cubic interpolating spline, and sinc function interpolators.
+We should add the zeroth and first order partial pixel ("flux conserving")
+interpolants because they offer unique properties not provided by any
+of the other interpolants.
+
+.nh 2
+Interactive Graphics
+
+    We will define a standard interactive graphics utility package for
+interactive operations upon data vectors (to be available in a system library
+in object form).  It should be possible to define a general package which
+can be used anywhere a data vector is to be plotted and
+examined interactively (not just in \fBonedspec\fR).  Standard keystrokes
+should be defined for common operations such as expanding a region of
+the plot and restoring the original scale.  This will not be attempted
+until an interactive version of the GIO interface is available later this
+fall.
+.endhelp

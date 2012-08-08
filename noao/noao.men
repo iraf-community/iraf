@@ -1,0 +1,16 @@
+        artdata - Artificial data generation package			[up]
+     astrometry - Astrometry package
+         astcat - Astronomical catalog and surveys access package	[up]
+        astutil - Astronomical utilities package			[up]
+       digiphot - Digital stellar photometry package                    [up]
+          focas - Faint object classification and analysis package
+          imred - Image reductions package				[up]
+        mtlocal - Magtape i/o for special NOAO format tapes		[up]
+      nobsolete - Obsolete tasks to be phased out in a future release	[up]
+	 nproto - Prototype (temporary, contributed) tasks		[up]
+    observatory - Examine and define observatory parameters             [up]
+        obsutil - Observing utilities (planning or evaluation)		[up]
+       onedspec - One dimensional spectral red & analysis package	[up]
+	     rv - Radial velocity analysis package			[up]
+       surfphot - Galaxy isophotal analysis package
+       twodspec - Two dimensional spectral red & analysis package	[up]

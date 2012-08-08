@@ -1,0 +1,246 @@
+.help keyselect Mar92 tables
+.ih
+NAME
+keyselect -- Copy selected image header keywords to an STSDAS table.
+.ih
+USAGE
+keyselect input output cols
+.ih
+DESCRIPTION
+This task copies the specified image header keywords to an STSDAS
+table. The required parameters are the input list of image names, the
+output STSDAS table name, and the list of header keywords. All groups of
+each image will be examined if the list of header keywords contains a
+group parameter. Otherwise only the first group of each image will be
+examined. The task appends rows to the output table if it exists or
+creates a new table if the output table does not exist. If the output
+table exists, column names must match the names in the existing table.
+The column names in the output table are the same as the header keywords
+unless they are explicitly specified, as described below.
+
+If a keyword is missing from an image header a warning message is
+printed and a null value inserted into the table. The default type of
+the table column is determined from the type of the header keyword.
+Text columns have a default length of 19 characters, unless the table
+column is the concatenation of several keywords, in which case the
+default length will be 63 characters. A column description file must
+be used if you want to override the default type or length of a table
+column.
+
+The third parameter ('cols') is a list of items specifying the header keyword
+names and table column names. Items in the list are separated by
+commas or whitespace. Three different kinds of items may appear in the
+list: a keyword name, a table column name followed by a equals sign
+followed by a keyword name, or a table column name followed by an
+equals sign followed by a list of keyword names separated by colons.
+If the item in the list is a keyword name, the table column name is
+the same as the keyword name. To specify a table column name different
+than the keyword name, the item in the list should be the table column
+name followed by an equals sign followed by the keyword name. To
+concatenate several header keywords into a string separated by commas,
+a list of keyword names separated by colons should replace the header
+keyword name in the item. The following list gives examples of the
+three types of items.
+
+.nf
+FGWA_ID
+GRATING=FGWA_ID
+OBS_MODE=DETECTOR:FGWA_ID:APER_ID
+.fi
+
+In the first case, both the header keyword name and table column name
+are 'fgwa_id'. In the second case the table column name is 'grating'.
+In the third case table column name is 'obs_mode' and the values in
+the column are the concatenation of the header keywords 'detector',
+'fgwa_id', and 'aper_id' separated by commas.
+
+Special keywords may also be used in the list wherever a header
+keyword may be used. Special keywords are used to place the image name
+or parts of the image name in the output table. The name of a special
+keyword always starts with a "$". The different special keywords,
+their types, and default table column names are given in the following
+list.
+
+.nf
+$group		int	group
+$dir		text	directory
+$ext		text	extension
+$hdr		text	header_file
+$pix		text	data_file
+$root		text	rootname
+.fi
+
+If an image has the name 'yref$y00vk101a.r1h[1]', the group will be 1,
+the directory 'yref$', the extension 'r1h', the header file
+'y00vk101a.r1h', the data file 'y00vk101a.r1d', and the root name
+'y00vk101a'. 
+
+The hidden task parameter 'expr' is used to select which images are
+examined when writing header keywords to the output table. If this
+task parameter is set to its default value, ' ' (a blank string), all
+images named in the image template will be examined. Otherwise the
+task parameter is interpreted as a boolean (logical) expression. The
+variables in the expression are header keyword names. As each image is
+opened the values of the header keywords are substituted for the
+keyword name. If the expression is true, the header keywords specified
+in the 'cols' parameter are copied into the output table. The special
+keywords mentioned above may also be used in the expression.  If a
+keyword name contains dashes the keyword name should be preceded by a
+'@' and enclosed in quotes. For example, 'date-obs' should be given as
+'@"date-obs"' in the expression.
+
+The following boolean operators may be used in the expression:
+
+.nf
+equal		==		not equal		!=	
+less than	<		less than or equal	<=	
+greater than	>		greater than or equal	>=	
+or		||		and			&&	
+negation	!		
+.fi
+
+The expression may also include the usual arithmetic operators and
+functions. Arguments to the trigonometric functions must be in
+degrees. The available operators are:
+
+.nf
+addition		+	 subtraction		-
+multiplication		*	 division		/
+negation		-	 exponentiation		**
+string concatenation	//
+.fi
+
+The following is a list of the available functions:
+
+.nf
+absolute value	abs(x)	     cosine		cos(x)
+sine		sin(x)	     tangent		tan(x)
+arc cosine	acos(x)	     arc sine		asin(x)
+arc tangent	atan(x)	     arc tangent	atan2(x,y)
+exponential	exp(x)	     square root	sqrt(x)
+natural log	log(x)	     common log		log10(x)
+minimum		min(x,y)     maximum		max(x,y)
+modulo		mod(x,y)     keyword found	find(x,y,z,..)
+.fi
+
+One new function, find, is available in addition to the usual arithmetic
+functions. The argument of this function is a list of header keyword
+names. The function returns true if all the header keywords are found
+in the image and false if one or more header keywords in the list are
+not found. The arguments to this function should be placed in quotes
+as otherwise the value of the header keyword will checked instead of
+the name. That is, if 'find(detector)' is used instead of
+'find("detector")', the task will look for a header keyword whose name
+is the value of the detector keyword.
+
+The 'cols' and 'expr' parameters can also be the name of a file
+preceded by an '@' character. If this is done, the task will read the
+list of keyword names or boolean expression from the specified file.
+Newlines in the file are treated as if they were blanks, so lines may
+be broken wherever a blank would be correct. Comments (lines starting
+with a '#' character) are not permitted in either file.
+
+The hidden parameter 'cdfile' is the name of the column description
+file. The default value for this parameter is ' ' (a blank string). If
+the parameter contains a blank string no column description file is
+used and the column data type is taken from the type of the header
+keyword. A column description file contains one line for each column
+in the table. Each line contains four fields in the following order:
+the column name, the data type, the print format, and the units. Any
+of the fields except the column name may be omitted. If a field is
+omitted the default for that field will be used instead. Fields are
+not case sensitive except for the units field. The column name in the
+column description file must match the column name in the 'cols'
+parameter.  If a column name in the 'cols' parameter is not found in
+the column description file, a warning message is printed and the
+defaults are used for that table column. Column names in the column
+description file that are not in the 'cols' parameter are ignored. For
+further information on the format of a column description file, refer
+to the help file for 'tlcol'.
+
+.ih
+PARAMETERS
+.ls input [file name template]
+List of image names. The usual wild card characters can be used. If
+the list of keyword names or the expression contains a group parameter
+all groups of each image will be examined unless a group is explicitly
+specified as part of the image name.
+.le
+.ls output [file name]
+The name of the output STSDAS table. If the table already exists new
+rows will be added to the existing table. Column names must match
+names in the existing table. If the table does not exist a new table
+will be created and any column names may be used.
+.le
+.ls cols [string]
+The list of header keyword names separated by white space or commas.
+Table column names are the same as the keyword names unless explicitly
+specified in the form <colname>=<keyword>. Several keywords can be
+concatenated by using the form <colname>=<keyword>:<keyword>. If the
+first character in the parameter is an '@', the rest of the parameter
+is interpreted as a file name containing the list of keyword names.
+.le
+.ls (expr = " ") [string]
+A boolean expression used to select which images are examined for
+header keywords. If the string is blank (the default) all images named
+in the input list are examined. Variables in the expression are
+header keyword names.  An image is selected if substituting the value
+of the header keywords for their names makes the expression true. The
+syntax of the expression follows the usual CL and SPP conventions. If
+the first character in the expression is a '@', the rest of the
+expression is interpreted as a filename containing the expression.
+.le
+.ls (cdfile = " ") [file name]
+The name of the column description file. The format of a column
+description file is defined in the help for 'tlcol'. Column names used
+in the column description file must match the names in the 'cols'
+parameter (except for case).
+.le
+.ih
+EXAMPLES
+1. Create an STSDAS table from the headers of the dead diode reference
+images: 
+
+.nf
+tt> keyselect yref$*.r4h ddt.tab detector,headname,dataname
+.fi
+
+2. Create the same table, only name the columns "header_file" and
+"data_file": 
+
+.nf
+tt> keyselect yref$*.r4h ddt.tab \
+>>> detector,header_file=headname,data_file=dataname
+.fi
+
+3. Only select images with the blue detector:
+
+.nf
+tt> keyselect yref$*.r4h ddt.tab detector,headname,dataname \
+>>> expr="detector='blue'"
+.fi
+
+4. Use a column description file when creating the table:
+
+.nf
+tt> keyselect yref$*.r4h ddt.tab \
+>>> detector,header_file=headname,data_file=dataname cdfile="ddt.cd"
+.fi
+
+The contents of the column description file:
+
+.nf
+DETECTOR             CH*5
+HEADER_FILE          CH*18
+DATA_FILE            CH*18
+.fi
+.ih
+BUGS
+.ih
+REFERENCES
+This task was written by Bernie Simon.
+.ih 
+SEE ALSO
+
+Type "help tables opt=sys" for a description of the 'tables' package.
+.endhelp

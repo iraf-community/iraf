@@ -1,0 +1,55 @@
+.help epix Jun84 proto
+.ih
+NAME
+epix -- edit pixels in an image
+.ih
+USAGE
+epix image_name x y new_value
+.ih
+PARAMETERS
+.ls image_name
+Name of image or image section to be edited.
+.le
+.ls xcoord, ycoord
+The coordinates of the pixel to be edited.
+.le
+.ls new_value
+The new value of the pixel.
+.le
+.ls boxsize = 3
+The width of a square subraster surrounding the pixel to be edited over which
+the rejection mean and the median will be computed.
+.le
+.ls ksigma = 0.0
+The pixel rejection threshold for the iterative rejection algorithm used
+to compute the mean.  If zero, a rejection threshold will be computed based
+on the size of the sample using Chauvenet's relation.
+.le
+.ls edit_image = yes
+Set the pixel value to \fInew_value\fR?  If editing is disabled the mean
+and median may still be computed, and the subraster may still be printed.
+.le
+.ls verbose = yes
+Print the values of the pixels in the subraster surrounding the image,
+and compute the rejection mean and the median.
+.le
+.ih
+DESCRIPTION
+A subraster \fIboxsize\fR pixels square is extracted centered on the pixel
+(xcoord,ycoord).  If the \fIverbose\fR flag is enabled the values
+of the pixels in the subraster are printed on the standard output along with
+the rejection mean and median of the subraster.  If \fIedit_image\fR is yes
+the program will ask for the \fInew_value\fR and edit the image.
+.ih
+EXAMPLES
+1. Replace the specified pixels with a value of zero.
+
+.nf
+    cl> epix M92 400 87 0.0
+    cl> epix M92 45 300 0.0
+    cl> epix M92 207 300 0.0
+.fi
+.ih
+SEE ALSO
+imedit
+.endhelp

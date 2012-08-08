@@ -1,0 +1,22 @@
+# The four cyber format readers LDUMPF, RDUMPF, RIDSFILE, RIDSOUT contribute
+# the following sources to the dataio package library:
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	@rrcopy
+
+	cykeywords.x	<mach.h> cyber.h <imhdr.h>
+	cyrbits.x	pow.inc powd.inc <error.h> <imhdr.h> <mach.h> cyber.h
+	cyrheader.x	<error.h> <imhdr.h> <mach.h> cyber.h
+	cyrimage.x	cyber.h <error.h> <imhdr.h> <mach.h>
+	rdumpf.x	cyber.h <mach.h>
+	rpft.x		<mach.h> cyber.h
+	t_ldumpf.x	<mach.h> cyber.h
+	t_rdumpf.x	cyber.h <error.h> <fset.h> <mach.h>
+	t_ridsfile.x	cyber.h <error.h> <fset.h> <mach.h> <imhdr.h>
+	t_ridsout.x	cyber.h <ctype.h> <error.h> <fset.h> <imhdr.h> <mach.h>
+	;

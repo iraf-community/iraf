@@ -1,0 +1,79 @@
+# Make the DISPLAY libraries.
+
+$checkout libds.a lib$
+$update   libds.a
+$checkin  libds.a lib$
+$exit
+
+zzdebug:
+zzdebug.e:
+	$omake  zzdebug.x <imhdr.h>
+	$link   zzdebug.o -lds -lstg -o zzdebug.e
+	;
+
+libds.a:
+	dsmap.x		<fset.h> <imset.h> <mach.h>
+	dspmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h> \
+			<pmset.h>
+	dsulut.x	<ctype.h> display.h <error.h>
+	findz.x		iis.com iis.h <imhdr.h>
+	iisblk.x	iis.h <mach.h> zdisplay.h
+	iiscls.x	iis.com iis.h <knet.h> <mach.h> zdisplay.h
+	iisers.x	iis.com iis.h <mach.h> zdisplay.h
+	iisflu.x	iis.h <mach.h> zdisplay.h
+	iisgop.x	iis.h <mach.h>
+	iishdr.x	iis.com iis.h <mach.h> zdisplay.h
+	iisio.x		iis.com iis.h <knet.h> <mach.h> zdisplay.h
+	iismtc.x	iis.h <mach.h> zdisplay.h
+	iisofm.x	iis.h <mach.h> <math.h> zdisplay.h
+	iisopn.x	iis.com iis.h imd.com <knet.h> <mach.h> zdisplay.h
+	iispio.x	iis.com iis.h <knet.h> <mach.h> zdisplay.h
+	iisrcr.x	iis.com iis.h <mach.h> zdisplay.h
+	iisrd.x		iis.com iis.h <mach.h> zdisplay.h
+	iisrgb.x	iis.h <mach.h> zdisplay.h
+	iissfr.x	iis.com iis.h
+	iisstt.x	<fio.h> iis.h <mach.h> zdisplay.h
+	iiswcr.x	iis.com iis.h <mach.h> zdisplay.h
+	iiswnd.x	iis.h <mach.h> zdisplay.h
+	iiswr.x		iis.com iis.h <mach.h> zdisplay.h
+	iiswt.x		iis.com iis.h <knet.h> <mach.h> zdisplay.h
+	iiszm.x		iis.h <mach.h> zdisplay.h
+	imdgcur.x	iis.com iis.h imd.com <knet.h>
+	imdgetwcs.x	<ctype.h> iis.com iis.h zdisplay.h
+	imdmapfr.x	display.h <fset.h> iis.com iis.h <imhdr.h> <imset.h> \
+			<mach.h>
+	imdmapping.x	<ctype.h> iis.com iis.h zdisplay.h
+	imdopen.x	<knet.h>
+	imdputwcs.x	display.h <error.h> <fset.h> iis.com iis.h <imhdr.h> \
+			<imset.h>
+	imdrcuro.x	<chars.h> <ctype.h> iis.com iis.h <mach.h> zdisplay.h
+	imdrcur.x	<ctype.h>
+	imdsetwcs.x	iis.com iis.h <knet.h> <mach.h>
+	imdwcsver.x	iis.com iis.h zdisplay.h
+	imdwcs.x	<imhdr.h>
+	maskcolor.x	ace.h <ctotok.h> <evvexpr.h>
+	maxmin.x	iis.com iis.h <imhdr.h> <mach.h>
+	sigl2.x		<error.h> <imhdr.h>
+	sigm2.x		<error.h> <imhdr.h>
+	t_dcontrol.x	display.h <fset.h> iis.com iis.h zdisplay.h
+	t_display.x	display.h <error.h> gwindow.h iis.h \
+			<imhdr.h> <imset.h> <mach.h> <pmset.h>
+	zardim.x	zdisplay.h
+	zawrim.x	zdisplay.h
+	zawtim.x	zdisplay.h
+	zblkim.x	zdisplay.h
+	zclrim.x	zdisplay.h
+	zclsim.x	zdisplay.h
+	zersim.x	zdisplay.h
+	zfrmim.x	zdisplay.h
+	zmapim.x	zdisplay.h
+	zmtcim.x	zdisplay.h
+	zopnim.x	zdisplay.h
+	zrcrim.x	zdisplay.h
+	zrgbim.x	zdisplay.h
+	zrmim.x		zdisplay.h
+	zscale.x	<ctype.h> <imhdr.h> <imio.h> <imset.h> <pmset.h>
+	zsttim.x	<fio.h> iis.com iis.h <knet.h>
+	zwndim.x	zdisplay.h
+	zzdebug.x	<imhdr.h>
+	;

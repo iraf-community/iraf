@@ -1,0 +1,83 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# AWVG -- Compute the mean and standard deviation (sigma) of a sample.  Pixels
+# whose value lies outside the specified lower and upper limits are not used.
+# If the upper and lower limits have the same value (e.g., zero), no limit
+# checking is performed.  The number of pixels in the sample is returned as the
+# function value.
+
+int procedure awvg$t (a, npix, mean, sigma, lcut, hcut)
+
+PIXEL	a[ARB]
+$if (datatype == dl)
+double	mean, sigma, lcut, hcut
+$else
+real	mean, sigma, lcut, hcut
+$endif
+double	sum, sumsq, value, temp
+int	npix, i, ngpix
+
+begin
+	sum = 0.0
+	sumsq = 0.0
+	ngpix = 0
+
+	# Accumulate sum, sum of squares.  The test to disable limit checking
+	# requires numerical equality of two floating point numbers; this should
+	# be ok since they are used as flags not as numbers (they are not used
+	# in computations).
+
+	if (hcut == lcut) {
+	    do i = 1, npix {
+		$if (datatype == x)
+		    value = abs (a[i])
+		$else
+		    value = a[i]
+		$endif
+		sum = sum + value
+		sumsq = sumsq + value ** 2
+	    }
+	    ngpix = npix
+
+	} else {
+	    do i = 1, npix {
+		$if (datatype == x)
+		    value = abs (a[i])
+		$else
+		    value = a[i]
+		$endif
+		if (value >= lcut && value <= hcut) {
+		    ngpix = ngpix + 1
+		    sum = sum + value
+		    sumsq = sumsq + value ** 2
+		}
+	    }
+	}
+
+	switch (ngpix) {		# compute mean and sigma
+	case 0:
+$if (datatype == dl)
+	    mean = $INDEFD
+	    sigma = $INDEFD
+$else
+	    mean = $INDEFR
+	    sigma = $INDEFR
+$endif
+	case 1:
+	    mean = sum
+$if (datatype == dl)
+	    sigma = $INDEFD
+$else
+	    sigma = $INDEFR
+$endif
+	default:
+	    mean = sum / ngpix
+	    temp = (sumsq - (sum/ngpix) * sum) / (ngpix - 1)
+	    if (temp < 0)		# possible with roundoff error
+		sigma = 0.0
+	    else
+		sigma = sqrt (temp)
+	}
+
+	return (ngpix)
+end

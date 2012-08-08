@@ -1,0 +1,70 @@
+.help boxcar Nov85 images.imfilter
+.ih
+NAME
+boxcar -- boxcar smooth a list of images
+.ih
+USAGE
+boxcar input output xwindow ywindow
+.ih
+PARAMETERS
+.ls input
+List of images to be smoothed.
+.le
+.ls output
+List of output images. The number of output images must equal the number of
+input images. If the input images name equals the output image name the
+smoothed image will replace the input image.
+.le
+.ls xwindow, ywindow
+The size of the smoothing window.
+.le
+.ls boundary = "nearest"
+The boundary extension options are:
+.ls nearest
+Use the value of the nearest boundary pixel.
+.le
+.ls constant
+Use a constant value.
+.le
+.ls reflect
+Generate a value by reflecting around the boundary.
+.le
+.ls wrap
+Generate a value by wrapping around to the opposite side of the image.
+.le
+.le
+.ls constant = 0.
+The constant for constant-valued boundary extension.
+.le
+
+.ih
+DESCRIPTION
+
+BOXCAR smooths the list of images specified by \fIinput\fR with a
+flat-topped rectangular kernel of dimensions \fIxwindow\fR by \fIywindow\fR
+and places the smoothed images in \fIoutput\fR. The type of boundary
+extension is optional and set by the \fIboundary\fR parameter.
+
+.ih
+EXAMPLES
+
+1. Smooth an image using a 3 by 3 smoothing box and nearest neighbor boundary
+   extension.
+
+.nf
+    cl> boxcar m82 m82.box 3 3
+.fi
+
+.ih
+TIME REQUIREMENTS
+
+BOXCAR requires approximately 30 cpu seconds to smooth a
+512 square real image with a  5 by 5 kernel (VAX 11/750 with fpa).
+
+.ih
+BUGS
+
+.ih
+SEE ALSO
+convolve, gauss, laplace, gradient
+.endhelp

@@ -1,0 +1,1696 @@
+      SUBROUTINE ISOSRF (T,LU,MU,LV,MV,MW,EYE,MUVWP2,SLAB,TISO,IFLAG)
+C                                                                               
+C +-----------------------------------------------------------------+           
+C |                                                                 |           
+C |                Copyright (C) 1986 by UCAR                       |           
+C |        University Corporation for Atmospheric Research          |           
+C |                    All Rights Reserved                          |           
+C |                                                                 |           
+C |                 NCARGRAPHICS  Version 1.00                      |           
+C |                                                                 |           
+C +-----------------------------------------------------------------+           
+C                                                                               
+C                                                                               
+C
+C
+C DIMENSION OF           T(LU,LV,MW),EYE(3),SLAB(MUVWP2,MUVWP2)
+C ARGUMENTS
+C
+C LATEST REVISION        DECEMBER 1984
+C
+C PURPOSE                ISOSRF DRAWS AN APPROXIMATION OF AN ISO-VALUED
+C                        SURFACE FROM A THREE-DIMENSIONAL ARRAY WITH
+C                        HIDDEN LINES REMOVED.
+C
+C USAGE                  IF THE FOLLOWING ASSUMPTIONS ARE MET, USE
+C
+C                            CALL EZISOS (T,MU,MV,MW,EYE,SLAB,TISO)
+C
+C                               ASSUMPTIONS:
+C                                 -- ALL OF THE T ARRAY IS TO BE USED.
+C                                 -- IFLAG IS CHOSEN INTERNALLY.
+C                                 -- FRAME IS CALLED BY EZISOS.
+C
+C                        IF THE ASSUMPTIONS ARE NOT MET, USE
+C
+C                            CALL ISOSRF (T,LU,MU,LV,MV,MW,EYE,MUVWP2,
+C                                         SLAB,TISO,IFLAG)
+C
+C ARGUMENTS
+C
+C ON INPUT               T
+C                          THREE DIMENSIONAL ARRAY OF DATA THAT DEFINES
+C                          THE ISO-VALUED SURFACE.
+C
+C                        LU
+C                          FIRST DIMENSION OF T IN THE CALLING PROGRAM.
+C
+C                        MU
+C                          THE NUMBER OF DATA VALUES OF T TO BE
+C                          PROCESSED IN THE U DIRECTION (THE FIRST
+C                          SUBSCRIPT DIRECTION).  WHEN PROCESSING THE
+C                          ENTIRE ARRAY, LU = MU (AND LV = MV).
+C
+C                        LV
+C                          SECOND DIMENSION OF T IN THE CALLING PROGRAM.
+C
+C                        MV
+C                          THE NUMBER OF DATA VALUES OF T TO BE
+C                          PROCESSED IN THE V DIRECTION (THE SECOND
+C                          SUBSCRIPT DIRECTION).
+C
+C                        MV
+C                          THE NUMBER OF DATA VALUES OF T TO BE
+C                          PROCESSED IN THE W DIRECTION (THE THIRD
+C                          SUBSCRIPT DIRECTION).
+C
+C                        EYE
+C                          THE POSITION OF THE EYE IN THREE-SPACE.  T IS
+C                          CONSIDERED TO BE IN A BOX WITH OPPOSITE
+C                          CORNERS (1,1,1) AND (MU,MV,MW).  THE EYE IS
+C                          AT (EYE(1),EYE(2),EYE(3)), WHICH MUST BE
+C                          OUTSIDE THE BOX THAT CONTAINS T.  WHILE GAINING
+C                          EXPERIENCE WITH THE ROUTINE, A GOOD CHOICE
+C                          FOR EYE MIGHT BE (5.0*MU,3.5*MV,2.0*MW).
+C
+C                        MUVWP2
+C                          THE MAXIMUM OF (MU,MV,MW)+2; THAT IS,
+C                          MUVWP2 = MAX(MU,MV,MW)+2).
+C
+C                        SLAB
+C                          A WORK SPACE USED FOR INTERNAL STORAGE.  SLAB
+C                          MUST BE AT LEAST MUVWP2*MUVWP2 WORDS LONG.
+C
+C                        TISO
+C                          THE ISO-VALUE USED TO DEFINE THE SURFACE.  THE
+C                          SURFACE DRAWN WILL SEPARATE VOLUMES OF T THAT
+C                          HAVE VALUES GREATER THAN OR EQUAL TO TISO FROM
+C                          VOLUMES OF T THAT HAVE VALUES LESS THAN TISO.
+C
+C                        IFLAG
+C                          THIS FLAG SERVES TWO PURPOSES.
+C                          .  FIRST, THE ABSOLUTE VALUE OF IFLAG
+C                             DETERMINES WHICH TYPES OF LINES ARE DRAWN
+C                             TO APPROXIMATE THE SURFACE.  THREE TYPES
+C                             OF LINES ARE CONSIDERED:  LINES OF
+C                             CONSTANT U, LINES OF CONSTANT V AND LINES
+C                             OF CONSTANT W.  THE FOLLOWING TABLE LISTS
+C                             THE TYPES OF LINES DRAWN.
+C
+C                                                LINES OF CONSTANT
+C                                                -----------------
+C                             IABS(IFLAG)           U    V    W
+C                             -----------          ---  ---  ---
+C                                  1               NO   NO   YES
+C                                  2               NO   YES  NO
+C                                  3               NO   YES  YES
+C                                  4               YES  NO   NO
+C                                  5               YES  NO   YES
+C                                  6               YES  YES  NO
+C                             0, 7 OR MORE         YES  YES  YES
+C
+C                          .  SECOND, THE SIGN OF IFLAG DETERMINES WHAT
+C                             IS INSIDE AND WHAT IS OUTSIDE, HENCE,
+C                             WHICH LINES ARE VISIBLE AND WHAT IS DONE
+C                             AT THE BOUNDARY OF T.  FOR IFLAG:
+C
+C                             POSITIVE   T VALUES GREATER THAN TISO ARE
+C                                        ASSUMED TO BE INSIDE THE SOLID
+C                                        FORMED BY THE DRAWN SURFACE.
+C                             NEGATIVE   T VALUES LESS THAN TISO ARE
+C                                        ASSUMED TO BE INSIDE THE SOLID
+C                                        FORMED BY THE DRAWN SURFACE.
+C                             IF THE ALGORITHM DRAWS A CUBE, REVERSE THE
+C                             SIGN OF IFLAG.
+C
+C ON OUTPUT              T,LU,MU,LV,MV,MW,EYE,MUVWP2,TISO AND IFLAG ARE
+C                        UNCHANGED.  SLAB HAS BEEN WRITTEN IN.
+C
+C NOTE                   .   THIS ROUTINE IS FOR LOWER RESOLUTION ARRAYS
+C                            THAN ISOSRFHR.  40 BY 40 BY 40 IS A
+C                            PRACTICAL MAXIMUM.
+C                        .   TRANSFORMATIONS CAN BE ACHIEVED BY
+C                            ADJUSTING SCALING STATEMENT FUNCTIONS IN
+C                            ISOSRF, SET3D AND TR32.
+C                        .   THE HIDDEN-LINE ALGORITHM IS NOT EXACT, SO
+C                            VISIBILITY ERRORS CAN OCCUR.
+C                        .   THREE-DIMENSIONAL PERSPECTIVE CHARACTER
+C                            LABELING OF ISOSRF IS POSSIBLE BY USING
+C                            THE UTILITY PWRZI.  FOR A DESCRIPTION OF
+C                            THE USAGE, SEE THE PWRZI DOCUMENTATION.
+C
+C ENTRY POINTS           ISOSRF, EZISOS, SET3D, TRN32I, ZEROSC,
+C                        STCNTR, DRCNTR, TR32, FRSTS, KURV1S, KURV2S,
+C                        FRSTC, FILLIN, DRAWI, ISOSRB, MMASK
+C
+C COMMON BLOCKS          ISOSR1, ISOSR2, ISOSR3, ISOSR4, ISOSR5,
+C                        ISOSR6, ISOSR7, ISOSR8, ISOSR9, TEMPR,
+C                        PWRZ1I
+C
+C REQUIRED LIBRARY       THE ERPRT77 PACKAGE AND THE SPPS.
+C ROUTINES
+C
+C I/O                    PLOTS SURFACE
+C
+C PRECISION              SINGLE
+C
+C LANGUAGE               FORTRAN 77
+C
+C HISTORY                DEVELOPED FOR USERS OF ISOSRFHR WITH SMALLER
+C                        ARRAYS.
+C
+C ALGORITHM              CUTS THROUGH THE THREE-DIMENSIONAL ARRAY ARE
+C                        CONTOURED WITH A SMOOTHING CONTOURER WHICH ALSO
+C                        MARKS A MODEL OF THE PLOTTING PLANE.  INTERIORS
+C                        OF BOUNDARIES ARE FILLED IN AND THE RESULT IS
+C                        .OR.ED INTO ANOTHER MODEL OF THE PLOTTING PLANE
+C                        WHICH IS USED TO TEST SUBSEQUENT CONTOUR LINES
+C                        FOR VISIBILITY.
+C
+C TIMING                 VARIES WIDELY WITH SIZE OF T AND THE VOLUME OF
+C                        THE SPACE ENCLOSED BY THE SURFACE DRAWN.
+C
+C  **NOTE**                  SPACE REQUIREMENTS CAN BE REDUCED BY
+C                            CHANGING THE SIZE OF THE ARRAYS ISCR, ISCA
+C                            (FOUND IN COMMON ISOSR2), MASK(FOUND IN
+C                            COMMON ISOSR5) AND THE VARIABLE NBPW
+C                            (COMMON ISOSR5).
+C                            ISCR AND ISCA NEED 128X128 BITS.  SO ON A
+C                            64 BIT MACHINE ISCR, ISCA CAN BE
+C                            DIMENSIONED TO (2,128). NBPW SET IN
+C                            SUBROUTINE MMASK SHOULD CONTAIN THE
+C                            NUMBER OF BITS PER WORD YOU WISH TO
+C                            UTILIZE.
+C                            THE DIMENSION OF MASK AND NMASK SHOULD
+C                            EQUAL THE VALUE OF NBPW.
+C                            LS SHOULD BE SET TO THE FIRST DIMENSION
+C                            OF ISCA AND ISCR.
+C
+C               EXAMPLES:
+C                            ON A 60 BIT MACHINE:
+C                                 DIMENSION ISCA(4,128), ISCR(4,128)
+C                                 DIMENSION MASK(32)
+C                                 NBPW = 32
+C                            ON A 64 BIT MACHINE:
+C                                 DIMENSION ISCA(2,128), ISCR(2,128)
+C                                 DIMENSION MASK(64)
+C                                 NBPW = 64
+C
+C INTERNAL PARAMETERS    NAME  DEFAULT           FUNCTION
+C                        ----  -------           --------
+C                        IREF     1     FLAG TO CONTROL DRAWING OF AXES.
+C                                       .IREF=NONZERO   DRAW AXES.
+C                                       .IREF=ZERO      DO NOT DRAW AXES.
+C
+C
+      SAVE
+      DIMENSION       T(LU,LV,MW),EYE(3)     ,SLAB(MUVWP2,MUVWP2)
+C
+      COMMON /ISOSR1/ ISLBT      ,U          ,V          ,W
+      COMMON /ISOSR2/ LX         ,NX         ,NY         ,ISCR(8,128),
+     1                ISCA(8,128)
+      COMMON /ISOSR3/ ISCALE     ,XMIN       ,XMAX       ,YMIN       ,
+     1                YMAX       ,BIGD       ,R0
+      COMMON /ISOSR4/ RX         ,RY
+      COMMON /ISOSR5/ NBPW       ,MASK(16)   ,GENDON
+      COMMON /ISOSR6/ IX         ,IY         ,IDX        ,IDY        ,
+     1                IS         ,ISS        ,NP         ,CV         ,
+     2                INX(8)     ,INY(8)     ,IR(500)    ,NR
+      COMMON /ISOSR7/ IENTRY     ,IONES
+      COMMON /ISOSR9/ BIG        ,IXBIT
+C
+      LOGICAL         GENDON
+      DATA IREF/1/
+C
+      AVE(A,B) = (A+B)*.5
+C
+C A.S.F. FOR SCALING
+C
+      SU(UTEMP) = UTEMP
+      SV(VTEMP) = VTEMP
+      SW(WTEMP) = WTEMP
+C
+C +NOAO - Blockdata ISOSRB rewritten as run time initialization
+C     EXTERNAL ISOSRB
+      call isosrb
+C -NOAO
+C
+C THE FOLLOWING CALL IS FOR GATHERING STATISTICS ON LIBRARY USE AT NCAR
+C
+      CALL Q8QST4 ('NSSL','ISOSRF','ISOSRF','VERSION 12')
+      NERR = 0
+C
+C 3-SPACE  U,V,W,IU,IV,IW,ETC
+C 2-SPACE  X,Y,IX,IY,ETC
+C
+C  INITIALIZE MASKS
+C
+      IF (.NOT.GENDON) CALL MMASK
+C
+C  SET SHIFT VALUE FOR X,Y PACKING
+C
+C  IF YOUR MACHINE HAS MORE THAN 16 BITS PER WORD THIS CHECK MAY BE
+C  MODIFIED
+C
+      IF (LU .LE. 256) GO TO  10
+      NERR = NERR + 1
+      CALL SETER('DIMENSION OF CUBE EXCEEDS 256',NERR,2)
+      RETURN
+   10 DO  20 J=1,30
+         IF (LU .LE. 2**(J-1)) GO TO  30
+   20 CONTINUE
+   30 IXBIT = J
+      NU = MU
+      NUP2 = NU+2
+      NV = MV
+      NVP2 = NV+2
+      NW = MW
+      NWP2 = NW+2
+      FNU = NU
+      FNV = NV
+      FNW = NW
+      SU1 = SU(1.)
+      SV1 = SV(1.)
+      SW1 = SW(1.)
+      SUNU = SU(FNU)
+      SVNV = SV(FNV)
+      SWNW = SW(FNW)
+      AVEU = AVE(SU1,SUNU)
+      AVEV = AVE(SV1,SVNV)
+      AVEW = AVE(SW1,SWNW)
+      EYEU = EYE(1)
+      EYEV = EYE(2)
+      EYEW = EYE(3)
+      NUVWP2 = MUVWP2
+      TVAL = TISO
+      NFLAG = IABS(IFLAG)
+      IF (NFLAG.EQ.0 .OR. NFLAG.GE.8) NFLAG = 7
+C
+C SET UP SCALING
+C
+      FACT = -ISIGN(1,IFLAG)
+      CALL SET3D (EYE,1.,FNU,1.,FNV,1.,FNW)
+C
+C BOUND LOWER AND LEFT EDGE OF SLAB
+C
+      EDGE = SIGN(BIG,FACT)
+      DO  40 IUVW=1,NUVWP2
+         SLAB(IUVW,1) = EDGE
+         SLAB(1,IUVW) = EDGE
+   40 CONTINUE
+C
+C SLICES PERPENDICULAR TO U. THAT IS, V W SLICES. T OF CONSTANT U.
+C
+      IF (NFLAG .LT. 4) GO TO 100
+      CALL ZEROSC
+      ISLBT = -1
+C
+C BOUND UPPER AND RIGHT EDGE OF SLAB.
+C
+      DO  50 IV=2,NVP2
+         SLAB(IV,NWP2) = EDGE
+   50 CONTINUE
+      DO  60 IW=2,NWP2
+         SLAB(NVP2,IW) = EDGE
+   60 CONTINUE
+C
+C GO THRU 3-D ARRAY IN U DIRECTION.  IUEW=IU EITHER WAY.
+C PICK IU BASED ON EYEU.
+C
+      DO  90 IUEW=1,NU
+         IU = IUEW
+         IF (EYEU .GT. AVEU) IU = NU+1-IUEW
+         U = IU
+C
+C LOAD THIS SLICE OF T INTO SLAB.
+C
+         DO  80 IV=1,NV
+            DO  70 IW=1,NW
+               SLAB(IV+1,IW+1) = T(IU,IV,IW)
+   70       CONTINUE
+   80    CONTINUE
+C
+C CONTOUR THIS SLAB.
+C
+         CALL STCNTR (SLAB,NUVWP2,NVP2,NWP2,TVAL)
+C
+C CONSTRUCT VISIBILITY ARRAY.
+C
+         CALL FILLIN
+   90 CONTINUE
+C
+C SLICES PERPENDICULAR TO V. U W SLICES. T OF CONSTANT V.
+C
+  100 IF (MOD(NFLAG/2,2) .EQ. 0) GO TO 160
+      CALL ZEROSC
+      ISLBT = 0
+C
+C BOUND UPPER AND RIGHT EDGE OF SLAB.
+C
+      DO 110 IU=2,NUP2
+         SLAB(IU,NWP2) = EDGE
+  110 CONTINUE
+      DO 120 IW=2,NWP2
+         SLAB(NUP2,IW) = EDGE
+  120 CONTINUE
+C
+C GO THRU T IN V DIRECTION.  IVEW=IV EITHER WAY.
+C
+      DO 150 IVEW=1,NV
+         IV = IVEW
+         IF (EYEV .GT. AVEV) IV = NV+1-IVEW
+         V = IV
+C
+C LOAD THIS SLICE OF T INTO SLAB.
+C
+         DO 140 IU=1,NU
+            DO 130 IW=1,NW
+               SLAB(IU+1,IW+1) = T(IU,IV,IW)
+  130       CONTINUE
+  140    CONTINUE
+C
+C CONTOUR THIS SLAB.
+C
+         CALL STCNTR (SLAB,NUVWP2,NUP2,NWP2,TVAL)
+C
+C CONSTRUCT VISIBILITY ARRAY.
+C
+         CALL FILLIN
+  150 CONTINUE
+C
+C SLICES PERPENDICULAR TO W. U V SLICES. T OF CONSTANT W.
+C
+  160 IF (MOD(NFLAG,2) .EQ. 0) GO TO 220
+      CALL ZEROSC
+C
+      ISLBT = 1
+C
+C BOUND UPPER AND RIGHT EDGE OF SLAB.
+C
+      DO 170 IU=2,NUP2
+         SLAB(IU,NVP2) = EDGE
+  170 CONTINUE
+      DO 180 IV=2,NVP2
+         SLAB(NUP2,IV) = EDGE
+  180 CONTINUE
+C
+C GO THRU T IN W DIRECTION.
+C
+      DO 210 IWEW=1,NW
+         IW = IWEW
+         IF (EYEW .GT. AVEW) IW = NW+1-IWEW
+         W = IW
+C
+C LOAD THIS SLICE OF T INTO SLAB.
+C
+         DO 200 IU=1,NU
+            DO 190 IV=1,NV
+               SLAB(IU+1,IV+1) = T(IU,IV,IW)
+  190       CONTINUE
+  200    CONTINUE
+C
+C CONTOUR THIS SLAB.
+C
+         CALL STCNTR (SLAB,NUVWP2,NUP2,NVP2,TVAL)
+C
+C CONSTRUCT VISIBILITY ARRAY.
+C
+         CALL FILLIN
+  210 CONTINUE
+C
+C DRAW REFERENCE PLANE EDGES AND W AXIS.
+C
+  220 IF (IREF .EQ. 0) RETURN
+      CALL TRN32I (SU1,SV1,SW1,XT,YT,DUM,2)
+      IF (EYEV .LT. SV1) GO TO 240
+      CALL FRSTC (IFIX(XT),IFIX(YT),1)
+      DO 230 IU=2,NU
+         CALL TRN32I (SU(FLOAT(IU)),SV1,SW1,XT,YT,DUM,2)
+         CALL FRSTC (IFIX(XT),IFIX(YT),2)
+  230 CONTINUE
+      GO TO 250
+  240 CALL PLOTIT (IFIX(XT),IFIX(YT),0)
+      CALL TRN32I (SUNU,SV1,SW1,XT,YT,DUM,2)
+      CALL PLOTIT (IFIX(XT),IFIX(YT),1)
+  250 IF (EYEU .GT. SUNU) GO TO 270
+      CALL FRSTC (IFIX(XT),IFIX(YT),1)
+      DO 260 IV=2,NV
+         CALL TRN32I (SUNU,SV(FLOAT(IV)),SW1,XT,YT,DUM,2)
+         CALL FRSTC (IFIX(XT),IFIX(YT),2)
+  260 CONTINUE
+      GO TO 280
+  270 CALL PLOTIT (IFIX(XT),IFIX(YT),0)
+      CALL TRN32I (SUNU,SVNV,SW1,XT,YT,DUM,2)
+      CALL PLOTIT (IFIX(XT),IFIX(YT),1)
+  280 IF (EYEV .GT. SVNV) GO TO 300
+      CALL FRSTC (IFIX(XT),IFIX(YT),1)
+      DO 290 IUOW=2,NU
+         CALL TRN32I (SU(FLOAT(NU-IUOW+1)),SVNV,SW1,XT,YT,DUM,2)
+         CALL FRSTC (IFIX(XT),IFIX(YT),2)
+  290 CONTINUE
+      GO TO 310
+  300 CALL PLOTIT (IFIX(XT),IFIX(YT),0)
+      CALL TRN32I (SU1,SVNV,SW1,XT,YT,DUM,2)
+      CALL PLOTIT (IFIX(XT),IFIX(YT),1)
+  310 IF (EYEU .LT. SU1) GO TO 330
+      CALL FRSTC (IFIX(XT),IFIX(YT),1)
+      DO 320 IVOW=2,NV
+         CALL TRN32I (SU1,SV(FLOAT(NV-IVOW+1)),SW1,XT,YT,DUM,2)
+         CALL FRSTC (IFIX(XT),IFIX(YT),2)
+  320 CONTINUE
+      GO TO 340
+  330 CALL PLOTIT (IFIX(XT),IFIX(YT),0)
+      CALL TRN32I (SU1,SV1,SW1,XT,YT,DUM,2)
+      CALL PLOTIT (IFIX(XT),IFIX(YT),1)
+  340 IF (EYEU.LE.SU1 .OR. EYEV.LE.SV1) GO TO 360
+      CALL FRSTC (IFIX(XT),IFIX(YT),1)
+      DO 350 IW=2,NW
+         CALL TRN32I (SU1,SV1,SW(FLOAT(IW)),XT,YT,DUM,2)
+         CALL FRSTC (IFIX(XT),IFIX(YT),2)
+  350 CONTINUE
+C +NOAO - Plotit buffer needs to be flushed before returning.
+      call plotit (0, 0, 2)
+C -NOAO
+      RETURN
+  360 CALL PLOTIT (IFIX(XT),IFIX(YT),0)
+      CALL TRN32I (SU1,SV1,SWNW,XT,YT,DUM,2)
+      CALL PLOTIT (IFIX(XT),IFIX(YT),1)
+C +NOAO - Plotit buffer needs to be flushed before returning.
+      call plotit (0, 0, 2)
+C -NOAO
+      RETURN
+      END
+      SUBROUTINE EZISOS (T,MU,MV,MW,EYE,SLAB,TISO)
+C
+      SAVE
+      DIMENSION       T(MU,MV,MW),EYE(3)
+C
+        DATA ANG,PI/.35,3.141592/
+C
+C THE FOLLOWING CALL IS FOR GATHERING STATISTICS ON LIBRARY USE AT NCAR
+C
+      CALL Q8QST4 ('NSSL','ISOSRF','EZISOS','VERSION 12')
+C
+C ARGUMENTS DESCRIBED IN ISOSRF
+C
+C PICK TYPES OF LINES TO DRAW
+C
+      NU = MU
+      NV = MV
+      NW = MW
+      TVAL = TISO
+      MAX = MAX0(NU,NV,NW)+2
+      ATU = NU/2
+      ATV = NV/2
+      ATW = NW/2
+      EYEU = EYE(1)
+      EYEV = EYE(2)
+      EYEW = EYE(3)
+      RU = EYEU-ATU
+      RV = EYEV-ATV
+      RW = EYEW-ATW
+      RU2 = RU*RU
+      RV2 = RV*RV
+      RW2 = RW*RW
+      DU = SQRT(RV2+RW2)
+      DV = SQRT(RU2+RW2)
+      DW = SQRT(RU2+RV2)
+      DR = 1./SQRT(RU2+RV2+RW2)
+C
+C  COMPUTE THE ARCCOSINE
+C
+      TU = DU*DR
+      ANGU = ATAN(ABS(SQRT(1.-TU*TU)/TU))
+      IF (TU .LE. 0.) ANGU = PI-ANGU
+      TV = DV*DR
+      ANGV = ATAN(ABS(SQRT(1.-TV*TV)/TV))
+      IF (TV .LE. 0.) ANGV = PI-ANGV
+      TW = DW*DR
+      ANGW = ATAN(ABS(SQRT(1.-TW*TW)/TW))
+      IF (TW .LE. 0.) ANGW = PI-ANGW
+C
+C BREAK POINT IS ABOUT 20 DEGREES OR ABOUT .35 RADIANS
+C
+      IFLAG = 0
+      IF (ANGU .GT. ANG) IFLAG = IFLAG+4
+      IF (ANGV .GT. ANG) IFLAG = IFLAG+2
+      IF (ANGW .GT. ANG) IFLAG = IFLAG+1
+C
+C FIND SIGN OF IFLAG
+C
+      ICNT = 0
+      IF (ABS(RU) .LE. ATU) GO TO  30
+      IU = 1
+      IF (EYEU .GT. ATU) IU = NU
+      DO  20 IW=1,NW
+         DO  10 IV=1,NV
+            IF (T(IU,IV,IW) .GT. TVAL) ICNT = ICNT-2
+            ICNT = ICNT+1
+   10    CONTINUE
+   20 CONTINUE
+   30 IF (ABS(RV) .LE. ATV) GO TO  60
+      IV = 1
+      IF (EYEV .GT. ATV) IV = NV
+      DO  50 IW=1,NW
+         DO  40 IU=1,NU
+            IF (T(IU,IV,IW) .GT. TVAL) ICNT = ICNT-2
+            ICNT = ICNT+1
+   40    CONTINUE
+   50 CONTINUE
+   60 IF (ABS(RW) .LE. ATW) GO TO  90
+      IW = 1
+      IF (EYEW .GT. ATW) IW = NW
+      DO  80 IV=1,NV
+         DO  70 IU=1,NU
+            IF (T(IU,IV,IW) .GT. TVAL) ICNT = ICNT-2
+            ICNT = ICNT+1
+   70    CONTINUE
+   80 CONTINUE
+   90 IFLAG = ISIGN(IFLAG,ICNT)
+      CALL ISOSRF (T,NU,NU,NV,NV,NW,EYE,MAX,SLAB,TVAL,IFLAG)
+C +NOAO - Call to frame is suppressed.
+C     CALL FRAME
+C -NOAO
+      RETURN
+      END
+      SUBROUTINE SET3D (EYE,ULO,UHI,VLO,VHI,WLO,WHI)
+      SAVE
+      COMMON /TEMPR/  RZERO
+C
+      DIMENSION       EYE(3)
+C
+      COMMON /ISOSR3/ ISCALE     ,XMIN       ,XMAX       ,YMIN       ,
+     1                YMAX       ,BIGD       ,R0
+      COMMON /PWRZ1I/ UUMIN      ,UUMAX      ,VVMIN      ,VVMAX      ,
+     1                WWMIN      ,WWMAX      ,DELCRT     ,EYEU       ,
+     2                EYEV       ,EYEW
+C
+C
+      AVE(A,B) = (A+B)*.5
+C
+C A.S.F. FOR SCALING
+C
+      SU(UTEMP) = UTEMP
+      SV(VTEMP) = VTEMP
+      SW(WTEMP) = WTEMP
+C
+C CONSTANTS FOR PWRZ
+C
+      UUMIN = ULO
+      UUMAX = UHI
+      VVMIN = VLO
+      VVMAX = VHI
+      WWMIN = WLO
+      WWMAX = WHI
+      EYEU = EYE(1)
+      EYEV = EYE(2)
+      EYEW = EYE(3)
+C
+C FIND CORNERS IN 2-SPACE FOR 3-SPACE BOX CONTAINING OBJECT
+C
+      ISCALE = 0
+      ATU = AVE(SU(UUMIN),SU(UUMAX))
+      ATV = AVE(SV(VVMIN),SV(VVMAX))
+      ATW = AVE(SW(WWMIN),SW(WWMAX))
+      BIGD = 0.
+      IF (RZERO .LE. 0.) GO TO  10
+C
+C RELETIVE SIZE FEATURE IN USE.
+C GENERATE EYE POSITION THAT MAKES BOX HAVE MAXIMUM PROJECTED SIZE.
+C
+      ALPHA = -(VVMIN-ATV)/(UUMIN-ATU)
+      VVEYE = -RZERO/SQRT(1.+ALPHA*ALPHA)
+      UUEYE = VVEYE*ALPHA
+      VVEYE = VVEYE+ATV
+      UUEYE = UUEYE+ATU
+      WWEYE = ATW
+      CALL TRN32I (ATU,ATV,ATW,UUEYE,VVEYE,WWEYE,1)
+      CALL TRN32I (UUMIN,VVMIN,ATW,XMIN,DUMM,DUMM,2)
+      CALL TRN32I (UUMAX,VVMIN,WWMIN,DUMM,YMIN,DUMM,2)
+      CALL TRN32I (UUMAX,VVMAX,ATW,XMAX,DUMM,DUMM,2)
+      CALL TRN32I (UUMAX,VVMIN,WWMAX,DUMM,YMAX,DUMM,2)
+      BIGD = SQRT((UUMAX-UUMIN)**2+(VVMAX-VVMIN)**2+(WWMAX-WWMIN)**2)*.5
+      R0 = RZERO
+      GO TO  20
+   10 CALL TRN32I (ATU,ATV,ATW,EYE(1),EYE(2),EYE(3),1)
+      CALL TRN32I (SU(UUMIN),SV(VVMIN),SW(WWMIN),X1,Y1,DUM,2)
+      CALL TRN32I (SU(UUMIN),SV(VVMIN),SW(WWMAX),X2,Y2,DUM,2)
+      CALL TRN32I (SU(UUMIN),SV(VVMAX),SW(WWMIN),X3,Y3,DUM,2)
+      CALL TRN32I (SU(UUMIN),SV(VVMAX),SW(WWMAX),X4,Y4,DUM,2)
+      CALL TRN32I (SU(UUMAX),SV(VVMIN),SW(WWMIN),X5,Y5,DUM,2)
+      CALL TRN32I (SU(UUMAX),SV(VVMIN),SW(WWMAX),X6,Y6,DUM,2)
+      CALL TRN32I (SU(UUMAX),SV(VVMAX),SW(WWMIN),X7,Y7,DUM,2)
+      CALL TRN32I (SU(UUMAX),SV(VVMAX),SW(WWMAX),X8,Y8,DUM,2)
+      XMIN = AMIN1(X1,X2,X3,X4,X5,X6,X7,X8)
+      XMAX = AMAX1(X1,X2,X3,X4,X5,X6,X7,X8)
+      YMIN = AMIN1(Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8)
+      YMAX = AMAX1(Y1,Y2,Y3,Y4,Y5,Y6,Y7,Y8)
+C
+C ADD RIGHT AMOUNT TO KEEP PICTURE SQUARE
+C
+   20 WIDTH = XMAX-XMIN
+      HIGHT = YMAX-YMIN
+      DIF = .5*(WIDTH-HIGHT)
+      IF (DIF)  30, 50, 40
+   30 XMIN = XMIN+DIF
+      XMAX = XMAX-DIF
+      GO TO  50
+   40 YMIN = YMIN-DIF
+      YMAX = YMAX+DIF
+   50 ISCALE = 1
+      CALL TRN32I (ATU,ATV,ATW,EYE(1),EYE(2),EYE(3),1)
+      RETURN
+      END
+      SUBROUTINE TRN32I (U,V,W,XT,YT,ZT,IENT)
+C
+C THIS ROUTINE IMPLEMENTS THE 3-SPACE TO 2-SPACE TRANSFOR-
+C MATION BY KUBER, SZABO AND GIULIERI, THE PERSPECTIVE
+C REPRESENTATION OF FUNCTIONS OF TWO VARIABLES. J. ACM 15,
+C 2, 193-204,1968.
+C ARGUMENTS FOR SET
+C U,V,W    ARE THE 3-SPACE COORDINATES OF THE INTERSECTION
+C          OF THE LINE OF SIGHT AND THE IMAGE PLANE.  THIS
+C          POINT CAN BE THOUGHT OF AS THE POINT LOOKED AT.
+C XT,YT,ZT ARE THE 3-SPACE COORDINATES OF THE EYE POSITION.
+C
+C TRN32 ARGUMENTS
+C U,V,W    ARE THE 3-SPACE COORDINATES OF A POINT TO BE
+C          TRANSFORMED.
+C XT,YT    THE RESULTS OF THE 3-SPACE TO 2-SPACE TRANSFOR-
+C          MATION.  WHEN ISCALE=0, XT AND YT ANR IN THE SAME
+C          UNITS AS U,V, AND W.  WHEN ISCALE'0, XT AND YT
+C          ARE IN PLOTTER COORDINATES.
+C ZT       NOT USED.
+C
+      SAVE
+      COMMON /PWRZ1I/ UUMIN      ,UUMAX      ,VVMIN      ,VVMAX      ,
+     1                WWMIN      ,WWMAX      ,DELCRT     ,EYEU       ,
+     2                EYEV       ,EYEW
+      COMMON /ISOSR3/ ISCALE     ,XMIN       ,XMAX       ,YMIN       ,
+     1                YMAX       ,BIGD       ,R0
+C
+C RANGE OF PLOTTER COORDINATES
+C
+C
+C  WARNING
+C  IF PLOTTER MAXIMUM VALUE RANGES (IN X OR Y DIRECTION) FALL BELOW
+C  101, THEN CHANGES MUST BE MADE IN SUBROUTINE FRSTC. THE REQUIRED
+C  CHANGES ARE MARKED BY WARNING COMMENTS IN FRSTC.
+      DATA NLX,NBY,NRX,NTY/10,10,32760,32760/
+        DATA PI/3.1411592/
+C
+C STORE THE PARAMETERS OF THE SET CALL FOR USE
+C WITH THE TRANSLATE CALL
+C
+C DECIDE IF SET OR TRANSLATE CALL
+C
+      IF (IENT .NE. 1) GO TO  50
+      AU = U
+      AV = V
+      AW = W
+      EU = XT
+      EV = YT
+      EW = ZT
+C
+C
+C
+C
+C
+      DU = AU-EU
+      DV = AV-EV
+      DW = AW-EW
+      D = SQRT(DU*DU+DV*DV+DW*DW)
+      COSAL = DU/D
+      COSBE = DV/D
+      COSGA = DW/D
+C
+C  COMPUTE THE ARCCOSINE
+C
+      AL = ATAN(ABS(SQRT(1.-COSAL*COSAL)/COSAL))
+      IF (COSAL .LE. 0.) AL = PI-AL
+      BE = ATAN(ABS(SQRT(1.-COSBE*COSBE)/COSBE))
+      IF (COSBE .LE. 0.) BE = PI-BE
+      GA = ATAN(ABS(SQRT(1.-COSGA*COSGA)/COSGA))
+      IF (COSGA .LE. 0.) GA = PI-GA
+      SINGA = SIN(GA)
+C
+C THE 3-SPACE POINT LOOKED AT IS TRANSFORMED INTO (0,0) OF
+C THE 2-SPACE.  THE 3-SPACE W AXIS IS TRANSFORMED INTO THE
+C 2-SPACE Y AXIS.  IF THE LINE OF SIGHT IS CLOSE TO PARALLEL
+C TO THE 3-SPACE W AXIS, THE 3-SPACE V AXIS IS CHOSEN (IN-
+C STEAD OF THE 3-SPACE W AXIS) TO BE TRANSFORMED INTO THE
+C 2-SPACE Y AXIS.
+C
+      ASSIGN  90 TO JDONE
+      IF (ISCALE)  10, 30, 10
+   10 X0 = XMIN
+      Y0 = YMIN
+      X1 = NLX
+      Y1 = NBY
+      X2 = NRX-NLX
+      Y2 = NTY-NBY
+      X3 = X2/(XMAX-XMIN)
+      Y3 = Y2/(YMAX-YMIN)
+      X4 = NRX
+      Y4 = NTY
+      FACT = 1.
+      IF (BIGD .LE. 0.) GO TO  20
+      X0 = -BIGD
+      Y0 = -BIGD
+      X3 = X2/(2.*BIGD)
+      Y3 = Y2/(2.*BIGD)
+      FACT = R0/D
+   20 DELCRT = X2
+      ASSIGN  80 TO JDONE
+   30 IF (SINGA .LT. 0.0001) GO TO  40
+      R = 1./SINGA
+      ASSIGN  70 TO JUMP
+      RETURN
+   40 SINBE = SIN(BE)
+      R = 1./SINBE
+      ASSIGN  60 TO JUMP
+      RETURN
+C
+C********************  ENTRY TRN32  ************************
+C     ENTRY TRN32 (U,V,W,XT,YT,ZT)
+C
+   50 UU = U
+      VV = V
+      WW = W
+      Q = D/((UU-EU)*COSAL+(VV-EV)*COSBE+(WW-EW)*COSGA)
+      GO TO JUMP,( 60, 70)
+   60 UU = ((EW+Q*(WW-EW)-AW)*COSAL-(EU+Q*(UU-EU)-AU)*COSGA)*R
+      VV = (EV+Q*(VV-EV)-AV)*R
+      GO TO JDONE,( 80, 90)
+   70 UU = ((EU+Q*(UU-EU)-AU)*COSBE-(EV+Q*(VV-EV)-AV)*COSAL)*R
+      VV = (EW+Q*(WW-EW)-AW)*R
+      GO TO JDONE,( 80, 90)
+   80 XT = AMIN1(X4,AMAX1(X1,X1+X3*(FACT*UU-X0)))
+      YT = AMIN1(Y4,AMAX1(Y1,Y1+Y3*(FACT*VV-Y0)))
+      RETURN
+   90 XT = UU
+      YT = VV
+      RETURN
+      END
+      SUBROUTINE ZEROSC
+      SAVE
+C
+      COMMON /ISOSR2/ LX         ,NX         ,NY         ,ISCR(8,128),
+     1                ISCA(8,128)
+C
+C ZERO BOTH SCRENE MODELS.
+C
+      DO  20 I=1,LX
+         DO  10 J=1,NY
+            ISCR(I,J) = 0
+            ISCA(I,J) = 0
+   10    CONTINUE
+   20 CONTINUE
+      RETURN
+      END
+      SUBROUTINE STCNTR (Z,L,M,N,CONV)
+C
+      SAVE
+      DIMENSION       Z(L,N)
+C
+C THIS ROUTINE FINDS THE BEGINNINGS OF ALL CONTOUR LINES AT LEVEL CONV.
+C FIRST THE EDGES ARE SEARCHED FOR LINES INTERSECTING THE EDGE (OPEN
+C LINES) THEN THE INTERIOR IS SEARCHED FOR LINES WHICH DO NOT INTERSECT
+C THE EDGE (CLOSED LINES).  BEGINNINGS ARE STORED IN IR TO PREVENT RE-
+C TRACING OF LINES.  IF IR IS FILLED, THE SEARCH IS STOPPED FOR THIS
+C CONV.
+C
+      COMMON /ISOSR6/ IX         ,IY         ,IDX        ,IDY        ,
+     1                IS         ,ISS        ,NP         ,CV         ,
+     2                INX(8)     ,INY(8)     ,IR(500)    ,NR
+      COMMON /ISOSR7/ IENTRY     ,IONES
+      COMMON /ISOSR9/ BIG        ,IXBIT
+C
+C  PACK X AND Y
+C
+      IPXY(I1,J1) = ISHIFT(I1,IXBIT)+J1
+C
+      IENTRY = 0
+      NP = 0
+      CV = CONV
+C
+C THE FOLLOWING CODE SHOULD BE RE-ENABLED IF THIS ROUTINE IS USED FOR
+C GENERAL CONTOURING
+C
+C     ISS=0
+C     DO 2 IP1=2,M
+C     I=IP1-1
+C     IF(Z(I,1).GE.CV.OR.Z(IP1,1).LT.CV) GO TO 1
+C     IX=IP1
+C     IY=1
+C     IDX=-1
+C     IDY=0
+C     IS=1
+C     CALL DRLINE(Z,L,M,N)
+C   1 IF(Z(IP1,N).GE.CV.OR.Z(I,N).LT.CV) GO TO 2
+C     IX=I
+C     IY=N
+C     IDX=1
+C     IDY=0
+C     IS=5
+C     CALL DRLINE(Z,L,M,N)
+C   2 CONTINUE
+C     DO 4 JP1=2,N
+C     J=JP1-1
+C     IF(Z(M,J).GE.CV.OR.Z(M,JP1).LT.CV) GO TO 3
+C     IX=M
+C     IY=JP1
+C     IDX=0
+C     IDY=-1
+C     IS=7
+C     CALL DRLINE(Z,L,M,N)
+C   3 IF(Z(1,JP1).GE.CV.OR.Z(1,J).LT.CV) GO TO 4
+C     IX=1
+C     IY=J
+C     IDX=0
+C     IDY=1
+C     IS=3
+C     CALL DRLINE(Z,L,M,N)
+C   4 CONTINUE
+C
+      ISS = 1
+      DO  40 JP1=3,N
+         J = JP1-1
+         DO  30 IP1=2,M
+            I = IP1-1
+            IF (Z(I,J).GE.CV .OR. Z(IP1,J).LT.CV) GO TO  30
+            IXY = IPXY(IP1,J)
+            IF (NP .EQ. 0) GO TO  20
+            DO  10 K=1,NP
+               IF (IR(K) .EQ. IXY) GO TO  30
+   10       CONTINUE
+   20       NP = NP+1
+            IF (NP .GT. NR) RETURN
+            IR(NP) = IXY
+            IX = IP1
+            IY = J
+            IDX = -1
+            IDY = 0
+            IS = 1
+            CALL DRCNTR (Z,L,M,N)
+   30    CONTINUE
+   40 CONTINUE
+      RETURN
+      END
+      SUBROUTINE DRCNTR (Z,L,MM,NN)
+      SAVE
+C
+      DIMENSION       Z(L,NN)
+C
+C THIS ROUTINE TRACES A CONTOUR LINE WHEN GIVEN THE BEGINNING BY STLINE.
+C TRANSFORMATIONS CAN BE ADDED BY DELETING THE STATEMENT FUNCTIONS FOR
+C FX AND FY IN DRLINE AND MINMAX AND ADDING EXTERNAL FUNCTIONS.
+C X=1. AT Z(1,J), X=FLOAT(M) AT Z(M,J). X TAKES ON NON-INTEGER VALUES.
+C Y=1. AT Z(I,1), Y=FLOAT(N) AT Z(I,N). Y TAKES ON NON-INTEGER VALUES.
+C
+      COMMON /ISOSR6/ IX         ,IY         ,IDX        ,IDY        ,
+     1                IS         ,ISS        ,NP         ,CV         ,
+     2                INX(8)     ,INY(8)     ,IR(500)    ,NR
+      COMMON /ISOSR9/ BIG        ,IXBIT
+C
+      LOGICAL         IPEN       ,IPENO
+C
+      DATA IOFFP,SPVAL/0,0./
+      DATA IPEN,IPENO/.TRUE.,.TRUE./
+C
+C  PACK X AND Y
+C
+      IPXY(I1,J1) = ISHIFT(I1,IXBIT)+J1
+      FX(X1,Y1) = X1
+      FY(X1,Y1) = Y1
+      C(P11,P21) = (P11-CV)/(P11-P21)
+C
+      M = MM
+      N = NN
+      IF (IOFFP .EQ. 0) GO TO  10
+      ASSIGN 100 TO JUMP1
+      ASSIGN 150 TO JUMP2
+      GO TO  20
+   10 ASSIGN 120 TO JUMP1
+      ASSIGN 160 TO JUMP2
+   20 IX0 = IX
+      IY0 = IY
+      IS0 = IS
+      IF (IOFFP .EQ. 0) GO TO  30
+      IX2 = IX+INX(IS)
+      IY2 = IY+INY(IS)
+      IPEN = Z(IX,IY).NE.SPVAL .AND. Z(IX2,IY2).NE.SPVAL
+      IPENO = IPEN
+   30 IF (IDX .EQ. 0) GO TO  40
+      Y = IY
+      ISUB = IX+IDX
+      X = C(Z(IX,IY),Z(ISUB,IY))*FLOAT(IDX)+FLOAT(IX)
+      GO TO  50
+   40 X = IX
+      ISUB = IY+IDY
+      Y = C(Z(IX,IY),Z(IX,ISUB))*FLOAT(IDY)+FLOAT(IY)
+   50 IF (IPEN) CALL FRSTS (FX(X,Y),FY(X,Y),1)
+   60 IS = IS+1
+      IF (IS .GT. 8) IS = IS-8
+      IDX = INX(IS)
+      IDY = INY(IS)
+      IX2 = IX+IDX
+      IY2 = IY+IDY
+      IF (ISS .NE. 0) GO TO  70
+      IF (IX2.GT.M .OR. IY2.GT.N .OR. IX2.LT.1 .OR. IY2.LT.1) GO TO 190
+   70 IF (CV-Z(IX2,IY2))  80, 80, 90
+   80 IS = IS+4
+      IX = IX2
+      IY = IY2
+      GO TO  60
+   90 IF (IS/2*2 .EQ. IS) GO TO  60
+      GO TO JUMP1,(100,120)
+  100 ISBIG = IS+(8-IS)/6*8
+      IX3 = IX+INX(ISBIG-1)
+      IY3 = IY+INY(ISBIG-1)
+      IX4 = IX+INX(ISBIG-2)
+      IY4 = IY+INY(ISBIG-2)
+      IPENO = IPEN
+      IF (ISS .NE. 0) GO TO 110
+      IF (IX3.GT.M .OR. IY3.GT.N .OR. IX3.LT.1 .OR. IY3.LT.1) GO TO 190
+      IF (IX4.GT.M .OR. IY4.GT.N .OR. IX4.LT.1 .OR. IY4.LT.1) GO TO 190
+  110 IPEN = Z(IX,IY).NE.SPVAL .AND. Z(IX2,IY2).NE.SPVAL .AND.
+     1       Z(IX3,IY3).NE.SPVAL .AND. Z(IX4,IY4).NE.SPVAL
+  120 IF (IDX .EQ. 0) GO TO 130
+      Y = IY
+      ISUB = IX+IDX
+      X = C(Z(IX,IY),Z(ISUB,IY))*FLOAT(IDX)+FLOAT(IX)
+      GO TO 140
+  130 X = IX
+      ISUB = IY+IDY
+      Y = C(Z(IX,IY),Z(IX,ISUB))*FLOAT(IDY)+FLOAT(IY)
+  140 GO TO JUMP2,(150,160)
+  150 IF (.NOT.IPEN) GO TO 170
+      IF (IPENO) GO TO 160
+C
+C END OF LINE SEGMENT
+C
+      CALL FRSTS (D1,D2,3)
+      CALL FRSTS (FX(XOLD,YOLD),FY(XOLD,YOLD),1)
+C
+C CONTINUE LINE SEGMENT
+C
+  160 CALL FRSTS (FX(X,Y),FY(X,Y),2)
+  170 XOLD = X
+      YOLD = Y
+      IF (IS .NE. 1) GO TO 180
+      NP = NP+1
+      IF (NP .GT. NR) GO TO 190
+      IR(NP) = IPXY(IX,IY)
+  180 IF (ISS .EQ. 0) GO TO  60
+      IF (IX.NE.IX0 .OR. IY.NE.IY0 .OR. IS.NE.IS0) GO TO  60
+C
+C END OF LINE
+C
+  190 CALL FRSTS (D1,D2,3)
+      RETURN
+      END
+      SUBROUTINE TR32 (X,Y,MX,MY)
+      SAVE
+C
+      COMMON /ISOSR1/ ISLBT      ,U          ,V          ,W
+C
+C A.S.F. FOR SCALING
+C
+      SU(UTEMP) = UTEMP
+      SV(VTEMP) = VTEMP
+      SW(WTEMP) = WTEMP
+C
+      XX = X
+      YY = Y
+      IF (ISLBT)  10, 20, 30
+   10 CALL TRN32I (SU(U),SV(XX-1.),SW(YY-1.),XT,YT,DUM,2)
+      GO TO  40
+   20 CALL TRN32I (SU(XX-1.),SV(V),SW(YY-1.),XT,YT,DUM,2)
+      GO TO  40
+   30 CALL TRN32I (SU(XX-1.),SV(YY-1.),SW(W),XT,YT,DUM,2)
+   40 MX = XT
+      MY = YT
+      RETURN
+      END
+      SUBROUTINE FRSTS (XX,YY,IENT)
+C
+C THIS IS A SPECIAL VERSION OF THE SMOOTHING DASHED LINE PACKAGE.  LINES
+C ARE SMOOTHED IN THE SAME WAY, BUT NO SOFTFARE DASHED LINES ARE USED.
+C CONDITIONAL PLOTTING ROUTINES ARE CALL WHICH DETERMINE THE VISIBILITY
+C OF A LINE SEGMENT BEFORE PLOTTING.
+C
+      SAVE
+      DIMENSION       XSAVE(70)  ,YSAVE(70)  ,XP(70)     ,YP(70)     ,
+     1                TEMP(70)
+C
+      COMMON /ISOSR7/ IENTRY     ,IONES
+C
+      DATA NP/150/
+      DATA L1/70/
+      DATA TENSN/2.5/
+      DATA PI/3.14159265358/
+      DATA SMALL/128./
+C
+      AVE(A,B) = .5*(A+B)
+C
+C  DECIDE IF FRSTS,VECTS,LASTS CALL
+C
+      GO TO ( 10, 20, 40),IENT
+   10 DEG = 180./PI
+      X = XX
+      Y = YY
+      LASTFL = 0
+      SSLP1 = 0.0
+      SSLPN = 0.0
+      XSVN = 0.0
+      YSVN = 0.0
+C
+C INITIALIZE THE POINT AND SEGMENT COUNTER
+C N COUNTS THE NUMBER OF POINTS/SEGMENT
+C
+      N = 0
+C
+C NSEG = 0       FIRST SEGMENT
+C NSEG = 1       MORE THAN ONE SEGMENT
+C
+      NSEG = 0
+      CALL TR32 (X,Y,MX,MY)
+C
+C SAVE THE X,Y COORDINATES OF THE FIRST POINT
+C XSV1           CONTAINS THE X COORDINATE OF THE FIRST POINT
+C                OF A LINE
+C YSV1           CONTAINS THE Y COORDINATE OF THE FIRST POINT
+C                OF A LINE
+C
+      XSV1 = MX
+      YSV1 = MY
+      GO TO  30
+C
+C ************************* ENTRY VECTS *************************
+C     ENTRY VECTS (XX,YY)
+C
+   20 X = XX
+      Y = YY
+C
+C VECTS          SAVES THE X,Y COORDINATES OF THE ACCEPTED
+C                POINTS ON A LINE SEGMENT
+C
+      CALL TR32 (X,Y,MX,MY)
+C
+CIF THE NEW POINT IS TOO CLOSE TO THE PREVIOUS POINT, IGNORE IT
+C
+      IF (ABS(FLOAT(IFIX(XSVN)-MX))+ABS(FLOAT(IFIX(YSVN)-MY)) .LT.
+     1    SMALL) RETURN
+      IFLAG = 0
+   30 N = N+1
+C
+C SAVE THE X,Y COORDINATES OF EACH POINT OF THE SEGMENT
+C XSAVE          THE ARRAY OF X COORDINATES OF LINE SEGMENT
+C YSAVE          THE ARRAY OF Y COORDINATES OF LINE SEGMENT
+C
+      XSAVE(N) = MX
+      YSAVE(N) = MY
+      XSVN = XSAVE(N)
+      YSVN = YSAVE(N)
+      IF (N .GE. L1-1) GO TO  50
+      RETURN
+C
+C ************************* ENTRY LASTS *************************
+C     ENTRY LASTS
+C
+   40 LASTFL = 1
+C
+C LASTS          CHECKS FOR PERIODIC LINES AND SETS UP
+C                  THE CALLS TO KURV1S AND KURV2S
+C
+C IFLAG = 0      OK TO CALL LASTS DIRECTLY
+C IFLAG = 1      LASTS WAS JUST CALLED FROM BY VECTS
+C                IGNORE CALL TO LASTS
+C
+      IF (IFLAG .EQ. 1) RETURN
+C
+C COMPARE THE LAST POINT OF SEGMENT WITH FIRST POINT OF LINE
+C
+   50 IFLAG = 1
+C
+C IPRD = 0       PERIODIC LINE
+C IPRD = 1       NON-PERIODIC LINE
+C
+      IPRD = 1
+      IF (ABS(XSV1-XSVN)+ABS(YSV1-YSVN) .LT. SMALL) IPRD = 0
+C
+C TAKE CARE OF THE CASE OF ONLY TWO DISTINCT P0INTS ON A LINE
+C
+      IF (NSEG .GE. 1) GO TO  70
+      IF (N-2) 160,150, 60
+   60 IF (N .GE. 4) GO TO  70
+      DX = XSAVE(2)-XSAVE(1)
+      DY = YSAVE(2)-YSAVE(1)
+      SLOPE = ATAN2(DY,DX)*DEG+90.
+      IF (SLOPE .GE. 360.) SLOPE = SLOPE-360.
+      IF (SLOPE .LE. 0.) SLOPE = SLOPE+360.
+      SLP1 = SLOPE
+      SLPN = SLOPE
+      ISLPSW = 0
+      SIGMA = TENSN
+      GO TO 110
+   70 SIGMA = TENSN
+      IF (IPRD .GE. 1) GO TO  90
+      IF (NSEG .GE. 1) GO TO  80
+C
+C SET UP FLAGS FOR A  1  SEGMENT, PERIODIC LINE
+C
+      ISLPSW = 4
+      XSAVE(N) = XSV1
+      YSAVE(N) = YSV1
+      GO TO 110
+C
+C SET UP FLAGS FOR AN N-SEGMENT, PERIODIC LINE
+C
+   80 SLP1 = SSLPN
+      SLPN = SSLP1
+      ISLPSW = 0
+      GO TO 110
+   90 IF (NSEG .GE. 1) GO TO 100
+C
+C SET UP FLAGS FOR THE 1ST SEGMENT OF A NON-PERIODIC LINE
+C
+      ISLPSW = 3
+      GO TO 110
+C
+C SET UP FLAGS FOR THE NTH SEGMENT OF A NON-PERIODIC LINE
+C
+  100 SLP1 = SSLPN
+      ISLPSW = 1
+C
+C CALL THE SMOOTHING ROUTINES
+C
+  110 CALL KURV1S (N,XSAVE,YSAVE,SLP1,SLPN,XP,YP,TEMP,S,SIGMA,ISLPSW)
+      IF (IPRD.EQ.0 .AND. NSEG.EQ.0 .AND. S.LT.70.) GO TO 170
+      IENTRY = 1
+C
+C DETERMINE THE NUMBER OF POINTS TO INTERPOLATE FOR EACH SEGMENT
+C
+      IF (NSEG.GE.1 .AND. N.LT.L1-1) GO TO 120
+      NPRIME = FLOAT(NP)-(S*FLOAT(NP))/(2.*32768.)
+      IF (S .GE. 32768.) NPRIME = .5*FLOAT(NP)
+      NPL = FLOAT(NPRIME)*S/32768.
+      IF (NPL .LT. 2) NPL = 2
+  120 DT = 1./FLOAT(NPL)
+      IF (NSEG .LE. 0) CALL FRSTC (IFIX(XSAVE(1)),IFIX(YSAVE(1)),1)
+      T = 0.0
+      NSLPSW = 1
+      IF (NSEG .GE. 1) NSLPSW = 0
+      NSEG = 1
+      CALL KURV2S (T,XS,YS,N,XSAVE,YSAVE,XP,YP,S,SIGMA,NSLPSW,SLP)
+C
+C SAVE SLOPE AT THE FIRST POINT OF THE LINE
+C
+      IF (NSLPSW .GE. 1) SSLP1 = SLP
+      NSLPSW = 0
+      XSOLD = XSAVE(1)
+      YSOLD = YSAVE(1)
+      DO 130 I=1,NPL
+         T = T+DT
+         TT = -T
+         IF (I .EQ. NPL) NSLPSW = 1
+         CALL KURV2S (TT,XS,YS,N,XSAVE,YSAVE,XP,YP,S,SIGMA,NSLPSW,SLP)
+C
+C SAVE THE LAST SLOPE OF THIS LINE SEGMENT
+C
+         IF (NSLPSW .GE. 1) SSLPN = SLP
+C
+C DRAW EACH PART OF THE LINE SEGMENT
+C
+         CALL FRSTC (IFIX(AVE(XSOLD,XS)),IFIX(AVE(YSOLD,YS)),2)
+         CALL FRSTC (IFIX(XS),IFIX(YS),2)
+         XSOLD = XS
+         YSOLD = YS
+  130 CONTINUE
+      IF (IPRD .NE. 0) GO TO 140
+C
+C CONNECT THE LAST POINT WITH THE FIRST POINT OF A PERIODIC LINE
+C
+      CALL FRSTC (IFIX(AVE(XSOLD,XS)),IFIX(AVE(YSOLD,YS)),2)
+      CALL FRSTC (IFIX(XSV1),IFIX(YSV1),2)
+C
+C BEGIN THE NEXT LINE SEGMENT WITH THE LAST POINT OF THIS SEGMENT
+C
+  140 XSAVE(1) = XS
+      YSAVE(1) = YS
+      N = 1
+  150 CONTINUE
+  160 RETURN
+  170 N = 0
+      RETURN
+      END
+      SUBROUTINE FRSTC (MX,MY,IENT)
+      SAVE
+C
+      COMMON /ISOSR2/ LX         ,NX         ,NY         ,ISCR(8,128),
+     1                ISCA(8,128)
+      COMMON /ISOSR4/ RX         ,RY
+      COMMON /ISOSR5/ NBPW       ,MASK(16)   ,GENDON
+      LOGICAL         GENDON
+      COMMON /ISOSR8/ NMASK(16)  ,IXOLD      ,IYOLD      ,IBTOLD     ,
+     1                HBFLAG     ,IOSLSN     ,LRLX       ,IFSX       ,
+     2                IFSY       ,FIRST      ,IYDIR      ,IHX        ,
+     3                IHB        ,IHS        ,IHV        ,IVOLD      ,
+     4                IVAL       ,IHRX       ,YCHANG     ,ITPD       ,
+     5                IHF
+      LOGICAL         YCHANG     ,HBFLAG     ,FIRST      ,IHF
+C
+C
+C  DRAW LINE TO THE POINT MX,MY
+C
+C  ENTER THE POINT INTO THE CURRENT SCREEN, ISCR, IF THE POINT CONFORMS
+C  TO THE SHADING ALGORITHM.
+C  THE POINT IS NOT ENTERED WHEN;
+C  1. IT IS THE SAME POINT USED IN THE LAST CALL, RESOLUTION PROBLEM
+C  2. IT IS PART OF A HORIZONTAL LINE BUT NOT AN END POINT
+C  3.  THE ENTIRE CONTOUR RESTS ON A HORIZONTAL PLANE
+C
+C  WHEN DRAWING A HORIZONTAL LINE THREE CONDITIONS EXIST;
+C  1. WHEN THE LINE IS A HORIZONTAL STEP ENTER ONLY THE OUTSIDE POINT.
+C     A HORIZONTAL STEP IS DEFINED BY THE ENTERING AND EXITING Y
+C     DIRECTION THAT IS THE SAME.
+C  2. ENTER BOTH END POINTS OF A HORIZONTAL TURNING POINT. A HORIZONTAL
+C     TURNING POINT IS A LINE WITH GREATER THAN 1 HORIZONTAL BITS
+C     AND THE ENTERING AND EXITING Y DIRECTION IS DIFFIRENT.
+C  3.  WHEN THE ENTIRE CONTOUR IS A HORIZONTAL LINE NO POINTS ARE
+C      ENTERED. THIS CONDITION IS DETECTED BY THE STATUS OF YCHANG.
+C      IF IT IS TRUE THEN THE CONTOUR IS NOT A SINGLE HORIZONTAL LINE.
+C
+C  THE PREVIOUS POINT IS ERASED IF IT IS A VERTICAL TURNING POINT.
+C  A VERTICAL TURNING POINT IS A HORIZONTAL LINE WITH ONLY 1 POINT
+C  AND THE ENTERING AND EXITING Y DIRECTION DIFFERS.THIS DATA IS
+C  IN THE VARIABLES IOSLSN-OLD SLOPE AND ISLSGN-NEW SLOPE.
+C  THE CHANGE IN SLOPE MUST BE -1 TO 1 OR 1 TO -1.
+C
+C  OTHERWISE THE POINT IS ENTERED INTO ISCR.
+C
+C  THE TWO ENTRY POINTS ARE REQUIRED BY THE HARDWARE DRAWING ROUTINES.
+C  FIRSTC IS USED FOR THE FIRST POINT ON THE CONTOUR. THE REMAINING
+C  POINTS ON THE SAME CONTOUR ARE ENTERED VIA VECTC.
+C
+      DATA IONE/1/
+      AVE(A,B) = (A+B)*.5
+C
+C  COMPUTE VISIBILITY OF THIS POINT
+C
+C  WARNING
+C  IF X OR Y PLOTTER MAXIMUM VALUE RANGES FALL BELOW 101 THEN THE
+C  FOLLOWING TWO STATEMENTS WHICH SET IX AND IY MUST BE CHANGED.
+C  REPLACE THE CONSTANT 1.0 BY 0.5 IN THE STATEMENTS WHERE THE
+C  MAXIMUM PLOTTER VALUE IS LESS THAN 101 FOR THAT DIRECTION.  THE
+C  PLOTTER CORDINATE RANGES ARE SET IN SET32.
+C
+      IX = FLOAT(MX-1)*RX+1.0
+      NRLX = IX
+      IY = FLOAT(MY-1)*RY+1.0
+      IBIT = NBPW-MOD(IX,NBPW)
+      IX = IX/NBPW+1
+      IVNOW = IAND(ISHIFT(ISCA(IX,IY),1-IBIT),IONE)
+C
+C  DECIDE IF FRSTC OR VECTC CALL
+C
+      IF (IENT .NE. 1) GO TO  10
+C
+      XOLD = MX
+      YOLD = MY
+C
+C
+C  SET INITIAL VALUES
+C
+      IHF = .FALSE.
+      IYDIR = 0
+      ITPD = 0
+      IVAL = 0
+      IOSLSN = 0
+      IFSX = NRLX
+      IFSY = IY
+      LASTV = IVNOW
+      HBFLAG = .FALSE.
+      YCHANG = .FALSE.
+      CALL PLOTIT (IFIX(XOLD),IFIX(YOLD),0)
+      GO TO 180
+C
+C****************************  ENTRY VECTC  ****************************
+C     ENTRY VECTC (MX,MY)
+C
+   10 XNOW = MX
+      YNOW = MY
+      JUMP = IVNOW*2+LASTV+1
+      GO TO ( 20, 30, 40, 50),JUMP
+C
+C BOTH VISIBLE
+C
+   20 CALL PLOTIT (IFIX(XNOW),IFIX(YNOW),1)
+      GO TO  50
+C
+C JUST TURNED VISIBLE
+C
+   30 CALL PLOTIT (IFIX(AVE(XNOW,XOLD)),IFIX(AVE(YNOW,YOLD)),0)
+      GO TO  50
+C
+C JUST TURNED INVISIBLE
+C
+   40 CALL PLOTIT (IFIX(AVE(XNOW,XOLD)),IFIX(AVE(YNOW,YOLD)),1)
+C
+C BOTH INVISIBLE
+C
+   50 XOLD = XNOW
+      YOLD = YNOW
+      LASTV = IVNOW
+C
+C  TEST FOR RESOLUTION PROBLEM
+C
+      IF (NRLX.EQ.LRLX .AND. IY.EQ.IYOLD) RETURN
+C
+C  TEST FOR HORIZONTAL BITS
+C
+      IF (IYOLD .NE. IY) GO TO  70
+C
+C  HORIZONTAL BITS DETECTED. SET FLAG AND EXIT.
+C  THIS AND THE NEXT HORIZONTAL BIT TEST IS NECESSARY FOR ISCR TO
+C  CONFORM TO THE SHADING ALGORITHM IN SUBROUTINE FILLIN
+C
+C
+C  IF HORIZONTAL LINE PREVIOUSLY DETECTED EXIT
+C
+      IF (.NOT.HBFLAG) GO TO  60
+C
+C  IF END OF CONTOUR ON A HORIZONTAL LINE BRANCH FOR SPECIAL PROCESSING.
+C
+      IF (NRLX.EQ.IFSX .AND. IY.EQ.IFSY) GO TO 210
+      GO TO 200
+C
+C  SAVE SLOPE PRIOR TO HORIZONTAL LINE
+C
+   60 IHX = IXOLD
+      IHB = IBTOLD
+      IHS = IOSLSN
+      IOSLSN = 0
+      HBFLAG = .TRUE.
+      IHRX = LRLX
+      IHV = IVOLD
+      IF (LRLX.EQ.IFSX .AND. IYOLD.EQ.IFSY) IHF = .TRUE.
+C
+C  THIS IS THE SECOND TRAP FOR END OF CONTOUR ON A HORIZONTAL LINE.
+C
+      IF (NRLX.EQ.IFSX .AND. IY.EQ.IFSY) GO TO 210
+      GO TO 200
+C
+C  COMPUTE THE SLOPE TO THIS POINT
+C
+   70 IF (IY-IYOLD)  80, 90,100
+   80 ISLSGN = 1
+      GO TO 110
+   90 ISLSGN = 0
+      GO TO 120
+  100 ISLSGN = -1
+  110 IF (IYDIR .EQ. 0) IYDIR = ISLSGN
+  120 CONTINUE
+C
+C  IF PROCESS REACHES THIS CODE THE CONTOUR IS NOT CONTAINED ON A SINGLE
+C  HORIZONTAL  PLANE, SO RECORD THIS FACT BY SETTING Y CHANGE FLAG.
+C
+      YCHANG = .TRUE.
+C
+C  TEST FOR END OF HORIZONTAL LINE
+C
+      IF (.NOT.HBFLAG) GO TO 160
+      HBFLAG = .FALSE.
+C
+C  HORIZONTAL LINE JUST ENDED
+C
+C  TEST FOR REDRAW
+C
+      ITEMP = IAND(ISCR(IXOLD,IYOLD),MASK(IBTOLD))
+      IF ((IHV .EQ. 0) .AND. (ITEMP .EQ. 0)) GO TO 130
+C
+C  REDRAWING ERASE THIS POINT
+C
+      ISCR(IXOLD,IYOLD) = IAND(ISCR(IXOLD,IYOLD),NMASK(IBTOLD))
+      ISCR(IHX,IYOLD) = IAND(ISCR(IHX,IYOLD),NMASK(IHB))
+      GO TO 170
+C
+C  TEST FOR STEP PROBLEM
+C
+  130 IF (IHS .NE. ISLSGN) GO TO 140
+C
+C  STEP PROBLEM
+C
+      GO TO 170
+C
+C  TURNING PROBLEM HORIZONTAL LINE IS A TURNING POINT
+C
+  140 CONTINUE
+C
+C  ENTER THE TURNING POINT ONLY IF IT IS NOT THE SECOND SUCCEEDING
+C  EVENT IN A ROW
+C
+      ICTPD = 1
+      IF (IHRX .GT. NRLX) ICTPD = -1
+      IF (ICTPD .NE. ITPD) GO TO 150
+      ITPD = 0
+C
+C  ERASE THE FIRST POINT
+C
+      ISCR(IHX,IYOLD) = IAND(ISCR(IHX,IYOLD),NMASK(IHB))
+      GO TO 170
+C
+C  ENTER THE TURNING POINT
+C
+  150 CONTINUE
+      ITPD = ICTPD
+C
+C  ENTER THE SECOND POINT
+C
+      ISCR(IXOLD,IYOLD) = IOR(ISCR(IXOLD,IYOLD),MASK(IBTOLD))
+      GO TO 170
+C
+C  CHECK IF PREVIOUS ENTRY WAS A VERTICAL TURNING POINT.
+C  IF SO ERASE IT.
+C
+  160 IF (ISLSGN.EQ.IOSLSN .OR. (IOSLSN.EQ.0 .OR. ISLSGN.EQ.0))
+     1    GO TO 170
+      ITPD = 0
+      ISCR(IXOLD,IYOLD) = IAND(ISCR(IXOLD,IYOLD),NMASK(IBTOLD))
+C
+  170 IOSLSN = ISLSGN
+C
+C  CHECK IF THIS GRID POINT PREVIOUSLY ACTIVATED
+C
+      IVAL = IAND(ISCR(IX,IY),MASK(IBIT))
+C
+C  IF GRID POINTS ACTIVATED BRANCH
+C
+      IF (IVAL .NE. 0) GO TO 190
+C
+C  GRID POINT NOT ACTIVATED   SET AND EXIT
+C
+  180 CONTINUE
+      ISCR(IX,IY) = IOR(ISCR(IX,IY),MASK(IBIT))
+      GO TO 200
+C
+C  THIS POINT IS BEING REDRAWN SO ERASE IT.
+C  (THIS IS TO CONFORM WITH THE SHADING ALGORITHM, FILLIN.
+C  HOWEVER IF BACK TO STARTING POINT DO NOT ERASE
+C
+  190 IF (NRLX.EQ.IFSX .AND. IY.EQ.IFSY) RETURN
+      ISCR(IX,IY) = IAND(ISCR(IX,IY),NMASK(IBIT))
+C
+C
+  200 IXOLD = IX
+      LRLX = NRLX
+      IYOLD = IY
+      IBTOLD = IBIT
+      IVOLD = IVAL
+      RETURN
+C
+C  PERFORM THIS OPERATION WHEN A CONTOUR STARTS OR ENDS ON A HORIZONTAL
+C  LINE.
+C
+  210 CONTINUE
+C
+C  ERASE THE FIRST POINT OF A CONTOUR WHEN IT IS PART OF A HORIZONTAL
+C  LINE SEGMENT AND IS NOT THE ENDPOINT OF THE SEGMENT
+C
+      IF (.NOT.IHF) GO TO 220
+      ISCR(IX,IY) = IAND(ISCR(IX,IY),NMASK(IBIT))
+  220 CONTINUE
+C
+C  ERASE THE FIRST POINT OF A HORIZONTAL LINE SEGMENT WHEN IT ENDS
+C  THE CONTOUR AND IS NOT THE HIGHEST LINE SEG ON THS SIDE.
+C
+      IF (.NOT.YCHANG) GO TO 230
+      IF (IYDIR .NE. IHS) GO TO 200
+  230 ISCR(IHX,IY) = IAND(ISCR(IHX,IY),NMASK(IHB))
+      GO TO 200
+      END
+      SUBROUTINE FILLIN
+C
+      SAVE
+      COMMON /ISOSR2/ LX         ,NX         ,NY         ,ISCR(8,128),
+     1                ISCA(8,128)
+      COMMON /ISOSR5/ NBPW       ,MASK(16)   ,GENDON
+      LOGICAL         GENDON
+      COMMON /ISOSR7/ IENTRY     ,IONES
+C
+      IF (IENTRY .EQ. 0) RETURN
+C
+C  THIS IS A SHADING ALGORITHM IT IS USED TO DETERMINE CONTOUR LINES
+C  THAT ARE HIDDEN BY THE PRESENT LINE. THE ALGORITHM PROCESSES
+C  HORIZONTAL ROWS. IT ASSUMES THAT THE BIT PATTERN PASSED TO IT
+C  HAS ONLY BITS SET TO MARK THE START AND END OF SHADING. THE
+C  ALGORITHM ALSO ASSUMES THAT WHEN AN ON BIT IS ENCOUNTERED THAT A
+C  CORRESPONDING OFF BIT IS INCLUDED IN THE SAME ROW.
+C
+C
+C  PULL OUT ROWS OF THE CONTOUR PATTERN
+C
+      IBVAL = 0
+      DO  80 IYNOW=1,NY
+         DO  40 IXNOW=1,LX
+C
+C  IF NO ACTIVATED BITS BRANCH
+C
+            ICRWD = ISCR(IXNOW,IYNOW)
+            IF (ICRWD .EQ. 0) GO TO  30
+C
+C  ACTIVATED BITS IN WORD SET SHADING FLAG
+C
+C  CHECK BIT BY BIT FOR ON/OFF FLAGS
+C
+            DO  20 IB=1,NBPW
+               IBIT = (NBPW+1)-IB
+C
+C
+C  PULL OUT THE CURRENT GRID POINT VALUE
+C
+               IVAL = IAND(ICRWD,MASK(IBIT))
+C
+C  IF IVAL SET, THIS IS AN ON/OFF FLAG
+C
+               IF (IVAL .EQ. 0) GO TO  10
+C
+C  FLAG BIT, ALWAYS SET
+C
+               IBVAL = MOD(IBVAL+1,2)
+               GO TO  20
+C
+C  SHADE THE SCREEN ACCORDING TO THE STATUS OF IBVAL
+C
+   10          IF (IBVAL .NE. 0) ICRWD = IOR(ICRWD,MASK(IBIT))
+C
+   20       CONTINUE
+C
+C  ZERO OUT THE SCREEN
+C
+            ISCR(IXNOW,IYNOW) = 0
+            ISCA(IXNOW,IYNOW) = IOR(ICRWD,ISCA(IXNOW,IYNOW))
+            GO TO  40
+C
+   30       IF (IBVAL .NE. 0) ISCA(IXNOW,IYNOW) = IONES
+   40    CONTINUE
+C
+C  FIX FOR NONCORRECTABLE RUNAWAYS
+C
+         IF (IBVAL .EQ. 0) GO TO  80
+         IBVAL = 0
+         DO  70 K=1,LX
+            ITEST = 0
+            IF (IYNOW .EQ. 1) GO TO  50
+            ITEST = ISCA(K,IYNOW-1)
+            IF (IYNOW .EQ. NY) GO TO  60
+   50       ITEST = IOR(ITEST,ISCA(K,IYNOW+1))
+   60       ISCA(K,IYNOW) = ITEST
+   70    CONTINUE
+C
+   80 CONTINUE
+      RETURN
+      END
+      SUBROUTINE DRAWI (IXA,IYA,IXB,IYB)
+C
+C INCLUDED FOR USE BY PWRZ
+C
+      SAVE
+      CALL FRSTC (IXA,IYA,1)
+      CALL FRSTC (IXB,IYB,2)
+      RETURN
+      END
+      SUBROUTINE MMASK
+C
+C  MAKE THE MACHINE DEPENDENT MASKS USED IN THE CONTOUR DRAWING
+C  AND SHADING ALGORITHMS
+C
+      SAVE
+      COMMON /ISOSR5/ NBPW       ,MASK(16)   ,GENDON
+      LOGICAL         GENDON
+      COMMON /ISOSR7/ IENTRY     ,IONES
+      COMMON /ISOSR8/ NMASK(16)  ,IXOLD      ,IYOLD      ,IBTOLD     ,
+     1                HBFLAG     ,IOSLSN     ,LRLX       ,IFSX       ,
+     2                IFSY       ,FIRST      ,IYDIR      ,IHX        ,
+     3                IHB        ,IHS        ,IHV        ,IVOLD      ,
+     4                IVAL       ,IHRX       ,YCHANG     ,ITPD       ,
+     5                IHF
+      COMMON /ISOSR9/ BIG        ,IXBIT
+      LOGICAL         YCHANG     ,HBFLAG     ,FIRST      ,IHF
+      GENDON = .TRUE.
+      NBPW = 16
+C
+C  GET BIGGEST REAL NUMBER
+C
+      BIG = R1MACH(2)
+C
+C  MASKS TO SELECT A SPECIFIC BIT
+C
+      DO  10 K=1,NBPW
+         MASK(K) = ISHIFT(1,K-1)
+   10 CONTINUE
+C
+C  GENERATE  THE BIT PATTERN 177777 OCTAL
+C
+      ITEMP1 = 0
+      ITEMP = MASK(NBPW)
+      IST = NBPW-1
+      DO  20 K=1,IST
+         ITEMP1 = IOR(ITEMP,ISHIFT(ITEMP1,-1))
+   20 CONTINUE
+      MFIX = IOR(ITEMP1,1)
+C
+C  MASKS TO CLEAR A SPECIFIC BIT
+C
+      DO  30 K=1,NBPW
+         NMASK(K) = IAND(ITEMP1,MFIX)
+         ITEMP1 = IOR(ISHIFT(ITEMP1,1),1)
+   30 CONTINUE
+      IONES = MFIX
+      RETURN
+C
+C REVISION HISTORY---
+C
+C JANUARY 1978     DELETED REFERENCES TO THE  *COSY  CARDS AND
+C                  ADDED REVISION HISTORY
+C JANUARY 1979     NEW SHADING ALGORITHM
+C MARCH 1979       MADE CODE MACHINE INDEPENDENT AND CONFORM
+C                  TO 66 FORTRAN STANDARD
+C JUNE 1979        THIS VERSION PLACED ON ULIB.
+C SEPTEMBER 1979   FIXED PROBLEM IN EZISOS DEALING WITH
+C                  DETERMINATION OF VISIBILITY OF W PLANE.
+C DECEMBER 1979    FIXED PROBLEM WITH PEN DOWN ON CONTOUR
+C                  INITIALIZATION IN SUBROUTINE FRSTC
+C MARCH            CHANGED ROUTINE NAMES  TRN32I  AND  DRAW  TO
+C                  TRN32I  AND  DRAWI  TO BE CONSISTENT WITH THE
+C                  USAGE OF THE NEW ROUTINE  PWRZI.
+C JUNE  1980       FIXED PROBLEM WITH ZERO INDEX COMPUTATION IN
+C                  SUBROUTINE FRSTC.  ADDED INPUT PARAMETER
+C                  DIMENSION STATEMENT MISSING IN EZISOS.
+C                  FIXED ERROR IN COMPUTATION OF ARCCOSINE
+C                  IN EZISOS AND TRN32I.
+C DECEMBER 1984    CONVERTED TO GKS LEVEL 0A AND STANDARD FORTRAN 77
+C-----------------------------------------------------------------------
+C
+      END

@@ -1,0 +1,26 @@
+
+mefwrhdr.x
+	Previuolsy we changed the value of INHERIT to NO. Now we pass
+	the card to the output file unchanged with the exception when
+	the output file is new, then we do not pass it along. 3/4/98
+
+mefrdhdr.x
+	When a kernel section is given in the input file, it is
+	necessary to read the entire header in memory rather
+	than the 1st block. An error was found trying to get EXTNAME
+	value when the keyword was not located in the 1st block.
+	nz 10/2/03
+mefldhdr.x
+	New routine to read the entire header in memory. 10.02.03
+
+==================================================
+
+mefrdhdr.x
+	Change mef_rdhdr...() to be a function now rather than a
+	procedure. This way we can return and EOF value to the
+	calling routine.
+	revised. Used mef_ldhdr() now and discard rd1st and rd2end.
+	Took out any eprintf statement and made the code much simpler.
+	Jan.7.04
+
+

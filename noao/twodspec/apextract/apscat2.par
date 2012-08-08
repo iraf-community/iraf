@@ -1,0 +1,10 @@
+# APSCAT2
+
+function,s,h,"spline3","spline3|legendre|chebyshev|spline1",,Fitting function
+order,i,h,1,1,,Order of fitting function
+sample,s,h,"*",,,Sample points to use in fit
+naverage,i,h,1,,,Number of points in sample averaging
+low_reject,r,h,3.,0.,,Low rejection in sigma of fit
+high_reject,r,h,3.,0.,,High rejection in sigma of fit
+niterate,i,h,0,0,,Number of rejection iterations
+grow,r,h,0.,0.,,Rejection growing radius in pixels

@@ -1,0 +1,29 @@
+.help next Feb86 language
+.ih
+NAME
+next -- start the next iteration of a for or while loop
+.ih
+USAGE
+next
+.ih
+DESCRIPTION
+The \fInext\fR statement begins the next iteration of the loop construct
+in which it is enclosed, without executing any of the statements remaining
+before the end of the loop.
+.ih
+EXAMPLES
+1. Sum the pixels in a two dimensional array.  Skip any negative valued pixels.
+
+.nf
+	for (i=1;  i <= NCOLS;  i+=1) {
+	    for (j=1;  j <= NLINES;  j+=1) {
+		if (pixel[i,j] < 0)
+		    next
+		total += pixel[i,j]
+	    }
+	}
+.fi
+.ih
+SEE ALSO
+break, while, for
+.endhelp

@@ -1,0 +1,433 @@
+# IMAGES.DAT -- Database of known formats recognized by the IMPORT task.
+#
+#  Each record of the database is of the form:
+# 
+#         <format_name>:
+#         <alias>:
+#         <alias>:
+#                 keyword = <expr>
+#                 keyword = <expr>
+#                    ...and so on
+# 
+#  A database record begins with the format name at the beginning of a line.
+#  Whitespace at the beginning of a line is considered the continuation of a
+#  previous line.  Comments may be inserted in the database using the normal '#'
+#  character, the remainder of the line is considered a comment.  Blank lines
+#  and comments are ignored, a record ends at the next line with a format name
+#  at the beginning of the line.
+#
+#         The format_name field is a string identifying each entry in the
+#  database, an alias may also be given to identify the same field if known
+#  by another name. Supported keywords include:
+# 
+#         image_id   - A boolean expression identifying the image type, either
+#                      using a literal string or one of the provided functions
+#         id_string  - Verbose name of file format
+#         bswap      - Is file byte-swapped? (See Below)
+#         dims       - A whitespace/comma delimited string of image dimension
+#         pixtype    - Pixel type, size [and tag], may be a composite
+#         interleave - Describes how pixels are stored
+#         hskip      - # of bytes of header info to skip
+#         tskip      - # of bytes of trailing info to skip at end of file
+#         bskip      - # of bytes of info to skip between image bands
+#         lskip      - # of bytes of info to skip at the front of each line
+#         lpad       - # of bytes of info to skip at the end of each line
+#         yflip      - Image is flipped relative to normal IRAF orientation
+#	  comment    - (Multiple) informational comment string to be printed, 
+#		       e.g. to warn the user about the pixel ordering. 
+#         error      - A condition that would cause a file read error, returns
+#                      a string with the error message, otherwise NULL
+#
+#  Expressions include not only functions supported by the system expression
+#  evaluator but also special functions particular to the IMPORT task.  The
+#  user is referred to the IMPORT help page for more details on the database
+#  functions.
+#
+#  Expressions may also contain *previously defined* database fields, so for
+#  instance the 'hskip' keyword can be computed in an expression using the
+#  value of the 'pixtype' keyword.  Additionally, several special operands are
+#  also supported and may be used in expressions:
+#
+#	$FSIZE			- the size in bytes of the binary file
+#	$FNAME			- the name of the binary file
+
+
+
+avs:						# AVS X image file
+mbfx:
+mbfavs:
+x:
+    image_id = ($FSIZE - (geti4(1) * geti4(5) * 4) == 8)
+    id_string = "AVS X Image Format file"
+    dims = (str(geti4(1)) // "," // str(geti4(5))) // ",4"
+    pixtype = "x1,b1,b1,b1"
+    hskip = 8
+    yflip = 1
+    comment = "Note: The first band of this image is an alpha channel."
+
+
+clementine:					# CLEMENTINE mission image
+pds3:
+    image_id = (getstr(1,23) == "PDS_VERSION_ID   = PDS3")
+    id_string = "CLEMENTINE 1 PDS3 image data file"
+    pixtype = "b1"
+    hskip = int(locate(1,"OBJECT = IMAGE\r\n")+16)
+    bskip = int(locate(hskip,"LINE_SAMPLES"))
+    lskip = int(locate(hskip,"LINES"))
+#   dims = ((str(ctoi((locate(hskip,"LINE_SAMPLES")+17)))) // "," // 
+#	    (str(ctoi((locate(hskip,"LINES")+17)))) )
+    dims = ((str(ctoi((locate(bskip,"=")+1)))) // "," // 
+ 	    (str(ctoi((locate(lskip,"=")+1)))) )
+    hskip = (ctoi(locate(1,"^IMAGE    ")+18))
+    bskip = 0
+    lskip = 0
+    yflip = 0
+
+
+export:						#  EXPORT task output format
+    image_id = (getstr(1,15) == "format = EXPORT")
+    id_string = "IRAF EXPORT file (with header)"
+    bswap = (getstr(locate(1,"bswap")+9,locate(1,"bswap")+11) == "no")
+    hskip = ctoi(locate(1,"hdrsize =")+10)
+    pixtype = (getstr(locate(1,"datatype = '")+12,2))
+    dims = ((ctoi(locate(1,"nbands =")+8) > 1) ? 
+	       (str(ctoi(locate(1,"ncols = ")+8)) // "," //
+	   	str(ctoi(locate(1,"nrows = ")+8)) // "," //
+		str(ctoi(locate(1,"nbands = ")+9)))
+	   :   (str(ctoi(locate(1,"ncols = ")+8)) // "," //
+	   	str(ctoi(locate(1,"nrows = ")+8))))
+    interleave = ctoi(locate(1,"interleave =")+13)
+
+
+fits:						# Uhh, use RFITS for this
+    bswap = parameter ("bswap")
+    image_id = (getstr(1,9) == "SIMPLE  =")
+    id_string = "FITS Format image"
+    hskip = ( int (locate(1,"END ") / 2800) ) * 2880
+    pixtype = ( str (ctoi((locate(1,"BITPIX")+10))) )
+    pixtype = ((pixtype == "8" ? "b1" :
+               (pixtype == "16" ? "i2" :
+               (pixtype == "32" ? "i4" :
+               (pixtype == "-32" ? "r4" :
+               (pixtype == "-64" ? "r8" : "0"))))))
+    dims = ((ctoi(locate(1,"NAXIS ")+10) == 3) ? 
+	       (str(ctoi(locate(1,"NAXIS1")+10)) // "," //
+	   	str(ctoi(locate(1,"NAXIS2")+10)) // "," //
+		str(ctoi(locate(1,"NAXIS3")+10)))
+	   :   (str(ctoi(locate(1,"NAXIS1")+10)) // "," //
+	   	str(ctoi(locate(1,"NAXIS2")+10))))
+
+
+gif:						# CompuServe's GIF format
+giff:
+    image_id = ( (getstr(1,6) == "GIF87a") || (getstr(1,6) == "GIF89a") )
+    id_string = "CompuServe GIF Format File"
+    dims = (str((getb(7)+(256*getb(8)))) //","// str((getb(9)+(256*getb(10)))))
+    pixtype = "u1"
+    hskip = 22
+    yflip = 1
+    comment = "Note: Colormap information will automatically be applied."
+
+
+oif:						# An IRAF OIF pixel file
+imh:
+iraf:
+    bswap = (geti2(1) == 26880 &&		# bswap("impix" in SPP chars)
+	     geti2(3) == 27904 &&
+	     geti2(5) == 28672 &&
+	     geti2(7) == 26880 &&
+	     geti2(9) == 30720)
+    image_id = (geti2(1) == 105 &&		# "impix" in SPP chars
+	        geti2(3) == 109 &&
+	        geti2(5) == 112 &&
+	        geti2(7) == 105 &&
+	        geti2(9) == 120)
+    id_string = "IRAF OIF image pixel file"
+    dims = ((geti2(23) == 3) ? 
+	 	(str(geti2(27)) //","// str(geti2(31)) //","// str(geti2(35)))
+	      : (str(geti2(27)) //","// str(geti2(31))) )
+    pixtype =  ((geti2(17) == 3 ? "i2" :
+		(geti2(17) == 4 ? "i4" :
+		(geti2(17) == 5 ? "i4" :
+		(geti2(17) == 6 ? "n4" :
+		(geti2(17) == 7 ? "n8" : ""))))) )
+    hskip = 1024
+    lpad = (geti2(55) - geti2(27))
+    lpad = (lpad * ((geti2(17) == 3 ? (2) :
+		    (geti2(17) == 4 ? (4) :
+		    (geti2(17) == 5 ? (4) :
+		    (geti2(17) == 6 ? (4) :
+		    (geti2(17) == 7 ? (8) : (1))))))) )
+    error = (geti2(23) > 3) ? "Maximum of 3 dimensions supported." : "okay"
+    error = ((geti2(17) > 7) || (geti2(17) < 3)) ? 
+		"Image data type not supported." : "okay"
+
+
+mcidas:                                         # Unidata McIDAS file
+    image_id = (geti4(5) == 4)
+    id_string = "McIDAS"
+    dims = (str(geti4(37)) // "," // str(geti4(33)))
+    pixtype = "b1"
+    hskip = geti4(133)
+    lskip = geti4(57)
+    yflip = 1
+
+
+miff:						# ImageMagick MIFF format
+mif:
+    image_id = (locate(1,"id=ImageMagick") < locate (1,":\n"))
+    id_string = "ImageMagick MIFF format file"
+    hskip = ((locate(1,":\n") + 1) + (ctoi(locate(1,"colors=")+7) * 3) + 1)
+    dims = (str(ctoi(locate(1,"columns=")+8)) // "," // 
+	    str(ctoi(locate(1,"rows=")+5)) )
+    yflip = 1
+    pixtype = (getstr(locate(1,"class=")+6,6) == "Direct" ? "b1,b1,b1" : 
+	       ((ctoi(locate(1,"colors=")+7) > 256) ? "b2" : "b1"))
+    error = locate(1,"compression") > 1 ? 
+		"Compressed files not supported" : "okay"
+    error = ctoi(locate(1,"colors=")+7) > 256 ?
+		"Too many entries in colormap" : "okay"
+    comment = "Note: Colormaps will not be applied to image."
+
+
+pgm:						# PBMPlus PGM format
+rpgm:
+    image_id = (getstr(1,2) == "P5" || getstr(1,2) == "P2")
+    id_string = "PBMPlus PGM format file"
+    pixtype = "b1"
+    hskip = ((str(getstr(line(2),1)) != "#") ?	# see if there's a comment
+	        (int(line(4) - 1))
+	    :	(int(line(5) - 1)) )
+    dims = ((str(getstr(line(2),1)) != "#") ?
+	      (str(ctoi(line(2))) // "," // str(ctoi(locate(line(2)," "))))
+	    : (str(ctoi(line(3))) // "," // str(ctoi(locate(line(3)," ")))) )
+    yflip = 1
+    error = getstr(1,2) == "5P" ? "File is byte-swapped" : "okay"
+    error = getstr(1,2) == "P2" ? "Only raw PGM files are supported." : "okay"
+
+
+ppm:						# PBMPlus PPM format
+pnm:
+rppm:
+    image_id = (getstr(1,2) == "P6" || getstr(1,2) == "P3")
+    id_string = "PBMPlus PPM format file"
+    pixtype = "b1,b1,b1"
+    hskip = ((str(getstr(line(2),1)) != "#") ?	# see if there's a comment
+	        (int(line(4) - 1))
+	    :	(int(line(5) - 1)) )
+    dims = ((str(getstr(line(2),1)) != "#") ?
+	      (str(ctoi(line(2))) // "," // str(ctoi(locate(line(2)," "))))
+	    : (str(ctoi(line(3))) // "," // str(ctoi(locate(line(3)," ")))) )
+    dims = dims // ",3"
+    yflip = 1
+    error = getstr(1,2) == "6P" ? "File is byte-swapped" : "okay"
+    error = getstr(1,2) == "P3" ? "Only raw PGM files are supported." : "okay"
+
+
+rgb:						# SGI RGB format image
+iris:
+sgi:
+    bswap = (getu(1) == bswap(0732b))
+    image_id = (getu(1) == 0732b)
+    id_string = "SGI RGB Image file"
+    dims = ((geti2(5) == 3) ?
+		(str(geti2(7)) // "," // str(geti2(9)) // "," // str(geti2(11)))
+	    :   (str(geti2(7)) // "," // str(geti2(9))) )
+    pixtype = "b1"
+    hskip = 512
+    interleave = 0
+    error = (geti2(3) == 3) ? "Colormap files not supported" : "okay"
+    error = ((geti2(3) != 0) && (geti2(3) != 1)) ? 
+		"Format of RGB file not supported" : "okay"
+    error = (geti2(3) == 257) ? "RLE compressed files not supported" : "okay"
+
+
+sunras:						# Sun rasterfile
+ras:
+    bswap = (geti4(1) == bswap(59a66a95x))
+    image_id = (geti4(1) == 59a66a95x || bswap)
+    id_string = "Sun Rasterfile"
+    dims = (str(geti4(5)) // "," // str(geti4(9)) //
+	      ((geti4(13) > 8) ? ("," // str(3)) : " ") )
+    pixtype = ((geti4(13) == 8   ? "b1" :
+	       (geti4(13) == 24 ? "b1,b1,b1" : 
+	       (geti4(13) == 32 ? "x1,b1,b1,b1" : "x1,b1,b1,b1") )) )
+    interleave = 0
+    hskip = (32 + geti4(29))
+    yflip = 1
+    comment = "Note: Colormaps will automatically be applied to 8-bit images."
+    error = geti4(13) == 1 ? "1-bit rasters not supported." : "okay"
+
+
+iff:						# Sun TAAC Image File Format
+taac:
+vff:
+suniff:
+    image_id = (getstr(1,4) == "ncaa")
+    id_string = "Sun TAAC Image File Format"
+    dims = (str(ctoi(locate(1,"size=")+5)) // "," //  
+	    str(ctoi(locate((locate(1,"size=")+5)," "))) )
+    dims = ((ctoi((locate(1,"bands=")+6)) == 3) ?  (dims // ",3") : dims )
+    hskip = $FSIZE - (ctoi(locate(1,"size=")+5) * 
+		 ctoi(locate((locate(1,"size=")+5)," ")) *
+		 ctoi((locate(1,"bands=")+6)) )
+    pixtype = ((ctoi((locate(1,"bands=")+6)) == 3) ?  "b1,b1,b1" : "b1" )
+    yflip = 1
+    comment = "Note: Colormaps will not be applied to 8-bit images."
+
+
+vicar:						# VICAR format file
+    bswap = ( msb_host() && (getstr((locate(1,"INTFMT=")+8),3) == "LOW") )
+    image_id = (getstr(1,8) == "LBLSIZE=")
+    id_string = "VICAR format image data file"
+    hskip = (ctoi((locate(1,"LBLSIZE=")+8)) +
+	(ctoi((locate(1,"NLB=")+4)) * ctoi((locate(1,"RECSIZE=")+8))))
+    lskip = (ctoi((locate(1,"NBB=")+4)))
+    interleave = (((getstr((locate(1,"ORG=")+5),3))) == "BSQ" ? 0 :
+ 	  	  ((getstr((locate(1,"ORG=")+5),3))  == "BIL" ? 
+			ctoi(locate(1,"NB=")+3) : 999) )
+    pixtype = (getstr((locate(1,"FORMAT=")+8),4))
+    pixtype = ((pixtype == "BYTE" ? "b1" :
+               (pixtype == "HALF" ? "i2" :
+               (pixtype == "FULL" ? "i4" :
+               (pixtype == "REAL" ? "r4" :
+               (pixtype == "DOUB" ? "r8" : "0"))))))
+    pixtype = (((interleave) != 999) ? pixtype :
+	       ((ctoi(locate(1,"DIM=")+5) == 2) ? 
+		   pixtype // "," // pixtype :
+	       ((ctoi(locate(1,"DIM=")+5) == 3) ? 
+		   pixtype // "," // pixtype // "," // pixtype :
+	        (pixtype) )) )
+    dims = (((ctoi(locate(1,"DIM=")+4)==3) && (ctoi(locate(1,"N3=")+3)!=1)) ?
+	       (str(ctoi(locate(1,"N1=")+3)) // "," //
+	   	str(ctoi(locate(1,"N2=")+3)) // "," //
+		str(ctoi(locate(1,"N3=")+3)))
+	   :   (str(ctoi(locate(1,"N1=")+3)) // "," //
+	   	str(ctoi(locate(1,"N2=")+3))))
+    yflip = 1
+    error = ((getstr((locate(1,"TYPE=")+6),5) != "IMAGE") ? 
+	"Not a VICAR image file." : "okay")
+    error = ((getstr((locate(1,"FORMAT=")+8),4) == "COMP") ?
+	"Complex image data not supported" : "okay")
+
+
+x10:						# X10 Window Dump file
+x10wd:
+    image_id = (geti4(5) == 6)
+    id_string = "X10 Window Dump file"
+    hskip = ( geti4(1) + (10 * geti2(39)) )
+    pixtype = "b1"
+    dims = (str(geti4(21)) // "," // str(geti4(25)))
+    comment = "Note: Colormaps will not be applied to image."
+
+
+xwd:						# X11 Window Dump file
+x11:
+x11wd:
+    #bswap = ( msb_host() && (geti4(29) == 0) )
+    image_id = (geti4(5) == 7)
+    id_string = "X11 Window Dump file"
+    dims = (str(geti4(17)) // "," // str(geti4(21)))
+    dims = ( (geti4(45) == 24) ? str (dims // ",3") : dims )  # add dims
+    dims = ( (geti4(45) == 32) ? str (dims // ",4") : dims )  # add dims
+    hskip = ( geti4(1) + (12 * geti4(73)) )
+	# On a 64-bit machine the colormap struct is 16 bytes long instead of
+	# 12, see if we have one of these files and pad the header.
+    hskip = ( ((geti4(17)*geti4(21)*(geti4(45)/8)) + hskip) < ($FSIZE-1024) ?
+		(hskip + (4*geti4(73))) : hskip)
+    lpad = ( geti4(49) - (geti4(17) * (geti4(45) / 8)) ) 
+    pixtype = ( (geti4(45) == 8) ? "b1" :
+		(geti4(45) == 24) ? "b1,b1,b1" :
+		(geti4(45) == 32) ? "x1,b1,b1,b1" : "x1,b1,b1,b1" )
+    yflip = 1
+
+
+
+#########################################################################
+#									#
+#  The following database entries are not supported for conversion but  #
+#  are provided for file identification purposes.			#
+#									#
+#########################################################################
+
+
+cmuwmraster:					# CMU Window Manager Raster
+    bswap = (geti4(1) == bswap(00F10040BBx))
+    image_id = (geti4(1) == 00F10040BBx || bswap)
+    id_string = "CMU Window manager Raster file (ID only)"
+    dims = (str(geti4(5)) // "," // str(geti4(9)) // "," // str(geti2(11)))
+    error = (1 == 1) ? "CMU raster supported for file identification only." : 
+		       "okay"
+
+
+fbm:						# Fuzzy Bitmap Format file
+    image_id = (getstr(1,7) == "%bitmap")
+    id_string = "Fuzzy Bitmap Format file (ID only)"
+    dims = (str(ctoi(getstr(17,8))) // "," // str(ctoi(getstr(9,8))))
+    error = (1 == 1) ? "FBM supported for file identification only." : 
+		       "okay"
+
+
+hdf:						# NCSA Hierarchical Data File
+df:
+ncsa:
+    bswap = ( lsb_host() )
+    image_id = (geti4(1) == 0e031301x)
+    id_string = "NCSA Hierarchical Data File (ID only)"
+    dims = (str(geti2(822)) // "," // str(geti2(826)))
+    error = (1 == 1) ? "NCSA HDF supported for file identification only." : 
+		       "okay"
+
+msp:						# Microsoft Paint Bitmap
+    bswap = (geti2(1) == bswap(01800x) || geti2(1) == bswap(0694Cx))
+    image_id = ((geti2(1) == 01800x && geti2(3) == 04D6Ex) ||
+	        (geti2(1) == 0694Cx && geti2(3) == 0536Ex))
+    id_string = "Microsoft Paint Bitmap (ID only)"
+    dims = (str(geti2(5)) // "," // str(geti2(7)))
+    error = (1 == 1) ? "MSP supported for file identification only." : 
+		       "okay"
+
+pcx:						# PC Paintbrush File Format
+dcx:
+pcc:
+    image_id = (getb(1) == 010x)
+    id_string = "PC Paintbrush File (ID only)"
+    dims = (str(geti2(9) - geti2(5) + 1) // "," // 
+            str(geti2(11) - geti2(7) + 1))
+    error = (1 == 1) ? "PC Paintbrush supported for file identification only." :
+		       "okay"
+
+pic:						# Pictor PC Paint
+clp:
+    bswap = (geti2(1) == bswap(01234x))
+    image_id = (geti2(1) == 01234x)
+    id_string = "Pictor PC Paint bitmap (ID only)"
+    dims = (str(geti2(3)) // "," // str(geti2(5)))
+    error = (1 == 1) ? "PC Paint supported for file identification only." : 
+		       "okay"
+
+ps:						# Postscript file
+postscript:
+    image_id = (getstr(1,2) == "%!")
+    id_string = "Postscript file (ID only)"
+    error = (1 == 1) ? "PS supported for file identification only." : 
+		       "okay"
+
+
+rle:						# Utah Raster Toolkit file
+utah:
+    image_id = (getb(1) == 52x || getb(1) == 00CCx)
+    id_string = "Utah Raster Toolkit Format file (ID only)"
+    error = (1 == 1) ? "RLE supported for file identification only." : 
+		       "okay"
+
+
+tif:						# TIFF format file
+tiff:
+    bswap = (geti2(1) == bswap(4949x) || geti2(1) == bswap(4D4Dx))
+    image_id = ((geti2(1) == 4D4Dx && geti2(3) == 002Ax) || 
+		(geti2(1) == 4949x && geti2(3) == 2A00x))
+    id_string = "TIFF Format file (ID only)"
+    error = (1 == 1) ? "TIFF supported for file identification only." : 
+		       "okay"
+

@@ -1,0 +1,31 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# ASQR -- Compute the square root of a vector (generic).  If the square root
+# is undefined (x < 0) a user supplied function is called to compute the value.
+
+procedure asqr$t (a, b, npix, errfcn)
+
+PIXEL	a[ARB], b[ARB]
+int	npix, i
+extern	errfcn()
+PIXEL	errfcn()
+errchk	errfcn
+
+begin
+	do i = 1, npix {
+	    $if (datatype != x)
+		if (a[i] < 0)
+		    b[i] = errfcn (a[i])
+		else
+	    $endif
+		{
+		    $if (datatype == rdx)
+			b[i] = sqrt (a[i])
+		    $else $if (datatype == l)
+			b[i] = sqrt (double (a[i]))
+		    $else
+			b[i] = sqrt (real (a[i]))
+		    $endif $endif
+		}
+	}
+end

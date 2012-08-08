@@ -1,0 +1,29 @@
+# Make CCDRED Package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	ccdred
+	;
+
+install:
+	$move	xx_ccdred.e noaobin$x_ccdred.e
+	;
+
+ccdred:
+	$omake	x_ccdred.x
+	$link	x_ccdred.o libpkg.a -lxtools -lcurfit -lgsurfit -lncar -lgks\
+		-o xx_ccdred.e
+	;
+
+libpkg.a:
+	@src
+	@ccdtest
+	;

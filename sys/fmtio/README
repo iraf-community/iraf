@@ -1,0 +1,6 @@
+This directory contains the IRAF Formatted I/O (FMTIO) routines.  The FMTIO
+package includes the string utilities (str___), character utilities (chr___),
+encode/decode primitives (ctod, itoc, etc.), and the high level SCAN and
+PRINTF routines.  This is a full implementation of FMTIO (excluding the
+language dependent features that will be provided when the full language
+becomes available).

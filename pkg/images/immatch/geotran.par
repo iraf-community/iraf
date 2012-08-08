@@ -1,0 +1,45 @@
+# GEOTRAN Parameters
+
+# required parameters
+input,f,a,,,,Input data
+output,f,a,,,,Output data
+database,f,a,,,,Name of GEOMAP database file
+transforms,s,a,,,,Names of coordinate transforms in database file
+
+# change transformation parameters
+geometry,s,h,"geometric",|linear|geometric|,,"Transformation type (linear,geometric)"
+xin,r,h,INDEF,1.,,X origin of input frame in pixels
+yin,r,h,INDEF,1.,,Y origin of input frame in pixels
+xshift,r,h,INDEF,,,X origin shift in pixels
+yshift,r,h,INDEF,,,Y origin shift in pixels
+xout,r,h,INDEF,1.,,X origin of output frame in reference units
+yout,r,h,INDEF,1.,,Y origin of output frame in reference units
+xmag,r,h,INDEF,,,X scale of input picture in pixels per reference unit
+ymag,r,h,INDEF,,,Y scale of input picture in pixels per reference unit
+xrotation,r,h,INDEF,,,X axis rotation in degrees
+yrotation,r,h,INDEF,,,Y axis rotation in degrees
+
+# output picture format parameters
+xmin,r,h,INDEF,,,Minimum reference x value of output picture
+xmax,r,h,INDEF,,,Maximum reference x value of output picture
+ymin,r,h,INDEF,,,Minimum reference y value of output picture
+ymax,r,h,INDEF,,,Maximum reference y value of output picture
+xscale,r,h,1.0,0.0,,X scale of output picture in reference units per pixel
+yscale,r,h,1.0,0.0,,Y scale of output picture in reference units per pixel
+ncols,i,h,INDEF,1,,Number of columns in the output picture
+nlines,i,h,INDEF,1,,Number of lines in the output picture
+
+# coordinate surface and image interpolation parameters
+xsample,r,h,1.,1.,,Coordinate surface sampling interval in x
+ysample,r,h,1.,1.,,Coordinate surface sampling interval in y
+interpolant,s,h,"linear",,,"Interpolant"
+boundary,s,h,"nearest",|nearest|constant|reflect|wrap|,,"Boundary extension (nearest,constant,reflect,wrap)"
+constant,r,h,0.,,,Constant boundary extension 
+fluxconserve,b,h,yes,,,Preserve image flux?
+
+# working blocksize
+nxblock,i,h,512,,,X dimension of working block size in pixels
+nyblock,i,h,512,,,Y dimension of working block size in pixels
+verbose,b,h,yes,,,Print messages about the progress of the task
+
+mode,s,h,'ql'

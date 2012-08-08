@@ -1,0 +1,493 @@
+.help imedit Aug07 images.tv
+.ih
+NAME
+imedit -- examine and edit pixels in images
+.ih
+USAGE
+imedit input output
+.ih
+PARAMETERS
+.ls input
+List of images to be edited.  Images must be two dimensional.
+.le
+.ls output
+List of output images.  The list must match the input list or be empty.
+In the latter case the output image is the same as the input image; i.e.
+the edited image replaces the input image.
+.le
+.ls cursor = ""
+The editing commands are entered via a cursor list.  When the task is
+run interactively this will normally be the standard image cursor
+(stdimcur) specified by a null string.  Commands may be read from
+a file.  The file format may be cursor values including the command
+keys, a simple list of positions with the default command given
+by the \fIdefault\fR parameter, and a regions file, as used in
+the task \fBfixpix\fR and the \fBccdred\fR package, selected by
+the \fIfixpix\fR parameter.
+.le
+.ls logfile = ""
+File in which to record the editing commands which modify the images.
+The display and statistics commands which don't modify the images are
+not recorded.  This file may be used for keeping a record of the
+modifications.  It may also be used as cursor input for other images
+to replicate the same editing operations.
+.le
+.ls display = yes
+Display the image during editing?  If yes then the display command,
+given by the parameter \fIcommand\fR, is used to display the image.
+Normally the display is used when editing interactively and turned
+off when using file input.
+.le
+.ls autodisplay = yes
+Automatically redisplay the image after each change?  If the display
+of the image is rapid enough then each change can be displayed as
+it is made by setting this parameter to yes.  However, it is faster
+to accumulate changes and then explicitly redisplay the image.
+When the parameter is no then the image is only redisplayed by
+explicit command.
+.le
+.ls autosurface = no
+Automatically display surface plots after each change?  In addition
+to the image display command, the task can display a before and after
+surface plot of the modified region.  This can be done by explicit
+command or automatically after each change.
+.le
+.ls aperture = "circular"
+Aperture for aperture editing.  Some commands specify the region to
+be edited by a center and radius.  The shape of the aperture is selected
+by this parameter.  The choices are "circular" and "square".  Note that
+this does not apply to commands in which a rectangle is specified by
+selecting the corners.
+.le
+.ls radius = 2.
+Radius of the aperture for commands selecting an aperture.  For circular
+apertures this is the radius while for square apertures it is half of the
+side of the square.  Note that partial pixels are not used so that a
+circular aperture is not perfectly circular; i.e. if  the center of a
+pixel is within this distance of the center pixel it is modified and
+otherwise it is not.  A radius of zero may be used to select a single
+pixel (with either aperture type).
+.le
+.ls search = 2.
+Search radius for adjusting the position of the region to be edited.
+This applies to both aperture regions and rectangular regions.  The
+center pixel of the region is searched within this radius for the
+maximum or minimum pixel value.  If the value is zero then no searching
+is done and the specified region is used directly.  If the value is
+positive then the specified region is adjusted to be centered on a
+relative maximum.  A relative minimum may be found if the value is
+negative with the absolute value used as the search radius.
+.le
+.ls buffer = 1.
+Background buffer width.  A buffer annulus separates the region to be
+edited from a background annulus used for determining the background.
+It has the same shape as the region to be edited; i.e. circular, square,
+rectangular, or line.
+.le
+.ls width = 2.
+Width of background annulus.  The pixels used for background determinations
+is taken from an annulus of the same shape as the region to be edited and
+with the specified width in pixels.
+.le
+.ls xorder = 2, yorder = 2
+Orders (number of terms) of surface polynomial fit to background pixels
+for statistics and background subtraction.  The orders should generally
+be low with orders of 2 for a plane background.  If either order is
+zero then a median background is used.
+.le
+.ls value = 0.
+Value for constant substitution.  One editing command is replacement of
+a region by this value.
+.le
+.ls minvalue = INDEF, maxvalue = INDEF
+Range of values which may be modified.  Value of INDEF map to the minimum
+and maximum possible values.
+.le
+.ls sigma = INDEF
+Sigma of noise to be added to substitution values.  If less than or
+equal to zero then no noise is added.  If INDEF then pixel values from
+the background region are randomly selected after subtracting the
+fitted background surface or median.  Finally if a positive value is given than
+a gaussian noise distribution is added.
+.le
+.ls angh = -33., angv = 25.
+Horizontal and vertical viewing angles (in degrees) for surface plots.
+.le
+.ls command = "display $image 1 erase=$erase fill=yes order=0 >& dev$null"
+Command for displaying images.  This task displays images by executing a
+standard IRAF command.  Two arguments may be substituted by the appropriate
+values; the image name specified by "$image" and the boolean erase
+flag specified by "$erase".  Except for unusual cases the \fBtv.display\fR
+command is used with the fill option.  The fill option is required to
+provide a zoom feature.  See the examples for another possible command.
+.le
+.ls graphics = "stdgraph"
+Graphics device used for surface plots.  Normally this is the standard
+graphics device "stdgraph" though other possibilities are "stdplot"
+and "stdvdm".  Note the standard graphics output may also be
+redirected to a file with ">G file" where "file" is any file name.
+.le
+.ls default = "b"
+Default command option for simple position list input.  If the input
+is a list of column and line positions (x,y) then the command executed
+at each position is given by this parameter.  This should be one of
+the aperture type editing commands, the statistics command, or the
+surface plotting command.  Two keystroke commands would obviously 
+be incorrect.  \fIThis parameter is ignored in "fixpix" mode\fR.
+.le
+.ls fixpix = no
+Fixpix style input?  This type of input consists of rectangular regions
+specified by lines giving the starting and ending column and starting
+and ending line.  This is the same input used by \fBfixpix\fR and in
+the \fBccdred\fR package.  The feature to refer to "untrimmed" images
+in the latter package is not available in this task.  When selected
+the editing consists of interpolation across the narrowest dimension
+of the region and the default key is ignored.
+.le
+.ih
+DESCRIPTION
+Regions of images are examined and edited.  This may be done interactively
+using an image display and cursor or non-interactively using a list of
+positions and commands.  There are a variety of display and editing
+options.  A list of input images and a matching list of output images
+are specified.  The output images are only created if the input image
+is modified (except by an explicit "write" command).  If no output
+list is specified (an empty list given by "") then the modified images
+are written back to the input images.  The images are edited in
+a temporary buffer image beginning with "imedit".
+ 
+Commands are given via a cursor list.  When the task is run
+interactively this will normally be the standard image cursor
+(stdimcur).  Commands may be read from a file.  The file format may be
+cursor values including the command keys, a simple list of positions
+with the default command given by the \fIdefault\fR parameter, and a
+regions file, as used in the task \fBfixpix\fR and the \fBccdred\fR
+package, selected by the \fIfixpix\fR parameter.
+ 
+The commands which modify the image may be written to a log file specified
+by parameter \fIlogfile\fR.  This file can be used as a record of the
+pixels modified.  The format of this file is also suitable for input
+as a cursor list.  This allows the same commands to be applied to other
+images.  \fIBe careful not to have the cursor input and logfile have the
+same name!\fR
+ 
+When the \fIdisplay\fR parameter is set the command given by the parameter
+\fIcommand\fR is executed.  Normally this command loads the image display
+though it could also create a contour map or other graph whose x and y
+coordinates are the same as the image coordinates.  The image is displayed
+when editing interactively and the standard image cursor (which can
+be redefined to be the standard graphics cursor) is used to select
+regions to be edited.  When not editing interactively the display
+flag should be turned off.
+ 
+It is nice to see changes to the image displayed immediately.  This is
+possible using the \fIautodisplay\fR option.  Note that this requires
+the display parameter to also be set.  If the autodisplay flag is set
+the display command is repeated after each change to the image.  The
+drawback to this is that the full image (or image section) is reloaded
+and so can be slow.  If not set it is still possible to explicitly give
+a redisplay command, 'r', after a number of changes have been made.
+ 
+Another display option is to make surface graphs to the specified
+graphics device (normally the standard graphics terminal).  This may
+be done by the commands 'g' and 's' and automatically after each
+change if the \fIautosurface\fR parameter is set.  The two types of
+surface plots are a single surface of the image at the marked position
+and before and after plots for a change.
+ 
+Regions of the image to be examined or edited are selected by one
+or two cursor commands.  The single cursor commands define the center
+of an aperture.  The shape of the aperture, circular or square, is
+specified by the \fIaperture\fR parameter and the radius (or half
+the edge of a square) is specified by the \fIradius\fR parameter.
+The radius may be zero to select a single pixel.  The keys '+' and
+'-' may be used to quickly increment or decrement the current radius.
+The two keystroke commands either define the corners of a rectangular
+region or the endpoints of a line.
+ 
+Because it is sometimes difficult to mark cursor position precisely
+the defined region may be shifted so that the center is either
+a local maximum or minimum.  This is usually desired for editing
+cosmicrays, bad pixels, and stars.  The center pixel of the aperture
+is moved within a specified search radius given by parameter
+\fIsearch\fR.  If the search radius is zero then the region defined
+by the cursor is not adjusted.  The sign of the search radius
+selects whether a maximum (positive value) or a minimum (negative value)
+is sought.  The special key 't' toggles between the two modes
+in order to quickly edit both low sensitivity bad pixels and
+cosmicrays and stars.
+ 
+Once a region has been defined a background region may be required
+to estimate the background for replacement.  The background
+region is an annulus of the same shape separated by a buffer width,
+given by the parameter \fIbuffer\fR, and having a width given by
+the parameter \fIwidth\fR.
+ 
+The replacement options are described below as is a summary of all the
+commands.  Two commands requiring a little more description are the
+space and 'p' commands.  These print the statistics at the cursor
+position for the current aperture and background parameters.  The
+printout gives the x and y position of the aperture center (after the
+search if any), the pixel value (z) at that pixel, the mean background
+subtracted flux in the aperture, the number of pixels in the aperture,
+the mean background "sky", the sigma of the background residuals from
+the background fit, and the number of pixels in the background region.
+The 'p' key additionally prints the pixel values in the aperture.
+Beware of apertures with radii greater than 5 since they will wrap
+around in an 80 column terminal.
+ 
+When done editing or examining an image exit with 'q' or 'Q'.  The
+former saves the modified image in the output image (which might be
+the same as the input image) while the latter does not save the
+modified image.  Note that if the image has not been modified then
+no output occurs.  After exiting the next image in the input
+list is edited.  One may also change input images using the
+":input" command.  Note that this command sets the output to be the
+same as the input and a subsequent ":output" command should be
+used to define a different output image name.  A final useful
+colon command is ":write" which forces the current editor buffer
+to be written.  This can be used to save partial changes.
+.ih
+REPLACEMENT ALGORITHMS
+The parameters "minvalue" and "maxvalue" are may be used to limit the
+range of values modified.  The default is to modify all pixels which
+are selected as described below.
+
+.ls a, b
+Replace rectangular or aperture regions by background values.  A background
+surface is fit the pixels in the background annulus if the x and y orders
+are greater than zero otherwise a median is computed.  The x and y orders
+of the surface function are given by the \fIxorder\fR and \fIyorder\fR
+parameters.  The median is used or the surface is evaluated for the pixels
+in the replacement region.  If a positive sigma is specified then gaussian
+noise is added.  If a sigma of INDEF is specified then the residuals of the
+background pixels are sorted, the upper and lower 10% are excluded, and the
+remainder are randomly selected as additive noise.
+.le
+.ls c, f, l
+Replace rectangular or line regions by interpolation from the nearest
+background column or line.  The 'f' line option interpolates across the
+narrowest dimension; i.e. for lines nearer to the line axis interpolation
+is by lines while for those  nearer to the column axis interpolation is
+by columns.  The buffer region applies but only the nearest background
+pixel at each line or column on either side of the replacement region
+is used for interpolation.  Gaussian noise may be added but background
+sampling is not available.  This method is similar to the method used
+in \fBfixpix\fR or \fBccdred\fR with no buffer.  For "fixpix" type
+input the type of interpolation is automatically selected for the
+narrower dimension with column interpolation for square regions.
+.le
+.ls d, e, v
+Replace rectangular, aperture, or vector regions by the specified
+constant value.  This may be used to flag pixels or make masks.
+The vector option makes a line between two points with a width
+set by the radius value.
+.le
+.ls j, k
+Replace rectangular or aperture regions in the editor buffer by the data
+from the input image.  This may be used to undo any change.  Note that
+the 'i' command can be used to completely reinitialize the editor
+buffer from the input image.
+.le
+.ls m, n
+Replace an aperture region by another aperture region.  There is no
+centering applied in this option.  The aperture region to copy is
+background subtracted using the background annulus for median or surface
+fitting.  This data may then be added to the destination aperture or
+replace the data in the destination aperture.  In the latter case the
+destination background surface is also computed and added.
+.le
+.ls u
+Undo the last change.  When a change is made the before and after data
+are saved.  An undo exchanges the two sets of data.  Note that it is
+possible to undo an undo to restore a change.  If any other command is
+used which causes data to be read (including the statistics and surface
+plotting) then the undo is lost.
+.le
+.ls =, <, >
+The all pixels with a value equal to that of the pixel at the cursor
+position are replaced by the specified constant value.  This is intended
+for editing detection masks where detected objects have specific mask
+values.
+.le
+.ih
+COMMANDS
+.ce
+		IMEDIT CURSOR KEYSTROKE COMMANDS
+ 
+.nf
+	?	Print help
+	:	Colon commands (see below)
+	<space>	Statistics
+	g	Surface graph
+	i	Initialize (start over without saving changes)
+	q	Quit and save changes
+	p	Print box of pixel values and statistics
+	r	Redraw image display
+	s	Surface plot at cursor
+	t	Toggle between minimum and maximum search
+	+	Increase radius by one
+	-	Decrease radius by one
+	I	Interrupt task immediately
+	Q	Quit without saving changes
+.fi
+
+The following editing options are available.  Rectangular, line, and
+vector regions are specified with two positions and aperture regions
+are specified by one position.  The current aperture type (circular or
+square) is used in the latter case.  The move option takes two positions,
+the position to move from and the position to move to.
+
+.nf
+	a 	Background replacement (rectangle)
+	b 	Background replacement (aperture)
+	c 	Column interpolation (rectangle)
+	d 	Constant value substitution (rectangle)
+	e 	Constant value substitution (aperture)
+	f	Interpolation across line (line)
+	j	Replace with input data (rectangle)
+	k	Replace with input data (aperture)
+	l 	Line interpolation (rectangle)
+	m	Copy by replacement (aperture)
+	n	Copy by addition (aperture)
+	u	Undo last change (see also 'i', 'j', and 'k')
+	v	Constant value substitution (vector)
+	=	Constant value substitution of pixels equal
+		    to pixel at the cursor position
+	<	Constant value substitution of pixels less than or equal
+		    to pixel at the cursor position
+	>	Constant value substitution of pixels greater than or equal
+		    to pixel at the cursor position
+.fi
+ 
+When the image display provides a fill option then the effect of zoom
+and roam is provided by loading image sections.  This is a temporary
+mechanism which will eventually be replaced by a more sophisticated
+image display interface.
+ 
+.nf
+	E	Expand image display
+	P	Pan image display
+	R	Redraw image display
+	Z	Zoom image display
+	0	Redraw image display with no zoom
+	1-9	Shift display
+.fi
+ 
+ 
+.ce
+IMEDIT COLON COMMANDS
+ 
+The colon either print the current value of a parameter when there is
+no value or set the parameter to the specified value.
+ 
+.nf
+angh [value]		Horizontal viewing angle (degrees)
+angv [value]		Vertical viewing angle (degrees)
+aperture [type]		Aperture type (circular|square)
+autodisplay [yes|no]	Automatic image display?
+autosurface [yes|no]	Automatic surface plots?
+buffer [value]		Background buffer width
+command [string]	Display command
+display [yes|no]	Display image?
+eparam			Edit parameters
+graphics [device]	Graphics device
+input [image]		New input image to edit (output name = input)
+output [image]		New output image name
+radius [value]		Aperture radius
+search [value]		Search radius
+sigma [value]		Noise sigma (INDEF for histogram replacement)
+value [value]		Constant substitution value
+minvalue [value]	Minimum value for modification (INDEF=minimum)
+maxvalue [value]	Maximum value for modification (INDEF=maximum)
+width [value]		Background annulus width
+write [name]		Write changes to name (default current output) 
+xorder [value]		X order for background fitting
+yorder [value]		Y order for background fitting
+.fi
+.ih
+KEYWORDS
+None
+.ih
+EXAMPLES
+1.  Interactively edit an image.
+ 
+	cl> imedit raw002 ed002
+ 
+2.  Edit pixels non-interactively from an x-y list.  Replace the original images
+    by the edited images.
+ 
+.nf
+	cl> head bad
+	20 32
+	40 91
+	<etc>
+	cl> imedit raw* "" cursor=bad display-
+.fi
+ 
+3.  It is possible to use a contour plot for image display.  This is really
+    not very satisfactory but can be used in desperation.
+ 
+.nf
+	cl> reset stdimcur=stdgraph
+	cl> display.command="contour $image >& dev$null"
+	cl> imedit raw002 ed002
+.fi
+ 
+4.  Use a "fixpix" file (without trim option).
+ 
+.nf
+	cl> head fixpix
+	20 22 30 80
+	99 99 1 500
+	<etc>
+	cl> imedit raw* %raw%ed%* cursor=fixpix fixpix+ display-
+.fi
+.ih
+REVISIONS
+.ls IMEDIT V2.13
+The 'v' option was added to allow vector replacement.
+The '=', '<', '>' options were added to replace values matching the pixel
+at the cursor.
+.le
+.ls IMEDIT V2.11.2
+The temporary editor image was changed to use a unique temporary image
+name beginning with "imedit" rather than the fixed name of "epixbuf".
+.le
+.ls IMEDIT V2.11
+If xorder or yorder are zero then a median background is computed
+for the 'a' and 'b' keys.
+.le
+.ls IMEDIT V2.10.4
+The 'u', 'j', 'k', and 'n' keys were added to those recorded in the
+log file.
+.le
+.ls IMEDIT V2.8
+This task is a first version of what will be an evolving task.
+Additional features and options will be added as they are suggested.
+It is also a prototype using a very limited display interface; execution
+of a separate display command.  Much better interaction with a variety
+of image displays will be provided after a planned "image display
+interface" is implemented.  Therefore any deficiencies in this area
+should be excused.
+ 
+The zoom and roam features provided here are quite useful.  However,
+they depend on a feature of the tv.display program which fills the
+current image display window by pixel replication or interpolation.
+If this is left out of the display command these features will not
+work.  The trick is that this task displays sections of the editor
+buffer whose size and position is based on an internal zoom and
+center and the display program expands the section to fill the
+display.
+ 
+The surface plotting is done using an imported package.  The limitations
+of this package (actually limitations in the complexity of interfacing
+the application to this sophisticated package) mean that the
+surface plots are always scaled to the range of the data and that
+it is not possible to label the graph or use the graphics cursor to
+point at features for the task.
+.le
+.ih
+SEE ALSO
+ccdred.instruments proto.fixpix
+.endhelp

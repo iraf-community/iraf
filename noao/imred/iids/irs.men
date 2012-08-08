@@ -1,0 +1,5 @@
+      addsets     coefs       flatfit     powercor    scombine    splot
+      batchred    coincor     identify    process     sensfunc    standard
+      bplot       continuum   lcalib      rebin       sinterp     subsets
+      bswitch     dispcor     mkspec      refspectra  slist1d     sums
+      calibrate   flatdiv     names       reidentify  specplot    

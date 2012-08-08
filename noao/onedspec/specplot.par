@@ -1,0 +1,28 @@
+spectra,s,a,,,,List of spectra to plot
+apertures,s,h,"",,,Apertures to plot
+bands,s,h,"1",,,Bands of 3D images to plot
+autolayout,b,h,yes,,,Use automatic layout algorithm?
+autoscale,b,h,yes,,,Scale to common mean for automatic layout?
+fraction,r,h,1.0,,,Fraction of automatic minimum separation step
+units,s,h,"",,,Coordinate units
+transform,s,h,"none","none|log",,Flux transformation
+scale,s,h,1.,,,"Intensity scale (value, @file, keyword)"
+offset,s,h,0.,,,"Intensity offset (value, @file, keyword)"
+step,r,h,0.,,,Default separation step
+ptype,s,h,"1",,,Plotting type
+labels,s,h,"user","none|imname|imtitle|index|user",,Type of labels
+ulabels,s,h,"",,,User labels (file)
+xlpos,r,h,1.02,,,X label position (fraction of range)
+ylpos,r,h,0.0,,,Y label position (fraction of mean)
+sysid,b,h,yes,,,Include system banner and step value?
+yscale,b,h,no,,,Draw Y axis scale?
+title,s,h,"",,,Plot title
+xlabel,s,h,"",,,X axis label
+ylabel,s,h,"",,,Y axis label
+xmin,r,h,INDEF,,,X axis left limit
+xmax,r,h,INDEF,,,X axis right limit
+ymin,r,h,INDEF,,,Y axis bottom limit
+ymax,r,h,INDEF,,,Y axis top limit
+logfile,f,h,"",,,Logfile
+graphics,s,h,"stdgraph",,,Graphics output device
+cursor,*gcur,h,"",,,Cursor input

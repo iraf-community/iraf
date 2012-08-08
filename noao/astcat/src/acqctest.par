@@ -1,0 +1,6 @@
+record,s,a,"usno2@noao",,,"Database record name"
+ra,s,a,"12:12:12.00",,,"Ra in hours"
+dec,s,a,"+12:12:12.0",,,"Dec in degrees"
+width,r,a,10.0,,,Width in minutes
+database,f,h,")_.catdb",,,"Catalog database file"
+mode,s,h,"ql",,,

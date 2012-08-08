@@ -1,0 +1,62 @@
+.help chdir,cd Feb86 language
+.ih
+NAME
+chdir, cd -- change the current working directory
+.ih
+USAGE
+chdir [newdir]  or  cd [newdir]
+.ih
+PARAMETERS
+.ls newdir
+The new working directory.
+The special name "." refers to the current directory; ".." refers to the next
+higher directory.
+.le
+.ih
+DESCRIPTION
+\fIChdir\fR is used to change the current working directory.
+When called without any arguments, \fIchdir\fR sets the default directory
+to "home$", the users home directory.
+The new directory can be specified as an IRAF logical name,
+as a sub-directory of the current directory,
+as a path from either a logical directory or the current directory,
+or as an operating system dependent name.
+
+The names \fIchdir\fR and \fIcd\fR are synonyms.  Note that the command
+\fIback\fR may be called after a \fIchdir\fR to return to the previous
+directory without typing its name.
+.ih
+EXAMPLES
+1. Return to our home directory.
+
+	cl> cd
+
+2. Go to the package logical directory "pkg$".
+
+	cl> chdir pkg
+
+3. Go down one level to the directory "dataio", a subdirectory of "pkg".
+
+	cl> cd dataio
+
+4. From "dataio", go back up to "pkg" and down into "images".
+
+	cl> cd ../images
+
+5. Go to the "tv" directory, a subdirectory of "images", regardless of the
+current directory
+
+	cl> cd pkg$images/tv
+
+6. On a VMS system, define a new logical directory on a different disk device
+and go there.  Note that the character $ is not permitted in host file or
+directory names.
+
+.nf
+	cl> set dd = scr1:[data]
+	cl> cd dd
+.fi
+.ih
+SEE ALSO
+back, pathnames
+.endhelp

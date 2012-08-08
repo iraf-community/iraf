@@ -1,0 +1,73 @@
+.help fitfunction Jul84 noao.twodspec.multispec
+.ih
+NAME
+fitfunction -- Fit a function to the spectra parameter values
+.ih
+USAGE
+fitfunction image
+.ih
+PARAMETERS
+.ls image
+Image in which the parameter values are to be fitted.
+.le
+.ls parameter = "x0"
+Parameter to be fit.  The legal minimum match abbreviated parameters
+are x0, s0, s1, s2.
+.le
+.ls lines = "*"
+Sample image lines to be used in the function fit.
+.le
+.ls spectra = "*"
+Spectra for which the parameters are to be fit.
+.le
+.ls function = "interpolation spline"
+Fitting function to be used.  The function is specified as a string
+which may be minimum match abbreviated.  The functions currently available
+are:
+.ls interpolation spline
+Interpolation spline of specified order.
+.le
+.ls smoothing spline
+Smoothing spline of specified order and number of polynomial pieces.
+.le
+.le
+.ls spline_order = 4
+Order of the fitting spline.  The order must be even.
+The minimum value is 2 and maximum value is determined from the number of
+sample lines in the fit.
+.le
+.ls spline_pieces = 1
+The number of polynomial pieces in a smoothing spline.
+The minimum value is 1 and the maximum value is determined from the number of
+sample lines in the fit.
+.le
+.ih
+DESCRIPTION
+A function is fit to the parameter values previously determined at the sample
+lines for each spectrum.  The function coefficients are stored in the
+database and the fitted values replace the original values at all the sample
+lines (not just the sample lines used in the fit).  The type of function,
+the parameter to be fitted, the sample lines used in the fit, and the
+spectra to be fitted are all selected by the user.  The function is
+extrapolated to cover all image lines.
+
+The values of the function fit at arbitrary image lines may be listed
+with \fBmslist\fR.
+.ih
+EXAMPLES
+The extraction of the spectra requires that a fitting function be
+determined for the spectra positions.  This is done by:
+
+	cl> fitfunction image
+
+To smooth the parameter "s0" in model \fIgauss5\fR with a cubic spline
+and leave out a bad point at sample line 7:
+
+.nf
+	cl> fitfunction image parmeter=s0 function=smooth \
+	>>> lines="1-6,8-"
+.fi
+.ih
+SEE ALSO
+mslist
+.endhelp

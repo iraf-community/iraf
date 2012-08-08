@@ -1,0 +1,280 @@
+
+		    Enhanced Image List Template Package
+
+			     April 15, 2011
+
+
+    The enhanced image list package provides new capabilities for handling
+image lists, but remains backwards compatible with tasks currently using
+the IMT interface.  The enhancements allow for expansion of MEF files into
+lists of extensions using the @-file operator, as well as selection of
+images within more general lists by means of modifiers (e.g. a simple
+expression such as the extname/extver or explicit extension number, or more
+complex boolean expressions to allow selection by header keyword). In
+addition, tables may now take the @-file operator to use a column
+containing image references as an input list.
+
+
+========================================================================
+TODO:  
+    - Describe syntax for use with tables and selection by row values
+    - Describe remote image specification caching mechanism
+========================================================================
+
+
+
+Template Strings
+----------------
+
+The FNT template package supports the following forms of pattern strings:
+
+    alpha, *.x, data* // .pix, [a-m]*, @list_file, nite%1%2%.1024.imh
+
+i.e. simple filenames, wildcard expansion in filenames, concatenation of
+filenames, @files, substitution in filenames, or a comma-delimited list of
+the above.  The image template package (IMT) extends these patterns to
+allow image names followed by a cluster index or image section in []
+brackets.  These patterns remain unchanged in the new version of the
+package to allow backward compatability with existing applications. Lists
+of these types represent *explicit* collections of images, i.e. a
+collection based on the image name (wildcards) or as a result of processing
+by some task (e.g. expansion of an MEF file to create an input @-file of
+expanded extension specifications).
+
+    The enhanced version of the IMT package further abstracts the concept
+of image collections to include data objects such as MEF files or tables
+containing a list of image references that *implicitly* defines the list
+(e.g. the expanded MEF extension specification or the complete column of
+image references).  Further, we allow this list (which might be quite
+broad) to be refined using modifiers or selectors on the list and thus
+dynamically create the list without requiring the use (and management) of
+intermediate files.  For example,
+
+
+  @file*			expand all files beginning w/ 'file'
+  @file//".fits"		append ".fits" to contents of 'file'
+
+  @mef.fits			expand all (image) extensions of an MEF file
+  @mef.fits[SCI]		select SCI extensions from MEF file
+  @mef.fits[SCI,2][noinherit]	select v2 SCI extns, add kernel param
+  @mef.fits[1-16x2]		select range of extensions from MEF file
+  @mef.fits[+1-8]		create a list of extensions for an MEF
+
+  *.fits[1:100,1:100]		append section to all FITS images
+  @@file[1:100,1:100]		append section to expanded MEFs in 'file'
+
+  *.fits[filter?='V']		select images w/ FILTER keyword containing 'V'
+  @*.fits[gain<3.0]		select image extns where GAIN keyword < 3.0
+  *.fits[filter?='V';gain<2.0]	select using multiple OR's expressions
+
+
+Template Syntax
+---------------
+
+    The previous syntax and behavior of image templates is unchanged in
+this version, new functionality is provided by (optional) new syntax now
+supported in the template pattern string.  Briefly,
+
+    - wildcard filename expansion may now be applied to @-files
+
+    - the use of an '@' operator is now permitted on MEF files.  By 
+      default, all image extensions in the file will be included in the 
+      list, modifiers may be used to select specific extensions or to
+      indicate a range of extensions to be used.
+
+    - the use of an '@@' operator to indicate expansion of the contents 
+      of an @-file.  For example, an @-file of MEF image names can be
+      expanded to list of all the file extensions using "@@file", whereas
+      just using "@file" would list the names of the MEF files as before.
+
+    - modifier expressions enclosed in square brackets may be appended
+      to an image template string (or @-file) to either constrain the 
+      list (e.g. only a range of MEF extensions, only images with a certain
+      keyword value, etc) or to append extra information to the image
+      specification (e.g. to add an image section to all images in the
+      list).  Multiple modifier expressions may be used 
+
+
+    The allowed syntax for a template string can be described roughly in
+the following way:
+
+
+  [@@ | @]  <file>  [extname] 	    [<expr>;...]  [<ikparams>] [<section>]
+  [@@ | @]  <file>  [extname,extver][<expr>;...]  [<ikparams>] [<section>]
+  [@@ | @]  <file>  [index_range]   [<expr>;...]  [<ikparams>] [<section>]
+ 
+		    <-------- selectors ------->  <------ modifiers ----->
+
+    The <file> specification may be the name of a file, and image, or a
+table.  The behavior of the @-file and @@-file operators will depend on
+the type of <file> but the @-file usage remains backward compatible when
+used with text files.
+
+    The use of a modifier/selection on an MEF file will automatically
+trigger expansion of the extensions in the image and so an '@' operator is
+not strictly required, however only those extensions matching the selection
+expression will be present in the final image list.  Note that the use of 
+index ranges and extname/extver selectors are mutually exclusive, selector
+expressions may be added to either.
+
+
+@-file Operations
+-----------------
+
+    The @-file operator is unchanged from previous versions when used with
+text files of image names.  Modifier/selector expressions however can now
+be applied to the contents of the @-file to select from the list only those
+images that match the selector expression, or to augment the name in the 
+list with an additional image syntax such as a section or kernel parameters.
+
+
+@@-file Operations
+------------------
+
+    The @@-file operator is new syntax meant to allow the contents of an 
+@-file to be expanded automaticaly, e.g. as if there were an @-file of
+@-file names.  Primarily this can be used to create a list of MEF image
+names in which an @-file would return the names of the MEF, while the
+@@-file syntax could be used to expand each MEF into individual extension
+specifications.
+
+
+Extension Indices
+-----------------
+
+    The [index_range] modifier may be used to specify an explicit set of
+extensions to be used.  Index ranges are specified as a comma-delimited
+list of strings specifying individual range segments as described in the
+RANGES help page.
+
+    The use of a '+' operator before an index range indicates the range
+list should be expanded without checking that the extension exists in the
+MEF itself.  Otherwise, only those extensions present in the MEF will be
+included in the list.
+
+
+Selection Expressions
+---------------------
+
+    Selection expressions may be used to restrict a template list to only
+those images that match some boolean expression, e.g. to provide for 
+selection based on a header keyword value.  Expressions follow the same
+guidelines as in the HSELECT task 'expr' parameter (see the help page
+for details).  Multiple expressions may be specified if they are separated
+by a semicolon however they are evaluated as a single expression of
+OR'd values rather than as individual expressions.  This is significant
+when considering that expressions may contain keywords not present in 
+all images being checked, for instance
+
+	*.fits[filter?='V';gain<3.0]
+
+would evaluate as if the expression had been written
+
+	(filter?='V' || gain < 3.0)
+
+If a particular image lacks either the 'filter' or 'gain' keyword the
+entire expression will evaluate to false because of an error even if one
+of the two clauses would otherwise have been true.  
+
+[NOTE:  This behavior will be changed in a future version.]
+
+
+
+Image Sections
+--------------
+    Image sections may be added to an image specification by adding a
+separate modifier string.  The section will be added once selection of
+the list by the selector expressions is complete.  An example of where
+this might be used is in automatically specifying the bias section for
+all images in a list, e.g.
+
+    @mef.fits[1:128,*]			all extensions in the image
+    @mef.fits[1-16x2][1:128,*]		only 'left' amplifiers of a mosaic
+    @mef.fits[2-16x2][1024:1128,*]	only 'right' amplifiers of a mosaic
+    m31*.fits[345:528,200:300]		same section in all registered images
+
+No check is made that the image section is valid for the given image.
+
+
+Kernel Parameters
+-----------------
+
+    A comma-delimited list of image kernel parameters may be added to any 
+image specification by adding the keywords to a separate modifier.  For 
+example,
+		@mef.fits[1-8][noinherit,padline=30]
+
+would expand the file 'mef.fits' to include extensions 1 thru 8 and add the
+kernel parameters, generating a list such as
+
+		mef.fits[1][noinherit,padline=30]
+		mef.fits[2][noinherit,padline=30]
+		    :    :      :         :
+		mef.fits[8][noinherit,padline=30]
+
+No check is made to verify that the image kernel keywords are appropriate
+for the image type.  Supplying an incorrect kernel parameter will likely
+result in the task throwing an error when opening the image.
+
+
+
+--------------------------------------------------------------------------------
+
+Appendix 1:  Examples
+
+   file
+   file*
+   @file
+   @file*
+
+   @file[2]				extension
+   @file[SCI]				extname
+   @file[SCI,2]				extname+extver
+
+   @file[2][noinherit]			extension + ikiparams
+   @file[SCI][noinherit]		extname + ikiparams
+   @file[SCI,2][noinherit]		extname+extver + ikiparams
+
+   @file[2][1:20,2:30]			extension + section
+   @file[SCI][1:20,2:30]		extname + section
+   @file[SCI,2][1:20,2:30]		extname+extver + section
+
+   @file[2][noinherit][1:20,2:30]	extension + ikiparams + section
+   @file[SCI][noinherit][1:20,2:30]	extname + ikiparams + section
+   @file[SCI,2][noinherit][1:20,2:30]	extname+extver + ikiparams + section
+
+   @file[noinherit]			ikiparams
+   @file[noinherit][1:123,2:234]	ikiparams + sections
+
+   @file[1:123,2:234]			sections
+
+   @file[1:123,2:234]			sections
+
+   mef*.fits[filter?='V']		selection expression
+   mef*.fits[filter?='V';filter?='B']	selection expressions (OR)
+   mef*.fits[filter?='V'||filter?='B']	selection expressions (OR)
+   mef*.fits[gain>0.5&&gain<2.0]	selection expressions (AND)
+
+	Expressions will evaluate to 'false' if there is an error such as
+	"keyword not found", meaning that no images will match when one or
+	more keywords may not be present.  Best to use a comma-delimited list
+	in this case.
+
+ Concatenation
+
+   @file // foo				append
+   @file* // foo			append wildcards
+   @file // [2]				append modifiers
+
+   foo // @file				prepend
+   foo // @file*			prepend wildcards
+   foo // @file[2]			prepend modifiers
+
+   Prior Behavior:
+
+	foo // bar.fits			==> foobar.fits
+	foo.fits // bar			==> foobar.fits
+
+	foo // @file1			==> foosif1.fits,foomef1.fits
+	@file1 // bar			==> sif1foo.fits,mef1foo.fits
+

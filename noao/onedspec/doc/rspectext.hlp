@@ -1,0 +1,138 @@
+.help rspectext Oct93 onedspec
+.ih
+NAME
+rspectext -- convert 1D ascii text spectra to IRAF image spectra
+.ih
+USAGE
+rspectext input output
+.ih
+PARAMETERS
+.ls input
+Input list of ascii text spectra.  These may have a optional FITS header
+at the beginning and then two columns of wavelength and flux.
+.le
+.ls output
+Output list of IRAF spectra image names.  The list must match the
+input list.
+.le
+
+
+The following parameters are only used if there is no FITS header
+with the data.
+.ls title = ""
+Title to be assigned to the spectra.
+.le
+.ls flux = no
+Are the flux values flux calibrated?  If so then header keywords are
+inserted to identify this for the IRAF spectral software.
+.le
+.ls dtype = "linear" (none|linear|log|nonlinear|interp)
+Type of dispersion to assign to the spectra.  The options are:
+.ls none
+No dispersion function and nothing is added to the image header.
+.le
+.ls linear
+Store the linear dispersion parameters \fBcrval1\fR and \fBcdelt1\fR
+in the image header.  The wavelength values are ignored.  This may
+be used if the wavelength values are known to be linear but one wants
+to avoid possible roundoff and resampling errors introduced by the
+"interp" option.
+.le
+.ls log
+Store the log-linear dispersion parameters \fBcrval1\fR and \fBcdelt1\fR in
+the image header.  The wavelength values are ignored.  This may be used if
+the wavelength values are known to be linear in the log of the wavelength
+but one wants to avoid possible roundoff and resampling errors introduced
+by the "interp" option.
+.le
+.ls nonlinear
+Store the wavelength values in the image header as a lookup table.
+The flux values are not resampled.  The wavelength values need not
+be evenly sampled.
+.le
+.ls interp
+Use the wavelength values to resample to a linear dispersion between
+the first and last wavelength values.  The dispersion per pixel is
+determined by the number of pixels and the endpoint wavelengths.
+.le
+.le
+.ls crval1 = 1., cdelt1 = 1.
+The wavelength coordinate of the first pixel and the wavelength interval
+per pixel to be used with the linear and log dispersion types.
+.le
+.ih
+DESCRIPTION
+Ascii text files consisting of an optional FITS header (usually produced
+by \fBwspectext\fR) and a two column list of wavelengths and fluxes
+are converted to IRAF image spectra.  If a header is included then
+the header information is assumed to describe the spectra including
+any dispersion function.  If no header is given then the minimal
+information for describing spectra in IRAF is added.  The dispersion
+function can be set either a linear or log-linear based on two
+keywords (ignoring the wavelength values) or from the wavelength
+values.  The latter may be stored in the header as a lookup table
+allowing for nonlinear dispersions or resample to a linear dispersion.
+This task is a script based on \fBrtextimage\fR for the creating
+the image and entering the flux values, \fBhedit\fR to set some
+of the header keywords, and \fBdispcor\fR to handle the nonlinear
+or resampled dispersion functions.
+.ih
+EXAMPLES
+1.  Create spectrum from a text file originally produced by \fBwspectext\fR.
+
+.nf
+    cl> type text001
+    BITPIX  =                    8  /  8-bit ASCII characters
+    NAXIS   =                    1  /  Number of Image Dimensions
+    NAXIS1  =                  100  /  Length of axis
+    ORIGIN  = 'NOAO-IRAF: WTEXTIMAGE'  /
+    IRAF-MAX=                   0.  /  Max image pixel (out of date)
+    IRAF-MIN=                   0.  /  Min image pixel (out of date)
+    IRAF-B/P=                   32  /  Image bits per pixel
+    IRAFTYPE= 'REAL FLOATING     '  /  Image datatype
+    OBJECT  = 'TITLE             '  /
+    FILENAME= 'TEST              '  /  IRAF filename
+    FORMAT  = '5G14.7            '  /  Text line format
+    APNUM1  = '1 1     '
+    DC-FLAG =                    0
+    WCSDIM  =                    1
+    CTYPE1  = 'LINEAR  '
+    CRVAL1  =                4000.
+    CRPIX1  =                   1.
+    CDELT1  =     10.1010101010101
+    CD1_1   =     10.1010101010101
+    LTM1_1  =                   1.
+    WAT0_001= 'system=equispec                                 '
+    WAT1_001= 'wtype=linear label=Wavelength units=Angstroms   '
+    END
+										    
+    4000.00  1000.
+    4010.10  1005.54
+    4020.20  1011.05
+    ...
+    cl> rspectext text001 spec001
+.fi
+
+2.  Create a spectrum with a nonlinear dispersion using the wavelength
+values as a lookup table.
+
+.nf
+    cl> type text002
+    4000.00  1000.
+    4010.10  1005.54
+    4020.20  1011.05
+    ...
+    cl> rspectext text002 spec002 title="HH12" dtype=nonlinear
+.fi
+.ih
+REVISIONS
+.ls RSPECTEXT V2.11
+The task now automatically senses the presence of a header.
+.le
+.ls RSPECTEXT V2.10.3
+This is a new task with this version.
+.le
+.ih
+SEE ALSO
+wspectext, rtextimage, dispcor, mkms, imspec, sinterp
+.endhelp

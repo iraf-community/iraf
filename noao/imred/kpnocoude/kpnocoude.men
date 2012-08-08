@@ -1,0 +1,41 @@
+          apall - Extract 1D spectra (all parameters in one task)
+      apdefault - Set the default aperture parameters
+         apedit - Edit apertures interactively
+	 apfind - Automatically find spectra and define apertures
+      apflatten - Remove overall spectral and profile shapes from flat fields
+    apnormalize - Normalize 2D apertures by 1D functions
+     aprecenter - Recenter apertures
+       apresize - Resize apertures
+          apsum - Extract 1D spectra
+	aptrace - Trace positions of spectra
+
+     background - Fit and subtract a line or column background
+	  bplot - Batch plot of spectra with SPLOT
+      calibrate - Apply extinction and flux calibrations to spectra
+      continuum - Fit and normalize the continuum of multispec spectra
+       deredden - Apply interstellar extinction corrections
+        dispcor - Dispersion correct spectra
+	 dopcor - Doppler correct spectra
+       identify - Identify arc lines and determine a dispersion function
+   illumination - Determine illumination calibration
+       msresp1d - Create fiber response spectra from flat field and sky spectra
+     refspectra - Assign reference spectra to observations
+     reidentify - Reidentify arc lines and determine new dispersion functions
+       response - Determine response calibration
+     sapertures - Set or change aperture header information
+	 sarith - Spectrum arithmetic
+       scombine - Combine spectra
+          scopy - Copy spectra including aperture selection and format changes
+       sensfunc - Create sensitivity function
+     setairmass - Compute effective airmass and middle UT for an exposure
+          setjd - Compute and set Julian dates in images
+	  sflip - Flip data and/or dispersion coordinates in spectra
+          slist - List spectrum headers
+       specplot - Stack and plot multiple spectra
+      specshift - Shift spectral dispersion coordinate systems
+	  splot - Plot and analyze spectra
+       standard - Identify standard stars to be used in sensitivity calc
+
+       do3fiber - Process KPNO coude three fiber spectra
+         doslit - Process KPNO coude slit spectra
+	  demos - Demonstrations and tests

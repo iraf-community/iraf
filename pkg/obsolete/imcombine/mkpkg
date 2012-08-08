@@ -1,0 +1,54 @@
+# Make the IMCOMBINE Task.
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+generic:
+	$set	GEN = "$$generic -k"
+
+        $ifolder (generic/icaclip.x, icaclip.gx)
+	    $(GEN) icaclip.gx -o generic/icaclip.x $endif
+        $ifolder (generic/icaverage.x, icaverage.gx)
+	    $(GEN) icaverage.gx -o generic/icaverage.x $endif
+        $ifolder (generic/iccclip.x, iccclip.gx)
+	    $(GEN) iccclip.gx -o generic/iccclip.x $endif
+        $ifolder (generic/icgdata.x, icgdata.gx)
+	    $(GEN) icgdata.gx -o generic/icgdata.x $endif
+        $ifolder (generic/icgrow.x, icgrow.gx)
+	    $(GEN) icgrow.gx -o generic/icgrow.x $endif
+        $ifolder (generic/icmedian.x, icmedian.gx)
+	    $(GEN) icmedian.gx -o generic/icmedian.x $endif
+        $ifolder (generic/icmm.x, icmm.gx)
+	    $(GEN) icmm.gx -o generic/icmm.x $endif
+        $ifolder (generic/icombine.x, icombine.gx)
+	    $(GEN) icombine.gx -o generic/icombine.x $endif
+        $ifolder (generic/icpclip.x, icpclip.gx)
+	    $(GEN) icpclip.gx -o generic/icpclip.x $endif
+        $ifolder (generic/icsclip.x, icsclip.gx)
+	    $(GEN) icsclip.gx -o generic/icsclip.x $endif
+        $ifolder (generic/icsigma.x, icsigma.gx)
+	    $(GEN) icsigma.gx -o generic/icsigma.x $endif
+        $ifolder (generic/icsort.x, icsort.gx)
+	    $(GEN) icsort.gx -o generic/icsort.x $endif
+        $ifolder (generic/icstat.x, icstat.gx)
+	    $(GEN) icstat.gx -o generic/icstat.x $endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	@generic
+
+	icimstack.x	<error.h> <imhdr.h>
+	iclog.x		icmask.com icombine.com icombine.h <imhdr.h> <imset.h>\
+			<mach.h>
+	icmask.x	icmask.com icombine.com icombine.h <imhdr.h> <pmset.h>
+	icrmasks.x	<imhdr.h>
+	icscale.x	icombine.com icombine.h <error.h> <imhdr.h> <imset.h>
+	icsection.x	<ctype.h>
+	icsetout.x	icombine.com <imhdr.h> <mwset.h> <imset.h>
+	t_imcombine.x	icombine.com icombine.h <error.h> <imhdr.h> <mach.h> \
+			<syserr.h> <pmset.h>
+	;

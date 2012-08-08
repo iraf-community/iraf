@@ -1,0 +1,28 @@
+.help logout Feb86 language
+.ih
+NAME
+logout -- log out of the CL
+.ih
+USAGE
+logout
+.ih
+DESCRIPTION
+\fILogout\fR causes the CL to shut itself down, regardless of how many
+packages may currently be active.  The only way to shut the CL down without
+killing it is to use \fIlogout\fR; \fIbye\fR is not allowed to shut the
+CL down, since it would be too easy to enter it by accident (and it takes
+a while to log back in).
+
+An error message will be printed if one attempts to log out of the CL while
+a device is still allocated.  The device should be deallocated and the
+\fIlogout\fR repeated, else type \fIlogout\fR several times and you will
+be permitted to logout with the device still allocated.
+.ih
+EXAMPLE
+1. Logout of the CL.
+
+	cl> logo
+.ih
+SEE ALSO
+deallocate, bye
+.endhelp

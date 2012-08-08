@@ -1,0 +1,27 @@
+# GTOOLS
+
+update:
+	$checkout	libxtools.a lib$
+	$update		libxtools.a
+	$checkin	libxtools.a lib$
+	;
+
+libxtools.a:
+	gtascale.x	gtools.h <mach.h>
+	gtcolon.x	gtools.h <ctype.h> <gset.h>
+	gtcopy.x	gtools.h
+	gtctran.x	
+	gtcur.x	
+	gtcur1.x	gtools.h
+	gtfree.x	gtools.h
+	gtget.x		gtools.h <gset.h>
+	gtgui.x		gtools.h <gset.h>
+	gtinit.x	gtools.h <gset.h>
+	gtlabax.x	gtools.h <ctype.h> <gset.h> <gio.h>
+	gtplot.x	gtools.h <gset.h>
+	gtreset.x	gtools.h <gset.h>
+	gtset.x		gtools.h <ctype.h> <gset.h>
+	gtswind.x	gtools.h <gset.h> <mach.h>
+	gtvplot.x	gtools.h <gset.h>
+	gtwindow.x	gtools.h
+	;

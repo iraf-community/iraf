@@ -1,0 +1,51 @@
+.help rvlsrd Jun99 "Slalib Package"
+.nf
+
+      REAL FUNCTION slRVLD (R2000, D2000)
+
+     - - - - - - -
+      R V L D
+     - - - - - - -
+
+  Velocity component in a given direction due to the Sun's motion
+  with respect to the dynamical Local Standard of Rest.
+
+  (single precision)
+
+  Given:
+     R2000,D2000   r    J2000.0 mean RA,Dec (radians)
+
+  Result:
+     Component of "peculiar" solar motion in direction R2000,D2000 (km/s)
+
+  Sign convention:
+     The result is +ve when the Sun is receding from the given point on
+     the sky.
+
+  Note:  The Local Standard of Rest used here is the "dynamical" LSR,
+         a point in the vicinity of the Sun which is in a circular
+         orbit around the Galactic centre.  The Sun's motion with
+         respect to the dynamical LSR is called the "peculiar" solar
+         motion.
+
+         There is another type of LSR, called a "kinematical" LSR.  A
+         kinematical LSR is the mean standard of rest of specified star
+         catalogues or stellar populations, and several slightly
+         different kinematical LSRs are in use.  The Sun's motion with
+         respect to an agreed kinematical LSR is known as the "standard"
+         solar motion.  To obtain a radial velocity correction with
+         respect to an adopted kinematical LSR use the routine slRVLK.
+
+  Reference:  Delhaye (1965), in "Stars and Stellar Systems", vol 5,
+              p73.
+
+  Called:
+     slCS2C, slVDV
+
+  P.T.Wallace   Starlink   9 March 1994
+
+  Copyright (C) 1995 Rutherford Appleton Laboratory
+  Copyright (C) 1995 Association of Universities for Research in Astronomy Inc.
+
+.fi
+.endhelp

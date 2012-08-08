@@ -1,0 +1,104 @@
+.help rcamera 2 "Program Structure"
+.sh
+RCAMERA Structure Chart
+
+.nf
+t_rcamera ()
+# Returns when file list is satisfied or if EOT is encountered
+# Errors from called routines are trapped and printed as a warning.
+
+	read_camera (camfile, iraffile)
+	# Returns OK or EOF
+
+		read_header (cam_fd, im)
+		# Returns OK or EOF
+
+			decode_camera (im, parameters, text)
+
+			prheader (parameters, text)
+
+	    			prcam (parameters, text)
+
+					prcam1  (parameters, text)
+
+		read_image (cam_fd, im)
+		# Invokes error handler if EOF is encountered
+
+			set_image_header (im)
+
+			init_read_pixels (npix_record, bitpix, lsbf, spp_type)
+			# Returns OK
+
+			read_pixels (fd, buffer, npix)
+			# Returns EOF or the number of pixels converted
+.fi
+
+.sh
+RCAMERA Structure Summary
+
+.ls 4 t_rcamera
+The main procedure reads the control parameters.
+The files to be read and converted are calculated from the specified source
+and file list.  A loop through
+the files determines the specific input source names and output filenames
+and calls READ_CAMERA for each conversion.
+.ls read_camera
+The input source is opened and the output image header file is created.
+If only the CAMERA header is to be listed then a temporary image header file
+is created.  The CAMERA header is read and decoded into the IRAF image
+header by READ_HEADER.  If the image is to be read then MAKE_IMAGE is
+called.  Finally, all files are closed.  If a temporary image header file
+was created it is deleted.
+.ls read_header
+The CAMERA header is read into an array of short parameters and a
+character array of text.  If EOF is encountered
+then EOF is returned.  The parameter and text arrays are passed to
+DECODE_CAMERA to set the IRAF image file header.  The arrays are also
+passed to PRHEADER to print the header information.
+The routine returns OK if the header was successfully read or EOF
+if encountered.  All other errors are returned
+via the error handler.
+.ls decode_camera
+The appropriate parameters are taken from the CAMERA header and put into
+the IRAF image file header.
+.le
+.ls prheader
+If the short_header switch is set then the image title and size are printed.
+If the long_header switch is set then PRCAM is called to print the long
+header.
+.ls prcam
+The CAMERA header information is formatted and printed.  Because of a string
+limitation in the SPP half of the header information must be printed by
+a call to PRCAM1.
+.ls prcam1
+The second half of the CAMERA header information is formatted and printed.
+.le
+.le
+.le
+.le
+.ls read_image
+The CAMERA image pixels are converted to an IRAF image file.
+The image file header is set.
+The lines of the image are converted one at a time.
+.ls set_image_header
+The pixel type for the IRAF image is set to the user specified type.
+If no type has been specified then the type is determined from the number
+of bits per pixel given in camera.h.
+.le
+.ls init_read_pixels
+The pixel reading routine is initialized.  The parameters are the number
+of pixels per record, the number of bits per pixel which must be a
+valid MII type, a byte order flag, and the SPP data type to be converted
+to.  In the CAMERA reader the byte order is specified to be least significant
+byte first and the SPP data type is TY_SHORT.
+.le
+.ls read_pixels
+The pixels are read into a record buffer.  Data conversion is accomplished
+with an initial byte swap to put the input in most significant byte first
+form and then the MII routines are called.   The
+specified number of pixels is returned in the specified buffer.
+.le
+.le
+.le
+.le
+.endhelp

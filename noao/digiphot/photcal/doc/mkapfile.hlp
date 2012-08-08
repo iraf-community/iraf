@@ -1,0 +1,473 @@
+.help mkapfile Apr93 photcal
+.ih
+NAME
+mkapfile -- prepare an aperture corrections file from a list of APPHOT
+photometry files using the daogrow algorithm
+.ih
+USAGE
+mkapfile photfiles naperts apercors
+.ih
+PARAMETERS
+.ls photfiles
+A list of APPHOT photometry files containing the images names or image ids, x-y
+coordinates, filter ids, exposure times, airmasses, aperture radii,
+magnitudes, and magnitude errors
+of all the objects to be used to compute the aperture corrections.
+.le
+.ls naperts
+The number of aperture radii for which aperture radii, magnitudes, and
+magnitude errors are to be extracted from \fIphotfiles\fR.
+.le
+.ls apercors
+The name of the output text file containing the aperture
+corrections computed between \fIsmallap\fR and \fIlargeap\fR
+for each image in \fIphotfiles\fR.
+.le
+.ls smallap = 1
+The index of the smallest extracted aperture for which the aperture 
+correction is to be computed.
+.le
+.ls largeap = 0
+The index of the largest extracted aperture for which the aperture 
+correction is to be computed. If \fIlargeap\fR is 0, then
+the largest aperture is \fInaperts\fR.
+.le
+.ls magfile = ""
+The name of an optional output text file containing the magnitudes
+of all the stars in \fIphotfiles\fR, corrected to the aperture \fIlargeap\fR
+by using the measured magnitude and computed aperture correction at
+which the estimated error is a minimum.
+.le
+.ls logfile = ""
+The name of an optional output text file containing details of the curve
+of growth model fit for each image in \fIphotfiles\fR. If \fIlogfile\fR is
+"", no file is written.  If \fIappend\fR = "no" a new logfile is written, if
+"yes" output is appended to an existing logfile.
+.le
+.ls plotfile = ""
+The name of an optional output plot file containing plots of the
+curve of growth model fit, the fit residuals versus aperture radius,
+magnitude inside the first aperture, x coordinate, and y coordinate,
+and the aperture correction versus aperture radius for each image
+in \fIphotfiles\fR. If \fIplotfile\fR is "", no file is written.
+If \fIappend\fR = "no" a new plotfile is written, if
+"yes" output is appended to an existing plotfile.
+.le
+.ls append = no
+Open \fIlogfile\fR and/or \fIplotfile\fR in append mode ?
+.le
+.ls obsparams = ""
+The name of an optional input text file containing the correct filter ids,
+exposure times, and airmasses for each image whose values are either
+undefined or incorrectly stored in \fIphotfiles\fR. The observing parameters
+for each image are listed in \fIobsparams\fR,
+1 image per line with the image name in column 1 and the filter id,
+exposure time, and airmass in
+\fIobscolumns\fR. The image names must match those in \fIphotfiles\fR.
+.le
+.ls obscolumns = "2 3 4 5"
+The list of numbers separated by commas or whitespace specifying which
+columns in the text file \fIobsparams\fR contain the correct filter ids,
+exposure times, airmasses, and times of observation respectively. The
+number 0 can be used as
+a place holder in the obscolumns string. For example to correct only
+the \fIphotfiles\fR airmass values, \fIobscolumns\fR should be set to
+"0 0 column 0", where column is the airmass column number.
+.le
+.ls maglim = 0.10
+The maximum magnitude error permitted in the input magnitude measurements.
+Data at and following the first aperture radius whose associated magnitude
+measurement has an error greater than \fImagerr\fR is rejected on input.
+.le
+.ls nparams = 3
+The number parameters in the five parameter curve of growth model to be fit.
+The remaining parameters 5 - nparams parameters are held constant.
+For \fInparams\fR = 3, the parameters \fIswings\fR,
+\fIpwings\fR, and \fIpgauss\fR are fit, and \fIrgescale\fR and 
+and \fIxwings\fR maintain their default values.
+\fINparams\fR must be greater than or equal to one.
+.le
+.ls swings = 1.2
+The slope of the power law component of the analytic curve of growth model
+describing the seeing independent part of the stellar profile. For a
+physically reasonable profile \fIswings\fR must be greater than 1.
+.le
+.ls pwings = 0.1
+The fraction of the total power in the seeing independent
+part of the stellar profile, if \fIxwings\fR is 0.0.
+.le
+.ls pgauss = 0.5
+The fraction of the total power in the seeing dependent part of the
+profile contained in the gaussian rather than the exponential component
+of the analytic curve of growth function.
+.le
+.ls rgescale = 0.9
+The ratio of the exponential to the gaussian radial scale
+lengths in the seeing dependent part of the profile.
+In practice the curve of growth model fits for most data do not depend
+significantly on this parameter and it can be left at its default value.
+.le
+.ls xwings = 0.0
+A parameter describing the effect of airmass on the total power 
+in the seeing independent part of the stellar profile, where this quantity
+is defined as defined as \fIpwings\fR + \fIxwings\fR * \fIairmass\fR.
+.le
+.ls interactive = yes
+Fit the curve of growth interactively ?
+.le
+.ls verify = no
+Verify interactive user input ? This option is used only if \fIobsparams\fR
+is set to the standard input STDIN.
+.le
+.ls gcommands = ""
+The interactive graphics cursor.
+.le
+.ls graphics = "stdgraph"
+The default graphics device.
+.le
+
+.ih
+DESCRIPTION
+
+MKAPFILE takes a list of APPHOT photometry files \fIphotfiles\fR, 
+containing the image names, x and y coordinates, filter ids, exposure times,
+airmasses, aperture radii, measured magnitudes, and magnitude errors for
+one or more stars in one or more images, computes the aperture correction
+between the apertures \fIsmallap\fR and \fIlargeap\fR for each image using
+a weighted average of the computed model curve of growth and the observed
+curve of growth, and writes the computed aperture corrections
+to \fIapercors\fR.
+
+MKAPFILE computes the aperture corrections by performing the following steps:
+1) extracts the image names,  x and y coordinates, filter ids, exposure
+times, airmasses, times of observation, and \fInaperts\fR aperture radii,
+measured magnitudes,
+and magnitude errors for all the objects in \fIphotfiles\fR, 2) rejects data
+for all aperture radii greater than any aperture radius for which the magnitude
+or magnitude error is INDEF, the magnitude error is > \fImaglim\fR,
+or the number of apertures left containing good data is < 2, 
+3) adds in quadrature a magnitude error of 0.001 magnitudes to the extracted
+magnitude errors, 4) edits any incorrect or undefined values of
+the filter id, exposure time, airmass, and time of observation
+in \fIphotfiles\fR using the values
+in \fIobsparams\fR if defined, or default values of INDEF, 1.0, 1.25, and INDEF
+respectively, 5) computes the theoretical and observed curve of growth
+curve for each image, 6) computes the adopted curve of growth for each
+image by combining the theoretical and observed curves with weights that
+favor the observed curve at smaller aperture radii and the theoretical curve
+at larger aperture radii, 7) integrates the adopted growth curve between
+the \fIsmallap\fR and \fIlargeap\fR apertures to
+compute the final aperture correction, 8) writes the results for each image
+to \fIapercors\fR, 9) optionally computes magnitudes for all the stars
+in \fIphotfiles\fR corrected to \fIlargeap\fR using the observed magnitude
+and computed correction for which the signal to noise is highest,
+10) optionally writes a \fIlogfile\fR containing the details of the
+fit for all the individual images, 11) optionally writes a file of
+plots of the fit, the residuals, and the curve of growth for all the
+images.
+
+MKAPFILE extracts the fields/columns IMAGE, XCENTER, YCENTER, IFILTER,
+ITIME, XAIRMASS, OTIME, RAPERT, MAG and MERR from \fIphotfiles\fR.
+The number of aperture radii,
+magnitudes, and magnitude errors extracted are specified by \fInaperts\fR.
+For example if \fInaperts\fR
+is 15, then the first 15 values of RAPERT, MAG, and MERR are extracted
+from \fIphotfiles\fR.
+
+Values of the filter ids, exposure times, airmasses, and times of
+observation which are undefined
+or incorrect in \fIphotfiles\fR, can be entered or corrected by reading values
+from the file \fIobsparams\fR, a simple multi-column text file with a
+format specified by \fIobscolumns\fR.
+If no values are read from \fIphotfiles\fR or \fIobsparams\fR, default values
+for the filter id, exposure time, airmass, and time of observation
+of "INDEF", 1.0, 1.25, and INDEF respectively will be assigned.
+It must be emphasized that the airmass is actually used in the curve of
+growth analysis only if \fInparams\fR is equal to
+5, and that the quantities filter id, exposure time, and time of observation
+are not used in
+the analysis at all. However if the user should wish to use the corrected
+magnitudes optionally computed and written to \fImagfile\fR in any subsequent
+analysis it is important to include the correct values of
+these quantities in \fImagfile\fR. 
+
+If \fIinteractive\fR is "yes", the user can interact with the curve of
+growth fitting process by examining plots of the model fit, the residuals
+versus aperture radius, magnitude in the first aperture, x and y coordinates,
+and the aperture correction
+as a function of radius, by changing the number of parameters to be fit and
+their initial values, deleting and undeleting points with the graphics
+cursor, refitting the model curve of growth and reexamining the results
+until satisfied. Users should realize when deleting or undeleting points
+with the graphics cursor that all
+the apertures above the marked point will be deleted or undeleted.
+
+The output aperture corrections file \fIapercors\fR is a simple text
+file containing the image name in column 1, the aperture correction
+computed from \fIsmallap\fR to \fIlargeap\fR in column 2, and the
+estimated error in the aperture correction in column 3.
+The sign of the aperture correction is such that the
+correction must be added to the observed magnitude to compute the corrected
+magnitude. \fIApercors\fR is written in a form suitable for input to
+the MKNOBSILE, MKOBSFILE, or OBSFILE tasks.
+
+If \fImagfile\fR is not "", a file containing the image name, x and y
+position, filter id, exposure time, airmass, time observation,
+magnitude corrected to
+\fIlargeap\fR using the observed magnitude and computed correction at the
+aperture radius with the highest signal-to-noise ratio, the associated
+magnitude error, and the radius to which the correction was made,
+for all the stars in all the images in \fIphotfiles\fR.
+\fIMagfile\fR is written in a form suitable for input to the OBSFILE task.
+
+If \fIlogfile\fR is not "", all the details and diagnostics of the
+curve of growth fit are logged either to a new file, if \fIappend\fR = "no"
+or to a previously existing file, \fIappend\fR = "yes". The output
+consists of: 1) a banner listing
+the date, time, and \fIapercors\fR for which the entry is relevant, 2)
+a listing of the number of parameters \fInparams\fR in the five parameter
+curve of growth model to be fit, the initial values of all the parameters, and
+the small and large aperture numbers, 3) the fitted values of the
+curve of growth model parameters and their errors where parameters which
+were not fit have zero-valued errors, 4) the computed seeing radius
+for each image,
+5) the theoretical, observed, and adopted curves of growth and
+their associated errors, 6) the aperture correction to  largeap,
+the estimated total aperture correction to an
+aperture radius twice the largest aperture radius, and the estimated error
+in the aperture correction, 7) the aperture
+correction from \fIsmallap\fR to \fIlargeap\fR, 8) for each star
+in the image the observed magnitudes, magnitude corrected to the largest
+aperture, and magnitude corrected to twice the largest aperture, and
+finally, 9) a summary of the mean adopted curve of growth, the mean residual,
+and the mean residual squared for all the data for all the images
+as a function of aperture radius.
+
+If \fIplotfile\fR is not "", plots of the final curve of growth model fit,
+residuals as a function of aperture radius, magnitude, x, y, and the
+aperture correction to the largest aperture \fIlargeap\fR
+for each image in \fIphotfiles\fR are saved in the plot metacode file
+\fIplotfile\fR..
+
+.ih
+CURSOR COMMANDS
+
+The following commands are available in interactive graphics cursor mode.
+
+.nf
+	Keystroke Commands 
+
+?	Print help
+w	Print computed aperture correction
+c	Print coordinates of star nearest cursor
+f	Compute a new fit
+d	Delete point(s) nearest the cursor
+u	Undelete point(s) nearest the cursor
+m	Plot the observed and model cog versus radius
+r	Plot the cog fit residuals versus radius
+b	Plot the cog fit residuals versus magnitude
+x	Plot the cog residuals versus the x coordinate
+y	Plot the cog residuals versus the y coordinate
+a	Plot the aperture correction versus radius
+g	Redraw the current plot
+n	Move to the next image
+p	Move to the previous image
+q	Quit task
+
+	Colon commands
+
+:show   parameters   Show the initial cog model parameter values
+:show   model	     Show the fitted cog model parameters
+:show   seeing       Show the computed seeing radii for all images
+:image  [value]      Show/set the image to be analyzed
+
+	Colon Parameter Editing Commands
+
+:smallap   [value]  Show/set the index of the smallest aperture
+:largeap   [value]  Show/set the index of the largest aperture
+:nparams   [value]  Show/set the number of cog model parameters to fit 
+:swings	   [value]  Show/set initial power law slope of stellar wings
+:pwings	   [value]  Show/set fraction of total power in stellar wings 
+:pgauss	   [value]  Show/set fraction of total core power in gaussian 
+:rgescale  [value]  Show/set ratio of exp to gauss radial scales
+:xwings	   [value]  Show/set the extinction coefficient
+.fi
+
+.ih
+ALGORITHMS
+
+The algorithm used to compute the aperture correction is the DAOGROW
+algorithm developed by Peter Stetson (1990, see the references section).
+
+In this algorithm the stellar profile is approximated by the following
+3 component model where P, G, E denote the power law, gaussian, and
+exponential analytic components of the model respectively. The subscript i
+denotes quantities that are a function of each image. 
+
+.nf
+
+    I[r,X[i];RO[i],swings,pwings,pgauss,regscale,xwings] =
+	(pwings + X[i] * xwings) * P[r;swings] + (1 - pwings - X[i] *
+	xwings) * (pgauss * G[r;RO[i]] + (1 - pgauss) *
+	E[r;rgescale,RO[i]])
+
+    P[r;swings] = mnorm * (1 + r ** 2) ** swings
+          mnorm = (swings - 1) / PI
+
+    G[r;RO[i]] = gnorm * exp (-0.5 * r ** 2 / RO[i] ** 2)
+         gnorm = 1 / (2 * PI * RO[i] ** 2)
+
+    E[r;RO[i]] = hnorm  * exp (-r / (rgescale * RO[i]))
+         hnorm = 1 /  (2 * PI * (rgescale * RO[i]) ** 2) 
+
+.fi
+
+This equation is actually applied to the magnitude differences between
+apertures where the observed magnitude differences are computed as follows
+for image i, star j, and aperture k.
+
+.nf
+
+    mdiff[i,j,k] = m[i,j,k] - m[i,j,k-1]           k=2,..,naperts
+
+.fi
+
+
+The observed differences are fit by least-squares techniques to 
+to the theoretical model differences represented by the following equation.
+
+.nf
+
+diff[i,j,k] = -2.5 * log10 (integral (2 * PI * r * I) from 0 to r[k] /
+          integral (2 * PI * r * I) from 0 to r[k-1])
+
+.fi
+
+The integrals of the three model components P, G, and E are the following.
+
+.nf
+
+    integral (2 * PI * r * P) = 1 - (1 + r ** 2) ** -swings
+
+    integral (2 * PI * r * G) = 1 - exp (-r ** 2 / (2 * RO[i] ** 2))
+
+    integral (2 * PI * r * H) = 1 + (1 + r / (rgescale * RO[i]) *
+                          exp (-r / (rgescale * RO[i]))
+
+.fi
+
+In a given run of MKAPFILE the seeing radius
+RO[i] is fit separately for each image, but the parameters swings, pwings,
+pgauss, rgescale, and xwings are fit to the entire data set. Therefore
+the RO[i] values define a family curves, each differing from the other
+by the seeing radius RO[i] alone. It turns out that for most data the
+fits do not depend significantly on the \fIrgescale\fR and \fIxwings\fR
+parameters.  Therefore by default \fInparams\fR is set to 3 and
+\fIrgescale\fR and \fIxwings\fR are set to default values of 0.9 and 0.0
+respectively.
+
+After the theoretical and observed growth curves are computed for
+each image, they are combined to produce an adopted growth curve. The
+weighting scheme used in the combining process is such that at small radii
+where the observed magnitude differences have the smallest errors,
+the observed values,
+are favored, and at large radii  the theoretical curve is favored. At
+all points in the computation of the theoretical curve, the observed curve,
+and the adopted curve, tests are made for deviant data points and these
+are down-weighted. The adopted curve is integrated between \fIsmallap\fr
+and \fIlargeap\fR to produce the aperture correction for each image.
+
+Because the error in the observed magnitudes grows rapidly toward
+larger radii, while the error in the aperture correction grows
+rapidly toward smaller radii, the combined error for the star will
+have some minimum value, usually at an intermediate aperture. If
+\fImagfile\fR is not "", the magnitudes corrected to \fIlargeap\fR
+using the observed magnitude and correction where the  error
+is lowest are written to \fImagfile\fR, along with the image id, x and y
+coordinates, filter ids, exposure times, airmasses, and errors in the
+magnitude. This file can be read into the OBSFILE program so as to
+create a photometry catalog suitable for input into PHOTCAL.
+
+
+.ih
+REFERENCES
+
+A full description of the DAOGROW algorithm used by MKAPFILE can be
+found in the article "On the Growth-Curve Method for Calibrating
+Stellar Photometry with CCDs" by Peter Stetson in PASP 102, 932
+(1990).
+
+.ih
+EXAMPLES
+
+1. Prepare an aperture corrections file from a set of observations
+from 5 different data frames taken in a single night.
+
+.nf
+	ph> mkapfile *.mag.* 15 apercor
+
+	    ... plot of the cog for the first image will appear
+
+	    ... type r to examine fit residuals versus radius
+
+	    ... type a to examine the aperture correction curve
+		versus radius
+
+	    ... type n to look at results for next image
+
+	    ... type d to remove a discrepant point
+
+	    ... type f to refit the cog
+
+	    ... type r to examine the residuals for this image
+
+	    ... type p to recheck the residuals for the first image
+
+	    ... step through the remaining image deleting points and
+		refitting as necessary
+
+	    ... type q to quit
+
+	    ... the compute aperture corrections will appear in apercor
+.fi
+
+2. Repeat the previous example in non-interactive mode saving all the
+details and plots of the fit in the log and plot file respectively.
+
+.nf
+	ph> mkapfile *.mag.* 15 apercor inter- logfile=apercor.log\
+	    plotfile=apercor.plot
+
+	ph> page apercor.log
+
+	    ... page through the log file
+
+	ph> gkiextract apercor.plot "1-25" | stdplot
+
+	    ... send all the plots of the fit to the default plotter
+.fi
+
+3. Compute the magnitudes corrected to largeap, of all the standard
+stars observed in a night using the observed magnitude and computed magnitude
+correction at the aperture radius with the lowest error.
+Assume that the filter ids (U,B,V), exposure times, and airmasses were
+all present and correct in the photometry files.
+
+.nf
+	ph> mkapfile stdfiles 15 apercor inter- magfile="stdfiles.ap"\
+	    logfile=apercor.log plotfile=apercor.plot
+
+	ph> obsfile stdfiles.ap "1,2,3,4,5,6,7,8,9" "U,B,V" imsets stdobs 
+
+	    ... create a standard star observations file suitable for
+		input to the photcal package
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+apfile, mknobsfile,mkobsfile,obsfile
+.endhelp

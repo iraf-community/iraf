@@ -1,0 +1,4 @@
+spectra,s,a,,,,List of spectra
+shift,r,a,0.,,,Shift to add to dispersion coordinates
+apertures,s,h,"",,,List of apertures to shift
+verbose,b,h,no,,,Print verbose information?

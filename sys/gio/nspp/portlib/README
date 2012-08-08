@@ -1,0 +1,28 @@
+This directory contains the sources for the NCAR system plot package.
+The original source is in the file "plot.4.8.sav".  If any modifications
+have to be made, they will be recorded here.
+
+REVISIONS
+
+04Mar84 SET --> SPPSET
+	The name of the SET module, used to set the device window and
+	user coordinate system, was changed to SPPSET.  The module "set.x"
+	in the high level code intercepts calls by the utilities to set,
+	so that the transformations may be stored away in a file for recovery
+	by another process.
+
+05Mar84 Elimination of Fortran i/o
+	All formatted writes to mprint were commented out.
+
+05Mar48 Resolve library conflict
+	getchr --> ncgchr		[collision with fio.getchar]
+	putchr --> ncpchr		[for consistency with above]
+
+12Mar84 Moved most of the initialization from the block data z8zpbd into
+	the initialization subroutine z8zpii, called by nspp_init at
+	GOPEN time.
+
+12Dec85 SPPSET -> SET
+	Changed this guy back, as the high level interface to the system
+	plot package is no longer used.  The NCAR system plot package stuff
+	is only used by the GIO/NCAR kernel now.

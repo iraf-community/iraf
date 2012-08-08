@@ -1,0 +1,43 @@
+.help mkmanpage Feb86 softools
+.ih
+NAME
+mkmanpage -- create and edit a new manual page
+.ih
+USAGE
+mkmanage module
+.ih
+PARAMETERS
+.ls module
+The name of the program to be documented, i.e., the name that will appear at
+the top of the manual page, and the root name of the ".hlp" file to be
+created.
+.le
+.ls clformat = yes
+Make a CL format manual page template?
+.le
+.ls cltemplate = "doc$mancl.hlp"
+Filename of the template file for a CL manual page.
+.le
+.ls xtemplate = "doc$manx.hlp"
+Filename of the template file for a library procedure manual page.
+.le
+.ih
+DESCRIPTION
+The \fImkmanpage\fR task is used to create a fill-in-the-blanks type
+template, to be edited to create the manual page for the named help module
+or task.  Depending upon the type of manual page to be created, \fImkmanpage\fR
+copies the template file to the current directory, creating a new file with
+the name "module.hlp", where \fImodule\fR is the name entered on the
+command line.  The editor is called up to edit the file and the task exits.
+.ih
+EXAMPLES
+1. Make a new manual page for task "page".
+
+	cl> mkmanpage page
+
+The task creates a file "page.hlp" in the current directory, and calls
+up the editor to edit the new file.
+.ih
+SEE ALSO
+mkhelpdb, help, lroff
+.endhelp

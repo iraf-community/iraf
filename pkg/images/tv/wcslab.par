@@ -1,0 +1,15 @@
+# Parameter file for WCSLAB
+
+image,f,a,,,,"Input image"
+frame,i,a,1,,,"Default frame number for image display"
+usewcs,b,h,no,,,"Use the world coordinate system definition parameters"
+wcspars,pset,h,"",,,"World coordinate system definition parameters"
+wlpars,pset,h,"",,,"World coordinate system labeling parameters"
+fill,b,h,yes,,,"Fill the viewport ?"
+vl,r,h,INDEF,0.0,1.0,"Left edge of viewport (0.0:1.1)"
+vr,r,h,INDEF,0.0,1.0,"Right edge of viewport (0.0:1.0)"
+vb,r,h,INDEF,0.0,1.0,"Bottom edge of viewport (0.0:1.0)"
+vt,r,h,INDEF,0.0,1.0,"Top edge of viewport (0.0:1.0)"
+overplot,b,h,no,,,"Overplot to an existing plot?"
+append,b,h,no,,,"Append to an existing plot?"
+device,s,h,"imd",,,"Graphics device"

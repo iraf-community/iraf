@@ -1,0 +1,9 @@
+
+$call	relink
+$exit
+
+
+relink:
+	$omake	spperrs.x
+	$link	spperrs.o
+	;

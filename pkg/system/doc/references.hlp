@@ -1,0 +1,78 @@
+.help references Jun89 system
+.ih
+NAME
+references -- find all help database references to a given topic
+.ih
+USAGE
+references topic
+.ih
+PARAMETERS
+.ls topic
+The topic for which help is desired, i.e., a keyword, phrase, or pattern
+which the help database or quick-reference file is to be searched for.
+.le
+.ls quickref = "uparm$quick.ref"
+The name of the optional quick-reference file.
+.le
+.ls updquick = no
+Create or update the quick-reference file, e.g., because new packages
+have been added to the global help database.  Updating the quick-reference
+file automatically enables \fIusequick\fR, discussed below.
+.le
+.ls usequick = no
+Use the quick-reference file.  By default, a runtime search of all the package
+menus in the full help database is performed, which ensures that all packages
+are searched, but which is comparatively slow.
+.le
+.ih
+DESCRIPTION
+The \fIreferences\fR task is used to search the help database for all tasks
+or other help modules pertaining to the given topic, where \fItopic\fR may be
+a keyword, phrase, or any general pattern as would be input to the \fImatch\fR
+task.  By default the full help database will be searched.  If desired,
+the "one-liner" information used for topic searching may be extracted and
+used to prepare a quick-reference file to speed further searches.
+This is not done by default because the help database is too dynamic, e.g., 
+new external packages may be installed at any time, by any user, or new
+tasks may be added to existing packages at any time.
+
+References to tasks (or other objects) are printed in the form
+
+.nf
+       keyword1 - one line description
+       keyword2 - one line description
+.fi
+
+and so on.  To determine the \fIpackage pathname\fR of each named task,
+get \fIhelp\fR on the named \fIkeyword\fR and the pathname will be seen at
+the top of the help screen, followed by additional information about the
+referenced object.  If there are multiple objects with the same name,
+a "help <keyword> \fIall+\fR" may be required to locate a particular one.
+.ih
+EXAMPLES
+1. Find all help on CCDs.
+
+	cl> ref ccd
+
+2. Create or update your private quick-reference file.
+
+	cl> ref upd+
+
+3. Examine the quick-reference file to get a summary of all the tasks
+or other help modules in the help database.
+
+	cl> page (ref.quickref)
+.ih
+TIME REQUIREMENTS
+If a quick-reference file is used searching takes seconds, otherwise it
+might take a minute or so for the typical large help database containing
+all help modules for the core system and several external, layered packages.
+.ih
+BUGS
+Only the one-liner (NAME) field describing each help module is used for
+the searches.  With a little work searching could be made much more
+comprehensive as well as faster.
+.ih
+SEE ALSO
+help, match
+.endhelp

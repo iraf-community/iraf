@@ -1,0 +1,80 @@
+#   Make the nttools package
+#   Author: CDBS, 23-NOV-1987
+#	to include copyone,keyselect,lib,tcalc,tchsize,tcopy,tcreate,tedit,
+#	tinfo,tjoin,tmerge,tprint,tproduct,tproject,tselect,tsort,tupar, 
+#	tintegrate application(s)
+#   03-Jun-97  3-D table translators (I. Busko)
+#
+#   Special keywords recognized by IRAF mkpkg files:
+#
+#	mkpkg relink		update object library and link
+#	mkpkg linkonly		skip object library updates and just link
+#	mkpkg install		move executable to lib$
+#	mkpkg update		update object library, link, and move to lib$
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+debug:
+        $set XFLAGS = "-fgq $(XFLAGS)"
+        $call relink
+        ;
+
+relink:
+	$update	libpkg.a
+	$call	nttools
+	;
+
+install:
+	$move	xx_nttools.e bin$x_nttools.e
+	;
+
+nttools:
+linkonly:
+	$omake	x_nttools.x
+	$link	x_nttools.o libpkg.a -lxtools -ltbtables -o xx_nttools.e
+	;
+
+libpkg.a:
+	@threed
+	@stxtools
+
+	@atools
+	@copyone
+	@gtedit
+	@imtab
+	@keyselect
+	@lib
+	@tcalc
+	@tchcol
+	@tchsize
+	@tcheck
+	@tcopy
+	@tcreate
+	@tdiffer
+	@tedit
+	@texpand
+	@thedit
+	@tinfo
+	@tintegrate
+	@tjoin
+        @tlinear
+	@tmatch
+	@tmerge
+	@tprint
+	@tproduct
+	@tproject
+	@tquery
+	@trebin
+	@tselect
+	@tsort
+	@tstat
+	@ttranspose
+	@tunits
+	@tupar
+	;

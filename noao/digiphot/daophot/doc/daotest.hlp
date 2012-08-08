@@ -1,0 +1,89 @@
+.help daotest Dec92 noao.digiphot.daophot
+.ih
+NAME
+daotest -- run basic tests on the daophot package tasks
+.ih
+USAGE
+daotest imname
+.ih
+PARAMETERS
+.ls imname
+The root name of the output test images. The input test image is stored in
+fits format in the DAOPHOT package test directory. If the image already exists
+DAOTEST will exit with a warning message.
+.le
+.ls daologfile = ""
+The name of the output log file. By default all the output image header
+listings and photometry file output is logged in a file
+called \fI"imname.log"\fR. If the log file already exists DAOTEST will
+exit with a warning message.
+.le
+.ls daoplotfile = ""
+The name of the output plot file. By default all the graphics output is
+logged in a file called \fI"imname.plot"\fR. If the plot file already exists
+DAOTEST will exit with a warning message.
+.le
+.ih
+DESCRIPTION
+DAOTEST is a simple script which exercises each of the major tasks in the
+DAOPHOT package in turn. At startup DAOTEST reads a small fits image stored
+in the DAOPHOT test subdirectory and creates the image \fIimname\fR in
+the user's working directory. DAOTEST initializes the DAOPHOT package by
+returning
+all the parameters to their default state, runs each of the DAOPHOT
+tasks in non-interactive mode, spools the text output to the file
+\fIdaologfile\fR, the graphics output from the PSF task to the plot
+metacode file \fIapplotfile\fR, and the image output from PSF, SUBSTAR
+and ADDSTAR to \fIimname.psf.1\fR, \fIimname.sub.1\fR, and \fIimname.add.1\fR
+respectively.
+.ih
+EXAMPLES
+
+1. Check to see that all the DAOPHOT tasks are functioning correctly.
+.nf
+	da> daophot
+
+	... load the daophot package
+
+	da> daotest testim
+
+	... run the test script
+
+	da> lprint testim.log
+
+	... print the text output
+
+	da> gkidir testim.plot
+
+	... list the contents of the plot file
+
+	da> gkiextract testim.plot 1-N | stdplot
+
+	... send the plots to the plotter
+
+	da> display testim 1
+
+	... display the original image
+
+	da> surface testim.psf.1
+
+	... make a surface plot of the psf look-up table
+
+	da> display testim.sub.1 1
+
+	... display the image with all the stars fitted by ALLSTAR
+	    subtracted out
+
+	da> display testim.add.1 1
+
+	... display the image  containing three additional artificial
+	    stars added by the ADDSTAR routine
+.fi
+
+.ih
+TIME REQUIREMENTS
+.ih
+BUGS
+.ih
+SEE ALSO
+.endhelp

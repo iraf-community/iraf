@@ -1,0 +1,130 @@
+.help imfunction Aug91 proto
+.ih
+NAME
+imfunction -- Apply a function to the image pixel values
+.ih
+USAGE	
+imfunction input output function
+.ih
+PARAMETERS
+.ls input
+The input image list.
+.le
+.ls output
+Output image list. The number of output images must match the number of
+input images. If the output image list equals the input image list
+the input images are overwritten.
+.le
+.ls function
+Function to be applied to the input pixels. The options are:
+.ls log10
+Take the logarithm to base 10 of an image. Negative and zero-valued
+pixels will be assigned the value -MAX_EXPONENT.
+.le
+.ls alog10
+Taken the antilogarithm to base 10 of the image. Positive out-of-bounds
+pixel values will be assigned the value MAX_REAL, negative out-of-bounds
+pixel values will be assigned the value 0.0.
+.le
+.ls ln   
+Take the natural logarithm of an image. Negative and zero-valued pixels
+will be assigned the value - ln (10.) * MAX_EXPONENT.
+.le
+.ls aln   
+Take the antilogarithm to base e of an image. Positive out-of-bounds pixel
+values will be assigned the value MAX_REAL, negative out-of-bounds
+pixel values will be assigned the value 0.0
+.le
+.ls sqrt
+Take the square root of an image. Negative pixel values will be assigned
+the value 0.0.
+.le
+.ls square
+Take the square of an image.
+.le
+.ls cbrt
+Take the cube root of an image.
+.le
+.ls cube
+Take the cube of an image.
+.le
+.ls abs  
+Take the absolute value of an image.
+.le
+.ls neg  
+Take the negative of an image.
+.le
+.ls cos  
+Take the cosine of an image.
+.le
+.ls sin  
+Take the sine of an image.
+.le
+.ls tan  
+Take the tangent of an image.
+.le
+.ls acos
+Take the arc-cosine of an image. The output pixels will lie between
+0.0 and PI.
+.le
+.ls asin
+Take the arc-sine of an image. The output pixels will lie between -PI/2
+and +PI/2.
+.le
+.ls atan
+Take the arc-tangent of an image. The output pixels will lie between
+-PI/2 and +PI/2.
+.le
+.ls hcos
+Take the hyperbolic cosine of an image. Positive or negative
+out-of-bounds pixels will be assigned the value MAX_REAL.
+.le
+.ls hsin
+Take the hyperbolic sine of an image. Positive and negative out-of-bounds
+pixel values will be assigned the values MAX_REAL and -MAX_REAL respectively.
+.le
+.ls htan
+Take the hyperbolic tangent of an image.
+.le
+.ls reciprocal
+Take the reciprocal of an image. Zero-valued pixels will be assigned
+the output value 0.0
+.le
+.le
+.ls verbose = yes
+Print messages about actions taken by the task?
+.le
+
+.ih
+DESCRIPTION
+
+The selected function \fIfunction\fR is applied to the pixel values of all
+the input images \fIinput\fR to create the pixel values of the output
+images \fIoutput\fR. The number of output images must equal the number of
+input images. If the output image name is the same as the input image name
+the input image will be overwritten.
+
+If the input image is type real or double the output image will
+be of type real or double respectively. If the input image is type
+ushort then the output image will be type real. If the input image is one of
+the remaining integer data types, then the output image will be type
+real, unless function is "abs" or "neg", in which case the output
+data type will be the same as the input data type.
+
+Values of the machine dependent constants MAX_REAL and MAX_EXPONENT can be
+found in the file "hlib$mach.h". 
+
+.ih
+EXAMPLES
+
+1. Take the logarithm of the pixel values of images in1 and in2 and write
+the results to out1 and out2.
+
+.nf
+    cl> imfunction in1,in2 out1,out2 log10
+.fi
+
+.ih
+SEE ALSO
+imarith,imreplace
+.endhelp

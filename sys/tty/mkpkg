@@ -1,0 +1,52 @@
+# Make the TTY interface portion of the LIBSYS library.
+
+$checkout libsys.a lib$
+$update   libsys.a
+$checkin  libsys.a lib$
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$omake	x_mkttydata.x <error.h> tty.h
+	$link	x_mkttydata.o
+	;
+
+install:
+	$move	x_mkttydata.e bin$
+	;
+
+libsys.a:
+	gttyload.x
+	ttycaps.x	tty.h
+	ttycdes.x	
+	ttyclear.x	tty.h <chars.h>
+	ttyclln.x	tty.h <chars.h>
+	ttyclose.x	
+	ttyctrl.x	tty.h <chars.h>
+	ttydelay.x	tty.h
+	ttydevnm.x	<ctype.h>
+	ttygdes.x	dev$cacheg.dat tty.h <chars.h> <ctype.h> <error.h>
+	ttygetb.x	
+	ttygeti.x	
+	ttygetr.x	<mach.h>
+	ttygets.x	<chars.h>
+	ttygoto.x	tty.h <chars.h>
+	ttygsize.x	<fset.h> <ttset.h> <ttyset.h>
+	ttyindex.x	tty.h <chars.h>
+	ttyinit.x	tty.h <chars.h> <error.h> <fset.h>
+	ttyload.x	dev$cachet.dat
+	ttyodes.x	tty.h <chars.h> <ctype.h> <error.h>
+	ttyopen.x	tty.h <chars.h> <ctype.h> <error.h>
+	ttyputl.x	tty.h <chars.h> <ctype.h>
+	ttyputs.x	
+	ttyread.x	<chars.h> <fset.h>
+	ttyseti.x	tty.h <chars.h> <ttyset.h>
+	ttyso.x	
+	ttystati.x	tty.h <chars.h> <ttyset.h>
+	ttysubi.x	tty.h <chars.h> <ctype.h>
+	ttywrite.x	tty.h <chars.h> <ctype.h>
+	;

@@ -1,0 +1,131 @@
+.help findgain Apr92 noao.nproto
+.ih
+NAME
+findgain -- calculate the gain and readout noise of a CCD
+.ih
+USAGE
+findgain flat1 flat2 bias1 bias2
+.ih
+PARAMETERS
+.ls flat1, flat2
+First and second dome flats.
+.le
+.ls bias1, bias2
+First and second bias frames (zero length dark exposures).
+.le
+.ls section = "[*,*]"
+The selected image section for the statistics.  This should be chosen
+to exclude bad columns or rows, cosmic rays and other blemishes, and
+the overscan region.  The flat field iillumination should be constant
+over this section.  Special care should be taken with spectral data!
+.le
+.ls center = "mean"
+The statistical measure of central tendency that is used to estimate
+the data level of each image.  This can have the values:  \fBmean\fR,
+\fBmidpt\fR, or \fBmode\fR.  These are calculated using the same
+algorithm as the IMSTATISTICS task.
+.le
+.ls binwidth = 0.1
+The bin width of the histogram (in sigma) that is used to estimate the
+\fBmidpt\fR or \fBmode\fR of the data section in each image.
+The default case of center=\fBmean\fR does not use this parameter.
+.le
+.ls verbose = yes
+Label the gain and readnoise on output, rather than print them two per
+line?
+.le
+.ih
+DESCRIPTION
+FINDGAIN uses Janesick's method for determining the gain and read noise
+of a CCD from a pair of dome flats and a pair of bias frames (zero
+length dark exposures).  The task requires that the flats and biases be
+unprocessed and uncoadded so that the noise characteristics of the data
+are preserved.  Note, however, that the frames may be bias subtracted
+if the average of many bias frames is used, and that the overscan
+region may be removed prior to using this task.
+
+The section over which the statistics are computed should be chosen
+carefully.  The frames may be displayed and perhaps blinked, and
+IMSTATISTICS, IMHISTOGRAM, IMPLOT, and other tasks may be used to
+compare the statistics of sections of various flats and biases directly.
+.ih
+ALGORITHM
+The formulae used by the task are:
+
+.nf
+    flatdif = flat1 - flat2
+
+    biasdif = bias1 - bias2
+
+       gain = ((mean(flat1) + mean(flat2)) - (mean(bias1) + mean(bias2))) /
+	      ((sigma(flatdif))**2 - (sigma(biasdif))**2 )
+
+   readnoise = gain * sigma(biasdif) / sqrt(2)
+.fi
+
+Where the gain is given in electrons per ADU and the readnoise in
+electrons.  Pairs of each type of comparison frame are used to reduce
+the effects of gain variations from pixel to pixel.  The derivation
+follows from the definition of the gain (N(e) = gain * N(ADU)) and from
+simple error propagation.  Also note that the measured variance
+(sigma**2) is related to the exposure level and read-noise variance
+(sigma(readout)**2) as follows:
+
+.nf
+     variance(e) = N(e) + variance(readout)
+.fi
+
+Where N(e) is the number of electrons (above the bias level) in a
+given duration exposure.
+
+In our implementation, the \fBmean\fR used in the formula for the gain
+may actually be any of the \fBmean\fR, \fBmidpt\fR (an estimate of the
+median), or \fBmode\fR as determined by the \fBcenter\fR parameter.
+For the \fBmidpt\fR or \fBmode\fR choices only, the value of the
+\fBbinwidth\fR parameter determines the bin width (in sigma) of the
+histogram that is used in the calculation.  FINDGAIN uses the
+IMSTATISTICS task to compute the statistics.
+.ih
+EXAMPLES
+To calculate the gain and readnoise within a 100x100 section:
+
+.nf
+    lo> findgain flat1 flat2 bias1 bias2 section="[271:370,361:460]"
+.fi
+
+To calculate the gain and readnoise using the mode to estimate the data
+level for each image section:
+
+.nf
+    lo> findgain.section="[271:370,361:460]"
+    lo> findgain flat1 flat2 bias1 bias2 center=mode
+.fi
+
+To calculate the gain and readnoise from several frames and accumulate
+the results in a file for graphing:
+
+.nf
+    lo> findgain.section = "[41:140,171:270]"
+    lo> findgain flat1 flat2 bias1 bias2 verbose- > gain.list
+    lo> findgain flat3 flat4 bias3 bias4 verbose- >> gain.list
+    lo> findgain flat5 flat6 bias5 bias6 verbose- >> gain.list
+    lo> findgain flat7 flat8 bias7 bias8 verbose- >> gain.list
+    lo> findgain flat9 flat10 bias9 bias10 verbose- >> gain.list
+    lo> plot
+    pl> graph gain.list point+
+.fi
+
+It is not obvious what to do with all the other combinations of flats
+and biases.  Note that the values in gain.list could have been averaged
+or fit as well.
+.ih
+BUGS
+The image headers are not checked to see if the frames have been
+processed.
+
+There is no provision for finding the "best" values and their errors
+from several flats and biases.
+.ih
+SEE ALSO
+findthresh, imstatistics, imhistogram, implot
+.endhelp

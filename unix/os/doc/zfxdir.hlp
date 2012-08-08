@@ -1,0 +1,31 @@
+.help zfxdir May84 "System Interface"
+.ih
+NAME
+zfxdir -- extract OS directory prefix from OSFN
+.ih
+SYNOPSIS
+.nf
+zfxdir (osfn, osdir, maxch, status)
+
+char	osfn[ARB]		# OS filename
+char	osdir[maxch]		# OS directory prefix
+int	maxch, status
+.fi
+.ih
+DESCRIPTION
+The OS directory prefix, if any, is extracted from the OS filename
+and returned as \fIosdir\fR.
+.ih
+RETURN VALUE
+ERR is returned if the output string overflows.  If \fIosfn\fR is null
+or does not contain a directory prefix a status of zero is returned,
+otherwise the number of characters in the output string is returned.
+If there is no directory prefix the null string is returned in \fIosdir\fR.
+.ih
+NOTES
+This routine is normally written in SPP since it does not communicate with
+the host system.  Character string arguments are therefore not packed.
+.ih
+SEE ALSO
+zfpath, zfsubd, zfgcwd
+.endhelp

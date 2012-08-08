@@ -1,0 +1,727 @@
+.help pcintro Apr94 noao.digiphot.photcal
+.ih
+I. INTRODUCTION
+
+The photometric calibration package PHOTCAL, contains a set of tasks
+for computing the transformation from the instrumental system to the standard 
+photometric system, and applying the computed transformations to 
+the observational data. 
+
+PHOTCAL distinguishes between two types of objects: \fIstandard stars\fR, 
+and \fIprogram stars\fR. Standard stars have known instrumental and standard 
+photometric indices. Program stars have known instrumental photometric 
+indices, but unknown standard photometric indices. 
+
+The standard indices of standard stars are contained in standard star
+catalogs known as \fIcatalog files\fR. Each standard star catalog
+contains only a single entry for a given standard star. The 
+instrumental indices of both standard and program stars are 
+contained in observations catalogs, known as \fIobservations files\fR.
+There may be any number of observations per star in an observations
+file. 
+
+PHOTCAL uses a setup file called the \fIconfiguration file\fR to specify
+the format of the input catalog and observations files and define the
+transformation equations to be fit.
+
+Normally the user must perform the following logical steps to
+complete their photometric calibrations with PHOTCAL. However not all types
+of data require all the following steps.
+
+.ls [1]
+Prepare a standard star catalog file using the MKCATALOG task.
+.le
+.ls [2]
+Prepare a standard star observations file using the MKIMSETS and MKNOBSFILE
+tasks or alternatively the MKOBSFILE task. 
+.le
+.ls [3]
+Create the configuration file using the MKCONFIG and CHKCONFIG tasks.
+.le
+.ls [4]
+Fit the transformation equations with the FITPARAMS task.
+.le
+.ls [5]
+Apply the transformations to the standard star observations file using
+the EVALFIT or INVERTFIT tasks.
+.le
+.ls [6]
+Prepare a program star observations file using the MKIMSETS and MKNOBSFILE
+tasks or alternatively the MKOBSFILE tasks.
+.le
+.ls [7]
+Apply the transformations to the program star observations file using the
+EVALFIT or INVERTFIT tasks.
+.le
+
+.ih
+II. THE CATALOG AND OBSERVATIONS FILES FORMAT
+
+PHOTCAL catalog and observation files are simple text files containing any
+number of columns. Columns are delimited by whitespace.
+The first column is always reserved for the star id or 
+matching name, and the rest contain actual data such as positions, magnitudes,
+colors, errors, air mass, or any other quantity of interest.
+Comments can be inserted
+as separate lines at any point in the catalog or observations files
+by beginning the comment line with the character "#".
+
+The star id is used to 
+match observations with catalog entries, and to determine which objects
+are standard and which are program stars. Star ids may contain any non-blank
+characters,
+but lower case letters are converted to upper case, and
+characters not in the set [A-Z,0-9,+,-,_] are removed before
+star id matching. Catalog files must contain only a single entry per star.
+Observations files may contain multiple entries per star.
+Missing or unknown data values should be set to  INDEF not left blank.
+
+Normal catalog and observations files records are restricted in length to
+the maximum size of a text
+file line in IRAF, currently 161 characters including the newline. The maximum
+record length can be extended by replacing the star id in column 1
+with the continuation character "*".
+
+Several preprocessors are provided to convert data coming from other
+IRAF packages, such as APPHOT and DAOPHOT, into a format suitable for PHOTCAL.
+If a preprocessor for a specific type of data does 
+not exist, then the user will have to use other IRAF facilities to convert it 
+to into the appropriate format, or write their own. 
+
+.ih
+III. PREPARE A STANDARD STAR CATALOG FILE
+
+A standard star catalog suitable for input to PHOTCAL may be prepared in
+one of the following ways. The advantages and disadvantages of each
+method are briefly discussed.
+
+.ls [1]
+Use one of the standard star catalogs supported by PHOTCAL and maintained in
+the directory "photcal$catalogs/". Each supported standard star catalog has
+an associated catalog format description file defining the format of the
+standard star catalog. The catalog format description file may be used as
+input to the MKCONFIG task.  A list of currently supported standard star
+catalogs and their format files can be found in the file
+"photcal$catalogs/README".
+
+The principal advantage of this option is that no data entry is
+required on the part of the user. The principal disadvantage is that
+PHOTCAL, in preparation for id matching,  loads the entire standard
+star catalog into memory, even though the number of observed
+standard stars may have been only a few dozen. For typical standard
+star catalogs containing a few hundred objects this is not a problem,
+but very large standard star catalogs should be avoided.
+.le
+.ls [2]
+Prepare a standard star catalog with the MKCATALOG task. MKCATALOG
+prompts the user for the catalog title, the id column name and width, and the
+names and widths of all the data columns.
+When column definition is complete, MKCATALOG writes the catalog
+definition information into the catalog header and the associated catalog
+format file and prompts for data.
+The catalog format description file created by MKCATALOG may be used
+as input to MKCONFIG.
+Type "help mkcatalog" for the details of task usage.
+
+The principal advantages of using MKCATALOG are that the task always
+produces a PHOTCAL readable catalog and accompanying format description file,
+and that the standard star catalog contains values only for those objects
+that have actually been observed.
+.le
+.ls [3]
+With a text file editor create or edit a standard star catalog which
+conforms to the requirements of PHOTCAL as described in the previous section.
+
+The principal advantage of this option is that the user can take advantage
+of any spread sheet capabilities that his/her favorite editor has. The
+principal disadvantage is that a format description file is not
+automatically created along with the catalog.
+.le
+.ls [4]
+Reformat an existing standard star catalog until it conforms to the
+requirements of photcal as described in the previous section. In some
+case this may require writing a local preprocessor program. PHOTCAL users
+should be aware of the PROTO package tasks JOIN and FIELDS, the LISTS
+package tasks COLUMN, and the UTILITIES package task TRANSLIT.
+.le
+
+The first few lines of a representative catalog file produced by MKCATALOG are
+listed below.  V, BV, and UB stand for  the V magnitude, B-V color,
+and U-B color respectively. The non-blank lines beginning with '#' at the
+beginning of the file are for the internal use of the MKCATALOG task only,
+and are ignored by other PHOTCAL tasks.
+
+.nf
+# CATALOG: ubv.cat
+# NCOLS: 7
+# HDRLENGTH: 68
+# 
+# ID        V         error(V)  BV        error(BV) UB        error(UB)
+# 8         8         8         8         8         8         8        
+
+  105-307   12.050    0.020     0.690     0.020     0.220     0.020    
+  105-405   8.309     0.004     1.521     0.001     1.905     0.007    
+  105-411   10.620    0.014     0.950     0.010     0.620     0.008    
+  105-256   11.820    0.013     0.610     0.012     0.180     0.022    
+.fi
+
+The accompanying format description file produced by MKCATALOG is listed below.
+This file associates a column number with the column name and can be used
+as input to MKCONFIG. The comments opposite
+the column definitions were not produced by MKCATALOG but typed in later.
+
+.nf
+
+# Declare the catalog variables
+
+catalog
+
+V          2		# the V magnitude
+error(V)   3		# the error in the V magnitude
+BV         4		# the B-V color
+error(BV)  5		# the error in the B-V color
+UB         6		# the U-B color
+error(UB)  7		# the error in the U-B color
+
+.fi
+
+.ih
+IV. PREPARE A STANDARD STAR OBSERVATIONS FILE
+
+A standard star observations file suitable for input to PHOTCAL may be
+prepared in one of the following ways. APPHOT and DAOPHOT users should
+use options [1] or [2]. Other users must either enter their data by hand using
+options [3] and [4], or write a local program to prepare their data
+for input to PHOTCAL, option [5].
+
+.ls [1]
+If the standard star magnitudes were computed with APPHOT or DAOPHOT
+and consist of many individual and repeated observations of standard star
+fields, then use MKIMSETS
+followed by MKNOBSFILE to create an observations file. MKIMSETS creates
+an image set definition file, telling MKNOBSFILE which images taken
+in which filters belong to the same observation of a given stellar field. 
+For each observations file written, MKNOBSFILE
+creates an associated format description file defining the format of
+the new observations file and suitable for input to
+MKCONFIG.  MKNOBSFILE is set up to run automatically once the image set file
+is defined.  Type "help mknobsfile" for details.
+.le
+.ls [2]
+If the standard star magnitudes in one or more colors were computed with
+APPHOT or DAOPHOT and all the standard stars are in one stellar field,
+use the MKOBSFILE task to create an observations file.
+For each observations file created, MKOBSFILE
+creates an associated format description file defining the format of
+the new observations file, and suitable for input to
+MKCONFIG. MKOBSFILE prompts the user for all
+the required input. Type "help mkobsfile" for details.
+.le
+.ls [3]
+Prepare a standard star observations file with the MKCATALOG task. MKCATALOG
+prompts the user for the observations file title, the id column name and
+width, and the names and widths of all the data columns.
+When column definition is complete, MKCATALOG writes the observations file
+definition information into the observations file header and the associated
+format description file and prompts for data.
+The format description file created by MKCATALOG may be used as input
+to MKCONFIG if the "catalog" keyword (see the example in the previous
+section) is  changed to "observations". 
+Type "help mkcatalog" for the details of task usage.
+.le
+.ls [4]
+With the text editor create or edit a standard star observations file 
+which conforms to
+the requirements of PHOTCAL as described in the previous section.
+.le
+.ls [5]
+Write a local program to prepare the data for input to PHOTCAL.
+.le
+
+A sample image set file produced by MKIMSETS is shown below. The labels
+STD1, STD2, ..., STD7 stand for standard star fields 1, 2, ..., 7 and
+the c0* labels are the names of images of each field taken through filters
+U, B, and V respectively.
+
+.nf
+    STD1 :  c023  c022  c021
+    STD2 :  c024  c025  c026
+    STD3 :  c029  c028  c027
+    STD4 :  c033  c031  c032
+    STD5 :  c061  c060  c059
+    STD6 :  c064  c063  c062
+    STD7 :  c069  c066  c065
+.fi
+
+The first few lines  of the observations file produced by
+MKNOBSFILE using the above image set file both before and after the user
+has edited in the correct standard star ids is listed below.
+Note that there is usually more than 1 star in the field. In fact the
+data set above included 17 standard stars and 5 additional stars that
+the automatic star finding algorithm picked up.
+Note also that some known bad data points in the 
+original observations file have been replaced with the undefined value
+INDEF.
+
+.nf
+
+before editing
+
+# FIELD     FILTER OTIME    AIRMASS  XCENTER  YCENTER      MAG      MERR
+
+STD1-1      1      INDEF      1.276   156.43   518.23   20.077     0.031 
+*           2      INDEF      1.270   155.37   521.12   17.712     0.053 
+*           3      INDEF      1.265   152.16   519.62   17.044     0.019 
+STD1-2      1      INDEF      1.276   481.39   357.19   18.683     0.009 
+*           2      INDEF      1.270   480.57   360.07   14.919     0.005 
+*           3      INDEF      1.265   477.07   358.62   13.292     0.002 
+STD1-3      1      INDEF      1.276   507.69   128.53   19.144     0.014 
+*           2      INDEF      1.270   507.06   131.44   16.612     0.020 
+*           3      INDEF      1.265   503.42   130.29   15.587     0.008 
+STD2-1      1      INDEF      1.305   719.59   399.17   19.863     0.097 
+*           2      INDEF      1.315   718.79   401.30   17.339     0.043 
+*           3      INDEF      1.320   715.47   402.55   16.601     0.033 
+STD2-2      1      INDEF      1.305   470.72   393.68   16.675     0.005 
+*           2      INDEF      1.315   469.71   396.22   14.743     0.004 
+*           3      INDEF      1.320   466.58   397.27   14.030     0.004 
+STD2-3      1      INDEF      1.305   498.75   204.35   19.413     0.057 
+*           2      INDEF      1.315   497.73   206.40   17.469     0.042 
+*           3      INDEF      1.320   494.55   207.64   16.662     0.032 
+STD2-4      1      INDEF      1.305   182.44   209.60   19.748     0.073 
+*           2      INDEF      1.315   181.10   211.95   18.056     0.074 
+*           3      INDEF      1.320   178.21   213.03   17.034     0.044 
+STD3-1      1      INDEF      1.251   397.57   200.65   19.060     0.007 
+*           2      INDEF      1.236   396.58   200.38   15.725     0.005 
+*           3      INDEF      1.231   393.53   200.51   14.237     0.007 
+
+after editing
+
+# FIELD     FILTER OTIME    AIRMASS  XCENTER  YCENTER      MAG      MERR
+
+STD1-1      1      INDEF      1.276   156.43   518.23   20.077     0.031 
+*           2      INDEF      1.270   155.37   521.12   17.712     0.053 
+*           3      INDEF      1.265   152.16   519.62   17.044     0.019 
+105-405     1      INDEF      1.276   481.39   357.19   18.683     0.009 
+*           2      INDEF      1.270   480.57   360.07   14.919     0.005 
+*           3      INDEF      1.265   477.07   358.62   13.212     0.002 
+105-411     1      INDEF      1.276   507.69   128.53   19.144     0.014 
+*           2      INDEF      1.270   507.06   131.44   16.612     0.020 
+*           3      INDEF      1.265   503.42   130.29   15.487     0.008 
+STD2-1      1      INDEF      1.305   719.59   399.17   19.863     0.097 
+*           2      INDEF      1.315   718.79   401.30   17.339     0.043 
+*           3      INDEF      1.320   715.47   402.55   16.601     0.033 
+105-257     1      INDEF      1.305   470.72   393.68   16.675     0.005 
+*           2      INDEF      1.315   469.71   396.22   14.743     0.004 
+*           3      INDEF      1.320   466.58   397.27   14.030     0.004 
+105-262     1      INDEF      1.305   498.75   204.35   INDEF      0.057 
+*           2      INDEF      1.315   497.73   206.40   17.469     0.042 
+*           3      INDEF      1.320   494.55   207.64   INDEF      0.032 
+STD2-4      1      INDEF      1.305   182.44   209.60   19.748     0.073 
+*           2      INDEF      1.315   181.10   211.95   18.056     0.074 
+*           3      INDEF      1.320   178.21   213.03   17.034     0.044 
+106-575     1      INDEF      1.251   397.57   200.65   19.060     0.007 
+*           2      INDEF      1.236   396.58   200.38   15.725     0.005 
+*           3      INDEF      1.231   393.53   200.51   14.237     0.007 
+.fi
+
+The accompanying format description file produced by MKNOBSFILE
+is listed below. This file associated column numbers with column
+names. The filter numbers 1, 2, 3 were written into the image
+headers by the data taking program, and subsequently picked up by the
+APPHOT package tasks computed the magnitudes. They stand for filters U, B and
+V respectively.
+
+.nf
+# Declare the observations file variables
+
+observations
+
+T1            3              # time of observation in filter 1
+X1            4              # airmass in filter 1
+x1            5              # x coordinate in filter 1
+y1            6              # y coordinate in filter 1
+m1            7              # instrumental magnitude in filter 1
+error(m1)     8              # magnitude error in filter 1
+
+T2            10             # time of observation in filter 2
+X2            11             # airmass in filter 2
+x2            12             # x coordinate in filter 2
+y2            13             # y coordinate in filter 2
+m2            14             # instrumental magnitude in filter 2
+error(m2)     15             # magnitude error in filter 2
+
+T3            17             # time of observation in filter 3
+X3            18             # airmass in filter 3
+x3            19             # x coordinate in filter 3
+y3            20             # y coordinate in filter 3
+m3            21             # instrumental magnitude in filter 3
+error(m3)     22             # magnitude error in filter 3
+.fi
+
+.ih
+V. PREPARE THE CONFIGURATION FILE
+
+The configuration file is a text file, created by the user, that specifies
+both the format of the input data and the form of the transformation equations.
+A detailed description of the grammar and syntax of the configuration file
+can be obtained by typing the following command.
+.nf
+
+ph> help config
+
+.fi
+The configuration file can be prepared in one of the following ways.
+
+.ls [1]
+Run the MKCONFIG task using the output of MKCATALOG or direct terminal input to
+define the catalog file format, the output of the MKNOBSFILE
+or MKOBSFILE tasks or direct terminal input to define the observations file
+format, and one of the standard template transformation section files or
+direct terminal input to define the transformation equations.
+Users are urged to use MKCONFIG if they are new to PHOTCAL,
+if the catalog file is one of the supported catalogs, or if the observations
+file was made with one of the standard preprocessors MKNOBSFILE or
+MKOBSFILE.
+.le
+.ls [2]
+Use the text editor to make small corrections to an existing functioning
+configuration file. This is the recommended method if the transformation
+equations have changed from a previous PHOTCAL reduction session but the
+format of the standard star and observations catalogs has not, or if
+the user has become familiar with the PHOTCAL configuration file format.
+.le
+.ls [3]
+Use the text editor to create a configuration file from scratch.
+.le
+
+The grammar and syntax of the configuration file can be checked with the
+CHKCONFIG task.  If an error was found, the program will print the 
+line and the word where the error was detected and the user must reedit the
+file until no errors are found. 
+
+A sample configuration file is shown below.
+
+.nf
+
+# Declare the catalog file variables
+
+catalog
+
+V               2
+error(V)	3
+BV              4
+error(BV)	5
+UB              6
+error(UB)	7
+
+# Declare the observations file variables
+
+observations
+
+T1            3              # time of observation in filter 1
+X1            4              # airmass in filter 1
+x1            5              # x coordinate in filter 1
+y1            6              # y coordinate in filter 1
+m1            7              # instrumental magnitude in filter 1
+error(m1)     8              # magnitude error in filter 1
+
+T2            10             # time of observation in filter 2
+X2            11             # airmass in filter 2
+x2            12             # x coordinate in filter 2
+y2            13             # y coordinate in filter 2
+m2            14             # instrumental magnitude in filter 2
+error(m2)     15             # magnitude error in filter 2
+
+T3            17             # time of observation in filter 3
+X3            18             # airmass in filter 3
+x3            19             # x coordinate in filter 3
+y3            20             # y coordinate in filter 3
+m3            21             # instrumental magnitude in filter 3
+error(m3)     22             # magnitude error in filter 3
+
+
+transformation
+
+fit  u1 = 0.0, u2 = -.07, u3 = 0.70
+UFIT : m1 = V + BV + UB + u1 + u2 * UB + u3 * X1
+
+fit  b1 = 0.0, b2 = -.06, b3 = 0.30
+BFIT : m2 = V + BV + b1 + b2 * BV + b3 * X2
+
+fit  v1 = 0.0, v2 = 0.05, v3 = 0.20
+VFIT : mv = V + v1 + v2 * BV + v3 * Xv
+.fi
+
+.ih
+VI. FITTING THE PARAMETERS OF THE TRANSFORMATION EQUATIONS
+
+The heart of the PHOTCAL package is the parameter fitting task FITPARAMS.
+A detailed description of this task and its parameters can be obtained by
+typing the following command. 
+.nf
+
+ph> help fitparams
+
+.fi
+FITPARAMS takes the observation files, catalog files, and configuration file, 
+and computes the value of the fit parameters for each of the 
+transformation equations specified in the configuration file. Equations will 
+be processed in the same order in which they occur in the configuration file.
+The output of FITPARAMS is a text database file containing one record,
+identified by the transformation equation label, for each equation fit.
+Successive fits are appended to the end of the database file. If more than
+one fit has the same label the last fit performed will be used by the
+evaluation tasks.
+
+Only standard stars with known instrumental magnitudes and photometric
+indices are used to compute the parameters of each transformation 
+equation. Standard stars are identified by matching the id in the observations
+catalog against the list of ids in the standard star catalog.
+
+The fitting process can be either interactive or non-interactive. Interactive
+fitting is the default. In interactive mode, the user 
+is presented with plots of the data and the fit, can reject points
+automatically using a k-sigma rejection algorithm, delete points interactively
+with the cursor, change which parameters are to be fit and which are to be
+held constant, and so on. A detailed description of
+all the interactive options and colon commands can be obtained by typing
+the following command. 
+.nf 
+
+ph> help inlfit
+
+.fi
+
+The database file produced by FITPARAMS for the catalog and
+observations files listed in sections III and IV and configuration file
+listed in section V is shown below.
+
+.nf
+# Mon 10:41:04 06-May-91
+begin	UFIT
+	status	0	(Solution converged)
+	variance	4.965303E-4
+	stdeviation	0.02228296
+	avsqerror	1.
+	averror		1.
+	avsqscatter	0.
+	avscatter	0.
+	chisqr		4.965303E-4
+	msq		3.901309E-4
+	rms		0.01975173
+	reference	mu
+	fitting		V+BV+UB+u1+u2*UB+u3*Xu
+	weights		uniform
+	parameters	3
+		u1	(fit)
+		u2	(fit)
+		u3	(fit)
+	derivatives	3
+		0.1
+		0.1
+		0.1
+	values	3
+		6.108767
+		-0.04842735
+		0.7180178
+	errors	3
+		0.05704632
+		0.008730207
+		0.04209311
+
+# Mon 10:41:14 06-May-91
+begin	BFIT
+	status	0	(Solution converged)
+	variance	0.002550806
+	stdeviation	0.0505055
+	avsqerror	1.
+	averror		1.
+	avsqscatter	0.
+	avscatter	0.
+	chisqr		0.002550806
+	msq		0.00207253
+	rms		0.04552504
+	reference	mb
+	fitting		V+BV+b1+b2*BV+b3*Xb
+	weights		uniform
+	parameters	3
+		b1	(fit)
+		b2	(fit)
+		b3	(fit)
+	derivatives	3
+		0.1
+		0.1
+		0.1
+	values	3
+		4.826268
+		-0.08220235
+		0.275757
+	errors	3
+		0.1189408
+		0.02718129
+		0.08517767
+
+# Mon 10:41:21 06-May-91
+begin	VFIT
+	status	0	(Solution converged)
+	variance	9.547584E-4
+	stdeviation	0.03089917
+	avsqerror	1.
+	averror		1.
+	avsqscatter	0.
+	avscatter	0.
+	chisqr		9.547584E-4
+	msq		7.501673E-4
+	rms		0.02738918
+	reference	mv
+	fitting		V+v1+v2*BV+v3*Xv
+	weights		uniform
+	parameters	3
+		v1	(fit)
+		v2	(fit)
+		v3	(fit)
+	derivatives	3
+		0.1
+		0.1 
+		0.1 
+	values	3
+		4.632307
+		0.02190715
+		0.1877689
+	errors	3
+		0.07831987
+		0.01721398
+		0.0573602
+.fi
+
+.ih
+VII. APPLYING THE TRANSFORMATIONS TO THE STANDARD STARS
+
+This step is optional since the goodness of fit can be assessed more
+efficiently from within the FITPARAMS task. However in some cases
+the user may want a record of the fitted photometric indices for the
+standard stars and the residuals from the fit.
+
+There are two tasks for evaluating the transformation equations
+and which one the user must select depends on how he/she has
+defined the transformations equations.
+
+If all references to the catalog file variables are on the left-hand side
+of the transformation equations 
+and the right-hand side is a function of the observations file
+variables only, then the user should use EVALFIT. The transformation equations
+used for reducing photoelectric photometry are often written in this manner.
+
+If the left-hand side
+of the transformation equation is a function of the observations file
+variables and all references to the catalog files variables are on
+the right-hand side of the transformation equations
+then the user must use INVERTFIT. The transformation equations
+for reducing CCD photometry are usually written in this manner.
+
+The full output of INVERTFIT for the partial catalog and observations
+files listed in section III and IV and the configuration file
+shown in section V are listed below.
+Only observations which were successively matched
+with objects in the standard star catalog files are shown. The fits for
+objects with undefined observational variables could not be successfully
+inverted producing a row of INDEF values.
+
+.nf
+# Tue 15:50:37 14-May-91
+# List of observations files:
+#		ubv.std
+# Number of catalog files:
+#		ubv.cat
+# Config:	ubv.cfg
+# Parameters:	ubv.fit
+#
+# Computed indices for standard objects only
+#
+# Columns: 
+#	1	object id
+#	2	V
+#	3	error(V)
+#	4	resid(V)
+#	5	BV
+#	6	error(BV)
+#	7	resid(BV)
+#	8	UB
+#	9	error(UB)
+#	10	resid(UB)
+
+
+105-405  8.308  0.002 0.001  1.563  0.006  -0.042 1.878  0.011  0.027
+105-411  10.597 0.008 0.023  0.913  0.024  0.037  0.639  0.027  -0.019
+105-257  9.140  0.004 0.000  0.451  0.006  0.039  0.040  0.007  -0.020
+105-262  INDEF  INDEF INDEF  INDEF  INDEF  INDEF  INDEF  INDEF  INDEF
+106-575  9.345  0.007 -0.004 1.322  0.010  -0.014 1.457  0.009  0.026
+106-728  INDEF  INDEF INDEF  INDEF  INDEF  INDEF  INDEF  INDEF  INDEF
+107-998  10.399 0.010 0.041  0.602  0.018  0.028  0.217  0.020  -0.057
+107-991  INDEF  INDEF INDEF  INDEF  INDEF  INDEF  INDEF  INDEF  INDEF
+107-990  9.555  0.005 0.005  0.455  0.009  0.035  0.047  0.009  -0.047
+114-473  8.514  0.004 0.006  1.005  0.007  0.005  0.832  0.008  -0.032
+114-353  INDEF  INDEF INDEF  INDEF  INDEF  INDEF  INDEF  INDEF  INDEF
+114-151  10.708 0.005 -0.048 0.748  0.011  0.002  0.221  0.014  0.069
+114-236  10.446 0.005 0.034  0.687  0.010  -0.057 0.093  0.011  0.007
+111-775  INDEF  INDEF INDEF  INDEF  INDEF  INDEF  INDEF  INDEF  INDEF
+111-773  8.980  0.005 -0.017 0.270  0.006  -0.064 -0.258 0.005  0.047
+111-1342 9.263  0.006 -0.043 1.702  0.009  -0.012 1.726  0.076  0.054
+111-733  9.219  0.006 -0.039 0.262  0.007  0.038  0.172  0.007  0.008
+.fi
+
+.ih
+VIII. PREPARE A PROGRAM STAR OBSERVATIONS FILE
+
+A program star observations file is prepared in the identical manner to
+the standard star observations file as described in section IV.
+In fact there is no intrinsic reason why standard star and program
+star observations cannot occupy the same observations file since
+they can be separated later by the EVALFIT and INVERTFIT tasks.
+In the sample observations
+file shown in section IV objects with names like 105-411 are the actual
+standard stars and those with names like STD* can, for the purpose
+of illustration, be regarded as program stars.
+
+.ih
+IX. APPLYING THE TRANSFORMATIONS TO THE PROGRAM STARS
+
+The transformation equations are applied to the program stars in the same
+way they are applied to the standard stars ad described in section VII.
+
+The output of INVERTFIT for the partial catalog and observations
+files listed in section III and IV and the configuration file
+shown in section V are listed below. Only observations
+which were not successfully matched
+with objects in the standard star files are shown.
+Note that the residuals from the fit cannot be computed for program
+objects and are therefore not output.
+
+.nf
+# Tue 16:17:11 14-May-91
+# List of observations files:
+#		ubv.obs
+# Number of catalog files:
+#		ubv.cat
+# Config:	ubv.cfg
+# Parameters:	ubv.fit
+#
+# Computed indices for program objects only
+#
+# Columns: 
+#	1	object id
+#	2	V
+#	3	error(V)
+#	4	BV
+#	5	error(BV)
+#	6	UB
+#	7	error(UB)
+
+
+STD1-3  12.165  0.019  0.403  0.063  0.508   0.069
+STD2-2  12.136  0.045  0.796  0.096  -0.242  0.115
+STD2-4  11.710  0.034  0.479  0.061  0.660   0.113
+STD6-3  10.589  0.006  0.619  0.016  -0.069  0.022
+STD7-5  11.852  0.059  0.406  0.069  0.981   0.129
+.fi
+.endhelp

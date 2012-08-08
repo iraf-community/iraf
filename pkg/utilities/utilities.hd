@@ -1,0 +1,26 @@
+# Help directory for the UTILITIES package.
+
+$defdir	 = "pkg$utilities/"
+$nttools = "pkg$utilities/nttools/"
+$doc     = "./doc/"
+
+
+nttools         men=nttools$nttools.men,
+                hlp=..,
+                sys=nttools$nttools.hlp,
+                pkg=nttools$nttools.hd,
+                src=nttools$nttools.cl
+
+
+bases           hlp=doc$bases.hlp,      src=bases.cl
+curfit		hlp=doc$curfit.hlp,	src=t_curfit.x
+detab		hlp=doc$detab.hlp,	src=t_detab.x
+entab		hlp=doc$entab.hlp,	src=t_entab.x
+lcase		hlp=doc$lcase.hlp,	src=t_lcase.x
+polyfit		hlp=doc$polyfit.hlp,	src=t_polyfit.x
+revisions	sys=Revisions
+split		hlp=doc$split.hlp,	src=t_split.x
+surfit		hlp=doc$surfit.hlp,	src=t_surfit.x
+translit	hlp=doc$translit.hlp,	src=t_translit.x
+ucase		hlp=doc$ucase.hlp,	src=t_ucase.x
+urand		hlp=doc$urand.hlp,	src=t_urand.x

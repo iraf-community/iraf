@@ -1,0 +1,5 @@
+module,s,a,,,,"module name"
+clformat,b,h,yes,,,"make a CL format manual page template"
+cltemplate,f,h,"doc$mancl.hlp",,,"template for a CL program manual page"
+xtemplate,f,h,"doc$manx.hlp",,,"template for a procedure manual page"
+fname,f,h

@@ -1,0 +1,38 @@
+$if (datatype == r)
+include "nlfitdefr.h"
+$else
+include "nlfitdefd.h"
+$endif
+
+
+# NLZERO --  Zero the accumulators and reset the fitting parameter values to
+# their original values set by nlinit().
+
+procedure nlzero$t (nl)
+
+pointer	nl		# pointer to nl fitting structure
+
+int	nparams		# number of parameters
+int	nfparams	# number of fitted parameters
+
+begin
+	# Get number of parameters and fitting parameters.
+	nparams  = NL_NPARAMS(nl)
+	nfparams = NL_NFPARAMS(nl)
+
+	# Clear temporary array space.
+	call aclr$t (ALPHA(NL_ALPHA(nl)), nfparams * nfparams)
+	call aclr$t (COVAR(NL_COVAR(nl)), nfparams * nfparams)
+	call aclr$t (CHOFAC(NL_CHOFAC(nl)), nfparams * nfparams)
+	call aclr$t (BETA(NL_BETA(nl)), nfparams)
+
+	# Clear space for derivatives and trial parameter vectors.
+	call aclr$t (DERIV(NL_DERIV(nl)), nparams)
+	call aclr$t (TRY(NL_TRY(nl)), nparams)
+
+	# Reset parameters.
+	call amov$t (OPARAM(NL_OPARAM(nl)), PARAM(NL_PARAM(nl)), nparams)
+	call aclr$t (DPARAM(NL_DPARAM(nl)), nparams)
+
+	NL_SCATTER(nl) = PIXEL(0.0)
+end

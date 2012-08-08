@@ -1,0 +1,90 @@
+.help mctable Aug89
+Multicolumn Table Handler.
+
+This package contains routines to handle a contiguous memory buffer as a
+table with one or more columns. The number of columns is fixed at creation
+time, but the number of rows can increase dynamicaly if needed. The table
+data type is fixed at creation time as well.
+.sp
+This package makes a distinction between the physical and logical size of
+the table. The first one is the amount of memory allocated to the table, and
+can increase if more space is needed. The physical size of a table can
+increase dinamycaly when entering data and can decrease up to the logical
+size unless the table is freed.
+The logical size is the amount of memory used by the data in the table,
+and is always less or equal to the physical size. The logical size of a
+table can also increase dinamycaly when entering data, and is zero
+if no data have been entered.
+.sp
+The procedures mct_maxrow() and mct_maxcol() return the amount of physical
+memory used by the table, and the procedures mct_nrows() and mct_ncols() return
+the highest row and column (in the highest row) used by the data in the table,
+i.e. the logical size.
+.sp
+The physical size can be reduced up to the logical size with the mct_shrink()
+procedure. This returns to the system any unused memory used by the table.
+This procedures should ne used with tables that are not intended to grow
+anymore.
+.sp
+The logical size can be set to zero with the mct_reset() procedure. This
+procedure clears all the counters used to keep track of the logical size
+of the table, and also fills all the physical memory with INDEF values.
+.sp
+The mct_clear() procedure fills all the physical memory with a specified
+value, but does not modify the logical size of the table.
+.sp
+It is possible to enter data into the table either sequentially, randomly,
+or a combination of both. The mct_put() procedures enter data randomly into
+the table at given row and column. The mct_sput() procedures enter data 
+sequentially into the table after the highest row and column, i.e., they
+start after the last element in table, increasing the logical size by one
+element. The physical size is increased automaticaly if needed.
+.sp
+Data can be retrieved from the table as a pointer to the whole data buffer,
+a pointer to a single row, randomly, or sequentially. The mct_getbuf() returns
+a pointer to the data buffer, the mct_getrow() returns a pointer to the
+beginning of a given row, the mct_get() procedures return a single data
+value for a given row and column, and the mct_sget() procedures return the
+next single data value. Sequential retrieval starts from the last retrieval
+made, either sequential or ramdom. The mct_rew() procedure can be used to
+reset the sequential retrieval counters.
+.sp
+A table can be saved into a file and restored later with the mct_save() and
+mct_restore() procedures. These procedures use the file name instead of a
+file descriptor. When saving only the WRITE_ONLY, READ_WRITE, NEW_FILE, and
+TEMP_FILE file modes are allowed.
+.sp
+.nf
+Entry points:
+
+	mct_alloc  (table, nrows, ncols, type)	    Allocate table space
+	mct_free   (table)			    Free table space
+	mct_shrink (table)			    Free unused memory
+	mct_copy   (itable, otable)		    Copy table
+
+	mct_save    (fname, fmode, table)	    Save table to file
+	mct_restore (fname, table)		    Restore table from file
+
+	mct_rew   (table)		    	    Reset seq. (get) counters
+	mct_reset (table)			    Reset all table counters
+
+	mct_clear[csilrdxp] (table, value)	    Clear table with value
+
+nrows =	mct_nrows (table)			    Return highest row used
+ncols =	mct_ncols (table)			    Return highest col. used
+
+nrow  = mct_maxrow (table)			    Return max. number of rows
+ncols =	mct_maxcol (table)			    Return max. number of col.
+
+type  =	mct_type (table)			    Return table type
+
+pval  =	mct_getbuf (table)			    Get buffer pointer
+pval  =	mct_getrow (table, row)			    Get row pointer
+
+value =	mct_get[csilrdxp] (table, row, col)	    Get value randomly
+	mct_put[csilrdxp] (table, row, col, value)  Put value randomly
+
+	mct_sput[csilrdxp] (table, value)	    Put value sequentially
+stat  = mct_sget[csilrdxp] (table, value)	    Get value sequentially
+.fi
+.endhelp

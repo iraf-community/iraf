@@ -1,0 +1,24 @@
+.help cqimclose Mar00 "Catquery Package"
+.ih
+NAME
+cqimclose -- free the survey results descriptor
+.ih
+SYNOPSIS
+
+call cq_imclose (imres)
+
+.nf
+pointer	imres		# the results descriptor
+.fi
+.ih
+ARGUMENTS
+.ls imres    
+The survey results descriptor.
+.le
+.ih
+DESCRIPTION
+Cq_imclose frees the survey results descriptor.
+.ih
+SEE ALSO
+cqimquery, cqfimquery
+.endhelp

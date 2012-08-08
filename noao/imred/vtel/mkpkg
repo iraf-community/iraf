@@ -1,0 +1,59 @@
+# Make the VTEL Package
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set	LIBS = "-lxtools"
+	$update	libpkg.a
+	$omake	x_vtel.x
+	$link	x_vtel.o libpkg.a $(LIBS)
+	;
+
+install:
+	$move	x_vtel.e noaobin$
+	;
+
+libpkg.a:
+	d1900.x	
+	decodeheader.x	"vt.h" <mach.h>
+	destreak.x	"vt.h" <imhdr.h> <imset.h> <mach.h>
+	dicoplot.x	"gryscl.inc" "dicoplot.h" "vt.h" <gset.h> <imhdr.h>\
+			<imset.h> <mach.h> <math/curfit.h>
+	dephem.x	
+	gauss.x
+	getsqib.x	"vt.h" <imhdr.h> <mach.h>
+	imfglexr.x	"vt.h" <imhdr.h> <mach.h>
+	imfilt.x	"vt.h" <imhdr.h> <imset.h> <mach.h>
+	imratio.x	
+	textim.x	 <imhdr.h> <mach.h>
+	lstsq.x	         <mach.h>
+	merge.x		"vt.h" <imhdr.h> <mach.h>
+	mrqmin.x
+	mscan.x		"vt.h" <error.h> <mach.h>
+	numeric.x	"vt.h" "numeric.h" <mach.h>
+	pimtext.x       "vt.h"
+	pixbit.x	"asciilook.inc" "pixelfont.inc"
+	putsqib.x	"vt.h" <imhdr.h> <mach.h>
+	quickfit.x	"vt.h" <imhdr.h> <mach.h>
+	readheader.x	"vt.h" <mach.h> <fset.h>
+	readss1.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
+	readss2.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
+	readss3.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
+	readss4.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
+	readsubswath.x	"vt.h" <mach.h> <fset.h>
+	readvt.x	"vt.h" <imhdr.h> <mach.h> <fset.h>
+	rmap.x		"vt.h" "numeric.h" <imhdr.h> <mach.h>
+	syndico.x	"vt.h" "trnsfrm.inc" "syndico.h" <mach.h> <imhdr.h>\
+			<imset.h> <gset.h>
+	tcopy.x		"vt.h" <error.h> <fset.h> <mach.h> <printf.h>
+	trim.x		"vt.h" <imhdr.h> <mach.h>
+	unwrap.x	<imhdr.h> <mach.h>
+	vtexamine.x	"vt.h" <error.h> <fset.h> <mach.h> <printf.h>
+	writevt.x	"vt.h" <error.h> <fset.h> <mach.h>
+	;

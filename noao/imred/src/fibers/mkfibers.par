@@ -1,0 +1,11 @@
+image,f,a,"",,,"Image name"
+type,s,h,"object",object|objnosky|sky|flat|henear|ehenear|ohenear|mercury,,"Object type"
+fibers,f,h,"",,,"Fiber data file"
+title,s,h,"Multifiber artificial image",,,"Title"
+header,f,h,"artdata$stdhdr.dat",,,"Header keyword file"
+ncols,i,h,400,,,"Number of columns"
+nlines,i,h,512,,,"Number of lines"
+wstart,r,h,4210.,,,"Starting wavelength"
+wend,r,h,7362.,,,"Ending wavelength"
+seed,i,h,1,,,"Noise seed"
+mode,s,h,"ql",,,

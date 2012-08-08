@@ -1,0 +1,7 @@
+# Help directory for the NOBSOLETE package.
+
+$doc		= "noao$nobsolete/doc/"
+
+badpiximage	hlp=doc$badpiximage.hlp,	src=t_badpixim.x
+
+revisions	sys=Revisions

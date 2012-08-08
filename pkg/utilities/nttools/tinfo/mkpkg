@@ -1,0 +1,12 @@
+# Update the tinfo application code in the ttools package library
+# Author: HODGE, 2-FEB-1988
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	tinfo.x        		<error.h> <tbset.h> 
+	tlcol.x        		<error.h> <tbset.h> 
+	;

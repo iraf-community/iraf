@@ -1,0 +1,144 @@
+.help "scan,scanf,fscan,fscanf,nscan" Jul95 language
+.ih
+NAME
+.nf
+scan   -- read parameters from standard input
+fscan  -- read parameters from file, or another parameter
+scanf  -- formatted read from standard input
+fscanf -- formatted read from file, or another parameter
+nscan  -- get number of parameters scanned
+.fi
+.ih
+USAGE
+.nf
+scan  (p1, p2, p3 ... pn)
+fscan (param, p1, p2, p3, ... pn)
+scanf  (format, p1, p2, p3 ... pn)
+fscanf (param, format, p1, p2, p3, ... pn)
+
+n = nscan()
+.fi
+.ih
+PARAMETERS
+.ls pN
+The name of an output parameter, to receive a scanned value.
+.le
+.ls param
+The name of the input parameter whose \fIvalue\fR is to be scanned to
+produce the output values.
+.le
+.ls format
+A C-like format specification string containing plain characters, which 
+which must match exactly what's on the input stream, and conversion 
+specifications,
+each of which causes conversion and scanning of zero or more \fIargs\fR.
+.le
+.ih
+DESCRIPTION
+\fIScan\fR, \fIscanf\fR, \fIfscan\fR,
+and \fIfscanf\fR permit the user to read in values from the
+standard input, a file, or a parameter and assign them to the listed parameters.
+\fIFscan\fR or \fIfscanf\fR may also be used to read a string already in core.
+It is useful to consider these functions as performing two disjoint actions:
+acquiring a string, where \fIscan/scanf\fR and \fIfscan/fscanf\fR differ; 
+and parsing the string, where they are identical.
+
+\fIScan/scanf\fR acquires its string by reading exactly one 
+line from the standard
+input.  The action of \fIfscan/fscanf\fR depends on \fIparam\fR.  
+If \fIparam\fR is
+a string, or a struct, then the string is simply the value of \fIparam\fR.
+If, however, \fIparam\fR is a list-directed struct, a call to \fIfscanfscanf\fR
+will get the next line from the file pointed to by \fIparam\fR.
+The file can be rewound by assigning a file name to \fIparam\fR.
+If either scan or fscan reach an EOF, they return with the value EOF and
+do not change any parameters.
+
+Once the string has been acquired it is parsed into segments delimited by
+spaces or tabs in the case of \fIscan\fR or \fIfscan\fR, or when using
+\fIscanf\fR and \fIfscanf\fR with no field width specification for the
+field formats.
+\fIScan\fR and \fIfscan\fR do not recognize quoted strings, nor do they
+view ',' as a delimiter.  The formatted scan functions scanf and fscanf
+recognize ',' as a delimiter in the case of numeric conversion only.
+Each token is then assigned in turn to p1 through
+pn.  If there are too many tokens they are discarded, if there are too
+few, the corresponding parameters are not affected by the call.
+Any conversion error terminates the scan, but parameters already scanned
+retain their new values.  An assignment to a struct terminates the scan
+because the entire unscanned portion of the string is assigned to the
+struct.  Thus any struct should be the last parameter in a scan or
+fscan call.
+
+Scan/scanf and fscan/fscanf are intrinsic functions returning either EOF 
+if end of 
+file on the input list is sensed, or the number of parameters successfully
+scanned.  The function \fInscan\fR also returns the number of parameters
+successfully scanned in the last call to scan or fscan.
+
+A field format specification has the form "%[*][W][lh]C", where '*' indicates
+the field should be skipped, W is  the  field width,
+'l' indicates longword output, 'h' indicates halfword output, and
+C is the format code.  The format codes C are as follows:
+
+.nf
+       c    single character (c or '\c' or '\0nnn')
+       d    decimal integer
+       e    exponential format
+       f    fixed format
+       g    general format
+       o    octal integer
+       s    string
+       x    hexadecimal integer
+.fi
+
+The W (field width) specification indicates the exact number of characters
+to assign to the given argument, e.g. "%2s" would assign two characters of
+an input string to a string variable even though the actual string might
+contain more before a delimiting whitespace.  For numeric input, only W
+digits, decimal points, or exponentiation characters are assigned, e.g.
+"%3f" used on the string "1.23456" would result in a value of "1.2",
+"%2d" used on the string "12345" would result in a value of "12", and so
+on.  If no field width is specified all characters up to a delimiting
+whitespace are used in the conversion, in the case of numeric data and a
+numeric format characters up to a whitespace or non-numeric (including
+decimal points and an 'e' or 'd' exponentiation character) are used.
+
+.ih
+EXAMPLES
+1. Print a list of radii, given a list of coordinates.
+
+.nf
+	list = coords
+	while (fscan (list, x, y) != EOF)
+	    print (sqrt (x**2 + y**2))
+.fi
+
+2. Use a formatted scan of the standard input.
+
+.nf
+     cl> print ("1.234 5 7.34abc") | scanf ("%g %d %f %s", x, i, y, s1)
+     cl> =x
+     1.234
+     cl> =i
+     5
+     cl> =y
+     7.34
+     cl> =s1
+     abc
+.fi
+
+3. Use a formatted scan from a "list" parameter.
+
+        fscanf (list, "%g %d %f %s", x, i, y, s1)
+
+.ih
+BUGS
+The syntax of scan and fscan is peculiar, in that they are the only
+functions where parameters are effectively passed by reference rather than by
+value.  Thus p1, ... pn must be parameters whereas in similar contexts an
+arbitrary expression can be used wherever a parameter can.
+.ih
+SEE ALSO
+string, print, fprint, printf
+.endhelp

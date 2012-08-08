@@ -1,0 +1,21 @@
+# Help directory for the IMFILTER package
+
+$doc		= "images$imfilter/doc/"
+$src		= "images$imfilter/src/"
+
+boxcar          hlp=doc$boxcar.hlp,     src=src$t_boxcar.x
+convolve        hlp=doc$convolve.hlp,   src=src$t_convolve.x
+fmedian         hlp=doc$fmedian.hlp,    src=src$t_fmedian.x
+fmode           hlp=doc$fmode.hlp,      src=src$t_fmode.x
+frmedian        hlp=doc$frmedian.hlp,   src=src$t_frmedian.x
+frmode          hlp=doc$frmode.hlp,     src=src$t_frmode.x
+gauss           hlp=doc$gauss.hlp,      src=src$gauss.hlp
+gradient        hlp=doc$gradient.hlp,   src=src$t_gradient.x
+laplace         hlp=doc$laplace.hlp,    src=src$t_laplace.x
+median          hlp=doc$median.hlp,     src=src$t_median.x
+mode            hlp=doc$mode.hlp,       src=src$t_mode.x
+rmedian         hlp=doc$rmedian.hlp,    src=src$t_rmedian.x
+rmode           hlp=doc$rmode.hlp,      src=src$t_rmode.x
+runmed          hlp=doc$runmed.hlp,     src=src$t_runmed.x
+revisions	sys=Revisions
+

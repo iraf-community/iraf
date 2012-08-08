@@ -1,0 +1,177 @@
+.help flatfields Jun87 noao.imred.ccdred
+
+.ih
+NAME
+flatfields -- Discussion of CCD flat field calibrations
+.ih
+DESCRIPTION
+This topic describes the different types of CCD flat fields and
+the tasks available in the \fBccdred\fR and spectroscopy packages for
+creating them.  Flat field calibration is the most important operation
+performed on CCD data.  This operation calibrates the relative response
+of the detector at each pixel.  In some cases this is as simple as
+taking a special type of observation called a flat field.  However, in
+many cases this calibration observation must be corrected for
+iillumination, scanning, wavelength, and aperture effects.
+
+The discussion is in three sections; direct imaging, scan mode,
+and spectroscopy.  Though there are many similarities between these
+modes of operation there are important differences in how corrections
+are applied to the basic flat field observations.  The application of
+the flat field calibrations to the observations using \fBccdproc\fR is
+the same in all cases, however.
+.sh
+1. Direct Imaging
+The starting point for determining the flat field calibration is an
+observation of something which should have uniform response at all
+points on the detector.  In addition the color of the light falling at
+each pixel should be the same as that in an observation so the same
+filter must be used when determining the flat field (the issue of the
+matching the color of the objects observed at the appropriate pixels is
+ignored here).  The best calibration observation is of a blank sky.  If
+an accurate blank sky observation can be obtained then this is all that
+is needed for a flat field calibration.  This type of flat field might
+be called a \fIsky flat\fR, though this term is more often used for a
+type of flat field described below.  There are two difficulties with
+this type of calibration; finding a really blank sky and getting a
+sufficiently accurate measurement without using all the observing
+time.
+
+It is usually not possible to get a blank sky observation accurate
+enough to calibrate the individual pixels without introducing
+undesirable noise.  What is generally done is to use a lamp to either
+uniformly illuminate a part of the dome or directly illuminate the
+field of view.  The first type of observation is called a \fIdome
+flat\fR and the second is called a \fIprojection flat\fR.  We shall call
+both of these types of observations \fBlamp flat fields\fR.  If the
+iillumination is truely uniform then these types of observations are
+sufficient for flat field calibration.  To get a very accurate flat
+field many observations are made and then combined (see
+\fBflatcombine\fR).
+
+Unfortunately, it is sometimes the case that the lamp flat fields
+do not illuminate the telescope/detector in the same way as the actual
+observations.  Calibrating with these flat fields will introduce a
+residual large scale iillumination pattern, though it will correctly
+calibrate the relative pixel responses locally.  There are two ways to
+correct for this effect.  The first is to correct the flat field
+observation.  The second is to apply the uncorrected flat field to the
+observations and then apply an \fIiillumination\fR correction as a
+separate operation.  The first is more efficient since it consists of a
+single correction applied to each observation but in some cases the
+approximate correction is desired immediately, the observation needed
+to make the correction has not been taken yet, or the residual
+iillumination error is not discovered until later.
+
+For the two methods there are two types of correction.  One is to
+use a blank sky observation to correct for the residual iillumination
+pattern.  This is different than using the sky observation directly as
+a flat field calibration in that only the large scale pattern is
+needed.  Determining the large scale iillumination does not require high
+signal-to-noise at each pixel and faint objects in the image can be
+either eliminated or ignored.  The second method is to remove the large
+scale shape from the lamp flat field.  This is not as good as using a
+blank sky observation but, if there is no such observation and the
+iillumination pattern is essentially only in the lamp flat field, this
+may be sufficient.
+
+From the above two paragraphs one sees there are four options.
+There is a task in the \fBccdred\fR package for each of these options.
+To correct a lamp flat field observation by a blank sky observation,
+called a \fIsky flat\fR, the task is \fBmkskyflat\fR.  To correct the
+flat field for its own large scale gradients, called an \fIiillumination
+flat\fR, the task is \fBmkillumflat\fR.  To create a secondary
+correction to be applied to data processed with the lamp flat field
+image the tasks are \fBmkskycor\fR and \fBmkillumcor\fR which are,
+respectively, based on a blank sky observation and the lamp flat field
+iillumination pattern.
+
+With this introduction turn to the individual documentation for these
+four tasks for further details.
+.sh
+2. Scan Mode
+There are two types of scan modes supported by the \fBccdred\fR
+package; \fIshortscan\fR and \fIlongscan\fR (see \fBccdproc\fR for
+further details).  They both affect the manner in which flat field
+calibrations are handled.  The shortscan mode produces images which are
+the same as direct images except that the light recorded at each pixel
+was collected by a number of different pixels.  This improves the flat
+field calibration.  If the flat field images, of the same types
+described in the direct imaging section, are observed in the same way
+as all other observations, i.e. in scan mode, then there is no
+difference from direct imaging (except in the quality of the flat
+fields).  There is a statistical advantage to observing the lamp or sky
+flat field without scanning and then numerically averaging to simulate
+the result of the scanning.  This improves the accuracy of
+the flat fields and might possibly allow direct blank sky observations
+to be used for flat fields.  The numerical scanning is done in
+\fBccdproc\fR by setting the appropriate scanning parameters.
+
+In longscan mode the CCD detector is read out in such a way that
+each output image pixel is the sum of the light falling on all pixels
+along the direction of the scan.  This reduces the flat field calibration
+to one dimension, one response value for each point across the scan.
+The one dimensional calibration is obtained from a longscan observation
+by averaging all the readout lines.
+This is done automatically in \fBccdproc\fR by setting the appropriate
+parameters.  In this case very good flat fields can be obtained from
+one or more blank sky observations or an unscanned lamp observation.  Other
+corrections are not generally used.
+.sh
+3. Spectroscopy
+Spectroscopic flat fields differ from direct imaging in that the
+spectrum of the sky or lamp and transmission variations with wavelength
+are part of the observation.  Application of such images will introduce
+the inverse of the spectrum and transmission into the observation.  It
+also distorts the observed counts making signal-to-noise estimates
+invalid.  This, and the low signal in the dispersed light, makes it
+difficult to use blank sky observations directly as flat fields.  As
+with direct imaging, sky observation may be used to correct for
+iillumination errors if necessary.  At sufficiently high dispersion the
+continuous lamp spectrum may be flat enough that the spectral signature
+of the lamp is not a problem.  Alternatively, flux calibrating the
+spectra will also remove the flat field spectral signature.  The
+spectroscopic flat fields also have to be corrected for regions outside
+of the slit or apertures to avoid bad response effects when applying
+the flat field calibration to the observations.
+
+The basic scheme for removing the spectral signature is to average
+all the lines or columns across the dispersion and within the aperture
+to form an estimate of the spectrum.  In addition to the averaging, a
+smooth curve is fit to the lamp spectrum to remove noise.  This smooth
+shape is then divided back into each line or column to eliminate the
+shape of the spectrum without changing the shape of the spectrum
+in the spatial direction or the small scale response variations.
+Regions outside of the apertures are replaced by unity.
+This method requires that the dispersion be aligned fairly close to
+either the CCD lines or columns.
+
+This scheme is used in both longslit and multiaperture spectra.
+The latter includes echelle, slitlets, aperture masks, and fiber feeds.
+For narrow apertures which do not have wider slits for the lamp
+exposures there may be problems with flexure and defining a good
+composite spectrum.  The algorithm for longslit spectra is simpler and
+is available in the task \fBresponse\fR in the \fBlongslit\fR package.
+For multiaperture data there are problems of defining where the spectra
+lie and avoiding regions off of the aperture where there is no signal.
+The task which does this is \fBapnormalize\fR in the \fBapextract\fR
+package.   Note that the lamp observations must first be processed
+explicitly for bias and dark count corrections.
+
+Longslit spectra may also suffer the same types of iillumination
+problems found in direct imaging.  However, in this case the iillumination
+pattern is determined from sky observations (or the flat field itself)
+by finding the large scale pattern across the dispersion and at a number
+of wavelengths while avoiding the effects of night sky spectrum.  The
+task which makes this type of correction in the \fBlongslit\fR package
+is \fBiillumination\fR.  This produces an iillumination correction.
+To make sky flats or the other types of corrections image arithmetic
+is used.  Note also that the sky observations must be explicitly
+processed through the flat field stage before computing the iillumination.
+.ih
+SEE ALSO
+.nf
+ccdproc, guide, mkillumcor, mkillumflat, mkskycor, mkskyflat
+apextract.apnormalize, longslit.response, longslit.iillumination
+.fi
+.endhelp

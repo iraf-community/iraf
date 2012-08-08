@@ -1,0 +1,38 @@
+.help movefiles Nov84 system
+.ih
+NAME
+movefiles -- move files to a directory
+.ih
+USAGE
+movefiles files directory
+.ih
+PARAMETERS
+.ls files
+A template specifying the file or files to be moved.
+.le
+.ls directory
+The directory to which the files are to be moved.
+.le
+.ls verbose = no
+If set to "yes", tell user as each file is moved.
+.le
+.ih
+DESCRIPTION
+This routine moves the specified files to the named directory.
+If a subdirectory and a logical directory both exist with the same
+name as the destination directory, the subdirectory is used.
+.ih
+EXAMPLES
+
+1. Move all files whose names start with `im' and end with `ab' to
+the directory `dir'.  Since "verbose" defaults to "no", do the work silently.
+
+	cl> movefiles im*ab dir
+
+2. Move all files in the current directory into the directory one level up.
+
+	cl> move * ..
+.ih
+SEE ALSO
+copy, rename
+.endhelp

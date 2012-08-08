@@ -1,0 +1,85 @@
+.help im3dtran Jan89 volumes
+.ih
+NAME
+im3dtran -- 3d image transpose, any axis to any other axis
+.ih
+USAGE
+im3dtran input output 
+.ih
+PARAMETERS
+.ls input
+Input 3d image (datacube).
+.le
+.ls output
+Transposed datacube.
+.le
+.ls len_blk = 128
+Size in pixels of linear internal subraster.  IM3DTRAN will try to transpose
+a subraster up to len_blk cubed at one time.  Runtime is much faster with
+larger \fBlen_blk\fR, but the task may run out of memory.
+.le
+.ls new_x = 3
+New x axis = old axis (1=x, 2=y, 3=z).  Default (3) replaces new x with old z.
+.le
+.ls new_y = 2
+New y axis = old axis.  Default (2) is identity.
+.le
+.ls new_z = 1
+New z axis = old axis.  Default (1) replaces new z with old x.
+.le
+
+.ih
+DESCRIPTION
+
+IM3DTRAN is very similar to IMAGES.IMTRANSPOSE, except that it can accomplish
+3d image transposes.  In 3 dimensions, it is necessary to specify which old
+axes map to the new axes.  In all cases, IM3DTRAN maps old axis element 1 to
+new axis element 1, i.e. it does not flip axes, just transposes them.
+
+If one wants to use IM3DTRAN to rotate a datacube 90 degrees in any direction,
+it is necessary to use a combination of flip and transpose (just like in the
+2d case).  For example, let the original datacube be visualized with its
+origin at the lower left front when seen by the viewer, with the abscissa
+being the x axis (dim1), ordinate the y axis (dim2), and depth being the
+z axis (dim3), z increasing away from the viewer or into the datacube [this
+is a left-handed coordinate system].  One then wants to rotate the datacube
+by 90 degrees clockwise about the y axis when viewed from +y (the "top");
+this means the old z axis becomes the new x axis, and the old x axis becomes
+the new z axis, while new y remains old y.  In this case the axis that must
+be flipped prior to transposition is the \fBx axis\fR; see Example 1.
+
+The parameter \fBlen_blk\fR controls how much memory is used during the
+transpose operation.  \fBlen_blk\fR elements are used in each axis at a
+time, or a cube len_blk elements on a side.  If \fBlen_blk\fR is too large,
+the task will abort with an "out of memory" error.  If it is too small,
+the task can take a very long time to run.  The maximum size of len_blk
+depends on how much memory is available at the time IM3DTRAN is run,
+and the size and datatype of the image to be transposed.
+
+.ih
+EXAMPLES
+
+.nf
+1.  For an input datacube with columns = x = abscissa, lines = y = ordinate,
+    and bands = z = depth increasing away from viewer, and with the image
+    origin at the lower left front, rotate datacube 90 degrees clockwise
+    around the y axis when viewed from +y (top):
+
+    cl> im3dtran input[-*,*,*] output 3 2 1
+
+.fi
+
+.ih
+TIMINGS
+
+[Not available yet]
+
+.ih
+BUGS
+
+[Not available yet]
+
+.ih
+SEE ALSO
+pvol i2sun
+.endhelp

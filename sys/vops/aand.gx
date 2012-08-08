@@ -1,0 +1,23 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# AAND -- Compute the bitwise boolean 'and' of two vectors (generic).
+
+procedure aand$t (a, b, c, npix)
+
+PIXEL	a[ARB], b[ARB], c[ARB]
+int	npix, i
+$if (datatype == i)
+int	and()
+$else
+PIXEL	and$t()
+$endif
+
+begin
+	do i = 1, npix {
+	    $if (datatype == i)
+		c[i] = and (a[i], b[i])
+	    $else
+		c[i] = and$t (a[i], b[i])
+	    $endif
+	}
+end

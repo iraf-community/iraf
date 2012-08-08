@@ -1,0 +1,45 @@
+.help msifit Dec98 "Image Interpolation Package"
+.ih
+NAME
+msifit - fit the interpolant to the data
+.ih
+SYNOPSIS
+msifit (msi, datain, nxpix, nypix, len_datain)
+
+.nf
+    pointer	msi			#I interpolant descriptor
+    real	datain[len_datain,ARB]	#I data array
+    int		nxpix			#I number of x pixels
+    int		nypix			#I number of y pixels
+    int		len_datain		#I length of datain, len_datain >= nxpix
+.fi
+.ih
+ARGUMENTS
+.ls msi     
+Pointer to the sequential interpolant descriptor.
+.le
+.ls datain
+Array containing the data.
+.le
+.ls nxpix, nypix
+The number of pixels in x and y.
+.le
+.ls len_datain
+The row length of the datain array. Len_datain must be >= nxpix.
+.le
+.ih
+DESCRIPTION
+The datain array is checked for size, memory is allocated for the coefficient
+array and the end conditions are specified. The interior polynomial, sinc,
+and drizzle interpolants are saved as the data points. The polynomial
+coefficients are calculated from the data points in the evaluation stage.
+The B-spline coefficients are calculated in MSIFIT as they depend on the
+entire data array.
+.ih
+NOTES
+Checking for INDEF valued pixels is the responsibility of the user.
+MSIINIT or MSISINIT must be called before using MSIFIT.  MSIFIT must be
+called before using MSIEVAL, MSIVECTOR, MSIDER, MSIGRL or MSISQGRL.
+.ih
+SEE ALSO
+.endhelp

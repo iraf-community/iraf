@@ -1,0 +1,40 @@
+.help gssolve Aug85 "Gsurfit Package"
+.ih
+NAME
+gssolve -- solve a linear system of equations by the Cholesky method
+.ih
+SYNOPSIS
+include <math/gsurfit.h>
+
+gssolve (sf, ier)
+
+.nf
+pointer	sf		# surface descriptor
+int	ier		# error code
+.fi
+.ih
+ARGUMENTS
+.ls sf     
+Pointer to the surface descriptor structure.
+.le
+.ls ier      
+Error code returned by the fitting routines. The options are OK, SINGULAR,
+and NO_DEG_FREEDOM. If ier = SINGULAR the matrix is singular, GSSOLVE
+will compute a solution to the normal equations but one or more of the
+coefficients will be zero. If ier = NO_DEG_FREEDOM, too few data points
+exist for a reasonable solution to be computed. GSSOLVE returns without
+fitting the data.
+.le
+.ih
+DESCRIPTION
+GSSOLVE computes the Cholesky factorization of the data matrix and
+solves for the coefficients
+of the fitting function by forward and back substitution. An error code is
+returned by GSSOLVE if it is unable to solve the normal equations as
+formulated.
+.ih
+NOTES
+.ih
+SEE ALSO
+gsfit, gsrefit, gsaccum, gsacpts
+.endhelp

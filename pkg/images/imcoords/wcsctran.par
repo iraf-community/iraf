@@ -1,0 +1,12 @@
+# Parameter file for the WCSTRAN task.
+
+input,s,a,"",,,The input coordinate files
+output,s,a,"",,,The output coordinate files
+image,f,a,"",,,The input images
+inwcs,s,a,"logical","|logical|tv|physical|world|",,The input coordinate system
+outwcs,s,a,"world","|logical|tv|physical|world|",,The output coordinate system
+columns,s,h,"1 2 3 4 5 6 7",,,List of input file columns
+units,s,h,"",,,List of input coordinate units
+formats,s,h,"",,,List of output coordinate formats
+min_sigdigits,i,h,7,,,Minimum precision of output coordinates
+verbose,b,h,yes,,,Write comments to the output file ?

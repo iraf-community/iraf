@@ -1,0 +1,90 @@
+.help text2mask Jun96 proto
+.ih
+NAME
+text2mask -- convert text description to pixel mask
+.ih
+USAGE	
+.nf
+text2mask text mask ncols nlines
+.fi
+.ih
+PARAMETERS
+.ls text
+Text file of pixel regions.  The format of this file consists of lines of
+individual pixels (whitespace separated column and line) or rectangular
+regions (whitespace separated starting and ending columns and starting and
+ending lines).
+.le
+.ls mask
+Pixel mask name to be created.  A pixel list image, .pl extension,
+is created so no extension is necessary.
+.le
+.ls ncols, nlines
+Dimensions for pixel mask image.
+.le
+.ls linterp = 1
+Mask code for rectangular regions which are narrower in the line direction
+than the column direction.
+.le
+.ls cinterp = 2
+Mask code for rectangular regions which are narrower in the column direction
+than the line direction.
+.le
+.ls square = 3
+Mask code for square regions which are larger than a single pixel.
+.le
+.ls pixel = 4
+Mask code for single pixels.
+.le
+.ih
+DESCRIPTION
+A text file describing individual pixels or rectangular regions is
+converted to a pixel mask image in pixel list format.  The name of
+the text file, the name of the pixel mask to be created, and the
+dimensions of the pixel mask image are specified.
+
+The text file consists of lines of two or four numbers.  If two numbers
+are given, separated by whitespace, they define a single pixel and
+the values are the column and line pixel coordinates.  If four numbers
+are given, separated by whitespace, they define a rectangular region.
+The four numbers are the pixel coordinates for the starting column,
+the ending column, the starting line, and the ending line.  This format
+is the same as the old (pre-V2.11) "fixpix" format.  This task may
+be used to convert these old "fixpix" data files to pixel masks (as used
+by the new \fBfixpix\fR task) or to create pixel masks.
+
+The different region shapes may be coded by the mask values.  This is
+useful with the \fBfixpix\fR task which can select different replacement
+methods based on the mask codes.  In particular, one may want to interpolate
+along the narrower dimension of a rectangular region.  The region
+shapes that may be coded are individual pixels, square regions, and
+rectangular regions with narrow dimension along lines or columns.
+
+In addition to this task,
+pixel mask images may be made in a variety of ways.  Any task which produces
+and modifies image values may be used.  Some useful tasks are
+\fBimexpr, imreplace, imcopy,\fR and \fBmkpattern\fR.  If a new image
+is specified with the explicit ".pl" extension then the pixel mask
+format is produced.  Another way to make masks are with the
+task \fBccdmask\fR.  The task \fBccdmask\fR is specialized to make a mask
+of bad pixels from flat fields or, even better, from the ratio of
+two flat fields of different exposure levels.
+.ih
+EXAMPLES
+1.  Convert a text region description into a mask and then use it to
+replace pixels by interpolation along the narrower dimension.
+
+.nf
+    cl> list2mask fp.dat mask
+    cl> fixpix pix mask linterp=1,3,4 cinterp=2
+.fi
+.ih
+REVISIONS
+.ls TEXT2MASK V2.11
+This task is new and appears in conjunction with a new pixel mask
+based version of \fBfixpix\fR.
+.le
+.ih
+SEE ALSO
+imreplace, imexpr, imcopy, imedit, fixpix
+.endhelp

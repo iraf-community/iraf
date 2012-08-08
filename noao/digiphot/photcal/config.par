@@ -1,0 +1,8 @@
+# Parameter file for CONFIG
+
+config,f,a,,,,The new configuration file
+catalog,f,h,"",,,The source of the catalog format description
+observations,f,h,"",,,The source of the observations format description
+transform,f,h,"",,,The source of the transformation equations
+template,f,h,"",,,An existing template configuration file
+verify,b,h,no,,,Verify each new configuration file entry ?

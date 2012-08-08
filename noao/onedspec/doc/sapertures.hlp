@@ -1,0 +1,217 @@
+.help sapertures Jul95 noao.onedspec
+.ih
+NAME
+sapertures -- Set or change aperture header information
+.ih
+USAGE
+sapertures input
+.ih
+PARAMETERS
+.ls input
+List of spectral images to be modified.
+.le
+.ls apertures = ""
+List of apertures to be modified.  The null list
+selects all apertures.  A list consists of comma separated
+numbers and ranges of numbers.  A range is specified by a hyphen.  An
+optional step size may be given by using the 'x' followed by a number.
+See \fBxtools.ranges\fR for more information.
+.le
+.ls apidtable = ""
+Aperture table.  This may be either a text file or an image.
+A text file consisting of lines with an aperture number,
+beam number, dispersion type code, coordinate of the first physical
+pixel, coordinate interval per physical pixel, redshift factor,
+lower extraction aperture position, upper extraction aperture position,
+and aperture title or identification.  An image will contain the
+keywords SLFIBnnn with string value consisting of aperture number,
+beam number, optional right ascension and declination, and aperture title.
+Any field except the aperture number may be given the value INDEF to
+indicate that the value is not to be changed from the current value.  Any
+apertures not in this table are assigned the values given by the task
+parameters described below.
+
+As a special case a file having just the aperture number, beam number, and
+spectrum aperture identification may be used.  This file format as well as
+use of an image header is the same as that in the \fBapextract\fR package.
+.le
+.ls wcsreset = no
+Reset the world coordinate system (WCS) of the selected apertures to
+uncorrected pixels.  If this parameter is set the \fIapidtable\fR and task
+aperture parameters are ignored.  This option sets the dispersion type flag
+to -1, the starting coordinate value to 1, the interval per pixel to 1, and
+no redshift factor and leaves the other parameters unchanged.  The option
+is useful when it is desired to apply a second dispersion correction using
+\fBidentify\fR and \fBdispcor\fR.
+.le
+.ls verbose = no
+Print a record of each aperture modified?  Only those apertures 
+in which the beam number or label are changed are printed.
+.le
+
+If no aperture table is specified or if there is not an aperture
+entry in the table for a selected aperture the following parameter
+values are used.  A value of INDEF will leave the corresponding
+parameter unchanged.
+.ls beam = INDEF
+Beam number.
+.le
+.ls dtype = INDEF
+Dispersion type.  The dispersion types are:
+
+.nf
+	-1  Linear with dispersion correction flag off
+	 0  Linear with dispersion correction flag on
+	 1  Log-linear with dispersion correction flag on
+.fi
+
+.le
+.ls w1 = INDEF
+Coordinate of the first physical pixel.  Note that it is possible
+that the physical pixels are not the same as the logical pixels if
+an image section has been extracted.
+.le
+.ls dw = INDEF
+Coordinate interval per physical pixel.  Note that it is possible
+that the physical pixels intervals are not the same as the logical pixels
+intervals if an image section has been extracted.
+.le
+.ls z = INDEF
+Redshift factor.  This is usually set with the task \fBdopcor\fR.
+Coordinates are divided by one plus the redshift factor (1+z).
+.le
+.ls aplow = INDEF, aphigh = INDEF
+The aperture extraction limits.  These are set when the \fBapextract\fR
+package is used and it is unlikely that one would use this task to
+change them.
+.le
+.ls title = INDEF
+Aperture title or identification string.
+.le
+.ih
+DESCRIPTION
+This task sets or changes any of the aperture specific parameters except
+the aperture number and the number of  valid pixels.  It is particularly
+useful for images which use the "multispec" world coordinate system
+attribute strings which are not readily accessible with other header
+editors.  A list of images and a list of apertures is used to select which
+spectra are to be modified.  The default empty string for the apertures
+selects all apertures.  The new values are specified either in an aperture
+table file or with task parameters.  The aperture table is used to give
+different values to specific apertures.  If all apertures are to have the
+same values this file need not be used.
+
+The aperture parameters which may be modified are the beam number, the
+dispersion type, the coordinate of the first physical pixel, the coordinate
+interval per physical pixel, the redshift factor, the aperture extraction
+limits, and the title.  The task has parameters for each of these and the
+aperture table consists of lines starting with an aperture number followed
+by the above parameters in the list order and separated by whitespace.  As
+a special case the aperture table may be a file abbreviated to aperture
+number, beam number, and title or an image with keywords SLFIBnnn
+containing the aperture number, beam number, optional right ascension and
+declination, and title.  These special cases allow use of the same file
+orimage used in the \fBapextract\fR package.  If any of the parameters are
+specified as INDEF then the value will be unchanged.
+
+If the \fIwcsreset\fR parameter is set then the aperture table and
+task aperture parameters are ignored and the selected apertures are
+reset to have a dispersion type of -1, a starting coordinate of 1,
+a coordinate interval of 1, and a redshift factor of 0.  This other
+parameters are not changed.  These choice of parameters has the effect
+of resetting the spectrum to physical pixel coordinates and flagging
+the spectra as not being dispersion calibrated.  One use of this option
+is to allow the \fBdispcor\fR task to be reapplied to previously
+dispersion calibrated spectra.
+
+The \fIverbose\fR parameter lists the old and new values when there is
+a change.  If there are no changes there will be no output.
+.ih
+EXAMPLES
+1.  To add titles to a multifiber extraction and change one of the
+beam numbers:
+
+.nf
+	cl> type m33aps
+	36 2 Henear
+	37 0 Sky
+	38 1 New title
+	39 1 Another title
+	41 0 Sky
+	42 1 Yet another title
+	43 1 YAT
+	44 1 Was a sky but actually has an object
+	45 1 Wow
+	46 1 Important new discovery
+	47 0 Sky
+	48 2 Henear
+	cl> saper m33.ms apid=m33aps v+
+	demoobj1.ms:
+	  Aperture 37:  --> Sky
+	  Aperture 38:  --> New title
+	  Aperture 39:  --> Another title
+	  Aperture 41:  --> Sky
+	  Aperture 42:  --> Yet another title
+	  Aperture 43:  --> YAT
+	  Aperture 44: beam 0 --> beam 1
+	  Aperture 44:  --> Was a sky but actually has an object
+	  Aperture 45:  --> Wow
+	  Aperture 46:  --> Important new discovery
+	  Aperture 47:  --> Sky
+.fi
+
+2.  To reset a dispersion calibrated multifiber spectrum:
+
+.nf
+	cl> saper test.ms wcsreset+ verbose+
+	test.ms:
+	  Aperture 1:
+	    w1 4321. --> 1.
+	    dw 1.23 --> 1.
+	  Aperture 2:
+	    w1 4321. --> 1.
+	    dw 1.23 --> 1.
+	  <etc.>
+.fi
+
+3.  To set a constant wavelength length scale (with the default parameters):
+
+.nf
+	cl> saper test.ms dtype=0 w1=4321 dw=1.23 v+
+	test.ms:
+	  Aperture 1:
+	    w1 1. --> 4321.
+	    dw 1. --> 1.23
+	  Aperture 2:
+	    w1 1. --> 4321.
+	    dw 1. --> 1.23
+	  <etc.>
+.fi
+
+4. To reset the wavelengths and title of only aperture 3:
+
+.nf
+	cl> saper test.ms aper=3 w1=4325 dw=1.22 title=HD12345 v+
+	test.ms:
+	  Aperture 3:
+	    w1 4321. --> 4325.
+	    dw 1.23 --> 1.22
+	    apid  --> HD12345
+.fi
+.ih
+REVISIONS
+.ls SAPERTURES V2.11
+This task has been modified to allow use of image header keywords
+as done in the APEXTRACT package.
+.le
+.ls SAPERTURES V2.10.3
+This task has been greatly expanded to allow changing any of the WCS
+parameters as well as the beam number and aperture title.
+.le
+.ls SAPERTURES V2.10
+This task is new.
+.le
+.ih
+SEE ALSO
+specshift, imcoords.wcsreset, hedit, ranges, onedspec.package
+.endhelp

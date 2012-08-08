@@ -1,0 +1,26 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+# AANDK -- Compute the bitwise boolean 'and' of a vector and a constant
+# (generic)
+
+procedure aandk$t (a, b, c, npix)
+
+PIXEL	a[ARB]
+PIXEL	b
+PIXEL	c[ARB]
+int	npix, i
+$if (datatype == i)
+int	and()
+$else
+PIXEL	and$t()
+$endif
+
+begin
+	do i = 1, npix {
+	    $if (datatype == i)
+		c[i] = and (a[i], b)
+	    $else
+		c[i] = and$t (a[i], b)
+	    $endif
+	}
+end

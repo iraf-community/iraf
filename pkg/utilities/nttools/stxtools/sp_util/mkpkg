@@ -1,0 +1,16 @@
+# Make the wcslab package
+
+$checkout libpkg.a ../
+$update   libpkg.a
+$checkin  libpkg.a ../
+$exit
+
+libpkg.a:
+	spchag.x
+	spdise.x
+	spmapt.x	<gset.h>
+	sprote.x	<math.h>
+	spstry.x
+	sptras.x
+	spw2ld.x
+        spwcss.x        <ctype.h>

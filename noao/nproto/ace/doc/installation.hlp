@@ -1,0 +1,208 @@
+.help installation Jan01 ace
+
+.ce
+\fBACE: Astronomical Cataloging Environment\fR
+.ce
+Release Notes and Installation Instructions
+
+.sh
+SUMMARY
+The ACE external package is used to catalog objects in images and manipulate
+the catalogs.
+
+.sh
+RELEASE INFORMATION
+The following summary only highlights the major changes.  There will also
+be minor changes and bug fixes.
+
+.ls V0.2: January 27, 2001
+Alpha test version.
+.le
+.sh
+INSTALLATION INSTRUCTIONS
+Installation of this external package consists of obtaining the files,
+creating a directory containing the package, compiling the executables or
+installing precompiled executables, and defining the environment to load
+and run the package.  The package may be
+installed for a site or as a personal installation.  If you need help with
+these installation instructions contact iraf@noao.edu or call the IRAF
+HOTLINE at 520-318-8160.
+.ls [arch]
+In the following steps you will need to know the IRAF architecture
+identifier for your IRAF installation.  This identifier is similar to the
+host operating system type.  The identifiers are things like "ssun" for
+Solaris, "alpha" for Dec Alpha, and "linux" or "redhat" for most Linux
+systems.  The IRAF architecture identifier is defined when you run IRAF.
+Start the CL and then type
+
+.nf
+    cl> show arch
+    .ssun
+.fi
+
+This is the value you need to know without the leading '.'; i.e. the
+IRAF architecture is "ssun" in the above example.
+.le
+.ls [1-site]
+If you are installing the package for site use, login as IRAF
+and edit the IRAF file defining the packages.
+
+.nf
+    % cd $hlib
+.fi
+
+Define the environment variable ace to be the pathname to
+the ace package root directory.  The '$'
+character must be escaped in the VMS pathname and UNIX pathnames must be
+terminated with a '/'.  Edit extern.pkg to include the following.
+
+.nf
+    reset ace = /local/ace/
+    task  ace.pkg = ace$ace.cl
+.fi
+
+Near the end of the hlib$extern.pkg file, update the definition of
+helpdb so it includes the ace help database, copying the syntax
+already used in the string.  Add this line before the line 
+containing a closing quote:
+
+.nf
+    ,ace$lib/helpdb.mip\
+.fi
+.le
+.ls [1-personal]
+If you are installing the package for personal use define a host
+environment variable with the pathname of the directory where the package
+will be located (needed in order to build the package from the source
+code).  Note that pathnames must end with '/'.  For example:
+
+.nf
+    % setenv ace /local/ace/
+.fi
+
+In your login.cl or loginuser.cl file make the following definitions
+somewhere before the "keep" statement.
+
+.nf
+    reset ace = /local/ace/
+    task  ace.pkg = ace$ace.cl
+    printf ("reset helpdb=%s,ace$lib/helpdb.mip\nkeep\n",
+        envget("helpdb")) | cl
+    flpr
+.fi
+
+If you will be compiling the package, as opposed to installing a binary
+distribution, then you need to define various environment variables.
+The following is for Unix/csh which is the main supported environment.
+
+.nf
+    # Example
+    % setenv iraf /iraf/iraf/             # Path to IRAF root (example)
+    % source $iraf/unix/hlib/irafuser.csh # Define rest of environment
+    % setenv IRAFARCH ssun                # IRAF architecture
+.fi
+
+where you need to supply the appropriate path to the IRAF installation root
+in the first step and the IRAF architecture identifier for your machine
+in the last step.
+.le
+.ls [2]
+Login into IRAF.  Create a directory to contain the package files and the
+instrument database files.  These directory should be outside the standard
+IRAF directory tree.
+
+.nf
+    cl> mkdir ace$
+    cl> cd ace
+.fi
+.le
+.ls [3]
+The package is distributed as a tar archive for the
+sources and, as an optional convenience, a tar archive of the executables
+for select host computers.  Note that IRAF includes a tar reader.  The tar
+file(s) are most commonly obtained via anonymous ftp.  Below is an example
+from a Unix machine where the compressed files have the ".Z" extension.
+Files with ".gz" or ".tgz" can be handled similarly.
+
+.nf
+    cl> ftp iraf.noao.edu (140.252.1.1)
+    login: anonymous
+    password: [your email address]
+    ftp> cd iraf/extern
+    ftp> get ace.readme
+    ftp> binary
+    ftp> get ace.tar.Z
+    ftp> get ace-bin.<arch>.Z  (optional)
+    ftp> quit
+    cl> !uncompress ace.tar
+    cl> !uncompress ace-bin.<arch> (optional)
+.fi
+
+The readme file contains these instructions.  The <arch> in the
+optional executable distribution is replaced by the IRAF architecture
+identification for your computer.
+
+Upon request the tar file(s) may be otained on tape for a service
+charge.  In this case you would mount the tape use rtar to extract
+the tar files.
+.le
+.ls [4]
+Extract the source files from the tar archive using 'rtar".
+
+.nf
+    cl> softools
+    so> rtar -xrf ace.tar
+    so> bye
+.fi
+
+On some systems, an error message will appear ("Copy 'bin.generic'
+to './bin fails") which can be ignored.
+Sites should leave the symbolic link 'bin' in the package root
+directory pointing to 'bin.generic' but can delete any of the
+bin.<arch> directories that won't be used.  If there is no binary
+directory for the system you are installing it will be created
+when the package is compiled later or when the binaries are installed.
+
+If the binary executables have been obtained these are now extracted
+into the appropriate bin.<arch> directory.
+
+.nf
+    # Example of sparc installation.
+    cl> cd ace
+    cl> rtar -xrf ace-bin.sparc      # Creates bin.sparc directory
+.fi
+
+The various tar file can be deleted once they have been
+successfully installed.
+.ls [5]
+For a source installation you now have to build the package
+executable(s).  The "tables" package must be installed first if not
+already available.  First you configure the package for the particular
+architecture.
+
+.nf
+    cl> cd ace
+    cl> mkpkg <arch>            # Substitute sparc, ssun, alpha, etc.
+.fi
+
+This will change the bin link from bin.generic to bin.<arch>.  The binary
+directory will be created if not present.  If an error occurs in setting
+the architecture then you may need to add an entry to the file "mkpkg".
+Just follow the examples in the file.
+
+To create the executables and move them to the binary directory
+
+.nf
+    cl> mkpkg -p ace 		# build executables
+    cl> mkpkg generic           # optionally restore generic setting
+.fi
+
+Check for errors.  If the executables are not moved to the binary directory
+then step [1] to define the path for the package was not done correctly.
+The last step restores the package to a generic configuration.  This is not
+necessary if you will only have one architecture for the package.
+.le
+
+This should complete the installation.  You can now load the package
+and begin testing and use.
+.endhelp

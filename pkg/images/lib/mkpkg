@@ -1,0 +1,72 @@
+# Library for the IMAGES package containing routines used by tasks in
+# different subpackages
+
+$checkout libpkg.a ../
+$update	libpkg.a
+$checkin libpkg.a ../
+$exit
+
+generic:
+        $set    GEN = "$$generic -k"
+
+        $ifolder (geofit.x,geofit.gx)
+            $(GEN) geofit.gx -o geofit.x $endif
+        $ifolder (geogmap.x,geogmap.gx)
+            $(GEN) geogmap.gx -o geogmap.x $endif
+        $ifolder (geograph.x,geograph.gx)
+            $(GEN) geograph.gx -o geograph.x $endif
+
+        $ifolder (liststr.x, liststr.gx)
+	    $(GEN) liststr.gx -o liststr.x $endif
+	;
+
+libpkg.a:
+        $ifeq (USE_GENERIC, yes) $call generic $endif
+
+	# used by imcopy, lineclean tasks
+	imcopy.x	<imhdr.h>
+
+	# used by xregister, psfmatch tasks
+	rgbckgrd.x	<mach.h> <math.h> <math/gsurfit.h>
+	rgcontour.x	<error.h> <mach.h> <gset.h> <config.h> <xwhen.h> \
+			<fset.h>
+	rgfft.x
+
+	# used by geoxytran and other list reading and writing tasks
+	liststr.x	<ctype.h>
+
+	# geomap, ccmap, and other tasks?, should be fmtio routine which is
+	# the reverse of strdic
+	rgwrdstr.x
+
+	# used by ccmap, ccsetwcs, cctran, skyxymatch, skyctran, imcctran
+	# ccxymatch tasks
+	# put in xtools at some point ?
+	#skywcs.x	<imhdr.h> <imio.h> <math.h> <mwset.h> \
+	#		"skywcs.h" "skywcsdef.h"
+
+	# used by ccmap, ccxymatch
+	rgccwcs.x	<imhdr.h> <math.h> <mwset.h> <pkg/skywcs.h>
+
+	# used by xyxymatch, ccxymatch, imtile tasks
+	rgsort.x
+
+	# used by skyxymatch and imctran tasks, include in skywcs.x ?
+	rglltran.x	<math.h> <pkg/skywcs.h>
+
+	# used by skyxymatch, wcsxymatch, imcctran tasks
+	rgxymatch.x	<mwset.h>
+
+	# used by ccxymatch, xyxymatch tasks
+	rgmerge.x       <mach.h> <plset.h> "xyxymatch.h"
+	rgtransform.x   <math.h> <math/gsurfit.h> "xyxymatch.h"
+        xymatch.x       "xyxymatch.h"
+
+	# used by ccmap, geomap tasks
+        geofit.x        <mach.h> <math.h> <math/gsurfit.h> "geomap.h"
+        geogmap.x       <error.h> <math.h> <math/gsurfit.h> "geomap.h" \
+			"geogmap.h"
+        geograph.x      <mach.h> <math.h> <gset.h> <math/gsurfit.h> \
+                        <pkg/gtools.h> "geomap.h" "geogmap.h"
+	geoset.x	"geomap.h"
+	;

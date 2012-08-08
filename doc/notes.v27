@@ -1,0 +1,2848 @@
+System Notes File for IRAF Version 2.6.
+Begun 8 July 1987.
+-------------------------------------------
+
+doc/notes.v25 +
+local/notes.v26 +
+	Moved the V2.5 system notes file to the documentation library and
+	started a new one (this file).  (7/8)
+
+unix/hlib/motd
+pkg/cl/cl.par
+	Incremented the IRAF version number to 2.6.  (7/8)
+
+local/bugs.v25 +
+unix/hlib/buglog.csh +
+unix/hlib/irafuser.csh
+unix/hlib/login.cl
+	Set up a system bugs file for V2.5, to be used to record bugs in the
+	frozen V2.5 system as they are discovered.  Added a new HSI utility
+	task (UNIX/IRAF only) called 'buglog', used to log new bugs.  (7/8)
+
+unix/hlib/login.cl
+	Added a new foreign task to the user package called 'nbugs'.
+	This may be used to page the tail of the system bugsfile, to see
+	if any new bugs have been added.  The new utility task is only
+	available on UNIX/IRAF and as defined will only work if the
+	nonstandard pager 'less' is installed, as it is on all NOAO
+	systems.  (7/9)
+
+pkg/bench/bench.hlp
+	Added IMLOAD and IMLOADF measurements to the Sun benchmark entries.
+	(7/10)
+
+unix/hlib/buglog.csh
+	Will now send a copy of each bug as it is logged to the iraf mail,
+	as well as appending it to the system bugs file.  This ensures that
+	all subscribers to the iraf mail see the bug report promptly.  (7/10)
+
+doc/vmsiraf.ms +
+	Added a completely new, more comprehensive VMS/IRAF Installation Guide
+	to the docs directory.  (7/20)
+
+GTERM (Sun/IRAF)
+	Made a number of obscure, mostly minor tuning enhancements to GTERM;
+	these have accumulated over the last couple of months.  Most of these
+	are little things that one does not notice if things are working right.
+
+	1. Incremented the version number to V1.1 for the first official
+	release of V2.5 SUN/IRAF.
+	2. Setup/reset now resets the user settable parameters to their
+	command line values, rather than to the builtin defaults.
+	3. I discovered that due to an oversight, there was no way to set
+	reverse video for the graphics plane on the command line.  Added
+	the new switches -[no]rev[erse], e.g., -rev or -norev (the default).
+
+	4. One can now add the sequence [task [args]] to the end of the
+	GTERM argument list to directly execute TASK in the window, even if the
+	command follows the -G in the command line.  This is different than
+	the already provided [-I command], which executes a shell in the
+	window and passes it the given command.  A shell process is eliminated,
+	and exiting the named task causes the window to quit (e.g., if the
+	command is "cl", logging out of the CL terminates the window).
+	A disadvantage (or advantage depending upon how you look at it) is
+	that since there is no csh, there is no job control in the window.
+
+	5. The F8 and F9 function keys are now recognized when the mouse is
+	in either the text or graphics window.  Hence if one types F8 to get
+	into graphics mode (perhaps by accident), then closes the graphics
+	window, typing F9 in the text window will restore text mode.
+	Previously one had to get the graphics frame back in setup mode in
+	order to type the F9 to restore text mode.  Also, typing L7 while
+	in graphics mode (which makes the graphics plane go away) will now
+	automatically restore text mode.  Hence if one types F8 by accident
+	while in text mode, typing L7 restores everything, including making
+	the graphics plane go away.
+
+	6. Typing F8 to get into graphics mode no longer clears the graphics
+	plane; typing F8 WHILE in graphics mode still clears the graphics
+	plane.  Hence, to switch to graphics mode AND clear the screen, one
+	can type F8 twice.  Typing F8 once while in text mode merely brings
+	up the graphics plane, providing a handy way to get the graphics plane
+	back without clearing it, without having to call up the setup panel.
+
+	7. Fixed a problem with the -Wh (-height) frame arg, used to set the
+	height of the tty window in lines of text.  For example, -Wh 40 may
+	be used to start up GTERM with the IRAF standard 40 line window.
+
+	8. GTERM now catches the suspend signal (SIGTSTP) and stops itself when
+	this signal is received.  Evidently, standard sunview window processes
+	(such as shelltool) do not do this since the window stops responding
+	to mouse and keyboard events, but it is necessary for GTERM to stop
+	itself when so commanded in order to be able to do a (<suspend>,'bg')
+	of a running gterm job in a cshell (e.g., another gterm window running
+	a shell), i.e., to stop the job and put it in the background.
+	Conversely, if SIGTSTP is not caught, typing 'fg' by accident on a
+	background gterm job causes the cshell to hang up, requiring a <ctrl/c>
+	abort to recover (killing whatever the gterm process was running,
+	e.g., a remote login to a computer on the other side of the world).
+
+	9. I tested GTERM on a monochrome terminal (3/110 overlay plane).
+	Modified the setup menu so that it says "mono only" when working on
+	a monochrome terminal, instead of indicating that color is an option.
+	Could not get reverse video to work on a monochrome monitor, although
+	it works fine in monochrome mode on a color monitor.  Decided to leave
+	it as it is for the moment (black polylines on a white background
+	unless entire screen is inverted).
+
+	10. Fixed a minor bug: when specifying frame colors for both the text
+	and graphics frames, the graphics frame colors would clobber the text
+	frame colors before the code would allocate a private colormap segment
+	for the second window.
+
+	11. Checked out a report than when printing very long lines, GTERM
+	might be losing characters during the wraparound.  The problem was
+	not duplicated and all characters were printed with autowrap as
+	expected, both in the left column on a cleared screen, and on the
+	half-screen column after a vertical screen wraparound.
+
+	12. Added a new command line option -T, and a set of related options
+	in the setup panel.  The options specify how the terminals responds to
+	graphics commands and data.  If -T is specified the graphics plane is
+	disabled, and graphics characters are printed in the text frame as on
+	a non-graphics terminal.  Another option allows graphics data to be
+	discarded entirely.  These options should be useful when debugging
+	graphics programs, or when working over a noisy line.
+
+	13. All gterm specific command line arguments and switch values now
+	permit minimum match abbreviations.
+
+	14. Added a new command line argument "-ginterm [ch [ch]]", where the
+	[ch] are the octal values of the GIN mode terminators.  Also added
+	support for setting the GIN mode terminators to the setup panel.
+	This is not required for IRAF, but for running foreign graphics
+	programs which require no GIN terminator, or a different value.
+
+	15. Reworked the setup panel code somewhat so that selecting one item
+	in the panel causes actions to be performed which affect only that one
+	item.  Formerly, the setup event procedure would fetch the value of
+	each setup item and perform some action if the value had changed.
+	This could result in unnecessary actions in some cases.
+
+	16. Fixed another suspend-process bug.  When running a command like CL
+	or SH which does not do job control in the gterm window without benefit
+	of an intermediate shell, typing the suspend character would cause the 
+	process (and terminal) to hang, requiring a kill to recover.  Added a
+	new command line option "-ignore" to allow filtering out of the suspend
+	control characters, and also a new frame menu option "continue" which
+	when selected, sends SIGCONT to the process group currently associated
+	with the terminal.  This will restart a process which is accidentally
+	stopped by typing the suspend control character.  Note that SHELLTOOL
+	also has this problem.
+	(7/23+)
+
+local/mail.mai -
+local/mbox.txt -
+local/tasks/daophot/image.dst -
+	Deleted these files in VMS/IRAF.  (7/27)
+
+unix/hlib/stripper
+unix/hlib/stripall		[UNIX,VMS,SUN]
+vms/hlib/stripper
+vms/hlib/stripall
+	Revised the stripper scripts for V2.5 IRAF.  This reduced the size
+	of the stripped V2.5 VMS/IRAF system from 18.7 to 14.9 Mb (with shared
+	libraries).  The main changes were deletion of all files in the
+	following directories:
+
+		local/noao
+		vms/hlib/share
+
+	In addition, a dozen or so modest size files, mostly .hlp files used
+	to generate printed manuals, were added to the list of special files
+	to be deleted in the stripper scripts.  (7/27)
+
+unix/hlib/install
+local/sun/Makefile			[SUN/IRAF]
+local/suntools -> local/suntools.e
+	Changed the name of the main 'suntools' executable in the IRAF system
+	login directory to 'suntools.e'.  This is necessary to prevent
+	execution of this local master copy of the suntools executable, when
+	entering the command 'suntools' when logged in as 'iraf'.  This is
+	wasteful of memory, as iraf/local/suntools is run for the root window,
+	but /usr/bin/suntools is used for most everthing else.  (7/30)
+
+pkg/cl/param.c
+	Fixed a serious bug in the code which searches for parameters where
+	no containing task has been specified, i.e., "param" rather than
+	"task.param", requiring a search of all pfiles in the search path.
+	There were two problems with the old code (lookup_param in param.c):
+
+	[1] If "param" was an ambiguous abbreviation for two or more of the
+	parameters in one of the pfiles in the search path, the search was
+	being terminated and an illegal value was being returned to the
+	calling routine (paramsrch), causing the error message
+
+		ERROR: task `' has no param file
+
+	to be printed, aborting the task.  The actual error would be an
+	ambiguous parameter name abbreviation, but even this is incorrect
+	since an exact match might be found in a pfile further on in the
+	search path.  This would commonly happen when referencing the CL
+	parameters i,j,k,x,y,z, etc., in complex scripts, since it is easy
+	in a complex script to have two or more parameters whose names begin
+	with one of these characters.
+
+	[2] If "param" was an unambiguous abbreviation for one of the
+	parameters in a pfile in the search path, that parameter would be
+	referenced, even though the actual parameter name given was the
+	exact name of a parameter in a pfile further on in the search path.
+	In other words, the search routine would stop as soon as it found
+	a parameter for which the given name was an abbreviation.  Clearly,
+	if searching for one of the CL global params i,j,k,x,y,z, etc.,
+	it is easy for this to occur, causing the script to fail.
+
+	The bug has been fixed, but the workaround is simply to not use the
+	global CL parameters in scripts.  This has always been considered
+	poor practice due to possible coupling problems between nested scripts
+	that access the same global parameters.  It is also more efficient
+	to define the parameters as local variables, as the search path is
+	shorter.  (7/31)
+
+IMTOOL (SUN/IRAF)
+	1. The hardware color table is now updated twice a second on a timer
+	loop, allowing the displayed image to be viewed normally even while
+	the mouse is not in the display window.
+	2. Added a rate option to continuous random pseudocolor.  Also, this
+	maptype option will now work when the mouse is not in the display
+	window, due to revision 1 above.
+	3. Added a command line option -maptype for setting pseudocolor options
+	etc. on the command line.  (8/4)
+
+local/sun/gterm.man +
+local/sun/imtool.man +
+local/sun/*
+	I cleaned up these directories, deleting the old ./save directory,
+	adding a README with installation instructions, adding a Makefile,
+	and so on.  Also, manual pages were added for both GTERM and IMTOOL.
+	(8/4)
+
+unix/gdev/sgidev/sgi2uapl.c
+	1. Added code to add the tiny timestamp/logo to the corner of each
+	output plot, so that the machine of origin, owner, and time are
+	recorded automatically on each plot when generated.  A -t switch
+	was added to disable printing of the logo (the default is to print it).
+
+	2. I also optimized the generated Postscript so as to speed up plotting.
+	This turned out to be tricky, as the Postscript interpreter is not all
+	that fast, hence even with the serial interface the laserwriter can
+	easily be cpu bound.  For a test vector plot with labelled axes, plot
+	title, and 3 512 point vectors overplotted, the following results were
+	obtained.
+					   data size, bytes	clock time
+					   ----------------     ----------
+		original code			90578		   1:45
+		4 byte encoding			25877		   1:43
+		7 byte encoding			37956		   1:12
+
+	The original code was clearly generating a lot more data than it
+	needed to to describe the plot (17 bytes per vector point), which was
+	the motivation for this optimization.  At 9600 baud, it should take
+	1:15 seconds to transmit 90Kb, suggesting that the plotting might be
+	i/o bound.  Hence in my first attempt at optimization I used a
+	sophisticated encoding scheme which used only 4+ bytes to encode each
+	vector point to be plotted.  This resulted in a very compact
+	representation of the plot, but the running time worked out about
+	the same, indicating that the processing was cpu bound due to the
+	overhead of the Postscript interpreter, and the relatively low speed
+	of the 68000 chip used in the current laserwriter.  In my second
+	attempt I streamlined the Postscript code, increasing the encoding to
+	7 bytes per vector point, with some loss of data compression, but a
+	significant improvement in processing time.
+
+	The conclusion is that Postscript, due to its very general and flexible
+	interpreter can sometimes be slower than one would like, and there is
+	little that can be done about it.  In many cases adding the more
+	expensive parallel interface would not help; the bandwidth of the
+	serial interface is rarely a problem, except perhaps for 1 to 1 bitmap
+	transfers.  As faster chips are used in the laserwriters there may
+	come a point where the 4 byte encoding is the fastest.  If the
+	Postscript output is to be used to save plots on disk or transmit them
+	via modem to remote computers, the 4 byte encoding may again be
+	preferable.  The ideal solution would be if Postscript were to provide
+	direct support for a polyline primitive, rather than relying on the
+	Postscript interpreter to draw polylines.
+
+	By default, the 7 byte encoding is used since it is faster.  The new
+	switch "-4" was added to enable the optional 4 byte encoding (the
+	translator supports both).  (8/9)
+
+pkg/images/tv/display/t_display.x
+	A new routine ds_setwcs() was added which writes a WCS descriptor file
+	to the directory 'wcsdir' (uparm if not defined) when an image or
+	image section is displayed.  The WCS file contains two lines: the
+	first line is some text describing the image (image name and title
+	string), and the second line is a rotation matrix to be applied to
+	screen coordinate to get image coordinates.  The rotation matrix
+	undoes the affects of the image section or display mapping
+	transformations.  The filename is "wcsdir$<device>_<frame>.wcs",
+	e.g., "uparm$imtool_1.wcs".  (8/12)
+
+doc/unixiraf.ms +
+	Installed the all new UNIX/IRAF Installation Guide in doc.  (8/24)
+
+vms/os/zfioty.c
+	Modified the VMS terminal driver to recognize the special device name
+	"dev$tty", passed by the VOS to indicate the user terminal.  Checked
+	out the operation of the TTOPEN routine (used to do i/o directly to
+	the terminal).  (8/25)
+
+unix/boot/mkpkg/host.c
+	The u_fmove function ($move) will now physically copy the file if
+	necessary to move it to a directory on a different device.  (8/27)
+
+local/tasks/mkpkg
+local/tasks/peritek -
+	Deleted the @ccdred reference and peritek references from this mkpkg
+	file on Sun/IRAF.  (8/27)
+
+dev/termcap
+	Added an entry for the unixpc.  (8/27)
+
+unix/hlib/install
+	Extracted the file lists and moved them to the head of the file as
+	SET statements so that they may more easily be modified for different
+	machines.  Added some more files to these lists for the Sun/IRAF
+	version of install.  (8/28)
+
+unix/hlib/stripper
+unix/hlib/stripall
+	Modified Sun/IRAF versions to delete the archived object files for
+	each floating point option during a strip operation.  (8/28)
+
+mkpkg
+unix/hlib/mkfloat.csh
+unix/hlib/cl.csh
+unix/hlib/irafuser.csh
+unix/hlib/login.cl
+	Added support to Sun/IRAF for multiple binary versions of the system,
+	e.g., to support multiple floating point options with a single copy
+	of the system.  There are two reasons for doing this.
+
+	    [1]	When multiple nodes must access the same copy of IRAF, the
+		different nodes will often have different floating point
+		hardware.
+
+	    [2] It would be nice to not require user sites to recompile the
+		full system because they have different floating point
+		hardware then we do on our development system.
+
+	This could have been done (could still be done by user sites if
+	desired) by recompiling the system with -fswitch, but this would
+	result in a significant loss of efficiency in some programs.
+	Our solution instead is to have multiple copies of the runtime
+	system executables.  This is transparent to the user, with the
+	best choice being made depending on the floating point hardware
+	available on the machine on which IRAF is being run.
+
+	Implementation is as follows:
+
+	    iraf$bin.f68881		Binaries for -f68881 option.
+	    iraf$bin.ffpa		Binaries for -ffpa option.
+	    iraf$bin			link to either of the above.
+	    cl				link to hlib$cl.csh, defines IRAFBIN
+	    login.cl			resets 'bin' to value of IRAFBIN
+
+	There are two bin directories, BIN.F68881 and BIN.FFPA, compiled
+	-f68881 and -ffpa respectively (the HSI executables are separate
+	and are compiled -fsoft).  The old BIN directory is now a symbolic
+	link to one of these two directories.  On our systems, bin.f68881
+	and bin.ffpa are also symbolic links to directories on a separate
+	device, in order to provide more flexibility in allocating such a
+	large amount of storage.
+
+	The command 'cl' is now a link to the script hlib$cl.csh, rather than
+	a link to bin$cl.e.  The script defines an environment variable
+	IRAFBIN giving the path to the bin directory to be used, and then
+	runs the cl.e in that directory.  The fpa bin will be used if it
+	exists and if the file /dev/fpa exits, indicating that the local
+	node has an fpa.  The revised LOGIN.CL file fetches the value of
+	IRAFBIN defined in cl.csh, and uses it to 'reset' the value of the
+	IRAF logical directory BIN.
+
+	While it is easy to switch bin directories, it is much harder to
+	maintain two separate copies of all the objects and package libraries.
+	The system has been set up so that it can easily be configured with
+	either f68881 or ffpa objects, but not both at the same time.
+	This is done as follows:
+
+		cd $iraf
+		mkpkg ffpa		(configure for -ffpa objects)
+		mkpkg f68881		(configure for -f68881 objects)
+		mkpkg showfloat		(show current float option)
+
+	MKPKG is used to configure the entire system for either float option.
+	Once this is done, that version of the binaries are updated by the
+	mkpkg.  The system is normally configured for f68881 so that software
+	development may take place on any node.  Periodically the ffpa objects
+	and executables are updated by the following commands:
+
+		cd $iraf
+		mkpkg ffpa		(configure for -ffpa)
+		mkpkg			(update libraries and relink)
+		mkpkg f68881		(restore to -f6881)
+
+	This updates the ffpa version of the system, and restores the system
+	to f68881 when done.  When not in use, all the system and package
+	objects and libraries are stored in the file OBJS.arc in one of the
+	bin.f* directories.
+
+	IMPORTANT NOTE -- Since bin, bin.f68881, and bin.ffpa are all
+	symbolic links, a tar archive of $iraf no longer includes any
+	executables.  The real bin directories (/tmp2/bin.f68881 and
+	/tmp2/bin.ffpa on our system) must be explicitly referenced on
+	the tar command line to be included in the archive.  A tar of $iraf
+	is now only about 35 Mb, and the bin directories are about 24 Mb.
+
+	When configuring the system for a particular site, the bin directories
+	may be located wherever there is space, and either directory may be
+	deleted if it will not be used.  Of course it is always possible to
+	delete both and compile the system for -fswitch, etc., if desired.
+
+	I am considering adding a gprof version of OBJS.arc for profiling
+	purposes, now that we have an easy mechanism for maintaining multiple
+	versions of the system binaries.  (8/28)
+
+unix/hlib/install
+	Modifed the Sun/IRAF part of the install script to install or update
+	the GTERM and IMTOOL manual pages.  (8/30)
+
+unix/hlib/zzsetenv.def
+	Added an entry "set stdimcur = text", so that image cursor reads will
+	come to the terminal by default, rather than trying to spawn the
+	stdimage kernel and dieing on a process not found error.  (8/31)
+
+unix/boot/mkpkg/host.c
+	Thanks to the recent change to a remote bin directory on Sun/IRAF,
+	which causes $move to call u_fcopy, we have found a bug in u_fcopy.
+	The variable "totchars", used to check if the file changes size
+	during the copy, was not being initialized before each copy.  (9/1)
+
+----------------------------
+Sun/IRAF V2.5 frozen and archived on tape.  (9/3)
+
+vms/boot/mkpkg/host.c
+	I had to add the /NOCONTIGUOUS qualifier to the COPY command, as COPY
+	would issue a warning message and return an error (warning) status
+	code, when trying to copy an input file which was contiguous and the
+	output file could not be created contiguous.  This was happening even
+	though there was no /CONTIGUOUS qualifer on the command line.  (9/4)
+
+local/sun/gterm.c
+local/sun/gtermio.c
+	Added a new, experimental feature to GTERM.  Selecting "logging on" in
+	the frame menu causes all output from that point on to be logged in a
+	file.  Selecting "logging off" disables logging.  The log file filename
+	may be set in the setup panel if desired.  Any utility such as 'cat'
+	may be used to replay the logfile.  "Page mode" may be set in the
+	text window to page the played back output.  This feature is useful
+	to spool terminal output for later review, e.g., during a terminal
+	session on a remote or non-UNIX node where i/o redirection is
+	difficult, or to provide a means of spooling the output of interactive
+	programs which do not provide such a facility as a builtin (e.g. a
+	file pager).  (9/8)
+
+doc/pkg.hlp
+	Deleted some ^N, ^O control codes which were embedded in the text,
+	causing the file to appear to be a binary file.  (9/9)
+
+sys/clio/clgcur.x
+	CLGCUR will now accept either X-Y-WCS-KEY-SVAL or KEY-SVAL as valid
+	input cursor value strings.  In the latter case, X-Y-WCS will be
+	returned as INDEF INDEF 0.  It is assumed that if the latter case is
+	used, the coordinate information is to be ignored, e.g., because the
+	function selected by the key does not use the coordinate information.
+	This is convenient when entering interactive commands in cursor mode,
+	e.g., with stdimcur set to "text", (or possibly in cursor lists when
+	the coordinate information would be meaningless for a given key).
+	Note that omission of X-Y-WCS is possible only when the given key
+	is nonnumeric.  (9/10)
+
+doc/aosvsiraf.hlp
+	Installed a new version of the AOSVS/IRAF Installation Guide.  (9/11)
+
+sys/gio/stdgraph.com
+sys/gio/stgres.x
+sys/gio/mkpkg
+sys/gio/stgpl.x
+sys/gio/stgpm.x
+sys/gio/stgencode.x
+sys/gio/stdgraph.h
+sys/gio/stginit.x
+	Someone (Dyer) discovered that the graphics system was noticeably
+	slower than specialized test code when used to plot very long vectors,
+	e.g., 4096 points.  Normally the software is faster than the hardware,
+	but for these very long vectors clipping of unresolved points becomes
+	a significant factor, as does all the processing needed to generate
+	all those points.
+
+	Investigation showed that virtually all of the time was being spent
+	in three routines: gadraw, the main point drawing routine in GIO,
+	and stg_polyline and stg_encode, the principle polyline drawing
+	routines in the stdgraph kernel.
+
+	The gadraw routine uses the most time, but examination of the code
+	showed that it was already fully optimized, with caching of the WCS,
+	use of integer rather than floating point where possible, and provision
+	of code to optimize the common special cases, e.g., linear WCS,
+	successive points all inbounds with no clipping, and so on.  I don't
+	seem much possiblity for improvement here, it just takes a little
+	while to plot all those thousands of points (i.e., 0.68 seconds for
+	all the GIO operations for 4096 points on my 16.7 MHz diskless Sun
+	node with f68881 fpa).
+
+	There was room for improvement in the polyline drawing code in the
+	stdgraph kernel, however, since most of the time was being spent in
+	a single routine.  I [1] added code to the inner loop to handle the
+	special case of Tek-4012 encoding inline, rather than calling the
+	encoder, [2] substituted lookup tables for the tek encoding, rather
+	than computing the 4 bytes each time with divides, mods, adds, etc.,
+	[3] substituted integer for floating point in the unresolved point
+	clipping code, and [4] replaced the FOR loop by a DO loop.  With these
+	changes, I was able to reduce the running time for drawing 100 4096
+	point polylines in the stdgraph kernel from 37.9 sec to 18.0 sec on
+	the 16.7 MHz f68881 Sun.  The most significant change occurred with
+	optimization [3], since for these long vectors clipping is the major
+	operation, and the f68881 floating point is quite slow compared to
+	68020 integer operations.
+
+	In repeating the same tests on the 11/750, my 4096 point test plot
+	took 11 seconds to draw both before and after installing the optimized
+	stdgraph kernel.  It appeared that the GIO time was about 2.2 sec
+	per plot, and the stdgraph time about 0.7 sec, indicating that the
+	operation was very much limited by the drawing speed of the terminal.
+	By decreasing the software resolution of the plot in cursor mode,
+	I was easily able to decrease the drawing time to 4 seconds, with
+	only slight degradation of the plot.  Hence, it appears that the most
+	significant factor affecting plotting time is actually the point
+	elimination algorithm, which is probably more conservative in the
+	stdgraph kernel than in the specialized test code mentioned above.
+
+	I conclude that, although a significant inefficiency in the polyline
+	drawing code was discovered and fixed, the graphics system has been
+	i/o limited all along (on conventional graphics terminals), and that
+	the differences in plotting speeds observed earlier were due to
+	differences in the point elimination algorithms, causing one program
+	to plot at a slightly different resolution than the other.  (9/12)
+
+	[Addendum 9/14: In repeating the plotting speed tests mentioned
+	[earlier, we discovered that the real difference was that Dyer's
+	[program was *subsampling* the data by 4, and hence only plotting 1024
+	[points, whereas all my tests were plotting the full 4096 points.
+	[Repeating the IRAF test with an [*:4] image section eliminated the
+	[problem - and I suspect the IRAF code, despite its generality, is now
+	[more efficient than Dyer's specialized test code.]
+
+sys/gio/gactivate.x
+sys/gio/greactivate.x
+sys/gio/gdeactivate.x
+sys/gio/gki/gkigca.x
+sys/gio/gki/gkifetch.x
+sys/gio/gki/gkigetwcs.x
+	Added some errchk declarations.  (9/14)
+
+dev/graphcap
+lib/syserr.h
+lib/syserrmsg
+sys/gio/gopen.x
+sys/gio/cursor/gtropenws.x
+	1. In the graphcap file, for device 'iis', deleted the kf and tn
+	capabilities (kf=bin$x_stdimage.e etc.) since there is no GIO
+	kernel yet for this device, and it is therefore incorrect to
+	indicate that there is such a kernel in the graphcap (this causes
+	misleading error messages).
+	2. Added a new system error message SYS_GNOKF, and modified gopen.x
+	and cursor/gtropenws.x (GIO) to check that a device has a GIO
+	kernel before trying to connect it, printing an informative error
+	message and taking an error exit if no kernel is found.
+
+	NOTE: All graphics devices accessed via GIO must now have the 'kf'
+	capability in their graphcap entry, specifiying the GIO kernel to
+	be used.  Previously, the value of kf would default to 'cl' if no
+	kernel were found, but this has been changed to an error condition.
+	As far as I know, all graphcap entries to date have explicitly
+	specified the kf so this should not cause any problems.  (9/15)
+
+pkg/cl/exec.c
+pkg/cl/pfiles.c
+	Fixed a PSET related bug that would occasionally cause segmentation
+	violations in the CL when "executing" a pset task.  The segmentation
+	violation was occurring due to an indirect reference (by pfileload()
+	in pfiles.c) to the param file pointer in the task structure, occurring
+	in the code in callnewtask() in exec.c which was in the process of
+	setting that very parameter.  (9/20)
+
+pkg/cl/binop.c
+pkg/cl/opcodes.c
+pkg/cl/unop.c
+sys/etc/envreset.x
+doc/ports/notes.sun4 +
+unix/mc68000/zsvjmp.SPARC +
+	Merged in some changes from the port of IRAF to the Sun-4, the new
+	RISC architecture (sparc) machine.
+	1. The changes to the three CL files were to avoid use of the VALU
+	macro to fetch the value of an operand, when evaluating boolean
+	operands.  The datatype of VALU, due to the union in the operand
+	struct, is double, and evaluation of boolean expressions in double
+	on the sparc cpu was not working (and obviously should be avoided).
+	2. In envreset.x, the maxch argument to a strcpy was being passed as
+	a short rather than an int, and this was causing a bus error on the
+	sun-4.
+	3. Saved copies of the notes file from the port, and the zsvjmp.s
+	(10/1)
+
+sys/gio/gopen.x
+	The recent addition of code to check for the kf parameter interfered
+	with the gopen action for the special device 'stdvdm'; fixed this.
+	(10/1)
+
+sys/gio/doc/gio.hlp
+sys/gio/stdgraph/stgrcur.x
+	Added a new graphcap device parameter RE.  This goes with RC, and if
+	defined for a device, is sent to the terminal after the cursor value
+	has been successfully read.  This is necessary on terminals which
+	ignore characters coming back from the computer (e.g., due to echo
+	not being turned off in the terminal driver) while transmitting the
+	cursor position characters during a cursor read.  (10/1)
+
+sys/clio/clgcur.x
+	The clgcur revision of 10 Sept (about 3 week back) introduced a bug
+	which would cause cursor reads returning negative x values to fail.
+	This has been fixed on lyra and tucana.  Our policy of not exporting
+	code from our test systems should have prevented this bug from being
+	propagated to any external sites, or even to our production systems
+	in Tucson.  (10/2)
+
+local/sun/Makefile
+local/sun/gtermio.c
+	1. Discovered and fixed a serious bug in GTERM which would cause the
+	terminal to lock up when trying to do graphics over a modem connection
+	to an external computer (evidently this was the first time this has
+	been tried).  In this mode of operation, characters are delivered one
+	at a time; receipt of the GS character alone would cause the input
+	code to get into an infinite loop, exiting immediately each time
+	called, posting a callback to the notifier, which would evidently call
+	the input procedure back BEFORE reading pending input on the pty.
+	2. Modified the makefile to strip the suntools.e executable in the
+	"make install" rather than when it is made, to make it easier to get
+	at an unstripped version for debugging.  (10/3)
+
+doc/cluser.tex
+doc/vmsiraf.ms
+	Corrected the spelling of Fred Romelfanger's name.  (10/7)
+
+sys/gio/gopen.x
+	Corrected another problem having to do with raw metacode output.
+	This was diagnosed as a stdvdm problem, but wasn't really.  A program
+	was opening device "stdvdm", but directing output to a binary file
+	opened by the application, and it was bombing because in this case
+	GIO is not writing to the stdvdm file, but to the user file.
+	The change was to disable checking for the existence of a graphics
+	kernel whenever output is directed to a stream other than STDGRAPH,
+	STDIMAGE, or STDPLOT.  If the user is controlling where the metacode
+	goes, it is inappropriate to make such a check, as probably no kernel
+	is being used.  (10/22)
+
+---------------------------------------
+Orion (Sun-4) updated (port actually) from lyra on 24 Oct.  This was with the
+    BETA1 release of SunOS for the RISC Sun-4, hence will have to be redone
+    when we get the correct, current operating system software in.
+Tucana updated from lyra on 26 Oct (both f68881 and ffpa).
+
+unix/boot/wtar/wtar.c
+	I wanted to use the -o (omit binary) feature to make a source only
+	update tape given a long list of individual files and directories.
+	This failed due to the restrictions in the unix/iraf HSI on changing
+	directories.  I hacked away on WTAR until it could handle this
+	properly, and had to generalize the library routines listed below
+	as well.  (10/27)
+
+unix/boot/bootlib/oschdir.c
+	The case which folds a subdirectory into the pathname of the current
+	directory was being called incorrectly when passed a directory name
+	of the form "path/subdir".  (10/27)
+
+unix/boot/bootlib/osfpathname.c
+	The special code in this routine for vfns "." and ".." was checking
+	only for such a prefix, and incorrectly matching filenames such as
+	"./path".  (10/27)
+
+-----------------------------------
+IRAFX (draco) updated from lyra on 27 Oct.
+
+sys/gio/gclose.x
+	Added a call to gki_redir(fd,0,0,0) to cancel any redirection of a
+	graphics stream to an inline kernel or subkernel, when the stream
+	is closed.  This has never been a problem, but could be required in
+	some circumstances.  (11/2)
+
+sys/gio/gki/gkiredir.x
+	May now be called with fd < 0 to obtain the redirection information
+	for a stream without changing anything.  (11/2)
+
+sys/gio/gopen.x
+	Checking for a kernel file in graphcap is now disabled if a graphics
+	stream is opened on an inline kernel or subkernel, in which case no
+	external kernel could possibly be needed.  (11/2)
+
+pkg/images/tv/cv/load1.x
+	The CVL task was issuing the following sequence of calls:
+
+		gki_inline_kernel
+		gopen, gclose
+		gopen, gclose
+
+	Since gclose now resets the default GKI stream type, a second call
+	to gki_inline kernel is necessary before the second call go gopen,
+	to setup GKI for an inline kernel.  (11/3)
+
+sys/gio/gvmark.x
+	Bug fix: replaced the single "marksize" argument by the "xsize, ysize"
+	specified in the documentation, etc.  (11/6)
+
+sys/fio/nowhite.x
+sys/fio/open.x
+sys/fio/vfntrans.x
+	The NOWHITE procedure, used to eliminate whitespace and newlines from
+	a string operand, was using maxch on the output string as a terminator
+	and ignoring EOS on the input string (most likely harmless, but
+	inefficient).  In the process of fixing this it appeared that it
+	would be useful to return the length of the output string as the
+	function value, and the procedure was only used in the two files
+	listed above, so the procedure was converted into a function.  (11/6)
+
+sys/gio/stdgraph/stgpm.x
+	The STDGRAPH kernel polymarker code would draw the polymarker and then
+	go into an infinite loop, due to a bug in the loop termination test
+	introduced when the optimized polyline drawing code was transferred
+	to the polymarker drawing routine some time back.  (11/7)
+
+sys/imio/imaccess.x
+	If an image section is specified, imaccess calls immap to see if the
+	image specification is legal as well as test if the image exists,
+	in order to avoid having to deal with the complexity of parsing image
+	sections etc.  The problem was that the 'mode' argument to imaccess
+	was being passed to 'immap' directly, and thence on to the file open.
+	Hence, the image header file was being opened with access mode 0,
+	causing an error exit to be taken in FIO (see below).  Changed imaccess
+	to open the image with mode READ_ONLY if the access mode specified
+	to the imaccess is 0, otherwise the user specified access mode is
+	used.  (11/13)
+
+sys/fio/fgetfd.x
+	In the process of fixing the above bug, I found and fixed a serious
+	bug in FIO, which has been there since the code as written!  If a file
+	were opened with an illegal mode or type, the FGETFD routine would
+	take an error exit sure enough, but it was not dealling the file
+	descriptor and marking the file slot unused, hence was leaving the
+	file descriptor allocated and half filled in.  This would go undetected
+	until the task terminated, normally or otherwise, at which time the
+	file cleanup routine would find the "open" file and try to close it,
+	causing a segmentation violation due to the partially filled in file
+	descriptor.  Note that this error would only be seen when attempting
+	to open a file with an illegal mode or type (a bug in the calling
+	program), hence it has probably rarely been seen.  (11/13)
+
+unix/os/zfiomt.c
+	I had to make a couple of subtle mods to the MTIO driver to workaround
+	peculiarities in the SunOS mtio driver on the Sun-4 (GAMMA release of
+	SunOS).  Note that none of these bugs is present on the Sun-3 or any
+	other UNIX system thus far tested.
+
+	1. On the Sun-4, it turns out that an MTBSR ioctl (back skip record),
+	if used to backskip over a tape mark, returns ERR, as does MTFSR,
+	with errno=EIO.  To workaround this it was necessary to ignore ERR if
+	errno=EIO following a forward or backward skip record.  The driver is
+	not technically at fault here, since the BSD mtio documentation does
+	not specify what the driver should do in this case, but all other unix
+	drivers thus far tested permit BSR to backspace over a tape mark.
+
+	2. This one was more subtle, so subtle in fact that I cannot be certain
+	I have diagnosed it properly, although everything fits my theory well.
+	For forward record skips, the IRAF magtape driver uses a read into a
+	large dummy record buffer for which space is automatically allocated on
+	the machine stack at function entry, e.g.: (a read rather than FSR is
+	used here to reliably detect tape marks)
+
+		char  buf[29184];
+		int   nb;
+		nb = read (fd, buf, 29184);
+
+	What would happen is that in the first call to this code following
+	process startup, the read would fail, returning errno=14 (EFAULT,
+	bad address causing fault during execution of system call).  What I
+	suspect is happening is that the page fault required to allocate
+	space on the process hardware stack for BUF is occuring during
+	execution of the dma read in the SunOS mtio device driver.  Once the
+	stack grows large enough to provide space for BUF, the error goes
+	away.  Adding a "buf[0] = 0" statement before the read fixes the
+	problem by causing the stack page fault to occur in the user process
+	before entering the kernel device driver.  (3/12)
+
+sys/mtio/mtio.h
+sys/mtio/mtpos.x
+sys/mtio/mtlocknam.x
+sys/mtio/mtfile.x
+sys/mtio/mtparse.x
+sys/mtio/mtosdev.x
+sys/etc/xalloc.x
+sys/etc/xgdevlist.x
+sys/ki/kzrdmt.x
+sys/ki/kzwrmt.x
+sys/ki/kzwtmt.x
+sys/ki/irafks.x
+sys/ki/kiextnode.x
+	Revised these files to finish adding support to the VOS for network
+	access to remote magtape devices.  Remote devices are accessed merely
+	by prefixing the device name with the node name, e.g., "orion!mta"
+	to access the A tape drive on node "orion".  For example, to list the
+	headers on a FITS tape on a remote drive,
+
+		cl> alloc o!mta
+		cl> rfits o!mta 1-99 make-
+
+	The dev$devices file on the remote node is used to obtain the device
+	information, hence no network information is required in the device
+	files, and device names need not be unique in a network sense.
+	Performance, as measured by the clock time, ranges from 30-90% of
+	what is achieved using the tape drive on the local node.  These
+	revisions also included a couple of bug fixes, e.g., the KI magtape
+	access bug logged sometime back, and a newly discovered missing
+	argument bug in some error recovery code in the device allocation
+	code in etc.  (12/5)
+
+pkg/dataio/mkpkg
+pkg/dataio/cardimage/conversion.x
+pkg/dataio/cardimage/t_rcardimage.x
+pkg/dataio/cardimage/t_wcardimage.x
+pkg/dataio/cardimage/tabs.x
+pkg/dataio/fits/fits_write.x
+pkg/dataio/fits/t_rfits.x
+pkg/dataio/fits/t_wfits.x
+pkg/dataio/imtext/rt_rwpix.x
+pkg/dataio/mtexamine/t_mtexamine.x
+pkg/dataio/reblock/reblock_file.x
+pkg/dataio/reblock/t_reblock.x
+pkg/dataio/t2d/t_t2d.x
+	1. Modified all programs in DATAIO to use the MTFILE operator to test
+	if a file is a magtape file.  Formerly, these routines were using
+	an explicit strncmp of the "mt" prefix, which is poor information
+	hiding and does not work with network access.
+	2. The cardimage and reblock programs were writing verbose output
+	to STDOUT but flushing STDERR.  (12/5)
+
+----------------------------------------------------
+Updated tucana and orion from lyra.  (12/5)
+
+local/sun/imtool.c
+local/sun/imtool.man
+	Modified the way the coordinate file name is entered via the setup
+	panel, to make this feature easier to use.  The string displayed and
+	entered via the setup panel is now a printf style format specification
+	rather than the actual file name, with the default being "frame.%d"
+	(the %d, if given is replaced by the frame number).  There is now
+	visible feedback when the user types return to enter the new string,
+	i.e., the window frame label is updated.  (12/6)
+
+sys/ki/kilnode.x
+sys/ki/kifndnode.x		[LOGICAL NODE NAMES]
+sys/ki/kinode.com
+sys/ki/kignode.x
+	Modified the KI to add support for logical node names that can be
+	defined in the environment.  These may be used interchangeably with
+	the node name aliases defined in the dev$hosts; the main advantage
+	is that since the environment is used, the values may be changed on
+	a per user basis.  Logical node names (similar to plot! etc.) may be
+	defined in the standard system, with the local node being assumed if
+	the given logical node name is not currently defined.  (12/6)
+
+unix/gdev/zfiogd.x
+pkg/images/tv/display/iisopn.x
+	Added support for IMTOOL to the master system on lyra.  (12/6)
+
+sys/imio/imdmap.x
+	Noticed and fixed a harmless bug in this file.  The graphcap descriptor
+	for the image display was being opened but never closed.  (12/6)
+
+dev/graphcap
+	Added a "node!" prefix to the DD string for device 'imtool'.
+	The logical node name "node" is supposed to refer to the primary node
+	the user is logged in on.  With this and the other changes noted
+	above, it is possible to use IMTOOL over a network connection
+	(there may be a byte swapping problem yet on the VAXes).  (12/6)
+
+---------------------------------------
+Updated orion and tucana from lyra, including propagating a bug fix in
+apextract.  (12/7)
+
+local/sun/imtool.c
+	Modified to automatically sense whether the input data is byte swapped,
+	to allow generation of the display data stream on remote, possibly
+	architecturally incompatible nodes on the network (e.g., VAXes).
+	Also added code to verify the checksum of each IIS header and print
+	an error message on the console if a bad checksum is seen.  Non-byte
+	packed data is now recognized and the difference in the size of the
+	data block allowed for (avoiding a possible data stream synchronization
+	problem), but currently only every other pixel will be displayed if
+	the data is not byte packed.  (12/9)
+
+dev/hosts
+	Added entries for all the new Sun nodes, and updated the file on most
+	or all unix nodes in the local network (it is getting hard to be sure
+	if one has gotten them all).  (12/9)
+
+sys/ki.h
+sys/kigchan.x
+sys/kighost.x
+sys/kifchan.x
+sys/kishownet.x
+	Adding the new nodes to the hosts table caused the internal KI node
+	table to overflow, revealing two bugs in the KI (sufficient to prevent
+	IRAF from running at all!).
+	1. In kighost.x, the test for a full table was not being performed
+	correctly, allowing an overflow by one error.
+	2. In ki[gf]chan.x, the value of 'server' was being used to index the
+	node tables when allocating a KI channel descriptor for a resource.
+	Unfortunately, when a resource is local 'server' is set to NULL.
+	This was causing an array to be indexed [0], overwriting the final
+	element of the node table (harmless until the table is full).
+
+	I fixed these bugs and tested for overflow on an overfull host table,
+	then increased the maximum number of nodes from 20 to 64 (I hate to
+	reserve the table space, but the KI is a major interface).  If there
+	are too many hosts the system will simply ignore the extra entries
+	once the internal node table is full.  No error message is given,
+	but if the system.netstatus task is run, the warning message
+
+		HOST NAME TABLE IS FULL
+
+	will be seen.  At some point we need to modify the code to permit a
+	runtime access to the host table (perhaps using the current node
+	table only as a cache), in order to support an arbitrary number of
+	nodes as is necessary in large networks.  (12/10)
+
+pkg/system/mkpkg
+pkg/softools/mkpkg
+noao/mtlocal/mkpkg
+	Modified these mkpkg files to generate an xx_*.e executable, and rename
+	it to x_*.e when installing it in BIN.  (12/10)
+
+---------------------------------------------
+Updated irafx on draco (VMS).  (12/11)
+
+dev/hosts
+	In the kernel server pathnames for the Sun-3 nodes, changed the "bin"
+	to "bin.f68881" so that a runnable server will be selected regardless
+	of the floating point configuration of the system.  (12/12)
+
+local/sun/imtool.c
+vms/gdev/zfiogd.x
+unix/gdev/zfiogd.x
+dev/graphcap
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/mkpkg
+pkg/images/tv/display/findz.x
+pkg/images/tv/display/iis.com
+pkg/images/tv/display/iis.h
+pkg/images/tv/display/iisers.x
+pkg/images/tv/display/iisopn.x
+pkg/images/tv/display/iispio.x
+pkg/images/tv/display/iisrcr.x
+pkg/images/tv/display/iisrd.x
+pkg/images/tv/display/iisstt.x
+pkg/images/tv/display/iiswcr.x
+pkg/images/tv/display/iiswr.x
+pkg/images/tv/display/maxmin.x
+	Modified IMTOOL to add support for an 800 square display format option.
+	1. Added logical devices 'imt512' and 'imt800' to the graphcap and
+	to gdev/zfiogd.x.
+	2. Modified the DISPLAY program to eliminate all occurrences of 512
+	or 511 as a constant, dimensioning everthing instead from the
+	graphcap entry for the device (all changes should be backwards
+	compatible for a standard IIS).
+	3. Modified IMTOOL to add the 800 square option.  This may be set
+	in the setup panel, but more commonly it will be set automatically
+	when the user writes to the device imt512 (imtool) or imt800.  (12/12)
+
+------------------------------------------
+Updated all systems.  (12/12)
+
+unix/os/zfioks.c
+	There was a bug in the UNIX/IRAF zfioks (kernel server) driver which
+	would cause it to needlessly open a host file descriptor every time it
+	was called to attempt to open a connection to a remote node.
+	This bug has gone undetected until now because once a connection to a
+	remote node has been opened, it tends to remain open for the lifetime
+	of the client process, and a process is not likely to connect to very
+	many nodes.
+
+	The bug was found on our diskless sun nodes, due to a circumstance
+	which was causing the connect to fail, resulting in a connection
+	attempt (and additional wasted file descriptor) every time a remote
+	file was accessed.  This rapidly used up the available file
+	descriptors.  What was happening was that a large number of images
+	were read from tape to disk on the server node (tucana).  The user
+	then logged in on a diskless node and attempted to access the images.
+	The user did not have a .irafhosts file, hence dev$hostlogin was
+	used, but this old file did not contain any login information for the
+	node in question, hence the connection would always fail.  If a resouce
+	cannot be accessed over the network the KI currently tries to access
+	it on the local node (probably not a good idea).  In this case this
+	would work, since the images were created on a disk which was shared
+	by the two nodes via NFS.
+
+	This problem occurs because of the pixel file pathname in the image
+	header.  This pathname includes the name of the node on which the
+	pixel file resides, i.e., it is the network pathname of the file,
+	as is needed in the general case if the file is to be accessed from
+	any node.  In the case described here the pixel file could be
+	accessed via either IRAF networking or NFS; in the general case only
+	IRAF networking would work.  The recommended solution is to either
+	use a .irafhosts file and IRAF networking, or use the imdir=HDR$pix/
+	option to eliminate the network pathname.  (12/19)
+
+dev/irafhosts
+	The original contents of this file contained a list of NOAO network
+	nodes with login information for the now defunct login 'ace' on each
+	node.  This has been changed to the system and user independent form
+
+		* : <user> ?
+
+	meaning for an attempted connection to any node (*), try to login with
+	the user name as used on the local host system (<user>), prompting for
+	the password.  I also added comments to the file describing the syntax
+	and usage of the file.  (12/19)
+
+	NOTE -- Since this file is now system independent and will result in
+	a reasonable action for any user on any node, it is no longer necessary
+	for each user to have a .irafhosts file unless they with to specify
+	the password or they wish to use a different login on remote nodes
+	than is used on the local node.
+
+unix/os/zfioks.c
+unix/os/net/zfioks.c
+vms/os/net/zfioks.c
+	Modified to add support for the "<user>" syntax.  This symbol,
+	appearing in the username field of a .irafhosts or dev$hostlogin
+	node entry, is replaced by the current login name of the user on
+	the client node.  (12/19)
+
+vms/hlib/gripes.cl
+vms/hlib/gripesfile
+/u2/sites/sitelog.c [noao only]
+	1. The site mail logging facility (used internally to the IRAF project)
+	was not logging mail from VMS addressed as
+
+		To: "IRAF" ...
+
+	The program was modified to ignore the quotes.
+
+	2. Modified the GRIPES facility for VMS to use the "Subject:' text
+	entered by the user as the subject for the VMS mail as well as in
+	the gripe header.  Commented out the code which would append the gripe
+	to hlib$gripesfile, since it can be assumed that this file will not
+	be writable on many VMS nodes, and the code is being disposed of via
+	mail anyhow.  (12/19)
+
+sys/imio/iki/oif/oifrename.x
+	The imio.imrename primitive was not working properly for an OIF type
+	image, when moving the image to a different directory.  The header
+	file would be moved but the name of the old pixel file was being
+	generated improperly, causing it to fail to be moved.  This would
+	affect not only the IMRENAME task, but any in place image operation
+	where the output image was created in a temporary image in the current
+	directory, then renamed to replace the old image.  (12/19)
+
+sys/imfort/imps3r.x
+	This routine would appear to function correctly, but when used to
+	output a 3 dimensional section, would replicate the first line of
+	the input section to fill the first output band, then fill the second
+	output band with the second line of the first input band, and so on
+	(the pointer into the input section was being incremented in the
+	outer, rather than inner, loop!).  All other IMFORT 3-dim i/o routines
+	were checked as well, but the bug was present only in the one routine.
+	(12/20)
+
+pkg/images/tv/display/t_display.x
+	Modified the code which output the WCS file to:
+	1. Take account of reduced dimension sections such as [5,*,*],
+	defining the WCS relative to the two dimensional section specified in
+	such a case.
+	2. Fixed a bug (oversight) which would cause the WCS matrix being
+	output to be incorrect if the image were loaded anywhere but at
+	xcen=ycen=0.5.
+	3. Output greyscale transformation information in addition to
+	the spatial information already output.  (12/20)
+
+sun/imtool.c		[SUN/IRAF]
+	1. In constant coordinate readout mode, will now print the intensity
+	of the pixel underneath the cursor, in addition to the x,y values
+	already output.  The pixel intensity is given in image intensity units
+	if the display transformation was linear, in display pixel units
+	otherwise.
+	2. The display window can now be resized without affecting cursor
+	readout or control, or the visibility of the WCS coordinate output
+	box.  If the displayed image is loaded into the upper left corner of
+	the imtool window, the window may be resized to exactly fit the
+	displayed image regardless of its shape.
+	3. The gclear function in the setup panel (graphics clear) now works
+	properly.  (12/20)
+
+--------------------------------------
+All systems updated (lyra, tucana, orion, irafx@draco).  (12/20)
+
+sun/imtool.c		[SUN/IRAF]
+	1. If the cursor is positioned to an area of the display window which
+	has not been loaded with image or colorbar data, the pixel value is
+	output as 0. rather than some miscellaneous fictious value.
+	2. If the pixel value is being output in raw display units for some
+	reason (e.g., because the WCS file could not be read, or a nonline
+	greyscale transformation was used to load the image), the pixel value
+	is displayed as an integer to flag this condition for the user.
+	3. Added an option to make the display window background color (the
+	color to which the window is set when the image is cleared) black, with
+	white being the default as before.  Settable via either a command line
+	argument or the setup panel.  (12/21)
+
+dev/hosts
+dev/termcap
+dev/graphcap
+	Changed the names of the logical node names "print" and "plot" to
+	"lpnode" and "plnode" (line printer node and plotter node).  The node
+	name "plot" was no longer working due to the recent modification of
+	the networking code to permit logical node names to be defined in the
+	environment; "plot" is already defined in the environment as a logical
+	directory.  (12/22)
+
+sun/imtool.c
+	Decreased the cursor gap from 10 to 6 pixels in response to a user
+	complaint that it was hard to center the cursor precisely on objects
+	due to the gap being too wide.  (12/24)
+
+sun/screendump.c
+	1. The output image is now fractionally scaled to fill the page.
+	Formerly an integer scale factor was used in the hopes that this would
+	be faster (it permits simple pixel replication), but there is little
+	speed difference, and having the output always scaled to fill the
+	page is nicer.
+	2. The screendump code now knows about devices like the 3/110 and 3/60
+	which have 10 bit frame buffers (8 bit color plus 1 bit overlay plus
+	1 bit overlay enable mask).  Hence, textcopy, graphcopy, and screencopy
+	will now work for all current Sun workstations.  (12/24)
+
+sun/gterm.c
+sun/gterm.man
+sun/imtool.c
+sun/imtool.man
+	1. Incremented the GTERM version number to V1.2 and updated the
+	manual page.
+	2. Added a "pan" capability to IMTOOL.  Provided that the display
+	window is smaller than the image, the middle mouse button may be
+	used to mark a position to be moved to the center of the display
+	window.  Panning is either instantaneous or via a smooth scroll;
+	the latter is selected by holding the control key down while pressing
+	and releasing the middle mouse button.  (12/26)
+
+pkg/images/tv/display/sigl2.x
+pkg/images/tv/cv/sigl2.x
+	Fixed a short/int datatype mismatch bug in a call to adivks.  The bug
+	had already been fixed in plot/crtpict/sigl2.x (the only other copy of
+	this routine I know about), but evidently the bug fix had not been
+	propagated to the other routines.  (12/28)
+
+unix/os/zfiobf.c		[SUN/IRAF]
+	Added support for FIFO (named) pipes, as are used by the display server
+	code (gdev$zfiogd.x) on Sun/IRAF.
+	1. Files opened read only or write only are opened with the O_NDELAY
+	flag, necessary to prevent the client process from blocking until the
+	server makes a connection (which in my case was not until the client
+	requested the connecton, leading to deadlock).
+	2. A close on a FIFO opened for reading by the client was causing the
+	error EPERM (insufficient permission) to be returned for the close.
+	This was highly inconvenient, so I modified ZCLSBF to ignore this
+	error.  Hopefully the file descriptor is actually getting freed; I did
+	not take the time to check.  (12/28)
+
+sun/gtermio.c
+sun/gterm.esc
+sun/gterm.man
+	Added support for the ESC ENQ function to GTERM.  This was necessary
+	to get GTERM to work for FORTH graphics.  (12/30)
+
+sun/gterm.c
+	Looked into a bug reported by Joe Schwarz at CFA.  While in cursor
+	mode, the mouse was moved into the gterm text window and the user
+	tried to exit the program (implot) by typing the usual 'q'.  This was
+	ignored, but typing 'q'<cr> three times would do the trick, but would
+	leave GTERM in a funny state, requiring a setup-reset to recover.
+
+	The reason typing 'q'<cr> three times would terminate cursor mode
+	is because this produces a six character sequence ending with CR,
+	which is what a tek cursor sequence is.  The reason GTERM got
+	confused was because it thought the cursor read was still in effect,
+	since cursor mode was not exited normally.
+
+	The suggested fix was to make input equivalent in either window,
+	hence typing 'q' in the text window would terminate the cursor loop
+	and applications program.  The problem is that a valid cursor sequence
+	requires an [x,y] position as well as a keystroke, and the cursor
+	position for a cursor read is invalid when the mouse is in the text
+	window.  Of course in this case the application does not need the
+	[x,y] to do a quit, but there is no way that the terminal could know
+	that.  Nonetheless, GTERM should not get into a funny state, so I
+	fixed the bug by having the text window discard ascii input entered
+	in the text window during a cursor read (rather than passing it on to
+	the application program as it was).  (12/30)
+
+pkg/images/tv/display/iispio.x
+	In testing the new display code (to be documented here shortly) I
+	found that it was easy to lose datastream synch to the display server
+	(an IIS or IMTOOL), when a user interrupt would arrive while a data
+	transfer was in progress, i.e., due to the user interrupting the
+	display program while loading the display.  I had to add calls to
+	intr_disable,intr_enable around the code which does i/o to the
+	display, to ensure that complete data packets are always sent.
+	This makes the display process immune to interrupts, but if an
+	interrupt arrives during a data transmission it may be ignored,
+	making it necessary for the user to type interrupt several times to
+	abort the task. (12/31)
+
+	TODO: Modify the interrupt disable/enable code to queue interrupts
+	for later delivery, rather than discard interrupts as at present.
+
+sys/fio/zfiott.x
+	Made some changes affecting the 'playback' feature of STTY:
+	1. Fixed a bug that would cause logfile lines containing only control
+	directives but no data, i.e., \{...\} alone on a line, to cause
+	premature EOF on the logfile, terminating playback.
+	2. There was a bug in the ztt_query code, used to process and execute
+	\{...\} control directives.  In effect, the way the code was written
+	embedded playback control directives could not be used while reading
+	text in raw mode.
+	3. Carriage return as well as space bar may now be used to continue
+	execution following a verify-pause.  (1/1-1988)
+
+pkg/language/doc/stty.hlp
+	Extensively revised the help page for STTY (the terminal driver),
+	mostly to add a discussion of the playback facilities.  (1/1)
+
+dev/graphcap
+local/sun/imtoolrc
+unix/hlib/install
+	1. Replaced the IMTOOL device entries in graphcap by a set of a
+	dozen or so logical device entries imt512, imt800, imt1024, imt2048,
+	etc., defining the set of defined frame buffer configurations for
+	the IMTOOL display server (this is site configurable).
+	2. To local/sun (Sun/IRAF), added the file imtoolrc, which is read
+	at startup time by IMTOOL to get the set of defined frame buffer
+	configurations.  This file is intended to be copied into a public
+	library at 'install' time, e.g., /usr/local/lib/imtoolrc.  The entries
+	in this file must have corresponding entries in the graphcap.
+	3. Modified the install script to install the imtoolrc file in
+	/usr/local/lib.  (12/26-1/3)
+
+sys/imio/imdmap.x
+	Modified to save the value of the graphcap parameter 'cn', the IMTOOL
+	frame buffer configuration number (if defined) in IM_LEN(im,3).
+	This is then picked up by the DISPLAY code and passed on to the
+	display server to specify the frame buffer configuration to be used.
+	(12/26-1/3)
+
+unix/gdev/zfiogd.x
+	Deleted the IMT512 and IMT800 logical device entries, and added a
+	capability to parse the display device frame buffer width and height
+	from the DD string.  (12/26-1/3)
+
+local/sun/imtool.c
+local/sun/imtool.man
+pkg/images/tv/display/iis.com
+pkg/images/tv/display/iisers.x
+pkg/images/tv/display/t_display.x
+	A new, and hopefully final (for a while) version of the IMTOOL display
+	server has been completed and installed, along with a few corresponding
+	changes to the DISPLAY task.  The latter will still work for ordinary
+	IIS displays as well as with IMTOOL.  The major revisions were the
+	following.
+
+	1. The scheme of a "standard" configuration (512 square) and a "large
+	format" configuration (800 square) has been scrapped and replaced by
+	a more general scheme.  There can now be up to 64 different frame
+	buffer configurations defined at any one time, with no restrictions
+	upon the sizes of the frames other than that they be defined when
+	IMTOOL is started up (a SunView restriction also requires that the
+	frame width be even).  An "imtoolrc" file, with corresponding entries
+	in the IRAF graphcap, is used to define the possible frame buffer
+	configurations for both IMTOOL and IRAF.  These may be modified or
+	extended by a site, and the user may have private, custom copies if
+	desired.
+
+	The default configuration file is stored in /usr/local/lib/imtoolrc.
+	The contents for our system are as follows at present:
+
+	    # IMTOOL -- Defined frame buffer configurations.  Note... 
+	    # is only a starting point, and may be modified during...
+	    # values are preferred.  The configuration numbers may...
+	    # but must be unique and in the range 1-64.
+	    #
+	    # Format:  configno nframes width height
+
+	     1  2  512  512		# imt1|imt512
+	     2  2  800  800		# imt2|imt800
+	     3  2 1024 1024		# imt3|imt1024
+	     4  1 1600 1600		# imt4|imt1600
+	     5  1 2048 2048		# imt5|imt2048
+	     6  1 4096 4096		# imt6|imt4096
+	     7  1 4096 1024		# imt7|imt4x1
+	     8  1 1024 4096		# imt8|imt1x4
+	     9  2 1142  880		# imt9|imtfs	full screen...
+
+	    20  2  384  576		# imt20|imtgec	GEC CCD detector format
+	    21  1 3040  976		# imt21|imtkpca	KPCA detector format
+
+	The frame size to be used is defined by the client program (the DISPLAY
+	task) at image load time.  In the case of IRAF, this is done via the
+	stdimage environment variable, e.g.,
+
+		cl> reset stdimage = imt1600
+
+	This is converted into the frame buffer configuration number (via the
+	'cn' parameter in the graphcap entry) and passed on to IMTOOL via a
+	a few unused bits in the otherwise IIS compatible datastream headers.
+
+	2. Multiple frame buffers are now supported by IMTOOL.  As far as
+	IMTOOL is concerned there could be any number of frame buffers (subject
+	to memory limitations), but DISPLAY task limitations currently limit
+	us to up to 4 frames; this will be plenty for most applications.
+
+	3. The display window is now completely decoupled from the frame buffer
+	size, i.e., the same modest sized window is typically used regardless
+	of the frame buffer size, relying upon pan to access the full frame.
+
+	4. A frame blink option has been added.  Frame selection for viewing
+	may be done either under program control or with the mouse or keyboard
+	in any of several ways.
+
+	5. A "smooth pan" feature has been added.  This smoothly pans the
+	image to the new center, insteadof going there in one step.  The big
+	step pan is still the most useful, however.
+
+	6. The colorbar is now implemented differently, allowing it to always
+	be visible on the screen regardless of the window size or pan offset.
+	The colorbar may be turned off an on via the setup panel if desired.
+
+	7. The setup panel and frame menu now contain a number of new items,
+	e.g., register all frames, turn blink on and off, enter a list of
+	frames to be blinked, adjust the size of the display window to fit
+	the full frame, display the next frame in sequence, save the current
+	frame in a Sun rasterfile, load the current frame from a Sun
+	rasterfile, and so on.
+
+	8. The setup panel has been made shorter so that it will fit "behind"
+	most display windows.  If you use it frequently, it may be most
+	convenient to leave it open all the time, and use the L5 function
+	key to display it (move it to the front) when needed.  It can also
+	be repositioned to an otherwise unoccupied area on the screen if
+	desired.
+
+	9. Output of the pixel intensity in cursor readout mode was added in
+	an earlier revision.
+
+	10. I/O to the server is now bidirectional (image data can be read
+	back as well as written to the server), allowing use of the erase-
+	option in the DISPLAY task to write into subregions of the frame
+	buffer, e.g, for mosaics.  Only the last WCS is saved.
+
+	11. The manual page has been updated.
+
+	The parameters for the different frames, e.g., monochrome or
+	pseudocolor, slope and offset of the transfer function, pan offset,
+	WCS, coordinate lists, etc., are independent.  When you change frames
+	all the values appropriate for that frame are set.
+
+	There were many other changes and bug fixes probably not worth noting
+	here.  Basically, while the prototype display server is still pretty
+	limited in some ways (full interaction with applications programs is
+	not supported, no graphics and text overlay support), it now does the
+	most basic things fairly well.  Probably all of this will change in
+	six months or so when SunOS 4.0 comes out - the NeWS/X in this will
+	probably trash both GTERM and IMTOOL, and when the features in IMTOOL
+	and the X based CFA XIMAGE are merged into the final display server.
+	Read the new manual page for additional details.  (written 1/3)
+
+------------------------------------
+Updated tucana, orion, irafx@draco from lyra.  (1/6)
+Updated pegasus and octans from tucana.  (1/7)
+
+sun/screendump.c
+	For Sun rasterfile output, the colortable length was being output as
+	NGREY*3 (256*3) rather than NGREY, due to a confusion about the use
+	of the length parameter in rasterfiles (usage differs in the rasterfile
+	header and in a colormap struct).  This is a bug, but the generated
+	rasterfiles would actually be legal rasterfiles, since the colortable
+	length was being recorded correctly - it was just that more than 256
+	bytes of data were being stored for each colortable.  (1/7)
+
+sun/imtool.c
+pkg/images/tv/display/iisers.x
+	1. In imtool.c, added some protection against being passed a negative
+	or zero config number.
+	2. In iisers.x (DISPLAY), added a max(0,... to the code which encodes
+	the frame buffer configuration number in the TID field, to avoid
+	passing a config of -1 to the display server, if the 'cn' field is
+	absent from the graphcap entry for the device for some reason.  (1/7)
+
+sys/etc/symtab/mkpkg
+sys/etc/symtab/README
+sys/etc/symtab/stsize.x +
+sys/etc/symtab/zzdebug.x
+	Added a new routine STSIZE to the symbol table package.  The new
+	routine is used to determine the number of chars of file storage
+	required to store the symbol table in its external form, e.g., before
+	a call to STSAVE to save the table in a file.  (1/8)
+
+local/sun/imtool.c
+	In remark_objects(), modified a test used to test if the next file
+	line begins with a number to permit the first character to be a minus
+	sign, e.g., a negative number.  (1/15)
+
+sys/osb/shift.c
+	There was an error in the way the shift-negative case was handled.
+	Replaced (a >> bits) by (a >> -bits) in the three routines.  (1/27)
+
+unix/as/zsvjmp.s
+unix/os/zdojmp.c +
+unix/os/mkpkg
+	Currently one of the hardest parts of a UNIX port is writing the
+	ZSVJMP/ZDOJMP routines, since the routines are complex and must be
+	coded in assembler.  In an attempt to simplify this task I have
+	rewritten the routines to interface to the standard C library
+	setjmp,longjmp routines.  Some assembler code is still required,
+	since setjmp cannot be called as a function, but must instead be
+	called in the context of ZSVJMP by a jump.  This appears to work,
+	but more testing is required.  At present I am making the change
+	only on tucana (the Sun/3 - MC68020).  (1/29)
+
+unix/os/zgcmdl.c
+	This routine is called from IMFORT (host level) programs to get the
+	command line as a string.  Since the routine is in a support library
+	and does not have ready access to the main, it cannot access ARGC and
+	ARGV directly, but must instead use a heuristic to guess where the
+	arrays are stored, relative to some well know landmark.  The technique
+	used to do this was working on the VAX and the Sun-3, but would fail
+	on the Sun-4.  A different heuristic was substituted which works in
+	all cases.  In this, the well known landmark is 'environ', which points
+	to the environment list array.  We assume that ARGC and ARGV are
+	stored immediately before the environment list array.  This holds on
+	all the machines currently at hand, but the routine should be regarded
+	as potentially host system dependent.  (1/31)
+
+unix/hlib/mkpkg.sf.SUN4
+	Added an entry to the list of files requiring special compilation due
+	to optimizer bugs.  In file imfort$imemsg.x, the length of a Fortran
+	character*(*) string is passed as an argument in an input register.
+	The register value has been modified by the time the register is later
+	used to pass the string length on to _i_len (the F77 len intrinsic
+	function), causing an incorrect string length to be computed, resulting
+	in string overflow in a subsequent call to F77PAK.  (1/31)
+
+local/sun/imtool.c
+	IMTOOL will now print "cannot be used on monochrome displays" and exit,
+	rather than dump core on a segmentation violation during startup.
+	(1/31)
+
+unix/boot/wtar/wtar.c		[lyra,tucana]
+vms/boot/wtar/wtar.c
+	The WTAR program was incorrectly writing a short block at the end of
+	the tar file, contrary to the tar format specification.  Now it always
+	writes a full block.  (2/4)
+
+sys/mkpkg
+	In the module libmain.o, changed the
+		
+		$set XFLAGS = "-c"
+	to
+		$set XFLAGS = "-c $(HSI_XC)"
+
+	since this entry compiles os$zmain.c, which is part of the HSI.  (2/4)
+
+local/sun/imtoolrc
+dev/graphcap
+	Added some more entries to the site-specific section of the imtoolrc
+	file (predefined frame buffer configurations).  (2/5)
+
+		# Some site specific formats for NOAO.
+		20  2  384  576		# imt20|imtgec	GEC CCD d...
+		21  1 3040  976		# imt21|imtkpca	KPCA dete...
+		22  1 1520  128		# imt22|imt2df1 2D-Frutti
+		23  1 1520  256		# imt23|imt2df2 2D-Frutti
+		24  1 1520  512		# imt24|imt2df5 2D-Frutti
+		25  1 1520  960		# imt25|imt2df9 2D-Frutti
+
+dev/termcap
+dev/cachet.dat
+pkg/cl/builtin.c
+pkg/system/help/t_help.x
+sys/libc/cttset.c
+sys/gio/mkpkg
+sys/tty/mkpkg
+sys/tty/ttygsize.x	+
+sys/tty/ttyread.x	+
+sys/etc/mkpkg
+sys/etc/pagefiles.x
+sys/etc/sttyco.x
+sys/etc/xttysize.x	+
+	Modifications and extensions were made to STTY and the TTY package to
+	support terminals which can dynamically change size at runtime, e.g.,
+	workstation windows.  This was done using a status query, i.e., an
+	escape sequence is written to the terminal commanding it to send the
+	screen size, and then the response is read back and decoded.  This
+	technique raises the possibility of blocking if a character is lost
+	(easily recovered from by having the user type return), but has the
+	advantage that it works over remote network connections to possibly
+	foreign host machines.
+
+	1. The new routine XTTYSIZE was added to ETC, and calls to this routine
+	were added in pagefiles.x and t_help.x.  XTTYSIZE recompute the screen
+	size and resets the values of the ttyncols and ttynlines environment
+	variables.  If the terminal supports querying of the screen size, the
+	screen size is determined by such a query, otherwise the default values
+	given in the termcap entry for the device are used.  This routine is
+	not intended to be called in regular applications code; applications
+	should continue to access the environment variables directory, or use
+	TTYSTATI (which does the same thing).  This will still work, since once
+	any system task like PAGE or HELP is called after the screen size
+	changes, the environment variables are updated, and all subsequent
+	tasks which use these variables automatically pick up the new screen
+	size.
+
+	Note that calling XTTYSIZE globally updates the values of the ttyncols
+	and ttynlines environment variables for the entire process tree.  If
+	the procedure is called from within a task executing in a connected
+	subprocess, the task posts a command to the STTY task in the CL which
+	is where the actual querying of the terminal takes place.
+
+	2. The new routine TTYGSIZE and the associated routine TTYREAD were
+	added to the TTY package.  These are the low level system routines
+	called by XTTYSIZE (when called from the STTY task in the CL) to do
+	the actual i/o to the terminal to determine the screen size.  Two new
+	termcap parameters are defined to describe terminals which support
+	this capability.
+
+		qs	Command sequence to be sent to the terminal to query
+			the screen size in characters.
+
+		wh	A string used as input to the pattern matching
+			facilities to determine when the full response to
+			the screen size query has been received, as well as
+			to decode the response.
+
+	The qs capability is a simple fixed control sequence.  The wh string is
+	more complicated, serving both as a pattern and as a decoding format.
+	For example, here is the entry for the GTERM SunView virtual graphics
+	terminal:
+
+		:qs=\E[18t:wh=\E\[8;%H;%Wt:
+
+	The %H and %W fields tell where the screen width and height appears
+	in the response sent by the terminal.  All other characters appearing
+	in the string must match what is actually sent by the terminal.  Note
+	that this string is used as input to the pattern matching code, hence
+	all the usual pattern matching characters are recognized (the %H and
+	%W fields are a special case, and are preprocessed into sequences of
+	the form "%[0-9]*" before patern matching takes place).  Any data read
+	from the terminal before the pattern is matched is probably type-ahead,
+	and is pushed back into the input stream minus the matched substring.
+
+	3. A new option "resize" was added to the STTY task, i.e., to sttyco.x
+	in ETC.  "stty resize" causes the values of ttyncols and ttynlines to
+	be reset; the terminal is queried for the screen size if such queries
+	are supported, otherwise the termcap defaults are used.  This feature
+	is not really intended for the user (although it can be used), and was
+	provided mainly for XTTYSIZE.  Setting the terminal type with STTY will
+	also cause the screen size to be queried if possible.
+
+	For example,
+
+		cl> stty resize show
+		gterm40 ncols=80 nlines=47 
+
+	will cause the terminal to be queried for the current screen size,
+	update the environment accordingly, with the current settings being
+	displayed as shown.
+
+	4. In LIBC and ETC, the calling sequence for the STTYCO procedure was
+	modified to add the arguments "ttin" and "ttout", the file descriptors
+	of the input and output streams to the terminal.  Formerly STDIN and
+	STDOUT were assumed.
+
+	5. In the termcap, the logical device entries 'gterm24', 'gterm34',
+	'gterm40', etc., were all converted into aliases for 'gterm'.  All are
+	equivalent now, and use of only 'gterm' is recommended.  The .ttyswrc
+	function key definitions, used to quickly change the screen size,
+	are retained as they are still useful for quickly resizing the screen,
+	but it is no longer necessary to run STTY after a resize to set the
+	new screen size.  A new entry 'gterm-nqs' was added for using GTERM
+	with auto screen size querying disabled.  This may be desirable when
+	working over a noisy modem connection, which could prevent the screen
+	size from being determined reliably.
+
+sys/gio/gpagefile.x
+	Modified to call gdeactivatews and greactivatews only if the
+	workstation is activated when the routine is called.  (2/6)
+
+sys/fmtio/parg.x
+	When printing negative integer numbers of type short or char in octal
+	or hex, the number of digits actually printed would correspond to type
+	long, with way more sign extension than is valid for a machine word.
+	Added some special case code to eliminate the extra sign extension,
+	which is only an artifact of the use of GLTOC to encode the number.
+	(2/7)
+
+unix/hlib/login.cl
+vms/hlib/login.cl
+	Modified to print the message
+
+		set terminal type to U_TERM...
+
+	immediately before executing stty U_TERM, to warn the user that the
+	terminal type is being set to the indicated type.  (2/10)
+
+pkg/images/tv/display/t_dcontrol.x
+	Added some code to set the values of iis_[xy]dim and iis_config from
+	the graphcap entry.  (2/11)
+
+sys/tty/ttygsize.x
+	Disabled the screen size query when STTY login or playback mode is in
+	effect.  (2/12)
+
+dev/termcap
+dev/cachet.dat
+	Making the gtermNN (gterm24,gterm34,etc.) simple aliases for 'gterm'
+	was a mistake.  When autosizing is disabled the termcap entry
+	determines the default screen size, hence the separate entries are
+	still needed; they have been restored.  The gtermXX entries are set
+	up to disable autosizing, hence entry 'gterm' must be specified to
+	make use of the autosize feature.  (2/17)
+
+pkg/cl/eparam.c
+sys/libc/cxttysize.c +
+unix/hlib/libc/xnames.h
+vms/hlib/libc/xnames.h
+	1. Added a new routine c_xttysize() to the LIBC package.
+	2. Modified EPARAM to call c_xttysize to read the screen size,
+	allowing autosizing.  (2/17)
+
+unix/boot/rtar/rtar.c
+vms/boot/rtar/rtar.c
+	This code contains a heuristic used to determine whether a file on the
+	tape is a text or binary file, which it must know in order to create
+	the file on disk on systems like VMS.  This heuristic was failing for
+	FITS files, which have an ASCII card iamge header which resembles a
+	text file except for the lack of line delimiters.  I had to make the
+	same change to the RTAR code as was made to ZFACSS some time ago, for
+	it to recognize this case of a binary file.  (2/17)
+
+pkg/system/help/t_help.x
+	XTTYSIZE is now called only when paging the output and the output is
+	not redirected, to avoid the terminal query when screen oriented
+	terminal output is not desired (as in a pipe, or in a background job).
+	(2/17)
+
+iraf/sys/fmtio/dtoc.x
+	The input format-code argument (fmt) was being used directly in a
+	logical test, rather than the internal lower case version, causing
+	the routine to be partially case sensitive to the floating point
+	format code character (efg etc.).  (2/19)
+
+unix/os/zfacss.c
+	When called to test the file type, this routine would hang when called
+	on a unix FIFO type file, due to the blocking-open associated with this
+	type of file.  The routine stats the file and only looks at it if it
+	is a regular file, but it was unnecessarily opening and closing the
+	file whether or not it needed to read from it.  (2/19)
+
+---------------------------------
+Version 2.6 of Sun/IRAF was frozen and taped.  (2/24)
+
+sys/fmtio/gstrcat.x
+	Fixed a bug in gstrcat - the string length being returned was one
+	greater than it should be.  (2/25)
+
+sys/gio/nspp/portlib/flash1.f
+sys/gio/nspp/portlib/flash2.f
+sys/gio/nspp/portlib/flash3.f
+sys/gio/nspp/portlib/flash4.f
+sys/gio/nspp/portlib/flushb.f
+sys/gio/nspp/portlib/preout.f
+sys/gio/nspp/portlib/z8zpii.f
+sys/gio/nspp/sysint/packum.x
+sys/gio/nspp/sysint/loc.x
+sys/gio/nsppkern/writeb.x
+	The NCAR code used a function LOC, evidently a non-standard intrinsic
+	function on the ancient Cyber machine the code was originally developed
+	on.  We ported the code by emulating the function, but it turns out
+	that the new Fortran compiler on the Sun-4 has its own LOC intrinsic
+	function which doesn't behave quite the same way, hence the 'stdplot'
+	gio kernel was failing on the Sun-4.  I fixed the problem by changing
+	all LOC references to LOCI.  (2/28)
+
+sys/vops/mkpkg
+	Horrible bug!  A user reported that the VOPS routine aiftrx (inverse
+	fourier transform) was not working properly.  Careful testing showed
+	that the code was correct, but that the combiled object in the VOPS
+	library did not agree with the code, even though the module dates
+	looked ok!  This turned out to be due to a bug in the mkpkg file,
+	which has probably been there since the file was written around 1985.
+	In the $ifolder clause, the actions were "cp file.x ak", which is a
+	UNIX, not MKPKG, command, which MKPKG was evidently ignoring every
+	time it tried to updated the ./AK versions of the files.  This was
+	changed to "$copy file.x ak/file.x", and all is well.  (3/2)
+
+unix/boot/spp/mkxc.csh
+	Renamed to mkxc.sh.  (3/9)
+
+unix/hlib/libc/kernel.h
+unix/os/irafpath.c +
+unix/os/mkpkg
+unix/os/zalloc.c
+	I added a new utility routine IRAFPATH to the UNIX/IRAF kernel.  Given
+	a filename, this routine searches the standard IRAF runtime directories
+	for the file, and returns the absolute system pathname of the file if
+	found.  In particular, on hosts like the Sun which can have multiple
+	bin directories for different architectures, the routine will find the
+	(HSI) executable appropriate for the current host.  (3/10)
+
+unix/boot/spp/xc.c
+	Modified XC to use IRAFPATH to determine the pathnames of the XPP and
+	RPP executables.  (3/10)
+
+mkpkg
+unix/mkpkg.sh
+unix/hlib/install		[SUN/IRAF only]
+unix/hlib/irafuser.csh
+	For Sun/IRAF, modified the HSI to permit multiple copies of the HSI
+	executables.  This is necessary to be able to use a single copy of IRAF
+	to support multiple incompatible binaries, e.g., sparc and mc68020.
+
+	1. To the 'unix' directory (host$), added subdirectories bin.sparc and
+	bin.mc68020.  The second field is what is returned by "mach" on a Sun.
+	The bin directory appropriate for a particular node is called HBIN,
+	and is defined as such in the irafuser.csh file, although HBIN need
+	not be defined to run the system.
+
+	2. All the .e files formerly in HLIB are now kept in HBIN.  The .csh
+	executable files are still in HLIB, since we can use one copy for both
+	architectures.  Runtime selection of the appropriate HBIN is via
+	symbolic links set by INSTALL (see below), or via the IRAFPATH routine.
+
+	3. The INSTALL script was extensively modified to support multiple
+	HSI binaries.  A Sun-4 server configured for both sparc and mc68020
+	hosts will have separate /usr.SPARC and /usr.MC68020 directories;
+	these are the "/usr" directories for the two types of machines.
+	IRAF can be installed anywhere, provided it is on a disk partition
+	which can be accessed from all nodes, either directly or via NFS.
+	Each machine type is assumed to have its own local/bin directory,
+	e.g., /usr/local/bin, where /usr is linked to /usr.MACH.
+
+	Since root can only modify files on the local node, the INSTALL script
+	must be run on the central file server.  To install the local (sparc)
+	copy of IRAF, one runs INSTALL in the usual way, e.g.,
+
+		% cd $hlib
+		% install
+	
+	To install the MC68020 version of IRAF on the fileserver, for access
+	by all Sun-3 nodes,
+
+		% cd $hlib
+		% install -m mc68020
+
+	For this to work properly, one must carefully enter the correct
+	pathnames, since the defaults will be for sparc rather than for
+	the mc68020, e.g.,
+
+		iraf root	can be made the same for both systems
+		imdir 		can be made the same for both systems
+		tmp 		can be made the same for both systems
+
+		/usr/bin	/usr.SPARC/bin or /usr.MC68020/bin
+		/usr/local/bin	/usr.SPARC/local/bin or /usr.MC68020/local/bin
+
+	When run on the Sun-4 host, /usr/bin is the same as /usr.SPARC/bin,
+	and /usr/local/bin (if there is one) is /usr.SPARC/local/bin.
+	For the Sun-4 installation, the script will put links to the
+	host$bin.sparc executables into /usr/bin, and install the suntools
+	executable into /usr/bin.  For the Sun-4 (MC68020) installation,
+	the links in /usr.MC68020/local/bin will point to host$bin.mc68020,
+	and the MC68020 suntools executable will go into /usr.MC68020/bin.
+
+	As before, although all versions of the executables are maintained
+	online and any version of the system may be executed, only one version
+	of the objects and libraries is online at any one time, and the system
+	must be reconfigured before a version of the system can be updated.
+	For example, assume the system is currently configured with the SPARC
+	objects.  Typing
+
+		% cd $iraf
+		% mkpkg f68881
+
+	would reconfigure the system for the f68881 binaries.  One could then
+	log onto a Sun-3 diskless node and update the f68881 binaries, after
+	which the SPARC binaries could be restored with mkpkg sparc.
+
+	A boostrap of the HSI will automatically update the binaries in the
+	appropriate HBIN directory.  If a single directory is subsequently
+	updated, however, the new executable will be placed in HLIB, and after
+	testing one must manually move the executable to the appropriate HBIN
+	directory.  (3/10)
+
+unix/sun/Makefile
+local/sun -> unix/sun
+	1. The custom suntools sources (formerly local/sun) have been moved
+	to unix/sun.
+	2. The suntools.e executables are now installed in the host$bin.XX,
+	rather than in LOCAL.  (3/10)
+
+local/.login
+	FLOAT_OPTION is not used for the Sun-4 (it will cause an error if
+	defined), hence this is now conditionally defined depending upon the
+	machine type.  (3/10)
+
+local/notes.orion -
+doc/ports/sun4_sep87.doc
+	Appended the contents of the "notes.orion" file to the record for the
+	Sun-4 port, and deleted the orion notes file, which we won't need
+	anymore.  (3/10)
+
+dev/hosts
+	Changed the iraf/bin in the entry for orion to iraf/bin.sparc.  Updated
+	on all nodes.  (3/10)
+
+unix/gdev/sgidev/sgidispatch.c
+unix/gdev/sgidev/mkpkg.sh
+unix/hlib/sgi.tab -
+	Simplified SGIDISPATCH considerably by using IRAFPATH.  The "sgi.tab"
+	file is no longer used; the translators may be anywhere irafpath can
+	find them, but are expected to reside with the other HSI executables.
+	(3/11 SRo)
+
+unix/os/zfioks.c
+	I made an attempt to use RCMD and the /etc/hosts.equiv mechanism to
+	implement connections to friendly hosts in the local network without
+	requiring login authentication.  Unfortunately, for this to work the
+	process calling RCMD must have uid=root, and it is not possible to
+	set root ownership on the IRAF executables, hence IRAF cannot use the
+	equivalent host mechanism (at least, without some sort of intermediary,
+	which would be too inefficient).  (3/12)
+
+unix/boot/spp/rpp/rpprat/defs
+unix/boot/spp/rpp/rppfor/*.f
+	I had a problem with "too many characters pushed back" in a compile,
+	and upon investigation discovered that the pushback limit was set to
+	100 characters, a very small amount.  I increased this and a number
+	of other size limiting parameters affecting macros - the maximum
+	definition size is now 2048, the max pushback is 3192 chars, and the
+	total amount of storage reserved for definitions was increased by
+	50%.  (3/13)
+
+unix/os/zfiopl.c
+unix/os/zfiolp.c
+	The ZOSCMD primitive, used to send commands to the host shell, provides
+	filename arguments which may be used to save any stdout or stderr
+	output in a file.  If the filenames are omitted the stdout and stderr
+	are left alone, i.e., left connected to the streams inherited from
+	the parent process.  The bug occured in the printer and plotter drivers
+	ZFIOLP and ZFIOPL, when called from a connected subprocess, i.e., a
+	child process of the CL.  In the case the standard i/o streams are
+	the IPC channels to the CL, and any output from the shell would be
+	sent to the CL, possibly corrupting the CL IPC prototol.  I changed
+	the calls to ZOSCMD in the two drivers (in the dispose spoolfile code)
+	to open /dev/tty for shell output, rather than inheriting the streams
+	from the CL, if the process is a connected subprocess.  (3/25)
+
+pkg/images/tv/display/t_display.x
+	Modified the DISPLAY program to accept either "wcsdir" or "WCSDIR".
+	(3/28)
+
+---------------------------------
+Updated all Sun/IRAF systems.  (3/25,28)
+
+unix/as/zsvjmp.s
+unix/os/zdojmp.c			[VAX only]
+unix/os/mkpkg
+	Installed the more portable version of ZSVJMP/ZDOJMP, which transform
+	into calls to the UNIX setjmp/longjmp, in the BSD (VAX) UNIX/IRAF HSI.
+	The original code was more compact and faster for the VAX, but the BSD
+	code is often used as a starting point for ports to new machines, and
+	the more portable version is a much simpler technique to code.  (3/28)
+
+sys/fmtio/ctowrd.x
+	This routine was returning an incorrect function value, the number of
+	non-white characters converted from the standard input.  There was
+	also a problem with how quoted strings were handled.  (3/31)
+
+sys/osb/miipak8.x
+sys/osb/miipak32.x
+sys/osb/miipak16.x
+sys/vops/achtgen/*.x
+	Added entries for TY_POINTER and TY_STRUCT to the TY_INT switch in the
+	case statements (one for each SPP datatype) in these routines.  (4/2)
+
+sys/etc/symtab/stalloc.x
+	Modified to align to double, rather than int, buffers allocated in the
+	symbol table.  (4/2)
+
+---------------------------------------
+IRAFX updated.  (4/3)
+
+unix/portkit +
+unix/mc68000 -
+	Replaced the old MC68000 directory by a new directory PORTKIT,
+	containing updated notes and replacement source files for porting
+	the 4.3 BSD version of UNIX/IRAF to new machines.  (4/4)
+
+unix/os/irafpath.c
+unix/boot/bootlib/ossysfile.c
+unix/boot/spp/xc.c
+	1. In BOOTLIB, modified os_sysfile() to call irafpath().
+	2. In XC, replaced the calls to irafpath() with calls to os_sysfile(),
+	   so that all file-searching is done through this one call.
+	3. Modified irafpath() to add support for searching user defined
+	   libraries, in addition to the default action of searching the
+	   standard libraries.  To make use of this feature the user must
+	   define the environment variable IRAFULIB, the value of which
+	   consists of a whitespace delimited list of directory pathnames
+	   (trailing underscore optional).
+
+	The purpose of this change is to provide greater flexibility for
+	debugging software developed outside of the standard system, e.g.,
+	during testing and before the software has been installed.  This
+	allows VOS software which includes <file.h> style include file
+	references to be tested outside the system without having to modify
+	the installed versions of the referenced include files.  It is not
+	intended as a means of adding new system libraries to the standard
+	search path.  (4/5)
+
+pkg/images/imdebug/mkpkg
+	Modified to produce the local executable "xx_imdebug.e" rather than
+	"x_imdebug.e", with the named changed to the latter at install time,
+	as per current standard practice.  (4/7)
+
+sys/vops/mkpkg
+sys/vops/tf/mkpkg
+sys/vops/aveq.gx +
+	Added a new vector,vector->scalar operator, AVEQ, used to compare two
+	vectors for equality, returning a boolean result.  (4/11)
+
+unix/boot/mkpkg/tok.c
+vms/boot/mkpkg/tok.c
+	1. Modified MKPKG so that system file names of the form "<file.h>" can
+	appear in the argument lists of $IF directives.  (4/14)
+	2. Generalized further to include most other macro statements. (4/15)
+
+unix/hlib/install
+unix/sun/imtool.c			[SUN/IRAF]
+unix/sun/mksuntool.csh
+	1. Modified IMTOOL to use "HOME" rather than "home" as the user login
+	directory.
+	2. Fixed a bug in mksuntool.csh that would cause it to unnecessarily
+	rebuild the suntools subdirectory.
+	3. Updated the Sun/IRAF INSTALL script, changing the pathname of the
+	imtoolrc and manual page files from $iraf/local/sun to $iraf/unix/sun,
+	to reflect the recent move of the code to the HSI.  (4/16)
+
+unix/sun/imtoolrc
+dev/graphcap
+	Added two new IMTOOL logical devices:
+
+		imtcryo		512x800
+		imtgcam		348x800		(4/16)
+
+unix/boot/spp/rpp/rpprat/defs
+unix/boot/spp/rpp/rpprat/declco.r
+unix/boot/spp/rpp/rppfor/declco.f
+	Modified RPP to conditionally output the IMPLICIT NONE statement
+	(a nonstandard extension to Fortran) in every subroutine or function
+	declaration.  The define IMPNONE in the 'defs' file should be
+	uncommented and the Fortran for declco.f generated, to enable this
+	feature.  This was added for Convex/IRAF, but should be of general
+	utility since IMPLICIT NONE is a common extension.  (4/17)
+
+vms/*
+	Updated the VMS/IRAF HSI.  Copied to lyra and did a diff/merge, leaving
+	an up to date copy on lyra.  About the only thing affected was the RPP
+	sources; everthing else has been kept up to date.  (4/17)
+
+----------------------------
+Updated IRAFX@draco.  (4/17)
+
+unix/hlib/mkpkg.sf		[VAX-UNIX/IRAF]
+	Commented out the special file list entries for the aadd*, amap*, and
+	awsu* VOPS entries.  The hand optimized versions of these routines
+	date back to the early days of BSD UNIX (4.1), when the compiler was
+	not so good, but nowadays the optimizer is good enough so that they
+	are probably not worth maintaining.  (4/20)
+
+pkg/images/tv/display/dsulut.x
+pkg/images/tv/display/display.h
+pkg/images/tv/display/t_display.x
+	Added a capability for a user defined lookup (intensity transformation)
+	table.  (Coded by SH).  (4/21)
+
+sys/gio/stdgraph/stgrtty.x
+sys/gio/stdgraph/zzdebug.x
+	The routine which reads from the status line was modified to echo \r\n
+	when either \n or \r is typed in by the user to terminate an input line
+	of text.  Since writing a newline to the status line erases the line,
+	this will cause the text input up to that point, e.g., a prompt
+	followed by the user's response, to be cleared, giving the user some
+	positive feedback to indicate that the newline was seen.  Clearing the
+	line is also consistent with the model of the status line as a one-line
+	terminal screen.  This change to the semantics of status line i/o may
+	affect some programs, although it should be harmless.  (5/1)
+
+---------------------------------
+Updated tucana and irafx@draco.  (5/1)
+
+sys/fio/vfntrans.x
+	Change directory commands such as the following would not work:
+
+		cl> cd imio.pl/plio
+
+	This turned out to be due to the filename mapping code, which was
+	losing the .pl when it occurred as part of a subdirectory name
+	followed by a /.  The code was changed so that any . delimited fields
+	occuring in a / delimited subdirectory name are considered part of
+	the root subdirectory name, rather than being parsed off and treated
+	as filename extensions.  (5/2)
+
+sys/mtio/mtalloc.x
+	Fixed a typo in the file header.  (5/9)
+
+unix/sun/imtoolrc
+	Changed the frame buffer width for the GEC format from 384 to 386.
+	(The actual width is 385 but imtool requires that it be rounded to
+	an even number; a user complained about the missing column).  (5/10)
+
+unix/os/alloc.c
+unix/os/getproc.c +
+unix/os/mkpkg
+unix/os/mkpkg.sh
+	Fixed a bug which would cause device allocation (magtape) to fail
+	over the network.  What would happen is that a remote user using the
+	magtape would not be logged in on the local node, even though they
+	had a kernel server executing with the device allocated.  A local
+	user could then reallocate and "steal" the device from the remote
+	user (or vice versa).  This was fixed by adding code to alloc.e to
+	test if the given user has any processes executing on the server node
+	for the device.  (5/10)
+
+unix/os/zmain.c
+unix/os/zfioks.c
+	1. In Sun/IRAF, if one submitted a bkg job from a CL running in a
+	terminal window and then subsequently selected "Exit Suntools" in the
+	root Sunview menu to give the parent CL the axe, the bkg CL job
+	would be killed too; this would not happen if one logged out of the
+	foreground CL before exiting suntools.  This was probably due to
+	suntools sending SIGTERM to all processes in the same process group
+	as the terminal window.  The fix was to modify ZMAIN.C to put a
+	detached process (such as a bkg CL) in its own process group.
+	This fixes the signal problem, and also prevents a detached process
+	from reading from the terminal of the foreground process, e.g., to
+	satisfy a password query (the detached process will now be suspended
+	indefinitely (SIGSTOP) if it attempts such a read).
+
+	2. ZFIOKS.C was modified to prevent a detached process from trying
+	to access the foreground process's terminal for a password query.
+	The server connect will fail, causing KI to attempt to access the
+	resource on the local node.  This is questionable (it has always
+	been that way), but it works out well if the resource is a file on
+	a shared (NFS) disk, since the result will be a valid file access.
+	(5/16)
+
+pkg/softools/mktags.x
+	Someone suggested that we make an alphabetized index of all the
+	procedures in the VOS.  I used the MKTAGS task to do just that, but
+	had to increase the size of the internal tables to accomodate such
+	a large number of files and procedures.  (The index files are stored
+	in /u2/sites on lyra, and were not installed in the main system).
+	(5/17)
+
+pkg/cl/cl.par
+vms/hlib/motd
+unix/hlib/motd
+vms/hlib/zzsetenv.def
+unix/hlib/zzsetenv.def
+	Incremented the version number to 2.7 - will continue to note system
+	changes here until this version stabilizes.  (5/21)
+
+--------------------------
+Updated tucana and irafx@draco.  (5/21)
+
+sys/fio/nowhite.x
+	This procedure, used to delete whitespace from filenames, evidently
+	was not working at all, due to a (ch < ' ') test which should have
+	been a (ch <= ' ').  (5/25)
+
+sys/gio/gascale.x
+sys/gio/grscale.x
+	These routines were not checking for INDEF when computing the min and
+	max values of the data arrays.  (6/2)
+
+unix/sun/gterm.c
+	Changed the default "close workstation" action to NO_ACTION.  Most
+	people seem to be annoyed when the graphics plan automatically gets
+	obscured at the end of a plot, and would prefer to control the
+	windows manually with the keyboard function keys.  (6/2)
+
+pkg/lists/rgcursor.x
+pkg/lists/rimcursor.x
+	These tasks would abort if they could not GOPEN the stdgraph or
+	stdimage stream.  This was not necessary, since may still be possible
+	to read either cursor even if a graphics kernel cannot be connected,
+	so I put iferr() conditionals around the gopen's to ignore any errors.
+	(6/2)
+
+unix/sun/Makefile
+unix/sun/imtool.cursor
+unix/sun/imtool.c
+unix/sun/mouse.c
+pkg/images/tv/display/iis.h
+pkg/images/tv/display/mkpkg
+pkg/images/tv/display/zzdebug.x
+pkg/images/tv/display/imdrcuro.x
+pkg/images/tv/display/imdrcur.x
+sys/libc/mkpkg
+sys/libc/cimdrcur.c
+unix/hlib/libc/xnames.h
+unix/hlib/zzsetenv.def
+pkg/cl/mkpkg
+pkg/cl/modes.c
+	Added a simple interactive image cursor readback mechanism (=IMCUR).
+	For the moment, this bypasses both cursor mode and the whole of GIO,
+	and goes directly to the display server to carry out a logical cursor
+	read.  While the interface is limited, it does provide a working
+	=imcur, and it remains device independent (or as much so as the rest
+	of the "display" interface), and uses the network interfaces, allowing
+	cursor readback from a display server on a remote node.
+
+	1. Modified IMTOOL to add support for another pseudo-IIS subunit 020,
+	used for logical cursor reads (a logical cursor read knows about the
+	WCS and can return image pixel coords, and can use the keyboard or
+	mouse to trigger the cursor read).  When a cursor read is initiated
+	the mouse is grabbed and moved into the IMTOOL window, and the regular
+	2 Hz "plus" cursor becomes an 8 Hz circular cursor, with the rapid
+	blinking intended to indicate to the user that a cursor read is in
+	progress (there is no other indication).  A key or the left mouse
+	button (if aliased to a key) is used to terminate the cursor read,
+	at which time the cursor value is returned to the client program,
+	the regular IMTOOL cursor is restored, and the mouse position is
+	restored to what it was before the cursor read began (usually a
+	different window).  Sampling and frame buffer coordinate cursor
+	reads are also supported.
+
+	2. To the DISPLAY package I added a new routine IMDRCUR, used to
+	read the logical image cursor of the named device (a lower level
+	routine imdrcuro is used for multiple reads on an open device).
+	Since the new routine needs to be called from the CL for a cursor
+	read, the display package library was exported to lib$libds.a.
+	Note that these new routines are temporary and will go away in
+	the future, but not until the new display interfaces are in place.
+
+	3. Added a C binding routine c_imdrcur to LIBC.
+
+	4. In the CL, modified the query code in modes.c to call c_imdrcur
+	to satisfy a physical image cursor read.  Note that the image cursor
+	(stdimcur) may still be redirected to either stdgraph, the terminal,
+	or a list file.  In the future, image cursor reads will be performed
+	in cursor mode, using the (currently nonexistent) stdimage kernel
+	to access the physical device.
+
+	5. The default value of the environment variable "stdimcur" was
+	changed from "text" to "stdimage", but only on Sun/IRAF for the
+	moment, since people running IRAF on other systems are likely to
+	be accessing a display device that does not yet have cursor input.
+
+		reset stdimcur = stdimage
+
+	To use the new image cursor facilities, make sure that "stdimcur" is
+	set to "stdimage", and then type "=imcur", or run any program which
+	reads the logical image cursor, e.g., lists.rimcursor or apphot.*.
+	(6/2)
+
+--------------------------
+All development systems updated.  (6/2)
+
+unix/sun/gterm.c
+	Added a new function key F7 (to go with F8 and F9 which are already
+	used).  This key toggles the graphics between fullscreen mode and
+	some other size window.  (6/5)
+
+unix/sun/imtool.c
+	Added multiple cursor marker types (the marks drawn at the cursor
+	position when a cursor read is terminated).  The 'Cursor mark' entry
+	was deleted from the frame menu and replaced by a choice option in
+	the setup panel.  The choices are None, Circle (the cursor pixrect),
+	Cross, and Square.  The default is Square.  Circles are the most
+	visible, Squares are modest and unobtrusive, and Crosses are real
+	small.  (6/5)
+
+dev/graphcap
+	Added a couple of new device kernel parameters for the image display
+	devices.  LC, if present, indicates that the display server supports
+	the new logical cursor operation, described under the IMTOOL revision
+	of 5 June.  This parameter was added to all IMTOOL entries in the
+	system graphcap file.  A second parameter BS specifies whether the
+	device is byte swapped.  (6/7)
+
+sys/mkpkg
+	Added an entry for the new library LIBDS.  (6/7)
+
+pkg/images/tv/display/mkpkg
+pkg/images/tv/display/iishdr.x
+pkg/images/tv/display/iisio.x
+pkg/images/tv/display/iispio.x
+pkg/images/tv/display/iisrcr.x
+pkg/images/tv/display/iiswnd.x
+pkg/images/tv/display/imdrcuro.x
+pkg/images/tv/display/imdrcur.x
+pkg/images/tv/display/imdgetwcs.x
+	1. Modified the DISPLAY read cursor code to add support for cursor
+	reads to the standard IIS device with no LC (logical cursor) operation
+	at the server level.  The cursor read sequence is very similar to that
+	for a LC read with IMTOOL, i.e.,
+
+	    - Enable cursor blink (the shape does not change in this case).
+		There is currently no prompting other than the blinking cursor.
+
+	    - Enter a loop (raw mode ukey read) waiting for the user to type
+		a key on the *terminal keyboard* to signal the end of the
+		cursor read.  If the key is : the : is echoed and a string
+		value may be entered.  If the key is ctrl/z or ctrl/d EOF is
+		returned as the cursor value.
+
+	    - When a key is typed to terminate the cursor read, IIS cursor
+		blink is turned off, and a small square mark is draw at the
+		position of the cursor, by overwriting the pixels in the
+		image frame buffer (the graphics overlay is not used).  No
+		marker type options are provided for the IIS.  The marker
+		is displayed with z=1 pixels, i.e., white with a negative
+		transfer function, or black with a positive transfer function.
+
+	While in "cursor mode" (not the normal cursor mode, which isn't
+	implemented yet for =imcur) the following keys are special:
+
+	    ctrl/f	display next frame (N' = N+1)
+	    ctrl/r	display prev frame (N' = N-1)
+	    ctrl/[dz]	EOF
+
+	The same keys are recognized by IMTOOL, but in the case of IMTOOL
+	they are recognized at all times, whereas for an IIS cursor read
+	they are recognized only while the cursor is blinking.
+
+	To invoke cursor mode for the IIS, the user merely types "=imcur",
+	or calls some program such as lists.rimcursor which reads the image
+	cursor, after setting STDIMAGE to an IIS device, e.g.,
+
+		reset stdimage = iism70l
+
+	If the IIS is on a remote node the system will prompt for the login
+	name and password to be used to access the display on that node.
+
+	Note that the DISPLAY code generates an "IIS compatible" datastream
+	(similar to a "Tektronix compatible" datastream for graphics
+	terminals), hence anyone who is desperate for interactive cursor
+	readback and doesn't want to wait for the full display interfaces
+	could in principle interface a different device.
+
+	2. The DISPLAY program and the TV tasks may now be used to drive the
+	IIS display from a Sun terminal.  This feature requires special
+	support since the IIS is configured for a VAX, hence the bytes are
+	swapped relative to the Sun.  The CV* programs are not currently
+	supported on Sun/IRAF.  (6/9)
+
+---------------------
+All development systems updated.  (6/9)
+
+pkg/images/tv/display/sigl2.x
+pkg/images/tv/display/t_display.x
+pkg/images/tv/display/display.par
+pkg/images/tv/doc/display.hlp
+	Modified the DISPLAY program to add support for image scaling via
+	pixel replication, to supplement the bilinear interpolation already
+	provided.  This was done by adding a new parameter "order", specifying
+	the order of the interpolator.  Order 0 gives pixel replication, 1
+	gives bilinear interpolation.  Other changes were made to ensure that
+	the coordinate system of a greatly expanded image is accurate.  The
+	coordinate system used is such that the coordinates [i,j] refer to
+	the *center* of the displayed pixel [i,j].  Since the range of the
+	display window goes from 1 to N, only half of each pixel on the edge
+	of the window is displayed, and the extent of the window is N-
+	(expanded) pixels.  This is consistent with the IRAF convention,
+	and preserves the information content of the image, but may not be
+	what is expected.  (6/13)
+
+pkg/images/doc
+	Edited the EXAMPLES section of a number of these manpages to make the
+	formatting more consistent (they still need work).  (6/13)
+
+---------------------
+Updated all UNIX development systems.  (6/13)
+
+pkg/cl/builtin.c
+	A CHDIR command to a directory with a name such as 123 would't work
+	unless the directory name string was explicitly quoted.  CHDIR was
+	modified to accept an argument of any type, coercing the operand to
+	type string before trying to access it.  (6/17)
+
+---------------------
+Updated all development systems.
+Started a full bootstrap and recompile of IRAF on tucana (need to do this
+occasionally to catch compile bugs that creep in).  (6/17)
+
+unix/os/mkpkg.sh
+	Added an "rm alloc.o" before building the library; this object is
+	the main for a task and should not be in libos.a.  (6/17)
+
+unix/hlib/buglog.csh
+unix/hlib/mkiraf.csh
+unix/hlib/mkmlist.csh
+	Added a "#! /bin/csh" to the top of each script.  (6/18)
+
+---------
+All development systems updated.  (6/25)
+All development systems updated.  (6/28)
+All development systems updated.  (7/1)
+
+unix/os/alloc.c
+unix/os/zalloc.c
+	The fix recently made to alloc.c to prevent a user on one node of the
+	network from stealing a device already allocated by a user on another
+	node was fine, but this still left the primitives in zalloc.c, called
+	by iraf programs, unable to determine accurately if the allocation
+	status of a device in a network.  The VOS would check to see if the
+	device could be allocated, and if it were allocated to a user on a
+	different node than the node serving the device, the VOS (via zalloc.c)
+	would think that the device could be allocated, then when it tried to
+	actually allocate it, the alloc.e would refuse to do so, causing a
+	confusing error message.
+
+	Fixing this was not trivial, since the test for network device
+	ownership requires reading the system process table, which requires
+	reading /dev/kmem, which can require root priviledge.  The solution
+	was to add a new flag -s (stat) to alloc.e, and modify the code in
+	zalloc.c to execute the alloc.e task to check the device status in
+	the one case where it mattered.  (7/7)
+
+---------
+All development systems updated.  (7/14)
+
+sys/etc/miireadc.x
+sys/etc/miireadi.x
+sys/etc/miireads.x
+	These routines could return more than the requested number of data
+	elements in some cases.  (7/25)
+
+---------
+All development systems updated.  (7/27)
+All development systems updated.  (7/28)
+
+==============================================================================
+31 July 1988 - the TUCANA complex, a Sun-3 server plus iraf software
+development workstations, replaces the BSD 4.3 VAX 11/750 LYRA as the
+master IRAF software development machine.
+==============================================================================
+
+Did a full file inventory on lyra, looking for junk files to be deleted.
+
+vms/hlib/share/common.map -
+vms/hlib/share/makeshare.cl
+	Modified the makeshare script to delete the large "common.map" file
+	after the shared library has been built.  (7/31)
+
+LYRA
+	No changes after today.  Will be archived automatically when the system
+	is taken down for the final time tuesday.  (7/31)
+
+CARINA
+	Deleted the entire carina version of iraf and replaced it by the full
+	lyra system.  Carina now contains the exact same system as lyra except
+	for the devices and motd files.  Hereafter, carina will be used to
+	maintain BSD VAX/UNIX IRAF, and will be maintained as a (sporadically
+	updated) irafx development system.  (7/31)
+
+TUCANA
+	Tucana becomes the new master development system.  Deleted doc, lib,
+	math, noao, pkg, and sys and restored from lyra.  Most files are now
+	owned by the responsible programmers rather than by iraf, as on lyra.
+	Diff/merge check of dev, local, and unix.  Did a full bootstrap.
+	A full recompile of the entire system will follow later today.  (7/31)
+
+/u2/sites
+	Moved the extra.v25 stuff to /iraf/extra on carina.
+	Moved everything else to /u2/sites on tucana.  (7/31)
+
+Moved irafmail facility.
+Moved sitemail facility.
+Moved aipsmail facility.
+Moved vms mail facility.
+Moved buglog facility.
+Moved emaildb facility.
+Moved assorted /local tasks.
+	(7/31)
+
+--------------------------
+Did a full bootstrap and sysgen of both f68881 and ffpa on tucana.  (8/1)
+
+dev/vi.ed			[VMS]
+	The set/terminal command in the host command used to run VI was
+	modified (by Nigel) to get around a problem with VI that was causing
+	the terminal driver to be left in a funny state - flow control was
+	being turned off or something.  The symptom was that after running
+	VI, the user would get into a graphics cursor loop, and the raw mode
+	cursor read would read a great deal of garbage characters (ctrl/s's),
+	causing the cursor mode to get repeated bad cursor reads, beeping
+	the terminal for an extended time.  (8/3)
+
+vms/boot/bootlib/osfdate.x
+	As an experiment, I changed this to use the file modify date rather
+	than the create date to test when a file was last modified.  This may
+	cause problems, as we have found in the past that on VMS, the file
+	modify date is often changed even when the file data is not modified.
+	(8/4)
+
+pkg/lists/*
+	Deleted the COLUMNS task.  (8/11)
+
+----------------------------
+Updated IRAFX@draco.  (8/13)
+
+vms/gdev/sgidev
+	All the VMS/SGI translators have been modified so they require only an 
+	input file name.  This fixes the problem of two $F filename expansions
+	(input and output files) causing the submit command from the graphcap
+	DD string to be truncated.  (8/15 ShJ)
+
+dev/graphcap
+vms/hlib/sgiqueue.com
+	These files were modified to accomodate the change made to the
+	VMS/SGI translators documented above.  (8/15 ShJ)
+
+unix/sun/Makefile
+unix/sun/imtool.c
+unix/hlib/install
+	Modified these files to add support for separate compilation of GTERM
+	and IMTOOL under SunOS 4.0.  In the new operating system, which has
+	shared libraries, GTERM and IMTOOL are just regular programs and there
+	is no "custom suntools" executable.  The new sun directory sources and
+	install script will automatically sense the OS version and do the right
+	thing on any version of SunOS.  (8/28)
+
+unix/boot/spp/rpp/rpprat/deftok.r
+unix/boot/spp/rpp/rpprat/entdkw.r
+unix/boot/spp/rpp/rpprat/initkw.r
+unix/boot/spp/rpp/rpprat/swend.r
+unix/boot/spp/rpp/rpprat/common
+unix/boot/spp/rpp/rpprat/defs
+unix/boot/spp/rpp/rppfor/*.f
+unix/boot/spp/rpp/mkpkg.sh
+	Added (experimental) support for a new SPP compiler directive, PRAGMA.
+	This is used to advise the compiler about succeeding statements to
+	modify the default behavior of the compiler, e.g., to optimize the
+	code is some nonstandard way.  The only pragma currently supported is
+	'pragma switch_no_range_check', which is used to eliminate the range
+	check in a SWITCH statement in cases where the extra efficiency makes
+	it worthwhile and it can be shown that the switch will always be in
+	range.  The keyword `pragma' is treated as data if the pragma is not
+	recognized, so that existing code using this keyword as a variable or
+	whatever will not be affected.  (9/5)
+
+unix/sun/imtoolrc
+dev/graphcap
+	Modified the 2D-Frutti entries after discussions with Steve Heathcote.
+	The long (dispersion) axis of the 2D-Frutti is y, not x, as the
+	previous entries assumed, and so the x and y dimensions of imt22
+	through imt25 entries were interchanged.  An additional entry for the
+	largest format of the 2D-Frutti was added (imt28).
+
+	     CN#    device       alias          dimensions
+
+	    imt22  imt2df1x1	imt2df1    	128 x 1520
+	    imt23  imt2df2x1	imt2df2    	256 x 1520
+	    imt24  imt2df5x1	imt2df5    	512 x 1520
+	    imt25  imt2df9x1	imt2df9    	960 x 1520
+	    imt28  imt2df9x3			976 x 3040
+
+	The current set of frame sizes and aliases for the 2D-Frutti are
+	summarized in the figure above.  (9/6 ShJ/dct)
+
+sys/fio/fstati.x
+	Added an entry for F_BUFPTR, which seems to have been inadvertently
+	omitted. (9/6)
+
+unix/hlib/clpackage.cl
+unix/hlib/zzsetenv.def
+	Changed all references to 'sdas' to 'stsdas'.  (9/6)
+
+unix/boot/spp/xpp/decl.c
+unix/boot/spp/xpp/xppcode.c
+	Increased the size of the string buffer used to store procedure
+	declarations text from 2048 to 4096.  (9/19)
+
+pkg/images/tv/display/dsulut.x
+pkg/images/tv/display/t_display.x
+	1. With the user lookup table option, the buffer for the lookup table
+	was being allocated but never freed.
+	2. Fixed a typo in a call to pargstr made in an error handler - the
+	pointer ztrans was not being dereferenced. (10/4)
+
+unix/hlib/d1mach.f
+	Modified to use the IEEE rather than PDP values (presumably we don't
+	have any software which actually uses these double constants yet).
+	(10/14)
+
+pkg/images/tv/display/gwindow.h
+pkg/images/tv/cv/gwindow.h
+	The offset to the W_IMSECT string was being calculated incorrectly,
+	causing the 4th WCS structure to be overwritten.  This bug was only
+	recently detected following addition of some code which looks at all
+	the WCS at shutdown time, and which was expecting to find NULLs in
+	the high numbered, unused WCSs.  (10/14)
+
+----------------------------
+Updated the IRAFX systems (irafx@draco, carina, tucana f68881/ffpa).  (10/14)
+
+unix/sun/screendump.c
+	Removed the -s flag from the lpr command in the default R_DISPOSE,
+	as this doesn't work any more under SunOS 4.0 (when writing to a
+	remote node and the link cannot be made, lpr is sending mail back
+	to the user, rendering the option effectively unusable).  (10/17)
+
+lib/nspp.h
+sys/gio/nspp/sysint/packum.x
+	Delted the SWAP_MCWORDS definition from nspp.h, and modified packum.x
+	to use the standard definition BYTE_SWAP2 in mach.h.  (10/18)
+
+sys/libc/csalloc.c
+	This file contained a reference to a nonexistent routine STKCMP,
+	intended for order comparision of buffers on the stack.  This has
+	never been used and it is not clear why we need such a routine,
+	so I deleted c_stkcmp and the reference to STKCMP.  (10/19)
+
+----------------------------
+Begin merge of revisions from SunOS 4.0 and RoadRunner (386i) ports into
+Sun/IRAF.  (10/19)
+
+unix/hlib/config.h
+unix/hlib/libc/spp.h
+	Increased LEN_JUMPBUF from 16 to 64, to accomodate the worst case
+	save buffer size. (19/19).
+
+unix/hlib/libc/kernel.h
+	Added a definition of PFI (pointer to function returning int).  This
+	is used in a number of OS files.  (10/19)
+
+pkg/cl/main.c
+	Changed the definition of the variable "cldebug" from
+		int cldebug;
+	to
+		int cldebug = 0;
+	to allow initialization with "adb -w cl.e" to enable debugging.
+	Some systems, including SunOS 4.0, don't allocate storage in the
+	executable unless the value of the variable is explicitly initialized.
+	(10/19)
+
+unix/as.i386 +
+unix/bin.i386 +
+	Created these new directories.  (10/19)
+
+unix/boot/spp/xc.c
+        1. Hacked XC to use F77 only to compile Fortran source files, and to
+        use CC for everything else.
+        2. Added /usr/local/bin to the list of directories to be searched for
+        commands like XPP and RPP.
+        3. Changed the defined names from "xpp.e" and "rpp.e" to "xpp" and
+        "rpp", since this is how they appear in /usr/local/bin.
+        (These changes originated in the 386i port).  (10/20)
+         
+------------------- 
+Sysgen-ed tucana (f68881,ffpa) and updated draco as well.  (10/20)
+
+------------------- 
+During the period 21-27 October, the NOAO Sun systems were down for the
+upgrade to SunOS 4.0.  The Sun/386i port of IRAF was also completed during
+this period.  Some of the following changes were made as a result of these
+efforts.
+
+unix/boot/mkpkg/scanlib.c
+	Had to add
+
+		#ifdef i386
+		#define PORTAR 1
+		#endif
+	
+	at the top of the file to get include <ar.h> to define the appropriate
+	library format.  Also, on the 386i, the code which scans the library
+	has to deal with the following peculiarities:
+
+	    o	The first "file" in the archive is a dummy entry containing
+		symbol information; the name field is null, hence the code
+		can skip this entry by checking for archive members with
+		null-string names.
+
+	    o	The names of the archive members now have a trailing /,
+		e.g., "file.o/", followed by blank padding.  Previously
+		only the blank padding was there.  I modified the code to
+		accept either / or blank as the name delimiter.
+
+	I also added some debug code which prints the name and date of each
+	archive member as the library is scanned, if debug > 1.  These
+	changes should be portable to other systems.  (10/19)
+
+SUNBUG - f77
+	The command "f77 -c -O file.c" produces the following:
+
+		Assembler: /tmp/optim.01231.5.s
+			aline 1	: Warning: cannot field update- '.file' not
+			   on first line
+
+	This prevents use of f77 to compile C files, at least on the 386i!
+	(It works if the optimizer is not used).  Will have to modify XC to
+	use CC instead.  (10/19)
+
+unix/hlib/mkpkg.inc
+unix/hlib/mkpkg.sf.I386 +
+	Added code for case FPU = i386 (not really an fpu), plus a special
+	file list for the 386.  (10/19)
+
+unix/hlib/cl.csh
+	Added a case for the i386, similar to that for sparc.  (10/19)
+
+---------------------
+Sysgen completed with a half a dozen files with errors, but no executables
+were linked due to a library conflict with the dummy zsvjmp.s I wrote.  (10/20)
+
+unix/as.i386/zsvjmp.s
+unix/as.i386/zzdebug.c
+	Wrote a ZSVJMP.S for the 386i (80386), plus a little test program to
+	make sure it works.  (10/20)
+
+---------------------
+Linked x_system.e and it runs on the first attempt!!  (10/20)
+Start another sysgen - ignore files that didn't compile for now, until we
+see which executables they prevent from being linked.
+
+sys/vops/acht.gx
+	On the 386i, statements of the form "b[i] = a[i]", where B was
+	COMPLEX and A was INTEGER*2, revealed a compiler error in the
+	386i Fortran compiler (the error was a syntax error in the assembler
+	code input to the system assembler).  I decided that assigning
+	an integer*2 to a complex in a straight assignment wasn't a very
+	safe thing to do anyhow, so the generic source was changed to
+	generate  "b[i] = complex(real(a[i]),0.0)" instead, whenever B
+	is complex and A isn't.  (10/20)
+
+sys/vops/amod.gx
+	No changes here, just logging the compiler bug.  The code is as
+	follows:
+
+	     do 110 i = 1, npix
+		c(i) = mod (a(i), b(i))
+
+	where A, B, and C are integer*2.  Once again, the compiler is
+	generating incorrect assembler for this case, causing a "syntax error"
+	from the assembler (evidently, because of the rather restrictive
+	instruction set of the 80386).  I am not sure there is anything in
+	IRAF that uses this routine anyhow, so we will try to ignore it for
+	now.  (10/20)
+
+noao/astutil/pdm/pdmstatistics.x			pdmstats.x
+noao/digiphot/apphot/center/apcentercolon.x		apcencolon.x
+noao/digiphot/apphot/center/aprefitcenter.x		aprefitcen.x
+noao/digiphot/apphot/center/apfitcenter.x		apfitcen.x
+noao/proto/t_mkhistogram.x				t_mkhgm.x
+	Shortened the names of the above source files.  These will not compile
+	on the 386i, which has a limit of 14 characters for the names of
+	modules in object libraries (which are COFF format libraries from
+	Sys V, hence the 14 char limit).  (10/21)
+
+unix/hlib/mpkg.sf.I386
+	Turned off the optimizer for conrec.f, srface.f, pwrzi.f.  An apparent
+	optimizer bug was causing declaration of an external which would cause
+	an unsatisfied exernal error at link time.  (10/21)
+
+pkg/images/iminfo/t_imstat.x
+	Replaced some ==INDEF constructs by IS_INDEF, and took the n=n+1 out
+	of the inner loop, since it isn't needed.  (10/21)
+
+unix/boot/mkpkg/host.c
+	Disabled the ranlib (library rebuild) on the 386, since it uses COFF
+	type libraries, which don't need to be ranlib-ed.  (10/21)
+
+unix/hlib/mpkg.sf.I386
+unix/as/amods.s +
+	Edited the assembler for the VOPS amods routine (to work around the
+	compiler bug mentioned above) and placed the assembler version in
+	AS and added the file to the special file list for the 386i.  (10/21)
+
+---------------------------------
+Restored IRAF on the ORION complex (Sun-4 plus Sun-3 nodes), now running
+SunOS 4.0.  Booted up the system and sysgen-ed the sparc, ffpa, and f68881
+binaries.  (10/23-25)
+
+---------------------------------
+Following a period of outage due to hardware problems, the TUCANA complex
+came back on the air, also under SunOS 4.0.  Moved the ffpa and f68881 binaries
+over from orion, and udpated the few files that had been modified.  (10/27)
+
+sys/ki/kishownet.x
+	ki_shownet, and hence the task NETSTATUS, now checks for name
+	collisions between node name aliases and the system environment
+	list, and prints a warning message if the same name is found
+	in both name spaces.  (10/28)
+
+unix/sun/gterm.c
+	Several users pointed out that if enough GTERM windows are opened
+	up, the system will run out of some critical resource and it won't
+	be possible to open any more windows (for some reason this did not
+	happen until we upgraded to SunOS 4.0).  This was traced to the
+	system actually running out of /dev/win* entries.  According to
+	/etc/pstat -i, GTERM was using 11 entries, whereas SHELLTOOL was
+	using only 2.  This is somewhat reasonable since GTERM does provide
+	more windows, but a factor of 5 is too much.  It turns out that
+	things like the setup panel and "pause" panel in GTERM were using
+	window descriptors, even when not in use.  GTERM was modified to
+	create the windows each time they need to be used, reduing the number
+	of window descriptors used from 11 to 5.  (11/2)
+
+sys/fio/mkpkg
+sys/fio/close.x
+sys/fio/filbuf.x
+sys/fio/ungetci.x +
+	The hitherto little used pushback feature of FIO has come into use
+	recently, leading to the following bugs being fixed.
+	1. filbuf.x did not permit pushback on a string or spool file,
+	although it worked for ordinary files.
+	2. A bug in close.x was causing fcanpb (cancel pushback) to be
+	called with the wrong file descriptor.
+	3. Added a new routine UNGETCI to complement the already existing
+	routine GETCI.  (11/7)
+
+sys/memio/salloc.x
+	Found and fixed a horrible bug, while testing the QPOE code on the
+	386i.  The alignment logic in the stack allocation code (SALLOC)
+	had an error which would cause it to work for types up to the size
+	of an int or real, but which would cause misaligned buffers for types
+	double or complex.  The MALLOC code was correct, however.  (11/8)
+
+pkg/cl/builtin.c
+	Added a new builtin "d_m" which prints some information on memory
+	usage, i.e., the dictionary and stack. (This is like the old d_d,
+	except that since it is not built into the gramar with lookahead,
+	the incomplete input '>>>' nonsense is avoided).  (11/8)
+
+unix/hlib/libc/make.h -
+	Deleted this obsolete file, a make template used back in pre-mkpkg
+	days when makefiles were used to maintain IRAF.  (11/10)
+
+-----------------------
+Snapshot of development system sent to CFA.  (11/14)
+
+unix/os/irafpath.c
+	Added a #ifdef i386 case so that irafpath() would be able to find
+	bin.i386.  (11/14)
+
+unix/boot/mkpkg/host.c
+	Added support for IRAFULIB (a user defined private library) to
+	the $checkout and $checkin directives.  For example, in
+
+		$checkout libex.a lib$
+
+	if file libex.a is found in IRAFULIB, that version is checked out,
+	rather than the one in the system directory lib$.  (11/15)
+
+sys/fio/fseti.x
+sys/fio/fstati.x
+	Added the case F_FILESIZE so that low level systems programs which
+	extend files by direct calls to the kernel routines can update the
+	file size in the FIO file descriptor.  (11/17)
+
+unix/hlib/mkpkg.sf.S34
+	Added a special file list for SunOS 3.4, with the SunOS 4.0 files
+	thrown in so that it will work for both systems.  (11/18)
+
+unix/boot/bootlib/osfiletype.c
+	Added ".fits" and ".mip" as known "source file" extensions, i.e.,
+	file types not deleted by rmbin, and movable between machines with
+	wtar -o.  These are really binary file types, but they are closer
+	to text in their usage.  (.mip is something just invented to denote
+	a machine independent file of some type).  (11/18)
+
+---------------------------------------
+Updated tucana.ffpa(Sun-3/OS4.0), pegasus(Sun-386i/OS4.0), and
+serpens(Sun-3/OS3.4).  (11/17-18)
+
+pkg/cl/edcap.c
+	Removed a pointless restriction to 10 characters on the length of
+	the editor name.  (11/19)
+
+unix/gdev/sgidev/sgidispatch.c
+	Fixed an automatic coredump if called with no arguments.  (11/22 SRo)
+
+sys/imio/db/idb.h
+sys/imio/db/idbfind.x
+sys/imio/db/idbfind.x
+sys/imio/db/idbdelf.x
+sys/imio/db/idbaddf.x
+	Modified these routines to automatically truncate the keyword passed
+	in by the caller to 8 characters, in accord with the FITS conventions
+	used to format user keywords.  (11/28)
+
+------------------------
+Updated orion.  (11/28)
+
+sys/imfort/db/impstr.x
+	In the call to amovc, added a 1 to the computed offset of the output
+	string; numeric values were being output shift one space to the left
+	of what the FITS format requires.  (12/2)
+
+pkg/system/directory.x
+	Removed an extra argument from a call to getline().  (12/2)
+
+------------------------
+Updated tucana (Sun-3, f68881,ffpa), orion (Sun-4, Sun-3 nodes), serpens
+(Sun-3 under 3.4, f68881, ffpa), pegasus (386i) and carina (BSD/VAX).
+(VMS/IRAF update to follow tomorrow).  (12/2)
+
+vms/boot/bootlib/osfiletype.c
+	Added ".mlb" to the list of known binary file types, and ".fits" and
+	".mip" to the list of known "source" file types.  (12/3)
+
+vms/hlib/share/mkpkg
+vms/hlib/share/irafcom.x
+	1. Modified irafcom.x to add a ,QUAD to the entry for the MEM psect.
+	2. Added an entry "mkpkg x_mkshare" to automatically build the
+	mkshare executable, which is needed before the shared library can
+	be built.   (12/4)
+
+VERSION 2.7 EXPORT

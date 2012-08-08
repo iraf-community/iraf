@@ -1,0 +1,67 @@
+.help nlerrors Feb91 "Nlfit Package"
+.ih
+NAME
+nlerrors -- compute the fit statistics and errors in the parameters
+.ih
+SYNOPSIS
+nlerrors[rd] (nl, z, zfit, w, npts, variance, chisqr, errors)
+
+.nf
+pointer		nl		# curve descriptor
+real/double	z[npts]		# array of input function values
+real/double	zfit[npts]	# array of fitted function values
+real/double	w[npts]		# array of weights
+int		npts		# number of data points
+real/double	variance	# the computed variance of the fit
+real/double	chisqr		# the computed reduced chi-square of the fit
+real/double	errors[*]	# errors in the fitted parameters
+.fi
+.ih
+ARGUMENTS
+.ls nl     
+Pointer to the curve descriptor structure.
+.le
+.ls z   
+Array of function values.
+.le
+.ls zfit  
+Array of fitted function values.
+.le
+.ls w
+Array of weights.
+.le
+.ls npts
+The number of data points.
+.le
+.ls variance
+The computed variance of the fit.
+.le
+.ls chisqr
+The computed reduced chi-squared of the fit.
+.le
+.ls errors
+Array of errors in the computed parameters.
+.le
+.ih
+DESCRIPTION
+Compute the variance and reduced chi-squared of the fit and the
+errors in the fitted parameters.
+.ih
+NOTES
+The reduced chi-squared of the fit is the square root of the sum of the
+weighted squares of the residuals divided by the number of degrees of freedom.
+The variance of the fit is the square root of the sum of the
+squares of the residuals divided by the number of degrees of freedom.
+If the weighting is uniform, then the reduced chi-squared is equal to the
+variance of the fit.
+The error of the j-th parameter is the square root of the j-th diagonal
+element of the inverse of the data matrix. If the weighting is uniform,
+then the errors are scaled by the square root of the variance of the data.
+
+The zfit array can be computed by a call to the nlvector[rd] routine.
+The size of the array required to hold the output error array can be
+determined by a call to nlstati.
+.ih
+SEE ALSO
+nlvector,nlstat
+.endhelp

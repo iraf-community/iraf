@@ -1,0 +1,23 @@
+# Help directory for the ASTUTIL package.
+
+$defdir		= "noao$astutil/"
+$doc		= "noao$astutil/doc/"
+$pdm		= "noao$astutil/pdm/"
+
+airmass		hlp=doc$airmass.hlp,	src=airmass.x
+asttimes	hlp=doc$asttimes.hlp,	src=t_asttimes.x
+ccdtime		hlp=doc$ccdtime.hlp,	src=ccdtime.x
+galactic	hlp=doc$galactic.hlp,	src=galactic.x
+gratings	hlp=doc$gratings.hlp,	src=t_gratings.x
+keywpars        hlp=doc$keywpars.hlp,   src=keywpars.par
+astcalc		hlp=doc$astcalc.hlp,	src=t_astcalc.x
+asthedit	hlp=doc$asthedit.hlp,	src=t_asthedit.x
+observatory	hlp=doc$obs.hlp,	src=t_obs.x
+pdm		hlp=doc$pdm.hlp,	src=pdm$t_pdm.x
+precess		hlp=doc$precess.hlp,	src=precess.x
+rvcorrect	hlp=doc$rvcorrect.hlp,	src=t_rvcorrect.x
+setairmass	hlp=doc$setairmass.hlp,	src=t_setairmass.x
+setjd		hlp=doc$setjd.hlp,	src=t_setjd.x
+astradius	hlp=doc$astradius.hlp,	src=astradius.cl
+
+revisions	sys=Revisions

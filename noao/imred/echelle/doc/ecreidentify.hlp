@@ -1,0 +1,117 @@
+.help ecreidentify Jun88 noao.imred.echelle
+.ih
+NAME
+ecreidentify -- Reidentify features in echelle spectra
+.ih
+USAGE
+ecreidentify images reference
+.ih
+PARAMETERS
+.ls images
+Echelle images in which the features in the reference image are to be
+reidentified and a new dispersion function fit.
+.le
+.ls reference
+Echelle image with previously identified features and dispersion
+function.
+.le
+.ls shift = 0.
+Shift in user coordinates to be added to the reference features before
+centering.  If INDEF then a shift is determined by correlating the
+reference features to features automatically identified in the image to
+be reidentified.
+.le
+.ls cradius = 5.
+Centering radius in pixels.  If a reidentified feature falls further
+than this distance from the reference position (after shifting) it is
+not reidentified.
+.le
+.ls threshold = 10.
+In order for a feature center to be determined the range of pixel
+intensities around the feature must exceed this threshold.
+.le
+.ls refit = yes
+Refit the dispersion function?  If yes and there are more than 4
+features in more than one order and a dispersion function was defined
+in the reference image then a new dispersion function of the same type
+and order offset
+as in the reference image is fit using the new pixel positions.
+Otherwise only a zero point shift is determined from the revised fitted
+coordinates without changing the form of the dispersion function.
+.le
+.ls database = "database"
+Database containing the feature data for the reference image and in
+which the features for the reidentified images are recorded.
+.le
+.ls logfiles = "STDOUT,logfile"
+List of file in which to keep a processing log.  If a null file, "", is
+given then no log is kept.  If the log file is "STDOUT" then the log is
+written to the terminal.
+.le
+.ih
+DESCRIPTION
+Emission or absorption features in a reference echelle spectrum are
+reidentified in other echelle spectra.  The features for the reference
+image and those determined for reidentified images are recorded in the
+specified database.
+
+The first step in transferring identifications from the reference
+spectrum to another spectrum is to add a shift (in wavelength) to each
+feature in the reference image.  The shift is specified by the
+parameter \fIshift\fR.  This shift is for the fundamental order (order
+number 1) which is then applied to each order by dividing by the order
+number.  If the shift is specified as INDEF then a shift is determined
+by finding the peaks in the input spectrum and correlating these peaks
+against the feature in the reference spectrum.  This is the 'x'
+algorithm described in \fBecidentify\fR.
+
+After the shift has been added to move the reference features to near
+the input spectrum features these positions are adjusted by centering
+on the features using the \fBcenter1d\fR algorithm.  The parameters
+\fIcradius\fR and \fIthreshold\fR are used in this operation.  If the
+centering fails to find the feature within the centering radius
+(\fIcradius\fR) that feature is eliminated from the feature list.
+
+If the parameter \fIrefit\fR has the value "no" then the average shift
+in the feature positions is recorded as a zero point wavelength offset
+for the fundamental order without changing the shape of the dispersion
+function.  If the parameter has the value "yes" then the new feature
+positions are used to refit the dispersion function (of the same function
+type and orders).  The order offset is also maintained.
+
+Log information is written to the specified log files.  To log this to
+the terminal, called the standard output, use STDOUT.  The log
+information includes reference spectrum, the spectrum being reidentified,
+the number of initial features and the number actually reidentified,
+the average shift in pixels, the average shift in wavelength (in terms
+of the fundamental order), the average fractional shift in wavelength
+(which can be scaled to a radial velocity), and the RMS of the features
+wavelengths given by the dispersion function to the user specified true
+wavelengths.
+.ih
+EXAMPLES
+The features in the spectrum f033.ec were identified previously
+with the task \fBecidentify\fR.  The features positions in f043.ec are
+are reidentified with and without refitting the dispersion function as
+follows:
+
+.nf
+ec> ecreidentify f043.ec f033.ec
+
+ECREIDENTIFY: NOAO/IRAF V2.7 seaman@puppis Mon 09:03:51 27-Jun-88
+  Reference image = f033.ec, Refit = yes
+               Image    Found  Pix Shift  User Shift  Z Shift      RMS
+             f043.ec  561/561       0.11       -1.07  -1.9E-6   0.0117
+
+
+ec> ecreidentify f043.ec f033.ec refit=no
+
+ECREIDENTIFY: NOAO/IRAF V2.7 seaman@puppis Mon 09:15:21 27-Jun-88
+  Reference image = f033.ec, Refit = no
+               Image    Found  Pix Shift  User Shift  Z Shift      RMS
+             f043.ec  561/561       0.11       -1.07  -1.9E-6   0.0131
+.fi
+.ih
+SEE ALSO
+center1d, ecidentify
+.endhelp

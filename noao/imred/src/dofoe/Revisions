@@ -1,0 +1,47 @@
+.help revisions Jan95 noao.imred.src.dofoe
+.nf
+dofoe$batch.cl
+dofoe$proc.cl
+dofoe$response.cl
+    Error messages now hint to check imtype setting.
+    (4/15/05, Valdes)
+
+========
+V2.11.3b
+========
+
+dofoe$proc.cl
+    Modified code to eliminate goto.  This is for use with pyraf.
+    (11/21/00, Valdes)
+
+========
+V2.11.3a
+========
+
+dofoe$arcrefs.cl
+dofoe$batch.cl
+dofoe$doarcs.cl
+dofoe$listonly.cl
+dofoe$proc.cl
+dofoe$response.cl
+    Any additional qualifiers in the imtype string are stripped.
+    (8/14/97, Valdes)
+
+=========
+V2.11BETA
+=========
+
+dofoe$apsript.par
+    Made changes for the new aperture selection option.  (9/5/96, Valdes)
+
+dofoe$params.par
+dofoe$arcrefs.cl
+dofoe$doarcs.cl
+    Added "threshold" as a user parameter.  (1/16/95, Valdes)
+
+dofoe$proc.cl
+dofoe$batch.cl
+dofoe$listonly.cl
+    The test for extracted spectra based on the system keyword was failing
+    and so it was removed.  (1/16/95, Valdes)
+.endhelp

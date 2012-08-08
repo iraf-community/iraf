@@ -1,0 +1,77 @@
+.help match Nov84 system
+.ih
+NAME
+match -- match a pattern against the lines in a file or files
+.ih
+USAGE
+match pattern files
+.ih
+PARAMETERS
+.ls pattern
+The pattern to be matched.  A pattern may contain any of the
+pattern matching \fImeta-characters\fR described below.
+.le
+.ls files
+A template specifying the file or files to be searched.  Omitted if the
+standard input is redirected.
+.le
+.ls meta-characters = yes
+Set to "no" to disable the pattern matching meta-characters, e.g., when
+you want to explicitly match one of the meta-characters as a regular character.
+.le
+.ls stop = no
+If \fIstop\fR is enabled, lines with match the pattern are "stopped" (not
+passed to the output), otherwise only those lines with match the pattern
+are output.
+.le
+.ls print_file_names = yes
+If more than one file is being searched, preface each printed line
+with the "file_name: ".
+.le
+.ih
+DESCRIPTION
+The listed files are searched for the given pattern, copying each line that
+matches to the standard output.  If "stop" is set the action is reversed,
+i.e., all lines are passed on to the output except those which match the
+pattern.  If no files are named text is read from the standard input.
+The pattern matching meta-characters are described in the table below.
+
+.nf
+	^		matches the beginning of a line
+	$		matches the end of a line
+	?		matches any single character
+	*		matches zero or more of whatever is at the left
+	[12345]		matches any single character in the given set
+	[1-5]		matches any single character in a range
+	[^a-z]		matches any character NOT in the range/set
+	#		matches whitespace
+	{chars}		turns off case sensitivity inside the braces
+	\		used to include a meta-character in the pattern
+.fi
+
+If more than one file is being searched, each output line is prefixed
+with its file name.
+.ih
+EXAMPLES
+
+1. From all the lines displayed by "set", print only those that have
+the string "tty" somewhere in them.
+
+	cl> set | match tty
+
+2. Find all tasks that delete something.
+
+	cl> help * | match delete
+
+3. Delete all the "red" objects from the list file "catalog".
+
+	cl> match red catalog stop+ > newcatalog
+
+4. Type out the file "spool", omitting all lines that end in a colon,
+and paginating the output.
+
+	cl> match ":$" spool stop+ | page
+.ih
+SEE ALSO
+lcase, ucase, translit, sort, unique
+.endhelp

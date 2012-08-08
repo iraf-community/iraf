@@ -1,0 +1,7 @@
+files,s,a,,,,list of files to be created or touched
+create,b,h,yes,,,create file if it doesn't exist?
+atime,b,h,yes,,,update file access time?
+mtime,b,h,yes,,,update file modification time?
+time,s,h,"",,,time to set (empty for current time)
+ref_file,s,h,"",,,reference file for times
+verbose,b,h,no,,,verbose output flag

@@ -1,0 +1,12 @@
+
+
+      $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+                  WARNING FROM THE PTOOLS PACKAGE LOADER                       
+      $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+                                                                               
+      The  SDAS  external package TABLES required by some of the PTOOLS
+      tasks is not available.  The tasks TBAPPEND,  TBDUMP, TBRENUMBER,
+      TBSELECT,  and  TBSORT  will not run.   The tasks PAPPEND, PDUMP,
+      PRENUMBER,  PSELECT  and  PSORT will run  only on  APPHOT/DAOPHOT
+      output  files  written  in the default text format,  not on files
+      written in ST tables format. 

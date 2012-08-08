@@ -1,0 +1,92 @@
+# Copyright(c) 1986 Association of Universities for Research in Astronomy Inc.
+
+include <pkg/rg.h>
+include	"icfit.h"
+include	"names.h"
+
+# IC_CLEAN -- Replace rejected points by the fitted values.
+
+procedure ic_clean$t (ic, cv, x, y, w, npts)
+
+pointer	ic				# ICFIT pointer
+pointer	cv				# Curfit pointer
+PIXEL	x[npts]				# Ordinates
+PIXEL	y[npts]				# Abscissas
+PIXEL	w[npts]				# Weights
+int	npts				# Number of points
+
+int	i, nclean, newreject
+pointer	sp, xclean, yclean, wclean
+
+PIXEL	$tcveval()
+
+begin
+	if ((IC_LOW(ic) == 0.) && (IC_HIGH(ic) == 0.))
+	    return
+
+	# If there has been no subsampling and no sample averaging then the
+	# IC_REJPTS(ic) array already contains the rejected points.
+
+	if (npts == IC_NFIT(ic)) {
+	    if (IC_NREJECT(ic) > 0) {
+	        do i = 1, npts {
+		    if (Memi[IC_REJPTS(ic)+i-1] == YES)
+		        y[i] = $tcveval (cv, x[i])
+	        }
+	    }
+
+	# If there has been no sample averaging then the rejpts array already
+	# contains indices into the subsampled array.
+
+	} else if (abs(IC_NAVERAGE(ic)) < 2) {
+	    if (IC_NREJECT(ic) > 0) {
+	        do i = 1, npts {
+		    if (Memi[IC_REJPTS(ic)+i-1] == YES)
+			Mem$t[IC_YFIT(ic)+i-1] =
+			    $tcveval (cv, Mem$t[IC_XFIT(ic)+i-1])
+		}
+	    }
+	    call rg_unpack$t (IC_RG(ic), Mem$t[IC_YFIT(ic)], y)
+
+	# Because ic_fit rejects points from the fitting data which
+	# has been sample averaged the rejpts array refers to the wrong data.
+	# Do the cleaning using ic_deviant to find the points to reject.
+
+	} else if (RG_NPTS(IC_RG(ic)) == npts) {
+	    call amovki (NO, Memi[IC_REJPTS(ic)], npts)
+	    call ic_deviant$t (cv, x, y, w, Memi[IC_REJPTS(ic)], npts,
+		IC_LOW(ic), IC_HIGH(ic), IC_GROW(ic), NO, IC_NREJECT(ic),
+		newreject)
+	    if (IC_NREJECT(ic) > 0) {
+	        do i = 1, npts {
+		    if (Memi[IC_REJPTS(ic)+i-1] == YES)
+			y[i] = $tcveval (cv, x[i])
+		}
+	    }
+
+	# If there is subsampling then allocate temporary arrays for the
+	# subsample points.
+
+	} else {
+	    call smark (sp)
+	    nclean = RG_NPTS(IC_RG(ic))
+	    call salloc (xclean, nclean, TY_PIXEL)
+	    call salloc (yclean, nclean, TY_PIXEL)
+	    call salloc (wclean, nclean, TY_PIXEL)
+	    call rg_pack$t (IC_RG(ic), x, Mem$t[xclean])
+	    call rg_pack$t (IC_RG(ic), y, Mem$t[yclean])
+	    call rg_pack$t (IC_RG(ic), w, Mem$t[wclean])
+	    call amovki (NO, Memi[IC_REJPTS(ic)], npts)
+	    call ic_deviant$t (cv, Mem$t[xclean], Mem$t[yclean],
+		Mem$t[wclean], Memi[IC_REJPTS(ic)], nclean, IC_LOW(ic),
+		IC_HIGH(ic), IC_GROW(ic), NO, IC_NREJECT(ic), newreject)
+	    if (IC_NREJECT(ic) > 0) {
+	        do i = 1, npts {
+		    if (Memi[IC_REJPTS(ic)+i-1] == YES)
+			Mem$t[yclean+i-1] = $tcveval (cv, Mem$t[xclean+i-1])
+		}
+	    }
+	    call rg_unpack$t (IC_RG(ic), Mem$t[yclean], y)
+	    call sfree (sp)
+	}
+end

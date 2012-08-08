@@ -1,0 +1,275 @@
+include	<imhdr.h>
+include	<pmset.h>
+include	"xtfixpix.h"
+
+
+$for (silrd)
+
+# XT_FP -- Get the specified line of image data and replace bad pixels by
+# interpolation.
+
+pointer procedure xt_fp$t (fp, im, line, fd)
+
+pointer	fp			#I FIXPIX pointer
+pointer	im			#I Image pointer
+int	line			#I Line
+int	fd			#I File descriptor for pixel list
+
+int	col1, col2		#I Section of interest
+int	line1, line2		#I Section of interest
+
+pointer	imgl2$t(), xt_fps$t()
+
+begin
+	# If there are no bad pixels just get the image line and return.
+	if (fp == NULL)
+	    return (imgl2$t (im, line))
+
+	col1 = 1
+	col2 = IM_LEN(im,1)
+	line1 = 1
+	line2 = IM_LEN(im,2)
+
+	return (xt_fps$t (fp, im, line, col1, col2, line1, line2, fd))
+end
+
+
+# XT_FXS -- Get the specified line of image data and replace bad pixels by
+# interpolation within a specified section.
+
+pointer procedure xt_fps$t (fp, im, line, col1, col2, line1, line2, fd)
+
+pointer	fp			#I FIXPIX pointer
+pointer	im			#I Image pointer
+int	line			#I Line
+int	fd			#I File descriptor for pixel list
+
+int	col1, col2		#I Section of interest
+int	line1, line2		#I Section of interest
+
+int	i, j, nc, nl, ncols, c1, c2, l1, l2, l3, l4
+long	v[IM_MAXDIM]
+$if (datatype == silr)
+real	a, b, c, d, val
+$else
+PIXEL	a, b, c, d, val
+$endif
+PIXEL	indef
+pointer	pm, data, bp
+
+bool	pm_linenotempty()
+pointer	imgl2$t(), xt_fpval$t()
+
+begin
+	# If there are no bad pixels just get the image line and return.
+	if (fp == NULL)
+	    return (imgl2$t (im, line))
+
+	# Initialize
+	pm = FP_PM(fp)
+	nc = IM_LEN(im,1)
+	nl = IM_LEN(im,2)
+	ncols = FP_NCOLS(fp)
+	call amovkl (long(1), v, IM_MAXDIM)
+	v[2] = line
+
+	# If there might be column interpolation initialize value arrays.
+	if (ncols > 0 && FP_PV1(fp) == NULL) {
+	    FP_PIXTYPE(fp) = TY_PIXEL
+	    call malloc (FP_PV1(fp), ncols, FP_PIXTYPE(fp))
+	    call malloc (FP_PV2(fp), ncols, FP_PIXTYPE(fp))
+	    indef = INDEF
+	    call amovk$t (indef, Mem$t[FP_V1(fp,1)], ncols)
+	    call amovk$t (indef, Mem$t[FP_V2(fp,1)], ncols)
+	}
+
+	# If there are no bad pixels in the line and the line contains
+	# no column interpolation endpoints return the data directly.
+	# Otherwise get the line and fill in any endpoints that may
+	# be used later.
+
+	if (!pm_linenotempty (pm, v)) {
+	    if (line < FP_LMIN(fp) || line > FP_LMAX(fp))
+		return (imgl2$t (im, line))
+	    else
+		return (xt_fpval$t (fp, im, line))
+	}
+
+	# Get the pixel mask.
+	call malloc (bp, nc, TY_SHORT)
+	call pmglps (pm, v, Mems[bp], 0, nc, PIX_SRC)
+	bp = bp - 1
+
+	# Check if any column interpolation endpoints are needed and
+	# set them.  Set any other endpoints on the same lines at
+	# the same time.
+
+	if (line >= FP_LMIN(fp) && line < FP_LMAX(fp)) {
+	    j = 1
+	    do i = col1, col2 {
+		if (Mems[bp+i] == FP_CVAL(fp)) {
+		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
+			;
+		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
+			if (line>FP_L1(fp,j) && line<FP_L2(fp,j)) {
+			    if (IS_INDEF(Mem$t[FP_V1(fp,j)]))
+				data = xt_fpval$t (fp, im, FP_L1(fp,j))
+			    if (IS_INDEF(Mem$t[FP_V2(fp,j)]))
+				data = xt_fpval$t (fp, im, FP_L2(fp,j))
+			}
+		    }
+		}
+	    }
+	}
+
+	# Fix pixels by column or line interpolation.
+	if (FP_DATA(fp) == NULL) {
+	    FP_PIXTYPE(fp) = TY_PIXEL
+	    call malloc (FP_DATA(fp), nc, FP_PIXTYPE(fp))
+	}
+	data = FP_DATA(fp)
+	call amov$t (Mem$t[xt_fpval$t(fp,im,line)], Mem$t[data], nc)
+	j = 1
+	for (c1=col1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
+	    ;
+	while (c1 <= col2) {
+	    c1 = c1 - 1
+	    for (c2=c1+2; c2<=col2 && Mems[bp+c2]!=0; c2=c2+1)
+		;
+	    a = INDEF
+	    do i = c1+1, c2-1 {
+		if (Mems[bp+i] == FP_LVAL(fp)) {
+		    if (IS_INDEF(a)) {
+			if (c1 < col1 && c2 > col2) {
+			    c1 = c2 + 1
+			    next
+			}
+			if (c1 >= col1)
+			    a = Mem$t[data+c1-1]
+			else
+			    a = Mem$t[data+c2-1]
+			if (c2 <= col2)
+			    b = (Mem$t[data+c2-1] - a) / (c2 - c1)
+			else
+			    b = 0.
+		    }
+		    val = a + b * (i - c1)
+		    if (fd != NULL) {
+			call fprintf (fd, "%4d %4d %8g %8g")
+			    call pargi (i)
+			    call pargi (line)
+			    call parg$t (Mem$t[data+i-1])
+			    $if (datatype == silr)
+			    call pargr (val)
+			    $else
+			    call parg$t (val)
+			    $endif
+			if (c1 >= col1) {
+			    call fprintf (fd, " %4d %4d")
+			    call pargi (c1)
+			    call pargi (line)
+			}
+			if (c2 <= col2) {
+			    call fprintf (fd, " %4d %4d")
+			    call pargi (c2)
+			    call pargi (line)
+			}
+			call fprintf (fd, "\n")
+		    }
+		} else {
+		    for (; j<=ncols && FP_COL(fp,j)!=i; j=j+1)
+			;
+		    for (; j<=ncols && FP_COL(fp,j)==i; j=j+1) {
+			l1 = FP_L1(fp,j)
+			l2 = FP_L2(fp,j)
+			if (l1 < line1 && l2 > line2)
+			    next
+			if (line > l1 && line < l2) {
+			    if (l1 >= line1)
+				c = Mem$t[FP_V1(fp,j)]
+			    else
+				c = Mem$t[FP_V2(fp,j)]
+			    if (l2 <= line2) {
+				d = (Mem$t[FP_V2(fp,j)] - c) / (l2 - l1)
+				val = c + d * (line - l1)
+			    } else
+				val = c
+			    l3 = l1
+			    l4 = l2
+			}
+		    }
+		    if (fd != NULL) {
+			call fprintf (fd, "%4d %4d %8g %8g")
+			    call pargi (i)
+			    call pargi (line)
+			    call parg$t (Mem$t[data+i-1])
+			    $if (datatype == silr)
+			    call pargr (val)
+			    $else
+			    call parg$t (val)
+			    $endif
+			if (l1 >= line1) {
+			    call fprintf (fd, " %4d %4d")
+			    call pargi (i)
+			    call pargi (l3)
+			}
+			if (l2 <= line2) {
+			    call fprintf (fd, " %4d %4d")
+			    call pargi (i)
+			    call pargi (l4)
+			}
+			call fprintf (fd, "\n")
+		    }
+		}
+		$if (datatype == sil)
+		Mem$t[data+i-1] = nint (val)
+		$else
+		Mem$t[data+i-1] = val
+		$endif
+	    }
+	    for (c1=c2+1; c1<=col2 && Mems[bp+c1]==0; c1=c1+1)
+		;
+	}
+
+	call mfree (bp, TY_SHORT)
+	return (data)
+end
+
+
+# XT_FPVAL -- Get data for the specified line and set the values for
+# all column interpolation endpoints which occur at that line.
+
+pointer procedure xt_fpval$t (fp, im, line)
+
+pointer	fp			#I FIXPIX pointer
+pointer	im			#I Image pointer
+int	line			#I Line
+
+int	i
+pointer	data, imgl2$t()
+
+begin
+	# Set out of bounds values to 0.  These are not used but we need
+	# to cancel the INDEF values.
+	if (line < 1 || line > IM_LEN(im,2)) {
+	    do i = 1, FP_NCOLS(fp) {
+		if (line == FP_L1(fp,i))
+		    Mem$t[FP_V1(fp,i)] = 0.
+		else if (line == FP_L2(fp,i))
+		    Mem$t[FP_V2(fp,i)] = 0.
+	    }
+	    return (NULL)
+	}
+
+	data = imgl2$t (im, line)
+	do i = 1, FP_NCOLS(fp) {
+	    if (line == FP_L1(fp,i))
+		Mem$t[FP_V1(fp,i)] = Mem$t[data+FP_COL(fp,i)-1]
+	    else if (line == FP_L2(fp,i))
+		Mem$t[FP_V2(fp,i)] = Mem$t[data+FP_COL(fp,i)-1]
+	}
+
+	return (data)
+end
+
+$endfor

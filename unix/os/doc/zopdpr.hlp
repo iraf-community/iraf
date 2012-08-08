@@ -1,0 +1,37 @@
+.help zopdpr May84 "System Interface"
+.ih
+NAME
+zopdpr -- open a detached process
+.ih
+SYNOPSIS
+.nf
+zopdpr (process_name, bkgfile, jobcode)
+
+packed	char process_name[]		# executable file name
+packed	char bkgfile[]			# job file
+int	jobcode				# job number of bkg job
+.fi
+.ih
+DESCRIPTION
+A background job is queued for execution at some unspecifiable future time.
+The process named by the executable file \fIprocess_name\fR will eventually
+execute as a detached process, i.e., independently of the parent process.
+When the process runs it will read the file \fIbkgfile\fR to determine what
+to do.  The format of the background file is application dependent.
+Deletion of the background file indicates that the background job
+has terminated.
+.ih
+RETURN VALUE
+ERR is returned if the background job cannot be queued for some reason.
+If the operation is successful \fIjobcode\fR contains the positive nonzero
+magic integer assigned by the kernel or by the host system to the job.
+.ih
+NOTES
+The background job may execute immediately or may be placed in a queue
+and executed at some later time, depending on the implementation chosen
+for a particular host system.  The significance of \fIjobcode\fR is
+machine dependent.
+.ih
+SEE ALSO
+zcldpr, zopcpr
+.endhelp

@@ -1,0 +1,24 @@
+# WCSLAB 
+
+$checkout libpkg.a ../
+$update libpkg.a
+$checkin libpkg.a ../
+$checkout libds.a ../
+$update libds.a
+$checkin libds.a ../
+$exit
+
+libpkg.a:
+	t_wcslab.x	<gset.h> <imhdr.h>
+	;
+
+libds.a:
+	wlutil.x	<imio.h> <imhdr.h> <gset.h> <math.h>
+	wcslab.x	<gset.h> <imhdr.h> <mwset.h> <math.h> "wcslab.h"\
+			"wcs_desc.h" <ctype.h>
+	wlwcslab.x	<gio.h> <gset.h> "wcslab.h" "wcs_desc.h"
+	wlsetup.x	<gset.h> <mach.h> <math.h> <math/curfit.h>\
+			"wcslab.h" "wcs_desc.h"
+	wlgrid.x	<gset.h> <math.h> "wcslab.h" "wcs_desc.h"
+	wllabel.x	<gset.h> <math.h> "wcslab.h" "wcs_desc.h"
+	;

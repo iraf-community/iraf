@@ -1,0 +1,43 @@
+.help bases Jan85 utilities
+.ih
+NAME
+bases -- Convert an integer to hex, octal, and binary
+.ih
+USAGE
+bases i
+.ih
+PARAMETERS
+.ls i
+Integer for base conversion.
+.le
+.ls nbyte = 0
+Number of bytes of precision.  Allowed values are "0", "1", "2", or "4".
+.le
+.ls verbose = yes
+Print labels for columns?
+.le
+.ih
+DESCRIPTION
+The BASES task converts an input integer value to equivalent values in
+other base systems.
+.ih
+EXAMPLES
+1. Convert the number 256 (in various bases).  Note the 'x' and 'b' suffix
+appended to the value to change the input base value:
+
+.nf
+	ecl> bases 256					# decimal input
+	  dec    hex    octal   7654 3210 7654 3210
+	  256   0100x  000400b  0000 0001 0000 0000
+	ecl> bases 256x					# hex input
+	  dec    hex    octal   7654 3210 7654 3210
+	  598   0256x  001126b  0000 0010 0101 0110
+	ecl> bases 256b					# octal input
+	  dec  hex  oct   7654 3210
+	  174  AEx  256b  1010 1110
+
+.fi
+
+.ih
+SEE ALSO
+.endhelp

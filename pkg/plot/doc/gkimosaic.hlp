@@ -1,0 +1,110 @@
+.help gkimosaic Mar87 plot
+.ih
+NAME
+gkimosaic -- condense metacode frames to fit on one page
+.ih
+USAGE
+gkimosaic input
+.ih
+PARAMETERS
+.ls input
+The metacode input, which can be redirected from STDIN or read from
+one or more binary metacode files.
+.le
+.ls output = ""
+If \fBoutput\fR is specified, the mosaiced metacode is spooled to this
+file for later plotting.
+.le
+.ls device = "stdgraph"
+Output plotting device.
+.le
+.ls nx = 2
+The number of plots to draw in the x direction.
+.le
+.ls ny = 2
+The number of plots to draw in the y direction.
+.le
+.ls fill = no
+The plots are reduced by equal factors in x and y when \fBfill\fR = no. 
+.le
+.ls rotate = no
+Output the mosaiced plots rotated by 90 degrees.
+.le
+.ls interactive = yes
+If plotting to \fBstdgraph\fR, interactively examine each page of plots.
+.le
+.ls cursor = "stdgcur"
+Source of cursor input.
+.le
+.ih
+DESCRIPTION
+Task \fBgkimosaic\fR condenses the plots in a metacode file to fit
+on a single page.  The plots can be examined interactively after
+each pageful.  The number of plots in x and y can be specified.  This
+task is useful for browsing through a large metacode file, and for
+compactly plotting a large number of metacode frames.
+
+When \fBfill\fR = no, the plots will be
+reduced by equal factors in x and y; the aspect ratio of the original 
+plot is preserved.  When \fBfill\fR = yes, the transformations in x and
+y are handled separately, meaning that the reduction factors will not
+be equal unless \fBnx\fR = \fBny\fR.  
+
+The mosaiced plots are drawn on the page rotated by 90 degrees
+when \fBrotate\fR = yes.  This means the x axis of the plots can be
+placed along either the page width or length.
+The plots can be output to a plotting \fBdevice\fR,
+or spooled in file \fBoutput\fR for later plotting.
+
+If plotting to \fBstdgraph\fR, the plot can be interactively
+examined after each page of output by setting \fBinteractive\fR = yes.
+The world coordinate system information of the individual plots has 
+been retained for cursor readback.
+Standard cursor mode keystroke commands are available as well as the
+\fIgkimosaic\fR specific commands listed below.  Colon commands :nx, :ny, 
+:fill and :rotate take effect on the next page of output.  Command :skip
+allows you to browse through a metacode file, skipping either forward or
+backward by N input plots.
+.nf
+
+	q				quit
+	return				quit
+	spacebar			continue
+	?				print help information
+
+	:nx N				change value of nx to N
+	:ny N				change value of ny to N
+	:fill yes, :fill+, :fill	sets fill = yes
+	:fill no, :fill-		sets fill = no
+	:rotate yes, :rotate+, :rotate	sets rotate = yes
+	:rotate no, :rotate-		sets rotate = no
+	:skip +/-N			skip forward/backward N plots
+
+.fi
+.ih
+EXAMPLES
+1. Plot every frame in the metacode file "oned.plots".  There will be 4 plots
+to the page originally, but this can be overridden interactively.
+
+    cl> gkimosaic oned.plots
+
+2. Extract every third plot from the metacode file "oned.plots" with task
+\fIgkiextract\fR and plot them four to a page.
+
+    cl> gkiextract oned.plots 1-99x3 | gkimosaic
+
+3. Plot all frames in every metacode file beginning with "mcode." and
+condense them so 16 fit on a page.  The metacode is being spooled;
+it will be plotted, perhaps, when the computer isn't so busy.  Interactive
+mode is automatically disabled when not plotting to a graphics terminal.
+
+    cl> gkimosaic mcode.* nx=4 ny=4 output=plt.spool
+.ih
+BUGS
+Setting \fBdevice\fR to "stdvdm" does not work.  To produce an output file
+of mosaiced metacode, use the \fIoutput\fR parameter or the ">G" graphics 
+stream redirection feature of the cl.
+.ih
+SEE ALSO
+gkidir, gkiextract
+.endhelp

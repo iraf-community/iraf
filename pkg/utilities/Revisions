@@ -1,0 +1,178 @@
+.help revisions Jun88 pkg.utilities
+.nf
+
+mkpkg
+utilities.hd
+lcase.x	-> t_lcase.x
+luase.x	-> t_ucase.x
+split.x	-> t_split.x
+detab.x	-> t_detab.x
+entab.x	-> t_entab.x
+doc/bases.hlp			+
+    Renamed files, added help page for BASES task. (10/24/11)
+
+
+=======
+V2.12.2
+=======
+
+utilities$urand.x
+    Modified method based on clktime for generating a new seed when
+    the users specifies it as INDEF so that it doesn't have a 1 second
+    granularity.  (8/7/03, Valdes)
+
+=====
+V2.12
+=====
+
+utilities$mkpkg
+    Added missing dependencies.  (10/11/99, Valdes)
+
+utilities$curfit.gx
+utilities$curfit.x
+    Removed an unneccessay include file statmenet. (9/22/99, Davis)
+
+=======
+V2.11.2
+=======
+
+utilities$surfit.par
+utilities$t_surfit.x
+utilities$doc/surfit.hlp
+    Added support for the half cross-terms option to the surfit task. This
+    involved changing the type of the xterms parameter from boolen (yes/no)
+    to string (none,half,full) but involved no other interface changes.
+    (7/6/99, Davis)
+
+utilities$doc/surfit.hlp
+    Fixed minor formating problem.  (4/22/99, Valdes)
+
+=======
+V2.11.1
+=======
+
+utilities$urand.x
+utilities$doc/urand.hlp
+    If the "seed" parameter is set to INDEF then the clock time (integer
+    seconds since 1980) will be used as the seed.  This allows different
+    executions to produce different random numbers.
+    (9/23/97, Valdes)
+
+===========
+V2.11export
+===========
+
+utilities$curfit.gx
+    Removed repeated output and added a comment character to the table
+    header line.  (2/29/95, Valdes)
+
+utilities$t_polyfit.x
+    Revoved the dependent variable normalization which was not doing anything
+    to improve the numerical statbility of the routine and which was causing
+    problems in the computation of the reduced chi-squared and standard
+    deviation statistics.
+    (7/11/94 LED)
+
+utilities$t_polyfit.x
+utilities$pfregres.f
+    Added a trap for rmul values < 0.0 and > 1.0 to the polyfit routine
+    to avoid floating operand errors caused by trying to take the square
+    route of a negative number.
+    (6/20/94 LED)
+
+utilities$curfit.gx
+    Removed the graph limit setting so that the graph will be automatically
+    drawn with the default buffer distance from the end of the data.
+    Previously the end datapoints would fall right on the axes.
+    (5/10/94, Valdes)
+
+utilities$t_surfit.x +
+utilities$surfit.par +
+utilities$doc/surfit.hlp +
+utilities$x_utilities.x
+utilities$mkpkg
+utilities$utilities.cl
+utilities$utilities.men
+utilities$utilities.hd
+    A task for fitting a 2D function or "surface" to an irregularly
+    sampled set of x, y, and z points has been added.  (7/6/93, Valdes)
+
+utilities$curfit/t_curfit.x,curfit.gx
+    Curfit was failing if the input file list contained more than one
+    file or image. The problem was that ic_open was being called
+    before the file loop but ic_close(rd) was being called after every
+    fit leaving a null pointer in place for the second file.
+    (7/30/90 LED)
+
+utilities$doc/polyfit.hlp
+    Added the missing "statistical" heading under the weighting section.
+    (7/23/90 LED)
+    
+utilities$lcase.x
+    Changed the default output file name extension from ".uc" to ".lc".
+    (3/7/90 LED)
+
+utilities$t_curfit.x
+    For list input only, curfit now sorts the input array before fitting.
+    Sorted data is required by the rg_ranges procedure (even in the
+    default case of sample=*) or else data points will be ommitted from
+    the fit.  (24/6/88 ShJ)
+
+utilities$t_curfit.x,curfit.gx
+    Davis, December 2, 1987
+    1. Added a new parameter weighting to the curfit task. The four weighting
+    options are uniform, user, statistical and instrumental. The weights in
+    the four cases are 1.0, user input, 1/y and 1/sigmay ** 2. In the latter
+    case the weight that the user supplies is interpreted as sigmay. All
+    four options are available if input is from a list or STDIN. If input
+    is from an image section only the uniform and statistical options are
+    available.
+
+utilities$t_polyfit.x
+    Davis, November 23, 1987.
+    1. Added a new parameter weighting to the polyfit task. The three
+    weighting options are instrumental, uniform and statistical. The
+    weights in the three cases are 1./sigy ** 2, 1.0 and 1/y consistent
+    with the Bevington definitions. If the weighting is instrumental
+    the user must supply the error in y as well as x and y.
+
+utilities$*x
+    Valdes, February 17, 1987
+    1.  Required GIO changes.
+
+utilities$t_curfit.x, curfit.gx:  Valdes, July 3, 1986
+    1.  Modified CURFIT to use new ICFIT package.
+
+________________________________________
+
+From:  Valdes	Mar 14, 1986
+Task:  Curfit
+
+1.  The CURFIT task has been modified to allow switching between single
+and double precision calculations.  Generally double precision is used
+but this task provides a convenient test facility for testing changes
+in the mathematical routines or which precision is appropriate for a
+new task being developed.
+
+2.  The help page was updated.
+
+________________________________________
+
+From:  Hammond	Jan 6, 1986
+Task:  Curfit
+
+1. A new task, Curfit, has been installed.  It is the cl interface to
+   the curfit package and allows for interactive fitting of functions
+   to list or image data.  The function types supported are Legendre
+   or Chebyshev polynomials and linear or cubic splines.
+
+__________________________________________
+
+From:	Hammond	Dec 19, 1985
+Task:	Polyfit
+
+1.  Polyfit no longer gets a floating divide by zero when a linear fit
+    has a correlation = 1.  The problem was in the error calculation (ftest)
+    portion of the Bevington routine regres.  This problem was reported
+    by ST.
+.endhelp

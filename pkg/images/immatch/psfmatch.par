@@ -1,0 +1,40 @@
+# The PSFMATCH parameters
+
+input,f,a,,,,Input images
+reference,f,a,,,,Reference images or reference psfs
+psfdata,f,a,,,,Objects lists or input psfs 
+kernel,f,a,"",,,Input/output convolution kernels
+output,f,h,"",,,Output convolved images
+
+convolution,s,h,"image","|image|psf|kernel|",,Kernel computation method
+dnx,i,h,31,,,X width of data region to extract
+dny,i,h,31,,,Y width of data region to extract
+pnx,i,h,15,,,X width of convolution kernel
+pny,i,h,15,,,Y width of convolution kernel
+
+center,b,h,"yes",,,Center the psf objects ?
+background,s,h,"median",,,Background fitting function
+loreject,r,h,INDEF,,,Low sigma rejection threshold
+hireject,r,h,INDEF,,,High sigma rejection threshold
+apodize,r,h,0,,,Fraction of endpoints to apodize
+
+fluxratio,s,h,INDEF,,,The reference to input integrated flux ratio
+filter,s,h,"replace","|none|cosbell|replace|model|",,Filter/replace option
+sx1,r,h,INDEF,,,Inner x spectral frequency for cosine bell filter
+sx2,r,h,INDEF,,,Outer x spectral frequency for cosine bell filter
+sy1,r,h,INDEF,,,Inner y spectral frequency for cosine bell filter
+sy2,r,h,INDEF,,,Outer y spectral frequency for cosine bell filter
+radsym,b,h,no,,,Radial symmetry for cosine bell filter ?
+threshold,r,h,0.2,0.0,1.0,Threshold in fourier spectrum for modeling/replacing
+normfactor,r,h,1.0,,,The kernel normalization factor
+
+boundary,s,h,'nearest',"|constant|nearest|reflect|wrap|",,Boundary extension
+constant,r,h,0.0,,,Constant for constant boundary extension
+
+interactive,b,h,no,,,Interactive mode ?
+verbose,b,h,yes,,,Verbose mode ?
+graphics,s,h,"stdgraph",,,The default graphics device
+display,s,h,"stdimage",,,The default display device
+gcommands,*gcur,h,"",,,Graphics cursor
+icommands,*imcur,h,"",,,Image display cursor
+mode,s,h,"ql"
