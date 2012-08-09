@@ -1,0 +1,14 @@
+This is a sequence of interactive commands that you can use to do
+a cursory check of whether IRAF is working.
+
+imheader dev$pix
+imheader dev$pix long=yes
+hselect dev$pix IRAF-MAX,IRAF-MIN yes
+
+prow dev$pix 5
+
+contour dev$coot interval=15
+
+implot dev$coot step=20
+	press j,k,q
+

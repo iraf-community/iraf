@@ -1,0 +1,55 @@
+#!/bin/csh
+#
+# See BUILD_NOTES for details
+#
+# This is a csh script because it uses stuff that comes with IRAF
+
+source build.setup
+
+env | sort
+pwd
+
+# Record determination of IRAFARCH for later use by ur-sel-real,
+# ur-normalize etc. Also note that IRAF 2.15 now has a helper script
+# hlib/irafarch.csh that we could use to figure out IRAFARCH above.
+if (! -e ur) then
+    mkdir ur
+endif
+echo $IRAFARCH > ur/irafarch
+
+yes '' | unix/hlib/install
+
+rm -rf include ; mkdir include
+
+# cp $iraf/unix/hlib/libc/iraf.h  		include/
+# ln -s $iraf/unix/bin/f2c.h			include/
+ln -s ../unix/hlib/libc/iraf.h			include/  # ur-normalized copy
+ln -s ../unix/bin/f2c.h				include/  # relocatable link
+cp $iraf/unix/hlib/libc/vosproto.h 		include/
+cp $iraf/unix/boot/xyacc/yaccpar.x 		include/
+
+touch $iraf/extern/.zzsetenv.def
+
+( cd unix/f2c/src ; make -f makefile.u ; cp f2c $iraf/unix/bin.$IRAFARCH/f2c.e ) >& log.f2c
+if ( $status != 0 ) then
+	echo f2c compile failed - see log.f2c
+	exit 1
+endif
+
+( cd unix/f2c/libf2c ; make -f makefile.u CFLAGS="$CFLAGS" ; cp f2c.h libf2c.a $iraf/unix/bin.$IRAFARCH/ ) >& log.libf2c
+if ( $status != 0 ) then
+	echo libf2c compile failed - see log.libf2c
+	exit 1
+endif
+
+make $IRAFARCH 
+
+source $iraf/unix/hlib/irafuser.csh
+
+# this is all that "make sysgen" does
+util/mksysgen >& log.mksysgen
+
+tr -d '[\015]' < log.mksysgen | egrep -v -f mkpkg_patterns
+set st=$status
+
+exit $st

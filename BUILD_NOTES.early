@@ -1,0 +1,111 @@
+[ This contains important history of how we got this build to work at all. ]
+
+From the IRAF README:
+
+    - I want to build the IRAF system from source:
+
+        1)  Download the iraf-src.tar.gz (or as.pcix.gen.gz) source-only 
+            distribution file
+        2)  Create a new iraf root directory and unpack the distro
+        3)  Define $iraf, $IRAFARCH in your environment and source the
+            $iraf/unix/hlib/irafuser.csh script.  Note a C-shell is required
+            for this step
+        4)  Run the $iraf/unix/hlib/install script to install the system
+        5)  Configure the directory tree for the proper architecture and
+            compile, e.g. on a 64-bit linux system:
+
+                % cd /iraf/iraf
+                % setenv iraf /iraf/iraf/       <-- trailing '/' required
+                % setenv IRAFARCH linux64       <-- set system architecture
+                % source $iraf/unix/hlib/irafuser.csh
+                % make linux64                  <-- reset system
+                % make sysgen                   <-- compile from source
+
+        In future versions this process will be made more robust and 
+        automatic, the above steps should compile the complete system.
+
+
+What it means:
+
+	svn checkout -q file:///eng/ssb/irafsvn/trunk iraf
+	cd iraf
+
+	setenv iraf $cwd/
+
+	linux 32 bit:		[works]
+		setenv IRAFARCH linux
+		setenv CFLAGS -m32
+		# works, arzach
+
+	mac leopard 64 bit:	[not compile]
+		setenv IRAFARCH macintel
+		setenv CFLAGS -m64
+
+	mac leopard 32 bit:	[?]
+		setenv IRAFARCH macosx
+		setenv CFLAGS -m32 
+
+	linux 64 bit:		[?]
+		setenv IRAFARCH linux64
+		setenv CFLAGS -m64
+		# works, arzach
+
+	other stuff:
+		setenv IRAFARCH macosx
+		setenv IRAFARCH linux64
+		setenv CFLAGS -m32
+
+	set path = ( $iraf/bin_directory `echo $path | sed 's?/usr/local/bin??' ` )
+
+	source $iraf/unix/hlib/irafuser.csh
+
+
+	unix/hlib/install
+		press return at all prompts
+
+	rm -rf include ; mkdir include
+
+	cp $iraf/unix/hlib/libc/iraf.h  		include/
+	# cp $iraf/unix/f2c/src/f2c.h 			include/ 
+	ln -s $iraf/unix/bin/f2c.h			include/
+	cp $iraf/unix/hlib/libc/vosproto.h 		include/
+	cp $iraf/unix/boot/xyacc/yaccpar.x 		include/
+
+	# touch $iraf/extern/.zzsetenv.def
+
+	( cd unix/f2c/src ; make -f makefile.u ; cp f2c $iraf/unix/bin.$IRAFARCH/f2c.e )
+
+	( cd unix/f2c/libf2c ; make -f makefile.u CFLAGS="$CFLAGS" ; cp f2c.h libf2c.a $iraf/unix/bin.$IRAFARCH/ )
+
+	make $IRAFARCH 
+
+	# this is all that "make sysgen" does
+	util/mksysgen >& logfile
+
+	tr -d '[\015]' < logfile | egrep -v -f mkpkg_patterns
+
+	try it out with commands in $iraf/interactive_tests
+
+### 
+
+	PROBLEMS:
+
+	direct reference to /usr/include/iraf.h
+        - fixed by patching mkpkg.inc
+
+	direct reference to /iraf
+	
+"./unix/boot/spp/xc.c"
+	look at special handling for mac
+	look at special -mn32/-m64 stuff
+
+"./unix/hlib/sysinfo" 
+"./unix/hlib/ecl.csh"
+"./unix/hlib/install.port"
+./local/*
+"./sys/gio/calcomp/vttest.x"
+	maybe not being compiled?  Includes stuff from /iraf but
+	doesn't cause a build error
+
+unix/os/zxwhen.c has debug_sig=0; change to 1 to get core dumps
+

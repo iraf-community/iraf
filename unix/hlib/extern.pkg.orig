@@ -1,0 +1,41 @@
+# External (non core-system) packages.  To install a new package, add the
+# two statements to define the package root directory and package task,
+# then add the package helpdb to the `helpdb' list.
+
+reset	extern		= iraf$extern/
+
+reset	noao		= iraf$noao/
+task	noao.pkg	= noao$noao.cl
+
+reset	vo		= iraf$vo/
+task	vo.pkg		= vo$vo.cl
+
+#reset	local		= iraf$local/
+#task	local.pkg	= local$local.cl
+
+
+# Manually defined external packages.  Packages installed in the iraf$extern
+# directory will be loaded dynamically, other packages may be defined here
+# if for some reason they are non-standard and cannot be loaded dynamically. 
+#
+# Package definitions have the form:
+#
+#   reset example	= extern$example/	   <--- must have trailing '/'
+#   task  example.pkg	= example$example.cl
+#
+# Note the 'helpdb' string below must also be modified.
+
+
+
+# Initialize the helpdb string.  We'll add to this when dyanamically 
+# loading packages when the next load the CLPACKAGE.
+reset	helpdb		= "lib$helpdb.mip\
+			  ,noao$lib/helpdb.mip\
+			  ,vo$lib/helpdb.mip\
+#			  ,example$lib/helpdb.mip\
+			  "
+
+
+# Do not modify below this line!
+clpackage
+keep

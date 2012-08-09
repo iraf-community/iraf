@@ -1,0 +1,70 @@
+:$
+^copy `.*\.[xh]' to `.*\.[xh]'
+^copy .*\.[xh] to .*\.[xh]
+^Warning: library.*not found
+^xc *-
+^ar r 
+^ranlib 
+^Updated .* files in 
+^ar: creating
+^[wW]arning.* not found
+^generic -k
+^move .* to 
+^Library .* is up to date
+^Object .* is up to date
+^check out file 
+^check file .* into 
+^deleting any dreg .e files
+^archiving and deleting [a-z]* objects...
+^$
+^===================
+^--------------
+^Subdirectory.* is up to date
+^NOTE:  CFITSIO
+^build_stsdas_mkpkg
+^!date$
+^[SMTWTFS][a-z][a-z] .* 2009$
+^[SMTWTFS][a-z][a-z] .* 201[0-9]$
+^purge directory .*bin
+^generic uimgmp.gx -k -o gen/uimgmp.x 
+^generic uimpmp.gx -k -o gen/uimpmp.x 
+^!/usr/stsci/irafdev/iraf/unix/hlib//mkfloat.csh macintel -d lib pkg
+Warning: local variable .* never used
+^!/usr/stsci/irafx/iraf/unix/hlib//mkfloat.csh macintel -d lib pkg
+^No match
+^system is already configured for 
+^archiving and deleting redhat objects... restoring archived macintel objects... no object archive found; full sysgen will be needed
+statement not reached
+^ld: warning alignment lost in merging tentative definition _xercom_
+warning: empty translation unit$
+^ranlib: file: .* has no symbols
+^a - [a-z0-9_]*\.o
+^delete file [a-z]*\.[cx]
+^install HSI executables in 
+^!clear;date
+^[+]
+^purge directory 
+^Clean.*directories.*Done
+^Clean.*files.*Done
+^checking for .*[.][.][.] [a-z]*
+^checking whether .*[.][.][.] [a-z]*
+^checking how to .*[.][.][.] [a-z]*
+^checking if .*[.][.][.] [a-z]*
+^checking which .*[.][.][.] [a-z]*
+^checking configuration .*[.][.][.] [a-z]*
+^checking .* presence[.][.][.] [a-z]*
+^checking .* usability[.][.][.] [a-z]*
+^checking .* system type
+^Beginning configuration for readline-
+^checking return type of signal handlers... void
+^config.status:
+^configure:
+^mach = 
+^hmach = 
+^/bin/rm: No match.
+^rm -f 
+^rm -rf 
+^!
+^I refuse to clear the screen
+^libtool -a 
+^r - .*\.o$

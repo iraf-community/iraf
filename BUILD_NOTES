@@ -1,0 +1,15 @@
+Building this IRAF from source
+--
+
+./build 32
+
+./build.x11iraf 32
+
+
+--
+
+build and build.x11iraf both source build.setup to get the correct environment
+
+BUILD_NOTES.early contains notes about how we got this to work.  It gives
+some insight into the procedure that ./build uses.
+
