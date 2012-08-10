@@ -1,6 +1,12 @@
 /* MKPKG.H -- Global definitions for MKPKG.
  */
 
+#include <stdio.h>
+#include <ctype.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define	SZ_SBUF		10240	/* string buffer size (fixed)		*/
 #define	SZ_PBSTK	50	/* push back stack 			*/
 #define	SZ_PBBUF	2048	/* push back buffer			*/
@@ -115,9 +121,8 @@ char	*getargs();
 char	*makeobj();
 char	*getsym();
 char	*putstr();
-char	*malloc();
-char	*calloc();
 long	os_fdate();
 long	m_fdate();
 char	*index();
 char	*k_fgets();
+

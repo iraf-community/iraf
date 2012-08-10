@@ -13,4 +13,12 @@ done
 
 ar rv		libboot.a *.o; rm *.o
 $RANLIB		libboot.a
-mv -f		libboot.a ../../bin
+
+there=../../bin/libboot.a
+rm -f $there
+cp -f libboot.a $there
+
+there=$hlib/libboot.a
+rm -f $there
+cp -f libboot.a $there
+

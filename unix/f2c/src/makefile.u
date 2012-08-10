@@ -2,13 +2,12 @@
 
 .SUFFIXES: .c .o
 CC = cc
-CFLAGS = -O 
 SHELL = /bin/sh
 YACC = yacc
 YFLAGS =
 
 .c.o:
-	$(CC) -c $(CFLAGS) $*.c
+	$(CC) -c -O $(CFLAGS) $*.c
 
 OBJECTSd = main.o init.o gram.o lex.o proc.o equiv.o data.o format.o \
 	  expr.o exec.o intr.o io.o misc.o error.o mem.o names.o \
@@ -27,7 +26,7 @@ OBJECTS = $(OBJECTSd) $(MALLOC)
 all: f2c
 
 f2c: $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o f2c
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o f2c
 
 # The following used to be a rule for gram.c rather than gram1.c, but
 # there are too many broken variants of yacc around, so now we

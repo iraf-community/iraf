@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 /*
  * FDCACHE -- Maintain a cache of filenames and their associated modification

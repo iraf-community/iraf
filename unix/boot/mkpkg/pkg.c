@@ -284,7 +284,7 @@ next_:	    tok = gettok (cx, token, SZ_FNAME);
 		if (exit_status != OK && !ignore)
 		    return (exit_status);
 
-	    } else if (tok == TOK_END || tok == NULL) {
+	    } else if (tok == TOK_END || tok == 0) {
 		/* We have reached the end of the current module list (;),
 		 * executed a $EXIT, or seen EOF on the mkpkg file.  If the
 		 * file list is nonempty update the current library, restore
@@ -630,7 +630,7 @@ int	maxfiles;		/* maxfiles out			*/
 
 	save_cp = cp;
 
-	while ((token = gettok (cx, fname, SZ_FNAME)) != NULL) {
+	while ((token = gettok (cx, fname, SZ_FNAME)) != 0) {
 	    switch (token) {
 	    case TOK_NEWLINE:
 		goto done;
@@ -834,7 +834,7 @@ register struct context *cx;
 	 * and then continue locally.
 	 */
 	while ((tok = gettok (cx, curr, SZ_FNAME)) != TOK_BEGIN) {
-	    if (tok == NULL || tok == TOK_END) {
+	    if (tok == 0 || tok == TOK_END) {
 		/* Exit; no entry found.
 		 */
 		return (ERR);

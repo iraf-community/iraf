@@ -10,30 +10,52 @@ if (! $?iraf) then
     set  iraf 	= $cwd/
 endif
 
+env | sort
+pwd
+
+alias NOTE 'echo XXXXXXXXXX;echo XXXXXXXXXX;echo XXXXXXXXXX; echo util/mksysgen stage \!* '
 
 set  c_start	= `date`
 /bin/rm -f spool */spool
 
+NOTE mkclean
 
 $iraf/util/mkclean				# clean old binaries
+
+NOTE mkpkg.sh
 
 cd $iraf/unix					# NOVOS bootstrap
 source hlib/irafuser.csh
 sh -x mkpkg.sh |& tee -a spool
 
+NOTE mkpkg
+
 cd $iraf/					# build NOVOS
+
+env | sort
+pwd
+
 mkpkg |& tee -a spool
+
+NOTE mkpkg.sh again
 
 cd $iraf/unix					# VOS bootstrap
 source hlib/irafuser.csh
 sh -x mkpkg.sh |& tee -a spool
 
+NOTE mkpkg again
+
 cd $iraf/					# build core system
 mkpkg |& tee -a spool
+
+NOTE noao
 
 cd $iraf/noao					# build NOAO package
 setenv noao $cwd/
 mkpkg -p noao |& tee -a spool
+
+
+NOTE 'end'
 
 set  c_end	= `date`
 

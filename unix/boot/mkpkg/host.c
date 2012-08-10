@@ -29,7 +29,6 @@
  */
 
 #define	SZ_COPYBUF	4096
-#define	SZ_CMD		512		/* max size OS command	*/
 #define	SZ_LIBPATH	512		/* path to library */
 #define	LIBRARIAN	"ar"
 #define	LIBTOOL		"libtool"

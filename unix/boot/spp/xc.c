@@ -412,6 +412,25 @@ char	*argv[];
 	    }
 	}
 
+	/*
+	* always pass -I$iraf/include
+	*/
+	{
+	    char *iraf, *s;
+	    iraf = getenv("iraf");
+	    if (iraf) {
+		s = malloc(strlen(iraf) + sizeof("-I/include"));
+		if (!s) {
+		    perror("malloc");
+		    exit(1);
+		}
+		sprintf(s,"-I%s/include",iraf);
+		lflags[nflags++] = s;
+	    } else {
+		    /* bummer */
+	    }
+	}
+
 	/* Process command line options, make file lists.
 	 * Convert ".x" files to ".f".
 	 */
@@ -770,8 +789,6 @@ passflag:		    mkobject = YES;
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
 	        if (strcmp (irafarch, "macosx") == 0) {
 	            arglist[nargs++] = "-arch";
-	    	    arglist[nargs++] = "ppc";
-	            arglist[nargs++] = "-arch";
 	    	    arglist[nargs++] = "i386";
 	    	    arglist[nargs++] = "-m32";
 	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
@@ -849,8 +866,6 @@ passflag:		    mkobject = YES;
 	if (useg95 == 0) {
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
                 if (strcmp (irafarch, "macosx") == 0) {
-                    arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "ppc";
                     arglist[nargs++] = "-arch";
                     arglist[nargs++] = "i386";
                     arglist[nargs++] = "-m32";
@@ -961,8 +976,6 @@ passflag:		    mkobject = YES;
 	    if ((irafarch = os_getenv("IRAFARCH"))) {
                 if (strcmp (irafarch, "macosx") == 0) {
                     arglist[nargs++] = "-arch";
-                    arglist[nargs++] = "ppc";
-                    arglist[nargs++] = "-arch";
                     arglist[nargs++] = "i386";
                     arglist[nargs++] = "-m32";
 	    	    arglist[nargs++] = "-mmacosx-version-min=10.4";
@@ -1044,8 +1057,6 @@ passflag:		    mkobject = YES;
 	if (useg95 == 0 && (irafarch = os_getenv("IRAFARCH"))) {
             if (strcmp (irafarch, "macosx") == 0) {
                 arglist[nargs++] = "-arch";
-                arglist[nargs++] = "ppc";
-                arglist[nargs++] = "-arch";
                 arglist[nargs++] = "i386";
                 arglist[nargs++] = "-m32";
 	    	arglist[nargs++] = "-mmacosx-version-min=10.4";
@@ -1077,6 +1088,10 @@ passflag:		    mkobject = YES;
 
 	    if (os_sysfile ("gcc-specs", gcc_specs, SZ_PATHNAME) < 0)
 		arglist[nargs++] = "/iraf/iraf/unix/bin/gcc-specs";
+	error! 
+		If you get this syntax error, then you have to do something
+		about the absolute /iraf path used here.
+
 	    sprintf (cmd, "-specs=%s", gcc_specs);
 	    arglist[nargs++] = cmd;
 	}

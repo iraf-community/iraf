@@ -75,3 +75,6 @@ $else $ifeq (MACH, sunos) then
 $else $ifeq (MACH, cygwin) then
     $include "hlib$mkpkg.sf.CYGW"
 $end
+
+# Make xc pick up the copy of iraf.h in the local UR tree
+$set	XFLAGS		= "$(XFLAGS) -/I$(iraf)include"

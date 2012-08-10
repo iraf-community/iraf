@@ -83,10 +83,10 @@ case macosx:
     setenv CC 	cc
     setenv F2C 	$hbin/f2c.e
 
-    setenv HSI_CF "-O -DMACOSX -w -Wunused -arch ppc -arch i386 -m32 -mmacosx-version-min=10.4"
-    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//ppc -/arch -//i386 -/mmacosx-version-min=10.4"
-    setenv HSI_FF "-O -arch ppc -arch i386 -m32 -DBLD_KERNEL -mmacosx-version-min=10.4"
-    setenv HSI_LF "-arch ppc -arch i386 -m32 -mmacosx-version-min=10.4"
+    setenv HSI_CF "-O -DMACOSX -w -Wunused -arch i386 -m32 -mmacosx-version-min=10.4"
+    setenv HSI_XF "-Inolibc -/DMACOSX -w -/Wunused -/m32 -/arch -//i386 -/mmacosx-version-min=10.4"
+    setenv HSI_FF "-O -arch i386 -m32 -DBLD_KERNEL -mmacosx-version-min=10.4"
+    setenv HSI_LF "-arch i386 -m32 -mmacosx-version-min=10.4"
     setenv HSI_F77LIBS ""
     setenv HSI_LFLAGS ""
     setenv HSI_OSLIBS ""
@@ -182,10 +182,10 @@ endsw
 # Prepend a user <iraf.h> file to the compile flags in case we don't
 # install as root.
 #
-setenv HSI_CF  "-I${HOME}/.iraf/ $HSI_CF"
-setenv HSI_FF  "-I${HOME}/.iraf/ $HSI_FF"
-setenv HSI_LF  "-I${HOME}/.iraf/ $HSI_LF"
-setenv HSI_XF  "-I${HOME}/.iraf/ $HSI_XF"
+setenv HSI_CF  "-I${iraf}/include/ $HSI_CF"
+setenv HSI_FF  "-I${iraf}/include/ $HSI_FF"
+setenv HSI_LF  "-I${iraf}/include/ $HSI_LF"
+setenv HSI_XF  "-I${iraf}/include/ $HSI_XF"
 
 
 # The following determines whether or not the VOS is used for filename mapping.

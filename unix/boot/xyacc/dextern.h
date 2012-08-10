@@ -352,7 +352,7 @@ extern char *parser;
 #endif
 
 #ifndef PARSER
-#define	PARSER "/iraf/iraf/lib/yaccpar.x"
+#define	PARSER "yaccpar.x"
 #endif
 
 

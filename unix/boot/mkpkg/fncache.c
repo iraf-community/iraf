@@ -2,6 +2,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 /*
  * FNCACHE -- Maintain a cache of system logical filenames (e.g., <config.h>)
