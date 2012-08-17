@@ -15,8 +15,8 @@
 .SUFFIXES: .c .o
 CC 	= gcc
 SHELL 	= /bin/sh
-CFLAGS 	= -O -arch ppc -arch i386 -m32
-LFLAGS 	= -arch ppc -arch i386
+CFLAGS 	= -O -arch i386 -m32
+LFLAGS 	= -arch i386
 
 # compile, then strip unnecessary symbols
 .c.o:

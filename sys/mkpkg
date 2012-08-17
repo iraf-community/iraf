@@ -178,6 +178,7 @@ memdbg:
 	;
 
 libsys.a:				# Core system
+	! which xc
 	@fio	
 	@fmio
 	@fmtio

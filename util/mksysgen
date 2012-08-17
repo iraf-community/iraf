@@ -18,6 +18,7 @@ alias NOTE 'echo XXXXXXXXXX;echo XXXXXXXXXX;echo XXXXXXXXXX; echo util/mksysgen 
 set  c_start	= `date`
 /bin/rm -f spool */spool
 
+
 NOTE mkclean
 
 $iraf/util/mkclean				# clean old binaries

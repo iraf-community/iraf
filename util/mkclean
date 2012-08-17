@@ -71,6 +71,7 @@ end
 set mach 	= `$iraf/unix/hlib/irafarch.csh -actual`
 set hmach 	= `$iraf/unix/hlib/irafarch.csh -actual`
 
+echo "These architectures may not be what you are building, but it is what iraf is cleaning:"
 echo "mach = " $mach
 echo "hmach = " $hmach
 

@@ -119,7 +119,7 @@ do
 		shift 2
 		;;
 
-	-U)	CFLAGS="$CFLAGS -arch ppc -arch i386"
+	-U)	CFLAGS="$CFLAGS -arch i386"
 		shift
 		;;
 

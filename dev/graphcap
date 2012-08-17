@@ -10,6 +10,122 @@
 # END of site local additions.
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# START UR (Unified Release) devices
+# Entries picked from the STScI graphcap file.  I didn't bring over
+# everything because we have a bunch of printer-specific (i.e. HP in
+# room 340) stuff that would not make sense.  This is all magic to me,
+# so I'm just copying these things as-is.
+
+# PostScript file, 19 October 1989, Z. G. Levay, STScI
+psfl|UNIX interface to PostScript file dump (Landscape):\
+        :cw#.0125:ch#.0294:ar#.752:xs#0.254:ys#0.191:xr#3000:yr#2250:\
+        :XO#151:XW#3000:YO#151:YW#2250:\
+        :DD=psfl,tmp$sgk,!{ sgidispatch sgi2uapl $F -t -l$(XO) -w$(XW) \
+        -b$(YO) -h$(YW) -p$(PW) > $F.ps ; rm $F; }&:tc=sgi_apl:
+psfp|UNIX interface to PostScript file dump (Portrait):\
+        :cw#.017:ch#.0215:ar#1.33:xs#0.191:ys#0.254:xr#2250:yr#3000:YF:RO:\
+        :XO#151:XW#3000:YO#151:YW#2250:\
+        :DD=psfp,tmp$sgk,!{ sgidispatch sgi2uapl $F -t -l$(XO) -w$(XW) \
+        -b$(YO) -h$(YW) -p$(PW) > $F.ps ; rm $F; }&:tc=sgi_apl:
+psfsq|UNIX interface to PostScript file dump (Square):\
+        :cw#.0170:ch#.0215:ar#1.00:xs#0.191:ys#0.191:xr#2250:yr#2250:YF:RO:\
+        :XO#151:XW#2250:YO#151:YW#2250:\
+        :DD=psfp,tmp$sgk,!{ sgidispatch sgi2uapl $F -t -l$(XO) -w$(XW) \
+        -b$(YO) -h$(YW) -p$(PW) > $F.ps ; rm $F; }&:tc=sgi_apl:
+
+# psikern: Force plots to be simply black/white.
+psi_port_qm| PostScript Kernel with only black/white output:\
+        :LG=stsdas$lib/mono:ca@:fa@:tc=psi_port_q:
+psi_port_qsm| PostScript Kernel with only black/white output:\
+        :LG=stsdas$lib/mono:ca@:fa@:tc=psi_port_qs:
+psi_land_qm| PostScript Kernel with only black/white output:\
+        :LG=stsdas$lib/mono:ca@:fa@:tc=psi_land_q:
+psi_land_qsm| PostScript Kernel with only black/white output:\
+        :LG=stsdas$lib/mono:ca@:fa@:tc=psi_land_qs:
+psi_portm|PostScript Kernel, No Cell/Fill Portrait:\
+        :ca@:fa@:LG=stsdas$lib/mono:\
+        :tc=psi_port:
+psi_landm|psi_defm|PostScript Kernel, No Cell/Fill Landscape:\
+        :ca@:fa@:LG=stsdas$lib/mono:\
+        :tc=psi_land:
+
+# psikern: Plot destination is a UNIX printer queue.
+# '-l' was added to be able to print psikern generated files 
+# using CUPS. It bypasses CUPS's filters and sends
+# the file directly to the printer. (Apr 26, 2007, trac ticket #52)
+
+psi_port_q|PostScript Kernel send output to queue QQ, Portrait:\
+        :DD=psi_def,tmp$psk,!{ lpr -l -P$(QQ) $F ; rm $F ; }&:tc=psi_port:
+psi_land_q|PostScript Kernel send output to queue QQ, Landscape:\
+        :DD=psi_def,tmp$psk,!{ lpr -l -P$(QQ) $F ; rm $F ; }&:tc=psi_land:
+
+# psikern: Generic square output.
+psi_psq|PostScript Kernel square viewport:\
+        :PT:xs#0.1959:ys#0.1959:ar#1:cw#.02:ch#.02:\
+        :XO#0.01:YO#0.0581:xr#2313:yr#2313:\
+        :tc=psi_def:
+
+# psikern:
+# REQUIRED ENTRIES:  Below are the two basic definitions for the PostScript
+# kernel.  These definition define all the properties need by the kernel.
+# If these entries are used directly, they will create a PostScript file in
+# the tmp$ directory of the form pskxxxx where "xxxx" are random numbers.
+# The name of this file will be echoed to standard output when the GIO
+# buffer is flushed.  See the DD parameter.
+
+psi_port|psidbgp|PostScript Kernel default portrait:\
+        :ar#1.3241525:ch#.02:cw#.02644:\
+        :xr#2313:xs#0.1959:yr#3063:ys#0.2594:PT:\
+        :tc=psi_def:
+
+psi_def|psi_land|Postscript Kernel Default 8.5x11in 300dpi Landscape:\
+        :ar#0.7552:ca:ch#.02644:co#80:cw#.02:fa:fs#6:\
+        :kf=stsdas$bin/x_psikern.e:\
+        :li#24:lt#4:pl:pm:se:tf#4:tn=psikern:tq#1:tx:xr#3063:xs#0.2594:\
+        :yr#2313:ys#0.1959:zr#256:\
+        :BO:\
+        :DD=psi_def,tmp$psk,!{ echo $F; }&:\
+        :FB=Times-Bold:FG=Symbol:FI=Times-Italic:FR=Times-Roman:\
+        :IF=stsdas$lib/psikern_prolog.ps:\
+        :LG=stsdas$lib/invxgterm:\
+        :MF#100:PI#1.:PW#.00011:TD#.01221:TP#.001221:TS#.006104:\
+        :XO#0.001:YO#0.001:
+
+# Additional PostScript file output options, Inger Jorgensen March 16, 2000
+epsfp|epsf|eps|         :tc=uepsf:
+epsfsq|epssq|           :tc=uepsfsq:
+epsfpage|               :tc=uepsfpage:
+
+uepsfsq|uepssq|Encapsulated Postscript file (square) UNIX:\
+        :XO#300:XW#1950:YO#300:YW#1950:PW#1.2:\
+        :DD=eps,tmp$sgk,!{ sgidispatch sgi2ueps $F -l$(XO) \
+        -w$(XW) -b$(YO) -h$(YW) -p$(PW) > sgi$$.eps; rm $F; }&:tc=sgi_aplsq:
+sgi_aplsq|Apple Laserwriter (Postscript) 300dpi:\
+        :kf=bin$x_sgikern.e:tn=sgikern:cw#.0125:ch#.0294:\
+        :ar#1.0001:xs#0.267:ys#0.267:xr#2380:yr#2380:\
+        :MF#1:XO#90:XW#2380:YO#90:YW#2380:PW#2.4:
+
+uepsfpage|Encapsulated Postscript file (portrait - full page) UNIX:\
+        :XO#300:XW#1950:YO#300:YW#2700:PW#1.2:\
+        :cw#.017:ch#.0215:ar#1.312:xs#0.191:ys#0.254:xr#2250:yr#3000:\
+        :DD=eps,tmp$sgk,!{ sgidispatch sgi2ueps $F -l$(XO) \
+        -w$(XW) -b$(YO) -h$(YW) -p$(PW) > sgi$$.eps; rm $F; }&:tc=sgi_aplfp:
+sgi_aplfp|Apple Laserwriter (Postscript) 300dpi:\
+        :kf=bin$x_sgikern.e:tn=sgikern:cw#.0125:ch#.0294:\
+        :ar#1.312:xs#0.267:ys#0.203:xr#3180:yr#2380:\
+        :MF#1:XO#55:XW#3180:YO#90:YW#2380:PW#2.4:
+
+# Useful portrait color eps, IJ, May 17, 2000
+psi_npor|PostScript Kernel default portrait:\
+        :ar#1.3241525:ch#.02:cw#.02644:\
+        :xr#3063:xs#0.2594:yr#2313:ys#0.1959:PT:\
+        :tc=psi_def:
+
+
+# END UR (Unified Release) devices
+# ---------------------------------------------------------------------------
+
 # Special devices.
 vdm|stdvdm|Virtual Device Metafile:\
 	:co#80:li#35:xr#1024:yr#1024:zr#256:ar#.77:ch#.0294:cw#.0125:\

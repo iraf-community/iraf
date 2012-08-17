@@ -2,7 +2,7 @@
 
 .SUFFIXES: .c .o
 CC = gcc
-CFLAGS = -O -arch ppc -arch i386 -m32
+CFLAGS = -O -arch i386 -m32
 SHELL = /bin/sh
 YACC = yacc
 YFLAGS =
