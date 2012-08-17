@@ -29,6 +29,11 @@ cd $iraf/unix					# NOVOS bootstrap
 source hlib/irafuser.csh
 sh -x mkpkg.sh |& tee -a spool
 
+NOTE mklibs
+
+cd $iraf/vendor					# UR: build libs in vendor/
+./mklibs |& tee -a spool
+
 NOTE mkpkg
 
 cd $iraf/					# build NOVOS
