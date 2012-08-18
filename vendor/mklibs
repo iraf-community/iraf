@@ -7,7 +7,8 @@ setenv CC 	"gcc"
 setenv CXX 	"g++"
 
 set	build_cfitsio	= 1
-set	build_readline	= 1
+# UR: there's a readline in ecl & vocl but none here; not sure what this is for
+set	build_readline	= 0
 set	build_voclient	= 1
 
 
@@ -49,6 +50,23 @@ if ($build_readline == 1) then
   echo -n "    Building Readline libs ...."
   set	opts = "$gopts --bindir=../../bin --libdir=../../bin"
   (chdir readline ; mkpkg ; make clean 		 >& _spool)
+  echo "done"
+
+endif
+
+
+####################################################################
+####   UR: VO client
+####################################################################
+if ($build_voclient == 1) then
+
+  echo -n "    Building VO client ...."
+  set	opts = "$gopts --bindir=$top/bin --libdir=$top/bin"
+  (chdir voclient ;  \
+    make clean 					 >& _spool ; \
+    make 					>>& _spool ; \
+    make install 				>>& _spool)
+  # (chdir voclient ;  make clean			>>& _spool )
   echo "done"
 
 endif

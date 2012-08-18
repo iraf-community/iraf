@@ -50,7 +50,9 @@ clean:
 
 install: xrpc
 	(cp libxrpc.a ../libsamp.a)
-	cp -rp $(INCS) ./include/* ../../include
+	# cp -rp $(INCS) ./include/* ../../include  # tries to copy .svn!
+	cp -p $(INCS) ../../include
+        ( cd include && tar cf - --exclude=".svn" * | ( cd ../../../include; tar xf - ) )
 
 World:
 everything:
@@ -70,7 +72,8 @@ xrpc: $(SRCS:%.c=%.o)
 	cp $(OBJS) lib/build/
 	/usr/bin/ar rv libxrpc.a $?
 	(cp libxrpc.a ../libsamp.a)
-	cp -rp $(INCS) ./include/* ../../include
+	cp -p $(INCS) ../../include
+	( cd include && tar cf - --exclude=".svn" * | ( cd ../../../include; tar xf - ) )
 
 %.o: %.c $(INCS)
 	/usr/bin/gcc -Wall $(CINCS) $(CFLAGS) -c $< -o $@

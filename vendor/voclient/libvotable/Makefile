@@ -14,6 +14,7 @@ HERE      	:= $(shell /bin/pwd)
 BINDIR    	:= ../bin/
 LIBDIR    	:= ../lib/
 INCDIR    	:= ../include/
+IRAFINCDIR    	:= ../../../include/
 
 
 # secondary dependencies
@@ -25,7 +26,7 @@ SHAREDLIB 	= $(LIBDIR)/$(LIBBASE).so.$(VERSION)
 
 # includes, flags and libraries
 CC 	  	= gcc
-CINCS  	  	= -I$(INCDIR)  -I.
+CINCS  	  	= -I$(IRAFINCDIR)  -I$(INCDIR)  -I.
 ifeq  ($(PLATFORM), "Darwin")
     ifeq  ($(PLMACH), "x86_64")
 	CARCH	= -m64 -mmacosx-version-min=10.5
