@@ -82,6 +82,7 @@ echo -n "    Building XMLRPC-C libs ...."
 # was 32
 # was 38
   (chdir xmlrpc-c-1.16.29 ;  \
+    setenv PATH "${PATH}:${top}/bin/" ; \
     ./configure $opts  				 >& _spool ; \
     make clean 					>>& _spool ; \
     make 					>>& _spool ; \
