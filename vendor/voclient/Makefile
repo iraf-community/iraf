@@ -17,6 +17,7 @@ HERE      	:= $(shell /bin/pwd)
 BINDIR    	:= ../../bin/
 LIBDIR    	:= ../../lib/
 INCDIR    	:= ../../lib/
+URCFLAGS	:= $(CFLAGS)
 
 
 # includes, flags and libraries
@@ -24,15 +25,15 @@ CC 	  	= gcc
 CINCS  	  	= -I$(INCDIR) -I./
 ifeq  ($(PLATFORM), "Darwin")
     ifeq  ($(PLATFORM), "x86_64")
-        CARCH	= -m64 -mmacosx-version-min=10.5
+        CARCH	= -mmacosx-version-min=10.5
     else
-        CARCH	= -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
+        CARCH	= -arch i386 -mmacosx-version-min=10.4
     endif
 else
     CARCH	= 
 endif
 
-CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
+CFLAGS 		= $(URCFLAGS) -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 LIBS		= -lm -lc -lpthread
 
 

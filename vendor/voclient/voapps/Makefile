@@ -14,6 +14,7 @@ HERE            := $(shell /bin/pwd)
 BINDIR          := ../bin/
 LIBDIR          := ../lib/
 INCDIR          := ../include/
+URCFLAGS	:= $(CFLAGS)
 
 
 # secondary dependencies
@@ -33,24 +34,24 @@ CINCS           = -I$(INCDIR)  -I.
 
 ifeq ($(PLATFORM), "Darwin")
     ifeq  ($(PLMACH), "x86_64")
-        CARCH   = -m64 -mmacosx-version-min=10.5
+        CARCH   = -mmacosx-version-min=10.5
     else
-        CARCH   = -arch i386 -arch ppc -m32 -mmacosx-version-min=10.4
+        CARCH   = -arch i386 -mmacosx-version-min=10.4
     endif
 else
     CLIBS       = -lm -lc -lcurl -lpthread
     CARCH       =
 endif
 
-CLIBS           = -lm -lc -lcurl -lpthread -lm
-CFLAGS          = -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
+CLIBS           = -lm -lc -lcurl -lpthread -lm -lrt
+CFLAGS          = $(URCFLAGS) -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 
 
 
 
 # includes, flags and libraries
 CC 	    = gcc
-CINCS  	    = -I$(HERE) -I../ -I../include -L../ -L../lib/ -L../
+CINCS  	    = -I$(HERE) -I../ -I../include -L../ -L../lib/ -L../ -L$(HERE)/../../../bin/
 
 #F77 	    = g77
 F77 	    = gfortran
@@ -87,7 +88,7 @@ TARGETS	    = $(F77_TASKS) $(SPP_TASKS) $(C_TASKS)
 
 SRCS	    = $(C_SRCS) $(F77_SRCS) $(SPP_SRCS) 
 OBJS	    = $(C_OBJS) $(F77_OBJS) $(SPP_OBJS) 
-HOST_LIBS   = -lcurl -lcfitsio -lpthread -lm
+HOST_LIBS   = -lcurl -lcfitsio -lpthread -lm -lrt
 LIBS        = lib$(NAME).a -lVOTable -lVOClient -lsamp $(HOST_LIBS)
 
 

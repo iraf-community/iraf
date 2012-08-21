@@ -14,6 +14,7 @@ HERE      	:= $(shell /bin/pwd)
 BINDIR    	:= ../bin/
 LIBDIR    	:= ../lib/
 INCDIR    	:= ../include/
+URCFLAGS	:= $(CFLAGS)
 
 
 # secondary dependencies
@@ -28,9 +29,9 @@ CC              = gcc
 CINCS           = -I$(INCDIR)  -I.
 
 CLIBS		= -lm -lc -lcurl -lpthread
-CARCH		= -m64 -mmacosx-version-min=10.5
+CARCH		= -mmacosx-version-min=10.5
 
-CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
+CFLAGS 		= $(URCFLAGS) -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 
 
 

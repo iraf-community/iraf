@@ -8,6 +8,7 @@
 NAME     = xrpc
 VERSION  = 1.0
 HERE    := $(shell /bin/pwd)
+URCFLAGS	:= $(CFLAGS)
 
 
 # secondary dependencies
@@ -26,7 +27,7 @@ SHAREDLIB   = $(HERE)/$(LIBBASE).so.$(VERSION)
 # includes, flags and libraries
 CINCS   = -I./ -I./include -I../include -Ixmlrpc-c/lib/abyss/src
 #CFLAGS  = -O2 -m32 -g $(CINCS)
-CFLAGS  = -g -Wall $(CINCS)
+CFLAGS  = $(URCFLAGS) -g -Wall $(CINCS)
 
 
 # list of source and include files

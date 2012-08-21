@@ -15,6 +15,7 @@ PLATFORM  := $(shell uname -s)
 #PLATFORM  = MACOSX
 #PLATFORM  = CYGWIN
 HERE      := $(shell /bin/pwd)
+URCFLAGS	:= $(CFLAGS)
 
 
 # secondary dependencies
@@ -35,7 +36,7 @@ CC        = gcc
 CINCS     = -I$(HERE)
 #CFLAGS   = -O2 -DDEBUG -D$(PLATFORM)
 #CFLAGS    = -arch i386 -arch ppc -g -Wall -D$(PLATFORM)
-CFLAGS    = -g -Wall -D$(PLATFORM)
+CFLAGS    = $(URCFLAGS) -g -Wall -D$(PLATFORM)
 
 
 # list of source and include files

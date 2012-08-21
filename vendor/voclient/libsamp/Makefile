@@ -15,6 +15,7 @@ HERE      	:= $(shell /bin/pwd)
 BINDIR    	:= ../bin/
 LIBDIR    	:= ../lib/
 INCDIR    	:= ../include/
+URCFLAGS	:= $(CFLAGS)
 
 
 # secondary dependencies
@@ -30,9 +31,9 @@ CINCS           = -I$(INCDIR)  -I.
 
 ifeq ("$(PLATFORM)", "Darwin")
     ifeq  ("$(PLMACH)", "macintel")
-	CARCH	= -m64 -mmacosx-version-min=10.5
+	CARCH	= -mmacosx-version-min=10.5
     else
-        CARCH   = -arch i386 -m32 -mmacosx-version-min=10.4
+        CARCH   = -arch i386 -mmacosx-version-min=10.4
     endif
 else
     CLIBS       = -lm -lc -lpthread -lcurl
@@ -40,7 +41,7 @@ else
 endif
 
 CLIBS		= -lm -lc -lcurl -lpthread -lrt
-CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./ -L$(LIBDIR)
+CFLAGS 		= $(URCFLAGS) -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./ -L$(LIBDIR)
 
 
 

@@ -66,8 +66,8 @@ endif
 
 
 
-setenv CC 	"gcc -g -ggdb -O0"
-setenv CXX 	"g++ -g -ggdb -O0"
+setenv CC 	"gcc -g -ggdb -O0 $CFLAGS"    # JT: Ignores -m32 otherwise
+setenv CXX 	"g++ -g -ggdb -O0 $CXXFLAGS"
 
 if ($build_xmlrpc == 1) then
 
