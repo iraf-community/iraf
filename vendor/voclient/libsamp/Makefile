@@ -39,7 +39,7 @@ else
     CARCH       = -D$(PLATFORM)
 endif
 
-CLIBS		= -lm -lc -lcurl -lpthread
+CLIBS		= -lm -lc -lcurl -lpthread -lrt
 CFLAGS 		= -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./ -L$(LIBDIR)
 
 
