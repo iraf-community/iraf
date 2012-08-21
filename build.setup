@@ -25,21 +25,25 @@ switch ( $target )
 case Linux.32:
 	setenv IRAFARCH linux
 	setenv CFLAGS -m32
+	setenv CXXFLAGS -m32
 	breaksw
 
 case Linux.64:
 	setenv IRAFARCH linux64
 	setenv CFLAGS -m64
+	setenv CXXFLAGS -m64
 	breaksw
 
 case Darwin.64:
 	setenv IRAFARCH macintel
 	setenv CFLAGS -m64
+	setenv CXXFLAGS -m64
 	breaksw
 
 case Darwin.32:
 	setenv IRAFARCH macosx
 	setenv CFLAGS -m32 
+	setenv CXXFLAGS -m32 
 	breaksw
 
 default:
