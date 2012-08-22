@@ -163,7 +163,13 @@ case $system in
                 changequote([,])
                 # Test to see whether the C compiler accepts the "-arch"
                 # flags for building "universal" binaries (Apple XCode only):
-                C_UNIV_SWITCH="-arch i386 -arch x86_64"
+                C_UNIV_SWITCH=""
+                if echo $CFLAGS | grep "\-m32" > /dev/null; then
+                    C_UNIV_SWITCH="$C_UNIV_SWITCH -arch i386"
+                fi
+                if echo $CFLAGS | grep "\-m64" > /dev/null; then
+                    C_UNIV_SWITCH="$C_UNIV_SWITCH -arch x86_64"
+                fi
                 SAVE_CFLAGS="$CFLAGS"
                 CFLAGS="$CFLAGS $C_UNIV_SWITCH"
                 AC_MSG_CHECKING([whether $CC accepts $C_UNIV_SWITCH])

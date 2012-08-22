@@ -18,8 +18,8 @@
 # testprog targets. See also changes and comments in configure.in
 #
 
-prefix		= /iraf/iraf
-exec_prefix	= /iraf/iraf
+prefix		= /rtfproc/unified_release/ur_work/iraf
+exec_prefix	= /rtfproc/unified_release/ur_work/iraf
 DESTDIR		= 
 CFITSIO_PREFIX	= $(prefix)
 CFITSIO_LIB	= $(DESTDIR)$(exec_prefix)/bin
@@ -30,15 +30,15 @@ INSTALL_DIRS	= $(DESTDIR)${prefix} ${CFITSIO_LIB} ${CFITSIO_LIB}/pkgconfig ${CFI
 SHELL =		/bin/sh
 RANLIB =	ranlib
 CC =		gcc
-CFLAGS =	-g -O2 -arch i386 -arch x86_64 -Dg77Fortran -fPIC -fno-common
-FC =		gfortran
+CFLAGS =	-m32  -arch i386 -Dg77Fortran -fPIC -fno-common
+FC =		notfound
 LDFLAGS =	$(CFLAGS)
 DEFS =		-DPACKAGE_NAME=\"\" -DPACKAGE_TARNAME=\"\" -DPACKAGE_VERSION=\"\" -DPACKAGE_STRING=\"\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE_URL=\"\" -DSTDC_HEADERS=1 -DHAVE_SYS_TYPES_H=1 -DHAVE_SYS_STAT_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MEMORY_H=1 -DHAVE_STRINGS_H=1 -DHAVE_INTTYPES_H=1 -DHAVE_STDINT_H=1 -DHAVE_UNISTD_H=1 -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 -DHAVE_MATH_H=1 -DHAVE_LIMITS_H=1 -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -DHAVE_FTRUNCATE=1 -DHAVE_LONGLONG=1 -DHAVE_SHMEM_SERVICES=1 -DHAVE_UNION_SEMUN=1 -DHAVE_NET_SERVICES=1
 LIBS =		
 FLEX =		flex
 BISON =		bison
 
-SHLIB_LD =	gcc -dynamiclib -arch i386 -arch x86_64
+SHLIB_LD =	gcc -dynamiclib  -arch i386
 SHLIB_SUFFIX =	.dylib
 
 .c.o:
