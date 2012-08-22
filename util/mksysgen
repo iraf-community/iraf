@@ -60,6 +60,11 @@ cd $iraf/noao					# build NOAO package
 setenv noao $cwd/
 mkpkg -p noao |& tee -a spool
 
+NOTE vo
+
+cd $iraf/vo					# build VO package
+setenv vo $cwd/
+mkpkg -p vo |& tee -a spool
 
 NOTE 'end'
 
