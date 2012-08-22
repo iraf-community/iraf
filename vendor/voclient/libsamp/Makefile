@@ -35,12 +35,12 @@ ifeq ("$(PLATFORM)", "Darwin")
     else
         CARCH   = -arch i386 -mmacosx-version-min=10.4
     endif
+    CLIBS	= -lm -lc -lcurl -lpthread
 else
-    CLIBS       = -lm -lc -lpthread -lcurl
+    CLIBS	= -lm -lc -lcurl -lpthread -lrt
     CARCH       = -D$(PLATFORM)
 endif
 
-CLIBS		= -lm -lc -lcurl -lpthread -lrt
 CFLAGS 		= $(URCFLAGS) -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./ -L$(LIBDIR)
 
 
