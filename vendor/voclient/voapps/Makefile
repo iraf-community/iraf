@@ -32,18 +32,18 @@ SHAREDLIB   = $(HERE)/$(LIBBASE).so.$(VERSION)
 CC              = gcc
 CINCS           = -I$(INCDIR)  -I.
 
-ifeq ($(PLATFORM), "Darwin")
-    ifeq  ($(PLMACH), "x86_64")
+ifeq ("$(PLATFORM)", "Darwin")
+    ifeq  ("$(PLMACH)", "x86_64")
         CARCH   = -mmacosx-version-min=10.5
     else
         CARCH   = -arch i386 -mmacosx-version-min=10.4
     endif
-else
     CLIBS       = -lm -lc -lcurl -lpthread
+else
+    CLIBS       = -lm -lc -lcurl -lpthread -lrt
     CARCH       =
 endif
 
-CLIBS           = -lm -lc -lcurl -lpthread -lm -lrt
 CFLAGS          = $(URCFLAGS) -g -Wall $(CARCH) -D$(PLATFORM) $(CINCS) -L./
 
 
@@ -88,7 +88,11 @@ TARGETS	    = $(F77_TASKS) $(SPP_TASKS) $(C_TASKS)
 
 SRCS	    = $(C_SRCS) $(F77_SRCS) $(SPP_SRCS) 
 OBJS	    = $(C_OBJS) $(F77_OBJS) $(SPP_OBJS) 
-HOST_LIBS   = -lcurl -lcfitsio -lpthread -lm -lrt
+ifeq ("$(PLATFORM)", "Darwin")
+	HOST_LIBS   = -lcurl -lcfitsio -lpthread -lm
+else
+	HOST_LIBS   = -lcurl -lcfitsio -lpthread -lm -lrt
+endif
 LIBS        = lib$(NAME).a -lVOTable -lVOClient -lsamp $(HOST_LIBS)
 
 
