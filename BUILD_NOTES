@@ -13,3 +13,12 @@ build and build.x11iraf both source build.setup to get the correct environment
 BUILD_NOTES.early contains notes about how we got this to work.  It gives
 some insight into the procedure that ./build uses.
 
+--
+
+Outstanding problems or quirks:
+
+- When building VOPS, a number of object files from the ak/ subdirectory get
+  appended to libvops.a twice, producing a warning from libtool. Apparently
+  the build just appends more copies each time it is run, but this is thought
+  to be harmless.
+
