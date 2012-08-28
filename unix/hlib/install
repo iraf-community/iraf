@@ -1526,20 +1526,20 @@ cd $lbin
 
 rm -f cl ecl generic mkiraf mkpkg rmbin rmfiles rpp rtar sgidispatch wtar xc xpp xyacc
 
-ln -s $iraf/unix/hlib/cl.csh 			cl
-ln -s $iraf/unix/hlib/ecl.csh			ecl
-ln -s $iraf/unix/bin.$IRAFARCH/generic.e	generic
-ln -s $iraf/unix/bin.$IRAFARCH/mkiraf.csh	mkiraf
-ln -s $iraf/unix/bin.$IRAFARCH/mkpkg.e		mkpkg
-ln -s $iraf/unix/bin.$IRAFARCH/rmbin.e		rmbin
-ln -s $iraf/unix/bin.$IRAFARCH/rmfiles.e	rmfiles
-ln -s $iraf/unix/bin.$IRAFARCH/rpp.e		rpp
-ln -s $iraf/unix/bin.$IRAFARCH/rtar.e		rtar
-ln -s $iraf/unix/bin.$IRAFARCH/sgidispatch.e	sgidispatch
-ln -s $iraf/unix/bin.$IRAFARCH/wtar.e		wtar
-ln -s $iraf/unix/bin.$IRAFARCH/xc.e		xc
-ln -s $iraf/unix/bin.$IRAFARCH/xpp.e		xpp
-ln -s $iraf/unix/bin.$IRAFARCH/xyacc.e		xyacc
+ln -s ../unix/hlib/cl.csh 			cl
+ln -s ../unix/hlib/ecl.csh			ecl
+ln -s ../unix/bin.$IRAFARCH/generic.e		generic
+ln -s ../unix/bin.$IRAFARCH/mkiraf.csh		mkiraf
+ln -s ../unix/bin.$IRAFARCH/mkpkg.e		mkpkg
+ln -s ../unix/bin.$IRAFARCH/rmbin.e		rmbin
+ln -s ../unix/bin.$IRAFARCH/rmfiles.e		rmfiles
+ln -s ../unix/bin.$IRAFARCH/rpp.e		rpp
+ln -s ../unix/bin.$IRAFARCH/rtar.e		rtar
+ln -s ../unix/bin.$IRAFARCH/sgidispatch.e	sgidispatch
+ln -s ../unix/bin.$IRAFARCH/wtar.e		wtar
+ln -s ../unix/bin.$IRAFARCH/xc.e		xc
+ln -s ../unix/bin.$IRAFARCH/xpp.e		xpp
+ln -s ../unix/bin.$IRAFARCH/xyacc.e		xyacc
 
 
 # Establish the remaining symbolic links to shared libraries.
