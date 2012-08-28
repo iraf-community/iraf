@@ -67,7 +67,7 @@ if ($build_voclient == 1) then
     make 					>>& _spool ; \
     make install 				>>& _spool)
   # (chdir voclient ;  make clean			>>& _spool )
-  cp -a voclient/lib/libVO.a $top/bin
+  cp -p voclient/lib/libVO.a $top/bin/
   echo "done"
 
 endif
