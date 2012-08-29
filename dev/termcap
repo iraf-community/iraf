@@ -416,7 +416,7 @@ k4|selanar|selanar hirez 100xl:\
 # Default xterm, gd=xtermr, has status line in graphics window; see graphcap.
 # Note:  users preferring the status-line-in-text window model should change
 # this xtermr to an xtermjh.
-xterm|:am@:tc=xtermr:
+xterm|xterm-color|:am@:tc=xtermr:
 
 # Alternate xterm has status line in text window (see Joe Harrington entries
 # in graphcap).
