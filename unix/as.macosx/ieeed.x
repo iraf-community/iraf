@@ -51,7 +51,7 @@ be written, placed in AS, and referenced in the MKPKG special file list.
 define	IEEE_SWAP	IEEE_SWAP8
 define	BSWAP		bswap8
 define	NSWAP		8
-define	IOFF		1	# MACHDEP (normally 1, 2 on e.g. Intel)
+define	IOFF		2	# MACHDEP (normally 1, 2 on e.g. Intel)
 
 
 # IEEVPAK -- Convert an array in the native floating point format into an
@@ -75,7 +75,6 @@ begin
 	    else
 		call amovd (native, ieee, nelem)
 	} else {
-	    call ieee_sigmask()
 	    do i = 1, nelem
 		if (native[i] == native_NaN) {
 		    ieee(i) = ieee_NaN
@@ -86,7 +85,6 @@ begin
 	    # Byteswap if necessary.
 	    if (IEEE_SWAP == YES)
 		call BSWAP (ieee, 1, ieee, 1, nelem * NSWAP)
-	    call ieee_sigrestore()
 	}
 end
 
@@ -100,27 +98,30 @@ double	ieee[ARB]		#I input IEEE floating format array
 double	native[ARB]		#O output native floating format array
 int	nelem			#I number of floating point numbers
 
-int	expon, i
+int	expon, i, val
 double	fval
 int	ival[2]
 %	equivalence (fval, ival)
+int	iand32()
+%	equivalence (ival, val)
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
-
 	if (IEEE_SWAP == YES) {
 	    call BSWAP (ieee, 1, native, 1, nelem * NSWAP)
 	    if (mapin != NO) {
 		# Check for IEEE exceptional values and map NaN to the native
 		# NaN value, and denormalized numbers (zero exponent) to zero.
 
-		call ieee_sigmask()
 		do i = 1, nelem {
 		    fval = native[i]
-		    expon = and (ival[IOFF], NaNmask)
+		    if (SZ_INT == SZ_INT32)
+		        expon = and (ival[IOFF], NaNmask)
+		    else
+		        expon = iand32 (val, NaNmask)
 		    if (expon == 0) {
 			native[i] = 0
 		    } else if (expon == NaNmask) {
@@ -128,7 +129,6 @@ begin
 			nin = nin + 1
 		    }
 		}
-		call ieee_sigrestore()
 	    }
 	} else {
 	    if (mapin == NO)
@@ -137,10 +137,12 @@ begin
 		# Check for IEEE exceptional values and map NaN to the native
 		# NaN value, and denormalized numbers (zero exponent) to zero.
 
-		call ieee_sigmask()
 		do i = 1, nelem {
 		    fval = ieee[i]
-		    expon = and (ival[IOFF], NaNmask)
+		    if (SZ_INT == SZ_INT32)
+		        expon = and (ival[IOFF], NaNmask)
+		    else
+		        expon = iand32 (val, NaNmask)
 		    if (expon == 0) {
 			native[i] = 0
 		    } else if (expon == NaNmask) {
@@ -149,11 +151,8 @@ begin
 		    } else
 			native[i] = ieee[i]
 		}
-		call ieee_sigrestore()
 	    }
 	}
-
-
 end
 
 
@@ -168,14 +167,11 @@ int	mapin, mapout, nin, nout, NaNmask
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
 
 begin
-	if (mapout != NO) {
-	    call ieee_sigmask()
+	if (mapout != NO)
 	    if (x == native_NaN) {
 		x = ieee_NaN
 		nout = nout + 1
 	    }
-	    call ieee_sigrestore()
-	}
 	if (IEEE_SWAP == YES)
 	    call BSWAP (x, 1, x, 1, NSWAP)
 end
@@ -187,10 +183,12 @@ procedure ieeupkd (x)
 
 double	x			#U datum to be converted
 
-int	expon
+int	expon, val
 double	fval
 int	ival[2]
 %	equivalence (fval, ival)
+int	iand32()
+%	equivalence (val, ival)
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
@@ -204,16 +202,17 @@ begin
 	# value, and denormalized numbers (zero exponent) to zero.
 
 	if (mapin != NO) {
-	    call ieee_sigmask()
 	    fval = x
-	    expon = and (ival[IOFF], NaNmask)
+	    if (SZ_INT == SZ_INT32)
+	        expon = and (ival[IOFF], NaNmask)
+	    else
+	        expon = iand32 (val, NaNmask)
 	    if (expon == 0)
 		x = 0
 	    else if (expon == NaNmask) {
 	        x = native_NaN
 		nin = nin + 1
 	    }
-	    call ieee_sigrestore()
 	}
 end
 
@@ -330,26 +329,28 @@ int	inval				#I enable NaN mapping for input?
 int	outval				#I enable NaN mapping for output?
 
 # MACHDEP.
-double	fval
-int	ival[2]
+#$if (datatype == r)
+#%	real r_quiet_nan
+#$else
+#%	double precision d_quiet_nan
+#$endif
 
 double	native_NaN, ieee_NaN
 int	mapin, mapout, nin, nout, NaNmask
 common	/ieenand/ native_NaN, ieee_NaN, NaNmask, mapin, mapout, nin, nout
-
-%	equivalence (fval, ival)
-%	data	ival(1) / '7ff7ffff'x /, ival(2) /-1/
 
 begin
 	mapin = inval
 	mapout = outval
 
 	# MACHDEP.
-	if (mapout == YES)
-	    ieee_NaN = fval
+#	if (mapout == YES)
+#	$if (datatype == r)
+#%	    ieeenn = r_quiet_NaN()
+#	$else
+#%	    ieeenn = d_quiet_NaN()
+#	$endif
 
 	if (mapin == YES)
 	    NaNmask = 7FF00000X
 end
-
-
