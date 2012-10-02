@@ -97,7 +97,7 @@ cache   directory page type help
 if (access (".hushiraf"))
     menus = no
 else {
-    clear; type hlib$motd
+    type hlib$motd
 }
 
 
