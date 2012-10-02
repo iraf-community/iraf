@@ -6,8 +6,6 @@
 # IRAFARCH.  That means that all we need to do is recognize the
 # cl parameters that are not implemented by cl.e / ecl.e
 
-echo SH CL
-
 binary=ecl.e
 
 case "$1"
