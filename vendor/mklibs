@@ -38,9 +38,8 @@ if ($build_cfitsio == 1) then
     make install 				>>& _spool)
   (chdir cfitsio ;  make clean 			>>& _spool )
   echo "done"
-  echo "results in $cwd/$logpref.10.cfitsio"
-  mv _spool $logpref.10.cfitsio
-  if ( "$sm_logs" != "" ) cp $logpref.10.cfitsio $sm_logs
+  echo "results in $cwd/cfitsio/_spool"
+  if ( "$?sm_logs" ) cp cfitsio/_spool $sm_logs/$logpref.10.cfitsio
 
 
 endif
@@ -56,9 +55,8 @@ if ($build_readline == 1) then
   set	opts = "$gopts --bindir=../../bin --libdir=../../bin"
   (chdir readline ; mkpkg ; make clean 		 >& _spool)
   echo "done"
-  echo "results in $cwd/$logpref.20.readline"
-  mv _spool $logpref.20.readline
-  if ( "$sm_logs" != "" ) cp $logpref.20.readline $sm_logs
+  echo "results in $cwd/readline/_spool"
+  if ( "$?sm_logs" ) ln readline/_spool $sm_logs/$logpref.20.readline
 
 endif
 
@@ -77,8 +75,7 @@ if ($build_voclient == 1) then
   # (chdir voclient ;  make clean			>>& _spool )
   cp -p voclient/lib/libVO.a $top/bin/
   echo "done"
-  echo "results in $cwd/$logpref.30.voclient"
-  mv _spool $logpref.30.voclient
-  if ( "$sm_logs" != "" ) cp $logpref.30.voclient $sm_logs
+  echo "results in $cwd/voclient/_spool"
+  if ( "$sm_logs" != "" ) ln voclient/_spool $sm_logs/$logpref/30.voclient
 
 endif
