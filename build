@@ -30,26 +30,32 @@ cp $iraf/unix/boot/xyacc/yaccpar.x 		include/
 
 touch $iraf/extern/.zzsetenv.def
 
-( cd unix/f2c/src ; make -f makefile.u ; cp f2c $iraf/unix/bin.$IRAFARCH/f2c.e ) >& log.f2c
+( cd unix/f2c/src ; make -f makefile.u ; cp f2c $iraf/unix/bin.$IRAFARCH/f2c.e ) >& log.010.f2c
 if ( $status != 0 ) then
-	echo f2c compile failed - see log.f2c
+	echo f2c compile failed - see log.010.f2c
 	exit 1
 endif
 
-( cd unix/f2c/libf2c ; make -f makefile.u CFLAGS="$CFLAGS" ; cp f2c.h libf2c.a $iraf/unix/bin.$IRAFARCH/ ) >& log.libf2c
+if ( "$sm_logs" != "" ) cp log.010.f2c $sm_logs
+
+( cd unix/f2c/libf2c ; make -f makefile.u CFLAGS="$CFLAGS" ; cp f2c.h libf2c.a $iraf/unix/bin.$IRAFARCH/ ) >& log.020.libf2c
 if ( $status != 0 ) then
-	echo libf2c compile failed - see log.libf2c
+	echo libf2c compile failed - see log.020.libf2c
 	exit 1
 endif
+
+if ( "$sm_logs" != "" ) cp log.020.libf2c $sm_logs
 
 make $IRAFARCH 
 
 source $iraf/unix/hlib/irafuser.csh
 
 # this is all that "make sysgen" does
-util/mksysgen >& log.mksysgen
+util/mksysgen >& log.030.mksysgen
 
-tr -d '[\015]' < log.mksysgen | egrep -v -f mkpkg_patterns
+if ( "$sm_logs" != "" ) cp log.030.mksysgen $sm_logs
+
+tr -d '[\015]' < log.030.mksysgen | egrep -v -f mkpkg_patterns
 set st=$status
 
 exit $st
