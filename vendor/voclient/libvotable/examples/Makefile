@@ -160,7 +160,7 @@ votdump_f77:  votdump_f77.f
 $(STATICLIB): $(C_SRCS:%.c=Static/%.o)
 	/usr/bin/ar rv $@ $?
 Static/%.o: %.c $(C_INCS)
-	/usr/bin/gcc $(CINCS) $(CFLAGS) -c $< -o $@
+	gcc $(CINCS) $(CFLAGS) -c $< -o $@
 Static:
 	/bin/mkdir $@
 	chmod 777 $@
@@ -168,7 +168,7 @@ Static:
 $(SHAREDLIB): $(C_SRCS:%.c=Shared/%.o)
 	/usr/bin/ld -shared -o $@ $? -lc -ldl
 Shared/%.o: %.c $(C_INCS)
-	/usr/bin/gcc $(CINCS) $(CFLAGS) -fpic -shared -c $< -o $@
+	gcc $(CINCS) $(CFLAGS) -fpic -shared -c $< -o $@
 Shared:
 	/bin/mkdir $@
 	chmod 777 $@
