@@ -35,9 +35,9 @@ if ( "$sm_logs" != "" ) cp log.040.NOVOS-boot $sm_logs
 NOTE mklibs
 
 cd $iraf/vendor					# UR: build libs in vendor/
-./mklibs |& tee log.050.vendor
+./mklibs |& tee log.050.00.vendor
 
-if ( "$sm_logs" != "" ) cp log.050.vendor $sm_logs
+if ( "$sm_logs" != "" ) cp log.050.00.vendor $sm_logs
 
 NOTE mkpkg
 
