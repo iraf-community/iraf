@@ -77,6 +77,11 @@ endif
 ####################################################################
 if ($build_voclient == 1) then
 
+  # Some of the autoconfs in voclient/ ask gcc "which ld do you use?"
+  # When it answers, they explicitly call that ld, so they DON'T use
+  # our special hack that passes in some necessary compiler flags.
+  setenv LD gcc
+
   echo -n "    Building VO client ...."
   set	opts = "$gopts --bindir=$top/bin --libdir=$top/bin"
   (chdir voclient ;  \
