@@ -10,7 +10,7 @@ env | sort
 pwd
 
 # Record determination of IRAFARCH for later use by ur-sel-real,
-# ur-normalize etc. Also note that IRAF 2.15 now has a helper script
+# ur_normalize etc. Also note that IRAF 2.15 now has a helper script
 # hlib/irafarch.csh that we could use to figure out IRAFARCH above.
 if (! -e ur) then
     mkdir ur
@@ -23,7 +23,7 @@ rm -rf include ; mkdir include
 
 # cp $iraf/unix/hlib/libc/iraf.h  		include/
 # ln -s $iraf/unix/bin/f2c.h			include/
-ln -s ../unix/hlib/libc/iraf.h			include/  # ur-normalized copy
+ln -s ../unix/hlib/libc/iraf.h			include/  # ur_normalized copy
 ln -s ../unix/bin/f2c.h				include/  # relocatable link
 cp $iraf/unix/hlib/libc/vosproto.h 		include/
 cp $iraf/unix/boot/xyacc/yaccpar.x 		include/
