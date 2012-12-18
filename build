@@ -4,6 +4,9 @@
 #
 # This is a csh script because it uses stuff that comes with IRAF
 
+# try to force debugging 
+setenv XC_LFLAGS -g
+
 source build.setup
 
 env | sort
