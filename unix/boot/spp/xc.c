@@ -627,7 +627,10 @@ char	*argv[];
 			} else if (*ip == 'T') {
 			    noshsym = YES;
 			} else if (*ip == 's') {
+			    /*
+			    * comment this out. trying to suppress the destruction of debugging symbols.
 			    stripexe = YES;
+			    */
 			    goto passflag;
 			} else if (*ip == 'N') {
 			    /* "NFS" link option.  Generate the output temp
