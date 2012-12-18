@@ -78,7 +78,7 @@ n)
 	read termtype
 	;;
 y)
-	termtype=''
+	termtype='xterm'
 	;;
 esac
 
