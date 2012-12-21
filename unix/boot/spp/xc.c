@@ -782,6 +782,7 @@ passflag:		    mkobject = YES;
 	nargs = 0;
 	arglist[nargs++] = f77comp;
 	arglist[nargs++] = "-c";
+	arglist[nargs++] = "-g";
 	if (usef2c == YES) {
 	    arglist[nargs++] = "-f2c";
 	    arglist[nargs++] = f2cpath;
@@ -858,6 +859,7 @@ passflag:		    mkobject = YES;
 	nargs = 0;
 	arglist[nargs++] = f77comp;
 	arglist[nargs++] = "-c";
+	arglist[nargs++] = "-g";
 	arglist[nargs++] = "-u";
 	arglist[nargs++] = "-x";
 	if (usef2c == YES) {
@@ -946,6 +948,7 @@ passflag:		    mkobject = YES;
 	nargs = 0;
 	arglist[nargs++] = ccomp;
 	arglist[nargs++] = "-c";
+	arglist[nargs++] = "-g";
 
 #ifdef MACH64
 	arglist[nargs++] = "-DMACH64";		/* needed for zmain.c */
@@ -1053,6 +1056,7 @@ passflag:		    mkobject = YES;
 	 */
 	nargs = 0;
 	arglist[nargs++] = linker;
+	arglist[nargs++] = "-g";
 	if ((s = os_getenv("XC-LFLAGS")) || (s = os_getenv("XC_LFLAGS")))
 	    addflags (s, arglist, &nargs);
 
