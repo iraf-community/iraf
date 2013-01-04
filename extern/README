@@ -1,0 +1,36 @@
+This README file replaces the one originally inluded with IRAF 2.16.  The
+original README has been renamed to README.orig.
+
+IRAF 2.16 makes available a number of external packages that the can be
+installed by running "./configure", followed by "make package" for each desired
+package.  However, all of the external packages provided in the NOAO repository
+are included with Ureka, so this functionality has been removed.
+
+These external packages are included with Ureka:
+
+    adccdrom
+    cfh12k
+    ctio
+    deitab
+    esowfi
+    fitsutil
+    guiapps
+    mem0
+    mscdb
+    mscred
+    mtools
+    nfextern
+    optic
+    rvsao
+    song
+    sqiid
+    stecf
+    stsdas
+    tables
+    ucsclris
+    upsqiid
+    xdimsum
+
+There are some known bugs in the these packages.
+
+[TODO: more about bugs]
