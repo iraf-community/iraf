@@ -1,10 +1,8 @@
-This README file replaces the one originally inluded with IRAF 2.16.  The
+This README file replaces the one originally included with IRAF 2.16.  The
 original README has been renamed to README.orig.
 
-IRAF 2.16 makes available a number of external packages that the can be
-installed by running "./configure", followed by "make package" for each desired
-package.  However, all of the external packages provided in the NOAO repository
-are included with Ureka, so this functionality has been removed.
+All of the external packages provided in the NOAO repository are included with
+Ureka, so you do not need to run configure.
 
 These external packages are included with Ureka:
 
@@ -31,6 +29,29 @@ These external packages are included with Ureka:
     upsqiid
     xdimsum
 
-There are some known bugs in the these packages.
+There are some known bugs in the these packages.  The error/warning messages
+below are also present in the unmodified IRAF 2.16:
 
-[TODO: more about bugs]
+    ecl> mscdb
+    ERROR: task `mscdb' has no param file
+
+
+    optic> optichdr
+    ERROR: task `optichdr' has no param file
+
+    ecl> song
+    ERROR: task `rvx' not found
+      "rvx"
+         line 3: song$song.cl
+         called as: `song ()'
+
+    ecl> sqiid
+    ERROR: task `sqiid' has no param file
+
+    ecl> upsqiid
+    ERROR: task `iis' not found
+         called as: `cl ()'
+
+    ecl> upsqiid
+    ERROR: task `iis' not found
+         called as: `cl ()'
