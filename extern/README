@@ -35,7 +35,6 @@ below are also present in the unmodified IRAF 2.16:
     ecl> mscdb
     ERROR: task `mscdb' has no param file
 
-
     optic> optichdr
     ERROR: task `optichdr' has no param file
 
