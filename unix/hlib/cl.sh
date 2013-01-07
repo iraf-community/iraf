@@ -17,6 +17,8 @@ in
 -old|-o)
 	binary=cl.e
 	;;
+-vo)
+    binary=vocl.e
 esac
 
 
