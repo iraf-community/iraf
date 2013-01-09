@@ -12,7 +12,7 @@ relink:
 	$update	libpkg.a
 	$omake	x_ace.x
 	$link	x_ace.o libpkg.a -lds -lgsurfit -lcurfit -lxtools -liminterp\
-	    -ltbtables -o xx_ace.e
+	    -lntbtables -o xx_ace.e
 	;
 
 install:

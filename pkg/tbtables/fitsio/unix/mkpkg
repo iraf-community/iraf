@@ -1,11 +1,11 @@
 # FITSIO -- Update the system-dependent subroutines in the FITSIO library.
 
-$checkout libtbtables.a ../
-$update   libtbtables.a
-$checkin  libtbtables.a ../
+$checkout libntbtables.a ../
+$update   libntbtables.a
+$checkin  libntbtables.a ../
 $exit
 
-libtbtables.a:
+libntbtables.a:
 	ftpcbf.x
 	ftgcbf.x
 	;

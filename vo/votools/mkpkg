@@ -9,7 +9,7 @@ update:
 	;
 
 relink:
-	$set	LIBS = "-lasttools -lxtools -lstg -lds -ltbtables -lslalib"
+	$set	LIBS = "-lasttools -lxtools -lstg -lds -lntbtables -lslalib"
 
 	$update	libpkg.a
 	$omake	x_votools.x

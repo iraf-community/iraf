@@ -53,5 +53,5 @@ in mkpkg.  However, there may be new source files that contain functions
 that are called by functions that are called by the table I/O routines.
 If the link fails for the ttools package, find the source files containing
 the missing modules, and add these files to the list of dependents in mkpkg
-for libtbtables.a.  It may require more than one iteration to find all the
+for libntbtables.a.  It may require more than one iteration to find all the
 required source files.

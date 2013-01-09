@@ -7,9 +7,9 @@
 # 4 Dec 1997, added "$call generic" after "libtbtables.a" (Phil Hodge)
 # 26 Mar 1998, added tbcga.x and tbcnel.x (Phil Hodge).
 
-$checkout libtbtables.a ../
-$update libtbtables.a
-$checkin libtbtables.a ../
+$checkout libntbtables.a ../
+$update libntbtables.a
+$checkin libntbtables.a ../
 $exit
 
 generic:
@@ -21,7 +21,7 @@ generic:
         $endif
         ;
 
-libtbtables.a:
+libntbtables.a:
         $call generic
         @generic
 	omniread.x	<tbset.h>  <imhdr.h>  <imio.h>

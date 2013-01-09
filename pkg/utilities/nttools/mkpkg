@@ -37,7 +37,7 @@ install:
 nttools:
 linkonly:
 	$omake	x_nttools.x
-	$link	x_nttools.o libpkg.a -lxtools -ltbtables -o xx_nttools.e
+	$link	x_nttools.o libpkg.a -lxtools -lntbtables -o xx_nttools.e
 	;
 
 libpkg.a:

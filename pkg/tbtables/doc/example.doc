@@ -2,7 +2,7 @@
 opening an existing table, and creating a new table based on a template.
 The example can be compiled and linked using:
 
-xc -p tables test.x -ltbtables
+xc -p tables test.x -lntbtables
 
 You can use xc regardless of whether you are logged into the cl or not;
 it doesn't matter.

@@ -1,12 +1,12 @@
 # Update the generic routines in selector
 
 default:
-	$checkout libtbtables.a ../../
-	$update   libtbtables.a
-	$checkin  libtbtables.a ../../
+	$checkout libntbtables.a ../../
+	$update   libntbtables.a
+	$checkin  libntbtables.a ../../
 $exit
 
-libtbtables.a:
+libntbtables.a:
 	tcsrdaryb.x	../tcs.h
 	tcsrdaryc.x	../tcs.h
 	tcsrdaryd.x	../tcs.h

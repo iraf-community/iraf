@@ -12,7 +12,7 @@ update:
 	$call system
 	$call softools
 	$call xtools
-	$call tbtables
+	$call ntbtables
 	$call dataio
 	$call images
 	$call lists
@@ -77,7 +77,7 @@ xtools:
 	$echo "--------------------- XTOOLS ----------------------"
 	$call update@xtools
 	;
-tbtables:
-	$echo "--------------------- TBTABLES --------------------"
-	$call update@tbtables
+ntbtables:
+	$echo "--------------------- NTBTABLES --------------------"
+	$call update@ntbtables
 	;

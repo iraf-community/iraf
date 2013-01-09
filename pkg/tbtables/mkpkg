@@ -27,14 +27,14 @@
 
 
 update:
-        $checkout libtbtables.a lib$
-        $update   libtbtables.a
-        $checkin  libtbtables.a lib$
+        $checkout libntbtables.a lib$
+        $update   libntbtables.a
+        $checkin  libntbtables.a lib$
         $purge    lib$
         ;
 
 
-libtbtables.a:
+libntbtables.a:
 	$set XFLAGS 	= "-Inolibc $(XFLAGS)"
 
 	tbagt.x		<mach.h> <tbset.h> tbtables.h

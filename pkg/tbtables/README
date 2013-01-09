@@ -9,3 +9,17 @@ The top-level procedures are listed in calls.doc in the doc subdirectory.
 
 A description of the file format of a table is given by fileformat.doc in
 the doc subdirectory.
+
+In Ureka, the new core IRAF version of libtbtables.a has been renamed to
+libntbtables.a, to distinguish it from the libtbtables that is still bundled
+as part of STScI's TABLES package. Currently our code is not compatible with
+the modified library in the IRAF core and most external IRAF packages have
+likewise been tested against the original version. If you are compiling your
+own SPP code in Ureka with the TABLES libraries and want the behaviour to be
+identical to what you'd get with NOAO's IRAF 2.16 distribution, you can create
+the following symbolic link to get NOAO's libtbtables at compile time (not
+tested):
+
+  cd $UR_DIR/iraf/lib
+  ln -s libntbtables.a libtbtables.a
+

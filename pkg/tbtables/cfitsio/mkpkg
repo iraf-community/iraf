@@ -1,7 +1,7 @@
 # CFITSIO -- This IRAF mkpkg file updates the TBTABLES library to include
 # the CFITSIO interface.
 
-libtbtables.a:
+libntbtables.a:
 	$set XFLAGS = "-Inolibc $(XFLAGS)"
 	buffers.c	fitsio2.h fitsio.h longnam.h drvrsmem.h
 	cfileio.c	fitsio2.h fitsio.h longnam.h drvrsmem.h

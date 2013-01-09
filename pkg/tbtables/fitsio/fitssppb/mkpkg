@@ -1,13 +1,13 @@
 # FITSIO -- This IRAF mkpkg file updates the TBTABLES library to include
 # the FITSIO interface.
 
-tbtables:
-$checkout libtbtables.a ../
-$update libtbtables.a
-$checkin libtbtables.a ../
+ntbtables:
+$checkout libntbtables.a ../
+$update libntbtables.a
+$checkin libntbtables.a ../
 $exit
 
-libtbtables.a:
+libntbtables.a:
 	fsadef.x
 	fsarch.x
 	fsasfm.x
