@@ -52,6 +52,10 @@ default:
 
 endsw
 
+
+setenv CFLAGS "$CFLAGS -static-libgcc"
+
+
 # bin_directory is where we put the IRAF commands that would normally
 # be in /usr/local/bin
 set path = ( $iraf/bin_directory `echo $path | sed 's?/usr/local/bin??' ` )
