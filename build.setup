@@ -53,7 +53,7 @@ default:
 endsw
 
 
-setenv CFLAGS "$CFLAGS -static-libgcc"
+setenv XC-CFLAGS "-static-libgcc"
 
 
 # bin_directory is where we put the IRAF commands that would normally
