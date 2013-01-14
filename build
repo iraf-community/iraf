@@ -61,4 +61,10 @@ if ( "$sm_logs" != "" ) cp log.030.mksysgen $sm_logs
 tr -d '[\015]' < log.030.mksysgen | egrep -v -f mkpkg_patterns
 set st=$status
 
+
+# remove IRAF's libcfitsio.a to avoid conflict (duplicate symbols)
+rm $iraf/unix/bin.$IRAFARCH/libcfitsio.a
+st={$st}$?
+
+
 exit $st
