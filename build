@@ -5,8 +5,8 @@
 # This is a csh script because it uses stuff that comes with IRAF
 
 # try to force debugging 
-setenv XC_LFLAGS "-g -static -static-libgcc"
-
+setenv XC_LFLAGS "-g"
+#setenv XC_LFLAGS "-g -static -static-libgcc"
 
 source build.setup
 

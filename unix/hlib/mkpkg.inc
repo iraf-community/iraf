@@ -78,3 +78,6 @@ $end
 
 # Make xc pick up the copy of iraf.h in the local UR tree
 $set	XFLAGS		= "$(XFLAGS) -/I$(iraf)include"
+
+# Force xc to build things statically
+$setLFLAGS		= "$(LFLAGS) -static -static-libgcc"
