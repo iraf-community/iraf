@@ -4,8 +4,9 @@
 #
 # This is a csh script because it uses stuff that comes with IRAF
 
-# try to force debugging and build statically
-setenv XC_LFLAGS "-g -static -static-libgcc"
+# try to force debugging
+#   to build IRAF statically, add -static -static-libgcc to XC_LFLAGS
+setenv XC_LFLAGS "-g"
 
 source build.setup
 
@@ -61,10 +62,8 @@ if ( "$sm_logs" != "" ) cp log.030.mksysgen $sm_logs
 tr -d '[\015]' < log.030.mksysgen | egrep -v -f mkpkg_patterns
 set st=$status
 
-
 # remove IRAF's libcfitsio.a to avoid conflict (duplicate symbols)
-rm $iraf/unix/bin.$IRAFARCH/libcfitsio.a
-st={$st}$?
-
+#rm $iraf/unix/bin.$IRAFARCH/libcfitsio.a
+#st={$st}$?
 
 exit $st
