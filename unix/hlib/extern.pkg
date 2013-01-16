@@ -8,9 +8,10 @@
 
 # tasks delived by NOAO along with iraf:
 
-reset	helpdb	= "noao$lib/helpdb.mip"
 reset	noao		= iraf$noao/
 task	noao.pkg	= noao$noao.cl
+reset	helpdb		= "noao$lib/helpdb.mip"
+reset	aproposdb	= "noao$lib/apropos.db"
 
 reset	vo		= iraf$vo/
 task	vo.pkg		= vo$vo.cl
@@ -23,6 +24,7 @@ cl < UR_DIR_PKG$extern.pkg
 
 clpackage
 reset	helpdb		= ( envget("helpdb") + ",lib$helpdb.mip" )
+reset	aproposdb	= ( envget("aproposdb") + ",lib$apropos.db" )
 
 # have to say "keep" or it forgets
 
