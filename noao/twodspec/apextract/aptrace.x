@@ -174,6 +174,7 @@ int	nlines, col, col1, col2, line1, line2
 int	i, j, n, nx, ny, ntrace, istart, lost, fd
 real	yc, yc1
 pointer	co, data, sp, str, x, y, wts, gp, gt
+bool	l1l2init
 
 real	center1d(), ap_cveval()
 bool	ap_answer()
@@ -196,6 +197,7 @@ begin
 	nlines = 5 * cwidth
 	istart = (start - 1) / step + 1
 	ntrace = istart + (nx - start) / step
+	l1l2init = false
 
 	# Allocate memory for the traced positions and the weights for fitting.
 
@@ -235,10 +237,11 @@ begin
 		if (lost < nlost) {
 		    # Update the scrolling buffer if the feature center is less
 		    # than cwidth from the edge of the buffer.
-		    if (((yc-line1) < cwidth) || ((line2-yc) < cwidth)) {
+		    if (!l1l2init || ((yc-line1) < cwidth) || ((line2-yc) < cwidth)) {
 		        line1 = max (1, int (yc + .5 - nlines / 2))
 		        line2 = min (ny, line1 + nlines - 1)
 		        line1 = max (1, line2 - nlines + 1)
+		        l1l2init = true
 		    }
 
 		    # Sum columns to form the 1D vector for centering.
@@ -299,10 +302,11 @@ begin
 		    # Update the scrolling buffer if the feature center is less
 		    # than cwidth from the edge of the buffer.
 
-		    if (((yc-line1) < cwidth) || ((line2-yc) < cwidth)) {
+		    if (!l1l2init || ((yc-line1) < cwidth) || ((line2-yc) < cwidth)) {
 		        line1 = max (1, int (yc + .5 - nlines / 2))
 		        line2 = min (ny, line1 + nlines - 1)
 		        line1 = max (1, line2 - nlines + 1)
+		        l1l2init = true
 		    }
 
 		    # Sum columns to form the 1D vector for centering.
