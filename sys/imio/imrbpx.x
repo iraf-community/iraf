@@ -72,6 +72,7 @@ begin
 
 	btype = IM_VTYBNDRY(im)
 	imtyp = IM_PIXTYPE(im)
+	ncp = sz_pixel
 	op = 1
 
 	do i = 1, 3 {
@@ -99,7 +100,6 @@ begin
 		call imrdpx (im, obuf[op], npix, v1, step)
 	    else {
 		# Use constant or value of nearest boundary pixel.
-		ncp = sz_pixel
 		if (btype == BT_CONSTANT)
 		    call impakr (IM_OOBPIX(im), pixval, 1, IM_PIXTYPE(im))
 		else
