@@ -1,0 +1,27 @@
+#!/bin/sh
+# Based on the like-named script from STSDAS. Here we remove any NR-derived
+# source code for which we only have a written license to distribute binaries.
+#
+
+inlist=$1
+if [ ! -f "$inlist" ]; then
+    echo "$0: no such file \"$inlist\"" >&2
+    exit 1
+fi
+
+awk '{ print $1 }' < $inlist | (
+	while read f
+	do
+		egrep "^([#*][ \t]|/[*/])" $f > $f.doc  # keep just comments
+                echo "" >> $f.doc
+                echo "###  Proprietary source code removed  ###" >> $f.doc
+		if rm $f
+		then
+			:
+		else
+			# make it really hard to miss any problems
+			echo unable to remove $f >&2
+			exit 1
+		fi
+	done
+	)
