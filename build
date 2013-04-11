@@ -62,4 +62,15 @@ if ( "$sm_logs" != "" ) cp log.030.mksysgen $sm_logs
 tr -d '[\015]' < log.030.mksysgen | egrep -v -f mkpkg_patterns
 set st=$status
 
+# remove proprietary sources from list; ideally we'd do this only if the
+# build succeeds, but that's hard to determine very reliably above
+util/de_numrec local/numrec_list.txt >& log.150.de_numrec
+if ( $status != 0 ) then
+    echo de_numrec failed - see log.150.de_numrec
+    exit 1
+endif
+
+if ( "$sm_logs" != "" ) cp log.150.de_numrec $sm_logs
+
+
 exit $st
