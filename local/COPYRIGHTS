@@ -37,3 +37,9 @@ specifically:
     UCAR				For NCAR graphics
 
 
+QSORT (sys/lib/qsort.c, unix/os/zopdir.c) was developed by the University of
+California, Berkeley.
+
+For math/minpack: This product includes software developed by the University
+of Chicago, as operator of Argonne National Laboratory.
+
